@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">Linux_x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>go</RootNamespace>
+    <AssemblyName>Interface</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoStdLib>False</NoStdLib>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <OutputPath>bin\$(configuration)\$(Platform)</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <WarningLevel>4</WarningLevel>
+    <NoWin32Manifest>False</NoWin32Manifest>
+    <SignAssembly>false</SignAssembly>
+    <DelaySign>False</DelaySign>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <Optimize>False</Optimize>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <DebugType>Full</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'Win_x86' ">
+    <BaseAddress>4194304</BaseAddress>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>False</Prefer32Bit>
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <BaseAddress>4194304</BaseAddress>
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'Linux_x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <BaseAddress>4194304</BaseAddress>
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <Optimize>True</Optimize>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <DebugType>None</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Linux_x86' ">
+    <DefineConstants>TRACE;DEBUG;__linux__</DefineConstants>
+    <OutputPath>..\bin\Debug\Linux_x86</OutputPath>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Win_x86' ">
+    <DefineConstants>TRACE;DEBUG;_WIN32</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Linux_x86' ">
+    <DefineConstants>__linux__</DefineConstants>
+    <OutputPath>..\bin\Release\Linux_x86</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Win_x86' ">
+    <DefineConstants>_WIN32</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="src\Button.cs" />
+    <Compile Include="src\Colors.cs" />
+    <Compile Include="src\directories.cs" />
+    <Compile Include="src\enums.cs" />
+    <Compile Include="src\GroupBox.cs" />
+    <Compile Include="src\HorizontalStack.cs" />
+    <Compile Include="src\HorizontalWrappingWidget.cs" />
+    <Compile Include="src\Image.cs" />
+    <Compile Include="src\Label.cs" />
+    <Compile Include="src\Mouse.cs" />
+    <Compile Include="src\Panel.cs" />
+    <Compile Include="src\PanelWithTitle.cs" />
+    <Compile Include="src\Point.cs" />
+    <Compile Include="src\AssemblyInfo.cs" />
+    <Compile Include="src\Rectangle.cs" />
+    <Compile Include="src\Rectangles.cs" />
+    <Compile Include="src\ScrollingWidget.cs" />
+    <Compile Include="src\Size.cs" />
+    <Compile Include="src\Slider.cs" />
+    <Compile Include="src\Spinner.cs" />
+    <Compile Include="src\TextBox.cs" />
+    <Compile Include="src\GenericStack.cs" />
+    <Compile Include="src\VerticalStack.cs" />
+    <Compile Include="src\VerticalWrappingWidget.cs" />
+    <Compile Include="src\GraphicObject.cs" />
+    <Compile Include="src\Group.cs" />
+    <Compile Include="src\Container.cs" />
+    <Compile Include="src\Win32.cs" />
+    <Compile Include="src\WrappedWidgetGroup.cs" />
+    <Compile Include="src\Interface.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="lib\freetype6.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\intl.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\libcairo-2.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\libcairo-gobject-2.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\libcairo-script-interpreter-2.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\libexpat-1.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\libfontconfig-1.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\libpng14-14.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\zlib1.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="Mono.Cairo" />
+    <Reference Condition="'$(Platform)'=='Win_x86'" Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Condition="'$(Platform)'=='Win_x86'" Include="OpenTK.Compatibility, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\OpenTK.Compatibility.dll</HintPath>
+    </Reference>
+    <Reference Condition="'$(Platform)'=='Win_x86'" Include="OpenTK.GLControl, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\OpenTK.GLControl.dll</HintPath>
+    </Reference>
+    <Reference Condition="'$(Platform)'=='Linux_x86'" Include="OpenTK.Compatibility">
+      <HintPath>..\..\..\OpenTK\1.0\Binaries\OpenTK\Debug\OpenTK.Compatibility.dll</HintPath>
+    </Reference>
+    <Reference Condition="'$(Platform)'=='Linux_x86'" Include="OpenTK">
+      <HintPath>..\..\..\OpenTK\1.0\Binaries\OpenTK\Debug\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Condition="'$(Platform)'=='Linux_x86'" Include="OpenTK.GLControl">
+      <HintPath>..\..\..\OpenTK\1.0\Binaries\OpenTK\Debug\OpenTK.GLControl.dll</HintPath>
+    </Reference>
+    <Reference Condition="'$(Platform)'=='Linux_x86'" Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>False</Private>
+      <Package>gtk-sharp-2.0</Package>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup Condition="'$(Platform)'=='Linux_x86'">
+    <None Include="lib\libfb.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="lib\libgo.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Pointeurs\left_ptr.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+</Project>
