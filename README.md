@@ -18,4 +18,4 @@ It support transparency by default (compositing), but a faster lib with no trans
 Lots of debug have been made, i release the code, and will try to make it evolves and perhaps find new motivations with 
 contributors.
 
-
+I'll make a small example soon...
