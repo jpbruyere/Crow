@@ -46,11 +46,30 @@ namespace go
         {
             return new Point(i, i);
         }
-
+        public static Point operator /(Point p, int d)
+        {
+            return new Point(p.X / d, p.Y / d);
+        }
+        public static Point operator *(Point p, int d)
+        {
+            return new Point(p.X * d, p.Y * d);
+        }
+        public static Point operator /(Point p, double d)
+        {
+            return new Point((int)(p.X / d), (int)(p.Y / d));
+        }
+        public static Point operator *(Point p, double d)
+        {
+            return new Point((int)(p.X * d), (int)(p.Y * d));
+        }
         public static Point operator +(Point p1, Point p2)
         {
             return new Point(p1.X + p2.X, p1.Y + p2.Y);
         }
+		public static Point operator +(Point p, int i)
+		{
+			return new Point(p.X + i, p.Y + i);
+		}
         public static Point operator -(Point p1, Point p2)
         {
             return new Point(p1.X - p2.X, p1.Y - p2.Y);

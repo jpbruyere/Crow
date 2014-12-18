@@ -2,6 +2,9 @@ Win_x86
 
 Debug
 
-/*.sln
-
 /GOLib.suo
+/bin/*
+/obj/*
+/GOLib.userprefs
+/Tests/obj/*
+/Tests/bin/*

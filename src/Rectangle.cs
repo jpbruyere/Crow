@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace go
-{
-    //should try to change it to struct
-    public class Rectangle
+{    
+	public struct Rectangle
     {
-        int _x = 0;
-        int _y = 0;
-        int _width = 0;
-        int _height = 0;
+		#region private fields
+        int _x;
+        int _y;
+        int _width;
+        int _height;
+		#endregion
 
-        public Rectangle()
-        { }
+		#region ctor
         public Rectangle(Point p, Size s)
         {
             _x = p.X;
@@ -36,46 +35,58 @@ namespace go
             _width = width;
             _height = height;
         }
+		#endregion
 
+		#region PROPERTIES
+        [System.Xml.Serialization.XmlIgnore()]
         public int X
         {
             get { return _x; }
             set { _x = value; }
         }
+        [System.Xml.Serialization.XmlIgnore()]
         public int Y
         {
             get { return _y; }
             set { _y = value; }
         }
+        [System.Xml.Serialization.XmlAttributeAttribute()]
         public int Left
         {
             get { return _x; }
             set { _x = value; }
         }
+        [System.Xml.Serialization.XmlAttributeAttribute()]
         public int Top
         {
             get { return _y; }
             set { _y = value; }
         }
+
+        [System.Xml.Serialization.XmlIgnore()]
         public int Right
         {
             get { return _x + _width; }
         }
+        [System.Xml.Serialization.XmlIgnore()]
         public int Bottom
         {
             get { return _y + _height; }
         }
 
+        [System.Xml.Serialization.XmlAttributeAttribute()]
         public int Width
         {
             get { return _width; }
             set { _width = value; }
         }
+        [System.Xml.Serialization.XmlAttributeAttribute()]
         public int Height
         {
             get { return _height; }
             set { _height = value; }
         }
+        [System.Xml.Serialization.XmlIgnore()]
         public Size Size
         {
             get { return new Size(Width, Height); }
@@ -85,6 +96,17 @@ namespace go
                 Height = value.Height;
             }
         }
+		[System.Xml.Serialization.XmlIgnore()]
+		public Point Position
+		{
+			get { return new Point(X, Y); }
+			set
+			{
+				X = value.X;
+				Y = value.Y;
+			}
+		}
+        [System.Xml.Serialization.XmlIgnore()]
         public Point TopLeft
         {
             set
@@ -94,18 +116,29 @@ namespace go
             }
             get { return new Point(X, Y); }
         }
+        [System.Xml.Serialization.XmlIgnore()]
         public Point TopRight
         {
             get { return new Point(Right, Y); }
         }
+        [System.Xml.Serialization.XmlIgnore()]
         public Point BottomLeft
         {
             get { return new Point(X, Bottom); }
         }
+        [System.Xml.Serialization.XmlIgnore()]
         public Point BottomRight
         {
             get { return new Point(Right, Bottom); }
         }
+        [System.Xml.Serialization.XmlIgnore()]
+        public Point Center
+        {
+            get { return new Point(Left + Width / 2, Top + Height / 2); }
+        }
+		#endregion
+
+		#region FUNCTIONS
         public void Inflate(int xDelta, int yDelta)
         {
             this.X -= xDelta;
@@ -113,12 +146,16 @@ namespace go
             this.Y -= yDelta;
             this.Height += 2 * yDelta;
         }
-        public bool Contains(Point p)
+		public void Inflate(int delta)
+		{
+			Inflate (delta, delta);
+		}
+        public bool ContainsOrIsEqual(Point p)
         {
             return (p.X >= X && p.X <= X + Width && p.Y >= Y && p.Y <= Y + Height) ?
                 true : false;
         }
-        public bool Contains(Rectangle r)
+        public bool ContainsOrIsEqual(Rectangle r)
         {
             return r.TopLeft >= this.TopLeft && r.BottomRight <= this.BottomRight ? true : false;
         }
@@ -129,11 +166,8 @@ namespace go
             int maxTop = Math.Max(this.Top, r.Top);
             int minBottom = Math.Min(this.Bottom, r.Bottom);
 
-            if (maxLeft < minRight && maxTop < minBottom)
-                return true;
-
-            return false;
-
+			return (maxLeft < minRight) && (maxTop < minBottom) ?
+				true : false;
         }
         public Rectangle Intersection(Rectangle r)
         {
@@ -161,6 +195,9 @@ namespace go
 
             return result;
         }
+		#endregion
+
+        #region operators
         public static implicit operator Rectangle(System.Drawing.Rectangle r)
         {
             return new Rectangle(r.X, r.Y, r.Width, r.Height);
@@ -181,6 +218,10 @@ namespace go
             int y2 = Math.Max(r1.Bottom, r2.Bottom);
             return new Rectangle(x, y, x2 - x, y2 - y);
         }
+		public static Rectangle operator +(Rectangle r, Point p)
+		{
+			return new Rectangle(r.X + p.X, r.Y + p.Y, r.Width, r.Height);
+		}
         public static bool operator ==(Rectangle r1, Rectangle r2)
         {
             return r1.TopLeft == r2.TopLeft && r1.Size == r2.Size ? true : false;
@@ -189,6 +230,7 @@ namespace go
         {
             return r1.TopLeft == r2.TopLeft && r1.Size == r2.Size ? false : true;
         }
+        #endregion
 
         public RectanglesRelations test(Rectangle r)
         {
@@ -197,13 +239,13 @@ namespace go
 
             int nbrPtIncluded = 0;
 
-            if (this.Contains(r.TopLeft))
+            if (this.ContainsOrIsEqual(r.TopLeft))
                 nbrPtIncluded++;
-            if (this.Contains(r.TopRight))
+            if (this.ContainsOrIsEqual(r.TopRight))
                 nbrPtIncluded++;
-            if (this.Contains(r.BottomLeft))
+            if (this.ContainsOrIsEqual(r.BottomLeft))
                 nbrPtIncluded++;
-            if (this.Contains(r.BottomRight))
+            if (this.ContainsOrIsEqual(r.BottomRight))
                 nbrPtIncluded++;
 
             switch (nbrPtIncluded)
@@ -216,13 +258,7 @@ namespace go
                     return RectanglesRelations.Intersect;
             }
         }
-        public Rectangle Clone
-        {
-            get
-            {
-                return new Rectangle(X, Y, Width, Height);
-            }
-        }
+
         public static Rectangle Zero
         {
             get { return new Rectangle(0, 0, 0, 0); }
@@ -233,7 +269,16 @@ namespace go
         }
         public override string ToString()
         {
-            return string.Format("({0},{1},{2},{3})", X, Y, Width, Height);
+            return string.Format("{0};{1};{2};{3}", X, Y, Width, Height);
+        }
+        public static Rectangle Parse(string s)
+        {
+            string[] d = s.Split(new char[] { ';' });
+            return new Rectangle(
+                int.Parse(d[0]),
+                int.Parse(d[1]),
+                int.Parse(d[2]),
+                int.Parse(d[3]));
         }
     }
 

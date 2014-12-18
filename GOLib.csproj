@@ -3,13 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">Linux_x86</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>go</RootNamespace>
-    <AssemblyName>Interface</AssemblyName>
+    <AssemblyName>golib</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <NoStdLib>False</NoStdLib>
@@ -21,6 +19,8 @@
     <SignAssembly>false</SignAssembly>
     <DelaySign>False</DelaySign>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>False</Optimize>
@@ -54,83 +54,62 @@
     <DebugType>None</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Linux_x86' ">
-    <DefineConstants>TRACE;DEBUG;__linux__</DefineConstants>
-    <OutputPath>..\bin\Debug\Linux_x86</OutputPath>
+    <DefineConstants>TRACE;DEBUG;__linux__;DEBUG_CLIP_RECTANGLE</DefineConstants>
+    <OutputPath>bin\Linux_x86\Debug</OutputPath>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Win_x86' ">
     <DefineConstants>TRACE;DEBUG;_WIN32</DefineConstants>
+    <DebugType>none</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Linux_x86' ">
     <DefineConstants>__linux__</DefineConstants>
-    <OutputPath>..\bin\Release\Linux_x86</OutputPath>
+    <OutputPath>bin\Linux_x86\Release</OutputPath>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Win_x86' ">
     <DefineConstants>_WIN32</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>none</DebugType>
+    <OutputPath>bin\Debug</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="src\Button.cs" />
+    <Compile Include="src\EventSource.cs" />
     <Compile Include="src\Colors.cs" />
-    <Compile Include="src\directories.cs" />
-    <Compile Include="src\enums.cs" />
-    <Compile Include="src\GroupBox.cs" />
-    <Compile Include="src\HorizontalStack.cs" />
-    <Compile Include="src\HorizontalWrappingWidget.cs" />
-    <Compile Include="src\Image.cs" />
-    <Compile Include="src\Label.cs" />
     <Compile Include="src\Mouse.cs" />
-    <Compile Include="src\Panel.cs" />
-    <Compile Include="src\PanelWithTitle.cs" />
     <Compile Include="src\Point.cs" />
-    <Compile Include="src\AssemblyInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Rectangle.cs" />
     <Compile Include="src\Rectangles.cs" />
-    <Compile Include="src\ScrollingWidget.cs" />
     <Compile Include="src\Size.cs" />
-    <Compile Include="src\Slider.cs" />
-    <Compile Include="src\Spinner.cs" />
-    <Compile Include="src\TextBox.cs" />
-    <Compile Include="src\GenericStack.cs" />
-    <Compile Include="src\VerticalStack.cs" />
-    <Compile Include="src\VerticalWrappingWidget.cs" />
-    <Compile Include="src\GraphicObject.cs" />
-    <Compile Include="src\Group.cs" />
-    <Compile Include="src\Container.cs" />
-    <Compile Include="src\Win32.cs" />
-    <Compile Include="src\WrappedWidgetGroup.cs" />
-    <Compile Include="src\Interface.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="lib\freetype6.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lib\intl.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lib\libcairo-2.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lib\libcairo-gobject-2.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lib\libcairo-script-interpreter-2.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lib\libexpat-1.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lib\libfontconfig-1.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lib\libpng14-14.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lib\zlib1.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Compile Include="src\OpenTKGameWindow.cs" />
+    <Compile Include="src\GraphicObjects\GraphicObject.cs" />
+    <Compile Include="src\GraphicObjects\Container.cs" />
+    <Compile Include="src\GraphicObjects\Group.cs" />
+    <Compile Include="src\GraphicObjects\GroupBox.cs" />
+    <Compile Include="src\GraphicObjects\HorizontalStack.cs" />
+    <Compile Include="src\GraphicObjects\Image.cs" />
+    <Compile Include="src\GraphicObjects\Label.cs" />
+    <Compile Include="src\GraphicObjects\TextBox.cs" />
+    <Compile Include="src\GraphicObjects\ProgressBar.cs" />
+    <Compile Include="src\GraphicObjects\VerticalStack.cs" />
+    <Compile Include="src\Cairo\CairoHelpers.cs" />
+    <Compile Include="src\win32\Win32.cs" />
+    <Compile Include="src\win32\winApi.cs" />
+    <Compile Include="src\GraphicObjects\Button.cs" />
+    <Compile Include="src\GraphicObjects\GraduatedSlider.cs" />
+    <Compile Include="src\GraphicObjects\Slider.cs" />
+    <Compile Include="src\ValueChangeEventArgs.cs" />
+    <Compile Include="src\GraphicObjects\NumericControl.cs" />
+    <Compile Include="src\GraphicObjects\Scroller.cs" />
+    <Compile Include="src\GraphicObjects\ILayoutable.cs" />
+    <Compile Include="src\Enums.cs" />
+    <Compile Include="src\GraphicObjects\GenericStack.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -138,30 +117,12 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="Mono.Cairo" />
-    <Reference Condition="'$(Platform)'=='Win_x86'" Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\OpenTK.dll</HintPath>
+    <Reference Include="System.Xml" />
+    <Reference Include="OpenTK.Compatibility, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
+      <HintPath>dependencies\OpenTK.Compatibility.dll</HintPath>
     </Reference>
-    <Reference Condition="'$(Platform)'=='Win_x86'" Include="OpenTK.Compatibility, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\OpenTK.Compatibility.dll</HintPath>
-    </Reference>
-    <Reference Condition="'$(Platform)'=='Win_x86'" Include="OpenTK.GLControl, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\OpenTK.GLControl.dll</HintPath>
-    </Reference>
-    <Reference Condition="'$(Platform)'=='Linux_x86'" Include="OpenTK.Compatibility">
-      <HintPath>..\..\..\OpenTK\1.0\Binaries\OpenTK\Debug\OpenTK.Compatibility.dll</HintPath>
-    </Reference>
-    <Reference Condition="'$(Platform)'=='Linux_x86'" Include="OpenTK">
-      <HintPath>..\..\..\OpenTK\1.0\Binaries\OpenTK\Debug\OpenTK.dll</HintPath>
-    </Reference>
-    <Reference Condition="'$(Platform)'=='Linux_x86'" Include="OpenTK.GLControl">
-      <HintPath>..\..\..\OpenTK\1.0\Binaries\OpenTK\Debug\OpenTK.GLControl.dll</HintPath>
-    </Reference>
-    <Reference Condition="'$(Platform)'=='Linux_x86'" Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
-      <Private>False</Private>
-      <Package>gtk-sharp-2.0</Package>
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
+      <HintPath>dependencies\OpenTK.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -172,16 +133,18 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup Condition="'$(Platform)'=='Linux_x86'">
-    <None Include="lib\libfb.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="lib\libgo.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Pointeurs\left_ptr.png">
+  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="src\GraphicObjects\" />
+    <Folder Include="src\Cairo\" />
+    <Folder Include="src\win32\" />
+    <Folder Include="Images\" />
+    <Folder Include="Images\Icons\" />
+    <Folder Include="src\Shapes\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Icons\icon_alert.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup />
 </Project>

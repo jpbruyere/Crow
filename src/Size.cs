@@ -33,6 +33,10 @@ namespace go
         {
             return string.Format("({0},{1})", Width, Height);
         }
+		public static implicit operator Rectangle(Size s)
+		{
+			return new Rectangle (s);
+		}
         public static implicit operator Size(int i)
         {
             return new Size(i, i);
@@ -77,6 +81,14 @@ namespace go
 
             return false;
         }
+		public static bool operator <(Size s, int i)
+		{
+			return s.Width < i && s.Height < i ? true : false;
+		}
+		public static bool operator <=(Size s, int i)
+		{
+			return s.Width <= i && s.Height <= i ? true : false;
+		}
         public static bool operator <=(Size s1, Size s2)
         {
             if (s1.Width <= s2.Width && s1.Height <= s2.Height)
