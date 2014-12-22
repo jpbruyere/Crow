@@ -8,7 +8,8 @@ using System.Xml.Serialization;
 namespace go
 {
 	public class GraduatedSlider : Slider
-    {        
+    {     
+		#region CTOR
 		public GraduatedSlider() : base()
 		{}
 		public GraduatedSlider(double minimum, double maximum, double step)
@@ -19,9 +20,11 @@ namespace go
 			SmallIncrement = step;
 			LargeIncrement = step * 5;
         }
-		public override void DrawGraduations(Context gr, PointD pStart, PointD pEnd)
+		#endregion
+
+		protected override void DrawGraduations(Context gr, PointD pStart, PointD pEnd)
 		{
-			Rectangle r = clientBounds;
+			Rectangle r = ClientRectangle;
 			gr.Color = Foreground;
 
 			gr.LineWidth = 2;

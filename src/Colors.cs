@@ -12,36 +12,64 @@ namespace go
 {
 	public struct Color : IXmlSerializable
     {
+		#region CTOR
+		public Color(double _R, double _G, double _B, double _A)
+		{
+			A = _A.Clamp(0,1);
+			R = _R.Clamp(0,1);
+			G = _G.Clamp(0,1);
+			B = _B.Clamp(0,1);
+			Name = "";
+		}
+		internal Color(double _R, double _G, double _B, double _A, string _name)
+		{
+			A = _A;
+			R = _R;
+			G = _G;
+			B = _B;
+			Name = _name;
+			ColorDic.Add(this);
+		}        
+		#endregion
+
 		public static List<Color> ColorDic = new List<Color>();
 
         internal string Name;   
+
+		#region public fields
         public double A;
         public double R;
         public double G;
         public double B;        
+		#endregion
 
-        public Color(double _R, double _G, double _B, double _A)
-        {
-            A = _A.Clamp(0,1);
-            R = _R.Clamp(0,1);
-            G = _G.Clamp(0,1);
-            B = _B.Clamp(0,1);
-            Name = "";
-        }
-        internal Color(double _R, double _G, double _B, double _A, string _name)
-        {
-            A = _A;
-            R = _R;
-            G = _G;
-            B = _B;
-            Name = _name;
-            ColorDic.Add(this);
-        }        
-        
+		#region Operators
         public static implicit operator string(Color c)
         {
             return c.ToString();
         }
+		public static implicit operator Color(string s)
+		{
+			if (string.IsNullOrEmpty(s))
+				return White;
+
+			string[] c = s.Split(new char[] { ';' });
+
+			if (c.Length == 1)
+			{
+				foreach (Color cr in ColorDic)
+				{
+					if (cr.Name == s)
+						return cr;
+				}
+			}
+
+			return new Color(
+				double.Parse(c[0]),
+				double.Parse(c[1]),
+				double.Parse(c[2]),
+				double.Parse(c[3]));                    
+		}
 
         public static implicit operator System.Drawing.Color(Color c)
         {
@@ -55,6 +83,53 @@ namespace go
         {
             return new Cairo.Color(c.R, c.G, c.B, c.A);
         }
+
+		public static bool operator ==(Color left, Color right)
+		{
+			return left.A == right.A &&
+				left.R == right.R &&
+				left.G == right.G &&
+				left.B == right.B ? true : false;
+		}
+		public static bool operator !=(Color left, Color right)
+		{
+			return left.A == right.A &&
+				left.R == right.R &&
+				left.G == right.G &&
+				left.B == right.B ? false : true;
+
+		}
+		public static bool operator ==(Color c, string n)
+		{
+			return c.Name == n ? true : false;
+		}
+		public static bool operator !=(Color c, string n)
+		{
+			return c.Name == n ? false : true;
+		}
+		public static bool operator ==(string n, Color c)
+		{
+			return c.Name == n ? true : false;
+		}
+		public static bool operator !=(string n, Color c)
+		{
+			return c.Name == n ? false : true;
+		}
+		public static Color operator *(Color c, Double f)
+		{
+			return new Color(c.R,c.G,c.B,c.A * f);
+		}
+		public static Color operator +(Color c1, Color c2)
+		{
+			return new Color(c1.R + c2.R,c1.G + c2.G,c1.B + c2.B,c1.A + c2.A);
+		}
+		public static Color operator -(Color c1, Color c2)
+		{
+			return new Color(c1.R - c2.R,c1.G - c2.G,c1.B - c2.B,c1.A - c2.A);
+		}
+		#endregion
+
+
 		public float[] floatArray
 		{
 			get { return new float[]{ (float)R, (float)G, (float)B, (float)A }; }
@@ -63,45 +138,8 @@ namespace go
 		{
 			return new Color (this.R, this.G, this.B, _A);
 		}
-        public static bool operator ==(Color left, Color right)
-        {
-            return left.A == right.A &&
-                left.R == right.R &&
-                left.G == right.G &&
-                left.B == right.B ? true : false;
-        }
-        public static bool operator !=(Color left, Color right)
-        {
-            return left.A == right.A &&
-                left.R == right.R &&
-                left.G == right.G &&
-                left.B == right.B ? false : true;
-            
-        }
-        public static bool operator ==(Color c, string n)
-        {
-            return c.Name == n ? true : false;
-        }
-        public static bool operator !=(Color c, string n)
-        {
-            return c.Name == n ? false : true;
-        }
-        public static bool operator ==(string n, Color c)
-        {
-            return c.Name == n ? true : false;
-        }
-        public static bool operator !=(string n, Color c)
-        {
-            return c.Name == n ? false : true;
-        }
-		public static Color operator *(Color c, Double f)
-		{
-			return new Color(c.R,c.G,c.B,c.A * f);
-		}
-		public static Color operator +(Color c1, Color c2)
-		{
-			return new Color(c1.R + c2.R,c1.G+c2.G,c1.B+c2.B,c1.A + c2.A);
-		}
+
+		#region Predefined colors
         public static readonly Color Transparent = new Color(0, 0, 0, 0, "Transparent");
 		public static readonly Color Green = new Color(0, 1.0, 0, 1.0, "Green");
 		public static readonly Color AirForceBlueRaf = new Color(0.364705882352941,0.541176470588235,0.658823529411765,1.0,"AirForceBlueRaf");
@@ -969,47 +1007,10 @@ namespace go
 		public static readonly Color YellowRyb = new Color(0.996078431372549,0.996078431372549,0.2,1.0,"YellowRyb");
 		public static readonly Color Zaffre = new Color(0,0.0784313725490196,0.658823529411765,1.0,"Zaffre");
 		public static readonly Color ZinnwalditeBrown = new Color(0.172549019607843,0.0862745098039216,0.0313725490196078,1.0,"ZinnwalditeBrown");
-
-        public override string ToString()
-        {
-            if (!string.IsNullOrEmpty(Name))
-                return Name;
-
-            foreach (Color cr in ColorDic)
-            {
-                if (cr == this)
-                {
-                    Name = cr.Name;
-                    return cr.Name;
-                }
-            }
-
-            return string.Format("{0};{1};{2};{3}", R, G, B, A);
-        }
-
-        public static implicit operator Color(string s)
-        {
-            if (string.IsNullOrEmpty(s))
-                return White;
-
-            string[] c = s.Split(new char[] { ';' });
-
-            if (c.Length == 1)
-            {
-                foreach (Color cr in ColorDic)
-                {
-                    if (cr.Name == s)
-                        return cr;
-                }
-            }
-
-            return new Color(
-                double.Parse(c[0]),
-                double.Parse(c[1]),
-                double.Parse(c[2]),
-                double.Parse(c[3]));                    
-        }
-        public void ReadXml(System.Xml.XmlReader reader)
+		#endregion
+		        
+		#region IXmlSerializable
+		public void ReadXml(System.Xml.XmlReader reader)
         {
             string[] c = reader["Color"].Split(new char[] { ';' });
             A = double.Parse(c[0]);
@@ -1017,20 +1018,32 @@ namespace go
             G = double.Parse(c[2]);
             B = double.Parse(c[3]);
         }
-
         public void WriteXml(System.Xml.XmlWriter writer)
         {
-
             writer.WriteAttributeString("Color", this.ToString());
         }
-
         public System.Xml.Schema.XmlSchema GetSchema()
         {
             return null;
         }
+		#endregion
 
+		public override string ToString()
+		{
+			if (!string.IsNullOrEmpty(Name))
+				return Name;
 
+			foreach (Color cr in ColorDic)
+			{
+				if (cr == this)
+				{
+					Name = cr.Name;
+					return cr.Name;
+				}
+			}
 
+			return string.Format("{0};{1};{2};{3}", R, G, B, A);
+		}
 
         public static object Parse(string s)
         {

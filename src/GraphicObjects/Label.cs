@@ -5,17 +5,32 @@ using System.Text;
 using System.Diagnostics;
 using Cairo;
 using System.Text.RegularExpressions;
+using System.Xml.Serialization;
+using System.ComponentModel;
 
 namespace go
 {
     [Serializable]
     public class Label : GraphicObject
     {
+		#region CTOR
+		public Label()
+		{ 
+
+		}
+		public Label(string _text)
+			: base()
+		{
+			Text = _text;
+		}
+		#endregion
+
         //TODO:change protected to private
         
+		#region private and protected fields
 		protected string _text = "label";
-        Alignment _textAlignment = Alignment.LeftCenter;
-        int _fontSize = 12;
+        Alignment _textAlignment = Alignment.LeftCenter;        
+		Font _font;
 		bool _multiline = false;
 
         protected Rectangle rText;
@@ -23,41 +38,17 @@ namespace go
 		protected float heightRatio = 1f;
 		protected FontExtents fe;
 		protected TextExtents te;
+		#endregion
 
 		//public string FontFace = "MagicMedieval";
-		public string FontFace = "droid";
 
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(-1)]
-		public override int Width {
-			get { return base.Width; }
-			set { base.Width = value; }
-		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(-1)]
-		public override int Height {
-			get { return base.Height; }
-			set { base.Height = value; }
-		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(2)]
-		public virtual int Margin {
-			get { return base.Margin; }
-			set { base.Margin = value; }
-		}
-
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        [System.ComponentModel.DefaultValue(Alignment.LeftCenter)]
+        [XmlAttributeAttribute()][DefaultValue(Alignment.LeftCenter)]
 		public Alignment TextAlignment
         {
             get { return _textAlignment; }
             set { _textAlignment = value; }
         }
-
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+		[XmlAttributeAttribute()][DefaultValue("label")]
         public string Text
         {
             get { return _text; }
@@ -73,21 +64,12 @@ namespace go
                 _text = value;
             }
         }
-						
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(10)]
-		public int FontSize
-        {
-            get { return _fontSize; }
-            set
-            {
-                _fontSize = value;
-                registerForGraphicUpdate();
-            }
-        }
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(false)]
+		[XmlAttributeAttribute()][DefaultValue("droid,10")]
+		public Font Font {
+			get { return _font; }
+			set { _font = value; }
+		}
+		[XmlAttributeAttribute()][DefaultValue(false)]
 		public bool Multiline
 		{
 			get { return _multiline; }
@@ -97,26 +79,7 @@ namespace go
 				registerForGraphicUpdate();
 			}
 		}
-
-        public Label()
-        { 
-
-		}
-
-        public Label(string _text)
-            : base()
-        {
-			//updateFont();
-            Text = _text;
-        }
-
-        void updateFont()
-        {
-            //TextFont = new Font(fontFamily, fontSize, fontStyle, GraphicsUnit.Pixel);
-
-            bmp = null;
-        }
-			
+						
 		string[] getLines {
 			get {
 				return _multiline ?
@@ -125,7 +88,24 @@ namespace go
 			}
 		}
 
-        public override Size measureRawSize()
+		#region GraphicObject overrides
+		[XmlAttributeAttribute()][DefaultValue(-1)]
+		public override int Width {
+			get { return base.Width; }
+			set { base.Width = value; }
+		}
+		[XmlAttributeAttribute()][DefaultValue(-1)]
+		public override int Height {
+			get { return base.Height; }
+			set { base.Height = value; }
+		}
+		[XmlAttributeAttribute()][DefaultValue(2)]
+		public override int Margin {
+			get { return base.Margin; }
+			set { base.Margin = value; }
+		}
+
+		protected override Size measureRawSize()
         {
 			Size s;
 
@@ -138,8 +118,9 @@ namespace go
 			using (ImageSurface img = new ImageSurface (Format.Argb32, 1, 1)) {
 				using (Context gr = new Context (img)) {
 					//Cairo.FontFace cf = gr.GetContextFontFace ();
-					gr.SelectFontFace (FontFace, FontSlant.Normal, FontWeight.Normal);
-					gr.SetFontSize (FontSize);
+
+					gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+					gr.SetFontSize (Font.Size);
 
 					te = new TextExtents();
 
@@ -153,30 +134,29 @@ namespace go
 							te = tmp;
 					}
 					fe = gr.FontExtents;
-					s = new Size ((int)Math.Ceiling (te.XAdvance) + (BorderWidth + Margin) * 2, (int)Math.Ceiling (fe.Height) * lines.Length + (BorderWidth + Margin) * 2);
+					s = new Size ((int)Math.Ceiling (te.XAdvance) + Margin * 2, (int)Math.Ceiling (fe.Height) * lines.Length + Margin*2);
 				}
 			}
             return s;// +borderWidth;
         }
-		public override void onDraw (Context gr)
+		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
 			string[] lines = getLines;
 
-			gr.SelectFontFace(FontFace, FontSlant.Normal, FontWeight.Normal);
+			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+			gr.SetFontSize (Font.Size);
 
-			gr.LineWidth = BorderWidth;
 			gr.Antialias = Antialias.Subpixel;
 			//gr.FontOptions.Antialias = Antialias.Subpixel;
 			//gr.FontOptions.HintMetrics = HintMetrics.On;
-			gr.SetFontSize(FontSize);
 
 			rText = new Rectangle(new Point(0, 0),new Size((int)te.Width,(int)fe.Height * lines.Length));
 
 			widthRatio = 1f;
 			heightRatio = 1f;
 
-			Rectangle cb = clientBounds;
+			Rectangle cb = ClientRectangle;
 
 			//ignore text alignment if size to content = true
 			if (Bounds.Size < 0)
@@ -278,7 +258,7 @@ namespace go
 
 			gr.Color = Foreground;
 
-			gr.FontMatrix = new Matrix(widthRatio * FontSize, 0, 0, heightRatio * FontSize, 0, 0);
+			gr.FontMatrix = new Matrix(widthRatio * Font.Size, 0, 0, heightRatio * Font.Size, 0, 0);
 
 			for (int i = 0; i < lines.Length; i++) {
 				gr.MoveTo(rText.X, rText.Y + fe.Ascent + fe.Height * i);
@@ -290,5 +270,6 @@ namespace go
 			}						
 			gr.Fill();
 		}
+		#endregion
     }
 }

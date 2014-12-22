@@ -7,16 +7,18 @@ namespace go
 {
     public class Container : GraphicObject, IXmlSerializable
     {
-        public GraphicObject child;
+		#region CTOR
+		public Container()
+			: base()
+		{
+		}
+		public Container(Rectangle _bounds)
+			: base(_bounds)
+		{
+		}
+		#endregion
 
-        public Container()
-            : base()
-        {
-        }
-        public Container(Rectangle _bounds)
-            : base(_bounds)
-        {
-        }
+		public GraphicObject child;
 
         public T setChild<T>(T _child)
         {
@@ -31,6 +33,22 @@ namespace go
 
             return (T)_child;
         }
+
+		#region GraphicObject Overrides
+		[XmlIgnore]public override bool LayoutIsValid
+		{
+			get
+			{
+				if (!Visible)
+					return true;
+
+				return !base.LayoutIsValid || child == null ?
+					base.LayoutIsValid :
+					child.LayoutIsValid;
+			}
+			set { base.LayoutIsValid = value; }
+		}
+
 		public override GraphicObject FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)
@@ -45,28 +63,15 @@ namespace go
             if (child != null)
                 child.InvalidateLayout();
         }
-        public override bool LayoutIsValid
-        {
-            get
-            {
-                if (!Visible)
-                    return true;
-
-				return !base.LayoutIsValid || child == null ?
-					base.LayoutIsValid :
-					child.LayoutIsValid;
-            }
-			set { base.LayoutIsValid = value; }
-        }
-		public override Size measureRawSize ()
+		protected override Size measureRawSize ()
 		{
 			Size raw = Bounds.Size;
 
 			if (child != null) {
 				if (Bounds.Width < 0 && child.WIsValid)
-					raw.Width = child.Width + 2 * (Margin + BorderWidth);
+					raw.Width = child.Slot.Width + 2 * (Margin);
 				if (Bounds.Height < 0 && child.HIsValid)
-					raw.Height = child.Height + 2 * (Margin + BorderWidth);
+					raw.Height = child.Slot.Height + 2 * (Margin);
 			}
 
 			return raw;
@@ -88,36 +93,12 @@ namespace go
             {
 				if (!child.LayoutIsValid) {
 					child.UpdateLayout ();
-
-					if (!WIsValid) {
-						if (Width < 0 && child.WIsValid) {
-							Slot.Width = child.Slot.Width + 2 * Margin + 2 * BorderWidth;
-							WIsValid = true;
-						}
-					}
-					if (!HIsValid) {
-						if (Height < 0 && child.HIsValid) {
-							Slot.Height = child.Slot.Height + 2 * Margin + 2 * BorderWidth;
-							HIsValid = true;
-						}
-					}
 				}
             }
 
             if (LayoutIsValid)
                 registerForRedraw();
         }
-//		public override void onDraw (Cairo.Context gr)
-//		{
-//			base.onDraw (gr);
-//
-//			if (child == null)
-//				return;
-//			if (!child.Visible)
-//				return;
-//
-//			child.Paint (ref gr);
-//		}
 		public override Rectangle ContextCoordinates (Rectangle r)
 		{
 			return
@@ -151,6 +132,7 @@ namespace go
 
             ctx.Restore();            
         }
+		#endregion
 
 		#region Mouse handling
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)

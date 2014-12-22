@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace go
 {    
@@ -38,57 +39,37 @@ namespace go
 		#endregion
 
 		#region PROPERTIES
-        [System.Xml.Serialization.XmlIgnore()]
-        public int X
-        {
+        [XmlIgnore]public int X{
             get { return _x; }
             set { _x = value; }
         }
-        [System.Xml.Serialization.XmlIgnore()]
-        public int Y
-        {
+		[XmlIgnore]public int Y{
             get { return _y; }
             set { _y = value; }
         }
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int Left
-        {
+		[XmlIgnore]public int Left{
             get { return _x; }
             set { _x = value; }
         }
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int Top
-        {
+		[XmlIgnore]public int Top{
             get { return _y; }
             set { _y = value; }
         }
-
-        [System.Xml.Serialization.XmlIgnore()]
-        public int Right
-        {
+		[XmlIgnore]public int Right{
             get { return _x + _width; }
         }
-        [System.Xml.Serialization.XmlIgnore()]
-        public int Bottom
-        {
+		[XmlIgnore]public int Bottom{
             get { return _y + _height; }
         }
-
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int Width
-        {
+		[XmlIgnore]public int Width{
             get { return _width; }
             set { _width = value; }
         }
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int Height
-        {
+		[XmlIgnore]public int Height{
             get { return _height; }
             set { _height = value; }
         }
-        [System.Xml.Serialization.XmlIgnore()]
-        public Size Size
-        {
+		[XmlIgnore]public Size Size{
             get { return new Size(Width, Height); }
             set
             {
@@ -96,9 +77,7 @@ namespace go
                 Height = value.Height;
             }
         }
-		[System.Xml.Serialization.XmlIgnore()]
-		public Point Position
-		{
+		[XmlIgnore]public Point Position{
 			get { return new Point(X, Y); }
 			set
 			{
@@ -106,9 +85,7 @@ namespace go
 				Y = value.Y;
 			}
 		}
-        [System.Xml.Serialization.XmlIgnore()]
-        public Point TopLeft
-        {
+		[XmlIgnore]public Point TopLeft{
             set
             {
                 X = value.X;
@@ -116,23 +93,16 @@ namespace go
             }
             get { return new Point(X, Y); }
         }
-        [System.Xml.Serialization.XmlIgnore()]
-        public Point TopRight
-        {
+		[XmlIgnore]public Point TopRight{
             get { return new Point(Right, Y); }
         }
-        [System.Xml.Serialization.XmlIgnore()]
-        public Point BottomLeft
-        {
+		[XmlIgnore]public Point BottomLeft{
             get { return new Point(X, Bottom); }
         }
-        [System.Xml.Serialization.XmlIgnore()]
-        public Point BottomRight
-        {
+		[XmlIgnore]public Point BottomRight{
             get { return new Point(Right, Bottom); }
         }
-        [System.Xml.Serialization.XmlIgnore()]
-        public Point Center
+		[XmlIgnore]public Point Center
         {
             get { return new Point(Left + Width / 2, Top + Height / 2); }
         }

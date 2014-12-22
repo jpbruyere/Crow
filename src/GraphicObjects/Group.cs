@@ -12,25 +12,25 @@ namespace go
 {
 	public class Group : GraphicObject, IXmlSerializable
     {
+		#region CTOR
+		public Group()
+			: base()
+		{            
+		}
+		#endregion
+
         bool _multiSelect = false;
 
         public GraphicObject activeWidget;
-
         public List<GraphicObject> Children = new List<GraphicObject>();
 
-		[XmlAttributeAttribute()]
-        [DefaultValue(false)]
+		[XmlAttributeAttribute()][DefaultValue(false)]
         public bool MultiSelect
         {
             get { return _multiSelect; }
             set { _multiSelect = value; }
         }
 			
-
-        public Group()
-            : base()
-        {            
-        }
 			
         public virtual T addChild<T>(T child)
         {
@@ -46,17 +46,31 @@ namespace go
             child.Parent = null;
             LayoutIsValid = false;
         }
+		public void putWidgetOnTop(GraphicObject w)
+		{
+			if (Children.Contains(w))
+			{
+				Children.Remove(w);
+				Children.Add(w);
+			}
+		}
+		public void putWidgetOnBottom(GraphicObject w)
+		{
+			if (Children.Contains(w))
+			{
+				Children.Remove(w);
+				Children.Insert(0, w);
+			}
+		}
 			
 		#region GraphicObject overrides
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(true)]//overiden to get default to true
+		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
 		public override bool Focusable
 		{
 			get { return base.Focusable; }
 			set { base.Focusable = value; }
 		}
-		[XmlIgnore]
-		public override bool DrawingIsValid {
+		[XmlIgnore]public override bool DrawingIsValid {
 			get {
 				if (!base.DrawingIsValid)
 					return false;
@@ -67,8 +81,7 @@ namespace go
 				return true;
 			}
 		}
-		[XmlIgnore]
-		public override bool LayoutIsValid
+		[XmlIgnore]public override bool LayoutIsValid
 		{
 			get
 			{
@@ -107,7 +120,7 @@ namespace go
 			foreach (GraphicObject w in Children)
 				w.InvalidateLayout();
 		}
-		public override Size measureRawSize ()
+		protected override Size measureRawSize ()
 		{
 			Size raw = Bounds.Size;
 			Size tmp = new Size ();
@@ -131,9 +144,9 @@ namespace go
 			}
 
 			if (raw.Width < 0)
-				tmp.Width += 2*(BorderWidth+Margin);
+				tmp.Width += 2*Margin;
 			if (raw.Height < 0)
-				tmp.Height += 2*(BorderWidth+Margin);
+				tmp.Height += 2*Margin;
 
 			return tmp;
 		}
@@ -169,7 +182,7 @@ namespace go
 			return r + ClientRectangle.Position;
 		}	
 
-		public override void onDraw (Context gr)
+		protected override void onDraw (Context gr)
 		{
 			Rectangle rBack = new Rectangle (Slot.Size);
 			gr.Color = Background;
@@ -183,7 +196,7 @@ namespace go
 
 		public override void Paint(ref Context ctx, Rectangles clip = null)
 		{
-			if ( !(Visible & LayoutIsValid) )
+			if ( !(Visible&LayoutIsValid) )
 				return;
 
 			//			ctx.Save ();
@@ -251,23 +264,6 @@ namespace go
 			base.onMouseMove (sender, e);
 		}
 		#endregion
-
-        public void putWidgetOnTop(GraphicObject w)
-        {
-            if (Children.Contains(w))
-            {
-                Children.Remove(w);
-                Children.Add(w);
-            }
-        }
-        public void putWidgetOnBottom(GraphicObject w)
-        {
-            if (Children.Contains(w))
-            {
-                Children.Remove(w);
-                Children.Insert(0, w);
-            }
-        }
 			        
         public override string ToString()
         {

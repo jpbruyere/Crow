@@ -10,57 +10,56 @@ namespace go
 {
     public class GenericStack : Group
     {
-        int currentXForWidget = 0;
-        int currentYForWidget = 0;
+		#region CTOR
+		public GenericStack()
+			: base()
+		{            
+		}
+		#endregion
+
+		#region Private fields
 		bool childrenArePositionned = false;
-        int _widgetSpacing;
+        int _spacing;
         Orientation _orientation;
+		#endregion
 
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(-1)]
-		public override int Width {
-			get { return base.Width; }
-			set { base.Width = value; }
-		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(-1)]
-		public override int Height {
-			get { return base.Height; }
-			set { base.Height = value; }
-		}
-
-        [XmlAttributeAttribute()]
-        [DefaultValue(2)]
-        public int WidgetSpacing
+		#region Public Properties
+        [XmlAttributeAttribute()][DefaultValue(2)]
+        public int Spacing
         {
-            get { return _widgetSpacing; }
-            set { _widgetSpacing = value; }
+			get { return _spacing; }
+            set { _spacing = value; }
         }
-
-        [XmlAttributeAttribute()]
-        [DefaultValue(Orientation.Horizontal)]
+        [XmlAttributeAttribute()][DefaultValue(Orientation.Horizontal)]
         public virtual Orientation Orientation
         {
             get { return _orientation; }
             set { _orientation = value; }
         }
+		#endregion
 
-        public GenericStack()
-            : base()
-        {            
-        }
-
-		public override bool LayoutIsValid {
+		#region GraphicObject Overrides
+		[XmlAttributeAttribute()][DefaultValue(-1)]
+		public override int Width {
+			get { return base.Width; }
+			set { base.Width = value; }
+		}
+		[XmlAttributeAttribute()][DefaultValue(-1)]
+		public override int Height {
+			get { return base.Height; }
+			set { base.Height = value; }
+		}
+		[XmlIgnore]public override bool LayoutIsValid {
 			get { return childrenArePositionned && base.LayoutIsValid; }
 			set { base.LayoutIsValid = value; }
 		}
+
 		public override void InvalidateLayout ()
 		{
 			childrenArePositionned = false;
 			base.InvalidateLayout ();
 		}
-		public override Size measureRawSize ()
+		protected override Size measureRawSize ()
 		{
 			Size raw = Bounds.Size;
 			Size tmp = new Size ();
@@ -72,7 +71,7 @@ namespace go
 				if (raw.Width < 0) {
 					if (c.WIsValid) {
 						if (Orientation == Orientation.Horizontal && c.Bounds.Width != 0)
-							tmp.Width += c.Slot.Width + WidgetSpacing;
+							tmp.Width += c.Slot.Width + Spacing;
 						else
 							tmp.Width = Math.Max (tmp.Width, c.Slot.Right);
 					}else
@@ -81,7 +80,7 @@ namespace go
 				if (raw.Height < 0) {
 					if (c.HIsValid) {
 						if (Orientation == Orientation.Vertical && c.Bounds.Height != 0)
-							tmp.Height += c.Slot.Height + WidgetSpacing;
+							tmp.Height += c.Slot.Height + Spacing;
 						else
 							tmp.Height = Math.Max (tmp.Height, c.Slot.Bottom);
 					}else
@@ -90,9 +89,9 @@ namespace go
 			}
 
 			if (raw.Width < 0)
-				tmp.Width += 2*(BorderWidth+Margin);
+				tmp.Width += 2*Margin;
 			if (raw.Height < 0)
-				tmp.Height += 2*(BorderWidth+Margin);
+				tmp.Height += 2*Margin;
 
 			return tmp;
 		}
@@ -106,7 +105,7 @@ namespace go
 
 					c.Slot.X = d;
 					c.XIsValid = true;
-					d += c.Slot.Width + WidgetSpacing;
+					d += c.Slot.Width + Spacing;
 				}
 			} else {
 				foreach (GraphicObject c in Children) {
@@ -115,7 +114,7 @@ namespace go
 
 					c.Slot.Y = d;
 					c.YIsValid = true;
-					d += c.Slot.Height + WidgetSpacing;
+					d += c.Slot.Height + Spacing;
 				}
 			}
 			childrenArePositionned = true;
@@ -130,7 +129,9 @@ namespace go
             if (LayoutIsValid)
                 registerForRedraw();
         }
-//
+		#endregion
+
+		//
 //        bool enoughtSpaceForWidget(GraphicObject w)
 //        {
 //            if (!SizeToContent)
@@ -144,9 +145,9 @@ namespace go
 //                    nextYForWidget = nextYForWidget + w.Slot.Height;
 //
 //
-//                if (nextXForWidget > clientBounds.Right )
+//                if (nextXForWidget > ClientRectangle.Right )
 //                    return false;
-//                if (currentYForWidget > clientBounds.Bottom )
+//                if (currentYForWidget > ClientRectangle.Bottom )
 //                    return false;
 //            }
 //            return true;
@@ -159,5 +160,6 @@ namespace go
 //                currentYForWidget = currentYForWidget + WidgetSpacing + w.Slot.Height;
 //
 //        }
-    }
+    
+	}
 }

@@ -2,15 +2,13 @@
 
 namespace go
 {
-	public class ValueChangeEventArgs: EventArgs
+	public class TextChangeEventArgs: EventArgs
 	{
-		public Decimal OldValue;
-		public Decimal NewValue;
+		public String Text;
 
-		public ValueChangeEventArgs (Decimal _oldValue, Decimal _newValue) : base()
+		public TextChangeEventArgs (string _newValue) : base()
 		{
-			OldValue = _oldValue;
-			NewValue = _newValue;
+			Text = _newValue;
 		}
 	}
 }

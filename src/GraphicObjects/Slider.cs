@@ -4,35 +4,32 @@ using System.Linq;
 using System.Text;
 using Cairo;
 using System.Xml.Serialization;
+using System.ComponentModel;
 
 namespace go
 {
 	public class Slider : NumericControl
     {
+		#region CTOR
+		public Slider() : base()
+		{}
+		public Slider(double minimum, double maximum, double step)
+			: base(minimum,maximum,step)
+		{
+		}
+		#endregion
+
+		#region private fields
         Rectangle cursor;
 		int _cursorWidth;
 		Color _cursorColor;
-		//Point mouseDownPos;
-		bool holdCursor = false;//may use maybe active go equality
+		bool holdCursor = false;
+		#endregion
 
 		protected double unity;
 
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue("Gray")]
-		public override Color Background {
-			get { return base.Background; }
-			set { base.Background = value; }
-		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(2)]
-		public override int BorderWidth {
-			get { return base.BorderWidth; }
-			set { base.BorderWidth = value; }
-		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue("BlueGray")]
+		#region Public properties
+		[XmlAttributeAttribute()][DefaultValue("BlueGray")]
 		public virtual Color CursorColor {
 			get { return _cursorColor; }
 			set {
@@ -40,9 +37,7 @@ namespace go
 				registerForGraphicUpdate ();
 			}
 		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(20)]
+		[XmlAttributeAttribute()][DefaultValue(20)]
 		public virtual int CursorWidth {
 			get { return _cursorWidth; }
 			set {
@@ -50,27 +45,61 @@ namespace go
 				registerForGraphicUpdate ();
 			}
 		}
+		#endregion
 
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(true)]
+		#region GraphicObject Overrides
+		[XmlAttributeAttribute()][DefaultValue("Gray")]
+		public override Color Background {
+			get { return base.Background; }
+			set { base.Background = value; }
+		}
+		[XmlAttributeAttribute()][DefaultValue(true)]
 		public override bool Focusable
 		{
 			get { return base.Focusable; }
 			set { base.Focusable = value; }
 		}
+		protected override void UpdateGraphic ()
+		{
+			computeCursorPosition();
+			base.UpdateGraphic ();
+		}
 
+		protected override void onDraw (Context gr)
+		{
+			base.onDraw (gr);
 
-        
-		public Slider() : base()
-		{}
-		public Slider(double minimum, double maximum, double step)
-			: base(minimum,maximum,step)
-        {
-        }
+			Rectangle r = ClientRectangle;
+			PointD pStart = r.TopLeft + new Point(cursor.Width/2, r.Height / 2);
+			PointD pEnd = r.TopRight + new Point(-cursor.Width/2, r.Height / 2);
+
+			DrawGraduations (gr, pStart,pEnd);
+
+			DrawCursor (gr, cursor);
+		}
+		#endregion
+
+		protected virtual void DrawGraduations(Context gr, PointD pStart, PointD pEnd)
+		{
+			gr.Color = Foreground;
+
+			gr.LineWidth = 1;
+			gr.MoveTo(pStart);
+			gr.LineTo(pEnd);
+
+			gr.Stroke();
+
+		}
+		protected virtual void DrawCursor(Context gr, Rectangle _cursor)
+		{
+			gr.Color = CursorColor;
+			CairoHelpers.CairoRectangle (gr, _cursor, CornerRadius);
+			gr.FillPreserve();
+		}
 
         void computeCursorPosition()
         {            
-            Rectangle r = clientBounds;
+            Rectangle r = ClientRectangle;
 
 			cursor = new Rectangle(new Size(_cursorWidth,(int) (r.Height)));
 
@@ -113,44 +142,5 @@ namespace go
 
 		}
 		#endregion
-
-		internal override void UpdateGraphic ()
-		{
-			computeCursorPosition();
-			base.UpdateGraphic ();
-		}
-
-		public override void onDraw (Context gr)
-		{
-			base.onDraw (gr);
-
-			Rectangle r = clientBounds;
-			PointD pStart = r.TopLeft + new Point(cursor.Width/2, r.Height / 2);
-			PointD pEnd = r.TopRight + new Point(-cursor.Width/2, r.Height / 2);
-
-			DrawGraduations (gr, pStart,pEnd);
-
-			DrawCursor (gr, cursor);
-		}
-
-		public virtual void DrawGraduations(Context gr, PointD pStart, PointD pEnd)
-		{
-			gr.Color = Foreground;
-
-			gr.LineWidth = 1;
-			gr.MoveTo(pStart);
-			gr.LineTo(pEnd);
-
-			gr.Stroke();
-
-		}
-		public virtual void DrawCursor(Context gr, Rectangle _cursor)
-		{
-			gr.Color = CursorColor;
-			CairoHelpers.CairoRectangle (gr, _cursor, CornerRadius);
-			gr.FillPreserve();
-			gr.Color = BorderColor;
-			gr.Stroke ();
-		}
     }
 }

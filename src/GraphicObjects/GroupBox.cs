@@ -1,20 +1,32 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Cairo;
-using System.Xml.Serialization;
 using System.ComponentModel;
+using System.Text;
+using System.Xml.Serialization;
+using Cairo;
 
 namespace go
 {
 
-    public class GroupBox : Container
+	public class GroupBox : Border
     {
-        string _title;
-        int _fontSize = 10;
+		#region CTOR
+		public GroupBox() : base (){
+		}
+		public GroupBox(string _title = "GroupBox")
+			: base()
+		{
+			Text = _title;            
+		}
+		#endregion
 
-        [XmlAttributeAttribute]
-        [DefaultValue("GroupBox")]
+		#region private fields
+        string _title;
+		Font _font;
+		#endregion
+
+		#region public properties
+        [XmlAttributeAttribute][DefaultValue("GroupBox")]
         public string Text
         {
             get { return _title; }
@@ -23,82 +35,68 @@ namespace go
                 _title = value;
                 registerForGraphicUpdate();
             }
-        }
-        
-        [XmlAttributeAttribute]
-        [DefaultValue(10)]
-        public int fontSize
-        {
-            get { return _fontSize; }
-            set
-            {
-                _fontSize = value;
-                registerForGraphicUpdate();
-            }
-        }
+        }        
+		[XmlAttributeAttribute()][DefaultValue("droid,12")]
+		public Font Font {
+			get { return _font; }
+			set { _font = value; }
+		}
+		#endregion
 
-        public Size titleSize()
-        {
+        Size titleSize {
+			get {
 #if _WIN32 || _WIN64
             byte[] txt = System.Text.UTF8Encoding.UTF8.GetBytes(_title);
 #endif
 
-            Size s;
+				Size s;
 
-			using (ImageSurface img = new ImageSurface (Format.Argb32, 1, 1)) {
-				using (Context gr = new Context (img)) {
-					gr.SetFontSize (fontSize);
-					TextExtents te;
+				using (ImageSurface img = new ImageSurface (Format.Argb32, 1, 1)) {
+					using (Context gr = new Context (img)) {
+						gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+						gr.SetFontSize (Font.Size);
+						TextExtents te;
 #if _WIN32 || _WIN64
                 te = gr.TextExtents(txt);
 #elif __linux__
-					te = gr.TextExtents (Text);
+						te = gr.TextExtents (Text);
 #endif
-					FontExtents fe = gr.FontExtents;
-					s = new Size ((int)Math.Ceiling (te.XAdvance), (int)Math.Ceiling (fe.Height));
+						FontExtents fe = gr.FontExtents;
+						s = new Size ((int)Math.Ceiling (te.XAdvance), (int)Math.Ceiling (fe.Height));
+					}
 				}
+				return s;// +borderWidth;
 			}
-            return s;// +borderWidth;
-        }
-
-		public GroupBox() : base (){
 		}
-        public GroupBox(Rectangle _bounds, string _title = "GroupBox")
-            : base(_bounds)
-        {
-            Text = _title;
-        }
-        
-        public GroupBox(string _title = "GroupBox")
-            : base()
-        {
-            Text = _title;            
-        }
-        
-        public override Rectangle clientBounds
-        {
-            get
-            {
-                Size ts = titleSize();
 
-                Rectangle cb = Slot;
-                cb.X = 0;
-                cb.Y = ts.Height;
-                cb.Height -= ts.Height;
-                cb.Inflate(-BorderWidth - Margin);
-                
-                return cb;
-            }
-        }        
-
-		public override void onDraw (Context gr)
+		#region GraphicObject overrides
+		public override Rectangle ClientRectangle {
+			get {
+				Size ts = titleSize;
+				Rectangle cb = Slot.Size;
+				cb.Y = ts.Height;
+				cb.Height -= ts.Height;
+				cb.Inflate ( - Margin);
+				return cb;
+			}
+		}			
+		protected override Size measureRawSize ()
+		{
+			Size raw = base.measureRawSize ();
+			return raw > 0 ? raw + titleSize : raw;
+		}
+		protected override void onDraw (Context gr)
 		{
 			//base.onDraw (gr);
 
 			byte[] txt = System.Text.UTF8Encoding.UTF8.GetBytes(Text);
 			Rectangle r = new Rectangle(Slot.Size);
+			if (BorderWidth > 0) 
+				r.Inflate (-BorderWidth / 2);
+
 			//gr.Rotate(Math.PI);
-			gr.SetFontSize(fontSize);
+			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+			gr.SetFontSize (Font.Size);
 			FontExtents fe = gr.FontExtents;
 			TextExtents te = gr.TextExtents(Text);
 
@@ -106,8 +104,7 @@ namespace go
 			gr.LineWidth = BorderWidth;
 			gr.Color = Background;
 
-			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
-			gr.Fill();
+
 
 			Rectangle rTitle = r;
 
@@ -115,14 +112,14 @@ namespace go
 			r.Y += th;
 			r.Height -= th;
 
+			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
+			gr.Fill();
+
 			const int titleGap = 5;
 
 			if (BorderWidth > 0)
 			{
 				gr.Color = BorderColor;
-				gr.LineWidth = BorderWidth;
-
-				r.Inflate(-BorderWidth / 2, -BorderWidth / 2);
 
 				rTitle.X = r.X + titleGap;
 				rTitle.Width = (int)Math.Ceiling(te.XAdvance) + 2 * titleGap;
@@ -149,10 +146,11 @@ namespace go
 			gr.Color = Foreground;
 			gr.Fill();
 		}
+		#endregion
 
         public override string ToString()
         {
-            return this.Text + ":" + base.ToString();
+			return base.ToString() + ": " + this.Text;
         }
     }
 }

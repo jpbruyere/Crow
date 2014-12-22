@@ -4,58 +4,47 @@ using System.Linq;
 using System.Text;
 using Cairo;
 using System.Diagnostics;
+using System.Xml.Serialization;
+using System.ComponentModel;
 
 namespace go
 {
 	[Serializable]
-	public class ProgressBar : GraphicObject
+	public class ProgressBar : Border
     {
+		#region CTOR
+		public ProgressBar() : base(){}
+		public ProgressBar(int _max) : base()
+		{
+			Maximum = _max;
+		}
+		#endregion
+
+		#region private fields
 		int _currentValue = 0;
 		int _minimum = 0;
 		int _maximum = 100;
+		#endregion
 
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue("Gray")]
-		public override Color Background {
-			get { return base.Background; }
-			set { base.Background = value; }
+		#region public properties
+		[XmlAttributeAttribute()][DefaultValue(0)]
+		public int Value
+		{
+			get { return _currentValue; }
+			set
+			{
+				if (_currentValue == value)
+					return;
+
+				_currentValue = value;
+
+				if (_currentValue > Maximum)
+					_currentValue = Maximum;
+
+				registerForGraphicUpdate();
+			}
 		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(0)]
-		public override int BorderWidth {
-			get { return base.BorderWidth; }
-			set { base.BorderWidth = value; }
-		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue("BlueCrayola")]
-		public virtual Color Foreground {
-			get { return base.Foreground; }
-			set { base.Foreground = value; }
-		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(0)]
-        public int Value
-        {
-            get { return _currentValue; }
-            set
-            {
-                if (_currentValue == value)
-                    return;
-
-                _currentValue = value;
-
-                if (_currentValue > Maximum)
-                    _currentValue = Maximum;
-
-                registerForGraphicUpdate();
-            }
-        }
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(0)]
+		[XmlAttributeAttribute()][DefaultValue(0)]
 		public int Minimum {
 			get {return _minimum;}
 			set {
@@ -65,9 +54,7 @@ namespace go
 				registerForGraphicUpdate ();
 			}
 		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(100)]
+		[XmlAttributeAttribute()][DefaultValue(100)]
 		public int Maximum {
 			get {return _maximum;}
 			set {
@@ -77,15 +64,26 @@ namespace go
 				registerForGraphicUpdate();
 			}
 		}
-               
-		public ProgressBar() : base(){}
+		#endregion
 
-		public ProgressBar(int _max) : base()
-        {
-            Maximum = _max;
-        }
+		#region GraphicObject overrides
+		[XmlAttributeAttribute()][DefaultValue("Gray")]
+		public override Color Background {
+			get { return base.Background; }
+			set { base.Background = value; }
+		}
+		[XmlAttributeAttribute()][DefaultValue(0)]
+		public override int BorderWidth {
+			get { return base.BorderWidth; }
+			set { base.BorderWidth = value; }
+		}
+		[XmlAttributeAttribute()][DefaultValue("BlueCrayola")]
+		public virtual Color Foreground {
+			get { return base.Foreground; }
+			set { base.Foreground = value; }
+		}
 
-		public override void onDraw (Context gr)
+		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
 
@@ -100,11 +98,6 @@ namespace go
 			CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);
 			gr.Fill();
 		}
-		public override void Paint (ref Context ctx, Rectangles clip)
-		{
-			base.Paint (ref ctx, clip);
-//			if (clip != null)
-//				clip.stroke (ctx, Color.Amethyst);
-		}
+		#endregion
     }
 }

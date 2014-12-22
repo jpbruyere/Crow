@@ -80,8 +80,8 @@ namespace go
 
                 if (scrollY > 0)
                     scrollY = 0;
-				else if (scrollY < -child.Slot.Height + clientBounds.Height)
-					scrollY = -child.Slot.Height + clientBounds.Height;
+				else if (scrollY < -child.Slot.Height + ClientRectangle.Height)
+					scrollY = -child.Slot.Height + ClientRectangle.Height;
 
             }
             if (HorizontalScrolling )
@@ -93,8 +93,8 @@ namespace go
 
 				if (scrollX > 0)
 					scrollX = 0;
-				else if (scrollX < -child.Slot.Width + clientBounds.Width)
-					scrollX = -child.Slot.Width + clientBounds.Width;
+				else if (scrollX < -child.Slot.Width + ClientRectangle.Width)
+					scrollX = -child.Slot.Width + ClientRectangle.Width;
             }
 
 

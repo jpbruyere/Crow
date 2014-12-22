@@ -91,12 +91,21 @@ namespace test
 			foreach (Color col in Color.ColorDic) {
 				HorizontalStack s = colors.addChild (new HorizontalStack ());
 				s.HorizontalAlignment = HorizontalAlignment.Left;
-				s.addChild (new Button () {
-						Bounds = new Size(32, 20),
-						CornerRadius = 5,
-						Background = col,
-					}
-				);
+				Border b = new Border () {
+					Bounds = new Size (32, 20),
+					CornerRadius = 5,
+					Background = col,
+					BorderWidth = 2,
+					BorderColor = Color.Transparent,
+					Focusable = true
+				};
+				b.MouseEnter += delegate(object sender, MouseMoveEventArgs ee) {
+					(sender as Border).BorderColor = Color.White;
+				};
+				b.MouseLeave += delegate(object sender, MouseMoveEventArgs ee) {
+					(sender as Border).BorderColor = Color.Transparent;
+				};
+				s.addChild (b);
 
 				s.addChild (
 					new Label (col.ToString ()){
@@ -132,7 +141,7 @@ namespace test
 			fps = (int)RenderFrequency;
 
 			labFps.Text = fps.ToString();
-			labUpdate.Text = this.updateTime.ElapsedMilliseconds.ToString();
+			labUpdate.Text = this.updateTime.ElapsedMilliseconds.ToString() + " ms";
 			if (frameCpt > 200) {
 				labFpsMin.Text = fpsMin.ToString();
 				labFpsMax.Text = fpsMax.ToString();

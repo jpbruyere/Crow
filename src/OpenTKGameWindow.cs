@@ -31,7 +31,7 @@ namespace go
 //				DisplayDevice.Default,
 //				3,0,OpenTK.Graphics.GraphicsContextFlags.Default)
 		public OpenTKGameWindow(int _width, int _height, string _title="golib")
-			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 1), _title)
+			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), _title)
 		{
 			VSync = VSyncMode.On;
 		}        
@@ -103,6 +103,7 @@ namespace go
 			int stride = 4 * ClientRectangle.Width;
 			int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
 			bmp = new byte[bmpSize];
+			//bmp = Enumerable.Repeat((byte)0, bmpSize).ToArray();
 
 			if (dispList > 0)
 				GL.DeleteLists (dispList, 1);
@@ -116,7 +117,7 @@ namespace go
 
 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, 
 				ClientRectangle.Width, ClientRectangle.Height, 0,
-				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, IntPtr.Zero);
+				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp);
 
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
@@ -230,7 +231,7 @@ namespace go
 				}
 			}
 
-			Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
+			//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
 			//redraw clip should be added when layout is complete among parents,
 			//that's why it take place in a second pass
 			foreach (GraphicObject p in gobjsToRedraw) {
@@ -367,9 +368,6 @@ namespace go
         #region Mouse Handling
         void Mouse_Move(object sender, MouseMoveEventArgs e)
         {
-
-            go.Mouse.Position = e.Position;
-
 			if (_activeWidget != null) {
 				//send move evt even if mouse move outside bounds
 				_activeWidget.onMouseMove (this, e);

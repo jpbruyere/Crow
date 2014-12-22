@@ -5,7 +5,7 @@ using System.Text;
 
 namespace go
 {
-    internal class EventSource
+	public class EventSource
     {
         public GraphicObject Source;
         public string EventName;

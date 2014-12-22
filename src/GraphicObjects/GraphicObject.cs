@@ -19,15 +19,25 @@ namespace go
 {
 	public class GraphicObject : IXmlSerializable, ILayoutable
 	{
+		#region CTOR
+		public GraphicObject ()
+		{
+			loadDefaultValues ();
+			registerForGraphicUpdate ();
+		}
+		public GraphicObject (Rectangle _bounds)
+		{
+			loadDefaultValues ();
+			Bounds = _bounds;
+			registerForGraphicUpdate ();
+		}
+		#endregion
 
-		#region private properties
-
+		#region private fields
 		ILayoutable _parent;
 		string _name;
 		Color _background;
 		Color _foreground;
-		Color _borderColor;
-		int _borderWidth;
 		double _cornerRadius;
 		int _margin;
 		bool _focusable = false;
@@ -40,59 +50,51 @@ namespace go
 		bool wIsValid = false;
 		bool xIsValid = false;
 		bool yIsValid = false;
-
 		#endregion
 
+		#region public fields
 		public Rectangle Bounds;
 		public Rectangle Slot = new Rectangle ();
 		public object Tag;
 		public byte[] bmp;
+		#endregion
 
 		#region ILayoutable
-
-		[System.Xml.Serialization.XmlIgnore]
-		public ILayoutable Parent { 
+		[XmlIgnore]public ILayoutable Parent { 
 			get { return _parent; }
 			set { _parent = value; }
 		}
-		[System.Xml.Serialization.XmlIgnore]
-		public virtual bool SizeIsValid {
+		[XmlIgnore]public virtual bool SizeIsValid {
 			get { return hIsValid & wIsValid; }
 			set {
 				hIsValid = value;
 				wIsValid = value;
 			}
 		}
-		[System.Xml.Serialization.XmlIgnore]
-		public virtual bool WIsValid {
+		[XmlIgnore]public virtual bool WIsValid {
 			get { return wIsValid; }
 			set { wIsValid = value; }
 		}
-		[System.Xml.Serialization.XmlIgnore]
-		public virtual bool HIsValid {
+		[XmlIgnore]public virtual bool HIsValid {
 			get { return hIsValid; }
 			set { hIsValid = value; }
 		}
-		[System.Xml.Serialization.XmlIgnore]
-		public virtual bool XIsValid {
+		[XmlIgnore]public virtual bool XIsValid {
 			get { return xIsValid; }
 			set { xIsValid = value; }
 		}
-		[System.Xml.Serialization.XmlIgnore]
-		public virtual bool YIsValid {
+		[XmlIgnore]public virtual bool YIsValid {
 			get { return yIsValid; }
 			set { yIsValid = value; }
 		}
-		[System.Xml.Serialization.XmlIgnore]
-		public virtual bool PositionIsValid {
+		[XmlIgnore]public virtual bool PositionIsValid {
 			get { return xIsValid & yIsValid; }
 			set {
 				xIsValid = value;
 				yIsValid = value;
 			}
 		}
-		[System.Xml.Serialization.XmlIgnore]
-		public virtual bool LayoutIsValid {
+		[XmlIgnore]public virtual bool LayoutIsValid {
 			get { return SizeIsValid & PositionIsValid; }
 			set {
 				if (value == SizeIsValid & PositionIsValid)
@@ -105,20 +107,18 @@ namespace go
 				//    Parent.layoutIsValid = false;
 			}
 		}
+		[XmlIgnore]public virtual Rectangle ClientRectangle {
+			get {
+				Rectangle cb = Slot.Size;
+				cb.Inflate ( - Margin);
+				return cb;
+			}
+		}
 
 		public virtual void InvalidateLayout ()
 		{
 			bmp = null;
 			LayoutIsValid = false;
-		}
-
-		[System.Xml.Serialization.XmlIgnore]
-		public virtual Rectangle ClientRectangle {
-			get {
-				Rectangle cb = Slot.Size;
-				cb.Inflate ( - BorderWidth - Margin);
-				return cb;
-			}
 		}
 		public virtual Rectangle ContextCoordinates(Rectangle r){
 			return
@@ -130,14 +130,17 @@ namespace go
 			return 
 				Parent.ScreenCoordinates(r) + Parent.getSlot().Position + Parent.ClientRectangle.Position;
 		}
+		public virtual Rectangle getSlot()
+		{
+			return Slot;
+		}
 		#endregion
 
-		#region event handlers
-
+		#region EVENT HANDLERS
 		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged = delegate { };
 		public event EventHandler<MouseButtonEventArgs> MouseButtonUp = delegate { };
 		public event EventHandler<MouseButtonEventArgs> MouseButtonDown = delegate { };
-		public event EventHandler<MouseButtonEventArgs> MouseClicked = delegate { };
+		public event EventHandler<MouseButtonEventArgs> MouseClick = delegate { };
 		public event EventHandler<MouseMoveEventArgs> MouseMove = delegate { };
 		public event EventHandler<MouseMoveEventArgs> MouseEnter = delegate { };
 		public event EventHandler<MouseMoveEventArgs> MouseLeave = delegate { };
@@ -145,19 +148,15 @@ namespace go
 		public event EventHandler<KeyboardKeyEventArgs> KeyUp = delegate { };
 		public event EventHandler Focused = delegate { };
 		public event EventHandler Unfocused = delegate { };
-
 		#endregion
 
 		#region public properties
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue("unamed")]
+		[XmlAttributeAttribute()][DefaultValue("unamed")]
 		public virtual string Name {
 			get { return _name; }
 			set { _name = value; }
 		}
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(VerticalAlignment.Center)]
+		[XmlAttributeAttribute()][DefaultValue(VerticalAlignment.Center)]
 		public virtual VerticalAlignment VerticalAlignment {
 			get { return _verticalAlignment; }
 			set { 
@@ -169,14 +168,12 @@ namespace go
 //				if (Top > 0)
 			}
 		}
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(HorizontalAlignment.Center)]
+		[XmlAttributeAttribute()][DefaultValue(HorizontalAlignment.Center)]
 		public virtual HorizontalAlignment HorizontalAlignment {
 			get { return _horizontalAlignment; }
 			set { _horizontalAlignment = value; }
 		}
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(0)]
+		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Left {
 			get { return Bounds.X; }
 			set {
@@ -189,9 +186,7 @@ namespace go
 				registerForGraphicUpdate ();
 			}
 		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(0)]
+		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Top {
 			get { return Bounds.Y; }
 			set {
@@ -204,9 +199,7 @@ namespace go
 				registerForGraphicUpdate ();
 			}
 		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(0)]
+		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Width {
 			get { return Bounds.Width; }
 			set {
@@ -218,9 +211,7 @@ namespace go
 				InvalidateLayout ();
 			}
 		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(0)]
+		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Height {
 			get { return Bounds.Height; }
 			set {
@@ -232,16 +223,23 @@ namespace go
 				InvalidateLayout ();
 			}
 		}
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public virtual bool Fit {
+			get { return Bounds.Width < 0 && Bounds.Height < 0 ? true : false; }
+			set {
+				if (value == Fit)
+					return;
 
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(false)]
+				Bounds.Width = Bounds.Height = -1;
+				InvalidateLayout ();
+			}
+		}
+		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool Focusable {
 			get { return _focusable; }
 			set { _focusable = value; }
-		}
-        
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue("Transparent")]
+		}        
+		[XmlAttributeAttribute()][DefaultValue("Transparent")]
 		public virtual Color Background {
 			get { return _background; }
 			set {
@@ -249,9 +247,7 @@ namespace go
 				registerForGraphicUpdate ();
 			}
 		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue("White")]
+		[XmlAttributeAttribute()][DefaultValue("White")]
 		public virtual Color Foreground {
 			get { return _foreground; }
 			set {
@@ -259,29 +255,7 @@ namespace go
 				registerForGraphicUpdate ();
 			}
 		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue("White")]
-		public virtual Color BorderColor {
-			get { return _borderColor; }
-			set {
-				_borderColor = value;
-				registerForGraphicUpdate ();
-			}
-		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(0)]
-		public virtual int BorderWidth {
-			get { return _borderWidth; }
-			set {
-				_borderWidth = value;
-				registerForGraphicUpdate ();
-			}
-		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(5)]
+		[XmlAttributeAttribute()][DefaultValue(5)]
 		public virtual double CornerRadius {
 			get { return _cornerRadius; }
 			set {
@@ -289,9 +263,7 @@ namespace go
 				registerForGraphicUpdate ();
 			}
 		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(0)]
+		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Margin {
 			get { return _margin; }
 			set {
@@ -299,9 +271,7 @@ namespace go
 				registerForGraphicUpdate ();
 			}
 		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(true)]
+		[XmlAttributeAttribute()][DefaultValue(true)]
 		public virtual bool Visible {
 			get { return _isVisible; }
 			set {
@@ -315,59 +285,16 @@ namespace go
 				//    registerForRedraw();
 			}
 		}
-		//should maybe test only focusedWidget in higher container (opentkwin for now)
-		[System.Xml.Serialization.XmlIgnore]
-		public virtual bool HasFocus {
+		[XmlIgnore]public virtual bool HasFocus {
 			get { return _hasFocus; }
 			set { _hasFocus = value; }
 		}
-
-		[System.Xml.Serialization.XmlIgnore]
-		public virtual bool isCached {
-			get { return false; }
-		}
-
-		[System.Xml.Serialization.XmlIgnore]
-		public virtual bool cachingInProgress {
-			get { return false; }
-			set { return; }
-		}
-
-		public virtual Rectangle clientBounds {
-			get {
-				Rectangle cb = Slot.Size;
-				cb.Inflate (-(BorderWidth + Margin));
-				return cb;
-			}
-		}
-
-
-
-
-
-
-		public virtual Rectangle getSlot()
-		{
-			return Slot;
-		}
-		[XmlIgnore]
-		public virtual bool DrawingIsValid
+		[XmlIgnore]public virtual bool DrawingIsValid
 		{ get { return bmp == null ? 
 				false : 
 				true; } }
 		#endregion
 
-		public GraphicObject ()
-		{
-			loadDefaultValues ();
-			registerForGraphicUpdate ();
-		}
-		public GraphicObject (Rectangle _bounds)
-		{
-			loadDefaultValues ();
-			Bounds = _bounds;
-			registerForGraphicUpdate ();
-		}
 		/// <summary>
 		/// Loads the default values from XML attributes default
 		/// </summary>
@@ -404,6 +331,8 @@ namespace go
 					if (dv != null) {
 						if (pi.PropertyType == typeof(Color))
 							pi.SetValue (this, Color.Parse ((string)dv.Value), null);
+						else if (pi.PropertyType == typeof(Font))
+							pi.SetValue (this, Font.Parse ((string)dv.Value), null);
 						else
 							pi.SetValue (this, dv.Value, null);
 						continue;
@@ -441,12 +370,12 @@ namespace go
 		{
 			OpenTKGameWindow.redrawClip.AddRectangle (ScreenCoordinates(Slot));
 		}
-		public virtual Size measureRawSize ()
+		protected virtual Size measureRawSize ()
 		{
 			return Bounds.Size;
 		}
 
-		public virtual void ComputeSize()
+		protected virtual void ComputeSize()
 		{
 			Size rawSize = measureRawSize ();
 
@@ -480,7 +409,7 @@ namespace go
 					hIsValid = false;				
 			}
 		}
-		public virtual void ComputePosition()
+		protected virtual void ComputePosition()
 		{
 			if (!xIsValid) {
 				xIsValid = true;
@@ -528,13 +457,6 @@ namespace go
 		}
 		public virtual void UpdateLayout ()
 		{
-//			if (LayoutIsValid)
-//				return;
-//
-			//should maybe invalidate drawing
-
-			//Rectangle oldRenderBounds = Slot;
-
 			if (!SizeIsValid)
 				ComputeSize ();
 			if (!PositionIsValid)
@@ -543,27 +465,15 @@ namespace go
 				registerForRedraw ();
 
 		}
-		public virtual void onDraw(Context gr)
+		protected virtual void onDraw(Context gr)
 		{
 			Rectangle rBack = new Rectangle (Slot.Size);
-
-			if (BorderWidth > 0) 
-				rBack.Inflate (-BorderWidth / 2);
 
 			gr.Color = Background;
 			CairoHelpers.CairoRectangle(gr,rBack,_cornerRadius);
 			gr.Fill ();
-
-			if (BorderWidth > 0) {
-
-				gr.LineWidth = BorderWidth;
-				gr.Color = BorderColor;
-				CairoHelpers.CairoRectangle(gr,rBack,_cornerRadius);
-				gr.Stroke ();
-			}
 		}
-
-		internal virtual void UpdateGraphic ()
+		protected virtual void UpdateGraphic ()
 		{
 			int stride = 4 * Slot.Width;
 
@@ -579,8 +489,7 @@ namespace go
 				draw.Flush ();
 			}
 		}
-
-		//could maybe be internal
+			
 		public virtual void Paint (ref Context ctx, Rectangles clip = null)
 		{
 			if (!Visible)
@@ -605,10 +514,9 @@ namespace go
         #endregion
 
 		#region Mouse handling
-
 		public virtual bool MouseIsIn(Point m)
 		{
-			return Visible ? ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false; 
+			return Visible & Focusable ? ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false; 
 		}
 		public virtual void onMouseMove(object sender, MouseMoveEventArgs e)
 		{
@@ -618,53 +526,47 @@ namespace go
 				w.hoverWidget = this;
 				onMouseEnter (sender, e);
 			}
-
-			if (MouseMove != null)
-				MouseMove (sender, e);
+				
+			MouseMove (this, e);
 		}
 		public virtual void onMouseButtonUp(object sender, MouseButtonEventArgs e){
 			if (MouseIsIn (e.Position))
-				onMouseClicked (sender, e);
-			if (MouseButtonUp != null)
-				MouseButtonUp (sender, e);
+				onMouseClick (sender, e);
+
+			MouseButtonUp (this, e);
 		}
 		public virtual void onMouseButtonDown(object sender, MouseButtonEventArgs e){
 			(sender as OpenTKGameWindow).FocusedWidget = this;
-			if (MouseButtonDown!=null)
-				MouseButtonDown (sender, e);
+
+			MouseButtonDown (this, e);
 		}
-		public virtual void onMouseClicked(object sender, MouseButtonEventArgs e){	
-			if (MouseClicked!=null)
-				MouseClicked(sender,e);
+		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){	
+			MouseClick(this,e);
 		}
 		public virtual void onMouseWheel(object sender, MouseWheelEventArgs e){
 			GraphicObject p = Parent as GraphicObject;
 			if (p != null)
 				p.onMouseWheel(this,e);
-
-			if (MouseWheelChanged!=null)
-				MouseWheelChanged (this, e);
+				
+			MouseWheelChanged (this, e);
 		}
 		public virtual void onFocused(object sender, EventArgs e){
-			if (Focused!=null)
-				Focused (sender, e);
+			Focused (this, e);
 			this.HasFocus = true;
 		}
 		public virtual void onUnfocused(object sender, EventArgs e){
-			if (Unfocused!=null)
-				Unfocused (sender, e);
+			Unfocused (this, e);
 			this.HasFocus = false;
 		}
 		public virtual void onMouseEnter(object sender, MouseMoveEventArgs e)
 		{
-			//Debug.WriteLine ("Mouse Enter: " + this.ToString ());
-			if (MouseEnter != null)
-				MouseEnter (this, e);
+			Debug.WriteLine ("Mouse enter: " + this.Name);
+			MouseEnter (this, e);
 		}
 		public virtual void onMouseLeave(object sender, MouseMoveEventArgs e)
 		{
-			if (MouseLeave != null)
-				MouseLeave (this, e);
+			Debug.WriteLine ("Mouse leave: " + this.Name);
+			MouseLeave (this, e);
 		}
 		#endregion
 
@@ -702,30 +604,24 @@ namespace go
 
 			foreach (EventSource es in EventsToResolve)
 			{
-				if (es.Handler == null)
+				if (string.IsNullOrEmpty(es.Handler))
 					continue;
-					
-				MethodInfo mi = ClassContainingHandlers.GetType().GetMethod(es.Handler, BindingFlags.NonPublic | BindingFlags.Public
-					| BindingFlags.Instance);
 
-				if (mi == null) {
-					Debug.WriteLine ("Handler Method not found: " + es.Handler);
-					continue;
+				if (es.Handler.StartsWith ("{")) {
+					CompilerServices.CompileEventSource (es);
+				} else {					
+					MethodInfo mi = ClassContainingHandlers.GetType ().GetMethod (es.Handler, BindingFlags.NonPublic | BindingFlags.Public
+					               | BindingFlags.Instance);
+
+					if (mi == null) {
+						Debug.WriteLine ("Handler Method not found: " + es.Handler);
+						continue;
+					}
+
+					FieldInfo fi = CompilerServices.getEventHandlerField (es.Source.GetType (), es.EventName);
+					Delegate del = Delegate.CreateDelegate(fi.FieldType, ClassContainingHandlers, mi);
+					fi.SetValue(es.Source, del);
 				}
-				FieldInfo fi;
-				Type ty = es.Source.GetType ();
-				do {
-					fi = ty.GetField (es.EventName,
-						BindingFlags.NonPublic |
-						BindingFlags.Instance |
-						BindingFlags.GetField);
-					ty = ty.BaseType;
-					if (ty == null)
-						break;
-				} while(fi == null);
-				Delegate del = Delegate.CreateDelegate(fi.FieldType, ClassContainingHandlers, mi);
-				fi.SetValue(es.Source, del);
-
 			}
 
 		}
@@ -735,14 +631,6 @@ namespace go
 		public override string ToString ()
 		{
 			return Name == "unamed" ? this.GetType ().ToString() : Name;
-//			string tmp = this.GetType ().ToString ().Split (new char[] { '.' }).Last () + ":-";
-//			if (!LayoutIsValid)
-//				tmp += "L-";
-//			//if (Interface.graphicUpdateList.Contains(this))
-//			//    tmp += "GU-";
-//			if (OpenTKGameWindow.redrawClip.intersect (this.renderBoundsInBackendSurfaceCoordonate))
-//				tmp += "D-";
-//			return tmp + string.Format ("rb:{0}", Slot);
 		}
 			
 		#region IXmlSerializable
@@ -762,6 +650,7 @@ namespace go
 				string handler = reader.GetAttribute(ei.Name);
 				if (string.IsNullOrEmpty (handler))
 					continue;
+					
 				GraphicObject.EventsToResolve.Add(new EventSource 
 					{ 
 						Source = this, 
@@ -829,6 +718,8 @@ namespace go
 						//TODO: maybe find another way to convert correctely colors default values
 						if (pi.PropertyType == typeof(Color))
 							pi.SetValue (this, Color.Parse ((string)defaultValue), null);
+						else if (pi.PropertyType == typeof(Font))
+							pi.SetValue (this, Font.Parse ((string)defaultValue), null);
 						else
 							pi.SetValue (this, defaultValue, null);
 					} else {

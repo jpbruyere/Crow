@@ -109,7 +109,11 @@ namespace go
                 return false;
             else
                 return true;
-        }
+		}
+		public static Size operator +(Size s1, Size s2)
+		{
+			return new Size(s1.Width + s2.Width, s1.Height + s2.Height);
+		}
         public static Size operator +(Size s, int i)
         {
             return new Size(s.Width + i, s.Height + i);

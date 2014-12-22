@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Xml.Serialization;
+using System.ComponentModel;
 
 namespace go
 {
 	public class NumericControl : GraphicObject
 	{
+		#region CTOR
 		public NumericControl () : base()
 		{
 		}
@@ -15,6 +18,7 @@ namespace go
 			_smallStep = step;
 			_bigStep = step * 5;
 		}
+		#endregion
 
 		#region event handlers
 		public EventHandler<ValueChangeEventArgs> ValueChanged;
@@ -26,10 +30,12 @@ namespace go
 		}
 		#endregion
 
+		#region private fields
 		double _actualValue, _minValue, _maxValue, _smallStep, _bigStep;
+		#endregion
 
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(0)]
+		#region public properties
+		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual double Minimum {
 			get { return _minValue; }
 			set {
@@ -42,9 +48,7 @@ namespace go
 				registerForGraphicUpdate ();
 			}
 		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(10.0)]
+		[XmlAttributeAttribute()][DefaultValue(10.0)]
 		public virtual double Maximum
 		{
 			get { return _maxValue; }
@@ -58,9 +62,7 @@ namespace go
 				registerForGraphicUpdate ();
 			}
 		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(0.5)]
+		[XmlAttributeAttribute()][DefaultValue(0.5)]
 		public virtual double SmallIncrement
 		{
 			get { return _smallStep; }
@@ -74,9 +76,7 @@ namespace go
 				registerForGraphicUpdate ();
 			}
 		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(2.0)]
+		[XmlAttributeAttribute()][DefaultValue(2.0)]
 		public virtual double LargeIncrement
 		{
 			get { return _bigStep; }
@@ -90,9 +90,7 @@ namespace go
 				registerForGraphicUpdate ();
 			}
 		}
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(0)]
+		[XmlAttributeAttribute()][DefaultValue(0)]
 		public double Value
 		{
 			get { return _actualValue; }
@@ -114,6 +112,8 @@ namespace go
 				registerForGraphicUpdate();
 			}
 		}
+		#endregion
+
 	}
 }
 

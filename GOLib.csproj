@@ -47,7 +47,6 @@
   <ItemGroup>
     <Compile Include="src\EventSource.cs" />
     <Compile Include="src\Colors.cs" />
-    <Compile Include="src\Mouse.cs" />
     <Compile Include="src\Point.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Rectangle.cs" />
@@ -76,6 +75,12 @@
     <Compile Include="src\GraphicObjects\ILayoutable.cs" />
     <Compile Include="src\Enums.cs" />
     <Compile Include="src\GraphicObjects\GenericStack.cs" />
+    <Compile Include="src\CompilerServices\CompilerServices.cs" />
+    <Compile Include="src\GraphicObjects\AnalogMeter.cs" />
+    <Compile Include="src\GraphicObjects\Border.cs" />
+    <Compile Include="src\GraphicObjects\Checkbox.cs" />
+    <Compile Include="src\Font.cs" />
+    <Compile Include="src\TextChangeEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -90,6 +95,7 @@
     <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
       <HintPath>dependencies\OpenTK.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -106,7 +112,7 @@
     <Folder Include="src\win32\" />
     <Folder Include="Images\" />
     <Folder Include="Images\Icons\" />
-    <Folder Include="src\Shapes\" />
+    <Folder Include="src\CompilerServices\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\Icons\icon_alert.gif">

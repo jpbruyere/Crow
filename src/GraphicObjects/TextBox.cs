@@ -7,15 +7,25 @@ using Cairo;
 using System.Diagnostics;
 using System.Xml.Serialization;
 using System.Globalization;
+using System.ComponentModel;
 
 namespace go
 {
     public class TextBoxWidget : Label
     {
-		public static KeyboardDevice Keyboard;
-		public static char decimalSeparator = '.';//????? should follow locale policy
+		#region CTOR
+		public TextBoxWidget(string _initialValue, GOEvent _onTextChanged = null)
+			: base(_initialValue)
+		{
+
+		}
+
+		public TextBoxWidget()
+		{ }
+		#endregion
+
 		static bool _capitalOn = false;	//????????????????
-		public static bool capitalOn
+		[XmlIgnore]public static bool capitalOn
 		{
 			get
 			{
@@ -26,17 +36,36 @@ namespace go
 			set { _capitalOn = value; }
 		}
 
-        Color selColor = Color.BlueBell;
-        Color selFontColor = Color.WhiteSmoke;
+		#region private fields
+        Color selColor;
+        Color selFontColor;
         Point mouseLocalPos;    //mouse coord in widget space, filled only when clicked        
         int _currentPos;        //0 based cursor position in string
         double textCursorPos;   //cursor position in cairo units in widget client coord.
         double SelStartCursorPos = -1;
         double SelEndCursorPos = -1;
         bool SelectionInProgress = false;
+		#endregion
 
-		[XmlIgnore]
-        public override bool HasFocus   //trigger update when lost focus to errase text beam
+		[XmlAttributeAttribute()][DefaultValue("SkyBlue")]
+		public virtual Color SelectionBackground {
+			get { return selColor; }
+			set {
+				selColor = value;
+				registerForGraphicUpdate ();
+			}
+		}
+		[XmlAttributeAttribute()][DefaultValue("Black")]
+		public virtual Color SelectionForeground {
+			get { return selFontColor; }
+			set {
+				selFontColor = value;
+				registerForGraphicUpdate ();
+			}
+		}
+
+		#region GraphicObject overrides
+		[XmlIgnore]public override bool HasFocus   //trigger update when lost focus to errase text beam
         {
             get
             {
@@ -48,65 +77,31 @@ namespace go
                 registerForGraphicUpdate();
             }
         }
-
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(true)]
+		[XmlAttributeAttribute()][DefaultValue(true)]
 		public override bool Focusable
 		{
 			get { return base.Focusable; }
 			set { base.Focusable = value; }
 		}
+		[XmlAttributeAttribute()][DefaultValue("White")]
+		public virtual Color Background {
+			get { return base.Background; }
+			set { base.Background = value; }
+		}
+		[XmlAttributeAttribute()][DefaultValue("Black")]
+		public virtual Color Foreground {
+			get { return base.Foreground; }
+			set { base.Foreground = value; }
+		}
 
-        [XmlIgnore]
-        public GOEvent onTextChanged;
-
-        [XmlIgnore]
-        public int currentPos
-        {
-            get { return _currentPos; }
-            set { _currentPos = value; }
-        }
-
-        [XmlIgnore]
-        public int selBeginPos;
-        [XmlIgnore]
-        public int selReleasePos;
-        [XmlIgnore]
-        public int selectionStart   //ordered selection start and end positions
-        {
-            get { return selReleasePos < 0 ? selBeginPos : Math.Min(selBeginPos, selReleasePos); }
-        }
-        [XmlIgnore]
-        public int selectionEnd
-        { get { return selReleasePos < 0 ? selReleasePos : Math.Max(selBeginPos, selReleasePos); } }
-        [XmlIgnore]
-        public string selectedText
-        { get { return selectionEnd < 0 ? null : Text.Substring(selectionStart, selectionEnd - selectionStart); } }
-        [XmlIgnore]
-        public bool selectionIsEmpty
-        { get { return string.IsNullOrEmpty(selectedText); } }
-
-        public TextBoxWidget(string _initialValue, GOEvent _onTextChanged = null)
-            : base(_initialValue)
-        {
-            onTextChanged = _onTextChanged;
-            Focusable = true;
-            selColor = Color.SkyBlue;
-            selFontColor = Color.Black;
-            Foreground = Color.Black;
-            Background = Color.White;
-            TextAlignment = Alignment.LeftCenter;
-        }
-
-        public TextBoxWidget()
-        { }
-
-		public override void onDraw (Context gr)
+		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
-//			gr.FontOptions.Antialias = Antialias.Subpixel;
-//			gr.FontOptions.HintMetrics = HintMetrics.On;
-			gr.SetFontSize(FontSize);
+			//			gr.FontOptions.Antialias = Antialias.Subpixel;
+			//			gr.FontOptions.HintMetrics = HintMetrics.On;
+			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+			gr.SetFontSize (Font.Size);
+
 			FontExtents fe = gr.FontExtents;
 
 			#region draw text cursor
@@ -135,7 +130,7 @@ namespace go
 			if (HasFocus)
 			{
 				//TODO:
-				gr.Color = Color.White;
+				gr.Color = Foreground;
 				gr.LineWidth = 2;
 				gr.MoveTo(new PointD(textCursorPos + rText.X, rText.Y ));
 				gr.LineTo(new PointD(textCursorPos + rText.X, rText.Y + fe.Height));
@@ -166,6 +161,34 @@ namespace go
 			gr.Fill();
 
 		}
+		#endregion
+
+		public event EventHandler<TextChangeEventArgs> TextChanged = delegate { };
+
+		public virtual void onTextChanged(Object sender, TextChangeEventArgs e)
+		{
+			TextChanged (this, e);
+		}
+
+
+        [XmlIgnore]public int currentPos{
+            get { return _currentPos; }
+            set { _currentPos = value; }
+        }
+        [XmlIgnore]public int selBeginPos;
+        [XmlIgnore]public int selReleasePos;
+        [XmlIgnore]public int selectionStart   //ordered selection start and end positions
+        {
+            get { return selReleasePos < 0 ? selBeginPos : Math.Min(selBeginPos, selReleasePos); }
+        }
+        [XmlIgnore]public int selectionEnd
+        { get { return selReleasePos < 0 ? selReleasePos : Math.Max(selBeginPos, selReleasePos); } }
+        [XmlIgnore]public string selectedText
+        { get { return selectionEnd < 0 ? null : Text.Substring(selectionStart, selectionEnd - selectionStart); } }
+        [XmlIgnore]public bool selectionIsEmpty
+        { get { return string.IsNullOrEmpty(selectedText); } }
+
+
 			
         #region Keyboard handling
 		public override void onKeyDown (object sender, KeyboardKeyEventArgs e)
@@ -208,8 +231,7 @@ namespace go
 				break;
 			case Key.Enter:
 			case Key.KeypadEnter:
-				if (onTextChanged != null)
-					onTextChanged(this);
+				onTextChanged(this,new TextChangeEventArgs(Text));
 				break;
 			case Key.Escape:
 				Text = "";
@@ -330,7 +352,7 @@ namespace go
 		public override void onMouseButtonDown (object sender, MouseButtonEventArgs e)
 		{
             if (this.HasFocus){
-				mouseLocalPos = Mouse.Position - ScreenCoordinates(rText).TopLeft - rText.TopLeft;
+				mouseLocalPos = e.Position - ScreenCoordinates(rText).TopLeft - rText.TopLeft;
 				selBeginPos = -1;
 				selReleasePos = -1;
 			}else{

@@ -56,12 +56,12 @@ namespace go
 			Bitmap = _bitmap;
 		}
 
-		public override Size measureRawSize ()
+		protected override Size measureRawSize ()
 		{
 			if (image == null)
 				loadImage (@"Images/Icons/icon_alert.gif");				
 
-			return imgSize + (BorderWidth + Margin)*2;
+			return imgSize + Margin*2;
 		}
 
 		//load image via System.Drawing.Bitmap, cairo load png only
@@ -94,15 +94,15 @@ namespace go
 			bitmap.UnlockBits (data);
 			//bitmap.Dispose();            
 		}
-		public override void onDraw (Context gr)
+		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
 			float ratio = 1f;
-			float widthRatio = (float)clientBounds.Width / imgSize.Width;
-			float heightRatio = (float)clientBounds.Height / imgSize.Height;
+			float widthRatio = (float)ClientRectangle.Width / imgSize.Width;
+			float heightRatio = (float)ClientRectangle.Height / imgSize.Height;
 
 			ratio = Math.Min (widthRatio, heightRatio);
-			Rectangle rImg = clientBounds;
+			Rectangle rImg = ClientRectangle;
 
 			gr.Scale (widthRatio, heightRatio);
 			using (ImageSurface imgSurf = new ImageSurface(image, Format.Argb32, 
