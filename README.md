@@ -1,14 +1,16 @@
 GOLib
 =====
 
-Graphic Object Library: custom widget library for OpenTK.
+Graphic Object Library: custom widget library c# version.
 
-Lightweight Widget toolkit for OpenTK using Mono.Cairo as backend.
+- Use OpenTK as top container for device abstraction layer
+- Curent drawing routines use Mono.Cairo
 
-Due to OpenTK experimental support for kms, I decided to use the
-OpenTK window as base container for applications.
+RoadMap:
 
-Layouting is still a bit consuming, I'm working on simplification.
-
-
+    - Implement Vertical and Horizontal layouting queue instead
+      of testing the whole object tree during layout.
+    - Implement GL textures backend, as in the c++ version
+    - Validate complete drm rendering stack (OpenTK, and Cairo
+      already have experimental support for drm stack)
 
