@@ -31,7 +31,11 @@ namespace go
 //				DisplayDevice.Default,
 //				3,0,OpenTK.Graphics.GraphicsContextFlags.Default)
 		public OpenTKGameWindow(int _width, int _height, string _title="golib")
-			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), _title)
+			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 0), 
+				_title,GameWindowFlags.Default,DisplayDevice.Default,
+				3,2,OpenTK.Graphics.GraphicsContextFlags.Debug|OpenTK.Graphics.GraphicsContextFlags.ForwardCompatible)
+//		public OpenTKGameWindow(int _width, int _height, string _title="golib")
+//			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), _title)
 		{
 			VSync = VSyncMode.On;
 		}        
@@ -89,13 +93,32 @@ namespace go
 		#endregion
 
 		#region graphic contexte
+		bool recreateContext = true;
+
 		Context ctx;
 		Surface surf;
 		byte[] bmp;
 		int texID;
-		int dispList;
+
+		QuadVAO uiQuad;
+		go.GLBackend.Shader shader;
+		Matrix4 projectionMatrix, 
+				modelviewMatrix;
+
 		Rectangle dirtyZone = Rectangle.Empty;
 
+		void createContext()
+		{
+			createOpenGLSurface ();
+			if (uiQuad != null)
+				uiQuad.Dispose ();
+			uiQuad = new QuadVAO (0, 0, ClientRectangle.Width, ClientRectangle.Height,0,1,1,-1);
+			projectionMatrix = Matrix4.CreateOrthographicOffCenter 
+				(0, ClientRectangle.Width, ClientRectangle.Height, 0, 0, 1);
+			modelviewMatrix = Matrix4.Identity;
+			redrawClip.AddRectangle (ClientRectangle);
+			recreateContext = false;
+		}
 		void createOpenGLSurface()
 		{
 			currentWindow = this;
@@ -103,10 +126,6 @@ namespace go
 			int stride = 4 * ClientRectangle.Width;
 			int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
 			bmp = new byte[bmpSize];
-			//bmp = Enumerable.Repeat((byte)0, bmpSize).ToArray();
-
-			if (dispList > 0)
-				GL.DeleteLists (dispList, 1);
 
 			//create texture
 			if (texID > 0)
@@ -126,78 +145,22 @@ namespace go
 		}
 		void OpenGLDraw()
 		{
+			shader.Enable ();
+			shader.ProjectionMatrix = projectionMatrix;
+			shader.ModelViewMatrix = modelviewMatrix;
+			shader.Color = new Vector4(1f,1f,1f,1f);
 			//if (dirtyZone != Rectangle.Empty) {
-				GL.BindTexture (TextureTarget.Texture2D, texID);
-				GL.TexSubImage2D (TextureTarget.Texture2D, 0,
-					0, 0, ClientRectangle.Width, ClientRectangle.Height,
+			GL.ActiveTexture (TextureUnit.Texture0);
+			GL.BindTexture (TextureTarget.Texture2D, texID);
+			GL.TexSubImage2D (TextureTarget.Texture2D, 0,
+				0, 0, ClientRectangle.Width, ClientRectangle.Height,
 				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp);
-//				GL.TexSubImage2D (TextureTarget.Texture2D, 0,
-//					dirtyZone.X, dirtyZone.Y, ClientRectangle.Width, dirtyZone.Height,
-//					OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp);
-			//				dirtyZone = Rectangle.Empty;
-//				if (dispList > 0)
-//					GL.DeleteLists (dispList, 1);
-				//surf.WriteToPng (@"/home/jp/test.png");
-			//}
 
-//			if (dispList > 0) {
-//				GL.CallList (dispList);
-//				return;
-//			}
-//
-//			dispList = GL.GenLists (1);
-//			GL.NewList (dispList, ListMode.CompileAndExecute);
-//			{
-			GL.Viewport(0, 0, ClientRectangle.Width, ClientRectangle.Height);
-				GL.PushAttrib (AttribMask.EnableBit);
-				GL.Color4 (Color.White);
-				GL.ActiveTexture (TextureUnit.Texture0);
-				GL.BindTexture (TextureTarget.Texture2D, texID);
-				GL.Enable (EnableCap.Texture2D);
+			uiQuad.Render (PrimitiveType.TriangleStrip);
 
-				GL.MatrixMode (MatrixMode.Modelview);
+			GL.BindTexture(TextureTarget.Texture2D, 0);
 
-				GL.PushMatrix ();
-				GL.LoadIdentity ();
-
-				GL.MatrixMode (MatrixMode.Projection);
-
-				GL.PushMatrix ();
-				GL.LoadIdentity ();
-
-				Matrix4 ortho2D = Matrix4.CreateOrthographicOffCenter 
-					(ClientRectangle.Left, ClientRectangle.Right, ClientRectangle.Bottom, ClientRectangle.Top, 0, 1);
-				GL.LoadMatrix (ref ortho2D);
-
-				GL.Disable (EnableCap.Lighting);
-				GL.Enable (EnableCap.AlphaTest);
-				GL.AlphaFunc (AlphaFunction.Greater, 0.0f);
-				GL.Enable (EnableCap.Blend);
-				GL.BlendFunc (BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-
-				GL.Begin (PrimitiveType.Quads);
-				{
-					GL.TexCoord2 (0, 0);
-					GL.Vertex2 (ClientRectangle.Left, ClientRectangle.Top);
-					GL.TexCoord2 (0, 1);
-					GL.Vertex2 (ClientRectangle.Left, ClientRectangle.Bottom);
-					GL.TexCoord2 (1, 1);
-					GL.Vertex2 (ClientRectangle.Right, ClientRectangle.Bottom);
-					GL.TexCoord2 (1, 0);
-					GL.Vertex2 (ClientRectangle.Right, ClientRectangle.Top);
-				}
-				GL.End ();
-
-				GL.PopMatrix ();
-
-				GL.MatrixMode (MatrixMode.Modelview);
-				GL.PopMatrix ();
-
-				GL.PopAttrib ();
-
-//			}
-//			GL.EndList ();
-
+			shader.Disable ();
 		}
 			
 		#endregion
@@ -312,11 +275,8 @@ namespace go
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
 			base.OnRenderFrame(e);
-			if (recreateContext) {
-				createOpenGLSurface ();
-				redrawClip.AddRectangle (ClientRectangle);
-				recreateContext = false;
-			}
+			if (recreateContext)
+				createContext ();
 			OpenGLDraw ();
 		}
 		protected override void OnLoad(EventArgs e)
@@ -337,19 +297,19 @@ namespace go
 			Console.WriteLine("GLSL version: " + GL.GetString (StringName.ShadingLanguageVersion));
 			Console.WriteLine("*************************************\n");
 
-			createOpenGLSurface ();
-        }
-        protected override void OnUnload(EventArgs e)
-        {
-			if (dispList > 0)
-				GL.DeleteLists (dispList, 1);
+			int matl = GL.GetInteger (GetPName.MaxArrayTextureLayers);
+			int mts = GL.GetInteger (GetPName.MaxTextureSize);
+			shader = new go.GLBackend.TexturedShader ();
+		}
+		protected override void OnUnload(EventArgs e)
+		{
 			if (texID > 0)
 				GL.DeleteTexture (texID);
 			//ctx.Dispose ();
-			surf.Dispose ();
-        }
-		bool recreateContext=true;
-        protected override void OnResize(EventArgs e)
+			//surf.Dispose ();
+		}
+
+		protected override void OnResize(EventArgs e)
 		{
 			base.OnResize (e);
 			recreateContext = true;

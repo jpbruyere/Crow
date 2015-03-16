@@ -81,6 +81,10 @@
     <Compile Include="src\GraphicObjects\Checkbox.cs" />
     <Compile Include="src\Font.cs" />
     <Compile Include="src\TextChangeEventArgs.cs" />
+    <Compile Include="src\OpenGL\QuadVAO.cs" />
+    <Compile Include="src\OpenGL\Shader.cs" />
+    <Compile Include="src\OpenGL\TexturedShader.cs" />
+    <Compile Include="src\OpenGL\VertexArrayObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -113,6 +117,7 @@
     <Folder Include="Images\" />
     <Folder Include="Images\Icons\" />
     <Folder Include="src\CompilerServices\" />
+    <Folder Include="src\OpenGL\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\Icons\icon_alert.gif">

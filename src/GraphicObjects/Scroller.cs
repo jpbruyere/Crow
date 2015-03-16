@@ -163,57 +163,5 @@ namespace go
 
 			ctx.Restore();            
 		}
-
-//
-//		public override void Paint(ref Cairo.Context ctx, Rectangles clip = null)
-//		{
-//			if (!Visible)//check if necessary??
-//				return;
-//
-//			ctx.Save();
-//
-//			Rectangle tmp;
-//			tmp = Parent.ContextCoordinates(Slot);
-////			ctx.Rectangle(tmp);
-////			ctx.Clip();
-//
-////			if (clip != null)
-////				clip.clip(ctx);
-//
-//			if (bmp == null)
-//				UpdateGraphic ();
-//
-//
-//
-//			int stride = 4 * Slot.Width;
-//			using (ImageSurface source = new ImageSurface(bmp, Format.Argb32, tmp.Width, tmp.Height, stride)) {
-//				ctx.SetSourceSurface (source, tmp.X, tmp.Y);
-//				ctx.Paint ();
-//			}
-//
-//
-//			//clip to client zone
-////			ctx.Rectangle(Parent.ContextCoordinates(ClientRectangle + Slot.Position));
-////			ctx.Clip();
-//
-//			//ctx.Translate (scrollX, scrollY);
-//
-//			if (clip != null) 
-//				clip.Srcoll (this);
-////
-////				//clip.stroke (ctx, Color.Green);
-////
-//////				if (scrollY < 0)
-//////					Debug.WriteLine ("..");
-////			}
-//
-//
-//
-//			if (child != null)
-//				child.Paint(ref ctx, clip);
-//
-//			ctx.Restore();            
-//		}
-
     }
 }
