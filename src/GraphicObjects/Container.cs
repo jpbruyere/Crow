@@ -2,6 +2,7 @@ using System;
 using System.Xml.Serialization;
 using System.Reflection;
 using OpenTK.Input;
+using System.ComponentModel;
 
 namespace go
 {
@@ -35,6 +36,13 @@ namespace go
         }
 
 		#region GraphicObject Overrides
+		//check if not causing problems
+		[XmlAttributeAttribute()][DefaultValue(true)]
+		public override bool Focusable
+		{
+			get { return base.Focusable; }
+			set { base.Focusable = value; }
+		}
 		[XmlIgnore]public override bool LayoutIsValid
 		{
 			get
@@ -55,6 +63,11 @@ namespace go
 				return this;
 
 			return child == null ? null : child.FindByName (nameToFind);
+		}
+		public override bool Contains (GraphicObject goToFind)
+		{
+			return child == goToFind ? true : 
+				child == null ? false : child.Contains(goToFind);
 		}
         public override void InvalidateLayout()
         {

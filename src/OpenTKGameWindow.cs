@@ -31,7 +31,7 @@ namespace go
 //				DisplayDevice.Default,
 //				3,0,OpenTK.Graphics.GraphicsContextFlags.Default)
 		public OpenTKGameWindow(int _width, int _height, string _title="golib")
-			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 0), 
+			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), 
 				_title,GameWindowFlags.Default,DisplayDevice.Default,
 				3,2,OpenTK.Graphics.GraphicsContextFlags.Debug|OpenTK.Graphics.GraphicsContextFlags.ForwardCompatible)
 //		public OpenTKGameWindow(int _width, int _height, string _title="golib")
@@ -53,6 +53,15 @@ namespace go
 		public static Rectangles redrawClip = new Rectangles();//should find another way to access it from child
 		public static List<GraphicObject> gobjsToRedraw = new List<GraphicObject>();
 		internal static OpenTKGameWindow currentWindow;
+
+		#region Events
+		//those events are raised only if mouse isn't in a graphic object
+		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged = delegate { };
+		public event EventHandler<MouseButtonEventArgs> MouseButtonUp = delegate { };
+		public event EventHandler<MouseButtonEventArgs> MouseButtonDown = delegate { };
+		public event EventHandler<MouseButtonEventArgs> MouseClick = delegate { };
+		public event EventHandler<MouseMoveEventArgs> MouseMove = delegate { };
+		#endregion
 
 		#region focus
 
@@ -197,10 +206,13 @@ namespace go
 			//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
 			//redraw clip should be added when layout is complete among parents,
 			//that's why it take place in a second pass
-			foreach (GraphicObject p in gobjsToRedraw) {
+			GraphicObject[] gotr = new GraphicObject[gobjsToRedraw.Count];
+			gobjsToRedraw.CopyTo (gotr);
+			gobjsToRedraw.Clear ();
+			foreach (GraphicObject p in gotr) {
 				p.registerClipRect ();
 			}
-			gobjsToRedraw.Clear ();
+
 
 			lock (redrawClip) {
 				if (redrawClip.count > 0) {
@@ -260,10 +272,22 @@ namespace go
 			g.Parent = this;
 			GraphicObjects.Add (g);
 		}
+		public void DeleteWidget(GraphicObject g)
+		{
+			g.Visible = false;//ensure clip is added to refresh zone
+			GraphicObjects.Remove (g);
+		}
 		public void LoadInterface<T>(string path, out T result)
 		{
 			GraphicObject.Load<T> (path, out result, this);
 			AddWidget (result as GraphicObject);
+		}
+		public T LoadInterface<T> (string Path)
+		{
+			T result;
+			GraphicObject.Load<T> (Path, out result, this);
+			AddWidget (result as GraphicObject);
+			return result;
 		}
 
 		#region Game win overrides
@@ -362,6 +386,7 @@ namespace go
 				}
 			}
 			_hoverWidget = null;
+			MouseMove (this, e);
         }
         void Mouse_ButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -370,17 +395,21 @@ namespace go
 
 			_activeWidget.onMouseButtonUp (this, e);
 			_activeWidget = null;
+			MouseButtonUp (this, e);
         }
         void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
         {
-			if (_hoverWidget == null)
+			if (_hoverWidget == null) {
+				MouseButtonDown (this, e);
 				return;
+			}
 
 			GraphicObject g = _hoverWidget;
 			while (!g.Focusable) {
 				g = g.Parent as GraphicObject;
-				if (g == null)
+				if (g == null) {					
 					return;
+				}
 			}
 
 			_activeWidget = g;
@@ -388,8 +417,10 @@ namespace go
         }
         void Mouse_WheelChanged(object sender, MouseWheelEventArgs e)
         {
-			if (_hoverWidget == null)
+			if (_hoverWidget == null) {
+				MouseWheelChanged (this, e);
 				return;
+			}
 			_hoverWidget.onMouseWheel (this, e);
         }        
 		#endregion
@@ -452,11 +483,18 @@ namespace go
 			get { return new Size(this.ClientRectangle.Size.Width,this.ClientRectangle.Size.Height); }
 		}
 
+		public OpenTKGameWindow TopContainer {
+			get { return this; }
+		}
+
 		public Rectangle getSlot ()
 		{
 			return ClientRectangle;
 		}
-
+		public Rectangle getBounds ()//redundant but fill ILayoutable implementation
+		{
+			return ClientRectangle;
+		}
 		public bool WIsValid {
 			get {
 				return true;

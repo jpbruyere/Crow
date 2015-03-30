@@ -140,13 +140,7 @@ namespace go
 				//emit left operand assignment
 				il.Emit(lopSetOC, lopSetMbi);
 			}
-
-
-
-
-
-
-
+				
 			il.Emit(OpCodes.Ret);
 
 			#endregion

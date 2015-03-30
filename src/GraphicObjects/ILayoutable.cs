@@ -16,6 +16,9 @@ namespace go
 
 		Rectangle ClientRectangle { get; }
 		Rectangle getSlot();
+		Rectangle getBounds();
+
+		OpenTKGameWindow TopContainer { get; }
 
 		void InvalidateLayout ();
 

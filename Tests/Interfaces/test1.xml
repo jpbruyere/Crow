@@ -1,0 +1,9 @@
+﻿<?xml version="1.0"?>
+<Container
+	HorizontalAlignment="Left" VerticalAlignment="Center"
+	Margin="10" Focusable="True" Fit="True" Background="Green">
+	<Group   Background="White" >
+		<Image Name="PhaseOverlay" Width="40" Height="40"
+				Path="image/u.svg" Background="Red"/>
+	</Group>
+</Container>

@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
-//using OpenTK.Graphics.OpenGL;
 using Cairo;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace go
 {
@@ -13,6 +12,7 @@ namespace go
 	{
 
 		byte[] image;
+		Rsvg.Handle hSVG;
 		Size imgSize;
         string _imgPath;
 
@@ -58,19 +58,33 @@ namespace go
 
 		protected override Size measureRawSize ()
 		{
-			if (image == null)
-				loadImage (@"Images/Icons/icon_alert.gif");				
+			if (image == null && hSVG == null)
+				loadRessourceSvg ("go.image.icons.question_mark");				
 
 			return imgSize + Margin*2;
 		}
-
+		void loadRessourceSvg(string resId)
+		{
+			Stream s = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(resId);
+			using (MemoryStream ms = new MemoryStream ()) {
+				s.CopyTo (ms);
+				hSVG = new Rsvg.Handle (ms.ToArray ());
+				imgSize = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
+				_imgPath = resId;
+				//loadImage (@"Images/Icons/question_mark.svg");
+			}
+		}
 		//load image via System.Drawing.Bitmap, cairo load png only
 		public void loadImage (string path)
 		{
             if (!File.Exists(path))
                 return;
             
-			loadImage (new System.Drawing.Bitmap (path));
+			if (path.EndsWith (".svg", true,System.Globalization.CultureInfo.InvariantCulture)) {
+				hSVG = new Rsvg.Handle (path);								 
+				imgSize = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
+			}else
+				loadImage (new System.Drawing.Bitmap (path));
             _imgPath = path;
 		}
 
@@ -97,19 +111,25 @@ namespace go
 		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
-			float ratio = 1f;
+
 			float widthRatio = (float)ClientRectangle.Width / imgSize.Width;
 			float heightRatio = (float)ClientRectangle.Height / imgSize.Height;
+			float ratio = Math.Min (widthRatio, heightRatio);
 
-			ratio = Math.Min (widthRatio, heightRatio);
 			Rectangle rImg = ClientRectangle;
-
+			gr.Save ();
 			gr.Scale (widthRatio, heightRatio);
-			using (ImageSurface imgSurf = new ImageSurface(image, Format.Argb32, 
-						imgSize.Width, imgSize.Height, 4 * imgSize.Width)) {
-				gr.SetSourceSurface (imgSurf, (int)(rImg.X / widthRatio), (int)(rImg.Y / heightRatio));
-				gr.Paint ();
+			if (hSVG == null) {
+				using (ImageSurface imgSurf = new ImageSurface (image, Format.Argb32, 
+					                              imgSize.Width, imgSize.Height, 4 * imgSize.Width)) {
+					gr.SetSourceSurface (imgSurf, (int)(rImg.X / widthRatio), (int)(rImg.Y / heightRatio));
+					gr.Paint ();
+				}
+			} else {
+				gr.Translate (rImg.X/widthRatio, rImg.Y/heightRatio);
+				hSVG.RenderCairo (gr);
 			}
+			gr.Restore ();
 		}
 	}
 }

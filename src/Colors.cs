@@ -71,6 +71,15 @@ namespace go
 				double.Parse(c[3]));                    
 		}
 
+		public static implicit operator OpenTK.Vector4(Color c)
+		{
+			return new OpenTK.Vector4 ((float)c.R, (float)c.G, (float)c.B, (float)c.A);
+		}
+		public static implicit operator Color(OpenTK.Vector4 v)
+		{
+			return new Color (v.X, v.Y, v.Z, v.W);
+		}
+
         public static implicit operator System.Drawing.Color(Color c)
         {
             return System.Drawing.Color.FromArgb((int)(c.A * 255), (int)(c.R * 255), (int)(c.G * 255), (int)(c.B * 255));

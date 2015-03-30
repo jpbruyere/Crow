@@ -56,6 +56,8 @@
     <Compile Include="GOLIBTest_5.cs" />
     <Compile Include="GOLIBTest_0.cs" />
     <Compile Include="GOLIBTest_4.cs" />
+    <Compile Include="GOLIBTest_3.cs" />
+    <Compile Include="GOLIBTest_1.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Interfaces\test0.xml">
@@ -67,9 +69,19 @@
     <None Include="Interfaces\test4.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Interfaces\test3.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="image\u.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\test1.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />
+    <Folder Include="image\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GOLib.csproj">

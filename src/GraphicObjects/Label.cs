@@ -115,7 +115,7 @@ namespace go
 				
 			string[] lines = getLines;
 				
-			using (ImageSurface img = new ImageSurface (Format.Argb32, 1, 1)) {
+			using (ImageSurface img = new ImageSurface (Format.Argb32, 10, 10)) {
 				using (Context gr = new Context (img)) {
 					//Cairo.FontFace cf = gr.GetContextFontFace ();
 

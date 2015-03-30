@@ -114,7 +114,9 @@ namespace go
 				return cb;
 			}
 		}
-
+		[XmlIgnore]public virtual OpenTKGameWindow TopContainer {
+			get { return Parent.TopContainer; }
+		}
 		public virtual void InvalidateLayout ()
 		{
 			bmp = null;
@@ -133,6 +135,10 @@ namespace go
 		public virtual Rectangle getSlot()
 		{
 			return Slot;
+		}
+		public virtual Rectangle getBounds()
+		{
+			return Bounds;
 		}
 		#endregion
 
@@ -279,8 +285,15 @@ namespace go
 					return;
 
 				_isVisible = value;
-				if (Parent != null)
-					Parent.InvalidateLayout ();
+
+				//add slot to clipping to redraw
+				OpenTKGameWindow.gobjsToRedraw.Add (this);
+
+				//ensure main win doesn't keep hidden childrens ref
+				if (this.Contains (OpenTKGameWindow.currentWindow.hoverWidget))
+					OpenTKGameWindow.currentWindow.hoverWidget = null;
+//				if (Parent != null)
+//					Parent.InvalidateLayout ();
 				//else
 				//    registerForRedraw();
 			}
@@ -346,6 +359,9 @@ namespace go
 
 		public virtual GraphicObject FindByName(string nameToFind){
 			return nameToFind == _name ? this : null;
+		}
+		public virtual bool Contains(GraphicObject goToFind){
+			return false;
 		}
 
 
@@ -429,7 +445,7 @@ namespace go
 						Slot.X = Parent.ClientRectangle.Width / 2 - Slot.Width / 2;
 						break;
 					}
-				} else
+				} else// if (Parent.getBounds().Width>=0)
 					xIsValid = false;
 			}
 
@@ -451,7 +467,7 @@ namespace go
 						Slot.Y = Parent.ClientRectangle.Height / 2 - Slot.Height / 2;
 						break;
 					}
-				} else
+				} else// if (Parent.getBounds().Height>=0)
 					yIsValid = false;
 			}
 		}

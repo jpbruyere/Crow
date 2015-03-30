@@ -114,6 +114,16 @@ namespace go
 			}
 			return null;
 		}
+		public override bool Contains (GraphicObject goToFind)
+		{
+			foreach (GraphicObject w in Children) {
+				if (w == goToFind)
+					return true;
+				if (w.Contains (goToFind))
+					return true;
+			}
+			return false;
+		}
 		public override void InvalidateLayout()
 		{
 			base.InvalidateLayout();
@@ -162,10 +172,16 @@ namespace go
 				if (c.LayoutIsValid)
 					continue;
 
-				if (Width < 0 && c.Width != 0)
+				if (Width < 0 && c.Width != 0) {
+					if (!atLeastOneChildHasWNotDependingOnParent && !(this is GenericStack))
+						c.XIsValid = true;
 					atLeastOneChildHasWNotDependingOnParent = true;
-				if (Height < 0 && c.Height != 0)
+				}
+				if (Height < 0 && c.Height != 0) {
+					if (!atLeastOneChildHasHNotDependingOnParent && !(this is GenericStack))
+						c.YIsValid = true;
 					atLeastOneChildHasHNotDependingOnParent = true;
+				}
 
 				c.UpdateLayout ();
 			}

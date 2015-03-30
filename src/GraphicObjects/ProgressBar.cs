@@ -91,6 +91,7 @@ namespace go
 
 			if (BorderWidth > 0)
 				rBack.Inflate(-BorderWidth, -BorderWidth);
+
 			rBack.Width = (int)((double)rBack.Width / Maximum * Value);
 
 			gr.Color = Foreground;

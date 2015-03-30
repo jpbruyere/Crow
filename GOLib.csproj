@@ -21,6 +21,7 @@
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,6 +44,10 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$$(Platform)' == 'Win_x86' ">
     <DefineConstants>_WIN32</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Linux_x86' ">
+    <DefineConstants>__linux__;DEBUG;TRACE</DefineConstants>
+    <PlatformTarget>anycpu</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="src\EventSource.cs" />
@@ -85,6 +90,7 @@
     <Compile Include="src\OpenGL\Shader.cs" />
     <Compile Include="src\OpenGL\TexturedShader.cs" />
     <Compile Include="src\OpenGL\VertexArrayObject.cs" />
+    <Compile Include="src\GraphicObjects\Window.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -98,6 +104,12 @@
     </Reference>
     <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
       <HintPath>dependencies\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="rsvg2-sharp, Version=2.18.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>rsvg2-sharp-2.0</Package>
+    </Reference>
+    <Reference Include="glib-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>glib-sharp-3.0</Package>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
@@ -120,8 +132,11 @@
     <Folder Include="src\OpenGL\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\icon_alert.gif">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="Images\Icons\icon_alert.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\Icons\question_mark.svg">
+      <LogicalName>go.image.icons.question_mark</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

@@ -13,7 +13,7 @@ using System.ComponentModel;
 
 namespace go
 {
-    public class Button : Container, IXmlSerializable
+    public class Button : Container
     {
 		#region CTOR
         public Button() : base()
@@ -37,7 +37,7 @@ namespace go
 			set { base.Height = value; }
 		}
 		[XmlAttributeAttribute()][DefaultValue("Gray")]
-		public virtual Color Background {
+		public override Color Background {
 			get { return base.Background; }
 			set { base.Background = value; }
 		}
