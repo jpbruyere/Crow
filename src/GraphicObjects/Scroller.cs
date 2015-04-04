@@ -115,7 +115,7 @@ namespace go
 
 		public override void registerClipRect ()
 		{
-			OpenTKGameWindow.redrawClip.AddRectangle (base.ScreenCoordinates(Slot));
+			TopContainer.redrawClip.AddRectangle (base.ScreenCoordinates(Slot));
 		}
 		public override void UpdateLayout ()
 		{

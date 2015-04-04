@@ -13,7 +13,7 @@ using System.ComponentModel;
 
 namespace go
 {
-    public class Button : Container
+    public class Button : Container, IXmlSerializable
     {
 		#region CTOR
         public Button() : base()

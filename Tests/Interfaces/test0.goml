@@ -1,0 +1,5 @@
+﻿<?xml version="1.0"?>
+<GraphicObject 
+			Top="10" Left="10"
+			Width="10" Height="50" 
+			Margin="10" Background="Green"/>

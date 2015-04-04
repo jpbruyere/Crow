@@ -17,12 +17,14 @@ using System.Threading;
 using System.Drawing.Imaging;
 //using System.Xml.Serialization;
 //using System.Reflection;
+using System.Xml;
+using System.IO;
 
 
 
 namespace go
 {
-	public class OpenTKGameWindow : GameWindow, ILayoutable
+	public class OpenTKGameWindow : GameWindow, ILayoutable, IGOLibHost
     {
 		#region ctor
 //		public OpenTKGameWindow(int _width, int _height, string _title="golib")
@@ -50,9 +52,38 @@ namespace go
 		public List<GraphicObject> GraphicObjects = new List<GraphicObject>();
 		public Color Background = Color.Transparent;
 
-		public static Rectangles redrawClip = new Rectangles();//should find another way to access it from child
-		public static List<GraphicObject> gobjsToRedraw = new List<GraphicObject>();
 		internal static OpenTKGameWindow currentWindow;
+
+		Rectangles _redrawClip = new Rectangles();//should find another way to access it from child
+		List<GraphicObject> _gobjsToRedraw = new List<GraphicObject>();
+
+		public Rectangles redrawClip {
+			get {
+				return _redrawClip;
+			}
+			set {
+				_redrawClip = value;
+			}
+		}
+
+		public List<GraphicObject> gobjsToRedraw {
+			get {
+				return _gobjsToRedraw;
+			}
+			set {
+				_gobjsToRedraw = value;
+			}
+		}
+		public void AddWidget(GraphicObject g)
+		{
+			g.Parent = this;
+			GraphicObjects.Add (g);
+		}
+		public void DeleteWidget(GraphicObject g)
+		{
+			g.Visible = false;//trick to ensure clip is added to refresh zone
+			GraphicObjects.Remove (g);
+		}
 
 		#region Events
 		//those events are raised only if mouse isn't in a graphic object
@@ -266,17 +297,7 @@ namespace go
 //				updateTime.ElapsedMilliseconds);
 
 		}						
-
-		public void AddWidget(GraphicObject g)
-		{
-			g.Parent = this;
-			GraphicObjects.Add (g);
-		}
-		public void DeleteWidget(GraphicObject g)
-		{
-			g.Visible = false;//ensure clip is added to refresh zone
-			GraphicObjects.Remove (g);
-		}
+			
 		public void LoadInterface<T>(string path, out T result)
 		{
 			GraphicObject.Load<T> (path, out result, this);
@@ -289,7 +310,7 @@ namespace go
 			AddWidget (result as GraphicObject);
 			return result;
 		}
-
+			
 		#region Game win overrides
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{	
@@ -434,14 +455,12 @@ namespace go
         }
         #endregion
 
-
 		#region ILayoutable implementation
 
 		public Rectangle ContextCoordinates (Rectangle r)
 		{
 			return r;
 		}
-
 		public Rectangle ScreenCoordinates (Rectangle r)
 		{
 			return r;
@@ -460,7 +479,6 @@ namespace go
 			get { return true; }
 			set { throw new NotImplementedException ();	}
 		}
-
 		public bool PositionIsValid {
 			get {
 				return true;
@@ -469,7 +487,6 @@ namespace go
 				throw new NotImplementedException ();
 			}
 		}
-
 		public bool LayoutIsValid {
 			get {
 				return true;//tester tout les enfants a mon avis
@@ -483,7 +500,7 @@ namespace go
 			get { return new Size(this.ClientRectangle.Size.Width,this.ClientRectangle.Size.Height); }
 		}
 
-		public OpenTKGameWindow TopContainer {
+		public IGOLibHost TopContainer {
 			get { return this; }
 		}
 
@@ -495,6 +512,7 @@ namespace go
 		{
 			return ClientRectangle;
 		}
+
 		public bool WIsValid {
 			get {
 				return true;
@@ -503,7 +521,6 @@ namespace go
 				throw new NotImplementedException ();
 			}
 		}
-
 		public bool HIsValid {
 			get {
 				return true;
@@ -512,7 +529,6 @@ namespace go
 				throw new NotImplementedException ();
 			}
 		}
-
 		public bool XIsValid {
 			get {
 				return true;
@@ -521,7 +537,6 @@ namespace go
 				throw new NotImplementedException ();
 			}
 		}
-
 		public bool YIsValid {
 			get {
 				return true;
@@ -530,52 +545,47 @@ namespace go
 				throw new NotImplementedException ();
 			}
 		}
+
 		public virtual void InvalidateLayout ()
 		{
 //			foreach (GraphicObject g in GraphicObjects) {
 //				g.InvalidateLayout ();
 //			}
 		}
-		public Rectangle rectInScreenCoord (Rectangle r)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public Rectangle renderBoundsInContextCoordonate {
-			get { return ClientRectangle; }
-		}
-
-		public Rectangle ClientBoundsInContextCoordonate {
-			get {
-				throw new NotImplementedException ();
-			}
-		}
-
-		public Rectangle renderBoundsInBackendSurfaceCoordonate {
-			get { return ClientRectangle; }
-		}
-
-		public Rectangle ClientBoundsInBackendSurfaceCoordonate {
-			get {
-				throw new NotImplementedException ();
-			}
-			set {
-				throw new NotImplementedException ();
-			}
-		}
-
-		public Rectangle ScreenCoordBounds {
-			get { return ClientRectangle; }
-		}
-
-		public Rectangle ScreenCoordClientBounds {
-			get {
-				throw new NotImplementedException ();
-			}
-			set {
-				throw new NotImplementedException ();
-			}
-		}
+//		public Rectangle rectInScreenCoord (Rectangle r)
+//		{
+//			throw new NotImplementedException ();
+//		}
+//		public Rectangle renderBoundsInContextCoordonate {
+//			get { return ClientRectangle; }
+//		}
+//		public Rectangle ClientBoundsInContextCoordonate {
+//			get {
+//				throw new NotImplementedException ();
+//			}
+//		}
+//		public Rectangle renderBoundsInBackendSurfaceCoordonate {
+//			get { return ClientRectangle; }
+//		}
+//		public Rectangle ClientBoundsInBackendSurfaceCoordonate {
+//			get {
+//				throw new NotImplementedException ();
+//			}
+//			set {
+//				throw new NotImplementedException ();
+//			}
+//		}
+//		public Rectangle ScreenCoordBounds {
+//			get { return ClientRectangle; }
+//		}
+//		public Rectangle ScreenCoordClientBounds {
+//			get {
+//				throw new NotImplementedException ();
+//			}
+//			set {
+//				throw new NotImplementedException ();
+//			}
+//		}
 		#endregion
     }
 }

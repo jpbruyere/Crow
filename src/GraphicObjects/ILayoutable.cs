@@ -18,7 +18,7 @@ namespace go
 		Rectangle getSlot();
 		Rectangle getBounds();
 
-		OpenTKGameWindow TopContainer { get; }
+		IGOLibHost TopContainer { get; }
 
 		void InvalidateLayout ();
 

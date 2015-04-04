@@ -14,6 +14,8 @@ using System.Xml.Serialization;
 using System.Reflection;
 using System.ComponentModel;
 using System.IO;
+//using System.Xml;
+using System.Xml;
 
 namespace go
 {
@@ -51,6 +53,8 @@ namespace go
 		bool xIsValid = false;
 		bool yIsValid = false;
 		#endregion
+
+		public static bool DesignerMode = false;
 
 		#region public fields
 		public Rectangle Bounds;
@@ -114,7 +118,7 @@ namespace go
 				return cb;
 			}
 		}
-		[XmlIgnore]public virtual OpenTKGameWindow TopContainer {
+		[XmlIgnore]public virtual IGOLibHost TopContainer {
 			get { return Parent.TopContainer; }
 		}
 		public virtual void InvalidateLayout ()
@@ -242,7 +246,7 @@ namespace go
 		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool Focusable {
-			get { return _focusable; }
+			get { return _focusable | DesignerMode; }
 			set { _focusable = value; }
 		}        
 		[XmlAttributeAttribute()][DefaultValue("Transparent")]
@@ -287,11 +291,11 @@ namespace go
 				_isVisible = value;
 
 				//add slot to clipping to redraw
-				OpenTKGameWindow.gobjsToRedraw.Add (this);
+				TopContainer.gobjsToRedraw.Add (this);
 
 				//ensure main win doesn't keep hidden childrens ref
-				if (this.Contains (OpenTKGameWindow.currentWindow.hoverWidget))
-					OpenTKGameWindow.currentWindow.hoverWidget = null;
+				if (this.Contains (TopContainer.hoverWidget))
+					TopContainer.hoverWidget = null;
 //				if (Parent != null)
 //					Parent.InvalidateLayout ();
 				//else
@@ -380,11 +384,11 @@ namespace go
 		public virtual void registerForRedraw ()
 		{
 			if (LayoutIsValid && Visible)
-				OpenTKGameWindow.gobjsToRedraw.Add (this);
+				TopContainer.gobjsToRedraw.Add (this);
 		}
 		public virtual void registerClipRect()
 		{
-			OpenTKGameWindow.redrawClip.AddRectangle (ScreenCoordinates(Slot));
+			TopContainer.redrawClip.AddRectangle (ScreenCoordinates(Slot));
 		}
 		protected virtual Size measureRawSize ()
 		{
@@ -536,10 +540,10 @@ namespace go
 		}
 		public virtual void onMouseMove(object sender, MouseMoveEventArgs e)
 		{
-			OpenTKGameWindow w = sender as OpenTKGameWindow;
+			//ILayoutable w = sender as ILayoutable;
 
-			if (w.hoverWidget != this) {
-				w.hoverWidget = this;
+			if (TopContainer.hoverWidget != this) {
+				TopContainer.hoverWidget = this;
 				onMouseEnter (sender, e);
 			}
 				
@@ -552,7 +556,7 @@ namespace go
 			MouseButtonUp (this, e);
 		}
 		public virtual void onMouseButtonDown(object sender, MouseButtonEventArgs e){
-			(sender as OpenTKGameWindow).FocusedWidget = this;
+			TopContainer.FocusedWidget = this;
 
 			MouseButtonDown (this, e);
 		}
@@ -601,7 +605,25 @@ namespace go
 			{
 				xs.Serialize(s, graphicObject, xn);
 			}
-		}			
+		}
+		public static GraphicObject Load(string path)
+		{
+			string root = "Object";
+			using (Stream s = new FileStream (path, FileMode.Open)) {
+				using (XmlReader reader = XmlReader.Create (s)) {
+					while (reader.Read()) {
+						// first element is the root element
+						if (reader.NodeType == XmlNodeType.Element) {
+							root = reader.Name;
+							break;
+						}
+					}
+				}
+			}
+			Type t = Type.GetType("go." + root);
+			var go = Activator.CreateInstance(t);
+			return Load(path, t);
+		}
 		public static void Load<T>(string file, out T result, object ClassContainingHandlers = null)
 		{
 			EventsToResolve = new List<EventSource>();
@@ -639,7 +661,47 @@ namespace go
 					fi.SetValue(es.Source, del);
 				}
 			}
+		}
 
+		public static GraphicObject Load(string file, Type type, object ClassContainingHandlers = null)
+		{
+			GraphicObject result;
+			EventsToResolve = new List<EventSource>();
+
+			XmlSerializerNamespaces xn = new XmlSerializerNamespaces();
+			xn.Add("", "");
+			XmlSerializer xs = new XmlSerializer(type);            
+
+			using (Stream s = new FileStream(file, FileMode.Open))
+			{
+				result = (GraphicObject)xs.Deserialize(s);
+			}
+
+			if (ClassContainingHandlers == null)
+				return result;
+
+			foreach (EventSource es in EventsToResolve)
+			{
+				if (string.IsNullOrEmpty(es.Handler))
+					continue;
+
+				if (es.Handler.StartsWith ("{")) {
+					CompilerServices.CompileEventSource (es);
+				} else {					
+					MethodInfo mi = ClassContainingHandlers.GetType ().GetMethod (es.Handler, BindingFlags.NonPublic | BindingFlags.Public
+						| BindingFlags.Instance);
+
+					if (mi == null) {
+						Debug.WriteLine ("Handler Method not found: " + es.Handler);
+						continue;
+					}
+
+					FieldInfo fi = CompilerServices.getEventHandlerField (es.Source.GetType (), es.EventName);
+					Delegate del = Delegate.CreateDelegate(fi.FieldType, ClassContainingHandlers, mi);
+					fi.SetValue(es.Source, del);
+				}
+			}
+			return result;
 		}
 
 		#endregion

@@ -5,12 +5,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GOLib", "GOLib.csproj", "{C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{74289092-9F70-4941-AFCB-DFD7BE2140B6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoDevelop.GOLib", "MonoDevelop.GOLib\MonoDevelop.GOLib.csproj", "{E9E14DB5-3C67-4E01-B5C3-4D90D7E31A2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoDevelop.Diagram", "..\MonoDevelop.Diagram\MonoDevelop.Diagram.csproj", "{232716B4-D19D-4FD7-B310-94A98FD926F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Linux_x86 = Debug|Linux_x86
 		Release|Linux_x86 = Release|Linux_x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{232716B4-D19D-4FD7-B310-94A98FD926F0}.Debug|Linux_x86.ActiveCfg = Debug|Any CPU
+		{232716B4-D19D-4FD7-B310-94A98FD926F0}.Debug|Linux_x86.Build.0 = Debug|Any CPU
+		{232716B4-D19D-4FD7-B310-94A98FD926F0}.Release|Linux_x86.ActiveCfg = Release|Linux_x86
+		{232716B4-D19D-4FD7-B310-94A98FD926F0}.Release|Linux_x86.Build.0 = Release|Linux_x86
 		{74289092-9F70-4941-AFCB-DFD7BE2140B6}.Debug|Linux_x86.ActiveCfg = Debug|Linux_x86
 		{74289092-9F70-4941-AFCB-DFD7BE2140B6}.Debug|Linux_x86.Build.0 = Debug|Linux_x86
 		{74289092-9F70-4941-AFCB-DFD7BE2140B6}.Release|Linux_x86.ActiveCfg = Release|Linux_x86
@@ -19,8 +27,9 @@ Global
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Debug|Linux_x86.Build.0 = Debug|Linux_x86
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Release|Linux_x86.ActiveCfg = Release|Linux_x86
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Release|Linux_x86.Build.0 = Release|Linux_x86
-	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Tests\Tests.csproj
+		{E9E14DB5-3C67-4E01-B5C3-4D90D7E31A2E}.Debug|Linux_x86.ActiveCfg = Debug|Any CPU
+		{E9E14DB5-3C67-4E01-B5C3-4D90D7E31A2E}.Debug|Linux_x86.Build.0 = Debug|Any CPU
+		{E9E14DB5-3C67-4E01-B5C3-4D90D7E31A2E}.Release|Linux_x86.ActiveCfg = Release|Any CPU
+		{E9E14DB5-3C67-4E01-B5C3-4D90D7E31A2E}.Release|Linux_x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
