@@ -6,7 +6,7 @@ Graphic Object Library: custom widget library c# version.
 - Use OpenTK as top container for device abstraction layer
 - Curent drawing routines use Mono.Cairo
 
-![GOLib in action](/GOLib/blob/master/magic3d.png?raw=true "Magic3d")
+![GOLib in action](/magic3d.png?raw=true "Magic3d")
 
 RoadMap:
 
