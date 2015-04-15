@@ -2,17 +2,17 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">Linux_x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{74289092-9F70-4941-AFCB-DFD7BE2140B6}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>test.GOLIBTest_0</StartupObject>
+    <StartupObject>test.GOLIBTest_3</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>..\bin\$(configuration)</OutputPath>
     <IntermediateOutputPath>obj\$(configuration)</IntermediateOutputPath>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <OutputPath>..\bin\Debug</OutputPath>
@@ -31,13 +31,6 @@
     <WarningLevel>0</WarningLevel>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Platform)' == 'Linux_x86' ">
-    <DefineConstants>__linux__</DefineConstants>
-    <PlatformTarget>x86</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$$(Platform)' == 'Win_x86' ">
-    <DefineConstants>_WIN32</DefineConstants>
-  </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Reference Include="System" />
@@ -53,35 +46,77 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GOLIBTest_5.cs" />
-    <Compile Include="GOLIBTest_0.cs" />
-    <Compile Include="GOLIBTest_4.cs" />
-    <Compile Include="GOLIBTest_3.cs" />
-    <Compile Include="GOLIBTest_1.cs" />
+    <Compile Include="GOLIBTest_5.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="GOLIBTest_0.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="GOLIBTest_4.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="GOLIBTest_3.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="GOLIBTest_1.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="GOLIBTest_2.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <LogicalName>
+      </LogicalName>
     </None>
     <None Include="Interfaces\test1.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <LogicalName>
+      </LogicalName>
     </None>
     <None Include="Interfaces\test3.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <LogicalName>
+      </LogicalName>
     </None>
     <None Include="Interfaces\test4.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <LogicalName>
+      </LogicalName>
     </None>
     <None Include="Interfaces\test5.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <LogicalName>
+      </LogicalName>
     </None>
     <None Include="Interfaces\test0.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <LogicalName>
+      </LogicalName>
+    </None>
+    <None Include="Interfaces\test2.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <LogicalName>
+      </LogicalName>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Interfaces\" />
-    <Folder Include="image\" />
+    <Folder Include="Interfaces\">
+      <LogicalName>
+      </LogicalName>
+    </Folder>
+    <Folder Include="image\">
+      <LogicalName>
+      </LogicalName>
+    </Folder>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GOLib.csproj">

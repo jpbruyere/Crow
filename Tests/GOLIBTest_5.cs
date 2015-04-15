@@ -27,7 +27,7 @@ namespace test
 		{
 			base.OnLoad (e);
 
-			LoadInterface("Interfaces/test5.xml", out c);
+			LoadInterface("Interfaces/test5.goml", out c);
 			gl.Add (c.FindByName ("g0"));
 			ll.Add (c.FindByName ("lab0")as Label);
 		}

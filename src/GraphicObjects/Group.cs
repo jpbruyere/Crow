@@ -140,13 +140,13 @@ namespace go
 
 			foreach (GraphicObject c in Children) {
 				if (raw.Width < 0) {
-					if (c.XIsValid & c.WIsValid)
+					if (c.WIsValid)
 						tmp.Width = Math.Max (tmp.Width, c.Slot.Right);
 					else
 						return raw;
 				}
 				if (raw.Height < 0) {
-					if (c.YIsValid & c.HIsValid)
+					if (c.HIsValid)
 						tmp.Height = Math.Max (tmp.Height, c.Slot.Bottom);
 					else
 						return raw;
@@ -172,12 +172,12 @@ namespace go
 				if (c.LayoutIsValid)
 					continue;
 
-				if (Width < 0 && c.Width != 0) {
+				if (Width < 0 && c.WIsValid) {
 					if (!atLeastOneChildHasWNotDependingOnParent && !(this is GenericStack))
 						c.XIsValid = true;
 					atLeastOneChildHasWNotDependingOnParent = true;
 				}
-				if (Height < 0 && c.Height != 0) {
+				if (Height < 0 && c.HIsValid) {
 					if (!atLeastOneChildHasHNotDependingOnParent && !(this is GenericStack))
 						c.YIsValid = true;
 					atLeastOneChildHasHNotDependingOnParent = true;
@@ -186,10 +186,10 @@ namespace go
 				c.UpdateLayout ();
 			}
 
-			if (Width < 0 && !atLeastOneChildHasWNotDependingOnParent)
-				Debug.WriteLine ("ERROR: no child has fixed width and parent width is set to content!");
-			if (Height < 0 && !atLeastOneChildHasHNotDependingOnParent)
-				Debug.WriteLine ("ERROR: no child has fixed height and parent height is set to content!");
+//			if (Width < 0 && !atLeastOneChildHasWNotDependingOnParent)
+//				Debug.WriteLine ("ERROR: no child has fixed width and parent width is set to content!");
+//			if (Height < 0 && !atLeastOneChildHasHNotDependingOnParent)
+//				Debug.WriteLine ("ERROR: no child has fixed height and parent height is set to content!");
 
 			base.UpdateLayout ();
 		}

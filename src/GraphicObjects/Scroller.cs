@@ -52,8 +52,7 @@ namespace go
 
 		#region Mouse handling
 		public override bool MouseIsIn (Point m)
-		{
-			//Debug.WriteLine ("scroller mouse is in");
+		{			
 			return Visible ? base.ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false; 
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
@@ -72,7 +71,6 @@ namespace go
 			
 			if (VerticalScrolling )
             {
-				Debug.WriteLine ("scroll");
                 //add redraw call with old bounds to errase old position
                 registerForRedraw();
 

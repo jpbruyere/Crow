@@ -16,9 +16,9 @@ using System.Threading;
 
 namespace test
 {
-	class GOLIBTest_1 : OpenTKGameWindow
+	class GOLIBTest_2 : OpenTKGameWindow
 	{
-		public GOLIBTest_1 ()
+		public GOLIBTest_2 ()
 			: base(1024, 600,"test")
 		{}
 
@@ -27,7 +27,7 @@ namespace test
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-			LoadInterface("Interfaces/test1.goml", out g);
+			LoadInterface("Interfaces/test2.goml", out g);
 
 		}
 		protected override void OnRenderFrame (FrameEventArgs e)
@@ -47,7 +47,7 @@ namespace test
 		{
 			Console.WriteLine ("starting example");
 
-			using (GOLIBTest_1 win = new GOLIBTest_1( )) {
+			using (GOLIBTest_2 win = new GOLIBTest_2( )) {
 				win.Run (30.0);
 			}
 		}

@@ -60,7 +60,7 @@ namespace test
 		{
 			base.OnLoad (e);
 
-			LoadInterface("Interfaces/test4.xml", out c);
+			LoadInterface("Interfaces/test4.goml", out c);
 			//LoadInterface("golibtests/test4.xml", out c2);
 			//c2.HorizontalAlignment = HorizontalAlignment.Left;
 			//c2.VerticalAlignment = VerticalAlignment.Top;

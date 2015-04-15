@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">Linux_x86</Platform>
+    <!--    <Platform Condition=" '$(Platform)' == '' ">Linux_x86</Platform>-->
     <ProjectGuid>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -22,10 +22,11 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;__linux__</DefineConstants>
     <Optimize>False</Optimize>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <DebugType>Full</DebugType>
@@ -37,61 +38,187 @@
     <DebugType>None</DebugType>
     <BaseAddress>4194304</BaseAddress>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Platform)' == 'Linux_x86' ">
+  <!--  <PropertyGroup Condition=" '$(Platform)' == 'Linux_x86' ">
     <DefineConstants>__linux__</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
     <BaseAddress>4194304</BaseAddress>
   </PropertyGroup>
   <PropertyGroup Condition=" '$$(Platform)' == 'Win_x86' ">
     <DefineConstants>_WIN32</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Linux_x86' ">
-    <DefineConstants>__linux__;DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>-->
+  <!--  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Linux_x86' ">
+    <DefineConstants>DEBUG;__linux__;DEBUG;TRACE</DefineConstants>
     <PlatformTarget>anycpu</PlatformTarget>
-  </PropertyGroup>
+  </PropertyGroup>-->
   <ItemGroup>
-    <Compile Include="src\EventSource.cs" />
-    <Compile Include="src\Colors.cs" />
-    <Compile Include="src\Point.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\Rectangle.cs" />
-    <Compile Include="src\Rectangles.cs" />
-    <Compile Include="src\Size.cs" />
-    <Compile Include="src\OpenTKGameWindow.cs" />
-    <Compile Include="src\GraphicObjects\GraphicObject.cs" />
-    <Compile Include="src\GraphicObjects\Container.cs" />
-    <Compile Include="src\GraphicObjects\Group.cs" />
-    <Compile Include="src\GraphicObjects\GroupBox.cs" />
-    <Compile Include="src\GraphicObjects\HorizontalStack.cs" />
-    <Compile Include="src\GraphicObjects\Image.cs" />
-    <Compile Include="src\GraphicObjects\Label.cs" />
-    <Compile Include="src\GraphicObjects\TextBox.cs" />
-    <Compile Include="src\GraphicObjects\ProgressBar.cs" />
-    <Compile Include="src\GraphicObjects\VerticalStack.cs" />
-    <Compile Include="src\Cairo\CairoHelpers.cs" />
-    <Compile Include="src\win32\Win32.cs" />
-    <Compile Include="src\win32\winApi.cs" />
-    <Compile Include="src\GraphicObjects\Button.cs" />
-    <Compile Include="src\GraphicObjects\GraduatedSlider.cs" />
-    <Compile Include="src\GraphicObjects\Slider.cs" />
-    <Compile Include="src\ValueChangeEventArgs.cs" />
-    <Compile Include="src\GraphicObjects\NumericControl.cs" />
-    <Compile Include="src\GraphicObjects\Scroller.cs" />
-    <Compile Include="src\GraphicObjects\ILayoutable.cs" />
-    <Compile Include="src\Enums.cs" />
-    <Compile Include="src\GraphicObjects\GenericStack.cs" />
-    <Compile Include="src\CompilerServices\CompilerServices.cs" />
-    <Compile Include="src\GraphicObjects\AnalogMeter.cs" />
-    <Compile Include="src\GraphicObjects\Border.cs" />
-    <Compile Include="src\GraphicObjects\Checkbox.cs" />
-    <Compile Include="src\Font.cs" />
-    <Compile Include="src\TextChangeEventArgs.cs" />
-    <Compile Include="src\OpenGL\QuadVAO.cs" />
-    <Compile Include="src\OpenGL\Shader.cs" />
-    <Compile Include="src\OpenGL\TexturedShader.cs" />
-    <Compile Include="src\OpenGL\VertexArrayObject.cs" />
-    <Compile Include="src\GraphicObjects\Window.cs" />
-    <Compile Include="src\GraphicObjects\IGOLibHost.cs" />
+    <Compile Include="src\EventSource.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\Colors.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\Point.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\Rectangle.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\Rectangles.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\Size.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\OpenTKGameWindow.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\GraphicObject.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Container.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Group.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\GroupBox.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\HorizontalStack.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Image.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Label.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\TextBox.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\ProgressBar.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\VerticalStack.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\Cairo\CairoHelpers.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\win32\Win32.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\win32\winApi.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Button.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\GraduatedSlider.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Slider.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\ValueChangeEventArgs.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\NumericControl.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Scroller.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\ILayoutable.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\Enums.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\GenericStack.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\CompilerServices\CompilerServices.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\AnalogMeter.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Border.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Checkbox.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\Font.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\TextChangeEventArgs.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\OpenGL\QuadVAO.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\OpenGL\Shader.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\OpenGL\TexturedShader.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\OpenGL\VertexArrayObject.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Window.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\IGOLibHost.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -99,12 +226,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="OpenTK.Compatibility, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
-      <HintPath>dependencies\OpenTK.Compatibility.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
-      <HintPath>dependencies\OpenTK.dll</HintPath>
-    </Reference>
     <Reference Include="rsvg2-sharp, Version=2.18.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <Package>rsvg2-sharp-2.0</Package>
     </Reference>
@@ -113,6 +234,9 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Mono.Cairo" />
+    <Reference Include="OpenTK">
+      <HintPath>..\..\src\opentk-git\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -124,16 +248,40 @@
   -->
   <ItemGroup />
   <ItemGroup>
-    <Folder Include="src\GraphicObjects\" />
-    <Folder Include="src\Cairo\" />
-    <Folder Include="src\win32\" />
-    <Folder Include="Images\" />
-    <Folder Include="Images\Icons\" />
-    <Folder Include="src\CompilerServices\" />
-    <Folder Include="src\OpenGL\" />
+    <Folder Include="src\GraphicObjects\">
+      <LogicalName>
+      </LogicalName>
+    </Folder>
+    <Folder Include="src\Cairo\">
+      <LogicalName>
+      </LogicalName>
+    </Folder>
+    <Folder Include="src\win32\">
+      <LogicalName>
+      </LogicalName>
+    </Folder>
+    <Folder Include="Images\">
+      <LogicalName>
+      </LogicalName>
+    </Folder>
+    <Folder Include="Images\Icons\">
+      <LogicalName>
+      </LogicalName>
+    </Folder>
+    <Folder Include="src\CompilerServices\">
+      <LogicalName>
+      </LogicalName>
+    </Folder>
+    <Folder Include="src\OpenGL\">
+      <LogicalName>
+      </LogicalName>
+    </Folder>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\icon_alert.gif" />
+    <None Include="Images\Icons\icon_alert.gif">
+      <LogicalName>
+      </LogicalName>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\Icons\question_mark.svg">

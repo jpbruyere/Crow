@@ -54,6 +54,9 @@ namespace go
 		bool yIsValid = false;
 		#endregion
 
+		public static int TabSize = 4;
+		public static string LineBreak = "\r\n";
+		public static bool ReplaceTabsWithSpace = false;
 		public static bool DesignerMode = false;
 
 		#region public fields

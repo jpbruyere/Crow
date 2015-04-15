@@ -29,7 +29,7 @@
 						Width="100" Height="10"
 						Value="30"/>
 				</HorizontalStack>
-				<HorizontalStack  Name="hsFocus">
+				<HorizontalStack  Name="hsFocus" HorizontalAlignment="Left">
 					<Label Text="Focused:"/>
 					<Label Name="labFocus" Width="200"/>
 				</HorizontalStack>
