@@ -219,6 +219,14 @@
       <LogicalName>
       </LogicalName>
     </Compile>
+    <Compile Include="src\GraphicObjects\ListBox.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\ExtensionsMethods.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -234,9 +242,6 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Mono.Cairo" />
-    <Reference Include="OpenTK">
-      <HintPath>..\..\src\opentk-git\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -287,5 +292,11 @@
     <EmbeddedResource Include="Images\Icons\question_mark.svg">
       <LogicalName>go.image.icons.question_mark</LogicalName>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\data\Developpements\Magic3D\OpenTK\Source\OpenTK\OpenTK.csproj">
+      <Project>{A37A7E14-0000-0000-0000-000000000000}</Project>
+      <Name>OpenTK</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

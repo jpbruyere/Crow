@@ -8,3 +8,11 @@ Debug
 /GOLib.userprefs
 /Tests/obj/*
 /Tests/bin/*
+MonoDevelop.GOLib/bin/
+MonoDevelop.GOLib/build/
+MonoDevelop.GOLib/obj/
+Tests/Tests.sln
+Tests/Tests.userprefs
+src/GraphicObjects/Panel.cs
+src/GraphicObjects/VerticalWrappingWidget.cs
+src/GraphicObjects/HorizontalWrappingWidget.cs

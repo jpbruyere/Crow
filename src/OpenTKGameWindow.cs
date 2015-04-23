@@ -87,11 +87,11 @@ namespace go
 
 		#region Events
 		//those events are raised only if mouse isn't in a graphic object
-		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged = delegate { };
-		public event EventHandler<MouseButtonEventArgs> MouseButtonUp = delegate { };
-		public event EventHandler<MouseButtonEventArgs> MouseButtonDown = delegate { };
-		public event EventHandler<MouseButtonEventArgs> MouseClick = delegate { };
-		public event EventHandler<MouseMoveEventArgs> MouseMove = delegate { };
+		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
+		public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
+		public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
+		public event EventHandler<MouseButtonEventArgs> MouseClick;
+		public event EventHandler<MouseMoveEventArgs> MouseMove;
 		#endregion
 
 		#region focus
@@ -407,7 +407,7 @@ namespace go
 				}
 			}
 			_hoverWidget = null;
-			MouseMove (this, e);
+			MouseMove.Raise (this, e);
         }
         void Mouse_ButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -416,12 +416,12 @@ namespace go
 
 			_activeWidget.onMouseButtonUp (this, e);
 			_activeWidget = null;
-			MouseButtonUp (this, e);
+			MouseButtonUp.Raise (this, e);
         }
         void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
         {
 			if (_hoverWidget == null) {
-				MouseButtonDown (this, e);
+				MouseButtonDown.Raise (this, e);
 				return;
 			}
 
@@ -439,7 +439,7 @@ namespace go
         void Mouse_WheelChanged(object sender, MouseWheelEventArgs e)
         {
 			if (_hoverWidget == null) {
-				MouseWheelChanged (this, e);
+				MouseWheelChanged.Raise (this, e);
 				return;
 			}
 			_hoverWidget.onMouseWheel (this, e);

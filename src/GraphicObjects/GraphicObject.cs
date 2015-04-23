@@ -150,17 +150,17 @@ namespace go
 		#endregion
 
 		#region EVENT HANDLERS
-		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged = delegate { };
-		public event EventHandler<MouseButtonEventArgs> MouseButtonUp = delegate { };
-		public event EventHandler<MouseButtonEventArgs> MouseButtonDown = delegate { };
-		public event EventHandler<MouseButtonEventArgs> MouseClick = delegate { };
-		public event EventHandler<MouseMoveEventArgs> MouseMove = delegate { };
-		public event EventHandler<MouseMoveEventArgs> MouseEnter = delegate { };
-		public event EventHandler<MouseMoveEventArgs> MouseLeave = delegate { };
-		public event EventHandler<KeyboardKeyEventArgs> KeyDown = delegate { };
-		public event EventHandler<KeyboardKeyEventArgs> KeyUp = delegate { };
-		public event EventHandler Focused = delegate { };
-		public event EventHandler Unfocused = delegate { };
+		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
+		public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
+		public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
+		public event EventHandler<MouseButtonEventArgs> MouseClick;
+		public event EventHandler<MouseMoveEventArgs> MouseMove;
+		public event EventHandler<MouseMoveEventArgs> MouseEnter;
+		public event EventHandler<MouseMoveEventArgs> MouseLeave;
+		public event EventHandler<KeyboardKeyEventArgs> KeyDown;
+		public event EventHandler<KeyboardKeyEventArgs> KeyUp;
+		public event EventHandler Focused;
+		public event EventHandler Unfocused;
 		#endregion
 
 		#region public properties
@@ -550,46 +550,46 @@ namespace go
 				onMouseEnter (sender, e);
 			}
 				
-			MouseMove (this, e);
+			MouseMove.Raise (this, e);
 		}
 		public virtual void onMouseButtonUp(object sender, MouseButtonEventArgs e){
 			if (MouseIsIn (e.Position))
 				onMouseClick (sender, e);
 
-			MouseButtonUp (this, e);
+			MouseButtonUp.Raise (this, e);
 		}
 		public virtual void onMouseButtonDown(object sender, MouseButtonEventArgs e){
 			TopContainer.FocusedWidget = this;
 
-			MouseButtonDown (this, e);
+			MouseButtonDown.Raise (this, e);
 		}
 		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){	
-			MouseClick(this,e);
+			MouseClick.Raise (this,e);
 		}
 		public virtual void onMouseWheel(object sender, MouseWheelEventArgs e){
 			GraphicObject p = Parent as GraphicObject;
 			if (p != null)
 				p.onMouseWheel(this,e);
 				
-			MouseWheelChanged (this, e);
+			MouseWheelChanged.Raise (this, e);
 		}
 		public virtual void onFocused(object sender, EventArgs e){
-			Focused (this, e);
+			Focused.Raise (this, e);
 			this.HasFocus = true;
 		}
 		public virtual void onUnfocused(object sender, EventArgs e){
-			Unfocused (this, e);
+			Unfocused.Raise (this, e);
 			this.HasFocus = false;
 		}
 		public virtual void onMouseEnter(object sender, MouseMoveEventArgs e)
 		{
 			Debug.WriteLine ("Mouse enter: " + this.Name);
-			MouseEnter (this, e);
+			MouseEnter.Raise (this, e);
 		}
 		public virtual void onMouseLeave(object sender, MouseMoveEventArgs e)
 		{
 			Debug.WriteLine ("Mouse leave: " + this.Name);
-			MouseLeave (this, e);
+			MouseLeave.Raise (this, e);
 		}
 		#endregion
 

@@ -91,11 +91,11 @@ namespace go
 		}
 		#endregion
 
-		public event EventHandler<TextChangeEventArgs> TextChanged = delegate { };
+		public event EventHandler<TextChangeEventArgs> TextChanged;
 
 		public virtual void onTextChanged(Object sender, TextChangeEventArgs e)
 		{
-			TextChanged (this, e);
+			TextChanged.Raise (this, e);
 		}
 			
         #region Keyboard handling

@@ -24,9 +24,8 @@ namespace go
 		public EventHandler<ValueChangeEventArgs> ValueChanged;
 
 		public virtual void onValueChanged(object sender, ValueChangeEventArgs e)
-		{
-			if (ValueChanged != null)
-				ValueChanged (sender, e);
+		{			
+			ValueChanged.Raise (sender, e);
 		}
 		#endregion
 
