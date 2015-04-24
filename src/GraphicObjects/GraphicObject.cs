@@ -54,11 +54,6 @@ namespace go
 		bool yIsValid = false;
 		#endregion
 
-		public static int TabSize = 4;
-		public static string LineBreak = "\r\n";
-		public static bool ReplaceTabsWithSpace = false;
-		public static bool DesignerMode = false;
-
 		#region public fields
 		public Rectangle Bounds;
 		public Rectangle Slot = new Rectangle ();
@@ -249,7 +244,7 @@ namespace go
 		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool Focusable {
-			get { return _focusable | DesignerMode; }
+			get { return _focusable | Interface.DesignerMode; }
 			set { _focusable = value; }
 		}        
 		[XmlAttributeAttribute()][DefaultValue("Transparent")]
@@ -593,122 +588,6 @@ namespace go
 		}
 		#endregion
 
-		#region Load/Save
-
-		internal static List<EventSource> EventsToResolve;
-
-		public static void Save<T>(string file, T graphicObject)
-		{            
-			XmlSerializerNamespaces xn = new XmlSerializerNamespaces();
-			xn.Add("", "");
-			XmlSerializer xs = new XmlSerializer(typeof(T));
-
-			xs = new XmlSerializer(typeof(T));
-			using (Stream s = new FileStream(file, FileMode.Create))
-			{
-				xs.Serialize(s, graphicObject, xn);
-			}
-		}
-		public static GraphicObject Load(string path)
-		{
-			string root = "Object";
-			using (Stream s = new FileStream (path, FileMode.Open)) {
-				using (XmlReader reader = XmlReader.Create (s)) {
-					while (reader.Read()) {
-						// first element is the root element
-						if (reader.NodeType == XmlNodeType.Element) {
-							root = reader.Name;
-							break;
-						}
-					}
-				}
-			}
-			Type t = Type.GetType("go." + root);
-			var go = Activator.CreateInstance(t);
-			return Load(path, t);
-		}
-		public static void Load<T>(string file, out T result, object ClassContainingHandlers = null)
-		{
-			EventsToResolve = new List<EventSource>();
-
-			XmlSerializerNamespaces xn = new XmlSerializerNamespaces();
-			xn.Add("", "");
-			XmlSerializer xs = new XmlSerializer(typeof(T));            
-
-			using (Stream s = new FileStream(file, FileMode.Open))
-			{
-				result = (T)xs.Deserialize(s);
-			}
-
-			if (ClassContainingHandlers == null)
-				return;
-
-			foreach (EventSource es in EventsToResolve)
-			{
-				if (string.IsNullOrEmpty(es.Handler))
-					continue;
-
-				if (es.Handler.StartsWith ("{")) {
-					CompilerServices.CompileEventSource (es);
-				} else {					
-					MethodInfo mi = ClassContainingHandlers.GetType ().GetMethod (es.Handler, BindingFlags.NonPublic | BindingFlags.Public
-					               | BindingFlags.Instance);
-
-					if (mi == null) {
-						Debug.WriteLine ("Handler Method not found: " + es.Handler);
-						continue;
-					}
-
-					FieldInfo fi = CompilerServices.getEventHandlerField (es.Source.GetType (), es.EventName);
-					Delegate del = Delegate.CreateDelegate(fi.FieldType, ClassContainingHandlers, mi);
-					fi.SetValue(es.Source, del);
-				}
-			}
-		}
-
-		public static GraphicObject Load(string file, Type type, object ClassContainingHandlers = null)
-		{
-			GraphicObject result;
-			EventsToResolve = new List<EventSource>();
-
-			XmlSerializerNamespaces xn = new XmlSerializerNamespaces();
-			xn.Add("", "");
-			XmlSerializer xs = new XmlSerializer(type);            
-
-			using (Stream s = new FileStream(file, FileMode.Open))
-			{
-				result = (GraphicObject)xs.Deserialize(s);
-			}
-
-			if (ClassContainingHandlers == null)
-				return result;
-
-			foreach (EventSource es in EventsToResolve)
-			{
-				if (string.IsNullOrEmpty(es.Handler))
-					continue;
-
-				if (es.Handler.StartsWith ("{")) {
-					CompilerServices.CompileEventSource (es);
-				} else {					
-					MethodInfo mi = ClassContainingHandlers.GetType ().GetMethod (es.Handler, BindingFlags.NonPublic | BindingFlags.Public
-						| BindingFlags.Instance);
-
-					if (mi == null) {
-						Debug.WriteLine ("Handler Method not found: " + es.Handler);
-						continue;
-					}
-
-					FieldInfo fi = CompilerServices.getEventHandlerField (es.Source.GetType (), es.EventName);
-					Delegate del = Delegate.CreateDelegate(fi.FieldType, ClassContainingHandlers, mi);
-					fi.SetValue(es.Source, del);
-				}
-			}
-			return result;
-		}
-
-		#endregion
-
 		public override string ToString ()
 		{
 			return Name == "unamed" ? this.GetType ().ToString() : Name;
@@ -732,7 +611,7 @@ namespace go
 				if (string.IsNullOrEmpty (handler))
 					continue;
 					
-				GraphicObject.EventsToResolve.Add(new EventSource 
+				Interface.EventsToResolve.Add(new EventSource 
 					{ 
 						Source = this, 
 						Handler = handler,

@@ -227,6 +227,10 @@
       <LogicalName>
       </LogicalName>
     </Compile>
+    <Compile Include="src\Interface.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -294,7 +298,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\data\Developpements\Magic3D\OpenTK\Source\OpenTK\OpenTK.csproj">
+    <ProjectReference Include="OpenTK\Source\OpenTK\OpenTK.csproj">
       <Project>{A37A7E14-0000-0000-0000-000000000000}</Project>
       <Name>OpenTK</Name>
     </ProjectReference>

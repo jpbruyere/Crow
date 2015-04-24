@@ -1,0 +1,6 @@
+[submodule "OpenTK"]
+	path = OpenTK
+	url = git://github.com/jpbruyere/opentk.git
+[submodule "GGL"]
+	path = GGL
+	url = git://github.com/jpbruyere/GGL.git

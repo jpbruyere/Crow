@@ -242,7 +242,7 @@ namespace go
         public override void ReadXml(System.Xml.XmlReader reader)
         {
             string handler = reader.GetAttribute("OnClick");
-			GraphicObject.EventsToResolve.Add(new EventSource 
+			Interface.EventsToResolve.Add(new EventSource 
             { 
                 Source = this, 
                 Handler = handler,

@@ -300,13 +300,13 @@ namespace go
 			
 		public void LoadInterface<T>(string path, out T result)
 		{
-			GraphicObject.Load<T> (path, out result, this);
+			Interface.Load<T> (path, out result, this);
 			AddWidget (result as GraphicObject);
 		}
 		public T LoadInterface<T> (string Path)
 		{
 			T result;
-			GraphicObject.Load<T> (Path, out result, this);
+			Interface.Load<T> (Path, out result, this);
 			AddWidget (result as GraphicObject);
 			return result;
 		}

@@ -78,7 +78,7 @@ namespace go
         {
             get {				
 				return lines == null ? 
-					_text : lines.Aggregate((i, j) => i + GraphicObject.LineBreak + j);
+					_text : lines.Aggregate((i, j) => i + Interface.LineBreak + j);
 			}
             set
             {
@@ -247,7 +247,7 @@ namespace go
 					te = new TextExtents();
 
 					foreach (string s in lines) {
-						string l = s.Replace("\t", new String (' ', GraphicObject.TabSize));
+						string l = s.Replace("\t", new String (' ', Interface.TabSize));
 
 #if _WIN32 || _WIN64
 						TextExtents tmp = gr.TextExtents(str.ToUtf8());
@@ -432,7 +432,7 @@ namespace go
 			gr.FontMatrix = new Matrix(widthRatio * Font.Size, 0, 0, heightRatio * Font.Size, 0, 0);
 
 			for (int i = 0; i < lines.Count; i++) {				
-				string l = lines [i].Replace ("\t", new String (' ', GraphicObject.TabSize));
+				string l = lines [i].Replace ("\t", new String (' ', Interface.TabSize));
 				if (selRelease >= 0 && i >= selectionStart.Y && i <= selectionEnd.Y) {					
 					gr.Color = selColor;
 					int lineLength = (int)gr.TextExtents (l).XAdvance;
@@ -536,11 +536,15 @@ namespace go
 
 			currentLine = (int)(mouseLocalPos.Y / fe.Height);
 
+			//fix cu
+			if (currentLine >= lines.Count)
+				currentLine = lines.Count - 1;
+
 			for (int i = 0; i < lines[currentLine].Length; i++)
 			{
 				string c = lines [currentLine].Substring (i, 1);
 				if (c == "\t")
-					c = new string (' ', GraphicObject.TabSize);
+					c = new string (' ', Interface.TabSize);
 				
 				#if _WIN32 || _WIN64
 				byte[] c = System.Text.UTF8Encoding.UTF8.GetBytes(Text.Substring(i, 1));
@@ -590,7 +594,7 @@ namespace go
 				{
 					string c = lines [currentLine].Substring (i, 1);
 					if (c == "\t")
-						c = new string (' ', GraphicObject.TabSize);
+						c = new string (' ', Interface.TabSize);
 					#if _WIN32 || _WIN64
 					byte[] c = System.Text.UTF8Encoding.UTF8.GetBytes(Text.Substring(i, 1));
 					te = gr.TextExtents(c);
