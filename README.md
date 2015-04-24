@@ -1,10 +1,11 @@
-GOLib
-=====
+#GOLib
 
 Graphic Object Library: custom widget library c# version.
 
 - Use OpenTK as top container for device abstraction layer
 - Curent drawing routines use Mono.Cairo
+
+#####GOLib in action
 
 ![GOLib in action](/magic3d.png?raw=true "Magic3d")
 
