@@ -1,0 +1,15 @@
+﻿<?xml version="1.0"?>
+<Group Width="0" Height="0" Margin="50"
+	Focusable="True" Background="Yellow">
+	<Group Width="-1" Height="-1" Margin="50" 
+		VerticalAlignment="Top" HorizontalAlignment="Left"
+		Focusable="True" Background="Green">
+		<Image VerticalAlignment="Bottom"			
+			Name="PhaseOverlay" Width="100" Height="100" Path="image/u.svg" Background="Red"/>
+		<Image Top="100"		
+			Name="PhaseOverlay" Width="100" Height="100" Path="image/u.svg" Background="Red"/>
+	</Group>
+	<Image Top="100"		
+		Name="PhaseOverlay" Width="100" Height="100" Path="image/u.svg" Background="Red"/>
+
+</Group>

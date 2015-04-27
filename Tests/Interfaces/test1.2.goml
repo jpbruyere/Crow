@@ -1,0 +1,18 @@
+﻿<?xml version="1.0"?>
+<VerticalStack>
+	<Label Text="label11"/>
+	<Label Text="label21"/>
+	<HorizontalStack Width="-1" Height="-1" Margin="50"
+		Focusable="True" Background="DarkBlue">
+		<Label Text="label12"/>
+		<Label Text="label22"/>
+		<Label Text="label32"/>
+		<Label Text="label42"/>
+		<Label Text="label52"/>
+	</HorizontalStack>
+	<Label Text="label33" Background="Green" Width="0"/>
+	<Button/>
+	<Label Text="label43"/>
+	<Label Text="label53"/>
+
+</VerticalStack>

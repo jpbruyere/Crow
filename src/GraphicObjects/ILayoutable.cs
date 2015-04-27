@@ -6,14 +6,6 @@ namespace go
 	{
 		ILayoutable Parent { get; set; }
 
-		bool SizeIsValid { get; set; }
-		bool WIsValid { get; set; }
-		bool HIsValid { get; set; }
-		bool PositionIsValid { get; set; }
-		bool XIsValid { get; set; }
-		bool YIsValid { get; set; }
-		bool LayoutIsValid { get; set; }
-
 		Rectangle ClientRectangle { get; }
 		Rectangle getSlot();
 		Rectangle getBounds();
@@ -21,6 +13,7 @@ namespace go
 		IGOLibHost TopContainer { get; }
 
 		void InvalidateLayout ();
+		void UpdateLayout(LayoutingType layoutType);
 
 
 		Rectangle ContextCoordinates(Rectangle r);

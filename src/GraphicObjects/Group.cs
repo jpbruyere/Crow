@@ -132,67 +132,58 @@ namespace go
 		}
 		protected override Size measureRawSize ()
 		{
-			Size raw = Bounds.Size;
 			Size tmp = new Size ();
 
-			if (raw.Width >= 0 && raw.Height >= 0)
-				return raw;
-
 			foreach (GraphicObject c in Children) {
-				if (raw.Width < 0) {
-					if (c.WIsValid)
-						tmp.Width = Math.Max (tmp.Width, c.Slot.Right);
-					else
-						return raw;
-				}
-				if (raw.Height < 0) {
-					if (c.HIsValid)
-						tmp.Height = Math.Max (tmp.Height, c.Slot.Bottom);
-					else
-						return raw;
-				}
+				tmp.Width = Math.Max (tmp.Width, c.Slot.Right);
+				tmp.Height = Math.Max (tmp.Height, c.Slot.Bottom);
 			}
 
-			if (raw.Width < 0)
-				tmp.Width += 2*Margin;
-			if (raw.Height < 0)
-				tmp.Height += 2*Margin;
+			tmp.Width += 2*Margin;
+			tmp.Height += 2*Margin;
 
 			return tmp;
 		}
-		public override void UpdateLayout()
+		public override void RegisterForLayouting ()
 		{
-			if (LayoutIsValid)
-				return;
+			base.RegisterForLayouting ();
 
-			bool atLeastOneChildHasWNotDependingOnParent = false;
-			bool atLeastOneChildHasHNotDependingOnParent = false;
-
-			foreach (GraphicObject c in Children) {
-				if (c.LayoutIsValid)
-					continue;
-
-				if (Width < 0 && c.WIsValid) {
-					if (!atLeastOneChildHasWNotDependingOnParent && !(this is GenericStack))
-						c.XIsValid = true;
-					atLeastOneChildHasWNotDependingOnParent = true;
-				}
-				if (Height < 0 && c.HIsValid) {
-					if (!atLeastOneChildHasHNotDependingOnParent && !(this is GenericStack))
-						c.YIsValid = true;
-					atLeastOneChildHasHNotDependingOnParent = true;
-				}
-
-				c.UpdateLayout ();
-			}
-
-//			if (Width < 0 && !atLeastOneChildHasWNotDependingOnParent)
-//				Debug.WriteLine ("ERROR: no child has fixed width and parent width is set to content!");
-//			if (Height < 0 && !atLeastOneChildHasHNotDependingOnParent)
-//				Debug.WriteLine ("ERROR: no child has fixed height and parent height is set to content!");
-
-			base.UpdateLayout ();
+			foreach (GraphicObject g in Children)
+				g.RegisterForLayouting ();			
 		}
+//		public override void UpdateLayout (LayoutingType layoutType)
+//		{
+//			if (LayoutIsValid)
+//				return;
+//
+//			bool atLeastOneChildHasWNotDependingOnParent = false;
+//			bool atLeastOneChildHasHNotDependingOnParent = false;
+//
+////			foreach (GraphicObject c in Children) {
+////				if (c.LayoutIsValid)
+////					continue;
+////
+////				if (Width < 0 && c.WIsValid) {
+////					if (!atLeastOneChildHasWNotDependingOnParent && !(this is GenericStack))
+////						c.XIsValid = true;
+////					atLeastOneChildHasWNotDependingOnParent = true;
+////				}
+////				if (Height < 0 && c.HIsValid) {
+////					if (!atLeastOneChildHasHNotDependingOnParent && !(this is GenericStack))
+////						c.YIsValid = true;
+////					atLeastOneChildHasHNotDependingOnParent = true;
+////				}
+////
+////				c.UpdateLayout ();
+////			}
+//
+////			if (Width < 0 && !atLeastOneChildHasWNotDependingOnParent)
+////				Debug.WriteLine ("ERROR: no child has fixed width and parent width is set to content!");
+////			if (Height < 0 && !atLeastOneChildHasHNotDependingOnParent)
+////				Debug.WriteLine ("ERROR: no child has fixed height and parent height is set to content!");
+//
+//			//base.UpdateLayout ();
+//		}
 
 		public override Rectangle ContextCoordinates(Rectangle r){
 			return r + ClientRectangle.Position;
@@ -212,7 +203,7 @@ namespace go
 
 		public override void Paint(ref Context ctx, Rectangles clip = null)
 		{
-			if ( !(Visible&LayoutIsValid) )
+			if ( !(Visible) )
 				return;
 
 			//			ctx.Save ();

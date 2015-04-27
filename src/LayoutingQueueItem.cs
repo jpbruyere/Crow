@@ -1,0 +1,70 @@
+﻿//
+//  LayoutingQueueItem.cs
+//
+//  Author:
+//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
+//
+//  Copyright (c) 2015 jp
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+using System;
+using System.Diagnostics;
+
+namespace go
+{
+	public enum LayoutingType
+	{
+		X,
+		Y,
+		Width,
+		Height,
+		PositionChildren
+	}
+
+	public class LayoutingQueueItem
+	{
+
+		public ILayoutable GraphicObject;
+		public LayoutingType LayoutType;
+
+		public LayoutingQueueItem (LayoutingType _layoutType, ILayoutable _graphicObject)
+		{
+			LayoutType = _layoutType;
+			GraphicObject = _graphicObject;
+		}
+		public void ProcessLayouting()
+		{
+			Debug.WriteLine ("Layouting => " + this.ToString ());
+			try {
+				GraphicObject.UpdateLayout (LayoutType);
+			} catch (Exception ex) {
+				Debug.WriteLine ("Layouting error: " + ex.ToString ());
+			}
+		}
+
+		public static implicit operator GraphicObject(LayoutingQueueItem queueItem)
+		{
+			return queueItem.GraphicObject as GraphicObject;
+		}
+		public static implicit operator LayoutingType(LayoutingQueueItem lqi)
+		{
+			return lqi.LayoutType;
+		}
+		public override string ToString ()
+		{
+			return string.Format ("{0}->{1}", LayoutType,GraphicObject.ToString());
+		}
+	}
+}
+

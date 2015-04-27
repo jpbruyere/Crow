@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>test.GOLIBTest_4</StartupObject>
+    <StartupObject>test.GOLIBTest_5</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>..\bin\$(configuration)</OutputPath>
     <IntermediateOutputPath>obj\$(configuration)</IntermediateOutputPath>
@@ -64,6 +64,14 @@
       <LogicalName>
       </LogicalName>
     </Compile>
+    <Compile Include="GOLIBTest_1.1.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="GOLIBTest_1.2.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -97,6 +105,16 @@
       </LogicalName>
     </None>
     <None Include="Interfaces\test2.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <LogicalName>
+      </LogicalName>
+    </None>
+    <None Include="Interfaces\test1.1.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <LogicalName>
+      </LogicalName>
+    </None>
+    <None Include="Interfaces\test1.2.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <LogicalName>
       </LogicalName>

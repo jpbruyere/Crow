@@ -78,6 +78,8 @@ namespace go
 		{
 			g.Parent = this;
 			GraphicObjects.Add (g);
+
+			g.RegisterForLayouting ();
 		}
 		public void DeleteWidget(GraphicObject g)
 		{
@@ -224,14 +226,18 @@ namespace go
 			GraphicObject[] invGOList = new GraphicObject[GraphicObjects.Count];
 			GraphicObjects.CopyTo (invGOList,0);
 			invGOList = invGOList.Reverse ().ToArray ();
-
-			foreach (GraphicObject p in invGOList) {
-				if (p.Visible) {
-					layoutTime.Start ();
-					while(!p.LayoutIsValid)
-						p.UpdateLayout ();
-					layoutTime.Stop ();
-				}
+//
+//			foreach (GraphicObject p in invGOList) {
+//				if (p.Visible) {
+//					layoutTime.Start ();
+//					while(!p.LayoutIsValid)
+//						p.UpdateLayout ();
+//					layoutTime.Stop ();
+//				}
+//			}
+			while (Interface.LayoutingQueue.Count > 0) {
+				LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
+				lqi.ProcessLayouting ();
 			}
 
 			//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
@@ -456,6 +462,11 @@ namespace go
         #endregion
 
 		#region ILayoutable implementation
+
+		public void UpdateLayout (LayoutingType layoutType)
+		{
+			throw new NotImplementedException ();
+		}
 
 		public Rectangle ContextCoordinates (Rectangle r)
 		{
