@@ -22,6 +22,17 @@ namespace go
         Orientation _orientation;
 		#endregion
 
+		public override T addChild<T> (T child)
+		{
+			this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+			return base.addChild (child);
+		}
+		public override void removeChild (GraphicObject child)
+		{
+			base.removeChild (child);
+			this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+		}
+
 		#region Public Properties
         [XmlAttributeAttribute()][DefaultValue(2)]
         public int Spacing
@@ -85,23 +96,30 @@ namespace go
 				}
 			}
 		}
-		public override void RegisterForLayouting ()
-		{
-			base.RegisterForLayouting ();
+//		public void RegisterForLayouting ()
+//		{
+//			base.RegisterForLayouting ();
+//
+//			int idx = Interface.LayoutingQueue.IndexOf (Interface.LayoutingQueue.Where (lq => lq.GraphicObject.Parent == this).LastOrDefault ());
+//			if (idx < 0)
+//				return;
+//			Interface.LayoutingQueue.Insert (
+//				idx+1,
+//				new LayoutingQueueItem (LayoutingType.PositionChildren, this));
+//		}
+		public override void RegisterForLayouting (int layoutType)
+		{			
+			base.RegisterForLayouting (layoutType);
 
-			int idx = Interface.LayoutingQueue.IndexOf (Interface.LayoutingQueue.Where (lq => lq.GraphicObject.Parent == this).LastOrDefault ());
-			if (idx < 0)
-				return;
-			Interface.LayoutingQueue.Insert (
-				idx+1,
-				new LayoutingQueueItem (LayoutingType.PositionChildren, this));
+			if ((layoutType & (int)LayoutingType.PositionChildren) > 0)
+				Interface.LayoutingQueue.Enqueue (LayoutingType.PositionChildren, this);
 		}
 		public override void UpdateLayout (LayoutingType layoutType)
         {            
 			if (layoutType == LayoutingType.PositionChildren)
 				ComputeChildrenPositions ();
-
-			base.UpdateLayout(layoutType);
+			else
+				base.UpdateLayout(layoutType);
         }
 		#endregion
 

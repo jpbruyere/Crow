@@ -22,7 +22,7 @@ namespace test
 			: base(1024, 600,"test")
 		{}
 
-		VerticalStack g;
+		Container g;
 
 		protected override void OnLoad (EventArgs e)
 		{

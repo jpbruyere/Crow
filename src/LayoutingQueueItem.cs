@@ -25,11 +25,13 @@ namespace go
 {
 	public enum LayoutingType
 	{
-		X,
-		Y,
-		Width,
-		Height,
-		PositionChildren
+		X = 0x01,
+		Y = 0x02,
+		Width = 0x04,
+		Height = 0x08,
+		Sizing = 0x0C,
+		PositionChildren = 0x10,
+		All = 0xFF
 	}
 
 	public class LayoutingQueueItem
@@ -63,7 +65,7 @@ namespace go
 		}
 		public override string ToString ()
 		{
-			return string.Format ("{0}->{1}", LayoutType,GraphicObject.ToString());
+			return string.Format ("{1}->{0}", LayoutType,GraphicObject.ToString());
 		}
 	}
 }

@@ -3,6 +3,7 @@ using System.Xml.Serialization;
 using System.Reflection;
 using OpenTK.Input;
 using System.ComponentModel;
+using System.Linq;
 
 namespace go
 {
@@ -24,13 +25,17 @@ namespace go
         public T setChild<T>(T _child)
         {
 
-            if (child != null)
-                child.Parent = null;
+			if (child != null) {
+				this.RegisterForLayouting ((int)LayoutingType.Sizing);
+				child.Parent = null;
+			}
 
             child = _child as GraphicObject;
 
-            if (child != null)
-                child.Parent = this;
+			if (child != null) {
+				child.Parent = this;
+				child.RegisterForLayouting ((int)LayoutingType.Sizing);
+			}
 
             return (T)_child;
         }
@@ -42,19 +47,6 @@ namespace go
 		{
 			get { return base.Focusable; }
 			set { base.Focusable = value; }
-		}
-		[XmlIgnore]public override bool LayoutIsValid
-		{
-			get
-			{
-				if (!Visible)
-					return true;
-
-				return !base.LayoutIsValid || child == null ?
-					base.LayoutIsValid :
-					child.LayoutIsValid;
-			}
-			set { base.LayoutIsValid = value; }
 		}
 
 		public override GraphicObject FindByName (string nameToFind)
@@ -69,45 +61,112 @@ namespace go
 			return child == goToFind ? true : 
 				child == null ? false : child.Contains(goToFind);
 		}
-        public override void InvalidateLayout()
-        {
-            base.InvalidateLayout();
-
-            if (child != null)
-                child.InvalidateLayout();
-        }
 		protected override Size measureRawSize ()
 		{			
 			return child == null ? Bounds.Size : new Size(child.Slot.Width + 2 * (Margin),child.Slot.Height + 2 * (Margin));
 		}
-		public override void RegisterForLayouting ()
-		{
-			base.RegisterForLayouting ();
 
-			if (child != null)
-				child.RegisterForLayouting ();
+		public override void UpdateLayout (LayoutingType layoutType)
+		{
+			{			
+				switch (layoutType) {
+				case LayoutingType.X:
+					if (Bounds.X == 0) {
+						switch (HorizontalAlignment) {
+						case HorizontalAlignment.Left:
+							Slot.X = 0;
+							break;
+						case HorizontalAlignment.Right:
+							Slot.X = Parent.ClientRectangle.Width - Slot.Width;
+							break;
+						case HorizontalAlignment.Center:
+							Slot.X = Parent.ClientRectangle.Width / 2 - Slot.Width / 2;
+							break;
+						}
+					} else
+						Slot.X = Bounds.X;
+					if (LastSlots.X == Slot.X)
+						break;
+					//register layouting here for objects depending on this.x
+					LastSlots.X = Slot.X;
+					break;
+				case LayoutingType.Y:
+					if (Bounds.Y == 0) {
+						switch (VerticalAlignment) {
+						case VerticalAlignment.Top:
+							Slot.Y = 0;
+							break;
+						case VerticalAlignment.Bottom:
+							Slot.Y = Parent.ClientRectangle.Height - Slot.Height;
+							break;
+						case VerticalAlignment.Center:
+							Slot.Y = Parent.ClientRectangle.Height / 2 - Slot.Height / 2;
+							break;
+						}
+					}else
+						Slot.Y = Bounds.Y;
+					if (LastSlots.Y == Slot.Y)
+						break;
+					//register layouting here for objects depending on this.x
+					LastSlots.Y = Slot.Y;
+					break;
+				case LayoutingType.Width:				
+					if (Width > 0)
+						Slot.Width = Width;
+					else if (Width < 0)
+						Slot.Width = measureRawSize ().Width;
+					else
+						Slot.Width = Parent.ClientRectangle.Width;
+
+					if (LastSlots.Width == Slot.Width)
+						break;
+
+					if (Parent.getBounds ().Width < 0)
+						this.Parent.RegisterForLayouting ((int)LayoutingType.Width);
+					else if (Width != 0) //update position in parent
+						this.RegisterForLayouting ((int)LayoutingType.X);
+
+					if (child != null) {
+						if (child.getBounds ().Width == 0)
+							child.RegisterForLayouting ((int)LayoutingType.Width);
+						else
+							child.RegisterForLayouting ((int)LayoutingType.X);
+					}
+					LastSlots.Width = Slot.Width;
+					break;
+				case LayoutingType.Height:
+					if (Height > 0)
+						Slot.Height = Height;
+					else if (Height < 0)
+						Slot.Height = measureRawSize ().Height;
+					else
+						Slot.Height = Parent.ClientRectangle.Height;
+
+					if (LastSlots.Height == Slot.Height)
+						break;
+
+					if (Parent.getBounds().Height < 0)
+						this.Parent.RegisterForLayouting((int)LayoutingType.Height);
+					else if (Height != 0) //update position in parent
+						this.RegisterForLayouting ((int)LayoutingType.Y);
+
+					if (child != null) {
+						if (child.getBounds ().Height == 0)
+							child.RegisterForLayouting ((int)LayoutingType.Height);
+						else
+							child.RegisterForLayouting ((int)LayoutingType.Y);
+					}
+
+					LastSlots.Height = Slot.Height;
+					break;
+				}
+
+				//if no layouting remains in queue for item, registre for redraw
+				if (Interface.LayoutingQueue.Where (lq => lq.GraphicObject == this).Count () <= 0)
+					this.RegisterForRedraw ();
+			}		
 		}
-//		public override void UpdateLayout (LayoutingType layoutType)
-//        {
-//
-////			if (Width < 0 && child.Width == 0)
-////				child.Width = -1;
-////			if (Height < 0 && child.Height == 0)
-////				child.Height = -1;
-////
-////			if (!(base.LayoutIsValid))
-////				base.UpdateLayout();
-////				
-////            if (child != null)
-////            {
-////				if (!child.LayoutIsValid) {
-////					child.UpdateLayout ();
-////				}
-////            }
-////
-////            if (LayoutIsValid)
-////                registerForRedraw();
-//        }
+
 		public override Rectangle ContextCoordinates (Rectangle r)
 		{
 			return

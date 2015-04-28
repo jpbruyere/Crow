@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<GraphicObject 
-			HorizontalAlignment="Right"
-			VerticalAlignment="Bottom"
+<GraphicObject
+			Width="100" Height="100"
+			Top="200" Left="200" 
 			Margin="10" Background="Green"/>

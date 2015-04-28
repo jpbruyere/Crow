@@ -36,7 +36,25 @@ namespace test
 			base.OnRenderFrame (e);
 			SwapBuffers ();
 		}
-
+		protected override void OnKeyDown (KeyboardKeyEventArgs e)
+		{
+			switch (e.Key) {
+			case Key.Left:
+				g.Left++;
+				break;
+			case Key.Right:
+				g.Left--;
+				break;
+			case Key.Up:
+				g.Top--;
+				break;
+			case Key.Down:
+				g.Top++;
+				break;
+			default:
+				break;
+			}
+		}
 		protected override void OnUpdateFrame (FrameEventArgs e)
 		{
 			base.OnUpdateFrame (e);

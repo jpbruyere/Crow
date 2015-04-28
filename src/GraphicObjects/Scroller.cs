@@ -72,7 +72,7 @@ namespace go
 			if (VerticalScrolling )
             {
                 //add redraw call with old bounds to errase old position
-                registerForRedraw();
+                RegisterForRedraw();
 
 				scrollY += e.Delta * ScrollSpeed;
 
@@ -85,7 +85,7 @@ namespace go
             if (HorizontalScrolling )
             {
                 //add redraw call with old bounds to errase old position
-                registerForRedraw();
+                RegisterForRedraw();
 
 				scrollX += e.Delta * ScrollSpeed;
 
@@ -97,7 +97,7 @@ namespace go
 
 
             //renderBounds.Y = -scrollY;
-            registerForRedraw();
+            RegisterForRedraw();
 			//Parent.registerForGraphicUpdate ();
         }
 		#endregion

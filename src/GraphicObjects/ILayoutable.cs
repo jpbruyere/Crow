@@ -12,7 +12,7 @@ namespace go
 
 		IGOLibHost TopContainer { get; }
 
-		void InvalidateLayout ();
+		void RegisterForLayouting(int layoutType);
 		void UpdateLayout(LayoutingType layoutType);
 
 

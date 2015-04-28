@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace go
 {
@@ -28,7 +29,34 @@ namespace go
 		public LayoutingQueue ()
 		{
 		}
-			
+		public void Enqueue(LayoutingType _lt, ILayoutable _object)
+		{
+			Interface.LayoutingQueue.RemoveAll(lq => lq.GraphicObject == _object && lq.LayoutType == _lt);
+			Interface.LayoutingQueue.Add (new LayoutingQueueItem (_lt, _object));
+		}
+
+		public void EnqueueAfterParentSizing (LayoutingType _lt, ILayoutable _object)
+		{
+			LayoutingQueueItem lqi = new LayoutingQueueItem (_lt, _object);
+			int idxParentSz = Interface.LayoutingQueue.IndexOf 
+				(Interface.LayoutingQueue.Where(lq => lq.GraphicObject == _object.Parent && lq.LayoutType == _lt).LastOrDefault());
+
+			Interface.LayoutingQueue.Insert (idxParentSz + 1, lqi);			
+		}
+		public void EnqueueAfterThisAndParentSizing (LayoutingType _lt, ILayoutable _object)
+		{
+			LayoutingQueueItem lqi = new LayoutingQueueItem (_lt, _object);
+			LayoutingType sizing = LayoutingType.Width;
+
+			if (_lt == LayoutingType.Y)
+				sizing = LayoutingType.Height;
+				
+			int idxW = Interface.LayoutingQueue.IndexOf (Interface.LayoutingQueue.Where
+				(lq => (lq.GraphicObject == _object.Parent || lq.GraphicObject == _object) && lq.LayoutType == sizing).LastOrDefault());
+
+			Interface.LayoutingQueue.Insert (idxW + 1, lqi);			
+		}
+
 		public LayoutingQueueItem Dequeue()
 		{
 			LayoutingQueueItem tmp = this [0];

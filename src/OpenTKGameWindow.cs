@@ -79,7 +79,7 @@ namespace go
 			g.Parent = this;
 			GraphicObjects.Add (g);
 
-			g.RegisterForLayouting ();
+			g.RegisterForLayouting ((int)LayoutingType.Sizing);
 		}
 		public void DeleteWidget(GraphicObject g)
 		{
@@ -463,6 +463,11 @@ namespace go
 
 		#region ILayoutable implementation
 
+		public void RegisterForLayouting (int layoutType)
+		{
+			throw new NotImplementedException ();
+		}
+
 		public void UpdateLayout (LayoutingType layoutType)
 		{
 			throw new NotImplementedException ();
@@ -524,79 +529,7 @@ namespace go
 			return ClientRectangle;
 		}
 
-		public bool WIsValid {
-			get {
-				return true;
-			}
-			set {
-				throw new NotImplementedException ();
-			}
-		}
-		public bool HIsValid {
-			get {
-				return true;
-			}
-			set {
-				throw new NotImplementedException ();
-			}
-		}
-		public bool XIsValid {
-			get {
-				return true;
-			}
-			set {
-				throw new NotImplementedException ();
-			}
-		}
-		public bool YIsValid {
-			get {
-				return true;
-			}
-			set {
-				throw new NotImplementedException ();
-			}
-		}
 
-		public virtual void InvalidateLayout ()
-		{
-//			foreach (GraphicObject g in GraphicObjects) {
-//				g.InvalidateLayout ();
-//			}
-		}
-//		public Rectangle rectInScreenCoord (Rectangle r)
-//		{
-//			throw new NotImplementedException ();
-//		}
-//		public Rectangle renderBoundsInContextCoordonate {
-//			get { return ClientRectangle; }
-//		}
-//		public Rectangle ClientBoundsInContextCoordonate {
-//			get {
-//				throw new NotImplementedException ();
-//			}
-//		}
-//		public Rectangle renderBoundsInBackendSurfaceCoordonate {
-//			get { return ClientRectangle; }
-//		}
-//		public Rectangle ClientBoundsInBackendSurfaceCoordonate {
-//			get {
-//				throw new NotImplementedException ();
-//			}
-//			set {
-//				throw new NotImplementedException ();
-//			}
-//		}
-//		public Rectangle ScreenCoordBounds {
-//			get { return ClientRectangle; }
-//		}
-//		public Rectangle ScreenCoordClientBounds {
-//			get {
-//				throw new NotImplementedException ();
-//			}
-//			set {
-//				throw new NotImplementedException ();
-//			}
-//		}
 		#endregion
     }
 }

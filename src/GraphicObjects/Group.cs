@@ -36,15 +36,15 @@ namespace go
         {
 			GraphicObject g = child as GraphicObject;
             Children.Add(g);
-            g.Parent = this as GraphicObject;
-            LayoutIsValid = false;
+            g.Parent = this as GraphicObject;            
+			g.RegisterForLayouting ((int)LayoutingType.Sizing);
             return (T)child;
         }
-        public void removeChild(GraphicObject child)        
+        public virtual void removeChild(GraphicObject child)        
 		{
             Children.Remove(child);
             child.Parent = null;
-            LayoutIsValid = false;
+			this.RegisterForLayouting ((int)LayoutingType.Sizing);
         }
 		public void putWidgetOnTop(GraphicObject w)
 		{
@@ -80,26 +80,6 @@ namespace go
 				}
 				return true;
 			}
-		}
-		[XmlIgnore]public override bool LayoutIsValid
-		{
-			get
-			{
-				if (!Visible)
-					return true;
-
-				if (!base.LayoutIsValid)
-					return false;
-				else//le layout n'est valide que si tous les enfents sont validés aussi
-				{
-					foreach (GraphicObject w in Children)
-						if (!w.LayoutIsValid)
-							return false;
-				}
-
-				return true;
-			}
-			set { base.LayoutIsValid = value; }
 		}
 
 		public override GraphicObject FindByName (string nameToFind)
@@ -144,13 +124,7 @@ namespace go
 
 			return tmp;
 		}
-		public override void RegisterForLayouting ()
-		{
-			base.RegisterForLayouting ();
 
-			foreach (GraphicObject g in Children)
-				g.RegisterForLayouting ();			
-		}
 //		public override void UpdateLayout (LayoutingType layoutType)
 //		{
 //			if (LayoutIsValid)
