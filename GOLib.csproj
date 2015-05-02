@@ -231,6 +231,14 @@
       <LogicalName>
       </LogicalName>
     </Compile>
+    <Compile Include="src\LayoutingQueueItem.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\LayoutingQueue.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

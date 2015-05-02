@@ -67,7 +67,7 @@ namespace go
                 if (value == _CurrentState)
                     return;
                 _CurrentState = value;
-                registerForRedraw();
+                RegisterForRedraw();
             }
         }
 

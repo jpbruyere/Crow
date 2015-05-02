@@ -86,7 +86,8 @@ namespace go
                     return;
 					                
                 registerForGraphicUpdate();
-                InvalidateLayout();
+				this.RegisterForLayouting ((int)LayoutingType.Sizing);
+
 
                 _text = value;
 

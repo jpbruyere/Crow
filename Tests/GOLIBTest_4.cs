@@ -113,8 +113,8 @@ namespace test
 					}
 				);
 				i++;
-				if (i > 50)
-					break;
+//				if (i > 50)
+//					break;
 			}
 		}
 		void pFps_mousemove(object sender, MouseMoveEventArgs e)
@@ -124,7 +124,6 @@ namespace test
 			redrawClip.AddRectangle (c.ScreenCoordinates(c.Slot));
 			c.Left += e.XDelta;
 			c.Top += e.YDelta;
-			c.LayoutIsValid = false;
 			c.registerForGraphicUpdate ();
 		}
 		protected override void OnRenderFrame (FrameEventArgs e)

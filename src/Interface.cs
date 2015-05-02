@@ -35,6 +35,8 @@ namespace go
 		public static bool ReplaceTabsWithSpace = false;
 		public static bool DesignerMode = false;
 
+		public static LayoutingQueue LayoutingQueue = new LayoutingQueue();
+
 		#region Load/Save
 
 		internal static List<EventSource> EventsToResolve;

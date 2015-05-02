@@ -3,6 +3,7 @@ using System.Xml.Serialization;
 using System.Reflection;
 using OpenTK.Input;
 using System.ComponentModel;
+using System.Linq;
 
 namespace go
 {
@@ -24,13 +25,17 @@ namespace go
         public T setChild<T>(T _child)
         {
 
-            if (child != null)
-                child.Parent = null;
+			if (child != null) {
+				this.RegisterForLayouting ((int)LayoutingType.Sizing);
+				child.Parent = null;
+			}
 
             child = _child as GraphicObject;
 
-            if (child != null)
-                child.Parent = this;
+			if (child != null) {
+				child.Parent = this;
+				child.RegisterForLayouting ((int)LayoutingType.Sizing);
+			}
 
             return (T)_child;
         }
@@ -42,19 +47,6 @@ namespace go
 		{
 			get { return base.Focusable; }
 			set { base.Focusable = value; }
-		}
-		[XmlIgnore]public override bool LayoutIsValid
-		{
-			get
-			{
-				if (!Visible)
-					return true;
-
-				return !base.LayoutIsValid || child == null ?
-					base.LayoutIsValid :
-					child.LayoutIsValid;
-			}
-			set { base.LayoutIsValid = value; }
 		}
 
 		public override GraphicObject FindByName (string nameToFind)
@@ -69,49 +61,63 @@ namespace go
 			return child == goToFind ? true : 
 				child == null ? false : child.Contains(goToFind);
 		}
-        public override void InvalidateLayout()
-        {
-            base.InvalidateLayout();
-
-            if (child != null)
-                child.InvalidateLayout();
-        }
 		protected override Size measureRawSize ()
-		{
-			Size raw = Bounds.Size;
-
-			if (child != null) {
-				if (Bounds.Width < 0 && child.WIsValid)
-					raw.Width = child.Slot.Width + 2 * (Margin);
-				if (Bounds.Height < 0 && child.HIsValid)
-					raw.Height = child.Slot.Height + 2 * (Margin);
-			}
-
-			return raw;
+		{			
+			return child == null ? Bounds.Size : new Size(child.Slot.Width + 2 * (Margin),child.Slot.Height + 2 * (Margin));
 		}
-        public override void UpdateLayout()
-        {
-			if (LayoutIsValid)
-                return;
 
-			if (Width < 0 && child.Width == 0)
-				child.Width = -1;
-			if (Height < 0 && child.Height == 0)
-				child.Height = -1;
-
-			if (!(base.LayoutIsValid))
-				base.UpdateLayout();
-				
-            if (child != null)
-            {
-				if (!child.LayoutIsValid) {
-					child.UpdateLayout ();
+		protected override void OnLayoutChanges (LayoutingType layoutType)
+		{
+			switch (layoutType) {
+			case LayoutingType.Width:				
+				base.OnLayoutChanges (layoutType);
+				if (child != null) {
+					if (child.getBounds ().Width == 0)
+						child.RegisterForLayouting ((int)LayoutingType.Width);
+					else
+						child.RegisterForLayouting ((int)LayoutingType.X);
 				}
-            }
+				break;
+			case LayoutingType.Height:
+				base.OnLayoutChanges (layoutType);
+				if (child != null) {
+					if (child.getBounds ().Height == 0)
+						child.RegisterForLayouting ((int)LayoutingType.Height);
+					else
+						child.RegisterForLayouting ((int)LayoutingType.Y);
+				}
+				break;
+			}							
+		}
 
-            if (LayoutIsValid)
-                registerForRedraw();
-        }
+//		public override void RegisterForLayouting(int layoutType)
+//		{
+//			Interface.LayoutingQueue.RemoveAll (lq => lq.GraphicObject == this && (layoutType & (int)lq.LayoutType) > 0);
+//
+//			if ((layoutType & (int)LayoutingType.Width) > 0) {
+//				if (Bounds.Width == 0) //stretch in parent
+//					Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Width, this);
+//				else //fit ou fixed
+//					Interface.LayoutingQueue.Enqueue (LayoutingType.Width, this);
+//			}
+//
+//			if ((layoutType & (int)LayoutingType.Height) > 0) {
+//				if (Bounds.Height == 0) //stretch in parent
+//					Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Height, this);
+//				else//fit ou fixed
+//					Interface.LayoutingQueue.Enqueue (LayoutingType.Height, this);
+//			}
+//
+//			if ((layoutType & (int)LayoutingType.X) > 0)
+//				//for x positionning, sizing of parent and this have to be done
+//				Interface.LayoutingQueue.EnqueueAfterThisAndParentSizing (LayoutingType.X, this);
+//
+//			if ((layoutType & (int)LayoutingType.Y) > 0)
+//				//for x positionning, sizing of parent and this have to be done
+//				Interface.LayoutingQueue.EnqueueAfterThisAndParentSizing (LayoutingType.Y, this);
+//
+//		}
+
 		public override Rectangle ContextCoordinates (Rectangle r)
 		{
 			return

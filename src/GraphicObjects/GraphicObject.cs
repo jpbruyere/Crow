@@ -66,49 +66,6 @@ namespace go
 			get { return _parent; }
 			set { _parent = value; }
 		}
-		[XmlIgnore]public virtual bool SizeIsValid {
-			get { return hIsValid & wIsValid; }
-			set {
-				hIsValid = value;
-				wIsValid = value;
-			}
-		}
-		[XmlIgnore]public virtual bool WIsValid {
-			get { return wIsValid; }
-			set { wIsValid = value; }
-		}
-		[XmlIgnore]public virtual bool HIsValid {
-			get { return hIsValid; }
-			set { hIsValid = value; }
-		}
-		[XmlIgnore]public virtual bool XIsValid {
-			get { return xIsValid; }
-			set { xIsValid = value; }
-		}
-		[XmlIgnore]public virtual bool YIsValid {
-			get { return yIsValid; }
-			set { yIsValid = value; }
-		}
-		[XmlIgnore]public virtual bool PositionIsValid {
-			get { return xIsValid & yIsValid; }
-			set {
-				xIsValid = value;
-				yIsValid = value;
-			}
-		}
-		[XmlIgnore]public virtual bool LayoutIsValid {
-			get { return SizeIsValid & PositionIsValid; }
-			set {
-				if (value == SizeIsValid & PositionIsValid)
-					return;
-
-				SizeIsValid = value;
-				PositionIsValid = value;
-
-				//if (!layoutIsValid && Parent != null)
-				//    Parent.layoutIsValid = false;
-			}
-		}
 		[XmlIgnore]public virtual Rectangle ClientRectangle {
 			get {
 				Rectangle cb = Slot.Size;
@@ -117,12 +74,7 @@ namespace go
 			}
 		}
 		[XmlIgnore]public virtual IGOLibHost TopContainer {
-			get { return Parent.TopContainer; }
-		}
-		public virtual void InvalidateLayout ()
-		{
-			bmp = null;
-			LayoutIsValid = false;
+			get { return Parent == null ? null : Parent.TopContainer; }
 		}
 		public virtual Rectangle ContextCoordinates(Rectangle r){
 			return
@@ -190,8 +142,7 @@ namespace go
 
 				Bounds.X = value;
 
-				LayoutIsValid = false;
-				registerForGraphicUpdate ();
+				this.RegisterForLayouting ((int)LayoutingType.X);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
@@ -203,8 +154,7 @@ namespace go
 
 				Bounds.Y = value;
 
-				LayoutIsValid = false;
-				registerForGraphicUpdate ();
+				this.RegisterForLayouting ((int)LayoutingType.Y);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
@@ -216,7 +166,7 @@ namespace go
 
 				Bounds.Width = value;
 
-				InvalidateLayout ();
+				this.RegisterForLayouting ((int)LayoutingType.Width);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
@@ -228,7 +178,7 @@ namespace go
 
 				Bounds.Height = value;
 
-				InvalidateLayout ();
+				this.RegisterForLayouting ((int)LayoutingType.Height);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
@@ -239,7 +189,6 @@ namespace go
 					return;
 
 				Bounds.Width = Bounds.Height = -1;
-				InvalidateLayout ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
@@ -373,69 +322,107 @@ namespace go
 		public virtual void registerForGraphicUpdate ()
 		{
 			bmp = null;
-			registerForRedraw ();
+			if (TopContainer != null)
+				TopContainer.gobjsToRedraw.Add (this);
+			//RegisterForLayouting ();
+			//registerForRedraw ();
 			//Interface.registerForGraphicUpdate(this);
 		}
 		/// <summary>
 		/// Add clipping region in redraw list of interface, dont update cached object content
 		/// </summary>
-		public virtual void registerForRedraw ()
+		public virtual void RegisterForRedraw ()
 		{
-			if (LayoutIsValid && Visible)
-				TopContainer.gobjsToRedraw.Add (this);
+			bmp = null;
+			TopContainer.gobjsToRedraw.Add (this);
 		}
+
+		public Rectangle LastSlots;
+
 		public virtual void registerClipRect()
 		{
 			TopContainer.redrawClip.AddRectangle (ScreenCoordinates(Slot));
 		}
 		protected virtual Size measureRawSize ()
-		{
+		{			
 			return Bounds.Size;
 		}
 
-		protected virtual void ComputeSize()
+		public virtual void RegisterForLayouting(int layoutType)
 		{
-			Size rawSize = measureRawSize ();
+			if (Parent == null)
+				return;
+			
+			Interface.LayoutingQueue.RemoveAll (lq => lq.GraphicObject == this && (layoutType & (int)lq.LayoutType) > 0);
 
-			if (!wIsValid) {
-				wIsValid = true;
-				if (Width > 0)
-					Slot.Width = Width;
-				else if (Width < 0) {
-					if (rawSize.Width > 0)
-						Slot.Width = rawSize.Width;
-					else
-						wIsValid = false;
-				} else if (Parent.WIsValid)
-					Slot.Width = Parent.ClientRectangle.Width;
+			if ((layoutType & (int)LayoutingType.Width) > 0) {
+
+				//force sizing to fit if parent is sizing on children
+				if (Parent.getBounds ().Width < 0 && Width == 0)
+					Width = -1;
+				
+				if (Bounds.Width == 0) //stretch in parent
+					Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Width, this);
+				else if (Bounds.Width < 0) //fit 
+					Interface.LayoutingQueue.EnqueueBeforeParentSizing (LayoutingType.Width, this);				
 				else
-					wIsValid = false;				
+					Interface.LayoutingQueue.Insert (0, new LayoutingQueueItem (LayoutingType.Width, this));
 			}
 
-			if (!hIsValid) {
-				hIsValid = true;
-				if (Height > 0)
-					Slot.Height = Height;
-				else if (Height < 0) {
-					if (rawSize.Height > 0)
-						Slot.Height = rawSize.Height;
-					else
-						hIsValid = false;
-				} else if (Parent.HIsValid)
-					Slot.Height = Parent.ClientRectangle.Height;
+			if ((layoutType & (int)LayoutingType.Height) > 0) {
+
+				//force sizing to fit if parent is sizing on children
+				if (Parent.getBounds ().Height < 0 && Height == 0)
+					Height = -1;
+
+				if (Bounds.Height == 0) //stretch in parent
+					Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Height, this);
+				else if (Bounds.Height < 0) //fit 
+					Interface.LayoutingQueue.EnqueueBeforeParentSizing (LayoutingType.Height, this);
 				else
-					hIsValid = false;				
+					Interface.LayoutingQueue.Insert (0, new LayoutingQueueItem (LayoutingType.Height, this));
 			}
+
+			if ((layoutType & (int)LayoutingType.X) > 0)
+				//for x positionning, sizing of parent and this have to be done
+				Interface.LayoutingQueue.EnqueueAfterThisAndParentSizing (LayoutingType.X, this);
+
+			if ((layoutType & (int)LayoutingType.Y) > 0)
+				//for x positionning, sizing of parent and this have to be done
+				Interface.LayoutingQueue.EnqueueAfterThisAndParentSizing (LayoutingType.Y, this);
+			
 		}
-		protected virtual void ComputePosition()
+
+		protected virtual void OnLayoutChanges(LayoutingType  layoutType)
 		{
-			if (!xIsValid) {
-				xIsValid = true;
-				if (Width == 0)
-					Slot.X = 0;
-				else if (Left != 0)
-					Slot.X = Left;
-				else if (Parent.WIsValid && WIsValid) {
+			switch (layoutType) {
+			case LayoutingType.Width:				
+				if (Parent.getBounds ().Width < 0)
+					this.Parent.RegisterForLayouting ((int)LayoutingType.Width);
+				else if (Width != 0) //update position in parent
+					this.RegisterForLayouting ((int)LayoutingType.X);
+				if (!(Parent is GenericStack))
+					break;
+				if ((Parent as GenericStack).Orientation == Orientation.Horizontal)
+					this.Parent.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+				break;
+			case LayoutingType.Height:
+				if (Parent.getBounds().Height < 0)
+					this.Parent.RegisterForLayouting((int)LayoutingType.Height);
+				else if (Height != 0) //update position in parent
+					this.RegisterForLayouting ((int)LayoutingType.Y);
+				if (!(Parent is GenericStack))
+					break;
+				if ((Parent as GenericStack).Orientation == Orientation.Vertical)
+					this.Parent.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+				break;
+			}			
+		}
+		public virtual void UpdateLayout (LayoutingType layoutType)
+		{			
+			switch (layoutType) {
+			case LayoutingType.X:
+				if (Bounds.X == 0) {
 					switch (HorizontalAlignment) {
 					case HorizontalAlignment.Left:
 						Slot.X = 0;
@@ -447,17 +434,20 @@ namespace go
 						Slot.X = Parent.ClientRectangle.Width / 2 - Slot.Width / 2;
 						break;
 					}
-				} else// if (Parent.getBounds().Width>=0)
-					xIsValid = false;
-			}
+				} else
+					Slot.X = Bounds.X;
 
-			if (!yIsValid) {
-				yIsValid = true;
-				if (Height== 0)
-					Slot.Y = 0;
-				else if (Top != 0)
-					Slot.Y = Top;
-				else if (Parent.HIsValid && HIsValid) {
+				if (LastSlots.X == Slot.X)
+					break;
+
+				bmp = null;
+
+				OnLayoutChanges (layoutType);
+
+				LastSlots.X = Slot.X;
+				break;
+			case LayoutingType.Y:
+				if (Bounds.Y == 0) {
 					switch (VerticalAlignment) {
 					case VerticalAlignment.Top:
 						Slot.Y = 0;
@@ -469,20 +459,59 @@ namespace go
 						Slot.Y = Parent.ClientRectangle.Height / 2 - Slot.Height / 2;
 						break;
 					}
-				} else// if (Parent.getBounds().Height>=0)
-					yIsValid = false;
-			}
-		}
-		public virtual void UpdateLayout ()
-		{
-			if (!SizeIsValid)
-				ComputeSize ();
-			if (!PositionIsValid)
-				ComputePosition ();				
-			if (LayoutIsValid)
-				registerForRedraw ();
+				}else
+					Slot.Y = Bounds.Y;
 
+				if (LastSlots.Y == Slot.Y)
+					break;
+
+				bmp = null;
+
+				OnLayoutChanges (layoutType);
+
+				LastSlots.Y = Slot.Y;
+				break;
+			case LayoutingType.Width:				
+				if (Width > 0)
+					Slot.Width = Width;
+				else if (Width < 0)
+					Slot.Width = measureRawSize ().Width;
+				else
+					Slot.Width = Parent.ClientRectangle.Width;
+
+				if (LastSlots.Width == Slot.Width)
+					break;
+
+				bmp = null;
+
+				OnLayoutChanges (layoutType);
+
+				LastSlots.Width = Slot.Width;
+				break;
+			case LayoutingType.Height:
+				if (Height > 0)
+					Slot.Height = Height;
+				else if (Height < 0)
+					Slot.Height = measureRawSize ().Height;
+				else
+					Slot.Height = Parent.ClientRectangle.Height;
+
+				if (LastSlots.Height == Slot.Height)
+					break;
+
+				bmp = null;
+
+				OnLayoutChanges (layoutType);
+
+				LastSlots.Height = Slot.Height;
+				break;
+			}
+
+			//if no layouting remains in queue for item, registre for redraw
+			if (Interface.LayoutingQueue.Where (lq => lq.GraphicObject == this).Count () <= 0)
+				this.RegisterForRedraw ();
 		}
+
 		protected virtual void onDraw(Context gr)
 		{
 			Rectangle rBack = new Rectangle (Slot.Size);
@@ -505,6 +534,7 @@ namespace go
 					onDraw (gr);
 				}
 				draw.Flush ();
+				//draw.WriteToPng ("/mnt/data/test.png");
 			}
 		}
 			

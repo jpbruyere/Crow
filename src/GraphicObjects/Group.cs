@@ -36,16 +36,17 @@ namespace go
         {
 			GraphicObject g = child as GraphicObject;
             Children.Add(g);
-            g.Parent = this as GraphicObject;
-            LayoutIsValid = false;
+            g.Parent = this as GraphicObject;            
+			g.RegisterForLayouting ((int)LayoutingType.Sizing);
             return (T)child;
         }
-        public void removeChild(GraphicObject child)        
+        public virtual void removeChild(GraphicObject child)        
 		{
             Children.Remove(child);
             child.Parent = null;
-            LayoutIsValid = false;
+			this.RegisterForLayouting ((int)LayoutingType.Sizing);
         }
+
 		public void putWidgetOnTop(GraphicObject w)
 		{
 			if (Children.Contains(w))
@@ -81,26 +82,6 @@ namespace go
 				return true;
 			}
 		}
-		[XmlIgnore]public override bool LayoutIsValid
-		{
-			get
-			{
-				if (!Visible)
-					return true;
-
-				if (!base.LayoutIsValid)
-					return false;
-				else//le layout n'est valide que si tous les enfents sont validés aussi
-				{
-					foreach (GraphicObject w in Children)
-						if (!w.LayoutIsValid)
-							return false;
-				}
-
-				return true;
-			}
-			set { base.LayoutIsValid = value; }
-		}
 
 		public override GraphicObject FindByName (string nameToFind)
 		{
@@ -124,75 +105,22 @@ namespace go
 			}
 			return false;
 		}
-		public override void InvalidateLayout()
-		{
-			base.InvalidateLayout();
-			foreach (GraphicObject w in Children)
-				w.InvalidateLayout();
-		}
 		protected override Size measureRawSize ()
 		{
-			Size raw = Bounds.Size;
 			Size tmp = new Size ();
 
-			if (raw.Width >= 0 && raw.Height >= 0)
-				return raw;
-
 			foreach (GraphicObject c in Children) {
-				if (raw.Width < 0) {
-					if (c.WIsValid)
-						tmp.Width = Math.Max (tmp.Width, c.Slot.Right);
-					else
-						return raw;
-				}
-				if (raw.Height < 0) {
-					if (c.HIsValid)
-						tmp.Height = Math.Max (tmp.Height, c.Slot.Bottom);
-					else
-						return raw;
-				}
+				tmp.Width = Math.Max (tmp.Width, c.Slot.Right);
+				tmp.Height = Math.Max (tmp.Height, c.Slot.Bottom);
 			}
 
-			if (raw.Width < 0)
-				tmp.Width += 2*Margin;
-			if (raw.Height < 0)
-				tmp.Height += 2*Margin;
+			tmp.Width += 2*Margin;
+			tmp.Height += 2*Margin;
 
 			return tmp;
 		}
-		public override void UpdateLayout()
-		{
-			if (LayoutIsValid)
-				return;
 
-			bool atLeastOneChildHasWNotDependingOnParent = false;
-			bool atLeastOneChildHasHNotDependingOnParent = false;
 
-			foreach (GraphicObject c in Children) {
-				if (c.LayoutIsValid)
-					continue;
-
-				if (Width < 0 && c.WIsValid) {
-					if (!atLeastOneChildHasWNotDependingOnParent && !(this is GenericStack))
-						c.XIsValid = true;
-					atLeastOneChildHasWNotDependingOnParent = true;
-				}
-				if (Height < 0 && c.HIsValid) {
-					if (!atLeastOneChildHasHNotDependingOnParent && !(this is GenericStack))
-						c.YIsValid = true;
-					atLeastOneChildHasHNotDependingOnParent = true;
-				}
-
-				c.UpdateLayout ();
-			}
-
-//			if (Width < 0 && !atLeastOneChildHasWNotDependingOnParent)
-//				Debug.WriteLine ("ERROR: no child has fixed width and parent width is set to content!");
-//			if (Height < 0 && !atLeastOneChildHasHNotDependingOnParent)
-//				Debug.WriteLine ("ERROR: no child has fixed height and parent height is set to content!");
-
-			base.UpdateLayout ();
-		}
 
 		public override Rectangle ContextCoordinates(Rectangle r){
 			return r + ClientRectangle.Position;
@@ -212,7 +140,7 @@ namespace go
 
 		public override void Paint(ref Context ctx, Rectangles clip = null)
 		{
-			if ( !(Visible&LayoutIsValid) )
+			if ( !(Visible) )
 				return;
 
 			//			ctx.Save ();
@@ -281,15 +209,15 @@ namespace go
 		}
 		#endregion
 			        
-        public override string ToString()
-        {
-            string tmp = base.ToString();
-            foreach (GraphicObject w in Children)
-            {
-                tmp += "\n" + w.ToString();
-            }
-            return tmp;
-        }
+//        public override string ToString()
+//        {
+//            string tmp = base.ToString();
+//            foreach (GraphicObject w in Children)
+//            {
+//                tmp += "\n" + w.ToString();
+//            }
+//            return tmp;
+//        }
 
 		#region IXmlSerializable
 

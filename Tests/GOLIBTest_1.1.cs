@@ -16,18 +16,18 @@ using System.Threading;
 
 namespace test
 {
-	class GOLIBTest_0 : OpenTKGameWindow
+	class GOLIBTest_1_1 : OpenTKGameWindow
 	{
-		public GOLIBTest_0 ()
+		public GOLIBTest_1_1 ()
 			: base(1024, 600,"test")
 		{}
 
-		GraphicObject g;
+		Group g;
 
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-			LoadInterface("Interfaces/test0.goml", out g);
+			LoadInterface("Interfaces/test1.1.goml", out g);
 
 		}
 		protected override void OnRenderFrame (FrameEventArgs e)
@@ -36,25 +36,7 @@ namespace test
 			base.OnRenderFrame (e);
 			SwapBuffers ();
 		}
-		protected override void OnKeyDown (KeyboardKeyEventArgs e)
-		{
-			switch (e.Key) {
-			case Key.Left:
-				g.Left++;
-				break;
-			case Key.Right:
-				g.Left--;
-				break;
-			case Key.Up:
-				g.Top--;
-				break;
-			case Key.Down:
-				g.Top++;
-				break;
-			default:
-				break;
-			}
-		}
+
 		protected override void OnUpdateFrame (FrameEventArgs e)
 		{
 			base.OnUpdateFrame (e);
@@ -65,7 +47,7 @@ namespace test
 		{
 			Console.WriteLine ("starting example");
 
-			using (GOLIBTest_0 win = new GOLIBTest_0( )) {
+			using (GOLIBTest_1_1 win = new GOLIBTest_1_1( )) {
 				win.Run (30.0);
 			}
 		}

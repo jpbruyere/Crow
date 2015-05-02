@@ -64,6 +64,22 @@
       <LogicalName>
       </LogicalName>
     </Compile>
+    <Compile Include="GOLIBTest_1.1.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="GOLIBTest_1.2.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="GOLIBTest_4.1.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="GOLIBTest_fps.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -100,6 +116,31 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <LogicalName>
       </LogicalName>
+    </None>
+    <None Include="Interfaces\test1.1.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <LogicalName>
+      </LogicalName>
+    </None>
+    <None Include="Interfaces\test1.2.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <LogicalName>
+      </LogicalName>
+    </None>
+    <None Include="Interfaces\test4.1.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <LogicalName>
+      </LogicalName>
+    </None>
+    <None Include="Interfaces\test1.3.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <LogicalName>
+      </LogicalName>
+    </None>
+    <None Include="Interfaces\fps.goml">
+      <LogicalName>
+      </LogicalName>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>

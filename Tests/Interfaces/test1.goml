@@ -1,9 +1,10 @@
 ﻿<?xml version="1.0"?>
-<Container
-	HorizontalAlignment="Left" VerticalAlignment="Center"
-	Margin="10" Focusable="True" Fit="True" Background="Green">
-	<Group   Background="White" >
-		<Image Name="PhaseOverlay" Width="40" Height="40"
-				Path="image/u.svg" Background="Red"/>
-	</Group>
+<Container Name="TopContainer" Width="400" Height="350"
+	Margin="20" Focusable="True" Background="Yellow">
+
+	<Container Name="MiddleContainer" Width="0" Height="0"
+		Margin="20" Focusable="True" Background="Green">
+			<Image VerticalAlignment="Bottom"			
+				Name="PhaseOverlay" Width="100" Height="100" Path="image/u.svg" Background="Red"/>
+	</Container>
 </Container>

@@ -43,8 +43,6 @@ namespace go
 
 				_minValue = value;
 
-				LayoutIsValid = false;
-				registerForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(10.0)]
@@ -57,8 +55,6 @@ namespace go
 
 				_maxValue = value;
 
-				LayoutIsValid = false;
-				registerForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0.5)]
@@ -71,8 +67,6 @@ namespace go
 
 				_smallStep = value;
 
-				LayoutIsValid = false;
-				registerForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(2.0)]
@@ -85,8 +79,6 @@ namespace go
 
 				_bigStep = value;
 
-				LayoutIsValid = false;
-				registerForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
