@@ -46,6 +46,7 @@ namespace go
             child.Parent = null;
 			this.RegisterForLayouting ((int)LayoutingType.Sizing);
         }
+
 		public void putWidgetOnTop(GraphicObject w)
 		{
 			if (Children.Contains(w))
@@ -104,12 +105,6 @@ namespace go
 			}
 			return false;
 		}
-		public override void InvalidateLayout()
-		{
-			base.InvalidateLayout();
-			foreach (GraphicObject w in Children)
-				w.InvalidateLayout();
-		}
 		protected override Size measureRawSize ()
 		{
 			Size tmp = new Size ();
@@ -125,39 +120,7 @@ namespace go
 			return tmp;
 		}
 
-//		public override void UpdateLayout (LayoutingType layoutType)
-//		{
-//			if (LayoutIsValid)
-//				return;
-//
-//			bool atLeastOneChildHasWNotDependingOnParent = false;
-//			bool atLeastOneChildHasHNotDependingOnParent = false;
-//
-////			foreach (GraphicObject c in Children) {
-////				if (c.LayoutIsValid)
-////					continue;
-////
-////				if (Width < 0 && c.WIsValid) {
-////					if (!atLeastOneChildHasWNotDependingOnParent && !(this is GenericStack))
-////						c.XIsValid = true;
-////					atLeastOneChildHasWNotDependingOnParent = true;
-////				}
-////				if (Height < 0 && c.HIsValid) {
-////					if (!atLeastOneChildHasHNotDependingOnParent && !(this is GenericStack))
-////						c.YIsValid = true;
-////					atLeastOneChildHasHNotDependingOnParent = true;
-////				}
-////
-////				c.UpdateLayout ();
-////			}
-//
-////			if (Width < 0 && !atLeastOneChildHasWNotDependingOnParent)
-////				Debug.WriteLine ("ERROR: no child has fixed width and parent width is set to content!");
-////			if (Height < 0 && !atLeastOneChildHasHNotDependingOnParent)
-////				Debug.WriteLine ("ERROR: no child has fixed height and parent height is set to content!");
-//
-//			//base.UpdateLayout ();
-//		}
+
 
 		public override Rectangle ContextCoordinates(Rectangle r){
 			return r + ClientRectangle.Position;
@@ -246,15 +209,15 @@ namespace go
 		}
 		#endregion
 			        
-        public override string ToString()
-        {
-            string tmp = base.ToString();
-            foreach (GraphicObject w in Children)
-            {
-                tmp += "\n" + w.ToString();
-            }
-            return tmp;
-        }
+//        public override string ToString()
+//        {
+//            string tmp = base.ToString();
+//            foreach (GraphicObject w in Children)
+//            {
+//                tmp += "\n" + w.ToString();
+//            }
+//            return tmp;
+//        }
 
 		#region IXmlSerializable
 

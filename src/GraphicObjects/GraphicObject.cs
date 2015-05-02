@@ -66,49 +66,6 @@ namespace go
 			get { return _parent; }
 			set { _parent = value; }
 		}
-		[XmlIgnore]public virtual bool SizeIsValid {
-			get { return hIsValid & wIsValid; }
-			set {
-				hIsValid = value;
-				wIsValid = value;
-			}
-		}
-		[XmlIgnore]public virtual bool WIsValid {
-			get { return wIsValid; }
-			set { wIsValid = value; }
-		}
-		[XmlIgnore]public virtual bool HIsValid {
-			get { return hIsValid; }
-			set { hIsValid = value; }
-		}
-		[XmlIgnore]public virtual bool XIsValid {
-			get { return xIsValid; }
-			set { xIsValid = value; }
-		}
-		[XmlIgnore]public virtual bool YIsValid {
-			get { return yIsValid; }
-			set { yIsValid = value; }
-		}
-		[XmlIgnore]public virtual bool PositionIsValid {
-			get { return xIsValid & yIsValid; }
-			set {
-				xIsValid = value;
-				yIsValid = value;
-			}
-		}
-		[XmlIgnore]public virtual bool LayoutIsValid {
-			get { return SizeIsValid & PositionIsValid; }
-			set {
-				if (value == SizeIsValid & PositionIsValid)
-					return;
-
-				SizeIsValid = value;
-				PositionIsValid = value;
-
-				//if (!layoutIsValid && Parent != null)
-				//    Parent.layoutIsValid = false;
-			}
-		}
 		[XmlIgnore]public virtual Rectangle ClientRectangle {
 			get {
 				Rectangle cb = Slot.Size;
@@ -118,11 +75,6 @@ namespace go
 		}
 		[XmlIgnore]public virtual IGOLibHost TopContainer {
 			get { return Parent == null ? null : Parent.TopContainer; }
-		}
-		public virtual void InvalidateLayout ()
-		{
-			bmp = null;
-			LayoutIsValid = false;
 		}
 		public virtual Rectangle ContextCoordinates(Rectangle r){
 			return
@@ -190,7 +142,7 @@ namespace go
 
 				Bounds.X = value;
 
-				Interface.LayoutingQueue.Enqueue (LayoutingType.X, this);
+				this.RegisterForLayouting ((int)LayoutingType.X);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
@@ -202,7 +154,7 @@ namespace go
 
 				Bounds.Y = value;
 
-				Interface.LayoutingQueue.Enqueue (LayoutingType.Y, this);
+				this.RegisterForLayouting ((int)LayoutingType.Y);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
@@ -214,7 +166,7 @@ namespace go
 
 				Bounds.Width = value;
 
-				InvalidateLayout ();
+				this.RegisterForLayouting ((int)LayoutingType.Width);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
@@ -226,7 +178,7 @@ namespace go
 
 				Bounds.Height = value;
 
-				InvalidateLayout ();
+				this.RegisterForLayouting ((int)LayoutingType.Height);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
@@ -237,7 +189,6 @@ namespace go
 					return;
 
 				Bounds.Width = Bounds.Height = -1;
-				InvalidateLayout ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
@@ -399,19 +350,36 @@ namespace go
 
 		public virtual void RegisterForLayouting(int layoutType)
 		{
+			if (Parent == null)
+				return;
+			
 			Interface.LayoutingQueue.RemoveAll (lq => lq.GraphicObject == this && (layoutType & (int)lq.LayoutType) > 0);
 
 			if ((layoutType & (int)LayoutingType.Width) > 0) {
+
+				//force sizing to fit if parent is sizing on children
+				if (Parent.getBounds ().Width < 0 && Width == 0)
+					Width = -1;
+				
 				if (Bounds.Width == 0) //stretch in parent
 					Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Width, this);
-				else //fit ou fixed
+				else if (Bounds.Width < 0) //fit 
+					Interface.LayoutingQueue.EnqueueBeforeParentSizing (LayoutingType.Width, this);				
+				else
 					Interface.LayoutingQueue.Insert (0, new LayoutingQueueItem (LayoutingType.Width, this));
 			}
 
 			if ((layoutType & (int)LayoutingType.Height) > 0) {
+
+				//force sizing to fit if parent is sizing on children
+				if (Parent.getBounds ().Height < 0 && Height == 0)
+					Height = -1;
+
 				if (Bounds.Height == 0) //stretch in parent
 					Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Height, this);
-				else//fit ou fixed
+				else if (Bounds.Height < 0) //fit 
+					Interface.LayoutingQueue.EnqueueBeforeParentSizing (LayoutingType.Height, this);
+				else
 					Interface.LayoutingQueue.Insert (0, new LayoutingQueueItem (LayoutingType.Height, this));
 			}
 
@@ -425,42 +393,31 @@ namespace go
 			
 		}
 
-//		public virtual void RegisterForLayouting()
-//		{
-//			//clear previous layouting for item
-//			Interface.LayoutingQueue.RemoveAll (lq => lq.GraphicObject == this);
-//
-//			if (Bounds.Width == 0) { //stretch in parent
-//				int idxParentW = Interface.LayoutingQueue.IndexOf (Interface.LayoutingQueue.Where(lq => lq.GraphicObject == this.Parent && lq.LayoutType == LayoutingType.Width).FirstOrDefault());
-//				if (idxParentW < 0)
-//					Interface.LayoutingQueue.Insert (0, new LayoutingQueueItem (LayoutingType.Width, this));
-//				else//insert after parent sizing
-//					Interface.LayoutingQueue.Insert (idxParentW + 1, new LayoutingQueueItem (LayoutingType.Width, this));
-//			} else {//fit ou fixed
-//				Interface.LayoutingQueue.Insert (0, new LayoutingQueueItem (LayoutingType.Width, this));
-//				//for x positionning, sizing of obj and parent have to be done
-////				int idxParentW = Interface.LayoutingQueue.IndexOf (Interface.LayoutingQueue.Where(lq => lq.GraphicObject == this.Parent && lq.LayoutType == LayoutingType.Width).FirstOrDefault());
-////				if (idxParentW < 0)
-////					Interface.LayoutingQueue.Insert (1, new LayoutingQueueItem (LayoutingType.X, this));
-////				else//insert after parent sizing
-////					Interface.LayoutingQueue.Insert (idxParentW + 1, new LayoutingQueueItem (LayoutingType.X, this));
-//			}
-//			if (Bounds.Height == 0) { //stretch
-//				int idxParentH = Interface.LayoutingQueue.IndexOf (Interface.LayoutingQueue.Where(lq => lq.GraphicObject == this.Parent && lq.LayoutType == LayoutingType.Height).FirstOrDefault());
-//				if (idxParentH < 0)
-//					Interface.LayoutingQueue.Insert (0, new LayoutingQueueItem (LayoutingType.Height, this));
-//				else
-//					Interface.LayoutingQueue.Insert (idxParentH + 1, new LayoutingQueueItem (LayoutingType.Height, this));
-//			} else {
-//				Interface.LayoutingQueue.Insert (0, new LayoutingQueueItem (LayoutingType.Height, this));
-////				int idxParentH = Interface.LayoutingQueue.IndexOf (Interface.LayoutingQueue.Where(lq => lq.GraphicObject == this.Parent && lq.LayoutType == LayoutingType.Height).FirstOrDefault());
-////				if (idxParentH < 0)
-////					Interface.LayoutingQueue.Insert (1, new LayoutingQueueItem (LayoutingType.Y, this));
-////				else//insert after parent sizing
-////					Interface.LayoutingQueue.Insert (idxParentH + 1, new LayoutingQueueItem (LayoutingType.Y, this));
-//			}
-//		}
-//
+		protected virtual void OnLayoutChanges(LayoutingType  layoutType)
+		{
+			switch (layoutType) {
+			case LayoutingType.Width:				
+				if (Parent.getBounds ().Width < 0)
+					this.Parent.RegisterForLayouting ((int)LayoutingType.Width);
+				else if (Width != 0) //update position in parent
+					this.RegisterForLayouting ((int)LayoutingType.X);
+				if (!(Parent is GenericStack))
+					break;
+				if ((Parent as GenericStack).Orientation == Orientation.Horizontal)
+					this.Parent.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+				break;
+			case LayoutingType.Height:
+				if (Parent.getBounds().Height < 0)
+					this.Parent.RegisterForLayouting((int)LayoutingType.Height);
+				else if (Height != 0) //update position in parent
+					this.RegisterForLayouting ((int)LayoutingType.Y);
+				if (!(Parent is GenericStack))
+					break;
+				if ((Parent as GenericStack).Orientation == Orientation.Vertical)
+					this.Parent.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+				break;
+			}			
+		}
 		public virtual void UpdateLayout (LayoutingType layoutType)
 		{			
 			switch (layoutType) {
@@ -479,9 +436,14 @@ namespace go
 					}
 				} else
 					Slot.X = Bounds.X;
+
 				if (LastSlots.X == Slot.X)
 					break;
-				//register layouting here for objects depending on this.x
+
+				bmp = null;
+
+				OnLayoutChanges (layoutType);
+
 				LastSlots.X = Slot.X;
 				break;
 			case LayoutingType.Y:
@@ -499,9 +461,14 @@ namespace go
 					}
 				}else
 					Slot.Y = Bounds.Y;
+
 				if (LastSlots.Y == Slot.Y)
 					break;
-				//register layouting here for objects depending on this.x
+
+				bmp = null;
+
+				OnLayoutChanges (layoutType);
+
 				LastSlots.Y = Slot.Y;
 				break;
 			case LayoutingType.Width:				
@@ -514,11 +481,10 @@ namespace go
 
 				if (LastSlots.Width == Slot.Width)
 					break;
-				
-				if (Parent.getBounds().Width < 0)
-					this.Parent.RegisterForLayouting((int)LayoutingType.Width);
-				else if (Width != 0) //update position in parent
-					this.RegisterForLayouting ((int)LayoutingType.X);
+
+				bmp = null;
+
+				OnLayoutChanges (layoutType);
 
 				LastSlots.Width = Slot.Width;
 				break;
@@ -533,10 +499,9 @@ namespace go
 				if (LastSlots.Height == Slot.Height)
 					break;
 
-				if (Parent.getBounds().Height < 0)
-					this.Parent.RegisterForLayouting((int)LayoutingType.Height);
-				else if (Height != 0) //update position in parent
-					this.RegisterForLayouting ((int)LayoutingType.Y);
+				bmp = null;
+
+				OnLayoutChanges (layoutType);
 
 				LastSlots.Height = Slot.Height;
 				break;
@@ -569,6 +534,7 @@ namespace go
 					onDraw (gr);
 				}
 				draw.Flush ();
+				//draw.WriteToPng ("/mnt/data/test.png");
 			}
 		}
 			

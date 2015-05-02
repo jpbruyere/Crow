@@ -48,9 +48,9 @@ namespace go
 			Size raw = Bounds.Size;
 
 			if (child != null) {
-				if (Bounds.Width < 0 && child.WIsValid)
+				if (Bounds.Width < 0)
 					raw.Width = child.Slot.Width + 2 * (Margin+BorderWidth);
-				if (Bounds.Height < 0 && child.HIsValid)
+				if (Bounds.Height < 0)
 					raw.Height = child.Slot.Height + 2 * (Margin+BorderWidth);
 			}
 

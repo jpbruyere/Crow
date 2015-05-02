@@ -43,6 +43,17 @@ namespace go
 
 			Interface.LayoutingQueue.Insert (idxParentSz + 1, lqi);			
 		}
+		public void EnqueueBeforeParentSizing (LayoutingType _lt, ILayoutable _object)
+		{
+			LayoutingQueueItem lqi = new LayoutingQueueItem (_lt, _object);
+			int idxParentSz = Interface.LayoutingQueue.IndexOf 
+				(Interface.LayoutingQueue.Where(lq => lq.GraphicObject == _object.Parent && lq.LayoutType == _lt).FirstOrDefault());
+
+			if (idxParentSz < 0)
+				Interface.LayoutingQueue.Enqueue (_lt, _object);
+			else
+				Interface.LayoutingQueue.Insert (idxParentSz, lqi);			
+		}
 		public void EnqueueAfterThisAndParentSizing (LayoutingType _lt, ILayoutable _object)
 		{
 			LayoutingQueueItem lqi = new LayoutingQueueItem (_lt, _object);

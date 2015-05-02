@@ -1,0 +1,27 @@
+﻿<?xml version="1.0"?>
+<Container Name="MainGrp"
+	HorizontalAlignment="Right" VerticalAlignment="Bottom"
+	Margin="10" Focusable="True" Fit="True">
+
+		<VerticalStack Fit="True" BorderWidth="1" Margin="5" WidgetSpacing="4">
+			<HorizontalStack>
+				<Label Text="Update:" FontColor="White" VerticalAlignment="Center" />
+				<Label Name="labUpdate" Text="xxxx" FontSize="12" Width="60" TextAlignment="Center" Background="DarkGreen"/>
+			</HorizontalStack>
+			<HorizontalStack>
+				<Label Text="Fps:" Width = "30" VerticalAlignment="Center"  TextAlignment="LeftCenter"/>
+				<Label Name="labFps" Text="xxxx" Font="droid bold, 12"
+					TextAlignment="Center" Background="AoEnglish"/>
+			</HorizontalStack>
+			<HorizontalStack>
+				<Label Text="Min:" Width = "30" />
+				<Label Name="labFpsMin" Text="xxxx" Font="droid bold, 12"
+					TextAlignment="Center" Background="AoEnglish"/>
+			</HorizontalStack>
+			<HorizontalStack>
+				<Label Text="Max:" Width = "30"/>
+				<Label Name="labFpsMax" Text="xxxx" Font="droid bold, 12"
+					TextAlignment="Center" Background="AoEnglish"/>
+			</HorizontalStack>
+		</VerticalStack>				
+</Container>

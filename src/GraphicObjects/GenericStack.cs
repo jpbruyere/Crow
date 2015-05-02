@@ -24,8 +24,9 @@ namespace go
 
 		public override T addChild<T> (T child)
 		{
+			T tmp = base.addChild (child);
 			this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
-			return base.addChild (child);
+			return tmp;
 		}
 		public override void removeChild (GraphicObject child)
 		{
@@ -96,17 +97,7 @@ namespace go
 				}
 			}
 		}
-//		public void RegisterForLayouting ()
-//		{
-//			base.RegisterForLayouting ();
-//
-//			int idx = Interface.LayoutingQueue.IndexOf (Interface.LayoutingQueue.Where (lq => lq.GraphicObject.Parent == this).LastOrDefault ());
-//			if (idx < 0)
-//				return;
-//			Interface.LayoutingQueue.Insert (
-//				idx+1,
-//				new LayoutingQueueItem (LayoutingType.PositionChildren, this));
-//		}
+
 		public override void RegisterForLayouting (int layoutType)
 		{			
 			base.RegisterForLayouting (layoutType);

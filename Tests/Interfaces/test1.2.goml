@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0"?>
-<Container>
-<VerticalStack>
+<Container Background="Green" Height="400" Width="400">
+<VerticalStack Margin="10" Background="DarkBlue" Height="-1" Width="0">
 	<Label Text="label11"/>
 	<Label Text="label21"/>
-	<HorizontalStack Width="-1" Height="-1" Margin="50"
-		Focusable="True" Background="DarkBlue">
+	<HorizontalStack Width="-1" Height="-1" Margin="5"
+		Focusable="True" Background="Blue">
 		<Label Text="label12"/>
 		<Label Text="label22"/>
 		<Label Text="label32"/>

@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0"?>
-<Container Width="300" Height="-1"
+<Container Name="TopContainer" Width="400" Height="350"
 	Margin="20" Focusable="True" Background="Yellow">
 
-	<Container Width="-1" Height="-1"
+	<Container Name="MiddleContainer" Width="0" Height="0"
 		Margin="20" Focusable="True" Background="Green">
 			<Image VerticalAlignment="Bottom"			
 				Name="PhaseOverlay" Width="100" Height="100" Path="image/u.svg" Background="Red"/>
