@@ -82,9 +82,9 @@ namespace test
 
 
 			c.MouseMove += pFps_mousemove;
-			slTest.ValueChanged += (object sender, ValueChangeEventArgs vce) => {
-				labV.Text = vce.NewValue.ToString ("00.00");
-			};
+//			slTest.ValueChanged += (object sender, ValueChangeEventArgs vce) => {
+//				labV.Text = vce.NewValue.ToString ("00.00");
+//			};
 
 
 			int i = 0;

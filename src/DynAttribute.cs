@@ -5,10 +5,10 @@ using System.Text;
 
 namespace go
 {
-	public class EventSource
+	public class DynAttribute
     {
         public GraphicObject Source;
-        public string EventName;
-        public String Handler;
+        public string MemberName;
+        public String Value;
     }
 }

@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Reflection.Emit;
 using System.Reflection;
+using System.Collections;
+using System.Diagnostics;
+using System.Linq;
+
 
 namespace go
 {
@@ -33,12 +37,12 @@ namespace go
 
 		}
 		static int dynHandleCpt = 0;
-		public static void CompileEventSource(EventSource es)
+		public static void CompileEventSource(DynAttribute es)
 		{
 			Type srcType = es.Source.GetType ();
 
 			#region Retrieve EventHandler parameter type
-			EventInfo ei = srcType.GetEvent (es.EventName);
+			EventInfo ei = srcType.GetEvent (es.MemberName);
 			MethodInfo invoke = ei.EventHandlerType.GetMethod ("Invoke");
 			ParameterInfo[] pars = invoke.GetParameters ();
 
@@ -54,10 +58,10 @@ namespace go
 			#region IL generation
 			ILGenerator il = dm.GetILGenerator(256);
 
-			string src = es.Handler.Trim();
+			string src = es.Value.Trim();
 
 			if (! (src.StartsWith("{") || src.EndsWith ("}"))) 
-				throw new Exception (string.Format("GOML:Malformed {0} Event handler: {1}", es.EventName, es.Handler));
+				throw new Exception (string.Format("GOML:Malformed {0} Event handler: {1}", es.MemberName, es.Value));
 
 			src = src.Substring (1, src.Length - 2);
 			string[] srcLines = src.Split (new char[] { ';' });
@@ -145,10 +149,108 @@ namespace go
 
 			#endregion
 
-			FieldInfo evtFi = getEventHandlerField (srcType, es.EventName);
+			FieldInfo evtFi = getEventHandlerField (srcType, es.MemberName);
 			Delegate del = dm.CreateDelegate(evtFi.FieldType);
 			evtFi.SetValue(es.Source, del);
 		}
+
+		public static void CreateBinding(DynAttribute binding, object _source)
+		{
+			
+			Type srcType = _source.GetType ();
+			Type dstType = binding.Source.GetType ();
+
+			MemberInfo miSrc = srcType.GetMember (binding.Value).FirstOrDefault();
+			Type srcValueType = null;
+			if (miSrc.MemberType == MemberTypes.Property)
+				srcValueType = (miSrc as PropertyInfo).PropertyType;
+			else if (miSrc.MemberType == MemberTypes.Field) 
+				srcValueType = (miSrc as FieldInfo).FieldType;
+			else
+				throw new Exception("unandled source type for binding");
+
+			#region Retrieve EventHandler parameter type
+			EventInfo ei = srcType.GetEvent ("ValueChanged");
+			MethodInfo evtInvoke = ei.EventHandlerType.GetMethod ("Invoke");
+			ParameterInfo[] evtParams = evtInvoke.GetParameters ();
+
+			Type handlerArgsType = evtParams [1].ParameterType;
+			#endregion
+
+			Type[] args = {typeof(object), handlerArgsType};
+			DynamicMethod dm = new DynamicMethod("dynHandle_" + dynHandleCpt,
+				typeof(void), 
+				args, 
+				srcType.Module, true);
+
+			//register target object reference
+			int dstIdx = Interface.References.IndexOf(binding.Source);
+
+			if (dstIdx < 0) {
+				dstIdx = Interface.References.Count;
+				Interface.References.Add (binding.Source);
+			}
+
+
+
+			#region IL generation
+			ILGenerator il = dm.GetILGenerator(256);
+
+			System.Reflection.Emit.Label labFailed = il.DefineLabel();
+			System.Reflection.Emit.Label labContinue = il.DefineLabel();
+
+			#region test if valueChange event is the correct one
+			il.Emit (OpCodes.Ldstr, binding.Value);
+			//push name from arg
+			il.Emit(OpCodes.Ldarg_1);
+			FieldInfo fiMbName = typeof(ValueChangeEventArgs).GetField("MemberName");
+			il.Emit(OpCodes.Ldfld, fiMbName);
+			MethodInfo miStrEqu = typeof(string).GetMethod("op_Inequality", new Type[] {typeof(string),typeof(string)});
+			il.Emit(OpCodes.Call, miStrEqu);
+			il.Emit(OpCodes.Brfalse_S, labContinue);
+			il.Emit(OpCodes.Br_S, labFailed);
+			il.MarkLabel(labContinue);
+			#endregion
+
+			string[] srcLines = binding.Value.Trim().Split (new char[] { ';' });
+			foreach (string srcLine in srcLines) {
+				MethodInfo infoWriteLine = typeof(System.Diagnostics.Debug).GetMethod("WriteLine", new Type[] { typeof(string) });
+
+				string statement = srcLine.Trim ();
+
+				//load target ref onto the stack
+				FieldInfo fiRefs = typeof(Interface).GetField("References");
+				il.Emit(OpCodes.Ldsfld, fiRefs);
+				il.Emit(OpCodes.Ldc_I4, dstIdx);
+
+				MethodInfo miGetRef = Interface.References.GetType().GetMethod("get_Item");
+				il.Emit(OpCodes.Callvirt, miGetRef);
+				il.Emit(OpCodes.Isinst, dstType);
+
+				//push new value
+				il.Emit(OpCodes.Ldarg_1);
+				FieldInfo fiNewValue = typeof(ValueChangeEventArgs).GetField("NewValue");
+				il.Emit(OpCodes.Ldfld, fiNewValue);
+
+				PropertyInfo piTarget = dstType.GetProperty(binding.MemberName);
+				MethodInfo miToStr = typeof(object).GetMethod("ToString",Type.EmptyTypes);
+
+				if (!srcValueType.IsValueType)
+					il.Emit(OpCodes.Castclass, srcValueType);
+				il.Emit(OpCodes.Callvirt, miToStr);
+				il.Emit(OpCodes.Callvirt, piTarget.GetSetMethod());
+			}
+			il.MarkLabel(labFailed);
+			il.Emit(OpCodes.Ret);
+
+			#endregion
+
+			Delegate del = dm.CreateDelegate(ei.EventHandlerType);
+			MethodInfo addHandler = ei.GetAddMethod ();
+			//Delegate del = dm.CreateDelegate(typeof(System.EventHandler));
+			addHandler.Invoke(_source, new object[] {del});
+		}
+
 
 		public static FieldInfo getEventHandlerField(Type type, string eventName)
 		{

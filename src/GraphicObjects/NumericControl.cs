@@ -13,10 +13,10 @@ namespace go
 		public NumericControl(double minimum, double maximum, double step)
 			: base()
 		{
-			_minValue = minimum;
-			_maxValue = maximum;
-			_smallStep = step;
-			_bigStep = step * 5;
+			minValue = minimum;
+			maxValue = maximum;
+			smallStep = step;
+			bigStep = step * 5;
 		}
 		#endregion
 
@@ -30,54 +30,54 @@ namespace go
 		#endregion
 
 		#region private fields
-		double _actualValue, _minValue, _maxValue, _smallStep, _bigStep;
+		double _actualValue, minValue, maxValue, smallStep, bigStep;
 		#endregion
 
 		#region public properties
 		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual double Minimum {
-			get { return _minValue; }
+			get { return minValue; }
 			set {
-				if (_minValue == value)
+				if (minValue == value)
 					return;
 
-				_minValue = value;
+				minValue = value;
 
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(10.0)]
 		public virtual double Maximum
 		{
-			get { return _maxValue; }
+			get { return maxValue; }
 			set {
-				if (_maxValue == value)
+				if (maxValue == value)
 					return;
 
-				_maxValue = value;
+				maxValue = value;
 
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0.5)]
 		public virtual double SmallIncrement
 		{
-			get { return _smallStep; }
+			get { return smallStep; }
 			set {
-				if (_smallStep == value)
+				if (smallStep == value)
 					return;
 
-				_smallStep = value;
+				smallStep = value;
 
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(2.0)]
 		public virtual double LargeIncrement
 		{
-			get { return _bigStep; }
+			get { return bigStep; }
 			set {
-				if (_bigStep == value)
+				if (bigStep == value)
 					return;
 
-				_bigStep = value;
+				bigStep = value;
 
 			}
 		}
@@ -90,16 +90,16 @@ namespace go
 				if (value == _actualValue)
 					return;
 
-				Decimal oldV = (Decimal)_actualValue;
+				int oldV = Convert.ToInt32(_actualValue);
 
-				if (value < _minValue)
-					_actualValue = _minValue;
-				else if (value > _maxValue)
-					_actualValue = _maxValue;
+				if (value < minValue)
+					_actualValue = minValue;
+				else if (value > maxValue)
+					_actualValue = maxValue;
 				else                    
 					_actualValue = value;
 
-				onValueChanged(this,new ValueChangeEventArgs(oldV,(Decimal)_actualValue));
+				onValueChanged(this,new ValueChangeEventArgs("Value", oldV, Convert.ToInt32( _actualValue)));
 				registerForGraphicUpdate();
 			}
 		}

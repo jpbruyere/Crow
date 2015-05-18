@@ -16,27 +16,49 @@ using System.Threading;
 
 namespace test
 {
-	class GOLIBTest_fps : OpenTKGameWindow
+	class GOLIBTest_fps : OpenTKGameWindow , IValueChange
 	{
 		#region FPS
-		static int _fps = 0;
+		int _fps = 0;
 
-		public static int fps {
+		public int fps {
 			get { return _fps; }
 			set {
+				if (_fps == value)
+					return;
+				
+				int oldVal = _fps;
 				_fps = value;
-				if (_fps > fpsMax)
-					fpsMax = _fps;
-				else if (_fps < fpsMin)
-					fpsMin = _fps;
-			}
 
+				if (_fps > fpsMax) {
+					fpsMax = _fps;
+					ValueChanged(this, new ValueChangeEventArgs ("fpsMax", fpsMax, _fps));
+				} else if (_fps < fpsMin) {
+					ValueChanged(this, new ValueChangeEventArgs ("fpsMin", fpsMin, _fps));
+					fpsMin = _fps;
+				}
+
+				if (ValueChanged != null)
+					ValueChanged(this, new ValueChangeEventArgs ("fps", oldVal, _fps));
+
+				//ValueChanged.Raise (this, new ValueChangeEventArgs ("fps", oldVal, _fps));
+			}
+		}
+		string name = "testName";
+
+		public string Name {
+			get {
+				return name;
+			}
+			set {
+				name = value;
+			}
 		}
 
-		public static int fpsMin = int.MaxValue;
-		public static int fpsMax = 0;
+		public int fpsMin = int.MaxValue;
+		public int fpsMax = 0;
 
-		static void resetFps ()
+		void resetFps ()
 		{
 			fpsMin = int.MaxValue;
 			fpsMax = 0;
@@ -61,6 +83,9 @@ namespace test
 			labFpsMax = g.FindByName ("labFpsMax") as Label;
 			labUpdate = g.FindByName ("labUpdate") as Label;
 
+			//ValueChanged += (object sender, ValueChangeEventArgs vce) => labFps.Text = vce.NewValue.ToString ();
+	
+
 		}
 		protected override void OnRenderFrame (FrameEventArgs e)
 		{
@@ -76,17 +101,24 @@ namespace test
 
 			fps = (int)RenderFrequency;
 
-			labFps.Text = fps.ToString();
+			//labFps.Text = fps.ToString();
 			labUpdate.Text = this.updateTime.ElapsedMilliseconds.ToString() + " ms";
+
 			if (frameCpt > 200) {
-				labFpsMin.Text = fpsMin.ToString();
-				labFpsMax.Text = fpsMax.ToString();
+//				labFpsMin.Text = fpsMin.ToString();
+//				labFpsMax.Text = fpsMax.ToString();
 				resetFps ();
 				frameCpt = 0;
 
 			}
 			frameCpt++;
 		}
+
+		#region IValueChange implementation
+
+		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+
+		#endregion
 
 		[STAThread]
 		static void Main ()

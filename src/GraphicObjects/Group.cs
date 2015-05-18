@@ -120,7 +120,10 @@ namespace go
 			return tmp;
 		}
 
-
+		public override void RegisterForLayouting (int layoutType)
+		{
+			base.RegisterForLayouting (layoutType);
+		}
 
 		public override Rectangle ContextCoordinates(Rectangle r){
 			return r + ClientRectangle.Position;

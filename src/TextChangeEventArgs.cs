@@ -4,11 +4,14 @@ namespace go
 {
 	public class ValueChangeEventArgs: EventArgs
 	{
-		public Decimal OldValue;
-		public Decimal NewValue;
+		public string MemberName;
+		public object OldValue;
+		public object NewValue;
 
-		public ValueChangeEventArgs (Decimal _oldValue, Decimal _newValue) : base()
+
+		public ValueChangeEventArgs (string _memberName, object _oldValue, object _newValue) : base()
 		{
+			MemberName = _memberName;
 			OldValue = _oldValue;
 			NewValue = _newValue;
 		}

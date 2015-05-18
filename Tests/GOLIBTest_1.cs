@@ -27,7 +27,7 @@ namespace test
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-			LoadInterface("Interfaces/test1.goml", out g);
+			LoadInterface("Interfaces/log.xml", out g);
 
 		}
 		protected override void OnRenderFrame (FrameEventArgs e)

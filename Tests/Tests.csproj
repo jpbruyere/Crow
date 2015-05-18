@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>test.GOLIBTest_4</StartupObject>
+    <StartupObject>test.GOLIBTest_fps</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>..\bin\$(configuration)</OutputPath>
     <IntermediateOutputPath>obj\$(configuration)</IntermediateOutputPath>
@@ -138,6 +138,11 @@
       </LogicalName>
     </None>
     <None Include="Interfaces\fps.goml">
+      <LogicalName>
+      </LogicalName>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\log.xml">
       <LogicalName>
       </LogicalName>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

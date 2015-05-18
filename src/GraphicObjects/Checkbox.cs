@@ -242,11 +242,11 @@ namespace go
         public override void ReadXml(System.Xml.XmlReader reader)
         {
             string handler = reader.GetAttribute("OnClick");
-			Interface.EventsToResolve.Add(new EventSource 
+			Interface.EventsToResolve.Add(new DynAttribute 
             { 
                 Source = this, 
-                Handler = handler,
-                EventName = "OnClick"
+                Value = handler,
+                MemberName = "OnClick"
             });
 
             //Container c = this as Container;

@@ -71,7 +71,6 @@ namespace go
 				hSVG = new Rsvg.Handle (ms.ToArray ());
 				imgSize = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
 				_imgPath = resId;
-				//loadImage (@"Images/Icons/question_mark.svg");
 			}
 		}
 		//load image via System.Drawing.Bitmap, cairo load png only

@@ -108,6 +108,7 @@ namespace go
 		public event EventHandler<KeyboardKeyEventArgs> KeyUp;
 		public event EventHandler Focused;
 		public event EventHandler Unfocused;
+
 		#endregion
 
 		#region public properties
@@ -641,11 +642,11 @@ namespace go
 				if (string.IsNullOrEmpty (handler))
 					continue;
 					
-				Interface.EventsToResolve.Add(new EventSource 
+				Interface.EventsToResolve.Add(new DynAttribute 
 					{ 
 						Source = this, 
-						Handler = handler,
-						EventName = ei.Name
+						Value = handler,
+						MemberName = ei.Name
 					});
 			}
 			foreach (PropertyInfo pi in this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
@@ -713,6 +714,19 @@ namespace go
 						else
 							pi.SetValue (this, defaultValue, null);
 					} else {
+						if (v.StartsWith("{")) {
+							//binding
+							if (!v.EndsWith("}"))
+								throw new Exception (string.Format("GOML:Malformed binding: {0}", v));
+							
+							string strBinding = v.Substring (1, v.Length - 2);
+							Interface.Bindings.Add (new DynAttribute () {
+								Source = this,
+								MemberName = name,
+								Value = strBinding
+							});
+						}
+
 						if (pi.PropertyType == typeof(string)) {
 							pi.SetValue (this, v, null);
 							continue;

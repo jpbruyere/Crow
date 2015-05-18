@@ -38,6 +38,9 @@
     <DebugType>None</DebugType>
     <BaseAddress>4194304</BaseAddress>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DefineConstants>__linux__</DefineConstants>
+  </PropertyGroup>
   <!--  <PropertyGroup Condition=" '$(Platform)' == 'Linux_x86' ">
     <DefineConstants>__linux__</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
@@ -51,10 +54,6 @@
     <PlatformTarget>anycpu</PlatformTarget>
   </PropertyGroup>-->
   <ItemGroup>
-    <Compile Include="src\EventSource.cs">
-      <LogicalName>
-      </LogicalName>
-    </Compile>
     <Compile Include="src\Colors.cs">
       <LogicalName>
       </LogicalName>
@@ -239,6 +238,18 @@
       <LogicalName>
       </LogicalName>
     </Compile>
+    <Compile Include="src\GraphicObjects\Spinner.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\DynAttribute.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\IValueChange.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -295,15 +306,11 @@
     </Folder>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\icon_alert.gif">
-      <LogicalName>
-      </LogicalName>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Images\Icons\question_mark.svg">
       <LogicalName>go.image.icons.question_mark</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Images\Icons\icon_alert.gif" />
+    <EmbeddedResource Include="Images\Icons\updown.svg" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="OpenTK\Source\OpenTK\OpenTK.csproj">

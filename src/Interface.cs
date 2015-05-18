@@ -25,6 +25,7 @@ using System.Reflection;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Xml;
+using System.Linq;
 
 namespace go
 {
@@ -35,11 +36,17 @@ namespace go
 		public static bool ReplaceTabsWithSpace = false;
 		public static bool DesignerMode = false;
 
+		/// <summary>
+		/// Graphic objects References use in dynamic delegates for binding
+		/// </summary>
+		public static List<object> References = new List<object>();
+
 		public static LayoutingQueue LayoutingQueue = new LayoutingQueue();
 
 		#region Load/Save
 
-		internal static List<EventSource> EventsToResolve;
+		internal static List<DynAttribute> EventsToResolve;
+		internal static List<DynAttribute> Bindings;
 
 		public static void Save<T>(string file, T graphicObject)
 		{            
@@ -68,12 +75,13 @@ namespace go
 				}
 			}
 			Type t = Type.GetType("go." + root);
-			var go = Activator.CreateInstance(t);
+			//var go = Activator.CreateInstance(t);
 			return Load(path, t);
 		}
 		public static void Load<T>(string file, out T result, object ClassContainingHandlers = null)
 		{
-			EventsToResolve = new List<EventSource>();
+			EventsToResolve = new List<DynAttribute>();
+			Bindings = new List<DynAttribute> ();
 
 			XmlSerializerNamespaces xn = new XmlSerializerNamespaces();
 			xn.Add("", "");
@@ -87,32 +95,42 @@ namespace go
 			if (ClassContainingHandlers == null)
 				return;
 
-			foreach (EventSource es in EventsToResolve)
+			foreach (DynAttribute es in EventsToResolve)
 			{
-				if (string.IsNullOrEmpty(es.Handler))
+				if (string.IsNullOrEmpty(es.Value))
 					continue;
 
-				if (es.Handler.StartsWith ("{")) {
+				if (es.Value.StartsWith ("{")) {
 					CompilerServices.CompileEventSource (es);
 				} else {					
-					MethodInfo mi = ClassContainingHandlers.GetType ().GetMethod (es.Handler, BindingFlags.NonPublic | BindingFlags.Public
+					MethodInfo mi = ClassContainingHandlers.GetType ().GetMethod (es.Value, BindingFlags.NonPublic | BindingFlags.Public
 						| BindingFlags.Instance);
 
 					if (mi == null) {
-						Debug.WriteLine ("Handler Method not found: " + es.Handler);
+						Debug.WriteLine ("Handler Method not found: " + es.Value);
 						continue;
 					}
 
-					FieldInfo fi = CompilerServices.getEventHandlerField (es.Source.GetType (), es.EventName);
+					FieldInfo fi = CompilerServices.getEventHandlerField (es.Source.GetType (), es.MemberName);
 					Delegate del = Delegate.CreateDelegate(fi.FieldType, ClassContainingHandlers, mi);
 					fi.SetValue(es.Source, del);
 				}
+			}
+
+			foreach (DynAttribute binding in Bindings) {
+//				Type tSource = binding.Source.GetType ();
+//				if (!tSource.GetInterfaces ().Any (i => i.Name == "IValueChange")){
+//					Debug.WriteLine ("Binding source does not implement IValueChange.");
+//					continue;
+//				}
+				//MemberInfo mi = binding.Source.GetType ().GetMember (binding.MemberName);
+				CompilerServices.CreateBinding (binding, ClassContainingHandlers);
 			}
 		}
 		public static GraphicObject Load(string file, Type type, object ClassContainingHandlers = null)
 		{
 			GraphicObject result;
-			EventsToResolve = new List<EventSource>();
+			EventsToResolve = new List<DynAttribute>();
 
 			XmlSerializerNamespaces xn = new XmlSerializerNamespaces();
 			xn.Add("", "");
@@ -126,23 +144,23 @@ namespace go
 			if (ClassContainingHandlers == null)
 				return result;
 
-			foreach (EventSource es in EventsToResolve)
+			foreach (DynAttribute es in EventsToResolve)
 			{
-				if (string.IsNullOrEmpty(es.Handler))
+				if (string.IsNullOrEmpty(es.Value))
 					continue;
 
-				if (es.Handler.StartsWith ("{")) {
+				if (es.Value.StartsWith ("{")) {
 					CompilerServices.CompileEventSource (es);
 				} else {					
-					MethodInfo mi = ClassContainingHandlers.GetType ().GetMethod (es.Handler, BindingFlags.NonPublic | BindingFlags.Public
+					MethodInfo mi = ClassContainingHandlers.GetType ().GetMethod (es.Value, BindingFlags.NonPublic | BindingFlags.Public
 						| BindingFlags.Instance);
 
 					if (mi == null) {
-						Debug.WriteLine ("Handler Method not found: " + es.Handler);
+						Debug.WriteLine ("Handler Method not found: " + es.Value);
 						continue;
 					}
 
-					FieldInfo fi = CompilerServices.getEventHandlerField (es.Source.GetType (), es.EventName);
+					FieldInfo fi = CompilerServices.getEventHandlerField (es.Source.GetType (), es.MemberName);
 					Delegate del = Delegate.CreateDelegate(fi.FieldType, ClassContainingHandlers, mi);
 					fi.SetValue(es.Source, del);
 				}

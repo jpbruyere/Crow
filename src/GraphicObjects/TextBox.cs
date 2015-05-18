@@ -15,7 +15,7 @@ namespace go
     public class TextBoxWidget : Label
     {
 		#region CTOR
-		public TextBoxWidget(string _initialValue, GOEvent _onTextChanged = null)
+		public TextBoxWidget(string _initialValue)
 			: base(_initialValue)
 		{
 
@@ -24,19 +24,6 @@ namespace go
 		public TextBoxWidget()
 		{ }
 		#endregion
-
-		static bool _capitalOn = false;	//????????????????
-		[XmlIgnore]public static bool capitalOn
-		{
-			get
-			{
-				return _capitalOn;
-					//Keyboard[Key.ShiftLeft] || Keyboard[Key.ShiftRight] ?
-					//!_capitalOn : _capitalOn;
-			}
-			set { _capitalOn = value; }
-		}
-
 
 		#region GraphicObject overrides
 		[XmlIgnore]public override bool HasFocus   //trigger update when lost focus to errase text beam
@@ -71,23 +58,7 @@ namespace go
 		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
-			//			gr.FontOptions.Antialias = Antialias.Subpixel;
-			//			gr.FontOptions.HintMetrics = HintMetrics.On;
-//			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-//			gr.SetFontSize (Font.Size);
-
 			FontExtents fe = gr.FontExtents;
-
-
-
-//			gr.MoveTo(rText.X, rText.Y + fe.Ascent);
-//			#if _WIN32 || _WIN64
-//			gr.ShowText(txt);
-//			#elif __linux__
-//			gr.ShowText(Text);
-//			#endif
-//			gr.Fill();
-
 		}
 		#endregion
 
