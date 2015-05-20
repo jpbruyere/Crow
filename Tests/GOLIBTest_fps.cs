@@ -32,14 +32,14 @@ namespace test
 
 				if (_fps > fpsMax) {
 					fpsMax = _fps;
-					ValueChanged(this, new ValueChangeEventArgs ("fpsMax", fpsMax, _fps));
+					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMax", fpsMax, _fps));
 				} else if (_fps < fpsMin) {
-					ValueChanged(this, new ValueChangeEventArgs ("fpsMin", fpsMin, _fps));
+					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMin", fpsMin, _fps));
 					fpsMin = _fps;
 				}
 
 				if (ValueChanged != null)
-					ValueChanged(this, new ValueChangeEventArgs ("fps", oldVal, _fps));
+					ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", oldVal, _fps));
 
 				//ValueChanged.Raise (this, new ValueChangeEventArgs ("fps", oldVal, _fps));
 			}
@@ -67,7 +67,7 @@ namespace test
 		#endregion
 
 		public GOLIBTest_fps ()
-			: base(400, 200,"test")
+			: base(600, 400,"test")
 		{}
 
 		Container g;

@@ -135,8 +135,6 @@ namespace go
 		#endregion
 
 		#region graphic contexte
-		bool recreateContext = true;
-
 		Context ctx;
 		Surface surf;
 		byte[] bmp;
@@ -146,20 +144,19 @@ namespace go
 		go.GLBackend.Shader shader;
 		Matrix4 projectionMatrix, 
 				modelviewMatrix;
+		int[] viewport = new int[4];
 
 		Rectangle dirtyZone = Rectangle.Empty;
-
 		void createContext()
-		{
+		{			
 			createOpenGLSurface ();
 			if (uiQuad != null)
 				uiQuad.Dispose ();
-			uiQuad = new QuadVAO (0, 0, ClientRectangle.Width, ClientRectangle.Height,0,1,1,-1);
+			uiQuad = new QuadVAO (0, 0, ClientRectangle.Width, ClientRectangle.Height, 0, 1, 1, -1);
 			projectionMatrix = Matrix4.CreateOrthographicOffCenter 
 				(0, ClientRectangle.Width, ClientRectangle.Height, 0, 0, 1);
 			modelviewMatrix = Matrix4.Identity;
 			redrawClip.AddRectangle (ClientRectangle);
-			recreateContext = false;
 		}
 		void createOpenGLSurface()
 		{
@@ -170,7 +167,7 @@ namespace go
 			bmp = new byte[bmpSize];
 
 			//create texture
-			if (texID > 0)
+			if (GL.IsTexture(texID))
 				GL.DeleteTexture (texID);
 			GL.GenTextures(1, out texID);
 			GL.ActiveTexture (TextureUnit.Texture0);
@@ -187,6 +184,8 @@ namespace go
 		}
 		void OpenGLDraw()
 		{
+			GL.GetInteger (GetPName.Viewport, viewport);
+			GL.Viewport (0, 0, ClientRectangle.Width, ClientRectangle.Height);
 			shader.Enable ();
 			shader.ProjectionMatrix = projectionMatrix;
 			shader.ModelViewMatrix = modelviewMatrix;
@@ -203,6 +202,7 @@ namespace go
 			GL.BindTexture(TextureTarget.Texture2D, 0);
 
 			shader.Disable ();
+			GL.Viewport (viewport [0], viewport [1], viewport [2], viewport [3]);
 		}
 			
 		#endregion
@@ -226,15 +226,7 @@ namespace go
 			GraphicObject[] invGOList = new GraphicObject[GraphicObjects.Count];
 			GraphicObjects.CopyTo (invGOList,0);
 			invGOList = invGOList.Reverse ().ToArray ();
-//
-//			foreach (GraphicObject p in invGOList) {
-//				if (p.Visible) {
-//					layoutTime.Start ();
-//					while(!p.LayoutIsValid)
-//						p.UpdateLayout ();
-//					layoutTime.Stop ();
-//				}
-//			}
+
 			while (Interface.LayoutingQueue.Count > 0) {
 				LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
 				lqi.ProcessLayouting ();
@@ -252,11 +244,12 @@ namespace go
 
 
 			lock (redrawClip) {
-				if (redrawClip.count > 0) {
+				if (redrawClip.count > 0) {					
 //					#if DEBUG_CLIP_RECTANGLE
 //					redrawClip.stroke (ctx, new Color(1.0,0,0,0.3));
 //					#endif
-					redrawClip.clearAndClip (ctx);//rajouté après, tester si utile
+					redrawClip.clearAndClip (ctx);//rajouté après, tester si utile	
+
 					//Link.draw (ctx);
 					foreach (GraphicObject p in invGOList) {
 						if (p.Visible) {
@@ -282,6 +275,7 @@ namespace go
 					redrawClip.Reset ();
 				}
 			}
+			//surf.WriteToPng (@"/mnt/data/test.png");
 			ctx.Dispose ();
 			surf.Dispose ();
 //			if (ToolTip.isVisible) {
@@ -326,8 +320,8 @@ namespace go
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
 			base.OnRenderFrame(e);
-			if (recreateContext)
-				createContext ();
+//			if (recreateContext)
+//				createContext ();
 			OpenGLDraw ();
 		}
 		protected override void OnLoad(EventArgs e)
@@ -350,6 +344,7 @@ namespace go
 
 			int matl = GL.GetInteger (GetPName.MaxArrayTextureLayers);
 			int mts = GL.GetInteger (GetPName.MaxTextureSize);
+
 			shader = new go.GLBackend.TexturedShader ();
 		}
 		protected override void OnUnload(EventArgs e)
@@ -363,7 +358,11 @@ namespace go
 		protected override void OnResize(EventArgs e)
 		{
 			base.OnResize (e);
-			recreateContext = true;
+			createContext ();
+			foreach (GraphicObject g in GraphicObjects) {
+				g.RegisterForLayouting ((int)LayoutingType.All);
+				//g.registerForGraphicUpdate();
+			}
 		}
 		#endregion
 
@@ -454,7 +453,7 @@ namespace go
 
         #region keyboard Handling
         void Keyboard_KeyDown(object sender, KeyboardKeyEventArgs e)
-        {
+        {			
 			if (_focusedWidget == null)
 				return;
 			_focusedWidget.onKeyDown (sender, e);

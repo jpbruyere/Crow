@@ -200,5 +200,13 @@ namespace go
             ctx.Operator = Operator.Over;
             //ctx.Restore();
         }
+		public override string ToString ()
+		{
+			string tmp = "";
+			foreach (Rectangle r in list) {
+				tmp += r.ToString ();
+			}
+			return tmp;
+		}
     }
 }
