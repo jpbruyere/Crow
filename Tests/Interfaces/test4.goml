@@ -57,7 +57,7 @@
 			</VerticalStack>
 			<VerticalStack Width="-1" Height="-1" BorderWidth="1" Margin="5" WidgetSpacing="4">
 				<Button Width="-1" Height="-1" Margin="5">
-					<Image Path="/mnt/data/Images/130px-Blason_ville_fr_Aubure_(Haut-Rhin).svg.png"/>
+					<Image Path="#Tests.image.tetra.png"/>
 				</Button>
 				<HorizontalStack>
 					<Label Text="Update" FontColor="White" VerticalAlignment="Center" />

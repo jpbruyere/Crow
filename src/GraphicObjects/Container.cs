@@ -177,8 +177,8 @@ namespace go
 
             using (System.Xml.XmlReader subTree = reader.ReadSubtree())
             {
-                subTree.Read();
-                subTree.Read(); //move to first child
+                subTree.Read(); //skip current node
+                subTree.Read(); //read first child
 
                 if (!subTree.IsStartElement())
                     return;

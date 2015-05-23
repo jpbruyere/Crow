@@ -5,89 +5,108 @@ using System.Text;
 using Cairo;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Xml.Serialization;
+using System.ComponentModel;
 
 namespace go
 {
 	public class Image : GraphicObject
 	{
-
 		byte[] image;
 		Rsvg.Handle hSVG;
 		Size imgSize;
         string _imgPath;
-
-        [System.Xml.Serialization.XmlIgnore]
-		public System.Drawing.Bitmap Bitmap {
-			set {
-				loadImage (value);                
-			}
-		}
+		string _svgSub;
 		
-        [System.Xml.Serialization.XmlAttributeAttribute("Path")]        
+        [XmlAttributeAttribute("Path")]        
 		public string ImagePath {
 			get { return _imgPath; }
 			set {
 				_imgPath = value;
-				loadImage (_imgPath);
+				LoadImage (_imgPath);
 			}
 		}
 
+		[XmlAttributeAttribute()][DefaultValue(null)]
+		public string SvgSub {
+			get { return _svgSub; }
+			set {
+				_svgSub = value;
+				registerForGraphicUpdate ();
+			}
+		}
+			
+		#region CTOR
 		public Image () : base()
 		{
 		}
-
 		public Image (string ImagePath, Rectangle _bounds)
             : base(_bounds)
 		{
 			_imgPath = ImagePath;
-            loadImage(_imgPath);
+            LoadImage(_imgPath);
         }
-
 		public Image (string ImagePath)
             : base()
 		{
 			_imgPath = ImagePath;
-            loadImage(_imgPath);
+            LoadImage(_imgPath);
 		}
-
 		public Image (System.Drawing.Bitmap _bitmap)
             : base()
 		{
-			Bitmap = _bitmap;
+			LoadImage (_bitmap);
 		}
+		#endregion
 
-		protected override Size measureRawSize ()
+		#region Image Loading
+		void loadFromRessource(string resId)
 		{
-			if (image == null && hSVG == null)
-				loadRessourceSvg ("go.image.icons.question_mark");				
+			Stream stream = null;
 
-			return imgSize + Margin*2;
-		}
-		void loadRessourceSvg(string resId)
-		{
-			Stream s = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(resId);
+			//first, search for ressource in main executable assembly
+			stream = System.Reflection.Assembly.GetEntryAssembly().GetManifestResourceStream(resId);
+			if (stream == null)//try to find ressource in golib assembly				
+				stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(resId);
+			if (stream == null)
+				return;
+			
 			using (MemoryStream ms = new MemoryStream ()) {
-				s.CopyTo (ms);
-				hSVG = new Rsvg.Handle (ms.ToArray ());
-				imgSize = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
-				_imgPath = resId;
+				stream.CopyTo (ms);
+
+				if (resId.EndsWith (".svg", true, System.Globalization.CultureInfo.InvariantCulture)) {
+					hSVG = new Rsvg.Handle (ms.ToArray ());
+					imgSize = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
+				} else
+					LoadImage (new System.Drawing.Bitmap (ms));					
 			}
 		}
-		//load image via System.Drawing.Bitmap, cairo load png only
-		public void loadImage (string path)
+		void loadFromFile(string path)
 		{
-            if (!File.Exists(path))
-                return;
-            
-			if (path.EndsWith (".svg", true,System.Globalization.CultureInfo.InvariantCulture)) {
+			if (!File.Exists(path))
+				return;
+
+			if (path.EndsWith (".svg", true, System.Globalization.CultureInfo.InvariantCulture)) {
 				hSVG = new Rsvg.Handle (path);								 
 				imgSize = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
 			}else
-				loadImage (new System.Drawing.Bitmap (path));
-            _imgPath = path;
-		}
+				LoadImage (new System.Drawing.Bitmap (path));
 
-		public void loadImage (System.Drawing.Bitmap bitmap)
+		}
+		public void LoadImage (string path)
+		{
+			hSVG = null;
+			image = null;
+
+			if (path.StartsWith ("#"))
+				loadFromRessource (path.Substring (1));
+			else
+				loadFromFile (path);
+
+			_imgPath = path;
+		}
+		//load image via System.Drawing.Bitmap, cairo load png only
+		public void LoadImage (System.Drawing.Bitmap bitmap)
 		{
 			if (bitmap == null)
 				return;
@@ -104,8 +123,18 @@ namespace go
 			image = new byte[bitmapSize];
 			System.Runtime.InteropServices.Marshal.Copy (data.Scan0, image, 0, bitmapSize);
 
-			bitmap.UnlockBits (data);
-			//bitmap.Dispose();            
+			bitmap.UnlockBits (data);           
+		}
+		#endregion
+
+		#region GraphicObject overrides
+		protected override Size measureRawSize ()
+		{
+			if (image == null && hSVG == null) {
+				loadFromRessource ("go.Images.Icons.IconAlerte.svg");
+			}
+
+			return imgSize + Margin * 2;
 		}
 		protected override void onDraw (Context gr)
 		{
@@ -126,9 +155,13 @@ namespace go
 				}
 			} else {
 				gr.Translate (rImg.X/widthRatio, rImg.Y/heightRatio);
-				hSVG.RenderCairo (gr);
+				if (string.IsNullOrEmpty (_svgSub))
+					hSVG.RenderCairo (gr);
+				else
+					hSVG.RenderCairoSub (gr, "#" + _svgSub);
 			}
 			gr.Restore ();
 		}
+		#endregion
 	}
 }

@@ -306,11 +306,8 @@
     </Folder>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Images\Icons\question_mark.svg">
-      <LogicalName>go.image.icons.question_mark</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Images\Icons\icon_alert.gif" />
     <EmbeddedResource Include="Images\Icons\updown.svg" />
+    <EmbeddedResource Include="Images\Icons\IconAlerte.svg" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="OpenTK\Source\OpenTK\OpenTK.csproj">

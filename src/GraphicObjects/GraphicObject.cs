@@ -213,7 +213,7 @@ namespace go
 				registerForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(5)]
+		[XmlAttributeAttribute()][DefaultValue(2)]
 		public virtual double CornerRadius {
 			get { return _cornerRadius; }
 			set {
