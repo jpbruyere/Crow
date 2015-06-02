@@ -5,6 +5,7 @@ using System.Text;
 using Cairo;
 using System.Xml.Serialization;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace go
 {
@@ -17,6 +18,15 @@ namespace go
 			: base(minimum,maximum,step)
 		{
 		}
+		#endregion
+
+		#region implemented abstract members of TemplatedControl
+
+		protected override void loadTemplate ()
+		{
+			
+		}
+
 		#endregion
 
 		#region private fields
@@ -108,10 +118,10 @@ namespace go
 			unity = (double)(r.Width - cursor.Width) / (Maximum - Minimum);
 
 			cursor.TopLeft = new Point(r.Left + (int)(Value * unity),
-                                        (int)(p1.Y - cursor.Height / 2));             
+                                        (int)(p1.Y - cursor.Height / 2));  
+			Debug.WriteLine (cursor.TopLeft.ToString ());
         }
         
-
 		#region mouse handling
 		public override void onMouseButtonDown (object sender, OpenTK.Input.MouseButtonEventArgs e)
 		{
@@ -133,13 +143,10 @@ namespace go
 		}
 		public override void onMouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
 		{
+			if (holdCursor)
+				Value += (double)e.XDelta / unity;
+			
 			base.onMouseMove (sender, e);
-
-			if (!holdCursor)
-				return;
-
-			Value += (double)e.XDelta / unity;
-
 		}
 		#endregion
     }

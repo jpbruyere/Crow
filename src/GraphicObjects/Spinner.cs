@@ -19,25 +19,59 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using OpenTK.Input;
 
 namespace go
 {
 	public class Spinner : NumericControl
 	{
+//		Button butUp;
+//		Button butDown;
+		Label labCpt;
+
 		public Spinner (double minimum, double maximum, double step) : 
 		base (minimum, maximum, step)
 		{
-			butUp = new Button ();
-			butUp.setChild (new Image ("go.Image.Icons.updown.svg"));
+//			butUp = new Button ();
+//			butUp.setChild (new Image ("go.Image.Icons.updown.svg"));
 		}
 		public Spinner () : base()
 		{
 		}
-	
-		Button butUp;
-		Button butDown;
-		Label labCpt;
 
+		#region implemented abstract members of TemplatedControl
+
+		protected override void loadTemplate ()
+		{
+			this.setChild (Interface.Load ("#go.Templates.Spinner.goml", this));
+			labCpt = this.child.FindByName ("labCpt") as Label;
+		}
+
+		#endregion
+
+		void onUp (object sender, MouseButtonEventArgs e)
+		{
+//			decimal tmp = 0;
+//			if (!decimal.TryParse (labCpt.Text, out tmp))
+//				return;
+
+			Value += this.SmallIncrement;
+			labCpt.Text = Value.ToString ();
+		}
+		void onDown (object sender, MouseButtonEventArgs e)
+		{
+//			decimal tmp = 0;
+//			if (!decimal.TryParse (labCpt.Text, out tmp))
+//				return;
+
+			Value -= this.SmallIncrement;
+			labCpt.Text = Value.ToString ();
+		}
+		public override void onValueChanged (object sender, ValueChangeEventArgs e)
+		{
+			//labCpt.Text = e.NewValue.ToString ();
+			base.onValueChanged (sender, e);
+		}
 	}
 }
 

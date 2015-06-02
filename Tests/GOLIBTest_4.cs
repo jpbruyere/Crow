@@ -12,12 +12,28 @@ using System.Diagnostics;
 
 using go;
 using System.Threading;
+using System.Collections.Generic;
 
 
 namespace test
 {
-	class GOLIBTest_4 : OpenTKGameWindow
+	public class ClsItem
 	{
+		public string Field;
+		public ClsItem(){
+		}
+		public ClsItem(string str){
+			Field = str;
+		}
+	}
+	class GOLIBTest_4 : OpenTKGameWindow, IValueChange
+	{
+		#region IValueChange implementation
+
+		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+
+		#endregion
+
 		public GOLIBTest_4 ()
 			: base(1024, 800,"test4")
 		{}
@@ -55,6 +71,12 @@ namespace test
 				labUpdate;
 		Slider slTest;
 		Group colors;
+
+		public List<ClsItem> TestList = new List<ClsItem>(new ClsItem[] 
+			{
+			new ClsItem("string 1"),
+			new ClsItem("string 2")
+			});
 
 		protected override void OnLoad (EventArgs e)
 		{
@@ -113,9 +135,10 @@ namespace test
 					}
 				);
 				i++;
-//				if (i > 50)
-//					break;
+				if (i > 50)
+					break;
 			}
+			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", null, TestList));
 		}
 		void pFps_mousemove(object sender, MouseMoveEventArgs e)
 		{
@@ -153,7 +176,7 @@ namespace test
 			if (pb.Value == pb.Maximum)
 				pb.Value = 0;
 			pb.Value++;
-			//pb2.Value = pb.Value;
+			pb2.Value = pb.Value;
 			labPb.Text = pb.Value.ToString ();
 			if (FocusedWidget==null)
 				labF.Text = "- none -";

@@ -18,10 +18,10 @@ namespace go
 		#region CTOR
         public Button() : base()
         {
-			MouseEnter += delegate { Background = Color.Lion;};
-			MouseLeave += delegate { Background = Color.Gray;};
-			MouseButtonDown += delegate { Background = Color.Red;};
-			MouseButtonUp += delegate { Background = Color.Gray;};
+			//MouseEnter += delegate { Background = Color.RedDevil;};
+			//MouseLeave += delegate { Background = Color.Transparent;};
+			MouseButtonDown += delegate { BackImgSub = "pressed"; registerForGraphicUpdate();};
+			MouseButtonUp += delegate { BackImgSub = "normal";registerForGraphicUpdate();};
 		}
 		#endregion
 
@@ -36,7 +36,7 @@ namespace go
 			get { return base.Height; }
 			set { base.Height = value; }
 		}
-		[XmlAttributeAttribute()][DefaultValue("Gray")]
+		[XmlAttributeAttribute()][DefaultValue("Transparent")]
 		public override Color Background {
 			get { return base.Background; }
 			set { base.Background = value; }
@@ -46,8 +46,17 @@ namespace go
         {
             get { return base.Focusable; }
             set { base.Focusable = value; }
-        }	
-
+		}
+		[XmlAttributeAttribute()][DefaultValue("#go.Images.Icons.buttest4.svg")]
+		public override Picture BackgroundImage {
+			get {
+				return base.BackgroundImage;
+			}
+			set {
+				base.BackgroundImage = value;
+				BackImgSub = "normal";
+			}
+		}
 		#endregion
 
 		[XmlAttributeAttribute][DefaultValue("Button")]

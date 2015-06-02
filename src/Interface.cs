@@ -60,25 +60,48 @@ namespace go
 				xs.Serialize(s, graphicObject, xn);
 			}
 		}
-		public static GraphicObject Load(string path)
+
+		public static Stream GetStreamFromPath(string path)
+		{
+			Stream stream = null;
+
+			if (path.StartsWith ("#")) {
+				string resId = path.Substring (1);
+				stream = System.Reflection.Assembly.GetEntryAssembly().GetManifestResourceStream(resId);
+				if (stream == null)//try to find ressource in golib assembly				
+					stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(resId);
+				if (stream == null)
+					return null;
+			} else {
+				if (!File.Exists (path))
+					return null;
+				stream = new FileStream (path, FileMode.Open);
+			}
+			return stream;
+		}
+		public static GraphicObject Load(string path, object hostClass = null)
 		{
 			string root = "Object";
-			using (Stream s = new FileStream (path, FileMode.Open)) {
-				using (XmlReader reader = XmlReader.Create (s)) {
-					while (reader.Read()) {
-						// first element is the root element
-						if (reader.NodeType == XmlNodeType.Element) {
-							root = reader.Name;
-							break;
-						}
+
+			Stream stream = GetStreamFromPath (path);
+			using (XmlReader reader = XmlReader.Create (stream)) {
+				while (reader.Read()) {
+					// first element is the root element
+					if (reader.NodeType == XmlNodeType.Element) {
+						root = reader.Name;
+						break;
 					}
 				}
 			}
+
 			Type t = Type.GetType("go." + root);
 			//var go = Activator.CreateInstance(t);
-			return Load(path, t);
+			stream.Seek(0,SeekOrigin.Begin);
+			GraphicObject tmp = Load(stream, t, hostClass);
+			stream.Dispose ();
+			return tmp;
 		}
-		public static void Load<T>(string file, out T result, object ClassContainingHandlers = null)
+		public static void Load<T>(string file, out T result, object hostClass = null)
 		{
 			EventsToResolve = new List<DynAttribute>();
 			Bindings = new List<DynAttribute> ();
@@ -92,7 +115,7 @@ namespace go
 				result = (T)xs.Deserialize(s);
 			}
 
-			if (ClassContainingHandlers == null)
+			if (hostClass == null)
 				return;
 
 			foreach (DynAttribute es in EventsToResolve)
@@ -103,7 +126,7 @@ namespace go
 				if (es.Value.StartsWith ("{")) {
 					CompilerServices.CompileEventSource (es);
 				} else {					
-					MethodInfo mi = ClassContainingHandlers.GetType ().GetMethod (es.Value, BindingFlags.NonPublic | BindingFlags.Public
+					MethodInfo mi = hostClass.GetType ().GetMethod (es.Value, BindingFlags.NonPublic | BindingFlags.Public
 						| BindingFlags.Instance);
 
 					if (mi == null) {
@@ -112,7 +135,7 @@ namespace go
 					}
 
 					FieldInfo fi = CompilerServices.getEventHandlerField (es.Source.GetType (), es.MemberName);
-					Delegate del = Delegate.CreateDelegate(fi.FieldType, ClassContainingHandlers, mi);
+					Delegate del = Delegate.CreateDelegate(fi.FieldType, hostClass, mi);
 					fi.SetValue(es.Source, del);
 				}
 			}
@@ -124,10 +147,10 @@ namespace go
 //					continue;
 //				}
 				//MemberInfo mi = binding.Source.GetType ().GetMember (binding.MemberName);
-				CompilerServices.CreateBinding (binding, ClassContainingHandlers);
+				CompilerServices.CreateBinding (binding, hostClass);
 			}
 		}
-		public static GraphicObject Load(string file, Type type, object ClassContainingHandlers = null)
+		public static GraphicObject Load(Stream stream, Type type, object hostClass = null)
 		{
 			GraphicObject result;
 			EventsToResolve = new List<DynAttribute>();
@@ -136,12 +159,9 @@ namespace go
 			xn.Add("", "");
 			XmlSerializer xs = new XmlSerializer(type);            
 
-			using (Stream s = new FileStream(file, FileMode.Open))
-			{
-				result = (GraphicObject)xs.Deserialize(s);
-			}
+			result = (GraphicObject)xs.Deserialize(stream);
 
-			if (ClassContainingHandlers == null)
+			if (hostClass == null)
 				return result;
 
 			foreach (DynAttribute es in EventsToResolve)
@@ -152,7 +172,7 @@ namespace go
 				if (es.Value.StartsWith ("{")) {
 					CompilerServices.CompileEventSource (es);
 				} else {					
-					MethodInfo mi = ClassContainingHandlers.GetType ().GetMethod (es.Value, BindingFlags.NonPublic | BindingFlags.Public
+					MethodInfo mi = hostClass.GetType ().GetMethod (es.Value, BindingFlags.NonPublic | BindingFlags.Public
 						| BindingFlags.Instance);
 
 					if (mi == null) {
@@ -161,10 +181,21 @@ namespace go
 					}
 
 					FieldInfo fi = CompilerServices.getEventHandlerField (es.Source.GetType (), es.MemberName);
-					Delegate del = Delegate.CreateDelegate(fi.FieldType, ClassContainingHandlers, mi);
+					Delegate del = Delegate.CreateDelegate(fi.FieldType, hostClass, mi);
 					fi.SetValue(es.Source, del);
 				}
 			}
+
+			foreach (DynAttribute binding in Bindings) {
+				//				Type tSource = binding.Source.GetType ();
+				//				if (!tSource.GetInterfaces ().Any (i => i.Name == "IValueChange")){
+				//					Debug.WriteLine ("Binding source does not implement IValueChange.");
+				//					continue;
+				//				}
+				//MemberInfo mi = binding.Source.GetType ().GetMember (binding.MemberName);
+				CompilerServices.CreateBinding (binding, hostClass);
+			}
+
 			return result;
 		}
 

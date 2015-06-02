@@ -182,10 +182,6 @@
       <LogicalName>
       </LogicalName>
     </Compile>
-    <Compile Include="src\GraphicObjects\Checkbox.cs">
-      <LogicalName>
-      </LogicalName>
-    </Compile>
     <Compile Include="src\Font.cs">
       <LogicalName>
       </LogicalName>
@@ -250,6 +246,30 @@
       <LogicalName>
       </LogicalName>
     </Compile>
+    <Compile Include="src\Picture.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\SvgPicture.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\BmpPicture.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\TemplatedControl.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Checkbox.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\RadioButton.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -265,6 +285,9 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Mono.Cairo" />
+    <Reference Include="OpenTK">
+      <HintPath>OpenTK\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -308,11 +331,20 @@
   <ItemGroup>
     <EmbeddedResource Include="Images\Icons\updown.svg" />
     <EmbeddedResource Include="Images\Icons\IconAlerte.svg" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="OpenTK\Source\OpenTK\OpenTK.csproj">
-      <Project>{A37A7E14-0000-0000-0000-000000000000}</Project>
-      <Name>OpenTK</Name>
-    </ProjectReference>
+    <EmbeddedResource Include="Images\Icons\button.svg" />
+    <EmbeddedResource Include="Images\Icons\butAqua.svg" />
+    <EmbeddedResource Include="Images\Icons\buttonB.svg" />
+    <EmbeddedResource Include="Images\Icons\buttest.svg" />
+    <EmbeddedResource Include="Images\Icons\buttest2.svg" />
+    <EmbeddedResource Include="Images\Icons\buttest4.svg" />
+    <EmbeddedResource Include="Images\Icons\checkbox.svg" />
+    <EmbeddedResource Include="Templates\Checkbox.goml" />
+    <EmbeddedResource Include="Images\Icons\radiobutton.svg" />
+    <EmbeddedResource Include="Templates\RadioButton.goml" />
+    <EmbeddedResource Include="Templates\Listbox.goml" />
+    <EmbeddedResource Include="Templates\Slider.goml" />
+    <EmbeddedResource Include="Templates\Spinner.goml" />
+    <EmbeddedResource Include="Templates\Spinner %28copier%29.goml" />
+    <EmbeddedResource Include="Templates\ItemTemplate.goml" />
   </ItemGroup>
 </Project>

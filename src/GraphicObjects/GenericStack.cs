@@ -70,15 +70,19 @@ namespace go
 					tmp.Width += c.Slot.Width + Spacing;
 					tmp.Height = Math.Max (tmp.Height, c.Slot.Bottom);
 				}
+				if (tmp.Width > 0)
+					tmp.Width -= Spacing;
 			} else {
 				foreach (GraphicObject c in Children) {
 					tmp.Width = Math.Max (tmp.Width, c.Slot.Right);
 					tmp.Height += c.Slot.Height + Spacing;
 				}
+				if (tmp.Height > 0)
+					tmp.Height -= Spacing;
 			}
 
-			tmp.Width += 2*Margin;
-			tmp.Height += 2*Margin;
+			tmp.Width += 2 * Margin;
+			tmp.Height += 2 * Margin;
 
 			return tmp;
 		}
@@ -89,11 +93,13 @@ namespace go
 				foreach (GraphicObject c in Children) {
 					c.Slot.X = d;
 					d += c.Slot.Width + Spacing;
+					c.RegisterForLayouting ((int)LayoutingType.Y);
 				}
 			} else {
 				foreach (GraphicObject c in Children) {
 					c.Slot.Y = d;
 					d += c.Slot.Height + Spacing;
+					c.RegisterForLayouting ((int)LayoutingType.X);
 				}
 			}
 		}

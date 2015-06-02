@@ -20,14 +20,31 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections;
+using System.Xml.Serialization;
+using System.ComponentModel;
 
 namespace go
 {
-	public class ListBox : GraphicObject
+	public class ListBox : TemplatedControl
 	{
-		IEnumerable data;
+		Group _list;
 
-		public IEnumerable Data {
+		public ListBox () : base()
+		{
+		}
+
+		#region implemented abstract members of TemplatedControl
+		protected override void loadTemplate ()
+		{
+			this.setChild (Interface.Load ("#go.Templates.Listbox.goml"));
+			_list = this.child.FindByName ("List") as Group;
+		}
+		#endregion
+
+		IList data;
+
+		[XmlAttributeAttribute()][DefaultValue(null)]
+		public IList Data {
 			get {
 				return data;
 			}
@@ -37,14 +54,12 @@ namespace go
 				
 				data = value;
 
+
 				foreach (var item in data) {
-					
+					_list.addChild(Interface.Load ("#go.Templates.ItemTemplate.goml", item));
+
 				}
 			}
-		}
-
-		public ListBox ()
-		{
 		}
 	}
 }

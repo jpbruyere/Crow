@@ -1,0 +1,14 @@
+﻿<?xml version="1.0"?>
+<Border CornerRadius="0" Margin="0" BorderWidth="1" Fit="True">
+	<HorizontalStack Name="hstack" Margin="0" Spacing="5">
+		<Label Width="30" Name="labCpt" Text="55" Margin="1" TextAlignment="RightCenter"/>
+		<VerticalStack Spacing="1" Name="vstack">
+			<Button Width="10" Height="8" MouseClick="onUp">
+				<Image Margin="1" Path="#go.Images.Icons.updown.svg" SvgSub="up"/>
+			</Button>
+			<Button Width="10" Height="8"  MouseClick="onDown">
+				<Image Margin="1" Path="#go.Images.Icons.updown.svg" SvgSub="down"/>
+			</Button>
+		</VerticalStack>
+	</HorizontalStack>
+</Border>

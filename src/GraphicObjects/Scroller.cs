@@ -115,22 +115,7 @@ namespace go
 		{
 			TopContainer.redrawClip.AddRectangle (base.ScreenCoordinates(Slot));
 		}
-//		public override void UpdateLayout (LayoutingType layoutType)
-//		{
-//			base.UpdateLayout ();
-//
-//			if (!LayoutIsValid)
-//				return;
-//
-//			//override child positionning inside scroller in the 
-//			//scrolling direction
-//			if (child == null)
-//				return;
-//			if (VerticalScrolling)
-//				child.Slot.Y = 0;
-//			if (HorizontalScrolling)
-//				child.Slot.X = 0;
-		//}
+
 		public override void Paint(ref Cairo.Context ctx, Rectangles clip = null)
 		{
 			if (!Visible)//check if necessary??

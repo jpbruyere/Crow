@@ -22,13 +22,33 @@ namespace test
 			: base(1024, 600,"test")
 		{}
 
-		GraphicObject g;
+		Border g;
+		Label l;
 
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
 			LoadInterface("Interfaces/test0.goml", out g);
+			l = g.FindByName ("labCpt") as Label;
+		}
 
+		void onUp (object sender, MouseButtonEventArgs e)
+		{
+			decimal tmp = 0;
+			if (!decimal.TryParse (l.Text, out tmp))
+				return;
+			
+			tmp += 1;
+			l.Text = tmp.ToString ();
+		}
+		void onDown (object sender, MouseButtonEventArgs e)
+		{
+			decimal tmp = 0;
+			if (!decimal.TryParse (l.Text, out tmp))
+				return;
+
+			tmp -= 1;
+			l.Text = tmp.ToString ();
 		}
 		protected override void OnRenderFrame (FrameEventArgs e)
 		{

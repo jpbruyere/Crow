@@ -275,7 +275,7 @@ namespace go
 			//gr.FontOptions.Antialias = Antialias.Subpixel;
 			//gr.FontOptions.HintMetrics = HintMetrics.On;
 
-			rText = ClientRectangle;
+			rText = new Rectangle(measureRawSize());
 
 			widthRatio = 1f;
 			heightRatio = 1f;

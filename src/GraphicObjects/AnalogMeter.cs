@@ -16,6 +16,15 @@ namespace go
 		}
 		#endregion
 
+		#region implemented abstract members of TemplatedControl
+
+		protected override void loadTemplate ()
+		{
+			throw new NotImplementedException ();
+		}
+
+		#endregion
+
 		#region GraphicObject Overrides
 		protected override void onDraw (Context gr)
 		{

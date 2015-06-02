@@ -3,20 +3,35 @@
 	Width="800" Height="500"
 	Background="0,5;0,5;0,5;0,5" Foreground="White"
 	Margin="10" >
-	<Border 
+	<Border Margin="10"
 		BorderWidth="2" BorderColor="Transparent"
 		Focusable="True"
 		MouseEnter="{BorderColor = White}"
 		MouseLeave="{BorderColor = Transparent}">
 
 		<HorizontalStack Name="hs0"
-			WidgetSpacing="10" 
-			VerticalAlignment="Top" 
-			Background="0,5;0,5;0,5;0,5">
-			<VerticalStack Name="vs1"
-				Margin="20">
+			WidgetSpacing="1" 
+			VerticalAlignment="Top">
+			<VerticalStack Name="vs1" Spacing="5">
+							<Slider Height="10" Width="300" BorderWidth="1" Background="Transparent" />
 				<Label Name="labMouse" Text="MousePos"/>
-				<HorizontalStack Name="hsPbar">
+				<HorizontalStack WidgetSpacing="10">
+					<VerticalStack Width="100">
+						<Checkbox Name="chk1"/>
+						<Checkbox Name="chk2" IsChecked="true"/>
+						<Checkbox Name="chk3"/>
+						<Checkbox Name="chk4"/>
+					</VerticalStack>
+					<VerticalStack Width="100">
+						<RadioButton IsChecked="true"/>
+						<RadioButton/>
+						<RadioButton/>
+						<RadioButton/>
+					</VerticalStack>
+					<Spinner Value="5"></Spinner>
+				</HorizontalStack>
+<!--				<ListBox Data="{TestList}"></ListBox>-->
+				<HorizontalStack Name="hsPbar" Margin="5">
 					<ProgressBar Name="pbBar" 
 						Width="100" Height="20"
 						Value="50"
@@ -25,38 +40,38 @@
 					<Label Name="labPb"
 						Width="20"
 						TextAlignment="RightCenter"/>
-					<ProgressBar Name="pbBar"
-						Width="100" Height="10"
-						Value="30"/>
 				</HorizontalStack>
-				<HorizontalStack  Name="hsFocus" HorizontalAlignment="Left">
+				<HorizontalStack  Name="hsFocus">
 					<Label Text="Focused:"/>
-					<Label Name="labFocus" Width="200"/>
+					<Label Name="labFocus"/>
 				</HorizontalStack>
 				<HorizontalStack>
 					<Label Text="Active:"  Name="hsActive"/>
-					<Label Name="labActive" Width="200"/>
+					<Label Name="labActive"/>
 				</HorizontalStack>
 				<HorizontalStack>
 					<Label Text="Hover:"  Name="hsHover"/>
-					<Label Name="labHover" Width="200"/>
+					<Label Name="labHover"/>
 				</HorizontalStack>
-				<Button Margin="5" BorderWidth="0" Background="Gray" Width="-1" Height="-1">
-					<Label FontSize="10" Text="This is a test" Margin="5" FontColor="White" Foreground="White" />
+				<Button  Margin="5" BorderWidth="0" Width="-1" Height="-1"  HorizontalAlignment="Center">
+					<Label FontSize="18" Text="This is a test" Margin="5" Foreground="Black" />
 				</Button>
 				<TextBoxWidget 	TextAlignment="LeftCenter" Font="droid,14"						
 								Width="300" Height="-1" Margin="2"
 								BorderColor="White" BorderWidth="1"
 								Text="editable text"/>
+								<Slider Height="10" Width="300" BorderWidth="1" Background="Transparent" />
+								<Slider Height="10" Width="300" BorderWidth="1" Background="Transparent" />
 				<GroupBox Title="Group Box" Width="300" Height="100" 
 					BorderColor="White" BorderWidth="2" Margin="3">
 					<Label Name="labValue" FontSize="14" Text="000"	TextAlignment="Center"/>
 				</GroupBox>
 				<Slider Height="10" Width="300" BorderWidth="1" Background="Transparent" />
 				<GraduatedSlider Name="slider" Height="30" Width="300" Foreground="BlueBell"/>
+				
 			</VerticalStack>
 			<VerticalStack Width="-1" Height="-1" BorderWidth="1" Margin="5" WidgetSpacing="4">
-				<Button Width="-1" Height="-1" Margin="5">
+				<Button  Margin="1" Width="150" Height="40">
 					<Image Path="#Tests.image.tetra.png"/>
 				</Button>
 				<HorizontalStack>
@@ -80,7 +95,7 @@
 				</HorizontalStack>
 			</VerticalStack>
 
-			<Scroller Background="DimGray" Height="350" Width="300"  
+			<Scroller Background="DimGray" Height="350" Width="150"  
 				 Margin="5" VerticalScrolling="true">
 				<VerticalStack Name="colors" VerticalAlignment="Top" Margin="5">
 					<ProgressBar Name="pbBar2" Width="100" Height="20" Value="50"
@@ -91,7 +106,7 @@
 		</HorizontalStack>
 
 		<Slider 
-			Height="20" Width="300" 
+			Height="20" Width="100" 
 			Background="Transparent"
 			VerticalAlignment="Bottom" />
 		</Border>

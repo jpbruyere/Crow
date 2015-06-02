@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <Container Background="Green" Height="400" Width="400">
 <VerticalStack Margin="10" Background="DarkBlue" Height="-1" Width="0">
-	<Label Text="label11"/>
+	<Label Text="label11" Width="0"/>
 	<Label Text="label21"/>
 	<HorizontalStack Width="-1" Height="-1" Margin="5"
 		Focusable="True" Background="Blue">

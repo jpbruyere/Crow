@@ -48,10 +48,8 @@ namespace go
 		VerticalAlignment _verticalAlignment;
 		HorizontalAlignment _horizontalAlignment;
 
-		bool hIsValid = false;
-		bool wIsValid = false;
-		bool xIsValid = false;
-		bool yIsValid = false;
+		Picture _backgroundImage;
+		string _template;
 		#endregion
 
 		#region public fields
@@ -258,12 +256,21 @@ namespace go
 		{ get { return bmp == null ? 
 				false : 
 				true; } }
+		[XmlAttributeAttribute()][DefaultValue(null)]
+		public virtual Picture BackgroundImage {
+			get { return _backgroundImage; }
+			set { 
+				_backgroundImage = value; 
+				registerForGraphicUpdate ();
+			}
+		}
 		#endregion
+		public string BackImgSub = null;
 
 		/// <summary>
 		/// Loads the default values from XML attributes default
 		/// </summary>
-		void loadDefaultValues()
+		protected virtual void loadDefaultValues()
 		{
 			foreach (PropertyInfo pi in this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
 				if (pi.GetSetMethod () == null)
@@ -298,6 +305,8 @@ namespace go
 							pi.SetValue (this, Color.Parse ((string)dv.Value), null);
 						else if (pi.PropertyType == typeof(Font))
 							pi.SetValue (this, Font.Parse ((string)dv.Value), null);
+						else if (pi.PropertyType == typeof(Picture))
+							pi.SetValue (this, Picture.Parse ((string)dv.Value), null);
 						else
 							pi.SetValue (this, dv.Value, null);
 						continue;
@@ -520,7 +529,13 @@ namespace go
 			gr.Color = Background;
 			CairoHelpers.CairoRectangle(gr,rBack,_cornerRadius);
 			gr.Fill ();
+
+			if (BackgroundImage == null)
+				return;
+
+			BackgroundImage.Paint (gr, rBack, BackImgSub);
 		}
+
 		protected virtual void UpdateGraphic ()
 		{
 			int stride = 4 * Slot.Width;
@@ -711,6 +726,8 @@ namespace go
 							pi.SetValue (this, Color.Parse ((string)defaultValue), null);
 						else if (pi.PropertyType == typeof(Font))
 							pi.SetValue (this, Font.Parse ((string)defaultValue), null);
+						else if (pi.PropertyType == typeof(Picture))
+							pi.SetValue (this, Picture.Parse ((string)defaultValue), null);
 						else
 							pi.SetValue (this, defaultValue, null);
 					} else {
@@ -725,6 +742,7 @@ namespace go
 								MemberName = name,
 								Value = strBinding
 							});
+							continue;
 						}
 
 						if (pi.PropertyType == typeof(string)) {
