@@ -237,8 +237,18 @@ namespace go
 
 				if (!srcValueType.IsValueType)
 					il.Emit(OpCodes.Castclass, srcValueType);
-				il.Emit(OpCodes.Callvirt, miToStr);
+				if (piTarget.PropertyType == typeof(string))
+					il.Emit(OpCodes.Callvirt, miToStr);
 				il.Emit(OpCodes.Callvirt, piTarget.GetSetMethod());
+
+				//initialize target with actual value
+				if (miSrc.MemberType == MemberTypes.Property)
+					piTarget.GetSetMethod().Invoke(binding.Source, new object[] { (miSrc as PropertyInfo).GetGetMethod().Invoke(_source,null)});
+				else if (miSrc.MemberType == MemberTypes.Field){ 
+					MethodInfo miSetTarget = piTarget.GetSetMethod();
+					FieldInfo fiSource = miSrc as FieldInfo;
+					miSetTarget.Invoke(binding.Source, new object[] { fiSource.GetValue(_source)});
+				}
 			}
 			il.MarkLabel(labFailed);
 			il.Emit(OpCodes.Ret);

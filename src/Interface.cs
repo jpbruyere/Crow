@@ -139,16 +139,21 @@ namespace go
 					fi.SetValue(es.Source, del);
 				}
 			}
-
-			foreach (DynAttribute binding in Bindings) {
-//				Type tSource = binding.Source.GetType ();
-//				if (!tSource.GetInterfaces ().Any (i => i.Name == "IValueChange")){
-//					Debug.WriteLine ("Binding source does not implement IValueChange.");
-//					continue;
-//				}
-				//MemberInfo mi = binding.Source.GetType ().GetMember (binding.MemberName);
+			while (Bindings.Count > 0) {
+				DynAttribute binding = Bindings [0];
+				Bindings.RemoveAt (0);
 				CompilerServices.CreateBinding (binding, hostClass);
 			}
+//			foreach (DynAttribute binding in Bindings) {
+////				Type tSource = binding.Source.GetType ();
+////				if (!tSource.GetInterfaces ().Any (i => i.Name == "IValueChange")){
+////					Debug.WriteLine ("Binding source does not implement IValueChange.");
+////					continue;
+////				}
+//				//MemberInfo mi = binding.Source.GetType ().GetMember (binding.MemberName);
+//				CompilerServices.CreateBinding (binding, hostClass);
+//			}
+//			Bindings.Clear ();
 		}
 		public static GraphicObject Load(Stream stream, Type type, object hostClass = null)
 		{
@@ -185,17 +190,22 @@ namespace go
 					fi.SetValue(es.Source, del);
 				}
 			}
-
-			foreach (DynAttribute binding in Bindings) {
-				//				Type tSource = binding.Source.GetType ();
-				//				if (!tSource.GetInterfaces ().Any (i => i.Name == "IValueChange")){
-				//					Debug.WriteLine ("Binding source does not implement IValueChange.");
-				//					continue;
-				//				}
-				//MemberInfo mi = binding.Source.GetType ().GetMember (binding.MemberName);
+			while (Bindings.Count > 0) {
+				DynAttribute binding = Bindings [0];
+				Bindings.RemoveAt (0);
 				CompilerServices.CreateBinding (binding, hostClass);
 			}
 
+//			foreach (DynAttribute binding in Bindings) {
+//				//				Type tSource = binding.Source.GetType ();
+//				//				if (!tSource.GetInterfaces ().Any (i => i.Name == "IValueChange")){
+//				//					Debug.WriteLine ("Binding source does not implement IValueChange.");
+//				//					continue;
+//				//				}
+//				//MemberInfo mi = binding.Source.GetType ().GetMember (binding.MemberName);
+//				CompilerServices.CreateBinding (binding, hostClass);
+//			}
+//			Bindings.Clear ();
 			return result;
 		}
 

@@ -1,3 +1,5 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack Name="List">
-</VerticalStack>
+<Border  Fit="True" Background="Gray">
+	<VerticalStack Name="List" Margin="5">
+	</VerticalStack>
+</Border>

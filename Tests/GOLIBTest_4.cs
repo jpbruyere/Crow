@@ -17,15 +17,7 @@ using System.Collections.Generic;
 
 namespace test
 {
-	public class ClsItem
-	{
-		public string Field;
-		public ClsItem(){
-		}
-		public ClsItem(string str){
-			Field = str;
-		}
-	}
+
 	class GOLIBTest_4 : OpenTKGameWindow, IValueChange
 	{
 		#region IValueChange implementation

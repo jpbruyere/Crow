@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>test.GOLIBTest_4</StartupObject>
+    <StartupObject>test.GOLIBTest_Listbox</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>..\bin\$(configuration)</OutputPath>
     <IntermediateOutputPath>obj\$(configuration)</IntermediateOutputPath>
@@ -83,6 +83,10 @@
       <LogicalName>
       </LogicalName>
     </Compile>
+    <Compile Include="GOLIBTest_Listbox.cs">
+      <LogicalName>
+      </LogicalName>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -149,6 +153,11 @@
       <LogicalName>
       </LogicalName>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\test_Listbox.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <LogicalName>
+      </LogicalName>
     </None>
   </ItemGroup>
   <ItemGroup>
