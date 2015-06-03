@@ -24,7 +24,7 @@ using System.ComponentModel;
 
 namespace go
 {
-	public abstract class TemplatedControl : Container
+	public abstract class TemplatedControl : Container, IXmlSerializable
 	{
 		public TemplatedControl () : base()
 		{
@@ -52,6 +52,52 @@ namespace go
 			//prevent name searching in template
 			return nameToFind == this.Name ? this : null;
 		}
+
+		#region IXmlSerializable
+
+		public override System.Xml.Schema.XmlSchema GetSchema()
+		{
+			return null;
+		}
+		public override void ReadXml(System.Xml.XmlReader reader)
+		{
+			base.ReadXml(reader);
+
+//			using (System.Xml.XmlReader subTree = reader.ReadSubtree())
+//			{
+//				subTree.Read(); //skip current node
+//				subTree.Read(); //read first child
+//
+//				if (!subTree.IsStartElement())
+//					return;
+//
+//				Type t = Type.GetType("go." + subTree.Name);
+//				GraphicObject go = (GraphicObject)Activator.CreateInstance(t);                                
+//
+//				(go as IXmlSerializable).ReadXml(subTree);
+//
+//				setChild(go);
+//
+//				subTree.Read();
+//
+//				if (!subTree.IsStartElement())
+//					return;
+//
+//			}
+		}
+		public override void WriteXml(System.Xml.XmlWriter writer)
+		{
+			base.WriteXml(writer);
+//
+//			if (child == null)
+//				return;
+//
+//			writer.WriteStartElement(child.GetType().Name);
+//			(child as IXmlSerializable).WriteXml(writer);
+//			writer.WriteEndElement();
+		}
+
+		#endregion
 	}
 }
 

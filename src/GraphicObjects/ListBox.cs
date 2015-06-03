@@ -41,22 +41,32 @@ namespace go
 		}
 		#endregion
 
-		IList data;
+		ICollection data;
+		int _selectedIndex;
+
+		public int SelectedIndex{
+			get { return _selectedIndex; }
+			set { _selectedIndex = value; }
+		}
 
 		[XmlAttributeAttribute()][DefaultValue(null)]
-		public IList Data {
+		public ICollection Data {
 			get {
 				return data;
 			}
-			set {
-				if (data == value)
-					return;
-				
+			set {				
 				data = value;
 
-
+				_list.Children.Clear ();
+				if (data == null)
+					return;
 				foreach (var item in data) {
-					_list.addChild(Interface.Load ("#go.Templates.ItemTemplate.goml", item));
+					GraphicObject g = Interface.Load ("#go.Templates.ItemTemplate.goml", item);
+//					g.Tag = item;
+//					g.MouseClick += (object sender, OpenTK.Input.MouseButtonEventArgs e) => {
+//						
+//					};
+					_list.addChild(g);
 
 				}
 			}

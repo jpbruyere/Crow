@@ -17,13 +17,13 @@ using System.Collections.Generic;
 
 namespace test
 {
-	public class ClsItem : IValueChange
+	public class ClsItem
 	{
-		#region IValueChange implementation
-
-		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-
-		#endregion
+//		#region IValueChange implementation
+//
+//		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+//
+//		#endregion
 
 		public string field;
 
@@ -33,7 +33,7 @@ namespace test
 			}
 			set {
 				field = value;
-				ValueChanged.Raise(this, new ValueChangeEventArgs ("Field", null, field));
+				//ValueChanged.Raise(this, new ValueChangeEventArgs ("Field", null, field));
 			}
 		}
 
@@ -56,12 +56,24 @@ namespace test
 			: base(1024, 600,"test")
 		{}
 
-		public List<ClsItem> TestList = new List<ClsItem>(new ClsItem[] 
+//		public List<ClsItem> TestList = new List<ClsItem>(new ClsItem[] 
+//			{
+//				new ClsItem("string 1"),
+//				new ClsItem("string 2"),
+//				new ClsItem("string 3")
+//			});
+		public List<string> TestList = new List<string>(new string[] 
 			{
-				new ClsItem("string 1"),
-				new ClsItem("string 2"),
-				new ClsItem("string 3")
-			});
+				"string 1",
+				"string 2",
+				"string 3"
+			});		
+//		string[] TestList = new string[] 
+//			{
+//				"string 1",
+//				"string 2",
+//				"string 3"
+//			};	
 		ListBox g;
 
 		protected override void OnLoad (EventArgs e)
@@ -69,8 +81,10 @@ namespace test
 			base.OnLoad (e);
 			LoadInterface("Interfaces/test_Listbox.goml", out g);
 
-			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", null, TestList));
-			TestList [1].Field = "test string";
+//			TestList [1].Field = "test string";
+//			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", null, TestList));
+
+
 		}
 		protected override void OnRenderFrame (FrameEventArgs e)
 		{

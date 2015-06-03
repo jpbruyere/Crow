@@ -1,2 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Label Text="{Field}"/>
+<Label Margin="2" Focusable="true" Text="{}" 
+	MouseEnter="{Background=SteelBlue}"
+	MouseLeave="{Background=Transparent}"
+/>

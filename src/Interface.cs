@@ -103,6 +103,8 @@ namespace go
 		}
 		public static void Load<T>(string file, out T result, object hostClass = null)
 		{
+			//result = (T)(Load (file, hostClass) as object);
+
 			EventsToResolve = new List<DynAttribute>();
 			Bindings = new List<DynAttribute> ();
 
@@ -142,7 +144,7 @@ namespace go
 			while (Bindings.Count > 0) {
 				DynAttribute binding = Bindings [0];
 				Bindings.RemoveAt (0);
-				CompilerServices.CreateBinding (binding, hostClass);
+				CompilerServices.ResolveBinding (binding, hostClass);
 			}
 //			foreach (DynAttribute binding in Bindings) {
 ////				Type tSource = binding.Source.GetType ();
@@ -193,7 +195,7 @@ namespace go
 			while (Bindings.Count > 0) {
 				DynAttribute binding = Bindings [0];
 				Bindings.RemoveAt (0);
-				CompilerServices.CreateBinding (binding, hostClass);
+				CompilerServices.ResolveBinding (binding, hostClass);
 			}
 
 //			foreach (DynAttribute binding in Bindings) {

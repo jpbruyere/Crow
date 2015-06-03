@@ -154,27 +154,41 @@ namespace go
 			evtFi.SetValue(es.Source, del);
 		}
 
-		public static void CreateBinding(DynAttribute binding, object _source)
-		{
-			
+		public static void ResolveBinding(DynAttribute binding, object _source)
+		{			
 			Type srcType = _source.GetType ();
 			Type dstType = binding.Source.GetType ();
 
+			MemberInfo miDst = dstType.GetMember (binding.MemberName).FirstOrDefault ();
 			MemberInfo miSrc = srcType.GetMember (binding.Value).FirstOrDefault();
-			Type srcValueType = null;
-			if (miSrc.MemberType == MemberTypes.Property)
-				srcValueType = (miSrc as PropertyInfo).PropertyType;
-			else if (miSrc.MemberType == MemberTypes.Field) 
-				srcValueType = (miSrc as FieldInfo).FieldType;
-			else
-				throw new Exception("unandled source type for binding");
 
+			//initialize target with actual value
+			if (miDst.MemberType == MemberTypes.Property) {
+				if (miSrc == null)//if no member is provided for binding, source raw value is taken
+					(miDst as PropertyInfo).GetSetMethod ().Invoke (binding.Source, new object[] { _source });
+				else if (miSrc.MemberType == MemberTypes.Property)
+					(miDst as PropertyInfo).GetSetMethod ().Invoke (binding.Source, new object[] { (miSrc as PropertyInfo).GetGetMethod ().Invoke (_source, null) });
+				else if (miSrc.MemberType == MemberTypes.Field)				
+					(miDst as PropertyInfo).GetSetMethod ().Invoke (binding.Source, new object[] { (miSrc as FieldInfo).GetValue (_source) });			
+			} else if (miDst.MemberType == MemberTypes.Field) {
+				if (miSrc == null)//if no member is provided for binding, source raw value is taken
+					(miDst as FieldInfo).SetValue (binding.Source, _source );
+				else if (miSrc.MemberType == MemberTypes.Property)
+					(miDst as FieldInfo).SetValue (binding.Source, (miSrc as PropertyInfo).GetGetMethod ().Invoke (_source, null));
+				else if (miSrc.MemberType == MemberTypes.Field)				
+					(miDst as FieldInfo).SetValue (binding.Source, (miSrc as FieldInfo).GetValue (_source));							
+			}else
+				throw new Exception("unandled destination member type for binding");
+			
 			#region Retrieve EventHandler parameter type
 			EventInfo ei = srcType.GetEvent ("ValueChanged");
+			if (ei == null)
+				return; //no dynamic update if ValueChanged interface is not implemented
+
 			MethodInfo evtInvoke = ei.EventHandlerType.GetMethod ("Invoke");
 			ParameterInfo[] evtParams = evtInvoke.GetParameters ();
-
 			Type handlerArgsType = evtParams [1].ParameterType;
+
 			#endregion
 
 			Type[] args = {typeof(object), handlerArgsType};
@@ -214,7 +228,7 @@ namespace go
 
 			string[] srcLines = binding.Value.Trim().Split (new char[] { ';' });
 			foreach (string srcLine in srcLines) {
-				MethodInfo infoWriteLine = typeof(System.Diagnostics.Debug).GetMethod("WriteLine", new Type[] { typeof(string) });
+				//MethodInfo infoWriteLine = typeof(System.Diagnostics.Debug).GetMethod("WriteLine", new Type[] { typeof(string) });
 
 				string statement = srcLine.Trim ();
 
@@ -232,23 +246,23 @@ namespace go
 				FieldInfo fiNewValue = typeof(ValueChangeEventArgs).GetField("NewValue");
 				il.Emit(OpCodes.Ldfld, fiNewValue);
 
-				PropertyInfo piTarget = dstType.GetProperty(binding.MemberName);
-				MethodInfo miToStr = typeof(object).GetMethod("ToString",Type.EmptyTypes);
 
+				MethodInfo miToStr = typeof(object).GetMethod("ToString",Type.EmptyTypes);
+				PropertyInfo piTarget = dstType.GetProperty(binding.MemberName);
+
+				Type srcValueType = null;
+				if (miSrc.MemberType == MemberTypes.Property)
+					srcValueType = (miSrc as PropertyInfo).PropertyType;
+				else if (miSrc.MemberType == MemberTypes.Field) 
+					srcValueType = (miSrc as FieldInfo).FieldType;
+				else
+					throw new Exception("unandled source member type for binding");
+				
 				if (!srcValueType.IsValueType)
 					il.Emit(OpCodes.Castclass, srcValueType);
 				if (piTarget.PropertyType == typeof(string))
 					il.Emit(OpCodes.Callvirt, miToStr);
 				il.Emit(OpCodes.Callvirt, piTarget.GetSetMethod());
-
-				//initialize target with actual value
-				if (miSrc.MemberType == MemberTypes.Property)
-					piTarget.GetSetMethod().Invoke(binding.Source, new object[] { (miSrc as PropertyInfo).GetGetMethod().Invoke(_source,null)});
-				else if (miSrc.MemberType == MemberTypes.Field){ 
-					MethodInfo miSetTarget = piTarget.GetSetMethod();
-					FieldInfo fiSource = miSrc as FieldInfo;
-					miSetTarget.Invoke(binding.Source, new object[] { fiSource.GetValue(_source)});
-				}
 			}
 			il.MarkLabel(labFailed);
 			il.Emit(OpCodes.Ret);
