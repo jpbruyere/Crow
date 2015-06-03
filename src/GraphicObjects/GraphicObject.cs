@@ -47,6 +47,8 @@ namespace go
 		protected bool _isVisible = true;
 		VerticalAlignment _verticalAlignment;
 		HorizontalAlignment _horizontalAlignment;
+		Size _maximumSize;
+		Size _minimumSize;
 
 		Picture _backgroundImage;
 		string _template;
@@ -264,7 +266,18 @@ namespace go
 				registerForGraphicUpdate ();
 			}
 		}
+		[XmlAttributeAttribute()][DefaultValue("0;0")]
+		public Size MaximumSize {
+			get { return _maximumSize; }
+			set { _maximumSize = value; }
+		}
+		[XmlAttributeAttribute()][DefaultValue("0;0")]
+		public Size MinimumSize {
+			get { return _minimumSize; }
+			set { _minimumSize = value; }
+		}
 		#endregion
+
 		public string BackImgSub = null;
 
 		/// <summary>
@@ -307,6 +320,8 @@ namespace go
 							pi.SetValue (this, Font.Parse ((string)dv.Value), null);
 						else if (pi.PropertyType == typeof(Picture))
 							pi.SetValue (this, Picture.Parse ((string)dv.Value), null);
+						else if (pi.PropertyType == typeof(Size))
+							pi.SetValue (this, Size.Parse ((string)dv.Value), null);
 						else
 							pi.SetValue (this, dv.Value, null);
 						continue;
@@ -354,7 +369,7 @@ namespace go
 			TopContainer.redrawClip.AddRectangle (ScreenCoordinates(Slot));
 		}
 		protected virtual Size measureRawSize ()
-		{			
+		{
 			return Bounds.Size;
 		}
 
@@ -489,6 +504,12 @@ namespace go
 				else
 					Slot.Width = Parent.ClientRectangle.Width;
 
+				//size constrain
+				if (Slot.Width < MinimumSize.Width)
+					Slot.Width = MinimumSize.Width;
+				else if (Slot.Width > MaximumSize.Width && MaximumSize.Width > 0)
+					Slot.Width = MaximumSize.Width;
+
 				if (LastSlots.Width == Slot.Width)
 					break;
 
@@ -505,6 +526,13 @@ namespace go
 					Slot.Height = measureRawSize ().Height;
 				else
 					Slot.Height = Parent.ClientRectangle.Height;
+
+				//size constrain
+				if (Slot.Height < MinimumSize.Height)
+					Slot.Height = MinimumSize.Height;
+				else if (Slot.Height > MaximumSize.Height && MaximumSize.Height > 0)
+					Slot.Height = MaximumSize.Height;
+
 
 				if (LastSlots.Height == Slot.Height)
 					break;
@@ -728,6 +756,8 @@ namespace go
 							pi.SetValue (this, Font.Parse ((string)defaultValue), null);
 						else if (pi.PropertyType == typeof(Picture))
 							pi.SetValue (this, Picture.Parse ((string)defaultValue), null);
+						else if (pi.PropertyType == typeof(Size))
+							pi.SetValue (this, Size.Parse ((string)defaultValue), null);
 						else
 							pi.SetValue (this, defaultValue, null);
 					} else {

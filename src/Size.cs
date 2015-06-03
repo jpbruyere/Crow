@@ -9,16 +9,20 @@ namespace go
     {
         public static Size Zero
         { get { return new Size(0, 0); } }
+
         int _width;
         int _height;
 
-        //public Size()
-        //{ }
         public Size(int width, int height)
         {
             _width = width;
             _height = height;
         }
+		public Size(int size)
+		{
+			_width = size;
+			_height = size;
+		}
         public int Width
         {
             get { return _width; }
@@ -29,10 +33,7 @@ namespace go
             get { return _height; }
             set { _height = value; }
         }
-        public override string ToString()
-        {
-            return string.Format("({0},{1})", Width, Height);
-        }
+		#region operators
 		public static implicit operator Rectangle(Size s)
 		{
 			return new Rectangle (s);
@@ -41,7 +42,15 @@ namespace go
         {
             return new Size(i, i);
         }
-        public static bool operator ==(Size s1, Size s2)
+		public static implicit operator string(Size s)
+		{
+			return s.ToString ();
+		}
+		public static implicit operator Size(string s)
+		{
+			return string.IsNullOrEmpty (s) ? Size.Zero : Parse (s);
+		}
+		public static bool operator ==(Size s1, Size s2)
         {
             if (s1.Width == s2.Width && s1.Height == s2.Height)
                 return true;
@@ -118,6 +127,19 @@ namespace go
         {
             return new Size(s.Width + i, s.Height + i);
         }
-    }
+		#endregion
+    
+		public override string ToString()
+		{
+			return string.Format("{0},{1}", Width, Height);
+		}
+		public static Size Parse(string s)
+		{
+			string[] d = s.Split(new char[] { ';' });
+			return d.Length == 1 ? new Size(int.Parse(d[0])) : new Size(
+				int.Parse(d[0]),
+				int.Parse(d[1]));
+		}
+	}
 
 }

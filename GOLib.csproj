@@ -346,5 +346,6 @@
     <EmbeddedResource Include="Templates\Spinner.goml" />
     <EmbeddedResource Include="Templates\Spinner %28copier%29.goml" />
     <EmbeddedResource Include="Templates\ItemTemplate.goml" />
+    <EmbeddedResource Include="Templates\ComboListOverlay.goml" />
   </ItemGroup>
 </Project>

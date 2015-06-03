@@ -1,0 +1,6 @@
+﻿<?xml version="1.0"?>
+<Border MaximumSize="0;100" Fit="True" Background="Gray">
+	<Scroller Height="0" MaximumSize="0;100" Background="DimGray" Margin="0" VerticalScrolling="true">
+		<VerticalStack Name="List" Margin="0" VerticalAlignment="Top"/>
+	</Scroller>
+</Border>

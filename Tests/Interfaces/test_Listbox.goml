@@ -1,3 +1,3 @@
 ﻿<?xml version="1.0"?>
-	<ListBox Data="{TestList}">
-	</ListBox>
+<ListBox Data="{TestList}">
+</ListBox>
