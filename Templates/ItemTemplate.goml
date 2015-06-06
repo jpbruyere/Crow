@@ -1,5 +1,7 @@
 ﻿<?xml version="1.0"?>
-<Label Margin="2" Focusable="true" Text="{}" 
-	MouseEnter="{Background=SteelBlue}"
-	MouseLeave="{Background=Transparent}"
+
+<Label Text="{}" Focusable="true" Fit="true" Margin="0"
+		MouseEnter="{Background=SteelBlue}"
+		MouseLeave="{Background=Transparent}"
 />
+

@@ -20,6 +20,7 @@ namespace go
 			get { return _pic == null ? null : _pic.Path; }
 			set {				
 				LoadImage (value);
+				_pic.KeepProportions = true;
 			}
 		}
 

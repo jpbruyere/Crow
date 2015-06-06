@@ -405,14 +405,16 @@ namespace go
 			if (HasFocus)
 			{
 				//TODO:
-				gr.Color = Color.White;
+				gr.Color = Foreground;
 				gr.LineWidth = 1.5;
 				gr.MoveTo(new PointD(textCursorPos + rText.X, rText.Y + currentLine * fe.Height));
 				gr.LineTo(new PointD(textCursorPos + rText.X, rText.Y + (currentLine + 1) * fe.Height));
 				gr.Stroke();
 			}
 			#endregion
-				
+
+			//*******************
+			//debug selection
 //			gr.Color = Color.Green;
 //			Rectangle R = new Rectangle(
 //				rText.X +  (int)SelEndCursorPos-10,
@@ -429,6 +431,7 @@ namespace go
 //				(int)fe.Height);
 //			gr.Rectangle(R);
 //			gr.Fill();
+			//*******************
 
 			gr.FontMatrix = new Matrix(widthRatio * Font.Size, 0, 0, heightRatio * Font.Size, 0, 0);
 

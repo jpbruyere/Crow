@@ -63,7 +63,7 @@ namespace go
 		}
 		protected override Size measureRawSize ()
 		{			
-			return child == null ? Bounds.Size : new Size(child.Slot.Width + 2 * (Margin),child.Slot.Height + 2 * (Margin));
+			return child == null ? Bounds.Size : new Size(child.Slot.Width + 2 * Margin, child.Slot.Height + 2 * (Margin));
 		}
 
 		protected override void OnLayoutChanges (LayoutingType layoutType)

@@ -34,7 +34,7 @@ namespace go
 		#endregion
 
 		#region public properties
-		[XmlAttributeAttribute()][DefaultValue(0)]
+		[XmlAttributeAttribute()][DefaultValue(0.0)]
 		public virtual double Minimum {
 			get { return minValue; }
 			set {

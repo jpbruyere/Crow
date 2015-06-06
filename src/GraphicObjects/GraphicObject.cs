@@ -213,7 +213,7 @@ namespace go
 				registerForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(2)]
+		[XmlAttributeAttribute()][DefaultValue(2.0)]
 		public virtual double CornerRadius {
 			get { return _cornerRadius; }
 			set {
@@ -314,23 +314,21 @@ namespace go
 
 					DefaultValueAttribute dv = o as DefaultValueAttribute;
 					if (dv != null) {
-						if (pi.PropertyType == typeof(Color))
-							pi.SetValue (this, Color.Parse ((string)dv.Value), null);
-						else if (pi.PropertyType == typeof(Font))
-							pi.SetValue (this, Font.Parse ((string)dv.Value), null);
-						else if (pi.PropertyType == typeof(Picture))
-							pi.SetValue (this, Picture.Parse ((string)dv.Value), null);
-						else if (pi.PropertyType == typeof(Size))
-							pi.SetValue (this, Size.Parse ((string)dv.Value), null);
-						else
-							pi.SetValue (this, dv.Value, null);
-						continue;
-					}
-
-					//Debug.WriteLine (o.ToString ());
+						object defaultValue = dv.Value;
+						//avoid system types automaticaly converted by parser
+						if (defaultValue != null && !pi.PropertyType.Namespace.StartsWith("System")) {
+							if (pi.PropertyType != defaultValue.GetType()) {
+								MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
+								if (miParse != null) {									
+									pi.SetValue (this, miParse.Invoke (null, new object[]{ defaultValue }), null);
+									continue;
+								}
+							}
+						}
+						pi.SetValue (this, defaultValue, null);	
+					}						
 				}
 			}
-
 		}
 
 		public virtual GraphicObject FindByName(string nameToFind){
@@ -749,18 +747,21 @@ namespace go
 					string v = reader.GetAttribute (name);
 
 					if (string.IsNullOrEmpty (v)) {
-						//TODO: maybe find another way to convert correctely colors default values
-						if (pi.PropertyType == typeof(Color))
-							pi.SetValue (this, Color.Parse ((string)defaultValue), null);
-						else if (pi.PropertyType == typeof(Font))
-							pi.SetValue (this, Font.Parse ((string)defaultValue), null);
-						else if (pi.PropertyType == typeof(Picture))
-							pi.SetValue (this, Picture.Parse ((string)defaultValue), null);
-						else if (pi.PropertyType == typeof(Size))
-							pi.SetValue (this, Size.Parse ((string)defaultValue), null);
-						else
-							pi.SetValue (this, defaultValue, null);
+						//avoid system types automaticaly converted by parser
+						if (defaultValue != null && !pi.PropertyType.Namespace.StartsWith("System")) {
+							if (pi.PropertyType != defaultValue.GetType()) {
+								MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
+								if (miParse != null) {									
+									pi.SetValue (this, miParse.Invoke (null, new object[]{ defaultValue }), null);
+									continue;
+								}
+							}
+						}
+
+						pi.SetValue (this, defaultValue, null);
+
 					} else {
+						
 						if (v.StartsWith("{")) {
 							//binding
 							if (!v.EndsWith("}"))
