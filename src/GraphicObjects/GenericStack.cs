@@ -110,12 +110,55 @@ namespace go
 
 			if ((layoutType & (int)LayoutingType.PositionChildren) > 0)
 				Interface.LayoutingQueue.Enqueue (LayoutingType.PositionChildren, this);
+			
 		}
 		public override void UpdateLayout (LayoutingType layoutType)
         {            
-			if (layoutType == LayoutingType.PositionChildren)
+			if (layoutType == LayoutingType.PositionChildren) {
+				//allow 1 child to have size to 0 if stack has fixed or streched size,
+				//this child will occupy remaining space
+				if (Orientation == Orientation.Horizontal) {
+					if (Width >= 0) {
+						GraphicObject[] gobjs = Children.Where (c => c.Width == 0).ToArray();
+						if (gobjs.Length > 1)
+							throw new Exception ("Only one child in stack may have size to stretched");
+						else if (gobjs.Length == 1) {
+							int sz = Children.Except (gobjs).Sum (g => g.Slot.Width);
+							if (sz < Slot.Width) {
+								gobjs [0].Slot.Width = Slot.Width - sz - Spacing;
+								int idx = Children.IndexOf (gobjs [0]);
+								if (idx > 0 && idx < Children.Count - 1)
+									gobjs [0].Slot.Width -= Spacing;
+
+								if (gobjs [0].LastSlots.Width != gobjs [0].Slot.Width) {
+									gobjs [0].bmp = null;
+									gobjs [0].LastSlots.Width = gobjs [0].Slot.Width;
+								}
+							}
+						}
+					}					
+				} else {
+					if (Height >= 0) {
+						GraphicObject[] gobjs = Children.Where (c => c.Height == 0).ToArray();
+						if (gobjs.Length > 1)
+							throw new Exception ("Only one child in stack may have size to stretched");
+						else if (gobjs.Length == 1) {
+							int sz = Children.Except (gobjs).Sum (g => g.Slot.Height);
+							if (sz < Slot.Height) {
+								gobjs [0].Slot.Height = Slot.Height - sz;
+								int idx = Children.IndexOf (gobjs [0]);
+								if (idx > 0 && idx < Children.Count - 1)
+									gobjs [0].Slot.Height -= Spacing;
+								if (gobjs [0].LastSlots.Height != gobjs [0].Slot.Height) {
+									gobjs [0].bmp = null;
+									gobjs [0].LastSlots.Height = gobjs [0].Slot.Height;
+								}
+							}
+						}
+					}
+				}				
 				ComputeChildrenPositions ();
-			else
+			}else
 				base.UpdateLayout(layoutType);
         }
 		#endregion
