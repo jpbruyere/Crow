@@ -85,12 +85,18 @@ namespace go
 			float heightRatio = (float)rect.Height / Dimensions.Height;
 			float ratio = Math.Min (widthRatio, heightRatio);
 
+//			if (KeepProportions)
+//				widthRatio = heightRatio = ratio;
+
 			Rectangle rImg = rect;
 			gr.Save ();
 
-			if (KeepProportions)
+			if (KeepProportions) {
+				gr.Translate ((rect.Width - (float)Dimensions.Width * ratio)/2f, 
+					(rect.Height - (float)Dimensions.Height * ratio)/2f);
 				gr.Scale (ratio, ratio);
-			else
+					
+			}else
 				gr.Scale (widthRatio, heightRatio);
 			
 			using (ImageSurface imgSurf = new ImageSurface (image, Format.Argb32, 

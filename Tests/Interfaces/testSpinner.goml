@@ -1,0 +1,6 @@
+﻿<?xml version="1.0"?>
+<Container Name="TopContainer" Width="400" Height="350"
+	Margin="20" Focusable="True" Background="DarkGray">
+
+	<Spinner Width="50"></Spinner>
+</Container>

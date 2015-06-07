@@ -35,6 +35,7 @@ namespace go
 		bool _multiline = false;
 		Color selColor;
 		Color selFontColor;
+		bool _selectable;
 		Point mouseLocalPos;    //mouse coord in widget space, filled only when clicked        
 		int _currentCol;        //0 based cursor position in string
 		int _currentLine;
@@ -65,6 +66,11 @@ namespace go
 				selFontColor = value;
 				registerForGraphicUpdate ();
 			}
+		}
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public virtual bool Selectable {
+			get { return _selectable; }
+			set { _selectable = value; }
 		}
 
         [XmlAttributeAttribute()][DefaultValue(Alignment.LeftCenter)]
@@ -259,10 +265,15 @@ namespace go
 							te = tmp;
 					}
 					fe = gr.FontExtents;
-					size = new Size ((int)Math.Ceiling (te.XAdvance) + Margin * 2, (int)(fe.Height * lines.Count) + Margin*2);
+					int lc = lines.Count;
+					//ensure minimal height = text line height
+					if (lc == 0)
+						lc = 1; 
+					size = new Size ((int)Math.Ceiling (te.XAdvance) + Margin * 2, (int)(fe.Height * lc) + Margin*2);
 				}
 			}
-            return size;// +borderWidth;
+
+            return size;;
         }
 		protected override void onDraw (Context gr)
 		{
@@ -402,7 +413,7 @@ namespace go
 			else
 				computeTextCursorPosition(gr);
 
-			if (HasFocus)
+			if (HasFocus && Selectable)
 			{
 				//TODO:
 				gr.Color = Foreground;
@@ -502,14 +513,16 @@ namespace go
 			if ((sender as OpenTKGameWindow).activeWidget != this)
 				return;
 
+			if (!Selectable)
+				return;
+			
 			SelectionInProgress = true;
 			mouseLocalPos = e.Position - ScreenCoordinates(ClientRectangle).TopLeft;
 			registerForGraphicUpdate();
-
 		}
 		public override void onMouseButtonDown (object sender, MouseButtonEventArgs e)
 		{
-			if (this.HasFocus){
+			if (this.HasFocus && Selectable){
 				mouseLocalPos = e.Position - ScreenCoordinates(ClientRectangle).TopLeft;
 				selBegin = -1;
 				selRelease = -1;

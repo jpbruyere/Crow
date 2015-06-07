@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>test.GOLIBTest_4</StartupObject>
+    <StartupObject>test.GOLIBTest_Spinner</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>..\bin\$(configuration)</OutputPath>
     <IntermediateOutputPath>obj\$(configuration)</IntermediateOutputPath>
@@ -43,132 +43,69 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GOLIBTest_5.cs">
-      <LogicalName>
-      </LogicalName>
-    </Compile>
-    <Compile Include="GOLIBTest_0.cs">
-      <LogicalName>
-      </LogicalName>
-    </Compile>
-    <Compile Include="GOLIBTest_4.cs">
-      <LogicalName>
-      </LogicalName>
-    </Compile>
-    <Compile Include="GOLIBTest_3.cs">
-      <LogicalName>
-      </LogicalName>
-    </Compile>
-    <Compile Include="GOLIBTest_1.cs">
-      <LogicalName>
-      </LogicalName>
-    </Compile>
-    <Compile Include="GOLIBTest_2.cs">
-      <LogicalName>
-      </LogicalName>
-    </Compile>
-    <Compile Include="GOLIBTest_1.1.cs">
-      <LogicalName>
-      </LogicalName>
-    </Compile>
-    <Compile Include="GOLIBTest_1.2.cs">
-      <LogicalName>
-      </LogicalName>
-    </Compile>
-    <Compile Include="GOLIBTest_4.1.cs">
-      <LogicalName>
-      </LogicalName>
-    </Compile>
-    <Compile Include="GOLIBTest_fps.cs">
-      <LogicalName>
-      </LogicalName>
-    </Compile>
-    <Compile Include="GOLIBTest_Listbox.cs">
-      <LogicalName>
-      </LogicalName>
-    </Compile>
+    <Compile Include="GOLIBTest_5.cs" />
+    <Compile Include="GOLIBTest_0.cs" />
+    <Compile Include="GOLIBTest_4.cs" />
+    <Compile Include="GOLIBTest_3.cs" />
+    <Compile Include="GOLIBTest_1.cs" />
+    <Compile Include="GOLIBTest_2.cs" />
+    <Compile Include="GOLIBTest_1.1.cs" />
+    <Compile Include="GOLIBTest_1.2.cs" />
+    <Compile Include="GOLIBTest_4.1.cs" />
+    <Compile Include="GOLIBTest_fps.cs" />
+    <Compile Include="GOLIBTest_Listbox.cs" />
+    <Compile Include="GOLIBTest_Spinner.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName>
-      </LogicalName>
     </None>
     <None Include="Interfaces\test1.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName>
-      </LogicalName>
     </None>
     <None Include="Interfaces\test3.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName>
-      </LogicalName>
     </None>
     <None Include="Interfaces\test4.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName>
-      </LogicalName>
     </None>
     <None Include="Interfaces\test5.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName>
-      </LogicalName>
     </None>
     <None Include="Interfaces\test0.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName>
-      </LogicalName>
     </None>
     <None Include="Interfaces\test2.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName>
-      </LogicalName>
     </None>
     <None Include="Interfaces\test1.1.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName>
-      </LogicalName>
     </None>
     <None Include="Interfaces\test1.2.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName>
-      </LogicalName>
     </None>
     <None Include="Interfaces\test4.1.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName>
-      </LogicalName>
     </None>
     <None Include="Interfaces\test1.3.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName>
-      </LogicalName>
     </None>
     <None Include="Interfaces\fps.goml">
-      <LogicalName>
-      </LogicalName>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Interfaces\log.xml">
-      <LogicalName>
-      </LogicalName>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Interfaces\test_Listbox.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName>
-      </LogicalName>
+    </None>
+    <None Include="Interfaces\testSpinner.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Interfaces\">
-      <LogicalName>
-      </LogicalName>
-    </Folder>
-    <Folder Include="image\">
-      <LogicalName>
-      </LogicalName>
-    </Folder>
+    <Folder Include="Interfaces\" />
+    <Folder Include="image\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GOLib.csproj">

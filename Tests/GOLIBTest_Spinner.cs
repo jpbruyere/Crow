@@ -16,18 +16,18 @@ using System.Threading;
 
 namespace test
 {
-	class GOLIBTest_2 : OpenTKGameWindow
+	class GOLIBTest_Spinner : OpenTKGameWindow
 	{
-		public GOLIBTest_2 ()
+		public GOLIBTest_Spinner ()
 			: base(1024, 600,"test")
 		{}
 
-		Group g;
+		Container g;
 
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-			LoadInterface("Interfaces/test2.goml", out g);
+			LoadInterface("Interfaces/testSpinner.goml", out g);
 
 		}
 		protected override void OnRenderFrame (FrameEventArgs e)
@@ -47,7 +47,7 @@ namespace test
 		{
 			Console.WriteLine ("starting example");
 
-			using (GOLIBTest_2 win = new GOLIBTest_2( )) {
+			using (GOLIBTest_Spinner win = new GOLIBTest_Spinner( )) {
 				win.Run (30.0);
 			}
 		}

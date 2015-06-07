@@ -32,8 +32,7 @@ namespace go
 		public Spinner (double minimum, double maximum, double step) : 
 		base (minimum, maximum, step)
 		{
-//			butUp = new Button ();
-//			butUp.setChild (new Image ("go.Image.Icons.updown.svg"));
+
 		}
 		public Spinner () : base()
 		{

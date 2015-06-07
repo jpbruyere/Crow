@@ -119,10 +119,28 @@ namespace go
 
 			return tmp;
 		}
-
-		public override void RegisterForLayouting (int layoutType)
+			
+		protected override void OnLayoutChanges (LayoutingType layoutType)
 		{
-			base.RegisterForLayouting (layoutType);
+			base.OnLayoutChanges (layoutType);
+
+			//position smaller objects in group when group size is fit
+			switch (layoutType) {
+			case LayoutingType.Width:				
+				if (Width < 0) {
+					int crw = ClientRectangle.Width;
+					foreach (GraphicObject c in Children.Where(ch => ch.Slot.Width != crw))
+						c.RegisterForLayouting ((int)LayoutingType.X);						
+				}
+				break;
+			case LayoutingType.Height:
+				if (Height < 0) {
+					int crh = ClientRectangle.Height;
+					foreach (GraphicObject c in Children.Where(ch => ch.Slot.Height != crh))
+						c.RegisterForLayouting ((int)LayoutingType.Y);						
+				}
+				break;
+			}
 		}
 
 		public override Rectangle ContextCoordinates(Rectangle r){
