@@ -7,13 +7,14 @@ Graphic Object Library: custom widget library c# version.
 
 #####GOLib in action
 
+![GOLib in action](/screenshot2.png?raw=true "golib")
+
 ![GOLib in action](/magic3d.png?raw=true "Magic3d")
 
 RoadMap:
 
-v   - Implement Vertical and Horizontal layouting queue instead
-      of testing the whole object tree during layout.
-    - Implement GL textures backend, as in the c++ version
-v   - Validate complete drm rendering stack (OpenTK, and Cairo
-      already have experimental support for drm stack)
-    - Now the the grobal architecture is ok, develop the common controls existing in every gui lib
+	- TreeView, templated of course...
+	  Menu, Popper, Combobox, PangoLayouting controls, Improved editor
+	- Monodevelop addin
+	- improve inline delegates to handle all conversion and graphic tree parsing with directory navigation syntax
+	- Make an easyly compilable example of complete application (3d mesh editor for example)

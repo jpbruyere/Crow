@@ -19,8 +19,15 @@
 					<VerticalStack Width="100">
 						<Checkbox Name="chk1"/>
 						<Checkbox Name="chk2" IsChecked="true"/>
-						<Checkbox Name="chk3"/>
-						<Checkbox Name="chk4"/>
+						<Checkbox Name="chk3" Template="#go.Templates.Checkbox2.goml"/>
+						<Checkbox Name="chk4">
+							<Template>
+								<HorizontalStack Margin="0" Spacing="1" Focusable="false">
+									<Image Name="Image" Width="16" Height="16" Path="#go.Images.Icons.checkbox.svg"/>
+									<Label Name="Caption" Foreground="Black" Background="Yellow"/>
+								</HorizontalStack>
+							</Template>
+						</Checkbox>
 					</VerticalStack>
 					<VerticalStack Width="100">
 						<RadioButton IsChecked="true"/>
@@ -41,6 +48,8 @@
 				<HorizontalStack Name="hsPbar" Margin="5">
 					<ProgressBar Name="pbBar" 
 						Width="100" Height="20"
+						Minimum="0"
+						Maximum="200"
 						Value="50"
 						Foreground="BlueCrayola" Background="DarkGray"
 						BorderWidth="2" BorderColor="White"/>

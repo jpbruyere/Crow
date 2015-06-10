@@ -23,10 +23,9 @@ using OpenTK.Input;
 
 namespace go
 {
+	[DefaultTemplate("#go.Templates.Spinner.goml")]
 	public class Spinner : NumericControl
 	{
-//		Button butUp;
-//		Button butDown;
 		Label labCpt;
 
 		public Spinner (double minimum, double maximum, double step) : 
@@ -42,11 +41,7 @@ namespace go
 
 		protected override void loadTemplate (GraphicObject template = null)
 		{
-			if (template == null)
-				this.SetChild (Interface.Load ("#go.Templates.Spinner.goml", this));
-			else
-				this.SetChild (template);
-			
+			base.loadTemplate (template);			
 			labCpt = this.child.FindByName ("labCpt") as Label;
 		}
 

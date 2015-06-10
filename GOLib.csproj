@@ -168,5 +168,6 @@
     <EmbeddedResource Include="Templates\ComboListOverlay.goml" />
     <EmbeddedResource Include="Templates\Expandable.goml" />
     <EmbeddedResource Include="Images\Icons\expandable.svg" />
+    <EmbeddedResource Include="Templates\Checkbox2.goml" />
   </ItemGroup>
 </Project>

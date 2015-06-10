@@ -16,6 +16,7 @@ using System.ComponentModel;
 
 namespace go
 {
+	[DefaultTemplate("#go.Templates.RadioButton.goml")]
     public class RadioButton : TemplatedControl
     {		        
 		Label _caption;
@@ -27,10 +28,7 @@ namespace go
 
 		protected override void loadTemplate(GraphicObject template = null)
 		{
-			if (template == null)
-				this.SetChild (Interface.Load ("#go.Templates.RadioButton.goml"));
-			else
-				this.SetChild (template);
+			base.loadTemplate (template);
 
 			_caption = this.child.FindByName ("Caption") as Label;
 			_image = this.child.FindByName ("Image") as Image;
@@ -38,7 +36,7 @@ namespace go
 		}
 			
 
-		[XmlAttributeAttribute()][DefaultValue("RadioButton")]
+		[XmlAttributeAttribute][DefaultValue("RadioButton")]
 		public string Caption {
 			get { return _caption.Text; } 
 			set { 

@@ -162,7 +162,7 @@ namespace go
 			MemberInfo miDst = dstType.GetMember (binding.MemberName).FirstOrDefault ();
 			MemberInfo miSrc = srcType.GetMember (binding.Value).FirstOrDefault();
 
-			//initialize target with actual value
+			#region initialize target with actual value
 			object srcVal = null;
 			if (miSrc == null)
 				srcVal = _source;//if no member is provided for binding, source raw value is taken
@@ -187,7 +187,8 @@ namespace go
 				fiDst.SetValue (binding.Source, srcVal );
 			}else
 				throw new Exception("unandled destination member type for binding");
-			
+			#endregion
+
 			#region Retrieve EventHandler parameter type
 			EventInfo ei = srcType.GetEvent ("ValueChanged");
 			if (ei == null)
@@ -198,6 +199,7 @@ namespace go
 			Type handlerArgsType = evtParams [1].ParameterType;
 
 			#endregion
+
 
 			Type[] args = {typeof(object), handlerArgsType};
 			DynamicMethod dm = new DynamicMethod("dynHandle_" + dynHandleCpt,
@@ -282,8 +284,7 @@ namespace go
 			//Delegate del = dm.CreateDelegate(typeof(System.EventHandler));
 			addHandler.Invoke(_source, new object[] {del});
 		}
-
-
+			
 		public static FieldInfo getEventHandlerField(Type type, string eventName)
 		{
 			FieldInfo fi;

@@ -23,9 +23,21 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.IO;
 using System.Xml;
+using System.Linq;
+using System.Diagnostics;
 
 namespace go
 {
+	[AttributeUsage(AttributeTargets.Class)]
+	public class DefaultTemplate : Attribute
+	{
+		public string Path = "";
+		public DefaultTemplate(string path)
+		{
+			Path = path;
+		}
+	}
+
 	public abstract class TemplatedControl : PrivateContainer, IXmlSerializable
 	{
 		public TemplatedControl () : base()
@@ -40,7 +52,14 @@ namespace go
 //		}
 
 
-		protected abstract void loadTemplate(GraphicObject template = null);
+		protected virtual void loadTemplate(GraphicObject template = null)
+		{
+			if (template == null) {
+				DefaultTemplate dt = (DefaultTemplate)this.GetType ().GetCustomAttributes (typeof(DefaultTemplate), true).FirstOrDefault();
+				this.SetChild (Interface.Load (dt.Path, this));
+			}else
+				this.SetChild (template);
+		}
 
 		protected override void loadDefaultValues ()
 		{
@@ -64,37 +83,48 @@ namespace go
 		}
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
+			//Template could be either an attribute containing path or expressed inlined
+			//as a Template Element
 			using (System.Xml.XmlReader subTree = reader.ReadSubtree())
 			{
 				subTree.Read ();
+
+				string template = reader.GetAttribute ("Template");
 				string tmp = subTree.ReadOuterXml ();
 
+				//Load template from path set as attribute in templated control
+				if (string.IsNullOrEmpty (template)) {					
 					//seek for template tag first
-				using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
-					//load template first if inlined
+					using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
+						//load template first if inlined
 
-					xr.Read (); //skip current node
+						xr.Read (); //skip current node
 
-					while (!xr.EOF) {
-						xr.Read (); //read first child
-						if (!xr.IsStartElement ())
-							continue;
-						if (xr.Name == "Template") {
-							xr.Read ();
+						while (!xr.EOF) {
+							xr.Read (); //read first child
+							if (!xr.IsStartElement ())
+								continue;
+							if (xr.Name == "Template") {
+								xr.Read ();
 
-							Type t = Type.GetType ("go." + xr.Name);
-							GraphicObject go = (GraphicObject)Activator.CreateInstance (t);                                
-							(go as IXmlSerializable).ReadXml (xr);
+								Type t = Type.GetType ("go." + xr.Name);
+								GraphicObject go = (GraphicObject)Activator.CreateInstance (t);                                
+								(go as IXmlSerializable).ReadXml (xr);
 
-							loadTemplate (go);
+								loadTemplate (go);
 
-							xr.Read ();//go close tag
-							xr.Read ();//Template close tag
-						} else {
-							xr.ReadInnerXml ();
+								xr.Read ();//go close tag
+								xr.Read ();//Template close tag
+							} else {
+								xr.ReadInnerXml ();
+							}
 						}
-					}
-				}
+					}				
+				} else
+					loadTemplate (Interface.Load (template, this));
+				
+
+				//normal xml read
 				using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
 					xr.Read ();
 					base.ReadXml(xr);

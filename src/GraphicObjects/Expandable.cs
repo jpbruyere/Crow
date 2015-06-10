@@ -18,6 +18,7 @@ using System.IO;
 
 namespace go
 {
+	[DefaultTemplate("#go.Templates.Expandable.goml")]
     public class Expandable : TemplatedControl
     {		
 		bool _isExpanded;
@@ -35,10 +36,7 @@ namespace go
 
 		protected override void loadTemplate(GraphicObject template = null)
 		{
-			if (template == null)
-				this.SetChild (Interface.Load ("#go.Templates.Expandable.goml",this));
-			else
-				this.SetChild (template);
+			base.loadTemplate (template);
 
 			_caption = this.child.FindByName ("Caption") as Label;
 			Content = this.child.FindByName ("Content") as Container;
@@ -47,6 +45,7 @@ namespace go
 			if (_image == null)
 				return;
 			_image.SvgSub = "collapsed";
+
 			this.Expand += (object sender, EventArgs e) => {_image.SvgSub = "expanded";};
 			this.Collapse += (object sender, EventArgs e) => {_image.SvgSub = "collapsed";};
 
