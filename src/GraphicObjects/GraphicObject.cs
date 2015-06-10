@@ -685,7 +685,7 @@ namespace go
 				if (string.IsNullOrEmpty (handler))
 					continue;
 					
-				Interface.EventsToResolve.Add(new DynAttribute 
+				Interface.GOMLResolver.Add(new DynAttribute 
 					{ 
 						Source = this, 
 						Value = handler,
@@ -770,7 +770,7 @@ namespace go
 								throw new Exception (string.Format("GOML:Malformed binding: {0}", v));
 							
 							string strBinding = v.Substring (1, v.Length - 2);
-							Interface.Bindings.Add (new DynAttribute () {
+							Interface.GOMLResolver.Add (new DynAttribute () {
 								Source = this,
 								MemberName = name,
 								Value = strBinding

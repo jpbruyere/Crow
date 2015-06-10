@@ -22,6 +22,7 @@ namespace go
     {		
 		bool _isExpanded;
 		Label _caption;
+		Image _image;
 
 		public Container Content;
 
@@ -41,6 +42,14 @@ namespace go
 
 			_caption = this.child.FindByName ("Caption") as Label;
 			Content = this.child.FindByName ("Content") as Container;
+			_image = this.child.FindByName ("Image") as Image;
+
+			if (_image == null)
+				return;
+			_image.SvgSub = "collapsed";
+			this.Expand += (object sender, EventArgs e) => {_image.SvgSub = "expanded";};
+			this.Collapse += (object sender, EventArgs e) => {_image.SvgSub = "collapsed";};
+
 		}
 			
 

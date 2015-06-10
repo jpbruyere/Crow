@@ -45,12 +45,12 @@ namespace go
 
 		#region Load/Save
 
-		internal static Stack<List<DynAttribute>> EventsResolutionStack = new Stack<List<DynAttribute>>();
-		internal static List<DynAttribute> EventsToResolve
+		internal static Stack<List<DynAttribute>> GOMLResolutionStack = new Stack<List<DynAttribute>>();
+		internal static List<DynAttribute> GOMLResolver
 		{
-			get { return EventsResolutionStack.Peek ();}
+			get { return GOMLResolutionStack.Peek ();}
 		}
-		internal static List<DynAttribute> Bindings;
+		//internal static List<DynAttribute> Bindings;
 
 
 		public static void Save<T>(string file, T graphicObject)
@@ -110,8 +110,7 @@ namespace go
 		{
 			//result = (T)(Load (file, hostClass) as object);
 
-			EventsResolutionStack.Push(new List<DynAttribute>());
-			Bindings = new List<DynAttribute> ();
+			GOMLResolutionStack.Push(new List<DynAttribute>());
 
 			XmlSerializerNamespaces xn = new XmlSerializerNamespaces();
 			xn.Add("", "");
@@ -125,13 +124,13 @@ namespace go
 			if (hostClass == null)
 				return;
 
-			resolveEvents (hostClass);
+			resolveGOML (hostClass);
 
-			while (Bindings.Count > 0) {
-				DynAttribute binding = Bindings [0];
-				Bindings.RemoveAt (0);
-				CompilerServices.ResolveBinding (binding, hostClass);
-			}
+//			while (Bindings.Count > 0) {
+//				DynAttribute binding = Bindings [0];
+//				Bindings.RemoveAt (0);
+//				CompilerServices.ResolveBinding (binding, hostClass);
+//			}
 //			foreach (DynAttribute binding in Bindings) {
 ////				Type tSource = binding.Source.GetType ();
 ////				if (!tSource.GetInterfaces ().Any (i => i.Name == "IValueChange")){
@@ -147,7 +146,7 @@ namespace go
 		public static GraphicObject Load(Stream stream, Type type, object hostClass = null)
 		{
 			GraphicObject result;
-			EventsResolutionStack.Push(new List<DynAttribute>());
+			GOMLResolutionStack.Push(new List<DynAttribute>());
 
 			XmlSerializerNamespaces xn = new XmlSerializerNamespaces();
 			xn.Add("", "");
@@ -155,16 +154,18 @@ namespace go
 
 			result = (GraphicObject)xs.Deserialize(stream);
 
-			if (hostClass == null)
+			if (hostClass == null) {
+				GOMLResolutionStack.Pop ();
 				return result;
-
-			resolveEvents (hostClass);
-
-			while (Bindings.Count > 0) {
-				DynAttribute binding = Bindings [0];
-				Bindings.RemoveAt (0);
-				CompilerServices.ResolveBinding (binding, hostClass);
 			}
+
+			resolveGOML (hostClass);
+
+//			while (Bindings.Count > 0) {
+//				DynAttribute binding = Bindings [0];
+//				Bindings.RemoveAt (0);
+//				CompilerServices.ResolveBinding (binding, hostClass);
+//			}
 
 //			foreach (DynAttribute binding in Bindings) {
 //				//				Type tSource = binding.Source.GetType ();
@@ -181,30 +182,42 @@ namespace go
 			return result;
 		}
 
-		static void resolveEvents(object hostClass)
+		static void resolveGOML(object hostClass)
 		{
-			foreach (DynAttribute es in EventsToResolve)
+			foreach (DynAttribute es in GOMLResolver)
 			{
 				if (string.IsNullOrEmpty(es.Value))
 					continue;
 
-				if (es.Value.StartsWith ("{")) {
-					CompilerServices.CompileEventSource (es);
-				} else {					
-					MethodInfo mi = hostClass.GetType ().GetMethod (es.Value, BindingFlags.NonPublic | BindingFlags.Public
-						| BindingFlags.Instance);
+				Type dstType = es.Source.GetType ();
+				MemberInfo miTarget = dstType.GetMember (es.MemberName).FirstOrDefault();
 
-					if (mi == null) {
-						Debug.WriteLine ("Handler Method not found: " + es.Value);
-						continue;
+				if (miTarget == null) {
+					Debug.WriteLine ("'{0}' Member not found in '{1}' type.", es.MemberName, dstType.ToString ());
+					continue;
+				}
+				
+				if (miTarget.MemberType == MemberTypes.Event) {
+					if (es.Value.StartsWith ("{")) {
+						CompilerServices.CompileEventSource (es);
+					} else {					
+						MethodInfo mi = hostClass.GetType ().GetMethod (es.Value, BindingFlags.NonPublic | BindingFlags.Public
+						                | BindingFlags.Instance);
+
+						if (mi == null) {
+							Debug.WriteLine ("Handler Method not found: " + es.Value);
+							continue;
+						}
+
+						FieldInfo fi = CompilerServices.getEventHandlerField (es.Source.GetType (), es.MemberName);
+						Delegate del = Delegate.CreateDelegate (fi.FieldType, hostClass, mi);
+						fi.SetValue (es.Source, del);
 					}
-
-					FieldInfo fi = CompilerServices.getEventHandlerField (es.Source.GetType (), es.MemberName);
-					Delegate del = Delegate.CreateDelegate(fi.FieldType, hostClass, mi);
-					fi.SetValue(es.Source, del);
+				} else {
+					CompilerServices.ResolveBinding (es, hostClass);
 				}
 			}
-			EventsResolutionStack.Pop();			
+			GOMLResolutionStack.Pop();			
 		}
 		#endregion
 	}
