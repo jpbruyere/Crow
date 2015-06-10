@@ -109,7 +109,7 @@ namespace go
 		{
 			Size tmp = new Size ();
 
-			foreach (GraphicObject c in Children) {
+			foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
 				tmp.Width = Math.Max (tmp.Width, c.Slot.Right);
 				tmp.Height = Math.Max (tmp.Height, c.Slot.Bottom);
 			}
@@ -129,14 +129,14 @@ namespace go
 			case LayoutingType.Width:				
 				if (Width < 0) {
 					int crw = ClientRectangle.Width;
-					foreach (GraphicObject c in Children.Where(ch => ch.Slot.Width != crw))
+					foreach (GraphicObject c in Children.Where(ch => ch.Slot.Width != crw && ch.Visible))
 						c.RegisterForLayouting ((int)LayoutingType.X);						
 				}
 				break;
 			case LayoutingType.Height:
 				if (Height < 0) {
 					int crh = ClientRectangle.Height;
-					foreach (GraphicObject c in Children.Where(ch => ch.Slot.Height != crh))
+					foreach (GraphicObject c in Children.Where(ch => ch.Slot.Height != crh && ch.Visible))
 						c.RegisterForLayouting ((int)LayoutingType.Y);						
 				}
 				break;
@@ -154,7 +154,7 @@ namespace go
 			CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);
 			gr.Fill ();
 
-			foreach (GraphicObject g in Children) {
+			foreach (GraphicObject g in Children.Where(ch=>ch.Visible)) {
 				g.Paint (ref gr);
 			}
 		}
@@ -197,7 +197,7 @@ namespace go
 						#if DEBUG_CLIP_RECTANGLE
 						clip.stroke (gr, Color.Amaranth.AdjustAlpha (0.8));
 						#endif
-						foreach (GraphicObject c in Children) {
+						foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
 							Rectangles childClip = clip.intersectingRects (ContextCoordinates(c.Slot));
 							if (!c.DrawingIsValid || childClip.count > 0)
 								c.Paint (ref gr,childClip);//, localClip);

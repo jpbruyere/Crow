@@ -66,14 +66,14 @@ namespace go
 			Size tmp = new Size ();
 
 			if (Orientation == Orientation.Horizontal) {
-				foreach (GraphicObject c in Children) {
+				foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
 					tmp.Width += c.Slot.Width + Spacing;
 					tmp.Height = Math.Max (tmp.Height, c.Slot.Bottom);
 				}
 				if (tmp.Width > 0)
 					tmp.Width -= Spacing;
 			} else {
-				foreach (GraphicObject c in Children) {
+				foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
 					tmp.Width = Math.Max (tmp.Width, c.Slot.Right);
 					tmp.Height += c.Slot.Height + Spacing;
 				}
@@ -90,13 +90,13 @@ namespace go
 		{
 			int d = 0;
 			if (Orientation == Orientation.Horizontal) {
-				foreach (GraphicObject c in Children) {
+				foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
 					c.Slot.X = d;
 					d += c.Slot.Width + Spacing;
 					c.RegisterForLayouting ((int)LayoutingType.Y);
 				}
 			} else {
-				foreach (GraphicObject c in Children) {
+				foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
 					c.Slot.Y = d;
 					d += c.Slot.Height + Spacing;
 					c.RegisterForLayouting ((int)LayoutingType.X);
@@ -119,11 +119,11 @@ namespace go
 				//this child will occupy remaining space
 				if (Orientation == Orientation.Horizontal) {
 					if (Width >= 0) {
-						GraphicObject[] gobjs = Children.Where (c => c.Width == 0).ToArray();
+						GraphicObject[] gobjs = Children.Where (c => c.Width == 0 && c.Visible).ToArray();
 						if (gobjs.Length > 1)
 							throw new Exception ("Only one child in stack may have size to stretched");
 						else if (gobjs.Length == 1) {
-							int sz = Children.Except (gobjs).Sum (g => g.Slot.Width);
+							int sz = Children.Where(ch=>ch.Visible).Except (gobjs).Sum (g => g.Slot.Width);
 							if (sz < Slot.Width) {
 								gobjs [0].Slot.Width = Slot.Width - sz - Spacing;
 								int idx = Children.IndexOf (gobjs [0]);
@@ -139,11 +139,11 @@ namespace go
 					}					
 				} else {
 					if (Height >= 0) {
-						GraphicObject[] gobjs = Children.Where (c => c.Height == 0).ToArray();
+						GraphicObject[] gobjs = Children.Where(ch=>ch.Visible).Where (c => c.Height == 0).ToArray();
 						if (gobjs.Length > 1)
 							throw new Exception ("Only one child in stack may have size to stretched");
 						else if (gobjs.Length == 1) {
-							int sz = Children.Except (gobjs).Sum (g => g.Slot.Height);
+							int sz = Children.Where(ch=>ch.Visible).Except (gobjs).Sum (g => g.Slot.Height);
 							if (sz < Slot.Height) {
 								gobjs [0].Slot.Height = Slot.Height - sz;
 								int idx = Children.IndexOf (gobjs [0]);

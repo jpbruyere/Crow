@@ -108,6 +108,8 @@
     <Compile Include="src\GraphicObjects\TemplatedControl.cs" />
     <Compile Include="src\GraphicObjects\Checkbox.cs" />
     <Compile Include="src\GraphicObjects\RadioButton.cs" />
+    <Compile Include="src\GraphicObjects\Expandable.cs" />
+    <Compile Include="src\GraphicObjects\PrivateContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -164,5 +166,7 @@
     <EmbeddedResource Include="Templates\Spinner %28copier%29.goml" />
     <EmbeddedResource Include="Templates\ItemTemplate.goml" />
     <EmbeddedResource Include="Templates\ComboListOverlay.goml" />
+    <EmbeddedResource Include="Templates\Expandable.goml" />
+    <EmbeddedResource Include="Images\Icons\expandable.svg" />
   </ItemGroup>
 </Project>

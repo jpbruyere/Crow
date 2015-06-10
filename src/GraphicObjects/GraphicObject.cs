@@ -238,13 +238,16 @@ namespace go
 
 				_isVisible = value;
 
+				if (TopContainer == null)
+					return;
 				//add slot to clipping to redraw
 				TopContainer.gobjsToRedraw.Add (this);
 
 				//ensure main win doesn't keep hidden childrens ref
 				if (this.Contains (TopContainer.hoverWidget))
 					TopContainer.hoverWidget = null;
-//				if (Parent != null)
+				if (Parent is GenericStack)
+					Parent.RegisterForLayouting ((int)LayoutingType.Sizing | (int)LayoutingType.PositionChildren);
 //					Parent.InvalidateLayout ();
 				//else
 				//    registerForRedraw();
@@ -666,7 +669,6 @@ namespace go
 		}
 			
 		#region IXmlSerializable
-
 		public virtual System.Xml.Schema.XmlSchema GetSchema ()
 		{
 			return null;
@@ -802,7 +804,6 @@ namespace go
 			}
 
 		}
-
 		public virtual void WriteXml (System.Xml.XmlWriter writer)
 		{
 			foreach (PropertyInfo pi in this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
@@ -889,7 +890,7 @@ namespace go
 				} 
 			}
 		}
+		#endregion
 
-		#endregion	
 	}
 }

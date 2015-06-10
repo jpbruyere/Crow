@@ -66,7 +66,7 @@ namespace go
 //			if (MouseWheelChanged!=null)
 //				MouseWheelChanged (this, e);
 
-			if (child == null)
+			if (Child == null)
 				return;
 			
 			if (VerticalScrolling )
@@ -78,8 +78,8 @@ namespace go
 
                 if (scrollY > 0)
                     scrollY = 0;
-				else if (scrollY < -child.Slot.Height + ClientRectangle.Height)
-					scrollY = -child.Slot.Height + ClientRectangle.Height;
+				else if (scrollY < -Child.Slot.Height + ClientRectangle.Height)
+					scrollY = -Child.Slot.Height + ClientRectangle.Height;
 
             }
             if (HorizontalScrolling )
@@ -91,8 +91,8 @@ namespace go
 
 				if (scrollX > 0)
 					scrollX = 0;
-				else if (scrollX < -child.Slot.Width + ClientRectangle.Width)
-					scrollX = -child.Slot.Width + ClientRectangle.Width;
+				else if (scrollX < -Child.Slot.Width + ClientRectangle.Width)
+					scrollX = -Child.Slot.Width + ClientRectangle.Width;
             }
 
 
@@ -141,8 +141,8 @@ namespace go
 			//            if (clip != null)
 			//                clip.Rebase(this);
 
-			if (child != null)
-				child.Paint(ref ctx, clip);
+			if (Child != null)
+				Child.Paint(ref ctx, clip);
 
 			ctx.Restore();            
 		}

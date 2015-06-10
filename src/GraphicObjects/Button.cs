@@ -63,14 +63,14 @@ namespace go
 		public string Text
 		{
 			get {
-				Label l = child as Label;
+				Label l = Child as Label;
 				return l == null ? "" : l.Text; 
 			}
 			set
 			{
-				Label l = child as Label;
+				Label l = Child as Label;
 				if (l == null)
-					this.setChild(new Label (value) 
+					this.SetChild(new Label (value) 
 						{ 
 							TextAlignment = Alignment.Center,
 							Foreground = Color.Black

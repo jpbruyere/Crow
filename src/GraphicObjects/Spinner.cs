@@ -40,9 +40,13 @@ namespace go
 
 		#region implemented abstract members of TemplatedControl
 
-		protected override void loadTemplate ()
+		protected override void loadTemplate (GraphicObject template = null)
 		{
-			this.setChild (Interface.Load ("#go.Templates.Spinner.goml", this));
+			if (template == null)
+				this.SetChild (Interface.Load ("#go.Templates.Spinner.goml", this));
+			else
+				this.SetChild (template);
+			
 			labCpt = this.child.FindByName ("labCpt") as Label;
 		}
 

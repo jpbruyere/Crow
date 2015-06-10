@@ -34,19 +34,31 @@ namespace test
 		#region FPS
 		static int _fps = 0;
 
-		public static int fps {
+		public int fps {
 			get { return _fps; }
 			set {
-				_fps = value;
-				if (_fps > fpsMax)
-					fpsMax = _fps;
-				else if (_fps < fpsMin)
-					fpsMin = _fps;
-			}
+				if (_fps == value)
+					return;
 
+				int oldVal = _fps;
+				_fps = value;
+
+				if (_fps > fpsMax) {
+					fpsMax = _fps;
+					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMax", fpsMax, _fps));
+				} else if (_fps < fpsMin) {
+					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMin", fpsMin, _fps));
+					fpsMin = _fps;
+				}
+
+				if (ValueChanged != null)
+					ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", oldVal, _fps));
+
+				//ValueChanged.Raise (this, new ValueChangeEventArgs ("fps", oldVal, _fps));
+			}
 		}
 
-		public static int fpsMin = int.MaxValue;
+		public static int fpsMin = 0;
 		public static int fpsMax = 0;
 
 		static void resetFps ()
@@ -154,11 +166,9 @@ namespace test
 
 			fps = (int)RenderFrequency;
 
-			labFps.Text = fps.ToString();
 			labUpdate.Text = this.updateTime.ElapsedMilliseconds.ToString() + " ms";
+
 			if (frameCpt > 200) {
-				labFpsMin.Text = fpsMin.ToString();
-				labFpsMax.Text = fpsMax.ToString();
 				resetFps ();
 				frameCpt = 0;
 

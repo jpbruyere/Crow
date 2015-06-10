@@ -25,9 +25,13 @@ namespace go
 		{
 		}	
 
-		protected override void loadTemplate()
-		{
-			this.setChild (Interface.Load ("#go.Templates.Checkbox.goml"));
+		protected override void loadTemplate(GraphicObject template = null)
+		{			
+			if (template == null)
+				this.SetChild (Interface.Load ("#go.Templates.Checkbox.goml", this));
+			else
+				this.SetChild (template);
+
 			_caption = this.child.FindByName ("Caption") as Label;
 			_image = this.child.FindByName ("Image") as Image;
 			_image.SvgSub = "unchecked";
@@ -36,8 +40,10 @@ namespace go
 
 		[XmlAttributeAttribute()][DefaultValue("Checkbox")]
 		public string Caption {
-			get { return _caption.Text; } 
+			get { return _caption == null ? "" : _caption.Text; } 
 			set { 
+				if (_caption == null)
+					return;
 				_caption.Text = value; 
 			}
 		}
@@ -63,6 +69,11 @@ namespace go
 		{
 			IsChecked = !IsChecked;
 			base.onMouseClick (sender, e);
+		}
+
+		public override void ReadXml (System.Xml.XmlReader reader)
+		{
+			base.ReadXml (reader);
 		}
 	}
 }

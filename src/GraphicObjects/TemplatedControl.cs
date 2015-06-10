@@ -21,10 +21,12 @@
 using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
+using System.IO;
+using System.Xml;
 
 namespace go
 {
-	public abstract class TemplatedControl : Container, IXmlSerializable
+	public abstract class TemplatedControl : PrivateContainer, IXmlSerializable
 	{
 		public TemplatedControl () : base()
 		{
@@ -38,11 +40,12 @@ namespace go
 //		}
 
 
-		protected abstract void loadTemplate();
+		protected abstract void loadTemplate(GraphicObject template = null);
 
 		protected override void loadDefaultValues ()
 		{
-			loadTemplate ();
+			if (child == null)//trigger loading of default template if child is empty
+				loadTemplate ();
 			base.loadDefaultValues ();
 			this.Focusable = true;
 		}
@@ -61,29 +64,42 @@ namespace go
 		}
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
-			base.ReadXml(reader);
+			using (System.Xml.XmlReader subTree = reader.ReadSubtree())
+			{
+				subTree.Read ();
+				string tmp = subTree.ReadOuterXml ();
 
-//			using (System.Xml.XmlReader subTree = reader.ReadSubtree())
-//			{
-//				subTree.Read(); //skip current node
-//				subTree.Read(); //read first child
-//
-//				if (!subTree.IsStartElement())
-//					return;
-//
-//				Type t = Type.GetType("go." + subTree.Name);
-//				GraphicObject go = (GraphicObject)Activator.CreateInstance(t);                                
-//
-//				(go as IXmlSerializable).ReadXml(subTree);
-//
-//				setChild(go);
-//
-//				subTree.Read();
-//
-//				if (!subTree.IsStartElement())
-//					return;
-//
-//			}
+					//seek for template tag first
+				using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
+					//load template first if inlined
+
+					xr.Read (); //skip current node
+
+					while (!xr.EOF) {
+						xr.Read (); //read first child
+						if (!xr.IsStartElement ())
+							continue;
+						if (xr.Name == "Template") {
+							xr.Read ();
+
+							Type t = Type.GetType ("go." + xr.Name);
+							GraphicObject go = (GraphicObject)Activator.CreateInstance (t);                                
+							(go as IXmlSerializable).ReadXml (xr);
+
+							loadTemplate (go);
+
+							xr.Read ();//go close tag
+							xr.Read ();//Template close tag
+						} else {
+							xr.ReadInnerXml ();
+						}
+					}
+				}
+				using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
+					xr.Read ();
+					base.ReadXml(xr);
+				}
+			}
 		}
 		public override void WriteXml(System.Xml.XmlWriter writer)
 		{

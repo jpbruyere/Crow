@@ -25,9 +25,13 @@ namespace go
 		{
 		}	
 
-		protected override void loadTemplate()
+		protected override void loadTemplate(GraphicObject template = null)
 		{
-			this.setChild (Interface.Load ("#go.Templates.RadioButton.goml"));
+			if (template == null)
+				this.SetChild (Interface.Load ("#go.Templates.RadioButton.goml"));
+			else
+				this.SetChild (template);
+
 			_caption = this.child.FindByName ("Caption") as Label;
 			_image = this.child.FindByName ("Image") as Image;
 			_image.SvgSub = "unchecked";

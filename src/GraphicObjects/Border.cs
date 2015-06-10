@@ -47,11 +47,11 @@ namespace go
 		{
 			Size raw = Bounds.Size;
 
-			if (child != null) {
+			if (Child != null) {
 				if (Bounds.Width < 0)
-					raw.Width = child.Slot.Width + 2 * (Margin+BorderWidth);
+					raw.Width = Child.Slot.Width + 2 * (Margin+BorderWidth);
 				if (Bounds.Height < 0)
-					raw.Height = child.Slot.Height + 2 * (Margin+BorderWidth);
+					raw.Height = Child.Slot.Height + 2 * (Margin+BorderWidth);
 			}
 
 			return raw;

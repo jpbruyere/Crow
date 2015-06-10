@@ -18,7 +18,7 @@ namespace go
 
 		#region implemented abstract members of TemplatedControl
 
-		protected override void loadTemplate ()
+		protected override void loadTemplate (GraphicObject template = null)
 		{
 			throw new NotImplementedException ();
 		}

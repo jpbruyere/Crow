@@ -163,20 +163,28 @@ namespace go
 			MemberInfo miSrc = srcType.GetMember (binding.Value).FirstOrDefault();
 
 			//initialize target with actual value
+			object srcVal = null;
+			if (miSrc == null)
+				srcVal = _source;//if no member is provided for binding, source raw value is taken
+			else {
+				if (miSrc.MemberType == MemberTypes.Property)
+					srcVal = (miSrc as PropertyInfo).GetGetMethod ().Invoke (_source, null);
+				else if (miSrc.MemberType == MemberTypes.Field)
+					srcVal = (miSrc as FieldInfo).GetValue (_source);
+				else
+					throw new Exception ("unandled source member type for binding");
+			}
 			if (miDst.MemberType == MemberTypes.Property) {
-				if (miSrc == null)//if no member is provided for binding, source raw value is taken
-					(miDst as PropertyInfo).GetSetMethod ().Invoke (binding.Source, new object[] { _source });
-				else if (miSrc.MemberType == MemberTypes.Property)
-					(miDst as PropertyInfo).GetSetMethod ().Invoke (binding.Source, new object[] { (miSrc as PropertyInfo).GetGetMethod ().Invoke (_source, null) });
-				else if (miSrc.MemberType == MemberTypes.Field)				
-					(miDst as PropertyInfo).GetSetMethod ().Invoke (binding.Source, new object[] { (miSrc as FieldInfo).GetValue (_source) });			
+				PropertyInfo piDst = miDst as PropertyInfo;
+				//TODO: handle other dest type conversions
+				if (piDst.PropertyType == typeof(string))
+					srcVal = srcVal.ToString ();
+				piDst.GetSetMethod ().Invoke (binding.Source, new object[] { srcVal });
 			} else if (miDst.MemberType == MemberTypes.Field) {
-				if (miSrc == null)//if no member is provided for binding, source raw value is taken
-					(miDst as FieldInfo).SetValue (binding.Source, _source );
-				else if (miSrc.MemberType == MemberTypes.Property)
-					(miDst as FieldInfo).SetValue (binding.Source, (miSrc as PropertyInfo).GetGetMethod ().Invoke (_source, null));
-				else if (miSrc.MemberType == MemberTypes.Field)				
-					(miDst as FieldInfo).SetValue (binding.Source, (miSrc as FieldInfo).GetValue (_source));							
+				FieldInfo fiDst = miDst as FieldInfo;
+				if (fiDst.FieldType == typeof(string))
+					srcVal = srcVal.ToString ();
+				fiDst.SetValue (binding.Source, srcVal );
 			}else
 				throw new Exception("unandled destination member type for binding");
 			

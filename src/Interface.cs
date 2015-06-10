@@ -45,8 +45,13 @@ namespace go
 
 		#region Load/Save
 
-		internal static List<DynAttribute> EventsToResolve;
+		internal static Stack<List<DynAttribute>> EventsResolutionStack = new Stack<List<DynAttribute>>();
+		internal static List<DynAttribute> EventsToResolve
+		{
+			get { return EventsResolutionStack.Peek ();}
+		}
 		internal static List<DynAttribute> Bindings;
+
 
 		public static void Save<T>(string file, T graphicObject)
 		{            
@@ -105,7 +110,7 @@ namespace go
 		{
 			//result = (T)(Load (file, hostClass) as object);
 
-			EventsToResolve = new List<DynAttribute>();
+			EventsResolutionStack.Push(new List<DynAttribute>());
 			Bindings = new List<DynAttribute> ();
 
 			XmlSerializerNamespaces xn = new XmlSerializerNamespaces();
@@ -120,27 +125,8 @@ namespace go
 			if (hostClass == null)
 				return;
 
-			foreach (DynAttribute es in EventsToResolve)
-			{
-				if (string.IsNullOrEmpty(es.Value))
-					continue;
+			resolveEvents (hostClass);
 
-				if (es.Value.StartsWith ("{")) {
-					CompilerServices.CompileEventSource (es);
-				} else {					
-					MethodInfo mi = hostClass.GetType ().GetMethod (es.Value, BindingFlags.NonPublic | BindingFlags.Public
-						| BindingFlags.Instance);
-
-					if (mi == null) {
-						Debug.WriteLine ("Handler Method not found: " + es.Value);
-						continue;
-					}
-
-					FieldInfo fi = CompilerServices.getEventHandlerField (es.Source.GetType (), es.MemberName);
-					Delegate del = Delegate.CreateDelegate(fi.FieldType, hostClass, mi);
-					fi.SetValue(es.Source, del);
-				}
-			}
 			while (Bindings.Count > 0) {
 				DynAttribute binding = Bindings [0];
 				Bindings.RemoveAt (0);
@@ -157,10 +143,11 @@ namespace go
 //			}
 //			Bindings.Clear ();
 		}
+
 		public static GraphicObject Load(Stream stream, Type type, object hostClass = null)
 		{
 			GraphicObject result;
-			EventsToResolve = new List<DynAttribute>();
+			EventsResolutionStack.Push(new List<DynAttribute>());
 
 			XmlSerializerNamespaces xn = new XmlSerializerNamespaces();
 			xn.Add("", "");
@@ -171,6 +158,31 @@ namespace go
 			if (hostClass == null)
 				return result;
 
+			resolveEvents (hostClass);
+
+			while (Bindings.Count > 0) {
+				DynAttribute binding = Bindings [0];
+				Bindings.RemoveAt (0);
+				CompilerServices.ResolveBinding (binding, hostClass);
+			}
+
+//			foreach (DynAttribute binding in Bindings) {
+//				//				Type tSource = binding.Source.GetType ();
+//				//				if (!tSource.GetInterfaces ().Any (i => i.Name == "IValueChange")){
+//				//					Debug.WriteLine ("Binding source does not implement IValueChange.");
+//				//					continue;
+//				//				}
+//				//MemberInfo mi = binding.Source.GetType ().GetMember (binding.MemberName);
+//				CompilerServices.CreateBinding (binding, hostClass);
+//			}
+//			Bindings.Clear ();
+
+
+			return result;
+		}
+
+		static void resolveEvents(object hostClass)
+		{
 			foreach (DynAttribute es in EventsToResolve)
 			{
 				if (string.IsNullOrEmpty(es.Value))
@@ -192,25 +204,8 @@ namespace go
 					fi.SetValue(es.Source, del);
 				}
 			}
-			while (Bindings.Count > 0) {
-				DynAttribute binding = Bindings [0];
-				Bindings.RemoveAt (0);
-				CompilerServices.ResolveBinding (binding, hostClass);
-			}
-
-//			foreach (DynAttribute binding in Bindings) {
-//				//				Type tSource = binding.Source.GetType ();
-//				//				if (!tSource.GetInterfaces ().Any (i => i.Name == "IValueChange")){
-//				//					Debug.WriteLine ("Binding source does not implement IValueChange.");
-//				//					continue;
-//				//				}
-//				//MemberInfo mi = binding.Source.GetType ().GetMember (binding.MemberName);
-//				CompilerServices.CreateBinding (binding, hostClass);
-//			}
-//			Bindings.Clear ();
-			return result;
+			EventsResolutionStack.Pop();			
 		}
-
 		#endregion
 	}
 }

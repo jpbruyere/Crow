@@ -34,9 +34,13 @@ namespace go
 		}
 
 		#region implemented abstract members of TemplatedControl
-		protected override void loadTemplate ()
+		protected override void loadTemplate (GraphicObject template = null)
 		{
-			this.setChild (Interface.Load ("#go.Templates.Listbox.goml"));
+			if (template == null)
+				this.SetChild (Interface.Load ("#go.Templates.Listbox.goml"));
+			else
+				this.SetChild (template);
+			
 			_list = this.child.FindByName ("List") as Group;
 		}
 		#endregion
