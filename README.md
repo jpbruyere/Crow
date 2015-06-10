@@ -2,7 +2,11 @@
 
 Graphic Object Library: custom widget library c# version.
 
-- Use OpenTK as top container for device abstraction layer
+- Use OpenTK as top container for device abstraction layer by default, (other container: GTK, GDK)
+- Allow easy creation of XAML like interface under linux directely in console mode, without X
+  It only required Mono,Mesa,GBM and DRM libraries.
+- Templated controls, with dynamic binding
+- inlined delegate in XML
 - Curent drawing routines use Mono.Cairo
 
 #####GOLib in action
