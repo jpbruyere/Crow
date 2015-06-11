@@ -77,7 +77,7 @@ namespace go
 		public void AddWidget(GraphicObject g)
 		{
 			g.Parent = this;
-			GraphicObjects.Add (g);
+			GraphicObjects.Insert (0, g);
 
 			g.RegisterForLayouting ((int)LayoutingType.Sizing);
 		}
@@ -246,7 +246,7 @@ namespace go
 			lock (redrawClip) {
 				if (redrawClip.count > 0) {					
 //					#if DEBUG_CLIP_RECTANGLE
-//					redrawClip.stroke (ctx, new Color(1.0,0,0,0.3));
+					redrawClip.stroke (ctx, new Color(1.0,0,0,0.3));
 //					#endif
 					redrawClip.clearAndClip (ctx);//rajouté après, tester si utile	
 

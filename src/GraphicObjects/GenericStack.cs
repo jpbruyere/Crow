@@ -158,6 +158,9 @@ namespace go
 					}
 				}				
 				ComputeChildrenPositions ();
+				//if no layouting remains in queue for item, registre for redraw
+				if (Interface.LayoutingQueue.Where (lq => lq.GraphicObject == this).Count () <= 0)
+					this.RegisterForRedraw ();
 			}else
 				base.UpdateLayout(layoutType);
         }

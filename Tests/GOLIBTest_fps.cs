@@ -102,7 +102,7 @@ namespace test
 			fps = (int)RenderFrequency;
 
 			//labFps.Text = fps.ToString();
-			labUpdate.Text = this.updateTime.ElapsedMilliseconds.ToString() + " ms";
+			//labUpdate.Text = this.updateTime.ElapsedMilliseconds.ToString() + " ms";
 
 			if (frameCpt > 200) {
 //				labFpsMin.Text = fpsMin.ToString();

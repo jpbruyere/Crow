@@ -18,27 +18,22 @@ using System.IO;
 
 namespace go
 {
-	[DefaultTemplate("#go.Templates.Expandable.goml")]
-    public class Expandable : TemplatedContainer
+	[DefaultTemplate("#go.Templates.Popper.goml")]
+    public class Popper : TemplatedContainer
     {		
-		bool _isExpanded;
+		bool _isPopped;
 		Label _caption;
 		Image _image;
-		Container _contentContainer;
+		GraphicObject _content;
 
-		public event EventHandler Expand;
-		public event EventHandler Collapse;
+		public event EventHandler Pop;
+		public event EventHandler Unpop;
 
 		public override GraphicObject Content {
-			get {
-				return _contentContainer == null ? null : _contentContainer.Child;
-			}
-			set {
-				_contentContainer.SetChild(value);
-			}
+			get { return _content; }
+			set { _content = value; }
 		}
-
-		public Expandable() : base()
+		public Popper() : base()
 		{
 		}	
 
@@ -46,7 +41,6 @@ namespace go
 		{
 			base.loadTemplate (template);
 
-			_contentContainer = this.child.FindByName ("Content") as Container;
 			_caption = this.child.FindByName ("Caption") as Label;
 			_image = this.child.FindByName ("Image") as Image;
 
@@ -54,13 +48,13 @@ namespace go
 				return;
 			_image.SvgSub = "collapsed";
 
-			this.Expand += (object sender, EventArgs e) => {_image.SvgSub = "expanded";};
-			this.Collapse += (object sender, EventArgs e) => {_image.SvgSub = "collapsed";};
+			this.Pop += (object sender, EventArgs e) => {_image.SvgSub = "expanded";};
+			this.Unpop += (object sender, EventArgs e) => {_image.SvgSub = "collapsed";};
 
 		}
 			
 
-		[XmlAttributeAttribute()][DefaultValue("Expandable")]
+		[XmlAttributeAttribute()][DefaultValue("Popper")]
 		public string Title {
 			get { return _caption.Text; } 
 			set {
@@ -71,39 +65,45 @@ namespace go
 		}        
       
 		[XmlAttributeAttribute()][DefaultValue(false)]
-        public bool IsExpanded
+        public bool IsPopped
         {
-			get { return _isExpanded; }
+			get { return _isPopped; }
             set
             {
-                if (value == _isExpanded)
+                if (value == _isPopped)
                     return;
 
-				_isExpanded = value;
+				_isPopped = value;
 
-				if (_isExpanded)
-					onExpand (this, null);
+				if (_isPopped)
+					onPop (this, null);
 				else
-					onCollapse (this, null);
+					onUnpop (this, null);
 
                 registerForGraphicUpdate();
             }
         }
 
-		public virtual void onExpand(object sender, EventArgs e)
+		public virtual void onPop(object sender, EventArgs e)
 		{
-			_contentContainer.Visible = true;
-			Expand.Raise (this, e);
+			if (Content != null) {
+				Rectangle r = this.ScreenCoordinates (this.Slot);
+				Content.Visible = true;
+				Content.Left = r.Left;
+				Content.Top = r.Bottom;
+				TopContainer.AddWidget (Content);
+			}
+			Pop.Raise (this, e);
 		}
-		public virtual void onCollapse(object sender, EventArgs e)
+		public virtual void onUnpop(object sender, EventArgs e)
 		{
-			_contentContainer.Visible = false;
-			Collapse.Raise (this, e);
+			TopContainer.DeleteWidget (Content);
+			Unpop.Raise (this, e);
 		}
 			
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{
-			IsExpanded = !IsExpanded;
+			IsPopped = !IsPopped;
 			base.onMouseClick (sender, e);
 		}
 

@@ -110,6 +110,8 @@
     <Compile Include="src\GraphicObjects\RadioButton.cs" />
     <Compile Include="src\GraphicObjects\Expandable.cs" />
     <Compile Include="src\GraphicObjects\PrivateContainer.cs" />
+    <Compile Include="src\GraphicObjects\TemplatedContainer.cs" />
+    <Compile Include="src\GraphicObjects\Popper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -169,5 +171,6 @@
     <EmbeddedResource Include="Templates\Expandable.goml" />
     <EmbeddedResource Include="Images\Icons\expandable.svg" />
     <EmbeddedResource Include="Templates\Checkbox2.goml" />
+    <EmbeddedResource Include="Templates\Popper.goml" />
   </ItemGroup>
 </Project>
