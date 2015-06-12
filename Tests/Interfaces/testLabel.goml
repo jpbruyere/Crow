@@ -1,0 +1,3 @@
+﻿<?xml version="1.0"?>
+				<Label Name="labFps" Text="{fps}" Font="droid bold, 12"
+					TextAlignment="Center" Background="AoEnglish" />

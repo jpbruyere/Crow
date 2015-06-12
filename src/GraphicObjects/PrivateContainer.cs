@@ -22,6 +22,7 @@ using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using OpenTK.Input;
+using Cairo;
 
 namespace go
 {
@@ -118,7 +119,7 @@ namespace go
 		public override Rectangle ContextCoordinates (Rectangle r)
 		{
 			return
-				Parent.ContextCoordinates(r) + getSlot().Position +  ClientRectangle.Position;
+				Parent.ContextCoordinates(r) + Slot.Position + ClientRectangle.Position;
 		}
 		public override void Paint(ref Cairo.Context ctx, Rectangles clip = null)
 		{
@@ -130,6 +131,8 @@ namespace go
 			//			ctx.Rectangle(ContextCoordinates(Slot));
 			//            ctx.Clip();
 			//
+
+
 			if (clip != null)
 				clip.clip(ctx);
 
@@ -147,6 +150,7 @@ namespace go
 
 			ctx.Restore();            
 		}
+
 		#endregion
 
 		#region Mouse handling

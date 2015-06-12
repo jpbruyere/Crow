@@ -85,32 +85,13 @@
 				<Slider Height="10" Width="300" BorderWidth="1" Background="Transparent" />
 				<GraduatedSlider Name="slider" Height="30" Width="300" Foreground="BlueBell"/>
 			</VerticalStack>
-			<VerticalStack Width="-1" Height="-1" BorderWidth="1" Margin="5" WidgetSpacing="4">
+			<VerticalStack Width="-1" Height="-1"  Margin="0" WidgetSpacing="1">
 				<Button  Margin="1" Width="150" Height="100">
 					<Image Path="#Tests.image.tetra.png"/>
 				</Button>
-				<Popper>
+				<Popper Width="100">
 					<Image Fit="true" Path="#Tests.image.tetra.png"/>
 				</Popper>
-				<HorizontalStack>
-					<Label Text="Update" FontColor="White"/>
-					<Label Name="labUpdate" Text="xxxx" FontSize="16" Width="60" TextAlignment="Center" Background="DarkGreen"/>
-				</HorizontalStack>
-				<HorizontalStack>
-					<Label Text="Fps:" Width = "30"/>
-					<Label Name="labFps" Text="{fps}" Font="droid bold, 14"
-						TextAlignment="Center" Background="AoEnglish"/>
-				</HorizontalStack>
-				<HorizontalStack>
-					<Label Text="Min:" Width = "30"/>
-					<Label Name="labFpsMin" Text="{fpsMin}" Font="droid bold, 14"
-						TextAlignment="Center" Background="AoEnglish"/>
-				</HorizontalStack>
-				<HorizontalStack>
-					<Label Text="Max:" Width = "30"/>
-					<Label Name="labFpsMax" Text="{fpsMax}" Font="droid bold, 14"
-						TextAlignment="Center" Background="AoEnglish"/>
-				</HorizontalStack>
 				<Expandable Name="expander" Width="150" Height="-1">
 					<VerticalStack Name="vsExpanded" Width="100">
 						<Checkbox Name="chk1"/>
@@ -131,6 +112,25 @@
 						<Checkbox Name="chk2"/>
 					</VerticalStack>		
 				</Expandable>
+				<HorizontalStack>
+					<Label Text="Update" FontColor="White"/>
+					<Label Name="labUpdate" Text="xxxx" FontSize="16" Width="60" TextAlignment="Center" Background="DarkGreen"/>
+				</HorizontalStack>
+				<HorizontalStack>
+					<Label Text="Fps:" Width = "30"/>
+					<Label Name="labFps" Text="{fps}" Font="droid bold, 14"
+						TextAlignment="Center" Background="AoEnglish"/>
+				</HorizontalStack>
+				<HorizontalStack>
+					<Label Text="Min:" Width = "30"/>
+					<Label Name="labFpsMin" Text="{fpsMin}" Font="droid bold, 14"
+						TextAlignment="Center" Background="AoEnglish"/>
+				</HorizontalStack>
+				<HorizontalStack>
+					<Label Text="Max:" Width = "30"/>
+					<Label Name="labFpsMax" Text="{fpsMax}" Font="droid bold, 14"
+						TextAlignment="Center" Background="AoEnglish"/>
+				</HorizontalStack>
 			</VerticalStack>
 
 			<Scroller Background="DimGray" Height="350" Width="150"  

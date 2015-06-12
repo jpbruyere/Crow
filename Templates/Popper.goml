@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="1" BorderColor="LightGray"  Height="50" Width="100" MouseClick="onMouseClick">
+<Border BorderWidth="1" BorderColor="LightGray" Height="-1" MouseClick="onMouseClick">
 	<HorizontalStack Name="hsTemplateExpander" Spacing="1" Focusable="false" Height="-1" Width="0">
 		<Image Name="Image" Margin="3" Width="16" Height="16" Path="#go.Images.Icons.expandable.svg"/>
 		<Label Name="Caption"/>

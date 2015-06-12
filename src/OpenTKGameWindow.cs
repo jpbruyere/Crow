@@ -257,7 +257,7 @@ namespace go
 
 							ctx.Save ();
 							if (redrawClip.count > 0) {
-								Rectangles clip = redrawClip.intersectingRects (p.ContextCoordinates(p.Slot.Size));
+								Rectangles clip = redrawClip.intersectingRects (p.Slot);
 
 								if (clip.count > 0)
 									p.Paint (ref ctx, clip);

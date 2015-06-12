@@ -1,0 +1,13 @@
+﻿<?xml version="1.0"?>
+<Border BorderWidth="1" BorderColor="LightGray"  MouseClick="onMouseClick" Margin="0" Focusable="true">
+	<VerticalStack MouseClick="onMouseClick" Height="0" Width="0" Margin="0" Focusable="true">
+		<Border BorderWidth="1" BorderColor="LightGray"  Height="-1" Width="0" MouseClick="onMouseClick"  Background="BlueCrayola" Focusable="true"
+			MouseMove="Window_MouseMove">
+			<HorizontalStack Margin="0" Spacing="1" Height="-1" Width="0" Focusable="true" MouseMove="Window_MouseMove">
+				<Image Name="Image" Margin="3" Width="16" Height="16" Path="#go.Images.Icons.expandable.svg"/>
+				<Label Focusable="true" Name="Title" MouseMove="Window_MouseMove"/>
+			</HorizontalStack>
+		</Border>
+		<Container Name="Content" Margin="1"/>
+	</VerticalStack>
+</Border>

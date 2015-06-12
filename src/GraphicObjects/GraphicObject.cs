@@ -547,7 +547,7 @@ namespace go
 			}
 
 			//if no layouting remains in queue for item, registre for redraw
-			if (Interface.LayoutingQueue.Where (lq => lq.GraphicObject == this).Count () <= 0)
+			if (Interface.LayoutingQueue.Where (lq => lq.GraphicObject == this).Count () <= 0 && bmp == null)
 				this.RegisterForRedraw ();
 		}
 

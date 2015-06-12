@@ -172,5 +172,6 @@
     <EmbeddedResource Include="Images\Icons\expandable.svg" />
     <EmbeddedResource Include="Templates\Checkbox2.goml" />
     <EmbeddedResource Include="Templates\Popper.goml" />
+    <EmbeddedResource Include="Templates\Window.goml" />
   </ItemGroup>
 </Project>

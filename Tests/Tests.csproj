@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>test.GOLIBTest_fps</StartupObject>
+    <StartupObject>test.GOLIBTest_4</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>..\bin\$(configuration)</OutputPath>
     <IntermediateOutputPath>obj\$(configuration)</IntermediateOutputPath>
@@ -57,6 +57,9 @@
     <Compile Include="GOLIBTest_Listbox.cs" />
     <Compile Include="GOLIBTest_Spinner.cs" />
     <Compile Include="GOLIBTest_Expandable.cs" />
+    <Compile Include="GOLIBTest_Label.cs" />
+    <Compile Include="GOLIBTest_Window.cs" />
+    <Compile Include="GOLIBTest_Container.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -105,6 +108,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Interfaces\testExpandable.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\testLabel.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\testWindow.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\testContainer.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

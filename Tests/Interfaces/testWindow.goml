@@ -1,0 +1,11 @@
+﻿<?xml version="1.0"?>
+<!--<Group>-->
+<Window Name="window1" Left="10" Top="10" Title="test window" Width="200" Height="200" Background="0,5;0,5;0,5;0,5" >
+	<VerticalStack Height="0" Width="0">
+		<Label Text="{fps}"  Background="DarkRed"/>
+		<Label/>
+		<Label/>
+		<Label/>
+	</VerticalStack>
+</Window>
+<!--</Group>-->
