@@ -87,6 +87,11 @@ namespace go
 			GraphicObjects.Remove (g);
 		}
 
+		public void Quit ()
+		{
+			this.Exit ();
+		}
+
 		#region Events
 		//those events are raised only if mouse isn't in a graphic object
 		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
@@ -97,7 +102,6 @@ namespace go
 		#endregion
 
 		#region focus
-
 		GraphicObject _activeWidget;	//button is pressed on widget 
 		GraphicObject _hoverWidget;		//mouse is over
 		GraphicObject _focusedWidget;	//has keyboard (or other perif) focus 
@@ -246,7 +250,7 @@ namespace go
 			lock (redrawClip) {
 				if (redrawClip.count > 0) {					
 //					#if DEBUG_CLIP_RECTANGLE
-					redrawClip.stroke (ctx, new Color(1.0,0,0,0.3));
+//					redrawClip.stroke (ctx, new Color(1.0,0,0,0.3));
 //					#endif
 					redrawClip.clearAndClip (ctx);//rajouté après, tester si utile	
 

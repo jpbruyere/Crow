@@ -47,10 +47,14 @@ namespace go
 		protected override void loadTemplate(GraphicObject template = null)
 		{
 			base.loadTemplate (template);
-
 			_contentContainer = this.child.FindByName ("Content") as Container;
 			_title = this.child.FindByName ("Title") as Label;
 			_icon = this.child.FindByName ("Icon") as Image;
+		}
+
+		void butQuitPress (object sender, MouseButtonEventArgs e)
+		{
+			TopContainer.Quit ();
 		}
 
 

@@ -12,6 +12,7 @@ namespace go
 		GraphicObject FocusedWidget { get; set; }
 		void AddWidget (GraphicObject g);
 		void DeleteWidget(GraphicObject g);
+		void Quit ();
 	}
 }
 

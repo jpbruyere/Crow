@@ -1,11 +1,19 @@
 ﻿<?xml version="1.0"?>
 <!--<Group>-->
-<Window Name="window1" Left="10" Top="10" Title="test window" Width="200" Height="200" Background="0,5;0,5;0,5;0,5" >
+<Window Name="window1" Left="10" Top="10" Title="Test window" Width="200" Height="200" Background="0,5;0,5;0,5;0,5" >
 	<VerticalStack Height="0" Width="0">
 		<Label Text="{fps}"  Background="DarkRed"/>
-		<Label/>
-		<Label/>
-		<Label/>
+		<Label Text="{fpsMin}"  />
+		<Label Text="{fpsMax}"  />
+		<Checkbox Height="-1" Width="-1"/>
+		<GroupBox Title="test"  Height="-1" Width="-1" Margin="5">
+			<VerticalStack Width="100">
+				<RadioButton  Height="-1" Width="-1"/>
+				<RadioButton  Height="-1" Width="-1"/>
+				<RadioButton  Height="-1" Width="-1"/>
+			</VerticalStack>
+		</GroupBox>
+
 	</VerticalStack>
 </Window>
 <!--</Group>-->

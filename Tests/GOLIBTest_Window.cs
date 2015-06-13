@@ -76,6 +76,11 @@ namespace test
 		{
 			base.OnLoad (e);
 			LoadInterface("Interfaces/testWindow.goml", out g);
+			LoadInterface("Interfaces/testWindow.goml", out g);
+			LoadInterface("Interfaces/testWindow.goml", out g);
+			LoadInterface("Interfaces/testWindow.goml", out g);
+			LoadInterface("Interfaces/testWindow.goml", out g);
+			LoadInterface("Interfaces/testWindow.goml", out g);
 
 		}
 		protected override void OnRenderFrame (FrameEventArgs e)
