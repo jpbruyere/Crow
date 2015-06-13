@@ -43,14 +43,14 @@ namespace test
 				int oldVal = _fps;
 				_fps = value;
 
-//				if (_fps > fpsMax) {
-//					fpsMax = _fps;
-//					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMax", fpsMax, _fps));
-//				} else if (_fps < fpsMin) {
-//					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMin", fpsMin, _fps));
-//					fpsMin = _fps;
-//				}
-//
+				if (_fps > fpsMax) {
+					fpsMax = _fps;
+					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMax", fpsMax, _fps));
+				} else if (_fps < fpsMin) {
+					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMin", fpsMin, _fps));
+					fpsMin = _fps;
+				}
+
 				ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", oldVal, _fps));
 			}
 		}

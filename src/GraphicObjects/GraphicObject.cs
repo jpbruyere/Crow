@@ -364,10 +364,12 @@ namespace go
 		}
 
 		public Rectangle LastSlots;
+		public Rectangle LastPaintedSlot;
 
 		public virtual void registerClipRect()
 		{
 			TopContainer.redrawClip.AddRectangle (ScreenCoordinates(Slot));
+			TopContainer.redrawClip.AddRectangle (ScreenCoordinates(LastPaintedSlot));
 		}
 		protected virtual Size measureRawSize ()
 		{
@@ -567,6 +569,8 @@ namespace go
 
 		protected virtual void UpdateGraphic ()
 		{
+			LastPaintedSlot = Slot;
+
 			int stride = 4 * Slot.Width;
 
 			int bmpSize = Math.Abs (stride) * Slot.Height;
