@@ -172,9 +172,9 @@ namespace test
 			}
 			frameCpt++;
 
-//			if (pb.Value == pb.Maximum)
-//				pb.Value = 0;
-//			pb.Value++;
+			if (pb.Value == pb.Maximum)
+				pb.Value = 0;
+			pb.Value++;
 			pb2.Value = pb.Value;
 			//labPb.Text = pb.Value.ToString ();
 			if (FocusedWidget==null)

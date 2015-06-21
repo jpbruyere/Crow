@@ -178,8 +178,13 @@ namespace go
 				if (clip != null) {
 					clip.Rebase (this);									
 					//localClip = clip.intersectingRects (Slot.Size);
-				} else
+				} else {
 					clip = new Rectangles ();
+					//TODO:added lately slot to empty clip,
+					//should rework this precise case causing expandable not
+					//to show image changes
+					clip.AddRectangle (ContextCoordinates (Slot.Size));
+				}
 
 				if (!DrawingIsValid || clip != null) {//false when 1 child has changed
 					//child having their content changed has to be repainted

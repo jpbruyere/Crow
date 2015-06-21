@@ -62,7 +62,7 @@ namespace go
 				else
 					_image.SvgSub = "unchecked";
 				                
-                registerForGraphicUpdate();
+                //registerForGraphicUpdate();
             }
         }
 

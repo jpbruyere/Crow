@@ -54,8 +54,8 @@ namespace go
 				return;
 			_image.SvgSub = "collapsed";
 
-			this.Expand += (object sender, EventArgs e) => {_image.SvgSub = "expanded";};
-			this.Collapse += (object sender, EventArgs e) => {_image.SvgSub = "collapsed";};
+//			this.Expand += (object sender, EventArgs e) => {};
+//			this.Collapse += (object sender, EventArgs e) => {};
 
 		}
 			
@@ -86,18 +86,20 @@ namespace go
 				else
 					onCollapse (this, null);
 
-                registerForGraphicUpdate();
+                //registerForGraphicUpdate();
             }
         }
 
 		public virtual void onExpand(object sender, EventArgs e)
 		{
 			_contentContainer.Visible = true;
+			_image.SvgSub = "expanded";
 			Expand.Raise (this, e);
 		}
 		public virtual void onCollapse(object sender, EventArgs e)
 		{
 			_contentContainer.Visible = false;
+			_image.SvgSub = "collapsed";
 			Collapse.Raise (this, e);
 		}
 			

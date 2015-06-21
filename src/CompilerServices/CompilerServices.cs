@@ -270,8 +270,12 @@ namespace go
 				
 				if (!srcValueType.IsValueType)
 					il.Emit(OpCodes.Castclass, srcValueType);
-				if (piTarget.PropertyType == typeof(string))
-					il.Emit(OpCodes.Callvirt, miToStr);
+				else
+					il.Emit( OpCodes.Callvirt, GetConvertMethod( piTarget.PropertyType ));
+			//	if (piTarget.PropertyType == typeof(string))
+//				else if ( srcValueType != piTarget.PropertyType)
+//					
+				
 				il.Emit(OpCodes.Callvirt, piTarget.GetSetMethod());
 			}
 			il.MarkLabel(labFailed);
@@ -284,6 +288,31 @@ namespace go
 			//Delegate del = dm.CreateDelegate(typeof(System.EventHandler));
 			addHandler.Invoke(_source, new object[] {del});
 		}
+
+		#region conversions
+
+		internal static MethodInfo GetConvertMethod( Type targetType )
+		{
+			string name;
+
+			if( targetType == typeof( bool ) )
+				name = "ToBoolean";
+			else if( targetType == typeof( byte ) )
+				name = "ToByte";
+			else if( targetType == typeof( short ) )
+				name = "ToInt16";
+			else if( targetType == typeof( int ) )
+				name = "ToInt32";
+			else if( targetType == typeof( long ) )
+				name = "ToInt64";
+			else if (targetType == typeof (string ) )
+				return typeof(object).GetMethod("ToString", Type.EmptyTypes);
+			else
+				throw new NotImplementedException( string.Format( "Conversion to {0} is not implemented.", targetType.Name ) );
+
+			return typeof( Convert ).GetMethod( name, BindingFlags.Static | BindingFlags.Public, null, new Type[] { typeof( object ) }, null );
+		}
+		#endregion
 			
 		public static FieldInfo getEventHandlerField(Type type, string eventName)
 		{

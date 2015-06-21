@@ -1,6 +1,4 @@
 // Released to the public domain. Use, modify and relicense at will.
-//#define DEBUG_CLIP_RECTANGLE
-
 using System;
 
 using OpenTK;

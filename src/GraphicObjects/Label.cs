@@ -287,6 +287,8 @@ namespace go
 			//gr.FontOptions.HintMetrics = HintMetrics.On;
 
 			rText = new Rectangle(measureRawSize());
+			rText.Width -= 2 * Margin;
+			rText.Height -= 2 * Margin;
 
 			widthRatio = 1f;
 			heightRatio = 1f;
@@ -479,6 +481,24 @@ namespace go
 				if (string.IsNullOrWhiteSpace (l))
 					continue;
 			
+//				double t = rText.Y;
+//				gr.LineWidth = 1;
+//				gr.Color = Color.Green;
+//				gr.MoveTo (rText.X, t);
+//				gr.LineTo (rText.X + rText.Width, t);
+//				gr.Stroke ();
+//				gr.MoveTo (rText.X, t + rText.Height);
+//				gr.LineTo (rText.X + rText.Width, t + rText.Height);
+//				gr.Stroke ();
+//				gr.Rectangle (rText);
+//				gr.Fill ();
+//
+//				t += fe.Ascent;
+//				gr.Color = Color.Red;
+//				gr.MoveTo (rText.X, t);
+//				gr.LineTo (rText.X + rText.Width, t);
+//				gr.Stroke ();
+
 				gr.Color = Foreground;				
 				gr.MoveTo (rText.X, rText.Y + fe.Ascent + fe.Height * i);
 

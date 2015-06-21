@@ -119,7 +119,6 @@ namespace go
 
 			cursor.TopLeft = new Point(r.Left + (int)(Value * unity),
                                         (int)(p1.Y - cursor.Height / 2));  
-			Debug.WriteLine (cursor.TopLeft.ToString ());
         }
         
 		#region mouse handling

@@ -44,6 +44,11 @@ namespace go
 			get { return base.Focusable; }
 			set { base.Focusable = value; }
 		}
+		[XmlAttributeAttribute()][DefaultValue(true)]
+		public override bool Selectable {
+			get { return base.Selectable; }
+			set { base.Selectable = value; }
+		}
 		[XmlAttributeAttribute()][DefaultValue("White")]
 		public override Color Background {
 			get { return base.Background; }

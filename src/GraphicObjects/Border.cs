@@ -16,7 +16,7 @@ namespace go
 		#endregion
 
 		#region public properties
-		[XmlAttributeAttribute()][DefaultValue(2)]
+		[XmlAttributeAttribute()][DefaultValue(1)]
 		public virtual int BorderWidth {
 			get { return _borderWidth; }
 			set {

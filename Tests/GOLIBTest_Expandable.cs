@@ -1,4 +1,5 @@
 #define MONO_CAIRO_DEBUG_DISPOSE
+#define DEBUG_CLIP_RECTANGLE
 
 
 using System;
