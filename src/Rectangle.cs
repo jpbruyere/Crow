@@ -192,7 +192,11 @@ namespace go
 		{
 			return new Rectangle(r.X + p.X, r.Y + p.Y, r.Width, r.Height);
 		}
-        public static bool operator ==(Rectangle r1, Rectangle r2)
+		public static Rectangle operator -(Rectangle r, Point p)
+		{
+			return new Rectangle(r.X - p.X, r.Y - p.Y, r.Width, r.Height);
+		}
+		public static bool operator ==(Rectangle r1, Rectangle r2)
         {
             return r1.TopLeft == r2.TopLeft && r1.Size == r2.Size ? true : false;
         }

@@ -7,6 +7,7 @@ using System.Drawing;
 using Cairo;
 using System.Xml.Serialization;
 using OpenTK.Input;
+using System.ComponentModel;
 
 namespace go
 {
@@ -14,27 +15,51 @@ namespace go
     {
 		bool _verticalScrolling;
 		bool _horizontalScrolling;
+		bool _scrollbarVisible;
+		int _scrollX = 0;
+		int _scrollY = 0;
+
 
 		#region public properties
 
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(false)]
+		[XmlAttributeAttribute][DefaultValue(false)]
 		public bool VerticalScrolling {
 			get { return _verticalScrolling; }
 			set { _verticalScrolling = value; }
 		}
         
-		[System.Xml.Serialization.XmlAttributeAttribute()]
-		[System.ComponentModel.DefaultValue(false)]
+		[XmlAttributeAttribute][DefaultValue(false)]
         public bool HorizontalScrolling {
 			get { return _horizontalScrolling; }
 			set { _horizontalScrolling = value; }
 		}
+		[XmlAttributeAttribute][DefaultValue(true)]
+		public bool ScrollbarVisible {
+			get { return _scrollbarVisible; }
+			set { _scrollbarVisible = value; }
+		}
 
-        [XmlIgnore]         
-        public int scrollX = 0;
-        [XmlIgnore]
-        public int scrollY = 0;
+
+		[XmlIgnore]         
+		public int ScrollX {
+			get {
+				return _scrollX;
+			}
+			set {
+				_scrollX = value;
+			}
+		}
+
+
+		[XmlIgnore]
+		public int ScrollY {
+			get {
+				return _scrollY;
+			}
+			set {
+				_scrollY = value;
+			}
+		}
 
 		public static int ScrollSpeed = 10;
 
@@ -57,7 +82,7 @@ namespace go
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
-			Point m = e.Position + new Point (scrollX, scrollY);
+			Point m = e.Position - new Point (ScrollX, ScrollY);
 			base.onMouseMove (sender, new MouseMoveEventArgs(m.X,m.Y,e.XDelta,e.YDelta));
 		}
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
@@ -74,12 +99,12 @@ namespace go
                 //add redraw call with old bounds to errase old position
                 RegisterForRedraw();
 
-				scrollY += e.Delta * ScrollSpeed;
+				ScrollY -= e.Delta * ScrollSpeed;
 
-                if (scrollY > 0)
-                    scrollY = 0;
-				else if (scrollY < -Child.Slot.Height + ClientRectangle.Height)
-					scrollY = -Child.Slot.Height + ClientRectangle.Height;
+                if (ScrollY < 0)
+                    ScrollY = 0;
+				else if (ScrollY > Child.Slot.Height - ClientRectangle.Height)
+					ScrollY = Child.Slot.Height - ClientRectangle.Height;
 
             }
             if (HorizontalScrolling )
@@ -87,12 +112,12 @@ namespace go
                 //add redraw call with old bounds to errase old position
                 RegisterForRedraw();
 
-				scrollX += e.Delta * ScrollSpeed;
+				ScrollX -= e.Delta * ScrollSpeed;
 
-				if (scrollX > 0)
-					scrollX = 0;
-				else if (scrollX < -Child.Slot.Width + ClientRectangle.Width)
-					scrollX = -Child.Slot.Width + ClientRectangle.Width;
+				if (ScrollX < 0)
+					ScrollX = 0;
+				else if (ScrollX > Child.Slot.Width - ClientRectangle.Width)
+					ScrollX = Child.Slot.Width - ClientRectangle.Width;
             }
 
 
@@ -104,11 +129,11 @@ namespace go
 
 		public override Rectangle ContextCoordinates (Rectangle r)
 		{
-			return base.ContextCoordinates (r) + new Point(scrollX,scrollY);
+			return base.ContextCoordinates (r) - new Point(ScrollX,ScrollY);
 		}
 		public override Rectangle ScreenCoordinates (Rectangle r)
 		{
-			return base.ScreenCoordinates (r) + new Point(scrollX,scrollY);
+			return base.ScreenCoordinates (r) - new Point(ScrollX,ScrollY);
 		}
 
 		public override void registerClipRect ()
