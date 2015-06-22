@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>test.GOLIBTest_4</StartupObject>
+    <StartupObject>test2.GOLIBTest_Scrollbar</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>..\bin\$(configuration)</OutputPath>
     <IntermediateOutputPath>obj\$(configuration)</IntermediateOutputPath>
@@ -60,6 +60,7 @@
     <Compile Include="GOLIBTest_Label.cs" />
     <Compile Include="GOLIBTest_Window.cs" />
     <Compile Include="GOLIBTest_Container.cs" />
+    <Compile Include="GOLIBTest_Scrollbar.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -117,6 +118,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Interfaces\testContainer.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\testScrollbar.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

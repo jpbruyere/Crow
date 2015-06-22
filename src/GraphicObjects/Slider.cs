@@ -31,8 +31,9 @@ namespace go
 
 		#region private fields
         Rectangle cursor;
-		int _cursorWidth;
+		int _cursorSize;
 		Color _cursorColor;
+		Orientation _orientation;
 		bool holdCursor = false;
 		#endregion
 
@@ -48,12 +49,18 @@ namespace go
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(20)]
-		public virtual int CursorWidth {
-			get { return _cursorWidth; }
+		public virtual int CursorSize {
+			get { return _cursorSize; }
 			set {
-				_cursorWidth = value;
+				_cursorSize = value;
 				registerForGraphicUpdate ();
 			}
+		}
+		[XmlAttributeAttribute()][DefaultValue(Orientation.Horizontal)]
+		public virtual Orientation Orientation
+		{
+			get { return _orientation; }
+			set { _orientation = value; }
 		}
 		#endregion
 
@@ -80,8 +87,15 @@ namespace go
 			base.onDraw (gr);
 
 			Rectangle r = ClientRectangle;
-			PointD pStart = r.TopLeft + new Point(cursor.Width/2, r.Height / 2);
-			PointD pEnd = r.TopRight + new Point(-cursor.Width/2, r.Height / 2);
+			PointD pStart;
+			PointD pEnd;
+			if (_orientation == Orientation.Horizontal) {
+				pStart = r.TopLeft + new Point (_cursorSize / 2, r.Height / 2);
+				pEnd = r.TopRight + new Point (-_cursorSize / 2, r.Height / 2);
+			} else {
+				pStart = r.TopLeft + new Point (r.Width / 2, _cursorSize / 2);
+				pEnd = r.BottomLeft + new Point (r.Width / 2,- _cursorSize / 2);
+			}
 
 			DrawGraduations (gr, pStart,pEnd);
 
@@ -110,15 +124,21 @@ namespace go
         void computeCursorPosition()
         {            
             Rectangle r = ClientRectangle;
+			PointD p1; 
 
-			cursor = new Rectangle(new Size(_cursorWidth,(int) (r.Height)));
-
-			PointD p1 = r.TopLeft + new Point(cursor.Width/2, r.Height / 2);
-
-			unity = (double)(r.Width - cursor.Width) / (Maximum - Minimum);
-
-			cursor.TopLeft = new Point(r.Left + (int)(Value * unity),
-                                        (int)(p1.Y - cursor.Height / 2));  
+			if (_orientation == Orientation.Horizontal) {
+				cursor = new Rectangle (new Size (_cursorSize, (int)(r.Height)));
+				p1 = r.TopLeft + new Point (_cursorSize / 2, r.Height / 2);
+				unity = (double)(r.Width - _cursorSize) / (Maximum - Minimum);
+				cursor.TopLeft = new Point (r.Left + (int)(Value * unity),
+					(int)(p1.Y - cursor.Height / 2));
+			} else {
+				cursor = new Rectangle (new Size ((int)(r.Width), _cursorSize));
+				p1 = r.TopLeft + new Point (r.Width / 2, _cursorSize / 2);
+				unity = (double)(r.Height - _cursorSize) / (Maximum - Minimum);
+				cursor.TopLeft = new Point ((int)(p1.X - r.Width / 2),
+					r.Top + (int)(Value * unity));				
+			}
         }
         
 		#region mouse handling
@@ -126,13 +146,20 @@ namespace go
 		{
 			base.onMouseButtonDown (sender, e);
 
-			Rectangle cursInScreenCoord = ScreenCoordinates(cursor+Slot.Position);
-			if (cursInScreenCoord.ContainsOrIsEqual(e.Position))
+			Rectangle cursInScreenCoord = ScreenCoordinates (cursor + Slot.Position);
+			if (cursInScreenCoord.ContainsOrIsEqual (e.Position))
 				holdCursor = true;
-			else if (e.Position.X < cursInScreenCoord.Left)
-				Value -= LargeIncrement;
-            else
-				Value += LargeIncrement;
+			else if (_orientation == Orientation.Horizontal) {
+				if (e.Position.X < cursInScreenCoord.Left)
+					Value -= LargeIncrement;
+				else
+					Value += LargeIncrement;
+			} else {
+				if (e.Position.Y < cursInScreenCoord.Top)
+					Value -= LargeIncrement;
+				else
+					Value += LargeIncrement;
+			}
 		}
 		public override void onMouseButtonUp (object sender, OpenTK.Input.MouseButtonEventArgs e)
 		{
@@ -142,8 +169,12 @@ namespace go
 		}
 		public override void onMouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
 		{
-			if (holdCursor)
-				Value += (double)e.XDelta / unity;
+			if (holdCursor) {
+				if (_orientation == Orientation.Horizontal)
+					Value += (double)e.XDelta / unity;
+				else
+					Value += (double)e.YDelta / unity;
+			}
 			
 			base.onMouseMove (sender, e);
 		}

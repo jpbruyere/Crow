@@ -270,8 +270,10 @@ namespace go
 				
 				if (!srcValueType.IsValueType)
 					il.Emit(OpCodes.Castclass, srcValueType);
+				else if (piTarget.PropertyType != srcValueType)
+					il.Emit(OpCodes.Callvirt, GetConvertMethod( piTarget.PropertyType ));
 				else
-					il.Emit( OpCodes.Callvirt, GetConvertMethod( piTarget.PropertyType ));
+					il.Emit(OpCodes.Unbox_Any, piTarget.PropertyType);
 			//	if (piTarget.PropertyType == typeof(string))
 //				else if ( srcValueType != piTarget.PropertyType)
 //					

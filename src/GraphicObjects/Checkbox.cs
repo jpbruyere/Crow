@@ -25,10 +25,7 @@ namespace go
 		public Checkbox() : base()
 		{
 		}	
-		protected override void loadDefaultValues ()
-		{
-			base.loadDefaultValues ();
-		}
+
 		protected override void loadTemplate(GraphicObject template = null)
 		{			
 			base.loadTemplate (template);
@@ -70,11 +67,6 @@ namespace go
 		{
 			IsChecked = !IsChecked;
 			base.onMouseClick (sender, e);
-		}
-
-		public override void ReadXml (System.Xml.XmlReader reader)
-		{
-			base.ReadXml (reader);
 		}
 	}
 }

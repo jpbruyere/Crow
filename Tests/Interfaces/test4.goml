@@ -12,6 +12,7 @@
 		<HorizontalStack Name="hs0"
 			WidgetSpacing="1" 
 			VerticalAlignment="Top">
+			<Slider Orientation="Vertical" Height="300" Width="10" Background="Transparent" />
 			<VerticalStack Name="vs1" Spacing="5">
 				<Slider Height="10" Width="300" BorderWidth="1" Background="Transparent" />
 				<Label Name="labMouse" Text="MousePos"/>

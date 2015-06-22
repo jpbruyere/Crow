@@ -40,18 +40,17 @@ namespace test
 				if (_fps == value)
 					return;
 
-				int oldVal = _fps;
 				_fps = value;
 
 				if (_fps > fpsMax) {
 					fpsMax = _fps;
-					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMax", fpsMax, _fps));
+					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMax", fpsMax));
 				} else if (_fps < fpsMin) {
-					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMin", fpsMin, _fps));
 					fpsMin = _fps;
+					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMin", fpsMin));
 				}
 
-				ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", oldVal, _fps));
+				ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
 			}
 		}
 
@@ -139,7 +138,7 @@ namespace test
 				if (i > 50)
 					break;
 			}
-			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", null, TestList));
+			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
 		}
 		void pFps_mousemove(object sender, MouseMoveEventArgs e)
 		{

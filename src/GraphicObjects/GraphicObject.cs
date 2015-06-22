@@ -19,8 +19,16 @@ using System.Xml;
 
 namespace go
 {
-	public class GraphicObject : IXmlSerializable, ILayoutable
+	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange
 	{
+		#region IValueChange implementation
+		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+		void NotifyValueChanged(string MemberName, object _value)
+		{
+			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));			
+		}
+		#endregion
+
 		#region CTOR
 		public GraphicObject ()
 		{
@@ -115,7 +123,12 @@ namespace go
 		[XmlAttributeAttribute()][DefaultValue("unamed")]
 		public virtual string Name {
 			get { return _name; }
-			set { _name = value; }
+			set { 
+				if (_name == value)
+					return;
+				_name = value; 
+				NotifyValueChanged("Name", _verticalAlignment);
+			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(VerticalAlignment.Center)]
 		public virtual VerticalAlignment VerticalAlignment {
@@ -125,14 +138,19 @@ namespace go
 					return;
 
 				_verticalAlignment = value; 
-
-//				if (Top > 0)
+				NotifyValueChanged("VerticalAlignment", _verticalAlignment);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(HorizontalAlignment.Center)]
 		public virtual HorizontalAlignment HorizontalAlignment {
 			get { return _horizontalAlignment; }
-			set { _horizontalAlignment = value; }
+			set { 
+				if (_horizontalAlignment == value)
+					return;
+
+				_horizontalAlignment = value; 
+				NotifyValueChanged("HorizontalAlignment", _horizontalAlignment);
+			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Left {
@@ -142,7 +160,7 @@ namespace go
 					return;
 
 				Bounds.X = value;
-
+				NotifyValueChanged ("Left", Bounds.X);
 				this.RegisterForLayouting ((int)LayoutingType.X);
 			}
 		}
@@ -154,7 +172,7 @@ namespace go
 					return;
 
 				Bounds.Y = value;
-
+				NotifyValueChanged ("Top", Bounds.Y);
 				this.RegisterForLayouting ((int)LayoutingType.Y);
 			}
 		}
@@ -166,7 +184,7 @@ namespace go
 					return;
 
 				Bounds.Width = value;
-
+				NotifyValueChanged ("Width", Bounds.Width);
 				this.RegisterForLayouting ((int)LayoutingType.Width);
 			}
 		}
@@ -178,7 +196,7 @@ namespace go
 					return;
 
 				Bounds.Height = value;
-
+				NotifyValueChanged ("Height", Bounds.Height);
 				this.RegisterForLayouting ((int)LayoutingType.Height);
 			}
 		}

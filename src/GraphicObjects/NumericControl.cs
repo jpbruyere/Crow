@@ -90,8 +90,6 @@ namespace go
 				if (value == _actualValue)
 					return;
 
-				int oldV = Convert.ToInt32(_actualValue);
-
 				if (value < minValue)
 					_actualValue = minValue;
 				else if (value > maxValue)
@@ -99,7 +97,7 @@ namespace go
 				else                    
 					_actualValue = value;
 
-				onValueChanged(this,new ValueChangeEventArgs("Value", oldV, Convert.ToInt32( _actualValue)));
+				onValueChanged(this,new ValueChangeEventArgs("Value", Convert.ToInt32( _actualValue)));
 				registerForGraphicUpdate();
 			}
 		}

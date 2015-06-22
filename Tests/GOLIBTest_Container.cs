@@ -27,21 +27,18 @@ namespace test2
 				if (_fps == value)
 					return;
 				
-				int oldVal = _fps;
 				_fps = value;
 
 				if (_fps > fpsMax) {
 					fpsMax = _fps;
-					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMax", fpsMax, _fps));
+					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMax", fpsMax));
 				} else if (_fps < fpsMin) {
-					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMin", fpsMin, _fps));
 					fpsMin = _fps;
+					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMin", fpsMin));
 				}
 
 				if (ValueChanged != null)
-					ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", oldVal, _fps));
-
-				//ValueChanged.Raise (this, new ValueChangeEventArgs ("fps", oldVal, _fps));
+					ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
 			}
 		}
 		string name = "testName";

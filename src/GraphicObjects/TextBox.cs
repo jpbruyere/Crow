@@ -69,7 +69,7 @@ namespace go
 
 		public event EventHandler<TextChangeEventArgs> TextChanged;
 
-		public virtual void onTextChanged(Object sender, TextChangeEventArgs e)
+		public virtual void OnTextChanged(Object sender, TextChangeEventArgs e)
 		{
 			TextChanged.Raise (this, e);
 		}
@@ -102,7 +102,7 @@ namespace go
 				break;
 			case Key.Enter:
 			case Key.KeypadEnter:
-				onTextChanged(this,new TextChangeEventArgs(Text));
+				OnTextChanged(this,new TextChangeEventArgs(Text));
 				break;
 			case Key.Escape:
 				Text = "";
