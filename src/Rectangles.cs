@@ -100,9 +100,9 @@ namespace go
 				Rectangle r = rInList;
 
 				if (sw.VerticalScrolling)
-					r.Top -= sw.ScrollY;
+					r.Top -= (int)sw.ScrollY;
 				if (sw.HorizontalScrolling)
-					r.Left -= sw.ScrollX;
+					r.Left -= (int)sw.ScrollX;
 
 				newList.Add(r);
 			}
@@ -122,11 +122,11 @@ namespace go
                 if (sw != null)
                 {
 					if (sw.VerticalScrolling) {
-						rebasedR.Top -= sw.ScrollY;
+						rebasedR.Top -= (int)sw.ScrollY;
 //						if (sw.scrollY < 0)
 //							Debug.WriteLine ("..");
 					}if (sw.HorizontalScrolling)
-						rebasedR.Left -= sw.ScrollX;
+						rebasedR.Left -= (int)sw.ScrollX;
                 }
 
                 newList.Add(rebasedR);

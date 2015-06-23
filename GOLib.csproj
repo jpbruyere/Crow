@@ -77,7 +77,6 @@
     <Compile Include="src\GraphicObjects\Button.cs" />
     <Compile Include="src\GraphicObjects\GraduatedSlider.cs" />
     <Compile Include="src\GraphicObjects\Slider.cs" />
-    <Compile Include="src\ValueChangeEventArgs.cs" />
     <Compile Include="src\GraphicObjects\NumericControl.cs" />
     <Compile Include="src\GraphicObjects\Scroller.cs" />
     <Compile Include="src\GraphicObjects\ILayoutable.cs" />
@@ -87,7 +86,6 @@
     <Compile Include="src\GraphicObjects\AnalogMeter.cs" />
     <Compile Include="src\GraphicObjects\Border.cs" />
     <Compile Include="src\Font.cs" />
-    <Compile Include="src\TextChangeEventArgs.cs" />
     <Compile Include="src\OpenGL\QuadVAO.cs" />
     <Compile Include="src\OpenGL\Shader.cs" />
     <Compile Include="src\OpenGL\TexturedShader.cs" />
@@ -113,6 +111,9 @@
     <Compile Include="src\GraphicObjects\TemplatedContainer.cs" />
     <Compile Include="src\GraphicObjects\Popper.cs" />
     <Compile Include="src\GraphicObjects\Scrollbar.cs" />
+    <Compile Include="src\TextChangeEventArgs.cs" />
+    <Compile Include="src\ValueChangeEventArgs.cs" />
+    <Compile Include="src\LayoutChangeEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

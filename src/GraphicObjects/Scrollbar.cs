@@ -57,6 +57,10 @@ namespace go
 				if (_scroll == value)
 					return;
 				_scroll = value;
+				if (_scroll < 0.0)
+					_scroll = 0.0;
+				else if (_scroll > _maximumScroll)
+					_scroll = _maximumScroll;
 				registerForGraphicUpdate ();
 				ValueChanged.Raise(this, new ValueChangeEventArgs ("Scroll", _scroll));
 			}
@@ -79,6 +83,12 @@ namespace go
 		public void onScrollForth (object sender, MouseButtonEventArgs e)
 		{
 			Scroll += _slider.LargeIncrement;
+
 		}
+
+		public void onSliderValueChange(object sender, ValueChangeEventArgs e){
+			Scroll = Convert.ToDouble(e.NewValue);
+		}
+
 	}
 }

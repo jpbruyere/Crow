@@ -2,16 +2,13 @@
 
 namespace go
 {
-	public class ValueChangeEventArgs: EventArgs
+	public class TextChangeEventArgs: EventArgs
 	{
-		public string MemberName;
-		public object NewValue;
+		public String Text;
 
-
-		public ValueChangeEventArgs (string _memberName, object _newValue) : base()
+		public TextChangeEventArgs (string _newValue) : base()
 		{
-			MemberName = _memberName;
-			NewValue = _newValue;
+			Text = _newValue;
 		}
 	}
 }

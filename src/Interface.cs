@@ -209,9 +209,13 @@ namespace go
 							continue;
 						}
 
-						FieldInfo fi = CompilerServices.getEventHandlerField (es.Source.GetType (), es.MemberName);
-						Delegate del = Delegate.CreateDelegate (fi.FieldType, hostClass, mi);
-						fi.SetValue (es.Source, del);
+						EventInfo ei = es.Source.GetType ().GetEvent (es.MemberName);
+						MethodInfo addHandler = ei.GetAddMethod ();
+						Delegate del = Delegate.CreateDelegate (ei.EventHandlerType, hostClass, mi);
+
+
+						addHandler.Invoke(es.Source, new object[] {del});
+
 					}
 				} else {
 					CompilerServices.ResolveBinding (es, hostClass);

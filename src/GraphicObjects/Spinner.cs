@@ -65,11 +65,7 @@ namespace go
 			Value -= this.SmallIncrement;
 			labCpt.Text = Value.ToString ();
 		}
-		public override void onValueChanged (object sender, ValueChangeEventArgs e)
-		{
-			//labCpt.Text = e.NewValue.ToString ();
-			base.onValueChanged (sender, e);
-		}
+
 	}
 }
 

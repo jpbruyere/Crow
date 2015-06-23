@@ -63,7 +63,18 @@ namespace go
 			set { _orientation = value; }
 		}
 		#endregion
+		[XmlAttributeAttribute()][DefaultValue(10.0)]
+		public override double Maximum {
+			get { return base.Maximum; }
+			set {
+				if (value == base.Maximum)
+					return;
+				base.Maximum = value;
+				LargeIncrement = base.Maximum / 10.0;
+				SmallIncrement = LargeIncrement / 5.0;
 
+			}
+		}
 		#region GraphicObject Overrides
 		[XmlAttributeAttribute()][DefaultValue("Gray")]
 		public override Color Background {

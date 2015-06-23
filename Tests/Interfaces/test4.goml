@@ -135,7 +135,7 @@
 			</VerticalStack>
 			<HorizontalStack Height="350" Width="250">
 				<Scroller Name="scroller1" Background="DimGray" Height="0" Width="0"  
-					 Margin="5" VerticalScrolling="true">
+					 Margin="5" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">
 					<VerticalStack Name="colors" VerticalAlignment="Top" Margin="1">
 						<ProgressBar Name="pbBar2" Width="100" Height="20" Value="50"
 									BorderWidth="2" BorderColor="White" Foreground="BlueCrayola" Background="DarkGray"/>

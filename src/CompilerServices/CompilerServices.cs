@@ -157,6 +157,7 @@ namespace go
 		public static void ResolveBinding(DynAttribute binding, object _source)
 		{			
 			object srcGO = _source;
+			string statement = binding.Value;
 
 			Type srcType = _source.GetType ();
 			Type dstType = binding.Source.GetType ();
@@ -178,9 +179,9 @@ namespace go
 					srcGO = (srcGO as GraphicObject).FindByName (bindTrg [0]);
 					srcType = srcGO.GetType ();
 				}
-				miSrc = srcType.GetMember (bindTrg.LastOrDefault()).FirstOrDefault ();
-			}else
-				miSrc = srcType.GetMember (binding.Value).FirstOrDefault ();
+				statement = bindTrg.LastOrDefault ();
+			}
+			miSrc = srcType.GetMember (statement).FirstOrDefault ();
 				
 
 			#region initialize target with actual value
@@ -245,7 +246,7 @@ namespace go
 			System.Reflection.Emit.Label labContinue = il.DefineLabel();
 
 			#region test if valueChange event is the correct one
-			il.Emit (OpCodes.Ldstr, binding.Value);
+			il.Emit (OpCodes.Ldstr, statement);
 			//push name from arg
 			il.Emit(OpCodes.Ldarg_1);
 			FieldInfo fiMbName = typeof(ValueChangeEventArgs).GetField("MemberName");
@@ -257,11 +258,10 @@ namespace go
 			il.MarkLabel(labContinue);
 			#endregion
 
-			string[] srcLines = binding.Value.Trim().Split (new char[] { ';' });
-			foreach (string srcLine in srcLines) {
+//			string[] srcLines = binding.Value.Trim().Split (new char[] { ';' });
+//			foreach (string srcLine in srcLines) {
 				//MethodInfo infoWriteLine = typeof(System.Diagnostics.Debug).GetMethod("WriteLine", new Type[] { typeof(string) });
-
-				string statement = srcLine.Trim ();
+							
 
 				//load target ref onto the stack
 				FieldInfo fiRefs = typeof(Interface).GetField("References");
@@ -300,7 +300,7 @@ namespace go
 //					
 				
 				il.Emit(OpCodes.Callvirt, piTarget.GetSetMethod());
-			}
+			//}
 			il.MarkLabel(labFailed);
 			il.Emit(OpCodes.Ret);
 

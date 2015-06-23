@@ -25,7 +25,7 @@ namespace go
 			get { return child; }
 			set { child = value; }
 		}
-		public T SetChild<T> (T _child)
+		public virtual T SetChild<T> (T _child)
 		{
 			return base.SetChild (_child);
 		}

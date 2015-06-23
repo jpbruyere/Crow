@@ -23,7 +23,7 @@ namespace go
 	{
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-		void NotifyValueChanged(string MemberName, object _value)
+		public virtual void NotifyValueChanged(string MemberName, object _value)
 		{
 			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));			
 		}
@@ -116,7 +116,7 @@ namespace go
 		public event EventHandler<KeyboardKeyEventArgs> KeyUp;
 		public event EventHandler Focused;
 		public event EventHandler Unfocused;
-
+		public event EventHandler<LayoutChangeEventArgs> LayoutChanged;
 		#endregion
 
 		#region public properties
@@ -462,7 +462,8 @@ namespace go
 				if ((Parent as GenericStack).Orientation == Orientation.Vertical)
 					this.Parent.RegisterForLayouting ((int)LayoutingType.PositionChildren);
 				break;
-			}			
+			}
+			LayoutChanged.Raise (this, new LayoutChangeEventArgs (layoutType));
 		}
 		public virtual void UpdateLayout (LayoutingType layoutType)
 		{			

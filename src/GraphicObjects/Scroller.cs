@@ -20,8 +20,8 @@ namespace go
 		bool _verticalScrolling;
 		bool _horizontalScrolling;
 		bool _scrollbarVisible;
-		int _scrollX = 0;
-		int _scrollY = 0;
+		double _scrollX = 0.0;
+		double _scrollY = 0.0;
 
 
 		#region public properties
@@ -44,26 +44,32 @@ namespace go
 		}
 
 
-		[XmlIgnore]         
-		public int ScrollX {
+		[XmlAttributeAttribute][DefaultValue(0.0)]
+		public double ScrollX {
 			get {
 				return _scrollX;
 			}
 			set {
+				if (_scrollX == value)
+					return;
 				_scrollX = value;
 				ValueChanged.Raise(this, new ValueChangeEventArgs("ScrollX", _scrollX));
+				RegisterForRedraw();
 			}
 		}
 
 
-		[XmlIgnore]
-		public int ScrollY {
+		[XmlAttributeAttribute][DefaultValue(0.0)]
+		public double ScrollY {
 			get {
 				return _scrollY;
 			}
 			set {
+				if (_scrollY == value)
+					return;
 				_scrollY = value;
 				ValueChanged.Raise(this, new ValueChangeEventArgs("ScrollY", _scrollY));
+				RegisterForRedraw();
 			}
 		}
 
@@ -87,15 +93,23 @@ namespace go
         }
 
 		#region GraphicObject Overrides
-		protected override void OnLayoutChanges (LayoutingType layoutType)
+		void OnChildLayoutChanges (object sender, LayoutChangeEventArgs arg)
 		{
-			base.OnLayoutChanges (layoutType);
-
 			if (_verticalScrolling) {
-				if (layoutType  == LayoutingType.Height)
+				if (arg.LayoutType  == LayoutingType.Height)
 					ValueChanged.Raise(this, new ValueChangeEventArgs("MaximumScroll", MaximumScroll));				
-			}else if (layoutType  == LayoutingType.Width)
+			}else if (arg.LayoutType  == LayoutingType.Width)
 				ValueChanged.Raise(this, new ValueChangeEventArgs("MaximumScroll", MaximumScroll));				
+		}
+		public override T SetChild<T> (T _child)
+		{			
+			GraphicObject c = child as GraphicObject;
+			if (c != null)
+				c.LayoutChanged -= OnChildLayoutChanges;
+			c = _child as GraphicObject;
+			if (c != null)
+				c.LayoutChanged += OnChildLayoutChanges;
+			return base.SetChild (_child);
 		}
 		#endregion
 
@@ -106,7 +120,7 @@ namespace go
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
-			Point m = e.Position - new Point (ScrollX, ScrollY);
+			Point m = e.Position - new Point ((int)ScrollX, (int)ScrollY);
 			base.onMouseMove (sender, new MouseMoveEventArgs(m.X,m.Y,e.XDelta,e.YDelta));
 		}
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
@@ -125,8 +139,8 @@ namespace go
 
 				ScrollY -= e.Delta * ScrollSpeed;
 
-                if (ScrollY < 0)
-                    ScrollY = 0;
+                if (ScrollY < 0.0)
+                    ScrollY = 0.0;
 				else if (ScrollY > Child.Slot.Height - ClientRectangle.Height)
 					ScrollY = Child.Slot.Height - ClientRectangle.Height;
 
@@ -138,26 +152,26 @@ namespace go
 
 				ScrollX -= e.Delta * ScrollSpeed;
 
-				if (ScrollX < 0)
-					ScrollX = 0;
+				if (ScrollX < 0.0)
+					ScrollX = 0.0;
 				else if (ScrollX > Child.Slot.Width - ClientRectangle.Width)
 					ScrollX = Child.Slot.Width - ClientRectangle.Width;
             }
 
 
             //renderBounds.Y = -scrollY;
-            RegisterForRedraw();
+            //RegisterForRedraw();
 			//Parent.registerForGraphicUpdate ();
         }
 		#endregion
 
 		public override Rectangle ContextCoordinates (Rectangle r)
 		{
-			return base.ContextCoordinates (r) - new Point(ScrollX,ScrollY);
+			return base.ContextCoordinates (r) - new Point((int)ScrollX,(int)ScrollY);
 		}
 		public override Rectangle ScreenCoordinates (Rectangle r)
 		{
-			return base.ScreenCoordinates (r) - new Point(ScrollX,ScrollY);
+			return base.ScreenCoordinates (r) - new Point((int)ScrollX,(int)ScrollY);
 		}
 
 		public override void registerClipRect ()

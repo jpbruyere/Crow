@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace go
 {
-	public abstract class NumericControl : TemplatedControl, IValueChange
+	public abstract class NumericControl : TemplatedControl
 	{
 		#region CTOR
 		public NumericControl () : base()
@@ -20,14 +20,7 @@ namespace go
 		}
 		#endregion
 
-		#region event handlers
-		public EventHandler<ValueChangeEventArgs> ValueChanged;
 
-		public virtual void onValueChanged(object sender, ValueChangeEventArgs e)
-		{			
-			ValueChanged.Raise (sender, e);
-		}
-		#endregion
 
 		#region private fields
 		double _actualValue, minValue, maxValue, smallStep, bigStep;
@@ -97,7 +90,7 @@ namespace go
 				else                    
 					_actualValue = value;
 
-				onValueChanged(this,new ValueChangeEventArgs("Value", Convert.ToInt32( _actualValue)));
+				NotifyValueChanged("Value",  _actualValue);
 				registerForGraphicUpdate();
 			}
 		}
