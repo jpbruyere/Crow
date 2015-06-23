@@ -25,6 +25,8 @@ namespace go
 
 		Orientation _orientation;
 		Slider _slider;
+		double _maximumScroll;
+		double _scroll;
 
 		public Scrollbar() : base()
 		{
@@ -36,6 +38,29 @@ namespace go
 			_slider = this.child.FindByName ("Slider") as Slider;
 		}
 
+		[XmlAttributeAttribute()][DefaultValue(0.0)]
+		public virtual double MaximumScroll
+		{
+			get { return _maximumScroll; }
+			set {
+				if (_maximumScroll == value)
+					return;
+				_maximumScroll = value;
+				ValueChanged.Raise(this, new ValueChangeEventArgs ("MaximumScroll", _maximumScroll));
+			}
+		}
+		[XmlAttributeAttribute()][DefaultValue(0.0)]
+		public virtual double Scroll
+		{
+			get { return _scroll; }
+			set {
+				if (_scroll == value)
+					return;
+				_scroll = value;
+				registerForGraphicUpdate ();
+				ValueChanged.Raise(this, new ValueChangeEventArgs ("Scroll", _scroll));
+			}
+		}
 		[XmlAttributeAttribute()][DefaultValue(Orientation.Vertical)]
 		public virtual Orientation Orientation
 		{
@@ -49,11 +74,11 @@ namespace go
 		}
 		public void onScrollBack (object sender, MouseButtonEventArgs e)
 		{
-			_slider.Value -= _slider.LargeIncrement;
+			Scroll -= _slider.LargeIncrement;
 		}
 		public void onScrollForth (object sender, MouseButtonEventArgs e)
 		{
-			_slider.Value += _slider.LargeIncrement;
+			Scroll += _slider.LargeIncrement;
 		}
 	}
 }

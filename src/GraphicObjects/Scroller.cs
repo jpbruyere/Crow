@@ -11,8 +11,12 @@ using System.ComponentModel;
 
 namespace go
 {
-	public class Scroller : Container
+	public class Scroller : Container, IValueChange
     {
+		#region IValueChange implementation
+		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+		#endregion
+
 		bool _verticalScrolling;
 		bool _horizontalScrolling;
 		bool _scrollbarVisible;
@@ -47,6 +51,7 @@ namespace go
 			}
 			set {
 				_scrollX = value;
+				ValueChanged.Raise(this, new ValueChangeEventArgs("ScrollX", _scrollX));
 			}
 		}
 
@@ -58,6 +63,16 @@ namespace go
 			}
 			set {
 				_scrollY = value;
+				ValueChanged.Raise(this, new ValueChangeEventArgs("ScrollY", _scrollY));
+			}
+		}
+
+		[XmlIgnore]
+		public int MaximumScroll {
+			get {
+				return VerticalScrolling ?
+					Child.Slot.Height - ClientRectangle.Height :
+					Child.Slot.Width - ClientRectangle.Width;				
 			}
 		}
 
@@ -72,7 +87,16 @@ namespace go
         }
 
 		#region GraphicObject Overrides
+		protected override void OnLayoutChanges (LayoutingType layoutType)
+		{
+			base.OnLayoutChanges (layoutType);
 
+			if (_verticalScrolling) {
+				if (layoutType  == LayoutingType.Height)
+					ValueChanged.Raise(this, new ValueChangeEventArgs("MaximumScroll", MaximumScroll));				
+			}else if (layoutType  == LayoutingType.Width)
+				ValueChanged.Raise(this, new ValueChangeEventArgs("MaximumScroll", MaximumScroll));				
+		}
 		#endregion
 
 		#region Mouse handling

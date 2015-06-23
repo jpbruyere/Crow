@@ -78,14 +78,16 @@ namespace go
 		}
 		protected override void UpdateGraphic ()
 		{
-			computeCursorPosition();
+			if (Maximum > 0)
+				computeCursorPosition();
 			base.UpdateGraphic ();
 		}
 
 		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
-
+			if (Maximum <= 0)
+				return;
 			Rectangle r = ClientRectangle;
 			PointD pStart;
 			PointD pEnd;

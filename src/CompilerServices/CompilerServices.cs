@@ -156,21 +156,42 @@ namespace go
 
 		public static void ResolveBinding(DynAttribute binding, object _source)
 		{			
+			object srcGO = _source;
+
 			Type srcType = _source.GetType ();
 			Type dstType = binding.Source.GetType ();
 
 			MemberInfo miDst = dstType.GetMember (binding.MemberName).FirstOrDefault ();
-			MemberInfo miSrc = srcType.GetMember (binding.Value).FirstOrDefault();
+			string[] bindingExp = binding.Value.Split ('/');
+			MemberInfo miSrc;
+			if (bindingExp.Length > 1){
+				int i = 0;
+				srcGO = binding.Source; //starts parsing from current GO
+				while (bindingExp [i] == "..") {
+					srcGO = (srcGO as ILayoutable).Parent as GraphicObject;
+					i++;
+				}
+				string[] bindTrg = bindingExp [i].Split ('.');
+				if (bindTrg.Length == 1)
+					srcType = srcGO.GetType ();
+				else {
+					srcGO = (srcGO as GraphicObject).FindByName (bindTrg [0]);
+					srcType = srcGO.GetType ();
+				}
+				miSrc = srcType.GetMember (bindTrg.LastOrDefault()).FirstOrDefault ();
+			}else
+				miSrc = srcType.GetMember (binding.Value).FirstOrDefault ();
+				
 
 			#region initialize target with actual value
 			object srcVal = null;
 			if (miSrc == null)
-				srcVal = _source;//if no member is provided for binding, source raw value is taken
+				srcVal = srcGO;//if no member is provided for binding, source raw value is taken
 			else {
 				if (miSrc.MemberType == MemberTypes.Property)
-					srcVal = (miSrc as PropertyInfo).GetGetMethod ().Invoke (_source, null);
+					srcVal = (miSrc as PropertyInfo).GetGetMethod ().Invoke (srcGO, null);
 				else if (miSrc.MemberType == MemberTypes.Field)
-					srcVal = (miSrc as FieldInfo).GetValue (_source);
+					srcVal = (miSrc as FieldInfo).GetValue (srcGO);
 				else
 					throw new Exception ("unandled source member type for binding");
 			}
@@ -288,7 +309,7 @@ namespace go
 			Delegate del = dm.CreateDelegate(ei.EventHandlerType);
 			MethodInfo addHandler = ei.GetAddMethod ();
 			//Delegate del = dm.CreateDelegate(typeof(System.EventHandler));
-			addHandler.Invoke(_source, new object[] {del});
+			addHandler.Invoke(srcGO, new object[] {del});
 		}
 
 		#region conversions
@@ -307,6 +328,8 @@ namespace go
 				name = "ToInt32";
 			else if( targetType == typeof( long ) )
 				name = "ToInt64";
+			else if( targetType == typeof( double ) )
+				name = "ToDouble";
 			else if (targetType == typeof (string ) )
 				return typeof(object).GetMethod("ToString", Type.EmptyTypes);
 			else

@@ -133,15 +133,17 @@
 						TextAlignment="Center" Background="AoEnglish"/>
 				</HorizontalStack>
 			</VerticalStack>
-
-			<Scroller Background="DimGray" Height="350" Width="150"  
-				 Margin="5" VerticalScrolling="true">
-				<VerticalStack Name="colors" VerticalAlignment="Top" Margin="5">
-					<ProgressBar Name="pbBar2" Width="100" Height="20" Value="50"
-								BorderWidth="2" BorderColor="White" Foreground="BlueCrayola" Background="DarkGray"/>
-				</VerticalStack>
-			</Scroller>
-
+			<HorizontalStack Height="350" Width="250">
+				<Scroller Name="scroller1" Background="DimGray" Height="0" Width="0"  
+					 Margin="5" VerticalScrolling="true">
+					<VerticalStack Name="colors" VerticalAlignment="Top" Margin="1">
+						<ProgressBar Name="pbBar2" Width="100" Height="20" Value="50"
+									BorderWidth="2" BorderColor="White" Foreground="BlueCrayola" Background="DarkGray"/>
+					</VerticalStack>
+				</Scroller>
+				<Scrollbar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" MaximumScroll="{../scroller1.MaximumScroll}"
+					Orientation="Vertical" Width="16" />
+			</HorizontalStack>
 		</HorizontalStack>
 
 		<Slider 

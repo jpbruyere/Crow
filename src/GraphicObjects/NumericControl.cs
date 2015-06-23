@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace go
 {
-	public abstract class NumericControl : TemplatedControl
+	public abstract class NumericControl : TemplatedControl, IValueChange
 	{
 		#region CTOR
 		public NumericControl () : base()
