@@ -88,7 +88,7 @@ namespace test
 			//c2.VerticalAlignment = VerticalAlignment.Top;
 			c.Background.AdjustAlpha (0.5);
 			labMousePos = c.FindByName ("labMouse") as Label;
-			pb = c.FindByName("pbBar") as ProgressBar;
+			//pb = c.FindByName("pbBar") as ProgressBar;
 			pb2 = c.FindByName("pbBar2") as ProgressBar;
 			labPb = c.FindByName ("labPb") as Label;
 			labF = c.FindByName ("labFocus") as Label;
@@ -135,8 +135,8 @@ namespace test
 					}
 				);
 				i++;
-				if (i > 250)
-					break;
+//				if (i > 150)
+//					break;
 			}
 			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
 		}
@@ -171,11 +171,10 @@ namespace test
 			}
 			frameCpt++;
 
-			if (pb.Value == pb.Maximum)
-				pb.Value = 0;
-			pb.Value++;
-			pb2.Value = pb.Value;
-			//labPb.Text = pb.Value.ToString ();
+			if (pb2.Value == pb2.Maximum)
+				pb2.Value = 0;
+			pb2.Value++;
+
 			if (FocusedWidget==null)
 				labF.Text = "- none -";
 			else

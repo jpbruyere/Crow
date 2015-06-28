@@ -199,8 +199,10 @@ namespace go
 			if (miDst.MemberType == MemberTypes.Property) {
 				PropertyInfo piDst = miDst as PropertyInfo;
 				//TODO: handle other dest type conversions
-				if (piDst.PropertyType == typeof(string))
-					srcVal = srcVal.ToString ();
+				if (piDst.PropertyType == typeof(string)){
+					if (srcVal != null)
+						srcVal = srcVal.ToString ();
+				}
 				piDst.GetSetMethod ().Invoke (binding.Source, new object[] { srcVal });
 			} else if (miDst.MemberType == MemberTypes.Field) {
 				FieldInfo fiDst = miDst as FieldInfo;

@@ -48,15 +48,15 @@
 <!--				<ListBox Data="{TestList}"></ListBox>-->
 				<HorizontalStack Name="hsPbar" Margin="5">
 					<ProgressBar Name="pbBar" 
-						Width="100" Height="20"
+						Width="200" Height="20"
 						Minimum="0"
 						Maximum="200"
-						Value="50"
+						Value="{fps}"
 						Foreground="BlueCrayola" Background="DarkGray"
 						BorderWidth="2" BorderColor="White"/>
-					<Label Name="labPb"
+<!--					<Label Name="labPb"
 						Width="30"
-						TextAlignment="RightCenter"/>
+						TextAlignment="RightCenter"/>-->
 				</HorizontalStack>
 				<HorizontalStack  Name="hsFocus">
 					<Label Text="Focused:"/>
@@ -79,7 +79,7 @@
 								Text="editable text"/>
 				<GroupBox Title="Group Box" Width="300" Height="100" 
 					BorderColor="White" BorderWidth="2" Margin="3">
-					<Label Name="labValue" FontSize="14" Text="000"	TextAlignment="Center"/>
+					<Label Name="labValue" FontSize="14" Text="{../../slider.Value}" TextAlignment="Center"/>
 				</GroupBox>
 				<Slider Height="10" Width="300" BorderWidth="1" Background="Transparent" />
 				<GraduatedSlider Name="slider" Height="30" Width="300" Foreground="BlueBell"/>
@@ -139,6 +139,8 @@
 					<VerticalStack Name="colors" VerticalAlignment="Top" Margin="1">
 						<ProgressBar Name="pbBar2" Width="100" Height="20" Value="50"
 									BorderWidth="2" BorderColor="White" Foreground="BlueCrayola" Background="DarkGray"/>
+						<ProgressBar Width="100" Height="20" Value="{fps}" BorderWidth="2"
+							BorderColor="White" Foreground="BlueCrayola" Background="DarkGray"/>												
 					</VerticalStack>
 				</Scroller>
 				<Scrollbar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" MaximumScroll="{../scroller1.MaximumScroll}"
