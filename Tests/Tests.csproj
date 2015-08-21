@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>test.GOLIBTest_4</StartupObject>
+    <StartupObject>test.GOLIBTest_TypeViewer</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>..\bin\$(configuration)</OutputPath>
     <IntermediateOutputPath>obj\$(configuration)</IntermediateOutputPath>
@@ -45,7 +45,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GOLIBTest_5.cs" />
-    <Compile Include="GOLIBTest_0.cs" />
     <Compile Include="GOLIBTest_4.cs" />
     <Compile Include="GOLIBTest_3.cs" />
     <Compile Include="GOLIBTest_1.cs" />
@@ -61,6 +60,9 @@
     <Compile Include="GOLIBTest_Window.cs" />
     <Compile Include="GOLIBTest_Container.cs" />
     <Compile Include="GOLIBTest_Scrollbar.cs" />
+    <Compile Include="GOLIBTest_meter.cs" />
+    <Compile Include="GOLIBTest_0.cs" />
+    <Compile Include="GOLIBTest_TypeViewer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -121,6 +123,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Interfaces\testScrollbar.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\testMeter.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\testTypeViewer.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

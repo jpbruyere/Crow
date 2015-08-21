@@ -135,8 +135,8 @@ namespace test
 					}
 				);
 				i++;
-//				if (i > 150)
-//					break;
+				if (i > 150)
+					break;
 			}
 			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
 		}

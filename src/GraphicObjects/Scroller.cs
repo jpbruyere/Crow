@@ -76,8 +76,8 @@ namespace go
 		[XmlIgnore]
 		public int MaximumScroll {
 			get {
-				return VerticalScrolling ?
-					Child.Slot.Height - ClientRectangle.Height :
+				return VerticalScrolling ? 
+					child == null ? 0 : Child.Slot.Height - ClientRectangle.Height :
 					Child.Slot.Width - ClientRectangle.Width;				
 			}
 		}
@@ -134,9 +134,6 @@ namespace go
 			
 			if (VerticalScrolling )
             {
-                //add redraw call with old bounds to errase old position
-                RegisterForRedraw();
-
 				ScrollY -= e.Delta * ScrollSpeed;
 
                 if (ScrollY < 0.0)
@@ -147,9 +144,6 @@ namespace go
             }
             if (HorizontalScrolling )
             {
-                //add redraw call with old bounds to errase old position
-                RegisterForRedraw();
-
 				ScrollX -= e.Delta * ScrollSpeed;
 
 				if (ScrollX < 0.0)
@@ -157,11 +151,6 @@ namespace go
 				else if (ScrollX > Child.Slot.Width - ClientRectangle.Width)
 					ScrollX = Child.Slot.Width - ClientRectangle.Width;
             }
-
-
-            //renderBounds.Y = -scrollY;
-            //RegisterForRedraw();
-			//Parent.registerForGraphicUpdate ();
         }
 		#endregion
 

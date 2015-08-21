@@ -87,6 +87,8 @@ namespace go
 			get { return base.Focusable; }
 			set { base.Focusable = value; }
 		}
+		//TODO:seems strange to trigger layout computation in an
+		//overriding of updateGraphic
 		protected override void UpdateGraphic ()
 		{
 			if (Maximum > 0)

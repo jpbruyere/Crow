@@ -1,0 +1,12 @@
+﻿<?xml version="1.0"?>
+
+<Border  Background="SteelBlue"
+	Width="150" Height="250" BorderWidth="2">
+	<VerticalStack Height="0" Width="0" Name="hstack" Margin="0" Spacing="5">
+		<Border Height="-1" Width="0" >
+			<Label Name="labName" Text="{Name}" Width="0" Height="-1"/>
+		</Border>
+		<ListBox Data="{GetMembers ()}" Width="0" Height="-1">
+		</ListBox>
+	</VerticalStack>
+</Border>

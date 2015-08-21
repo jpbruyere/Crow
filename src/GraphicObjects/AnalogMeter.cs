@@ -5,6 +5,7 @@ using Cairo;
 
 namespace go
 {
+	[DefaultTemplate("#go.Templates.AnalogMeter0.goml")]
 	public class AnalogMeter : NumericControl
 	{
 		#region CTOR
@@ -20,29 +21,34 @@ namespace go
 
 		protected override void loadTemplate (GraphicObject template = null)
 		{
-			throw new NotImplementedException ();
+			base.loadTemplate (template);
 		}
 
 		#endregion
 
 		#region GraphicObject Overrides
 		protected override void onDraw (Context gr)
-		{
+		{			
 			base.onDraw (gr);
 
 			Rectangle r = ClientRectangle;
 			Point m = r.Center;
 
+			gr.Save ();
+
+
 			double aUnit = Math.PI*2.0 / (Maximum - Minimum);
-			gr.Translate (m.X, m.Y);
-			gr.Rotate (Value * aUnit);
+			gr.Translate (m.X, r.Height *1.1);
+			gr.Rotate (Value/4.0 * aUnit - Math.PI/4.0);
 			gr.Translate (-m.X, -m.Y);
 
 			gr.LineWidth = 2;
 			gr.Color = Foreground;
-			gr.MoveTo (m);
-			gr.LineTo (m.X, 0);
+			gr.MoveTo (m.X,0.0);
+			gr.LineTo (m.X, -m.Y*0.5);
 			gr.Stroke ();
+
+			gr.Restore ();
 		}
 		#endregion
 	}

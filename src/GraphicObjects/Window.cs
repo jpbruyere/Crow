@@ -54,7 +54,7 @@ namespace go
 
 		void butQuitPress (object sender, MouseButtonEventArgs e)
 		{
-			TopContainer.Quit ();
+			TopContainer.DeleteWidget (this);
 		}
 
 

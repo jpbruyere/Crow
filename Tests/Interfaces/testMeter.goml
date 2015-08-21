@@ -1,0 +1,2 @@
+﻿<?xml version="1.0"?>
+<AnalogMeter Width="-1" Height="-1" Background="White" Foreground="Black"  Value="{fps}" Minimum="0" Maximum="100"/>

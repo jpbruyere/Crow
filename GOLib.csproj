@@ -178,5 +178,7 @@
     <EmbeddedResource Include="Images\Icons\tetra.png" />
     <EmbeddedResource Include="Images\Icons\exit.svg" />
     <EmbeddedResource Include="Templates\Scrollbar.goml" />
+    <EmbeddedResource Include="Templates\AnalogMeter0.goml" />
+    <EmbeddedResource Include="Images\meter.svg" />
   </ItemGroup>
 </Project>

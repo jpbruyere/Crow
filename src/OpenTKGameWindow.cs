@@ -1,22 +1,16 @@
 // Released to the public domain. Use, modify and relicense at will.
 using System;
-
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Xml;
+using Cairo;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Linq;
-//using System.IO;
-//using GLU = OpenTK.Graphics.Glu;
-using Cairo;
-using System.Threading;
-
-using System.Drawing.Imaging;
-//using System.Xml.Serialization;
-//using System.Reflection;
-using System.Xml;
-using System.IO;
 
 
 
@@ -37,7 +31,7 @@ namespace go
 //		public OpenTKGameWindow(int _width, int _height, string _title="golib")
 //			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), _title)
 		{
-			VSync = VSyncMode.On;
+			//VSync = VSyncMode.On;
 		}        
 		#endregion
 
@@ -111,10 +105,7 @@ namespace go
 			{
 				if (_activeWidget == value)
 					return;
-
 				_activeWidget = value;
-
-
 			}
 		}
 		public GraphicObject hoverWidget
@@ -133,7 +124,6 @@ namespace go
 				_focusedWidget.onFocused (this, null);
 			}
 		}
-
 		#endregion
 
 		#region graphic contexte
@@ -209,6 +199,7 @@ namespace go
 			
 		#endregion
 
+		#region update
 		public Stopwatch updateTime = new Stopwatch ();
 		public Stopwatch layoutTime = new Stopwatch ();
 		public Stopwatch guTime = new Stopwatch ();
@@ -235,7 +226,7 @@ namespace go
 			}
 
 			//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
-			//redraw clip should be added when layout is complete among parents,
+			//final redraw clips should be added only when layout is completed among parents,
 			//that's why it take place in a second pass
 			GraphicObject[] gotr = new GraphicObject[gobjsToRedraw.Count];
 			gobjsToRedraw.CopyTo (gotr);
@@ -299,7 +290,9 @@ namespace go
 //				updateTime.ElapsedMilliseconds);
 
 		}						
+		#endregion
 			
+		#region loading
 		public void LoadInterface<T>(string path, out T result)
 		{
 			Interface.Load<T> (path, out result, this);
@@ -312,6 +305,7 @@ namespace go
 			AddWidget (result as GraphicObject);
 			return result;
 		}
+		#endregion
 			
 		#region Game win overrides
 		protected override void OnUpdateFrame(FrameEventArgs e)
@@ -322,8 +316,6 @@ namespace go
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
 			base.OnRenderFrame(e);
-//			if (recreateContext)
-//				createContext ();
 			OpenGLDraw ();
 		}
 		protected override void OnLoad(EventArgs e)
@@ -353,8 +345,6 @@ namespace go
 		{
 			if (texID > 0)
 				GL.DeleteTexture (texID);
-			//ctx.Dispose ();
-			//surf.Dispose ();
 		}
 
 		protected override void OnResize(EventArgs e)
@@ -464,16 +454,8 @@ namespace go
 
 		#region ILayoutable implementation
 
-		public void RegisterForLayouting (int layoutType)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public void UpdateLayout (LayoutingType layoutType)
-		{
-			throw new NotImplementedException ();
-		}
-
+		public void RegisterForLayouting (int layoutType) { throw new NotImplementedException (); }
+		public void UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public Rectangle ContextCoordinates (Rectangle r)
 		{
 			return r;
@@ -491,32 +473,9 @@ namespace go
 				throw new NotImplementedException ();
 			}
 		}
-
-		public bool SizeIsValid {
-			get { return true; }
-			set { throw new NotImplementedException ();	}
-		}
-		public bool PositionIsValid {
-			get {
-				return true;
-			}
-			set {
-				throw new NotImplementedException ();
-			}
-		}
-		public bool LayoutIsValid {
-			get {
-				return true;//tester tout les enfants a mon avis
-			}
-			set {
-				throw new NotImplementedException ();
-			}
-		}
-
 		Rectangle ILayoutable.ClientRectangle {
 			get { return new Size(this.ClientRectangle.Size.Width,this.ClientRectangle.Size.Height); }
 		}
-
 		public IGOLibHost TopContainer {
 			get { return this; }
 		}
@@ -528,9 +487,7 @@ namespace go
 		public Rectangle getBounds ()//redundant but fill ILayoutable implementation
 		{
 			return ClientRectangle;
-		}
-
-
+		}			
 		#endregion
     }
 }

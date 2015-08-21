@@ -20,8 +20,6 @@ namespace go
 		}
 		#endregion
 
-
-
 		#region private fields
 		double _actualValue, minValue, maxValue, smallStep, bigStep;
 		#endregion
@@ -38,7 +36,7 @@ namespace go
 
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(10.0)]
+		[XmlAttributeAttribute()][DefaultValue(100.0)]
 		public virtual double Maximum
 		{
 			get { return maxValue; }
@@ -50,7 +48,7 @@ namespace go
 
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(0.5)]
+		[XmlAttributeAttribute()][DefaultValue(1.0)]
 		public virtual double SmallIncrement
 		{
 			get { return smallStep; }
@@ -62,7 +60,7 @@ namespace go
 
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(2.0)]
+		[XmlAttributeAttribute()][DefaultValue(5.0)]
 		public virtual double LargeIncrement
 		{
 			get { return bigStep; }

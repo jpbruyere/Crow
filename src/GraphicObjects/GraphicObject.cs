@@ -130,7 +130,7 @@ namespace go
 				NotifyValueChanged("Name", _verticalAlignment);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(VerticalAlignment.Center)]
+		[XmlAttributeAttribute	()][DefaultValue(VerticalAlignment.Center)]
 		public virtual VerticalAlignment VerticalAlignment {
 			get { return _verticalAlignment; }
 			set { 
@@ -275,6 +275,7 @@ namespace go
 			get { return _hasFocus; }
 			set { _hasFocus = value; }
 		}
+		//TODO: only used in group, should be removed from base go object
 		[XmlIgnore]public virtual bool DrawingIsValid
 		{ get { return bmp == null ? 
 				false : 
@@ -299,6 +300,10 @@ namespace go
 		}
 		#endregion
 
+		/// <summary>
+		/// allow selection of svg subobject to draw in goml, should be improved
+		/// ex: allow access to backgroundImage.subimg from goml
+		/// </summary>
 		public string BackImgSub = null;
 
 		/// <summary>
@@ -368,32 +373,42 @@ namespace go
 			bmp = null;
 			if (TopContainer != null)
 				TopContainer.gobjsToRedraw.Add (this);
-			//RegisterForLayouting ();
-			//registerForRedraw ();
-			//Interface.registerForGraphicUpdate(this);
 		}
 		/// <summary>
 		/// Add clipping region in redraw list of interface, dont update cached object content
 		/// </summary>
 		public virtual void RegisterForRedraw ()
 		{
-			bmp = null;
 			TopContainer.gobjsToRedraw.Add (this);
 		}
 
+		/// <summary>
+		/// keep last slot components for each layouting pass to track
+		/// changes and trigger update of other component accordingly
+		/// </summary>
 		public Rectangle LastSlots;
+		/// <summary>
+		/// keep last slot painted on screen to clear traces if moved or resized
+		/// TODO: we should ensure the whole parsed widget tree is the last painted
+		/// version to clear effective oldslot if parents have been moved or resized.
+		/// IDEA is to add a ScreenCoordinates function that use only lastPaintedSlots
+		/// </summary>
 		public Rectangle LastPaintedSlot;
 
 		public virtual void registerClipRect()
 		{
 			TopContainer.redrawClip.AddRectangle (ScreenCoordinates(Slot));
+			//this clipping should take only last painted slots in ancestor tree which
+			//is not the case for now.
 			TopContainer.redrawClip.AddRectangle (ScreenCoordinates(LastPaintedSlot));
 		}
+		/// <summary> return size of content + margins </summary>
 		protected virtual Size measureRawSize ()
 		{
 			return Bounds.Size;
 		}
-
+		/// <summary> clear current layoutingQueue items for object and
+		/// trigger a new layouting pass for a layoutType </summary>
 		public virtual void RegisterForLayouting(int layoutType)
 		{
 			if (Parent == null)
@@ -439,6 +454,7 @@ namespace go
 			
 		}
 
+		/// <summary> trigger dependant sizing component update </summary>
 		protected virtual void OnLayoutChanges(LayoutingType  layoutType)
 		{
 			switch (layoutType) {
@@ -465,6 +481,8 @@ namespace go
 			}
 			LayoutChanged.Raise (this, new LayoutChangeEventArgs (layoutType));
 		}
+		/// <summary> Update layout component, this is where the computation of alignement
+		/// and size take place </summary>
 		public virtual void UpdateLayout (LayoutingType layoutType)
 		{			
 			switch (layoutType) {
@@ -572,6 +590,7 @@ namespace go
 				this.RegisterForRedraw ();
 		}
 
+		/// <summary> This is the common overridable drawing routine to create new widget </summary>
 		protected virtual void onDraw(Context gr)
 		{
 			Rectangle rBack = new Rectangle (Slot.Size);
@@ -586,6 +605,9 @@ namespace go
 			BackgroundImage.Paint (gr, rBack, BackImgSub);
 		}
 
+		/// <summary>
+		/// Interfal drawing context creation on a chached surface limited to slot size
+		/// this trigger the effective drawing routine </summary>
 		protected virtual void UpdateGraphic ()
 		{
 			LastPaintedSlot = Slot;
@@ -605,7 +627,8 @@ namespace go
 				//draw.WriteToPng ("/mnt/data/test.png");
 			}
 		}
-			
+		/// <summary> Chained painting routine on the parent context of the actual cached version
+		/// of the widget </summary>
 		public virtual void Paint (ref Context ctx, Rectangles clip = null)
 		{
 			if (!Visible)
