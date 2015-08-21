@@ -156,33 +156,40 @@ namespace go
 
 		public static void ResolveBinding(DynAttribute binding, object _source)
 		{			
-			object srcGO = _source;
+			object srcGO = null;
 			string statement = binding.Value;
 
-			Type srcType = _source.GetType ();
-			Type dstType = binding.Source.GetType ();
+			if (statement.StartsWith ("/"))//binding is done in graphic object tree, _source param is ignore
+				srcGO = binding.Source;
+			else
+				srcGO = _source;
 
-			MemberInfo miDst = dstType.GetMember (binding.MemberName).FirstOrDefault ();
 			string[] bindingExp = binding.Value.Split ('/');
-			MemberInfo miSrc;
+
 			if (bindingExp.Length > 1){
 				int i = 0;
 				srcGO = binding.Source; //starts parsing from current GO
-				while (bindingExp [i] == "..") {
-					srcGO = (srcGO as ILayoutable).Parent as GraphicObject;
+				while (i < bindingExp.Length - 1) {
+					if (bindingExp [i] == "..")
+						srcGO = (srcGO as ILayoutable).Parent as GraphicObject;
+					else
+						srcGO = (srcGO as GraphicObject).FindByName (bindingExp [i]);
 					i++;
 				}
 				string[] bindTrg = bindingExp [i].Split ('.');
-				if (bindTrg.Length == 1)
-					srcType = srcGO.GetType ();
-				else {
+
+				if (bindTrg.Length == 2) {
 					srcGO = (srcGO as GraphicObject).FindByName (bindTrg [0]);
-					srcType = srcGO.GetType ();
-				}
-				statement = bindTrg.LastOrDefault ();
+					statement = bindTrg [1];
+				} else
+					throw new Exception ("Syntax error in binding, expected 'go dot member'");
 			}
-			miSrc = srcType.GetMember (statement).FirstOrDefault ();
-				
+
+			Type srcType = srcGO.GetType ();
+			Type dstType = binding.Source.GetType ();
+
+			MemberInfo miSrc = srcType.GetMember (statement).FirstOrDefault ();
+			MemberInfo miDst = dstType.GetMember (binding.MemberName).FirstOrDefault ();
 
 			#region initialize target with actual value
 			object srcVal = null;
