@@ -379,7 +379,8 @@ namespace go
 		/// </summary>
 		public virtual void RegisterForRedraw ()
 		{
-			TopContainer.gobjsToRedraw.Add (this);
+			if (TopContainer != null)
+				TopContainer.gobjsToRedraw.Add (this);
 		}
 
 		/// <summary>
@@ -457,6 +458,9 @@ namespace go
 		/// <summary> trigger dependant sizing component update </summary>
 		protected virtual void OnLayoutChanges(LayoutingType  layoutType)
 		{
+			if (Parent==null)
+				return;
+			
 			switch (layoutType) {
 			case LayoutingType.Width:				
 				if (Parent.getBounds ().Width < 0)

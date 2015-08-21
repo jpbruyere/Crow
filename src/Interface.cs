@@ -89,6 +89,9 @@ namespace go
 			string root = "Object";
 
 			Stream stream = GetStreamFromPath (path);
+			if (stream == null)
+				throw new FileNotFoundException ("GOML file not found", path);
+			
 			using (XmlReader reader = XmlReader.Create (stream)) {
 				while (reader.Read()) {
 					// first element is the root element
