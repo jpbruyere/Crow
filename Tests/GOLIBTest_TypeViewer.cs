@@ -12,6 +12,7 @@ using System.Diagnostics;
 //using GGL;
 using go;
 using System.Threading;
+using System.Reflection;
 
 
 namespace test
@@ -22,13 +23,13 @@ namespace test
 			: base(1024, 600,"test")
 		{}
 
-		Border g;
-		Type type;
+		VerticalStack g;
+		TypeContainer type;
 
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-			type = typeof (GraphicObject);
+			type = new TypeContainer(typeof (GraphicObject));
 
 			this.AddWidget(Interface.Load ("Interfaces/testTypeViewer.goml", type));
 			//LoadInterface("Interfaces/testTypeViewer.goml", out g);
@@ -39,6 +40,9 @@ namespace test
 			GL.Clear (ClearBufferMask.ColorBufferBit);
 			base.OnRenderFrame (e);
 			SwapBuffers ();
+
+			MemberInfo mi;
+
 		}
 
 		[STAThread]
@@ -49,6 +53,19 @@ namespace test
 			using (GOLIBTest_TypeViewer win = new GOLIBTest_TypeViewer( )) {
 				win.Run (30.0);
 			}
+		}
+	}
+	public class TypeContainer
+	{
+		public Type Type;
+		public TypeContainer(Type _type){
+			Type = _type;
+		}
+		public string Name {
+			get { return Type.Name; }
+		}
+		public MemberInfo[] Members {
+			get { return Type.GetProperties (BindingFlags.Public | BindingFlags.Instance); }
 		}
 	}
 }

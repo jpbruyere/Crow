@@ -37,6 +37,15 @@ namespace go
 			Path = path;
 		}
 	}
+	[AttributeUsage(AttributeTargets.Class)]
+	public class DefaultItemTemplate : Attribute
+	{
+		public string Path = "";
+		public DefaultItemTemplate(string path)
+		{
+			Path = path;
+		}
+	}
 
 	public abstract class TemplatedControl : PrivateContainer, IXmlSerializable
 	{
@@ -77,10 +86,7 @@ namespace go
 
 		#region IXmlSerializable
 
-		public override System.Xml.Schema.XmlSchema GetSchema()
-		{
-			return null;
-		}
+		public override System.Xml.Schema.XmlSchema GetSchema(){ return null; }
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
 			//Template could be either an attribute containing path or expressed inlined

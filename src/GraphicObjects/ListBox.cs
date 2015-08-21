@@ -26,6 +26,7 @@ using System.ComponentModel;
 namespace go
 {
 	[DefaultTemplate("#go.Templates.Listbox.goml")]
+	//[DefaultTemplate("#go.Templates.ItemTemplate.goml")]
 	public class ListBox : TemplatedControl
 	{
 		Group _list;
@@ -44,13 +45,19 @@ namespace go
 
 		ICollection data;
 		int _selectedIndex;
+		string _itemTemplate;
 
+		[XmlAttributeAttribute][DefaultValue("#go.Templates.ItemTemplate.goml")]
+		public string ItemTemplate {
+			get { return _itemTemplate; }
+			set { _itemTemplate = value; }
+		}
 		public int SelectedIndex{
 			get { return _selectedIndex; }
 			set { _selectedIndex = value; }
 		}
 
-		[XmlAttributeAttribute()][DefaultValue(null)]
+		[XmlAttributeAttribute][DefaultValue(null)]
 		public ICollection Data {
 			get {
 				return data;
@@ -62,7 +69,8 @@ namespace go
 				if (data == null)
 					return;
 				foreach (var item in data) {
-					GraphicObject g = Interface.Load ("#go.Templates.ItemTemplate.goml", item);
+					GraphicObject g = Interface.Load (ItemTemplate, item);
+					//GraphicObject g = Interface.Load ("#go.Templates.Listbox.goml", item);
 //					g.Tag = item;
 //					g.MouseClick += (object sender, OpenTK.Input.MouseButtonEventArgs e) => {
 //						

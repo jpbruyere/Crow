@@ -1,12 +1,17 @@
 ﻿<?xml version="1.0"?>
 
-<Border  Background="SteelBlue"
-	Width="150" Height="250" BorderWidth="2">
-	<VerticalStack Height="0" Width="0" Name="hstack" Margin="0" Spacing="5">
-		<Border Height="-1" Width="0" >
+	<VerticalStack Height="-1" Width="200" Name="hstack" Margin="0" Spacing="0">
+		<Border Height="-1" Width="0" BorderWidth="2" CornerRadius="10">
 			<Label Name="labName" Text="{Name}" Width="0" Height="-1"/>
 		</Border>
-		<ListBox Data="{GetMembers ()}" Width="0" Height="-1">
+		<ListBox Data="{Members}" Width="0" Height="0" ItemTemplate="Interfaces/tmpMembers.goml">
+			<Template>
+				<Border Width="0" Height="0" BorderWidth="1" Margin="1" MinimumSize="0;100" >
+					<Scroller  Name="scroller1" Height="0" Width="0"  
+					 Margin="5" VerticalScrolling="true"  >
+						<VerticalStack Width="0" Height="-1" Name="List" Margin="1" VerticalAlignment="Top"/>
+					</Scroller>
+				</Border>
+			</Template>
 		</ListBox>
 	</VerticalStack>
-</Border>
