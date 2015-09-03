@@ -202,7 +202,9 @@ namespace go
 						lines [selectionEnd.Y].Substring (selectionEnd.X, lines [selectionEnd.Y].Length - selectionEnd.X);
 					l++;
 					for (int c = 0; c < linesToRemove-1; c++)
-						lines.RemoveAt (l);					
+						lines.RemoveAt (l);
+					currentCol = selectionStart.X;
+					currentLine = selectionStart.Y;
 				} else 
 					lines [l] = lines [l].Remove (selectionStart.X, selectionEnd.X - selectionStart.X);
 				currentCol = selectionStart.X;

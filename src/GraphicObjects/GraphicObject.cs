@@ -456,7 +456,7 @@ namespace go
 		}
 
 		/// <summary> trigger dependant sizing component update </summary>
-		protected virtual void OnLayoutChanges(LayoutingType  layoutType)
+		public virtual void OnLayoutChanges(LayoutingType  layoutType)
 		{
 			if (Parent==null)
 				return;

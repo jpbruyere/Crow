@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Collections;
 using System.Diagnostics;
 using System.Linq;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 
 namespace go
@@ -37,6 +39,10 @@ namespace go
 
 		}
 		static int dynHandleCpt = 0;
+		/// <summary>
+		/// Compile events expression in GOML attributes
+		/// </summary>
+		/// <param name="es">Event binding details</param>
 		public static void CompileEventSource(DynAttribute es)
 		{
 			Type srcType = es.Source.GetType ();
@@ -154,6 +160,11 @@ namespace go
 			evtFi.SetValue(es.Source, del);
 		}
 
+		/// <summary>
+		/// Resolves GOML property bindings afler loading
+		/// </summary>
+		/// <param name="binding">Binding details</param>
+		/// <param name="_source">Data source for binding</param>
 		public static void ResolveBinding(DynAttribute binding, object _source)
 		{			
 			object srcGO = null;
@@ -185,14 +196,28 @@ namespace go
 					throw new Exception ("Syntax error in binding, expected 'go dot member'");
 			}
 
+			if (srcGO == null) {
+				Debug.WriteLine ("Invalid Binding Source: " + binding.Value);
+				return;
+			}
 			Type srcType = srcGO.GetType ();
 			Type dstType = binding.Source.GetType ();
 
 			MemberInfo miSrc = srcType.GetMember (statement).FirstOrDefault ();
 			MemberInfo miDst = dstType.GetMember (binding.MemberName).FirstOrDefault ();
 
+			object srcVal = null; //value in source member
+
+			#region search for extensions methods if member not found in type
+			if (miSrc == null && !string.IsNullOrEmpty(statement))
+			{
+				Assembly a = Assembly.GetExecutingAssembly();
+				miSrc =  CompilerServices.GetExtensionMethods(a, srcType).FirstOrDefault();					
+			}
+			#endregion
+
 			#region initialize target with actual value
-			object srcVal = null;
+
 			if (miSrc == null)
 				srcVal = srcGO;//if no member is provided for binding, source raw value is taken
 			else {
@@ -200,7 +225,13 @@ namespace go
 					srcVal = (miSrc as PropertyInfo).GetGetMethod ().Invoke (srcGO, null);
 				else if (miSrc.MemberType == MemberTypes.Field)
 					srcVal = (miSrc as FieldInfo).GetValue (srcGO);
-				else
+				else if (miSrc.MemberType == MemberTypes.Method){
+					MethodInfo mthSrc = miSrc as MethodInfo;
+					if (mthSrc.IsDefined(typeof(ExtensionAttribute), false))
+						srcVal = mthSrc.Invoke(null, new object[] {srcGO});
+					else
+						srcVal = mthSrc.Invoke(srcGO, null);
+				}else
 					throw new Exception ("unandled source member type for binding");
 			}
 			if (miDst.MemberType == MemberTypes.Property) {
@@ -362,6 +393,36 @@ namespace go
 					break;
 			} while(fi == null);
 			return fi;
+		}
+	
+		/// <summary>
+		/// Gets extension methods defined in assembley for extendedType
+		/// </summary>
+		/// <returns>Extension methods enumerable</returns>
+		/// <param name="assembly">Assembly</param>
+		/// <param name="extendedType">Extended type to search for</param>
+		public static IEnumerable<MethodInfo> GetExtensionMethods(Assembly assembly,
+			Type extendedType)
+		{
+			IEnumerable<MethodInfo> query = null;
+			Type curType = extendedType;
+
+			do {
+				query = from type in assembly.GetTypes ()
+				        where type.IsSealed && !type.IsGenericType && !type.IsNested
+				        from method in type.GetMethods (BindingFlags.Static
+				            | BindingFlags.Public | BindingFlags.NonPublic)
+				        where method.IsDefined (typeof(ExtensionAttribute), false)
+				        where method.GetParameters () [0].ParameterType == curType
+				        select method;
+
+				if (query.Count() > 0)
+					break;
+				
+				curType = curType.BaseType;
+			} while (curType != null);
+				
+			return query;
 		}
 	}
 }

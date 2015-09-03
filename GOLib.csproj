@@ -114,6 +114,7 @@
     <Compile Include="src\TextChangeEventArgs.cs" />
     <Compile Include="src\ValueChangeEventArgs.cs" />
     <Compile Include="src\LayoutChangeEventArgs.cs" />
+    <Compile Include="src\ReflexionExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -180,5 +181,6 @@
     <EmbeddedResource Include="Templates\Scrollbar.goml" />
     <EmbeddedResource Include="Templates\AnalogMeter0.goml" />
     <EmbeddedResource Include="Images\meter.svg" />
+    <EmbeddedResource Include="Images\Icons\member.svg" />
   </ItemGroup>
 </Project>

@@ -133,7 +133,7 @@
 						TextAlignment="Center" Background="AoEnglish"/>
 				</HorizontalStack>
 			</VerticalStack>
-			<HorizontalStack Height="350" Width="250">
+			<HorizontalStack Height="350" Width="150">
 				<Scroller Name="scroller1" Background="DimGray" Height="0" Width="0"  
 					 Margin="5" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">
 					<VerticalStack Name="colors" VerticalAlignment="Top" Margin="1">

@@ -41,16 +41,6 @@ namespace test
 					ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
 			}
 		}
-		string name = "testName";
-
-		public string Name {
-			get {
-				return name;
-			}
-			set {
-				name = value;
-			}
-		}
 
 		public int fpsMin = int.MaxValue;
 		public int fpsMax = 0;
@@ -62,6 +52,17 @@ namespace test
 			_fps = 0;
 		}
 		#endregion
+
+		string name = "testName";
+
+		public string Name {
+			get {
+				return name;
+			}
+			set {
+				name = value;
+			}
+		}
 
 		public GOLIBTest_fps ()
 			: base(600, 400,"test")

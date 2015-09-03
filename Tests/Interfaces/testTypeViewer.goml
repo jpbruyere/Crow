@@ -1,16 +1,20 @@
 ﻿<?xml version="1.0"?>
 
-	<VerticalStack Height="-1" Width="200" Name="hstack" Margin="0" Spacing="0">
+	<VerticalStack Height="-1" Width="250" Name="hstack" Margin="0" Spacing="0">
 		<Border Height="-1" Width="0" BorderWidth="2" CornerRadius="10">
 			<Label Name="labName" Text="{Name}" Width="0" Height="-1"/>
 		</Border>
-		<ListBox Data="{Members}" Width="0" Height="0" ItemTemplate="Interfaces/tmpMembers.goml">
+		<ListBox Data="{Members}" Width="0" Height="400" ItemTemplate="Interfaces/tmpMembers.goml">
 			<Template>
 				<Border Width="0" Height="0" BorderWidth="1" Margin="1" MinimumSize="0;100" >
-					<Scroller  Name="scroller1" Height="0" Width="0"  
-					 Margin="5" VerticalScrolling="true"  >
-						<VerticalStack Width="0" Height="-1" Name="List" Margin="1" VerticalAlignment="Top"/>
-					</Scroller>
+					<HorizontalStack Width="0" Height="0">
+						<Scroller  Name="scroller1" Height="0" Width="0"  
+						 Margin="10" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">
+							<VerticalStack Width="0" Height="-1" Name="List" Margin="0" VerticalAlignment="Top"/>
+						</Scroller>
+						<Scrollbar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" MaximumScroll="{../scroller1.MaximumScroll}"
+							Orientation="Vertical" Width="10" />
+					</HorizontalStack>
 				</Border>
 			</Template>
 		</ListBox>

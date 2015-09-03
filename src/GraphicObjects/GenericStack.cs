@@ -125,13 +125,13 @@ namespace go
 						else if (gobjs.Length == 1) {
 							int sz = Children.Where(ch=>ch.Visible).Except (gobjs).Sum (g => g.Slot.Width);
 							if (sz < Slot.Width) {
-								gobjs [0].Slot.Width = Slot.Width - sz - Spacing;
+								gobjs [0].Slot.Width = Slot.Width - sz - (Children.Count+1) * Spacing;
 								int idx = Children.IndexOf (gobjs [0]);
 								if (idx > 0 && idx < Children.Count - 1)
 									gobjs [0].Slot.Width -= Spacing;
-
 								if (gobjs [0].LastSlots.Width != gobjs [0].Slot.Width) {
 									gobjs [0].bmp = null;
+									//gobjs [0].OnLayoutChanges (LayoutingType.Width);
 									gobjs [0].LastSlots.Width = gobjs [0].Slot.Width;
 								}
 							}

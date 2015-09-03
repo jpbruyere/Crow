@@ -120,7 +120,7 @@ namespace go
 			return tmp;
 		}
 			
-		protected override void OnLayoutChanges (LayoutingType layoutType)
+		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
 			base.OnLayoutChanges (layoutType);
 

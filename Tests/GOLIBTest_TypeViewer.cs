@@ -13,6 +13,7 @@ using System.Diagnostics;
 using go;
 using System.Threading;
 using System.Reflection;
+using System.Linq;
 
 
 namespace test
@@ -43,6 +44,7 @@ namespace test
 
 			MemberInfo mi;
 
+
 		}
 
 		[STAThread]
@@ -65,7 +67,18 @@ namespace test
 			get { return Type.Name; }
 		}
 		public MemberInfo[] Members {
-			get { return Type.GetProperties (BindingFlags.Public | BindingFlags.Instance); }
+			get {
+				MemberInfo[] mi = Properties.Cast<MemberInfo> ().Concat (Methods.Cast<MemberInfo> ()).ToArray(); 
+				return mi;
+			}
 		}
+		public MethodInfo[] Methods {
+			get { return Type.GetMethods (BindingFlags.Public | BindingFlags.Instance).Where (m => !m.IsSpecialName).ToArray(); }
+		}
+		public PropertyInfo[] Properties {
+			get { return Type.GetProperties (); }
+		}
+				
 	}
+
 }

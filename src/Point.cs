@@ -26,6 +26,9 @@ namespace go
             _y = y;
         }
 
+		public int Length {
+			get { return (int)Math.Sqrt (Math.Pow (_x, 2) + Math.Pow (_y, 2)); }
+		}
         public static implicit operator Cairo.Point(Point p)
         {
             return new Cairo.Point(p.X, p.Y);

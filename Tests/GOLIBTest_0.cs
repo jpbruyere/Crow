@@ -14,7 +14,7 @@ using go;
 using System.Threading;
 
 
-namespace test
+namespace test6
 {
 	class GOLIBTest_0 : OpenTKGameWindow
 	{

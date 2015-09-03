@@ -92,7 +92,7 @@ namespace go
 			return child == null ? Bounds.Size : new Size(child.Slot.Width + 2 * Margin, child.Slot.Height + 2 * (Margin));
 		}
 
-		protected override void OnLayoutChanges (LayoutingType layoutType)
+		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
 			switch (layoutType) {
 			case LayoutingType.Width:				

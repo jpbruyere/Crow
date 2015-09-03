@@ -36,8 +36,19 @@ namespace go
 
 		void Window_MouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
 		{
+			
+//			if ((e.Position - this.Slot.TopLeft).Length < 3)
+//				System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.SizeNWSE;
+//			else
+//				System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
+			
 			if (!e.Mouse.IsButtonDown (MouseButton.Left))
 				return;
+			
+			//
+
+			System.Windows.Forms.Cursor.Show();// = System.Windows.Forms.Cursors.SizeAll;
+
 			this.TopContainer.redrawClip.AddRectangle (this.ScreenCoordinates(this.Slot));
 			this.Left += e.XDelta;
 			this.Top += e.YDelta;
