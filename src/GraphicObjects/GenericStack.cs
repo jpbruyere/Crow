@@ -125,7 +125,7 @@ namespace go
 						else if (gobjs.Length == 1) {
 							int sz = Children.Where(ch=>ch.Visible).Except (gobjs).Sum (g => g.Slot.Width);
 							if (sz < Slot.Width) {
-								gobjs [0].Slot.Width = Slot.Width - sz - (Children.Count+1) * Spacing;
+								gobjs [0].Slot.Width = Slot.Width - sz - (Children.Count-1) * Spacing;
 								int idx = Children.IndexOf (gobjs [0]);
 								if (idx > 0 && idx < Children.Count - 1)
 									gobjs [0].Slot.Width -= Spacing;
@@ -145,7 +145,7 @@ namespace go
 						else if (gobjs.Length == 1) {
 							int sz = Children.Where(ch=>ch.Visible).Except (gobjs).Sum (g => g.Slot.Height);
 							if (sz < Slot.Height) {
-								gobjs [0].Slot.Height = Slot.Height - sz;
+								gobjs [0].Slot.Height = Slot.Height - sz- (Children.Count-1) * Spacing;
 								int idx = Children.IndexOf (gobjs [0]);
 								if (idx > 0 && idx < Children.Count - 1)
 									gobjs [0].Slot.Height -= Spacing;

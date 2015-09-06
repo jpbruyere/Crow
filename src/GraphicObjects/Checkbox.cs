@@ -58,7 +58,8 @@ namespace go
 					_image.SvgSub = "checked";
 				else
 					_image.SvgSub = "unchecked";
-				                
+				           
+				NotifyValueChanged("IsChecked",  IsChecked);
                 //registerForGraphicUpdate();
             }
         }
