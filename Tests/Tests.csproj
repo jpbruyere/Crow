@@ -40,7 +40,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Drawing" />
     <Reference Include="OpenTK">
-      <HintPath>..\OpenTK\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
+      <HintPath>..\opentk\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

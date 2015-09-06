@@ -131,7 +131,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Mono.Cairo" />
     <Reference Include="OpenTK">
-      <HintPath>OpenTK\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
+      <HintPath>..\opentk\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
