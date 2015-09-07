@@ -75,7 +75,6 @@ namespace go
 			if (child == null)//trigger loading of default template if child is empty
 				loadTemplate ();
 			base.loadDefaultValues ();
-			this.Focusable = true;
 		}
 
 		public override GraphicObject FindByName (string nameToFind)

@@ -659,7 +659,11 @@ namespace go
 		#region Mouse handling
 		public virtual bool MouseIsIn(Point m)
 		{
-			return Visible & Focusable ? ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false; 
+			return Visible ? ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false; 
+		}
+		internal virtual void checkHoverWidget(Point m)
+		{
+			
 		}
 		public virtual void onMouseMove(object sender, MouseMoveEventArgs e)
 		{

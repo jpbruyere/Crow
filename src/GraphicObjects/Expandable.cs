@@ -58,7 +58,12 @@ namespace go
 //			this.Collapse += (object sender, EventArgs e) => {};
 
 		}
-			
+		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
+		public override bool Focusable
+		{
+			get { return base.Focusable; }
+			set { base.Focusable = value; }
+		}
 
 		[XmlAttributeAttribute()][DefaultValue("Expandable")]
 		public string Title {

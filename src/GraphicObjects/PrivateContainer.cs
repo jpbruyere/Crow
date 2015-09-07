@@ -67,14 +67,6 @@ namespace go
 		}
 
 		#region GraphicObject Overrides
-		//check if not causing problems
-		[XmlAttributeAttribute()][DefaultValue(true)]
-		public override bool Focusable
-		{
-			get { return base.Focusable; }
-			set { base.Focusable = value; }
-		}
-
 		public override GraphicObject FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)

@@ -23,7 +23,7 @@ namespace go
 		Image _image;
 
 		public Checkbox() : base()
-		{
+		{			
 		}	
 
 		protected override void loadTemplate(GraphicObject template = null)
@@ -64,6 +64,12 @@ namespace go
             }
         }
 
+		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
+		public override bool Focusable
+		{
+			get { return base.Focusable; }
+			set { base.Focusable = value; }
+		}
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{
 			IsChecked = !IsChecked;

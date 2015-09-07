@@ -52,7 +52,12 @@ namespace go
 			this.Unpop += (object sender, EventArgs e) => {_image.SvgSub = "collapsed";};
 
 		}
-			
+		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
+		public override bool Focusable
+		{
+			get { return base.Focusable; }
+			set { base.Focusable = value; }
+		}
 
 		[XmlAttributeAttribute()][DefaultValue("Popper")]
 		public string Title {

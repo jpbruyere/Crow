@@ -35,6 +35,12 @@ namespace go
 			_image.SvgSub = "unchecked";
 		}
 			
+		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
+		public override bool Focusable
+		{
+			get { return base.Focusable; }
+			set { base.Focusable = value; }
+		}
 
 		[XmlAttributeAttribute][DefaultValue("RadioButton")]
 		public string Caption {

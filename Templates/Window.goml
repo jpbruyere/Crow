@@ -1,11 +1,10 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="1" BorderColor="LightGray"  MouseClick="onMouseClick" Margin="0" Focusable="true">
-	<VerticalStack MouseClick="onMouseClick" Height="0" Width="0" Margin="0" Focusable="true">
-		<Border BorderWidth="1" BorderColor="LightGray"  Height="-1" Width="0" MouseClick="onMouseClick"  Background="BlueCrayola" Focusable="true"
-			MouseMove="Window_MouseMove">
-			<HorizontalStack Margin="1" Spacing="1" Height="-1" Width="0" Focusable="true" MouseMove="Window_MouseMove">
+<Border BorderWidth="1" BorderColor="LightGray" Margin="0">
+	<VerticalStack Height="0" Width="0" Margin="0">
+		<Border BorderWidth="1" BorderColor="LightGray"  Height="-1" Width="0" Background="BlueCrayola">
+			<HorizontalStack Name="hs" Margin="1" Spacing="1" Height="-1" Width="0" Focusable="false" >
 				<Image Name="Image" Margin="1" Width="16" Height="16" Path="#go.Images.Icons.tetra.png"/>
-				<Label Width="0" Focusable="true" Name="Title" MouseMove="Window_MouseMove" Margin="5" />
+				<Label Width="0" Name="Title" Margin="5" />
 				<Image Focusable="true" Name="Image" Margin="1" Width="16" Height="16" Path="#go.Images.Icons.exit.svg"
 					MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}" MouseClick="butQuitPress"/>
 			</HorizontalStack>

@@ -115,6 +115,7 @@
     <Compile Include="src\ValueChangeEventArgs.cs" />
     <Compile Include="src\LayoutChangeEventArgs.cs" />
     <Compile Include="src\ReflexionExtensions.cs" />
+    <Compile Include="src\XCursor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -182,5 +183,16 @@
     <EmbeddedResource Include="Templates\AnalogMeter0.goml" />
     <EmbeddedResource Include="Images\meter.svg" />
     <EmbeddedResource Include="Images\Icons\member.svg" />
+    <EmbeddedResource Include="Images\Icons\Cursors\cross" />
+    <EmbeddedResource Include="Images\Icons\Cursors\bottom_left_corner" />
+    <EmbeddedResource Include="Images\Icons\Cursors\bottom_right_corner" />
+    <EmbeddedResource Include="Images\Icons\Cursors\top_left_corner" />
+    <EmbeddedResource Include="Images\Icons\Cursors\top_right_corner" />
+    <EmbeddedResource Include="Images\Icons\Cursors\arrow" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Icons\Cursors\hand" />
+    <None Include="Images\Icons\Cursors\help" />
+    <None Include="Images\Icons\Cursors\move" />
   </ItemGroup>
 </Project>

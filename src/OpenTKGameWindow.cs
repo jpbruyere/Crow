@@ -32,6 +32,16 @@ namespace go
 //			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), _title)
 		{
 			//VSync = VSyncMode.On;
+
+			//Load cursors
+			XCursor.Cross = XCursorFile.Load("#go.Images.Icons.Cursors.cross").Cursors[0];
+			XCursor.Default = XCursorFile.Load("#go.Images.Icons.Cursors.arrow").Cursors[0];
+			XCursor.NW = XCursorFile.Load("#go.Images.Icons.Cursors.top_left_corner").Cursors[0];
+			XCursor.NE = XCursorFile.Load("#go.Images.Icons.Cursors.top_right_corner").Cursors[0];
+			XCursor.SW = XCursorFile.Load("#go.Images.Icons.Cursors.bottom_left_corner").Cursors[0];
+			XCursor.SE = XCursorFile.Load("#go.Images.Icons.Cursors.bottom_right_corner").Cursors[0];
+
+
 		}        
 		#endregion
 
@@ -288,7 +298,10 @@ namespace go
 //			Debug.WriteLine("UPDATE: {0} ticks \t, {1} ms",
 //				updateTime.ElapsedTicks,
 //				updateTime.ElapsedMilliseconds);
-
+			//update Mouse cursor
+			if (_hoverWidget is Window) {
+				
+			}
 		}						
 		#endregion
 			
@@ -423,7 +436,7 @@ namespace go
 			}
 
 			GraphicObject g = _hoverWidget;
-			while (!g.Focusable) {
+			while (!g.Focusable) {				
 				g = g.Parent as GraphicObject;
 				if (g == null) {					
 					return;
@@ -433,6 +446,7 @@ namespace go
 			_activeWidget = g;
 			_activeWidget.onMouseButtonDown (this, e);
         }
+
         void Mouse_WheelChanged(object sender, MouseWheelEventArgs e)
         {
 			if (_hoverWidget == null) {

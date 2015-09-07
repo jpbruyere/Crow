@@ -65,12 +65,6 @@ namespace go
 		}
 			
 		#region GraphicObject overrides
-		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
-		public override bool Focusable
-		{
-			get { return base.Focusable; }
-			set { base.Focusable = value; }
-		}
 		[XmlIgnore]public override bool DrawingIsValid {
 			get {
 				if (!base.DrawingIsValid)

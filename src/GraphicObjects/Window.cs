@@ -36,23 +36,37 @@ namespace go
 
 		void Window_MouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
 		{
-			
-//			if ((e.Position - this.Slot.TopLeft).Length < 3)
-//				System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.SizeNWSE;
-//			else
-//				System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
-			
-			if (!e.Mouse.IsButtonDown (MouseButton.Left))
+
+
+		}
+		public override void onMouseMove (object sender, MouseMoveEventArgs e)
+		{
+			base.onMouseMove (sender, e);
+
+
+			OpenTKGameWindow otkgw = TopContainer as OpenTKGameWindow;
+
+			if ((e.Position - this.Slot.TopLeft).Length < 5)
+				otkgw.Cursor = XCursor.NW;
+			else
+				otkgw.Cursor = XCursor.Cross;
+
+
+			if (TopContainer.activeWidget != this)
 				return;
 			
-			//
-
-			System.Windows.Forms.Cursor.Show();// = System.Windows.Forms.Cursors.SizeAll;
-
 			this.TopContainer.redrawClip.AddRectangle (this.ScreenCoordinates(this.Slot));
 			this.Left += e.XDelta;
 			this.Top += e.YDelta;
 			this.registerForGraphicUpdate ();			
+
+
+		}
+		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
+		{
+			base.onMouseLeave (sender, e);
+			OpenTKGameWindow otkgw = TopContainer as OpenTKGameWindow;
+			otkgw.Cursor = XCursor.Default;
 		}
 
 		protected override void loadTemplate(GraphicObject template = null)
