@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>test.GOLIBTest_4</StartupObject>
+    <StartupObject>test3.GOLIBTest_HStack</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>..\bin\$(configuration)</OutputPath>
     <IntermediateOutputPath>obj\$(configuration)</IntermediateOutputPath>
@@ -64,6 +64,7 @@
     <Compile Include="GOLIBTest_0.cs" />
     <Compile Include="GOLIBTest_TypeViewer.cs" />
     <Compile Include="GOLIBTest_stack.cs" />
+    <Compile Include="GOLIBTest_HStack.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -139,6 +140,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Interfaces\itemTmp.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\testHStack.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

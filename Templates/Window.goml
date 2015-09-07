@@ -3,12 +3,12 @@
 	<VerticalStack Height="0" Width="0" Margin="0">
 		<Border BorderWidth="1" BorderColor="LightGray"  Height="-1" Width="0" Background="BlueCrayola">
 			<HorizontalStack Name="hs" Margin="1" Spacing="1" Height="-1" Width="0" Focusable="false" >
-				<Image Name="Image" Margin="1" Width="16" Height="16" Path="#go.Images.Icons.tetra.png"/>
-				<Label Width="0" Name="Title" Margin="5" />
-				<Image Focusable="true" Name="Image" Margin="1" Width="16" Height="16" Path="#go.Images.Icons.exit.svg"
+				<Image Name="Image" Margin="1" Width="12" Height="12" Path="#go.Images.Icons.tetra.png"/>
+				<Label Width="0" Name="Title" Margin="1" />
+				<Image Focusable="true" Name="Image" Margin="1" Width="12" Height="12" Path="#go.Images.Icons.exit.svg"
 					MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}" MouseClick="butQuitPress"/>
 			</HorizontalStack>
 		</Border>
-		<Container Name="Content" Margin="1"/>
+		<Container Name="Content" Margin="1" Width="0" Height="0"/>
 	</VerticalStack>
 </Border>

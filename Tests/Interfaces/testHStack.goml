@@ -1,0 +1,11 @@
+﻿<?xml version="1.0"?>
+<!--<HorizontalStack Background="Gray" Margin="1">-->
+<Group  Background="Gray" Margin="5" Height="-1" Width="-1">
+	<VerticalStack Background="Green" Margin="1">
+		<HorizontalStack Width="-1" Height="-1" Margin="5" Background="Red">
+			<Checkbox Height="100" Width="200" Background="Blue"/>
+	<!--		<Checkbox Height="-1" Width="-1"/>-->
+		</HorizontalStack>
+	</VerticalStack>
+</Group>
+<!--</HorizontalStack>-->

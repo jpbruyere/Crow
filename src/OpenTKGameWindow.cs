@@ -318,8 +318,16 @@ namespace go
 			AddWidget (result as GraphicObject);
 			return result;
 		}
+		public GraphicObject LoadInterface (string path)
+		{
+			GraphicObject tmp = Interface.Load (path, this);
+			AddWidget (tmp);
+			return tmp;
+		}
 		#endregion
-			
+		public virtual void OnRender(FrameEventArgs e)
+		{
+		}
 		#region Game win overrides
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{	
@@ -328,8 +336,14 @@ namespace go
 		}
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
+			GL.Clear (ClearBufferMask.ColorBufferBit);
+
 			base.OnRenderFrame(e);
+
 			OpenGLDraw ();
+			OnRender (e);
+
+			SwapBuffers ();
 		}
 		protected override void OnLoad(EventArgs e)
         {

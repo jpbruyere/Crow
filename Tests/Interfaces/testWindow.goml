@@ -3,18 +3,22 @@
 <Window Name="window1" Left="10" Top="10" Title="Test window" Width="200" Height="200" Background="0,5;0,5;0,5;0,5" 
 	Focusable="True">
 	<VerticalStack Height="0" Width="0">
+		<Slider Name="slider" Height="10" Width="150"/>
 		<Label Text="{fps}"  Background="DarkRed"/>
 		<Label Text="{fpsMin}"  />
 		<Label Text="{fpsMax}"  />
-		<Checkbox Height="-1" Width="-1"/>
+		<HorizontalStack Width="150" Height="-1" Margin="5" Background="Red">
+			<Checkbox Height="-1" Width="-1"/>
+			<Checkbox Height="-1" Width="-1"/>
+		</HorizontalStack>
 		<GroupBox Title="test"  Height="-1" Width="-1" Margin="5">
 			<VerticalStack Width="100">
-				<RadioButton  Height="-1" Width="-1"/>
-				<RadioButton  Height="-1" Width="-1"/>
-				<RadioButton  Height="-1" Width="-1"/>
+				<RadioButton  Caption="Radio 1"/>
+				<RadioButton  Caption="Radio 2" IsChecked="true"/>
+				<RadioButton  Caption="Radio 3"/>
+
 			</VerticalStack>
 		</GroupBox>
-
 	</VerticalStack>
 </Window>
 <!--</Group>-->

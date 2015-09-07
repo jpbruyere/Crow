@@ -39,32 +39,125 @@ namespace go
 
 
 		}
+		enum Direction
+		{
+			None,
+			N,
+			S,
+			E,
+			W,
+			NW,
+			NE,
+			SW,
+			SE
+		}
+		Direction currentDirection = Direction.None;
+
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
 
-
 			OpenTKGameWindow otkgw = TopContainer as OpenTKGameWindow;
 
-			if ((e.Position - this.Slot.TopLeft).Length < 5)
-				otkgw.Cursor = XCursor.NW;
-			else
-				otkgw.Cursor = XCursor.Cross;
+			int borderLim = 5;
 
+
+
+			if (TopContainer.activeWidget == null) {
+				Direction lastDir = currentDirection;
+
+				if ((e.Position - this.Slot.TopLeft).Length < borderLim)
+					currentDirection = Direction.NW;
+				else if ((e.Position - this.Slot.TopRight).Length < borderLim)
+					currentDirection = Direction.NE;
+				else if ((e.Position - this.Slot.BottomLeft).Length < borderLim)
+					currentDirection = Direction.SW;
+				else if ((e.Position - this.Slot.BottomRight).Length < borderLim)
+					currentDirection = Direction.SE;
+				else
+					currentDirection = Direction.None;
+
+
+				if (currentDirection != lastDir) {
+					switch (currentDirection) {
+					case Direction.None:
+						otkgw.Cursor = XCursor.Default;
+						break;
+					case Direction.N:
+						otkgw.Cursor = XCursor.Cross;
+						break;
+					case Direction.S:
+						otkgw.Cursor = XCursor.Cross;
+						break;
+					case Direction.E:
+						otkgw.Cursor = XCursor.Cross;
+						break;
+					case Direction.W:
+						otkgw.Cursor = XCursor.Cross;
+						break;
+					case Direction.NW:
+						otkgw.Cursor = XCursor.NW;
+						break;
+					case Direction.NE:
+						otkgw.Cursor = XCursor.NE;
+						break;
+					case Direction.SW:
+						otkgw.Cursor = XCursor.SW;
+						break;
+					case Direction.SE:
+						otkgw.Cursor = XCursor.SE;
+						break;
+					}
+				}				
+				return;
+			}
 
 			if (TopContainer.activeWidget != this)
 				return;
-			
+				
 			this.TopContainer.redrawClip.AddRectangle (this.ScreenCoordinates(this.Slot));
-			this.Left += e.XDelta;
-			this.Top += e.YDelta;
-			this.registerForGraphicUpdate ();			
 
-
+			switch (currentDirection) {
+			case Direction.None:
+				this.Left += e.XDelta;
+				this.Top += e.YDelta;
+				break;
+			case Direction.N:
+				break;
+			case Direction.S:
+				break;
+			case Direction.E:
+				break;
+			case Direction.W:
+				break;
+			case Direction.NW:
+				this.Left += e.XDelta;
+				this.Top += e.YDelta;
+				this.Width -= e.XDelta;
+				this.Height -= e.YDelta;
+				break;
+			case Direction.NE:
+				this.Width += e.XDelta;
+				this.Top += e.YDelta;
+				this.Height -= e.YDelta;
+				break;
+			case Direction.SW:
+				this.Left += e.XDelta;
+				this.Width -= e.XDelta;
+				this.Height += e.YDelta;
+				break;
+			case Direction.SE:
+				this.Width += e.XDelta;
+				this.Height += e.YDelta;
+				break;
+			}
+		
+			this.RegisterForLayouting ((int)LayoutingType.All);			
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
+			currentDirection = Direction.None;
 			OpenTKGameWindow otkgw = TopContainer as OpenTKGameWindow;
 			otkgw.Cursor = XCursor.Default;
 		}
