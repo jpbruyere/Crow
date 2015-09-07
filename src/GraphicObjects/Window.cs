@@ -150,9 +150,7 @@ namespace go
 				this.Width += e.XDelta;
 				this.Height += e.YDelta;
 				break;
-			}
-		
-			this.RegisterForLayouting ((int)LayoutingType.All);			
+			}		
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{

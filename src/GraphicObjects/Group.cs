@@ -125,6 +125,9 @@ namespace go
 					int crw = ClientRectangle.Width;
 					foreach (GraphicObject c in Children.Where(ch => ch.Slot.Width != crw && ch.Visible))
 						c.RegisterForLayouting ((int)LayoutingType.X);						
+				} else {
+					foreach (GraphicObject c in Children.Where(ch => ch.Width == 0 && ch.Visible))
+						c.RegisterForLayouting ((int)LayoutingType.Width);											
 				}
 				break;
 			case LayoutingType.Height:
@@ -132,6 +135,9 @@ namespace go
 					int crh = ClientRectangle.Height;
 					foreach (GraphicObject c in Children.Where(ch => ch.Slot.Height != crh && ch.Visible))
 						c.RegisterForLayouting ((int)LayoutingType.Y);						
+				} else {
+					foreach (GraphicObject c in Children.Where(ch => ch.Height == 0 && ch.Visible))
+						c.RegisterForLayouting ((int)LayoutingType.Height);											
 				}
 				break;
 			}

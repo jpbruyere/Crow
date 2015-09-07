@@ -9,6 +9,6 @@
 					MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}" MouseClick="butQuitPress"/>
 			</HorizontalStack>
 		</Border>
-		<Container Name="Content" Margin="1" Width="0" Height="0"/>
+		<Container Name="Content" Margin="0" Width="0" Height="0"/>
 	</VerticalStack>
 </Border>

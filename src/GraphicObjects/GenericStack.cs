@@ -68,13 +68,13 @@ namespace go
 			if (Orientation == Orientation.Horizontal) {
 				foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
 					tmp.Width += c.Slot.Width + Spacing;
-					tmp.Height = Math.Max (tmp.Height, c.Slot.Bottom);
+					tmp.Height = Math.Max (tmp.Height, Math.Max(c.Slot.Bottom, c.Slot.Height));
 				}
 				if (tmp.Width > 0)
 					tmp.Width -= Spacing;
 			} else {
 				foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
-					tmp.Width = Math.Max (tmp.Width, c.Slot.Right);
+					tmp.Width = Math.Max (tmp.Width, Math.Max(c.Slot.Right, c.Slot.Width));
 					tmp.Height += c.Slot.Height + Spacing;
 				}
 				if (tmp.Height > 0)
@@ -125,13 +125,13 @@ namespace go
 						else if (gobjs.Length == 1) {
 							int sz = Children.Where(ch=>ch.Visible).Except (gobjs).Sum (g => g.Slot.Width);
 							if (sz < Slot.Width) {
-								gobjs [0].Slot.Width = Slot.Width - sz - (Children.Count-1) * Spacing;
+								gobjs [0].Slot.Width = Slot.Width - sz - (Children.Count-1) * Spacing - 2 * Margin;
 								int idx = Children.IndexOf (gobjs [0]);
 								if (idx > 0 && idx < Children.Count - 1)
 									gobjs [0].Slot.Width -= Spacing;
 								if (gobjs [0].LastSlots.Width != gobjs [0].Slot.Width) {
 									gobjs [0].bmp = null;
-									//gobjs [0].OnLayoutChanges (LayoutingType.Width);
+									gobjs [0].OnLayoutChanges (LayoutingType.Width);
 									gobjs [0].LastSlots.Width = gobjs [0].Slot.Width;
 								}
 							}
@@ -145,12 +145,13 @@ namespace go
 						else if (gobjs.Length == 1) {
 							int sz = Children.Where(ch=>ch.Visible).Except (gobjs).Sum (g => g.Slot.Height);
 							if (sz < Slot.Height) {
-								gobjs [0].Slot.Height = Slot.Height - sz- (Children.Count-1) * Spacing;
+								gobjs [0].Slot.Height = Slot.Height - sz- (Children.Count-1) * Spacing - 2 * Margin;
 								int idx = Children.IndexOf (gobjs [0]);
 								if (idx > 0 && idx < Children.Count - 1)
 									gobjs [0].Slot.Height -= Spacing;
 								if (gobjs [0].LastSlots.Height != gobjs [0].Slot.Height) {
 									gobjs [0].bmp = null;
+									gobjs [0].OnLayoutChanges (LayoutingType.Height);
 									gobjs [0].LastSlots.Height = gobjs [0].Slot.Height;
 								}
 							}

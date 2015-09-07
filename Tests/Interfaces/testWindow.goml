@@ -2,23 +2,28 @@
 <!--<Group>-->
 <Window Name="window1" Left="10" Top="10" Title="Test window" Width="200" Height="200" Background="0,5;0,5;0,5;0,5" 
 	Focusable="True">
-	<VerticalStack Height="0" Width="0">
-		<Slider Name="slider" Height="10" Width="150"/>
-		<Label Text="{fps}"  Background="DarkRed"/>
-		<Label Text="{fpsMin}"  />
-		<Label Text="{fpsMax}"  />
-		<HorizontalStack Width="150" Height="-1" Margin="5" Background="Red">
+	<VerticalStack Name="contentVSStack" Height="0" Width="0" Margin="1" Spacing="10">
+		<Slider Name="slider" Height="20" Width="0"/>
+
+		<HorizontalStack Width="0" Height="-1" Margin="0" Background="Red">
 			<Checkbox Height="-1" Width="-1"/>
 			<Checkbox Height="-1" Width="-1"/>
 		</HorizontalStack>
-		<GroupBox Title="test"  Height="-1" Width="-1" Margin="5">
-			<VerticalStack Width="100">
+		<GroupBox Title="test"  Height="0" Width="0" Margin="0">
+			<VerticalStack Width="0">
 				<RadioButton  Caption="Radio 1"/>
 				<RadioButton  Caption="Radio 2" IsChecked="true"/>
 				<RadioButton  Caption="Radio 3"/>
-
+				<RadioButton  Caption="Radio 4"/>
+				<RadioButton  Caption="Radio 5"/>
+				<RadioButton  Caption="Radio 6"/>
+				<RadioButton  Caption="Radio 7"/>
 			</VerticalStack>
 		</GroupBox>
+<!--		<Checkbox Height="-1" Width="-1" Background="Red" Margin="0" VerticalAlignment="Center" HorizontalAlignment="Right"/>-->
 	</VerticalStack>
 </Window>
 <!--</Group>-->
+<!--		<Label Text="{fps}"  Background="DarkRed"/>
+		<Label Text="{fpsMin}"  />
+		<Label Text="{fpsMax}"  />-->

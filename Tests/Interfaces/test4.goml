@@ -134,8 +134,8 @@
 						TextAlignment="Center" Background="AoEnglish"/>
 				</HorizontalStack>
 			</VerticalStack>
-			<HorizontalStack Height="350" Width="150">
-				<Scroller Name="scroller1" Background="DimGray" Height="0" Width="0"  
+			<HorizontalStack Height="350" Width="-1">
+				<Scroller Name="scroller1" Background="DimGray" Height="0" Width="-1"  
 					 Margin="5" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">
 					<VerticalStack Name="colors" VerticalAlignment="Top" Margin="1">
 						<ProgressBar Name="pbBar2" Width="100" Height="20" Value="50"

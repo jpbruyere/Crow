@@ -22,19 +22,11 @@ namespace test
 			: base(1024, 600,"test")
 		{}
 
-		VerticalStack g;
-
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-			LoadInterface("Interfaces/test_stack.goml", out g);
+			LoadInterface("Interfaces/test_stack.goml");
 
-		}
-		protected override void OnRenderFrame (FrameEventArgs e)
-		{
-			GL.Clear (ClearBufferMask.ColorBufferBit);
-			base.OnRenderFrame (e);
-			SwapBuffers ();
 		}
 
 		protected override void OnUpdateFrame (FrameEventArgs e)
