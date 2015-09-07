@@ -661,20 +661,23 @@ namespace go
 		{
 			return Visible ? ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false; 
 		}
-		internal virtual void checkHoverWidget(Point m)
+		internal virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
-			
+			if (TopContainer.hoverWidget != this) {
+				TopContainer.hoverWidget = this;
+				onMouseEnter (this, e);
+			}
+
+			this.onMouseMove (this, e);
 		}
 		public virtual void onMouseMove(object sender, MouseMoveEventArgs e)
 		{
-			//ILayoutable w = sender as ILayoutable;
-
-			if (TopContainer.hoverWidget != this) {
-				TopContainer.hoverWidget = this;
-				onMouseEnter (sender, e);
-			}
-				
-			MouseMove.Raise (this, e);
+			//bubble event to the top
+			GraphicObject p = Parent as GraphicObject;
+			if (p != null)
+				p.onMouseMove(sender,e);
+			
+			MouseMove.Raise (sender, e);
 		}
 		public virtual void onMouseButtonUp(object sender, MouseButtonEventArgs e){
 			if (MouseIsIn (e.Position))

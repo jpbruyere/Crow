@@ -309,13 +309,13 @@ namespace MonoDevelop.GOLib
 		{
 			if (_activeWidget != null) {
 				//send move evt even if mouse move outside bounds
-				_activeWidget.onMouseMove (this, e);
+				_activeWidget.checkHoverWidget (e);
 				return;
 			}
 
 			if (_hoverWidget != null) {
 				if (_hoverWidget.MouseIsIn (e.Position)) {
-					_hoverWidget.onMouseMove (this, e);
+					_hoverWidget.checkHoverWidget (e);
 					return;
 				} else {
 					_hoverWidget.onMouseLeave (this, e);
@@ -323,7 +323,7 @@ namespace MonoDevelop.GOLib
 					while (_hoverWidget.Parent as GraphicObject!=null) {
 						_hoverWidget = _hoverWidget.Parent as GraphicObject;
 						if (_hoverWidget.MouseIsIn (e.Position)) {
-							_hoverWidget.onMouseMove (this, e);
+							_hoverWidget.checkHoverWidget (e);
 							return;
 						} else
 							_hoverWidget.onMouseLeave (this, e);
@@ -335,12 +335,13 @@ namespace MonoDevelop.GOLib
 			for (int i = 0; i < GraphicObjects.Count; i++) {
 				GraphicObject g = GraphicObjects[i];
 				if (g.MouseIsIn (e.Position)) {
-					g.onMouseMove (this, e);
+					g.checkHoverWidget (e);
 					PutOnTop (g);
 					return;
 				}
 			}
 			_hoverWidget = null;
+			MouseMove.Raise (this, e);
 		}
 		void Mouse_ButtonUp(object sender, MouseButtonEventArgs e)
 		{

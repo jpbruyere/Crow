@@ -385,13 +385,13 @@ namespace go
         {
 			if (_activeWidget != null) {
 				//send move evt even if mouse move outside bounds
-				_activeWidget.onMouseMove (this, e);
+				_activeWidget.onMouseMove (_activeWidget, e);
 				return;
 			}
 
 			if (_hoverWidget != null) {
 				if (_hoverWidget.MouseIsIn (e.Position)) {
-					_hoverWidget.onMouseMove (this, e);
+					_hoverWidget.checkHoverWidget (e);
 					return;
 				} else {
 					_hoverWidget.onMouseLeave (this, e);
@@ -399,7 +399,7 @@ namespace go
 					while (_hoverWidget.Parent as GraphicObject!=null) {
 						_hoverWidget = _hoverWidget.Parent as GraphicObject;
 						if (_hoverWidget.MouseIsIn (e.Position)) {
-							_hoverWidget.onMouseMove (this, e);
+							_hoverWidget.checkHoverWidget (e);
 							return;
 						} else
 							_hoverWidget.onMouseLeave (this, e);
@@ -411,7 +411,7 @@ namespace go
 			for (int i = 0; i < GraphicObjects.Count; i++) {
 				GraphicObject g = GraphicObjects[i];
 				if (g.MouseIsIn (e.Position)) {
-					g.onMouseMove (this, e);
+					g.checkHoverWidget (e);
 					PutOnTop (g);
 					return;
 				}

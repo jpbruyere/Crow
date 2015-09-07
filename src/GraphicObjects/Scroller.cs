@@ -118,10 +118,10 @@ namespace go
 		{			
 			return Visible ? base.ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false; 
 		}
-		public override void onMouseMove (object sender, MouseMoveEventArgs e)
+		internal override void checkHoverWidget (MouseMoveEventArgs e)
 		{
 			Point m = e.Position - new Point ((int)ScrollX, (int)ScrollY);
-			base.onMouseMove (sender, new MouseMoveEventArgs(m.X,m.Y,e.XDelta,e.YDelta));
+			base.checkHoverWidget (new MouseMoveEventArgs(m.X,m.Y,e.XDelta,e.YDelta));
 		}
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
 		{

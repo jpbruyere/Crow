@@ -215,17 +215,17 @@ namespace go
 
 	
 		#region Mouse handling
-		public override void onMouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
+		internal override void checkHoverWidget (OpenTK.Input.MouseMoveEventArgs e)
 		{
 			foreach (GraphicObject g in Children)
-            {
+			{
 				if (g.MouseIsIn(e.Position))
-                {
-					g.onMouseMove (sender, e);
-                    return;
-                }
-            }
-			base.onMouseMove (sender, e);
+				{
+					g.checkHoverWidget (e);
+					return;
+				}
+			}
+			base.checkHoverWidget (e);
 		}
 		#endregion
 			        

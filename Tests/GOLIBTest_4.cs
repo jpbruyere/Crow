@@ -13,6 +13,7 @@ using System.Diagnostics;
 using go;
 using System.Threading;
 using System.Collections.Generic;
+using System.IO;
 
 
 namespace test
@@ -82,6 +83,9 @@ namespace test
 		{
 			base.OnLoad (e);
 
+			this.Cursor = XCursor.NE;
+
+
 			LoadInterface("Interfaces/test4.goml", out c);
 			//LoadInterface("golibtests/test4.xml", out c2);
 			//c2.HorizontalAlignment = HorizontalAlignment.Left;
@@ -142,7 +146,7 @@ namespace test
 		}
 		void pFps_mousemove(object sender, MouseMoveEventArgs e)
 		{
-			if (!e.Mouse.IsButtonDown (MouseButton.Left))
+			if (!e.Mouse.IsButtonDown (MouseButton.Left)||sender!=c)
 				return;
 			redrawClip.AddRectangle (c.ScreenCoordinates(c.Slot));
 			c.Left += e.XDelta;

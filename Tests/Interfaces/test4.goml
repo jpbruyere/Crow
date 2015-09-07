@@ -1,9 +1,10 @@
 ﻿<?xml version="1.0"?>
-<Group Name="MainGrp"
+<Group Name="MainGrp" Focusable="true"
 	Width="800" Height="500"
 	Background="0,5;0,5;0,5;0,5" Foreground="White"
 	Margin="10" >
 	<Border Margin="10"
+		Name="mainBorder"
 		BorderWidth="2" BorderColor="Transparent"
 		Focusable="True"
 		MouseEnter="{BorderColor = White}"
@@ -18,7 +19,7 @@
 				<Label Name="labMouse" Text="MousePos"/>
 				<HorizontalStack WidgetSpacing="10">
 					<VerticalStack Width="100">
-						<Checkbox Name="chk1"/>
+						<Checkbox Name="chk1" Focusable="true"/>
 						<Checkbox Name="chk2" IsChecked="true"/>
 						<Checkbox Name="chk3" Template="#go.Templates.Checkbox2.goml"/>
 						<Checkbox Name="chk4">

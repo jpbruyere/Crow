@@ -146,14 +146,12 @@ namespace go
 		#endregion
 
 		#region Mouse handling
-		public override void onMouseMove (object sender, MouseMoveEventArgs e)
+		internal override void checkHoverWidget (MouseMoveEventArgs e)
 		{
-			base.onMouseMove (sender, e);
-
+			base.checkHoverWidget (e);
 			if (child != null) 
 			if (child.MouseIsIn (e.Position)) 
-				child.onMouseMove (sender, e);
-
+				child.checkHoverWidget (e);
 		}
 		#endregion
 	}
