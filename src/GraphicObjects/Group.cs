@@ -223,6 +223,10 @@ namespace go
 		#region Mouse handling
 		internal override void checkHoverWidget (OpenTK.Input.MouseMoveEventArgs e)
 		{
+			if (TopContainer.hoverWidget != this) {
+				TopContainer.hoverWidget = this;
+				onMouseEnter (this, e);
+			}
 			foreach (GraphicObject g in Children)
 			{
 				if (g.MouseIsIn(e.Position))
