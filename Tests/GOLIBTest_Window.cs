@@ -18,6 +18,10 @@ namespace test
 {
 	class GOLIBTest_Window : OpenTKGameWindow , IValueChange
 	{
+		#region IValueChange implementation
+		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+		#endregion
+
 		#region FPS
 		int _fps = 0;
 
@@ -64,7 +68,7 @@ namespace test
 		#endregion
 
 		public GOLIBTest_Window ()
-			: base(600, 400,"test")
+			: base(800, 600,"test")
 		{}
 
 		Window g;
@@ -78,14 +82,9 @@ namespace test
 //			LoadInterface("Interfaces/testWindow.goml", out g);
 //			LoadInterface("Interfaces/testWindow.goml", out g);
 //			LoadInterface("Interfaces/testWindow.goml", out g);
+			CursorVisible = true;
+		}
 
-		}
-		protected override void OnRenderFrame (FrameEventArgs e)
-		{
-			GL.Clear (ClearBufferMask.ColorBufferBit);
-			base.OnRenderFrame (e);
-			SwapBuffers ();
-		}
 
 		private int frameCpt = 0;
 		protected override void OnUpdateFrame (FrameEventArgs e)
@@ -102,11 +101,11 @@ namespace test
 			frameCpt++;
 		}
 
-		#region IValueChange implementation
-
-		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-
-		#endregion
+		protected override void OnKeyDown (KeyboardKeyEventArgs e)
+		{
+			base.OnKeyDown (e);
+			this.Quit ();
+		}
 
 		[STAThread]
 		static void Main ()

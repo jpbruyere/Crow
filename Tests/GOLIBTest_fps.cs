@@ -36,9 +36,10 @@ namespace test
 					fpsMin = _fps;
 					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMin", fpsMin));
 				}
-
-				if (ValueChanged != null)
-					ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
+					
+				ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
+				ValueChanged.Raise (this, new ValueChangeEventArgs ("update",
+					this.updateTime.ElapsedMilliseconds.ToString () + " ms"));
 			}
 		}
 
@@ -53,6 +54,8 @@ namespace test
 		}
 		#endregion
 
+		public string update = "";
+
 		string name = "testName";
 
 		public string Name {
@@ -66,30 +69,19 @@ namespace test
 
 		public GOLIBTest_fps ()
 			: base(600, 400,"test")
-		{}
-
-		Container g;
-		Label labFps, labFpsMin, labFpsMax, labUpdate;
+		{
+			VSync = VSyncMode.Off;
+		}
 
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-			LoadInterface("Interfaces/fps.goml", out g);
+			LoadInterface("Interfaces/fps.goml");
 
-			labFps = g.FindByName ("labFps") as Label;
-			labFpsMin = g.FindByName ("labFpsMin") as Label;
-			labFpsMax = g.FindByName ("labFpsMax") as Label;
-			labUpdate = g.FindByName ("labUpdate") as Label;
 
 			//ValueChanged += (object sender, ValueChangeEventArgs vce) => labFps.Text = vce.NewValue.ToString ();
 	
 
-		}
-		protected override void OnRenderFrame (FrameEventArgs e)
-		{
-			GL.Clear (ClearBufferMask.ColorBufferBit);
-			base.OnRenderFrame (e);
-			SwapBuffers ();
 		}
 
 		private int frameCpt = 0;
@@ -99,15 +91,10 @@ namespace test
 
 			fps = (int)RenderFrequency;
 
-			//labFps.Text = fps.ToString();
-			//labUpdate.Text = this.updateTime.ElapsedMilliseconds.ToString() + " ms";
 
 			if (frameCpt > 200) {
-//				labFpsMin.Text = fpsMin.ToString();
-//				labFpsMax.Text = fpsMax.ToString();
 				resetFps ();
 				frameCpt = 0;
-
 			}
 			frameCpt++;
 		}

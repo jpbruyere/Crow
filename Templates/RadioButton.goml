@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
 <HorizontalStack Margin="0" Spacing="1" Focusable="false">
-	<Image Name="Image" Width="16" Height="16" Path="#go.Images.Icons.radiobutton.svg"/>
+	<Image Name="Image" Width="12" Height="12" Path="#go.Images.Icons.radiobutton.svg"/>
 	<Label Name="Caption"/>
 </HorizontalStack>

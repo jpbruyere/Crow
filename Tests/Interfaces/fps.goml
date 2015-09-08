@@ -1,29 +1,25 @@
 ﻿<?xml version="1.0"?>
-<Container Name="MainGrp"
-	
-	Margin="10" Focusable="True" Fit="True">
-	<Expandable  Width="150" Background="Green" Margin="2">
-<!--	HorizontalAlignment="Right" VerticalAlignment="Bottom"-->
-<!--		<VerticalStack Fit="True" BorderWidth="1" Margin="5" WidgetSpacing="4">-->
-<!--			<HorizontalStack>
-				<Label Text="Update:" FontColor="White" VerticalAlignment="Center" />
-				<Label Name="labUpdate" Text="xxxx" FontSize="12" Width="60" TextAlignment="Center" Background="DarkGreen"/>
-			</HorizontalStack>-->
+<Container Name="MainGrp" Background="0,5;0,5;0,5;0,5"
+	HorizontalAlignment="Left" VerticalAlignment="Top"
+	Margin="10" Width="-1" Height="-1" Focusable="True" >
+
+		<VerticalStack Name="vsFps"  BorderWidth="1" Margin="5" Spacing="4">
 			<HorizontalStack>
-				<Label Text="Fps:" Width = "30" VerticalAlignment="Center"  TextAlignment="LeftCenter"/>
-				<Label Name="labFps" Text="{fps}" Font="droid bold, 12"
-					TextAlignment="Center" Background="AoEnglish"/>
+				<Label Text="Update:" FontColor="White" />
+				<Label Name="labUpdate" Text="{update}" FontSize="12" Background="DarkGreen"/>
 			</HorizontalStack>
-<!--			<HorizontalStack>
+			<HorizontalStack Name="hsFps" Background="Red" >
+				<Label Name="captionFps" Text="Fps:" />
+				<Label Name="valueFps" Text="{fps}" Font="droid bold, 12" TextAlignment="Center" Background="AoEnglish"/>
+			</HorizontalStack>
+			<HorizontalStack Background="Red">
 				<Label Text="Min:" Width = "30" />
-				<Label Name="labFpsMin" Text="{fpsMin}" Font="droid bold, 12"
-					TextAlignment="Center" Background="AoEnglish"/>
+				<Label Text="{fpsMin}" Font="droid bold, 12" TextAlignment="Center" Background="AoEnglish"/>
 			</HorizontalStack>
-			<HorizontalStack>
+			<HorizontalStack Background="Red" >
 				<Label Text="Max:" Width = "30"/>
-				<Label Name="labFpsMax" Text="{fpsMax}" Font="droid bold, 12"
-					TextAlignment="Center" Background="AoEnglish"/>
-			</HorizontalStack>-->
-<!--		</VerticalStack>-->
-		</Expandable>
+				<Label Text="{fpsMax}" Font="droid bold, 12" TextAlignment="Center" Background="AoEnglish"/>
+			</HorizontalStack>
+
+		</VerticalStack>				
 </Container>

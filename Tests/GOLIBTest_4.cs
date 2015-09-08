@@ -150,12 +150,7 @@ namespace test
 			c.Top += e.YDelta;
 			c.registerForGraphicUpdate ();
 		}
-		protected override void OnRenderFrame (FrameEventArgs e)
-		{
-			GL.Clear (ClearBufferMask.ColorBufferBit);
-			base.OnRenderFrame (e);
-			SwapBuffers ();
-		}
+
 		private int frameCpt = 0;
 		protected override void OnUpdateFrame (FrameEventArgs e)
 		{

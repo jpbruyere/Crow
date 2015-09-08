@@ -26,7 +26,7 @@ namespace go
 //				3,0,OpenTK.Graphics.GraphicsContextFlags.Default)
 		public OpenTKGameWindow(int _width, int _height, string _title="golib")
 			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), 
-				_title,GameWindowFlags.Default,DisplayDevice.Default,
+				_title,GameWindowFlags.Default,DisplayDevice.GetDisplay(DisplayIndex.Second),
 				3,2,OpenTK.Graphics.GraphicsContextFlags.Debug|OpenTK.Graphics.GraphicsContextFlags.ForwardCompatible)
 //		public OpenTKGameWindow(int _width, int _height, string _title="golib")
 //			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), _title)
@@ -40,7 +40,6 @@ namespace go
 			XCursor.NE = XCursorFile.Load("#go.Images.Icons.Cursors.top_right_corner").Cursors[0];
 			XCursor.SW = XCursorFile.Load("#go.Images.Icons.Cursors.bottom_left_corner").Cursors[0];
 			XCursor.SE = XCursorFile.Load("#go.Images.Icons.Cursors.bottom_right_corner").Cursors[0];
-
 
 		}        
 		#endregion
@@ -230,6 +229,7 @@ namespace go
 			GraphicObjects.CopyTo (invGOList,0);
 			invGOList = invGOList.Reverse ().ToArray ();
 
+			//Debug.WriteLine ("======= Layouting queue start =======");
 			while (Interface.LayoutingQueue.Count > 0) {
 				LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
 				lqi.ProcessLayouting ();
@@ -325,8 +325,13 @@ namespace go
 			return tmp;
 		}
 		#endregion
+
 		public virtual void OnRender(FrameEventArgs e)
 		{
+		}
+		public virtual void GLClear()
+		{
+			GL.Clear (ClearBufferMask.ColorBufferBit);
 		}
 		#region Game win overrides
 		protected override void OnUpdateFrame(FrameEventArgs e)
@@ -336,12 +341,14 @@ namespace go
 		}
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
-			GL.Clear (ClearBufferMask.ColorBufferBit);
+			GLClear ();
+
 
 			base.OnRenderFrame(e);
 
-			OpenGLDraw ();
 			OnRender (e);
+			OpenGLDraw ();
+
 
 			SwapBuffers ();
 		}
