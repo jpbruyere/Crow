@@ -154,20 +154,15 @@ namespace go
 			CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);
 			gr.Fill ();
 
-			foreach (GraphicObject g in Children.Where(ch=>ch.Visible)) {
+			foreach (GraphicObject g in Children) {
 				g.Paint (ref gr);
 			}
 		}
 
 		public override void Paint(ref Context ctx, Rectangles clip = null)
 		{
-			if ( !(Visible) )
+			if ( !Visible )
 				return;
-
-			//			ctx.Save ();
-
-//			if (clip!=null)
-//				clip.clearAndClip (ctx);//n'était pas actif
 
 			if (bmp == null)
 				UpdateGraphic ();
@@ -175,10 +170,9 @@ namespace go
 
 				Rectangle rb = Parent.ContextCoordinates (Slot);
 
-				if (clip != null) {
+				if (clip != null)
 					clip.Rebase (this);									
-					//localClip = clip.intersectingRects (Slot.Size);
-				} else {
+				else {
 					clip = new Rectangles ();
 					//TODO:added lately slot to empty clip,
 					//should rework this precise case causing expandable not
@@ -214,8 +208,6 @@ namespace go
 			}
 				
 			base.Paint (ref ctx, clip);
-
-			//			ctx.Restore(); 
 		}
 		#endregion
 
@@ -238,16 +230,6 @@ namespace go
 			base.checkHoverWidget (e);
 		}
 		#endregion
-			        
-//        public override string ToString()
-//        {
-//            string tmp = base.ToString();
-//            foreach (GraphicObject w in Children)
-//            {
-//                tmp += "\n" + w.ToString();
-//            }
-//            return tmp;
-//        }
 
 		#region IXmlSerializable
 
