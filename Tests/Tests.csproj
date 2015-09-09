@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>test.GOLIBTest_Window</StartupObject>
+    <StartupObject>test.GOLIBTests</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>..\bin\$(configuration)</OutputPath>
     <IntermediateOutputPath>obj\$(configuration)</IntermediateOutputPath>
@@ -46,26 +46,11 @@
   <ItemGroup>
     <Compile Include="GOLIBTest_5.cs" />
     <Compile Include="GOLIBTest_4.cs" />
-    <Compile Include="GOLIBTest_3.cs" />
-    <Compile Include="GOLIBTest_1.cs" />
-    <Compile Include="GOLIBTest_2.cs" />
-    <Compile Include="GOLIBTest_1.1.cs" />
-    <Compile Include="GOLIBTest_1.2.cs" />
-    <Compile Include="GOLIBTest_4.1.cs" />
-    <Compile Include="GOLIBTest_fps.cs" />
     <Compile Include="GOLIBTest_Listbox.cs" />
-    <Compile Include="GOLIBTest_Spinner.cs" />
-    <Compile Include="GOLIBTest_Expandable.cs" />
-    <Compile Include="GOLIBTest_Label.cs" />
-    <Compile Include="GOLIBTest_Window.cs" />
-    <Compile Include="GOLIBTest_Container.cs" />
-    <Compile Include="GOLIBTest_Scrollbar.cs" />
-    <Compile Include="GOLIBTest_meter.cs" />
     <Compile Include="GOLIBTest_0.cs" />
     <Compile Include="GOLIBTest_TypeViewer.cs" />
-    <Compile Include="GOLIBTest_stack.cs" />
-    <Compile Include="GOLIBTest_HStack.cs" />
     <Compile Include="GOLIBTest_DirViewer.cs" />
+    <Compile Include="GOLIBTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">

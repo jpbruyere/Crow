@@ -16,15 +16,39 @@ using System.Threading;
 
 namespace test
 {
-	class GOLIBTest_meter : OpenTKGameWindow, IValueChange
+	class GOLIBTests : OpenTKGameWindow, IValueChange
 	{
-		public GOLIBTest_meter ()
-			: base(1024, 600,"test")
+		#region IValueChange implementation
+
+		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+
+		#endregion
+
+		public GOLIBTests ()
+			: base(800, 600,"test")
 		{}
 
-		#region IValueChange implementation
-		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-		#endregion
+		int frameCpt = 0;
+		int idx = 0;
+		string[] testFiles = {
+			"test1.goml",
+			"test1.1.goml",
+			"test1.2.goml",
+			"test1.3.goml",
+			"test2.goml",
+			"testLabel.goml",
+			"testContainer.goml",
+			"test_stack.goml",
+			"testHStack.goml",
+			"testScrollbar.goml",
+			"testSpinner.goml",
+			"testExpandable.goml",
+			"testWindow.goml",
+			"fps.goml",
+			"testMeter.goml",
+			"test3.goml",
+			"test4.1.goml",
+		};
 
 		#region FPS
 		int _fps = 0;
@@ -45,18 +69,9 @@ namespace test
 					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMin", fpsMin));
 				}
 
-				if (ValueChanged != null)
-					ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
-			}
-		}
-		string name = "testName";
-
-		public string Name {
-			get {
-				return name;
-			}
-			set {
-				name = value;
+				ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
+				ValueChanged.Raise (this, new ValueChangeEventArgs ("update",
+					this.updateTime.ElapsedMilliseconds.ToString () + " ms"));
 			}
 		}
 
@@ -69,27 +84,20 @@ namespace test
 			fpsMax = 0;
 			_fps = 0;
 		}
+		public string update = "";
 		#endregion
-		AnalogMeter g;
 
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-			LoadInterface("Interfaces/testMeter.goml", out g);
+			LoadInterface("Interfaces/" + testFiles[idx]);
 		}
-
-		protected override void OnRenderFrame (FrameEventArgs e)
-		{
-			GL.Clear (ClearBufferMask.ColorBufferBit);
-			base.OnRenderFrame (e);
-			SwapBuffers ();
-		}
-		private int frameCpt = 0;
 		protected override void OnUpdateFrame (FrameEventArgs e)
 		{
 			base.OnUpdateFrame (e);
 
 			fps = (int)RenderFrequency;
+
 
 			if (frameCpt > 200) {
 				resetFps ();
@@ -97,12 +105,27 @@ namespace test
 			}
 			frameCpt++;
 		}
+		protected override void OnKeyDown (KeyboardKeyEventArgs e)
+		{
+			base.OnKeyDown (e);
+			if (e.Key == Key.Escape) {
+				this.Quit ();
+			}
+			ClearInterface ();
+			idx++;
+			if (idx == testFiles.Length)
+				idx = 0;
+			this.Title = testFiles [idx];
+			LoadInterface("Interfaces/" + testFiles[idx]);
+
+		}
+
 		[STAThread]
 		static void Main ()
 		{
 			Console.WriteLine ("starting example");
 
-			using (GOLIBTest_meter win = new GOLIBTest_meter( )) {
+			using (GOLIBTests win = new GOLIBTests( )) {
 				win.Run (30.0);
 			}
 		}

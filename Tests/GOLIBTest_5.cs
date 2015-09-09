@@ -31,12 +31,6 @@ namespace test
 			gl.Add (c.FindByName ("g0"));
 			ll.Add (c.FindByName ("lab0")as Label);
 		}
-		protected override void OnRenderFrame (FrameEventArgs e)
-		{
-			GL.Clear (ClearBufferMask.ColorBufferBit);
-			base.OnRenderFrame (e);
-			SwapBuffers ();
-		}
 
 		int cpt;
 		protected override void OnUpdateFrame (FrameEventArgs e)

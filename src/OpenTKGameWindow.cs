@@ -88,7 +88,13 @@ namespace go
 			g.Visible = false;//trick to ensure clip is added to refresh zone
 			GraphicObjects.Remove (g);
 		}
-
+		/// <summary> Remove all Graphic objects from top container </summary>
+		public void ClearInterface()
+		{
+			foreach (GraphicObject g in GraphicObjects)
+				g.Visible = false;
+			GraphicObjects.Clear ();
+		}
 		public void Quit ()
 		{
 			this.Exit ();

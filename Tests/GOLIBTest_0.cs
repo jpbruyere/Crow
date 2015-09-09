@@ -50,12 +50,7 @@ namespace test6
 			tmp -= 1;
 			l.Text = tmp.ToString ();
 		}
-		protected override void OnRenderFrame (FrameEventArgs e)
-		{
-			GL.Clear (ClearBufferMask.ColorBufferBit);
-			base.OnRenderFrame (e);
-			SwapBuffers ();
-		}
+
 		protected override void OnKeyDown (KeyboardKeyEventArgs e)
 		{
 			switch (e.Key) {

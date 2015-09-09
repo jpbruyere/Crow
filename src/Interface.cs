@@ -113,9 +113,7 @@ namespace go
 			return tmp;
 		}
 		public static void Load<T>(string file, out T result, object hostClass = null)
-		{
-			//result = (T)(Load (file, hostClass) as object);
-
+		{			
 			GOMLResolutionStack.Push(new List<DynAttribute>());
 
 			XmlSerializerNamespaces xn = new XmlSerializerNamespaces();
