@@ -20,14 +20,14 @@ namespace test
 			: base(1024, 600,"test5")
 		{}
 
-		Container c;
+		GraphicObject c;
 		List<GraphicObject> gl = new List<GraphicObject>();
 		List<Label> ll = new List<Label>();
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
 
-			LoadInterface("Interfaces/test5.goml", out c);
+			c = LoadInterface("Interfaces/test5.goml");
 			gl.Add (c.FindByName ("g0"));
 			ll.Add (c.FindByName ("lab0")as Label);
 		}

@@ -80,23 +80,16 @@ namespace test
 //				"string 2",
 //				"string 3"
 //			};	
-		ListBox g;
 
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-			LoadInterface("Interfaces/test_Listbox.goml", out g);
+			LoadInterface("Interfaces/test_Listbox.goml");
 
 //			TestList [1].Field = "test string";
 //			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", null, TestList));
 
 
-		}
-		protected override void OnRenderFrame (FrameEventArgs e)
-		{
-			GL.Clear (ClearBufferMask.ColorBufferBit);
-			base.OnRenderFrame (e);
-			SwapBuffers ();
 		}
 
 		protected override void OnUpdateFrame (FrameEventArgs e)

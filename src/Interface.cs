@@ -87,6 +87,7 @@ namespace go
 			}
 			return stream;
 		}
+
 		public static GraphicObject Load(string path, object hostClass = null)
 		{
 			string root = "Object";
@@ -112,42 +113,7 @@ namespace go
 			stream.Dispose ();
 			return tmp;
 		}
-		public static void Load<T>(string file, out T result, object hostClass = null)
-		{			
-			GOMLResolutionStack.Push(new List<DynAttribute>());
-
-			XmlSerializerNamespaces xn = new XmlSerializerNamespaces();
-			xn.Add("", "");
-			XmlSerializer xs = new XmlSerializer(typeof(T));            
-
-			using (Stream s = new FileStream(file, FileMode.Open))
-			{
-				result = (T)xs.Deserialize(s);
-			}
-
-			if (hostClass == null)
-				return;
-
-			resolveGOML (hostClass);
-
-//			while (Bindings.Count > 0) {
-//				DynAttribute binding = Bindings [0];
-//				Bindings.RemoveAt (0);
-//				CompilerServices.ResolveBinding (binding, hostClass);
-//			}
-//			foreach (DynAttribute binding in Bindings) {
-////				Type tSource = binding.Source.GetType ();
-////				if (!tSource.GetInterfaces ().Any (i => i.Name == "IValueChange")){
-////					Debug.WriteLine ("Binding source does not implement IValueChange.");
-////					continue;
-////				}
-//				//MemberInfo mi = binding.Source.GetType ().GetMember (binding.MemberName);
-//				CompilerServices.CreateBinding (binding, hostClass);
-//			}
-//			Bindings.Clear ();
-		}
-
-		public static GraphicObject Load(Stream stream, Type type, object hostClass = null)
+		static GraphicObject Load(Stream stream, Type type, object hostClass = null)
 		{
 			GraphicObject result;
 			GOMLResolutionStack.Push(new List<DynAttribute>());

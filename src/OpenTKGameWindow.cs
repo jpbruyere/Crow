@@ -313,18 +313,6 @@ namespace go
 		#endregion
 			
 		#region loading
-		public void LoadInterface<T>(string path, out T result)
-		{
-			Interface.Load<T> (path, out result, this);
-			AddWidget (result as GraphicObject);
-		}
-		public T LoadInterface<T> (string Path)
-		{
-			T result;
-			Interface.Load<T> (Path, out result, this);
-			AddWidget (result as GraphicObject);
-			return result;
-		}
 		public GraphicObject LoadInterface (string path)
 		{
 			GraphicObject tmp = Interface.Load (path, this);
@@ -340,6 +328,7 @@ namespace go
 		{
 			GL.Clear (ClearBufferMask.ColorBufferBit);
 		}
+
 		#region Game win overrides
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{	

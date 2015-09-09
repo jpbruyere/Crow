@@ -22,13 +22,13 @@ namespace test6
 			: base(1024, 600,"test")
 		{}
 
-		Border g;
+		GraphicObject g;
 		Label l;
 
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-			LoadInterface("Interfaces/test0.goml", out g);
+			g = LoadInterface("Interfaces/test0.goml");
 			l = g.FindByName ("labCpt") as Label;
 		}
 

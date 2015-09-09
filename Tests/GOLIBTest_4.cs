@@ -66,7 +66,7 @@ namespace test
 		}
 		#endregion
 
-		Group c,c2;
+		GraphicObject c;
 		ProgressBar pb, pb2;
 		Label labMousePos, labPb, labF, labA, labH, labFps, labFpsMin, labFpsMax, labV,
 				labUpdate;
@@ -83,7 +83,7 @@ namespace test
 		{
 			base.OnLoad (e);
 
-			LoadInterface("Interfaces/test4.goml", out c);
+			c = LoadInterface("Interfaces/test4.goml");
 			//LoadInterface("golibtests/test4.xml", out c2);
 			//c2.HorizontalAlignment = HorizontalAlignment.Left;
 			//c2.VerticalAlignment = VerticalAlignment.Top;
