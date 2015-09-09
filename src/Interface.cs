@@ -79,11 +79,11 @@ namespace go
 				if (stream == null)//try to find ressource in golib assembly				
 					stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(resId);
 				if (stream == null)
-					return null;
+					throw new Exception ("Resource not found: " + path);
 			} else {
 				if (!File.Exists (path))
-					return null;
-				stream = new FileStream (path, FileMode.Open);
+					throw new FileNotFoundException ("File not found: ", path);
+				stream = new FileStream (path, FileMode.Open, FileAccess.Read);
 			}
 			return stream;
 		}
@@ -92,26 +92,26 @@ namespace go
 		{
 			string root = "Object";
 
-			Stream stream = GetStreamFromPath (path);
-			if (stream == null)
-				throw new FileNotFoundException ("GOML file not found", path);
-			
-			using (XmlReader reader = XmlReader.Create (stream)) {
-				while (reader.Read()) {
-					// first element is the root element
-					if (reader.NodeType == XmlNodeType.Element) {
-						root = reader.Name;
-						break;
+			using (Stream stream = GetStreamFromPath (path)) {
+
+				#region Pre-read first node to set GraphicObject class for loading
+				using (XmlReader reader = XmlReader.Create (stream)) {
+					while (reader.Read()) {
+						// first element is the root element
+						if (reader.NodeType == XmlNodeType.Element) {
+							root = reader.Name;
+							break;
+						}
 					}
 				}
-			}
 
-			Type t = Type.GetType("go." + root);
-			//var go = Activator.CreateInstance(t);
-			stream.Seek(0,SeekOrigin.Begin);
-			GraphicObject tmp = Load(stream, t, hostClass);
-			stream.Dispose ();
-			return tmp;
+				Type t = Type.GetType("go." + root);
+				//var go = Activator.CreateInstance(t);
+				stream.Seek(0,SeekOrigin.Begin);
+				#endregion
+
+				return Load(stream, t, hostClass);
+			}
 		}
 		static GraphicObject Load(Stream stream, Type type, object hostClass = null)
 		{

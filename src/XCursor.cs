@@ -46,32 +46,7 @@ namespace go
 
 		public List<XCursor> Cursors = new List<XCursor>();
 
-		static XCursorFile loadFromRessource (string resId)
-		{
-			Stream stream = null;
 
-			//first, search for ressource in main executable assembly
-			stream = System.Reflection.Assembly.GetEntryAssembly().GetManifestResourceStream(resId);
-			if (stream == null)//try to find ressource in golib assembly				
-				stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(resId);
-			if (stream == null) {
-				Debug.WriteLine ("Ressource not found: " + resId);
-				return null;
-			}
-
-			using (MemoryStream ms = new MemoryStream ()) {
-				stream.CopyTo (ms);
-				ms.Seek (0, SeekOrigin.Begin);
-				return loadFromStream (ms);
-			}			
-		}
-		static XCursorFile loadFromFile (string path)
-		{			
-			using (Stream s = new FileStream (path, 
-				FileMode.Open, FileAccess.Read)) {
-				return loadFromStream (s);
-			}		
-		}
 		static XCursorFile loadFromStream(Stream s)
 		{
 			List<toc> tocList = new List<toc> ();
@@ -108,10 +83,7 @@ namespace go
 
 		public static XCursorFile Load(string path)
 		{
-			if (path.StartsWith ("#"))
-				return loadFromRessource (path.Substring(1));
-			else
-				return loadFromFile (path);									
+			return loadFromStream (Interface.GetStreamFromPath (path));
 		}
 
 		static XCursor imageLoad(BinaryReader sr)

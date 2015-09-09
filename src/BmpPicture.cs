@@ -32,30 +32,12 @@ namespace go
 		{}
 		public BmpPicture (string path) : base(path)
 		{}
-
-		protected override void loadFromRessource (string resId)
+		protected override void loadFromStream (Stream stream)
 		{
-			Stream stream = null;
-
-			//first, search for ressource in main executable assembly
-			stream = System.Reflection.Assembly.GetEntryAssembly().GetManifestResourceStream(resId);
-			if (stream == null)//try to find ressource in golib assembly				
-				stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(resId);
-			if (stream == null)
-				return;
-
 			using (MemoryStream ms = new MemoryStream ()) {
 				stream.CopyTo (ms);
 				loadBitmap (new System.Drawing.Bitmap (ms));	
 			}
-		}
-
-		protected override void loadFromFile (string path)
-		{
-			if (!File.Exists(path))
-				return;
-
-			loadBitmap (new System.Drawing.Bitmap (path));
 		}
 
 		//load image via System.Drawing.Bitmap, cairo load png only

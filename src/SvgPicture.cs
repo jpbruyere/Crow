@@ -33,18 +33,8 @@ namespace go
 		{}
 		public SvgPicture (string path) : base(path)
 		{}
-
-		protected override void loadFromRessource (string resId)
+		protected override void loadFromStream (Stream stream)
 		{
-			Stream stream = null;
-
-			//first, search for ressource in main executable assembly
-			stream = System.Reflection.Assembly.GetEntryAssembly().GetManifestResourceStream(resId);
-			if (stream == null)//try to find ressource in golib assembly				
-				stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(resId);
-			if (stream == null)
-				return;
-
 			using (MemoryStream ms = new MemoryStream ()) {
 				stream.CopyTo (ms);
 
@@ -52,16 +42,7 @@ namespace go
 				Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
 			}
 		}
-
-		protected override void loadFromFile (string path)
-		{
-			if (!File.Exists(path))
-				return;
-
-			hSVG = new Rsvg.Handle (path);								 
-			Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
-		}
-
+			
 		public override void Paint (Cairo.Context gr, Rectangle rect, string subPart = "")
 		{
 			float widthRatio = (float)rect.Width / Dimensions.Width;

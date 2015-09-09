@@ -41,16 +41,12 @@ namespace go
 		#region Image Loading
 		public void LoadImage (string path)
 		{
-			if (path.StartsWith ("#"))
-				loadFromRessource (path.Substring (1));
-			else
-				loadFromFile (path);
+			loadFromStream (Interface.GetStreamFromPath (path));
 
 			Path = path;
 		}
-
-		protected abstract void loadFromRessource(string resId);
-		protected abstract void loadFromFile(string path);
+			
+		protected abstract void loadFromStream(Stream stream);
 		#endregion
 
 		public abstract void Paint(Context ctx, Rectangle rect, string subPart = "");
