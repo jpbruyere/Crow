@@ -33,6 +33,7 @@ namespace go
             get { return _height; }
             set { _height = value; }
         }
+
 		#region operators
 		public static implicit operator Rectangle(Size s)
 		{
