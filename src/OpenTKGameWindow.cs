@@ -398,6 +398,7 @@ namespace go
 			{
 				GraphicObjects.Remove(g);
 				GraphicObjects.Insert(0, g);
+				g.registerClipRect ();
 			}
 		}
 
