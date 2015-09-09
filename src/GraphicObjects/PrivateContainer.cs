@@ -81,7 +81,7 @@ namespace go
 		}
 		protected override Size measureRawSize ()
 		{			
-			return child == null ? Bounds.Size : new Size(child.Slot.Width + 2 * Margin, child.Slot.Height + 2 * (Margin));
+			return child == null ? Bounds.Size : child.Slot.Size + 2 * Margin;
 		}
 
 		public override void OnLayoutChanges (LayoutingType layoutType)
@@ -120,22 +120,14 @@ namespace go
 
 			ctx.Save();
 
-			//			ctx.Rectangle(ContextCoordinates(Slot));
-			//            ctx.Clip();
-			//
-
-
 			if (clip != null)
 				clip.clip(ctx);
 
 			base.Paint(ref ctx, clip);
 
 			//clip to client zone
-			ctx.Rectangle(Parent.ContextCoordinates(ClientRectangle + Slot.Position));
+			CairoHelpers.CairoRectangle (ctx, Parent.ContextCoordinates(ClientRectangle + Slot.Position), CornerRadius);
 			ctx.Clip();
-
-			//            if (clip != null)
-			//                clip.Rebase(this);
 
 			if (child != null)
 				child.Paint(ref ctx, clip);
