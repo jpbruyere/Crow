@@ -65,6 +65,7 @@
     <Compile Include="GOLIBTest_TypeViewer.cs" />
     <Compile Include="GOLIBTest_stack.cs" />
     <Compile Include="GOLIBTest_HStack.cs" />
+    <Compile Include="GOLIBTest_DirViewer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -143,6 +144,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Interfaces\testHStack.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\testDirViewer.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\tmpDirItem.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -14,37 +14,26 @@ using go;
 using System.Threading;
 using System.Reflection;
 using System.Linq;
+using System.IO;
 
 
-namespace test
+namespace test2
 {
-	class GOLIBTest_TypeViewer : OpenTKGameWindow
+	class GOLIBTest_DirViewer : OpenTKGameWindow
 	{
-		public GOLIBTest_TypeViewer ()
+		public GOLIBTest_DirViewer ()
 			: base(1024, 600,"test")
 		{}
 
-		VerticalStack g;
-		TypeContainer type;
+		public DirContainer CurDir;
 
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-			type = new TypeContainer(typeof (GraphicObject));
+			CurDir = new DirContainer(new DirectoryInfo ("/home/jp/"));
 
-			this.AddWidget(Interface.Load ("Interfaces/testTypeViewer.goml", type));
+			this.AddWidget(Interface.Load ("Interfaces/testDirViewer.goml", CurDir));
 			//LoadInterface("Interfaces/testTypeViewer.goml", out g);
-		}
-
-		protected override void OnRenderFrame (FrameEventArgs e)
-		{
-			GL.Clear (ClearBufferMask.ColorBufferBit);
-			base.OnRenderFrame (e);
-			SwapBuffers ();
-
-			MemberInfo mi;
-
-
 		}
 
 		[STAThread]
@@ -52,33 +41,34 @@ namespace test
 		{
 			Console.WriteLine ("starting example");
 
-			using (GOLIBTest_TypeViewer win = new GOLIBTest_TypeViewer( )) {
+			using (GOLIBTest_DirViewer win = new GOLIBTest_DirViewer( )) {
 				win.Run (30.0);
 			}
 		}
 	}
-	public class TypeContainer
+	public class DirContainer
 	{
-		public Type Type;
-		public TypeContainer(Type _type){
-			Type = _type;
+		public DirectoryInfo CurDir;
+		public DirContainer(DirectoryInfo _dir){
+			CurDir = _dir;
 		}
 		public string Name {
-			get { return Type.Name; }
+			get { return CurDir.Name; }
 		}
-		public MemberInfo[] Members {
+		public FileSystemInfo[] GetFileSystemInfos
+		{
 			get {
-				MemberInfo[] mi = Properties.Cast<MemberInfo> ().Concat (Methods.Cast<MemberInfo> ()).ToArray(); 
-				return mi;
+				return CurDir.GetFileSystemInfos ().Where(fi => !fi.Attributes.HasFlag(FileAttributes.Hidden)).ToArray();
 			}
 		}
-		public MethodInfo[] Methods {
-			get { return Type.GetMethods (BindingFlags.Public | BindingFlags.Instance).Where (m => !m.IsSpecialName).ToArray(); }
+		void onDirUp(object sender, MouseButtonEventArgs e)
+		{
+			
 		}
-		public PropertyInfo[] Properties {
-			get { return Type.GetProperties (); }
+		public void onMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			Debug.WriteLine (sender.ToString ());
 		}
-				
 	}
 
 }

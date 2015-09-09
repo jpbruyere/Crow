@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0"?>
 
-	<VerticalStack Height="-1" Width="250" Name="hstack" Margin="0" Spacing="0">
+	<VerticalStack Height="-1" Width="600" Name="hstack" Margin="0" Spacing="0">
 		<Border Height="-1" Width="0" BorderWidth="2" CornerRadius="10">
 			<Label Name="labName" Text="{Name}" Width="0" Height="-1"/>
 		</Border>
-		<ListBox Data="{Members}" Width="0" Height="400" ItemTemplate="Interfaces/tmpMembers.goml" Focusable="true">
+		<ListBox Data="{GetFileSystemInfos}" Width="0" Height="400" ItemTemplate="Interfaces/tmpDirItem.goml" Focusable="true">
 			<Template>
 				<Border Width="0" Height="0" BorderWidth="1" Margin="1" MinimumSize="0;100" >
 					<HorizontalStack Width="0" Height="0">
