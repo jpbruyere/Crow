@@ -151,8 +151,8 @@ namespace go
 		public static XCursor NE;
 		public static XCursor N;
 		public static XCursor S;
-
-
+		public static XCursor V;
+		public static XCursor H;
 
 		public uint Width;
 		public uint Height;

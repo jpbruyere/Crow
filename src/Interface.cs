@@ -34,7 +34,10 @@ namespace go
 		public static int TabSize = 4;
 		public static string LineBreak = "\r\n";
 		public static bool ReplaceTabsWithSpace = false;
+		/// <summary> Allow rendering of interface in development environment </summary>
 		public static bool DesignerMode = false;
+		/// <summary> Threshold to catch borders for sizing </summary>
+		public static int BorderThreshold = 5;
 
 		/// <summary>
 		/// Graphic objects References use in dynamic delegates for binding

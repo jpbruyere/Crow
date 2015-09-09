@@ -33,12 +33,7 @@ namespace go
 		public Window () : base()
 		{
 		}
-
-		void Window_MouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
-		{
-
-
-		}
+			
 		enum Direction
 		{
 			None,
@@ -49,7 +44,7 @@ namespace go
 			NW,
 			NE,
 			SW,
-			SE
+			SE,
 		}
 		Direction currentDirection = Direction.None;
 
@@ -59,24 +54,29 @@ namespace go
 
 			OpenTKGameWindow otkgw = TopContainer as OpenTKGameWindow;
 
-			int borderLim = 5;
-
-
-
-			if (TopContainer.activeWidget == null) {
+			if (otkgw.activeWidget == null) {
 				Direction lastDir = currentDirection;
 
-				if ((e.Position - this.Slot.TopLeft).Length < borderLim)
-					currentDirection = Direction.NW;
-				else if ((e.Position - this.Slot.TopRight).Length < borderLim)
-					currentDirection = Direction.NE;
-				else if ((e.Position - this.Slot.BottomLeft).Length < borderLim)
-					currentDirection = Direction.SW;
-				else if ((e.Position - this.Slot.BottomRight).Length < borderLim)
-					currentDirection = Direction.SE;
+				if (Math.Abs (e.Position.Y - this.Slot.Y) < Interface.BorderThreshold) {
+					if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
+						currentDirection = Direction.NW;
+					else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
+						currentDirection = Direction.NE;
+					else
+						currentDirection = Direction.N;
+				} else if (Math.Abs (e.Position.Y - this.Slot.Bottom) < Interface.BorderThreshold) {
+					if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
+						currentDirection = Direction.SW;
+					else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
+						currentDirection = Direction.SE;
+					else
+						currentDirection = Direction.S;
+				} else if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
+					currentDirection = Direction.W;
+				else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
+					currentDirection = Direction.E;
 				else
 					currentDirection = Direction.None;
-
 
 				if (currentDirection != lastDir) {
 					switch (currentDirection) {
@@ -84,16 +84,16 @@ namespace go
 						otkgw.Cursor = XCursor.Default;
 						break;
 					case Direction.N:
-						otkgw.Cursor = XCursor.Cross;
+						otkgw.Cursor = XCursor.V;
 						break;
 					case Direction.S:
-						otkgw.Cursor = XCursor.Cross;
+						otkgw.Cursor = XCursor.V;
 						break;
 					case Direction.E:
-						otkgw.Cursor = XCursor.Cross;
+						otkgw.Cursor = XCursor.H;
 						break;
 					case Direction.W:
-						otkgw.Cursor = XCursor.Cross;
+						otkgw.Cursor = XCursor.H;
 						break;
 					case Direction.NW:
 						otkgw.Cursor = XCursor.NW;
@@ -123,12 +123,18 @@ namespace go
 				this.Top += e.YDelta;
 				break;
 			case Direction.N:
+				this.Top += e.YDelta;
+				this.Height -= e.YDelta;
 				break;
 			case Direction.S:
-				break;
-			case Direction.E:
+				this.Height += e.YDelta;
 				break;
 			case Direction.W:
+				this.Left += e.XDelta;
+				this.Width -= e.XDelta;
+				break;
+			case Direction.E:
+				this.Width += e.XDelta;
 				break;
 			case Direction.NW:
 				this.Left += e.XDelta;

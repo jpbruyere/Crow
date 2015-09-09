@@ -189,6 +189,9 @@
     <EmbeddedResource Include="Images\Icons\Cursors\top_left_corner" />
     <EmbeddedResource Include="Images\Icons\Cursors\top_right_corner" />
     <EmbeddedResource Include="Images\Icons\Cursors\arrow" />
+    <EmbeddedResource Include="Images\Icons\exit2.svg" />
+    <EmbeddedResource Include="Images\Icons\Cursors\sb_h_double_arrow" />
+    <EmbeddedResource Include="Images\Icons\Cursors\sb_v_double_arrow" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\Icons\Cursors\hand" />

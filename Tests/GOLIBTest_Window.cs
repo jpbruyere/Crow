@@ -71,12 +71,12 @@ namespace test
 			: base(800, 600,"test")
 		{}
 
-		Window g;
 
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-			LoadInterface("Interfaces/testWindow.goml", out g);
+			LoadInterface("Interfaces/testWindow.goml");
+			LoadInterface("Interfaces/testWindow.goml");
 //			LoadInterface("Interfaces/testWindow.goml", out g);
 //			LoadInterface("Interfaces/testWindow.goml", out g);
 //			LoadInterface("Interfaces/testWindow.goml", out g);
@@ -105,6 +105,11 @@ namespace test
 		{
 			base.OnKeyDown (e);
 			this.Quit ();
+		}
+
+		void butQuitPress (object sender, MouseButtonEventArgs e)
+		{
+			DeleteWidget (sender as GraphicObject);
 		}
 
 		[STAThread]

@@ -40,7 +40,8 @@ namespace go
 			XCursor.NE = XCursorFile.Load("#go.Images.Icons.Cursors.top_right_corner").Cursors[0];
 			XCursor.SW = XCursorFile.Load("#go.Images.Icons.Cursors.bottom_left_corner").Cursors[0];
 			XCursor.SE = XCursorFile.Load("#go.Images.Icons.Cursors.bottom_right_corner").Cursors[0];
-
+			XCursor.H = XCursorFile.Load("#go.Images.Icons.Cursors.sb_h_double_arrow").Cursors[0];
+			XCursor.V = XCursorFile.Load("#go.Images.Icons.Cursors.sb_v_double_arrow").Cursors[0];
 		}        
 		#endregion
 
