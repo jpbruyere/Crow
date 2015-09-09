@@ -50,6 +50,8 @@ namespace go
 		#endregion
 
 		#region GraphicObject Overrides
+		//TODO: to be coherent, those overrides should be removed
+		//I could maybe set size to fit dynamicaly in the direction of the stack
 		[XmlAttributeAttribute()][DefaultValue(-1)]
 		public override int Width {
 			get { return base.Width; }
