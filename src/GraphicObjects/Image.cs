@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Xml.Serialization;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace go
 {
@@ -16,11 +17,16 @@ namespace go
 		string _svgSub;
 
         [XmlAttributeAttribute("Path")]        
-		public string ImagePath {
+		public string Path {
 			get { return _pic == null ? null : _pic.Path; }
-			set {				
-				LoadImage (value);
-				_pic.KeepProportions = true;
+			set {	
+				try {
+					LoadImage (value);
+					_pic.KeepProportions = true;
+				} catch (Exception ex) {
+					Debug.WriteLine (ex.Message);
+					_pic = null;
+				}
 			}
 		}
 
