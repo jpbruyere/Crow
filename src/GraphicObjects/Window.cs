@@ -176,7 +176,10 @@ namespace go
 
 		void butQuitPress (object sender, MouseButtonEventArgs e)
 		{
-			TopContainer.DeleteWidget (this);
+			ILayoutable parent = (sender as GraphicObject).Parent;
+			while(!(parent is Window))
+				parent = parent.Parent;
+			TopContainer.DeleteWidget (parent as GraphicObject);
 		}
 
 
