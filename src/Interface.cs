@@ -123,6 +123,7 @@ namespace go
 			XmlSerializer xs = new XmlSerializer(type);            
 
 			result = (GraphicObject)xs.Deserialize(stream);
+			result.DataSource = hostClass;
 
 			if (hostClass == null) {
 				GOMLResolutionStack.Pop ();

@@ -298,6 +298,7 @@ namespace go
 			get { return _minimumSize; }
 			set { _minimumSize = value; }
 		}
+		[XmlIgnore]public object DataSource;
 		#endregion
 
 		/// <summary>

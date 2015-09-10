@@ -43,7 +43,7 @@ namespace go
 		}
 		#endregion
 
-		ICollection data;
+		IList data;
 		int _selectedIndex;
 		string _itemTemplate;
 
@@ -56,9 +56,11 @@ namespace go
 			get { return _selectedIndex; }
 			set { _selectedIndex = value; }
 		}
-
+		public object SelectedItem{
+			get { return data[_selectedIndex]; }
+		}
 		[XmlAttributeAttribute][DefaultValue(null)]
-		public ICollection Data {
+		public IList Data {
 			get {
 				return data;
 			}
@@ -70,15 +72,15 @@ namespace go
 					return;
 				foreach (var item in data) {
 					GraphicObject g = Interface.Load (ItemTemplate, item);
-					//GraphicObject g = Interface.Load ("#go.Templates.Listbox.goml", item);
-//					g.Tag = item;
-//					g.MouseClick += (object sender, OpenTK.Input.MouseButtonEventArgs e) => {
-//						
-//					};
+					g.MouseClick += itemClick;
 					_list.addChild(g);
 
 				}
 			}
+		}
+		void itemClick(object sender, OpenTK.Input.MouseButtonEventArgs e){
+			NotifyValueChanged ("SelectedItem", (sender as GraphicObject).DataSource);
+			//Debug.WriteLine ((sender as GraphicObject).DataSource);
 		}
 	}
 }
