@@ -175,14 +175,21 @@ namespace go
 						MethodInfo mi = hostClass.GetType ().GetMethod (es.Value, BindingFlags.NonPublic | BindingFlags.Public
 						                | BindingFlags.Instance);
 
+						object effectiveHostClass = hostClass;
 						if (mi == null) {
-							Debug.WriteLine ("Handler Method not found: " + es.Value);
-							continue;
+							//TODO: hack to have it work, hostClass and dataSource should be clearly separated
+							mi = OpenTKGameWindow.currentWindow.GetType ().GetMethod (es.Value, BindingFlags.NonPublic | BindingFlags.Public
+								| BindingFlags.Instance);
+							if (mi == null) {
+								Debug.WriteLine ("Handler Method not found: " + es.Value);
+								continue;
+							}
+							effectiveHostClass = OpenTKGameWindow.currentWindow;
 						}
 
 						EventInfo ei = es.Source.GetType ().GetEvent (es.MemberName);
 						MethodInfo addHandler = ei.GetAddMethod ();
-						Delegate del = Delegate.CreateDelegate (ei.EventHandlerType, hostClass, mi);
+						Delegate del = Delegate.CreateDelegate (ei.EventHandlerType, effectiveHostClass, mi);
 
 
 						addHandler.Invoke(es.Source, new object[] {del});
