@@ -48,6 +48,7 @@ namespace go
 		string _name;
 		Color _background;
 		Color _foreground;
+		Font _font;
 		double _cornerRadius;
 		int _margin;
 		bool _focusable = false;
@@ -230,6 +231,11 @@ namespace go
 				_foreground = value;
 				registerForGraphicUpdate ();
 			}
+		}
+		[XmlAttributeAttribute()][DefaultValue("droid,10")]
+		public virtual Font Font {
+			get { return _font; }
+			set { _font = value; }
 		}
 		[XmlAttributeAttribute()][DefaultValue(2.0)]
 		public virtual double CornerRadius {

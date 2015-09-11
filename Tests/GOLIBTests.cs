@@ -31,13 +31,13 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"testLabel.goml",
 			"testGrid.goml",
 			"test1.goml",
 			"test1.1.goml",
 			"test1.2.goml",
 			"test1.3.goml",
 			"test2.goml",
-			"testLabel.goml",
 			"testContainer.goml",
 			"test_stack.goml",
 			"testHStack.goml",

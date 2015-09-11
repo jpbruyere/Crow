@@ -117,6 +117,7 @@
     <Compile Include="src\ReflexionExtensions.cs" />
     <Compile Include="src\XCursor.cs" />
     <Compile Include="src\GraphicObjects\Grid.cs" />
+    <Compile Include="src\GraphicObjects\TextRun.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
