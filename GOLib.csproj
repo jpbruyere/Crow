@@ -157,7 +157,6 @@
     <EmbeddedResource Include="Images\Icons\updown.svg" />
     <EmbeddedResource Include="Images\Icons\IconAlerte.svg" />
     <EmbeddedResource Include="Images\Icons\button.svg" />
-    <EmbeddedResource Include="Images\Icons\butAqua.svg" />
     <EmbeddedResource Include="Images\Icons\buttonB.svg" />
     <EmbeddedResource Include="Images\Icons\buttest.svg" />
     <EmbeddedResource Include="Images\Icons\buttest2.svg" />
