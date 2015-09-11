@@ -711,12 +711,10 @@ namespace go
 		}
 		public virtual void onMouseEnter(object sender, MouseMoveEventArgs e)
 		{
-			Debug.WriteLine ("Mouse enter: " + this.Name);
 			MouseEnter.Raise (this, e);
 		}
 		public virtual void onMouseLeave(object sender, MouseMoveEventArgs e)
 		{
-			Debug.WriteLine ("Mouse leave: " + this.Name);
 			MouseLeave.Raise (this, e);
 		}
 		#endregion

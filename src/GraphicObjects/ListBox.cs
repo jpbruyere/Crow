@@ -22,7 +22,7 @@ using System;
 using System.Collections;
 using System.Xml.Serialization;
 using System.ComponentModel;
-
+//TODO: implement ItemTemplate node in xml
 namespace go
 {
 	[DefaultTemplate("#go.Templates.Listbox.goml")]

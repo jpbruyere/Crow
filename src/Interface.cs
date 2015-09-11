@@ -157,8 +157,8 @@ namespace go
 		{
 			foreach (DynAttribute es in GOMLResolver)
 			{
-				if (string.IsNullOrEmpty(es.Value))
-					continue;
+//				if (string.IsNullOrEmpty(es.Value))
+//					continue;
 
 				Type dstType = es.Source.GetType ();
 				MemberInfo miTarget = dstType.GetMember (es.MemberName).FirstOrDefault();
