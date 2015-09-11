@@ -116,6 +116,7 @@
     <Compile Include="src\LayoutChangeEventArgs.cs" />
     <Compile Include="src\ReflexionExtensions.cs" />
     <Compile Include="src\XCursor.cs" />
+    <Compile Include="src\GraphicObjects\Grid.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

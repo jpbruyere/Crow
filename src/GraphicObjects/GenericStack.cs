@@ -39,7 +39,12 @@ namespace go
         public int Spacing
         {
 			get { return _spacing; }
-            set { _spacing = value; }
+            set { 
+				if (_spacing == value)
+					return;
+				_spacing = value; 
+				NotifyValueChanged ("Spacing", Spacing);
+			}
         }
         [XmlAttributeAttribute()][DefaultValue(Orientation.Horizontal)]
         public virtual Orientation Orientation
@@ -50,19 +55,6 @@ namespace go
 		#endregion
 
 		#region GraphicObject Overrides
-		//TODO: to be coherent, those overrides should be removed
-		//I could maybe set size to fit dynamicaly in the direction of the stack
-		[XmlAttributeAttribute()][DefaultValue(-1)]
-		public override int Width {
-			get { return base.Width; }
-			set { base.Width = value; }
-		}
-		[XmlAttributeAttribute()][DefaultValue(-1)]
-		public override int Height {
-			get { return base.Height; }
-			set { base.Height = value; }
-		}
-
 		protected override Size measureRawSize ()
 		{
 			Size tmp = new Size ();

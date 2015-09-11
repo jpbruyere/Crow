@@ -31,6 +31,7 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"testGrid.goml",
 			"test1.goml",
 			"test1.1.goml",
 			"test1.2.goml",
