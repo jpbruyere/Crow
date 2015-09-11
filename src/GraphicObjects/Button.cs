@@ -47,7 +47,7 @@ namespace go
             get { return base.Focusable; }
             set { base.Focusable = value; }
 		}
-		[XmlAttributeAttribute()][DefaultValue("#go.Images.Icons.buttest4.svg")]
+		[XmlAttributeAttribute()][DefaultValue("#go.Images.button.svg")]
 		public override Picture BackgroundImage {
 			get {
 				return base.BackgroundImage;

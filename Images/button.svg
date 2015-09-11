@@ -1,0 +1,16 @@
+﻿ <svg width="200" height="100">
+	<g id="normal">
+		<rect width="98%" height="98%" 
+			rx="10px" ry="10px" x="2%" y="2%"
+			style="fill:rgb(50,50,50);" />
+		<rect width="98%" height="98%" 
+			rx="10px" ry="10px" 
+			style="fill:rgb(200,200,200);" />
+	</g>
+	<g id="pressed">
+		<rect width="98%" height="98%" 
+			rx="10px" ry="10px" x="2%" y="2%"
+			style="fill:rgb(200,200,200);" />
+	</g>
+
+</svg> 
