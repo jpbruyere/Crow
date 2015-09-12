@@ -426,7 +426,8 @@ namespace go
 
 			if ((layoutType & (int)LayoutingType.Width) > 0) {
 
-				//force sizing to fit if parent is sizing on children
+				//force sizing to fit if parent is sizing on children and 
+				//this object has stretched size
 				if (Parent.getBounds ().Width < 0 && Width == 0)
 					Width = -1;
 				
