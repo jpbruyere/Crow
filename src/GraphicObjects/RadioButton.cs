@@ -30,11 +30,16 @@ namespace go
 		{
 			base.loadTemplate (template);
 
-			_caption = this.child.FindByName ("Caption") as Label;
+			_caption = this.child.FindByName ("Caption") as Label;//TODO:should use bindings instead
 			_image = this.child.FindByName ("Image") as Image;
 			_image.SvgSub = "unchecked";
 		}
-			
+
+		[XmlAttributeAttribute()][DefaultValue(-1)]
+		public override int Height {
+			get { return base.Height; }
+			set { base.Height = value; }
+		}
 		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
 		public override bool Focusable
 		{

@@ -3,20 +3,20 @@
 	HorizontalAlignment="Left" VerticalAlignment="Top"
 	Margin="10" Width="-1" Height="-1" Focusable="True" >
 
-		<VerticalStack Name="vsFps"  BorderWidth="1" Margin="5" Spacing="4">
-			<HorizontalStack>
+		<VerticalStack Name="vsFps"  BorderWidth="1" Margin="5" Spacing="4" Fit="true">
+			<HorizontalStack Height="-1">
 				<Label Text="Update:" FontColor="White" />
 				<Label Name="labUpdate" Text="{update}" FontSize="12" Background="DarkGreen"/>
 			</HorizontalStack>
-			<HorizontalStack Name="hsFps" Background="Red" >
+			<HorizontalStack Height="-1" Name="hsFps" Background="Red" >
 				<Label Name="captionFps" Text="Fps:" />
 				<Label Name="valueFps" Text="{fps}" Font="droid bold, 12" TextAlignment="Center" Background="AoEnglish"/>
 			</HorizontalStack>
-			<HorizontalStack Background="Red">
+			<HorizontalStack Height="-1" Background="Red">
 				<Label Text="Min:" Width = "30" />
 				<Label Text="{fpsMin}" Font="droid bold, 12" TextAlignment="Center" Background="AoEnglish"/>
 			</HorizontalStack>
-			<HorizontalStack Background="Red" >
+			<HorizontalStack Height="-1" Background="Red" >
 				<Label Text="Max:" Width = "30"/>
 				<Label Text="{fpsMax}" Font="droid bold, 12" TextAlignment="Center" Background="AoEnglish"/>
 			</HorizontalStack>

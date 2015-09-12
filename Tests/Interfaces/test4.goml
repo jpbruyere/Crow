@@ -1,91 +1,64 @@
 ﻿<?xml version="1.0"?>
-<Group Name="MainGrp" Focusable="true"
+<Group Name="MainGrp"
 	Width="800" Height="500"
 	Background="0,5;0,5;0,5;0,5" Foreground="White"
 	Margin="10" >
-	<Border Margin="10"
+	<Border Margin="10" CornerRadius="10"
 		Name="mainBorder"
 		BorderWidth="2" BorderColor="Transparent"
 		Focusable="True"
 		MouseEnter="{BorderColor = White}"
 		MouseLeave="{BorderColor = Transparent}">
-
-		<HorizontalStack Name="hs0"
-			WidgetSpacing="1" 
-			VerticalAlignment="Top">
-			<Slider Orientation="Vertical" Height="300" Width="10" Background="Transparent" />
-			<VerticalStack Name="vs1" Spacing="5">
-				<Slider Height="10" Width="300" BorderWidth="1" Background="Transparent" />
-				<Label Name="labMouse" Text="MousePos"/>
-				<HorizontalStack WidgetSpacing="10">
-					<VerticalStack Width="100">
-						<Checkbox Name="chk1" Focusable="true"/>
+		<HorizontalStack WidgetSpacing="1">
+			<VerticalStack Width="-1">
+				<HorizontalStack WidgetSpacing="1" Fit="true">
+					<VerticalStack Fit="true">
+						<Label Text="{MousePosition}"/>
+						<HorizontalStack  Name="hsFocus" Fit="true">
+							<Label Text="Focused:"/>
+							<Label Name="labFocus"/>
+						</HorizontalStack>
+						<HorizontalStack Fit="true">
+							<Label Text="Active:"  Name="hsActive"/>
+							<Label Name="labActive"/>
+						</HorizontalStack>
+						<HorizontalStack Fit="true">
+							<Label Text="Hover:"  Name="hsHover"/>
+							<Label Name="labHover"/>
+						</HorizontalStack>
+					</VerticalStack>
+					<VerticalStack Fit="true">					
+						<Checkbox Name="chk1"/>
 						<Checkbox Name="chk2" IsChecked="true"/>
-						<Checkbox Name="chk3" Template="#go.Templates.Checkbox2.goml"/>
-						<Checkbox Name="chk4">
+						<Checkbox Name="chk4" >
 							<Template>
-								<HorizontalStack Margin="0" Spacing="1" Focusable="false">
-									<Image Name="Image" Width="16" Height="16" Path="#go.Images.Icons.checkbox.svg"/>
-									<Label Name="Caption" Foreground="Black" Background="Yellow"/>
+								<HorizontalStack Fit="True" Margin="0" Spacing="1">
+									<Image Name="Image" Width="20" Height="20" Path="#go.Images.Icons.checkbox.svg"/>
+									<Label Name="Caption" Height="-1" Width="-1" Foreground="Black" Background="Yellow"/>
 								</HorizontalStack>
 							</Template>
 						</Checkbox>
 					</VerticalStack>
-					<VerticalStack Width="100">
+					<VerticalStack Fit="true">
 						<RadioButton IsChecked="true"/>
 						<RadioButton/>
 						<RadioButton>							
 							<Template>
-								<HorizontalStack Background="Green" Margin="0" Spacing="1" Focusable="false">
-									<Image Name="Image" Width="16" Height="16" Path="#go.Images.Icons.radiobutton.svg"/>
+								<HorizontalStack Fit="true" Background="Green" Margin="0" Spacing="1" Focusable="false">
+									<Image Name="Image" Width="20" Height="20" Path="#go.Images.Icons.radiobutton.svg"/>
 									<Label Name="Caption"/>
 								</HorizontalStack>
 							</Template>
 						</RadioButton>
-						<RadioButton/>
 					</VerticalStack>
-					<Spinner Width="50" Value="5"></Spinner>
 				</HorizontalStack>
-<!--				<ListBox Data="{TestList}"></ListBox>-->
-				<HorizontalStack Name="hsPbar" Margin="5">
-					<ProgressBar Name="pbBar" 
-						Width="200" Height="20"
-						Minimum="0"
-						Maximum="200"
-						Value="{fps}"
-						Foreground="BlueCrayola" Background="DarkGray"
-						BorderWidth="2" BorderColor="White"/>
-<!--					<Label Name="labPb"
-						Width="30"
-						TextAlignment="RightCenter"/>-->
-				</HorizontalStack>
-				<HorizontalStack  Name="hsFocus">
-					<Label Text="Focused:"/>
-					<Label Name="labFocus"/>
-				</HorizontalStack>
-				<HorizontalStack>
-					<Label Text="Active:"  Name="hsActive"/>
-					<Label Name="labActive"/>
-				</HorizontalStack>
-				<HorizontalStack>
-					<Label Text="Hover:"  Name="hsHover"/>
-					<Label Name="labHover"/>
-				</HorizontalStack>
-				<Button  Margin="5" BorderWidth="0" Width="-1" Height="-1"  HorizontalAlignment="Center">
-					<Label FontSize="18" Text="This is a test" Margin="5" Foreground="Black" />
-				</Button>
 				<TextBoxWidget Name="textbox1" TextAlignment="LeftCenter" Font="droid,14"						
-								Width="300" Height="-1" Margin="2"
-								BorderColor="White" BorderWidth="1"
+								Width="200" Height="-1" Margin="2" Background="White"
+								Forground="Black"
+								BorderColor="DimGray" BorderWidth="1"
 								Text="editable text"/>
-				<GroupBox Title="Group Box" Width="300" Height="100" 
-					BorderColor="White" BorderWidth="2" Margin="3">
-					<Label Name="labValue" FontSize="14" Text="{../../slider.Value}" TextAlignment="Center"/>
-				</GroupBox>
-				<Slider Height="10" Width="300" BorderWidth="1" Background="Transparent" />
-				<GraduatedSlider Name="slider" Height="30" Width="300" Foreground="BlueBell"/>
 			</VerticalStack>
-			<VerticalStack Width="-1" Height="-1"  Margin="0" WidgetSpacing="1">
+			<VerticalStack Fit="true"  Margin="0" WidgetSpacing="1">
 				<Button  Margin="1" Width="150" Height="100">
 					<Image Path="#Tests.image.tetra.png"/>
 				</Button>
@@ -116,7 +89,7 @@
 				</Expandable>
 				<HorizontalStack>
 					<Label Text="Update" FontColor="White"/>
-					<Label Name="labUpdate" Text="xxxx" FontSize="16" Width="60" TextAlignment="Center" Background="DarkGreen"/>
+					<Label Name="labUpdate" Text="{update}" FontSize="16" Width="60" TextAlignment="Center" Background="DarkGreen"/>
 				</HorizontalStack>
 				<HorizontalStack>
 					<Label Text="Fps:" Width = "30"/>
@@ -134,6 +107,53 @@
 						TextAlignment="Center" Background="AoEnglish"/>
 				</HorizontalStack>
 			</VerticalStack>
+			<HorizontalStack Width="-1">
+				<Scroller Name="scroller1" Background="DimGray" Width="-1"  
+					 Margin="5" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">
+					<VerticalStack Name="colors" VerticalAlignment="Top" Margin="1" Fit="true">
+						<ProgressBar Name="pbBar2" Width="100" Height="20" Value="50"
+									BorderWidth="2" BorderColor="White" Foreground="BlueCrayola" Background="DarkGray"/>
+						<ProgressBar Width="100" Height="20" Value="{fps}" BorderWidth="2"
+							BorderColor="White" Foreground="BlueCrayola" Background="DarkGray"/>												
+					</VerticalStack>
+				</Scroller>
+				<Scrollbar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" MaximumScroll="{../scroller1.MaximumScroll}"
+					Orientation="Vertical" Width="16" />
+			</HorizontalStack>
+		</HorizontalStack>
+<!--		<HorizontalStack Name="hs0"
+			WidgetSpacing="1" 
+			VerticalAlignment="Top">
+			<Slider Orientation="Vertical" Height="300" Width="10" Background="Transparent" />
+			<VerticalStack Name="vs1" Spacing="5">
+				<Slider Height="10" Width="300" BorderWidth="1" Background="Transparent" />
+				<HorizontalStack WidgetSpacing="10">
+					
+
+					<Spinner Width="50" Value="5"></Spinner>
+				</HorizontalStack>
+				<HorizontalStack Name="hsPbar" Margin="5">
+					<ProgressBar Name="pbBar" 
+						Width="200" Height="20"
+						Minimum="0"
+						Maximum="200"
+						Value="{fps}"
+						Foreground="BlueCrayola" Background="DarkGray"
+						BorderWidth="2" BorderColor="White"/>
+				</HorizontalStack>
+
+				<Button  Margin="5" BorderWidth="0" Width="-1" Height="-1"  HorizontalAlignment="Center">
+					<Label FontSize="18" Text="This is a test" Margin="5" Foreground="Black" />
+				</Button>
+
+				<GroupBox Title="Group Box" Width="300" Height="100" 
+					BorderColor="White" BorderWidth="2" Margin="3">
+					<Label Name="labValue" FontSize="14" Text="{../../slider.Value}" TextAlignment="Center"/>
+				</GroupBox>
+				<Slider Height="10" Width="300" BorderWidth="1" Background="Transparent" />
+				<GraduatedSlider Name="slider" Height="30" Width="300" Foreground="BlueBell"/>
+			</VerticalStack>
+	
 			<HorizontalStack Height="350" Width="-1">
 				<Scroller Name="scroller1" Background="DimGray" Height="0" Width="-1"  
 					 Margin="5" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">
@@ -148,10 +168,10 @@
 					Orientation="Vertical" Width="16" />
 			</HorizontalStack>
 		</HorizontalStack>
-
-		<Slider 
+-->
+<!--		<Slider 
 			Height="20" Width="100" 
 			Background="Transparent"
-			VerticalAlignment="Bottom" />
+			VerticalAlignment="Bottom" />-->
 		</Border>
 </Group>

@@ -25,7 +25,7 @@ namespace go
 		public Checkbox() : base()
 		{			
 		}	
-
+			
 		protected override void loadTemplate(GraphicObject template = null)
 		{			
 			base.loadTemplate (template);
@@ -64,6 +64,11 @@ namespace go
             }
         }
 
+		[XmlAttributeAttribute()][DefaultValue(-1)]
+		public override int Height {
+			get { return base.Height; }
+			set { base.Height = value; }
+		}
 		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
 		public override bool Focusable
 		{

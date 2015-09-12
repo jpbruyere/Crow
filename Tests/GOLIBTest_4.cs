@@ -33,7 +33,7 @@ namespace test
 
 
 		#region FPS
-		static int _fps = 0;
+		int _fps = 0;
 
 		public int fps {
 			get { return _fps; }
@@ -52,19 +52,23 @@ namespace test
 				}
 
 				ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
+				ValueChanged.Raise (this, new ValueChangeEventArgs ("update",
+					this.updateTime.ElapsedMilliseconds.ToString () + " ms"));
 			}
 		}
 
-		public static int fpsMin = 0;
-		public static int fpsMax = 0;
+		public int fpsMin = int.MaxValue;
+		public int fpsMax = 0;
 
-		static void resetFps ()
+		void resetFps ()
 		{
 			fpsMin = int.MaxValue;
 			fpsMax = 0;
 			_fps = 0;
 		}
+		public string update = "";
 		#endregion
+
 
 		GraphicObject c;
 		ProgressBar pb, pb2;
@@ -88,19 +92,19 @@ namespace test
 			//c2.HorizontalAlignment = HorizontalAlignment.Left;
 			//c2.VerticalAlignment = VerticalAlignment.Top;
 			c.Background.AdjustAlpha (0.5);
-			labMousePos = c.FindByName ("labMouse") as Label;
-			//pb = c.FindByName("pbBar") as ProgressBar;
-			pb2 = c.FindByName("pbBar2") as ProgressBar;
-			labPb = c.FindByName ("labPb") as Label;
+//			labMousePos = c.FindByName ("labMouse") as Label;
+//			//pb = c.FindByName("pbBar") as ProgressBar;
+//			pb2 = c.FindByName("pbBar2") as ProgressBar;
+//			labPb = c.FindByName ("labPb") as Label;
 			labF = c.FindByName ("labFocus") as Label;
 			labA = c.FindByName ("labActive") as Label;
 			labH = c.FindByName ("labHover") as Label;
-			labFps = c.FindByName ("labFps") as Label;
-			labFpsMin = c.FindByName ("labFpsMin") as Label;
-			labFpsMax = c.FindByName ("labFpsMax") as Label;
-			labV = c.FindByName ("labValue") as Label;
-			labUpdate = c.FindByName ("labUpdate") as Label;
-			slTest = c.FindByName ("slider") as Slider;
+//			labFps = c.FindByName ("labFps") as Label;
+//			labFpsMin = c.FindByName ("labFpsMin") as Label;
+//			labFpsMax = c.FindByName ("labFpsMax") as Label;
+//			labV = c.FindByName ("labValue") as Label;
+//			labUpdate = c.FindByName ("labUpdate") as Label;
+//			slTest = c.FindByName ("slider") as Slider;
 			colors = c.FindByName ("colors") as Group;
 
 
@@ -112,7 +116,7 @@ namespace test
 
 			int i = 0;
 			foreach (Color col in Color.ColorDic) {
-				HorizontalStack s = colors.addChild (new HorizontalStack ());
+				HorizontalStack s = colors.addChild (new HorizontalStack () { Fit = true});
 				s.HorizontalAlignment = HorizontalAlignment.Left;
 				Border b = new Border () {
 					Bounds = new Size (32, 20),
@@ -139,7 +143,7 @@ namespace test
 				if (i > 150)
 					break;
 			}
-			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
+//			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
 		}
 		void pFps_mousemove(object sender, MouseMoveEventArgs e)
 		{
@@ -158,38 +162,36 @@ namespace test
 
 			fps = (int)RenderFrequency;
 
-			labUpdate.Text = this.updateTime.ElapsedMilliseconds.ToString() + " ms";
 
 			if (frameCpt > 200) {
 				resetFps ();
 				frameCpt = 0;
-
 			}
 			frameCpt++;
 
-			if (pb2.Value == pb2.Maximum)
-				pb2.Value = 0;
-			pb2.Value++;
 
-			if (FocusedWidget==null)
-				labF.Text = "- none -";
-			else
-				labF.Text = FocusedWidget.Name;
-
-			if (activeWidget==null)
-				labA.Text = "- none -";
-			else
-				labA.Text = activeWidget.Name;
-
-			if (hoverWidget==null)
-				labH.Text = "- none -";
-			else
-				labH.Text = hoverWidget.Name;
+//			if (FocusedWidget==null)
+//				labF.Text = "- none -";
+//			else
+//				labF.Text = FocusedWidget.Name;
+//
+//			if (activeWidget==null)
+//				labA.Text = "- none -";
+//			else
+//				labA.Text = activeWidget.Name;
+//
+//			if (hoverWidget==null)
+//				labH.Text = "- none -";
+//			else
+//				labH.Text = hoverWidget.Name;
 		}
+		//public Point MousePosition;
+
 		protected override void OnMouseMove (MouseMoveEventArgs e)
 		{
 			base.OnMouseMove (e);
-			labMousePos.Text = e.Position.ToString ();
+			//MousePosition = e.Position;
+			ValueChanged.Raise(this, new ValueChangeEventArgs ("MousePosition", e.Position.ToString()));
 		}
 		[STAThread]
 		static void Main ()
