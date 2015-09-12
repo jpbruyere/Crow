@@ -322,13 +322,19 @@ namespace go
 				PropertyInfo piTarget = dstType.GetProperty(binding.MemberName);
 
 				Type srcValueType = null;
+
+			if (miSrc == null)
+				//this allow memberless binding with only a name passed as MemberName
+				//but the value passed has to be a string
+				srcValueType = typeof(string);
+			else{
 				if (miSrc.MemberType == MemberTypes.Property)
 					srcValueType = (miSrc as PropertyInfo).PropertyType;
 				else if (miSrc.MemberType == MemberTypes.Field) 
 					srcValueType = (miSrc as FieldInfo).FieldType;
 				else
 					throw new Exception("unandled source member type for binding");
-				
+			}
 				if (!srcValueType.IsValueType)
 					il.Emit(OpCodes.Castclass, srcValueType);
 				else if (piTarget.PropertyType != srcValueType)
