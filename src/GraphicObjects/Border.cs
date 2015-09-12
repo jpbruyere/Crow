@@ -45,16 +45,7 @@ namespace go
 
 		protected override Size measureRawSize ()
 		{
-			Size raw = Bounds.Size;
-
-			if (Child != null) {
-				if (Bounds.Width < 0)
-					raw.Width = Child.Slot.Width + 2 * (Margin+BorderWidth);
-				if (Bounds.Height < 0)
-					raw.Height = Child.Slot.Height + 2 * (Margin+BorderWidth);
-			}
-
-			return raw;
+			return child == null ? Bounds.Size : child.Slot.Size + 2 * (Margin + BorderWidth);
 		}
 		protected override void onDraw (Cairo.Context gr)
 		{
