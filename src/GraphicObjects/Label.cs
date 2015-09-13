@@ -233,11 +233,6 @@ namespace go
 			get { return base.Height; }
 			set { base.Height = value; }
 		}
-		[XmlAttributeAttribute()][DefaultValue(2)]
-		public override int Margin {
-			get { return base.Margin; }
-			set { base.Margin = value; }
-		}
 
 		protected override Size measureRawSize()
         {
