@@ -87,33 +87,38 @@ namespace go
 			}
 			return stream;
 		}
-
-		public static GraphicObject Load(string path, object hostClass = null)
-		{
+		/// <summary>
+		/// Pre-read first node to set GraphicObject class for loading
+		/// and reset stream position to 0
+		/// </summary>
+		public static Type GetTopContainerOfGOMLStream(Stream stream){
 			string root = "Object";
-
-			using (Stream stream = GetStreamFromPath (path)) {
-
-				#region Pre-read first node to set GraphicObject class for loading
-				using (XmlReader reader = XmlReader.Create (stream)) {
-					while (reader.Read()) {
-						// first element is the root element
-						if (reader.NodeType == XmlNodeType.Element) {
-							root = reader.Name;
-							break;
-						}
+			stream.Seek(0,SeekOrigin.Begin);
+			using (XmlReader reader = XmlReader.Create (stream)) {
+				while (reader.Read()) {
+					// first element is the root element
+					if (reader.NodeType == XmlNodeType.Element) {
+						root = reader.Name;
+						break;
 					}
 				}
-
-				Type t = Type.GetType("go." + root);
-				//var go = Activator.CreateInstance(t);
-				stream.Seek(0,SeekOrigin.Begin);
-				#endregion
-
-				return Load(stream, t, hostClass);
 			}
+
+			Type t = Type.GetType("go." + root);
+			//var go = Activator.CreateInstance(t);
+			stream.Seek(0,SeekOrigin.Begin);
+			return t;
 		}
-		static GraphicObject Load(Stream stream, Type type, object hostClass = null)
+		public static string CurrentGOMLPath;
+		public static GraphicObject Load(string path, object hostClass = null)
+		{			
+			CurrentGOMLPath = path;
+			using (Stream stream = GetStreamFromPath (path)) {
+				return Load(stream, GetTopContainerOfGOMLStream(stream), hostClass);
+			}
+			CurrentGOMLPath = "";
+		}
+		public static GraphicObject Load(Stream stream, Type type, object hostClass = null, bool resolve = true)
 		{
 			GraphicObject result;
 			GOMLResolutionStack.Push(new List<DynAttribute>());
@@ -129,31 +134,14 @@ namespace go
 				GOMLResolutionStack.Pop ();
 				return result;
 			}
-
-			resolveGOML (hostClass);
-
-//			while (Bindings.Count > 0) {
-//				DynAttribute binding = Bindings [0];
-//				Bindings.RemoveAt (0);
-//				CompilerServices.ResolveBinding (binding, hostClass);
-//			}
-
-//			foreach (DynAttribute binding in Bindings) {
-//				//				Type tSource = binding.Source.GetType ();
-//				//				if (!tSource.GetInterfaces ().Any (i => i.Name == "IValueChange")){
-//				//					Debug.WriteLine ("Binding source does not implement IValueChange.");
-//				//					continue;
-//				//				}
-//				//MemberInfo mi = binding.Source.GetType ().GetMember (binding.MemberName);
-//				CompilerServices.CreateBinding (binding, hostClass);
-//			}
-//			Bindings.Clear ();
-
+				
+			if (resolve)
+				resolveGOML (hostClass);
 
 			return result;
 		}
 
-		static void resolveGOML(object hostClass)
+		public static void resolveGOML(object hostClass)
 		{
 			foreach (DynAttribute es in GOMLResolver)
 			{

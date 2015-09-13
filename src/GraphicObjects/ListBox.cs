@@ -23,6 +23,10 @@ using System.Collections;
 using System.Xml.Serialization;
 using System.ComponentModel;
 //TODO: implement ItemTemplate node in xml
+using System.IO;
+using System.Diagnostics;
+
+
 namespace go
 {
 	[DefaultTemplate("#go.Templates.Listbox.goml")]
@@ -70,12 +74,35 @@ namespace go
 				_list.Children.Clear ();
 				if (data == null)
 					return;
+
+				#if DEBUG
+				Stopwatch loadingTime = new Stopwatch ();
+				loadingTime.Start ();
+				#endif
+
+				MemoryStream ms = new MemoryStream ();
+				using (Stream stream = Interface.GetStreamFromPath (ItemTemplate)) {
+					
+					stream.CopyTo (ms);
+				}
+					
+				Type t = Interface.GetTopContainerOfGOMLStream (ms);
+
 				foreach (var item in data) {
-					GraphicObject g = Interface.Load (ItemTemplate, item);
+					ms.Seek(0,SeekOrigin.Begin);
+					GraphicObject g = Interface.Load (ms, t, item);
 					g.MouseClick += itemClick;
 					_list.addChild(g);
 
 				}
+				ms.Dispose ();
+
+				#if DEBUG
+				loadingTime.Stop ();
+				Debug.WriteLine("Listbox Loading: {0} ticks \t, {1} ms",
+					loadingTime.ElapsedTicks,
+					loadingTime.ElapsedMilliseconds);
+				#endif
 			}
 		}
 		void itemClick(object sender, OpenTK.Input.MouseButtonEventArgs e){
