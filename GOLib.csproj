@@ -118,6 +118,7 @@
     <Compile Include="src\XCursor.cs" />
     <Compile Include="src\GraphicObjects\Grid.cs" />
     <Compile Include="src\GraphicObjects\TextRun.cs" />
+    <Compile Include="src\GraphicObjects\MessageBox.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -194,6 +195,8 @@
     <EmbeddedResource Include="Images\Icons\Cursors\sb_h_double_arrow" />
     <EmbeddedResource Include="Images\Icons\Cursors\sb_v_double_arrow" />
     <EmbeddedResource Include="Images\button.svg" />
+    <EmbeddedResource Include="Templates\MessageBox.goml" />
+    <EmbeddedResource Include="Images\Icons\iconInfo.svg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\Icons\Cursors\hand" />

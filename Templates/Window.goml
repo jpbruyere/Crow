@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="1" BorderColor="White" Margin="0" CornerRadius="20">
-	<VerticalStack Height="0" Width="0" Margin="0">
-		<Border BorderWidth="1" BorderColor="White"  Height="-1" Width="0" Background="0,1;0,5;1,0;0,5">
-			<HorizontalStack Name="hs" Margin="1" Spacing="1" Height="-1" Width="0" Focusable="false" >
-				<GraphicObject Width="5" Height="0"/>
+<Border BorderWidth="1" BorderColor="White" CornerRadius="20">
+	<VerticalStack Height="0">
+		<Border BorderWidth="1" BorderColor="White"  Height="-1" Background="0,1;0,5;1,0;0,5">
+			<HorizontalStack Name="hs" Margin="1" Spacing="1" Height="-1" >
+				<GraphicObject Width="5"/>
 				<Image Name="Image" Margin="1" Width="12" Height="12" Path="#go.Images.Icons.tetra.png"/>
 				<Label Foreground="White" Width="0" Name="Title" Margin="1" TextAlignment="Center" />
 				<Border CornerRadius="6" BorderWidth="1" Margin="0" BorderColor="Transparent"  Height="12" Width="12"
@@ -11,9 +11,9 @@
 					<Image Focusable="true" Name="Image" Margin="0" Width="0" Height="0" Path="#go.Images.Icons.exit2.svg"
 						 MouseClick="butQuitPress"/>
 				</Border>
-				<GraphicObject Width="5" Height="0"/>
+				<GraphicObject Width="5"/>
 			</HorizontalStack>
 		</Border>
-		<Container Name="Content" Margin="0" Width="0" Height="0"/>
+		<Container Name="Content"/>
 	</VerticalStack>
 </Border>
