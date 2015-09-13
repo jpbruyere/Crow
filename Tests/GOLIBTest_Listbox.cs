@@ -13,6 +13,8 @@ using System.Diagnostics;
 using go;
 using System.Threading;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 
 namespace test
@@ -62,18 +64,7 @@ namespace test
 //				new ClsItem("string 2"),
 //				new ClsItem("string 3")
 //			});
-		public List<string> TestList = new List<string>(new string[] 
-			{
-				"string 1",
-				"string 2",
-//				"string 3",
-//				"string 4",
-//				"string 5",
-//				"string 6",
-//				"string 7",
-//				"string 8",
-				"string 9"
-			});		
+		public List<string> TestList;
 //		string[] TestList = new string[] 
 //			{
 //				"string 1",
@@ -84,6 +75,8 @@ namespace test
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
+
+			TestList = Directory.GetFileSystemEntries("/mnt/data/MagicCardDataBase/", "*.txt",SearchOption.AllDirectories).ToList();
 			LoadInterface("Interfaces/test_Listbox.goml");
 
 //			TestList [1].Field = "test string";
