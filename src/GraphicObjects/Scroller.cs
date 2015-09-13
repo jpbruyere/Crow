@@ -52,7 +52,12 @@ namespace go
 			set {
 				if (_scrollX == value)
 					return;
-				_scrollX = value;
+				if (value < 0.0)
+					_scrollX = 0.0;
+				else if (value > Child.Slot.Width - ClientRectangle.Width)
+					_scrollX = Math.Max(0.0, Child.Slot.Width - ClientRectangle.Width);
+				else
+					_scrollX = value;
 				ValueChanged.Raise(this, new ValueChangeEventArgs("ScrollX", _scrollX));
 				RegisterForRedraw();
 			}
@@ -67,7 +72,12 @@ namespace go
 			set {
 				if (_scrollY == value)
 					return;
-				_scrollY = value;
+				if (value < 0.0)
+					_scrollY = 0.0;
+				else if (value > Child.Slot.Height - ClientRectangle.Height)
+					_scrollY = Math.Max(0.0,Child.Slot.Height - ClientRectangle.Height);
+				else
+					_scrollY = value;
 				ValueChanged.Raise(this, new ValueChangeEventArgs("ScrollY", _scrollY));
 				RegisterForRedraw();
 			}
@@ -133,24 +143,9 @@ namespace go
 				return;
 			
 			if (VerticalScrolling )
-            {
 				ScrollY -= e.Delta * ScrollSpeed;
-
-                if (ScrollY < 0.0)
-                    ScrollY = 0.0;
-				else if (ScrollY > Child.Slot.Height - ClientRectangle.Height)
-					ScrollY = Child.Slot.Height - ClientRectangle.Height;
-
-            }
             if (HorizontalScrolling )
-            {
 				ScrollX -= e.Delta * ScrollSpeed;
-
-				if (ScrollX < 0.0)
-					ScrollX = 0.0;
-				else if (ScrollX > Child.Slot.Width - ClientRectangle.Width)
-					ScrollX = Child.Slot.Width - ClientRectangle.Width;
-            }
         }
 		#endregion
 
