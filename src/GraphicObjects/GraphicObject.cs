@@ -736,82 +736,52 @@ namespace go
 		{
 			return null;
 		}
-		//TODO: allert or inform when unknow attribute name in XML, very confusing...
 		public virtual void ReadXml (System.Xml.XmlReader reader)
 		{
-			foreach (EventInfo ei in this.GetType().GetEvents()) {
-//				FieldInfo fi = this.GetType().GetField(ei.Name,
-//					BindingFlags.NonPublic |
-//					BindingFlags.Instance |
-//					BindingFlags.GetField);
-				string handler = reader.GetAttribute(ei.Name);
-				if (string.IsNullOrEmpty (handler))
+			if (!reader.HasAttributes)
+				return;
+			Type thisType = this.GetType ();
+			while (reader.MoveToNextAttribute ()) {
+				string attName = reader.Name;
+				string attValue = reader.Value;
+				MemberInfo mi = thisType.GetMember (attName).FirstOrDefault();
+				if (mi == null) {
+					Debug.WriteLine (Interface.CurrentGOMLPath + "=>GOML: Unknown attribute in " + thisType.ToString() + " : " + attName);
 					continue;
-					
-				Interface.GOMLResolver.Add(new DynAttribute 
-					{ 
-						Source = this, 
-						Value = handler,
-						MemberName = ei.Name
-					});
-			}
-			foreach (PropertyInfo pi in this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
-				if (pi.GetSetMethod () == null)
-					continue;
-
-				bool isAttribute = false;
-
-				string name = "";
-				object value = null;
-				object defaultValue = null;
-
-				Type valueType = null;
-
-
-				MemberInfo mi = pi.GetGetMethod ();
-
-				//if (mi.MemberType == MemberTypes.Property)
-				//{
-				//    PropertyInfo pi = mi as PropertyInfo;
-				//    value = pi.GetValue(this, null);
-				//    valueType = pi.PropertyType;
-				//}
-				//else if (mi.MemberType == MemberTypes.Field)
-				//{
-				//    FieldInfo fi = mi as FieldInfo;
-				//    value = fi.GetValue(this);
-				//    valueType = fi.FieldType;
-				//}
-
-				object[] att = pi.GetCustomAttributes (false);
-
-				foreach (object o in att) {
-					XmlAttributeAttribute xaa = o as XmlAttributeAttribute;
-					if (xaa != null) {
-						isAttribute = true;
-						if (string.IsNullOrEmpty (xaa.AttributeName))
-							name = pi.Name;
-						else
-							name = xaa.AttributeName;
-						continue;
-					}
-
-					XmlIgnoreAttribute xia = o as XmlIgnoreAttribute;
-					if (xia != null)
-						continue;
-
-					DefaultValueAttribute dv = o as DefaultValueAttribute;
-					if (dv != null) {
-						defaultValue = dv.Value;
-						continue;
-					}
 				}
+				if (mi.MemberType == MemberTypes.Event) {
+					Interface.GOMLResolver.Add (new DynAttribute { 
+						Source = this, 
+						Value = attValue,
+						MemberName = attName
+					});
+				} else if (mi.MemberType == MemberTypes.Property) {
+					PropertyInfo pi = mi as PropertyInfo;
 
+					if (pi.GetSetMethod () == null)
+						continue;
 
-				if (isAttribute) {
-					string v = reader.GetAttribute (name);
+					bool isAttribute = false;
+					object defaultValue = null;
 
-					if (string.IsNullOrEmpty (v)) {
+					foreach (object o in pi.GetCustomAttributes ()) {
+						XmlAttributeAttribute xaa = o as XmlAttributeAttribute;
+						if (xaa != null) {
+							isAttribute = true;
+							if (!string.IsNullOrEmpty (xaa.AttributeName))
+								attName = xaa.AttributeName;
+							continue;
+						}
+						if (o is XmlIgnoreAttribute)
+							break;
+						DefaultValueAttribute dv = o as DefaultValueAttribute;
+						if (dv != null)
+							defaultValue = dv.Value;						
+					}
+					if (!isAttribute)
+						continue;
+					
+					if (string.IsNullOrEmpty (attValue)) {
 						//avoid system types automaticaly converted by parser
 						if (defaultValue != null && !pi.PropertyType.Namespace.StartsWith("System")) {
 							if (pi.PropertyType != defaultValue.GetType()) {
@@ -822,50 +792,42 @@ namespace go
 								}
 							}
 						}
-
 						pi.SetValue (this, defaultValue, null);
-
 					} else {
-						
-						if (v.StartsWith("{")) {
+
+						if (attValue.StartsWith("{")) {
 							//binding
-							if (!v.EndsWith("}"))
-								throw new Exception (string.Format("GOML:Malformed binding: {0}", v));
-							
-							string strBinding = v.Substring (1, v.Length - 2);
+							if (!attValue.EndsWith("}"))
+								throw new Exception (string.Format("GOML:Malformed binding: {0}", attValue));
+
+							string strBinding = attValue.Substring (1, attValue.Length - 2);
 							Interface.GOMLResolver.Add (new DynAttribute () {
 								Source = this,
-								MemberName = name,
+								MemberName = attName,
 								Value = strBinding
 							});
 							continue;
 						}
 
 						if (pi.PropertyType == typeof(string)) {
-							pi.SetValue (this, v, null);
+							pi.SetValue (this, attValue, null);
 							continue;
 						}
 
 						object o = null;
 
 						if (pi.PropertyType.IsEnum) {
-							o = Enum.Parse (pi.PropertyType, v);
+							o = Enum.Parse (pi.PropertyType, attValue);
 						} else {
 							MethodInfo me = pi.PropertyType.GetMethod ("Parse", new Type[] { typeof(string) });
-							o = me.Invoke (null, new string[] { v });
+							o = me.Invoke (null, new string[] { attValue });
 						}
 
 						pi.SetValue (this, o, null);
-					}
-				} else {
-					////if member type is not serializable, cancel
-					//if (valueType.GetInterface("IXmlSerializable") == null)
-					//    continue;
-
-					//(pi.GetValue(this, null) as IXmlSerializable).WriteXml(writer);
+					}					
 				}
 			}
-
+			reader.MoveToElement();
 		}
 		public virtual void WriteXml (System.Xml.XmlWriter writer)
 		{
