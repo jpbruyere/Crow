@@ -20,10 +20,16 @@ namespace go
 		#endregion
 
         bool _multiSelect = false;
+		List<GraphicObject> children = new List<GraphicObject>();
 
         public GraphicObject activeWidget;
-        public List<GraphicObject> Children = new List<GraphicObject>();
 
+        public virtual List<GraphicObject> Children {
+			get { return children; }
+			set { 
+				children = value; 
+			}
+		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
         public bool MultiSelect
         {
