@@ -174,7 +174,7 @@ namespace go
 			_icon = this.child.FindByName ("Icon") as Image;
 		}
 
-		void butQuitPress (object sender, MouseButtonEventArgs e)
+		protected void butQuitPress (object sender, MouseButtonEventArgs e)
 		{
 			ILayoutable parent = (sender as GraphicObject).Parent;
 			while(!(parent is Window))

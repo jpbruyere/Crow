@@ -295,12 +295,12 @@ namespace go
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("0;0")]
-		public Size MaximumSize {
+		public virtual Size MaximumSize {
 			get { return _maximumSize; }
 			set { _maximumSize = value; }
 		}
 		[XmlAttributeAttribute()][DefaultValue("0;0")]
-		public Size MinimumSize {
+		public virtual Size MinimumSize {
 			get { return _minimumSize; }
 			set { _minimumSize = value; }
 		}

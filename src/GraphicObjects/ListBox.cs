@@ -72,6 +72,7 @@ namespace go
 				data = value;
 
 				_list.Children.Clear ();
+				_list.registerForGraphicUpdate ();
 				if (data == null)
 					return;
 
