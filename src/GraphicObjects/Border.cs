@@ -51,18 +51,18 @@ namespace go
 		{
 			Rectangle rBack = new Rectangle (Slot.Size);
 
+			rBack.Inflate (-Margin);
 			if (BorderWidth > 0) 
-				rBack.Inflate (-BorderWidth / 2);
+				rBack.Inflate (-BorderWidth / 2);			
 
 			gr.Color = Background;
 			CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);
 			gr.Fill ();
 
 			if (BorderWidth > 0) {
-
 				gr.LineWidth = BorderWidth;
 				gr.Color = BorderColor;
-				CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);
+				CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
 				gr.Stroke ();
 			}
 		}		

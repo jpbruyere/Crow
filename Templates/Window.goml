@@ -6,7 +6,7 @@
 				<GraphicObject Width="5"/>
 				<Image Name="Image" Margin="1" Width="12" Height="12" Path="#go.Images.Icons.tetra.png"/>
 				<Label Foreground="White" Width="0" Name="Title" Margin="1" TextAlignment="Center" />
-				<Border CornerRadius="6" BorderWidth="1" Margin="0" BorderColor="Transparent"  Height="12" Width="12"
+				<Border CornerRadius="6" BorderWidth="1" BorderColor="Transparent"  Height="12" Width="12"
 					MouseEnter="{BorderColor=White}" MouseLeave="{BorderColor=Transparent}">
 					<Image Focusable="true" Name="Image" Margin="0" Width="0" Height="0" Path="#go.Images.Icons.exit2.svg"
 						 MouseClick="butQuitPress"/>
