@@ -69,10 +69,6 @@ namespace go
 				NotifyValueChanged ("Image", image);
 			}
 		} 
-		[XmlAttributeAttribute()][DefaultValue("collapsed")]
-		public string SvgSub {
-			get { return IsPopped ? "expanded" : "collapsed"; } 
-		} 
 
 		[XmlAttributeAttribute()][DefaultValue(false)]
         public bool IsPopped
@@ -80,35 +76,39 @@ namespace go
 			get { return _isPopped; }
             set
             {
-                if (value == _isPopped)
-                    return;
-
 				_isPopped = value;
-				NotifyValueChanged ("SvgSub", SvgSub);
 
-				if (_isPopped)
+				if (_isPopped) {
 					onPop (this, null);
-				else
-					onUnpop (this, null);
+					NotifyValueChanged ("SvgSub", "expanded");
+					return;
+				}
 
-                //registerForGraphicUpdate();
+				onUnpop (this, null);
+				NotifyValueChanged ("SvgSub", "collapsed");
             }
         }
 			
 		public virtual void onPop(object sender, EventArgs e)
 		{
+			IGOLibHost tc = TopContainer;
+			if (tc == null)
+				return;
 			if (Content != null) {
 				Rectangle r = this.ScreenCoordinates (this.Slot);
 				Content.Visible = true;
 				Content.Left = r.Left;
 				Content.Top = r.Bottom;
-				TopContainer.AddWidget (Content);
+				tc.AddWidget (Content);
 			}
 			Pop.Raise (this, e);
 		}
 		public virtual void onUnpop(object sender, EventArgs e)
 		{
-			TopContainer.DeleteWidget (Content);
+			IGOLibHost tc = TopContainer;
+			if (tc == null)
+				return;
+			tc.DeleteWidget (Content);
 			Unpop.Raise (this, e);
 		}
 			

@@ -19,51 +19,18 @@ namespace go
 	[DefaultTemplate("#go.Templates.Checkbox.goml")]
     public class Checkbox : TemplatedControl
     {		        
-		Label _caption;
-		Image _image;
+		string caption;
+		string image;
+		bool isChecked;
 
+		#region CTOR
 		public Checkbox() : base()
 		{			
-		}	
-			
-		protected override void loadTemplate(GraphicObject template = null)
-		{			
-			base.loadTemplate (template);
+		}							
+		#endregion
 
-			_caption = this.child.FindByName ("Caption") as Label;
-			_image = this.child.FindByName ("Image") as Image;
-			_image.SvgSub = "unchecked";
-		}
-			
 
-		[XmlAttributeAttribute()][DefaultValue("Checkbox")]
-		public string Caption {
-			get { return _caption == null ? "" : _caption.Text; } 
-			set { 
-				if (_caption == null)
-					return;
-				_caption.Text = value; 
-			}
-		}
-        [XmlAttributeAttribute()][DefaultValue(false)]
-        public bool IsChecked
-        {
-			get { return _image == null ? false :_image.SvgSub == "checked"; }
-            set
-            {
-                if (value == IsChecked)
-                    return;
-
-				if (value)
-					_image.SvgSub = "checked";
-				else
-					_image.SvgSub = "unchecked";
-				           
-				NotifyValueChanged("IsChecked",  IsChecked);
-                //registerForGraphicUpdate();
-            }
-        }
-
+		#region GraphicObject overrides
 		[XmlAttributeAttribute()][DefaultValue(-1)]
 		public override int Height {
 			get { return base.Height; }
@@ -74,6 +41,44 @@ namespace go
 		{
 			get { return base.Focusable; }
 			set { base.Focusable = value; }
+		}
+		#endregion
+
+		[XmlAttributeAttribute()][DefaultValue("Checkbox")]
+		public string Caption {
+			get { return caption; } 
+			set {
+				if (caption == value)
+					return;
+				caption = value; 
+				NotifyValueChanged ("Caption", caption);
+			}
+		}        
+		[XmlAttributeAttribute()][DefaultValue("#go.Images.Icons.checkbox.svg")]
+		public string Image {
+			get { return image; } 
+			set {
+				if (image == value)
+					return;
+				image = value; 
+				NotifyValueChanged ("Image", image);
+			}
+		} 
+
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public bool IsChecked
+		{
+			get { return isChecked; }
+			set
+			{
+				isChecked = value;
+
+				NotifyValueChanged ("IsChecked", value);
+				if (isChecked)
+					NotifyValueChanged ("SvgSub", "checked");
+				else
+					NotifyValueChanged ("SvgSub", "unchecked");
+			}
 		}
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{

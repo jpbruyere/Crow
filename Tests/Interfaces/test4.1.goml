@@ -9,14 +9,14 @@
 		MouseEnter="{BorderColor = White}"
 		MouseLeave="{BorderColor = Transparent}">
 
-		<HorizontalStack Name="hs0"
+		<HorizontalStack Name="hs0" Fit="true"
 			WidgetSpacing="10" 
 			VerticalAlignment="Center" 
 			Background="0,5;0,5;0,5;0,5">
 			<VerticalStack Name="vs1"
-				Margin="20" Width="400">
+				Margin="20" Width="400" Height="-1">
 				<Label Name="labMouse" Text="MousePos"/>
-				<HorizontalStack Name="hsPbar">
+				<HorizontalStack Name="hsPbar" Fit="true">
 					<ProgressBar Name="pbBar" 
 						Width="100" Height="20"
 						Value="50"
@@ -29,15 +29,15 @@
 						Width="100" Height="10"
 						Value="30"/>-->
 				</HorizontalStack>
-				<HorizontalStack  Name="hsFocus">
+				<HorizontalStack  Name="hsFocus" Fit="true">
 					<Label Text="Focused:"/>
 					<Label Name="labFocus" />
 				</HorizontalStack>
-				<HorizontalStack>
+				<HorizontalStack Fit="true">
 					<Label Text="Active:"  Name="hsActive"/>
 					<Label Name="labActive"/>
 				</HorizontalStack>
-				<HorizontalStack>
+				<HorizontalStack Fit="true">
 					<Label Text="Hover:"  Name="hsHover"/>
 					<Label Name="labHover" />
 				</HorizontalStack>

@@ -4,13 +4,13 @@
 			Top="200" Left="200" 
 			Margin="10" Background="Green"/>-->
 <Border CornerRadius="5" Margin="1" BorderWidth="1" Fit="True" Background="SteelBlue">
-	<HorizontalStack Name="hstack" Margin="0" Spacing="5">
+	<HorizontalStack Name="hstack" Margin="0" Spacing="5" Fit="True">
 		<Label Name="labCpt" Text="55"/>
-		<VerticalStack Spacing="1" Name="vstack">
-			<Button Width="10" Height="8" MouseClick="onUp">
+		<VerticalStack Spacing="1" Name="vstack" Fit="True">
+			<Button Width="10" Height="8" >
 				<Image Margin="1" Path="#go.Images.Icons.updown.svg" SvgSub="up"/>
 			</Button>
-			<Button Width="10" Height="8"  MouseClick="onDown">
+			<Button Width="10" Height="8"  >
 				<Image Margin="1" Path="#go.Images.Icons.updown.svg" SvgSub="down"/>
 			</Button>
 		</VerticalStack>

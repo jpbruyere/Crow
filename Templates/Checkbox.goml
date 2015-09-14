@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<HorizontalStack Width="{Width}" Height="{Height}" Margin="0" Spacing="1">
-	<Image Name="Image" Width="16" Height="16" Path="#go.Images.Icons.checkbox.svg"/>
-	<Label Name="Caption" Height="{Height}" Width="-1"/>
+<HorizontalStack Spacing="1" Height="-1" Width="0">
+	<Image Margin="2" Width="14" Height="14" Path="{Image}" SvgSub="{SvgSub}"/>
+	<Label Text="{Caption}" Width="0"/>
 </HorizontalStack>

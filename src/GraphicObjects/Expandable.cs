@@ -80,30 +80,23 @@ namespace go
 				image = value; 
 				NotifyValueChanged ("Image", image);
 			}
-		} 
-		[XmlAttributeAttribute()][DefaultValue("collapsed")]
-		public string SvgSub {
-			get { return IsExpanded ? "expanded" : "collapsed"; } 
-		}      
-      
+		}     
 		[XmlAttributeAttribute()][DefaultValue(false)]
         public bool IsExpanded
         {
 			get { return _isExpanded; }
             set
             {
-                if (value == _isExpanded)
-                    return;
-
 				_isExpanded = value;
-				NotifyValueChanged ("SvgSub", SvgSub);
 
-				if (_isExpanded)
+				if (_isExpanded) {
 					onExpand (this, null);
-				else
-					onCollapse (this, null);
+					NotifyValueChanged ("SvgSub", "expanded");
+					return;
+				}
 
-                //registerForGraphicUpdate();
+				onCollapse (this, null);
+				NotifyValueChanged ("SvgSub", "collapsed");
             }
         }
 

@@ -19,56 +19,62 @@ namespace go
 	[DefaultTemplate("#go.Templates.RadioButton.goml")]
     public class RadioButton : TemplatedControl
     {		        
-		Label _caption;
-		Image _image;
+		string caption;
+		string image;
+		bool isChecked;
 
-		public RadioButton() : base()
-		{
-		}	
-
-		protected override void loadTemplate(GraphicObject template = null)
-		{
-			base.loadTemplate (template);
-
-			_caption = this.child.FindByName ("Caption") as Label;//TODO:should use bindings instead
-			_image = this.child.FindByName ("Image") as Image;
-			_image.SvgSub = "unchecked";
-		}
-
-		[XmlAttributeAttribute()][DefaultValue(-1)]
-		public override int Height {
-			get { return base.Height; }
-			set { base.Height = value; }
-		}
+		#region CTOR
+		public RadioButton() : base(){}	
+		#endregion
+			
+		#region GraphicObject overrides
 		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
 		public override bool Focusable
 		{
 			get { return base.Focusable; }
 			set { base.Focusable = value; }
 		}
-
-		[XmlAttributeAttribute][DefaultValue("RadioButton")]
-		public string Caption {
-			get { return _caption.Text; } 
-			set { 
-				_caption.Text = value; 
-			}
+		[XmlAttributeAttribute()][DefaultValue(-1)]
+		public override int Height {
+			get { return base.Height; }
+			set { base.Height = value; }
 		}
+		#endregion
+
+		[XmlAttributeAttribute()][DefaultValue("RadioButton")]
+		public string Caption {
+			get { return caption; } 
+			set {
+				if (caption == value)
+					return;
+				caption = value; 
+				NotifyValueChanged ("Caption", caption);
+			}
+		}        
+		[XmlAttributeAttribute()][DefaultValue("#go.Images.Icons.radiobutton.svg")]
+		public string Image {
+			get { return image; } 
+			set {
+				if (image == value)
+					return;
+				image = value; 
+				NotifyValueChanged ("Image", image);
+			}
+		} 
+ 
         [XmlAttributeAttribute()][DefaultValue(false)]
         public bool IsChecked
         {
-			get { return _image == null ? false :_image.SvgSub == "checked"; }
+			get { return isChecked; }
             set
             {
-//                if (value == IsChecked)
-//                    return;
-//
-				if (value)
-					_image.SvgSub = "checked";
+				isChecked = value;
+
+				NotifyValueChanged ("IsChecked", value);
+				if (isChecked)
+					NotifyValueChanged ("SvgSub", "checked");
 				else
-					_image.SvgSub = "unchecked";
-				                
-                registerForGraphicUpdate();
+					NotifyValueChanged ("SvgSub", "unchecked");
             }
         }
 
@@ -78,7 +84,8 @@ namespace go
 			if (pg != null) {
 				foreach (RadioButton c in pg.Children.OfType<RadioButton>())
 					c.IsChecked = (c == this);
-			}
+			} else
+				IsChecked = !IsChecked;
 
 			base.onMouseClick (sender, e);
 		}
