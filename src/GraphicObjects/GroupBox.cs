@@ -33,14 +33,10 @@ namespace go
             set
             {
                 _title = value;
+				NotifyValueChanged ("Text", _title);
                 registerForGraphicUpdate();
             }
         }        
-		[XmlAttributeAttribute()][DefaultValue("droid,12")]
-		public Font Font {
-			get { return _font; }
-			set { _font = value; }
-		}
 		#endregion
 
         Size titleSize {

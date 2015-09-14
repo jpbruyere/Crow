@@ -205,7 +205,7 @@ namespace go
 						foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
 							Rectangles childClip = clip.intersectingRects (ContextCoordinates(c.Slot));
 							if (!c.DrawingIsValid || childClip.count > 0)
-								c.Paint (ref gr,childClip);//, localClip);
+								c.Paint (ref gr, childClip);//, localClip);
 						}
 
 						gr.Dispose ();
