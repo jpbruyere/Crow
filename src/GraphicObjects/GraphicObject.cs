@@ -934,22 +934,24 @@ namespace go
 		///  and delete ref of this in Shared interface refs
 		/// </summary>
 		public virtual void ClearBinding(){
-			if (this.DataSource == null)
-				return;
 			object ds = this.DataSource;
+			if (ds == null)
+				return;
+			
 			Type dataSourceType = ds.GetType ();
 			EventInfo evtInfo = dataSourceType.GetEvent ("ValueChanged");
-			FieldInfo evtFi = CompilerServices.GetEventHandlerField (dataSourceType, "ValueChanged");
-			MulticastDelegate multicastDelegate = evtFi.GetValue (ds) as MulticastDelegate;
-			if (multicastDelegate != null){				
-				foreach (Delegate d in multicastDelegate.GetInvocationList())
-				{
-					string dn = d.Method.Name;
-					if (!dn.StartsWith ("dynHandle_"))
-						continue;
-					int did = int.Parse (dn.Substring (10));
-					if (this.DynamicMethodIds.Contains(did))
-						evtInfo.RemoveEventHandler (ds, d);
+			if (evtInfo != null) {
+				FieldInfo evtFi = CompilerServices.GetEventHandlerField (dataSourceType, "ValueChanged");
+				MulticastDelegate multicastDelegate = evtFi.GetValue (ds) as MulticastDelegate;
+				if (multicastDelegate != null) {				
+					foreach (Delegate d in multicastDelegate.GetInvocationList()) {
+						string dn = d.Method.Name;
+						if (!dn.StartsWith ("dynHandle_"))
+							continue;
+						int did = int.Parse (dn.Substring (10));
+						if (this.DynamicMethodIds.Contains (did))
+							evtInfo.RemoveEventHandler (ds, d);
+					}
 				}
 			}
 				
