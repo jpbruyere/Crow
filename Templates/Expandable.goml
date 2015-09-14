@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0"?>
 <Border BorderWidth="1" BorderColor="LightGray"  Height="-1" Width="0" MouseClick="onMouseClick">
-	<VerticalStack MouseClick="onMouseClick" Height="-1" Width="0" Name="vsTemplateExpander">
-		<HorizontalStack Name="hsTemplateExpander" Spacing="1" Focusable="false" Height="-1" Width="0">
-			<Image Name="Image" Margin="3" Width="16" Height="16" Path="#go.Images.Icons.expandable.svg"/>
-			<Label Name="Caption"/>
+	<VerticalStack Height="-1" Width="0" Name="vsTemplateExpander">
+		<HorizontalStack Spacing="1" Focusable="false" Height="-1" Width="0">
+			<Image Margin="2" Width="12" Height="12" Path="{Image}" SvgSub="{SvgSub}"/>
+			<Label Text="{Title}" Width="0"/>
 		</HorizontalStack>
 		<Container Name="Content" Visible="false"/>
 	</VerticalStack>

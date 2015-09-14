@@ -31,6 +31,8 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"testPopper.goml",
+			"testExpandable.goml",
 			"test6.goml",
 			"testHStack.goml",
 			"testMsgBox.goml",
@@ -45,7 +47,6 @@ namespace test
 			"test_stack.goml",
 			"testScrollbar.goml",
 			"testSpinner.goml",
-			"testExpandable.goml",
 			"testWindow.goml",
 			"fps.goml",
 			"testMeter.goml",

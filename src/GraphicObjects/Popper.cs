@@ -22,8 +22,8 @@ namespace go
     public class Popper : TemplatedContainer
     {		
 		bool _isPopped;
-		Label _caption;
-		Image _image;
+		string title;
+		string image;
 		GraphicObject _content;
 
 		public event EventHandler Pop;
@@ -36,39 +36,44 @@ namespace go
 		public Popper() : base()
 		{
 		}	
-
-		protected override void loadTemplate(GraphicObject template = null)
-		{
-			base.loadTemplate (template);
-
-			_caption = this.child.FindByName ("Caption") as Label;
-			_image = this.child.FindByName ("Image") as Image;
-
-			if (_image == null)
-				return;
-			_image.SvgSub = "collapsed";
-
-			this.Pop += (object sender, EventArgs e) => {_image.SvgSub = "expanded";};
-			this.Unpop += (object sender, EventArgs e) => {_image.SvgSub = "collapsed";};
-
-		}
+			
 		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
 		public override bool Focusable
 		{
 			get { return base.Focusable; }
 			set { base.Focusable = value; }
 		}
+		[XmlAttributeAttribute()][DefaultValue(-1)]
+		public override int Height {
+			get { return base.Height; }
+			set { base.Height = value; }
+		}
 
 		[XmlAttributeAttribute()][DefaultValue("Popper")]
 		public string Title {
-			get { return _caption.Text; } 
+			get { return title; } 
 			set {
-				if (_caption == null)
+				if (title == value)
 					return;
-				_caption.Text = value; 
+				title = value; 
+				NotifyValueChanged ("Title", title);
 			}
 		}        
-      
+		[XmlAttributeAttribute()][DefaultValue("#go.Images.Icons.expandable.svg")]
+		public string Image {
+			get { return image; } 
+			set {
+				if (image == value)
+					return;
+				image = value; 
+				NotifyValueChanged ("Image", image);
+			}
+		} 
+		[XmlAttributeAttribute()][DefaultValue("collapsed")]
+		public string SvgSub {
+			get { return IsPopped ? "expanded" : "collapsed"; } 
+		} 
+
 		[XmlAttributeAttribute()][DefaultValue(false)]
         public bool IsPopped
         {
@@ -79,16 +84,17 @@ namespace go
                     return;
 
 				_isPopped = value;
+				NotifyValueChanged ("SvgSub", SvgSub);
 
 				if (_isPopped)
 					onPop (this, null);
 				else
 					onUnpop (this, null);
 
-                registerForGraphicUpdate();
+                //registerForGraphicUpdate();
             }
         }
-
+			
 		public virtual void onPop(object sender, EventArgs e)
 		{
 			if (Content != null) {

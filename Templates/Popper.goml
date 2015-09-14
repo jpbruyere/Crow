@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <Border BorderWidth="1" BorderColor="LightGray" Height="-1" MouseClick="onMouseClick">
-	<HorizontalStack Name="hsTemplateExpander" Spacing="1" Focusable="false" Height="-1" Width="0">
-		<Image Name="Image" Margin="3" Width="16" Height="16" Path="#go.Images.Icons.expandable.svg"/>
-		<Label Name="Caption"/>
+	<HorizontalStack Spacing="1" Focusable="false" Height="-1" Width="0">
+		<Image Margin="2" Width="12" Height="12" Path="{Image}" SvgSub="{SvgSub}"/>
+		<Label Text="{Title}" Width="0"/>
 	</HorizontalStack>
 </Border>

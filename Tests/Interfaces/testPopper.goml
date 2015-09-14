@@ -1,0 +1,6 @@
+﻿<?xml version="1.0"?>
+<Popper Title="TestPopper" Width="100" Background="DimGray">
+	<Border Fit="True" Background="ArmyGreen">
+		<Image Fit="true" Path="#go.Images.Icons.tetra.png" Margin="10"/>
+	</Border>
+</Popper>

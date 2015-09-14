@@ -22,8 +22,8 @@ namespace go
     public class Expandable : TemplatedContainer
     {		
 		bool _isExpanded;
-		Label _caption;
-		Image _image;
+		string title;
+		string image;
 		Container _contentContainer;
 
 		public event EventHandler Expand;
@@ -47,33 +47,44 @@ namespace go
 			base.loadTemplate (template);
 
 			_contentContainer = this.child.FindByName ("Content") as Container;
-			_caption = this.child.FindByName ("Caption") as Label;
-			_image = this.child.FindByName ("Image") as Image;
-
-			if (_image == null)
-				return;
-			_image.SvgSub = "collapsed";
-
-//			this.Expand += (object sender, EventArgs e) => {};
-//			this.Collapse += (object sender, EventArgs e) => {};
-
 		}
+
 		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
 		public override bool Focusable
 		{
 			get { return base.Focusable; }
 			set { base.Focusable = value; }
 		}
+		[XmlAttributeAttribute()][DefaultValue(-1)]
+		public override int Height {
+			get { return base.Height; }
+			set { base.Height = value; }
+		}
 
 		[XmlAttributeAttribute()][DefaultValue("Expandable")]
 		public string Title {
-			get { return _caption.Text; } 
+			get { return title; } 
 			set {
-				if (_caption == null)
+				if (title == value)
 					return;
-				_caption.Text = value; 
+				title = value; 
+				NotifyValueChanged ("Title", title);
 			}
 		}        
+		[XmlAttributeAttribute()][DefaultValue("#go.Images.Icons.expandable.svg")]
+		public string Image {
+			get { return image; } 
+			set {
+				if (image == value)
+					return;
+				image = value; 
+				NotifyValueChanged ("Image", image);
+			}
+		} 
+		[XmlAttributeAttribute()][DefaultValue("collapsed")]
+		public string SvgSub {
+			get { return IsExpanded ? "expanded" : "collapsed"; } 
+		}      
       
 		[XmlAttributeAttribute()][DefaultValue(false)]
         public bool IsExpanded
@@ -85,6 +96,7 @@ namespace go
                     return;
 
 				_isExpanded = value;
+				NotifyValueChanged ("SvgSub", SvgSub);
 
 				if (_isExpanded)
 					onExpand (this, null);
@@ -98,13 +110,11 @@ namespace go
 		public virtual void onExpand(object sender, EventArgs e)
 		{
 			_contentContainer.Visible = true;
-			_image.SvgSub = "expanded";
 			Expand.Raise (this, e);
 		}
 		public virtual void onCollapse(object sender, EventArgs e)
 		{
 			_contentContainer.Visible = false;
-			_image.SvgSub = "collapsed";
 			Collapse.Raise (this, e);
 		}
 			
