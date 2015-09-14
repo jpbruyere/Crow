@@ -21,6 +21,8 @@ namespace go
 {
 	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange
 	{
+		internal List<int> DynamicMethodIds = new List<int> ();
+
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
 		public virtual void NotifyValueChanged(string MemberName, object _value)
@@ -304,7 +306,17 @@ namespace go
 			get { return _minimumSize; }
 			set { _minimumSize = value; }
 		}
-		[XmlIgnore]public object DataSource;
+		object dataSource;
+
+		[XmlIgnore]public object DataSource {
+			set {
+				dataSource = value;
+			}
+			get {				
+				return dataSource == null ? 
+					Parent is GraphicObject ? (Parent as GraphicObject).DataSource : null : dataSource;
+			}
+		}
 		#endregion
 
 		/// <summary>
@@ -632,7 +644,7 @@ namespace go
 			using (ImageSurface draw =
                 new ImageSurface(bmp, Format.Argb32, Slot.Width, Slot.Height, stride)) {
 				using (Context gr = new Context (draw)) {
-					gr.Antialias = Antialias.Subpixel;
+					gr.Antialias = Antialias.Gray;
 					onDraw (gr);
 				}
 				draw.Flush ();
@@ -917,5 +929,31 @@ namespace go
 		}
 		#endregion
 
+		/// <summary>
+		/// Remove dynamic delegates by ids from dataSource
+		///  and delete ref of this in Shared interface refs
+		/// </summary>
+		public virtual void ClearBinding(){
+			if (this.DataSource == null)
+				return;
+			object ds = this.DataSource;
+			Type dataSourceType = ds.GetType ();
+			EventInfo evtInfo = dataSourceType.GetEvent ("ValueChanged");
+			FieldInfo evtFi = CompilerServices.GetEventHandlerField (dataSourceType, "ValueChanged");
+			MulticastDelegate multicastDelegate = evtFi.GetValue (ds) as MulticastDelegate;
+			if (multicastDelegate != null){				
+				foreach (Delegate d in multicastDelegate.GetInvocationList())
+				{
+					string dn = d.Method.Name;
+					if (!dn.StartsWith ("dynHandle_"))
+						continue;
+					int did = int.Parse (dn.Substring (10));
+					if (this.DynamicMethodIds.Contains(did))
+						evtInfo.RemoveEventHandler (ds, d);
+				}
+			}
+				
+			Interface.References.Remove (this);
+		}
 	}
 }

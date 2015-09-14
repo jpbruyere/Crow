@@ -12,32 +12,6 @@ namespace go
 {
 	public static class CompilerServices
 	{
-		public static void createDynHandler(string eventName, 
-			object dstObj, Type handlerArgsType, string destProp, string src)
-		{
-			Type dstType = dstObj.GetType ();
-
-			Type[] args = {typeof(object), handlerArgsType};
-			DynamicMethod hello = new DynamicMethod("dynHandle",
-				typeof(void), 
-				args, 
-				dstType.Module);
-
-			MethodInfo dstMi = dstType.GetProperty (destProp).GetSetMethod ();
-			FieldInfo srcFi = typeof(go.Color).GetField (src, BindingFlags.Static|BindingFlags.Public);
-			ILGenerator il = hello.GetILGenerator(256);
-
-			il.Emit(OpCodes.Ldarg_0);
-			il.Emit (OpCodes.Ldsfld, srcFi);
-			il.Emit(OpCodes.Callvirt, dstMi);
-			il.Emit(OpCodes.Ret);
-			//hello.DefineParameter(1, ParameterAttributes.In, "instance");
-			//hello.DefineParameter(2, ParameterAttributes.In, "value");
-			FieldInfo fi = getEventHandlerField (dstType, eventName);
-			Delegate del = hello.CreateDelegate(fi.FieldType);
-			fi.SetValue(dstObj, del);
-
-		}
 		static int dynHandleCpt = 0;
 		/// <summary>
 		/// Compile events expression in GOML attributes
@@ -60,6 +34,10 @@ namespace go
 				typeof(void), 
 				args, 
 				srcType.Module);
+			
+			es.Source.DynamicMethodIds.Add (dynHandleCpt);
+
+			dynHandleCpt++;
 
 			#region IL generation
 			ILGenerator il = dm.GetILGenerator(256);
@@ -155,7 +133,7 @@ namespace go
 
 			#endregion
 
-			FieldInfo evtFi = getEventHandlerField (srcType, es.MemberName);
+			FieldInfo evtFi = GetEventHandlerField (srcType, es.MemberName);
 			Delegate del = dm.CreateDelegate(evtFi.FieldType);
 			evtFi.SetValue(es.Source, del);
 		}
@@ -268,6 +246,10 @@ namespace go
 				typeof(void), 
 				args, 
 				srcType.Module, true);
+
+			(binding.Source as GraphicObject).DynamicMethodIds.Add (dynHandleCpt);
+
+			dynHandleCpt++;
 
 			//register target object reference
 			int dstIdx = Interface.References.IndexOf(binding.Source);
@@ -385,7 +367,7 @@ namespace go
 		}
 		#endregion
 			
-		public static FieldInfo getEventHandlerField(Type type, string eventName)
+		public static FieldInfo GetEventHandlerField(Type type, string eventName)
 		{
 			FieldInfo fi;
 			Type ty = type;

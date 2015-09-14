@@ -146,6 +146,13 @@ namespace go
 				child.checkHoverWidget (e);
 		}
 		#endregion
+
+		public override void ClearBinding ()
+		{
+			if (child != null)
+				child.ClearBinding ();
+			base.ClearBinding ();
+		}
 	}
 }
 

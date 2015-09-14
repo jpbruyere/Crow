@@ -278,5 +278,11 @@ namespace go
         }
     
 		#endregion
+
+		public override void ClearBinding(){
+			foreach (GraphicObject c in children)
+				c.ClearBinding ();
+			base.ClearBinding ();
+		}
 	}
 }

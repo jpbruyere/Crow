@@ -86,13 +86,16 @@ namespace go
 		public void DeleteWidget(GraphicObject g)
 		{
 			g.Visible = false;//trick to ensure clip is added to refresh zone
+			g.ClearBinding();
 			GraphicObjects.Remove (g);
 		}
 		/// <summary> Remove all Graphic objects from top container </summary>
 		public void ClearInterface()
 		{
-			foreach (GraphicObject g in GraphicObjects)
+			foreach (GraphicObject g in GraphicObjects) {
 				g.Visible = false;
+				g.ClearBinding ();
+			}
 			GraphicObjects.Clear ();
 		}
 		public void Quit ()
