@@ -11,10 +11,10 @@
 			<Checkbox Height="-1" Width="80"/>
 		</HorizontalStack>
 		<GroupBox Text="test"  Height="-1" Width="0" Margin="5">
-			<VerticalStack  Height="-1" Width="0">
-				<RadioButton  Caption="Radio 1"/>
-				<RadioButton  Caption="Radio 2" IsChecked="true"/>
-				<RadioButton  Caption="Radio 3"/>
+			<VerticalStack  Height="-1" Width="0" >
+				<RadioButton  Caption="Radio 1" Background="Red" />
+				<RadioButton  Caption="Radio 2" IsChecked="true" />
+				<RadioButton  Caption="Radio 3" />
 			</VerticalStack>
 		</GroupBox>
 <!--		<Checkbox Height="-1" Width="-1" Background="Red" Margin="0" VerticalAlignment="Center" HorizontalAlignment="Right"/>-->

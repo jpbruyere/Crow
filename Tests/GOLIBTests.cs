@@ -31,6 +31,7 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"testCheckbox.goml",
 			"testWindow.goml",
 			"test0.goml",
 			"test1.goml",
@@ -38,7 +39,6 @@ namespace test
 			"test1.2.goml",
 			"testLabel.goml",
 			"testContainer.goml",
-			"testCheckbox.goml",
 			"testRadioButton.goml",
 			"testSpinner.goml",
 			"testPopper.goml",

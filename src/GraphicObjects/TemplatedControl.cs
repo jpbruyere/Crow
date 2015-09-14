@@ -60,6 +60,45 @@ namespace go
 //			set { _templatePath = value; }
 //		}
 
+		#region GraphicObject overrides
+		[XmlAttributeAttribute()][DefaultValue(-1)]
+		public override int Width {
+			get { return base.Width; }
+			set { 
+				base.Width = value; 
+				//PropertyLess binding for sizing policy in template
+				if (base.Width < 1) //send size policy to template elements
+					NotifyValueChanged ("TemplatedWidth", base.Width);
+				else //stretched in control if size is fixed
+					NotifyValueChanged ("TemplatedWidth", 0);
+			}
+		}
+		[XmlAttributeAttribute()][DefaultValue(-1)]
+		public override int Height {
+			get { return base.Height; }
+			set { 
+				base.Height = value; 
+
+				//PropertyLess binding for sizing policy in template
+				if (base.Height < 1) //send size policy to template elements
+					NotifyValueChanged ("TemplatedHeight", base.Height);
+				else //stretched in control if size is fixed
+					NotifyValueChanged ("TemplatedHeight", 0);
+			}
+		}
+
+		protected override void loadDefaultValues ()
+		{
+			if (child == null)//trigger loading of default template if child is empty
+				loadTemplate ();
+			base.loadDefaultValues ();
+		}
+		public override GraphicObject FindByName (string nameToFind)
+		{
+			//prevent name searching in template
+			return nameToFind == this.Name ? this : null;
+		}
+		#endregion
 
 		protected virtual void loadTemplate(GraphicObject template = null)
 		{
@@ -70,18 +109,7 @@ namespace go
 				this.SetChild (template);
 		}
 
-		protected override void loadDefaultValues ()
-		{
-			if (child == null)//trigger loading of default template if child is empty
-				loadTemplate ();
-			base.loadDefaultValues ();
-		}
 
-		public override GraphicObject FindByName (string nameToFind)
-		{
-			//prevent name searching in template
-			return nameToFind == this.Name ? this : null;
-		}
 
 		#region IXmlSerializable
 

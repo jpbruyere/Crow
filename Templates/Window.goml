@@ -1,11 +1,12 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="1" BorderColor="White" CornerRadius="20">
-	<VerticalStack Height="0">
-		<Border BorderWidth="1" BorderColor="White"  Height="-1" Background="0,1;0,5;1,0;0,5">
-			<HorizontalStack Name="hs" Margin="1" Spacing="1" Height="-1" >
+<Border BorderWidth="1" BorderColor="White" CornerRadius="20" Height="{TemplatedHeight}" Width="{TemplatedWidth}">
+	<VerticalStack Height="{TemplatedHeight}" Width="{TemplatedWidth}">
+		<Border BorderWidth="1" BorderColor="White" Width="{TemplatedWidth}" Height="-1" 
+				Background="0,1;0,5;1,0;0,5">
+			<HorizontalStack Name="hs" Margin="1" Spacing="1" Width="{TemplatedWidth}" Height="-1" >
 				<GraphicObject Width="5"/>
 				<Image Margin="1" Width="12" Height="12" Path="{Icon}"/>
-				<Label Foreground="White" Width="0" Margin="1" TextAlignment="Center" Text="{Title}" />
+				<Label Foreground="White" Width="{TemplatedWidth}" Margin="1" TextAlignment="Center" Text="{Title}" />
 				<Border CornerRadius="6" BorderWidth="1" BorderColor="Transparent"  Height="12" Width="12"
 					MouseEnter="{BorderColor=White}" MouseLeave="{BorderColor=Transparent}">
 					<Image Focusable="true" Name="Image" Margin="0" Width="0" Height="0" Path="#go.Images.Icons.exit2.svg"
@@ -14,6 +15,6 @@
 				<GraphicObject Width="5"/>
 			</HorizontalStack>
 		</Border>
-		<Container Name="Content" Background="0,5;0,5;0,5;0,5"/>
+		<Container Name="Content" Height="{TemplatedHeight}" Width="{TemplatedWidth}" Background="0,5;0,5;0,5;0,5"/>
 	</VerticalStack>
 </Border>

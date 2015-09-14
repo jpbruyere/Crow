@@ -31,11 +31,11 @@ namespace go
 
 
 		#region GraphicObject overrides
-		[XmlAttributeAttribute()][DefaultValue(-1)]
-		public override int Height {
-			get { return base.Height; }
-			set { base.Height = value; }
-		}
+//		[XmlAttributeAttribute()][DefaultValue(-1)]
+//		public override int Height {
+//			get { return base.Height; }
+//			set { base.Height = value; }
+//		}
 		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
 		public override bool Focusable
 		{

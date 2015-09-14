@@ -9,9 +9,27 @@ namespace go
 	[DefaultTemplate("#go.Templates.Window.goml")]
 	public class Window : TemplatedContainer
 	{
+		enum Direction
+		{
+			None,
+			N,
+			S,
+			E,
+			W,
+			NW,
+			NE,
+			SW,
+			SE,
+		}
+
 		string _title;
 		string _icon;
 		Container _contentContainer;
+		Direction currentDirection = Direction.None;
+
+		#region CTOR
+		public Window () : base() {}
+		#endregion
 
 		#region GraphicObject overrides
 		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
@@ -46,25 +64,7 @@ namespace go
 				NotifyValueChanged ("Icon", _icon);
 			}
 		} 
-
-		public Window () : base()
-		{
-		}
 			
-		enum Direction
-		{
-			None,
-			N,
-			S,
-			E,
-			W,
-			NW,
-			NE,
-			SW,
-			SE,
-		}
-		Direction currentDirection = Direction.None;
-
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
