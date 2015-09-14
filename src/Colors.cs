@@ -150,6 +150,7 @@ namespace go
 
 		#region Predefined colors
         public static readonly Color Transparent = new Color(0, 0, 0, 0, "Transparent");
+		public static readonly Color Clear = new Color(-1, -1, -1, -1, "Clear");
 		public static readonly Color Green = new Color(0, 1.0, 0, 1.0, "Green");
 		public static readonly Color AirForceBlueRaf = new Color(0.364705882352941,0.541176470588235,0.658823529411765,1.0,"AirForceBlueRaf");
 		public static readonly Color AirForceBlueUsaf = new Color(0,0.188235294117647,0.56078431372549,1.0,"AirForceBlueUsaf");

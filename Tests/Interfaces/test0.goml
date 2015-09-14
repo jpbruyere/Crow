@@ -3,16 +3,15 @@
 			Width="100" Height="100"
 			Top="200" Left="200" 
 			Margin="10" Background="Green"/>-->
-<Border CornerRadius="5" Margin="1" BorderWidth="1" Fit="True" Background="SteelBlue">
-	<HorizontalStack Name="hstack" Margin="0" Spacing="5">
-		<Label Name="labCpt" Text="55"/>
-		<VerticalStack Spacing="1" Name="vstack">
-			<Button Width="10" Height="8" MouseClick="onUp">
-				<Image Margin="1" Path="#go.Images.Icons.updown.svg" SvgSub="up"/>
-			</Button>
-			<Button Width="10" Height="8"  MouseClick="onDown">
-				<Image Margin="1" Path="#go.Images.Icons.updown.svg" SvgSub="down"/>
-			</Button>
-		</VerticalStack>
-	</HorizontalStack>
-</Border>
+
+<Container Width="0" Height="0" Background="Transparent">
+	<Group  >
+		<Border CornerRadius="5" BorderWidth="1" Margin="5"/>
+		<HorizontalStack  Fit="true" Background="Clear" 
+			VerticalAlignment="Top" Left="10">
+			<GraphicObject Width="5"/>
+			<Label Text="GroupBox"/>
+			<GraphicObject Width="5"/>
+		</HorizontalStack>
+	</Group>
+</Container>
