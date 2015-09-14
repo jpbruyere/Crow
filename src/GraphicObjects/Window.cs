@@ -9,9 +9,18 @@ namespace go
 	[DefaultTemplate("#go.Templates.Window.goml")]
 	public class Window : TemplatedContainer
 	{
-		Label _title;
-		Image _icon;
+		string _title;
+		string _icon;
 		Container _contentContainer;
+
+		#region GraphicObject overrides
+		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
+		public override bool Focusable
+		{
+			get { return base.Focusable; }
+			set { base.Focusable = value; }
+		}
+		#endregion
 
 		public override GraphicObject Content {
 			get {
@@ -23,13 +32,21 @@ namespace go
 		}
 		[XmlAttributeAttribute()][DefaultValue("Window")]
 		public string Title {
-			get { return _title.Text; } 
+			get { return _title; } 
 			set {
-				if (_title == null)
-					return;
-				_title.Text = value; 
+				_title = value;
+				NotifyValueChanged ("Title", _title);
 			}
-		}   
+		}
+		[XmlAttributeAttribute()][DefaultValue("#go.Images.Icons.tetra.png")]
+		public string Icon {
+			get { return _icon; } 
+			set {
+				_icon = value;
+				NotifyValueChanged ("Icon", _icon);
+			}
+		} 
+
 		public Window () : base()
 		{
 		}
@@ -170,8 +187,6 @@ namespace go
 		{
 			base.loadTemplate (template);
 			_contentContainer = this.child.FindByName ("Content") as Container;
-			_title = this.child.FindByName ("Title") as Label;
-			_icon = this.child.FindByName ("Icon") as Image;
 		}
 
 		protected void butQuitPress (object sender, MouseButtonEventArgs e)

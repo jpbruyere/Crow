@@ -1,36 +1,17 @@
 ﻿<?xml version="1.0"?>
 <!--<Group>-->
-<Window Name="window1" Left="10" Top="10" Title="Test window" Width="200" Height="200" Background="0,5;0,5;0,5;0,8" 
-	Focusable="True"  CornerRadius="20" MinimumSize="100;100" MaximumSize="500;500">
-	<Template>
-		<Border BorderWidth="1" BorderColor="White" Margin="0" CornerRadius="20">
-			<VerticalStack Margin="0">
-				<Border BorderWidth="1" BorderColor="White"  Height="-1" Background="0,1;0,5;1,0;0,5">
-					<HorizontalStack Name="hs" Margin="1" Spacing="1" Height="-1" Focusable="false" >
-						<GraphicObject Width="5" Height="0"/>
-						<Image Name="Image" Margin="1" Width="12" Height="12" Path="#go.Images.Icons.tetra.png"/>
-						<Label Foreground="White" Width="0" Name="Title" Margin="1" TextAlignment="Center" />
-						<Border CornerRadius="6" BorderWidth="1" Margin="0" BorderColor="Transparent"  Height="12" Width="12"
-							MouseEnter="{BorderColor=White}" MouseLeave="{BorderColor=Transparent}">
-							<Image Focusable="true" Name="Image" Margin="0" Width="0" Height="0" Path="#go.Images.Icons.exit2.svg"
-								 MouseClick="butQuitPress"/>
-						</Border>
-						<GraphicObject Width="5" Height="0"/>
-					</HorizontalStack>
-				</Border>
-				<Container Name="Content" Margin="0" Width="0" Height="0"/>
-			</VerticalStack>
-		</Border>
-	</Template>
+<Window Name="window1" Left="10" Top="10" Title="Test window" 
+		Width="250" Height="300" >
 	<VerticalStack Name="contentVSStack" Margin="10" Spacing="10">
 		<Slider Name="slider" Height="10" Width="0"/>
 
-		<HorizontalStack Width="-1" Height="-1" Margin="0" Background="Red">
-			<Checkbox Height="-1" Width="100"/>
-			<Checkbox Height="-1" Width="100"/>
+		<HorizontalStack Width="0" Height="-1" Margin="10" Background="BlueCrayola">
+			<Checkbox Height="-1" Width="80"/>
+			<GraphicObject Width="0"/>
+			<Checkbox Height="-1" Width="80"/>
 		</HorizontalStack>
-		<GroupBox Title="test"  Height="-1" Width="-1" Margin="5">
-			<VerticalStack  Height="-1" Width="-1">
+		<GroupBox Text="test"  Height="-1" Width="0" Margin="5">
+			<VerticalStack  Height="-1" Width="0">
 				<RadioButton  Caption="Radio 1"/>
 				<RadioButton  Caption="Radio 2" IsChecked="true"/>
 				<RadioButton  Caption="Radio 3"/>

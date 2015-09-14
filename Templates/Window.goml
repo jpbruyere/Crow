@@ -4,8 +4,8 @@
 		<Border BorderWidth="1" BorderColor="White"  Height="-1" Background="0,1;0,5;1,0;0,5">
 			<HorizontalStack Name="hs" Margin="1" Spacing="1" Height="-1" >
 				<GraphicObject Width="5"/>
-				<Image Name="Image" Margin="1" Width="12" Height="12" Path="#go.Images.Icons.tetra.png"/>
-				<Label Foreground="White" Width="0" Name="Title" Margin="1" TextAlignment="Center" />
+				<Image Margin="1" Width="12" Height="12" Path="{Icon}"/>
+				<Label Foreground="White" Width="0" Margin="1" TextAlignment="Center" Text="{Title}" />
 				<Border CornerRadius="6" BorderWidth="1" BorderColor="Transparent"  Height="12" Width="12"
 					MouseEnter="{BorderColor=White}" MouseLeave="{BorderColor=Transparent}">
 					<Image Focusable="true" Name="Image" Margin="0" Width="0" Height="0" Path="#go.Images.Icons.exit2.svg"
@@ -14,6 +14,6 @@
 				<GraphicObject Width="5"/>
 			</HorizontalStack>
 		</Border>
-		<Container Name="Content"/>
+		<Container Name="Content" Background="0,5;0,5;0,5;0,5"/>
 	</VerticalStack>
 </Border>
