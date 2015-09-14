@@ -71,6 +71,9 @@ namespace go
 			set {				
 				data = value;
 
+				foreach (GraphicObject c in _list.Children) {
+					c.ClearBinding ();
+				}
 				_list.Children.Clear ();
 				_list.registerForGraphicUpdate ();
 				if (data == null)
