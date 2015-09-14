@@ -21,6 +21,10 @@ namespace go
 			get { return _pic == null ? null : _pic.Path; }
 			set {	
 				try {
+					if (string.IsNullOrEmpty(value)){
+						_pic = null;
+						return;
+					}
 					LoadImage (value);
 					_pic.KeepProportions = true;
 				} catch (Exception ex) {
