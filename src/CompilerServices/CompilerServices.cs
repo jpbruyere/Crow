@@ -196,9 +196,9 @@ namespace go
 
 			#region initialize target with actual value
 
-			if (miSrc == null)
+			if (string.IsNullOrEmpty(binding.Value))
 				srcVal = srcGO;//if no member is provided for binding, source raw value is taken
-			else {
+			else if (miSrc != null){
 				if (miSrc.MemberType == MemberTypes.Property)
 					srcVal = (miSrc as PropertyInfo).GetGetMethod ().Invoke (srcGO, null);
 				else if (miSrc.MemberType == MemberTypes.Field)
@@ -212,21 +212,23 @@ namespace go
 				}else
 					throw new Exception ("unandled source member type for binding");
 			}
-			if (miDst.MemberType == MemberTypes.Property) {
-				PropertyInfo piDst = miDst as PropertyInfo;
-				//TODO: handle other dest type conversions
-				if (piDst.PropertyType == typeof(string)){
-					if (srcVal != null)
+			if (miSrc != null){
+				if (miDst.MemberType == MemberTypes.Property) {
+					PropertyInfo piDst = miDst as PropertyInfo;
+					//TODO: handle other dest type conversions
+					if (piDst.PropertyType == typeof(string)){
+						if (srcVal != null)
+							srcVal = srcVal.ToString ();
+					}
+					piDst.GetSetMethod ().Invoke (binding.Source, new object[] { srcVal });
+				} else if (miDst.MemberType == MemberTypes.Field) {
+					FieldInfo fiDst = miDst as FieldInfo;
+					if (fiDst.FieldType == typeof(string))
 						srcVal = srcVal.ToString ();
-				}
-				piDst.GetSetMethod ().Invoke (binding.Source, new object[] { srcVal });
-			} else if (miDst.MemberType == MemberTypes.Field) {
-				FieldInfo fiDst = miDst as FieldInfo;
-				if (fiDst.FieldType == typeof(string))
-					srcVal = srcVal.ToString ();
-				fiDst.SetValue (binding.Source, srcVal );
-			}else
-				throw new Exception("unandled destination member type for binding");
+					fiDst.SetValue (binding.Source, srcVal );
+				}else
+					throw new Exception("unandled destination member type for binding");
+			}
 			#endregion
 
 			#region Retrieve EventHandler parameter type
@@ -305,18 +307,20 @@ namespace go
 
 				Type srcValueType = null;
 
-			if (miSrc == null)
+			MemberInfo miSrcVal = miSrc;
+			if (miSrcVal == null)
+				miSrcVal = miDst;
 				//this allow memberless binding with only a name passed as MemberName
-				//but the value passed has to be a string
-				srcValueType = typeof(string);
-			else{
-				if (miSrc.MemberType == MemberTypes.Property)
-					srcValueType = (miSrc as PropertyInfo).PropertyType;
-				else if (miSrc.MemberType == MemberTypes.Field) 
-					srcValueType = (miSrc as FieldInfo).FieldType;
-				else
-					throw new Exception("unandled source member type for binding");
-			}
+				//but the type is determined by the destination member
+				
+
+			if (miSrcVal.MemberType == MemberTypes.Property)
+				srcValueType = (miSrcVal as PropertyInfo).PropertyType;
+			else if (miSrcVal.MemberType == MemberTypes.Field) 
+				srcValueType = (miSrcVal as FieldInfo).FieldType;
+			else
+				throw new Exception("unandled source member type for binding");
+			
 				if (!srcValueType.IsValueType)
 					il.Emit(OpCodes.Castclass, srcValueType);
 				else if (piTarget.PropertyType != srcValueType)
