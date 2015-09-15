@@ -31,12 +31,69 @@ namespace go
 
 		public override GraphicObject Content {
 			get { return _content; }
-			set { _content = value; }
+			set { 
+				if (_content != null) {
+					_content.LayoutChanged -= _content_LayoutChanged;
+					_content.MouseLeave -= _content_MouseLeave;
+				}
+				
+				_content = value; 
+
+				if (_content == null)
+					return;
+
+				_content.Focusable = true;
+				_content.LayoutChanged += _content_LayoutChanged;
+				_content.MouseLeave += _content_MouseLeave;
+			}
+		}
+
+		void _content_MouseLeave (object sender, MouseMoveEventArgs e)
+		{
+			IsPopped = false;
+		}
+
+		void _content_LayoutChanged (object sender, LayoutChangeEventArgs e)
+		{
+			ILayoutable tc = Content.Parent as ILayoutable;
+			if (tc == null)
+				return;
+			Rectangle r = this.ScreenCoordinates (this.Slot);
+			if (e.LayoutType == LayoutingType.Width) {
+				if (Content.Slot.Width < tc.ClientRectangle.Width) {
+					if (r.Left + Content.Slot.Width > tc.ClientRectangle.Right)
+						Content.Left = tc.ClientRectangle.Right - Content.Slot.Width;
+					else
+						Content.Left = r.Left;
+				}else
+					Content.Left = 0;
+			}else if (e.LayoutType == LayoutingType.Height) {
+				if (Content.Slot.Height < tc.ClientRectangle.Height) {
+					if (r.Bottom + Content.Slot.Height > tc.ClientRectangle.Bottom)
+						Content.Top = r.Top - Content.Slot.Height;
+					else
+						Content.Top = r.Bottom;
+				}else
+					Content.Top = 0;
+			}
 		}
 		public Popper() : base()
 		{
 		}	
-			
+		public override void ClearBinding ()
+		{
+			//ensure popped window is cleared
+			if (Content != null) {
+				if (Content.Parent != null) {
+					IGOLibHost tc = Content.Parent as IGOLibHost;
+					if (tc != null)
+						tc.DeleteWidget (Content);
+				}
+			}
+
+			base.ClearBinding ();
+		}
+
 		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
 		public override bool Focusable
 		{
@@ -95,10 +152,7 @@ namespace go
 			if (tc == null)
 				return;
 			if (Content != null) {
-				Rectangle r = this.ScreenCoordinates (this.Slot);
 				Content.Visible = true;
-				Content.Left = r.Left;
-				Content.Top = r.Bottom;
 				tc.AddWidget (Content);
 			}
 			Pop.Raise (this, e);
