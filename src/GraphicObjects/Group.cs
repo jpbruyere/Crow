@@ -47,9 +47,10 @@ namespace go
             return (T)child;
         }
         public virtual void removeChild(GraphicObject child)        
-		{
+		{			
+			child.ClearBinding ();
+			child.Parent = null;
             Children.Remove(child);
-            child.Parent = null;
 			this.RegisterForLayouting ((int)LayoutingType.Sizing);
         }
 
