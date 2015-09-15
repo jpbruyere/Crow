@@ -133,9 +133,9 @@ namespace go
 
 			#endregion
 
-			FieldInfo evtFi = GetEventHandlerField (srcType, es.MemberName);
-			Delegate del = dm.CreateDelegate(evtFi.FieldType);
-			evtFi.SetValue(es.Source, del);
+			Delegate del = dm.CreateDelegate(ei.EventHandlerType);
+			MethodInfo addHandler = ei.GetAddMethod ();
+			addHandler.Invoke(es.Source, new object[] {del});
 		}
 
 		/// <summary>
@@ -340,7 +340,6 @@ namespace go
 
 			Delegate del = dm.CreateDelegate(ei.EventHandlerType);
 			MethodInfo addHandler = ei.GetAddMethod ();
-			//Delegate del = dm.CreateDelegate(typeof(System.EventHandler));
 			addHandler.Invoke(srcGO, new object[] {del});
 		}
 
