@@ -5,17 +5,6 @@
 			<Label Name="labName" Text="{Name}" Width="0" Height="-1"/>
 		</Border>
 		<ListBox Data="{Members}" Width="0" Height="400" ItemTemplate="Interfaces/tmpMembers.goml" Focusable="true">
-			<Template>
-				<Border Width="0" Height="0" BorderWidth="1" Margin="1" MinimumSize="0;100" >
-					<HorizontalStack Width="0" Height="0">
-						<Scroller  Name="scroller1" Height="0" Width="0"  
-						 Margin="10" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">
-							<VerticalStack Width="0" Height="-1" Name="List" Margin="0" VerticalAlignment="Top"/>
-						</Scroller>
-						<Scrollbar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" MaximumScroll="{../scroller1.MaximumScroll}"
-							Orientation="Vertical" Width="10" />
-					</HorizontalStack>
-				</Border>
-			</Template>
+			
 		</ListBox>
 	</VerticalStack>

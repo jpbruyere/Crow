@@ -1,17 +1,21 @@
 ﻿<?xml version="1.0"?>
 <!--<ListBox Data="{TestList}" Focusable="true"/>-->
 <ListBox Data="{TestList}" Background="0,5;0,5;0,5;0,5"
-			 HorizontalAlignment="Left">
+			 HorizontalAlignment="Left" Width="0" Height="0" Margin="50">
+<!--	<Template>
+		<Border BorderWidth="1" Margin="1" MinimumSize="100;100" Width="0" Height="0" >
+			<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true" 
+				Height="0" Width="0">
+				<VerticalStack Height="-1" Name="List" Margin="0" VerticalAlignment="Top"/>
+			</Scroller>
+		</Border>
+	</Template>-->
 	<Template>
-		<Border BorderWidth="1" Margin="1" MinimumSize="0;100" >
-			<HorizontalStack>
-				<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true" 
-							ScrollY="{../scrollbar1.Scroll}">
-					<VerticalStack Height="-1" Name="List" Margin="0" VerticalAlignment="Top"/>
-				</Scroller>
-				<Scrollbar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" MaximumScroll="{../scroller1.MaximumScroll}"
-					Orientation="Vertical" Width="10" />
-			</HorizontalStack>
+		<Border BorderWidth="1" Margin="1" MinimumSize="100;100" Height="{TemplatedHeight}" Width="{TemplatedWidth}" >
+			<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true" 
+				Height="{TemplatedHeight}" Width="{TemplatedWidth}">
+				<VerticalStack Height="-1" Width="{TemplatedWidth}" Name="List" Margin="0" VerticalAlignment="Top"/>
+			</Scroller>
 		</Border>
 	</Template>
 </ListBox>

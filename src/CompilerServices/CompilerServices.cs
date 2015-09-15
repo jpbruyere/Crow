@@ -212,7 +212,7 @@ namespace go
 				}else
 					throw new Exception ("unandled source member type for binding");
 			}
-			if (miSrc != null){
+//			if (miSrc != null){
 				if (miDst.MemberType == MemberTypes.Property) {
 					PropertyInfo piDst = miDst as PropertyInfo;
 					//TODO: handle other dest type conversions
@@ -228,7 +228,7 @@ namespace go
 					fiDst.SetValue (binding.Source, srcVal );
 				}else
 					throw new Exception("unandled destination member type for binding");
-			}
+//			}
 			#endregion
 
 			#region Retrieve EventHandler parameter type

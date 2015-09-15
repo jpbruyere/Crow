@@ -1,4 +1,10 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="1" Margin="1" MinimumSize="0;100" Height="{TemplatedHeight}" Width="{TemplatedWidth}" Background="Gray">
+<!--<Border BorderWidth="1" Margin="1" MinimumSize="0;100" Height="{TemplatedHeight}" Width="{TemplatedWidth}" Background="Gray">
 	<VerticalStack Name="List" Margin="1" Height="{TemplatedHeight}" Width="{TemplatedWidth}"/>
+</Border>-->
+<Border BorderWidth="1" Margin="1" MinimumSize="100;100" Height="{TemplatedHeight}" Width="{TemplatedWidth}" >
+	<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"
+		Height="{TemplatedHeight}" Width="{TemplatedWidth}">
+		<VerticalStack Height="-1" Width="{TemplatedWidth}" Name="List" Margin="0" VerticalAlignment="Top"/>
+	</Scroller>
 </Border>

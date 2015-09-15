@@ -124,7 +124,6 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="rsvg2-sharp, Version=2.18.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <Package>rsvg2-sharp-2.0</Package>
@@ -203,5 +202,6 @@
     <None Include="Images\Icons\Cursors\hand" />
     <None Include="Images\Icons\Cursors\help" />
     <None Include="Images\Icons\Cursors\move" />
+    <None Include="README.md" />
   </ItemGroup>
 </Project>

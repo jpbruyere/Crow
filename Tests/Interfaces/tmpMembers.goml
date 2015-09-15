@@ -2,8 +2,8 @@
 	<HorizontalStack Width="0" Height="-1" Focusable="true" 
 			MouseEnter="{Background=Red}"
 			MouseLeave="{Background=Transparent}">
-		<Label Text="{Name}" Width="0" Height="-1" Margin="2" Background="Gray"/>
-		<Label Text="{MemberType}" Width="-1" Height="-1" Margin="0"/>
 		<Image Width="8" Height="8" Path="#go.Images.Icons.member.svg" SvgSub="{GetIcon}"/>
+		<Label Text="{Name}" Width="0" Height="-1" Margin="2"/>
+		<Label Text="{MemberType}" Width="-1" Height="-1" Margin="0"/>
 	</HorizontalStack>
 
