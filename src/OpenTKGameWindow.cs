@@ -411,6 +411,27 @@ namespace go
 			}
 
 			if (_hoverWidget != null) {
+				//check topmost graphicobject first
+				GraphicObject tmp = _hoverWidget;
+				GraphicObject topc = null;
+				while (tmp is GraphicObject) {
+					topc = tmp;
+					tmp = tmp.Parent as GraphicObject;
+				}
+				int idxhw = GraphicObjects.IndexOf (topc);
+				if (idxhw != 0) {
+					int i = 0;
+					while (i < idxhw) {
+						if (GraphicObjects [i].MouseIsIn (e.Position)) {
+							_hoverWidget.onMouseLeave (this, e);
+							GraphicObjects [i].checkHoverWidget (e);
+							return;
+						}
+						i++;
+					}
+				}
+					
+					
 				if (_hoverWidget.MouseIsIn (e.Position)) {
 					_hoverWidget.checkHoverWidget (e);
 					return;
