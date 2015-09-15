@@ -480,6 +480,8 @@ namespace go
 		{
 			if (Parent==null)
 				return;
+
+			//Debug.WriteLine ("Layout change: " + this.ToString () + ":" + LastSlots.ToString() + "=>" + Slot.ToString ());
 			
 			switch (layoutType) {
 			case LayoutingType.Width:				
@@ -644,7 +646,7 @@ namespace go
 			using (ImageSurface draw =
                 new ImageSurface(bmp, Format.Argb32, Slot.Width, Slot.Height, stride)) {
 				using (Context gr = new Context (draw)) {
-					gr.Antialias = Antialias.Gray;
+					gr.Antialias = Antialias.Subpixel;
 					onDraw (gr);
 				}
 				draw.Flush ();

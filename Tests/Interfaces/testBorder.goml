@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0"?>
-<GroupBox Width="-1" Height="-1" Background="Red">
-	<VerticalStack Margin="0">
-		<Checkbox />
-
-	</VerticalStack>
-</GroupBox>
+<Container Fit="true" Margin="5" Background="Blue">
+<Group Fit="true" Margin="5" Background="Green">
+<Border Fit="true" Background="Red" Margin="10">
+	<Checkbox/>
+</Border>
+</Group>
+</Container>

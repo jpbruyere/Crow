@@ -26,13 +26,13 @@ namespace go
 {
 	public abstract class TemplatedContainer : TemplatedControl
 	{
-		[XmlIgnore]
-		public abstract GraphicObject Content{ get; set;}
+		[XmlIgnore]public abstract GraphicObject Content{ get; set;}
 
 		protected override void loadTemplate (GraphicObject template)
 		{
 			base.loadTemplate (template);
 		}
+
 		public TemplatedContainer () : base()
 		{
 		}

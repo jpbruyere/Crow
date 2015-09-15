@@ -17,15 +17,6 @@ namespace go
 		}
 		#endregion
 
-		#region implemented abstract members of TemplatedControl
-
-		protected override void loadTemplate (GraphicObject template = null)
-		{
-			base.loadTemplate (template);
-		}
-
-		#endregion
-
 		#region GraphicObject Overrides
 		protected override void onDraw (Context gr)
 		{			

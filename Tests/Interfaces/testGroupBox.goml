@@ -1,9 +1,7 @@
 ﻿<?xml version="1.0"?>
-<Expandable Title="Test expandable" Width="150" Background="DimGray">
-		<VerticalStack Width="100" Height="-1">
-			<Checkbox Name="chk1"/>
-			<Checkbox Name="chk2" IsChecked="true"/>
-			<Checkbox Name="chk3"/>
-			<Checkbox Name="chk4"/>
-		</VerticalStack>		
-</Expandable>
+<Groupbox Width="-1" Height="-1" Background="Red">
+	<VerticalStack Margin="0">
+		<Checkbox />
+
+	</VerticalStack>
+</Groupbox>

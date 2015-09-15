@@ -108,9 +108,7 @@ namespace go
 			}else
 				this.SetChild (template);
 		}
-
-
-
+			
 		#region IXmlSerializable
 
 		public override System.Xml.Schema.XmlSchema GetSchema(){ return null; }
