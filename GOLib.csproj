@@ -64,7 +64,6 @@
     <Compile Include="src\GraphicObjects\GraphicObject.cs" />
     <Compile Include="src\GraphicObjects\Container.cs" />
     <Compile Include="src\GraphicObjects\Group.cs" />
-    <Compile Include="src\GraphicObjects\GroupBox.cs" />
     <Compile Include="src\GraphicObjects\HorizontalStack.cs" />
     <Compile Include="src\GraphicObjects\Image.cs" />
     <Compile Include="src\GraphicObjects\Label.cs" />
@@ -119,6 +118,7 @@
     <Compile Include="src\GraphicObjects\Grid.cs" />
     <Compile Include="src\GraphicObjects\TextRun.cs" />
     <Compile Include="src\GraphicObjects\MessageBox.cs" />
+    <Compile Include="src\GraphicObjects\Groupbox.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -197,6 +197,7 @@
     <EmbeddedResource Include="Images\button.svg" />
     <EmbeddedResource Include="Templates\MessageBox.goml" />
     <EmbeddedResource Include="Images\Icons\iconInfo.svg" />
+    <EmbeddedResource Include="Templates\Groupbox.goml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\Icons\Cursors\hand" />

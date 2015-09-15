@@ -1,0 +1,7 @@
+﻿<?xml version="1.0"?>
+<GroupBox Width="-1" Height="-1" Background="Red">
+	<VerticalStack Margin="0">
+		<Checkbox />
+
+	</VerticalStack>
+</GroupBox>

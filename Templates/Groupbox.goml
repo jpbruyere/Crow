@@ -1,0 +1,10 @@
+﻿<?xml version="1.0"?>
+<Group Height="{TemplatedHeight}" Width="{TemplatedWidth}">
+	<Border CornerRadius="5" BorderWidth="1" Margin="6"
+		Height="{TemplatedHeight}" Width="{TemplatedWidth}">
+		<Container Name="Content" Margin="10"
+				Height="{TemplatedHeight}" Width="{TemplatedWidth}"/>
+	</Border>
+	<Label Text="{Title}" VerticalAlignment="Top" Left="15"
+		Background="Clear" Margin="1"/>
+</Group>
