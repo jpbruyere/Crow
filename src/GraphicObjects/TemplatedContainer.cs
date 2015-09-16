@@ -26,15 +26,19 @@ namespace go
 {
 	public abstract class TemplatedContainer : TemplatedControl
 	{
+		#region CTOR
+		public TemplatedContainer () : base(){}
+		#endregion
+
 		[XmlIgnore]public abstract GraphicObject Content{ get; set;}
 
-		protected override void loadTemplate (GraphicObject template)
+		#region GraphicObject overrides
+		public override void ClearBinding ()
 		{
-			base.loadTemplate (template);
-		}
+			if (Content != null)
+				Content.ClearBinding ();
 
-		public TemplatedContainer () : base()
-		{
+			base.ClearBinding ();
 		}
 		public override GraphicObject FindByName (string nameToFind)
 		{
@@ -43,6 +47,9 @@ namespace go
 
 			return Content == null ? null : Content.FindByName (nameToFind);
 		}
+		#endregion
+
+		#region IXmlSerialisation Overrides
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
 			using (System.Xml.XmlReader subTree = reader.ReadSubtree ()) {
@@ -90,6 +97,7 @@ namespace go
 			(Content as IXmlSerializable).WriteXml(writer);
 			writer.WriteEndElement();
 		}
+		#endregion
 	}
 }
 

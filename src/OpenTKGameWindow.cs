@@ -92,11 +92,13 @@ namespace go
 		/// <summary> Remove all Graphic objects from top container </summary>
 		public void ClearInterface()
 		{
-			foreach (GraphicObject g in GraphicObjects) {
+			int i = 0;
+			while (GraphicObjects.Count>0) {
+				GraphicObject g = GraphicObjects [i];
 				g.Visible = false;
 				g.ClearBinding ();
+				GraphicObjects.RemoveAt (0);
 			}
-			GraphicObjects.Clear ();
 		}
 		public void Quit ()
 		{
