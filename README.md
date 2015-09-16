@@ -19,6 +19,32 @@ FEATURES
 - Templated controls, with dynamic binding.
 - Inlined delegate in XML
 
+Example
+-------
+
+```
+<Window Width="800" Height="600" Title="Decks">	
+	<HorizontalStack>
+		<ListBox Height="0" Width="150" Background="0,5;0,5;0,5;0,5" Name="deckList"
+			Data="{DeckList}" HorizontalAlignment="Left" ValueChanged="onDeckListValueChange"
+			ItemTemplate="#Magic3D.ui.DeckItemTemplate.goml">
+			<Template>
+				<Border BorderWidth="1" MinimumSize="0;100" Height="{TemplatedHeight}" Width="{TemplatedWidth}">
+					<HorizontalStack Margin="1" Height="{TemplatedHeight}" Width="{TemplatedWidth}">
+						<Scroller  Name="scroller1" Height="{TemplatedHeight}" Width="{TemplatedWidth}" 
+						 Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">
+							<VerticalStack Width="{TemplatedWidth}" Height="-1" Name="List" Margin="0" VerticalAlignment="Top"/>
+						</Scroller>
+						<Scrollbar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" MaximumScroll="{../scroller1.MaximumScroll}"
+							Orientation="Vertical" Width="10" Height="{TemplatedHeight}" />
+					</HorizontalStack>
+				</Border>
+			</Template>
+		</ListBox>
+		<HorizontalStack Width="0" Height="0" Background="DimGray" Name="hsDeck"/>
+	</HorizontalStack>
+</Window>
+```
 Building
 ========
 
@@ -44,10 +70,10 @@ xbuild  /p:Configuration=Release GOLib.sln  		# Build on Mono (Linux / Mac OS X)
 ```
 #####GOLib in action
 
+![GOLib in action](/magic3d.png?raw=true "Magic3d")
+
 ![GOLib in action](/screenshot1.png?raw=true "golib")
 
 ![GOLib in action](/screenshot2.png?raw=true "golib")
-
-![GOLib in action](/magic3d.png?raw=true "Magic3d")
 
 
