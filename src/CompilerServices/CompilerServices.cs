@@ -254,14 +254,7 @@ namespace go
 			dynHandleCpt++;
 
 			//register target object reference
-			int dstIdx = Interface.References.IndexOf(binding.Source);
-
-			if (dstIdx < 0) {
-				dstIdx = Interface.References.Count;
-				Interface.References.Add (binding.Source);
-			}
-
-
+			int dstIdx = Interface.Reference(binding.Source);
 
 			#region IL generation
 			ILGenerator il = dm.GetILGenerator(256);

@@ -749,7 +749,10 @@ namespace go
 
 		public override string ToString ()
 		{
-			return Name == "unamed" ? this.GetType ().ToString() : Name;
+			string tmp ="";
+			if (Parent != null)
+				tmp = Parent.ToString () + tmp;
+			return Name == "unamed" ? tmp + "." + this.GetType ().Name : tmp + "." + Name;
 		}
 			
 		#region IXmlSerializable
@@ -771,11 +774,13 @@ namespace go
 					continue;
 				}
 				if (mi.MemberType == MemberTypes.Event) {
-					Interface.GOMLResolver.Add (new DynAttribute { 
-						Source = this, 
-						Value = attValue,
-						MemberName = attName
-					});
+					if (!Interface.DontResoveGOML) {
+						Interface.GOMLResolver.Add (new DynAttribute { 
+							Source = this, 
+							Value = attValue,
+							MemberName = attName
+						});
+					}
 				} else if (mi.MemberType == MemberTypes.Property) {
 					PropertyInfo pi = mi as PropertyInfo;
 
@@ -817,6 +822,8 @@ namespace go
 					} else {
 
 						if (attValue.StartsWith("{")) {
+							if (Interface.DontResoveGOML)
+								continue;
 							//binding
 							if (!attValue.EndsWith("}"))
 								throw new Exception (string.Format("GOML:Malformed binding: {0}", attValue));
@@ -944,27 +951,26 @@ namespace go
 		/// </summary>
 		public virtual void ClearBinding(){
 			object ds = this.DataSource;
-			if (ds == null)
-				return;
-			
-			Type dataSourceType = ds.GetType ();
-			EventInfo evtInfo = dataSourceType.GetEvent ("ValueChanged");
-			if (evtInfo != null) {
-				FieldInfo evtFi = CompilerServices.GetEventHandlerField (dataSourceType, "ValueChanged");
-				MulticastDelegate multicastDelegate = evtFi.GetValue (ds) as MulticastDelegate;
-				if (multicastDelegate != null) {				
-					foreach (Delegate d in multicastDelegate.GetInvocationList()) {
-						string dn = d.Method.Name;
-						if (!dn.StartsWith ("dynHandle_"))
-							continue;
-						int did = int.Parse (dn.Substring (10));
-						if (this.DynamicMethodIds.Contains (did))
-							evtInfo.RemoveEventHandler (ds, d);
+			if (ds != null) {
+				Type dataSourceType = ds.GetType ();
+				EventInfo evtInfo = dataSourceType.GetEvent ("ValueChanged");
+				if (evtInfo != null) {
+					FieldInfo evtFi = CompilerServices.GetEventHandlerField (dataSourceType, "ValueChanged");
+					MulticastDelegate multicastDelegate = evtFi.GetValue (ds) as MulticastDelegate;
+					if (multicastDelegate != null) {				
+						foreach (Delegate d in multicastDelegate.GetInvocationList()) {
+							string dn = d.Method.Name;
+							if (!dn.StartsWith ("dynHandle_"))
+								continue;
+							int did = int.Parse (dn.Substring (10));
+							if (this.DynamicMethodIds.Contains (did))
+								evtInfo.RemoveEventHandler (ds, d);
+						}
 					}
 				}
 			}
-				
-			Interface.References.Remove (this);
+			Interface.Unreference (this);
+
 		}
 	}
 }

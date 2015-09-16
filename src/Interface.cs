@@ -36,6 +36,7 @@ namespace go
 		public static bool ReplaceTabsWithSpace = false;
 		/// <summary> Allow rendering of interface in development environment </summary>
 		public static bool DesignerMode = false;
+		public static bool DontResoveGOML = false;
 		/// <summary> Threshold to catch borders for sizing </summary>
 		public static int BorderThreshold = 5;
 
@@ -43,7 +44,32 @@ namespace go
 		/// Graphic objects References use in dynamic delegates for binding
 		/// </summary>
 		public static List<object> References = new List<object>();
+		public static Queue<int> FreeRefIndices = new Queue<int>();
+		public static void Unreference(Object o)
+		{
+			int idxt = Interface.References.IndexOf (o);
+			if (idxt < 0)
+				return;
+			References[idxt] = null;
+			FreeRefIndices.Enqueue (idxt);
+		}
+		/// <summary> register target object reference in an array for binding CIL </summary>
+		public static int Reference(object o)
+		{
+			
+			int dstIdx = Interface.References.IndexOf(o);
 
+			if (dstIdx < 0) {
+				if (FreeRefIndices.Count == 0) {
+					dstIdx = Interface.References.Count;
+					Interface.References.Add (o);
+				} else {
+					dstIdx = FreeRefIndices.Dequeue ();
+					Interface.References [dstIdx] = o;
+				}
+			}
+			return dstIdx;
+		}
 		public static LayoutingQueue LayoutingQueue = new LayoutingQueue();
 
 		#region Load/Save
@@ -110,22 +136,26 @@ namespace go
 			return t;
 		}
 		public static string CurrentGOMLPath;
-		public static GraphicObject Load(string path, object hostClass = null)
+		public static GraphicObject Load(string path, object hostClass = null, bool resolveGOML = true)
 		{			
 			CurrentGOMLPath = path;
 			using (Stream stream = GetStreamFromPath (path)) {
-				return Load(stream, GetTopContainerOfGOMLStream(stream), hostClass);
+				return Load(stream, GetTopContainerOfGOMLStream(stream), hostClass, resolveGOML);
 			}
 			CurrentGOMLPath = "";
 		}
 		public static GraphicObject Load(Stream stream, Type type, object hostClass = null, bool resolve = true)
 		{
 			GraphicObject result;
-			GOMLResolutionStack.Push(new List<DynAttribute>());
+
 
 			XmlSerializerNamespaces xn = new XmlSerializerNamespaces();
 			xn.Add("", "");
-			XmlSerializer xs = new XmlSerializer(type);            
+			//prevent unused ref in References created by xmlSerializer
+			Interface.DontResoveGOML = true;
+			XmlSerializer xs = new XmlSerializer(type);
+			Interface.DontResoveGOML = false;
+			GOMLResolutionStack.Push(new List<DynAttribute>());
 
 			result = (GraphicObject)xs.Deserialize(stream);
 			result.DataSource = hostClass;

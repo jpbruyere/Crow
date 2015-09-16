@@ -104,7 +104,7 @@ namespace go
 		{
 			if (template == null) {
 				DefaultTemplate dt = (DefaultTemplate)this.GetType ().GetCustomAttributes (typeof(DefaultTemplate), true).FirstOrDefault();
-				this.SetChild (Interface.Load (dt.Path, this));
+				this.SetChild (Interface.Load (dt.Path, this,!Interface.DontResoveGOML));
 			}else
 				this.SetChild (template);
 		}
@@ -146,13 +146,14 @@ namespace go
 
 								xr.Read ();//go close tag
 								xr.Read ();//Template close tag
+								break;
 							} else {
 								xr.ReadInnerXml ();
 							}
 						}
 					}				
 				} else
-					loadTemplate (Interface.Load (template, this));
+					loadTemplate (Interface.Load (template, this, !Interface.DontResoveGOML));
 				
 
 				//normal xml read
