@@ -25,38 +25,27 @@ namespace test
 		#endregion
 
 		public GOLIBTests ()
-			: base(800, 600,"test")
+			: base(600, 400,"test: press spacebar to toogle test files")
 		{}
 
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
-			"testGroupBox.goml",
 			"testBorder.goml",
-			"testCheckbox.goml",
-			"testWindow.goml",
-			"test0.goml",
-			"test1.goml",
-			"test1.1.goml",
-			"test1.2.goml",
-			"testLabel.goml",
 			"testContainer.goml",
+			"testLabel.goml",
+			"testCheckbox.goml",
 			"testRadioButton.goml",
 			"testSpinner.goml",
 			"testPopper.goml",
 			"testExpandable.goml",
+			"testGroupBox.goml",
+			"test_stack.goml",
+			"testWindow.goml",
 			"testMsgBox.goml",
 			"testGrid.goml",
 			"fps.goml",
 			"testMeter.goml",
-			"test6.goml",
-			"testHStack.goml",
-			"test2.goml",
-			"test_stack.goml",
-			"testScrollbar.goml",
-			"test3.goml",
-			"test4.1.goml",
-			"test7.goml",
 		};
 
 		#region FPS

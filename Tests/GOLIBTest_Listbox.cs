@@ -76,7 +76,7 @@ namespace test
 		{
 			base.OnLoad (e);
 
-			TestList = Directory.GetFileSystemEntries("/mnt/data/MagicCardDataBase/", "*.txt",SearchOption.AllDirectories).ToList();
+			TestList = Directory.GetFileSystemEntries("/mnt/data/MagicCardDataBase/a/", "*.txt",SearchOption.AllDirectories).ToList();
 			LoadInterface("Interfaces/test_Listbox.goml");
 
 //			TestList [1].Field = "test string";

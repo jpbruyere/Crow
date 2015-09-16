@@ -1,8 +1,4 @@
 ﻿<?xml version="1.0"?>
-<Container Fit="true" Margin="5" Background="Blue">
-<Group Fit="true" Margin="5" Background="Green">
-<Border Fit="true" Background="Red" Margin="10">
-	<Checkbox/>
+<Border BorderWidth="5" Width="200" Height="200" CornerRadius="20" Margin="0" Background="Mantis">
+	<GraphicObject CornerRadius="0" Background="CornflowerBlue" Height="100" Width="100"/>
 </Border>
-</Group>
-</Container>
