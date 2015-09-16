@@ -21,6 +21,11 @@ namespace go
 	[DefaultTemplate("#go.Templates.Popper.goml")]
     public class Popper : TemplatedContainer
     {		
+		#region CTOR
+		public Popper() : base()
+		{
+		}	
+		#endregion
 		bool _isPopped;
 		string title;
 		string image;
@@ -77,9 +82,6 @@ namespace go
 					Content.Top = 0;
 			}
 		}
-		public Popper() : base()
-		{
-		}	
 		public override void ClearBinding ()
 		{
 			//ensure popped window is cleared
@@ -90,8 +92,8 @@ namespace go
 						tc.DeleteWidget (Content);
 				}
 			}
-
 			base.ClearBinding ();
+
 		}
 
 		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
@@ -153,7 +155,8 @@ namespace go
 				return;
 			if (Content != null) {
 				Content.Visible = true;
-				tc.AddWidget (Content);
+				if (Content.Parent == null)
+					tc.AddWidget (Content);
 			}
 			Pop.Raise (this, e);
 		}
@@ -162,7 +165,7 @@ namespace go
 			IGOLibHost tc = TopContainer;
 			if (tc == null)
 				return;
-			tc.DeleteWidget (Content);
+			Content.Visible = false;
 			Unpop.Raise (this, e);
 		}
 			
