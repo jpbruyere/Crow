@@ -29,6 +29,8 @@ namespace go
 		}							
 		#endregion
 
+		public event EventHandler Checked;
+		public event EventHandler Unchecked;
 
 		#region GraphicObject overrides
 //		[XmlAttributeAttribute()][DefaultValue(-1)]
@@ -74,10 +76,13 @@ namespace go
 				isChecked = value;
 
 				NotifyValueChanged ("IsChecked", value);
-				if (isChecked)
+				if (isChecked) {
 					NotifyValueChanged ("SvgSub", "checked");
-				else
+					Checked.Raise (this, null);
+				} else {
 					NotifyValueChanged ("SvgSub", "unchecked");
+					Unchecked.Raise (this, null);
+				}
 			}
 		}
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)
