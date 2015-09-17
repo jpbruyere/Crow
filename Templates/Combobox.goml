@@ -1,0 +1,10 @@
+﻿<?xml version="1.0"?>
+<Border CornerRadius="0" BorderColor="LightGray" Height="{TemplatedHeight}" Width="{TemplatedWidth}">
+	<HorizontalStack Margin="1" Spacing="1" Height="{TemplatedHeight}" Width="{TemplatedWidth}">
+		<Label Margin="1" Foreground="Black" Background="White" Text="{Text}" 
+			Height="{TemplatedHeight}" Width="{TemplatedWidth}"/>
+		<Button Width="14" Height="14" >
+			<Image Margin="0"  Path="#go.Images.Icons.updown.svg" SvgSub="down"/>
+		</Button>
+	</HorizontalStack>
+</Border>

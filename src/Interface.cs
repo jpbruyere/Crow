@@ -61,7 +61,7 @@ namespace go
 
 			if (dstIdx < 0) {
 				if (FreeRefIndices.Count == 0) {
-					dstIdx = Interface.References.Count;
+					dstIdx = Interface.References.Count();
 					Interface.References.Add (o);
 				} else {
 					dstIdx = FreeRefIndices.Dequeue ();

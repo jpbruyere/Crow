@@ -12,6 +12,7 @@ using System.Diagnostics;
 //using GGL;
 using go;
 using System.Threading;
+using System.Collections.Generic;
 
 
 namespace test
@@ -31,6 +32,7 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"testCombobox.goml",
 			"testBorder.goml",
 			"testContainer.goml",
 			"testLabel.goml",
@@ -84,6 +86,13 @@ namespace test
 		}
 		public string update = "";
 		#endregion
+
+		public List<String> TestList = new List<string>( new string[] 
+			{
+				"string 1",
+				"string 2",
+				"string 3"
+			});	
 
 		protected override void OnLoad (EventArgs e)
 		{

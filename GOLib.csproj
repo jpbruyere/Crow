@@ -116,7 +116,6 @@
     <Compile Include="src\GraphicObjects\Popper.cs" />
     <Compile Include="src\GraphicObjects\Scrollbar.cs" />
     <Compile Include="src\TextChangeEventArgs.cs" />
-    <Compile Include="src\ValueChangeEventArgs.cs" />
     <Compile Include="src\LayoutChangeEventArgs.cs" />
     <Compile Include="src\ReflexionExtensions.cs" />
     <Compile Include="src\XCursor.cs" />
@@ -124,6 +123,9 @@
     <Compile Include="src\GraphicObjects\TextRun.cs" />
     <Compile Include="src\GraphicObjects\MessageBox.cs" />
     <Compile Include="src\GraphicObjects\Groupbox.cs" />
+    <Compile Include="src\GraphicObjects\Combobox.cs" />
+    <Compile Include="src\SelectionChangeEventArgs.cs" />
+    <Compile Include="src\ValueChangeEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -177,7 +179,6 @@
     <EmbeddedResource Include="Templates\Spinner.goml" />
     <EmbeddedResource Include="Templates\Spinner %28copier%29.goml" />
     <EmbeddedResource Include="Templates\ItemTemplate.goml" />
-    <EmbeddedResource Include="Templates\ComboListOverlay.goml" />
     <EmbeddedResource Include="Templates\Expandable.goml" />
     <EmbeddedResource Include="Images\Icons\expandable.svg" />
     <EmbeddedResource Include="Templates\Checkbox2.goml" />
@@ -202,6 +203,8 @@
     <EmbeddedResource Include="Templates\MessageBox.goml" />
     <EmbeddedResource Include="Images\Icons\iconInfo.svg" />
     <EmbeddedResource Include="Templates\Groupbox.goml" />
+    <EmbeddedResource Include="Templates\Combobox.goml" />
+    <EmbeddedResource Include="Templates\ComboboxOverlay.goml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\Icons\Cursors\hand" />

@@ -28,37 +28,44 @@ using System.Diagnostics;
 
 namespace go
 {
-	[AttributeUsage(AttributeTargets.Class)]
-	public class DefaultTemplate : Attribute
+//	[AttributeUsage(AttributeTargets.Class)]
+	public class TemplateAttribute : Attribute
 	{
 		public string Path = "";
-		public DefaultTemplate(string path)
+		public TemplateAttribute(string path)
 		{
 			Path = path;
 		}
 	}
 	[AttributeUsage(AttributeTargets.Class)]
-	public class DefaultItemTemplate : Attribute
+	public class DefaultTemplate : TemplateAttribute
 	{
-		public string Path = "";
-		public DefaultItemTemplate(string path)
-		{
-			Path = path;
-		}
+		public DefaultTemplate(string path) : base(path){}
+	}
+	[AttributeUsage(AttributeTargets.Class)]
+	public class DefaultOverlayTemplate : TemplateAttribute
+	{
+		public DefaultOverlayTemplate(string path) : base(path){}
+	}
+	[AttributeUsage(AttributeTargets.Class)]
+	public class DefaultItemTemplate : TemplateAttribute
+	{
+		public DefaultItemTemplate(string path) : base(path){}
 	}
 
 	public abstract class TemplatedControl : PrivateContainer, IXmlSerializable
 	{
-		public TemplatedControl () : base()
-		{
-		}
+		#region CTOR
+		public TemplatedControl () : base()	{}
+		#endregion
 
-//		string _templatePath;
-//		[XmlAttributeAttribute()]
-//		public virtual string Template {
-//			get { return _templatePath; }
-//			set { _templatePath = value; }
-//		}
+		string _template;
+
+		[XmlAttributeAttribute][DefaultValue("#go.Templates.Template.goml")]
+		public string Template {
+			get { return _template; }
+			set { _template = value; }
+		}
 
 		#region GraphicObject overrides
 		[XmlAttributeAttribute()][DefaultValue(-1)]
@@ -110,7 +117,6 @@ namespace go
 		}
 			
 		#region IXmlSerializable
-
 		public override System.Xml.Schema.XmlSchema GetSchema(){ return null; }
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
@@ -165,16 +171,9 @@ namespace go
 		}
 		public override void WriteXml(System.Xml.XmlWriter writer)
 		{
-			base.WriteXml(writer);
-//
-//			if (child == null)
-//				return;
-//
-//			writer.WriteStartElement(child.GetType().Name);
-//			(child as IXmlSerializable).WriteXml(writer);
-//			writer.WriteEndElement();
+			//TODO:
+			throw new NotImplementedException();
 		}
-
 		#endregion
 	}
 }

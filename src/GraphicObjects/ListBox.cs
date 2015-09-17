@@ -25,19 +25,25 @@ using System.ComponentModel;
 //TODO: implement ItemTemplate node in xml
 using System.IO;
 using System.Diagnostics;
+using System.Xml;
 
 
 namespace go
 {
 	[DefaultTemplate("#go.Templates.Listbox.goml")]
 	//[DefaultTemplate("#go.Templates.ItemTemplate.goml")]
-	public class ListBox : TemplatedControl
+	public class ListBox : TemplatedControl, IXmlSerializable
 	{
-		Group _list;
+		#region CTOR
+		public ListBox () : base() {}
+		#endregion
 
-		public ListBox () : base()
-		{
-		}
+		Group _list;
+		IList data;
+		int _selectedIndex;
+		string _itemTemplate;
+
+		public event EventHandler<SelectionChangeEventArgs> SelectedItemChanged;
 
 		#region implemented abstract members of TemplatedControl
 		protected override void loadTemplate (GraphicObject template = null)
@@ -47,21 +53,21 @@ namespace go
 		}
 		#endregion
 
-		IList data;
-		int _selectedIndex;
-		string _itemTemplate;
-
 		[XmlAttributeAttribute][DefaultValue("#go.Templates.ItemTemplate.goml")]
 		public string ItemTemplate {
 			get { return _itemTemplate; }
-			set { _itemTemplate = value; }
+			set { 
+				//TODO:reload list with new template?
+				_itemTemplate = value; 
+			}
 		}
+		[XmlAttributeAttribute][DefaultValue(-1)]
 		public int SelectedIndex{
 			get { return _selectedIndex; }
 			set { _selectedIndex = value; }
 		}
 		public object SelectedItem{
-			get { return data[_selectedIndex]; }
+			get { return data == null ? null : data[_selectedIndex]; }
 		}
 		[XmlAttributeAttribute][DefaultValue(null)]
 		public IList Data {
@@ -85,10 +91,8 @@ namespace go
 				#endif
 
 				MemoryStream ms = new MemoryStream ();
-				using (Stream stream = Interface.GetStreamFromPath (ItemTemplate)) {
-					
+				using (Stream stream = Interface.GetStreamFromPath (ItemTemplate))					
 					stream.CopyTo (ms);
-				}
 					
 				Type t = Interface.GetTopContainerOfGOMLStream (ms);
 
@@ -97,8 +101,8 @@ namespace go
 					GraphicObject g = Interface.Load (ms, t, item);
 					g.MouseClick += itemClick;
 					_list.addChild(g);
-
 				}
+
 				ms.Dispose ();
 
 				#if DEBUG
@@ -109,10 +113,72 @@ namespace go
 				#endif
 			}
 		}
+
 		void itemClick(object sender, OpenTK.Input.MouseButtonEventArgs e){
+			SelectedItemChanged.Raise (sender, new SelectionChangeEventArgs((sender as GraphicObject).DataSource));
 			NotifyValueChanged ("SelectedItem", (sender as GraphicObject).DataSource);
 			//Debug.WriteLine ((sender as GraphicObject).DataSource);
 		}
+
+		#region IXmlSerializable
+		public override System.Xml.Schema.XmlSchema GetSchema(){ return null; }
+		public override void ReadXml(System.Xml.XmlReader reader)
+		{
+			//Template could be either an attribute containing path or expressed inlined
+			//as a Template Element
+			using (System.Xml.XmlReader subTree = reader.ReadSubtree())
+			{
+				subTree.Read ();
+
+				string template = reader.GetAttribute ("Template");
+				string tmp = subTree.ReadOuterXml ();
+
+				//Load template from path set as attribute in templated control
+				if (string.IsNullOrEmpty (template)) {					
+					//seek for template tag first
+					using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
+						//load template first if inlined
+
+						xr.Read (); //skip current node
+
+						while (!xr.EOF) {
+							xr.Read (); //read first child
+							if (!xr.IsStartElement ())
+								continue;
+							if (xr.Name == "Template") {
+								xr.Read ();
+
+								Type t = Type.GetType ("go." + xr.Name);
+								GraphicObject go = (GraphicObject)Activator.CreateInstance (t);                                
+								(go as IXmlSerializable).ReadXml (xr);
+
+								loadTemplate (go);
+
+								xr.Read ();//go close tag
+								xr.Read ();//Template close tag
+								break;
+							} else {
+								xr.ReadInnerXml ();
+							}
+						}
+					}				
+				} else
+					loadTemplate (Interface.Load (template, this, !Interface.DontResoveGOML));
+
+
+				//normal xml read
+				using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
+					xr.Read ();
+					base.ReadXml(xr);
+				}
+			}
+		}
+		public override void WriteXml(System.Xml.XmlWriter writer)
+		{
+			//TODO:
+			throw new NotImplementedException();
+		}
+		#endregion
 	}
 }
 

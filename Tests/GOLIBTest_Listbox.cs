@@ -64,19 +64,18 @@ namespace test
 //				new ClsItem("string 2"),
 //				new ClsItem("string 3")
 //			});
-		public List<string> TestList;
-//		string[] TestList = new string[] 
-//			{
-//				"string 1",
-//				"string 2",
-//				"string 3"
-//			};	
+		public List<string> TestList = new List<string>( new string[] 
+			{
+				"string 1",
+				"string 2",
+				"string 3"
+			});	
 
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
 
-			TestList = Directory.GetFileSystemEntries("/mnt/data/MagicCardDataBase/a/", "*.txt",SearchOption.AllDirectories).ToList();
+			//TestList = Directory.GetFileSystemEntries("/mnt/data/MagicCardDataBase/a/", "*.txt",SearchOption.AllDirectories).ToList();
 			LoadInterface("Interfaces/test_Listbox.goml");
 
 //			TestList [1].Field = "test string";

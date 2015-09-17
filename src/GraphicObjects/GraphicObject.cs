@@ -239,7 +239,7 @@ namespace go
 			get { return _font; }
 			set { _font = value; }
 		}
-		[XmlAttributeAttribute()][DefaultValue(2.0)]
+		[XmlAttributeAttribute()][DefaultValue(0.0)]
 		public virtual double CornerRadius {
 			get { return _cornerRadius; }
 			set {
