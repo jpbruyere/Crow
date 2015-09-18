@@ -280,32 +280,33 @@ namespace go
 				//MethodInfo infoWriteLine = typeof(System.Diagnostics.Debug).GetMethod("WriteLine", new Type[] { typeof(string) });
 							
 
-				//load target ref onto the stack
-				FieldInfo fiRefs = typeof(Interface).GetField("References");
-				il.Emit(OpCodes.Ldsfld, fiRefs);
-				il.Emit(OpCodes.Ldc_I4, dstIdx);
+			//load target ref onto the stack
+			FieldInfo fiRefs = typeof(Interface).GetField("References");
+			il.Emit(OpCodes.Ldsfld, fiRefs);
+			il.Emit(OpCodes.Ldc_I4, dstIdx);
 
-				MethodInfo miGetRef = Interface.References.GetType().GetMethod("get_Item");
-				il.Emit(OpCodes.Callvirt, miGetRef);
-				il.Emit(OpCodes.Isinst, dstType);
+			MethodInfo miGetRef = Interface.References.GetType().GetMethod("get_Item");
+			il.Emit(OpCodes.Callvirt, miGetRef);
+			il.Emit(OpCodes.Isinst, dstType);
 
-				//push new value
-				il.Emit(OpCodes.Ldarg_1);
-				FieldInfo fiNewValue = typeof(ValueChangeEventArgs).GetField("NewValue");
-				il.Emit(OpCodes.Ldfld, fiNewValue);
+			//push new value
+			il.Emit(OpCodes.Ldarg_1);
+			FieldInfo fiNewValue = typeof(ValueChangeEventArgs).GetField("NewValue");
+			il.Emit(OpCodes.Ldfld, fiNewValue);
 
+			//Target is expected always to be a Property
+			PropertyInfo piTarget = dstType.GetProperty(binding.MemberName);
 
-				MethodInfo miToStr = typeof(object).GetMethod("ToString",Type.EmptyTypes);
-				PropertyInfo piTarget = dstType.GetProperty(binding.MemberName);
+			//type of the source value
+			Type srcValueType = null;
 
-				Type srcValueType = null;
-
+			//member info of the source value
 			MemberInfo miSrcVal = miSrc;
+
+			//this allow memberless binding with only a name passed as MemberName
+			//the type of the source value is determined by the destination member
 			if (miSrcVal == null)
 				miSrcVal = miDst;
-				//this allow memberless binding with only a name passed as MemberName
-				//but the type is determined by the destination member
-				
 
 			if (miSrcVal.MemberType == MemberTypes.Property)
 				srcValueType = (miSrcVal as PropertyInfo).PropertyType;
@@ -314,18 +315,15 @@ namespace go
 			else
 				throw new Exception("unandled source member type for binding");
 			
-				if (!srcValueType.IsValueType)
-					il.Emit(OpCodes.Castclass, srcValueType);
-				else if (piTarget.PropertyType != srcValueType)
-					il.Emit(OpCodes.Callvirt, GetConvertMethod( piTarget.PropertyType ));
-				else
-					il.Emit(OpCodes.Unbox_Any, piTarget.PropertyType);
-			//	if (piTarget.PropertyType == typeof(string))
-//				else if ( srcValueType != piTarget.PropertyType)
-//					
+			if (!srcValueType.IsValueType)
+				il.Emit(OpCodes.Castclass, srcValueType);
+			else if (piTarget.PropertyType != srcValueType)
+				il.Emit(OpCodes.Callvirt, GetConvertMethod( piTarget.PropertyType ));
+			else
+				il.Emit(OpCodes.Unbox_Any, piTarget.PropertyType);
 				
-				il.Emit(OpCodes.Callvirt, piTarget.GetSetMethod());
-			//}
+			il.Emit(OpCodes.Callvirt, piTarget.GetSetMethod());
+
 			il.MarkLabel(labFailed);
 			il.Emit(OpCodes.Ret);
 
