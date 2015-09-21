@@ -29,6 +29,7 @@ namespace go
 		public string Path;
 		public Size Dimensions;
 		public bool KeepProportions = false;
+		public bool Scale = true;
 
 		public Picture ()
 		{

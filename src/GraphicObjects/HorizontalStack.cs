@@ -18,10 +18,6 @@ namespace go
         public override Orientation Orientation
         {
             get { return Orientation.Horizontal; }
-            //set {  }
         }
-
-
-
     }
 }

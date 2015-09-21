@@ -35,8 +35,11 @@ namespace go
 		#region GraphicObject overrides
 		public override void ClearBinding ()
 		{
-			if (Content != null)
+			if (Content != null) {
+				//fix datasource = null to clear bindings, but it's illogic
+				Content.DataSource = this.DataSource;
 				Content.ClearBinding ();
+			}
 
 			base.ClearBinding ();
 		}

@@ -63,8 +63,14 @@ namespace go
 
 		public override void Paint (Cairo.Context gr, Rectangle rect, string subPart = "")
 		{
-			float widthRatio = (float)rect.Width / Dimensions.Width;
-			float heightRatio = (float)rect.Height / Dimensions.Height;
+			float widthRatio = 1f;
+			float heightRatio = 1f;
+
+			if (Scale){
+				widthRatio = (float)rect.Width / Dimensions.Width;
+				heightRatio = (float)rect.Height / Dimensions.Height;
+			}
+
 			float ratio = Math.Min (widthRatio, heightRatio);
 
 //			if (KeepProportions)

@@ -62,6 +62,7 @@ namespace go
 		Size _minimumSize;
 
 		Picture _backgroundImage;
+		string _backgroundImagePath;
 		string _template;
 		#endregion
 
@@ -289,6 +290,24 @@ namespace go
 				false : 
 				true; } }
 		[XmlAttributeAttribute()][DefaultValue(null)]
+		public virtual string BackgroundImagePath {
+			get { return _backgroundImagePath; }
+			set { 
+				_backgroundImagePath = value;
+				if (string.IsNullOrEmpty(_backgroundImagePath))					
+					return;
+
+				if (_backgroundImagePath.EndsWith (".svg", true, System.Globalization.CultureInfo.InvariantCulture)) 
+					_backgroundImage = new SvgPicture ();
+				else 
+					_backgroundImage = new BmpPicture ();
+
+				_backgroundImage.LoadImage (_backgroundImagePath);
+				//_backgroundImage.Scale = false;
+				registerForGraphicUpdate ();
+			}
+		}
+		[XmlAttributeAttribute()]
 		public virtual Picture BackgroundImage {
 			get { return _backgroundImage; }
 			set { 
@@ -692,8 +711,9 @@ namespace go
 		}
 		internal virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
-			if (TopContainer.hoverWidget != this) {
-				TopContainer.hoverWidget = this;
+			IGOLibHost glh = TopContainer;
+			if (glh.hoverWidget != this) {
+				glh.hoverWidget = this;
 				onMouseEnter (this, e);
 			}
 

@@ -25,7 +25,7 @@ namespace go
 //				DisplayDevice.Default,
 //				3,0,OpenTK.Graphics.GraphicsContextFlags.Default)
 		public OpenTKGameWindow(int _width, int _height, string _title="golib")
-			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), 
+			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 1), 
 				_title,GameWindowFlags.Default,DisplayDevice.GetDisplay(DisplayIndex.Second),
 				3,2,OpenTK.Graphics.GraphicsContextFlags.Debug|OpenTK.Graphics.GraphicsContextFlags.ForwardCompatible)
 //		public OpenTKGameWindow(int _width, int _height, string _title="golib")
@@ -153,7 +153,7 @@ namespace go
 		byte[] bmp;
 		int texID;
 
-		QuadVAO uiQuad;
+		public QuadVAO uiQuad, uiQuad2;
 		go.GLBackend.Shader shader;
 		Matrix4 projectionMatrix, 
 				modelviewMatrix;
@@ -166,6 +166,7 @@ namespace go
 			if (uiQuad != null)
 				uiQuad.Dispose ();
 			uiQuad = new QuadVAO (0, 0, ClientRectangle.Width, ClientRectangle.Height, 0, 1, 1, -1);
+			uiQuad2 = new QuadVAO (0, 0, ClientRectangle.Width, ClientRectangle.Height, 0, 0, 1, 1);
 			projectionMatrix = Matrix4.CreateOrthographicOffCenter 
 				(0, ClientRectangle.Width, ClientRectangle.Height, 0, 0, 1);
 			modelviewMatrix = Matrix4.Identity;
@@ -216,6 +217,23 @@ namespace go
 
 			shader.Disable ();
 			GL.Viewport (viewport [0], viewport [1], viewport [2], viewport [3]);
+		}
+		public void RenderCustomTextureOnUIQuad(int _customTex)
+		{
+			GL.GetInteger (GetPName.Viewport, viewport);
+			GL.Viewport (0, 0, ClientRectangle.Width, ClientRectangle.Height);
+			shader.Enable ();
+			shader.ProjectionMatrix = projectionMatrix;
+			shader.ModelViewMatrix = modelviewMatrix;
+			shader.Color = new Vector4(1f,1f,1f,1f);
+			GL.ActiveTexture (TextureUnit.Texture0);
+			GL.BindTexture (TextureTarget.Texture2D, _customTex);
+			GL.Disable (EnableCap.DepthTest);
+			uiQuad2.Render (PrimitiveType.TriangleStrip);
+			GL.Enable (EnableCap.DepthTest);
+			GL.BindTexture(TextureTarget.Texture2D, 0);
+			shader.Disable ();
+			GL.Viewport (viewport [0], viewport [1], viewport [2], viewport [3]);			
 		}
 			
 		#endregion
@@ -310,10 +328,6 @@ namespace go
 //			Debug.WriteLine("UPDATE: {0} ticks \t, {1} ms",
 //				updateTime.ElapsedTicks,
 //				updateTime.ElapsedMilliseconds);
-			//update Mouse cursor
-			if (_hoverWidget is Window) {
-				
-			}
 		}						
 		#endregion
 			

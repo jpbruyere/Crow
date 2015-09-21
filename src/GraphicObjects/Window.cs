@@ -24,6 +24,7 @@ namespace go
 
 		string _title;
 		string _icon;
+		bool _resizable;
 		Container _contentContainer;
 		Direction currentDirection = Direction.None;
 
@@ -64,7 +65,18 @@ namespace go
 				NotifyValueChanged ("Icon", _icon);
 			}
 		} 
-			
+		[XmlAttributeAttribute()][DefaultValue(true)]
+		public bool Resizable {
+			get {
+				return _resizable;
+			}
+			set {
+				_resizable = value;
+				NotifyValueChanged ("Resizable", _resizable);
+			}
+		}
+
+
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
@@ -72,60 +84,62 @@ namespace go
 			OpenTKGameWindow otkgw = TopContainer as OpenTKGameWindow;
 
 			if (otkgw.activeWidget == null) {
-				Direction lastDir = currentDirection;
+				if (Resizable) {
+					Direction lastDir = currentDirection;
 
-				if (Math.Abs (e.Position.Y - this.Slot.Y) < Interface.BorderThreshold) {
-					if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
-						currentDirection = Direction.NW;
+					if (Math.Abs (e.Position.Y - this.Slot.Y) < Interface.BorderThreshold) {
+						if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
+							currentDirection = Direction.NW;
+						else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
+							currentDirection = Direction.NE;
+						else
+							currentDirection = Direction.N;
+					} else if (Math.Abs (e.Position.Y - this.Slot.Bottom) < Interface.BorderThreshold) {
+						if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
+							currentDirection = Direction.SW;
+						else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
+							currentDirection = Direction.SE;
+						else
+							currentDirection = Direction.S;
+					} else if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
+						currentDirection = Direction.W;
 					else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
-						currentDirection = Direction.NE;
+						currentDirection = Direction.E;
 					else
-						currentDirection = Direction.N;
-				} else if (Math.Abs (e.Position.Y - this.Slot.Bottom) < Interface.BorderThreshold) {
-					if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
-						currentDirection = Direction.SW;
-					else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
-						currentDirection = Direction.SE;
-					else
-						currentDirection = Direction.S;
-				} else if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
-					currentDirection = Direction.W;
-				else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
-					currentDirection = Direction.E;
-				else
-					currentDirection = Direction.None;
+						currentDirection = Direction.None;
 
-				if (currentDirection != lastDir) {
-					switch (currentDirection) {
-					case Direction.None:
-						otkgw.Cursor = XCursor.Default;
-						break;
-					case Direction.N:
-						otkgw.Cursor = XCursor.V;
-						break;
-					case Direction.S:
-						otkgw.Cursor = XCursor.V;
-						break;
-					case Direction.E:
-						otkgw.Cursor = XCursor.H;
-						break;
-					case Direction.W:
-						otkgw.Cursor = XCursor.H;
-						break;
-					case Direction.NW:
-						otkgw.Cursor = XCursor.NW;
-						break;
-					case Direction.NE:
-						otkgw.Cursor = XCursor.NE;
-						break;
-					case Direction.SW:
-						otkgw.Cursor = XCursor.SW;
-						break;
-					case Direction.SE:
-						otkgw.Cursor = XCursor.SE;
-						break;
-					}
-				}				
+					if (currentDirection != lastDir) {
+						switch (currentDirection) {
+						case Direction.None:
+							otkgw.Cursor = XCursor.Default;
+							break;
+						case Direction.N:
+							otkgw.Cursor = XCursor.V;
+							break;
+						case Direction.S:
+							otkgw.Cursor = XCursor.V;
+							break;
+						case Direction.E:
+							otkgw.Cursor = XCursor.H;
+							break;
+						case Direction.W:
+							otkgw.Cursor = XCursor.H;
+							break;
+						case Direction.NW:
+							otkgw.Cursor = XCursor.NW;
+							break;
+						case Direction.NE:
+							otkgw.Cursor = XCursor.NE;
+							break;
+						case Direction.SW:
+							otkgw.Cursor = XCursor.SW;
+							break;
+						case Direction.SE:
+							otkgw.Cursor = XCursor.SE;
+							break;
+						}
+					}				
+				}
 				return;
 			}
 
@@ -134,38 +148,46 @@ namespace go
 				
 			this.TopContainer.redrawClip.AddRectangle (this.ScreenCoordinates(this.Slot));
 
+			int currentLeft = this.Left;
+			int currentTop = this.Top;
+
+			if (currentLeft == 0)
+				currentLeft = this.Slot.Left;
+			if (currentTop == 0)
+				currentTop = this.Slot.Top;
+
 			switch (currentDirection) {
 			case Direction.None:
-				this.Left += e.XDelta;
-				this.Top += e.YDelta;
+				this.Left = currentLeft + e.XDelta;				
+				this.Top = currentTop + e.YDelta;
 				break;
 			case Direction.N:
-				this.Top += e.YDelta;
+				this.Top = currentTop + e.YDelta;
 				this.Height -= e.YDelta;
 				break;
 			case Direction.S:
 				this.Height += e.YDelta;
 				break;
 			case Direction.W:
-				this.Left += e.XDelta;
+				this.Left = currentLeft + e.XDelta;
 				this.Width -= e.XDelta;
 				break;
 			case Direction.E:
 				this.Width += e.XDelta;
 				break;
 			case Direction.NW:
-				this.Left += e.XDelta;
-				this.Top += e.YDelta;
+				this.Left = currentLeft + e.XDelta;
+				this.Top = currentTop + e.YDelta;
 				this.Width -= e.XDelta;
 				this.Height -= e.YDelta;
 				break;
 			case Direction.NE:
 				this.Width += e.XDelta;
-				this.Top += e.YDelta;
+				this.Top = currentTop + e.YDelta;
 				this.Height -= e.YDelta;
 				break;
 			case Direction.SW:
-				this.Left += e.XDelta;
+				this.Left = currentLeft + e.XDelta;
 				this.Width -= e.XDelta;
 				this.Height += e.YDelta;
 				break;

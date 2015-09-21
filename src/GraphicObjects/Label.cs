@@ -527,9 +527,9 @@ namespace go
 		{
 			base.onMouseMove (sender, e);
 
-			if ((sender as OpenTKGameWindow).activeWidget != this)
+			IGOLibHost glh = TopContainer;
+			if (glh.activeWidget != this)
 				return;
-
 			if (!Selectable)
 				return;
 			
