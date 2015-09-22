@@ -27,7 +27,6 @@ using System.IO;
 using System.Diagnostics;
 using System.Xml;
 
-
 namespace go
 {
 	[DefaultTemplate("#go.Templates.Listbox.goml")]
@@ -85,10 +84,10 @@ namespace go
 				if (data == null)
 					return;
 
-//				#if DEBUG
-//				Stopwatch loadingTime = new Stopwatch ();
-//				loadingTime.Start ();
-//				#endif
+				#if DEBUG_LOAD_TIME
+				Stopwatch loadingTime = new Stopwatch ();
+				loadingTime.Start ();
+				#endif
 
 				MemoryStream ms = new MemoryStream ();
 				using (Stream stream = Interface.GetStreamFromPath (ItemTemplate))					
@@ -105,12 +104,12 @@ namespace go
 
 				ms.Dispose ();
 
-//				#if DEBUG
-//				loadingTime.Stop ();
-//				Debug.WriteLine("Listbox {2} Loading: {0} ticks \t, {1} ms",
-//					loadingTime.ElapsedTicks,
-//					loadingTime.ElapsedMilliseconds, this.ToString());
-//				#endif
+				#if DEBUG_LOAD_TIME
+				loadingTime.Stop ();
+				Debug.WriteLine("Listbox {2} Loading: {0} ticks \t, {1} ms",
+					loadingTime.ElapsedTicks,
+					loadingTime.ElapsedMilliseconds, this.ToString());
+				#endif
 			}
 		}
 

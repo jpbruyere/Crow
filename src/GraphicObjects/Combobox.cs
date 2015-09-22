@@ -37,6 +37,8 @@ namespace go
 		string _itemTemplate;
 		string _overlayTemplate;
 
+		public event EventHandler Pop;
+		public event EventHandler Unpop;
 		public event EventHandler<SelectionChangeEventArgs> SelectedItemChanged;
 
 		#region implemented abstract members of TemplatedControl
@@ -87,20 +89,44 @@ namespace go
 		[XmlAttributeAttribute][DefaultValue(-1)]
 		public int SelectedIndex{
 			get { return _selectedIndex; }
-			set { _selectedIndex = value; }
-		}
-		public object SelectedItem{
-			set { 				
-				_selectedItem = value;
+			set { 
+				//store value event if data is null, because in xml parsing selindex is always
+				//before data, so it's impossible without that trick to set a default index in goml
+				_selectedIndex = value;	
+	
+				if (data == null)					
+					return;
+	
+				if (_selectedIndex > data.Count - 1 || _selectedIndex < 0)
+					throw new Exception ("Combobox SelectedIndex out of range");
 
-//				NotifyValueChanged ("SelectedItem", _selectedItem);
-//
+
+				_selectedItem = data [_selectedIndex];
+				NotifyValueChanged ("SelectedIndex", SelectedIndex);
+				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs(_selectedItem));
+
 				if (SelectedItem == null)
 					Text = "";
 				else
 					Text = _selectedItem.ToString ();
 			}
-				
+		}
+		public object SelectedItem{
+			set {
+				if (_selectedItem == value)
+					return;
+
+				_selectedItem = value;
+				_selectedIndex = data.IndexOf (_selectedItem);
+				NotifyValueChanged ("SelectedIndex", _selectedIndex);
+				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs(_selectedItem));
+
+				if (SelectedItem == null)
+					Text = "";
+				else
+					Text = _selectedItem.ToString ();
+			}
+
 			get { return _selectedItem; }
 		}
 		[XmlAttributeAttribute][DefaultValue(null)]
@@ -121,7 +147,7 @@ namespace go
 				if (data == null)
 					return;
 
-				#if DEBUG
+				#if DEBUG_LOAD_TIME
 				Stopwatch loadingTime = new Stopwatch ();
 				loadingTime.Start ();
 				#endif
@@ -141,7 +167,13 @@ namespace go
 
 				ms.Dispose ();
 
-				#if DEBUG
+				if (SelectedIndex < 0)
+					return;
+
+				//force raise of changes
+				SelectedIndex = SelectedIndex;
+
+				#if DEBUG_LOAD_TIME
 				loadingTime.Stop ();
 				Debug.WriteLine("Listbox Loading: {0} ticks \t, {1} ms",
 					loadingTime.ElapsedTicks,
@@ -149,27 +181,14 @@ namespace go
 				#endif
 			}
 		}
-
-		void itemClick(object sender, OpenTK.Input.MouseButtonEventArgs e){
-			object datasource = (sender as GraphicObject).DataSource;
-			SelectedItem = datasource;
-			SelectedItemChanged.Raise (sender, new SelectionChangeEventArgs(datasource));
-			IsPopped = false;
-
-			//Debug.WriteLine ((sender as GraphicObject).DataSource);
-		}
-
-		public event EventHandler Pop;
-		public event EventHandler Unpop;
-
 		public GraphicObject Overlay {
 			get { return _overlay; }
 			set { 
 				if (_overlay != null) {
 					_overlay.LayoutChanged -= _overlay_LayoutChanged;
-					_overlay.MouseLeave -= _content_MouseLeave;
+					_overlay.MouseLeave -= _overlay_MouseLeave;
 				}
-				
+
 				_overlay = value; 
 
 				if (_overlay == null)
@@ -177,15 +196,48 @@ namespace go
 
 				_overlay.Focusable = true;
 				_overlay.LayoutChanged += _overlay_LayoutChanged;
-				_overlay.MouseLeave += _content_MouseLeave;
+				_overlay.MouseLeave += _overlay_MouseLeave;
+			}
+		}
+		[XmlAttributeAttribute()][DefaultValue("Combobox")]
+		public string Text {
+			get { return text; } 
+			set {
+				if (text == value)
+					return;
+				text = value; 
+				NotifyValueChanged ("Text", text);
+			}
+		}        
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public bool IsPopped
+		{
+			get { return _isPopped; }
+			set
+			{
+				_isPopped = value;
+
+				if (_isPopped) {
+					onPop (this, null);
+					NotifyValueChanged ("SvgSub", "expanded");
+					return;
+				}
+
+				onUnpop (this, null);
+				NotifyValueChanged ("SvgSub", "collapsed");
 			}
 		}
 
-		void _content_MouseLeave (object sender, MouseMoveEventArgs e)
+		void itemClick(object sender, OpenTK.Input.MouseButtonEventArgs e){
+			object datasource = (sender as GraphicObject).DataSource;
+			SelectedItem = datasource;
+			IsPopped = false;
+			//Debug.WriteLine ((sender as GraphicObject).DataSource);
+		}
+		void _overlay_MouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			IsPopped = false;
 		}
-
 		void _overlay_LayoutChanged (object sender, LayoutChangeEventArgs e)
 		{
 			ILayoutable tc = Overlay.Parent as ILayoutable;
@@ -210,19 +262,6 @@ namespace go
 					Overlay.Top = 0;
 			}
 		}
-		public override void ClearBinding ()
-		{
-			//ensure popped window is cleared
-			if (Overlay != null) {
-				if (Overlay.Parent != null) {
-					IGOLibHost tc = Overlay.Parent as IGOLibHost;
-					if (tc != null)
-						tc.DeleteWidget (Overlay);
-				}
-			}
-			base.ClearBinding ();
-
-		}
 
 		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
 		public override bool Focusable
@@ -231,35 +270,6 @@ namespace go
 			set { base.Focusable = value; }
 		}
 
-		[XmlAttributeAttribute()][DefaultValue("Combobox")]
-		public string Text {
-			get { return text; } 
-			set {
-				if (text == value)
-					return;
-				text = value; 
-				NotifyValueChanged ("Text", text);
-			}
-		}        
-
-		[XmlAttributeAttribute()][DefaultValue(false)]
-        public bool IsPopped
-        {
-			get { return _isPopped; }
-            set
-            {
-				_isPopped = value;
-
-				if (_isPopped) {
-					onPop (this, null);
-					NotifyValueChanged ("SvgSub", "expanded");
-					return;
-				}
-
-				onUnpop (this, null);
-				NotifyValueChanged ("SvgSub", "collapsed");
-            }
-        }
 			
 		public virtual void onPop(object sender, EventArgs e)
 		{
@@ -289,5 +299,18 @@ namespace go
 			base.onMouseClick (sender, e);
 		}
 
+		public override void ClearBinding ()
+		{
+			//ensure popped window is cleared
+			if (Overlay != null) {
+				if (Overlay.Parent != null) {
+					IGOLibHost tc = Overlay.Parent as IGOLibHost;
+					if (tc != null)
+						tc.DeleteWidget (Overlay);
+				}
+			}
+			base.ClearBinding ();
+
+		}
 	}
 }

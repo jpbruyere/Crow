@@ -801,7 +801,9 @@ namespace go
 							MemberName = attName
 						});
 					}
-				} else if (mi.MemberType == MemberTypes.Property) {
+					continue;
+				}
+				if (mi.MemberType == MemberTypes.Property) {
 					PropertyInfo pi = mi as PropertyInfo;
 
 					if (pi.GetSetMethod () == null)

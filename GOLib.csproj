@@ -24,6 +24,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ReleaseVersion>0.2</ReleaseVersion>
+    <SynchReleaseVersion>false</SynchReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,17 +35,18 @@
     <BaseAddress>4194304</BaseAddress>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DefineConstants>__linux__</DefineConstants>
     <Optimize>True</Optimize>
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
     <DebugType>None</DebugType>
     <BaseAddress>4194304</BaseAddress>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DefineConstants>__linux__</DefineConstants>
     <OutputPath>bin\Release</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>TRACE;DEBUG;__linux__;DEBUG_LOAD_TIME</DefineConstants>
   </PropertyGroup>
   <!--  <PropertyGroup Condition=" '$(Platform)' == 'Linux_x86' ">
     <DefineConstants>__linux__</DefineConstants>

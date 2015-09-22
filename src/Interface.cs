@@ -146,6 +146,11 @@ namespace go
 		}
 		public static GraphicObject Load(Stream stream, Type type, object hostClass = null, bool resolve = true)
 		{
+			#if DEBUG_LOAD_TIME
+			Stopwatch loadingTime = new Stopwatch ();
+			loadingTime.Start ();
+			#endif
+
 			GraphicObject result;
 
 
@@ -167,6 +172,14 @@ namespace go
 				
 			if (resolve)
 				resolveGOML (hostClass);
+
+			#if DEBUG_LOAD_TIME
+			loadingTime.Stop ();
+			Debug.WriteLine("GOML Loading ({2}): {0} ticks \t, {1} ms",
+			loadingTime.ElapsedTicks,
+			loadingTime.ElapsedMilliseconds,
+			CurrentGOMLPath);
+			#endif
 
 			return result;
 		}
