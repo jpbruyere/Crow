@@ -27,26 +27,29 @@ namespace test
 
 		public GOLIBTests ()
 			: base(600, 400,"test: press spacebar to toogle test files")
-		{}
+		{
+			VSync = VSyncMode.Off;
+		}
 
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
-			"testCombobox.goml",
-			"testBorder.goml",
+			"test4.goml",
 			"testContainer.goml",
+			"testBorder.goml",
 			"testLabel.goml",
 			"testCheckbox.goml",
+			"fps.goml",
 			"testRadioButton.goml",
 			"testSpinner.goml",
 			"testPopper.goml",
 			"testExpandable.goml",
 			"testGroupBox.goml",
-			"test_stack.goml",
+			"testCombobox.goml",
 			"testWindow.goml",
 			"testMsgBox.goml",
 			"testGrid.goml",
-			"fps.goml",
+
 			"testMeter.goml",
 		};
 
@@ -97,12 +100,14 @@ namespace test
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-			LoadInterface("Interfaces/" + testFiles[idx]);
+			this.AddWidget(new test4());
+			//LoadInterface("Interfaces/" + testFiles[idx]);
 		}
 		protected override void OnUpdateFrame (FrameEventArgs e)
 		{
-			base.OnUpdateFrame (e);
-
+			if (frameCpt % 8 == 0)
+				base.OnUpdateFrame (e);
+			
 			fps = (int)RenderFrequency;
 
 

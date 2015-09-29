@@ -18,7 +18,7 @@ using System.IO;
 using System.Xml;
 
 namespace go
-{
+{		
 	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange
 	{
 		internal List<int> DynamicMethodIds = new List<int> ();
@@ -47,19 +47,19 @@ namespace go
 
 		#region private fields
 		ILayoutable _parent;
-		string _name;
-		Color _background;
-		Color _foreground;
-		Font _font;
-		double _cornerRadius;
-		int _margin;
+		string _name = "unamed";
+		Color _background = Color.Transparent;
+		Color _foreground = Color.White;
+		Font _font = "droid, 10";
+		double _cornerRadius = 0;
+		int _margin = 0;
 		bool _focusable = false;
 		bool _hasFocus = false;
 		protected bool _isVisible = true;
-		VerticalAlignment _verticalAlignment;
-		HorizontalAlignment _horizontalAlignment;
-		Size _maximumSize;
-		Size _minimumSize;
+		VerticalAlignment _verticalAlignment = VerticalAlignment.Center;
+		HorizontalAlignment _horizontalAlignment = HorizontalAlignment.Center;
+		Size _maximumSize = "0;0";
+		Size _minimumSize = "0;0";
 
 		Picture _backgroundImage;
 		string _backgroundImagePath;
@@ -709,7 +709,7 @@ namespace go
 		{
 			return Visible ? ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false; 
 		}
-		internal virtual void checkHoverWidget(MouseMoveEventArgs e)
+		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
 			IGOLibHost glh = TopContainer;
 			if (glh.hoverWidget != this) {
@@ -788,6 +788,10 @@ namespace go
 			while (reader.MoveToNextAttribute ()) {
 				string attName = reader.Name;
 				string attValue = reader.Value;
+
+				if (string.IsNullOrEmpty (attValue))
+					continue;
+				
 				MemberInfo mi = thisType.GetMember (attName).FirstOrDefault();
 				if (mi == null) {
 					Debug.WriteLine (Interface.CurrentGOMLPath + "=>GOML: Unknown attribute in " + thisType.ToString() + " : " + attName);
@@ -812,69 +816,68 @@ namespace go
 					bool isAttribute = false;
 					object defaultValue = null;
 
-					foreach (object o in pi.GetCustomAttributes ()) {
-						XmlAttributeAttribute xaa = o as XmlAttributeAttribute;
+					foreach (object attrib in pi.GetCustomAttributes ()) {
+						XmlAttributeAttribute xaa = attrib as XmlAttributeAttribute;
 						if (xaa != null) {
 							isAttribute = true;
 							if (!string.IsNullOrEmpty (xaa.AttributeName))
 								attName = xaa.AttributeName;
 							continue;
 						}
-						if (o is XmlIgnoreAttribute)
+						if (attrib is XmlIgnoreAttribute)
 							break;
-						DefaultValueAttribute dv = o as DefaultValueAttribute;
+						DefaultValueAttribute dv = attrib as DefaultValueAttribute;
 						if (dv != null)
 							defaultValue = dv.Value;						
 					}
 					if (!isAttribute)
 						continue;
-					
-					if (string.IsNullOrEmpty (attValue)) {
-						//avoid system types automaticaly converted by parser
-						if (defaultValue != null && !pi.PropertyType.Namespace.StartsWith("System")) {
-							if (pi.PropertyType != defaultValue.GetType()) {
-								MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
-								if (miParse != null) {									
-									pi.SetValue (this, miParse.Invoke (null, new object[]{ defaultValue }), null);
-									continue;
-								}
-							}
-						}
-						pi.SetValue (this, defaultValue, null);
+//					{
+//						//avoid system types automaticaly converted by parser
+//						if (defaultValue != null && !pi.PropertyType.Namespace.StartsWith("System")) {
+//							if (pi.PropertyType != defaultValue.GetType()) {
+//								MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
+//								if (miParse != null) {									
+//									pi.SetValue (this, miParse.Invoke (null, new object[]{ defaultValue }), null);
+//									continue;
+//								}
+//							}
+//						}
+//						pi.SetValue (this, defaultValue, null);
+//					} else {
+
+					if (attValue.StartsWith("{")) {
+						if (Interface.DontResoveGOML)
+							continue;
+						//binding
+						if (!attValue.EndsWith("}"))
+							throw new Exception (string.Format("GOML:Malformed binding: {0}", attValue));
+
+						string strBinding = attValue.Substring (1, attValue.Length - 2);
+						Interface.GOMLResolver.Add (new DynAttribute () {
+							Source = this,
+							MemberName = attName,
+							Value = strBinding
+						});
+						continue;
+					}
+
+					if (pi.PropertyType == typeof(string)) {
+						pi.SetValue (this, attValue, null);
+						continue;
+					}
+
+					object o = null;
+
+					if (pi.PropertyType.IsEnum) {
+						pi.SetValue (this, Enum.Parse (pi.PropertyType, attValue), null);
 					} else {
+						MethodInfo me = pi.PropertyType.GetMethod ("Parse", new Type[] { typeof(string) });
+						pi.SetValue (this, me.Invoke (null, new string[] { attValue }), null);
+					}
 
-						if (attValue.StartsWith("{")) {
-							if (Interface.DontResoveGOML)
-								continue;
-							//binding
-							if (!attValue.EndsWith("}"))
-								throw new Exception (string.Format("GOML:Malformed binding: {0}", attValue));
+					 
 
-							string strBinding = attValue.Substring (1, attValue.Length - 2);
-							Interface.GOMLResolver.Add (new DynAttribute () {
-								Source = this,
-								MemberName = attName,
-								Value = strBinding
-							});
-							continue;
-						}
-
-						if (pi.PropertyType == typeof(string)) {
-							pi.SetValue (this, attValue, null);
-							continue;
-						}
-
-						object o = null;
-
-						if (pi.PropertyType.IsEnum) {
-							o = Enum.Parse (pi.PropertyType, attValue);
-						} else {
-							MethodInfo me = pi.PropertyType.GetMethod ("Parse", new Type[] { typeof(string) });
-							o = me.Invoke (null, new string[] { attValue });
-						}
-
-						pi.SetValue (this, o, null);
-					}					
 				}
 			}
 			reader.MoveToElement();

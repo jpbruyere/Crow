@@ -64,18 +64,16 @@ namespace MonoDevelop.GOLib
 			}
 		}
 		public bool CanUseAsDefault 
-		{ get { return false; }}
+		{ get { return canHandle; } }
 
 		public IViewContent CreateContent (FilePath fileName, string mimeType, Project ownerProject)
 		{			
 			return new GOLibView ();
-
-
 		}
 		public bool CanHandle (FilePath fileName, string mimeType, Project ownerProject)
 		{			
 			canHandle = mimeType.StartsWith("text/x-goml");
-			return canHandle;
+			return true;
 		}		
 	}
 }

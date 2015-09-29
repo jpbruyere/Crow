@@ -30,7 +30,6 @@ using MonoDevelop.Ide.Gui.Components;
 using MonoDevelop.Components;
 using MonoDevelop.Components.Commands;
 using MonoDevelop.Ide;
-using System.Linq;
 
 namespace MonoDevelop.GOLib
 {
@@ -73,25 +72,11 @@ namespace MonoDevelop.GOLib
 			GOLibView view = new GOLibView ();
 
 			ProjectFile file   = CurrentNode.DataItem as ProjectFile;
-
 			if (file != null)
 				view.Load (file.FilePath);
 			
-			
 			IdeApp.Workbench.OpenDocument (view, true);
-			//IdeApp.Workbench.Documents.Where (d => d.FileName == file.FilePath);
-
 		}
-		public override void ActivateItem ()
-		{
-//			ProjectFile o = this.CurrentNode.DataItem as ProjectFile;
-//			Ide.Gui.Document[] doc = IdeApp.Workbench.Documents.Where (d => d.FileName == o.FilePath).ToArray();
-//			if (doc [0].ActiveView != null)
-//				return;
-				//doc [0].ActiveView.Select();
-			OnShowGOLibViewer ();
-		}
-
 	}
 
 }

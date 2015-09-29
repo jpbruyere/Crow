@@ -128,7 +128,7 @@ namespace go
 		{			
 			return Visible ? base.ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false; 
 		}
-		internal override void checkHoverWidget (MouseMoveEventArgs e)
+		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
 			Point m = e.Position - new Point ((int)ScrollX, (int)ScrollY);
 			base.checkHoverWidget (new MouseMoveEventArgs(m.X,m.Y,e.XDelta,e.YDelta));

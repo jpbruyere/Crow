@@ -18,11 +18,11 @@ namespace MonoDevelop.GOLib
 
 		public object GetActiveComponent ()
 		{
-			return hoverWidget;
+			return activeWidget;
 		}
 		public object GetProvider ()
 		{
-			return hoverWidget;
+			return activeWidget;
 		}
 		public void OnEndEditing (object obj)
 		{
@@ -48,7 +48,7 @@ namespace MonoDevelop.GOLib
 
 		public GOLibGtkHost ()
 		{
-			this.ExposeEvent += onExpose;
+			this.Drawn += onExpose;
 			this.ButtonPressEvent += GOLibGtkHost_ButtonPressEvent;
 			this.ButtonReleaseEvent += GOLibGtkHost_ButtonReleaseEvent;
 			this.MotionNotifyEvent += GOLibGtkHost_MotionNotifyEvent;
@@ -58,14 +58,12 @@ namespace MonoDevelop.GOLib
 		}
 		static double[] dashed = {2.0};
 
-		void onExpose(object o, Gtk.ExposeEventArgs args)
+		void onExpose(object o, Gtk.DrawnArgs args)
 		{
 			Gtk.DrawingArea area = (Gtk.DrawingArea) o;
-			Cairo.Context cr =  Gdk.CairoHelper.Create(area.GdkWindow);
+
+			Cairo.Context cr = args.Cr;
 			_redrawClip.AddRectangle (this.ClientRectangle);
-
-			LoggingService.LogInfo ("expose event");
-
 			update (cr);
 
 			if (_hoverWidget != null) {
@@ -84,15 +82,14 @@ namespace MonoDevelop.GOLib
 			MouseButtonEventArgs e = new MouseButtonEventArgs 
 				((int)args.Event.X, (int)args.Event.Y, 
 					gtkButtonIdToOpenTkButton(args.Event.Button), true);
-			Mouse_ButtonDown (o, e);
+			activeWidget = hoverWidget;
 			DesignerSupport.DesignerSupport.Service.SetPadContent (this);
 		}
 		void GOLibGtkHost_ButtonReleaseEvent (object o, Gtk.ButtonReleaseEventArgs args)
 		{
 			MouseButtonEventArgs e = new MouseButtonEventArgs 
 				((int)args.Event.X, (int)args.Event.Y, 
-					gtkButtonIdToOpenTkButton(args.Event.Button), false);
-			Mouse_ButtonUp (o, e);
+					gtkButtonIdToOpenTkButton(args.Event.Button), false);			
 		}
 		int lastX,LastY;
 		void GOLibGtkHost_MotionNotifyEvent (object o, Gtk.MotionNotifyEventArgs args)
@@ -215,13 +212,6 @@ namespace MonoDevelop.GOLib
 			GraphicObjects.CopyTo (invGOList,0);
 			invGOList = invGOList.Reverse ().ToArray ();
 
-			go.Size newSize = this.ClientRectangle.Size;
-			if (lastSize != newSize) {
-				foreach (GraphicObject g in GraphicObjects)
-					g.RegisterForLayouting ((int)LayoutingType.All);
-				lastSize = newSize;
-			}
-
 			//Debug.WriteLine ("======= Layouting queue start =======");
 			while (Interface.LayoutingQueue.Count > 0) {
 				LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
@@ -297,14 +287,11 @@ namespace MonoDevelop.GOLib
 		public void AddWidget(GraphicObject g)
 		{
 			g.Parent = this;
-			GraphicObjects.Insert (0, g);
-
-			g.RegisterForLayouting ((int)LayoutingType.Sizing);
+			GraphicObjects.Add (g);
 		}
 		public void DeleteWidget(GraphicObject g)
 		{
 			g.Visible = false;//trick to ensure clip is added to refresh zone
-			g.ClearBinding();
 			GraphicObjects.Remove (g);
 		}
 
@@ -497,11 +484,10 @@ namespace MonoDevelop.GOLib
 				throw new NotImplementedException ();
 			}
 		}
-		Size lastSize;
+
 		public Rectangle ClientRectangle {
-			get {	
-				go.Size newSize = new go.Size (Allocation.Width, Allocation.Height);
-				return newSize;
+			get {			
+				return new go.Size(Allocation.Width,Allocation.Height);
 			}
 		}
 

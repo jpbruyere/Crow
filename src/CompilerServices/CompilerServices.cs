@@ -10,9 +10,151 @@ using System.Runtime.CompilerServices;
 
 namespace go
 {
+	public enum BindingType
+	{
+		Handler,
+		DynamicHandler,
+		PropertyBinding
+	}
+	public class Binding{
+		public BindingType BindingType;
+		public string MemberName;
+		public string BindingExpression;
+	}
+
+	public static class CompilerServices2
+	{
+		static int dynHandleCpt = 0;
+		/// <summary>
+		/// Compile events expression in GOML attributes
+		/// </summary>
+		/// <param name="es">Event binding details</param>
+		public static void ResolveBinding(DynAttribute es)
+		{
+			Type srcType = es.Source.GetType ();
+
+			#region Retrieve EventHandler parameter type
+			EventInfo ei = srcType.GetEvent (es.MemberName);
+			MethodInfo invoke = ei.EventHandlerType.GetMethod ("Invoke");
+			ParameterInfo[] pars = invoke.GetParameters ();
+
+			Type handlerArgsType = pars [1].ParameterType;
+			#endregion
+
+			Type[] args = {typeof(object), handlerArgsType};
+			DynamicMethod dm = new DynamicMethod("dynHandle_" + dynHandleCpt,
+				typeof(void), 
+				args, 
+				srcType.Module);
+
+			es.Source.DynamicMethodIds.Add (dynHandleCpt);
+
+			dynHandleCpt++;
+
+			#region IL generation
+			ILGenerator il = dm.GetILGenerator(256);
+
+			string src = es.Value.Trim();
+
+			if (! (src.StartsWith("{") || src.EndsWith ("}"))) 
+				throw new Exception (string.Format("GOML:Malformed {0} Event handler: {1}", es.MemberName, es.Value));
+
+			src = src.Substring (1, src.Length - 2);
+			string[] srcLines = src.Split (new char[] { ';' });
+
+			foreach (string srcLine in srcLines) {
+				string statement = srcLine.Trim ();
+
+				string[] operandes = statement.Split (new char[] { '=' });
+				if (operandes.Length < 2) //not an affectation
+				{
+					continue;
+				}
+				string lop = operandes [0].Trim ();
+				string rop = operandes [operandes.Length-1].Trim ();
+
+				#region LEFT OPERANDES
+				GraphicObject lopObj = es.Source;	//default left operand base object is 
+				//the first arg (object sender) of the event handler
+
+				string[] lopParts = lop.Split (new char[] { '.' });
+				if (lopParts.Length == 2) {//should search also for member of es.Source
+					lopObj = es.Source.FindByName (lopParts [0]);
+					if (lopObj==null)
+						throw new Exception (string.Format("GOML:Unknown name: {0}", lopParts[0]));
+					//TODO: should create private member holding ref of lopObj, and emit
+					//a call to FindByName(lopObjName) during #ctor or in a onLoad func or evt handler
+					throw new Exception (string.Format("GOML:obj tree ref not yet implemented", lopParts[0]));
+				}else
+					il.Emit(OpCodes.Ldarg_0);	//load sender ref onto the stack
+
+				int i = lopParts.Length -1;
+
+				MemberInfo lopMbi = lopObj.GetType().GetMember (lopParts[i])[0];
+				OpCode lopSetOC;
+				dynamic lopSetMbi;
+				Type lopT = null;
+				switch (lopMbi.MemberType) {
+				case MemberTypes.Property:
+					PropertyInfo lopPi = srcType.GetProperty (lopParts[i]);
+					MethodInfo dstMi = lopPi.GetSetMethod ();
+					lopT = lopPi.PropertyType;
+					lopSetMbi = dstMi;
+					lopSetOC = OpCodes.Callvirt;
+					break;
+				case MemberTypes.Field:
+					FieldInfo dstFi = srcType.GetField(lopParts[i]);
+					lopT = dstFi.FieldType;
+					lopSetMbi = dstFi;
+					lopSetOC = OpCodes.Stfld;
+					break;
+				default:
+					throw new Exception (string.Format("GOML:member type not handle: {0}", lopParts[i]));
+				}  
+				#endregion
+
+				#region RIGHT OPERANDES
+				if (rop.StartsWith("\'")){
+					if (!rop.EndsWith("\'"))
+						throw new Exception (string.Format
+							("GOML:malformed string constant in handler: {0}", rop));	
+					string strcst = rop.Substring (1, rop.Length - 2);
+
+					il.Emit(OpCodes.Ldstr,strcst);
+
+				}else{
+					//search for a static field in left operand type named 'rop name'
+					FieldInfo ropFi = lopT.GetField (rop, BindingFlags.Static|BindingFlags.Public);
+					if (ropFi != null)
+					{
+						il.Emit (OpCodes.Ldsfld, ropFi);
+					}else{
+						//search if parsing methods are present
+						MethodInfo lopTryParseMi = lopT.GetMethod("TryParse");
+
+					}
+				}
+
+				#endregion
+
+				//emit left operand assignment
+				il.Emit(lopSetOC, lopSetMbi);
+			}
+
+			il.Emit(OpCodes.Ret);
+
+			#endregion
+
+			Delegate del = dm.CreateDelegate(ei.EventHandlerType);
+			MethodInfo addHandler = ei.GetAddMethod ();
+			addHandler.Invoke(es.Source, new object[] {del});
+		}
+
+	}
 	public static class CompilerServices
 	{
 		static int dynHandleCpt = 0;
+
 		/// <summary>
 		/// Compile events expression in GOML attributes
 		/// </summary>

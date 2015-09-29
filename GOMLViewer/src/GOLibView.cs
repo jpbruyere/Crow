@@ -1,5 +1,5 @@
 //
-//  DisplayBinding.cs
+//  ImageViewer.cs
 //
 //  Author:
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
@@ -20,7 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // 
-// DisplayBinding.cs
+// HexEditorView.cs
 //  
 // Author:
 //       Mike Krüger <mkrueger@novell.com>
@@ -45,37 +45,51 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
 using System.IO;
-using MonoDevelop.Core;
 using MonoDevelop.Ide.Gui;
-using MonoDevelop.Projects;
-using System.Globalization;
-using System.Diagnostics;
+using MonoDevelop.Ide.Gui.Content;
+using MonoDevelop.Ide.Fonts;
+using Mono.Addins;
+using MonoDevelop.Core;
+using MonoDevelop.Ide;
+using go;
+using MonoDevelop.DesignerSupport;
 
 namespace MonoDevelop.GOLib
 {
-	class GOLibDisplayBinding : IViewDisplayBinding
+	class GOLibView : AbstractViewContent
 	{
-		bool canHandle = false;
+		GOLibGtkHost gtkGoWidgetHost;
 
-		public string Name {
+
+		double zoom = 1.0;
+		
+		public override Gtk.Widget Control {
 			get {
-				return GettextCatalog.GetString ("GOLib designer");
+				return gtkGoWidgetHost;
 			}
 		}
-		public bool CanUseAsDefault 
-		{ get { return false; }}
 
-		public IViewContent CreateContent (FilePath fileName, string mimeType, Project ownerProject)
+		public GOLibView ()
 		{			
-			return new GOLibView ();
-
-
+			gtkGoWidgetHost = new GOLibGtkHost ();
 		}
-		public bool CanHandle (FilePath fileName, string mimeType, Project ownerProject)
-		{			
-			canHandle = mimeType.StartsWith("text/x-goml");
-			return canHandle;
-		}		
+
+		public override void Load (string fileName)
+		{							
+			gtkGoWidgetHost.Load (fileName);
+			ContentName = fileName;
+			this.IsDirty = false;
+			gtkGoWidgetHost.Show ();
+		}
+		public override bool CanReuseView (string fileName)
+		{
+			return base.CanReuseView (fileName);
+		}
+		public override void RedrawContent ()
+		{
+			base.RedrawContent ();
+		}
 	}
 }

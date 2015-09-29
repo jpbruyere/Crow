@@ -1,15 +1,10 @@
 ﻿<?xml version="1.0"?>
-<!--<GraphicObject
-			Width="100" Height="100"
-			Top="200" Left="200" 
-			Margin="10" Background="Green"/>-->
-
-<Container Width="0" Height="0" Background="Transparent">
-	<Group  >
+<Container Width="100" Height="100" Background="Red">
+	<Group>
 		<Border CornerRadius="5" BorderWidth="1" Margin="5"/>
 		<HorizontalStack  Fit="true" Background="Clear" 
 			VerticalAlignment="Top" Left="10">
-			<GraphicObject Width="5"/>
+			<GraphicObject Width="3"/>
 			<Label Text="GroupBox"/>
 			<GraphicObject Width="5"/>
 		</HorizontalStack>

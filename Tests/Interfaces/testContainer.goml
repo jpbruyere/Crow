@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Container Background="Red" Left="100" Top="100" Height="300" Width="300" >
+<Container Class="TestContainer1" Background="Red" Left="100" Top="100" Height="300" Width="300" >
 	<Container Left="100" Top="100" Height="100" Width="100" Background="LightGreen" Margin="0">
 		<Label Text="{fps}"  Background="DarkRed"/>
 	</Container>

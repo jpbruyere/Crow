@@ -1,7 +1,4 @@
 ﻿<?xml version="1.0"?>
 <Groupbox Width="-1" Height="-1" Background="Red">
-	<VerticalStack Margin="0">
-		<Checkbox />
-
-	</VerticalStack>
+<Label/>
 </Groupbox>

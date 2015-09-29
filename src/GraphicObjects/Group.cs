@@ -222,7 +222,7 @@ namespace go
 
 	
 		#region Mouse handling
-		internal override void checkHoverWidget (OpenTK.Input.MouseMoveEventArgs e)
+		public override void checkHoverWidget (OpenTK.Input.MouseMoveEventArgs e)
 		{
 			if (TopContainer.hoverWidget != this) {
 				TopContainer.hoverWidget = this;

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <Grid RowCount="2" ColumnCount="2">
-	<GraphicObject Background="1,0;0,0;0,0;1,0"/>
+	<GraphicObject Background="0,0;0,0;0,0;1,0"/>
 	<GraphicObject Background="0,0;0,0;0,5;1,0"/>
 	<GraphicObject Background="0,0;0,5;0,0;1,0"/>
 	<GraphicObject Background="0,5;0,0;0,0;1,0"/>

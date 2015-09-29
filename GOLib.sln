@@ -26,6 +26,7 @@ Global
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Release|Linux_x86.ActiveCfg = Release|Any CPU
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Release|Linux_x86.Build.0 = Release|Any CPU
 		{E9E14DB5-3C67-4E01-B5C3-4D90D7E31A2E}.Debug|Linux_x86.ActiveCfg = Debug|Any CPU
+		{E9E14DB5-3C67-4E01-B5C3-4D90D7E31A2E}.Debug|Linux_x86.Build.0 = Debug|Any CPU
 		{E9E14DB5-3C67-4E01-B5C3-4D90D7E31A2E}.Release|Linux_x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution

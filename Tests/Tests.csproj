@@ -42,6 +42,9 @@
       <HintPath>..\..\opentk\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cairo" />
+    <Reference Include="golib">
+      <HintPath>..\bin\Release\golib.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GOLIBTest_5.cs" />
@@ -51,6 +54,16 @@
     <Compile Include="GOLIBTest_TypeViewer.cs" />
     <Compile Include="GOLIBTest_DirViewer.cs" />
     <Compile Include="GOLIBTests.cs" />
+    <Compile Include="Interfaces\testBorder.goml.cs" />
+    <Compile Include="..\bin\Debug\Interfaces\testContainer.goml.cs">
+      <Link>Interfaces\testContainer.goml.cs</Link>
+    </Compile>
+    <Compile Include="..\bin\Debug\Interfaces\test_stack.goml.cs">
+      <Link>Interfaces\test_stack.goml.cs</Link>
+    </Compile>
+    <Compile Include="..\bin\Debug\Interfaces\test4.goml.cs">
+      <Link>Interfaces\test4.goml.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -172,12 +185,6 @@
   <ItemGroup>
     <Folder Include="Interfaces\" />
     <Folder Include="image\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\GOLib.csproj">
-      <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
-      <Name>GOLib</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="image\tetra.png" />

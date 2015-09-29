@@ -3,7 +3,7 @@
 	Margin="10" Focusable="True" Fit="True" Background="Green">-->
 	<Group Fit="true">
 		<GraphicObject Name="g1" Width="400" Height="40" Background="Blue"/>
-		<GraphicObject Name="g2" Width="40" Height="40" Background="Red"
+		<GraphicObject Name="g2" Width="400" Height="40" Background="Red"
 			HorizontalAlignment="Right"/>	
 	</Group>
 <!--</Container>-->

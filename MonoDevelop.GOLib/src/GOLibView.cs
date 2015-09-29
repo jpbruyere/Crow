@@ -74,6 +74,7 @@ namespace MonoDevelop.GOLib
 		public GOLibView ()
 		{			
 			gtkGoWidgetHost = new GOLibGtkHost ();
+
 		}
 
 		public override void Load (string fileName)
@@ -81,6 +82,7 @@ namespace MonoDevelop.GOLib
 			gtkGoWidgetHost.Load (fileName);
 			ContentName = fileName;
 			this.IsDirty = false;
+
 			gtkGoWidgetHost.Show ();
 		}
 		public override bool CanReuseView (string fileName)
@@ -91,5 +93,6 @@ namespace MonoDevelop.GOLib
 		{
 			base.RedrawContent ();
 		}
+
 	}
 }
