@@ -31,6 +31,7 @@ using MonoDevelop.Components;
 using MonoDevelop.Components.Commands;
 using MonoDevelop.Ide;
 using System.Linq;
+using MonoDevelop.DesignerSupport;
 
 namespace MonoDevelop.GOLib
 {
@@ -64,7 +65,7 @@ namespace MonoDevelop.GOLib
 		} 
 	}
 	
-	class GOLibCommandHandler: NodeCommandHandler 
+	class GOLibCommandHandler: NodeCommandHandler //, IPropertyPadProvider
 	{
 		[CommandHandler (Commands.ShowGOLibViewer)]
 		protected void OnShowGOLibViewer () 
@@ -80,19 +81,55 @@ namespace MonoDevelop.GOLib
 			
 			IdeApp.Workbench.OpenDocument (view, true);
 			//IdeApp.Workbench.Documents.Where (d => d.FileName == file.FilePath);
-
 		}
-		public override void ActivateItem ()
-		{
+
+//		public override void ActivateItem ()
+//		{
 //			ProjectFile o = this.CurrentNode.DataItem as ProjectFile;
+//
 //			Ide.Gui.Document[] doc = IdeApp.Workbench.Documents.Where (d => d.FileName == o.FilePath).ToArray();
-//			if (doc [0].ActiveView != null)
-//				return;
-				//doc [0].ActiveView.Select();
-			OnShowGOLibViewer ();
-		}
+//			var tmp = MonoDevelop.Ide.Gui.DisplayBindingService.GetFileViewers (o.FilePath, o.Project).ToList();
+//
+//			OnShowGOLibViewer ();
+//		}
 
+//		#region IPropertyPadProvider implementation
+//		public object GetActiveComponent ()
+//		{
+//			if (CurrentNodes.Length == 1)
+//				return CurrentNode.DataItem;
+//			else
+//				return null;
+//		}
+//		public object GetProvider ()
+//		{
+//			return null;
+//		}
+//		public void OnEndEditing (object obj)
+//		{
+//			throw new NotImplementedException ();
+//		}
+//		public void OnChanged (object obj)
+//		{
+//			
+//		}
+//		#endregion
 	}
 
+//	class GOLibItemPropertyProvider : IPropertyProvider
+//	{
+//		#region IPropertyProvider implementation
+//		public object CreateProvider (object obj)
+//		{
+//			var projectFile = obj as ProjectFile;
+//			return projectFile;
+//		}
+//
+//		public bool SupportsObject (object obj)
+//		{
+//			return obj is ProjectFile;
+//		}
+//		#endregion
+//	}
 }
 

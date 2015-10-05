@@ -31,6 +31,7 @@ namespace go
 		Height = 0x08,
 		Sizing = 0x0C,
 		PositionChildren = 0x10,
+		ChildAddition = 0x20,
 		All = 0xFF
 	}
 

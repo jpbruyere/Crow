@@ -64,7 +64,7 @@ namespace MonoDevelop.GOLib
 			}
 		}
 		public bool CanUseAsDefault 
-		{ get { return false; }}
+		{ get { return true; }}
 
 		public IViewContent CreateContent (FilePath fileName, string mimeType, Project ownerProject)
 		{			

@@ -30,26 +30,12 @@
 					<VerticalStack Fit="true">					
 						<Checkbox Name="chk1"/>
 						<Checkbox Name="chk2" IsChecked="true"/>
-						<Checkbox Name="chk4" >
-							<Template>
-								<HorizontalStack Fit="True" Margin="0" Spacing="1">
-									<Image Name="Image" Width="20" Height="20" Path="#go.Images.Icons.checkbox.svg"/>
-									<Label Name="Caption" Height="-1" Width="-1" Foreground="Black" Background="Yellow"/>
-								</HorizontalStack>
-							</Template>
-						</Checkbox>
+
 					</VerticalStack>
 					<VerticalStack Fit="true">
 						<RadioButton IsChecked="true"/>
 						<RadioButton/>
-						<RadioButton>							
-							<Template>
-								<HorizontalStack Fit="true" Background="Green" Margin="0" Spacing="1" Focusable="false">
-									<Image Name="Image" Width="20" Height="20" Path="#go.Images.Icons.radiobutton.svg"/>
-									<Label Name="Caption"/>
-								</HorizontalStack>
-							</Template>
-						</RadioButton>
+						<Button MouseClick="onButClick"/>
 					</VerticalStack>
 				</HorizontalStack>
 				<TextBoxWidget Name="textbox1" TextAlignment="LeftCenter" Font="droid,14"						
@@ -111,14 +97,14 @@
 				<Scroller Name="scroller1" Background="DimGray" Width="-1"  
 					 Margin="5" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">
 					<VerticalStack Name="colors" VerticalAlignment="Top" Margin="1" Fit="true">
-						<ProgressBar Name="pbBar2" Width="100" Height="20" Value="50"
+<!--						<ProgressBar Name="pbBar2" Width="100" Height="20" Value="50"
 									BorderWidth="2" BorderColor="White" Foreground="BlueCrayola" Background="DarkGray"/>
 						<ProgressBar Width="100" Height="20" Value="{fps}" BorderWidth="2"
-							BorderColor="White" Foreground="BlueCrayola" Background="DarkGray"/>												
+							BorderColor="White" Foreground="BlueCrayola" Background="DarkGray"/>												-->
 					</VerticalStack>
 				</Scroller>
 				<Scrollbar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" MaximumScroll="{../scroller1.MaximumScroll}"
-					Orientation="Vertical" Width="16" />
+					Orientation="Vertical" Width="10" Height="0"/>
 			</HorizontalStack>
 		</HorizontalStack>
 <!--		<HorizontalStack Name="hs0"

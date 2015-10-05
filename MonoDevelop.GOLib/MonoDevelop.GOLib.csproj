@@ -13,15 +13,12 @@
     <OutputPath>build</OutputPath>
     <CustomCommands>
       <CustomCommands>
-        <Command type="Execute" 
-        	command="/usr/local/lib/monodevelop/bin/MonoDevelop.exe --no-redirect" 
-        	workingdir="/usr/local/lib/monodevelop/bin" 
-        	>
+        <Command type="Execute" command="/usr/local/lib/monodevelop/bin/MonoDevelop.exe --no-redirect" workingdir="/usr/local/lib/monodevelop/bin">
           <EnvironmentVariables>
             <Variable name="MONODEVELOP_DEV_ADDINS" value="${TargetDir}" />
             <Variable name="MONODEVELOP_CONSOLE_LOG_LEVEL" value="UpToDebug" />
             <Variable name="MONODEVELOP_LOGGING_PAD_LEVEL" value="UpToDebug" />
-            <Variable name="MONODEVELOP_CONSOLE_LOG_USE_COLOUR" value="True"/>
+            <Variable name="MONODEVELOP_CONSOLE_LOG_USE_COLOUR" value="True" />
           </EnvironmentVariables>
         </Command>
       </CustomCommands>
@@ -57,6 +54,13 @@
       <HintPath>\usr\local\lib\monodevelop\bin\MonoDevelop.Ide.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="MonoDevelop.Core">
+      <HintPath>\usr\local\lib\monodevelop\bin\MonoDevelop.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.DesignerSupport">
+      <HintPath>\usr\local\lib\monodevelop\AddIns\MonoDevelop.DesignerSupport\MonoDevelop.DesignerSupport.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Mono.Cairo" />
     <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <Package>gtk-sharp-2.0</Package>
@@ -73,15 +77,14 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
-    <Reference Include="MonoDevelop.DesignerSupport">
-      <HintPath>\usr\local\lib\monodevelop\AddIns\MonoDevelop.DesignerSupport\MonoDevelop.DesignerSupport.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="OpenTK">
       <HintPath>..\..\opentk\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
     </Reference>
-    <Reference Include="MonoDevelop.Core">
-      <HintPath>..\..\..\..\..\usr\local\lib\monodevelop\bin\MonoDevelop.Core.dll</HintPath>
+    <Reference Include="MonoDevelop.SourceEditor2">
+      <HintPath>..\..\..\..\..\usr\local\lib\monodevelop\AddIns\DisplayBindings\SourceEditor\MonoDevelop.SourceEditor2.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.TextEditor">
+      <HintPath>..\..\..\..\..\usr\local\lib\monodevelop\bin\Mono.TextEditor.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

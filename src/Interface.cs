@@ -424,6 +424,8 @@ namespace go
 			CurrentGOMLPath = "";
 		}
 
+
+
 		public static GraphicObject Load (Stream stream, Type type, object hostClass = null, bool resolve = true)
 		{
 			#if DEBUG_LOAD_TIME

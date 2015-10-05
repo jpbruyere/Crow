@@ -1,22 +1,24 @@
 ﻿<?xml version="1.0"?>
-<Container Name="MainGrp" Background="0,5;0,5;0,5;0,5"
-	Margin="10" Width="-1" Height="-1" Focusable="True" >
-		<VerticalStack Name="vsFps"  BorderWidth="1" Margin="5" Spacing="4" Fit="true">
-			<HorizontalStack Height="-1">
-				<Label Text="Update:" FontColor="White" />
-				<Label Name="labUpdate" Text="{update}" FontSize="12" Background="DarkGreen"/>
-			</HorizontalStack>
-			<HorizontalStack Height="-1" Name="hsFps" Background="Mantis" >
-				<Label Name="captionFps" Text="Fps:" />
-				<Label Name="valueFps" Text="{fps}" Font="droid bold, 12" TextAlignment="Center" Background="AoEnglish"/>
-			</HorizontalStack>
-			<HorizontalStack Height="-1" Background="UniversityOfCaliforniaGold">
-				<Label Text="Min:" Width = "30" />
-				<Label Text="{fpsMin}" Font="droid bold, 12" TextAlignment="Center" Background="AoEnglish"/>
-			</HorizontalStack>
-			<HorizontalStack Height="-1" Background="Sienna" >
-				<Label Text="Max:" Width = "30"/>
-				<Label Text="{fpsMax}" Font="droid bold, 12" TextAlignment="Center" Background="AoEnglish"/>
-			</HorizontalStack>
-		</VerticalStack>				
-</Container>
+<Border Fit="true" CornerRadius="5" BorderWidth="1">
+	<Container Name="MainGrp" Background="0,5;0,5;0,5;0,4" Width="120" Fit="true"
+		Margin="10" Focusable="True" >
+			<VerticalStack Fit="true" Name="vsFps"  Spacing="10" >
+				<HorizontalStack Fit="true">
+					<Label Text="Update:" Width="50" TextAlignment="RightCenter"/>
+					<Label Name="labUpdate" Text="{update}" Font="droid,12" Background="AoEnglish" Width="50" TextAlignment="Center"/>
+				</HorizontalStack>
+				<HorizontalStack Fit="true">
+					<Label Name="captionFps" Text="Fps:" Width="50" TextAlignment="RightCenter"/>
+					<Label Name="valueFps" Text="{fps}" Font="droid , 12" Width="50" TextAlignment="Center" Background="AoEnglish"/>
+				</HorizontalStack>
+				<HorizontalStack Fit="true">
+					<Label Text="Min:" Width="50" TextAlignment="RightCenter"/>
+					<Label Text="{fpsMin}" Font="droid , 12" Width="50" TextAlignment="Center" Background="AoEnglish"/>
+				</HorizontalStack>
+				<HorizontalStack Fit="true">
+					<Label Text="Max:" Width="50" TextAlignment="RightCenter"/>
+					<Label Text="{fpsMax}" Font="droid , 12" Background="AoEnglish" Width="50" TextAlignment="Center"/>
+				</HorizontalStack>
+			</VerticalStack>				
+	</Container>
+</Border>

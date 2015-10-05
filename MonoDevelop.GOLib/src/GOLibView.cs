@@ -55,44 +55,107 @@ using MonoDevelop.Core;
 using MonoDevelop.Ide;
 using go;
 using MonoDevelop.DesignerSupport;
+using MonoDevelop.SourceEditor;
 
 namespace MonoDevelop.GOLib
 {
-	class GOLibView : AbstractViewContent
+	class CustomVPaned : Gtk.VPaned, IPropertyPadProvider
+	{
+		#region IPropertyPadProvider implementation
+		public object GetActiveComponent ()
+		{
+			return this.Child1 == null ? this as object: (this.Child1 as GOLibGtkHost).activeWidget as object;
+		}
+		public object GetProvider ()
+		{
+			return null;
+			//throw new NotImplementedException ();
+		}
+		public void OnEndEditing (object obj)
+		{
+			//throw new NotImplementedException ();
+		}
+		public void OnChanged (object obj)
+		{
+			//throw new NotImplementedException ();
+		}
+		#endregion
+		
+	}
+	class GOLibView : SourceEditorView
 	{
 		GOLibGtkHost gtkGoWidgetHost;
+		CustomVPaned gtkGOMLWidget;
 
 
 		double zoom = 1.0;
 		
 		public override Gtk.Widget Control {
 			get {
-				return gtkGoWidgetHost;
+				return gtkGOMLWidget;
 			}
 		}
 
-		public GOLibView ()
+		public GOLibView () : base()
 		{			
 			gtkGoWidgetHost = new GOLibGtkHost ();
+			gtkGOMLWidget = new CustomVPaned ();
+			gtkGOMLWidget.CanFocus = true;
+			gtkGOMLWidget.Name = "vpaned1";
+			gtkGOMLWidget.Add (gtkGoWidgetHost);
+			gtkGOMLWidget.Add (base.Control);
+			gtkGOMLWidget.SizeAllocated += GtkGOMLWidget_SizeAllocated;
 
+			this.Document.DocumentUpdated += Document_DocumentUpdated;
+			//this.DirtyChanged += GOLibView_DirtyChanged;
+		}
+
+		void Document_DocumentUpdated (object sender, EventArgs e)
+		{
+			reloadGOML ();
+		}
+
+		void GOLibView_DirtyChanged (object sender, EventArgs e)
+		{
+
+		}
+
+		void reloadGOML()
+		{
+			using (MemoryStream stream = new MemoryStream ()) {
+				using (StreamWriter writer = new StreamWriter (stream)) {
+					writer.Write (this.Document.Text);
+					writer.Flush ();
+
+					stream.Position = 0;
+					gtkGoWidgetHost.Load (stream);
+				}
+			}			
+		}
+			
+		void GtkGOMLWidget_SizeAllocated (object o, Gtk.SizeAllocatedArgs args)
+		{
+			gtkGoWidgetHost.SetSizeRequest (-1, args.Allocation.Height / 2);
 		}
 
 		public override void Load (string fileName)
 		{							
 			gtkGoWidgetHost.Load (fileName);
-			ContentName = fileName;
-			this.IsDirty = false;
+			//ContentName = fileName;
+			//this.IsDirty = false;
+			gtkGOMLWidget.ShowAll ();
+			gtkGOMLWidget.Show ();
 
-			gtkGoWidgetHost.Show ();
+			base.Load (fileName);
 		}
-		public override bool CanReuseView (string fileName)
-		{
-			return base.CanReuseView (fileName);
-		}
-		public override void RedrawContent ()
-		{
-			base.RedrawContent ();
-		}
+//		public override bool CanReuseView (string fileName)
+//		{
+//			return base.CanReuseView (fileName);
+//		}
+//		public override void RedrawContent ()
+//		{
+//			base.RedrawContent ();
+//		}
 
 	}
 }

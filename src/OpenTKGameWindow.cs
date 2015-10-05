@@ -260,9 +260,19 @@ namespace go
 			invGOList = invGOList.Reverse ().ToArray ();
 
 			//Debug.WriteLine ("======= Layouting queue start =======");
-			while (Interface.LayoutingQueue.Count > 0) {
-				LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
-				lqi.ProcessLayouting ();
+			lock (Interface.LayoutingQueue) {				
+				while (Interface.LayoutingQueue.Count > 0) {
+//					Stopwatch lqiProcTime = new Stopwatch ();
+//					lqiProcTime.Start ();
+					LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
+					lqi.ProcessLayouting ();
+//					lqiProcTime.Stop ();
+//					if (lqiProcTime.ElapsedMilliseconds > 10) {
+//						Debug.WriteLine("lqi {2}: {0} ticks \t, {1} ms",
+//							updateTime.ElapsedTicks,
+//							updateTime.ElapsedMilliseconds, lqi.ToString());
+//					}
+				}
 			}
 
 			//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");

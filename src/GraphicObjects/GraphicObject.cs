@@ -452,46 +452,46 @@ namespace go
 		{
 			if (Parent == null)
 				return;
-			
-			Interface.LayoutingQueue.RemoveAll (lq => lq.GraphicObject == this && (layoutType & (int)lq.LayoutType) > 0);
+			lock (Interface.LayoutingQueue) {
+				Interface.LayoutingQueue.RemoveAll (lq => lq.GraphicObject == this && (layoutType & (int)lq.LayoutType) > 0);
 
-			if ((layoutType & (int)LayoutingType.Width) > 0) {
+				if ((layoutType & (int)LayoutingType.Width) > 0) {
 
-				//force sizing to fit if parent is sizing on children and 
-				//this object has stretched size
-				if (Parent.getBounds ().Width < 0 && Width == 0)
-					Width = -1;
+					//force sizing to fit if parent is sizing on children and 
+					//this object has stretched size
+					if (Parent.getBounds ().Width < 0 && Width == 0)
+						Width = -1;
 				
-				if (Bounds.Width == 0) //stretch in parent
+					if (Bounds.Width == 0) //stretch in parent
 					Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Width, this);
-				else if (Bounds.Width < 0) //fit 
-					Interface.LayoutingQueue.EnqueueBeforeParentSizing (LayoutingType.Width, this);				
-				else
-					Interface.LayoutingQueue.Insert (0, new LayoutingQueueItem (LayoutingType.Width, this));
-			}
+					else if (Bounds.Width < 0) //fit 
+					Interface.LayoutingQueue.EnqueueBeforeParentSizing (LayoutingType.Width, this);
+					else
+						Interface.LayoutingQueue.Insert (0, new LayoutingQueueItem (LayoutingType.Width, this));
+				}
 
-			if ((layoutType & (int)LayoutingType.Height) > 0) {
+				if ((layoutType & (int)LayoutingType.Height) > 0) {
 
-				//force sizing to fit if parent is sizing on children
-				if (Parent.getBounds ().Height < 0 && Height == 0)
-					Height = -1;
+					//force sizing to fit if parent is sizing on children
+					if (Parent.getBounds ().Height < 0 && Height == 0)
+						Height = -1;
 
-				if (Bounds.Height == 0) //stretch in parent
+					if (Bounds.Height == 0) //stretch in parent
 					Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Height, this);
-				else if (Bounds.Height < 0) //fit 
+					else if (Bounds.Height < 0) //fit 
 					Interface.LayoutingQueue.EnqueueBeforeParentSizing (LayoutingType.Height, this);
-				else
-					Interface.LayoutingQueue.Insert (0, new LayoutingQueueItem (LayoutingType.Height, this));
-			}
+					else
+						Interface.LayoutingQueue.Insert (0, new LayoutingQueueItem (LayoutingType.Height, this));
+				}
 
-			if ((layoutType & (int)LayoutingType.X) > 0)
+				if ((layoutType & (int)LayoutingType.X) > 0)
 				//for x positionning, sizing of parent and this have to be done
 				Interface.LayoutingQueue.EnqueueAfterThisAndParentSizing (LayoutingType.X, this);
 
-			if ((layoutType & (int)LayoutingType.Y) > 0)
+				if ((layoutType & (int)LayoutingType.Y) > 0)
 				//for x positionning, sizing of parent and this have to be done
 				Interface.LayoutingQueue.EnqueueAfterThisAndParentSizing (LayoutingType.Y, this);
-			
+			}
 		}
 
 		/// <summary> trigger dependant sizing component update </summary>
@@ -629,10 +629,11 @@ namespace go
 				LastSlots.Height = Slot.Height;
 				break;
 			}
-
-			//if no layouting remains in queue for item, registre for redraw
-			if (Interface.LayoutingQueue.Where (lq => lq.GraphicObject == this).Count () <= 0 && bmp == null)
-				this.RegisterForRedraw ();
+			lock (Interface.LayoutingQueue) {
+				//if no layouting remains in queue for item, registre for redraw
+				if (Interface.LayoutingQueue.Where (lq => lq.GraphicObject == this).Count () <= 0 && bmp == null)
+					this.RegisterForRedraw ();
+			}
 		}
 
 		/// <summary> This is the common overridable drawing routine to create new widget </summary>

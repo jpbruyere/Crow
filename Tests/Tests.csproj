@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>test.GOLIBTests</StartupObject>
+    <StartupObject>test.GOLIBTest_4</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>..\bin\$(configuration)</OutputPath>
     <IntermediateOutputPath>obj\$(configuration)</IntermediateOutputPath>
@@ -42,9 +42,6 @@
       <HintPath>..\..\opentk\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cairo" />
-    <Reference Include="golib">
-      <HintPath>..\bin\Release\golib.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GOLIBTest_5.cs" />
@@ -188,5 +185,11 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="image\tetra.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GOLib.csproj">
+      <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
+      <Name>GOLib</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

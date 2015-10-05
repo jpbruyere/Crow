@@ -100,6 +100,8 @@ namespace go
 
 		public override void RegisterForLayouting (int layoutType)
 		{			
+			if (Parent == null)
+				return;
 			base.RegisterForLayouting (layoutType);
 
 			if ((layoutType & (int)LayoutingType.PositionChildren) > 0)

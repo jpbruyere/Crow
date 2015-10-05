@@ -82,6 +82,11 @@ namespace test
 			new ClsItem("string 1"),
 			new ClsItem("string 2")
 			});
+		int i = 0;
+		Color[] colorsArray;
+		volatile List<GraphicObject> loadedCols = new List<GraphicObject>();
+		volatile bool allColsLoaded = false;
+		private static readonly object mutex = new object();
 
 		protected override void OnLoad (EventArgs e)
 		{
@@ -114,9 +119,18 @@ namespace test
 //			};
 
 
-			int i = 0;
-			foreach (Color col in Color.ColorDic) {
-				HorizontalStack s = colors.addChild (new HorizontalStack () { Fit = true});
+			colorsArray = Color.ColorDic.ToArray ();
+
+			Thread t = new Thread (loadingThread);
+			t.Start ();
+
+//			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
+		}
+
+		void loadingThread()
+		{			
+			foreach (Color col in colorsArray) {
+				HorizontalStack s = new HorizontalStack () { Fit = true};
 				s.HorizontalAlignment = HorizontalAlignment.Left;
 				Border b = new Border () {
 					Bounds = new Size (32, 20),
@@ -140,10 +154,18 @@ namespace test
 					}
 				);
 				i++;
-				if (i > 150)
-					break;
-			}
-//			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
+
+				while(true){
+					lock (mutex) {
+						loadedCols.Add (s);
+						break;
+					}
+				}
+
+				Thread.Sleep (10);
+				
+			}	
+			allColsLoaded = true;
 		}
 		void pFps_mousemove(object sender, MouseMoveEventArgs e)
 		{
@@ -154,7 +176,34 @@ namespace test
 			c.Top += e.YDelta;
 			c.registerForGraphicUpdate ();
 		}
+		void onButClick(object send, MouseButtonEventArgs e)
+		{
+			Color col = Color.ColorDic.ToArray () [i];
+			HorizontalStack s = colors.addChild (new HorizontalStack () { Fit = true});
+			s.HorizontalAlignment = HorizontalAlignment.Left;
+			Border b = new Border () {
+				Bounds = new Size (32, 20),
+				CornerRadius = 5,
+				Background = col,
+				BorderWidth = 2,
+				BorderColor = Color.Transparent,
+				Focusable = true
+			};
+			b.MouseEnter += delegate(object sender, MouseMoveEventArgs ee) {
+				(sender as Border).BorderColor = Color.White;
+			};
+			b.MouseLeave += delegate(object sender, MouseMoveEventArgs ee) {
+				(sender as Border).BorderColor = Color.Transparent;
+			};
+			s.addChild (b);
 
+			s.addChild (
+				new Label (col.ToString ()){
+					Bounds=new Rectangle(0,0,-1,-1),
+				}
+			);
+			i++;
+		}
 		private int frameCpt = 0;
 		protected override void OnUpdateFrame (FrameEventArgs e)
 		{
@@ -162,6 +211,14 @@ namespace test
 
 			fps = (int)RenderFrequency;
 
+			lock (mutex) {
+				if (loadedCols.Count > 50 || allColsLoaded) {
+					while (loadedCols.Count > 0) {
+						colors.addChild (loadedCols[0]);
+						loadedCols.RemoveAt (0);
+					}
+				}
+			}
 
 			if (frameCpt > 200) {
 				resetFps ();

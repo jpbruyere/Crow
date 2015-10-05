@@ -9,20 +9,31 @@ using MonoDevelop.Projects;
 using System.Diagnostics;
 using OpenTK.Input;
 using MonoDevelop.DesignerSupport;
+using System.IO;
+using MonoDevelop.Components.Commands;
 
 namespace MonoDevelop.GOLib
 {
-	public class GOLibGtkHost : Gtk.DrawingArea, ILayoutable, IGOLibHost, IPropertyPadProvider
+	public class GOLibGtkHost : Gtk.DrawingArea, ILayoutable, IGOLibHost, IPropertyPadProvider,ICommandDelegator
 	{
+		#region ICommandDelegator implementation
+
+		public object GetDelegatedCommandTarget ()
+		{
+			return hoverWidget;
+		}
+
+		#endregion
+
 		#region IPropertyPadProvider implementation
 
 		public object GetActiveComponent ()
 		{
-			return hoverWidget;
+			return activeWidget;
 		}
 		public object GetProvider ()
 		{
-			return hoverWidget;
+			return activeWidget;
 		}
 		public void OnEndEditing (object obj)
 		{
@@ -30,7 +41,8 @@ namespace MonoDevelop.GOLib
 		}
 		public void OnChanged (object obj)
 		{
-
+			(obj as GraphicObject).registerForGraphicUpdate ();
+			QueueDraw ();
 		}
 		#endregion
 	
@@ -64,7 +76,7 @@ namespace MonoDevelop.GOLib
 			Cairo.Context cr =  Gdk.CairoHelper.Create(area.GdkWindow);
 			_redrawClip.AddRectangle (this.ClientRectangle);
 
-			LoggingService.LogInfo ("expose event");
+			//LoggingService.LogInfo ("expose event");
 
 			update (cr);
 
@@ -85,7 +97,8 @@ namespace MonoDevelop.GOLib
 				((int)args.Event.X, (int)args.Event.Y, 
 					gtkButtonIdToOpenTkButton(args.Event.Button), true);
 			Mouse_ButtonDown (o, e);
-			DesignerSupport.DesignerSupport.Service.SetPadContent (this);
+
+			DesignerSupport.DesignerSupport.Service.SetPadContent (this, this);
 		}
 		void GOLibGtkHost_ButtonReleaseEvent (object o, Gtk.ButtonReleaseEventArgs args)
 		{
@@ -129,11 +142,42 @@ namespace MonoDevelop.GOLib
 
 		public void Load(string path)
 		{
-			goWidget = Interface.Load (path);
+			load(Interface.Load (path));
+		}
+
+		public void Load(Stream stream)
+		{
+			GraphicObject tmp = null;
+			try {
+				tmp = Interface.Load (stream, Interface.GetTopContainerOfGOMLStream (stream));
+			} catch (Exception ex) {
+				return;	
+			} 
+			load (tmp);
+			QueueDraw ();
+		}
+
+		void load(GraphicObject go)
+		{
+			if (goWidget != null)
+				DeleteWidget (goWidget);
+			goWidget = go;
 			this.AddWidget (goWidget);
 		}
 
+		public void AddWidget(GraphicObject g)
+		{
+			g.Parent = this;
+			GraphicObjects.Insert (0, g);
 
+			g.RegisterForLayouting ((int)LayoutingType.Sizing);
+		}
+		public void DeleteWidget(GraphicObject g)
+		{
+			g.Visible = false;//trick to ensure clip is added to refresh zone
+			g.ClearBinding();
+			GraphicObjects.Remove (g);
+		}
 
 		public List<GraphicObject> GraphicObjects = new List<GraphicObject>();
 		public Color Background = Color.Transparent;
@@ -294,20 +338,6 @@ namespace MonoDevelop.GOLib
 		#endregion
 					
 
-		public void AddWidget(GraphicObject g)
-		{
-			g.Parent = this;
-			GraphicObjects.Insert (0, g);
-
-			g.RegisterForLayouting ((int)LayoutingType.Sizing);
-		}
-		public void DeleteWidget(GraphicObject g)
-		{
-			g.Visible = false;//trick to ensure clip is added to refresh zone
-			g.ClearBinding();
-			GraphicObjects.Remove (g);
-		}
-
 //		public void LoadInterface<T>(string path, out T result)
 //		{
 //			GraphicObject.Load<T> (path, out result, this);
@@ -335,11 +365,11 @@ namespace MonoDevelop.GOLib
 		#region Mouse Handling
 		void Mouse_Move(object sender, MouseMoveEventArgs e)
 		{
-			if (_activeWidget != null) {
-				//send move evt even if mouse move outside bounds
-				_activeWidget.onMouseMove (_activeWidget, e);
-				return;
-			}
+//			if (_activeWidget != null) {
+//				//send move evt even if mouse move outside bounds
+//				_activeWidget.onMouseMove (_activeWidget, e);
+//				return;
+//			}
 
 			if (_hoverWidget != null) {
 				//check topmost graphicobject first
@@ -394,11 +424,11 @@ namespace MonoDevelop.GOLib
 		}
 		void Mouse_ButtonUp(object sender, MouseButtonEventArgs e)
 		{
-			if (_activeWidget == null)
-				return;
+//			if (_activeWidget == null)
+//				return;
 
-			_activeWidget.onMouseButtonUp (this, e);
-			_activeWidget = null;
+			//_activeWidget.onMouseButtonUp (this, e);
+			//_activeWidget = null;
 			MouseButtonUp.Raise (this, e);
 		}
 		void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
@@ -407,17 +437,9 @@ namespace MonoDevelop.GOLib
 				MouseButtonDown.Raise (this, e);
 				return;
 			}
-
-			GraphicObject g = _hoverWidget;
-			while (!g.Focusable) {				
-				g = g.Parent as GraphicObject;
-				if (g == null) {					
-					return;
-				}
-			}
-
-			_activeWidget = g;
-			_activeWidget.onMouseButtonDown (this, e);
+				
+			_activeWidget = _hoverWidget;
+			//_activeWidget.onMouseButtonDown (this, e);
 		}
 
 		void Mouse_WheelChanged(object sender, MouseWheelEventArgs e)

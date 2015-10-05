@@ -26,6 +26,8 @@ using System.ComponentModel;
 using System.IO;
 using System.Diagnostics;
 using System.Xml;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace go
 {
@@ -84,33 +86,65 @@ namespace go
 				if (data == null)
 					return;
 
-				#if DEBUG_LOAD_TIME
-				Stopwatch loadingTime = new Stopwatch ();
-				loadingTime.Start ();
-				#endif
+				pendingChildrenAddition = new Queue<GraphicObject> ();
+				threadedLoadingFinished = false;
 
-				MemoryStream ms = new MemoryStream ();
-				using (Stream stream = Interface.GetStreamFromPath (ItemTemplate))					
-					stream.CopyTo (ms);
-					
-				Type t = Interface.GetTopContainerOfGOMLStream (ms);
+				Thread t = new Thread (loadingThread);
+				t.Start ();
 
-				foreach (var item in data) {
-					ms.Seek(0,SeekOrigin.Begin);
-					GraphicObject g = Interface.Load (ms, t, item);
-					g.MouseClick += itemClick;
-					_list.addChild(g);
-				}
-
-				ms.Dispose ();
-
-				#if DEBUG_LOAD_TIME
-				loadingTime.Stop ();
-				Debug.WriteLine("Listbox {2} Loading: {0} ticks \t, {1} ms",
-					loadingTime.ElapsedTicks,
-					loadingTime.ElapsedMilliseconds, this.ToString());
-				#endif
 			}
+		}
+
+		internal void CheckPendingChildrenAddition()
+		{
+			if (pendingChildrenAddition == null)
+				return;
+			lock (pendingChildrenAddition) {
+				if (!threadedLoadingFinished && pendingChildrenAddition.Count < 50)
+					return;
+				while (pendingChildrenAddition.Count > 0)
+					_list.addChild (pendingChildrenAddition.Dequeue ());
+			}
+		}
+
+		volatile Queue<GraphicObject> pendingChildrenAddition;
+		volatile bool threadedLoadingFinished = false;
+
+		void loadingThread()
+		{
+			#if DEBUG_LOAD_TIME
+			Stopwatch loadingTime = new Stopwatch ();
+			loadingTime.Start ();
+			#endif
+
+			MemoryStream ms = new MemoryStream ();
+			lock (ItemTemplate) {
+				using (Stream stream = Interface.GetStreamFromPath (ItemTemplate))
+					stream.CopyTo (ms);
+			}
+
+			Type t = Interface.GetTopContainerOfGOMLStream (ms);
+
+			foreach (var item in data) {
+				ms.Seek(0,SeekOrigin.Begin);
+				GraphicObject g = Interface.Load (ms, t, item);
+				g.MouseClick += itemClick;
+
+				lock (pendingChildrenAddition) {
+					pendingChildrenAddition.Enqueue (g);
+				}
+			}
+
+			ms.Dispose ();			
+
+			threadedLoadingFinished = true;
+
+			#if DEBUG_LOAD_TIME
+			loadingTime.Stop ();
+			Debug.WriteLine("Listbox {2} Loading: {0} ticks \t, {1} ms",
+				loadingTime.ElapsedTicks,
+				loadingTime.ElapsedMilliseconds, this.ToString());
+			#endif
 		}
 
 		void itemClick(object sender, OpenTK.Input.MouseButtonEventArgs e){

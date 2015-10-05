@@ -426,7 +426,6 @@ namespace go
 			FieldInfo fiRefs = typeof(Interface).GetField("References");
 			il.Emit(OpCodes.Ldsfld, fiRefs);
 			il.Emit(OpCodes.Ldc_I4, dstIdx);
-
 			MethodInfo miGetRef = Interface.References.GetType().GetMethod("get_Item");
 			il.Emit(OpCodes.Callvirt, miGetRef);
 			il.Emit(OpCodes.Isinst, dstType);

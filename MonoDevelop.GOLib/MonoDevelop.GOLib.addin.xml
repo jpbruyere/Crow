@@ -13,4 +13,7 @@
 			<File pattern="*.goml" />
 		</MimeType>
 	</Extension>
+<!--	<Extension path = "/MonoDevelop/DesignerSupport/PropertyProviders" extension-nodes="Class">
+		<Class class = "MonoDevelop.GOLib.GOLibItemPropertyProvider"/>
+	</Extension>-->
 </ExtensionModel>
