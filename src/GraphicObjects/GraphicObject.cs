@@ -16,12 +16,15 @@ using System.ComponentModel;
 using System.IO;
 //using System.Xml;
 using System.Xml;
+using System.Runtime.CompilerServices;
+using System.Reflection.Emit;
 
 namespace go
 {		
 	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange
 	{
 		internal List<int> DynamicMethodIds = new List<int> ();
+		internal List<Binding> Bindings = new List<Binding> ();
 
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
@@ -329,7 +332,16 @@ namespace go
 
 		[XmlIgnore]public object DataSource {
 			set {
+				if (dataSource == value)
+					return;
+
+				if (dataSource != null)
+					this.ClearBinding ();
+				
 				dataSource = value;
+
+				if (dataSource != null)
+					this.ResolveBindings();
 			}
 			get {				
 				return dataSource == null ? 
@@ -775,7 +787,161 @@ namespace go
 				tmp = Parent.ToString () + tmp;
 			return Name == "unamed" ? tmp + "." + this.GetType ().Name : tmp + "." + Name;
 		}
-			
+
+		public virtual void ResolveBindings()
+		{
+			List<ResolvedBinding> resolved = new List<ResolvedBinding> ();
+			foreach (Binding b in Bindings) {
+				ResolvedBinding rb = new ResolvedBinding (b);
+				if (!rb.FindTarget (this))
+					continue;
+				resolved.Add (rb);				
+			}
+			IEnumerable<ResolvedBinding[]> groupedByTarget = resolved.GroupBy (g => g.Target, g => g, (k, g) => g.ToArray ());
+			foreach (ResolvedBinding[] grouped in groupedByTarget) {
+				int i = 0;
+				object targetValue = grouped [0].Target;//empty binding exp=> bound to target object by default
+				Type targetType = targetValue.GetType();
+				Type sourceType = this.GetType();
+
+				DynamicMethod dm = null;
+				ILGenerator il = null;
+
+				MethodInfo stringEquals = typeof(string).GetMethod
+					("op_Equality", new Type[2] {typeof(string), typeof(string)});
+
+
+				System.Reflection.Emit.Label[] jumpTable = null;
+				System.Reflection.Emit.Label endMethod = new System.Reflection.Emit.Label();
+
+				LocalBuilder lbMemberName = null;
+				LocalBuilder lbValue = null;
+
+				#region Retrieve EventHandler parameter type
+				EventInfo ei = targetType.GetEvent ("ValueChanged");
+				//no dynamic update if ValueChanged interface is not implemented
+				if (ei != null){
+					MethodInfo evtInvoke = ei.EventHandlerType.GetMethod ("Invoke");
+					ParameterInfo[] evtParams = evtInvoke.GetParameters ();
+					Type handlerArgsType = evtParams [1].ParameterType;
+
+					Type[] args = {typeof(object), typeof(object),handlerArgsType};
+					dm = new DynamicMethod("dynHandle",
+						typeof(void), 
+						args,
+						sourceType);
+					
+
+					il = dm.GetILGenerator(256);
+
+
+					endMethod = il.DefineLabel();
+					jumpTable = new System.Reflection.Emit.Label[grouped.Length];
+					for (i = 0; i < grouped.Length; i++)
+						jumpTable [i] = il.DefineLabel ();
+					lbMemberName = il.DeclareLocal(typeof(string));
+					lbValue  = il.DeclareLocal(typeof(object));
+
+					il.Emit(OpCodes.Nop);
+					il.Emit(OpCodes.Ldarg_0);
+					//il.Emit(OpCodes.Isinst, sourceType);
+					//push new value onto stack
+					il.Emit(OpCodes.Ldarg_2);
+					FieldInfo fiNewValue = typeof(ValueChangeEventArgs).GetField("NewValue");
+					il.Emit(OpCodes.Ldfld, fiNewValue);
+					il.Emit(OpCodes.Stloc, lbValue);
+					//push name 
+					il.Emit(OpCodes.Ldarg_2);
+					FieldInfo fiMbName = typeof(ValueChangeEventArgs).GetField("MemberName");
+					il.Emit(OpCodes.Ldfld, fiMbName);
+					il.Emit(OpCodes.Stloc, lbMemberName);
+					il.Emit(OpCodes.Ldloc, lbMemberName);
+					il.Emit(OpCodes.Brfalse, endMethod);
+				}
+				#endregion
+
+				i = 0;
+				foreach (ResolvedBinding rb in grouped) {
+					#region initialize target with actual value
+					if (rb.Member != null){
+						if (rb.Member.MemberType == MemberTypes.Property)
+							targetValue = (rb.Member as PropertyInfo).GetGetMethod ().Invoke (rb.Target, null);
+						else if (rb.Member.MemberType == MemberTypes.Field)
+							targetValue = (rb.Member as FieldInfo).GetValue (rb.Target);
+						else if (rb.Member.MemberType == MemberTypes.Method){
+							MethodInfo mthSrc = rb.Member as MethodInfo;
+							if (mthSrc.IsDefined(typeof(ExtensionAttribute), false))
+								targetValue = mthSrc.Invoke(null, new object[] {rb.Target});
+							else
+								targetValue = mthSrc.Invoke(rb.Target, null);
+						}else
+							throw new Exception ("unandled source member type for binding");						
+					}
+					//TODO: handle other dest type conversions
+					if (rb.Binding.Property.PropertyType == typeof(string)){
+						if (targetValue != null)
+							targetValue = targetValue.ToString ();
+					}
+					rb.Binding.Property.GetSetMethod ().Invoke (this, new object[] { targetValue });
+					#endregion
+
+					//if no dyn update, skip jump table
+					if (il == null)
+						continue;
+
+					il.Emit (OpCodes.Ldloc, lbMemberName);
+					il.Emit (OpCodes.Ldstr, rb.Member.Name);
+					il.Emit (OpCodes.Callvirt, stringEquals);
+					il.Emit (OpCodes.Brtrue, jumpTable[i]);
+					i++;
+				}
+
+				if (il == null)
+					continue;
+				
+				il.Emit (OpCodes.Br, endMethod);
+
+				i = 0;
+				foreach (ResolvedBinding rb in grouped) {
+
+					il.MarkLabel (jumpTable [i]);
+					il.Emit(OpCodes.Ldloc, lbValue);
+
+					//by default, target value type is deducted from source member type to allow
+					//memberless binding, if targetMember exists, it will be used to determine target
+					//value type for conversion
+					Type targetValueType = rb.Binding.Property.PropertyType;
+					if (rb.Member != null) {
+						if (rb.Member.MemberType == MemberTypes.Property)
+							targetValueType = (rb.Member as PropertyInfo).PropertyType;
+						else if (rb.Member.MemberType == MemberTypes.Field)
+							targetValueType = (rb.Member as FieldInfo).FieldType;
+						else
+							throw new Exception ("unhandle target member type in binding");
+					}
+					
+					if (!targetValueType.IsValueType)
+						il.Emit(OpCodes.Castclass, targetValueType);
+					else if (rb.Binding.Property.PropertyType != targetValueType)
+						il.Emit(OpCodes.Callvirt, CompilerServices.GetConvertMethod( rb.Binding.Property.PropertyType ));
+					else
+						il.Emit(OpCodes.Unbox_Any, rb.Binding.Property.PropertyType);
+
+					il.Emit(OpCodes.Callvirt, rb.Binding.Property.GetSetMethod());
+					il.Emit (OpCodes.Br, endMethod);
+					i++;
+
+				}
+				il.MarkLabel(endMethod);
+				il.Emit(OpCodes.Pop);
+				il.Emit(OpCodes.Ret);
+
+				Delegate del = dm.CreateDelegate(ei.EventHandlerType, this);
+				MethodInfo addHandler = ei.GetAddMethod ();
+				addHandler.Invoke(grouped [0].Target, new object[] {del});
+			}
+		}
+
 		#region IXmlSerializable
 		public virtual System.Xml.Schema.XmlSchema GetSchema ()
 		{
@@ -848,18 +1014,11 @@ namespace go
 //					} else {
 
 					if (attValue.StartsWith("{")) {
-						if (Interface.DontResoveGOML)
-							continue;
 						//binding
 						if (!attValue.EndsWith("}"))
 							throw new Exception (string.Format("GOML:Malformed binding: {0}", attValue));
 
-						string strBinding = attValue.Substring (1, attValue.Length - 2);
-						Interface.GOMLResolver.Add (new DynAttribute () {
-							Source = this,
-							MemberName = attName,
-							Value = strBinding
-						});
+						this.Bindings.Add (new Binding (pi, attValue.Substring (1, attValue.Length - 2)));
 						continue;
 					}
 
@@ -976,26 +1135,26 @@ namespace go
 		///  and delete ref of this in Shared interface refs
 		/// </summary>
 		public virtual void ClearBinding(){
-			object ds = this.DataSource;
-			if (ds != null) {
-				Type dataSourceType = ds.GetType ();
-				EventInfo evtInfo = dataSourceType.GetEvent ("ValueChanged");
-				if (evtInfo != null) {
-					FieldInfo evtFi = CompilerServices.GetEventHandlerField (dataSourceType, "ValueChanged");
-					MulticastDelegate multicastDelegate = evtFi.GetValue (ds) as MulticastDelegate;
-					if (multicastDelegate != null) {				
-						foreach (Delegate d in multicastDelegate.GetInvocationList()) {
-							string dn = d.Method.Name;
-							if (!dn.StartsWith ("dynHandle_"))
-								continue;
-							int did = int.Parse (dn.Substring (10));
-							if (this.DynamicMethodIds.Contains (did))
-								evtInfo.RemoveEventHandler (ds, d);
-						}
-					}
-				}
-			}
-			Interface.Unreference (this);
+//			object ds = this.DataSource;
+//			if (ds != null) {
+//				Type dataSourceType = ds.GetType ();
+//				EventInfo evtInfo = dataSourceType.GetEvent ("ValueChanged");
+//				if (evtInfo != null) {
+//					FieldInfo evtFi = CompilerServices.GetEventHandlerField (dataSourceType, "ValueChanged");
+//					MulticastDelegate multicastDelegate = evtFi.GetValue (ds) as MulticastDelegate;
+//					if (multicastDelegate != null) {				
+//						foreach (Delegate d in multicastDelegate.GetInvocationList()) {
+//							string dn = d.Method.Name;
+//							if (!dn.StartsWith ("dynHandle_"))
+//								continue;
+//							int did = int.Parse (dn.Substring (10));
+//							if (this.DynamicMethodIds.Contains (did))
+//								evtInfo.RemoveEventHandler (ds, d);
+//						}
+//					}
+//				}
+//			}
+//			Interface.Unreference (this);
 
 		}
 	}

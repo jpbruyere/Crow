@@ -34,12 +34,11 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
-			"test4.goml",
+			"fps.goml",
 			"testContainer.goml",
 			"testBorder.goml",
 			"testLabel.goml",
 			"testCheckbox.goml",
-			"fps.goml",
 			"testRadioButton.goml",
 			"testSpinner.goml",
 			"testPopper.goml",
@@ -49,7 +48,7 @@ namespace test
 			"testWindow.goml",
 			"testMsgBox.goml",
 			"testGrid.goml",
-
+			"test4.goml",
 			"testMeter.goml",
 		};
 
@@ -100,12 +99,12 @@ namespace test
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-			this.AddWidget(new test4());
-			//LoadInterface("Interfaces/" + testFiles[idx]);
+			//this.AddWidget(new test4());
+			LoadInterface("Interfaces/" + testFiles[idx]);
 		}
 		protected override void OnUpdateFrame (FrameEventArgs e)
 		{
-			if (frameCpt % 8 == 0)
+			//if (frameCpt % 8 == 0)
 				base.OnUpdateFrame (e);
 			
 			fps = (int)RenderFrequency;

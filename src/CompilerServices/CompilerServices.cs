@@ -17,9 +17,99 @@ namespace go
 		PropertyBinding
 	}
 	public class Binding{
-		public BindingType BindingType;
-		public string MemberName;
-		public string BindingExpression;
+		public PropertyInfo Property;
+		public string Expression;
+
+		public Binding(){
+		}
+		public Binding(PropertyInfo _property, string _expression)
+		{
+			Property = _property;
+			Expression = _expression;
+		}
+	}
+
+	public class ResolvedBinding
+	{
+		public object Target;
+		public MemberInfo Member;
+
+		public Binding Binding;
+
+		public ResolvedBinding(){
+		}
+		public ResolvedBinding(Binding _binding){
+			Binding = _binding;
+		}
+
+		public bool FindTarget(GraphicObject source){
+			string member = null;
+
+			if (string.IsNullOrEmpty (Binding.Expression)) {
+				Target = source;
+				Member = null;
+				return true;
+			}
+
+			string[] bindingExp = Binding.Expression.Split ('/');
+
+			if (bindingExp.Length == 1) {
+				//datasource binding
+				Target = source.DataSource;
+				member = bindingExp [0];
+			} else {
+				int ptr = 0;
+				ILayoutable tmp = source;
+				if (string.IsNullOrEmpty (bindingExp [0])) {
+					//if exp start with '/' => Graphic tree parsing start at top container
+					tmp = source.TopContainer as ILayoutable;
+					ptr++;
+				}
+				while (ptr < bindingExp.Length - 1) {
+					if (tmp == null)
+						return false;
+					if (bindingExp [ptr] == "..")
+						tmp = tmp.Parent as GraphicObject;
+					else if (bindingExp [ptr] == ".") {
+						if (ptr > 0)
+							throw new Exception ("Syntax error in binding, './' may only appear in first position");						
+						tmp = source;
+					}else
+						tmp = (tmp as GraphicObject).FindByName (bindingExp [ptr]);
+					ptr++;
+				}
+
+				string[] bindTrg = bindingExp [ptr].Split ('.');
+
+				if (bindTrg.Length == 2) {
+					tmp = (tmp as GraphicObject).FindByName (bindTrg [0]);
+					member = bindTrg [1];
+				} else
+					throw new Exception ("Syntax error in binding, expected 'go dot member'");
+				Target = tmp;
+			}
+			if (Target == null) {
+				Debug.WriteLine ("Binding Source is null: " + Binding.Expression);
+				return false;
+			}
+			Type targetType = Target.GetType ();
+			Member = targetType.GetMember (member).FirstOrDefault ();
+
+			#region search for extensions methods if member not found in type
+			if (Member == null && !string.IsNullOrEmpty(member))
+			{
+				Assembly a = Assembly.GetExecutingAssembly();
+				Member =  CompilerServices.GetExtensionMethods(a, targetType).FirstOrDefault();					
+			}
+			#endregion
+
+			if (member == null) {
+				Debug.WriteLine ("Binding member not found: " + member);
+				return false;
+			}
+
+			return true;
+		}
 	}
 
 	public static class CompilerServices2
@@ -153,6 +243,10 @@ namespace go
 	}
 	public static class CompilerServices
 	{
+		public static void CreateBindingHandler()
+		{
+		}
+
 		static int dynHandleCpt = 0;
 
 		/// <summary>

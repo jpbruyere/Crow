@@ -438,22 +438,10 @@ namespace go
 
 			XmlSerializerNamespaces xn = new XmlSerializerNamespaces ();
 			xn.Add ("", "");
-			//prevent unused ref in References created by xmlSerializer
-			Interface.DontResoveGOML = true;
 			XmlSerializer xs = new XmlSerializer (type);
-			Interface.DontResoveGOML = false;
-			GOMLResolutionStack.Push (new List<DynAttribute> ());
 
 			result = (GraphicObject)xs.Deserialize (stream);
-			//result.DataSource = hostClass;
-
-			if (hostClass == null) {
-				GOMLResolutionStack.Pop ();
-				return result;
-			}
-				
-			if (resolve)
-				resolveGOML (hostClass);
+			result.DataSource = hostClass;
 
 			#if DEBUG_LOAD_TIME
 			loadingTime.Stop ();

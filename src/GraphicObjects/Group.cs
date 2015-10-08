@@ -83,7 +83,12 @@ namespace go
 				return true;
 			}
 		}
-
+		public override void ResolveBindings ()
+		{
+			base.ResolveBindings ();
+			foreach (GraphicObject w in Children)
+				w.ResolveBindings ();
+		}
 		public override GraphicObject FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)

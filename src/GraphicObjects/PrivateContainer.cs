@@ -67,6 +67,12 @@ namespace go
 		}
 
 		#region GraphicObject Overrides
+		public override void ResolveBindings ()
+		{
+			base.ResolveBindings ();
+			if (child != null)
+				child.ResolveBindings ();
+		}
 		public override GraphicObject FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)
