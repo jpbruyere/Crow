@@ -35,21 +35,21 @@ namespace test
 		int idx = 0;
 		string[] testFiles = {
 			"fps.goml",
+			"testCheckbox.goml",
+			"testExpandable.goml",
 			"testContainer.goml",
 			"testBorder.goml",
 			"testLabel.goml",
-			"testCheckbox.goml",
 			"testRadioButton.goml",
 			"testSpinner.goml",
 			"testPopper.goml",
-			"testExpandable.goml",
 			"testGroupBox.goml",
-			"testCombobox.goml",
 			"testWindow.goml",
 			"testMsgBox.goml",
 			"testGrid.goml",
-			"test4.goml",
 			"testMeter.goml",
+//			"testCombobox.goml",
+//			"test4.goml",
 		};
 
 		#region FPS
@@ -100,6 +100,7 @@ namespace test
 		{
 			base.OnLoad (e);
 			//this.AddWidget(new test4());
+
 			LoadInterface("Interfaces/" + testFiles[idx]);
 		}
 		protected override void OnUpdateFrame (FrameEventArgs e)

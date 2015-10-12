@@ -96,7 +96,7 @@ namespace go
 				}
 
 				onCollapse (this, null);
-				NotifyValueChanged ("SvgSub", "collapsed");
+ 				NotifyValueChanged ("SvgSub", "collapsed");
             }
         }
 

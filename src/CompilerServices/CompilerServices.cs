@@ -17,14 +17,17 @@ namespace go
 		PropertyBinding
 	}
 	public class Binding{
-		public PropertyInfo Property;
+		public MemberInfo SourceMember;
 		public string Expression;
+
+		public PropertyInfo Property { get { return SourceMember as PropertyInfo; } }
+		public EventInfo Event { get { return SourceMember as EventInfo; } }
 
 		public Binding(){
 		}
-		public Binding(PropertyInfo _property, string _expression)
+		public Binding(MemberInfo _sourceMember, string _expression)
 		{
-			Property = _property;
+			SourceMember = _sourceMember;
 			Expression = _expression;
 		}
 	}
@@ -45,11 +48,14 @@ namespace go
 		public bool FindTarget(GraphicObject source){
 			string member = null;
 
+			//if binding exp = '{}' => binding is done on datasource
 			if (string.IsNullOrEmpty (Binding.Expression)) {
 				Target = source;
 				Member = null;
 				return true;
 			}
+
+			//if (Binding.SourceMember.MemberType == MemberTypes.Event)
 
 			string[] bindingExp = Binding.Expression.Split ('/');
 
@@ -81,11 +87,14 @@ namespace go
 
 				string[] bindTrg = bindingExp [ptr].Split ('.');
 
-				if (bindTrg.Length == 2) {
+				if (bindTrg.Length == 1)
+					member = bindTrg [0];
+				else if (bindTrg.Length == 2){
 					tmp = (tmp as GraphicObject).FindByName (bindTrg [0]);
 					member = bindTrg [1];
 				} else
 					throw new Exception ("Syntax error in binding, expected 'go dot member'");
+				
 				Target = tmp;
 			}
 			if (Target == null) {
@@ -266,14 +275,10 @@ namespace go
 			#endregion
 
 			Type[] args = {typeof(object), handlerArgsType};
-			DynamicMethod dm = new DynamicMethod("dynHandle_" + dynHandleCpt,
+			DynamicMethod dm = new DynamicMethod("dynHandle",
 				typeof(void), 
 				args, 
 				srcType.Module);
-			
-			es.Source.DynamicMethodIds.Add (dynHandleCpt);
-
-			dynHandleCpt++;
 
 			#region IL generation
 			ILGenerator il = dm.GetILGenerator(256);
@@ -355,7 +360,7 @@ namespace go
 					}else{
 						//search if parsing methods are present
 						MethodInfo lopTryParseMi = lopT.GetMethod("TryParse");
-
+						//TODO
 					}
 				}
 

@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="1" BorderColor="LightGray" Height="{TemplatedHeight}" Width="{TemplatedWidth}" MouseClick="onMouseClick">
+<Border BorderWidth="1" BorderColor="LightGray" Height="{TemplatedHeight}" Width="{TemplatedWidth}" 
+		MouseClick="onMouseClick">
 	<VerticalStack Height="{TemplatedHeight}" Width="{TemplatedWidth}">
 		<HorizontalStack Spacing="1" Height="-1" Width="{TemplatedWidth}">
 			<Image Margin="2" Width="12" Height="12" Path="{Image}" SvgSub="{SvgSub}"/>

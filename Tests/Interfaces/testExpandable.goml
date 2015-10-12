@@ -5,5 +5,5 @@
 			<Checkbox Name="chk2" IsChecked="true"/>
 			<Checkbox Name="chk3"/>
 			<Checkbox Name="chk4"/>
-		</VerticalStack>		
+		</VerticalStack>
 </Expandable>

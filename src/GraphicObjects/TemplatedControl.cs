@@ -105,6 +105,10 @@ namespace go
 			//prevent name searching in template
 			return nameToFind == this.Name ? this : null;
 		}
+		public override void ResolveBindings ()
+		{
+			base.ResolveBindingsWithNoRecurse ();
+		}
 		#endregion
 
 		protected virtual void loadTemplate(GraphicObject template = null)

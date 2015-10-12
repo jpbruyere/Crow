@@ -792,16 +792,36 @@ namespace go
 		{
 			List<ResolvedBinding> resolved = new List<ResolvedBinding> ();
 			foreach (Binding b in Bindings) {
+				if (b.SourceMember.MemberType == MemberTypes.Event) {
+					if (b.Expression.StartsWith("{")){
+						CompileEventSource(b);
+						continue;
+					}
+				}
 				ResolvedBinding rb = new ResolvedBinding (b);
 				if (!rb.FindTarget (this))
 					continue;
+				if (rb.Binding.SourceMember.MemberType == MemberTypes.Event) {
+					//register handler for event
+					MethodInfo mi = rb.Member as MethodInfo;
+					if (mi == null) {
+						Debug.WriteLine ("Handler Method not found: " + rb.Binding.Expression);
+						continue;
+					}
+
+					MethodInfo addHandler = rb.Binding.Event.GetAddMethod ();
+					Delegate del = Delegate.CreateDelegate (rb.Binding.Event.EventHandlerType, rb.Target, mi);
+					addHandler.Invoke (this, new object[] { del });
+					continue;
+				}
 				resolved.Add (rb);				
 			}
+			//group;only one dynMethods by target (valuechanged event source)
+			//changed value name tested in switch
 			IEnumerable<ResolvedBinding[]> groupedByTarget = resolved.GroupBy (g => g.Target, g => g, (k, g) => g.ToArray ());
 			foreach (ResolvedBinding[] grouped in groupedByTarget) {
 				int i = 0;
-				object targetValue = grouped [0].Target;//empty binding exp=> bound to target object by default
-				Type targetType = targetValue.GetType();
+				Type targetType = grouped[0].Target.GetType();
 				Type sourceType = this.GetType();
 
 				DynamicMethod dm = null;
@@ -839,8 +859,8 @@ namespace go
 					jumpTable = new System.Reflection.Emit.Label[grouped.Length];
 					for (i = 0; i < grouped.Length; i++)
 						jumpTable [i] = il.DefineLabel ();
-					lbMemberName = il.DeclareLocal(typeof(string));
-					lbValue  = il.DeclareLocal(typeof(object));
+					il.DeclareLocal(typeof(string));
+					il.DeclareLocal(typeof(object));
 
 					il.Emit(OpCodes.Nop);
 					il.Emit(OpCodes.Ldarg_0);
@@ -849,13 +869,13 @@ namespace go
 					il.Emit(OpCodes.Ldarg_2);
 					FieldInfo fiNewValue = typeof(ValueChangeEventArgs).GetField("NewValue");
 					il.Emit(OpCodes.Ldfld, fiNewValue);
-					il.Emit(OpCodes.Stloc, lbValue);
+					il.Emit(OpCodes.Stloc_1);
 					//push name 
 					il.Emit(OpCodes.Ldarg_2);
 					FieldInfo fiMbName = typeof(ValueChangeEventArgs).GetField("MemberName");
 					il.Emit(OpCodes.Ldfld, fiMbName);
-					il.Emit(OpCodes.Stloc, lbMemberName);
-					il.Emit(OpCodes.Ldloc, lbMemberName);
+					il.Emit(OpCodes.Stloc_0);
+					il.Emit(OpCodes.Ldloc_0);
 					il.Emit(OpCodes.Brfalse, endMethod);
 				}
 				#endregion
@@ -863,6 +883,7 @@ namespace go
 				i = 0;
 				foreach (ResolvedBinding rb in grouped) {
 					#region initialize target with actual value
+					object targetValue = null;
 					if (rb.Member != null){
 						if (rb.Member.MemberType == MemberTypes.Property)
 							targetValue = (rb.Member as PropertyInfo).GetGetMethod ().Invoke (rb.Target, null);
@@ -876,10 +897,14 @@ namespace go
 								targetValue = mthSrc.Invoke(rb.Target, null);
 						}else
 							throw new Exception ("unandled source member type for binding");						
-					}
+					}else if (string.IsNullOrEmpty(rb.Binding.Expression))
+						targetValue= grouped [0].Target;//empty binding exp=> bound to target object by default
 					//TODO: handle other dest type conversions
 					if (rb.Binding.Property.PropertyType == typeof(string)){
-						if (targetValue != null)
+						if (targetValue == null){
+							//set default value
+
+						}else
 							targetValue = targetValue.ToString ();
 					}
 					rb.Binding.Property.GetSetMethod ().Invoke (this, new object[] { targetValue });
@@ -889,8 +914,11 @@ namespace go
 					if (il == null)
 						continue;
 
-					il.Emit (OpCodes.Ldloc, lbMemberName);
-					il.Emit (OpCodes.Ldstr, rb.Member.Name);
+					il.Emit (OpCodes.Ldloc_0);
+					if (rb.Member != null)
+						il.Emit (OpCodes.Ldstr, rb.Member.Name);
+					else
+						il.Emit (OpCodes.Ldstr, rb.Binding.Expression);
 					il.Emit (OpCodes.Callvirt, stringEquals);
 					il.Emit (OpCodes.Brtrue, jumpTable[i]);
 					i++;
@@ -905,7 +933,7 @@ namespace go
 				foreach (ResolvedBinding rb in grouped) {
 
 					il.MarkLabel (jumpTable [i]);
-					il.Emit(OpCodes.Ldloc, lbValue);
+					il.Emit(OpCodes.Ldloc_1);
 
 					//by default, target value type is deducted from source member type to allow
 					//memberless binding, if targetMember exists, it will be used to determine target
@@ -941,6 +969,125 @@ namespace go
 				addHandler.Invoke(grouped [0].Target, new object[] {del});
 			}
 		}
+		/// <summary>
+		/// Compile events expression in GOML attributes
+		/// </summary>
+		/// <param name="es">Event binding details</param>
+		public void CompileEventSource(Binding binding)
+		{			
+			Type sourceType = this.GetType();
+
+			#region Retrieve EventHandler parameter type
+			MethodInfo evtInvoke = binding.Event.EventHandlerType.GetMethod ("Invoke");
+			ParameterInfo[] evtParams = evtInvoke.GetParameters ();
+			Type handlerArgsType = evtParams [1].ParameterType;
+			#endregion
+
+			Type[] args = {typeof(object), typeof(object),handlerArgsType};
+			DynamicMethod dm = new DynamicMethod("dynHandle",
+				typeof(void), 
+				args,
+				sourceType);
+
+
+			#region IL generation
+			ILGenerator il = dm.GetILGenerator(256);
+
+			string src = binding.Expression.Trim();
+
+			if (! (src.StartsWith("{") || src.EndsWith ("}"))) 
+				throw new Exception (string.Format("GOML:Malformed {0} Event handler: {1}", binding.SourceMember.Name, binding.Expression));
+
+			src = src.Substring (1, src.Length - 2);
+			string[] srcLines = src.Split (new char[] { ';' });
+
+			foreach (string srcLine in srcLines) {
+				string statement = srcLine.Trim ();
+
+				string[] operandes = statement.Split (new char[] { '=' });
+				if (operandes.Length < 2) //not an affectation
+				{
+					continue;
+				}
+				string lop = operandes [0].Trim ();
+				string rop = operandes [operandes.Length-1].Trim ();
+
+				#region LEFT OPERANDES
+				GraphicObject lopObj = this;	//default left operand base object is 
+				//the first arg (object sender) of the event handler
+
+				string[] lopParts = lop.Split (new char[] { '.' });
+				if (lopParts.Length == 2) {//should search also for member of es.Source
+					lopObj = this.FindByName (lopParts [0]);
+					if (lopObj==null)
+						throw new Exception (string.Format("GOML:Unknown name: {0}", lopParts[0]));
+					//TODO: should create private member holding ref of lopObj, and emit
+					//a call to FindByName(lopObjName) during #ctor or in a onLoad func or evt handler
+					throw new Exception (string.Format("GOML:obj tree ref not yet implemented", lopParts[0]));
+				}else
+					il.Emit(OpCodes.Ldarg_0);	//load sender ref onto the stack
+
+				int i = lopParts.Length -1;
+
+				MemberInfo lopMbi = lopObj.GetType().GetMember (lopParts[i])[0];
+				OpCode lopSetOC;
+				dynamic lopSetMbi;
+				Type lopT = null;
+				switch (lopMbi.MemberType) {
+				case MemberTypes.Property:
+					PropertyInfo lopPi = sourceType.GetProperty (lopParts[i]);
+					MethodInfo dstMi = lopPi.GetSetMethod ();
+					lopT = lopPi.PropertyType;
+					lopSetMbi = dstMi;
+					lopSetOC = OpCodes.Callvirt;
+					break;
+				case MemberTypes.Field:
+					FieldInfo dstFi = sourceType.GetField(lopParts[i]);
+					lopT = dstFi.FieldType;
+					lopSetMbi = dstFi;
+					lopSetOC = OpCodes.Stfld;
+					break;
+				default:
+					throw new Exception (string.Format("GOML:member type not handle: {0}", lopParts[i]));
+				}  
+				#endregion
+
+				#region RIGHT OPERANDES
+				if (rop.StartsWith("\'")){
+					if (!rop.EndsWith("\'"))
+						throw new Exception (string.Format
+							("GOML:malformed string constant in handler: {0}", rop));	
+					string strcst = rop.Substring (1, rop.Length - 2);
+
+					il.Emit(OpCodes.Ldstr,strcst);
+
+				}else{
+					//search for a static field in left operand type named 'rop name'
+					FieldInfo ropFi = lopT.GetField (rop, BindingFlags.Static|BindingFlags.Public);
+					if (ropFi != null)
+					{
+						il.Emit (OpCodes.Ldsfld, ropFi);
+					}else{
+						//search if parsing methods are present
+						MethodInfo lopTryParseMi = lopT.GetMethod("TryParse");
+						//TODO
+					}
+				}
+
+				#endregion
+
+				//emit left operand assignment
+				il.Emit(lopSetOC, lopSetMbi);
+			}
+
+			il.Emit(OpCodes.Ret);
+
+			#endregion
+
+			Delegate del = dm.CreateDelegate(binding.Event.EventHandlerType,this);
+			MethodInfo addHandler = binding.Event.GetAddMethod ();
+			addHandler.Invoke(this, new object[] {del});
+		}
 
 		#region IXmlSerializable
 		public virtual System.Xml.Schema.XmlSchema GetSchema ()
@@ -965,13 +1112,7 @@ namespace go
 					continue;
 				}
 				if (mi.MemberType == MemberTypes.Event) {
-					if (!Interface.DontResoveGOML) {
-						Interface.GOMLResolver.Add (new DynAttribute { 
-							Source = this, 
-							Value = attValue,
-							MemberName = attName
-						});
-					}
+					this.Bindings.Add (new Binding (mi, attValue));
 					continue;
 				}
 				if (mi.MemberType == MemberTypes.Property) {

@@ -73,6 +73,10 @@ namespace go
 			if (child != null)
 				child.ResolveBindings ();
 		}
+		protected void ResolveBindingsWithNoRecurse ()
+		{
+			base.ResolveBindings ();
+		}
 		public override GraphicObject FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)
