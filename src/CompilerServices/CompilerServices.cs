@@ -10,65 +10,91 @@ using System.Runtime.CompilerServices;
 
 namespace go
 {
-	public enum BindingType
+	public class MemberReference
 	{
-		Handler,
-		DynamicHandler,
-		PropertyBinding
-	}
-	public class Binding{
-		public MemberInfo SourceMember;
-		public string Expression;
-
-		public PropertyInfo Property { get { return SourceMember as PropertyInfo; } }
-		public EventInfo Event { get { return SourceMember as EventInfo; } }
-
-		public Binding(){
-		}
-		public Binding(MemberInfo _sourceMember, string _expression)
-		{
-			SourceMember = _sourceMember;
-			Expression = _expression;
-		}
-	}
-
-	public class ResolvedBinding
-	{
-		public object Target;
+		public object Instance;
 		public MemberInfo Member;
 
-		public Binding Binding;
+		public PropertyInfo Property { get { return Member as PropertyInfo; } }
+		public FieldInfo Field { get { return Member as FieldInfo; } }
+		public EventInfo Event { get { return Member as EventInfo; } }
+		public MethodInfo Method { get { return Member as MethodInfo; } }
 
-		public ResolvedBinding(){
+		public MemberReference(){
 		}
-		public ResolvedBinding(Binding _binding){
-			Binding = _binding;
+		public MemberReference(object _instance, MemberInfo _member = null)
+		{
+			Instance = _instance;
+			Member = _member;
 		}
+		public bool FindMember(string _memberName)
+		{
+			Type t = Instance.GetType ();
+			Member = t.GetMember (_memberName).FirstOrDefault ();
 
-		public bool FindTarget(GraphicObject source){
+			#region search for extensions methods if member not found in type
+			if (Member == null && !string.IsNullOrEmpty(_memberName))
+			{
+				Assembly a = Assembly.GetExecutingAssembly();
+				Member =  CompilerServices.GetExtensionMethods(a, t).Where(em=>em.Name == _memberName).FirstOrDefault();
+			}			
+			#endregion
+		
+			return string.IsNullOrEmpty(_memberName) ? false : true;
+		}
+	}
+	public class Binding{
+		static int bindingCpt = 0;
+		string dynMethodId = "";
+		public string NewDynMethodId {
+			get {
+				if (!string.IsNullOrEmpty (dynMethodId))
+					return dynMethodId;
+				dynMethodId = "dynHandle_" + bindingCpt;
+				bindingCpt++;
+				return dynMethodId;
+			}
+		}
+		public string DynMethodId {
+			get { return dynMethodId; }
+		}
+				
+
+		public MemberReference Source;
+		public MemberReference Target;
+
+		public string Expression;
+
+		#region CTOR
+		public Binding(){}
+		public Binding(MemberReference _source, string _expression)
+		{
+			Source = _source;
+			Expression = _expression;
+		}
+		#endregion
+
+		public bool FindTarget(){
 			string member = null;
 
 			//if binding exp = '{}' => binding is done on datasource
-			if (string.IsNullOrEmpty (Binding.Expression)) {
-				Target = source;
-				Member = null;
+			if (string.IsNullOrEmpty (Expression)) {
+				Target = new MemberReference (Source.Instance);
 				return true;
 			}
 
-			//if (Binding.SourceMember.MemberType == MemberTypes.Event)
-
-			string[] bindingExp = Binding.Expression.Split ('/');
+			string[] bindingExp = Expression.Split ('/');
 
 			if (bindingExp.Length == 1) {
 				//datasource binding
-				Target = source.DataSource;
+				Target = new MemberReference((Source.Instance as GraphicObject).DataSource);
 				member = bindingExp [0];
 			} else {
 				int ptr = 0;
-				ILayoutable tmp = source;
+				ILayoutable tmp = Source.Instance as ILayoutable;
 				if (string.IsNullOrEmpty (bindingExp [0])) {
 					//if exp start with '/' => Graphic tree parsing start at top container
-					tmp = source.TopContainer as ILayoutable;
+					tmp = tmp.TopContainer as ILayoutable;
 					ptr++;
 				}
 				while (ptr < bindingExp.Length - 1) {
@@ -79,7 +105,7 @@ namespace go
 					else if (bindingExp [ptr] == ".") {
 						if (ptr > 0)
 							throw new Exception ("Syntax error in binding, './' may only appear in first position");						
-						tmp = source;
+						tmp = Source.Instance as ILayoutable;
 					}else
 						tmp = (tmp as GraphicObject).FindByName (bindingExp [ptr]);
 					ptr++;
@@ -94,485 +120,32 @@ namespace go
 					member = bindTrg [1];
 				} else
 					throw new Exception ("Syntax error in binding, expected 'go dot member'");
-				
-				Target = tmp;
+
+				Target = new MemberReference(tmp);
 			}
 			if (Target == null) {
-				Debug.WriteLine ("Binding Source is null: " + Binding.Expression);
-				return false;
-			}
-			Type targetType = Target.GetType ();
-			Member = targetType.GetMember (member).FirstOrDefault ();
-
-			#region search for extensions methods if member not found in type
-			if (Member == null && !string.IsNullOrEmpty(member))
-			{
-				Assembly a = Assembly.GetExecutingAssembly();
-				Member =  CompilerServices.GetExtensionMethods(a, targetType).FirstOrDefault();					
-			}
-			#endregion
-
-			if (member == null) {
-				Debug.WriteLine ("Binding member not found: " + member);
+				Debug.WriteLine ("Binding Source is null: " + Expression);
 				return false;
 			}
 
-			return true;
+			if (Target.FindMember (member))
+				return true;
+			
+			Debug.WriteLine ("Binding member not found: " + member);
+			return false;
 		}
-	}
-
-	public static class CompilerServices2
-	{
-		static int dynHandleCpt = 0;
-		/// <summary>
-		/// Compile events expression in GOML attributes
-		/// </summary>
-		/// <param name="es">Event binding details</param>
-		public static void ResolveBinding(DynAttribute es)
+		public void Reset()
 		{
-			Type srcType = es.Source.GetType ();
-
-			#region Retrieve EventHandler parameter type
-			EventInfo ei = srcType.GetEvent (es.MemberName);
-			MethodInfo invoke = ei.EventHandlerType.GetMethod ("Invoke");
-			ParameterInfo[] pars = invoke.GetParameters ();
-
-			Type handlerArgsType = pars [1].ParameterType;
-			#endregion
-
-			Type[] args = {typeof(object), handlerArgsType};
-			DynamicMethod dm = new DynamicMethod("dynHandle_" + dynHandleCpt,
-				typeof(void), 
-				args, 
-				srcType.Module);
-
-			es.Source.DynamicMethodIds.Add (dynHandleCpt);
-
-			dynHandleCpt++;
-
-			#region IL generation
-			ILGenerator il = dm.GetILGenerator(256);
-
-			string src = es.Value.Trim();
-
-			if (! (src.StartsWith("{") || src.EndsWith ("}"))) 
-				throw new Exception (string.Format("GOML:Malformed {0} Event handler: {1}", es.MemberName, es.Value));
-
-			src = src.Substring (1, src.Length - 2);
-			string[] srcLines = src.Split (new char[] { ';' });
-
-			foreach (string srcLine in srcLines) {
-				string statement = srcLine.Trim ();
-
-				string[] operandes = statement.Split (new char[] { '=' });
-				if (operandes.Length < 2) //not an affectation
-				{
-					continue;
-				}
-				string lop = operandes [0].Trim ();
-				string rop = operandes [operandes.Length-1].Trim ();
-
-				#region LEFT OPERANDES
-				GraphicObject lopObj = es.Source;	//default left operand base object is 
-				//the first arg (object sender) of the event handler
-
-				string[] lopParts = lop.Split (new char[] { '.' });
-				if (lopParts.Length == 2) {//should search also for member of es.Source
-					lopObj = es.Source.FindByName (lopParts [0]);
-					if (lopObj==null)
-						throw new Exception (string.Format("GOML:Unknown name: {0}", lopParts[0]));
-					//TODO: should create private member holding ref of lopObj, and emit
-					//a call to FindByName(lopObjName) during #ctor or in a onLoad func or evt handler
-					throw new Exception (string.Format("GOML:obj tree ref not yet implemented", lopParts[0]));
-				}else
-					il.Emit(OpCodes.Ldarg_0);	//load sender ref onto the stack
-
-				int i = lopParts.Length -1;
-
-				MemberInfo lopMbi = lopObj.GetType().GetMember (lopParts[i])[0];
-				OpCode lopSetOC;
-				dynamic lopSetMbi;
-				Type lopT = null;
-				switch (lopMbi.MemberType) {
-				case MemberTypes.Property:
-					PropertyInfo lopPi = srcType.GetProperty (lopParts[i]);
-					MethodInfo dstMi = lopPi.GetSetMethod ();
-					lopT = lopPi.PropertyType;
-					lopSetMbi = dstMi;
-					lopSetOC = OpCodes.Callvirt;
-					break;
-				case MemberTypes.Field:
-					FieldInfo dstFi = srcType.GetField(lopParts[i]);
-					lopT = dstFi.FieldType;
-					lopSetMbi = dstFi;
-					lopSetOC = OpCodes.Stfld;
-					break;
-				default:
-					throw new Exception (string.Format("GOML:member type not handle: {0}", lopParts[i]));
-				}  
-				#endregion
-
-				#region RIGHT OPERANDES
-				if (rop.StartsWith("\'")){
-					if (!rop.EndsWith("\'"))
-						throw new Exception (string.Format
-							("GOML:malformed string constant in handler: {0}", rop));	
-					string strcst = rop.Substring (1, rop.Length - 2);
-
-					il.Emit(OpCodes.Ldstr,strcst);
-
-				}else{
-					//search for a static field in left operand type named 'rop name'
-					FieldInfo ropFi = lopT.GetField (rop, BindingFlags.Static|BindingFlags.Public);
-					if (ropFi != null)
-					{
-						il.Emit (OpCodes.Ldsfld, ropFi);
-					}else{
-						//search if parsing methods are present
-						MethodInfo lopTryParseMi = lopT.GetMethod("TryParse");
-
-					}
-				}
-
-				#endregion
-
-				//emit left operand assignment
-				il.Emit(lopSetOC, lopSetMbi);
-			}
-
-			il.Emit(OpCodes.Ret);
-
-			#endregion
-
-			Delegate del = dm.CreateDelegate(ei.EventHandlerType);
-			MethodInfo addHandler = ei.GetAddMethod ();
-			addHandler.Invoke(es.Source, new object[] {del});
+			Target = null;
+			dynMethodId = "";
 		}
-
 	}
+
+
+
 	public static class CompilerServices
 	{
-		public static void CreateBindingHandler()
-		{
-		}
-
 		static int dynHandleCpt = 0;
-
-		/// <summary>
-		/// Compile events expression in GOML attributes
-		/// </summary>
-		/// <param name="es">Event binding details</param>
-		public static void CompileEventSource(DynAttribute es)
-		{
-			Type srcType = es.Source.GetType ();
-
-			#region Retrieve EventHandler parameter type
-			EventInfo ei = srcType.GetEvent (es.MemberName);
-			MethodInfo invoke = ei.EventHandlerType.GetMethod ("Invoke");
-			ParameterInfo[] pars = invoke.GetParameters ();
-
-			Type handlerArgsType = pars [1].ParameterType;
-			#endregion
-
-			Type[] args = {typeof(object), handlerArgsType};
-			DynamicMethod dm = new DynamicMethod("dynHandle",
-				typeof(void), 
-				args, 
-				srcType.Module);
-
-			#region IL generation
-			ILGenerator il = dm.GetILGenerator(256);
-
-			string src = es.Value.Trim();
-
-			if (! (src.StartsWith("{") || src.EndsWith ("}"))) 
-				throw new Exception (string.Format("GOML:Malformed {0} Event handler: {1}", es.MemberName, es.Value));
-
-			src = src.Substring (1, src.Length - 2);
-			string[] srcLines = src.Split (new char[] { ';' });
-
-			foreach (string srcLine in srcLines) {
-				string statement = srcLine.Trim ();
-
-				string[] operandes = statement.Split (new char[] { '=' });
-				if (operandes.Length < 2) //not an affectation
-				{
-					continue;
-				}
-				string lop = operandes [0].Trim ();
-				string rop = operandes [operandes.Length-1].Trim ();
-
-				#region LEFT OPERANDES
-				GraphicObject lopObj = es.Source;	//default left operand base object is 
-													//the first arg (object sender) of the event handler
-
-				string[] lopParts = lop.Split (new char[] { '.' });
-				if (lopParts.Length == 2) {//should search also for member of es.Source
-					lopObj = es.Source.FindByName (lopParts [0]);
-					if (lopObj==null)
-						throw new Exception (string.Format("GOML:Unknown name: {0}", lopParts[0]));
-					//TODO: should create private member holding ref of lopObj, and emit
-					//a call to FindByName(lopObjName) during #ctor or in a onLoad func or evt handler
-					throw new Exception (string.Format("GOML:obj tree ref not yet implemented", lopParts[0]));
-				}else
-					il.Emit(OpCodes.Ldarg_0);	//load sender ref onto the stack
-
-				int i = lopParts.Length -1;
-
-				MemberInfo lopMbi = lopObj.GetType().GetMember (lopParts[i])[0];
-				OpCode lopSetOC;
-				dynamic lopSetMbi;
-				Type lopT = null;
-				switch (lopMbi.MemberType) {
-				case MemberTypes.Property:
-					PropertyInfo lopPi = srcType.GetProperty (lopParts[i]);
-					MethodInfo dstMi = lopPi.GetSetMethod ();
-					lopT = lopPi.PropertyType;
-					lopSetMbi = dstMi;
-					lopSetOC = OpCodes.Callvirt;
-					break;
-				case MemberTypes.Field:
-					FieldInfo dstFi = srcType.GetField(lopParts[i]);
-					lopT = dstFi.FieldType;
-					lopSetMbi = dstFi;
-					lopSetOC = OpCodes.Stfld;
-					break;
-				default:
-					throw new Exception (string.Format("GOML:member type not handle: {0}", lopParts[i]));
-				}  
-				#endregion
-
-				#region RIGHT OPERANDES
-				if (rop.StartsWith("\'")){
-					if (!rop.EndsWith("\'"))
-						throw new Exception (string.Format
-						("GOML:malformed string constant in handler: {0}", rop));	
-					string strcst = rop.Substring (1, rop.Length - 2);
-
-					il.Emit(OpCodes.Ldstr,strcst);
-
-				}else{
-					//search for a static field in left operand type named 'rop name'
-					FieldInfo ropFi = lopT.GetField (rop, BindingFlags.Static|BindingFlags.Public);
-					if (ropFi != null)
-					{
-						il.Emit (OpCodes.Ldsfld, ropFi);
-					}else{
-						//search if parsing methods are present
-						MethodInfo lopTryParseMi = lopT.GetMethod("TryParse");
-						//TODO
-					}
-				}
-
-				#endregion
-
-				//emit left operand assignment
-				il.Emit(lopSetOC, lopSetMbi);
-			}
-				
-			il.Emit(OpCodes.Ret);
-
-			#endregion
-
-			Delegate del = dm.CreateDelegate(ei.EventHandlerType);
-			MethodInfo addHandler = ei.GetAddMethod ();
-			addHandler.Invoke(es.Source, new object[] {del});
-		}
-
-		/// <summary>
-		/// Resolves GOML property bindings afler loading
-		/// </summary>
-		/// <param name="binding">Binding details</param>
-		/// <param name="_source">Data source for binding</param>
-		public static void ResolveBinding(DynAttribute binding, object _source)
-		{			
-			object srcGO = null;
-			string statement = binding.Value;
-
-			if (statement.StartsWith ("/"))//binding is done in graphic object tree, _source param is ignore
-				srcGO = binding.Source;
-			else
-				srcGO = _source;
-
-			string[] bindingExp = binding.Value.Split ('/');
-
-			if (bindingExp.Length > 1){
-				int i = 0;
-				srcGO = binding.Source; //starts parsing from current GO
-				while (i < bindingExp.Length - 1) {
-					if (bindingExp [i] == "..")
-						srcGO = (srcGO as ILayoutable).Parent as GraphicObject;
-					else
-						srcGO = (srcGO as GraphicObject).FindByName (bindingExp [i]);
-					i++;
-				}
-				string[] bindTrg = bindingExp [i].Split ('.');
-
-				if (bindTrg.Length == 2) {
-					srcGO = (srcGO as GraphicObject).FindByName (bindTrg [0]);
-					statement = bindTrg [1];
-				} else
-					throw new Exception ("Syntax error in binding, expected 'go dot member'");
-			}
-
-			if (srcGO == null) {
-				Debug.WriteLine ("Invalid Binding Source: " + binding.Value);
-				return;
-			}
-			Type srcType = srcGO.GetType ();
-			Type dstType = binding.Source.GetType ();
-
-			MemberInfo miSrc = srcType.GetMember (statement).FirstOrDefault ();
-			MemberInfo miDst = dstType.GetMember (binding.MemberName).FirstOrDefault ();
-
-			object srcVal = null; //value in source member
-
-			#region search for extensions methods if member not found in type
-			if (miSrc == null && !string.IsNullOrEmpty(statement))
-			{
-				Assembly a = Assembly.GetExecutingAssembly();
-				miSrc =  CompilerServices.GetExtensionMethods(a, srcType).FirstOrDefault();					
-			}
-			#endregion
-
-			#region initialize target with actual value
-
-			if (string.IsNullOrEmpty(binding.Value))
-				srcVal = srcGO;//if no member is provided for binding, source raw value is taken
-			else if (miSrc != null){
-				if (miSrc.MemberType == MemberTypes.Property)
-					srcVal = (miSrc as PropertyInfo).GetGetMethod ().Invoke (srcGO, null);
-				else if (miSrc.MemberType == MemberTypes.Field)
-					srcVal = (miSrc as FieldInfo).GetValue (srcGO);
-				else if (miSrc.MemberType == MemberTypes.Method){
-					MethodInfo mthSrc = miSrc as MethodInfo;
-					if (mthSrc.IsDefined(typeof(ExtensionAttribute), false))
-						srcVal = mthSrc.Invoke(null, new object[] {srcGO});
-					else
-						srcVal = mthSrc.Invoke(srcGO, null);
-				}else
-					throw new Exception ("unandled source member type for binding");
-			}
-//			if (miSrc != null){
-				if (miDst.MemberType == MemberTypes.Property) {
-					PropertyInfo piDst = miDst as PropertyInfo;
-					//TODO: handle other dest type conversions
-					if (piDst.PropertyType == typeof(string)){
-						if (srcVal != null)
-							srcVal = srcVal.ToString ();
-					}
-					piDst.GetSetMethod ().Invoke (binding.Source, new object[] { srcVal });
-				} else if (miDst.MemberType == MemberTypes.Field) {
-					FieldInfo fiDst = miDst as FieldInfo;
-					if (fiDst.FieldType == typeof(string))
-						srcVal = srcVal.ToString ();
-					fiDst.SetValue (binding.Source, srcVal );
-				}else
-					throw new Exception("unandled destination member type for binding");
-//			}
-			#endregion
-
-			#region Retrieve EventHandler parameter type
-			EventInfo ei = srcType.GetEvent ("ValueChanged");
-			if (ei == null)
-				return; //no dynamic update if ValueChanged interface is not implemented
-
-			MethodInfo evtInvoke = ei.EventHandlerType.GetMethod ("Invoke");
-			ParameterInfo[] evtParams = evtInvoke.GetParameters ();
-			Type handlerArgsType = evtParams [1].ParameterType;
-
-			#endregion
-
-
-			Type[] args = {typeof(object), handlerArgsType};
-			DynamicMethod dm = new DynamicMethod("dynHandle_" + dynHandleCpt,
-				typeof(void), 
-				args, 
-				srcType.Module, true);
-
-			(binding.Source as GraphicObject).DynamicMethodIds.Add (dynHandleCpt);
-
-			dynHandleCpt++;
-
-			//register target object reference
-			int dstIdx = Interface.Reference(binding.Source);
-
-			#region IL generation
-			ILGenerator il = dm.GetILGenerator(256);
-
-			System.Reflection.Emit.Label labFailed = il.DefineLabel();
-			System.Reflection.Emit.Label labContinue = il.DefineLabel();
-
-			#region test if valueChange event is the correct one
-			il.Emit (OpCodes.Ldstr, statement);
-			//push name from arg
-			il.Emit(OpCodes.Ldarg_1);
-			FieldInfo fiMbName = typeof(ValueChangeEventArgs).GetField("MemberName");
-			il.Emit(OpCodes.Ldfld, fiMbName);
-			MethodInfo miStrEqu = typeof(string).GetMethod("op_Inequality", new Type[] {typeof(string),typeof(string)});
-			il.Emit(OpCodes.Call, miStrEqu);
-			il.Emit(OpCodes.Brfalse_S, labContinue);
-			il.Emit(OpCodes.Br_S, labFailed);
-			il.MarkLabel(labContinue);
-			#endregion
-
-//			string[] srcLines = binding.Value.Trim().Split (new char[] { ';' });
-//			foreach (string srcLine in srcLines) {
-				//MethodInfo infoWriteLine = typeof(System.Diagnostics.Debug).GetMethod("WriteLine", new Type[] { typeof(string) });
-							
-
-			//load target ref onto the stack
-			FieldInfo fiRefs = typeof(Interface).GetField("References");
-			il.Emit(OpCodes.Ldsfld, fiRefs);
-			il.Emit(OpCodes.Ldc_I4, dstIdx);
-			MethodInfo miGetRef = Interface.References.GetType().GetMethod("get_Item");
-			il.Emit(OpCodes.Callvirt, miGetRef);
-			il.Emit(OpCodes.Isinst, dstType);
-
-			//push new value
-			il.Emit(OpCodes.Ldarg_1);
-			FieldInfo fiNewValue = typeof(ValueChangeEventArgs).GetField("NewValue");
-			il.Emit(OpCodes.Ldfld, fiNewValue);
-
-			//Target is expected always to be a Property
-			PropertyInfo piTarget = dstType.GetProperty(binding.MemberName);
-
-			//type of the source value
-			Type srcValueType = null;
-
-			//member info of the source value
-			MemberInfo miSrcVal = miSrc;
-
-			//this allow memberless binding with only a name passed as MemberName
-			//the type of the source value is determined by the destination member
-			if (miSrcVal == null)
-				miSrcVal = miDst;
-
-			if (miSrcVal.MemberType == MemberTypes.Property)
-				srcValueType = (miSrcVal as PropertyInfo).PropertyType;
-			else if (miSrcVal.MemberType == MemberTypes.Field) 
-				srcValueType = (miSrcVal as FieldInfo).FieldType;
-			else
-				throw new Exception("unandled source member type for binding");
-			
-			if (!srcValueType.IsValueType)
-				il.Emit(OpCodes.Castclass, srcValueType);
-			else if (piTarget.PropertyType != srcValueType)
-				il.Emit(OpCodes.Callvirt, GetConvertMethod( piTarget.PropertyType ));
-			else
-				il.Emit(OpCodes.Unbox_Any, piTarget.PropertyType);
-				
-			il.Emit(OpCodes.Callvirt, piTarget.GetSetMethod());
-
-			il.MarkLabel(labFailed);
-			il.Emit(OpCodes.Ret);
-
-			#endregion
-
-			Delegate del = dm.CreateDelegate(ei.EventHandlerType);
-			MethodInfo addHandler = ei.GetAddMethod ();
-			addHandler.Invoke(srcGO, new object[] {del});
-		}
 
 		#region conversions
 

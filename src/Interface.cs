@@ -454,53 +454,6 @@ namespace go
 			return result;
 		}
 
-		public static void resolveGOML (object hostClass)
-		{
-			foreach (DynAttribute es in GOMLResolver) {
-//				if (string.IsNullOrEmpty(es.Value))
-//					continue;
-
-				Type dstType = es.Source.GetType ();
-				MemberInfo miTarget = dstType.GetMember (es.MemberName).FirstOrDefault ();
-
-				if (miTarget == null) {
-					Debug.WriteLine ("'{0}' Member not found in '{1}' type.", es.MemberName, dstType.ToString ());
-					continue;
-				}
-				
-				if (miTarget.MemberType == MemberTypes.Event) {
-					if (es.Value.StartsWith ("{")) {
-						CompilerServices.CompileEventSource (es);
-					} else {					
-						MethodInfo mi = hostClass.GetType ().GetMethod (es.Value, BindingFlags.NonPublic | BindingFlags.Public
-						                | BindingFlags.Instance);
-
-						object effectiveHostClass = hostClass;
-						if (mi == null) {
-							//TODO: hack to have it work, hostClass and dataSource should be clearly separated
-							mi = OpenTKGameWindow.currentWindow.GetType ().GetMethod (es.Value, BindingFlags.NonPublic | BindingFlags.Public
-							| BindingFlags.Instance);
-							if (mi == null) {
-								Debug.WriteLine ("Handler Method not found: " + es.Value);
-								continue;
-							}
-							effectiveHostClass = OpenTKGameWindow.currentWindow;
-						}
-
-						EventInfo ei = es.Source.GetType ().GetEvent (es.MemberName);
-						MethodInfo addHandler = ei.GetAddMethod ();
-						Delegate del = Delegate.CreateDelegate (ei.EventHandlerType, effectiveHostClass, mi);
-
-
-						addHandler.Invoke (es.Source, new object[] { del });
-
-					}
-				} else {
-					CompilerServices.ResolveBinding (es, hostClass);
-				}
-			}
-			GOMLResolutionStack.Pop ();			
-		}
 
 		#endregion
 	}
