@@ -30,7 +30,7 @@ namespace go
 		public bool FindMember(string _memberName)
 		{
 			Type t = Instance.GetType ();
-			Member = t.GetMember (_memberName).FirstOrDefault ();
+			Member = t.GetMember (_memberName,BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance).FirstOrDefault ();
 
 			#region search for extensions methods if member not found in type
 			if (Member == null && !string.IsNullOrEmpty(_memberName))

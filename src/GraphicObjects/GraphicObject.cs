@@ -794,6 +794,7 @@ namespace go
 			return Name == "unamed" ? tmp + "." + this.GetType ().Name : tmp + "." + Name;
 		}
 
+		#region Binding
 		public virtual void ResolveBindings()
 		{
 			List<Binding> resolved = new List<Binding> ();
@@ -1094,6 +1095,33 @@ namespace go
 			MethodInfo addHandler = binding.Source.Event.GetAddMethod ();
 			addHandler.Invoke(this, new object[] {del});
 		}
+		/// <summary>
+		/// Remove dynamic delegates by ids from dataSource
+		///  and delete ref of this in Shared interface refs
+		/// </summary>
+		public virtual void ClearBinding(){
+			foreach (Binding b in Bindings) {
+				if (string.IsNullOrEmpty (b.DynMethodId))
+					continue;
+				MemberReference mr = null;
+				if (b.Target == null)
+					mr = b.Source;
+				else
+					mr = b.Target;
+				Type dataSourceType = mr.Instance.GetType();
+				EventInfo evtInfo = dataSourceType.GetEvent ("ValueChanged");
+				FieldInfo evtFi = CompilerServices.GetEventHandlerField (dataSourceType, "ValueChanged");
+				MulticastDelegate multicastDelegate = evtFi.GetValue (mr.Instance) as MulticastDelegate;
+				if (multicastDelegate != null) {				
+					foreach (Delegate d in multicastDelegate.GetInvocationList()) {						
+						if (d.Method.Name == b.DynMethodId)
+							evtInfo.RemoveEventHandler (mr.Instance, d);
+					}
+				}
+				b.Reset ();
+			}
+		}
+		#endregion
 
 		#region IXmlSerializable
 		public virtual System.Xml.Schema.XmlSchema GetSchema ()
@@ -1277,31 +1305,5 @@ namespace go
 		}
 		#endregion
 
-		/// <summary>
-		/// Remove dynamic delegates by ids from dataSource
-		///  and delete ref of this in Shared interface refs
-		/// </summary>
-		public virtual void ClearBinding(){
-			foreach (Binding b in Bindings) {
-				if (string.IsNullOrEmpty (b.DynMethodId))
-					continue;
-				MemberReference mr = null;
-				if (b.Target == null)
-					mr = b.Source;
-				else
-					mr = b.Target;
-				Type dataSourceType = mr.Instance.GetType();
-				EventInfo evtInfo = dataSourceType.GetEvent ("ValueChanged");
-				FieldInfo evtFi = CompilerServices.GetEventHandlerField (dataSourceType, "ValueChanged");
-				MulticastDelegate multicastDelegate = evtFi.GetValue (mr.Instance) as MulticastDelegate;
-				if (multicastDelegate != null) {				
-					foreach (Delegate d in multicastDelegate.GetInvocationList()) {						
-						if (d.Method.Name == b.DynMethodId)
-							evtInfo.RemoveEventHandler (mr.Instance, d);
-					}
-				}
-				b.Reset ();
-			}
-		}
 	}
 }
