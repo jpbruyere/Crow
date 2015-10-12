@@ -1285,16 +1285,22 @@ namespace go
 			foreach (Binding b in Bindings) {
 				if (string.IsNullOrEmpty (b.DynMethodId))
 					continue;
-				Type dataSourceType = b.Target.Instance.GetType ();
+				MemberReference mr = null;
+				if (b.Target == null)
+					mr = b.Source;
+				else
+					mr = b.Target;
+				Type dataSourceType = mr.Instance.GetType();
 				EventInfo evtInfo = dataSourceType.GetEvent ("ValueChanged");
 				FieldInfo evtFi = CompilerServices.GetEventHandlerField (dataSourceType, "ValueChanged");
-				MulticastDelegate multicastDelegate = evtFi.GetValue (b.Target.Instance) as MulticastDelegate;
+				MulticastDelegate multicastDelegate = evtFi.GetValue (mr.Instance) as MulticastDelegate;
 				if (multicastDelegate != null) {				
 					foreach (Delegate d in multicastDelegate.GetInvocationList()) {						
 						if (d.Method.Name == b.DynMethodId)
-							evtInfo.RemoveEventHandler (b.Target.Instance, d);
+							evtInfo.RemoveEventHandler (mr.Instance, d);
 					}
 				}
+				b.Reset ();
 			}
 		}
 	}
