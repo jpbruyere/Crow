@@ -91,10 +91,15 @@ namespace go
 
 				Thread t = new Thread (loadingThread);
 				t.Start ();
+				t.Join ();
 
 			}
 		}
-
+		public override void UpdateLayout (LayoutingType layoutType)
+		{
+			CheckPendingChildrenAddition ();
+			base.UpdateLayout (layoutType);
+		}
 		internal void CheckPendingChildrenAddition()
 		{
 			if (pendingChildrenAddition == null)
@@ -127,7 +132,8 @@ namespace go
 
 			foreach (var item in data) {
 				ms.Seek(0,SeekOrigin.Begin);
-				GraphicObject g = Interface.Load (ms, t, item);
+				GraphicObject g = Interface.Load (ms, t);
+				g.DataSource = item;
 				g.MouseClick += itemClick;
 
 				lock (pendingChildrenAddition) {

@@ -22,7 +22,7 @@ namespace go
 {
 	[DefaultTemplate("#go.Templates.Combobox.goml")]
 	[DefaultOverlayTemplate("#go.Templates.ComboboxOverlay.goml")]
-	public class Combobox : TemplatedContainer
+	public class Combobox : TemplatedControl
     {		
 		#region CTOR
 		public Combobox() : base(){	}	
@@ -48,21 +48,22 @@ namespace go
 			base.loadTemplate (template);
 			loadOverlayTemplate (null);
 		}
-		public override GraphicObject Content {
-			get {
-				throw new NotImplementedException ();
-			}
-			set {
-				throw new NotImplementedException ();
-			}
-		}
+//		public override GraphicObject Content {
+//			get {
+//				throw new NotImplementedException ();
+//			}
+//			set {
+//				throw new NotImplementedException ();
+//			}
+//		}
 		#endregion
 
 		protected virtual void loadOverlayTemplate(GraphicObject overlayTemplate)
 		{
 			if (overlayTemplate == null) {
 				DefaultOverlayTemplate dt = (DefaultOverlayTemplate)this.GetType ().GetCustomAttributes (typeof(DefaultOverlayTemplate), true).FirstOrDefault ();
-				Overlay = Interface.Load (dt.Path, this, !Interface.DontResoveGOML);
+				Overlay = Interface.Load (dt.Path);
+				Overlay.ResolveBindings ();
 			} else
 				Overlay = overlayTemplate;
 			_list = Overlay.FindByName ("List") as Group;
@@ -173,8 +174,9 @@ namespace go
 			lock (pendingChildrenAddition) {
 				if (!threadedLoadingFinished && pendingChildrenAddition.Count < 50)
 					return;
-				while (pendingChildrenAddition.Count > 0)
+				while (pendingChildrenAddition.Count > 0) {
 					_list.addChild (pendingChildrenAddition.Dequeue ());
+				}
 			}
 		}
 
@@ -198,7 +200,8 @@ namespace go
 
 			foreach (var item in data) {
 				ms.Seek(0,SeekOrigin.Begin);
-				GraphicObject g = Interface.Load (ms, t, item);
+				GraphicObject g = Interface.Load (ms, t);
+				g.DataSource = item;
 				g.MouseClick += itemClick;
 
 				lock (pendingChildrenAddition) {
@@ -348,5 +351,6 @@ namespace go
 			base.ClearBinding ();
 
 		}
+
 	}
 }

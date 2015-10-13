@@ -38,6 +38,7 @@ namespace go
 			get { return _content; }
 			set { 
 				if (_content != null) {
+					_content.LogicalParent = null;
 					_content.LayoutChanged -= _content_LayoutChanged;
 					_content.MouseLeave -= _content_MouseLeave;
 				}
@@ -47,6 +48,7 @@ namespace go
 				if (_content == null)
 					return;
 
+				_content.LogicalParent = this;
 				_content.Focusable = true;
 				_content.LayoutChanged += _content_LayoutChanged;
 				_content.MouseLeave += _content_MouseLeave;
@@ -93,7 +95,12 @@ namespace go
 				}
 			}
 			base.ClearBinding ();
-
+		}
+		public override void ResolveBindings ()
+		{
+			base.ResolveBindings ();
+			if (Content != null)
+				Content.ResolveBindings ();
 		}
 
 		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true

@@ -34,6 +34,8 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"test_Listbox.goml",
+			"testCombobox.goml",
 			"fps.goml",
 			"testCheckbox.goml",
 			"testExpandable.goml",
@@ -48,7 +50,6 @@ namespace test
 			"testMsgBox.goml",
 			"testGrid.goml",
 			"testMeter.goml",
-//			"testCombobox.goml",
 //			"test4.goml",
 		};
 
@@ -101,7 +102,8 @@ namespace test
 			base.OnLoad (e);
 			//this.AddWidget(new test4());
 
-			LoadInterface("Interfaces/" + testFiles[idx]);
+			GraphicObject obj = LoadInterface("Interfaces/" + testFiles[idx]);
+			obj.DataSource = this;
 		}
 		protected override void OnUpdateFrame (FrameEventArgs e)
 		{
@@ -128,7 +130,8 @@ namespace test
 			if (idx == testFiles.Length)
 				idx = 0;
 			this.Title = testFiles [idx];
-			LoadInterface("Interfaces/" + testFiles[idx]);
+			GraphicObject obj = LoadInterface("Interfaces/" + testFiles[idx]);
+			obj.DataSource = this;
 
 		}
 

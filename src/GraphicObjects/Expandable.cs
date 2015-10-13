@@ -116,6 +116,11 @@ namespace go
 			IsExpanded = !IsExpanded;
 			base.onMouseClick (sender, e);
 		}
-
+		public override void ResolveBindings ()
+		{
+			base.ResolveBindings ();
+			if (Content != null)
+				Content.ResolveBindings ();
+		}
 	}
 }

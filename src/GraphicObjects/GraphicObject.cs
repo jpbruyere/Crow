@@ -76,6 +76,7 @@ namespace go
 		#endregion
 
 		#region public fields
+		public GraphicObject LogicalParent;
 		public Rectangle Bounds;
 		public Rectangle Slot = new Rectangle ();
 		public object Tag;
@@ -85,8 +86,20 @@ namespace go
 		#region ILayoutable
 		[XmlIgnore]public ILayoutable Parent { 
 			get { return _parent; }
-			set { _parent = value; }
+			set {
+//				if (_parent == value)
+//					return;
+//				if (_parent != null)
+//					ClearBinding ();
+//				
+				_parent = value;
+//
+//				if (DataSource != null)
+//					ResolveBindings ();
+			}
 		}
+
+
 		[XmlIgnore]public virtual Rectangle ClientRectangle {
 			get {
 				Rectangle cb = Slot.Size;
@@ -336,7 +349,7 @@ namespace go
 		}
 		object dataSource;
 
-		[XmlIgnore]public object DataSource {
+		[XmlIgnore]public virtual object DataSource {
 			set {
 				if (dataSource == value)
 					return;
@@ -351,7 +364,8 @@ namespace go
 			}
 			get {				
 				return dataSource == null ? 
-					Parent is GraphicObject ? (Parent as GraphicObject).DataSource : null : dataSource;
+					LogicalParent == null ?
+					Parent is GraphicObject ? (Parent as GraphicObject).DataSource : null :  LogicalParent.DataSource : dataSource;
 			}
 		}
 		#endregion
@@ -799,6 +813,8 @@ namespace go
 		{
 			List<Binding> resolved = new List<Binding> ();
 			foreach (Binding b in Bindings) {
+				if (!string.IsNullOrEmpty (b.DynMethodId))
+					continue;
 				if (b.Source.Member.MemberType == MemberTypes.Event) {
 					if (b.Expression.StartsWith("{")){
 						CompileEventSource(b);
@@ -854,9 +870,13 @@ namespace go
 
 					Type[] args = {typeof(object), typeof(object),handlerArgsType};
 					dm = new DynamicMethod(grouped[0].NewDynMethodId,
-						typeof(void), 
+						MethodAttributes.Family | MethodAttributes.FamANDAssem | MethodAttributes.NewSlot,
+						CallingConventions.Standard,
+						typeof(void),
 						args,
-						sourceType);
+						sourceType,true);
+
+
 					
 
 					il = dm.GetILGenerator(256);
@@ -905,7 +925,7 @@ namespace go
 						}else
 							throw new Exception ("unandled source member type for binding");						
 					}else if (string.IsNullOrEmpty(b.Expression))
-						targetValue= grouped [0].Target;//empty binding exp=> bound to target object by default
+						targetValue= grouped [0].Target.Instance;//empty binding exp=> bound to target object by default
 					//TODO: handle other dest type conversions
 					if (b.Source.Property.PropertyType == typeof(string)){
 						if (targetValue == null){
@@ -925,7 +945,7 @@ namespace go
 					if (b.Target.Member != null)
 						il.Emit (OpCodes.Ldstr, b.Target.Member.Name);
 					else
-						il.Emit (OpCodes.Ldstr, b.Expression);
+						il.Emit (OpCodes.Ldstr, b.Expression.Split('/').LastOrDefault());
 					il.Emit (OpCodes.Callvirt, stringEquals);
 					il.Emit (OpCodes.Brtrue, jumpTable[i]);
 					i++;

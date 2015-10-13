@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0"?>
 <Border BorderWidth="1" BorderColor="LightGray">
-	<GenericStack Orientation="{Orientation}" Width="0" Height="0">
-		<Button Width="12" Height="12" MouseClick="onScrollBack">
-			<Image Margin="1" Path="#go.Images.Icons.updown.svg" SvgSub="up"/>
+	<GenericStack Orientation="{../../Orientation}" Width="0" Height="0">
+		<Button Width="12" Height="12" MouseClick="../../../onScrollBack">
+			<Image Margin="1" Path="#go.Images.Icons.updown.svg" SvgSub="../../../../up"/>
 		</Button>
-		<Slider Name="Slider" Value="{Scroll}" Maximum="{MaximumScroll}" 
-			Width="{Width}" Height="{Height}" Orientation="{Orientation}"
-			ValueChanged="onSliderValueChange"/>
-		<Button Width="12" Height="12" MouseClick="onScrollForth">
-			<Image Margin="1" Path="#go.Images.Icons.updown.svg" SvgSub="down"/>
+		<Slider Name="Slider" Value="{../../../Scroll}" Maximum="{../../../MaximumScroll}" 
+			Width="{../../../Width}" Height="{../../../Height}" Orientation="{../../../Orientation}"
+			ValueChanged="../../../onSliderValueChange"/>
+		<Button Width="12" Height="12" MouseClick="../../../onScrollForth">
+			<Image Margin="1" Path="#go.Images.Icons.updown.svg" SvgSub="../../../../down"/>
 		</Button>
 	</GenericStack>
 </Border>

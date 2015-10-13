@@ -441,7 +441,7 @@ namespace go
 			XmlSerializer xs = new XmlSerializer (type);
 
 			result = (GraphicObject)xs.Deserialize (stream);
-			result.DataSource = hostClass;
+			//result.DataSource = hostClass;
 
 			#if DEBUG_LOAD_TIME
 			loadingTime.Stop ();

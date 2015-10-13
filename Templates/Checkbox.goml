@@ -1,5 +1,9 @@
 ﻿<?xml version="1.0"?>
-<HorizontalStack Spacing="1" Height="{TemplatedHeight}" Width="{TemplatedWidth}">
-	<Image Margin="2" Width="14" Height="14" Path="{Image}" SvgSub="{SvgSub}"/>
-	<Label Text="{Caption}" Height="{TemplatedHeight}" Width="{TemplatedWidth}"/>
+<!--<HorizontalStack Spacing="1" Height="100" Width="300">
+	<Image Margin="2" Width="14" Height="14" Path="{../../Image}"  SvgSub="{../../SvgSub}"/>
+	<Label Text="{../../Caption}" Height="80" Width="200"/>
+</HorizontalStack>-->
+<HorizontalStack Spacing="1" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}">
+	<Image Margin="2" Width="14" Height="14" Path="{../../Image}" SvgSub="{../../SvgSub}"/>
+	<Label Text="{../../Caption}" Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}"/>
 </HorizontalStack>

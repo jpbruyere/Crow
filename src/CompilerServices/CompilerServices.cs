@@ -29,6 +29,8 @@ namespace go
 		}
 		public bool FindMember(string _memberName)
 		{
+			if (Instance == null)
+				return false;
 			Type t = Instance.GetType ();
 			Member = t.GetMember (_memberName,BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance).FirstOrDefault ();
 
@@ -79,7 +81,7 @@ namespace go
 
 			//if binding exp = '{}' => binding is done on datasource
 			if (string.IsNullOrEmpty (Expression)) {
-				Target = new MemberReference (Source.Instance);
+				Target = new MemberReference ((Source.Instance as GraphicObject).DataSource);
 				return true;
 			}
 
@@ -101,7 +103,7 @@ namespace go
 					if (tmp == null)
 						return false;
 					if (bindingExp [ptr] == "..")
-						tmp = tmp.Parent as GraphicObject;
+						tmp = tmp.Parent as ILayoutable;
 					else if (bindingExp [ptr] == ".") {
 						if (ptr > 0)
 							throw new Exception ("Syntax error in binding, './' may only appear in first position");						
@@ -110,6 +112,9 @@ namespace go
 						tmp = (tmp as GraphicObject).FindByName (bindingExp [ptr]);
 					ptr++;
 				}
+
+				if (tmp == null)
+					return false;
 
 				string[] bindTrg = bindingExp [ptr].Split ('.');
 

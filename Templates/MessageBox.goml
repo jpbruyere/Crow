@@ -1,27 +1,27 @@
 ﻿<?xml version="1.0"?>
-<Border Height="{TemplatedHeight}" Width="{TemplatedWidth}" BorderWidth="1" BorderColor="White" CornerRadius="10" >
-	<VerticalStack Height="{TemplatedHeight}" Width="{TemplatedWidth}" Background="0,4;0,4;0,4;0,4">
-		<Border BorderWidth="1" BorderColor="White" Width="{TemplatedWidth}" Height="-1" 
+<Border Height="{../TemplatedHeight}" Width="{../TemplatedWidth}" BorderWidth="1" BorderColor="White" CornerRadius="10" >
+	<VerticalStack Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}" Background="0,4;0,4;0,4;0,4">
+		<Border BorderWidth="1" BorderColor="White" Width="{../../../TemplatedWidth}" Height="-1" 
 				Background="0,1;0,5;1,0;0,5">
-			<HorizontalStack Name="hs" Margin="1" Spacing="1" Width="{TemplatedWidth}" Height="-1" >
+			<HorizontalStack Name="hs" Margin="1" Spacing="1" Width="{../../../../TemplatedWidth}" Height="-1" >
 				<GraphicObject Width="5" Height="5"/>
-				<Image Margin="1" Width="12" Height="12" Path="{Icon}"/>
-				<Label Foreground="White" Width="{TemplatedWidth}" Margin="1" TextAlignment="Center" Text="{Title}" />
+				<Image Margin="1" Width="12" Height="12" Path="{../../../../../Icon}"/>
+				<Label Foreground="White" Width="{../../../../../TemplatedWidth}" Margin="1" TextAlignment="Center" Text="{../../../../../Title}" />
 				<Border CornerRadius="6" BorderWidth="1" BorderColor="Transparent"  Height="12" Width="12"
 					MouseEnter="{BorderColor=White}" MouseLeave="{BorderColor=Transparent}">
 					<Image Focusable="true" Name="Image" Margin="0" Width="0" Height="0" Path="#go.Images.Icons.exit2.svg"
-						 MouseClick="butQuitPress"/>
+						 MouseClick="../../../../../../butQuitPress"/>
 				</Border>
 				<GraphicObject Width="5" Height="5"/>
 			</HorizontalStack>
 		</Border>
-		<HorizontalStack Spacing="10" Margin="10" Height="{TemplatedHeight}" Width="{TemplatedWidth}">
+		<HorizontalStack Spacing="10" Margin="10" Height="{../../../TemplatedHeight}" Width="{../../../TemplatedWidth}">
 			<Image Name="Image" Width="32" Height="32"
 				Path="#go.Images.Icons.iconInfo.svg" />
-			<TextRun Font="serif, 12" Height="{TemplatedHeight}" Width="{TemplatedWidth}" Text="{Message}"
+			<TextRun Font="serif, 12" Height="{../../../../TemplatedHeight}" Width="{../../../../TemplatedWidth}" Text="{../../../../Message}"
 				Multiline="true" WordWrap="true"/>		
 		</HorizontalStack>
-		<HorizontalStack Height="-1" Width="{TemplatedWidth}" Margin="5">
+		<HorizontalStack Height="-1" Width="{../../../TemplatedWidth}" Margin="5">
 			<GraphicObject Height="5"/>
 			<Button Text="Ok"/>
 			<Button Text="Cancel"/>
