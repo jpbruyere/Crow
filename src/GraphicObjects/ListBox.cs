@@ -75,45 +75,60 @@ namespace go
 			get {
 				return data;
 			}
-			set {				
+			set {			
+				if (loadingInProgress) {					
+					thread.Join ();
+					Interface.LoadingLists.Remove (this);
+					pendingChildrenAddition = null;
+					loadingInProgress = false;
+				}
+
 				data = value;
 
-				foreach (GraphicObject c in _list.Children) {
-					c.ClearBinding ();
-				}
-				_list.Children.Clear ();
-				_list.registerForGraphicUpdate ();
+				_list.ClearChildren ();
+
 				if (data == null)
 					return;
 
 				pendingChildrenAddition = new Queue<GraphicObject> ();
 				threadedLoadingFinished = false;
+				Interface.LoadingLists.Add (this);
 
-				Thread t = new Thread (loadingThread);
-				t.Start ();
-				t.Join ();
-
+				thread = new Thread(loadingThread);
+				loadingInProgress = true;
+				thread.Start ();
 			}
 		}
-		public override void UpdateLayout (LayoutingType layoutType)
-		{
-			CheckPendingChildrenAddition ();
-			base.UpdateLayout (layoutType);
-		}
+//		public override void UpdateLayout (LayoutingType layoutType)
+//		{
+//			CheckPendingChildrenAddition ();
+//			base.UpdateLayout (layoutType);
+//		}
 		internal void CheckPendingChildrenAddition()
 		{
-			if (pendingChildrenAddition == null)
+			if (!loadingInProgress)
 				return;
 			lock (pendingChildrenAddition) {
 				if (!threadedLoadingFinished && pendingChildrenAddition.Count < 50)
 					return;
-				while (pendingChildrenAddition.Count > 0)
-					_list.addChild (pendingChildrenAddition.Dequeue ());
+				while (pendingChildrenAddition.Count > 0) {
+					GraphicObject tmp = pendingChildrenAddition.Dequeue ();
+					tmp.DataSource = tmp.Tag;
+					tmp.Tag = null;
+					_list.addChild (tmp);
+				}
+				if (threadedLoadingFinished) {
+					Interface.LoadingLists.Remove (this);
+					pendingChildrenAddition = null;
+					loadingInProgress = false;
+				}
 			}
 		}
 
-		volatile Queue<GraphicObject> pendingChildrenAddition;
+		Queue<GraphicObject> pendingChildrenAddition;
 		volatile bool threadedLoadingFinished = false;
+		volatile bool loadingInProgress = false;
+		Thread thread;
 
 		void loadingThread()
 		{
@@ -133,9 +148,8 @@ namespace go
 			foreach (var item in data) {
 				ms.Seek(0,SeekOrigin.Begin);
 				GraphicObject g = Interface.Load (ms, t);
-				g.DataSource = item;
+				g.Tag = item;
 				g.MouseClick += itemClick;
-
 				lock (pendingChildrenAddition) {
 					pendingChildrenAddition.Enqueue (g);
 				}

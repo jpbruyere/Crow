@@ -116,9 +116,10 @@ namespace go
 			if (template == null) {
 				DefaultTemplate dt = (DefaultTemplate)this.GetType ().GetCustomAttributes (typeof(DefaultTemplate), true).FirstOrDefault();
 				this.SetChild (Interface.Load (dt.Path, this));
-				this.child.ResolveBindings ();
 			}else
 				this.SetChild (template);
+			
+			this.child.ResolveBindings ();
 		}
 			
 		#region IXmlSerializable

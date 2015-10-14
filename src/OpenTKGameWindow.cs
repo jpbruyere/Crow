@@ -254,6 +254,12 @@ namespace go
 			surf = new ImageSurface(bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height,ClientRectangle.Width*4);
 			ctx = new Context(surf);
 
+			if (Interface.LoadingLists.Count > 0) {
+				ListBox[] loadings = new ListBox[Interface.LoadingLists.Count];
+				Interface.LoadingLists.CopyTo (loadings, 0);
+				for (int i = 0; i < loadings.Length; i++)
+					loadings [i].CheckPendingChildrenAddition ();				
+			}
 
 			GraphicObject[] invGOList = new GraphicObject[GraphicObjects.Count];
 			GraphicObjects.CopyTo (invGOList,0);

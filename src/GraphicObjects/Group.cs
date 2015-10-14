@@ -53,7 +53,17 @@ namespace go
             Children.Remove(child);
 			this.RegisterForLayouting ((int)LayoutingType.Sizing);
         }
-
+		public virtual void ClearChildren()
+		{
+			int lim = children.Count;
+			for (int i = 0; i < lim; i++) {
+				GraphicObject g = Children [0];
+				g.ClearBinding ();
+				g.Parent = null;
+				Children.Remove(g);				
+			}
+			this.RegisterForLayouting ((int)LayoutingType.Sizing);
+		}
 		public void putWidgetOnTop(GraphicObject w)
 		{
 			if (Children.Contains(w))

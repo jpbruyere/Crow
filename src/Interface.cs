@@ -49,6 +49,7 @@ namespace go
 		/// </summary>
 		public static List<object> References = new List<object> ();
 		public static Queue<int> FreeRefIndices = new Queue<int> ();
+		public static List<ListBox> LoadingLists= new List<ListBox>();
 
 		public static void Unreference (Object o)
 		{

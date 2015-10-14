@@ -22,7 +22,7 @@ namespace go
 {
 	[DefaultTemplate("#go.Templates.Combobox.goml")]
 	[DefaultOverlayTemplate("#go.Templates.ComboboxOverlay.goml")]
-	public class Combobox : TemplatedControl
+	public class Combobox : TemplatedContainer
     {		
 		#region CTOR
 		public Combobox() : base(){	}	
@@ -48,14 +48,14 @@ namespace go
 			base.loadTemplate (template);
 			loadOverlayTemplate (null);
 		}
-//		public override GraphicObject Content {
-//			get {
-//				throw new NotImplementedException ();
-//			}
-//			set {
-//				throw new NotImplementedException ();
-//			}
-//		}
+		public override GraphicObject Content {
+			get {
+				throw new NotImplementedException ();
+			}
+			set {
+				throw new NotImplementedException ();
+			}
+		}
 		#endregion
 
 		protected virtual void loadOverlayTemplate(GraphicObject overlayTemplate)
@@ -84,7 +84,8 @@ namespace go
 				//TODO:reload list with new template?
 				_overlayTemplate = value; 
 
-				Overlay = Interface.Load (_overlayTemplate, this, !Interface.DontResoveGOML);
+				Overlay = Interface.Load (_overlayTemplate);
+				Overlay.ResolveBindings ();
 				_list = Overlay.FindByName ("List") as Group;
 			}
 		}
@@ -111,7 +112,7 @@ namespace go
 					Text = "";
 				else
 					Text = _selectedItem.ToString ();
-			}
+				}
 		}
 		public object SelectedItem{
 			set {
@@ -159,6 +160,7 @@ namespace go
 
 				Thread t = new Thread (loadingThread);
 				t.Start ();
+				t.Join ();
 
 			}
 		}
@@ -226,6 +228,7 @@ namespace go
 				if (_overlay != null) {
 					_overlay.LayoutChanged -= _overlay_LayoutChanged;
 					_overlay.MouseLeave -= _overlay_MouseLeave;
+					_overlay.LogicalParent = null;
 				}
 
 				_overlay = value; 
@@ -233,6 +236,7 @@ namespace go
 				if (_overlay == null)
 					return;
 
+				_overlay.LogicalParent = this;
 				_overlay.Focusable = true;
 				_overlay.LayoutChanged += _overlay_LayoutChanged;
 				_overlay.MouseLeave += _overlay_MouseLeave;
@@ -351,6 +355,11 @@ namespace go
 			base.ClearBinding ();
 
 		}
-
+		public override void ResolveBindings ()
+		{
+			base.ResolveBindings ();
+			if (Overlay != null)
+				Overlay.ResolveBindings ();
+		}
 	}
 }

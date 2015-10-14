@@ -219,7 +219,12 @@ namespace go
 			TopContainer.DeleteWidget (parent as GraphicObject);
 		}
 
-
+		public override void ResolveBindings ()
+		{
+			base.ResolveBindings ();
+			if (Content != null)
+				Content.ResolveBindings ();
+		}
 	}
 }
 

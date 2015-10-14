@@ -20,13 +20,15 @@ namespace test
 	class GOLIBTests : OpenTKGameWindow, IValueChange
 	{
 		#region IValueChange implementation
-
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-
+		public virtual void NotifyValueChanged(string MemberName, object _value)
+		{
+			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));			
+		}
 		#endregion
 
 		public GOLIBTests ()
-			: base(600, 400,"test: press spacebar to toogle test files")
+			: base(600, 500,"test: press spacebar to toogle test files")
 		{
 			VSync = VSyncMode.Off;
 		}
@@ -124,6 +126,11 @@ namespace test
 			base.OnKeyDown (e);
 			if (e.Key == Key.Escape) {
 				this.Quit ();
+				return;
+			}else if (e.Key == Key.L) {
+				TestList.Add ("new string");
+				NotifyValueChanged ("TestList", TestList);
+				return;
 			}
 			ClearInterface ();
 			idx++;
