@@ -93,6 +93,22 @@ namespace test
 		public string update = "";
 		#endregion
 
+		public int intValue = 25;
+
+		public int IntValue {
+			get {
+				return intValue;
+			}
+			set {
+				intValue = value;
+				NotifyValueChanged ("IntValue", intValue);
+			}
+		}
+		void onSpinnerValueChange(object sender, ValueChangeEventArgs e){
+			if (e.MemberName != "Value")
+				return;
+			intValue = Convert.ToInt32(e.NewValue);
+		}
 		public List<String> TestList = new List<string>( new string[] 
 			{
 				"string 1",
