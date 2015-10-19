@@ -36,8 +36,8 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"testSpinner.goml",
 			"test_Listbox.goml",
-			"testCombobox.goml",
 			"fps.goml",
 			"testCheckbox.goml",
 			"testExpandable.goml",
@@ -53,6 +53,7 @@ namespace test
 			"testGrid.goml",
 			"testMeter.goml",
 //			"test4.goml",
+//			"testCombobox.goml",
 		};
 
 		#region FPS

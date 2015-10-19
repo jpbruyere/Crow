@@ -185,6 +185,8 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="image\tetra.png" />
+    <EmbeddedResource Include="image\folder0.svg" />
+    <EmbeddedResource Include="image\folder1.svg" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GOLib.csproj">

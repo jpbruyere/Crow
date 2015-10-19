@@ -15,12 +15,21 @@ using System.Threading;
 using System.Reflection;
 using System.Linq;
 using System.IO;
+using System.Collections.Generic;
 
 
 namespace test2
 {
-	class GOLIBTest_DirViewer : OpenTKGameWindow
+	class GOLIBTest_DirViewer : OpenTKGameWindow, IValueChange
 	{
+		#region IValueChange implementation
+		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+		public void NotifyValueChanged(string name, object value)
+		{
+			ValueChanged.Raise (this, new ValueChangeEventArgs (name, value));
+		}
+		#endregion
+
 		public GOLIBTest_DirViewer ()
 			: base(1024, 600,"test")
 		{}
@@ -30,11 +39,16 @@ namespace test2
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
+
 			CurDir = new DirContainer(new DirectoryInfo ("/home/jp/"));
 
-			this.AddWidget(Interface.Load ("Interfaces/testDirViewer.goml", CurDir));
+			GraphicObject dv = Interface.Load ("Interfaces/testDirViewer.goml");
+			this.AddWidget(dv);
+			dv.DataSource = CurDir;
+
 			//LoadInterface("Interfaces/testTypeViewer.goml", out g);
 		}
+			
 
 		[STAThread]
 		static void Main ()
@@ -46,8 +60,16 @@ namespace test2
 			}
 		}
 	}
-	public class DirContainer
+	public class DirContainer: IValueChange
 	{
+		#region IValueChange implementation
+		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+		public void NotifyValueChanged(string name, object value)
+		{
+			ValueChanged.Raise (this, new ValueChangeEventArgs (name, value));
+		}
+		#endregion
+
 		public DirectoryInfo CurDir;
 		public DirContainer(DirectoryInfo _dir){
 			CurDir = _dir;
@@ -58,7 +80,10 @@ namespace test2
 		public FileSystemInfo[] GetFileSystemInfos
 		{
 			get {
-				return CurDir.GetFileSystemInfos ().Where(fi => !fi.Attributes.HasFlag(FileAttributes.Hidden)).ToArray();
+				List<FileSystemInfo> tmp = CurDir.GetFileSystemInfos ().Where(fi => !fi.Attributes.HasFlag(FileAttributes.Hidden)).ToList();
+				if (CurDir.Parent != null)
+					tmp.Insert (0, CurDir.Parent);
+				return tmp.ToArray ();
 			}
 		}
 		void onDirUp(object sender, MouseButtonEventArgs e)
@@ -68,6 +93,13 @@ namespace test2
 		public void onMouseDown(object sender, MouseButtonEventArgs e)
 		{
 			Debug.WriteLine (sender.ToString ());
+		}
+		void OnSelectedItemChanged (object sender, SelectionChangeEventArgs e)
+		{
+			CurDir = e.NewValue as DirectoryInfo;
+			NotifyValueChanged ("GetFileSystemInfos", GetFileSystemInfos);
+			NotifyValueChanged ("Name", Name);
+
 		}
 	}
 

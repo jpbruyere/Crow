@@ -96,7 +96,9 @@ namespace go
 
 				thread = new Thread(loadingThread);
 				loadingInProgress = true;
+				thread.IsBackground = true;
 				thread.Start ();
+				thread.Join ();
 			}
 		}
 //		public override void UpdateLayout (LayoutingType layoutType)
@@ -109,7 +111,7 @@ namespace go
 			if (!loadingInProgress)
 				return;
 			lock (pendingChildrenAddition) {
-				if (!threadedLoadingFinished && pendingChildrenAddition.Count < 50)
+				if (!threadedLoadingFinished && pendingChildrenAddition.Count < 10)
 					return;
 				while (pendingChildrenAddition.Count > 0) {
 					GraphicObject tmp = pendingChildrenAddition.Dequeue ();
