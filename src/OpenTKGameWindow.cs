@@ -142,7 +142,8 @@ namespace go
 				if (_focusedWidget != null)
 					_focusedWidget.onUnfocused (this, null);
 				_focusedWidget = value;
-				_focusedWidget.onFocused (this, null);
+				if (_focusedWidget != null)
+					_focusedWidget.onFocused (this, null);
 			}
 		}
 		#endregion
@@ -437,46 +438,57 @@ namespace go
         void Mouse_Move(object sender, MouseMoveEventArgs e)
         {
 			if (_activeWidget != null) {
-				//send move evt even if mouse move outside bounds
-				_activeWidget.onMouseMove (_activeWidget, e);
-				return;
+				//first, ensure object is still in the graphic tree
+				if (_activeWidget.TopContainer == null) {
+					activeWidget = null;
+				} else {
+					
+					//send move evt even if mouse move outside bounds
+					_activeWidget.onMouseMove (_activeWidget, e);
+					return;
+				}
 			}
 
 			if (_hoverWidget != null) {
-				//check topmost graphicobject first
-				GraphicObject tmp = _hoverWidget;
-				GraphicObject topc = null;
-				while (tmp is GraphicObject) {
-					topc = tmp;
-					tmp = tmp.Parent as GraphicObject;
-				}
-				int idxhw = GraphicObjects.IndexOf (topc);
-				if (idxhw != 0) {
-					int i = 0;
-					while (i < idxhw) {
-						if (GraphicObjects [i].MouseIsIn (e.Position)) {
-							_hoverWidget.onMouseLeave (this, e);
-							GraphicObjects [i].checkHoverWidget (e);
-							return;
-						}
-						i++;
-					}
-				}
-					
-					
-				if (_hoverWidget.MouseIsIn (e.Position)) {
-					_hoverWidget.checkHoverWidget (e);
-					return;
+				//first, ensure object is still in the graphic tree
+				if (_hoverWidget.TopContainer == null) {
+					hoverWidget = null;
 				} else {
-					_hoverWidget.onMouseLeave (this, e);
-					//seek upward from last focused graph obj's
-					while (_hoverWidget.Parent as GraphicObject!=null) {
-						_hoverWidget = _hoverWidget.Parent as GraphicObject;
-						if (_hoverWidget.MouseIsIn (e.Position)) {
-							_hoverWidget.checkHoverWidget (e);
-							return;
-						} else
-							_hoverWidget.onMouseLeave (this, e);
+					//check topmost graphicobject first
+					GraphicObject tmp = _hoverWidget;
+					GraphicObject topc = null;
+					while (tmp is GraphicObject) {
+						topc = tmp;
+						tmp = tmp.Parent as GraphicObject;
+					}
+					int idxhw = GraphicObjects.IndexOf (topc);
+					if (idxhw != 0) {
+						int i = 0;
+						while (i < idxhw) {
+							if (GraphicObjects [i].MouseIsIn (e.Position)) {
+								_hoverWidget.onMouseLeave (this, e);
+								GraphicObjects [i].checkHoverWidget (e);
+								return;
+							}
+							i++;
+						}
+					}
+					
+					
+					if (_hoverWidget.MouseIsIn (e.Position)) {
+						_hoverWidget.checkHoverWidget (e);
+						return;
+					} else {
+						_hoverWidget.onMouseLeave (this, e);
+						//seek upward from last focused graph obj's
+						while (_hoverWidget.Parent as GraphicObject != null) {
+							_hoverWidget = _hoverWidget.Parent as GraphicObject;
+							if (_hoverWidget.MouseIsIn (e.Position)) {
+								_hoverWidget.checkHoverWidget (e);
+								return;
+							} else
+								_hoverWidget.onMouseLeave (this, e);
+						}
 					}
 				}
 			}
@@ -495,12 +507,13 @@ namespace go
         }
         void Mouse_ButtonUp(object sender, MouseButtonEventArgs e)
         {
-			if (_activeWidget == null)
+			if (_activeWidget == null) {
+				MouseButtonUp.Raise (this, e);
 				return;
+			}
 
 			_activeWidget.onMouseButtonUp (this, e);
 			_activeWidget = null;
-			MouseButtonUp.Raise (this, e);
         }
         void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
         {

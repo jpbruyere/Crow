@@ -42,7 +42,6 @@ namespace go
 		protected override void loadTemplate (GraphicObject template = null)
 		{
 			base.loadTemplate (template);			
-			labCpt = this.child.FindByName ("labCpt") as Label;
 		}
 
 		#endregion
@@ -54,7 +53,6 @@ namespace go
 //				return;
 
 			Value += this.SmallIncrement;
-			labCpt.Text = Value.ToString ();
 		}
 		void onDown (object sender, MouseButtonEventArgs e)
 		{
@@ -63,7 +61,6 @@ namespace go
 //				return;
 
 			Value -= this.SmallIncrement;
-			labCpt.Text = Value.ToString ();
 		}
 
 	}

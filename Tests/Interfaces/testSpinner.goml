@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0"?>
-<Container Name="TopContainer" Width="400" Height="350"
-	Margin="20" Focusable="True" Background="DarkGray">
+<VerticalStack Name="TopContainer" Width="400" Height="-1"
+	Margin="20" Background="DarkGray">
 
-	<Spinner Height="-1" Width="-1" Value="5"></Spinner>
-</Container>
+	<Spinner Value="5"/>
+	<Spinner Value="5"/>
+</VerticalStack>
