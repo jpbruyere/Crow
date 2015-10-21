@@ -19,6 +19,10 @@ namespace go
 		}
 		#endregion
 
+		#region EVENT HANDLERS
+		public event EventHandler<EventArgs> ChildrenCleared;
+		#endregion
+
         bool _multiSelect = false;
 		List<GraphicObject> children = new List<GraphicObject>();
 
@@ -63,6 +67,7 @@ namespace go
 				Children.Remove(g);				
 			}
 			this.RegisterForLayouting ((int)LayoutingType.Sizing);
+			ChildrenCleared.Raise (this, new EventArgs ());
 		}
 		public void putWidgetOnTop(GraphicObject w)
 		{

@@ -105,20 +105,41 @@ namespace go
 		#region GraphicObject Overrides
 		void OnChildLayoutChanges (object sender, LayoutChangeEventArgs arg)
 		{
+			int maxScroll = MaximumScroll;
 			if (_verticalScrolling) {
-				if (arg.LayoutType  == LayoutingType.Height)
-					ValueChanged.Raise(this, new ValueChangeEventArgs("MaximumScroll", MaximumScroll));				
-			}else if (arg.LayoutType  == LayoutingType.Width)
-				ValueChanged.Raise(this, new ValueChangeEventArgs("MaximumScroll", MaximumScroll));				
+				if (arg.LayoutType == LayoutingType.Height) {
+					if (maxScroll < ScrollY) {
+						Debug.WriteLine ("scrolly={0} maxscroll={1}", ScrollY, maxScroll);
+						ScrollY = 0;
+					}
+					ValueChanged.Raise (this, new ValueChangeEventArgs ("MaximumScroll", maxScroll));
+				}
+			} else if (arg.LayoutType == LayoutingType.Width) {
+				if (maxScroll < ScrollX)
+					ScrollX = 0;
+				ValueChanged.Raise (this, new ValueChangeEventArgs ("MaximumScroll", maxScroll));
+			}
+		}
+		void onChildListCleared(object sender, EventArgs e){
+			ScrollY = 0;
+			ScrollX = 0;
 		}
 		public override T SetChild<T> (T _child)
 		{			
 			GraphicObject c = child as GraphicObject;
-			if (c != null)
+			Group g = child as Group;
+			if (c != null) {
 				c.LayoutChanged -= OnChildLayoutChanges;
+				if (g != null)
+					g.ChildrenCleared -= onChildListCleared;
+			}
 			c = _child as GraphicObject;
-			if (c != null)
+			g = _child as Group;
+			if (c != null) {
 				c.LayoutChanged += OnChildLayoutChanges;
+				if (g != null)
+					g.ChildrenCleared += onChildListCleared;				
+			}
 			return base.SetChild (_child);
 		}
 		#endregion
