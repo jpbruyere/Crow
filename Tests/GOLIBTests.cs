@@ -140,7 +140,10 @@ namespace test
 		}
 		protected override void OnKeyDown (KeyboardKeyEventArgs e)
 		{
-			base.OnKeyDown (e);
+			if (FocusedWidget != null) {
+				base.OnKeyDown (e);
+				return;
+			}
 			if (e.Key == Key.Escape) {
 				this.Quit ();
 				return;

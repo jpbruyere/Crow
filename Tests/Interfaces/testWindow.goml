@@ -1,5 +1,4 @@
 ﻿<?xml version="1.0"?>
-<!--<Group>-->
 <Window Name="window1" Left="10" Top="10" Title="Test window" 
 		Width="250" Height="300" >
 	<VerticalStack Name="contentVSStack" Margin="10" Spacing="10">

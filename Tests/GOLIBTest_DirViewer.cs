@@ -35,6 +35,7 @@ namespace test2
 		{}
 
 		public DirContainer CurDir;
+		FileDialog dialog;
 
 		protected override void OnLoad (EventArgs e)
 		{
@@ -42,9 +43,12 @@ namespace test2
 
 			CurDir = new DirContainer(new DirectoryInfo ("/home/jp/"));
 
-			GraphicObject dv = Interface.Load ("Interfaces/testDirViewer.goml");
-			this.AddWidget(dv);
-			dv.DataSource = CurDir;
+//			GraphicObject dv = Interface.Load ("Interfaces/testDirViewer.goml");
+//			this.AddWidget(dv);
+//			dv.DataSource = CurDir;
+			dialog = new FileDialog();
+			dialog.SearchPattern = ".png|.jpg|.jpeg|.gif|.svg";
+			dialog.Show ();
 
 			//LoadInterface("Interfaces/testTypeViewer.goml", out g);
 		}

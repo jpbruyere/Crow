@@ -76,6 +76,7 @@ namespace go
 				_pic = new BmpPicture ();
 
 			_pic.LoadImage (path);
+			registerForGraphicUpdate ();
 		}
 		#endregion
 

@@ -32,7 +32,7 @@ namespace go
 //			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), _title)
 		{
 			//VSync = VSyncMode.On;
-
+			currentWindow = this;
 			//Load cursors
 			XCursor.Cross = XCursorFile.Load("#go.Images.Icons.Cursors.cross").Cursors[0];
 			XCursor.Default = XCursorFile.Load("#go.Images.Icons.Cursors.arrow").Cursors[0];

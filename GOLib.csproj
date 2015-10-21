@@ -128,6 +128,7 @@
     <Compile Include="src\GraphicObjects\Combobox.cs" />
     <Compile Include="src\SelectionChangeEventArgs.cs" />
     <Compile Include="src\ValueChangeEventArgs.cs" />
+    <Compile Include="src\GraphicObjects\FileDialog.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -207,6 +208,10 @@
     <EmbeddedResource Include="Templates\Groupbox.goml" />
     <EmbeddedResource Include="Templates\Combobox.goml" />
     <EmbeddedResource Include="Templates\ComboboxOverlay.goml" />
+    <EmbeddedResource Include="Templates\FileDialog.goml" />
+    <EmbeddedResource Include="Templates\tmpDirItem.goml" />
+    <EmbeddedResource Include="Templates\ScrollingListBox.goml" />
+    <EmbeddedResource Include="Templates\imgItemTemplate.goml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\Icons\Cursors\hand" />

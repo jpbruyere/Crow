@@ -22,6 +22,8 @@ namespace go
 		bool _scrollbarVisible;
 		double _scrollX = 0.0;
 		double _scrollY = 0.0;
+		int scrollSpeed;
+
 
 
 		#region public properties
@@ -92,7 +94,14 @@ namespace go
 			}
 		}
 
-		public static int ScrollSpeed = 10;
+		[XmlAttributeAttribute][DefaultValue(30)]
+		public int ScrollSpeed {
+			get { return scrollSpeed; }
+			set {
+				scrollSpeed = value;
+				ValueChanged.Raise(this, new ValueChangeEventArgs("ScrollSpeed", scrollSpeed));
+			}
+		}
 
 		#endregion
 
@@ -147,6 +156,10 @@ namespace go
 		#region Mouse handling
 		public override bool MouseIsIn (Point m)
 		{			
+			Debug.WriteLine ("Mouse in scroller: {0} scr coord:{1} mouse:{2}",
+				base.ScreenCoordinates (Slot).ContainsOrIsEqual (m),
+				base.ScreenCoordinates (Slot), m);
+
 			return Visible ? base.ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false; 
 		}
 		public override void checkHoverWidget (MouseMoveEventArgs e)
