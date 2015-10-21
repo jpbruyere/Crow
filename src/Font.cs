@@ -3,13 +3,6 @@ using Cairo;
 
 namespace go
 {
-	public enum FontStyle
-	{
-		Normal,
-		Bold,
-		Italic,
-		Underlined
-	}
 	public class Font
 	{
 		#region CTOR

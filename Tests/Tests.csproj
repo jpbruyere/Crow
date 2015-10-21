@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>test2.GOLIBTest_DirViewer</StartupObject>
+    <StartupObject>testGLBackend.GOLIBTestglb</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>..\bin\$(configuration)</OutputPath>
     <IntermediateOutputPath>obj\$(configuration)</IntermediateOutputPath>
@@ -42,6 +42,9 @@
       <HintPath>..\..\opentk\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cairo" />
+    <Reference Include="GGL">
+      <HintPath>..\..\GGL\bin\GGL.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GOLIBTest_5.cs" />
@@ -61,6 +64,8 @@
     <Compile Include="..\bin\Debug\Interfaces\test4.goml.cs">
       <Link>Interfaces\test4.goml.cs</Link>
     </Compile>
+    <Compile Include="testGLBackend.cs" />
+    <Compile Include="testGLBackend %28copier%29.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -195,6 +200,10 @@
     <ProjectReference Include="..\GOLib.csproj">
       <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
       <Name>GOLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SharpFont-2.5.0.1\SharpFont\SharpFont.csproj">
+      <Project>{C293DB32-FA42-486D-B128-5A12522FAE4E}</Project>
+      <Name>SharpFont</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

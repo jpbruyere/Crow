@@ -201,11 +201,14 @@ namespace go
 		{
 			GL.GetInteger (GetPName.Viewport, viewport);
 			GL.Viewport (0, 0, ClientRectangle.Width, ClientRectangle.Height);
+			bool blend = GL.GetBoolean (GetPName.Blend);
+			GL.Enable (EnableCap.Blend);
+			GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 			shader.Enable ();
 			shader.ProjectionMatrix = projectionMatrix;
 			shader.ModelViewMatrix = modelviewMatrix;
 			shader.Color = new Vector4(1f,1f,1f,1f);
-			//if (dirtyZone != Rectangle.Empty) {
+//			//if (dirtyZone != Rectangle.Empty) {
 			GL.ActiveTexture (TextureUnit.Texture0);
 			GL.BindTexture (TextureTarget.Texture2D, texID);
 			GL.TexSubImage2D (TextureTarget.Texture2D, 0,
@@ -215,6 +218,9 @@ namespace go
 			uiQuad.Render (PrimitiveType.TriangleStrip);
 
 			GL.BindTexture(TextureTarget.Texture2D, 0);
+
+			if (!blend)
+				GL.Disable (EnableCap.Blend);
 
 			shader.Disable ();
 			GL.Viewport (viewport [0], viewport [1], viewport [2], viewport [3]);

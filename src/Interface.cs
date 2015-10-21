@@ -139,9 +139,9 @@ namespace go
 						if (!string.IsNullOrEmpty (ClassName))
 							break;
 						if (CurrentGOMLPath.StartsWith ("#"))
-							ClassName = Path.GetFileNameWithoutExtension (CurrentGOMLPath.Substring (1));
+							ClassName = System.IO.Path.GetFileNameWithoutExtension (CurrentGOMLPath.Substring (1));
 						else
-							ClassName = Path.GetFileNameWithoutExtension (CurrentGOMLPath);
+							ClassName = System.IO.Path.GetFileNameWithoutExtension (CurrentGOMLPath);
 						break;
 					}
 				}
@@ -228,9 +228,9 @@ namespace go
 								newClassName = reader.GetAttribute ("Class");
 								if (string.IsNullOrEmpty (newClassName)) {
 									if (path.StartsWith ("#"))
-										newClassName = Path.GetFileNameWithoutExtension (path.Substring (1));
+										newClassName = System.IO.Path.GetFileNameWithoutExtension (path.Substring (1));
 									else
-										newClassName = Path.GetFileNameWithoutExtension (path);
+										newClassName = System.IO.Path.GetFileNameWithoutExtension (path);
 								}
 								curType = Type.GetType ("go." + root);
 

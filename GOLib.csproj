@@ -129,6 +129,22 @@
     <Compile Include="src\SelectionChangeEventArgs.cs" />
     <Compile Include="src\ValueChangeEventArgs.cs" />
     <Compile Include="src\GraphicObjects\FileDialog.cs" />
+    <Compile Include="src\OpenGL\GLBackend\ClipShader.cs" />
+    <Compile Include="src\OpenGL\GLBackend\Context.cs" />
+    <Compile Include="src\OpenGL\GLBackend\Path.cs" />
+    <Compile Include="src\OpenGL\GLBackend\Shader %28copier%29.cs" />
+    <Compile Include="src\OpenGL\GLBackend\Surface.cs" />
+    <Compile Include="src\OpenGL\GLBackend\Font\Font.cs" />
+    <Compile Include="src\OpenGL\GLBackend\Font\FontExtents.cs" />
+    <Compile Include="src\OpenGL\GLBackend\Font\FontFace.cs" />
+    <Compile Include="src\OpenGL\GLBackend\Font\FontFlag.cs" />
+    <Compile Include="src\OpenGL\GLBackend\Font\FontShader.cs" />
+    <Compile Include="src\OpenGL\GLBackend\Font\FontSlant.cs" />
+    <Compile Include="src\OpenGL\GLBackend\Font\FontWeight.cs" />
+    <Compile Include="src\OpenGL\GLBackend\Font\glFont.cs" />
+    <Compile Include="src\OpenGL\GLBackend\Font\glGlyph.cs" />
+    <Compile Include="src\OpenGL\GLBackend\Font\TextExtents.cs" />
+    <Compile Include="src\OpenGL\GLBackend\Font\FontStyle.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -164,6 +180,8 @@
     <Folder Include="Images\Icons\" />
     <Folder Include="src\CompilerServices\" />
     <Folder Include="src\OpenGL\" />
+    <Folder Include="src\OpenGL\GLBackend\" />
+    <Folder Include="src\OpenGL\GLBackend\Font\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\Icons\updown.svg" />
@@ -218,5 +236,11 @@
     <None Include="Images\Icons\Cursors\help" />
     <None Include="Images\Icons\Cursors\move" />
     <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SharpFont-2.5.0.1\SharpFont\SharpFont.csproj">
+      <Project>{C293DB32-FA42-486D-B128-5A12522FAE4E}</Project>
+      <Name>SharpFont</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
