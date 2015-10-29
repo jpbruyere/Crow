@@ -156,21 +156,21 @@ namespace go
 
 		public QuadVAO uiQuad, uiQuad2;
 		go.GLBackend.Shader shader;
-		Matrix4 projectionMatrix, 
-				modelviewMatrix;
 		int[] viewport = new int[4];
 
 		Rectangle dirtyZone = Rectangle.Empty;
 		void createContext()
 		{			
 			createOpenGLSurface ();
+
 			if (uiQuad != null)
 				uiQuad.Dispose ();
 			uiQuad = new QuadVAO (0, 0, ClientRectangle.Width, ClientRectangle.Height, 0, 1, 1, -1);
 			uiQuad2 = new QuadVAO (0, 0, ClientRectangle.Width, ClientRectangle.Height, 0, 0, 1, 1);
-			projectionMatrix = Matrix4.CreateOrthographicOffCenter 
-				(0, ClientRectangle.Width, ClientRectangle.Height, 0, 0, 1);
-			modelviewMatrix = Matrix4.Identity;
+
+			shader.ProjectionMatrix = Matrix4.CreateOrthographicOffCenter 
+				(0, ClientRectangle.Width, ClientRectangle.Height, 0, 0, 1);			
+
 			redrawClip.AddRectangle (ClientRectangle);
 		}
 		void createOpenGLSurface()
@@ -196,18 +196,16 @@ namespace go
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 
 			GL.BindTexture(TextureTarget.Texture2D, 0);
+
+			shader.Texture = texID;
 		}
 		void OpenGLDraw()
 		{
 			GL.GetInteger (GetPName.Viewport, viewport);
 			GL.Viewport (0, 0, ClientRectangle.Width, ClientRectangle.Height);
+
 			shader.Enable ();
-			shader.ProjectionMatrix = projectionMatrix;
-			shader.ModelViewMatrix = modelviewMatrix;
-			shader.Color = new Vector4(1f,1f,1f,1f);
-			//if (dirtyZone != Rectangle.Empty) {
-			GL.ActiveTexture (TextureUnit.Texture0);
-			GL.BindTexture (TextureTarget.Texture2D, texID);
+
 			GL.TexSubImage2D (TextureTarget.Texture2D, 0,
 				0, 0, ClientRectangle.Width, ClientRectangle.Height,
 				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp);
@@ -219,23 +217,22 @@ namespace go
 			shader.Disable ();
 			GL.Viewport (viewport [0], viewport [1], viewport [2], viewport [3]);
 		}
-		public void RenderCustomTextureOnUIQuad(int _customTex)
-		{
-			GL.GetInteger (GetPName.Viewport, viewport);
-			GL.Viewport (0, 0, ClientRectangle.Width, ClientRectangle.Height);
-			shader.Enable ();
-			shader.ProjectionMatrix = projectionMatrix;
-			shader.ModelViewMatrix = modelviewMatrix;
-			shader.Color = new Vector4(1f,1f,1f,1f);
-			GL.ActiveTexture (TextureUnit.Texture0);
-			GL.BindTexture (TextureTarget.Texture2D, _customTex);
-			GL.Disable (EnableCap.DepthTest);
-			uiQuad2.Render (PrimitiveType.TriangleStrip);
-			GL.Enable (EnableCap.DepthTest);
-			GL.BindTexture(TextureTarget.Texture2D, 0);
-			shader.Disable ();
-			GL.Viewport (viewport [0], viewport [1], viewport [2], viewport [3]);			
-		}
+//		public void RenderCustomTextureOnUIQuad(int _customTex)
+//		{
+//			GL.GetInteger (GetPName.Viewport, viewport);
+//			GL.Viewport (0, 0, ClientRectangle.Width, ClientRectangle.Height);
+//
+//			shader.Enable ();
+//
+//			GL.ActiveTexture (TextureUnit.Texture0);
+//			GL.BindTexture (TextureTarget.Texture2D, _customTex);
+//			GL.Disable (EnableCap.DepthTest);
+//			uiQuad2.Render (PrimitiveType.TriangleStrip);
+//			GL.Enable (EnableCap.DepthTest);
+//			GL.BindTexture(TextureTarget.Texture2D, 0);
+//			shader.Disable ();
+//			GL.Viewport (viewport [0], viewport [1], viewport [2], viewport [3]);			
+//		}
 			
 		#endregion
 
@@ -406,11 +403,6 @@ namespace go
 			int mts = GL.GetInteger (GetPName.MaxTextureSize);
 
 			shader = new go.GLBackend.TexturedShader ();
-		}
-		protected override void OnUnload(EventArgs e)
-		{
-			if (texID > 0)
-				GL.DeleteTexture (texID);
 		}
 
 		protected override void OnResize(EventArgs e)

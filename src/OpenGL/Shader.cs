@@ -1,7 +1,9 @@
 ﻿using System;
-using OpenTK.Graphics.OpenGL;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 
 namespace go.GLBackend
 {
@@ -12,58 +14,103 @@ namespace go.GLBackend
 		{
 			Compile ();
 		}
-		#endregion
+		public Shader (string vertResId, string fragResId)
+		{
 
+			Stream s = tryGetStreamForResource (vertResId);
+			if (s != null) {
+				using (StreamReader sr = new StreamReader (s)) {				
+					vertSource = sr.ReadToEnd ();
+				}
+			}
+
+			s = tryGetStreamForResource (fragResId);
+			if (s != null) {
+				using (StreamReader sr = new StreamReader (s)) {				
+					fragSource = sr.ReadToEnd ();
+				}
+			}
+
+			Compile ();
+		}
+		Stream tryGetStreamForResource(string resId){
+			if (string.IsNullOrEmpty (resId))
+				return null;
+			
+			Stream s = Assembly.GetEntryAssembly ().
+				GetManifestResourceStream (resId);
+			return s == null ?
+				Assembly.GetExecutingAssembly ().
+					GetManifestResourceStream (resId) :
+				s;
+		}
+		#endregion
 
 		#region Sources
 		protected string _vertSource = @"
-			#version 130
+			#version 330
 
 			precision highp float;
 
-			uniform mat4 projection_matrix;
-			uniform mat4 modelview_matrix;
+			uniform mat4 Projection;
+			uniform mat4 ModelView;
+			uniform mat4 Model;
+			uniform mat4 Normal;
 
 			in vec2 in_position;
+			in vec2 in_tex;
+
+			out vec2 texCoord;
+			
 
 			void main(void)
 			{
-				gl_Position = projection_matrix * modelview_matrix * vec4(in_position,0, 1);
+				texCoord = in_tex;
+				gl_Position = Projection * ModelView * Model * vec4(in_position, 0, 1);
 			}";
 
 		protected string _fragSource = @"
-			#version 130
+			#version 330
 			precision highp float;
 
 			uniform vec4 color;
-			uniform bool stencilTest;
-			uniform sampler2D stencil;
-			uniform vec2 resolution;
+			uniform sampler2D tex;
 
+			in vec2 texCoord;
 			out vec4 out_frag_color;
 
 			void main(void)
 			{
-				if (stencilTest)
-				{
-					vec2 uv = gl_FragCoord.xy/resolution;
-					vec4 s = texture( stencil, uv);					
-					if (s.r == 0.0)
-						discard;
-				}
-				out_frag_color = color;
+				out_frag_color = texture( tex, texCoord);
 			}";
-		string _geomSource = "";
+		string _geomSource = @"";
+//			#version 330 
+//			layout(triangles) in;
+//			layout(triangle_strip, max_vertices=3) out;
+//			void main()
+//			{
+//				for(int i=0; i<3; i++)
+//				{
+//					gl_Position = gl_in[i].gl_Position;
+//					EmitVertex();
+//				}
+//				EndPrimitive();
+//			}";
 		#endregion
 
 		#region Private and protected fields
-		protected int vsId, fsId, gsId, pgmId, savedPgmId = 0,
-						modelviewMatrixLocation,
-						projectionMatrixLocation,
-						colorLocation,stencilTestLocation,resolutionLocation;
+		protected int vsId, fsId, gsId, pgmId, 
+						modelViewLocation,
+						modelLocation,
+						projectionLocation,
+						normalLocation,	
+						colorLocation;
 
-		Matrix4 projectionMatrix, 
-				modelviewMatrix;
+		Matrix4 projectionMat = Matrix4.Identity, 
+				modelMat = Matrix4.Identity,
+				modelViewMat = Matrix4.Identity;
+		Vector4 color = new Vector4(1,1,1,1);
+		int texture;
 		#endregion
 
 
@@ -85,36 +132,35 @@ namespace go.GLBackend
 		}
 
 		public Matrix4 ProjectionMatrix{
-			set { 
-				projectionMatrix = value;
-				GL.UniformMatrix4(projectionMatrixLocation, false, ref projectionMatrix);  
-			}
+			set { projectionMat = value; }
+			get { return projectionMat; }
 		}
 		public Matrix4 ModelViewMatrix {
-			set { 
-				modelviewMatrix = value;
-				GL.UniformMatrix4 (modelviewMatrixLocation, false, ref modelviewMatrix); 
-			}
+			set { modelViewMat = value; }
+			get { return modelViewMat; }
 		}
-
+		public Matrix4 ModelMatrix {
+			set { modelMat = value; }
+			get { return modelMat; }
+		}
 		public Vector4 Color {
-			set {GL.Uniform4 (colorLocation, value);}
+			set { color = value; }
+			get { return color; }
 		}
 
-		public bool StencilTest {
-			set {
-				if (value)
-					GL.Uniform1 (stencilTestLocation, 1);
-				else
-					GL.Uniform1 (stencilTestLocation, 0);
-			}
-		}
-
-		public Vector2 Resolution {
-			set { GL.Uniform2 (resolutionLocation, value); }
+		public int Texture {
+			get { return texture; }
+			set { texture = value; }
 		}
 
 		#endregion
+
+		void updateNormalMatrix()
+		{
+			Matrix4 normalMat = (modelViewMat).Inverted();
+			normalMat.Transpose ();
+			GL.UniformMatrix4 (normalLocation, false, ref normalMat);
+		}
 
 		#region Public functions
 		public virtual void Compile()
@@ -149,42 +195,67 @@ namespace go.GLBackend
 
 			BindVertexAttributes ();
 
-			GL.LinkProgram(pgmId);
-			GL.ValidateProgram(pgmId);
-
 			string info;
+			GL.LinkProgram(pgmId);
 			GL.GetProgramInfoLog(pgmId, out info);
-			Debug.WriteLine(info);
 
-			Enable ();
+			if (!string.IsNullOrEmpty (info)) {
+				Debug.WriteLine ("Linkage:");
+				Debug.WriteLine (info);
+			}
+
+			info = null;
+
+			GL.ValidateProgram(pgmId);
+			GL.GetProgramInfoLog(pgmId, out info);
+			if (!string.IsNullOrEmpty (info)) {
+				Debug.WriteLine ("Validation:");
+				Debug.WriteLine (info);
+			}
+				
+			GL.UseProgram (pgmId);
 
 			GetUniformLocations ();
 			BindSamplesSlots ();
 
 			Disable ();
 		}
+
 		protected virtual void BindVertexAttributes()
 		{
-			GL.BindAttribLocation(pgmId, 0, "in_position");
+			GL.BindAttribLocation(pgmId, 0, "in_position");						
+			GL.BindAttribLocation(pgmId, 1, "in_tex");
 		}
 		protected virtual void GetUniformLocations()
 		{
-			projectionMatrixLocation = GL.GetUniformLocation(pgmId, "projection_matrix");
-			modelviewMatrixLocation = GL.GetUniformLocation(pgmId, "modelview_matrix");
+			projectionLocation = GL.GetUniformLocation(pgmId, "Projection");
+			modelViewLocation = GL.GetUniformLocation(pgmId, "ModelView");
+			modelLocation = GL.GetUniformLocation(pgmId, "Model");
+			normalLocation = GL.GetUniformLocation(pgmId, "Normal");
 			colorLocation = GL.GetUniformLocation (pgmId, "color");
-			stencilTestLocation = GL.GetUniformLocation (pgmId, "stencilTest");
-			resolutionLocation = GL.GetUniformLocation (pgmId, "resolution");
+
 		}
 		protected virtual void BindSamplesSlots(){
-			GL.Uniform1(GL.GetUniformLocation (pgmId, "stencil"),0);
+			GL.Uniform1(GL.GetUniformLocation (pgmId, "tex"), 0);
 		}
 
 		public virtual void Enable(){
-			GL.GetInteger (GetPName.CurrentProgram, out savedPgmId);
 			GL.UseProgram (pgmId);
+
+			GL.UniformMatrix4(projectionLocation, false, ref projectionMat);
+			GL.UniformMatrix4 (modelLocation, false, ref modelMat); 
+			GL.UniformMatrix4 (modelViewLocation, false, ref modelViewMat);
+			updateNormalMatrix ();
+			GL.Uniform4 (colorLocation, color);
+
+			if (texture < 0)
+				return;
+
+			GL.ActiveTexture (TextureUnit.Texture0);
+			GL.BindTexture(TextureTarget.Texture2D, texture);
 		}
 		public virtual void Disable(){
-			GL.UseProgram (savedPgmId);
+			GL.UseProgram (0);
 		}
 		public static void Enable(Shader s)
 		{
@@ -219,7 +290,7 @@ namespace go.GLBackend
 		}			
 			
 		#region IDisposable implementation
-		public void Dispose ()
+		public virtual void Dispose ()
 		{
 			if (GL.IsProgram (pgmId))
 				GL.DeleteProgram (pgmId);
