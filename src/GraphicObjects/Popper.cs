@@ -164,6 +164,7 @@ namespace go
 				Content.Visible = true;
 				if (Content.Parent == null)
 					tc.AddWidget (Content);
+				tc.PutOnTop (Content);
 			}
 			Pop.Raise (this, e);
 		}

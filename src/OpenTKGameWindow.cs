@@ -27,7 +27,7 @@ namespace go
 		public OpenTKGameWindow(int _width, int _height, string _title="golib")
 			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 1), 
 				_title,GameWindowFlags.Default,DisplayDevice.GetDisplay(DisplayIndex.Second),
-				3,2,OpenTK.Graphics.GraphicsContextFlags.Debug|OpenTK.Graphics.GraphicsContextFlags.ForwardCompatible)
+				3,3,OpenTK.Graphics.GraphicsContextFlags.Debug)
 //		public OpenTKGameWindow(int _width, int _height, string _title="golib")
 //			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), _title)
 		{
@@ -59,6 +59,7 @@ namespace go
 		Rectangles _redrawClip = new Rectangles();//should find another way to access it from child
 		List<GraphicObject> _gobjsToRedraw = new List<GraphicObject>();
 
+		#region IGOLibHost implementation
 		public Rectangles redrawClip {
 			get {
 				return _redrawClip;
@@ -89,30 +90,19 @@ namespace go
 			g.ClearBinding();
 			GraphicObjects.Remove (g);
 		}
-		/// <summary> Remove all Graphic objects from top container </summary>
-		public void ClearInterface()
+		public void PutOnTop(GraphicObject g)
 		{
-			int i = 0;
-			while (GraphicObjects.Count>0) {
-				GraphicObject g = GraphicObjects [i];
-				g.Visible = false;
-				g.ClearBinding ();
-				GraphicObjects.RemoveAt (0);
+			if (GraphicObjects.IndexOf(g) > 0)
+			{
+				GraphicObjects.Remove(g);
+				GraphicObjects.Insert(0, g);
+				g.registerClipRect ();
 			}
 		}
 		public void Quit ()
 		{
 			this.Exit ();
 		}
-
-		#region Events
-		//those events are raised only if mouse isn't in a graphic object
-		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
-		public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
-		public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
-		public event EventHandler<MouseButtonEventArgs> MouseClick;
-		public event EventHandler<MouseMoveEventArgs> MouseMove;
-		#endregion
 
 		#region focus
 		GraphicObject _activeWidget;	//button is pressed on widget 
@@ -146,6 +136,29 @@ namespace go
 					_focusedWidget.onFocused (this, null);
 			}
 		}
+		#endregion
+
+		#endregion
+
+		/// <summary> Remove all Graphic objects from top container </summary>
+		public void ClearInterface()
+		{
+			int i = 0;
+			while (GraphicObjects.Count>0) {
+				GraphicObject g = GraphicObjects [i];
+				g.Visible = false;
+				g.ClearBinding ();
+				GraphicObjects.RemoveAt (0);
+			}
+		}
+
+		#region Events
+		//those events are raised only if mouse isn't in a graphic object
+		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
+		public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
+		public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
+		public event EventHandler<MouseButtonEventArgs> MouseClick;
+		public event EventHandler<MouseMoveEventArgs> MouseMove;
 		#endregion
 
 		#region graphic contexte
@@ -415,16 +428,6 @@ namespace go
 			}
 		}
 		#endregion
-
-		public void PutOnTop(GraphicObject g)
-		{
-			if (GraphicObjects.IndexOf(g) > 0)
-			{
-				GraphicObjects.Remove(g);
-				GraphicObjects.Insert(0, g);
-				g.registerClipRect ();
-			}
-		}
 
         #region Mouse Handling
         void Mouse_Move(object sender, MouseMoveEventArgs e)
