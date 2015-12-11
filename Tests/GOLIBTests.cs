@@ -36,8 +36,9 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
-			"testSpinner.goml",
-			"test_Listbox.goml",
+//			"testSpinner.goml",
+//			"test_Listbox.goml",
+			"testRadioButton2.goml",
 			"fps.goml",
 			"testCheckbox.goml",
 			"testExpandable.goml",
@@ -140,10 +141,10 @@ namespace test
 		}
 		protected override void OnKeyDown (KeyboardKeyEventArgs e)
 		{
-			if (FocusedWidget != null) {
-				base.OnKeyDown (e);
-				return;
-			}
+//			if (FocusedWidget != null) {
+//				base.OnKeyDown (e);
+//				return;
+//			}
 			if (e.Key == Key.Escape) {
 				this.Quit ();
 				return;
