@@ -45,12 +45,6 @@ namespace go
 		}        
 		#endregion
 
-		#if _WIN32 || _WIN64
-		public const string rootDir = @"d:\";
-		#elif __linux__
-		public const string rootDir = @"/mnt/data/";
-		#endif
-
 		public List<GraphicObject> GraphicObjects = new List<GraphicObject>();
 		public Color Background = Color.Transparent;
 

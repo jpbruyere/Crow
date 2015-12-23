@@ -96,9 +96,10 @@ namespace go
 
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
+			base.OnLayoutChanges (layoutType);
+
 			switch (layoutType) {
-			case LayoutingType.Width:				
-				base.OnLayoutChanges (layoutType);
+			case LayoutingType.Width:								
 				if (child != null) {
 					if (child.getBounds ().Width == 0)
 						child.RegisterForLayouting ((int)LayoutingType.Width);
@@ -107,7 +108,6 @@ namespace go
 				}
 				break;
 			case LayoutingType.Height:
-				base.OnLayoutChanges (layoutType);
 				if (child != null) {
 					if (child.getBounds ().Height == 0)
 						child.RegisterForLayouting ((int)LayoutingType.Height);

@@ -23,13 +23,11 @@ namespace go
 {		
 	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange
 	{
-		internal List<string> DynamicMethodIds
-		{
-			get { return Bindings.
-				Where(bi=>!string.IsNullOrEmpty(bi.DynMethodId)).
-				Select (b => b.DynMethodId).ToList ();
-			}
-		}
+		#if DEBUG_LAYOUTING
+		internal static ulong currentUid = 0;
+		internal ulong uid = 0;
+		#endif
+
 		internal List<Binding> Bindings = new List<Binding> ();
 
 		#region IValueChange implementation
@@ -43,11 +41,22 @@ namespace go
 		#region CTOR
 		public GraphicObject ()
 		{
+			#if DEBUG_LAYOUTING
+			uid = currentUid;
+			currentUid++;
+			#endif
+
+			if (Interface.XmlSerializerInit)
+				return;
+
 			loadDefaultValues ();
 			registerForGraphicUpdate ();
 		}
 		public GraphicObject (Rectangle _bounds)
 		{
+			if (Interface.XmlSerializerInit)
+				return;
+			
 			loadDefaultValues ();
 			Bounds = _bounds;
 			registerForGraphicUpdate ();
@@ -531,29 +540,50 @@ namespace go
 		{
 			if (Parent==null)
 				return;
-
-			//Debug.WriteLine ("Layout change: " + this.ToString () + ":" + LastSlots.ToString() + "=>" + Slot.ToString ());
+			#if DEBUG_LAYOUTING
+			Debug.WriteLine ("Layout change: " + this.ToString () + ":" + LastSlots.ToString() + "=>" + Slot.ToString ());
+			#endif
 			
 			switch (layoutType) {
 			case LayoutingType.Width:				
-				if (Parent.getBounds ().Width < 0)
+				if (Parent.getBounds ().Width < 0) {
+					Group gw = Parent as Group;
+					if (gw != null) {
+						if (Slot.Width > gw.maxChildrenWidth)
+							gw.maxChildrenWidth = Slot.Width;
+					}
 					this.Parent.RegisterForLayouting ((int)LayoutingType.Width);
-				else if (Width != 0) //update position in parent
+				}else if (Width != 0) //update position in parent
 					this.RegisterForLayouting ((int)LayoutingType.X);
-				if (!(Parent is GenericStack))
-					break;
-				if ((Parent as GenericStack).Orientation == Orientation.Horizontal)
+				GenericStack gsw = Parent as GenericStack;
+				if (gsw == null)
+					break;	
+				if ((Parent as GenericStack).Orientation == Orientation.Horizontal) {
+//					ulong idx = (ulong)gsw.Children.IndexOf (this);
+//					if (idx < gsw.stackingUpdateStartIndex)
+//						gsw.stackingUpdateStartIndex = idx;
 					this.Parent.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+				}
 				break;
 			case LayoutingType.Height:
-				if (Parent.getBounds().Height < 0)
-					this.Parent.RegisterForLayouting((int)LayoutingType.Height);
-				else if (Height != 0) //update position in parent
+				if (Parent.getBounds ().Height < 0) {
+					Group gh = Parent as Group;
+					if (gh != null) {
+						if (Slot.Width > gh.maxChildrenHeight)
+							gh.maxChildrenHeight = Slot.Height;
+					}
+					this.Parent.RegisterForLayouting ((int)LayoutingType.Height);
+				}else if (Height != 0) //update position in parent
 					this.RegisterForLayouting ((int)LayoutingType.Y);
-				if (!(Parent is GenericStack))
-					break;
-				if ((Parent as GenericStack).Orientation == Orientation.Vertical)
+				GenericStack gsh = Parent as GenericStack;
+				if (gsh==null)
+					break;				
+				if (gsh.Orientation == Orientation.Vertical) {
+//					ulong idx = (ulong)gsh.Children.IndexOf (this);
+//					if (idx < gsh.stackingUpdateStartIndex)
+//						gsh.stackingUpdateStartIndex = idx;
 					this.Parent.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+				}
 				break;
 			}
 			LayoutChanged.Raise (this, new LayoutChangeEventArgs (layoutType));
@@ -684,7 +714,7 @@ namespace go
 		}
 
 		/// <summary>
-		/// Interfal drawing context creation on a chached surface limited to slot size
+		/// Interfal drawing context creation on a cached surface limited to slot size
 		/// this trigger the effective drawing routine </summary>
 		protected virtual void UpdateGraphic ()
 		{
@@ -732,8 +762,7 @@ namespace go
 
         #region Keyboard handling
 		public virtual void onKeyDown(object sender, KeyboardKeyEventArgs e){
-			if (KeyDown != null)
-				KeyDown (sender, e);
+			KeyDown.Raise (sender, e);
 		}
         #endregion
 
@@ -803,9 +832,14 @@ namespace go
 		public override string ToString ()
 		{
 			string tmp ="";
+
 			if (Parent != null)
 				tmp = Parent.ToString () + tmp;
+			#if DEBUG_LAYOUTING
+			return Name == "unamed" ? tmp + "." + this.GetType ().Name + uid.ToString(): tmp + "." + Name;
+			#else
 			return Name == "unamed" ? tmp + "." + this.GetType ().Name : tmp + "." + Name;
+			#endif
 		}
 
 		#region Binding
@@ -855,11 +889,6 @@ namespace go
 				System.Reflection.Emit.Label[] jumpTable = null;
 				System.Reflection.Emit.Label endMethod = new System.Reflection.Emit.Label();
 
-				LocalBuilder lbMemberName = null;
-				LocalBuilder lbValue = null;
-
-
-
 				#region Retrieve EventHandler parameter type
 				EventInfo ei = targetType.GetEvent ("ValueChanged");
 				//no dynamic update if ValueChanged interface is not implemented
@@ -876,11 +905,7 @@ namespace go
 						args,
 						sourceType,true);
 
-
-					
-
 					il = dm.GetILGenerator(256);
-
 
 					endMethod = il.DefineLabel();
 					jumpTable = new System.Reflection.Emit.Label[grouped.Length];
@@ -1162,7 +1187,7 @@ namespace go
 				
 				MemberInfo mi = thisType.GetMember (attName).FirstOrDefault();
 				if (mi == null) {
-					Debug.WriteLine (Interface.CurrentGOMLPath + "=>GOML: Unknown attribute in " + thisType.ToString() + " : " + attName);
+					Debug.WriteLine ("GOML: Unknown attribute in " + thisType.ToString() + " : " + attName);
 					continue;
 				}
 				if (mi.MemberType == MemberTypes.Event) {

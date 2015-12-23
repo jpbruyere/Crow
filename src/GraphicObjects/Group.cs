@@ -23,6 +23,9 @@ namespace go
 		public event EventHandler<EventArgs> ChildrenCleared;
 		#endregion
 
+		internal int maxChildrenWidth = 0;
+		internal int maxChildrenHeight = 0;
+
         bool _multiSelect = false;
 		List<GraphicObject> children = new List<GraphicObject>();
 
@@ -30,9 +33,7 @@ namespace go
 
         public virtual List<GraphicObject> Children {
 			get { return children; }
-			set { 
-				children = value; 
-			}
+			set { children = value; }
 		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
         public bool MultiSelect
@@ -128,17 +129,18 @@ namespace go
 		}
 		protected override Size measureRawSize ()
 		{
-			Size tmp = new Size ();
-
-			foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
-				tmp.Width = Math.Max (tmp.Width, c.Slot.Right);
-				tmp.Height = Math.Max (tmp.Height, c.Slot.Bottom);
-			}
-
-			tmp.Width += 2*Margin;
-			tmp.Height += 2*Margin;
-
-			return tmp;
+//			Size tmp = new Size ();
+//
+//			foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
+//				tmp.Width = Math.Max (tmp.Width, c.Slot.Right);
+//				tmp.Height = Math.Max (tmp.Height, c.Slot.Bottom);
+//			}
+//
+//			tmp.Width += 2*Margin;
+//			tmp.Height += 2*Margin;
+//
+//			return tmp;
+			return new Size(maxChildrenWidth + 2 * Margin, maxChildrenHeight + 2 * Margin);
 		}
 			
 		public override void OnLayoutChanges (LayoutingType layoutType)
@@ -150,7 +152,7 @@ namespace go
 			case LayoutingType.Width:				
 				if (Width < 0) {
 					int crw = ClientRectangle.Width;
-					foreach (GraphicObject c in Children.Where(ch => ch.Slot.Width != crw && ch.Visible))
+					foreach (GraphicObject c in Children.Where(ch => ch.Visible))
 						c.RegisterForLayouting ((int)LayoutingType.X);						
 				} else {
 					foreach (GraphicObject c in Children.Where(ch => ch.Width == 0 && ch.Visible))
@@ -160,7 +162,7 @@ namespace go
 			case LayoutingType.Height:
 				if (Height < 0) {
 					int crh = ClientRectangle.Height;
-					foreach (GraphicObject c in Children.Where(ch => ch.Slot.Height != crh && ch.Visible))
+					foreach (GraphicObject c in Children.Where(ch => ch.Visible))
 						c.RegisterForLayouting ((int)LayoutingType.Y);						
 				} else {
 					foreach (GraphicObject c in Children.Where(ch => ch.Height == 0 && ch.Visible))

@@ -218,7 +218,7 @@ namespace go
 						}
 					}				
 				} else
-					loadTemplate (Interface.Load (template, this, !Interface.DontResoveGOML));
+					loadTemplate (Interface.Load (template, this));
 
 
 				//normal xml read

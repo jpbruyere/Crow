@@ -28,7 +28,7 @@ namespace test
 		#endregion
 
 		public GOLIBTests ()
-			: base(600, 500,"test: press spacebar to toogle test files")
+			: base(800, 600,"test: press spacebar to toogle test files")
 		{
 			VSync = VSyncMode.Off;
 		}
@@ -36,6 +36,8 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"testAll.goml",
+			"test4.goml",
 //			"testSpinner.goml",
 //			"test_Listbox.goml",
 			"testRadioButton2.goml",
@@ -53,7 +55,6 @@ namespace test
 			"testMsgBox.goml",
 			"testGrid.goml",
 			"testMeter.goml",
-//			"test4.goml",
 //			"testCombobox.goml",
 		};
 

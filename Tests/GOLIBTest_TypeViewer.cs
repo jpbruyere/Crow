@@ -32,8 +32,9 @@ namespace test
 			base.OnLoad (e);
 			type = new TypeContainer(typeof (GraphicObject));
 
-			this.AddWidget(Interface.Load ("Interfaces/testTypeViewer.goml", type));
-			//LoadInterface("Interfaces/testTypeViewer.goml", out g);
+			//this.AddWidget(Interface.Load ("Interfaces/testTypeViewer.goml", type));
+			GraphicObject go = LoadInterface("Interfaces/testTypeViewer.goml");
+			go.DataSource = type;
 		}
 
 		protected override void OnRenderFrame (FrameEventArgs e)

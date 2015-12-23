@@ -48,7 +48,9 @@ namespace go
 		}
 		public void ProcessLayouting()
 		{
-			//Debug.WriteLine ("Layouting => " + this.ToString ());
+			#if DEBUG_LAYOUTING
+			Debug.WriteLine ("Layouting => " + this.ToString ());
+			#endif
 			try {
 				GraphicObject.UpdateLayout (LayoutType);
 			} catch (Exception ex) {

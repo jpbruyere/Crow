@@ -64,22 +64,23 @@ namespace test
 //				new ClsItem("string 2"),
 //				new ClsItem("string 3")
 //			});
-		public List<string> TestList = new List<string>( new string[] 
+		public List<string> TestList;/* = new List<string>( new string[] 
 			{
 				"string 1",
 				"string 2",
 				"string 3"
-			});	
+			});	*/
 
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
 
-			//TestList = Directory.GetFileSystemEntries("/mnt/data/MagicCardDataBase/a/", "*.txt",SearchOption.AllDirectories).ToList();
-			LoadInterface("Interfaces/test_Listbox.goml");
+			TestList = Directory.GetFileSystemEntries("/home/jp/tmp/mtgdata/a", "*.txt",SearchOption.AllDirectories).ToList();
+			GraphicObject tlb = LoadInterface("Interfaces/test_Listbox.goml");
+			tlb.DataSource = this;
 
 //			TestList [1].Field = "test string";
-//			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", null, TestList));
+//			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
 
 
 		}
@@ -88,7 +89,11 @@ namespace test
 		{
 			base.OnUpdateFrame (e);
 		}
-
+		protected override void OnKeyDown (KeyboardKeyEventArgs e)
+		{
+			TestList.Add ("newly added list item");
+			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
+		}
 		[STAThread]
 		static void Main ()
 		{
