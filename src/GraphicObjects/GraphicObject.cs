@@ -493,6 +493,9 @@ namespace go
 		{
 			if (Parent == null)
 				return;
+			#if DEBUG_LAYOUTING
+			Debug.WriteLine ("RegisterForLayouting => {1}->{0}", layoutType, this.ToString());
+			#endif
 			lock (Interface.LayoutingQueue) {
 				Interface.LayoutingQueue.RemoveAll (lq => lq.GraphicObject == this && (layoutType & (int)lq.LayoutType) > 0);
 
@@ -504,9 +507,9 @@ namespace go
 						Width = -1;
 				
 					if (Bounds.Width == 0) //stretch in parent
-					Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Width, this);
+						Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Width, this);
 					else if (Bounds.Width < 0) //fit 
-					Interface.LayoutingQueue.EnqueueBeforeParentSizing (LayoutingType.Width, this);
+						Interface.LayoutingQueue.EnqueueBeforeParentSizing (LayoutingType.Width, this);
 					else
 						Interface.LayoutingQueue.Insert (0, new LayoutingQueueItem (LayoutingType.Width, this));
 				}
@@ -518,20 +521,20 @@ namespace go
 						Height = -1;
 
 					if (Bounds.Height == 0) //stretch in parent
-					Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Height, this);
+						Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Height, this);
 					else if (Bounds.Height < 0) //fit 
-					Interface.LayoutingQueue.EnqueueBeforeParentSizing (LayoutingType.Height, this);
+						Interface.LayoutingQueue.EnqueueBeforeParentSizing (LayoutingType.Height, this);
 					else
 						Interface.LayoutingQueue.Insert (0, new LayoutingQueueItem (LayoutingType.Height, this));
 				}
 
 				if ((layoutType & (int)LayoutingType.X) > 0)
-				//for x positionning, sizing of parent and this have to be done
-				Interface.LayoutingQueue.EnqueueAfterThisAndParentSizing (LayoutingType.X, this);
+					//for x positionning, sizing of parent and this have to be done
+					Interface.LayoutingQueue.EnqueueAfterThisAndParentSizing (LayoutingType.X, this);
 
 				if ((layoutType & (int)LayoutingType.Y) > 0)
-				//for x positionning, sizing of parent and this have to be done
-				Interface.LayoutingQueue.EnqueueAfterThisAndParentSizing (LayoutingType.Y, this);
+					//for x positionning, sizing of parent and this have to be done
+					Interface.LayoutingQueue.EnqueueAfterThisAndParentSizing (LayoutingType.Y, this);
 			}
 		}
 

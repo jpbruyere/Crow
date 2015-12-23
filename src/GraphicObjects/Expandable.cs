@@ -102,12 +102,16 @@ namespace go
 
 		public virtual void onExpand(object sender, EventArgs e)
 		{
-			_contentContainer.Visible = true;
+			if (_contentContainer != null)
+				_contentContainer.Visible = true;
+			
 			Expand.Raise (this, e);
 		}
 		public virtual void onCollapse(object sender, EventArgs e)
 		{
-			_contentContainer.Visible = false;
+			if (_contentContainer != null)
+				_contentContainer.Visible = false;
+			
 			Collapse.Raise (this, e);
 		}
 			

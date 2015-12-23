@@ -15,16 +15,16 @@
 	<Groupbox  Background="DarkGreen">		
 <!--		<Template>
 			<Group Height="{../TemplatedHeight}" Width="{../TemplatedWidth}">
-				<Border CornerRadius="5" BorderWidth="1" Margin="6"
+				<Border CornerRadius="5" BorderWidth="1" Margin="0"
 					Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}">
-					<Container Name="Content" Margin="10"
+					<Container Name="Content" Margin="0"
 							Height="{../../../TemplatedHeight}" Width="{../../../TemplatedWidth}"/>
 				</Border>
 				<Label Text="{../../Title}" VerticalAlignment="Top" Left="15"
 					Background="Clear" Margin="1"/>
 			</Group>
 		</Template>-->
-		<VerticalStack Fit="true" Background="Red" Margin="0">
+		<VerticalStack Fit="true" Background="Red" Margin="10">
 			<TextRun Text="text run test" />
 			<TextRun Text="text run test" />
 			<TextRun Text="text run test"/>

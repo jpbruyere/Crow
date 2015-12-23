@@ -3,12 +3,6 @@
 		Width="250" Height="300" >
 	<VerticalStack Name="contentVSStack" Margin="10" Spacing="10">
 		<Slider Name="slider" Height="10" Width="0"/>
-
-		<HorizontalStack Width="0" Height="-1" Margin="10" Background="BlueCrayola">
-			<Checkbox Height="-1" Width="80"/>
-			<GraphicObject Width="0"/>
-			<Checkbox Height="-1" Width="80"/>
-		</HorizontalStack>
 		<Groupbox Text="test"  Height="-1" Width="-1" Margin="5">
 			<VerticalStack  Height="-1" Width="0" >
 				<RadioButton  Caption="Radio 1" Background="Red" />
@@ -16,6 +10,12 @@
 				<RadioButton  Caption="Radio 3" />
 			</VerticalStack>
 		</Groupbox>
+		<HorizontalStack Width="0" Height="-1" Margin="10" Background="BlueCrayola">
+			<Checkbox Height="-1" Width="80"/>
+			<GraphicObject Width="0"/>
+			<Checkbox Height="-1" Width="80" IsChecked="true"/>
+		</HorizontalStack>
+
 <!--		<Checkbox Height="-1" Width="-1" Background="Red" Margin="0" VerticalAlignment="Center" HorizontalAlignment="Right"/>-->
 	</VerticalStack>
 </Window>

@@ -102,6 +102,7 @@ namespace go
 		{			
 			if (Parent == null)
 				return;
+
 			base.RegisterForLayouting (layoutType);
 
 			if ((layoutType & (int)LayoutingType.PositionChildren) > 0)

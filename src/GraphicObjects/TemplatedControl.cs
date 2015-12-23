@@ -96,8 +96,8 @@ namespace go
 
 		protected override void loadDefaultValues ()
 		{
-			if (child == null)//trigger loading of default template if child is empty
-				loadTemplate ();
+//			if (child == null)//trigger loading of default template if child is empty
+//				loadTemplate ();
 			base.loadDefaultValues ();
 		}
 		public override GraphicObject FindByName (string nameToFind)
@@ -159,15 +159,18 @@ namespace go
 								xr.Read ();//go close tag
 								xr.Read ();//Template close tag
 								break;
-							} else {
-								xr.ReadInnerXml ();
-							}
+							} else
+								xr.ReadInnerXml ();							
 						}
 					}				
 				} else
 					loadTemplate (Interface.Load (template, this));
 				
-
+				if (this.child == null) {
+					loadTemplate ();
+					loadDefaultValues ();
+				}
+				
 				//normal xml read
 				using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
 					xr.Read ();

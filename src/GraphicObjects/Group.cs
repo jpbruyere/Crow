@@ -147,26 +147,35 @@ namespace go
 		{
 			base.OnLayoutChanges (layoutType);
 
+			GenericStack gs = this as GenericStack;
 			//position smaller objects in group when group size is fit
 			switch (layoutType) {
-			case LayoutingType.Width:				
-				if (Width < 0) {
-					int crw = ClientRectangle.Width;
-					foreach (GraphicObject c in Children.Where(ch => ch.Visible))
-						c.RegisterForLayouting ((int)LayoutingType.X);						
-				} else {
-					foreach (GraphicObject c in Children.Where(ch => ch.Width == 0 && ch.Visible))
-						c.RegisterForLayouting ((int)LayoutingType.Width);											
+			case LayoutingType.Width:
+				if (gs != null) {
+					if (gs.Orientation == Orientation.Horizontal) {
+						this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+						break;
+					}
+				}	
+				foreach (GraphicObject c in Children.Where(ch => ch.Visible)) {
+					if (c.getBounds ().Width == 0)
+						c.RegisterForLayouting ((int)LayoutingType.Width);
+					else
+						c.RegisterForLayouting ((int)LayoutingType.X);					
 				}
 				break;
 			case LayoutingType.Height:
-				if (Height < 0) {
-					int crh = ClientRectangle.Height;
-					foreach (GraphicObject c in Children.Where(ch => ch.Visible))
-						c.RegisterForLayouting ((int)LayoutingType.Y);						
-				} else {
-					foreach (GraphicObject c in Children.Where(ch => ch.Height == 0 && ch.Visible))
-						c.RegisterForLayouting ((int)LayoutingType.Height);											
+				if (gs != null) {
+					if (gs.Orientation == Orientation.Vertical) {
+						this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+						break;
+					}
+				}
+				foreach (GraphicObject c in Children.Where(ch => ch.Visible)) {
+					if (c.getBounds ().Height == 0)
+						c.RegisterForLayouting ((int)LayoutingType.Height);
+					else
+						c.RegisterForLayouting ((int)LayoutingType.Y);
 				}
 				break;
 			}
