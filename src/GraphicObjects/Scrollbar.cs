@@ -90,5 +90,10 @@ namespace go
 			Scroll = Convert.ToDouble(e.NewValue);
 		}
 
+		public override void OnLayoutChanges (LayoutingType layoutType)
+		{
+			OpenTKGameWindow.currentWindow.CursorVisible = true;
+			base.OnLayoutChanges (layoutType);
+		}
 	}
 }

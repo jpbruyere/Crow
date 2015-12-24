@@ -156,9 +156,9 @@ namespace go
 		#region Mouse handling
 		public override bool MouseIsIn (Point m)
 		{			
-			Debug.WriteLine ("Mouse in scroller: {0} scr coord:{1} mouse:{2}",
-				base.ScreenCoordinates (Slot).ContainsOrIsEqual (m),
-				base.ScreenCoordinates (Slot), m);
+//			Debug.WriteLine ("Mouse in scroller: {0} scr coord:{1} mouse:{2}",
+//				base.ScreenCoordinates (Slot).ContainsOrIsEqual (m),
+//				base.ScreenCoordinates (Slot), m);
 
 			return Visible ? base.ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false; 
 		}

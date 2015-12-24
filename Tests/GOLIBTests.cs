@@ -36,6 +36,7 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+//			"testCombobox.goml",
 			"testWindow3.goml",
 			"testExpandable.goml",
 			"testPopper.goml",
@@ -46,7 +47,6 @@ namespace test
 			"testWindow.goml",
 			"testWindow2.goml",
 //			"testSpinner.goml",
-//			"test_Listbox.goml",
 			"test4.goml",
 			"testRadioButton2.goml",
 			"testContainer.goml",
@@ -57,7 +57,8 @@ namespace test
 			"testMsgBox.goml",
 			"testGrid.goml",
 			"testMeter.goml",
-//			"testCombobox.goml",
+			"testScrollbar.goml",
+			"test_Listbox.goml",
 		};
 
 		#region FPS

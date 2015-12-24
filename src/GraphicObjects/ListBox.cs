@@ -70,7 +70,7 @@ namespace go
 		public object SelectedItem{
 			get { return data == null ? null : data[_selectedIndex]; }
 		}
-		[XmlAttributeAttribute][DefaultValue(null)]
+		[XmlAttributeAttribute]//[DefaultValue(null)]
 		public IList Data {
 			get {
 				return data;

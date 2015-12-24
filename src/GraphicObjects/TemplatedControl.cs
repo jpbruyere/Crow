@@ -95,9 +95,7 @@ namespace go
 		}
 
 		protected override void loadDefaultValues ()
-		{
-//			if (child == null)//trigger loading of default template if child is empty
-//				loadTemplate ();
+		{			
 			base.loadDefaultValues ();
 		}
 		public override GraphicObject FindByName (string nameToFind)

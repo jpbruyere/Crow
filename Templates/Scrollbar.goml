@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="1" BorderColor="LightGray">
-	<GenericStack Orientation="{../../Orientation}" Width="0" Height="0">
+<Border BorderWidth="1" BorderColor="LightGray" Width="{../TemplatedWidth}" Height="{../TemplatedHeight}">
+	<GenericStack Orientation="{../../Orientation}" Width="{../../TemplatedWidth}" Height="{../../TemplatedHeight}">
 		<Button Width="12" Height="12" MouseClick="../../../onScrollBack">
 			<Image Margin="1" Path="#go.Images.Icons.updown.svg" SvgSub="up"/>
 		</Button>
 		<Slider Name="Slider" Value="{../../../Scroll}" Maximum="{../../../MaximumScroll}" 
-			Width="{../../../Width}" Height="{../../../Height}" Orientation="{../../../Orientation}"
+			Width="{../../../TemplatedWidth}" Height="{../../../TemplatedHeight}" Orientation="{../../../Orientation}"
 			ValueChanged="../../../onSliderValueChange"/>
 		<Button Width="12" Height="12" MouseClick="../../../onScrollForth">
 			<Image Margin="1" Path="#go.Images.Icons.updown.svg" SvgSub="down"/>

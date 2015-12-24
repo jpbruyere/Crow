@@ -503,8 +503,8 @@ namespace go
 
 					//force sizing to fit if parent is sizing on children and 
 					//this object has stretched size
-					if (Parent.getBounds ().Width < 0 && Width == 0)
-						Width = -1;
+//					if (Parent.getBounds ().Width < 0 && Width == 0)
+//						Width = -1;
 				
 					if (Bounds.Width == 0) //stretch in parent
 						Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Width, this);
@@ -517,8 +517,8 @@ namespace go
 				if ((layoutType & (int)LayoutingType.Height) > 0) {
 
 					//force sizing to fit if parent is sizing on children
-					if (Parent.getBounds ().Height < 0 && Height == 0)
-						Height = -1;
+//					if (Parent.getBounds ().Height < 0 && Height == 0)
+//						Height = -1;
 
 					if (Bounds.Height == 0) //stretch in parent
 						Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Height, this);
@@ -594,7 +594,7 @@ namespace go
 		/// <summary> Update layout component, this is where the computation of alignement
 		/// and size take place </summary>
 		public virtual void UpdateLayout (LayoutingType layoutType)
-		{			
+		{		
 			switch (layoutType) {
 			case LayoutingType.X:
 				if (Bounds.X == 0) {
@@ -646,7 +646,7 @@ namespace go
 
 				LastSlots.Y = Slot.Y;
 				break;
-			case LayoutingType.Width:				
+			case LayoutingType.Width:
 				if (Width > 0)
 					Slot.Width = Width;
 				else if (Width < 0)
@@ -848,6 +848,9 @@ namespace go
 		#region Binding
 		public virtual void ResolveBindings()
 		{
+			#if DEBUG_BINDING
+			Debug.WriteLine ("ResolveBinding => " + this.ToString ());
+			#endif
 			List<Binding> resolved = new List<Binding> ();
 			foreach (Binding b in Bindings) {
 				if (!string.IsNullOrEmpty (b.DynMethodId))
