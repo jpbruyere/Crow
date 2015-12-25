@@ -500,12 +500,6 @@ namespace go
 				Interface.LayoutingQueue.RemoveAll (lq => lq.GraphicObject == this && (layoutType & (int)lq.LayoutType) > 0);
 
 				if ((layoutType & (int)LayoutingType.Width) > 0) {
-
-					//force sizing to fit if parent is sizing on children and 
-					//this object has stretched size
-//					if (Parent.getBounds ().Width < 0 && Width == 0)
-//						Width = -1;
-				
 					if (Bounds.Width == 0) //stretch in parent
 						Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Width, this);
 					else if (Bounds.Width < 0) //fit 
@@ -515,11 +509,6 @@ namespace go
 				}
 
 				if ((layoutType & (int)LayoutingType.Height) > 0) {
-
-					//force sizing to fit if parent is sizing on children
-//					if (Parent.getBounds ().Height < 0 && Height == 0)
-//						Height = -1;
-
 					if (Bounds.Height == 0) //stretch in parent
 						Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Height, this);
 					else if (Bounds.Height < 0) //fit 
@@ -647,6 +636,11 @@ namespace go
 				LastSlots.Y = Slot.Y;
 				break;
 			case LayoutingType.Width:
+				//force sizing to fit if parent is sizing on children and
+				//this object has stretched size
+				if (Parent.getBounds ().Width < 0 && Width == 0)
+					Width = -1;
+
 				if (Width > 0)
 					Slot.Width = Width;
 				else if (Width < 0)
@@ -670,6 +664,10 @@ namespace go
 				LastSlots.Width = Slot.Width;
 				break;
 			case LayoutingType.Height:
+				//force sizing to fit if parent is sizing on children
+				if (Parent.getBounds ().Height < 0 && Height == 0)
+					Height = -1;
+
 				if (Height > 0)
 					Slot.Height = Height;
 				else if (Height < 0)
