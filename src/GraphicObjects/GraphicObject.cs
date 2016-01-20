@@ -748,7 +748,7 @@ namespace go
 
 			Rectangle rb = Parent.ContextCoordinates(Slot);
 
-			using (ImageSurface source = new ImageSurface(bmp, Format.Argb32, rb.Width, rb.Height, 4 * Slot.Width)) {
+			using (ImageSurface source = new ImageSurface(bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
 				if (this.Background == Color.Clear) {
 					ctx.Save ();
 					ctx.Operator = Operator.Clear;
