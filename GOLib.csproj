@@ -46,7 +46,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>TRACE;DEBUG;__linux__;DEBUG_LOAD_TIME0;DEBUG_LAYOUTING;DEBUG_BINDING</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;__linux__;CAIRO_GL;DEBUG_LOAD_TIME0;DEBUG_LAYOUTING0;DEBUG_BINDING0</DefineConstants>
   </PropertyGroup>
   <!--  <PropertyGroup Condition=" '$(Platform)' == 'Linux_x86' ">
     <DefineConstants>__linux__</DefineConstants>
@@ -139,12 +139,10 @@
       <Package>glib-sharp-3.0</Package>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="OpenTK">
-      <HintPath>..\opentk\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
-    </Reference>
     <Reference Include="Mono.Cairo" />
-    <Reference Include="rsvg2-sharp, Version=2.18.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
-      <Package>rsvg2-sharp-2.0</Package>
+    <Reference Include="rsvg2-sharp, Version=2.18.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="OpenTK">
+      <HintPath>..\..\src\opentk-git\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -219,4 +217,14 @@
     <None Include="Images\Icons\Cursors\move" />
     <None Include="README.md" />
   </ItemGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <TextStylePolicy FileWidth="120" TabsToSpaces="False" EolMarker="Unix" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
+          <CSharpFormattingPolicy AfterDelegateDeclarationParameterComma="True" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
 </Project>

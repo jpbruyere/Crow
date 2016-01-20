@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="1" Margin="1" MinimumSize="20;20" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}" >
+<Border BorderWidth="1" Margin="1" MinimumSize="100;100" MaximumSize="500;500" Fit="true" >
 <!--	<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"
 		Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}">-->
-		<VerticalStack Height="-1" Width="{../../../TemplatedWidth}" Name="List" Margin="0" VerticalAlignment="Top"/>
+		<VerticalStack Fit="True" Name="List" Margin="0" VerticalAlignment="Top"/>
 <!--	</Scroller>-->
 </Border>

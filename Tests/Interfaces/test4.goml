@@ -44,7 +44,7 @@
 								BorderColor="DimGray" BorderWidth="1"
 								Text="editable text"/>
 			</VerticalStack>
-			<VerticalStack Fit="true"  Margin="0" WidgetSpacing="1">
+			<VerticalStack Width="200" Height="-1" Margin="0" WidgetSpacing="1" Background="Blue">
 				<Button  Margin="1" Width="150" Height="100">
 					<Image Path="#Tests.image.tetra.png"/>
 				</Button>
@@ -73,23 +73,23 @@
 						<Checkbox Name="chk2"/>
 					</VerticalStack>		
 				</Expandable>
-				<HorizontalStack>
+				<HorizontalStack Fit="true">
 					<Label Text="Update" FontColor="White"/>
 					<Label Name="labUpdate" Text="{update}" FontSize="16" Width="60" TextAlignment="Center" Background="DarkGreen"/>
 				</HorizontalStack>
-				<HorizontalStack>
+				<HorizontalStack Fit="true">
 					<Label Text="Fps:" Width = "30"/>
 					<Label Name="labFps" Text="{fps}" Font="droid bold, 14"
 						TextAlignment="Center" Background="AoEnglish"/>
 				</HorizontalStack>
-				<HorizontalStack>
-					<Label Text="Min:" Width = "30"/>
-					<Label Name="labFpsMin" Text="{fpsMin}" Font="droid bold, 14"
-						TextAlignment="Center" Background="AoEnglish"/>
-				</HorizontalStack>
-				<HorizontalStack>
+				<HorizontalStack  Fit="true">
 					<Label Text="Max:" Width = "30"/>
 					<Label Name="labFpsMax" Text="{fpsMax}" Font="droid bold, 14"
+						TextAlignment="Center" Background="AoEnglish"/>
+				</HorizontalStack>
+				<HorizontalStack Background="Red" Fit="true">
+					<Label Text="Min:" Width = "30"/>
+					<Label Name="labFpsMin" Text="{fpsMin}" Font="droid bold, 14"
 						TextAlignment="Center" Background="AoEnglish"/>
 				</HorizontalStack>
 			</VerticalStack>

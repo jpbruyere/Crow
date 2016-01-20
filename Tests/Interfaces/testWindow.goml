@@ -4,7 +4,7 @@
 	<VerticalStack Name="contentVSStack" Margin="10" Spacing="10">
 		<Slider Name="slider" Height="10" Width="0"/>
 		<Groupbox Text="test"  Height="-1" Width="-1" Margin="5">
-			<VerticalStack  Height="-1" Width="0" >
+			<VerticalStack  Height="-1" Width="-1" >
 				<RadioButton  Caption="Radio 1" Background="Red" />
 				<RadioButton  Caption="Radio 2" IsChecked="true" />
 				<RadioButton  Caption="Radio 3" />

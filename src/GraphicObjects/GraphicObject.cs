@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
-//using OpenTK.Graphics.OpenGL;
+#if CAIRO_GL
+using OpenTK.Graphics.OpenGL;
+#endif
 using System.Drawing.Imaging;
 using System.Diagnostics;
 using OpenTK.Input;
@@ -89,7 +90,12 @@ namespace go
 		public Rectangle Bounds;
 		public Rectangle Slot = new Rectangle ();
 		public object Tag;
+		#if CAIRO_GL
+		public static Cairo.Device device;
+		public uint texID;
+		#else
 		public byte[] bmp;
+		#endif
 		#endregion
 
 		#region ILayoutable
@@ -317,9 +323,25 @@ namespace go
 		}
 		//TODO: only used in group, should be removed from base go object
 		[XmlIgnore]public virtual bool DrawingIsValid
-		{ get { return bmp == null ? 
-				false : 
-				true; } }
+		{ 
+			get {
+				#if CAIRO_GL
+				return GL.IsTexture(texID);
+				#else
+				return bmp != null; 
+				#endif
+			} 
+		}
+		[XmlIgnore]protected bool cacheIsEmpty
+		{ 
+			get {
+				#if CAIRO_GL
+				return !GL.IsTexture(texID);
+				#else
+				return bmp == null; 
+				#endif
+			} 
+		}
 		[XmlAttributeAttribute()][DefaultValue(null)]
 		public virtual string BackgroundImagePath {
 			get { return _backgroundImagePath; }
@@ -449,7 +471,7 @@ namespace go
 		/// </summary>
 		public virtual void registerForGraphicUpdate ()
 		{
-			bmp = null;
+			DeleteCache ();
 			if (TopContainer != null)
 				TopContainer.gobjsToRedraw.Add (this);
 		}
@@ -604,7 +626,7 @@ namespace go
 				if (LastSlots.X == Slot.X)
 					break;
 
-				bmp = null;
+				DeleteCache ();
 
 				OnLayoutChanges (layoutType);
 
@@ -623,13 +645,13 @@ namespace go
 						Slot.Y = Parent.ClientRectangle.Height / 2 - Slot.Height / 2;
 						break;
 					}
-				}else
+				} else
 					Slot.Y = Bounds.Y;
 
 				if (LastSlots.Y == Slot.Y)
 					break;
 
-				bmp = null;
+				DeleteCache ();
 
 				OnLayoutChanges (layoutType);
 
@@ -657,7 +679,7 @@ namespace go
 				if (LastSlots.Width == Slot.Width)
 					break;
 
-				bmp = null;
+				DeleteCache ();
 
 				OnLayoutChanges (layoutType);
 
@@ -685,7 +707,7 @@ namespace go
 				if (LastSlots.Height == Slot.Height)
 					break;
 
-				bmp = null;
+				DeleteCache ();
 
 				OnLayoutChanges (layoutType);
 
@@ -694,7 +716,7 @@ namespace go
 			}
 			lock (Interface.LayoutingQueue) {
 				//if no layouting remains in queue for item, registre for redraw
-				if (Interface.LayoutingQueue.Where (lq => lq.GraphicObject == this).Count () <= 0 && bmp == null)
+				if (Interface.LayoutingQueue.Where (lq => lq.GraphicObject == this).Count () <= 0 && cacheIsEmpty)
 					this.RegisterForRedraw ();
 			}
 		}
@@ -721,13 +743,25 @@ namespace go
 		{
 			LastPaintedSlot = Slot;
 
+			#if CAIRO_GL
+			DeleteCache ();
+			GL.GenTextures(1, out texID);
+			GL.BindTexture(TextureTarget.Texture2D, texID);
+			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, 
+				Slot.Width, Slot.Height, 0,
+				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, IntPtr.Zero);
+			using (Surface draw = new GLSurface
+				(device, Content.ColorAlpha, texID, Slot.Width, Slot.Height)) {
+			#else
+			bmp = null;
 			int stride = 4 * Slot.Width;
 
 			int bmpSize = Math.Abs (stride) * Slot.Height;
 			bmp = new byte[bmpSize];
 
-			using (ImageSurface draw =
-                new ImageSurface(bmp, Format.Argb32, Slot.Width, Slot.Height, stride)) {
+			using (Surface draw =
+				new ImageSurface(bmp, Format.Argb32, Slot.Width, Slot.Height, stride)) {
+			#endif
 				using (Context gr = new Context (draw)) {
 					gr.Antialias = Antialias.Subpixel;
 					onDraw (gr);
@@ -735,6 +769,9 @@ namespace go
 				draw.Flush ();
 				//draw.WriteToPng ("/mnt/data/test.png");
 			}
+			#if CAIRO_GL
+			GL.BindTexture(TextureTarget.Texture2D, 0);
+			#endif
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version
 		/// of the widget </summary>
@@ -743,12 +780,18 @@ namespace go
 			if (!Visible)
 				return;
 
-			if (bmp == null)
+			if (cacheIsEmpty)
 				UpdateGraphic ();
 
 			Rectangle rb = Parent.ContextCoordinates(Slot);
 
-			using (ImageSurface source = new ImageSurface(bmp, Format.Argb32, rb.Width, rb.Height, 4 * Slot.Width)) {
+			#if CAIRO_GL
+			using (Surface source = new GLSurface
+				(device, Content.ColorAlpha, texID, rb.Width, rb.Height)) {
+			#else
+			using (Surface source =
+			new ImageSurface(bmp, Format.Argb32, rb.Width, rb.Height, 4 * Slot.Width)) {
+			#endif
 				if (this.Background == Color.Clear) {
 					ctx.Save ();
 					ctx.Operator = Operator.Clear;
@@ -759,6 +802,16 @@ namespace go
 				ctx.SetSourceSurface (source, rb.X, rb.Y);
 				ctx.Paint ();
 			}
+		}
+
+		public void DeleteCache()
+		{
+			#if CAIRO_GL
+			if (GL.IsTexture(texID))
+				GL.DeleteTexture(texID);
+			#else
+			bmp = null;
+			#endif			
 		}
 
         #region Keyboard handling

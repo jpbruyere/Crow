@@ -127,7 +127,7 @@ namespace go
 								if (idx > 0 && idx < Children.Count - 1)
 									gobjs [0].Slot.Width -= Spacing;
 								if (gobjs [0].LastSlots.Width != gobjs [0].Slot.Width) {
-									gobjs [0].bmp = null;
+									gobjs [0].DeleteCache();
 									gobjs [0].OnLayoutChanges (LayoutingType.Width);
 									gobjs [0].LastSlots.Width = gobjs [0].Slot.Width;
 								}
@@ -147,7 +147,7 @@ namespace go
 								if (idx > 0 && idx < Children.Count - 1)
 									gobjs [0].Slot.Height -= Spacing;
 								if (gobjs [0].LastSlots.Height != gobjs [0].Slot.Height) {
-									gobjs [0].bmp = null;
+									gobjs [0].DeleteCache();
 									gobjs [0].OnLayoutChanges (LayoutingType.Height);
 									gobjs [0].LastSlots.Height = gobjs [0].Slot.Height;
 								}
@@ -157,7 +157,7 @@ namespace go
 				}				
 				ComputeChildrenPositions ();
 				//if no layouting remains in queue for item, registre for redraw
-				if (Interface.LayoutingQueue.Where (lq => lq.GraphicObject == this).Count () <= 0 && bmp==null)
+				if (Interface.LayoutingQueue.Where (lq => lq.GraphicObject == this).Count () <= 0 && cacheIsEmpty)
 					this.RegisterForRedraw ();
 			}else
 				base.UpdateLayout(layoutType);

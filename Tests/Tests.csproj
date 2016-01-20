@@ -38,10 +38,10 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Drawing" />
-    <Reference Include="OpenTK">
-      <HintPath>..\..\opentk\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
-    </Reference>
     <Reference Include="Mono.Cairo" />
+    <Reference Include="OpenTK">
+      <HintPath>..\..\..\src\opentk-git\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GOLIBTest_5.cs" />

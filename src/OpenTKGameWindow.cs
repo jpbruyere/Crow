@@ -27,7 +27,7 @@ namespace go
 		public OpenTKGameWindow(int _width, int _height, string _title="golib")
 			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 1), 
 				_title,GameWindowFlags.Default,DisplayDevice.GetDisplay(DisplayIndex.Second),
-				3,3,OpenTK.Graphics.GraphicsContextFlags.Debug)
+				3,3,OpenTK.Graphics.GraphicsContextFlags.Default)
 //		public OpenTKGameWindow(int _width, int _height, string _title="golib")
 //			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), _title)
 		{
@@ -158,8 +158,14 @@ namespace go
 		#region graphic contexte
 		Context ctx;
 		Surface surf;
+		#if CAIRO_GL
+		public Device device;
+		OpenTK.Graphics.IGraphicsContext cairoGLContext;
+		#else
 		byte[] bmp;
-		int texID;
+		#endif
+
+		uint texID;
 
 		public QuadVAO uiQuad, uiQuad2;
 		go.GLBackend.Shader shader;
@@ -167,8 +173,16 @@ namespace go
 
 		Rectangle dirtyZone = Rectangle.Empty;
 		void createContext()
-		{			
+		{
+			#if CAIRO_GL
+			cairoGLContext.MakeCurrent(this.WindowInfo);
+			#endif
+
 			createOpenGLSurface ();
+
+			#if CAIRO_GL
+			this.MakeCurrent();
+			#endif
 
 			if (uiQuad != null)
 				uiQuad.Dispose ();
@@ -179,14 +193,12 @@ namespace go
 				(0, ClientRectangle.Width, ClientRectangle.Height, 0, 0, 1);			
 
 			redrawClip.AddRectangle (ClientRectangle);
+
+
 		}
 		void createOpenGLSurface()
 		{
 			currentWindow = this;
-
-			int stride = 4 * ClientRectangle.Width;
-			int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
-			bmp = new byte[bmpSize];
 
 			//create texture
 			if (GL.IsTexture(texID))
@@ -195,16 +207,29 @@ namespace go
 			GL.ActiveTexture (TextureUnit.Texture0);
 			GL.BindTexture(TextureTarget.Texture2D, texID);
 
+			#if CAIRO_GL
+			if (surf != null)
+				surf.Dispose();			
+			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, 
+				ClientRectangle.Width, ClientRectangle.Height, 0,
+				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, IntPtr.Zero);
+			surf = new Cairo.GLSurface (device, Cairo.Content.ColorAlpha, texID, 
+				ClientRectangle.Width, ClientRectangle.Height);
+			#else
+			int stride = 4 * ClientRectangle.Width;
+			int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
+			bmp = new byte[bmpSize];
+
 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, 
 				ClientRectangle.Width, ClientRectangle.Height, 0,
 				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp);
 
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-
+			#endif
 			GL.BindTexture(TextureTarget.Texture2D, 0);
 
-			shader.Texture = texID;
+			shader.Texture = (int)texID;
 		}
 		void OpenGLDraw()
 		{
@@ -213,10 +238,12 @@ namespace go
 
 			shader.Enable ();
 
+			#if CAIRO_GL
+			#else
 			GL.TexSubImage2D (TextureTarget.Texture2D, 0,
 				0, 0, ClientRectangle.Width, ClientRectangle.Height,
 				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp);
-
+			#endif
 			uiQuad.Render (PrimitiveType.TriangleStrip);
 
 			GL.BindTexture(TextureTarget.Texture2D, 0);
@@ -224,23 +251,7 @@ namespace go
 			shader.Disable ();
 			GL.Viewport (viewport [0], viewport [1], viewport [2], viewport [3]);
 		}
-//		public void RenderCustomTextureOnUIQuad(int _customTex)
-//		{
-//			GL.GetInteger (GetPName.Viewport, viewport);
-//			GL.Viewport (0, 0, ClientRectangle.Width, ClientRectangle.Height);
-//
-//			shader.Enable ();
-//
-//			GL.ActiveTexture (TextureUnit.Texture0);
-//			GL.BindTexture (TextureTarget.Texture2D, _customTex);
-//			GL.Disable (EnableCap.DepthTest);
-//			uiQuad2.Render (PrimitiveType.TriangleStrip);
-//			GL.Enable (EnableCap.DepthTest);
-//			GL.BindTexture(TextureTarget.Texture2D, 0);
-//			shader.Disable ();
-//			GL.Viewport (viewport [0], viewport [1], viewport [2], viewport [3]);			
-//		}
-			
+
 		#endregion
 
 		#region update
@@ -256,7 +267,13 @@ namespace go
 			guTime.Reset ();
 			drawingTime.Reset ();
 
+			#if CAIRO_GL
+			GraphicObject.device = device;
+			cairoGLContext.MakeCurrent(this.WindowInfo);
+			#else
 			surf = new ImageSurface(bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height,ClientRectangle.Width*4);
+			#endif
+
 			ctx = new Context(surf);
 
 			if (Interface.LoadingLists.Count > 0) {
@@ -329,9 +346,17 @@ namespace go
 					redrawClip.Reset ();
 				}
 			}
+			surf.Flush ();
 			//surf.WriteToPng (@"/mnt/data/test.png");
 			ctx.Dispose ();
+			#if CAIRO_GL
+			this.MakeCurrent ();
+			#else
 			surf.Dispose ();
+			#endif
+
+
+
 //			if (ToolTip.isVisible) {
 //				ToolTip.panel.processkLayouting();
 //				if (ToolTip.panel.layoutIsValid)
@@ -379,7 +404,6 @@ namespace go
 		{
 			GLClear ();
 
-
 			base.OnRenderFrame(e);
 
 			OnRender (e);
@@ -410,6 +434,14 @@ namespace go
 			int mts = GL.GetInteger (GetPName.MaxTextureSize);
 
 			shader = new go.GLBackend.TexturedShader ();
+
+			#if CAIRO_GL
+			cairoGLContext = OpenTK.Platform.Utilities.CloneGLContext (this);
+			IntPtr dpy = OpenTK.Platform.Utilities.GetDisplay(this.WindowInfo);
+			cairoGLContext.MakeCurrent(this.WindowInfo);
+			device = new Cairo.Device (dpy, 
+				(cairoGLContext as OpenTK.Graphics.IGraphicsContextInternal).Context.Handle);			
+			#endif
 		}
 
 		protected override void OnResize(EventArgs e)

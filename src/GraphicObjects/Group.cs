@@ -204,7 +204,7 @@ namespace go
 			if ( !Visible )
 				return;
 
-			if (bmp == null)
+			if (cacheIsEmpty)
 				UpdateGraphic ();
 			else {
 
@@ -223,9 +223,13 @@ namespace go
 				if (!DrawingIsValid || clip != null) {//false when 1 child has changed
 					//child having their content changed has to be repainted
 					//and those with slot intersecting clip rectangle have also to be repainted
-
-					using (ImageSurface cache =
-						      new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, Slot.Width * 4)) {
+					#if CAIRO_GL
+					using (Surface cache = new GLSurface
+						(device, Content.ColorAlpha, texID, Slot.Width, Slot.Height)) {
+					#else
+					using (Surface cache =
+							new ImageSurface(bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
+					#endif
 						Context gr = new Context (cache);
 						clip.clearAndClip (gr);
 

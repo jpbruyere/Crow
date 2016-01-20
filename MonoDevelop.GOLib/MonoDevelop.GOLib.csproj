@@ -33,6 +33,11 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="Execute" command="/usr/local/lib/monodevelop/bin/MonoDevelop.exe --no-redirect" workingdir="/usr/local/lib/monodevelop/bin" />
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -40,26 +45,30 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="Execute" command="/usr/local/lib/monodevelop/bin/MonoDevelop.exe --no-redirect" workingdir="/usr/local/lib/monodevelop/bin" />
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="ICSharpCode.NRefactory">
       <HintPath>\usr\local\lib\monodevelop\bin\ICSharpCode.NRefactory.dll</HintPath>
-      <Private>False</Private>
+      <Package>monodevelop</Package>
     </Reference>
-    <Reference Include="Mono.Addins">
-      <Package>mono-addins</Package>
-    </Reference>
+    <Reference Include="Mono.Addins" />
     <Reference Include="MonoDevelop.Ide">
       <HintPath>\usr\local\lib\monodevelop\bin\MonoDevelop.Ide.dll</HintPath>
-      <Private>False</Private>
+      <Package>monodevelop</Package>
     </Reference>
     <Reference Include="MonoDevelop.Core">
       <HintPath>\usr\local\lib\monodevelop\bin\MonoDevelop.Core.dll</HintPath>
+      <Package>monodevelop</Package>
     </Reference>
     <Reference Include="MonoDevelop.DesignerSupport">
       <HintPath>\usr\local\lib\monodevelop\AddIns\MonoDevelop.DesignerSupport\MonoDevelop.DesignerSupport.dll</HintPath>
-      <Private>False</Private>
+      <Package>monodevelop-core-addins</Package>
     </Reference>
     <Reference Include="Mono.Cairo" />
     <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
@@ -82,9 +91,11 @@
     </Reference>
     <Reference Include="MonoDevelop.SourceEditor2">
       <HintPath>..\..\..\..\..\usr\local\lib\monodevelop\AddIns\DisplayBindings\SourceEditor\MonoDevelop.SourceEditor2.dll</HintPath>
+      <Package>monodevelop-core-addins</Package>
     </Reference>
     <Reference Include="Mono.TextEditor">
       <HintPath>..\..\..\..\..\usr\local\lib\monodevelop\bin\Mono.TextEditor.dll</HintPath>
+      <Package>monodevelop</Package>
     </Reference>
   </ItemGroup>
   <ItemGroup>

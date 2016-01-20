@@ -1,12 +1,2 @@
 ﻿<?xml version="1.0"?>
-<Container Width="100" Height="100" Background="Red">
-	<Group>
-		<Border CornerRadius="5" BorderWidth="1" Margin="5"/>
-		<HorizontalStack  Fit="true" Background="Clear" 
-			VerticalAlignment="Top" Left="10">
-			<GraphicObject Width="3"/>
-			<Label Text="GroupBox"/>
-			<GraphicObject Width="5"/>
-		</HorizontalStack>
-	</Group>
-</Container>
+<GraphicObject Width="200" Background="Green"/>
