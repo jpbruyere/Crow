@@ -764,6 +764,10 @@ namespace go
 			#endif
 				using (Context gr = new Context (draw)) {
 					gr.Antialias = Antialias.Subpixel;
+					gr.Operator = Operator.Source;
+					gr.SetSourceRGBA(0,0,0,0);
+					gr.Paint();
+					gr.Operator = Operator.Over;
 					onDraw (gr);
 				}
 				draw.Flush ();
@@ -787,10 +791,10 @@ namespace go
 
 			#if CAIRO_GL
 			using (Surface source = new GLSurface
-				(device, Content.ColorAlpha, texID, rb.Width, rb.Height)) {
+				(device, Content.ColorAlpha, texID, Slot.Width, Slot.Height)) {
 			#else
 			using (Surface source =
-			new ImageSurface(bmp, Format.Argb32, rb.Width, rb.Height, 4 * Slot.Width)) {
+			new ImageSurface(bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
 			#endif
 				if (this.Background == Color.Clear) {
 					ctx.Save ();
@@ -801,6 +805,7 @@ namespace go
 				}
 				ctx.SetSourceSurface (source, rb.X, rb.Y);
 				ctx.Paint ();
+				source.Flush();
 			}
 		}
 

@@ -1,2 +1,4 @@
 ﻿<?xml version="1.0"?>
-<GraphicObject Width="200" Background="Green"/>
+<Container Width="300" Height="300" Background="Red">
+	<GraphicObject Width="200" Height="200" Background="Green"/>
+</Container>
