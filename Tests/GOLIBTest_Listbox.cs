@@ -71,6 +71,13 @@ namespace test
 				"string 3"
 			});	*/
 
+		public String Hover {
+			get { return hoverWidget == null ? "None" : hoverWidget.ToString(); }
+		}
+		Point mPos;
+		public string MousePos {
+			get { return mPos.ToString(); }
+		}
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
@@ -81,8 +88,12 @@ namespace test
 
 //			TestList [1].Field = "test string";
 //			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
-
-
+		}
+		protected override void OnMouseMove (MouseMoveEventArgs e)
+		{			
+			base.OnMouseMove (e);
+			ValueChanged.Raise (this, new ValueChangeEventArgs ("Hover", Hover));
+			ValueChanged.Raise (this, new ValueChangeEventArgs ("MousePos", e.Position.ToString()));
 		}
 
 		protected override void OnUpdateFrame (FrameEventArgs e)
@@ -94,6 +105,7 @@ namespace test
 			TestList.Add ("newly added list item");
 			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
 		}
+
 		[STAThread]
 		static void Main ()
 		{

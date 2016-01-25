@@ -770,7 +770,15 @@ namespace go
 		#region Mouse handling
 		public virtual bool MouseIsIn(Point m)
 		{
-			return Visible ? ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false; 
+			if (!Visible) 
+				return false;
+			if (ScreenCoordinates (Slot).ContainsOrIsEqual (m)) {
+				Scroller scr = Parent as Scroller;
+				if (scr == null)
+					return true;
+				return scr.MouseIsIn (scr.savedMousePos);
+			}
+			return false; 
 		}
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{

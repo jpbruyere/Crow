@@ -154,6 +154,7 @@ namespace go
 		#endregion
 
 		#region Mouse handling
+		internal Point savedMousePos;
 		public override bool MouseIsIn (Point m)
 		{			
 //			Debug.WriteLine ("Mouse in scroller: {0} scr coord:{1} mouse:{2}",
@@ -164,6 +165,7 @@ namespace go
 		}
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
+			savedMousePos = e.Position;
 			Point m = e.Position - new Point ((int)ScrollX, (int)ScrollY);
 			base.checkHoverWidget (new MouseMoveEventArgs(m.X,m.Y,e.XDelta,e.YDelta));
 		}
@@ -181,6 +183,12 @@ namespace go
             if (HorizontalScrolling )
 				ScrollX -= e.Delta * ScrollSpeed;
         }
+		public override void onMouseMove (object sender, MouseMoveEventArgs e)
+		{
+			savedMousePos.X += e.XDelta;
+			savedMousePos.Y += e.YDelta;
+			base.onMouseMove (sender, new MouseMoveEventArgs(savedMousePos.X,savedMousePos.Y,e.XDelta,e.YDelta));
+		}
 		#endregion
 
 		public override Rectangle ContextCoordinates (Rectangle r)
