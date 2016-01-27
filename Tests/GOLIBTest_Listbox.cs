@@ -82,12 +82,20 @@ namespace test
 		{
 			base.OnLoad (e);
 
-			TestList = Directory.GetFileSystemEntries("/home/jp/tmp/mtgdata/a", "*.txt",SearchOption.AllDirectories).ToList();
+			//TestList = Directory.GetFileSystemEntries("/home/jp/tmp/mtgdata/a", "*.txt",SearchOption.AllDirectories).ToList();
 			GraphicObject tlb = LoadInterface("Interfaces/test_Listbox.goml");
 			tlb.DataSource = this;
 
 //			TestList [1].Field = "test string";
 //			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
+		}
+		void OnClear (object sender, MouseButtonEventArgs e){
+			TestList = null;
+			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
+		}
+		void OnLoadList (object sender, MouseButtonEventArgs e){
+			TestList = Directory.GetFileSystemEntries("/home/jp/tmp/mtgdata/a", "*.txt",SearchOption.AllDirectories).ToList();
+			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
 		}
 		protected override void OnMouseMove (MouseMoveEventArgs e)
 		{			
@@ -102,7 +110,8 @@ namespace test
 		}
 		protected override void OnKeyDown (KeyboardKeyEventArgs e)
 		{
-			TestList.Add ("newly added list item");
+			TestList = Directory.GetFileSystemEntries("/home/jp/tmp/mtgdata/a", "*.txt",SearchOption.AllDirectories).ToList();
+			//TestList.Add ("newly added list item");
 			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
 		}
 

@@ -46,6 +46,7 @@ namespace go
 				if (_maximumScroll == value)
 					return;
 				_maximumScroll = value;
+				registerForGraphicUpdate ();
 				ValueChanged.Raise(this, new ValueChangeEventArgs ("MaximumScroll", _maximumScroll));
 			}
 		}
@@ -74,6 +75,7 @@ namespace go
 					return;
 				_orientation = value;
 				ValueChanged.Raise(this, new ValueChangeEventArgs ("Orientation", _orientation));
+				registerForGraphicUpdate ();
 			}
 		}
 		public void onScrollBack (object sender, MouseButtonEventArgs e)
