@@ -1,13 +1,13 @@
-GOLib
+CROW
 =====
 
-GOLib stands for 'Graphic Object Library' which is a pure c# widget toolkit with templates and bindings.
+CROW stands for 'Collaborative Radiant Open Widgets' which is a pure c# widget toolkit with templates and bindings.
 Running under Mono, With multi-platform libraries (Cairo, OpenTK) it should run on any target.
 
 The main advantage of this toolkit is it's simplicity and it's coherence. Thanks to the job done by 
-OpenTK team on linux drm/kms support, GOLib may run without a X server directely in console.
+OpenTK team on linux drm/kms support, Crow may run without a X server directely in console.
 
-Graphic Rendering stack could easily be changed by implementing IGOLibHost, and a custom (and lighter) opengl rendering replacement for cairo is on the stack.
+Graphic Rendering stack could easily be changed by implementing ICrowHost, and a custom (and lighter) opengl rendering replacement for cairo is on the stack.
 
 FEATURES
 ========
@@ -61,19 +61,19 @@ xbuild  /p:Configuration=Release OpenTK.sln  # Build on Mono (Linux / Mac OS X)
 ```
 sudo apt-get install libmono-cairo4.0-cil libglib3.0-cil librsvg2-2.18-cil
 ```
-#####Build GOLib
+#####Build Crow
 ```
-git clone https://github.com/jpbruyere/GOLib.git   	# Download source code from git
-cd GOLib                                    		# Enter the source directory
-msbuild /p:Configuration=Release GOLib.sln  		# Build on .Net (Windows)
-xbuild  /p:Configuration=Release GOLib.sln  		# Build on Mono (Linux / Mac OS X)
+git clone https://github.com/jpbruyere/Crow.git   	# Download source code from git
+cd Crow	                                    		# Enter the source directory
+msbuild /p:Configuration=Release Crow.sln			# Build on .Net (Windows)
+xbuild  /p:Configuration=Release Crow.sln			# Build on Mono (Linux / Mac OS X)
 ```
-#####GOLib in action
+#####Crow in action
 
-![GOLib in action](/magic3d.png?raw=true "Magic3d")
+![Crow in action](/magic3d.png?raw=true "Magic3d")
 
-![GOLib in action](/screenshot1.png?raw=true "golib")
+![Crow in action](/screenshot1.png?raw=true "golib")
 
-![GOLib in action](/screenshot2.png?raw=true "golib")
+![Crow in action](/screenshot2.png?raw=true "golib")
 
 
