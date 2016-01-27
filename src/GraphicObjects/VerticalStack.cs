@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace go
+namespace Crow
 {
     public class VerticalStack : GenericStack
     {
         public VerticalStack()
             : base()
         {
-            Orientation = go.Orientation.Vertical;
+            Orientation = Crow.Orientation.Vertical;
         }
 
         [System.Xml.Serialization.XmlIgnore]

@@ -2,7 +2,7 @@
 using System.Xml.Serialization;
 using System.ComponentModel;
 
-namespace go
+namespace Crow
 {
 	public abstract class NumericControl : TemplatedControl
 	{

@@ -6,8 +6,8 @@
     <ProjectGuid>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>go</RootNamespace>
-    <AssemblyName>golib</AssemblyName>
+    <RootNamespace>Crow</RootNamespace>
+    <AssemblyName>Crow</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <NoStdLib>False</NoStdLib>
@@ -191,15 +191,7 @@
     <EmbeddedResource Include="Templates\AnalogMeter0.goml" />
     <EmbeddedResource Include="Images\meter.svg" />
     <EmbeddedResource Include="Images\Icons\member.svg" />
-    <EmbeddedResource Include="Images\Icons\Cursors\cross" />
-    <EmbeddedResource Include="Images\Icons\Cursors\bottom_left_corner" />
-    <EmbeddedResource Include="Images\Icons\Cursors\bottom_right_corner" />
-    <EmbeddedResource Include="Images\Icons\Cursors\top_left_corner" />
-    <EmbeddedResource Include="Images\Icons\Cursors\top_right_corner" />
-    <EmbeddedResource Include="Images\Icons\Cursors\arrow" />
     <EmbeddedResource Include="Images\Icons\exit2.svg" />
-    <EmbeddedResource Include="Images\Icons\Cursors\sb_h_double_arrow" />
-    <EmbeddedResource Include="Images\Icons\Cursors\sb_v_double_arrow" />
     <EmbeddedResource Include="Images\button.svg" />
     <EmbeddedResource Include="Templates\MessageBox.goml" />
     <EmbeddedResource Include="Images\Icons\iconInfo.svg" />
@@ -210,11 +202,19 @@
     <EmbeddedResource Include="Templates\tmpDirItem.goml" />
     <EmbeddedResource Include="Templates\ScrollingListBox.goml" />
     <EmbeddedResource Include="Templates\imgItemTemplate.goml" />
+    <EmbeddedResource Include="Images\Icons\Cursors\cross" />
+    <EmbeddedResource Include="Images\Icons\Cursors\bottom_left_corner" />
+    <EmbeddedResource Include="Images\Icons\Cursors\bottom_right_corner" />
+    <EmbeddedResource Include="Images\Icons\Cursors\top_left_corner" />
+    <EmbeddedResource Include="Images\Icons\Cursors\top_right_corner" />
+    <EmbeddedResource Include="Images\Icons\Cursors\arrow" />
+    <EmbeddedResource Include="Images\Icons\Cursors\sb_h_double_arrow" />
+    <EmbeddedResource Include="Images\Icons\Cursors\sb_v_double_arrow" />
+    <EmbeddedResource Include="Images\Icons\Cursors\hand" />
+    <EmbeddedResource Include="Images\Icons\Cursors\help" />
+    <EmbeddedResource Include="Images\Icons\Cursors\move" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\Cursors\hand" />
-    <None Include="Images\Icons\Cursors\help" />
-    <None Include="Images\Icons\Cursors\move" />
     <None Include="README.md" />
   </ItemGroup>
 </Project>

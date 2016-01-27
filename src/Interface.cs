@@ -31,7 +31,7 @@ using System.CodeDom;
 using Microsoft.CSharp;
 using System.CodeDom.Compiler;
 
-namespace go
+namespace Crow
 {
 	public static class Interface
 	{
@@ -143,7 +143,7 @@ namespace go
 				}
 			}
 
-			Type t = Type.GetType ("go." + root);
+			Type t = Type.GetType ("Crow." + root);
 
 			stream.Seek (0, SeekOrigin.Begin);
 			return t;

@@ -5,7 +5,7 @@ using System.Reflection;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace go.GLBackend
+namespace Crow
 {
 	public class Shader : IDisposable
 	{

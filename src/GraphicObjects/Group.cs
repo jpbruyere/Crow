@@ -8,7 +8,7 @@ using Cairo;
 using System.Xml.Serialization;
 using System.ComponentModel;
 
-namespace go
+namespace Crow
 {
 	public class Group : GraphicObject, IXmlSerializable
     {
@@ -292,7 +292,7 @@ namespace go
                     if (!subTree.IsStartElement())
                         break;
 
-                    Type t = Type.GetType("go." + subTree.Name);
+                    Type t = Type.GetType("Crow." + subTree.Name);
                     GraphicObject go = (GraphicObject)Activator.CreateInstance(t);
                     (go as IXmlSerializable).ReadXml(subTree);                    
                     addChild(go);

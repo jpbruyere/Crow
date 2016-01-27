@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Xml.Serialization;
 using System.ComponentModel;
 
-namespace go
+namespace Crow
 {
 	[Serializable]
 	public class ProgressBar : Border

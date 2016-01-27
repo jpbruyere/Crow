@@ -5,7 +5,7 @@ using System.Text;
 using Cairo;
 using System.Diagnostics;
 
-namespace go
+namespace Crow
 {
     public class Rectangles
     {

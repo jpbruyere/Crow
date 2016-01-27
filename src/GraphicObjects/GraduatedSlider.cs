@@ -5,7 +5,7 @@ using System.Text;
 using Cairo;
 using System.Xml.Serialization;
 
-namespace go
+namespace Crow
 {
 	public class GraduatedSlider : Slider
     {     

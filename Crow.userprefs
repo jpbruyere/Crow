@@ -1,0 +1,48 @@
+﻿<Properties GitUserInfo="UsingGIT" StartupItem="Tests/Tests.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|Linux_x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Images/Icons/button.svg">
+    <Files>
+      <File FileName="src/GraphicObjects/ListBox.cs" Line="36" Column="43" />
+      <File FileName="Tests/Interfaces/test_Listbox.goml" Line="25" Column="60" />
+      <File FileName="Tests/GOLIBTest_Listbox.cs" Line="98" Column="1" />
+      <File FileName="src/GraphicObjects/TemplatedControl.cs" Line="151" Column="39" />
+      <File FileName="src/GraphicObjects/Scrollbar.cs" Line="49" Column="1" />
+      <File FileName="src/GraphicObjects/GenericStack.cs" Line="96" Column="8" />
+      <File FileName="src/GraphicObjects/GraphicObject.cs" Line="22" Column="15" />
+      <File FileName="src/OpenTKGameWindow.cs" Line="27" Column="71" />
+      <File FileName="src/OpenGL/Shader.cs" Line="1" Column="1" />
+      <File FileName="src/OpenGL/TexturedShader.cs" Line="1" Column="1" />
+      <File FileName="src/OpenGL/QuadVAO.cs" Line="1" Column="1" />
+      <File FileName="src/Interface.cs" Line="119" Column="1" />
+      <File FileName="bin/Debug/Interfaces/test4.goml.cs" Line="97" Column="35" />
+      <File FileName="src/GraphicObjects/Group.cs" Line="308" Column="42" />
+      <File FileName="Tests/GOLIBTest_TypeViewer.cs" Line="37" Column="4" />
+      <File FileName="Images/Icons/button.svg" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/mnt/data2/devel/GOLib/src/GraphicObjects/HorizontalStack.cs" line="26" column="1" />
+      <Breakpoint file="/mnt/data2/devel/GOLib/MonoDevelop.GOLib/src/GOLibNodeExtension.cs" line="99" column="1" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
+    <Watch file="../../src/monodevelop/main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Gui/Workbench.cs" line="1399" offsetX="14" offsetY="23383" expression="ex" liveUpdate="False" />
+    <Watch file="src/GraphicObjects/Scroller.cs" line="95" offsetX="527" offsetY="1598" expression="layoutType" liveUpdate="False" />
+    <Watch file="src/XCursor.cs" line="49" offsetX="757" offsetY="351" expression="type" liveUpdate="False" />
+    <Watch file="src/XCursor.cs" line="50" offsetX="791" offsetY="377" expression="subtype" liveUpdate="False" />
+    <Watch file="src/XCursor.cs" line="51" offsetX="812" offsetY="409" expression="pos" liveUpdate="False" />
+    <Watch file="src/OpenTKGameWindow.cs" line="234" offsetX="746" offsetY="1618" expression="lqi" liveUpdate="False" />
+    <Watch file="src/GraphicObjects/GenericStack.cs" line="171" offsetX="447" offsetY="1717" expression="layoutType" liveUpdate="False" />
+    <Watch file="src/GraphicObjects/GraphicObject.cs" line="925" offsetX="695" offsetY="6851" expression="d.Method.Name" liveUpdate="False" />
+    <Watch file="src/GraphicObjects/Combobox.cs" line="97" offsetX="750" offsetY="1303" expression="value" liveUpdate="False" />
+    <Watch file="src/Interface.cs" line="217" offsetX="623" offsetY="3315" expression="es" liveUpdate="False" />
+    <Watch file="src/Interface.cs" line="217" offsetX="623" offsetY="3339" expression="es.MemberName" liveUpdate="False" />
+    <Watch file="src/GraphicObjects/GraphicObject.cs" line="907" offsetX="879" offsetY="9010" expression="targetValue" liveUpdate="False" />
+    <Watch file="src/GraphicObjects/GraphicObject.cs" line="815" offsetX="511" offsetY="11050" expression="b.Expression" liveUpdate="False" />
+    <Watch file="src/CompilerServices/CompilerServices.cs" line="88" offsetX="630" offsetY="1184" expression="Expression" liveUpdate="False" />
+    <Watch file="src/GraphicObjects/GraphicObject.cs" line="394" offsetX="672" offsetY="1844" expression="pi.Name" liveUpdate="False" />
+    <Watch file="src/GraphicObjects/GenericStack.cs" line="108" offsetX="495" offsetY="1377" expression="layoutType" liveUpdate="False" />
+  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
+  <AuthorInfo Name="Jean-Philippe Bruyère" Email="jp_bruyere@hotmail.com" Copyright="jp" Company="" Trademark="" />
+</Properties>

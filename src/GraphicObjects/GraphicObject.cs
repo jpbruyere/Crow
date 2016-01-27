@@ -19,7 +19,7 @@ using System.Xml;
 using System.Runtime.CompilerServices;
 using System.Reflection.Emit;
 
-namespace go
+namespace Crow
 {		
 	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange
 	{

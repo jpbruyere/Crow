@@ -21,7 +21,7 @@
 using System;
 using System.Reflection;
 
-namespace go
+namespace Crow
 {
 	public static class ReflexionExtensions
 	{

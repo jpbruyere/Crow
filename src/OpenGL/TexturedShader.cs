@@ -1,7 +1,7 @@
 ﻿using System;
 using OpenTK.Graphics.OpenGL;
 
-namespace go.GLBackend
+namespace Crow
 {
 	public class TexturedShader : Shader
 	{

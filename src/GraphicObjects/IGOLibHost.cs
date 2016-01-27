@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace go
+namespace Crow
 {
 	public interface IGOLibHost
 	{

@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using OpenTK.Input;
 
-namespace go
+namespace Crow
 {
     [Serializable]
     public class Label : GraphicObject

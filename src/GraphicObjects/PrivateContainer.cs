@@ -24,7 +24,7 @@ using System.ComponentModel;
 using OpenTK.Input;
 using Cairo;
 
-namespace go
+namespace Crow
 {
 	/// <summary>
 	/// Implement drawing and layouting for a single child, but

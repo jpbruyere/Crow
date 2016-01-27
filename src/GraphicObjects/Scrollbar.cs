@@ -14,9 +14,9 @@ using System.Xml.Serialization;
 using OpenTK.Input;
 using System.ComponentModel;
 
-namespace go
+namespace Crow
 {
-	[DefaultTemplate("#go.Templates.Scrollbar.goml")]
+	[DefaultTemplate("#Crow.Templates.Scrollbar.goml")]
 	public class Scrollbar : TemplatedControl, IValueChange
 	{
 		#region IValueChange implementation

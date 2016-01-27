@@ -16,9 +16,9 @@ using System.ComponentModel;
 using System.Xml;
 using System.IO;
 
-namespace go
+namespace Crow
 {
-	[DefaultTemplate("#go.Templates.Groupbox.goml")]
+	[DefaultTemplate("#Crow.Templates.Groupbox.goml")]
     public class Groupbox : TemplatedContainer
     {		
 		string title;

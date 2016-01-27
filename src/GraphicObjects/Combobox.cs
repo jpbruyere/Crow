@@ -18,10 +18,10 @@ using System.IO;
 using System.Collections;
 using System.Threading;
 
-namespace go
+namespace Crow
 {
-	[DefaultTemplate("#go.Templates.Combobox.goml")]
-	[DefaultOverlayTemplate("#go.Templates.ComboboxOverlay.goml")]
+	[DefaultTemplate("#Crow.Templates.Combobox.goml")]
+	[DefaultOverlayTemplate("#Crow.Templates.ComboboxOverlay.goml")]
 	public class Combobox : TemplatedContainer
     {		
 		#region CTOR
@@ -69,7 +69,7 @@ namespace go
 			_list = Overlay.FindByName ("List") as Group;
 		}
 
-		[XmlAttributeAttribute][DefaultValue("#go.Templates.ItemTemplate.goml")]
+		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ItemTemplate.goml")]
 		public string ItemTemplate {
 			get { return _itemTemplate; }
 			set { 
@@ -77,7 +77,7 @@ namespace go
 				_itemTemplate = value; 
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue("#go.Templates.ComboboxOverlay.goml")]
+		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ComboboxOverlay.goml")]
 		public string OverlayTemplate {
 			get { return _overlayTemplate; }
 			set { 

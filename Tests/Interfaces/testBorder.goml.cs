@@ -11,7 +11,7 @@
 using System;
 
 
-namespace go {
+namespace Crow {
     
     public partial class testBorder : Border {
         public testBorder() {
@@ -20,10 +20,10 @@ namespace go {
             this.Height = 200;
             this.CornerRadius = 20;
             this.Margin = 0;
-            this.Background = go.Color.Mantis;
-            this.SetChild(new go.GraphicObject());
+            this.Background = Crow.Color.Mantis;
+            this.SetChild(new Crow.GraphicObject());
             this.Child.CornerRadius = 0;
-            this.Child.Background = go.Color.CornflowerBlue;
+            this.Child.Background = Crow.Color.CornflowerBlue;
             this.Child.Height = 100;
             this.Child.Width = 100;
         }

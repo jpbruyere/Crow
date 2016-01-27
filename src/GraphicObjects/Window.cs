@@ -4,9 +4,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using OpenTK.Input;
 
-namespace go
+namespace Crow
 {
-	[DefaultTemplate("#go.Templates.Window.goml")]
+	[DefaultTemplate("#Crow.Templates.Window.goml")]
 	public class Window : TemplatedContainer
 	{
 		enum Direction
@@ -57,7 +57,7 @@ namespace go
 				NotifyValueChanged ("Title", _title);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("#go.Images.Icons.tetra.png")]
+		[XmlAttributeAttribute()][DefaultValue("#Crow.Images.Icons.tetra.png")]
 		public string Icon {
 			get { return _icon; } 
 			set {

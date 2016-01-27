@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using go;
+using Crow;
 using MonoDevelop.Core;
 using MonoDevelop.Ide;
 using MonoDevelop.Projects;
@@ -84,7 +84,7 @@ namespace MonoDevelop.GOLib
 				cr.Rectangle (_hoverWidget.ScreenCoordinates(_hoverWidget.getSlot ()));
 				cr.LineWidth = 1;
 				cr.SetDash (dashed, 0);
-				cr.Color = go.Color.Yellow;
+				cr.Color = Crow.Color.Yellow;
 				cr.Stroke ();
 			}
 			((IDisposable) cr.Target).Dispose();                                      
@@ -259,7 +259,7 @@ namespace MonoDevelop.GOLib
 			GraphicObjects.CopyTo (invGOList,0);
 			invGOList = invGOList.Reverse ().ToArray ();
 
-			go.Size newSize = this.ClientRectangle.Size;
+			Crow.Size newSize = this.ClientRectangle.Size;
 			if (lastSize != newSize) {
 				foreach (GraphicObject g in GraphicObjects)
 					g.RegisterForLayouting ((int)LayoutingType.All);
@@ -522,7 +522,7 @@ namespace MonoDevelop.GOLib
 		Size lastSize;
 		public Rectangle ClientRectangle {
 			get {	
-				go.Size newSize = new go.Size (Allocation.Width, Allocation.Height);
+				Crow.Size newSize = new Crow.Size (Allocation.Width, Allocation.Height);
 				return newSize;
 			}
 		}

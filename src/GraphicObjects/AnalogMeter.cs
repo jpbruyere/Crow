@@ -3,9 +3,9 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using Cairo;
 
-namespace go
+namespace Crow
 {
-	[DefaultTemplate("#go.Templates.AnalogMeter0.goml")]
+	[DefaultTemplate("#Crow.Templates.AnalogMeter0.goml")]
 	public class AnalogMeter : NumericControl
 	{
 		#region CTOR

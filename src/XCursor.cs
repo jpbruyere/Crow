@@ -24,7 +24,7 @@ using System.Diagnostics;
 using OpenTK;
 using System.Collections.Generic;
 
-namespace go
+namespace Crow
 {
 	public class XCursorFile
 	{

@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
 
-namespace go
+namespace Crow
 {
 	public class Image : GraphicObject
 	{
@@ -84,7 +84,7 @@ namespace go
 		protected override Size measureRawSize ()
 		{
 //			if (_pic == null)
-//				_pic = "#go.Images.Icons.IconAlerte.svg";
+//				_pic = "#Crow.Images.Icons.IconAlerte.svg";
 
 			return _pic.Dimensions + Margin * 2;
 		}

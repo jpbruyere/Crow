@@ -14,9 +14,9 @@ using System.Xml.Serialization;
 using OpenTK.Input;
 using System.ComponentModel;
 
-namespace go
+namespace Crow
 {
-	[DefaultTemplate("#go.Templates.Checkbox.goml")]
+	[DefaultTemplate("#Crow.Templates.Checkbox.goml")]
     public class Checkbox : TemplatedControl
     {		        
 		string caption;
@@ -56,7 +56,7 @@ namespace go
 				NotifyValueChanged ("Caption", caption);
 			}
 		}        
-		[XmlAttributeAttribute()][DefaultValue("#go.Images.Icons.checkbox.svg")]
+		[XmlAttributeAttribute()][DefaultValue("#Crow.Images.Icons.checkbox.svg")]
 		public string Image {
 			get { return image; } 
 			set {

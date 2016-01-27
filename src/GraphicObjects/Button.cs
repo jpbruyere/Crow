@@ -11,7 +11,7 @@ using Cairo;
 using OpenTK.Input;
 using System.ComponentModel;
 
-namespace go
+namespace Crow
 {
     public class Button : Container, IXmlSerializable
     {
@@ -47,7 +47,7 @@ namespace go
             get { return base.Focusable; }
             set { base.Focusable = value; }
 		}
-		[XmlAttributeAttribute()][DefaultValue("#go.Images.button.svg")]
+		[XmlAttributeAttribute()][DefaultValue("#Crow.Images.button.svg")]
 		public override Picture BackgroundImage {
 			get {
 				return base.BackgroundImage;

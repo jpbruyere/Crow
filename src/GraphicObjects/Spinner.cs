@@ -21,9 +21,9 @@
 using System;
 using OpenTK.Input;
 
-namespace go
+namespace Crow
 {
-	[DefaultTemplate("#go.Templates.Spinner.goml")]
+	[DefaultTemplate("#Crow.Templates.Spinner.goml")]
 	public class Spinner : NumericControl
 	{
 		Label labCpt;

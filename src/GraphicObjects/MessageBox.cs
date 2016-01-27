@@ -21,9 +21,9 @@ using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
 
-namespace go
+namespace Crow
 {
-	[DefaultTemplate("#go.Templates.MessageBox.goml")]
+	[DefaultTemplate("#Crow.Templates.MessageBox.goml")]
 	public class MessageBox : Window
 	{
 		public MessageBox ():base(){}

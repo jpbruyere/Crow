@@ -2,7 +2,7 @@
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace go
+namespace Crow
 {
 	public class VertexArrayObject : IDisposable
 	{

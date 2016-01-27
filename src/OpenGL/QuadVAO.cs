@@ -1,7 +1,7 @@
 ﻿using System;
 using OpenTK;
 
-namespace go
+namespace Crow
 {
 	public class QuadVAO : VertexArrayObject
 	{

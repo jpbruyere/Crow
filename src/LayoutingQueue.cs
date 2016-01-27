@@ -22,7 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace go
+namespace Crow
 {
 	public class LayoutingQueue : List<LayoutingQueueItem>
 	{

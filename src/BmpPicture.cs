@@ -22,7 +22,7 @@ using System;
 using System.IO;
 using Cairo;
 
-namespace go
+namespace Crow
 {
 	public class BmpPicture : Picture
 	{

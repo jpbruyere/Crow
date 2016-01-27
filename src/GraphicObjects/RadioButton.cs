@@ -14,9 +14,9 @@ using System.Xml.Serialization;
 using OpenTK.Input;
 using System.ComponentModel;
 
-namespace go
+namespace Crow
 {
-	[DefaultTemplate("#go.Templates.RadioButton.goml")]
+	[DefaultTemplate("#Crow.Templates.RadioButton.goml")]
     public class RadioButton : TemplatedControl
     {		        
 		string caption;
@@ -51,7 +51,7 @@ namespace go
 				NotifyValueChanged ("Caption", caption);
 			}
 		}        
-		[XmlAttributeAttribute()][DefaultValue("#go.Images.Icons.radiobutton.svg")]
+		[XmlAttributeAttribute()][DefaultValue("#Crow.Images.Icons.radiobutton.svg")]
 		public string Image {
 			get { return image; } 
 			set {

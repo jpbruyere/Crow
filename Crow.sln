@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GOLib", "GOLib.csproj", "{C2980F9B-4798-4C05-99E2-E174810F7C7B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crow", "Crow.csproj", "{C2980F9B-4798-4C05-99E2-E174810F7C7B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{74289092-9F70-4941-AFCB-DFD7BE2140B6}"
 EndProject

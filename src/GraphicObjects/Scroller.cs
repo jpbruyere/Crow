@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 using OpenTK.Input;
 using System.ComponentModel;
 
-namespace go
+namespace Crow
 {
 	public class Scroller : Container, IValueChange
     {

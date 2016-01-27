@@ -53,7 +53,7 @@ using MonoDevelop.Ide.Fonts;
 using Mono.Addins;
 using MonoDevelop.Core;
 using MonoDevelop.Ide;
-using go;
+using Crow;
 using MonoDevelop.DesignerSupport;
 using MonoDevelop.SourceEditor;
 

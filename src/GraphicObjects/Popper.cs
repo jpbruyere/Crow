@@ -16,9 +16,9 @@ using System.ComponentModel;
 using System.Xml;
 using System.IO;
 
-namespace go
+namespace Crow
 {
-	[DefaultTemplate("#go.Templates.Popper.goml")]
+	[DefaultTemplate("#Crow.Templates.Popper.goml")]
     public class Popper : TemplatedContainer
     {		
 		#region CTOR
@@ -125,7 +125,7 @@ namespace go
 				NotifyValueChanged ("Title", title);
 			}
 		}        
-		[XmlAttributeAttribute()][DefaultValue("#go.Images.Icons.expandable.svg")]
+		[XmlAttributeAttribute()][DefaultValue("#Crow.Images.Icons.expandable.svg")]
 		public string Image {
 			get { return image; } 
 			set {

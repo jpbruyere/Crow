@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace go
+namespace Crow
 {
 	public interface ILayoutable
 	{

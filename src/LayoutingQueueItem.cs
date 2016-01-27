@@ -21,7 +21,7 @@
 using System;
 using System.Diagnostics;
 
-namespace go
+namespace Crow
 {
 	public enum LayoutingType
 	{

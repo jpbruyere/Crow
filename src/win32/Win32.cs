@@ -5,7 +5,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
-namespace go
+namespace Crow
 {
     public static class Win32
     {

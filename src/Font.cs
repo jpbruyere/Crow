@@ -1,7 +1,7 @@
 ﻿using System;
 using Cairo;
 
-namespace go
+namespace Crow
 {
 	public enum FontStyle
 	{

@@ -14,7 +14,7 @@ using OpenTK.Input;
 
 
 
-namespace go
+namespace Crow
 {
 	public class OpenTKGameWindow : GameWindow, ILayoutable, IGOLibHost
     {
@@ -24,7 +24,7 @@ namespace go
 //				GameWindowFlags.Fullscreen,
 //				DisplayDevice.Default,
 //				3,0,OpenTK.Graphics.GraphicsContextFlags.Default)
-		public OpenTKGameWindow(int _width, int _height, string _title="golib")
+		public OpenTKGameWindow(int _width, int _height, string _title="Crow")
 			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 1), 
 				_title,GameWindowFlags.Default,DisplayDevice.GetDisplay(DisplayIndex.Second),
 				3,3,OpenTK.Graphics.GraphicsContextFlags.Debug)
@@ -34,14 +34,14 @@ namespace go
 			//VSync = VSyncMode.On;
 			currentWindow = this;
 			//Load cursors
-			XCursor.Cross = XCursorFile.Load("#go.Images.Icons.Cursors.cross").Cursors[0];
-			XCursor.Default = XCursorFile.Load("#go.Images.Icons.Cursors.arrow").Cursors[0];
-			XCursor.NW = XCursorFile.Load("#go.Images.Icons.Cursors.top_left_corner").Cursors[0];
-			XCursor.NE = XCursorFile.Load("#go.Images.Icons.Cursors.top_right_corner").Cursors[0];
-			XCursor.SW = XCursorFile.Load("#go.Images.Icons.Cursors.bottom_left_corner").Cursors[0];
-			XCursor.SE = XCursorFile.Load("#go.Images.Icons.Cursors.bottom_right_corner").Cursors[0];
-			XCursor.H = XCursorFile.Load("#go.Images.Icons.Cursors.sb_h_double_arrow").Cursors[0];
-			XCursor.V = XCursorFile.Load("#go.Images.Icons.Cursors.sb_v_double_arrow").Cursors[0];
+			XCursor.Cross = XCursorFile.Load("#Crow.Images.Icons.Cursors.cross").Cursors[0];
+			XCursor.Default = XCursorFile.Load("#Crow.Images.Icons.Cursors.arrow").Cursors[0];
+			XCursor.NW = XCursorFile.Load("#Crow.Images.Icons.Cursors.top_left_corner").Cursors[0];
+			XCursor.NE = XCursorFile.Load("#Crow.Images.Icons.Cursors.top_right_corner").Cursors[0];
+			XCursor.SW = XCursorFile.Load("#Crow.Images.Icons.Cursors.bottom_left_corner").Cursors[0];
+			XCursor.SE = XCursorFile.Load("#Crow.Images.Icons.Cursors.bottom_right_corner").Cursors[0];
+			XCursor.H = XCursorFile.Load("#Crow.Images.Icons.Cursors.sb_h_double_arrow").Cursors[0];
+			XCursor.V = XCursorFile.Load("#Crow.Images.Icons.Cursors.sb_v_double_arrow").Cursors[0];
 		}        
 		#endregion
 
@@ -162,7 +162,7 @@ namespace go
 		int texID;
 
 		public QuadVAO uiQuad, uiQuad2;
-		go.GLBackend.Shader shader;
+		Crow.Shader shader;
 		int[] viewport = new int[4];
 
 		Rectangle dirtyZone = Rectangle.Empty;
@@ -409,7 +409,7 @@ namespace go
 			int matl = GL.GetInteger (GetPName.MaxArrayTextureLayers);
 			int mts = GL.GetInteger (GetPName.MaxTextureSize);
 
-			shader = new go.GLBackend.TexturedShader ();
+			shader = new Crow.TexturedShader ();
 		}
 
 		protected override void OnResize(EventArgs e)

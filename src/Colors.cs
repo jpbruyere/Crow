@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 
 
-namespace go
+namespace Crow
 {
 	public struct Color : IXmlSerializable
     {

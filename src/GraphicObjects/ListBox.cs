@@ -29,11 +29,11 @@ using System.Xml;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace go
+namespace Crow
 {
-	[DefaultTemplate("#go.Templates.Listbox.goml")]
-	//[DefaultTemplate("#go.Templates.ItemTemplate.goml")]
-	public class ListBox : TemplatedControl, IXmlSerializable
+	[DefaultTemplate("#Crow.Templates.Listbox.goml")]
+	//[DefaultTemplate("#Crow.Templates.ItemTemplate.goml")]
+	public class ListBox : TemplatedControl//, IXmlSerializable
 	{
 		#region CTOR
 		public ListBox () : base() {}
@@ -54,7 +54,7 @@ namespace go
 		}
 		#endregion
 
-		[XmlAttributeAttribute][DefaultValue("#go.Templates.ItemTemplate.goml")]
+		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ItemTemplate.goml")]
 		public string ItemTemplate {
 			get { return _itemTemplate; }
 			set { 
@@ -176,63 +176,63 @@ namespace go
 		}
 
 		#region IXmlSerializable
-		public override System.Xml.Schema.XmlSchema GetSchema(){ return null; }
-		public override void ReadXml(System.Xml.XmlReader reader)
-		{
-			//Template could be either an attribute containing path or expressed inlined
-			//as a Template Element
-			using (System.Xml.XmlReader subTree = reader.ReadSubtree())
-			{
-				subTree.Read ();
-
-				string template = reader.GetAttribute ("Template");
-				string tmp = subTree.ReadOuterXml ();
-
-				//Load template from path set as attribute in templated control
-				if (string.IsNullOrEmpty (template)) {					
-					//seek for template tag first
-					using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
-						//load template first if inlined
-
-						xr.Read (); //skip current node
-
-						while (!xr.EOF) {
-							xr.Read (); //read first child
-							if (!xr.IsStartElement ())
-								continue;
-							if (xr.Name == "Template") {
-								xr.Read ();
-
-								Type t = Type.GetType ("go." + xr.Name);
-								GraphicObject go = (GraphicObject)Activator.CreateInstance (t);                                
-								(go as IXmlSerializable).ReadXml (xr);
-
-								loadTemplate (go);
-
-								xr.Read ();//go close tag
-								xr.Read ();//Template close tag
-								break;
-							} else {
-								xr.ReadInnerXml ();
-							}
-						}
-					}				
-				} else
-					loadTemplate (Interface.Load (template, this));
-
-
-				//normal xml read
-				using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
-					xr.Read ();
-					base.ReadXml(xr);
-				}
-			}
-		}
-		public override void WriteXml(System.Xml.XmlWriter writer)
-		{
-			//TODO:
-			throw new NotImplementedException();
-		}
+//		public override System.Xml.Schema.XmlSchema GetSchema(){ return null; }
+//		public override void ReadXml(System.Xml.XmlReader reader)
+//		{
+//			//Template could be either an attribute containing path or expressed inlined
+//			//as a Template Element
+//			using (System.Xml.XmlReader subTree = reader.ReadSubtree())
+//			{
+//				subTree.Read ();
+//
+//				string template = reader.GetAttribute ("Template");
+//				string tmp = subTree.ReadOuterXml ();
+//
+//				//Load template from path set as attribute in templated control
+//				if (string.IsNullOrEmpty (template)) {					
+//					//seek for template tag first
+//					using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
+//						//load template first if inlined
+//
+//						xr.Read (); //skip current node
+//
+//						while (!xr.EOF) {
+//							xr.Read (); //read first child
+//							if (!xr.IsStartElement ())
+//								continue;
+//							if (xr.Name == "Template") {
+//								xr.Read ();
+//
+//								Type t = Type.GetType ("Crow." + xr.Name);
+//								GraphicObject go = (GraphicObject)Activator.CreateInstance (t);                                
+//								(go as IXmlSerializable).ReadXml (xr);
+//
+//								loadTemplate (go);
+//
+//								xr.Read ();//go close tag
+//								xr.Read ();//Template close tag
+//								break;
+//							} else {
+//								xr.ReadInnerXml ();
+//							}
+//						}
+//					}				
+//				} else
+//					loadTemplate (Interface.Load (template, this));
+//
+//
+//				//normal xml read
+//				using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
+//					xr.Read ();
+//					base.ReadXml(xr);
+//				}
+//			}
+//		}
+//		public override void WriteXml(System.Xml.XmlWriter writer)
+//		{
+//			//TODO:
+//			throw new NotImplementedException();
+//		}
 		#endregion
 	}
 }

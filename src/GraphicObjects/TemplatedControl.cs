@@ -26,7 +26,7 @@ using System.Xml;
 using System.Linq;
 using System.Diagnostics;
 
-namespace go
+namespace Crow
 {
 //	[AttributeUsage(AttributeTargets.Class)]
 	public class TemplateAttribute : Attribute
@@ -61,7 +61,7 @@ namespace go
 
 		string _template;
 
-		[XmlAttributeAttribute][DefaultValue("#go.Templates.Template.goml")]
+		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.Template.goml")]
 		public string Template {
 			get { return _template; }
 			set { _template = value; }
@@ -148,7 +148,7 @@ namespace go
 							if (xr.Name == "Template") {
 								xr.Read ();
 
-								Type t = Type.GetType ("go." + xr.Name);
+								Type t = Type.GetType ("Crow." + xr.Name);
 								GraphicObject go = (GraphicObject)Activator.CreateInstance (t);                                
 								(go as IXmlSerializable).ReadXml (xr);
 

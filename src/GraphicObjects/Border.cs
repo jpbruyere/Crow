@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
 
-namespace go
+namespace Crow
 {
 	public class Border : Container
 	{

@@ -5,7 +5,7 @@ using OpenTK.Input;
 using System.ComponentModel;
 using System.Linq;
 
-namespace go
+namespace Crow
 {
     public class Container : PrivateContainer, IXmlSerializable
     {
@@ -50,7 +50,7 @@ namespace go
                 if (!subTree.IsStartElement())
                     return;
 
-                Type t = Type.GetType("go." + subTree.Name);
+                Type t = Type.GetType("Crow." + subTree.Name);
                 GraphicObject go = (GraphicObject)Activator.CreateInstance(t);                                
 
                 (go as IXmlSerializable).ReadXml(subTree);

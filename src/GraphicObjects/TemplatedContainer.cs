@@ -22,7 +22,7 @@ using System;
 using System.Xml.Serialization;
 using System.Xml;
 
-namespace go
+namespace Crow
 {
 	public abstract class TemplatedContainer : TemplatedControl
 	{
@@ -79,7 +79,7 @@ namespace go
 						if (xr.Name == "Template")
 							continue;
 
-						Type t = Type.GetType ("go." + xr.Name);
+						Type t = Type.GetType ("Crow." + xr.Name);
 						GraphicObject go = (GraphicObject)Activator.CreateInstance (t);                                
 
 						(go as IXmlSerializable).ReadXml (xr);

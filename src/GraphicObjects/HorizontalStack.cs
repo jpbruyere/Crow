@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace go
+namespace Crow
 {
     public class HorizontalStack : GenericStack
     {
         public HorizontalStack()
             : base()
         {
-            Orientation = go.Orientation.Horizontal;
+            Orientation = Crow.Orientation.Horizontal;
         }
 
         [XmlIgnore]

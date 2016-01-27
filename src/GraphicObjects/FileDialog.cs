@@ -28,7 +28,7 @@ using OpenTK.Input;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace go
+namespace Crow
 {
 	public class FileDialog: IValueChange
 	{
@@ -49,7 +49,7 @@ namespace go
 		public FileDialog ()
 		{
 			currentDir = new DirectoryInfo (Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
-			window = Interface.Load("#go.Templates.FileDialog.goml") as Window;
+			window = Interface.Load("#Crow.Templates.FileDialog.goml") as Window;
 			window.DataSource = this;
 		}
 		#endregion

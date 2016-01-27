@@ -6,7 +6,7 @@ using System.Text;
 using System.Xml.Serialization;
 using System.ComponentModel;
 
-namespace go
+namespace Crow
 {
 	/// <summary>
 	/// Simple grid container

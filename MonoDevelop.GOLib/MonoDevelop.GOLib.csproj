@@ -103,9 +103,9 @@
     <EmbeddedResource Include="MonoDevelop.GOLib.addin.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GOLib.csproj">
+    <ProjectReference Include="..\Crow.csproj">
       <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
-      <Name>GOLib</Name>
+      <Name>Crow</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
