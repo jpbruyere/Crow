@@ -76,8 +76,12 @@ namespace Crow
 
 						if (!xr.IsStartElement ())
 							continue;
-						if (xr.Name == "Template")
-							continue;
+						
+						if (xr.Name == "Template"){
+							xr.Skip ();
+							if (!xr.IsStartElement ())
+								continue;
+						}
 
 						Type t = Type.GetType ("Crow." + xr.Name);
 						GraphicObject go = (GraphicObject)Activator.CreateInstance (t);                                

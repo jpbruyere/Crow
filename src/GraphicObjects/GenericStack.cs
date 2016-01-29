@@ -10,6 +10,12 @@ namespace Crow
 {
     public class GenericStack : Group
     {
+		internal class Page
+		{
+			public byte[] bmp;
+			public int Size;
+		}
+
 		#region CTOR
 		public GenericStack()
 			: base()
@@ -87,13 +93,13 @@ namespace Crow
 				foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
 					c.Slot.X = d;
 					d += c.Slot.Width + Spacing;
-					//c.RegisterForLayouting ((int)LayoutingType.Y);
+					c.RegisterForLayouting ((int)LayoutingType.Y);
 				}
 			} else {
 				foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
 					c.Slot.Y = d;
 					d += c.Slot.Height + Spacing;
-					//c.RegisterForLayouting ((int)LayoutingType.X);
+					c.RegisterForLayouting ((int)LayoutingType.X);
 				}
 			}
 		}

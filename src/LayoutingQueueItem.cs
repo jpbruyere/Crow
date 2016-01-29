@@ -52,6 +52,10 @@ namespace Crow
 			Debug.WriteLine ("Layouting => " + this.ToString ());
 			#endif
 			try {
+				if (GraphicObject.Parent == null){
+					Debug.WriteLine("ERROR: processLayouting, no parent for: " + GraphicObject.ToString());
+					return;
+				}
 				GraphicObject.UpdateLayout (LayoutType);
 			} catch (Exception ex) {
 				Debug.WriteLine ("Layouting error: " + ex.ToString ());

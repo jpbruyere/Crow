@@ -12,7 +12,7 @@
 						<Label Foreground="White" Width="{../../../../../TemplatedWidth}" Margin="1" TextAlignment="Center" Text="{../../../../../Title}" />
 						<Border CornerRadius="6" BorderWidth="1" BorderColor="Transparent"  Height="12" Width="12"
 							MouseEnter="{BorderColor=White}" MouseLeave="{BorderColor=Transparent}">
-							<Image Focusable="true" Name="Image" Margin="0" Width="0" Height="0" Path="#go.Images.Icons.exit2.svg"
+							<Image Focusable="true" Name="Image" Margin="0" Width="0" Height="0" Path="#Crow.Images.Icons.exit2.svg"
 								 MouseClick="../../../../../../butQuitPress"/>
 						</Border>
 						<GraphicObject Width="5"/>

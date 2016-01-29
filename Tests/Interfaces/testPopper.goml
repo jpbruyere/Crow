@@ -3,7 +3,7 @@
 	<Border Fit="True" Background="ArmyGreen">
 <!--		<Image Fit="true" Path="#go.Images.Icons.tetra.png" Margin="10"/>-->
 		<VerticalStack Fit="true" Margin="10" Background="CornflowerBlue">
-			<Checkbox Name="chk1"/>
+			<Checkbox Name="chk1" Background="Red"/>
 			<Checkbox Name="chk2" IsChecked="true"/>
 			<Checkbox Name="chk3"/>
 			<Checkbox Name="chk4"/>

@@ -36,16 +36,17 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"testWindow2.goml",
 //			"testCombobox.goml",
 			"testWindow3.goml",
+			"testWindow.goml",
+			"testGroupBox.goml",
 			"testExpandable.goml",
-			"testPopper.goml",
 			"testCheckbox.goml",
+			"testPopper.goml",
 			"fps.goml",
 			"testLabel.goml",
 			"testAll.goml",
-			"testWindow.goml",
-			"testWindow2.goml",
 //			"testSpinner.goml",
 			"test4.goml",
 			"testRadioButton2.goml",
@@ -53,7 +54,6 @@ namespace test
 			"testBorder.goml",
 			"testRadioButton.goml",
 			"testSpinner.goml",
-			"testGroupBox.goml",
 			"testMsgBox.goml",
 			"testGrid.goml",
 			"testMeter.goml",

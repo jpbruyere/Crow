@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0"?>
-<Expandable Title="Test expandable" Width="-1" Background="DimGray">
+<Expandable Title="Test expandable" Background="DimGray">
 		<VerticalStack Width="-1" Height="-1">
-			<Checkbox Name="chk1"/>
+			<Checkbox Name="chk1" Background="Red"/>
 			<Checkbox Name="chk2" IsChecked="true"/>
 			<Checkbox Name="chk3"/>
 			<Checkbox Name="chk4"/>
-			<HorizontalStack Fit="true" Margin="20">
-				<Label Name="captionFps" Text="Fps:" Width="50" TextAlignment="RightCenter"/>
-				<Label Name="valueFps" Text="{fps}" Font="droid , 12" Width="50" TextAlignment="Center" Background="AoEnglish"/>
+			<HorizontalStack Fit="true" Margin="2" Background="Blue">
+				<Label Name="captionFps" Text="Fps:" Width="30" TextAlignment="RightCenter"/>
+				<Label Name="valueFps" Text="{fps}" Font="droid , 12" Width="-1" TextAlignment="Center" Background="AoEnglish"/>
 			</HorizontalStack>
 		</VerticalStack>
 </Expandable>

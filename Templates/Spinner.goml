@@ -5,10 +5,10 @@
 			Text="{../../../Value}" Margin="1" TextAlignment="RightCenter"/>
 		<VerticalStack Width="-1" Height="{../../../TemplatedHeight}" Spacing="1" >
 			<Button Width="12" Height="8" MouseClick="../../../../onUp">
-				<Image Margin="1" Path="#go.Images.Icons.updown.svg" SvgSub="up"/>
+				<Image Margin="1" Path="#Crow.Images.Icons.updown.svg" SvgSub="up"/>
 			</Button>
 			<Button Width="12" Height="8" MouseClick="../../../../onDown">
-				<Image Margin="1" Path="#go.Images.Icons.updown.svg" SvgSub="down"/>
+				<Image Margin="1" Path="#Crow .Images.Icons.updown.svg" SvgSub="down"/>
 			</Button>
 		</VerticalStack>
 	</HorizontalStack>

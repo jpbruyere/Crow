@@ -50,7 +50,7 @@
 				</Button>
 				<Popper Width="100">
 					<Border Margin="10" Fit="True" Background="ArmyGreen">
-						<Image Fit="true" Path="#go.Images.Icons.tetra.png"/>
+						<Image Fit="true" Path="#Crow.Images.Icons.tetra.png"/>
 					</Border>
 				</Popper>
 				<Expandable Name="expander" Width="150" Height="-1">

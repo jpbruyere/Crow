@@ -29,7 +29,9 @@ namespace Crow
 		Direction currentDirection = Direction.None;
 
 		#region CTOR
-		public Window () : base() {}
+		public Window () : base() {
+			
+		}
 		#endregion
 
 		#region GraphicObject overrides
