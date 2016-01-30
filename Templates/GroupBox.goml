@@ -5,6 +5,6 @@
 		<Container Name="Content" Margin="10"
 				Height="{../../../TemplatedHeight}" Width="{../../../TemplatedWidth}"/>
 	</Border>
-	<Label Text="{../../Title}" VerticalAlignment="Top" Left="15"
+	<Label Text="{../../Caption}" VerticalAlignment="Top" Left="15"
 		Background="Clear" Margin="1"/>
 </Group>

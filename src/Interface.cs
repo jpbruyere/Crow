@@ -112,8 +112,11 @@ namespace Crow
 
 			if (path.StartsWith ("#")) {
 				string resId = path.Substring (1);
-				stream = System.Reflection.Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
-				if (stream == null)//try to find ressource in golib assembly				
+				//try/catch added to prevent nunit error
+				try {
+					stream = System.Reflection.Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
+				} catch (Exception ex) {}
+				if (stream == null)//try to find ressource in Crow assembly				
 					stream = System.Reflection.Assembly.GetExecutingAssembly ().GetManifestResourceStream (resId);
 				if (stream == null)
 					throw new Exception ("Resource not found: " + path);

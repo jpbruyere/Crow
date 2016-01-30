@@ -12,7 +12,7 @@
 			<TextRun Text="text run test"/>
 		</VerticalStack>
 	</Groupbox>-->
-	<Groupbox  Background="DarkGreen">		
+	<GroupBox  Background="DarkGreen">		
 <!--		<Template>
 			<Group Height="{../TemplatedHeight}" Width="{../TemplatedWidth}">
 				<Border CornerRadius="5" BorderWidth="1" Margin="0"
@@ -29,7 +29,7 @@
 			<TextRun Text="text run test" />
 			<TextRun Text="text run test"/>
 		</VerticalStack>
-	</Groupbox>
+	</GroupBox>
 <!--	<Group Fit="true">
 		<Border CornerRadius="5" BorderWidth="1" Margin="6" Fit="true">
 			<Container Name="Content" Margin="10" Fit="true">

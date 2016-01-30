@@ -26,12 +26,12 @@ namespace Crow
 		#endregion
 
 		#region GraphicObject Overrides
-		[XmlAttributeAttribute()][DefaultValue(60)]
+		[XmlAttributeAttribute()][DefaultValue(50)]
 		public override int Width {
 			get { return base.Width; }
 			set { base.Width = value; }
 		}
-		[XmlAttributeAttribute()][DefaultValue(30)]
+		[XmlAttributeAttribute()][DefaultValue(20)]
 		public override int Height {
 			get { return base.Height; }
 			set { base.Height = value; }

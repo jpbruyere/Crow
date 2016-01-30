@@ -1,0 +1,7 @@
+﻿<?xml version="1.0"?>
+<Container Width="300" Height="300" Margin="20" Background="Yellow">
+	<Container Width="0" Height="0" Margin="20" Background="Green">
+		<GraphicObject VerticalAlignment="Bottom" Width="50" Height="50"
+			Background="Red"/>
+	</Container>
+</Container>

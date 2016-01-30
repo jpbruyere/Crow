@@ -31,7 +31,7 @@ using System.Threading;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.Listbox.goml")]
+	[DefaultTemplate("#Crow.Templates.ListBox.goml")]
 	//[DefaultTemplate("#Crow.Templates.ItemTemplate.goml")]
 	public class ListBox : TemplatedControl//, IXmlSerializable
 	{

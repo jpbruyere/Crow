@@ -18,14 +18,14 @@ using System.IO;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.Groupbox.goml")]
-    public class Groupbox : TemplatedContainer
+	[DefaultTemplate("#Crow.Templates.GroupBox.goml")]
+    public class GroupBox : TemplatedContainer
     {		
-		string title;
+		string caption;
 		Container _contentContainer;
 
 		#region CTOR
-		public Groupbox() : base(){}	
+		public GroupBox() : base(){}	
 		#endregion
 
 		#region Template overrides
@@ -55,13 +55,13 @@ namespace Crow
 		#endregion
 
 		[XmlAttributeAttribute()][DefaultValue("Groupbox")]
-		public string Title {
-			get { return title; } 
+		public string Caption {
+			get { return caption; } 
 			set {
-				if (title == value)
+				if (caption == value)
 					return;
-				title = value; 
-				NotifyValueChanged ("Title", title);
+				caption = value; 
+				NotifyValueChanged ("Caption", caption);
 			}
 		}        
 	}

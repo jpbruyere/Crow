@@ -1,23 +1,15 @@
 ﻿<Properties GitUserInfo="UsingGIT" StartupItem="Tests/Tests.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|Linux_x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Images/Icons/button.svg">
+  <MonoDevelop.Ide.Workbench ActiveDocument="src/GraphicObjects/TemplatedControl.cs">
     <Files>
-      <File FileName="src/GraphicObjects/ListBox.cs" Line="36" Column="43" />
-      <File FileName="Tests/Interfaces/test_Listbox.goml" Line="25" Column="60" />
-      <File FileName="Tests/GOLIBTest_Listbox.cs" Line="98" Column="1" />
-      <File FileName="src/GraphicObjects/TemplatedControl.cs" Line="151" Column="39" />
-      <File FileName="src/GraphicObjects/Scrollbar.cs" Line="49" Column="1" />
-      <File FileName="src/GraphicObjects/GenericStack.cs" Line="96" Column="8" />
-      <File FileName="src/GraphicObjects/GraphicObject.cs" Line="22" Column="15" />
-      <File FileName="src/OpenTKGameWindow.cs" Line="27" Column="71" />
-      <File FileName="src/OpenGL/Shader.cs" Line="1" Column="1" />
-      <File FileName="src/OpenGL/TexturedShader.cs" Line="1" Column="1" />
-      <File FileName="src/OpenGL/QuadVAO.cs" Line="1" Column="1" />
-      <File FileName="src/Interface.cs" Line="119" Column="1" />
-      <File FileName="bin/Debug/Interfaces/test4.goml.cs" Line="97" Column="35" />
-      <File FileName="src/GraphicObjects/Group.cs" Line="308" Column="42" />
-      <File FileName="Tests/GOLIBTest_TypeViewer.cs" Line="37" Column="4" />
-      <File FileName="Images/Icons/button.svg" Line="1" Column="1" />
+      <File FileName="src/GraphicObjects/GraphicObject.cs" Line="848" Column="39" />
+      <File FileName="Tests/GOLIBTests.cs" Line="41" Column="1" />
+      <File FileName="Tests/Interfaces/testWindow3.goml" Line="10" Column="6" />
+      <File FileName="src/GraphicObjects/TemplatedControl.cs" Line="114" Column="1" />
+      <File FileName="src/GraphicObjects/Window.cs" Line="214" Column="1" />
+      <File FileName="src/GraphicObjects/TemplatedContainer.cs" Line="80" Column="19" />
+      <File FileName="src/GraphicObjects/Container.cs" Line="31" Column="1" />
+      <File FileName="src/GraphicObjects/PrivateContainer.cs" Line="67" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -154,6 +154,7 @@ namespace Crow
 				cursor.TopLeft = new Point ((int)(p1.X - r.Width / 2),
 					r.Top + (int)(Value * unity));				
 			}
+			cursor.Inflate (-1);
         }
         
 		#region mouse handling

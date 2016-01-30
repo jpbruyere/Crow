@@ -14,7 +14,7 @@
    version="1.1"
    inkscape:version="0.91 r13725"
    sodipodi:docname="updown.svg">
-  <metadata
+<!--  <metadata
      id="metadata13">
     <rdf:RDF>
       <cc:Work
@@ -45,37 +45,12 @@
      inkscape:window-x="0"
      inkscape:window-y="16"
      inkscape:window-maximized="0"
-     inkscape:current-layer="svg2" />
-  <defs
-     id="defs4">
-    <filter
-       height="1.4299999"
-       y="-0.215"
-       width="1.3096"
-       x="-0.1548"
-       id="filter4391"
-       style="color-interpolation-filters:sRGB">
-      <feGaussianBlur
-         id="feGaussianBlur4393"
-         stdDeviation="3.225" />
-    </filter>
-    <filter
-       height="1.4299999"
-       y="-0.215"
-       width="1.3096"
-       x="-0.1548"
-       id="filter4391-5"
-       style="color-interpolation-filters:sRGB">
-      <feGaussianBlur
-         id="feGaussianBlur4393-0"
-         stdDeviation="3.225" />
-    </filter>
-  </defs>
+     inkscape:current-layer="svg2" />-->
   <g
      id="up"
      transform="matrix(0.88780545,0,0,0.79362094,4.0529638,4.3893292)">
     <path
-       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter4391)"
+       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 32,9 7,44 57,44 Z"
        id="path4144"
        inkscape:connector-curvature="0"
@@ -85,7 +60,7 @@
      id="down"
      transform="matrix(0.88780545,0,0,0.79362094,4.0529638,4.3893292)">
     <path
-       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter4391-5)"
+       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 7,9 57,9 32,44 Z"
        id="path4144-0"
        inkscape:connector-curvature="0"

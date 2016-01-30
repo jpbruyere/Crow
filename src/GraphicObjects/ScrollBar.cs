@@ -16,8 +16,8 @@ using System.ComponentModel;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.Scrollbar.goml")]
-	public class Scrollbar : TemplatedControl, IValueChange
+	[DefaultTemplate("#Crow.Templates.ScrollBar.goml")]
+	public class ScrollBar : TemplatedControl, IValueChange
 	{
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
@@ -28,7 +28,7 @@ namespace Crow
 		double _maximumScroll;
 		double _scroll;
 
-		public Scrollbar() : base()
+		public ScrollBar() : base()
 		{
 		}	
 

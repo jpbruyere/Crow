@@ -28,8 +28,8 @@
 						</HorizontalStack>
 					</VerticalStack>
 					<VerticalStack Fit="true">					
-						<Checkbox Name="chk1"/>
-						<Checkbox Name="chk2" IsChecked="true"/>
+						<CheckBox Name="chk1"/>
+						<CheckBox Name="chk2" IsChecked="true"/>
 
 					</VerticalStack>
 					<VerticalStack Fit="true">
@@ -38,39 +38,45 @@
 						<Button MouseClick="onButClick"/>
 					</VerticalStack>
 				</HorizontalStack>
-				<TextBoxWidget Name="textbox1" TextAlignment="LeftCenter" Font="droid,14"						
+				<TextBox Name="textbox1" TextAlignment="LeftCenter" Font="droid,14"						
 								Width="200" Height="-1" Margin="2" Background="White"
 								Forground="Black"
 								BorderColor="DimGray" BorderWidth="1"
 								Text="editable text"/>
+				<Popper Width="100">
+					<Border Fit="True" Background="ArmyGreen">
+						<Image Margin="10" Fit="true" Path="#Crow.Images.Icons.tetra.png"/>
+					</Border>
+				</Popper>
+
 			</VerticalStack>
 			<VerticalStack Fit="true"  Margin="0" WidgetSpacing="1">
 				<Button  Margin="1" Width="150" Height="100">
 					<Image Path="#Tests.image.tetra.png"/>
 				</Button>
 				<Popper Width="100">
-					<Border Margin="10" Fit="True" Background="ArmyGreen">
-						<Image Fit="true" Path="#Crow.Images.Icons.tetra.png"/>
+					<Border Fit="True" Background="ArmyGreen">
+						<Image Margin="10" Fit="true" Path="#Crow.Images.Icons.tetra.png"/>
 					</Border>
 				</Popper>
 				<Expandable Name="expander" Width="150" Height="-1">
 					<VerticalStack Name="vsExpanded" Width="100">
-						<Checkbox Name="chk1"/>
-						<Checkbox Name="chk2" IsChecked="true"/>
-						<Checkbox Name="chk3"/>
-						<Checkbox Name="chk4"/>
+						<CheckBox Name="chk1"/>
+						<CheckBox Name="chk2" IsChecked="true"/>
+						<CheckBox Name="chk3"/>
+						<CheckBox Name="chk4"/>
 					</VerticalStack>		
 				</Expandable>
 				<Expandable Name="expander2" Width="150" Height="-1">
 					<VerticalStack Name="vsExpanded" Width="100">
-						<Checkbox Name="chk1"/>
-						<Checkbox Name="chk2" IsChecked="true"/>
+						<CheckBox Name="chk1"/>
+						<CheckBox Name="chk2" IsChecked="true"/>
 					</VerticalStack>		
 				</Expandable>
 				<Expandable Name="expander3" Width="150" Height="-1">
 					<VerticalStack Name="vsExpanded" Width="100">
-						<Checkbox Name="chk1" IsChecked="true"/>
-						<Checkbox Name="chk2"/>
+						<CheckBox Name="chk1" IsChecked="true"/>
+						<CheckBox Name="chk2"/>
 					</VerticalStack>		
 				</Expandable>
 				<HorizontalStack>
@@ -103,7 +109,7 @@
 							BorderColor="White" Foreground="BlueCrayola" Background="DarkGray"/>												-->
 					</VerticalStack>
 				</Scroller>
-				<Scrollbar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" MaximumScroll="{../scroller1.MaximumScroll}"
+				<ScrollBar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" MaximumScroll="{../scroller1.MaximumScroll}"
 					Orientation="Vertical" Width="10" Height="0"/>
 			</HorizontalStack>
 		</HorizontalStack>

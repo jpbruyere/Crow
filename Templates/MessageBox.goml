@@ -9,19 +9,19 @@
 				<Label Foreground="White" Width="{../../../../../TemplatedWidth}" Margin="1" TextAlignment="Center" Text="{../../../../../Title}" />
 				<Border CornerRadius="6" BorderWidth="1" BorderColor="Transparent"  Height="12" Width="12"
 					MouseEnter="{BorderColor=White}" MouseLeave="{BorderColor=Transparent}">
-					<Image Focusable="true" Name="Image" Margin="0" Width="0" Height="0" Path="#go.Images.Icons.exit2.svg"
+					<Image Focusable="true" Name="Image" Margin="0" Width="0" Height="0" Path="#Crow.Images.Icons.exit2.svg"
 						 MouseClick="../../../../../../butQuitPress"/>
 				</Border>
 				<GraphicObject Width="5" Height="5"/>
 			</HorizontalStack>
 		</Border>
-		<HorizontalStack Spacing="10" Margin="10" Height="{../../../TemplatedHeight}" Width="{../../../TemplatedWidth}">
-			<Image Name="Image" Width="32" Height="32"
-				Path="#go.Images.Icons.iconInfo.svg" />
+		<HorizontalStack Spacing="3" Margin="3" Height="{../../../TemplatedHeight}" Width="{../../../TemplatedWidth}">
+			<Image Name="Image" Width="24" Height="24"
+				Path="#Crow.Images.Icons.iconInfo.svg" />
 			<TextRun Font="serif, 12" Height="{../../../../TemplatedHeight}" Width="{../../../../TemplatedWidth}" Text="{../../../../Message}"
 				Multiline="true" WordWrap="true"/>		
 		</HorizontalStack>
-		<HorizontalStack Height="-1" Width="{../../../TemplatedWidth}" Margin="5">
+		<HorizontalStack Height="-1" Width="{../../../TemplatedWidth}" Margin="3">
 			<GraphicObject Height="5"/>
 			<Button Text="Ok"/>
 			<Button Text="Cancel"/>

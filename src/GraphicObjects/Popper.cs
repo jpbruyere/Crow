@@ -27,7 +27,7 @@ namespace Crow
 		}	
 		#endregion
 		bool _isPopped;
-		string title;
+		string caption;
 		string image;
 		GraphicObject _content;
 
@@ -66,15 +66,16 @@ namespace Crow
 			if (tc == null)
 				return;
 			Rectangle r = this.ScreenCoordinates (this.Slot);
-			if (e.LayoutType == LayoutingType.Width) {
+			if (((int)e.LayoutType & (int)LayoutingType.Width) > 0) {
 				if (Content.Slot.Width < tc.ClientRectangle.Width) {
 					if (r.Left + Content.Slot.Width > tc.ClientRectangle.Right)
 						Content.Left = tc.ClientRectangle.Right - Content.Slot.Width;
 					else
 						Content.Left = r.Left;
-				}else
+				} else
 					Content.Left = 0;
-			}else if (e.LayoutType == LayoutingType.Height) {
+			}
+			if (((int)e.LayoutType & (int)LayoutingType.Height) > 0) {
 				if (Content.Slot.Height < tc.ClientRectangle.Height) {
 					if (r.Bottom + Content.Slot.Height > tc.ClientRectangle.Bottom)
 						Content.Top = r.Top - Content.Slot.Height;
@@ -116,13 +117,13 @@ namespace Crow
 		}
 
 		[XmlAttributeAttribute()][DefaultValue("Popper")]
-		public string Title {
-			get { return title; } 
+		public string Caption {
+			get { return caption; } 
 			set {
-				if (title == value)
+				if (caption == value)
 					return;
-				title = value; 
-				NotifyValueChanged ("Title", title);
+				caption = value; 
+				NotifyValueChanged ("Caption", caption);
 			}
 		}        
 		[XmlAttributeAttribute()][DefaultValue("#Crow.Images.Icons.expandable.svg")]
@@ -165,6 +166,7 @@ namespace Crow
 				if (Content.Parent == null)
 					tc.AddWidget (Content);
 				tc.PutOnTop (Content);
+				_content_LayoutChanged (this, new LayoutChangeEventArgs (LayoutingType.Sizing));
 			}
 			Pop.Raise (this, e);
 		}
@@ -182,6 +184,5 @@ namespace Crow
 			IsPopped = !IsPopped;
 			base.onMouseClick (sender, e);
 		}
-
 	}
 }

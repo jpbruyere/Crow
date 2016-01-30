@@ -22,7 +22,7 @@ namespace Crow
     public class Expandable : TemplatedContainer
     {		
 		bool _isExpanded;
-		string title;
+		string caption;
 		string image;
 		Container _contentContainer;
 
@@ -62,13 +62,13 @@ namespace Crow
 		}
 
 		[XmlAttributeAttribute()][DefaultValue("Expandable")]
-		public string Title {
-			get { return title; } 
+		public string Caption {
+			get { return caption; } 
 			set {
-				if (title == value)
+				if (caption == value)
 					return;
-				title = value; 
-				NotifyValueChanged ("Title", title);
+				caption = value; 
+				NotifyValueChanged ("Caption", caption);
 			}
 		}        
 		[XmlAttributeAttribute()][DefaultValue("#Crow.Images.Icons.expandable.svg")]

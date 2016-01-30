@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0"?>
 <Container Name="TopContainer" Width="400" Height="350"
 	Margin="20" Focusable="True" Background="Yellow">
-
 	<Container Name="MiddleContainer" Width="0" Height="0"
 		Margin="20" Focusable="True" Background="Green">
 			<Image VerticalAlignment="Bottom"			

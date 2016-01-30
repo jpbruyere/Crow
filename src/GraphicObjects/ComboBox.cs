@@ -20,16 +20,16 @@ using System.Threading;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.Combobox.goml")]
-	[DefaultOverlayTemplate("#Crow.Templates.ComboboxOverlay.goml")]
-	public class Combobox : TemplatedContainer
+	[DefaultTemplate("#Crow.Templates.ComboBox.goml")]
+	[DefaultOverlayTemplate("#Crow.Templates.ComboBoxOverlay.goml")]
+	public class ComboBox : TemplatedContainer
     {		
 		#region CTOR
-		public Combobox() : base(){	}	
+		public ComboBox() : base(){	}	
 		#endregion
 
 		bool _isPopped;
-		string text;
+		string caption;
 		GraphicObject _overlay;
 		Group _list;
 		IList data;
@@ -77,7 +77,7 @@ namespace Crow
 				_itemTemplate = value; 
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ComboboxOverlay.goml")]
+		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ComboBoxOverlay.goml")]
 		public string OverlayTemplate {
 			get { return _overlayTemplate; }
 			set { 
@@ -109,9 +109,9 @@ namespace Crow
 				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs(_selectedItem));
 
 				if (SelectedItem == null)
-					Text = "";
+					Caption = "";
 				else
-					Text = _selectedItem.ToString ();
+					Caption = _selectedItem.ToString ();
 				}
 		}
 		public object SelectedItem{
@@ -125,9 +125,9 @@ namespace Crow
 				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs(_selectedItem));
 
 				if (SelectedItem == null)
-					Text = "";
+					Caption = "";
 				else
-					Text = _selectedItem.ToString ();
+					Caption = _selectedItem.ToString ();
 			}
 
 			get { return _selectedItem; }
@@ -243,13 +243,13 @@ namespace Crow
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("Combobox")]
-		public string Text {
-			get { return text; } 
+		public string Caption {
+			get { return caption; } 
 			set {
-				if (text == value)
+				if (caption == value)
 					return;
-				text = value; 
-				NotifyValueChanged ("Text", text);
+				caption = value; 
+				NotifyValueChanged ("Caption", caption);
 			}
 		}        
 		[XmlAttributeAttribute()][DefaultValue(false)]

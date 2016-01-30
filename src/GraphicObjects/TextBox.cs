@@ -12,16 +12,16 @@ using System.Runtime.InteropServices;
 
 namespace Crow
 {
-    public class TextBoxWidget : Label
+    public class TextBox : Label
     {
 		#region CTOR
-		public TextBoxWidget(string _initialValue)
+		public TextBox(string _initialValue)
 			: base(_initialValue)
 		{
 
 		}
 
-		public TextBoxWidget()
+		public TextBox()
 		{ }
 		#endregion
 

@@ -16,15 +16,15 @@ using System.ComponentModel;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.Checkbox.goml")]
-    public class Checkbox : TemplatedControl
+	[DefaultTemplate("#Crow.Templates.CheckBox.goml")]
+    public class CheckBox : TemplatedControl
     {		        
 		string caption;
 		string image;
 		bool isChecked;
 
 		#region CTOR
-		public Checkbox() : base()
+		public CheckBox() : base()
 		{			
 		}							
 		#endregion
