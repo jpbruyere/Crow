@@ -12,7 +12,6 @@ namespace Crow
 		#endregion
 
 		#region private fields
-		Color _borderColor;
 		int _borderWidth;
 		#endregion
 
@@ -26,12 +25,9 @@ namespace Crow
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("White")]
-		public virtual Color BorderColor {
-			get { return _borderColor; }
-			set {
-				_borderColor = value;
-				registerForGraphicUpdate ();
-			}
+		public override Color Foreground {
+			get { return base.Foreground;}
+			set {base.Foreground = value;}
 		}
 		#endregion
 
@@ -62,7 +58,7 @@ namespace Crow
 
 			if (BorderWidth > 0) {
 				gr.LineWidth = BorderWidth;
-				gr.Color = BorderColor;
+				gr.Color = Foreground;
 				CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
 				gr.Stroke ();
 			}

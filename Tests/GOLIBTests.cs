@@ -36,6 +36,11 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"testTextBox.crow",
+			"testSpinner.goml",
+			"testImage.crow",
+			"testButton.crow",
+			"fps.goml",
 			"test4.goml",
 			"testScrollbar.goml",
 			"2.crow",
@@ -48,7 +53,6 @@ namespace test
 			"testExpandable.goml",
 			"testCheckbox.goml",
 			"testPopper.goml",
-			"fps.goml",
 			"testLabel.goml",
 			"testAll.goml",
 //			"testSpinner.goml",
@@ -56,7 +60,6 @@ namespace test
 			"testContainer.goml",
 			"testBorder.goml",
 			"testRadioButton.goml",
-			"testSpinner.goml",
 			"testMsgBox.goml",
 			"testGrid.goml",
 			"testMeter.goml",
@@ -85,6 +88,8 @@ namespace test
 				ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
 				ValueChanged.Raise (this, new ValueChangeEventArgs ("update",
 					this.updateTime.ElapsedMilliseconds.ToString () + " ms"));
+				ValueChanged.Raise (this, new ValueChangeEventArgs ("drawing",
+					this.drawingTime.ElapsedMilliseconds.ToString () + " ms"));
 			}
 		}
 
@@ -98,6 +103,7 @@ namespace test
 			_fps = 0;
 		}
 		public string update = "";
+		public string drawing = "";
 		#endregion
 
 		public int intValue = 25;
@@ -147,16 +153,20 @@ namespace test
 		}
 		protected override void OnKeyDown (KeyboardKeyEventArgs e)
 		{
-//			if (FocusedWidget != null) {
-//				base.OnKeyDown (e);
-//				return;
-//			}
+			if (FocusedWidget is TextBox) {
+				base.OnKeyDown (e);
+				return;
+			}
 			if (e.Key == Key.Escape) {
 				this.Quit ();
 				return;
-			}else if (e.Key == Key.L) {
+			} else if (e.Key == Key.L) {
 				TestList.Add ("new string");
 				NotifyValueChanged ("TestList", TestList);
+				return;
+			} else if (e.Key == Key.W) {
+				GraphicObject w = LoadInterface("Interfaces/testWindow.goml");
+				w.DataSource = this;
 				return;
 			}
 			ClearInterface ();
@@ -168,7 +178,10 @@ namespace test
 			obj.DataSource = this;
 
 		}
-
+		void onButClick(object send, MouseButtonEventArgs e)
+		{
+			Console.WriteLine ("button clicked:" + send.ToString());
+		}
 		[STAThread]
 		static void Main ()
 		{

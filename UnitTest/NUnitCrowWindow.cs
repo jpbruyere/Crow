@@ -301,7 +301,7 @@ namespace Crow
 		{
 			if (_activeWidget != null) {
 				//first, ensure object is still in the graphic tree
-				if (_activeWidget.TopContainer == null) {
+				if (_activeWidget.HostContainer == null) {
 					activeWidget = null;
 				} else {
 
@@ -313,7 +313,7 @@ namespace Crow
 
 			if (_hoverWidget != null) {
 				//first, ensure object is still in the graphic tree
-				if (_hoverWidget.TopContainer == null) {
+				if (_hoverWidget.HostContainer == null) {
 					hoverWidget = null;
 				} else {
 					//check topmost graphicobject first
@@ -374,7 +374,7 @@ namespace Crow
 				return;
 			}
 
-			_activeWidget.onMouseButtonUp (this, e);
+			_activeWidget.onMouseUp (this, e);
 			_activeWidget = null;
 		}
 		void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
@@ -393,7 +393,7 @@ namespace Crow
 			}
 
 			_activeWidget = g;
-			_activeWidget.onMouseButtonDown (this, e);
+			_activeWidget.onMouseDown (this, e);
 		}
 
 		void Mouse_WheelChanged(object sender, MouseWheelEventArgs e)
@@ -439,7 +439,7 @@ namespace Crow
 		Rectangle ILayoutable.ClientRectangle {
 			get { return new Size(this.ClientRectangle.Size.Width,this.ClientRectangle.Size.Height); }
 		}
-		public IGOLibHost TopContainer {
+		public IGOLibHost HostContainer {
 			get { return this; }
 		}
 

@@ -83,127 +83,134 @@ namespace Crow
 		{
 			base.onMouseMove (sender, e);
 
-			OpenTKGameWindow otkgw = TopContainer as OpenTKGameWindow;
+			OpenTKGameWindow otkgw = HostContainer as OpenTKGameWindow;
 
-			if (otkgw.activeWidget == null) {
-				if (Resizable) {
-					Direction lastDir = currentDirection;
+			if (e.Mouse.IsButtonDown (MouseButton.Left)) {
+				if (!HasFocus)
+					return;
+				
+				otkgw.redrawClip.AddRectangle (this.ScreenCoordinates(this.Slot));
 
-					if (Math.Abs (e.Position.Y - this.Slot.Y) < Interface.BorderThreshold) {
-						if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
-							currentDirection = Direction.NW;
-						else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
-							currentDirection = Direction.NE;
-						else
-							currentDirection = Direction.N;
-					} else if (Math.Abs (e.Position.Y - this.Slot.Bottom) < Interface.BorderThreshold) {
-						if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
-							currentDirection = Direction.SW;
-						else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
-							currentDirection = Direction.SE;
-						else
-							currentDirection = Direction.S;
-					} else if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
-						currentDirection = Direction.W;
-					else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
-						currentDirection = Direction.E;
-					else
-						currentDirection = Direction.None;
+				int currentLeft = this.Left;
+				int currentTop = this.Top;
 
-					if (currentDirection != lastDir) {
-						switch (currentDirection) {
-						case Direction.None:
-							otkgw.Cursor = XCursor.Default;
-							break;
-						case Direction.N:
-							otkgw.Cursor = XCursor.V;
-							break;
-						case Direction.S:
-							otkgw.Cursor = XCursor.V;
-							break;
-						case Direction.E:
-							otkgw.Cursor = XCursor.H;
-							break;
-						case Direction.W:
-							otkgw.Cursor = XCursor.H;
-							break;
-						case Direction.NW:
-							otkgw.Cursor = XCursor.NW;
-							break;
-						case Direction.NE:
-							otkgw.Cursor = XCursor.NE;
-							break;
-						case Direction.SW:
-							otkgw.Cursor = XCursor.SW;
-							break;
-						case Direction.SE:
-							otkgw.Cursor = XCursor.SE;
-							break;
-						}
-					}				
+				if (currentLeft == 0)
+					currentLeft = this.Slot.Left;
+				if (currentTop == 0)
+					currentTop = this.Slot.Top;
+
+				switch (currentDirection) {
+				case Direction.None:
+					this.Left = currentLeft + e.XDelta;				
+					this.Top = currentTop + e.YDelta;
+					break;
+				case Direction.N:
+					this.Top = currentTop + e.YDelta;
+					this.Height -= e.YDelta;
+					break;
+				case Direction.S:
+					this.Height += e.YDelta;
+					break;
+				case Direction.W:
+					this.Left = currentLeft + e.XDelta;
+					this.Width -= e.XDelta;
+					break;
+				case Direction.E:
+					this.Width += e.XDelta;
+					break;
+				case Direction.NW:
+					this.Left = currentLeft + e.XDelta;
+					this.Top = currentTop + e.YDelta;
+					this.Width -= e.XDelta;
+					this.Height -= e.YDelta;
+					break;
+				case Direction.NE:
+					this.Width += e.XDelta;
+					this.Top = currentTop + e.YDelta;
+					this.Height -= e.YDelta;
+					break;
+				case Direction.SW:
+					this.Left = currentLeft + e.XDelta;
+					this.Width -= e.XDelta;
+					this.Height += e.YDelta;
+					break;
+				case Direction.SE:
+					this.Width += e.XDelta;
+					this.Height += e.YDelta;
+					break;
 				}
 				return;
 			}
+			GraphicObject firstFocusableAncestor = otkgw.hoverWidget;
+			while (firstFocusableAncestor != this) {
+				if (firstFocusableAncestor == null)
+					return;
+				if (firstFocusableAncestor.Focusable)
+					return;
+				firstFocusableAncestor = firstFocusableAncestor.Parent as GraphicObject;
+			}
+			if (Resizable) {
+				Direction lastDir = currentDirection;
 
-			if (TopContainer.activeWidget != this)
-				return;
-				
-			this.TopContainer.redrawClip.AddRectangle (this.ScreenCoordinates(this.Slot));
+				if (Math.Abs (e.Position.Y - this.Slot.Y) < Interface.BorderThreshold) {
+					if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
+						currentDirection = Direction.NW;
+					else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
+						currentDirection = Direction.NE;
+					else
+						currentDirection = Direction.N;
+				} else if (Math.Abs (e.Position.Y - this.Slot.Bottom) < Interface.BorderThreshold) {
+					if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
+						currentDirection = Direction.SW;
+					else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
+						currentDirection = Direction.SE;
+					else
+						currentDirection = Direction.S;
+				} else if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
+					currentDirection = Direction.W;
+				else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
+					currentDirection = Direction.E;
+				else
+					currentDirection = Direction.None;
 
-			int currentLeft = this.Left;
-			int currentTop = this.Top;
-
-			if (currentLeft == 0)
-				currentLeft = this.Slot.Left;
-			if (currentTop == 0)
-				currentTop = this.Slot.Top;
-
-			switch (currentDirection) {
-			case Direction.None:
-				this.Left = currentLeft + e.XDelta;				
-				this.Top = currentTop + e.YDelta;
-				break;
-			case Direction.N:
-				this.Top = currentTop + e.YDelta;
-				this.Height -= e.YDelta;
-				break;
-			case Direction.S:
-				this.Height += e.YDelta;
-				break;
-			case Direction.W:
-				this.Left = currentLeft + e.XDelta;
-				this.Width -= e.XDelta;
-				break;
-			case Direction.E:
-				this.Width += e.XDelta;
-				break;
-			case Direction.NW:
-				this.Left = currentLeft + e.XDelta;
-				this.Top = currentTop + e.YDelta;
-				this.Width -= e.XDelta;
-				this.Height -= e.YDelta;
-				break;
-			case Direction.NE:
-				this.Width += e.XDelta;
-				this.Top = currentTop + e.YDelta;
-				this.Height -= e.YDelta;
-				break;
-			case Direction.SW:
-				this.Left = currentLeft + e.XDelta;
-				this.Width -= e.XDelta;
-				this.Height += e.YDelta;
-				break;
-			case Direction.SE:
-				this.Width += e.XDelta;
-				this.Height += e.YDelta;
-				break;
-			}		
+				if (currentDirection != lastDir) {
+					switch (currentDirection) {
+					case Direction.None:
+						otkgw.Cursor = XCursor.Default;
+						break;
+					case Direction.N:
+						otkgw.Cursor = XCursor.V;
+						break;
+					case Direction.S:
+						otkgw.Cursor = XCursor.V;
+						break;
+					case Direction.E:
+						otkgw.Cursor = XCursor.H;
+						break;
+					case Direction.W:
+						otkgw.Cursor = XCursor.H;
+						break;
+					case Direction.NW:
+						otkgw.Cursor = XCursor.NW;
+						break;
+					case Direction.NE:
+						otkgw.Cursor = XCursor.NE;
+						break;
+					case Direction.SW:
+						otkgw.Cursor = XCursor.SW;
+						break;
+					case Direction.SE:
+						otkgw.Cursor = XCursor.SE;
+						break;
+					}
+				}				
+			}				
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
 			currentDirection = Direction.None;
-			OpenTKGameWindow otkgw = TopContainer as OpenTKGameWindow;
+			OpenTKGameWindow otkgw = HostContainer as OpenTKGameWindow;
 			otkgw.Cursor = XCursor.Default;
 		}
 
@@ -218,7 +225,7 @@ namespace Crow
 			ILayoutable parent = (sender as GraphicObject).Parent;
 			while(!(parent is Window))
 				parent = parent.Parent;
-			TopContainer.DeleteWidget (parent as GraphicObject);
+			HostContainer.DeleteWidget (parent as GraphicObject);
 		}
 
 		public override void ResolveBindings ()

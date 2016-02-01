@@ -202,7 +202,7 @@ namespace Crow
 
 		public override void registerClipRect ()
 		{
-			TopContainer.redrawClip.AddRectangle (base.ScreenCoordinates(Slot));
+			HostContainer.redrawClip.AddRectangle (base.ScreenCoordinates(Slot));
 		}
 
 		public override void Paint(ref Cairo.Context ctx, Rectangles clip = null)

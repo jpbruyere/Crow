@@ -96,7 +96,7 @@ namespace Crow
 				ILayoutable tmp = Source.Instance as ILayoutable;
 				if (string.IsNullOrEmpty (bindingExp [0])) {
 					//if exp start with '/' => Graphic tree parsing start at top container
-					tmp = tmp.TopContainer as ILayoutable;
+					tmp = tmp.HostContainer as ILayoutable;
 					ptr++;
 				}
 				while (ptr < bindingExp.Length - 1) {

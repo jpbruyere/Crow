@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Border CornerRadius="0" BorderColor="LightGray" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}">
+<Border CornerRadius="0" Foreground="LightGray" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}">
 	<HorizontalStack Margin="1" Spacing="1" Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}">
 		<Label Margin="1" Foreground="Black" Background="White" Text="{../../../Caption}" 
 			Height="{../../../TemplatedHeight}" Width="{../../../TemplatedWidth}"/>

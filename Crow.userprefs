@@ -1,16 +1,18 @@
 ﻿<Properties GitUserInfo="UsingGIT" StartupItem="Tests/Tests.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|Linux_x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="src/GraphicObjects/TemplatedControl.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="src/GraphicObjects/GraphicObject.cs">
     <Files>
-      <File FileName="src/GraphicObjects/GraphicObject.cs" Line="848" Column="39" />
-      <File FileName="Tests/GOLIBTests.cs" Line="41" Column="1" />
-      <File FileName="Tests/Interfaces/testWindow3.goml" Line="10" Column="6" />
-      <File FileName="src/GraphicObjects/TemplatedControl.cs" Line="114" Column="1" />
-      <File FileName="src/GraphicObjects/Window.cs" Line="214" Column="1" />
-      <File FileName="src/GraphicObjects/TemplatedContainer.cs" Line="80" Column="19" />
-      <File FileName="src/GraphicObjects/Container.cs" Line="31" Column="1" />
-      <File FileName="src/GraphicObjects/PrivateContainer.cs" Line="67" Column="1" />
+      <File FileName="src/GraphicObjects/GraphicObject.cs" Line="572" Column="23" />
+      <File FileName="src/GraphicObjects/Label.cs" Line="15" Column="5" />
+      <File FileName="src/OpenTKGameWindow.cs" Line="114" Column="1" />
+      <File FileName="Tests/GOLIBTests.cs" Line="156" Column="32" />
+      <File FileName="src/GraphicObjects/TextBox.cs" Line="15" Column="31" />
     </Files>
+    <Pads>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>

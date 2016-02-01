@@ -44,11 +44,6 @@ namespace Crow
 			get { return base.Focusable; }
 			set { base.Focusable = value; }
 		}
-		[XmlAttributeAttribute()][DefaultValue(true)]
-		public override bool Selectable {
-			get { return base.Selectable; }
-			set { base.Selectable = value; }
-		}
 		[XmlAttributeAttribute()][DefaultValue("White")]
 		public override Color Background {
 			get { return base.Background; }
@@ -107,7 +102,7 @@ namespace Crow
 			case Key.Escape:
 				Text = "";
 				currentCol = 0;
-				selRelease = -1;
+				SelRelease = -1;
 				break;
 			case Key.Home:
 				//TODO
@@ -195,8 +190,8 @@ namespace Crow
 
 				this.Insert (k);
 
-				selRelease = -1;
-				selBegin.X = currentCol;
+				SelRelease = -1;
+				SelBegin = new Point(currentCol, SelBegin.Y);
 
 				break;
 			}

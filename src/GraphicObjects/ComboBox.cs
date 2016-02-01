@@ -316,7 +316,7 @@ namespace Crow
 			
 		public virtual void onPop(object sender, EventArgs e)
 		{
-			IGOLibHost tc = TopContainer;
+			IGOLibHost tc = HostContainer;
 			if (tc == null)
 				return;
 			if (Overlay != null) {
@@ -329,7 +329,7 @@ namespace Crow
 		}
 		public virtual void onUnpop(object sender, EventArgs e)
 		{
-			IGOLibHost tc = TopContainer;
+			IGOLibHost tc = HostContainer;
 			if (tc == null)
 				return;
 			Overlay.Visible = false;

@@ -1,13 +1,18 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="1" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}" Background="White">
+<Border BorderWidth="1" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}"
+	Foreground="Gray"
+	Background="White">
 	<HorizontalStack Name="hstack" Margin="0" Spacing="2" Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}">
 		<Label Foreground="DimGray" Height="{../../../TemplatedHeight}" Width="{../../../TemplatedWidth}" 
 			Text="{../../../Value}" Margin="1" TextAlignment="RightCenter"/>
-		<VerticalStack Width="-1" Height="{../../../TemplatedHeight}" Spacing="1" >
-			<Button Width="12" Height="8" MouseClick="../../../../onUp">
+		<VerticalStack Width="-1" Height="{../../../TemplatedHeight}" Spacing="0" >
+			<Button MouseRepeat="true" Width="12" Height="8" MouseClick="../../../../onUp"
+				Template="#Crow.Templates.ArrowButTemplate.crow">
 				<Image Margin="1" Path="#Crow.Images.Icons.updown.svg" SvgSub="up"/>
 			</Button>
-			<Button Width="12" Height="8" MouseClick="../../../../onDown">
+				
+			<Button MouseRepeat="true" Width="12" Height="8" MouseClick="../../../../onDown" 
+				Template="#Crow.Templates.ArrowButTemplate.crow">
 				<Image Margin="1" Path="#Crow.Images.Icons.updown.svg" SvgSub="down"/>
 			</Button>
 		</VerticalStack>

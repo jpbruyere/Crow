@@ -1,0 +1,14 @@
+﻿<?xml version="1.0"?>
+<!--<HorizontalStack Spacing="1" Height="100" Width="300">
+	<Image Margin="2" Width="14" Height="14" Path="{../../Image}"  SvgSub="{../../SvgSub}"/>
+	<Label Text="{../../Caption}" Height="80" Width="200"/>
+</HorizontalStack>-->
+<Border Name="Content"
+	Background="Gray" Foreground="DarkGray" 
+	Height="{../TemplatedHeight}" Width="{../TemplatedWidth}"
+	MouseEnter="{Foreground=White}"
+	MouseLeave="{Foreground=DarkGray}"
+	MouseDown="{Background=LightGray}"
+	MouseUp="{Background=Gray}"
+	>
+</Border>

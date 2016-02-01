@@ -13,10 +13,6 @@ namespace Crow
 		public NumericControl(double minimum, double maximum, double step)
 			: base()
 		{
-			minValue = minimum;
-			maxValue = maximum;
-			smallStep = step;
-			bigStep = step * 5;
 		}
 		#endregion
 

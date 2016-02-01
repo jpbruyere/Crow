@@ -5,10 +5,10 @@
 	Margin="10" >
 	<Border Margin="10" CornerRadius="10"
 		Name="mainBorder"
-		BorderWidth="2" BorderColor="Transparent"
+		BorderWidth="2" Foreground="Transparent"
 		Focusable="True"
-		MouseEnter="{BorderColor = White}"
-		MouseLeave="{BorderColor = Transparent}">
+		MouseEnter="{Foreground = White}"
+		MouseLeave="{Foreground = Transparent}">
 		<HorizontalStack WidgetSpacing="1">
 			<VerticalStack Width="-1">
 				<HorizontalStack WidgetSpacing="1" Fit="true">
@@ -41,7 +41,7 @@
 				<TextBox Name="textbox1" TextAlignment="LeftCenter" Font="droid,14"						
 								Width="200" Height="-1" Margin="2" Background="White"
 								Forground="Black"
-								BorderColor="DimGray" BorderWidth="1"
+								Foreground="DimGray" BorderWidth="1"
 								Text="editable text"/>
 				<Popper Width="100">
 					<Border Fit="True" Background="ArmyGreen">
@@ -104,9 +104,9 @@
 					 Margin="5" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">
 					<VerticalStack Name="colors" VerticalAlignment="Top" Margin="1" Fit="true">
 <!--						<ProgressBar Name="pbBar2" Width="100" Height="20" Value="50"
-									BorderWidth="2" BorderColor="White" Foreground="BlueCrayola" Background="DarkGray"/>
+									BorderWidth="2" Foreground="White" Foreground="BlueCrayola" Background="DarkGray"/>
 						<ProgressBar Width="100" Height="20" Value="{fps}" BorderWidth="2"
-							BorderColor="White" Foreground="BlueCrayola" Background="DarkGray"/>												-->
+							Foreground="White" Foreground="BlueCrayola" Background="DarkGray"/>												-->
 					</VerticalStack>
 				</Scroller>
 				<ScrollBar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" MaximumScroll="{../scroller1.MaximumScroll}"
@@ -131,7 +131,7 @@
 						Maximum="200"
 						Value="{fps}"
 						Foreground="BlueCrayola" Background="DarkGray"
-						BorderWidth="2" BorderColor="White"/>
+						BorderWidth="2" Foreground="White"/>
 				</HorizontalStack>
 
 				<Button  Margin="5" BorderWidth="0" Width="-1" Height="-1"  HorizontalAlignment="Center">
@@ -139,7 +139,7 @@
 				</Button>
 
 				<GroupBox Title="Group Box" Width="300" Height="100" 
-					BorderColor="White" BorderWidth="2" Margin="3">
+					Foreground="White" BorderWidth="2" Margin="3">
 					<Label Name="labValue" FontSize="14" Text="{../../slider.Value}" TextAlignment="Center"/>
 				</GroupBox>
 				<Slider Height="10" Width="300" BorderWidth="1" Background="Transparent" />
@@ -151,9 +151,9 @@
 					 Margin="5" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">
 					<VerticalStack Name="colors" VerticalAlignment="Top" Margin="1">
 						<ProgressBar Name="pbBar2" Width="100" Height="20" Value="50"
-									BorderWidth="2" BorderColor="White" Foreground="BlueCrayola" Background="DarkGray"/>
+									BorderWidth="2" Foreground="White" Foreground="BlueCrayola" Background="DarkGray"/>
 						<ProgressBar Width="100" Height="20" Value="{fps}" BorderWidth="2"
-							BorderColor="White" Foreground="BlueCrayola" Background="DarkGray"/>												
+							Foreground="White" Foreground="BlueCrayola" Background="DarkGray"/>												
 					</VerticalStack>
 				</Scroller>
 				<Scrollbar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" MaximumScroll="{../scroller1.MaximumScroll}"

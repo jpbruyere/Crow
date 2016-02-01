@@ -88,6 +88,9 @@ namespace Crow
 		}
 		public virtual void ComputeChildrenPositions()
 		{
+			#if DEBUG_LAYOUTING
+			Debug.WriteLine("ComputeChildrenPosition: " + this.ToString());
+			#endif
 			int d = 0;
 			if (Orientation == Orientation.Horizontal) {
 				foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {

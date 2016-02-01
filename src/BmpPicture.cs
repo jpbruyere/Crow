@@ -66,30 +66,27 @@ namespace Crow
 			float widthRatio = 1f;
 			float heightRatio = 1f;
 
-			if (Scale){
+			if (Scaled){
 				widthRatio = (float)rect.Width / Dimensions.Width;
 				heightRatio = (float)rect.Height / Dimensions.Height;
 			}
 
-			float ratio = Math.Min (widthRatio, heightRatio);
+			if (KeepProportions) {
+				if (widthRatio < heightRatio)
+					heightRatio = widthRatio;
+				else
+					widthRatio = heightRatio;
+			}
 
-//			if (KeepProportions)
-//				widthRatio = heightRatio = ratio;
-
-			Rectangle rImg = rect;
 			gr.Save ();
 
-			if (KeepProportions) {
-				gr.Translate ((rect.Width - (float)Dimensions.Width * ratio)/2f, 
-					(rect.Height - (float)Dimensions.Height * ratio)/2f);
-				gr.Scale (ratio, ratio);
-					
-			}else
-				gr.Scale (widthRatio, heightRatio);
+			gr.Translate (rect.Left,rect.Top);
+			gr.Scale (widthRatio, heightRatio);
+			gr.Translate ((rect.Width/widthRatio - Dimensions.Width)/2, (rect.Height/heightRatio - Dimensions.Height)/2);
 			
 			using (ImageSurface imgSurf = new ImageSurface (image, Format.Argb32, 
 				Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) {
-				gr.SetSourceSurface (imgSurf, (int)(rImg.X / widthRatio), (int)(rImg.Y / heightRatio));
+				gr.SetSourceSurface (imgSurf, 0,0);
 				gr.Paint ();
 			}
 			gr.Restore ();

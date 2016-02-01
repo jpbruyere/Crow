@@ -109,7 +109,7 @@ namespace Crow
 			set 
 			{
 				if (_activeWidget == value)
-					return;
+					return;				
 				_activeWidget = value;
 			}
 		}
@@ -165,7 +165,6 @@ namespace Crow
 		Crow.Shader shader;
 		int[] viewport = new int[4];
 
-		Rectangle dirtyZone = Rectangle.Empty;
 		void createContext()
 		{			
 			createOpenGLSurface ();
@@ -224,23 +223,6 @@ namespace Crow
 			shader.Disable ();
 			GL.Viewport (viewport [0], viewport [1], viewport [2], viewport [3]);
 		}
-//		public void RenderCustomTextureOnUIQuad(int _customTex)
-//		{
-//			GL.GetInteger (GetPName.Viewport, viewport);
-//			GL.Viewport (0, 0, ClientRectangle.Width, ClientRectangle.Height);
-//
-//			shader.Enable ();
-//
-//			GL.ActiveTexture (TextureUnit.Texture0);
-//			GL.BindTexture (TextureTarget.Texture2D, _customTex);
-//			GL.Disable (EnableCap.DepthTest);
-//			uiQuad2.Render (PrimitiveType.TriangleStrip);
-//			GL.Enable (EnableCap.DepthTest);
-//			GL.BindTexture(TextureTarget.Texture2D, 0);
-//			shader.Disable ();
-//			GL.Viewport (viewport [0], viewport [1], viewport [2], viewport [3]);			
-//		}
-			
 		#endregion
 
 		#region update
@@ -251,6 +233,14 @@ namespace Crow
 
 		void update ()
 		{
+			if (mouseRepeatCount > 0) {
+				int mc = mouseRepeatCount;
+				mouseRepeatCount -= mc;
+				for (int i = 0; i < mc; i++) {
+					FocusedWidget.onMouseClick (this, new MouseButtonEventArgs (Mouse.X, Mouse.Y, MouseButton.Left, true));
+				}
+			}
+
 			updateTime.Restart ();
 			layoutTime.Reset ();
 			guTime.Reset ();
@@ -295,19 +285,20 @@ namespace Crow
 			foreach (GraphicObject p in gotr) {
 				p.registerClipRect ();
 			}
+			updateTime.Stop ();
 
+			drawingTime.Start ();
 
 			lock (redrawClip) {
 				if (redrawClip.count > 0) {					
-//					#if DEBUG_CLIP_RECTANGLE
-//					redrawClip.stroke (ctx, new Color(1.0,0,0,0.3));
-//					#endif
+					#if DEBUG_CLIP_RECTANGLE
+					redrawClip.stroke (ctx, new Color(1.0,0,0,0.3));
+					#endif
 					redrawClip.clearAndClip (ctx);//rajouté après, tester si utile	
 
 					//Link.draw (ctx);
 					foreach (GraphicObject p in invGOList) {
 						if (p.Visible) {
-							drawingTime.Start ();
 
 							ctx.Save ();
 							if (redrawClip.count > 0) {
@@ -317,18 +308,16 @@ namespace Crow
 									p.Paint (ref ctx, clip);
 							}
 							ctx.Restore ();
-
-							drawingTime.Stop ();
 						}
 					}
 					ctx.ResetClip ();
-					dirtyZone = redrawClip.Bounds;
-//					#if DEBUG_CLIP_RECTANGLE
-//					redrawClip.stroke (ctx, Color.Red.AdjustAlpha(0.1));
-//					#endif
+					#if DEBUG_CLIP_RECTANGLE
+					redrawClip.stroke (ctx, Color.Red.AdjustAlpha(0.1));
+					#endif
 					redrawClip.Reset ();
 				}
 			}
+			drawingTime.Stop ();
 			//surf.WriteToPng (@"/mnt/data/test.png");
 			ctx.Dispose ();
 			surf.Dispose ();
@@ -345,7 +334,7 @@ namespace Crow
 //			    layoutTime.ElapsedMilliseconds,
 //			    guTime.ElapsedMilliseconds,
 //			    drawingTime.ElapsedMilliseconds);
-			updateTime.Stop ();
+
 //			Debug.WriteLine("UPDATE: {0} ticks \t, {1} ms",
 //				updateTime.ElapsedTicks,
 //				updateTime.ElapsedMilliseconds);
@@ -428,7 +417,7 @@ namespace Crow
         {
 			if (_activeWidget != null) {
 				//first, ensure object is still in the graphic tree
-				if (_activeWidget.TopContainer == null) {
+				if (_activeWidget.HostContainer == null) {
 					activeWidget = null;
 				} else {
 					
@@ -440,7 +429,7 @@ namespace Crow
 
 			if (_hoverWidget != null) {
 				//first, ensure object is still in the graphic tree
-				if (_hoverWidget.TopContainer == null) {
+				if (_hoverWidget.HostContainer == null) {
 					hoverWidget = null;
 				} else {
 					//check topmost graphicobject first
@@ -500,9 +489,15 @@ namespace Crow
 				MouseButtonUp.Raise (this, e);
 				return;
 			}
+				
+			if (mouseRepeatThread != null) {
+				mouseRepeatOn = false;
+				mouseRepeatThread.Abort();
+				mouseRepeatThread.Join ();
+			}
 
-			_activeWidget.onMouseButtonUp (this, e);
-			_activeWidget = null;
+			_activeWidget.onMouseUp (this, e);
+			activeWidget = null;
         }
         void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -511,18 +506,15 @@ namespace Crow
 				return;
 			}
 
-			GraphicObject g = _hoverWidget;
-			while (!g.Focusable) {				
-				g = g.Parent as GraphicObject;
-				if (g == null) {					
-					return;
-				}
-			}
+			_hoverWidget.onMouseDown(_hoverWidget,new BubblingMouseButtonEventArg(e));
 
-			_activeWidget = g;
-			_activeWidget.onMouseButtonDown (this, e);
+			if (FocusedWidget == null)
+				return;
+			if (!FocusedWidget.MouseRepeat)
+				return;
+			mouseRepeatThread = new Thread (mouseRepeatThreadFunc);
+			mouseRepeatThread.Start ();
         }
-
         void Mouse_WheelChanged(object sender, MouseWheelEventArgs e)
         {
 			if (_hoverWidget == null) {
@@ -530,7 +522,21 @@ namespace Crow
 				return;
 			}
 			_hoverWidget.onMouseWheel (this, e);
-        }        
+        }
+
+		volatile bool mouseRepeatOn;
+		volatile int mouseRepeatCount;
+		Thread mouseRepeatThread;
+		void mouseRepeatThreadFunc()
+		{
+			mouseRepeatOn = true;
+			Thread.Sleep (Interface.DeviceRepeatDelay);
+			while (mouseRepeatOn) {
+				mouseRepeatCount++;
+				Thread.Sleep (Interface.DeviceRepeatInterval);
+			}
+			mouseRepeatCount = 0;
+		}
 		#endregion
 
         #region keyboard Handling
@@ -566,7 +572,7 @@ namespace Crow
 		Rectangle ILayoutable.ClientRectangle {
 			get { return new Size(this.ClientRectangle.Size.Width,this.ClientRectangle.Size.Height); }
 		}
-		public IGOLibHost TopContainer {
+		public IGOLibHost HostContainer {
 			get { return this; }
 		}
 

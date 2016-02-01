@@ -1,13 +1,15 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="1" BorderColor="LightGray" Width="{../TemplatedWidth}" Height="{../TemplatedHeight}">
+<Border BorderWidth="1" Foreground="LightGray" Width="{../TemplatedWidth}" Height="{../TemplatedHeight}">
 	<GenericStack Orientation="{../../Orientation}" Width="{../../TemplatedWidth}" Height="{../../TemplatedHeight}">
-		<Button Width="12" Height="12" MouseClick="../../../onScrollBack">
+		<Button MouseRepeat="true" Width="12" Height="8" MouseClick="../../../onScrollBack"
+			Template="#Crow.Templates.ArrowButTemplate.crow">
 			<Image Margin="1" Path="#Crow.Images.Icons.updown.svg" SvgSub="up"/>
 		</Button>
 		<Slider Name="Slider" Value="{../../../Scroll}" Maximum="{../../../MaximumScroll}" 
 			Width="{../../../TemplatedWidth}" Height="{../../../TemplatedHeight}" Orientation="{../../../Orientation}"
 			ValueChanged="../../../onSliderValueChange"/>
-		<Button Width="12" Height="12" MouseClick="../../../onScrollForth">
+		<Button MouseRepeat="true" Width="12" Height="8" MouseClick="../../../onScrollForth"
+			Template="#Crow.Templates.ArrowButTemplate.crow">
 			<Image Margin="1" Path="#Crow.Images.Icons.updown.svg" SvgSub="down"/>
 		</Button>
 	</GenericStack>

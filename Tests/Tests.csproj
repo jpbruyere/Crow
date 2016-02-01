@@ -58,9 +58,6 @@
     <Compile Include="..\bin\Debug\Interfaces\test_stack.goml.cs">
       <Link>Interfaces\test_stack.goml.cs</Link>
     </Compile>
-    <Compile Include="..\bin\Debug\Interfaces\test4.goml.cs">
-      <Link>Interfaces\test4.goml.cs</Link>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -194,6 +191,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Interfaces\1.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\testButton.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\testImage.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\testTextBox.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

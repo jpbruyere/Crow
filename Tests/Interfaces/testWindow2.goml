@@ -2,16 +2,16 @@
 <Window Name="window1" Left="10" Top="10" Title="Test window" Width="200" Height="200" Background="0,5;0,5;0,5;0,8" 
 	Focusable="True"  CornerRadius="20" MinimumSize="100;100" MaximumSize="500;500">
 	<Template>
-		<Border BorderWidth="1" BorderColor="White" CornerRadius="20" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}">
+		<Border BorderWidth="1" Foreground="White" CornerRadius="20" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}">
 			<VerticalStack Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}">
-				<Border BorderWidth="1" BorderColor="White" Width="{../../../TemplatedWidth}" Height="-1" 
+				<Border BorderWidth="1" Foreground="White" Width="{../../../TemplatedWidth}" Height="-1" 
 						Background="0,1;0,5;1,0;0,5">
 					<HorizontalStack Name="hs" Margin="1" Spacing="1" Width="{../../../../TemplatedWidth}" Height="-1" >
 						<GraphicObject Width="5"/>
 						<Image Margin="1" Width="12" Height="12" Path="{../../../../../Icon}"/>
 						<Label Foreground="White" Width="{../../../../../TemplatedWidth}" Margin="1" TextAlignment="Center" Text="{../../../../../Title}" />
-						<Border CornerRadius="6" BorderWidth="1" BorderColor="Transparent"  Height="12" Width="12"
-							MouseEnter="{BorderColor=White}" MouseLeave="{BorderColor=Transparent}">
+						<Border CornerRadius="6" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
+							MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
 							<Image Focusable="true" Name="Image" Margin="0" Width="0" Height="0" Path="#Crow.Images.Icons.exit2.svg"
 								 MouseClick="../../../../../../butQuitPress"/>
 						</Border>

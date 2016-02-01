@@ -255,8 +255,8 @@ namespace Crow
 		#region Mouse handling
 		public override void checkHoverWidget (OpenTK.Input.MouseMoveEventArgs e)
 		{
-			if (TopContainer.hoverWidget != this) {
-				TopContainer.hoverWidget = this;
+			if (HostContainer.hoverWidget != this) {
+				HostContainer.hoverWidget = this;
 				onMouseEnter (this, e);
 			}
 			foreach (GraphicObject g in Children)

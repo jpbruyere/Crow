@@ -73,6 +73,7 @@ namespace Crow
 		int _margin = 0;
 		bool _focusable = false;
 		bool _hasFocus = false;
+		bool _mouseRepeat;
 		protected bool _isVisible = true;
 		VerticalAlignment _verticalAlignment = VerticalAlignment.Center;
 		HorizontalAlignment _horizontalAlignment = HorizontalAlignment.Center;
@@ -93,6 +94,8 @@ namespace Crow
 		#endregion
 
 		#region ILayoutable
+		//TODO: it would save the recurent cost of a cast in event bubbling if parent type was GraphicObject
+		//		or we could add to the interface the mouse events
 		[XmlIgnore]public ILayoutable Parent { 
 			get { return _parent; }
 			set {
@@ -116,8 +119,8 @@ namespace Crow
 				return cb;
 			}
 		}
-		[XmlIgnore]public virtual IGOLibHost TopContainer {
-			get { return Parent == null ? null : Parent.TopContainer; }
+		[XmlIgnore]public virtual IGOLibHost HostContainer {
+			get { return Parent == null ? null : Parent.HostContainer; }
 		}
 		public virtual Rectangle ContextCoordinates(Rectangle r){
 			return
@@ -141,8 +144,8 @@ namespace Crow
 
 		#region EVENT HANDLERS
 		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
-		public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
-		public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
+		public event EventHandler<MouseButtonEventArgs> MouseUp;
+		public event EventHandler<MouseButtonEventArgs> MouseDown;
 		public event EventHandler<MouseButtonEventArgs> MouseClick;
 		public event EventHandler<MouseMoveEventArgs> MouseMove;
 		public event EventHandler<MouseMoveEventArgs> MouseEnter;
@@ -247,35 +250,75 @@ namespace Crow
 		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool Focusable {
-			get { return _focusable | Interface.DesignerMode; }
-			set { _focusable = value; }
-		}        
+			get { return _focusable; }
+			set {
+				if (_focusable == value)
+					return;
+				_focusable = value; 
+				NotifyValueChanged ("Focusable", _focusable);
+			}
+		}
+		[XmlIgnore]public virtual bool HasFocus {
+			get { return _hasFocus; }
+			set { 
+				if (value == _hasFocus)
+					return;
+
+				_hasFocus = value; 
+				NotifyValueChanged ("HasFocus", _hasFocus);
+			}
+		}
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public virtual bool MouseRepeat {
+			get { return _mouseRepeat; }
+			set {
+				if (_mouseRepeat == value)
+					return;
+				_mouseRepeat = value; 
+				NotifyValueChanged ("MouseRepeat", _mouseRepeat);
+			}
+		} 
 		[XmlAttributeAttribute()][DefaultValue("Transparent")]
 		public virtual Color Background {
 			get { return _background; }
 			set {
-				_background = value;
+				if (_background == value)
+					return;
+				_background = value; 
+				NotifyValueChanged ("Background", _background);
 				registerForGraphicUpdate ();
 			}
-		}
+		} 
 		[XmlAttributeAttribute()][DefaultValue("White")]
 		public virtual Color Foreground {
 			get { return _foreground; }
 			set {
-				_foreground = value;
+				if (_foreground == value)
+					return;
+				_foreground = value; 
+				NotifyValueChanged ("Foreground", _foreground);
 				registerForGraphicUpdate ();
 			}
-		}
+		} 
 		[XmlAttributeAttribute()][DefaultValue("droid,10")]
 		public virtual Font Font {
 			get { return _font; }
-			set { _font = value; }
+			set { 
+				if (value == _font)
+					return;				
+				_font = value; 
+				NotifyValueChanged ("Font", _font);
+				registerForGraphicUpdate ();
+			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0.0)]
 		public virtual double CornerRadius {
 			get { return _cornerRadius; }
 			set {
-				_cornerRadius = value;
+				if (value == _cornerRadius)
+					return;				
+				_cornerRadius = value; 
+				NotifyValueChanged ("CornerRadius", _cornerRadius);
 				registerForGraphicUpdate ();
 			}
 		}
@@ -283,7 +326,10 @@ namespace Crow
 		public virtual int Margin {
 			get { return _margin; }
 			set {
-				_margin = value;
+				if (value == _margin)
+					return;				
+				_margin = value; 
+				NotifyValueChanged ("Margin", _margin);
 				registerForGraphicUpdate ();
 			}
 		}
@@ -296,24 +342,19 @@ namespace Crow
 
 				_isVisible = value;
 
-				if (TopContainer == null)
+				if (HostContainer == null)
 					return;
 				//add slot to clipping to redraw
-				TopContainer.gobjsToRedraw.Add (this);
+				HostContainer.gobjsToRedraw.Add (this);
 
 				//ensure main win doesn't keep hidden childrens ref
-				if (this.Contains (TopContainer.hoverWidget))
-					TopContainer.hoverWidget = null;
+				if (this.Contains (HostContainer.hoverWidget))
+					HostContainer.hoverWidget = null;
 				if (Parent is GenericStack)
 					Parent.RegisterForLayouting ((int)LayoutingType.Sizing | (int)LayoutingType.PositionChildren);
-//					Parent.InvalidateLayout ();
-				//else
-				//    registerForRedraw();
+
+				NotifyValueChanged ("Visible", _isVisible);
 			}
-		}
-		[XmlIgnore]public virtual bool HasFocus {
-			get { return _hasFocus; }
-			set { _hasFocus = value; }
 		}
 		//TODO: only used in group, should be removed from base go object
 		[XmlIgnore]public virtual bool DrawingIsValid
@@ -450,16 +491,16 @@ namespace Crow
 		public virtual void registerForGraphicUpdate ()
 		{
 			bmp = null;
-			if (TopContainer != null)
-				TopContainer.gobjsToRedraw.Add (this);
+			if (HostContainer != null)
+				HostContainer.gobjsToRedraw.Add (this);
 		}
 		/// <summary>
 		/// Add clipping region in redraw list of interface, dont update cached object content
 		/// </summary>
 		public virtual void RegisterForRedraw ()
 		{
-			if (TopContainer != null)
-				TopContainer.gobjsToRedraw.Add (this);
+			if (HostContainer != null)
+				HostContainer.gobjsToRedraw.Add (this);
 		}
 
 		/// <summary>
@@ -477,10 +518,10 @@ namespace Crow
 
 		public virtual void registerClipRect()
 		{
-			TopContainer.redrawClip.AddRectangle (ScreenCoordinates(Slot));
+			HostContainer.redrawClip.AddRectangle (ScreenCoordinates(Slot));
 			//this clipping should take only last painted slots in ancestor tree which
 			//is not the case for now.
-			TopContainer.redrawClip.AddRectangle (ScreenCoordinates(LastPaintedSlot));
+			HostContainer.redrawClip.AddRectangle (ScreenCoordinates(LastPaintedSlot));
 		}
 		/// <summary> return size of content + margins </summary>
 		protected virtual Size measureRawSize ()
@@ -782,7 +823,7 @@ namespace Crow
 		}
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
-			IGOLibHost glh = TopContainer;
+			IGOLibHost glh = HostContainer;
 			if (glh.hoverWidget != this) {
 				glh.hoverWidget = this;
 				onMouseEnter (this, e);
@@ -799,19 +840,37 @@ namespace Crow
 			
 			MouseMove.Raise (sender, e);
 		}
-		public virtual void onMouseButtonUp(object sender, MouseButtonEventArgs e){
-			if (MouseIsIn (e.Position))
-				onMouseClick (sender, e);
-
-			MouseButtonUp.Raise (this, e);
+		public virtual void onMouseDown(object sender, MouseButtonEventArgs e){
+			IGOLibHost hc = HostContainer;
+			if (hc.activeWidget == null)
+				hc.activeWidget = this;
+			if (this.Focusable && !Interface.FocusOnHover) {
+				BubblingMouseButtonEventArg be = e as BubblingMouseButtonEventArg;
+				if (be.Focused == null) {
+					be.Focused = this;
+					hc.FocusedWidget = this;
+				}
+			}
+			//bubble event to the top
+			GraphicObject p = Parent as GraphicObject;
+			if (p != null)
+				p.onMouseDown(sender,e);
+			
+			MouseDown.Raise (this, e);
 		}
-		public virtual void onMouseButtonDown(object sender, MouseButtonEventArgs e){
-			TopContainer.FocusedWidget = this;
+		public virtual void onMouseUp(object sender, MouseButtonEventArgs e){
+			//bubble event to the top
+			GraphicObject p = Parent as GraphicObject;
+			if (p != null)
+				p.onMouseUp(sender,e);
 
-			MouseButtonDown.Raise (this, e);
+			MouseUp.Raise (this, e);
+
+			if (MouseIsIn (e.Position)&&HasFocus)
+				onMouseClick(sender,e);
 		}
-		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){	
-			MouseClick.Raise (this,e);
+		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){							
+			MouseClick.Raise (this, e);
 		}
 		public virtual void onMouseWheel(object sender, MouseWheelEventArgs e){
 			GraphicObject p = Parent as GraphicObject;
@@ -1080,24 +1139,28 @@ namespace Crow
 				GraphicObject lopObj = this;	//default left operand base object is 
 				//the first arg (object sender) of the event handler
 
+				il.Emit(OpCodes.Ldarg_0);	//load sender ref onto the stack
+
 				string[] lopParts = lop.Split (new char[] { '.' });
-				if (lopParts.Length == 2) {//should search also for member of es.Source
-					lopObj = this.FindByName (lopParts [0]);
-					if (lopObj==null)
-						throw new Exception (string.Format("GOML:Unknown name: {0}", lopParts[0]));
-					//TODO: should create private member holding ref of lopObj, and emit
-					//a call to FindByName(lopObjName) during #ctor or in a onLoad func or evt handler
-					throw new Exception (string.Format("GOML:obj tree ref not yet implemented", lopParts[0]));
-				}else
-					il.Emit(OpCodes.Ldarg_0);	//load sender ref onto the stack
+				if (lopParts.Length > 1) {//should search also for member of es.Source
+					MethodInfo FindByNameMi = typeof(GraphicObject).GetMethod("FindByName");
+					for (int j = 0; j < lopParts.Length - 1; j++) {
+						il.Emit (OpCodes.Ldstr, lopParts[j]);
+						il.Emit(OpCodes.Callvirt, FindByNameMi);
+					}
+				}
 
 				int i = lopParts.Length -1;
 
-				MemberInfo lopMbi = lopObj.GetType().GetMember (lopParts[i])[0];
+				MemberInfo[] lopMbis = lopObj.GetType().GetMember (lopParts[i]);
+
+				if (lopMbis.Length<1)
+					throw new Exception (string.Format("CROW BINDING: Member not found '{0}'", lop));
+				
 				OpCode lopSetOC;
 				dynamic lopSetMbi;
 				Type lopT = null;
-				switch (lopMbi.MemberType) {
+				switch (lopMbis[0].MemberType) {
 				case MemberTypes.Property:
 					PropertyInfo lopPi = sourceType.GetProperty (lopParts[i]);
 					MethodInfo dstMi = lopPi.GetSetMethod ();

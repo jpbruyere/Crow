@@ -15,7 +15,36 @@ namespace Crow
 	{
 		Picture _pic;
 		string _svgSub;
-
+		bool scaled;
+		[XmlAttributeAttribute()][DefaultValue(true)]
+		public virtual bool Scaled {
+			get { return scaled; }
+			set {
+				if (scaled == value)
+					return;
+				scaled = value; 
+				NotifyValueChanged ("Scaled", scaled);
+				if (_pic == null)
+					return;
+				_pic.Scaled = scaled;
+				registerForGraphicUpdate ();
+			}
+		} 
+		bool keepProps;
+		[XmlAttributeAttribute()][DefaultValue(true)]
+		public virtual bool KeepProportions {
+			get { return keepProps; }
+			set {
+				if (keepProps == value)
+					return;
+				keepProps = value; 
+				NotifyValueChanged ("KeepProportions", keepProps);
+				if (_pic == null)
+					return;
+				_pic.KeepProportions = keepProps;
+				registerForGraphicUpdate ();
+			}
+		} 
         [XmlAttributeAttribute("Path")]        
 		public string Path {
 			get { return _pic == null ? null : _pic.Path; }
@@ -26,7 +55,8 @@ namespace Crow
 						return;
 					}
 					LoadImage (value);
-					_pic.KeepProportions = true;
+					_pic.Scaled = scaled;
+					_pic.KeepProportions = keepProps;
 				} catch (Exception ex) {
 					Debug.WriteLine (ex.Message);
 					_pic = null;
@@ -47,23 +77,6 @@ namespace Crow
 		public Image () : base()
 		{
 		}
-		public Image (string _imgPath, Rectangle _bounds)
-            : base(_bounds)
-		{			
-            LoadImage(_imgPath);
-        }
-		public Image (string _imgPath)
-            : base()
-		{			
-            LoadImage(_imgPath);
-		}
-//		public Image (System.Drawing.Bitmap _bitmap)
-//            : base()
-//		{
-//			_pic = new BmpPicture ();
-//
-//			LoadImage (_bitmap);
-//		}
 		#endregion
 
 		#region Image Loading

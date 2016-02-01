@@ -35,10 +35,11 @@ namespace Crow
 		bool _multiline = false;
 		Color selColor;
 		Color selFontColor;
-		bool _selectable;
-		Point mouseLocalPos;    //mouse coord in widget space, filled only when clicked        
+		Point mouseLocalPos = -1;//mouse coord in widget space, filled only when clicked        
 		int _currentCol;        //0 based cursor position in string
 		int _currentLine;
+		Point _selBegin = -1;	//selection start (row,column)
+		Point _selRelease = -1;	//selection end (row,column)
 		double textCursorPos;   //cursor position in cairo units in widget client coord.
 		double SelStartCursorPos = -1;
 		double SelEndCursorPos = -1;
@@ -55,24 +56,24 @@ namespace Crow
 		public virtual Color SelectionBackground {
 			get { return selColor; }
 			set {
+				if (value == selColor)
+					return;
 				selColor = value;
+				NotifyValueChanged ("SelectionBackground", selColor);
 				registerForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("Black")]
+		[XmlAttributeAttribute()][DefaultValue("DarkGray")]
 		public virtual Color SelectionForeground {
 			get { return selFontColor; }
 			set {
+				if (value == selFontColor)
+					return;
 				selFontColor = value;
+				NotifyValueChanged ("SelectionForeground", selFontColor);
 				registerForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(false)]
-		public virtual bool Selectable {
-			get { return _selectable; }
-			set { _selectable = value; }
-		}
-
         [XmlAttributeAttribute()][DefaultValue(Alignment.LeftCenter)]
 		public Alignment TextAlignment
         {
@@ -90,24 +91,19 @@ namespace Crow
             {
                 if (_text == value)
                     return;
-					                
-                registerForGraphicUpdate();
-				this.RegisterForLayouting ((int)LayoutingType.Sizing);
-
-
+					                                
                 _text = value;
 
 				if (string.IsNullOrEmpty(_text))
 					_text = "";
 
 				lines = getLines;
+
+				//registerForGraphicUpdate();
+				this.RegisterForLayouting ((int)LayoutingType.Sizing);
+				NotifyValueChanged ("Text", Text);
             }
         }
-		[XmlAttributeAttribute()][DefaultValue("droid,10")]
-		public Font Font {
-			get { return _font; }
-			set { _font = value; }
-		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public bool Multiline
 		{
@@ -126,7 +122,7 @@ namespace Crow
 				else if (value > lines [_currentLine].Count ())
 					_currentCol = lines [_currentLine].Count ();
 				else
-					_currentCol = value; 
+					_currentCol = value;
 			}
 		}
 		[XmlIgnore]public int currentLine{
@@ -140,40 +136,71 @@ namespace Crow
 					_currentLine = value; 
 			}
 		}
-		[XmlIgnore]protected Point selBegin;
-		[XmlIgnore]protected Point selRelease;
+
+		[XmlIgnore]public Point SelBegin {
+			get {
+				return _selBegin;
+			}
+			set {
+				if (value == _selBegin)
+					return;
+				_selBegin = value;
+				NotifyValueChanged ("SelectedText", SelectedText);
+			}
+		}			
+		[XmlIgnore]public Point SelRelease {
+			get {
+				return _selRelease;
+			}
+			set {
+				if (value == _selRelease)
+					return;
+				_selRelease = value;
+				NotifyValueChanged ("SelectedText", SelectedText);
+			}
+		}
+
 		[XmlIgnore]protected Point selectionStart   //ordered selection start and end positions
 		{
 			get { 
-				return selRelease < 0 || selBegin.Y < selRelease.Y ? selBegin : 
-					selBegin.Y > selRelease.Y ? selRelease :
-					selBegin.X < selRelease.X ? selBegin : selRelease;
+				return SelRelease < 0 || SelBegin.Y < SelRelease.Y ? SelBegin : 
+					SelBegin.Y > SelRelease.Y ? SelRelease :
+					SelBegin.X < SelRelease.X ? SelBegin : SelRelease;
 			}
 		}
 		[XmlIgnore]public Point selectionEnd
 		{  
 			get { 
-				return selRelease < 0 || selBegin.Y > selRelease.Y ? selBegin : 
-					selBegin.Y < selRelease.Y ? selRelease :
-					selBegin.X > selRelease.X ? selBegin : selRelease;
+				return SelRelease < 0 || SelBegin.Y > SelRelease.Y ? SelBegin : 
+					SelBegin.Y < SelRelease.Y ? SelRelease :
+					SelBegin.X > SelRelease.X ? SelBegin : SelRelease;
 			}		
 		}
-		[XmlIgnore]public string selectedText
+		[XmlIgnore]public string SelectedText
 		{ 
-			get { 
-				return null; 
-					//selectionEnd < 0 ? null : 
-					//Text.Substring(selectionStart, selectionEnd - selectionStart); 
+			get {
+				
+				if (SelRelease < 0 || SelBegin < 0)
+					return "";
+				if (selectionStart.Y == selectionEnd.Y)
+					return lines [selectionStart.Y].Substring (selectionStart.X, selectionEnd.X - selectionStart.X);
+				string tmp = "";
+				tmp = lines [selectionStart.Y].Substring (selectionStart.X);
+				for (int l = selectionStart.Y + 1; l < selectionEnd.Y; l++) {
+					tmp += Interface.LineBreak + lines [l];
+				}
+				tmp += Interface.LineBreak + lines [selectionEnd.Y].Substring (0, selectionEnd.X);
+				return tmp;
 			}			
 		}
 		[XmlIgnore]public bool selectionIsEmpty
-		{ get { return selRelease < 0; } }
+		{ get { return SelRelease < 0; } }
 
 		List<string> lines;
 		List<string> getLines {
 			get {				
 				return _multiline ?
-					Regex.Split (_text, "\r\n|\r|\n").ToList() :
+					Regex.Split (_text, "\r\n|\r|\n|" + @"\\n").ToList() :
 					new List<string>(new string[] { _text });
 			}
 		}
@@ -208,8 +235,8 @@ namespace Crow
 				} else 
 					lines [l] = lines [l].Remove (selectionStart.X, selectionEnd.X - selectionStart.X);
 				currentCol = selectionStart.X;
-				selBegin = -1;
-				selRelease = -1;
+				SelBegin = -1;
+				SelRelease = -1;
 			}
 		}
 		/// <summary>
@@ -389,77 +416,94 @@ namespace Crow
 					break;
 				}
 			}
+			OpenTKGameWindow.currentWindow.CursorVisible = true;
 
 			#region draw text cursor
-			if (mouseLocalPos > 0)
+			if (mouseLocalPos >= 0)
 			{
 				computeTextCursor(gr);
 
 				if (SelectionInProgress)
 				{
-					selRelease = new Point(currentCol, currentLine);
-					SelEndCursorPos = textCursorPos;
+					if (SelBegin < 0){
+						SelBegin = new Point(currentCol, currentLine);
+						SelStartCursorPos = textCursorPos;
+						SelRelease = -1;
+					}else{
+						SelRelease = new Point(currentCol, currentLine);
+						if (SelRelease == SelBegin)
+							SelRelease = -1;
+						else
+							SelEndCursorPos = textCursorPos;
+					}						
 				}
-				else if (selBegin < 0)
-				{
-					selBegin = new Point(currentCol, currentLine);
-					SelStartCursorPos = textCursorPos;
-					selRelease = -1;
-				}
-				else
-					computeTextCursorPosition(gr);
-			}
-			else
+			}else
 				computeTextCursorPosition(gr);
 
-			if (HasFocus && Selectable)
+
+			#endregion
+
+			//*******************
+			//debug selection
+			if (SelRelease >= 0) {
+				gr.Color = Color.Green;
+				Rectangle R = new Rectangle (
+					             rText.X + (int)SelEndCursorPos - 2,
+					             rText.Y + (int)(SelRelease.Y * fe.Height), 
+					             4, 
+					             (int)fe.Height);
+				gr.Rectangle (R);
+				gr.Fill ();
+			}
+			if (SelBegin >= 0) {
+				gr.Color = Color.UnmellowYellow;
+				Rectangle R = new Rectangle (
+					rText.X + (int)SelStartCursorPos - 2,
+					rText.Y + (int)(SelBegin.Y * fe.Height), 
+					4, 
+					(int)fe.Height);
+				gr.Rectangle (R);
+				gr.Fill ();
+			}
+			//*******************
+			if (HasFocus )
 			{
 				//TODO:
-				gr.Color = Foreground;
+				gr.SetSourceColor(Foreground);
 				gr.LineWidth = 1.5;
 				gr.MoveTo(new PointD(textCursorPos + rText.X, rText.Y + currentLine * fe.Height));
 				gr.LineTo(new PointD(textCursorPos + rText.X, rText.Y + (currentLine + 1) * fe.Height));
 				gr.Stroke();
 			}
-			#endregion
-
-			//*******************
-			//debug selection
-//			gr.Color = Color.Green;
-//			Rectangle R = new Rectangle(
-//				rText.X +  (int)SelEndCursorPos-10,
-//				rText.Y + (int)(selRelease.Y * fe.Height), 
-//				20, 
-//				(int)fe.Height);
-//			gr.Rectangle(R);
-//			gr.Fill();
-//			gr.Color = Color.UnmellowYellow;
-//			R = new Rectangle(
-//				rText.X + (int)SelStartCursorPos-10,
-//				rText.Y + (int)(selBegin.Y * fe.Height), 
-//				20, 
-//				(int)fe.Height);
-//			gr.Rectangle(R);
-//			gr.Fill();
-			//*******************
-
 			gr.FontMatrix = new Matrix(widthRatio * Font.Size, 0, 0, heightRatio * Font.Size, 0, 0);
-
+			OpenTKGameWindow.currentWindow.CursorVisible = true;
 			for (int i = 0; i < lines.Count; i++) {				
 				string l = lines [i].Replace ("\t", new String (' ', Interface.TabSize));
-				if (selRelease >= 0 && i >= selectionStart.Y && i <= selectionEnd.Y) {					
-					gr.Color = selColor;
-					int lineLength = (int)gr.TextExtents (l).XAdvance;
-					Rectangle selRect = new Rectangle (
-						rText.X,
-						rText.Y + (int)(i * fe.Height), 
-						lineLength, 
-						(int)fe.Height);
+				int lineLength = (int)gr.TextExtents (l).XAdvance;
+				Rectangle lineRect = new Rectangle (
+					rText.X,
+					rText.Y + (int)(i * fe.Height), 
+					lineLength, 
+					(int)fe.Height);
+
+//				if (TextAlignment == Alignment.Center ||
+//					TextAlignment == Alignment.TopCenter ||
+//					TextAlignment == Alignment.BottomCenter)
+//					lineRect.X += (rText.Width - lineLength) / 2;
+//				else if (TextAlignment == Alignment.RightCenter ||
+//					TextAlignment == Alignment.TopRight ||
+//					TextAlignment == Alignment.BottomRight)
+//					lineRect.X += (rText.Width - lineLength);
+				
+				if (SelRelease >= 0 && i >= selectionStart.Y && i <= selectionEnd.Y) {					
+					gr.SetSourceColor(selColor);
+
+					Rectangle selRect = lineRect ;
 
 					int cpStart = (int)SelStartCursorPos,
 						cpEnd = (int)SelEndCursorPos;
 
-					if (selBegin.Y > selRelease.Y) {
+					if (SelBegin.Y > SelRelease.Y) {
 						cpStart = cpEnd;
 						cpEnd = (int)SelStartCursorPos;
 					}
@@ -477,27 +521,9 @@ namespace Crow
 
 				if (string.IsNullOrWhiteSpace (l))
 					continue;
-			
-//				double t = rText.Y;
-//				gr.LineWidth = 1;
-//				gr.Color = Color.Green;
-//				gr.MoveTo (rText.X, t);
-//				gr.LineTo (rText.X + rText.Width, t);
-//				gr.Stroke ();
-//				gr.MoveTo (rText.X, t + rText.Height);
-//				gr.LineTo (rText.X + rText.Width, t + rText.Height);
-//				gr.Stroke ();
-//				gr.Rectangle (rText);
-//				gr.Fill ();
-//
-//				t += fe.Ascent;
-//				gr.Color = Color.Red;
-//				gr.MoveTo (rText.X, t);
-//				gr.LineTo (rText.X + rText.Width, t);
-//				gr.Stroke ();
 
-				gr.Color = Foreground;				
-				gr.MoveTo (rText.X, rText.Y + fe.Ascent + fe.Height * i);
+				gr.SetSourceColor(Foreground);	
+				gr.MoveTo (lineRect.X, rText.Y + fe.Ascent + fe.Height * i);
 
 				#if _WIN32 || _WIN64
 				gr.ShowText(l.ToUtf8());
@@ -505,65 +531,81 @@ namespace Crow
 				gr.ShowText (l);
 				#endif
 				gr.Fill ();
-
-			}						
+			}
 		}
 		#endregion
 
 		#region Mouse handling
-		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
-		{
-			//			SelectionInProgress = true;                
-			//			mouseLocalPos = e.Position - ScreenCoordBounds.TopLeft - rText.TopLeft;
-			//			registerForGraphicUpdate();
-
-			base.onMouseEnter (sender, e);
+		void updatemouseLocalPos(Point mpos){
+			mouseLocalPos = mpos - ScreenCoordinates(Slot).TopLeft - ClientRectangle.TopLeft;
+			if (mouseLocalPos.X < 0)
+				mouseLocalPos.X = 0;
+			if (mouseLocalPos.Y < 0)
+				mouseLocalPos.Y = 0;
 		}
-		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
+		public override void onFocused (object sender, EventArgs e)
 		{
-			base.onMouseLeave (sender, e);
+			base.onFocused (sender, e);
+
+			SelBegin = new Point(0,0);
+			SelRelease = new Point (lines.LastOrDefault ().Length, lines.Count-1);
+			OpenTKGameWindow.currentWindow.CursorVisible = true;
+			registerForGraphicUpdate ();
+			Debug.WriteLine("focused:", this.ToString());
+		}
+		public override void onUnfocused (object sender, EventArgs e)
+		{
+			base.onUnfocused (sender, e);
+
+			SelBegin = -1;
+			SelRelease = -1;
+
+			registerForGraphicUpdate ();
+			Debug.WriteLine("unfocused:", this.ToString());
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
 
-			IGOLibHost glh = TopContainer;
-			if (glh.activeWidget != this)
+			if (!(SelectionInProgress && HasFocus))
 				return;
-			if (!Selectable)
-				return;
-			
-			SelectionInProgress = true;
-			mouseLocalPos = e.Position - ScreenCoordinates(ClientRectangle).TopLeft;
+
+			updatemouseLocalPos (e.Position);
+
 			registerForGraphicUpdate();
 		}
-		public override void onMouseButtonDown (object sender, MouseButtonEventArgs e)
-		{
-			if (this.HasFocus && Selectable){
-				mouseLocalPos = e.Position - ScreenCoordinates(ClientRectangle).TopLeft;
-				selBegin = -1;
-				selRelease = -1;
-			}else{
-//				selBeginPos = 0;
-//				selReleasePos = new Point(lines[lines.Count].Length-1, lines.Count-1);
-			}            
+		public override void onMouseDown (object sender, MouseButtonEventArgs e)
+		{			
+			if (this.HasFocus){
+				updatemouseLocalPos (e.Position);
+				SelBegin = -1;
+				SelRelease = -1;
+				SelectionInProgress = true;
+			}          
 
 			//done at the end to set 'hasFocus' value after testing it
-			base.onMouseButtonDown (sender, e);
+			base.onMouseDown (sender, e);
 
 			registerForGraphicUpdate();
 		}
-		public override void onMouseButtonUp (object sender, MouseButtonEventArgs e)
+		public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{
-			base.onMouseButtonUp (sender, e);
+			base.onMouseUp (sender, e);
+
+			if (!SelectionInProgress)
+				return;
+			
+			updatemouseLocalPos (e.Position);
 			SelectionInProgress = false;
+			registerForGraphicUpdate ();
 		}
 		#endregion
-
-
+		/// <summary>
+		/// Update Current Column, line and TextCursorPos
+		/// from mouseLocalPos
+		/// </summary>
 		void computeTextCursor(Context gr)
-		{
-			//FontExtents fe = gr.FontExtents;
+		{			
 			TextExtents te;
 
 			double cPos = 0f;
@@ -604,41 +646,25 @@ namespace Crow
 			//reset mouseLocalPos
 			mouseLocalPos = -1;
 		}
+		/// <summary> Computes offsets in cairo units </summary>
 		void computeTextCursorPosition(Context gr)
 		{			
-			TextExtents te;
-
-			double cPos = 0f;
-
-			int limit = currentCol;
-
-			if (selectionEnd > 0)
-				limit = Math.Max(currentCol, selectionEnd.X);
-
-			for (int i = 0; i <= limit; i++)
-			{
-				if (i == currentCol)
-					textCursorPos = cPos;
-				if (i == selectionStart.X)
-					SelStartCursorPos = cPos;
-				if (i == selectionEnd.X)
-					SelEndCursorPos = cPos;
-
-				if (i < lines[currentLine].Length)
-				{
-					string c = lines [currentLine].Substring (i, 1);
-					if (c == "\t")
-						c = new string (' ', Interface.TabSize);
-					#if _WIN32 || _WIN64
-					byte[] c = System.Text.UTF8Encoding.UTF8.GetBytes(Text.Substring(i, 1));
-					te = gr.TextExtents(c);
-					#elif __linux__
-					te = gr.TextExtents(c);
-					#endif
-					cPos += te.XAdvance;
-				}
+			if (SelBegin >= 0)
+				SelStartCursorPos = GetXFromTextPointer (gr, SelBegin);
+			if (SelRelease >= 0)
+				SelEndCursorPos = GetXFromTextPointer (gr, SelRelease);
+			textCursorPos = GetXFromTextPointer (gr, new Point(currentCol, currentLine));
+		}
+		/// <summary> Compute x offset in cairo unit from text position </summary>
+		double GetXFromTextPointer(Context gr, Point pos)
+		{
+			try {
+				string l = lines [pos.Y].Substring (0, pos.X).
+					Replace ("\t", new String (' ', Interface.TabSize));
+				return gr.TextExtents (l).XAdvance;
+			} catch (Exception ex) {
+				return -1;
 			}
-
-		}		
+		}
     }
 }

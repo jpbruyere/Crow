@@ -137,14 +137,14 @@ namespace test
 					CornerRadius = 5,
 					Background = col,
 					BorderWidth = 2,
-					BorderColor = Color.Transparent,
+					Foreground = Color.Transparent,
 					Focusable = true
 				};
 				b.MouseEnter += delegate(object sender, MouseMoveEventArgs ee) {
-					(sender as Border).BorderColor = Color.White;
+					(sender as Border).Foreground = Color.White;
 				};
 				b.MouseLeave += delegate(object sender, MouseMoveEventArgs ee) {
-					(sender as Border).BorderColor = Color.Transparent;
+					(sender as Border).Foreground = Color.Transparent;
 				};
 				s.addChild (b);
 
@@ -186,14 +186,14 @@ namespace test
 				CornerRadius = 5,
 				Background = col,
 				BorderWidth = 2,
-				BorderColor = Color.Transparent,
+				Foreground = Color.Transparent,
 				Focusable = true
 			};
 			b.MouseEnter += delegate(object sender, MouseMoveEventArgs ee) {
-				(sender as Border).BorderColor = Color.White;
+				(sender as Border).Foreground = Color.White;
 			};
 			b.MouseLeave += delegate(object sender, MouseMoveEventArgs ee) {
-				(sender as Border).BorderColor = Color.Transparent;
+				(sender as Border).Foreground = Color.Transparent;
 			};
 			s.addChild (b);
 

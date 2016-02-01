@@ -527,7 +527,7 @@ namespace MonoDevelop.GOLib
 			}
 		}
 
-		public IGOLibHost TopContainer {
+		public IGOLibHost HostContainer {
 			get { return this as IGOLibHost; }
 		}
 

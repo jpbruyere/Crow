@@ -45,20 +45,26 @@ namespace Crow
 			
 		public override void Paint (Cairo.Context gr, Rectangle rect, string subPart = "")
 		{
-			float widthRatio = (float)rect.Width / Dimensions.Width;
-			float heightRatio = (float)rect.Height / Dimensions.Height;
-			float ratio = Math.Min (widthRatio, heightRatio);
+			float widthRatio = 1f;
+			float heightRatio = 1f;
 
-			Rectangle rImg = rect;
-
+			if (Scaled) {
+				widthRatio = (float)rect.Width / Dimensions.Width;
+				heightRatio = (float)rect.Height / Dimensions.Height;
+			}
+			if (KeepProportions) {
+				if (widthRatio < heightRatio)
+					heightRatio = widthRatio;
+				else
+					widthRatio = heightRatio;
+			}
+				
 			gr.Save ();
 
-			if (KeepProportions)
-				gr.Scale (ratio, ratio);
-			else
-				gr.Scale (widthRatio, heightRatio);
+			gr.Translate (rect.Left,rect.Top);
+			gr.Scale (widthRatio, heightRatio);
+			gr.Translate (((float)rect.Width/widthRatio - Dimensions.Width)/2f, ((float)rect.Height/heightRatio - Dimensions.Height)/2f);
 
-			gr.Translate (rImg.X/widthRatio, rImg.Y/heightRatio);
 			if (string.IsNullOrEmpty (subPart))
 				hSVG.RenderCairo (gr);
 			else

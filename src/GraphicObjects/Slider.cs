@@ -158,9 +158,9 @@ namespace Crow
         }
         
 		#region mouse handling
-		public override void onMouseButtonDown (object sender, OpenTK.Input.MouseButtonEventArgs e)
+		public override void onMouseDown (object sender, OpenTK.Input.MouseButtonEventArgs e)
 		{
-			base.onMouseButtonDown (sender, e);
+			base.onMouseDown (sender, e);
 
 			Rectangle cursInScreenCoord = ScreenCoordinates (cursor + Slot.Position);
 			if (cursInScreenCoord.ContainsOrIsEqual (e.Position))
@@ -177,9 +177,9 @@ namespace Crow
 					Value += LargeIncrement;
 			}
 		}
-		public override void onMouseButtonUp (object sender, OpenTK.Input.MouseButtonEventArgs e)
+		public override void onMouseUp (object sender, OpenTK.Input.MouseButtonEventArgs e)
 		{
-			base.onMouseButtonUp (sender, e);
+			base.onMouseUp (sender, e);
 
 			holdCursor = false;
 		}

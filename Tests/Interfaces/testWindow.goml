@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <Window Left="10" Top="10" Title="Test window" 
-		Width="250" Height="300" >
-	<VerticalStack Name="contentVSStack" Margin="10" Spacing="10">
+		Width="250" Height="550" >
+	<VerticalStack Name="contentVSStack" Margin="10" Spacing="10" Background="0,4;0,4;0,4;0,4">
 		<Slider Name="slider" Height="10" Width="0"/>
 		<GroupBox Caption="test"  Height="-1" Width="-1" Margin="5">
 			<VerticalStack  Height="-1" Width="0" >
@@ -15,7 +15,33 @@
 			<GraphicObject Width="0"/>
 			<CheckBox Height="-1" Width="80" IsChecked="true"/>
 		</HorizontalStack>
-
+<Border Fit="true" CornerRadius="5" BorderWidth="1">
+	<Container Name="MainGrp" Background="0,5;0,5;0,5;0,4" Width="120" Fit="true"
+		Margin="10" Focusable="True" >
+			<VerticalStack Fit="true" Name="vsFps"  Spacing="10" >
+				<HorizontalStack Fit="true">
+					<Label Text="Update:" Width="50" TextAlignment="RightCenter"/>
+					<Label Name="labUpdate" Text="{update}" Font="droid,12" Background="AoEnglish" Width="50" TextAlignment="Center"/>
+				</HorizontalStack>
+				<HorizontalStack Fit="true">
+					<Label Text="Drawing:" Width="50" TextAlignment="RightCenter"/>
+					<Label Name="labDrawing" Text="{drawing}" Font="droid,12" Background="AoEnglish" Width="50" TextAlignment="Center"/>
+				</HorizontalStack>
+				<HorizontalStack Fit="true">
+					<Label Name="captionFps" Text="Fps:" Width="50" TextAlignment="RightCenter"/>
+					<Label Name="valueFps" Text="{fps}" Font="droid , 12" Width="50" TextAlignment="Center" Background="AoEnglish"/>
+				</HorizontalStack>
+				<HorizontalStack Fit="true">
+					<Label Text="Min:" Width="50" TextAlignment="RightCenter"/>
+					<Label Text="{fpsMin}" Font="droid , 12" Width="50" TextAlignment="Center" Background="AoEnglish"/>
+				</HorizontalStack>
+				<HorizontalStack Fit="true">
+					<Label Text="Max:" Width="50" TextAlignment="RightCenter"/>
+					<Label Text="{fpsMax}" Font="droid , 12" Background="AoEnglish" Width="50" TextAlignment="Center"/>
+				</HorizontalStack>
+			</VerticalStack>				
+	</Container>
+</Border>
 <!--		<Checkbox Height="-1" Width="-1" Background="Red" Margin="0" VerticalAlignment="Center" HorizontalAlignment="Right"/>-->
 	</VerticalStack>
 </Window>

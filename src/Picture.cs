@@ -29,7 +29,7 @@ namespace Crow
 		public string Path;
 		public Size Dimensions;
 		public bool KeepProportions = false;
-		public bool Scale = true;
+		public bool Scaled = true;
 
 		public Picture ()
 		{

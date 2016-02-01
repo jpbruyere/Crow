@@ -46,7 +46,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>TRACE;DEBUG;__linux__;DEBUG_LOAD_TIME0;DEBUG_LAYOUTING0;DEBUG_BINDING0</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;__linux__;DEBUG_LOAD_TIME0;DEBUG_LAYOUTING;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
   </PropertyGroup>
   <!--  <PropertyGroup Condition=" '$(Platform)' == 'Linux_x86' ">
     <DefineConstants>__linux__</DefineConstants>
@@ -129,6 +129,7 @@
     <Compile Include="src\GraphicObjects\ComboBox.cs" />
     <Compile Include="src\GraphicObjects\GroupBox.cs" />
     <Compile Include="src\GraphicObjects\ScrollBar.cs" />
+    <Compile Include="src\BubblingMouseButtonEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -213,6 +214,8 @@
     <EmbeddedResource Include="Templates\GroupBox.goml" />
     <EmbeddedResource Include="Templates\ListBox.goml" />
     <EmbeddedResource Include="Templates\ScrollBar.goml" />
+    <EmbeddedResource Include="Templates\Button.crow" />
+    <EmbeddedResource Include="Templates\ArrowButTemplate.crow" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
