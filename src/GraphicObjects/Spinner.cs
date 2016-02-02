@@ -26,8 +26,6 @@ namespace Crow
 	[DefaultTemplate("#Crow.Templates.Spinner.goml")]
 	public class Spinner : NumericControl
 	{
-		Label labCpt;
-
 		public Spinner (double minimum, double maximum, double step) : 
 		base (minimum, maximum, step)
 		{

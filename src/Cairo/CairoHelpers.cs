@@ -83,13 +83,13 @@ namespace Crow
             gr.Save();
             r.Inflate((int)-width / 2, (int)-width / 2);
             gr.LineWidth = width;
-            gr.Color = Color.White;
+			gr.SetSourceColor(Color.White);
             gr.MoveTo(r.BottomLeft);
             gr.LineTo(r.TopLeft);
             gr.LineTo(r.TopRight);
             gr.Stroke();
 
-            gr.Color = Color.DarkGray;
+			gr.SetSourceColor(Color.DarkGray);
             gr.MoveTo(r.TopRight);
             gr.LineTo(r.BottomRight);
             gr.LineTo(r.BottomLeft);
@@ -102,12 +102,12 @@ namespace Crow
             gr.Save();
             r.Inflate((int)-width / 2, (int)-width / 2);
             gr.LineWidth = width;
-            gr.Color = Color.DarkGray;
+			gr.SetSourceColor(Color.DarkGray);
             gr.MoveTo(r.BottomLeft);
             gr.LineTo(r.TopLeft);
             gr.LineTo(r.TopRight);
             gr.Stroke();
-            gr.Color = Color.White;
+			gr.SetSourceColor(Color.White);
             gr.MoveTo(r.TopRight);
             gr.LineTo(r.BottomRight);
             gr.LineTo(r.BottomLeft);

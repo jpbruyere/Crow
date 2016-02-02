@@ -190,7 +190,7 @@ namespace Crow
 			Rectangle rBack = new Rectangle (Slot.Size);
 			if (BackgroundImage != null)				
 				BackgroundImage.Paint (gr, rBack, BackImgSub);
-			gr.Color = Background;
+			gr.SetSourceColor(Background);
 			CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);
 			gr.Fill ();
 
@@ -207,9 +207,6 @@ namespace Crow
 			if (bmp == null)
 				UpdateGraphic ();
 			else {
-
-				Rectangle rb = Parent.ContextCoordinates (Slot);
-
 				if (clip != null)
 					clip.Rebase (this);									
 				else {
@@ -230,7 +227,7 @@ namespace Crow
 						clip.clearAndClip (gr);
 
 						Rectangle rBack = Slot.Size;
-						gr.Color = Background;
+						gr.SetSourceColor(Background);
 						CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);
 						gr.Fill ();
 						#if DEBUG_CLIP_RECTANGLE

@@ -92,7 +92,7 @@ namespace Crow
 				break;
 			case Key.Delete:
 				if (selectionIsEmpty)
-					currentCol++;
+					CurrentColumn++;
 				this.DeleteChar ();
 				break;
 			case Key.Enter:
@@ -101,33 +101,33 @@ namespace Crow
 				break;
 			case Key.Escape:
 				Text = "";
-				currentCol = 0;
+				CurrentColumn = 0;
 				SelRelease = -1;
 				break;
 			case Key.Home:
 				//TODO
 				if (e.Control)
-					currentLine = 0;
-				currentCol = 0;
+					CurrentLine = 0;
+				CurrentColumn = 0;
 				break;
 			case Key.End:
 				if (e.Control)
-					currentLine = int.MaxValue;
-				currentCol = int.MaxValue;
+					CurrentLine = int.MaxValue;
+				CurrentColumn = int.MaxValue;
 				break;
 			case Key.Insert:
 				break;
 			case Key.Left:				
-				currentCol--;
+				CurrentColumn--;
 				break;
 			case Key.Right:				
-				currentCol++;
+				CurrentColumn++;
 				break;
 			case Key.Up:
-				currentLine--;
+				CurrentLine--;
 				break;
 			case Key.Down:
-				currentLine++;
+				CurrentLine++;
 				break;
 			case Key.Menu:
 				break;
@@ -191,7 +191,7 @@ namespace Crow
 				this.Insert (k);
 
 				SelRelease = -1;
-				SelBegin = new Point(currentCol, SelBegin.Y);
+				SelBegin = new Point(CurrentColumn, SelBegin.Y);
 
 				break;
 			}

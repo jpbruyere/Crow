@@ -11,12 +11,8 @@ using System.ComponentModel;
 
 namespace Crow
 {
-	public class Scroller : Container, IValueChange
-    {
-		#region IValueChange implementation
-		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-		#endregion
-
+	public class Scroller : Container
+	{
 		bool _verticalScrolling;
 		bool _horizontalScrolling;
 		bool _scrollbarVisible;
@@ -27,7 +23,6 @@ namespace Crow
 
 
 		#region public properties
-
 		[XmlAttributeAttribute][DefaultValue(false)]
 		public bool VerticalScrolling {
 			get { return _verticalScrolling; }
@@ -43,9 +38,7 @@ namespace Crow
 		public bool ScrollbarVisible {
 			get { return _scrollbarVisible; }
 			set { _scrollbarVisible = value; }
-		}
-
-
+		}			
 		[XmlAttributeAttribute][DefaultValue(0.0)]
 		public double ScrollX {
 			get {
@@ -60,12 +53,10 @@ namespace Crow
 					_scrollX = Math.Max(0.0, Child.Slot.Width - ClientRectangle.Width);
 				else
 					_scrollX = value;
-				ValueChanged.Raise(this, new ValueChangeEventArgs("ScrollX", _scrollX));
+				NotifyValueChanged("ScrollX", _scrollX);
 				RegisterForRedraw();
 			}
-		}
-
-
+		}			
 		[XmlAttributeAttribute][DefaultValue(0.0)]
 		public double ScrollY {
 			get {
@@ -80,7 +71,7 @@ namespace Crow
 					_scrollY = Math.Max(0.0,Child.Slot.Height - ClientRectangle.Height);
 				else
 					_scrollY = value;
-				ValueChanged.Raise(this, new ValueChangeEventArgs("ScrollY", _scrollY));
+				NotifyValueChanged("ScrollY", _scrollY);
 				RegisterForRedraw();
 			}
 		}
@@ -99,17 +90,14 @@ namespace Crow
 			get { return scrollSpeed; }
 			set {
 				scrollSpeed = value;
-				ValueChanged.Raise(this, new ValueChangeEventArgs("ScrollSpeed", scrollSpeed));
+				NotifyValueChanged("ScrollSpeed", scrollSpeed);
 			}
 		}
-
 		#endregion
 
 
         public Scroller()
-            : base()
-        {
-        }
+            : base(){}
 
 		#region GraphicObject Overrides
 		void OnChildLayoutChanges (object sender, LayoutChangeEventArgs arg)
@@ -121,12 +109,12 @@ namespace Crow
 						Debug.WriteLine ("scrolly={0} maxscroll={1}", ScrollY, maxScroll);
 						ScrollY = 0;
 					}
-					ValueChanged.Raise (this, new ValueChangeEventArgs ("MaximumScroll", maxScroll));
+					NotifyValueChanged("MaximumScroll", maxScroll);
 				}
 			} else if (arg.LayoutType == LayoutingType.Width) {
 				if (maxScroll < ScrollX)
 					ScrollX = 0;
-				ValueChanged.Raise (this, new ValueChangeEventArgs ("MaximumScroll", maxScroll));
+				NotifyValueChanged("MaximumScroll", maxScroll);
 			}
 		}
 		void onChildListCleared(object sender, EventArgs e){

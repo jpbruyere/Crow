@@ -313,7 +313,7 @@ namespace Crow
 						continue;
 					}
 
-					gr.Color = Foreground;				
+					gr.SetSourceColor (Foreground);	
 					gr.MoveTo (rText.X, rText.Y + fe.Ascent + fe.Height * curLineCount);
 
 					#if _WIN32 || _WIN64

@@ -78,7 +78,7 @@ namespace Crow
 			set { base.BorderWidth = value; }
 		}
 		[XmlAttributeAttribute()][DefaultValue("BlueCrayola")]
-		public virtual Color Foreground {
+		public override Color Foreground {
 			get { return base.Foreground; }
 			set { base.Foreground = value; }
 		}
@@ -94,7 +94,7 @@ namespace Crow
 
 			rBack.Width = (int)((double)rBack.Width / Maximum * Value);
 
-			gr.Color = Foreground;
+			gr.SetSourceColor(Foreground);
 
 			CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);
 			gr.Fill();

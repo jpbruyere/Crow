@@ -17,12 +17,8 @@ using System.ComponentModel;
 namespace Crow
 {
 	[DefaultTemplate("#Crow.Templates.ScrollBar.goml")]
-	public class ScrollBar : TemplatedControl, IValueChange
+	public class ScrollBar : TemplatedControl
 	{
-		#region IValueChange implementation
-		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-		#endregion
-
 		Orientation _orientation;
 		Slider _slider;
 		double _maximumScroll;
@@ -47,7 +43,7 @@ namespace Crow
 					return;
 				_maximumScroll = value;
 				registerForGraphicUpdate ();
-				ValueChanged.Raise(this, new ValueChangeEventArgs ("MaximumScroll", _maximumScroll));
+				NotifyValueChanged ("MaximumScroll", _maximumScroll);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0.0)]
@@ -63,7 +59,7 @@ namespace Crow
 				else if (_scroll > _maximumScroll)
 					_scroll = _maximumScroll;
 				registerForGraphicUpdate ();
-				ValueChanged.Raise(this, new ValueChangeEventArgs ("Scroll", _scroll));
+				NotifyValueChanged ("Scroll", _scroll);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(Orientation.Vertical)]
@@ -74,7 +70,7 @@ namespace Crow
 				if (_orientation == value)
 					return;
 				_orientation = value;
-				ValueChanged.Raise(this, new ValueChangeEventArgs ("Orientation", _orientation));
+				NotifyValueChanged ("Orientation", _orientation);
 				registerForGraphicUpdate ();
 			}
 		}

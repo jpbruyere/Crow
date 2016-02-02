@@ -140,7 +140,7 @@ namespace Crow
 				ctx.Rectangle(r);
 			}
 
-			ctx.Color = c;
+			ctx.SetSourceColor(c);
 
 			ctx.LineWidth = 2;
 			ctx.Stroke ();

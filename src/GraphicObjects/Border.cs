@@ -52,13 +52,13 @@ namespace Crow
 			if (BorderWidth > 0) 
 				rBack.Inflate (-BorderWidth / 2);			
 
-			gr.Color = Background;
+			gr.SetSourceColor(Background);
 			CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);
 			gr.Fill ();
 
 			if (BorderWidth > 0) {
 				gr.LineWidth = BorderWidth;
-				gr.Color = Foreground;
+				gr.SetSourceColor(Foreground);
 				CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
 				gr.Stroke ();
 			}

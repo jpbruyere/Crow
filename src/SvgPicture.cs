@@ -27,7 +27,6 @@ namespace Crow
 	public class SvgPicture : Picture
 	{
 		Rsvg.Handle hSVG;
-		string _subSvg;
 
 		public SvgPicture ()
 		{}

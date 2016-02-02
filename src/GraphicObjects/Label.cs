@@ -29,9 +29,8 @@ namespace Crow
         //TODO:change protected to private
         
 		#region private and protected fields
-		protected string _text = "label";
+		string _text = "label";
         Alignment _textAlignment = Alignment.LeftCenter;        
-		Font _font;
 		bool _multiline = false;
 		Color selColor;
 		Color selFontColor;
@@ -52,7 +51,7 @@ namespace Crow
 		protected TextExtents te;
 		#endregion
 
-		[XmlAttributeAttribute()][DefaultValue("SkyBlue")]
+		[XmlAttributeAttribute()][DefaultValue("SteelBlue")]
 		public virtual Color SelectionBackground {
 			get { return selColor; }
 			set {
@@ -63,7 +62,7 @@ namespace Crow
 				registerForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("DarkGray")]
+		[XmlAttributeAttribute()][DefaultValue("White")]
 		public virtual Color SelectionForeground {
 			get { return selFontColor; }
 			set {
@@ -78,7 +77,13 @@ namespace Crow
 		public Alignment TextAlignment
         {
             get { return _textAlignment; }
-            set { _textAlignment = value; }
+            set { 
+				if (value == _textAlignment)
+					return;
+				_textAlignment = value; 
+				registerForGraphicUpdate ();
+				NotifyValueChanged ("TextAlignment", _textAlignment);
+			}
         }
 		[XmlAttributeAttribute()][DefaultValue("label")]
         public string Text
@@ -99,7 +104,7 @@ namespace Crow
 
 				lines = getLines;
 
-				//registerForGraphicUpdate();
+				this.registerForGraphicUpdate ();
 				this.RegisterForLayouting ((int)LayoutingType.Sizing);
 				NotifyValueChanged ("Text", Text);
             }
@@ -110,33 +115,41 @@ namespace Crow
 			get { return _multiline; }
 			set
 			{
+				if (value == _multiline)
+					return;
 				_multiline = value;
+				NotifyValueChanged ("Multiline", _multiline);
 				registerForGraphicUpdate();
 			}
 		}
-		[XmlIgnore]public int currentCol{
+		[XmlIgnore]public int CurrentColumn{
 			get { return _currentCol; }
 			set { 
+				if (value == _currentCol)
+					return;
 				if (value < 0)
 					_currentCol = 0;
 				else if (value > lines [_currentLine].Count ())
 					_currentCol = lines [_currentLine].Count ();
 				else
 					_currentCol = value;
+				NotifyValueChanged ("CurrentColumn", _currentCol);
 			}
 		}
-		[XmlIgnore]public int currentLine{
+		[XmlIgnore]public int CurrentLine{
 			get { return _currentLine; }
 			set { 
+				if (value == _currentLine)
+					return;
 				if (value > lines.Count)
 					_currentLine = lines.Count; 
 				else if (value < 0)
 					_currentLine = 0;
 				else
 					_currentLine = value; 
+				NotifyValueChanged ("CurrentLine", _currentLine);
 			}
 		}
-
 		[XmlIgnore]public Point SelBegin {
 			get {
 				return _selBegin;
@@ -208,17 +221,17 @@ namespace Crow
 		public void DeleteChar()
 		{
 			if (selectionIsEmpty) {				
-				if (currentCol == 0) {
-					if (currentLine == 0)
+				if (CurrentColumn == 0) {
+					if (CurrentLine == 0)
 						return;
-					currentLine--;
-					currentCol = lines [currentLine].Count ();
-					lines [currentLine] += lines [currentLine + 1];
-					lines.RemoveAt (currentLine + 1);
+					CurrentLine--;
+					CurrentColumn = lines [CurrentLine].Count ();
+					lines [CurrentLine] += lines [CurrentLine + 1];
+					lines.RemoveAt (CurrentLine + 1);
 					return;
 				}
-				currentCol--;
-				lines [currentLine] = lines [currentLine].Remove (currentCol, 1);
+				CurrentColumn--;
+				lines [CurrentLine] = lines [CurrentLine].Remove (CurrentColumn, 1);
 			} else {
 				Debug.WriteLine (selectionEnd.ToString());
 				int linesToRemove = selectionEnd.Y - selectionStart.Y;
@@ -230,11 +243,11 @@ namespace Crow
 					l++;
 					for (int c = 0; c < linesToRemove-1; c++)
 						lines.RemoveAt (l);
-					currentCol = selectionStart.X;
-					currentLine = selectionStart.Y;
+					CurrentColumn = selectionStart.X;
+					CurrentLine = selectionStart.Y;
 				} else 
 					lines [l] = lines [l].Remove (selectionStart.X, selectionEnd.X - selectionStart.X);
-				currentCol = selectionStart.X;
+				CurrentColumn = selectionStart.X;
 				SelBegin = -1;
 				SelRelease = -1;
 			}
@@ -245,8 +258,8 @@ namespace Crow
 		/// <param name="str">String.</param>
 		protected void Insert(string str)
 		{
-			lines [currentLine] = lines [currentLine].Insert (currentCol, str);
-			currentCol += str.Length;
+			lines [CurrentLine] = lines [CurrentLine].Insert (CurrentColumn, str);
+			CurrentColumn += str.Length;
 		}
 
 		#region GraphicObject overrides
@@ -426,11 +439,11 @@ namespace Crow
 				if (SelectionInProgress)
 				{
 					if (SelBegin < 0){
-						SelBegin = new Point(currentCol, currentLine);
+						SelBegin = new Point(CurrentColumn, CurrentLine);
 						SelStartCursorPos = textCursorPos;
 						SelRelease = -1;
 					}else{
-						SelRelease = new Point(currentCol, currentLine);
+						SelRelease = new Point(CurrentColumn, CurrentLine);
 						if (SelRelease == SelBegin)
 							SelRelease = -1;
 						else
@@ -443,36 +456,35 @@ namespace Crow
 
 			#endregion
 
+			//****** debug selection *************
+//			if (SelRelease >= 0) {
+//				gr.Color = Color.Green;
+//				Rectangle R = new Rectangle (
+//					             rText.X + (int)SelEndCursorPos - 2,
+//					             rText.Y + (int)(SelRelease.Y * fe.Height), 
+//					             4, 
+//					             (int)fe.Height);
+//				gr.Rectangle (R);
+//				gr.Fill ();
+//			}
+//			if (SelBegin >= 0) {
+//				gr.Color = Color.UnmellowYellow;
+//				Rectangle R = new Rectangle (
+//					rText.X + (int)SelStartCursorPos - 2,
+//					rText.Y + (int)(SelBegin.Y * fe.Height), 
+//					4, 
+//					(int)fe.Height);
+//				gr.Rectangle (R);
+//				gr.Fill ();
+//			}
 			//*******************
-			//debug selection
-			if (SelRelease >= 0) {
-				gr.Color = Color.Green;
-				Rectangle R = new Rectangle (
-					             rText.X + (int)SelEndCursorPos - 2,
-					             rText.Y + (int)(SelRelease.Y * fe.Height), 
-					             4, 
-					             (int)fe.Height);
-				gr.Rectangle (R);
-				gr.Fill ();
-			}
-			if (SelBegin >= 0) {
-				gr.Color = Color.UnmellowYellow;
-				Rectangle R = new Rectangle (
-					rText.X + (int)SelStartCursorPos - 2,
-					rText.Y + (int)(SelBegin.Y * fe.Height), 
-					4, 
-					(int)fe.Height);
-				gr.Rectangle (R);
-				gr.Fill ();
-			}
-			//*******************
+
 			if (HasFocus )
 			{
-				//TODO:
 				gr.SetSourceColor(Foreground);
 				gr.LineWidth = 1.5;
-				gr.MoveTo(new PointD(textCursorPos + rText.X, rText.Y + currentLine * fe.Height));
-				gr.LineTo(new PointD(textCursorPos + rText.X, rText.Y + (currentLine + 1) * fe.Height));
+				gr.MoveTo(new PointD(textCursorPos + rText.X, rText.Y + CurrentLine * fe.Height));
+				gr.LineTo(new PointD(textCursorPos + rText.X, rText.Y + (CurrentLine + 1) * fe.Height));
 				gr.Stroke();
 			}
 			gr.FontMatrix = new Matrix(widthRatio * Font.Size, 0, 0, heightRatio * Font.Size, 0, 0);
@@ -549,9 +561,7 @@ namespace Crow
 
 			SelBegin = new Point(0,0);
 			SelRelease = new Point (lines.LastOrDefault ().Length, lines.Count-1);
-			OpenTKGameWindow.currentWindow.CursorVisible = true;
 			registerForGraphicUpdate ();
-			Debug.WriteLine("focused:", this.ToString());
 		}
 		public override void onUnfocused (object sender, EventArgs e)
 		{
@@ -559,9 +569,7 @@ namespace Crow
 
 			SelBegin = -1;
 			SelRelease = -1;
-
 			registerForGraphicUpdate ();
-			Debug.WriteLine("unfocused:", this.ToString());
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
@@ -610,15 +618,15 @@ namespace Crow
 
 			double cPos = 0f;
 
-			currentLine = (int)(mouseLocalPos.Y / fe.Height);
+			CurrentLine = (int)(mouseLocalPos.Y / fe.Height);
 
 			//fix cu
-			if (currentLine >= lines.Count)
-				currentLine = lines.Count - 1;
+			if (CurrentLine >= lines.Count)
+				CurrentLine = lines.Count - 1;
 
-			for (int i = 0; i < lines[currentLine].Length; i++)
+			for (int i = 0; i < lines[CurrentLine].Length; i++)
 			{
-				string c = lines [currentLine].Substring (i, 1);
+				string c = lines [CurrentLine].Substring (i, 1);
 				if (c == "\t")
 					c = new string (' ', Interface.TabSize);
 				
@@ -632,7 +640,7 @@ namespace Crow
 
 				if (mouseLocalPos.X <= cPos + halfWidth)
 				{
-					currentCol = i;
+					CurrentColumn = i;
 					textCursorPos = cPos;
 					mouseLocalPos = -1;
 					return;
@@ -640,7 +648,7 @@ namespace Crow
 
 				cPos += te.XAdvance;
 			}
-			currentCol = lines[currentLine].Length;
+			CurrentColumn = lines[CurrentLine].Length;
 			textCursorPos = cPos;
 
 			//reset mouseLocalPos
@@ -653,7 +661,7 @@ namespace Crow
 				SelStartCursorPos = GetXFromTextPointer (gr, SelBegin);
 			if (SelRelease >= 0)
 				SelEndCursorPos = GetXFromTextPointer (gr, SelRelease);
-			textCursorPos = GetXFromTextPointer (gr, new Point(currentCol, currentLine));
+			textCursorPos = GetXFromTextPointer (gr, new Point(CurrentColumn, CurrentLine));
 		}
 		/// <summary> Compute x offset in cairo unit from text position </summary>
 		double GetXFromTextPointer(Context gr, Point pos)
@@ -662,7 +670,7 @@ namespace Crow
 				string l = lines [pos.Y].Substring (0, pos.X).
 					Replace ("\t", new String (' ', Interface.TabSize));
 				return gr.TextExtents (l).XAdvance;
-			} catch (Exception ex) {
+			} catch{
 				return -1;
 			}
 		}

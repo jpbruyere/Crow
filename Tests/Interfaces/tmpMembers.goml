@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0"?>
 	<HorizontalStack Width="0" Height="-1" Focusable="true" 
-			MouseEnter="{Background=Red}"
+			MouseEnter="{Background=SkyBlue}"
 			MouseLeave="{Background=Transparent}">
 		<Image Width="8" Height="8" Path="#Crow.Images.Icons.member.svg" SvgSub="{GetIcon}"/>
-		<Label Text="{Name}" Width="0" Height="-1" Margin="2"/>
+		<Label Text="{Name}" Width="0" Height="-1" Margin="1"/>
 		<Label Text="{MemberType}" Width="-1" Height="-1" Margin="0"/>
 	</HorizontalStack>
 

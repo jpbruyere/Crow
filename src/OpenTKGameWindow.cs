@@ -395,9 +395,6 @@ namespace Crow
 			Console.WriteLine("GLSL version: " + GL.GetString (StringName.ShadingLanguageVersion));
 			Console.WriteLine("*************************************\n");
 
-			int matl = GL.GetInteger (GetPName.MaxArrayTextureLayers);
-			int mts = GL.GetInteger (GetPName.MaxTextureSize);
-
 			shader = new Crow.TexturedShader ();
 		}
 

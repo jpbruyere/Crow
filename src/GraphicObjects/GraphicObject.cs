@@ -82,7 +82,6 @@ namespace Crow
 
 		Picture _backgroundImage;
 		string _backgroundImagePath;
-		string _template;
 		#endregion
 
 		#region public fields
@@ -434,19 +433,13 @@ namespace Crow
 			foreach (PropertyInfo pi in this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
 				if (pi.GetSetMethod () == null)
 					continue;
-
-				bool isAttribute = false;
 				string name = "";
-				Type valueType = null;
-
-				MemberInfo mi = pi.GetGetMethod ();
 
 				object[] att = pi.GetCustomAttributes (false);
 
 				foreach (object o in att) {
 					XmlAttributeAttribute xaa = o as XmlAttributeAttribute;
-					if (xaa != null) {
-						isAttribute = true;
+					if (xaa != null) {						
 						if (string.IsNullOrEmpty (xaa.AttributeName))
 							name = pi.Name;
 						else
@@ -745,7 +738,7 @@ namespace Crow
 		{
 			Rectangle rBack = new Rectangle (Slot.Size);
 
-			gr.Color = Background;
+			gr.SetSourceColor(Background);
 			CairoHelpers.CairoRectangle(gr,rBack,_cornerRadius);
 			gr.Fill ();
 
@@ -1322,17 +1315,12 @@ namespace Crow
 						continue;
 					}
 
-					object o = null;
-
 					if (pi.PropertyType.IsEnum) {
 						pi.SetValue (this, Enum.Parse (pi.PropertyType, attValue), null);
 					} else {
 						MethodInfo me = pi.PropertyType.GetMethod ("Parse", new Type[] { typeof(string) });
 						pi.SetValue (this, me.Invoke (null, new string[] { attValue }), null);
 					}
-
-					 
-
 				}
 			}
 			reader.MoveToElement();

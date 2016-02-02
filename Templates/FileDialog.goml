@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
-<Window Title="OpenFile" Height="300" Width="500">
+<Window Caption="OpenFile" Height="300" Width="500">
 	<VerticalStack Margin="5">
-		<TextBoxWidget Margin="1" Width="0" Height="-1" Text="{CurrentPath}"/>
+		<TextBox Margin="1" Width="0" Height="-1" Text="{CurrentPath}"/>
 		<HorizontalStack >
 			<ListBox Data="{Directories}" Width="-1" Height="0"
 				Background="0,5;0,5;0,5;0,5"
@@ -17,8 +17,8 @@
 			</ListBox>
 		</HorizontalStack>
 		<HorizontalStack Fit="true" HorizontalAlignment="Right">
-			<Button Text="Ok" MouseClick="onFileSelect"/>
-			<Button Text="Cancel"/>
+			<Button Caption="Ok" MouseClick="onFileSelect"/>
+			<Button Caption="Cancel"/>
 		</HorizontalStack>
 	</VerticalStack>
 </Window>

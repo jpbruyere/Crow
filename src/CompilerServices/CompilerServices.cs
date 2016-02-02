@@ -150,8 +150,6 @@ namespace Crow
 
 	public static class CompilerServices
 	{
-		static int dynHandleCpt = 0;
-
 		#region conversions
 
 		internal static MethodInfo GetConvertMethod( Type targetType )

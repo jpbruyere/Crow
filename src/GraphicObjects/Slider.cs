@@ -120,7 +120,7 @@ namespace Crow
 
 		protected virtual void DrawGraduations(Context gr, PointD pStart, PointD pEnd)
 		{
-			gr.Color = Foreground;
+			gr.SetSourceColor(Foreground);
 
 			gr.LineWidth = 1;
 			gr.MoveTo(pStart);
@@ -131,7 +131,7 @@ namespace Crow
 		}
 		protected virtual void DrawCursor(Context gr, Rectangle _cursor)
 		{
-			gr.Color = CursorColor;
+			gr.SetSourceColor(CursorColor);
 			CairoHelpers.CairoRectangle (gr, _cursor, CornerRadius);
 			gr.FillPreserve();
 		}

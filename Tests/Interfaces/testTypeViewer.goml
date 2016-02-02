@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0"?>
 
 	<VerticalStack Height="-1" Width="250" Name="hstack" Margin="0" Spacing="0">
-		<Border Height="-1" Width="0" BorderWidth="2" CornerRadius="10">
-			<Label Name="labName" Text="{Name}" Width="0" Height="-1" Margin="1"/>
+		<Border Height="-1" Width="0" BorderWidth="2" CornerRadius="10" Background="SteelBlue">
+			<Label Name="labName" Text="{Name}" Width="0" Height="-1" Margin="3"/>
 		</Border>
 		<ListBox Data="{Members}" Width="0" Height="400" ItemTemplate="Interfaces/tmpMembers.goml" Focusable="true">
 			

@@ -1,18 +1,36 @@
 ﻿<Properties GitUserInfo="UsingGIT" StartupItem="Tests/Tests.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|Linux_x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="src/GraphicObjects/GraphicObject.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="src/GraphicObjects/Label.cs">
     <Files>
-      <File FileName="src/GraphicObjects/GraphicObject.cs" Line="572" Column="23" />
-      <File FileName="src/GraphicObjects/Label.cs" Line="15" Column="5" />
-      <File FileName="src/OpenTKGameWindow.cs" Line="114" Column="1" />
-      <File FileName="Tests/GOLIBTests.cs" Line="156" Column="32" />
-      <File FileName="src/GraphicObjects/TextBox.cs" Line="15" Column="31" />
+      <File FileName="Tests/GOLIBTest_TypeViewer.cs" Line="1" Column="1" />
+      <File FileName="Tests/Interfaces/testTypeViewer.goml" Line="4" Column="84" />
+      <File FileName="Tests/Interfaces/tmpMembers.goml" Line="3" Column="35" />
+      <File FileName="Tests/Interfaces/testWindow.goml" Line="1" Column="1" />
+      <File FileName="src/GraphicObjects/Label.cs" Line="107" Column="38" />
+      <File FileName="src/OpenTKGameWindow.cs" Line="154" Column="3" />
+      <File FileName="src/GraphicObjects/ScrollBar.cs" Line="1" Column="1" />
+      <File FileName="src/GraphicObjects/TemplatedControl.cs" Line="56" Column="53" />
+      <File FileName="src/GraphicObjects/GraphicObject.cs" Line="153" Column="51" />
+      <File FileName="src/Colors.cs" Line="13" Column="16" />
+      <File FileName="src/GraphicObjects/Container.cs" Line="10" Column="37" />
+      <File FileName="src/GraphicObjects/ProgressBar.cs" Line="97" Column="33" />
+      <File FileName="src/GraphicObjects/Scroller.cs" Line="100" Column="21" />
+      <File FileName="src/GraphicObjects/MessageBox.cs" Line="35" Column="30" />
+      <File FileName="src/Rectangles.cs" Line="143" Column="25" />
+      <File FileName="src/GraphicObjects/Group.cs" Line="210" Column="1" />
+      <File FileName="src/Cairo/CairoHelpers.cs" Line="110" Column="34" />
+      <File FileName="src/GraphicObjects/GraduatedSlider.cs" Line="41" Column="11" />
+      <File FileName="src/GraphicObjects/Slider.cs" Line="134" Column="34" />
+      <File FileName="src/GraphicObjects/Border.cs" Line="61" Column="8" />
+      <File FileName="src/Interface.cs" Line="128" Column="1" />
+      <File FileName="src/XCursor.cs" Line="56" Column="12" />
+      <File FileName="src/GraphicObjects/TextRun.cs" Line="316" Column="37" />
+      <File FileName="src/GraphicObjects/GenericStack.cs" Line="15" Column="18" />
+      <File FileName="src/CompilerServices/CompilerServices.cs" Line="153" Column="1" />
+      <File FileName="src/GraphicObjects/Spinner.cs" Line="29" Column="1" />
+      <File FileName="src/SvgPicture.cs" Line="30" Column="1" />
+      <File FileName="src/GraphicObjects/FileDialog.cs" Line="45" Column="12" />
     </Files>
-    <Pads>
-      <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State />
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
