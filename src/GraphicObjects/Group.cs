@@ -188,8 +188,6 @@ namespace Crow
 		protected override void onDraw (Context gr)
 		{
 			Rectangle rBack = new Rectangle (Slot.Size);
-			if (BackgroundImage != null)				
-				BackgroundImage.Paint (gr, rBack, BackImgSub);
 			gr.SetSourceColor(Background);
 			CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);
 			gr.Fill ();

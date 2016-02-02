@@ -360,32 +360,6 @@ namespace Crow
 		{ get { return bmp == null ? 
 				false : 
 				true; } }
-		[XmlAttributeAttribute()][DefaultValue(null)]
-		public virtual string BackgroundImagePath {
-			get { return _backgroundImagePath; }
-			set { 
-				_backgroundImagePath = value;
-				if (string.IsNullOrEmpty(_backgroundImagePath))					
-					return;
-
-				if (_backgroundImagePath.EndsWith (".svg", true, System.Globalization.CultureInfo.InvariantCulture)) 
-					_backgroundImage = new SvgPicture ();
-				else 
-					_backgroundImage = new BmpPicture ();
-
-				_backgroundImage.LoadImage (_backgroundImagePath);
-				//_backgroundImage.Scale = false;
-				registerForGraphicUpdate ();
-			}
-		}
-		[XmlAttributeAttribute()]
-		public virtual Picture BackgroundImage {
-			get { return _backgroundImage; }
-			set { 
-				_backgroundImage = value; 
-				registerForGraphicUpdate ();
-			}
-		}
 		[XmlAttributeAttribute()][DefaultValue("0;0")]
 		public virtual Size MaximumSize {
 			get { return _maximumSize; }
@@ -419,11 +393,6 @@ namespace Crow
 		}
 		#endregion
 
-		/// <summary>
-		/// allow selection of svg subobject to draw in goml, should be improved
-		/// ex: allow access to backgroundImage.subimg from goml
-		/// </summary>
-		public string BackImgSub = null;
 
 		/// <summary>
 		/// Loads the default values from XML attributes default
@@ -741,11 +710,6 @@ namespace Crow
 			gr.SetSourceColor(Background);
 			CairoHelpers.CairoRectangle(gr,rBack,_cornerRadius);
 			gr.Fill ();
-
-			if (BackgroundImage == null)
-				return;
-
-			BackgroundImage.Paint (gr, rBack, BackImgSub);
 		}
 
 		/// <summary>
