@@ -32,7 +32,7 @@ namespace Crow
 		#region private fields
         Rectangle cursor;
 		int _cursorSize;
-		Color _cursorColor;
+		Fill _cursorColor;
 		Orientation _orientation;
 		bool holdCursor = false;
 		#endregion
@@ -40,33 +40,47 @@ namespace Crow
 		protected double unity;
 
 		#region Public properties
-		[XmlAttributeAttribute()][DefaultValue("BlueGray")]
-		public virtual Color CursorColor {
+		[XmlAttributeAttribute()][DefaultValue("vgradient|0:White|0,1:SteelBlue|0,9:SteelBlue|1:DimGray")]
+		public virtual Fill CursorColor {
 			get { return _cursorColor; }
 			set {
+				if (_cursorColor == value)
+					return;
 				_cursorColor = value;
 				registerForGraphicUpdate ();
+				NotifyValueChanged ("CursorColor", _cursorColor);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(20)]
 		public virtual int CursorSize {
 			get { return _cursorSize; }
 			set {
+				if (_cursorSize == value)
+					return;
 				_cursorSize = value;
+				RegisterForLayouting ((int)LayoutingType.Sizing);
 				registerForGraphicUpdate ();
+				NotifyValueChanged ("CursorSize", _cursorSize);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(Orientation.Horizontal)]
 		public virtual Orientation Orientation
 		{
 			get { return _orientation; }
-			set { _orientation = value; }
+			set { 
+				if (_orientation == value)
+					return;
+				_orientation = value; 
+
+				RegisterForLayouting ((int)LayoutingType.All);
+				NotifyValueChanged ("Orientation", _orientation);
+			}
 		}
 		#endregion
 		[XmlAttributeAttribute()][DefaultValue(10.0)]
 		public override double Maximum {
 			get { return base.Maximum; }
-			set {
+			set {				
 				if (value == base.Maximum)
 					return;
 				base.Maximum = value;
@@ -75,11 +89,17 @@ namespace Crow
 
 			}
 		}
+
 		#region GraphicObject Overrides
-		[XmlAttributeAttribute()][DefaultValue("Gray")]
-		public override Color Background {
+		[XmlAttributeAttribute()][DefaultValue("vgradient|0:Black|0,1:Gray|0,9:Gray|1:LightGray")]
+		public override Fill Background {
 			get { return base.Background; }
 			set { base.Background = value; }
+		}
+		[XmlAttributeAttribute()][DefaultValue("Gray")]
+		public override Fill Foreground {
+			get { return base.Foreground; }
+			set { base.Foreground = value; }
 		}
 		[XmlAttributeAttribute()][DefaultValue(true)]
 		public override bool Focusable
@@ -120,7 +140,7 @@ namespace Crow
 
 		protected virtual void DrawGraduations(Context gr, PointD pStart, PointD pEnd)
 		{
-			gr.SetSourceColor(Foreground);
+			Foreground.SetAsSource (gr);
 
 			gr.LineWidth = 1;
 			gr.MoveTo(pStart);
@@ -131,9 +151,9 @@ namespace Crow
 		}
 		protected virtual void DrawCursor(Context gr, Rectangle _cursor)
 		{
-			gr.SetSourceColor(CursorColor);
+			CursorColor.SetAsSource (gr, _cursor);
 			CairoHelpers.CairoRectangle (gr, _cursor, CornerRadius);
-			gr.FillPreserve();
+			gr.Fill();
 		}
 
         void computeCursorPosition()

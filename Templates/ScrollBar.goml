@@ -5,7 +5,8 @@
 			Template="#Crow.Templates.ArrowButTemplate.crow">
 			<Image Margin="1" Path="#Crow.Images.Icons.updown.svg" SvgSub="up"/>
 		</Button>
-		<Slider Name="Slider" Value="{../../../Scroll}" Maximum="{../../../MaximumScroll}" 
+		<Slider Name="Slider" Value="{../../../Scroll}" Maximum="{../../../MaximumScroll}"
+			Background="hgradient|0:Black|0,1:Gray|0,9:Gray|1:LightGray"
 			Width="{../../../TemplatedWidth}" Height="{../../../TemplatedHeight}" Orientation="{../../../Orientation}"
 			ValueChanged="../../../onSliderValueChange"/>
 		<Button MouseRepeat="true" Width="12" Height="8" MouseClick="../../../onScrollForth"

@@ -1,0 +1,8 @@
+﻿<?xml version="1.0"?>
+<Border BorderWidth="2" Width="200" Height="200" Foreground="Gray" Margin="10"
+	Background="Green"
+	MouseEnter="{Background=White;Foreground=White}"
+	MouseLeave="{Background=Green;Foreground=Gray}"	
+	>
+	<GraphicObject  Width="100" Height="100" Background="Red" Margin="10"/>
+</Border>

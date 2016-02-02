@@ -1,15 +1,16 @@
 ﻿<Properties GitUserInfo="UsingGIT" StartupItem="Tests/Tests.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|Linux_x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="src/Colors.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Tests/Interfaces/testWindow.goml">
     <Files>
-      <File FileName="src/Colors.cs" Line="13" Column="32" />
+      <File FileName="Tests/Interfaces/testWindow.goml" Line="5" Column="35" />
+      <File FileName="src/GraphicObjects/Slider.cs" Line="1" Column="1" />
+      <File FileName="src/GraphicObjects/GraphicObject.cs" Line="1" Column="1" />
+      <File FileName="Tests/GOLIBTests.cs" Line="1" Column="1" />
+      <File FileName="src/Fill/Fill.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/mnt/data2/devel/GOLib/src/GraphicObjects/HorizontalStack.cs" line="26" column="1" />
-      <Breakpoint file="/mnt/data2/devel/GOLib/MonoDevelop.GOLib/src/GOLibNodeExtension.cs" line="99" column="1" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches>
     <Watch file="../../src/monodevelop/main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Gui/Workbench.cs" line="1399" offsetX="14" offsetY="23383" expression="ex" liveUpdate="False" />
@@ -19,7 +20,6 @@
     <Watch file="src/XCursor.cs" line="51" offsetX="812" offsetY="409" expression="pos" liveUpdate="False" />
     <Watch file="src/OpenTKGameWindow.cs" line="234" offsetX="746" offsetY="1618" expression="lqi" liveUpdate="False" />
     <Watch file="src/GraphicObjects/GenericStack.cs" line="171" offsetX="447" offsetY="1717" expression="layoutType" liveUpdate="False" />
-    <Watch file="src/GraphicObjects/GraphicObject.cs" line="925" offsetX="695" offsetY="6851" expression="d.Method.Name" liveUpdate="False" />
     <Watch file="src/GraphicObjects/Combobox.cs" line="97" offsetX="750" offsetY="1303" expression="value" liveUpdate="False" />
     <Watch file="src/Interface.cs" line="217" offsetX="623" offsetY="3315" expression="es" liveUpdate="False" />
     <Watch file="src/Interface.cs" line="217" offsetX="623" offsetY="3339" expression="es.MemberName" liveUpdate="False" />

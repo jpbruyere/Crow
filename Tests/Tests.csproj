@@ -45,7 +45,6 @@
     <Reference Include="Mono.Cairo" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GOLIBTest_5.cs" />
     <Compile Include="GOLIBTest_4.cs" />
     <Compile Include="GOLIBTest_Listbox.cs" />
     <Compile Include="GOLIBTest_0.cs" />
@@ -203,6 +202,13 @@
     <None Include="Interfaces\testTextBox.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="GOLIBTest_5.cs" />
+    <None Include="Interfaces\0.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\test2WayBinding.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />
@@ -212,6 +218,7 @@
     <EmbeddedResource Include="image\tetra.png" />
     <EmbeddedResource Include="image\folder0.svg" />
     <EmbeddedResource Include="image\folder1.svg" />
+    <EmbeddedResource Include="image\crow0.svg" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">

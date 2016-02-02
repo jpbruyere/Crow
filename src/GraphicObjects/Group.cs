@@ -188,8 +188,9 @@ namespace Crow
 		protected override void onDraw (Context gr)
 		{
 			Rectangle rBack = new Rectangle (Slot.Size);
-			gr.SetSourceColor(Background);
-			CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);
+
+			Background.SetAsSource (gr, rBack);
+			CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
 			gr.Fill ();
 
 			foreach (GraphicObject g in Children) {
@@ -225,9 +226,10 @@ namespace Crow
 						clip.clearAndClip (gr);
 
 						Rectangle rBack = Slot.Size;
-						gr.SetSourceColor(Background);
-						CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);
+						Background.SetAsSource (gr, rBack);
+						CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
 						gr.Fill ();
+
 						#if DEBUG_CLIP_RECTANGLE
 						clip.stroke (gr, Color.Amaranth.AdjustAlpha (0.8));
 						#endif

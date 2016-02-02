@@ -45,12 +45,12 @@ namespace Crow
 			set { base.Focusable = value; }
 		}
 		[XmlAttributeAttribute()][DefaultValue("White")]
-		public override Color Background {
+		public override Fill Background {
 			get { return base.Background; }
 			set { base.Background = value; }
 		}
 		[XmlAttributeAttribute()][DefaultValue("Black")]
-		public override Color Foreground {
+		public override Fill Foreground {
 			get { return base.Foreground; }
 			set { base.Foreground = value; }
 		}

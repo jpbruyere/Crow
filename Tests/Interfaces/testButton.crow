@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack Fit="true">
+<VerticalStack Fit="true" Background="vgradient|0:DimGray|1:Black">
 	<HorizontalStack Fit="True">
 		<Button Caption="but" MouseClick="onButClick"/>
 		<Button MouseClick="onButClick"/>

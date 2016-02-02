@@ -130,7 +130,9 @@
     <Compile Include="src\GraphicObjects\GroupBox.cs" />
     <Compile Include="src\GraphicObjects\ScrollBar.cs" />
     <Compile Include="src\BubblingMouseButtonEventArgs.cs" />
-    <Compile Include="src\Cairo\IFill.cs" />
+    <Compile Include="src\SolidColor.cs" />
+    <Compile Include="src\Gradient.cs" />
+    <Compile Include="src\Fill\Fill.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -164,6 +166,7 @@
     <Folder Include="Images\Icons\" />
     <Folder Include="src\CompilerServices\" />
     <Folder Include="src\OpenGL\" />
+    <Folder Include="src\Fill\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\Icons\updown.svg" />

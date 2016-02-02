@@ -34,7 +34,7 @@ namespace Crow
 			gr.Translate (-m.X, -m.Y);
 
 			gr.LineWidth = 2;
-			gr.Color = Foreground;
+			Foreground.SetAsSource (gr);
 			gr.MoveTo (m.X,0.0);
 			gr.LineTo (m.X, -m.Y*0.5);
 			gr.Stroke ();

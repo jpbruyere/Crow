@@ -2,7 +2,8 @@
 <Border BorderWidth="1" Foreground="White" CornerRadius="20" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}">
 	<VerticalStack Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}">
 		<Border Name="TitleBar" BorderWidth="1" Foreground="White" Width="{../../../TemplatedWidth}" Height="-1" 
-				Background="0,1;0,5;1,0;0,5">
+				Background="vgradient|0:0,1;0,5;1,0;0,5|1:0,0;0,1;0,3;0,9">
+<!--				Background="0,1;0,5;1,0;0,5"-->
 			<HorizontalStack Name="hs" Margin="1" Spacing="1" Width="{../../../../TemplatedWidth}" Height="-1" >
 				<GraphicObject Width="5"/>
 				<Image Margin="1" Width="12" Height="12" Path="{../../../../../Icon}"/>

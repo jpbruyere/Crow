@@ -25,7 +25,7 @@ namespace Crow
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("White")]
-		public override Color Foreground {
+		public override Fill Foreground {
 			get { return base.Foreground;}
 			set {base.Foreground = value;}
 		}
@@ -52,13 +52,13 @@ namespace Crow
 			if (BorderWidth > 0) 
 				rBack.Inflate (-BorderWidth / 2);			
 
-			gr.SetSourceColor(Background);
-			CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);
+			Background.SetAsSource (gr, rBack);
+			CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
 			gr.Fill ();
 
 			if (BorderWidth > 0) {
 				gr.LineWidth = BorderWidth;
-				gr.SetSourceColor(Foreground);
+				Foreground.SetAsSource (gr, rBack);
 				CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
 				gr.Stroke ();
 			}

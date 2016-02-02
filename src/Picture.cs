@@ -24,7 +24,7 @@ using Cairo;
 
 namespace Crow
 {
-	public abstract class Picture
+	public abstract class Picture : Fill
 	{
 		public string Path;
 		public Size Dimensions;

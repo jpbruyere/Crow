@@ -4,11 +4,11 @@
 	<Label Text="{../../Caption}" Height="80" Width="200"/>
 </HorizontalStack>-->
 <Border Name="Content"
-	Background="Gray" Foreground="DarkGray" 
+	Background="vgradient|0:White|0,2:Gray|0,9:Gray|1:Black" Foreground="DarkGray" 
 	Height="{../TemplatedHeight}" Width="{../TemplatedWidth}"
 	MouseEnter="{Foreground=White}"
 	MouseLeave="{Foreground=DarkGray}"
-	MouseDown="{Background=LightGray}"
-	MouseUp="{Background=Gray}"
+	MouseDown="{Background=vgradient|0:Black|0,1:Gray|0,9:Gray|1:White}"
+	MouseUp="{Background=vgradient|0:White|0,2:Gray|0,9:Gray|1:Black}"
 	>
 </Border>
