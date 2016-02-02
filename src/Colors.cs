@@ -1027,6 +1027,25 @@ namespace Crow
 		public static readonly Color Zaffre = new Color(0,0.0784313725490196,0.658823529411765,1.0,"Zaffre");
 		public static readonly Color ZinnwalditeBrown = new Color(0.172549019607843,0.0862745098039216,0.0313725490196078,1.0,"ZinnwalditeBrown");
 		#endregion
+		        
+		#region IXmlSerializable
+		public void ReadXml(System.Xml.XmlReader reader)
+        {
+            string[] c = reader["Color"].Split(new char[] { ';' });            
+            R = double.Parse(c[0]);
+            G = double.Parse(c[1]);
+            B = double.Parse(c[2]);
+			A = double.Parse(c[3]);
+        }
+        public void WriteXml(System.Xml.XmlWriter writer)
+        {
+            writer.WriteAttributeString("Color", this.ToString());
+        }
+        public System.Xml.Schema.XmlSchema GetSchema()
+        {
+            return null;
+        }
+		#endregion
 
 		public override string ToString()
 		{
