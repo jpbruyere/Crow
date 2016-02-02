@@ -379,8 +379,8 @@ namespace Crow
 				case Alignment.RightStretch://ok
 					heightRatio = widthRatio = (float)cb.Height / rText.Height;
 					rText.Height = cb.Height;
-					rText.Width = (int)(widthRatio * cb.Width);
-					rText.X = cb.X;
+					rText.Width = (int)(widthRatio * rText.Width);
+					rText.X = cb.Right - rText.Width;
 					rText.Y = cb.Y;
 					break;
 				case Alignment.BottomCenter://ok
@@ -429,7 +429,9 @@ namespace Crow
 					break;
 				}
 			}
-			OpenTKGameWindow.currentWindow.CursorVisible = true;
+
+			gr.FontMatrix = new Matrix(widthRatio * Font.Size, 0, 0, heightRatio * Font.Size, 0, 0);
+			fe = gr.FontExtents;
 
 			#region draw text cursor
 			if (mouseLocalPos >= 0)
@@ -487,8 +489,7 @@ namespace Crow
 				gr.LineTo(new PointD(textCursorPos + rText.X, rText.Y + (CurrentLine + 1) * fe.Height));
 				gr.Stroke();
 			}
-			gr.FontMatrix = new Matrix(widthRatio * Font.Size, 0, 0, heightRatio * Font.Size, 0, 0);
-			OpenTKGameWindow.currentWindow.CursorVisible = true;
+
 			for (int i = 0; i < lines.Count; i++) {				
 				string l = lines [i].Replace ("\t", new String (' ', Interface.TabSize));
 				int lineLength = (int)gr.TextExtents (l).XAdvance;

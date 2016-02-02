@@ -1,5 +1,25 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack Background="Red" Width="-1" Height="-1">	
+<VerticalStack Background="SteelBlue" Fit="true">
+	<HorizontalStack Fit="true">
+		<TextBox Background="DarkGray" Height="30" Width="50" TextAlignment="TopLeft"/>
+		<TextBox Background="DarkGray" Height="30" Width="50" TextAlignment="TopCenter"/>
+		<TextBox Background="DarkGray" Height="30" Width="50" TextAlignment="TopRight"/>
+		<TextBox Background="DarkGray" Height="30" Width="50" TextAlignment="LeftCenter"/>
+		<TextBox Background="DarkGray" Height="30" Width="50" TextAlignment="Center"/>
+		<TextBox Background="DarkGray" Height="30" Width="50" TextAlignment="RightCenter"/>
+		<TextBox Background="DarkGray" Height="30" Width="50" TextAlignment="BottomLeft"/>
+		<TextBox Background="DarkGray" Height="30" Width="50" TextAlignment="BottomCenter"/>
+		<TextBox Background="DarkGray" Height="30" Width="50" TextAlignment="BottomRight"/>
+	</HorizontalStack>
+	<HorizontalStack Fit="true">
+		<TextBox Background="DarkGray" Height="30" Width="70" TextAlignment="TopStretch" Text="TopStretch"/>
+		<TextBox Background="DarkGray" Height="30" Width="60" TextAlignment="HorizontalStretch" Text="HorizontalStretch" />
+		<TextBox Background="DarkGray" Height="30" Width="60" TextAlignment="BottomStretch" Text="BottomStretch"/>
+		<TextBox Background="DarkGray" Height="10" Width="70" TextAlignment="LeftStretch" Text="LeftStretch"/>
+		<TextBox Background="DarkGray" Height="10" Width="70" TextAlignment="VerticalStretch" Text="VerticalStretch"/>
+		<TextBox Background="DarkGray" Height="10" Width="70" TextAlignment="RightStretch" Text="RightStretch"/>
+		<TextBox Background="DarkGray" Height="30" Width="50" TextAlignment="Fit" Text="Fit"/>
+	</HorizontalStack>	
 	<TextBox Name="tb" Multiline="true" Font="droid,16" Margin="5" Text="A\nBB\nCCC\nDDDD"/>
 	<TextBox Multiline="true" Font="droid,16" Name="tb5" Margin="5" Text="{../tb.SelectedText}"/>
 <!--	<TextBox Font="droid,10" Name="tb1" Margin="5" Text="this is a test of a text box"/>
