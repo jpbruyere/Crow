@@ -106,7 +106,7 @@ namespace Crow
 
 				this.registerForGraphicUpdate ();
 				this.RegisterForLayouting ((int)LayoutingType.Sizing);
-				NotifyValueChanged ("Text", Text);
+				NotifyValueChanged ("Text", _text);
             }
         }
 		[XmlAttributeAttribute()][DefaultValue(false)]
@@ -122,7 +122,8 @@ namespace Crow
 				registerForGraphicUpdate();
 			}
 		}
-		[XmlIgnore]public int CurrentColumn{
+		[XmlAttributeAttribute()][DefaultValue(0)]
+		public int CurrentColumn{
 			get { return _currentCol; }
 			set { 
 				if (value == _currentCol)
@@ -136,7 +137,8 @@ namespace Crow
 				NotifyValueChanged ("CurrentColumn", _currentCol);
 			}
 		}
-		[XmlIgnore]public int CurrentLine{
+		[XmlAttributeAttribute()][DefaultValue(0)]
+		public int CurrentLine{
 			get { return _currentLine; }
 			set { 
 				if (value == _currentLine)
@@ -150,7 +152,9 @@ namespace Crow
 				NotifyValueChanged ("CurrentLine", _currentLine);
 			}
 		}
-		[XmlIgnore]public Point SelBegin {
+		//TODO:using HasFocus for drawing selection cause SelBegin and Release binding not to work
+		[XmlAttributeAttribute()][DefaultValue("-1")]
+		public Point SelBegin {
 			get {
 				return _selBegin;
 			}
@@ -158,10 +162,12 @@ namespace Crow
 				if (value == _selBegin)
 					return;
 				_selBegin = value;
+				NotifyValueChanged ("SelBegin", _selBegin);
 				NotifyValueChanged ("SelectedText", SelectedText);
 			}
 		}			
-		[XmlIgnore]public Point SelRelease {
+		[XmlAttributeAttribute()][DefaultValue("-1")]
+		public Point SelRelease {
 			get {
 				return _selRelease;
 			}
@@ -169,6 +175,7 @@ namespace Crow
 				if (value == _selRelease)
 					return;
 				_selRelease = value;
+				NotifyValueChanged ("SelRelease", _selRelease);
 				NotifyValueChanged ("SelectedText", SelectedText);
 			}
 		}
@@ -228,6 +235,7 @@ namespace Crow
 					CurrentColumn = lines [CurrentLine].Count ();
 					lines [CurrentLine] += lines [CurrentLine + 1];
 					lines.RemoveAt (CurrentLine + 1);
+					NotifyValueChanged ("Text", Text);
 					return;
 				}
 				CurrentColumn--;
@@ -251,6 +259,7 @@ namespace Crow
 				SelBegin = -1;
 				SelRelease = -1;
 			}
+			NotifyValueChanged ("Text", Text);
 		}
 		/// <summary>
 		/// Insert new string at caret position, should be sure no line break is inside.
@@ -260,6 +269,7 @@ namespace Crow
 		{
 			lines [CurrentLine] = lines [CurrentLine].Insert (CurrentColumn, str);
 			CurrentColumn += str.Length;
+			NotifyValueChanged ("Text", Text);
 		}
 
 		#region GraphicObject overrides
@@ -483,7 +493,7 @@ namespace Crow
 
 			if (HasFocus )
 			{
-				gr.SetSourceColor(Foreground);
+				Foreground.SetAsSource (gr);
 				gr.LineWidth = 1.5;
 				gr.MoveTo(new PointD(textCursorPos + rText.X, rText.Y + CurrentLine * fe.Height));
 				gr.LineTo(new PointD(textCursorPos + rText.X, rText.Y + (CurrentLine + 1) * fe.Height));
@@ -535,7 +545,7 @@ namespace Crow
 				if (string.IsNullOrWhiteSpace (l))
 					continue;
 
-				gr.SetSourceColor(Foreground);	
+				Foreground.SetAsSource (gr);	
 				gr.MoveTo (lineRect.X, rText.Y + fe.Ascent + fe.Height * i);
 
 				#if _WIN32 || _WIN64

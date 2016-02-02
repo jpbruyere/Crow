@@ -233,10 +233,7 @@ namespace Crow
             }
         }
 
-        public static Rectangle Zero
-        {
-            get { return new Rectangle(0, 0, 0, 0); }
-        }
+		public static readonly Rectangle Zero = new Rectangle(0, 0, 0, 0);
         public static Rectangle Empty
         {
             get { return Zero; }

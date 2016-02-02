@@ -25,7 +25,7 @@ namespace Crow
 		protected override void DrawGraduations(Context gr, PointD pStart, PointD pEnd)
 		{
 			Rectangle r = ClientRectangle;
-			gr.SetSourceColor(Foreground);
+			Foreground.SetAsSource (gr);
 
 			gr.LineWidth = 2;
 			gr.MoveTo(pStart);

@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace Crow
 {
-	public struct Color : ICairoFill
+	public struct Color
     {
 		#region CTOR
 		public Color(double _R, double _G, double _B, double _A)
@@ -63,7 +63,6 @@ namespace Crow
 						return cr;
 				}
 			}
-
 			return new Color(
 				double.Parse(c[0]),
 				double.Parse(c[1]),
@@ -92,6 +91,10 @@ namespace Crow
         {
             return new Cairo.Color(c.R, c.G, c.B, c.A);
         }
+		public static implicit operator Fill(Color c){
+			return new SolidColor (c) as Fill;
+		}
+
 
 		public static bool operator ==(Color left, Color right)
 		{
@@ -147,16 +150,7 @@ namespace Crow
 		{
 			return new Color (this.R, this.G, this.B, _A);
 		}
-
-		#region IFill implementation
-
-		public void SetAsSource (Cairo.Context ctx)
-		{
-			ctx.SetSourceRGBA (R, G, B, A);
-		}
-
-		#endregion
-
+			
 		#region Predefined colors
         public static readonly Color Transparent = new Color(0, 0, 0, 0, "Transparent");
 		public static readonly Color Clear = new Color(-1, -1, -1, -1, "Clear");

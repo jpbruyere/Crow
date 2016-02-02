@@ -3,12 +3,17 @@
 	<Image Margin="2" Width="14" Height="14" Path="{../../Image}"  SvgSub="{../../SvgSub}"/>
 	<Label Text="{../../Caption}" Height="80" Width="200"/>
 </HorizontalStack>-->
-<Border Fit="True" Background="Gray" MinimumSize="50;20" Foreground="Gray" CornerRadius="3" 
-	MouseEnter="{Foreground=White;caption.Foreground=White}"
-	MouseLeave="{Foreground=Gray;caption.Foreground=Black}"
-	MouseDown="{Background=LightGray}"
-	MouseUp="{Background=Gray}"
+<Border Fit="True" Background="Gray" MinimumSize="50;20" 
+		Foreground="Transparent" CornerRadius="3" BorderWidth="1" 
+	MouseEnter="{Foreground=vgradient|0:White|0,2:Gray|0,9:Gray|1:Black;caption.Foreground=White}"
+	MouseLeave="{Foreground=Transparent;caption.Foreground=Black}"
+	MouseDown="{Foreground=vgradient|0:Black|0,05:Gray|0,85:Gray|1:White}"
+	MouseUp="{Foreground=vgradient|0:White|0,2:Gray|0,9:Gray|1:Black}"		    
 	>
+<!--
+	MouseDown="{Background=vgradient|0:Black|0,1:Gray|0,9:Gray|1:White}"
+	MouseUp="{Background=vgradient|0:White|0,1:Gray|0,9:Gray|1:Black}"
+-->
 <!--	<Image Height="0" Width="0" Margin="0" Path="{../../Image}" SvgSub="{../../SvgSub}"/>-->
 	<Label Name="caption" Margin="5" Foreground="Black" Text="{../../Caption}"/>
 </Border>

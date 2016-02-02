@@ -44,7 +44,7 @@ namespace test
 				l.Text = cpt.ToString ();
 			}
 			foreach (GraphicObject o in gl) {
-				Color a = o.Background;
+				Color a = (Color)o.Background;
 				if (a.A > 1)
 					a.A = 0;
 				else

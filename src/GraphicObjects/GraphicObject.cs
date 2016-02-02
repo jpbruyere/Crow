@@ -66,8 +66,8 @@ namespace Crow
 		#region private fields
 		ILayoutable _parent;
 		string _name = "unamed";
-		Color _background = Color.Transparent;
-		Color _foreground = Color.White;
+		Fill _background = Color.Transparent;
+		Fill _foreground = Color.White;
 		Font _font = "droid, 10";
 		double _cornerRadius = 0;
 		int _margin = 0;
@@ -79,9 +79,6 @@ namespace Crow
 		HorizontalAlignment _horizontalAlignment = HorizontalAlignment.Center;
 		Size _maximumSize = "0;0";
 		Size _minimumSize = "0;0";
-
-		Picture _backgroundImage;
-		string _backgroundImagePath;
 		#endregion
 
 		#region public fields
@@ -278,7 +275,7 @@ namespace Crow
 			}
 		} 
 		[XmlAttributeAttribute()][DefaultValue("Transparent")]
-		public virtual Color Background {
+		public virtual Fill Background {
 			get { return _background; }
 			set {
 				if (_background == value)
@@ -289,7 +286,7 @@ namespace Crow
 			}
 		} 
 		[XmlAttributeAttribute()][DefaultValue("White")]
-		public virtual Color Foreground {
+		public virtual Fill Foreground {
 			get { return _foreground; }
 			set {
 				if (_foreground == value)
@@ -415,7 +412,6 @@ namespace Crow
 							name = xaa.AttributeName;
 						continue;
 					}
-
 					XmlIgnoreAttribute xia = o as XmlIgnoreAttribute;
 					if (xia != null)
 						continue;
@@ -707,7 +703,7 @@ namespace Crow
 		{
 			Rectangle rBack = new Rectangle (Slot.Size);
 
-			Background.SetAsSource (gr);
+			Background.SetAsSource (gr, rBack);
 			CairoHelpers.CairoRectangle(gr,rBack,_cornerRadius);
 			gr.Fill ();
 		}
@@ -747,12 +743,15 @@ namespace Crow
 			Rectangle rb = Parent.ContextCoordinates(Slot);
 
 			using (ImageSurface source = new ImageSurface(bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
-				if (this.Background == Color.Clear) {
-					ctx.Save ();
-					ctx.Operator = Operator.Clear;
-					ctx.Rectangle(rb);
-					ctx.Fill ();
-					ctx.Restore ();
+				//TODO:improve equality test for basic color and Fill
+				if (this.Background is SolidColor) {					
+					if ((this.Background as SolidColor).Equals(Color.Clear)) {
+						ctx.Save ();
+						ctx.Operator = Operator.Clear;
+						ctx.Rectangle (rb);
+						ctx.Fill ();
+						ctx.Restore ();
+					}
 				}
 				ctx.SetSourceSurface (source, rb.X, rb.Y);
 				ctx.Paint ();
@@ -1146,16 +1145,16 @@ namespace Crow
 					il.Emit(OpCodes.Ldstr,strcst);
 
 				}else{
-					//search for a static field in left operand type named 'rop name'
-					FieldInfo ropFi = lopT.GetField (rop, BindingFlags.Static|BindingFlags.Public);
-					if (ropFi != null)
-					{
-						il.Emit (OpCodes.Ldsfld, ropFi);
-					}else{
-						//search if parsing methods are present
-						MethodInfo lopTryParseMi = lopT.GetMethod("TryParse");
-						//TODO
-					}
+					if (lopT.IsEnum)
+						throw new NotImplementedException();
+						
+					MethodInfo lopParseMi = lopT.GetMethod("Parse");
+					if (lopParseMi == null)
+						throw new Exception (string.Format
+							("GOML:no parse method found in: {0}", lopT.Name));	
+					il.Emit(OpCodes.Ldstr, rop);
+					il.Emit(OpCodes.Callvirt, lopParseMi);
+					il.Emit(OpCodes.Unbox_Any, lopT);
 				}
 
 				#endregion

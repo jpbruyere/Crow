@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="5" Width="200" Height="200" CornerRadius="20" Margin="0" Background="Mantis">
-	<GraphicObject CornerRadius="0" Background="CornflowerBlue" Height="100" Width="100"/>
+<Border BorderWidth="2" Width="200" Height="200" CornerRadius="2" Margin="0" 
+		Background="vgradient|0,65:Mantis|1:Transparent">
+	<GraphicObject CornerRadius="20" Background="#Tests.image.crow0.svg" Margin="0" Height="100" Width="120" />
 </Border>

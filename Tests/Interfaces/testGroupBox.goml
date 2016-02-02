@@ -1,4 +1,7 @@
 ﻿<?xml version="1.0"?>
-<GroupBox Width="-1" Height="-1" Background="Red">
-<Label/>
-</GroupBox>
+<Container Background="vgradient|0:DarkGray|1:DimGray">
+	<GroupBox Width="200" Height="150" Background="vgradient|0:SteelBlue|1:Transparent"
+		Foreground="ogradient|0:White|1:Black">
+	<!--	<Label/>-->
+	</GroupBox>
+</Container>

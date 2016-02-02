@@ -96,7 +96,7 @@ namespace test
 			//LoadInterface("golibtests/test4.xml", out c2);
 			//c2.HorizontalAlignment = HorizontalAlignment.Left;
 			//c2.VerticalAlignment = VerticalAlignment.Top;
-			c.Background.AdjustAlpha (0.5);
+			//((Color)c.Background).AdjustAlpha (0.5);
 //			labMousePos = c.FindByName ("labMouse") as Label;
 //			//pb = c.FindByName("pbBar") as ProgressBar;
 //			pb2 = c.FindByName("pbBar2") as ProgressBar;

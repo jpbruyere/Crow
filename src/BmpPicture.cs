@@ -61,6 +61,42 @@ namespace Crow
 			bitmap.UnlockBits (data);           
 		}
 
+		#region implemented abstract members of Fill
+
+		public override void SetAsSource (Context ctx, Rectangle bounds = default(Rectangle))
+		{
+			float widthRatio = 1f;
+			float heightRatio = 1f;
+
+			if (Scaled){
+				widthRatio = (float)bounds.Width / Dimensions.Width;
+				heightRatio = (float)bounds.Height / Dimensions.Height;
+			}
+
+			if (KeepProportions) {
+				if (widthRatio < heightRatio)
+					heightRatio = widthRatio;
+				else
+					widthRatio = heightRatio;
+			}
+
+			using (ImageSurface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
+				using (Cairo.Context gr = new Context (tmp)) {
+					gr.Translate (bounds.Left, bounds.Top);
+					gr.Scale (widthRatio, heightRatio);
+					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
+
+					using (ImageSurface imgSurf = new ImageSurface (image, Format.Argb32, 
+						Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) {
+						gr.SetSourceSurface (imgSurf, 0,0);
+						gr.Paint ();
+					}
+				}
+				ctx.SetSource (tmp);
+			}				
+		}
+		#endregion
+
 		public override void Paint (Cairo.Context gr, Rectangle rect, string subPart = "")
 		{
 			float widthRatio = 1f;

@@ -68,7 +68,7 @@ namespace Crow
 
 		#region GraphicObject overrides
 		[XmlAttributeAttribute()][DefaultValue("Gray")]
-		public override Color Background {
+		public override Fill Background {
 			get { return base.Background; }
 			set { base.Background = value; }
 		}
@@ -78,7 +78,7 @@ namespace Crow
 			set { base.BorderWidth = value; }
 		}
 		[XmlAttributeAttribute()][DefaultValue("BlueCrayola")]
-		public override Color Foreground {
+		public override Fill Foreground {
 			get { return base.Foreground; }
 			set { base.Foreground = value; }
 		}
@@ -94,7 +94,7 @@ namespace Crow
 
 			rBack.Width = (int)((double)rBack.Width / Maximum * Value);
 
-			gr.SetSourceColor(Foreground);
+			Foreground.SetAsSource (gr, rBack);
 
 			CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);
 			gr.Fill();
