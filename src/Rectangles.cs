@@ -148,18 +148,10 @@ namespace Crow
         public void clearAndClip(Context ctx)
         {
             foreach (Rectangle r in list)
-            {
                 ctx.Rectangle(r);
-            }
-				
+
 			ctx.ClipPreserve();
-
-			//if (Interface.Background == Color.Transparent) {
-				ctx.Operator = Operator.Clear; 
-			//} else {
-			//	ctx.Color = Interface.Background;
-			//}
-
+			ctx.Operator = Operator.Clear; 
             ctx.Fill();
             ctx.Operator = Operator.Over;            
         }
