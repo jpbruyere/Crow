@@ -130,6 +130,7 @@
     <Compile Include="src\GraphicObjects\GroupBox.cs" />
     <Compile Include="src\GraphicObjects\ScrollBar.cs" />
     <Compile Include="src\BubblingMouseButtonEventArgs.cs" />
+    <Compile Include="src\Cairo\IFill.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

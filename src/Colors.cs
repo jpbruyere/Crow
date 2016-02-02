@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace Crow
 {
-	public struct Color
+	public struct Color : ICairoFill
     {
 		#region CTOR
 		public Color(double _R, double _G, double _B, double _A)
@@ -147,6 +147,15 @@ namespace Crow
 		{
 			return new Color (this.R, this.G, this.B, _A);
 		}
+
+		#region IFill implementation
+
+		public void SetAsSource (Cairo.Context ctx)
+		{
+			ctx.SetSourceRGBA (R, G, B, A);
+		}
+
+		#endregion
 
 		#region Predefined colors
         public static readonly Color Transparent = new Color(0, 0, 0, 0, "Transparent");
