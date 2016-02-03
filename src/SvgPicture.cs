@@ -96,10 +96,6 @@ namespace Crow
 			gr.Scale (widthRatio, heightRatio);
 			gr.Translate (((float)rect.Width/widthRatio - Dimensions.Width)/2f, ((float)rect.Height/heightRatio - Dimensions.Height)/2f);
 
-			if (string.IsNullOrEmpty (subPart))
-				hSVG.RenderCairo (gr);
-			else
-				hSVG.RenderCairoSub (gr, "#" + subPart);			
 			gr.Restore ();			
 		}
 	}
