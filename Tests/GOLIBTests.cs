@@ -13,6 +13,7 @@ using System.Diagnostics;
 using Crow;
 using System.Threading;
 using System.Collections.Generic;
+using System.Linq;
 
 
 namespace test
@@ -36,10 +37,13 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"testColorList.crow",
+			"test_Listbox.goml",
+			"testButton.crow",
 			"testBorder.goml",
+			"testButton2.crow",
 			"testGroupBox.goml",
 			"test2WayBinding.crow",
-			"testButton.crow",
 			"0.crow",
 			"testSpinner.goml",
 			"fps.goml",
@@ -65,7 +69,6 @@ namespace test
 			"testMsgBox.goml",
 			"testGrid.goml",
 			"testMeter.goml",
-			"test_Listbox.goml",
 		};
 
 		#region FPS
@@ -124,12 +127,9 @@ namespace test
 				return;
 			intValue = Convert.ToInt32(e.NewValue);
 		}
-		public List<String> TestList = new List<string>( new string[] 
-			{
-				"string 1",
-				"string 2",
-				"string 3"
-			});	
+		public IList<Color> TestList {
+			get { return Color.ColorDic; }
+		}
 
 		protected override void OnLoad (EventArgs e)
 		{
@@ -138,6 +138,7 @@ namespace test
 
 			GraphicObject obj = LoadInterface("Interfaces/" + testFiles[idx]);
 			obj.DataSource = this;
+
 		}
 		protected override void OnUpdateFrame (FrameEventArgs e)
 		{

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0"?>
+<Border BorderWidth="2" Fit="true">
+	<VerticalStack Fit="true" Margin="5">
+		<ListBox Data="{TestList}" Background="0,5;0,5;0,5;0,5"
+					 HorizontalAlignment="Center" Width="-1" Height="350" Margin="5"
+					 ItemTemplate="#Tests.Interfaces.colorItem.crow">
+			<Template>
+				<Border BorderWidth="1" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}">
+					<HorizontalStack Margin="1" Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}" >
+						<Scroller Name="scroller1" Height="{../../../TemplatedHeight}" Width="{../../../TemplatedWidth}" 
+								Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">
+							<VerticalStack Width="{../../../../TemplatedWidth}" Height="-1" MinimumSize="100;100"
+								Name="List" Margin="0" VerticalAlignment="Top" />
+						</Scroller>
+						<ScrollBar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" 
+							MaximumScroll="{../scroller1.MaximumScroll}" Orientation="Vertical" 
+							Width="10" Height="{../../../TemplatedHeight}" />
+					</HorizontalStack>
+				</Border>
+			</Template>
+		</ListBox>
+		<HorizontalStack Fit="true" HorizontalAlignment="Right">
+			<Button Caption="Load list" MouseClick="OnLoadList"/>
+			<Button Caption="Clear" MouseClick="OnClear"/>
+		</HorizontalStack>
+	</VerticalStack>
+</Border>

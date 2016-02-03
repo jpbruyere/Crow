@@ -209,6 +209,12 @@
     <None Include="Interfaces\test2WayBinding.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Interfaces\testButton2.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\testColorList.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />
@@ -219,6 +225,9 @@
     <EmbeddedResource Include="image\folder0.svg" />
     <EmbeddedResource Include="image\folder1.svg" />
     <EmbeddedResource Include="image\crow0.svg" />
+    <EmbeddedResource Include="Interfaces\colorItem.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">

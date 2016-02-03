@@ -40,7 +40,7 @@ namespace Crow
 		protected double unity;
 
 		#region Public properties
-		[XmlAttributeAttribute()][DefaultValue("vgradient|0:White|0,1:SteelBlue|0,9:SteelBlue|1:DimGray")]
+		[XmlAttributeAttribute()][DefaultValue("vgradient|0:White|0,1:LightGray|0,9:LightGray|1:DimGray")]
 		public virtual Fill CursorColor {
 			get { return _cursorColor; }
 			set {
