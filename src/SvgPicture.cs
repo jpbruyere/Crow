@@ -99,7 +99,8 @@ namespace Crow
 			if (string.IsNullOrEmpty (subPart))
 				hSVG.RenderCairo (gr);
 			else
-				hSVG.RenderCairoSub (gr, "#" + subPart);			
+				hSVG.RenderCairoSub (gr, "#" + subPart);
+			
 			gr.Restore ();			
 		}
 	}
