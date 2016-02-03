@@ -290,6 +290,8 @@ namespace Crow
                         break;
 
                     Type t = Type.GetType("Crow." + subTree.Name);
+					if (t == null)
+						throw new Exception ("Crow." + subTree.Name + " type not found");
                     GraphicObject go = (GraphicObject)Activator.CreateInstance(t);
                     (go as IXmlSerializable).ReadXml(subTree);                    
                     addChild(go);
