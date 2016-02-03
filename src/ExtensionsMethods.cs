@@ -19,6 +19,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Linq.Expressions;
 
 namespace Crow
 {
@@ -37,6 +38,18 @@ namespace Crow
 			{
 				handler(sender, e);
 			}
+		}
+		/// <summary>
+		/// Type Extension method for Casting
+		/// </summary>
+		public static object Cast(this Type Type, object data)
+		{
+			var DataParam = Expression.Parameter(typeof(object), "data");
+			var Body = Expression.Block(Expression.Convert(Expression.Convert(DataParam, data.GetType()), Type));
+
+			var Run = Expression.Lambda(Body, DataParam).Compile();
+			var ret = Run.DynamicInvoke(data);
+			return ret;
 		}
 	}
 }

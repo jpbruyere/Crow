@@ -986,7 +986,12 @@ namespace Crow
 						}else
 							targetValue = targetValue.ToString ();
 					}
-					b.Source.Property.GetSetMethod ().Invoke (this, new object[] { targetValue });
+					if (targetValue != null)
+						b.Source.Property.GetSetMethod ().Invoke 
+						(this, new object[] { b.Source.Property.PropertyType.Cast(targetValue)});
+					else
+						b.Source.Property.GetSetMethod ().Invoke 
+							(this, new object[] { targetValue });
 					#endregion
 
 					//if no dyn update, skip jump table
