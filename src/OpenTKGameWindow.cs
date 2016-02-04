@@ -261,7 +261,7 @@ namespace Crow
 			invGOList = invGOList.Reverse ().ToArray ();
 
 			//Debug.WriteLine ("======= Layouting queue start =======");
-			lock (Interface.LayoutingQueue) {				
+
 				while (Interface.LayoutingQueue.Count > 0) {
 //					Stopwatch lqiProcTime = new Stopwatch ();
 //					lqiProcTime.Start ();
@@ -274,7 +274,7 @@ namespace Crow
 //							updateTime.ElapsedMilliseconds, lqi.ToString());
 //					}
 				}
-			}
+
 
 			//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
 			//final redraw clips should be added only when layout is completed among parents,

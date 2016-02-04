@@ -507,7 +507,7 @@ namespace Crow
 			#if DEBUG_LAYOUTING
 			Debug.WriteLine ("RegisterForLayouting => {1}->{0}", layoutType, this.ToString());
 			#endif
-			lock (Interface.LayoutingQueue) {
+
 				deleteLQI (layoutType);
 				if ((layoutType & (int)LayoutingType.Width) > 0) {
 					if (Bounds.Width == 0) //stretch in parent
@@ -535,7 +535,7 @@ namespace Crow
 					//for x positionning, sizing of parent and this have to be done
 					Interface.LayoutingQueue.EnqueueAfterThisAndParentSizing (LayoutingType.Y, this);
 			}
-		}
+
 
 		/// <summary> trigger dependant sizing component update </summary>
 		public virtual void OnLayoutChanges(LayoutingType  layoutType)
@@ -702,11 +702,9 @@ namespace Crow
 				LastSlots.Height = Slot.Height;
 				break;
 			}
-			lock (Interface.LayoutingQueue) {
-				//if no layouting remains in queue for item, registre for redraw
-				if (this.RegisteredLQIs.Count () <= 0 && bmp == null)
-					this.RegisterForRedraw ();
-			}
+			//if no layouting remains in queue for item, registre for redraw
+			if (this.RegisteredLQIs.Count () <= 0 && bmp == null)
+				this.RegisterForRedraw ();
 		}
 
 		/// <summary> This is the common overridable drawing routine to create new widget </summary>
