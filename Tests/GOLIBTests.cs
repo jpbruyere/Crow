@@ -37,6 +37,7 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"4.crow",
 			"testColorList.crow",
 			"testGroupBox.goml",
 			"testGrid.goml",
