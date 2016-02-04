@@ -149,7 +149,7 @@ namespace Crow
 			invGOList = invGOList.Reverse ().ToArray ();
 
 			//Debug.WriteLine ("======= Layouting queue start =======");
-				while (Interface.LayoutingQueue.Count > 0) {
+				while (Interface.LayoutingQueue.First != null) {
 					//					Stopwatch lqiProcTime = new Stopwatch ();
 					//					lqiProcTime.Start ();
 					LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();

@@ -21,17 +21,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Crow
 {
-	public class LayoutingQueue : List<LayoutingQueueItem>
+	public class LayoutingQueue : LinkedList<LayoutingQueueItem>
 	{
 		public LayoutingQueue ()
 		{
 		}
 		public void Enqueue(LayoutingType _lt, ILayoutable _object)
 		{
-			this.Add (new LayoutingQueueItem (_lt, _object));
+			LayoutingQueueItem lqi = new LayoutingQueueItem (_lt, _object);
+			lqi.Node = this.AddLast (lqi);
 		}
 		LayoutingQueueItem searchLqi(ILayoutable go, LayoutingType lt){
 			return go.RegisteredLQIs.Where(lq => lq.LayoutType == lt).LastOrDefault();
@@ -42,9 +44,9 @@ namespace Crow
 			LayoutingQueueItem parentLqi = searchLqi (_object.Parent, _lt);
 
 			if (parentLqi == null)
-				this.Insert (0, lqi);
+				lqi.Node = this.AddFirst (lqi);
 			else
-				this.Insert (this.IndexOf (parentLqi) + 1, lqi);
+				lqi.Node = this.AddAfter (parentLqi.Node, lqi);
 		}
 		public void EnqueueBeforeParentSizing (LayoutingType _lt, ILayoutable _object)
 		{
@@ -52,9 +54,9 @@ namespace Crow
 			LayoutingQueueItem parentLqi = searchLqi (_object.Parent, _lt);
 
 			if (parentLqi == null)
-				this.Add (lqi);
+				lqi.Node = this.AddLast (lqi);
 			else
-				this.Insert (this.IndexOf (parentLqi), lqi);
+				lqi.Node = this.AddBefore (parentLqi.Node, lqi);
 		}
 		public void EnqueueAfterThisAndParentSizing (LayoutingType _lt, ILayoutable _object)
 		{
@@ -66,25 +68,38 @@ namespace Crow
 
 			LayoutingQueueItem parentLqi = searchLqi (_object.Parent, sizing);
 			LayoutingQueueItem thisLqi = searchLqi (_object, sizing);
-			int idx = -1;
 
 			if (parentLqi == null) {
 				if (thisLqi != null)
-					idx = this.IndexOf (thisLqi);
+					lqi.Node = this.AddAfter (thisLqi.Node, lqi);
+				else
+					lqi.Node = this.AddLast (lqi);
 			} else {
 				if (thisLqi == null)
-					idx = this.IndexOf (parentLqi);
-				else
-					idx = Math.Max(this.IndexOf (parentLqi), this.IndexOf (thisLqi));				
+					lqi.Node = this.AddAfter (parentLqi.Node, lqi);
+				else {
+					switch (sizing) {
+					case LayoutingType.Width:
+						if (_object.Parent.getBounds().Width<0)
+							lqi.Node = this.AddAfter (parentLqi.Node, lqi);
+						else
+							lqi.Node = this.AddAfter (thisLqi.Node, lqi);							
+						break;
+					case LayoutingType.Height:
+						if (_object.Parent.getBounds().Height<0)
+							lqi.Node = this.AddAfter (parentLqi.Node, lqi);
+						else
+							lqi.Node = this.AddAfter (thisLqi.Node, lqi);							
+						break;
+					}
+				}
 			}
-
-			this.Insert (idx + 1, lqi);			
 		}
 		public LayoutingQueueItem Dequeue()
 		{
-			LayoutingQueueItem tmp = this [0];
+			LayoutingQueueItem tmp = this.First.Value;
 			tmp.DeleteLayoutableRef ();
-			this.RemoveAt (0);
+			this.RemoveFirst ();
 			return tmp;
 		}
 	}

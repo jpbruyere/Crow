@@ -494,7 +494,7 @@ namespace Crow
 		void deleteLQI(int lt){
 			LayoutingQueueItem[] lqis = this.RegisteredLQIs.Where (lq => (lt & (int)lq.LayoutType) > 0).ToArray ();
 			for (int i = 0; i < lqis.Length; i++) {
-				Interface.LayoutingQueue.Remove (lqis [i]);
+				Interface.LayoutingQueue.Remove (lqis [i].Node);
 				lqis [i].DeleteLayoutableRef();
 			}
 		}
@@ -508,33 +508,37 @@ namespace Crow
 			Debug.WriteLine ("RegisterForLayouting => {1}->{0}", layoutType, this.ToString());
 			#endif
 
-				deleteLQI (layoutType);
-				if ((layoutType & (int)LayoutingType.Width) > 0) {
-					if (Bounds.Width == 0) //stretch in parent
+			deleteLQI (layoutType);
+			if ((layoutType & (int)LayoutingType.Width) > 0) {
+				if (Bounds.Width == 0) //stretch in parent
 						Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Width, this);
-					else if (Bounds.Width < 0) //fit 
+				else if (Bounds.Width < 0) //fit 
 						Interface.LayoutingQueue.EnqueueBeforeParentSizing (LayoutingType.Width, this);
-					else
-						Interface.LayoutingQueue.Insert (0, new LayoutingQueueItem (LayoutingType.Width, this));
+				else {
+					LayoutingQueueItem lqi = new LayoutingQueueItem (LayoutingType.Width, this);
+					lqi.Node = Interface.LayoutingQueue.AddFirst (lqi);
 				}
+			}
 
-				if ((layoutType & (int)LayoutingType.Height) > 0) {
-					if (Bounds.Height == 0) //stretch in parent
+			if ((layoutType & (int)LayoutingType.Height) > 0) {
+				if (Bounds.Height == 0) //stretch in parent
 						Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Height, this);
-					else if (Bounds.Height < 0) //fit 
+				else if (Bounds.Height < 0) //fit 
 						Interface.LayoutingQueue.EnqueueBeforeParentSizing (LayoutingType.Height, this);
-					else
-						Interface.LayoutingQueue.Insert (0, new LayoutingQueueItem (LayoutingType.Height, this));
+				else{
+					LayoutingQueueItem lqi = new LayoutingQueueItem (LayoutingType.Height, this);
+					lqi.Node = Interface.LayoutingQueue.AddFirst (lqi);
 				}
+			}
 
-				if ((layoutType & (int)LayoutingType.X) > 0)
+			if ((layoutType & (int)LayoutingType.X) > 0)
 					//for x positionning, sizing of parent and this have to be done
 					Interface.LayoutingQueue.EnqueueAfterThisAndParentSizing (LayoutingType.X, this);
 
-				if ((layoutType & (int)LayoutingType.Y) > 0)
+			if ((layoutType & (int)LayoutingType.Y) > 0)
 					//for x positionning, sizing of parent and this have to be done
 					Interface.LayoutingQueue.EnqueueAfterThisAndParentSizing (LayoutingType.Y, this);
-			}
+		}
 
 
 		/// <summary> trigger dependant sizing component update </summary>

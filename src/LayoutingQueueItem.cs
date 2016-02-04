@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace Crow
 {
@@ -37,7 +38,7 @@ namespace Crow
 
 	public class LayoutingQueueItem
 	{
-
+		public LinkedListNode<LayoutingQueueItem> Node;
 		public ILayoutable GraphicObject;
 		public LayoutingType LayoutType;
 
