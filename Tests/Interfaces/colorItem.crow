@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0"?>
 <HorizontalStack Height="-1" Width="200"
-	MouseEnter="{Background=SteelBlue}"
-	MouseLeave="{Background=Transparent}">
-	<GraphicObject Height="10" Width="30" Background="{}"/>
-	<TextRun Text="{Name}"/>
+			MouseEnter="{Background=Red}"
+			MouseLeave="{Background=Transparent}">
+	<GraphicObject Height="10" Width="30" Background="{}" Margin="0" CornerRadius="3"/>
+	<TextRun Text="{Name}" Margin="0"/>
 </HorizontalStack>
 

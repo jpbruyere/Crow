@@ -31,28 +31,30 @@ namespace Crow
 		}
 		public void Enqueue(LayoutingType _lt, ILayoutable _object)
 		{
-			Interface.LayoutingQueue.RemoveAll(lq => lq.GraphicObject == _object && lq.LayoutType == _lt);
-			Interface.LayoutingQueue.Add (new LayoutingQueueItem (_lt, _object));
+			this.Add (new LayoutingQueueItem (_lt, _object));
 		}
-
+		LayoutingQueueItem searchLqi(ILayoutable go, LayoutingType lt){
+			return go.RegisteredLQIs.Where(lq => lq.LayoutType == lt).LastOrDefault();
+		}
 		public void EnqueueAfterParentSizing (LayoutingType _lt, ILayoutable _object)
 		{
 			LayoutingQueueItem lqi = new LayoutingQueueItem (_lt, _object);
-			int idxParentSz = Interface.LayoutingQueue.IndexOf 
-				(Interface.LayoutingQueue.Where(lq => lq.GraphicObject == _object.Parent && lq.LayoutType == _lt).LastOrDefault());
+			LayoutingQueueItem parentLqi = searchLqi (_object.Parent, _lt);
 
-			Interface.LayoutingQueue.Insert (idxParentSz + 1, lqi);			
+			if (parentLqi == null)
+				this.Insert (0, lqi);
+			else
+				this.Insert (this.IndexOf (parentLqi) + 1, lqi);
 		}
 		public void EnqueueBeforeParentSizing (LayoutingType _lt, ILayoutable _object)
 		{
 			LayoutingQueueItem lqi = new LayoutingQueueItem (_lt, _object);
-			int idxParentSz = Interface.LayoutingQueue.IndexOf 
-				(Interface.LayoutingQueue.Where(lq => lq.GraphicObject == _object.Parent && lq.LayoutType == _lt).FirstOrDefault());
+			LayoutingQueueItem parentLqi = searchLqi (_object.Parent, _lt);
 
-			if (idxParentSz < 0)
-				Interface.LayoutingQueue.Enqueue (_lt, _object);
+			if (parentLqi == null)
+				this.Add (lqi);
 			else
-				Interface.LayoutingQueue.Insert (idxParentSz, lqi);			
+				this.Insert (this.IndexOf (parentLqi), lqi);
 		}
 		public void EnqueueAfterThisAndParentSizing (LayoutingType _lt, ILayoutable _object)
 		{
@@ -61,16 +63,27 @@ namespace Crow
 
 			if (_lt == LayoutingType.Y)
 				sizing = LayoutingType.Height;
-				
-			int idxW = Interface.LayoutingQueue.IndexOf (Interface.LayoutingQueue.Where
-				(lq => (lq.GraphicObject == _object.Parent || lq.GraphicObject == _object) && lq.LayoutType == sizing).LastOrDefault());
 
-			Interface.LayoutingQueue.Insert (idxW + 1, lqi);			
+			LayoutingQueueItem parentLqi = searchLqi (_object.Parent, sizing);
+			LayoutingQueueItem thisLqi = searchLqi (_object, sizing);
+			int idx = -1;
+
+			if (parentLqi == null) {
+				if (thisLqi != null)
+					idx = this.IndexOf (thisLqi);
+			} else {
+				if (thisLqi == null)
+					idx = this.IndexOf (parentLqi);
+				else
+					idx = Math.Max(this.IndexOf (parentLqi), this.IndexOf (thisLqi));				
+			}
+
+			this.Insert (idx + 1, lqi);			
 		}
-
 		public LayoutingQueueItem Dequeue()
 		{
 			LayoutingQueueItem tmp = this [0];
+			tmp.DeleteLayoutableRef ();
 			this.RemoveAt (0);
 			return tmp;
 		}
