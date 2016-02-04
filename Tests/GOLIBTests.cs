@@ -132,9 +132,17 @@ namespace test
 				return;
 			intValue = Convert.ToInt32(e.NewValue);
 		}
+		IList<Color> testList = null;
 		public IList<Color> TestList {
-			get { return Color.ColorDic; }
+			set{
+				testList = value;
+				NotifyValueChanged ("TestList", testList);
+			}
+			get { return testList; }
 		}
+		void OnClear (object sender, MouseButtonEventArgs e) => TestList = null;
+
+		void OnLoadList (object sender, MouseButtonEventArgs e) => TestList = Color.ColorDic.ToList();
 
 		protected override void OnLoad (EventArgs e)
 		{
@@ -190,6 +198,7 @@ namespace test
 		{
 			Console.WriteLine ("button clicked:" + send.ToString());
 		}
+
 		[STAThread]
 		static void Main ()
 		{

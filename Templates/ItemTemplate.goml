@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 
-<Label Text="{}" Focusable="true" Fit="true" Margin="0"
+<Label Text="{}" Fit="true" Margin="0"
 		MouseEnter="{Background=SteelBlue}"
 		MouseLeave="{Background=Transparent}"
 />
