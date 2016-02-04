@@ -225,12 +225,14 @@ namespace Crow
 		}
 		#endregion
 
-		#region update
+		#if MEASURE_TIME
 		public Stopwatch updateTime = new Stopwatch ();
 		public Stopwatch layoutTime = new Stopwatch ();
 		public Stopwatch guTime = new Stopwatch ();
 		public Stopwatch drawingTime = new Stopwatch ();
+		#endif
 
+		#region update
 		void update ()
 		{
 			if (mouseRepeatCount > 0) {
@@ -240,11 +242,12 @@ namespace Crow
 					FocusedWidget.onMouseClick (this, new MouseButtonEventArgs (Mouse.X, Mouse.Y, MouseButton.Left, true));
 				}
 			}
-
-			updateTime.Restart ();
+			#if MEASURE_TIME
 			layoutTime.Reset ();
 			guTime.Reset ();
 			drawingTime.Reset ();
+			updateTime.Restart ();			
+			#endif
 
 			surf = new ImageSurface(bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height,ClientRectangle.Width*4);
 			ctx = new Context(surf);
@@ -253,6 +256,9 @@ namespace Crow
 			GraphicObjects.CopyTo (invGOList,0);
 			invGOList = invGOList.Reverse ().ToArray ();
 
+			#if MEASURE_TIME
+			layoutTime.Start ();
+			#endif
 			//Debug.WriteLine ("======= Layouting queue start =======");
 
 				while (Interface.LayoutingQueue.Count > 0) {
@@ -267,7 +273,9 @@ namespace Crow
 //							updateTime.ElapsedMilliseconds, lqi.ToString());
 //					}
 				}
-
+			#if MEASURE_TIME
+			layoutTime.Stop ();
+			#endif
 
 			//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
 			//final redraw clips should be added only when layout is completed among parents,
@@ -278,9 +286,11 @@ namespace Crow
 			foreach (GraphicObject p in gotr) {
 				p.registerClipRect ();
 			}
-			updateTime.Stop ();
 
+			#if MEASURE_TIME
+			updateTime.Stop ();
 			drawingTime.Start ();
+			#endif
 
 			lock (redrawClip) {
 				if (redrawClip.count > 0) {					
@@ -310,7 +320,9 @@ namespace Crow
 					redrawClip.Reset ();
 				}
 			}
+			#if MEASURE_TIME
 			drawingTime.Stop ();
+			#endif
 			//surf.WriteToPng (@"/mnt/data/test.png");
 			ctx.Dispose ();
 			surf.Dispose ();

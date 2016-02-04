@@ -52,8 +52,8 @@ namespace test
 				}
 
 				ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
-				ValueChanged.Raise (this, new ValueChangeEventArgs ("update",
-					this.updateTime.ElapsedMilliseconds.ToString () + " ms"));
+//				ValueChanged.Raise (this, new ValueChangeEventArgs ("update",
+//					this.updateTime.ElapsedMilliseconds.ToString () + " ms"));
 			}
 		}
 

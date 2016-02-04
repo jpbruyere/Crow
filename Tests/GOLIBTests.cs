@@ -91,10 +91,14 @@ namespace test
 				}
 
 				ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
+				#if MEASURE_TIME
 				ValueChanged.Raise (this, new ValueChangeEventArgs ("update",
-					this.updateTime.ElapsedMilliseconds.ToString () + " ms"));
+					this.updateTime.ElapsedTicks.ToString () + " ticks"));
+				ValueChanged.Raise (this, new ValueChangeEventArgs ("layouting",
+					this.layoutTime.ElapsedTicks.ToString () + " ticks"));
 				ValueChanged.Raise (this, new ValueChangeEventArgs ("drawing",
-					this.drawingTime.ElapsedMilliseconds.ToString () + " ms"));
+					this.drawingTime.ElapsedTicks.ToString () + " ticks"));
+				#endif
 			}
 		}
 
@@ -109,6 +113,7 @@ namespace test
 		}
 		public string update = "";
 		public string drawing = "";
+		public string layouting = "";
 		#endregion
 
 		public int intValue = 25;
