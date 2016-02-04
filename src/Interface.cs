@@ -53,7 +53,6 @@ namespace Crow
 		/// <summary> Threshold to catch borders for sizing </summary>
 		public static int BorderThreshold = 5;
 
-		public static List<ListBox> LoadingLists= new List<ListBox>();
 		public static LayoutingQueue LayoutingQueue = new LayoutingQueue ();
 
 		#region Load/Save

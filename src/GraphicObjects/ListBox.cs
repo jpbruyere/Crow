@@ -75,98 +75,46 @@ namespace Crow
 			get {
 				return data;
 			}
-			set {			
-				if (loadingInProgress) {					
-					thread.Join ();
-					Interface.LoadingLists.Remove (this);
-					pendingChildrenAddition = null;
-					loadingInProgress = false;
-				}
-
+			set {
+				
 				data = value;
 
 				_list.ClearChildren ();
 
 				if (data == null)
 					return;
+				
+				#if DEBUG_LOAD_TIME
+				Stopwatch loadingTime = new Stopwatch ();
+				loadingTime.Start ();
+				#endif
 
-				pendingChildrenAddition = new Queue<GraphicObject> ();
-				threadedLoadingFinished = false;
-				Interface.LoadingLists.Add (this);
-
-				thread = new Thread(loadingThread);
-				loadingInProgress = true;
-				thread.IsBackground = true;
-				thread.Start ();
-				thread.Join ();
-			}
-		}
-//		public override void UpdateLayout (LayoutingType layoutType)
-//		{
-//			CheckPendingChildrenAddition ();
-//			base.UpdateLayout (layoutType);
-//		}
-		internal void CheckPendingChildrenAddition()
-		{
-			if (!loadingInProgress)
-				return;
-			lock (pendingChildrenAddition) {
-				if (!threadedLoadingFinished && pendingChildrenAddition.Count < 10)
-					return;
-				while (pendingChildrenAddition.Count > 0) {
-					GraphicObject tmp = pendingChildrenAddition.Dequeue ();
-					tmp.DataSource = tmp.Tag;
-					tmp.Tag = null;
-					_list.addChild (tmp);
+				MemoryStream ms = new MemoryStream ();
+				lock (ItemTemplate) {
+					using (Stream stream = Interface.GetStreamFromPath (ItemTemplate))
+						stream.CopyTo (ms);
 				}
-				if (threadedLoadingFinished) {
-					Interface.LoadingLists.Remove (this);
-					pendingChildrenAddition = null;
-					loadingInProgress = false;
+
+				Type t = Interface.GetTopContainerOfGOMLStream (ms);
+
+				foreach (var item in data) {
+					ms.Seek(0,SeekOrigin.Begin);
+					GraphicObject g = Interface.Load (ms, t);
+					g.DataSource = item;
+					g.MouseClick += itemClick;
+					_list.addChild (g);
 				}
-			}
-		}
 
-		Queue<GraphicObject> pendingChildrenAddition;
-		volatile bool threadedLoadingFinished = false;
-		volatile bool loadingInProgress = false;
-		Thread thread;
+				ms.Dispose ();			
 
-		void loadingThread()
-		{
-			#if DEBUG_LOAD_TIME
-			Stopwatch loadingTime = new Stopwatch ();
-			loadingTime.Start ();
-			#endif
-
-			MemoryStream ms = new MemoryStream ();
-			lock (ItemTemplate) {
-				using (Stream stream = Interface.GetStreamFromPath (ItemTemplate))
-					stream.CopyTo (ms);
-			}
-
-			Type t = Interface.GetTopContainerOfGOMLStream (ms);
-
-			foreach (var item in data) {
-				ms.Seek(0,SeekOrigin.Begin);
-				GraphicObject g = Interface.Load (ms, t);
-				g.Tag = item;
-				g.MouseClick += itemClick;
-				lock (pendingChildrenAddition) {
-					pendingChildrenAddition.Enqueue (g);
-				}
-			}
-
-			ms.Dispose ();			
-
-			threadedLoadingFinished = true;
-
-			#if DEBUG_LOAD_TIME
-			loadingTime.Stop ();
-			Debug.WriteLine("Listbox {2} Loading: {0} ticks \t, {1} ms",
+				#if DEBUG_LOAD_TIME
+				loadingTime.Stop ();
+				Debug.WriteLine("Listbox {2} Loading: {0} ticks \t, {1} ms",
 				loadingTime.ElapsedTicks,
 				loadingTime.ElapsedMilliseconds, this.ToString());
-			#endif
+				#endif
+
+			}
 		}
 
 		void itemClick(object sender, OpenTK.Input.MouseButtonEventArgs e){
