@@ -31,32 +31,31 @@ namespace Crow
 		{
 		}
 		public void Enqueue(LayoutingType _lt, ILayoutable _object)
-		{
-			LayoutingQueueItem lqi = new LayoutingQueueItem (_lt, _object);
-			lqi.Node = this.AddLast (lqi);
+		{			
+			_object.RegisteredLQINodes.Add(this.AddLast (new LayoutingQueueItem (_lt, _object)));
 		}
-		LayoutingQueueItem searchLqi(ILayoutable go, LayoutingType lt){
-			return go.RegisteredLQIs.Where(lq => lq.LayoutType == lt).LastOrDefault();
+		LinkedListNode<LayoutingQueueItem> searchLqi(ILayoutable go, LayoutingType lt){
+			return go.RegisteredLQINodes.Where(n => n.Value.LayoutType == lt).LastOrDefault();
 		}
 		public void EnqueueAfterParentSizing (LayoutingType _lt, ILayoutable _object)
 		{
 			LayoutingQueueItem lqi = new LayoutingQueueItem (_lt, _object);
-			LayoutingQueueItem parentLqi = searchLqi (_object.Parent, _lt);
+			LinkedListNode<LayoutingQueueItem> parentLqi = searchLqi (_object.Parent, _lt);
 
 			if (parentLqi == null)
-				lqi.Node = this.AddFirst (lqi);
+				_object.RegisteredLQINodes.Add(this.AddFirst (lqi));
 			else
-				lqi.Node = this.AddAfter (parentLqi.Node, lqi);
+				_object.RegisteredLQINodes.Add(this.AddAfter (parentLqi, lqi));
 		}
 		public void EnqueueBeforeParentSizing (LayoutingType _lt, ILayoutable _object)
 		{
 			LayoutingQueueItem lqi = new LayoutingQueueItem (_lt, _object);
-			LayoutingQueueItem parentLqi = searchLqi (_object.Parent, _lt);
+			LinkedListNode<LayoutingQueueItem> parentLqi = searchLqi (_object.Parent, _lt);
 
 			if (parentLqi == null)
-				lqi.Node = this.AddLast (lqi);
+				_object.RegisteredLQINodes.Add(this.AddLast (lqi));
 			else
-				lqi.Node = this.AddBefore (parentLqi.Node, lqi);
+				_object.RegisteredLQINodes.Add(this.AddBefore (parentLqi, lqi));
 		}
 		public void EnqueueAfterThisAndParentSizing (LayoutingType _lt, ILayoutable _object)
 		{
@@ -66,30 +65,30 @@ namespace Crow
 			if (_lt == LayoutingType.Y)
 				sizing = LayoutingType.Height;
 
-			LayoutingQueueItem parentLqi = searchLqi (_object.Parent, sizing);
-			LayoutingQueueItem thisLqi = searchLqi (_object, sizing);
+			LinkedListNode<LayoutingQueueItem> parentLqi = searchLqi (_object.Parent, sizing);
+			LinkedListNode<LayoutingQueueItem> thisLqi = searchLqi (_object, sizing);
 
 			if (parentLqi == null) {
 				if (thisLqi != null)
-					lqi.Node = this.AddAfter (thisLqi.Node, lqi);
+					_object.RegisteredLQINodes.Add(this.AddAfter (thisLqi, lqi));
 				else
-					lqi.Node = this.AddLast (lqi);
+					_object.RegisteredLQINodes.Add(this.AddLast (lqi));
 			} else {
 				if (thisLqi == null)
-					lqi.Node = this.AddAfter (parentLqi.Node, lqi);
+					_object.RegisteredLQINodes.Add(this.AddAfter (parentLqi, lqi));
 				else {
 					switch (sizing) {
 					case LayoutingType.Width:
 						if (_object.Parent.getBounds().Width<0)
-							lqi.Node = this.AddAfter (parentLqi.Node, lqi);
+							_object.RegisteredLQINodes.Add(this.AddAfter (parentLqi, lqi));
 						else
-							lqi.Node = this.AddAfter (thisLqi.Node, lqi);							
+							_object.RegisteredLQINodes.Add(this.AddAfter (thisLqi, lqi));	
 						break;
 					case LayoutingType.Height:
 						if (_object.Parent.getBounds().Height<0)
-							lqi.Node = this.AddAfter (parentLqi.Node, lqi);
+							_object.RegisteredLQINodes.Add(this.AddAfter (parentLqi, lqi));
 						else
-							lqi.Node = this.AddAfter (thisLqi.Node, lqi);							
+							_object.RegisteredLQINodes.Add(this.AddAfter (thisLqi, lqi));							
 						break;
 					}
 				}
@@ -98,7 +97,7 @@ namespace Crow
 		public LayoutingQueueItem Dequeue()
 		{
 			LayoutingQueueItem tmp = this.First.Value;
-			tmp.DeleteLayoutableRef ();
+			tmp.GraphicObject.RegisteredLQINodes.Remove(this.First);
 			this.RemoveFirst ();
 			return tmp;
 		}

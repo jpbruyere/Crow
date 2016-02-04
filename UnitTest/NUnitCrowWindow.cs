@@ -416,7 +416,7 @@ namespace Crow
 		#region ILayoutable implementation
 
 		//TODO:uneeded list, should be removed
-		public List<LayoutingQueueItem> RegisteredLQIs { get; } = new List<LayoutingQueueItem>();
+		public List<LinkedListNode<LayoutingQueueItem>> RegisteredLQINodes { get; } = new List<LinkedListNode<LayoutingQueueItem>>();
 		public void RegisterForLayouting (int layoutType) { throw new NotImplementedException (); }
 		public void UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public Rectangle ContextCoordinates (Rectangle r)

@@ -91,7 +91,7 @@ namespace Crow
 
 		#region ILayoutable
 
-		public List<LayoutingQueueItem> RegisteredLQIs { get; } = new List<LayoutingQueueItem>();
+		public List<LinkedListNode<LayoutingQueueItem>> RegisteredLQINodes { get; } = new List<LinkedListNode<LayoutingQueueItem>>();
 		//TODO: it would save the recurent cost of a cast in event bubbling if parent type was GraphicObject
 		//		or we could add to the interface the mouse events
 		[XmlIgnore]public ILayoutable Parent { 
@@ -492,10 +492,10 @@ namespace Crow
 			return Bounds.Size;
 		}
 		void deleteLQI(int lt){
-			LayoutingQueueItem[] lqis = this.RegisteredLQIs.Where (lq => (lt & (int)lq.LayoutType) > 0).ToArray ();
+			LinkedListNode<LayoutingQueueItem>[] lqis = this.RegisteredLQINodes.Where (n => (lt & (int)n.Value.LayoutType) > 0).ToArray ();
 			for (int i = 0; i < lqis.Length; i++) {
-				Interface.LayoutingQueue.Remove (lqis [i].Node);
-				lqis [i].DeleteLayoutableRef();
+				Interface.LayoutingQueue.Remove (lqis [i]);
+				RegisteredLQINodes.Remove (lqis [i]);
 			}
 		}
 		/// <summary> clear current layoutingQueue items for object and
@@ -514,10 +514,10 @@ namespace Crow
 						Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Width, this);
 				else if (Bounds.Width < 0) //fit 
 						Interface.LayoutingQueue.EnqueueBeforeParentSizing (LayoutingType.Width, this);
-				else {
-					LayoutingQueueItem lqi = new LayoutingQueueItem (LayoutingType.Width, this);
-					lqi.Node = Interface.LayoutingQueue.AddFirst (lqi);
-				}
+				else					
+					RegisteredLQINodes.Add(
+						Interface.LayoutingQueue.AddFirst (
+							new LayoutingQueueItem (LayoutingType.Width, this)));				
 			}
 
 			if ((layoutType & (int)LayoutingType.Height) > 0) {
@@ -526,8 +526,10 @@ namespace Crow
 				else if (Bounds.Height < 0) //fit 
 						Interface.LayoutingQueue.EnqueueBeforeParentSizing (LayoutingType.Height, this);
 				else{
-					LayoutingQueueItem lqi = new LayoutingQueueItem (LayoutingType.Height, this);
-					lqi.Node = Interface.LayoutingQueue.AddFirst (lqi);
+					RegisteredLQINodes.Add(
+						Interface.LayoutingQueue.AddFirst (
+							new LayoutingQueueItem (LayoutingType.Height, this)));				
+					
 				}
 			}
 
@@ -707,7 +709,7 @@ namespace Crow
 				break;
 			}
 			//if no layouting remains in queue for item, registre for redraw
-			if (this.RegisteredLQIs.Count () <= 0 && bmp == null)
+			if (this.RegisteredLQINodes.Count () <= 0 && bmp == null)
 				this.RegisterForRedraw ();
 		}
 

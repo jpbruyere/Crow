@@ -37,8 +37,7 @@ namespace Crow
 	}
 
 	public class LayoutingQueueItem
-	{
-		public LinkedListNode<LayoutingQueueItem> Node;
+	{		
 		public ILayoutable GraphicObject;
 		public LayoutingType LayoutType;
 
@@ -46,11 +45,8 @@ namespace Crow
 		{
 			LayoutType = _layoutType;
 			GraphicObject = _graphicObject;
-			GraphicObject.RegisteredLQIs.Add (this);
 		}
-		public void DeleteLayoutableRef(){
-			GraphicObject.RegisteredLQIs.Remove(this);
-		}
+	
 		public void ProcessLayouting()
 		{
 			#if DEBUG_LAYOUTING

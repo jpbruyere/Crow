@@ -166,7 +166,7 @@ namespace Crow
 				}				
 				ComputeChildrenPositions ();
 				//if no layouting remains in queue for item, registre for redraw
-				if (RegisteredLQIs.Count () <= 0 && bmp==null)
+				if (RegisteredLQINodes.Count () <= 0 && bmp==null)
 					this.RegisterForRedraw ();
 			}else
 				base.UpdateLayout(layoutType);

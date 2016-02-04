@@ -13,7 +13,7 @@ namespace Crow
 
 		IGOLibHost HostContainer { get; }
 
-		List<LayoutingQueueItem> RegisteredLQIs { get; }
+		List<LinkedListNode<LayoutingQueueItem>> RegisteredLQINodes { get; }
 		void RegisterForLayouting(int layoutType);
 		void UpdateLayout(LayoutingType layoutType);
 
