@@ -125,8 +125,6 @@ namespace Crow
 				Parent.ContextCoordinates (r);// + ClientRectangle.Position;
 		}			
 		public virtual Rectangle ScreenCoordinates (Rectangle r){
-			//r += Slot.Position;
-
 			return 
 				Parent.ScreenCoordinates(r) + Parent.getSlot().Position + Parent.ClientRectangle.Position;
 		}
@@ -451,14 +449,19 @@ namespace Crow
 		public virtual void registerForGraphicUpdate ()
 		{
 			bmp = null;
-			if (HostContainer != null)
-				HostContainer.gobjsToRedraw.Add (this);
+			RegisterForRedraw ();
 		}
 		/// <summary>
 		/// Add clipping region in redraw list of interface, dont update cached object content
 		/// </summary>
 		public virtual void RegisterForRedraw ()
 		{
+			//test if this speed up a lot to cancel clipping for an uncached group
+			Group p = Parent as Group;
+			if (p != null) {
+				if (p.bmp == null)
+					return;
+			}
 			if (HostContainer != null)
 				HostContainer.gobjsToRedraw.Add (this);
 		}
