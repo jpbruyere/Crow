@@ -193,35 +193,6 @@ namespace Crow
 			HostContainer.redrawClip.AddRectangle (base.ScreenCoordinates(Slot));
 		}
 
-		public override void Paint(ref Cairo.Context ctx, Rectangles clip = null)
-		{
-			if (!Visible)//check if necessary??
-				return;
 
-			ctx.Save();
-
-			//			ctx.Rectangle(ContextCoordinates(Slot));
-			//            ctx.Clip();
-			//
-//			if (clip != null)
-//				clip.clip(ctx);
-			//clip.Srcoll (this);
-
-			base.Paint (ref ctx, clip);
-
-			//clip to client zone
-			ctx.Rectangle(Parent.ContextCoordinates(ClientRectangle + Slot.Position));
-			ctx.Clip();
-
-//			if (clip != null)
-//				clip.Srcoll (this);
-			//            if (clip != null)
-			//                clip.Rebase(this);
-
-			if (Child != null)
-				Child.Paint(ref ctx, clip);
-
-			ctx.Restore();            
-		}
     }
 }
