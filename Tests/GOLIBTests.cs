@@ -38,11 +38,12 @@ namespace test
 		int idx = 0;
 		string[] testFiles = {
 			"testColorList.crow",
+			"testGroupBox.goml",
+			"testGrid.goml",
 			"test_Listbox.goml",
 			"testButton.crow",
 			"testBorder.goml",
-			"testButton2.crow",
-			"testGroupBox.goml",
+//			"testButton2.crow",
 			"test2WayBinding.crow",
 			"0.crow",
 			"testSpinner.goml",
@@ -67,7 +68,6 @@ namespace test
 			"testContainer.goml",
 			"testRadioButton.goml",
 			"testMsgBox.goml",
-			"testGrid.goml",
 			"testMeter.goml",
 		};
 

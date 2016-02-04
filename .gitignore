@@ -1,13 +1,15 @@
 Win_x86
 
 Debug
-
+packages
 /GOLib.suo
 /bin/*
 /obj/*
 /GOLib.userprefs
 /Tests/obj/*
 /Tests/bin/*
+/UnitTest/obj
+/UnitTest/bin
 MonoDevelop.GOLib/bin/
 MonoDevelop.GOLib/build/
 MonoDevelop.GOLib/obj/

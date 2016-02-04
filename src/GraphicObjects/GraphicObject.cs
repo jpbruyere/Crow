@@ -90,6 +90,8 @@ namespace Crow
 		#endregion
 
 		#region ILayoutable
+
+		public List<LayoutingQueueItem> RegisteredLQIs { get; } = new List<LayoutingQueueItem>();
 		//TODO: it would save the recurent cost of a cast in event bubbling if parent type was GraphicObject
 		//		or we could add to the interface the mouse events
 		[XmlIgnore]public ILayoutable Parent { 
@@ -486,6 +488,13 @@ namespace Crow
 		{
 			return Bounds.Size;
 		}
+		void deleteLQI(int lt){
+			LayoutingQueueItem[] lqis = this.RegisteredLQIs.Where (lq => (lt & (int)lq.LayoutType) > 0).ToArray ();
+			for (int i = 0; i < lqis.Length; i++) {
+				Interface.LayoutingQueue.Remove (lqis [i]);
+				lqis [i].DeleteLayoutableRef();
+			}
+		}
 		/// <summary> clear current layoutingQueue items for object and
 		/// trigger a new layouting pass for a layoutType </summary>
 		public virtual void RegisterForLayouting(int layoutType)
@@ -496,8 +505,7 @@ namespace Crow
 			Debug.WriteLine ("RegisterForLayouting => {1}->{0}", layoutType, this.ToString());
 			#endif
 			lock (Interface.LayoutingQueue) {
-				Interface.LayoutingQueue.RemoveAll (lq => lq.GraphicObject == this && (layoutType & (int)lq.LayoutType) > 0);
-
+				deleteLQI (layoutType);
 				if ((layoutType & (int)LayoutingType.Width) > 0) {
 					if (Bounds.Width == 0) //stretch in parent
 						Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Width, this);
@@ -693,7 +701,7 @@ namespace Crow
 			}
 			lock (Interface.LayoutingQueue) {
 				//if no layouting remains in queue for item, registre for redraw
-				if (Interface.LayoutingQueue.Where (lq => lq.GraphicObject == this).Count () <= 0 && bmp == null)
+				if (this.RegisteredLQIs.Count () <= 0 && bmp == null)
 					this.RegisterForRedraw ();
 			}
 		}

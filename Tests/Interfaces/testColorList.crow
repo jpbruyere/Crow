@@ -14,7 +14,7 @@
 						</Scroller>
 						<ScrollBar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" 
 							MaximumScroll="{../scroller1.MaximumScroll}" Orientation="Vertical" 
-							Width="10" Height="{../../../TemplatedHeight}" />
+							Width="14" Height="{../../../TemplatedHeight}" />
 					</HorizontalStack>
 				</Border>
 			</Template>

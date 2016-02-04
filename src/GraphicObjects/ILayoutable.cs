@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Crow
 {
@@ -12,6 +13,7 @@ namespace Crow
 
 		IGOLibHost HostContainer { get; }
 
+		List<LayoutingQueueItem> RegisteredLQIs { get; }
 		void RegisterForLayouting(int layoutType);
 		void UpdateLayout(LayoutingType layoutType);
 
