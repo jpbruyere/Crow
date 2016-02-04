@@ -17,7 +17,7 @@ namespace Crow
 
         public void AddRectangle(Rectangle r)
         {
-			if (rectIsNotContainedInRectangles (r)) {
+			if (doesNotContain (r)) {
 				list.Add (r);
 				boundsUpToDate = false;
 			}
@@ -28,7 +28,7 @@ namespace Crow
 			_bounds = Rectangle.Empty;
 			boundsUpToDate = true;
         }
-        bool rectIsNotContainedInRectangles(Rectangle r)
+        bool doesNotContain(Rectangle r)
         {
             foreach (Rectangle rInList in list)
                 if (rInList.ContainsOrIsEqual(r))
