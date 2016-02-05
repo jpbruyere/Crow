@@ -205,11 +205,7 @@ namespace Crow
 
 		protected override void onDraw (Context gr)
 		{
-			Rectangle rBack = new Rectangle (Slot.Size);
-
-			Background.SetAsSource (gr, rBack);
-			CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
-			gr.Fill ();
+			base.onDraw (gr);
 
 			foreach (GraphicObject g in Children) {
 				g.Paint (ref gr);
