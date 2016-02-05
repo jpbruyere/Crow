@@ -913,6 +913,9 @@ namespace Crow
 				}
 				resolved.Add (b);				
 			}
+
+			MethodInfo stringEquals = typeof(string).GetMethod
+				("Compare", new Type[3] {typeof(string), typeof(string), typeof(StringComparison)});
 			//group;only one dynMethods by target (valuechanged event source)
 			//changed value name tested in switch
 			IEnumerable<Binding[]> groupedByTarget = resolved.GroupBy (g => g.Target.Instance, g => g, (k, g) => g.ToArray ());
@@ -923,10 +926,6 @@ namespace Crow
 
 				DynamicMethod dm = null;
 				ILGenerator il = null;
-
-				MethodInfo stringEquals = typeof(string).GetMethod
-					("op_Equality", new Type[2] {typeof(string), typeof(string)});
-
 
 				System.Reflection.Emit.Label[] jumpTable = null;
 				System.Reflection.Emit.Label endMethod = new System.Reflection.Emit.Label();
@@ -1018,8 +1017,9 @@ namespace Crow
 						il.Emit (OpCodes.Ldstr, b.Target.Member.Name);
 					else
 						il.Emit (OpCodes.Ldstr, b.Expression.Split('/').LastOrDefault());
+					il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
 					il.Emit (OpCodes.Callvirt, stringEquals);
-					il.Emit (OpCodes.Brtrue, jumpTable[i]);
+					il.Emit (OpCodes.Brfalse, jumpTable[i]);
 					i++;
 				}
 
