@@ -1243,7 +1243,7 @@ namespace Crow
 
 				if (string.IsNullOrEmpty (attValue))
 					continue;
-				
+
 				MemberInfo mi = thisType.GetMember (attName).FirstOrDefault();
 				if (mi == null) {
 					Debug.WriteLine ("GOML: Unknown attribute in " + thisType.ToString() + " : " + attName);
@@ -1256,8 +1256,10 @@ namespace Crow
 				if (mi.MemberType == MemberTypes.Property) {
 					PropertyInfo pi = mi as PropertyInfo;
 
-					if (pi.GetSetMethod () == null)
+					if (pi.GetSetMethod () == null) {
+						Debug.WriteLine ("GOML: Read only property in " + thisType.ToString() + " : " + attName);
 						continue;
+					}
 
 					bool isAttribute = false;
 					object defaultValue = null;
@@ -1278,19 +1280,6 @@ namespace Crow
 					}
 					if (!isAttribute)
 						continue;
-//					{
-//						//avoid system types automaticaly converted by parser
-//						if (defaultValue != null && !pi.PropertyType.Namespace.StartsWith("System")) {
-//							if (pi.PropertyType != defaultValue.GetType()) {
-//								MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
-//								if (miParse != null) {									
-//									pi.SetValue (this, miParse.Invoke (null, new object[]{ defaultValue }), null);
-//									continue;
-//								}
-//							}
-//						}
-//						pi.SetValue (this, defaultValue, null);
-//					} else {
 
 					if (attValue.StartsWith("{")) {
 						//binding
