@@ -565,44 +565,12 @@ namespace Crow
 			
 			switch (layoutType) {
 			case LayoutingType.Width:				
-				if (Parent.getBounds ().Width < 0) {
-					Group gw = Parent as Group;
-					if (gw != null) {
-						if (Slot.Width > gw.maxChildrenWidth)
-							gw.maxChildrenWidth = Slot.Width;
-					}
-					this.Parent.RegisterForLayouting ((int)LayoutingType.Width);
-				}else if (Width != 0) //update position in parent
+				if (Width != 0 && Parent.getBounds().Width >=0) //update position in parent
 					this.RegisterForLayouting ((int)LayoutingType.X);
-				GenericStack gsw = Parent as GenericStack;
-				if (gsw == null)
-					break;	
-				if ((Parent as GenericStack).Orientation == Orientation.Horizontal) {
-//					ulong idx = (ulong)gsw.Children.IndexOf (this);
-//					if (idx < gsw.stackingUpdateStartIndex)
-//						gsw.stackingUpdateStartIndex = idx;
-					this.Parent.RegisterForLayouting ((int)LayoutingType.PositionChildren);
-				}
 				break;
 			case LayoutingType.Height:
-				if (Parent.getBounds ().Height < 0) {
-					Group gh = Parent as Group;
-					if (gh != null) {
-						if (Slot.Width > gh.maxChildrenHeight)
-							gh.maxChildrenHeight = Slot.Height;
-					}
-					this.Parent.RegisterForLayouting ((int)LayoutingType.Height);
-				}else if (Height != 0) //update position in parent
+				if (Height != 0 && Parent.getBounds().Height >=0) //update position in parent
 					this.RegisterForLayouting ((int)LayoutingType.Y);
-				GenericStack gsh = Parent as GenericStack;
-				if (gsh==null)
-					break;				
-				if (gsh.Orientation == Orientation.Vertical) {
-//					ulong idx = (ulong)gsh.Children.IndexOf (this);
-//					if (idx < gsh.stackingUpdateStartIndex)
-//						gsh.stackingUpdateStartIndex = idx;
-					this.Parent.RegisterForLayouting ((int)LayoutingType.PositionChildren);
-				}
 				break;
 			}
 			LayoutChanged.Raise (this, new LayoutChangeEventArgs (layoutType));

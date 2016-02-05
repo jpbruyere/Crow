@@ -52,6 +52,7 @@ namespace Crow
 		{
 
 			if (child != null) {
+				child.LayoutChanged -= OnChildLayoutChanges;
 				this.RegisterForLayouting ((int)LayoutingType.Sizing);
 				child.Parent = null;
 			}
@@ -60,6 +61,7 @@ namespace Crow
 
 			if (child != null) {
 				child.Parent = this;
+				child.LayoutChanged += OnChildLayoutChanges;
 				child.RegisterForLayouting ((int)LayoutingType.Sizing);
 			}
 
@@ -116,6 +118,24 @@ namespace Crow
 				}
 				break;
 			}							
+		}
+		public virtual void OnChildLayoutChanges (object sender, LayoutChangeEventArgs arg)
+		{
+			GraphicObject g = sender as GraphicObject;
+			switch (arg.LayoutType) {
+			case LayoutingType.X:
+				break;
+			case LayoutingType.Y:
+				break;
+			case LayoutingType.Width:
+				if (this.Bounds.Width < 0)
+					this.RegisterForLayouting ((int)LayoutingType.Width);
+				break;
+			case LayoutingType.Height:
+				if (this.Bounds.Height < 0)
+					this.RegisterForLayouting ((int)LayoutingType.Height);
+				break;
+			}
 		}
 
 		public override Rectangle ContextCoordinates (Rectangle r)

@@ -1,17 +1,14 @@
 ﻿<Properties GitUserInfo="UsingGIT" StartupItem="Tests/Tests.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|Linux_x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Tests/GOLIBTests.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="src/GraphicObjects/GenericStack.cs">
     <Files>
-      <File FileName="Tests/GOLIBTests.cs" Line="98" Column="2" />
-      <File FileName="src/GraphicObjects/GraphicObject.cs" Line="538" Column="3" />
-      <File FileName="src/GraphicObjects/Group.cs" Line="197" Column="1" />
-      <File FileName="src/GraphicObjects/PrivateContainer.cs" Line="127" Column="1" />
-      <File FileName="src/OpenTKGameWindow.cs" Line="328" Column="10" />
-      <File FileName="src/Rectangles.cs" Line="90" Column="21" />
-      <File FileName="src/GraphicObjects/Scroller.cs" Line="196" Column="1" />
-      <File FileName="src/LayoutingQueue.cs" Line="30" Column="4" />
-      <File FileName="src/Interface.cs" Line="56" Column="1" />
-      <File FileName="UnitTest/NUnitCrowWindow.cs" Line="163" Column="1" />
+      <File FileName="src/GraphicObjects/GraphicObject.cs" Line="627" Column="5" />
+      <File FileName="src/GraphicObjects/Group.cs" Line="165" Column="15" />
+      <File FileName="src/GraphicObjects/PrivateContainer.cs" Line="132" Column="57" />
+      <File FileName="src/GraphicObjects/GenericStack.cs" Line="170" Column="1" />
+      <File FileName="Tests/GOLIBTests.cs" Line="50" Column="11" />
+      <File FileName="Tests/Interfaces/0.crow" Line="1" Column="1" />
+      <File FileName="Tests/Interfaces/testWindow.goml" Line="22" Column="5" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

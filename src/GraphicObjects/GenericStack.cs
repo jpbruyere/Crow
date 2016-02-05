@@ -105,6 +105,7 @@ namespace Crow
 					c.RegisterForLayouting ((int)LayoutingType.X);
 				}
 			}
+			bmp = null;
 		}
 
 		public override void RegisterForLayouting (int layoutType)
@@ -171,6 +172,42 @@ namespace Crow
 			}else
 				base.UpdateLayout(layoutType);
         }
+		public override void OnLayoutChanges (LayoutingType layoutType)
+		{
+			base.OnLayoutChanges (layoutType);
+
+			if (Orientation == Orientation.Horizontal){
+				if(layoutType == LayoutingType.Width)
+					this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+			}else if (layoutType == LayoutingType.Height)
+				this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+		}
+		public override void OnChildLayoutChanges (object sender, LayoutChangeEventArgs arg)
+		{
+			base.OnChildLayoutChanges (sender, arg);
+
+			GraphicObject g = sender as GraphicObject;
+			switch (arg.LayoutType) {
+			case LayoutingType.X:
+				break;
+			case LayoutingType.Y:
+				break;
+			case LayoutingType.Width:
+				if (Orientation == Orientation.Horizontal) {
+					if (this.Bounds.Width < 0)
+						this.RegisterForLayouting ((int)LayoutingType.Width);
+					this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+				}
+				break;
+			case LayoutingType.Height:
+				if (Orientation == Orientation.Vertical) {
+					if (this.Bounds.Height < 0)
+						this.RegisterForLayouting ((int)LayoutingType.Height);
+					this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+				}
+				break;
+			}
+		}
 		#endregion
 
     

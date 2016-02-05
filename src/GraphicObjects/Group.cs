@@ -25,6 +25,8 @@ namespace Crow
 
 		internal int maxChildrenWidth = 0;
 		internal int maxChildrenHeight = 0;
+		internal GraphicObject largestChild = null;
+		internal GraphicObject tallestChild = null;
 
         bool _multiSelect = false;
 		List<GraphicObject> children = new List<GraphicObject>();
@@ -49,10 +51,12 @@ namespace Crow
             Children.Add(g);
             g.Parent = this as GraphicObject;            
 			g.RegisterForLayouting ((int)LayoutingType.Sizing);
+			g.LayoutChanged += OnChildLayoutChanges;
             return (T)child;
         }
         public virtual void removeChild(GraphicObject child)        
-		{			
+		{
+			child.LayoutChanged -= OnChildLayoutChanges;
 			child.ClearBinding ();
 			child.Parent = null;
             Children.Remove(child);
@@ -60,12 +64,14 @@ namespace Crow
         }
 		public virtual void ClearChildren()
 		{
-			int lim = children.Count;
-			for (int i = 0; i < lim; i++) {
-				GraphicObject g = Children [0];
+			int cpt = children.Count;
+			while(cpt > 0){
+				GraphicObject g = children[cpt-1];
+				g.LayoutChanged -= OnChildLayoutChanges;
 				g.ClearBinding ();
 				g.Parent = null;
-				Children.Remove(g);				
+				Children.RemoveAt(cpt-1);
+				cpt = children.Count;
 			}
 			this.RegisterForLayouting ((int)LayoutingType.Sizing);
 			ChildrenCleared.Raise (this, new EventArgs ());
@@ -86,7 +92,7 @@ namespace Crow
 				Children.Insert(0, w);
 			}
 		}
-			
+
 		#region GraphicObject overrides
 		[XmlIgnore]public override bool DrawingIsValid {
 			get {
@@ -136,16 +142,9 @@ namespace Crow
 		{
 			base.OnLayoutChanges (layoutType);
 
-			GenericStack gs = this as GenericStack;
 			//position smaller objects in group when group size is fit
 			switch (layoutType) {
 			case LayoutingType.Width:
-				if (gs != null) {
-					if (gs.Orientation == Orientation.Horizontal) {
-						this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
-						break;
-					}
-				}	
 				foreach (GraphicObject c in Children.Where(ch => ch.Visible)) {
 					if (c.getBounds ().Width == 0)
 						c.RegisterForLayouting ((int)LayoutingType.Width);
@@ -154,12 +153,6 @@ namespace Crow
 				}
 				break;
 			case LayoutingType.Height:
-				if (gs != null) {
-					if (gs.Orientation == Orientation.Vertical) {
-						this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
-						break;
-					}
-				}
 				foreach (GraphicObject c in Children.Where(ch => ch.Visible)) {
 					if (c.getBounds ().Height == 0)
 						c.RegisterForLayouting ((int)LayoutingType.Height);
@@ -169,7 +162,56 @@ namespace Crow
 				break;
 			}
 		}
-
+		public virtual void OnChildLayoutChanges (object sender, LayoutChangeEventArgs arg)
+		{
+			GraphicObject g = sender as GraphicObject;
+			switch (arg.LayoutType) {
+			case LayoutingType.X:
+				break;
+			case LayoutingType.Y:
+				break;
+			case LayoutingType.Width:
+				if (g.Slot.Width > maxChildrenWidth) {
+					maxChildrenWidth = g.Slot.Width;
+					largestChild = g;
+					if (this.Bounds.Width < 0)
+						this.RegisterForLayouting ((int)LayoutingType.Width);
+				} else if (g == largestChild) {
+					//search for the new largest child
+					largestChild = null;
+					maxChildrenWidth = 0;
+					for (int i = 0; i < children.Count; i++) {
+						if (children [i].Slot.Width > maxChildrenWidth) {
+							maxChildrenWidth = children [i].Slot.Width;
+							largestChild = children [i];
+						}
+					}
+					if (this.Bounds.Width < 0)
+						this.RegisterForLayouting ((int)LayoutingType.Width);
+				}
+				break;
+			case LayoutingType.Height:
+				if (g.Slot.Height > maxChildrenHeight) {
+					maxChildrenHeight = g.Slot.Height;
+					tallestChild = g;
+					if (this.Bounds.Height < 0)
+						this.RegisterForLayouting ((int)LayoutingType.Height);
+				} else if (g == tallestChild) {
+					//search for the new tallest child
+					tallestChild = null;
+					maxChildrenHeight = 0;
+					for (int i = 0; i < children.Count; i++) {
+						if (children [i].Slot.Height > maxChildrenHeight) {
+							maxChildrenHeight = children [i].Slot.Height;
+							tallestChild = children [i];
+						}
+					}
+					if (this.Bounds.Height < 0)
+						this.RegisterForLayouting ((int)LayoutingType.Height);
+				}
+				break;
+			}
+		}
 		public override Rectangle ContextCoordinates(Rectangle r){
 			return r + ClientRectangle.Position;
 		}	
