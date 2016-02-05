@@ -86,7 +86,6 @@ namespace Crow
 				base.Maximum = value;
 				LargeIncrement = base.Maximum / 10.0;
 				SmallIncrement = LargeIncrement / 5.0;
-
 			}
 		}
 

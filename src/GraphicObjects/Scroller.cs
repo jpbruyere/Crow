@@ -80,8 +80,8 @@ namespace Crow
 		public int MaximumScroll {
 			get {
 				return VerticalScrolling ? 
-					child == null ? 0 : Child.Slot.Height - ClientRectangle.Height :
-					Child.Slot.Width - ClientRectangle.Width;				
+					child == null ? 0 : Math.Max(Child.Slot.Height - ClientRectangle.Height,0) :
+					Math.Max(Child.Slot.Width - ClientRectangle.Width,0);
 			}
 		}
 

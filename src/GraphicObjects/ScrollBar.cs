@@ -76,22 +76,17 @@ namespace Crow
 		}
 		public void onScrollBack (object sender, MouseButtonEventArgs e)
 		{
-			Scroll -= _slider.LargeIncrement;
+			Scroll -= 50;
 		}
 		public void onScrollForth (object sender, MouseButtonEventArgs e)
 		{
-			Scroll += _slider.LargeIncrement;
+			Scroll += 50;
 
 		}
 
 		public void onSliderValueChange(object sender, ValueChangeEventArgs e){
-			Scroll = Convert.ToDouble(e.NewValue);
-		}
-
-		public override void OnLayoutChanges (LayoutingType layoutType)
-		{
-			OpenTKGameWindow.currentWindow.CursorVisible = true;
-			base.OnLayoutChanges (layoutType);
+			if (e.MemberName == "Value")
+				Scroll = Convert.ToDouble(e.NewValue);
 		}
 	}
 }
