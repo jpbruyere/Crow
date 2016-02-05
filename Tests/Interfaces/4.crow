@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <HorizontalStack Fit="true">
-	<VerticalStack Fit="true" Name="vsFps"  Spacing="10" >
+	<VerticalStack Fit="true" Spacing="10" Caching="false">
 		<HorizontalStack Fit="true">
 			<Label Text="Update:" Width="50" TextAlignment="RightCenter"/>
 			<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
@@ -92,7 +92,7 @@
 				Background="vgradient|0:AoEnglish|1:Black"/>
 		</HorizontalStack>
 	</VerticalStack>
-	<VerticalStack Fit="true" Name="vsFps"  Spacing="10" >
+	<VerticalStack Fit="true" Spacing="10" Caching="false">
 		<HorizontalStack Fit="true">
 			<Label Text="Update:" Width="50" TextAlignment="RightCenter"/>
 			<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
@@ -184,7 +184,7 @@
 				Background="vgradient|0:AoEnglish|1:Black"/>
 		</HorizontalStack>
 	</VerticalStack>
-	<VerticalStack Fit="true" Name="vsFps"  Spacing="10" >
+	<VerticalStack Fit="true" Spacing="10" Caching="false">
 		<HorizontalStack Fit="true">
 			<Label Text="Update:" Width="50" TextAlignment="RightCenter"/>
 			<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
@@ -276,7 +276,7 @@
 				Background="vgradient|0:AoEnglish|1:Black"/>
 		</HorizontalStack>
 	</VerticalStack>
-	<VerticalStack Fit="true" Name="vsFps"  Spacing="10" >
+	<VerticalStack Fit="true" Spacing="10" Caching="false">
 		<HorizontalStack Fit="true">
 			<Label Text="Update:" Width="50" TextAlignment="RightCenter"/>
 			<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
