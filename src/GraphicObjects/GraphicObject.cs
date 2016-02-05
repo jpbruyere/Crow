@@ -82,9 +82,30 @@ namespace Crow
 		#endregion
 
 		#region public fields
+		/// <summary>
+		/// The logical parent (used mainly for bindings) as opposed to the parent in the graphic tree
+		/// </summary>
 		public GraphicObject LogicalParent;
+		/// <summary>
+		/// Original size and position 0=Stretched; -1=Fit
+		/// </summary>
 		public Rectangle Bounds;
+		/// <summary>
+		/// Current size and position computed during layouting pass
+		/// </summary>
 		public Rectangle Slot = new Rectangle ();
+		/// <summary>
+		/// keep last slot components for each layouting pass to track
+		/// changes and trigger update of other component accordingly
+		/// </summary>
+		public Rectangle LastSlots;
+		/// <summary>
+		/// keep last slot painted on screen to clear traces if moved or resized
+		/// TODO: we should ensure the whole parsed widget tree is the last painted
+		/// version to clear effective oldslot if parents have been moved or resized.
+		/// IDEA is to add a ScreenCoordinates function that use only lastPaintedSlots
+		/// </summary>
+		public Rectangle LastPaintedSlot;
 		public object Tag;
 		public byte[] bmp;
 		#endregion
@@ -94,6 +115,9 @@ namespace Crow
 		public List<LinkedListNode<LayoutingQueueItem>> RegisteredLQINodes { get; } = new List<LinkedListNode<LayoutingQueueItem>>();
 		//TODO: it would save the recurent cost of a cast in event bubbling if parent type was GraphicObject
 		//		or we could add to the interface the mouse events
+		/// <summary>
+		/// Parent in the graphic tree, used for rendering and layouting
+		/// </summary>
 		[XmlIgnore]public ILayoutable Parent { 
 			get { return _parent; }
 			set {
@@ -442,7 +466,13 @@ namespace Crow
 			return false;
 		}
 
-
+		public virtual void registerClipRect()
+		{
+			HostContainer.redrawClip.AddRectangle (ScreenCoordinates(Slot));
+			//this clipping should take only last painted slots in ancestor tree which
+			//is not the case for now.
+			HostContainer.redrawClip.AddRectangle (ScreenCoordinates(LastPaintedSlot));
+		}
 		/// <summary>
 		/// Clear chached object and add clipping region in redraw list of interface
 		/// </summary>
@@ -466,31 +496,12 @@ namespace Crow
 				HostContainer.gobjsToRedraw.Add (this);
 		}
 
-		/// <summary>
-		/// keep last slot components for each layouting pass to track
-		/// changes and trigger update of other component accordingly
-		/// </summary>
-		public Rectangle LastSlots;
-		/// <summary>
-		/// keep last slot painted on screen to clear traces if moved or resized
-		/// TODO: we should ensure the whole parsed widget tree is the last painted
-		/// version to clear effective oldslot if parents have been moved or resized.
-		/// IDEA is to add a ScreenCoordinates function that use only lastPaintedSlots
-		/// </summary>
-		public Rectangle LastPaintedSlot;
-
-		public virtual void registerClipRect()
-		{
-			HostContainer.redrawClip.AddRectangle (ScreenCoordinates(Slot));
-			//this clipping should take only last painted slots in ancestor tree which
-			//is not the case for now.
-			HostContainer.redrawClip.AddRectangle (ScreenCoordinates(LastPaintedSlot));
-		}
+		#region Layouting
 		/// <summary> return size of content + margins </summary>
-		protected virtual Size measureRawSize ()
-		{
+		protected virtual Size measureRawSize () {
 			return Bounds.Size;
 		}
+
 		void deleteLQI(int lt){
 			LinkedListNode<LayoutingQueueItem>[] lqis = this.RegisteredLQINodes.Where (n => (lt & (int)n.Value.LayoutType) > 0).ToArray ();
 			for (int i = 0; i < lqis.Length; i++) {
@@ -712,7 +723,9 @@ namespace Crow
 			if (this.RegisteredLQINodes.Count () <= 0 && bmp == null)
 				this.RegisterForRedraw ();
 		}
+		#endregion
 
+		#region Rendering
 		/// <summary> This is the common overridable drawing routine to create new widget </summary>
 		protected virtual void onDraw(Context gr)
 		{
@@ -772,6 +785,7 @@ namespace Crow
 				ctx.Paint ();
 			}
 		}
+		#endregion
 
         #region Keyboard handling
 		public virtual void onKeyDown(object sender, KeyboardKeyEventArgs e){

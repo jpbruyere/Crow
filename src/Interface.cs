@@ -44,7 +44,7 @@ namespace Crow
 		public static string LineBreak = "\r\n";
 		public static bool FocusOnHover = false;
 		/// <summary> Time to wait in millisecond before starting repeat loop</summary>
-		public static int DeviceRepeatDelay = 1000;
+		public static int DeviceRepeatDelay = 600;
 		/// <summary> Time interval in millisecond between device event repeat</summary>
 		public static int DeviceRepeatInterval = 100;
 		public static bool ReplaceTabsWithSpace = false;

@@ -129,17 +129,6 @@ namespace Crow
 		}
 		protected override Size measureRawSize ()
 		{
-//			Size tmp = new Size ();
-//
-//			foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
-//				tmp.Width = Math.Max (tmp.Width, c.Slot.Right);
-//				tmp.Height = Math.Max (tmp.Height, c.Slot.Bottom);
-//			}
-//
-//			tmp.Width += 2*Margin;
-//			tmp.Height += 2*Margin;
-//
-//			return tmp;
 			return new Size(maxChildrenWidth + 2 * Margin, maxChildrenHeight + 2 * Margin);
 		}
 			
