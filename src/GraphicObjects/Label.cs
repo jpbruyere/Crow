@@ -271,7 +271,17 @@ namespace Crow
 			CurrentColumn += str.Length;
 			NotifyValueChanged ("Text", Text);
 		}
-
+		/// <summary>
+		/// Insert a line break.
+		/// </summary>
+		protected void InsertLineBreak()
+		{
+			lines.Insert(CurrentLine + 1, lines[CurrentLine].Substring(CurrentColumn));
+			lines [CurrentLine] = lines [CurrentLine].Substring (0, CurrentColumn);
+			CurrentLine++;
+			CurrentColumn = 0;
+			NotifyValueChanged ("Text", Text);
+		}
 		#region GraphicObject overrides
 		[XmlAttributeAttribute()][DefaultValue(-1)]
 		public override int Width {

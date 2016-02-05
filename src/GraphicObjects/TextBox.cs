@@ -97,7 +97,10 @@ namespace Crow
 				break;
 			case Key.Enter:
 			case Key.KeypadEnter:
-				OnTextChanged(this,new TextChangeEventArgs(Text));
+				if (Multiline)
+					this.InsertLineBreak ();
+				else
+					OnTextChanged(this,new TextChangeEventArgs(Text));
 				break;
 			case Key.Escape:
 				Text = "";
@@ -195,6 +198,10 @@ namespace Crow
 
 				break;
 			}
+			if (Width < 0)
+				RegisterForLayouting ((int)LayoutingType.Width);
+			if (Height < 0)
+				RegisterForLayouting ((int)LayoutingType.Height);
 			registerForGraphicUpdate();
 		}
         #endregion
