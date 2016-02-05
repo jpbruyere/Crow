@@ -916,13 +916,21 @@ namespace Crow
 
 			MethodInfo stringEquals = typeof(string).GetMethod
 				("Compare", new Type[3] {typeof(string), typeof(string), typeof(StringComparison)});
+			Type sourceType = this.GetType();
+			EventInfo ei = typeof(IValueChange).GetEvent("ValueChanged");
+			MethodInfo evtInvoke = ei.EventHandlerType.GetMethod ("Invoke");
+			ParameterInfo[] evtParams = evtInvoke.GetParameters ();
+			Type handlerArgsType = evtParams [1].ParameterType;
+			Type[] args = {typeof(object), typeof(object),handlerArgsType};
+			FieldInfo fiNewValue = typeof(ValueChangeEventArgs).GetField("NewValue");
+			FieldInfo fiMbName = typeof(ValueChangeEventArgs).GetField("MemberName");
+
 			//group;only one dynMethods by target (valuechanged event source)
 			//changed value name tested in switch
 			IEnumerable<Binding[]> groupedByTarget = resolved.GroupBy (g => g.Target.Instance, g => g, (k, g) => g.ToArray ());
 			foreach (Binding[] grouped in groupedByTarget) {
 				int i = 0;
 				Type targetType = grouped[0].Target.Instance.GetType();
-				Type sourceType = this.GetType();
 
 				DynamicMethod dm = null;
 				ILGenerator il = null;
@@ -931,14 +939,9 @@ namespace Crow
 				System.Reflection.Emit.Label endMethod = new System.Reflection.Emit.Label();
 
 				#region Retrieve EventHandler parameter type
-				EventInfo ei = targetType.GetEvent ("ValueChanged");
+				//EventInfo ei = targetType.GetEvent ("ValueChanged");
 				//no dynamic update if ValueChanged interface is not implemented
-				if (ei != null){
-					MethodInfo evtInvoke = ei.EventHandlerType.GetMethod ("Invoke");
-					ParameterInfo[] evtParams = evtInvoke.GetParameters ();
-					Type handlerArgsType = evtParams [1].ParameterType;
-
-					Type[] args = {typeof(object), typeof(object),handlerArgsType};
+				if (targetType.GetInterfaces().Contains(typeof(IValueChange))){
 					dm = new DynamicMethod(grouped[0].NewDynMethodId,
 						MethodAttributes.Family | MethodAttributes.FamANDAssem | MethodAttributes.NewSlot,
 						CallingConventions.Standard,
@@ -960,12 +963,10 @@ namespace Crow
 					//il.Emit(OpCodes.Isinst, sourceType);
 					//push new value onto stack
 					il.Emit(OpCodes.Ldarg_2);
-					FieldInfo fiNewValue = typeof(ValueChangeEventArgs).GetField("NewValue");
 					il.Emit(OpCodes.Ldfld, fiNewValue);
 					il.Emit(OpCodes.Stloc_1);
 					//push name 
 					il.Emit(OpCodes.Ldarg_2);
-					FieldInfo fiMbName = typeof(ValueChangeEventArgs).GetField("MemberName");
 					il.Emit(OpCodes.Ldfld, fiMbName);
 					il.Emit(OpCodes.Stloc_0);
 					il.Emit(OpCodes.Ldloc_0);
