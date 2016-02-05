@@ -27,13 +27,9 @@ namespace Crow
 		internal int maxChildrenHeight = 0;
 
         bool _multiSelect = false;
-		bool _caching = false;
 		List<GraphicObject> children = new List<GraphicObject>();
 
         public GraphicObject activeWidget;
-
-
-
 
         public virtual List<GraphicObject> Children {
 			get { return children; }
@@ -43,23 +39,9 @@ namespace Crow
         public bool MultiSelect
         {
             get { return _multiSelect; }
-            set { 
-				if (value == _multiSelect)
-					return;
-				_multiSelect = value; 
-				NotifyValueChanged ("MultiSelect", _multiSelect);
-			}
+            set { _multiSelect = value; }
         }
-		[XmlAttributeAttribute()][DefaultValue(true)]
-		public bool Caching {
-			get { return _caching; }
-			set {
-				if (value == _caching)
-					return;
-				_caching = value; 
-				NotifyValueChanged ("Caching", _multiSelect);
-			}
-		}			
+			
 			
         public virtual T addChild<T>(T child)
         {

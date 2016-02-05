@@ -1,11 +1,17 @@
 ﻿<Properties GitUserInfo="UsingGIT" StartupItem="Tests/Tests.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|Linux_x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="src/GraphicObjects/Group.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Tests/GOLIBTests.cs">
     <Files>
-      <File FileName="Tests/Interfaces/4.crow" Line="371" Column="19" />
-      <File FileName="Tests/GOLIBTests.cs" Line="40" Column="6" />
-      <File FileName="src/GraphicObjects/Group.cs" Line="247" Column="31" />
-      <File FileName="src/GraphicObjects/GraphicObject.cs" Line="462" Column="22" />
+      <File FileName="Tests/GOLIBTests.cs" Line="98" Column="2" />
+      <File FileName="src/GraphicObjects/GraphicObject.cs" Line="538" Column="3" />
+      <File FileName="src/GraphicObjects/Group.cs" Line="197" Column="1" />
+      <File FileName="src/GraphicObjects/PrivateContainer.cs" Line="127" Column="1" />
+      <File FileName="src/OpenTKGameWindow.cs" Line="328" Column="10" />
+      <File FileName="src/Rectangles.cs" Line="90" Column="21" />
+      <File FileName="src/GraphicObjects/Scroller.cs" Line="196" Column="1" />
+      <File FileName="src/LayoutingQueue.cs" Line="30" Column="4" />
+      <File FileName="src/Interface.cs" Line="56" Column="1" />
+      <File FileName="UnitTest/NUnitCrowWindow.cs" Line="163" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

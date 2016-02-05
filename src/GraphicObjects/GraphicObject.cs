@@ -79,7 +79,6 @@ namespace Crow
 		HorizontalAlignment _horizontalAlignment = HorizontalAlignment.Center;
 		Size _maximumSize = "0;0";
 		Size _minimumSize = "0;0";
-		bool isRegisteredForRepaint = false;
 		#endregion
 
 		#region public fields
@@ -460,16 +459,11 @@ namespace Crow
 			//test if this speed up a lot to cancel clipping for an uncached group
 			Group p = Parent as Group;
 			if (p != null) {
-				if (p.bmp == null || !p.Caching) {
-					p.RegisterForRedraw ();	
+				if (p.bmp == null)
 					return;
-				}
 			}
-			if (HostContainer == null || isRegisteredForRepaint)
-				return;
-
-			HostContainer.gobjsToRedraw.Add (this);
-			isRegisteredForRepaint = true;
+			if (HostContainer != null)
+				HostContainer.gobjsToRedraw.Add (this);
 		}
 
 		/// <summary>
@@ -491,7 +485,6 @@ namespace Crow
 			//this clipping should take only last painted slots in ancestor tree which
 			//is not the case for now.
 			HostContainer.redrawClip.AddRectangle (ScreenCoordinates(LastPaintedSlot));
-			isRegisteredForRepaint = false;
 		}
 		/// <summary> return size of content + margins </summary>
 		protected virtual Size measureRawSize ()
