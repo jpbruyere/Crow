@@ -565,44 +565,12 @@ namespace Crow
 			
 			switch (layoutType) {
 			case LayoutingType.Width:				
-				if (Parent.getBounds ().Width < 0) {
-					Group gw = Parent as Group;
-					if (gw != null) {
-						if (Slot.Width > gw.maxChildrenWidth)
-							gw.maxChildrenWidth = Slot.Width;
-					}
-					this.Parent.RegisterForLayouting ((int)LayoutingType.Width);
-				}else if (Width != 0) //update position in parent
+				if (Width != 0 && Parent.getBounds().Width >=0) //update position in parent
 					this.RegisterForLayouting ((int)LayoutingType.X);
-				GenericStack gsw = Parent as GenericStack;
-				if (gsw == null)
-					break;	
-				if ((Parent as GenericStack).Orientation == Orientation.Horizontal) {
-//					ulong idx = (ulong)gsw.Children.IndexOf (this);
-//					if (idx < gsw.stackingUpdateStartIndex)
-//						gsw.stackingUpdateStartIndex = idx;
-					this.Parent.RegisterForLayouting ((int)LayoutingType.PositionChildren);
-				}
 				break;
 			case LayoutingType.Height:
-				if (Parent.getBounds ().Height < 0) {
-					Group gh = Parent as Group;
-					if (gh != null) {
-						if (Slot.Width > gh.maxChildrenHeight)
-							gh.maxChildrenHeight = Slot.Height;
-					}
-					this.Parent.RegisterForLayouting ((int)LayoutingType.Height);
-				}else if (Height != 0) //update position in parent
+				if (Height != 0 && Parent.getBounds().Height >=0) //update position in parent
 					this.RegisterForLayouting ((int)LayoutingType.Y);
-				GenericStack gsh = Parent as GenericStack;
-				if (gsh==null)
-					break;				
-				if (gsh.Orientation == Orientation.Vertical) {
-//					ulong idx = (ulong)gsh.Children.IndexOf (this);
-//					if (idx < gsh.stackingUpdateStartIndex)
-//						gsh.stackingUpdateStartIndex = idx;
-					this.Parent.RegisterForLayouting ((int)LayoutingType.PositionChildren);
-				}
 				break;
 			}
 			LayoutChanged.Raise (this, new LayoutChangeEventArgs (layoutType));
@@ -901,7 +869,8 @@ namespace Crow
 			#if DEBUG_BINDING
 			Debug.WriteLine ("ResolveBinding => " + this.ToString ());
 			#endif
-			List<Binding> resolved = new List<Binding> ();
+
+			Dictionary<object,List<Binding>> resolved = new Dictionary<object, List<Binding>>();
 			foreach (Binding b in Bindings) {
 				if (!string.IsNullOrEmpty (b.DynMethodId))
 					continue;
@@ -925,7 +894,12 @@ namespace Crow
 					addHandler.Invoke (this, new object[] { del });
 					continue;
 				}
-				resolved.Add (b);				
+				List<Binding> bindings = null;
+				if (!resolved.TryGetValue (b.Target.Instance, out bindings)) {
+					bindings = new List<Binding> ();
+					resolved [b.Target.Instance] = bindings;
+				}
+				bindings.Add (b);
 			}
 
 			MethodInfo stringEquals = typeof(string).GetMethod
@@ -941,8 +915,8 @@ namespace Crow
 
 			//group;only one dynMethods by target (valuechanged event source)
 			//changed value name tested in switch
-			IEnumerable<Binding[]> groupedByTarget = resolved.GroupBy (g => g.Target.Instance, g => g, (k, g) => g.ToArray ());
-			foreach (Binding[] grouped in groupedByTarget) {
+			//IEnumerable<Binding[]> groupedByTarget = resolved.GroupBy (g => g.Target.Instance, g => g, (k, g) => g.ToArray ());
+			foreach (List<Binding> grouped in resolved.Values) {
 				int i = 0;
 				Type targetType = grouped[0].Target.Instance.GetType();
 
@@ -966,8 +940,8 @@ namespace Crow
 					il = dm.GetILGenerator(256);
 
 					endMethod = il.DefineLabel();
-					jumpTable = new System.Reflection.Emit.Label[grouped.Length];
-					for (i = 0; i < grouped.Length; i++)
+					jumpTable = new System.Reflection.Emit.Label[grouped.Count];
+					for (i = 0; i < grouped.Count; i++)
 						jumpTable [i] = il.DefineLabel ();
 					il.DeclareLocal(typeof(string));
 					il.DeclareLocal(typeof(object));
