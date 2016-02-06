@@ -35,7 +35,11 @@ namespace Crow
 			_object.RegisteredLQINodes.Add(this.AddLast (new LayoutingQueueItem (_lt, _object)));
 		}
 		LinkedListNode<LayoutingQueueItem> searchLqi(ILayoutable go, LayoutingType lt){
-			return go.RegisteredLQINodes.Where(n => n.Value.LayoutType == lt).LastOrDefault();
+			for (int i = 0; i < go.RegisteredLQINodes.Count; i++) {
+				if (go.RegisteredLQINodes [i].Value.LayoutType == lt)
+					return go.RegisteredLQINodes [i];
+			}
+			return null;
 		}
 		public void EnqueueAfterParentSizing (LayoutingType _lt, ILayoutable _object)
 		{
