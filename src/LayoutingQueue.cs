@@ -47,7 +47,7 @@ namespace Crow
 			LinkedListNode<LayoutingQueueItem> parentLqi = searchLqi (_object.Parent, _lt);
 
 			if (parentLqi == null)
-				_object.RegisteredLQINodes.Add(this.AddFirst (lqi));
+				_object.RegisteredLQINodes.Add(this.AddLast (lqi));
 			else
 				_object.RegisteredLQINodes.Add(this.AddAfter (parentLqi, lqi));
 		}
