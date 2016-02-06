@@ -111,7 +111,10 @@ namespace Crow
 		#endregion
 
 		#region ILayoutable
-
+		/// <summary>
+		/// Keep ref's of LQI in queue per GraphicObject, to prevent searching in
+		/// the double linked list which would be very slow.
+		/// </summary>
 		public List<LinkedListNode<LayoutingQueueItem>> RegisteredLQINodes { get; } = new List<LinkedListNode<LayoutingQueueItem>>();
 		//TODO: it would save the recurent cost of a cast in event bubbling if parent type was GraphicObject
 		//		or we could add to the interface the mouse events
@@ -501,12 +504,17 @@ namespace Crow
 		protected virtual Size measureRawSize () {
 			return Bounds.Size;
 		}
-
+		/// <summary>
+		/// Delete all ref's to this LQI (local and inQueue)
+		/// </summary>
 		void deleteLQI(int lt){
-			LinkedListNode<LayoutingQueueItem>[] lqis = this.RegisteredLQINodes.Where (n => (lt & (int)n.Value.LayoutType) > 0).ToArray ();
-			for (int i = 0; i < lqis.Length; i++) {
-				Interface.LayoutingQueue.Remove (lqis [i]);
-				RegisteredLQINodes.Remove (lqis [i]);
+			int i = 0;
+			while (i < RegisteredLQINodes.Count) {
+				if (((int)RegisteredLQINodes [i].Value.LayoutType & lt) > 0) {
+					Interface.LayoutingQueue.Remove (RegisteredLQINodes [i]);
+					RegisteredLQINodes.RemoveAt (i);
+				} else
+					i++;
 			}
 		}
 		/// <summary> clear current layoutingQueue items for object and
