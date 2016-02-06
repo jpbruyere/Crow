@@ -261,18 +261,18 @@ namespace Crow
 			#endif
 			//Debug.WriteLine ("======= Layouting queue start =======");
 
+			while (Interface.RegisteredGOForLayouting.Count > 0){
+				while (Interface.RegisteredGOForLayouting.Count > 0){
+					GraphicObject go = Interface.RegisteredGOForLayouting.Dequeue ();
+					go.EnqueueForLayouting ();
+					go.RegisteredLayoutings = LayoutingType.None;
+				}
 				while (Interface.LayoutingQueue.First != null) {
-//					Stopwatch lqiProcTime = new Stopwatch ();
-//					lqiProcTime.Start ();
 					LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
 					lqi.ProcessLayouting ();
-//					lqiProcTime.Stop ();
-//					if (lqiProcTime.ElapsedMilliseconds > 10) {
-//						Debug.WriteLine("lqi {2}: {0} ticks \t, {1} ms",
-//							updateTime.ElapsedTicks,
-//							updateTime.ElapsedMilliseconds, lqi.ToString());
-//					}
 				}
+			}
+
 			#if MEASURE_TIME
 			layoutTime.Stop ();
 			#endif

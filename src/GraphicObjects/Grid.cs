@@ -125,11 +125,11 @@ namespace Crow
 			}
 		}
 
-		public override void RegisterForLayouting (int layoutType)
+		public override void EnqueueForLayouting ()
 		{			
-			base.RegisterForLayouting (layoutType);
+			base.EnqueueForLayouting ();
 
-			if ((layoutType & (int)LayoutingType.PositionChildren) > 0)
+			if (RegisteredLayoutings.HasFlag(LayoutingType.PositionChildren))
 				Interface.LayoutingQueue.Enqueue (LayoutingType.PositionChildren, this);			
 		}
 		public override void UpdateLayout (LayoutingType layoutType)

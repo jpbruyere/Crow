@@ -54,6 +54,7 @@ namespace Crow
 		public static int BorderThreshold = 5;
 
 		public static LayoutingQueue LayoutingQueue = new LayoutingQueue ();
+		public static Queue<GraphicObject> RegisteredGOForLayouting = new Queue<GraphicObject>();
 
 		#region Load/Save
 		//internal static List<DynAttribute> Bindings;

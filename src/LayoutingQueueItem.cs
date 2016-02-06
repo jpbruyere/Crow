@@ -26,6 +26,7 @@ namespace Crow
 {
 	public enum LayoutingType
 	{
+		None = 0x00,
 		X = 0x01,
 		Y = 0x02,
 		Width = 0x04,

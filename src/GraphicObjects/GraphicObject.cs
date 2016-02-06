@@ -509,9 +509,16 @@ namespace Crow
 				RegisteredLQINodes.Remove (lqis [i]);
 			}
 		}
+		public LayoutingType RegisteredLayoutings = 0;
+
+		public virtual void RegisterForLayouting(int layoutType){
+			if (RegisteredLayoutings == LayoutingType.None)
+				Interface.RegisteredGOForLayouting.Enqueue (this);
+			RegisteredLayoutings |= (LayoutingType)layoutType;
+		}
 		/// <summary> clear current layoutingQueue items for object and
 		/// trigger a new layouting pass for a layoutType </summary>
-		public virtual void RegisterForLayouting(int layoutType)
+		public virtual void EnqueueForLayouting()
 		{
 			if (Parent == null)
 				return;
@@ -519,8 +526,8 @@ namespace Crow
 			Debug.WriteLine ("RegisterForLayouting => {1}->{0}", layoutType, this.ToString());
 			#endif
 
-			deleteLQI (layoutType);
-			if ((layoutType & (int)LayoutingType.Width) > 0) {
+			//deleteLQI (RegisteredLayoutings);
+			if (RegisteredLayoutings.HasFlag(LayoutingType.Width)) {
 				if (Bounds.Width == 0) //stretch in parent
 						Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Width, this);
 				else if (Bounds.Width < 0) //fit 
@@ -531,7 +538,7 @@ namespace Crow
 							new LayoutingQueueItem (LayoutingType.Width, this)));				
 			}
 
-			if ((layoutType & (int)LayoutingType.Height) > 0) {
+			if (RegisteredLayoutings.HasFlag(LayoutingType.Height)) {
 				if (Bounds.Height == 0) //stretch in parent
 						Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Height, this);
 				else if (Bounds.Height < 0) //fit 
@@ -544,11 +551,11 @@ namespace Crow
 				}
 			}
 
-			if ((layoutType & (int)LayoutingType.X) > 0)
+			if (RegisteredLayoutings.HasFlag(LayoutingType.X))
 					//for x positionning, sizing of parent and this have to be done
 					Interface.LayoutingQueue.EnqueueAfterThisAndParentSizing (LayoutingType.X, this);
 
-			if ((layoutType & (int)LayoutingType.Y) > 0)
+			if (RegisteredLayoutings.HasFlag(LayoutingType.Y))
 					//for x positionning, sizing of parent and this have to be done
 					Interface.LayoutingQueue.EnqueueAfterThisAndParentSizing (LayoutingType.Y, this);
 		}
