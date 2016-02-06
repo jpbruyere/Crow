@@ -60,7 +60,7 @@ namespace Crow
 			IsPopped = false;
 		}
 
-		void _content_LayoutChanged (object sender, LayoutChangeEventArgs e)
+		void _content_LayoutChanged (object sender, LayoutingEventArgs e)
 		{
 			ILayoutable tc = Content.Parent as ILayoutable;
 			if (tc == null)
@@ -166,7 +166,7 @@ namespace Crow
 				if (Content.Parent == null)
 					tc.AddWidget (Content);
 				tc.PutOnTop (Content);
-				_content_LayoutChanged (this, new LayoutChangeEventArgs (LayoutingType.Sizing));
+				_content_LayoutChanged (this, new LayoutingEventArgs (LayoutingType.Sizing));
 			}
 			Pop.Raise (this, e);
 		}

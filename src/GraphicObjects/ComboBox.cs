@@ -281,7 +281,7 @@ namespace Crow
 		{
 			IsPopped = false;
 		}
-		void _overlay_LayoutChanged (object sender, LayoutChangeEventArgs e)
+		void _overlay_LayoutChanged (object sender, LayoutingEventArgs e)
 		{
 			ILayoutable tc = Overlay.Parent as ILayoutable;
 			if (tc == null)

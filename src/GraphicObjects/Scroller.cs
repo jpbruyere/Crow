@@ -100,7 +100,7 @@ namespace Crow
             : base(){}
 
 		#region GraphicObject Overrides
-		void OnChildLayoutChanges (object sender, LayoutChangeEventArgs arg)
+		void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
 			int maxScroll = MaximumScroll;
 			if (_verticalScrolling) {

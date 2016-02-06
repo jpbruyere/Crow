@@ -162,7 +162,7 @@ namespace Crow
 				break;
 			}
 		}
-		public virtual void OnChildLayoutChanges (object sender, LayoutChangeEventArgs arg)
+		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
 			GraphicObject g = sender as GraphicObject;
 			switch (arg.LayoutType) {

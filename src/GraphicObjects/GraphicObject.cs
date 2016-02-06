@@ -174,7 +174,7 @@ namespace Crow
 		public event EventHandler<KeyboardKeyEventArgs> KeyUp;
 		public event EventHandler Focused;
 		public event EventHandler Unfocused;
-		public event EventHandler<LayoutChangeEventArgs> LayoutChanged;
+		public event EventHandler<LayoutingEventArgs> LayoutChanged;
 		#endregion
 
 		#region public properties
@@ -523,7 +523,7 @@ namespace Crow
 			if (Parent == null)
 				return;
 			#if DEBUG_LAYOUTING
-			Debug.WriteLine ("RegisterForLayouting => {1}->{0}", layoutType, this.ToString());
+			Debug.WriteLine ("RegisterForLayouting => {1}->{0}", RegisteredLayoutings.ToString(), this.ToString());
 			#endif
 
 			//deleteLQI (RegisteredLayoutings);
@@ -580,7 +580,7 @@ namespace Crow
 					this.RegisterForLayouting (LayoutingType.Y);
 				break;
 			}
-			LayoutChanged.Raise (this, new LayoutChangeEventArgs (layoutType));
+			LayoutChanged.Raise (this, new LayoutingEventArgs (layoutType));
 		}
 		/// <summary> Update layout component, this is where the computation of alignement
 		/// and size take place </summary>

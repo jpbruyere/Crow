@@ -181,7 +181,7 @@ namespace Crow
 			}else if (layoutType == LayoutingType.Height)
 				this.RegisterForLayouting (LayoutingType.PositionChildren);
 		}
-		public override void OnChildLayoutChanges (object sender, LayoutChangeEventArgs arg)
+		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
 			base.OnChildLayoutChanges (sender, arg);
 
