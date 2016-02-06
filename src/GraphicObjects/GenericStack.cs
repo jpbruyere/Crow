@@ -96,13 +96,15 @@ namespace Crow
 				foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
 					c.Slot.X = d;
 					d += c.Slot.Width + Spacing;
-					c.RegisterForLayouting (LayoutingType.Y);
+					if (c.Height != 0)
+						c.RegisterForLayouting (LayoutingType.Y);
 				}
 			} else {
 				foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
 					c.Slot.Y = d;
 					d += c.Slot.Height + Spacing;
-					c.RegisterForLayouting (LayoutingType.X);
+					if (c.Width != 0)
+						c.RegisterForLayouting (LayoutingType.X);
 				}
 			}
 			bmp = null;
