@@ -8,6 +8,7 @@
 				<RadioButton  Caption="Radio 1" Background="Red" Width="0"/>
 				<RadioButton  Caption="Radio 2" IsChecked="true" />
 				<RadioButton  Caption="Radio 3" />
+				<RadioButton  Caption="Radio 1" Background="SkyBlue" Width="0"/>
 			</VerticalStack>
 		</GroupBox>
 		<HorizontalStack Width="0" Height="-1" Margin="10" CornerRadius="5" 

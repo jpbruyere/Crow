@@ -37,6 +37,8 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"0.crow",
+			"testExpandable.goml",
 			"5.crow",
 			"testSpinner.goml",
 			"testScrollbar.goml",
@@ -49,7 +51,6 @@ namespace test
 			"testBorder.goml",
 //			"testButton2.crow",
 			"test2WayBinding.crow",
-			"0.crow",
 			"fps.goml",
 			"testTextBox.crow",
 			"testImage.crow",
@@ -60,7 +61,6 @@ namespace test
 //			"testCombobox.goml",
 			"testWindow3.goml",
 			"testWindow.goml",
-			"testExpandable.goml",
 			"testCheckbox.goml",
 			"testPopper.goml",
 			"testLabel.goml",

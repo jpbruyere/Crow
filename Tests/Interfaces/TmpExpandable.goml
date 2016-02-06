@@ -1,0 +1,12 @@
+﻿<?xml version="1.0"?>
+<!--<VerticalStack Height="{../TemplatedHeight}" Width="{../TemplatedWidth}" MouseClick="../onMouseClick">
+	<Label Text="{../../Caption}" Width="{../../TemplatedWidth}"/>
+	<Container Name="Content" Visible="false" Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}"/>
+</VerticalStack>-->
+<Group BorderWidth="1" Foreground="LightGray" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}" 
+		MouseClick="../onMouseClick">
+	<VerticalStack Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}">
+		<Label Text="{../../../Caption}" Width="{../../../TemplatedWidth}"/>
+		<Container Name="Content" Visible="false" Height="{../../../TemplatedHeight}" Width="{../../../TemplatedWidth}"/>
+	</VerticalStack>
+</Group>

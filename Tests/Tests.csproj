@@ -234,6 +234,7 @@
     <EmbeddedResource Include="Interfaces\colorItem.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Interfaces\TmpExpandable.goml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">
