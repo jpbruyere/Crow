@@ -512,6 +512,10 @@ namespace Crow
 		public LayoutingType RegisteredLayoutings = 0;
 
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
+			if (Width == 0)
+				layoutType &= (~LayoutingType.X);
+			if (Height == 0)
+				layoutType &= (~LayoutingType.Y);
 			//Prevent child repositionning in a stack
 			//TODO:this should be done inside GenericStack
 			GenericStack gs = Parent as GenericStack;
@@ -520,11 +524,9 @@ namespace Crow
 					layoutType &= (~LayoutingType.X);
 				else
 					layoutType &= (~LayoutingType.Y);
-
-				if (layoutType == LayoutingType.None)
-					return;
 			}
-
+			if (layoutType == LayoutingType.None)
+				return;
 			if (RegisteredLayoutings == LayoutingType.None)
 				Interface.RegisteredGOForLayouting.Enqueue (this);
 			RegisteredLayoutings |= (LayoutingType)layoutType;
