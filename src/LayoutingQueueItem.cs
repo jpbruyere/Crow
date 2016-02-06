@@ -24,7 +24,7 @@ using System.Collections.Generic;
 
 namespace Crow
 {
-	public enum LayoutingType
+	public enum LayoutingType : byte
 	{
 		None = 0x00,
 		X = 0x01,

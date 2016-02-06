@@ -31,13 +31,13 @@ namespace Crow
 		public override T addChild<T> (T child)
 		{
 			T tmp = base.addChild (child);
-			this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+			this.RegisterForLayouting (LayoutingType.PositionChildren);
 			return tmp;
 		}
 		public override void removeChild (GraphicObject child)
 		{
 			base.removeChild (child);
-			this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+			this.RegisterForLayouting (LayoutingType.PositionChildren);
 		}
 
 		#region Public Properties
@@ -96,13 +96,13 @@ namespace Crow
 				foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
 					c.Slot.X = d;
 					d += c.Slot.Width + Spacing;
-					c.RegisterForLayouting ((int)LayoutingType.Y);
+					c.RegisterForLayouting (LayoutingType.Y);
 				}
 			} else {
 				foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
 					c.Slot.Y = d;
 					d += c.Slot.Height + Spacing;
-					c.RegisterForLayouting ((int)LayoutingType.X);
+					c.RegisterForLayouting (LayoutingType.X);
 				}
 			}
 			bmp = null;
@@ -177,9 +177,9 @@ namespace Crow
 
 			if (Orientation == Orientation.Horizontal){
 				if(layoutType == LayoutingType.Width)
-					this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+					this.RegisterForLayouting (LayoutingType.PositionChildren);
 			}else if (layoutType == LayoutingType.Height)
-				this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+				this.RegisterForLayouting (LayoutingType.PositionChildren);
 		}
 		public override void OnChildLayoutChanges (object sender, LayoutChangeEventArgs arg)
 		{
@@ -194,15 +194,15 @@ namespace Crow
 			case LayoutingType.Width:
 				if (Orientation == Orientation.Horizontal) {
 					if (this.Bounds.Width < 0)
-						this.RegisterForLayouting ((int)LayoutingType.Width);
-					this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+						this.RegisterForLayouting (LayoutingType.Width);
+					this.RegisterForLayouting (LayoutingType.PositionChildren);
 				}
 				break;
 			case LayoutingType.Height:
 				if (Orientation == Orientation.Vertical) {
 					if (this.Bounds.Height < 0)
-						this.RegisterForLayouting ((int)LayoutingType.Height);
-					this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+						this.RegisterForLayouting (LayoutingType.Height);
+					this.RegisterForLayouting (LayoutingType.PositionChildren);
 				}
 				break;
 			}

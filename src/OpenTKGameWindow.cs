@@ -76,7 +76,7 @@ namespace Crow
 			g.Parent = this;
 			GraphicObjects.Insert (0, g);
 
-			g.RegisterForLayouting ((int)LayoutingType.Sizing);
+			g.RegisterForLayouting (LayoutingType.Sizing);
 		}
 		public void DeleteWidget(GraphicObject g)
 		{
@@ -408,7 +408,7 @@ namespace Crow
 			base.OnResize (e);
 			createContext ();
 			foreach (GraphicObject g in GraphicObjects) {
-				g.RegisterForLayouting ((int)LayoutingType.All);
+				g.RegisterForLayouting (LayoutingType.All);
 				//g.registerForGraphicUpdate();
 			}
 		}
@@ -554,7 +554,7 @@ namespace Crow
 
 		//TODO:uneeded list, should be removed
 		public List<LinkedListNode<LayoutingQueueItem>> RegisteredLQINodes { get; } = new List<LinkedListNode<LayoutingQueueItem>>();
-		public void RegisterForLayouting (int layoutType) { throw new NotImplementedException (); }
+		public void RegisterForLayouting (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public void UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public Rectangle ContextCoordinates (Rectangle r)
 		{

@@ -66,7 +66,7 @@ namespace Crow
 			if (tc == null)
 				return;
 			Rectangle r = this.ScreenCoordinates (this.Slot);
-			if (((int)e.LayoutType & (int)LayoutingType.Width) > 0) {
+			if (e.LayoutType.HasFlag(LayoutingType.Width)) {
 				if (Content.Slot.Width < tc.ClientRectangle.Width) {
 					if (r.Left + Content.Slot.Width > tc.ClientRectangle.Right)
 						Content.Left = tc.ClientRectangle.Right - Content.Slot.Width;
@@ -75,7 +75,7 @@ namespace Crow
 				} else
 					Content.Left = 0;
 			}
-			if (((int)e.LayoutType & (int)LayoutingType.Height) > 0) {
+			if (e.LayoutType.HasFlag(LayoutingType.Height)) {
 				if (Content.Slot.Height < tc.ClientRectangle.Height) {
 					if (r.Bottom + Content.Slot.Height > tc.ClientRectangle.Bottom)
 						Content.Top = r.Top - Content.Slot.Height;

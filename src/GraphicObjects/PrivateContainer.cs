@@ -53,7 +53,7 @@ namespace Crow
 
 			if (child != null) {
 				child.LayoutChanged -= OnChildLayoutChanges;
-				this.RegisterForLayouting ((int)LayoutingType.Sizing);
+				this.RegisterForLayouting (LayoutingType.Sizing);
 				child.Parent = null;
 			}
 
@@ -62,7 +62,7 @@ namespace Crow
 			if (child != null) {
 				child.Parent = this;
 				child.LayoutChanged += OnChildLayoutChanges;
-				child.RegisterForLayouting ((int)LayoutingType.Sizing);
+				child.RegisterForLayouting (LayoutingType.Sizing);
 			}
 
 			return (T)_child;
@@ -104,17 +104,17 @@ namespace Crow
 			case LayoutingType.Width:								
 				if (child != null) {
 					if (child.getBounds ().Width == 0)
-						child.RegisterForLayouting ((int)LayoutingType.Width);
+						child.RegisterForLayouting (LayoutingType.Width);
 					else
-						child.RegisterForLayouting ((int)LayoutingType.X);
+						child.RegisterForLayouting (LayoutingType.X);
 				}
 				break;
 			case LayoutingType.Height:
 				if (child != null) {
 					if (child.getBounds ().Height == 0)
-						child.RegisterForLayouting ((int)LayoutingType.Height);
+						child.RegisterForLayouting (LayoutingType.Height);
 					else
-						child.RegisterForLayouting ((int)LayoutingType.Y);
+						child.RegisterForLayouting (LayoutingType.Y);
 				}
 				break;
 			}							
@@ -129,11 +129,11 @@ namespace Crow
 				break;
 			case LayoutingType.Width:
 				if (this.Bounds.Width < 0)
-					this.RegisterForLayouting ((int)LayoutingType.Width);
+					this.RegisterForLayouting (LayoutingType.Width);
 				break;
 			case LayoutingType.Height:
 				if (this.Bounds.Height < 0)
-					this.RegisterForLayouting ((int)LayoutingType.Height);
+					this.RegisterForLayouting (LayoutingType.Height);
 				break;
 			}
 		}

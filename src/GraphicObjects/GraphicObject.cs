@@ -219,7 +219,7 @@ namespace Crow
 
 				Bounds.X = value;
 				NotifyValueChanged ("Left", Bounds.X);
-				this.RegisterForLayouting ((int)LayoutingType.X);
+				this.RegisterForLayouting (LayoutingType.X);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
@@ -231,7 +231,7 @@ namespace Crow
 
 				Bounds.Y = value;
 				NotifyValueChanged ("Top", Bounds.Y);
-				this.RegisterForLayouting ((int)LayoutingType.Y);
+				this.RegisterForLayouting (LayoutingType.Y);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
@@ -243,7 +243,7 @@ namespace Crow
 
 				Bounds.Width = value;
 				NotifyValueChanged ("Width", Bounds.Width);
-				this.RegisterForLayouting ((int)LayoutingType.Width);
+				this.RegisterForLayouting (LayoutingType.Width);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
@@ -255,7 +255,7 @@ namespace Crow
 
 				Bounds.Height = value;
 				NotifyValueChanged ("Height", Bounds.Height);
-				this.RegisterForLayouting ((int)LayoutingType.Height);
+				this.RegisterForLayouting (LayoutingType.Height);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
@@ -371,7 +371,7 @@ namespace Crow
 				if (this.Contains (HostContainer.hoverWidget))
 					HostContainer.hoverWidget = null;
 				if (Parent is GenericStack)
-					Parent.RegisterForLayouting ((int)LayoutingType.Sizing | (int)LayoutingType.PositionChildren);
+					Parent.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.PositionChildren);
 
 				NotifyValueChanged ("Visible", _isVisible);
 			}
@@ -511,7 +511,7 @@ namespace Crow
 		}
 		public LayoutingType RegisteredLayoutings = 0;
 
-		public virtual void RegisterForLayouting(int layoutType){
+		public virtual void RegisterForLayouting(LayoutingType layoutType){
 			if (RegisteredLayoutings == LayoutingType.None)
 				Interface.RegisteredGOForLayouting.Enqueue (this);
 			RegisteredLayoutings |= (LayoutingType)layoutType;
@@ -573,11 +573,11 @@ namespace Crow
 			switch (layoutType) {
 			case LayoutingType.Width:				
 				if (Width != 0 && Parent.getBounds().Width >=0) //update position in parent
-					this.RegisterForLayouting ((int)LayoutingType.X);
+					this.RegisterForLayouting (LayoutingType.X);
 				break;
 			case LayoutingType.Height:
 				if (Height != 0 && Parent.getBounds().Height >=0) //update position in parent
-					this.RegisterForLayouting ((int)LayoutingType.Y);
+					this.RegisterForLayouting (LayoutingType.Y);
 				break;
 			}
 			LayoutChanged.Raise (this, new LayoutChangeEventArgs (layoutType));

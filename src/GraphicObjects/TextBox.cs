@@ -199,9 +199,9 @@ namespace Crow
 				break;
 			}
 			if (Width < 0)
-				RegisterForLayouting ((int)LayoutingType.Width);
+				RegisterForLayouting (LayoutingType.Width);
 			if (Height < 0)
-				RegisterForLayouting ((int)LayoutingType.Height);
+				RegisterForLayouting (LayoutingType.Height);
 			registerForGraphicUpdate();
 		}
         #endregion

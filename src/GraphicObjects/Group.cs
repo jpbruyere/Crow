@@ -50,7 +50,7 @@ namespace Crow
 			GraphicObject g = child as GraphicObject;
             Children.Add(g);
             g.Parent = this as GraphicObject;            
-			g.RegisterForLayouting ((int)LayoutingType.Sizing);
+			g.RegisterForLayouting (LayoutingType.Sizing);
 			g.LayoutChanged += OnChildLayoutChanges;
             return (T)child;
         }
@@ -60,7 +60,7 @@ namespace Crow
 			child.ClearBinding ();
 			child.Parent = null;
             Children.Remove(child);
-			this.RegisterForLayouting ((int)LayoutingType.Sizing);
+			this.RegisterForLayouting (LayoutingType.Sizing);
         }
 		public virtual void ClearChildren()
 		{
@@ -73,7 +73,7 @@ namespace Crow
 				Children.RemoveAt(cpt-1);
 				cpt = children.Count;
 			}
-			this.RegisterForLayouting ((int)LayoutingType.Sizing);
+			this.RegisterForLayouting (LayoutingType.Sizing);
 			ChildrenCleared.Raise (this, new EventArgs ());
 		}
 		public void putWidgetOnTop(GraphicObject w)
@@ -147,17 +147,17 @@ namespace Crow
 			case LayoutingType.Width:
 				foreach (GraphicObject c in Children.Where(ch => ch.Visible)) {
 					if (c.getBounds ().Width == 0)
-						c.RegisterForLayouting ((int)LayoutingType.Width);
+						c.RegisterForLayouting (LayoutingType.Width);
 					else
-						c.RegisterForLayouting ((int)LayoutingType.X);					
+						c.RegisterForLayouting (LayoutingType.X);					
 				}
 				break;
 			case LayoutingType.Height:
 				foreach (GraphicObject c in Children.Where(ch => ch.Visible)) {
 					if (c.getBounds ().Height == 0)
-						c.RegisterForLayouting ((int)LayoutingType.Height);
+						c.RegisterForLayouting (LayoutingType.Height);
 					else
-						c.RegisterForLayouting ((int)LayoutingType.Y);
+						c.RegisterForLayouting (LayoutingType.Y);
 				}
 				break;
 			}
@@ -175,7 +175,7 @@ namespace Crow
 					maxChildrenWidth = g.Slot.Width;
 					largestChild = g;
 					if (this.Bounds.Width < 0)
-						this.RegisterForLayouting ((int)LayoutingType.Width);
+						this.RegisterForLayouting (LayoutingType.Width);
 				} else if (g == largestChild) {
 					//search for the new largest child
 					largestChild = null;
@@ -187,7 +187,7 @@ namespace Crow
 						}
 					}
 					if (this.Bounds.Width < 0)
-						this.RegisterForLayouting ((int)LayoutingType.Width);
+						this.RegisterForLayouting (LayoutingType.Width);
 				}
 				break;
 			case LayoutingType.Height:
@@ -195,7 +195,7 @@ namespace Crow
 					maxChildrenHeight = g.Slot.Height;
 					tallestChild = g;
 					if (this.Bounds.Height < 0)
-						this.RegisterForLayouting ((int)LayoutingType.Height);
+						this.RegisterForLayouting (LayoutingType.Height);
 				} else if (g == tallestChild) {
 					//search for the new tallest child
 					tallestChild = null;
@@ -207,7 +207,7 @@ namespace Crow
 						}
 					}
 					if (this.Bounds.Height < 0)
-						this.RegisterForLayouting ((int)LayoutingType.Height);
+						this.RegisterForLayouting (LayoutingType.Height);
 				}
 				break;
 			}
