@@ -1,17 +1,15 @@
 ﻿<Properties GitUserInfo="UsingGIT" StartupItem="Tests/Tests.csproj">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|Linux_x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Tests/GOLIBTests.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|Linux_x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="src/GraphicObjects/Group.cs">
     <Files>
-      <File FileName="Tests/GOLIBTests.cs" Line="98" Column="2" />
-      <File FileName="src/GraphicObjects/GraphicObject.cs" Line="538" Column="3" />
-      <File FileName="src/GraphicObjects/Group.cs" Line="197" Column="1" />
-      <File FileName="src/GraphicObjects/PrivateContainer.cs" Line="127" Column="1" />
-      <File FileName="src/OpenTKGameWindow.cs" Line="328" Column="10" />
-      <File FileName="src/Rectangles.cs" Line="90" Column="21" />
-      <File FileName="src/GraphicObjects/Scroller.cs" Line="196" Column="1" />
-      <File FileName="src/LayoutingQueue.cs" Line="30" Column="4" />
-      <File FileName="src/Interface.cs" Line="56" Column="1" />
-      <File FileName="UnitTest/NUnitCrowWindow.cs" Line="163" Column="1" />
+      <File FileName="src/GraphicObjects/GraphicObject.cs" Line="180" Column="41" />
+      <File FileName="src/GraphicObjects/Grid.cs" Line="1" Column="1" />
+      <File FileName="src/OpenTKGameWindow.cs" Line="1" Column="1" />
+      <File FileName="src/LayoutingQueueItem.cs" Line="1" Column="1" />
+      <File FileName="src/GraphicObjects/ILayoutable.cs" Line="1" Column="1" />
+      <File FileName="src/GraphicObjects/ComboBox.cs" Line="1" Column="1" />
+      <File FileName="src/GraphicObjects/GraduatedSlider.cs" Line="1" Column="1" />
+      <File FileName="src/GraphicObjects/Group.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
@@ -34,6 +32,7 @@
     <Watch file="src/GraphicObjects/GraphicObject.cs" line="394" offsetX="672" offsetY="1844" expression="pi.Name" liveUpdate="False" />
     <Watch file="src/GraphicObjects/GenericStack.cs" line="108" offsetX="495" offsetY="1377" expression="layoutType" liveUpdate="False" />
     <Watch file="src/Colors.cs" line="148" offsetX="367" offsetY="561" expression="R" liveUpdate="False" />
+    <Watch file="src/GraphicObjects/GraphicObject.cs" line="522" offsetX="531" offsetY="6462" expression="layoutType" liveUpdate="False" />
   </MonoDevelop.Ide.DebuggingService.PinnedWatches>
   <AuthorInfo Name="Jean-Philippe Bruyère" Email="jp_bruyere@hotmail.com" Copyright="jp" Company="" Trademark="" />
 </Properties>
