@@ -125,22 +125,23 @@ namespace Crow
 			}
 		}
 
-		public override void EnqueueForLayouting ()
-		{			
-			base.EnqueueForLayouting ();
 
-			if (RegisteredLayoutings.HasFlag(LayoutingType.PositionChildren))
-				Interface.LayoutingQueue.Enqueue (LayoutingType.PositionChildren, this);			
-		}
-		public override void UpdateLayout (LayoutingType layoutType)
-		{            
+		public override bool UpdateLayout (LayoutingType layoutType)
+		{
+			RegisteredLayoutings &= (~layoutType);
+
 			if (layoutType == LayoutingType.PositionChildren) {				
+
 				ComputeChildrenPositions ();
+
 				//if no layouting remains in queue for item, registre for redraw
-				if (RegisteredLQINodes.Count () <= 0 && bmp==null)
+				if (RegisteredLayoutings == LayoutingType.None && bmp==null)
 					this.RegisterForRedraw ();
-			}else
-				base.UpdateLayout(layoutType);
+				
+				return true;
+			}
+
+			return base.UpdateLayout(layoutType);
 		}
 		#endregion
 

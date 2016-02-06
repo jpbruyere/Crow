@@ -64,6 +64,7 @@ namespace Crow
 		#endregion
 
 		#region private fields
+		LayoutingType registeredLayoutings = LayoutingType.None;
 		ILayoutable _parent;
 		string _name = "unamed";
 		Fill _background = Color.Transparent;
@@ -111,8 +112,7 @@ namespace Crow
 		#endregion
 
 		#region ILayoutable
-
-		public List<LinkedListNode<LayoutingQueueItem>> RegisteredLQINodes { get; } = new List<LinkedListNode<LayoutingQueueItem>>();
+		[XmlIgnore]public LayoutingType RegisteredLayoutings { get { return registeredLayoutings; } set { registeredLayoutings = value; } }
 		//TODO: it would save the recurent cost of a cast in event bubbling if parent type was GraphicObject
 		//		or we could add to the interface the mouse events
 		/// <summary>
@@ -501,21 +501,14 @@ namespace Crow
 		protected virtual Size measureRawSize () {
 			return Bounds.Size;
 		}
-
-		void deleteLQI(int lt){
-			LinkedListNode<LayoutingQueueItem>[] lqis = this.RegisteredLQINodes.Where (n => (lt & (int)n.Value.LayoutType) > 0).ToArray ();
-			for (int i = 0; i < lqis.Length; i++) {
-				Interface.LayoutingQueue.Remove (lqis [i]);
-				RegisteredLQINodes.Remove (lqis [i]);
-			}
-		}
-		public LayoutingType RegisteredLayoutings = 0;
-
+			
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
+			//dont set position for stretched item
 			if (Width == 0)
 				layoutType &= (~LayoutingType.X);
 			if (Height == 0)
 				layoutType &= (~LayoutingType.Y);
+
 			//Prevent child repositionning in a stack
 			//TODO:this should be done inside GenericStack
 			GenericStack gs = Parent as GenericStack;
@@ -525,66 +518,36 @@ namespace Crow
 				else
 					layoutType &= (~LayoutingType.Y);
 			}
+
+			//prevent queueing same LayoutingType for this
+			layoutType &= (~RegisteredLayoutings);
+
 			if (layoutType == LayoutingType.None)
 				return;
-			if (RegisteredLayoutings == LayoutingType.None)
-				Interface.RegisteredGOForLayouting.Enqueue (this);
-			RegisteredLayoutings |= (LayoutingType)layoutType;
-		}
-		/// <summary> clear current layoutingQueue items for object and
-		/// trigger a new layouting pass for a layoutType </summary>
-		public virtual void EnqueueForLayouting()
-		{
-			if (Parent == null)
-				return;
+
 			#if DEBUG_LAYOUTING
-			Debug.WriteLine ("RegisterForLayouting => {1}->{0}", RegisteredLayoutings.ToString(), this.ToString());
+			Debug.WriteLine ("RegisterForLayouting => {1}->{0}", layoutType, this.ToString());
 			#endif
 
-			//deleteLQI (RegisteredLayoutings);
-			if (RegisteredLayoutings.HasFlag(LayoutingType.Width)) {
-				if (Bounds.Width == 0) //stretch in parent
-						Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Width, this);
-				else if (Bounds.Width < 0) //fit 
-						Interface.LayoutingQueue.EnqueueBeforeParentSizing (LayoutingType.Width, this);
-				else					
-					RegisteredLQINodes.Add(
-						Interface.LayoutingQueue.AddFirst (
-							new LayoutingQueueItem (LayoutingType.Width, this)));				
-			}
-
-			if (RegisteredLayoutings.HasFlag(LayoutingType.Height)) {
-				if (Bounds.Height == 0) //stretch in parent
-						Interface.LayoutingQueue.EnqueueAfterParentSizing (LayoutingType.Height, this);
-				else if (Bounds.Height < 0) //fit 
-						Interface.LayoutingQueue.EnqueueBeforeParentSizing (LayoutingType.Height, this);
-				else{
-					RegisteredLQINodes.Add(
-						Interface.LayoutingQueue.AddFirst (
-							new LayoutingQueueItem (LayoutingType.Height, this)));				
-					
-				}
-			}
-
-			if (RegisteredLayoutings.HasFlag(LayoutingType.X))
-					//for x positionning, sizing of parent and this have to be done
-					Interface.LayoutingQueue.EnqueueAfterThisAndParentSizing (LayoutingType.X, this);
-
-			if (RegisteredLayoutings.HasFlag(LayoutingType.Y))
-					//for x positionning, sizing of parent and this have to be done
-					Interface.LayoutingQueue.EnqueueAfterThisAndParentSizing (LayoutingType.Y, this);
+			if (layoutType.HasFlag (LayoutingType.Width))
+				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
+			if (layoutType.HasFlag (LayoutingType.Height))
+				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
+			if (layoutType.HasFlag (LayoutingType.X))
+				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
+			if (layoutType.HasFlag (LayoutingType.Y))
+				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
+			if (layoutType.HasFlag (LayoutingType.PositionChildren))
+				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.PositionChildren, this));
 		}
-
 
 		/// <summary> trigger dependant sizing component update </summary>
 		public virtual void OnLayoutChanges(LayoutingType  layoutType)
 		{
-			if (Parent==null)
-				return;
 			#if DEBUG_LAYOUTING
 			Debug.WriteLine ("Layout change: " + this.ToString () + ":" + LastSlots.ToString() + "=>" + Slot.ToString ());
 			#endif
-			
+
 			switch (layoutType) {
 			case LayoutingType.Width:				
 				if (Width != 0 && Parent.getBounds().Width >=0) //update position in parent
@@ -597,13 +560,23 @@ namespace Crow
 			}
 			LayoutChanged.Raise (this, new LayoutingEventArgs (layoutType));
 		}
+
 		/// <summary> Update layout component, this is where the computation of alignement
 		/// and size take place </summary>
-		public virtual void UpdateLayout (LayoutingType layoutType)
-		{		
+		/// <returns><c>true</c>, if layouting was possible, <c>false</c> if conditions were not
+		/// met and LQI has to be re-queued</returns>
+		public virtual bool UpdateLayout (LayoutingType layoutType)
+		{
+			//unset bit, it would be reset if LQI is re-queued
+			registeredLayoutings &= (~layoutType);
+
 			switch (layoutType) {
 			case LayoutingType.X:
 				if (Bounds.X == 0) {
+
+					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+						return false;
+					
 					switch (HorizontalAlignment) {
 					case HorizontalAlignment.Left:
 						Slot.X = 0;
@@ -629,8 +602,12 @@ namespace Crow
 				break;
 			case LayoutingType.Y:
 				if (Bounds.Y == 0) {
+
+					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height))
+						return false;
+					
 					switch (VerticalAlignment) {
-					case VerticalAlignment.Top:
+					case VerticalAlignment.Top://this could be processed even if parent Height is not known
 						Slot.Y = 0;
 						break;
 					case VerticalAlignment.Bottom:
@@ -662,6 +639,8 @@ namespace Crow
 					Slot.Width = Width;
 				else if (Width < 0)
 					Slot.Width = measureRawSize ().Width;
+				else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+					return false;
 				else
 					Slot.Width = Parent.ClientRectangle.Width;
 
@@ -689,6 +668,8 @@ namespace Crow
 					Slot.Height = Height;
 				else if (Height < 0)
 					Slot.Height = measureRawSize ().Height;
+				else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+					return false;
 				else
 					Slot.Height = Parent.ClientRectangle.Height;
 
@@ -697,7 +678,6 @@ namespace Crow
 					Slot.Height = MinimumSize.Height;
 				else if (Slot.Height > MaximumSize.Height && MaximumSize.Height > 0)
 					Slot.Height = MaximumSize.Height;
-
 
 				if (LastSlots.Height == Slot.Height)
 					break;
@@ -709,9 +689,12 @@ namespace Crow
 				LastSlots.Height = Slot.Height;
 				break;
 			}
+
 			//if no layouting remains in queue for item, registre for redraw
-			if (this.RegisteredLQINodes.Count () <= 0 && bmp == null)
+			if (this.registeredLayoutings == LayoutingType.None && bmp == null)
 				this.RegisterForRedraw ();
+
+			return true;
 		}
 		#endregion
 

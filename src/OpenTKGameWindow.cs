@@ -261,16 +261,9 @@ namespace Crow
 			#endif
 			//Debug.WriteLine ("======= Layouting queue start =======");
 
-			while (Interface.RegisteredGOForLayouting.Count > 0){
-				while (Interface.RegisteredGOForLayouting.Count > 0){
-					GraphicObject go = Interface.RegisteredGOForLayouting.Dequeue ();
-					go.EnqueueForLayouting ();
-					go.RegisteredLayoutings = LayoutingType.None;
-				}
-				while (Interface.LayoutingQueue.First != null) {
-					LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
-					lqi.ProcessLayouting ();
-				}
+			while (Interface.LayoutingQueue.Count > 0) {
+				LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
+				lqi.ProcessLayouting ();
 			}
 
 			#if MEASURE_TIME
@@ -551,11 +544,12 @@ namespace Crow
         #endregion
 
 		#region ILayoutable implementation
-
-		//TODO:uneeded list, should be removed
-		public List<LinkedListNode<LayoutingQueueItem>> RegisteredLQINodes { get; } = new List<LinkedListNode<LayoutingQueueItem>>();
+		public LayoutingType RegisteredLayoutings {
+			get { return LayoutingType.None; }
+			set { throw new NotImplementedException (); } 
+		}
 		public void RegisterForLayouting (LayoutingType layoutType) { throw new NotImplementedException (); }
-		public void UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
+		public bool UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public Rectangle ContextCoordinates (Rectangle r)
 		{
 			return r;

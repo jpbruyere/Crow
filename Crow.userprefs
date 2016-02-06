@@ -1,18 +1,38 @@
 ﻿<Properties GitUserInfo="UsingGIT" StartupItem="Tests/Tests.csproj">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|Linux_x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="src/LayoutingQueueItem.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|Linux_x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="src/GraphicObjects/GenericStack.cs">
     <Files>
-      <File FileName="src/GraphicObjects/GraphicObject.cs" Line="589" Column="47" />
-      <File FileName="Tests/Interfaces/0.crow" Line="13" Column="49" />
-      <File FileName="src/LayoutingQueueItem.cs" Line="54" Column="57" />
-      <File FileName="src/LayoutingQueue.cs" Line="50" Column="48" />
-      <File FileName="Tests/Interfaces/testWindow.goml" Line="9" Column="55" />
-      <File FileName="Templates/CheckBox.goml" Line="10" Column="46" />
-      <File FileName="src/GraphicObjects/Group.cs" Line="152" Column="45" />
-      <File FileName="src/OpenTKGameWindow.cs" Line="411" Column="43" />
-      <File FileName="src/GraphicObjects/Slider.cs" Line="75" Column="41" />
-      <File FileName="src/GraphicObjects/GenericStack.cs" Line="107" Column="7" />
+      <File FileName="src/GraphicObjects/GraphicObject.cs" Line="532" Column="1" />
+      <File FileName="src/GraphicObjects/GenericStack.cs" Line="116" Column="4" />
+      <File FileName="src/GraphicObjects/Grid.cs" Line="129" Column="24" />
+      <File FileName="src/OpenTKGameWindow.cs" Line="548" Column="35" />
+      <File FileName="src/LayoutingQueueItem.cs" Line="63" Column="1" />
+      <File FileName="src/GraphicObjects/ILayoutable.cs" Line="17" Column="50" />
+      <File FileName="src/GraphicObjects/ComboBox.cs" Line="167" Column="1" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Crow" expanded="True" selected="True">
+            <Node name="Crow" expanded="True">
+              <Node name="src" expanded="True">
+                <Node name="GraphicObjects" expanded="True" />
+              </Node>
+            </Node>
+            <Node name="MonoDevelop.Diagram" expanded="True">
+              <Node name="src" expanded="True" />
+            </Node>
+            <Node name="MonoDevelop.GOLib" expanded="True">
+              <Node name="src" expanded="True" />
+            </Node>
+            <Node name="Tests" expanded="True">
+              <Node name="Interfaces" expanded="True" />
+            </Node>
+            <Node name="UnitTest" expanded="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

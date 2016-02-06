@@ -164,11 +164,7 @@ namespace Crow
 
 			}
 		}
-		public override void UpdateLayout (LayoutingType layoutType)
-		{
-			CheckPendingChildrenAddition ();
-			base.UpdateLayout (layoutType);
-		}
+
 		internal void CheckPendingChildrenAddition()
 		{
 			if (pendingChildrenAddition == null)

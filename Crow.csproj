@@ -102,7 +102,6 @@
     <Compile Include="src\ExtensionsMethods.cs" />
     <Compile Include="src\Interface.cs" />
     <Compile Include="src\LayoutingQueueItem.cs" />
-    <Compile Include="src\LayoutingQueue.cs" />
     <Compile Include="src\GraphicObjects\Spinner.cs" />
     <Compile Include="src\DynAttribute.cs" />
     <Compile Include="src\GraphicObjects\IValueChange.cs" />

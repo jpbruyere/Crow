@@ -46,6 +46,7 @@ namespace Crow
 		{
 			LayoutType = _layoutType;
 			GraphicObject = _graphicObject;
+			GraphicObject.RegisteredLayoutings |= LayoutType;
 		}
 	
 		public void ProcessLayouting()
@@ -53,12 +54,14 @@ namespace Crow
 			#if DEBUG_LAYOUTING
 			Debug.WriteLine ("Layouting => " + this.ToString ());
 			#endif
+
 			try {
 				if (GraphicObject.Parent == null){
 					Debug.WriteLine("ERROR: processLayouting, no parent for: " + GraphicObject.ToString());
 					return;
 				}
-				GraphicObject.UpdateLayout (LayoutType);
+				if (!GraphicObject.UpdateLayout (LayoutType))
+					Interface.LayoutingQueue.Enqueue(this);
 			} catch (Exception ex) {
 				Debug.WriteLine ("Layouting error: " + ex.ToString ());
 			}

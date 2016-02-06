@@ -1,21 +1,8 @@
 ﻿<?xml version="1.0"?>
-<!--<GroupBox Height="-1" Width="0" Margin="5">
-	<VerticalStack  Height="-1" Width="0" >
-		<RadioButton  Caption="Radio 1" Background="Red" Width="0"/>
-		<RadioButton  Caption="Radio 2" IsChecked="true" />
-		<RadioButton  Caption="Radio 3" />
-		<RadioButton  Caption="Radio 1" Background="SkyBlue" Width="0"/>
-	</VerticalStack>
-</GroupBox>-->
-<GroupBox Height="-1" Width="0" Margin="5">
-	<VerticalStack  Height="-1" Width="0" >
-<!--		<RadioButton  Caption="Radio 1" Background="Red" Width="0"/>-->
-		<CheckBox  Caption="Radio 1" Background="Red" Width="0"/>
-<!--		<Button Background="Red" Width="0"/>-->
-<!--			<Popper  Caption="Radio 1" Background="Red" Width="0"/>-->
-
-<!--		<GraphicObject Height="20" Background="Red" Width="0"/>-->
-<!--		<RadioButton  Caption="Radio 3" />-->
-
-	</VerticalStack>
-</GroupBox>
+<VerticalStack Fit="true" Background="Green" Margin="5">
+	<GraphicObject Height="20" Background="Red" Width="20"/>
+	<GraphicObject Height="20" Background="Red" Width="20"/>
+	<GraphicObject Height="20" Background="Red" Width="20"/>
+	<GraphicObject Height="20" Background="Red" Width="20"/>
+	<GraphicObject Height="20" Background="Red" Width="20"/>
+</VerticalStack>

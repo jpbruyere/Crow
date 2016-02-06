@@ -109,19 +109,11 @@ namespace Crow
 			}
 			bmp = null;
 		}
+			
+		public override bool UpdateLayout (LayoutingType layoutType)
+        {
+			RegisteredLayoutings &= (~layoutType);
 
-		public override void EnqueueForLayouting ()
-		{			
-			if (Parent == null)
-				return;
-
-			base.EnqueueForLayouting ();
-
-			if (RegisteredLayoutings.HasFlag(LayoutingType.PositionChildren))
-				Interface.LayoutingQueue.Enqueue (LayoutingType.PositionChildren, this);
-		}
-		public override void UpdateLayout (LayoutingType layoutType)
-        {            
 			if (layoutType == LayoutingType.PositionChildren) {
 				//allow 1 child to have size to 0 if stack has fixed or streched size,
 				//this child will occupy remaining space
@@ -165,13 +157,18 @@ namespace Crow
 							}
 						}
 					}
-				}				
+				}
+
 				ComputeChildrenPositions ();
+
 				//if no layouting remains in queue for item, registre for redraw
-				if (RegisteredLQINodes.Count () <= 0 && bmp==null)
+				if (RegisteredLayoutings == LayoutingType.None && bmp==null)
 					this.RegisterForRedraw ();
-			}else
-				base.UpdateLayout(layoutType);
+
+				return true;
+			}
+
+			return base.UpdateLayout(layoutType);
         }
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
