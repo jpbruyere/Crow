@@ -549,13 +549,11 @@ namespace Crow
 			#endif
 
 			switch (layoutType) {
-			case LayoutingType.Width:				
-				if (Width != 0 && Parent.getBounds().Width >=0) //update position in parent
-					this.RegisterForLayouting (LayoutingType.X);
+			case LayoutingType.Width:
+				this.RegisterForLayouting (LayoutingType.X);
 				break;
 			case LayoutingType.Height:
-				if (Height != 0 && Parent.getBounds().Height >=0) //update position in parent
-					this.RegisterForLayouting (LayoutingType.Y);
+				this.RegisterForLayouting (LayoutingType.Y);
 				break;
 			}
 			LayoutChanged.Raise (this, new LayoutingEventArgs (layoutType));

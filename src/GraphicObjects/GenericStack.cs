@@ -66,14 +66,18 @@ namespace Crow
 			Size tmp = new Size ();
 
 			if (Orientation == Orientation.Horizontal) {
-				foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
+				foreach (GraphicObject c in Children) {
+					if (!c.Visible)
+						continue;					
 					tmp.Width += c.Slot.Width + Spacing;
 					tmp.Height = Math.Max (tmp.Height, Math.Max(c.Slot.Bottom, c.Slot.Height));
 				}
 				if (tmp.Width > 0)
 					tmp.Width -= Spacing;
 			} else {
-				foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
+				foreach (GraphicObject c in Children) {
+					if (!c.Visible)
+						continue;					
 					tmp.Width = Math.Max (tmp.Width, Math.Max(c.Slot.Right, c.Slot.Width));
 					tmp.Height += c.Slot.Height + Spacing;
 				}
@@ -93,18 +97,20 @@ namespace Crow
 			#endif
 			int d = 0;
 			if (Orientation == Orientation.Horizontal) {
-				foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
+				foreach (GraphicObject c in Children) {
+					if (!c.Visible)
+						continue;
 					c.Slot.X = d;
 					d += c.Slot.Width + Spacing;
-					if (c.Height != 0)
-						c.RegisterForLayouting (LayoutingType.Y);
+					c.RegisterForLayouting (LayoutingType.Y);
 				}
 			} else {
-				foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
+				foreach (GraphicObject c in Children) {
+					if (!c.Visible)
+						continue;					
 					c.Slot.Y = d;
 					d += c.Slot.Height + Spacing;
-					if (c.Width != 0)
-						c.RegisterForLayouting (LayoutingType.X);
+					c.RegisterForLayouting (LayoutingType.X);
 				}
 			}
 			bmp = null;
@@ -113,6 +119,19 @@ namespace Crow
 		public override bool UpdateLayout (LayoutingType layoutType)
         {
 			RegisteredLayoutings &= (~layoutType);
+
+			LayoutingType childSizeToCheck;
+			if (Orientation == Orientation.Horizontal)
+				childSizeToCheck = LayoutingType.Width;
+			else
+				childSizeToCheck = LayoutingType.Height;
+
+			foreach (GraphicObject g in Children) {
+				if (!g.Visible)
+					continue;
+				if (g.RegisteredLayoutings.HasFlag (childSizeToCheck))
+					return false;						
+			}
 
 			if (layoutType == LayoutingType.PositionChildren) {
 				//allow 1 child to have size to 0 if stack has fixed or streched size,
@@ -170,16 +189,16 @@ namespace Crow
 
 			return base.UpdateLayout(layoutType);
         }
-		public override void OnLayoutChanges (LayoutingType layoutType)
-		{
-			base.OnLayoutChanges (layoutType);
-
-			if (Orientation == Orientation.Horizontal){
-				if(layoutType == LayoutingType.Width)
-					this.RegisterForLayouting (LayoutingType.PositionChildren);
-			}else if (layoutType == LayoutingType.Height)
-				this.RegisterForLayouting (LayoutingType.PositionChildren);
-		}
+//		public override void OnLayoutChanges (LayoutingType layoutType)
+//		{
+//			base.OnLayoutChanges (layoutType);
+//
+//			if (Orientation == Orientation.Horizontal){
+//				if(layoutType == LayoutingType.Width)
+//					this.RegisterForLayouting (LayoutingType.PositionChildren);
+//			}else if (layoutType == LayoutingType.Height)
+//				this.RegisterForLayouting (LayoutingType.PositionChildren);
+//		}
 		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
 			base.OnChildLayoutChanges (sender, arg);

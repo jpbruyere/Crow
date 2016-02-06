@@ -145,20 +145,17 @@ namespace Crow
 			//position smaller objects in group when group size is fit
 			switch (layoutType) {
 			case LayoutingType.Width:
-				foreach (GraphicObject c in Children.Where(ch => ch.Visible)) {
-					if (c.getBounds ().Width == 0)
-						c.RegisterForLayouting (LayoutingType.Width);
-					else
-						c.RegisterForLayouting (LayoutingType.X);					
+				foreach (GraphicObject c in Children) {
+					if (!c.Visible)
+						continue;					
+					c.RegisterForLayouting (LayoutingType.X | LayoutingType.Width);
 				}
 				break;
 			case LayoutingType.Height:
-				foreach (GraphicObject c in Children.Where(ch => ch.Visible)) {
-					if (c.getBounds ().Height == 0)
-						c.RegisterForLayouting (LayoutingType.Height);
-					else
-						c.RegisterForLayouting (LayoutingType.Y);
-				}
+				foreach (GraphicObject c in Children) {
+					if (!c.Visible)
+						continue;
+					c.RegisterForLayouting (LayoutingType.Y | LayoutingType.Height);				}
 				break;
 			}
 		}
