@@ -386,7 +386,7 @@ namespace Crow
 			get { return _maximumSize; }
 			set { _maximumSize = value; }
 		}
-		[XmlAttributeAttribute()][DefaultValue("0;0")]
+		[XmlAttributeAttribute()][DefaultValue("1;1")]
 		public virtual Size MinimumSize {
 			get { return _minimumSize; }
 			set { _minimumSize = value; }
@@ -503,6 +503,8 @@ namespace Crow
 		}
 			
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
+			if (Parent == null)
+				return;
 			//dont set position for stretched item
 			if (Width == 0)
 				layoutType &= (~LayoutingType.X);
