@@ -24,8 +24,9 @@ using System.Collections.Generic;
 
 namespace Crow
 {
-	public enum LayoutingType
+	public enum LayoutingType : byte
 	{
+		None = 0x00,
 		X = 0x01,
 		Y = 0x02,
 		Width = 0x04,
@@ -45,21 +46,26 @@ namespace Crow
 		{
 			LayoutType = _layoutType;
 			GraphicObject = _graphicObject;
+			GraphicObject.RegisteredLayoutings |= LayoutType;
 		}
 	
 		public void ProcessLayouting()
 		{
-			#if DEBUG_LAYOUTING
-			Debug.WriteLine ("Layouting => " + this.ToString ());
-			#endif
-			try {
-				if (GraphicObject.Parent == null){
-					Debug.WriteLine("ERROR: processLayouting, no parent for: " + GraphicObject.ToString());
-					return;
-				}
-				GraphicObject.UpdateLayout (LayoutType);
-			} catch (Exception ex) {
-				Debug.WriteLine ("Layouting error: " + ex.ToString ());
+			if (GraphicObject.Parent == null) {
+				//cancel layouting for object without parent, maybe some were in queue when
+				//removed from a listbox
+				Debug.WriteLine ("ERROR: processLayouting, no parent for: " + this.ToString ());
+				return;
+			}
+			if (!GraphicObject.UpdateLayout (LayoutType)) {
+				#if DEBUG_LAYOUTING
+				Debug.WriteLine ("Requeuing => " + this.ToString ());
+				#endif
+				Interface.LayoutingQueue.Enqueue (this);
+			} else {
+				#if DEBUG_LAYOUTING
+				Debug.WriteLine ("Layouting => " + this.ToString ());
+				#endif
 			}
 		}
 
