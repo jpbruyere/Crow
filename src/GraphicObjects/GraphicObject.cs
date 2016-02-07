@@ -364,16 +364,16 @@ namespace Crow
 
 				if (HostContainer == null)
 					return;
-//				//add slot to clipping to redraw
-//				HostContainer.gobjsToRedraw.Add (this);
 
 				//ensure main win doesn't keep hidden childrens ref
 				if (!_isVisible && this.Contains (HostContainer.hoverWidget))
 					HostContainer.hoverWidget = null;
+
 				if (Parent is GenericStack)
 					Parent.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.PositionChildren);
-//
-				RegisterForLayouting(LayoutingType.Sizing);
+
+				RegisterForLayouting (LayoutingType.Sizing);
+
 				RegisterForRedraw ();
 				NotifyValueChanged ("Visible", _isVisible);
 			}
