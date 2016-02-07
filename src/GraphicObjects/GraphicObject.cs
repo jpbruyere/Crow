@@ -874,7 +874,8 @@ namespace Crow
 			#if DEBUG_BINDING
 			Debug.WriteLine ("ResolveBinding => " + this.ToString ());
 			#endif
-			List<Binding> resolved = new List<Binding> ();
+
+			Dictionary<object,List<Binding>> resolved = new Dictionary<object, List<Binding>>();
 			foreach (Binding b in Bindings) {
 				if (!string.IsNullOrEmpty (b.DynMethodId))
 					continue;
@@ -898,7 +899,12 @@ namespace Crow
 					addHandler.Invoke (this, new object[] { del });
 					continue;
 				}
-				resolved.Add (b);				
+				List<Binding> bindings = null;
+				if (!resolved.TryGetValue (b.Target.Instance, out bindings)) {
+					bindings = new List<Binding> ();
+					resolved [b.Target.Instance] = bindings;
+				}
+				bindings.Add (b);
 			}
 
 			MethodInfo stringEquals = typeof(string).GetMethod
@@ -914,8 +920,8 @@ namespace Crow
 
 			//group;only one dynMethods by target (valuechanged event source)
 			//changed value name tested in switch
-			IEnumerable<Binding[]> groupedByTarget = resolved.GroupBy (g => g.Target.Instance, g => g, (k, g) => g.ToArray ());
-			foreach (Binding[] grouped in groupedByTarget) {
+			//IEnumerable<Binding[]> groupedByTarget = resolved.GroupBy (g => g.Target.Instance, g => g, (k, g) => g.ToArray ());
+			foreach (List<Binding> grouped in resolved.Values) {
 				int i = 0;
 				Type targetType = grouped[0].Target.Instance.GetType();
 
@@ -939,8 +945,8 @@ namespace Crow
 					il = dm.GetILGenerator(256);
 
 					endMethod = il.DefineLabel();
-					jumpTable = new System.Reflection.Emit.Label[grouped.Length];
-					for (i = 0; i < grouped.Length; i++)
+					jumpTable = new System.Reflection.Emit.Label[grouped.Count];
+					for (i = 0; i < grouped.Count; i++)
 						jumpTable [i] = il.DefineLabel ();
 					il.DeclareLocal(typeof(string));
 					il.DeclareLocal(typeof(object));
@@ -993,7 +999,7 @@ namespace Crow
 						(this, new object[] { b.Source.Property.PropertyType.Cast(targetValue)});
 					else
 						b.Source.Property.GetSetMethod ().Invoke 
-							(this, new object[] { targetValue });
+						(this, new object[] { targetValue });
 					#endregion
 
 					//if no dyn update, skip jump table
@@ -1013,7 +1019,7 @@ namespace Crow
 
 				if (il == null)
 					continue;
-				
+
 				il.Emit (OpCodes.Br, endMethod);
 
 				i = 0;
@@ -1034,7 +1040,7 @@ namespace Crow
 						else
 							throw new Exception ("unhandle target member type in binding");
 					}
-					
+
 					if (!targetValueType.IsValueType)
 						il.Emit(OpCodes.Castclass, targetValueType);
 					else if (b.Source.Property.PropertyType != targetValueType)
@@ -1120,7 +1126,7 @@ namespace Crow
 
 				if (lopMbis.Length<1)
 					throw new Exception (string.Format("CROW BINDING: Member not found '{0}'", lop));
-				
+
 				OpCode lopSetOC;
 				dynamic lopSetMbi;
 				Type lopT = null;
@@ -1155,7 +1161,7 @@ namespace Crow
 				}else{
 					if (lopT.IsEnum)
 						throw new NotImplementedException();
-						
+
 					MethodInfo lopParseMi = lopT.GetMethod("Parse");
 					if (lopParseMi == null)
 						throw new Exception (string.Format
