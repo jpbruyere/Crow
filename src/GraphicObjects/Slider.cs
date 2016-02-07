@@ -58,7 +58,7 @@ namespace Crow
 				if (_cursorSize == value)
 					return;
 				_cursorSize = value;
-				RegisterForLayouting ((int)LayoutingType.Sizing);
+				RegisterForLayouting (LayoutingType.Sizing);
 				registerForGraphicUpdate ();
 				NotifyValueChanged ("CursorSize", _cursorSize);
 			}
@@ -72,7 +72,7 @@ namespace Crow
 					return;
 				_orientation = value; 
 
-				RegisterForLayouting ((int)LayoutingType.All);
+				RegisterForLayouting (LayoutingType.All);
 				NotifyValueChanged ("Orientation", _orientation);
 			}
 		}

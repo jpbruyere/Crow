@@ -13,9 +13,9 @@ namespace Crow
 
 		IGOLibHost HostContainer { get; }
 
-		List<LinkedListNode<LayoutingQueueItem>> RegisteredLQINodes { get; }
-		void RegisterForLayouting(int layoutType);
-		void UpdateLayout(LayoutingType layoutType);
+		LayoutingType RegisteredLayoutings { get; set; }
+		void RegisterForLayouting(LayoutingType layoutType);
+		bool UpdateLayout(LayoutingType layoutType);
 
 
 		Rectangle ContextCoordinates(Rectangle r);

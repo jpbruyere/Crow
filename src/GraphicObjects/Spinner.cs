@@ -35,29 +35,12 @@ namespace Crow
 		{
 		}
 
-		#region implemented abstract members of TemplatedControl
-
-		protected override void loadTemplate (GraphicObject template = null)
-		{
-			base.loadTemplate (template);			
-		}
-
-		#endregion
-
 		void onUp (object sender, MouseButtonEventArgs e)
 		{
-//			decimal tmp = 0;
-//			if (!decimal.TryParse (labCpt.Text, out tmp))
-//				return;
-
 			Value += this.SmallIncrement;
 		}
 		void onDown (object sender, MouseButtonEventArgs e)
 		{
-//			decimal tmp = 0;
-//			if (!decimal.TryParse (labCpt.Text, out tmp))
-//				return;
-
 			Value -= this.SmallIncrement;
 		}
 

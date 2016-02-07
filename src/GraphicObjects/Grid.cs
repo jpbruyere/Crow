@@ -32,13 +32,13 @@ namespace Crow
 		public override T addChild<T> (T child)
 		{
 			T tmp = base.addChild (child);
-			this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+			this.RegisterForLayouting (LayoutingType.PositionChildren);
 			return tmp;
 		}
 		public override void removeChild (GraphicObject child)
 		{
 			base.removeChild (child);
-			this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+			this.RegisterForLayouting (LayoutingType.PositionChildren);
 		}
 
 		#region Public Properties
@@ -59,7 +59,7 @@ namespace Crow
 				_columnCount = value; 
 
 				NotifyValueChanged ("ColumnCount", ColumnCount);
-				this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+				this.RegisterForLayouting (LayoutingType.PositionChildren);
 			}
         }
 		[XmlAttributeAttribute()][DefaultValue(1)]
@@ -73,7 +73,7 @@ namespace Crow
 				_rowCount = value; 
 
 				NotifyValueChanged ("RowCount", RowCount);
-				this.RegisterForLayouting ((int)LayoutingType.PositionChildren);
+				this.RegisterForLayouting (LayoutingType.PositionChildren);
 			}
 		}
 		public virtual int CaseWidth {
@@ -125,22 +125,23 @@ namespace Crow
 			}
 		}
 
-		public override void RegisterForLayouting (int layoutType)
-		{			
-			base.RegisterForLayouting (layoutType);
 
-			if ((layoutType & (int)LayoutingType.PositionChildren) > 0)
-				Interface.LayoutingQueue.Enqueue (LayoutingType.PositionChildren, this);			
-		}
-		public override void UpdateLayout (LayoutingType layoutType)
-		{            
+		public override bool UpdateLayout (LayoutingType layoutType)
+		{
+			RegisteredLayoutings &= (~layoutType);
+
 			if (layoutType == LayoutingType.PositionChildren) {				
+
 				ComputeChildrenPositions ();
+
 				//if no layouting remains in queue for item, registre for redraw
-				if (RegisteredLQINodes.Count () <= 0 && bmp==null)
+				if (RegisteredLayoutings == LayoutingType.None && bmp==null)
 					this.RegisterForRedraw ();
-			}else
-				base.UpdateLayout(layoutType);
+				
+				return true;
+			}
+
+			return base.UpdateLayout(layoutType);
 		}
 		#endregion
 

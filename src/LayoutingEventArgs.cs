@@ -2,11 +2,11 @@
 
 namespace Crow
 {
-	public class LayoutChangeEventArgs: EventArgs
+	public class LayoutingEventArgs: EventArgs
 	{
 		public LayoutingType  LayoutType;
 
-		public LayoutChangeEventArgs (LayoutingType  _layoutType) : base()
+		public LayoutingEventArgs (LayoutingType  _layoutType) : base()
 		{
 			LayoutType = _layoutType;
 		}

@@ -60,7 +60,7 @@ namespace Crow
                     return;
 					                
                 registerForGraphicUpdate();
-				this.RegisterForLayouting ((int)LayoutingType.Sizing);
+				this.RegisterForLayouting (LayoutingType.Sizing);
 
 
                 _text = value;

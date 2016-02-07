@@ -76,7 +76,7 @@ namespace Crow
 			g.Parent = this;
 			GraphicObjects.Insert (0, g);
 
-			g.RegisterForLayouting ((int)LayoutingType.Sizing);
+			g.RegisterForLayouting (LayoutingType.Sizing);
 		}
 		public void DeleteWidget(GraphicObject g)
 		{
@@ -261,18 +261,11 @@ namespace Crow
 			#endif
 			//Debug.WriteLine ("======= Layouting queue start =======");
 
-				while (Interface.LayoutingQueue.First != null) {
-//					Stopwatch lqiProcTime = new Stopwatch ();
-//					lqiProcTime.Start ();
-					LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
-					lqi.ProcessLayouting ();
-//					lqiProcTime.Stop ();
-//					if (lqiProcTime.ElapsedMilliseconds > 10) {
-//						Debug.WriteLine("lqi {2}: {0} ticks \t, {1} ms",
-//							updateTime.ElapsedTicks,
-//							updateTime.ElapsedMilliseconds, lqi.ToString());
-//					}
-				}
+			while (Interface.LayoutingQueue.Count > 0) {
+				LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
+				lqi.ProcessLayouting ();
+			}
+
 			#if MEASURE_TIME
 			layoutTime.Stop ();
 			#endif
@@ -408,7 +401,7 @@ namespace Crow
 			base.OnResize (e);
 			createContext ();
 			foreach (GraphicObject g in GraphicObjects) {
-				g.RegisterForLayouting ((int)LayoutingType.All);
+				g.RegisterForLayouting (LayoutingType.All);
 				//g.registerForGraphicUpdate();
 			}
 		}
@@ -551,11 +544,12 @@ namespace Crow
         #endregion
 
 		#region ILayoutable implementation
-
-		//TODO:uneeded list, should be removed
-		public List<LinkedListNode<LayoutingQueueItem>> RegisteredLQINodes { get; } = new List<LinkedListNode<LayoutingQueueItem>>();
-		public void RegisterForLayouting (int layoutType) { throw new NotImplementedException (); }
-		public void UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
+		public LayoutingType RegisteredLayoutings {
+			get { return LayoutingType.None; }
+			set { throw new NotImplementedException (); } 
+		}
+		public void RegisterForLayouting (LayoutingType layoutType) { throw new NotImplementedException (); }
+		public bool UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public Rectangle ContextCoordinates (Rectangle r)
 		{
 			return r;

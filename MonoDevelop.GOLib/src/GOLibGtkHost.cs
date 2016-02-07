@@ -170,7 +170,7 @@ namespace MonoDevelop.GOLib
 			g.Parent = this;
 			GraphicObjects.Insert (0, g);
 
-			g.RegisterForLayouting ((int)LayoutingType.Sizing);
+			g.RegisterForLayouting (LayoutingType.Sizing);
 		}
 		public void DeleteWidget(GraphicObject g)
 		{
@@ -262,7 +262,7 @@ namespace MonoDevelop.GOLib
 			Crow.Size newSize = this.ClientRectangle.Size;
 			if (lastSize != newSize) {
 				foreach (GraphicObject g in GraphicObjects)
-					g.RegisterForLayouting ((int)LayoutingType.All);
+					g.RegisterForLayouting (LayoutingType.All);
 				lastSize = newSize;
 			}
 

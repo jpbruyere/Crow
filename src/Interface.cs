@@ -53,11 +53,9 @@ namespace Crow
 		/// <summary> Threshold to catch borders for sizing </summary>
 		public static int BorderThreshold = 5;
 
-		public static LayoutingQueue LayoutingQueue = new LayoutingQueue ();
+		public static Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem>();
 
 		#region Load/Save
-		//internal static List<DynAttribute> Bindings;
-
 
 		public static void Save<T> (string file, T graphicObject)
 		{            

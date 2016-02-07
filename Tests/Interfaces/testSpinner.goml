@@ -2,10 +2,10 @@
 <VerticalStack Name="TopContainer" Width="400" Height="-1"
 	Margin="20" Background="DarkGray">
 
-	<HorizontalStack Fit="true">
-	<Spinner Value="{IntValue}" ValueChanged="onSpinnerValueChange"/>
-	<Spinner Value="5"/>
-	<Spinner Value="5"/>
-	<Button></Button>
+	<HorizontalStack Fit="true" Margin="5" Background="SkyBlue">
+		<Spinner Value="{IntValue}" ValueChanged="onSpinnerValueChange"/>
+		<Spinner Value="5"/>
+		<Spinner Value="5"/>
+		<Button/>
 	</HorizontalStack>
 </VerticalStack>

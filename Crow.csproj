@@ -46,7 +46,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>TRACE;DEBUG;__linux__;MEASURE_TIME;DEBUG_LOAD_TIME0;DEBUG_LAYOUTING0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
+    <DefineConstants>DEBUG_LAYOUTING0;TRACE;DEBUG;__linux__;MEASURE_TIME;DEBUG_LOAD_TIME0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
   </PropertyGroup>
   <!--  <PropertyGroup Condition=" '$(Platform)' == 'Linux_x86' ">
     <DefineConstants>__linux__</DefineConstants>
@@ -102,7 +102,6 @@
     <Compile Include="src\ExtensionsMethods.cs" />
     <Compile Include="src\Interface.cs" />
     <Compile Include="src\LayoutingQueueItem.cs" />
-    <Compile Include="src\LayoutingQueue.cs" />
     <Compile Include="src\GraphicObjects\Spinner.cs" />
     <Compile Include="src\DynAttribute.cs" />
     <Compile Include="src\GraphicObjects\IValueChange.cs" />
@@ -116,7 +115,6 @@
     <Compile Include="src\GraphicObjects\TemplatedContainer.cs" />
     <Compile Include="src\GraphicObjects\Popper.cs" />
     <Compile Include="src\TextChangeEventArgs.cs" />
-    <Compile Include="src\LayoutChangeEventArgs.cs" />
     <Compile Include="src\ReflexionExtensions.cs" />
     <Compile Include="src\XCursor.cs" />
     <Compile Include="src\GraphicObjects\Grid.cs" />
@@ -133,6 +131,7 @@
     <Compile Include="src\SolidColor.cs" />
     <Compile Include="src\Gradient.cs" />
     <Compile Include="src\Fill\Fill.cs" />
+    <Compile Include="src\LayoutingEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

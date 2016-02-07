@@ -105,7 +105,7 @@ namespace Crow
 				lines = getLines;
 
 				this.registerForGraphicUpdate ();
-				this.RegisterForLayouting ((int)LayoutingType.Sizing);
+				this.RegisterForLayouting (LayoutingType.Sizing);
 				NotifyValueChanged ("Text", _text);
             }
         }
