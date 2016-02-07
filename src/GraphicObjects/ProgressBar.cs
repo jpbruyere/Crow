@@ -10,74 +10,19 @@ using System.ComponentModel;
 namespace Crow
 {
 	[Serializable]
-	public class ProgressBar : Border
+	public class ProgressBar : NumericControl
     {
 		#region CTOR
 		public ProgressBar() : base(){}
-		public ProgressBar(int _max) : base()
+		#endregion
+
+		protected override void loadTemplate (GraphicObject template)
 		{
-			Maximum = _max;
+			
 		}
-		#endregion
-
-		#region private fields
-		int _currentValue = 0;
-		int _minimum = 0;
-		int _maximum = 100;
-		#endregion
-
-		#region public properties
-		[XmlAttributeAttribute()][DefaultValue(0)]
-		public int Value
-		{
-			get { return _currentValue; }
-			set
-			{
-				if (_currentValue == value)
-					return;
-
-				_currentValue = value;
-
-				if (_currentValue > Maximum)
-					_currentValue = Maximum;
-
-				registerForGraphicUpdate();
-			}
-		}
-		[XmlAttributeAttribute()][DefaultValue(0)]
-		public int Minimum {
-			get {return _minimum;}
-			set {
-				if (_minimum == value || _minimum >= Maximum)
-					return;
-				_minimum = value;
-				registerForGraphicUpdate ();
-			}
-		}
-		[XmlAttributeAttribute()][DefaultValue(100)]
-		public int Maximum {
-			get {return _maximum;}
-			set {
-				if (_maximum == value || _maximum <= _minimum)
-					return;
-				_maximum = value;
-				registerForGraphicUpdate();
-			}
-		}
-		#endregion
 
 		#region GraphicObject overrides
-		[XmlAttributeAttribute()][DefaultValue("Gray")]
-		public override Fill Background {
-			get { return base.Background; }
-			set { base.Background = value; }
-		}
-		[XmlAttributeAttribute()][DefaultValue(0)]
-		public override int BorderWidth {
-			get { return base.BorderWidth; }
-			set { base.BorderWidth = value; }
-		}
-		[XmlAttributeAttribute()][DefaultValue("BlueCrayola")]
+		[XmlAttributeAttribute()][DefaultValue("vgradient|0:BlueCrayola|0,5:SkyBlue|1:BlueCrayola")]
 		public override Fill Foreground {
 			get { return base.Foreground; }
 			set { base.Foreground = value; }
@@ -87,10 +32,7 @@ namespace Crow
 		{
 			base.onDraw (gr);
 
-			Rectangle rBack = Slot.Size;
-
-			if (BorderWidth > 0)
-				rBack.Inflate(-BorderWidth, -BorderWidth);
+			Rectangle rBack = ClientRectangle;
 
 			rBack.Width = (int)((double)rBack.Width / Maximum * Value);
 
