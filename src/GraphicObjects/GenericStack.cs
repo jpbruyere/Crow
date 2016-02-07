@@ -138,41 +138,67 @@ namespace Crow
 				//this child will occupy remaining space
 				if (Orientation == Orientation.Horizontal) {
 					if (Width >= 0) {
-						GraphicObject[] gobjs = Children.Where (c => c.Width == 0 && c.Visible).ToArray();
-						if (gobjs.Length > 1)
-							throw new Exception ("Only one child in stack may have size to stretched");
-						else if (gobjs.Length == 1) {
-							int sz = Children.Where(ch=>ch.Visible).Except (gobjs).Sum (g => g.Slot.Width);
-							if (sz < Slot.Width) {
-								gobjs [0].Slot.Width = Slot.Width - sz - (Children.Count-1) * Spacing - 2 * Margin;
-								int idx = Children.IndexOf (gobjs [0]);
-								if (idx > 0 && idx < Children.Count - 1)
-									gobjs [0].Slot.Width -= Spacing;
-								if (gobjs [0].LastSlots.Width != gobjs [0].Slot.Width) {
-									gobjs [0].bmp = null;
-									gobjs [0].OnLayoutChanges (LayoutingType.Width);
-									gobjs [0].LastSlots.Width = gobjs [0].Slot.Width;
-								}
+						GraphicObject stretchedGO = null;
+						int tmpWidth = Slot.Width;
+						int cptChildren = 0;
+						for (int i = 0; i < Children.Count; i++) {
+							if (!Children [i].Visible)
+								continue;
+							cptChildren++;
+							if (Children [i].Width == 0) {
+								if (stretchedGO != null)
+									throw new Exception ("Only one child in stack may have size to stretched");
+								stretchedGO = Children [i];
+								if (i < Children.Count - 1)
+									tmpWidth -= Spacing;
+								continue;
+							}
+							tmpWidth -= Children[i].Slot.Width + Spacing;
+						}
+						if (stretchedGO != null) {
+							tmpWidth += (Spacing - 2 * Margin);
+							if (tmpWidth < MinimumSize.Width)
+								tmpWidth = MinimumSize.Width;
+							else if (tmpWidth > MaximumSize.Width && MaximumSize.Width > 0)
+								tmpWidth = MaximumSize.Width;
+							if (stretchedGO.LastSlots.Width != tmpWidth) {
+								stretchedGO.Slot.Width = tmpWidth;
+								stretchedGO.bmp = null;
+								stretchedGO.OnLayoutChanges (LayoutingType.Width);
+								stretchedGO.LastSlots.Width = stretchedGO.Slot.Width;
 							}
 						}
 					}					
 				} else {
 					if (Height >= 0) {
-						GraphicObject[] gobjs = Children.Where(ch=>ch.Visible).Where (c => c.Height == 0).ToArray();
-						if (gobjs.Length > 1)
-							throw new Exception ("Only one child in stack may have size to stretched");
-						else if (gobjs.Length == 1) {
-							int sz = Children.Where(ch=>ch.Visible).Except (gobjs).Sum (g => g.Slot.Height);
-							if (sz < Slot.Height) {
-								gobjs [0].Slot.Height = Slot.Height - sz- (Children.Count-1) * Spacing - 2 * Margin;
-								int idx = Children.IndexOf (gobjs [0]);
-								if (idx > 0 && idx < Children.Count - 1)
-									gobjs [0].Slot.Height -= Spacing;
-								if (gobjs [0].LastSlots.Height != gobjs [0].Slot.Height) {
-									gobjs [0].bmp = null;
-									gobjs [0].OnLayoutChanges (LayoutingType.Height);
-									gobjs [0].LastSlots.Height = gobjs [0].Slot.Height;
-								}
+						GraphicObject stretchedGO = null;
+						int tmpHeight = Slot.Height;
+						int cptChildren = 0;
+						for (int i = 0; i < Children.Count; i++) {
+							if (!Children [i].Visible)
+								continue;
+							cptChildren++;
+							if (Children [i].Height == 0) {
+								if (stretchedGO != null)
+									throw new Exception ("Only one child in stack may have size to stretched");
+								stretchedGO = Children [i];
+								if (i < Children.Count - 1)
+									tmpHeight -= Spacing;
+								continue;
+							}
+							tmpHeight -= Children[i].Slot.Height + Spacing;
+						}
+						if (stretchedGO != null) {
+							tmpHeight += (Spacing - 2 * Margin);
+							if (tmpHeight < MinimumSize.Height)
+								tmpHeight = MinimumSize.Height;
+							else if (tmpHeight > MaximumSize.Height && MaximumSize.Height > 0)
+								tmpHeight = MaximumSize.Height;
+							if (stretchedGO.LastSlots.Height != tmpHeight) {
+								stretchedGO.Slot.Height = tmpHeight;
+								stretchedGO.bmp = null;
+								stretchedGO.OnLayoutChanges (LayoutingType.Height);
+								stretchedGO.LastSlots.Height = stretchedGO.Slot.Height;
 							}
 						}
 					}
@@ -189,26 +215,13 @@ namespace Crow
 
 			return base.UpdateLayout(layoutType);
         }
-//		public override void OnLayoutChanges (LayoutingType layoutType)
-//		{
-//			base.OnLayoutChanges (layoutType);
-//
-//			if (Orientation == Orientation.Horizontal){
-//				if(layoutType == LayoutingType.Width)
-//					this.RegisterForLayouting (LayoutingType.PositionChildren);
-//			}else if (layoutType == LayoutingType.Height)
-//				this.RegisterForLayouting (LayoutingType.PositionChildren);
-//		}
+
 		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
 			base.OnChildLayoutChanges (sender, arg);
 
 			GraphicObject g = sender as GraphicObject;
 			switch (arg.LayoutType) {
-			case LayoutingType.X:
-				break;
-			case LayoutingType.Y:
-				break;
 			case LayoutingType.Width:
 				if (Orientation == Orientation.Horizontal) {
 					if (this.Bounds.Width < 0)
