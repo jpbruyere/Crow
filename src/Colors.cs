@@ -43,7 +43,7 @@ namespace Crow
         public double B;        
 		#endregion
 
-		#region Operators
+		#region Operators	
         public static implicit operator string(Color c)
         {
             return c.ToString();
@@ -59,7 +59,7 @@ namespace Crow
 			{
 				foreach (Color cr in ColorDic)
 				{
-					if (cr.Name == s)
+					if (string.Equals(cr.Name,s,StringComparison.Ordinal))
 						return cr;
 				}
 			}

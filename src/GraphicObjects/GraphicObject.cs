@@ -364,15 +364,17 @@ namespace Crow
 
 				if (HostContainer == null)
 					return;
-				//add slot to clipping to redraw
-				HostContainer.gobjsToRedraw.Add (this);
+//				//add slot to clipping to redraw
+//				HostContainer.gobjsToRedraw.Add (this);
 
 				//ensure main win doesn't keep hidden childrens ref
-				if (this.Contains (HostContainer.hoverWidget))
+				if (!_isVisible && this.Contains (HostContainer.hoverWidget))
 					HostContainer.hoverWidget = null;
 				if (Parent is GenericStack)
 					Parent.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.PositionChildren);
-
+//
+				RegisterForLayouting(LayoutingType.Sizing);
+				RegisterForRedraw ();
 				NotifyValueChanged ("Visible", _isVisible);
 			}
 		}
@@ -908,7 +910,7 @@ namespace Crow
 			}
 
 			MethodInfo stringEquals = typeof(string).GetMethod
-				("Compare", new Type[3] {typeof(string), typeof(string), typeof(StringComparison)});
+				("Equals", new Type[3] {typeof(string), typeof(string), typeof(StringComparison)});
 			Type sourceType = this.GetType();
 			EventInfo ei = typeof(IValueChange).GetEvent("ValueChanged");
 			MethodInfo evtInvoke = ei.EventHandlerType.GetMethod ("Invoke");
@@ -1013,7 +1015,7 @@ namespace Crow
 						il.Emit (OpCodes.Ldstr, b.Expression.Split('/').LastOrDefault());
 					il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
 					il.Emit (OpCodes.Callvirt, stringEquals);
-					il.Emit (OpCodes.Brfalse, jumpTable[i]);
+					il.Emit (OpCodes.Brtrue, jumpTable[i]);
 					i++;
 				}
 
