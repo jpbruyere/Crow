@@ -469,7 +469,7 @@ namespace Crow
 		public virtual void registerClipRect()
 		{
 			HostContainer.redrawClip.AddRectangle (ScreenCoordinates(Slot));
-			//this clipping should take only last painted slots in ancestor tree which
+			//this clipping should take only last painted slots on each level in ancestor tree which
 			//is not the case for now.
 			HostContainer.redrawClip.AddRectangle (ScreenCoordinates(LastPaintedSlot));
 		}
@@ -531,6 +531,7 @@ namespace Crow
 			Debug.WriteLine ("RegisterForLayouting => {1}->{0}", layoutType, this.ToString());
 			#endif
 
+			//enqueue LQI LayoutingTypes separately
 			if (layoutType.HasFlag (LayoutingType.Width))
 				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
 			if (layoutType.HasFlag (LayoutingType.Height))
@@ -728,7 +729,6 @@ namespace Crow
 					onDraw (gr);
 				}
 				draw.Flush ();
-				//draw.WriteToPng ("/mnt/data/test.png");
 			}
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version

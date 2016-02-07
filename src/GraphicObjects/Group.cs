@@ -14,9 +14,7 @@ namespace Crow
     {
 		#region CTOR
 		public Group()
-			: base()
-		{            
-		}
+			: base(){}
 		#endregion
 
 		#region EVENT HANDLERS
@@ -35,7 +33,6 @@ namespace Crow
 
         public virtual List<GraphicObject> Children {
 			get { return children; }
-			set { children = value; }
 		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
         public bool MultiSelect
@@ -64,14 +61,12 @@ namespace Crow
         }
 		public virtual void ClearChildren()
 		{
-			int cpt = children.Count;
-			while(cpt > 0){
-				GraphicObject g = children[cpt-1];
+			while(children.Count > 0){
+				GraphicObject g = children[children.Count-1];
 				g.LayoutChanged -= OnChildLayoutChanges;
 				g.ClearBinding ();
 				g.Parent = null;
-				Children.RemoveAt(cpt-1);
-				cpt = children.Count;
+				Children.RemoveAt(children.Count-1);
 			}
 			this.RegisterForLayouting (LayoutingType.Sizing);
 			ChildrenCleared.Raise (this, new EventArgs ());

@@ -51,18 +51,21 @@ namespace Crow
 	
 		public void ProcessLayouting()
 		{
-			#if DEBUG_LAYOUTING
-			Debug.WriteLine ("Layouting => " + this.ToString ());
-			#endif
-
 			if (GraphicObject.Parent == null) {
 				//cancel layouting for object without parent, maybe some were in queue when
 				//removed from a listbox
 				Debug.WriteLine ("ERROR: processLayouting, no parent for: " + this.ToString ());
 				return;
 			}
-			if (!GraphicObject.UpdateLayout (LayoutType))
-				Interface.LayoutingQueue.Enqueue(this);
+			if (!GraphicObject.UpdateLayout (LayoutType)) {
+				#if DEBUG_LAYOUTING
+				Debug.WriteLine ("Requeuing => " + this.ToString ());
+				#endif
+				Interface.LayoutingQueue.Enqueue (this);
+			}else
+				#if DEBUG_LAYOUTING
+				Debug.WriteLine ("Layouting => " + this.ToString ());
+				#endif
 		}
 
 		public static implicit operator GraphicObject(LayoutingQueueItem queueItem)

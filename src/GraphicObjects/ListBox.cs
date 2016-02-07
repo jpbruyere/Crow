@@ -100,9 +100,9 @@ namespace Crow
 				foreach (var item in data) {
 					ms.Seek(0,SeekOrigin.Begin);
 					GraphicObject g = Interface.Load (ms, t);
-					g.DataSource = item;
 					g.MouseClick += itemClick;
 					_list.addChild (g);
+					g.DataSource = item;
 				}
 
 				ms.Dispose ();			
