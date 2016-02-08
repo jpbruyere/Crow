@@ -26,7 +26,10 @@ namespace Crow
 		#region CTOR
 		public RadioButton() : base(){}	
 		#endregion
-			
+
+		public event EventHandler Checked;
+		public event EventHandler Unchecked;
+
 		#region GraphicObject overrides
 		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
 		public override bool Focusable
@@ -71,10 +74,13 @@ namespace Crow
 				isChecked = value;
 
 				NotifyValueChanged ("IsChecked", value);
-				if (isChecked)
+				if (isChecked) {
 					NotifyValueChanged ("SvgSub", "checked");
-				else
+					Checked.Raise (this, null);
+				} else {
 					NotifyValueChanged ("SvgSub", "unchecked");
+					Unchecked.Raise (this, null);
+				}
             }
         }
 
