@@ -10,28 +10,8 @@ namespace Crow
         Horizontal,
         Vertical
     }
-    public enum Alignment
-    {
-        None,
-        TopCenter,
-        TopStretch,
-        LeftCenter,
-        LeftStretch,
-        RightCenter,
-        RightStretch,
-        BottomCenter,
-        BottomStretch,
-        TopLeft,
-        TopRight,
-        BottomLeft,
-        BottomRight,
-        Center,
-        Fit,
-        HorizontalStretch,
-        VerticalStretch
-    }
 
-    public enum PanelBorderPosition
+    public enum Alignment
     {
         Top,
         Left,
@@ -41,9 +21,7 @@ namespace Crow
         TopRight,
         BottomLeft,
         BottomRight,
-        Moving,
-        Closing,
-        ClientArea
+		Center
     }
     public enum HorizontalAlignment
     {

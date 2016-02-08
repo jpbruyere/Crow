@@ -4,7 +4,7 @@
 	Background="White">
 	<HorizontalStack Name="hstack" Margin="0" Spacing="2" Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}">
 		<Label Foreground="DimGray" Height="{../../../TemplatedHeight}" Width="{../../../TemplatedWidth}" 
-			Text="{../../../Value}" Margin="1" TextAlignment="RightCenter"/>
+			Text="{../../../Value}" Margin="1" TextAlignment="Right"/>
 		<VerticalStack Width="-1" Height="{../../../TemplatedHeight}" Spacing="0" >
 			<Button MouseRepeat="true" Width="12" Height="8" MouseClick="../../../../onUp"
 				Template="#Crow.Templates.ArrowButTemplate.crow">

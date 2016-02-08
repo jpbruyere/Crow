@@ -6,7 +6,7 @@
 			<CheckBox Name="chk3"/>
 			<CheckBox Name="chk4"/>
 			<HorizontalStack Fit="true" Margin="2" Background="Blue">
-				<Label Name="captionFps" Text="Fps:" Width="30" TextAlignment="RightCenter"/>
+				<Label Name="captionFps" Text="Fps:" Width="30" TextAlignment="Right"/>
 				<Label Name="valueFps" Text="{fps}" Font="droid , 12" Width="-1" TextAlignment="Center" Background="AoEnglish"/>
 			</HorizontalStack>
 		</VerticalStack>

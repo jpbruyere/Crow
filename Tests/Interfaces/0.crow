@@ -2,17 +2,17 @@
 <VerticalStack Fit="true">
 	<ProgressBar CornerRadius="5" Background="DimGray" Margin="1" Maximum="1000" Value="{fps}" Width="200" Height="15"/>
 	<HorizontalStack Fit="true">
-		<Label Text="Memory:" Width="50" TextAlignment="RightCenter"/>
+		<Label Text="Memory:" Width="50" TextAlignment="Right"/>
 		<Label Text="{memory}" Font="droid,12" 
 			Background="vgradient|0:BlueCrayola|1:Black"/>
 	</HorizontalStack>
 	<HorizontalStack Fit="true">
-		<Label Text="Fps:" Width="50" TextAlignment="RightCenter"/>
+		<Label Text="Fps:" Width="50" TextAlignment="Right"/>
 		<Label Text="{fps}" Font="droid , 12"
 			Background="vgradient|0:LimeGreen|1:Black"/>
 	</HorizontalStack>
 <!--	<HorizontalStack Fit="true">
-		<Label Text="Layouting:" Width="50" TextAlignment="RightCenter"/>
+		<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
 		<Label Text="{layouting}" Font="droid,12"
 			Background="vgradient|0:AoEnglish|1:Black"/>
 	</HorizontalStack>-->

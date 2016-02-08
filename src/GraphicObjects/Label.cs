@@ -30,7 +30,9 @@ namespace Crow
         
 		#region private and protected fields
 		string _text = "label";
-        Alignment _textAlignment = Alignment.LeftCenter;        
+        Alignment _textAlignment = Alignment.Left;
+		bool horizontalStretch = false;
+		bool verticalStretch = false;
 		bool _multiline = false;
 		Color selColor;
 		Color selFontColor;
@@ -73,7 +75,7 @@ namespace Crow
 				registerForGraphicUpdate ();
 			}
 		}
-        [XmlAttributeAttribute()][DefaultValue(Alignment.LeftCenter)]
+		[XmlAttributeAttribute()][DefaultValue(Alignment.Left)]
 		public Alignment TextAlignment
         {
             get { return _textAlignment; }
@@ -82,9 +84,32 @@ namespace Crow
 					return;
 				_textAlignment = value; 
 				registerForGraphicUpdate ();
+				registerForGraphicUpdate ();
 				NotifyValueChanged ("TextAlignment", _textAlignment);
 			}
         }
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public virtual bool HorizontalStretch {
+			get { return horizontalStretch; }
+			set {
+				if (horizontalStretch == value)
+					return;
+				horizontalStretch = value; 
+				registerForGraphicUpdate ();
+				NotifyValueChanged ("HorizontalStretch", horizontalStretch);
+			}
+		}
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public virtual bool VerticalStretch {
+			get { return verticalStretch; }
+			set {
+				if (verticalStretch == value)
+					return;
+				verticalStretch = value; 
+				NotifyValueChanged ("VerticalStretch", verticalStretch);
+
+			}
+		} 
 		[XmlAttributeAttribute()][DefaultValue("label")]
         public string Text
         {
@@ -358,61 +383,44 @@ namespace Crow
 				rText.X = cb.X;
 				rText.Y = cb.Y;
 			}else{
+				if (horizontalStretch) {
+					widthRatio = (float)cb.Width / rText.Width;
+					if (!verticalStretch)
+						heightRatio = widthRatio;
+				}if (verticalStretch) {
+					heightRatio = (float)cb.Height / rText.Height;
+					if (!horizontalStretch)
+						widthRatio = heightRatio;
+				}
+				
+				rText.Width = (int)(widthRatio * rText.Width);
+				rText.Height = (int)(heightRatio * rText.Height);
+
 				switch (TextAlignment)
 				{
-				case Alignment.None:
-					break;
 				case Alignment.TopLeft:     //ok
 					rText.X = cb.X;
 					rText.Y = cb.Y;
 					break;
-				case Alignment.TopCenter:   //ok
+				case Alignment.Top:   //ok						
 					rText.Y = cb.Y;
 					rText.X = cb.X + cb.Width / 2 - rText.Width / 2;
 					break;
 				case Alignment.TopRight:    //ok
+					rText.Y = cb.Y;
 					rText.X = cb.Right - rText.Width;
-					rText.Y = cb.Y;
 					break;
-				case Alignment.TopStretch://ok
-					heightRatio = widthRatio = (float)cb.Width / rText.Width;
-					rText.X = cb.X;
-					rText.Y = cb.Y;
-					rText.Width = cb.Width;
-					rText.Height = (int)(rText.Height * heightRatio);
-					break;
-				case Alignment.LeftCenter://ok
+				case Alignment.Left://ok
 					rText.X = cb.X;
 					rText.Y = cb.Y + cb.Height / 2 - rText.Height / 2;
 					break;
-				case Alignment.LeftStretch://ok
-					heightRatio = widthRatio = (float)cb.Height / rText.Height;
-					rText.X = cb.X;
-					rText.Y = cb.Y;
-					rText.Height = cb.Height;
-					rText.Width = (int)(widthRatio * cb.Width);
-					break;
-				case Alignment.RightCenter://ok
+				case Alignment.Right://ok
 					rText.X = cb.X + cb.Width - rText.Width;
 					rText.Y = cb.Y + cb.Height / 2 - rText.Height / 2;
 					break;
-				case Alignment.RightStretch://ok
-					heightRatio = widthRatio = (float)cb.Height / rText.Height;
-					rText.Height = cb.Height;
-					rText.Width = (int)(widthRatio * rText.Width);
-					rText.X = cb.Right - rText.Width;
-					rText.Y = cb.Y;
-					break;
-				case Alignment.BottomCenter://ok
+				case Alignment.Bottom://ok
 					rText.X = cb.Width / 2 - rText.Width / 2;
 					rText.Y = cb.Height - rText.Height;
-					break;
-				case Alignment.BottomStretch://ok
-					heightRatio = widthRatio = (float)cb.Width / rText.Width;
-					rText.Width = cb.Width;
-					rText.Height = (int)(rText.Height * heightRatio);
-					rText.Y = cb.Bottom - rText.Height;
-					rText.X = cb.X;
 					break;
 				case Alignment.BottomLeft://ok
 					rText.X = cb.X;
@@ -425,27 +433,6 @@ namespace Crow
 				case Alignment.Center://ok
 					rText.X = cb.X + cb.Width / 2 - rText.Width / 2;
 					rText.Y = cb.Y + cb.Height / 2 - rText.Height / 2;
-					break;
-				case Alignment.Fit://ok, peut être mieu aligné                            
-					widthRatio = (float)cb.Width / rText.Width;
-					heightRatio = (float)cb.Height / rText.Height;
-					rText = cb;
-					break;
-				case Alignment.HorizontalStretch://ok
-					heightRatio = widthRatio = (float)cb.Width / rText.Width;
-					rText.Width = cb.Width;
-					rText.Height = (int)(heightRatio * rText.Height);
-					rText.Y = cb.Y + cb.Height / 2 - rText.Height / 2;
-					rText.X = cb.X;
-					break;
-				case Alignment.VerticalStretch://ok
-					heightRatio = widthRatio = (float)cb.Height / rText.Height;
-					rText.Height = cb.Height;
-					rText.Width = (int)(widthRatio * rText.Width);
-					rText.X = cb.X + cb.Width / 2 - rText.Width / 2;
-					rText.Y = cb.Y;
-					break;
-				default:
 					break;
 				}
 			}
@@ -520,10 +507,10 @@ namespace Crow
 					(int)fe.Height);
 
 //				if (TextAlignment == Alignment.Center ||
-//					TextAlignment == Alignment.TopCenter ||
-//					TextAlignment == Alignment.BottomCenter)
+//					TextAlignment == Alignment.Top ||
+//					TextAlignment == Alignment.Bottom)
 //					lineRect.X += (rText.Width - lineLength) / 2;
-//				else if (TextAlignment == Alignment.RightCenter ||
+//				else if (TextAlignment == Alignment.Right ||
 //					TextAlignment == Alignment.TopRight ||
 //					TextAlignment == Alignment.BottomRight)
 //					lineRect.X += (rText.Width - lineLength);

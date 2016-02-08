@@ -4,9 +4,9 @@
 		<Label Text="centered" Width="80" Height="30" Background="DarkBlue" TextAlignment="Center"/>
 		<Label Text="top left" Width="80" Height="30" Background="DarkBlue" TextAlignment="TopLeft"/>
 		<Label Text="top right" Width="80" Height="30" Background="DarkBlue" TextAlignment="TopRight"/>
-		<Label Text="right center" Width="80" Height="30" Background="DarkBlue" TextAlignment="RightCenter"/>
+		<Label Text="right center" Width="80" Height="30" Background="DarkBlue" TextAlignment="Right"/>
 		<Label Text="bottom left" Width="80" Height="30" Background="DarkBlue" TextAlignment="BottomLeft"/>
-		<Label Text="bottom center" Width="80" Height="30" Background="DarkBlue" TextAlignment="BottomCenter"/>
+		<Label Text="bottom center" Width="80" Height="30" Background="DarkBlue" TextAlignment="Bottom"/>
 		<Label Text="bottom right" Width="80" Height="30" Background="DarkBlue" TextAlignment="BottomRight"/>
 	</HorizontalStack>
 	<HorizontalStack Fit="true">

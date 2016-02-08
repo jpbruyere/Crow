@@ -4,19 +4,19 @@
 		Margin="10" Focusable="True" >
 			<VerticalStack Fit="true" Name="vsFps"  Spacing="10" >
 				<HorizontalStack Fit="true">
-					<Label Text="Update:" Width="50" TextAlignment="RightCenter"/>
+					<Label Text="Update:" Width="50" TextAlignment="Right"/>
 					<Label Name="labUpdate" Text="{update}" Font="droid,12" Background="AoEnglish" Width="50" TextAlignment="Center"/>
 				</HorizontalStack>
 				<HorizontalStack Fit="true">
-					<Label Name="captionFps" Text="Fps:" Width="50" TextAlignment="RightCenter"/>
+					<Label Name="captionFps" Text="Fps:" Width="50" TextAlignment="Right"/>
 					<Label Name="valueFps" Text="{fps}" Font="droid , 12" Width="50" TextAlignment="Center" Background="AoEnglish"/>
 				</HorizontalStack>
 				<HorizontalStack Fit="true">
-					<Label Text="Min:" Width="50" TextAlignment="RightCenter"/>
+					<Label Text="Min:" Width="50" TextAlignment="Right"/>
 					<Label Text="{fpsMin}" Font="droid , 12" Width="50" TextAlignment="Center" Background="AoEnglish"/>
 				</HorizontalStack>
 				<HorizontalStack Fit="true">
-					<Label Text="Max:" Width="50" TextAlignment="RightCenter"/>
+					<Label Text="Max:" Width="50" TextAlignment="Right"/>
 					<Label Text="{fpsMax}" Font="droid , 12" Background="AoEnglish" Width="50" TextAlignment="Center"/>
 				</HorizontalStack>
 			</VerticalStack>				

@@ -38,7 +38,7 @@
 						<Button MouseClick="onButClick"/>
 					</VerticalStack>
 				</HorizontalStack>
-				<TextBox Name="textbox1" TextAlignment="LeftCenter" Font="droid,14"						
+				<TextBox Name="textbox1" TextAlignment="Left" Font="droid,14"						
 								Width="200" Height="-1" Margin="2" Background="White"
 								Forground="Black"
 								Foreground="DimGray" BorderWidth="1"
