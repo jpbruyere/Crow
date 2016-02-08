@@ -20,7 +20,7 @@ namespace Crow
 		double _scrollY = 0.0;
 		int scrollSpeed;
 
-
+		public event EventHandler<ScrollingEventArgs> Scrolled;
 
 		#region public properties
 		[XmlAttributeAttribute][DefaultValue(false)]

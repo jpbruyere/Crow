@@ -40,6 +40,7 @@ namespace Crow
 		#endregion
 
 		Group _list;
+		GenericStack _gsList;
 		IList data;
 		int _selectedIndex;
 		string _itemTemplate;
@@ -51,21 +52,42 @@ namespace Crow
 		{
 			base.loadTemplate (template);
 			_list = this.child.FindByName ("List") as Group;
+			_gsList = _list as GenericStack;
 		}
+
+
 		#endregion
 
 		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ItemTemplate.goml")]
 		public string ItemTemplate {
 			get { return _itemTemplate; }
 			set { 
+				if (value == _itemTemplate)
+					return;
+
+				_itemTemplate = value;
+
+				if (templateStream != null) {
+					templateStream.Dispose ();
+					templateStream = null;
+				}
+
 				//TODO:reload list with new template?
-				_itemTemplate = value; 
+				NotifyValueChanged("ItemTemplate", _itemTemplate);
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue(-1)]
 		public int SelectedIndex{
 			get { return _selectedIndex; }
-			set { _selectedIndex = value; }
+			set { 
+				if (value == _selectedIndex)
+					return;
+				
+				_selectedIndex = value; 
+
+				NotifyValueChanged ("SelectedIndex", _selectedIndex);
+				NotifyValueChanged ("SelectedItem", SelectedItem);
+			}
 		}
 		public object SelectedItem{
 			get { return data == null ? null : data[_selectedIndex]; }
@@ -76,44 +98,112 @@ namespace Crow
 				return data;
 			}
 			set {
+				if (value == data)
+					return;
 				
 				data = value;
+
+				NotifyValueChanged ("Data", data);
 
 				_list.ClearChildren ();
 
 				if (data == null)
 					return;
-				
-				#if DEBUG_LOAD_TIME
-				Stopwatch loadingTime = new Stopwatch ();
-				loadingTime.Start ();
-				#endif
 
-				MemoryStream ms = new MemoryStream ();
+				loadPage (1);
+			}
+		}
+		int itemPerPage = 40;
+		MemoryStream templateStream = null;
+		Type templateBaseType = null;
+
+		void loadPage(int pageNum)
+		{
+			#if DEBUG_LOAD_TIME
+			Stopwatch loadingTime = new Stopwatch ();
+			loadingTime.Start ();
+			#endif
+
+			if (templateStream == null) {
+				templateStream = new MemoryStream ();
 				lock (ItemTemplate) {
 					using (Stream stream = Interface.GetStreamFromPath (ItemTemplate))
-						stream.CopyTo (ms);
+						stream.CopyTo (templateStream);
 				}
+				templateBaseType = Interface.GetTopContainerOfGOMLStream (templateStream);
+			}
 
-				Type t = Interface.GetTopContainerOfGOMLStream (ms);
+			Group page = _list.Clone () as Group;
+			page.Name = "page" + pageNum;
 
-				foreach (var item in data) {
-					ms.Seek(0,SeekOrigin.Begin);
-					GraphicObject g = Interface.Load (ms, t);
-					g.MouseClick += itemClick;
-					_list.AddChild (g);
-					g.DataSource = item;
+
+			for (int i = (pageNum - 1) * itemPerPage; i < pageNum * itemPerPage; i++) {
+				if (i >= data.Count)
+					break;
+				templateStream.Seek(0,SeekOrigin.Begin);
+				GraphicObject g = Interface.Load (templateStream, templateBaseType);
+				g.MouseClick += itemClick;
+				page.AddChild (g);
+				g.DataSource = data [i];
+				//g.LogicalParent = this;
+			}
+
+			_list.AddChild (page);
+
+			#if DEBUG_LOAD_TIME
+			loadingTime.Stop ();
+			Debug.WriteLine("Listbox {2} Loading: {0} ticks \t, {1} ms",
+			loadingTime.ElapsedTicks,
+			loadingTime.ElapsedMilliseconds, this.ToString());
+			#endif
+		}
+		void _scroller_ValueChanged (object sender, ValueChangeEventArgs e)
+		{
+			if (_gsList == null)
+				return;
+
+			if (_gsList.Orientation == Orientation.Horizontal) {
+			} else {
+				if (!string.Equals (e.MemberName, "ScrollY"))
+					return;
+
+				double scroll = (double)e.NewValue;
+				int pageHeight = (int)Math.Ceiling((double)_gsList.getSlot().Height / (double)data.Count * (double)itemPerPage);
+
+				int pagePtr = (int)Math.Ceiling(scroll / (double)pageHeight);
+
+				for (int i = _gsList.Children.Count+1; i <= pagePtr+1; i++) {
+					loadPage (i);					
 				}
+			}
+		}
+		void _list_LayoutChanged (object sender, LayoutingEventArgs e)
+		{
+			if (_gsList == null)
+				return;
 
-				ms.Dispose ();			
+			GenericStack page1 = _list.FindByName ("page1") as GenericStack;
+			if (page1 == null)
+				return;
 
-				#if DEBUG_LOAD_TIME
-				loadingTime.Stop ();
-				Debug.WriteLine("Listbox {2} Loading: {0} ticks \t, {1} ms",
-				loadingTime.ElapsedTicks,
-				loadingTime.ElapsedMilliseconds, this.ToString());
-				#endif
-
+			if (_gsList.Orientation == Orientation.Horizontal) {
+				if (e.LayoutType != LayoutingType.Width)
+					return;
+				int tmpWidth = (int)Math.Ceiling ((double)page1.Slot.Width / (double)itemPerPage * (double)data.Count);
+				if (_gsList.Slot.Width == tmpWidth)
+					return;
+				_gsList.Slot.Width = tmpWidth;
+				_gsList.OnLayoutChanges (LayoutingType.Width);
+				_gsList.LastSlots.Width = _gsList.Slot.Width;
+			} else {
+				if (e.LayoutType != LayoutingType.Height)
+					return;
+				int tmpHeight = (int)Math.Ceiling ((double)page1.Slot.Height / (double)itemPerPage * (double)data.Count);
+				if (_gsList.Slot.Height == tmpHeight)
+					return;
+				_gsList.Slot.Height = tmpHeight;
+				_gsList.OnLayoutChanges (LayoutingType.Height);
+				_gsList.LastSlots.Height = _gsList.Slot.Height;
 			}
 		}
 

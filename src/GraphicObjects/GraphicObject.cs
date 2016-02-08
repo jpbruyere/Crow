@@ -21,7 +21,7 @@ using System.Reflection.Emit;
 
 namespace Crow
 {		
-	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange
+	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange, ICloneable
 	{
 		#if DEBUG_LAYOUTING
 		internal static ulong currentUid = 0;
@@ -462,7 +462,7 @@ namespace Crow
 		}
 
 		public virtual GraphicObject FindByName(string nameToFind){
-			return nameToFind == _name ? this : null;
+			return string.Equals(nameToFind, _name, StringComparison.Ordinal) ? this : null;
 		}
 		public virtual bool Contains(GraphicObject goToFind){
 			return false;
@@ -1381,5 +1381,30 @@ namespace Crow
 		}
 		#endregion
 
+		#region ICloneable implementation
+		public object Clone ()
+		{
+			Type type = this.GetType ();
+			GraphicObject result = (GraphicObject)Activator.CreateInstance (type);
+
+			foreach (PropertyInfo pi in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
+				if (pi.GetSetMethod () == null)
+					continue;
+
+				if (pi.GetCustomAttribute<XmlIgnoreAttribute> () != null)
+					continue;
+
+//				object[] att = pi.GetCustomAttributes (false);
+//				foreach (object o in att) {
+//					XmlIgnoreAttribute xia = o as XmlIgnoreAttribute;
+//					if (xia != null)
+//						continue;
+//				}
+
+				pi.SetValue(result, pi.GetValue(this));
+			}
+			return result;
+		}
+		#endregion
 	}
 }

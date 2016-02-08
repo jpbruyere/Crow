@@ -132,6 +132,7 @@
     <Compile Include="src\Gradient.cs" />
     <Compile Include="src\Fill\Fill.cs" />
     <Compile Include="src\LayoutingEventArgs.cs" />
+    <Compile Include="src\ScrollingEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
