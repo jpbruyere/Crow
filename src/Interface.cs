@@ -52,6 +52,8 @@ namespace Crow
 		public static bool DesignerMode = false;
 		/// <summary> Threshold to catch borders for sizing </summary>
 		public static int BorderThreshold = 5;
+		public const int MaxCacheSize = 2048;
+		public const int MaxLayoutingTries = 50;
 
 		public static Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem>();
 

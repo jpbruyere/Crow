@@ -5,6 +5,7 @@ namespace Crow
 {
 	public interface ILayoutable
 	{
+		int LayoutingTries { get; set; }
 		ILayoutable Parent { get; set; }
 
 		Rectangle ClientRectangle { get; }

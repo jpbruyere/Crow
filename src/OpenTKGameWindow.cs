@@ -544,6 +544,10 @@ namespace Crow
         #endregion
 
 		#region ILayoutable implementation
+		public int LayoutingTries {
+			get { throw new NotImplementedException (); }
+			set { throw new NotImplementedException (); }
+		}
 		public LayoutingType RegisteredLayoutings {
 			get { return LayoutingType.None; }
 			set { throw new NotImplementedException (); } 

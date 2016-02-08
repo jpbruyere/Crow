@@ -61,8 +61,11 @@ namespace Crow
 				#if DEBUG_LAYOUTING
 				Debug.WriteLine ("Requeuing => " + this.ToString ());
 				#endif
-				Interface.LayoutingQueue.Enqueue (this);
+				GraphicObject.LayoutingTries ++;
+				if (GraphicObject.LayoutingTries < Interface.MaxLayoutingTries)
+					Interface.LayoutingQueue.Enqueue (this);
 			} else {
+				GraphicObject.LayoutingTries = 0;
 				#if DEBUG_LAYOUTING
 				Debug.WriteLine ("Layouting => " + this.ToString ());
 				#endif

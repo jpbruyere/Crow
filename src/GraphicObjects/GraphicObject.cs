@@ -29,6 +29,7 @@ namespace Crow
 		#endif
 
 		internal List<Binding> Bindings = new List<Binding> ();
+		internal int layoutingTries = 0;
 
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
@@ -80,6 +81,7 @@ namespace Crow
 		HorizontalAlignment _horizontalAlignment = HorizontalAlignment.Center;
 		Size _maximumSize = "0;0";
 		Size _minimumSize = "0;0";
+		bool cacheEnabled = false;
 		#endregion
 
 		#region public fields
@@ -178,6 +180,16 @@ namespace Crow
 		#endregion
 
 		#region public properties
+		[XmlAttributeAttribute()][DefaultValue(true)]
+		public virtual bool CacheEnabled {
+			get { return cacheEnabled; }
+			set {
+				if (cacheEnabled == value)
+					return;
+				cacheEnabled = value;
+				NotifyValueChanged ("CacheEnabled", cacheEnabled);
+			}
+		}
 		[XmlAttributeAttribute()][DefaultValue("unamed")]
 		public virtual string Name {
 			get { return _name; }
@@ -499,6 +511,11 @@ namespace Crow
 		}
 
 		#region Layouting
+		public int LayoutingTries {
+			get { return layoutingTries; }
+			set { layoutingTries = value; }
+		}
+
 		/// <summary> return size of content + margins </summary>
 		protected virtual Size measureRawSize () {
 			return Bounds.Size;
@@ -740,25 +757,37 @@ namespace Crow
 			if (!Visible)
 				return;
 
-			if (bmp == null)
-				UpdateGraphic ();
+			Rectangle rb = Parent.ContextCoordinates (Slot);
 
-			Rectangle rb = Parent.ContextCoordinates(Slot);
-
-			using (ImageSurface source = new ImageSurface(bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
-				//TODO:improve equality test for basic color and Fill
-				if (this.Background is SolidColor) {					
-					if ((this.Background as SolidColor).Equals(Color.Clear)) {
-						ctx.Save ();
-						ctx.Operator = Operator.Clear;
-						ctx.Rectangle (rb);
-						ctx.Fill ();
-						ctx.Restore ();
-					}
-				}
-				ctx.SetSourceSurface (source, rb.X, rb.Y);
-				ctx.Paint ();
+			if (cacheEnabled) {
+				if (Slot.Width > Interface.MaxCacheSize || Slot.Height > Interface.MaxCacheSize)
+					cacheEnabled = false;
 			}
+
+			if (cacheEnabled) {
+				if (bmp == null)
+					UpdateGraphic ();
+
+				using (ImageSurface source = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
+					//TODO:improve equality test for basic color and Fill
+					if (this.Background is SolidColor) {
+						if ((this.Background as SolidColor).Equals (Color.Clear)) {
+							ctx.Save ();
+							ctx.Operator = Operator.Clear;
+							ctx.Rectangle (rb);
+							ctx.Fill ();
+							ctx.Restore ();
+						}
+					}
+					ctx.SetSourceSurface (source, rb.X, rb.Y);
+					ctx.Paint ();
+				}
+				return;
+			}
+			ctx.Save ();
+			ctx.Translate (rb.X, rb.Y);
+			onDraw (ctx);
+			ctx.Restore ();
 		}
 		#endregion
 
