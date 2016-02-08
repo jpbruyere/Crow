@@ -55,11 +55,6 @@ namespace Crow
 			}
 		}
 
-		void _content_MouseLeave (object sender, MouseMoveEventArgs e)
-		{
-			IsPopped = false;
-		}
-
 		void _content_LayoutChanged (object sender, LayoutingEventArgs e)
 		{
 			ILayoutable tc = Content.Parent as ILayoutable;
@@ -67,23 +62,51 @@ namespace Crow
 				return;
 			Rectangle r = this.ScreenCoordinates (this.Slot);
 			if (e.LayoutType.HasFlag(LayoutingType.Width)) {
-				if (Content.Slot.Width < tc.ClientRectangle.Width) {
-					if (r.Left + Content.Slot.Width > tc.ClientRectangle.Right)
-						Content.Left = tc.ClientRectangle.Right - Content.Slot.Width;
+				if (popDirection.HasFlag (Alignment.Right)) {
+					if (r.Right + Content.Slot.Width > tc.ClientRectangle.Right)
+						Content.Left = r.Left - Content.Slot.Width;
 					else
-						Content.Left = r.Left;
-				} else
-					Content.Left = 0;
+						Content.Left = r.Right;
+				} else if (popDirection.HasFlag (Alignment.Left)) {
+					if (r.Left - Content.Slot.Width < tc.ClientRectangle.Left)
+						Content.Left = r.Right;
+					else
+						Content.Left = r.Left - Content.Slot.Width;
+				} else {
+					if (Content.Slot.Width < tc.ClientRectangle.Width) {
+						if (r.Left + Content.Slot.Width > tc.ClientRectangle.Right)
+							Content.Left = tc.ClientRectangle.Right - Content.Slot.Width;
+						else
+							Content.Left = r.Left;
+					} else
+						Content.Left = 0;
+				}
 			}
 			if (e.LayoutType.HasFlag(LayoutingType.Height)) {
 				if (Content.Slot.Height < tc.ClientRectangle.Height) {
-					if (r.Bottom + Content.Slot.Height > tc.ClientRectangle.Bottom)
-						Content.Top = r.Top - Content.Slot.Height;
-					else
-						Content.Top = r.Bottom;
+					if (PopDirection.HasFlag (Alignment.Bottom)) {
+						if (r.Bottom + Content.Slot.Height > tc.ClientRectangle.Bottom)
+							Content.Top = r.Top - Content.Slot.Height;
+						else
+							Content.Top = r.Bottom;
+					} else if (PopDirection.HasFlag (Alignment.Top)) {
+						if (r.Top - Content.Slot.Height < tc.ClientRectangle.Top)
+							Content.Top = r.Bottom;
+						else
+							Content.Top = r.Top - Content.Slot.Height;
+					} else
+						Content.Top = r.Top;
 				}else
 					Content.Top = 0;
 			}
+		}
+
+		#region GraphicObject overrides
+		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
+		public override bool Focusable
+		{
+			get { return base.Focusable; }
+			set { base.Focusable = value; }
 		}
 		public override void ClearBinding ()
 		{
@@ -104,18 +127,19 @@ namespace Crow
 				Content.ResolveBindings ();
 		}
 
-		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
-		public override bool Focusable
+		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{
-			get { return base.Focusable; }
-			set { base.Focusable = value; }
+			IsPopped = !IsPopped;
+			base.onMouseClick (sender, e);
 		}
-		[XmlAttributeAttribute()][DefaultValue(-1)]
-		public override int Height {
-			get { return base.Height; }
-			set { base.Height = value; }
+		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
+		{
+			base.onMouseLeave (sender, e);
+			IsPopped = false;
 		}
+		#endregion
 
+		#region Public Properties
 		[XmlAttributeAttribute()][DefaultValue("Popper")]
 		public string Caption {
 			get { return caption; } 
@@ -136,7 +160,6 @@ namespace Crow
 				NotifyValueChanged ("Image", image);
 			}
 		} 
-
 		[XmlAttributeAttribute()][DefaultValue(false)]
         public bool IsPopped
         {
@@ -155,6 +178,18 @@ namespace Crow
 				NotifyValueChanged ("SvgSub", "collapsed");
             }
         }
+		Alignment popDirection;
+		[XmlAttributeAttribute()][DefaultValue(Alignment.Bottom)]
+		public virtual Alignment PopDirection {
+			get { return popDirection; }
+			set {
+				if (popDirection == value)
+					return;
+				popDirection = value;
+				NotifyValueChanged ("PopDirection", popDirection);
+			}
+		}
+		#endregion
 			
 		public virtual void onPop(object sender, EventArgs e)
 		{
@@ -177,12 +212,6 @@ namespace Crow
 				return;
 			Content.Visible = false;
 			Unpop.Raise (this, e);
-		}
-			
-		public override void onMouseClick (object sender, MouseButtonEventArgs e)
-		{
-			IsPopped = !IsPopped;
-			base.onMouseClick (sender, e);
 		}
 	}
 }

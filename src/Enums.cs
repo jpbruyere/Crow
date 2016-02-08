@@ -11,17 +11,17 @@ namespace Crow
         Vertical
     }
 
-    public enum Alignment
+	public enum Alignment : byte
     {
-        Top,
-        Left,
-        Right,
-        Bottom,
-        TopLeft,
-        TopRight,
-        BottomLeft,
-        BottomRight,
-		Center
+        Top = 0x01,
+        Left = 0x02,
+		TopLeft = 0x03,
+		Right = 0x04,
+		TopRight = 0x05,
+		Bottom = 0x08,
+        BottomLeft = 0x0a,
+        BottomRight = 0x0c,
+		Center = 0x10
     }
     public enum HorizontalAlignment
     {

@@ -37,6 +37,8 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"testPopper.goml",
+			"testTextBox.crow",
 			"testColorList.crow",
 			"0.crow",
 			"testExpandable.goml",
@@ -52,7 +54,6 @@ namespace test
 //			"testButton2.crow",
 			"test2WayBinding.crow",
 			"fps.goml",
-			"testTextBox.crow",
 			"testImage.crow",
 			"test4.goml",
 			"2.crow",
@@ -62,15 +63,14 @@ namespace test
 			"testWindow3.goml",
 			"testWindow.goml",
 			"testCheckbox.goml",
-			"testPopper.goml",
 			"testLabel.goml",
 			"testAll.goml",
 //			"testSpinner.goml",
-			"testRadioButton2.goml",
+//			"testRadioButton2.goml",
 			"testContainer.goml",
 			"testRadioButton.goml",
 			"testMsgBox.goml",
-			"testMeter.goml",
+//			"testMeter.goml",
 		};
 
 		#region FPS
@@ -116,6 +116,7 @@ namespace test
 		public string update = "";
 		public string drawing = "";
 		public string layouting = "";
+		public Alignment alignment = Alignment.Left;
 		#endregion
 
 		public int intValue = 25;
@@ -133,6 +134,12 @@ namespace test
 			if (e.MemberName != "Value")
 				return;
 			intValue = Convert.ToInt32(e.NewValue);
+		}
+		void change_alignment(object sender, EventArgs e){
+			RadioButton rb = sender as RadioButton;
+			if (rb == null)
+				return;
+			NotifyValueChanged ("alignment", Enum.Parse(typeof(Alignment), rb.Caption));
 		}
 		IList<Color> testList = null;
 		public IList<Color> TestList {
