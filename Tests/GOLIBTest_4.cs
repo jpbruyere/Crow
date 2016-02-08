@@ -146,9 +146,9 @@ namespace test
 				b.MouseLeave += delegate(object sender, MouseMoveEventArgs ee) {
 					(sender as Border).Foreground = Color.Transparent;
 				};
-				s.addChild (b);
+				s.AddChild (b);
 
-				s.addChild (
+				s.AddChild (
 					new Label (col.ToString ()){
 						Bounds=new Rectangle(0,0,-1,-1),
 					}
@@ -179,7 +179,7 @@ namespace test
 		void onButClick(object send, MouseButtonEventArgs e)
 		{
 			Color col = Color.ColorDic.ToArray () [i];
-			HorizontalStack s = colors.addChild (new HorizontalStack () { Fit = true});
+			HorizontalStack s = colors.AddChild (new HorizontalStack () { Fit = true});
 			s.HorizontalAlignment = HorizontalAlignment.Left;
 			Border b = new Border () {
 				Bounds = new Size (32, 20),
@@ -195,9 +195,9 @@ namespace test
 			b.MouseLeave += delegate(object sender, MouseMoveEventArgs ee) {
 				(sender as Border).Foreground = Color.Transparent;
 			};
-			s.addChild (b);
+			s.AddChild (b);
 
-			s.addChild (
+			s.AddChild (
 				new Label (col.ToString ()){
 					Bounds=new Rectangle(0,0,-1,-1),
 				}
@@ -214,7 +214,7 @@ namespace test
 			lock (mutex) {
 				if (loadedCols.Count > 50 || allColsLoaded) {
 					while (loadedCols.Count > 0) {
-						colors.addChild (loadedCols[0]);
+						colors.AddChild (loadedCols[0]);
 						loadedCols.RemoveAt (0);
 					}
 				}

@@ -42,21 +42,21 @@ namespace Crow
         }
 			
 			
-        public virtual T addChild<T>(T child)
+        public virtual T AddChild<T>(T child)
         {
 			GraphicObject g = child as GraphicObject;
-            Children.Add(g);
+            children.Add(g);
             g.Parent = this as GraphicObject;            
 			g.RegisterForLayouting (LayoutingType.Sizing);
 			g.LayoutChanged += OnChildLayoutChanges;
             return (T)child;
         }
-        public virtual void removeChild(GraphicObject child)        
+        public virtual void RemoveChild(GraphicObject child)        
 		{
 			child.LayoutChanged -= OnChildLayoutChanges;
 			child.ClearBinding ();
 			child.Parent = null;
-            Children.Remove(child);
+            children.Remove(child);
 			this.RegisterForLayouting (LayoutingType.Sizing);
         }
 		public virtual void ClearChildren()
@@ -66,25 +66,25 @@ namespace Crow
 				g.LayoutChanged -= OnChildLayoutChanges;
 				g.ClearBinding ();
 				g.Parent = null;
-				Children.RemoveAt(children.Count-1);
+				children.RemoveAt(children.Count-1);
 			}
 			this.RegisterForLayouting (LayoutingType.Sizing);
 			ChildrenCleared.Raise (this, new EventArgs ());
 		}
 		public void putWidgetOnTop(GraphicObject w)
 		{
-			if (Children.Contains(w))
+			if (children.Contains(w))
 			{
-				Children.Remove(w);
-				Children.Add(w);
+				children.Remove(w);
+				children.Add(w);
 			}
 		}
 		public void putWidgetOnBottom(GraphicObject w)
 		{
-			if (Children.Contains(w))
+			if (children.Contains(w))
 			{
-				Children.Remove(w);
-				Children.Insert(0, w);
+				children.Remove(w);
+				children.Insert(0, w);
 			}
 		}
 
@@ -93,7 +93,7 @@ namespace Crow
 			get {
 				if (!base.DrawingIsValid)
 					return false;
-				foreach (GraphicObject g in Children) {
+				foreach (GraphicObject g in children) {
 					if (!g.DrawingIsValid)
 						return false;
 				}
@@ -103,7 +103,7 @@ namespace Crow
 		public override void ResolveBindings ()
 		{
 			base.ResolveBindings ();
-			foreach (GraphicObject w in Children)
+			foreach (GraphicObject w in children)
 				w.ResolveBindings ();
 		}
 		public override GraphicObject FindByName (string nameToFind)
@@ -111,7 +111,7 @@ namespace Crow
 			if (Name == nameToFind)
 				return this;
 
-			foreach (GraphicObject w in Children) {
+			foreach (GraphicObject w in children) {
 				GraphicObject r = w.FindByName (nameToFind);
 				if (r != null)
 					return r;
@@ -120,7 +120,7 @@ namespace Crow
 		}
 		public override bool Contains (GraphicObject goToFind)
 		{
-			foreach (GraphicObject w in Children) {
+			foreach (GraphicObject w in children) {
 				if (w == goToFind)
 					return true;
 				if (w.Contains (goToFind))
@@ -140,14 +140,14 @@ namespace Crow
 			//position smaller objects in group when group size is fit
 			switch (layoutType) {
 			case LayoutingType.Width:
-				foreach (GraphicObject c in Children) {
+				foreach (GraphicObject c in children) {
 					if (!c.Visible)
 						continue;					
 					c.RegisterForLayouting (LayoutingType.X | LayoutingType.Width);
 				}
 				break;
 			case LayoutingType.Height:
-				foreach (GraphicObject c in Children) {
+				foreach (GraphicObject c in children) {
 					if (!c.Visible)
 						continue;
 					c.RegisterForLayouting (LayoutingType.Y | LayoutingType.Height);				}
@@ -212,7 +212,7 @@ namespace Crow
 		{
 			base.onDraw (gr);
 
-			foreach (GraphicObject g in Children) {
+			foreach (GraphicObject g in children) {
 				g.Paint (ref gr);
 			}
 		}
@@ -252,7 +252,7 @@ namespace Crow
 						#if DEBUG_CLIP_RECTANGLE
 						clip.stroke (gr, Color.Amaranth.AdjustAlpha (0.8));
 						#endif
-						foreach (GraphicObject c in Children.Where(ch=>ch.Visible)) {
+						foreach (GraphicObject c in children.Where(ch=>ch.Visible)) {
 							Rectangles childClip = clip.intersectingRects (ContextCoordinates(c.Slot));
 							if (!c.DrawingIsValid || childClip.count > 0)
 								c.Paint (ref gr, childClip);//, localClip);
@@ -275,7 +275,7 @@ namespace Crow
 				HostContainer.hoverWidget = this;
 				onMouseEnter (this, e);
 			}
-			foreach (GraphicObject g in Children)
+			foreach (GraphicObject g in children)
 			{
 				if (g.MouseIsIn(e.Position))
 				{
@@ -313,7 +313,7 @@ namespace Crow
 						throw new Exception ("Crow." + subTree.Name + " type not found");
                     GraphicObject go = (GraphicObject)Activator.CreateInstance(t);
                     (go as IXmlSerializable).ReadXml(subTree);                    
-                    addChild(go);
+                    AddChild(go);
                 }
             }
         }
@@ -321,7 +321,7 @@ namespace Crow
         {
             base.WriteXml(writer);
 
-            foreach (GraphicObject go in Children)
+            foreach (GraphicObject go in children)
             {
                 writer.WriteStartElement(go.GetType().Name);
                 (go as IXmlSerializable).WriteXml(writer);

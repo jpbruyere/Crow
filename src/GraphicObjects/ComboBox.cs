@@ -173,7 +173,7 @@ namespace Crow
 				if (!threadedLoadingFinished && pendingChildrenAddition.Count < 50)
 					return;
 				while (pendingChildrenAddition.Count > 0) {
-					_list.addChild (pendingChildrenAddition.Dequeue ());
+					_list.AddChild (pendingChildrenAddition.Dequeue ());
 				}
 			}
 		}

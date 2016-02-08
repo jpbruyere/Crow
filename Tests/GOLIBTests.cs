@@ -39,11 +39,11 @@ namespace test
 		string[] testFiles = {
 			"0.crow",
 			"testExpandable.goml",
+			"4.crow",
+			"testColorList.crow",
 			"5.crow",
 			"testSpinner.goml",
 			"testScrollbar.goml",
-			"4.crow",
-			"testColorList.crow",
 			"testGroupBox.goml",
 			"testGrid.goml",
 			"test_Listbox.goml",
@@ -163,9 +163,12 @@ namespace test
 			fps = (int)RenderFrequency;
 
 
-			if (frameCpt > 200) {
+			if (frameCpt > 50) {
 				resetFps ();
 				frameCpt = 0;
+				GC.Collect();
+				GC.WaitForPendingFinalizers();
+				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
 			}
 			frameCpt++;
 		}

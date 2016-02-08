@@ -101,7 +101,7 @@ namespace Crow
 					ms.Seek(0,SeekOrigin.Begin);
 					GraphicObject g = Interface.Load (ms, t);
 					g.MouseClick += itemClick;
-					_list.addChild (g);
+					_list.AddChild (g);
 					g.DataSource = item;
 				}
 

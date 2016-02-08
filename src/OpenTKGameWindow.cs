@@ -249,76 +249,76 @@ namespace Crow
 			updateTime.Restart ();			
 			#endif
 
-			surf = new ImageSurface(bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height,ClientRectangle.Width*4);
-			ctx = new Context(surf);
+			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
+				using (ctx = new Context (surf)){
 
-			GraphicObject[] invGOList = new GraphicObject[GraphicObjects.Count];
-			GraphicObjects.CopyTo (invGOList,0);
-			invGOList = invGOList.Reverse ().ToArray ();
+					GraphicObject[] invGOList = new GraphicObject[GraphicObjects.Count];
+					GraphicObjects.CopyTo (invGOList, 0);
+					invGOList = invGOList.Reverse ().ToArray ();
 
-			#if MEASURE_TIME
-			layoutTime.Start ();
-			#endif
-			//Debug.WriteLine ("======= Layouting queue start =======");
-
-			while (Interface.LayoutingQueue.Count > 0) {
-				LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
-				lqi.ProcessLayouting ();
-			}
-
-			#if MEASURE_TIME
-			layoutTime.Stop ();
-			#endif
-
-			//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
-			//final redraw clips should be added only when layout is completed among parents,
-			//that's why it take place in a second pass
-			GraphicObject[] gotr = new GraphicObject[gobjsToRedraw.Count];
-			gobjsToRedraw.CopyTo (gotr);
-			gobjsToRedraw.Clear ();
-			foreach (GraphicObject p in gotr) {
-				p.registerClipRect ();
-			}
-
-			#if MEASURE_TIME
-			updateTime.Stop ();
-			drawingTime.Start ();
-			#endif
-
-			lock (redrawClip) {
-				if (redrawClip.count > 0) {					
-					#if DEBUG_CLIP_RECTANGLE
-					redrawClip.stroke (ctx, new Color(1.0,0,0,0.3));
+					#if MEASURE_TIME
+					layoutTime.Start ();
 					#endif
-					redrawClip.clearAndClip (ctx);	
+					//Debug.WriteLine ("======= Layouting queue start =======");
 
-					//Link.draw (ctx);
-					foreach (GraphicObject p in invGOList) {
-						if (p.Visible) {
+					while (Interface.LayoutingQueue.Count > 0) {
+						LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
+						lqi.ProcessLayouting ();
+					}
 
-							ctx.Save ();
-							if (redrawClip.count > 0) {
-								Rectangles clip = redrawClip.intersectingRects (p.Slot);
+					#if MEASURE_TIME
+					layoutTime.Stop ();
+					#endif
 
-								if (clip.count > 0)
-									p.Paint (ref ctx, clip);
+					//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
+					//final redraw clips should be added only when layout is completed among parents,
+					//that's why it take place in a second pass
+					GraphicObject[] gotr = new GraphicObject[gobjsToRedraw.Count];
+					gobjsToRedraw.CopyTo (gotr);
+					gobjsToRedraw.Clear ();
+					foreach (GraphicObject p in gotr) {
+						p.registerClipRect ();
+					}
+
+					#if MEASURE_TIME
+					updateTime.Stop ();
+					drawingTime.Start ();
+					#endif
+
+					lock (redrawClip) {
+						if (redrawClip.count > 0) {
+							#if DEBUG_CLIP_RECTANGLE
+						redrawClip.stroke (ctx, new Color(1.0,0,0,0.3));
+							#endif
+							redrawClip.clearAndClip (ctx);
+
+							//Link.draw (ctx);
+							foreach (GraphicObject p in invGOList) {
+								if (p.Visible) {
+
+									ctx.Save ();
+									if (redrawClip.count > 0) {
+										Rectangles clip = redrawClip.intersectingRects (p.Slot);
+
+										if (clip.count > 0)
+											p.Paint (ref ctx, clip);
+									}
+									ctx.Restore ();
+								}
 							}
-							ctx.Restore ();
+							ctx.ResetClip ();
+							#if DEBUG_CLIP_RECTANGLE
+						redrawClip.stroke (ctx, Color.Red.AdjustAlpha(0.1));
+							#endif
+							redrawClip.Reset ();
 						}
 					}
-					ctx.ResetClip ();
-					#if DEBUG_CLIP_RECTANGLE
-					redrawClip.stroke (ctx, Color.Red.AdjustAlpha(0.1));
+					#if MEASURE_TIME
+					drawingTime.Stop ();
 					#endif
-					redrawClip.Reset ();
+					//surf.WriteToPng (@"/mnt/data/test.png");
 				}
 			}
-			#if MEASURE_TIME
-			drawingTime.Stop ();
-			#endif
-			//surf.WriteToPng (@"/mnt/data/test.png");
-			ctx.Dispose ();
-			surf.Dispose ();
 //			if (ToolTip.isVisible) {
 //				ToolTip.panel.processkLayouting();
 //				if (ToolTip.panel.layoutIsValid)

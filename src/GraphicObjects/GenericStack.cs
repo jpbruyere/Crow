@@ -28,15 +28,15 @@ namespace Crow
         Orientation _orientation;
 		#endregion
 
-		public override T addChild<T> (T child)
+		public override T AddChild<T> (T child)
 		{
-			T tmp = base.addChild (child);
+			T tmp = base.AddChild (child);
 			this.RegisterForLayouting (LayoutingType.PositionChildren);
 			return tmp;
 		}
-		public override void removeChild (GraphicObject child)
+		public override void RemoveChild (GraphicObject child)
 		{
-			base.removeChild (child);
+			base.RemoveChild (child);
 			this.RegisterForLayouting (LayoutingType.PositionChildren);
 		}
 
