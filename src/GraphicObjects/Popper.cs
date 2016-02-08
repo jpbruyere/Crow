@@ -40,7 +40,6 @@ namespace Crow
 				if (_content != null) {
 					_content.LogicalParent = null;
 					_content.LayoutChanged -= _content_LayoutChanged;
-					_content.MouseLeave -= _content_MouseLeave;
 				}
 				
 				_content = value; 
@@ -49,9 +48,7 @@ namespace Crow
 					return;
 
 				_content.LogicalParent = this;
-				_content.Focusable = true;
 				_content.LayoutChanged += _content_LayoutChanged;
-				_content.MouseLeave += _content_MouseLeave;
 			}
 		}
 
