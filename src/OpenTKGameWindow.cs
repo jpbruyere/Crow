@@ -116,7 +116,11 @@ namespace Crow
 		public GraphicObject hoverWidget
 		{
 			get { return _hoverWidget; }
-			set { _hoverWidget = value; }
+			set {
+				if (_hoverWidget == value)
+					return;
+				_hoverWidget = value;
+			}
 		}
 		public GraphicObject FocusedWidget {
 			get { return _focusedWidget; }
@@ -422,13 +426,13 @@ namespace Crow
 				}
 			}
 
-			if (_hoverWidget != null) {
+			if (hoverWidget != null) {
 				//first, ensure object is still in the graphic tree
-				if (_hoverWidget.HostContainer == null) {
+				if (hoverWidget.HostContainer == null) {
 					hoverWidget = null;
 				} else {
 					//check topmost graphicobject first
-					GraphicObject tmp = _hoverWidget;
+					GraphicObject tmp = hoverWidget;
 					GraphicObject topc = null;
 					while (tmp is GraphicObject) {
 						topc = tmp;
@@ -439,7 +443,7 @@ namespace Crow
 						int i = 0;
 						while (i < idxhw) {
 							if (GraphicObjects [i].MouseIsIn (e.Position)) {
-								_hoverWidget.onMouseLeave (this, e);
+								hoverWidget.onMouseLeave (this, e);
 								GraphicObjects [i].checkHoverWidget (e);
 								return;
 							}
@@ -448,19 +452,19 @@ namespace Crow
 					}
 					
 					
-					if (_hoverWidget.MouseIsIn (e.Position)) {
-						_hoverWidget.checkHoverWidget (e);
+					if (hoverWidget.MouseIsIn (e.Position)) {
+						hoverWidget.checkHoverWidget (e);
 						return;
 					} else {
-						_hoverWidget.onMouseLeave (this, e);
+						hoverWidget.onMouseLeave (this, e);
 						//seek upward from last focused graph obj's
-						while (_hoverWidget.Parent as GraphicObject != null) {
-							_hoverWidget = _hoverWidget.Parent as GraphicObject;
-							if (_hoverWidget.MouseIsIn (e.Position)) {
-								_hoverWidget.checkHoverWidget (e);
+						while (hoverWidget.Parent as GraphicObject != null) {
+							hoverWidget = hoverWidget.Parent as GraphicObject;
+							if (hoverWidget.MouseIsIn (e.Position)) {
+								hoverWidget.checkHoverWidget (e);
 								return;
 							} else
-								_hoverWidget.onMouseLeave (this, e);
+								hoverWidget.onMouseLeave (this, e);
 						}
 					}
 				}
@@ -475,7 +479,7 @@ namespace Crow
 					return;
 				}
 			}
-			_hoverWidget = null;
+			hoverWidget = null;
 			MouseMove.Raise (this, e);
         }
         void Mouse_ButtonUp(object sender, MouseButtonEventArgs e)
@@ -496,12 +500,12 @@ namespace Crow
         }
         void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
         {
-			if (_hoverWidget == null) {
+			if (hoverWidget == null) {
 				MouseButtonDown.Raise (this, e);
 				return;
 			}
 
-			_hoverWidget.onMouseDown(_hoverWidget,new BubblingMouseButtonEventArg(e));
+			hoverWidget.onMouseDown(hoverWidget,new BubblingMouseButtonEventArg(e));
 
 			if (FocusedWidget == null)
 				return;
@@ -512,11 +516,11 @@ namespace Crow
         }
         void Mouse_WheelChanged(object sender, MouseWheelEventArgs e)
         {
-			if (_hoverWidget == null) {
+			if (hoverWidget == null) {
 				MouseWheelChanged.Raise (this, e);
 				return;
 			}
-			_hoverWidget.onMouseWheel (this, e);
+			hoverWidget.onMouseWheel (this, e);
         }
 
 		volatile bool mouseRepeatOn;
