@@ -1,86 +1,19 @@
 ﻿<?xml version="1.0"?>
-<Window Width="500" Height="300" MinimumSize="50;50">
-<HorizontalStack Margin="5" Background="DimGray">
-	<VerticalStack Width="200" Margin="5" Background="Gray">
-		<VerticalStack Fit="true" Background="DimGray" Margin="5">
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue"/>
-		</VerticalStack>
-		<VerticalStack Width="0" Height="-1" Background="DimGray" Margin="5">
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue" Width="0"/>
-			<TextRun Background="SkyBlue" Height="0"/>
-		</VerticalStack>
-		<HorizontalStack Fit="true" Background="DimGray" Margin="5">
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue"/>
-		</HorizontalStack>
-		<HorizontalStack Width="0" Height="-1" Background="DimGray" Margin="5">
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue"/>
-		</HorizontalStack>
-			<HorizontalStack Width="0" Height="0" Background="DimGray" Margin="5">
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue" Width="0"/>
-			<TextRun Background="SkyBlue"/>
-		</HorizontalStack>
-	</VerticalStack>
-	<VerticalStack Width="0" Height="0" Margin="5" Background="Gray">
-		<VerticalStack Fit="true" Background="DimGray" Margin="5">
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue"/>
-		</VerticalStack>
-		<VerticalStack Width="0" Height="0" Background="DimGray" Margin="5">
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue" Width="0"/>
-			<TextRun TextAlignment="Center" Background="SkyBlue" Width="0" Height="0"/>
-		</VerticalStack>
-		<HorizontalStack Fit="true" Background="DimGray" Margin="5">
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue"/>
-		</HorizontalStack>
-		<HorizontalStack Width="0" Height="-1" Background="DimGray" Margin="5">
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue"/>
-		</HorizontalStack>
-			<HorizontalStack Width="0" Height="-1" Background="DimGray" Margin="5">
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue" Width="0"/>
-			<TextRun Background="SkyBlue"/>
-		</HorizontalStack>
-	</VerticalStack>
-	<VerticalStack Width="-1" Margin="5" Background="Gray">
-		<VerticalStack Width="0" Height="-1" Background="DimGray" Margin="5">
-			<TextRun Background="SkyBlue" HorizontalAlignment="Left"/>
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue"/>
-		</VerticalStack>
-		<VerticalStack Width="0" Height="-1" Background="DimGray" Margin="5">
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue" Width="0"/>
-			<TextRun Background="SkyBlue" Height="0"/>
-		</VerticalStack>
-		<HorizontalStack Fit="true" Background="DimGray" Margin="5">
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue"/>
-		</HorizontalStack>
-		<HorizontalStack Width="0" Height="-1" Background="DimGray" Margin="5">
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue"/>
-		</HorizontalStack>
-			<HorizontalStack Width="0" Height="0" Background="DimGray" Margin="5">
-			<TextRun Background="SkyBlue"/>
-			<TextRun Background="SkyBlue" Width="0"/>
-			<TextRun Background="SkyBlue"/>
-		</HorizontalStack>
-	</VerticalStack>
-</HorizontalStack>
-</Window>
+<VerticalStack Fit="true">
+	<ProgressBar CornerRadius="5" Background="DimGray" Margin="1" Maximum="1000" Value="{fps}" Width="200" Height="15"/>
+	<HorizontalStack Fit="true">
+		<Label Text="Memory:" Width="50" TextAlignment="RightCenter"/>
+		<Label Text="{memory}" Font="droid,12" 
+			Background="vgradient|0:BlueCrayola|1:Black"/>
+	</HorizontalStack>
+	<HorizontalStack Fit="true">
+		<Label Text="Fps:" Width="50" TextAlignment="RightCenter"/>
+		<Label Text="{fps}" Font="droid , 12"
+			Background="vgradient|0:LimeGreen|1:Black"/>
+	</HorizontalStack>
+<!--	<HorizontalStack Fit="true">
+		<Label Text="Layouting:" Width="50" TextAlignment="RightCenter"/>
+		<Label Text="{layouting}" Font="droid,12"
+			Background="vgradient|0:AoEnglish|1:Black"/>
+	</HorizontalStack>-->
+</VerticalStack>

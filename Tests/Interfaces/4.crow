@@ -1,6 +1,12 @@
 ﻿<?xml version="1.0"?>
-<HorizontalStack Fit="true">
+<HorizontalStack Fit="true">	
 	<VerticalStack Fit="true" Name="vsFps"  Spacing="10" >
+		<ProgressBar CornerRadius="5" Background="DimGray" Margin="1" Maximum="1000" Value="{fps}" Width="200" Height="15"/>
+		<HorizontalStack Fit="true">
+			<Label Text="Memory:" Width="50" TextAlignment="RightCenter"/>
+			<Label Text="{memory}" Font="droid,12" TextAlignment="Center"
+				Background="vgradient|0:BlueCrayola|1:Black"/>
+		</HorizontalStack>
 		<HorizontalStack Fit="true">
 			<Label Text="Update:" Width="50" TextAlignment="RightCenter"/>
 			<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
