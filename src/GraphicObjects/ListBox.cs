@@ -90,7 +90,7 @@ namespace Crow
 			}
 		}
 		public object SelectedItem{
-			get { return data == null ? null : data[_selectedIndex]; }
+			get { return data == null ? "none" : data[_selectedIndex]; }
 		}
 		[XmlAttributeAttribute]//[DefaultValue(null)]
 		public IList Data {
@@ -157,7 +157,7 @@ namespace Crow
 			loadingTime.ElapsedMilliseconds, this.ToString());
 			#endif
 		}
-		void _scroller_ValueChanged (object sender, ValueChangeEventArgs e)
+		protected void _scroller_ValueChanged (object sender, ValueChangeEventArgs e)
 		{
 			if (_gsList == null)
 				return;
@@ -177,7 +177,7 @@ namespace Crow
 				}
 			}
 		}
-		void _list_LayoutChanged (object sender, LayoutingEventArgs e)
+		protected void _list_LayoutChanged (object sender, LayoutingEventArgs e)
 		{
 			if (_gsList == null)
 				return;
@@ -211,6 +211,7 @@ namespace Crow
 			SelectedItemChanged.Raise (sender, new SelectionChangeEventArgs((sender as GraphicObject).DataSource));
 			NotifyValueChanged ("SelectedItem", (sender as GraphicObject).DataSource);
 			//Debug.WriteLine ((sender as GraphicObject).DataSource);
+
 		}
 
 		#region IXmlSerializable

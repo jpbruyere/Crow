@@ -1,2 +1,4 @@
 ﻿<?xml version="1.0"?>
-<ComboBox Height="-1" Data="{TestList}" SelectedIndex="0"/>
+<VerticalStack>
+	<ComboBox Width="200" Data="{TestList}" SelectedItem="Blue"/>
+</VerticalStack>

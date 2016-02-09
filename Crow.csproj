@@ -215,7 +215,6 @@
     <EmbeddedResource Include="Images\Icons\Cursors\move" />
     <EmbeddedResource Include="Templates\CheckBox.goml" />
     <EmbeddedResource Include="Templates\ComboBox.goml" />
-    <EmbeddedResource Include="Templates\ComboBoxOverlay.goml" />
     <EmbeddedResource Include="Templates\GroupBox.goml" />
     <EmbeddedResource Include="Templates\ListBox.goml" />
     <EmbeddedResource Include="Templates\ScrollBar.goml" />

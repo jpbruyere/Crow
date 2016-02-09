@@ -26,6 +26,7 @@ namespace Crow
 		{
 		}	
 		#endregion
+
 		bool _isPopped;
 		string caption;
 		string image;
@@ -52,7 +53,7 @@ namespace Crow
 			}
 		}
 
-		void _content_LayoutChanged (object sender, LayoutingEventArgs e)
+		protected void _content_LayoutChanged (object sender, LayoutingEventArgs e)
 		{
 			ILayoutable tc = Content.Parent as ILayoutable;
 			if (tc == null)
