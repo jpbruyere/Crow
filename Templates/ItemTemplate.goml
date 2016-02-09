@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
-
-<Label Text="{}" Fit="true" Margin="0"
+<Container Fit="true" Margin="0" Focusable="true"
 		MouseEnter="{Background=SteelBlue}"
-		MouseLeave="{Background=Transparent}"
-/>
+		MouseLeave="{Background=Transparent}">
+	<Label Text="{}"/>
+</Container>
 
