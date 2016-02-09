@@ -78,19 +78,6 @@ namespace Crow
 		{
 			return new Color (v.X, v.Y, v.Z, v.W);
 		}
-
-        public static implicit operator System.Drawing.Color(Color c)
-        {
-            return System.Drawing.Color.FromArgb((int)(c.A * 255), (int)(c.R * 255), (int)(c.G * 255), (int)(c.B * 255));
-        }
-		public static implicit operator Color(System.Drawing.Color c)
-		{
-			return new Color (1.0f / c.R, 1.0f / c.G, 1.0f / c.B, 1.0f / c.A);
-		}
-        public static implicit operator Cairo.Color(Color c)
-        {
-            return new Cairo.Color(c.R, c.G, c.B, c.A);
-        }
 		public static implicit operator Fill(Color c){
 			return new SolidColor (c) as Fill;
 		}
@@ -98,34 +85,34 @@ namespace Crow
 
 		public static bool operator ==(Color left, Color right)
 		{
-			return left.A == right.A &&
-				left.R == right.R &&
-				left.G == right.G &&
-				left.B == right.B ? true : false;
+			return left.A != right.A ? false :
+				left.R != right.R ? false :
+				left.G != right.G ? false :
+				left.B != right.B ? false : true;
 		}
 		public static bool operator !=(Color left, Color right)
 		{
-			return left.A == right.A &&
-				left.R == right.R &&
-				left.G == right.G &&
+			return left.A == right.A ? false :
+				left.R == right.R ? false :
+				left.G == right.G ? false :
 				left.B == right.B ? false : true;
 
 		}
 		public static bool operator ==(Color c, string n)
 		{
-			return c.Name == n ? true : false;
+			return string.Equals(c.Name, n, StringComparison.Ordinal);
 		}
 		public static bool operator !=(Color c, string n)
 		{
-			return c.Name == n ? false : true;
+			return !string.Equals(c.Name, n, StringComparison.Ordinal);
 		}
 		public static bool operator ==(string n, Color c)
 		{
-			return c.Name == n ? true : false;
+			return string.Equals (c.Name, n, StringComparison.Ordinal);
 		}
 		public static bool operator !=(string n, Color c)
 		{
-			return c.Name == n ? false : true;
+			return !string.Equals (c.Name, n, StringComparison.Ordinal);
 		}
 		public static Color operator *(Color c, Double f)
 		{
