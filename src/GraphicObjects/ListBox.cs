@@ -113,7 +113,7 @@ namespace Crow
 				loadPage (1);
 			}
 		}
-		int itemPerPage = 40;
+		int itemPerPage = 100;
 		MemoryStream templateStream = null;
 		Type templateBaseType = null;
 

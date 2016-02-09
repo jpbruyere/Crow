@@ -1,5 +1,62 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack Fit="true">
+
+	<HorizontalStack Fit="true">
+		<VerticalStack Fit="true">
+			<Border CornerRadius="5" Background="DimGray" >
+				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
+					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="600" Foreground="White"/>
+			</Border>
+			<Border CornerRadius="5" Background="DimGray" >
+				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
+					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
+			</Border>
+			<Border CornerRadius="5" Background="DimGray" >
+				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
+					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
+			</Border>
+			<Border CornerRadius="5" Background="DimGray" >
+				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
+					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
+			</Border>
+		</VerticalStack>
+				<VerticalStack Fit="true">
+			<Border CornerRadius="5" Background="DimGray" >
+				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
+					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="600" Foreground="White"/>
+			</Border>
+			<Border CornerRadius="5" Background="DimGray" >
+				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
+					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
+			</Border>
+			<Border CornerRadius="5" Background="DimGray" >
+				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
+					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
+			</Border>
+			<Border CornerRadius="5" Background="DimGray" >
+				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
+					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
+			</Border>
+		</VerticalStack>
+				<VerticalStack Fit="true">
+			<Border CornerRadius="5" Background="DimGray" >
+				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
+					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="600" Foreground="White"/>
+			</Border>
+			<Border CornerRadius="5" Background="DimGray" >
+				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
+					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
+			</Border>
+			<Border CornerRadius="5" Background="DimGray" >
+				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
+					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
+			</Border>
+			<Border CornerRadius="5" Background="DimGray" >
+				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
+					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
+			</Border>
+		</VerticalStack>
+	</HorizontalStack>
 	<ProgressBar CornerRadius="5" Background="DimGray" Margin="1" Maximum="1000" Value="{fps}" Width="200" Height="15"/>
 	<HorizontalStack Fit="true">
 		<Label Text="Memory:" Width="50" TextAlignment="Right"/>
