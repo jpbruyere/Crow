@@ -1,2 +1,7 @@
 ﻿<?xml version="1.0"?>
-<ComboBox/>
+<VerticalStack>
+	<CheckBox IsChecked="false" Caption="test" Width="-1" Background="hgradient|0:LimeGreen|1:Transparent"/>
+	<CheckBox IsChecked="false" Caption="test" Width="-1" Background="hgradient|0:LimeGreen|1:Transparent"/>
+	<CheckBox IsChecked="true" Caption="test" Width="-1" Background="hgradient|0:LimeGreen|1:Transparent"/>
+	<CheckBox IsChecked="false" Caption="test" Width="-1" Background="hgradient|0:LimeGreen|1:Transparent"/>
+</VerticalStack>

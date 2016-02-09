@@ -37,6 +37,8 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"testCombobox.goml",
+			"1.crow",
 			"0.crow",
 			"testPopper.goml",
 			"testTextBox.crow",
@@ -60,7 +62,7 @@ namespace test
 			"2.crow",
 			"test1.goml",
 			"testWindow2.goml",
-//			"testCombobox.goml",
+
 			"testWindow3.goml",
 			"testWindow.goml",
 			"testCheckbox.goml",
@@ -142,7 +144,7 @@ namespace test
 				return;
 			NotifyValueChanged ("alignment", Enum.Parse(typeof(Alignment), rb.Caption));
 		}
-		IList<Color> testList = null;
+		IList<Color> testList = Color.ColorDic.ToList();
 		public IList<Color> TestList {
 			set{
 				testList = value;
