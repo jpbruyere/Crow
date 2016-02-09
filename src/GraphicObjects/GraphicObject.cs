@@ -66,6 +66,7 @@ namespace Crow
 
 		#region private fields
 		LayoutingType registeredLayoutings = LayoutingType.None;
+		ILayoutable logicalParent;
 		ILayoutable _parent;
 		string _name = "unamed";
 		Fill _background = Color.Transparent;
@@ -85,10 +86,6 @@ namespace Crow
 		#endregion
 
 		#region public fields
-		/// <summary>
-		/// The logical parent (used mainly for bindings) as opposed to the parent in the graphic tree
-		/// </summary>
-		public GraphicObject LogicalParent;
 		/// <summary>
 		/// Original size and position 0=Stretched; -1=Fit
 		/// </summary>
@@ -135,6 +132,10 @@ namespace Crow
 			}
 		}
 
+		public ILayoutable LogicalParent {
+			get { return logicalParent == null ? Parent : logicalParent; }
+			set { logicalParent = value; }
+		}
 
 		[XmlIgnore]public virtual Rectangle ClientRectangle {
 			get {
@@ -422,8 +423,7 @@ namespace Crow
 			}
 			get {				
 				return dataSource == null ? 
-					LogicalParent == null ?
-					Parent is GraphicObject ? (Parent as GraphicObject).DataSource : null :  LogicalParent.DataSource : dataSource;
+					(LogicalParent as GraphicObject).DataSource : dataSource;
 			}
 		}
 		#endregion
@@ -905,10 +905,11 @@ namespace Crow
 			#if DEBUG_BINDING
 			Debug.WriteLine ("ResolveBinding => " + this.ToString ());
 			#endif
-
+			if (Bindings.Count == 0)
+				return;
 			Dictionary<object,List<Binding>> resolved = new Dictionary<object, List<Binding>>();
 			foreach (Binding b in Bindings) {
-				if (!string.IsNullOrEmpty (b.DynMethodId))
+				if (b.Resolved)
 					continue;
 				if (b.Source.Member.MemberType == MemberTypes.Event) {
 					if (b.Expression.StartsWith("{")){
@@ -928,6 +929,7 @@ namespace Crow
 					MethodInfo addHandler = b.Source.Event.GetAddMethod ();
 					Delegate del = Delegate.CreateDelegate (b.Source.Event.EventHandlerType, b.Target.Instance, b.Target.Method);
 					addHandler.Invoke (this, new object[] { del });
+					b.Resolved = true;
 					continue;
 				}
 				List<Binding> bindings = null;
@@ -936,6 +938,7 @@ namespace Crow
 					resolved [b.Target.Instance] = bindings;
 				}
 				bindings.Add (b);
+				b.Resolved = true;
 			}
 
 			MethodInfo stringEquals = typeof(string).GetMethod
@@ -1072,7 +1075,12 @@ namespace Crow
 							throw new Exception ("unhandle target member type in binding");
 					}
 
-					if (!targetValueType.IsValueType)
+					if (b.Source.Property.PropertyType == typeof(string)) {
+						MemberReference tostring = new MemberReference (b.Source.Instance);
+						if (!tostring.FindMember ("ToString"))
+							throw new Exception ("ToString method not found");
+						il.Emit (OpCodes.Callvirt, tostring.Method);
+					}else if (!targetValueType.IsValueType)
 						il.Emit(OpCodes.Castclass, targetValueType);
 					else if (b.Source.Property.PropertyType != targetValueType)
 						il.Emit(OpCodes.Callvirt, CompilerServices.GetConvertMethod( b.Source.Property.PropertyType ));
@@ -1215,6 +1223,8 @@ namespace Crow
 			Delegate del = dm.CreateDelegate(binding.Source.Event.EventHandlerType,this);
 			MethodInfo addHandler = binding.Source.Event.GetAddMethod ();
 			addHandler.Invoke(this, new object[] {del});
+
+			binding.Resolved = true;
 		}
 		/// <summary>
 		/// Remove dynamic delegates by ids from dataSource

@@ -562,19 +562,18 @@ namespace Crow
 		{
 			return r;
 		}
-		public Rectangle ScreenCoordinates (Rectangle r)
-		{
-			return r;
-		}
+		public Rectangle ScreenCoordinates (Rectangle r) => r;
 
 		public ILayoutable Parent {
-			get {
-				return null;
-			}
-			set {
-				throw new NotImplementedException ();
-			}
+			get { return null; }
+			set { throw new NotImplementedException (); }
 		}
+
+		public ILayoutable LogicalParent {
+			get { return null; }
+			set { throw new NotImplementedException (); }
+		}
+
 		Rectangle ILayoutable.ClientRectangle {
 			get { return new Size(this.ClientRectangle.Size.Width,this.ClientRectangle.Size.Height); }
 		}

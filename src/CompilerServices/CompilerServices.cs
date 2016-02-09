@@ -60,7 +60,7 @@ namespace Crow
 		public string DynMethodId {
 			get { return dynMethodId; }
 		}
-				
+		public bool Resolved = false;
 
 		public MemberReference Source;
 		public MemberReference Target;
@@ -103,7 +103,7 @@ namespace Crow
 					if (tmp == null)
 						return false;
 					if (bindingExp [ptr] == "..")
-						tmp = tmp.Parent as ILayoutable;
+						tmp = tmp.LogicalParent;
 					else if (bindingExp [ptr] == ".") {
 						if (ptr > 0)
 							throw new Exception ("Syntax error in binding, './' may only appear in first position");						
@@ -143,6 +143,11 @@ namespace Crow
 		{
 			Target = null;
 			dynMethodId = "";
+			Resolved = false;
+		}
+		public override string ToString ()
+		{
+			return string.Format ("[Binding: {0}.{1} <= {2}]", Source.Instance, Source.Member.Name, Expression);
 		}
 	}
 
