@@ -176,10 +176,6 @@ namespace Crow
         {
             return new System.Drawing.Rectangle(r.X, r.Y, r.Width, r.Height);
         }
-        public static implicit operator Cairo.Rectangle(Rectangle r)
-        {
-            return new Cairo.Rectangle((double)r.X, (double)r.Y, (double)r.Width, (double)r.Height);
-        }
         public static Rectangle operator +(Rectangle r1, Rectangle r2)
         {
             int x = Math.Min(r1.X, r2.X);

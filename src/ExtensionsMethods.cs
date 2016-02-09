@@ -25,6 +25,20 @@ namespace Crow
 {
 	public static class ExtensionsMethods
 	{
+		#region Cairo extensions
+		public static void Rectangle(this Cairo.Context ctx, Rectangle r)
+		{
+			ctx.Rectangle (r.X, r.Y, r.Width, r.Height);
+		}
+		public static void SetSourceColor(this Cairo.Context ctx, Color c)
+		{
+			ctx.SetSourceRGBA(c.R,c.G,c.B,c.A);
+		}
+		public static void AddColorStop(this Cairo.Gradient grad, double offset, Color c)
+		{
+			grad.AddColorStop (offset, new Cairo.Color (c.R, c.G, c.B, c.A));
+		}
+		#endregion
 		public static void Raise(this EventHandler handler, object sender, EventArgs e)
 		{
 			if(handler != null)
