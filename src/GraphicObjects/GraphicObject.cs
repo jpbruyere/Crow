@@ -1295,8 +1295,7 @@ namespace Crow
 						if (dv != null)
 							defaultValue = dv.Value;						
 					}
-					if (!isAttribute)
-						continue;
+
 
 					if (attValue.StartsWith("{")) {
 						//binding
@@ -1306,6 +1305,9 @@ namespace Crow
 						this.Bindings.Add (new Binding (new MemberReference(this, pi), attValue.Substring (1, attValue.Length - 2)));
 						continue;
 					}
+
+					if (!isAttribute)
+						continue;
 
 					if (pi.PropertyType == typeof(string)) {
 						pi.SetValue (this, attValue, null);
