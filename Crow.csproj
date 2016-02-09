@@ -133,6 +133,7 @@
     <Compile Include="src\Fill\Fill.cs" />
     <Compile Include="src\LayoutingEventArgs.cs" />
     <Compile Include="src\ScrollingEventArgs.cs" />
+    <Compile Include="src\GraphicObjects\Trend.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
