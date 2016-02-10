@@ -428,49 +428,135 @@ namespace Crow
 		}
 		#endregion
 
+		protected delegate void loadDefaultInvoker(object instance);
+		protected static loadDefaultInvoker loadDefaultDelegate;
 
 		/// <summary>
 		/// Loads the default values from XML attributes default
 		/// </summary>
 		protected virtual void loadDefaultValues()
 		{
+			if (loadDefaultDelegate != null) {
+				loadDefaultDelegate (this);
+				return;
+			}
+			
+			DynamicMethod dm = null;
+			ILGenerator il = null;
+
+			dm = new DynamicMethod("dyn_loadDefValues",
+				MethodAttributes.Family | MethodAttributes.FamANDAssem | MethodAttributes.NewSlot,
+				CallingConventions.Standard,
+				typeof(void),new Type[] {typeof(object)},this.GetType(),true);
+
+			il = dm.GetILGenerator(256);
+
+			il.Emit(OpCodes.Nop);
+
+
+
 			foreach (PropertyInfo pi in this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
-				if (pi.GetSetMethod () == null)
-					continue;
 				string name = "";
 
-				object[] att = pi.GetCustomAttributes (false);
+				#region retrieve custom attributes
+				if (pi.GetSetMethod () == null)
+					continue;
+				XmlIgnoreAttribute xia = (XmlIgnoreAttribute)pi.GetCustomAttribute (typeof(XmlIgnoreAttribute));
+				if (xia != null)
+					continue;
+				DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof(DefaultValueAttribute));
+				if (dv == null)
+					continue;
 
-				foreach (object o in att) {
-					XmlAttributeAttribute xaa = o as XmlAttributeAttribute;
-					if (xaa != null) {						
-						if (string.IsNullOrEmpty (xaa.AttributeName))
-							name = pi.Name;
+				XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
+				if (xaa != null) {
+					if (string.IsNullOrEmpty (xaa.AttributeName))
+						name = pi.Name;
+					else
+						name = xaa.AttributeName;
+				}
+				#endregion
+
+				il.Emit (OpCodes.Ldarg_0);
+
+				object defaultValue = dv.Value;
+				Type dvType = defaultValue.GetType ();
+				Debug.WriteLine (dvType.ToString ());
+
+				if (dvType.IsValueType) {
+					switch (Type.GetTypeCode (dvType)) {
+					case TypeCode.Boolean:
+						if ((bool)defaultValue == true)
+							il.Emit (OpCodes.Ldc_I4_1);
 						else
-							name = xaa.AttributeName;
+							il.Emit (OpCodes.Ldc_I4_0);
+						break;
+//					case TypeCode.Empty:
+//						break;
+//					case TypeCode.Object:
+//						break;
+//					case TypeCode.DBNull:
+//						break;
+//					case TypeCode.Char:
+//						break;
+//					case TypeCode.SByte:
+//						break;
+					case TypeCode.Byte:
+					case TypeCode.Int16:
+					case TypeCode.Int32:
+						il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (defaultValue));
+						break;
+					case TypeCode.UInt16:
+					case TypeCode.UInt32:
+						il.Emit (OpCodes.Ldc_I4, Convert.ToUInt32 (defaultValue));
+						break;
+					case TypeCode.Int64:
+						il.Emit (OpCodes.Ldc_I8, Convert.ToInt64 (defaultValue));
+						break;
+					case TypeCode.UInt64:
+						il.Emit (OpCodes.Ldc_I8, Convert.ToUInt64 (defaultValue));
+						break;
+					case TypeCode.Single:
+						il.Emit (OpCodes.Ldc_R4, Convert.ToSingle (defaultValue));
+						break;
+					case TypeCode.Double:
+						il.Emit (OpCodes.Ldc_R8, Convert.ToDouble (defaultValue));
+						break;
+//					case TypeCode.Decimal:
+//						break;
+//					case TypeCode.DateTime:
+//						break;
+					case TypeCode.String:
+						il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
+						break;
+					default:
+						il.Emit(OpCodes.Pop);
 						continue;
 					}
-					XmlIgnoreAttribute xia = o as XmlIgnoreAttribute;
-					if (xia != null)
+				} else {
+					if (!dvType.IsEnum) {
+						il.Emit (OpCodes.Pop);
 						continue;
-
-					DefaultValueAttribute dv = o as DefaultValueAttribute;
-					if (dv != null) {
-						object defaultValue = dv.Value;
-						//avoid system types automaticaly converted by parser
-						if (defaultValue != null && !pi.PropertyType.Namespace.StartsWith("System")) {
-							if (pi.PropertyType != defaultValue.GetType()) {
-								MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
-								if (miParse != null) {									
-									pi.SetValue (this, miParse.Invoke (null, new object[]{ defaultValue }), null);
-									continue;
-								}
-							}
-						}
-						pi.SetValue (this, defaultValue, null);	
-					}						
+					}
+					il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (defaultValue));
 				}
+
+				if (pi.PropertyType != dvType) {
+					MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
+					if (miParse != null) {
+						il.Emit (OpCodes.Callvirt, miParse);
+					}
+				}
+				il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
+
 			}
+
+			//il.Emit(OpCodes.Pop);	
+			il.Emit(OpCodes.Ret);
+
+			loadDefaultDelegate = (loadDefaultInvoker)dm.CreateDelegate(typeof(loadDefaultInvoker));
+
+			loadDefaultDelegate (this);
 		}
 
 		public virtual GraphicObject FindByName(string nameToFind){
