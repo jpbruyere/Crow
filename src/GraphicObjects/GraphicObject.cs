@@ -428,16 +428,16 @@ namespace Crow
 		}
 		#endregion
 
-		protected delegate void loadDefaultInvoker(object instance);
-		protected static loadDefaultInvoker loadDefaultDelegate;
+
 
 		/// <summary>
 		/// Loads the default values from XML attributes default
 		/// </summary>
 		protected virtual void loadDefaultValues()
 		{
-			if (loadDefaultDelegate != null) {
-				loadDefaultDelegate (this);
+			Type thisType = this.GetType ();
+			if (Interface.DefaultValuesLoader.ContainsKey(thisType.FullName)) {
+				Interface.DefaultValuesLoader[thisType.FullName] (this);
 				return;
 			}
 			
@@ -447,7 +447,7 @@ namespace Crow
 			dm = new DynamicMethod("dyn_loadDefValues",
 				MethodAttributes.Family | MethodAttributes.FamANDAssem | MethodAttributes.NewSlot,
 				CallingConventions.Standard,
-				typeof(void),new Type[] {typeof(object)},this.GetType(),true);
+				typeof(void),new Type[] {typeof(object)},thisType,true);
 
 			il = dm.GetILGenerator(256);
 
@@ -455,7 +455,7 @@ namespace Crow
 
 
 
-			foreach (PropertyInfo pi in this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
+			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
 				string name = "";
 
 				#region retrieve custom attributes
@@ -480,17 +480,21 @@ namespace Crow
 				il.Emit (OpCodes.Ldarg_0);
 
 				object defaultValue = dv.Value;
-				Type dvType = defaultValue.GetType ();
-				Debug.WriteLine (dvType.ToString ());
 
-				if (dvType.IsValueType) {
-					switch (Type.GetTypeCode (dvType)) {
-					case TypeCode.Boolean:
-						if ((bool)defaultValue == true)
-							il.Emit (OpCodes.Ldc_I4_1);
-						else
-							il.Emit (OpCodes.Ldc_I4_0);
-						break;
+				if (defaultValue == null) {
+					il.Emit (OpCodes.Ldnull);
+				} else {
+					Type dvType = defaultValue.GetType ();
+					Debug.WriteLine (dvType.ToString ());
+
+					if (dvType.IsValueType) {
+						switch (Type.GetTypeCode (dvType)) {
+						case TypeCode.Boolean:
+							if ((bool)defaultValue == true)
+								il.Emit (OpCodes.Ldc_I4_1);
+							else
+								il.Emit (OpCodes.Ldc_I4_0);
+							break;
 //					case TypeCode.Empty:
 //						break;
 //					case TypeCode.Object:
@@ -501,52 +505,54 @@ namespace Crow
 //						break;
 //					case TypeCode.SByte:
 //						break;
-					case TypeCode.Byte:
-					case TypeCode.Int16:
-					case TypeCode.Int32:
-						il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (defaultValue));
-						break;
-					case TypeCode.UInt16:
-					case TypeCode.UInt32:
-						il.Emit (OpCodes.Ldc_I4, Convert.ToUInt32 (defaultValue));
-						break;
-					case TypeCode.Int64:
-						il.Emit (OpCodes.Ldc_I8, Convert.ToInt64 (defaultValue));
-						break;
-					case TypeCode.UInt64:
-						il.Emit (OpCodes.Ldc_I8, Convert.ToUInt64 (defaultValue));
-						break;
-					case TypeCode.Single:
-						il.Emit (OpCodes.Ldc_R4, Convert.ToSingle (defaultValue));
-						break;
-					case TypeCode.Double:
-						il.Emit (OpCodes.Ldc_R8, Convert.ToDouble (defaultValue));
-						break;
+						case TypeCode.Byte:
+						case TypeCode.Int16:
+						case TypeCode.Int32:
+							il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (defaultValue));
+							break;
+						case TypeCode.UInt16:
+						case TypeCode.UInt32:
+							il.Emit (OpCodes.Ldc_I4, Convert.ToUInt32 (defaultValue));
+							break;
+						case TypeCode.Int64:
+							il.Emit (OpCodes.Ldc_I8, Convert.ToInt64 (defaultValue));
+							break;
+						case TypeCode.UInt64:
+							il.Emit (OpCodes.Ldc_I8, Convert.ToUInt64 (defaultValue));
+							break;
+						case TypeCode.Single:
+							il.Emit (OpCodes.Ldc_R4, Convert.ToSingle (defaultValue));
+							break;
+						case TypeCode.Double:
+							il.Emit (OpCodes.Ldc_R8, Convert.ToDouble (defaultValue));
+							break;
 //					case TypeCode.Decimal:
 //						break;
 //					case TypeCode.DateTime:
 //						break;
-					case TypeCode.String:
-						il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
-						break;
-					default:
-						il.Emit(OpCodes.Pop);
-						continue;
+						case TypeCode.String:
+							il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
+							break;
+						default:
+							il.Emit (OpCodes.Pop);
+							continue;
+						}
+					} else {
+						if (!dvType.IsEnum) {
+							il.Emit (OpCodes.Pop);
+							continue;
+						}
+						il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (defaultValue));
 					}
-				} else {
-					if (!dvType.IsEnum) {
-						il.Emit (OpCodes.Pop);
-						continue;
+
+					if (pi.PropertyType != dvType) {
+						MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
+						if (miParse != null) {
+							il.Emit (OpCodes.Callvirt, miParse);
+						}
 					}
-					il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (defaultValue));
 				}
 
-				if (pi.PropertyType != dvType) {
-					MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
-					if (miParse != null) {
-						il.Emit (OpCodes.Callvirt, miParse);
-					}
-				}
 				il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
 
 			}
@@ -554,9 +560,8 @@ namespace Crow
 			//il.Emit(OpCodes.Pop);	
 			il.Emit(OpCodes.Ret);
 
-			loadDefaultDelegate = (loadDefaultInvoker)dm.CreateDelegate(typeof(loadDefaultInvoker));
-
-			loadDefaultDelegate (this);
+			Interface.DefaultValuesLoader[thisType.FullName] = (Interface.loadDefaultInvoker)dm.CreateDelegate(typeof(Interface.loadDefaultInvoker));
+			Interface.DefaultValuesLoader[thisType.FullName] (this);
 		}
 
 		public virtual GraphicObject FindByName(string nameToFind){
