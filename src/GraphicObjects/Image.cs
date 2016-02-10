@@ -96,8 +96,8 @@ namespace Crow
 		#region GraphicObject overrides
 		protected override Size measureRawSize ()
 		{
-//			if (_pic == null)
-//				_pic = "#Crow.Images.Icons.IconAlerte.svg";
+			if (_pic == null)
+				_pic = "#Crow.Images.Icons.IconAlerte.svg";
 
 			return _pic.Dimensions + Margin * 2;
 		}
