@@ -688,7 +688,7 @@ namespace Crow
 					Slot.Height = Height;
 				else if (Height < 0)
 					Slot.Height = measureRawSize ().Height;
-				else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+				else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height))
 					return false;
 				else
 					Slot.Height = Parent.ClientRectangle.Height;
