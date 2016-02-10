@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Popper PopDirection="Bottom" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}">
+<Popper Name="popper" PopDirection="Bottom" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}">
 	<Template>
 		<Border CornerRadius="0" Foreground="LightGray" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}">
 			<HorizontalStack Margin="1" Spacing="1" Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}">
