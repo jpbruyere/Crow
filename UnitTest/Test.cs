@@ -33,14 +33,14 @@ namespace UnitTest
 		[SetUp]
 		public void Init()
 		{
-			win = new NUnitCrowWindow (400,400);
+			win = new NUnitCrowWindow (600,600);
 		}
 
 		[Test ()]
 		[Category("Alignment")]
 		public void GraphicObject ()
 		{
-			string[] tests = new string[] { "0","1" };
+			string[] tests = new string[] { "0","1","3","4", "5" };
 
 			foreach (string s in tests) {
 				win.LoadTest (s);

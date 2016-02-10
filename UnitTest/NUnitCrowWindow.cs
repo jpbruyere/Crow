@@ -14,6 +14,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
 using Cairo;
+using System.IO;
 
 
 namespace Crow
@@ -148,19 +149,15 @@ namespace Crow
 			GraphicObjects.CopyTo (invGOList,0);
 			invGOList = invGOList.Reverse ().ToArray ();
 
-			//Debug.WriteLine ("======= Layouting queue start =======");
-				while (Interface.LayoutingQueue.First != null) {
-					//					Stopwatch lqiProcTime = new Stopwatch ();
-					//					lqiProcTime.Start ();
-					LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
-					lqi.ProcessLayouting ();
-					//					lqiProcTime.Stop ();
-					//					if (lqiProcTime.ElapsedMilliseconds > 10) {
-					//						Debug.WriteLine("lqi {2}: {0} ticks \t, {1} ms",
-					//							updateTime.ElapsedTicks,
-					//							updateTime.ElapsedMilliseconds, lqi.ToString());
-					//					}
-				}
+
+			layoutTime.Start ();
+
+			while (Interface.LayoutingQueue.Count > 0) {
+				LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
+				lqi.ProcessLayouting ();
+			}
+
+			layoutTime.Stop ();
 
 			//final redraw clips should be added only when layout is completed among parents,
 			//that's why it take place in a second pass
@@ -171,7 +168,7 @@ namespace Crow
 				p.registerClipRect ();
 			}
 
-			layoutTime.Stop ();
+
 			guTime.Start ();
 
 			lock (redrawClip) {
@@ -208,17 +205,20 @@ namespace Crow
 			guTime.Stop ();
 			updateTime.Stop ();
 			ctx.Dispose ();
-			Console.WriteLine("{3} => layout:{0,8} t\tdraw:{1,8} t\tupdate:{2,8} t",
-			    layoutTime.ElapsedTicks,
-			    guTime.ElapsedTicks,
-			    updateTime.ElapsedTicks,
+
+			sw.WriteLine ("{3}\t{0,8}\t{1,8}\t{2,8}",
+				layoutTime.ElapsedTicks,
+				guTime.ElapsedTicks,
+				updateTime.ElapsedTicks,
 				testId);
+			sw.Flush ();
+			
 //			Console.WriteLine("{3} => layout:{0}ms\tdraw{1}ms\tupdate:{2}ms",
 //				layoutTime.ElapsedMilliseconds,
 //				guTime.ElapsedMilliseconds,
 //				updateTime.ElapsedMilliseconds,
 //				testId);
-			surf.WriteToPng (@"ExpectedOutputs/" + testId + ".png");
+			//surf.WriteToPng (@"ExpectedOutputs/" + testId + ".png");
 			surf.WriteToPng (@"tmp.png");
 		}						
 		#endregion
@@ -244,17 +244,30 @@ namespace Crow
 		}
 		#endregion
 
+		#region CTOR
 		public NUnitCrowWindow (int width, int height)
 		{
 			ClientRectangle.Width = width;
 			ClientRectangle.Height = height;
 
 			surf = new ImageSurface(Format.Argb32, ClientRectangle.Width, ClientRectangle.Height);
+			string path = "crow-" + DateTime.Now + ".txt";
+
+			sw = new StreamWriter (path);
+
+			sw.WriteLine ("ID        layout            draw          update");
+			sw.WriteLine ("------------------------------------------------");
+			sw.Flush ();
 		}
+		~NUnitCrowWindow(){
+			
+			sw.Close ();
+		}
+		#endregion
 
 		int frameCpt = 0;
 		int idx = 0;
-
+		StreamWriter sw;
 
 		#region FPS
 		int _fps = 0;
@@ -414,35 +427,37 @@ namespace Crow
 		#endregion
 
 		#region ILayoutable implementation
-
-		//TODO:uneeded list, should be removed
-		public List<LinkedListNode<LayoutingQueueItem>> RegisteredLQINodes { get; } = new List<LinkedListNode<LayoutingQueueItem>>();
-		public void RegisterForLayouting (int layoutType) { throw new NotImplementedException (); }
-		public void UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
-		public Rectangle ContextCoordinates (Rectangle r)
+		public void RegisterForLayouting (LayoutingType layoutType)
 		{
-			return r;
+			throw new NotImplementedException ();
+		}			
+		public int LayoutingTries {
+			get { throw new NotImplementedException (); }
+			set { throw new NotImplementedException (); }
 		}
+		public ILayoutable LogicalParent {
+			get { return null; }
+			set { throw new NotImplementedException (); }
+		}
+		public ILayoutable Parent {
+			get { return null; }
+			set { throw new NotImplementedException (); }
+		}
+		public LayoutingType RegisteredLayoutings {
+			get { return LayoutingType.None; }
+			set { throw new NotImplementedException (); } 
+		}
+		public void RegisterForLayouting (int layoutType) { throw new NotImplementedException (); }
+		public bool UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
+		public Rectangle ContextCoordinates (Rectangle r) => r;
 		public Rectangle ScreenCoordinates (Rectangle r)
 		{
 			return r;
 		}
-
-		public ILayoutable Parent {
-			get {
-				return null;
-			}
-			set {
-				throw new NotImplementedException ();
-			}
-		}
 		Rectangle ILayoutable.ClientRectangle {
 			get { return new Size(this.ClientRectangle.Size.Width,this.ClientRectangle.Size.Height); }
 		}
-		public IGOLibHost HostContainer {
-			get { return this; }
-		}
-
+		public IGOLibHost HostContainer { get { return this; }}
 		public Rectangle getSlot ()
 		{
 			return ClientRectangle;
