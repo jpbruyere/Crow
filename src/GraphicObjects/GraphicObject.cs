@@ -453,11 +453,11 @@ namespace Crow
 
 			il.Emit(OpCodes.Nop);
 
-
+			int cpt = 0;
 
 			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
 				string name = "";
-
+				cpt++;
 				#region retrieve custom attributes
 				if (pi.GetSetMethod () == null)
 					continue;
@@ -537,7 +537,11 @@ namespace Crow
 							il.Emit (OpCodes.Pop);
 							continue;
 						}
-					} else {
+					} else if (dvType.FullName == "System.String") {
+						il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
+//						il.Emit (OpCodes.Pop);
+//						continue;
+					}else{
 						if (!dvType.IsEnum) {
 							il.Emit (OpCodes.Pop);
 							continue;
@@ -549,15 +553,19 @@ namespace Crow
 						MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
 						if (miParse != null) {
 							il.Emit (OpCodes.Callvirt, miParse);
-						}
+							if (miParse.ReturnType != pi.PropertyType)
+								il.Emit(OpCodes.Unbox_Any, pi.PropertyType);
+//								il.Emit(OpCodes.Castclass, pi.PropertyType);
+							
+						} else
+							Debugger.Break ();
 					}
 				}
 
 				il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
-
+	
 			}
-
-			//il.Emit(OpCodes.Pop);	
+				
 			il.Emit(OpCodes.Ret);
 
 			Interface.DefaultValuesLoader[thisType.FullName] = (Interface.loadDefaultInvoker)dm.CreateDelegate(typeof(Interface.loadDefaultInvoker));
