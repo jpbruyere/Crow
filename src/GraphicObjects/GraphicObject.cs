@@ -453,11 +453,9 @@ namespace Crow
 
 			il.Emit(OpCodes.Nop);
 
-			int cpt = 0;
-
 			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
 				string name = "";
-				cpt++;
+
 				#region retrieve custom attributes
 				if (pi.GetSetMethod () == null)
 					continue;
@@ -485,7 +483,6 @@ namespace Crow
 					il.Emit (OpCodes.Ldnull);
 				} else {
 					Type dvType = defaultValue.GetType ();
-					Debug.WriteLine (dvType.ToString ());
 
 					if (dvType.IsValueType) {
 						switch (Type.GetTypeCode (dvType)) {
@@ -537,11 +534,9 @@ namespace Crow
 							il.Emit (OpCodes.Pop);
 							continue;
 						}
-					} else if (dvType.FullName == "System.String") {
+					} else if (dvType.FullName == "System.String")
 						il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
-//						il.Emit (OpCodes.Pop);
-//						continue;
-					}else{
+					else{
 						if (!dvType.IsEnum) {
 							il.Emit (OpCodes.Pop);
 							continue;
@@ -550,20 +545,23 @@ namespace Crow
 					}
 
 					if (pi.PropertyType != dvType) {
-						MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
-						if (miParse != null) {
-							il.Emit (OpCodes.Callvirt, miParse);
-							if (miParse.ReturnType != pi.PropertyType)
-								il.Emit(OpCodes.Unbox_Any, pi.PropertyType);
-//								il.Emit(OpCodes.Castclass, pi.PropertyType);
-							
-						} else
-							Debugger.Break ();
+						if (Type.GetTypeCode (dvType) == TypeCode.String) {
+							MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
+							if (miParse != null) {
+								il.Emit (OpCodes.Callvirt, miParse);
+								if (miParse.ReturnType != pi.PropertyType)
+									il.Emit (OpCodes.Unbox_Any, pi.PropertyType);
+							} else
+								throw new Exception ("no Parse method found for: " + pi.PropertyType.FullName);
+						} else {
+							MethodInfo conv = CompilerServices.GetConvertMethod (pi.PropertyType);
+							il.Emit(OpCodes.Callvirt, conv);
+							il.Emit (OpCodes.Unbox_Any, pi.PropertyType);
+						}
 					}
 				}
 
 				il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
-	
 			}
 				
 			il.Emit(OpCodes.Ret);
