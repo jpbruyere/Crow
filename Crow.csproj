@@ -220,6 +220,9 @@
     <EmbeddedResource Include="Templates\ScrollBar.goml" />
     <EmbeddedResource Include="Templates\Button.crow" />
     <EmbeddedResource Include="Templates\ArrowButTemplate.crow" />
+    <EmbeddedResource Include="Images\crow0.svg">
+      <LogicalName>Crow.image.crow0.svg</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

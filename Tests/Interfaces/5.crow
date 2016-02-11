@@ -1,11 +1,61 @@
 ﻿<?xml version="1.0"?>
-<HorizontalStack Fit="true" Background="BlueCrayola" Margin="2">
-<!--	<Spinner Maximum="10000000000" SmallIncrement="10" Value="0"/>
-	<Spinner Maximum="10000000000" SmallIncrement="10" Value="0"/>
-	<Spinner Maximum="10000000000" SmallIncrement="10" Value="0"/>-->
-	<Spinner Maximum="10000000000" SmallIncrement="100" Value="0"/>
-	<Spinner Maximum="10000000000" SmallIncrement="100" Value="0"/>
-	<GraphicObject Background="Green" Width="30" Height="20"/>
+<HorizontalStack Fit="true" Margin="5">
+	<VerticalStack Fit="true" Margin="2" Spacing="2">
+		<TextRun Text="text run test"/>
+		<Label Text="label test"/>
+		<TextBox Text="text box test"/>
+		<Button Caption="test button"/>
+<!--		<CheckBox Caption="test checkbox"/>
+		<RadioButton Caption="test radiobutton"/>
+		<ComboBox/>
+		<Popper Caption="test popper">
+			<Label Text="label test"/>
+		</Popper>
+		<Expandable Caption="test expandable">
+			<Label Text="label test"/>
+		</Expandable>
+		<Border >
+			<Label Text="border test" Margin="3"/>
+		</Border>
+		<GroupBox Caption="Group box" >
+			<Label Text="border test" Margin="3"/>
+		</GroupBox>
+		<Container Fit="true" Background="DimGray" Margin="3">
+			<GraphicObject Width="20" Height="20" Background="LightGray"/>
+		</Container>-->
+<!--		<ProgressBar Height="10" Width="150" Background="DimGray" Value="50" />
+		<Slider Value="5" Width="150" Height="10"/>
+		<ScrollBar Orientation="Horizontal" Maximum="100" Value="50" Height="16" Width="150"/>
+		<Spinner Value="100"/>-->
+	</VerticalStack>
+<!--	<VerticalStack Width="150" Height="-1" Margin="2" Spacing="2">
+		<TextRun Text="text run test" Width="0"/>
+		<Label Text="label test" Width="0"/>
+		<TextBox Text="text box test" Width="0"/>
+		<Button Caption="test button" Width="0"/>
+		<CheckBox Caption="test checkbox" Width="0"/>
+		<RadioButton Caption="test radiobutton" Width="0"/>
+		<ComboBox Width="0"/>
+		<Popper Caption="test popper" Width="0">
+			<Label Text="label test"/>
+		</Popper>
+		<Expandable Caption="test expandable" Width="0">
+			<Label Text="label test"/>
+		</Expandable>
+		<Border  Width="0">
+			<Label Text="border test" Margin="3"/>
+		</Border>
+		<GroupBox Caption="Group box"  Width="0">
+			<Label Text="border test" Margin="3"/>
+		</GroupBox>
+		<Container Height="-1"  Width="0" Background="DimGray" Margin="3">
+			<GraphicObject Width="20" Height="20" Background="LightGray"/>
+		</Container>
+		<ProgressBar Height="10" Width="0" Background="DimGray" Value="50" />
+		<Slider Value="5" Width="0" Height="10"/>
+		<ScrollBar Orientation="Horizontal" Maximum="100" Value="50" Height="16" Width="0"/>
+		<Spinner Value="100"  Width="0"/>
+	</VerticalStack>-->
 </HorizontalStack>
 <!--<HorizontalStack Fit="true" Background="BlueCrayola" Margin="5">
 	<GraphicObject Background="Red" Width="30" Height="20"/>

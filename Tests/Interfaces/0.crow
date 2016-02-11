@@ -1,64 +1,20 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack Fit="true">
-
-	<HorizontalStack Fit="true">
-		<VerticalStack Fit="true">
-			<Border CornerRadius="5" Background="DimGray" >
-				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
-					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="600" Foreground="White"/>
-			</Border>
-			<Border CornerRadius="5" Background="DimGray" >
-				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
-					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
-			</Border>
-			<Border CornerRadius="5" Background="DimGray" >
-				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
-					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
-			</Border>
-			<Border CornerRadius="5" Background="DimGray" >
-				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
-					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
-			</Border>
-		</VerticalStack>
-				<VerticalStack Fit="true">
-			<Border CornerRadius="5" Background="DimGray" >
-				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
-					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="600" Foreground="White"/>
-			</Border>
-			<Border CornerRadius="5" Background="DimGray" >
-				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
-					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
-			</Border>
-			<Border CornerRadius="5" Background="DimGray" >
-				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
-					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
-			</Border>
-			<Border CornerRadius="5" Background="DimGray" >
-				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
-					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
-			</Border>
-		</VerticalStack>
-				<VerticalStack Fit="true">
-			<Border CornerRadius="5" Background="DimGray" >
-				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
-					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="600" Foreground="White"/>
-			</Border>
-			<Border CornerRadius="5" Background="DimGray" >
-				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
-					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
-			</Border>
-			<Border CornerRadius="5" Background="DimGray" >
-				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
-					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
-			</Border>
-			<Border CornerRadius="5" Background="DimGray" >
-				<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}"
-					Height="100" Width="200" NewValue="{fps}" Name="trend" Maximum="1000" Foreground="White"/>
-			</Border>
-		</VerticalStack>
-	</HorizontalStack>
+<!--<Label Text="test" Background="BlueCrayola"/>-->
+<!--<GraphicObject Width="10" Height="10" Background="Red"/>-->
+<VerticalStack Fit="true" Margin="2" Spacing="2">
 	<ProgressBar CornerRadius="5" Background="DimGray" Margin="1" Maximum="1000" Value="{fps}" Width="200" Height="15"/>
-	<HorizontalStack Fit="true">
+	<Label Text="test" Background="BlueCrayola"/>
+	<RadioButton Caption="test radiobutton"/>
+	<Image Width="50" Height="50" Background="vgradient|0:SkyBlue|1:White" Path="#Tests.image.crow0.svg"/>	
+	<Button Caption="test button"/>
+	<TextRun Text="text run test"/>
+	<TextBox Text="text run test"/>
+	<Border CornerRadius="5" Background="DimGray" >
+		<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}" NbValues="5"
+			Height="100" Width="400" NewValue="{fps}" Name="trend" Maximum="600" Foreground="White"/>
+	</Border>
+</VerticalStack>
+<!--		<HorizontalStack Fit="true">
 		<Label Text="Memory:" Width="50" TextAlignment="Right"/>
 		<Label Text="{memory}" Font="droid,12" 
 			Background="vgradient|0:BlueCrayola|1:Black"/>
@@ -67,10 +23,9 @@
 		<Label Text="Fps:" Width="50" TextAlignment="Right"/>
 		<Label Text="{fps}" Font="droid , 12"
 			Background="vgradient|0:LimeGreen|1:Black"/>
-	</HorizontalStack>
-<!--	<HorizontalStack Fit="true">
-		<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
-		<Label Text="{layouting}" Font="droid,12"
-			Background="vgradient|0:AoEnglish|1:Black"/>
 	</HorizontalStack>-->
-</VerticalStack>
+
+<!--<VerticalStack Fit="true">
+
+	
+</VerticalStack>-->

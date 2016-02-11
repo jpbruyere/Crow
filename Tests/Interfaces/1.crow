@@ -1,7 +1,9 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack>
+<VerticalStack Fit="true">
+	<GraphicObject CornerRadius="5" Height="10" Width="600" Background="vgradient|0:Transparent|0,5:White|1:Transparent"/>
 	<CheckBox IsChecked="false" Caption="test" Width="-1" Background="hgradient|0:LimeGreen|1:Transparent"/>
 	<CheckBox IsChecked="false" Caption="test" Width="-1" Background="hgradient|0:LimeGreen|1:Transparent"/>
 	<CheckBox IsChecked="true" Caption="test" Width="-1" Background="hgradient|0:LimeGreen|1:Transparent"/>
 	<CheckBox IsChecked="false" Caption="test" Width="-1" Background="hgradient|0:LimeGreen|1:Transparent"/>
+	<GraphicObject CornerRadius="5" Height="10" Width="600" Background="vgradient|0:Transparent|0,5:White|1:Transparent"/>
 </VerticalStack>

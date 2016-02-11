@@ -37,16 +37,16 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"0.crow",
+			"5.crow",
 			"testCombobox.goml",
 			"1.crow",
-			"0.crow",
 			"testPopper.goml",
 			"testTextBox.crow",
 			"testColorList.crow",
 
 			"testExpandable.goml",
 			"4.crow",
-			"5.crow",
 			"testSpinner.goml",
 			"testScrollbar.goml",
 			"testGroupBox.goml",
