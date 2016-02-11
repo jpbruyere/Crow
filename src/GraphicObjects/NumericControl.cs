@@ -72,7 +72,7 @@ namespace Crow
 				registerForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(0)]
+		[XmlAttributeAttribute()][DefaultValue(0.0)]
 		public double Value
 		{
 			get { return _actualValue; }
