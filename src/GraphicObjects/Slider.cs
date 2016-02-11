@@ -106,20 +106,15 @@ namespace Crow
 			get { return base.Focusable; }
 			set { base.Focusable = value; }
 		}
-		//TODO:seems strange to trigger layout computation in an
-		//overriding of updateGraphic
-		protected override void UpdateGraphic ()
-		{
-			if (Maximum > 0)
-				computeCursorPosition();
-			base.UpdateGraphic ();
-		}
 
 		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
 			if (Maximum <= 0)
 				return;
+
+			computeCursorPosition ();
+
 			Rectangle r = ClientRectangle;
 			PointD pStart;
 			PointD pEnd;
