@@ -428,11 +428,7 @@ namespace Crow
 		}
 		#endregion
 
-
-
-		/// <summary>
-		/// Loads the default values from XML attributes default
-		/// </summary>
+		/// <summary> Loads the default values from XML attributes default </summary>
 		protected virtual void loadDefaultValues()
 		{
 			Type thisType = this.GetType ();
@@ -465,6 +461,7 @@ namespace Crow
 				DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof(DefaultValueAttribute));
 				if (dv == null)
 					continue;
+				object defaultValue = dv.Value;
 
 				XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
 				if (xaa != null) {
@@ -477,93 +474,93 @@ namespace Crow
 
 				il.Emit (OpCodes.Ldarg_0);
 
-				object defaultValue = dv.Value;
-
 				if (defaultValue == null) {
 					il.Emit (OpCodes.Ldnull);
-				} else {
-					Type dvType = defaultValue.GetType ();
+					il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
+					continue;
+				} 
+				Type dvType = defaultValue.GetType ();
 
-					if (dvType.IsValueType) {
-						switch (Type.GetTypeCode (dvType)) {
-						case TypeCode.Boolean:
-							if ((bool)defaultValue == true)
-								il.Emit (OpCodes.Ldc_I4_1);
-							else
-								il.Emit (OpCodes.Ldc_I4_0);
-							break;
-//					case TypeCode.Empty:
-//						break;
-//					case TypeCode.Object:
-//						break;
-//					case TypeCode.DBNull:
-//						break;
-//					case TypeCode.Char:
-//						break;
-//					case TypeCode.SByte:
-//						break;
-						case TypeCode.Byte:
-						case TypeCode.Int16:
-						case TypeCode.Int32:
+				if (dvType.IsValueType) {
+					if (pi.PropertyType.IsValueType) {
+						if (pi.PropertyType.IsEnum) {
+							if (pi.PropertyType != dvType)
+								throw new Exception ("Enum mismatch in default values: " + pi.PropertyType.FullName);
 							il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (defaultValue));
-							break;
-						case TypeCode.UInt16:
-						case TypeCode.UInt32:
-							il.Emit (OpCodes.Ldc_I4, Convert.ToUInt32 (defaultValue));
-							break;
-						case TypeCode.Int64:
-							il.Emit (OpCodes.Ldc_I8, Convert.ToInt64 (defaultValue));
-							break;
-						case TypeCode.UInt64:
-							il.Emit (OpCodes.Ldc_I8, Convert.ToUInt64 (defaultValue));
-							break;
-						case TypeCode.Single:
-							il.Emit (OpCodes.Ldc_R4, Convert.ToSingle (defaultValue));
-							break;
-						case TypeCode.Double:
-							il.Emit (OpCodes.Ldc_R8, Convert.ToDouble (defaultValue));
-							break;
-//					case TypeCode.Decimal:
-//						break;
-//					case TypeCode.DateTime:
-//						break;
-						case TypeCode.String:
-							il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
-							break;
-						default:
-							il.Emit (OpCodes.Pop);
-							continue;
-						}
-					} else if (dvType.FullName == "System.String")
-						il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
-					else{
-						if (!dvType.IsEnum) {
-							il.Emit (OpCodes.Pop);
-							continue;
-						}
-						il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (defaultValue));
-					}
-
-					if (pi.PropertyType != dvType) {
-						if (Type.GetTypeCode (dvType) == TypeCode.String) {
-							MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
-							if (miParse != null) {
-								il.Emit (OpCodes.Callvirt, miParse);
-								if (miParse.ReturnType != pi.PropertyType)
-									il.Emit (OpCodes.Unbox_Any, pi.PropertyType);
-							} else
-								throw new Exception ("no Parse method found for: " + pi.PropertyType.FullName);
 						} else {
-							MethodInfo conv = CompilerServices.GetConvertMethod (pi.PropertyType);
-							il.Emit(OpCodes.Callvirt, conv);
-							il.Emit (OpCodes.Unbox_Any, pi.PropertyType);
+							switch (Type.GetTypeCode (dvType)) {
+							case TypeCode.Boolean:
+								if ((bool)defaultValue == true)
+									il.Emit (OpCodes.Ldc_I4_1);
+								else
+									il.Emit (OpCodes.Ldc_I4_0);
+								break;
+//						case TypeCode.Empty:
+//							break;
+//						case TypeCode.Object:
+//							break;
+//						case TypeCode.DBNull:
+//							break;
+//						case TypeCode.SByte:
+//							break;
+//						case TypeCode.Decimal:
+//							break;
+//						case TypeCode.DateTime:
+//							break;
+							case TypeCode.Char:
+								il.Emit (OpCodes.Ldc_I4, Convert.ToChar (defaultValue));
+								break;
+							case TypeCode.Byte:
+							case TypeCode.Int16:
+							case TypeCode.Int32:
+								il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (defaultValue));
+								break;
+							case TypeCode.UInt16:
+							case TypeCode.UInt32:
+								il.Emit (OpCodes.Ldc_I4, Convert.ToUInt32 (defaultValue));
+								break;
+							case TypeCode.Int64:
+								il.Emit (OpCodes.Ldc_I8, Convert.ToInt64 (defaultValue));
+								break;
+							case TypeCode.UInt64:
+								il.Emit (OpCodes.Ldc_I8, Convert.ToUInt64 (defaultValue));
+								break;
+							case TypeCode.Single:
+								il.Emit (OpCodes.Ldc_R4, Convert.ToSingle (defaultValue));
+								break;
+							case TypeCode.Double:
+								il.Emit (OpCodes.Ldc_R8, Convert.ToDouble (defaultValue));
+								break;
+							case TypeCode.String:
+								il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
+								break;
+							default:
+								il.Emit (OpCodes.Pop);
+								continue;
+							}
 						}
+					} else
+						throw new Exception ("Expecting valuetype in default values for: " + pi.Name);
+				}else{
+					//surely a class or struct
+					if (dvType != typeof(string))
+						throw new Exception ("Expecting String in default values for: " + pi.Name);
+					if (pi.PropertyType == typeof(string))
+						il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
+					else {
+						MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
+						if (miParse == null)
+							throw new Exception ("no Parse method found for: " + pi.PropertyType.FullName);
+
+						il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
+						il.Emit (OpCodes.Callvirt, miParse);
+
+						if (miParse.ReturnType != pi.PropertyType)
+							il.Emit (OpCodes.Unbox_Any, pi.PropertyType);
 					}
 				}
-
 				il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
 			}
-				
 			il.Emit(OpCodes.Ret);
 
 			Interface.DefaultValuesLoader[thisType.FullName] = (Interface.loadDefaultInvoker)dm.CreateDelegate(typeof(Interface.loadDefaultInvoker));
