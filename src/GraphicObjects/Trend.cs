@@ -53,7 +53,7 @@ namespace Crow
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(100)]
-		public virtual int NbValue {
+		public virtual int NbValues {
 			get { return nbValues; }
 			set {
 				if (nbValues == value)
@@ -145,7 +145,7 @@ namespace Crow
 
 			double ptrX = (double)r.Right;
 			double scaleY = (double)r.Height / (Maximum - Minimum);
-			double stepX = (double)r.Width / (double)nbValues;
+			double stepX = (double)r.Width / (double)(nbValues-1);
 
 			gr.LineWidth = 1.0;
 			gr.SetDash (new double[]{ 1.0 },0.0);
