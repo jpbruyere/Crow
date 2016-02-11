@@ -217,53 +217,42 @@ namespace Crow
 			}
 		}
 
-		public override void Paint(ref Context ctx, Rectangles clip = null)
+		public override void Paint(ref Context ctx)
 		{
 			if ( !Visible )
 				return;
 
-			if (bmp == null)
-				UpdateGraphic ();
-			else {
-				if (clip != null)
-					clip.Rebase (this);									
-				else {
-					clip = new Rectangles ();
-					//TODO:added lately slot to empty clip,
-					//should rework this precise case causing expandable not
-					//to show image changes
-					clip.AddRectangle (ContextCoordinates (Slot.Size));
-				}
-
-				if (!DrawingIsValid || clip != null) {//false when 1 child has changed
-					//child having their content changed has to be repainted
-					//and those with slot intersecting clip rectangle have also to be repainted
-
-					using (ImageSurface cache =
-						      new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, Slot.Width * 4)) {
-						Context gr = new Context (cache);
-						clip.clearAndClip (gr);
-
-						Rectangle rBack = Slot.Size;
-						Background.SetAsSource (gr, rBack);
-						CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
-						gr.Fill ();
-
-						#if DEBUG_CLIP_RECTANGLE
-						clip.stroke (gr, Color.Amaranth.AdjustAlpha (0.8));
-						#endif
-						foreach (GraphicObject c in children.Where(ch=>ch.Visible)) {
-							Rectangles childClip = clip.intersectingRects (ContextCoordinates(c.Slot));
-							if (!c.DrawingIsValid || childClip.count > 0)
-								c.Paint (ref gr, childClip);//, localClip);
-						}
-
-						gr.Dispose ();
-					}
-				}
+			if (CacheEnabled) {
+				if (bmp == null)
+					RecreateCache ();
 			}
-				
-			base.Paint (ref ctx, clip);
+
+			if (Clipping.count > 0) {
+				using (ImageSurface cache =
+					       new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, Slot.Width * 4)) {
+					Context gr = new Context (cache);
+
+					Clipping.clearAndClip (gr);
+					Rectangle rBack = Slot.Size;
+					Background.SetAsSource (gr, rBack);
+					CairoHelpers.CairoRectangle (gr, rBack, CornerRadius);
+					gr.Fill ();
+
+					foreach (GraphicObject c in children) {
+						if (!c.Visible)
+							continue;
+						Rectangles childClip = Clipping.intersectingRects (ContextCoordinates (c.Slot));
+						if (childClip.count > 0)
+							c.Paint (ref ctx);						
+					}
+					#if DEBUG_CLIP_RECTANGLE
+					Clipping.stroke (gr, Color.Amaranth.AdjustAlpha (0.8));
+					#endif
+
+					gr.Dispose ();
+				}
+			}				
+			base.Paint (ref ctx);
 		}
 		#endregion
 

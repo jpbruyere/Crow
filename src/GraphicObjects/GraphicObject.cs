@@ -31,6 +31,9 @@ namespace Crow
 		internal List<Binding> Bindings = new List<Binding> ();
 		internal int layoutingTries = 0;
 
+		Rectangles _clipping = new Rectangles();
+		public Rectangles Clipping { get { return _clipping; }}
+
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
 		public virtual void NotifyValueChanged(string MemberName, object _value)
@@ -121,15 +124,7 @@ namespace Crow
 		[XmlIgnore]public ILayoutable Parent { 
 			get { return _parent; }
 			set {
-//				if (_parent == value)
-//					return;
-//				if (_parent != null)
-//					ClearBinding ();
-//				
 				_parent = value;
-//
-//				if (DataSource != null)
-//					ResolveBindings ();
 			}
 		}
 
@@ -150,20 +145,14 @@ namespace Crow
 		}
 		public virtual Rectangle ContextCoordinates(Rectangle r){
 			return
-				Parent.ContextCoordinates (r);// + ClientRectangle.Position;
+				Parent.ContextCoordinates (r);
 		}			
 		public virtual Rectangle ScreenCoordinates (Rectangle r){
 			return 
 				Parent.ScreenCoordinates(r) + Parent.getSlot().Position + Parent.ClientRectangle.Position;
 		}
-		public virtual Rectangle getSlot()
-		{
-			return Slot;
-		}
-		public virtual Rectangle getBounds()
-		{
-			return Bounds;
-		}
+		public virtual Rectangle getSlot() => Slot;
+		public virtual Rectangle getBounds() => Bounds;
 		#endregion
 
 		#region EVENT HANDLERS
@@ -478,14 +467,22 @@ namespace Crow
 		public virtual bool Contains(GraphicObject goToFind){
 			return false;
 		}
-
-		public virtual void registerClipRect()
-		{
-			HostContainer.redrawClip.AddRectangle (ScreenCoordinates(Slot));
+		public void RegisterClip(Rectangle clip){
+			Rectangle r = Slot + Parent.ClientRectangle;
+			if (CacheEnabled && bmp != null)
+				Clipping.AddRectangle (r);				
+			Parent.RegisterClip (r);
+		}
+//		public virtual void registerClipRect(Rectangle clip)
+//		{
+//			Rectangle tmp = ContextCoordinates (clip);
+//			if (CacheEnabled) {
+//			}
+			//HostContainer.redrawClip.AddRectangle (ScreenCoordinates(Slot));
 			//this clipping should take only last painted slots on each level in ancestor tree which
 			//is not the case for now.
-			HostContainer.redrawClip.AddRectangle (ScreenCoordinates(LastPaintedSlot));
-		}
+			//HostContainer.redrawClip.AddRectangle (ScreenCoordinates(LastPaintedSlot));
+		//}
 		/// <summary>
 		/// Clear chached object and add clipping region in redraw list of interface
 		/// </summary>
@@ -754,7 +751,7 @@ namespace Crow
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version
 		/// of the widget </summary>
-		public virtual void Paint (ref Context ctx, Rectangles clip = null)
+		public virtual void Paint (ref Context ctx)
 		{
 			if (!Visible)
 				return;
@@ -771,24 +768,25 @@ namespace Crow
 			if (cacheEnabled) {
 				if (bmp == null)
 					UpdateGraphic ();
-
 				using (ImageSurface source = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
-					//TODO:improve equality test for basic color and Fill
-					if (this.Background is SolidColor) {
-						if ((this.Background as SolidColor).Equals (Color.Clear)) {
-							ctx.Save ();
-							ctx.Operator = Operator.Clear;
-							ctx.Rectangle (rb);
-							ctx.Fill ();
-							ctx.Restore ();
-						}
-					}
+//					//TODO:improve equality test for basic color and Fill
+//					if (this.Background is SolidColor) {
+//						if ((this.Background as SolidColor).Equals (Color.Clear)) {
+//							ctx.Save ();
+//							ctx.Operator = Operator.Clear;
+//							ctx.Rectangle (rb);
+//							ctx.Fill ();
+//							ctx.Restore ();
+//						}
+//					}
 					ctx.SetSourceSurface (source, rb.X, rb.Y);
 					ctx.Paint ();
 				}
 				return;
 			}
 			ctx.Save ();
+
+			Clipping.clearAndClip (ctx);
 			ctx.Translate (rb.X, rb.Y);
 			onDraw (ctx);
 			ctx.Restore ();

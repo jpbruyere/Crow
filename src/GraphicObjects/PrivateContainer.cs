@@ -139,24 +139,21 @@ namespace Crow
 			return
 				Parent.ContextCoordinates(r) + Slot.Position + ClientRectangle.Position;
 		}
-		public override void Paint(ref Cairo.Context ctx, Rectangles clip = null)
+		public override void Paint(ref Cairo.Context ctx)
 		{
 			if (!Visible)//check if necessary??
 				return;
 
 			ctx.Save();
 
-			if (clip != null)
-				clip.clip(ctx);
-
-			base.Paint(ref ctx, clip);
+			base.Paint(ref ctx);
 
 			//clip to client zone
 			CairoHelpers.CairoRectangle (ctx, Parent.ContextCoordinates(ClientRectangle + Slot.Position), CornerRadius);
 			ctx.Clip();
 
 			if (child != null)
-				child.Paint(ref ctx, clip);
+				child.Paint(ref ctx);
 
 			ctx.Restore();            
 		}

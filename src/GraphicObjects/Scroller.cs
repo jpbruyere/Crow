@@ -188,10 +188,10 @@ namespace Crow
 			return base.ScreenCoordinates (r) - new Point((int)ScrollX,(int)ScrollY);
 		}
 
-		public override void registerClipRect ()
-		{
-			HostContainer.redrawClip.AddRectangle (base.ScreenCoordinates(Slot));
-		}
+//		public override void registerClipRect ()
+//		{
+//			HostContainer.redrawClip.AddRectangle (base.ScreenCoordinates(Slot));
+//		}
 
 
     }

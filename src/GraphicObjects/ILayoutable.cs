@@ -21,6 +21,7 @@ namespace Crow
 
 		LayoutingType RegisteredLayoutings { get; set; }
 		void RegisterForLayouting(LayoutingType layoutType);
+		void RegisterClip(Rectangle clip);
 		bool UpdateLayout(LayoutingType layoutType);
 
 

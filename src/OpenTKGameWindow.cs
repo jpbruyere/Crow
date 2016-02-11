@@ -90,7 +90,7 @@ namespace Crow
 			{
 				GraphicObjects.Remove(g);
 				GraphicObjects.Insert(0, g);
-				g.registerClipRect ();
+				//g.registerClipRect ();
 			}
 		}
 		public void Quit ()
@@ -282,14 +282,15 @@ namespace Crow
 					gobjsToRedraw.Clear ();
 					foreach (GraphicObject p in gotr) {
 						p.IsQueuedForRedraw = false;
-						p.registerClipRect ();
+						p.RegisterClip (p.LastPaintedSlot);
+						p.RegisterClip (p.getSlot());
 					}
 
 					#if MEASURE_TIME
 					updateTime.Stop ();
 					drawingTime.Start ();
 					#endif
-
+					Debug.WriteLine (redrawClip.ToString ());
 					lock (redrawClip) {
 						if (redrawClip.count > 0) {
 							#if DEBUG_CLIP_RECTANGLE
@@ -299,17 +300,18 @@ namespace Crow
 
 							//Link.draw (ctx);
 							foreach (GraphicObject p in invGOList) {
-								if (p.Visible) {
+								if (!p.Visible)
+									continue;
 
-									ctx.Save ();
-									if (redrawClip.count > 0) {
-										Rectangles clip = redrawClip.intersectingRects (p.Slot);
+								ctx.Save ();
 
-										if (clip.count > 0)
-											p.Paint (ref ctx, clip);
-									}
-									ctx.Restore ();
-								}
+								Rectangles clip = redrawClip.intersectingRects (p.Slot);
+
+								if (clip.count > 0)
+									p.Paint (ref ctx);
+								
+								ctx.Restore ();
+
 							}
 							ctx.ResetClip ();
 							#if DEBUG_CLIP_RECTANGLE
@@ -549,6 +551,9 @@ namespace Crow
         #endregion
 
 		#region ILayoutable implementation
+		public void RegisterClip(Rectangle r){
+			redrawClip.AddRectangle (r);
+		}
 		public int LayoutingTries {
 			get { throw new NotImplementedException (); }
 			set { throw new NotImplementedException (); }
@@ -559,17 +564,13 @@ namespace Crow
 		}
 		public void RegisterForLayouting (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public bool UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
-		public Rectangle ContextCoordinates (Rectangle r)
-		{
-			return r;
-		}
+		public Rectangle ContextCoordinates (Rectangle r) => r;
 		public Rectangle ScreenCoordinates (Rectangle r) => r;
 
 		public ILayoutable Parent {
 			get { return null; }
 			set { throw new NotImplementedException (); }
 		}
-
 		public ILayoutable LogicalParent {
 			get { return null; }
 			set { throw new NotImplementedException (); }
@@ -581,15 +582,8 @@ namespace Crow
 		public IGOLibHost HostContainer {
 			get { return this; }
 		}
-
-		public Rectangle getSlot ()
-		{
-			return ClientRectangle;
-		}
-		public Rectangle getBounds ()//redundant but fill ILayoutable implementation
-		{
-			return ClientRectangle;
-		}			
+		public Rectangle getSlot () => ClientRectangle;
+		public Rectangle getBounds () => ClientRectangle;
 		#endregion
     }
 }
