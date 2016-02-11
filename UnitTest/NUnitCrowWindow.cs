@@ -165,6 +165,7 @@ namespace Crow
 			gobjsToRedraw.CopyTo (gotr);
 			gobjsToRedraw.Clear ();
 			foreach (GraphicObject p in gotr) {
+				p.IsQueuedForRedraw = false;
 				p.registerClipRect ();
 			}
 
@@ -206,11 +207,12 @@ namespace Crow
 			updateTime.Stop ();
 			ctx.Dispose ();
 
-			sw.WriteLine ("{3}\t{0,8}\t{1,8}\t{2,8}",
+			sw.WriteLine ("{0}\t{1,8}\t{2,8}\t{3,8}\t{4,8}",
+				testId,
 				layoutTime.ElapsedTicks,
 				guTime.ElapsedTicks,
 				updateTime.ElapsedTicks,
-				testId);
+				loadTime.ElapsedTicks);
 			sw.Flush ();
 			
 //			Console.WriteLine("{3} => layout:{0}ms\tdraw{1}ms\tupdate:{2}ms",
@@ -224,10 +226,13 @@ namespace Crow
 		#endregion
 
 		#region loading
+		public Stopwatch loadTime = new Stopwatch ();
 		public GraphicObject LoadTest (string id)
 		{
 			testId = id;
+			loadTime.Start ();
 			GraphicObject tmp = Interface.Load ("Interfaces/" + testId + ".crow", this);
+			loadTime.Stop ();
 			AddWidget (tmp);
 			return tmp;
 		}
@@ -255,8 +260,8 @@ namespace Crow
 
 			sw = new StreamWriter (path);
 
-			sw.WriteLine ("ID        layout            draw          update");
-			sw.WriteLine ("------------------------------------------------");
+			sw.WriteLine ("ID        layout            draw          update            load");
+			sw.WriteLine ("----------------------------------------------------------------");
 			sw.Flush ();
 		}
 		~NUnitCrowWindow(){

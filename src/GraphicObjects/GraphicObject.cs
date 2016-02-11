@@ -83,6 +83,7 @@ namespace Crow
 		Size _maximumSize = "0;0";
 		Size _minimumSize = "0;0";
 		bool cacheEnabled = false;
+		object dataSource;
 		#endregion
 
 		#region public fields
@@ -406,8 +407,6 @@ namespace Crow
 			get { return _minimumSize; }
 			set { _minimumSize = value; }
 		}
-		object dataSource;
-
 		[XmlIgnore]public virtual object DataSource {
 			set {
 				if (dataSource == value)
@@ -495,19 +494,24 @@ namespace Crow
 			bmp = null;
 			RegisterForRedraw ();
 		}
+		public bool IsQueuedForRedraw = false;
 		/// <summary>
 		/// Add clipping region in redraw list of interface, dont update cached object content
 		/// </summary>
 		public virtual void RegisterForRedraw ()
 		{
+			if (IsQueuedForRedraw)
+				return;
 			//test if this speed up a lot to cancel clipping for an uncached group
 			Group p = Parent as Group;
 			if (p != null) {
 				if (p.bmp == null)
 					return;
 			}
-			if (HostContainer != null)
-				HostContainer.gobjsToRedraw.Add (this);
+			if (HostContainer == null)
+				return;
+			HostContainer.gobjsToRedraw.Add (this);
+			IsQueuedForRedraw = true;
 		}
 
 		#region Layouting
@@ -734,8 +738,6 @@ namespace Crow
 		/// this trigger the effective drawing routine </summary>
 		protected virtual void UpdateGraphic ()
 		{
-			LastPaintedSlot = Slot;
-
 			int stride = 4 * Slot.Width;
 
 			int bmpSize = Math.Abs (stride) * Slot.Height;
@@ -756,6 +758,8 @@ namespace Crow
 		{
 			if (!Visible)
 				return;
+
+			LastPaintedSlot = Slot;
 
 			Rectangle rb = Parent.ContextCoordinates (Slot);
 

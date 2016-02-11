@@ -281,6 +281,7 @@ namespace Crow
 					gobjsToRedraw.CopyTo (gotr);
 					gobjsToRedraw.Clear ();
 					foreach (GraphicObject p in gotr) {
+						p.IsQueuedForRedraw = false;
 						p.registerClipRect ();
 					}
 
