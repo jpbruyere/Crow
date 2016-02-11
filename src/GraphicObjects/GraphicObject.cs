@@ -1381,26 +1381,15 @@ namespace Crow
 						Debug.WriteLine ("GOML: Read only property in " + thisType.ToString() + " : " + attName);
 						continue;
 					}
-
-					bool isAttribute = false;
-					object defaultValue = null;
-
-					foreach (object attrib in pi.GetCustomAttributes ()) {
-						XmlAttributeAttribute xaa = attrib as XmlAttributeAttribute;
-						if (xaa != null) {
-							isAttribute = true;
-							if (!string.IsNullOrEmpty (xaa.AttributeName))
-								attName = xaa.AttributeName;
-							continue;
-						}
-						if (attrib is XmlIgnoreAttribute)
-							break;
-						DefaultValueAttribute dv = attrib as DefaultValueAttribute;
-						if (dv != null)
-							defaultValue = dv.Value;						
+					XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
+					if (xaa != null) {
+						if (!string.IsNullOrEmpty (xaa.AttributeName))
+							attName = xaa.AttributeName;
 					}
-
-
+					DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof(DefaultValueAttribute));
+					object defaultValue = null;
+					if (dv != null)
+						defaultValue = dv.Value;
 					if (attValue.StartsWith("{")) {
 						//binding
 						if (!attValue.EndsWith("}"))
@@ -1409,8 +1398,9 @@ namespace Crow
 						this.Bindings.Add (new Binding (new MemberReference(this, pi), attValue.Substring (1, attValue.Length - 2)));
 						continue;
 					}
-
-					if (!isAttribute)
+					if (pi.GetCustomAttribute (typeof(XmlIgnoreAttribute)) != null)
+						continue;
+					if (xaa == null)//not define as xmlAttribute
 						continue;
 
 					if (pi.PropertyType == typeof(string)) {
