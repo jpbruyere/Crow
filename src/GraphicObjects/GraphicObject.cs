@@ -850,16 +850,16 @@ namespace Crow
 		protected virtual void UpdateCache(Context ctx){
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
-				//					//TODO:improve equality test for basic color and Fill
-				//					if (this.Background is SolidColor) {
-				//						if ((this.Background as SolidColor).Equals (Color.Clear)) {
-				//							ctx.Save ();
-				//							ctx.Operator = Operator.Clear;
-				//							ctx.Rectangle (rb);
-				//							ctx.Fill ();
-				//							ctx.Restore ();
-				//						}
-				//					}
+				//TODO:improve equality test for basic color and Fill
+				if (this.Background is SolidColor) {
+					if ((this.Background as SolidColor).Equals (Color.Clear)) {
+						ctx.Save ();
+						ctx.Operator = Operator.Clear;
+						ctx.Rectangle (rb);
+						ctx.Fill ();
+						ctx.Restore ();
+					}
+				}
 				ctx.SetSourceSurface (cache, rb.X, rb.Y);
 				ctx.Paint ();
 			}
