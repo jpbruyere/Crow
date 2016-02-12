@@ -209,9 +209,15 @@ namespace Crow
 		{
 			base.onDraw (gr);
 
+			gr.Save ();
+			//clip to client zone
+			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+			gr.Clip ();
+
 			foreach (GraphicObject g in children) {
 				g.Paint (ref gr);
 			}
+			gr.Restore ();
 		}
 		protected override void UpdateCache (Context ctx)
 		{
@@ -224,10 +230,15 @@ namespace Crow
 					Clipping.clearAndClip (gr);
 					base.onDraw (gr);
 
+					//clip to client zone
+					CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+					gr.Clip ();
+
 					foreach (GraphicObject c in children) {
 						if (!c.Visible)
 							continue;
-						c.Paint (ref gr);						
+						if (Clipping.intersect(c.Slot + ClientRectangle.Position))
+							c.Paint (ref gr);
 					}
 
 					#if DEBUG_CLIP_RECTANGLE

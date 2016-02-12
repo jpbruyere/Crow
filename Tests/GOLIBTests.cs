@@ -37,6 +37,7 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"testWindow.goml",
 			"clip4.crow",
 			"clip3.crow",
 			"clip2.crow",
@@ -69,7 +70,6 @@ namespace test
 			"testWindow2.goml",
 
 			"testWindow3.goml",
-			"testWindow.goml",
 			"testCheckbox.goml",
 			"testLabel.goml",
 			"testAll.goml",

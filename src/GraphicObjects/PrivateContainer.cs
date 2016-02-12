@@ -136,8 +136,15 @@ namespace Crow
 		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
+
+			gr.Save ();
+			//clip to client zone
+			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+			gr.Clip ();
+
 			if (child != null)
 				child.Paint (ref gr);
+			gr.Restore ();
 		}
 		protected override void UpdateCache (Context ctx)
 		{
@@ -156,6 +163,10 @@ namespace Crow
 					if (child != null) {
 						
 						base.onDraw (gr);
+
+						//clip to client zone
+						CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+						gr.Clip ();
 
 						child.Paint (ref gr);
 					}
