@@ -40,7 +40,7 @@ namespace UnitTest
 		[Category("Alignment")]
 		public void GraphicObject ()
 		{
-			string[] tests = new string[] { "0","1", "3", "4", "5"};
+			string[] tests = new string[] { "0","1","3","4","5"};
 
 			foreach (string s in tests) {
 				win.LoadTest (s);
