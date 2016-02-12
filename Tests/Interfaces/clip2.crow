@@ -7,7 +7,7 @@
 		HorizontalAlignment="Right" VerticalAlignment="Bottom"
 		MouseEnter="{Background=Gray}"
 		MouseLeave="{Background=LimeGreen}">
-	<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="false"
+	<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
 		MouseEnter="{Background=DimGray}" Width="100"
 		MouseLeave="{Background=BlueCrayola}"
 	 	Margin="10" Text="{drawing}" Background="BlueCrayola"/>

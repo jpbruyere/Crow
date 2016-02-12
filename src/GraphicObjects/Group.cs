@@ -220,19 +220,20 @@ namespace Crow
 			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
 				Context gr = new Context (cache);
 
-				//Clipping.clearAndClip (gr);
-				base.onDraw (gr);
+				if (Clipping.count > 0) {
+					Clipping.clearAndClip (gr);
+					base.onDraw (gr);
 
-				foreach (GraphicObject c in children) {
-					if (!c.Visible)
-						continue;
-					c.Paint (ref gr);						
+					foreach (GraphicObject c in children) {
+						if (!c.Visible)
+							continue;
+						c.Paint (ref gr);						
+					}
+
+					#if DEBUG_CLIP_RECTANGLE
+					Clipping.stroke (gr, Color.Amaranth.AdjustAlpha (0.8));
+					#endif
 				}
-
-				#if DEBUG_CLIP_RECTANGLE
-				Clipping.stroke (gr, Color.Amaranth.AdjustAlpha (0.8));
-				#endif
-
 				gr.Dispose ();
 
 				ctx.SetSourceSurface (cache, rb.X, rb.Y);

@@ -141,14 +141,18 @@ namespace Crow
 		}
 		protected override void UpdateCache (Context ctx)
 		{
+			//ctx.Save ();
+
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 
 			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
 				Context gr = new Context (cache);
 
-				//Clipping.clearAndClip (ctx);
 
 				if (Clipping.count > 0) {
+
+					Clipping.clearAndClip (gr);
+
 					if (child != null) {
 						
 						base.onDraw (gr);
@@ -163,6 +167,8 @@ namespace Crow
 				ctx.Paint ();
 			}
 			Clipping.Reset();
+
+			//ctx.Restore ();
 		}
 //		public override Rectangle ContextCoordinates (Rectangle r)
 //		{

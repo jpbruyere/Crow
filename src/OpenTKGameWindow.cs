@@ -279,8 +279,8 @@ namespace Crow
 			gobjsToRedraw.Clear ();
 			foreach (GraphicObject p in gotr) {
 				p.IsQueuedForRedraw = false;
-				p.RegisterClip (p.LastPaintedSlot);
-				p.RegisterClip (p.getSlot());
+				p.Parent.RegisterClip (p.LastPaintedSlot);
+				p.Parent.RegisterClip (p.getSlot());
 			}
 
 			#if MEASURE_TIME
@@ -307,9 +307,9 @@ namespace Crow
 							ctx.Restore ();
 						}
 
-						#if DEBUG_CLIP_RECTANGLE
-						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
-						#endif
+//						#if DEBUG_CLIP_RECTANGLE
+//						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
+//						#endif
 
 						clipping.Reset ();
 					}

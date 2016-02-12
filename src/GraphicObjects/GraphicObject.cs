@@ -473,8 +473,8 @@ namespace Crow
 		}
 		public void RegisterClip(Rectangle clip){			
 			if (CacheEnabled && bmp != null)
-				Clipping.AddRectangle (clip);				
-			Parent.RegisterClip (clip + Slot.Position + Parent.ClientRectangle.Position);
+				Clipping.AddRectangle (clip + ClientRectangle.Position);
+			Parent.RegisterClip (clip + Slot.Position + ClientRectangle.Position);
 		}
 //		public virtual void registerClipRect(Rectangle clip)
 //		{
@@ -502,12 +502,6 @@ namespace Crow
 		{
 			if (IsQueuedForRedraw)
 				return;
-			//test if this speed up a lot to cancel clipping for an uncached group
-			Group p = Parent as Group;
-			if (p != null) {
-				if (p.bmp == null)
-					return;
-			}
 			if (HostContainer == null)
 				return;
 			HostContainer.gobjsToRedraw.Add (this);

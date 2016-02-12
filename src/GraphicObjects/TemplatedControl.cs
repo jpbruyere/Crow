@@ -93,11 +93,6 @@ namespace Crow
 					NotifyValueChanged ("TemplatedHeight", 0);
 			}
 		}
-
-		protected override void loadDefaultValues ()
-		{			
-			base.loadDefaultValues ();
-		}
 		public override GraphicObject FindByName (string nameToFind)
 		{
 			//prevent name searching in template

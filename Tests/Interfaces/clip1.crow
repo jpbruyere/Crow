@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0"?>
-<Container Fit="true" Margin="20" Background="SkyBlue" CacheEnabled="true"
+<Container Fit="true" Margin="20" Background="SkyBlue" CacheEnabled="false"
 		HorizontalAlignment="Right" VerticalAlignment="Bottom"
 		MouseEnter="{Background=LightGray}"
 		MouseLeave="{Background=SkyBlue}">
-		<Container Fit="true" Margin="20" Background="Red" CacheEnabled="false"
+		<Container Fit="true" Margin="20" Background="Red" CacheEnabled="true"
 			HorizontalAlignment="Right" VerticalAlignment="Bottom"
 			MouseEnter="{Background=White}"
 			MouseLeave="{Background=Red}">
