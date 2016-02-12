@@ -420,49 +420,143 @@ namespace Crow
 		}
 		#endregion
 
-
-		/// <summary>
-		/// Loads the default values from XML attributes default
-		/// </summary>
+		/// <summary> Loads the default values from XML attributes default </summary>
 		protected virtual void loadDefaultValues()
 		{
-			foreach (PropertyInfo pi in this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
-				if (pi.GetSetMethod () == null)
-					continue;
+			Type thisType = this.GetType ();
+			if (Interface.DefaultValuesLoader.ContainsKey(thisType.FullName)) {
+				Interface.DefaultValuesLoader[thisType.FullName] (this);
+				return;
+			}
+			
+			DynamicMethod dm = null;
+			ILGenerator il = null;
+
+			dm = new DynamicMethod("dyn_loadDefValues",
+				MethodAttributes.Family | MethodAttributes.FamANDAssem | MethodAttributes.NewSlot,
+				CallingConventions.Standard,
+				typeof(void),new Type[] {typeof(object)},thisType,true);
+
+			il = dm.GetILGenerator(256);
+
+			il.Emit(OpCodes.Nop);
+
+			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
 				string name = "";
 
-				object[] att = pi.GetCustomAttributes (false);
+				#region retrieve custom attributes
+				if (pi.GetSetMethod () == null)
+					continue;
+				XmlIgnoreAttribute xia = (XmlIgnoreAttribute)pi.GetCustomAttribute (typeof(XmlIgnoreAttribute));
+				if (xia != null)
+					continue;
+				DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof(DefaultValueAttribute));
+				if (dv == null)
+					continue;
+				object defaultValue = dv.Value;
 
-				foreach (object o in att) {
-					XmlAttributeAttribute xaa = o as XmlAttributeAttribute;
-					if (xaa != null) {						
-						if (string.IsNullOrEmpty (xaa.AttributeName))
-							name = pi.Name;
-						else
-							name = xaa.AttributeName;
-						continue;
-					}
-					XmlIgnoreAttribute xia = o as XmlIgnoreAttribute;
-					if (xia != null)
-						continue;
+				XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
+				if (xaa != null) {
+					if (string.IsNullOrEmpty (xaa.AttributeName))
+						name = pi.Name;
+					else
+						name = xaa.AttributeName;
+				}
+				#endregion
 
-					DefaultValueAttribute dv = o as DefaultValueAttribute;
-					if (dv != null) {
-						object defaultValue = dv.Value;
-						//avoid system types automaticaly converted by parser
-						if (defaultValue != null && !pi.PropertyType.Namespace.StartsWith("System")) {
-							if (pi.PropertyType != defaultValue.GetType()) {
-								MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
-								if (miParse != null) {									
-									pi.SetValue (this, miParse.Invoke (null, new object[]{ defaultValue }), null);
-									continue;
-								}
+				il.Emit (OpCodes.Ldarg_0);
+
+				if (defaultValue == null) {
+					il.Emit (OpCodes.Ldnull);
+					il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
+					continue;
+				} 
+				Type dvType = defaultValue.GetType ();
+
+				if (dvType.IsValueType) {
+					if (pi.PropertyType.IsValueType) {
+						if (pi.PropertyType.IsEnum) {
+							if (pi.PropertyType != dvType)
+								throw new Exception ("Enum mismatch in default values: " + pi.PropertyType.FullName);
+							il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (defaultValue));
+						} else {
+							switch (Type.GetTypeCode (dvType)) {
+							case TypeCode.Boolean:
+								if ((bool)defaultValue == true)
+									il.Emit (OpCodes.Ldc_I4_1);
+								else
+									il.Emit (OpCodes.Ldc_I4_0);
+								break;
+//						case TypeCode.Empty:
+//							break;
+//						case TypeCode.Object:
+//							break;
+//						case TypeCode.DBNull:
+//							break;
+//						case TypeCode.SByte:
+//							break;
+//						case TypeCode.Decimal:
+//							break;
+//						case TypeCode.DateTime:
+//							break;
+							case TypeCode.Char:
+								il.Emit (OpCodes.Ldc_I4, Convert.ToChar (defaultValue));
+								break;
+							case TypeCode.Byte:
+							case TypeCode.Int16:
+							case TypeCode.Int32:
+								il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (defaultValue));
+								break;
+							case TypeCode.UInt16:
+							case TypeCode.UInt32:
+								il.Emit (OpCodes.Ldc_I4, Convert.ToUInt32 (defaultValue));
+								break;
+							case TypeCode.Int64:
+								il.Emit (OpCodes.Ldc_I8, Convert.ToInt64 (defaultValue));
+								break;
+							case TypeCode.UInt64:
+								il.Emit (OpCodes.Ldc_I8, Convert.ToUInt64 (defaultValue));
+								break;
+							case TypeCode.Single:
+								il.Emit (OpCodes.Ldc_R4, Convert.ToSingle (defaultValue));
+								break;
+							case TypeCode.Double:
+								il.Emit (OpCodes.Ldc_R8, Convert.ToDouble (defaultValue));
+								break;
+							case TypeCode.String:
+								il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
+								break;
+							default:
+								il.Emit (OpCodes.Pop);
+								continue;
 							}
 						}
-						pi.SetValue (this, defaultValue, null);	
-					}						
+					} else
+						throw new Exception ("Expecting valuetype in default values for: " + pi.Name);
+				}else{
+					//surely a class or struct
+					if (dvType != typeof(string))
+						throw new Exception ("Expecting String in default values for: " + pi.Name);
+					if (pi.PropertyType == typeof(string))
+						il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
+					else {
+						MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
+						if (miParse == null)
+							throw new Exception ("no Parse method found for: " + pi.PropertyType.FullName);
+
+						il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
+						il.Emit (OpCodes.Callvirt, miParse);
+
+						if (miParse.ReturnType != pi.PropertyType)
+							il.Emit (OpCodes.Unbox_Any, pi.PropertyType);
+					}
 				}
+				il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
 			}
+			il.Emit(OpCodes.Ret);
+
+			Interface.DefaultValuesLoader[thisType.FullName] = (Interface.loadDefaultInvoker)dm.CreateDelegate(typeof(Interface.loadDefaultInvoker));
+			Interface.DefaultValuesLoader[thisType.FullName] (this);
 		}
 
 		public virtual GraphicObject FindByName(string nameToFind){
@@ -1293,26 +1387,15 @@ namespace Crow
 						Debug.WriteLine ("GOML: Read only property in " + thisType.ToString() + " : " + attName);
 						continue;
 					}
-
-					bool isAttribute = false;
-					object defaultValue = null;
-
-					foreach (object attrib in pi.GetCustomAttributes ()) {
-						XmlAttributeAttribute xaa = attrib as XmlAttributeAttribute;
-						if (xaa != null) {
-							isAttribute = true;
-							if (!string.IsNullOrEmpty (xaa.AttributeName))
-								attName = xaa.AttributeName;
-							continue;
-						}
-						if (attrib is XmlIgnoreAttribute)
-							break;
-						DefaultValueAttribute dv = attrib as DefaultValueAttribute;
-						if (dv != null)
-							defaultValue = dv.Value;						
+					XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
+					if (xaa != null) {
+						if (!string.IsNullOrEmpty (xaa.AttributeName))
+							attName = xaa.AttributeName;
 					}
-
-
+					DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof(DefaultValueAttribute));
+					object defaultValue = null;
+					if (dv != null)
+						defaultValue = dv.Value;
 					if (attValue.StartsWith("{")) {
 						//binding
 						if (!attValue.EndsWith("}"))
@@ -1321,8 +1404,9 @@ namespace Crow
 						this.Bindings.Add (new Binding (new MemberReference(this, pi), attValue.Substring (1, attValue.Length - 2)));
 						continue;
 					}
-
-					if (!isAttribute)
+					if (pi.GetCustomAttribute (typeof(XmlIgnoreAttribute)) != null)
+						continue;
+					if (xaa == null)//not define as xmlAttribute
 						continue;
 
 					if (pi.PropertyType == typeof(string)) {

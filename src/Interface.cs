@@ -56,6 +56,8 @@ namespace Crow
 		public const int MaxLayoutingTries = 50;
 
 		public static Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem>();
+		public delegate void loadDefaultInvoker(object instance);
+		public static Dictionary<String, loadDefaultInvoker> DefaultValuesLoader = new Dictionary<string, loadDefaultInvoker>();
 
 		#region Load/Save
 
