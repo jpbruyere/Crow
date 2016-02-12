@@ -62,6 +62,15 @@ namespace Crow
 				CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
 				gr.Stroke ();
 			}
+
+			gr.Save ();
+			//clip to client zone
+			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+			gr.Clip ();
+
+			if (child != null)
+				child.Paint (ref gr);
+			gr.Restore ();
 		}		
 		#endregion
 	}

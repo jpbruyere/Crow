@@ -171,7 +171,7 @@ namespace test
 		{
 			if (!e.Mouse.IsButtonDown (MouseButton.Left)||sender!=c)
 				return;
-			redrawClip.AddRectangle (c.ScreenCoordinates(c.Slot));
+			clipping.AddRectangle (c.ScreenCoordinates(c.Slot));
 			c.Left += e.XDelta;
 			c.Top += e.YDelta;
 			c.registerForGraphicUpdate ();

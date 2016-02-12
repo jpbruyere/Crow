@@ -100,6 +100,11 @@ namespace Crow
             : base(){}
 
 		#region GraphicObject Overrides
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public override bool CacheEnabled {
+			get { return base.CacheEnabled; }
+			set { base.CacheEnabled = value; }
+		}
 		void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
 			int maxScroll = MaximumScroll;
@@ -177,21 +182,55 @@ namespace Crow
 			savedMousePos.Y += e.YDelta;
 			base.onMouseMove (sender, new MouseMoveEventArgs(savedMousePos.X,savedMousePos.Y,e.XDelta,e.YDelta));
 		}
+		public override void RegisterClip (Rectangle clip)
+		{
+			base.RegisterClip (clip - new Point((int)ScrollX,(int)ScrollY));
+		}
 		#endregion
 
-		public override Rectangle ContextCoordinates (Rectangle r)
-		{
-			return base.ContextCoordinates (r) - new Point((int)ScrollX,(int)ScrollY);
-		}
 		public override Rectangle ScreenCoordinates (Rectangle r)
 		{
 			return base.ScreenCoordinates (r) - new Point((int)ScrollX,(int)ScrollY);
 		}
-
-		public override void registerClipRect ()
+//		protected override void onDraw (Context gr)
+//		{
+//			gr.Save ();
+//			//gr.ResetClip ();
+//
+//			base.onDraw (gr);
+//			gr.Restore ();
+//		}
+		protected override void onDraw (Context gr)
 		{
-			HostContainer.redrawClip.AddRectangle (base.ScreenCoordinates(Slot));
+			Rectangle rBack = new Rectangle (Slot.Size);
+
+			Background.SetAsSource (gr, rBack);
+			CairoHelpers.CairoRectangle(gr,rBack, CornerRadius);
+			gr.Fill ();
+
+			gr.Save ();
+			//clip to scrolled client zone
+			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);//+ new Point((int)ScrollX,(int)ScrollY)
+			gr.Clip ();
+
+			gr.Translate (-ScrollX, -ScrollY);
+			if (child != null)
+				child.Paint (ref gr);
+			gr.Restore ();
 		}
+
+//		public override void Paint (ref Context ctx)
+//		{
+//			ctx.Save ();
+//			//ctx.ResetClip ();
+//			ctx.Translate (-ScrollX, -ScrollY);
+//			base.Paint (ref ctx);
+//			ctx.Restore ();
+//		}
+//		public override void registerClipRect ()
+//		{
+//			HostContainer.redrawClip.AddRectangle (base.ScreenCoordinates(Slot));
+//		}
 
 
     }

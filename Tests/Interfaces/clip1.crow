@@ -1,0 +1,25 @@
+﻿<?xml version="1.0"?>
+<Container Fit="true" Margin="20" Background="SkyBlue" CacheEnabled="false"
+		HorizontalAlignment="Right" VerticalAlignment="Bottom"
+		MouseEnter="{Background=LightGray}"
+		MouseLeave="{Background=SkyBlue}">
+		<Container Fit="true" Margin="20" Background="Red" CacheEnabled="true"
+			HorizontalAlignment="Right" VerticalAlignment="Bottom"
+			MouseEnter="{Background=White}"
+			MouseLeave="{Background=Red}">
+			<Container Fit="true" Margin="20" Background="Yellow" CacheEnabled="false"
+				HorizontalAlignment="Right" VerticalAlignment="Bottom"
+				MouseEnter="{Background=Blue}"
+				MouseLeave="{Background=Yellow}">
+				<Container Margin="50" Background="LimeGreen" CacheEnabled="true"
+						HorizontalAlignment="Right" VerticalAlignment="Bottom"
+						MouseEnter="{Background=Gray}"
+						MouseLeave="{Background=LimeGreen}">
+					<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
+						MouseEnter="{Background=DimGray}"
+						MouseLeave="{Background=BlueCrayola}" 
+					 	Margin="1" Text="{drawing}" Background="BlueCrayola"/>
+				</Container>
+			</Container>
+		</Container>
+ </Container>

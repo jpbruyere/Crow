@@ -133,33 +133,77 @@ namespace Crow
 				break;
 			}
 		}
-
-		public override Rectangle ContextCoordinates (Rectangle r)
+		protected override void onDraw (Context gr)
 		{
-			return
-				Parent.ContextCoordinates(r) + Slot.Position + ClientRectangle.Position;
-		}
-		public override void Paint(ref Cairo.Context ctx, Rectangles clip = null)
-		{
-			if (!Visible)//check if necessary??
-				return;
+			base.onDraw (gr);
 
-			ctx.Save();
-
-			if (clip != null)
-				clip.clip(ctx);
-
-			base.Paint(ref ctx, clip);
-
+			gr.Save ();
 			//clip to client zone
-			CairoHelpers.CairoRectangle (ctx, Parent.ContextCoordinates(ClientRectangle + Slot.Position), CornerRadius);
-			ctx.Clip();
+			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+			gr.Clip ();
 
 			if (child != null)
-				child.Paint(ref ctx, clip);
-
-			ctx.Restore();            
+				child.Paint (ref gr);
+			gr.Restore ();
 		}
+		protected override void UpdateCache (Context ctx)
+		{
+			//ctx.Save ();
+
+			Rectangle rb = Slot + Parent.ClientRectangle.Position;
+
+			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
+				Context gr = new Context (cache);
+
+				//clip to client zone
+				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+				gr.Clip ();
+
+				if (Clipping.count > 0) {
+
+					Clipping.clearAndClip (gr);
+
+					if (child != null) {
+						
+						base.onDraw (gr);
+
+
+						child.Paint (ref gr);
+					}
+				}
+					
+				gr.Dispose ();
+
+				ctx.SetSourceSurface (cache, rb.X, rb.Y);
+				ctx.Paint ();
+			}
+			Clipping.Reset();
+
+			//ctx.Restore ();
+		}
+//		public override Rectangle ContextCoordinates (Rectangle r)
+//		{
+//			return
+//				Parent.ContextCoordinates(r) + Slot.Position + ClientRectangle.Position;
+//		}
+//		public override void Paint(ref Cairo.Context ctx)
+//		{
+//			if (!Visible)//check if necessary??
+//				return;
+//
+//			ctx.Save();
+//
+//			base.Paint(ref ctx);
+//
+//			//clip to client zone
+//			CairoHelpers.CairoRectangle (ctx, Parent.ContextCoordinates(ClientRectangle + Slot.Position), CornerRadius);
+//			ctx.Clip();
+//
+//			if (child != null)
+//				child.Paint(ref ctx);
+//
+//			ctx.Restore();            
+//		}
 
 		#endregion
 

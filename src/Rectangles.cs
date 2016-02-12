@@ -147,6 +147,8 @@ namespace Crow
 		}
         public void clearAndClip(Context ctx)
         {
+			if (list.Count == 0)
+				return;
             foreach (Rectangle r in list)
                 ctx.Rectangle(r);
 

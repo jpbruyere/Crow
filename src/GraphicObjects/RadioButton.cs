@@ -71,6 +71,9 @@ namespace Crow
 			get { return isChecked; }
             set
             {
+				if (isChecked == value)
+					return;
+				
 				isChecked = value;
 
 				NotifyValueChanged ("IsChecked", value);

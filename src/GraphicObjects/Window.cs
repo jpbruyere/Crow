@@ -89,7 +89,7 @@ namespace Crow
 				if (!HasFocus)
 					return;
 				
-				otkgw.redrawClip.AddRectangle (this.ScreenCoordinates(this.Slot));
+				//otkgw.redrawClip.AddRectangle (this.ScreenCoordinates(this.Slot));
 
 				int currentLeft = this.Left;
 				int currentTop = this.Top;

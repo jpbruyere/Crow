@@ -1,0 +1,58 @@
+﻿<?xml version="1.0"?>
+<Border Fit="true" BorderWidth="2"  >
+<Scroller CornerRadius="2" VerticalScrolling="true" Height="200" Width="300" Background="DimGray" Margin="2">
+	<VerticalStack Margin="10" VerticalAlignment="Top" Fit="true" Background="vgradient|0:BlueCrayola|1:Black" >
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 1"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 2"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 3"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 4"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 5"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 6"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 7"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 8"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 9"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 10"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 11"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 12"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 13"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 14"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 15"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 16"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 17"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 18"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 19"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 20"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 21"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 22"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 23"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 24"/>
+		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 25"/>
+	</VerticalStack>
+</Scroller>
+</Border>
+<!--<VerticalStack Fit="true" Margin="50" Background="LimeGreen" CacheEnabled="false"
+		HorizontalAlignment="Right" VerticalAlignment="Bottom"
+		MouseEnter="{Background=Gray}"
+		MouseLeave="{Background=LimeGreen}">
+
+		<CheckBox Margin="20" Background="BlueCrayola"/>
+		<CheckBox/>
+		<CheckBox/>
+		<CheckBox/>
+		<CheckBox/>
+		<RadioButton/>
+		<RadioButton/>
+		<RadioButton/>
+		<RadioButton/>
+		<RadioButton/>
+		<CheckBox/>
+
+	<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
+		MouseEnter="{Background=DimGray}" Width="100"
+		MouseLeave="{Background=BlueCrayola}"
+	 	Margin="10" Text="{fps}" Background="BlueCrayola"/>
+	<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
+		MouseEnter="{Background=DimGray}" Width="100"
+		MouseLeave="{Background=BlueCrayola}"
+	 	Margin="10" Text="{drawing}" Background="BlueCrayola"/>
+ </VerticalStack>-->

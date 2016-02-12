@@ -1,0 +1,34 @@
+﻿<?xml version="1.0"?>
+<Group Fit="true" Margin="50" Background="Yellow" CacheEnabled="true"
+		HorizontalAlignment="Right" VerticalAlignment="Bottom"
+		MouseEnter="{Background=DimGray}"
+		MouseLeave="{Background=Yellow}">
+	<HorizontalStack Fit="true">
+		<VerticalStack Fit="true" Margin="50" Background="LimeGreen" CacheEnabled="false"
+				HorizontalAlignment="Right" VerticalAlignment="Bottom"
+				MouseEnter="{Background=Gray}"
+				MouseLeave="{Background=LimeGreen}">
+			<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
+				MouseEnter="{Background=DimGray}" Width="100"
+				MouseLeave="{Background=BlueCrayola}"
+			 	Margin="10" Text="{fps}" Background="BlueCrayola"/>
+			<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
+				MouseEnter="{Background=DimGray}" Width="100"
+				MouseLeave="{Background=BlueCrayola}"
+			 	Margin="10" Text="{drawing}" Background="BlueCrayola"/>
+		 </VerticalStack>
+		<VerticalStack Fit="true" Margin="50" Background="LimeGreen" CacheEnabled="false"
+				HorizontalAlignment="Right" VerticalAlignment="Bottom"
+				MouseEnter="{Background=Gray}"
+				MouseLeave="{Background=LimeGreen}">
+			<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
+				MouseEnter="{Background=DimGray}" Width="100"
+				MouseLeave="{Background=BlueCrayola}"
+			 	Margin="10" Text="{fpsMax}" Background="BlueCrayola"/>
+			<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
+				MouseEnter="{Background=DimGray}" Width="100"
+				MouseLeave="{Background=BlueCrayola}"
+			 	Margin="10" Text="{fpsMin}" Background="BlueCrayola"/>
+		 </VerticalStack>
+	</HorizontalStack>
+ </Group>
