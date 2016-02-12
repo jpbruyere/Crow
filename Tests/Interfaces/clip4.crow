@@ -1,0 +1,30 @@
+﻿<?xml version="1.0"?>
+<Border Fit="true" Margin="50" Background="DimGray" CornerRadius="20">
+	<Label Margin="50" Text="fpsklhlkjh" Background="BlueCrayola"/>	
+</Border>
+<!--<VerticalStack Fit="true" Margin="50" Background="LimeGreen" CacheEnabled="false"
+		HorizontalAlignment="Right" VerticalAlignment="Bottom"
+		MouseEnter="{Background=Gray}"
+		MouseLeave="{Background=LimeGreen}">
+
+		<CheckBox Margin="20" Background="BlueCrayola"/>
+		<CheckBox/>
+		<CheckBox/>
+		<CheckBox/>
+		<CheckBox/>
+		<RadioButton/>
+		<RadioButton/>
+		<RadioButton/>
+		<RadioButton/>
+		<RadioButton/>
+		<CheckBox/>
+
+	<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
+		MouseEnter="{Background=DimGray}" Width="100"
+		MouseLeave="{Background=BlueCrayola}"
+	 	Margin="10" Text="{fps}" Background="BlueCrayola"/>
+	<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
+		MouseEnter="{Background=DimGray}" Width="100"
+		MouseLeave="{Background=BlueCrayola}"
+	 	Margin="10" Text="{drawing}" Background="BlueCrayola"/>
+ </VerticalStack>-->

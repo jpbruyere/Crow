@@ -597,12 +597,11 @@ namespace Crow
 				SelBegin = -1;
 				SelRelease = -1;
 				SelectionInProgress = true;
+				registerForGraphicUpdate();//TODO:should put it in properties
 			}          
 
 			//done at the end to set 'hasFocus' value after testing it
 			base.onMouseDown (sender, e);
-
-			registerForGraphicUpdate();
 		}
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{

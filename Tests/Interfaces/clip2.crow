@@ -3,11 +3,11 @@
 		HorizontalAlignment="Right" VerticalAlignment="Bottom"
 		MouseEnter="{Background=DimGray}"
 		MouseLeave="{Background=Yellow}">
-<Group Fit="true" Margin="50" Background="LimeGreen" CacheEnabled="false"
+<Group Width="300" Height="200" Margin="50" Background="LimeGreen" CacheEnabled="false"
 		HorizontalAlignment="Right" VerticalAlignment="Bottom"
 		MouseEnter="{Background=Gray}"
 		MouseLeave="{Background=LimeGreen}">
-	<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
+	<Label Left="10" HorizontalAlignment="Right" VerticalAlignment="Center" CacheEnabled="true"
 		MouseEnter="{Background=DimGray}" Width="100"
 		MouseLeave="{Background=BlueCrayola}"
 	 	Margin="10" Text="{drawing}" Background="BlueCrayola"/>
