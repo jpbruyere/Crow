@@ -37,8 +37,8 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
-			"clip1.crow",
 			"clip0.crow",
+			"clip1.crow",
 			"0.crow",
 			"5.crow",
 			"testCombobox.goml",

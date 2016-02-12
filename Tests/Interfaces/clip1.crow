@@ -1,21 +1,21 @@
 ﻿<?xml version="1.0"?>
-<Container Fit="true" Margin="20" Background="SkyBlue" CacheEnabled="true"
+<Container Fit="true" Margin="20" Background="SkyBlue" CacheEnabled="false"
 		HorizontalAlignment="Right" VerticalAlignment="Bottom"
 		MouseEnter="{Background=LightGray}"
 		MouseLeave="{Background=SkyBlue}">
-		<Container Fit="true" Margin="20" Background="Red" CacheEnabled="true"
+		<Container Fit="true" Margin="20" Background="Red" CacheEnabled="false"
 			HorizontalAlignment="Right" VerticalAlignment="Bottom"
 			MouseEnter="{Background=White}"
 			MouseLeave="{Background=Red}">
-			<Container Fit="true" Margin="20" Background="Yellow" CacheEnabled="true"
+			<Container Fit="true" Margin="20" Background="Yellow" CacheEnabled="false"
 				HorizontalAlignment="Right" VerticalAlignment="Bottom"
 				MouseEnter="{Background=Blue}"
 				MouseLeave="{Background=Yellow}">
-				<Container Margin="50" Background="LimeGreen" CacheEnabled="false"
+				<Container Width="200" Height="200" Margin="0" Background="LimeGreen" CacheEnabled="false"
 						HorizontalAlignment="Right" VerticalAlignment="Bottom"
 						MouseEnter="{Background=Gray}"
 						MouseLeave="{Background=LimeGreen}">
-					<Label  HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
+					<Label Left="30"  HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="false"
 						MouseEnter="{Background=DimGray}"
 						MouseLeave="{Background=BlueCrayola}" 
 					 	Margin="1" Text="{drawing}" Background="BlueCrayola"/>

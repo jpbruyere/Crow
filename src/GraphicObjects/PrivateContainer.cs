@@ -133,30 +133,57 @@ namespace Crow
 				break;
 			}
 		}
-
-		public override Rectangle ContextCoordinates (Rectangle r)
+		protected override void onDraw (Context gr)
 		{
-			return
-				Parent.ContextCoordinates(r) + Slot.Position + ClientRectangle.Position;
-		}
-		public override void Paint(ref Cairo.Context ctx)
-		{
-			if (!Visible)//check if necessary??
-				return;
-
-			ctx.Save();
-
-			base.Paint(ref ctx);
-
-			//clip to client zone
-			CairoHelpers.CairoRectangle (ctx, Parent.ContextCoordinates(ClientRectangle + Slot.Position), CornerRadius);
-			ctx.Clip();
-
+			base.onDraw (gr);
 			if (child != null)
-				child.Paint(ref ctx);
-
-			ctx.Restore();            
+				child.Paint (ref gr);
 		}
+		protected override void UpdateCache (Context ctx)
+		{
+			Rectangle rb = Slot + Parent.ClientRectangle.Position;
+
+			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
+				Context gr = new Context (cache);
+
+				child.Clipping.clearAndClip (gr);
+				base.onDraw (gr);
+
+				if (Clipping.count > 0) {
+					if (child != null) {
+						child.Paint (ref gr);
+					}
+				}
+					
+				gr.Dispose ();
+
+				ctx.SetSourceSurface (cache, rb.X, rb.Y);
+				ctx.Paint ();
+			}
+		}
+//		public override Rectangle ContextCoordinates (Rectangle r)
+//		{
+//			return
+//				Parent.ContextCoordinates(r) + Slot.Position + ClientRectangle.Position;
+//		}
+//		public override void Paint(ref Cairo.Context ctx)
+//		{
+//			if (!Visible)//check if necessary??
+//				return;
+//
+//			ctx.Save();
+//
+//			base.Paint(ref ctx);
+//
+//			//clip to client zone
+//			CairoHelpers.CairoRectangle (ctx, Parent.ContextCoordinates(ClientRectangle + Slot.Position), CornerRadius);
+//			ctx.Clip();
+//
+//			if (child != null)
+//				child.Paint(ref ctx);
+//
+//			ctx.Restore();            
+//		}
 
 		#endregion
 
