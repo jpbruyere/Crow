@@ -204,9 +204,6 @@ namespace Crow
 				break;
 			}
 		}
-		public override Rectangle ContextCoordinates(Rectangle r){
-			return r + ClientRectangle.Position;
-		}	
 
 		protected override void onDraw (Context gr)
 		{
@@ -216,43 +213,31 @@ namespace Crow
 				g.Paint (ref gr);
 			}
 		}
-
-		public override void Paint(ref Context ctx)
+		protected override void UpdateCache (Context ctx)
 		{
-			if ( !Visible )
-				return;
+			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 
-			if (CacheEnabled) {
-				if (bmp == null)
-					RecreateCache ();
-			}
+			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
+				Context gr = new Context (cache);
 
-			if (Clipping.count > 0) {
-				using (ImageSurface cache =
-					       new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, Slot.Width * 4)) {
-					Context gr = new Context (cache);
+				//Clipping.clearAndClip (gr);
+				base.onDraw (gr);
 
-					Clipping.clearAndClip (gr);
-					Rectangle rBack = Slot.Size;
-					Background.SetAsSource (gr, rBack);
-					CairoHelpers.CairoRectangle (gr, rBack, CornerRadius);
-					gr.Fill ();
-
-					foreach (GraphicObject c in children) {
-						if (!c.Visible)
-							continue;
-						Rectangles childClip = Clipping.intersectingRects (ContextCoordinates (c.Slot));
-						if (childClip.count > 0)
-							c.Paint (ref ctx);						
-					}
-					#if DEBUG_CLIP_RECTANGLE
-					Clipping.stroke (gr, Color.Amaranth.AdjustAlpha (0.8));
-					#endif
-
-					gr.Dispose ();
+				foreach (GraphicObject c in children) {
+					if (!c.Visible)
+						continue;
+					c.Paint (ref gr);						
 				}
-			}				
-			base.Paint (ref ctx);
+
+				#if DEBUG_CLIP_RECTANGLE
+				Clipping.stroke (gr, Color.Amaranth.AdjustAlpha (0.8));
+				#endif
+
+				gr.Dispose ();
+
+				ctx.SetSourceSurface (cache, rb.X, rb.Y);
+				ctx.Paint ();
+			}
 		}
 		#endregion
 

@@ -146,7 +146,7 @@ namespace Crow
 			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
 				Context gr = new Context (cache);
 
-				child.Clipping.clearAndClip (gr);
+				//Clipping.clearAndClip (gr);
 				base.onDraw (gr);
 
 				if (Clipping.count > 0) {

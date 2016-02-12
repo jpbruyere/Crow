@@ -793,7 +793,7 @@ namespace Crow
 				Rectangle rb = Slot + Parent.ClientRectangle.Position;
 				ctx.Save ();
 
-				Clipping.clearAndClip (ctx);
+				//Clipping.clearAndClip (ctx);
 				ctx.Translate (rb.X, rb.Y);
 
 				onDraw (ctx);

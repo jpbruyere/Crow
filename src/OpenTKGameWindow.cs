@@ -290,36 +290,20 @@ namespace Crow
 					updateTime.Stop ();
 					drawingTime.Start ();
 					#endif
-					Debug.WriteLine (redrawClip.ToString ());
-					lock (redrawClip) {
-						if (redrawClip.count > 0) {
-							#if DEBUG_CLIP_RECTANGLE
-						redrawClip.stroke (ctx, new Color(1.0,0,0,0.3));
-							#endif
-							redrawClip.clearAndClip (ctx);
+
 
 							//Link.draw (ctx);
-							foreach (GraphicObject p in invGOList) {
-								if (!p.Visible)
-									continue;
+					foreach (GraphicObject p in invGOList) {
+						if (!p.Visible)
+							continue;
 
-								ctx.Save ();
+						ctx.Save ();
 
-								Rectangles clip = redrawClip.intersectingRects (p.Slot);
-
-								if (clip.count > 0)
-									p.Paint (ref ctx);
-								
-								ctx.Restore ();
-
-							}
-							ctx.ResetClip ();
-							#if DEBUG_CLIP_RECTANGLE
-						redrawClip.stroke (ctx, Color.Red.AdjustAlpha(0.1));
-							#endif
-							redrawClip.Reset ();
-						}
+						p.Paint (ref ctx);
+						
+						ctx.Restore ();
 					}
+
 					#if MEASURE_TIME
 					drawingTime.Stop ();
 					#endif
