@@ -1,7 +1,33 @@
 ﻿<?xml version="1.0"?>
-<Border Fit="true" Margin="50" Background="DimGray" CornerRadius="20">
-	<Label Margin="50" Text="fpsklhlkjh" Background="BlueCrayola"/>	
-</Border>
+<Scroller CacheEnabled="false" VerticalScrolling="true" Height="100" Width="300" Background="DimGray" Margin="20">
+	<VerticalStack Margin="10" VerticalAlignment="Top" Fit="true" Background="vgradient|0:BlueCrayola|1:Black">
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 1"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 2"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 3"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 4"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 5"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 6"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 7"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 8"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 9"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 10"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 11"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 12"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 13"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 14"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 15"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 16"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 17"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 18"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 19"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 20"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 21"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 22"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 23"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 24"/>
+		 <Label Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 25"/>
+	</VerticalStack>
+</Scroller>
 <!--<VerticalStack Fit="true" Margin="50" Background="LimeGreen" CacheEnabled="false"
 		HorizontalAlignment="Right" VerticalAlignment="Bottom"
 		MouseEnter="{Background=Gray}"
