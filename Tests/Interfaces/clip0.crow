@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0"?>
-<Container Fit="true" Margin="50" Background="LimeGreen" CacheEnabled="false"
+<Container Fit="true" Margin="50" Background="LimeGreen" CacheEnabled="true"
 		HorizontalAlignment="Right" VerticalAlignment="Bottom"
 		MouseEnter="{Background=Gray}"
 		MouseLeave="{Background=LimeGreen}">
-	<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="false"
+	<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
 		MouseEnter="{Background=DimGray}" Width="100"
 		MouseLeave="{Background=BlueCrayola}"
 	 	Margin="10" Text="{drawing}" Background="BlueCrayola"/>

@@ -31,8 +31,8 @@ namespace Crow
 		internal List<Binding> Bindings = new List<Binding> ();
 		internal int layoutingTries = 0;
 
-		Rectangles _clipping = new Rectangles();
-		public Rectangles Clipping { get { return _clipping; }}
+		Rectangles clipping = new Rectangles();
+		public Rectangles Clipping { get { return clipping; }}
 
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
@@ -471,11 +471,10 @@ namespace Crow
 		public virtual bool Contains(GraphicObject goToFind){
 			return false;
 		}
-		public void RegisterClip(Rectangle clip){
-			Rectangle r = Slot + Parent.ClientRectangle;
+		public void RegisterClip(Rectangle clip){			
 			if (CacheEnabled && bmp != null)
-				Clipping.AddRectangle (r);				
-			Parent.RegisterClip (r);
+				Clipping.AddRectangle (clip);				
+			Parent.RegisterClip (clip + Slot.Position + Parent.ClientRectangle.Position);
 		}
 //		public virtual void registerClipRect(Rectangle clip)
 //		{
@@ -768,7 +767,9 @@ namespace Crow
 				//					}
 				ctx.SetSourceSurface (cache, rb.X, rb.Y);
 				ctx.Paint ();
-			}						
+			}
+			//Clipping.clearAndClip (ctx);
+			Clipping.Reset();
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version
 		/// of the widget </summary>
@@ -793,7 +794,6 @@ namespace Crow
 				Rectangle rb = Slot + Parent.ClientRectangle.Position;
 				ctx.Save ();
 
-				//Clipping.clearAndClip (ctx);
 				ctx.Translate (rb.X, rb.Y);
 
 				onDraw (ctx);

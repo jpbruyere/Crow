@@ -54,7 +54,7 @@ namespace Crow
 		List<GraphicObject> _gobjsToRedraw = new List<GraphicObject>();
 
 		#region IGOLibHost implementation
-		public Rectangles redrawClip {
+		public Rectangles clipping {
 			get {
 				return _redrawClip;
 			}
@@ -181,7 +181,7 @@ namespace Crow
 			shader.ProjectionMatrix = Matrix4.CreateOrthographicOffCenter 
 				(0, ClientRectangle.Width, ClientRectangle.Height, 0, 0, 1);			
 
-			redrawClip.AddRectangle (ClientRectangle);
+			clipping.AddRectangle (ClientRectangle);
 		}
 		void createOpenGLSurface()
 		{
@@ -253,55 +253,65 @@ namespace Crow
 			updateTime.Restart ();			
 			#endif
 
+			GraphicObject[] invGOList = new GraphicObject[GraphicObjects.Count];
+			GraphicObjects.CopyTo (invGOList, 0);
+			invGOList = invGOList.Reverse ().ToArray ();
+
+			#if MEASURE_TIME
+			layoutTime.Start ();
+			#endif
+			//Debug.WriteLine ("======= Layouting queue start =======");
+
+			while (Interface.LayoutingQueue.Count > 0) {
+				LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
+				lqi.ProcessLayouting ();
+			}
+
+			#if MEASURE_TIME
+			layoutTime.Stop ();
+			#endif
+
+			//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
+			//final redraw clips should be added only when layout is completed among parents,
+			//that's why it take place in a second pass
+			GraphicObject[] gotr = new GraphicObject[gobjsToRedraw.Count];
+			gobjsToRedraw.CopyTo (gotr);
+			gobjsToRedraw.Clear ();
+			foreach (GraphicObject p in gotr) {
+				p.IsQueuedForRedraw = false;
+				p.RegisterClip (p.LastPaintedSlot);
+				p.RegisterClip (p.getSlot());
+			}
+
+			#if MEASURE_TIME
+			updateTime.Stop ();
+			drawingTime.Start ();
+			#endif
+
 			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
 				using (ctx = new Context (surf)){
 
-					GraphicObject[] invGOList = new GraphicObject[GraphicObjects.Count];
-					GraphicObjects.CopyTo (invGOList, 0);
-					invGOList = invGOList.Reverse ().ToArray ();
 
-					#if MEASURE_TIME
-					layoutTime.Start ();
-					#endif
-					//Debug.WriteLine ("======= Layouting queue start =======");
+					if (clipping.count > 0) {
+						//Link.draw (ctx);
+						clipping.clearAndClip(ctx);
 
-					while (Interface.LayoutingQueue.Count > 0) {
-						LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
-						lqi.ProcessLayouting ();
-					}
+						foreach (GraphicObject p in invGOList) {
+							if (!p.Visible)
+								continue;
 
-					#if MEASURE_TIME
-					layoutTime.Stop ();
-					#endif
+							ctx.Save ();
 
-					//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
-					//final redraw clips should be added only when layout is completed among parents,
-					//that's why it take place in a second pass
-					GraphicObject[] gotr = new GraphicObject[gobjsToRedraw.Count];
-					gobjsToRedraw.CopyTo (gotr);
-					gobjsToRedraw.Clear ();
-					foreach (GraphicObject p in gotr) {
-						p.IsQueuedForRedraw = false;
-						p.RegisterClip (p.LastPaintedSlot);
-						p.RegisterClip (p.getSlot());
-					}
-
-					#if MEASURE_TIME
-					updateTime.Stop ();
-					drawingTime.Start ();
-					#endif
-
-
-							//Link.draw (ctx);
-					foreach (GraphicObject p in invGOList) {
-						if (!p.Visible)
-							continue;
-
-						ctx.Save ();
-
-						p.Paint (ref ctx);
+							p.Paint (ref ctx);
 						
-						ctx.Restore ();
+							ctx.Restore ();
+						}
+
+						#if DEBUG_CLIP_RECTANGLE
+						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
+						#endif
+
+						clipping.Reset ();
 					}
 
 					#if MEASURE_TIME
@@ -536,7 +546,7 @@ namespace Crow
 
 		#region ILayoutable implementation
 		public void RegisterClip(Rectangle r){
-			redrawClip.AddRectangle (r);
+			clipping.AddRectangle (r);
 		}
 		public int LayoutingTries {
 			get { throw new NotImplementedException (); }

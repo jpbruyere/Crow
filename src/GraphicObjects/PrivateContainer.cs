@@ -146,11 +146,13 @@ namespace Crow
 			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
 				Context gr = new Context (cache);
 
-				//Clipping.clearAndClip (gr);
-				base.onDraw (gr);
+				//Clipping.clearAndClip (ctx);
 
 				if (Clipping.count > 0) {
 					if (child != null) {
+						
+						base.onDraw (gr);
+
 						child.Paint (ref gr);
 					}
 				}
@@ -160,6 +162,7 @@ namespace Crow
 				ctx.SetSourceSurface (cache, rb.X, rb.Y);
 				ctx.Paint ();
 			}
+			Clipping.Reset();
 		}
 //		public override Rectangle ContextCoordinates (Rectangle r)
 //		{

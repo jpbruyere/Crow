@@ -238,6 +238,7 @@ namespace Crow
 				ctx.SetSourceSurface (cache, rb.X, rb.Y);
 				ctx.Paint ();
 			}
+			Clipping.Reset();
 		}
 		#endregion
 

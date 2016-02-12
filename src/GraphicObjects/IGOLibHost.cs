@@ -5,7 +5,6 @@ namespace Crow
 {
 	public interface IGOLibHost
 	{
-		Rectangles redrawClip { get; set; }
 		List<GraphicObject> gobjsToRedraw { get; }
 		GraphicObject activeWidget { get; set; }
 		GraphicObject hoverWidget { get; set; }
