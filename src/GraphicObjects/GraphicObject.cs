@@ -471,7 +471,7 @@ namespace Crow
 		public virtual bool Contains(GraphicObject goToFind){
 			return false;
 		}
-		public void RegisterClip(Rectangle clip){			
+		public virtual void RegisterClip(Rectangle clip){			
 			if (CacheEnabled && bmp != null)
 				Clipping.AddRectangle (clip + ClientRectangle.Position);
 			Parent.RegisterClip (clip + Slot.Position + ClientRectangle.Position);

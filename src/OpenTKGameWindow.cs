@@ -307,9 +307,9 @@ namespace Crow
 							ctx.Restore ();
 						}
 
-//						#if DEBUG_CLIP_RECTANGLE
-//						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
-//						#endif
+						#if DEBUG_CLIP_RECTANGLE
+						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
+						#endif
 
 						clipping.Reset ();
 					}
