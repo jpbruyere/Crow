@@ -37,7 +37,7 @@ namespace Crow
 		List<GraphicObject> _gobjsToRedraw = new List<GraphicObject>();
 
 		#region IGOLibHost implementation
-		public Rectangles redrawClip {
+		public Rectangles clipping {
 			get {
 				return _redrawClip;
 			}
@@ -45,7 +45,6 @@ namespace Crow
 				_redrawClip = value;
 			}
 		}
-
 		public List<GraphicObject> gobjsToRedraw {
 			get {
 				return _gobjsToRedraw;
@@ -73,7 +72,7 @@ namespace Crow
 			{
 				GraphicObjects.Remove(g);
 				GraphicObjects.Insert(0, g);
-				g.registerClipRect ();
+				g.RegisterForRedraw ();
 			}
 		}
 		public void Quit ()
@@ -139,18 +138,17 @@ namespace Crow
 
 		public void Update ()
 		{
+			ctx = new Context(surf);
+
 			guTime.Reset ();
 			updateTime.Restart ();
 			layoutTime.Restart ();
 
-			ctx = new Context(surf);
-
 			GraphicObject[] invGOList = new GraphicObject[GraphicObjects.Count];
-			GraphicObjects.CopyTo (invGOList,0);
+			GraphicObjects.CopyTo (invGOList, 0);
 			invGOList = invGOList.Reverse ().ToArray ();
 
-
-			layoutTime.Start ();
+			//Debug.WriteLine ("======= Layouting queue start =======");
 
 			while (Interface.LayoutingQueue.Count > 0) {
 				LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
@@ -159,6 +157,7 @@ namespace Crow
 
 			layoutTime.Stop ();
 
+			//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
 			//final redraw clips should be added only when layout is completed among parents,
 			//that's why it take place in a second pass
 			GraphicObject[] gotr = new GraphicObject[gobjsToRedraw.Count];
@@ -166,46 +165,39 @@ namespace Crow
 			gobjsToRedraw.Clear ();
 			foreach (GraphicObject p in gotr) {
 				p.IsQueuedForRedraw = false;
-				p.registerClipRect ();
+				p.Parent.RegisterClip (p.LastPaintedSlot);
+				p.Parent.RegisterClip (p.getSlot());
 			}
-
 
 			guTime.Start ();
 
-			lock (redrawClip) {
-				if (redrawClip.count > 0) {					
-					//					#if DEBUG_CLIP_RECTANGLE
-					//					redrawClip.stroke (ctx, new Color(1.0,0,0,0.3));
-					//					#endif
-					redrawClip.clearAndClip (ctx);//rajouté après, tester si utile	
-
+			using (ctx = new Context (surf)){
+				if (clipping.count > 0) {
 					//Link.draw (ctx);
+					clipping.clearAndClip(ctx);
+
 					foreach (GraphicObject p in invGOList) {
-						if (p.Visible) {
-							drawingTime.Start ();
+						if (!p.Visible)
+							continue;
 
-							ctx.Save ();
-							if (redrawClip.count > 0) {
-								Rectangles clip = redrawClip.intersectingRects (p.Slot);
+						ctx.Save ();
 
-								if (clip.count > 0)
-									p.Paint (ref ctx, clip);
-							}
-							ctx.Restore ();
+						p.Paint (ref ctx);
 
-							drawingTime.Stop ();
-						}
+						ctx.Restore ();
 					}
-					ctx.ResetClip ();
-					//					#if DEBUG_CLIP_RECTANGLE
-					//					redrawClip.stroke (ctx, Color.Red.AdjustAlpha(0.1));
-					//					#endif
-					redrawClip.Reset ();
+
+					#if DEBUG_CLIP_RECTANGLE
+					clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
+					#endif
+
+					clipping.Reset ();
 				}
 			}
+
 			guTime.Stop ();
 			updateTime.Stop ();
-			ctx.Dispose ();
+
 
 			sw.WriteLine ("{0}\t{1,8}\t{2,8}\t{3,8}\t{4,8}",
 				testId,
@@ -432,6 +424,9 @@ namespace Crow
 		#endregion
 
 		#region ILayoutable implementation
+		public void RegisterClip(Rectangle r){
+			clipping.AddRectangle (r);
+		}
 		public void RegisterForLayouting (LayoutingType layoutType)
 		{
 			throw new NotImplementedException ();
@@ -455,22 +450,13 @@ namespace Crow
 		public void RegisterForLayouting (int layoutType) { throw new NotImplementedException (); }
 		public bool UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public Rectangle ContextCoordinates (Rectangle r) => r;
-		public Rectangle ScreenCoordinates (Rectangle r)
-		{
-			return r;
-		}
+		public Rectangle ScreenCoordinates (Rectangle r) => r;
 		Rectangle ILayoutable.ClientRectangle {
 			get { return new Size(this.ClientRectangle.Size.Width,this.ClientRectangle.Size.Height); }
 		}
 		public IGOLibHost HostContainer { get { return this; }}
-		public Rectangle getSlot ()
-		{
-			return ClientRectangle;
-		}
-		public Rectangle getBounds ()//redundant but fill ILayoutable implementation
-		{
-			return ClientRectangle;
-		}			
+		public Rectangle getSlot () => ClientRectangle;
+		public Rectangle getBounds () => ClientRectangle;
 		#endregion	
 	}
 }
