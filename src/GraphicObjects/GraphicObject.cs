@@ -428,7 +428,13 @@ namespace Crow
 				Interface.DefaultValuesLoader[thisType.FullName] (this);
 				return;
 			}
-			
+
+			//Reflexion being very slow compared to dyn method or delegates,
+			//I compile the initial values coded in the CustomAttribs of the class,
+			//all other instance of this type would not longer use reflexion to init properly
+			//but will fetch the  dynamic initialisation method compiled for this precise type
+			//TODO:measure speed gain.
+			#region Delfault values Loading dynamic compilation
 			DynamicMethod dm = null;
 			ILGenerator il = null;
 
@@ -554,6 +560,7 @@ namespace Crow
 				il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
 			}
 			il.Emit(OpCodes.Ret);
+			#endregion
 
 			Interface.DefaultValuesLoader[thisType.FullName] = (Interface.loadDefaultInvoker)dm.CreateDelegate(typeof(Interface.loadDefaultInvoker));
 			Interface.DefaultValuesLoader[thisType.FullName] (this);
