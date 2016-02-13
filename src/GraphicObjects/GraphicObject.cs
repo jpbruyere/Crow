@@ -79,6 +79,7 @@ namespace Crow
 		int _margin = 0;
 		bool _focusable = false;
 		bool _hasFocus = false;
+		bool _isActive = false;
 		bool _mouseRepeat;
 		protected bool _isVisible = true;
 		VerticalAlignment _verticalAlignment = VerticalAlignment.Center;
@@ -121,11 +122,9 @@ namespace Crow
 		/// <summary>
 		/// Parent in the graphic tree, used for rendering and layouting
 		/// </summary>
-		[XmlIgnore]public ILayoutable Parent { 
+		[XmlIgnore]public virtual ILayoutable Parent { 
 			get { return _parent; }
-			set {
-				_parent = value;
-			}
+			set { _parent = value; }
 		}
 
 		public ILayoutable LogicalParent {
@@ -293,6 +292,16 @@ namespace Crow
 
 				_hasFocus = value; 
 				NotifyValueChanged ("HasFocus", _hasFocus);
+			}
+		}
+		[XmlIgnore]public virtual bool IsActive {
+			get { return _isActive; }
+			set { 
+				if (value == _isActive)
+					return;
+
+				_isActive = value; 
+				NotifyValueChanged ("IsActive", _isActive);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(false)]

@@ -63,6 +63,9 @@ namespace Crow
 			}
 		}
 
+		public XCursor MouseCursor {
+			set { Cursor = value; }
+		}
 		public List<GraphicObject> gobjsToRedraw {
 			get {
 				return _gobjsToRedraw;
@@ -107,10 +110,17 @@ namespace Crow
 		{
 			get { return _activeWidget; }
 			set 
-			{
+			{				
 				if (_activeWidget == value)
-					return;				
+					return;	
+
+				if (_activeWidget != null)
+					_activeWidget.IsActive = false;
+
 				_activeWidget = value;
+
+				if (_activeWidget != null)
+					_activeWidget.IsActive = true;
 			}
 		}
 		public GraphicObject hoverWidget
@@ -418,7 +428,7 @@ namespace Crow
 				} else {
 					
 					//send move evt even if mouse move outside bounds
-					_activeWidget.onMouseMove (_activeWidget, e);
+					_activeWidget.onMouseMove (this, e);
 					return;
 				}
 			}
