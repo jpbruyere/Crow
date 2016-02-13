@@ -42,6 +42,6 @@ Global
 		$2.DirectoryNamespaceAssociation = None
 		$2.ResourceNamePolicy = FileFormatDefault
 		description = @C.R.O.W. Collaborative Radiant Open Widgets\n\nA pure c# toolkit with XML definition of interface with binding and\ndynamic delegates
-		version = 0.3
+		version = 0.4
 	EndGlobalSection
 EndGlobal

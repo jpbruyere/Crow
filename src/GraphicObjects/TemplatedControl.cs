@@ -38,6 +38,16 @@ namespace Crow
 		}
 	}
 	[AttributeUsage(AttributeTargets.Class)]
+	public class StyleAttribute : Attribute
+	{
+		public string PropertyName = "";
+		public object DefaultValue = null;
+		public StyleAttribute(string _property, object _defValue){
+			PropertyName = _property;
+			DefaultValue = _defValue;
+		}
+	}
+	[AttributeUsage(AttributeTargets.Class)]
 	public class DefaultTemplate : TemplateAttribute
 	{
 		public DefaultTemplate(string path) : base(path){}

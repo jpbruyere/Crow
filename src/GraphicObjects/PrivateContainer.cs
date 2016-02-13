@@ -95,7 +95,24 @@ namespace Crow
 		{			
 			return child == null ? Bounds.Size : child.Slot.Size + 2 * Margin;
 		}
-
+		public override bool UpdateLayout (LayoutingType layoutType)
+		{
+			if (child != null) {
+				//force sizing to fit if sizing on children and
+				//child has stretched size
+				switch (layoutType) {
+				case LayoutingType.Width:
+					if (Width < 0 && child.Width == 0)
+						child.Width = -1;
+					break;
+				case LayoutingType.Height:
+					if (Height < 0 && child.Height == 0)
+						child.Height = -1;
+					break;
+				}
+			}
+			return base.UpdateLayout (layoutType);
+		}
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
 			base.OnLayoutChanges (layoutType);

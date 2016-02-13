@@ -10,15 +10,18 @@
 				<CheckBox IsChecked="false" Caption="Check 4" Background="hgradient|0:LimeGreen|1:Transparent"/>
 			</VerticalStack>
 		</Border>
+		<Splitter/>
 		<Border Fit="true" CornerRadius="10" BorderWidth="1">
 			<VerticalStack Margin="10">
 				<RadioButton IsChecked="false" Caption="Choice 1" Background="hgradient|0:DarkRed|1:Transparent"/>
+				<Splitter/>
 				<RadioButton IsChecked="false" Caption="Choice 2"  Background="hgradient|0:DarkRed|1:Transparent"/>
 				<RadioButton IsChecked="true" Caption="Choice 3"  Background="hgradient|0:DarkRed|1:Transparent"/>
 				<RadioButton IsChecked="false" Caption="Choice 4" Background="hgradient|0:DarkRed|1:Transparent"/>
 			</VerticalStack>
 		</Border>
-		<Border Fit="true" CornerRadius="10" BorderWidth="1">
+		<Splitter Thickness="3" />
+		<Border Fit="true" CornerRadius="10" BorderWidth="1" MinimumSize="200;200">
 			<VerticalStack Margin="10">
 				<Label Text="label 1" Background="hgradient|0:BlueCrayola|1:Transparent"/>
 				<Label Text="label 2" Background="hgradient|0:BlueCrayola|1:Transparent"/>
@@ -26,6 +29,7 @@
 				<Label Text="label 4" Background="hgradient|0:BlueCrayola|1:Transparent"/>
 			</VerticalStack>
 		</Border>
+		<Splitter/>
 		<Border Fit="true" CornerRadius="10" BorderWidth="1">
 			<VerticalStack Margin="10">
 				<Button Caption="Button 1" Background="hgradient|0:Red|1:DarkRed" CornerRadius="5"/>
@@ -34,6 +38,7 @@
 				<Button Caption="Button 4" Background="hgradient|0:DarkRed|1:Transparent" CornerRadius="8"/>
 			</VerticalStack>
 		</Border>
+		<Splitter/>
 	</HorizontalStack>
 	<GraphicObject CornerRadius="5" Height="10" Width="600" Background="vgradient|0:Transparent|0,5:White|1:Transparent"/>
 </VerticalStack>

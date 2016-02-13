@@ -431,7 +431,7 @@ namespace Crow
 
 		/// <summary> Loads the default values from XML attributes default </summary>
 		protected virtual void loadDefaultValues()
-		{
+		{			
 			Type thisType = this.GetType ();
 			if (Interface.DefaultValuesLoader.ContainsKey(thisType.FullName)) {
 				Interface.DefaultValuesLoader[thisType.FullName] (this);
@@ -456,20 +456,19 @@ namespace Crow
 
 			il.Emit(OpCodes.Nop);
 
+			StyleAttribute[] style = thisType.GetCustomAttributes().OfType<StyleAttribute>().ToArray();
+
 			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
 				string name = "";
+				object defaultValue = null;
 
 				#region retrieve custom attributes
 				if (pi.GetSetMethod () == null)
 					continue;
+
 				XmlIgnoreAttribute xia = (XmlIgnoreAttribute)pi.GetCustomAttribute (typeof(XmlIgnoreAttribute));
 				if (xia != null)
-					continue;
-				DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof(DefaultValueAttribute));
-				if (dv == null)
-					continue;
-				object defaultValue = dv.Value;
-
+					continue;					
 				XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
 				if (xaa != null) {
 					if (string.IsNullOrEmpty (xaa.AttributeName))
@@ -477,6 +476,16 @@ namespace Crow
 					else
 						name = xaa.AttributeName;
 				}
+
+				StyleAttribute piStyle = style.Where(s => s.PropertyName == pi.Name).FirstOrDefault();
+				if (piStyle != null){
+					defaultValue = piStyle.DefaultValue;
+				}else{
+					DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof(DefaultValueAttribute));
+					if (dv == null)
+						continue;
+					defaultValue = dv.Value;
+				}				
 				#endregion
 
 				il.Emit (OpCodes.Ldarg_0);
@@ -758,11 +767,6 @@ namespace Crow
 				LastSlots.Y = Slot.Y;
 				break;
 			case LayoutingType.Width:
-				//force sizing to fit if parent is sizing on children and
-				//this object has stretched size
-				if (Parent.getBounds ().Width < 0 && Width == 0)
-					Width = -1;
-
 				if (Width > 0)
 					Slot.Width = Width;
 				else if (Width < 0)
@@ -788,10 +792,6 @@ namespace Crow
 				LastSlots.Width = Slot.Width;
 				break;
 			case LayoutingType.Height:
-				//force sizing to fit if parent is sizing on children
-				if (Parent.getBounds ().Height < 0 && Height == 0)
-					Height = -1;
-
 				if (Height > 0)
 					Slot.Height = Height;
 				else if (Height < 0)

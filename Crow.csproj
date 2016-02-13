@@ -23,7 +23,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ReleaseVersion>0.3</ReleaseVersion>
+    <ReleaseVersion>0.4</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -133,6 +133,7 @@
     <Compile Include="src\LayoutingEventArgs.cs" />
     <Compile Include="src\ScrollingEventArgs.cs" />
     <Compile Include="src\GraphicObjects\Trend.cs" />
+    <Compile Include="src\GraphicObjects\Splitter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

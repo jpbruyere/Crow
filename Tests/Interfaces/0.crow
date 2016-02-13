@@ -9,7 +9,7 @@
 	<Button Caption="test button"/>
 	<TextRun Text="text run test"/>
 	<TextBox Text="text run test"/>
-	<Border CornerRadius="5" Background="DimGray" >
+	<Border CornerRadius="5" Background="DimGray" Fit="true" >
 		<Trend HighThreshold="{fpsMax}" LowThreshold="{fpsMin}" NbValues="5"
 			Height="100" Width="400" NewValue="{fps}" Name="trend" Maximum="600" Foreground="White"/>
 	</Border>

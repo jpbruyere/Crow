@@ -158,10 +158,6 @@ namespace Crow
 		{
 			GraphicObject g = sender as GraphicObject;
 			switch (arg.LayoutType) {
-			case LayoutingType.X:
-				break;
-			case LayoutingType.Y:
-				break;
 			case LayoutingType.Width:
 				if (g.Slot.Width > maxChildrenWidth) {
 					maxChildrenWidth = g.Slot.Width;
