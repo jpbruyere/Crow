@@ -55,24 +55,15 @@ namespace Crow
 
 		#region IGOLibHost implementation
 		public Rectangles clipping {
-			get {
-				return _redrawClip;
-			}
-			set {
-				_redrawClip = value;
-			}
+			get { return _redrawClip; }
+			set { _redrawClip = value; }
 		}
-
 		public XCursor MouseCursor {
 			set { Cursor = value; }
 		}
 		public List<GraphicObject> gobjsToRedraw {
-			get {
-				return _gobjsToRedraw;
-			}
-			set {
-				_gobjsToRedraw = value;
-			}
+			get { return _gobjsToRedraw; }
+			set { _gobjsToRedraw = value; }
 		}
 		public void AddWidget(GraphicObject g)
 		{
@@ -308,6 +299,8 @@ namespace Crow
 
 						foreach (GraphicObject p in invGOList) {
 							if (!p.Visible)
+								continue;
+							if (!clipping.intersect (p.Slot))
 								continue;
 
 							ctx.Save ();
