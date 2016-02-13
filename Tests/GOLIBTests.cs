@@ -5,7 +5,6 @@ using System;
 using System.Runtime.InteropServices;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using OpenTK.Input;
 
 using System.Diagnostics;
 
@@ -189,41 +188,22 @@ namespace test
 		{
 			base.OnLoad (e);
 			//this.AddWidget(new test4());
+			KeyboardKeyDown += GOLIBTests_KeyboardKeyDown1;;
 
 			GraphicObject obj = LoadInterface("Interfaces/" + testFiles[idx]);
 			obj.DataSource = this;
-	}
-		protected override void OnUpdateFrame (FrameEventArgs e)
-		{
-			//if (frameCpt % 8 == 0)
-				base.OnUpdateFrame (e);
-			
-			fps = (int)RenderFrequency;
-
-
-			if (frameCpt > 50) {
-				resetFps ();
-				frameCpt = 0;
-				GC.Collect();
-				GC.WaitForPendingFinalizers();
-				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
-			}
-			frameCpt++;
 		}
-		protected override void OnKeyDown (KeyboardKeyEventArgs e)
+
+		void GOLIBTests_KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
-			if (FocusedWidget is TextBox) {
-				base.OnKeyDown (e);
-				return;
-			}
-			if (e.Key == Key.Escape) {
+			if (e.Key == OpenTK.Input.Key.Escape) {
 				this.Quit ();
 				return;
-			} else if (e.Key == Key.L) {
+			} else if (e.Key == OpenTK.Input.Key.L) {
 				TestList.Add ("new string");
 				NotifyValueChanged ("TestList", TestList);
 				return;
-			} else if (e.Key == Key.W) {
+			} else if (e.Key == OpenTK.Input.Key.W) {
 				GraphicObject w = LoadInterface("Interfaces/testWindow.goml");
 				w.DataSource = this;
 				return;
@@ -235,7 +215,24 @@ namespace test
 			this.Title = testFiles [idx];
 			GraphicObject obj = LoadInterface("Interfaces/" + testFiles[idx]);
 			obj.DataSource = this;
+		}
 
+		protected override void OnUpdateFrame (FrameEventArgs e)
+		{
+			//if (frameCpt % 8 == 0)
+				base.OnUpdateFrame (e);
+
+			fps = (int)RenderFrequency;
+
+
+			if (frameCpt > 50) {
+				resetFps ();
+				frameCpt = 0;
+				GC.Collect();
+				GC.WaitForPendingFinalizers();
+				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
+			}
+			frameCpt++;
 		}
 		void onButClick(object send, MouseButtonEventArgs e)
 		{

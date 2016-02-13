@@ -7,7 +7,6 @@ using Cairo;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using System.ComponentModel;
-using OpenTK.Input;
 
 namespace Crow
 {

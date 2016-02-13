@@ -1,7 +1,6 @@
 using System;
 using System.Xml.Serialization;
 using System.Reflection;
-using OpenTK.Input;
 using System.ComponentModel;
 using System.Linq;
 

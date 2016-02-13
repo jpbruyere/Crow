@@ -24,7 +24,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
-using OpenTK.Input;
 using System.Linq;
 using System.Text.RegularExpressions;
 

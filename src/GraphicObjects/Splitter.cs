@@ -58,7 +58,7 @@ namespace Crow
 				base.Parent = value;
 			}
 		}
-		public override void onMouseEnter (object sender, OpenTK.Input.MouseMoveEventArgs e)
+		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseEnter (sender, e);
 			if ((Parent as GenericStack).Orientation == Orientation.Horizontal)
@@ -66,12 +66,12 @@ namespace Crow
 			else
 				this.HostContainer.MouseCursor = XCursor.V;
 		}
-		public override void onMouseLeave (object sender, OpenTK.Input.MouseMoveEventArgs e)
+		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
 			this.HostContainer.MouseCursor = XCursor.Default;
 		}
-		public override void onMouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
+		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
 

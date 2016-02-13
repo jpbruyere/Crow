@@ -137,6 +137,16 @@
     <Compile Include="src\GraphicObjects\TabView.cs" />
     <Compile Include="src\GraphicObjects\TabItem.cs" />
     <Compile Include="src\GraphicObjects\DummyTemplate.cs" />
+    <Compile Include="src\Input\KeyboardKeyEventArgs.cs" />
+    <Compile Include="src\Input\Buttons.cs" />
+    <Compile Include="src\Input\ButtonState.cs" />
+    <Compile Include="src\Input\Key.cs" />
+    <Compile Include="src\Input\KeyboardState.cs" />
+    <Compile Include="src\Input\KeyModifiers.cs" />
+    <Compile Include="src\Input\MouseButton.cs" />
+    <Compile Include="src\Input\MouseEventArgs.cs" />
+    <Compile Include="src\Input\MouseScroll.cs" />
+    <Compile Include="src\Input\MouseState.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -172,6 +182,7 @@
     <Folder Include="src\OpenGL\" />
     <Folder Include="src\Fill\" />
     <Folder Include="Styles\" />
+    <Folder Include="src\Input\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\Icons\updown.svg" />

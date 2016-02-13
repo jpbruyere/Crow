@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using OpenTK.Input;
 using Cairo;
 using System.Diagnostics;
 using System.Xml.Serialization;

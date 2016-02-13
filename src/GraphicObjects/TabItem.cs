@@ -158,18 +158,18 @@ namespace Crow
 				|| mouseIsInTitle;
 		}
 		bool holdCursor = false;
-		public override void onMouseDown (object sender, OpenTK.Input.MouseButtonEventArgs e)
+		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseDown (sender, e);
 			holdCursor = true;
 		}
-		public override void onMouseUp (object sender, OpenTK.Input.MouseButtonEventArgs e)
+		public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseUp (sender, e);
 			holdCursor = false;
 			(Parent as TabView).UpdateLayout (LayoutingType.ArrangeChildren);
 		}
-		public override void onMouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
+		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
 
@@ -206,7 +206,7 @@ namespace Crow
 				TabOffset = tmp;
 			}
 		}
-		public void butCloseTabClick (object sender, OpenTK.Input.MouseButtonEventArgs e){
+		public void butCloseTabClick (object sender, MouseButtonEventArgs e){
 			(Parent as TabView).RemoveChild(this);
 		}
 		#endregion

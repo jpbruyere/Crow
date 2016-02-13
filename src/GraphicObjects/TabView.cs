@@ -23,7 +23,6 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using Cairo;
 using System.Diagnostics;
-using OpenTK.Input;
 
 namespace Crow
 {
@@ -207,7 +206,8 @@ namespace Crow
 			}
 		}
 		#endregion
-		void Ti_MouseDown (object sender, OpenTK.Input.MouseButtonEventArgs e)
+
+		void Ti_MouseDown (object sender, MouseButtonEventArgs e)
 		{
 			SelectedTab = Children.IndexOf (sender as GraphicObject);
 		}

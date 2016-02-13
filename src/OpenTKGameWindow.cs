@@ -28,7 +28,6 @@ using System.Xml;
 using Cairo;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using OpenTK.Input;
 
 namespace Crow
 {
@@ -179,11 +178,12 @@ namespace Crow
 		}
 		#region Events
 		//those events are raised only if mouse isn't in a graphic object
-		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
-		public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
-		public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
-		public event EventHandler<MouseButtonEventArgs> MouseClick;
-		public event EventHandler<MouseMoveEventArgs> MouseMove;
+		public event EventHandler<OpenTK.Input.MouseWheelEventArgs> MouseWheelChanged;
+		public event EventHandler<OpenTK.Input.MouseButtonEventArgs> MouseButtonUp;
+		public event EventHandler<OpenTK.Input.MouseButtonEventArgs> MouseButtonDown;
+		public event EventHandler<OpenTK.Input.MouseButtonEventArgs> MouseClick;
+		public event EventHandler<OpenTK.Input.MouseMoveEventArgs> MouseMove;
+		public event EventHandler<OpenTK.Input.KeyboardKeyEventArgs> KeyboardKeyDown;
 		#endregion
 
 		#region graphic contexte
@@ -430,11 +430,11 @@ namespace Crow
         {
             base.OnLoad(e);
 
-			Keyboard.KeyDown += new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
-			Mouse.WheelChanged += new EventHandler<MouseWheelEventArgs>(Mouse_WheelChanged);
-			Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
-			Mouse.ButtonUp += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonUp);
-			Mouse.Move += new EventHandler<MouseMoveEventArgs>(Mouse_Move);
+			Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
+			Mouse.WheelChanged += new EventHandler<OpenTK.Input.MouseWheelEventArgs>(Mouse_WheelChanged);
+			Mouse.ButtonDown += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonDown);
+			Mouse.ButtonUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonUp);
+			Mouse.Move += new EventHandler<OpenTK.Input.MouseMoveEventArgs>(Mouse_Move);
 
 			GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -457,8 +457,11 @@ namespace Crow
 		#endregion
 
         #region Mouse Handling
-        void Mouse_Move(object sender, MouseMoveEventArgs e)
+
+		void Mouse_Move(object sender, OpenTK.Input.MouseMoveEventArgs otk_e)
         {
+			MouseMoveEventArgs e = new MouseMoveEventArgs (otk_e.X, otk_e.Y, otk_e.XDelta, otk_e.YDelta);
+
 			if (_activeWidget != null) {
 				//first, ensure object is still in the graphic tree
 				if (_activeWidget.HostContainer == null) {
@@ -525,12 +528,14 @@ namespace Crow
 				}
 			}
 			hoverWidget = null;
-			MouseMove.Raise (this, e);
+			MouseMove.Raise (this, otk_e);
         }
-        void Mouse_ButtonUp(object sender, MouseButtonEventArgs e)
+		void Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
         {
+			MouseButtonEventArgs e = new MouseButtonEventArgs (otk_e.X, otk_e.Y, (Crow.MouseButton)otk_e.Button, otk_e.IsPressed);
+
 			if (_activeWidget == null) {
-				MouseButtonUp.Raise (this, e);
+				MouseButtonUp.Raise (this, otk_e);
 				return;
 			}
 				
@@ -543,10 +548,12 @@ namespace Crow
 			_activeWidget.onMouseUp (this, e);
 			activeWidget = null;
         }
-        void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
-        {
+		void Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
+		{
+			MouseButtonEventArgs e = new MouseButtonEventArgs (otk_e.X, otk_e.Y, (Crow.MouseButton)otk_e.Button, otk_e.IsPressed);
+
 			if (hoverWidget == null) {
-				MouseButtonDown.Raise (this, e);
+				MouseButtonDown.Raise (this, otk_e);
 				return;
 			}
 
@@ -559,10 +566,12 @@ namespace Crow
 			mouseRepeatThread = new Thread (mouseRepeatThreadFunc);
 			mouseRepeatThread.Start ();
         }
-        void Mouse_WheelChanged(object sender, MouseWheelEventArgs e)
+		void Mouse_WheelChanged(object sender, OpenTK.Input.MouseWheelEventArgs otk_e)
         {
+			MouseWheelEventArgs e = new MouseWheelEventArgs (otk_e.X, otk_e.Y, otk_e.Value, otk_e.Delta);
+
 			if (hoverWidget == null) {
-				MouseWheelChanged.Raise (this, e);
+				MouseWheelChanged.Raise (this, otk_e);
 				return;
 			}
 			hoverWidget.onMouseWheel (this, e);
@@ -584,10 +593,15 @@ namespace Crow
 		#endregion
 
         #region keyboard Handling
-        void Keyboard_KeyDown(object sender, KeyboardKeyEventArgs e)
-        {			
-			if (_focusedWidget == null)
-				return;
+		KeyboardState Keyboad = new KeyboardState ();
+		void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
+	{
+//			if (_focusedWidget == null) {
+				KeyboardKeyDown.Raise (this, otk_e);
+//				return;
+//			}
+			Keyboad.SetKeyState ((Crow.Key)otk_e.Key, true);
+			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)otk_e.Key, otk_e.IsRepeat,Keyboad);
 			_focusedWidget.onKeyDown (sender, e);
         }
         #endregion

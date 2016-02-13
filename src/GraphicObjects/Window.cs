@@ -2,7 +2,6 @@
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
-using OpenTK.Input;
 
 namespace Crow
 {

@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
+using System.Xml.Serialization;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
-using System.Xml.Serialization;
 using Cairo;
-using OpenTK.Input;
-using System.IO;
+using System.Linq;
+using System.Diagnostics;
 
 namespace Crow
 {

@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Cairo;
-using System.IO;
-using System.Runtime.InteropServices;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
+
 
 namespace Crow
 {
