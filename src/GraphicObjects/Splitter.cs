@@ -80,15 +80,16 @@ namespace Crow
 			GenericStack gs = Parent as GenericStack;
 			int ptrThis = gs.Children.IndexOf (this);
 
-			if (ptrThis == 0 || ptrThis == gs.Children.Count - 1)
-				return;
-
 			if (gs.Orientation == Orientation.Horizontal) {
-				gs.Children [ptrThis - 1].Width = Math.Max(gs.Children [ptrThis - 1].Slot.Width + e.XDelta*2, 1);
-				gs.Children [ptrThis + 1].Width = Math.Max(gs.Children [ptrThis + 1].Slot.Width - e.XDelta*2, 1);
+				if (ptrThis >= 0)
+					gs.Children [ptrThis - 1].Width = Math.Max(gs.Children [ptrThis - 1].Slot.Width + e.XDelta*2, 1);
+				if (ptrThis < gs.Children.Count - 1)
+					gs.Children [ptrThis + 1].Width = Math.Max(gs.Children [ptrThis + 1].Slot.Width - e.XDelta*2, 1);
 			} else {
-				gs.Children [ptrThis - 1].Height = Math.Max(gs.Children [ptrThis - 1].Slot.Height + e.YDelta*2, 1);
-				gs.Children [ptrThis + 1].Height = Math.Max(gs.Children [ptrThis + 1].Slot.Height - e.YDelta*2, 1);
+				if (ptrThis >= 0)
+					gs.Children [ptrThis - 1].Height = Math.Max(gs.Children [ptrThis - 1].Slot.Height + e.YDelta*2, 1);
+				if (ptrThis < gs.Children.Count - 1)
+					gs.Children [ptrThis + 1].Height = Math.Max(gs.Children [ptrThis + 1].Slot.Height - e.YDelta*2, 1);
 			}
 		}
 		public override bool UpdateLayout (LayoutingType layoutType)
