@@ -309,7 +309,8 @@ namespace Crow
 						foreach (GraphicObject p in invGOList) {
 							if (!p.Visible)
 								continue;
-
+							if (!clipping.intersect (p.Slot))
+								continue;
 							ctx.Save ();
 
 							p.Paint (ref ctx);
