@@ -120,86 +120,81 @@ namespace Crow
         {
 			RegisteredLayoutings &= (~layoutType);
 
-			LayoutingType childSizeToCheck;
-			if (Orientation == Orientation.Horizontal)
-				childSizeToCheck = LayoutingType.Width;
-			else
-				childSizeToCheck = LayoutingType.Height;
-
-			foreach (GraphicObject g in Children) {
-				if (!g.Visible)
-					continue;
-				if (g.RegisteredLayoutings.HasFlag (childSizeToCheck))
-					return false;						
-			}
-
 			if (layoutType == LayoutingType.PositionChildren) {
-				//allow 1 child to have size to 0 if stack has fixed or streched size,
+				//allow 1 child to have size to 0 if stack has fixed or streched size policy,
 				//this child will occupy remaining space
+				//if stack size policy is Fit, no child may have stretch enabled
+				//in the direction of stacking.
 				if (Orientation == Orientation.Horizontal) {
-					if (Width >= 0) {
-						GraphicObject stretchedGO = null;
-						int tmpWidth = Slot.Width;
-						int cptChildren = 0;
-						for (int i = 0; i < Children.Count; i++) {
-							if (!Children [i].Visible)
-								continue;
-							cptChildren++;
-							if (Children [i].Width == 0) {
-								if (stretchedGO != null)
-									throw new Exception ("Only one child in stack may have size to stretched");
-								stretchedGO = Children [i];
-								if (i < Children.Count - 1)
-									tmpWidth -= Spacing;
-								continue;
+					GraphicObject stretchedGO = null;
+					int tmpWidth = Slot.Width;
+					int cptChildren = 0;
+					for (int i = 0; i < Children.Count; i++) {
+						if (!Children [i].Visible)
+							continue;
+						//requeue Positionning if child is not layouted
+						if (Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
+							return false;
+						cptChildren++;
+						if (Children [i].Width == 0) {
+							if (!(stretchedGO == null && Width >= 0)) {
+								//change size policy of other stretched children
+								Children [i].Width = -1;
+								return false;
 							}
-							tmpWidth -= Children[i].Slot.Width + Spacing;
+							stretchedGO = Children [i];
+							if (i < Children.Count - 1)
+								tmpWidth -= Spacing;
+							continue;
 						}
-						if (stretchedGO != null) {
-							tmpWidth += (Spacing - 2 * Margin);
-							if (tmpWidth < MinimumSize.Width)
-								tmpWidth = MinimumSize.Width;
-							else if (tmpWidth > MaximumSize.Width && MaximumSize.Width > 0)
-								tmpWidth = MaximumSize.Width;
-							if (stretchedGO.LastSlots.Width != tmpWidth) {
-								stretchedGO.Slot.Width = tmpWidth;
-								stretchedGO.bmp = null;
-								stretchedGO.OnLayoutChanges (LayoutingType.Width);
-								stretchedGO.LastSlots.Width = stretchedGO.Slot.Width;
-							}
+						tmpWidth -= Children [i].Slot.Width + Spacing;
+					}
+					if (stretchedGO != null && Width >= 0) {
+						tmpWidth += (Spacing - 2 * Margin);
+						if (tmpWidth < MinimumSize.Width)
+							tmpWidth = MinimumSize.Width;
+						else if (tmpWidth > MaximumSize.Width && MaximumSize.Width > 0)
+							tmpWidth = MaximumSize.Width;
+						if (stretchedGO.LastSlots.Width != tmpWidth) {
+							stretchedGO.Slot.Width = tmpWidth;
+							stretchedGO.bmp = null;
+							stretchedGO.OnLayoutChanges (LayoutingType.Width);
+							stretchedGO.LastSlots.Width = stretchedGO.Slot.Width;
 						}
-					}					
+					}
 				} else {
-					if (Height >= 0) {
-						GraphicObject stretchedGO = null;
-						int tmpHeight = Slot.Height;
-						int cptChildren = 0;
-						for (int i = 0; i < Children.Count; i++) {
-							if (!Children [i].Visible)
-								continue;
-							cptChildren++;
-							if (Children [i].Height == 0) {
-								if (stretchedGO != null)
-									throw new Exception ("Only one child in stack may have size to stretched");
-								stretchedGO = Children [i];
-								if (i < Children.Count - 1)
-									tmpHeight -= Spacing;
-								continue;
+					GraphicObject stretchedGO = null;
+					int tmpHeight = Slot.Height;
+					int cptChildren = 0;
+					for (int i = 0; i < Children.Count; i++) {
+						if (!Children [i].Visible)
+							continue;
+						if (Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
+							return false;
+						cptChildren++;
+						if (Children [i].Height == 0) {
+							if (!(stretchedGO == null && Height >= 0)){
+								Children [i].Width = -1;
+								return false;
 							}
-							tmpHeight -= Children[i].Slot.Height + Spacing;
+							stretchedGO = Children [i];
+							if (i < Children.Count - 1)
+								tmpHeight -= Spacing;
+							continue;
 						}
-						if (stretchedGO != null) {
-							tmpHeight += (Spacing - 2 * Margin);
-							if (tmpHeight < MinimumSize.Height)
-								tmpHeight = MinimumSize.Height;
-							else if (tmpHeight > MaximumSize.Height && MaximumSize.Height > 0)
-								tmpHeight = MaximumSize.Height;
-							if (stretchedGO.LastSlots.Height != tmpHeight) {
-								stretchedGO.Slot.Height = tmpHeight;
-								stretchedGO.bmp = null;
-								stretchedGO.OnLayoutChanges (LayoutingType.Height);
-								stretchedGO.LastSlots.Height = stretchedGO.Slot.Height;
-							}
+						tmpHeight -= Children[i].Slot.Height + Spacing;
+					}
+					if (stretchedGO != null && Height >= 0) {
+						tmpHeight += (Spacing - 2 * Margin);
+						if (tmpHeight < MinimumSize.Height)
+							tmpHeight = MinimumSize.Height;
+						else if (tmpHeight > MaximumSize.Height && MaximumSize.Height > 0)
+							tmpHeight = MaximumSize.Height;
+						if (stretchedGO.LastSlots.Height != tmpHeight) {
+							stretchedGO.Slot.Height = tmpHeight;
+							stretchedGO.bmp = null;
+							stretchedGO.OnLayoutChanges (LayoutingType.Height);
+							stretchedGO.LastSlots.Height = stretchedGO.Slot.Height;
 						}
 					}
 				}
