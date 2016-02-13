@@ -1,33 +1,39 @@
 ﻿using System;
-
-
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-//using OpenTK.Graphics.OpenGL;
-
-using Cairo;
-
-using winColors = System.Drawing.Color;
-using System.Diagnostics;
-using System.Xml.Serialization;
 using OpenTK.Input;
 using System.ComponentModel;
-using System.Xml;
-using System.IO;
+using System.Xml.Serialization;
 
 namespace Crow
 {
 	[DefaultTemplate("#Crow.Templates.Expandable.goml")]
     public class Expandable : TemplatedContainer
-    {		
+    {
+		#region CTOR
+		public Expandable() : base()
+		{
+		}
+		#endregion
+
+		#region Private fields
 		bool _isExpanded;
 		string caption;
 		string image;
 		Container _contentContainer;
+		#endregion
 
+		#region Event Handlers
 		public event EventHandler Expand;
 		public event EventHandler Collapse;
+		#endregion
+
+		#region GraphicObject overrides
+		[XmlAttributeAttribute()][DefaultValue(true)]
+		public override bool Focusable
+		{
+			get { return base.Focusable; }
+			set { base.Focusable = value; }
+		}
+		#endregion
 
 		public override GraphicObject Content {
 			get {
@@ -37,30 +43,25 @@ namespace Crow
 				_contentContainer.SetChild(value);
 			}
 		}
-
-		public Expandable() : base()
-		{
-		}	
-
 		protected override void loadTemplate(GraphicObject template = null)
 		{
 			base.loadTemplate (template);
 
 			_contentContainer = this.child.FindByName ("Content") as Container;
 		}
-
-		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
-		public override bool Focusable
+		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{
-			get { return base.Focusable; }
-			set { base.Focusable = value; }
+			IsExpanded = !IsExpanded;
+			base.onMouseClick (sender, e);
 		}
-		[XmlAttributeAttribute()][DefaultValue(-1)]
-		public override int Height {
-			get { return base.Height; }
-			set { base.Height = value; }
+		public override void ResolveBindings ()
+		{
+			base.ResolveBindings ();
+			if (Content != null)
+				Content.ResolveBindings ();
 		}
 
+		#region Public properties
 		[XmlAttributeAttribute()][DefaultValue("Expandable")]
 		public string Caption {
 			get { return caption; } 
@@ -99,6 +100,7 @@ namespace Crow
  				NotifyValueChanged ("SvgSub", "collapsed");
             }
         }
+		#endregion
 
 		public virtual void onExpand(object sender, EventArgs e)
 		{
@@ -113,18 +115,6 @@ namespace Crow
 				_contentContainer.Visible = false;
 			
 			Collapse.Raise (this, e);
-		}
-			
-		public override void onMouseClick (object sender, MouseButtonEventArgs e)
-		{
-			IsExpanded = !IsExpanded;
-			base.onMouseClick (sender, e);
-		}
-		public override void ResolveBindings ()
-		{
-			base.ResolveBindings ();
-			if (Content != null)
-				Content.ResolveBindings ();
 		}
 	}
 }

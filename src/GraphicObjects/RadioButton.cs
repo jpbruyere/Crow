@@ -1,18 +1,7 @@
 ﻿using System;
-
-
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-//using OpenTK.Graphics.OpenGL;
-
-using Cairo;
-
-using winColors = System.Drawing.Color;
-using System.Diagnostics;
-using System.Xml.Serialization;
 using OpenTK.Input;
 using System.ComponentModel;
+using System.Xml.Serialization;
 
 namespace Crow
 {
@@ -31,16 +20,11 @@ namespace Crow
 		public event EventHandler Unchecked;
 
 		#region GraphicObject overrides
-		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
+		[XmlAttributeAttribute()][DefaultValue(true)]
 		public override bool Focusable
 		{
 			get { return base.Focusable; }
 			set { base.Focusable = value; }
-		}
-		[XmlAttributeAttribute()][DefaultValue(-1)]
-		public override int Height {
-			get { return base.Height; }
-			set { base.Height = value; }
 		}
 		#endregion
 
@@ -91,8 +75,12 @@ namespace Crow
 		{						
 			Group pg = Parent as Group;
 			if (pg != null) {
-				foreach (RadioButton c in pg.Children.OfType<RadioButton>())
+				for (int i = 0; i < pg.Children.Count; i++) {
+					RadioButton c = pg.Children [i] as RadioButton;
+					if (c == null)
+						continue;
 					c.IsChecked = (c == this);
+				}
 			} else
 				IsChecked = !IsChecked;
 

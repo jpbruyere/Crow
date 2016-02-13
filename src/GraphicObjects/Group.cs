@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Drawing;
-using System.Diagnostics;
-using Cairo;
-using System.Xml.Serialization;
 using System.ComponentModel;
+using System.Xml.Serialization;
+using Cairo;
+using OpenTK.Input;
+
 
 namespace Crow
 {
@@ -252,7 +250,7 @@ namespace Crow
 
 	
 		#region Mouse handling
-		public override void checkHoverWidget (OpenTK.Input.MouseMoveEventArgs e)
+		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
 			if (HostContainer.hoverWidget != this) {
 				HostContainer.hoverWidget = this;

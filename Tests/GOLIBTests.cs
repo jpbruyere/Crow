@@ -37,6 +37,10 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"testImage.crow",
+			"testOutOfClipUpdate.crow",
+			"test_Listbox.goml",
+			"testTreeView.crow",
 			"0.crow",
 			"1.crow",
 			"testWindow.goml",
@@ -57,13 +61,11 @@ namespace test
 			"testScrollbar.goml",
 			"testGroupBox.goml",
 			"testGrid.goml",
-			"test_Listbox.goml",
 			"testButton.crow",
 			"testBorder.goml",
 //			"testButton2.crow",
 			"test2WayBinding.crow",
 			"fps.goml",
-			"testImage.crow",
 			"test4.goml",
 			"2.crow",
 			"test1.goml",
@@ -149,6 +151,24 @@ namespace test
 				return;
 			NotifyValueChanged ("alignment", Enum.Parse(typeof(Alignment), rb.Caption));
 		}
+		public IList<String> List2 = new List<string>(new string[]
+			{
+				"string1",
+				"string2",
+				"string3",
+				"string4",
+				"string5",
+				"string6",
+				"string7",
+				"string8",
+				"string8",
+				"string8",
+				"string8",
+				"string8",
+				"string8",
+				"string9"
+			}
+		);
 		IList<Color> testList = Color.ColorDic.ToList();
 		public IList<Color> TestList {
 			set{
