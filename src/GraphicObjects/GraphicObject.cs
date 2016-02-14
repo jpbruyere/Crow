@@ -376,20 +376,17 @@ namespace Crow
 				if (!_isVisible && this.Contains (HostContainer.hoverWidget))
 					HostContainer.hoverWidget = null;
 
+				if (Parent is GraphicObject)
+					Parent.RegisterForLayouting (LayoutingType.Sizing);
 				if (Parent is GenericStack)
-					Parent.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.PositionChildren);
-
+					Parent.RegisterForLayouting (LayoutingType.ArrangeChildren);
 				RegisterForLayouting (LayoutingType.Sizing);
 
 				RegisterForRedraw ();
+
 				NotifyValueChanged ("Visible", _isVisible);
 			}
 		}
-		//TODO: only used in group, should be removed from base go object
-		[XmlIgnore]public virtual bool DrawingIsValid
-		{ get { return bmp == null ? 
-				false : 
-				true; } }
 		[XmlAttributeAttribute()][DefaultValue("0;0")]
 		public virtual Size MaximumSize {
 			get { return _maximumSize; }
@@ -623,12 +620,14 @@ namespace Crow
 			get { return layoutingTries; }
 			set { layoutingTries = value; }
 		}
-
 		/// <summary> return size of content + margins </summary>
 		protected virtual Size measureRawSize () {
 			return Bounds.Size;
 		}
-			
+		/// <summary> By default in groups, LayoutingType.ArrangeChildren is reset </summary>
+		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){
+			layoutType &= (~LayoutingType.ArrangeChildren);
+		}	
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
 			if (Parent == null)
 				return;
@@ -638,15 +637,9 @@ namespace Crow
 			if (Height == 0)
 				layoutType &= (~LayoutingType.Y);
 
-			//Prevent child repositionning in a stack
-			//TODO:this should be done inside GenericStack
-			GenericStack gs = Parent as GenericStack;
-			if (gs != null) {
-				if (gs.Orientation == Orientation.Horizontal)
-					layoutType &= (~LayoutingType.X);
-				else
-					layoutType &= (~LayoutingType.Y);
-			}
+			//apply constraints depending on parent type
+			if (Parent is GraphicObject)
+				(Parent as GraphicObject).ChildrenLayoutingConstraints (ref layoutType);
 
 			//prevent queueing same LayoutingType for this
 			layoutType &= (~RegisteredLayoutings);
@@ -667,8 +660,8 @@ namespace Crow
 				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
 			if (layoutType.HasFlag (LayoutingType.Y))
 				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
-			if (layoutType.HasFlag (LayoutingType.PositionChildren))
-				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.PositionChildren, this));
+			if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
+				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
 		}
 
 		/// <summary> trigger dependant sizing component update </summary>
@@ -1009,11 +1002,11 @@ namespace Crow
 		#region Binding
 		public virtual void ResolveBindings()
 		{
+			if (Bindings.Count == 0)
+				return;
 			#if DEBUG_BINDING
 			Debug.WriteLine ("ResolveBinding => " + this.ToString ());
 			#endif
-			if (Bindings.Count == 0)
-				return;
 			Dictionary<object,List<Binding>> resolved = new Dictionary<object, List<Binding>>();
 			foreach (Binding b in Bindings) {
 				if (b.Resolved)
@@ -1024,12 +1017,14 @@ namespace Crow
 						continue;
 					}
 				}
-				if (!b.FindTarget ())
+				if (!b.FindTarget ()) {
+					Debug.WriteLine ("BINDING ERROR: target not found => " + b.ToString());
 					continue;
+				}
 				if (b.Source.Member.MemberType == MemberTypes.Event) {
 					//register handler for event
 					if (b.Target.Method == null) {
-						Debug.WriteLine ("Handler Method not found: " + b.Expression);
+						Debug.WriteLine ("Handler Method not found: " + b.ToString());
 						continue;
 					}
 
@@ -1037,6 +1032,9 @@ namespace Crow
 					Delegate del = Delegate.CreateDelegate (b.Source.Event.EventHandlerType, b.Target.Instance, b.Target.Method);
 					addHandler.Invoke (this, new object[] { del });
 					b.Resolved = true;
+					#if DEBUG_BINDING
+					Debug.WriteLine ("\tHandler binded => " + b.ToString());
+					#endif
 					continue;
 				}
 				List<Binding> bindings = null;
@@ -1046,6 +1044,9 @@ namespace Crow
 				}
 				bindings.Add (b);
 				b.Resolved = true;
+				#if DEBUG_BINDING
+				Debug.WriteLine ("\tmarked as resolved => " + b.ToString());
+				#endif
 			}
 
 			MethodInfo stringEquals = typeof(string).GetMethod
@@ -1332,6 +1333,9 @@ namespace Crow
 			addHandler.Invoke(this, new object[] {del});
 
 			binding.Resolved = true;
+			#if DEBUG_BINDING
+			Debug.WriteLine ("\tCompiled Event Source => " + binding.ToString());
+			#endif
 		}
 		/// <summary>
 		/// Remove dynamic delegates by ids from dataSource

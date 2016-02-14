@@ -32,8 +32,7 @@ namespace Crow
 		Width = 0x04,
 		Height = 0x08,
 		Sizing = 0x0C,
-		PositionChildren = 0x10,
-		ChildAddition = 0x20,
+		ArrangeChildren = 0x10,
 		All = 0xFF
 	}
 

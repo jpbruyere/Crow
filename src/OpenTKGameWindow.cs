@@ -169,6 +169,8 @@ namespace Crow
 		{
 			int i = 0;
 			while (GraphicObjects.Count>0) {
+				//TODO:parent is not reset to null because object will be added
+				//to ObjectToRedraw list, and without parent, it fails
 				GraphicObject g = GraphicObjects [i];
 				g.Visible = false;
 				g.ClearBinding ();

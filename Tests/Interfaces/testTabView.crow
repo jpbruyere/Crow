@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<TabView Orientation="Horizontal" Background="Gray">
+	<TabItem Caption="tab 1">
+		<Label Text="tab content test 1"/>
+	</TabItem>
+	<TabItem Caption="tab 2">
+		<Label Text="tab content test 2"/>
+	</TabItem>
+
+</TabView>
+

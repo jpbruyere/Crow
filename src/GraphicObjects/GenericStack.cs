@@ -10,12 +10,6 @@ namespace Crow
 {
     public class GenericStack : Group
     {
-		internal class Page
-		{
-			public byte[] bmp;
-			public int Size;
-		}
-
 		#region CTOR
 		public GenericStack()
 			: base()
@@ -27,18 +21,6 @@ namespace Crow
         int _spacing;
         Orientation _orientation;
 		#endregion
-
-		public override T AddChild<T> (T child)
-		{
-			T tmp = base.AddChild (child);
-			this.RegisterForLayouting (LayoutingType.PositionChildren);
-			return tmp;
-		}
-		public override void RemoveChild (GraphicObject child)
-		{
-			base.RemoveChild (child);
-			this.RegisterForLayouting (LayoutingType.PositionChildren);
-		}
 
 		#region Public Properties
         [XmlAttributeAttribute()][DefaultValue(2)]
@@ -59,6 +41,15 @@ namespace Crow
             set { _orientation = value; }
         }
 		#endregion
+
+		public override void ChildrenLayoutingConstraints (ref LayoutingType layoutType)
+		{
+			//Prevent child repositionning in the direction of stacking
+			if (Orientation == Orientation.Horizontal)
+				layoutType &= (~LayoutingType.X);
+			else
+				layoutType &= (~LayoutingType.Y);			
+		}
 
 		#region GraphicObject Overrides
 		protected override Size measureRawSize ()
@@ -120,7 +111,7 @@ namespace Crow
         {
 			RegisteredLayoutings &= (~layoutType);
 
-			if (layoutType == LayoutingType.PositionChildren) {
+			if (layoutType == LayoutingType.ArrangeChildren) {
 				//allow 1 child to have size to 0 if stack has fixed or streched size policy,
 				//this child will occupy remaining space
 				//if stack size policy is Fit, no child may have stretch enabled
@@ -221,14 +212,14 @@ namespace Crow
 				if (Orientation == Orientation.Horizontal) {
 					if (this.Bounds.Width < 0)
 						this.RegisterForLayouting (LayoutingType.Width);
-					this.RegisterForLayouting (LayoutingType.PositionChildren);
+					this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 				}
 				break;
 			case LayoutingType.Height:
 				if (Orientation == Orientation.Vertical) {
 					if (this.Bounds.Height < 0)
 						this.RegisterForLayouting (LayoutingType.Height);
-					this.RegisterForLayouting (LayoutingType.PositionChildren);
+					this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 				}
 				break;
 			}

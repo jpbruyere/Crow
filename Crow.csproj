@@ -45,7 +45,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG_LAYOUTING0;TRACE;DEBUG;__linux__;MEASURE_TIME;DEBUG_LOAD_TIME0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
+    <DefineConstants>DEBUG_LAYOUTING0;TRACE;DEBUG;__linux__;MEASURE_TIME;DEBUG_LOAD_TIME0;DEBUG_BINDING;DEBUG_CLIP_RECTANGLE0</DefineConstants>
   </PropertyGroup>
   <!--  <PropertyGroup Condition=" '$(Platform)' == 'Linux_x86' ">
     <DefineConstants>__linux__</DefineConstants>
@@ -136,6 +136,7 @@
     <Compile Include="src\GraphicObjects\Splitter.cs" />
     <Compile Include="src\GraphicObjects\TreeView.cs" />
     <Compile Include="src\GraphicObjects\TabView.cs" />
+    <Compile Include="src\GraphicObjects\TabItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -226,7 +227,8 @@
       <LogicalName>Crow.image.crow0.svg</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="Templates\TreeView.crow" />
-    <EmbeddedResource Include="Templates\TreeViewItem.crow" />
+    <EmbeddedResource Include="Templates\TabItem.crow" />
+    <EmbeddedResource Include="Templates\TreeItem.crow" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

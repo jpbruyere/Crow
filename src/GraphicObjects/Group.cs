@@ -45,7 +45,7 @@ namespace Crow
 			GraphicObject g = child as GraphicObject;
             Children.Add(g);
             g.Parent = this as GraphicObject;            
-			g.RegisterForLayouting (LayoutingType.Sizing);
+			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 			g.LayoutChanged += OnChildLayoutChanges;
             return (T)child;
         }
@@ -55,7 +55,13 @@ namespace Crow
 			child.ClearBinding ();
 			child.Parent = null;
             Children.Remove(child);
-			this.RegisterForLayouting (LayoutingType.Sizing);
+
+			if (child == largestChild)
+				searchLargestChild ();
+			if (child == tallestChild)
+				searchTallestChild ();
+			
+			this.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
         }
 		public virtual void ClearChildren()
 		{
@@ -66,9 +72,13 @@ namespace Crow
 				g.Parent = null;
 				Children.RemoveAt(Children.Count-1);
 			}
+
+			resetChildrenMaxSize ();
+
 			this.RegisterForLayouting (LayoutingType.Sizing);
 			ChildrenCleared.Raise (this, new EventArgs ());
 		}
+
 		public void putWidgetOnTop(GraphicObject w)
 		{
 			if (Children.Contains(w))
@@ -87,17 +97,6 @@ namespace Crow
 		}
 
 		#region GraphicObject overrides
-		[XmlIgnore]public override bool DrawingIsValid {
-			get {
-				if (!base.DrawingIsValid)
-					return false;
-				foreach (GraphicObject g in Children) {
-					if (!g.DrawingIsValid)
-						return false;
-				}
-				return true;
-			}
-		}
 		public override void ResolveBindings ()
 		{
 			base.ResolveBindings ();
@@ -163,15 +162,9 @@ namespace Crow
 					if (this.Bounds.Width < 0)
 						this.RegisterForLayouting (LayoutingType.Width);
 				} else if (g == largestChild) {
-					//search for the new largest child
-					largestChild = null;
-					maxChildrenWidth = 0;
-					for (int i = 0; i < Children.Count; i++) {
-						if (Children [i].Slot.Width > maxChildrenWidth) {
-							maxChildrenWidth = Children [i].Slot.Width;
-							largestChild = Children [i];
-						}
-					}
+					
+					searchLargestChild ();
+
 					if (this.Bounds.Width < 0)
 						this.RegisterForLayouting (LayoutingType.Width);
 				}
@@ -183,19 +176,44 @@ namespace Crow
 					if (this.Bounds.Height < 0)
 						this.RegisterForLayouting (LayoutingType.Height);
 				} else if (g == tallestChild) {
-					//search for the new tallest child
-					tallestChild = null;
-					maxChildrenHeight = 0;
-					for (int i = 0; i < Children.Count; i++) {
-						if (Children [i].Slot.Height > maxChildrenHeight) {
-							maxChildrenHeight = Children [i].Slot.Height;
-							tallestChild = Children [i];
-						}
-					}
+
+					searchTallestChild ();
+
 					if (this.Bounds.Height < 0)
 						this.RegisterForLayouting (LayoutingType.Height);
 				}
 				break;
+			}
+		}
+
+		void resetChildrenMaxSize(){
+			largestChild = null;
+			tallestChild = null;
+			maxChildrenWidth = 0;
+			maxChildrenHeight = 0;
+		}
+		void searchLargestChild(){
+			largestChild = null;
+			maxChildrenWidth = 0;
+			for (int i = 0; i < Children.Count; i++) {
+				if (!Children [i].Visible)
+					continue;
+				if (Children [i].Slot.Width > maxChildrenWidth) {
+					maxChildrenWidth = Children [i].Slot.Width;
+					largestChild = Children [i];
+				}
+			}
+		}
+		void searchTallestChild(){
+			tallestChild = null;
+			maxChildrenHeight = 0;
+			for (int i = 0; i < Children.Count; i++) {
+				if (!Children [i].Visible)
+					continue;
+				if (Children [i].Slot.Height > maxChildrenHeight) {
+					maxChildrenHeight = Children [i].Slot.Height;
+					tallestChild = Children [i];
+				}
 			}
 		}
 
