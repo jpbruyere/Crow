@@ -274,17 +274,17 @@ namespace Crow
 				HostContainer.hoverWidget = this;
 				onMouseEnter (this, e);
 			}
-			foreach (GraphicObject g in Children)
-			{
-				if (g.MouseIsIn(e.Position))
+			for (int i = Children.Count - 1; i >= 0; i--) {
+				if (Children[i].MouseIsIn(e.Position))
 				{
-					g.checkHoverWidget (e);
+					Children[i].checkHoverWidget (e);
 					return;
 				}
 			}
 			base.checkHoverWidget (e);
 		}
 		#endregion
+
 
 		#region IXmlSerializable
 
