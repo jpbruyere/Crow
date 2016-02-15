@@ -448,10 +448,8 @@ namespace Crow
 		{
 			base.OnResize (e);
 			createContext ();
-			foreach (GraphicObject g in GraphicObjects) {
+			foreach (GraphicObject g in GraphicObjects)
 				g.RegisterForLayouting (LayoutingType.All);
-				//g.registerForGraphicUpdate();
-			}
 		}
 		#endregion
 
