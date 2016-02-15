@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<TabView Orientation="Horizontal" Background="Gray">
-	<TabItem Caption="tab 1">
+<TabView Orientation="Horizontal" Spacing="20" Margin="0">
+	<TabItem Caption="tab 1" Width="0" Height="0" Margin="0" Background="Gray">
 		<Label Text="tab content test 1"/>
 	</TabItem>
-	<TabItem Caption="tab 2">
+	<TabItem Caption="tab 2" Width="0" Height="0" Margin="0" Background="Gray">
 		<Label Text="tab content test 2"/>
 	</TabItem>
 

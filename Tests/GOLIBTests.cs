@@ -37,7 +37,7 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
-//			"testTabView.crow",
+			"testTabView.crow",
 			"testExpandable.goml",
 			"0.crow",
 			"testImage.crow",

@@ -72,22 +72,48 @@ namespace Crow
 			set {
 				if (tabOffset == value)
 					return;
-				tabOffset = value; 
+				tabOffset = value;
 				NotifyValueChanged ("TabOffset", tabOffset);
 			}
-		} 
+		}
 		[XmlAttributeAttribute()][DefaultValue("TabItem")]
 		public string Caption {
-			get { return caption; } 
+			get { return caption; }
 			set {
 				if (caption == value)
 					return;
-				caption = value; 
+				caption = value;
 				NotifyValueChanged ("Caption", caption);
 			}
-		} 
+		}
+		protected override void onDraw (Cairo.Context gr)
+		{
+			int spacing = (Parent as TabView).Spacing;
+			gr.MoveTo (0, TabTitle.Slot.Bottom);
+			gr.LineTo (TabTitle.Slot.Left - spacing, TabTitle.Slot.Bottom);
+			gr.CurveTo (
+				TabTitle.Slot.Left - spacing / 2, TabTitle.Slot.Bottom,
+				TabTitle.Slot.Left - spacing / 2, 0,
+				TabTitle.Slot.Left, 0);
+			gr.LineTo (TabTitle.Slot.Right, 0);
+			gr.CurveTo (
+				TabTitle.Slot.Right + spacing / 2, 0,
+				TabTitle.Slot.Right + spacing / 2, TabTitle.Slot.Bottom,
+				TabTitle.Slot.Right + spacing, TabTitle.Slot.Bottom);
+			gr.LineTo (Slot.Width, TabTitle.Slot.Bottom);
 
+			gr.LineWidth = 1;
+			Foreground.SetAsSource (gr);
+			gr.StrokePreserve ();
 
+			gr.LineTo (Slot.Width, Slot.Height);
+			gr.LineTo (0, Slot.Height);
+			gr.ClosePath ();
+			gr.Save ();
+			gr.Clip ();
+			base.onDraw (gr);
+			gr.Restore ();
+		}
 	}
 }
 

@@ -1,12 +1,13 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<GenericStack Margin="2" Background="DarkRed" Orientation="Vertical"
-		Width="{../../TemplatedWidth}" Height="{../../TemplatedHeight}">
-	<Label Name="TabTitle" Width="-1" Background="BlueCrayola"
+<GenericStack Orientation="Vertical" Spacing="0"
+		Width="{../../WidthPolicy}" Height="{../../HeightPolicy}">
+	<Label Margin="5" Name="TabTitle" Width="-1"
+		HorizontalAlignment="Left"
 		Text="{../../Caption}"
 		Height="{../../../TabThickness}"
 		Left="{../../TabOffset}"
 		LayoutChanged="../../../TabTitleLayoutChanged"/>
-	<Container Background="White" Margin="2"
-		Name="Content" Width="{../../../TemplatedWidth}" Height="{../../../TemplatedHeight}"/>
+	<Container
+		Name="Content" Width="{../../../WidthPolicy}" Height="{../../../HeightPolicy}"/>
 </GenericStack>
 

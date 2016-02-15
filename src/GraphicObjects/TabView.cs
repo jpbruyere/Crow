@@ -21,13 +21,18 @@
 using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
+using Cairo;
+using System.Diagnostics;
 
 namespace Crow
 {
 	public class TabView : Group
 	{
+		#region Private fields
+		int _spacing;
 		Orientation _orientation;
 		int selectedTab = 0;
+		#endregion
 
 		public TabView () : base()
 		{
@@ -37,15 +42,26 @@ namespace Crow
 		public virtual Orientation Orientation
 		{
 			get { return _orientation; }
-			set { 
+			set {
 				if (_orientation == value)
 					return;
-				_orientation = value; 
+				_orientation = value;
 				NotifyValueChanged ("Orientation", _orientation);
 				if (_orientation == Orientation.Horizontal)
 					NotifyValueChanged ("TabOrientation", Orientation.Vertical);
 				else
 					NotifyValueChanged ("TabOrientation", Orientation.Horizontal);
+			}
+		}
+		[XmlAttributeAttribute()][DefaultValue(2)]
+		public int Spacing
+		{
+			get { return _spacing; }
+			set {
+				if (_spacing == value)
+					return;
+				_spacing = value;
+				NotifyValueChanged ("Spacing", Spacing);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
@@ -54,8 +70,9 @@ namespace Crow
 			set {
 				if (selectedTab == value)
 					return;
-				selectedTab = value; 
+				selectedTab = value;
 				NotifyValueChanged ("SelectedTab", selectedTab);
+				registerForGraphicUpdate ();
 			}
 		}
 		int tabThickness;
@@ -65,7 +82,7 @@ namespace Crow
 			set {
 				if (tabThickness == value)
 					return;
-				tabThickness = value; 
+				tabThickness = value;
 				NotifyValueChanged ("TabThickness", tabThickness);
 			}
 		}
@@ -74,26 +91,18 @@ namespace Crow
 			TabItem ti = child as TabItem;
 			if (ti == null)
 				throw new Exception ("TabView control accept only TabItem as child.");
-			
+
 			ti.MouseDown += Ti_MouseDown;
 
 			return base.AddChild (child);
 		}
 		public override bool ArrangeChildren { get { return true; } }
-		public override void ChildrenLayoutingConstraints (ref LayoutingType layoutType)
-		{
-//			//Prevent child repositionning in the direction of 
-//			if (Orientation == Orientation.Horizontal)
-//				layoutType &= (~LayoutingType.X);
-//			else
-//				layoutType &= (~LayoutingType.Y);			
-		}
 		public override bool UpdateLayout (LayoutingType layoutType)
 		{
 			RegisteredLayoutings &= (~layoutType);
 
-			if (layoutType == LayoutingType.ArrangeChildren) {			 
-				int curOffset = 0;
+			if (layoutType == LayoutingType.ArrangeChildren) {
+				int curOffset = Spacing;
 				for (int i = 0; i < Children.Count; i++) {
 					if (!Children [i].Visible)
 						continue;
@@ -102,11 +111,11 @@ namespace Crow
 					if (Orientation == Orientation.Horizontal) {
 						if (ti.TabTitle.RegisteredLayoutings.HasFlag (LayoutingType.Width))
 							return false;
-						curOffset += ti.TabTitle.Slot.Width;
+						curOffset += ti.TabTitle.Slot.Width + Spacing;
 					} else {
 						if (ti.TabTitle.RegisteredLayoutings.HasFlag (LayoutingType.Height))
 							return false;
-						curOffset += ti.TabTitle.Slot.Height;
+						curOffset += ti.TabTitle.Slot.Height + Spacing;
 					}
 				}
 
@@ -122,18 +131,12 @@ namespace Crow
 
 		void TabTitleLayoutChanged (object sender, LayoutingEventArgs e)
 		{
-			
+
 		}
 
 		void Ti_MouseDown (object sender, OpenTK.Input.MouseButtonEventArgs e)
 		{
 			SelectedTab = Children.IndexOf (sender as GraphicObject);
-		}
-		protected override void onDraw (Cairo.Context gr)
-		{
-			base.onDraw (gr);
-
-
 		}
 	}
 }
