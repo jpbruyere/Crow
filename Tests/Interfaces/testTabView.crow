@@ -2,7 +2,7 @@
 <HorizontalStack Fit="true">
 	<TabView CacheEnabled="false" Width="200" Height="200" Orientation="Horizontal" Spacing="20" Margin="0">
 		<TabItem Name="TabItem1" Caption="tab item 1" Width="0" Height="0" Margin="0" Background="Gray"
-			MouseEnter="{Background=Red}"
+			MouseEnter="{Background=Red}" Focusable="true"
 			MouseLeave="{Background=Gray}">
 			<VerticalStack Fit="true">
 				<CheckBox/>

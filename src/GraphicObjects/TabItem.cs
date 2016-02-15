@@ -67,11 +67,17 @@ namespace Crow
 		#endregion
 
 		#region GraphicObject overrides
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[XmlAttributeAttribute()][DefaultValue(true)]
 		public override bool Focusable
 		{
 			get { return base.Focusable; }
 			set { base.Focusable = value; }
+		}
+		//prevent caching, because drawing order is different depending on selected tab
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public override bool CacheEnabled {
+			get {return false;}
+			set { }
 		}
 		#endregion
 
@@ -83,6 +89,9 @@ namespace Crow
 					return;
 				tabOffset = value;
 				NotifyValueChanged ("TabOffset", tabOffset);
+
+				RegisterForLayouting (LayoutingType.X);
+				registerForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("TabItem")]
@@ -134,6 +143,8 @@ namespace Crow
 			base.onDraw (gr);
 			gr.Restore ();
 		}
+
+		#region Mouse Handling
 		public override bool MouseIsIn (Point m)
 		{
 			if (!Visible)
@@ -146,6 +157,58 @@ namespace Crow
 			return _contentContainer.ScreenCoordinates (_contentContainer.Slot).ContainsOrIsEqual (m)
 				|| mouseIsInTitle;
 		}
+		bool holdCursor = false;
+		public override void onMouseDown (object sender, OpenTK.Input.MouseButtonEventArgs e)
+		{
+			base.onMouseDown (sender, e);
+			holdCursor = true;
+		}
+		public override void onMouseUp (object sender, OpenTK.Input.MouseButtonEventArgs e)
+		{
+			base.onMouseUp (sender, e);
+			holdCursor = false;
+			(Parent as TabView).UpdateLayout (LayoutingType.ArrangeChildren);
+		}
+		public override void onMouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
+		{
+			base.onMouseMove (sender, e);
+
+			if (!(HasFocus&&holdCursor))
+				return;
+			TabView tv = Parent as TabView;
+			TabItem previous = null, next = null;
+			int tmp = TabOffset + e.XDelta;
+			Debug.WriteLine (tmp);
+			if (tmp < tv.Spacing)
+				TabOffset = tv.Spacing;
+			else if (tmp > Parent.getSlot ().Width - TabTitle.Slot.Width - tv.Spacing)
+				TabOffset = Parent.getSlot ().Width - TabTitle.Slot.Width - tv.Spacing;
+			else{
+				int idx = tv.Children.IndexOf (this);
+				if (idx > 0 && e.XDelta < 0) {
+					previous = tv.Children [idx - 1] as TabItem;
+
+					if (tmp < previous.TabOffset + previous.TabTitle.Slot.Width / 2) {
+						tv.Children.RemoveAt (idx);
+						tv.Children.Insert (idx - 1, this);
+						tv.SelectedTab = idx - 1;
+						tv.UpdateLayout (LayoutingType.ArrangeChildren);
+					}
+
+				}else if (idx < tv.Children.Count - 1 && e.XDelta > 0) {
+					next = tv.Children [idx + 1] as TabItem;
+					if (tmp > next.TabOffset - next.TabTitle.Slot.Width / 2){
+						tv.Children.RemoveAt (idx);
+						tv.Children.Insert (idx + 1, this);
+						tv.SelectedTab = idx + 1;
+						tv.UpdateLayout (LayoutingType.ArrangeChildren);
+					}
+				}
+				TabOffset = tmp;
+			}
+		}
+		#endregion
+
 	}
 }
 
