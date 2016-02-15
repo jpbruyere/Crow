@@ -394,11 +394,6 @@ namespace Crow
 				NotifyValueChanged ("Visible", _isVisible);
 			}
 		}
-		//TODO: only used in group, should be removed from base go object
-		[XmlIgnore]public virtual bool DrawingIsValid
-		{ get { return bmp == null ? 
-				false : 
-				true; } }
 		[XmlAttributeAttribute()][DefaultValue("0;0")]
 		public virtual Size MaximumSize {
 			get { return _maximumSize; }

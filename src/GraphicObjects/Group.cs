@@ -89,17 +89,6 @@ namespace Crow
 		}
 
 		#region GraphicObject overrides
-		[XmlIgnore]public override bool DrawingIsValid {
-			get {
-				if (!base.DrawingIsValid)
-					return false;
-				foreach (GraphicObject g in children) {
-					if (!g.DrawingIsValid)
-						return false;
-				}
-				return true;
-			}
-		}
 		public override void ResolveBindings ()
 		{
 			base.ResolveBindings ();
