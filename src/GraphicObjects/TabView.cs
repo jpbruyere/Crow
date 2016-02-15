@@ -79,7 +79,7 @@ namespace Crow
 
 			return base.AddChild (child);
 		}
-
+		public override bool ArrangeChildren { get { return true; } }
 		public override void ChildrenLayoutingConstraints (ref LayoutingType layoutType)
 		{
 //			//Prevent child repositionning in the direction of 

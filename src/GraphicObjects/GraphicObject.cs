@@ -626,8 +626,9 @@ namespace Crow
 		}
 		/// <summary> By default in groups, LayoutingType.ArrangeChildren is reset </summary>
 		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){
-			layoutType &= (~LayoutingType.ArrangeChildren);
-		}	
+			
+		}
+		public virtual bool ArrangeChildren { get { return false; } }
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
 			if (Parent == null)
 				return;
@@ -637,6 +638,9 @@ namespace Crow
 			if (Height == 0)
 				layoutType &= (~LayoutingType.Y);
 
+			if (!ArrangeChildren)
+				layoutType &= (~LayoutingType.ArrangeChildren);
+			
 			//apply constraints depending on parent type
 			if (Parent is GraphicObject)
 				(Parent as GraphicObject).ChildrenLayoutingConstraints (ref layoutType);

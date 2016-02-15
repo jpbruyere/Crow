@@ -19,6 +19,7 @@ namespace Crow
 
 		IGOLibHost HostContainer { get; }
 
+		bool ArrangeChildren { get; }
 		LayoutingType RegisteredLayoutings { get; set; }
 		void RegisterForLayouting(LayoutingType layoutType);
 		void RegisterClip(Rectangle clip);

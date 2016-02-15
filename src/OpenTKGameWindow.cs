@@ -577,6 +577,7 @@ namespace Crow
 		public void RegisterClip(Rectangle r){
 			clipping.AddRectangle (r);
 		}
+		public bool ArrangeChildren { get { return false; }}
 		public int LayoutingTries {
 			get { throw new NotImplementedException (); }
 			set { throw new NotImplementedException (); }

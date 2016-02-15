@@ -42,6 +42,8 @@ namespace Crow
         }
 		#endregion
 
+		#region GraphicObject Overrides
+		public override bool ArrangeChildren { get { return true; } }
 		public override void ChildrenLayoutingConstraints (ref LayoutingType layoutType)
 		{
 			//Prevent child repositionning in the direction of stacking
@@ -50,8 +52,6 @@ namespace Crow
 			else
 				layoutType &= (~LayoutingType.Y);			
 		}
-
-		#region GraphicObject Overrides
 		protected override Size measureRawSize ()
 		{
 			Size tmp = new Size ();
