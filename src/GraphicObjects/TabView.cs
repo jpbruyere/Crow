@@ -79,7 +79,6 @@ namespace Crow
 				(Children [selectedTab] as TabItem).IsSelected = true;
 
 				NotifyValueChanged ("SelectedTab", selectedTab);
-				Debug.WriteLine ("selected tab: " + (selectedTab + 1).ToString ());
 				registerForGraphicUpdate ();
 			}
 		}
@@ -175,15 +174,12 @@ namespace Crow
 		#region Mouse handling
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
-			Debug.WriteLine ("TabView check Hover");
-
 			if (HostContainer.hoverWidget != this) {
 				HostContainer.hoverWidget = this;
 				onMouseEnter (this, e);
 			}
 			if (((Children[SelectedTab] as TabItem).Content.Parent as GraphicObject).MouseIsIn(e.Position))
 			{
-				Debug.WriteLine ("Mouse is in selected tab: {0}", selectedTab + 1);
 				Children[SelectedTab].checkHoverWidget (e);
 				return;
 			}
@@ -191,19 +187,12 @@ namespace Crow
 				TabItem ti = Children [i] as TabItem;
 				if (ti.TabTitle.MouseIsIn(e.Position))
 				{
-					Debug.WriteLine ("Mouse is in tab title: {0}", i + 1);
 					Children[i].checkHoverWidget (e);
 					return;
 				}
 			}
 		}
 		#endregion
-
-		void TabTitleLayoutChanged (object sender, LayoutingEventArgs e)
-		{
-
-		}
-
 		void Ti_MouseDown (object sender, OpenTK.Input.MouseButtonEventArgs e)
 		{
 			SelectedTab = Children.IndexOf (sender as GraphicObject);
