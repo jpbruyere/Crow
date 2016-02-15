@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <HorizontalStack Fit="true">
-	<TabView CacheEnabled="false" Width="200" Height="200" Orientation="Horizontal" Spacing="20" Margin="0">
+	<TabView CacheEnabled="false" Width="400" Height="200" Orientation="Horizontal" Spacing="20" Margin="0">
 		<TabItem Name="TabItem1" Caption="tab item 1" Width="0" Height="0" Margin="0" Background="Gray"
 			MouseEnter="{Background=Red}" Focusable="true"
 			MouseLeave="{Background=Gray}">
@@ -22,6 +22,16 @@
 				<RadioButton/>
 				<Label Text="{fps}" HorizontalAlignment="Left" Background="LimeGreen"/>
 			</VerticalStack>
+		</TabItem>
+		<TabItem Name="TabItem2" Caption="tab item 3" Width="0" Height="0" Margin="0" Background="Gray"
+			MouseEnter="{Background=BlueCrayola}"
+			MouseLeave="{Background=Gray}">
+			<TextBox Width="0" Height="0" Multiline="true" TextAlignment="TopLeft"/>
+		</TabItem>
+		<TabItem Name="TabItem2" Caption="tab item 4" Width="0" Height="0" Margin="0" Background="Gray"
+			MouseEnter="{Background=BlueCrayola}"
+			MouseLeave="{Background=Gray}">
+			<TextBox/>
 		</TabItem>
 	</TabView>
 	<TabView CacheEnabled="false" Width="200" Height="200" Orientation="Horizontal" Spacing="20" Margin="0">

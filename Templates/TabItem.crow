@@ -5,8 +5,7 @@
 		HorizontalAlignment="Left"
 		Text="{../../Caption}"
 		Height="{../../../TabThickness}"
-		Left="{../../TabOffset}"
-		LayoutChanged="../../../TabTitleLayoutChanged"/>
+		Left="{../../TabOffset}"/>
 	<Container
 		Name="Content" Width="{../../../WidthPolicy}" Height="{../../../HeightPolicy}"/>
 </GenericStack>
