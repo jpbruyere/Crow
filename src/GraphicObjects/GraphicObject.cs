@@ -69,7 +69,6 @@ namespace Crow
 		double _cornerRadius = 0;
 		int _margin = 0;
 		bool _focusable = false;
-		bool hoverable = true;
 		bool _hasFocus = false;
 		bool _isActive = false;
 		bool _mouseRepeat;
@@ -273,19 +272,6 @@ namespace Crow
 				Bounds.Width = Bounds.Height = -1;
 			}
 		}
-		/// <summary>
-		/// used to handle mouse hover in children instead of the whole container
-		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(true)]
-		public virtual bool Hoverable {
-			get { return hoverable; }
-			set {
-				if (hoverable == value)
-					return;
-				hoverable = value; 
-				NotifyValueChanged ("Hoverable", hoverable);
-			}
-		} 
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool Focusable {
 			get { return _focusable; }
@@ -929,8 +915,11 @@ namespace Crow
 				return false;
 			if (ScreenCoordinates (Slot).ContainsOrIsEqual (m)) {
 				Scroller scr = Parent as Scroller;
-				if (scr == null)
-					return Hoverable;
+				if (scr == null) {
+					if (Parent is GraphicObject)
+						return (Parent as GraphicObject).MouseIsIn (m);
+					else return true;
+				}
 				return scr.MouseIsIn (scr.savedMousePos);
 			}
 			return false; 

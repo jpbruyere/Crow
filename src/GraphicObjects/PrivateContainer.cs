@@ -225,12 +225,6 @@ namespace Crow
 		#endregion
 
 		#region Mouse handling
-		public override bool MouseIsIn (Point m)
-		{
-			if (Hoverable || child == null)
-				return base.MouseIsIn (m);
-			return child.MouseIsIn (m);
-		}
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
 			base.checkHoverWidget (e);
