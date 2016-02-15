@@ -244,10 +244,18 @@ namespace Crow
 
 			shader.Enable ();
 
-			GL.TexSubImage2D (TextureTarget.Texture2D, 0,
-				0, 0, ClientRectangle.Width, ClientRectangle.Height,
-				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp);
-
+			if (isDirty) {
+				byte[] tmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
+				for (int y = 0; y < DirtyRect.Height; y++) {
+					Array.Copy(bmp,
+						((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
+						tmp, y * DirtyRect.Width * 4, DirtyRect.Width *4);
+				}
+				GL.TexSubImage2D (TextureTarget.Texture2D, 0,
+					DirtyRect.Left, DirtyRect.Top, DirtyRect.Width, DirtyRect.Height,
+					OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, tmp);
+				isDirty = false;
+			}
 			uiQuad.Render (PrimitiveType.TriangleStrip);
 
 			GL.BindTexture(TextureTarget.Texture2D, 0);
@@ -263,6 +271,9 @@ namespace Crow
 		public Stopwatch guTime = new Stopwatch ();
 		public Stopwatch drawingTime = new Stopwatch ();
 		#endif
+
+		bool isDirty = false;
+		Rectangle DirtyRect;
 
 		#region update
 		void update ()
@@ -339,6 +350,13 @@ namespace Crow
 						#if DEBUG_CLIP_RECTANGLE
 						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
 						#endif
+
+						isDirty = true;
+						DirtyRect = clipping.Bounds;
+						DirtyRect.Left = Math.Max (0, DirtyRect.Left);
+						DirtyRect.Top = Math.Max (0, DirtyRect.Top);
+						DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
+						DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
 
 						clipping.Reset ();
 					}
