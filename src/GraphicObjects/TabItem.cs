@@ -143,7 +143,8 @@ namespace Crow
 			if (!IsSelected)
 				return mouseIsInTitle;
 
-			return _contentContainer.ScreenCoordinates (_contentContainer.Slot).ContainsOrIsEqual (m) || mouseIsInTitle;
+			return _contentContainer.ScreenCoordinates (_contentContainer.Slot).ContainsOrIsEqual (m)
+				|| mouseIsInTitle;
 		}
 	}
 }
