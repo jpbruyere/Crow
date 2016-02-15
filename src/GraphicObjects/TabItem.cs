@@ -95,25 +95,25 @@ namespace Crow
 				NotifyValueChanged ("Caption", caption);
 			}
 		}
-		public override bool MouseIsIn (Point m)
-		{
-			if (!Visible)
-				return false;
-
-			Debug.WriteLine ("Mouse Testing " + this.ToString ());
-
-			if (TabTitle.MouseIsIn (m)){
-				Debug.WriteLine ("Mouse is in title of " + this.ToString ());
-				return true;
-			}
-			if (Content.MouseIsIn (m)){
-				Debug.WriteLine ("Mouse is in content of " + this.ToString ());
-				return true;
-			}
-
-			Debug.WriteLine ("Mouse is not in " + this.ToString ());
-			return false;
-		}
+//		public override bool MouseIsIn (Point m)
+//		{
+//			if (!Visible)
+//				return false;
+//
+//			Debug.WriteLine ("Mouse Testing " + this.ToString ());
+//
+//			if (TabTitle.MouseIsIn (m)){
+//				Debug.WriteLine ("Mouse is in title of " + this.ToString ());
+//				return true;
+//			}
+//			if (Content.MouseIsIn (m)){
+//				Debug.WriteLine ("Mouse is in content of " + this.ToString ());
+//				return true;
+//			}
+//
+//			Debug.WriteLine ("Mouse is not in " + this.ToString ());
+//			return false;
+//		}
 		protected override void onDraw (Cairo.Context gr)
 		{
 			int spacing = (Parent as TabView).Spacing;

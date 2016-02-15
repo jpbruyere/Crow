@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<GenericStack Orientation="Vertical" Spacing="0"
+<GenericStack Orientation="Vertical" Spacing="0" Hoverable="false"
 		Width="{../../WidthPolicy}" Height="{../../HeightPolicy}">
 	<Label Margin="5" Name="TabTitle" Width="-1"
 		HorizontalAlignment="Left"
@@ -7,7 +7,7 @@
 		Height="{../../../TabThickness}"
 		Left="{../../TabOffset}"
 		LayoutChanged="../../../TabTitleLayoutChanged"/>
-	<Container Background="LightGray"
+	<Container
 		Name="Content" Width="{../../../WidthPolicy}" Height="{../../../HeightPolicy}"/>
 </GenericStack>
 

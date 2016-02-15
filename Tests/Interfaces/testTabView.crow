@@ -1,15 +1,44 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<TabView Orientation="Horizontal" Spacing="20" Margin="0">
-	<TabItem Name="TabItem1" Caption="tab 1" Width="0" Height="0" Margin="0" Background="Gray"
-		MouseEnter="{Background=Red}"
-		MouseLeave="{Background=Gray}">
-		<Label Text="tab content test 1"/>
-	</TabItem>
-	<TabItem Name="TabItem2" Caption="tab 2" Width="0" Height="0" Margin="0" Background="Gray"
-		MouseEnter="{Background=Red}"
-		MouseLeave="{Background=Gray}">
-		<Label Text="tab content test 2"/>
-	</TabItem>
-
-</TabView>
+<HorizontalStack>
+	<TabView CacheEnabled="false" Width="200" Height="200" Orientation="Horizontal" Spacing="20" Margin="0">
+		<TabItem Hoverable="false" Name="TabItem1" Caption="tab 1" Width="0" Height="0" Margin="0" Background="Gray">
+			<VerticalStack Fit="true">
+				<CheckBox/>
+				<CheckBox/>
+				<CheckBox/>
+				<CheckBox/>
+				<Label Text="tab content test 1"/>
+			</VerticalStack>
+		</TabItem>
+		<TabItem Hoverable="false" Name="TabItem2" Caption="tab 2" Width="0" Height="0" Margin="0" Background="Gray">
+			<VerticalStack Fit="true">
+				<RadioButton/>
+				<RadioButton/>
+				<RadioButton/>
+				<RadioButton/>
+				<Label Text="tab content test 2"/>
+			</VerticalStack>
+		</TabItem>
+	</TabView>
+	<TabView CacheEnabled="false" Width="200" Height="200" Orientation="Horizontal" Spacing="20" Margin="0">
+		<TabItem Hoverable="false" Name="TabItem1" Caption="tab 1" Width="0" Height="0" Margin="0" Background="Gray">
+			<VerticalStack Fit="true">
+				<CheckBox/>
+				<CheckBox/>
+				<CheckBox/>
+				<CheckBox/>
+				<Label Text="tab content test 1"/>
+			</VerticalStack>
+		</TabItem>
+		<TabItem Hoverable="false" Name="TabItem2" Caption="tab 2" Width="0" Height="0" Margin="0" Background="Gray">
+			<VerticalStack Fit="true">
+				<RadioButton/>
+				<RadioButton/>
+				<RadioButton/>
+				<RadioButton/>
+				<Label Text="tab content test 2"/>
+			</VerticalStack>
+		</TabItem>
+	</TabView>
+</HorizontalStack>
 

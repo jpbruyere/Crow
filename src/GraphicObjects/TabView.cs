@@ -73,6 +73,7 @@ namespace Crow
 					return;
 				selectedTab = value;
 				NotifyValueChanged ("SelectedTab", selectedTab);
+				Debug.WriteLine ("selected tab: " + (selectedTab + 1).ToString ());
 				registerForGraphicUpdate ();
 			}
 		}
@@ -187,7 +188,6 @@ namespace Crow
 		void Ti_MouseDown (object sender, OpenTK.Input.MouseButtonEventArgs e)
 		{
 			SelectedTab = Children.IndexOf (sender as GraphicObject);
-			Debug.WriteLine ("selected tab: " + (selectedTab + 1).ToString ());
 		}
 	}
 }

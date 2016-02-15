@@ -268,6 +268,16 @@ namespace Crow
 
 	
 		#region Mouse handling
+		public override bool MouseIsIn (Point m)
+		{
+			if (Hoverable)
+				return base.MouseIsIn (m);
+			for (int i = Children.Count - 1; i >= 0; i--) {
+				if (Children[i].MouseIsIn(m))
+					return true;
+			}
+			return false;
+		}
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
 			if (HostContainer.hoverWidget != this) {
