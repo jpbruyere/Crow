@@ -240,6 +240,8 @@ namespace Crow
 
 				Bounds.Width = value;
 				NotifyValueChanged ("Width", Bounds.Width);
+				NotifyValueChanged ("WidthPolicy", WidthPolicy);
+
 				this.RegisterForLayouting (LayoutingType.Width);
 			}
 		}
@@ -252,9 +254,14 @@ namespace Crow
 
 				Bounds.Height = value;
 				NotifyValueChanged ("Height", Bounds.Height);
+				NotifyValueChanged ("HeightPolicy", HeightPolicy);
+
 				this.RegisterForLayouting (LayoutingType.Height);
 			}
 		}
+		[XmlIgnore]public virtual int WidthPolicy { get { return Width < 1 ? Width : 0; } }
+		[XmlIgnore]public virtual int HeightPolicy { get { return Height < 1 ? Height : 0; } }
+
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool Fit {
 			get { return Bounds.Width < 0 && Bounds.Height < 0 ? true : false; }
