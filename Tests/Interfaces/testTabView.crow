@@ -1,42 +1,52 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<HorizontalStack>
+<HorizontalStack Fit="true">
 	<TabView CacheEnabled="false" Width="200" Height="200" Orientation="Horizontal" Spacing="20" Margin="0">
-		<TabItem Hoverable="false" Name="TabItem1" Caption="tab 1" Width="0" Height="0" Margin="0" Background="Gray">
+		<TabItem Name="TabItem1" Caption="tab item 1" Width="0" Height="0" Margin="0" Background="Gray"
+			MouseEnter="{Background=Red}"
+			MouseLeave="{Background=Gray}">
 			<VerticalStack Fit="true">
 				<CheckBox/>
 				<CheckBox/>
 				<CheckBox/>
 				<CheckBox/>
-				<Label Text="tab content test 1"/>
+				<Label Text="{fps}" HorizontalAlignment="Right" Foreground="Black" Background="Yellow"/>
 			</VerticalStack>
 		</TabItem>
-		<TabItem Hoverable="false" Name="TabItem2" Caption="tab 2" Width="0" Height="0" Margin="0" Background="Gray">
+		<TabItem Name="TabItem2" Caption="tab item 2" Width="0" Height="0" Margin="0" Background="Gray"
+			MouseEnter="{Background=BlueCrayola}"
+			MouseLeave="{Background=Gray}">
 			<VerticalStack Fit="true">
 				<RadioButton/>
 				<RadioButton/>
 				<RadioButton/>
 				<RadioButton/>
-				<Label Text="tab content test 2"/>
+				<Label Text="{fps}" HorizontalAlignment="Left" Background="LimeGreen"/>
 			</VerticalStack>
 		</TabItem>
 	</TabView>
 	<TabView CacheEnabled="false" Width="200" Height="200" Orientation="Horizontal" Spacing="20" Margin="0">
-		<TabItem Hoverable="false" Name="TabItem1" Caption="tab 1" Width="0" Height="0" Margin="0" Background="Gray">
+		<TabItem
+			MouseEnter="{Background=BlueCrayola}"
+			MouseLeave="{Background=Gray}"
+		 	Name="TabItem1" Caption="tab 1" Width="0" Height="0" Margin="0" Background="Gray">
 			<VerticalStack Fit="true">
 				<CheckBox/>
 				<CheckBox/>
 				<CheckBox/>
 				<CheckBox/>
-				<Label Text="tab content test 1"/>
+				<Label Text="{fps}" HorizontalAlignment="Right" Foreground="Black" Background="Yellow"/>
 			</VerticalStack>
 		</TabItem>
-		<TabItem Hoverable="false" Name="TabItem2" Caption="tab 2" Width="0" Height="0" Margin="0" Background="Gray">
+		<TabItem
+			MouseEnter="{Background=BlueCrayola}"
+			MouseLeave="{Background=Gray}"
+			Name="TabItem2" Caption="tab 2" Width="0" Height="0" Margin="0" Background="Gray">
 			<VerticalStack Fit="true">
 				<RadioButton/>
 				<RadioButton/>
 				<RadioButton/>
 				<RadioButton/>
-				<Label Text="tab content test 2"/>
+				<Label Text="{fps}" HorizontalAlignment="Left" Background="LimeGreen"/>
 			</VerticalStack>
 		</TabItem>
 	</TabView>

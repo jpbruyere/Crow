@@ -71,7 +71,13 @@ namespace Crow
 			set {
 				if (selectedTab == value)
 					return;
+
+				(Children [selectedTab] as TabItem).IsSelected = false;
+
 				selectedTab = value;
+
+				(Children [selectedTab] as TabItem).IsSelected = true;
+
 				NotifyValueChanged ("SelectedTab", selectedTab);
 				Debug.WriteLine ("selected tab: " + (selectedTab + 1).ToString ());
 				registerForGraphicUpdate ();
@@ -96,7 +102,20 @@ namespace Crow
 
 			ti.MouseDown += Ti_MouseDown;
 
+			if (Children.Count == 0) {
+				ti.IsSelected = true;
+				SelectedTab = 0;
+			}
+
 			return base.AddChild (child);
+		}
+		public override void RemoveChild (GraphicObject child)
+		{
+			TabItem ti = child as TabItem;
+			base.RemoveChild (child);
+			if (ti.IsSelected)
+				SelectedTab = Math.Min(0, Children.Count - 1);
+
 		}
 		public override bool ArrangeChildren { get { return true; } }
 		public override bool UpdateLayout (LayoutingType layoutType)
@@ -162,21 +181,21 @@ namespace Crow
 				HostContainer.hoverWidget = this;
 				onMouseEnter (this, e);
 			}
-			if (Children[SelectedTab].MouseIsIn(e.Position))
+			if (((Children[SelectedTab] as TabItem).Content.Parent as GraphicObject).MouseIsIn(e.Position))
 			{
+				Debug.WriteLine ("Mouse is in selected tab: {0}", selectedTab + 1);
 				Children[SelectedTab].checkHoverWidget (e);
 				return;
 			}
 			for (int i = Children.Count - 1; i >= 0; i--) {
-				if (i == SelectedTab)
-					continue;
-				if (Children[i].MouseIsIn(e.Position))
+				TabItem ti = Children [i] as TabItem;
+				if (ti.TabTitle.MouseIsIn(e.Position))
 				{
+					Debug.WriteLine ("Mouse is in tab title: {0}", i + 1);
 					Children[i].checkHoverWidget (e);
 					return;
 				}
 			}
-			base.checkHoverWidget (e);
 		}
 		#endregion
 

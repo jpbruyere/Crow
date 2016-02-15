@@ -95,25 +95,17 @@ namespace Crow
 				NotifyValueChanged ("Caption", caption);
 			}
 		}
-//		public override bool MouseIsIn (Point m)
-//		{
-//			if (!Visible)
-//				return false;
-//
-//			Debug.WriteLine ("Mouse Testing " + this.ToString ());
-//
-//			if (TabTitle.MouseIsIn (m)){
-//				Debug.WriteLine ("Mouse is in title of " + this.ToString ());
-//				return true;
-//			}
-//			if (Content.MouseIsIn (m)){
-//				Debug.WriteLine ("Mouse is in content of " + this.ToString ());
-//				return true;
-//			}
-//
-//			Debug.WriteLine ("Mouse is not in " + this.ToString ());
-//			return false;
-//		}
+		bool isSelected;
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public virtual bool IsSelected {
+			get { return isSelected; }
+			set {
+				if (isSelected == value)
+					return;
+				isSelected = value;
+				NotifyValueChanged ("IsSelected", isSelected);
+			}
+		}
 		protected override void onDraw (Cairo.Context gr)
 		{
 			int spacing = (Parent as TabView).Spacing;
@@ -141,6 +133,17 @@ namespace Crow
 			gr.Clip ();
 			base.onDraw (gr);
 			gr.Restore ();
+		}
+		public override bool MouseIsIn (Point m)
+		{
+			if (!Visible)
+				return false;
+
+			bool mouseIsInTitle = TabTitle.ScreenCoordinates (TabTitle.Slot).ContainsOrIsEqual (m);
+			if (!IsSelected)
+				return mouseIsInTitle;
+
+			return _contentContainer.ScreenCoordinates (_contentContainer.Slot).ContainsOrIsEqual (m) || mouseIsInTitle;
 		}
 	}
 }
