@@ -165,7 +165,7 @@ namespace Crow
 						cptChildren++;
 						if (Children [i].Height == 0) {
 							if (!(stretchedGO == null && Height >= 0)){
-								Children [i].Width = -1;
+								Children [i].Height = -1;
 								return false;
 							}
 							stretchedGO = Children [i];
