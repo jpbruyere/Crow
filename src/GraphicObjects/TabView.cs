@@ -23,6 +23,7 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using Cairo;
 using System.Diagnostics;
+using OpenTK.Input;
 
 namespace Crow
 {
@@ -128,6 +129,55 @@ namespace Crow
 
 			return base.UpdateLayout(layoutType);
 		}
+		protected override void onDraw (Context gr)
+		{
+			Rectangle rBack = new Rectangle (Slot.Size);
+
+			Background.SetAsSource (gr, rBack);
+			CairoHelpers.CairoRectangle(gr,rBack, CornerRadius);
+			gr.Fill ();
+
+			gr.Save ();
+			//clip to client zone
+			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+			gr.Clip ();
+
+			for (int i = 0; i < Children.Count; i++) {
+				if (i == SelectedTab)
+					continue;
+				Children [i].Paint (ref gr);
+			}
+			Children [SelectedTab].Paint (ref gr);
+
+			gr.Restore ();
+		}
+
+		#region Mouse handling
+		public override void checkHoverWidget (MouseMoveEventArgs e)
+		{
+			Debug.WriteLine ("TabView check Hover");
+
+			if (HostContainer.hoverWidget != this) {
+				HostContainer.hoverWidget = this;
+				onMouseEnter (this, e);
+			}
+			if (Children[SelectedTab].MouseIsIn(e.Position))
+			{
+				Children[SelectedTab].checkHoverWidget (e);
+				return;
+			}
+			for (int i = Children.Count - 1; i >= 0; i--) {
+				if (i == SelectedTab)
+					continue;
+				if (Children[i].MouseIsIn(e.Position))
+				{
+					Children[i].checkHoverWidget (e);
+					return;
+				}
+			}
+			base.checkHoverWidget (e);
+		}
+		#endregion
 
 		void TabTitleLayoutChanged (object sender, LayoutingEventArgs e)
 		{
@@ -137,6 +187,7 @@ namespace Crow
 		void Ti_MouseDown (object sender, OpenTK.Input.MouseButtonEventArgs e)
 		{
 			SelectedTab = Children.IndexOf (sender as GraphicObject);
+			Debug.WriteLine ("selected tab: " + (selectedTab + 1).ToString ());
 		}
 	}
 }

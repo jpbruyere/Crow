@@ -7,7 +7,7 @@
 		Height="{../../../TabThickness}"
 		Left="{../../TabOffset}"
 		LayoutChanged="../../../TabTitleLayoutChanged"/>
-	<Container
+	<Container Background="LightGray"
 		Name="Content" Width="{../../../WidthPolicy}" Height="{../../../HeightPolicy}"/>
 </GenericStack>
 

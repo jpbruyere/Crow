@@ -1,9 +1,13 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <TabView Orientation="Horizontal" Spacing="20" Margin="0">
-	<TabItem Caption="tab 1" Width="0" Height="0" Margin="0" Background="Gray">
+	<TabItem Name="TabItem1" Caption="tab 1" Width="0" Height="0" Margin="0" Background="Gray"
+		MouseEnter="{Background=Red}"
+		MouseLeave="{Background=Gray}">
 		<Label Text="tab content test 1"/>
 	</TabItem>
-	<TabItem Caption="tab 2" Width="0" Height="0" Margin="0" Background="Gray">
+	<TabItem Name="TabItem2" Caption="tab 2" Width="0" Height="0" Margin="0" Background="Gray"
+		MouseEnter="{Background=Red}"
+		MouseLeave="{Background=Gray}">
 		<Label Text="tab content test 2"/>
 	</TabItem>
 
