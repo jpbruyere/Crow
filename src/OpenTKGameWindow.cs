@@ -351,8 +351,12 @@ namespace Crow
 						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
 						#endif
 
+						if (isDirty)
+							DirtyRect += clipping.Bounds;
+						else
+							DirtyRect = clipping.Bounds;
 						isDirty = true;
-						DirtyRect = clipping.Bounds;
+
 						DirtyRect.Left = Math.Max (0, DirtyRect.Left);
 						DirtyRect.Top = Math.Max (0, DirtyRect.Top);
 						DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
