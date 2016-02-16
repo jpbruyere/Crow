@@ -122,11 +122,11 @@ namespace Crow
 			gr.LineTo (TabTitle.Slot.Left - spacing, TabTitle.Slot.Bottom);
 			gr.CurveTo (
 				TabTitle.Slot.Left - spacing / 2, TabTitle.Slot.Bottom,
-				TabTitle.Slot.Left - spacing / 2, 0,
-				TabTitle.Slot.Left, 0);
-			gr.LineTo (TabTitle.Slot.Right, 0);
+				TabTitle.Slot.Left - spacing / 2, 1,
+				TabTitle.Slot.Left, 1);
+			gr.LineTo (TabTitle.Slot.Right, 1);
 			gr.CurveTo (
-				TabTitle.Slot.Right + spacing / 2, 0,
+				TabTitle.Slot.Right + spacing / 2, 1,
 				TabTitle.Slot.Right + spacing / 2, TabTitle.Slot.Bottom,
 				TabTitle.Slot.Right + spacing, TabTitle.Slot.Bottom);
 			gr.LineTo (Slot.Width, TabTitle.Slot.Bottom);
@@ -178,7 +178,6 @@ namespace Crow
 			TabView tv = Parent as TabView;
 			TabItem previous = null, next = null;
 			int tmp = TabOffset + e.XDelta;
-			Debug.WriteLine (tmp);
 			if (tmp < tv.Spacing)
 				TabOffset = tv.Spacing;
 			else if (tmp > Parent.getSlot ().Width - TabTitle.Slot.Width - tv.Spacing)
@@ -206,6 +205,9 @@ namespace Crow
 				}
 				TabOffset = tmp;
 			}
+		}
+		public void butCloseTabClick (object sender, OpenTK.Input.MouseButtonEventArgs e){
+			(Parent as TabView).RemoveChild(this);
 		}
 		#endregion
 

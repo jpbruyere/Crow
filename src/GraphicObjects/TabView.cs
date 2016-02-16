@@ -69,21 +69,20 @@ namespace Crow
 		public virtual int SelectedTab {
 			get { return selectedTab; }
 			set {
-				if (selectedTab == value)
-					return;
-
-				(Children [selectedTab] as TabItem).IsSelected = false;
+				if (selectedTab < Children.Count && SelectedTab >= 0)
+					(Children [selectedTab] as TabItem).IsSelected = false;
 
 				selectedTab = value;
 
-				(Children [selectedTab] as TabItem).IsSelected = true;
+				if (selectedTab < Children.Count && SelectedTab >= 0)
+					(Children [selectedTab] as TabItem).IsSelected = true;
 
 				NotifyValueChanged ("SelectedTab", selectedTab);
 				registerForGraphicUpdate ();
 			}
 		}
 		int tabThickness;
-		[XmlAttributeAttribute()][DefaultValue(20)]
+		[XmlAttributeAttribute()][DefaultValue(22)]
 		public virtual int TabThickness {
 			get { return tabThickness; }
 			set {
@@ -93,6 +92,14 @@ namespace Crow
 				NotifyValueChanged ("TabThickness", tabThickness);
 			}
 		}
+
+		//prevent caching, because drawing order is different depending on selected tab
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public override bool CacheEnabled {
+			get {return false;}
+			set { }
+		}
+
 		public override T AddChild<T> (T child)
 		{
 			TabItem ti = child as TabItem;
@@ -110,11 +117,12 @@ namespace Crow
 		}
 		public override void RemoveChild (GraphicObject child)
 		{
-			TabItem ti = child as TabItem;
+			int idx = Children.IndexOf (child);
 			base.RemoveChild (child);
-			if (ti.IsSelected)
-				SelectedTab = Math.Min(0, Children.Count - 1);
-
+			if (selectedTab > Children.Count - 1)
+				SelectedTab--;
+			else
+				SelectedTab = selectedTab;
 		}
 		public override bool ArrangeChildren { get { return true; } }
 		public override bool UpdateLayout (LayoutingType layoutType)
@@ -166,7 +174,9 @@ namespace Crow
 					continue;
 				Children [i].Paint (ref gr);
 			}
-			Children [SelectedTab].Paint (ref gr);
+
+			if (SelectedTab < Children.Count && SelectedTab >= 0)
+				Children [SelectedTab].Paint (ref gr);
 
 			gr.Restore ();
 		}
@@ -178,6 +188,10 @@ namespace Crow
 				HostContainer.hoverWidget = this;
 				onMouseEnter (this, e);
 			}
+
+			if (SelectedTab > Children.Count - 1)
+				return;
+
 			if (((Children[SelectedTab] as TabItem).Content.Parent as GraphicObject).MouseIsIn(e.Position))
 			{
 				Children[SelectedTab].checkHoverWidget (e);

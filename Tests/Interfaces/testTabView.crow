@@ -1,9 +1,8 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <HorizontalStack Fit="true">
-	<TabView CacheEnabled="false" Width="400" Height="200" Orientation="Horizontal" Spacing="20" Margin="0">
-		<TabItem Name="TabItem1" Caption="tab item 1" Width="0" Height="0" Margin="0" Background="Gray"
-			MouseEnter="{Background=Red}" Focusable="true"
-			MouseLeave="{Background=Gray}">
+	<TabView Margin="20"
+		Width="400" Height="200" Orientation="Horizontal" Spacing="20">
+		<TabItem Name="TabItem1" Caption="tab item 1" Width="0" Height="0" Margin="0">
 			<VerticalStack Fit="true">
 				<CheckBox/>
 				<CheckBox/>
@@ -12,9 +11,7 @@
 				<Label Text="{fps}" HorizontalAlignment="Right" Foreground="Black" Background="Yellow"/>
 			</VerticalStack>
 		</TabItem>
-		<TabItem Name="TabItem2" Caption="tab item 2" Width="0" Height="0" Margin="0" Background="Gray"
-			MouseEnter="{Background=BlueCrayola}"
-			MouseLeave="{Background=Gray}">
+		<TabItem Name="TabItem2" Caption="tab item 2" Width="0" Height="0" Margin="0" Background="Gray">
 			<VerticalStack Fit="true">
 				<RadioButton/>
 				<RadioButton/>
@@ -23,21 +20,17 @@
 				<Label Text="{fps}" HorizontalAlignment="Left" Background="LimeGreen"/>
 			</VerticalStack>
 		</TabItem>
-		<TabItem Name="TabItem2" Caption="tab item 3" Width="0" Height="0" Margin="0" Background="Gray"
-			MouseEnter="{Background=BlueCrayola}"
-			MouseLeave="{Background=Gray}">
-			<TextBox Width="0" Height="0" Multiline="true" TextAlignment="TopLeft"/>
+		<TabItem Name="TabItem2" Caption="tab item 3" Width="0" Height="0" Margin="0" Background="Gray">
+			<Container Margin="5" CornerRadius="2" Width="0" Height="0">
+				<TextBox Margin="5" Width="0" Height="0" Multiline="true" TextAlignment="TopLeft"/>
+			</Container>
 		</TabItem>
-		<TabItem Name="TabItem2" Caption="tab item 4" Width="0" Height="0" Margin="0" Background="Gray"
-			MouseEnter="{Background=BlueCrayola}"
-			MouseLeave="{Background=Gray}">
+		<TabItem Name="TabItem2" Caption="tab item 4" Width="0" Height="0" Margin="0" Background="Gray">
 			<TextBox/>
 		</TabItem>
 	</TabView>
 	<TabView CacheEnabled="false" Width="200" Height="200" Orientation="Horizontal" Spacing="20" Margin="0">
 		<TabItem
-			MouseEnter="{Background=BlueCrayola}"
-			MouseLeave="{Background=Gray}"
 		 	Name="TabItem1" Caption="tab 1" Width="0" Height="0" Margin="0" Background="Gray">
 			<VerticalStack Fit="true">
 				<CheckBox/>
@@ -48,8 +41,6 @@
 			</VerticalStack>
 		</TabItem>
 		<TabItem
-			MouseEnter="{Background=BlueCrayola}"
-			MouseLeave="{Background=Gray}"
 			Name="TabItem2" Caption="tab 2" Width="0" Height="0" Margin="0" Background="Gray">
 			<VerticalStack Fit="true">
 				<RadioButton/>
