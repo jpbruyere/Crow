@@ -657,7 +657,7 @@ namespace Crow
 				return;
 
 			#if DEBUG_LAYOUTING
-			Debug.WriteLine ("RegisterForLayouting => {1}->{0}", layoutType, this.ToString());
+			Debug.WriteLine ("REGLayout => {1}->{0}", layoutType, this.ToString());
 			#endif
 
 			//enqueue LQI LayoutingTypes separately
@@ -677,7 +677,7 @@ namespace Crow
 		public virtual void OnLayoutChanges(LayoutingType  layoutType)
 		{
 			#if DEBUG_LAYOUTING
-			Debug.WriteLine ("Layout change: " + this.ToString () + ":" + LastSlots.ToString() + "=>" + Slot.ToString ());
+			Debug.WriteLine ("\t    " + LastSlots.ToString() + "\n\t => " + Slot.ToString ());
 			#endif
 
 			switch (layoutType) {

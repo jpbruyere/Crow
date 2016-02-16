@@ -83,9 +83,6 @@ namespace Crow
 		}
 		public virtual void ComputeChildrenPositions()
 		{
-			#if DEBUG_LAYOUTING
-			Debug.WriteLine("ComputeChildrenPosition: " + this.ToString());
-			#endif
 			int d = 0;
 			if (Orientation == Orientation.Horizontal) {
 				foreach (GraphicObject c in Children) {
@@ -149,6 +146,9 @@ namespace Crow
 						if (stretchedGO.LastSlots.Width != tmpWidth) {
 							stretchedGO.Slot.Width = tmpWidth;
 							stretchedGO.bmp = null;
+							#if DEBUG_LAYOUTING
+							Debug.WriteLine ("\tAdjusting Width of " + stretchedGO.ToString());
+							#endif
 							stretchedGO.OnLayoutChanges (LayoutingType.Width);
 							stretchedGO.LastSlots.Width = stretchedGO.Slot.Width;
 						}
@@ -184,6 +184,9 @@ namespace Crow
 						if (stretchedGO.LastSlots.Height != tmpHeight) {
 							stretchedGO.Slot.Height = tmpHeight;
 							stretchedGO.bmp = null;
+							#if DEBUG_LAYOUTING
+							Debug.WriteLine ("\tAdjusting Height of " + stretchedGO.ToString());
+							#endif
 							stretchedGO.OnLayoutChanges (LayoutingType.Height);
 							stretchedGO.LastSlots.Height = stretchedGO.Slot.Height;
 						}
