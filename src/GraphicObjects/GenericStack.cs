@@ -52,34 +52,43 @@ namespace Crow
 			else
 				layoutType &= (~LayoutingType.Y);			
 		}
-		protected override Size measureRawSize ()
+		protected override int measureRawSize (LayoutingType lt)
 		{
-			Size tmp = new Size ();
-
-			if (Orientation == Orientation.Horizontal) {
-				foreach (GraphicObject c in Children) {
-					if (!c.Visible)
-						continue;					
-					tmp.Width += c.Slot.Width + Spacing;
-					tmp.Height = Math.Max (tmp.Height, Math.Max(c.Slot.Bottom, c.Slot.Height));
+			int tmp = 0;
+			switch (lt) {
+			case LayoutingType.Width:
+				if (Orientation == Orientation.Horizontal) {
+					if (Children.Count > 0) {
+						foreach (GraphicObject c in Children) {
+							if (!c.Visible)
+								continue;
+							if (c.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+								return -1;
+							tmp += c.Slot.Width + Spacing;
+						}
+						tmp -= Spacing;
+					}
+					break;
+				} 
+				return base.measureRawSize (lt);				
+			case LayoutingType.Height:
+				if (Orientation == Orientation.Vertical) {
+					if (Children.Count > 0) {
+						foreach (GraphicObject c in Children) {
+							if (!c.Visible)
+								continue;
+							if (c.RegisteredLayoutings.HasFlag (LayoutingType.Height))
+								return -1;
+							tmp += c.Slot.Height + Spacing;
+						}
+						tmp -= Spacing;
+					}
+					break;
 				}
-				if (tmp.Width > 0)
-					tmp.Width -= Spacing;
-			} else {
-				foreach (GraphicObject c in Children) {
-					if (!c.Visible)
-						continue;					
-					tmp.Width = Math.Max (tmp.Width, Math.Max(c.Slot.Right, c.Slot.Width));
-					tmp.Height += c.Slot.Height + Spacing;
-				}
-				if (tmp.Height > 0)
-					tmp.Height -= Spacing;
+				return base.measureRawSize (lt);
 			}
 
-			tmp.Width += 2 * Margin;
-			tmp.Height += 2 * Margin;
-
-			return tmp;
+			return tmp + 2 * Margin;
 		}
 		public virtual void ComputeChildrenPositions()
 		{

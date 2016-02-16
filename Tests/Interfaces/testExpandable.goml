@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <Expandable Caption="Test expandable" Background="DimGray">
-		<VerticalStack Width="-1" Height="-1">
+		<VerticalStack Margin="5" Background="Green">
 			<CheckBox Name="chk1" Background="Red"/>
 			<CheckBox Name="chk2" IsChecked="true"/>
 			<CheckBox Name="chk3"/>

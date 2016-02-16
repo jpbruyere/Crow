@@ -262,12 +262,12 @@ namespace Crow
 
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool Fit {
-			get { return Bounds.Width < 0 && Bounds.Height < 0 ? true : false; }
+			get { return Width < 0 && Height < 0 ? true : false; }
 			set {
 				if (value == Fit)
 					return;
 
-				Bounds.Width = Bounds.Height = -1;
+				Width = Height = -1;
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
@@ -626,8 +626,8 @@ namespace Crow
 			set { layoutingTries = value; }
 		}
 		/// <summary> return size of content + margins </summary>
-		protected virtual Size measureRawSize () {
-			return Bounds.Size;
+		protected virtual int measureRawSize (LayoutingType lt) {
+			return lt == LayoutingType.Width ? Bounds.Size.Width : Bounds.Size.Height;
 		}
 		/// <summary> By default in groups, LayoutingType.ArrangeChildren is reset </summary>
 		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){
@@ -704,7 +704,8 @@ namespace Crow
 			case LayoutingType.X:
 				if (Bounds.X == 0) {
 
-					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width) ||
+						RegisteredLayoutings.HasFlag (LayoutingType.Width))
 						return false;
 					
 					switch (HorizontalAlignment) {
@@ -733,7 +734,8 @@ namespace Crow
 			case LayoutingType.Y:
 				if (Bounds.Y == 0) {
 
-					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height))
+					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height) || 
+						RegisteredLayoutings.HasFlag (LayoutingType.Height))
 						return false;
 					
 					switch (VerticalAlignment) {
@@ -762,9 +764,12 @@ namespace Crow
 			case LayoutingType.Width:
 				if (Width > 0)
 					Slot.Width = Width;
-				else if (Width < 0)
-					Slot.Width = measureRawSize ().Width;
-				else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+				else if (Width < 0) {
+					int tmp = measureRawSize (LayoutingType.Width);
+					if (tmp < 0)
+						return false;
+					Slot.Width = tmp;
+				}else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
 					return false;
 				else
 					Slot.Width = Parent.ClientRectangle.Width;
@@ -787,9 +792,12 @@ namespace Crow
 			case LayoutingType.Height:
 				if (Height > 0)
 					Slot.Height = Height;
-				else if (Height < 0)
-					Slot.Height = measureRawSize ().Height;
-				else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height))
+				else if (Height < 0){
+					int tmp = measureRawSize (LayoutingType.Height);
+					if (tmp < 0)
+						return false;
+					Slot.Height = tmp;
+				}else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height))
 					return false;
 				else
 					Slot.Height = Parent.ClientRectangle.Height;

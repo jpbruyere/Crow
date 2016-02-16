@@ -137,6 +137,7 @@
     <Compile Include="src\GraphicObjects\TreeView.cs" />
     <Compile Include="src\GraphicObjects\TabView.cs" />
     <Compile Include="src\GraphicObjects\TabItem.cs" />
+    <Compile Include="src\GraphicObjects\DummyTemplate.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -229,6 +230,7 @@
     <EmbeddedResource Include="Templates\TreeView.crow" />
     <EmbeddedResource Include="Templates\TabItem.crow" />
     <EmbeddedResource Include="Templates\TreeItem.crow" />
+    <EmbeddedResource Include="Templates\Dummy.goml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

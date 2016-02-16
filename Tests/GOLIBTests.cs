@@ -37,6 +37,7 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"testCheckbox.goml",
 			"testTabView.crow",
 			"testExpandable.goml",
 			"0.crow",
@@ -73,7 +74,6 @@ namespace test
 			"testWindow2.goml",
 
 			"testWindow3.goml",
-			"testCheckbox.goml",
 			"testLabel.goml",
 			"testAll.goml",
 //			"testSpinner.goml",
@@ -239,7 +239,13 @@ namespace test
 		{
 			Console.WriteLine ("button clicked:" + send.ToString());
 		}
-
+		void onAddTabButClick(object sender, MouseButtonEventArgs e){
+			
+			TabView tv = this.FindByName("tabview1") as TabView;
+			if (tv == null)
+				return;
+			tv.AddChild (new TabItem () { Caption = "NewTab" });
+		}
 		[STAThread]
 		static void Main ()
 		{

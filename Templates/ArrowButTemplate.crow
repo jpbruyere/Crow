@@ -5,7 +5,7 @@
 </HorizontalStack>-->
 <Border Name="Content"
 	Background="vgradient|0:White|0,1:LightGray|0,9:LightGray|1:Black" Foreground="DarkGray" 
-	Height="{../TemplatedHeight}" Width="{../TemplatedWidth}"
+	Height="{../HeightPolicy}" Width="{../WidthPolicy}"
 	MouseEnter="{Foreground=White}"
 	MouseLeave="{Foreground=DarkGray}"
 	MouseDown="{Background=vgradient|0:Black|0,1:LightGray|0,9:LightGray|1:White}"

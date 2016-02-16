@@ -14,11 +14,11 @@
 	</Groupbox>-->
 	<GroupBox  Background="DarkGreen">		
 <!--		<Template>
-			<Group Height="{../TemplatedHeight}" Width="{../TemplatedWidth}">
+			<Group Height="{../HeightPolicy}" Width="{../WidthPolicy}">
 				<Border CornerRadius="5" BorderWidth="1" Margin="0"
-					Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}">
+					Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
 					<Container Name="Content" Margin="0"
-							Height="{../../../TemplatedHeight}" Width="{../../../TemplatedWidth}"/>
+							Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}"/>
 				</Border>
 				<Label Text="{../../Title}" VerticalAlignment="Top" Left="15"
 					Background="Clear" Margin="1"/>

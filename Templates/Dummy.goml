@@ -1,0 +1,8 @@
+﻿<?xml version="1.0"?>
+<!--<Group Margin="5" Background="Red" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
+<Label Margin="0" Text="DUMMY2" Background="Green" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}"/>
+</Group>-->
+<HorizontalStack Margin="5" Background="Red" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
+	<Label Margin="0" Text="DUMMY" Background="Blue" Height="{../../HeightPolicy}" Width="20"/>
+	<Label Margin="0" Text="DUMMY2" Background="Green" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}"/>
+</HorizontalStack>

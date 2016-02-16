@@ -40,9 +40,10 @@ namespace Crow
 			}
 		}
 
-		protected override Size measureRawSize ()
+		protected override int measureRawSize (LayoutingType lt)
 		{
-			return child == null ? Bounds.Size : child.Slot.Size + 2 * (Margin + BorderWidth);
+			int tmp = base.measureRawSize (lt);
+			return tmp < 0 ? tmp : tmp + 2 * BorderWidth;
 		}
 		protected override void onDraw (Cairo.Context gr)
 		{

@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0"?>
-<!--<VerticalStack Height="{../TemplatedHeight}" Width="{../TemplatedWidth}" MouseClick="../onMouseClick">
-	<Label Text="{../../Caption}" Width="{../../TemplatedWidth}"/>
-	<Container Name="Content" Visible="false" Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}"/>
+<!--<VerticalStack Height="{../HeightPolicy}" Width="{../WidthPolicy}" MouseClick="../onMouseClick">
+	<Label Text="{../../Caption}" Width="{../../WidthPolicy}"/>
+	<Container Name="Content" Visible="false" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}"/>
 </VerticalStack>-->
-<Group BorderWidth="1" Foreground="LightGray" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}" 
+<Group BorderWidth="1" Foreground="LightGray" Height="{../HeightPolicy}" Width="{../WidthPolicy}" 
 		MouseClick="../onMouseClick">
-	<VerticalStack Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}">
-		<Label Text="{../../../Caption}" Width="{../../../TemplatedWidth}"/>
-		<Container Name="Content" Visible="false" Height="{../../../TemplatedHeight}" Width="{../../../TemplatedWidth}"/>
+	<VerticalStack Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
+		<Label Text="{../../../Caption}" Width="{../../../WidthPolicy}"/>
+		<Container Name="Content" Visible="false" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}"/>
 	</VerticalStack>
 </Group>

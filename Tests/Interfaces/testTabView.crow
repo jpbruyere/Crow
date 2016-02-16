@@ -1,34 +1,38 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <HorizontalStack Fit="true">
-	<TabView Margin="20"
-		Width="400" Height="200" Orientation="Horizontal" Spacing="20">
-		<TabItem Name="TabItem1" Caption="tab item 1" Width="0" Height="0" Margin="0">
-			<VerticalStack Fit="true">
-				<CheckBox/>
-				<CheckBox/>
-				<CheckBox/>
-				<CheckBox/>
-				<Label Text="{fps}" HorizontalAlignment="Right" Foreground="Black" Background="Yellow"/>
-			</VerticalStack>
-		</TabItem>
-		<TabItem Name="TabItem2" Caption="tab item 2" Width="0" Height="0" Margin="0" Background="Gray">
-			<VerticalStack Fit="true">
-				<RadioButton/>
-				<RadioButton/>
-				<RadioButton/>
-				<RadioButton/>
-				<Label Text="{fps}" HorizontalAlignment="Left" Background="LimeGreen"/>
-			</VerticalStack>
-		</TabItem>
-		<TabItem Name="TabItem2" Caption="tab item 3" Width="0" Height="0" Margin="0" Background="Gray">
-			<Container Margin="5" CornerRadius="2" Width="0" Height="0">
-				<TextBox Margin="5" Width="0" Height="0" Multiline="true" TextAlignment="TopLeft"/>
-			</Container>
-		</TabItem>
-		<TabItem Name="TabItem2" Caption="tab item 4" Width="0" Height="0" Margin="0" Background="Gray">
-			<TextBox/>
-		</TabItem>
-	</TabView>
+	<VerticalStack Fit="true">
+		<TabView Name="tabview1"
+			Width="400" Height="200" Orientation="Horizontal" Spacing="20">
+			<TabItem Name="TabItem1" Caption="tab item 1" Margin="0">
+				<VerticalStack Fit="true">
+					<CheckBox/>
+					<CheckBox/>
+					<CheckBox/>
+					<CheckBox/>
+<!--					<Label Text="{fps}" HorizontalAlignment="Right" Foreground="Black" Background="Yellow"/>-->
+				</VerticalStack>
+			</TabItem>
+			<TabItem Name="TabItem2" Caption="tab item 2" Width="0" Height="0" Margin="0" Background="Gray">
+				<VerticalStack Fit="true">
+					<RadioButton/>
+					<RadioButton/>
+					<RadioButton/>
+					<RadioButton/>
+<!--					<Label Text="{fps}" HorizontalAlignment="Left" Background="LimeGreen"/>-->
+				</VerticalStack>
+			</TabItem>
+			<TabItem Name="TabItem2" Caption="tab item 3" Width="0" Height="0" Margin="0" Background="Gray">
+				<Container Margin="5" CornerRadius="2" Width="0" Height="0">
+					<TextBox Margin="5" Width="0" Height="0" Multiline="true" TextAlignment="TopLeft"/>
+				</Container>
+			</TabItem>
+			<TabItem Name="TabItem2" Caption="tab item 4" Width="0" Height="0" Margin="0" Background="Gray">
+				<TextBox/>
+			</TabItem>
+		</TabView>
+		<Button Background="vgradient|0:DimGray|1:Black" HorizontalAlignment="Right"
+			Caption="Add new tab" Width="-1" Height="30" MouseClick="onAddTabButClick"/>
+	</VerticalStack>
 	<TabView CacheEnabled="false" Width="200" Height="200" Orientation="Horizontal" Spacing="20" Margin="0">
 		<TabItem
 		 	Name="TabItem1" Caption="tab 1" Width="0" Height="0" Margin="0" Background="Gray">

@@ -125,9 +125,21 @@ namespace Crow
 			}
 			return false;
 		}
-		protected override Size measureRawSize ()
+		protected override int measureRawSize (LayoutingType lt)
 		{
-			return new Size(maxChildrenWidth + 2 * Margin, maxChildrenHeight + 2 * Margin);
+			if (lt == LayoutingType.Width) {
+				if (largestChild == null)
+					searchLargestChild ();
+				if (largestChild == null)//if still null, not possible to determine a width
+					return -1;
+				return maxChildrenWidth + 2 * Margin;
+			}else{
+				if (tallestChild == null)
+					searchTallestChild ();
+				if (tallestChild == null)
+					return -1;
+				return maxChildrenHeight + 2 * Margin;
+			}
 		}
 			
 		public override void OnLayoutChanges (LayoutingType layoutType)
@@ -162,8 +174,9 @@ namespace Crow
 					if (this.Bounds.Width < 0)
 						this.RegisterForLayouting (LayoutingType.Width);
 				} else if (g == largestChild) {
-					
-					searchLargestChild ();
+
+					largestChild = null;
+					maxChildrenWidth = 0;
 
 					if (this.Bounds.Width < 0)
 						this.RegisterForLayouting (LayoutingType.Width);
@@ -177,7 +190,8 @@ namespace Crow
 						this.RegisterForLayouting (LayoutingType.Height);
 				} else if (g == tallestChild) {
 
-					searchTallestChild ();
+					tallestChild = null;
+					maxChildrenHeight = 0;
 
 					if (this.Bounds.Height < 0)
 						this.RegisterForLayouting (LayoutingType.Height);
@@ -186,6 +200,7 @@ namespace Crow
 			}
 		}
 
+		//TODO: x,y position should be taken in account for computation of width and height
 		void resetChildrenMaxSize(){
 			largestChild = null;
 			tallestChild = null;
@@ -198,6 +213,8 @@ namespace Crow
 			for (int i = 0; i < Children.Count; i++) {
 				if (!Children [i].Visible)
 					continue;
+				if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
+					continue;
 				if (Children [i].Slot.Width > maxChildrenWidth) {
 					maxChildrenWidth = Children [i].Slot.Width;
 					largestChild = Children [i];
@@ -209,6 +226,8 @@ namespace Crow
 			maxChildrenHeight = 0;
 			for (int i = 0; i < Children.Count; i++) {
 				if (!Children [i].Visible)
+					continue;
+				if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
 					continue;
 				if (Children [i].Slot.Height > maxChildrenHeight) {
 					maxChildrenHeight = Children [i].Slot.Height;
