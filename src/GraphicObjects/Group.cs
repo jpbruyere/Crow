@@ -53,7 +53,7 @@ namespace Crow
 		{
 			child.LayoutChanged -= OnChildLayoutChanges;
 			child.ClearBinding ();
-			child.Parent = null;
+			//child.Parent = null;
             Children.Remove(child);
 
 			if (child == largestChild)
