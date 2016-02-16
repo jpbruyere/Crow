@@ -45,7 +45,6 @@ namespace Crow
 				return;
 
 			loadDefaultValues ();
-			registerForGraphicUpdate ();
 		}
 		public GraphicObject (Rectangle _bounds)
 		{
@@ -54,7 +53,6 @@ namespace Crow
 			
 			loadDefaultValues ();
 			Bounds = _bounds;
-			registerForGraphicUpdate ();
 		}
 		#endregion
 
