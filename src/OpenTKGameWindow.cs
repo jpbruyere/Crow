@@ -177,7 +177,15 @@ namespace Crow
 				GraphicObjects.RemoveAt (0);
 			}
 		}
-
+		public GraphicObject FindByName (string nameToFind)
+		{
+			foreach (GraphicObject w in GraphicObjects) {
+				GraphicObject r = w.FindByName (nameToFind);
+				if (r != null)
+					return r;
+			}
+			return null;
+		}
 		#region Events
 		//those events are raised only if mouse isn't in a graphic object
 		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
