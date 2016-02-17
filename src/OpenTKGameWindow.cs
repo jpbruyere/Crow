@@ -457,10 +457,18 @@ namespace Crow
 		#endregion
 
         #region Mouse Handling
-
+		void update_mouseButtonStates(ref MouseState e, OpenTK.Input.MouseState otk_e){
+			for (int i = 0; i < MouseState.MaxButtons; i++) {
+				if (otk_e.IsButtonDown ((OpenTK.Input.MouseButton)i))
+					e.EnableBit (i);
+			}
+		}
 		void Mouse_Move(object sender, OpenTK.Input.MouseMoveEventArgs otk_e)
         {
 			MouseMoveEventArgs e = new MouseMoveEventArgs (otk_e.X, otk_e.Y, otk_e.XDelta, otk_e.YDelta);
+			MouseState ms = e.Mouse;
+			update_mouseButtonStates (ref ms, otk_e.Mouse);
+			e.Mouse = ms;
 
 			if (_activeWidget != null) {
 				//first, ensure object is still in the graphic tree
@@ -533,6 +541,9 @@ namespace Crow
 		void Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
         {
 			MouseButtonEventArgs e = new MouseButtonEventArgs (otk_e.X, otk_e.Y, (Crow.MouseButton)otk_e.Button, otk_e.IsPressed);
+			MouseState ms = e.Mouse;
+			update_mouseButtonStates (ref ms, otk_e.Mouse);
+			e.Mouse = ms;
 
 			if (_activeWidget == null) {
 				MouseButtonUp.Raise (this, otk_e);
@@ -551,6 +562,9 @@ namespace Crow
 		void Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
 		{
 			MouseButtonEventArgs e = new MouseButtonEventArgs (otk_e.X, otk_e.Y, (Crow.MouseButton)otk_e.Button, otk_e.IsPressed);
+			MouseState ms = e.Mouse;
+			update_mouseButtonStates (ref ms, otk_e.Mouse);
+			e.Mouse = ms;
 
 			if (hoverWidget == null) {
 				MouseButtonDown.Raise (this, otk_e);
@@ -569,6 +583,9 @@ namespace Crow
 		void Mouse_WheelChanged(object sender, OpenTK.Input.MouseWheelEventArgs otk_e)
         {
 			MouseWheelEventArgs e = new MouseWheelEventArgs (otk_e.X, otk_e.Y, otk_e.Value, otk_e.Delta);
+			MouseState ms = e.Mouse;
+			update_mouseButtonStates (ref ms, otk_e.Mouse);
+			e.Mouse = ms;
 
 			if (hoverWidget == null) {
 				MouseWheelChanged.Raise (this, otk_e);
