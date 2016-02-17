@@ -370,8 +370,8 @@ namespace Crow
 			//gr.FontOptions.Antialias = Antialias.Subpixel;
 			//gr.FontOptions.HintMetrics = HintMetrics.On;
 
-			rText = new Rectangle(
-				measureRawSize(LayoutingType.Width), measureRawSize(LayoutingType.Height));
+			rText = new Rectangle(new Size(
+				measureRawSize(LayoutingType.Width), measureRawSize(LayoutingType.Height)));
 			rText.Width -= 2 * Margin;
 			rText.Height -= 2 * Margin;
 
