@@ -1,36 +1,9 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack Fit="true" Margin="10" Background="DimGray" >
-<!--	<Label Text="label1" Width="0" Height="0"/>
-	<Label Text="label2" Width="0" Height="0"/>-->
 	<CheckBox Background="Gray"/>
 	<CheckBox Background="Gray"/>
 	<CheckBox Background="Gray"/>
 	<CheckBox Background="Gray"/>
 	<CheckBox Background="Gray"/>
-<!--	<CheckBox Background="Gray"/>-->
-<!--	<HorizontalStack Fit="true" Margin="5" Background="Green">
-		<Label Background="Red"/>
-		<Label Background="Red"/>
-	</HorizontalStack>-->
-	<DummyTemplate Fit="true"/>
-	<DummyTemplate/>
-	<DummyTemplate/>
-	<DummyTemplate/>
-	<DummyTemplate/>
-	<DummyTemplate/>
-	<DummyTemplate Height="-1"/>
-<!--	<Label Margin="5" Background="Red"/>
-	<Label Background="Red"/>
-	<Container Width="100" Height="50" Margin="5" Background="Green">
-		<Label Width="0" Height="0" Background="Red"/>
-	</Container>
-
-	<Container Fit="true" Margin="5" Background="Green">
-		<Label Background="Red" Height="5"/>
-	</Container>
-	<HorizontalStack Margin="5" Background="Red" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
-		<Label Background="Green"/>
-		<Label Background="Green"/>
-	</HorizontalStack>-->
 </VerticalStack>
 
