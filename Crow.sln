@@ -41,7 +41,19 @@ Global
 		$0.DotNetNamingPolicy = $2
 		$2.DirectoryNamespaceAssociation = None
 		$2.ResourceNamePolicy = FileFormatDefault
+		$0.TextStylePolicy = $3
+		$3.FileWidth = 120
+		$3.TabsToSpaces = False
+		$3.EolMarker = Unix
+		$3.inheritsSet = VisualStudio
+		$3.inheritsScope = text/plain
+		$3.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $4
+		$4.AfterDelegateDeclarationParameterComma = True
+		$4.inheritsSet = Mono
+		$4.inheritsScope = text/x-csharp
+		$4.scope = text/x-csharp
 		description = @C.R.O.W. Collaborative Radiant Open Widgets\n\nA pure c# toolkit with XML definition of interface with binding and\ndynamic delegates
-		version = 0.3
+		version = 0.4
 	EndGlobalSection
 EndGlobal

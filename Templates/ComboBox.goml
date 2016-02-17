@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0"?>
-<Popper Name="popper" PopDirection="Bottom" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}">
+<Popper Name="popper" PopDirection="Bottom" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
 	<Template>
-		<Border CornerRadius="0" Foreground="LightGray" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}">
-			<HorizontalStack Margin="1" Spacing="1" Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}">
+		<Border CornerRadius="0" Foreground="LightGray" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
+			<HorizontalStack Margin="1" Spacing="1" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
 				<TextBox MinimumSize="80;10" Margin="1" Foreground="Black" Background="White"
 					Text="{../../../../SelectedItem}" Focusable="true"
-					Height="{../../../../TemplatedHeight}" Width="{../../../../TemplatedWidth}"/>
+					Height="{../../../../HeightPolicy}" Width="{../../../../WidthPolicy}"/>
 				<Button Width="14" Height="14" MouseClick="../../../onMouseClick"
 					Template="#Crow.Templates.ArrowButTemplate.crow">
 					<Image Margin="0"  Path="#Crow.Images.Icons.updown.svg" SvgSub="down"/>

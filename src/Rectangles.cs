@@ -171,11 +171,15 @@ namespace Crow
 		Rectangle _bounds;
 		bool boundsUpToDate = true;
 		public Rectangle Bounds {
-			get { 
+			get {
 				if (!boundsUpToDate) {
-					_bounds = Rectangle.Empty;
-					foreach (Rectangle rInList in list)
-						_bounds += rInList;
+					if (list.Count > 0) {
+						_bounds = list [0];
+						for (int i = 1; i < list.Count; i++) {
+							_bounds += list [i];
+						}
+					} else
+						_bounds = Rectangle.Empty;
 					boundsUpToDate = true;
 				}
 				return _bounds;

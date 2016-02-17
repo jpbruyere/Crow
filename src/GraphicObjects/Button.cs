@@ -18,12 +18,7 @@ namespace Crow
     {
 		#region CTOR
         public Button() : base()
-        {
-			//MouseEnter += delegate { Background = Color.RedDevil;};
-			//MouseLeave += delegate { Background = Color.Transparent;};
-//			MouseButtonDown += delegate { BackImgSub = "pressed"; registerForGraphicUpdate();};
-//			MouseButtonUp += delegate { BackImgSub = "normal";registerForGraphicUpdate();};
-		}
+        {}
 		#endregion
 
 		string caption;

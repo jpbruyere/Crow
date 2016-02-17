@@ -91,11 +91,35 @@ namespace Crow
 			return child == goToFind ? true : 
 				child == null ? false : child.Contains(goToFind);
 		}
-		protected override Size measureRawSize ()
-		{			
-			return child == null ? Bounds.Size : child.Slot.Size + 2 * Margin;
+		protected override int measureRawSize (LayoutingType lt)
+		{
+			if (child == null)
+				return base.measureRawSize (lt);
+			if (lt == LayoutingType.Width)
+				return child.RegisteredLayoutings.HasFlag(LayoutingType.Width) ?
+					-1 : child.Slot.Size.Width + 2 * Margin;
+			else
+				return child.RegisteredLayoutings.HasFlag(LayoutingType.Height) ?
+					-1 : child.Slot.Size.Height + 2 * Margin;			
 		}
-
+		public override bool UpdateLayout (LayoutingType layoutType)
+		{
+			if (child != null) {
+				//force sizing to fit if sizing on children and
+				//child has stretched size
+				switch (layoutType) {
+				case LayoutingType.Width:
+					if (Width < 0 && child.Width == 0)
+						child.Width = -1;
+					break;
+				case LayoutingType.Height:
+					if (Height < 0 && child.Height == 0)
+						child.Height = -1;
+					break;
+				}
+			}
+			return base.UpdateLayout (layoutType);
+		}
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
 			base.OnLayoutChanges (layoutType);
@@ -212,8 +236,8 @@ namespace Crow
 		{
 			base.checkHoverWidget (e);
 			if (child != null) 
-			if (child.MouseIsIn (e.Position)) 
-				child.checkHoverWidget (e);
+				if (child.MouseIsIn (e.Position)) 
+					child.checkHoverWidget (e);
 		}
 		#endregion
 

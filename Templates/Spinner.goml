@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="1" Height="{../TemplatedHeight}" Width="{../TemplatedWidth}"
+<Border BorderWidth="1" Height="{../HeightPolicy}" Width="{../WidthPolicy}"
 	Foreground="Gray"
 	Background="White">
-	<HorizontalStack Name="hstack" Margin="0" Spacing="2" Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}">
-		<Label Foreground="DimGray" Height="{../../../TemplatedHeight}" Width="{../../../TemplatedWidth}" 
+	<HorizontalStack Name="hstack" Margin="0" Spacing="2" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
+		<Label Foreground="DimGray" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}" 
 			Text="{../../../Value}" Margin="1" TextAlignment="Right"/>
-		<VerticalStack Width="-1" Height="{../../../TemplatedHeight}" Spacing="0" >
+		<VerticalStack Width="-1" Height="{../../../HeightPolicy}" Spacing="0" >
 			<Button MouseRepeat="true" Width="12" Height="8" MouseClick="../../../../onUp"
 				Template="#Crow.Templates.ArrowButTemplate.crow">
 				<Image Margin="1" Path="#Crow.Images.Icons.updown.svg" SvgSub="up"/>

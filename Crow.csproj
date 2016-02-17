@@ -23,7 +23,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ReleaseVersion>0.3</ReleaseVersion>
+    <ReleaseVersion>0.4</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -133,11 +133,15 @@
     <Compile Include="src\LayoutingEventArgs.cs" />
     <Compile Include="src\ScrollingEventArgs.cs" />
     <Compile Include="src\GraphicObjects\Trend.cs" />
+    <Compile Include="src\GraphicObjects\Splitter.cs" />
+    <Compile Include="src\GraphicObjects\TreeView.cs" />
+    <Compile Include="src\GraphicObjects\TabView.cs" />
+    <Compile Include="src\GraphicObjects\TabItem.cs" />
+    <Compile Include="src\GraphicObjects\DummyTemplate.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="glib-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <Package>glib-sharp-3.0</Package>
@@ -148,6 +152,7 @@
     </Reference>
     <Reference Include="Mono.Cairo" />
     <Reference Include="rsvg2-sharp, Version=2.18.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -222,6 +227,10 @@
     <EmbeddedResource Include="Images\crow0.svg">
       <LogicalName>Crow.image.crow0.svg</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Templates\TreeView.crow" />
+    <EmbeddedResource Include="Templates\TabItem.crow" />
+    <EmbeddedResource Include="Templates\TreeItem.crow" />
+    <EmbeddedResource Include="Templates\Dummy.goml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

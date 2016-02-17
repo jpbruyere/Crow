@@ -1,20 +1,6 @@
 ﻿using System;
-
-
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-//using OpenTK.Graphics.OpenGL;
-
-using Cairo;
-
-using winColors = System.Drawing.Color;
-using System.Diagnostics;
 using System.Xml.Serialization;
-using OpenTK.Input;
 using System.ComponentModel;
-using System.Xml;
-using System.IO;
 
 namespace Crow
 {

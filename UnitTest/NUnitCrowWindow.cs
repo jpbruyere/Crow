@@ -37,6 +37,9 @@ namespace Crow
 		List<GraphicObject> _gobjsToRedraw = new List<GraphicObject>();
 
 		#region IGOLibHost implementation
+		public XCursor MouseCursor {
+			set { throw new NotImplementedException ();}
+		}
 		public Rectangles clipping {
 			get {
 				return _redrawClip;

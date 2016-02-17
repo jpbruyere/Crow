@@ -1,3 +1,9 @@
 ﻿<?xml version="1.0"?>
-<CheckBox Width="-1" Height="-1" Caption="Checkbox" Background="DimGray" IsChecked="true"/>
+<VerticalStack Fit="true" Margin="10" Background="DimGray" >
+	<CheckBox Background="Gray"/>
+	<CheckBox Background="Gray"/>
+	<CheckBox Background="Gray"/>
+	<CheckBox Background="Gray"/>
+	<CheckBox Background="Gray"/>
+</VerticalStack>
 

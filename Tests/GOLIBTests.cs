@@ -37,6 +37,14 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"testCheckbox.goml",
+			"testTabView.crow",
+			"testExpandable.goml",
+			"0.crow",
+			"testImage.crow",
+			"testOutOfClipUpdate.crow",
+			"test_Listbox.goml",
+			"testTreeView.crow",
 			"1.crow",
 			"testWindow.goml",
 			"clip4.crow",
@@ -44,33 +52,28 @@ namespace test
 			"clip2.crow",
 			"clip0.crow",
 			"clip1.crow",
-			"0.crow",
 			"5.crow",
 			"testCombobox.goml",
 			"testPopper.goml",
 			"testTextBox.crow",
 			"testColorList.crow",
 
-			"testExpandable.goml",
 			"4.crow",
 			"testSpinner.goml",
 			"testScrollbar.goml",
 			"testGroupBox.goml",
 			"testGrid.goml",
-			"test_Listbox.goml",
 			"testButton.crow",
 			"testBorder.goml",
 //			"testButton2.crow",
 			"test2WayBinding.crow",
 			"fps.goml",
-			"testImage.crow",
 			"test4.goml",
 			"2.crow",
 			"test1.goml",
 			"testWindow2.goml",
 
 			"testWindow3.goml",
-			"testCheckbox.goml",
 			"testLabel.goml",
 			"testAll.goml",
 //			"testSpinner.goml",
@@ -149,6 +152,24 @@ namespace test
 				return;
 			NotifyValueChanged ("alignment", Enum.Parse(typeof(Alignment), rb.Caption));
 		}
+		public IList<String> List2 = new List<string>(new string[]
+			{
+				"string1",
+				"string2",
+				"string3",
+				"string4",
+				"string5",
+				"string6",
+				"string7",
+				"string8",
+				"string8",
+				"string8",
+				"string8",
+				"string8",
+				"string8",
+				"string9"
+			}
+		);
 		IList<Color> testList = Color.ColorDic.ToList();
 		public IList<Color> TestList {
 			set{
@@ -218,7 +239,13 @@ namespace test
 		{
 			Console.WriteLine ("button clicked:" + send.ToString());
 		}
-
+		void onAddTabButClick(object sender, MouseButtonEventArgs e){
+			
+			TabView tv = this.FindByName("tabview1") as TabView;
+			if (tv == null)
+				return;
+			tv.AddChild (new TabItem () { Caption = "NewTab" });
+		}
 		[STAThread]
 		static void Main ()
 		{

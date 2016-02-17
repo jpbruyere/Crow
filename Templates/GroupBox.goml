@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0"?>
-<Group Height="{../TemplatedHeight}" Width="{../TemplatedWidth}">
+<Group Height="{../HeightPolicy}" Width="{../WidthPolicy}">
 	<Border CornerRadius="5" BorderWidth="1" Margin="6" Foreground="{../../Foreground}"
-		Height="{../../TemplatedHeight}" Width="{../../TemplatedWidth}">
+		Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
 		<Container Name="Content" Margin="10"
-				Height="{../../../TemplatedHeight}" Width="{../../../TemplatedWidth}"/>
+				Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}"/>
 	</Border>
 	<Label Text="{../../Caption}" VerticalAlignment="Top" Left="15"
 		Background="Clear" Margin="1"/>

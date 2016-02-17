@@ -94,12 +94,15 @@ namespace Crow
 		#endregion
 
 		#region GraphicObject overrides
-		protected override Size measureRawSize ()
+		protected override int measureRawSize (LayoutingType lt)
 		{
 			if (_pic == null)
 				_pic = "#Crow.Images.Icons.IconAlerte.svg";
-
-			return _pic.Dimensions + Margin * 2;
+			//TODO:take scalling in account
+			if (lt == LayoutingType.Width)
+				return _pic.Dimensions.Width + 2 * Margin;
+			else
+				return _pic.Dimensions.Height + 2 * Margin;			
 		}
 		protected override void onDraw (Context gr)
 		{

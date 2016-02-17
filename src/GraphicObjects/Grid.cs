@@ -32,13 +32,13 @@ namespace Crow
 		public override T AddChild<T> (T child)
 		{
 			T tmp = base.AddChild (child);
-			this.RegisterForLayouting (LayoutingType.PositionChildren);
+			this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 			return tmp;
 		}
 		public override void RemoveChild (GraphicObject child)
 		{
 			base.RemoveChild (child);
-			this.RegisterForLayouting (LayoutingType.PositionChildren);
+			this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 		}
 
 		#region Public Properties
@@ -59,7 +59,7 @@ namespace Crow
 				_columnCount = value; 
 
 				NotifyValueChanged ("ColumnCount", ColumnCount);
-				this.RegisterForLayouting (LayoutingType.PositionChildren);
+				this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 			}
         }
 		[XmlAttributeAttribute()][DefaultValue(1)]
@@ -73,7 +73,7 @@ namespace Crow
 				_rowCount = value; 
 
 				NotifyValueChanged ("RowCount", RowCount);
-				this.RegisterForLayouting (LayoutingType.PositionChildren);
+				this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 			}
 		}
 		public virtual int CaseWidth {
@@ -130,7 +130,7 @@ namespace Crow
 		{
 			RegisteredLayoutings &= (~layoutType);
 
-			if (layoutType == LayoutingType.PositionChildren) {				
+			if (layoutType == LayoutingType.ArrangeChildren) {				
 
 				ComputeChildrenPositions ();
 

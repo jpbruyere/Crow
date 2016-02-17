@@ -23,7 +23,7 @@
         </Command>
       </CustomCommands>
     </CustomCommands>
-    <ReleaseVersion>0.3</ReleaseVersion>
+    <ReleaseVersion>0.4</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

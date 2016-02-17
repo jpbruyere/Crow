@@ -319,13 +319,11 @@ namespace Crow
 			set { base.Height = value; }
 		}
 
-		protected override Size measureRawSize()
-        {
-			Size size;
-
+		protected override int measureRawSize(LayoutingType lt)
+        {			
 			if (lines == null)
 				lines = getLines;
-				
+								
 			using (ImageSurface img = new ImageSurface (Format.Argb32, 10, 10)) {
 				using (Context gr = new Context (img)) {
 					//Cairo.FontFace cf = gr.GetContextFontFace ();
@@ -333,7 +331,18 @@ namespace Crow
 					gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
 					gr.SetFontSize (Font.Size);
 
+
+					fe = gr.FontExtents;
 					te = new TextExtents();
+
+					if (lt == LayoutingType.Height){
+						int lc = lines.Count;
+						//ensure minimal height = text line height
+						if (lc == 0)
+							lc = 1; 
+						
+						return (int)(fe.Height * lc) + Margin * 2;
+					}
 
 					foreach (string s in lines) {
 						string l = s.Replace("\t", new String (' ', Interface.TabSize));
@@ -346,16 +355,9 @@ namespace Crow
 						if (tmp.XAdvance > te.XAdvance)
 							te = tmp;
 					}
-					fe = gr.FontExtents;
-					int lc = lines.Count;
-					//ensure minimal height = text line height
-					if (lc == 0)
-						lc = 1; 
-					size = new Size ((int)Math.Ceiling (te.XAdvance) + Margin * 2, (int)(fe.Height * lc) + Margin*2);
+					return (int)Math.Ceiling (te.XAdvance) + Margin * 2;
 				}
 			}
-
-            return size;;
         }
 		protected override void onDraw (Context gr)
 		{
@@ -368,7 +370,8 @@ namespace Crow
 			//gr.FontOptions.Antialias = Antialias.Subpixel;
 			//gr.FontOptions.HintMetrics = HintMetrics.On;
 
-			rText = new Rectangle(measureRawSize());
+			rText = new Rectangle(new Size(
+				measureRawSize(LayoutingType.Width), measureRawSize(LayoutingType.Height)));
 			rText.Width -= 2 * Margin;
 			rText.Height -= 2 * Margin;
 

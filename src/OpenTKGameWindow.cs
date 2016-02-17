@@ -1,8 +1,26 @@
-// Released to the public domain. Use, modify and relicense at will.
+//
+//  OpenTKGameWindow.cs
+//
+//  Author:
+//       Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+//
+//  Copyright (c) 2016 jp
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -11,8 +29,6 @@ using Cairo;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
-
-
 
 namespace Crow
 {
@@ -144,13 +160,23 @@ namespace Crow
 		{
 			int i = 0;
 			while (GraphicObjects.Count>0) {
+				//TODO:parent is not reset to null because object will be added
+				//to ObjectToRedraw list, and without parent, it fails
 				GraphicObject g = GraphicObjects [i];
 				g.Visible = false;
 				g.ClearBinding ();
 				GraphicObjects.RemoveAt (0);
 			}
 		}
-
+		public GraphicObject FindByName (string nameToFind)
+		{
+			foreach (GraphicObject w in GraphicObjects) {
+				GraphicObject r = w.FindByName (nameToFind);
+				if (r != null)
+					return r;
+			}
+			return null;
+		}
 		#region Events
 		//those events are raised only if mouse isn't in a graphic object
 		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
@@ -217,10 +243,18 @@ namespace Crow
 
 			shader.Enable ();
 
-			GL.TexSubImage2D (TextureTarget.Texture2D, 0,
-				0, 0, ClientRectangle.Width, ClientRectangle.Height,
-				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp);
-
+			if (isDirty) {
+				byte[] tmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
+				for (int y = 0; y < DirtyRect.Height; y++) {
+					Array.Copy(bmp,
+						((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
+						tmp, y * DirtyRect.Width * 4, DirtyRect.Width *4);
+				}
+				GL.TexSubImage2D (TextureTarget.Texture2D, 0,
+					DirtyRect.Left, DirtyRect.Top, DirtyRect.Width, DirtyRect.Height,
+					OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, tmp);
+				isDirty = false;
+			}
 			uiQuad.Render (PrimitiveType.TriangleStrip);
 
 			GL.BindTexture(TextureTarget.Texture2D, 0);
@@ -236,6 +270,9 @@ namespace Crow
 		public Stopwatch guTime = new Stopwatch ();
 		public Stopwatch drawingTime = new Stopwatch ();
 		#endif
+
+		bool isDirty = false;
+		Rectangle DirtyRect;
 
 		#region update
 		void update ()
@@ -302,7 +339,6 @@ namespace Crow
 								continue;
 							if (!clipping.intersect (p.Slot))
 								continue;
-
 							ctx.Save ();
 
 							p.Paint (ref ctx);
@@ -313,6 +349,17 @@ namespace Crow
 						#if DEBUG_CLIP_RECTANGLE
 						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
 						#endif
+
+						if (isDirty)
+							DirtyRect += clipping.Bounds;
+						else
+							DirtyRect = clipping.Bounds;
+						isDirty = true;
+
+						DirtyRect.Left = Math.Max (0, DirtyRect.Left);
+						DirtyRect.Top = Math.Max (0, DirtyRect.Top);
+						DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
+						DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
 
 						clipping.Reset ();
 					}
@@ -404,10 +451,8 @@ namespace Crow
 		{
 			base.OnResize (e);
 			createContext ();
-			foreach (GraphicObject g in GraphicObjects) {
+			foreach (GraphicObject g in GraphicObjects)
 				g.RegisterForLayouting (LayoutingType.All);
-				//g.registerForGraphicUpdate();
-			}
 		}
 		#endregion
 
@@ -551,6 +596,7 @@ namespace Crow
 		public void RegisterClip(Rectangle r){
 			clipping.AddRectangle (r);
 		}
+		public bool ArrangeChildren { get { return false; }}
 		public int LayoutingTries {
 			get { throw new NotImplementedException (); }
 			set { throw new NotImplementedException (); }

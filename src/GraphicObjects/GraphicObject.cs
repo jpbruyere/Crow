@@ -1,23 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-//using OpenTK.Graphics.OpenGL;
-using System.Drawing.Imaging;
-using System.Diagnostics;
-using OpenTK.Input;
-
-using Cairo;
-
-using System.Xml.Serialization;
-using System.Reflection;
 using System.ComponentModel;
-using System.IO;
-//using System.Xml;
-using System.Xml;
-using System.Runtime.CompilerServices;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
+using System.Xml.Serialization;
+using Cairo;
+using OpenTK.Input;
 
 namespace Crow
 {		
@@ -54,7 +45,6 @@ namespace Crow
 				return;
 
 			loadDefaultValues ();
-			registerForGraphicUpdate ();
 		}
 		public GraphicObject (Rectangle _bounds)
 		{
@@ -63,7 +53,6 @@ namespace Crow
 			
 			loadDefaultValues ();
 			Bounds = _bounds;
-			registerForGraphicUpdate ();
 		}
 		#endregion
 
@@ -249,6 +238,8 @@ namespace Crow
 
 				Bounds.Width = value;
 				NotifyValueChanged ("Width", Bounds.Width);
+				NotifyValueChanged ("WidthPolicy", WidthPolicy);
+
 				this.RegisterForLayouting (LayoutingType.Width);
 			}
 		}
@@ -261,17 +252,22 @@ namespace Crow
 
 				Bounds.Height = value;
 				NotifyValueChanged ("Height", Bounds.Height);
+				NotifyValueChanged ("HeightPolicy", HeightPolicy);
+
 				this.RegisterForLayouting (LayoutingType.Height);
 			}
 		}
+		[XmlIgnore]public virtual int WidthPolicy { get { return Width < 1 ? Width : 0; } }
+		[XmlIgnore]public virtual int HeightPolicy { get { return Height < 1 ? Height : 0; } }
+
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool Fit {
-			get { return Bounds.Width < 0 && Bounds.Height < 0 ? true : false; }
+			get { return Width < 0 && Height < 0 ? true : false; }
 			set {
 				if (value == Fit)
 					return;
 
-				Bounds.Width = Bounds.Height = -1;
+				Width = Height = -1;
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
@@ -385,12 +381,14 @@ namespace Crow
 				if (!_isVisible && this.Contains (HostContainer.hoverWidget))
 					HostContainer.hoverWidget = null;
 
+				if (Parent is GraphicObject)
+					Parent.RegisterForLayouting (LayoutingType.Sizing);
 				if (Parent is GenericStack)
-					Parent.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.PositionChildren);
-
+					Parent.RegisterForLayouting (LayoutingType.ArrangeChildren);
 				RegisterForLayouting (LayoutingType.Sizing);
 
 				RegisterForRedraw ();
+
 				NotifyValueChanged ("Visible", _isVisible);
 			}
 		}
@@ -426,7 +424,7 @@ namespace Crow
 
 		/// <summary> Loads the default values from XML attributes default </summary>
 		protected virtual void loadDefaultValues()
-		{
+		{			
 			Type thisType = this.GetType ();
 			if (Interface.DefaultValuesLoader.ContainsKey(thisType.FullName)) {
 				Interface.DefaultValuesLoader[thisType.FullName] (this);
@@ -451,20 +449,19 @@ namespace Crow
 
 			il.Emit(OpCodes.Nop);
 
+			StyleAttribute[] style = thisType.GetCustomAttributes().OfType<StyleAttribute>().ToArray();
+
 			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
 				string name = "";
+				object defaultValue = null;
 
 				#region retrieve custom attributes
 				if (pi.GetSetMethod () == null)
 					continue;
+
 				XmlIgnoreAttribute xia = (XmlIgnoreAttribute)pi.GetCustomAttribute (typeof(XmlIgnoreAttribute));
 				if (xia != null)
-					continue;
-				DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof(DefaultValueAttribute));
-				if (dv == null)
-					continue;
-				object defaultValue = dv.Value;
-
+					continue;					
 				XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
 				if (xaa != null) {
 					if (string.IsNullOrEmpty (xaa.AttributeName))
@@ -472,6 +469,16 @@ namespace Crow
 					else
 						name = xaa.AttributeName;
 				}
+
+				StyleAttribute piStyle = style.Where(s => s.PropertyName == pi.Name).FirstOrDefault();
+				if (piStyle != null){
+					defaultValue = piStyle.DefaultValue;
+				}else{
+					DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof(DefaultValueAttribute));
+					if (dv == null)
+						continue;
+					defaultValue = dv.Value;
+				}				
 				#endregion
 
 				il.Emit (OpCodes.Ldarg_0);
@@ -618,12 +625,15 @@ namespace Crow
 			get { return layoutingTries; }
 			set { layoutingTries = value; }
 		}
-
 		/// <summary> return size of content + margins </summary>
-		protected virtual Size measureRawSize () {
-			return Bounds.Size;
+		protected virtual int measureRawSize (LayoutingType lt) {
+			return lt == LayoutingType.Width ? Bounds.Size.Width : Bounds.Size.Height;
 		}
+		/// <summary> By default in groups, LayoutingType.ArrangeChildren is reset </summary>
+		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){
 			
+		}
+		public virtual bool ArrangeChildren { get { return false; } }
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
 			if (Parent == null)
 				return;
@@ -633,15 +643,12 @@ namespace Crow
 			if (Height == 0)
 				layoutType &= (~LayoutingType.Y);
 
-			//Prevent child repositionning in a stack
-			//TODO:this should be done inside GenericStack
-			GenericStack gs = Parent as GenericStack;
-			if (gs != null) {
-				if (gs.Orientation == Orientation.Horizontal)
-					layoutType &= (~LayoutingType.X);
-				else
-					layoutType &= (~LayoutingType.Y);
-			}
+			if (!ArrangeChildren)
+				layoutType &= (~LayoutingType.ArrangeChildren);
+			
+			//apply constraints depending on parent type
+			if (Parent is GraphicObject)
+				(Parent as GraphicObject).ChildrenLayoutingConstraints (ref layoutType);
 
 			//prevent queueing same LayoutingType for this
 			layoutType &= (~RegisteredLayoutings);
@@ -650,7 +657,7 @@ namespace Crow
 				return;
 
 			#if DEBUG_LAYOUTING
-			Debug.WriteLine ("RegisterForLayouting => {1}->{0}", layoutType, this.ToString());
+			Debug.WriteLine ("REGLayout => {1}->{0}", layoutType, this.ToString());
 			#endif
 
 			//enqueue LQI LayoutingTypes separately
@@ -662,15 +669,15 @@ namespace Crow
 				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
 			if (layoutType.HasFlag (LayoutingType.Y))
 				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
-			if (layoutType.HasFlag (LayoutingType.PositionChildren))
-				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.PositionChildren, this));
+			if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
+				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
 		}
 
 		/// <summary> trigger dependant sizing component update </summary>
 		public virtual void OnLayoutChanges(LayoutingType  layoutType)
 		{
 			#if DEBUG_LAYOUTING
-			Debug.WriteLine ("Layout change: " + this.ToString () + ":" + LastSlots.ToString() + "=>" + Slot.ToString ());
+			Debug.WriteLine ("\t    " + LastSlots.ToString() + "\n\t => " + Slot.ToString ());
 			#endif
 
 			switch (layoutType) {
@@ -697,7 +704,8 @@ namespace Crow
 			case LayoutingType.X:
 				if (Bounds.X == 0) {
 
-					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width) ||
+						RegisteredLayoutings.HasFlag (LayoutingType.Width))
 						return false;
 					
 					switch (HorizontalAlignment) {
@@ -726,7 +734,8 @@ namespace Crow
 			case LayoutingType.Y:
 				if (Bounds.Y == 0) {
 
-					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height))
+					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height) || 
+						RegisteredLayoutings.HasFlag (LayoutingType.Height))
 						return false;
 					
 					switch (VerticalAlignment) {
@@ -753,16 +762,14 @@ namespace Crow
 				LastSlots.Y = Slot.Y;
 				break;
 			case LayoutingType.Width:
-				//force sizing to fit if parent is sizing on children and
-				//this object has stretched size
-				if (Parent.getBounds ().Width < 0 && Width == 0)
-					Width = -1;
-
 				if (Width > 0)
 					Slot.Width = Width;
-				else if (Width < 0)
-					Slot.Width = measureRawSize ().Width;
-				else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+				else if (Width < 0) {
+					int tmp = measureRawSize (LayoutingType.Width);
+					if (tmp < 0)
+						return false;
+					Slot.Width = tmp;
+				}else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
 					return false;
 				else
 					Slot.Width = Parent.ClientRectangle.Width;
@@ -783,15 +790,14 @@ namespace Crow
 				LastSlots.Width = Slot.Width;
 				break;
 			case LayoutingType.Height:
-				//force sizing to fit if parent is sizing on children
-				if (Parent.getBounds ().Height < 0 && Height == 0)
-					Height = -1;
-
 				if (Height > 0)
 					Slot.Height = Height;
-				else if (Height < 0)
-					Slot.Height = measureRawSize ().Height;
-				else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height))
+				else if (Height < 0){
+					int tmp = measureRawSize (LayoutingType.Height);
+					if (tmp < 0)
+						return false;
+					Slot.Height = tmp;
+				}else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height))
 					return false;
 				else
 					Slot.Height = Parent.ClientRectangle.Height;
@@ -915,8 +921,11 @@ namespace Crow
 				return false;
 			if (ScreenCoordinates (Slot).ContainsOrIsEqual (m)) {
 				Scroller scr = Parent as Scroller;
-				if (scr == null)
-					return true;
+				if (scr == null) {
+					if (Parent is GraphicObject)
+						return (Parent as GraphicObject).MouseIsIn (m);
+					else return true;
+				}
 				return scr.MouseIsIn (scr.savedMousePos);
 			}
 			return false; 
@@ -1013,11 +1022,11 @@ namespace Crow
 		#region Binding
 		public virtual void ResolveBindings()
 		{
+			if (Bindings.Count == 0)
+				return;
 			#if DEBUG_BINDING
 			Debug.WriteLine ("ResolveBinding => " + this.ToString ());
 			#endif
-			if (Bindings.Count == 0)
-				return;
 			Dictionary<object,List<Binding>> resolved = new Dictionary<object, List<Binding>>();
 			foreach (Binding b in Bindings) {
 				if (b.Resolved)
@@ -1028,12 +1037,14 @@ namespace Crow
 						continue;
 					}
 				}
-				if (!b.FindTarget ())
+				if (!b.FindTarget ()) {
+					Debug.WriteLine ("BINDING ERROR: target not found => " + b.ToString());
 					continue;
+				}
 				if (b.Source.Member.MemberType == MemberTypes.Event) {
 					//register handler for event
 					if (b.Target.Method == null) {
-						Debug.WriteLine ("Handler Method not found: " + b.Expression);
+						Debug.WriteLine ("Handler Method not found: " + b.ToString());
 						continue;
 					}
 
@@ -1041,6 +1052,9 @@ namespace Crow
 					Delegate del = Delegate.CreateDelegate (b.Source.Event.EventHandlerType, b.Target.Instance, b.Target.Method);
 					addHandler.Invoke (this, new object[] { del });
 					b.Resolved = true;
+					#if DEBUG_BINDING
+					Debug.WriteLine ("\tHandler binded => " + b.ToString());
+					#endif
 					continue;
 				}
 				List<Binding> bindings = null;
@@ -1050,6 +1064,9 @@ namespace Crow
 				}
 				bindings.Add (b);
 				b.Resolved = true;
+				#if DEBUG_BINDING
+				Debug.WriteLine ("\tmarked as resolved => " + b.ToString());
+				#endif
 			}
 
 			MethodInfo stringEquals = typeof(string).GetMethod
@@ -1336,6 +1353,9 @@ namespace Crow
 			addHandler.Invoke(this, new object[] {del});
 
 			binding.Resolved = true;
+			#if DEBUG_BINDING
+			Debug.WriteLine ("\tCompiled Event Source => " + binding.ToString());
+			#endif
 		}
 		/// <summary>
 		/// Remove dynamic delegates by ids from dataSource

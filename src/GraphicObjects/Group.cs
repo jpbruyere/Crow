@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Drawing;
-using System.Diagnostics;
-using Cairo;
-using System.Xml.Serialization;
 using System.ComponentModel;
+using System.Xml.Serialization;
+using Cairo;
+using OpenTK.Input;
+
 
 namespace Crow
 {
@@ -45,9 +43,9 @@ namespace Crow
         public virtual T AddChild<T>(T child)
         {
 			GraphicObject g = child as GraphicObject;
-            children.Add(g);
+            Children.Add(g);
             g.Parent = this as GraphicObject;            
-			g.RegisterForLayouting (LayoutingType.Sizing);
+			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 			g.LayoutChanged += OnChildLayoutChanges;
             return (T)child;
         }
@@ -55,36 +53,46 @@ namespace Crow
 		{
 			child.LayoutChanged -= OnChildLayoutChanges;
 			child.ClearBinding ();
-			child.Parent = null;
-            children.Remove(child);
-			this.RegisterForLayouting (LayoutingType.Sizing);
+			//child.Parent = null;
+            Children.Remove(child);
+
+			if (child == largestChild)
+				searchLargestChild ();
+			if (child == tallestChild)
+				searchTallestChild ();
+			
+			this.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
         }
 		public virtual void ClearChildren()
 		{
-			while(children.Count > 0){
-				GraphicObject g = children[children.Count-1];
+			while(Children.Count > 0){
+				GraphicObject g = Children[Children.Count-1];
 				g.LayoutChanged -= OnChildLayoutChanges;
 				g.ClearBinding ();
 				g.Parent = null;
-				children.RemoveAt(children.Count-1);
+				Children.RemoveAt(Children.Count-1);
 			}
+
+			resetChildrenMaxSize ();
+
 			this.RegisterForLayouting (LayoutingType.Sizing);
 			ChildrenCleared.Raise (this, new EventArgs ());
 		}
+
 		public void putWidgetOnTop(GraphicObject w)
 		{
-			if (children.Contains(w))
+			if (Children.Contains(w))
 			{
-				children.Remove(w);
-				children.Add(w);
+				Children.Remove(w);
+				Children.Add(w);
 			}
 		}
 		public void putWidgetOnBottom(GraphicObject w)
 		{
-			if (children.Contains(w))
+			if (Children.Contains(w))
 			{
-				children.Remove(w);
-				children.Insert(0, w);
+				Children.Remove(w);
+				Children.Insert(0, w);
 			}
 		}
 
@@ -92,7 +100,7 @@ namespace Crow
 		public override void ResolveBindings ()
 		{
 			base.ResolveBindings ();
-			foreach (GraphicObject w in children)
+			foreach (GraphicObject w in Children)
 				w.ResolveBindings ();
 		}
 		public override GraphicObject FindByName (string nameToFind)
@@ -100,7 +108,7 @@ namespace Crow
 			if (Name == nameToFind)
 				return this;
 
-			foreach (GraphicObject w in children) {
+			foreach (GraphicObject w in Children) {
 				GraphicObject r = w.FindByName (nameToFind);
 				if (r != null)
 					return r;
@@ -109,7 +117,7 @@ namespace Crow
 		}
 		public override bool Contains (GraphicObject goToFind)
 		{
-			foreach (GraphicObject w in children) {
+			foreach (GraphicObject w in Children) {
 				if (w == goToFind)
 					return true;
 				if (w.Contains (goToFind))
@@ -117,9 +125,30 @@ namespace Crow
 			}
 			return false;
 		}
-		protected override Size measureRawSize ()
+		protected override int measureRawSize (LayoutingType lt)
 		{
-			return new Size(maxChildrenWidth + 2 * Margin, maxChildrenHeight + 2 * Margin);
+			if (Children.Count == 0)
+				return base.measureRawSize (lt);
+			
+			if (lt == LayoutingType.Width) {
+				if (largestChild == null)
+					searchLargestChild ();
+				if (largestChild == null){
+					//if still null, not possible to determine a width
+					//because all children are stretched, force first one to fit
+					Children[0].Width = -1;
+					return -1;//cancel actual sizing to let child computation take place
+				}
+				return maxChildrenWidth + 2 * Margin;
+			}else{
+				if (tallestChild == null)
+					searchTallestChild ();
+				if (tallestChild == null) {
+					Children[0].Height = -1;
+					return -1;
+				}
+				return maxChildrenHeight + 2 * Margin;
+			}
 		}
 			
 		public override void OnLayoutChanges (LayoutingType layoutType)
@@ -129,14 +158,14 @@ namespace Crow
 			//position smaller objects in group when group size is fit
 			switch (layoutType) {
 			case LayoutingType.Width:
-				foreach (GraphicObject c in children) {
+				foreach (GraphicObject c in Children) {
 					if (!c.Visible)
 						continue;					
 					c.RegisterForLayouting (LayoutingType.X | LayoutingType.Width);
 				}
 				break;
 			case LayoutingType.Height:
-				foreach (GraphicObject c in children) {
+				foreach (GraphicObject c in Children) {
 					if (!c.Visible)
 						continue;
 					c.RegisterForLayouting (LayoutingType.Y | LayoutingType.Height);				}
@@ -147,10 +176,6 @@ namespace Crow
 		{
 			GraphicObject g = sender as GraphicObject;
 			switch (arg.LayoutType) {
-			case LayoutingType.X:
-				break;
-			case LayoutingType.Y:
-				break;
 			case LayoutingType.Width:
 				if (g.Slot.Width > maxChildrenWidth) {
 					maxChildrenWidth = g.Slot.Width;
@@ -158,15 +183,10 @@ namespace Crow
 					if (this.Bounds.Width < 0)
 						this.RegisterForLayouting (LayoutingType.Width);
 				} else if (g == largestChild) {
-					//search for the new largest child
+
 					largestChild = null;
 					maxChildrenWidth = 0;
-					for (int i = 0; i < children.Count; i++) {
-						if (children [i].Slot.Width > maxChildrenWidth) {
-							maxChildrenWidth = children [i].Slot.Width;
-							largestChild = children [i];
-						}
-					}
+
 					if (this.Bounds.Width < 0)
 						this.RegisterForLayouting (LayoutingType.Width);
 				}
@@ -178,19 +198,50 @@ namespace Crow
 					if (this.Bounds.Height < 0)
 						this.RegisterForLayouting (LayoutingType.Height);
 				} else if (g == tallestChild) {
-					//search for the new tallest child
+
 					tallestChild = null;
 					maxChildrenHeight = 0;
-					for (int i = 0; i < children.Count; i++) {
-						if (children [i].Slot.Height > maxChildrenHeight) {
-							maxChildrenHeight = children [i].Slot.Height;
-							tallestChild = children [i];
-						}
-					}
+
 					if (this.Bounds.Height < 0)
 						this.RegisterForLayouting (LayoutingType.Height);
 				}
 				break;
+			}
+		}
+
+		//TODO: x,y position should be taken in account for computation of width and height
+		void resetChildrenMaxSize(){
+			largestChild = null;
+			tallestChild = null;
+			maxChildrenWidth = 0;
+			maxChildrenHeight = 0;
+		}
+		void searchLargestChild(){
+			largestChild = null;
+			maxChildrenWidth = 0;
+			for (int i = 0; i < Children.Count; i++) {
+				if (!Children [i].Visible)
+					continue;
+				if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
+					continue;
+				if (Children [i].Slot.Width > maxChildrenWidth) {
+					maxChildrenWidth = Children [i].Slot.Width;
+					largestChild = Children [i];
+				}
+			}
+		}
+		void searchTallestChild(){
+			tallestChild = null;
+			maxChildrenHeight = 0;
+			for (int i = 0; i < Children.Count; i++) {
+				if (!Children [i].Visible)
+					continue;
+				if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
+					continue;
+				if (Children [i].Slot.Height > maxChildrenHeight) {
+					maxChildrenHeight = Children [i].Slot.Height;
+					tallestChild = Children [i];
+				}
 			}
 		}
 
@@ -203,7 +254,7 @@ namespace Crow
 			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
 			gr.Clip ();
 
-			foreach (GraphicObject g in children) {
+			foreach (GraphicObject g in Children) {
 				g.Paint (ref gr);
 			}
 			gr.Restore ();
@@ -223,7 +274,7 @@ namespace Crow
 					CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
 					gr.Clip ();
 
-					foreach (GraphicObject c in children) {
+					foreach (GraphicObject c in Children) {
 						if (!c.Visible)
 							continue;
 						if (Clipping.intersect(c.Slot + ClientRectangle.Position))
@@ -245,23 +296,23 @@ namespace Crow
 
 	
 		#region Mouse handling
-		public override void checkHoverWidget (OpenTK.Input.MouseMoveEventArgs e)
+		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
 			if (HostContainer.hoverWidget != this) {
 				HostContainer.hoverWidget = this;
 				onMouseEnter (this, e);
 			}
-			foreach (GraphicObject g in children)
-			{
-				if (g.MouseIsIn(e.Position))
+			for (int i = Children.Count - 1; i >= 0; i--) {
+				if (Children[i].MouseIsIn(e.Position))
 				{
-					g.checkHoverWidget (e);
+					Children[i].checkHoverWidget (e);
 					return;
 				}
 			}
 			base.checkHoverWidget (e);
 		}
 		#endregion
+
 
 		#region IXmlSerializable
 
@@ -297,7 +348,7 @@ namespace Crow
         {
             base.WriteXml(writer);
 
-            foreach (GraphicObject go in children)
+            foreach (GraphicObject go in Children)
             {
                 writer.WriteStartElement(go.GetType().Name);
                 (go as IXmlSerializable).WriteXml(writer);
@@ -308,7 +359,7 @@ namespace Crow
 		#endregion
 
 		public override void ClearBinding(){
-			foreach (GraphicObject c in children)
+			foreach (GraphicObject c in Children)
 				c.ClearBinding ();
 			base.ClearBinding ();
 		}

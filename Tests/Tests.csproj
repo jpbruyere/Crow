@@ -13,7 +13,7 @@
     <OutputPath>..\bin\$(configuration)</OutputPath>
     <IntermediateOutputPath>obj\$(configuration)</IntermediateOutputPath>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ReleaseVersion>0.3</ReleaseVersion>
+    <ReleaseVersion>0.4</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <OutputPath>..\bin\Debug</OutputPath>
@@ -236,6 +236,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Interfaces\clip4.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\testTreeView.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\testOutOfClipUpdate.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\testTabView.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

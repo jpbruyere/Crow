@@ -1,13 +1,30 @@
-﻿using System;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Drawing;
-using Cairo;
+﻿//
+//  Scroller.cs
+//
+//  Author:
+//       Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+//
+//  Copyright (c) 2016 jp
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+using System;
 using System.Xml.Serialization;
-using OpenTK.Input;
 using System.ComponentModel;
+using System.Diagnostics;
+using Cairo;
+using OpenTK.Input;
 
 namespace Crow
 {
@@ -94,7 +111,6 @@ namespace Crow
 			}
 		}
 		#endregion
-
 
         public Scroller()
             : base(){}
@@ -192,14 +208,6 @@ namespace Crow
 		{
 			return base.ScreenCoordinates (r) - new Point((int)ScrollX,(int)ScrollY);
 		}
-//		protected override void onDraw (Context gr)
-//		{
-//			gr.Save ();
-//			//gr.ResetClip ();
-//
-//			base.onDraw (gr);
-//			gr.Restore ();
-//		}
 		protected override void onDraw (Context gr)
 		{
 			Rectangle rBack = new Rectangle (Slot.Size);
@@ -218,20 +226,5 @@ namespace Crow
 				child.Paint (ref gr);
 			gr.Restore ();
 		}
-
-//		public override void Paint (ref Context ctx)
-//		{
-//			ctx.Save ();
-//			//ctx.ResetClip ();
-//			ctx.Translate (-ScrollX, -ScrollY);
-//			base.Paint (ref ctx);
-//			ctx.Restore ();
-//		}
-//		public override void registerClipRect ()
-//		{
-//			HostContainer.redrawClip.AddRectangle (base.ScreenCoordinates(Slot));
-//		}
-
-
     }
 }

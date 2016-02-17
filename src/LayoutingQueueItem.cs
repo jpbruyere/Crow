@@ -32,8 +32,7 @@ namespace Crow
 		Width = 0x04,
 		Height = 0x08,
 		Sizing = 0x0C,
-		PositionChildren = 0x10,
-		ChildAddition = 0x20,
+		ArrangeChildren = 0x10,
 		All = 0xFF
 	}
 
@@ -57,18 +56,20 @@ namespace Crow
 				Debug.WriteLine ("ERROR: processLayouting, no parent for: " + this.ToString ());
 				return;
 			}
+			#if DEBUG_LAYOUTING
+			Debug.WriteLine ("Layouting => " + this.ToString ());
+			#endif
 			if (!GraphicObject.UpdateLayout (LayoutType)) {
 				#if DEBUG_LAYOUTING
-				Debug.WriteLine ("Requeuing => " + this.ToString ());
+				Debug.WriteLine ("\tRequeuing => " + this.ToString ());
 				#endif
 				GraphicObject.LayoutingTries ++;
-				if (GraphicObject.LayoutingTries < Interface.MaxLayoutingTries)
+				if (GraphicObject.LayoutingTries < Interface.MaxLayoutingTries) {
+					GraphicObject.RegisteredLayoutings |= LayoutType;
 					Interface.LayoutingQueue.Enqueue (this);
+				}
 			} else {
 				GraphicObject.LayoutingTries = 0;
-				#if DEBUG_LAYOUTING
-				Debug.WriteLine ("Layouting => " + this.ToString ());
-				#endif
 			}
 		}
 
