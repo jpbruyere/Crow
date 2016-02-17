@@ -127,17 +127,26 @@ namespace Crow
 		}
 		protected override int measureRawSize (LayoutingType lt)
 		{
+			if (Children.Count == 0)
+				return base.measureRawSize (lt);
+			
 			if (lt == LayoutingType.Width) {
 				if (largestChild == null)
 					searchLargestChild ();
-				if (largestChild == null)//if still null, not possible to determine a width
-					return -1;
+				if (largestChild == null){
+					//if still null, not possible to determine a width
+					//because all children are stretched, force first one to fit
+					Children[0].Width = -1;
+					return -1;//cancel actual sizing to let child computation take place
+				}
 				return maxChildrenWidth + 2 * Margin;
 			}else{
 				if (tallestChild == null)
 					searchTallestChild ();
-				if (tallestChild == null)
+				if (tallestChild == null) {
+					Children[0].Height = -1;
 					return -1;
+				}
 				return maxChildrenHeight + 2 * Margin;
 			}
 		}
