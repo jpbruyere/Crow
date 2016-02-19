@@ -44,13 +44,23 @@
     <Reference Include="OpenTK">
       <HintPath>..\..\opentk\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
     </Reference>
-    <Reference Include="Mono.Cairo" />
+    <Reference Include="cairo-sharp, Version=1.10.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+      <Package>gtk-sharp-3.0</Package>
+    </Reference>
+    <Reference Include="gio-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gio-sharp-3.0</Package>
+    </Reference>
+    <Reference Include="glib-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>glib-sharp-3.0</Package>
+    </Reference>
+    <Reference Include="gtk-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-3.0</Package>
+    </Reference>
+    <Reference Include="atk-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-3.0</Package>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GOLIBTest_Listbox.cs" />
-    <Compile Include="GOLIBTest_0.cs" />
-    <Compile Include="GOLIBTest_TypeViewer.cs" />
-    <Compile Include="GOLIBTest_DirViewer.cs" />
     <Compile Include="GOLIBTests.cs" />
     <Compile Include="Interfaces\testBorder.goml.cs" />
     <Compile Include="..\bin\Debug\Interfaces\testContainer.goml.cs">
@@ -203,7 +213,6 @@
     <None Include="Interfaces\testTextBox.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="GOLIBTest_5.cs" />
     <None Include="Interfaces\0.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -269,9 +278,9 @@
       <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
       <Name>Crow</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OTKCrow\OTKCrow.csproj">
-      <Project>{350D4F49-9901-4998-9903-BCA7D48DA58C}</Project>
-      <Name>OTKCrow</Name>
+    <ProjectReference Include="..\GtkCrow\GtkCrow.csproj">
+      <Project>{D6F98B08-56B8-405C-9212-F9D26097E35F}</Project>
+      <Name>GtkCrow</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

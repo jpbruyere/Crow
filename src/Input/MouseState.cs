@@ -115,8 +115,8 @@ namespace Crow
 	/// </summary>
 	public int X
 	{
-			get { return position.X; }
-	    internal set { position.X = value; }
+		get { return position.X; }
+	    set { position.X = value; }
 	}
 
 	/// <summary>
@@ -124,8 +124,8 @@ namespace Crow
 	/// </summary>
 	public int Y
 	{
-			get { return position.Y; }
-	    internal set { position.Y = value; }
+		get { return position.Y; }
+	    set { position.Y = value; }
 	}
 
 	/// <summary>
@@ -291,7 +291,7 @@ namespace Crow
 	    buttons |= unchecked((ushort)(1 << offset));
 	}
 
-	internal void DisableBit(int offset)
+	public void DisableBit(int offset)
 	{
 	    ValidateOffset(offset);
 	    buttons &= unchecked((ushort)(~(1 << offset)));

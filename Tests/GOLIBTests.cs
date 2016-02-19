@@ -30,7 +30,7 @@ namespace test
 		public GOLIBTests ()
 			: base(800, 600,"test: press spacebar to toogle test files")
 		{
-			VSync = VSyncMode.Off;
+			//VSync = VSyncMode.Off;
 		}
 
 		int frameCpt = 0;
@@ -45,12 +45,20 @@ namespace test
 			"1.crow",
 			"5.crow",
 			"testCheckbox.goml",
+			"testWindow.goml",
+			"fps.goml",
 			"testTabView.crow",
 			"0.crow",
 			"testImage.crow",
 			"testOutOfClipUpdate.crow",
+<<<<<<< 328c6d4eab1127cd9799540f253deda66060b68a
 			"testTreeView.crow",
 			"testWindow.goml",
+=======
+//			"test_Listbox.goml",
+//			"testTreeView.crow",
+			"1.crow",
+>>>>>>> GtkCrowContainer test, functionnal, keyboard issue
 			"clip4.crow",
 			"clip3.crow",
 			"clip2.crow",
@@ -67,7 +75,6 @@ namespace test
 			"testBorder.goml",
 //			"testButton2.crow",
 			"test2WayBinding.crow",
-			"fps.goml",
 			"test4.goml",
 			"2.crow",
 			"test1.goml",
@@ -188,12 +195,11 @@ namespace test
 		{
 			base.OnLoad (e);
 			//this.AddWidget(new test4());
-			KeyboardKeyDown += GOLIBTests_KeyboardKeyDown1;;
+			//KeyboardKeyDown += GOLIBTests_KeyboardKeyDown1;;
 
 			GraphicObject obj = LoadInterface("Interfaces/" + testFiles[idx]);
 			obj.DataSource = this;
 		}
-
 		void GOLIBTests_KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
 			if (e.Key == OpenTK.Input.Key.Escape) {
@@ -217,23 +223,23 @@ namespace test
 			obj.DataSource = this;
 		}
 
-		protected override void OnUpdateFrame (FrameEventArgs e)
-		{
-			//if (frameCpt % 8 == 0)
-				base.OnUpdateFrame (e);
-
-			fps = (int)RenderFrequency;
-
-
-			if (frameCpt > 50) {
-				resetFps ();
-				frameCpt = 0;
-				GC.Collect();
-				GC.WaitForPendingFinalizers();
-				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
-			}
-			frameCpt++;
-		}
+//		protected override void OnUpdateFrame (FrameEventArgs e)
+//		{
+//			//if (frameCpt % 8 == 0)
+//				base.OnUpdateFrame (e);
+//
+//			fps = (int)RenderFrequency;
+//
+//
+//			if (frameCpt > 50) {
+//				resetFps ();
+//				frameCpt = 0;
+//				GC.Collect();
+//				GC.WaitForPendingFinalizers();
+//				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
+//			}
+//			frameCpt++;
+//		}
 		void onButClick(object send, MouseButtonEventArgs e)
 		{
 			Console.WriteLine ("button clicked:" + send.ToString());
@@ -249,10 +255,11 @@ namespace test
 		static void Main ()
 		{
 			Console.WriteLine ("starting example");
+			Gtk.Application.Init ();
+			GOLIBTests win = new GOLIBTests ();
+			win.KeyPressEvent += win.Win_KeyPressEvent;
 
-			using (GOLIBTests win = new GOLIBTests( )) {
-				win.Run (30.0);
-			}
+			Gtk.Application.Run ();
 		}
 		void onMsgBoxOk(object sender, EventArgs e){
 			Debug.WriteLine ("OK");
@@ -260,6 +267,16 @@ namespace test
 		void onMsgBoxCancel(object sender, EventArgs e)
 		{
 			Debug.WriteLine ("cancel");
+		}
+		void Win_KeyPressEvent (object o, Gtk.KeyPressEventArgs args)
+		{
+			ClearInterface ();
+			idx++;
+			if (idx == testFiles.Length)
+				idx = 0;
+			this.Title = testFiles [idx];
+			GraphicObject obj = LoadInterface("Interfaces/" + testFiles[idx]);
+			obj.DataSource = this;
 		}
 	}
 }

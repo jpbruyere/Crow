@@ -5,10 +5,10 @@
     <Platform Condition=" '$(Platform)' == '' ">Linux_x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{350D4F49-9901-4998-9903-BCA7D48DA58C}</ProjectGuid>
+    <ProjectGuid>{D6F98B08-56B8-405C-9212-F9D26097E35F}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>OTKCrow</RootNamespace>
-    <AssemblyName>OTKCrow</AssemblyName>
+    <RootNamespace>GtkCrow</RootNamespace>
+    <AssemblyName>GtkCrow</AssemblyName>
     <ReleaseVersion>0.4</ReleaseVersion>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
@@ -32,28 +32,36 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Reference Include="OpenTK">
-      <HintPath>..\..\opentk\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="cairo-sharp, Version=1.10.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <Package>gtk-sharp-3.0</Package>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="OpenTKGameWindow.cs" />
-    <Compile Include="OpenGL\QuadVAO.cs" />
-    <Compile Include="OpenGL\Shader.cs" />
-    <Compile Include="OpenGL\TexturedShader.cs" />
-    <Compile Include="OpenGL\VertexArrayObject.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">
       <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
       <Name>Crow</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="atk-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-3.0</Package>
+    </Reference>
+    <Reference Include="cairo-sharp, Version=1.10.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+      <Package>gtk-sharp-3.0</Package>
+    </Reference>
+    <Reference Include="gdk-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gdk-sharp-3.0</Package>
+    </Reference>
+    <Reference Include="gio-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gio-sharp-3.0</Package>
+    </Reference>
+    <Reference Include="glib-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>glib-sharp-3.0</Package>
+    </Reference>
+    <Reference Include="gtk-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-3.0</Package>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CrowContainer.cs" />
   </ItemGroup>
 </Project>
