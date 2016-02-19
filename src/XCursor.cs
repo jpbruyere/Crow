@@ -136,10 +136,10 @@ namespace Crow
 		public XCursor ()
 		{
 		}
-		public static implicit operator MouseCursor(XCursor xc)
-		{
-			return new MouseCursor((int)xc.Xhot, (int)xc.Yhot, (int)xc.Width, (int)xc.Height,xc.data);
-		}
+//		public static implicit operator MouseCursor(XCursor xc)
+//		{
+//			return new MouseCursor((int)xc.Xhot, (int)xc.Yhot, (int)xc.Width, (int)xc.Height,xc.data);
+//		}
 	}
 }
 

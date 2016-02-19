@@ -210,7 +210,7 @@ namespace Crow
 
 	#region Internal Members
 
-	internal void SetKeyState(Key key, bool down)
+	public void SetKeyState(Key key, bool down)
 	{
 	    if (down)
 	    {

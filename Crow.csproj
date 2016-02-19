@@ -65,7 +65,6 @@
     <Compile Include="src\Rectangle.cs" />
     <Compile Include="src\Rectangles.cs" />
     <Compile Include="src\Size.cs" />
-    <Compile Include="src\OpenTKGameWindow.cs" />
     <Compile Include="src\GraphicObjects\GraphicObject.cs" />
     <Compile Include="src\GraphicObjects\Container.cs" />
     <Compile Include="src\GraphicObjects\Group.cs" />
@@ -90,10 +89,6 @@
     <Compile Include="src\GraphicObjects\AnalogMeter.cs" />
     <Compile Include="src\GraphicObjects\Border.cs" />
     <Compile Include="src\Font.cs" />
-    <Compile Include="src\OpenGL\QuadVAO.cs" />
-    <Compile Include="src\OpenGL\Shader.cs" />
-    <Compile Include="src\OpenGL\TexturedShader.cs" />
-    <Compile Include="src\OpenGL\VertexArrayObject.cs" />
     <Compile Include="src\GraphicObjects\Window.cs" />
     <Compile Include="src\GraphicObjects\IGOLibHost.cs" />
     <Compile Include="src\GraphicObjects\ListBox.cs" />
@@ -156,9 +151,6 @@
       <Package>glib-sharp-3.0</Package>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="OpenTK">
-      <HintPath>..\opentk\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
-    </Reference>
     <Reference Include="Mono.Cairo" />
     <Reference Include="rsvg2-sharp, Version=2.18.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="System.Drawing" />
@@ -179,7 +171,6 @@
     <Folder Include="Images\" />
     <Folder Include="Images\Icons\" />
     <Folder Include="src\CompilerServices\" />
-    <Folder Include="src\OpenGL\" />
     <Folder Include="src\Fill\" />
     <Folder Include="Styles\" />
     <Folder Include="src\Input\" />

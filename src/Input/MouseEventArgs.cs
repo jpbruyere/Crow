@@ -147,7 +147,7 @@ namespace Crow
 	public MouseState Mouse
 	{
 	    get { return state; }
-	    internal set { state = value; }
+	    set { state = value; }
 	}
 
 	#endregion

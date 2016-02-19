@@ -38,7 +38,7 @@ namespace Crow
     {
 	#region Fields
 
-	internal const int MaxButtons = 16; // we are storing in an ushort
+	public const int MaxButtons = 16; // we are storing in an ushort
 	Point position;
 	MouseScroll scroll;
 	ushort buttons;
@@ -285,7 +285,7 @@ namespace Crow
 	    return (buttons & (1 << offset)) != 0;
 	}
 
-	internal void EnableBit(int offset)
+	public void EnableBit(int offset)
 	{
 	    ValidateOffset(offset);
 	    buttons |= unchecked((ushort)(1 << offset));

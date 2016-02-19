@@ -89,7 +89,7 @@ namespace Crow
 		}
 
 		public void Show(){
-			OpenTKGameWindow.currentWindow.AddWidget(window);
+			 //.AddWidget(window);
 		}
 
 		void OnSelectedItemChanged (object sender, SelectionChangeEventArgs e)
@@ -104,8 +104,8 @@ namespace Crow
 		{
 			selectedFile = e.NewValue as FileInfo;
 		}
-		void onFileSelect(object sender, OpenTK.Input.MouseButtonEventArgs e){
-			OpenTKGameWindow.currentWindow.DeleteWidget(window);
+		void onFileSelect(object sender, MouseButtonEventArgs e){
+			//OpenTKGameWindow.currentWindow.DeleteWidget(window);
 		}
 	}
 	public class DirContainer: IValueChange

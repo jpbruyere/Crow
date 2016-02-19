@@ -83,7 +83,7 @@ namespace Crow
 		{
 			base.onMouseMove (sender, e);
 
-			OpenTKGameWindow otkgw = HostContainer as OpenTKGameWindow;
+			IGOLibHost otkgw = HostContainer;
 
 			if (e.Mouse.IsButtonDown (MouseButton.Left)) {
 				if (!HasFocus)
@@ -176,31 +176,31 @@ namespace Crow
 				if (currentDirection != lastDir) {
 					switch (currentDirection) {
 					case Direction.None:
-						otkgw.Cursor = XCursor.Default;
+						otkgw.MouseCursor = XCursor.Default;
 						break;
 					case Direction.N:
-						otkgw.Cursor = XCursor.V;
+						otkgw.MouseCursor = XCursor.V;
 						break;
 					case Direction.S:
-						otkgw.Cursor = XCursor.V;
+						otkgw.MouseCursor = XCursor.V;
 						break;
 					case Direction.E:
-						otkgw.Cursor = XCursor.H;
+						otkgw.MouseCursor = XCursor.H;
 						break;
 					case Direction.W:
-						otkgw.Cursor = XCursor.H;
+						otkgw.MouseCursor = XCursor.H;
 						break;
 					case Direction.NW:
-						otkgw.Cursor = XCursor.NW;
+						otkgw.MouseCursor = XCursor.NW;
 						break;
 					case Direction.NE:
-						otkgw.Cursor = XCursor.NE;
+						otkgw.MouseCursor = XCursor.NE;
 						break;
 					case Direction.SW:
-						otkgw.Cursor = XCursor.SW;
+						otkgw.MouseCursor = XCursor.SW;
 						break;
 					case Direction.SE:
-						otkgw.Cursor = XCursor.SE;
+						otkgw.MouseCursor = XCursor.SE;
 						break;
 					}
 				}				
@@ -210,8 +210,7 @@ namespace Crow
 		{
 			base.onMouseLeave (sender, e);
 			currentDirection = Direction.None;
-			OpenTKGameWindow otkgw = HostContainer as OpenTKGameWindow;
-			otkgw.Cursor = XCursor.Default;
+			HostContainer.MouseCursor = XCursor.Default;
 		}
 
 		protected override void loadTemplate(GraphicObject template = null)

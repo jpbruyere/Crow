@@ -40,7 +40,7 @@ namespace Crow
 //				DisplayDevice.Default,
 //				3,0,OpenTK.Graphics.GraphicsContextFlags.Default)
 		public OpenTKGameWindow(int _width, int _height, string _title="Crow")
-			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 1), 
+			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 1),
 				_title,GameWindowFlags.Default,DisplayDevice.GetDisplay(DisplayIndex.Second),
 				3,3,OpenTK.Graphics.GraphicsContextFlags.Debug)
 //		public OpenTKGameWindow(int _width, int _height, string _title="golib")
@@ -57,7 +57,7 @@ namespace Crow
 			XCursor.SE = XCursorFile.Load("#Crow.Images.Icons.Cursors.bottom_right_corner").Cursors[0];
 			XCursor.H = XCursorFile.Load("#Crow.Images.Icons.Cursors.sb_h_double_arrow").Cursors[0];
 			XCursor.V = XCursorFile.Load("#Crow.Images.Icons.Cursors.sb_v_double_arrow").Cursors[0];
-		}        
+		}
 		#endregion
 
 		public List<GraphicObject> GraphicObjects = new List<GraphicObject>();
@@ -74,7 +74,13 @@ namespace Crow
 			set { _redrawClip = value; }
 		}
 		public XCursor MouseCursor {
-			set { Cursor = value; }
+			set {
+				if (value == null) {
+					Cursor = null;
+					return;
+				}
+				Cursor = new MouseCursor
+					((int)value.Xhot, (int)value.Yhot, (int)value.Width, (int)value.Height,value.data);; }
 		}
 		public List<GraphicObject> gobjsToRedraw {
 			get { return _gobjsToRedraw; }
@@ -108,17 +114,17 @@ namespace Crow
 		}
 
 		#region focus
-		GraphicObject _activeWidget;	//button is pressed on widget 
+		GraphicObject _activeWidget;	//button is pressed on widget
 		GraphicObject _hoverWidget;		//mouse is over
-		GraphicObject _focusedWidget;	//has keyboard (or other perif) focus 
+		GraphicObject _focusedWidget;	//has keyboard (or other perif) focus
 
 		public GraphicObject activeWidget
 		{
 			get { return _activeWidget; }
-			set 
-			{				
+			set
+			{
 				if (_activeWidget == value)
-					return;	
+					return;
 
 				if (_activeWidget != null)
 					_activeWidget.IsActive = false;
@@ -197,7 +203,7 @@ namespace Crow
 		int[] viewport = new int[4];
 
 		void createContext()
-		{			
+		{
 			createOpenGLSurface ();
 
 			if (uiQuad != null)
@@ -205,8 +211,8 @@ namespace Crow
 			uiQuad = new QuadVAO (0, 0, ClientRectangle.Width, ClientRectangle.Height, 0, 1, 1, -1);
 			uiQuad2 = new QuadVAO (0, 0, ClientRectangle.Width, ClientRectangle.Height, 0, 0, 1, 1);
 
-			shader.ProjectionMatrix = Matrix4.CreateOrthographicOffCenter 
-				(0, ClientRectangle.Width, ClientRectangle.Height, 0, 0, 1);			
+			shader.ProjectionMatrix = Matrix4.CreateOrthographicOffCenter
+				(0, ClientRectangle.Width, ClientRectangle.Height, 0, 0, 1);
 
 			clipping.AddRectangle (ClientRectangle);
 		}
@@ -225,7 +231,7 @@ namespace Crow
 			GL.ActiveTexture (TextureUnit.Texture0);
 			GL.BindTexture(TextureTarget.Texture2D, texID);
 
-			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, 
+			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba,
 				ClientRectangle.Width, ClientRectangle.Height, 0,
 				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp);
 
@@ -288,7 +294,7 @@ namespace Crow
 			layoutTime.Reset ();
 			guTime.Reset ();
 			drawingTime.Reset ();
-			updateTime.Restart ();			
+			updateTime.Restart ();
 			#endif
 
 			GraphicObject[] invGOList = new GraphicObject[GraphicObjects.Count];
@@ -342,7 +348,7 @@ namespace Crow
 							ctx.Save ();
 
 							p.Paint (ref ctx);
-						
+
 							ctx.Restore ();
 						}
 
@@ -387,9 +393,9 @@ namespace Crow
 //			Debug.WriteLine("UPDATE: {0} ticks \t, {1} ms",
 //				updateTime.ElapsedTicks,
 //				updateTime.ElapsedMilliseconds);
-		}						
+		}
 		#endregion
-			
+
 		#region loading
 		public GraphicObject LoadInterface (string path)
 		{
@@ -409,7 +415,7 @@ namespace Crow
 
 		#region Game win overrides
 		protected override void OnUpdateFrame(FrameEventArgs e)
-		{	
+		{
 			base.OnUpdateFrame(e);
 			update ();
 		}
@@ -427,8 +433,8 @@ namespace Crow
 			SwapBuffers ();
 		}
 		protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
+	{
+	    base.OnLoad(e);
 
 			Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
 			Mouse.WheelChanged += new EventHandler<OpenTK.Input.MouseWheelEventArgs>(Mouse_WheelChanged);
@@ -456,7 +462,7 @@ namespace Crow
 		}
 		#endregion
 
-        #region Mouse Handling
+	#region Mouse Handling
 		void update_mouseButtonStates(ref MouseState e, OpenTK.Input.MouseState otk_e){
 			for (int i = 0; i < MouseState.MaxButtons; i++) {
 				if (otk_e.IsButtonDown ((OpenTK.Input.MouseButton)i))
@@ -464,7 +470,7 @@ namespace Crow
 			}
 		}
 		void Mouse_Move(object sender, OpenTK.Input.MouseMoveEventArgs otk_e)
-        {
+	{
 			MouseMoveEventArgs e = new MouseMoveEventArgs (otk_e.X, otk_e.Y, otk_e.XDelta, otk_e.YDelta);
 			MouseState ms = e.Mouse;
 			update_mouseButtonStates (ref ms, otk_e.Mouse);
@@ -475,7 +481,7 @@ namespace Crow
 				if (_activeWidget.HostContainer == null) {
 					activeWidget = null;
 				} else {
-					
+
 					//send move evt even if mouse move outside bounds
 					_activeWidget.onMouseMove (this, e);
 					return;
@@ -506,8 +512,8 @@ namespace Crow
 							i++;
 						}
 					}
-					
-					
+
+
 					if (hoverWidget.MouseIsIn (e.Position)) {
 						hoverWidget.checkHoverWidget (e);
 						return;
@@ -537,9 +543,9 @@ namespace Crow
 			}
 			hoverWidget = null;
 			MouseMove.Raise (this, otk_e);
-        }
+	}
 		void Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
-        {
+	{
 			MouseButtonEventArgs e = new MouseButtonEventArgs (otk_e.X, otk_e.Y, (Crow.MouseButton)otk_e.Button, otk_e.IsPressed);
 			MouseState ms = e.Mouse;
 			update_mouseButtonStates (ref ms, otk_e.Mouse);
@@ -549,7 +555,7 @@ namespace Crow
 				MouseButtonUp.Raise (this, otk_e);
 				return;
 			}
-				
+
 			if (mouseRepeatThread != null) {
 				mouseRepeatOn = false;
 				mouseRepeatThread.Abort();
@@ -558,7 +564,7 @@ namespace Crow
 
 			_activeWidget.onMouseUp (this, e);
 			activeWidget = null;
-        }
+	}
 		void Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
 		{
 			MouseButtonEventArgs e = new MouseButtonEventArgs (otk_e.X, otk_e.Y, (Crow.MouseButton)otk_e.Button, otk_e.IsPressed);
@@ -579,9 +585,9 @@ namespace Crow
 				return;
 			mouseRepeatThread = new Thread (mouseRepeatThreadFunc);
 			mouseRepeatThread.Start ();
-        }
+	}
 		void Mouse_WheelChanged(object sender, OpenTK.Input.MouseWheelEventArgs otk_e)
-        {
+	{
 			MouseWheelEventArgs e = new MouseWheelEventArgs (otk_e.X, otk_e.Y, otk_e.Value, otk_e.Delta);
 			MouseState ms = e.Mouse;
 			update_mouseButtonStates (ref ms, otk_e.Mouse);
@@ -592,7 +598,7 @@ namespace Crow
 				return;
 			}
 			hoverWidget.onMouseWheel (this, e);
-        }
+	}
 
 		volatile bool mouseRepeatOn;
 		volatile int mouseRepeatCount;
@@ -609,7 +615,7 @@ namespace Crow
 		}
 		#endregion
 
-        #region keyboard Handling
+	#region keyboard Handling
 		KeyboardState Keyboad = new KeyboardState ();
 		void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
 	{
@@ -620,8 +626,8 @@ namespace Crow
 			Keyboad.SetKeyState ((Crow.Key)otk_e.Key, true);
 			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)otk_e.Key, otk_e.IsRepeat,Keyboad);
 			_focusedWidget.onKeyDown (sender, e);
-        }
-        #endregion
+	}
+	#endregion
 
 		#region ILayoutable implementation
 		public void RegisterClip(Rectangle r){
@@ -634,7 +640,7 @@ namespace Crow
 		}
 		public LayoutingType RegisteredLayoutings {
 			get { return LayoutingType.None; }
-			set { throw new NotImplementedException (); } 
+			set { throw new NotImplementedException (); }
 		}
 		public void RegisterForLayouting (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public bool UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
