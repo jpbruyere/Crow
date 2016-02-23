@@ -128,9 +128,7 @@ namespace Crow
 				return cb;
 			}
 		}
-		[XmlIgnore]public virtual IGOLibHost HostContainer {
-			get { return Parent == null ? null : Parent.HostContainer; }
-		}
+
 		public virtual Rectangle ContextCoordinates(Rectangle r){
 			GraphicObject go = Parent as GraphicObject;
 			if (go == null)
@@ -374,12 +372,12 @@ namespace Crow
 
 				_isVisible = value;
 
-				if (HostContainer == null)
+				if (Interface.CurrentInterface == null)
 					return;
 
 				//ensure main win doesn't keep hidden childrens ref
-				if (!_isVisible && this.Contains (HostContainer.hoverWidget))
-					HostContainer.hoverWidget = null;
+				if (!_isVisible && this.Contains (Interface.CurrentInterface.hoverWidget))
+					Interface.CurrentInterface.hoverWidget = null;
 
 				if (Parent is GraphicObject)
 					Parent.RegisterForLayouting (LayoutingType.Sizing);
@@ -645,9 +643,9 @@ namespace Crow
 		{
 			if (IsQueuedForRedraw)
 				return;
-			if (HostContainer == null)
+			if (Interface.CurrentInterface == null)
 				return;
-			HostContainer.gobjsToRedraw.Add (this);
+			Interface.CurrentInterface.gobjsToRedraw.Add (this);
 			IsQueuedForRedraw = true;
 		}
 
@@ -957,9 +955,8 @@ namespace Crow
 		}
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
-			IGOLibHost glh = HostContainer;
-			if (glh.hoverWidget != this) {
-				glh.hoverWidget = this;
+			if (Interface.CurrentInterface.hoverWidget != this) {
+				Interface.CurrentInterface.hoverWidget = this;
 				onMouseEnter (this, e);
 			}
 
@@ -975,14 +972,13 @@ namespace Crow
 			MouseMove.Raise (sender, e);
 		}
 		public virtual void onMouseDown(object sender, MouseButtonEventArgs e){
-			IGOLibHost hc = HostContainer;
-			if (hc.activeWidget == null)
-				hc.activeWidget = this;
+			if (Interface.CurrentInterface.activeWidget == null)
+				Interface.CurrentInterface.activeWidget = this;
 			if (this.Focusable && !Interface.FocusOnHover) {
 				BubblingMouseButtonEventArg be = e as BubblingMouseButtonEventArg;
 				if (be.Focused == null) {
 					be.Focused = this;
-					hc.FocusedWidget = this;
+					Interface.CurrentInterface.FocusedWidget = this;
 				}
 			}
 			//bubble event to the top

@@ -31,6 +31,10 @@ namespace test
 			: base(800, 600,"test: press spacebar to toogle test files")
 		{
 			//VSync = VSyncMode.Off;
+			Interface.CurrentInterface = CrowInterface;
+			GraphicObject obj = CrowInterface.LoadInterface("Interfaces/" + testFiles[idx]);
+			obj.DataSource = this;
+
 		}
 
 		int frameCpt = 0;
@@ -51,14 +55,9 @@ namespace test
 			"0.crow",
 			"testImage.crow",
 			"testOutOfClipUpdate.crow",
-<<<<<<< 328c6d4eab1127cd9799540f253deda66060b68a
-			"testTreeView.crow",
-			"testWindow.goml",
-=======
 //			"test_Listbox.goml",
 //			"testTreeView.crow",
 			"1.crow",
->>>>>>> GtkCrowContainer test, functionnal, keyboard issue
 			"clip4.crow",
 			"clip3.crow",
 			"clip2.crow",
@@ -113,11 +112,11 @@ namespace test
 				ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
 				#if MEASURE_TIME
 				ValueChanged.Raise (this, new ValueChangeEventArgs ("update",
-					this.updateTime.ElapsedTicks.ToString () + " ticks"));
+					this.CrowInterface.updateTime.ElapsedTicks.ToString () + " ticks"));
 				ValueChanged.Raise (this, new ValueChangeEventArgs ("layouting",
-					this.layoutTime.ElapsedTicks.ToString () + " ticks"));
+					this.CrowInterface.layoutTime.ElapsedTicks.ToString () + " ticks"));
 				ValueChanged.Raise (this, new ValueChangeEventArgs ("drawing",
-					this.drawingTime.ElapsedTicks.ToString () + " ticks"));
+					this.CrowInterface.drawingTime.ElapsedTicks.ToString () + " ticks"));
 				#endif
 			}
 		}
@@ -191,35 +190,26 @@ namespace test
 			TestList = Color.ColorDic.ToList();
 		}
 
-		protected override void OnLoad (EventArgs e)
-		{
-			base.OnLoad (e);
-			//this.AddWidget(new test4());
-			//KeyboardKeyDown += GOLIBTests_KeyboardKeyDown1;;
-
-			GraphicObject obj = LoadInterface("Interfaces/" + testFiles[idx]);
-			obj.DataSource = this;
-		}
 		void GOLIBTests_KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
 			if (e.Key == OpenTK.Input.Key.Escape) {
-				this.Quit ();
+				Quit (null, null);
 				return;
 			} else if (e.Key == OpenTK.Input.Key.L) {
 				TestList.Add ("new string");
 				NotifyValueChanged ("TestList", TestList);
 				return;
 			} else if (e.Key == OpenTK.Input.Key.W) {
-				GraphicObject w = LoadInterface("Interfaces/testWindow.goml");
+				GraphicObject w = CrowInterface.LoadInterface("Interfaces/testWindow.goml");
 				w.DataSource = this;
 				return;
 			}
-			ClearInterface ();
+			CrowInterface.ClearInterface ();
 			idx++;
 			if (idx == testFiles.Length)
 				idx = 0;
 			this.Title = testFiles [idx];
-			GraphicObject obj = LoadInterface("Interfaces/" + testFiles[idx]);
+			GraphicObject obj = CrowInterface.LoadInterface("Interfaces/" + testFiles[idx]);
 			obj.DataSource = this;
 		}
 
@@ -246,7 +236,7 @@ namespace test
 		}
 		void onAddTabButClick(object sender, MouseButtonEventArgs e){
 			
-			TabView tv = this.FindByName("tabview1") as TabView;
+			TabView tv = CrowInterface.FindByName("tabview1") as TabView;
 			if (tv == null)
 				return;
 			tv.AddChild (new TabItem () { Caption = "NewTab" });
@@ -270,13 +260,13 @@ namespace test
 		}
 		void Win_KeyPressEvent (object o, Gtk.KeyPressEventArgs args)
 		{
-			ClearInterface ();
+			CrowInterface.ClearInterface ();
 			idx++;
 			if (idx == testFiles.Length)
 				idx = 0;
 			this.Title = testFiles [idx];
-			GraphicObject obj = LoadInterface("Interfaces/" + testFiles[idx]);
-			obj.DataSource = this;
+			GraphicObject obj = CrowInterface.LoadInterface("Interfaces/" + testFiles[idx]);
+			obj.DataSource = this;			
 		}
 	}
 }

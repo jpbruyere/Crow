@@ -270,12 +270,6 @@ namespace Crow
 		}
 		#endregion
 
-		#if MEASURE_TIME
-		public Stopwatch updateTime = new Stopwatch ();
-		public Stopwatch layoutTime = new Stopwatch ();
-		public Stopwatch guTime = new Stopwatch ();
-		public Stopwatch drawingTime = new Stopwatch ();
-		#endif
 
 		bool isDirty = false;
 		Rectangle DirtyRect;
@@ -290,20 +284,11 @@ namespace Crow
 					FocusedWidget.onMouseClick (this, new MouseButtonEventArgs (Mouse.X, Mouse.Y, MouseButton.Left, true));
 				}
 			}
-			#if MEASURE_TIME
-			layoutTime.Reset ();
-			guTime.Reset ();
-			drawingTime.Reset ();
-			updateTime.Restart ();
-			#endif
 
 			GraphicObject[] invGOList = new GraphicObject[GraphicObjects.Count];
 			GraphicObjects.CopyTo (invGOList, 0);
 			invGOList = invGOList.Reverse ().ToArray ();
 
-			#if MEASURE_TIME
-			layoutTime.Start ();
-			#endif
 			//Debug.WriteLine ("======= Layouting queue start =======");
 
 			while (Interface.LayoutingQueue.Count > 0) {
@@ -311,9 +296,6 @@ namespace Crow
 				lqi.ProcessLayouting ();
 			}
 
-			#if MEASURE_TIME
-			layoutTime.Stop ();
-			#endif
 
 			//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
 			//final redraw clips should be added only when layout is completed among parents,
@@ -326,11 +308,6 @@ namespace Crow
 				p.Parent.RegisterClip (p.LastPaintedSlot);
 				p.Parent.RegisterClip (p.getSlot());
 			}
-
-			#if MEASURE_TIME
-			updateTime.Stop ();
-			drawingTime.Start ();
-			#endif
 
 			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
 				using (ctx = new Context (surf)){
@@ -364,36 +341,14 @@ namespace Crow
 
 						DirtyRect.Left = Math.Max (0, DirtyRect.Left);
 						DirtyRect.Top = Math.Max (0, DirtyRect.Top);
-						DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
-						DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
+						DirtyRect.Width = Math.Min (ClientRectangle.Right, DirtyRect.Width);
+						DirtyRect.Height = Math.Min (ClientRectangle.Bottom, DirtyRect.Height);
 
 						clipping.Reset ();
 					}
-
-					#if MEASURE_TIME
-					drawingTime.Stop ();
-					#endif
-					//surf.WriteToPng (@"/mnt/data/test.png");
 				}
 			}
-//			if (ToolTip.isVisible) {
-//				ToolTip.panel.processkLayouting();
-//				if (ToolTip.panel.layoutIsValid)
-//					ToolTip.panel.Paint(ref ctx);
-//			}
-//			Debug.WriteLine("INTERFACE: layouting: {0} ticks \t graphical update {1} ticks \t drawing {2} ticks",
-//			    layoutTime.ElapsedTicks,
-//			    guTime.ElapsedTicks,
-//			    drawingTime.ElapsedTicks);
-//			Debug.WriteLine("INTERFACE: layouting: {0} ms \t graphical update {1} ms \t drawing {2} ms",
-//			    layoutTime.ElapsedMilliseconds,
-//			    guTime.ElapsedMilliseconds,
-//			    drawingTime.ElapsedMilliseconds);
-
-//			Debug.WriteLine("UPDATE: {0} ticks \t, {1} ms",
-//				updateTime.ElapsedTicks,
-//				updateTime.ElapsedMilliseconds);
-		}
+		}						
 		#endregion
 
 		#region loading

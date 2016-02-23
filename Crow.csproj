@@ -148,6 +148,7 @@
     <Compile Include="src\rsvg\Pixbuf.cs" />
     <Compile Include="src\rsvg\RsvgSharp.SizeFuncNative.cs" />
     <Compile Include="src\rsvg\SizeFunc.cs" />
+    <Compile Include="src\MouseCursorChangedEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

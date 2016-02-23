@@ -174,22 +174,20 @@ namespace Crow
 			
 		public virtual void onPop(object sender, EventArgs e)
 		{
-			IGOLibHost tc = HostContainer;
-			if (tc == null)
+			if (Interface.CurrentInterface == null)
 				return;
 			if (Content != null) {
 				Content.Visible = true;
 				if (Content.Parent == null)
-					tc.AddWidget (Content);
-				tc.PutOnTop (Content);
+					Interface.CurrentInterface.AddWidget (Content);
+				Interface.CurrentInterface.PutOnTop (Content);
 				_content_LayoutChanged (this, new LayoutingEventArgs (LayoutingType.Sizing));
 			}
 			Pop.Raise (this, e);
 		}
 		public virtual void onUnpop(object sender, EventArgs e)
 		{
-			IGOLibHost tc = HostContainer;
-			if (tc == null)
+			if (Interface.CurrentInterface == null)
 				return;
 			Content.Visible = false;
 			Unpop.Raise (this, e);

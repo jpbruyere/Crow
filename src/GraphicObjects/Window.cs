@@ -83,7 +83,7 @@ namespace Crow
 		{
 			base.onMouseMove (sender, e);
 
-			IGOLibHost otkgw = HostContainer;
+			Interface otkgw = Interface.CurrentInterface;
 
 			if (e.Mouse.IsButtonDown (MouseButton.Left)) {
 				if (!HasFocus)
@@ -210,7 +210,7 @@ namespace Crow
 		{
 			base.onMouseLeave (sender, e);
 			currentDirection = Direction.None;
-			HostContainer.MouseCursor = XCursor.Default;
+			Interface.CurrentInterface.MouseCursor = XCursor.Default;
 		}
 
 		protected override void loadTemplate(GraphicObject template = null)
@@ -224,7 +224,7 @@ namespace Crow
 			ILayoutable parent = (sender as GraphicObject).Parent;
 			while(!(parent is Window))
 				parent = parent.Parent;
-			HostContainer.DeleteWidget (parent as GraphicObject);
+			Interface.CurrentInterface.DeleteWidget (parent as GraphicObject);
 		}
 
 		public override void ResolveBindings ()

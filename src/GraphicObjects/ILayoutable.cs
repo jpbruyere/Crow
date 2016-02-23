@@ -17,8 +17,6 @@ namespace Crow
 		Rectangle getSlot();
 		Rectangle getBounds();
 
-		IGOLibHost HostContainer { get; }
-
 		bool ArrangeChildren { get; }
 		LayoutingType RegisteredLayoutings { get; set; }
 		void RegisterForLayouting(LayoutingType layoutType);
