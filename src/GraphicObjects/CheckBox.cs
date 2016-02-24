@@ -22,11 +22,10 @@ namespace Crow
 		public event EventHandler Unchecked;
 
 		#region GraphicObject overrides
-		[XmlAttributeAttribute()][DefaultValue(true)]
-		public override bool Focusable
-		{
-			get { return base.Focusable; }
-			set { base.Focusable = value; }
+		[XmlAttributeAttribute()][DefaultValue("#Crow.Style.CheckBox.style")]
+		public override string Style {
+			get { return base.Style; }
+			set { base.Style = value; }
 		}
 		#endregion
 

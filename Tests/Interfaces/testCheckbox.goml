@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack Fit="true" Margin="10" Background="DimGray" >
+<VerticalStack  Margin="10" Background="DimGray" Style="test">
 	<CheckBox Background="Gray"/>
 	<CheckBox Background="Gray"/>
 	<CheckBox Background="Gray"/>

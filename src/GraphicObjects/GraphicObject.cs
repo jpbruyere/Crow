@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 using Cairo;
 using OpenTK.Input;
+using System.IO;
 
 namespace Crow
 {		
@@ -77,6 +78,7 @@ namespace Crow
 		Size _minimumSize = "0;0";
 		bool cacheEnabled = false;
 		object dataSource;
+		string style;
 		#endregion
 
 		#region public fields
@@ -392,15 +394,31 @@ namespace Crow
 				NotifyValueChanged ("Visible", _isVisible);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("0;0")]
-		public virtual Size MaximumSize {
-			get { return _maximumSize; }
-			set { _maximumSize = value; }
-		}
 		[XmlAttributeAttribute()][DefaultValue("1;1")]
 		public virtual Size MinimumSize {
 			get { return _minimumSize; }
-			set { _minimumSize = value; }
+			set {
+				if (value == _minimumSize)
+					return;
+
+				_minimumSize = value;
+
+				NotifyValueChanged ("MinimumSize", _minimumSize);
+				RegisterForLayouting (LayoutingType.Sizing);
+			}
+		}
+		[XmlAttributeAttribute()][DefaultValue("0;0")]
+		public virtual Size MaximumSize {
+			get { return _maximumSize; }
+			set { 
+				if (value == _maximumSize)
+					return;
+				
+				_maximumSize = value; 
+
+				NotifyValueChanged ("MaximumSize", _maximumSize);
+				RegisterForLayouting (LayoutingType.Sizing);
+			}
 		}
 		[XmlIgnore]public virtual object DataSource {
 			set {
@@ -420,6 +438,18 @@ namespace Crow
 					(LogicalParent as GraphicObject).DataSource : dataSource;
 			}
 		}
+		[XmlAttributeAttribute][DefaultValue(null)]
+		public virtual string Style {
+			get { return style; }
+			set {
+				if (value == style)
+					return;
+				
+				style = value;
+
+				NotifyValueChanged ("Style", style);
+			}
+		}
 		#endregion
 
 		/// <summary> Loads the default values from XML attributes default </summary>
@@ -428,6 +458,7 @@ namespace Crow
 			Type thisType = this.GetType ();
 			if (Interface.DefaultValuesLoader.ContainsKey(thisType.FullName)) {
 				Interface.DefaultValuesLoader[thisType.FullName] (this);
+				applyStyle ();
 				return;
 			}
 
@@ -588,16 +619,6 @@ namespace Crow
 				Clipping.AddRectangle (clip + ClientRectangle.Position);
 			Parent.RegisterClip (clip + Slot.Position + ClientRectangle.Position);
 		}
-//		public virtual void registerClipRect(Rectangle clip)
-//		{
-//			Rectangle tmp = ContextCoordinates (clip);
-//			if (CacheEnabled) {
-//			}
-			//HostContainer.redrawClip.AddRectangle (ScreenCoordinates(Slot));
-			//this clipping should take only last painted slots on each level in ancestor tree which
-			//is not the case for now.
-			//HostContainer.redrawClip.AddRectangle (ScreenCoordinates(LastPaintedSlot));
-		//}
 		/// <summary>
 		/// Clear chached object and add clipping region in redraw list of interface
 		/// </summary>
@@ -1390,68 +1411,99 @@ namespace Crow
 		{
 			return null;
 		}
+		void affectMember(string name, string value){
+			Type thisType = this.GetType ();
+
+			if (string.IsNullOrEmpty (value))
+				return;
+
+			MemberInfo mi = thisType.GetMember (name).FirstOrDefault();
+			if (mi == null) {
+				Debug.WriteLine ("GOML: Unknown attribute in " + thisType.ToString() + " : " + name);
+				return;
+			}
+			if (mi.MemberType == MemberTypes.Event) {
+				this.Bindings.Add (new Binding (new MemberReference(this, mi), value));
+				return;
+			}
+			if (mi.MemberType == MemberTypes.Property) {
+				PropertyInfo pi = mi as PropertyInfo;
+
+				if (pi.GetSetMethod () == null) {
+					Debug.WriteLine ("GOML: Read only property in " + thisType.ToString() + " : " + name);
+					return;
+				}
+
+				XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
+				if (xaa != null) {
+					if (!string.IsNullOrEmpty (xaa.AttributeName))
+						name = xaa.AttributeName;
+				}
+				if (value.StartsWith("{")) {
+					//binding
+					if (!value.EndsWith("}"))
+						throw new Exception (string.Format("GOML:Malformed binding: {0}", value));
+
+					this.Bindings.Add (new Binding (new MemberReference(this, pi), value.Substring (1, value.Length - 2)));
+					return;
+				}
+				if (pi.GetCustomAttribute (typeof(XmlIgnoreAttribute)) != null)
+					return;
+				if (xaa == null)//not define as xmlAttribute
+					return;
+
+				if (pi.PropertyType == typeof(string)) {
+					pi.SetValue (this, value, null);
+					return;
+				}
+
+				if (pi.PropertyType.IsEnum) {
+					pi.SetValue (this, Enum.Parse (pi.PropertyType, value), null);
+				} else {
+					MethodInfo me = pi.PropertyType.GetMethod ("Parse", new Type[] { typeof(string) });
+					pi.SetValue (this, me.Invoke (null, new string[] { value }), null);
+				}
+			}
+		}
+		void applyStyle(){
+			if (string.IsNullOrEmpty (style))
+				return;
+			Stream s = Interface.GetStreamFromPath (style);
+			if (s == null)
+				throw new Exception ("Style Path not found: " + style);
+			using (StreamReader sr = new StreamReader (s)) {
+				while (!sr.EndOfStream) {
+					string tmp = sr.ReadLine ();
+					if (string.IsNullOrWhiteSpace (tmp))
+						continue;
+					int i = tmp.IndexOf ('=');
+					if (i < 0)
+						continue;
+					string name = tmp.Substring (0, i).Trim();
+					string value = tmp.Substring (i + 1).Trim ();
+
+					affectMember (name, value);
+				}
+			}
+		}
 		public virtual void ReadXml (System.Xml.XmlReader reader)
 		{
 			if (!reader.HasAttributes)
 				return;
 			Type thisType = this.GetType ();
+
+			string stylePath = reader.GetAttribute ("Style");
+
+			if (!string.IsNullOrEmpty (style)) {
+				Style = stylePath;
+				applyStyle ();
+			}
+				
 			while (reader.MoveToNextAttribute ()) {
-				string attName = reader.Name;
-				string attValue = reader.Value;
-
-				if (string.IsNullOrEmpty (attValue))
+				if (reader.Name == "Style")
 					continue;
 
-				MemberInfo mi = thisType.GetMember (attName).FirstOrDefault();
-				if (mi == null) {
-					Debug.WriteLine ("GOML: Unknown attribute in " + thisType.ToString() + " : " + attName);
-					continue;
-				}
-				if (mi.MemberType == MemberTypes.Event) {
-					this.Bindings.Add (new Binding (new MemberReference(this, mi), attValue));
-					continue;
-				}
-				if (mi.MemberType == MemberTypes.Property) {
-					PropertyInfo pi = mi as PropertyInfo;
-
-					if (pi.GetSetMethod () == null) {
-						Debug.WriteLine ("GOML: Read only property in " + thisType.ToString() + " : " + attName);
-						continue;
-					}
-					XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
-					if (xaa != null) {
-						if (!string.IsNullOrEmpty (xaa.AttributeName))
-							attName = xaa.AttributeName;
-					}
-					DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof(DefaultValueAttribute));
-					object defaultValue = null;
-					if (dv != null)
-						defaultValue = dv.Value;
-					if (attValue.StartsWith("{")) {
-						//binding
-						if (!attValue.EndsWith("}"))
-							throw new Exception (string.Format("GOML:Malformed binding: {0}", attValue));
-
-						this.Bindings.Add (new Binding (new MemberReference(this, pi), attValue.Substring (1, attValue.Length - 2)));
-						continue;
-					}
-					if (pi.GetCustomAttribute (typeof(XmlIgnoreAttribute)) != null)
-						continue;
-					if (xaa == null)//not define as xmlAttribute
-						continue;
-
-					if (pi.PropertyType == typeof(string)) {
-						pi.SetValue (this, attValue, null);
-						continue;
-					}
-
-					if (pi.PropertyType.IsEnum) {
-						pi.SetValue (this, Enum.Parse (pi.PropertyType, attValue), null);
-					} else {
-						MethodInfo me = pi.PropertyType.GetMethod ("Parse", new Type[] { typeof(string) });
-						pi.SetValue (this, me.Invoke (null, new string[] { attValue }), null);
-					}
-				}
+				affectMember (reader.Name, reader.Value);
 			}
 			reader.MoveToElement();
 		}
