@@ -56,16 +56,17 @@ namespace Crow
 			get { return isChecked; }
 			set
 			{
+				if (isChecked == value)
+					return;
+				
 				isChecked = value;
 
 				NotifyValueChanged ("IsChecked", value);
-				if (isChecked) {
-					NotifyValueChanged ("SvgSub", "checked");
+
+				if (isChecked)
 					Checked.Raise (this, null);
-				} else {
-					NotifyValueChanged ("SvgSub", "unchecked");
+				else
 					Unchecked.Raise (this, null);
-				}
 			}
 		}
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)

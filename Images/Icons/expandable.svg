@@ -1,42 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="64"
-   height="64"
-   viewBox="0 0 64 64.000002"
-   id="svg2"
    version="1.1"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="expandable.svg">
+   id="svg2"
+   viewBox="0 0 64 64.000002"
+   height="64"
+   width="64">
   <defs
      id="defs4" />
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="6.6713043"
-     inkscape:cx="34.688233"
-     inkscape:cy="18.992144"
-     inkscape:document-units="px"
-     inkscape:current-layer="svg2"
-     showgrid="false"
-     units="px"
-     inkscape:window-width="1280"
-     inkscape:window-height="984"
-     inkscape:window-x="0"
-     inkscape:window-y="16"
-     inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -50,31 +25,10 @@
     </rdf:RDF>
   </metadata>
   <g
-     id="collapsed">
-    <rect
-       ry="8.8907347"
-       y="4.3914709"
-       x="4.4468598"
-       height="55.122551"
-       width="55.122551"
-       id="rect4136"
-       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:8.89073467;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-    <path
-       inkscape:connector-curvature="0"
-       id="path4177"
-       d="m 32.008136,12.393132 0,39.11923"
-       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:8.89073467;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-    <path
-       inkscape:connector-curvature="0"
-       id="path4181"
-       d="m 12.448521,31.952746 39.119231,0"
-       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:8.89073467;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-  </g>
-  <g
-     id="expanded">
+     id="False">
     <rect
        style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:8.89073467;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4190"
+       id="rect4136"
        width="55.122551"
        height="55.122551"
        x="4.4468598"
@@ -82,8 +36,26 @@
        ry="8.8907347" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:8.89073467;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 32.008136,12.393132 0,39.11923"
+       id="path4177" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:8.89073467;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 12.448521,31.952746 39.119231,0"
+       id="path4181" />
+  </g>
+  <g
+     id="True">
+    <rect
+       ry="8.8907347"
+       y="4.3914709"
+       x="4.4468598"
+       height="55.122551"
+       width="55.122551"
+       id="rect4190"
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:8.89073467;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
+    <path
        id="path4194"
-       inkscape:connector-curvature="0" />
+       d="m 12.448521,31.952746 39.119231,0"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:8.89073467;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
   </g>
 </svg>

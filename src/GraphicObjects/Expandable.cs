@@ -88,16 +88,16 @@ namespace Crow
 			get { return _isExpanded; }
             set
             {
-				_isExpanded = value;
-
-				if (_isExpanded) {
-					onExpand (this, null);
-					NotifyValueChanged ("SvgSub", "expanded");
+				if (value == _isExpanded)
 					return;
-				}
+				
+				_isExpanded = value;
+				NotifyValueChanged ("IsExpanded", _isExpanded);
 
-				onCollapse (this, null);
- 				NotifyValueChanged ("SvgSub", "collapsed");
+				if (_isExpanded)
+					onExpand (this, null);
+				else
+					onCollapse (this, null);
             }
         }
 		#endregion

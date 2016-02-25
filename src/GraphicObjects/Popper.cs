@@ -151,16 +151,17 @@ namespace Crow
 			get { return _isPopped; }
             set
             {
-				_isPopped = value;
-
-				if (_isPopped) {
-					onPop (this, null);
-					NotifyValueChanged ("SvgSub", "expanded");
+				if (value == _isPopped)
 					return;
-				}
+				
+				_isPopped = value;
+				NotifyValueChanged ("IsPopped", _isPopped);
 
-				onUnpop (this, null);
-				NotifyValueChanged ("SvgSub", "collapsed");
+				if (_isPopped)
+					onPop (this, null);
+				else
+					onUnpop (this, null);
+				
             }
         }
 		Alignment popDirection;
