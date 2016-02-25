@@ -240,6 +240,7 @@
     <EmbeddedResource Include="Styles\Expandable.style" />
     <EmbeddedResource Include="Styles\GroupBox.style" />
     <EmbeddedResource Include="Styles\ComboBox.style" />
+    <EmbeddedResource Include="Styles\Label.style" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

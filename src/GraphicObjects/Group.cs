@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Xml.Serialization;
 using Cairo;
 using OpenTK.Input;
+using System.Diagnostics;
 
 
 namespace Crow
@@ -217,6 +218,9 @@ namespace Crow
 			maxChildrenHeight = 0;
 		}
 		void searchLargestChild(){
+			#if DEBUG_LAYOUTING
+			Debug.WriteLine("\tSearch largest child");
+			#endif
 			largestChild = null;
 			maxChildrenWidth = 0;
 			for (int i = 0; i < Children.Count; i++) {
@@ -231,6 +235,9 @@ namespace Crow
 			}
 		}
 		void searchTallestChild(){
+			#if DEBUG_LAYOUTING
+			Debug.WriteLine("\tSearch tallest child");
+			#endif
 			tallestChild = null;
 			maxChildrenHeight = 0;
 			for (int i = 0; i < Children.Count; i++) {

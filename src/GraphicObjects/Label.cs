@@ -12,6 +12,7 @@ using OpenTK.Input;
 namespace Crow
 {
     [Serializable]
+	[DefaultStyle("#Crow.Styles.Label.style")]
     public class Label : GraphicObject
     {
 		#region CTOR
@@ -308,17 +309,6 @@ namespace Crow
 			NotifyValueChanged ("Text", Text);
 		}
 		#region GraphicObject overrides
-		[XmlAttributeAttribute()][DefaultValue(-1)]
-		public override int Width {
-			get { return base.Width; }
-			set { base.Width = value; }
-		}
-		[XmlAttributeAttribute()][DefaultValue(-1)]
-		public override int Height {
-			get { return base.Height; }
-			set { base.Height = value; }
-		}
-
 		protected override int measureRawSize(LayoutingType lt)
         {			
 			if (lines == null)

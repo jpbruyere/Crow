@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
-<Container Background="vgradient|0:DarkGray|1:DimGray">
-	<GroupBox Width="200" Height="150" Background="vgradient|0:SteelBlue|1:Transparent"
-		Foreground="ogradient|0:White|1:Black">
-	<!--	<Label/>-->
+<!--<Container Background="vgradient|0:DarkGray|1:DimGray">-->
+	<GroupBox Fit="true" Background="vgradient|0:SteelBlue|1:Transparent"
+		Foreground="White">
+<!--		<Label/>-->
 	</GroupBox>
-</Container>
+<!--</Container>-->

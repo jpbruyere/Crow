@@ -790,10 +790,7 @@ namespace Crow
 				if (Width > 0)
 					Slot.Width = Width;
 				else if (Width < 0) {
-					int tmp = measureRawSize (LayoutingType.Width);
-					if (tmp < 0)
-						return false;
-					Slot.Width = tmp;
+					Slot.Width = measureRawSize (LayoutingType.Width);
 				}else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
 					return false;
 				else
@@ -818,10 +815,7 @@ namespace Crow
 				if (Height > 0)
 					Slot.Height = Height;
 				else if (Height < 0){
-					int tmp = measureRawSize (LayoutingType.Height);
-					if (tmp < 0)
-						return false;
-					Slot.Height = tmp;
+					Slot.Height = measureRawSize (LayoutingType.Height);
 				}else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height))
 					return false;
 				else
