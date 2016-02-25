@@ -119,7 +119,7 @@ namespace Crow
 
 		void loadPage(int pageNum)
 		{
-			#if DEBUG_LOAD_TIME
+			#if DEBUG_LOAD
 			Stopwatch loadingTime = new Stopwatch ();
 			loadingTime.Start ();
 			#endif
@@ -150,7 +150,7 @@ namespace Crow
 
 			_list.AddChild (page);
 
-			#if DEBUG_LOAD_TIME
+			#if DEBUG_LOAD
 			loadingTime.Stop ();
 			Debug.WriteLine("Listbox {2} Loading: {0} ticks \t, {1} ms",
 			loadingTime.ElapsedTicks,

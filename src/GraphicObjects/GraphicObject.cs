@@ -454,7 +454,11 @@ namespace Crow
 
 		/// <summary> Loads the default values from XML attributes default </summary>
 		protected virtual void loadDefaultValues()
-		{			
+		{
+			#if DEBUG_LOAD
+			Debug.WriteLine ("LoadDefValues for " + this.ToString ());
+			#endif
+
 			Type thisType = this.GetType ();
 			if (Interface.DefaultValuesLoader.ContainsKey(thisType.FullName)) {
 				Interface.DefaultValuesLoader[thisType.FullName] (this);
@@ -606,6 +610,7 @@ namespace Crow
 
 			Interface.DefaultValuesLoader[thisType.FullName] = (Interface.loadDefaultInvoker)dm.CreateDelegate(typeof(Interface.loadDefaultInvoker));
 			Interface.DefaultValuesLoader[thisType.FullName] (this);
+			applyStyle ();
 		}
 
 		public virtual GraphicObject FindByName(string nameToFind){
@@ -1471,6 +1476,11 @@ namespace Crow
 			Stream s = Interface.GetStreamFromPath (style);
 			if (s == null)
 				throw new Exception ("Style Path not found: " + style);
+
+			#if DEBUG_LOAD
+			Debug.WriteLine ("ApplyStyle for " + this.ToString ());
+			#endif
+
 			using (StreamReader sr = new StreamReader (s)) {
 				while (!sr.EndOfStream) {
 					string tmp = sr.ReadLine ();

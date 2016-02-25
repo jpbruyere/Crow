@@ -174,10 +174,9 @@ namespace Crow
 				} else
 					loadTemplate (Interface.Load (template, this));
 				
-				if (this.child == null) {
+				//if no template found, load default one
+				if (this.child == null)
 					loadTemplate ();
-					loadDefaultValues ();
-				}
 				
 				//normal xml read
 				using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {

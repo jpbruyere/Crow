@@ -132,7 +132,7 @@ namespace Crow
 
 		public static GraphicObject Load (Stream stream, Type type, object hostClass = null)
 		{
-			#if DEBUG_LOAD_TIME
+			#if DEBUG_LOAD
 			Stopwatch loadingTime = new Stopwatch ();
 			loadingTime.Start ();
 			#endif
@@ -150,7 +150,7 @@ namespace Crow
 			result = (GraphicObject)xs.Deserialize (stream);
 			//result.DataSource = hostClass;
 
-			#if DEBUG_LOAD_TIME
+			#if DEBUG_LOAD
 			FileStream fs = stream as FileStream;
 			if (fs!=null)
 				CurrentGOMLPath = fs.Name;
