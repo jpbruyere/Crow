@@ -28,7 +28,7 @@ using System.Diagnostics;
 
 namespace Crow
 {
-//	[AttributeUsage(AttributeTargets.Class)]
+	[AttributeUsage(AttributeTargets.Class)]
 	public class TemplateAttribute : Attribute
 	{
 		public string Path = "";
@@ -38,24 +38,14 @@ namespace Crow
 		}
 	}
 	[AttributeUsage(AttributeTargets.Class)]
-	public class StyleAttribute : Attribute
+	public class DefaultStyle : TemplateAttribute
 	{
-		public string PropertyName = "";
-		public object DefaultValue = null;
-		public StyleAttribute(string _property, object _defValue){
-			PropertyName = _property;
-			DefaultValue = _defValue;
-		}
+		public DefaultStyle(string path) : base(path){}
 	}
 	[AttributeUsage(AttributeTargets.Class)]
 	public class DefaultTemplate : TemplateAttribute
 	{
 		public DefaultTemplate(string path) : base(path){}
-	}
-	[AttributeUsage(AttributeTargets.Class)]
-	public class DefaultOverlayTemplate : TemplateAttribute
-	{
-		public DefaultOverlayTemplate(string path) : base(path){}
 	}
 	[AttributeUsage(AttributeTargets.Class)]
 	public class DefaultItemTemplate : TemplateAttribute

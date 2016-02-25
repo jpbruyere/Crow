@@ -438,7 +438,7 @@ namespace Crow
 					(LogicalParent as GraphicObject).DataSource : dataSource;
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(null)]
+		[XmlAttributeAttribute]
 		public virtual string Style {
 			get { return style; }
 			set {
@@ -484,8 +484,6 @@ namespace Crow
 
 			il.Emit(OpCodes.Nop);
 
-			StyleAttribute[] style = thisType.GetCustomAttributes().OfType<StyleAttribute>().ToArray();
-
 			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
 				string name = "";
 				object defaultValue = null;
@@ -504,16 +502,17 @@ namespace Crow
 					else
 						name = xaa.AttributeName;
 				}
-
-				StyleAttribute piStyle = style.Where(s => s.PropertyName == pi.Name).FirstOrDefault();
-				if (piStyle != null){
-					defaultValue = piStyle.DefaultValue;
+				if (name == "Style"){
+					//retrieve default value from class attribute
+					DefaultStyle defStyle = thisType.GetCustomAttribute<DefaultStyle>();
+					if (defStyle != null)
+						defaultValue = defStyle.Path;
 				}else{
 					DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof(DefaultValueAttribute));
 					if (dv == null)
 						continue;
 					defaultValue = dv.Value;
-				}				
+				}
 				#endregion
 
 				il.Emit (OpCodes.Ldarg_0);
