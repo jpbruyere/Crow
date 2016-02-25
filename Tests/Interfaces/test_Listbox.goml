@@ -2,10 +2,10 @@
 <!--<ListBox Data="{TestList}" Focusable="true"/>-->
 <Border BorderWidth="2" Fit="true">
 	<VerticalStack Fit="true" Margin="50">
-		<Label Text="{MousePos}" Width="-1" Background="DarkGreen"/>
+		<Label Text="{../ColorList.SelectedItem}" Width="-1" Background="DarkGreen"/>
 		<Label Text="{Hover}" Width="-1" Background="DarkGreen"/>
 		<Button Caption="Clear" Width="150" MouseClick="OnClear"/>
-		<ListBox Data="{TestList}" Background="0,5;0,5;0,5;0,5"
+		<ListBox Name="ColorList" Data="{TestList}" Background="0,5;0,5;0,5;0,5"
 					 HorizontalAlignment="Center" Width="-1" Height="150" Margin="5">
 			<Template>
 				<Border BorderWidth="1" Height="{../HeightPolicy}" Width="{../WidthPolicy}">

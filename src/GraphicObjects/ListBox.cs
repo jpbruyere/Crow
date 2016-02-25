@@ -208,10 +208,7 @@ namespace Crow
 		}
 
 		void itemClick(object sender, OpenTK.Input.MouseButtonEventArgs e){
-			SelectedItemChanged.Raise (sender, new SelectionChangeEventArgs((sender as GraphicObject).DataSource));
-			NotifyValueChanged ("SelectedItem", (sender as GraphicObject).DataSource);
-			//Debug.WriteLine ((sender as GraphicObject).DataSource);
-
+			SelectedIndex = data.IndexOf((sender as GraphicObject).DataSource);
 		}
 
 		#region IXmlSerializable
