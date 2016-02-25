@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0"?>
 <Border BorderWidth="1" Margin="1" MinimumSize="20;20" Height="{../HeightPolicy}" Width="{../WidthPolicy}" >
 	<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"
-		Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
+		Height="{../../HeightPolicy}" Width="{../../WidthPolicy}"
+		ValueChanged="../../_scroller_ValueChanged">
 		<VerticalStack LayoutChanged="../../../_list_LayoutChanged"
 			Height="-1" Width="{../../../WidthPolicy}" Name="List" Margin="0" VerticalAlignment="Top"/>
 	</Scroller>

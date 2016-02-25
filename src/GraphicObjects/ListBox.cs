@@ -87,6 +87,7 @@ namespace Crow
 
 				NotifyValueChanged ("SelectedIndex", _selectedIndex);
 				NotifyValueChanged ("SelectedItem", SelectedItem);
+				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
 			}
 		}
 		public object SelectedItem{

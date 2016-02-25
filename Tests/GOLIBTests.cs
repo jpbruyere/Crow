@@ -37,6 +37,7 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"test_Listbox.goml",
 			"6.crow",
 			"testGroupBox.goml",
 			"1.crow",
@@ -47,7 +48,6 @@ namespace test
 			"0.crow",
 			"testImage.crow",
 			"testOutOfClipUpdate.crow",
-			"test_Listbox.goml",
 			"testTreeView.crow",
 			"testWindow.goml",
 			"clip4.crow",

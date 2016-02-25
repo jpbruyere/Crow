@@ -6,21 +6,23 @@
 		<Label Text="{Hover}" Width="-1" Background="DarkGreen"/>
 		<Button Caption="Clear" Width="150" MouseClick="OnClear"/>
 		<ListBox Name="ColorList" Data="{TestList}" Background="0,5;0,5;0,5;0,5"
-					 HorizontalAlignment="Center" Width="-1" Height="150" Margin="5">
-			<Template>
+					 HorizontalAlignment="Center" Width="-1" Height="200" Margin="5">
+<!--			<Template>
 				<Border BorderWidth="1" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
 					<HorizontalStack Margin="1" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}" >
 						<Scroller Name="scroller1" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}" 
-								Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}">
+								Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}"
+								ValueChanged="../../../_scroller_ValueChanged">
 							<VerticalStack Width="{../../../../WidthPolicy}" Height="-1" MinimumSize="100;100"
-								Name="List" Margin="0" VerticalAlignment="Top" />
+								Name="List" Margin="0" VerticalAlignment="Top"
+								LayoutChanged="../../../../_list_LayoutChanged"/>
 						</Scroller>
 						<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}" 
 							Maximum="{../scroller1.MaximumScroll}" Orientation="Vertical" 
-							Width="10" Height="{../../../HeightPolicy}" />
+							Width="12" Height="{../../../HeightPolicy}" />
 					</HorizontalStack>
 				</Border>
-			</Template>
+			</Template>-->
 		</ListBox>
 		<Button Caption="Load list" Width="0" MouseClick="OnLoadList"/>
 	</VerticalStack>
