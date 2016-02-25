@@ -172,7 +172,7 @@
     <Folder Include="src\CompilerServices\" />
     <Folder Include="src\OpenGL\" />
     <Folder Include="src\Fill\" />
-    <Folder Include="Style\" />
+    <Folder Include="Styles\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\Icons\updown.svg" />
@@ -232,7 +232,14 @@
     <EmbeddedResource Include="Templates\TabItem.crow" />
     <EmbeddedResource Include="Templates\TreeItem.crow" />
     <EmbeddedResource Include="Templates\Dummy.goml" />
-    <EmbeddedResource Include="Style\CheckBox.style" />
+    <EmbeddedResource Include="Styles\CheckBox.style" />
+    <EmbeddedResource Include="Styles\Splitter.style" />
+    <EmbeddedResource Include="Styles\Popper.style" />
+    <EmbeddedResource Include="Styles\RadioButton.style" />
+    <EmbeddedResource Include="Styles\Button.style" />
+    <EmbeddedResource Include="Styles\Expandable.style" />
+    <EmbeddedResource Include="Styles\GroupBox.style" />
+    <EmbeddedResource Include="Styles\ComboBox.style" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

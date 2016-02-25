@@ -5,6 +5,7 @@ using System.Xml.Serialization;
 
 namespace Crow
 {
+	[DefaultStyle("#Crow.Styles.Expandable.style")]
 	[DefaultTemplate("#Crow.Templates.Expandable.goml")]
     public class Expandable : TemplatedContainer
     {
@@ -27,11 +28,10 @@ namespace Crow
 		#endregion
 
 		#region GraphicObject overrides
-		[XmlAttributeAttribute()][DefaultValue(true)]
-		public override bool Focusable
+		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{
-			get { return base.Focusable; }
-			set { base.Focusable = value; }
+			IsExpanded = !IsExpanded;
+			base.onMouseClick (sender, e);
 		}
 		#endregion
 
@@ -48,11 +48,6 @@ namespace Crow
 			base.loadTemplate (template);
 
 			_contentContainer = this.child.FindByName ("Content") as Container;
-		}
-		public override void onMouseClick (object sender, MouseButtonEventArgs e)
-		{
-			IsExpanded = !IsExpanded;
-			base.onMouseClick (sender, e);
 		}
 		public override void ResolveBindings ()
 		{

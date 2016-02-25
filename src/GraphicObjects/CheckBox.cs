@@ -5,6 +5,7 @@ using System.Xml.Serialization;
 
 namespace Crow
 {
+	[DefaultStyle("#Crow.Styles.CheckBox.style")]
 	[DefaultTemplate("#Crow.Templates.CheckBox.goml")]
 	public class CheckBox : TemplatedControl
 	{
@@ -14,20 +15,11 @@ namespace Crow
 
 		#region CTOR
 		public CheckBox() : base()
-		{			
-		}							
+		{}							
 		#endregion
 
 		public event EventHandler Checked;
 		public event EventHandler Unchecked;
-
-		#region GraphicObject overrides
-		[XmlAttributeAttribute()][DefaultValue("#Crow.Style.CheckBox.style")]
-		public override string Style {
-			get { return base.Style; }
-			set { base.Style = value; }
-		}
-		#endregion
 
 		[XmlAttributeAttribute()][DefaultValue("Checkbox")]
 		public string Caption {
@@ -49,7 +41,6 @@ namespace Crow
 				NotifyValueChanged ("Image", image);
 			}
 		} 
-
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public bool IsChecked
 		{
@@ -69,6 +60,7 @@ namespace Crow
 					Unchecked.Raise (this, null);
 			}
 		}
+
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{
 			IsChecked = !IsChecked;

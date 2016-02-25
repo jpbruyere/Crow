@@ -5,6 +5,7 @@ using OpenTK.Input;
 
 namespace Crow
 {
+	[DefaultStyle("#Crow.Styles.Popper.style")]
 	[DefaultTemplate("#Crow.Templates.Popper.goml")]
     public class Popper : TemplatedContainer
     {		
@@ -87,12 +88,6 @@ namespace Crow
 		}
 
 		#region GraphicObject overrides
-		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
-		public override bool Focusable
-		{
-			get { return base.Focusable; }
-			set { base.Focusable = value; }
-		}
 		public override void ClearBinding ()
 		{
 			//ensure popped window is cleared
@@ -119,8 +114,8 @@ namespace Crow
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
-			base.onMouseLeave (sender, e);
 			IsPopped = false;
+			base.onMouseLeave (sender, e);
 		}
 		#endregion
 

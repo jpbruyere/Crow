@@ -5,6 +5,7 @@ using System.Xml.Serialization;
 
 namespace Crow
 {
+	[DefaultStyle("#Crow.Styles.RadioButton.style")]
 	[DefaultTemplate("#Crow.Templates.RadioButton.goml")]
     public class RadioButton : TemplatedControl
     {		        
@@ -20,11 +21,20 @@ namespace Crow
 		public event EventHandler Unchecked;
 
 		#region GraphicObject overrides
-		[XmlAttributeAttribute()][DefaultValue(true)]
-		public override bool Focusable
-		{
-			get { return base.Focusable; }
-			set { base.Focusable = value; }
+		public override void onMouseClick (object sender, MouseButtonEventArgs e)
+		{						
+			Group pg = Parent as Group;
+			if (pg != null) {
+				for (int i = 0; i < pg.Children.Count; i++) {
+					RadioButton c = pg.Children [i] as RadioButton;
+					if (c == null)
+						continue;
+					c.IsChecked = (c == this);
+				}
+			} else
+				IsChecked = !IsChecked;
+
+			base.onMouseClick (sender, e);
 		}
 		#endregion
 
@@ -68,21 +78,5 @@ namespace Crow
 					Unchecked.Raise (this, null);
             }
         }
-
-		public override void onMouseClick (object sender, MouseButtonEventArgs e)
-		{						
-			Group pg = Parent as Group;
-			if (pg != null) {
-				for (int i = 0; i < pg.Children.Count; i++) {
-					RadioButton c = pg.Children [i] as RadioButton;
-					if (c == null)
-						continue;
-					c.IsChecked = (c == this);
-				}
-			} else
-				IsChecked = !IsChecked;
-
-			base.onMouseClick (sender, e);
-		}
 	}
 }

@@ -13,6 +13,7 @@ using System.ComponentModel;
 
 namespace Crow
 {
+	[DefaultStyle("#Crow.Styles.Button.style")]
 	[DefaultTemplate("#Crow.Templates.Button.crow")]
     public class Button : TemplatedContainer
     {
@@ -42,22 +43,6 @@ namespace Crow
 		}
 
 		#region GraphicObject Overrides
-//		[XmlAttributeAttribute()][DefaultValue(50)]
-//		public override int Width {
-//			get { return base.Width; }
-//			set { base.Width = value; }
-//		}
-//		[XmlAttributeAttribute()][DefaultValue(20)]
-//		public override int Height {
-//			get { return base.Height; }
-//			set { base.Height = value; }
-//		}
-		[XmlAttributeAttribute()][DefaultValue(true)]
-        public override bool Focusable
-        {
-            get { return base.Focusable; }
-            set { base.Focusable = value; }
-		}
 		public override void ResolveBindings ()
 		{
 			base.ResolveBindings ();

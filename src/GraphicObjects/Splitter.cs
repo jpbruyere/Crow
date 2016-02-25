@@ -24,7 +24,7 @@ using System.ComponentModel;
 
 namespace Crow
 {
-	[StyleAttribute("Background", "DimGray")]
+	[DefaultStyle("#Crow.Styles.Splitter.style")]
 	public class Splitter : GraphicObject
 	{
 		#region CTOR
@@ -32,6 +32,7 @@ namespace Crow
 		#endregion
 
 		int thickness;
+
 		[XmlAttributeAttribute()][DefaultValue(1)]
 		public virtual int Thickness {
 			get { return thickness; }

@@ -4,6 +4,7 @@ using System.ComponentModel;
 
 namespace Crow
 {
+	[DefaultStyle("#Crow.Styles.GroupBox.style")]
 	[DefaultTemplate("#Crow.Templates.GroupBox.goml")]
     public class GroupBox : TemplatedContainer
     {		
@@ -28,15 +29,6 @@ namespace Crow
 			base.loadTemplate (template);
 
 			_contentContainer = this.child.FindByName ("Content") as Container;
-		}
-		#endregion
-
-		#region GraphicObject overrides
-		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
-		public override bool Focusable
-		{
-			get { return base.Focusable; }
-			set { base.Focusable = value; }
 		}
 		#endregion
 
