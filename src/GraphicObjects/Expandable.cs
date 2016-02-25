@@ -41,6 +41,7 @@ namespace Crow
 			}
 			set {
 				_contentContainer.SetChild(value);
+				NotifyValueChanged ("HasContent", HasContent);
 			}
 		}
 		protected override void loadTemplate(GraphicObject template = null)
@@ -85,8 +86,12 @@ namespace Crow
             {
 				if (value == _isExpanded)
 					return;
-				
+
 				_isExpanded = value;
+
+				if (!HasContent)
+					_isExpanded = false;
+
 				NotifyValueChanged ("IsExpanded", _isExpanded);
 
 				if (_isExpanded)
@@ -95,6 +100,10 @@ namespace Crow
 					onCollapse (this, null);
             }
         }
+		[XmlIgnore]public bool HasContent {
+			get { return _contentContainer == null ? false : _contentContainer.Child != null; }
+		}
+
 		#endregion
 
 		public virtual void onExpand(object sender, EventArgs e)

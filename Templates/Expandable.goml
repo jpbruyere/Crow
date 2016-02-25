@@ -3,7 +3,10 @@
 		MouseClick="../onMouseClick">
 	<VerticalStack Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
 		<HorizontalStack Spacing="1" Height="-1" Width="{../../../WidthPolicy}">
-			<Image Margin="2" Width="12" Height="12" Path="{../../../../Image}" SvgSub="{../../../../IsExpanded}"/>
+			<Image Margin="2" Width="12" Height="12"
+				Visible="{../../../../HasContent}"
+				Path="{../../../../Image}" 
+				SvgSub="{../../../../IsExpanded}"/>
 			<Label Text="{../../../../Caption}" Width="{../../../../WidthPolicy}"/>
 		</HorizontalStack>
 		<Container Name="Content" Visible="false"
