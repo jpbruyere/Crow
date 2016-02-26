@@ -434,7 +434,7 @@ namespace Crow
 					this.ResolveBindings();
 			}
 			get {				
-				return dataSource == null ? 
+				return dataSource == null ? LogicalParent == null ? null :
 					(LogicalParent as GraphicObject).DataSource : dataSource;
 			}
 		}
