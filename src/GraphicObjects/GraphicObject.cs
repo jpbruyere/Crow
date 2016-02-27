@@ -649,7 +649,7 @@ namespace Crow
 		}
 
 		#region Layouting
-		public int LayoutingTries {
+		[XmlIgnore]public int LayoutingTries {
 			get { return layoutingTries; }
 			set { layoutingTries = value; }
 		}
