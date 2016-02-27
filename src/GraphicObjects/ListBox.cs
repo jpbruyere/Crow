@@ -93,7 +93,7 @@ namespace Crow
 			}
 		}
 		public object SelectedItem{
-			get { return data == null ? "none" : data[_selectedIndex]; }
+			get { return data == null ? null : _selectedIndex < 0 ? null : data[_selectedIndex]; }
 		}
 		[XmlAttributeAttribute]//[DefaultValue(null)]
 		public IList Data {
