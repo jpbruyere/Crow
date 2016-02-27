@@ -52,6 +52,8 @@ namespace Crow
 		{
 			base.loadTemplate (template);
 			_list = this.child.FindByName ("List") as Group;
+			if (_list == null)
+				throw new Exception ("ListBox Template MUST contain a Goup named 'List'.");
 			_gsList = _list as GenericStack;
 		}
 
@@ -107,6 +109,10 @@ namespace Crow
 				NotifyValueChanged ("Data", data);
 
 				_list.ClearChildren ();
+				if (_gsList.Orientation == Orientation.Horizontal)
+					_gsList.Width = -1;
+				else
+					_gsList.Height = -1;
 
 				if (data == null)
 					return;
@@ -137,6 +143,13 @@ namespace Crow
 			Group page = _list.Clone () as Group;
 			page.Name = "page" + pageNum;
 
+			//reset size to fit in the dir of the stacking
+			//because _list total size is forced to approx size
+			if (_gsList.Orientation == Orientation.Horizontal)
+				page.Width = -1;
+			else
+				page.Height = -1;			
+
 
 			for (int i = (pageNum - 1) * itemPerPage; i < pageNum * itemPerPage; i++) {
 				if (i >= data.Count)
@@ -162,6 +175,10 @@ namespace Crow
 		{
 			if (_gsList == null)
 				return;
+			if (data == null)
+				return;
+			if (data.Count <= itemPerPage)
+				return;
 
 			if (_gsList.Orientation == Orientation.Horizontal) {
 			} else {
@@ -170,44 +187,39 @@ namespace Crow
 
 				double scroll = (double)e.NewValue;
 				int pageHeight = (int)Math.Ceiling((double)_gsList.getSlot().Height / (double)data.Count * (double)itemPerPage);
+				int pagePtr = (int)Math.Ceiling((scroll + (double)pageHeight / 2.0) / (double)pageHeight);
 
-				int pagePtr = (int)Math.Ceiling(scroll / (double)pageHeight);
-
-				for (int i = _gsList.Children.Count+1; i <= pagePtr+1; i++) {
+				for (int i = _gsList.Children.Count+1; i < pagePtr+1; i++) {
 					loadPage (i);					
 				}
 			}
 		}
 		protected void _list_LayoutChanged (object sender, LayoutingEventArgs e)
 		{
-			if (_gsList == null)
-				return;
-
-			GenericStack page1 = _list.FindByName ("page1") as GenericStack;
-			if (page1 == null)
-				return;
-
 			if (_gsList.Orientation == Orientation.Horizontal) {
-				if (e.LayoutType != LayoutingType.Width)
-					return;
-				int tmpWidth = (int)Math.Ceiling ((double)page1.Slot.Width / (double)itemPerPage * (double)data.Count);
-				if (_gsList.Slot.Width == tmpWidth)
-					return;
-				_gsList.Slot.Width = tmpWidth;
-				_gsList.OnLayoutChanges (LayoutingType.Width);
-				_gsList.LastSlots.Width = _gsList.Slot.Width;
-			} else {
-				if (e.LayoutType != LayoutingType.Height)
-					return;
-				int tmpHeight = (int)Math.Ceiling ((double)page1.Slot.Height / (double)itemPerPage * (double)data.Count);
-				if (_gsList.Slot.Height == tmpHeight)
-					return;
-				_gsList.Slot.Height = tmpHeight;
-				_gsList.OnLayoutChanges (LayoutingType.Height);
-				_gsList.LastSlots.Height = _gsList.Slot.Height;
+				if (e.LayoutType == LayoutingType.Width)
+					_gsList.Width = approxSize;
+			} else if (e.LayoutType == LayoutingType.Height)
+				_gsList.Height = approxSize;
+		}
+		int approxSize
+		{
+			get {
+				if (data == null)
+					return -1;
+				GenericStack page1 = _list.FindByName ("page1") as GenericStack;
+				if (page1 == null)
+					return - 1;
+				
+				return page1.Orientation == Orientation.Horizontal ?
+					data.Count < itemPerPage ?
+						-1:
+					(int)Math.Ceiling ((double)page1.Slot.Width / (double)itemPerPage * (double)(data.Count+1)):
+					data.Count < itemPerPage ?
+						-1:
+					(int)Math.Ceiling ((double)page1.Slot.Height / (double)itemPerPage * (double)(data.Count+1));
 			}
 		}
-
 		void itemClick(object sender, OpenTK.Input.MouseButtonEventArgs e){
 			SelectedIndex = data.IndexOf((sender as GraphicObject).DataSource);
 		}

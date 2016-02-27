@@ -1,12 +1,14 @@
 ﻿<?xml version="1.0"?>
 <!--<ListBox Data="{TestList}" Focusable="true"/>-->
-<Border BorderWidth="2" Fit="true">
-	<VerticalStack Fit="true" Margin="50">
-		<Label Text="{../ColorList.SelectedItem}" Width="-1" Background="DarkGreen"/>
-		<Label Text="{Hover}" Width="-1" Background="DarkGreen"/>
-		<Button Caption="Clear" Width="150" MouseClick="OnClear"/>
+<Border Margin="50">
+	<VerticalStack >
+		<Label Text="{../ColorList.SelectedItem}" Background="DarkGreen"/>
+		<Label Text="{Hover}" Background="DarkGreen"/>
+		<Button Caption="Clear" Width="0" MouseClick="OnClear"/>
 		<ListBox Name="ColorList" Data="{TestList}" Background="0,5;0,5;0,5;0,5"
-					 HorizontalAlignment="Center" Width="-1" Height="200" Margin="5">
+					 HorizontalAlignment="Center" Width="-1" Height="200" Margin="0"
+					 ItemTemplate="#Tests.Interfaces.colorItem.crow"
+					 Template="#Crow.Templates.ScrollingListBox.goml">
 <!--			<Template>
 				<Border BorderWidth="1" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
 					<HorizontalStack Margin="1" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}" >
@@ -24,6 +26,6 @@
 				</Border>
 			</Template>-->
 		</ListBox>
-		<Button Caption="Load list" Width="0" MouseClick="OnLoadList"/>
+		<Button Caption="Load list" Width="0" MouseClick="../../../OnLoadList"/>
 	</VerticalStack>
 </Border>

@@ -1,8 +1,10 @@
 ﻿<?xml version="1.0"?>
-<HorizontalStack Height="-1" Width="150" Margin="1" Focusable="true"
+<HorizontalStack
+			HorizontalAlignment="Left"
+			Height="-1" Width="-1" Margin="1" Focusable="true"
 			MouseEnter="{Background=hgradient|0:DarkRed|1:Transparent}"
 			MouseLeave="{Background=Transparent}">
 	<GraphicObject Height="12" Width="20" Background="{}" Margin="0" CornerRadius="3"/>
-	<TextRun Text="{Name}" Margin="0"/>
+	<Label Text="{Name}" Margin="0"/>
 </HorizontalStack>
 
