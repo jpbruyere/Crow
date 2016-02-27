@@ -426,13 +426,11 @@ namespace Crow
 				if (dataSource == value)
 					return;
 
-				if (dataSource != null)
-					this.ClearBinding ();
+				this.ClearBinding ();
 				
 				dataSource = value;
 
-				if (dataSource != null)
-					this.ResolveBindings();
+				this.ResolveBindings();
 
 				NotifyValueChanged ("DataSource", dataSource);
 			}
