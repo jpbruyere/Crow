@@ -420,7 +420,8 @@ namespace Crow
 				RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
-		[XmlIgnore]public virtual object DataSource {
+		[XmlAttributeAttribute][DefaultValue(null)]
+		public virtual object DataSource {
 			set {
 				if (dataSource == value)
 					return;
@@ -432,6 +433,8 @@ namespace Crow
 
 				if (dataSource != null)
 					this.ResolveBindings();
+
+				NotifyValueChanged ("DataSource", dataSource);
 			}
 			get {				
 				return dataSource == null ? LogicalParent == null ? null :
@@ -1610,7 +1613,8 @@ namespace Crow
 
 				if (pi.GetCustomAttribute<XmlIgnoreAttribute> () != null)
 					continue;
-
+				if (pi.Name == "DataSource")
+					continue;
 //				object[] att = pi.GetCustomAttributes (false);
 //				foreach (object o in att) {
 //					XmlIgnoreAttribute xia = o as XmlIgnoreAttribute;
