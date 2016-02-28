@@ -15,7 +15,7 @@
 	</Template>
 	<Border Background="DimGray" BorderWidth="1" Margin="1"
 		MinimumSize="{../../MinimumPopupSize}" MaximumSize="0;400"
-		Height="400" Width="{../WidthPolicy}">
+		Height="400" Width="-1">
 		<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"
 			Height="{../HeightPolicy}" Width="{../WidthPolicy}"
 			ValueChanged="../../../_scroller_ValueChanged">
