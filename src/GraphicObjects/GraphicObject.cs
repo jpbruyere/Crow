@@ -1383,8 +1383,11 @@ namespace Crow
 		/// </summary>
 		public virtual void ClearBinding(){
 			foreach (Binding b in Bindings) {
-				if (string.IsNullOrEmpty (b.DynMethodId))
+				if (string.IsNullOrEmpty (b.DynMethodId)) {
+					b.Resolved = false;
+					//TODO:check if full reset is necessary
 					continue;
+				}
 				MemberReference mr = null;
 				if (b.Target == null)
 					mr = b.Source;
