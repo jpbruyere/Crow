@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack>
-	<ComboBox Width="120" Data="{TestList}" SelectedIndex="0"
+	<ComboBox Width="220" Data="{TestList}" SelectedIndex="0"
 		ItemTemplate="#Tests.Interfaces.colorItem.crow"/>
 </VerticalStack>
