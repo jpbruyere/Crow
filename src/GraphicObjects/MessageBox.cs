@@ -23,25 +23,17 @@ using System.ComponentModel;
 
 namespace Crow
 {
+	[DefaultStyle("#Crow.Styles.MessageBox.style")]
 	[DefaultTemplate("#Crow.Templates.MessageBox.goml")]
 	public class MessageBox : Window
 	{
 		public MessageBox ():base(){}
 
-		string title;
 		string message;
 
-		[XmlAttributeAttribute][DefaultValue("Message box")]
-		public virtual string Title
-		{
-			get { return title; }
-			set {
-				if (title == value)
-					return;
-				title = value;
-				NotifyValueChanged ("Title", title);
-			}
-		}
+		public event EventHandler Ok;
+		public event EventHandler Cancel;
+
 		[XmlAttributeAttribute][DefaultValue("Informations")]
 		public virtual string Message
 		{
@@ -53,30 +45,16 @@ namespace Crow
 				NotifyValueChanged ("Message", message);
 			}
 		}
-		#region GraphicObject overrides
-		[XmlAttributeAttribute][DefaultValue(250)]
-		public override int Width {
-			get { return base.Width; }
-			set { base.Width = value; }
-		}
-//		[XmlAttributeAttribute][DefaultValue(80)]
-//		public override int Height {
-//			get { return base.Height; }
-//			set { base.Height = value; }
-//		}
-		[XmlAttributeAttribute()][DefaultValue(true)]
-		public override bool Focusable
+
+		void onOkButtonClick (object sender, EventArgs e)
 		{
-			get { return base.Focusable; }
-			set { base.Focusable = value; }
+			Ok.Raise (this, null);
 		}
-		[XmlAttributeAttribute()][DefaultValue("150;80")]
-		public override Size MinimumSize
+		void onCancelButtonClick (object sender, EventArgs e)
 		{
-			get { return base.MinimumSize; }
-			set { base.MinimumSize = value; }
+			Ok.Raise (this, null);
 		}
-		#endregion
+
 	}
 }
 
