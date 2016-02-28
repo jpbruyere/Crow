@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0"?>
 <Popper Name="popper" PopDirection="Bottom" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
 	<Template>
-		<Border CornerRadius="0" Foreground="LightGray" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
-			<HorizontalStack Margin="1" Spacing="1" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
+		<Border CornerRadius="0" Foreground="LightGray" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
+			<HorizontalStack Margin="1" Spacing="1" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}">
 				<TextBox MinimumSize="80;10" Margin="1" Foreground="Black" Background="White"
-					Text="{../../../../SelectedItem}" Focusable="true"
+					Text="{../../../../SelectedItem}"
 					Height="{../../../../HeightPolicy}" Width="{../../../../WidthPolicy}"/>
-				<Button Width="14" Height="14" MouseClick="../../../onMouseClick"
+				<Button Width="14" Height="14" Focusable="false"
 					Template="#Crow.Templates.ArrowButTemplate.crow">
 					<Image Margin="0"  Path="#Crow.Images.Icons.updown.svg" SvgSub="down"/>
 				</Button>
 			</HorizontalStack>
 		</Border>
 	</Template>
-	<Border Background="DimGray" BorderWidth="1" Margin="1" MinimumSize="100;100" MaximumSize="200;300" Height="-1" Width="-1">
+	<Border Background="DimGray" BorderWidth="1" Margin="1" MinimumSize="100;100" MaximumSize="200;400" Height="-1" Width="-1">
 		<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"
 			Height="200" Width="-1"
 			ValueChanged="../../../_scroller_ValueChanged">
