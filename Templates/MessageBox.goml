@@ -23,8 +23,8 @@
 		</HorizontalStack>
 		<HorizontalStack Height="-1" Width="{../../../WidthPolicy}" Margin="3">
 			<GraphicObject Height="5"/>
-			<Button Caption="Ok"/>
-			<Button Caption="Cancel"/>
+			<Button Caption="Ok" MouseClick="onOkButtonClick"/>
+			<Button Caption="Cancel" MouseClick="onCancelButtonClick"/>
 		</HorizontalStack>
 	</VerticalStack>
 </Border>

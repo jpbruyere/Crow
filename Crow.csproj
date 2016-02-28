@@ -242,6 +242,7 @@
     <EmbeddedResource Include="Styles\ComboBox.style" />
     <EmbeddedResource Include="Styles\Label.style" />
     <EmbeddedResource Include="Styles\Spinner.style" />
+    <EmbeddedResource Include="Styles\MessageBox.style" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
