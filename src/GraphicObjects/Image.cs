@@ -90,6 +90,7 @@ namespace Crow
 
 			_pic.LoadImage (path);
 			registerForGraphicUpdate ();
+			RegisterForLayouting (LayoutingType.Sizing);
 		}
 		#endregion
 
