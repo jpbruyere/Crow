@@ -62,8 +62,8 @@ namespace Crow
 		}
 		public bool Resolved = false;
 
-		public MemberReference Source;
 		public MemberReference Target;
+		public MemberReference Source;
 
 		public string Expression;
 
@@ -71,7 +71,7 @@ namespace Crow
 		public Binding(){}
 		public Binding(MemberReference _source, string _expression)
 		{
-			Source = _source;
+			Target = _source;
 			Expression = _expression;
 		}
 		#endregion
@@ -81,7 +81,7 @@ namespace Crow
 
 			//if binding exp = '{}' => binding is done on datasource
 			if (string.IsNullOrEmpty (Expression)) {
-				Target = new MemberReference ((Source.Instance as GraphicObject).DataSource);
+				Source = new MemberReference ((Target.Instance as GraphicObject).DataSource);
 				return true;
 			}
 
@@ -89,11 +89,11 @@ namespace Crow
 
 			if (bindingExp.Length == 1) {
 				//datasource binding
-				Target = new MemberReference((Source.Instance as GraphicObject).DataSource);
+				Source = new MemberReference((Target.Instance as GraphicObject).DataSource);
 				member = bindingExp [0];
 			} else {
 				int ptr = 0;
-				ILayoutable tmp = Source.Instance as ILayoutable;
+				ILayoutable tmp = Target.Instance as ILayoutable;
 				if (string.IsNullOrEmpty (bindingExp [0])) {
 					//if exp start with '/' => Graphic tree parsing start at top container
 					tmp = tmp.HostContainer as ILayoutable;
@@ -107,7 +107,7 @@ namespace Crow
 					else if (bindingExp [ptr] == ".") {
 						if (ptr > 0)
 							throw new Exception ("Syntax error in binding, './' may only appear in first position");						
-						tmp = Source.Instance as ILayoutable;
+						tmp = Target.Instance as ILayoutable;
 					}else
 						tmp = (tmp as GraphicObject).FindByName (bindingExp [ptr]);
 					ptr++;
@@ -126,14 +126,14 @@ namespace Crow
 				} else
 					throw new Exception ("Syntax error in binding, expected 'go dot member'");
 
-				Target = new MemberReference(tmp);
+				Source = new MemberReference(tmp);
 			}
-			if (Target == null) {
+			if (Source == null) {
 				Debug.WriteLine ("Binding Source is null: " + Expression);
 				return false;
 			}
 
-			if (Target.FindMember (member))
+			if (Source.FindMember (member))
 				return true;
 			
 			Debug.WriteLine ("Binding member not found: " + member);
@@ -141,13 +141,13 @@ namespace Crow
 		}
 		public void Reset()
 		{
-			Target = null;
+			Source = null;
 			dynMethodId = "";
 			Resolved = false;
 		}
 		public override string ToString ()
 		{
-			return string.Format ("[Binding: {0}.{1} <= {2}]", Source.Instance, Source.Member.Name, Expression);
+			return string.Format ("[Binding: {0}.{1} <= {2}]", Target.Instance, Target.Member.Name, Expression);
 		}
 	}
 
