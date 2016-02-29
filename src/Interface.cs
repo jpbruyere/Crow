@@ -125,10 +125,12 @@ namespace Crow
 		{
 			Interface.XmlLoaderCount ++;
 			CurrentGOMLPath = path;
+			GraphicObject tmp = null;
 			using (Stream stream = GetStreamFromPath (path)) {
-				return Load(stream, GetTopContainerOfGOMLStream(stream), hostClass);
+				tmp = Load(stream, GetTopContainerOfGOMLStream(stream), hostClass);
 			}
 			Interface.XmlLoaderCount --;
+			return tmp;
 		}
 
 
