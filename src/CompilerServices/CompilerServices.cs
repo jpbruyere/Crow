@@ -48,6 +48,8 @@ namespace Crow
 	public class Binding{
 		static int bindingCpt = 0;
 		string dynMethodId = "";
+		bool resolved = false;
+
 		public string NewDynMethodId {
 			get {
 				if (!string.IsNullOrEmpty (dynMethodId))
@@ -60,7 +62,24 @@ namespace Crow
 		public string DynMethodId {
 			get { return dynMethodId; }
 		}
-		public bool Resolved = false;
+
+
+		public bool Resolved {
+			get {
+				return resolved;
+			}
+			set {
+				if (value == resolved)
+					return;
+				#if DEBUG_BINDING
+				if (value == true)
+					Debug.WriteLine ("\tOk => " + this.ToString());
+				else
+					Debug.WriteLine ("\tresolved state reseted => " + this.ToString());
+				#endif
+				resolved = value;
+			}
+		}
 
 		public MemberReference Target;
 		public MemberReference Source;
@@ -100,8 +119,10 @@ namespace Crow
 					ptr++;
 				}
 				while (ptr < bindingExp.Length - 1) {
-					if (tmp == null)
+					if (tmp == null) {
+						Debug.WriteLine ("\tERROR: target not found => " + this.ToString());
 						return false;
+					}
 					if (bindingExp [ptr] == "..")
 						tmp = tmp.LogicalParent;
 					else if (bindingExp [ptr] == ".") {
@@ -113,8 +134,10 @@ namespace Crow
 					ptr++;
 				}
 
-				if (tmp == null)
+				if (tmp == null) {
+					Debug.WriteLine ("\tERROR: target not found => " + this.ToString());
 					return false;
+				}
 
 				string[] bindTrg = bindingExp [ptr].Split ('.');
 

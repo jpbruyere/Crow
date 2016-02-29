@@ -425,6 +425,12 @@ namespace Crow
 			set {
 				if (dataSource == value)
 					return;
+				#if DEBUG_BINDING
+				Debug.WriteLine("******************************");
+				Debug.WriteLine("New DataSource for => " + this.ToString());
+				Debug.WriteLine("\t- " + DataSource);
+				Debug.WriteLine("\t+ " + value);
+				#endif
 
 				this.ClearBinding ();
 
@@ -436,7 +442,8 @@ namespace Crow
 			}
 			get {
 				return dataSource == null ? LogicalParent == null ? null :
-					(LogicalParent as GraphicObject).DataSource : dataSource;
+					LogicalParent is GraphicObject ?
+					(LogicalParent as GraphicObject).DataSource : null : dataSource;
 			}
 		}
 		[XmlAttributeAttribute]
@@ -1045,38 +1052,45 @@ namespace Crow
 			if (Bindings.Count == 0)
 				return;
 			#if DEBUG_BINDING
-			Debug.WriteLine ("ResolveBinding => " + this.ToString ());
+			Debug.WriteLine ("Resolve Bindings => " + this.ToString ());
 			#endif
+			//grouped bindings by Instance of Source
 			Dictionary<object,List<Binding>> resolved = new Dictionary<object, List<Binding>>();
+
 			foreach (Binding b in Bindings) {
 				if (b.Resolved)
 					continue;
+
 				if (b.Target.Member.MemberType == MemberTypes.Event) {
 					if (b.Expression.StartsWith("{")){
 						CompileEventSource(b);
 						continue;
 					}
-				}
-				if (!b.FindTarget ()) {
-					Debug.WriteLine ("BINDING ERROR: target not found => " + b.ToString());
-					continue;
-				}
-				if (b.Target.Member.MemberType == MemberTypes.Event) {
+					if (!b.FindTarget ())
+						continue;
 					//register handler for event
 					if (b.Source.Method == null) {
-						Debug.WriteLine ("Handler Method not found: " + b.ToString());
+						Debug.WriteLine ("\tError: Handler Method not found: " + b.ToString());
 						continue;
 					}
+					try {
+						MethodInfo addHandler = b.Target.Event.GetAddMethod ();
+						Delegate del = Delegate.CreateDelegate (b.Target.Event.EventHandlerType, b.Source.Instance, b.Source.Method);
+						addHandler.Invoke (this, new object[] { del });
 
-					MethodInfo addHandler = b.Target.Event.GetAddMethod ();
-					Delegate del = Delegate.CreateDelegate (b.Target.Event.EventHandlerType, b.Source.Instance, b.Source.Method);
-					addHandler.Invoke (this, new object[] { del });
-					b.Resolved = true;
-					#if DEBUG_BINDING
-					Debug.WriteLine ("\tHandler binded => " + b.ToString());
-					#endif
+						#if DEBUG_BINDING
+						Debug.WriteLine ("\tHandler binded => " + b.ToString());
+						#endif
+						b.Resolved = true;
+					} catch (Exception ex) {
+						Debug.WriteLine ("\tERROR: " + ex.ToString());
+					}
 					continue;
 				}
+
+				if (!b.FindTarget ())
+					continue;
+
 				List<Binding> bindings = null;
 				if (!resolved.TryGetValue (b.Source.Instance, out bindings)) {
 					bindings = new List<Binding> ();
@@ -1084,9 +1098,7 @@ namespace Crow
 				}
 				bindings.Add (b);
 				b.Resolved = true;
-				#if DEBUG_BINDING
-				Debug.WriteLine ("\tmarked as resolved => " + b.ToString());
-				#endif
+
 			}
 
 			MethodInfo stringEquals = typeof(string).GetMethod
@@ -1255,6 +1267,10 @@ namespace Crow
 		/// <param name="es">Event binding details</param>
 		public void CompileEventSource(Binding binding)
 		{
+			#if DEBUG_BINDING
+			Debug.WriteLine ("\tCompile Event Source => " + binding.ToString());
+			#endif
+
 			Type sourceType = this.GetType();
 
 			#region Retrieve EventHandler parameter type
@@ -1373,17 +1389,30 @@ namespace Crow
 			addHandler.Invoke(this, new object[] {del});
 
 			binding.Resolved = true;
-			#if DEBUG_BINDING
-			Debug.WriteLine ("\tCompiled Event Source => " + binding.ToString());
-			#endif
 		}
 		/// <summary>
 		/// Remove dynamic delegates by ids from dataSource
 		///  and delete ref of this in Shared interface refs
 		/// </summary>
 		public virtual void ClearBinding(){
+			//dont clear binding if dataSource is not null,
 			foreach (Binding b in Bindings) {
 				try {
+					if (!b.Resolved)
+						continue;
+					//cancel compiled events
+					if (b.Source == null){
+						continue;
+						#if DEBUG_BINDING
+						Debug.WriteLine("Clear binding canceled for => " + b.ToString());
+						#endif
+					}
+					if (b.Source.Instance != DataSource){
+						#if DEBUG_BINDING
+						Debug.WriteLine("Clear binding canceled for => " + b.ToString());
+						#endif
+						continue;
+					}
 					#if DEBUG_BINDING
 					Debug.WriteLine("ClearBinding => " + b.ToString());
 					#endif
