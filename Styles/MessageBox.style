@@ -1,4 +1,5 @@
-﻿Width=260
+﻿Width=200
+Height=-1
 Title=MessageBox
 Focusable=true
 MinimumSize=150;80

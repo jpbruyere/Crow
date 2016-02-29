@@ -52,7 +52,7 @@ namespace Crow
 		}
 		void onCancelButtonClick (object sender, EventArgs e)
 		{
-			Ok.Raise (this, null);
+			Cancel.Raise (this, null);
 		}
 
 	}

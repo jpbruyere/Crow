@@ -37,6 +37,9 @@ namespace test
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
+			"testMsgBox.goml",
+			"testCombobox.goml",
+			"testExpandable.goml",
 			"test_Listbox.goml",
 			"6.crow",
 			"testGroupBox.goml",
@@ -44,7 +47,6 @@ namespace test
 			"5.crow",
 			"testCheckbox.goml",
 			"testTabView.crow",
-			"testExpandable.goml",
 			"0.crow",
 			"testImage.crow",
 			"testOutOfClipUpdate.crow",
@@ -55,7 +57,6 @@ namespace test
 			"clip2.crow",
 			"clip0.crow",
 			"clip1.crow",
-			"testCombobox.goml",
 			"testPopper.goml",
 			"testTextBox.crow",
 			"testColorList.crow",
@@ -80,7 +81,7 @@ namespace test
 //			"testRadioButton2.goml",
 			"testContainer.goml",
 			"testRadioButton.goml",
-			"testMsgBox.goml",
+
 //			"testMeter.goml",
 		};
 
@@ -180,7 +181,9 @@ namespace test
 		}
 		void OnClear (object sender, MouseButtonEventArgs e) => TestList = null;
 
-		void OnLoadList (object sender, MouseButtonEventArgs e) => TestList = Color.ColorDic.ToList();
+		void OnLoadList (object sender, MouseButtonEventArgs e) {
+			TestList = Color.ColorDic.ToList();
+		}
 
 		protected override void OnLoad (EventArgs e)
 		{
@@ -189,8 +192,7 @@ namespace test
 
 			GraphicObject obj = LoadInterface("Interfaces/" + testFiles[idx]);
 			obj.DataSource = this;
-
-		}
+	}
 		protected override void OnUpdateFrame (FrameEventArgs e)
 		{
 			//if (frameCpt % 8 == 0)
@@ -254,6 +256,13 @@ namespace test
 			using (GOLIBTests win = new GOLIBTests( )) {
 				win.Run (30.0);
 			}
+		}
+		void onMsgBoxOk(object sender, EventArgs e){
+			Debug.WriteLine ("OK");
+		}
+		void onMsgBoxCancel(object sender, EventArgs e)
+		{
+			Debug.WriteLine ("cancel");
 		}
 	}
 }
