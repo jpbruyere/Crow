@@ -6,6 +6,7 @@ using OpenTK.Input;
 
 namespace Crow
 {
+	[DefaultStyle("#Crow.Styles.Window.style")]
 	[DefaultTemplate("#Crow.Templates.Window.goml")]
 	public class Window : TemplatedContainer
 	{

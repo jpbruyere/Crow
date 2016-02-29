@@ -23,7 +23,6 @@
     <SchemaVersion>2.0</SchemaVersion>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ReleaseVersion>0.4</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -243,6 +242,7 @@
     <EmbeddedResource Include="Styles\Label.style" />
     <EmbeddedResource Include="Styles\Spinner.style" />
     <EmbeddedResource Include="Styles\MessageBox.style" />
+    <EmbeddedResource Include="Styles\Window.style" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
