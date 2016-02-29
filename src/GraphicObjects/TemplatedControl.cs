@@ -56,7 +56,12 @@ namespace Crow
 	public abstract class TemplatedControl : PrivateContainer, IXmlSerializable
 	{
 		#region CTOR
-		public TemplatedControl () : base()	{}
+		public TemplatedControl () : base()
+		{
+			if (Interface.XmlLoaderCount > 0)
+				return;
+			loadTemplate ();
+		}
 		#endregion
 
 		string _template;
@@ -91,10 +96,10 @@ namespace Crow
 				this.SetChild (Interface.Load (dt.Path, this));
 			}else
 				this.SetChild (template);
-			
+
 			this.ResolveBindings ();
 		}
-			
+
 		#region IXmlSerializable
 		public override System.Xml.Schema.XmlSchema GetSchema(){ return null; }
 		public override void ReadXml(System.Xml.XmlReader reader)
@@ -109,7 +114,7 @@ namespace Crow
 				string tmp = subTree.ReadOuterXml ();
 
 				//Load template from path set as attribute in templated control
-				if (string.IsNullOrEmpty (template)) {					
+				if (string.IsNullOrEmpty (template)) {
 					//seek for template tag first
 					using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
 						//load template first if inlined
@@ -124,7 +129,7 @@ namespace Crow
 								xr.Read ();
 
 								Type t = Type.GetType ("Crow." + xr.Name);
-								GraphicObject go = (GraphicObject)Activator.CreateInstance (t);                                
+								GraphicObject go = (GraphicObject)Activator.CreateInstance (t);
 								(go as IXmlSerializable).ReadXml (xr);
 
 								loadTemplate (go);
@@ -133,16 +138,16 @@ namespace Crow
 								xr.Read ();//Template close tag
 								break;
 							} else
-								xr.ReadInnerXml ();							
+								xr.ReadInnerXml ();
 						}
-					}				
+					}
 				} else
 					loadTemplate (Interface.Load (template, this));
-				
+
 				//if no template found, load default one
 				if (this.child == null)
 					loadTemplate ();
-				
+
 				//normal xml read
 				using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
 					xr.Read ();

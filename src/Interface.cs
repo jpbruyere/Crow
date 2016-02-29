@@ -39,6 +39,7 @@ namespace Crow
 		internal static bool XmlSerializerInit = false;
 		/// <summary> keep ressource path for debug msg </summary>
 		internal static string CurrentGOMLPath = "";
+		internal static int XmlLoaderCount = 0;
 
 		public static int TabSize = 4;
 		public static string LineBreak = "\r\n";
@@ -122,10 +123,12 @@ namespace Crow
 
 		public static GraphicObject Load (string path, object hostClass = null)
 		{
+			Interface.XmlLoaderCount ++;
 			CurrentGOMLPath = path;
 			using (Stream stream = GetStreamFromPath (path)) {
 				return Load(stream, GetTopContainerOfGOMLStream(stream), hostClass);
 			}
+			Interface.XmlLoaderCount --;
 		}
 
 
