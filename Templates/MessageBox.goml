@@ -18,13 +18,14 @@
 		<HorizontalStack Spacing="3" Margin="3" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}">
 			<Image Name="Image" Width="24" Height="24"
 				Path="#Crow.Images.Icons.iconInfo.svg" />
-			<TextRun Font="serif, 12" Height="{../../../../HeightPolicy}" Width="{../../../../WidthPolicy}" Text="{../../../../Message}"
+			<Label Font="serif, 12" Height="{../../../../HeightPolicy}" Width="{../../../../WidthPolicy}" Text="{../../../../Message}"
+				TextAlignment="Left"
 				Multiline="true" WordWrap="true"/>		
 		</HorizontalStack>
 		<HorizontalStack Height="-1" Width="{../../../WidthPolicy}" Margin="3">
 			<GraphicObject Height="5"/>
-			<Button Caption="Ok" MouseClick="../../../../onOkButtonClick"/>
-			<Button Caption="Cancel" MouseClick="../../../../onCancelButtonClick"/>
+			<Button Caption="Ok" MouseClick="../../../../onOkButtonClick" Background="Gray"/>
+			<Button Caption="Cancel" MouseClick="../../../../onCancelButtonClick" Background="Gray"/>
 		</HorizontalStack>
 	</VerticalStack>
 </Border>
