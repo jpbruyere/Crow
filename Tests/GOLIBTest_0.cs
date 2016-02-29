@@ -28,8 +28,18 @@ namespace test6
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-			g = LoadInterface("Interfaces/test0.goml");
-			l = g.FindByName ("labCpt") as Label;
+//			g = LoadInterface("Interfaces/test0.goml");
+//			l = g.FindByName ("labCpt") as Label;
+			MessageBox m = new MessageBox();
+			m.Message = "this is a test";
+			m.Ok += M_Ok;
+			//m.DataSource = this;
+			this.AddWidget(m);
+		}
+
+		void M_Ok (object sender, EventArgs e)
+		{
+			Debug.WriteLine ("ok");
 		}
 
 		void onUp (object sender, MouseButtonEventArgs e)
