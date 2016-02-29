@@ -118,6 +118,10 @@ namespace Crow
 					return;
 
 				loadPage (1);
+
+				NotifyValueChanged ("SelectedIndex", _selectedIndex);
+				NotifyValueChanged ("SelectedItem", SelectedItem);
+				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
 			}
 		}
 		int itemPerPage = 100;
