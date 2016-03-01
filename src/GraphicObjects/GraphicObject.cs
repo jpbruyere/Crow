@@ -646,7 +646,8 @@ namespace Crow
 				return;
 			if (Interface.CurrentInterface == null)
 				return;
-			Interface.CurrentInterface.gobjsToRedraw.Add (this);
+			lock(Interface.CurrentInterface.RenderMutex)
+				Interface.CurrentInterface.gobjsToRedraw.Add (this);
 			IsQueuedForRedraw = true;
 		}
 
@@ -690,17 +691,19 @@ namespace Crow
 			Debug.WriteLine ("REGLayout => {1}->{0}", layoutType, this.ToString());
 			#endif
 
-			//enqueue LQI LayoutingTypes separately
-			if (layoutType.HasFlag (LayoutingType.Width))
-				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
-			if (layoutType.HasFlag (LayoutingType.Height))
-				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
-			if (layoutType.HasFlag (LayoutingType.X))
-				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
-			if (layoutType.HasFlag (LayoutingType.Y))
-				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
-			if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
-				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
+			lock (Interface.LayoutingQueue) {
+				//enqueue LQI LayoutingTypes separately
+				if (layoutType.HasFlag (LayoutingType.Width))
+					Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
+				if (layoutType.HasFlag (LayoutingType.Height))
+					Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
+				if (layoutType.HasFlag (LayoutingType.X))
+					Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
+				if (layoutType.HasFlag (LayoutingType.Y))
+					Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
+				if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
+					Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
+			}
 		}
 
 		/// <summary> trigger dependant sizing component update </summary>

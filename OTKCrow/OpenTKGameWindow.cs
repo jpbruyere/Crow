@@ -37,7 +37,8 @@ namespace Crow
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
 		public virtual void NotifyValueChanged(string MemberName, object _value)
 		{
-			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
+			if (ValueChanged != null)				
+				ValueChanged.Invoke(this, new ValueChangeEventArgs(MemberName, _value));
 		}
 		#endregion
 
@@ -102,11 +103,26 @@ namespace Crow
 //		public OpenTKGameWindow(int _width, int _height, string _title="golib")
 //			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), _title)
 		{
-			CrowInterface = new Interface ();
-			CrowInterface.Quit += Quit;
-			CrowInterface.MouseCursorChanged += CrowInterface_MouseCursorChanged;
+			Thread t = new Thread (interfaceThread);
+			t.IsBackground = true;
+			t.Start ();
+
+//			interfaceThread ();
 		}
 		#endregion
+
+		void interfaceThread()
+		{
+			CrowInterface = new Interface ();
+			Interface.CurrentInterface = CrowInterface;
+			CrowInterface.Quit += Quit;
+			CrowInterface.MouseCursorChanged += CrowInterface_MouseCursorChanged;
+
+			while (true) {
+				CrowInterface.Update ();
+				Thread.Sleep (1);
+			}
+		}
 
 		public void Quit (object sender, EventArgs e)
 		{
@@ -176,21 +192,21 @@ namespace Crow
 			GL.Viewport (0, 0, ClientRectangle.Width, ClientRectangle.Height);
 
 			shader.Enable ();
-
-			if (CrowInterface.IsDirty) {
-				byte[] tmp = new byte[4 * CrowInterface.DirtyRect.Width * CrowInterface.DirtyRect.Height];
-				for (int y = 0; y < CrowInterface.DirtyRect.Height; y++) {
-					Array.Copy(CrowInterface.bmp,
-						((CrowInterface.DirtyRect.Top + y) * ClientRectangle.Width * 4) + CrowInterface.DirtyRect.Left * 4,
-						tmp, y * CrowInterface.DirtyRect.Width * 4, CrowInterface.DirtyRect.Width *4);
+			lock (CrowInterface.RenderMutex) {
+				if (CrowInterface.IsDirty) {
+					byte[] tmp = new byte[4 * CrowInterface.DirtyRect.Width * CrowInterface.DirtyRect.Height];
+					for (int y = 0; y < CrowInterface.DirtyRect.Height; y++) {
+						Array.Copy (CrowInterface.bmp,
+							((CrowInterface.DirtyRect.Top + y) * ClientRectangle.Width * 4) + CrowInterface.DirtyRect.Left * 4,
+							tmp, y * CrowInterface.DirtyRect.Width * 4, CrowInterface.DirtyRect.Width * 4);
+					}
+					GL.TexSubImage2D (TextureTarget.Texture2D, 0,
+						CrowInterface.DirtyRect.Left, CrowInterface.DirtyRect.Top,
+						CrowInterface.DirtyRect.Width, CrowInterface.DirtyRect.Height,
+						OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, tmp);
+					CrowInterface.IsDirty = false;
 				}
-				GL.TexSubImage2D (TextureTarget.Texture2D, 0,
-					CrowInterface.DirtyRect.Left, CrowInterface.DirtyRect.Top,
-					CrowInterface.DirtyRect.Width, CrowInterface.DirtyRect.Height,
-					OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, tmp);
-				CrowInterface.IsDirty = false;
 			}
-
 			uiQuad.Render (PrimitiveType.TriangleStrip);
 
 			GL.BindTexture(TextureTarget.Texture2D, 0);
@@ -232,18 +248,18 @@ namespace Crow
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
 			base.OnUpdateFrame(e);
-			fps = (int)RenderFrequency;
-
-
-			if (frameCpt > 50) {
-				resetFps ();
-				frameCpt = 0;
-				GC.Collect();
-				GC.WaitForPendingFinalizers();
-				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
-			}
-			frameCpt++;
-			CrowInterface.Update ();
+//			fps = (int)RenderFrequency;
+//
+//
+//			if (frameCpt > 50) {
+//				resetFps ();
+//				frameCpt = 0;
+//				GC.Collect();
+//				GC.WaitForPendingFinalizers();
+//				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
+//			}
+//			frameCpt++;
+			//CrowInterface.Update ();
 		}
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
@@ -260,7 +276,7 @@ namespace Crow
 		protected override void OnResize(EventArgs e)
 		{
 			base.OnResize (e);
-			CrowInterface.ProcessResize(
+			CrowInterface.ResizeDelegate.Invoke(
 				new Rectangle(
 				this.ClientRectangle.X,
 				this.ClientRectangle.Y,
@@ -270,7 +286,7 @@ namespace Crow
 		}
 		#endregion
 
-	#region Mouse Handling
+		#region Mouse Handling
 		void update_mouseButtonStates(ref MouseState e, OpenTK.Input.MouseState otk_e){
 			for (int i = 0; i < MouseState.MaxButtons; i++) {
 				if (otk_e.IsButtonDown ((OpenTK.Input.MouseButton)i))
@@ -295,10 +311,10 @@ namespace Crow
         }
 		#endregion
 
-	#region keyboard Handling
+		#region keyboard Handling
 		KeyboardState Keyboad = new KeyboardState ();
 		void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
-	{
+		{
 //			if (_focusedWidget == null) {
 				KeyboardKeyDown.Raise (this, otk_e);
 //				return;

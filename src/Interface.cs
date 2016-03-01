@@ -37,9 +37,20 @@ namespace Crow
 {
 	public class Interface : ILayoutable
 	{
+		public delegate void ResizeDelegatePrototype(Rectangle bounds);
+		public delegate void LoaderDelegatePrototype (string path);
+		public ResizeDelegatePrototype ResizeDelegate;
+		public LoaderDelegatePrototype LoadInterfaceDelegate;
+
 		#region CTOR
-		static Interface(){
+		static Interface(){			
 			Interface.LoadCursors ();
+		}
+		public Interface(){
+			Interface.CurrentInterface = this;
+
+			LoadInterfaceDelegate = new LoaderDelegatePrototype(InterfaceLoad);
+			ResizeDelegate = new ResizeDelegatePrototype (ProcessResize);
 		}
 		#endregion
 
@@ -187,6 +198,11 @@ namespace Crow
 			return result;
 		}
 
+		public void InterfaceLoad(string path){
+			GraphicObject tmp = Interface.Load (path, this);
+			AddWidget (tmp);
+		}
+
 		public GraphicObject LoadInterface (string path)
 		{
 			GraphicObject tmp = Interface.Load (path, this);
@@ -214,9 +230,10 @@ namespace Crow
 
 		Context ctx;
 		Surface surf;
-		public byte[] bmp;
+		volatile public byte[] bmp;
 		public bool IsDirty = false;
 		public Rectangle DirtyRect;
+		public object RenderMutex = new object();
 
 		#region focus
 		GraphicObject _activeWidget;	//button is pressed on widget
@@ -283,11 +300,20 @@ namespace Crow
 			layoutTime.Start ();
 			#endif
 			//Debug.WriteLine ("======= Layouting queue start =======");
+			int queueCount = 0;
+			LayoutingQueueItem lqi = null;
 
-			while (Interface.LayoutingQueue.Count > 0) {
-				LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
+			lock (Interface.LayoutingQueue)
+				queueCount = Interface.LayoutingQueue.Count;
+			
+			while (queueCount > 0) {
+				lock (Interface.LayoutingQueue)
+					lqi = Interface.LayoutingQueue.Dequeue ();				
 				lqi.ProcessLayouting ();
+				lock (Interface.LayoutingQueue)
+					queueCount = Interface.LayoutingQueue.Count;				
 			}
+
 
 			#if MEASURE_TIME
 			layoutTime.Stop ();
@@ -296,9 +322,12 @@ namespace Crow
 			//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
 			//final redraw clips should be added only when layout is completed among parents,
 			//that's why it take place in a second pass
-			GraphicObject[] gotr = new GraphicObject[gobjsToRedraw.Count];
-			gobjsToRedraw.CopyTo (gotr);
-			gobjsToRedraw.Clear ();
+			GraphicObject[] gotr = null;
+			lock (Interface.CurrentInterface.RenderMutex) {
+				gotr = new GraphicObject[gobjsToRedraw.Count];
+				gobjsToRedraw.CopyTo (gotr);
+				gobjsToRedraw.Clear ();
+			}
 			foreach (GraphicObject p in gotr) {
 				try {
 					p.IsQueuedForRedraw = false;
@@ -339,16 +368,18 @@ namespace Crow
 						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
 						#endif
 
-						if (IsDirty)
-							DirtyRect += clipping.Bounds;
-						else
-							DirtyRect = clipping.Bounds;
-						IsDirty = true;
+						lock (RenderMutex) {
+							if (IsDirty)
+								DirtyRect += clipping.Bounds;
+							else
+								DirtyRect = clipping.Bounds;
+							IsDirty = true;
 
-						DirtyRect.Left = Math.Max (0, DirtyRect.Left);
-						DirtyRect.Top = Math.Max (0, DirtyRect.Top);
-						DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
-						DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
+							DirtyRect.Left = Math.Max (0, DirtyRect.Left);
+							DirtyRect.Top = Math.Max (0, DirtyRect.Top);
+							DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
+							DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
+						}
 
 						clipping.Reset ();
 					}
@@ -429,6 +460,9 @@ namespace Crow
 			}
 			return null;
 		}
+
+
+
 		public void ProcessResize(Rectangle bounds){
 			clientRectangle = bounds;
 
