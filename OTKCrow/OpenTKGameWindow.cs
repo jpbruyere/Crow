@@ -31,8 +31,64 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Crow
 {
-	public class OpenTKGameWindow : GameWindow, ILayoutable, IGOLibHost
+	public class OpenTKGameWindow : GameWindow, IValueChange
     {
+		#region IValueChange implementation
+		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+		public virtual void NotifyValueChanged(string MemberName, object _value)
+		{
+			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
+		}
+		#endregion
+
+		public Interface CrowInterface;
+
+		#region FPS
+		int frameCpt = 0;
+		int _fps = 0;
+
+		public int fps {
+			get { return _fps; }
+			set {
+				if (_fps == value)
+					return;
+
+				_fps = value;
+
+				if (_fps > fpsMax) {
+					fpsMax = _fps;
+					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMax", fpsMax));
+				} else if (_fps < fpsMin) {
+					fpsMin = _fps;
+					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMin", fpsMin));
+				}
+
+				ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
+				#if MEASURE_TIME
+				ValueChanged.Raise (this, new ValueChangeEventArgs ("update",
+					this.CrowInterface.updateTime.ElapsedTicks.ToString () + " ticks"));
+				ValueChanged.Raise (this, new ValueChangeEventArgs ("layouting",
+					this.CrowInterface.layoutTime.ElapsedTicks.ToString () + " ticks"));
+				ValueChanged.Raise (this, new ValueChangeEventArgs ("drawing",
+					this.CrowInterface.drawingTime.ElapsedTicks.ToString () + " ticks"));
+				#endif
+			}
+		}
+
+		public int fpsMin = int.MaxValue;
+		public int fpsMax = 0;
+
+		void resetFps ()
+		{
+			fpsMin = int.MaxValue;
+			fpsMax = 0;
+			_fps = 0;
+		}
+		public string update = "";
+		public string drawing = "";
+		public string layouting = "";
+		#endregion
+
 		#region ctor
 //		public OpenTKGameWindow(int _width, int _height, string _title="golib")
 //			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 1), _title,
@@ -46,142 +102,16 @@ namespace Crow
 //		public OpenTKGameWindow(int _width, int _height, string _title="golib")
 //			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), _title)
 		{
-			//VSync = VSyncMode.On;
-			currentWindow = this;
-			//Load cursors
-			XCursor.Cross = XCursorFile.Load("#Crow.Images.Icons.Cursors.cross").Cursors[0];
-			XCursor.Default = XCursorFile.Load("#Crow.Images.Icons.Cursors.arrow").Cursors[0];
-			XCursor.NW = XCursorFile.Load("#Crow.Images.Icons.Cursors.top_left_corner").Cursors[0];
-			XCursor.NE = XCursorFile.Load("#Crow.Images.Icons.Cursors.top_right_corner").Cursors[0];
-			XCursor.SW = XCursorFile.Load("#Crow.Images.Icons.Cursors.bottom_left_corner").Cursors[0];
-			XCursor.SE = XCursorFile.Load("#Crow.Images.Icons.Cursors.bottom_right_corner").Cursors[0];
-			XCursor.H = XCursorFile.Load("#Crow.Images.Icons.Cursors.sb_h_double_arrow").Cursors[0];
-			XCursor.V = XCursorFile.Load("#Crow.Images.Icons.Cursors.sb_v_double_arrow").Cursors[0];
+			CrowInterface = new Interface ();
+			CrowInterface.Quit += Quit;
 		}
 		#endregion
 
-		public List<GraphicObject> GraphicObjects = new List<GraphicObject>();
-		public Color Background = Color.Transparent;
-
-		internal static OpenTKGameWindow currentWindow;
-
-		Rectangles _redrawClip = new Rectangles();//should find another way to access it from child
-		List<GraphicObject> _gobjsToRedraw = new List<GraphicObject>();
-
-		#region IGOLibHost implementation
-		public Rectangles clipping {
-			get { return _redrawClip; }
-			set { _redrawClip = value; }
-		}
-		public XCursor MouseCursor {
-			set {
-				if (value == null) {
-					Cursor = null;
-					return;
-				}
-				Cursor = new MouseCursor
-					((int)value.Xhot, (int)value.Yhot, (int)value.Width, (int)value.Height,value.data);; }
-		}
-		public List<GraphicObject> gobjsToRedraw {
-			get { return _gobjsToRedraw; }
-			set { _gobjsToRedraw = value; }
-		}
-		public void AddWidget(GraphicObject g)
-		{
-			g.Parent = this;
-			GraphicObjects.Insert (0, g);
-
-			g.RegisterForLayouting (LayoutingType.Sizing);
-		}
-		public void DeleteWidget(GraphicObject g)
-		{
-			g.Visible = false;//trick to ensure clip is added to refresh zone
-			g.ClearBinding();
-			GraphicObjects.Remove (g);
-		}
-		public void PutOnTop(GraphicObject g)
-		{
-			if (GraphicObjects.IndexOf(g) > 0)
-			{
-				GraphicObjects.Remove(g);
-				GraphicObjects.Insert(0, g);
-				//g.registerClipRect ();
-			}
-		}
-		public void Quit ()
+		public void Quit (object sender, EventArgs e)
 		{
 			this.Exit ();
 		}
 
-		#region focus
-		GraphicObject _activeWidget;	//button is pressed on widget
-		GraphicObject _hoverWidget;		//mouse is over
-		GraphicObject _focusedWidget;	//has keyboard (or other perif) focus
-
-		public GraphicObject activeWidget
-		{
-			get { return _activeWidget; }
-			set
-			{
-				if (_activeWidget == value)
-					return;
-
-				if (_activeWidget != null)
-					_activeWidget.IsActive = false;
-
-				_activeWidget = value;
-
-				if (_activeWidget != null)
-					_activeWidget.IsActive = true;
-			}
-		}
-		public GraphicObject hoverWidget
-		{
-			get { return _hoverWidget; }
-			set {
-				if (_hoverWidget == value)
-					return;
-				_hoverWidget = value;
-			}
-		}
-		public GraphicObject FocusedWidget {
-			get { return _focusedWidget; }
-			set {
-				if (_focusedWidget == value)
-					return;
-				if (_focusedWidget != null)
-					_focusedWidget.onUnfocused (this, null);
-				_focusedWidget = value;
-				if (_focusedWidget != null)
-					_focusedWidget.onFocused (this, null);
-			}
-		}
-		#endregion
-
-		#endregion
-
-		/// <summary> Remove all Graphic objects from top container </summary>
-		public void ClearInterface()
-		{
-			int i = 0;
-			while (GraphicObjects.Count>0) {
-				//TODO:parent is not reset to null because object will be added
-				//to ObjectToRedraw list, and without parent, it fails
-				GraphicObject g = GraphicObjects [i];
-				g.Visible = false;
-				g.ClearBinding ();
-				GraphicObjects.RemoveAt (0);
-			}
-		}
-		public GraphicObject FindByName (string nameToFind)
-		{
-			foreach (GraphicObject w in GraphicObjects) {
-				GraphicObject r = w.FindByName (nameToFind);
-				if (r != null)
-					return r;
-			}
-			return null;
-		}
 		#region Events
 		//those events are raised only if mouse isn't in a graphic object
 		public event EventHandler<OpenTK.Input.MouseWheelEventArgs> MouseWheelChanged;
@@ -192,39 +122,15 @@ namespace Crow
 		public event EventHandler<OpenTK.Input.KeyboardKeyEventArgs> KeyboardKeyDown;
 		#endregion
 
-		#region graphic contexte
-		Context ctx;
-		Surface surf;
-		byte[] bmp;
+		#region graphic context
 		int texID;
-
-		public QuadVAO uiQuad, uiQuad2;
+		QuadVAO uiQuad;
 		Crow.Shader shader;
 		int[] viewport = new int[4];
 
 		void createContext()
 		{
-			createOpenGLSurface ();
-
-			if (uiQuad != null)
-				uiQuad.Dispose ();
-			uiQuad = new QuadVAO (0, 0, ClientRectangle.Width, ClientRectangle.Height, 0, 1, 1, -1);
-			uiQuad2 = new QuadVAO (0, 0, ClientRectangle.Width, ClientRectangle.Height, 0, 0, 1, 1);
-
-			shader.ProjectionMatrix = Matrix4.CreateOrthographicOffCenter
-				(0, ClientRectangle.Width, ClientRectangle.Height, 0, 0, 1);
-
-			clipping.AddRectangle (ClientRectangle);
-		}
-		void createOpenGLSurface()
-		{
-			currentWindow = this;
-
-			int stride = 4 * ClientRectangle.Width;
-			int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
-			bmp = new byte[bmpSize];
-
-			//create texture
+			#region Create texture
 			if (GL.IsTexture(texID))
 				GL.DeleteTexture (texID);
 			GL.GenTextures(1, out texID);
@@ -233,7 +139,7 @@ namespace Crow
 
 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba,
 				ClientRectangle.Width, ClientRectangle.Height, 0,
-				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp);
+				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, CrowInterface.bmp);
 
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
@@ -241,6 +147,18 @@ namespace Crow
 			GL.BindTexture(TextureTarget.Texture2D, 0);
 
 			shader.Texture = texID;
+			#endregion
+
+			#region Update ui quad
+			if (uiQuad != null)
+				uiQuad.Dispose ();
+			uiQuad = new QuadVAO (0, 0, ClientRectangle.Width, ClientRectangle.Height, 0, 1, 1, -1);
+
+			shader.ProjectionMatrix = Matrix4.CreateOrthographicOffCenter
+				(0, ClientRectangle.Width, ClientRectangle.Height, 0, 0, 1);
+			#endregion
+
+			//TODO:add maybe clientrectangle to clipping here
 		}
 		void OpenGLDraw()
 		{
@@ -249,114 +167,26 @@ namespace Crow
 
 			shader.Enable ();
 
-			if (isDirty) {
-				byte[] tmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
-				for (int y = 0; y < DirtyRect.Height; y++) {
-					Array.Copy(bmp,
-						((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
-						tmp, y * DirtyRect.Width * 4, DirtyRect.Width *4);
+			if (CrowInterface.IsDirty) {
+				byte[] tmp = new byte[4 * CrowInterface.DirtyRect.Width * CrowInterface.DirtyRect.Height];
+				for (int y = 0; y < CrowInterface.DirtyRect.Height; y++) {
+					Array.Copy(CrowInterface.bmp,
+						((CrowInterface.DirtyRect.Top + y) * ClientRectangle.Width * 4) + CrowInterface.DirtyRect.Left * 4,
+						tmp, y * CrowInterface.DirtyRect.Width * 4, CrowInterface.DirtyRect.Width *4);
 				}
 				GL.TexSubImage2D (TextureTarget.Texture2D, 0,
-					DirtyRect.Left, DirtyRect.Top, DirtyRect.Width, DirtyRect.Height,
+					CrowInterface.DirtyRect.Left, CrowInterface.DirtyRect.Top,
+					CrowInterface.DirtyRect.Width, CrowInterface.DirtyRect.Height,
 					OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, tmp);
-				isDirty = false;
+				CrowInterface.IsDirty = false;
 			}
+
 			uiQuad.Render (PrimitiveType.TriangleStrip);
 
 			GL.BindTexture(TextureTarget.Texture2D, 0);
 
 			shader.Disable ();
 			GL.Viewport (viewport [0], viewport [1], viewport [2], viewport [3]);
-		}
-		#endregion
-
-
-		bool isDirty = false;
-		Rectangle DirtyRect;
-
-		#region update
-		void update ()
-		{
-			if (mouseRepeatCount > 0) {
-				int mc = mouseRepeatCount;
-				mouseRepeatCount -= mc;
-				for (int i = 0; i < mc; i++) {
-					FocusedWidget.onMouseClick (this, new MouseButtonEventArgs (Mouse.X, Mouse.Y, MouseButton.Left, true));
-				}
-			}
-
-			GraphicObject[] invGOList = new GraphicObject[GraphicObjects.Count];
-			GraphicObjects.CopyTo (invGOList, 0);
-			invGOList = invGOList.Reverse ().ToArray ();
-
-			//Debug.WriteLine ("======= Layouting queue start =======");
-
-			while (Interface.LayoutingQueue.Count > 0) {
-				LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
-				lqi.ProcessLayouting ();
-			}
-
-
-			//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
-			//final redraw clips should be added only when layout is completed among parents,
-			//that's why it take place in a second pass
-			GraphicObject[] gotr = new GraphicObject[gobjsToRedraw.Count];
-			gobjsToRedraw.CopyTo (gotr);
-			gobjsToRedraw.Clear ();
-			foreach (GraphicObject p in gotr) {
-				p.IsQueuedForRedraw = false;
-				p.Parent.RegisterClip (p.LastPaintedSlot);
-				p.Parent.RegisterClip (p.getSlot());
-			}
-
-			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
-				using (ctx = new Context (surf)){
-
-
-					if (clipping.count > 0) {
-						//Link.draw (ctx);
-						clipping.clearAndClip(ctx);
-
-						foreach (GraphicObject p in invGOList) {
-							if (!p.Visible)
-								continue;
-							if (!clipping.intersect (p.Slot))
-								continue;
-							ctx.Save ();
-
-							p.Paint (ref ctx);
-
-							ctx.Restore ();
-						}
-
-						#if DEBUG_CLIP_RECTANGLE
-						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
-						#endif
-
-						if (isDirty)
-							DirtyRect += clipping.Bounds;
-						else
-							DirtyRect = clipping.Bounds;
-						isDirty = true;
-
-						DirtyRect.Left = Math.Max (0, DirtyRect.Left);
-						DirtyRect.Top = Math.Max (0, DirtyRect.Top);
-						DirtyRect.Width = Math.Min (ClientRectangle.Right, DirtyRect.Width);
-						DirtyRect.Height = Math.Min (ClientRectangle.Bottom, DirtyRect.Height);
-
-						clipping.Reset ();
-					}
-				}
-			}
-		}						
-		#endregion
-
-		#region loading
-		public GraphicObject LoadInterface (string path)
-		{
-			GraphicObject tmp = Interface.Load (path, this);
-			AddWidget (tmp);
-			return tmp;
 		}
 		#endregion
 
@@ -369,27 +199,9 @@ namespace Crow
 		}
 
 		#region Game win overrides
-		protected override void OnUpdateFrame(FrameEventArgs e)
-		{
-			base.OnUpdateFrame(e);
-			update ();
-		}
-		protected override void OnRenderFrame(FrameEventArgs e)
-		{
-			GLClear ();
-
-
-			base.OnRenderFrame(e);
-
-			OnRender (e);
-			OpenGLDraw ();
-
-
-			SwapBuffers ();
-		}
 		protected override void OnLoad(EventArgs e)
-	{
-	    base.OnLoad(e);
+		{
+			base.OnLoad(e);
 
 			Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
 			Mouse.WheelChanged += new EventHandler<OpenTK.Input.MouseWheelEventArgs>(Mouse_WheelChanged);
@@ -407,13 +219,44 @@ namespace Crow
 
 			shader = new Crow.TexturedShader ();
 		}
+		protected override void OnUpdateFrame(FrameEventArgs e)
+		{
+			base.OnUpdateFrame(e);
+			fps = (int)RenderFrequency;
+
+
+			if (frameCpt > 50) {
+				resetFps ();
+				frameCpt = 0;
+				GC.Collect();
+				GC.WaitForPendingFinalizers();
+				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
+			}
+			frameCpt++;
+			CrowInterface.Update ();
+		}
+		protected override void OnRenderFrame(FrameEventArgs e)
+		{
+			GLClear ();
+
+			base.OnRenderFrame(e);
+
+			OnRender (e);
+			OpenGLDraw ();
+
+			SwapBuffers ();
+		}
 
 		protected override void OnResize(EventArgs e)
 		{
 			base.OnResize (e);
+			CrowInterface.ProcessResize(
+				new Rectangle(
+				this.ClientRectangle.X,
+				this.ClientRectangle.Y,
+				this.ClientRectangle.Width,
+				this.ClientRectangle.Height));
 			createContext ();
-			foreach (GraphicObject g in GraphicObjects)
-				g.RegisterForLayouting (LayoutingType.All);
 		}
 		#endregion
 
@@ -425,149 +268,21 @@ namespace Crow
 			}
 		}
 		void Mouse_Move(object sender, OpenTK.Input.MouseMoveEventArgs otk_e)
-	{
-			MouseMoveEventArgs e = new MouseMoveEventArgs (otk_e.X, otk_e.Y, otk_e.XDelta, otk_e.YDelta);
-			MouseState ms = e.Mouse;
-			update_mouseButtonStates (ref ms, otk_e.Mouse);
-			e.Mouse = ms;
-
-			if (_activeWidget != null) {
-				//first, ensure object is still in the graphic tree
-				if (_activeWidget.HostContainer == null) {
-					activeWidget = null;
-				} else {
-
-					//send move evt even if mouse move outside bounds
-					_activeWidget.onMouseMove (this, e);
-					return;
-				}
-			}
-
-			if (hoverWidget != null) {
-				//first, ensure object is still in the graphic tree
-				if (hoverWidget.HostContainer == null) {
-					hoverWidget = null;
-				} else {
-					//check topmost graphicobject first
-					GraphicObject tmp = hoverWidget;
-					GraphicObject topc = null;
-					while (tmp is GraphicObject) {
-						topc = tmp;
-						tmp = tmp.Parent as GraphicObject;
-					}
-					int idxhw = GraphicObjects.IndexOf (topc);
-					if (idxhw != 0) {
-						int i = 0;
-						while (i < idxhw) {
-							if (GraphicObjects [i].MouseIsIn (e.Position)) {
-								hoverWidget.onMouseLeave (this, e);
-								GraphicObjects [i].checkHoverWidget (e);
-								return;
-							}
-							i++;
-						}
-					}
-
-
-					if (hoverWidget.MouseIsIn (e.Position)) {
-						hoverWidget.checkHoverWidget (e);
-						return;
-					} else {
-						hoverWidget.onMouseLeave (this, e);
-						//seek upward from last focused graph obj's
-						while (hoverWidget.Parent as GraphicObject != null) {
-							hoverWidget = hoverWidget.Parent as GraphicObject;
-							if (hoverWidget.MouseIsIn (e.Position)) {
-								hoverWidget.checkHoverWidget (e);
-								return;
-							} else
-								hoverWidget.onMouseLeave (this, e);
-						}
-					}
-				}
-			}
-
-			//top level graphic obj's parsing
-			for (int i = 0; i < GraphicObjects.Count; i++) {
-				GraphicObject g = GraphicObjects[i];
-				if (g.MouseIsIn (e.Position)) {
-					g.checkHoverWidget (e);
-					PutOnTop (g);
-					return;
-				}
-			}
-			hoverWidget = null;
-			MouseMove.Raise (this, otk_e);
-	}
+        {
+			CrowInterface.ProcessMouseMove (otk_e.X, otk_e.Y);
+        }
 		void Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
-	{
-			MouseButtonEventArgs e = new MouseButtonEventArgs (otk_e.X, otk_e.Y, (Crow.MouseButton)otk_e.Button, otk_e.IsPressed);
-			MouseState ms = e.Mouse;
-			update_mouseButtonStates (ref ms, otk_e.Mouse);
-			e.Mouse = ms;
-
-			if (_activeWidget == null) {
-				MouseButtonUp.Raise (this, otk_e);
-				return;
-			}
-
-			if (mouseRepeatThread != null) {
-				mouseRepeatOn = false;
-				mouseRepeatThread.Abort();
-				mouseRepeatThread.Join ();
-			}
-
-			_activeWidget.onMouseUp (this, e);
-			activeWidget = null;
-	}
+        {
+			CrowInterface.ProcessMouseButtonUp ((int)otk_e.Button);
+        }
 		void Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
 		{
-			MouseButtonEventArgs e = new MouseButtonEventArgs (otk_e.X, otk_e.Y, (Crow.MouseButton)otk_e.Button, otk_e.IsPressed);
-			MouseState ms = e.Mouse;
-			update_mouseButtonStates (ref ms, otk_e.Mouse);
-			e.Mouse = ms;
-
-			if (hoverWidget == null) {
-				MouseButtonDown.Raise (this, otk_e);
-				return;
-			}
-
-			hoverWidget.onMouseDown(hoverWidget,new BubblingMouseButtonEventArg(e));
-
-			if (FocusedWidget == null)
-				return;
-			if (!FocusedWidget.MouseRepeat)
-				return;
-			mouseRepeatThread = new Thread (mouseRepeatThreadFunc);
-			mouseRepeatThread.Start ();
-	}
+			CrowInterface.ProcessMouseButtonDown ((int)otk_e.Button);
+        }
 		void Mouse_WheelChanged(object sender, OpenTK.Input.MouseWheelEventArgs otk_e)
-	{
-			MouseWheelEventArgs e = new MouseWheelEventArgs (otk_e.X, otk_e.Y, otk_e.Value, otk_e.Delta);
-			MouseState ms = e.Mouse;
-			update_mouseButtonStates (ref ms, otk_e.Mouse);
-			e.Mouse = ms;
-
-			if (hoverWidget == null) {
-				MouseWheelChanged.Raise (this, otk_e);
-				return;
-			}
-			hoverWidget.onMouseWheel (this, e);
-	}
-
-		volatile bool mouseRepeatOn;
-		volatile int mouseRepeatCount;
-		Thread mouseRepeatThread;
-		void mouseRepeatThreadFunc()
-		{
-			mouseRepeatOn = true;
-			Thread.Sleep (Interface.DeviceRepeatDelay);
-			while (mouseRepeatOn) {
-				mouseRepeatCount++;
-				Thread.Sleep (Interface.DeviceRepeatInterval);
-			}
-			mouseRepeatCount = 0;
-		}
+        {
+			CrowInterface.ProcessMouseWheelChanged (otk_e.DeltaPrecise);
+        }
 		#endregion
 
 	#region keyboard Handling
@@ -580,45 +295,7 @@ namespace Crow
 //			}
 			Keyboad.SetKeyState ((Crow.Key)otk_e.Key, true);
 			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)otk_e.Key, otk_e.IsRepeat,Keyboad);
-			_focusedWidget.onKeyDown (sender, e);
-	}
-	#endregion
-
-		#region ILayoutable implementation
-		public void RegisterClip(Rectangle r){
-			clipping.AddRectangle (r);
-		}
-		public bool ArrangeChildren { get { return false; }}
-		public int LayoutingTries {
-			get { throw new NotImplementedException (); }
-			set { throw new NotImplementedException (); }
-		}
-		public LayoutingType RegisteredLayoutings {
-			get { return LayoutingType.None; }
-			set { throw new NotImplementedException (); }
-		}
-		public void RegisterForLayouting (LayoutingType layoutType) { throw new NotImplementedException (); }
-		public bool UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
-		public Rectangle ContextCoordinates (Rectangle r) => r;
-		public Rectangle ScreenCoordinates (Rectangle r) => r;
-
-		public ILayoutable Parent {
-			get { return null; }
-			set { throw new NotImplementedException (); }
-		}
-		public ILayoutable LogicalParent {
-			get { return null; }
-			set { throw new NotImplementedException (); }
-		}
-
-		Rectangle ILayoutable.ClientRectangle {
-			get { return new Size(this.ClientRectangle.Size.Width,this.ClientRectangle.Size.Height); }
-		}
-		public IGOLibHost HostContainer {
-			get { return this; }
-		}
-		public Rectangle getSlot () => ClientRectangle;
-		public Rectangle getBounds () => ClientRectangle;
-		#endregion
+        }
+        #endregion
     }
 }

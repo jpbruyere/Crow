@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OTKCrow", "OTKCrow\OTKCrow.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GtkCrow", "GtkCrow\GtkCrow.csproj", "{D6F98B08-56B8-405C-9212-F9D26097E35F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testGdk", "testGdk\testGdk.csproj", "{AF79108B-C774-4220-8D34-4CC31831E713}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Linux_x86 = Debug|Linux_x86
@@ -36,10 +34,6 @@ Global
 		{7BAE4448-E8F4-48B3-BB11-FA78E7F4506B}.Debug|Linux_x86.ActiveCfg = Debug|Any CPU
 		{7BAE4448-E8F4-48B3-BB11-FA78E7F4506B}.Debug|Linux_x86.Build.0 = Debug|Any CPU
 		{7BAE4448-E8F4-48B3-BB11-FA78E7F4506B}.Release|Linux_x86.ActiveCfg = Release|Any CPU
-		{AF79108B-C774-4220-8D34-4CC31831E713}.Debug|Linux_x86.ActiveCfg = Debug|Linux_x86
-		{AF79108B-C774-4220-8D34-4CC31831E713}.Debug|Linux_x86.Build.0 = Debug|Linux_x86
-		{AF79108B-C774-4220-8D34-4CC31831E713}.Release|Linux_x86.ActiveCfg = Release|Linux_x86
-		{AF79108B-C774-4220-8D34-4CC31831E713}.Release|Linux_x86.Build.0 = Release|Linux_x86
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Debug|Linux_x86.ActiveCfg = Debug|Any CPU
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Debug|Linux_x86.Build.0 = Debug|Any CPU
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Release|Linux_x86.ActiveCfg = Release|Any CPU

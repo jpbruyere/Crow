@@ -304,9 +304,13 @@ namespace Crow
 			gobjsToRedraw.CopyTo (gotr);
 			gobjsToRedraw.Clear ();
 			foreach (GraphicObject p in gotr) {
-				p.IsQueuedForRedraw = false;
-				p.Parent.RegisterClip (p.LastPaintedSlot);
-				p.Parent.RegisterClip (p.getSlot());
+				try {
+					p.IsQueuedForRedraw = false;
+					p.Parent.RegisterClip (p.LastPaintedSlot);
+					p.Parent.RegisterClip (p.getSlot());
+				} catch (Exception ex) {
+					Debug.WriteLine ("Error Register Clip: " + ex.ToString ());
+				}
 			}
 
 			#if MEASURE_TIME
@@ -561,14 +565,19 @@ namespace Crow
 			mouseRepeatThread.Start ();
 			return true;
 		}
-//		public bool ProcessMouseWheelChanged(int delta)
-//		{
-//			if (hoverWidget == null)
-//				return false;
-//			hoverWidget.onMouseWheel (this, e);
-//			return true;
-//		}
+		public bool ProcessMouseWheelChanged(float delta)
+		{
+			Mouse.SetScrollRelative (0, delta);
+			MouseWheelEventArgs e = new MouseWheelEventArgs () { Mouse = Mouse, DeltaPrecise = delta };
 
+			if (hoverWidget == null)
+				return false;
+			hoverWidget.onMouseWheel (this, e);
+			return true;
+		}
+//		public bool ProcessKeyDown(int Key){
+//
+//		}
 		volatile bool mouseRepeatOn;
 		volatile int mouseRepeatCount;
 		Thread mouseRepeatThread;

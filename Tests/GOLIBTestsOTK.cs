@@ -15,43 +15,26 @@ using System.Collections.Generic;
 using System.Linq;
 
 
-namespace test
+namespace testOTK
 {
-	class GOLIBTests : OpenTKGameWindow, IValueChange
+	class GOLIBTests : OpenTKGameWindow
 	{
-		#region IValueChange implementation
-		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-		public virtual void NotifyValueChanged(string MemberName, object _value)
-		{
-			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));			
-		}
-		#endregion
-
 		public GOLIBTests ()
 			: base(800, 600,"test: press spacebar to toogle test files")
 		{
-			//VSync = VSyncMode.Off;
+			VSync = VSyncMode.Off;
 			Interface.CurrentInterface = CrowInterface;
-			GraphicObject obj = CrowInterface.LoadInterface("Interfaces/" + testFiles[idx]);
-			obj.DataSource = this;
-
 		}
 
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
-			"testMsgBox.goml",
-			"testCombobox.goml",
-			"testExpandable.goml",
-			"test_Listbox.goml",
-			"6.crow",
-			"testGroupBox.goml",
-			"1.crow",
-			"5.crow",
+			"testColorList.crow",
 			"testCheckbox.goml",
 			"testWindow.goml",
 			"fps.goml",
 			"testTabView.crow",
+			"testExpandable.goml",
 			"0.crow",
 			"testImage.crow",
 			"testOutOfClipUpdate.crow",
@@ -63,17 +46,15 @@ namespace test
 			"clip2.crow",
 			"clip0.crow",
 			"clip1.crow",
-			"testPopper.goml",
-			"testTextBox.crow",
-			"testColorList.crow",
 //			"5.crow",
 //			"testCombobox.goml",
 //			"testPopper.goml",
 			"testTextBox.crow",
-//			"testColorList.crow",
+
 			"4.crow",
 			"testSpinner.goml",
 			"testScrollbar.goml",
+			"testGroupBox.goml",
 			"testGrid.goml",
 			"testButton.crow",
 			"testBorder.goml",
@@ -91,55 +72,10 @@ namespace test
 //			"testRadioButton2.goml",
 			"testContainer.goml",
 			"testRadioButton.goml",
-
+			"testMsgBox.goml",
 //			"testMeter.goml",
 		};
 
-		#region FPS
-		int _fps = 0;
-
-		public int fps {
-			get { return _fps; }
-			set {
-				if (_fps == value)
-					return;
-
-				_fps = value;
-
-				if (_fps > fpsMax) {
-					fpsMax = _fps;
-					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMax", fpsMax));
-				} else if (_fps < fpsMin) {
-					fpsMin = _fps;
-					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMin", fpsMin));
-				}
-
-				ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
-				#if MEASURE_TIME
-				ValueChanged.Raise (this, new ValueChangeEventArgs ("update",
-					this.CrowInterface.updateTime.ElapsedTicks.ToString () + " ticks"));
-				ValueChanged.Raise (this, new ValueChangeEventArgs ("layouting",
-					this.CrowInterface.layoutTime.ElapsedTicks.ToString () + " ticks"));
-				ValueChanged.Raise (this, new ValueChangeEventArgs ("drawing",
-					this.CrowInterface.drawingTime.ElapsedTicks.ToString () + " ticks"));
-				#endif
-			}
-		}
-
-		public int fpsMin = int.MaxValue;
-		public int fpsMax = 0;
-
-		void resetFps ()
-		{
-			fpsMin = int.MaxValue;
-			fpsMax = 0;
-			_fps = 0;
-		}
-		public string update = "";
-		public string drawing = "";
-		public string layouting = "";
-		public Alignment alignment = Alignment.Left;
-		#endregion
 
 		public int intValue = 25;
 
@@ -191,10 +127,18 @@ namespace test
 		}
 		void OnClear (object sender, MouseButtonEventArgs e) => TestList = null;
 
-		void OnLoadList (object sender, MouseButtonEventArgs e) {
-			TestList = Color.ColorDic.ToList();
-		}
+		void OnLoadList (object sender, MouseButtonEventArgs e) => TestList = Color.ColorDic.ToList();
 
+		protected override void OnLoad (EventArgs e)
+		{
+			base.OnLoad (e);
+			//this.AddWidget(new test4());
+			KeyboardKeyDown += GOLIBTests_KeyboardKeyDown1;;
+
+			GraphicObject obj = CrowInterface.LoadInterface("Interfaces/" + testFiles[idx]);
+			obj.DataSource = this;
+
+		}
 		void GOLIBTests_KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
 			if (e.Key == OpenTK.Input.Key.Escape) {
@@ -240,7 +184,7 @@ namespace test
 			Console.WriteLine ("button clicked:" + send.ToString());
 		}
 		void onAddTabButClick(object sender, MouseButtonEventArgs e){
-			
+
 			TabView tv = CrowInterface.FindByName("tabview1") as TabView;
 			if (tv == null)
 				return;
@@ -250,19 +194,11 @@ namespace test
 		static void Main ()
 		{
 			Console.WriteLine ("starting example");
-			Gtk.Application.Init ();
 			GOLIBTests win = new GOLIBTests ();
-			win.KeyPressEvent += win.Win_KeyPressEvent;
+			win.Run (30);
+			//win.KeyPressEvent += win.Win_KeyPressEvent;
+		}
 
-			Gtk.Application.Run ();
-		}
-		void onMsgBoxOk(object sender, EventArgs e){
-			Debug.WriteLine ("OK");
-		}
-		void onMsgBoxCancel(object sender, EventArgs e)
-		{
-			Debug.WriteLine ("cancel");
-		}
 		void Win_KeyPressEvent (object o, Gtk.KeyPressEventArgs args)
 		{
 			CrowInterface.ClearInterface ();
@@ -271,7 +207,10 @@ namespace test
 				idx = 0;
 			this.Title = testFiles [idx];
 			GraphicObject obj = CrowInterface.LoadInterface("Interfaces/" + testFiles[idx]);
-			obj.DataSource = this;			
+			obj.DataSource = this;
 		}
+
+
+
 	}
 }

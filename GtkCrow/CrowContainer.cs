@@ -61,23 +61,20 @@ namespace Crow
 
 			GLib.Idle.Add (new GLib.IdleHandler (idleHandler));
 			GLib.Timeout.Add (10, new GLib.TimeoutHandler (updateHandler));
-			interval.Start ();
 		}
 		#endregion
 
 
 
 		#region Timers
-		Stopwatch interval = new Stopwatch();
 		bool updateHandler(){
 			CrowInterface.Update();
 			return true;
 		}
 		bool idleHandler(){
-			if (CrowInterface.IsDirty && interval.ElapsedMilliseconds > 1) {
-				Debug.WriteLine (interval.ElapsedTicks.ToString ());
+			if (CrowInterface.IsDirty) {
 				QueueDrawArea (CrowInterface.DirtyRect.X, CrowInterface.DirtyRect.Y, CrowInterface.DirtyRect.Width, CrowInterface.DirtyRect.Height);
-				interval.Restart ();
+				return false;
 			}
 			return true;
 		}
@@ -243,13 +240,14 @@ namespace Crow
 				}
 
 				CrowInterface.IsDirty = false;
+				GLib.Idle.Add (new GLib.IdleHandler (idleHandler));
 				return;
 			}
-			if (CrowInterface.bmp == null)
-				return;
-			using (ImageSurface img = new ImageSurface (CrowInterface.bmp, Format.Argb32, CrowInterface.ClientRectangle.Width, CrowInterface.ClientRectangle.Height, 4 * CrowInterface.ClientRectangle.Width)) {
-				args.Cr.SetSourceSurface (img, CrowInterface.ClientRectangle.X, CrowInterface.ClientRectangle.Y);
-				args.Cr.Paint();
+			if (CrowInterface.bmp != null) {
+				using (ImageSurface img = new ImageSurface (CrowInterface.bmp, Format.Argb32, CrowInterface.ClientRectangle.Width, CrowInterface.ClientRectangle.Height, 4 * CrowInterface.ClientRectangle.Width)) {
+					args.Cr.SetSourceSurface (img, CrowInterface.ClientRectangle.X, CrowInterface.ClientRectangle.Y);
+					args.Cr.Paint ();
+				}
 			}
 		}
 		void Win_DeleteEvent (object o, Gtk.DeleteEventArgs args)
