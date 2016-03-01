@@ -248,17 +248,17 @@ namespace Crow
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
 			base.OnUpdateFrame(e);
-//			fps = (int)RenderFrequency;
-//
-//
-//			if (frameCpt > 50) {
-//				resetFps ();
-//				frameCpt = 0;
-//				GC.Collect();
-//				GC.WaitForPendingFinalizers();
-//				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
-//			}
-//			frameCpt++;
+			fps = (int)RenderFrequency;
+
+
+			if (frameCpt > 50) {
+				resetFps ();
+				frameCpt = 0;
+				GC.Collect();
+				GC.WaitForPendingFinalizers();
+				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
+			}
+			frameCpt++;
 			//CrowInterface.Update ();
 		}
 		protected override void OnRenderFrame(FrameEventArgs e)
