@@ -279,10 +279,6 @@ namespace Crow
 			updateTime.Restart ();
 			#endif
 
-			GraphicObject[] invGOList = new GraphicObject[GraphicObjects.Count];
-			GraphicObjects.CopyTo (invGOList, 0);
-			invGOList = invGOList.Reverse ().ToArray ();
-
 			#if MEASURE_TIME
 			layoutTime.Start ();
 			#endif
@@ -326,7 +322,8 @@ namespace Crow
 						//Link.draw (ctx);
 						clipping.clearAndClip(ctx);
 
-						foreach (GraphicObject p in invGOList) {
+						for (int i = GraphicObjects.Count -1; i >= 0 ; i--){
+							GraphicObject p = GraphicObjects[i];
 							if (!p.Visible)
 								continue;
 							if (!clipping.intersect (p.Slot))
