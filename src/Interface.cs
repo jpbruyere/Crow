@@ -458,7 +458,7 @@ namespace Crow
 				if (value == cursor)
 					return;
 				cursor = value;
-				MouseCursorChanged.Raise (this,new MouseCursorChangedEventArgs(value));
+				MouseCursorChanged.Raise (this,new MouseCursorChangedEventArgs(cursor));
 			}
 		}
 		public bool ProcessMouseMove(int x, int y)

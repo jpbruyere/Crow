@@ -104,12 +104,22 @@ namespace Crow
 		{
 			CrowInterface = new Interface ();
 			CrowInterface.Quit += Quit;
+			CrowInterface.MouseCursorChanged += CrowInterface_MouseCursorChanged;
 		}
 		#endregion
 
 		public void Quit (object sender, EventArgs e)
 		{
 			this.Exit ();
+		}
+		void CrowInterface_MouseCursorChanged (object sender, MouseCursorChangedEventArgs e)
+		{
+			this.Cursor = new MouseCursor(
+				(int)e.NewCursor.Xhot,
+				(int)e.NewCursor.Yhot,
+				(int)e.NewCursor.Width,
+				(int)e.NewCursor.Height,
+				e.NewCursor.data);
 		}
 
 		#region Events

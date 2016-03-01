@@ -25,9 +25,9 @@ namespace Crow
 	public class MouseCursorChangedEventArgs : EventArgs
 	{
 		public XCursor NewCursor;
-		public MouseCursorChangedEventArgs (XCursor NewCursor) : base()
+		public MouseCursorChangedEventArgs (XCursor newCursor) : base()
 		{
-			NewCursor = NewCursor;
+			NewCursor = newCursor;
 		}
 	}
 }
