@@ -189,7 +189,8 @@ namespace Crow
 		{
 			if (Interface.CurrentInterface == null)
 				return;
-			Content.Visible = false;
+			if (Content != null)
+				Content.Visible = false;
 			Unpop.Raise (this, e);
 		}
 	}
