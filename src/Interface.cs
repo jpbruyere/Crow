@@ -205,9 +205,11 @@ namespace Crow
 
 		public GraphicObject LoadInterface (string path)
 		{
-			GraphicObject tmp = Interface.Load (path, this);
-			AddWidget (tmp);
-			return tmp;
+			lock (RenderMutex) {
+				GraphicObject tmp = Interface.Load (path, this);
+				AddWidget (tmp);
+				return tmp;
+			}
 		}
 
 		#endregion
@@ -310,7 +312,8 @@ namespace Crow
 				while (queueCount > 0) {
 					lock (Interface.LayoutingQueue)
 						lqi = Interface.LayoutingQueue.Dequeue ();
-					lqi.ProcessLayouting ();
+					if (lqi!=null)
+						lqi.ProcessLayouting ();
 					lock (Interface.LayoutingQueue)
 						queueCount = Interface.LayoutingQueue.Count;
 				}
