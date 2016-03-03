@@ -284,113 +284,28 @@ namespace Crow
 
 
 		public void Update(){
-			lock (Interface.CurrentInterface.RenderMutex) {
-				if (mouseRepeatCount > 0) {
-					int mc = mouseRepeatCount;
-					mouseRepeatCount -= mc;
-					for (int i = 0; i < mc; i++) {
-						FocusedWidget.onMouseClick (this, new MouseButtonEventArgs (Mouse.X, Mouse.Y, MouseButton.Left, true));
-					}
+			if (mouseRepeatCount > 0) {
+				int mc = mouseRepeatCount;
+				mouseRepeatCount -= mc;
+				for (int i = 0; i < mc; i++) {
+					FocusedWidget.onMouseClick (this, new MouseButtonEventArgs (Mouse.X, Mouse.Y, MouseButton.Left, true));
 				}
-				#if MEASURE_TIME
-				layoutTime.Reset ();
-				guTime.Reset ();
-				drawingTime.Reset ();
-				updateTime.Restart ();
-				#endif
-
-				#if MEASURE_TIME
-				layoutTime.Start ();
-				#endif
-				//Debug.WriteLine ("======= Layouting queue start =======");
-				int queueCount = 0;
-				LayoutingQueueItem lqi = null;
-
-				lock (Interface.LayoutingQueue)
-					queueCount = Interface.LayoutingQueue.Count;
-
-				while (queueCount > 0) {
-					lock (Interface.LayoutingQueue)
-						lqi = Interface.LayoutingQueue.Dequeue ();
-					if (lqi!=null)
-						lqi.ProcessLayouting ();
-					lock (Interface.LayoutingQueue)
-						queueCount = Interface.LayoutingQueue.Count;
-				}
+			}
+			#if MEASURE_TIME
+			guTime.Reset ();
+			updateTime.Restart ();
+			#endif
 
 
-				#if MEASURE_TIME
-				layoutTime.Stop ();
-				#endif
+			processLayouting ();
 
-				//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
-				//final redraw clips should be added only when layout is completed among parents,
-				//that's why it take place in a second pass
-				GraphicObject[] gotr = null;
-				gotr = new GraphicObject[gobjsToRedraw.Count];
-				gobjsToRedraw.CopyTo (gotr);
-				gobjsToRedraw.Clear ();
+			clippingRegistration ();
 
-				foreach (GraphicObject p in gotr) {
-					try {
-						p.IsQueuedForRedraw = false;
-						p.Parent.RegisterClip (p.LastPaintedSlot);
-						p.Parent.RegisterClip (p.getSlot());
-					} catch (Exception ex) {
-						Debug.WriteLine ("Error Register Clip: " + ex.ToString ());
-					}
-				}
+			processDrawing ();
 
-				#if MEASURE_TIME
-				updateTime.Stop ();
-				drawingTime.Start ();
-				#endif
-
-				using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
-					using (ctx = new Context (surf)){
-
-
-						if (clipping.count > 0) {
-							//Link.draw (ctx);
-							clipping.clearAndClip(ctx);
-
-							for (int i = GraphicObjects.Count -1; i >= 0 ; i--){
-								GraphicObject p = GraphicObjects[i];
-								if (!p.Visible)
-									continue;
-								if (!clipping.intersect (p.Slot))
-									continue;
-								ctx.Save ();
-
-								p.Paint (ref ctx);
-
-								ctx.Restore ();
-							}
-
-							#if DEBUG_CLIP_RECTANGLE
-							clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
-							#endif
-
-							if (IsDirty)
-								DirtyRect += clipping.Bounds;
-							else
-								DirtyRect = clipping.Bounds;
-							IsDirty = true;
-
-							DirtyRect.Left = Math.Max (0, DirtyRect.Left);
-							DirtyRect.Top = Math.Max (0, DirtyRect.Top);
-							DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
-							DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
-
-							clipping.Reset ();
-						}
-
-						#if MEASURE_TIME
-						drawingTime.Stop ();
-						#endif
-						//surf.WriteToPng (@"/mnt/data/test.png");
-					}
-				}
+			#if MEASURE_TIME
+			updateTime.Stop ();
+			#endif
 			//			if (ToolTip.isVisible) {
 			//				ToolTip.panel.processkLayouting();
 			//				if (ToolTip.panel.layoutIsValid)
@@ -408,8 +323,102 @@ namespace Crow
 			//			Debug.WriteLine("UPDATE: {0} ticks \t, {1} ms",
 			//				updateTime.ElapsedTicks,
 				//				updateTime.ElapsedMilliseconds);
+		}
+		void processLayouting(){
+			#if MEASURE_TIME
+			layoutTime.Restart();
+			#endif
+
+			//Debug.WriteLine ("======= Layouting queue start =======");
+			int queueCount = 0;
+			LayoutingQueueItem lqi = null;
+
+			lock (Interface.LayoutingQueue)
+				queueCount = Interface.LayoutingQueue.Count;
+
+			while (queueCount > 0) {
+				lock (Interface.LayoutingQueue)
+					lqi = Interface.LayoutingQueue.Dequeue ();
+				if (lqi!=null)
+					lqi.ProcessLayouting ();
+				lock (Interface.LayoutingQueue)
+					queueCount = Interface.LayoutingQueue.Count;
+			}
+			#if MEASURE_TIME
+			layoutTime.Stop ();
+			#endif
+		}
+		void clippingRegistration(){
+			//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
+			//final redraw clips should be added only when layout is completed among parents,
+			//that's why it take place in a second pass
+			lock (Interface.CurrentInterface.RenderMutex) {
+				GraphicObject[] gotr = null;
+				gotr = new GraphicObject[gobjsToRedraw.Count];
+				gobjsToRedraw.CopyTo (gotr);
+				gobjsToRedraw.Clear ();
+
+				foreach (GraphicObject p in gotr) {
+					try {
+						p.IsQueuedForRedraw = false;
+						p.Parent.RegisterClip (p.LastPaintedSlot);
+						p.Parent.RegisterClip (p.getSlot ());
+					} catch (Exception ex) {
+						Debug.WriteLine ("Error Register Clip: " + ex.ToString ());
+					}
+				}
 			}
 		}
+		void processDrawing(){
+			#if MEASURE_TIME
+			drawingTime.Restart();
+			#endif
+			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
+				using (ctx = new Context (surf)){
+
+
+					if (clipping.count > 0) {
+						//Link.draw (ctx);
+						clipping.clearAndClip(ctx);
+
+						for (int i = GraphicObjects.Count -1; i >= 0 ; i--){
+							GraphicObject p = GraphicObjects[i];
+							if (!p.Visible)
+								continue;
+							if (!clipping.intersect (p.Slot))
+								continue;
+							ctx.Save ();
+
+							p.Paint (ref ctx);
+
+							ctx.Restore ();
+						}
+
+						#if DEBUG_CLIP_RECTANGLE
+						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
+						#endif
+						lock (Interface.CurrentInterface.RenderMutex) {
+							if (IsDirty)
+								DirtyRect += clipping.Bounds;
+							else
+								DirtyRect = clipping.Bounds;
+							IsDirty = true;
+
+							DirtyRect.Left = Math.Max (0, DirtyRect.Left);
+							DirtyRect.Top = Math.Max (0, DirtyRect.Top);
+							DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
+							DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
+						}
+						clipping.Reset ();
+					}
+					//surf.WriteToPng (@"/mnt/data/test.png");
+				}
+			}
+			#if MEASURE_TIME
+			drawingTime.Stop ();
+			#endif
+		}
+
 		public Rectangles clipping {
 			get { return _redrawClip; }
 			set { _redrawClip = value; }
@@ -466,14 +475,17 @@ namespace Crow
 
 
 		public void ProcessResize(Rectangle bounds){
-			clientRectangle = bounds;
+			lock (RenderMutex) {
+				clientRectangle = bounds;
 
-			int stride = 4 * ClientRectangle.Width;
-			int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
-			bmp = new byte[bmpSize];
+				int stride = 4 * ClientRectangle.Width;
+				int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
+				bmp = new byte[bmpSize];
 
-			foreach (GraphicObject g in GraphicObjects)
-				g.RegisterForLayouting (LayoutingType.All);
+				foreach (GraphicObject g in GraphicObjects)
+					g.RegisterForLayouting (LayoutingType.All);
+				clipping.AddRectangle (clientRectangle);
+			}
 		}
 
 		XCursor cursor = XCursor.Default;
