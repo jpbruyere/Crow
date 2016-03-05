@@ -79,23 +79,12 @@ namespace Crow
 
 		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem>();
 		public Queue<GraphicObject> GraphicUpdateQueue = new Queue<GraphicObject>();
-		public Queue<GraphicObject> UpdateLayoutQueue = new Queue<GraphicObject>();
 
-		public static void RegisterForLayouting(GraphicObject g, LayoutingType lt){
-			
-			lock (CurrentInterface.UpdateLayoutQueue) {
-				if (CurrentInterface == null)
-					return;
-				if (g.RegisteredLayoutings == LayoutingType.None)
-					CurrentInterface.UpdateLayoutQueue.Enqueue (g);				
-				g.RegisteredLayoutings |= lt;
-			}
-		}
 		public static void RegisterForGraphicUpdate(GraphicObject g)
 		{
 			lock (CurrentInterface.GraphicUpdateQueue) {
 				if (g.IsQueueForGraphicUpdate)
-					return;			
+					return;
 				if (CurrentInterface == null)
 					return;
 				CurrentInterface.GraphicUpdateQueue.Enqueue (g);
@@ -109,7 +98,7 @@ namespace Crow
 			if (Interface.CurrentInterface == null)
 				return;
 			Interface.CurrentInterface.RedrawList.Add (g);
-			g.IsInRedrawList = true;	
+			g.IsInRedrawList = true;
 		}
 
 		#region default values loading helpers
@@ -238,12 +227,12 @@ namespace Crow
 		}
 
 		public GraphicObject LoadInterface (string path)
-		{		
-			lock (this) {	
+		{
+			lock (this) {
 				GraphicObject tmp = Interface.Load (path, this);
 				AddWidget (tmp);
 				return tmp;
-			}		
+			}
 		}
 
 		#endregion
@@ -266,10 +255,12 @@ namespace Crow
 
 		Context ctx;
 		Surface surf;
-		volatile public byte[] bmp;
+		public byte[] bmp;
+		public byte[] dirtyBmp;
 		public bool IsDirty = false;
 		public Rectangle DirtyRect;
 		public object RenderMutex = new object();
+		public object UpdateMutex = new object();
 
 		#region focus
 		GraphicObject _activeWidget;	//button is pressed on widget
@@ -337,6 +328,7 @@ namespace Crow
 
 				processDrawing ();
 			}
+
 			#if MEASURE_TIME
 			updateTime.Stop ();
 			#endif
@@ -362,18 +354,13 @@ namespace Crow
 			#if MEASURE_TIME
 			layoutTime.Restart();
 			#endif
-			lock (Interface.CurrentInterface.UpdateLayoutQueue) {
-				while(Interface.CurrentInterface.UpdateLayoutQueue.Count>0){
-					GraphicObject g = Interface.CurrentInterface.UpdateLayoutQueue.Dequeue();
-					g.EnqueueForLayouting (g.RegisteredLayoutings);
-					g.RegisteredLayoutings = LayoutingType.None;
-				}
-			}
-			//Debug.WriteLine ("======= Layouting queue start =======");
-			LayoutingQueueItem lqi = null;
-			while (Interface.CurrentInterface.LayoutingQueue.Count > 0) {				
+			lock (Interface.CurrentInterface.LayoutingQueue) {
+				//Debug.WriteLine ("======= Layouting queue start =======");
+				LayoutingQueueItem lqi = null;
+				while (Interface.CurrentInterface.LayoutingQueue.Count > 0) {
 					lqi = Interface.CurrentInterface.LayoutingQueue.Dequeue ();
 					lqi.ProcessLayouting ();
+				}
 			}
 			#if MEASURE_TIME
 			layoutTime.Stop ();
@@ -443,6 +430,13 @@ namespace Crow
 							DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
 							DirtyRect.Width = Math.Max (0, DirtyRect.Width);
 							DirtyRect.Height = Math.Max (0, DirtyRect.Height);
+
+							dirtyBmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
+							for (int y = 0; y < DirtyRect.Height; y++) {
+								Array.Copy (bmp,
+									((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
+									dirtyBmp, y * DirtyRect.Width * 4, DirtyRect.Width * 4);
+							}
 						}
 						clipping.Reset ();
 					}
@@ -510,7 +504,7 @@ namespace Crow
 
 
 		public void ProcessResize(Rectangle bounds){
-			lock (RenderMutex) {
+			lock (CurrentInterface) {
 				clientRectangle = bounds;
 
 				int stride = 4 * ClientRectangle.Width;
@@ -519,6 +513,7 @@ namespace Crow
 
 				foreach (GraphicObject g in GraphicObjects)
 					g.RegisterForLayouting (LayoutingType.All);
+
 				clipping.AddRectangle (clientRectangle);
 			}
 		}
@@ -682,11 +677,11 @@ namespace Crow
 			get { throw new NotImplementedException (); }
 			set { throw new NotImplementedException (); }
 		}
-		public LayoutingType QueuedLayoutings {
+		public LayoutingType RegisteredLayoutings {
 			get { return LayoutingType.None; }
 			set { throw new NotImplementedException (); }
 		}
-		public void EnqueueForLayouting (LayoutingType layoutType) { throw new NotImplementedException (); }
+		public void RegisterForLayouting (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public bool UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public Rectangle ContextCoordinates (Rectangle r) => r;
 		public Rectangle ScreenCoordinates (Rectangle r) => r;

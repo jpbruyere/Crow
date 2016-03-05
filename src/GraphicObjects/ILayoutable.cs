@@ -18,8 +18,8 @@ namespace Crow
 		Rectangle getBounds();
 
 		bool ArrangeChildren { get; }
-		LayoutingType QueuedLayoutings { get; set; }
-		void EnqueueForLayouting(LayoutingType layoutType);
+		LayoutingType RegisteredLayoutings { get; set; }
+		void RegisterForLayouting(LayoutingType layoutType);
 		void RegisterClip(Rectangle clip);
 		bool UpdateLayout(LayoutingType layoutType);
 

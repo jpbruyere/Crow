@@ -45,7 +45,7 @@ namespace Crow
 		{
 			LayoutType = _layoutType;
 			GraphicObject = _graphicObject;
-			GraphicObject.QueuedLayoutings |= LayoutType;
+			GraphicObject.RegisteredLayoutings |= LayoutType;
 		}
 	
 		public void ProcessLayouting()
@@ -65,7 +65,7 @@ namespace Crow
 				#endif
 				GraphicObject.LayoutingTries ++;
 				if (GraphicObject.LayoutingTries < Interface.MaxLayoutingTries) {
-					GraphicObject.QueuedLayoutings |= LayoutType;
+					GraphicObject.RegisteredLayoutings |= LayoutType;
 					Interface.CurrentInterface.LayoutingQueue.Enqueue (this);
 				}
 			} else {

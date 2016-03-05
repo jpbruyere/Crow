@@ -120,7 +120,7 @@ namespace Crow
 
 			while (true) {
 				CrowInterface.Update ();
-				Thread.Sleep (1);
+				Thread.Sleep (10);
 			}
 		}
 
@@ -194,16 +194,10 @@ namespace Crow
 			shader.Enable ();
 			lock (CrowInterface.RenderMutex) {
 				if (CrowInterface.IsDirty) {
-					byte[] tmp = new byte[4 * CrowInterface.DirtyRect.Width * CrowInterface.DirtyRect.Height];
-					for (int y = 0; y < CrowInterface.DirtyRect.Height; y++) {
-						Array.Copy (CrowInterface.bmp,
-							((CrowInterface.DirtyRect.Top + y) * ClientRectangle.Width * 4) + CrowInterface.DirtyRect.Left * 4,
-							tmp, y * CrowInterface.DirtyRect.Width * 4, CrowInterface.DirtyRect.Width * 4);
-					}
 					GL.TexSubImage2D (TextureTarget.Texture2D, 0,
 						CrowInterface.DirtyRect.Left, CrowInterface.DirtyRect.Top,
 						CrowInterface.DirtyRect.Width, CrowInterface.DirtyRect.Height,
-						OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, tmp);
+						OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, CrowInterface.dirtyBmp);
 					CrowInterface.IsDirty = false;
 				}
 			}

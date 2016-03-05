@@ -128,14 +128,14 @@ namespace Crow
 
 		public override bool UpdateLayout (LayoutingType layoutType)
 		{
-			QueuedLayoutings &= (~layoutType);
+			RegisteredLayoutings &= (~layoutType);
 
 			if (layoutType == LayoutingType.ArrangeChildren) {				
 
 				ComputeChildrenPositions ();
 
 				//if no layouting remains in queue for item, registre for redraw
-				if (QueuedLayoutings == LayoutingType.None && bmp==null)
+				if (RegisteredLayoutings == LayoutingType.None && bmp==null)
 					this.AddToRedrawList ();
 				
 				return true;

@@ -95,10 +95,10 @@ namespace Crow
 			if (child == null)
 				return base.measureRawSize (lt);
 			if (lt == LayoutingType.Width)
-				return child.QueuedLayoutings.HasFlag(LayoutingType.Width) ?
+				return child.RegisteredLayoutings.HasFlag(LayoutingType.Width) ?
 					-1 : child.Slot.Size.Width + 2 * Margin;
 			else
-				return child.QueuedLayoutings.HasFlag(LayoutingType.Height) ?
+				return child.RegisteredLayoutings.HasFlag(LayoutingType.Height) ?
 					-1 : child.Slot.Size.Height + 2 * Margin;			
 		}
 		public override bool UpdateLayout (LayoutingType layoutType)
@@ -127,13 +127,13 @@ namespace Crow
 			case LayoutingType.Width:								
 				if (child != null) {
 					if (child.Visible)
-						child.EnqueueForLayouting (LayoutingType.X | LayoutingType.Width);
+						child.RegisterForLayouting (LayoutingType.X | LayoutingType.Width);
 				}
 				break;
 			case LayoutingType.Height:
 				if (child != null) {
 					if (child.Visible)
-						child.EnqueueForLayouting (LayoutingType.Y | LayoutingType.Height);
+						child.RegisterForLayouting (LayoutingType.Y | LayoutingType.Height);
 				}
 				break;
 			}							
@@ -148,11 +148,11 @@ namespace Crow
 				break;
 			case LayoutingType.Width:
 				if (this.Bounds.Width < 0)
-					this.EnqueueForLayouting (LayoutingType.Width);
+					this.RegisterForLayouting (LayoutingType.Width);
 				break;
 			case LayoutingType.Height:
 				if (this.Bounds.Height < 0)
-					this.EnqueueForLayouting (LayoutingType.Height);
+					this.RegisterForLayouting (LayoutingType.Height);
 				break;
 			}
 		}
