@@ -70,7 +70,7 @@ namespace Crow
 				else
 					_scrollX = value;
 				NotifyValueChanged("ScrollX", _scrollX);
-				RegisterForRedraw();
+				RegisterForGraphicUpdate ();
 			}
 		}			
 		[XmlAttributeAttribute][DefaultValue(0.0)]
@@ -88,7 +88,7 @@ namespace Crow
 				else
 					_scrollY = value;
 				NotifyValueChanged("ScrollY", _scrollY);
-				RegisterForRedraw();
+				RegisterForGraphicUpdate ();
 			}
 		}
 

@@ -77,7 +77,7 @@ namespace testOTK
 		};
 
 
-		volatile public int intValue = 25;
+		public int intValue = 25;
 
 		public int IntValue {
 			get {
@@ -99,7 +99,7 @@ namespace testOTK
 				return;
 			NotifyValueChanged ("alignment", Enum.Parse(typeof(Alignment), rb.Caption));
 		}
-		volatile public IList<String> List2 = new List<string>(new string[]
+		public IList<String> List2 = new List<string>(new string[]
 			{
 				"string1",
 				"string2",
@@ -117,7 +117,7 @@ namespace testOTK
 				"string9"
 			}
 		);
-		volatile IList<Color> testList = Color.ColorDic.ToList();
+		IList<Color> testList = Color.ColorDic.ToList();
 		public IList<Color> TestList {
 			set{
 				testList = value;
@@ -135,9 +135,8 @@ namespace testOTK
 			//this.AddWidget(new test4());
 			KeyboardKeyDown += GOLIBTests_KeyboardKeyDown1;;
 
-			CrowInterface.LoadInterfaceDelegate.Invoke ("Interfaces/" + testFiles [idx]);
-			//GraphicObject obj = CrowInterface.LoadInterface("Interfaces/" + testFiles[idx]);
-			//obj.DataSource = this;
+			GraphicObject obj = CrowInterface.LoadInterface("Interfaces/" + testFiles[idx]);
+			obj.DataSource = this;
 
 		}
 		void GOLIBTests_KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)

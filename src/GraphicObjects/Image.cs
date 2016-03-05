@@ -23,7 +23,7 @@ namespace Crow
 				if (_pic == null)
 					return;
 				_pic.Scaled = scaled;
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		} 
 		bool keepProps;
@@ -38,7 +38,7 @@ namespace Crow
 				if (_pic == null)
 					return;
 				_pic.KeepProportions = keepProps;
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		} 
         [XmlAttributeAttribute("Path")]        
@@ -65,7 +65,7 @@ namespace Crow
 			get { return _svgSub; }
 			set {
 				_svgSub = value;
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 			
@@ -85,7 +85,7 @@ namespace Crow
 				_pic = new BmpPicture ();
 
 			_pic.LoadImage (path);
-			registerForGraphicUpdate ();
+			RegisterForGraphicUpdate ();
 			RegisterForLayouting (LayoutingType.Sizing);
 		}
 		#endregion

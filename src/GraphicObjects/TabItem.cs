@@ -91,7 +91,7 @@ namespace Crow
 				NotifyValueChanged ("TabOffset", tabOffset);
 
 				RegisterForLayouting (LayoutingType.X);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("TabItem")]

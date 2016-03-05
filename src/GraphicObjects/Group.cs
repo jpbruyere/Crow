@@ -162,14 +162,14 @@ namespace Crow
 				foreach (GraphicObject c in Children) {
 					if (!c.Visible)
 						continue;					
-					c.RegisterForLayouting (LayoutingType.X | LayoutingType.Width);
+					c.EnqueueForLayouting (LayoutingType.X | LayoutingType.Width);
 				}
 				break;
 			case LayoutingType.Height:
 				foreach (GraphicObject c in Children) {
 					if (!c.Visible)
 						continue;
-					c.RegisterForLayouting (LayoutingType.Y | LayoutingType.Height);				}
+					c.EnqueueForLayouting (LayoutingType.Y | LayoutingType.Height);				}
 				break;
 			}
 		}
@@ -182,14 +182,14 @@ namespace Crow
 					maxChildrenWidth = g.Slot.Width;
 					largestChild = g;
 					if (this.Bounds.Width < 0)
-						this.RegisterForLayouting (LayoutingType.Width);
+						this.EnqueueForLayouting (LayoutingType.Width);
 				} else if (g == largestChild) {
 
 					largestChild = null;
 					maxChildrenWidth = 0;
 
 					if (this.Bounds.Width < 0)
-						this.RegisterForLayouting (LayoutingType.Width);
+						this.EnqueueForLayouting (LayoutingType.Width);
 				}
 				break;
 			case LayoutingType.Height:
@@ -197,14 +197,14 @@ namespace Crow
 					maxChildrenHeight = g.Slot.Height;
 					tallestChild = g;
 					if (this.Bounds.Height < 0)
-						this.RegisterForLayouting (LayoutingType.Height);
+						this.EnqueueForLayouting (LayoutingType.Height);
 				} else if (g == tallestChild) {
 
 					tallestChild = null;
 					maxChildrenHeight = 0;
 
 					if (this.Bounds.Height < 0)
-						this.RegisterForLayouting (LayoutingType.Height);
+						this.EnqueueForLayouting (LayoutingType.Height);
 				}
 				break;
 			}
@@ -226,7 +226,7 @@ namespace Crow
 			for (int i = 0; i < Children.Count; i++) {
 				if (!Children [i].Visible)
 					continue;
-				if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
+				if (children [i].QueuedLayoutings.HasFlag (LayoutingType.Width))
 					continue;
 				if (Children [i].Slot.Width > maxChildrenWidth) {
 					maxChildrenWidth = Children [i].Slot.Width;
@@ -243,7 +243,7 @@ namespace Crow
 			for (int i = 0; i < Children.Count; i++) {
 				if (!Children [i].Visible)
 					continue;
-				if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
+				if (children [i].QueuedLayoutings.HasFlag (LayoutingType.Height))
 					continue;
 				if (Children [i].Slot.Height > maxChildrenHeight) {
 					maxChildrenHeight = Children [i].Slot.Height;

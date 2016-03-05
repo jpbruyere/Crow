@@ -34,7 +34,7 @@ namespace Crow
             set
             {
                 base.HasFocus = value;
-                registerForGraphicUpdate();
+                RegisterForGraphicUpdate();
             }
         }
 		[XmlAttributeAttribute()][DefaultValue(true)]
@@ -201,7 +201,7 @@ namespace Crow
 				RegisterForLayouting (LayoutingType.Width);
 			if (Height < 0)
 				RegisterForLayouting (LayoutingType.Height);
-			registerForGraphicUpdate();
+			RegisterForGraphicUpdate();
 		}
         #endregion
 	} 

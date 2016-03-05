@@ -41,7 +41,7 @@ namespace Crow
 			values.Add (_value);
 			while (values.Count > nbValues)
 				values.RemoveAt (0);
-			registerForGraphicUpdate ();
+			RegisterForGraphicUpdate ();
 		}
 
 		public Trend ()
@@ -61,7 +61,7 @@ namespace Crow
 
 				nbValues = value;
 				NotifyValueChanged ("NbValues", minValue);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0.0)]
@@ -73,7 +73,7 @@ namespace Crow
 
 				minValue = value;
 				NotifyValueChanged ("Minimum", minValue);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(100.0)]
@@ -86,7 +86,7 @@ namespace Crow
 
 				maxValue = value;
 				NotifyValueChanged ("Maximum", maxValue);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(20.0)]
@@ -97,7 +97,7 @@ namespace Crow
 					return;
 				lowThreshold = value;
 				NotifyValueChanged ("LowThreshold", lowThreshold);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(80.0)]
@@ -108,7 +108,7 @@ namespace Crow
 					return;
 				highThreshold = value;
 				NotifyValueChanged ("HighThreshold", highThreshold);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("DarkRed")]
@@ -119,7 +119,7 @@ namespace Crow
 					return;
 				lowThresholdFill = value;
 				NotifyValueChanged ("LowThresholdFill", lowThresholdFill);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("DarkGreen")]
@@ -130,7 +130,7 @@ namespace Crow
 					return;
 				highThresholdFill = value;
 				NotifyValueChanged ("HighThresholdFill", highThresholdFill);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 		protected override void onDraw (Cairo.Context gr)

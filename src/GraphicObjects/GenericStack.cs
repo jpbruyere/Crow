@@ -62,7 +62,7 @@ namespace Crow
 						foreach (GraphicObject c in Children) {
 							if (!c.Visible)
 								continue;
-							if (c.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+							if (c.QueuedLayoutings.HasFlag (LayoutingType.Width))
 								return -1;
 							tmp += c.Slot.Width + Spacing;
 						}
@@ -77,7 +77,7 @@ namespace Crow
 						foreach (GraphicObject c in Children) {
 							if (!c.Visible)
 								continue;
-							if (c.RegisteredLayoutings.HasFlag (LayoutingType.Height))
+							if (c.QueuedLayoutings.HasFlag (LayoutingType.Height))
 								return -1;
 							tmp += c.Slot.Height + Spacing;
 						}
@@ -99,7 +99,7 @@ namespace Crow
 						continue;
 					c.Slot.X = d;
 					d += c.Slot.Width + Spacing;
-					c.RegisterForLayouting (LayoutingType.Y);
+					c.EnqueueForLayouting (LayoutingType.Y);
 				}
 			} else {
 				foreach (GraphicObject c in Children) {
@@ -107,7 +107,7 @@ namespace Crow
 						continue;					
 					c.Slot.Y = d;
 					d += c.Slot.Height + Spacing;
-					c.RegisterForLayouting (LayoutingType.X);
+					c.EnqueueForLayouting (LayoutingType.X);
 				}
 			}
 			bmp = null;
@@ -115,7 +115,7 @@ namespace Crow
 			
 		public override bool UpdateLayout (LayoutingType layoutType)
         {
-			RegisteredLayoutings &= (~layoutType);
+			QueuedLayoutings &= (~layoutType);
 
 			if (layoutType == LayoutingType.ArrangeChildren) {
 				//allow 1 child to have size to 0 if stack has fixed or streched size policy,
@@ -130,7 +130,7 @@ namespace Crow
 						if (!Children [i].Visible)
 							continue;
 						//requeue Positionning if child is not layouted
-						if (Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
+						if (Children [i].QueuedLayoutings.HasFlag (LayoutingType.Width))
 							return false;
 						cptChildren++;
 						if (Children [i].Width == 0) {
@@ -169,7 +169,7 @@ namespace Crow
 					for (int i = 0; i < Children.Count; i++) {
 						if (!Children [i].Visible)
 							continue;
-						if (Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
+						if (Children [i].QueuedLayoutings.HasFlag (LayoutingType.Height))
 							return false;
 						cptChildren++;
 						if (Children [i].Height == 0) {
@@ -205,8 +205,8 @@ namespace Crow
 				ComputeChildrenPositions ();
 
 				//if no layouting remains in queue for item, registre for redraw
-				if (RegisteredLayoutings == LayoutingType.None && bmp==null)
-					this.RegisterForRedraw ();
+				if (QueuedLayoutings == LayoutingType.None && bmp==null)
+					this.AddToRedrawList ();
 
 				return true;
 			}
@@ -223,15 +223,15 @@ namespace Crow
 			case LayoutingType.Width:
 				if (Orientation == Orientation.Horizontal) {
 					if (this.Bounds.Width < 0)
-						this.RegisterForLayouting (LayoutingType.Width);
-					this.RegisterForLayouting (LayoutingType.ArrangeChildren);
+						this.EnqueueForLayouting (LayoutingType.Width);
+					this.EnqueueForLayouting (LayoutingType.ArrangeChildren);
 				}
 				break;
 			case LayoutingType.Height:
 				if (Orientation == Orientation.Vertical) {
 					if (this.Bounds.Height < 0)
-						this.RegisterForLayouting (LayoutingType.Height);
-					this.RegisterForLayouting (LayoutingType.ArrangeChildren);
+						this.EnqueueForLayouting (LayoutingType.Height);
+					this.EnqueueForLayouting (LayoutingType.ArrangeChildren);
 				}
 				break;
 			}

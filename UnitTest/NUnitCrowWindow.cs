@@ -75,7 +75,7 @@ namespace Crow
 			{
 				GraphicObjects.Remove(g);
 				GraphicObjects.Insert(0, g);
-				g.RegisterForRedraw ();
+				g.AddToRedrawList ();
 			}
 		}
 		public void Quit ()
@@ -153,8 +153,8 @@ namespace Crow
 
 			//Debug.WriteLine ("======= Layouting queue start =======");
 
-			while (Interface.LayoutingQueue.Count > 0) {
-				LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
+			while (Interface.CurrentInterface.LayoutingQueue.Count > 0) {
+				LayoutingQueueItem lqi = Interface.CurrentInterface.LayoutingQueue.Dequeue ();
 				lqi.ProcessLayouting ();
 			}
 
@@ -167,7 +167,7 @@ namespace Crow
 			gobjsToRedraw.CopyTo (gotr);
 			gobjsToRedraw.Clear ();
 			foreach (GraphicObject p in gotr) {
-				p.IsQueuedForRedraw = false;
+				p.IsInRedrawList = false;
 				p.Parent.RegisterClip (p.LastPaintedSlot);
 				p.Parent.RegisterClip (p.getSlot());
 			}
@@ -430,7 +430,7 @@ namespace Crow
 		public void RegisterClip(Rectangle r){
 			clipping.AddRectangle (r);
 		}
-		public void RegisterForLayouting (LayoutingType layoutType)
+		public void EnqueueForLayouting (LayoutingType layoutType)
 		{
 			throw new NotImplementedException ();
 		}			
@@ -446,11 +446,11 @@ namespace Crow
 			get { return null; }
 			set { throw new NotImplementedException (); }
 		}
-		public LayoutingType RegisteredLayoutings {
+		public LayoutingType QueuedLayoutings {
 			get { return LayoutingType.None; }
 			set { throw new NotImplementedException (); } 
 		}
-		public void RegisterForLayouting (int layoutType) { throw new NotImplementedException (); }
+		public void EnqueueForLayouting (int layoutType) { throw new NotImplementedException (); }
 		public bool UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public Rectangle ContextCoordinates (Rectangle r) => r;
 		public Rectangle ScreenCoordinates (Rectangle r) => r;

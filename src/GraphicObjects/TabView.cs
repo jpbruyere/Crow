@@ -77,7 +77,7 @@ namespace Crow
 					(Children [selectedTab] as TabItem).IsSelected = true;
 
 				NotifyValueChanged ("SelectedTab", selectedTab);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 		int tabThickness;
@@ -126,7 +126,7 @@ namespace Crow
 		public override bool ArrangeChildren { get { return true; } }
 		public override bool UpdateLayout (LayoutingType layoutType)
 		{
-			RegisteredLayoutings &= (~layoutType);
+			QueuedLayoutings &= (~layoutType);
 
 			if (layoutType == LayoutingType.ArrangeChildren) {
 				int curOffset = Spacing;
@@ -136,19 +136,19 @@ namespace Crow
 					TabItem ti = Children [i] as TabItem;
 					ti.TabOffset = curOffset;
 					if (Orientation == Orientation.Horizontal) {
-						if (ti.TabTitle.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+						if (ti.TabTitle.QueuedLayoutings.HasFlag (LayoutingType.Width))
 							return false;
 						curOffset += ti.TabTitle.Slot.Width + Spacing;
 					} else {
-						if (ti.TabTitle.RegisteredLayoutings.HasFlag (LayoutingType.Height))
+						if (ti.TabTitle.QueuedLayoutings.HasFlag (LayoutingType.Height))
 							return false;
 						curOffset += ti.TabTitle.Slot.Height + Spacing;
 					}
 				}
 
 				//if no layouting remains in queue for item, registre for redraw
-				if (RegisteredLayoutings == LayoutingType.None && bmp==null)
-					this.RegisterForRedraw ();
+				if (QueuedLayoutings == LayoutingType.None && bmp==null)
+					this.AddToRedrawList ();
 
 				return true;
 			}

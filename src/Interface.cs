@@ -77,7 +77,41 @@ namespace Crow
 		public const int MaxLayoutingTries = 50;
 		#endregion
 
-		public static Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem>();
+		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem>();
+		public Queue<GraphicObject> GraphicUpdateQueue = new Queue<GraphicObject>();
+		public Queue<GraphicObject> UpdateLayoutQueue = new Queue<GraphicObject>();
+
+		public static void RegisterForLayouting(GraphicObject g, LayoutingType lt){
+			
+			lock (CurrentInterface.UpdateLayoutQueue) {
+				if (CurrentInterface == null)
+					return;
+				if (g.RegisteredLayoutings == LayoutingType.None)
+					CurrentInterface.UpdateLayoutQueue.Enqueue (g);				
+				g.RegisteredLayoutings |= lt;
+			}
+		}
+		public static void RegisterForGraphicUpdate(GraphicObject g)
+		{
+			lock (CurrentInterface.GraphicUpdateQueue) {
+				if (g.IsQueueForGraphicUpdate)
+					return;			
+				if (CurrentInterface == null)
+					return;
+				CurrentInterface.GraphicUpdateQueue.Enqueue (g);
+				g.IsQueueForGraphicUpdate = true;
+			}
+		}
+		public static void AddToRedrawList(GraphicObject g)
+		{
+			if (g.IsInRedrawList)
+				return;
+			if (Interface.CurrentInterface == null)
+				return;
+			Interface.CurrentInterface.RedrawList.Add (g);
+			g.IsInRedrawList = true;	
+		}
+
 		#region default values loading helpers
 		public delegate void loadDefaultInvoker(object instance);
 		public static Dictionary<String, loadDefaultInvoker> DefaultValuesLoader = new Dictionary<string, loadDefaultInvoker>();
@@ -204,12 +238,12 @@ namespace Crow
 		}
 
 		public GraphicObject LoadInterface (string path)
-		{
-			lock (RenderMutex) {
+		{		
+			lock (this) {	
 				GraphicObject tmp = Interface.Load (path, this);
 				AddWidget (tmp);
 				return tmp;
-			}
+			}		
 		}
 
 		#endregion
@@ -296,13 +330,13 @@ namespace Crow
 			updateTime.Restart ();
 			#endif
 
+			lock (this) {
+				processLayouting ();
 
-			processLayouting ();
+				clippingRegistration ();
 
-			clippingRegistration ();
-
-			processDrawing ();
-
+				processDrawing ();
+			}
 			#if MEASURE_TIME
 			updateTime.Stop ();
 			#endif
@@ -328,46 +362,45 @@ namespace Crow
 			#if MEASURE_TIME
 			layoutTime.Restart();
 			#endif
-
+			lock (Interface.CurrentInterface.UpdateLayoutQueue) {
+				while(Interface.CurrentInterface.UpdateLayoutQueue.Count>0){
+					GraphicObject g = Interface.CurrentInterface.UpdateLayoutQueue.Dequeue();
+					g.EnqueueForLayouting (g.RegisteredLayoutings);
+					g.RegisteredLayoutings = LayoutingType.None;
+				}
+			}
 			//Debug.WriteLine ("======= Layouting queue start =======");
-			int queueCount = 0;
 			LayoutingQueueItem lqi = null;
-
-			lock (Interface.LayoutingQueue)
-				queueCount = Interface.LayoutingQueue.Count;
-
-			while (queueCount > 0) {
-				lock (Interface.LayoutingQueue)
-					lqi = Interface.LayoutingQueue.Dequeue ();
-				if (lqi!=null)
+			while (Interface.CurrentInterface.LayoutingQueue.Count > 0) {				
+					lqi = Interface.CurrentInterface.LayoutingQueue.Dequeue ();
 					lqi.ProcessLayouting ();
-				lock (Interface.LayoutingQueue)
-					queueCount = Interface.LayoutingQueue.Count;
 			}
 			#if MEASURE_TIME
 			layoutTime.Stop ();
 			#endif
 		}
 		void clippingRegistration(){
+			lock (CurrentInterface.GraphicUpdateQueue) {
+				while (CurrentInterface.GraphicUpdateQueue.Count > 0) {
+					GraphicObject g = CurrentInterface.GraphicUpdateQueue.Dequeue ();
+					g.bmp = null;
+					g.IsQueueForGraphicUpdate = false;
+					AddToRedrawList (g);
+				}
+			}
 			//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
 			//final redraw clips should be added only when layout is completed among parents,
 			//that's why it take place in a second pass
-			lock (Interface.CurrentInterface.RenderMutex) {
-				GraphicObject[] gotr = null;
-				gotr = new GraphicObject[gobjsToRedraw.Count];
-				gobjsToRedraw.CopyTo (gotr);
-				gobjsToRedraw.Clear ();
-
-				foreach (GraphicObject p in gotr) {
-					try {
-						p.IsQueuedForRedraw = false;
-						p.Parent.RegisterClip (p.LastPaintedSlot);
-						p.Parent.RegisterClip (p.getSlot ());
-					} catch (Exception ex) {
-						Debug.WriteLine ("Error Register Clip: " + ex.ToString ());
-					}
+			foreach (GraphicObject p in RedrawList) {
+				try {
+					p.IsInRedrawList = false;
+					p.Parent.RegisterClip (p.LastPaintedSlot);
+					p.Parent.RegisterClip (p.getSlot ());
+				} catch (Exception ex) {
+					Debug.WriteLine ("Error Register Clip: " + ex.ToString ());
 				}
 			}
+			RedrawList.Clear ();
 		}
 		void processDrawing(){
 			#if MEASURE_TIME
@@ -408,6 +441,8 @@ namespace Crow
 							DirtyRect.Top = Math.Max (0, DirtyRect.Top);
 							DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
 							DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
+							DirtyRect.Width = Math.Max (0, DirtyRect.Width);
+							DirtyRect.Height = Math.Max (0, DirtyRect.Height);
 						}
 						clipping.Reset ();
 					}
@@ -423,7 +458,7 @@ namespace Crow
 			get { return _redrawClip; }
 			set { _redrawClip = value; }
 		}
-		public List<GraphicObject> gobjsToRedraw {
+		public List<GraphicObject> RedrawList {
 			get { return _gobjsToRedraw; }
 			set { _gobjsToRedraw = value; }
 		}
@@ -647,11 +682,11 @@ namespace Crow
 			get { throw new NotImplementedException (); }
 			set { throw new NotImplementedException (); }
 		}
-		public LayoutingType RegisteredLayoutings {
+		public LayoutingType QueuedLayoutings {
 			get { return LayoutingType.None; }
 			set { throw new NotImplementedException (); }
 		}
-		public void RegisterForLayouting (LayoutingType layoutType) { throw new NotImplementedException (); }
+		public void EnqueueForLayouting (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public bool UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public Rectangle ContextCoordinates (Rectangle r) => r;
 		public Rectangle ScreenCoordinates (Rectangle r) => r;

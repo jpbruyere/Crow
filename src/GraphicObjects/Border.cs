@@ -21,7 +21,7 @@ namespace Crow
 			get { return _borderWidth; }
 			set {
 				_borderWidth = value;
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("White")]

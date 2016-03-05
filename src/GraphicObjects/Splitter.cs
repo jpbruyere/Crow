@@ -42,7 +42,7 @@ namespace Crow
 				thickness = value; 
 				NotifyValueChanged ("Thickness", thickness);
 				RegisterForLayouting (LayoutingType.Sizing);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		} 
 		#region GraphicObject override
