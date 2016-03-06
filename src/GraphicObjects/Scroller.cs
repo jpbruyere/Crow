@@ -24,7 +24,6 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
 using Cairo;
-using OpenTK.Input;
 
 namespace Crow
 {
@@ -71,7 +70,7 @@ namespace Crow
 				else
 					_scrollX = value;
 				NotifyValueChanged("ScrollX", _scrollX);
-				RegisterForRedraw();
+				RegisterForGraphicUpdate ();
 			}
 		}			
 		[XmlAttributeAttribute][DefaultValue(0.0)]
@@ -89,7 +88,7 @@ namespace Crow
 				else
 					_scrollY = value;
 				NotifyValueChanged("ScrollY", _scrollY);
-				RegisterForRedraw();
+				RegisterForGraphicUpdate ();
 			}
 		}
 
@@ -166,10 +165,6 @@ namespace Crow
 		internal Point savedMousePos;
 		public override bool MouseIsIn (Point m)
 		{			
-//			Debug.WriteLine ("Mouse in scroller: {0} scr coord:{1} mouse:{2}",
-//				base.ScreenCoordinates (Slot).ContainsOrIsEqual (m),
-//				base.ScreenCoordinates (Slot), m);
-
 			return Visible ? base.ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false; 
 		}
 		public override void checkHoverWidget (MouseMoveEventArgs e)
@@ -180,10 +175,6 @@ namespace Crow
 		}
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
 		{
-			//base.onMouseWheel (sender, e); base event buble to the top
-//			if (MouseWheelChanged!=null)
-//				MouseWheelChanged (this, e);
-
 			if (Child == null)
 				return;
 			
@@ -218,7 +209,7 @@ namespace Crow
 
 			gr.Save ();
 			//clip to scrolled client zone
-			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);//+ new Point((int)ScrollX,(int)ScrollY)
+			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
 			gr.Clip ();
 
 			gr.Translate (-ScrollX, -ScrollY);

@@ -41,7 +41,7 @@ namespace MonoDevelop.GOLib
 		}
 		public void OnChanged (object obj)
 		{
-			(obj as GraphicObject).registerForGraphicUpdate ();
+			(obj as GraphicObject).RegisterForGraphicUpdate ();
 			QueueDraw ();
 		}
 		#endregion
@@ -267,8 +267,8 @@ namespace MonoDevelop.GOLib
 			}
 
 			//Debug.WriteLine ("======= Layouting queue start =======");
-			while (Interface.LayoutingQueue.Count > 0) {
-				LayoutingQueueItem lqi = Interface.LayoutingQueue.Dequeue ();
+			while (Interface.CurrentInterface.LayoutingQueue.Count > 0) {
+				LayoutingQueueItem lqi = Interface.CurrentInterface.LayoutingQueue.Dequeue ();
 				lqi.ProcessLayouting ();
 			}
 
@@ -492,7 +492,7 @@ namespace MonoDevelop.GOLib
 			set { throw new NotImplementedException ();	}
 		}
 
-		public void RegisterForLayouting (int layoutType)
+		public void EnqueueForLayouting (int layoutType)
 		{
 			throw new NotImplementedException ();
 		}

@@ -42,7 +42,7 @@ namespace Crow
 				thickness = value; 
 				NotifyValueChanged ("Thickness", thickness);
 				RegisterForLayouting (LayoutingType.Sizing);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		} 
 		#region GraphicObject override
@@ -58,20 +58,20 @@ namespace Crow
 				base.Parent = value;
 			}
 		}
-		public override void onMouseEnter (object sender, OpenTK.Input.MouseMoveEventArgs e)
+		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseEnter (sender, e);
 			if ((Parent as GenericStack).Orientation == Orientation.Horizontal)
-				this.HostContainer.MouseCursor = XCursor.H;
+				Interface.CurrentInterface.MouseCursor = XCursor.H;
 			else
-				this.HostContainer.MouseCursor = XCursor.V;
+				Interface.CurrentInterface.MouseCursor = XCursor.V;
 		}
-		public override void onMouseLeave (object sender, OpenTK.Input.MouseMoveEventArgs e)
+		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			this.HostContainer.MouseCursor = XCursor.Default;
+			Interface.CurrentInterface.MouseCursor = XCursor.Default;
 		}
-		public override void onMouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
+		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
 

@@ -8,7 +8,6 @@ using System.Diagnostics;
 
 using System.Xml.Serialization;
 using Cairo;
-using OpenTK.Input;
 using System.ComponentModel;
 
 namespace Crow

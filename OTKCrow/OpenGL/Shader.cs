@@ -19,14 +19,14 @@ namespace Crow
 
 			Stream s = tryGetStreamForResource (vertResId);
 			if (s != null) {
-				using (StreamReader sr = new StreamReader (s)) {				
+				using (StreamReader sr = new StreamReader (s)) {
 					vertSource = sr.ReadToEnd ();
 				}
 			}
 
 			s = tryGetStreamForResource (fragResId);
 			if (s != null) {
-				using (StreamReader sr = new StreamReader (s)) {				
+				using (StreamReader sr = new StreamReader (s)) {
 					fragSource = sr.ReadToEnd ();
 				}
 			}
@@ -36,7 +36,7 @@ namespace Crow
 		Stream tryGetStreamForResource(string resId){
 			if (string.IsNullOrEmpty (resId))
 				return null;
-			
+
 			Stream s = Assembly.GetEntryAssembly ().
 				GetManifestResourceStream (resId);
 			return s == null ?
@@ -61,7 +61,7 @@ namespace Crow
 			in vec2 in_tex;
 
 			out vec2 texCoord;
-			
+
 
 			void main(void)
 			{
@@ -84,7 +84,7 @@ namespace Crow
 				out_frag_color = texture( tex, texCoord);
 			}";
 		string _geomSource = @"";
-//			#version 330 
+//			#version 330
 //			layout(triangles) in;
 //			layout(triangle_strip, max_vertices=3) out;
 //			void main()
@@ -99,14 +99,14 @@ namespace Crow
 		#endregion
 
 		#region Private and protected fields
-		protected int vsId, fsId, gsId, pgmId, 
+		protected int vsId, fsId, gsId, pgmId,
 						modelViewLocation,
 						modelLocation,
 						projectionLocation,
-						normalLocation,	
+						normalLocation,
 						colorLocation;
 
-		Matrix4 projectionMat = Matrix4.Identity, 
+		Matrix4 projectionMat = Matrix4.Identity,
 				modelMat = Matrix4.Identity,
 				modelViewMat = Matrix4.Identity;
 		Vector4 color = new Vector4(1,1,1,1);
@@ -120,14 +120,14 @@ namespace Crow
 			get { return _vertSource;}
 			set { _vertSource = value; }
 		}
-		public virtual string fragSource 
+		public virtual string fragSource
 		{
 			get { return _fragSource;}
 			set { _fragSource = value; }
 		}
 		public virtual string geomSource
-		{ 
-			get { return _geomSource; }          
+		{
+			get { return _geomSource; }
 			set { _geomSource = value; }
 		}
 
@@ -183,7 +183,7 @@ namespace Crow
 			if (!string.IsNullOrEmpty(geomSource))
 			{
 				gsId = GL.CreateShader(ShaderType.GeometryShader);
-				compileShader(gsId,geomSource);                
+				compileShader(gsId,geomSource);
 			}
 
 			if (vsId != 0)
@@ -212,7 +212,7 @@ namespace Crow
 				Debug.WriteLine ("Validation:");
 				Debug.WriteLine (info);
 			}
-				
+
 			GL.UseProgram (pgmId);
 
 			GetUniformLocations ();
@@ -223,7 +223,7 @@ namespace Crow
 
 		protected virtual void BindVertexAttributes()
 		{
-			GL.BindAttribLocation(pgmId, 0, "in_position");						
+			GL.BindAttribLocation(pgmId, 0, "in_position");
 			GL.BindAttribLocation(pgmId, 1, "in_tex");
 		}
 		protected virtual void GetUniformLocations()
@@ -243,7 +243,7 @@ namespace Crow
 			GL.UseProgram (pgmId);
 
 			GL.UniformMatrix4(projectionLocation, false, ref projectionMat);
-			GL.UniformMatrix4 (modelLocation, false, ref modelMat); 
+			GL.UniformMatrix4 (modelLocation, false, ref modelMat);
 			GL.UniformMatrix4 (modelViewLocation, false, ref modelViewMat);
 			updateNormalMatrix ();
 			GL.Uniform4 (colorLocation, color);
@@ -287,8 +287,8 @@ namespace Crow
 				Debug.WriteLine("Compile Error!");
 				Debug.WriteLine(source);
 			}
-		}			
-			
+		}
+
 		#region IDisposable implementation
 		public virtual void Dispose ()
 		{
@@ -305,4 +305,3 @@ namespace Crow
 		#endregion
 	}
 }
-

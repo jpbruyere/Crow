@@ -206,7 +206,7 @@ namespace Crow
 
 				//if no layouting remains in queue for item, registre for redraw
 				if (RegisteredLayoutings == LayoutingType.None && bmp==null)
-					this.RegisterForRedraw ();
+					this.AddToRedrawList ();
 
 				return true;
 			}

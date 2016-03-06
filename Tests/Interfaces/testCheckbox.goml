@@ -1,9 +1,12 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack  Margin="10" Background="DimGray" Style="test">
-	<CheckBox IsChecked="true"/>
-	<CheckBox Background="Gray"/>
-<!--	<CheckBox Background="Gray"/>
-	<CheckBox Background="Gray"/>
-	<CheckBox Background="Gray"/>-->
+<VerticalStack Fit="true" Margin="100" Background="DimGray" >
+	<CheckBox Background="Gray" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
+	<CheckBox Background="Gray" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
+	<CheckBox Background="Gray" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
+	<CheckBox Background="Gray" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
+	<CheckBox Background="Gray" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
+	<CheckBox Background="Gray" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
+	<CheckBox Background="Gray" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
+	<CheckBox Background="Gray" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
 </VerticalStack>
 

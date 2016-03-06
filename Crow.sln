@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoDevelop.Diagram", "..\M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{7BAE4448-E8F4-48B3-BB11-FA78E7F4506B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OTKCrow", "OTKCrow\OTKCrow.csproj", "{350D4F49-9901-4998-9903-BCA7D48DA58C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GtkCrow", "GtkCrow\GtkCrow.csproj", "{D6F98B08-56B8-405C-9212-F9D26097E35F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Linux_x86 = Debug|Linux_x86
@@ -19,6 +23,10 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{232716B4-D19D-4FD7-B310-94A98FD926F0}.Debug|Linux_x86.ActiveCfg = Debug|Any CPU
 		{232716B4-D19D-4FD7-B310-94A98FD926F0}.Release|Linux_x86.ActiveCfg = Debug|Any CPU
+		{350D4F49-9901-4998-9903-BCA7D48DA58C}.Debug|Linux_x86.ActiveCfg = Debug|Linux_x86
+		{350D4F49-9901-4998-9903-BCA7D48DA58C}.Debug|Linux_x86.Build.0 = Debug|Linux_x86
+		{350D4F49-9901-4998-9903-BCA7D48DA58C}.Release|Linux_x86.ActiveCfg = Release|Linux_x86
+		{350D4F49-9901-4998-9903-BCA7D48DA58C}.Release|Linux_x86.Build.0 = Release|Linux_x86
 		{74289092-9F70-4941-AFCB-DFD7BE2140B6}.Debug|Linux_x86.ActiveCfg = Debug|Any CPU
 		{74289092-9F70-4941-AFCB-DFD7BE2140B6}.Debug|Linux_x86.Build.0 = Debug|Any CPU
 		{74289092-9F70-4941-AFCB-DFD7BE2140B6}.Release|Linux_x86.ActiveCfg = Release|Any CPU
@@ -30,6 +38,10 @@ Global
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Debug|Linux_x86.Build.0 = Debug|Any CPU
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Release|Linux_x86.ActiveCfg = Release|Any CPU
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Release|Linux_x86.Build.0 = Release|Any CPU
+		{D6F98B08-56B8-405C-9212-F9D26097E35F}.Debug|Linux_x86.ActiveCfg = Debug|Linux_x86
+		{D6F98B08-56B8-405C-9212-F9D26097E35F}.Debug|Linux_x86.Build.0 = Debug|Linux_x86
+		{D6F98B08-56B8-405C-9212-F9D26097E35F}.Release|Linux_x86.ActiveCfg = Release|Linux_x86
+		{D6F98B08-56B8-405C-9212-F9D26097E35F}.Release|Linux_x86.Build.0 = Release|Linux_x86
 		{E9E14DB5-3C67-4E01-B5C3-4D90D7E31A2E}.Debug|Linux_x86.ActiveCfg = Debug|Any CPU
 		{E9E14DB5-3C67-4E01-B5C3-4D90D7E31A2E}.Release|Linux_x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection

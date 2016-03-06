@@ -23,6 +23,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ReleaseVersion>0.4</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -65,7 +66,6 @@
     <Compile Include="src\Rectangle.cs" />
     <Compile Include="src\Rectangles.cs" />
     <Compile Include="src\Size.cs" />
-    <Compile Include="src\OpenTKGameWindow.cs" />
     <Compile Include="src\GraphicObjects\GraphicObject.cs" />
     <Compile Include="src\GraphicObjects\Container.cs" />
     <Compile Include="src\GraphicObjects\Group.cs" />
@@ -90,10 +90,6 @@
     <Compile Include="src\GraphicObjects\AnalogMeter.cs" />
     <Compile Include="src\GraphicObjects\Border.cs" />
     <Compile Include="src\Font.cs" />
-    <Compile Include="src\OpenGL\QuadVAO.cs" />
-    <Compile Include="src\OpenGL\Shader.cs" />
-    <Compile Include="src\OpenGL\TexturedShader.cs" />
-    <Compile Include="src\OpenGL\VertexArrayObject.cs" />
     <Compile Include="src\GraphicObjects\Window.cs" />
     <Compile Include="src\GraphicObjects\IGOLibHost.cs" />
     <Compile Include="src\GraphicObjects\ListBox.cs" />
@@ -137,6 +133,23 @@
     <Compile Include="src\GraphicObjects\TabView.cs" />
     <Compile Include="src\GraphicObjects\TabItem.cs" />
     <Compile Include="src\GraphicObjects\DummyTemplate.cs" />
+    <Compile Include="src\Input\KeyboardKeyEventArgs.cs" />
+    <Compile Include="src\Input\Buttons.cs" />
+    <Compile Include="src\Input\ButtonState.cs" />
+    <Compile Include="src\Input\Key.cs" />
+    <Compile Include="src\Input\KeyboardState.cs" />
+    <Compile Include="src\Input\KeyModifiers.cs" />
+    <Compile Include="src\Input\MouseButton.cs" />
+    <Compile Include="src\Input\MouseEventArgs.cs" />
+    <Compile Include="src\Input\MouseScroll.cs" />
+    <Compile Include="src\Input\MouseState.cs" />
+    <Compile Include="src\rsvg\DimensionData.cs" />
+    <Compile Include="src\rsvg\Global.cs" />
+    <Compile Include="src\rsvg\Handle.cs" />
+    <Compile Include="src\rsvg\Pixbuf.cs" />
+    <Compile Include="src\rsvg\RsvgSharp.SizeFuncNative.cs" />
+    <Compile Include="src\rsvg\SizeFunc.cs" />
+    <Compile Include="src\MouseCursorChangedEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -146,12 +159,16 @@
       <Package>glib-sharp-3.0</Package>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="OpenTK">
-      <HintPath>..\opentk\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cairo" />
-    <Reference Include="rsvg2-sharp, Version=2.18.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="System.Drawing" />
+    <Reference Include="cairo-sharp, Version=1.10.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+      <Package>gtk-sharp-3.0</Package>
+    </Reference>
+    <Reference Include="gdk-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gdk-sharp-3.0</Package>
+    </Reference>
+    <Reference Include="gio-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gio-sharp-3.0</Package>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -169,9 +186,10 @@
     <Folder Include="Images\" />
     <Folder Include="Images\Icons\" />
     <Folder Include="src\CompilerServices\" />
-    <Folder Include="src\OpenGL\" />
     <Folder Include="src\Fill\" />
     <Folder Include="Styles\" />
+    <Folder Include="src\Input\" />
+    <Folder Include="src\rsvg\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\Icons\updown.svg" />

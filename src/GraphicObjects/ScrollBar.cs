@@ -28,7 +28,7 @@ namespace Crow
 					return;
 				_orientation = value;
 				NotifyValueChanged ("Orientation", _orientation);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 		public void onScrollBack (object sender, MouseButtonEventArgs e)

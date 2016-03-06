@@ -74,11 +74,11 @@ namespace Crow
 
 			GL.BindVertexArray(0);
 		}
-			
+
 		public void Render(PrimitiveType _primitiveType){
 			GL.BindVertexArray(vaoHandle);
 			GL.DrawElements(_primitiveType, indicesVboData.Length,
-				DrawElementsType.UnsignedInt, IntPtr.Zero);	
+				DrawElementsType.UnsignedInt, IntPtr.Zero);
 			GL.BindVertexArray (0);
 		}
 
@@ -91,4 +91,3 @@ namespace Crow
 		#endregion
 	}
 }
-

@@ -1,5 +1,4 @@
 ﻿using System;
-using OpenTK.Input;
 using System.ComponentModel;
 using System.Xml.Serialization;
 

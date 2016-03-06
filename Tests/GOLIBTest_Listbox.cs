@@ -5,7 +5,6 @@ using System;
 using System.Runtime.InteropServices;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using OpenTK.Input;
 
 using System.Diagnostics;
 
@@ -97,23 +96,23 @@ namespace test
 			TestList = Directory.GetFileSystemEntries("/home/jp/tmp/mtgdata/a", "*.txt",SearchOption.AllDirectories).ToList();
 			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
 		}
-		protected override void OnMouseMove (MouseMoveEventArgs e)
-		{			
-			base.OnMouseMove (e);
-			ValueChanged.Raise (this, new ValueChangeEventArgs ("Hover", Hover));
-			ValueChanged.Raise (this, new ValueChangeEventArgs ("MousePos", e.Position.ToString()));
-		}
+//		protected override void OnMouseMove (MouseMoveEventArgs e)
+//		{
+//			base.OnMouseMove (e);
+//			ValueChanged.Raise (this, new ValueChangeEventArgs ("Hover", Hover));
+//			ValueChanged.Raise (this, new ValueChangeEventArgs ("MousePos", e.Position.ToString()));
+//		}
 
 		protected override void OnUpdateFrame (FrameEventArgs e)
 		{
 			base.OnUpdateFrame (e);
 		}
-		protected override void OnKeyDown (KeyboardKeyEventArgs e)
-		{
-			TestList = Directory.GetFileSystemEntries("/home/jp/tmp/mtgdata/a", "*.txt",SearchOption.AllDirectories).ToList();
-			//TestList.Add ("newly added list item");
-			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
-		}
+//		protected override void OnKeyDown (KeyboardKeyEventArgs e)
+//		{
+//			TestList = Directory.GetFileSystemEntries("/home/jp/tmp/mtgdata/a", "*.txt",SearchOption.AllDirectories).ToList();
+//			//TestList.Add ("newly added list item");
+//			ValueChanged.Raise(this, new ValueChangeEventArgs ("TestList", TestList));
+//		}
 
 		[STAThread]
 		static void Main ()

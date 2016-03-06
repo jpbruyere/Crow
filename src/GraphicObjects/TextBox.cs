@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using OpenTK.Input;
 using Cairo;
 using System.Diagnostics;
 using System.Xml.Serialization;
@@ -35,7 +34,7 @@ namespace Crow
             set
             {
                 base.HasFocus = value;
-                registerForGraphicUpdate();
+                RegisterForGraphicUpdate();
             }
         }
 		[XmlAttributeAttribute()][DefaultValue(true)]
@@ -202,7 +201,7 @@ namespace Crow
 				RegisterForLayouting (LayoutingType.Width);
 			if (Height < 0)
 				RegisterForLayouting (LayoutingType.Height);
-			registerForGraphicUpdate();
+			RegisterForGraphicUpdate();
 		}
         #endregion
 	} 

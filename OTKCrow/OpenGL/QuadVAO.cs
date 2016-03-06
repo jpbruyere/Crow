@@ -22,7 +22,7 @@ namespace Crow
 		{
 
 		}
-		public QuadVAO (float x, float y, float width, float height, 
+		public QuadVAO (float x, float y, float width, float height,
 			float texX, float texY, float texW, float texH):base(
 			new Vector2[] {
 				new Vector2 (x, y),
@@ -42,4 +42,3 @@ namespace Crow
 		}
 	}
 }
-

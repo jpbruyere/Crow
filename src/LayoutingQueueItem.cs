@@ -66,7 +66,7 @@ namespace Crow
 				GraphicObject.LayoutingTries ++;
 				if (GraphicObject.LayoutingTries < Interface.MaxLayoutingTries) {
 					GraphicObject.RegisteredLayoutings |= LayoutType;
-					Interface.LayoutingQueue.Enqueue (this);
+					Interface.CurrentInterface.LayoutingQueue.Enqueue (this);
 				}
 			} else {
 				GraphicObject.LayoutingTries = 0;

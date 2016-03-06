@@ -23,7 +23,6 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using Cairo;
 using System.Diagnostics;
-using OpenTK.Input;
 
 namespace Crow
 {
@@ -78,7 +77,7 @@ namespace Crow
 					(Children [selectedTab] as TabItem).IsSelected = true;
 
 				NotifyValueChanged ("SelectedTab", selectedTab);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 		int tabThickness;
@@ -149,7 +148,7 @@ namespace Crow
 
 				//if no layouting remains in queue for item, registre for redraw
 				if (RegisteredLayoutings == LayoutingType.None && bmp==null)
-					this.RegisterForRedraw ();
+					this.AddToRedrawList ();
 
 				return true;
 			}
@@ -184,8 +183,8 @@ namespace Crow
 		#region Mouse handling
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
-			if (HostContainer.hoverWidget != this) {
-				HostContainer.hoverWidget = this;
+			if (Interface.CurrentInterface.hoverWidget != this) {
+				Interface.CurrentInterface.hoverWidget = this;
 				onMouseEnter (this, e);
 			}
 
@@ -207,7 +206,8 @@ namespace Crow
 			}
 		}
 		#endregion
-		void Ti_MouseDown (object sender, OpenTK.Input.MouseButtonEventArgs e)
+
+		void Ti_MouseDown (object sender, MouseButtonEventArgs e)
 		{
 			SelectedTab = Children.IndexOf (sender as GraphicObject);
 		}

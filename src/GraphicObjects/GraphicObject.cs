@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
+using System.Xml.Serialization;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
-using System.Xml.Serialization;
 using Cairo;
-using OpenTK.Input;
+using System.Linq;
+using System.Diagnostics;
 using System.IO;
 
 namespace Crow
@@ -130,9 +129,7 @@ namespace Crow
 				return cb;
 			}
 		}
-		[XmlIgnore]public virtual IGOLibHost HostContainer {
-			get { return Parent == null ? null : Parent.HostContainer; }
-		}
+
 		public virtual Rectangle ContextCoordinates(Rectangle r){
 			GraphicObject go = Parent as GraphicObject;
 			if (go == null)
@@ -320,7 +317,7 @@ namespace Crow
 					return;
 				_background = value;
 				NotifyValueChanged ("Background", _background);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("White")]
@@ -331,7 +328,7 @@ namespace Crow
 					return;
 				_foreground = value;
 				NotifyValueChanged ("Foreground", _foreground);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("droid,10")]
@@ -342,7 +339,7 @@ namespace Crow
 					return;
 				_font = value;
 				NotifyValueChanged ("Font", _font);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0.0)]
@@ -353,7 +350,7 @@ namespace Crow
 					return;
 				_cornerRadius = value;
 				NotifyValueChanged ("CornerRadius", _cornerRadius);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
@@ -364,7 +361,7 @@ namespace Crow
 					return;
 				_margin = value;
 				NotifyValueChanged ("Margin", _margin);
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(true)]
@@ -376,20 +373,20 @@ namespace Crow
 
 				_isVisible = value;
 
-				if (HostContainer == null)
+				if (Interface.CurrentInterface == null)
 					return;
 
 				//ensure main win doesn't keep hidden childrens ref
-				if (!_isVisible && this.Contains (HostContainer.hoverWidget))
-					HostContainer.hoverWidget = null;
+				if (!_isVisible && this.Contains (Interface.CurrentInterface.hoverWidget))
+					Interface.CurrentInterface.hoverWidget = null;
 
 				if (Parent is GraphicObject)
-					Parent.RegisterForLayouting (LayoutingType.Sizing);
+					(Parent as GraphicObject).RegisterForLayouting (LayoutingType.Sizing);
 				if (Parent is GenericStack)
-					Parent.RegisterForLayouting (LayoutingType.ArrangeChildren);
-				RegisterForLayouting (LayoutingType.Sizing);
+					(Parent as GraphicObject).RegisterForLayouting (LayoutingType.ArrangeChildren);
 
-				RegisterForRedraw ();
+				RegisterForLayouting (LayoutingType.Sizing);
+				RegisterForGraphicUpdate ();
 
 				NotifyValueChanged ("Visible", _isVisible);
 			}
@@ -631,26 +628,21 @@ namespace Crow
 				Clipping.AddRectangle (clip + ClientRectangle.Position);
 			Parent.RegisterClip (clip + Slot.Position + ClientRectangle.Position);
 		}
+		public bool IsQueueForGraphicUpdate = false;
 		/// <summary>
 		/// Clear chached object and add clipping region in redraw list of interface
 		/// </summary>
-		public virtual void registerForGraphicUpdate ()
+		public void RegisterForGraphicUpdate ()
 		{
-			bmp = null;
-			RegisterForRedraw ();
+			Interface.RegisterForGraphicUpdate (this);
 		}
-		public bool IsQueuedForRedraw = false;
+		internal bool IsInRedrawList = false;
 		/// <summary>
 		/// Add clipping region in redraw list of interface, dont update cached object content
 		/// </summary>
-		public virtual void RegisterForRedraw ()
+		internal void AddToRedrawList ()
 		{
-			if (IsQueuedForRedraw)
-				return;
-			if (HostContainer == null)
-				return;
-			HostContainer.gobjsToRedraw.Add (this);
-			IsQueuedForRedraw = true;
+			Interface.AddToRedrawList (this);
 		}
 
 		#region Layouting
@@ -670,40 +662,41 @@ namespace Crow
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
 			if (Parent == null)
 				return;
-			//dont set position for stretched item
-			if (Width == 0)
-				layoutType &= (~LayoutingType.X);
-			if (Height == 0)
-				layoutType &= (~LayoutingType.Y);
+			lock (Interface.CurrentInterface.LayoutMutex) {
+				//dont set position for stretched item
+				if (Width == 0)
+					layoutType &= (~LayoutingType.X);
+				if (Height == 0)
+					layoutType &= (~LayoutingType.Y);
 
-			if (!ArrangeChildren)
-				layoutType &= (~LayoutingType.ArrangeChildren);
+				if (!ArrangeChildren)
+					layoutType &= (~LayoutingType.ArrangeChildren);
 
-			//apply constraints depending on parent type
-			if (Parent is GraphicObject)
-				(Parent as GraphicObject).ChildrenLayoutingConstraints (ref layoutType);
+				//apply constraints depending on parent type
+				if (Parent is GraphicObject)
+					(Parent as GraphicObject).ChildrenLayoutingConstraints (ref layoutType);
 
-			//prevent queueing same LayoutingType for this
-			layoutType &= (~RegisteredLayoutings);
+				//prevent queueing same LayoutingType for this
+				layoutType &= (~RegisteredLayoutings);
 
-			if (layoutType == LayoutingType.None)
-				return;
+				if (layoutType == LayoutingType.None)
+					return;
 
-			#if DEBUG_LAYOUTING
-			Debug.WriteLine ("REGLayout => {1}->{0}", layoutType, this.ToString());
-			#endif
-
-			//enqueue LQI LayoutingTypes separately
-			if (layoutType.HasFlag (LayoutingType.Width))
-				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
-			if (layoutType.HasFlag (LayoutingType.Height))
-				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
-			if (layoutType.HasFlag (LayoutingType.X))
-				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
-			if (layoutType.HasFlag (LayoutingType.Y))
-				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
-			if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
-				Interface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
+				#if DEBUG_LAYOUTING
+				Debug.WriteLine ("REGLayout => {1}->{0}", layoutType, this.ToString());
+				#endif
+				//enqueue LQI LayoutingTypes separately
+				if (layoutType.HasFlag (LayoutingType.Width))
+					Interface.CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
+				if (layoutType.HasFlag (LayoutingType.Height))
+					Interface.CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
+				if (layoutType.HasFlag (LayoutingType.X))
+					Interface.CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
+				if (layoutType.HasFlag (LayoutingType.Y))
+					Interface.CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
+				if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
+					Interface.CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
+			}
 		}
 
 		/// <summary> trigger dependant sizing component update </summary>
@@ -715,10 +708,10 @@ namespace Crow
 
 			switch (layoutType) {
 			case LayoutingType.Width:
-				this.RegisterForLayouting (LayoutingType.X);
+				RegisterForLayouting (LayoutingType.X);
 				break;
 			case LayoutingType.Height:
-				this.RegisterForLayouting (LayoutingType.Y);
+				RegisterForLayouting (LayoutingType.Y);
 				break;
 			}
 			LayoutChanged.Raise (this, new LayoutingEventArgs (layoutType));
@@ -848,7 +841,7 @@ namespace Crow
 
 			//if no layouting remains in queue for item, registre for redraw
 			if (this.registeredLayoutings == LayoutingType.None && bmp == null)
-				this.RegisterForRedraw ();
+				this.AddToRedrawList ();
 
 			return true;
 		}
@@ -959,9 +952,8 @@ namespace Crow
 		}
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
-			IGOLibHost glh = HostContainer;
-			if (glh.hoverWidget != this) {
-				glh.hoverWidget = this;
+			if (Interface.CurrentInterface.hoverWidget != this) {
+				Interface.CurrentInterface.hoverWidget = this;
 				onMouseEnter (this, e);
 			}
 
@@ -977,14 +969,13 @@ namespace Crow
 			MouseMove.Raise (sender, e);
 		}
 		public virtual void onMouseDown(object sender, MouseButtonEventArgs e){
-			IGOLibHost hc = HostContainer;
-			if (hc.activeWidget == null)
-				hc.activeWidget = this;
+			if (Interface.CurrentInterface.activeWidget == null)
+				Interface.CurrentInterface.activeWidget = this;
 			if (this.Focusable && !Interface.FocusOnHover) {
 				BubblingMouseButtonEventArg be = e as BubblingMouseButtonEventArg;
 				if (be.Focused == null) {
 					be.Focused = this;
-					hc.FocusedWidget = this;
+					Interface.CurrentInterface.FocusedWidget = this;
 				}
 			}
 			//bubble event to the top

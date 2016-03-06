@@ -7,7 +7,6 @@ using Cairo;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using System.ComponentModel;
-using OpenTK.Input;
 
 namespace Crow
 {
@@ -56,7 +55,7 @@ namespace Crow
 				if (horizontalStretch == value)
 					return;
 				horizontalStretch = value; 
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 				NotifyValueChanged ("HorizontalStretch", horizontalStretch);
 			}
 		}
@@ -83,7 +82,7 @@ namespace Crow
                 if (_text == value)
                     return;
 					                
-                registerForGraphicUpdate();
+                RegisterForGraphicUpdate();
 				this.RegisterForLayouting (LayoutingType.Sizing);
 
 
@@ -102,7 +101,7 @@ namespace Crow
 			set
 			{
 				_multiline = value;
-				registerForGraphicUpdate();
+				RegisterForGraphicUpdate();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
@@ -114,7 +113,7 @@ namespace Crow
 				if (wordWrap == value)
 					return;
 				wordWrap = value;
-				registerForGraphicUpdate();
+				RegisterForGraphicUpdate();
 			}
 		}
 

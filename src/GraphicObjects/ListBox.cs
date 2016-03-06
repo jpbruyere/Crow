@@ -1,4 +1,4 @@
-﻿//
+﻿						//
 //  ListBox.cs
 //
 //  Author:
@@ -224,7 +224,7 @@ namespace Crow
 					(int)Math.Ceiling ((double)page1.Slot.Height / (double)itemPerPage * (double)(data.Count+1));
 			}
 		}
-		void itemClick(object sender, OpenTK.Input.MouseButtonEventArgs e){
+		void itemClick(object sender, MouseButtonEventArgs e){
 			SelectedIndex = data.IndexOf((sender as GraphicObject).DataSource);
 		}
 

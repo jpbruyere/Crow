@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Cairo;
-using System.IO;
-using System.Runtime.InteropServices;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
+
 
 namespace Crow
 {
@@ -27,7 +23,7 @@ namespace Crow
 				if (_pic == null)
 					return;
 				_pic.Scaled = scaled;
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		} 
 		bool keepProps;
@@ -42,7 +38,7 @@ namespace Crow
 				if (_pic == null)
 					return;
 				_pic.KeepProportions = keepProps;
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		} 
         [XmlAttributeAttribute("Path")]        
@@ -69,7 +65,7 @@ namespace Crow
 			get { return _svgSub; }
 			set {
 				_svgSub = value;
-				registerForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 			
@@ -89,7 +85,7 @@ namespace Crow
 				_pic = new BmpPicture ();
 
 			_pic.LoadImage (path);
-			registerForGraphicUpdate ();
+			RegisterForGraphicUpdate ();
 			RegisterForLayouting (LayoutingType.Sizing);
 		}
 		#endregion
