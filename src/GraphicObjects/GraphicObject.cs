@@ -662,7 +662,7 @@ namespace Crow
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
 			if (Parent == null)
 				return;
-			lock (Interface.CurrentInterface.LayoutingQueue) {
+			lock (Interface.CurrentInterface.LayoutMutex) {
 				//dont set position for stretched item
 				if (Width == 0)
 					layoutType &= (~LayoutingType.X);

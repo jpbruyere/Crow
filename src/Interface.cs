@@ -228,7 +228,7 @@ namespace Crow
 
 		public GraphicObject LoadInterface (string path)
 		{
-			lock (this) {
+			lock (UpdateMutex) {
 				GraphicObject tmp = Interface.Load (path, this);
 				AddWidget (tmp);
 				return tmp;
@@ -238,7 +238,7 @@ namespace Crow
 		#endregion
 
 		#if MEASURE_TIME
-		public Stopwatch updateTime = new Stopwatch ();
+		public Stopwatch clippingTime = new Stopwatch ();
 		public Stopwatch layoutTime = new Stopwatch ();
 		public Stopwatch guTime = new Stopwatch ();
 		public Stopwatch drawingTime = new Stopwatch ();
@@ -259,6 +259,7 @@ namespace Crow
 		public byte[] dirtyBmp;
 		public bool IsDirty = false;
 		public Rectangle DirtyRect;
+		public object LayoutMutex = new object();
 		public object RenderMutex = new object();
 		public object UpdateMutex = new object();
 
@@ -316,12 +317,8 @@ namespace Crow
 					FocusedWidget.onMouseClick (this, new MouseButtonEventArgs (Mouse.X, Mouse.Y, MouseButton.Left, true));
 				}
 			}
-			#if MEASURE_TIME
-			guTime.Reset ();
-			updateTime.Restart ();
-			#endif
 
-			lock (this) {
+			lock (UpdateMutex) {
 				processLayouting ();
 
 				clippingRegistration ();
@@ -329,9 +326,6 @@ namespace Crow
 				processDrawing ();
 			}
 
-			#if MEASURE_TIME
-			updateTime.Stop ();
-			#endif
 			//			if (ToolTip.isVisible) {
 			//				ToolTip.panel.processkLayouting();
 			//				if (ToolTip.panel.layoutIsValid)
@@ -354,7 +348,7 @@ namespace Crow
 			#if MEASURE_TIME
 			layoutTime.Restart();
 			#endif
-			lock (Interface.CurrentInterface.LayoutingQueue) {
+			lock (LayoutMutex) {
 				//Debug.WriteLine ("======= Layouting queue start =======");
 				LayoutingQueueItem lqi = null;
 				while (Interface.CurrentInterface.LayoutingQueue.Count > 0) {
@@ -367,6 +361,9 @@ namespace Crow
 			#endif
 		}
 		void clippingRegistration(){
+			#if MEASURE_TIME
+			clippingTime.Restart ();
+			#endif
 			lock (CurrentInterface.GraphicUpdateQueue) {
 				while (CurrentInterface.GraphicUpdateQueue.Count > 0) {
 					GraphicObject g = CurrentInterface.GraphicUpdateQueue.Dequeue ();
@@ -388,6 +385,9 @@ namespace Crow
 				}
 			}
 			RedrawList.Clear ();
+			#if MEASURE_TIME
+			clippingTime.Stop ();
+			#endif
 		}
 		void processDrawing(){
 			#if MEASURE_TIME
@@ -504,7 +504,7 @@ namespace Crow
 
 
 		public void ProcessResize(Rectangle bounds){
-			lock (CurrentInterface) {
+			lock (UpdateMutex) {
 				clientRectangle = bounds;
 
 				int stride = 4 * ClientRectangle.Width;

@@ -67,7 +67,7 @@ namespace Crow
 				ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
 				#if MEASURE_TIME
 				ValueChanged.Raise (this, new ValueChangeEventArgs ("update",
-					this.CrowInterface.updateTime.ElapsedTicks.ToString () + " ticks"));
+					this.CrowInterface.clippingTime.ElapsedTicks.ToString () + " ticks"));
 				ValueChanged.Raise (this, new ValueChangeEventArgs ("layouting",
 					this.CrowInterface.layoutTime.ElapsedTicks.ToString () + " ticks"));
 				ValueChanged.Raise (this, new ValueChangeEventArgs ("drawing",
@@ -120,7 +120,7 @@ namespace Crow
 
 			while (true) {
 				CrowInterface.Update ();
-				Thread.Sleep (10);
+				Thread.Sleep (5);
 			}
 		}
 
@@ -201,8 +201,8 @@ namespace Crow
 					CrowInterface.IsDirty = false;
 				}
 			}
-			uiQuad.Render (PrimitiveType.TriangleStrip);
 
+			uiQuad.Render (PrimitiveType.TriangleStrip);
 			GL.BindTexture(TextureTarget.Texture2D, 0);
 
 			shader.Disable ();

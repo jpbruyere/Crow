@@ -36,13 +36,13 @@
 				Margin="10" Focusable="True" >
 					<VerticalStack Fit="true" Name="vsFps"  Spacing="10" >
 						<HorizontalStack Fit="true">
-							<Label Text="Update:" Width="50" TextAlignment="Right"/>
-							<Label Name="labUpdate" Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
+							<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
+							<Label Name="labLayouting" Text="{layouting}" Font="droid,12" Width="80" TextAlignment="Center"
 								Background="vgradient|0:AoEnglish|1:Black"/>
 						</HorizontalStack>
 						<HorizontalStack Fit="true">
-							<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
-							<Label Name="labLayouting" Text="{layouting}" Font="droid,12" Width="80" TextAlignment="Center"
+							<Label Text="Clipping:" Width="50" TextAlignment="Right"/>
+							<Label Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
 								Background="vgradient|0:AoEnglish|1:Black"/>
 						</HorizontalStack>
 						<HorizontalStack Fit="true">
@@ -68,7 +68,7 @@
 					</VerticalStack>				
 			</Container>
 		</Border>
-		<Border Fit="true" CornerRadius="5" BorderWidth="1" >
+<!--		<Border Fit="true" CornerRadius="5" BorderWidth="1" >
 			<Container Name="MainGrp" Background="0,5;0,5;0,5;0,4" Fit="true" Margin="10">
 					<VerticalStack Fit="true" Spacing="10" >
 						<HorizontalStack Fit="true">
@@ -81,7 +81,7 @@
 						</HorizontalStack>
 					</VerticalStack>
 			</Container>
-		</Border>
+		</Border>-->
 		<HorizontalStack Fit="true" Background="BlueCrayola" Margin="3">
 			<GraphicObject Margin="10" Background="LimeGreen" Width="5" Height="5"/>
 			<TextBox Font="droid, 16" Multiline="true" Text="this is a test\nmultiline" Margin="2"/>
