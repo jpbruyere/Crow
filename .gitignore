@@ -4,6 +4,7 @@ Crow.userprefs
 Debug
 packages
 /GOLib.suo
+/tmp
 /bin/*
 /obj/*
 /GOLib.userprefs
