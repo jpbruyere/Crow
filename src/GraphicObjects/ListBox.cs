@@ -149,10 +149,13 @@ namespace Crow
 
 			//reset size to fit in the dir of the stacking
 			//because _list total size is forced to approx size
-			if (_gsList.Orientation == Orientation.Horizontal)
+			if (_gsList.Orientation == Orientation.Horizontal) {
 				page.Width = -1;
-			else
-				page.Height = -1;			
+				page.Height = 0;
+			} else {
+				page.Height = -1;
+				page.Width = 0;
+			}
 
 
 			for (int i = (pageNum - 1) * itemPerPage; i < pageNum * itemPerPage; i++) {

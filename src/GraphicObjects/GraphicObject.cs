@@ -626,7 +626,8 @@ namespace Crow
 		public virtual void RegisterClip(Rectangle clip){
 			if (CacheEnabled && bmp != null)
 				Clipping.AddRectangle (clip + ClientRectangle.Position);
-			Parent.RegisterClip (clip + Slot.Position + ClientRectangle.Position);
+			if (Parent != null)
+				Parent.RegisterClip (clip + Slot.Position + ClientRectangle.Position);
 		}
 		public bool IsQueueForGraphicUpdate = false;
 		/// <summary>
@@ -1516,7 +1517,6 @@ namespace Crow
 			#if DEBUG_LOAD
 			Debug.WriteLine ("ApplyStyle for " + this.ToString ());
 			#endif
-
 			using (StreamReader sr = new StreamReader (s)) {
 				while (!sr.EndOfStream) {
 					string tmp = sr.ReadLine ();
@@ -1544,7 +1544,6 @@ namespace Crow
 				Style = stylePath;
 				applyStyle ();
 			}
-
 			while (reader.MoveToNextAttribute ()) {
 				if (reader.Name == "Style")
 					continue;

@@ -3,6 +3,7 @@ using System.Xml.Serialization;
 using System.Reflection;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 
 namespace Crow
 {
@@ -50,11 +51,11 @@ namespace Crow
                     return;
 
                 Type t = Type.GetType("Crow." + subTree.Name);
-                GraphicObject go = (GraphicObject)Activator.CreateInstance(t);                                
+				GraphicObject go = (GraphicObject)Activator.CreateInstance(t);
 
-                (go as IXmlSerializable).ReadXml(subTree);
-                
-                SetChild(go);
+				(go as IXmlSerializable).ReadXml(subTree);
+
+				SetChild(go);
 
                 subTree.Read();//closing tag
             }
