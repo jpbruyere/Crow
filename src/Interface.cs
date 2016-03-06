@@ -37,20 +37,12 @@ namespace Crow
 {
 	public class Interface : ILayoutable
 	{
-		public delegate void ResizeDelegatePrototype(Rectangle bounds);
-		public delegate void LoaderDelegatePrototype (string path);
-		public ResizeDelegatePrototype ResizeDelegate;
-		public LoaderDelegatePrototype LoadInterfaceDelegate;
-
 		#region CTOR
 		static Interface(){
 			Interface.LoadCursors ();
 		}
 		public Interface(){
 			Interface.CurrentInterface = this;
-
-			LoadInterfaceDelegate = new LoaderDelegatePrototype(InterfaceLoad);
-			ResizeDelegate = new ResizeDelegatePrototype (ProcessResize);
 		}
 		#endregion
 
@@ -317,14 +309,16 @@ namespace Crow
 					FocusedWidget.onMouseClick (this, new MouseButtonEventArgs (Mouse.X, Mouse.Y, MouseButton.Left, true));
 				}
 			}
+			if (!Monitor.TryEnter (UpdateMutex))
+				return;
 
-			lock (UpdateMutex) {
-				processLayouting ();
+			processLayouting ();
 
-				clippingRegistration ();
+			clippingRegistration ();
 
-				processDrawing ();
-			}
+			processDrawing ();
+
+			Monitor.Exit (UpdateMutex);
 
 			//			if (ToolTip.isVisible) {
 			//				ToolTip.panel.processkLayouting();
@@ -378,6 +372,8 @@ namespace Crow
 			foreach (GraphicObject p in RedrawList) {
 				try {
 					p.IsInRedrawList = false;
+					if (p.Parent == null)
+						continue;
 					p.Parent.RegisterClip (p.LastPaintedSlot);
 					p.Parent.RegisterClip (p.getSlot ());
 				} catch (Exception ex) {

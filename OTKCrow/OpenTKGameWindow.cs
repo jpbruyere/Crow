@@ -270,7 +270,7 @@ namespace Crow
 		protected override void OnResize(EventArgs e)
 		{
 			base.OnResize (e);
-			CrowInterface.ResizeDelegate.Invoke(
+			CrowInterface.ProcessResize(
 				new Rectangle(
 				this.ClientRectangle.X,
 				this.ClientRectangle.Y,
