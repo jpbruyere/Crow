@@ -126,14 +126,12 @@ namespace Crow
 			switch (layoutType) {
 			case LayoutingType.Width:								
 				if (child != null) {
-					if (child.Visible)
-						child.RegisterForLayouting (LayoutingType.X | LayoutingType.Width);
+					child.RegisterForLayouting (LayoutingType.X | LayoutingType.Width);
 				}
 				break;
 			case LayoutingType.Height:
 				if (child != null) {
-					if (child.Visible)
-						child.RegisterForLayouting (LayoutingType.Y | LayoutingType.Height);
+					child.RegisterForLayouting (LayoutingType.Y | LayoutingType.Height);
 				}
 				break;
 			}							
