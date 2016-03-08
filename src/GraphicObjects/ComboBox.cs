@@ -11,7 +11,7 @@ namespace Crow
 		public ComboBox() : base(){	}	
 		#endregion
 
-		Size minimumPopupSize = "100;100";
+		Size minimumPopupSize = "10;10";
 		[XmlIgnore]public Size MinimumPopupSize{
 			get { return minimumPopupSize; }
 			set {

@@ -29,8 +29,9 @@ namespace testOTK
 		int frameCpt = 0;
 		int idx = 0;
 		string[] testFiles = {
-			"0.crow",
 			"testColorList.crow",
+			"testCombobox.goml",
+			"0.crow",
 			"testCheckbox.goml",
 			"testWindow.goml",
 			"fps.goml",

@@ -117,7 +117,7 @@ namespace Crow
 			set { _parent = value; }
 		}
 
-		public ILayoutable LogicalParent {
+		[XmlIgnore]public ILayoutable LogicalParent {
 			get { return logicalParent == null ? Parent : logicalParent; }
 			set { logicalParent = value; }
 		}
@@ -793,16 +793,19 @@ namespace Crow
 					Slot.Width = Width;
 				else if (Width < 0) {
 					Slot.Width = measureRawSize (LayoutingType.Width);
-				}else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+				} else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
 					return false;
 				else
 					Slot.Width = Parent.ClientRectangle.Width;
 
 				//size constrain
-				if (Slot.Width < MinimumSize.Width)
+				if (Slot.Width < MinimumSize.Width) {
 					Slot.Width = MinimumSize.Width;
-				else if (Slot.Width > MaximumSize.Width && MaximumSize.Width > 0)
+					NotifyValueChanged ("WidthPolicy", 0);
+				} else if (Slot.Width > MaximumSize.Width && MaximumSize.Width > 0) {
 					Slot.Width = MaximumSize.Width;
+					NotifyValueChanged ("WidthPolicy", 0);
+				}
 
 				if (LastSlots.Width == Slot.Width)
 					break;
@@ -816,18 +819,21 @@ namespace Crow
 			case LayoutingType.Height:
 				if (Height > 0)
 					Slot.Height = Height;
-				else if (Height < 0){
+				else if (Height < 0) {
 					Slot.Height = measureRawSize (LayoutingType.Height);
-				}else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height))
+				} else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height))
 					return false;
 				else
 					Slot.Height = Parent.ClientRectangle.Height;
 
 				//size constrain
-				if (Slot.Height < MinimumSize.Height)
+				if (Slot.Height < MinimumSize.Height) {
 					Slot.Height = MinimumSize.Height;
-				else if (Slot.Height > MaximumSize.Height && MaximumSize.Height > 0)
+					NotifyValueChanged ("HeightPolicy", 0);
+				} else if (Slot.Height > MaximumSize.Height && MaximumSize.Height > 0) {
 					Slot.Height = MaximumSize.Height;
+					NotifyValueChanged ("HeightPolicy", 0);
+				}
 
 				if (LastSlots.Height == Slot.Height)
 					break;
@@ -1039,6 +1045,9 @@ namespace Crow
 		}
 
 		#region Binding
+		public void BindMember(string _member, string _expression){
+			Bindings.Add(new Binding (this, _member, _expression));
+		}
 		public virtual void ResolveBindings()
 		{
 			if (Bindings.Count == 0)

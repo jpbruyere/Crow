@@ -93,6 +93,11 @@ namespace Crow
 			Target = _source;
 			Expression = _expression;
 		}
+		public Binding(object _source, string _member, string _expression)
+		{
+			Target = new MemberReference (_source, _source.GetType().GetMember (_member) [0]);
+			Expression = _expression;
+		}
 		#endregion
 
 		public bool FindTarget(){

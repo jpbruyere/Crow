@@ -124,7 +124,7 @@ namespace Crow
 				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
 			}
 		}
-		int itemPerPage = 100;
+		int itemPerPage = 50;
 		MemoryStream templateStream = null;
 		Type templateBaseType = null;
 
@@ -144,33 +144,37 @@ namespace Crow
 				templateBaseType = Interface.GetTopContainerOfGOMLStream (templateStream);
 			}
 
-			Group page = _list.Clone () as Group;
-			page.Name = "page" + pageNum;
+			lock (Interface.CurrentInterface.UpdateMutex) {
+				
+				Group page = _list.Clone () as Group;
+				page.Name = "page" + pageNum;
+				page.Background = Color.Transparent;
 
-			//reset size to fit in the dir of the stacking
-			//because _list total size is forced to approx size
-			if (_gsList.Orientation == Orientation.Horizontal) {
-				page.Width = -1;
-				page.Height = 0;
-			} else {
-				page.Height = -1;
-				page.Width = 0;
+				//reset size to fit in the dir of the stacking
+				//because _list total size is forced to approx size
+				if (_gsList.Orientation == Orientation.Horizontal) {
+					page.Width = -1;
+				} else {
+					page.Height = -1;
+//					Bindings.Add(new Binding 
+//						(new MemberReference (page, typeof(GraphicObject).GetMember ("Width")[0]), "../../WidthPolicy"));
+					//page.Bindings.Add(new Binding (page, "Width", "../../WidthPolicy"));
+					page.BindMember("Width", "../../WidthPolicy");
+				}
+
+				for (int i = (pageNum - 1) * itemPerPage; i < pageNum * itemPerPage; i++) {
+					if (i >= data.Count)
+						break;
+					templateStream.Seek (0, SeekOrigin.Begin);
+					GraphicObject g = Interface.Load (templateStream, templateBaseType);
+					g.MouseClick += itemClick;
+					page.AddChild (g);
+					g.DataSource = data [i];
+					//g.LogicalParent = this;
+				}
+
+				_list.AddChild (page);
 			}
-
-
-			for (int i = (pageNum - 1) * itemPerPage; i < pageNum * itemPerPage; i++) {
-				if (i >= data.Count)
-					break;
-				templateStream.Seek(0,SeekOrigin.Begin);
-				GraphicObject g = Interface.Load (templateStream, templateBaseType);
-				g.MouseClick += itemClick;
-				page.AddChild (g);
-				g.DataSource = data [i];
-				//g.LogicalParent = this;
-			}
-
-			_list.AddChild (page);
-
 			#if DEBUG_LOAD
 			loadingTime.Stop ();
 			Debug.WriteLine("Listbox {2} Loading: {0} ticks \t, {1} ms",

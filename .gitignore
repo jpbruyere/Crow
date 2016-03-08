@@ -9,6 +9,7 @@ packages
 /obj/*
 /GOLib.userprefs
 /Tests/obj/*
+/OTKCrow/obj
 /Tests/bin/*
 /UnitTest/obj
 /UnitTest/bin

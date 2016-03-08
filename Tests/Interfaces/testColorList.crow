@@ -2,7 +2,7 @@
 <Border BorderWidth="2" Fit="true">
 	<VerticalStack Fit="true" Margin="5">
 		<ListBox Data="{TestList}" Background="0,5;0,5;0,5;0,7"
-					 HorizontalAlignment="Center" Width="300" Height="350" Margin="5"
+					 HorizontalAlignment="Center" Width="200" Height="200" Margin="5"
 					 ItemTemplate="#Tests.Interfaces.colorItem.crow">
 			<Template>
 				<Border BorderWidth="1" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
@@ -11,7 +11,9 @@
 								Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}"
 								ValueChanged="../../../_scroller_ValueChanged">
 							<VerticalStack Width="{../../../../WidthPolicy}" Height="-1" MinimumSize="10;10"
-								Name="List" Margin="0" VerticalAlignment="Top"
+								Name="List" Margin="0"
+								VerticalAlignment="Top"
+								HorizontalAlignment="Left"
 								LayoutChanged="../../../../_list_LayoutChanged"/>
 						</Scroller>
 						<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}" 
