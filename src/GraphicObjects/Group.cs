@@ -44,8 +44,9 @@ namespace Crow
         public virtual T AddChild<T>(T child)
         {
 			GraphicObject g = child as GraphicObject;
-            Children.Add(g);
-            g.Parent = this as GraphicObject;            
+			Children.Add(g);
+			g.Parent = this as GraphicObject;
+			ResolveBindings ();
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 			g.LayoutChanged += OnChildLayoutChanges;
             return (T)child;
