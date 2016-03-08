@@ -92,11 +92,8 @@ namespace Crow
 		{
 			//ensure popped window is cleared
 			if (Content != null) {
-				if (Content.Parent != null) {
-					IGOLibHost tc = Content.Parent as IGOLibHost;
-					if (tc != null)
-						tc.DeleteWidget (Content);
-				}
+				if (Content.Parent != null)
+					Interface.CurrentInterface.DeleteWidget (Content);
 			}
 			base.ClearBinding ();
 		}
