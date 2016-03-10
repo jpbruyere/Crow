@@ -106,8 +106,16 @@ namespace Crow
 			Thread t = new Thread (interfaceThread);
 			t.IsBackground = true;
 			t.Start ();
-
 //			interfaceThread ();
+		}
+		public OpenTKGameWindow(int _width, int _height, int colors, int depth, int stencil, int samples, string _title="Crow")
+			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(colors, depth, stencil, samples),
+				_title,GameWindowFlags.Default,DisplayDevice.GetDisplay(DisplayIndex.Second),
+				3,3,OpenTK.Graphics.GraphicsContextFlags.Default)
+		{
+			Thread t = new Thread (interfaceThread);
+			t.IsBackground = true;
+			t.Start ();
 		}
 		#endregion
 
@@ -289,19 +297,23 @@ namespace Crow
 		}
 		void Mouse_Move(object sender, OpenTK.Input.MouseMoveEventArgs otk_e)
         {
-			CrowInterface.ProcessMouseMove (otk_e.X, otk_e.Y);
+			if (!CrowInterface.ProcessMouseMove (otk_e.X, otk_e.Y))
+				MouseMove.Raise (sender, otk_e);
         }
 		void Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
         {
-			CrowInterface.ProcessMouseButtonUp ((int)otk_e.Button);
+			if (!CrowInterface.ProcessMouseButtonUp ((int)otk_e.Button))
+				MouseButtonUp.Raise (sender, otk_e);
         }
 		void Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
 		{
-			CrowInterface.ProcessMouseButtonDown ((int)otk_e.Button);
+			if (!CrowInterface.ProcessMouseButtonDown ((int)otk_e.Button))
+				MouseButtonDown.Raise (sender, otk_e);
         }
 		void Mouse_WheelChanged(object sender, OpenTK.Input.MouseWheelEventArgs otk_e)
         {
-			CrowInterface.ProcessMouseWheelChanged (otk_e.DeltaPrecise);
+			if (!CrowInterface.ProcessMouseWheelChanged (otk_e.DeltaPrecise))
+				MouseWheelChanged.Raise (sender, otk_e);
         }
 		#endregion
 
