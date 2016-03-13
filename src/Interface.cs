@@ -42,6 +42,7 @@ namespace Crow
 			Interface.LoadCursors ();
 		}
 		public Interface(){
+			LayoutingQueue = new Queue<LayoutingQueueItem>();
 			Interface.CurrentInterface = this;
 		}
 		#endregion
@@ -69,7 +70,7 @@ namespace Crow
 		public const int MaxLayoutingTries = 50;
 		#endregion
 
-		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem>();
+		public Queue<LayoutingQueueItem> LayoutingQueue;
 		public Queue<GraphicObject> GraphicUpdateQueue = new Queue<GraphicObject>();
 
 		public static void RegisterForGraphicUpdate(GraphicObject g)

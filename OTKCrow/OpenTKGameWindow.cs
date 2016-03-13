@@ -122,7 +122,6 @@ namespace Crow
 		void interfaceThread()
 		{
 			CrowInterface = new Interface ();
-			Interface.CurrentInterface = CrowInterface;
 			CrowInterface.Quit += Quit;
 			CrowInterface.MouseCursorChanged += CrowInterface_MouseCursorChanged;
 
