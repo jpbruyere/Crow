@@ -105,7 +105,10 @@ namespace Crow
 
 			//if binding exp = '{}' => binding is done on datasource
 			if (string.IsNullOrEmpty (Expression)) {
-				Source = new MemberReference ((Target.Instance as GraphicObject).DataSource);
+				Object o = (Target.Instance as GraphicObject).DataSource;
+				if (o == null)
+					return false;
+				Source = new MemberReference (o);
 				return true;
 			}
 
