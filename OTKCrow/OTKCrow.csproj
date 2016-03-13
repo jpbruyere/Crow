@@ -3,13 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">Linux_x86</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{350D4F49-9901-4998-9903-BCA7D48DA58C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>OTKCrow</RootNamespace>
     <AssemblyName>OTKCrow</AssemblyName>
-    <ReleaseVersion>0.4</ReleaseVersion>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Linux_x86' ">
@@ -49,11 +46,5 @@
     <Compile Include="OpenGL\Shader.cs" />
     <Compile Include="OpenGL\TexturedShader.cs" />
     <Compile Include="OpenGL\VertexArrayObject.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Crow.csproj">
-      <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
-      <Name>Crow</Name>
-    </ProjectReference>
   </ItemGroup>
 </Project>
