@@ -71,6 +71,7 @@ namespace Crow
 					_scrollX = value;
 				NotifyValueChanged("ScrollX", _scrollX);
 				RegisterForGraphicUpdate ();
+				Scrolled.Raise (this, new ScrollingEventArgs (Orientation.Horizontal));
 			}
 		}			
 		[XmlAttributeAttribute][DefaultValue(0.0)]
@@ -89,6 +90,7 @@ namespace Crow
 					_scrollY = value;
 				NotifyValueChanged("ScrollY", _scrollY);
 				RegisterForGraphicUpdate ();
+				Scrolled.Raise (this, new ScrollingEventArgs (Orientation.Vertical));
 			}
 		}
 
