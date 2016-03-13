@@ -51,6 +51,13 @@ namespace Crow
                     return;
 
                 Type t = Type.GetType("Crow." + subTree.Name);
+				if (t == null) {
+					Assembly a = Assembly.GetEntryAssembly ();
+					foreach (Type expT in a.GetExportedTypes ()) {
+						if (expT.Name == subTree.Name)
+							t = expT;
+					}
+				}
 				GraphicObject go = (GraphicObject)Activator.CreateInstance(t);
 
 				(go as IXmlSerializable).ReadXml(subTree);

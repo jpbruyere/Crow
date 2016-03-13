@@ -21,6 +21,7 @@
 using System;
 using System.Xml.Serialization;
 using System.Xml;
+using System.Reflection;
 
 namespace Crow
 {
@@ -84,6 +85,13 @@ namespace Crow
 						}
 
 						Type t = Type.GetType ("Crow." + xr.Name);
+						if (t == null) {
+							Assembly a = Assembly.GetEntryAssembly ();
+							foreach (Type expT in a.GetExportedTypes ()) {
+								if (expT.Name == xr.Name)
+									t = expT;
+							}
+						}
 						GraphicObject go = (GraphicObject)Activator.CreateInstance (t);                                
 
 						(go as IXmlSerializable).ReadXml (xr);

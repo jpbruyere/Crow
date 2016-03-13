@@ -5,6 +5,7 @@ using System.Xml.Serialization;
 using Cairo;
 using OpenTK.Input;
 using System.Diagnostics;
+using System.Reflection;
 
 
 namespace Crow
@@ -46,7 +47,7 @@ namespace Crow
 			GraphicObject g = child as GraphicObject;
 			Children.Add(g);
 			g.Parent = this as GraphicObject;
-			ResolveBindings ();
+			g.ResolveBindings ();
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 			g.LayoutChanged += OnChildLayoutChanges;
             return (T)child;
@@ -339,6 +340,13 @@ namespace Crow
                         break;
 
                     Type t = Type.GetType("Crow." + subTree.Name);
+					if (t == null) {
+						Assembly a = Assembly.GetEntryAssembly ();
+						foreach (Type expT in a.GetExportedTypes ()) {
+							if (expT.Name == subTree.Name)
+								t = expT;
+						}
+					}
 					if (t == null)
 						throw new Exception ("Crow." + subTree.Name + " type not found");
                     GraphicObject go = (GraphicObject)Activator.CreateInstance(t);
