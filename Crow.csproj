@@ -21,7 +21,6 @@
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ReleaseVersion>0.4</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -147,6 +146,7 @@
     <Compile Include="src\rsvg\RsvgSharp.SizeFuncNative.cs" />
     <Compile Include="src\rsvg\SizeFunc.cs" />
     <Compile Include="src\MouseCursorChangedEventArgs.cs" />
+    <Compile Include="src\GraphicObjects\IBindable.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
