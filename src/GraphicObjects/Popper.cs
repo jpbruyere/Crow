@@ -118,8 +118,10 @@ namespace Crow
 				return;
 			if (_content == null)
 				return;
-			if (_content.MouseIsIn (e.Position))
-				return;
+			try {
+				if (_content.MouseIsIn (e.Position))
+					return;
+			} catch (Exception ex) {}
 			IsPopped = false;
 		}
 		#endregion
