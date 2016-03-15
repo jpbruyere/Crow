@@ -72,7 +72,6 @@ namespace Crow
 		public override void onKeyDown (object sender, KeyboardKeyEventArgs e)
 		{
 			base.onKeyDown (sender, e);
-
 			Key key = e.Key;
 
 			switch (key)
@@ -80,9 +79,9 @@ namespace Crow
 			case Key.Back:
 				if (!selectionIsEmpty)
 				{
-//					Text = Text.Remove(selectionStart, selectionEnd - selectionStart);
-//					selReleasePos = -1;
-//					currentCol = selBeginPos;
+					//					Text = Text.Remove(selectionStart, selectionEnd - selectionStart);
+					//					selReleasePos = -1;
+					//					currentCol = selBeginPos;
 				}
 				else 
 					this.DeleteChar();
@@ -141,62 +140,24 @@ namespace Crow
 				break;
 			case Key.RWin:
 				break;
-			case Key.Tab:
-				this.Insert("\t");
-				break;
-			case Key.KeypadDecimal:
-				this.Insert (".");					
-				break;
-			case Key.Space:
-				this.Insert(" ");
-				break;
-			case Key.KeypadDivide:
-			case Key.Slash:
-				this.Insert("/");
-				break;
-			case Key.KeypadMultiply:
-				this.Insert("*");
-				break;
-			case Key.KeypadMinus:
-			case Key.Minus:
-				this.Insert("-");
-				break;
-			case Key.KeypadPlus:
-			case Key.Plus:
-				this.Insert("+");
-				break;
-			case Key.ShiftLeft:
-			case Key.ShiftRight:
-			case Key.AltLeft:
-			case Key.AltRight:
-				break;
-			case Key.Semicolon:
-				this.Insert(";");
-				break;
 			default:
-				if (!selectionIsEmpty)
-				{
-//					Text = Text.Remove(selectionStart, selectionEnd - selectionStart);
-//					currentCol = selBeginPos;
-				}
-
-				string k = "?";
-				if ((char)key >= 67 && (char)key <= 76)
-					k = ((int)key - 67).ToString();
-				else if ((char)key >= 109 && (char)key <= 118)
-					k = ((int)key - 109).ToString();
-				else if (e.Shift)
-					k = key.ToString();
-				else
-					k = key.ToString().ToLower();
-
-				this.Insert (k);
-
-				SelRelease = -1;
-				SelBegin = new Point(CurrentColumn, SelBegin.Y);
-
 				break;
 			}
+			if (Width < 0)
+				RegisterForLayouting (LayoutingType.Width);
+			if (Height < 0)
+				RegisterForLayouting (LayoutingType.Height);
+			RegisterForGraphicUpdate();
+		}
+		public override void onKeyPress (object sender, KeyPressEventArgs e)
+		{
+			base.onKeyPress (sender, e);
+
+			this.Insert (e.KeyChar.ToString());
+
+			SelRelease = -1;
+			SelBegin = new Point(CurrentColumn, SelBegin.Y);
+
 			if (Width < 0)
 				RegisterForLayouting (LayoutingType.Width);
 			if (Height < 0)

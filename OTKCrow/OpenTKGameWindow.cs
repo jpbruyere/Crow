@@ -153,6 +153,8 @@ namespace Crow
 		public event EventHandler<OpenTK.Input.MouseButtonEventArgs> MouseClick;
 		public event EventHandler<OpenTK.Input.MouseMoveEventArgs> MouseMove;
 		public event EventHandler<OpenTK.Input.KeyboardKeyEventArgs> KeyboardKeyDown;
+		public event EventHandler<OpenTK.Input.KeyboardKeyEventArgs> KeyboardKeyUp;
+
 		#endregion
 
 		#region graphic context
@@ -230,7 +232,9 @@ namespace Crow
 		{
 			base.OnLoad(e);
 
+			this.KeyPress += new EventHandler<OpenTK.KeyPressEventArgs>(OpenTKGameWindow_KeyPress);
 			Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
+			Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
 			Mouse.WheelChanged += new EventHandler<OpenTK.Input.MouseWheelEventArgs>(Mouse_WheelChanged);
 			Mouse.ButtonDown += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonDown);
 			Mouse.ButtonUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonUp);
@@ -246,6 +250,7 @@ namespace Crow
 
 			shader = new Crow.TexturedShader ();
 		}
+
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
 			base.OnUpdateFrame(e);
@@ -322,6 +327,15 @@ namespace Crow
 			if (!CrowInterface.ProcessKeyDown((int)otk_e.Key))
 				KeyboardKeyDown.Raise (this, otk_e);
         }
+		void Keyboard_KeyUp(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
+		{
+			if (!CrowInterface.ProcessKeyUp((int)otk_e.Key))
+				KeyboardKeyUp.Raise (this, otk_e);
+		}
+		void OpenTKGameWindow_KeyPress (object sender, OpenTK.KeyPressEventArgs e)
+		{
+			CrowInterface.ProcessKeyPress (e.KeyChar);
+		}
         #endregion
     }
 }

@@ -156,6 +156,7 @@ namespace Crow
 		public event EventHandler<MouseMoveEventArgs> MouseLeave;
 		public event EventHandler<KeyboardKeyEventArgs> KeyDown;
 		public event EventHandler<KeyboardKeyEventArgs> KeyUp;
+		public event EventHandler<KeyPressEventArgs> KeyPress;
 		public event EventHandler Focused;
 		public event EventHandler Unfocused;
 		public event EventHandler<LayoutingEventArgs> LayoutChanged;
@@ -938,6 +939,9 @@ namespace Crow
         #region Keyboard handling
 		public virtual void onKeyDown(object sender, KeyboardKeyEventArgs e){
 			KeyDown.Raise (sender, e);
+		}
+		public virtual void onKeyPress(object sender, KeyPressEventArgs e){
+			KeyPress.Raise (sender, e);
 		}
         #endregion
 

@@ -663,6 +663,14 @@ namespace Crow
 			return true;
 		}
 
+		public bool ProcessKeyPress(char Key){
+			if (_focusedWidget == null)
+				return false;
+			KeyPressEventArgs e = new KeyPressEventArgs(Key);
+			_focusedWidget.onKeyPress (this, e);
+			return true;
+		}
+
 		volatile bool mouseRepeatOn;
 		volatile int mouseRepeatCount;
 		Thread mouseRepeatThread;

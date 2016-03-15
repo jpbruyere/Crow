@@ -147,6 +147,7 @@
     <Compile Include="src\rsvg\SizeFunc.cs" />
     <Compile Include="src\MouseCursorChangedEventArgs.cs" />
     <Compile Include="src\GraphicObjects\IBindable.cs" />
+    <Compile Include="src\Input\KeyPressEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
