@@ -647,9 +647,22 @@ namespace Crow
 			hoverWidget.onMouseWheel (this, e);
 			return true;
 		}
-//		public bool ProcessKeyDown(int Key){
-//
-//		}
+		public bool ProcessKeyDown(int Key){
+			Keyboard.SetKeyState ((Crow.Key)Key, true);
+			if (_focusedWidget == null)
+				return false;
+			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
+			_focusedWidget.onKeyDown (this, e);
+			return true;
+		}
+		public bool ProcessKeyUp(int Key){
+			Keyboard.SetKeyState ((Crow.Key)Key, false);
+			if (_activeWidget == null)
+				return false;
+			//KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
+			return true;
+		}
+
 		volatile bool mouseRepeatOn;
 		volatile int mouseRepeatCount;
 		Thread mouseRepeatThread;

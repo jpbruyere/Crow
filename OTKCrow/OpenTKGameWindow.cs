@@ -317,15 +317,10 @@ namespace Crow
 		#endregion
 
 		#region keyboard Handling
-		KeyboardState Keyboad = new KeyboardState ();
 		void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
 		{
-//			if (_focusedWidget == null) {
+			if (!CrowInterface.ProcessKeyDown((int)otk_e.Key))
 				KeyboardKeyDown.Raise (this, otk_e);
-//				return;
-//			}
-			Keyboad.SetKeyState ((Crow.Key)otk_e.Key, true);
-			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)otk_e.Key, otk_e.IsRepeat,Keyboad);
         }
         #endregion
     }
