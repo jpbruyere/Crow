@@ -72,6 +72,7 @@ namespace Crow
 		public override void onKeyDown (object sender, KeyboardKeyEventArgs e)
 		{
 			base.onKeyDown (sender, e);
+
 			Key key = e.Key;
 
 			switch (key)
@@ -140,6 +141,8 @@ namespace Crow
 				break;
 			case Key.RWin:
 				break;
+			case Key.Tab:
+				this.Insert("\t");
 			default:
 				break;
 			}
