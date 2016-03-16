@@ -647,9 +647,7 @@ namespace Crow
 			hoverWidget.onMouseWheel (this, e);
 			return true;
 		}
-//		public bool ProcessKeyDown(int Key){
-//
-//		}
+
 		volatile bool mouseRepeatOn;
 		volatile int mouseRepeatCount;
 		Thread mouseRepeatThread;
@@ -662,6 +660,31 @@ namespace Crow
 				Thread.Sleep (Interface.DeviceRepeatInterval);
 			}
 			mouseRepeatCount = 0;
+		}
+		#endregion
+
+		#region Keyboard
+		public bool ProcessKeyDown(int Key){
+			Keyboard.SetKeyState ((Crow.Key)Key, true);
+			if (_focusedWidget == null)
+				return false;
+			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
+			_focusedWidget.onKeyDown (this, e);
+			return true;
+		}
+		public bool ProcessKeyUp(int Key){
+			Keyboard.SetKeyState ((Crow.Key)Key, false);
+			if (_activeWidget == null)
+				return false;
+			//KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
+			return true;
+		}
+		public bool ProcessKeyPress(char Key){
+			if (_focusedWidget == null)
+				return false;
+			KeyPressEventArgs e = new KeyPressEventArgs(Key);
+			_focusedWidget.onKeyPress (this, e);
+			return true;
 		}
 		#endregion
 

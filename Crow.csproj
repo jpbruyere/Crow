@@ -21,7 +21,8 @@
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ReleaseVersion>0.4</ReleaseVersion>
+    <ReleaseVersion>0.1.*</ReleaseVersion>
+    <Description>Crow project description</Description>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -60,7 +61,6 @@
   <ItemGroup>
     <Compile Include="src\Colors.cs" />
     <Compile Include="src\Point.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Rectangle.cs" />
     <Compile Include="src\Rectangles.cs" />
     <Compile Include="src\Size.cs" />
@@ -147,27 +147,30 @@
     <Compile Include="src\rsvg\RsvgSharp.SizeFuncNative.cs" />
     <Compile Include="src\rsvg\SizeFunc.cs" />
     <Compile Include="src\MouseCursorChangedEventArgs.cs" />
+    <Compile Include="src\GraphicObjects\IBindable.cs" />
+    <Compile Include="src\Input\KeyPressEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="glib-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
-      <Package>glib-sharp-3.0</Package>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Drawing" />
-    <Reference Include="cairo-sharp, Version=1.10.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <Package>gtk-sharp-3.0</Package>
+    <Reference Include="cairo-sharp">
+      <HintPath>..\..\packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\cairo-sharp.dll</HintPath>
     </Reference>
-    <Reference Include="gdk-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
-      <Package>gdk-sharp-3.0</Package>
+    <Reference Include="gdk-sharp">
+      <HintPath>..\..\packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\gdk-sharp.dll</HintPath>
     </Reference>
-    <Reference Include="gio-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
-      <Package>gio-sharp-3.0</Package>
+    <Reference Include="gio-sharp">
+      <HintPath>..\..\packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\gio-sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="glib-sharp">
+      <HintPath>..\..\packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\glib-sharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\..\packages\gtk-sharp.Linux.3.14.3.14.7\build\net40\gtk-sharp.Linux.3.14.targets" Condition="Exists('..\..\packages\gtk-sharp.Linux.3.14.3.14.7\build\net40\gtk-sharp.Linux.3.14.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -261,5 +264,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
