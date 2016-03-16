@@ -142,7 +142,8 @@ namespace Crow
 			case Key.RWin:
 				break;
 			case Key.Tab:
-				this.Insert("\t");
+				this.Insert ("\t");
+				break;
 			default:
 				break;
 			}
