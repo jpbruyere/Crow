@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Crow;
+using MonoDevelop.Components.Commands;
 using MonoDevelop.Core;
+using MonoDevelop.DesignerSupport;
 using MonoDevelop.Ide;
 using MonoDevelop.Projects;
-using System.Diagnostics;
 using OpenTK.Input;
-using MonoDevelop.DesignerSupport;
-using System.IO;
-using MonoDevelop.Components.Commands;
 
-namespace MonoDevelop.GOLib
+namespace MonoDevelop.Crow
 {
-	public class GOLibGtkHost : Gtk.DrawingArea, ILayoutable, IGOLibHost, IPropertyPadProvider,ICommandDelegator
+	public class GOLibGtkHost : Gtk.DrawingArea, IPropertyPadProvider,ICommandDelegator
 	{
 		#region ICommandDelegator implementation
 

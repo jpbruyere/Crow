@@ -21,3 +21,4 @@ Tests/Tests.userprefs
 src/GraphicObjects/Panel.cs
 src/GraphicObjects/VerticalWrappingWidget.cs
 src/GraphicObjects/HorizontalWrappingWidget.cs
+MonoDevelop.Crow/build

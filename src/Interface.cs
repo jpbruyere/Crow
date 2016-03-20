@@ -227,7 +227,15 @@ namespace Crow
 				return tmp;
 			}
 		}
-
+		public GraphicObject LoadInterface (Stream stream)
+		{
+			lock (UpdateMutex) {
+				GraphicObject tmp = Interface.Load (stream,
+					Interface.GetTopContainerOfGOMLStream(stream), this);
+				AddWidget (tmp);
+				return tmp;
+			}
+		}
 		#endregion
 
 		#if MEASURE_TIME

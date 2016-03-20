@@ -47,24 +47,18 @@
 
 using System;
 using System.IO;
-using MonoDevelop.Ide.Gui;
-using MonoDevelop.Ide.Gui.Content;
-using MonoDevelop.Ide.Fonts;
-using Mono.Addins;
-using MonoDevelop.Core;
-using MonoDevelop.Ide;
 using Crow;
 using MonoDevelop.DesignerSupport;
 using MonoDevelop.SourceEditor;
 
-namespace MonoDevelop.GOLib
+namespace MonoDevelop.Crow
 {
 	class CustomVPaned : Gtk.VPaned, IPropertyPadProvider
 	{
 		#region IPropertyPadProvider implementation
 		public object GetActiveComponent ()
 		{
-			return this.Child1 == null ? this as object: (this.Child1 as GOLibGtkHost).activeWidget as object;
+			return this.Child1 == null ? this as object: (this.Child1 as XwtContainer).CrowInterface.activeWidget as object;
 		}
 		public object GetProvider ()
 		{
@@ -82,29 +76,29 @@ namespace MonoDevelop.GOLib
 		#endregion
 		
 	}
-	class GOLibView : SourceEditorView
+	class CrowView : SourceEditorView
 	{
-		GOLibGtkHost gtkGoWidgetHost;
-		CustomVPaned gtkGOMLWidget;
+		XwtContainer gtkCrowHost;
+		CustomVPaned gtkCrowWidget;
 
 
 		double zoom = 1.0;
 		
 		public override Gtk.Widget Control {
 			get {
-				return gtkGOMLWidget;
+				return gtkCrowWidget;
 			}
 		}
 
-		public GOLibView () : base()
+		public CrowView () : base()
 		{			
-			gtkGoWidgetHost = new GOLibGtkHost ();
-			gtkGOMLWidget = new CustomVPaned ();
-			gtkGOMLWidget.CanFocus = true;
-			gtkGOMLWidget.Name = "vpaned1";
-			gtkGOMLWidget.Add (gtkGoWidgetHost);
-			gtkGOMLWidget.Add (base.Control);
-			gtkGOMLWidget.SizeAllocated += GtkGOMLWidget_SizeAllocated;
+			gtkCrowHost = new XwtContainer ();
+			gtkCrowWidget = new CustomVPaned ();
+			gtkCrowWidget.CanFocus = true;
+			gtkCrowWidget.Name = "vpaned1";
+			gtkCrowWidget.Add (gtkCrowHost);
+			gtkCrowWidget.Add (base.Control);
+			gtkCrowWidget.SizeAllocated += GtkGOMLWidget_SizeAllocated;
 
 			this.Document.DocumentUpdated += Document_DocumentUpdated;
 			//this.DirtyChanged += GOLibView_DirtyChanged;
@@ -128,23 +122,23 @@ namespace MonoDevelop.GOLib
 					writer.Flush ();
 
 					stream.Position = 0;
-					gtkGoWidgetHost.Load (stream);
+					gtkCrowHost.CrowInterface.LoadInterface (stream);
 				}
 			}			
 		}
 			
 		void GtkGOMLWidget_SizeAllocated (object o, Gtk.SizeAllocatedArgs args)
 		{
-			gtkGoWidgetHost.SetSizeRequest (-1, args.Allocation.Height / 2);
+			gtkCrowHost.SetSizeRequest (-1, args.Allocation.Height / 2);
 		}
 
 		public override void Load (string fileName)
 		{							
-			gtkGoWidgetHost.Load (fileName);
+			gtkCrowHost.CrowInterface.LoadInterface (fileName);
 			//ContentName = fileName;
 			//this.IsDirty = false;
-			gtkGOMLWidget.ShowAll ();
-			gtkGOMLWidget.Show ();
+			gtkCrowWidget.ShowAll ();
+			gtkCrowWidget.Show ();
 
 			base.Load (fileName);
 		}

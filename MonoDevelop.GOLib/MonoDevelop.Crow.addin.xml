@@ -1,16 +1,19 @@
 <ExtensionModel>	
 	<Extension path = "/MonoDevelop/Ide/DisplayBindings">			
 		<DisplayBinding
-			id = "GOLib designer"
+			id = "Crow designer"
 			insertafter ="AssemblyBrowser" 
-			class = "MonoDevelop.GOLib.GOLibDisplayBinding" />
+			class = "MonoDevelop.Crow.CrowDisplayBinding" />
 	</Extension>
 	<Extension path = "/MonoDevelop/Ide/Pads/ProjectPad">
-		<NodeBuilder id = "GOLibNodeExtension" class = "MonoDevelop.GOLib.GOLibNodeExtension"/>
+		<NodeBuilder id = "CrowNodeExtension" class = "MonoDevelop.Crow.CrowNodeExtension"/>
 	</Extension>
 	<Extension path = "/MonoDevelop/Core/MimeTypes">
 		<MimeType id="text/x-goml" _description="GOlib interface definition" icon="md-csharp-file" isText="false">
 			<File pattern="*.goml" />
+		</MimeType>
+		<MimeType id="text/x-crow" _description="Crow interface definition" icon="md-csharp-file" isText="false">
+			<File pattern="*.crow" />
 		</MimeType>
 	</Extension>
 <!--	<Extension path = "/MonoDevelop/DesignerSupport/PropertyProviders" extension-nodes="Class">

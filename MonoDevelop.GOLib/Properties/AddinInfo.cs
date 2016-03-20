@@ -3,12 +3,12 @@ using System;
 using Mono.Addins;
 using Mono.Addins.Description;
 
-[assembly:Addin ("GOLib", 
+[assembly:Addin ("Crow", 
         Namespace = "MonoDevelop",
         Version = MonoDevelop.BuildInfo.Version,
         Category = "IDE extensions")]
 
-[assembly:AddinName ("MonoDevelop GOLib interface designer")]
+[assembly:AddinName ("MonoDevelop Crow interface designer")]
 [assembly:AddinDescription ("")]
 
 [assembly:AddinDependency ("Core", MonoDevelop.BuildInfo.Version)]

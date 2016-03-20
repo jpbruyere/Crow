@@ -52,15 +52,15 @@ using MonoDevelop.Projects;
 using System.Globalization;
 using System.Diagnostics;
 
-namespace MonoDevelop.GOLib
+namespace MonoDevelop.Crow
 {
-	class GOLibDisplayBinding : IViewDisplayBinding
+	class CrowDisplayBinding : IViewDisplayBinding
 	{
 		bool canHandle = false;
 
 		public string Name {
 			get {
-				return GettextCatalog.GetString ("GOLib designer");
+				return GettextCatalog.GetString ("Crow designer");
 			}
 		}
 		public bool CanUseAsDefault 
@@ -68,13 +68,14 @@ namespace MonoDevelop.GOLib
 
 		public IViewContent CreateContent (FilePath fileName, string mimeType, Project ownerProject)
 		{			
-			return new GOLibView ();
+			return new CrowView ();
 
 
 		}
 		public bool CanHandle (FilePath fileName, string mimeType, Project ownerProject)
 		{			
-			canHandle = mimeType.StartsWith("text/x-goml");
+			canHandle = mimeType.StartsWith("text/x-goml", System.StringComparison.OrdinalIgnoreCase) |
+			                    mimeType.StartsWith ("text/x-crow", System.StringComparison.OrdinalIgnoreCase);
 			return canHandle;
 		}		
 	}

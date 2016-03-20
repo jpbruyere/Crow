@@ -33,16 +33,16 @@ using MonoDevelop.Ide;
 using System.Linq;
 using MonoDevelop.DesignerSupport;
 
-namespace MonoDevelop.GOLib
+namespace MonoDevelop.Crow
 {
 	enum Commands {
 		ShowGOLibViewer
 	}
 	
-	class GOLibNodeExtension : NodeBuilderExtension
+	class CrowNodeExtension : NodeBuilderExtension
 	{		
 		public override Type CommandHandlerType {
-			get { return typeof(GOLibCommandHandler); }
+			get { return typeof(CrowCommandHandler); }
 		}
 		public override bool CanBuildNode (Type dataType)
 		{			
@@ -65,13 +65,13 @@ namespace MonoDevelop.GOLib
 		} 
 	}
 	
-	class GOLibCommandHandler: NodeCommandHandler //, IPropertyPadProvider
+	class CrowCommandHandler: NodeCommandHandler //, IPropertyPadProvider
 	{
 		[CommandHandler (Commands.ShowGOLibViewer)]
 		protected void OnShowGOLibViewer () 
 		{
 
-			GOLibView view = new GOLibView ();
+			CrowView view = new CrowView ();
 
 			ProjectFile file   = CurrentNode.DataItem as ProjectFile;
 
