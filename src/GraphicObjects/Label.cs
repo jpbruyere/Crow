@@ -397,7 +397,7 @@ namespace Crow
 			Rectangle cb = ClientRectangle;
 
 			//ignore text alignment if size to content = true
-			if (Bounds.Size < 0)
+			if (Width < 0 || Height < 0)
 			{
 				rText.X = cb.X;
 				rText.Y = cb.Y;

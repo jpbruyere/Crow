@@ -15,7 +15,6 @@ namespace Crow
 
 		Rectangle ClientRectangle { get; }
 		Rectangle getSlot();
-		Rectangle getBounds();
 
 		bool ArrangeChildren { get; }
 		LayoutingType RegisteredLayoutings { get; set; }

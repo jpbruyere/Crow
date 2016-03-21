@@ -221,14 +221,14 @@ namespace Crow
 			switch (arg.LayoutType) {
 			case LayoutingType.Width:
 				if (Orientation == Orientation.Horizontal) {
-					if (this.Bounds.Width < 0)
+					if (Width < 0)
 						this.RegisterForLayouting (LayoutingType.Width);
 					this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 				}
 				break;
 			case LayoutingType.Height:
 				if (Orientation == Orientation.Vertical) {
-					if (this.Bounds.Height < 0)
+					if (Height < 0)
 						this.RegisterForLayouting (LayoutingType.Height);
 					this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 				}

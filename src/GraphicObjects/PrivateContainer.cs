@@ -144,11 +144,11 @@ namespace Crow
 			case LayoutingType.Y:
 				break;
 			case LayoutingType.Width:
-				if (this.Bounds.Width < 0)
+				if (Width < 0)
 					this.RegisterForLayouting (LayoutingType.Width);
 				break;
 			case LayoutingType.Height:
-				if (this.Bounds.Height < 0)
+				if (Height < 0)
 					this.RegisterForLayouting (LayoutingType.Height);
 				break;
 			}

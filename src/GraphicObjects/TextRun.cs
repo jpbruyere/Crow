@@ -206,7 +206,7 @@ namespace Crow
 
 			//ignore text alignment if size to content = true
 			//or if text size is larger than client bounds
-			if (Bounds.Size < 0 || rText.Width > cb.Width)
+			if (Width < 0 || Height < 0 || rText.Width > cb.Width)
 			{
 				rText.X = cb.X;
 				rText.Y = cb.Y;

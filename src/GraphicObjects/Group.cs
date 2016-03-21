@@ -178,14 +178,14 @@ namespace Crow
 				if (g.Slot.Width > maxChildrenWidth) {
 					maxChildrenWidth = g.Slot.Width;
 					largestChild = g;
-					if (this.Bounds.Width < 0)
+					if (Width < 0)
 						this.RegisterForLayouting (LayoutingType.Width);
 				} else if (g == largestChild) {
 
 					largestChild = null;
 					maxChildrenWidth = 0;
 
-					if (this.Bounds.Width < 0)
+					if (Width < 0)
 						this.RegisterForLayouting (LayoutingType.Width);
 				}
 				break;
@@ -193,14 +193,14 @@ namespace Crow
 				if (g.Slot.Height > maxChildrenHeight) {
 					maxChildrenHeight = g.Slot.Height;
 					tallestChild = g;
-					if (this.Bounds.Height < 0)
+					if (Height < 0)
 						this.RegisterForLayouting (LayoutingType.Height);
 				} else if (g == tallestChild) {
 
 					tallestChild = null;
 					maxChildrenHeight = 0;
 
-					if (this.Bounds.Height < 0)
+					if (Height < 0)
 						this.RegisterForLayouting (LayoutingType.Height);
 				}
 				break;

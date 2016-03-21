@@ -60,7 +60,10 @@ namespace Crow
 				return;
 
 			loadDefaultValues ();
-			Bounds = _bounds;
+			Left = _bounds.Left;
+			Top = _bounds.Top;
+			Width = _bounds.Width;
+			Height = _bounds.Height;
 		}
 		#endregion
 
@@ -92,7 +95,7 @@ namespace Crow
 		/// <summary>
 		/// Original size and position 0=Stretched; -1=Fit
 		/// </summary>
-		public Rectangle Bounds;
+		int _width, _height, _left, _top;
 		/// <summary>
 		/// Current size and position computed during layouting pass
 		/// </summary>
@@ -151,7 +154,6 @@ namespace Crow
 				Parent.ScreenCoordinates(r) + Parent.getSlot().Position + Parent.ClientRectangle.Position;
 		}
 		public virtual Rectangle getSlot() => Slot;
-		public virtual Rectangle getBounds() => Bounds;
 		#endregion
 
 		#region EVENT HANDLERS
@@ -215,37 +217,37 @@ namespace Crow
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Left {
-			get { return Bounds.X; }
+			get { return _left; }
 			set {
-				if (Bounds.X == value)
+				if (_left == value)
 					return;
 
-				Bounds.X = value;
-				NotifyValueChanged ("Left", Bounds.X);
+				_left = value;
+				NotifyValueChanged ("Left", _left);
 				this.RegisterForLayouting (LayoutingType.X);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Top {
-			get { return Bounds.Y; }
+			get { return _top; }
 			set {
-				if (Bounds.Y == value)
+				if (_top == value)
 					return;
 
-				Bounds.Y = value;
-				NotifyValueChanged ("Top", Bounds.Y);
+				_top = value;
+				NotifyValueChanged ("Top", _top);
 				this.RegisterForLayouting (LayoutingType.Y);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Width {
-			get { return Bounds.Width; }
+			get { return _width; }
 			set {
-				if (Bounds.Width == value)
+				if (_width == value)
 					return;
 
-				Bounds.Width = value;
-				NotifyValueChanged ("Width", Bounds.Width);
+				_width = value;
+				NotifyValueChanged ("Width", _width);
 				NotifyValueChanged ("WidthPolicy", WidthPolicy);
 
 				this.RegisterForLayouting (LayoutingType.Width);
@@ -253,13 +255,13 @@ namespace Crow
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Height {
-			get { return Bounds.Height; }
+			get { return _height; }
 			set {
-				if (Bounds.Height == value)
+				if (_height == value)
 					return;
 
-				Bounds.Height = value;
-				NotifyValueChanged ("Height", Bounds.Height);
+				_height = value;
+				NotifyValueChanged ("Height", _height);
 				NotifyValueChanged ("HeightPolicy", HeightPolicy);
 
 				this.RegisterForLayouting (LayoutingType.Height);
@@ -662,7 +664,7 @@ namespace Crow
 		}
 		/// <summary> return size of content + margins </summary>
 		protected virtual int measureRawSize (LayoutingType lt) {
-			return lt == LayoutingType.Width ? Bounds.Size.Width : Bounds.Size.Height;
+			return lt == LayoutingType.Width ? Width : Height;
 		}
 		/// <summary> By default in groups, LayoutingType.ArrangeChildren is reset </summary>
 		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){
@@ -738,7 +740,7 @@ namespace Crow
 
 			switch (layoutType) {
 			case LayoutingType.X:
-				if (Bounds.X == 0) {
+				if (Left == 0) {
 
 					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width) ||
 						RegisteredLayoutings.HasFlag (LayoutingType.Width))
@@ -756,7 +758,7 @@ namespace Crow
 						break;
 					}
 				} else
-					Slot.X = Bounds.X;
+					Slot.X = Left;
 
 				if (LastSlots.X == Slot.X)
 					break;
@@ -768,7 +770,7 @@ namespace Crow
 				LastSlots.X = Slot.X;
 				break;
 			case LayoutingType.Y:
-				if (Bounds.Y == 0) {
+				if (Top == 0) {
 
 					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height) ||
 						RegisteredLayoutings.HasFlag (LayoutingType.Height))
@@ -786,7 +788,7 @@ namespace Crow
 						break;
 					}
 				}else
-					Slot.Y = Bounds.Y;
+					Slot.Y = Top;
 
 				if (LastSlots.Y == Slot.Y)
 					break;
