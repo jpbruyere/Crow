@@ -138,7 +138,6 @@ namespace Crow
 		}
 		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
-			GraphicObject g = sender as GraphicObject;
 			switch (arg.LayoutType) {
 			case LayoutingType.X:
 				break;

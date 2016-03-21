@@ -1225,7 +1225,6 @@ namespace Crow
 		{
 			if (!reader.HasAttributes)
 				return;
-			Type thisType = this.GetType ();
 
 			string stylePath = reader.GetAttribute ("Style");
 

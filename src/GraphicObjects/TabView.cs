@@ -116,7 +116,6 @@ namespace Crow
 		}
 		public override void RemoveChild (GraphicObject child)
 		{
-			int idx = Children.IndexOf (child);
 			base.RemoveChild (child);
 			if (selectedTab > Children.Count - 1)
 				SelectedTab--;

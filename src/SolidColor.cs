@@ -50,6 +50,10 @@ namespace Crow
 			return left.color == right.color ? false : true;
 
 		}
+		public override int GetHashCode ()
+		{
+			return color.GetHashCode();
+		}
 		public override bool Equals (object obj)
 		{
 			if (obj is Crow.Color)

@@ -129,7 +129,24 @@ namespace Crow
             return new Size(s.Width + i, s.Height + i);
         }
 		#endregion
-    
+
+		public override int GetHashCode ()
+		{
+			unchecked // Overflow is fine, just wrap
+			{
+				int hash = 17;
+				// Suitable nullity checks etc, of course :)
+				hash = hash * 23 + _width.GetHashCode();
+				hash = hash * 23 + _height.GetHashCode();
+				return hash;
+			}
+		}
+		public override bool Equals (object obj)
+		{
+			return (obj == null || obj.GetType() != typeof(Size)) ?
+				false :
+				this == (Size)obj;
+		}
 		public override string ToString()
 		{
 			return string.Format("{0},{1}", Width, Height);
