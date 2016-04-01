@@ -198,8 +198,12 @@ namespace Crow
 		void OpenGLDraw()
 		{
 			GL.GetInteger (GetPName.Viewport, viewport);
-			GL.Viewport (0, 0, ClientRectangle.Width, ClientRectangle.Height);
+			bool blend = GL.GetBoolean (GetPName.Blend);
 
+			GL.Enable (EnableCap.Blend);
+			GL.Viewport (0, 0, ClientRectangle.Width, ClientRectangle.Height);
+			GL.DepthMask (false);
+			GL.Disable (EnableCap.DepthTest);
 			shader.Enable ();
 			lock (CrowInterface.RenderMutex) {
 				if (CrowInterface.IsDirty) {
@@ -215,7 +219,12 @@ namespace Crow
 			GL.BindTexture(TextureTarget.Texture2D, 0);
 
 			shader.Disable ();
+			if (!blend)
+				GL.Disable (EnableCap.Blend);
 			GL.Viewport (viewport [0], viewport [1], viewport [2], viewport [3]);
+
+			GL.DepthMask (true);
+			GL.Enable (EnableCap.DepthTest);
 		}
 		#endregion
 

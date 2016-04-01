@@ -224,6 +224,7 @@ namespace Crow
 			lock (UpdateMutex) {
 				GraphicObject tmp = Interface.Load (path, this);
 				AddWidget (tmp);
+
 				return tmp;
 			}
 		}
@@ -457,7 +458,6 @@ namespace Crow
 		{
 			g.Parent = this;
 			GraphicObjects.Insert (0, g);
-
 			g.RegisterForLayouting (LayoutingType.Sizing);
 		}
 		public void DeleteWidget(GraphicObject g)

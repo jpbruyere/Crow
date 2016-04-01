@@ -28,18 +28,11 @@ namespace Crow
 		Container _contentContainer;
 		Direction currentDirection = Direction.None;
 
+		public event EventHandler Closing;
+
 		#region CTOR
 		public Window () : base() {
 			
-		}
-		#endregion
-
-		#region GraphicObject overrides
-		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
-		public override bool Focusable
-		{
-			get { return base.Focusable; }
-			set { base.Focusable = value; }
 		}
 		#endregion
 
@@ -221,10 +214,13 @@ namespace Crow
 
 		protected void butQuitPress (object sender, MouseButtonEventArgs e)
 		{
-			ILayoutable parent = (sender as GraphicObject).Parent;
-			while(!(parent is Window))
-				parent = parent.Parent;
-			Interface.CurrentInterface.DeleteWidget (parent as GraphicObject);
+			close ();
+		}
+
+		void close(){
+			Closing.Raise (this, null);
+
+			Interface.CurrentInterface.DeleteWidget (this);
 		}
 
 		public override void ResolveBindings ()

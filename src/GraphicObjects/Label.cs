@@ -119,7 +119,7 @@ namespace Crow
 			}
             set
             {
-                if (_text == value)
+				if (string.Equals (value, _text, StringComparison.Ordinal))
                     return;
 					                                
                 _text = value;
