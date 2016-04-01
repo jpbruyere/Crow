@@ -153,6 +153,13 @@ namespace Crow
 			}
 
 			Type t = Type.GetType ("Crow." + root);
+			if (t == null) {
+				Assembly a = Assembly.GetEntryAssembly ();
+				foreach (Type expT in a.GetExportedTypes ()) {
+					if (expT.Name == root)
+						t = expT;
+				}
+			}
 
 			stream.Seek (0, SeekOrigin.Begin);
 			return t;
