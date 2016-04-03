@@ -72,7 +72,7 @@ namespace Crow
 
 		public Queue<LayoutingQueueItem> LayoutingQueue;
 		public Queue<GraphicObject> GraphicUpdateQueue = new Queue<GraphicObject>();
-
+		public string Clipboard;
 		public static void RegisterForGraphicUpdate(GraphicObject g)
 		{
 			lock (CurrentInterface.GraphicUpdateQueue) {

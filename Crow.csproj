@@ -21,8 +21,9 @@
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ReleaseVersion>0.4</ReleaseVersion>
     <Description>Crow project description</Description>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -262,6 +263,7 @@
     <EmbeddedResource Include="Styles\Spinner.style" />
     <EmbeddedResource Include="Styles\MessageBox.style" />
     <EmbeddedResource Include="Styles\Window.style" />
+    <EmbeddedResource Include="Styles\TextBox.style" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
