@@ -579,6 +579,8 @@ namespace Crow
 				name = "ToInt64";
 			else if( targetType == typeof( double ) )
 				name = "ToDouble";
+			else if( targetType == typeof( float ) )
+				name = "ToSingle";
 			else if (targetType == typeof (string ) )
 				return typeof(object).GetMethod("ToString", Type.EmptyTypes);
 			else
