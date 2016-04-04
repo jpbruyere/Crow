@@ -34,15 +34,6 @@ namespace Crow
 		}
 		#endregion
 
-		#region GraphicObject overrides
-		[XmlAttributeAttribute()][DefaultValue(true)]//overiden to get default to true
-		public override bool Focusable
-		{
-			get { return base.Focusable; }
-			set { base.Focusable = value; }
-		}
-		#endregion
-
 		public override GraphicObject Content {
 			get {
 				return _contentContainer == null ? null : _contentContainer.Child;
@@ -78,6 +69,7 @@ namespace Crow
 			}
 		}
 
+		bool hoverBorder = false;
 
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
@@ -85,11 +77,13 @@ namespace Crow
 
 			Interface otkgw = Interface.CurrentInterface;
 
-			if (e.Mouse.IsButtonDown (MouseButton.Left)) {
-				if (!HasFocus)
-					return;
-				
-				//otkgw.redrawClip.AddRectangle (this.ScreenCoordinates(this.Slot));
+			if (!hoverBorder) {
+				currentDirection = Direction.None;
+				Interface.CurrentInterface.MouseCursor = XCursor.Default;
+				return;
+			}
+			
+			if (e.Mouse.IsButtonDown (MouseButton.Left)) {				
 
 				int currentLeft = this.Left;
 				int currentTop = this.Top;
@@ -141,14 +135,14 @@ namespace Crow
 				}
 				return;
 			}
-			GraphicObject firstFocusableAncestor = otkgw.hoverWidget;
-			while (firstFocusableAncestor != this) {
-				if (firstFocusableAncestor == null)
-					return;
-				if (firstFocusableAncestor.Focusable)
-					return;
-				firstFocusableAncestor = firstFocusableAncestor.Parent as GraphicObject;
-			}
+//			GraphicObject firstFocusableAncestor = otkgw.hoverWidget;
+//			while (firstFocusableAncestor != this) {
+//				if (firstFocusableAncestor == null)
+//					return;
+//				if (firstFocusableAncestor.Focusable)
+//					return;
+//				firstFocusableAncestor = firstFocusableAncestor.Parent as GraphicObject;
+//			}
 			if (Resizable) {
 				Direction lastDir = currentDirection;
 
@@ -206,13 +200,21 @@ namespace Crow
 				}				
 			}				
 		}
-		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
+		public void onBorderMouseLeave (object sender, MouseMoveEventArgs e)
 		{
-			base.onMouseLeave (sender, e);
+			hoverBorder = false;
 			currentDirection = Direction.None;
 			Interface.CurrentInterface.MouseCursor = XCursor.Default;
 		}
+		public void onBorderMouseEnter (object sender, MouseMoveEventArgs e)
+		{
+			hoverBorder = true;
+		}
 
+		public override void onMouseDown (object sender, MouseButtonEventArgs e)
+		{
+			base.onMouseDown (sender, e);
+		}
 		protected override void loadTemplate(GraphicObject template = null)
 		{
 			base.loadTemplate (template);
@@ -221,10 +223,8 @@ namespace Crow
 
 		protected void butQuitPress (object sender, MouseButtonEventArgs e)
 		{
-			ILayoutable parent = (sender as GraphicObject).Parent;
-			while(!(parent is Window))
-				parent = parent.Parent;
-			Interface.CurrentInterface.DeleteWidget (parent as GraphicObject);
+			Interface.CurrentInterface.MouseCursor = XCursor.Default;
+			Interface.CurrentInterface.DeleteWidget (this);
 		}
 
 		public override void ResolveBindings ()
