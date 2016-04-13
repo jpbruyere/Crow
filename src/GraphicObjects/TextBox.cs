@@ -121,6 +121,8 @@ namespace Crow
 			case Key.Insert:
 				if (e.Shift)
 					this.Insert (Interface.CurrentInterface.Clipboard);
+				else if (e.Control)
+					Interface.CurrentInterface.Clipboard = this.SelectedText;
 				break;
 			case Key.Left:
 				if (e.Shift) {
