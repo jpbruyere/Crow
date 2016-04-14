@@ -1,21 +1,20 @@
 ﻿<?xml version="1.0"?>
 <Border BorderWidth="1" Foreground="White" CornerRadius="20" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
 	<VerticalStack Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
-		<Border Name="TitleBar" BorderWidth="1" Foreground="White" Width="{../../../WidthPolicy}" Height="-1" 
+		<Border Name="TitleBar" BorderWidth="1" Foreground="White" Width="{../../../WidthPolicy}" Height="Fit"
 				Background="vgradient|0:0,1;0,5;1,0;0,5|1:0,0;0,1;0,3;0,9">
-<!--				Background="0,1;0,5;1,0;0,5"-->
-			<HorizontalStack Name="hs" Margin="1" Spacing="1" Width="{../../../../WidthPolicy}" Height="-1" >
+			<HorizontalStack Name="hs" Margin="1" Spacing="1" Width="{../../../../WidthPolicy}" Height="Fit" >
 				<GraphicObject Width="5"/>
 				<Image Margin="1" Width="12" Height="12" Path="{../../../../../Icon}"/>
 				<Label Foreground="White" Width="{../../../../../WidthPolicy}" Margin="1" TextAlignment="Center" Text="{../../../../../Title}" />
 				<Border CornerRadius="6" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
 					MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
-					<Image Focusable="true" Name="Image" Margin="0" Width="0" Height="0" Path="#Crow.Images.Icons.exit2.svg"
+					<Image Focusable="true" Name="Image" Margin="0" Width="Stretched" Height="Stretched" Path="#Crow.Images.Icons.exit2.svg"
 						 MouseClick="../../../../../../butQuitPress"/>
 				</Border>
 				<GraphicObject Width="5"/>
 			</HorizontalStack>
 		</Border>
-		<Container Name="Content" Height="{../../../../HeightPolicy}" Width="{../../../../WidthPolicy}" Background="0,5;0,5;0,5;0,5"/>
+		<Container Name="Content" MinimumSize="50;50" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}" Background="0,5;0,5;0,5;0,5"/>
 	</VerticalStack>
 </Border>

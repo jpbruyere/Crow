@@ -148,7 +148,7 @@ namespace Crow
 				
 				Group page = _list.Clone () as Group;
 				page.Name = "page" + pageNum;
-				page.Background = Color.Green;
+				//page.Background = Color.Green;
 
 				//reset size to fit in the dir of the stacking
 				//because _list total size is forced to approx size

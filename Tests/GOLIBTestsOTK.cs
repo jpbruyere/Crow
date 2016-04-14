@@ -30,6 +30,9 @@ namespace testOTK
 		int idx = 0;
 
 		string[] testFiles = {
+//			"testTabView.crow",
+			"testCombobox.goml",
+			"testWindow.goml",
 			@"basicTests/5.crow",
 			"testColorList.crow",
 			@"basicTests/0.crow",
@@ -39,12 +42,9 @@ namespace testOTK
 			"test0.goml",
 			"test1.goml",
 			"0.crow",
-			"testCombobox.goml",
 			"0.crow",
 			"testCheckbox.goml",
-			"testWindow.goml",
 			"fps.goml",
-			"testTabView.crow",
 			"testExpandable.goml",
 			"0.crow",
 			"testImage.crow",
