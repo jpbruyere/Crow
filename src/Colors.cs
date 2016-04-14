@@ -1028,6 +1028,25 @@ namespace Crow
         }
 		#endregion
 
+		public override int GetHashCode ()
+		{
+			unchecked // Overflow is fine, just wrap
+			{
+				int hash = 17;
+				// Suitable nullity checks etc, of course :)
+				hash = hash * 23 + A.GetHashCode();
+				hash = hash * 23 + R.GetHashCode();
+				hash = hash * 23 + G.GetHashCode();
+				hash = hash * 23 + B.GetHashCode();
+				return hash;
+			}
+		}
+		public override bool Equals (object obj)
+		{
+			return (obj == null || obj.GetType() != typeof(Color)) ?
+				false :
+				this == (Color)obj;
+		}
 		public override string ToString()
 		{
 			if (!string.IsNullOrEmpty(Name))

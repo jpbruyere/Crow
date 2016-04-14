@@ -10,7 +10,7 @@
 						<Scroller Name="scroller1" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}" 
 								Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}"
 								ValueChanged="../../../_scroller_ValueChanged">
-							<VerticalStack Width="{../../../../WidthPolicy}" Height="-1" MinimumSize="10;10"
+							<VerticalStack Width="{../../../../WidthPolicy}" Height="Fit" MinimumSize="10;10"
 								Name="List" Margin="0"
 								VerticalAlignment="Top"
 								HorizontalAlignment="Left"

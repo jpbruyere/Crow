@@ -7,7 +7,7 @@
 			<TextRun Background="SkyBlue"/>
 			<TextRun Background="SkyBlue"/>
 		</VerticalStack>
-		<VerticalStack Width="0" Height="-1" Background="DimGray" Margin="5">
+		<VerticalStack Width="0" Height="Fit" Background="DimGray" Margin="5">
 			<TextRun Background="SkyBlue"/>
 			<TextRun Background="SkyBlue" Width="0"/>
 			<TextRun Background="SkyBlue" Height="0"/>
@@ -17,7 +17,7 @@
 			<TextRun Background="SkyBlue"/>
 			<TextRun Background="SkyBlue"/>
 		</HorizontalStack>
-		<HorizontalStack Width="0" Height="-1" Background="DimGray" Margin="5">
+		<HorizontalStack Width="0" Height="Fit" Background="DimGray" Margin="5">
 			<TextRun Background="SkyBlue"/>
 			<TextRun Background="SkyBlue"/>
 			<TextRun Background="SkyBlue"/>
@@ -44,24 +44,24 @@
 			<TextRun Background="SkyBlue"/>
 			<TextRun Background="SkyBlue"/>
 		</HorizontalStack>
-		<HorizontalStack Width="0" Height="-1" Background="DimGray" Margin="5">
+		<HorizontalStack Width="0" Height="Fit" Background="DimGray" Margin="5">
 			<TextRun Background="SkyBlue"/>
 			<TextRun Background="SkyBlue"/>
 			<TextRun Background="SkyBlue"/>
 		</HorizontalStack>
-			<HorizontalStack Width="0" Height="-1" Background="DimGray" Margin="5">
+			<HorizontalStack Width="0" Height="Fit" Background="DimGray" Margin="5">
 			<TextRun Background="SkyBlue"/>
 			<TextRun Background="SkyBlue" Width="0"/>
 			<TextRun Background="SkyBlue"/>
 		</HorizontalStack>
 	</VerticalStack>
-	<VerticalStack Width="-1" Margin="5" Background="Gray">
-		<VerticalStack Width="0" Height="-1" Background="DimGray" Margin="5">
+	<VerticalStack Width="Fit" Margin="5" Background="Gray">
+		<VerticalStack Width="0" Height="Fit" Background="DimGray" Margin="5">
 			<TextRun Background="SkyBlue" HorizontalAlignment="Left"/>
 			<TextRun Background="SkyBlue"/>
 			<TextRun Background="SkyBlue"/>
 		</VerticalStack>
-		<VerticalStack Width="0" Height="-1" Background="DimGray" Margin="5">
+		<VerticalStack Width="0" Height="Fit" Background="DimGray" Margin="5">
 			<TextRun Background="SkyBlue"/>
 			<TextRun Background="SkyBlue" Width="0"/>
 			<TextRun Background="SkyBlue" Height="0"/>
@@ -71,7 +71,7 @@
 			<TextRun Background="SkyBlue"/>
 			<TextRun Background="SkyBlue"/>
 		</HorizontalStack>
-		<HorizontalStack Width="0" Height="-1" Background="DimGray" Margin="5">
+		<HorizontalStack Width="0" Height="Fit" Background="DimGray" Margin="5">
 			<TextRun Background="SkyBlue"/>
 			<TextRun Background="SkyBlue"/>
 			<TextRun Background="SkyBlue"/>

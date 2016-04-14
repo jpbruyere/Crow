@@ -103,6 +103,7 @@ namespace Crow
 //		public OpenTKGameWindow(int _width, int _height, string _title="golib")
 //			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), _title)
 		{
+			CrowInterface = new Interface ();
 			Thread t = new Thread (interfaceThread);
 			t.IsBackground = true;
 			t.Start ();

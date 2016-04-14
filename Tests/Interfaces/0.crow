@@ -1,46 +1,4 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack Height="-1" Width="-1">
-	<Label Width="0"/>
-	<Expandable  Width="-1" Background="Gray">
-		<Expandable Background="LightBlue">
-			<Expandable Background="Green">
-				<Expandable Background="LimeGreen">
-					<Expandable Background="DimGray">
-						<Expandable Width="0" Background="Yellow">
-							<Expandable Background="NavyBlue">
-								<Expandable Width="0" Background="Blue">
-									<Expandable Width="0" Background="BlueCrayola">
-										<Expandable Width="0" Background="Green">
-											<Label Background="Red"/>
-										</Expandable>
-									</Expandable>
-								</Expandable>
-							</Expandable>
-						</Expandable>
-					</Expandable>
-				</Expandable>
-			</Expandable>
-		</Expandable>
-	</Expandable>
-	<Expandable Width="0"  Background="Gray">
-		<Expandable Width="0" Background="LightBlue">
-			<Expandable Width="0" Background="Green">
-				<Expandable Width="0" Background="LimeGreen">
-					<Expandable Width="0" Background="DimGray">
-						<Expandable Width="0" Background="Yellow">
-							<Expandable Width="0" Background="NavyBlue">
-								<Expandable Width="0" Background="Blue">
-									<Expandable Width="0" Background="BlueCrayola">
-										<Expandable Width="0" Background="Green">
-											<Label Background="Red"/>
-										</Expandable>
-									</Expandable>
-								</Expandable>
-							</Expandable>
-						</Expandable>
-					</Expandable>
-				</Expandable>
-			</Expandable>
-		</Expandable>
-	</Expandable>
-</VerticalStack>
+<Container Background="Green" Margin="10">
+	<GraphicObject Margin="10" Width="{../WidthPolicy}" Height="{../HeightPolicy}" Background="Red"/>
+</Container>

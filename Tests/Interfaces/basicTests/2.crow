@@ -1,0 +1,4 @@
+﻿<?xml version="1.0"?>
+<Container Background="Green" Margin="0">
+	<GraphicObject Margin="0" Width="90" Height="90%" Background="Red"/>
+</Container>

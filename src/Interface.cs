@@ -729,7 +729,6 @@ namespace Crow
 			get { return this; }
 		}
 		public Rectangle getSlot () => ClientRectangle;
-		public Rectangle getBounds () => ClientRectangle;
 		#endregion
 	}
 }

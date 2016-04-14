@@ -108,12 +108,12 @@ namespace Crow
 				//child has stretched size
 				switch (layoutType) {
 				case LayoutingType.Width:
-					if (Width < 0 && child.Width == 0)
-						child.Width = -1;
+					if (Width == Measure.Fit && child.Width.Units == Unit.Percent)
+						child.Width = Measure.Fit;
 					break;
 				case LayoutingType.Height:
-					if (Height < 0 && child.Height == 0)
-						child.Height = -1;
+					if (Height == Measure.Fit && child.Height.Units == Unit.Percent)
+						child.Height = Measure.Fit;
 					break;
 				}
 			}
@@ -138,18 +138,17 @@ namespace Crow
 		}
 		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
-			GraphicObject g = sender as GraphicObject;
 			switch (arg.LayoutType) {
 			case LayoutingType.X:
 				break;
 			case LayoutingType.Y:
 				break;
 			case LayoutingType.Width:
-				if (this.Bounds.Width < 0)
+				if (Width < 0)
 					this.RegisterForLayouting (LayoutingType.Width);
 				break;
 			case LayoutingType.Height:
-				if (this.Bounds.Height < 0)
+				if (Height < 0)
 					this.RegisterForLayouting (LayoutingType.Height);
 				break;
 			}

@@ -247,6 +247,24 @@ namespace Crow
                 int.Parse(d[2]),
                 int.Parse(d[3]));
         }
+		public override int GetHashCode ()
+		{
+			unchecked // Overflow is fine, just wrap
+			{
+				int hash = 17;
+				// Suitable nullity checks etc, of course :)
+				hash = hash * 23 + _x.GetHashCode();
+				hash = hash * 23 + _y.GetHashCode();
+				hash = hash * 23 + _width.GetHashCode();
+				hash = hash * 23 + _height.GetHashCode();
+				return hash;
+			}
+		}
+		public override bool Equals (object obj)
+		{
+			return (obj == null || obj.GetType() != typeof(Rectangle)) ?
+				false :
+				this == (Rectangle)obj;
+		}
     }
-
 }
