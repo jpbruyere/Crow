@@ -1,20 +1,18 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="1" Height="{../HeightPolicy}" Width="{../WidthPolicy}"
-	Foreground="Gray"
-	Background="White">
-	<HorizontalStack Name="hstack" Margin="0" Spacing="2" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
-		<Label Foreground="DimGray" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}" 
-			Text="{../../../Value}" Margin="1" TextAlignment="Right"/>
-		<VerticalStack Width="-1" Height="{../../../HeightPolicy}" Spacing="0" >
-			<Button MouseRepeat="true" Width="12" Height="8" MouseClick="../../../../onUp"
-				Template="#Crow.Templates.ArrowButTemplate.crow">
-				<Image Margin="1" Path="#Crow.Images.Icons.updown.svg" SvgSub="up"/>
-			</Button>
-				
-			<Button MouseRepeat="true" Width="12" Height="8" MouseClick="../../../../onDown" 
-				Template="#Crow.Templates.ArrowButTemplate.crow">
-				<Image Margin="1" Path="#Crow.Images.Icons.updown.svg" SvgSub="down"/>
-			</Button>
-		</VerticalStack>
-	</HorizontalStack>
-</Border>
+<HorizontalStack Name="hstack" Margin="0" Spacing="0" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
+	<Border BorderWidth="1" Height="{../../HeightPolicy}" Width="80%"  Background="White" 
+		Foreground="DimGray" Margin="0">
+		<Label Foreground="DimGray" Height="{../../../HeightPolicy}" Width="Stretched"
+			Text="{../../../Value}" TextAlignment="Right" Margin="0"/>
+	</Border>
+	<VerticalStack Width="20%" Height="Stretched" Spacing="0" Margin="0" Background="Red">
+		<Button MouseRepeat="true" Width="Stretched" Height="50%" Margin="0" MouseClick="../../../onUp"
+			Template="#Crow.Templates.ArrowButTemplate.crow">
+			<Image Path="#Crow.Images.Icons.updown.svg" SvgSub="up" Margin="0"/>
+		</Button>				
+		<Button MouseRepeat="true" Width="Stretched" Height="50%" Margin="0" MouseClick="../../../onDown" 
+			Template="#Crow.Templates.ArrowButTemplate.crow">
+			<Image Path="#Crow.Images.Icons.updown.svg" SvgSub="down" Margin="0"/>
+		</Button>
+	</VerticalStack>
+</HorizontalStack>

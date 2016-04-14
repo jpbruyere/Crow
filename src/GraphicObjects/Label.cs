@@ -357,7 +357,7 @@ namespace Crow
 						if (lc == 0)
 							lc = 1; 
 						
-						return (int)(fe.Height * lc) + Margin * 2;
+						return (int)Math.Ceiling(fe.Height * lc) + Margin * 2;
 					}
 
 					foreach (string s in lines) {
@@ -396,70 +396,65 @@ namespace Crow
 
 			Rectangle cb = ClientRectangle;
 
-			//ignore text alignment if size to content = true
-			//TODO: split horizontal and vertical logic
-			if (Width == Measure.Fit || Height == Measure.Fit)
-			{
-				rText.X = cb.X;
-				rText.Y = cb.Y;
-			}else{
-				if (horizontalStretch) {
-					widthRatio = (float)cb.Width / rText.Width;
-					if (!verticalStretch)
-						heightRatio = widthRatio;
-				}
+			rText.X = cb.X;
+			rText.Y = cb.Y;
 
-				if (verticalStretch) {
-					heightRatio = (float)cb.Height / rText.Height;
-					if (!horizontalStretch)
-						widthRatio = heightRatio;
-				}
-				
-				rText.Width = (int)(widthRatio * rText.Width);
-				rText.Height = (int)(heightRatio * rText.Height);
-
-				switch (TextAlignment)
-				{
-				case Alignment.TopLeft:     //ok
-					rText.X = cb.X;
-					rText.Y = cb.Y;
-					break;
-				case Alignment.Top:   //ok						
-					rText.Y = cb.Y;
-					rText.X = cb.X + cb.Width / 2 - rText.Width / 2;
-					break;
-				case Alignment.TopRight:    //ok
-					rText.Y = cb.Y;
-					rText.X = cb.Right - rText.Width;
-					break;
-				case Alignment.Left://ok
-					rText.X = cb.X;
-					rText.Y = cb.Y + cb.Height / 2 - rText.Height / 2;
-					break;
-				case Alignment.Right://ok
-					rText.X = cb.X + cb.Width - rText.Width;
-					rText.Y = cb.Y + cb.Height / 2 - rText.Height / 2;
-					break;
-				case Alignment.Bottom://ok
-					rText.X = cb.Width / 2 - rText.Width / 2;
-					rText.Y = cb.Height - rText.Height;
-					break;
-				case Alignment.BottomLeft://ok
-					rText.X = cb.X;
-					rText.Y = cb.Bottom - rText.Height;
-					break;
-				case Alignment.BottomRight://ok
-					rText.Y = cb.Bottom - rText.Height;
-					rText.X = cb.Right - rText.Width;
-					break;
-				case Alignment.Center://ok
-					rText.X = cb.X + cb.Width / 2 - rText.Width / 2;
-					rText.Y = cb.Y + cb.Height / 2 - rText.Height / 2;
-					break;
-				}
+			if (horizontalStretch) {
+				widthRatio = (float)cb.Width / (float)rText.Width;
+				if (!verticalStretch)
+					heightRatio = widthRatio;
 			}
 
-			gr.FontMatrix = new Matrix(widthRatio * Font.Size, 0, 0, heightRatio * Font.Size, 0, 0);
+			if (verticalStretch) {
+				heightRatio = (float)cb.Height / (float)rText.Height;
+				if (!horizontalStretch)
+					widthRatio = heightRatio;
+			}
+			
+			rText.Width = (int)(widthRatio * (float)rText.Width);
+			rText.Height = (int)(heightRatio * (float)rText.Height);
+
+			switch (TextAlignment)
+			{
+			case Alignment.TopLeft:     //ok
+				rText.X = cb.X;
+				rText.Y = cb.Y;
+				break;
+			case Alignment.Top:   //ok						
+				rText.Y = cb.Y;
+				rText.X = cb.X + cb.Width / 2 - rText.Width / 2;
+				break;
+			case Alignment.TopRight:    //ok
+				rText.Y = cb.Y;
+				rText.X = cb.Right - rText.Width;
+				break;
+			case Alignment.Left://ok
+				rText.X = cb.X;
+				rText.Y = cb.Y + cb.Height / 2 - rText.Height / 2;
+				break;
+			case Alignment.Right://ok
+				rText.X = cb.X + cb.Width - rText.Width;
+				rText.Y = cb.Y + cb.Height / 2 - rText.Height / 2;
+				break;
+			case Alignment.Bottom://ok
+				rText.X = cb.Width / 2 - rText.Width / 2;
+				rText.Y = cb.Height - rText.Height;
+				break;
+			case Alignment.BottomLeft://ok
+				rText.X = cb.X;
+				rText.Y = cb.Bottom - rText.Height;
+				break;
+			case Alignment.BottomRight://ok
+				rText.Y = cb.Bottom - rText.Height;
+				rText.X = cb.Right - rText.Width;
+				break;
+			case Alignment.Center://ok
+				rText.X = cb.X + cb.Width / 2 - rText.Width / 2;
+				rText.Y = cb.Y + cb.Height / 2 - rText.Height / 2;
+				break;
+			}
+
+			gr.FontMatrix = new Matrix(widthRatio * (float)Font.Size, 0, 0, heightRatio * (float)Font.Size, 0, 0);
 			fe = gr.FontExtents;
 
 			#region draw text cursor
