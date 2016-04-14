@@ -1,0 +1,6 @@
+﻿<?xml version="1.0"?>
+<HorizontalStack Width="Stretched" Height="Stretched" Margin="5" Background="Mantis">
+	<GraphicObject Background="Carmine" Width="40%" Height="20%"/>
+	<GraphicObject Background="Carmine" Width="Stretched" Height="20%"/>
+	<GraphicObject Background="Carmine" Width="40%" Height="20%"/>
+</HorizontalStack>

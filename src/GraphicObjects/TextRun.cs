@@ -11,6 +11,7 @@ using System.ComponentModel;
 namespace Crow
 {
     [Serializable]
+	[DefaultStyle("#Crow.Styles.TextRun.style")]
     public class TextRun : GraphicObject
     {
 		#region CTOR
@@ -127,22 +128,6 @@ namespace Crow
 		}
 
 		#region GraphicObject overrides
-		[XmlAttributeAttribute()][DefaultValue(-1)]
-		public override int Width {
-			get { return base.Width; }
-			set { base.Width = value; }
-		}
-		[XmlAttributeAttribute()][DefaultValue(-1)]
-		public override int Height {
-			get { return base.Height; }
-			set { base.Height = value; }
-		}
-		[XmlAttributeAttribute()][DefaultValue(2)]
-		public override int Margin {
-			get { return base.Margin; }
-			set { base.Margin = value; }
-		}
-
 		protected override int measureRawSize(LayoutingType lt)
 		{			
 			if (lines == null)

@@ -31,7 +31,7 @@
 			</TabItem>
 		</TabView>
 		<Button Background="vgradient|0:DimGray|1:Black" HorizontalAlignment="Right"
-			Caption="Add new tab" Width="-1" Height="30" MouseClick="onAddTabButClick"/>
+			Caption="Add new tab" Width="Fit" Height="30" MouseClick="onAddTabButClick"/>
 	</VerticalStack>
 	<TabView CacheEnabled="false" Width="200" Height="200" Orientation="Horizontal" Spacing="20" Margin="0">
 		<TabItem

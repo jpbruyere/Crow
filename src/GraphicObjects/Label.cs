@@ -397,7 +397,8 @@ namespace Crow
 			Rectangle cb = ClientRectangle;
 
 			//ignore text alignment if size to content = true
-			if (Width < 0 || Height < 0)
+			//TODO: split horizontal and vertical logic
+			if (Width == Measure.Fit || Height == Measure.Fit)
 			{
 				rText.X = cb.X;
 				rText.Y = cb.Y;
@@ -406,7 +407,9 @@ namespace Crow
 					widthRatio = (float)cb.Width / rText.Width;
 					if (!verticalStretch)
 						heightRatio = widthRatio;
-				}if (verticalStretch) {
+				}
+
+				if (verticalStretch) {
 					heightRatio = (float)cb.Height / rText.Height;
 					if (!horizontalStretch)
 						widthRatio = heightRatio;

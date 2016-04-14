@@ -28,8 +28,17 @@ namespace testOTK
 
 		int frameCpt = 0;
 		int idx = 0;
+
 		string[] testFiles = {
+			@"basicTests/5.crow",
 			"testColorList.crow",
+			@"basicTests/0.crow",
+			@"basicTests/4.crow",
+			@"basicTests/1.crow",
+			@"basicTests/2.crow",
+			"test0.goml",
+			"test1.goml",
+			"0.crow",
 			"testCombobox.goml",
 			"0.crow",
 			"testCheckbox.goml",

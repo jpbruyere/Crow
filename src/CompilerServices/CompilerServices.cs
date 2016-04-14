@@ -391,15 +391,15 @@ namespace Crow
 					il.MarkLabel (jumpTable [i]);
 					il.Emit(OpCodes.Ldloc_1);
 
-					//by default, target value type is deducted from source member type to allow
+					//by default, source value type is deducted from target member type to allow
 					//memberless binding, if targetMember exists, it will be used to determine target
 					//value type for conversion
-					Type targetValueType = b.Target.Property.PropertyType;
+					Type sourceValueType = b.Target.Property.PropertyType;
 					if (b.Source.Member != null) {
 						if (b.Source.Member.MemberType == MemberTypes.Property)
-							targetValueType = b.Source.Property.PropertyType;
+							sourceValueType = b.Source.Property.PropertyType;
 						else if (b.Source.Member.MemberType == MemberTypes.Field)
-							targetValueType = b.Source.Field.FieldType;
+							sourceValueType = b.Source.Field.FieldType;
 						else
 							throw new Exception ("unhandle target member type in binding");
 					}
@@ -409,11 +409,11 @@ namespace Crow
 						if (!tostring.FindMember ("ToString"))
 							throw new Exception ("ToString method not found");
 						il.Emit (OpCodes.Callvirt, tostring.Method);
-					}else if (!targetValueType.IsValueType)
-						il.Emit(OpCodes.Castclass, targetValueType);
-					else if (b.Target.Property.PropertyType != targetValueType)
-						il.Emit(OpCodes.Callvirt, CompilerServices.GetConvertMethod( b.Target.Property.PropertyType ));
-					else
+					} else if (!sourceValueType.IsValueType)
+						il.Emit (OpCodes.Castclass, sourceValueType);
+					else if (b.Target.Property.PropertyType != sourceValueType) {
+						il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (b.Target.Property.PropertyType));
+					}else
 						il.Emit(OpCodes.Unbox_Any, b.Target.Property.PropertyType);
 
 					il.Emit(OpCodes.Callvirt, b.Target.Property.GetSetMethod());
@@ -583,7 +583,7 @@ namespace Crow
 				name = "ToSingle";
 			else if (targetType == typeof (string ) )
 				return typeof(object).GetMethod("ToString", Type.EmptyTypes);
-			else
+			else //try to find implicit convertion
 				throw new NotImplementedException( string.Format( "Conversion to {0} is not implemented.", targetType.Name ) );
 
 			return typeof( Convert ).GetMethod( name, BindingFlags.Static | BindingFlags.Public, null, new Type[] { typeof( object ) }, null );

@@ -139,7 +139,7 @@ namespace Crow
 				if (largestChild == null){
 					//if still null, not possible to determine a width
 					//because all children are stretched, force first one to fit
-					Children[0].Width = -1;
+					Children[0].Width = Measure.Fit;
 					return -1;//cancel actual sizing to let child computation take place
 				}
 				return maxChildrenWidth + 2 * Margin;
@@ -147,7 +147,7 @@ namespace Crow
 				if (tallestChild == null)
 					searchTallestChild ();
 				if (tallestChild == null) {
-					Children[0].Height = -1;
+					Children[0].Height = Measure.Fit;
 					return -1;
 				}
 				return maxChildrenHeight + 2 * Margin;
@@ -178,14 +178,14 @@ namespace Crow
 				if (g.Slot.Width > maxChildrenWidth) {
 					maxChildrenWidth = g.Slot.Width;
 					largestChild = g;
-					if (Width < 0)
+					if (Width == Measure.Fit)
 						this.RegisterForLayouting (LayoutingType.Width);
 				} else if (g == largestChild) {
 
 					largestChild = null;
 					maxChildrenWidth = 0;
 
-					if (Width < 0)
+					if (Width == Measure.Fit)
 						this.RegisterForLayouting (LayoutingType.Width);
 				}
 				break;
@@ -193,14 +193,14 @@ namespace Crow
 				if (g.Slot.Height > maxChildrenHeight) {
 					maxChildrenHeight = g.Slot.Height;
 					tallestChild = g;
-					if (Height < 0)
+					if (Height == Measure.Fit)
 						this.RegisterForLayouting (LayoutingType.Height);
 				} else if (g == tallestChild) {
 
 					tallestChild = null;
 					maxChildrenHeight = 0;
 
-					if (Height < 0)
+					if (Height == Measure.Fit)
 						this.RegisterForLayouting (LayoutingType.Height);
 				}
 				break;

@@ -8,7 +8,7 @@
 		Name="TabTitle"
 		HorizontalAlignment="Left"
 		Height="{../../../TabThickness}"
-		Width="-1">
+		Width="Fit">
 		<Label Text="{../../../Caption}"/>
 		<Border CornerRadius="5" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
 					MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">

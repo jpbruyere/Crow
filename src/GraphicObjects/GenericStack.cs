@@ -133,10 +133,10 @@ namespace Crow
 						if (Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
 							return false;
 						cptChildren++;
-						if (Children [i].Width == 0) {
-							if (!(stretchedGO == null && Width >= 0)) {
+						if (Children [i].Width == Measure.Stretched) {
+							if (!(stretchedGO == null && Width != Measure.Fit)) {
 								//change size policy of other stretched children
-								Children [i].Width = -1;
+								Children [i].Width = Measure.Fit;
 								return false;
 							}
 							stretchedGO = Children [i];
@@ -146,7 +146,7 @@ namespace Crow
 						}
 						tmpWidth -= Children [i].Slot.Width + Spacing;
 					}
-					if (stretchedGO != null && Width >= 0) {
+					if (stretchedGO != null && Width != Measure.Fit) {
 						tmpWidth += (Spacing - 2 * Margin);
 						if (tmpWidth < MinimumSize.Width)
 							tmpWidth = MinimumSize.Width;
@@ -172,9 +172,9 @@ namespace Crow
 						if (Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
 							return false;
 						cptChildren++;
-						if (Children [i].Height == 0) {
-							if (!(stretchedGO == null && Height >= 0)){
-								Children [i].Height = -1;
+						if (Children [i].Height == Measure.Stretched) {
+							if (!(stretchedGO == null && Height != Measure.Fit)){
+								Children [i].Height = Measure.Fit;
 								return false;
 							}
 							stretchedGO = Children [i];
@@ -184,7 +184,7 @@ namespace Crow
 						}
 						tmpHeight -= Children[i].Slot.Height + Spacing;
 					}
-					if (stretchedGO != null && Height >= 0) {
+					if (stretchedGO != null && Height != Measure.Fit) {
 						tmpHeight += (Spacing - 2 * Margin);
 						if (tmpHeight < MinimumSize.Height)
 							tmpHeight = MinimumSize.Height;
@@ -221,14 +221,14 @@ namespace Crow
 			switch (arg.LayoutType) {
 			case LayoutingType.Width:
 				if (Orientation == Orientation.Horizontal) {
-					if (Width < 0)
+					if (Width == Measure.Fit)
 						this.RegisterForLayouting (LayoutingType.Width);
 					this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 				}
 				break;
 			case LayoutingType.Height:
 				if (Orientation == Orientation.Vertical) {
-					if (Height < 0)
+					if (Height == Measure.Fit)
 						this.RegisterForLayouting (LayoutingType.Height);
 					this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 				}
