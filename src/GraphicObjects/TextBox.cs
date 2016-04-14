@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 
 namespace Crow
 {
+	[DefaultStyle("#Crow.Styles.TextBox.style")]
     public class TextBox : Label
     {
 		#region CTOR
@@ -37,22 +38,6 @@ namespace Crow
                 RegisterForGraphicUpdate();
             }
         }
-		[XmlAttributeAttribute()][DefaultValue(true)]
-		public override bool Focusable
-		{
-			get { return base.Focusable; }
-			set { base.Focusable = value; }
-		}
-		[XmlAttributeAttribute()][DefaultValue("White")]
-		public override Fill Background {
-			get { return base.Background; }
-			set { base.Background = value; }
-		}
-		[XmlAttributeAttribute()][DefaultValue("Black")]
-		public override Fill Foreground {
-			get { return base.Foreground; }
-			set { base.Foreground = value; }
-		}
 
 		protected override void onDraw (Context gr)
 		{
@@ -78,24 +63,21 @@ namespace Crow
 			switch (key)
 			{
 			case Key.Back:
-				if (!selectionIsEmpty)
-				{
-					//					Text = Text.Remove(selectionStart, selectionEnd - selectionStart);
-					//					selReleasePos = -1;
-					//					currentCol = selBeginPos;
-				}
-				else 
-					this.DeleteChar();
+				this.DeleteChar();
 				break;
 			case Key.Clear:
 				break;
 			case Key.Delete:
 				if (selectionIsEmpty)
 					CurrentColumn++;
+				else if (e.Shift)
+					Interface.CurrentInterface.Clipboard = this.SelectedText;
 				this.DeleteChar ();
 				break;
 			case Key.Enter:
 			case Key.KeypadEnter:
+				if (!selectionIsEmpty)
+					this.DeleteChar ();
 				if (Multiline)
 					this.InsertLineBreak ();
 				else
@@ -107,35 +89,102 @@ namespace Crow
 				SelRelease = -1;
 				break;
 			case Key.Home:
-				//TODO
+				if (e.Shift) {
+					if (selectionIsEmpty)
+						SelBegin = new Point (CurrentColumn, CurrentLine);
+					if (e.Control)
+						CurrentLine = 0;
+					CurrentColumn = 0;
+					SelRelease = new Point (CurrentColumn, CurrentLine);
+					break;
+				}
+				SelRelease = -1;
 				if (e.Control)
 					CurrentLine = 0;
 				CurrentColumn = 0;
 				break;
 			case Key.End:
+				if (e.Shift) {
+					if (selectionIsEmpty)
+						SelBegin = new Point (CurrentColumn, CurrentLine);
+					if (e.Control)
+						CurrentLine = int.MaxValue;
+					CurrentColumn = int.MaxValue;
+					SelRelease = new Point (CurrentColumn, CurrentLine);
+					break;
+				}
+				SelRelease = -1;
 				if (e.Control)
 					CurrentLine = int.MaxValue;
 				CurrentColumn = int.MaxValue;
 				break;
 			case Key.Insert:
+				if (e.Shift)
+					this.Insert (Interface.CurrentInterface.Clipboard);
+				else if (e.Control)
+					Interface.CurrentInterface.Clipboard = this.SelectedText;
 				break;
-			case Key.Left:				
-				CurrentColumn--;
+			case Key.Left:
+				if (e.Shift) {
+					if (selectionIsEmpty)
+						SelBegin = new Point(CurrentColumn, CurrentLine);
+					if (e.Control)
+						GotoWordStart ();
+					else
+						CurrentColumn--;
+					SelRelease = new Point(CurrentColumn, CurrentLine);
+					break;
+				}
+				SelRelease = -1;
+				if (e.Control)
+					GotoWordStart ();
+				else
+					CurrentColumn--;
 				break;
-			case Key.Right:				
-				CurrentColumn++;
+			case Key.Right:
+				if (e.Shift) {
+					if (selectionIsEmpty)
+						SelBegin = new Point(CurrentColumn, CurrentLine);
+					if (e.Control)
+						GotoWordEnd ();
+					else
+						CurrentColumn++;
+					SelRelease = new Point(CurrentColumn, CurrentLine);
+					break;
+				}
+				SelRelease = -1;
+				if (e.Control)
+					GotoWordEnd ();
+				else
+					CurrentColumn++;
 				break;
 			case Key.Up:
+				if (e.Shift) {
+					if (selectionIsEmpty)
+						SelBegin = new Point(CurrentColumn, CurrentLine);
+					CurrentLine--;
+					SelRelease = new Point(CurrentColumn, CurrentLine);
+					break;
+				}
+				SelRelease = -1;
 				CurrentLine--;
 				break;
 			case Key.Down:
-				CurrentLine++;
+				if (e.Shift) {
+					if (selectionIsEmpty)
+						SelBegin = new Point(CurrentColumn, CurrentLine);
+					CurrentLine++;
+					SelRelease = new Point(CurrentColumn, CurrentLine);
+					break;
+				}
+				SelRelease = -1;
+				CurrentLine++;				
 				break;
 			case Key.Menu:
 				break;
 			case Key.NumLock:
 				break;
-			case Key.PageDown:
+			case Key.PageDown:				
 				break;
 			case Key.PageUp:
 				break;

@@ -28,6 +28,8 @@ namespace Crow
 		Container _contentContainer;
 		Direction currentDirection = Direction.None;
 
+		public event EventHandler Closing;
+
 		#region CTOR
 		public Window () : base() {
 			
@@ -224,6 +226,11 @@ namespace Crow
 		protected void butQuitPress (object sender, MouseButtonEventArgs e)
 		{
 			Interface.CurrentInterface.MouseCursor = XCursor.Default;
+			close ();
+		}
+
+		void close(){
+			Closing.Raise (this, null);
 			Interface.CurrentInterface.DeleteWidget (this);
 		}
 

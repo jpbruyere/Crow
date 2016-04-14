@@ -72,7 +72,7 @@ namespace Crow
 
 		public Queue<LayoutingQueueItem> LayoutingQueue;
 		public Queue<GraphicObject> GraphicUpdateQueue = new Queue<GraphicObject>();
-
+		public string Clipboard;
 		public static void RegisterForGraphicUpdate(GraphicObject g)
 		{
 			lock (CurrentInterface.GraphicUpdateQueue) {
@@ -153,6 +153,13 @@ namespace Crow
 			}
 
 			Type t = Type.GetType ("Crow." + root);
+			if (t == null) {
+				Assembly a = Assembly.GetEntryAssembly ();
+				foreach (Type expT in a.GetExportedTypes ()) {
+					if (expT.Name == root)
+						t = expT;
+				}
+			}
 
 			stream.Seek (0, SeekOrigin.Begin);
 			return t;
@@ -224,6 +231,7 @@ namespace Crow
 			lock (UpdateMutex) {
 				GraphicObject tmp = Interface.Load (path, this);
 				AddWidget (tmp);
+
 				return tmp;
 			}
 		}
@@ -457,7 +465,6 @@ namespace Crow
 		{
 			g.Parent = this;
 			GraphicObjects.Insert (0, g);
-
 			g.RegisterForLayouting (LayoutingType.Sizing);
 		}
 		public void DeleteWidget(GraphicObject g)

@@ -12,14 +12,22 @@ using System.IO;
 
 namespace Crow
 {
-	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange, ICloneable
+	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange, ICloneable, IBindable
 	{
+		#region IBindable implementation
+		List<Binding> bindings = new List<Binding> ();
+		public List<Binding> Bindings {
+			get { return bindings; }
+		}
+
+		#endregion
+
 		#if DEBUG_LAYOUTING
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
 		#endif
 
-		internal List<Binding> Bindings = new List<Binding> ();
+
 		internal int layoutingTries = 0;
 
 		Rectangles clipping = new Rectangles();

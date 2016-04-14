@@ -9,8 +9,7 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 
 namespace Crow
-{
-    [Serializable]
+{    
 	[DefaultStyle("#Crow.Styles.Label.style")]
     public class Label : GraphicObject
     {
@@ -119,7 +118,7 @@ namespace Crow
 			}
             set
             {
-                if (_text == value)
+				if (string.Equals (value, _text, StringComparison.Ordinal))
                     return;
 					                                
                 _text = value;
@@ -155,8 +154,8 @@ namespace Crow
 					return;
 				if (value < 0)
 					_currentCol = 0;
-				else if (value > lines [_currentLine].Count ())
-					_currentCol = lines [_currentLine].Count ();
+				else if (value > lines [_currentLine].Length)
+					_currentCol = lines [_currentLine].Length;
 				else
 					_currentCol = value;
 				NotifyValueChanged ("CurrentColumn", _currentCol);
@@ -173,7 +172,11 @@ namespace Crow
 				else if (value < 0)
 					_currentLine = 0;
 				else
-					_currentLine = value; 
+					_currentLine = value;
+				//force recheck of currentCol for bounding
+				int cc = _currentCol;
+				_currentCol = 0;
+				CurrentColumn = cc;
 				NotifyValueChanged ("CurrentLine", _currentLine);
 			}
 		}
@@ -205,6 +208,12 @@ namespace Crow
 			}
 		}
 
+		[XmlIgnore]protected Char CurrentChar   //ordered selection start and end positions
+		{
+			get {
+				return lines [CurrentLine] [CurrentColumn];
+			}
+		}
 		[XmlIgnore]protected Point selectionStart   //ordered selection start and end positions
 		{
 			get { 
@@ -250,6 +259,25 @@ namespace Crow
 			}
 		}
 
+		public void GotoWordStart(){
+			CurrentColumn--;
+			//skip white spaces
+			while (char.IsWhiteSpace (this.CurrentChar) && CurrentColumn > 0)
+				CurrentColumn--;
+			while (!char.IsWhiteSpace (lines [CurrentLine] [CurrentColumn]) && CurrentColumn > 0)
+				CurrentColumn--;
+			if (char.IsWhiteSpace (this.CurrentChar))
+				CurrentColumn++;
+		}
+		public void GotoWordEnd(){
+			//skip white spaces
+			while (char.IsWhiteSpace (this.CurrentChar) && CurrentColumn < lines [CurrentLine].Length-1)
+				CurrentColumn++;
+			while (!char.IsWhiteSpace (this.CurrentChar) && CurrentColumn < lines [CurrentLine].Length-1)
+				CurrentColumn++;
+			if (!char.IsWhiteSpace (this.CurrentChar))
+				CurrentColumn++;
+		}
 		public void DeleteChar()
 		{
 			if (selectionIsEmpty) {				
@@ -257,7 +285,7 @@ namespace Crow
 					if (CurrentLine == 0)
 						return;
 					CurrentLine--;
-					CurrentColumn = lines [CurrentLine].Count ();
+					CurrentColumn = lines [CurrentLine].Length;
 					lines [CurrentLine] += lines [CurrentLine + 1];
 					lines.RemoveAt (CurrentLine + 1);
 					NotifyValueChanged ("Text", Text);
@@ -265,8 +293,7 @@ namespace Crow
 				}
 				CurrentColumn--;
 				lines [CurrentLine] = lines [CurrentLine].Remove (CurrentColumn, 1);
-			} else {
-				Debug.WriteLine (selectionEnd.ToString());
+			} else {				
 				int linesToRemove = selectionEnd.Y - selectionStart.Y;
 				int l = selectionStart.Y;
 

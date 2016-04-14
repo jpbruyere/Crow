@@ -239,6 +239,7 @@
     <EmbeddedResource Include="Styles\Spinner.style" />
     <EmbeddedResource Include="Styles\MessageBox.style" />
     <EmbeddedResource Include="Styles\Window.style" />
+    <EmbeddedResource Include="Styles\TextBox.style" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
