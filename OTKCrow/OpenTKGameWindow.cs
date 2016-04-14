@@ -113,6 +113,7 @@ namespace Crow
 				_title,GameWindowFlags.Default,DisplayDevice.GetDisplay(DisplayIndex.Second),
 				3,3,OpenTK.Graphics.GraphicsContextFlags.Default)
 		{
+			CrowInterface = new Interface ();
 			Thread t = new Thread (interfaceThread);
 			t.IsBackground = true;
 			t.Start ();
@@ -121,7 +122,6 @@ namespace Crow
 
 		void interfaceThread()
 		{
-			CrowInterface = new Interface ();
 			CrowInterface.Quit += Quit;
 			CrowInterface.MouseCursorChanged += CrowInterface_MouseCursorChanged;
 
@@ -159,9 +159,8 @@ namespace Crow
 
 		#region graphic context
 		int texID;
-		QuadVAO uiQuad;
-		Crow.Shader shader;
-		int[] viewport = new int[4];
+		Tetra.Shader shader;
+		public static GGL.vaoMesh quad;
 
 		void createContext()
 		{
@@ -180,27 +179,12 @@ namespace Crow
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 
 			GL.BindTexture(TextureTarget.Texture2D, 0);
-
-			shader.Texture = texID;
 			#endregion
-
-			#region Update ui quad
-			if (uiQuad != null)
-				uiQuad.Dispose ();
-			uiQuad = new QuadVAO (0, 0, ClientRectangle.Width, ClientRectangle.Height, 0, 1, 1, -1);
-
-			shader.ProjectionMatrix = Matrix4.CreateOrthographicOffCenter
-				(0, ClientRectangle.Width, ClientRectangle.Height, 0, 0, 1);
-			#endregion
-
-			//TODO:add maybe clientrectangle to clipping here
 		}
 		void OpenGLDraw()
 		{
-			GL.GetInteger (GetPName.Viewport, viewport);
-			GL.Viewport (0, 0, ClientRectangle.Width, ClientRectangle.Height);
-
 			shader.Enable ();
+			GL.BindTexture (TextureTarget.Texture2D, texID);
 			lock (CrowInterface.RenderMutex) {
 				if (CrowInterface.IsDirty) {
 					GL.TexSubImage2D (TextureTarget.Texture2D, 0,
@@ -210,12 +194,8 @@ namespace Crow
 					CrowInterface.IsDirty = false;
 				}
 			}
-
-			uiQuad.Render (PrimitiveType.TriangleStrip);
+			quad.Render (PrimitiveType.TriangleStrip);
 			GL.BindTexture(TextureTarget.Texture2D, 0);
-
-			shader.Disable ();
-			GL.Viewport (viewport [0], viewport [1], viewport [2], viewport [3]);
 		}
 		#endregion
 
@@ -248,7 +228,11 @@ namespace Crow
 			Console.WriteLine("GLSL version: " + GL.GetString (StringName.ShadingLanguageVersion));
 			Console.WriteLine("*************************************\n");
 
-			shader = new Crow.TexturedShader ();
+			shader = new Tetra.Shader ();
+			shader.Enable();
+			shader.SetMVP(OpenTK.Matrix4.CreateOrthographicOffCenter (-0.5f, 0.5f, -0.5f, 0.5f, 1, -1));
+			GL.UseProgram(0);
+			quad = new GGL.vaoMesh (0, 0, 0, 1, 1, 1, -1);
 		}
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
