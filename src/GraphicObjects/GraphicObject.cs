@@ -75,6 +75,8 @@ namespace Crow
 		Fill _background = Color.Transparent;
 		Fill _foreground = Color.White;
 		Font _font = "droid, 10";
+		Measure _width, _height;
+		int _left, _top;
 		double _cornerRadius = 0;
 		int _margin = 0;
 		bool _focusable = false;
@@ -92,11 +94,6 @@ namespace Crow
 		#endregion
 
 		#region public fields
-		/// <summary>
-		/// Original size and position 0=Stretched; -1=Fit
-		/// </summary>
-		Measure _width, _height;
-		int _left, _top;
 		/// <summary>
 		/// Current size and position computed during layouting pass
 		/// </summary>
