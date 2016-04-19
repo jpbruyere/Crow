@@ -96,10 +96,10 @@ namespace Crow
 				return base.measureRawSize (lt);
 			if (lt == LayoutingType.Width)
 				return child.RegisteredLayoutings.HasFlag(LayoutingType.Width) ?
-					-1 : child.Slot.Size.Width + 2 * Margin;
+					int.MinValue : child.Slot.Size.Width + 2 * Margin;
 			else
 				return child.RegisteredLayoutings.HasFlag(LayoutingType.Height) ?
-					-1 : child.Slot.Size.Height + 2 * Margin;			
+					int.MinValue : child.Slot.Size.Height + 2 * Margin;
 		}
 		public override bool UpdateLayout (LayoutingType layoutType)
 		{

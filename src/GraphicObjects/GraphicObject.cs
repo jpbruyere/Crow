@@ -816,6 +816,9 @@ namespace Crow
 				else
 					Slot.Width = Parent.ClientRectangle.Width * Width / 100;
 
+				if (Slot.Width == int.MinValue)
+					return false;
+
 				//size constrain
 				if (Slot.Width < MinimumSize.Width) {
 					Slot.Width = MinimumSize.Width;
@@ -845,6 +848,9 @@ namespace Crow
 					Slot.Height = Parent.ClientRectangle.Height;
 				else
 					Slot.Height = Parent.ClientRectangle.Height * Height.Value / 100;
+
+				if (Slot.Height == int.MinValue)
+					return false;
 
 				//size constrain
 				if (Slot.Height < MinimumSize.Height) {
