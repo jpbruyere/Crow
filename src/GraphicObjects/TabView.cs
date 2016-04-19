@@ -30,6 +30,7 @@ namespace Crow
 	{
 		#region Private fields
 		int _spacing;
+		Measure tabThickness;
 		Orientation _orientation;
 		int selectedTab = 0;
 		#endregion
@@ -80,15 +81,15 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-		int tabThickness;
 		[XmlAttributeAttribute()][DefaultValue(22)]
-		public virtual int TabThickness {
+		public virtual Measure TabThickness {
 			get { return tabThickness; }
 			set {
 				if (tabThickness == value)
 					return;
 				tabThickness = value;
 				NotifyValueChanged ("TabThickness", tabThickness);
+				RegisterForGraphicUpdate ();
 			}
 		}
 
