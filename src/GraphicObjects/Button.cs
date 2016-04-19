@@ -16,15 +16,21 @@ namespace Crow
 	[DefaultTemplate("#Crow.Templates.Button.crow")]
     public class Button : TemplatedContainer
     {
+		string caption;
+		string image;
+		bool isPressed;
+		Container _contentContainer;
+
 		#region CTOR
         public Button() : base()
         {}
 		#endregion
 
-		string caption;
-		string image;
-		Container _contentContainer;
+		public event EventHandler Pressed;
+		public event EventHandler Released;
+		public event EventHandler Clicked;
 
+		#region TemplatedContainer overrides
 		public override GraphicObject Content {
 			get {
 				return _contentContainer == null ? null : _contentContainer.Child;
@@ -40,6 +46,7 @@ namespace Crow
 
 			_contentContainer = this.child.FindByName ("Content") as Container;
 		}
+		#endregion
 
 		#region GraphicObject Overrides
 		public override void ResolveBindings ()
@@ -50,12 +57,20 @@ namespace Crow
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
+			IsPressed = true;
+
 			base.onMouseDown (sender, e);
+
+			//TODO:remove
 			NotifyValueChanged ("State", "pressed");
 		}
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{
+			IsPressed = false;
+
 			base.onMouseUp (sender, e);
+
+			//TODO:remove
 			NotifyValueChanged ("State", "normal");
 		}
 		#endregion
@@ -79,6 +94,25 @@ namespace Crow
 				image = value; 
 				NotifyValueChanged ("Image", image);
 			}
-		}     
+		} 
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public bool IsPressed
+		{
+			get { return isPressed; }
+			set
+			{
+				if (isPressed == value)
+					return;
+
+				isPressed = value;
+
+				NotifyValueChanged ("IsPressed", isPressed);
+
+				if (isPressed)
+					Pressed.Raise (this, null);
+				else
+					Released.Raise (this, null);
+			}
+		}
 	}
 }
