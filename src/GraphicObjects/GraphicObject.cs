@@ -811,7 +811,7 @@ namespace Crow
 				else if (Width == Measure.Stretched)
 					Slot.Width = Parent.ClientRectangle.Width;
 				else
-					Slot.Width = Parent.ClientRectangle.Width * Width / 100;
+					Slot.Width = (int)Math.Round((double)(Parent.ClientRectangle.Width * Width) / 100.0);
 
 				if (Slot.Width == int.MinValue)
 					return false;
@@ -844,7 +844,7 @@ namespace Crow
 				else if (Height == Measure.Stretched)
 					Slot.Height = Parent.ClientRectangle.Height;
 				else
-					Slot.Height = Parent.ClientRectangle.Height * Height.Value / 100;
+					Slot.Height = (int)Math.Round((double)(Parent.ClientRectangle.Height * Height) / 100.0);
 
 				if (Slot.Height == int.MinValue)
 					return false;

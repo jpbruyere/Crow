@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0"?>
-<HorizontalStack Name="hstack" Margin="0" Spacing="0" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
+<HorizontalStack MinimumSize="40;10" Name="hstack" Margin="0" Spacing="0" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
 	<Border BorderWidth="1" Height="{../../HeightPolicy}" Width="80%"  Background="White" 
 		Foreground="DimGray" Margin="0">
 		<Label Foreground="DimGray" Height="{../../../HeightPolicy}" Width="Stretched"
 			Text="{../../../Value}" TextAlignment="Right" Margin="0"/>
 	</Border>
-	<VerticalStack Width="20%" Height="Stretched" Spacing="0" Margin="0" Background="Red">
+	<VerticalStack MinimumSize="8;10" Width="20%" Height="Stretched" Spacing="0" Margin="0" Background="Red">
 		<Button MouseRepeat="true" Width="Stretched" Height="50%" Margin="0" MouseClick="../../../onUp"
 			Template="#Crow.Templates.ArrowButTemplate.crow">
 			<Image Path="#Crow.Images.Icons.updown.svg" SvgSub="up" Margin="0"/>

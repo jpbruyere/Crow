@@ -97,9 +97,13 @@ namespace Crow
 		[XmlIgnore]
 		public int MaximumScroll {
 			get {
-				return VerticalScrolling ? 
-					child == null ? 0 : Math.Max(Child.Slot.Height - ClientRectangle.Height,0) :
-					Math.Max(Child.Slot.Width - ClientRectangle.Width,0);
+				try {
+					return VerticalScrolling ? 
+						Math.Max(Child.Slot.Height - ClientRectangle.Height,0) :
+						Math.Max(Child.Slot.Width - ClientRectangle.Width,0);					
+				} catch {
+					return 0;
+				}
 			}
 		}
 
@@ -117,6 +121,7 @@ namespace Crow
             : base(){}
 
 		#region GraphicObject Overrides
+		//TODO:put this override in style
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public override bool CacheEnabled {
 			get { return base.CacheEnabled; }

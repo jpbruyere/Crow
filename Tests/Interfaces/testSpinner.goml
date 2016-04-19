@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack Name="TopContainer" Width="400" Height="-1"
+<VerticalStack Name="TopContainer" Width="400" Height="Fit"
 	Margin="20" Background="DarkGray">
 
 	<HorizontalStack Fit="true" Margin="5" Background="SkyBlue">
