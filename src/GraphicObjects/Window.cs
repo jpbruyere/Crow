@@ -25,6 +25,8 @@ namespace Crow
 		string _title;
 		string _icon;
 		bool _resizable;
+		bool hoverBorder = false;
+
 		Container _contentContainer;
 		Direction currentDirection = Direction.None;
 
@@ -36,6 +38,7 @@ namespace Crow
 		}
 		#endregion
 
+		#region TemplatedContainer overrides
 		public override GraphicObject Content {
 			get {
 				return _contentContainer == null ? null : _contentContainer.Child;
@@ -44,6 +47,13 @@ namespace Crow
 				_contentContainer.SetChild(value);
 			}
 		}
+		protected override void loadTemplate(GraphicObject template = null)
+		{
+			base.loadTemplate (template);
+			_contentContainer = this.child.FindByName ("Content") as Container;
+		}
+		#endregion
+
 		[XmlAttributeAttribute()][DefaultValue("Window")]
 		public string Title {
 			get { return _title; } 
@@ -71,8 +81,13 @@ namespace Crow
 			}
 		}
 
-		bool hoverBorder = false;
-
+		#region GraphicObject Overrides
+		public override void ResolveBindings ()
+		{
+			base.ResolveBindings ();
+			if (Content != null)
+				Content.ResolveBindings ();
+		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
@@ -202,6 +217,12 @@ namespace Crow
 				}				
 			}				
 		}
+		public override void onMouseDown (object sender, MouseButtonEventArgs e)
+		{
+			base.onMouseDown (sender, e);
+		}
+		#endregion
+
 		public void onBorderMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			hoverBorder = false;
@@ -213,15 +234,6 @@ namespace Crow
 			hoverBorder = true;
 		}
 
-		public override void onMouseDown (object sender, MouseButtonEventArgs e)
-		{
-			base.onMouseDown (sender, e);
-		}
-		protected override void loadTemplate(GraphicObject template = null)
-		{
-			base.loadTemplate (template);
-			_contentContainer = this.child.FindByName ("Content") as Container;
-		}
 
 		protected void butQuitPress (object sender, MouseButtonEventArgs e)
 		{
@@ -232,13 +244,6 @@ namespace Crow
 		void close(){
 			Closing.Raise (this, null);
 			Interface.CurrentInterface.DeleteWidget (this);
-		}
-
-		public override void ResolveBindings ()
-		{
-			base.ResolveBindings ();
-			if (Content != null)
-				Content.ResolveBindings ();
 		}
 	}
 }
