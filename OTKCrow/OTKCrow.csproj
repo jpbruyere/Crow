@@ -21,6 +21,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Linux_x86' ">
     <DebugType>full</DebugType>
@@ -29,8 +30,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\SharpFont.3.1.0\build\SharpFont.props" Condition="Exists('..\packages\SharpFont.3.1.0\build\SharpFont.props')" />
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -45,6 +48,9 @@
     <Reference Include="GGL">
       <HintPath>..\..\Chess\build\Debug\GGL.dll</HintPath>
     </Reference>
+    <Reference Include="SharpFont">
+      <HintPath>..\packages\SharpFont.3.1.0\lib\net20\SharpFont.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OpenTKGameWindow.cs" />
@@ -52,6 +58,22 @@
     <Compile Include="OpenGL\Shader.cs" />
     <Compile Include="OpenGL\TexturedShader.cs" />
     <Compile Include="OpenGL\VertexArrayObject.cs" />
+    <Compile Include="OpenGL\GLBackend\ClipShader.cs" />
+    <Compile Include="OpenGL\GLBackend\Context.cs" />
+    <Compile Include="OpenGL\GLBackend\Path.cs" />
+    <Compile Include="OpenGL\GLBackend\Shader %28copier%29.cs" />
+    <Compile Include="OpenGL\GLBackend\Surface.cs" />
+    <Compile Include="OpenGL\GLBackend\Font\Font.cs" />
+    <Compile Include="OpenGL\GLBackend\Font\FontExtents.cs" />
+    <Compile Include="OpenGL\GLBackend\Font\FontFace.cs" />
+    <Compile Include="OpenGL\GLBackend\Font\FontFlag.cs" />
+    <Compile Include="OpenGL\GLBackend\Font\FontShader.cs" />
+    <Compile Include="OpenGL\GLBackend\Font\FontSlant.cs" />
+    <Compile Include="OpenGL\GLBackend\Font\FontStyle.cs" />
+    <Compile Include="OpenGL\GLBackend\Font\FontWeight.cs" />
+    <Compile Include="OpenGL\GLBackend\Font\TextExtents.cs" />
+    <Compile Include="OpenGL\GLBackend\Font\glFont.cs" />
+    <Compile Include="OpenGL\GLBackend\Font\glGlyph.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">
@@ -62,5 +84,9 @@
   <ItemGroup>
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
+    <None Include="OpenGL\GLBackend\Font\FontShader %28copier%29.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="OpenGL\GLBackend\" />
   </ItemGroup>
 </Project>

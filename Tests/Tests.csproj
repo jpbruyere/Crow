@@ -69,6 +69,8 @@
       <Link>Interfaces\test_stack.goml.cs</Link>
     </Compile>
     <Compile Include="GOLIBTestsOTK.cs" />
+    <Compile Include="testGLBackend.cs" />
+    <Compile Include="testGLBackend %28copier%29.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
