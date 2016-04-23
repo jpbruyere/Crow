@@ -115,6 +115,7 @@ namespace Crow
 				3,3,OpenTK.Graphics.GraphicsContextFlags.Default)
 		{
 			CrowInterface = new Interface ();
+
 			Thread t = new Thread (interfaceThread);
 			t.IsBackground = true;
 			t.Start ();
@@ -125,7 +126,9 @@ namespace Crow
 		{
 			CrowInterface.Quit += Quit;
 			CrowInterface.MouseCursorChanged += CrowInterface_MouseCursorChanged;
-
+			while (CrowInterface.ClientRectangle.Size.Width == 0)
+				Thread.Sleep (5);
+			
 			while (true) {
 				CrowInterface.Update ();
 				Thread.Sleep (5);

@@ -51,6 +51,7 @@ namespace Crow
 		{
 
 			if (child != null) {
+				contentSize = new Size (0, 0);
 				child.LayoutChanged -= OnChildLayoutChanges;
 				this.RegisterForLayouting (LayoutingType.Sizing);
 				child.Parent = null;
@@ -61,6 +62,7 @@ namespace Crow
 			if (child != null) {
 				child.Parent = this;
 				child.LayoutChanged += OnChildLayoutChanges;
+				contentSize = child.Slot.Size;
 				child.RegisterForLayouting (LayoutingType.Sizing);
 			}
 
@@ -90,22 +92,10 @@ namespace Crow
 			return child == goToFind ? true : 
 				child == null ? false : child.Contains(goToFind);
 		}
-		protected override int measureRawSize (LayoutingType lt)
-		{
-			if (child == null)
-				return base.measureRawSize (lt);
-			if (lt == LayoutingType.Width)
-				return child.RegisteredLayoutings.HasFlag(LayoutingType.Width) ?
-					-1 : child.Slot.Size.Width + 2 * Margin;
-			else
-				return child.RegisteredLayoutings.HasFlag(LayoutingType.Height) ?
-					-1 : child.Slot.Size.Height + 2 * Margin;
-		}
 		public override bool UpdateLayout (LayoutingType layoutType)
 		{
 			if (child != null) {
-				//force sizing to fit if sizing on children and
-				//child has stretched size
+				//force sizing to fit if sizing on children and child has stretched size
 				switch (layoutType) {
 				case LayoutingType.Width:
 					if (Width == Measure.Fit && child.Width.Units == Unit.Percent)
@@ -123,34 +113,46 @@ namespace Crow
 		{
 			base.OnLayoutChanges (layoutType);
 
-			switch (layoutType) {
-			case LayoutingType.Width:								
-				if (child != null) {
-					child.RegisterForLayouting (LayoutingType.X | LayoutingType.Width);
+			if (child == null)
+				return;
+			
+			LayoutingType ltChild = LayoutingType.None;
+
+			if (layoutType == LayoutingType.Width) {
+				if (Width == Measure.Fit)
+					return;
+				if (child.Width.Units == Unit.Percent) {
+					ltChild |= LayoutingType.Width;
+					if (child.Width.Value < 100 && child.Left == 0)
+						ltChild |= LayoutingType.X;
 				}
-				break;
-			case LayoutingType.Height:
-				if (child != null) {
-					child.RegisterForLayouting (LayoutingType.Y | LayoutingType.Height);
+			} else if (layoutType == LayoutingType.Height) {
+				if (Height == Measure.Fit)
+					return;
+				if (child.Height.Units == Unit.Percent) {
+					ltChild |= LayoutingType.Height;
+					if (child.Height.Value < 100 && child.Top == 0)
+						ltChild |= LayoutingType.Y;
 				}
-				break;
-			}							
+			}
+			if (ltChild == LayoutingType.None)
+				return;
+			child.RegisterForLayouting (ltChild);
 		}
 		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
-		{
-			switch (arg.LayoutType) {
-			case LayoutingType.X:
-				break;
-			case LayoutingType.Y:
-				break;
-			case LayoutingType.Width:
-				if (Width < 0)
-					this.RegisterForLayouting (LayoutingType.Width);
-				break;
-			case LayoutingType.Height:
-				if (Height < 0)
-					this.RegisterForLayouting (LayoutingType.Height);
-				break;
+		{			
+			GraphicObject g = sender as GraphicObject;
+
+			if (arg.LayoutType == LayoutingType.Width) {
+				if (Width != Measure.Fit)
+					return;
+				contentSize.Width = g.Slot.Width;
+				this.RegisterForLayouting (LayoutingType.Width);
+			}else if (arg.LayoutType == LayoutingType.Height){
+				if (Height != Measure.Fit)
+					return;
+				contentSize.Height = g.Slot.Height;
+				this.RegisterForLayouting (LayoutingType.Height);
 			}
 		}
 		protected override void onDraw (Context gr)

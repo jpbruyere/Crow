@@ -1,0 +1,7 @@
+﻿<?xml version="1.0"?>
+<Group Background="Onyx" Margin="10" Fit="true">
+	<Label Font="droid bold,40" Text="{fps}" Margin="10"  Fit="true"/>
+	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
+			VerticalAlignment="Top"
+			MinimumSize="10;10"/>
+</Group>

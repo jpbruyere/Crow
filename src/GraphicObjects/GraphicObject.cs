@@ -664,11 +664,11 @@ namespace Crow
 			get { return layoutingTries; }
 			set { layoutingTries = value; }
 		}
+		protected Size contentSize;
 		/// <summary> return size of content + margins </summary>
 		protected virtual int measureRawSize (LayoutingType lt) {
 			return lt == LayoutingType.Width ? 
-				Width == Measure.Fit ? MinimumSize.Width : (int)Width :
-				Height == Measure.Fit ? MinimumSize.Height : (int)Height;
+				contentSize.Width + 2 * Margin: contentSize.Height + 2 * Margin;
 		}
 		/// <summary> By default in groups, LayoutingType.ArrangeChildren is reset </summary>
 		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){

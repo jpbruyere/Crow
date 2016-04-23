@@ -91,13 +91,13 @@ namespace testOTK
 			//this.AddWidget(new test4());
 			KeyboardKeyDown += GOLIBTests_KeyboardKeyDown1;;
 
+			testFiles = Directory.GetFiles(@"Interfaces/Group", "*.crow").ToArray();
+			//testFiles = Directory.GetFiles(@"Interfaces/Stack", "*.crow").ToArray();
+			//testFiles = Directory.GetFiles(@"Interfaces/GraphicObject", "*.crow").Concat(testFiles).ToArray();
 
-			testFiles = Directory.GetFiles(@"Interfaces/Stack", "*.crow").ToArray();
-			testFiles = Directory.GetFiles(@"Interfaces/GraphicObject", "*.crow").Concat(testFiles).ToArray();
-			testFiles = Directory.GetFiles(@"Interfaces/Container", "*.crow").Concat(testFiles).ToArray();
 			//testFiles = Directory.GetFiles(@"Interfaces", "*.crow").Concat(testFiles).ToArray();
 
-			GraphicObject obj = CrowInterface.LoadInterface(testFiles[5]);
+			GraphicObject obj = CrowInterface.LoadInterface(testFiles[idx]);
 			obj.DataSource = this;
 
 		}

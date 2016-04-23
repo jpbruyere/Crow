@@ -21,8 +21,6 @@ namespace Crow
 		public event EventHandler<EventArgs> ChildrenCleared;
 		#endregion
 
-		internal int maxChildrenWidth = 0;
-		internal int maxChildrenHeight = 0;
 		internal GraphicObject largestChild = null;
 		internal GraphicObject tallestChild = null;
 
@@ -59,9 +57,9 @@ namespace Crow
 			//child.Parent = null;
             Children.Remove(child);
 
-			if (child == largestChild)
+			if (child == largestChild && Width == Measure.Fit)
 				searchLargestChild ();
-			if (child == tallestChild)
+			if (child == tallestChild && Height == Measure.Fit)
 				searchTallestChild ();
 			
 			this.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
@@ -130,28 +128,26 @@ namespace Crow
 		}
 		protected override int measureRawSize (LayoutingType lt)
 		{
-			if (Children.Count == 0)
-				return base.measureRawSize (lt);
-			
-			if (lt == LayoutingType.Width) {
-				if (largestChild == null)
-					searchLargestChild ();
-				if (largestChild == null){
-					//if still null, not possible to determine a width
-					//because all children are stretched, force first one to fit
-					Children[0].Width = Measure.Fit;
-					return -1;//cancel actual sizing to let child computation take place
+			if (Children.Count > 0) {
+				if (lt == LayoutingType.Width) {
+					if (largestChild == null)
+						searchLargestChild ();
+					if (largestChild == null) {
+						//if still null, not possible to determine a width
+						//because all children are stretched, force first one to fit
+						Children [0].Width = Measure.Fit;
+						return -1;//cancel actual sizing to let child computation take place
+					}
+				} else {
+					if (tallestChild == null)
+						searchTallestChild ();
+					if (tallestChild == null) {
+						Children [0].Height = Measure.Fit;
+						return -1;
+					}
 				}
-				return maxChildrenWidth + 2 * Margin;
-			}else{
-				if (tallestChild == null)
-					searchTallestChild ();
-				if (tallestChild == null) {
-					Children[0].Height = Measure.Fit;
-					return -1;
-				}
-				return maxChildrenHeight + 2 * Margin;
 			}
+			return base.measureRawSize (lt);
 		}
 			
 		public override void OnLayoutChanges (LayoutingType layoutType)
@@ -173,36 +169,29 @@ namespace Crow
 		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
 			GraphicObject g = sender as GraphicObject;
+
 			switch (arg.LayoutType) {
 			case LayoutingType.Width:
-				if (g.Slot.Width > maxChildrenWidth) {
-					maxChildrenWidth = g.Slot.Width;
+				if (Width != Measure.Fit)
+					return;
+				if (g.Slot.Width > contentSize.Width) {
 					largestChild = g;
-					if (Width == Measure.Fit)
-						this.RegisterForLayouting (LayoutingType.Width);
-				} else if (g == largestChild) {
+					contentSize.Width = g.Slot.Width;
+				} else if (g == largestChild)
+					searchLargestChild ();
 
-					largestChild = null;
-					maxChildrenWidth = 0;
-
-					if (Width == Measure.Fit)
-						this.RegisterForLayouting (LayoutingType.Width);
-				}
+				this.RegisterForLayouting (LayoutingType.Width);
 				break;
 			case LayoutingType.Height:
-				if (g.Slot.Height > maxChildrenHeight) {
-					maxChildrenHeight = g.Slot.Height;
+				if (Height != Measure.Fit)
+					return;
+				if (g.Slot.Height > contentSize.Height) {
 					tallestChild = g;
-					if (Height == Measure.Fit)
-						this.RegisterForLayouting (LayoutingType.Height);
-				} else if (g == tallestChild) {
+					contentSize.Height = g.Slot.Height;
+				} else if (g == tallestChild)
+					searchTallestChild ();
 
-					tallestChild = null;
-					maxChildrenHeight = 0;
-
-					if (Height == Measure.Fit)
-						this.RegisterForLayouting (LayoutingType.Height);
-				}
+				this.RegisterForLayouting (LayoutingType.Height);
 				break;
 			}
 		}
@@ -211,22 +200,21 @@ namespace Crow
 		void resetChildrenMaxSize(){
 			largestChild = null;
 			tallestChild = null;
-			maxChildrenWidth = 0;
-			maxChildrenHeight = 0;
+			contentSize = 0;
 		}
 		void searchLargestChild(){
 			#if DEBUG_LAYOUTING
 			Debug.WriteLine("\tSearch largest child");
 			#endif
 			largestChild = null;
-			maxChildrenWidth = 0;
+			contentSize.Width = 0;
 			for (int i = 0; i < Children.Count; i++) {
 				if (!Children [i].Visible)
 					continue;
 				if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
 					continue;
-				if (Children [i].Slot.Width > maxChildrenWidth) {
-					maxChildrenWidth = Children [i].Slot.Width;
+				if (Children [i].Slot.Width > contentSize.Width) {
+					contentSize.Width = Children [i].Slot.Width;
 					largestChild = Children [i];
 				}
 			}
@@ -236,14 +224,14 @@ namespace Crow
 			Debug.WriteLine("\tSearch tallest child");
 			#endif
 			tallestChild = null;
-			maxChildrenHeight = 0;
+			contentSize.Height = 0;
 			for (int i = 0; i < Children.Count; i++) {
 				if (!Children [i].Visible)
 					continue;
 				if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
 					continue;
-				if (Children [i].Slot.Height > maxChildrenHeight) {
-					maxChildrenHeight = Children [i].Slot.Height;
+				if (Children [i].Slot.Height > contentSize.Height) {
+					contentSize.Height = Children [i].Slot.Height;
 					tallestChild = Children [i];
 				}
 			}

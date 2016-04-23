@@ -30,7 +30,7 @@ namespace Crow
 
 		public static Measure Fit = new Measure(-1);
 		//TODO:implement stretching as 100%, not 0%
-		public static Measure Stretched = new Measure(0, Unit.Percent);
+		public static Measure Stretched = new Measure(100, Unit.Percent);
 
 		public Measure (int _value, Unit _units = Unit.Pixel)
 		{
@@ -72,8 +72,8 @@ namespace Crow
 		public override string ToString ()
 		{
 			return Value == -1 ? "Fit" :
-				Value == 0 ? "Stretched" :
-				Units == Unit.Percent ? Value.ToString () + "%" : Value.ToString ();
+				Units == Unit.Percent ? Value == 100 ? "Stretched" :
+				Value.ToString () + "%" : Value.ToString ();
 		}
 		public static Measure Parse(string s){
 			if (string.IsNullOrEmpty (s))
