@@ -666,7 +666,9 @@ namespace Crow
 		}
 		/// <summary> return size of content + margins </summary>
 		protected virtual int measureRawSize (LayoutingType lt) {
-			return lt == LayoutingType.Width ? Width : Height;
+			return lt == LayoutingType.Width ? 
+				Width == Measure.Fit ? MinimumSize.Width : (int)Width :
+				Height == Measure.Fit ? MinimumSize.Height : (int)Height;
 		}
 		/// <summary> By default in groups, LayoutingType.ArrangeChildren is reset </summary>
 		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){
@@ -813,7 +815,7 @@ namespace Crow
 				else
 					Slot.Width = (int)Math.Round((double)(Parent.ClientRectangle.Width * Width) / 100.0);
 
-				if (Slot.Width == int.MinValue)
+				if (Slot.Width < 0)
 					return false;
 
 				//size constrain
@@ -846,7 +848,7 @@ namespace Crow
 				else
 					Slot.Height = (int)Math.Round((double)(Parent.ClientRectangle.Height * Height) / 100.0);
 
-				if (Slot.Height == int.MinValue)
+				if (Slot.Height < 0)
 					return false;
 
 				//size constrain
@@ -1040,19 +1042,32 @@ namespace Crow
 			MouseWheelChanged.Raise (this, e);
 		}
 		public virtual void onFocused(object sender, EventArgs e){
+			#if DEBUG_FOCUS
+			Debug.WriteLine("Focused => " + this.ToString());
+			#endif
 			Focused.Raise (this, e);
 			this.HasFocus = true;
 		}
 		public virtual void onUnfocused(object sender, EventArgs e){
+			#if DEBUG_FOCUS
+			Debug.WriteLine("UnFocused => " + this.ToString());
+			#endif
+
 			Unfocused.Raise (this, e);
 			this.HasFocus = false;
 		}
 		public virtual void onMouseEnter(object sender, MouseMoveEventArgs e)
 		{
+			#if DEBUG_FOCUS
+			Debug.WriteLine("MouseEnter => " + this.ToString());
+			#endif
 			MouseEnter.Raise (this, e);
 		}
 		public virtual void onMouseLeave(object sender, MouseMoveEventArgs e)
 		{
+			#if DEBUG_FOCUS
+			Debug.WriteLine("MouseLeave => " + this.ToString());
+			#endif
 			MouseLeave.Raise (this, e);
 		}
 		#endregion

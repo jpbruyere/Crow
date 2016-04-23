@@ -283,7 +283,15 @@ namespace Crow
 				_activeWidget = value;
 
 				if (_activeWidget != null)
+				{
 					_activeWidget.IsActive = true;
+					#if DEBUG_FOCUS
+					Debug.WriteLine("Active => " + _activeWidget.ToString());
+				}else
+					Debug.WriteLine("Active => null");
+					#else
+				}
+					#endif
 			}
 		}
 		public GraphicObject hoverWidget
@@ -293,6 +301,12 @@ namespace Crow
 				if (_hoverWidget == value)
 					return;
 				_hoverWidget = value;
+				#if DEBUG_FOCUS
+				if (_hoverWidget != null)
+				Debug.WriteLine("Hover => " + _hoverWidget.ToString());
+				else
+				Debug.WriteLine("Hover => null");
+				#endif
 			}
 		}
 		public GraphicObject FocusedWidget {
