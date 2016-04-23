@@ -747,7 +747,7 @@ namespace Crow
 				if (Left == 0) {
 
 					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width) ||
-						RegisteredLayoutings.HasFlag (LayoutingType.Width))
+					    RegisteredLayoutings.HasFlag (LayoutingType.Width))
 						return false;
 
 					switch (HorizontalAlignment) {
@@ -763,21 +763,12 @@ namespace Crow
 					}
 				} else
 					Slot.X = Left;
-
-				if (LastSlots.X == Slot.X)
-					break;
-
-				bmp = null;
-
-				OnLayoutChanges (layoutType);
-
-				LastSlots.X = Slot.X;
 				break;
 			case LayoutingType.Y:
 				if (Top == 0) {
 
 					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height) ||
-						RegisteredLayoutings.HasFlag (LayoutingType.Height))
+					    RegisteredLayoutings.HasFlag (LayoutingType.Height))
 						return false;
 
 					switch (VerticalAlignment) {
@@ -791,17 +782,8 @@ namespace Crow
 						Slot.Y = Parent.ClientRectangle.Height / 2 - Slot.Height / 2;
 						break;
 					}
-				}else
+				} else
 					Slot.Y = Top;
-
-				if (LastSlots.Y == Slot.Y)
-					break;
-
-				bmp = null;
-
-				OnLayoutChanges (layoutType);
-
-				LastSlots.Y = Slot.Y;
 				break;
 			case LayoutingType.Width:
 				if (Width.IsFixed)
@@ -813,7 +795,7 @@ namespace Crow
 				else if (Width == Measure.Stretched)
 					Slot.Width = Parent.ClientRectangle.Width;
 				else
-					Slot.Width = (int)Math.Round((double)(Parent.ClientRectangle.Width * Width) / 100.0);
+					Slot.Width = (int)Math.Round ((double)(Parent.ClientRectangle.Width * Width) / 100.0);
 
 				if (Slot.Width < 0)
 					return false;
@@ -826,15 +808,6 @@ namespace Crow
 					Slot.Width = MaximumSize.Width;
 					NotifyValueChanged ("WidthPolicy", Measure.Stretched);
 				}
-
-				if (LastSlots.Width == Slot.Width)
-					break;
-
-				bmp = null;
-
-				OnLayoutChanges (layoutType);
-
-				LastSlots.Width = Slot.Width;
 				break;
 			case LayoutingType.Height:
 				if (Height.IsFixed)
@@ -846,7 +819,7 @@ namespace Crow
 				else if (Height == Measure.Stretched)
 					Slot.Height = Parent.ClientRectangle.Height;
 				else
-					Slot.Height = (int)Math.Round((double)(Parent.ClientRectangle.Height * Height) / 100.0);
+					Slot.Height = (int)Math.Round ((double)(Parent.ClientRectangle.Height * Height) / 100.0);
 
 				if (Slot.Height < 0)
 					return false;
@@ -859,7 +832,51 @@ namespace Crow
 					Slot.Height = MaximumSize.Height;
 					NotifyValueChanged ("HeightPolicy", Measure.Stretched);
 				}
+				break;
+			}
 
+			updateSlot (layoutType);
+
+			//if no layouting remains in queue for item, registre for redraw
+			if (this.registeredLayoutings == LayoutingType.None && bmp == null)
+				this.AddToRedrawList ();
+
+			return true;
+		}
+		protected void updateSlot(LayoutingType layoutType)
+		{
+			switch (layoutType) {
+			case LayoutingType.X:
+				if (LastSlots.X == Slot.X)
+					break;
+
+				bmp = null;
+
+				OnLayoutChanges (layoutType);
+
+				LastSlots.X = Slot.X;				
+				break;
+			case LayoutingType.Y:
+				if (LastSlots.Y == Slot.Y)
+					break;
+
+				bmp = null;
+
+				OnLayoutChanges (layoutType);
+
+				LastSlots.Y = Slot.Y;				
+				break;
+			case LayoutingType.Width:
+				if (LastSlots.Width == Slot.Width)
+					break;
+
+				bmp = null;
+
+				OnLayoutChanges (layoutType);
+
+				LastSlots.Width = Slot.Width;				
+				break;
+			case LayoutingType.Height:
 				if (LastSlots.Height == Slot.Height)
 					break;
 
@@ -867,15 +884,9 @@ namespace Crow
 
 				OnLayoutChanges (layoutType);
 
-				LastSlots.Height = Slot.Height;
+				LastSlots.Height = Slot.Height;				
 				break;
 			}
-
-			//if no layouting remains in queue for item, registre for redraw
-			if (this.registeredLayoutings == LayoutingType.None && bmp == null)
-				this.AddToRedrawList ();
-
-			return true;
 		}
 		#endregion
 

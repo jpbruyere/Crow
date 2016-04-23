@@ -13,6 +13,7 @@ using Crow;
 using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 
 namespace testOTK
@@ -29,63 +30,7 @@ namespace testOTK
 		int frameCpt = 0;
 		int idx = 0;
 
-		string[] testFiles = {
-//			"testTabView.crow",
-			"testCombobox.goml",
-			"testWindow.goml",
-			@"basicTests/5.crow",
-			"testColorList.crow",
-			@"basicTests/0.crow",
-			@"basicTests/4.crow",
-			@"basicTests/1.crow",
-			@"basicTests/2.crow",
-			"test0.goml",
-			"test1.goml",
-			"0.crow",
-			"0.crow",
-			"testCheckbox.goml",
-			"fps.goml",
-			"testExpandable.goml",
-			"0.crow",
-			"testImage.crow",
-			"testOutOfClipUpdate.crow",
-//			"test_Listbox.goml",
-//			"testTreeView.crow",
-			"1.crow",
-			"clip4.crow",
-			"clip3.crow",
-			"clip2.crow",
-			"clip0.crow",
-			"clip1.crow",
-//			"5.crow",
-//			"testCombobox.goml",
-//			"testPopper.goml",
-			"testTextBox.crow",
-
-			"4.crow",
-			"testSpinner.goml",
-			"testScrollbar.goml",
-			"testGroupBox.goml",
-			"testGrid.goml",
-			"testButton.crow",
-			"testBorder.goml",
-//			"testButton2.crow",
-			"test2WayBinding.crow",
-			"test4.goml",
-			"2.crow",
-			"test1.goml",
-			"testWindow2.goml",
-
-			"testWindow3.goml",
-			"testLabel.goml",
-			"testAll.goml",
-//			"testSpinner.goml",
-//			"testRadioButton2.goml",
-			"testContainer.goml",
-			"testRadioButton.goml",
-			"testMsgBox.goml",
-//			"testMeter.goml",
-		};
+		string[] testFiles;
 
 
 		public int intValue = 25;
@@ -146,7 +91,13 @@ namespace testOTK
 			//this.AddWidget(new test4());
 			KeyboardKeyDown += GOLIBTests_KeyboardKeyDown1;;
 
-			GraphicObject obj = CrowInterface.LoadInterface("Interfaces/" + testFiles[idx]);
+
+			testFiles = Directory.GetFiles(@"Interfaces/Stack", "*.crow").ToArray();
+			testFiles = Directory.GetFiles(@"Interfaces/GraphicObject", "*.crow").Concat(testFiles).ToArray();
+			testFiles = Directory.GetFiles(@"Interfaces/Container", "*.crow").Concat(testFiles).ToArray();
+			//testFiles = Directory.GetFiles(@"Interfaces", "*.crow").Concat(testFiles).ToArray();
+
+			GraphicObject obj = CrowInterface.LoadInterface(testFiles[5]);
 			obj.DataSource = this;
 
 		}
@@ -169,7 +120,7 @@ namespace testOTK
 			if (idx == testFiles.Length)
 				idx = 0;
 			this.Title = testFiles [idx];
-			GraphicObject obj = CrowInterface.LoadInterface("Interfaces/" + testFiles[idx]);
+			GraphicObject obj = CrowInterface.LoadInterface(testFiles[idx]);
 			obj.DataSource = this;
 		}
 

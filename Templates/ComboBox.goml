@@ -16,12 +16,12 @@
 	<Border Background="DimGray" BorderWidth="1" Margin="1"		
 		Fit="true">
 		<Scroller  Name="scroller1" Margin="2" VerticalScrolling="true"
-			MinimumSize="{../../../MinimumPopupSize}" MaximumSize="0;400"
-			Fit="true"
+			MinimumSize="{../../../MinimumPopupSize}" MaximumSize="0;200"
+			Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}"
 			HorizontalAlignment="Left"
 			ValueChanged="../../../_scroller_ValueChanged">
 			<VerticalStack LayoutChanged="../../../../_list_LayoutChanged"
-				Height="-1" Width="{../WidthPolicy}" Name="List" Margin="0"
+				Height="Fit" Width="{../WidthPolicy}" Name="List" Margin="0"
 				HorizontalAlignment="Left"
 				VerticalAlignment="Top"/>
 		</Scroller>

@@ -190,6 +190,7 @@ namespace Crow
 			GL.Disable (EnableCap.DepthTest);
 
 			shader.Enable ();
+			GL.ActiveTexture (TextureUnit.Texture0);
 			GL.BindTexture (TextureTarget.Texture2D, texID);
 			lock (CrowInterface.RenderMutex) {
 				if (CrowInterface.IsDirty) {
@@ -284,6 +285,7 @@ namespace Crow
 				this.ClientRectangle.Width,
 				this.ClientRectangle.Height));
 			createContext ();
+			GL.Viewport (0, 0, ClientRectangle.Width, ClientRectangle.Height);
 		}
 		#endregion
 
@@ -319,12 +321,12 @@ namespace Crow
 		#region keyboard Handling
 		void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
 		{
-			if (!CrowInterface.ProcessKeyDown((int)otk_e.Key))
+			//if (!CrowInterface.ProcessKeyDown((int)otk_e.Key))
 				KeyboardKeyDown.Raise (this, otk_e);
         }
 		void Keyboard_KeyUp(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
 		{
-			if (!CrowInterface.ProcessKeyUp((int)otk_e.Key))
+			//if (!CrowInterface.ProcessKeyUp((int)otk_e.Key))
 				KeyboardKeyUp.Raise (this, otk_e);
 		}
 		void OpenTKGameWindow_KeyPress (object sender, OpenTK.KeyPressEventArgs e)

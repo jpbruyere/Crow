@@ -30,5 +30,5 @@
 <!--		<ComboBox/>-->
 	</HorizontalStack>
 	<MessageBox></MessageBox>
-	<Window><Label/></Window>
+<!--	<Window><Label/></Window>-->
 </VerticalStack>

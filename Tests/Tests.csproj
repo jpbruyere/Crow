@@ -62,12 +62,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Interfaces\testBorder.goml.cs" />
-    <Compile Include="..\bin\Debug\Interfaces\testContainer.goml.cs">
-      <Link>Interfaces\testContainer.goml.cs</Link>
-    </Compile>
-    <Compile Include="..\bin\Debug\Interfaces\test_stack.goml.cs">
-      <Link>Interfaces\test_stack.goml.cs</Link>
-    </Compile>
     <Compile Include="GOLIBTestsOTK.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -283,11 +277,42 @@
     <None Include="Interfaces\basicTests\7.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Interfaces\GraphicObject\0.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\GraphicObject\1.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\GraphicObject\2.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Container\0.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Container\1.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Container\2.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Stack\0.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Stack\1.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Stack\2.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Stack\3.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />
     <Folder Include="image\" />
     <Folder Include="Interfaces\basicTests\" />
+    <Folder Include="Interfaces\GraphicObject\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="image\tetra.png" />

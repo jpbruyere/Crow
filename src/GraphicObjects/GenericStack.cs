@@ -218,6 +218,8 @@ namespace Crow
 		{
 			base.OnChildLayoutChanges (sender, arg);
 
+			GraphicObject go = sender as GraphicObject;
+
 			switch (arg.LayoutType) {
 			case LayoutingType.Width:
 				if (Orientation == Orientation.Horizontal) {

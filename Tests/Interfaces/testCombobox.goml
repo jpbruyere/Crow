@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack Width="200">
-	<ComboBox Width="Stretched" Data="{TestList}" SelectedIndex="0"
+<Container Background="Onyx">
+	<ComboBox Width="200" Data="{TestList}" SelectedIndex="0" Background="Mantis"
 		ItemTemplate="#Tests.Interfaces.colorItem.crow"/>
-</VerticalStack>
+</Container>
