@@ -99,7 +99,7 @@ namespace Crow
 		public OpenTKGameWindow(int _width, int _height, string _title="Crow")
 			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 1),
 				_title,GameWindowFlags.Default,DisplayDevice.GetDisplay(DisplayIndex.Second),
-				3,3,OpenTK.Graphics.GraphicsContextFlags.Debug)
+				3,3,OpenTK.Graphics.GraphicsContextFlags.Default)
 //		public OpenTKGameWindow(int _width, int _height, string _title="golib")
 //			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), _title)
 		{
@@ -131,7 +131,7 @@ namespace Crow
 			
 			while (true) {
 				CrowInterface.Update ();
-				Thread.Sleep (5);
+				Thread.Sleep (1);
 			}
 		}
 
