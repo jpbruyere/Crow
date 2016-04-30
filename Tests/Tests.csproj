@@ -165,9 +165,6 @@
     <None Include="Interfaces\Stack\4.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Interfaces\Divers\1.crow">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Interfaces\Divers\2.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -341,6 +338,12 @@
     <None Include="Interfaces\Nouveau dossier\testTreeView.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Interfaces\Splitter\1.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Splitter\1 %28copier%29.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />
@@ -351,6 +354,7 @@
     <Folder Include="Interfaces\Divers\" />
     <Folder Include="Interfaces\Nouveau dossier\" />
     <Folder Include="Interfaces\Expandable\" />
+    <Folder Include="Interfaces\Splitter\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="image\tetra.png" />

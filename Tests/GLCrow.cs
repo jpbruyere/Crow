@@ -97,13 +97,15 @@ namespace Tests
 
 		public override void OnLoad ()
 		{
-			testFiles = Directory.GetFiles(@"Interfaces/Expandable", "*.crow").ToArray();
-			testFiles = Directory.GetFiles(@"Interfaces/GraphicObject", "*.crow").Concat(testFiles).ToArray();
-			testFiles = Directory.GetFiles(@"Interfaces/Container", "*.crow").Concat (testFiles).ToArray();
-			testFiles = Directory.GetFiles(@"Interfaces/Group", "*.crow").Concat (testFiles).ToArray();
-			testFiles = Directory.GetFiles(@"Interfaces/Stack", "*.crow").Concat (testFiles).ToArray();
-			testFiles = Directory.GetFiles(@"Interfaces/basicTests", "*.crow").Concat (testFiles).ToArray();
-			testFiles = Directory.GetFiles (@"Interfaces/Divers", "*.crow").Concat (testFiles).ToArray ();
+			testFiles = new string [0];
+			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
+			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/basicTests", "*.crow")).ToArray ();
+			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
+			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
+			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Stack", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Splitter", "*.crow")).ToArray ();
+			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Expandable", "*.crow")).ToArray ();
+			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
 
 			//testFiles = Directory.GetFiles(@"Interfaces", "*.crow").Concat(testFiles).ToArray();
 			this.Title = testFiles [idx];

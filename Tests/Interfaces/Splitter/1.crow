@@ -1,0 +1,30 @@
+﻿<?xml version="1.0"?>
+<HorizontalStack Width="80%" Height="50%">
+	<Border Width="45%" CornerRadius="10" BorderWidth="1">
+		<VerticalStack>
+			<VerticalStack Height="45%">
+				<CheckBox Height="25%" IsChecked="false" Caption="Check 1" Background="hgradient|0:LimeGreen|1:Transparent"/>
+				<CheckBox Height="25%" IsChecked="false" Caption="Check 2"  Background="hgradient|0:LimeGreen|1:Transparent"/>
+				<CheckBox Height="25%" IsChecked="true" Caption="Check 3"  Background="hgradient|0:LimeGreen|1:Transparent"/>
+				<CheckBox Height="25%" IsChecked="false" Caption="Check 4" Background="hgradient|0:LimeGreen|1:Transparent"/>
+			</VerticalStack>
+			<Splitter Thickness="3"/>
+			<VerticalStack Height="45%">
+				<CheckBox Height="25%" IsChecked="false" Caption="Check 1" Background="hgradient|0:LimeGreen|1:Transparent"/>
+				<CheckBox Height="25%" IsChecked="false" Caption="Check 2"  Background="hgradient|0:LimeGreen|1:Transparent"/>
+				<CheckBox Height="25%" IsChecked="true" Caption="Check 3"  Background="hgradient|0:LimeGreen|1:Transparent"/>
+				<CheckBox Height="25%" IsChecked="false" Caption="Check 4" Background="hgradient|0:LimeGreen|1:Transparent"/>
+			</VerticalStack>
+		</VerticalStack>
+	</Border>
+	<Splitter Thickness="3"/>
+	<Border Width="45%" CornerRadius="10" BorderWidth="1">
+		<VerticalStack Width="50%" Height="50%" Background="Onyx">
+			<RadioButton IsChecked="false" Caption="Choice 1" Background="hgradient|0:DarkRed|1:Transparent"/>
+			<RadioButton IsChecked="false" Caption="Choice 2"  Background="hgradient|0:DarkRed|1:Transparent"/>
+			<RadioButton IsChecked="true" Caption="Choice 3"  Background="hgradient|0:DarkRed|1:Transparent"/>
+			<RadioButton IsChecked="false" Caption="Choice 4" Background="hgradient|0:DarkRed|1:Transparent"/>
+		</VerticalStack>
+	</Border>
+	<Splitter Thickness="3"/>
+</HorizontalStack>

@@ -178,7 +178,8 @@ namespace GLC
 				Environment.Exit (1);
 			}
 			Debug.WriteLine("GLFW: " + Glfw.GetVersionString ());
-			// Create GLFW window
+			// Create GLFW window.
+
 			Glfw.WindowHint(WindowHint.Samples, 1);
 			Glfw.WindowHint(WindowHint.ContextVersionMajor, 3 );
 			Glfw.WindowHint(WindowHint.ContextVersionMinor, 3);
@@ -317,6 +318,7 @@ namespace GLC
 					CrowInterface.DirtyRect.Left, CrowInterface.DirtyRect.Top,
 					CrowInterface.DirtyRect.Width, CrowInterface.DirtyRect.Height,
 					PixelFormat.Bgra, PixelType.UnsignedByte, CrowInterface.dirtyBmp);
+				//TODO:use pbo
 				//updatePBOs ();		
 				CrowInterface.IsDirty = false;
 			}
