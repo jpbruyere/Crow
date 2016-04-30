@@ -1,4 +1,0 @@
-﻿<?xml version="1.0"?>
-<Container Background="Green" Margin="10">
-	<GraphicObject Margin="10" Width="{../WidthPolicy}" Height="{../HeightPolicy}" Background="Red"/>
-</Container>

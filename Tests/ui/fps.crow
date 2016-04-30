@@ -1,0 +1,55 @@
+﻿<?xml version="1.0"?>
+<Window Font="droid bold, 10" Title="Open GL" Width="120" Height="200"
+	MinimumSize="160;250"
+	Template="#GLC.ui.tmpWindow.crow"
+	HorizontalAlignment="Right" Top="10">
+	<VerticalStack Height="Fit" Width="95%" Spacing="10">
+		<HorizontalStack Height="Fit" Width="Stretched">
+			<Label Text="Frame:" Width="25%" TextAlignment="Right" Background="Mantis"/>
+			<Label Text="{frameTime}" Font="droid , 12" Width="75%"
+				TextAlignment="Center" Background="Teal"/>
+		</HorizontalStack>
+		<HorizontalStack Height="Fit" Width="Stretched">
+			<Label Text="Max:" Width="25%" TextAlignment="Right" Background="Mantis"/>
+			<Label Text="{frameMax}" Font="droid , 12" Width="75%"
+				TextAlignment="Center" Background="Teal"/>
+		</HorizontalStack>
+		<HorizontalStack Height="Fit" Width="Stretched">
+			<Label Text="Min:" Width="25%" TextAlignment="Right" Background="Mantis"/>
+			<Label Text="{frameMin}" Font="droid , 12" Width="75%"
+				TextAlignment="Center" Background="Teal"/>
+		</HorizontalStack>
+		<HorizontalStack Height="Fit" Width="Stretched">
+			<Label Text="Fps:" Width="30%" TextAlignment="Right" Background="Onyx"/>
+			<Label Text="{fps}" Font="droid , 12" Width="70%"
+				TextAlignment="Center" Background="Teal"/>
+		</HorizontalStack>
+		<HorizontalStack Height="Fit" Width="Stretched">
+			<Label Text="Min:" Width="30%" TextAlignment="Right" Background="Mantis"/>
+			<Label Text="{fpsMin}" Font="droid , 12" Width="70%"
+				TextAlignment="Center" Background="Teal"/>
+		</HorizontalStack>
+		<HorizontalStack Height="Fit" Width="Stretched">
+			<Label Text="Max:" Width="30%" TextAlignment="Right" Background="Mantis"/>
+			<Label Text="{fpsMax}" Font="droid , 12" Width="70%"
+				TextAlignment="Center" Background="Teal"/>
+		</HorizontalStack>
+		<Button Caption="Reset Min/Max times" MouseClick="onResetTimes"/>
+<!--		<HorizontalStack Fit="true">
+			<Label Text="GPU Mem:" TextAlignment="Right"/>
+			<Label Text="{gpuTotalMem}" Font="droid , 12" Width="50"
+				TextAlignment="Center" Background="Teal"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Text="GPU Mem:" TextAlignment="Right"/>
+			<Label Text="{gpuDedicatedMem}" Font="droid , 12" Width="50"
+				TextAlignment="Center" Background="Teal"/>
+		</HorizontalStack>
+		<HorizontalStack Fit="true">
+			<Label Text="GPU Mem:"  TextAlignment="Right"/>
+			<Label Text="{gpuFreeMem}" Font="droid , 12" Width="50"
+				TextAlignment="Center" Background="Teal"/>
+		</HorizontalStack>-->
+		<Button Caption="Update GPU mem info" MouseClick="onUpdateGPUMemInfo"/>
+	</VerticalStack>				
+</Window>

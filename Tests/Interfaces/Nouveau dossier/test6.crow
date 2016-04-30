@@ -1,0 +1,32 @@
+﻿<?xml version="1.0"?>
+<Border BorderWidth="1" Foreground="White" CornerRadius="10" Width="500" Height="300">
+	<VerticalStack Height="Stretched" Background="0,4;0,4;0,4;0,4">
+		<Border BorderWidth="1" Foreground="White"  Height="20" Background="0,1;0,5;1,0;0,5">
+			<HorizontalStack Name="hs" Margin="1" Spacing="1" Height="Fit" >
+				<GraphicObject Width="5"/>
+				<Image Name="Image" Margin="1" Width="12" Height="12" Path="#go.Images.Icons.tetra.png"/>
+				<Label Foreground="White" Width="Stretched" Name="Title" Margin="1" TextAlignment="Center" />
+				<Border CornerRadius="6" BorderWidth="1" Margin="0" Foreground="Transparent"  Height="12" Width="12"
+					MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
+					<Image Focusable="true" Name="Image" Margin="0" Width="Stretched" Height="Stretched" 
+					Path="#go.Images.Icons.exit2.svg"/>
+				</Border>
+				<GraphicObject Width="5"/>
+			</HorizontalStack>
+		</Border>
+<!--		<Container Name="Content"/>-->
+		<HorizontalStack Spacing="10">
+			<GraphicObject Width="30"/>
+			<Image Name="Image" Width="40" Height="40" Background="Red"
+				Path="#go.Images.Icons.iconInfo.svg" />
+			<Label Font="serif, 12" Width="Stretched" Height="Stretched" Text="MessageBox"
+				Multiline="true" WordWrap="true"/>
+			<GraphicObject Width="30"/>
+		</HorizontalStack>
+		<HorizontalStack Height="Fit" Margin="5">
+			<GraphicObject/>
+			<Button Text="Ok"/>
+			<Button Text="Cancel"/>
+		</HorizontalStack>
+	</VerticalStack>
+</Border>

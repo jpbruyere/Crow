@@ -655,6 +655,7 @@ namespace Crow
 			if (!FocusedWidget.MouseRepeat)
 				return true;
 			mouseRepeatThread = new Thread (mouseRepeatThreadFunc);
+			mouseRepeatThread.IsBackground = true;
 			mouseRepeatThread.Start ();
 			return true;
 		}
@@ -685,8 +686,7 @@ namespace Crow
 		#endregion
 
 		#region Keyboard
-		public bool ProcessKeyDown(int Key){
-			Keyboard.SetKeyState ((Crow.Key)Key, true);
+		public bool ProcessKeyDown(int Key){			
 			if (_focusedWidget == null)
 				return false;
 			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
@@ -694,7 +694,6 @@ namespace Crow
 			return true;
 		}
 		public bool ProcessKeyUp(int Key){
-			Keyboard.SetKeyState ((Crow.Key)Key, false);
 			if (_activeWidget == null)
 				return false;
 			//KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);

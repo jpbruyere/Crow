@@ -672,7 +672,6 @@ namespace Crow
 		}
 		/// <summary> By default in groups, LayoutingType.ArrangeChildren is reset </summary>
 		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){
-
 		}
 		public virtual bool ArrangeChildren { get { return false; } }
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
@@ -680,9 +679,9 @@ namespace Crow
 				return;
 			lock (Interface.CurrentInterface.LayoutMutex) {
 				//dont set position for stretched item
-				if (Width == 0)
+				if (Width == Measure.Stretched)
 					layoutType &= (~LayoutingType.X);
-				if (Height == 0)
+				if (Height == Measure.Stretched)
 					layoutType &= (~LayoutingType.Y);
 
 				if (!ArrangeChildren)
@@ -786,52 +785,58 @@ namespace Crow
 					Slot.Y = Top;
 				break;
 			case LayoutingType.Width:
-				if (Width.IsFixed)
-					Slot.Width = Width;
-				else if (Width == Measure.Fit) {
-					Slot.Width = measureRawSize (LayoutingType.Width);
-				} else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
-					return false;
-				else if (Width == Measure.Stretched)
-					Slot.Width = Parent.ClientRectangle.Width;
-				else
-					Slot.Width = (int)Math.Round ((double)(Parent.ClientRectangle.Width * Width) / 100.0);
+				if (Visible) {
+					if (Width.IsFixed)
+						Slot.Width = Width;
+					else if (Width == Measure.Fit) {
+						Slot.Width = measureRawSize (LayoutingType.Width);
+					} else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+						return false;
+					else if (Width == Measure.Stretched)
+						Slot.Width = Parent.ClientRectangle.Width;
+					else
+						Slot.Width = (int)Math.Round ((double)(Parent.ClientRectangle.Width * Width) / 100.0);
 
-				if (Slot.Width < 0)
-					return false;
+					if (Slot.Width < 0)
+						return false;
 
-				//size constrain
-				if (Slot.Width < MinimumSize.Width) {
-					Slot.Width = MinimumSize.Width;
-					NotifyValueChanged ("WidthPolicy", Measure.Stretched);
-				} else if (Slot.Width > MaximumSize.Width && MaximumSize.Width > 0) {
-					Slot.Width = MaximumSize.Width;
-					NotifyValueChanged ("WidthPolicy", Measure.Stretched);
-				}
+					//size constrain
+					if (Slot.Width < MinimumSize.Width) {
+						Slot.Width = MinimumSize.Width;
+						NotifyValueChanged ("WidthPolicy", Measure.Stretched);
+					} else if (Slot.Width > MaximumSize.Width && MaximumSize.Width > 0) {
+						Slot.Width = MaximumSize.Width;
+						NotifyValueChanged ("WidthPolicy", Measure.Stretched);
+					}
+				} else
+					Slot.Width = 0;
 				break;
 			case LayoutingType.Height:
-				if (Height.IsFixed)
-					Slot.Height = Height;
-				else if (Height == Measure.Fit) {
-					Slot.Height = measureRawSize (LayoutingType.Height);
-				} else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height))
-					return false;
-				else if (Height == Measure.Stretched)
-					Slot.Height = Parent.ClientRectangle.Height;
-				else
-					Slot.Height = (int)Math.Round ((double)(Parent.ClientRectangle.Height * Height) / 100.0);
+				if (Visible) {
+					if (Height.IsFixed)
+						Slot.Height = Height;
+					else if (Height == Measure.Fit) {
+						Slot.Height = measureRawSize (LayoutingType.Height);
+					} else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height))
+						return false;
+					else if (Height == Measure.Stretched)
+						Slot.Height = Parent.ClientRectangle.Height;
+					else
+						Slot.Height = (int)Math.Round ((double)(Parent.ClientRectangle.Height * Height) / 100.0);
 
-				if (Slot.Height < 0)
-					return false;
+					if (Slot.Height < 0)
+						return false;
 
-				//size constrain
-				if (Slot.Height < MinimumSize.Height) {
-					Slot.Height = MinimumSize.Height;
-					NotifyValueChanged ("HeightPolicy", Measure.Stretched);
-				} else if (Slot.Height > MaximumSize.Height && MaximumSize.Height > 0) {
-					Slot.Height = MaximumSize.Height;
-					NotifyValueChanged ("HeightPolicy", Measure.Stretched);
-				}
+					//size constrain
+					if (Slot.Height < MinimumSize.Height) {
+						Slot.Height = MinimumSize.Height;
+						NotifyValueChanged ("HeightPolicy", Measure.Stretched);
+					} else if (Slot.Height > MaximumSize.Height && MaximumSize.Height > 0) {
+						Slot.Height = MaximumSize.Height;
+						NotifyValueChanged ("HeightPolicy", Measure.Stretched);
+					}
+				} else
+					Slot.Height = 0;
 				break;
 			}
 

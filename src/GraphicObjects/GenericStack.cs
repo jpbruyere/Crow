@@ -50,11 +50,18 @@ namespace Crow
 		}
 		protected override int measureRawSize (LayoutingType lt)
 		{
+			int totSpace = 0;
+			for (int i = 0; i < Children.Count; i++) {
+				if (Children [i].Visible)
+					totSpace += Spacing;
+			}
+			if (totSpace > 0)
+				totSpace -= Spacing;
 			if (lt == LayoutingType.Width) {
 				if (Orientation == Orientation.Horizontal)
-					return contentSize.Width + (Children.Count - 1) * Spacing + 2 * Margin;
+					return contentSize.Width + totSpace + 2 * Margin;
 			}else if (Orientation == Orientation.Vertical)
-				return contentSize.Height + (Children.Count - 1) * Spacing + 2 * Margin;							
+				return contentSize.Height + totSpace + 2 * Margin;							
 			
 			return base.measureRawSize (lt);
 		}
@@ -103,7 +110,7 @@ namespace Crow
 		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
 			GraphicObject go = sender as GraphicObject;
-			Debug.WriteLine ("child layout change: " + go.LastSlots.ToString() + " => " + go.Slot.ToString());
+			//Debug.WriteLine ("child layout change: " + go.LastSlots.ToString() + " => " + go.Slot.ToString());
 			switch (arg.LayoutType) {
 			case LayoutingType.Width:
 				if (Orientation == Orientation.Horizontal) {

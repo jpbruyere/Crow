@@ -1,6 +1,0 @@
-﻿<?xml version="1.0"?>
-<Container Width="200" Height="100" Background="DimGray" Margin="5">
-	<Container Width="0" Height="300" Background="DarkBlue">
-		<Label Text="{fps}" Background="BlueCrayola" VerticalAlignment="Center"/>
-	</Container>
-</Container>

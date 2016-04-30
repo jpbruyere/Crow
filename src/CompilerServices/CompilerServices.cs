@@ -46,11 +46,11 @@ namespace Crow
 		}
 	}
 	public class Binding{
-		static int bindingCpt = 0;
+		static int bindingCpt;
 		string dynMethodId = "";
-		bool resolved = false;
+		bool resolved;
 
-		public bool TwoWayBinding = false;
+		public bool TwoWayBinding;
 
 		public string NewDynMethodId {
 			get {
@@ -150,7 +150,9 @@ namespace Crow
 				}
 				while (ptr < bindingExp.Length - 1) {
 					if (tmp == null) {
+						#if DEBUG_BINDING
 						Debug.WriteLine ("\tERROR: target not found => " + this.ToString());
+						#endif
 						return false;
 					}
 					if (bindingExp [ptr] == "..")
@@ -165,7 +167,9 @@ namespace Crow
 				}
 
 				if (tmp == null) {
+					#if DEBUG_BINDING
 					Debug.WriteLine ("\tERROR: target not found => " + this.ToString());
+					#endif
 					return false;
 				}
 
@@ -190,7 +194,7 @@ namespace Crow
 				if (TwoWayBinding) {
 					IBindable source = Source.Instance as IBindable;
 					if (source == null)
-						throw new Exception (Target.Instance.ToString() + " does not implement IBindable for 2 way bindings");
+						throw new Exception (Target.Instance + " does not implement IBindable for 2 way bindings");
 					source.Bindings.Add (new Binding (Source, Target));
 				}
 				return true;
@@ -222,9 +226,9 @@ namespace Crow
 				return;
 			if (Bindings.Count == 0)
 				return;
-			#if DEBUG_BINDING
+#if DEBUG_BINDING
 			Debug.WriteLine ("Resolve Bindings => " + this.ToString ());
-			#endif
+#endif
 			//grouped bindings by Instance of Source
 			Dictionary<object,List<Binding>> resolved = new Dictionary<object, List<Binding>>();
 
@@ -248,9 +252,9 @@ namespace Crow
 						Delegate del = Delegate.CreateDelegate (b.Target.Event.EventHandlerType, b.Source.Instance, b.Source.Method);
 						addHandler.Invoke (b.Target.Instance, new object[] { del });
 
-						#if DEBUG_BINDING
+#if DEBUG_BINDING
 						Debug.WriteLine ("\tHandler binded => " + b.ToString());
-						#endif
+#endif
 						b.Resolved = true;
 					} catch (Exception ex) {
 						Debug.WriteLine ("\tERROR: " + ex.ToString());
@@ -294,7 +298,7 @@ namespace Crow
 				System.Reflection.Emit.Label[] jumpTable = null;
 				System.Reflection.Emit.Label endMethod = new System.Reflection.Emit.Label();
 
-				#region Retrieve EventHandler parameter type
+#region Retrieve EventHandler parameter type
 				//EventInfo ei = targetType.GetEvent ("ValueChanged");
 				//no dynamic update if ValueChanged interface is not implemented
 				if (source_Type.GetInterfaces().Contains(typeof(IValueChange))){
@@ -328,11 +332,11 @@ namespace Crow
 					il.Emit(OpCodes.Ldloc_0);
 					il.Emit(OpCodes.Brfalse, endMethod);
 				}
-				#endregion
+#endregion
 
 				i = 0;
 				foreach (Binding b in grouped) {
-					#region initialize target with actual value
+#region initialize target with actual value
 					object targetValue = null;
 					if (b.Source.Member != null){
 						if (b.Source.Member.MemberType == MemberTypes.Property)
@@ -363,7 +367,7 @@ namespace Crow
 					else
 						b.Target.Property.GetSetMethod ().Invoke
 						(b.Target.Instance, new object[] { targetValue });
-					#endregion
+#endregion
 
 					//if no dyn update, skip jump table
 					if (il == null)
@@ -437,17 +441,17 @@ namespace Crow
 		/// <param name="es">Event binding details</param>
 		public static void CompileEventSource(Binding binding)
 		{
-			#if DEBUG_BINDING
+#if DEBUG_BINDING
 			Debug.WriteLine ("\tCompile Event Source => " + binding.ToString());
-			#endif
+#endif
 
 			Type target_type = binding.Target.Instance.GetType();
 
-			#region Retrieve EventHandler parameter type
+#region Retrieve EventHandler parameter type
 			MethodInfo evtInvoke = binding.Target.Event.EventHandlerType.GetMethod ("Invoke");
 			ParameterInfo[] evtParams = evtInvoke.GetParameters ();
 			Type handlerArgsType = evtParams [1].ParameterType;
-			#endregion
+#endregion
 
 			Type[] args = {typeof(object), typeof(object),handlerArgsType};
 			DynamicMethod dm = new DynamicMethod(binding.NewDynMethodId,
@@ -456,7 +460,7 @@ namespace Crow
 				target_type);
 
 
-			#region IL generation
+#region IL generation
 			ILGenerator il = dm.GetILGenerator(256);
 
 			string src = binding.Expression.Trim();
@@ -478,7 +482,7 @@ namespace Crow
 				string lop = operandes [0].Trim ();
 				string rop = operandes [operandes.Length-1].Trim ();
 
-				#region LEFT OPERANDES
+#region LEFT OPERANDES
 				GraphicObject lopObj = binding.Target.Instance as GraphicObject;	//default left operand base object is
 				//the first arg (object sender) of the event handler
 
@@ -520,9 +524,9 @@ namespace Crow
 				default:
 					throw new Exception (string.Format("GOML:member type not handle: {0}", lopParts[i]));
 				}
-				#endregion
+#endregion
 
-				#region RIGHT OPERANDES
+#region RIGHT OPERANDES
 				if (rop.StartsWith("\'")){
 					if (!rop.EndsWith("\'"))
 						throw new Exception (string.Format
@@ -544,7 +548,7 @@ namespace Crow
 					il.Emit(OpCodes.Unbox_Any, lopT);
 				}
 
-				#endregion
+#endregion
 
 				//emit left operand assignment
 				il.Emit(lopSetOC, lopSetMbi);
@@ -552,7 +556,7 @@ namespace Crow
 
 			il.Emit(OpCodes.Ret);
 
-			#endregion
+#endregion
 
 			Delegate del = dm.CreateDelegate(binding.Target.Event.EventHandlerType, binding.Target.Instance);
 			MethodInfo addHandler = binding.Target.Event.GetAddMethod ();
@@ -561,7 +565,7 @@ namespace Crow
 			binding.Resolved = true;
 		}
 
-		#region conversions
+#region conversions
 
 		internal static MethodInfo GetConvertMethod( Type targetType )
 		{
@@ -588,7 +592,7 @@ namespace Crow
 
 			return typeof( Convert ).GetMethod( name, BindingFlags.Static | BindingFlags.Public, null, new Type[] { typeof( object ) }, null );
 		}
-		#endregion
+#endregion
 			
 		public static FieldInfo GetEventHandlerField(Type type, string eventName)
 		{

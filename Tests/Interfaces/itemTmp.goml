@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <Border BorderWidth="3">
-	<Label Text="{Name}" Focusable="true" Width="0" Height="-1" Margin="0"
+	<Label Text="{Name}" Focusable="true" Width="Stretched" Height="Fit" Margin="0"
 			MouseEnter="{Background=Red}"
 			MouseLeave="{Background=Transparent}"
 	/>

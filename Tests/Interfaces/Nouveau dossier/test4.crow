@@ -1,0 +1,169 @@
+﻿<?xml version="1.0"?>
+<Group Name="MainGrp"
+	Width="800" Height="500"
+	Background="0,5;0,5;0,5;0,5" Foreground="White"
+	Margin="10" >
+	<Border Margin="10" CornerRadius="10"
+		Name="mainBorder"
+		BorderWidth="2" Foreground="Transparent"
+		Focusable="True"
+		MouseEnter="{Foreground = White}"
+		MouseLeave="{Foreground = Transparent}">
+		<HorizontalStack WidgetSpacing="1">
+			<VerticalStack Width="Fit">
+				<HorizontalStack WidgetSpacing="1" Fit="true">
+					<VerticalStack Fit="true">
+						<Label Text="{MousePosition}"/>
+						<HorizontalStack  Name="hsFocus" Fit="true">
+							<Label Text="Focused:"/>
+							<Label Name="labFocus"/>
+						</HorizontalStack>
+						<HorizontalStack Fit="true">
+							<Label Text="Active:"  Name="hsActive"/>
+							<Label Name="labActive"/>
+						</HorizontalStack>
+						<HorizontalStack Fit="true">
+							<Label Text="Hover:"  Name="hsHover"/>
+							<Label Name="labHover"/>
+						</HorizontalStack>
+					</VerticalStack>
+					<VerticalStack Fit="true">					
+						<CheckBox Name="chk1"/>
+						<CheckBox Name="chk2" IsChecked="true"/>
+
+					</VerticalStack>
+					<VerticalStack Fit="true">
+						<RadioButton IsChecked="true"/>
+						<RadioButton/>
+						<Button MouseClick="onButClick"/>
+					</VerticalStack>
+				</HorizontalStack>
+				<TextBox Name="textbox1" TextAlignment="Left" Font="droid,14"						
+								Width="200" Height="Fit" Margin="2" Background="White"
+								Forground="Black"
+								Foreground="DimGray" BorderWidth="1"
+								Text="editable text"/>
+				<Popper Width="100">
+					<Border Fit="True" Background="ArmyGreen">
+						<Image Margin="10" Fit="true" Path="#Crow.Images.Icons.tetra.png"/>
+					</Border>
+				</Popper>
+
+			</VerticalStack>
+			<VerticalStack Fit="true"  Margin="0" WidgetSpacing="1">
+				<Button  Margin="1" Width="150" Height="100">
+					<Image Path="#Tests.image.tetra.png"/>
+				</Button>
+				<Popper Width="100">
+					<Border Fit="True" Background="ArmyGreen">
+						<Image Margin="10" Fit="true" Path="#Crow.Images.Icons.tetra.png"/>
+					</Border>
+				</Popper>
+				<Expandable Name="expander" Width="150" Height="Fit">
+					<VerticalStack Name="vsExpanded" Width="100">
+						<CheckBox Name="chk1"/>
+						<CheckBox Name="chk2" IsChecked="true"/>
+						<CheckBox Name="chk3"/>
+						<CheckBox Name="chk4"/>
+					</VerticalStack>		
+				</Expandable>
+				<Expandable Name="expander2" Width="150" Height="Fit">
+					<VerticalStack Name="vsExpanded" Width="100">
+						<CheckBox Name="chk1"/>
+						<CheckBox Name="chk2" IsChecked="true"/>
+					</VerticalStack>		
+				</Expandable>
+				<Expandable Name="expander3" Width="150" Height="Fit">
+					<VerticalStack Name="vsExpanded" Width="100">
+						<CheckBox Name="chk1" IsChecked="true"/>
+						<CheckBox Name="chk2"/>
+					</VerticalStack>		
+				</Expandable>
+				<HorizontalStack>
+					<Label Text="Update" FontColor="White"/>
+					<Label Name="labUpdate" Text="{update}" FontSize="16" Width="60" TextAlignment="Center" Background="DarkGreen"/>
+				</HorizontalStack>
+				<HorizontalStack>
+					<Label Text="Fps:" Width = "30"/>
+					<Label Name="labFps" Text="{fps}" Font="droid bold, 14"
+						TextAlignment="Center" Background="AoEnglish"/>
+				</HorizontalStack>
+				<HorizontalStack>
+					<Label Text="Min:" Width = "30"/>
+					<Label Name="labFpsMin" Text="{fpsMin}" Font="droid bold, 14"
+						TextAlignment="Center" Background="AoEnglish"/>
+				</HorizontalStack>
+				<HorizontalStack>
+					<Label Text="Max:" Width = "30"/>
+					<Label Name="labFpsMax" Text="{fpsMax}" Font="droid bold, 14"
+						TextAlignment="Center" Background="AoEnglish"/>
+				</HorizontalStack>
+			</VerticalStack>
+			<HorizontalStack Width="Fit">
+				<Scroller Name="scroller1" Background="DimGray" Width="Fit"  
+					 Margin="5" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">
+					<VerticalStack Name="colors" VerticalAlignment="Top" Margin="1" Fit="true">
+<!--						<ProgressBar Name="pbBar2" Width="100" Height="20" Value="50"
+									BorderWidth="2" Foreground="White" Foreground="BlueCrayola" Background="DarkGray"/>
+						<ProgressBar Width="100" Height="20" Value="{fps}" BorderWidth="2"
+							Foreground="White" Foreground="BlueCrayola" Background="DarkGray"/>												-->
+					</VerticalStack>
+				</Scroller>
+				<ScrollBar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" MaximumScroll="{../scroller1.MaximumScroll}"
+					Orientation="Vertical" Width="10" Height="Stretched"/>
+			</HorizontalStack>
+		</HorizontalStack>
+<!--		<HorizontalStack Name="hs0"
+			WidgetSpacing="1" 
+			VerticalAlignment="Top">
+			<Slider Orientation="Vertical" Height="300" Width="10" Background="Transparent" />
+			<VerticalStack Name="vs1" Spacing="5">
+				<Slider Height="10" Width="300" BorderWidth="1" Background="Transparent" />
+				<HorizontalStack WidgetSpacing="10">
+					
+
+					<Spinner Width="50" Value="5"></Spinner>
+				</HorizontalStack>
+				<HorizontalStack Name="hsPbar" Margin="5">
+					<ProgressBar Name="pbBar" 
+						Width="200" Height="20"
+						Minimum="0"
+						Maximum="200"
+						Value="{fps}"
+						Foreground="BlueCrayola" Background="DarkGray"
+						BorderWidth="2" Foreground="White"/>
+				</HorizontalStack>
+
+				<Button  Margin="5" BorderWidth="Stretched" Width="Fit" Height="Fit"  HorizontalAlignment="Center">
+					<Label FontSize="18" Text="This is a test" Margin="5" Foreground="Black" />
+				</Button>
+
+				<GroupBox Title="Group Box" Width="300" Height="100" 
+					Foreground="White" BorderWidth="2" Margin="3">
+					<Label Name="labValue" FontSize="14" Text="{../../slider.Value}" TextAlignment="Center"/>
+				</GroupBox>
+				<Slider Height="10" Width="300" BorderWidth="1" Background="Transparent" />
+				<GraduatedSlider Name="slider" Height="30" Width="300" Foreground="BlueBell"/>
+			</VerticalStack>
+	
+			<HorizontalStack Height="350" Width="Fit">
+				<Scroller Name="scroller1" Background="DimGray" Height="Stretched" Width="Fit"  
+					 Margin="5" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">
+					<VerticalStack Name="colors" VerticalAlignment="Top" Margin="1">
+						<ProgressBar Name="pbBar2" Width="100" Height="20" Value="50"
+									BorderWidth="2" Foreground="White" Foreground="BlueCrayola" Background="DarkGray"/>
+						<ProgressBar Width="100" Height="20" Value="{fps}" BorderWidth="2"
+							Foreground="White" Foreground="BlueCrayola" Background="DarkGray"/>												
+					</VerticalStack>
+				</Scroller>
+				<Scrollbar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" MaximumScroll="{../scroller1.MaximumScroll}"
+					Orientation="Vertical" Width="16" />
+			</HorizontalStack>
+		</HorizontalStack>
+-->
+<!--		<Slider 
+			Height="20" Width="100" 
+			Background="Transparent"
+			VerticalAlignment="Bottom" />-->
+		</Border>
+</Group>
