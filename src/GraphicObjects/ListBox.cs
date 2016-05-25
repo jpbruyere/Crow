@@ -207,6 +207,9 @@ namespace Crow
 		}
 		protected void _list_LayoutChanged (object sender, LayoutingEventArgs e)
 		{
+#if DEBUG_LAYOUTING
+			Debug.WriteLine("list_LayoutChanged");
+#endif
 			if (_gsList.Orientation == Orientation.Horizontal) {
 				if (e.LayoutType == LayoutingType.Width)
 					_gsList.Width = approxSize;

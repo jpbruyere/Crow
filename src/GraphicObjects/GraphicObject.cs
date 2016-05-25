@@ -398,7 +398,8 @@ namespace Crow
 				if (Parent is GenericStack)
 					(Parent as GraphicObject).RegisterForLayouting (LayoutingType.ArrangeChildren);
 
-				RegisterForLayouting (LayoutingType.Sizing);
+				if (_isVisible)
+					RegisterForLayouting (LayoutingType.Sizing);
 				RegisterForGraphicUpdate ();
 
 				NotifyValueChanged ("Visible", _isVisible);
@@ -803,10 +804,10 @@ namespace Crow
 					//size constrain
 					if (Slot.Width < MinimumSize.Width) {
 						Slot.Width = MinimumSize.Width;
-						NotifyValueChanged ("WidthPolicy", Measure.Stretched);
+						//NotifyValueChanged ("WidthPolicy", Measure.Stretched);
 					} else if (Slot.Width > MaximumSize.Width && MaximumSize.Width > 0) {
 						Slot.Width = MaximumSize.Width;
-						NotifyValueChanged ("WidthPolicy", Measure.Stretched);
+						//NotifyValueChanged ("WidthPolicy", Measure.Stretched);
 					}
 				} else
 					Slot.Width = 0;
@@ -830,10 +831,10 @@ namespace Crow
 					//size constrain
 					if (Slot.Height < MinimumSize.Height) {
 						Slot.Height = MinimumSize.Height;
-						NotifyValueChanged ("HeightPolicy", Measure.Stretched);
+						//NotifyValueChanged ("HeightPolicy", Measure.Stretched);
 					} else if (Slot.Height > MaximumSize.Height && MaximumSize.Height > 0) {
 						Slot.Height = MaximumSize.Height;
-						NotifyValueChanged ("HeightPolicy", Measure.Stretched);
+						//NotifyValueChanged ("HeightPolicy", Measure.Stretched);
 					}
 				} else
 					Slot.Height = 0;

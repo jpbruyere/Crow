@@ -58,19 +58,19 @@ namespace Tests
 		public IList<String> List2 = new List<string>(new string[]
 			{
 				"string1",
-				"string2",
-				"string3",
-				"string4",
-				"string5",
-				"string6",
-				"string7",
-				"string8",
-				"string8",
-				"string8",
-				"string8",
-				"string8",
-				"string8",
-				"string9"
+				"string2"
+				//"string3",
+				//"string4",
+				//"string5",
+				//"string6",
+				//"string7",
+				//"string8",
+				//"string8",
+				//"string8",
+				//"string8",
+				//"string8",
+				//"string8",
+				//"string9"
 			}
 		);
 		IList<Color> testList = Color.ColorDic.ToList();
@@ -97,15 +97,15 @@ namespace Tests
 
 		public override void OnLoad ()
 		{
-			testFiles = new string [0];
-			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
+			testFiles = new string [] { @"Interfaces/Divers/testCombobox.crow" };
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/basicTests", "*.crow")).ToArray ();
-			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
-			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
-			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Stack", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Stack", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Splitter", "*.crow")).ToArray ();
-			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Expandable", "*.crow")).ToArray ();
-			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Expandable", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
 
 			//testFiles = Directory.GetFiles(@"Interfaces", "*.crow").Concat(testFiles).ToArray();
 			this.Title = testFiles [idx];

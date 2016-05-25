@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Container Background="Onyx" Margin="10" Fit="true">
-	<GraphicObject Margin="10" Width="50%" Height="50%" Background="Mantis"
+<Container Background="Teal" Margin="10" Fit="true">
+	<GraphicObject Margin="10" Width="50%" Height="50%" Background="Malachite"
 			MinimumSize="50;50"/>
 </Container>

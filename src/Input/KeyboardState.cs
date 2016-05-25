@@ -236,7 +236,7 @@ namespace Crow
 
 	internal void EnableBit(int offset)
 	{
-	    ValidateOffset(offset);
+	    //ValidateOffset(offset);
 
 	    int int_offset = offset / 32;
 	    int bit_offset = offset % 32;

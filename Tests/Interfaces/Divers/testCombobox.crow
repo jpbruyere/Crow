@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Container Background="Onyx">
-	<ComboBox Width="200" Data="{TestList}" SelectedIndex="0" Background="Mantis"
+<Container Background="Onyx" Width="300">
+	<ComboBox  Data="{TestList}" SelectedIndex="0"
 		ItemTemplate="#Tests.Interfaces.colorItem.crow"/>
 </Container>
