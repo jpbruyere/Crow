@@ -21,7 +21,7 @@
 			Height="{../HeightPolicy}" Width="{../WidthPolicy}"
 			HorizontalAlignment="Left"
 			ValueChanged="../../../_scroller_ValueChanged">
-			<VerticalStack LayoutChanged="../../../../_list_LayoutChanged" Background="Mantis"
+			<VerticalStack LayoutChanged="../../../../_list_LayoutChanged"
 				Height="Fit" Width="{../../WidthPolicy}" Name="List" Margin="0"
 				HorizontalAlignment="Left"
 				VerticalAlignment="Top"/>

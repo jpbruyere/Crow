@@ -226,9 +226,9 @@ namespace Crow
 				return;
 			if (Bindings.Count == 0)
 				return;
-#if DEBUG_BINDING
-			Debug.WriteLine ("Resolve Bindings => " + this.ToString ());
-#endif
+//#if DEBUG_BINDING
+//			Debug.WriteLine ("Resolve Bindings => " + this.ToString ());
+//#endif
 			//grouped bindings by Instance of Source
 			Dictionary<object,List<Binding>> resolved = new Dictionary<object, List<Binding>>();
 
@@ -361,12 +361,16 @@ namespace Crow
 						}else
 							targetValue = targetValue.ToString ();
 					}
-					if (targetValue != null)
-						b.Target.Property.GetSetMethod ().Invoke
-						(b.Target.Instance, new object[] { b.Target.Property.PropertyType.Cast(targetValue)});
-					else
-						b.Target.Property.GetSetMethod ().Invoke
-						(b.Target.Instance, new object[] { targetValue });
+					try {
+						if (targetValue != null)
+							b.Target.Property.GetSetMethod ().Invoke
+							(b.Target.Instance, new object [] { b.Target.Property.PropertyType.Cast (targetValue) });
+						else
+							b.Target.Property.GetSetMethod ().Invoke
+							(b.Target.Instance, new object [] { targetValue });
+					} catch (Exception ex) {
+						Debug.WriteLine (ex.ToString ());
+					}
 #endregion
 
 					//if no dyn update, skip jump table
@@ -390,10 +394,24 @@ namespace Crow
 				il.Emit (OpCodes.Br, endMethod);
 
 				i = 0;
-				foreach (Binding b in grouped) {
-
+				foreach (Binding b in grouped) {					
+					
 					il.MarkLabel (jumpTable [i]);
-					il.Emit(OpCodes.Ldloc_1);
+
+
+					//load 2 times to check first for null
+					il.Emit (OpCodes.Ldloc_1);
+					il.Emit (OpCodes.Ldloc_1);
+
+					System.Reflection.Emit.Label labSetValue = il.DefineLabel ();
+					il.Emit (OpCodes.Brtrue, labSetValue);
+					//if null
+					il.Emit (OpCodes.Unbox_Any, b.Target.Property.PropertyType);
+					il.Emit (OpCodes.Callvirt, b.Target.Property.GetSetMethod ());
+					il.Emit (OpCodes.Br, endMethod);
+
+					il.MarkLabel (labSetValue);
+					//new value not null
 
 					//by default, source value type is deducted from target member type to allow
 					//memberless binding, if targetMember exists, it will be used to determine target
@@ -408,6 +426,8 @@ namespace Crow
 							throw new Exception ("unhandle target member type in binding");
 					}
 
+
+
 					if (b.Target.Property.PropertyType == typeof(string)) {
 						MemberReference tostring = new MemberReference (b.Target.Instance);
 						if (!tostring.FindMember ("ToString"))
@@ -421,6 +441,11 @@ namespace Crow
 						il.Emit(OpCodes.Unbox_Any, b.Target.Property.PropertyType);
 
 					il.Emit(OpCodes.Callvirt, b.Target.Property.GetSetMethod());
+
+					//il.BeginCatchBlock (typeof (Exception));
+					//il.Emit (OpCodes.Pop);
+					//il.EndExceptionBlock ();
+
 					il.Emit (OpCodes.Br, endMethod);
 					i++;
 

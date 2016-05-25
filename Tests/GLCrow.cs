@@ -94,9 +94,17 @@ namespace Tests
 				w.Run (30);
 			}
 		}
-
+		public object data = "datas";
+		public object Datas {
+			get { return data; }
+		}
+		void onSetDataToNull (object sender, MouseButtonEventArgs e) {
+			data = null;
+			NotifyValueChanged ("Datas", null);
+		}
 		public override void OnLoad ()
 		{
+			//testFiles = new string [] { @"Interfaces/Divers/testBind0.crow" };
 			testFiles = new string [] { @"Interfaces/Divers/testCombobox.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/basicTests", "*.crow")).ToArray ();
