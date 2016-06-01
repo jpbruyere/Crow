@@ -22,10 +22,8 @@ namespace Crow
 
 		#endregion
 
-		#if DEBUG_LAYOUTING
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
-		#endif
 
 
 		internal int layoutingTries = 0;
@@ -44,10 +42,8 @@ namespace Crow
 		#region CTOR
 		public GraphicObject ()
 		{
-			#if DEBUG_LAYOUTING
 			uid = currentUid;
 			currentUid++;
-			#endif
 
 			if (Interface.XmlSerializerInit)
 				return;

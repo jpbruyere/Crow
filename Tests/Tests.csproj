@@ -447,10 +447,6 @@
     <None Include="GOLIBTestsOTK.cs">
       <LogicalName></LogicalName>
     </None>
-    <None Include="Interfaces\Divers\2 %28copier%29.crow">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />

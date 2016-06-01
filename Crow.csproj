@@ -319,6 +319,8 @@
     <Compile Include="src\Measure.cs">
       <LogicalName></LogicalName>
     </Compile>
+    <Compile Include="src\CompilerServices\MemberReference.cs" />
+    <Compile Include="src\CompilerServices\Bindings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
