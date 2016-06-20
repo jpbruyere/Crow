@@ -1212,9 +1212,9 @@ namespace Crow
 					if (!string.IsNullOrEmpty (xaa.AttributeName))
 						name = xaa.AttributeName;
 				}
-				if (value.StartsWith("{")) {
+				if (value.StartsWith("{",StringComparison.Ordinal)) {
 					//binding
-					if (!value.EndsWith("}"))
+					if (!value.EndsWith("}", StringComparison.Ordinal))
 						throw new Exception (string.Format("GOML:Malformed binding: {0}", value));
 
 					this.Bindings.Add (new Binding (new MemberReference(this, pi), value.Substring (1, value.Length - 2)));
