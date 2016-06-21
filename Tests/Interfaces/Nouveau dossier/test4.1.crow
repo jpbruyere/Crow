@@ -1,0 +1,98 @@
+﻿<?xml version="1.0"?>
+<Group Name="MainGrp"
+	Width="800" Height="500"
+	Background="0,5;0,5;0,5;0,5" Foreground="White"
+	Margin="10" >
+	<Border 
+		BorderWidth="2" Foreground="Transparent"
+		Focusable="True"
+		MouseEnter="{Foreground = White}"
+		MouseLeave="{Foreground = Transparent}">
+
+		<HorizontalStack Name="hs0" Fit="true"
+			WidgetSpacing="10" 
+			VerticalAlignment="Center" 
+			Background="0,5;0,5;0,5;0,5">
+			<VerticalStack Name="vs1"
+				Margin="20" Width="400" Height="Fit">
+				<Label Name="labMouse" Text="MousePos"/>
+				<HorizontalStack Name="hsPbar" Fit="true">
+					<ProgressBar Name="pbBar" 
+						Width="100" Height="20"
+						Value="50"
+						Foreground="BlueCrayola" Background="DarkGray"
+						BorderWidth="2" Foreground="White"/>
+<!--					<Label Name="labPb"
+						Width="20"
+						TextAlignment="Right"/>
+					<ProgressBar Name="pbBar"
+						Width="100" Height="10"
+						Value="30"/>-->
+				</HorizontalStack>
+				<HorizontalStack  Name="hsFocus" Fit="true">
+					<Label Text="Focused:"/>
+					<Label Name="labFocus" />
+				</HorizontalStack>
+				<HorizontalStack Fit="true">
+					<Label Text="Active:"  Name="hsActive"/>
+					<Label Name="labActive"/>
+				</HorizontalStack>
+				<HorizontalStack Fit="true">
+					<Label Text="Hover:"  Name="hsHover"/>
+					<Label Name="labHover" />
+				</HorizontalStack>
+				<Button Margin="5" BorderWidth="0" Background="Gray" Width="Fit" Height="Fit">
+					<Label FontSize="10" Text="This is a test" Margin="5" FontColor="White" Foreground="White" />
+				</Button>
+				<TextBoxWidget 	TextAlignment="Left" Font="droid,14"						
+								Width="300" Height="Fit" Margin="2"
+								Foreground="White" BorderWidth="1"
+								Text="editable text"/>
+				<GroupBox Title="Group Box" Width="300" Height="100" 
+					Foreground="White" BorderWidth="2" Margin="3">
+					<Label Name="labValue" FontSize="14" Text="000"	TextAlignment="Center"/>
+				</GroupBox>
+				<Slider Height="10" Width="300" BorderWidth="1" Background="Transparent" />
+				<GraduatedSlider Name="slider" Height="30" Width="300" Foreground="BlueBell"/>
+			</VerticalStack>
+<!--			<VerticalStack Width="Fit" Height="Fit" BorderWidth="1" Margin="5" WidgetSpacing="4">
+				<Button Width="Fit" Height="Fit" Margin="15">
+					<Image Path="/mnt/data/Images/130px-Blason_ville_fr_Aubure_(Haut-Rhin).svg.png"/>
+				</Button>
+				<HorizontalStack>
+					<Label Text="Update" FontColor="White" VerticalAlignment="Center" />
+					<Label Name="labUpdate" Text="xxxx" FontSize="16" Width="60" TextAlignment="Center" Background="DarkGreen"/>
+				</HorizontalStack>
+				<HorizontalStack>
+					<Label Text="Fps:" Width = "30" VerticalAlignment="Center"  TextAlignment="Left"/>
+					<Label Name="labFps" Text="xxxx" Font="droid bold, 14"
+						TextAlignment="Center" Background="AoEnglish"/>
+				</HorizontalStack>
+				<HorizontalStack>
+					<Label Text="Min:" Width = "30" />
+					<Label Name="labFpsMin" Text="xxxx" Font="droid bold, 14"
+						TextAlignment="Center" Background="AoEnglish"/>
+				</HorizontalStack>
+				<HorizontalStack>
+					<Label Text="Max:" Width = "30"/>
+					<Label Name="labFpsMax" Text="xxxx" Font="droid bold, 14"
+						TextAlignment="Center" Background="AoEnglish"/>
+				</HorizontalStack>
+			</VerticalStack>
+
+			<Scroller Background="DimGray" Height="350" Width="300"  
+				 Margin="5" VerticalScrolling="true">
+				<VerticalStack Name="colors" VerticalAlignment="Top" Margin="5">
+					<ProgressBar Name="pbBar2" Width="100" Height="20" Value="50"
+								BorderWidth="2" Foreground="White" Foreground="BlueCrayola" Background="DarkGray"/>
+				</VerticalStack>
+			</Scroller>-->
+
+		</HorizontalStack>
+
+		<Slider 
+			Height="20" Width="300" 
+			Background="Transparent"
+			VerticalAlignment="Bottom" />
+		</Border>
+</Group>

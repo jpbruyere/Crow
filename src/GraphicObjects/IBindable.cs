@@ -26,6 +26,7 @@ namespace Crow
 	public interface IBindable
 	{
 		List<Binding> Bindings { get; }
+		object DataSource { get; set; }
 	}
 }
 

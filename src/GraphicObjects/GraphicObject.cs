@@ -22,10 +22,8 @@ namespace Crow
 
 		#endregion
 
-		#if DEBUG_LAYOUTING
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
-		#endif
 
 
 		internal int layoutingTries = 0;
@@ -44,10 +42,8 @@ namespace Crow
 		#region CTOR
 		public GraphicObject ()
 		{
-			#if DEBUG_LAYOUTING
 			uid = currentUid;
 			currentUid++;
-			#endif
 
 			if (Interface.XmlSerializerInit)
 				return;
@@ -398,7 +394,8 @@ namespace Crow
 				if (Parent is GenericStack)
 					(Parent as GraphicObject).RegisterForLayouting (LayoutingType.ArrangeChildren);
 
-				RegisterForLayouting (LayoutingType.Sizing);
+				if (_isVisible)
+					RegisterForLayouting (LayoutingType.Sizing);
 				RegisterForGraphicUpdate ();
 
 				NotifyValueChanged ("Visible", _isVisible);
@@ -664,15 +661,14 @@ namespace Crow
 			get { return layoutingTries; }
 			set { layoutingTries = value; }
 		}
+		protected Size contentSize;
 		/// <summary> return size of content + margins </summary>
 		protected virtual int measureRawSize (LayoutingType lt) {
 			return lt == LayoutingType.Width ? 
-				Width == Measure.Fit ? MinimumSize.Width : (int)Width :
-				Height == Measure.Fit ? MinimumSize.Height : (int)Height;
+				contentSize.Width + 2 * Margin: contentSize.Height + 2 * Margin;
 		}
 		/// <summary> By default in groups, LayoutingType.ArrangeChildren is reset </summary>
 		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){
-
 		}
 		public virtual bool ArrangeChildren { get { return false; } }
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
@@ -680,9 +676,9 @@ namespace Crow
 				return;
 			lock (Interface.CurrentInterface.LayoutMutex) {
 				//dont set position for stretched item
-				if (Width == 0)
+				if (Width == Measure.Stretched)
 					layoutType &= (~LayoutingType.X);
-				if (Height == 0)
+				if (Height == Measure.Stretched)
 					layoutType &= (~LayoutingType.Y);
 
 				if (!ArrangeChildren)
@@ -747,7 +743,7 @@ namespace Crow
 				if (Left == 0) {
 
 					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width) ||
-						RegisteredLayoutings.HasFlag (LayoutingType.Width))
+					    RegisteredLayoutings.HasFlag (LayoutingType.Width))
 						return false;
 
 					switch (HorizontalAlignment) {
@@ -763,21 +759,12 @@ namespace Crow
 					}
 				} else
 					Slot.X = Left;
-
-				if (LastSlots.X == Slot.X)
-					break;
-
-				bmp = null;
-
-				OnLayoutChanges (layoutType);
-
-				LastSlots.X = Slot.X;
 				break;
 			case LayoutingType.Y:
 				if (Top == 0) {
 
 					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height) ||
-						RegisteredLayoutings.HasFlag (LayoutingType.Height))
+					    RegisteredLayoutings.HasFlag (LayoutingType.Height))
 						return false;
 
 					switch (VerticalAlignment) {
@@ -791,9 +778,87 @@ namespace Crow
 						Slot.Y = Parent.ClientRectangle.Height / 2 - Slot.Height / 2;
 						break;
 					}
-				}else
+				} else
 					Slot.Y = Top;
+				break;
+			case LayoutingType.Width:
+				if (Visible) {
+					if (Width.IsFixed)
+						Slot.Width = Width;
+					else if (Width == Measure.Fit) {
+						Slot.Width = measureRawSize (LayoutingType.Width);
+					} else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+						return false;
+					else if (Width == Measure.Stretched)
+						Slot.Width = Parent.ClientRectangle.Width;
+					else
+						Slot.Width = (int)Math.Round ((double)(Parent.ClientRectangle.Width * Width) / 100.0);
 
+					if (Slot.Width < 0)
+						return false;
+
+					//size constrain
+					if (Slot.Width < MinimumSize.Width) {
+						Slot.Width = MinimumSize.Width;
+						//NotifyValueChanged ("WidthPolicy", Measure.Stretched);
+					} else if (Slot.Width > MaximumSize.Width && MaximumSize.Width > 0) {
+						Slot.Width = MaximumSize.Width;
+						//NotifyValueChanged ("WidthPolicy", Measure.Stretched);
+					}
+				} else
+					Slot.Width = 0;
+				break;
+			case LayoutingType.Height:
+				if (Visible) {
+					if (Height.IsFixed)
+						Slot.Height = Height;
+					else if (Height == Measure.Fit) {
+						Slot.Height = measureRawSize (LayoutingType.Height);
+					} else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height))
+						return false;
+					else if (Height == Measure.Stretched)
+						Slot.Height = Parent.ClientRectangle.Height;
+					else
+						Slot.Height = (int)Math.Round ((double)(Parent.ClientRectangle.Height * Height) / 100.0);
+
+					if (Slot.Height < 0)
+						return false;
+
+					//size constrain
+					if (Slot.Height < MinimumSize.Height) {
+						Slot.Height = MinimumSize.Height;
+						//NotifyValueChanged ("HeightPolicy", Measure.Stretched);
+					} else if (Slot.Height > MaximumSize.Height && MaximumSize.Height > 0) {
+						Slot.Height = MaximumSize.Height;
+						//NotifyValueChanged ("HeightPolicy", Measure.Stretched);
+					}
+				} else
+					Slot.Height = 0;
+				break;
+			}
+
+			updateSlot (layoutType);
+
+			//if no layouting remains in queue for item, registre for redraw
+			if (this.registeredLayoutings == LayoutingType.None && bmp == null)
+				this.AddToRedrawList ();
+
+			return true;
+		}
+		protected void updateSlot(LayoutingType layoutType)
+		{
+			switch (layoutType) {
+			case LayoutingType.X:
+				if (LastSlots.X == Slot.X)
+					break;
+
+				bmp = null;
+
+				OnLayoutChanges (layoutType);
+
+				LastSlots.X = Slot.X;				
+				break;
+			case LayoutingType.Y:
 				if (LastSlots.Y == Slot.Y)
 					break;
 
@@ -801,32 +866,9 @@ namespace Crow
 
 				OnLayoutChanges (layoutType);
 
-				LastSlots.Y = Slot.Y;
+				LastSlots.Y = Slot.Y;				
 				break;
 			case LayoutingType.Width:
-				if (Width.IsFixed)
-					Slot.Width = Width;
-				else if (Width == Measure.Fit) {
-					Slot.Width = measureRawSize (LayoutingType.Width);
-				} else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
-					return false;
-				else if (Width == Measure.Stretched)
-					Slot.Width = Parent.ClientRectangle.Width;
-				else
-					Slot.Width = (int)Math.Round((double)(Parent.ClientRectangle.Width * Width) / 100.0);
-
-				if (Slot.Width < 0)
-					return false;
-
-				//size constrain
-				if (Slot.Width < MinimumSize.Width) {
-					Slot.Width = MinimumSize.Width;
-					NotifyValueChanged ("WidthPolicy", Measure.Stretched);
-				} else if (Slot.Width > MaximumSize.Width && MaximumSize.Width > 0) {
-					Slot.Width = MaximumSize.Width;
-					NotifyValueChanged ("WidthPolicy", Measure.Stretched);
-				}
-
 				if (LastSlots.Width == Slot.Width)
 					break;
 
@@ -834,32 +876,9 @@ namespace Crow
 
 				OnLayoutChanges (layoutType);
 
-				LastSlots.Width = Slot.Width;
+				LastSlots.Width = Slot.Width;				
 				break;
 			case LayoutingType.Height:
-				if (Height.IsFixed)
-					Slot.Height = Height;
-				else if (Height == Measure.Fit) {
-					Slot.Height = measureRawSize (LayoutingType.Height);
-				} else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height))
-					return false;
-				else if (Height == Measure.Stretched)
-					Slot.Height = Parent.ClientRectangle.Height;
-				else
-					Slot.Height = (int)Math.Round((double)(Parent.ClientRectangle.Height * Height) / 100.0);
-
-				if (Slot.Height < 0)
-					return false;
-
-				//size constrain
-				if (Slot.Height < MinimumSize.Height) {
-					Slot.Height = MinimumSize.Height;
-					NotifyValueChanged ("HeightPolicy", Measure.Stretched);
-				} else if (Slot.Height > MaximumSize.Height && MaximumSize.Height > 0) {
-					Slot.Height = MaximumSize.Height;
-					NotifyValueChanged ("HeightPolicy", Measure.Stretched);
-				}
-
 				if (LastSlots.Height == Slot.Height)
 					break;
 
@@ -867,15 +886,9 @@ namespace Crow
 
 				OnLayoutChanges (layoutType);
 
-				LastSlots.Height = Slot.Height;
+				LastSlots.Height = Slot.Height;				
 				break;
 			}
-
-			//if no layouting remains in queue for item, registre for redraw
-			if (this.registeredLayoutings == LayoutingType.None && bmp == null)
-				this.AddToRedrawList ();
-
-			return true;
 		}
 		#endregion
 
@@ -1199,9 +1212,9 @@ namespace Crow
 					if (!string.IsNullOrEmpty (xaa.AttributeName))
 						name = xaa.AttributeName;
 				}
-				if (value.StartsWith("{")) {
+				if (value.StartsWith("{",StringComparison.Ordinal)) {
 					//binding
-					if (!value.EndsWith("}"))
+					if (!value.EndsWith("}", StringComparison.Ordinal))
 						throw new Exception (string.Format("GOML:Malformed binding: {0}", value));
 
 					this.Bindings.Add (new Binding (new MemberReference(this, pi), value.Substring (1, value.Length - 2)));

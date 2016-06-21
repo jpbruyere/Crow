@@ -1,0 +1,45 @@
+﻿<?xml version="1.0"?>
+<VerticalStack Background="Onyx" Margin="10" Width="90%" Height="90%">
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Stretched" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Stretched" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="Mantis"
+			MinimumSize="2;2"/>
+</VerticalStack>

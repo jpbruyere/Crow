@@ -1,0 +1,8 @@
+﻿<?xml version="1.0"?>
+<VerticalStack Width="200" Height="Fit" Margin="20" Background="DimGray">
+	<RadioButton Caption="Radio1"/>
+	<RadioButton Caption="Radio2" IsChecked="true"/>
+	<RadioButton Caption="Radio3"/>
+	<RadioButton Caption="Radio4"/>
+</VerticalStack>
+

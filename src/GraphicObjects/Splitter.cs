@@ -83,14 +83,14 @@ namespace Crow
 
 			if (gs.Orientation == Orientation.Horizontal) {
 				if (ptrThis >= 0)
-					gs.Children [ptrThis - 1].Width = Math.Max(gs.Children [ptrThis - 1].Slot.Width + e.XDelta*2, 1);
+					gs.Children [ptrThis - 1].Width = Math.Max(gs.Children [ptrThis - 1].Slot.Width + e.XDelta, 1);
 				if (ptrThis < gs.Children.Count - 1)
-					gs.Children [ptrThis + 1].Width = Math.Max(gs.Children [ptrThis + 1].Slot.Width - e.XDelta*2, 1);
+					gs.Children [ptrThis + 1].Width = Math.Max(gs.Children [ptrThis + 1].Slot.Width - e.XDelta, 1);
 			} else {
 				if (ptrThis >= 0)
-					gs.Children [ptrThis - 1].Height = Math.Max(gs.Children [ptrThis - 1].Slot.Height + e.YDelta*2, 1);
+					gs.Children [ptrThis - 1].Height = Math.Max(gs.Children [ptrThis - 1].Slot.Height + e.YDelta, 1);
 				if (ptrThis < gs.Children.Count - 1)
-					gs.Children [ptrThis + 1].Height = Math.Max(gs.Children [ptrThis + 1].Slot.Height - e.YDelta*2, 1);
+					gs.Children [ptrThis + 1].Height = Math.Max(gs.Children [ptrThis + 1].Slot.Height - e.YDelta, 1);
 			}
 		}
 		public override bool UpdateLayout (LayoutingType layoutType)
@@ -100,12 +100,12 @@ namespace Crow
 				if (gs.Orientation == Orientation.Horizontal)
 					Width = thickness;
 				else
-					Width = 0;
+					Width = Measure.Stretched;
 			} else if (layoutType == LayoutingType.Height){
 				if (gs.Orientation == Orientation.Vertical)
 					Height = thickness;
 				else
-					Height = 0;
+					Height = Measure.Stretched;
 			}
 			return base.UpdateLayout (layoutType);
 		}

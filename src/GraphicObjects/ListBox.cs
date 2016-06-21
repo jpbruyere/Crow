@@ -93,7 +93,7 @@ namespace Crow
 			}
 		}
 		public object SelectedItem{
-			get { return data == null ? "" : _selectedIndex < 0 ? "" : data[_selectedIndex]; }
+			get { return data == null ? null : _selectedIndex < 0 ? null : data[_selectedIndex]; }
 		}
 		[XmlAttributeAttribute]//[DefaultValue(null)]
 		public IList Data {
@@ -207,6 +207,9 @@ namespace Crow
 		}
 		protected void _list_LayoutChanged (object sender, LayoutingEventArgs e)
 		{
+#if DEBUG_LAYOUTING
+			Debug.WriteLine("list_LayoutChanged");
+#endif
 			if (_gsList.Orientation == Orientation.Horizontal) {
 				if (e.LayoutType == LayoutingType.Width)
 					_gsList.Width = approxSize;

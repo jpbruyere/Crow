@@ -1,5 +1,6 @@
+build
 Win_x86
-
+.nuget
 Crow.userprefs
 Debug
 packages

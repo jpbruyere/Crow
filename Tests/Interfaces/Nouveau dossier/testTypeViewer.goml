@@ -1,0 +1,10 @@
+﻿<?xml version="1.0"?>
+
+	<VerticalStack Height="Fit" Width="250" Name="hstack" Margin="0" Spacing="0">
+		<Border Height="Fit" Width="Stretched" BorderWidth="2" CornerRadius="10" Background="SteelBlue">
+			<Label Name="labName" Text="{Name}" Width="Stretched" Height="Fit" Margin="3"/>
+		</Border>
+		<ListBox Data="{Members}" Width="Stretched" Height="400" ItemTemplate="Interfaces/tmpMembers.goml" Focusable="true">
+			
+		</ListBox>
+	</VerticalStack>

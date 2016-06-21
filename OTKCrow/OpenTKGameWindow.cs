@@ -99,7 +99,7 @@ namespace Crow
 		public OpenTKGameWindow(int _width, int _height, string _title="Crow")
 			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 1),
 				_title,GameWindowFlags.Default,DisplayDevice.GetDisplay(DisplayIndex.Second),
-				3,3,OpenTK.Graphics.GraphicsContextFlags.Debug)
+				3,3,OpenTK.Graphics.GraphicsContextFlags.Default)
 //		public OpenTKGameWindow(int _width, int _height, string _title="golib")
 //			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), _title)
 		{
@@ -115,6 +115,7 @@ namespace Crow
 				3,3,OpenTK.Graphics.GraphicsContextFlags.Default)
 		{
 			CrowInterface = new Interface ();
+
 			Thread t = new Thread (interfaceThread);
 			t.IsBackground = true;
 			t.Start ();
@@ -125,10 +126,12 @@ namespace Crow
 		{
 			CrowInterface.Quit += Quit;
 			CrowInterface.MouseCursorChanged += CrowInterface_MouseCursorChanged;
-
+			while (CrowInterface.ClientRectangle.Size.Width == 0)
+				Thread.Sleep (5);
+			
 			while (true) {
 				CrowInterface.Update ();
-				Thread.Sleep (5);
+				Thread.Sleep (1);
 			}
 		}
 
@@ -190,6 +193,7 @@ namespace Crow
 			GL.Disable (EnableCap.DepthTest);
 
 			shader.Enable ();
+			GL.ActiveTexture (TextureUnit.Texture0);
 			GL.BindTexture (TextureTarget.Texture2D, texID);
 			lock (CrowInterface.RenderMutex) {
 				if (CrowInterface.IsDirty) {
@@ -284,6 +288,7 @@ namespace Crow
 				this.ClientRectangle.Width,
 				this.ClientRectangle.Height));
 			createContext ();
+			GL.Viewport (0, 0, ClientRectangle.Width, ClientRectangle.Height);
 		}
 		#endregion
 
@@ -319,12 +324,12 @@ namespace Crow
 		#region keyboard Handling
 		void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
 		{
-			if (!CrowInterface.ProcessKeyDown((int)otk_e.Key))
+			//if (!CrowInterface.ProcessKeyDown((int)otk_e.Key))
 				KeyboardKeyDown.Raise (this, otk_e);
         }
 		void Keyboard_KeyUp(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
 		{
-			if (!CrowInterface.ProcessKeyUp((int)otk_e.Key))
+			//if (!CrowInterface.ProcessKeyUp((int)otk_e.Key))
 				KeyboardKeyUp.Raise (this, otk_e);
 		}
 		void OpenTKGameWindow_KeyPress (object sender, OpenTK.KeyPressEventArgs e)

@@ -19,18 +19,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Xml.Serialization;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Xml;
-using System.Linq;
-using System.Reflection.Emit;
-using System.CodeDom;
-using Microsoft.CSharp;
-using System.CodeDom.Compiler;
 using System.Threading;
+using System.Xml;
+using System.Xml.Serialization;
 using Cairo;
 
 namespace Crow
@@ -52,6 +47,7 @@ namespace Crow
 		internal static bool XmlSerializerInit = false;
 		/// <summary> keep ressource path for debug msg </summary>
 		internal static string CurrentGOMLPath = "";
+		//used in templatedControl
 		internal static int XmlLoaderCount = 0;
 
 		public static int TabSize = 4;
@@ -325,6 +321,8 @@ namespace Crow
 
 
 		public void Update(){
+			CurrentInterface = this;
+
 			if (mouseRepeatCount > 0) {
 				int mc = mouseRepeatCount;
 				mouseRepeatCount -= mc;
@@ -655,6 +653,7 @@ namespace Crow
 			if (!FocusedWidget.MouseRepeat)
 				return true;
 			mouseRepeatThread = new Thread (mouseRepeatThreadFunc);
+			mouseRepeatThread.IsBackground = true;
 			mouseRepeatThread.Start ();
 			return true;
 		}
@@ -685,8 +684,7 @@ namespace Crow
 		#endregion
 
 		#region Keyboard
-		public bool ProcessKeyDown(int Key){
-			Keyboard.SetKeyState ((Crow.Key)Key, true);
+		public bool ProcessKeyDown(int Key){			
 			if (_focusedWidget == null)
 				return false;
 			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
@@ -694,7 +692,6 @@ namespace Crow
 			return true;
 		}
 		public bool ProcessKeyUp(int Key){
-			Keyboard.SetKeyState ((Crow.Key)Key, false);
 			if (_activeWidget == null)
 				return false;
 			//KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);

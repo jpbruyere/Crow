@@ -1,5 +1,0 @@
-﻿<?xml version="1.0"?>
-<VerticalStack Width="200">
-	<ComboBox Width="Stretched" Data="{TestList}" SelectedIndex="0"
-		ItemTemplate="#Tests.Interfaces.colorItem.crow"/>
-</VerticalStack>

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0"?>
+<Window Width="600" Height="500">
+<Border BorderWidth="5" Margin="10">
+	<VerticalStack Margin="10">
+		<GraphicObject Height="20" Width="50" Background="Blue"/>
+		<HorizontalStack Spacing="5" Margin="5" Background="Red">
+			<GraphicObject Height="20" Width="50" Background="Blue"/>
+			<GraphicObject Height="20" Width="50" Background="Blue"/>
+			<Image Name="Image" Width="40" Height="40" Background="Red"
+					Path="#go.Images.Icons.iconInfo.svg" />
+			<Label Font="serif, 12" Width="Stretched" Height="Stretched" Text="MessageBox"
+				Multiline="true" WordWrap="true"/>
+			<GraphicObject Height="20" Width="50" Background="Blue"/>
+			<GraphicObject Height="20" Width="50" Background="Blue"/>
+			<GraphicObject Height="20" Width="50" Background="Blue"/>
+		</HorizontalStack>
+	</VerticalStack>
+</Border>
+</Window>

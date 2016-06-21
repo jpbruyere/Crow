@@ -1,6 +1,0 @@
-﻿<?xml version="1.0"?>
-<VerticalStack>
-	<TextRun Multiline="true" WordWrap="true" Width="0" Height="100" Background="DimGray"
-		Text="This is a long text to test text wrapping, and so here is another statement to add to this meaningless text only designed to make a small test" />
-	<Label Name="labFps" Text="{fps}" Font="droid bold, 12"	TextAlignment="Center" Background="AoEnglish" />
-</VerticalStack>

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0"?>
+<VerticalStack>
+	<HorizontalStack Background="Onyx" Margin="10" Width="90%" Height="20%">
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Width="100%" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+	</HorizontalStack>
+	<HorizontalStack Background="Onyx" Margin="10" Width="Fit" Height="20%">
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Width="100%" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="Mantis"/>
+	</HorizontalStack>
+</VerticalStack>
