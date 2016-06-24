@@ -241,7 +241,7 @@ namespace Crow
 		public Stopwatch drawingTime = new Stopwatch ();
 		#endif
 
-		public List<GraphicObject> GraphicObjects = new List<GraphicObject>();
+		public List<GraphicObject> GraphicTree = new List<GraphicObject>();
 		public Color Background = Color.Transparent;
 
 		internal static Interface currentWindow;
@@ -418,8 +418,8 @@ namespace Crow
 						//Link.draw (ctx);
 						clipping.clearAndClip(ctx);
 
-						for (int i = GraphicObjects.Count -1; i >= 0 ; i--){
-							GraphicObject p = GraphicObjects[i];
+						for (int i = GraphicTree.Count -1; i >= 0 ; i--){
+							GraphicObject p = GraphicTree[i];
 							if (!p.Visible)
 								continue;
 							if (!clipping.intersect (p.Slot))
@@ -476,21 +476,21 @@ namespace Crow
 		public void AddWidget(GraphicObject g)
 		{
 			g.Parent = this;
-			GraphicObjects.Insert (0, g);
+			GraphicTree.Insert (0, g);
 			g.RegisterForLayouting (LayoutingType.Sizing);
 		}
 		public void DeleteWidget(GraphicObject g)
 		{
 			g.Visible = false;//trick to ensure clip is added to refresh zone
 			g.ClearBinding();
-			GraphicObjects.Remove (g);
+			GraphicTree.Remove (g);
 		}
 		public void PutOnTop(GraphicObject g)
 		{
-			if (GraphicObjects.IndexOf(g) > 0)
+			if (GraphicTree.IndexOf(g) > 0)
 			{
-				GraphicObjects.Remove(g);
-				GraphicObjects.Insert(0, g);
+				GraphicTree.Remove(g);
+				GraphicTree.Insert(0, g);
 				//g.registerClipRect ();
 			}
 		}
@@ -498,18 +498,18 @@ namespace Crow
 		public void ClearInterface()
 		{
 			int i = 0;
-			while (GraphicObjects.Count>0) {
+			while (GraphicTree.Count>0) {
 				//TODO:parent is not reset to null because object will be added
 				//to ObjectToRedraw list, and without parent, it fails
-				GraphicObject g = GraphicObjects [i];
+				GraphicObject g = GraphicTree [i];
 				g.Visible = false;
 				g.ClearBinding ();
-				GraphicObjects.RemoveAt (0);
+				GraphicTree.RemoveAt (0);
 			}
 		}
 		public GraphicObject FindByName (string nameToFind)
 		{
-			foreach (GraphicObject w in GraphicObjects) {
+			foreach (GraphicObject w in GraphicTree) {
 				GraphicObject r = w.FindByName (nameToFind);
 				if (r != null)
 					return r;
@@ -527,7 +527,7 @@ namespace Crow
 				int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
 				bmp = new byte[bmpSize];
 
-				foreach (GraphicObject g in GraphicObjects)
+				foreach (GraphicObject g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
 
 				clipping.AddRectangle (clientRectangle);
@@ -577,13 +577,13 @@ namespace Crow
 					topc = tmp;
 					tmp = tmp.Parent as GraphicObject;
 				}
-				int idxhw = GraphicObjects.IndexOf (topc);
+				int idxhw = GraphicTree.IndexOf (topc);
 				if (idxhw != 0) {
 					int i = 0;
 					while (i < idxhw) {
-						if (GraphicObjects [i].MouseIsIn (e.Position)) {
+						if (GraphicTree [i].MouseIsIn (e.Position)) {
 							hoverWidget.onMouseLeave (this, e);
-							GraphicObjects [i].checkHoverWidget (e);
+							GraphicTree [i].checkHoverWidget (e);
 							return true;
 						}
 						i++;
@@ -609,8 +609,8 @@ namespace Crow
 			}
 
 			//top level graphic obj's parsing
-			for (int i = 0; i < GraphicObjects.Count; i++) {
-				GraphicObject g = GraphicObjects[i];
+			for (int i = 0; i < GraphicTree.Count; i++) {
+				GraphicObject g = GraphicTree[i];
 				if (g.MouseIsIn (e.Position)) {
 					g.checkHoverWidget (e);
 					PutOnTop (g);
