@@ -35,6 +35,12 @@ namespace Crow
 		#region CTOR
 		static Interface(){
 			Interface.LoadCursors ();
+
+			FontRenderingOptions = new FontOptions ();
+			FontRenderingOptions.Antialias = Antialias.Subpixel;
+			FontRenderingOptions.HintMetrics = HintMetrics.On;
+			FontRenderingOptions.HintStyle = HintStyle.Medium;
+			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
 		}
 		public Interface(){
 			LayoutingQueue = new Queue<LayoutingQueueItem>();
@@ -64,6 +70,7 @@ namespace Crow
 		public static int BorderThreshold = 5;
 		public const int MaxCacheSize = 2048;
 		public const int MaxLayoutingTries = 50;
+		public static FontOptions FontRenderingOptions;
 		#endregion
 
 		public Queue<LayoutingQueueItem> LayoutingQueue;

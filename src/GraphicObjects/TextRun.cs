@@ -174,10 +174,9 @@ namespace Crow
 
 			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
 			gr.SetFontSize (Font.Size);
+			gr.FontOptions = Interface.FontRenderingOptions;
 
 			gr.Antialias = Antialias.Subpixel;
-			//gr.FontOptions.Antialias = Antialias.Subpixel;
-			//gr.FontOptions.HintMetrics = HintMetrics.On;
 
 			rText = new Rectangle(new Size(
 				measureRawSize(LayoutingType.Width), measureRawSize(LayoutingType.Height)));
