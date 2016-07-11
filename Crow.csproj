@@ -32,15 +32,11 @@
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <DefineConstants>DEBUG_FOCUS0;DEBUG_LAYOUTING0;TRACE;DEBUG;__linux__;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
     <Optimize>false</Optimize>
-    <OutputPath>/mnt/data2/devel/Crow/build/e6fff453-f739-4ceb-bc28-57249f654fcd</OutputPath>
-    <IntermediateOutputPath>/mnt/data2/devel/Crow/build/obj/e6fff453-f739-4ceb-bc28-57249f654fcd</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>True</Optimize>
-    <OutputPath>/mnt/data2/devel/Crow/build/e6fff453-f739-4ceb-bc28-57249f654fcd</OutputPath>
     <DebugType>None</DebugType>
     <DefineConstants>__linux__;MEASURE_TIME</DefineConstants>
-    <IntermediateOutputPath>/mnt/data2/devel/Crow/build/obj/e6fff453-f739-4ceb-bc28-57249f654fcd</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="src\Colors.cs">
