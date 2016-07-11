@@ -340,7 +340,7 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("droid,10")]
+		[XmlAttributeAttribute()][DefaultValue("sans,10")]
 		public virtual Font Font {
 			get { return _font; }
 			set {
@@ -1124,13 +1124,13 @@ namespace Crow
 					if (!b.Resolved)
 						continue;
 					//cancel compiled events
-					if (b.Source == null){
+					if (b.Target == null){
 						continue;
 						#if DEBUG_BINDING
 						Debug.WriteLine("Clear binding canceled for => " + b.ToString());
 						#endif
 					}
-					if (b.Source.Instance != DataSource){
+					if (b.Target.Instance != DataSource){
 						#if DEBUG_BINDING
 						Debug.WriteLine("Clear binding canceled for => " + b.ToString());
 						#endif
@@ -1141,16 +1141,16 @@ namespace Crow
 					#endif
 					if (string.IsNullOrEmpty (b.DynMethodId)) {
 						b.Resolved = false;
-						if (b.Target.Member.MemberType == MemberTypes.Event)
+						if (b.Source.Member.MemberType == MemberTypes.Event)
 							removeEventHandler (b);
 						//TODO:check if full reset is necessary
 						continue;
 					}
 					MemberReference mr = null;
-					if (b.Source == null)
-						mr = b.Target;
-					else
+					if (b.Target == null)
 						mr = b.Source;
+					else
+						mr = b.Target;
 					Type dataSourceType = mr.Instance.GetType();
 					EventInfo evtInfo = dataSourceType.GetEvent ("ValueChanged");
 					FieldInfo evtFi = CompilerServices.GetEventHandlerField (dataSourceType, "ValueChanged");
@@ -1168,12 +1168,12 @@ namespace Crow
 			}
 		}
 		void removeEventHandler(Binding b){
-			FieldInfo fiEvt = CompilerServices.GetEventHandlerField (b.Target.Instance.GetType(), b.Target.Member.Name);
-			MulticastDelegate multiDel = fiEvt.GetValue (b.Target.Instance) as MulticastDelegate;
+			FieldInfo fiEvt = CompilerServices.GetEventHandlerField (b.Source.Instance.GetType(), b.Source.Member.Name);
+			MulticastDelegate multiDel = fiEvt.GetValue (b.Source.Instance) as MulticastDelegate;
 			if (multiDel != null) {
 				foreach (Delegate d in multiDel.GetInvocationList()) {
-					if (d.Method.Name == b.Source.Member.Name)
-						b.Target.Event.RemoveEventHandler (b.Target.Instance, d);
+					if (d.Method.Name == b.Target.Member.Name)
+						b.Source.Event.RemoveEventHandler (b.Source.Instance, d);
 				}
 			}
 		}

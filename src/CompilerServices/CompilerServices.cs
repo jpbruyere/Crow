@@ -26,22 +26,22 @@ namespace Crow
 			foreach (Binding b in Bindings) {
 				if (b.Resolved)
 					continue;
-				if (b.Target.Member.MemberType == MemberTypes.Event) {
+				if (b.Source.Member.MemberType == MemberTypes.Event) {
 					if (b.Expression.StartsWith ("{")) {
 						CompilerServices.CompileEventSource (b);
 						continue;
 					}
-					if (!b.FindSource ())
+					if (!b.FindTarget ())
 						continue;
 					//register handler for event
-					if (b.Source.Method == null) {
+					if (b.Target.Method == null) {
 						Debug.WriteLine ("\tError: Handler Method not found: " + b.ToString ());
 						continue;
 					}
 					try {
-						MethodInfo addHandler = b.Target.Event.GetAddMethod ();
-						Delegate del = Delegate.CreateDelegate (b.Target.Event.EventHandlerType, b.Source.Instance, b.Source.Method);
-						addHandler.Invoke (b.Target.Instance, new object [] { del });
+						MethodInfo addHandler = b.Source.Event.GetAddMethod ();
+						Delegate del = Delegate.CreateDelegate (b.Source.Event.EventHandlerType, b.Target.Instance, b.Target.Method);
+						addHandler.Invoke (b.Source.Instance, new object [] { del });
 
 #if DEBUG_BINDING
 						Debug.WriteLine ("\tHandler binded => " + b.ToString());
@@ -53,13 +53,13 @@ namespace Crow
 					continue;
 				}
 
-				if (!b.FindSource ())
+				if (!b.FindTarget ())
 					continue;
 
 				List<Binding> bindings = null;
-				if (!resolved.TryGetValue (b.Source.Instance, out bindings)) {
+				if (!resolved.TryGetValue (b.Target.Instance, out bindings)) {
 					bindings = new List<Binding> ();
-					resolved [b.Source.Instance] = bindings;
+					resolved [b.Target.Instance] = bindings;
 				}
 				bindings.Add (b);
 				b.Resolved = true;
@@ -67,7 +67,7 @@ namespace Crow
 
 			MethodInfo stringEquals = typeof (string).GetMethod
 				("Equals", new Type [3] { typeof (string), typeof (string), typeof (StringComparison) });
-			Type target_Type = Bindings [0].Target.Instance.GetType ();
+			Type target_Type = Bindings [0].Source.Instance.GetType ();
 			EventInfo ei = typeof (IValueChange).GetEvent ("ValueChanged");
 			MethodInfo evtInvoke = ei.EventHandlerType.GetMethod ("Invoke");
 			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
@@ -81,7 +81,7 @@ namespace Crow
 			//IEnumerable<Binding[]> groupedByTarget = resolved.GroupBy (g => g.Target.Instance, g => g, (k, g) => g.ToArray ());
 			foreach (List<Binding> grouped in resolved.Values) {
 				int i = 0;
-				Type source_Type = grouped [0].Source.Instance.GetType ();
+				Type source_Type = grouped [0].Target.Instance.GetType ();
 
 				DynamicMethod dm = null;
 				ILGenerator il = null;
@@ -129,23 +129,23 @@ namespace Crow
 				foreach (Binding b in grouped) {
 					#region initialize target with actual value
 					object targetValue = null;
-					if (b.Source.Member != null) {
-						if (b.Source.Member.MemberType == MemberTypes.Property)
-							targetValue = b.Source.Property.GetGetMethod ().Invoke (b.Source.Instance, null);
-						else if (b.Source.Member.MemberType == MemberTypes.Field)
-							targetValue = b.Source.Field.GetValue (b.Source.Instance);
-						else if (b.Source.Member.MemberType == MemberTypes.Method) {
-							MethodInfo mthSrc = b.Source.Method;
+					if (b.Target.Member != null) {
+						if (b.Target.Member.MemberType == MemberTypes.Property)
+							targetValue = b.Target.Property.GetGetMethod ().Invoke (b.Target.Instance, null);
+						else if (b.Target.Member.MemberType == MemberTypes.Field)
+							targetValue = b.Target.Field.GetValue (b.Target.Instance);
+						else if (b.Target.Member.MemberType == MemberTypes.Method) {
+							MethodInfo mthSrc = b.Target.Method;
 							if (mthSrc.IsDefined (typeof (ExtensionAttribute), false))
-								targetValue = mthSrc.Invoke (null, new object [] { b.Source.Instance });
+								targetValue = mthSrc.Invoke (null, new object [] { b.Target.Instance });
 							else
-								targetValue = mthSrc.Invoke (b.Source.Instance, null);
+								targetValue = mthSrc.Invoke (b.Target.Instance, null);
 						} else
 							throw new Exception ("unandled source member type for binding");
 					} else if (string.IsNullOrEmpty (b.Expression))
-						targetValue = grouped [0].Source.Instance;//empty binding exp=> bound to target object by default
+						targetValue = grouped [0].Target.Instance;//empty binding exp=> bound to target object by default
 																  //TODO: handle other dest type conversions
-					if (b.Target.Property.PropertyType == typeof (string)) {
+					if (b.Source.Property.PropertyType == typeof (string)) {
 						if (targetValue == null) {
 							//set default value
 
@@ -154,11 +154,11 @@ namespace Crow
 					}
 					try {
 						if (targetValue != null)
-							b.Target.Property.GetSetMethod ().Invoke
-							(b.Target.Instance, new object [] { b.Target.Property.PropertyType.Cast (targetValue) });
+							b.Source.Property.GetSetMethod ().Invoke
+							(b.Source.Instance, new object [] { b.Source.Property.PropertyType.Cast (targetValue) });
 						else
-							b.Target.Property.GetSetMethod ().Invoke
-							(b.Target.Instance, new object [] { targetValue });
+							b.Source.Property.GetSetMethod ().Invoke
+							(b.Source.Instance, new object [] { targetValue });
 					} catch (Exception ex) {
 						Debug.WriteLine (ex.ToString ());
 					}
@@ -169,8 +169,8 @@ namespace Crow
 						continue;
 
 					il.Emit (OpCodes.Ldloc_0);
-					if (b.Source.Member != null)
-						il.Emit (OpCodes.Ldstr, b.Source.Member.Name);
+					if (b.Target.Member != null)
+						il.Emit (OpCodes.Ldstr, b.Target.Member.Name);
 					else
 						il.Emit (OpCodes.Ldstr, b.Expression.Split ('/').LastOrDefault ());
 					il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
@@ -197,8 +197,8 @@ namespace Crow
 					System.Reflection.Emit.Label labSetValue = il.DefineLabel ();
 					il.Emit (OpCodes.Brtrue, labSetValue);
 					//if null
-					il.Emit (OpCodes.Unbox_Any, b.Target.Property.PropertyType);
-					il.Emit (OpCodes.Callvirt, b.Target.Property.GetSetMethod ());
+					il.Emit (OpCodes.Unbox_Any, b.Source.Property.PropertyType);
+					il.Emit (OpCodes.Callvirt, b.Source.Property.GetSetMethod ());
 					il.Emit (OpCodes.Br, endMethod);
 
 					il.MarkLabel (labSetValue);
@@ -207,31 +207,31 @@ namespace Crow
 					//by default, source value type is deducted from target member type to allow
 					//memberless binding, if targetMember exists, it will be used to determine target
 					//value type for conversion
-					Type sourceValueType = b.Target.Property.PropertyType;
-					if (b.Source.Member != null) {
-						if (b.Source.Member.MemberType == MemberTypes.Property)
-							sourceValueType = b.Source.Property.PropertyType;
-						else if (b.Source.Member.MemberType == MemberTypes.Field)
-							sourceValueType = b.Source.Field.FieldType;
+					Type sourceValueType = b.Source.Property.PropertyType;
+					if (b.Target.Member != null) {
+						if (b.Target.Member.MemberType == MemberTypes.Property)
+							sourceValueType = b.Target.Property.PropertyType;
+						else if (b.Target.Member.MemberType == MemberTypes.Field)
+							sourceValueType = b.Target.Field.FieldType;
 						else
 							throw new Exception ("unhandle target member type in binding");
 					}
 
 
 
-					if (b.Target.Property.PropertyType == typeof (string)) {
-						MemberReference tostring = new MemberReference (b.Target.Instance);
+					if (b.Source.Property.PropertyType == typeof (string)) {
+						MemberReference tostring = new MemberReference (b.Source.Instance);
 						if (!tostring.TryFindMember ("ToString"))
 							throw new Exception ("ToString method not found");
 						il.Emit (OpCodes.Callvirt, tostring.Method);
 					} else if (!sourceValueType.IsValueType)
 						il.Emit (OpCodes.Castclass, sourceValueType);
-					else if (b.Target.Property.PropertyType != sourceValueType) {
-						il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (b.Target.Property.PropertyType));
+					else if (b.Source.Property.PropertyType != sourceValueType) {
+						il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (b.Source.Property.PropertyType));
 					} else
-						il.Emit (OpCodes.Unbox_Any, b.Target.Property.PropertyType);
+						il.Emit (OpCodes.Unbox_Any, b.Source.Property.PropertyType);
 
-					il.Emit (OpCodes.Callvirt, b.Target.Property.GetSetMethod ());
+					il.Emit (OpCodes.Callvirt, b.Source.Property.GetSetMethod ());
 
 					//il.BeginCatchBlock (typeof (Exception));
 					//il.Emit (OpCodes.Pop);
@@ -245,9 +245,9 @@ namespace Crow
 				il.Emit (OpCodes.Pop);
 				il.Emit (OpCodes.Ret);
 
-				Delegate del = dm.CreateDelegate (ei.EventHandlerType, Bindings [0].Target.Instance);
+				Delegate del = dm.CreateDelegate (ei.EventHandlerType, Bindings [0].Source.Instance);
 				MethodInfo addHandler = ei.GetAddMethod ();
-				addHandler.Invoke (grouped [0].Source.Instance, new object [] { del });
+				addHandler.Invoke (grouped [0].Target.Instance, new object [] { del });
 			}
 		}
 
@@ -261,10 +261,10 @@ namespace Crow
 			Debug.WriteLine ("\tCompile Event Source => " + binding.ToString());
 #endif
 
-			Type target_type = binding.Target.Instance.GetType ();
+			Type target_type = binding.Source.Instance.GetType ();
 
 			#region Retrieve EventHandler parameter type
-			MethodInfo evtInvoke = binding.Target.Event.EventHandlerType.GetMethod ("Invoke");
+			MethodInfo evtInvoke = binding.Source.Event.EventHandlerType.GetMethod ("Invoke");
 			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
 			Type handlerArgsType = evtParams [1].ParameterType;
 			#endregion
@@ -282,7 +282,7 @@ namespace Crow
 			string src = binding.Expression.Trim ();
 
 			if (!(src.StartsWith ("{") || src.EndsWith ("}")))
-				throw new Exception (string.Format ("GOML:Malformed {0} Event handler: {1}", binding.Target.Member.Name, binding.Expression));
+				throw new Exception (string.Format ("GOML:Malformed {0} Event handler: {1}", binding.Source.Member.Name, binding.Expression));
 
 			src = src.Substring (1, src.Length - 2);
 			string [] srcLines = src.Split (new char [] { ';' });
@@ -299,7 +299,7 @@ namespace Crow
 				string rop = operandes [operandes.Length - 1].Trim ();
 
 				#region LEFT OPERANDES
-				GraphicObject lopObj = binding.Target.Instance as GraphicObject;    //default left operand base object is
+				GraphicObject lopObj = binding.Source.Instance as GraphicObject;    //default left operand base object is
 																					//the first arg (object sender) of the event handler
 
 				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack
@@ -374,9 +374,9 @@ namespace Crow
 
 			#endregion
 
-			Delegate del = dm.CreateDelegate (binding.Target.Event.EventHandlerType, binding.Target.Instance);
-			MethodInfo addHandler = binding.Target.Event.GetAddMethod ();
-			addHandler.Invoke (binding.Target.Instance, new object [] { del });
+			Delegate del = dm.CreateDelegate (binding.Source.Event.EventHandlerType, binding.Source.Instance);
+			MethodInfo addHandler = binding.Source.Event.GetAddMethod ();
+			addHandler.Invoke (binding.Source.Instance, new object [] { del });
 
 			binding.Resolved = true;
 		}

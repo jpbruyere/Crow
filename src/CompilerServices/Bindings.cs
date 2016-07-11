@@ -33,8 +33,8 @@ namespace Crow
 		bool resolved;
 
 		public bool TwoWayBinding;
-		public MemberReference Target;
 		public MemberReference Source;
+		public MemberReference Target;
 
 		public string Expression;
 
@@ -59,25 +59,25 @@ namespace Crow
 
 		#region CTOR
 		public Binding () { }
-		public Binding (MemberReference _target, string _expression)
+		public Binding (MemberReference _source, string _expression)
 		{
-			Target = _target;
-			Expression = _expression;
-		}
-		public Binding (object _target, string _member, string _expression)
-		{
-			Target = new MemberReference (_target, _target.GetType ().GetMember (_member) [0]);
-			Expression = _expression;
-		}
-		public Binding (object _target, string _targetMember, object _source, string _sourceMember)
-		{
-			Target = new MemberReference (_target, _target.GetType ().GetMember (_targetMember) [0]);
-			Source = new MemberReference (_source, _source.GetType ().GetMember (_sourceMember) [0]);
-		}
-		public Binding (MemberReference _target, MemberReference _source)
-		{
-			Target = _target;
 			Source = _source;
+			Expression = _expression;
+		}
+		public Binding (object _source, string _member, string _expression)
+		{
+			Source = new MemberReference (_source, _source.GetType ().GetMember (_member) [0]);
+			Expression = _expression;
+		}
+		public Binding (object _source, string _sourceMember, object _target, string _targetMember)
+		{
+			Source = new MemberReference (_source, _source.GetType ().GetMember (_sourceMember) [0]);
+			Target = new MemberReference (_target, _target.GetType ().GetMember (_targetMember) [0]);
+		}
+		public Binding (MemberReference _source, MemberReference _target)
+		{
+			Source = _source;
+			Target = _target;
 		}
 		#endregion
 
@@ -89,20 +89,23 @@ namespace Crow
 			bindingCpt++;
 			return dynMethodId;
 		}
-
-		public bool FindSource ()
+		/// <summary>
+		/// resolve target expression
+		/// </summary>
+		/// <returns><c>true</c>, if target was found, <c>false</c> otherwise.</returns>
+		public bool FindTarget ()
 		{
-			if (Source != null)
+			if (Target != null)
 				return true;
 
 			string member = null;
 
 			//if binding exp = '{}' => binding is done on datasource
 			if (string.IsNullOrEmpty (Expression)) {
-				Object o = (Target.Instance as GraphicObject).DataSource;
+				Object o = (Source.Instance as GraphicObject).DataSource;
 				if (o == null)
 					return false;
-				Source = new MemberReference (o);
+				Target = new MemberReference (o);
 				return true;
 			}
 
@@ -117,11 +120,11 @@ namespace Crow
 
 			if (bindingExp.Length == 1) {
 				//datasource binding
-				Source = new MemberReference ((Target.Instance as GraphicObject).DataSource);
+				Target = new MemberReference ((Source.Instance as GraphicObject).DataSource);
 				member = bindingExp [0];
 			} else {
 				int ptr = 0;
-				ILayoutable tmp = Target.Instance as ILayoutable;
+				ILayoutable tmp = Source.Instance as ILayoutable;
 				if (string.IsNullOrEmpty (bindingExp [0])) {
 					//if exp start with '/' => Graphic tree parsing start at top container
 					tmp = Interface.CurrentInterface as ILayoutable;
@@ -139,7 +142,7 @@ namespace Crow
 					else if (bindingExp [ptr] == ".") {
 						if (ptr > 0)
 							throw new Exception ("Syntax error in binding, './' may only appear in first position");
-						tmp = Target.Instance as ILayoutable;
+						tmp = Source.Instance as ILayoutable;
 					} else
 						tmp = (tmp as GraphicObject).FindByName (bindingExp [ptr]);
 					ptr++;
@@ -162,36 +165,36 @@ namespace Crow
 				} else
 					throw new Exception ("Syntax error in binding, expected 'go dot member'");
 
-				Source = new MemberReference (tmp);
+				Target = new MemberReference (tmp);
 			}
-			if (Source == null) {
+			if (Target == null) {
 				Debug.WriteLine ("Binding Source is null: " + Expression);
 				return false;
 			}
 
-			if (Source.TryFindMember (member)) {
+			if (Target.TryFindMember (member)) {
 				if (TwoWayBinding) {
-					IBindable source = Source.Instance as IBindable;
+					IBindable source = Target.Instance as IBindable;
 					if (source == null)
-						throw new Exception (Target.Instance + " does not implement IBindable for 2 way bindings");
-					source.Bindings.Add (new Binding (Source, Target));
+						throw new Exception (Source.Instance + " does not implement IBindable for 2 way bindings");
+					source.Bindings.Add (new Binding (Target, Source));
 				}
 				return true;
 			}
 
 			Debug.WriteLine ("Binding member not found: " + member);
-			Source = null;
+			Target = null;
 			return false;
 		}
 		public void Reset ()
 		{
-			Source = null;
+			Target = null;
 			dynMethodId = "";
 			Resolved = false;
 		}
 		public override string ToString ()
 		{
-			return string.Format ("[Binding: {0}.{1} <= {2}]", Target.Instance, Target.Member.Name, Expression);
+			return string.Format ("[Binding: {0}.{1} <= {2}]", Source.Instance, Source.Member.Name, Expression);
 		}
 	}
 
