@@ -141,12 +141,12 @@ namespace Crow
 		}
 		void CrowInterface_MouseCursorChanged (object sender, MouseCursorChangedEventArgs e)
 		{
-//			this.Cursor = new MouseCursor(
-//				(int)e.NewCursor.Xhot,
-//				(int)e.NewCursor.Yhot,
-//				(int)e.NewCursor.Width,
-//				(int)e.NewCursor.Height,
-//				e.NewCursor.data);
+			this.Cursor = new MouseCursor(
+				(int)e.NewCursor.Xhot,
+				(int)e.NewCursor.Yhot,
+				(int)e.NewCursor.Width,
+				(int)e.NewCursor.Height,
+				e.NewCursor.data);
 		}
 
 		#region Events
