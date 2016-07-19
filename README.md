@@ -7,12 +7,17 @@ Running under Mono, With multi-platform libraries it should run on any target.
 
 **Crow** has full transparency support, but a fast opaque rendering queue exist for heavy critical application.
 
-#####Screen shots
-<img src="/magic3d.png?raw=true" alt="Magic3d" width="20%" style="float:left" /> 
-<img src="/screenshot1.png?raw=true" alt="Screen Shot" width="20%" align="center"/> 
-<img src="/screenshot2.png?raw=true" alt="Screen Shot" width="20%" style="float:right"/> 
+Screen shots
+============
+<table width="100%">
+  <tr>
+    <td width="30%" align="center"><img src="/magic3d.png?raw=true" alt="Magic3d" width="90%"/></td>
+    <td width="30%" align="center"><img src="/screenshot1.png?raw=true" alt="Screen Shot" width="90%" /> </td>
+    <td width="30%" align="center"><img src="/screenshot2.png?raw=true" alt="Screen Shot" width="90%"/> </td>
+  </tr>
+</table>
 
-FEATURES
+Feature
 ========
 
 - **XML** interface definition.
@@ -24,7 +29,7 @@ Building
 ========
 
 ```
-git clone https://github.com/jpbruyere/Crow.git   	# Download source code from git
+git clone https://github.com/jpbruyere/Crow.git   	# Download source code from github
 cd Crow	                                    		# Enter the source directory
 nuget restore Crow.sln								# Restore nuget packages
 msbuild /p:Configuration=Release Crow.sln			# Build on .Net (Windows)
