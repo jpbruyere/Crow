@@ -261,13 +261,23 @@ namespace Crow
 				this.RegisterForLayouting (LayoutingType.Height);
 			}
 		}
+		/// <summary>
+		/// Used for binding on dimensions, this property will never hold fixed size, but instead only
+		/// Fit or Stretched
+		/// </summary>
 		[XmlIgnore]public virtual Measure WidthPolicy { get {
 				return Width.Units == Unit.Percent || Width.IsFixed ?
 					Measure.Stretched : Measure.Fit; } }
+		/// <summary>
+		/// Used for binding on dimensions, this property will never hold fixed size, but instead only
+		/// Fit or Stretched
+		/// </summary>
 		[XmlIgnore]public virtual Measure HeightPolicy { get {
 				return Height.Units == Unit.Percent || Height.IsFixed ?
 					Measure.Stretched : Measure.Fit; } }
-
+		/// <summary>
+		/// When set to True, the <see cref="T:Crow.GraphicObject"/>'s width and height will be set to Fit.
+		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool Fit {
 			get { return Width == Measure.Fit && Height == Measure.Fit ? true : false; }
@@ -729,8 +739,9 @@ namespace Crow
 			LayoutChanged.Raise (this, new LayoutingEventArgs (layoutType));
 		}
 
-		/// <summary> Update layout component, this is where the computation of alignement
-		/// and size take place </summary>
+		/// <summary> Update layout component only one at a time, this is where the computation of alignement
+		/// and size take place.
+		/// The redrawing will only be triggered if final slot size has changed </summary>
 		/// <returns><c>true</c>, if layouting was possible, <c>false</c> if conditions were not
 		/// met and LQI has to be re-queued</returns>
 		public virtual bool UpdateLayout (LayoutingType layoutType)
@@ -759,6 +770,15 @@ namespace Crow
 					}
 				} else
 					Slot.X = Left;
+
+				if (LastSlots.X == Slot.X)
+					break;
+
+				bmp = null;
+
+				OnLayoutChanges (layoutType);
+
+				LastSlots.X = Slot.X;
 				break;
 			case LayoutingType.Y:
 				if (Top == 0) {
@@ -780,6 +800,15 @@ namespace Crow
 					}
 				} else
 					Slot.Y = Top;
+				
+				if (LastSlots.Y == Slot.Y)
+					break;
+
+				bmp = null;
+
+				OnLayoutChanges (layoutType);
+
+				LastSlots.Y = Slot.Y;
 				break;
 			case LayoutingType.Width:
 				if (Visible) {
@@ -807,6 +836,15 @@ namespace Crow
 					}
 				} else
 					Slot.Width = 0;
+
+				if (LastSlots.Width == Slot.Width)
+					break;
+
+				bmp = null;
+
+				OnLayoutChanges (layoutType);
+
+				LastSlots.Width = Slot.Width;
 				break;
 			case LayoutingType.Height:
 				if (Visible) {
@@ -834,51 +872,7 @@ namespace Crow
 					}
 				} else
 					Slot.Height = 0;
-				break;
-			}
-
-			updateSlot (layoutType);
-
-			//if no layouting remains in queue for item, registre for redraw
-			if (this.registeredLayoutings == LayoutingType.None && bmp == null)
-				this.AddToRedrawList ();
-
-			return true;
-		}
-		protected void updateSlot(LayoutingType layoutType)
-		{
-			switch (layoutType) {
-			case LayoutingType.X:
-				if (LastSlots.X == Slot.X)
-					break;
-
-				bmp = null;
-
-				OnLayoutChanges (layoutType);
-
-				LastSlots.X = Slot.X;				
-				break;
-			case LayoutingType.Y:
-				if (LastSlots.Y == Slot.Y)
-					break;
-
-				bmp = null;
-
-				OnLayoutChanges (layoutType);
-
-				LastSlots.Y = Slot.Y;				
-				break;
-			case LayoutingType.Width:
-				if (LastSlots.Width == Slot.Width)
-					break;
-
-				bmp = null;
-
-				OnLayoutChanges (layoutType);
-
-				LastSlots.Width = Slot.Width;				
-				break;
-			case LayoutingType.Height:
+				
 				if (LastSlots.Height == Slot.Height)
 					break;
 
@@ -886,9 +880,15 @@ namespace Crow
 
 				OnLayoutChanges (layoutType);
 
-				LastSlots.Height = Slot.Height;				
+				LastSlots.Height = Slot.Height;	
 				break;
 			}
+
+			//if no layouting remains in queue for item, registre for redraw
+			if (this.registeredLayoutings == LayoutingType.None && bmp == null)
+				this.AddToRedrawList ();
+
+			return true;
 		}
 		#endregion
 

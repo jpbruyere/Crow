@@ -1,79 +1,38 @@
-CROW
-=====
+CROW [![NuGet Version and Downloads](https://buildstats.info/nuget/Crow.dll)](https://www.nuget.org/packages/Crow.dll/) [![Build Status](https://travis-ci.org/jpbruyere/Crow.svg?branch=master)](https://travis-ci.org/jpbruyere/Crow)
+===========
 
-CROW stands for 'Collaborative Radiant Open Widgets' which is a pure c# widget toolkit with templates and bindings.
-Running under Mono, With multi-platform libraries (Cairo, OpenTK) it should run on any target.
+**CROW** is a pure **C#** widget toolkit originally developed for easy GUI implementation for OpenTK.
+Trying to make it as efficient as possible, it evolved as a full feature toolkit with templates, styles, compositing,  and  bindings.
+Running under Mono, With multi-platform libraries it should run on any target.
 
-The main advantage of this toolkit is it's simplicity and it's coherence. Thanks to the job done by 
-OpenTK team on linux drm/kms support, Crow may run without a X server directely in console.
+**Crow** has full transparency support, but a fast opaque rendering queue exist for heavy critical application.
 
-Graphic Rendering stack could easily be changed by implementing ICrowHost, and a custom (and lighter) opengl rendering replacement for cairo is on the stack.
+Screen shots
+============
 
-FEATURES
+<table width="100%">
+  <tr>
+    <td width="30%" align="center"><img src="/magic3d.png?raw=true" alt="Magic3d" width="90%"/></td>
+    <td width="30%" align="center"><img src="/screenshot1.png?raw=true" alt="Screen Shot" width="90%" /> </td>
+    <td width="30%" align="center"><img src="/screenshot2.png?raw=true" alt="Screen Shot" width="90%"/> </td>
+  </tr>
+</table>
+
+Feature
 ========
 
-- Use OpenTK as top container for device abstraction layer by default, (other container: GTK, GDK)
-- Curent drawing routines use Mono.Cairo
-- Allow easy creation of XAML like interface under linux directely in console mode, without X
-  It only required Mono with cairo libraries, OpenTK, Mesa, GBM and DRM libraries.
-- Templated controls, with dynamic binding.
-- Inlined delegate in XML
+- **XML** interface definition.
+- Templates and styling
+- Dynamic binding system with code injection.
+- Inlined delegates in XML
 
-Example
--------
-
-```
-<Window Width="800" Height="600" Title="Decks">	
-	<HorizontalStack>
-		<ListBox Height="0" Width="150" Background="0,5;0,5;0,5;0,5" Name="deckList"
-			Data="{DeckList}" HorizontalAlignment="Left" ValueChanged="onDeckListValueChange"
-			ItemTemplate="#Magic3D.ui.DeckItemTemplate.goml">
-			<Template>
-				<Border BorderWidth="1" MinimumSize="0;100" Height="{TemplatedHeight}" Width="{TemplatedWidth}">
-					<HorizontalStack Margin="1" Height="{TemplatedHeight}" Width="{TemplatedWidth}">
-						<Scroller  Name="scroller1" Height="{TemplatedHeight}" Width="{TemplatedWidth}" 
-						 Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">
-							<VerticalStack Width="{TemplatedWidth}" Height="-1" Name="List" Margin="0" VerticalAlignment="Top"/>
-						</Scroller>
-						<Scrollbar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" MaximumScroll="{../scroller1.MaximumScroll}"
-							Orientation="Vertical" Width="10" Height="{TemplatedHeight}" />
-					</HorizontalStack>
-				</Border>
-			</Template>
-		</ListBox>
-		<HorizontalStack Width="0" Height="0" Background="DimGray" Name="hsDeck"/>
-	</HorizontalStack>
-</Window>
-```
 Building
 ========
 
-#####Build latest OpenTK:
 ```
-git clone https://github.com/opentk/opentk   # Download source code from git
-cd opentk                                    # Enter the source directory
-msbuild /p:Configuration=Release OpenTK.sln  # Build on .Net (Windows)
-xbuild  /p:Configuration=Release OpenTK.sln  # Build on Mono (Linux / Mac OS X)
-```
-#####Install Cairo and RSVG cli bindings
-######On Debian:
-
-```
-sudo apt-get install libmono-cairo4.0-cil libglib3.0-cil librsvg2-2.18-cil
-```
-#####Build Crow
-```
-git clone https://github.com/jpbruyere/Crow.git   	# Download source code from git
+git clone https://github.com/jpbruyere/Crow.git   	# Download source code from github
 cd Crow	                                    		# Enter the source directory
+nuget restore Crow.sln								# Restore nuget packages
 msbuild /p:Configuration=Release Crow.sln			# Build on .Net (Windows)
 xbuild  /p:Configuration=Release Crow.sln			# Build on Mono (Linux / Mac OS X)
 ```
-#####Crow in action
-
-![Crow in action](/magic3d.png?raw=true "Magic3d")
-
-![Crow in action](/screenshot1.png?raw=true "golib")
-
-![Crow in action](/screenshot2.png?raw=true "golib")
-
-

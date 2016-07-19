@@ -30,6 +30,15 @@ using Cairo;
 
 namespace Crow
 {
+	/// <summary>
+	/// The Interface Class is the top container of the application.
+	/// It provides the Dirty bitmap and zone of the interface to be drawn on screen
+	/// 
+	/// The Interface contains :
+	/// 	- rendering and layouting queues and logic.
+	/// 	- helpers to load XML interfaces files
+	/// 	- global constants and variables of CROW
+	/// </summary>
 	public class Interface : ILayoutable
 	{
 		#region CTOR
@@ -58,6 +67,7 @@ namespace Crow
 
 		public static int TabSize = 4;
 		public static string LineBreak = "\r\n";
+		//TODO: shold be declared in graphicObject
 		public static bool FocusOnHover = false;
 		/// <summary> Time to wait in millisecond before starting repeat loop</summary>
 		public static int DeviceRepeatDelay = 600;
@@ -68,11 +78,18 @@ namespace Crow
 		public static bool DesignerMode = false;
 		/// <summary> Threshold to catch borders for sizing </summary>
 		public static int BorderThreshold = 5;
+		/// <summary> Disable caching for a widget if this threshold is reached </summary>
 		public const int MaxCacheSize = 2048;
+		/// <summary> Above this count, the layouting is discard for the widget and it
+		/// will not be rendered on screen </summary>
 		public const int MaxLayoutingTries = 50;
+		/// <summary> Global font rendering settings for Cairo </summary>
 		public static FontOptions FontRenderingOptions;
 		#endregion
 
+		/// <summary>
+		/// The layouting queue contains layouting commands
+		/// </summary>
 		public Queue<LayoutingQueueItem> LayoutingQueue;
 		public Queue<GraphicObject> GraphicUpdateQueue = new Queue<GraphicObject>();
 		public string Clipboard;
@@ -98,6 +115,10 @@ namespace Crow
 		}
 
 		#region default values loading helpers
+		/// Default values of properties from GraphicObjects are retrieve from XML Attributes.
+		/// The reflexion process used to retrieve those values being very slow, it is compiled in MSIL
+		/// and injected as a dynamic method referenced in the DefaultValuesLoader Dictionnary.
+		/// The compilation is done on the first object instancing, and is also done for custom widgets
 		public delegate void loadDefaultInvoker(object instance);
 		public static Dictionary<String, loadDefaultInvoker> DefaultValuesLoader = new Dictionary<string, loadDefaultInvoker>();
 		#endregion

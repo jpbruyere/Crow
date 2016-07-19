@@ -141,12 +141,12 @@ namespace Crow
 		}
 		void CrowInterface_MouseCursorChanged (object sender, MouseCursorChangedEventArgs e)
 		{
-			this.Cursor = new MouseCursor(
-				(int)e.NewCursor.Xhot,
-				(int)e.NewCursor.Yhot,
-				(int)e.NewCursor.Width,
-				(int)e.NewCursor.Height,
-				e.NewCursor.data);
+//			this.Cursor = new MouseCursor(
+//				(int)e.NewCursor.Xhot,
+//				(int)e.NewCursor.Yhot,
+//				(int)e.NewCursor.Width,
+//				(int)e.NewCursor.Height,
+//				e.NewCursor.data);
 		}
 
 		#region Events
@@ -164,7 +164,7 @@ namespace Crow
 		#region graphic context
 		int texID;
 		Tetra.Shader shader;
-		public static GGL.vaoMesh quad;
+		public static Crow.vaoMesh quad;
 
 		void createContext()
 		{
@@ -187,8 +187,9 @@ namespace Crow
 		}
 		void OpenGLDraw()
 		{
-			bool blend = GL.GetBoolean (GetPName.Blend);
-			bool depthTest = GL.GetBoolean (GetPName.DepthTest);
+			bool blend, depthTest;
+			GL.GetBoolean (GetPName.Blend, out blend);
+			GL.GetBoolean (GetPName.DepthTest, out depthTest);
 			GL.Enable (EnableCap.Blend);
 			GL.Disable (EnableCap.DepthTest);
 
@@ -204,7 +205,7 @@ namespace Crow
 					CrowInterface.IsDirty = false;
 				}
 			}
-			quad.Render (PrimitiveType.TriangleStrip);
+			quad.Render (BeginMode.TriangleStrip);
 			GL.BindTexture(TextureTarget.Texture2D, 0);
 			shader.Disable ();
 			if (!blend)
@@ -247,7 +248,7 @@ namespace Crow
 			shader.Enable();
 			shader.SetMVP(OpenTK.Matrix4.CreateOrthographicOffCenter (-0.5f, 0.5f, -0.5f, 0.5f, 1, -1));
 			GL.UseProgram(0);
-			quad = new GGL.vaoMesh (0, 0, 0, 1, 1, 1, -1);
+			quad = new Crow.vaoMesh (0, 0, 0, 1, 1, 1, -1);
 		}
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
@@ -283,8 +284,8 @@ namespace Crow
 			base.OnResize (e);
 			CrowInterface.ProcessResize(
 				new Rectangle(
-				this.ClientRectangle.X,
-				this.ClientRectangle.Y,
+				0,
+				0,
 				this.ClientRectangle.Width,
 				this.ClientRectangle.Height));
 			createContext ();

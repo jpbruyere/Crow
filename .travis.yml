@@ -1,0 +1,7 @@
+language: csharp
+solution: Crow.sln
+install:
+      - nuget restore Crow.sln
+script:
+      - xbuild /p:Configuration=Release Crow.sln
+

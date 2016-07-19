@@ -1,0 +1,20 @@
+﻿<?xml version="1.0"?>
+<Window Font="droid bold, 10" Title="Open GL" Width="60%" Height="50%">
+	<VerticalStack>
+		<HorizontalStack Background="Jet" Height="Fit" Width="Stretched"  Margin="2">
+			<Popper Caption="File" Template="#Tests.ui.Popper.template" Width="Fit">
+				<Border Fit="True" Foreground="Gray" Background="Jet">
+					<VerticalStack Height="Fit" Width="Fit" Margin="2">
+						<Label Text="New File" Style="#Tests.ui.MenuItem.style" />
+						<Label Text="Open..." Style="#Tests.ui.MenuItem.style"/>
+						<Label Text="Save..." Style="#Tests.ui.MenuItem.style"/>
+						<Label Text="Exit" Style="#Tests.ui.MenuItem.style"/>
+					</VerticalStack>
+				</Border>
+			</Popper>
+			<Label Text="Edit" Style="#Tests.ui.LabelButton.style"/>
+			<Label Text="Project" Style="#Tests.ui.LabelButton.style"/>
+			<Label Text="Help" Style="#Tests.ui.LabelButton.style"/>
+		</HorizontalStack>	
+	</VerticalStack>
+</Window>

@@ -89,6 +89,17 @@ namespace Crow
 			}
 		}
 
+		public override void OnLayoutChanges (LayoutingType layoutType)
+		{
+			base.OnLayoutChanges (layoutType);
+
+			if (_content == null)
+				return;
+			
+			if (layoutType == LayoutingType.Width)
+				_content.MinimumSize = new Size (this.Slot.Width, _content.MinimumSize.Height);			
+		}
+
 		#region GraphicObject overrides
 		public override void ClearBinding ()
 		{

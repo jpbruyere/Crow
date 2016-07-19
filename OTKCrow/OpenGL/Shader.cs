@@ -4,76 +4,54 @@ using System.IO;
 using System.Reflection;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using System.Collections.Generic;
 
-namespace Crow
+namespace Tetra
 {
 	public class Shader : IDisposable
 	{
 		#region CTOR
 		public Shader ()
 		{
-			Compile ();
+			Init ();
 		}
-		public Shader (string vertResId, string fragResId)
+		public Shader (string vertResPath, string fragResPath = null, string geomResPath = null)
 		{
+			VertSourcePath = vertResPath;
+			FragSourcePath = fragResPath;
+			GeomSourcePath = geomResPath;
 
-			Stream s = tryGetStreamForResource (vertResId);
-			if (s != null) {
-				using (StreamReader sr = new StreamReader (s)) {
-					vertSource = sr.ReadToEnd ();
-				}
-			}
+			loadSourcesFiles ();
 
-			s = tryGetStreamForResource (fragResId);
-			if (s != null) {
-				using (StreamReader sr = new StreamReader (s)) {
-					fragSource = sr.ReadToEnd ();
-				}
-			}
-
-			Compile ();
-		}
-		Stream tryGetStreamForResource(string resId){
-			if (string.IsNullOrEmpty (resId))
-				return null;
-
-			Stream s = Assembly.GetEntryAssembly ().
-				GetManifestResourceStream (resId);
-			return s == null ?
-				Assembly.GetExecutingAssembly ().
-					GetManifestResourceStream (resId) :
-				s;
+			Init ();
 		}
 		#endregion
 
+		public string	VertSourcePath,
+						FragSourcePath,
+						GeomSourcePath;
 		#region Sources
 		protected string _vertSource = @"
 			#version 330
+			precision lowp float;
 
-			precision highp float;
+			uniform mat4 mvp;
 
-			uniform mat4 Projection;
-			uniform mat4 ModelView;
-			uniform mat4 Model;
-			uniform mat4 Normal;
-
-			in vec2 in_position;
-			in vec2 in_tex;
+			layout(location = 0) in vec3 in_position;
+			layout(location = 1) in vec2 in_tex;
 
 			out vec2 texCoord;
-
 
 			void main(void)
 			{
 				texCoord = in_tex;
-				gl_Position = Projection * ModelView * Model * vec4(in_position, 0, 1);
+				gl_Position = mvp * vec4(in_position, 1.0);
 			}";
 
 		protected string _fragSource = @"
 			#version 330
-			precision highp float;
+			precision lowp float;
 
-			uniform vec4 color;
 			uniform sampler2D tex;
 
 			in vec2 texCoord;
@@ -99,18 +77,9 @@ namespace Crow
 		#endregion
 
 		#region Private and protected fields
-		protected int vsId, fsId, gsId, pgmId,
-						modelViewLocation,
-						modelLocation,
-						projectionLocation,
-						normalLocation,
-						colorLocation;
+		public int vsId, fsId, gsId, pgmId, mvpLocation;
 
-		Matrix4 projectionMat = Matrix4.Identity,
-				modelMat = Matrix4.Identity,
-				modelViewMat = Matrix4.Identity;
-		Vector4 color = new Vector4(1,1,1,1);
-		int texture;
+		Matrix4 mvp = Matrix4.Identity;
 		#endregion
 
 
@@ -131,38 +100,59 @@ namespace Crow
 			set { _geomSource = value; }
 		}
 
-		public Matrix4 ProjectionMatrix{
-			set { projectionMat = value; }
-			get { return projectionMat; }
+		public virtual Matrix4 MVP{
+			set { mvp = value; }
+			get { return mvp; }
 		}
-		public Matrix4 ModelViewMatrix {
-			set { modelViewMat = value; }
-			get { return modelViewMat; }
-		}
-		public Matrix4 ModelMatrix {
-			set { modelMat = value; }
-			get { return modelMat; }
-		}
-		public Vector4 Color {
-			set { color = value; }
-			get { return color; }
-		}
-
-		public int Texture {
-			get { return texture; }
-			set { texture = value; }
-		}
-
 		#endregion
 
-		void updateNormalMatrix()
-		{
-			Matrix4 normalMat = (modelViewMat).Inverted();
-			normalMat.Transpose ();
-			GL.UniformMatrix4 (normalLocation, false, ref normalMat);
-		}
-
 		#region Public functions
+		/// <summary>
+		/// configure sources and compile
+		/// </summary>
+		public virtual void Init()
+		{
+			Compile ();
+		}
+		public void Reload(){
+			loadSourcesFiles ();
+			Compile ();
+		}
+		public void SetSource(ShaderType shaderType, string _source){
+			switch (shaderType) {
+			case ShaderType.FragmentShader:
+				fragSource = _source;
+				return;
+			case ShaderType.VertexShader:
+				vertSource = _source;
+				return;
+			case ShaderType.GeometryShader:
+				geomSource = _source;
+				return;
+			}
+		}
+		public string GetSource(ShaderType shaderType){
+			switch (shaderType) {
+			case ShaderType.FragmentShader:
+				return fragSource;
+			case ShaderType.VertexShader:
+				return vertSource;
+			case ShaderType.GeometryShader:
+				return geomSource;
+			}
+			return "";
+		}
+		public string GetSourcePath(ShaderType shaderType){
+			switch (shaderType) {
+			case ShaderType.FragmentShader:
+				return FragSourcePath;
+			case ShaderType.VertexShader:
+				return VertSourcePath;
+			case ShaderType.GeometryShader:
+				return GeomSourcePath;
+			}
+			return "";
+		}
 		public virtual void Compile()
 		{
 			Dispose ();
@@ -228,31 +218,16 @@ namespace Crow
 		}
 		protected virtual void GetUniformLocations()
 		{
-			projectionLocation = GL.GetUniformLocation(pgmId, "Projection");
-			modelViewLocation = GL.GetUniformLocation(pgmId, "ModelView");
-			modelLocation = GL.GetUniformLocation(pgmId, "Model");
-			normalLocation = GL.GetUniformLocation(pgmId, "Normal");
-			colorLocation = GL.GetUniformLocation (pgmId, "color");
-
+			mvpLocation = GL.GetUniformLocation(pgmId, "mvp");
 		}
 		protected virtual void BindSamplesSlots(){
 			GL.Uniform1(GL.GetUniformLocation (pgmId, "tex"), 0);
 		}
-
+		public void SetMVP(Matrix4 _mvp){
+			GL.UniformMatrix4(mvpLocation, false, ref _mvp);
+		}
 		public virtual void Enable(){
 			GL.UseProgram (pgmId);
-
-			GL.UniformMatrix4(projectionLocation, false, ref projectionMat);
-			GL.UniformMatrix4 (modelLocation, false, ref modelMat);
-			GL.UniformMatrix4 (modelViewLocation, false, ref modelViewMat);
-			updateNormalMatrix ();
-			GL.Uniform4 (colorLocation, color);
-
-			if (texture < 0)
-				return;
-
-			GL.ActiveTexture (TextureUnit.Texture0);
-			GL.BindTexture(TextureTarget.Texture2D, texture);
 		}
 		public virtual void Disable(){
 			GL.UseProgram (0);
@@ -271,6 +246,36 @@ namespace Crow
 		}
 		#endregion
 
+		void loadSourcesFiles(){
+			Stream s;
+
+			if (!string.IsNullOrEmpty (VertSourcePath)) {
+				s = Crow.Interface.GetStreamFromPath (VertSourcePath);
+				if (s != null) {
+					using (StreamReader sr = new StreamReader (s)) {
+						vertSource = sr.ReadToEnd ();
+					}
+				}
+			}
+
+			if (!string.IsNullOrEmpty (FragSourcePath)) {
+				s = Crow.Interface.GetStreamFromPath (FragSourcePath);
+				if (s != null) {
+					using (StreamReader sr = new StreamReader (s)) {
+						fragSource = sr.ReadToEnd ();
+					}
+				}
+			}
+
+			if (!string.IsNullOrEmpty (GeomSourcePath)) {
+				s = Crow.Interface.GetStreamFromPath (GeomSourcePath);
+				if (s != null) {
+					using (StreamReader sr = new StreamReader (s)) {
+						geomSource = sr.ReadToEnd ();
+					}
+				}
+			}			
+		}
 		void compileShader(int shader, string source)
 		{
 			GL.ShaderSource(shader, source);
@@ -288,10 +293,14 @@ namespace Crow
 				Debug.WriteLine(source);
 			}
 		}
+		public override string ToString ()
+		{
+			return string.Format ("{0} {1} {2}", VertSourcePath, FragSourcePath, GeomSourcePath);
+		}
 
 		#region IDisposable implementation
 		public virtual void Dispose ()
-		{
+		{			
 			if (GL.IsProgram (pgmId))
 				GL.DeleteProgram (pgmId);
 
@@ -305,3 +314,4 @@ namespace Crow
 		#endregion
 	}
 }
+

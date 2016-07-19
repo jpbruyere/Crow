@@ -10,8 +10,7 @@ namespace Crow
     {
         public HorizontalStack()
             : base()
-        {
-            Orientation = Crow.Orientation.Horizontal;
+        {            
         }
 
         [XmlIgnore]

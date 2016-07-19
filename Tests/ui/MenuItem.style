@@ -1,0 +1,11 @@
+﻿Height = Fit
+Width = Stretched
+MinimumSize=60;10
+Margin=2
+CornerRadius=0
+TextAlignment=Left
+Foreground=Gray
+MouseEnter = {Background=SeaGreen;Foreground=White}
+MouseLeave = {Background=Transparent;Foreground=Gray}
+MouseDown = {Background=White;Foreground=DimGray}
+MouseUp = {Background=SeaGreen;Foreground=White}

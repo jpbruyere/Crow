@@ -9,6 +9,7 @@ using System.Diagnostics;
 
 namespace Crow
 {
+	[DefaultStyle ("#Crow.Styles.Slider.style")]
 	public class Slider : NumericControl
     {
 		#region CTOR
@@ -77,6 +78,7 @@ namespace Crow
 			}
 		}
 		#endregion
+
 		[XmlAttributeAttribute()][DefaultValue(10.0)]
 		public override double Maximum {
 			get { return base.Maximum; }
@@ -90,23 +92,6 @@ namespace Crow
 		}
 
 		#region GraphicObject Overrides
-		[XmlAttributeAttribute()][DefaultValue("vgradient|0:Black|0,1:Gray|0,9:Gray|1:LightGray")]
-		public override Fill Background {
-			get { return base.Background; }
-			set { base.Background = value; }
-		}
-		[XmlAttributeAttribute()][DefaultValue("Gray")]
-		public override Fill Foreground {
-			get { return base.Foreground; }
-			set { base.Foreground = value; }
-		}
-		[XmlAttributeAttribute()][DefaultValue(true)]
-		public override bool Focusable
-		{
-			get { return base.Focusable; }
-			set { base.Focusable = value; }
-		}
-
 		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);

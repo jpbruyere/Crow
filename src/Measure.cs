@@ -22,22 +22,47 @@ using System;
 
 namespace Crow
 {
+	/// <summary>
+	/// Measurement unit
+	/// </summary>
 	public enum Unit { Pixel, Percent }
+	/// <summary>
+	/// Measure class allow proportional sizes as well as stretched and fit on content.
+	/// </summary>
 	public struct Measure
 	{
+		/// <summary>
+		/// Integer value of the measure
+		/// </summary>
 		public int Value;
+		/// <summary>
+		/// Measurement unit
+		/// </summary>
 		public Unit Units;
 
+		/// <summary>
+		/// Fit on content, this special measure is defined as a fixed integer set to -1 pixel
+		/// </summary>
 		public static Measure Fit = new Measure(-1);
-		//TODO:implement stretching as 100%, not 0%
+		/// <summary>
+		/// Stretched into parent client area. This special measure is defined as a proportional cote
+		/// set to 100 Percents
+		/// </summary>
 		public static Measure Stretched = new Measure(100, Unit.Percent);
 
+		#region CTOR
 		public Measure (int _value, Unit _units = Unit.Pixel)
 		{
 			Value = _value;
 			Units = _units;
 		}
+		#endregion
+
+		/// <summary>
+		/// True is size is fixed in pixels, this means not proportional, stretched nor fit.
+		/// </summary>
 		public bool IsFixed { get { return Value > 0 && Units == Unit.Pixel; }}
+
 		#region Operators
 		public static implicit operator int(Measure m){
 			return m.Value;
@@ -59,6 +84,8 @@ namespace Crow
 			return !(m1.Value == m2.Value && m1.Units == m2.Units);
 		}
 		#endregion
+
+		#region Object overrides
 		public override int GetHashCode ()
 		{
 			return Value.GetHashCode ();
@@ -75,6 +102,8 @@ namespace Crow
 				Units == Unit.Percent ? Value == 100 ? "Stretched" :
 				Value.ToString () + "%" : Value.ToString ();
 		}
+		#endregion
+
 		public static Measure Parse(string s){
 			if (string.IsNullOrEmpty (s))
 				return Measure.Stretched;
