@@ -57,7 +57,4 @@
   <ItemGroup>
     <Folder Include="OpenGL\" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
 </Project>
