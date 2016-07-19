@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">Linux_x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{350D4F49-9901-4998-9903-BCA7D48DA58C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>OTKCrow</RootNamespace>
@@ -14,7 +14,7 @@
     <OutputPath>$(SolutionDir)/build/$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)/build/obj/$(Configuration)</IntermediateOutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Linux_x86' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,13 +22,17 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <IntermediateOutputPath>$(SolutionDir)\build\obj\$(Configuration)</IntermediateOutputPath>
+    <OutputPath>$(SolutionDir)\build\$(Configuration)</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Linux_x86' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <IntermediateOutputPath>$(SolutionDir)\build\obj\$(Configuration)</IntermediateOutputPath>
+    <OutputPath>$(SolutionDir)\build\$(Configuration)</OutputPath>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -40,18 +44,13 @@
       <Package>gtk-sharp-3.0</Package>
     </Reference>
     <Reference Include="OpenTK">
-      <HintPath>..\packages\OpenTK.1.1.2225.0\lib\net20\OpenTK.dll</HintPath>
-    </Reference>
-    <Reference Include="GGL">
-      <HintPath>..\..\Chess\build\Debug\GGL.dll</HintPath>
+      <HintPath>..\packages\OpenTK.1.1.2349.61993\lib\NET40\OpenTK.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OpenTKGameWindow.cs" />
-    <Compile Include="OpenGL\QuadVAO.cs" />
     <Compile Include="OpenGL\Shader.cs" />
-    <Compile Include="OpenGL\TexturedShader.cs" />
-    <Compile Include="OpenGL\VertexArrayObject.cs" />
+    <Compile Include="OpenGL\vaoMesh.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">
@@ -60,7 +59,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="OpenTK.dll.config" />
+    <Folder Include="OpenGL\" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
 </Project>

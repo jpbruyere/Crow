@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>GLC</RootNamespace>
     <AssemblyName>GLCrow</AssemblyName>
-	<OutputPath>$(SolutionDir)/build/$(Configuration)</OutputPath>
+    <OutputPath>$(SolutionDir)/build/$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)/build/obj/$(Configuration)</IntermediateOutputPath>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <ReleaseVersion>0.4</ReleaseVersion>
@@ -27,12 +27,16 @@
         <Variable name="vblank_mode" value="1" />
       </EnvironmentVariables>
     </EnvironmentVariables>
+    <IntermediateOutputPath>$(SolutionDir)\build\obj\$(Configuration)</IntermediateOutputPath>
+    <OutputPath>$(SolutionDir)\build\$(Configuration)</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Linux_x86' ">
     <Optimize>true</Optimize>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <IntermediateOutputPath>$(SolutionDir)\build\obj\$(Configuration)</IntermediateOutputPath>
+    <OutputPath>$(SolutionDir)\build\$(Configuration)</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="cairo-sharp">
@@ -60,10 +64,6 @@
     <ProjectReference Include="..\Crow.csproj">
       <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
       <Name>Crow</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\src\Pencil.Gaming\Pencil.Gaming\Pencil.Gaming.csproj">
-      <Project>{DDB6DB6D-E5DE-4BDB-8AC8-26DF800E9FF0}</Project>
-      <Name>Pencil.Gaming</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

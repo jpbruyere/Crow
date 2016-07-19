@@ -25,6 +25,7 @@ using System.Diagnostics;
 
 namespace Crow
 {
+	[DefaultStyle ("#Crow.Styles.TabItem.style")]
 	[DefaultTemplate("#Crow.Templates.TabItem.crow")]
 	public class TabItem : TemplatedContainer
 	{
@@ -64,21 +65,6 @@ namespace Crow
 			_tabTitle = this.child.FindByName ("TabTitle");
 		}
 		internal GraphicObject TabTitle { get { return _tabTitle; }}
-		#endregion
-
-		#region GraphicObject overrides
-		[XmlAttributeAttribute()][DefaultValue(true)]
-		public override bool Focusable
-		{
-			get { return base.Focusable; }
-			set { base.Focusable = value; }
-		}
-		//prevent caching, because drawing order is different depending on selected tab
-		[XmlAttributeAttribute()][DefaultValue(false)]
-		public override bool CacheEnabled {
-			get {return false;}
-			set { }
-		}
 		#endregion
 
 		[XmlAttributeAttribute()][DefaultValue(0)]

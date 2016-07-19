@@ -1,0 +1,8 @@
+﻿MouseEnter = {Background = Gray;Foreground = White}
+Fit = true
+MouseLeave = {Background=Transparent;Foreground=Gray}
+MouseDown = {Background=Red;Foreground=White}
+MouseUp = {Background=Gray;Foreground=White}
+Foreground=Gray
+Margin=5
+CornerRadius=5

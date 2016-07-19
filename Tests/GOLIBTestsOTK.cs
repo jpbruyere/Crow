@@ -89,16 +89,24 @@ namespace testOTK
 		{
 			base.OnLoad (e);
 			//this.AddWidget(new test4());
-			KeyboardKeyDown += GOLIBTests_KeyboardKeyDown1;;
+			KeyboardKeyDown += GOLIBTests_KeyboardKeyDown1;
 
-			testFiles = Directory.GetFiles(@"Interfaces/Stack", "*.crow").ToArray();
-			//testFiles = Directory.GetFiles(@"Interfaces/Stack", "*.crow").ToArray();
-			//testFiles = Directory.GetFiles(@"Interfaces/GraphicObject", "*.crow").Concat(testFiles).ToArray();
+			//testFiles = new string [] { @"Interfaces/Divers/testBind0.crow" };
+			testFiles = new string [] { @"Interfaces/Divers/testCombobox.crow" };
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
+			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/basicTests", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Stack", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Splitter", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Expandable", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
 
 			//testFiles = Directory.GetFiles(@"Interfaces", "*.crow").Concat(testFiles).ToArray();
 			this.Title = testFiles [idx];
-			GraphicObject obj = CrowInterface.LoadInterface(testFiles[idx]);
-			obj.DataSource = this;
+			CrowInterface.LoadInterface(testFiles[idx]).DataSource = this;
+
+			//CrowInterface.LoadInterface ("#Tests.ui.fps.crow").DataSource = this;	
 
 		}
 		void GOLIBTests_KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
@@ -124,23 +132,6 @@ namespace testOTK
 			obj.DataSource = this;
 		}
 
-//		protected override void OnUpdateFrame (FrameEventArgs e)
-//		{
-//			//if (frameCpt % 8 == 0)
-//				base.OnUpdateFrame (e);
-//
-//			fps = (int)RenderFrequency;
-//
-//
-//			if (frameCpt > 50) {
-//				resetFps ();
-//				frameCpt = 0;
-//				GC.Collect();
-//				GC.WaitForPendingFinalizers();
-//				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
-//			}
-//			frameCpt++;
-//		}
 		void onButClick(object send, MouseButtonEventArgs e)
 		{
 			Console.WriteLine ("button clicked:" + send.ToString());
@@ -161,16 +152,16 @@ namespace testOTK
 			//win.KeyPressEvent += win.Win_KeyPressEvent;
 		}
 
-		void Win_KeyPressEvent (object o, Gtk.KeyPressEventArgs args)
-		{
-			CrowInterface.ClearInterface ();
-			idx++;
-			if (idx == testFiles.Length)
-				idx = 0;
-			this.Title = testFiles [idx];
-			GraphicObject obj = CrowInterface.LoadInterface(testFiles[2]);
-			obj.DataSource = this;
-		}
+//		void Win_KeyPressEvent (object o, Gtk.KeyPressEventArgs args)
+//		{
+//			CrowInterface.ClearInterface ();
+//			idx++;
+//			if (idx == testFiles.Length)
+//				idx = 0;
+//			this.Title = testFiles [idx];
+//			GraphicObject obj = CrowInterface.LoadInterface(testFiles[2]);
+//			obj.DataSource = this;
+//		}
 
 
 

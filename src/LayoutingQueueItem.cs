@@ -36,19 +36,26 @@ namespace Crow
 		ArrangeChildren = 0x10,
 		All = 0xFF
 	}
-
+	/// <summary>
+	/// Element class of the LayoutingQueue
+	/// </summary>
 	public class LayoutingQueueItem
-	{		
+	{
+		/// <summary> Instance of widget to be layouted</summary>
 		public ILayoutable GraphicObject;
+		/// <summary> Bitfield containing the element of the layout to performs (x|y|width|height)</summary>
 		public LayoutingType LayoutType;
 
+		#region CTOR
 		public LayoutingQueueItem (LayoutingType _layoutType, ILayoutable _graphicObject)
 		{
 			LayoutType = _layoutType;
 			GraphicObject = _graphicObject;
 			GraphicObject.RegisteredLayoutings |= LayoutType;
 		}
-	
+		#endregion
+
+
 		public void ProcessLayouting()
 		{
 			if (GraphicObject.Parent == null) {

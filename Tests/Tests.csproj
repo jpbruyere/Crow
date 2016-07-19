@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>Tests.GLCrow</StartupObject>
+    <StartupObject>testCrowOTK.CrowTest</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>$(SolutionDir)/build/$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)/build/obj/$(Configuration)</IntermediateOutputPath>
@@ -23,12 +23,16 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <DefineConstants>DEBUG;TRACE;MEASURE_TIME</DefineConstants>
+    <IntermediateOutputPath>..\build\obj\Debug</IntermediateOutputPath>
+    <OutputPath>..\build\Debug</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <WarningLevel>0</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <IntermediateOutputPath>..\build\obj\Release</IntermediateOutputPath>
+    <OutputPath>..\build\Release</OutputPath>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -36,249 +40,178 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Drawing" />
-    <Reference Include="cairo-sharp, Version=1.10.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <Package>gtk-sharp-3.0</Package>
-    </Reference>
-    <Reference Include="gio-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
-      <Package>gio-sharp-3.0</Package>
-    </Reference>
-    <Reference Include="glib-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
-      <Package>glib-sharp-3.0</Package>
-    </Reference>
-    <Reference Include="gtk-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
-      <Package>gtk-sharp-3.0</Package>
-    </Reference>
-    <Reference Include="atk-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
-      <Package>gtk-sharp-3.0</Package>
+    <Reference Include="OpenTK">
+      <HintPath>..\packages\OpenTK.1.1.2349.61993\lib\NET40\OpenTK.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Interfaces\testBorder.goml.cs">
-      <LogicalName></LogicalName>
-    </Compile>
-    <Compile Include="GLCrow.cs">
-      <LogicalName></LogicalName>
-    </Compile>
+    <Compile Include="Interfaces\testBorder.goml.cs" />
+    <Compile Include="GOLIBTestsOTK.cs" />
+    <Compile Include="OTKCrow.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\log.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\testMeter.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\tmpMembers.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\itemTmp.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\tmpDirItem.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
-    <None Include="GOLIBTests.cs">
-      <LogicalName></LogicalName>
-    </None>
+    <None Include="GOLIBTests.cs" />
     <None Include="Interfaces\basicTests\0.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\basicTests\1.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\basicTests\2.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\basicTests\4.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\basicTests\5.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\basicTests\6.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\basicTests\7.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\GraphicObject\0.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\GraphicObject\1.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\GraphicObject\2.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Container\0.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Container\1.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Container\2.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Stack\0.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Stack\1.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Stack\2.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Stack\3.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Container\3.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Group\0.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Group\1.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Group\2.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Group\3.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Group\4.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Stack\0h.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Stack\1h.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Stack\2h.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Stack\3h.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Stack\4.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\2.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\4.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\5.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\6.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\clip0.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\clip1.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\clip2.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\clip3.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\clip4.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\fps.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\test_Listbox.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\test_stack.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\test0.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\test1.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\test1.1.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\test1.2.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\test2.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\test2WayBinding.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\test3.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\test5.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\test7.crow">
       <LogicalName>Tests.Interfaces.test7.goml</LogicalName>
@@ -286,158 +219,119 @@
     </None>
     <None Include="Interfaces\Divers\testAll.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\testBorder.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\testButton.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\testCheckbox.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\testCombobox.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\testContainer.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\testGrid.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\testGroupBox.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\testHStack.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\testPopper.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\testRadioButton.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\testScrollbar.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\testSpinner.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\testStacks.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\testTextBox.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\testWindow.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\testWindow2.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Divers\testWindow3.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Nouveau dossier\testColorList.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Nouveau dossier\test4.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Nouveau dossier\test6.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Nouveau dossier\test4.1.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Nouveau dossier\testMsgBox.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Nouveau dossier\testOutOfClipUpdate.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Nouveau dossier\testFileDialog.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Nouveau dossier\testImage.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Nouveau dossier\testDirViewer.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Nouveau dossier\testTabView.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Nouveau dossier\testTypeViewer.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Nouveau dossier\testLabel.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Nouveau dossier\testRadioButton2.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Expandable\1.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Expandable\0.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Expandable\7.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Expandable\2.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Nouveau dossier\testTreeView.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
     <None Include="Interfaces\Splitter\1.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LogicalName></LogicalName>
     </None>
-    <None Include="OpenTK.dll.config">
-      <LogicalName></LogicalName>
-    </None>
-    <None Include="GOLIBTestsOTK.cs">
-      <LogicalName></LogicalName>
-    </None>
+    <None Include="OpenTK.dll.config" />
+    <None Include="packages.config" />
+    <None Include="main.cs" />
+    <None Include="GLCrow.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />
@@ -459,21 +353,20 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Interfaces\TmpExpandable.goml" />
-    <EmbeddedResource Include="ui\fps.crow" />
     <EmbeddedResource Include="ui\tmpWindow.crow" />
+    <EmbeddedResource Include="ui\test.crow" />
+    <EmbeddedResource Include="ui\LabelButton.style" />
+    <EmbeddedResource Include="ui\Popper.template" />
+    <EmbeddedResource Include="ui\MenuItem.style" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">
       <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
       <Name>Crow</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GLCrow\GLCrow.csproj">
-      <Project>{66376B95-9351-4A63-B920-F4BB53FEF0E2}</Project>
-      <Name>GLCrow</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\src\Pencil.Gaming\Pencil.Gaming\Pencil.Gaming.csproj">
-      <Project>{DDB6DB6D-E5DE-4BDB-8AC8-26DF800E9FF0}</Project>
-      <Name>Pencil.Gaming</Name>
+    <ProjectReference Include="..\OTKCrow\OTKCrow.csproj">
+      <Project>{350D4F49-9901-4998-9903-BCA7D48DA58C}</Project>
+      <Name>OTKCrow</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

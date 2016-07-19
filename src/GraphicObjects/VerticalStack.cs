@@ -10,14 +10,12 @@ namespace Crow
         public VerticalStack()
             : base()
         {
-            Orientation = Crow.Orientation.Vertical;
         }
 
         [System.Xml.Serialization.XmlIgnore]
         public override Orientation Orientation
         {
-            get { return Orientation.Vertical; }
-            //set {  }
+            get { return Orientation.Vertical; }            
         }
 
 
