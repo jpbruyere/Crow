@@ -1,5 +1,4 @@
-CROW [![NuGet Version and Downloads](https://buildstats.info/nuget/Crow.dll)](https://www.nuget.org/packages/Crow.dll/)
-[![Build Status](https://travis-ci.org/jpbruyere/Crow.svg?branch=master)](https://travis-ci.org/jpbruyere/Crow)
+CROW [![NuGet Version and Downloads](https://buildstats.info/nuget/Crow.dll)](https://www.nuget.org/packages/Crow.dll/) [![Build Status](https://travis-ci.org/jpbruyere/Crow.svg?branch=master)](https://travis-ci.org/jpbruyere/Crow)
 ===========
 
 **CROW** is a pure **C#** widget toolkit originally developed for easy GUI implementation for OpenTK.
@@ -9,9 +8,9 @@ Running under Mono, With multi-platform libraries it should run on any target.
 **Crow** has full transparency support, but a fast opaque rendering queue exist for heavy critical application.
 
 #####Screen shots
-<img src="/magic3d.png?raw=true" alt="Magic3d" width="20%" /> 
-<img src="/screenshot1.png?raw=true" alt="Screen Shot" width="20%" /> 
-<img src="/screenshot2.png?raw=true" alt="Screen Shot" width="20%" /> 
+<img src="/magic3d.png?raw=true" alt="Magic3d" width="20%" style="float:left" /> 
+<img src="/screenshot1.png?raw=true" alt="Screen Shot" width="20%" align="center"/> 
+<img src="/screenshot2.png?raw=true" alt="Screen Shot" width="20%" style="float:right"/> 
 
 FEATURES
 ========
