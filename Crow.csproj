@@ -154,6 +154,7 @@
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="packages\gtk-sharp.Linux.3.14.3.14.7\build\net40\gtk-sharp.Linux.3.14.targets" Condition="Exists('packages\gtk-sharp.Linux.3.14.3.14.7\build\net40\gtk-sharp.Linux.3.14.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -225,7 +226,7 @@
     <EmbeddedResource Include="Templates\ScrollBar.goml" />
     <EmbeddedResource Include="Templates\Button.crow" />
     <EmbeddedResource Include="Templates\ArrowButTemplate.crow" />
-    <EmbeddedResource Include="Images\crow0.svg"/>
+    <EmbeddedResource Include="Images\crow0.svg" />
     <EmbeddedResource Include="Templates\TreeView.crow" />
     <EmbeddedResource Include="Templates\TabItem.crow" />
     <EmbeddedResource Include="Templates\TreeItem.crow" />

@@ -15,6 +15,9 @@
 			<Label Text="Edit" Style="#Tests.ui.LabelButton.style"/>
 			<Label Text="Project" Style="#Tests.ui.LabelButton.style"/>
 			<Label Text="Help" Style="#Tests.ui.LabelButton.style"/>
-		</HorizontalStack>	
+		</HorizontalStack>
+		<CheckBox Text="Test"/>
+		<Image Width="100" Height="100"
+		Path="#Crow.Images.Icons.exit2.svg"	/>
 	</VerticalStack>
 </Window>

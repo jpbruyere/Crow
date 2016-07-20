@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<package >
+	<metadata>
+		<id>Crow.OpenTK</id>
+		<version>0.4.1</version>
+		<title>C# Rapid Widget Toolkit</title>
+		<authors>JP Bruyere</authors>
+		<owners>Grand Tetras Software Team</owners>
+		<licenseUrl>https://www.gnu.org/licenses/gpl-3.0.html</licenseUrl>
+		<projectUrl>https://jpbruyere.github.io/Crow/</projectUrl>
+		<iconUrl>https://jpbruyere.github.io/Crow/images/crow.png</iconUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>
+		CROW is a pure C# widget toolkit with templates, styles, compositing, and bindings.
+		Crow.OpenTK is the OpenTK ready version. 
+		</description>
+		<releaseNotes>second nuget packaging try</releaseNotes>
+		<copyright>Copyright 2016</copyright>
+		<dependencies>
+			<dependency id="OpenTK.Next"/>
+		</dependencies>
+        <tags>Crow OpenTK OpenGL Widget Interface GUI C# .Net Mono</tags>
+        <references>
+            <reference file="OpenTK.dll" />
+        </references>
+        <frameworkAssemblies>
+            <frameworkAssembly assemblyName="System" />
+            <frameworkAssembly assemblyName="System.Drawing" />
+            <frameworkAssembly assemblyName="System.Xml" />
+        </frameworkAssemblies>
+	</metadata>
+	<files>
+		<file src="build/Release/Crow.dll" target="lib/net45" />
+		<file src="build/Release/OTKCrow.dll" target="lib/net45" />
+		<file src="build/Release/gio-sharp.dll" target="lib/net45" />
+		<file src="build/Release/glib-sharp.dll" target="lib/net45" />
+		<file src="build/Release/cairo-sharp.dll" target="lib/net45" />
+		<file src="build/Release/glib-sharp.dll.config" target="build" />
+		<file src="build/Release/gio-sharp.dll.config" target="build" />
+	</files>
+</package>

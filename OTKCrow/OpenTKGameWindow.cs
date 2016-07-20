@@ -91,28 +91,16 @@ namespace Crow
 		#endregion
 
 		#region ctor
-//		public OpenTKGameWindow(int _width, int _height, string _title="golib")
-//			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 1), _title,
-//				GameWindowFlags.Fullscreen,
-//				DisplayDevice.Default,
-//				3,0,OpenTK.Graphics.GraphicsContextFlags.Default)
-		public OpenTKGameWindow(int _width, int _height, string _title="Crow")
-			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 1),
-				_title,GameWindowFlags.Default,DisplayDevice.GetDisplay(DisplayIndex.Second),
-				3,3,OpenTK.Graphics.GraphicsContextFlags.Default)
-//		public OpenTKGameWindow(int _width, int _height, string _title="golib")
-//			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), _title)
+		public OpenTKGameWindow(int _width = 800, int _height = 600, string _title="Crow",
+			int colors = 32, int depth = 24, int stencil = 0, int samples = 1,
+			int major=3, int minor=3)
+			: this(_width, _height, new OpenTK.Graphics.GraphicsMode(colors, depth, stencil, samples),
+				_title,GameWindowFlags.Default,DisplayDevice.Default,
+				major,minor,OpenTK.Graphics.GraphicsContextFlags.Default)
 		{
-			CrowInterface = new Interface ();
-			Thread t = new Thread (interfaceThread);
-			t.IsBackground = true;
-			t.Start ();
-//			interfaceThread ();
 		}
-		public OpenTKGameWindow(int _width, int _height, int colors, int depth, int stencil, int samples, string _title="Crow")
-			: base(_width, _height, new OpenTK.Graphics.GraphicsMode(colors, depth, stencil, samples),
-				_title,GameWindowFlags.Default,DisplayDevice.GetDisplay(DisplayIndex.Second),
-				3,3,OpenTK.Graphics.GraphicsContextFlags.Default)
+		public OpenTKGameWindow (int width, int height, OpenTK.Graphics.GraphicsMode mode, string title, GameWindowFlags options, DisplayDevice device, int major, int minor, OpenTK.Graphics.GraphicsContextFlags flags)
+			: base(width,height,mode,title,options,device,major,minor,flags)
 		{
 			CrowInterface = new Interface ();
 
@@ -120,6 +108,7 @@ namespace Crow
 			t.IsBackground = true;
 			t.Start ();
 		}
+
 		#endregion
 
 		void interfaceThread()
