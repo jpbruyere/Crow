@@ -4,7 +4,7 @@
   <head>
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="Crow : C.R.O.W.: Collaborative Radiant Open Widgets">
+    <meta name="description" content="Crow : C.R.O.W.: C# Rapid Open Widgets">
     <link rel="icon" href="images/crow.png">
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
@@ -35,50 +35,52 @@
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
         <h1>
-<a href="https://travis-ci.org/jpbruyere/Crow"><img src="https://travis-ci.org/jpbruyere/Crow.svg?branch=master" alt="Build Status"/></a>
-</h1>
+			<a href="https://travis-ci.org/jpbruyere/Crow"><img src="https://travis-ci.org/jpbruyere/Crow.svg?branch=master" alt="Build Status"/></a>
+		</h1>
 
 
-<p><strong>CROW</strong> is a pure <strong>C#</strong> widget toolkit originally developed for easy GUI implementation for <a href="http://opentk.github.io/">OpenTK</a>.<p/>
-<p>
-Trying to make it as efficient as possible, it evolved as a full feature toolkit with templates, styles, compositing,  and  bindings.
-Running under Mono, With multi-platform libraries it should run on any target.</p>
+		<p><strong>CROW</strong> is a pure <strong>C#</strong> widget toolkit originally developed for rapid GUI implementation for
+		<a href="http://opentk.github.io/">OpenTK</a>.<p/>
+		<p>Trying to make it as efficient as possible, it evolved as a full feature toolkit with templates, styles, compositing,  and  bindings.
+		Running under Mono, With multi-platform libraries it should run on any target.</p>
+		<p><strong>Crow</strong> has full transparency support, but a fast opaque rendering queue exist for heavy critical application.</p>
 
-<p><strong>Crow</strong> has full transparency support, but a fast opaque rendering queue exist for heavy critical application.</p>
+		<h1>
+			<a id="screen-shots" class="anchor" href="#screen-shots" aria-hidden="true">
+				<span aria-hidden="true" class="octicon octicon-link"></span></a>Screen shots
+		</h1>
 
-<h1>
-<a id="screen-shots" class="anchor" href="#screen-shots" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Screen shots</h1>
+		<table width="100%">
+		  <tr>
+			<td width="30%" align="center"><img src="images/magic3d.png" alt="Magic3d" width="90%"></td>
+			<td width="30%" align="center"><img src="images/screenshot1.png" alt="Screen Shot" width="90%"></td>
+			<td width="30%" align="center"><img src="images/screenshot3.png" alt="Chess3D" width="90%"></td>
+		  </tr>
+		</table>
 
-<table width="100%">
-  <tr>
-    <td width="30%" align="center"><img src="images/magic3d.png" alt="Magic3d" width="90%"></td>
-    <td width="30%" align="center">
-<img src="images/screenshot1.png" alt="Screen Shot" width="90%"> </td>
-    <td width="30%" align="center">
-<img src="images/screenshot2.png" alt="Screen Shot" width="90%"> </td>
-  </tr>
-</table>
+		<h1>
+			<a id="feature" class="anchor" href="#feature" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Feature
+		</h1>
 
-<h1>
-<a id="feature" class="anchor" href="#feature" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Feature</h1>
+		<ul>
+			<li><strong>XML</strong> interface definition.</li>
+			<li>Templates and styling</li>
+			<li>Dynamic binding system with code injection.</li>
+			<li>Inlined delegates in XML</li>
+			<li>Proportionnal layouting</li>
+		</ul>
 
-<ul>
-<li>
-<strong>XML</strong> interface definition.</li>
-<li>Templates and styling</li>
-<li>Dynamic binding system with code injection.</li>
-<li>Inlined delegates in XML</li>
-</ul>
+		<h1>
+			<a id="building" class="anchor" href="#building" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Building
+		</h1>
 
-<h1>
-<a id="building" class="anchor" href="#building" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Building</h1>
-
-<pre><code>git clone https://github.com/jpbruyere/Crow.git     # Download source code from github
-cd Crow                                             # Enter the source directory
-nuget restore Crow.sln                              # Restore nuget packages
-msbuild /p:Configuration=Release Crow.sln           # Build on .Net (Windows)
-xbuild  /p:Configuration=Release Crow.sln           # Build on Mono (Linux / Mac OS X)
-</code></pre>
+		<pre><code>
+			git clone https://github.com/jpbruyere/Crow.git     # Download source code from github
+			cd Crow                                             # Enter the source directory
+			nuget restore Crow.sln                              # Restore nuget packages
+			msbuild /p:Configuration=Release Crow.sln           # Build on .Net (Windows)
+			xbuild  /p:Configuration=Release Crow.sln           # Build on Mono (Linux / Mac OS X)
+		</code></pre>
       </section>
     </div>
 
@@ -89,8 +91,5 @@ xbuild  /p:Configuration=Release Crow.sln           # Build on Mono (Linux / Mac
         <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
-
-    
-
   </body>
 </html>
