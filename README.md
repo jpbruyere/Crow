@@ -1,11 +1,17 @@
 CROW [![NuGet Version and Downloads](https://buildstats.info/nuget/Crow.OpenTK)](https://www.nuget.org/packages/Crow.OpenTK) [![Build Status](https://travis-ci.org/jpbruyere/Crow.svg?branch=master)](https://travis-ci.org/jpbruyere/Crow)
 ===========
 
-**CROW** is a pure **C#** widget toolkit originally developed for easy GUI implementation for OpenTK.
+**CROW** is a pure **C#** widget toolkit originally developed for easy GUI implementation for [OpenTK](http://opentk.github.io/).
+
 Trying to make it as efficient as possible, it evolved as a full feature toolkit with templates, styles, compositing,  and  bindings.
 Running under Mono, With multi-platform libraries it should run on any target.
 
-**Crow** has full transparency support, but a fast opaque rendering queue exist for heavy critical application.
+Using Crow is an easy way to get instantly some controls in your your OpenGL application. With the binding system, your local
+variables are bound to the interface in 2 clicks and with the full transparency, your openGL scene will always stay fully visible.
+
+You can visit the [Wiki](https://github.com/jpbruyere/Crow/wiki) or the [Project Site](https://jpbruyere.github.io/Crow/) for documentation and tutorials. _(in progress)_
+
+Please report bugs and issues on [GitHub](https://github.com/jpbruyere/Crow/issues)
 
 Screen shots
 ============
@@ -18,7 +24,7 @@ Screen shots
   </tr>
 </table>
 
-Feature
+Features
 ========
 
 - **XML** interface definition.
@@ -29,8 +35,8 @@ Feature
 Using CROW in your OpenTK project
 =================================
 * add [Crow.OpenTK NuGet package](https://www.nuget.org/packages/Crow.OpenTK/) to your project.
-* Derive **OpenTKGameWindow.cs**.
-* Load some widget in the **OnLoad** override.
+* Derive **OpenTKGameWindow** class.
+* Load some widget in the **OnLoad** override with `CrowInterface.LoadInterface` .
 
 Build from sources
 ==================
