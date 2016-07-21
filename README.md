@@ -12,9 +12,9 @@ Screen shots
 
 <table width="100%">
   <tr>
-    <td width="30%" align="center"><img src="/magic3d.png?raw=true" alt="Magic3d" width="90%"/></td>
-    <td width="30%" align="center"><img src="/screenshot1.png?raw=true" alt="Screen Shot" width="90%" /> </td>
-    <td width="30%" align="center"><img src="/screenshot2.png?raw=true" alt="Screen Shot" width="90%"/> </td>
+    <td width="30%" align="center"><img src="https://jpbruyere.github.io/Crow/images/magic3d.png" alt="Magic3d" width="90%"/></td>
+    <td width="30%" align="center"><img src="https://jpbruyere.github.io/Crow/images/screenshot3.png" alt="Screen Shot" width="90%" /> </td>
+    <td width="30%" align="center"><img src="https://jpbruyere.github.io/Crow/images/screenshot1.png" alt="Screen Shot" width="90%"/> </td>
   </tr>
 </table>
 
