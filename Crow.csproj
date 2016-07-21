@@ -144,10 +144,6 @@
       <HintPath>$(SolutionDir)packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\cairo-sharp.dll</HintPath>
       <Package>gtk-sharp-3.0</Package>
     </Reference>
-    <Reference Include="gdk-sharp">
-      <HintPath>$(SolutionDir)packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\gdk-sharp.dll</HintPath>
-      <Package>gtk-sharp-2.0</Package>
-    </Reference>
     <Reference Include="gio-sharp">
       <HintPath>$(SolutionDir)packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\gio-sharp.dll</HintPath>
       <Package>gio-sharp-3.0</Package>
@@ -156,6 +152,10 @@
       <HintPath>$(SolutionDir)packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\glib-sharp.dll</HintPath>
       <Package>glib-sharp-3.0</Package>
     </Reference>
+	<Reference Include="gdk-sharp">
+		<HintPath>$(SolutionDir)packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\gdk-sharp.dll</HintPath>
+		<Package>gtk-sharp-3.0</Package>
+	</Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\gtk-sharp.Linux.3.14.3.14.7\build\net40\gtk-sharp.Linux.3.14.targets" Condition="Exists('packages\gtk-sharp.Linux.3.14.3.14.7\build\net40\gtk-sharp.Linux.3.14.targets')" />
