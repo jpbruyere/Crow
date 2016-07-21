@@ -1,4 +1,4 @@
-CROW [![NuGet Version and Downloads](https://buildstats.info/nuget/Crow.dll)](https://www.nuget.org/packages/Crow.dll/) [![Build Status](https://travis-ci.org/jpbruyere/Crow.svg?branch=master)](https://travis-ci.org/jpbruyere/Crow)
+CROW [![NuGet Version and Downloads](https://buildstats.info/nuget/Crow.OpenTK)](https://www.nuget.org/packages/Crow.OpenTK) [![Build Status](https://travis-ci.org/jpbruyere/Crow.svg?branch=master)](https://travis-ci.org/jpbruyere/Crow)
 ===========
 
 **CROW** is a pure **C#** widget toolkit originally developed for easy GUI implementation for OpenTK.
@@ -26,8 +26,14 @@ Feature
 - Dynamic binding system with code injection.
 - Inlined delegates in XML
 
-Building
-========
+Using CROW in your OpenTK project
+=================================
+* add [Crow.OpenTK NuGet package](https://www.nuget.org/packages/Crow.OpenTK/) to your project.
+* Derive **OpenTKGameWindow.cs**.
+* Load some widget in the **OnLoad** override.
+
+Build from sources
+==================
 
 ```
 git clone https://github.com/jpbruyere/Crow.git   	# Download source code from github
