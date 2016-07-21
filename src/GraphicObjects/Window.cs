@@ -97,7 +97,6 @@ namespace Crow
 			if (!hoverBorder) {
 				currentDirection = Direction.None;
 				Interface.CurrentInterface.MouseCursor = XCursor.Default;
-				Debug.WriteLine ("not hover border");
 				return;
 			}
 
