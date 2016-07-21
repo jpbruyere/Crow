@@ -82,15 +82,27 @@ namespace Crow
 			int ptrThis = gs.Children.IndexOf (this);
 
 			if (gs.Orientation == Orientation.Horizontal) {
-				if (ptrThis >= 0)
-					gs.Children [ptrThis - 1].Width = Math.Max(gs.Children [ptrThis - 1].Slot.Width + e.XDelta, 1);
-				if (ptrThis < gs.Children.Count - 1)
-					gs.Children [ptrThis + 1].Width = Math.Max(gs.Children [ptrThis + 1].Slot.Width - e.XDelta, 1);
+				if (ptrThis >= 0){
+					if (!gs.Children [ptrThis - 1].Width.IsFixed)
+						gs.Children [ptrThis - 1].Width = gs.Children [ptrThis - 1].Slot.Width;
+					gs.Children [ptrThis - 1].Width = Math.Max(gs.Children [ptrThis - 1].Width + e.XDelta, 1);
+				}
+				if (ptrThis < gs.Children.Count - 1){
+					if (!gs.Children [ptrThis + 1].Width.IsFixed)
+						gs.Children [ptrThis + 1].Width = gs.Children [ptrThis + 1].Slot.Width;					
+					gs.Children [ptrThis + 1].Width = Math.Max(gs.Children [ptrThis + 1].Width - e.XDelta, 1);
+				}
 			} else {
-				if (ptrThis >= 0)
-					gs.Children [ptrThis - 1].Height = Math.Max(gs.Children [ptrThis - 1].Slot.Height + e.YDelta, 1);
-				if (ptrThis < gs.Children.Count - 1)
-					gs.Children [ptrThis + 1].Height = Math.Max(gs.Children [ptrThis + 1].Slot.Height - e.YDelta, 1);
+				if (ptrThis >= 0) {
+					if (!gs.Children [ptrThis - 1].Height.IsFixed)
+						gs.Children [ptrThis - 1].Height = gs.Children [ptrThis - 1].Slot.Height;
+					gs.Children [ptrThis - 1].Height = Math.Max (gs.Children [ptrThis - 1].Height + e.YDelta, 1);
+				}
+				if (ptrThis < gs.Children.Count - 1) {
+					if (!gs.Children [ptrThis + 1].Height.IsFixed)
+						gs.Children [ptrThis + 1].Height = gs.Children [ptrThis + 1].Slot.Height;
+					gs.Children [ptrThis + 1].Height = Math.Max (gs.Children [ptrThis + 1].Height - e.YDelta, 1);
+				}
 			}
 		}
 		public override bool UpdateLayout (LayoutingType layoutType)
