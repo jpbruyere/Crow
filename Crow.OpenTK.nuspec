@@ -17,11 +17,12 @@
 		<releaseNotes>second nuget packaging try</releaseNotes>
 		<copyright>Copyright 2016</copyright>
 		<dependencies>
-			<dependency id="OpenTK.Next"/>
+			<dependency id="OpenTK.Next" version="1.2" />
+			<dependency id="gtk-sharp.Linux.3.14" version="3.14" />
 		</dependencies>
         <tags>Crow OpenTK OpenGL Widget Interface GUI C# .Net Mono</tags>
         <references>
-            <reference file="OpenTK.dll" />
+            <reference file="Crow.dll" />
         </references>
         <frameworkAssemblies>
             <frameworkAssembly assemblyName="System" />
@@ -30,12 +31,8 @@
         </frameworkAssemblies>
 	</metadata>
 	<files>
+		<file src="Tests/OpenTKGameWindow.cs" target="content" />
+		<file src="Tests/OpenGL/*.cs" target="content/OpenGL" />
 		<file src="build/Release/Crow.dll" target="lib/net45" />
-		<file src="build/Release/OTKCrow.dll" target="lib/net45" />
-		<file src="build/Release/gio-sharp.dll" target="lib/net45" />
-		<file src="build/Release/glib-sharp.dll" target="lib/net45" />
-		<file src="build/Release/cairo-sharp.dll" target="lib/net45" />
-		<file src="build/Release/glib-sharp.dll.config" target="build" />
-		<file src="build/Release/gio-sharp.dll.config" target="build" />
 	</files>
 </package>

@@ -23,8 +23,6 @@ namespace testCrowOTK
 		public CrowTest ()
 			: base(800, 600,"Crow Test with OpenTK")
 		{
-			VSync = VSyncMode.Off;
-			Interface.CurrentInterface = CrowInterface;
 		}
 
 
