@@ -48,6 +48,9 @@
     <Compile Include="Interfaces\testBorder.goml.cs" />
     <Compile Include="GOLIBTestsOTK.cs" />
     <Compile Include="OTKCrow.cs" />
+    <Compile Include="OpenGL\Shader.cs" />
+    <Compile Include="OpenGL\vaoMesh.cs" />
+    <Compile Include="OpenTKGameWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -68,7 +71,6 @@
     <None Include="Interfaces\tmpDirItem.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="GOLIBTests.cs" />
     <None Include="Interfaces\basicTests\0.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -328,8 +330,6 @@
     <None Include="Interfaces\Splitter\1.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="OpenTK.dll.config" />
-    <None Include="GLCrow.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />
@@ -361,10 +361,6 @@
     <ProjectReference Include="..\Crow.csproj">
       <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
       <Name>Crow</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OTKCrow\OTKCrow.csproj">
-      <Project>{350D4F49-9901-4998-9903-BCA7D48DA58C}</Project>
-      <Name>OTKCrow</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

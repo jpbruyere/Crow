@@ -62,7 +62,7 @@ namespace Crow
 				NotifyValueChanged ("Title", _title);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("#Crow.Images.Icons.tetra.png")]
+		[XmlAttributeAttribute()][DefaultValue("#Crow.Images.Icons.crow.png")]
 		public string Icon {
 			get { return _icon; } 
 			set {
