@@ -12,9 +12,9 @@
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>
 		CROW is a pure C# widget toolkit with templates, styles, compositing, and bindings.
-		Crow.OpenTK is the OpenTK ready version. 
+		Crow.OpenTK is the OpenTK ready version.
 		</description>
-		<releaseNotes>second nuget packaging try</releaseNotes>
+		<releaseNotes>Beta release, minimal OpenTK implementation.</releaseNotes>
 		<copyright>Copyright 2016</copyright>
 		<dependencies>
 			<dependency id="OpenTK.Next" version="1.2" />
