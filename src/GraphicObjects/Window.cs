@@ -97,60 +97,78 @@ namespace Crow
 			if (!hoverBorder) {
 				currentDirection = Direction.None;
 				Interface.CurrentInterface.MouseCursor = XCursor.Default;
+				Debug.WriteLine ("not hover border");
 				return;
 			}
-			
-			if (e.Mouse.IsButtonDown (MouseButton.Left)) {				
 
-				int currentLeft = this.Left;
-				int currentTop = this.Top;
+			if (this.HasFocus) {
+				
+				if (e.Mouse.IsButtonDown (MouseButton.Left)) {				
 
-				if (currentLeft == 0)
-					currentLeft = this.Slot.Left;
-				if (currentTop == 0)
-					currentTop = this.Slot.Top;
+					int currentLeft = this.Left;
+					int currentTop = this.Top;
+					int currentWidth, currentHeight;
 
-				switch (currentDirection) {
-				case Direction.None:
-					this.Left = currentLeft + e.XDelta;				
-					this.Top = currentTop + e.YDelta;
-					break;
-				case Direction.N:
-					this.Top = currentTop + e.YDelta;
-					this.Height -= e.YDelta;
-					break;
-				case Direction.S:
-					this.Height += e.YDelta;
-					break;
-				case Direction.W:
-					this.Left = currentLeft + e.XDelta;
-					this.Width -= e.XDelta;
-					break;
-				case Direction.E:
-					this.Width += e.XDelta;
-					break;
-				case Direction.NW:
-					this.Left = currentLeft + e.XDelta;
-					this.Top = currentTop + e.YDelta;
-					this.Width -= e.XDelta;
-					this.Height -= e.YDelta;
-					break;
-				case Direction.NE:
-					this.Width += e.XDelta;
-					this.Top = currentTop + e.YDelta;
-					this.Height -= e.YDelta;
-					break;
-				case Direction.SW:
-					this.Left = currentLeft + e.XDelta;
-					this.Width -= e.XDelta;
-					this.Height += e.YDelta;
-					break;
-				case Direction.SE:
-					this.Width += e.XDelta;
-					this.Height += e.YDelta;
-					break;
+					if (currentLeft == 0) {
+						currentLeft = this.Slot.Left;
+						//this.Left = currentLeft;
+					}
+					if (currentTop == 0) {
+						currentTop = this.Slot.Top;
+						//this.Top = currentTop;
+					}
+					if (this.Width.IsFixed)
+						currentWidth = this.Width;
+					else
+						currentWidth = this.Slot.Width;
+				
+					if (this.Height.IsFixed)
+						currentHeight = this.Height;
+					else
+						currentHeight = this.Slot.Height;
+
+					switch (currentDirection) {
+					case Direction.None:
+						this.Left = currentLeft + e.XDelta;				
+						this.Top = currentTop + e.YDelta;
+						break;
+					case Direction.N:
+						this.Top = currentTop + e.YDelta;
+						this.Height = currentHeight - e.YDelta;
+						break;
+					case Direction.S:
+						this.Height = currentHeight + e.YDelta;
+						break;
+					case Direction.W:
+						this.Left = currentLeft + e.XDelta;
+						this.Width = currentWidth - e.XDelta;
+						break;
+					case Direction.E:
+						this.Width = currentWidth + e.XDelta;
+						break;
+					case Direction.NW:
+						this.Left = currentLeft + e.XDelta;
+						this.Top = currentTop + e.YDelta;
+						this.Width = currentWidth - e.XDelta;
+						this.Height = currentHeight - e.YDelta;
+						break;
+					case Direction.NE:
+						this.Width = currentWidth + e.XDelta;
+						this.Top = currentTop + e.YDelta;
+						this.Height = currentHeight - e.YDelta;
+						break;
+					case Direction.SW:
+						this.Left = currentLeft + e.XDelta;
+						this.Width = currentWidth - e.XDelta;
+						this.Height = currentHeight + e.YDelta;
+						break;
+					case Direction.SE:
+						this.Width = currentWidth + e.XDelta;
+						this.Height = currentHeight + e.YDelta;
+						break;
+					}
+					return;
 				}
-				return;
 			}
 //			GraphicObject firstFocusableAncestor = otkgw.hoverWidget;
 //			while (firstFocusableAncestor != this) {
