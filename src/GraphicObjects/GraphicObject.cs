@@ -239,6 +239,10 @@ namespace Crow
 			set {
 				if (_width == value)
 					return;
+				if (value.IsFixed) {
+					if (value < MinimumSize.Width || (value > MaximumSize.Width && MaximumSize.Width > 0))
+						return;
+				}
 
 				_width = value;
 				NotifyValueChanged ("Width", _width);
@@ -253,6 +257,10 @@ namespace Crow
 			set {
 				if (_height == value)
 					return;
+				if (value.IsFixed) {
+					if (value < MinimumSize.Height || (value > MaximumSize.Height && MaximumSize.Height > 0))
+						return;
+				}
 
 				_height = value;
 				NotifyValueChanged ("Height", _height);
@@ -1239,6 +1247,8 @@ namespace Crow
 			}
 		}
 		void applyStyle(){
+			//The first place searched for a style is in the style propery of this instance
+			//this field may contains the path to a Style file for the object.
 			if (string.IsNullOrEmpty (style))
 				return;
 			Stream s = Interface.GetStreamFromPath (style);

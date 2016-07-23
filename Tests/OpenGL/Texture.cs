@@ -37,30 +37,31 @@ namespace Crow
 		        
 		public Texture(string _mapPath, bool flipY = true)
         {
-			if (!File.Exists (_mapPath))
-				throw new FileNotFoundException ("Texture not found", _mapPath);
-			try {
-	            Map = _mapPath;
+			using (Stream s = Interface.GetStreamFromPath (_mapPath)) {
 
-				Bitmap bitmap = new Bitmap(_mapPath);				
+				try {
+					Map = _mapPath;
 
-				if(flipY)
-					bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
+					Bitmap bitmap = new Bitmap (s);
 
-				BitmapData data = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-					ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+					if (flipY)
+						bitmap.RotateFlip (RotateFlipType.RotateNoneFlipY);
 
-				createTexture (data.Scan0, data.Width, data.Height);
+					BitmapData data = bitmap.LockBits (new System.Drawing.Rectangle (0, 0, bitmap.Width, bitmap.Height),
+						ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-				bitmap.UnlockBits(data);
+					createTexture (data.Scan0, data.Width, data.Height);
 
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+					bitmap.UnlockBits (data);
 
-				GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+					GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
+					GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 
-			} catch (Exception ex) {
-				Debug.WriteLine ("Error loading texture: " + Map + ":" + ex.Message); 
+					GL.GenerateMipmap (GenerateMipmapTarget.Texture2D);
+
+				} catch (Exception ex) {
+					Debug.WriteLine ("Error loading texture: " + Map + ":" + ex.Message);
+				}
 			}
 		}
 

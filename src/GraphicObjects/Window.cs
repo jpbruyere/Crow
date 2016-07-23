@@ -101,20 +101,18 @@ namespace Crow
 			}
 
 			if (this.HasFocus) {
-				
-				if (e.Mouse.IsButtonDown (MouseButton.Left)) {				
-
+				if (e.Mouse.IsButtonDown (MouseButton.Left)) {
 					int currentLeft = this.Left;
 					int currentTop = this.Top;
 					int currentWidth, currentHeight;
 
 					if (currentLeft == 0) {
 						currentLeft = this.Slot.Left;
-						//this.Left = currentLeft;
+						this.Left = currentLeft;
 					}
 					if (currentTop == 0) {
 						currentTop = this.Slot.Top;
-						//this.Top = currentTop;
+						this.Top = currentTop;
 					}
 					if (this.Width.IsFixed)
 						currentWidth = this.Width;
@@ -132,38 +130,44 @@ namespace Crow
 						this.Top = currentTop + e.YDelta;
 						break;
 					case Direction.N:
-						this.Top = currentTop + e.YDelta;
 						this.Height = currentHeight - e.YDelta;
+						if (this.Height == currentHeight - e.YDelta)
+							this.Top = currentTop + e.YDelta;
 						break;
 					case Direction.S:
 						this.Height = currentHeight + e.YDelta;
 						break;
 					case Direction.W:
-						this.Left = currentLeft + e.XDelta;
 						this.Width = currentWidth - e.XDelta;
+						if (this.Width == currentWidth - e.XDelta)
+							this.Left = currentLeft + e.XDelta;
 						break;
 					case Direction.E:
 						this.Width = currentWidth + e.XDelta;
 						break;
 					case Direction.NW:
-						this.Left = currentLeft + e.XDelta;
-						this.Top = currentTop + e.YDelta;
-						this.Width = currentWidth - e.XDelta;
 						this.Height = currentHeight - e.YDelta;
+						if (this.Height == currentHeight - e.YDelta)
+							this.Top = currentTop + e.YDelta;
+						this.Width = currentWidth - e.XDelta;
+						if (this.Width == currentWidth - e.XDelta)
+							this.Left = currentLeft + e.XDelta;
 						break;
 					case Direction.NE:
-						this.Width = currentWidth + e.XDelta;
-						this.Top = currentTop + e.YDelta;
 						this.Height = currentHeight - e.YDelta;
+						if (this.Height == currentHeight - e.YDelta)
+							this.Top = currentTop + e.YDelta;
+						this.Width = currentWidth + e.XDelta;
 						break;
 					case Direction.SW:
-						this.Left = currentLeft + e.XDelta;
 						this.Width = currentWidth - e.XDelta;
+						if (this.Width == currentWidth - e.XDelta)
+							this.Left = currentLeft + e.XDelta;
 						this.Height = currentHeight + e.YDelta;
 						break;
 					case Direction.SE:
-						this.Width = currentWidth + e.XDelta;
 						this.Height = currentHeight + e.YDelta;
+						this.Width = currentWidth + e.XDelta;
 						break;
 					}
 					return;
