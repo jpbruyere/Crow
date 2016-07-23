@@ -2,8 +2,8 @@
 <package >
 	<metadata>
 		<id>Crow.OpenTK</id>
-		<version>0.4.1</version>
-		<title>C# Rapid Widget Toolkit</title>
+		<version>0.4.3</version>
+		<title>C# Rapid Open Widget Toolkit</title>
 		<authors>JP Bruyere</authors>
 		<owners>Grand Tetras Software Team</owners>
 		<licenseUrl>https://www.gnu.org/licenses/gpl-3.0.html</licenseUrl>
@@ -11,10 +11,17 @@
 		<iconUrl>https://jpbruyere.github.io/Crow/images/crow.png</iconUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>
-		CROW is a pure C# widget toolkit with templates, styles, compositing, and bindings.
-		Crow.OpenTK is the OpenTK ready version.
+CROW is a pure C# widget toolkit with templates, styles, compositing, and bindings.
+Crow.OpenTK is the OpenTK ready version.
+This package depends on a pre-release OpenTK version, ensure pre-release packages are visible in your nuget client when adding Crow package.
 		</description>
-		<releaseNotes>Beta release, minimal OpenTK implementation.</releaseNotes>
+		<summary>
+CROW is a pure C# widget toolkit with templates, styles, compositing, and bindings.
+Crow.OpenTK is the OpenTK ready version.
+
+For more information, please visit https://jpbruyere.github.io/Crow/.
+		</summary>
+		<releaseNotes>pre-alpha release, minimal OpenTK implementation.</releaseNotes>
 		<copyright>Copyright 2016</copyright>
 		<dependencies>
 			<dependency id="OpenTK.Next" version="1.2" />

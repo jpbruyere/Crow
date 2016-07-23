@@ -1,38 +1,23 @@
-#define MONO_CAIRO_DEBUG_DISPOSE
-
-
 using System;
-using System.Runtime.InteropServices;
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
-
-using System.Diagnostics;
-
-//using GGL;
 using Crow;
-using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 
 
-namespace testOTK
+namespace Tests
 {
-	class GOLIBTests : OpenTKGameWindow
+	class BasicTests : OpenTKGameWindow
 	{
-		public GOLIBTests ()
+		public BasicTests ()
 			: base(800, 600,"test: press spacebar to toogle test files")
 		{
-			VSync = VSyncMode.Off;
-			Interface.CurrentInterface = CrowInterface;
 		}
 
-		int frameCpt = 0;
 		int idx = 0;
-
 		string[] testFiles;
 
-
+		#region Test values for Binding
 		public int intValue = 25;
 
 		public int IntValue {
@@ -81,6 +66,8 @@ namespace testOTK
 			}
 			get { return testList; }
 		}
+		#endregion
+
 		void OnClear (object sender, MouseButtonEventArgs e) => TestList = null;
 
 		void OnLoadList (object sender, MouseButtonEventArgs e) => TestList = Color.ColorDic.ToList();
@@ -88,11 +75,11 @@ namespace testOTK
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-			//this.AddWidget(new test4());
+
 			KeyboardKeyDown += GOLIBTests_KeyboardKeyDown1;
 
-			//testFiles = new string [] { @"Interfaces/Divers/testBind0.crow" };
-			testFiles = new string [] { @"Interfaces/Divers/testCombobox.crow" };
+
+			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/basicTests", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
@@ -102,12 +89,8 @@ namespace testOTK
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Expandable", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
 
-			//testFiles = Directory.GetFiles(@"Interfaces", "*.crow").Concat(testFiles).ToArray();
-			this.Title = testFiles [idx];
+			this.Title = testFiles [idx] + ". Press key to switch example.";
 			CrowInterface.LoadInterface(testFiles[idx]).DataSource = this;
-
-			//CrowInterface.LoadInterface ("#Tests.ui.fps.crow").DataSource = this;	
-
 		}
 		void GOLIBTests_KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
@@ -127,7 +110,7 @@ namespace testOTK
 			idx++;
 			if (idx == testFiles.Length)
 				idx = 0;
-			this.Title = testFiles [idx];
+			this.Title = testFiles [idx] + ". Press key to cycle examples.";
 			GraphicObject obj = CrowInterface.LoadInterface(testFiles[idx]);
 			obj.DataSource = this;
 		}
@@ -147,23 +130,8 @@ namespace testOTK
 		static void Main ()
 		{
 			Console.WriteLine ("starting example");
-			GOLIBTests win = new GOLIBTests ();
+			BasicTests win = new BasicTests ();
 			win.Run (30);
-			//win.KeyPressEvent += win.Win_KeyPressEvent;
 		}
-
-//		void Win_KeyPressEvent (object o, Gtk.KeyPressEventArgs args)
-//		{
-//			CrowInterface.ClearInterface ();
-//			idx++;
-//			if (idx == testFiles.Length)
-//				idx = 0;
-//			this.Title = testFiles [idx];
-//			GraphicObject obj = CrowInterface.LoadInterface(testFiles[2]);
-//			obj.DataSource = this;
-//		}
-
-
-
 	}
 }

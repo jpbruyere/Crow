@@ -19,13 +19,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Threading;
-using System.Xml;
-using Cairo;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
@@ -151,9 +145,10 @@ namespace Crow
 		#endregion
 
 		#region graphic context
-		int texID;
-		Tetra.Shader shader;
-		public static Crow.vaoMesh quad;
+		public int texID;
+		public Shader shader;
+		public vaoMesh quad;
+		public Matrix4 projection;
 
 		void createContext()
 		{
@@ -183,6 +178,7 @@ namespace Crow
 			GL.Disable (EnableCap.DepthTest);
 
 			shader.Enable ();
+			shader.SetMVP (projection);
 			GL.ActiveTexture (TextureUnit.Texture0);
 			GL.BindTexture (TextureTarget.Texture2D, texID);
 			lock (CrowInterface.RenderMutex) {
@@ -196,7 +192,7 @@ namespace Crow
 			}
 			quad.Render (BeginMode.TriangleStrip);
 			GL.BindTexture(TextureTarget.Texture2D, 0);
-			shader.Disable ();
+
 			if (!blend)
 				GL.Disable (EnableCap.Blend);
 			if (depthTest)
@@ -204,12 +200,18 @@ namespace Crow
 		}
 		#endregion
 
+		/// <summary>
+		/// Override this method for your OpenGL rendering calls
+		/// </summary>
 		public virtual void OnRender(FrameEventArgs e)
 		{
 		}
+		/// <summary>
+		/// Override this method to customize clear method between frames
+		/// </summary>
 		public virtual void GLClear()
 		{
-			GL.Clear (ClearBufferMask.ColorBufferBit);
+			GL.Clear (ClearBufferMask.ColorBufferBit|ClearBufferMask.DepthBufferBit);
 		}
 
 		#region Game win overrides
@@ -233,10 +235,9 @@ namespace Crow
 			Console.WriteLine("GLSL version: " + GL.GetString (StringName.ShadingLanguageVersion));
 			Console.WriteLine("*************************************\n");
 
-			shader = new Tetra.Shader ();
-			shader.Enable();
-			shader.SetMVP(OpenTK.Matrix4.CreateOrthographicOffCenter (-0.5f, 0.5f, -0.5f, 0.5f, 1, -1));
-			GL.UseProgram(0);
+			projection = OpenTK.Matrix4.CreateOrthographicOffCenter (-0.5f, 0.5f, -0.5f, 0.5f, 1, -1);
+
+			shader = new Shader ();
 			quad = new Crow.vaoMesh (0, 0, 0, 1, 1, 1, -1);
 		}
 
@@ -254,7 +255,6 @@ namespace Crow
 				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
 			}
 			frameCpt++;
-			//CrowInterface.Update ();
 		}
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{

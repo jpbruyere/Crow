@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Window Font="droid bold, 10" Title="Open GL" Width="60%" Height="50%">
+<Window Font="droid bold, 10" Title="Open GL" HorizontalAlignment="Left" Width="30%" Height="90%">
 	<VerticalStack>
 		<HorizontalStack Background="Jet" Height="Fit" Width="Stretched"  Margin="2">
 			<Popper Caption="File" Template="#Tests.ui.Popper.template" Width="Fit">
@@ -16,7 +16,21 @@
 			<Label Text="Project" Style="#Tests.ui.LabelButton.style"/>
 			<Label Text="Help" Style="#Tests.ui.LabelButton.style"/>
 		</HorizontalStack>
-		<CheckBox Text="Test"/>
+		<GroupBox Caption="Object Rotation" Margin="10" Width="70%" Height="Fit" >
+			<VerticalStack Spacing="10">
+				<Spinner Width="50%" Maximum="1,0" SmallIncrement="0,01" Value="{²RotationSpeed}"/>
+				<Slider Height="10" Width="50%" Maximum="1,0" SmallIncrement="0,01" Value="{²RotationSpeed}"/>
+				<CheckBox IsChecked="{²ClockWiseRotation}" Caption="Clockwise Rotation"/>
+				<GroupBox Caption="Rotation Axis" Height="Fit" >
+					<VerticalStack>
+						<RadioButton Caption="x"/>
+						<RadioButton Caption="y"/>
+						<RadioButton Caption="z"/>
+					</VerticalStack>
+				</GroupBox>
+			</VerticalStack>
+		</GroupBox>
+
 		<Image Width="100" Height="100"
 		Path="#Crow.Images.Icons.exit2.svg"	/>
 	</VerticalStack>

@@ -12,19 +12,19 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <NoStdLib>False</NoStdLib>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-    <OutputPath>$(SolutionDir)/build/$(Configuration)</OutputPath>
-    <IntermediateOutputPath>$(SolutionDir)/build/obj/$(Configuration)</IntermediateOutputPath>
     <WarningLevel>4</WarningLevel>
     <NoWin32Manifest>False</NoWin32Manifest>
     <SignAssembly>false</SignAssembly>
     <DelaySign>False</DelaySign>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <Description>Crow project description</Description>
+    <Description>C# Rapid Open Widget</Description>
     <BaseAddress>4194304</BaseAddress>
     <ReleaseVersion>0.4</ReleaseVersion>
     <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
+	<SchemaVersion>2.0</SchemaVersion>
+	<OutputPath>$(SolutionDir)/build/$(Configuration)</OutputPath>
+	<IntermediateOutputPath>$(SolutionDir)/build/obj/$(Configuration)</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,100 +39,288 @@
     <DefineConstants>__linux__;MEASURE_TIME</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="src\Colors.cs" />
-    <Compile Include="src\Point.cs" />
-    <Compile Include="src\Rectangle.cs" />
-    <Compile Include="src\Rectangles.cs" />
-    <Compile Include="src\Size.cs" />
-    <Compile Include="src\GraphicObjects\GraphicObject.cs" />
-    <Compile Include="src\GraphicObjects\Container.cs" />
-    <Compile Include="src\GraphicObjects\Group.cs" />
-    <Compile Include="src\GraphicObjects\HorizontalStack.cs" />
-    <Compile Include="src\GraphicObjects\Image.cs" />
-    <Compile Include="src\GraphicObjects\Label.cs" />
-    <Compile Include="src\GraphicObjects\TextBox.cs" />
-    <Compile Include="src\GraphicObjects\ProgressBar.cs" />
-    <Compile Include="src\GraphicObjects\VerticalStack.cs" />
-    <Compile Include="src\Cairo\CairoHelpers.cs" />
-    <Compile Include="src\win32\Win32.cs" />
-    <Compile Include="src\win32\winApi.cs" />
-    <Compile Include="src\GraphicObjects\Button.cs" />
-    <Compile Include="src\GraphicObjects\GraduatedSlider.cs" />
-    <Compile Include="src\GraphicObjects\Slider.cs" />
-    <Compile Include="src\GraphicObjects\NumericControl.cs" />
-    <Compile Include="src\GraphicObjects\Scroller.cs" />
-    <Compile Include="src\GraphicObjects\ILayoutable.cs" />
-    <Compile Include="src\Enums.cs" />
-    <Compile Include="src\GraphicObjects\GenericStack.cs" />
-    <Compile Include="src\CompilerServices\CompilerServices.cs" />
-    <Compile Include="src\GraphicObjects\AnalogMeter.cs" />
-    <Compile Include="src\GraphicObjects\Border.cs" />
-    <Compile Include="src\Font.cs" />
-    <Compile Include="src\GraphicObjects\Window.cs" />
-    <Compile Include="src\GraphicObjects\ListBox.cs" />
-    <Compile Include="src\ExtensionsMethods.cs" />
-    <Compile Include="src\Interface.cs" />
-    <Compile Include="src\LayoutingQueueItem.cs" />
-    <Compile Include="src\GraphicObjects\Spinner.cs" />
-    <Compile Include="src\DynAttribute.cs" />
-    <Compile Include="src\GraphicObjects\IValueChange.cs" />
-    <Compile Include="src\Picture.cs" />
-    <Compile Include="src\SvgPicture.cs" />
-    <Compile Include="src\BmpPicture.cs" />
-    <Compile Include="src\GraphicObjects\TemplatedControl.cs" />
-    <Compile Include="src\GraphicObjects\RadioButton.cs" />
-    <Compile Include="src\GraphicObjects\Expandable.cs" />
-    <Compile Include="src\GraphicObjects\PrivateContainer.cs" />
-    <Compile Include="src\GraphicObjects\TemplatedContainer.cs" />
-    <Compile Include="src\GraphicObjects\Popper.cs" />
-    <Compile Include="src\TextChangeEventArgs.cs" />
-    <Compile Include="src\ReflexionExtensions.cs" />
-    <Compile Include="src\XCursor.cs" />
-    <Compile Include="src\GraphicObjects\Grid.cs" />
-    <Compile Include="src\GraphicObjects\TextRun.cs" />
-    <Compile Include="src\GraphicObjects\MessageBox.cs" />
-    <Compile Include="src\SelectionChangeEventArgs.cs" />
-    <Compile Include="src\ValueChangeEventArgs.cs" />
-    <Compile Include="src\GraphicObjects\FileDialog.cs" />
-    <Compile Include="src\GraphicObjects\CheckBox.cs" />
-    <Compile Include="src\GraphicObjects\ComboBox.cs" />
-    <Compile Include="src\GraphicObjects\GroupBox.cs" />
-    <Compile Include="src\GraphicObjects\ScrollBar.cs" />
-    <Compile Include="src\BubblingMouseButtonEventArgs.cs" />
-    <Compile Include="src\SolidColor.cs" />
-    <Compile Include="src\Gradient.cs" />
-    <Compile Include="src\Fill\Fill.cs" />
-    <Compile Include="src\LayoutingEventArgs.cs" />
-    <Compile Include="src\ScrollingEventArgs.cs" />
-    <Compile Include="src\GraphicObjects\Trend.cs" />
-    <Compile Include="src\GraphicObjects\Splitter.cs" />
-    <Compile Include="src\GraphicObjects\TreeView.cs" />
-    <Compile Include="src\GraphicObjects\TabView.cs" />
-    <Compile Include="src\GraphicObjects\TabItem.cs" />
-    <Compile Include="src\GraphicObjects\DummyTemplate.cs" />
-    <Compile Include="src\Input\KeyboardKeyEventArgs.cs" />
-    <Compile Include="src\Input\Buttons.cs" />
-    <Compile Include="src\Input\ButtonState.cs" />
-    <Compile Include="src\Input\Key.cs" />
-    <Compile Include="src\Input\KeyboardState.cs" />
-    <Compile Include="src\Input\KeyModifiers.cs" />
-    <Compile Include="src\Input\MouseButton.cs" />
-    <Compile Include="src\Input\MouseEventArgs.cs" />
-    <Compile Include="src\Input\MouseScroll.cs" />
-    <Compile Include="src\Input\MouseState.cs" />
-    <Compile Include="src\rsvg\DimensionData.cs" />
-    <Compile Include="src\rsvg\Global.cs" />
-    <Compile Include="src\rsvg\Handle.cs" />
-    <Compile Include="src\rsvg\Pixbuf.cs" />
-    <Compile Include="src\rsvg\RsvgSharp.SizeFuncNative.cs" />
-    <Compile Include="src\rsvg\SizeFunc.cs" />
-    <Compile Include="src\MouseCursorChangedEventArgs.cs" />
-    <Compile Include="src\GraphicObjects\IBindable.cs" />
-    <Compile Include="src\Input\KeyPressEventArgs.cs" />
-    <Compile Include="src\Configuration.cs" />
-    <Compile Include="src\Measure.cs" />
-    <Compile Include="src\CompilerServices\MemberReference.cs" />
-    <Compile Include="src\CompilerServices\Bindings.cs" />
+    <Compile Include="src\Colors.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Point.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Rectangle.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Rectangles.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Size.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\GraphicObject.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Container.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Group.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\HorizontalStack.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Image.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Label.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\TextBox.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\ProgressBar.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\VerticalStack.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Cairo\CairoHelpers.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\win32\Win32.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\win32\winApi.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Button.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\GraduatedSlider.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Slider.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\NumericControl.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Scroller.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\ILayoutable.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Enums.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\GenericStack.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\CompilerServices\CompilerServices.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\AnalogMeter.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Border.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Font.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Window.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\ListBox.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\ExtensionsMethods.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Interface.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\LayoutingQueueItem.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Spinner.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\DynAttribute.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\IValueChange.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Picture.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\SvgPicture.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\BmpPicture.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\TemplatedControl.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\RadioButton.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Expandable.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\PrivateContainer.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\TemplatedContainer.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Popper.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\TextChangeEventArgs.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\ReflexionExtensions.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\XCursor.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Grid.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\TextRun.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\MessageBox.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\SelectionChangeEventArgs.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\ValueChangeEventArgs.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\FileDialog.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\CheckBox.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\ComboBox.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\GroupBox.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\ScrollBar.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\BubblingMouseButtonEventArgs.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\SolidColor.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Gradient.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Fill\Fill.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\LayoutingEventArgs.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\ScrollingEventArgs.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Trend.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\Splitter.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\TreeView.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\TabView.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\TabItem.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\DummyTemplate.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Input\KeyboardKeyEventArgs.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Input\Buttons.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Input\ButtonState.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Input\Key.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Input\KeyboardState.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Input\KeyModifiers.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Input\MouseButton.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Input\MouseEventArgs.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Input\MouseScroll.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Input\MouseState.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\rsvg\DimensionData.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\rsvg\Global.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\rsvg\Handle.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\rsvg\Pixbuf.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\rsvg\RsvgSharp.SizeFuncNative.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\rsvg\SizeFunc.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\MouseCursorChangedEventArgs.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\GraphicObjects\IBindable.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Input\KeyPressEventArgs.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Configuration.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\Measure.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\CompilerServices\MemberReference.cs">
+      <LogicalName></LogicalName>
+    </Compile>
+    <Compile Include="src\CompilerServices\Bindings.cs">
+      <LogicalName></LogicalName>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -140,22 +328,30 @@
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Drawing" />
+    <Reference Include="atk-sharp">
+      <HintPath>packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\atk-sharp.dll</HintPath>
+    </Reference>
     <Reference Include="cairo-sharp">
-      <HintPath>$(SolutionDir)packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\cairo-sharp.dll</HintPath>
-      <Package>gtk-sharp-3.0</Package>
+      <HintPath>packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\cairo-sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="gdk-sharp">
+      <HintPath>packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\gdk-sharp.dll</HintPath>
     </Reference>
     <Reference Include="gio-sharp">
-      <HintPath>$(SolutionDir)packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\gio-sharp.dll</HintPath>
-      <Package>gio-sharp-3.0</Package>
+      <HintPath>packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\gio-sharp.dll</HintPath>
     </Reference>
     <Reference Include="glib-sharp">
-      <HintPath>$(SolutionDir)packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\glib-sharp.dll</HintPath>
-      <Package>glib-sharp-3.0</Package>
+      <HintPath>packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\glib-sharp.dll</HintPath>
     </Reference>
-	<Reference Include="gdk-sharp">
-		<HintPath>$(SolutionDir)packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\gdk-sharp.dll</HintPath>
-		<Package>gtk-sharp-3.0</Package>
-	</Reference>
+    <Reference Include="gtk-dotnet">
+      <HintPath>packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\gtk-dotnet.dll</HintPath>
+    </Reference>
+    <Reference Include="gtk-sharp">
+      <HintPath>packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\gtk-sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="pango-sharp">
+      <HintPath>packages\gtk-sharp.Linux.3.14.3.14.7\lib\net40\pango-sharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\gtk-sharp.Linux.3.14.3.14.7\build\net40\gtk-sharp.Linux.3.14.targets" Condition="Exists('packages\gtk-sharp.Linux.3.14.3.14.7\build\net40\gtk-sharp.Linux.3.14.targets')" />
@@ -255,6 +451,8 @@
     <EmbeddedResource Include="Images\Icons\crow.svg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="README.md" />
+    <None Include="README.md">
+      <LogicalName></LogicalName>
+    </None>
   </ItemGroup>
 </Project>
