@@ -11,8 +11,8 @@ before_build:
 - cmd: nuget restore
 #- cmd: reg query hklm 
 
-build_script:
-- ps: dotnet -v --version
+#build_script:
+#- ps: dotnet -v --version
 #- cmd: build.cmd %BUILD_TARGET%
 
 test: off
