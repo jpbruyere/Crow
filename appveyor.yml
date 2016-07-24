@@ -8,9 +8,14 @@ clone_depth: 1
 
 before_build:
 - cmd: nuget restore
+#- cmd: reg query hklm 
+
+build_script:
+- ps: dotnet --info
+- cmd: build.cmd %BUILD_TARGET%
+
+test: off
 
 build:
-
   project: Crow.sln
-
   verbosity: normal
