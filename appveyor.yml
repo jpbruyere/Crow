@@ -8,7 +8,6 @@ clone_depth: 1
 
 before_build:
 - cmd: nuget restore
-- ps: frameworks.ps
 
 build:
 
