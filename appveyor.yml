@@ -7,7 +7,7 @@ branches:
 clone_depth: 1
 
 before_build:
-- cmd: Clrver 
+- cmd: reg query "HKLM\SOFTWARE\Novell\Mono" /s
 - cmd: nuget restore
 #- cmd: reg query hklm 
 
