@@ -3,11 +3,11 @@ CROW [![NuGet Version and Downloads](https://buildstats.info/nuget/Crow.OpenTK)]
 
 **CROW** is a pure **C#** widget toolkit originally developed for easy GUI implementation for [OpenTK](http://opentk.github.io/).
 
-Trying to make it as efficient as possible, it evolved as a full feature toolkit with templates, styles, compositing,  and  bindings.
+Trying to make it as efficient as possible, it evolved as a full feature toolkit with templates, styles, compositing,  and bindings, allowing me to develop new OpenGL apps in a couple of hours.
 Running under Mono, With multi-platform libraries it should run on any target.
 
-Using Crow is an easy way to get instantly some controls in your your OpenGL application. With the binding system, your local
-variables are bound to the interface in 2 clicks and with the full transparency, your openGL scene will always stay fully visible.
+Using Crow is an easy way to get instantly some controls into your your OpenGL application. With the binding system, your local
+variables are bound to the interface very easily and with the full transparency, your openGL scene will always stay fully visible.
 
 You can visit the [Wiki](https://github.com/jpbruyere/Crow/wiki) or the [Project Site](https://jpbruyere.github.io/Crow/) for documentation and tutorials. _(in progress)_
 
@@ -26,11 +26,19 @@ Screen shots
 
 Features
 ========
-
 - **XML** interface definition.
 - Templates and styling
 - Dynamic binding system with code injection.
 - Inlined delegates in XML
+
+Requirements
+============
+
+- **C#6** compatible compiler.
+- Mono 4.5 Framework on every os. (It solves the **String Encoding** problem.)
+- Cairo Graphic Library >= 1.12
+- OpenTK version assume you have OpenGL libraries installed on your system.
+- GTK Sharp. (At least glib, gio, gdk and cairo cil binding, atk, pango and gtk sharp may be removed from references)
 
 Using CROW in your OpenTK project
 =================================
