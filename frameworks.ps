@@ -1,0 +1,48 @@
+function Get-KeyPropertyValue($key, $property)
+{
+    if($key.Property -contains $property)
+    {
+        Get-ItemProperty $key.PSPath -name $property | select -expand $property
+    }
+}
+function Get-VersionName($key)
+{
+   $name = Get-KeyPropertyValue $key Version
+   $sp = Get-KeyPropertyValue $key SP
+   $install = Get-KeyPropertyValue $key Install
+   if($sp)
+   {
+        "$($_.PSChildName) $name SP $sp"
+    }else{
+    "$($_.PSChildName) $name"
+    }
+}
+function Get-FrameworkVersion{
+   dir "hklm:\SOFTWARE\Microsoft\NET Framework Setup\NDP\" |? {$_.PSChildName -like "v*"} |%{
+    if( $_.Property -contains "Version")
+    {
+        Get-VersionName $_
+    }else{
+        $parent = $_
+        Get-ChildItem $_.PSPath |%{
+            $versionName = Get-VersionName $_
+            "$($parent.PSChildName) $versionName"
+
+        }
+    }    
+}
+$v4Directory = "hklm:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full"
+if(Test-Path $v4Directory)
+{
+    $v4 = Get-Item $v4Directory
+    $version = Get-KeyPropertyValue $v4 Release
+    switch($version){
+        378389 {".NET Framework 4.5"; break;}
+        378675 {".NET Framework 4.5.1 installed with Windows 8.1 or Windows Server 2012 R2"; break;}
+        378758 {".NET Framework 4.5.1 installed on Windows 8, Windows 7 SP1, or Windows Vista SP2"; break;}
+        379893 {".NET Framework 4.5.2"; break;}
+        { 393295, 393297 -contains $_} {".NET Framework 4.6"; break;}
+        { 394254, 394271 -contains $_} {".NET Framework 4.6.1"; break;}        
+    }
+}
+}
