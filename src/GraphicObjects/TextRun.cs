@@ -155,12 +155,7 @@ namespace Crow
 
 					foreach (string s in lines) {
 						string l = s.Replace("\t", new String (' ', Interface.TabSize));
-
-						#if _WIN32 || _WIN64
-						TextExtents tmp = gr.TextExtents(str.ToUtf8());
-						#elif __linux__
 						TextExtents tmp = gr.TextExtents (l);
-						#endif
 						if (tmp.XAdvance > te.XAdvance)
 							te = tmp;
 					}
@@ -287,15 +282,10 @@ namespace Crow
 					Foreground.SetAsSource (gr);	
 					gr.MoveTo (rText.X, rText.Y + fe.Ascent + fe.Height * curLineCount);
 
-					#if _WIN32 || _WIN64
-					gr.ShowText(ll.ToUtf8());
-					#elif __linux__
 					gr.ShowText (ll);
-					#endif
 					gr.Fill ();
 
 					curLineCount++;
-						
 				}
 			}						
 		}
