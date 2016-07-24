@@ -11,7 +11,7 @@ before_build:
 #- cmd: reg query hklm 
 
 build_script:
-- ps: dotnet --info
+- ps: dotnet -v --version
 - cmd: build.cmd %BUILD_TARGET%
 
 test: off
