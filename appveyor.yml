@@ -7,6 +7,7 @@ branches:
 clone_depth: 1
 
 before_build:
+- cmd: Clrver 
 - cmd: nuget restore
 #- cmd: reg query hklm 
 
