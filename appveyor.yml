@@ -7,13 +7,13 @@ branches:
 clone_depth: 1
 
 before_build:
-- cmd: reg query "HKLM\SOFTWARE" /s
+#- cmd: reg query "HKLM\SOFTWARE" /s
 - cmd: nuget restore
 #- cmd: reg query hklm 
 
 build_script:
 - ps: dotnet -v --version
-- cmd: build.cmd %BUILD_TARGET%
+#- cmd: build.cmd %BUILD_TARGET%
 
 test: off
 
