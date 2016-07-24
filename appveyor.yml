@@ -10,5 +10,7 @@ before_build:
 - cmd: nuget restore
 
 build:
+
   project: Crow.sln
+
   verbosity: normal
