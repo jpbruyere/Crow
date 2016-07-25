@@ -23,10 +23,10 @@ build_script:
     - echo building...
     - C:\"Program Files (x86)"\Mono\lib\mono\4.5\xbuild /p:Configuration=Release Crow.sln
 
-build: off
+#build: off
 
-#build:
+build:
 
 #  project: Crow.sln
 
-#  verbosity: normal
+  verbosity: normal
