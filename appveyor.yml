@@ -19,7 +19,7 @@ clone_depth: 1
 #- cmd: dir "C:\Program Files (x86)\Mono\lib\mono\4.5"
 
 build_script:
-    - "C:\Program Files (x86)\Mono\lib\mono\4.5\xbuild" /p:Configuration=Release Crow.sln
+    - C:\"Program Files (x86)"\Mono\lib\mono\4.5\xbuild /p:Configuration=Release Crow.sln
 
 build:
 
