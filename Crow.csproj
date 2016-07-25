@@ -141,7 +141,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Drawing" />
     <Reference Include="cairo-sharp">
-      <HintPath>$(PackagesDir)GtkSharp.3.1.3\lib\net45\cairo-sharp.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\GtkSharp.3.1.3\lib\net45\cairo-sharp.dll</HintPath>
     </Reference>
     <Reference Include="gdk-sharp">
       <HintPath>$(PackagesDir)GtkSharp.3.1.3\lib\net45\gdk-sharp.dll</HintPath>
