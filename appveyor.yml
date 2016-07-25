@@ -8,6 +8,7 @@ clone_depth: 1
 
 before_build:
 - cmd: nuget restore
+- cmd: reg query HKLM\SOFTWARE\Microsoft\MSBuild\ /s
 #- cmd: C:\"Program Files (x86)"\Mono\lib\mono\4.5\xbuild /p:Configuration=Release Crow.sln
 #- cmd: reg add HKLM\SOFTWARE\Microsoft\.NETFramework\v4.0.30319\SKUs\.NETFramework /v Version /t REG_SZ /d "v4.0" /f
 #- cmd: reg add HKLM\SOFTWARE\Microsoft\.NETFramework\v4.0.30319\SKUs\.NETFramework /v Profile /t REG_SZ /d "Mono" /f
@@ -22,7 +23,7 @@ before_build:
 
 build_script:
     - echo building...
-    - dir C:\"Program Files (x86)"\Mono\lib\mono\4.5\
+#    - dir C:\"Program Files (x86)"\Mono\lib\mono\4.5\
     - set path=%path%;C:\"Program Files (x86)"\Mono\lib\mono\4.5\
     - xbuild /p:Configuration=Release Crow.sln 
 
