@@ -26,6 +26,9 @@
     <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(OS)' != 'Unix'">
+	<CscToolPath>C:\Program Files (x86)\Mono\lib\mono\4.5\</CscToolPath>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
