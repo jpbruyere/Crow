@@ -24,7 +24,7 @@ build_script:
     - echo building...
     - dir C:\"Program Files (x86)"\Mono\lib\mono\4.5\
     - set path=%path%;C:\"Program Files (x86)"\Mono\lib\mono\4.5\
-    - xbuild /p:Configuration=Release Crow.sln 
+    - xbuild /p:Configuration=Release Crow.sln /p:BuildWithMono="true" 
 
 #build: off
 
