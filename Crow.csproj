@@ -17,7 +17,7 @@
     <SignAssembly>false</SignAssembly>
     <DelaySign>False</DelaySign>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <TargetFrameworkVersion>Mono-4.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Description>C# Rapid Open Widget</Description>
     <BaseAddress>4194304</BaseAddress>
     <ReleaseVersion>0.4</ReleaseVersion>

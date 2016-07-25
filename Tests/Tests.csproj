@@ -9,7 +9,7 @@
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
     <StartupObject>Tests.HelloCube</StartupObject>
-    <TargetFrameworkVersion>Mono</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ReleaseVersion>0.4</ReleaseVersion>
     <OutputPath>$(SolutionDir)/build/$(Configuration)</OutputPath>
