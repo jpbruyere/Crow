@@ -7,8 +7,11 @@ branches:
 clone_depth: 1
 
 before_build:
-- cmd: dir "C:\Program Files (x86)\Mono\lib\mono\4.5"
+- cmd: reg add HKLM\SOFTWARE\Microsoft\.NETFramework\v4.0.30319\SKUs\.NETFramework /v Version /t REG_SZ /d "v4.0" /f
+- cmd: reg add HKLM\SOFTWARE\Microsoft\.NETFramework\v4.0.30319\SKUs\.NETFramework /v Profile /t REG_SZ /d "Mono" /f
 - cmd: nuget restore
+
+#- cmd: dir "C:\Program Files (x86)\Mono\lib\mono\4.5"
 
 build:
 
