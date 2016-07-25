@@ -23,6 +23,8 @@ before_build:
 build_script:
     - echo building...
     - set XBUILD_FRAMEWORK_FOLDERS_PATH="C:\Program Files (x86)\Mono\lib\mono\4.5\"
+    - echo $XBUILD_FRAMEWORK_FOLDERS_PATH
+    - echo ........................
     - dir C:\"Program Files (x86)"\Mono\lib\mono\4.5\
     - set path=%path%;C:\"Program Files (x86)"\Mono\lib\mono\4.5\
     - xbuild /p:Configuration=Release Crow.sln /p:BuildWithMono="true" 
