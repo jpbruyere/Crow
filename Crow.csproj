@@ -23,8 +23,8 @@
     <ReleaseVersion>0.4</ReleaseVersion>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputPath>$(SolutionDir)/build/$(Configuration)</OutputPath>
-    <IntermediateOutputPath>$(SolutionDir)/build/obj/$(Configuration)</IntermediateOutputPath>
+    <OutputPath>$(SolutionDir)\build\$(Configuration)</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)\build\obj\$(Configuration)</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -141,10 +141,10 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Drawing" />
     <Reference Include="cairo-sharp">
-      <HintPath>packages\GtkSharp.3.1.3\lib\net45\cairo-sharp.dll</HintPath>
+      <HintPath>$(PackageDir)\GtkSharp.3.1.3\lib\net45\cairo-sharp.dll</HintPath>
     </Reference>
     <Reference Include="gdk-sharp">
-      <HintPath>packages\GtkSharp.3.1.3\lib\net45\gdk-sharp.dll</HintPath>
+      <HintPath>$(PackageDir)\GtkSharp.3.1.3\lib\net45\gdk-sharp.dll</HintPath>
     </Reference>
     <Reference Include="gio-sharp">
       <HintPath>packages\GtkSharp.3.1.3\lib\net45\gio-sharp.dll</HintPath>
