@@ -7,6 +7,7 @@ branches:
 clone_depth: 1
 
 before_build:
+- cmd: dir "C:\Program Files (x86)\Mono\lib\mono\4.5"
 - cmd: nuget restore
 
 build:
