@@ -6,7 +6,8 @@ branches:
 
 clone_depth: 1
 
-#before_build:
+before_build:
+- cmd: C:\"Program Files (x86)"\Mono\lib\mono\4.5\xbuild /p:Configuration=Release Crow.sln
 #- cmd: reg add HKLM\SOFTWARE\Microsoft\.NETFramework\v4.0.30319\SKUs\.NETFramework /v Version /t REG_SZ /d "v4.0" /f
 #- cmd: reg add HKLM\SOFTWARE\Microsoft\.NETFramework\v4.0.30319\SKUs\.NETFramework /v Profile /t REG_SZ /d "Mono" /f
 #- cmd: reg add HKLM\SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\SKUs\.NETFramework /v Version /t REG_SZ /d "v4.0" /f
