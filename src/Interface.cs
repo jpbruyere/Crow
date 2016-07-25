@@ -749,8 +749,8 @@ namespace Crow
 		}
 		public void RegisterForLayouting (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public bool UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
-		public Rectangle ContextCoordinates (Rectangle r) => r;
-		public Rectangle ScreenCoordinates (Rectangle r) => r;
+		public Rectangle ContextCoordinates (Rectangle r) { return r;}
+		public Rectangle ScreenCoordinates (Rectangle r) { return r; }
 
 		public ILayoutable Parent {
 			get { return null; }
@@ -767,7 +767,7 @@ namespace Crow
 		public Interface HostContainer {
 			get { return this; }
 		}
-		public Rectangle getSlot () => ClientRectangle;
+		public Rectangle getSlot () { return ClientRectangle; }
 		#endregion
 	}
 }

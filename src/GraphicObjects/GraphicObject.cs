@@ -147,7 +147,7 @@ namespace Crow
 			return
 				Parent.ScreenCoordinates(r) + Parent.getSlot().Position + Parent.ClientRectangle.Position;
 		}
-		public virtual Rectangle getSlot() => Slot;
+		public virtual Rectangle getSlot () { return Slot;}
 		#endregion
 
 		#region EVENT HANDLERS
