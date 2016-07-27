@@ -1,82 +1,38 @@
-#
-# Appveyor configuration file for CI build of Mono on Windows (under Cygwin)
-#
-# For further details see http://www.appveyor.com
-#
-
-#
-# Custom environment variables
-#
-environment:
-    global:
-        CYG_ROOT: C:\cygwin
-        CYG_MIRROR: http://cygwin.mirror.constant.com
-        CYG_CACHE: C:\cygwin\var\cache\setup
-        CYG_BASH: C:\cygwin\bin\bash
-
-#
-# Cache Cygwin files to speed up build
-#
-cache:
-    - '%CYG_CACHE%'
-
-#
-# Do a shallow clone of the repo to speed up build
-#
-clone_depth: 1
-
 version: 0.4.{build}
-#
-# Initialisation prior to pulling the Mono repository
-# Attempt to ensure we don't try to convert line endings to Win32 CRLF as this will cause build to fail
-#
-init:
-    - git config --global core.autocrlf input
 
-#
-# Install needed build dependencies
-# 
-install:
-    - ps: 'Start-FileDownload "http://cygwin.com/setup-x86.exe" -FileName "setup-x86.exe"'
-    - 'setup-x86.exe --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages autoconf,automake,bison,gcc-core,gcc-g++,mingw-runtime,mingw-binutils,mingw-gcc-core,mingw-gcc-g++,mingw-pthreads,mingw-w32api,libtool,make,python,gettext-devel,gettext,intltool,libiconv,pkg-config,git,curl,libxslt > NUL 2>&1'
-    - '%CYG_BASH% -lc "cygcheck -dc cygwin"'
+branches:
+  only:
+  - appveyor
+
+clone_depth: 1
 
 before_build:
 - cmd: nuget restore
-# Cygwin build script
-#
-# NOTES:
-#
-# The stdin/stdout file descriptor appears not to be valid for the Appveyor
-# build which causes failures as certain functions attempt to redirect 
-# default file handles. Ensure a dummy file descriptor is opened with 'exec'.
-#
+#- cmd: C:\"Program Files (x86)"\Mono\lib\mono\4.5\xbuild /p:Configuration=Release Crow.sln
+#- cmd: reg add HKLM\SOFTWARE\Microsoft\.NETFramework\v4.0.30319\SKUs\.NETFramework /v Version /t REG_SZ /d "v4.0" /f
+#- cmd: reg add HKLM\SOFTWARE\Microsoft\.NETFramework\v4.0.30319\SKUs\.NETFramework /v Profile /t REG_SZ /d "Mono" /f
+#- cmd: reg add HKLM\SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\SKUs\.NETFramework /v Version /t REG_SZ /d "v4.0" /f
+#- cmd: reg add HKLM\SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\SKUs\.NETFramework /v Profile /t REG_SZ /d "Mono" /f
+#- cmd: mklink /d "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\Profile\Mono" "C:\Program Files (x86)\Mono\lib\mono\4.5"
+#- cmd: mkdir "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\Profile\Mono\RedistList"
+#- cmd: echo "<?xml version='1.0' encoding='utf-8'?><FileList  Redist='Mono-4.5' Name='Mono 4.5 Profile' RuntimeVersion='4.5' ToolsVersion='4.0' > </FileList>" > "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\Profile\Mono\RedistList\FrameworkList.xml"
+
+
+#- cmd: dir "C:\Program Files (x86)\Mono\lib\mono\4.5"
+
 build_script:
-    - 'echo Building...'
-    - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER; exec 0</dev/null; xbuild /p:Configuration=Release Crow.sln"'
-#    - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER; exec 0</dev/null; make get-monolite-latest"'
-#    - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER; exec 0</dev/null; make -j2"'
-#    - 'echo Installing...'
-#    - 'mkdir %APPVEYOR_BUILD_FOLDER%\install'
-#    - '%CYG_BASH% -lc "export CYGWIN=winsymlinks:native; mount \"$APPVEYOR_BUILD_FOLDER\install\" /usr/local; cd $APPVEYOR_BUILD_FOLDER; exec 0</dev/null; make install; umount /usr/local"'
+    - echo building...
+    - set XBUILD_FRAMEWORK_FOLDERS_PATH="C:\Program Files (x86)\Mono\lib\mono\4.5\"
+    - echo %XBUILD_FRAMEWORK_FOLDERS_PATH%
+    - echo ........................
+    - dir C:\"Program Files (x86)"\Mono\lib\mono\4.5\
+    - set path=%path%;C:\"Program Files (x86)"\Mono\lib\mono\4.5\
+    - xbuild /p:Configuration=Release Crow.sln /p:BuildWithMono="true" 
 
-#
-# Disable tests for now
-# 
-test: off
+#build: off
 
-#
-# Only build the master branch
-#
-branches:
-  only:
-    - master
+build:
 
-#
-# NOTE: Currently this is the Mono installation tree. In future we will create an installation package artifact.
-#       It has to be relative to the project path. Thus we have installed to within the build tree.
-#
-#artifacts:
-#    - path: install
-#      name: mono-binaries
-#      type: zip
+#  project: Crow.sln
+
+  verbosity: normal

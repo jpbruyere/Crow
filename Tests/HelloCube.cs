@@ -66,9 +66,7 @@ namespace Tests
 			CrowInterface.AddWidget(
 				new Window ()
 				{
-					Title = "Hello World",
-					Width = 200,
-					Height = 200
+					Title = "Hello World"
 				}
 			);
 			initGL ();
