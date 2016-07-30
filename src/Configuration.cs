@@ -41,21 +41,8 @@ namespace Crow
 			Assembly a = Assembly.GetEntryAssembly ();
 			string appName = a.GetName().Name;
 
-			OperatingSystem os = Environment.OSVersion;
-			switch (os.Platform) {
-			case PlatformID.Win32S:
-			case PlatformID.Win32Windows:
-			case PlatformID.Win32NT:
-			case PlatformID.WinCE:
-				break;
-			case PlatformID.Unix:
-				configPath = Path.Combine (configRoot, appName);
-				break;
-			case PlatformID.Xbox:
-				break;
-			case PlatformID.MacOSX:
-				break;
-			}
+			configPath = Path.Combine (configRoot, appName);
+
 			if (!Directory.Exists(configPath))
 				Directory.CreateDirectory (configPath);
 			load ();
