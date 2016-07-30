@@ -130,7 +130,7 @@ namespace Crow
 
         public override string ToString()
         {
-			return string.Format("({0};{1})", X, Y);
+			return string.Format("({0},{1})", X, Y);
         }
 
         public override bool Equals(object obj)
@@ -145,7 +145,7 @@ namespace Crow
 		{
 			if (string.IsNullOrEmpty (s))
 				return default(Point);
-			string[] d = s.Trim().Split(';');
+			string[] d = s.Trim().Split(',');
 			if (d.Length == 2)
 				return new Point (int.Parse (d [0]), int.Parse (d [1]));
 			else if (d.Length == 1) {

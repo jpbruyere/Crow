@@ -1,9 +1,9 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <Border BorderWidth="1" Foreground="White" CornerRadius="15"	
 	Height="{../HeightPolicy}" Width="{../WidthPolicy}"
 	MouseEnter="../onBorderMouseEnter"
 	MouseLeave="../onBorderMouseLeave"
-	Background="vgradient|0:0,6;0,6;0,6;0,9|1:0,4;0,4;0,4;0,6">
+	Background="vgradient|0:0.6,0.6,0.6,0.9|1:0.4,0.4,0.4,0.6">
 	<VerticalStack Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
 		<HorizontalStack Height="Fit" Width="{../../../WidthPolicy}">
 			<Label Margin="2" Font="{../../../../Font}" Text="{../../../../Title}" Width="Stretched"/>

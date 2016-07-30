@@ -204,6 +204,9 @@ namespace Crow
 		}
 		public static GraphicObject Load (string path, object hostClass = null)
 		{
+			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
+			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
 			Interface.XmlLoaderCount ++;
 			CurrentGOMLPath = path;
 			GraphicObject tmp = null;
@@ -211,6 +214,9 @@ namespace Crow
 				tmp = Load(stream, GetTopContainerOfGOMLStream(stream), hostClass);
 			}
 			Interface.XmlLoaderCount --;
+
+			Thread.CurrentThread.CurrentCulture = savedCulture;
+
 			return tmp;
 		}
 		public static GraphicObject Load (Stream stream, Type type, object hostClass = null)
@@ -264,12 +270,17 @@ namespace Crow
 		public Dictionary<string, Dictionary<string, string>> Styling;
 
 		public void LoadStyling() {
+			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
+			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
 			Styling = new Dictionary<string, Dictionary<string, string>> ();
 
 			//fetch styling info in this order, if member styling is alreadey referenced in previous
 			//assembly, it's ignored
 			loadStylingFromAssembly (Assembly.GetEntryAssembly ());
 			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
+
+			Thread.CurrentThread.CurrentCulture = savedCulture;
 		}
 
 		void loadStylingFromAssembly (Assembly assembly) { 

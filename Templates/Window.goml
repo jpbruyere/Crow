@@ -1,10 +1,10 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <Border BorderWidth="1" Foreground="White" CornerRadius="20" Height="{../HeightPolicy}" Width="{../WidthPolicy}"
 				MouseEnter="../onBorderMouseEnter"
 				MouseLeave="../onBorderMouseLeave">
 	<VerticalStack Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
 		<Border Name="TitleBar" BorderWidth="1" Foreground="White" Width="{../../../WidthPolicy}" Height="Fit"
-				Background="vgradient|0:0,4;0,6;0,0;0,5|1:0,0;0,8;0,8;0,9">
+				Background="vgradient|0:0.4,0.6,0.0,0.5|1:0.0,0.8,0.8,0.9">
 			<HorizontalStack Name="hs" Margin="1" Spacing="1" Width="{../../../../WidthPolicy}" Height="Fit" 
 				>
 				<GraphicObject Width="5"/>
@@ -18,6 +18,6 @@
 				<GraphicObject Width="5"/>
 			</HorizontalStack>
 		</Border>
-		<Container Name="Content" MinimumSize="50;50" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}" Background="0,5;0,5;0,5;0,5"/>
+		<Container Name="Content" MinimumSize="50;50" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}" Background="0.5,0.5,0.5,0.5"/>
 	</VerticalStack>
 </Border>

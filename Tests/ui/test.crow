@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <Window Font="droid bold, 10" Title="Open GL" HorizontalAlignment="Left" Width="30%" Height="90%">
 	<VerticalStack>
 		<HorizontalStack Background="Jet" Height="Fit" Width="Stretched"  Margin="2">
@@ -18,8 +18,8 @@
 		</HorizontalStack>
 		<GroupBox Caption="Object Rotation" Margin="10" Width="70%" Height="Fit" >
 			<VerticalStack Spacing="10">
-				<Spinner Width="50%" Maximum="1,0" SmallIncrement="0,01" Value="{²RotationSpeed}"/>
-				<Slider Height="10" Width="50%" Maximum="1,0" SmallIncrement="0,01" Value="{²RotationSpeed}"/>
+				<Spinner Width="50%" Maximum="1,0" SmallIncrement="0.01" Value="{²RotationSpeed}"/>
+				<Slider Height="10" Width="50%" Maximum="1,0" SmallIncrement="0.01" Value="{²RotationSpeed}"/>
 				<CheckBox IsChecked="{²ClockWiseRotation}" Caption="Clockwise Rotation"/>
 				<GroupBox Caption="Rotation Axis" Height="Fit" >
 					<VerticalStack>

@@ -1,7 +1,7 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <Group Name="MainGrp"
 	Width="800" Height="500"
-	Background="0,5;0,5;0,5;0,5" Foreground="White"
+	Background="0.5,0.5,0.5,0.5" Foreground="White"
 	Margin="10" >
 	<Border Margin="10" CornerRadius="10"
 		Name="mainBorder"

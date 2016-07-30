@@ -1,11 +1,11 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 
 	<VerticalStack Height="Fit" Width="Fit" Name="hstack" Margin="0" Spacing="Stretched">
 		<Border Height="Fit" Width="200" BorderWidth="2" CornerRadius="10">
 			<Label Name="labName" Text="{Name}" Width="Stretched" Height="Fit"/>
 		</Border>
 		<ListBox Data="{GetFileSystemInfos}" Width="Fit" Height="400"
-			Background="0,5;0,5;0,5;0,5"
+			Background="0.5,0.5,0.5,0.5"
 			SelectedItemChanged="OnSelectedItemChanged" 
 			ItemTemplate="Interfaces/tmpDirItem.goml" >
 			<Template>

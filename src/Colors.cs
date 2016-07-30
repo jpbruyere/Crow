@@ -1012,7 +1012,7 @@ namespace Crow
 		#region IXmlSerializable
 		public void ReadXml(System.Xml.XmlReader reader)
         {
-            string[] c = reader["Color"].Split(new char[] { ';' });            
+            string[] c = reader["Color"].Split(new char[] { ',' });            
             R = double.Parse(c[0]);
             G = double.Parse(c[1]);
             B = double.Parse(c[2]);
@@ -1061,7 +1061,7 @@ namespace Crow
 				}
 			}
 
-			return string.Format("{0};{1};{2};{3}", R, G, B, A);
+			return string.Format("{0},{1},{2},{3}", R, G, B, A);
 		}
 
         public static object Parse(string s)

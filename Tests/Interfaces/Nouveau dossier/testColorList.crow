@@ -1,7 +1,7 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <Border BorderWidth="2" Fit="true">
 	<VerticalStack Fit="true" Margin="5">
-		<ListBox Data="{TestList}" Background="0,5;0,5;0,5;0,7"
+		<ListBox Data="{TestList}" Background="0.5,0.5,0.5,0.7"
 					 HorizontalAlignment="Center" Width="200" Height="200" Margin="5"
 					 ItemTemplate="#Tests.Interfaces.colorItem.crow">
 			<Template>

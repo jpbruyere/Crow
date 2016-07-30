@@ -2,4 +2,4 @@
 Height=Fit;
 Title=MessageBox;
 Focusable=true;
-MinimumSize=150;80;
+MinimumSize=150,80;

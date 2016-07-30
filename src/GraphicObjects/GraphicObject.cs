@@ -82,8 +82,8 @@ namespace Crow
 		protected bool _isVisible = true;
 		VerticalAlignment _verticalAlignment = VerticalAlignment.Center;
 		HorizontalAlignment _horizontalAlignment = HorizontalAlignment.Center;
-		Size _maximumSize = "0;0";
-		Size _minimumSize = "0;0";
+		Size _maximumSize = "0,0";
+		Size _minimumSize = "0,0";
 		bool cacheEnabled = false;
 		object dataSource;
 		string style;
@@ -419,7 +419,7 @@ namespace Crow
 				NotifyValueChanged ("Visible", _isVisible);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("1;1")]
+		[XmlAttributeAttribute()][DefaultValue("1,1")]
 		public virtual Size MinimumSize {
 			get { return _minimumSize; }
 			set {
@@ -432,7 +432,7 @@ namespace Crow
 				RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("0;0")]
+		[XmlAttributeAttribute()][DefaultValue("0,0")]
 		public virtual Size MaximumSize {
 			get { return _maximumSize; }
 			set {
@@ -539,9 +539,15 @@ namespace Crow
 					else
 						name = xaa.AttributeName;
 				}
-				if (styling.ContainsKey (name)) {
 
-				} else {
+				bool memberHasStyle = false;
+				if (styling != null){
+					if (styling.ContainsKey (name))
+						memberHasStyle = true;
+				} 
+				if (memberHasStyle){
+					
+				}else {
 					if (name == "Style") {
 						//retrieve default value from class attribute
 						//DefaultStyle defStyle = thisType.GetCustomAttribute<DefaultStyle>();

@@ -1,11 +1,11 @@
-﻿<?xml version="1.0"?>
-<Window Name="window1" Left="10" Top="10" Title="Test window" Width="200" Height="200" Background="0,5;0,5;0,5;0,8" 
+<?xml version="1.0"?>
+<Window Name="window1" Left="10" Top="10" Title="Test window" Width="200" Height="200" Background="0.5,0.5,0.5,0.8" 
 	Focusable="True"  CornerRadius="20" MinimumSize="100;100" MaximumSize="500;500">
 	<Template>
 		<Border BorderWidth="1" Foreground="White" CornerRadius="20" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
 			<VerticalStack Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
 				<Border BorderWidth="1" Foreground="White" Width="{../../../WidthPolicy}" Height="Fit" 
-						Background="0,1;0,5;1,0;0,5">
+						Background="0.1,0.5;1,0,0.5">
 					<HorizontalStack Name="hs" Margin="1" Spacing="1" Width="{../../../../WidthPolicy}" Height="Fit" >
 						<GraphicObject Width="5"/>
 						<Image Margin="1" Width="12" Height="12" Path="{../../../../../Icon}"/>
@@ -18,7 +18,7 @@
 						<GraphicObject Width="5"/>
 					</HorizontalStack>
 				</Border>
-				<Container Name="Content" Height="{../../../../HeightPolicy}" Width="{../../../../WidthPolicy}" Background="0,5;0,5;0,5;0,5"/>
+				<Container Name="Content" Height="{../../../../HeightPolicy}" Width="{../../../../WidthPolicy}" Background="0.5,0.5,0.5,0.5"/>
 			</VerticalStack>
 		</Border>
 	</Template>
