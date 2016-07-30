@@ -1,5 +1,5 @@
-﻿<?xml version="1.0"?>
-<HorizontalStack MinimumSize="40;10" Name="hstack" Margin="0" Spacing="0" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
+<?xml version="1.0"?>
+<HorizontalStack MinimumSize="40,10" Name="hstack" Margin="0" Spacing="0" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
 	<Border BorderWidth="1" Height="{../../HeightPolicy}" Width="80%"  Background="White" 
 		Foreground="DimGray" Margin="0">
 		<Label Foreground="DimGray" Height="{../../../HeightPolicy}" Width="Stretched"

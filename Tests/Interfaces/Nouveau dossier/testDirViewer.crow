@@ -9,7 +9,7 @@
 			SelectedItemChanged="OnSelectedItemChanged" 
 			ItemTemplate="Interfaces/tmpDirItem.goml" >
 			<Template>
-				<Border BorderWidth="1" MinimumSize="20;20" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
+				<Border BorderWidth="1" MinimumSize="20,20" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
 					<HorizontalStack Margin="1" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
 						<Scroller  Name="scroller1" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}" 
 						 Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">

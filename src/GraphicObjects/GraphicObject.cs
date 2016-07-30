@@ -485,6 +485,17 @@ namespace Crow
 		}
 		#endregion
 
+
+		/// <summary>
+		/// Add 'Styles' to full class name between assembly name and the rest of the full name space
+		/// </summary>
+		string getDefaultStyleResId (Type t) {
+			string [] tmp = t.FullName.Split ('.');
+			string res = tmp [0] + ".Styles";
+			for (int i = 1; i < tmp.Length; i++)			
+				res += "." + tmp [i];
+			return res;
+		}
 		/// <summary> Loads the default values from XML attributes default </summary>
 		protected virtual void loadDefaultValues()
 		{
@@ -500,8 +511,21 @@ namespace Crow
 
 			Dictionary<string, string> styling = null;
 
-			if (Interface.CurrentInterface.Styling.ContainsKey (thisType.Name))
-				styling = Interface.CurrentInterface.Styling[thisType.Name];
+			//Search for a style mathing :
+			//1: Full class name, with full namespace
+			//2: class name
+			//3: style may have been registered with their ressource ID minus .style extention
+			//   those files being placed in a Styles folder
+
+			if (Interface.CurrentInterface.Styling.ContainsKey (thisType.FullName))
+				styling = Interface.CurrentInterface.Styling [thisType.FullName];
+			else if (Interface.CurrentInterface.Styling.ContainsKey (thisType.Name))
+				styling = Interface.CurrentInterface.Styling [thisType.Name];
+			else {
+				string styleFullName = getDefaultStyleResId (thisType);
+				if (Interface.CurrentInterface.Styling.ContainsKey (styleFullName)) 
+					styling = Interface.CurrentInterface.Styling [styleFullName];
+			}
 				                                             
 			//Reflexion being very slow compared to dyn method or delegates,
 			//I compile the initial values coded in the CustomAttribs of the class,
@@ -546,7 +570,7 @@ namespace Crow
 						memberHasStyle = true;
 				} 
 				if (memberHasStyle){
-					
+					defaultValue = styling [name];
 				}else {
 					if (name == "Style") {
 						//retrieve default value from class attribute
@@ -635,10 +659,12 @@ namespace Crow
 					//surely a class or struct
 					if (dvType != typeof(string))
 						throw new Exception ("Expecting String in default values for: " + pi.Name);
-					if (pi.PropertyType == typeof(string))
+					if (pi.PropertyType == typeof (string))
 						il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
 					else {
-						MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
+						MethodInfo miParse = pi.PropertyType.GetMethod 
+						                       ("Parse", BindingFlags.Static | BindingFlags.Public,
+						                        Type.DefaultBinder, new Type [] {typeof (string)},null);
 						if (miParse == null)
 							throw new Exception ("no Parse method found for: " + pi.PropertyType.FullName);
 

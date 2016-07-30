@@ -1,10 +1,10 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <Popper Name="popper" PopDirection="Bottom" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
 	<Template>
 		<Border CornerRadius="0" Foreground="LightGray" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
 			<HorizontalStack Margin="0
 						" Spacing="1" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}">
-				<TextBox MinimumSize="80;10" Margin="1" Foreground="Black" Background="White"
+				<TextBox MinimumSize="80,10" Margin="1" Foreground="Black" Background="White"
 					Text="{../../../../SelectedItem}"
 					Height="{../../../../HeightPolicy}" Width="{../../../../WidthPolicy}"/>
 				<Button Width="14" Height="14" Focusable="false"
@@ -17,7 +17,7 @@
 	<Border Background="DimGray" BorderWidth="1" Margin="1"
 		MinimumSize="{../../MinimumPopupSize}" Fit="true">
 		<Scroller Name="scroller1" Margin="2" VerticalScrolling="true"
-			MaximumSize="0;200"
+			MaximumSize="0,200"
 			Height="{../HeightPolicy}" Width="{../WidthPolicy}"
 			HorizontalAlignment="Left"
 			ValueChanged="../../../_scroller_ValueChanged">

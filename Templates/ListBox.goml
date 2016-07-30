@@ -1,5 +1,5 @@
-﻿<?xml version="1.0"?>
-<Border BorderWidth="1" Margin="1" MinimumSize="10;10" Height="{../HeightPolicy}" Width="{../WidthPolicy}" >
+<?xml version="1.0"?>
+<Border BorderWidth="1" Margin="1" MinimumSize="10,10" Height="{../HeightPolicy}" Width="{../WidthPolicy}" >
 	<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"
 		Height="{../../HeightPolicy}" Width="{../../WidthPolicy}"
 		ValueChanged="../../_scroller_ValueChanged">

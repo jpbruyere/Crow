@@ -78,8 +78,8 @@ namespace Tests
 
 			KeyboardKeyDown += GOLIBTests_KeyboardKeyDown1;
 
-
-			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			testFiles = new string [] { @"Interfaces/Divers/5.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/basicTests", "*.crow")).ToArray ();

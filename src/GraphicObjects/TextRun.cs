@@ -10,30 +10,30 @@ using System.ComponentModel;
 
 namespace Crow
 {
-    public class TextRun : GraphicObject
-    {
+	public class TextRun : GraphicObject
+	{
 		#region CTOR
-		public TextRun()
-		{ 
+		public TextRun ()
+		{
 
 		}
-		public TextRun(string _text)
-			: base()
+		public TextRun (string _text)
+			: base ()
 		{
 			Text = _text;
 		}
 		#endregion
 
-        //TODO:change protected to private
-        
+		//TODO:change protected to private
+
 		#region private and protected fields
 		protected string _text = "label";
-        Alignment _textAlignment = Alignment.Left;
+		Alignment _textAlignment = Alignment.Left;
 		bool horizontalStretch = false;
 		bool verticalStretch = false;
 		bool _multiline;
 		bool wordWrap;
-        protected Rectangle rText;
+		protected Rectangle rText;
 		protected float widthRatio = 1f;
 		protected float heightRatio = 1f;
 		protected FontExtents fe;
@@ -41,69 +41,70 @@ namespace Crow
 		#endregion
 
 
-        [XmlAttributeAttribute()][DefaultValue(Alignment.Left)]
-		public Alignment TextAlignment
-        {
-            get { return _textAlignment; }
-            set { _textAlignment = value; }
-        }
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[XmlAttributeAttribute ()]
+		[DefaultValue (Alignment.Left)]
+		public Alignment TextAlignment {
+			get { return _textAlignment; }
+			set { _textAlignment = value; }
+		}
+		[XmlAttributeAttribute ()]
+		[DefaultValue (false)]
 		public virtual bool HorizontalStretch {
 			get { return horizontalStretch; }
 			set {
 				if (horizontalStretch == value)
 					return;
-				horizontalStretch = value; 
+				horizontalStretch = value;
 				RegisterForGraphicUpdate ();
 				NotifyValueChanged ("HorizontalStretch", horizontalStretch);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[XmlAttributeAttribute ()]
+		[DefaultValue (false)]
 		public virtual bool VerticalStretch {
 			get { return verticalStretch; }
 			set {
 				if (verticalStretch == value)
 					return;
-				verticalStretch = value; 
+				verticalStretch = value;
 				NotifyValueChanged ("VerticalStretch", verticalStretch);
 
 			}
-		} 
-		[XmlAttributeAttribute()][DefaultValue("label")]
-        public string Text
-        {
-            get {				
-				return lines == null ? 
-					_text : lines.Aggregate((i, j) => i + Interface.LineBreak + j);
+		}
+		[XmlAttributeAttribute ()]
+		[DefaultValue ("label")]
+		public string Text {
+			get {
+				return lines == null ?
+					_text : lines.Aggregate ((i, j) => i + Interface.LineBreak + j);
 			}
-            set
-            {
-                if (_text == value)
-                    return;
-					                
-                RegisterForGraphicUpdate();
+			set {
+				if (_text == value)
+					return;
+
+				RegisterForGraphicUpdate ();
 				this.RegisterForLayouting (LayoutingType.Sizing);
 
 
-                _text = value;
+				_text = value;
 
-				if (string.IsNullOrEmpty(_text))
+				if (string.IsNullOrEmpty (_text))
 					_text = "";
 
 				lines = getLines;
-            }
-        }
-		[XmlAttributeAttribute()][DefaultValue(false)]
-		public bool Multiline
-		{
-			get { return _multiline; }
-			set
-			{
-				_multiline = value;
-				RegisterForGraphicUpdate();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[XmlAttributeAttribute ()]
+		[DefaultValue (false)]
+		public bool Multiline {
+			get { return _multiline; }
+			set {
+				_multiline = value;
+				RegisterForGraphicUpdate ();
+			}
+		}
+		[XmlAttributeAttribute ()]
+		[DefaultValue (false)]
 		public bool WordWrap {
 			get {
 				return wordWrap;
@@ -112,22 +113,22 @@ namespace Crow
 				if (wordWrap == value)
 					return;
 				wordWrap = value;
-				RegisterForGraphicUpdate();
+				RegisterForGraphicUpdate ();
 			}
 		}
 
 		List<string> lines;
 		List<string> getLines {
-			get {				
+			get {
 				return _multiline ?
-					Regex.Split (_text, "\r\n|\r|\n").ToList() :
-					new List<string>(new string[] { _text });
+					Regex.Split (_text, "\r\n|\r|\n").ToList () :
+					new List<string> (new string [] { _text });
 			}
 		}
 
 		#region GraphicObject overrides
-		protected override int measureRawSize(LayoutingType lt)
-		{			
+		protected override int measureRawSize (LayoutingType lt)
+		{
 			if (lines == null)
 				lines = getLines;
 
@@ -140,25 +141,22 @@ namespace Crow
 
 
 					fe = gr.FontExtents;
-					te = new TextExtents();
+					te = new TextExtents ();
 
-					if (lt == LayoutingType.Height){
+					if (lt == LayoutingType.Height) {
 						int lc = lines.Count;
 						//ensure minimal height = text line height
 						if (lc == 0)
-							lc = 1; 
+							lc = 1;
 
 						return (int)(fe.Height * lc) + Margin * 2;
 					}
 
 					foreach (string s in lines) {
-						string l = s.Replace("\t", new String (' ', Interface.TabSize));
+						string l = s.Replace ("\t", new String (' ', Interface.TabSize));
 
-						#if _WIN32 || _WIN64
-						TextExtents tmp = gr.TextExtents(str.ToUtf8());
-						#elif __linux__
 						TextExtents tmp = gr.TextExtents (l);
-						#endif
+
 						if (tmp.XAdvance > te.XAdvance)
 							te = tmp;
 					}
@@ -176,8 +174,8 @@ namespace Crow
 
 			gr.Antialias = Antialias.Subpixel;
 
-			rText = new Rectangle(new Size(
-				measureRawSize(LayoutingType.Width), measureRawSize(LayoutingType.Height)));
+			rText = new Rectangle (new Size (
+				measureRawSize (LayoutingType.Width), measureRawSize (LayoutingType.Height)));
 			rText.Width -= 2 * Margin;
 			rText.Height -= 2 * Margin;
 
@@ -188,16 +186,16 @@ namespace Crow
 
 			//ignore text alignment if size to content = true
 			//or if text size is larger than client bounds
-			if (Width < 0 || Height < 0 || rText.Width > cb.Width)
-			{
+			if (Width < 0 || Height < 0 || rText.Width > cb.Width) {
 				rText.X = cb.X;
 				rText.Y = cb.Y;
-			}else {
+			} else {
 				if (horizontalStretch) {
 					widthRatio = (float)cb.Width / rText.Width;
 					if (!verticalStretch)
 						heightRatio = widthRatio;
-				}if (verticalStretch) {
+				}
+				if (verticalStretch) {
 					heightRatio = (float)cb.Height / rText.Height;
 					if (!horizontalStretch)
 						widthRatio = heightRatio;
@@ -206,8 +204,7 @@ namespace Crow
 				rText.Width = (int)(widthRatio * cb.Width);
 				rText.Height = (int)(heightRatio * cb.Height);
 
-				switch (TextAlignment)
-				{
+				switch (TextAlignment) {
 				case Alignment.TopLeft:     //ok
 					rText.X = cb.X;
 					rText.Y = cb.Y;
@@ -247,11 +244,11 @@ namespace Crow
 				}
 			}
 
-			gr.FontMatrix = new Matrix(widthRatio * Font.Size, 0, 0, heightRatio * Font.Size, 0, 0);
+			gr.FontMatrix = new Matrix (widthRatio * Font.Size, 0, 0, heightRatio * Font.Size, 0, 0);
 
 
 			int curLineCount = 0;
-			for (int i = 0;i < lines.Count;i++) {				
+			for (int i = 0; i < lines.Count; i++) {
 				string l = lines [i].Replace ("\t", new String (' ', Interface.TabSize));
 				List<string> wl = new List<string> ();
 				int lineLength = (int)gr.TextExtents (l).XAdvance;
@@ -275,28 +272,28 @@ namespace Crow
 
 				foreach (string ll in wl) {
 					lineLength = (int)gr.TextExtents (ll).XAdvance;
-									
+
 
 					if (string.IsNullOrWhiteSpace (ll)) {
 						curLineCount++;
 						continue;
 					}
 
-					Foreground.SetAsSource (gr);	
+					Foreground.SetAsSource (gr);
 					gr.MoveTo (rText.X, rText.Y + fe.Ascent + fe.Height * curLineCount);
 
-					#if _WIN32 || _WIN64
+#if _WIN32 || _WIN64
 					gr.ShowText(ll.ToUtf8());
-					#elif __linux__
+#elif __linux__
 					gr.ShowText (ll);
-					#endif
+#endif
 					gr.Fill ();
 
 					curLineCount++;
-						
+
 				}
-			}						
+			}
 		}
 		#endregion
-    }
+	}
 }

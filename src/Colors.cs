@@ -53,7 +53,7 @@ namespace Crow
 			if (string.IsNullOrEmpty(s))
 				return White;
 
-			string[] c = s.Split(new char[] { ';' });
+			string[] c = s.Split(new char[] { ',' });
 
 			if (c.Length == 1)
 			{

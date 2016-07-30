@@ -1,5 +1,5 @@
-﻿<?xml version="1.0"?>
-<Window Width="500" Height="300" MinimumSize="50;50">
+<?xml version="1.0"?>
+<Window Width="500" Height="300" MinimumSize="50,50">
 <HorizontalStack Margin="5" Background="DimGray">
 	<VerticalStack Width="200" Margin="5" Background="Gray">
 		<VerticalStack Fit="true" Background="DimGray" Margin="5">
