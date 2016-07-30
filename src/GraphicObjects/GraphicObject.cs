@@ -575,17 +575,10 @@ namespace Crow
 				if (styleIndex >= 0){
 					defaultValue = styling[styleIndex] [name];
 				}else {
-					if (name == "Style") {
-						//retrieve default value from class attribute
-						//DefaultStyle defStyle = thisType.GetCustomAttribute<DefaultStyle>();
-						//if (defStyle != null)
-						//	defaultValue = defStyle.Path;
-					} else {
-						DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof (DefaultValueAttribute));
-						if (dv == null)
-							continue;
-						defaultValue = dv.Value;
-					}
+					DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof (DefaultValueAttribute));
+					if (dv == null)
+						continue;
+					defaultValue = dv.Value;
 				}
 				#endregion
 
@@ -685,7 +678,6 @@ namespace Crow
 
 			Interface.DefaultValuesLoader[thisType.FullName] = (Interface.loadDefaultInvoker)dm.CreateDelegate(typeof(Interface.loadDefaultInvoker));
 			Interface.DefaultValuesLoader[thisType.FullName] (this);
-			applyStyle ();
 		}
 
 		public virtual GraphicObject FindByName(string nameToFind){
@@ -1243,7 +1235,7 @@ namespace Crow
 
 			MemberInfo mi = thisType.GetMember (name).FirstOrDefault();
 			if (mi == null) {
-				Debug.WriteLine ("GOML: Unknown attribute in " + thisType.ToString() + " : " + name);
+				Debug.WriteLine ("XML: Unknown attribute in " + thisType.ToString() + " : " + name);
 				return;
 			}
 			if (mi.MemberType == MemberTypes.Event) {
@@ -1266,7 +1258,7 @@ namespace Crow
 				if (value.StartsWith("{",StringComparison.Ordinal)) {
 					//binding
 					if (!value.EndsWith("}", StringComparison.Ordinal))
-						throw new Exception (string.Format("GOML:Malformed binding: {0}", value));
+						throw new Exception (string.Format("XML:Malformed binding: {0}", value));
 
 					this.Bindings.Add (new Binding (new MemberReference(this, pi), value.Substring (1, value.Length - 2)));
 					return;
@@ -1289,50 +1281,14 @@ namespace Crow
 				}
 			}
 		}
-		void applyStyle(){
-			//The first place searched for a style is in the style propery of this instance
-			//this field may contains the path to a Style file for the object.
-			if (string.IsNullOrEmpty (style))
-				return;
-			Stream s = Interface.GetStreamFromPath (style);
-			if (s == null)
-				throw new Exception ("Style Path not found: " + style);
-
-			#if DEBUG_LOAD
-			Debug.WriteLine ("ApplyStyle for " + this.ToString ());
-			#endif
-			using (StreamReader sr = new StreamReader (s)) {
-				while (!sr.EndOfStream) {
-					string tmp = sr.ReadLine ();
-					if (string.IsNullOrWhiteSpace (tmp))
-						continue;
-					int i = tmp.IndexOf ('=');
-					if (i < 0)
-						continue;
-					string name = tmp.Substring (0, i).Trim();
-					string value = tmp.Substring (i + 1).Trim ();
-
-					affectMember (name, value);
-				}
-			}
-		}
 		public virtual void ReadXml (System.Xml.XmlReader reader)
 		{
 			if (!reader.HasAttributes)
 				return;
 
-			string stylePath = reader.GetAttribute ("Style");
-
-			if (!string.IsNullOrEmpty (style)) {
-				Style = stylePath;
-				applyStyle ();
-			}
-			while (reader.MoveToNextAttribute ()) {
-				if (reader.Name == "Style")
-					continue;
-
+			while (reader.MoveToNextAttribute ())
 				affectMember (reader.Name, reader.Value);
-			}
+
 			reader.MoveToElement();
 		}
 		public virtual void WriteXml (System.Xml.XmlWriter writer)
