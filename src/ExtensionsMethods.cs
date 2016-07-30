@@ -65,6 +65,10 @@ namespace Crow
 			var ret = Run.DynamicInvoke(data);
 			return ret;
 		}
+		public static bool IsWhiteSpaceOrNewLine (this char c)
+		{
+			return c == '\t' || c == '\r' || c == '\n' || char.IsWhiteSpace (c);
+		}
 	}
 }
 

@@ -1,4 +1,4 @@
-﻿Background = vgradient|0:Black|0,1:Gray|0,9:Gray|1:LightGray
-Foreground = Gray
-Focusable = true
-Fit = true
+﻿Background = vgradient|0:Black|0,1:Gray|0,9:Gray|1:LightGray;
+Foreground = Gray;
+Focusable = true;
+Fit = true;

@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Xml;
@@ -54,6 +55,7 @@ namespace Crow
 		public Interface(){
 			LayoutingQueue = new Queue<LayoutingQueueItem>();
 			Interface.CurrentInterface = this;
+			LoadStyling ();
 		}
 		#endregion
 
@@ -259,7 +261,48 @@ namespace Crow
 				return tmp;
 			}
 		}
+		public Dictionary<string, Dictionary<string, string>> Styling;
 
+		public void LoadStyling() {
+			Styling = new Dictionary<string, Dictionary<string, string>> ();
+
+			//fetch styling info in this order, if member styling is alreadey referenced in previous
+			//assembly, it's ignored
+			loadStylingFromAssembly (Assembly.GetEntryAssembly ());
+			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
+		}
+
+		void loadStylingFromAssembly (Assembly assembly) { 
+			foreach (string s in assembly
+					.GetManifestResourceNames ()
+					 .Where (r => r.EndsWith (".style", StringComparison.OrdinalIgnoreCase))) {
+
+				StyleReader sr = new StyleReader (assembly, s);
+									
+			}
+		}
+
+		//public static bool TryGetStyle (Type crowType, out Stream stream) {			
+		//	string styleId = crowType.Name + ".style";
+
+		//	if (tryGetStyle (Assembly.GetEntryAssembly (), styleId, out stream))
+		//		return true;
+		//	if (tryGetStyle (Assembly.GetExecutingAssembly (), styleId, out stream))
+		//		return true;			
+		//	return false;
+		//}
+
+		//static bool tryGetStyle (Assembly assembly, string styleId, out Stream stream) { 
+		//	try {
+		//		stream = assembly.GetManifestResourceStream (
+		//				assembly.GetManifestResourceNames ().FirstOrDefault (r => r.EndsWith
+		//															  (styleId, StringComparison.OrdinalIgnoreCase)));
+		//	} catch {
+		//		stream = null;
+		//		return false;
+		//	}
+		//	return true;
+		//}
 		#endregion
 
 		#if MEASURE_TIME

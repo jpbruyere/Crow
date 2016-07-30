@@ -321,6 +321,7 @@
     <Compile Include="src\CompilerServices\Bindings.cs">
       <LogicalName></LogicalName>
     </Compile>
+    <Compile Include="src\StyleReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

@@ -12,7 +12,6 @@ using System.ComponentModel;
 
 namespace Crow
 {
-	[DefaultStyle("#Crow.Styles.Button.style")]
 	[DefaultTemplate("#Crow.Templates.Button.crow")]
     public class Button : TemplatedContainer
     {

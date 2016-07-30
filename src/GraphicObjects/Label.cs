@@ -1,7 +1,27 @@
-﻿using System;
+﻿//
+//  Label.cs
+//
+//  Author:
+//       Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+//
+//  Copyright (c) 2016 jp
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Diagnostics;
 using Cairo;
 using System.Text.RegularExpressions;
@@ -10,7 +30,6 @@ using System.ComponentModel;
 
 namespace Crow
 {    
-	[DefaultStyle("#Crow.Styles.Label.style")]
     public class Label : GraphicObject
     {
 		#region CTOR
@@ -52,7 +71,7 @@ namespace Crow
 		protected TextExtents te;
 		#endregion
 
-		[XmlAttributeAttribute()][DefaultValue("SteelBlue")]
+		[XmlAttributeAttribute][DefaultValue("SteelBlue")]
 		public virtual Color SelectionBackground {
 			get { return selColor; }
 			set {
@@ -63,7 +82,7 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("White")]
+		[XmlAttributeAttribute][DefaultValue("White")]
 		public virtual Color SelectionForeground {
 			get { return selFontColor; }
 			set {
@@ -74,7 +93,7 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(Alignment.Left)]
+		[XmlAttributeAttribute][DefaultValue(Alignment.Left)]
 		public Alignment TextAlignment
         {
             get { return _textAlignment; }
@@ -87,7 +106,7 @@ namespace Crow
 				NotifyValueChanged ("TextAlignment", _textAlignment);
 			}
         }
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[XmlAttributeAttribute][DefaultValue(false)]
 		public virtual bool HorizontalStretch {
 			get { return horizontalStretch; }
 			set {
@@ -98,7 +117,7 @@ namespace Crow
 				NotifyValueChanged ("HorizontalStretch", horizontalStretch);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[XmlAttributeAttribute][DefaultValue(false)]
 		public virtual bool VerticalStretch {
 			get { return verticalStretch; }
 			set {
@@ -109,7 +128,7 @@ namespace Crow
 
 			}
 		} 
-		[XmlAttributeAttribute()][DefaultValue("label")]
+		[XmlAttributeAttribute][DefaultValue("label")]
         public string Text
         {
             get {				
@@ -133,7 +152,7 @@ namespace Crow
 				NotifyValueChanged ("Text", _text);
             }
         }
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[XmlAttributeAttribute][DefaultValue(false)]
 		public bool Multiline
 		{
 			get { return _multiline; }
@@ -146,7 +165,7 @@ namespace Crow
 				RegisterForGraphicUpdate();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(0)]
+		[XmlAttributeAttribute][DefaultValue(0)]
 		public int CurrentColumn{
 			get { return _currentCol; }
 			set { 
@@ -161,7 +180,7 @@ namespace Crow
 				NotifyValueChanged ("CurrentColumn", _currentCol);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(0)]
+		[XmlAttributeAttribute][DefaultValue(0)]
 		public int CurrentLine{
 			get { return _currentLine; }
 			set { 
@@ -181,7 +200,7 @@ namespace Crow
 			}
 		}
 		//TODO:using HasFocus for drawing selection cause SelBegin and Release binding not to work
-		[XmlAttributeAttribute()][DefaultValue("-1")]
+		[XmlAttributeAttribute][DefaultValue("-1")]
 		public Point SelBegin {
 			get {
 				return _selBegin;
@@ -194,7 +213,7 @@ namespace Crow
 				NotifyValueChanged ("SelectedText", SelectedText);
 			}
 		}			
-		[XmlAttributeAttribute()][DefaultValue("-1")]
+		[XmlAttributeAttribute][DefaultValue("-1")]
 		public Point SelRelease {
 			get {
 				return _selRelease;

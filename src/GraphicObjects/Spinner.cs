@@ -22,7 +22,6 @@ using System;
 
 namespace Crow
 {
-	[DefaultStyle("#Crow.Styles.Spinner.style")]
 	[DefaultTemplate("#Crow.Templates.Spinner.goml")]
 	public class Spinner : NumericControl
 	{

@@ -493,12 +493,16 @@ namespace Crow
 			#endif
 
 			Type thisType = this.GetType ();
-			if (Interface.DefaultValuesLoader.ContainsKey(thisType.FullName)) {
-				Interface.DefaultValuesLoader[thisType.FullName] (this);
-				applyStyle ();
+			if (Interface.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
+				Interface.DefaultValuesLoader [thisType.FullName] (this);
 				return;
 			}
 
+			Dictionary<string, string> styling = null;
+
+			if (Interface.CurrentInterface.Styling.ContainsKey (thisType.Name))
+				styling = Interface.CurrentInterface.Styling[thisType.Name];
+				                                             
 			//Reflexion being very slow compared to dyn method or delegates,
 			//I compile the initial values coded in the CustomAttribs of the class,
 			//all other instance of this type would not longer use reflexion to init properly
@@ -535,16 +539,20 @@ namespace Crow
 					else
 						name = xaa.AttributeName;
 				}
-				if (name == "Style"){
-					//retrieve default value from class attribute
-					DefaultStyle defStyle = thisType.GetCustomAttribute<DefaultStyle>();
-					if (defStyle != null)
-						defaultValue = defStyle.Path;
-				}else{
-					DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof(DefaultValueAttribute));
-					if (dv == null)
-						continue;
-					defaultValue = dv.Value;
+				if (styling.ContainsKey (name)) {
+
+				} else {
+					if (name == "Style") {
+						//retrieve default value from class attribute
+						//DefaultStyle defStyle = thisType.GetCustomAttribute<DefaultStyle>();
+						//if (defStyle != null)
+						//	defaultValue = defStyle.Path;
+					} else {
+						DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof (DefaultValueAttribute));
+						if (dv == null)
+							continue;
+						defaultValue = dv.Value;
+					}
 				}
 				#endregion
 

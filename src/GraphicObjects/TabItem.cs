@@ -25,7 +25,6 @@ using System.Diagnostics;
 
 namespace Crow
 {
-	[DefaultStyle ("#Crow.Styles.TabItem.style")]
 	[DefaultTemplate("#Crow.Templates.TabItem.crow")]
 	public class TabItem : TemplatedContainer
 	{
@@ -67,7 +66,7 @@ namespace Crow
 		internal GraphicObject TabTitle { get { return _tabTitle; }}
 		#endregion
 
-		[XmlAttributeAttribute()][DefaultValue(0)]
+		[XmlAttributeAttribute][DefaultValue(0)]
 		public virtual int TabOffset {
 			get { return tabOffset; }
 			set {
@@ -80,7 +79,7 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("TabItem")]
+		[XmlAttributeAttribute][DefaultValue("TabItem")]
 		public string Caption {
 			get { return caption; }
 			set {
@@ -91,7 +90,7 @@ namespace Crow
 			}
 		}
 		bool isSelected;
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[XmlAttributeAttribute][DefaultValue(false)]
 		public virtual bool IsSelected {
 			get { return isSelected; }
 			set {

@@ -10,8 +10,6 @@ using System.ComponentModel;
 
 namespace Crow
 {
-    [Serializable]
-	[DefaultStyle("#Crow.Styles.TextRun.style")]
     public class TextRun : GraphicObject
     {
 		#region CTOR
