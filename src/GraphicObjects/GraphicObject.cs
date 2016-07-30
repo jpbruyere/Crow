@@ -509,7 +509,7 @@ namespace Crow
 				return;
 			}
 
-			List<Dictionary<string, string>> styling = new List<Dictionary<string, string>>();
+			List<Dictionary<string, object>> styling = new List<Dictionary<string, object>>();
 
 			//Search for a style mathing :
 			//1: Full class name, with full namespace

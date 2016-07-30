@@ -90,7 +90,7 @@ namespace Crow
 
 		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem> ();
 		public Queue<GraphicObject> GraphicUpdateQueue = new Queue<GraphicObject>();
-		public Dictionary<string, Dictionary<string, string>> Styling;
+		public Dictionary<string, Dictionary<string, object>> Styling;
 		public string Clipboard;
 		public static void RegisterForGraphicUpdate(GraphicObject g)
 		{
@@ -269,7 +269,7 @@ namespace Crow
 			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
-			Styling = new Dictionary<string, Dictionary<string, string>> ();
+			Styling = new Dictionary<string, Dictionary<string, object>> ();
 
 			//fetch styling info in this order, if member styling is alreadey referenced in previous
 			//assembly, it's ignored.

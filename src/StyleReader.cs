@@ -106,7 +106,7 @@ namespace Crow
 
 								foreach (string tc in targetsClasses) {
 									if (!iface.Styling.ContainsKey (tc))
-										iface.Styling [tc] = new Dictionary<string, string> ();
+										iface.Styling [tc] = new Dictionary<string, object> ();
 									else if (iface.Styling [tc].ContainsKey (currentProperty))
 										continue;
 									iface.Styling [tc] [currentProperty] = expression;
