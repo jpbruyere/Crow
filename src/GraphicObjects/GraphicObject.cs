@@ -492,7 +492,7 @@ namespace Crow
 		string getDefaultStyleResId (Type t) {
 			string [] tmp = t.FullName.Split ('.');
 			string res = tmp [0] + ".Styles";
-			for (int i = 1; i < tmp.Length; i++)			
+			for (int i = 1; i < tmp.Length; i++)
 				res += "." + tmp [i];
 			return res;
 		}
@@ -509,7 +509,7 @@ namespace Crow
 				return;
 			}
 
-			Dictionary<string, string> styling = null;
+			List<Dictionary<string, string>> styling = new List<Dictionary<string, string>>();
 
 			//Search for a style mathing :
 			//1: Full class name, with full namespace
@@ -518,15 +518,14 @@ namespace Crow
 			//   those files being placed in a Styles folder
 
 			if (Interface.CurrentInterface.Styling.ContainsKey (thisType.FullName))
-				styling = Interface.CurrentInterface.Styling [thisType.FullName];
-			else if (Interface.CurrentInterface.Styling.ContainsKey (thisType.Name))
-				styling = Interface.CurrentInterface.Styling [thisType.Name];
-			else {
-				string styleFullName = getDefaultStyleResId (thisType);
-				if (Interface.CurrentInterface.Styling.ContainsKey (styleFullName)) 
-					styling = Interface.CurrentInterface.Styling [styleFullName];
-			}
-				                                             
+				styling.Add (Interface.CurrentInterface.Styling [thisType.FullName]);
+			if (Interface.CurrentInterface.Styling.ContainsKey (thisType.Name))
+				styling.Add (Interface.CurrentInterface.Styling [thisType.Name]);
+			
+			string styleFullName = getDefaultStyleResId (thisType);
+			if (Interface.CurrentInterface.Styling.ContainsKey (styleFullName))
+				styling.Add (Interface.CurrentInterface.Styling [styleFullName]);
+			
 			//Reflexion being very slow compared to dyn method or delegates,
 			//I compile the initial values coded in the CustomAttribs of the class,
 			//all other instance of this type would not longer use reflexion to init properly
@@ -564,13 +563,17 @@ namespace Crow
 						name = xaa.AttributeName;
 				}
 
-				bool memberHasStyle = false;
-				if (styling != null){
-					if (styling.ContainsKey (name))
-						memberHasStyle = true;
-				} 
-				if (memberHasStyle){
-					defaultValue = styling [name];
+				int styleIndex = -1;
+				if (styling.Count > 0){
+					for (int i = 0; i < styling.Count; i++) {
+						if (styling[i].ContainsKey (name)){
+							styleIndex = i;
+							break;
+						}
+					}
+				}
+				if (styleIndex >= 0){
+					defaultValue = styling[styleIndex] [name];
 				}else {
 					if (name == "Style") {
 						//retrieve default value from class attribute
@@ -662,7 +665,7 @@ namespace Crow
 					if (pi.PropertyType == typeof (string))
 						il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
 					else {
-						MethodInfo miParse = pi.PropertyType.GetMethod 
+						MethodInfo miParse = pi.PropertyType.GetMethod
 						                       ("Parse", BindingFlags.Static | BindingFlags.Public,
 						                        Type.DefaultBinder, new Type [] {typeof (string)},null);
 						if (miParse == null)
@@ -722,7 +725,7 @@ namespace Crow
 		protected Size contentSize;
 		/// <summary> return size of content + margins </summary>
 		protected virtual int measureRawSize (LayoutingType lt) {
-			return lt == LayoutingType.Width ? 
+			return lt == LayoutingType.Width ?
 				contentSize.Width + 2 * Margin: contentSize.Height + 2 * Margin;
 		}
 		/// <summary> By default in groups, LayoutingType.ArrangeChildren is reset </summary>
@@ -848,7 +851,7 @@ namespace Crow
 					}
 				} else
 					Slot.Y = Top;
-				
+
 				if (LastSlots.Y == Slot.Y)
 					break;
 
@@ -920,7 +923,7 @@ namespace Crow
 					}
 				} else
 					Slot.Height = 0;
-				
+
 				if (LastSlots.Height == Slot.Height)
 					break;
 
@@ -928,7 +931,7 @@ namespace Crow
 
 				OnLayoutChanges (layoutType);
 
-				LastSlots.Height = Slot.Height;	
+				LastSlots.Height = Slot.Height;
 				break;
 			}
 

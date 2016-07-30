@@ -40,6 +40,8 @@ namespace Crow
 			List<string> targetsClasses = new List<string> ();
 			string currentProperty = "";
 
+			int curlyBracketCount = 0;
+
 			while (!EndOfStream) {
 				char c = (Char)Read ();
 
@@ -90,25 +92,43 @@ namespace Crow
 						token += c;
 					break;
 				case readerState.expression:
-					if (c == ';') {
-						if (!string.IsNullOrEmpty (token)) {
-							string expression = token.Trim ();
+					if (curlyBracketCount == 0) {
+						if (c == '{'){
+							if (string.IsNullOrEmpty(token))
+								throw new Exception ("Unexpected token '{'");
+							curlyBracketCount++;
+							token = "{";
+						}else if (c == '}')
+							throw new Exception ("Unexpected token '{'");
+						else if (c == ';') {
+							if (!string.IsNullOrEmpty (token)) {
+								string expression = token.Trim ();
 
-							foreach (string tc in targetsClasses) {
-								if (!iface.Styling.ContainsKey (tc))
-									iface.Styling [tc] = new Dictionary<string, string> ();
-								else if (iface.Styling [tc].ContainsKey (currentProperty))
-									continue;
-								iface.Styling [tc] [currentProperty] = expression;
+								foreach (string tc in targetsClasses) {
+									if (!iface.Styling.ContainsKey (tc))
+										iface.Styling [tc] = new Dictionary<string, string> ();
+									else if (iface.Styling [tc].ContainsKey (currentProperty))
+										continue;
+									iface.Styling [tc] [currentProperty] = expression;
+								}
+								token = "";
 							}
-							token = "";
-						}
-						state = readerState.propertyName;
-					} else
+							state = readerState.propertyName;
+						} else
+							token += c;
+					} else {
+						if (c == '{')
+							curlyBracketCount++;
+						else if (c == '}')
+							curlyBracketCount--;
 						token += c;
+					}
 					break;
 				}
-			}					
+			}
+
+			if (curlyBracketCount > 0)
+				throw new Exception ("Unexpected end of file");
 		}
 	}
 }

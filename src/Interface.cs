@@ -34,7 +34,7 @@ namespace Crow
 	/// <summary>
 	/// The Interface Class is the top container of the application.
 	/// It provides the Dirty bitmap and zone of the interface to be drawn on screen
-	/// 
+	///
 	/// The Interface contains :
 	/// 	- rendering and layouting queues and logic.
 	/// 	- helpers to load XML interfaces files
@@ -53,7 +53,6 @@ namespace Crow
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
 		}
 		public Interface(){
-			LayoutingQueue = new Queue<LayoutingQueueItem>();
 			Interface.CurrentInterface = this;
 			LoadStyling ();
 		}
@@ -89,11 +88,9 @@ namespace Crow
 		public static FontOptions FontRenderingOptions;
 		#endregion
 
-		/// <summary>
-		/// The layouting queue contains layouting commands
-		/// </summary>
-		public Queue<LayoutingQueueItem> LayoutingQueue;
+		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem> ();
 		public Queue<GraphicObject> GraphicUpdateQueue = new Queue<GraphicObject>();
+		public Dictionary<string, Dictionary<string, string>> Styling;
 		public string Clipboard;
 		public static void RegisterForGraphicUpdate(GraphicObject g)
 		{
@@ -267,7 +264,6 @@ namespace Crow
 				return tmp;
 			}
 		}
-		public Dictionary<string, Dictionary<string, string>> Styling;
 
 		public void LoadStyling() {
 			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
@@ -276,44 +272,22 @@ namespace Crow
 			Styling = new Dictionary<string, Dictionary<string, string>> ();
 
 			//fetch styling info in this order, if member styling is alreadey referenced in previous
-			//assembly, it's ignored
+			//assembly, it's ignored.
 			loadStylingFromAssembly (Assembly.GetEntryAssembly ());
 			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
 
 			Thread.CurrentThread.CurrentCulture = savedCulture;
 		}
 
-		void loadStylingFromAssembly (Assembly assembly) { 
+		void loadStylingFromAssembly (Assembly assembly) {
 			foreach (string s in assembly
 					.GetManifestResourceNames ()
 					 .Where (r => r.EndsWith (".style", StringComparison.OrdinalIgnoreCase))) {
 
 				StyleReader sr = new StyleReader (assembly, s);
-									
+				sr.Dispose ();
 			}
 		}
-
-		//public static bool TryGetStyle (Type crowType, out Stream stream) {			
-		//	string styleId = crowType.Name + ".style";
-
-		//	if (tryGetStyle (Assembly.GetEntryAssembly (), styleId, out stream))
-		//		return true;
-		//	if (tryGetStyle (Assembly.GetExecutingAssembly (), styleId, out stream))
-		//		return true;			
-		//	return false;
-		//}
-
-		//static bool tryGetStyle (Assembly assembly, string styleId, out Stream stream) { 
-		//	try {
-		//		stream = assembly.GetManifestResourceStream (
-		//				assembly.GetManifestResourceNames ().FirstOrDefault (r => r.EndsWith
-		//															  (styleId, StringComparison.OrdinalIgnoreCase)));
-		//	} catch {
-		//		stream = null;
-		//		return false;
-		//	}
-		//	return true;
-		//}
 		#endregion
 
 		#if MEASURE_TIME
@@ -766,7 +740,7 @@ namespace Crow
 		#endregion
 
 		#region Keyboard
-		public bool ProcessKeyDown(int Key){			
+		public bool ProcessKeyDown(int Key){
 			if (_focusedWidget == null)
 				return false;
 			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
