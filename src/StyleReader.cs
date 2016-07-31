@@ -35,7 +35,7 @@ namespace Crow
 			: base(assembly.GetManifestResourceStream (resId))
 		{
 			Interface iface = Interface.CurrentInterface;
-			string classNameFromResId = resId.Substring (0, resId.Length - 6);
+			string styleKey = resId.Substring (0, resId.Length - 6);
 			string token = "";
 			List<string> targetsClasses = new List<string> ();
 			string currentProperty = "";
@@ -62,11 +62,11 @@ namespace Crow
 							if (!string.IsNullOrEmpty (token))
 								throw new Exception ("Unexpected token '='");
 							currentProperty = targetsClasses [0];
-							targetsClasses [0] = classNameFromResId;
+							targetsClasses [0] = styleKey;
 						}else{
 							if (string.IsNullOrEmpty (token))
 								throw new Exception ("Unexpected token '='");
-							targetsClasses.Add (classNameFromResId);
+							targetsClasses.Add (styleKey);
 							currentProperty = token;
 							token = "";
 						}
