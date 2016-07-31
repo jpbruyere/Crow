@@ -1,0 +1,38 @@
+﻿Button, CheckBox, RadioButton, ComboBox, Expandable,
+MessageBox, Popper, Slider, Spinner, TextBox, Window  {
+	Focusable = true;
+	Height = Fit;
+}
+Button {
+	Width = Fit;
+}
+Label {
+	Fit = true;
+	Margin = 0;
+}
+MessageBox {
+	Width=200;
+	Title=MessageBox;
+	MinimumSize=150,80;
+}
+Slider {
+	Background = vgradient|0:Black|0.1:Gray|0.9:Gray|1:LightGray;
+	Foreground = Gray;
+	Width = Fit;
+}
+Splitter {
+	Focusable = true;
+	Background = DimGray;
+}
+TabItem {
+	Focusable = true;
+	CacheEnabled = false;
+}
+TextBox {
+	Background = White;
+	Foreground = Black;
+}
+Window {
+	MinimumSize=50,50;
+	Width = Fit;
+}
