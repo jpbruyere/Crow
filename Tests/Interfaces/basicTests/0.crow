@@ -1,6 +1,6 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <Label Margin="50" Width="50%" Height="50%" TextAlignment="BottomRight" Background="Mantis"/>
 <!--<Container Background="Green" Margin="10" Width="Fit" Height="Fit">
 	<GraphicObject Margin="10" Width="{../WidthPolicy}" Height="{../HeightPolicy}" Background="Red"
-		MinimumSize="50;50"/>
+		MinimumSize="50,50"/>
 </Container>-->

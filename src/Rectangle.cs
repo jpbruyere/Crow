@@ -236,11 +236,11 @@ namespace Crow
         }
         public override string ToString()
         {
-            return string.Format("{0};{1};{2};{3}", X, Y, Width, Height);
+            return string.Format("{0},{1},{2},{3}", X, Y, Width, Height);
         }
         public static Rectangle Parse(string s)
         {
-            string[] d = s.Split(new char[] { ';' });
+            string[] d = s.Split(new char[] { ',' });
             return new Rectangle(
                 int.Parse(d[0]),
                 int.Parse(d[1]),

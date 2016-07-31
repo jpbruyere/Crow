@@ -56,6 +56,7 @@ namespace Crow
 				if (!b.FindTarget ())
 					continue;
 
+				//group Bindings by target instanceq
 				List<Binding> bindings = null;
 				if (!resolved.TryGetValue (b.Target.Instance, out bindings)) {
 					bindings = new List<Binding> ();

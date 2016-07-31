@@ -1,7 +1,7 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <Group Name="MainGrp"
 	Width="800" Height="500"
-	Background="0,5;0,5;0,5;0,5" Foreground="White"
+	Background="0.5,0.5,0.5,0.5" Foreground="White"
 	Margin="10" >
 	<Border 
 		BorderWidth="2" Foreground="Transparent"
@@ -12,7 +12,7 @@
 		<HorizontalStack Name="hs0" Fit="true"
 			WidgetSpacing="10" 
 			VerticalAlignment="Center" 
-			Background="0,5;0,5;0,5;0,5">
+			Background="0.5,0.5,0.5,0.5">
 			<VerticalStack Name="vs1"
 				Margin="20" Width="400" Height="Fit">
 				<Label Name="labMouse" Text="MousePos"/>

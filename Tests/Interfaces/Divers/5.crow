@@ -2,9 +2,9 @@
 <HorizontalStack Fit="true" Margin="5">
 	<VerticalStack Fit="true" Margin="2" Spacing="2">
 		<TextRun Text="text run test"/>
-		<Label Text="label test"/>
+<!--		<Label Text="label test"/>
 		<TextBox Text="text box test"/>
-		<Button Caption="test button"/>
+		<Button Caption="test button"/>-->
 <!--		<CheckBox Caption="test checkbox"/>
 		<RadioButton Caption="test radiobutton"/>
 		<ComboBox/>

@@ -1,10 +1,10 @@
-﻿<?xml version="1.0"?>
-<Border Background="{../Background}" MinimumSize="50;20" Height="{../HeightPolicy}" Width="{../WidthPolicy}"
+<?xml version="1.0"?>
+<Border Background="{../Background}" MinimumSize="50,20" Height="{../HeightPolicy}" Width="{../WidthPolicy}"
 		Foreground="Transparent" CornerRadius="{../CornerRadius}" BorderWidth="1" 
-	MouseEnter="{Foreground=vgradient|0:White|0,2:Gray|0,9:Gray|1:Black;caption.Foreground=White}"
+	MouseEnter="{Foreground=vgradient|0:White|0.2:Gray|0.9:Gray|1:Black;caption.Foreground=White}"
 	MouseLeave="{Foreground=Transparent;caption.Foreground=LightGray}"
-	MouseDown="{Foreground=vgradient|0:Black|0,05:Gray|0,85:Gray|1:White}"
-	MouseUp="{Foreground=vgradient|0:White|0,2:Gray|0,9:Gray|1:Black}"		    
+	MouseDown="{Foreground=vgradient|0:Black|0.05:Gray|0.85:Gray|1:White}"
+	MouseUp="{Foreground=vgradient|0:White|0.2:Gray|0.9:Gray|1:Black}"		    
 	>
 <!--	<Image Height="0" Width="0" Margin="0" Path="{../../Image}" SvgSub="{../../SvgSub}"/>-->
 	<Label Font="{../../Font}" Name="caption" Margin="5" Foreground="LightGray" Text="{../../Caption}"/>

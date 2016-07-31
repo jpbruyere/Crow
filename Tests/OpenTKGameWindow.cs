@@ -107,6 +107,8 @@ namespace Crow
 
 		void interfaceThread()
 		{
+			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
 			CrowInterface.Quit += Quit;
 			CrowInterface.MouseCursorChanged += CrowInterface_MouseCursorChanged;
 			while (CrowInterface.ClientRectangle.Size.Width == 0)
@@ -314,12 +316,12 @@ namespace Crow
 		#region keyboard Handling
 		void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
 		{
-			//if (!CrowInterface.ProcessKeyDown((int)otk_e.Key))
+			if (!CrowInterface.ProcessKeyDown((int)otk_e.Key))
 				KeyboardKeyDown.Raise (this, otk_e);
         }
 		void Keyboard_KeyUp(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
 		{
-			//if (!CrowInterface.ProcessKeyUp((int)otk_e.Key))
+			if (!CrowInterface.ProcessKeyUp((int)otk_e.Key))
 				KeyboardKeyUp.Raise (this, otk_e);
 		}
 		void OpenTKGameWindow_KeyPress (object sender, OpenTK.KeyPressEventArgs e)

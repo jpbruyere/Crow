@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Xml;
@@ -33,7 +34,7 @@ namespace Crow
 	/// <summary>
 	/// The Interface Class is the top container of the application.
 	/// It provides the Dirty bitmap and zone of the interface to be drawn on screen
-	/// 
+	///
 	/// The Interface contains :
 	/// 	- rendering and layouting queues and logic.
 	/// 	- helpers to load XML interfaces files
@@ -52,14 +53,13 @@ namespace Crow
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
 		}
 		public Interface(){
-			LayoutingQueue = new Queue<LayoutingQueueItem>();
 			Interface.CurrentInterface = this;
+			LoadStyling ();
 		}
 		#endregion
 
 		#region Static and constants
-		/// <summary> Used to prevent spurious loading of templates </summary>
-		internal static bool XmlSerializerInit = false;
+		internal bool XmlLoading = false;
 		/// <summary> keep ressource path for debug msg </summary>
 		internal static string CurrentGOMLPath = "";
 		//used in templatedControl
@@ -87,11 +87,9 @@ namespace Crow
 		public static FontOptions FontRenderingOptions;
 		#endregion
 
-		/// <summary>
-		/// The layouting queue contains layouting commands
-		/// </summary>
-		public Queue<LayoutingQueueItem> LayoutingQueue;
+		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem> ();
 		public Queue<GraphicObject> GraphicUpdateQueue = new Queue<GraphicObject>();
+		public Dictionary<string, Dictionary<string, object>> Styling;
 		public string Clipboard;
 		public static void RegisterForGraphicUpdate(GraphicObject g)
 		{
@@ -202,6 +200,9 @@ namespace Crow
 		}
 		public static GraphicObject Load (string path, object hostClass = null)
 		{
+			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
+			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
 			Interface.XmlLoaderCount ++;
 			CurrentGOMLPath = path;
 			GraphicObject tmp = null;
@@ -209,9 +210,12 @@ namespace Crow
 				tmp = Load(stream, GetTopContainerOfGOMLStream(stream), hostClass);
 			}
 			Interface.XmlLoaderCount --;
+
+			Thread.CurrentThread.CurrentCulture = savedCulture;
+
 			return tmp;
 		}
-		public static GraphicObject Load (Stream stream, Type type, object hostClass = null)
+		internal static GraphicObject Load (Stream stream, Type type, object hostClass = null)
 		{
 			#if DEBUG_LOAD
 			Stopwatch loadingTime = new Stopwatch ();
@@ -220,16 +224,16 @@ namespace Crow
 
 			GraphicObject result;
 
+			CurrentInterface.XmlLoading = true;
 
 			XmlSerializerNamespaces xn = new XmlSerializerNamespaces ();
 			xn.Add ("", "");
 
-			XmlSerializerInit = true;
 			XmlSerializer xs = new XmlSerializer (type);
-			XmlSerializerInit = false;
 
 			result = (GraphicObject)xs.Deserialize (stream);
 			//result.DataSource = hostClass;
+			CurrentInterface.XmlLoading = false;
 
 			#if DEBUG_LOAD
 			FileStream fs = stream as FileStream;
@@ -245,11 +249,6 @@ namespace Crow
 			return result;
 		}
 
-		public void InterfaceLoad(string path){
-			GraphicObject tmp = Interface.Load (path, this);
-			AddWidget (tmp);
-		}
-
 		public GraphicObject LoadInterface (string path)
 		{
 			lock (UpdateMutex) {
@@ -260,6 +259,29 @@ namespace Crow
 			}
 		}
 
+		public void LoadStyling() {
+			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
+			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
+			Styling = new Dictionary<string, Dictionary<string, object>> ();
+
+			//fetch styling info in this order, if member styling is alreadey referenced in previous
+			//assembly, it's ignored.
+			loadStylingFromAssembly (Assembly.GetEntryAssembly ());
+			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
+
+			Thread.CurrentThread.CurrentCulture = savedCulture;
+		}
+
+		void loadStylingFromAssembly (Assembly assembly) {
+			foreach (string s in assembly
+					.GetManifestResourceNames ()
+					 .Where (r => r.EndsWith (".style", StringComparison.OrdinalIgnoreCase))) {
+
+				StyleReader sr = new StyleReader (assembly, s);
+				sr.Dispose ();
+			}
+		}
 		#endregion
 
 		#if MEASURE_TIME
@@ -712,7 +734,7 @@ namespace Crow
 		#endregion
 
 		#region Keyboard
-		public bool ProcessKeyDown(int Key){			
+		public bool ProcessKeyDown(int Key){
 			if (_focusedWidget == null)
 				return false;
 			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);

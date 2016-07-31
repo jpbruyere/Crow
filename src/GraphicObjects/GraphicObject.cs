@@ -45,17 +45,14 @@ namespace Crow
 			uid = currentUid;
 			currentUid++;
 
-			if (Interface.XmlSerializerInit)
+			if (Interface.CurrentInterface.XmlLoading)
 				return;
-
-			loadDefaultValues ();
 		}
 		public GraphicObject (Rectangle _bounds)
 		{
-			if (Interface.XmlSerializerInit)
-				return;
-
-			loadDefaultValues ();
+			if (!Interface.CurrentInterface.XmlLoading)
+				loadDefaultValues ();
+			
 			Left = _bounds.Left;
 			Top = _bounds.Top;
 			Width = _bounds.Width;
@@ -82,8 +79,8 @@ namespace Crow
 		protected bool _isVisible = true;
 		VerticalAlignment _verticalAlignment = VerticalAlignment.Center;
 		HorizontalAlignment _horizontalAlignment = HorizontalAlignment.Center;
-		Size _maximumSize = "0;0";
-		Size _minimumSize = "0;0";
+		Size _maximumSize = "0,0";
+		Size _minimumSize = "0,0";
 		bool cacheEnabled = false;
 		object dataSource;
 		string style;
@@ -419,7 +416,7 @@ namespace Crow
 				NotifyValueChanged ("Visible", _isVisible);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("1;1")]
+		[XmlAttributeAttribute()][DefaultValue("1,1")]
 		public virtual Size MinimumSize {
 			get { return _minimumSize; }
 			set {
@@ -432,7 +429,7 @@ namespace Crow
 				RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("0;0")]
+		[XmlAttributeAttribute()][DefaultValue("0,0")]
 		public virtual Size MaximumSize {
 			get { return _maximumSize; }
 			set {
@@ -493,12 +490,50 @@ namespace Crow
 			#endif
 
 			Type thisType = this.GetType ();
-			if (Interface.DefaultValuesLoader.ContainsKey(thisType.FullName)) {
-				Interface.DefaultValuesLoader[thisType.FullName] (this);
-				applyStyle ();
+
+			if (!string.IsNullOrEmpty (Style)) {
+				if (Interface.DefaultValuesLoader.ContainsKey (Style)) {
+					Interface.DefaultValuesLoader [Style] (this);
+					return;
+				}
+			}
+			if (Interface.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
+				Interface.DefaultValuesLoader [thisType.FullName] (this);
+				return;
+			}
+			if (Interface.DefaultValuesLoader.ContainsKey (thisType.Name)) {
+				Interface.DefaultValuesLoader [thisType.Name] (this);
 				return;
 			}
 
+			List<Dictionary<string, object>> styling = new List<Dictionary<string, object>>();
+
+			//Search for a style mathing :
+			//1: Full class name, with full namespace
+			//2: class name
+			//3: style may have been registered with their ressource ID minus .style extention
+			//   those files being placed in a Styles folder
+			string styleKey = Style;
+			if (!string.IsNullOrEmpty (Style)) {
+				if (Interface.CurrentInterface.Styling.ContainsKey (Style)) {
+					styling.Add (Interface.CurrentInterface.Styling [Style]);
+				}
+			}
+			if (Interface.CurrentInterface.Styling.ContainsKey (thisType.FullName)) {
+				styling.Add (Interface.CurrentInterface.Styling [thisType.FullName]);
+				if (string.IsNullOrEmpty (styleKey))
+					styleKey = thisType.FullName;
+			}
+			if (Interface.CurrentInterface.Styling.ContainsKey (thisType.Name)) {
+				styling.Add (Interface.CurrentInterface.Styling [thisType.Name]);
+				if (string.IsNullOrEmpty (styleKey))
+					styleKey = thisType.Name;
+			}
+
+			if (string.IsNullOrEmpty (styleKey))
+				styleKey = thisType.FullName;
+
+			
 			//Reflexion being very slow compared to dyn method or delegates,
 			//I compile the initial values coded in the CustomAttribs of the class,
 			//all other instance of this type would not longer use reflexion to init properly
@@ -535,13 +570,20 @@ namespace Crow
 					else
 						name = xaa.AttributeName;
 				}
-				if (name == "Style"){
-					//retrieve default value from class attribute
-					DefaultStyle defStyle = thisType.GetCustomAttribute<DefaultStyle>();
-					if (defStyle != null)
-						defaultValue = defStyle.Path;
-				}else{
-					DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof(DefaultValueAttribute));
+
+				int styleIndex = -1;
+				if (styling.Count > 0){
+					for (int i = 0; i < styling.Count; i++) {
+						if (styling[i].ContainsKey (name)){
+							styleIndex = i;
+							break;
+						}
+					}
+				}
+				if (styleIndex >= 0){
+					defaultValue = styling[styleIndex] [name];
+				}else {
+					DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof (DefaultValueAttribute));
 					if (dv == null)
 						continue;
 					defaultValue = dv.Value;
@@ -621,10 +663,12 @@ namespace Crow
 					//surely a class or struct
 					if (dvType != typeof(string))
 						throw new Exception ("Expecting String in default values for: " + pi.Name);
-					if (pi.PropertyType == typeof(string))
+					if (pi.PropertyType == typeof (string))
 						il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
 					else {
-						MethodInfo miParse = pi.PropertyType.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public);
+						MethodInfo miParse = pi.PropertyType.GetMethod
+						                       ("Parse", BindingFlags.Static | BindingFlags.Public,
+						                        Type.DefaultBinder, new Type [] {typeof (string)},null);
 						if (miParse == null)
 							throw new Exception ("no Parse method found for: " + pi.PropertyType.FullName);
 
@@ -640,9 +684,8 @@ namespace Crow
 			il.Emit(OpCodes.Ret);
 			#endregion
 
-			Interface.DefaultValuesLoader[thisType.FullName] = (Interface.loadDefaultInvoker)dm.CreateDelegate(typeof(Interface.loadDefaultInvoker));
-			Interface.DefaultValuesLoader[thisType.FullName] (this);
-			applyStyle ();
+			Interface.DefaultValuesLoader[styleKey] = (Interface.loadDefaultInvoker)dm.CreateDelegate(typeof(Interface.loadDefaultInvoker));
+			Interface.DefaultValuesLoader[styleKey] (this);
 		}
 
 		public virtual GraphicObject FindByName(string nameToFind){
@@ -682,7 +725,7 @@ namespace Crow
 		protected Size contentSize;
 		/// <summary> return size of content + margins </summary>
 		protected virtual int measureRawSize (LayoutingType lt) {
-			return lt == LayoutingType.Width ? 
+			return lt == LayoutingType.Width ?
 				contentSize.Width + 2 * Margin: contentSize.Height + 2 * Margin;
 		}
 		/// <summary> By default in groups, LayoutingType.ArrangeChildren is reset </summary>
@@ -808,7 +851,7 @@ namespace Crow
 					}
 				} else
 					Slot.Y = Top;
-				
+
 				if (LastSlots.Y == Slot.Y)
 					break;
 
@@ -880,7 +923,7 @@ namespace Crow
 					}
 				} else
 					Slot.Height = 0;
-				
+
 				if (LastSlots.Height == Slot.Height)
 					break;
 
@@ -888,7 +931,7 @@ namespace Crow
 
 				OnLayoutChanges (layoutType);
 
-				LastSlots.Height = Slot.Height;	
+				LastSlots.Height = Slot.Height;
 				break;
 			}
 
@@ -1200,7 +1243,7 @@ namespace Crow
 
 			MemberInfo mi = thisType.GetMember (name).FirstOrDefault();
 			if (mi == null) {
-				Debug.WriteLine ("GOML: Unknown attribute in " + thisType.ToString() + " : " + name);
+				Debug.WriteLine ("XML: Unknown attribute in " + thisType.ToString() + " : " + name);
 				return;
 			}
 			if (mi.MemberType == MemberTypes.Event) {
@@ -1223,7 +1266,7 @@ namespace Crow
 				if (value.StartsWith("{",StringComparison.Ordinal)) {
 					//binding
 					if (!value.EndsWith("}", StringComparison.Ordinal))
-						throw new Exception (string.Format("GOML:Malformed binding: {0}", value));
+						throw new Exception (string.Format("XML:Malformed binding: {0}", value));
 
 					this.Bindings.Add (new Binding (new MemberReference(this, pi), value.Substring (1, value.Length - 2)));
 					return;
@@ -1246,51 +1289,23 @@ namespace Crow
 				}
 			}
 		}
-		void applyStyle(){
-			//The first place searched for a style is in the style propery of this instance
-			//this field may contains the path to a Style file for the object.
-			if (string.IsNullOrEmpty (style))
-				return;
-			Stream s = Interface.GetStreamFromPath (style);
-			if (s == null)
-				throw new Exception ("Style Path not found: " + style);
-
-			#if DEBUG_LOAD
-			Debug.WriteLine ("ApplyStyle for " + this.ToString ());
-			#endif
-			using (StreamReader sr = new StreamReader (s)) {
-				while (!sr.EndOfStream) {
-					string tmp = sr.ReadLine ();
-					if (string.IsNullOrWhiteSpace (tmp))
-						continue;
-					int i = tmp.IndexOf ('=');
-					if (i < 0)
-						continue;
-					string name = tmp.Substring (0, i).Trim();
-					string value = tmp.Substring (i + 1).Trim ();
-
-					affectMember (name, value);
-				}
-			}
-		}
 		public virtual void ReadXml (System.Xml.XmlReader reader)
 		{
-			if (!reader.HasAttributes)
-				return;
+			if (reader.HasAttributes) {				
 
-			string stylePath = reader.GetAttribute ("Style");
+				style = reader.GetAttribute ("Style");
 
-			if (!string.IsNullOrEmpty (style)) {
-				Style = stylePath;
-				applyStyle ();
-			}
-			while (reader.MoveToNextAttribute ()) {
-				if (reader.Name == "Style")
-					continue;
+				loadDefaultValues ();
 
-				affectMember (reader.Name, reader.Value);
-			}
-			reader.MoveToElement();
+				while (reader.MoveToNextAttribute ()) {
+					if (reader.Name == "Style")
+						continue;
+
+					affectMember (reader.Name, reader.Value);
+				}
+				reader.MoveToElement ();
+			}else
+				loadDefaultValues ();
 		}
 		public virtual void WriteXml (System.Xml.XmlWriter writer)
 		{

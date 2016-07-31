@@ -133,6 +133,7 @@
     <Compile Include="src\Measure.cs" />
     <Compile Include="src\CompilerServices\MemberReference.cs" />
     <Compile Include="src\CompilerServices\Bindings.cs" />
+    <Compile Include="src\StyleReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -171,7 +172,6 @@
     <Folder Include="Images\Icons\" />
     <Folder Include="src\CompilerServices\" />
     <Folder Include="src\Fill\" />
-    <Folder Include="Styles\" />
     <Folder Include="src\Input\" />
     <Folder Include="src\rsvg\" />
   </ItemGroup>
@@ -231,24 +231,9 @@
     <EmbeddedResource Include="Templates\TabItem.crow" />
     <EmbeddedResource Include="Templates\TreeItem.crow" />
     <EmbeddedResource Include="Templates\Dummy.goml" />
-    <EmbeddedResource Include="Styles\CheckBox.style" />
-    <EmbeddedResource Include="Styles\Splitter.style" />
-    <EmbeddedResource Include="Styles\Popper.style" />
-    <EmbeddedResource Include="Styles\RadioButton.style" />
-    <EmbeddedResource Include="Styles\Button.style" />
-    <EmbeddedResource Include="Styles\Expandable.style" />
-    <EmbeddedResource Include="Styles\GroupBox.style" />
-    <EmbeddedResource Include="Styles\ComboBox.style" />
-    <EmbeddedResource Include="Styles\Label.style" />
-    <EmbeddedResource Include="Styles\Spinner.style" />
-    <EmbeddedResource Include="Styles\MessageBox.style" />
-    <EmbeddedResource Include="Styles\Window.style" />
-    <EmbeddedResource Include="Styles\TextBox.style" />
-    <EmbeddedResource Include="Styles\TextRun.style" />
-    <EmbeddedResource Include="Styles\TabItem.style" />
-    <EmbeddedResource Include="Styles\Slider.style" />
     <EmbeddedResource Include="Images\Icons\crow.png" />
     <EmbeddedResource Include="Images\Icons\crow.svg" />
+    <EmbeddedResource Include="Default.style" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

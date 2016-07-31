@@ -1,15 +1,15 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 
 	<VerticalStack Height="Fit" Width="Fit" Name="hstack" Margin="0" Spacing="Stretched">
 		<Border Height="Fit" Width="200" BorderWidth="2" CornerRadius="10">
 			<Label Name="labName" Text="{Name}" Width="Stretched" Height="Fit"/>
 		</Border>
 		<ListBox Data="{GetFileSystemInfos}" Width="Fit" Height="400"
-			Background="0,5;0,5;0,5;0,5"
+			Background="0.5,0.5,0.5,0.5"
 			SelectedItemChanged="OnSelectedItemChanged" 
 			ItemTemplate="Interfaces/tmpDirItem.goml" >
 			<Template>
-				<Border BorderWidth="1" MinimumSize="20;20" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
+				<Border BorderWidth="1" MinimumSize="20,20" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
 					<HorizontalStack Margin="1" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
 						<Scroller  Name="scroller1" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}" 
 						 Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">

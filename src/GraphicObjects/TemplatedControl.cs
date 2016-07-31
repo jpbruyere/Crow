@@ -37,11 +37,7 @@ namespace Crow
 			Path = path;
 		}
 	}
-	[AttributeUsage(AttributeTargets.Class)]
-	public class DefaultStyle : TemplateAttribute
-	{
-		public DefaultStyle(string path) : base(path){}
-	}
+
 	[AttributeUsage(AttributeTargets.Class)]
 	public class DefaultTemplate : TemplateAttribute
 	{

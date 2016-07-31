@@ -1,33 +1,33 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <Group Background="Onyx" Margin="10" Width="70%" Height="50%">
 	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
 			VerticalAlignment="Top"
 			HorizontalAlignment="Left"
-			MinimumSize="10;10"/>
+			MinimumSize="10,10"/>
 	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
 			VerticalAlignment="Top"
-			MinimumSize="10;10"/>
+			MinimumSize="10,10"/>
 	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
 			VerticalAlignment="Top"
 			HorizontalAlignment="Right"
-			MinimumSize="10;10"/>
+			MinimumSize="10,10"/>
 	<GraphicObject Margin="10" Width="100%" Height="20%" Background="Mantis"
 			HorizontalAlignment="Left"
-			MinimumSize="10;10"/>
+			MinimumSize="10,10"/>
 	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
-			MinimumSize="10;10"/>
+			MinimumSize="10,10"/>
 	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
 			HorizontalAlignment="Right"
-			MinimumSize="10;10"/>
+			MinimumSize="10,10"/>
 	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
 			VerticalAlignment="Bottom"
 			HorizontalAlignment="Left"
-			MinimumSize="10;10"/>
+			MinimumSize="10,10"/>
 	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
 			VerticalAlignment="Bottom"
-			MinimumSize="10;10"/>
+			MinimumSize="10,10"/>
 	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
 			VerticalAlignment="Bottom"
 			HorizontalAlignment="Right"
-			MinimumSize="10;10"/>
+			MinimumSize="10,10"/>
 </Group>

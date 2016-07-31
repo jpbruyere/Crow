@@ -24,7 +24,6 @@ using System.ComponentModel;
 
 namespace Crow
 {
-	[DefaultStyle("#Crow.Styles.Splitter.style")]
 	public class Splitter : GraphicObject
 	{
 		#region CTOR
@@ -33,7 +32,7 @@ namespace Crow
 
 		int thickness;
 
-		[XmlAttributeAttribute()][DefaultValue(1)]
+		[XmlAttributeAttribute][DefaultValue(1)]
 		public virtual int Thickness {
 			get { return thickness; }
 			set {

@@ -1,8 +1,8 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <Border Height="{../HeightPolicy}" Width="{../WidthPolicy}" BorderWidth="1" Foreground="White" CornerRadius="10" >
-	<VerticalStack Height="{../../HeightPolicy}" Width="{../../WidthPolicy}" Background="0,4;0,4;0,4;0,4">
+	<VerticalStack Height="{../../HeightPolicy}" Width="{../../WidthPolicy}" Background="0.4,0.4,0.4,0.4">
 		<Border BorderWidth="1" Foreground="White" Width="{../../../WidthPolicy}" Height="-1" 
-				Background="0,1;0,5;1,0;0,5">
+				Background="0.1,0.5;1,0,0.5">
 			<HorizontalStack Name="hs" Margin="1" Spacing="1" Width="{../../../../WidthPolicy}" Height="-1" >
 				<GraphicObject Width="5" Height="5"/>
 				<Image Margin="1" Width="12" Height="12" Path="{../../../../../Icon}"/>

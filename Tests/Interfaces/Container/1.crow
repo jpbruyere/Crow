@@ -1,5 +1,5 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <Container Background="Lust" Margin="10" Width="90%" Height="90%">
 	<GraphicObject Margin="10" Width="50%" Height="50%" Background="Maize"
-			MinimumSize="50;50"/>
+			MinimumSize="50,50"/>
 </Container>

@@ -153,7 +153,7 @@ namespace Crow
 		}
 		public static Size Parse(string s)
 		{
-			string[] d = s.Split(new char[] { ';' });
+			string[] d = s.Split(new char[] { ',' });
 			return d.Length == 1 ? new Size(int.Parse(d[0])) : new Size(
 				int.Parse(d[0]),
 				int.Parse(d[1]));

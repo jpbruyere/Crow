@@ -1,10 +1,10 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <Border BorderWidth="1" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
 	<HorizontalStack Margin="1" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}" >
 		<Scroller Name="scroller1" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}" 
 				Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}"
 				ValueChanged="../../../_scroller_ValueChanged">
-			<VerticalStack Width="{../../../../WidthPolicy}" Height="-1" MinimumSize="10;10"
+			<VerticalStack Width="{../../../../WidthPolicy}" Height="-1" MinimumSize="10,10"
 				Name="List" Margin="0" VerticalAlignment="Top"
 				LayoutChanged="../../../../_list_LayoutChanged"/>
 		</Scroller>

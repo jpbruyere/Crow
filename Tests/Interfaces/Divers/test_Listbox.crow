@@ -1,11 +1,11 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <!--<ListBox Data="{TestList}" Focusable="true"/>-->
 <Border Margin="50">
 	<VerticalStack >
 		<Label Text="{../ColorList.SelectedItem}" Background="DarkGreen"/>
 		<Label Text="{Hover}" Background="DarkGreen"/>
 		<Button Caption="Clear" Width="Stretched" MouseClick="OnClear"/>
-		<ListBox Name="ColorList" Data="{TestList}" Background="0,5;0,5;0,5;0,5"
+		<ListBox Name="ColorList" Data="{TestList}" Background="0.5,0.5,0.5,0.5"
 					 HorizontalAlignment="Center" Width="Fit" Height="200" Margin="0"
 					 ItemTemplate="#Tests.Interfaces.colorItem.crow"
 					 Template="#Crow.Templates.ScrollingListBox.goml">
@@ -15,7 +15,7 @@
 						<Scroller Name="scroller1" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}" 
 								Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}"
 								ValueChanged="../../../_scroller_ValueChanged">
-							<VerticalStack Width="{../../../../WidthPolicy}" Height="Fit" MinimumSize="100;100"
+							<VerticalStack Width="{../../../../WidthPolicy}" Height="Fit" MinimumSize="100,100"
 								Name="List" Margin="0" VerticalAlignment="Top"
 								LayoutChanged="../../../../_list_LayoutChanged"/>
 						</Scroller>
