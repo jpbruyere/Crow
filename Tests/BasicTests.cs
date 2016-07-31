@@ -78,9 +78,7 @@ namespace Tests
 
 			KeyboardKeyDown += GOLIBTests_KeyboardKeyDown1;
 
-			testFiles = new string [] { @"Interfaces/Divers/5.crow" };
-			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
+			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/basicTests", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
@@ -88,6 +86,7 @@ namespace Tests
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Stack", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Splitter", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Expandable", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
 
 			this.Title = testFiles [idx] + ". Press key to switch example.";
 			CrowInterface.LoadInterface(testFiles[idx]).DataSource = this;
