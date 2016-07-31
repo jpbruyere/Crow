@@ -59,8 +59,7 @@ namespace Crow
 		#endregion
 
 		#region Static and constants
-		/// <summary> Used to prevent spurious loading of templates </summary>
-		internal static bool XmlSerializerInit = false;
+		internal bool XmlLoading = false;
 		/// <summary> keep ressource path for debug msg </summary>
 		internal static string CurrentGOMLPath = "";
 		//used in templatedControl
@@ -216,7 +215,7 @@ namespace Crow
 
 			return tmp;
 		}
-		public static GraphicObject Load (Stream stream, Type type, object hostClass = null)
+		internal static GraphicObject Load (Stream stream, Type type, object hostClass = null)
 		{
 			#if DEBUG_LOAD
 			Stopwatch loadingTime = new Stopwatch ();
@@ -225,16 +224,16 @@ namespace Crow
 
 			GraphicObject result;
 
+			CurrentInterface.XmlLoading = true;
 
 			XmlSerializerNamespaces xn = new XmlSerializerNamespaces ();
 			xn.Add ("", "");
 
-			XmlSerializerInit = true;
 			XmlSerializer xs = new XmlSerializer (type);
-			XmlSerializerInit = false;
 
 			result = (GraphicObject)xs.Deserialize (stream);
 			//result.DataSource = hostClass;
+			CurrentInterface.XmlLoading = false;
 
 			#if DEBUG_LOAD
 			FileStream fs = stream as FileStream;
@@ -248,11 +247,6 @@ namespace Crow
 			#endif
 
 			return result;
-		}
-
-		public void InterfaceLoad(string path){
-			GraphicObject tmp = Interface.Load (path, this);
-			AddWidget (tmp);
 		}
 
 		public GraphicObject LoadInterface (string path)

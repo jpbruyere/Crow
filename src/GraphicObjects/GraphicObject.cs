@@ -45,17 +45,14 @@ namespace Crow
 			uid = currentUid;
 			currentUid++;
 
-			if (Interface.XmlSerializerInit)
+			if (Interface.CurrentInterface.XmlLoading)
 				return;
-
-			loadDefaultValues ();
 		}
 		public GraphicObject (Rectangle _bounds)
 		{
-			if (Interface.XmlSerializerInit)
-				return;
-
-			loadDefaultValues ();
+			if (!Interface.CurrentInterface.XmlLoading)
+				loadDefaultValues ();
+			
 			Left = _bounds.Left;
 			Top = _bounds.Top;
 			Width = _bounds.Width;
@@ -485,17 +482,6 @@ namespace Crow
 		}
 		#endregion
 
-
-		/// <summary>
-		/// Add 'Styles' to full class name between assembly name and the rest of the full name space
-		/// </summary>
-		string getDefaultStyleResId (Type t) {
-			string [] tmp = t.FullName.Split ('.');
-			string res = tmp [0] + ".Styles";
-			for (int i = 1; i < tmp.Length; i++)
-				res += "." + tmp [i];
-			return res;
-		}
 		/// <summary> Loads the default values from XML attributes default </summary>
 		protected virtual void loadDefaultValues()
 		{
@@ -504,8 +490,19 @@ namespace Crow
 			#endif
 
 			Type thisType = this.GetType ();
+
+			if (!string.IsNullOrEmpty (Style)) {
+				if (Interface.DefaultValuesLoader.ContainsKey (Style)) {
+					Interface.DefaultValuesLoader [Style] (this);
+					return;
+				}
+			}
 			if (Interface.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
 				Interface.DefaultValuesLoader [thisType.FullName] (this);
+				return;
+			}
+			if (Interface.DefaultValuesLoader.ContainsKey (thisType.Name)) {
+				Interface.DefaultValuesLoader [thisType.Name] (this);
 				return;
 			}
 
@@ -516,15 +513,26 @@ namespace Crow
 			//2: class name
 			//3: style may have been registered with their ressource ID minus .style extention
 			//   those files being placed in a Styles folder
-
-			if (Interface.CurrentInterface.Styling.ContainsKey (thisType.FullName))
+			string styleKey = Style;
+			if (!string.IsNullOrEmpty (Style)) {
+				if (Interface.CurrentInterface.Styling.ContainsKey (Style)) {
+					styling.Add (Interface.CurrentInterface.Styling [Style]);
+				}
+			}
+			if (Interface.CurrentInterface.Styling.ContainsKey (thisType.FullName)) {
 				styling.Add (Interface.CurrentInterface.Styling [thisType.FullName]);
-			if (Interface.CurrentInterface.Styling.ContainsKey (thisType.Name))
+				if (string.IsNullOrEmpty (styleKey))
+					styleKey = thisType.FullName;
+			}
+			if (Interface.CurrentInterface.Styling.ContainsKey (thisType.Name)) {
 				styling.Add (Interface.CurrentInterface.Styling [thisType.Name]);
-			
-			string styleFullName = getDefaultStyleResId (thisType);
-			if (Interface.CurrentInterface.Styling.ContainsKey (styleFullName))
-				styling.Add (Interface.CurrentInterface.Styling [styleFullName]);
+				if (string.IsNullOrEmpty (styleKey))
+					styleKey = thisType.Name;
+			}
+
+			if (string.IsNullOrEmpty (styleKey))
+				styleKey = thisType.FullName;
+
 			
 			//Reflexion being very slow compared to dyn method or delegates,
 			//I compile the initial values coded in the CustomAttribs of the class,
@@ -676,8 +684,8 @@ namespace Crow
 			il.Emit(OpCodes.Ret);
 			#endregion
 
-			Interface.DefaultValuesLoader[thisType.FullName] = (Interface.loadDefaultInvoker)dm.CreateDelegate(typeof(Interface.loadDefaultInvoker));
-			Interface.DefaultValuesLoader[thisType.FullName] (this);
+			Interface.DefaultValuesLoader[styleKey] = (Interface.loadDefaultInvoker)dm.CreateDelegate(typeof(Interface.loadDefaultInvoker));
+			Interface.DefaultValuesLoader[styleKey] (this);
 		}
 
 		public virtual GraphicObject FindByName(string nameToFind){
@@ -1283,13 +1291,21 @@ namespace Crow
 		}
 		public virtual void ReadXml (System.Xml.XmlReader reader)
 		{
-			if (!reader.HasAttributes)
-				return;
+			if (reader.HasAttributes) {				
 
-			while (reader.MoveToNextAttribute ())
-				affectMember (reader.Name, reader.Value);
+				style = reader.GetAttribute ("Style");
 
-			reader.MoveToElement();
+				loadDefaultValues ();
+
+				while (reader.MoveToNextAttribute ()) {
+					if (reader.Name == "Style")
+						continue;
+
+					affectMember (reader.Name, reader.Value);
+				}
+				reader.MoveToElement ();
+			}else
+				loadDefaultValues ();
 		}
 		public virtual void WriteXml (System.Xml.XmlWriter writer)
 		{
