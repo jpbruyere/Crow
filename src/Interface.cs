@@ -219,8 +219,12 @@ namespace Crow
 			Interface.XmlLoaderCount ++;
 			CurrentGOMLPath = path;
 			GraphicObject tmp = null;
-			using (Stream stream = GetStreamFromPath (path)) {
-				tmp = Load(stream, GetTopContainerOfXMLStream(stream), hostClass);
+			try {
+				using (Stream stream = GetStreamFromPath (path)) {
+					tmp = Load(stream, GetTopContainerOfXMLStream(stream), hostClass);
+				}
+			} catch (Exception ex) {
+				throw new Exception ("Error loading <" + CurrentGOMLPath + ">:", ex);
 			}
 			Interface.XmlLoaderCount --;
 
