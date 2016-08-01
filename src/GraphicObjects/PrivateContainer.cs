@@ -126,21 +126,19 @@ namespace Crow
 			LayoutingType ltChild = LayoutingType.None;
 
 			if (layoutType == LayoutingType.Width) {
-				if (Width == Measure.Fit)
-					return;
 				if (child.Width.Units == Unit.Percent) {
 					ltChild |= LayoutingType.Width;
 					if (child.Width.Value < 100 && child.Left == 0)
 						ltChild |= LayoutingType.X;
-				}
+				} else if (child.Left == 0)
+					ltChild |= LayoutingType.X;
 			} else if (layoutType == LayoutingType.Height) {
-				if (Height == Measure.Fit)
-					return;
 				if (child.Height.Units == Unit.Percent) {
 					ltChild |= LayoutingType.Height;
 					if (child.Height.Value < 100 && child.Top == 0)
 						ltChild |= LayoutingType.Y;
-				}
+				} else if (child.Top == 0)
+						ltChild |= LayoutingType.Y;
 			}
 			if (ltChild == LayoutingType.None)
 				return;
