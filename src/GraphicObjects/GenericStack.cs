@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Xml.Serialization;
+using System;
 
 namespace Crow
 {
@@ -99,7 +100,7 @@ namespace Crow
 
 				//if no layouting remains in queue for item, registre for redraw
 				if (RegisteredLayoutings == LayoutingType.None && bmp == null)
-					RegisterForGraphicUpdate ();
+					Interface.CurrentInterface.EnqueueForRepaint (this);
 
 				return true;
 			}
@@ -126,15 +127,22 @@ namespace Crow
 						contentSize.Width += go.Slot.Width - go.LastSlots.Width;
 
 					if (stretchedGO != null) {
-						stretchedGO.Slot.Width = this.ClientRectangle.Width - contentSize.Width - Spacing * (Children.Count - 1);
-						stretchedGO.bmp = null;
+						int newW = Math.Max (
+							           this.ClientRectangle.Width - contentSize.Width - Spacing * (Children.Count - 1),
+							           stretchedGO.MinimumSize.Width);
+						if (stretchedGO.MaximumSize.Width > 0)
+							newW = Math.Min (newW, stretchedGO.MaximumSize.Width);
+						if (newW != stretchedGO.Slot.Width) {							
+							stretchedGO.Slot.Width = newW;
+							stretchedGO.bmp = null;
 #if DEBUG_LAYOUTING
 					Debug.WriteLine ("\tAdjusting Width of " + stretchedGO.ToString());
 #endif
-						stretchedGO.LayoutChanged -= OnChildLayoutChanges;
-						stretchedGO.OnLayoutChanges (LayoutingType.Width);
-						stretchedGO.LayoutChanged += OnChildLayoutChanges;
-						stretchedGO.LastSlots.Width = stretchedGO.Slot.Width;
+							stretchedGO.LayoutChanged -= OnChildLayoutChanges;
+							stretchedGO.OnLayoutChanges (LayoutingType.Width);
+							stretchedGO.LayoutChanged += OnChildLayoutChanges;
+							stretchedGO.LastSlots.Width = stretchedGO.Slot.Width;
+						}
 					}
 					
 					if (Width == Measure.Fit)
@@ -158,15 +166,22 @@ namespace Crow
 						contentSize.Height += go.Slot.Height - go.LastSlots.Height;
 					
 					if (stretchedGO != null) {
-						stretchedGO.Slot.Height = this.ClientRectangle.Height - contentSize.Height - Spacing * (Children.Count -1);
-						stretchedGO.bmp = null;
+						int newH = Math.Max (
+							this.ClientRectangle.Height - contentSize.Height - Spacing * (Children.Count - 1),
+							stretchedGO.MinimumSize.Height);
+						if (stretchedGO.MaximumSize.Height > 0)
+							newH = Math.Min (newH, stretchedGO.MaximumSize.Height);
+						if (newH != stretchedGO.Slot.Height) {
+							stretchedGO.Slot.Height = newH;
+							stretchedGO.bmp = null;
 #if DEBUG_LAYOUTING
 					Debug.WriteLine ("\tAdjusting Width of " + stretchedGO.ToString());
 #endif
-						stretchedGO.LayoutChanged -= OnChildLayoutChanges;
-						stretchedGO.OnLayoutChanges (LayoutingType.Height);
-						stretchedGO.LayoutChanged += OnChildLayoutChanges;
-						stretchedGO.LastSlots.Height = stretchedGO.Slot.Height;
+							stretchedGO.LayoutChanged -= OnChildLayoutChanges;
+							stretchedGO.OnLayoutChanges (LayoutingType.Height);
+							stretchedGO.LayoutChanged += OnChildLayoutChanges;
+							stretchedGO.LastSlots.Height = stretchedGO.Slot.Height;
+						}
 					}
 
 					if (Height == Measure.Fit)

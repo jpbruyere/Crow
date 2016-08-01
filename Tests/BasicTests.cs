@@ -10,7 +10,7 @@ namespace Tests
 	class BasicTests : OpenTKGameWindow
 	{
 		public BasicTests ()
-			: base(800, 600,"test: press spacebar to toogle test files")
+			: base(800, 600,"test: press <F3> to toogle test files")
 		{
 		}
 
@@ -76,9 +76,10 @@ namespace Tests
 		{
 			base.OnLoad (e);
 
-			KeyboardKeyDown += GOLIBTests_KeyboardKeyDown1;
+			this.KeyDown += KeyboardKeyDown1;
 
 			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Unsorted", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/basicTests", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
@@ -88,28 +89,37 @@ namespace Tests
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Expandable", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
 
-			this.Title = testFiles [idx] + ". Press key to switch example.";
+			this.Title = testFiles [idx] + ". Press <F3> to switch example.";
 			CrowInterface.LoadInterface(testFiles[idx]).DataSource = this;
 		}
-		void GOLIBTests_KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
+		void KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
 			if (e.Key == OpenTK.Input.Key.Escape) {
 				Quit (null, null);
 				return;
-			} else if (e.Key == OpenTK.Input.Key.L) {
+			} else if (e.Key == OpenTK.Input.Key.F1) {
 				TestList.Add ("new string");
 				NotifyValueChanged ("TestList", TestList);
 				return;
-			} else if (e.Key == OpenTK.Input.Key.W) {
-				GraphicObject w = CrowInterface.LoadInterface("Interfaces/testWindow.goml");
+			} else if (e.Key == OpenTK.Input.Key.F4) {
+				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/testWindow.goml");
 				w.DataSource = this;
 				return;
-			}
+			} else if (e.Key == OpenTK.Input.Key.F2)
+				idx--;
+			else if (e.Key == OpenTK.Input.Key.F3)
+				idx++;
+			else
+				return;
+		
 			CrowInterface.ClearInterface ();
-			idx++;
+
 			if (idx == testFiles.Length)
 				idx = 0;
-			this.Title = testFiles [idx] + ". Press key to cycle examples.";
+			else if (idx < 0)
+				idx = testFiles.Length - 1;
+			
+			this.Title = testFiles [idx] + ". Press <F3> to cycle examples.";
 			GraphicObject obj = CrowInterface.LoadInterface(testFiles[idx]);
 			obj.DataSource = this;
 		}

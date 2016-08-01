@@ -34,7 +34,6 @@ namespace Crow
 		public StyleReader (Assembly assembly, string resId)
 			: base(assembly.GetManifestResourceStream (resId))
 		{
-			Interface iface = Interface.CurrentInterface;
 			string styleKey = resId.Substring (0, resId.Length - 6);
 			string token = "";
 			List<string> targetsClasses = new List<string> ();
@@ -105,11 +104,11 @@ namespace Crow
 								string expression = token.Trim ();
 
 								foreach (string tc in targetsClasses) {
-									if (!iface.Styling.ContainsKey (tc))
-										iface.Styling [tc] = new Dictionary<string, object> ();
-									else if (iface.Styling [tc].ContainsKey (currentProperty))
+									if (!Interface.Styling.ContainsKey (tc))
+										Interface.Styling [tc] = new Dictionary<string, object> ();
+									else if (Interface.Styling [tc].ContainsKey (currentProperty))
 										continue;
-									iface.Styling [tc] [currentProperty] = expression;
+									Interface.Styling [tc] [currentProperty] = expression;
 								}
 								token = "";
 							}

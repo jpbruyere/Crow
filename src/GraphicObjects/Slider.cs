@@ -65,7 +65,7 @@ namespace Crow
 				if (_cursorColor == value)
 					return;
 				_cursorColor = value;
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 				NotifyValueChanged ("CursorColor", _cursorColor);
 			}
 		}
@@ -76,7 +76,6 @@ namespace Crow
 				if (_cursorSize == value)
 					return;
 				_cursorSize = value;
-				RegisterForLayouting (LayoutingType.Sizing);
 				RegisterForGraphicUpdate ();
 				NotifyValueChanged ("CursorSize", _cursorSize);
 			}

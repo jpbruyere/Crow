@@ -141,7 +141,7 @@ namespace Crow
 					using (Stream stream = Interface.GetStreamFromPath (ItemTemplate))
 						stream.CopyTo (templateStream);
 				}
-				templateBaseType = Interface.GetTopContainerOfGOMLStream (templateStream);
+				templateBaseType = Interface.GetTopContainerOfXMLStream (templateStream);
 			}
 
 			lock (Interface.CurrentInterface.UpdateMutex) {

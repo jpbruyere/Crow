@@ -79,7 +79,7 @@ namespace Crow
 					return;
 				selColor = value;
 				NotifyValueChanged ("SelectionBackground", selColor);
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue("White")]
@@ -90,7 +90,7 @@ namespace Crow
 					return;
 				selFontColor = value;
 				NotifyValueChanged ("SelectionForeground", selFontColor);
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue(Alignment.Left)]
@@ -101,8 +101,7 @@ namespace Crow
 				if (value == _textAlignment)
 					return;
 				_textAlignment = value; 
-				RegisterForGraphicUpdate ();
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 				NotifyValueChanged ("TextAlignment", _textAlignment);
 			}
         }
@@ -113,7 +112,7 @@ namespace Crow
 				if (horizontalStretch == value)
 					return;
 				horizontalStretch = value; 
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 				NotifyValueChanged ("HorizontalStretch", horizontalStretch);
 			}
 		}
@@ -124,8 +123,8 @@ namespace Crow
 				if (verticalStretch == value)
 					return;
 				verticalStretch = value; 
+				RegisterForRedraw ();
 				NotifyValueChanged ("VerticalStretch", verticalStretch);
-
 			}
 		} 
 		[XmlAttributeAttribute][DefaultValue("label")]
@@ -147,9 +146,8 @@ namespace Crow
 
 				lines = getLines;
 
-				this.RegisterForGraphicUpdate ();
-				this.RegisterForLayouting (LayoutingType.Sizing);
 				NotifyValueChanged ("Text", _text);
+				RegisterForGraphicUpdate ();
             }
         }
 		[XmlAttributeAttribute][DefaultValue(false)]
@@ -598,7 +596,7 @@ namespace Crow
 
 			SelBegin = new Point(0,0);
 			SelRelease = new Point (lines.LastOrDefault ().Length, lines.Count-1);
-			RegisterForGraphicUpdate ();
+			RegisterForRedraw ();
 		}
 		public override void onUnfocused (object sender, EventArgs e)
 		{
@@ -606,7 +604,7 @@ namespace Crow
 
 			SelBegin = -1;
 			SelRelease = -1;
-			RegisterForGraphicUpdate ();
+			RegisterForRedraw ();
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
@@ -617,7 +615,7 @@ namespace Crow
 
 			updatemouseLocalPos (e.Position);
 
-			RegisterForGraphicUpdate();
+			RegisterForRedraw();
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{			
@@ -626,7 +624,7 @@ namespace Crow
 				SelBegin = -1;
 				SelRelease = -1;
 				SelectionInProgress = true;
-				RegisterForGraphicUpdate();//TODO:should put it in properties
+				RegisterForRedraw();//TODO:should put it in properties
 			}          
 
 			//done at the end to set 'hasFocus' value after testing it
@@ -641,7 +639,7 @@ namespace Crow
 			
 			updatemouseLocalPos (e.Position);
 			SelectionInProgress = false;
-			RegisterForGraphicUpdate ();
+			RegisterForRedraw ();
 		}
 		#endregion
 

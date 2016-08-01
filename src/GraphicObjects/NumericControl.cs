@@ -30,7 +30,7 @@ namespace Crow
 
 				minValue = value;
 				NotifyValueChanged ("Minimum", minValue);
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(100.0)]
@@ -43,7 +43,7 @@ namespace Crow
 
 				maxValue = value;
 				NotifyValueChanged ("Maximum", maxValue);
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(1.0)]
@@ -56,7 +56,7 @@ namespace Crow
 
 				smallStep = value;
 				NotifyValueChanged ("SmallIncrement", smallStep);
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(5.0)]
@@ -69,7 +69,7 @@ namespace Crow
 
 				bigStep = value;
 				NotifyValueChanged ("LargeIncrement", bigStep);
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0.0)]

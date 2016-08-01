@@ -78,7 +78,7 @@ namespace Crow
 					(Children [selectedTab] as TabItem).IsSelected = true;
 
 				NotifyValueChanged ("SelectedTab", selectedTab);
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(22)]
@@ -148,7 +148,7 @@ namespace Crow
 
 				//if no layouting remains in queue for item, registre for redraw
 				if (RegisteredLayoutings == LayoutingType.None && bmp == null)
-					RegisterForGraphicUpdate ();
+					Interface.CurrentInterface.EnqueueForRepaint (this);
 
 				return true;
 			}
@@ -183,8 +183,8 @@ namespace Crow
 		#region Mouse handling
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
-			if (Interface.CurrentInterface.hoverWidget != this) {
-				Interface.CurrentInterface.hoverWidget = this;
+			if (Interface.CurrentInterface.HoverWidget != this) {
+				Interface.CurrentInterface.HoverWidget = this;
 				onMouseEnter (this, e);
 			}
 

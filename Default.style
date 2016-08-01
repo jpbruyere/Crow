@@ -7,7 +7,8 @@ Button {
 	Width = Fit;
 }
 Label {
-	Fit = true;
+	Height = Fit;
+	Width = Fit;
 	Margin = 0;
 }
 MessageBox {
@@ -37,4 +38,7 @@ Window {
 	MinimumSize=50,50;
 	Width = 150;
 	Height = 150;
+}
+Border {
+	Foreground = White;
 }

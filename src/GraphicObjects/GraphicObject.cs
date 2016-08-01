@@ -241,10 +241,22 @@ namespace Crow
 					if (value < MinimumSize.Width || (value > MaximumSize.Width && MaximumSize.Width > 0))
 						return;
 				}
-
+				Measure lastWP = WidthPolicy;
 				_width = value;
 				NotifyValueChanged ("Width", _width);
-				NotifyValueChanged ("WidthPolicy", WidthPolicy);
+				if (WidthPolicy != lastWP) {
+					NotifyValueChanged ("WidthPolicy", WidthPolicy);
+					//contentSize in Stacks are only update on childLayoutChange, and the single stretched
+					//child of the stack is not counted in contentSize, so when changing size policy of a child
+					//we should adapt contentSize
+					//TODO:check case when child become stretched, and another stretched item already exists.
+					if (_parent is GenericStack) {//TODO:check if I should test Group instead
+						if (lastWP == Measure.Fit)
+							(_parent as GenericStack).contentSize.Width -= this.LastSlots.Width;
+						else
+							(_parent as GenericStack).contentSize.Width += this.LastSlots.Width;
+					}
+				}
 
 				this.RegisterForLayouting (LayoutingType.Width);
 			}
@@ -259,10 +271,18 @@ namespace Crow
 					if (value < MinimumSize.Height || (value > MaximumSize.Height && MaximumSize.Height > 0))
 						return;
 				}
-
+				Measure lastHP = HeightPolicy;
 				_height = value;
 				NotifyValueChanged ("Height", _height);
-				NotifyValueChanged ("HeightPolicy", HeightPolicy);
+				if (HeightPolicy != lastHP) {
+					NotifyValueChanged ("HeightPolicy", HeightPolicy);
+					if (_parent is GenericStack) {
+						if (lastHP == Measure.Fit)
+							(_parent as GenericStack).contentSize.Height -= this.LastSlots.Height;
+						else
+							(_parent as GenericStack).contentSize.Height += this.LastSlots.Height;
+					}
+				}
 
 				this.RegisterForLayouting (LayoutingType.Height);
 			}
@@ -342,7 +362,7 @@ namespace Crow
 					return;
 				_background = value;
 				NotifyValueChanged ("Background", _background);
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("White")]
@@ -353,7 +373,7 @@ namespace Crow
 					return;
 				_foreground = value;
 				NotifyValueChanged ("Foreground", _foreground);
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("sans,10")]
@@ -375,7 +395,7 @@ namespace Crow
 					return;
 				_cornerRadius = value;
 				NotifyValueChanged ("CornerRadius", _cornerRadius);
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
@@ -402,8 +422,8 @@ namespace Crow
 					return;
 
 				//ensure main win doesn't keep hidden childrens ref
-				if (!_isVisible && this.Contains (Interface.CurrentInterface.hoverWidget))
-					Interface.CurrentInterface.hoverWidget = null;
+				if (!_isVisible && this.Contains (Interface.CurrentInterface.HoverWidget))
+					Interface.CurrentInterface.HoverWidget = null;
 
 				if (Parent is GraphicObject)
 					(Parent as GraphicObject).RegisterForLayouting (LayoutingType.Sizing);
@@ -412,7 +432,7 @@ namespace Crow
 
 				if (_isVisible)
 					RegisterForLayouting (LayoutingType.Sizing);
-				RegisterForGraphicUpdate ();
+				Interface.CurrentInterface.EnqueueForRepaint (this);
 
 				NotifyValueChanged ("Visible", _isVisible);
 			}
@@ -497,14 +517,16 @@ namespace Crow
 					Interface.DefaultValuesLoader [Style] (this);
 					return;
 				}
-			}
-			if (Interface.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
-				Interface.DefaultValuesLoader [thisType.FullName] (this);
-				return;
-			}
-			if (Interface.DefaultValuesLoader.ContainsKey (thisType.Name)) {
-				Interface.DefaultValuesLoader [thisType.Name] (this);
-				return;
+			} else {
+				if (Interface.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
+					Interface.DefaultValuesLoader [thisType.FullName] (this);
+					return;
+				} else if (!Interface.Styling.ContainsKey (thisType.FullName)) {
+					if (Interface.DefaultValuesLoader.ContainsKey (thisType.Name)) {
+						Interface.DefaultValuesLoader [thisType.Name] (this);
+						return;
+					}
+				}
 			}
 
 			List<Dictionary<string, object>> styling = new List<Dictionary<string, object>>();
@@ -516,17 +538,17 @@ namespace Crow
 			//   those files being placed in a Styles folder
 			string styleKey = Style;
 			if (!string.IsNullOrEmpty (Style)) {
-				if (Interface.CurrentInterface.Styling.ContainsKey (Style)) {
-					styling.Add (Interface.CurrentInterface.Styling [Style]);
+				if (Interface.Styling.ContainsKey (Style)) {
+					styling.Add (Interface.Styling [Style]);
 				}
 			}
-			if (Interface.CurrentInterface.Styling.ContainsKey (thisType.FullName)) {
-				styling.Add (Interface.CurrentInterface.Styling [thisType.FullName]);
+			if (Interface.Styling.ContainsKey (thisType.FullName)) {
+				styling.Add (Interface.Styling [thisType.FullName]);
 				if (string.IsNullOrEmpty (styleKey))
 					styleKey = thisType.FullName;
 			}
-			if (Interface.CurrentInterface.Styling.ContainsKey (thisType.Name)) {
-				styling.Add (Interface.CurrentInterface.Styling [thisType.Name]);
+			if (Interface.Styling.ContainsKey (thisType.Name)) {
+				styling.Add (Interface.Styling [thisType.Name]);
 				if (string.IsNullOrEmpty (styleKey))
 					styleKey = thisType.Name;
 			}
@@ -582,7 +604,10 @@ namespace Crow
 					}
 				}
 				if (styleIndex >= 0){
-					defaultValue = styling[styleIndex] [name];
+					if (pi.PropertyType.IsEnum)//maybe should be in parser..
+						defaultValue = Enum.Parse(pi.PropertyType, (string)styling[styleIndex] [name], true);
+					else
+						defaultValue = styling[styleIndex] [name];
 				}else {
 					DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof (DefaultValueAttribute));
 					if (dv == null)
@@ -685,8 +710,12 @@ namespace Crow
 			il.Emit(OpCodes.Ret);
 			#endregion
 
-			Interface.DefaultValuesLoader[styleKey] = (Interface.loadDefaultInvoker)dm.CreateDelegate(typeof(Interface.loadDefaultInvoker));
-			Interface.DefaultValuesLoader[styleKey] (this);
+			try {
+				Interface.DefaultValuesLoader[styleKey] = (Interface.loadDefaultInvoker)dm.CreateDelegate(typeof(Interface.loadDefaultInvoker));
+				Interface.DefaultValuesLoader[styleKey] (this);
+			} catch (Exception ex) {
+				throw new Exception ("Error applying style <" + styleKey + ">:", ex);
+			}
 		}
 
 		public virtual GraphicObject FindByName(string nameToFind){
@@ -701,21 +730,29 @@ namespace Crow
 			if (Parent != null)
 				Parent.RegisterClip (clip + Slot.Position + ClientRectangle.Position);
 		}
-		public bool IsQueueForGraphicUpdate = false;
-		/// <summary>
-		/// Clear chached object and add clipping region in redraw list of interface
-		/// </summary>
+		public bool IsQueueForRedraw = false;
+		/// <summary> Full update, taking care of sizing policy </summary>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForGraphicUpdate ()
 		{
-			Interface.RegisterForGraphicUpdate (this);
+			bmp = null;
+			if (Width == Measure.Fit || Height == Measure.Fit)
+				RegisterForLayouting (LayoutingType.Sizing);
+			Interface.CurrentInterface.EnqueueForRepaint (this);
 		}
-
+		/// <summary> query an update of the content, a redraw </summary>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void RegisterForRedraw ()
+		{
+			bmp = null;
+			Interface.CurrentInterface.EnqueueForRepaint (this);
+		}
 		#region Layouting
 		[XmlIgnore]public int LayoutingTries {
 			get { return layoutingTries; }
 			set { layoutingTries = value; }
 		}
-		protected Size contentSize;
+		internal Size contentSize;
 		/// <summary> return size of content + margins </summary>
 		protected virtual int measureRawSize (LayoutingType lt) {
 			return lt == LayoutingType.Width ?
@@ -930,7 +967,7 @@ namespace Crow
 
 			//if no layouting remains in queue for item, registre for redraw
 			if (this.registeredLayoutings == LayoutingType.None && bmp == null)
-				RegisterForGraphicUpdate ();
+				Interface.CurrentInterface.EnqueueForRepaint (this);
 
 			return true;
 		}
@@ -1044,8 +1081,8 @@ namespace Crow
 		}
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
-			if (Interface.CurrentInterface.hoverWidget != this) {
-				Interface.CurrentInterface.hoverWidget = this;
+			if (Interface.CurrentInterface.HoverWidget != this) {
+				Interface.CurrentInterface.HoverWidget = this;
 				onMouseEnter (this, e);
 			}
 
