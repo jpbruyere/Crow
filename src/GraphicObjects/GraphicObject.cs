@@ -47,6 +47,7 @@ namespace Crow
 
 			if (Interface.CurrentInterface.XmlLoading)
 				return;
+			loadDefaultValues ();
 		}
 		public GraphicObject (Rectangle _bounds)
 		{
@@ -708,14 +709,6 @@ namespace Crow
 		{
 			Interface.RegisterForGraphicUpdate (this);
 		}
-		internal bool IsInRedrawList = false;
-		/// <summary>
-		/// Add clipping region in redraw list of interface, dont update cached object content
-		/// </summary>
-		internal void AddToRedrawList ()
-		{
-			Interface.AddToRedrawList (this);
-		}
 
 		#region Layouting
 		[XmlIgnore]public int LayoutingTries {
@@ -937,7 +930,7 @@ namespace Crow
 
 			//if no layouting remains in queue for item, registre for redraw
 			if (this.registeredLayoutings == LayoutingType.None && bmp == null)
-				this.AddToRedrawList ();
+				RegisterForGraphicUpdate ();
 
 			return true;
 		}

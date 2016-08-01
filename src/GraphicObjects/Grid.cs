@@ -135,8 +135,8 @@ namespace Crow
 				ComputeChildrenPositions ();
 
 				//if no layouting remains in queue for item, registre for redraw
-				if (RegisteredLayoutings == LayoutingType.None && bmp==null)
-					this.AddToRedrawList ();
+				if (RegisteredLayoutings == LayoutingType.None && bmp == null)
+					this.RegisterForGraphicUpdate ();
 				
 				return true;
 			}

@@ -102,15 +102,6 @@ namespace Crow
 				g.IsQueueForGraphicUpdate = true;
 			}
 		}
-		public static void AddToRedrawList(GraphicObject g)
-		{
-			if (g.IsInRedrawList)
-				return;
-			if (Interface.CurrentInterface == null)
-				return;
-			Interface.CurrentInterface.RedrawList.Add (g);
-			g.IsInRedrawList = true;
-		}
 
 		#region default values loading helpers
 		/// Default values of properties from GraphicObjects are retrieve from XML Attributes.
@@ -298,7 +289,6 @@ namespace Crow
 		public static Interface CurrentInterface;
 
 		Rectangles _redrawClip = new Rectangles();//should find another way to access it from child
-		List<GraphicObject> _gobjsToRedraw = new List<GraphicObject>();
 
 		Context ctx;
 		Surface surf;
@@ -434,24 +424,16 @@ namespace Crow
 					GraphicObject g = CurrentInterface.GraphicUpdateQueue.Dequeue ();
 					g.bmp = null;
 					g.IsQueueForGraphicUpdate = false;
-					AddToRedrawList (g);
+					try {
+						if (g.Parent == null)
+							continue;
+						g.Parent.RegisterClip (g.LastPaintedSlot);
+						g.Parent.RegisterClip (g.getSlot ());
+					} catch (Exception ex) {
+						Debug.WriteLine ("Error Register Clip: " + ex.ToString ());
+					}
 				}
 			}
-			//Debug.WriteLine ("otd:" + gobjsToRedraw.Count.ToString () + "-");
-			//final redraw clips should be added only when layout is completed among parents,
-			//that's why it take place in a second pass
-			foreach (GraphicObject p in RedrawList) {
-				try {
-					p.IsInRedrawList = false;
-					if (p.Parent == null)
-						continue;
-					p.Parent.RegisterClip (p.LastPaintedSlot);
-					p.Parent.RegisterClip (p.getSlot ());
-				} catch (Exception ex) {
-					Debug.WriteLine ("Error Register Clip: " + ex.ToString ());
-				}
-			}
-			RedrawList.Clear ();
 			#if MEASURE_TIME
 			clippingTime.Stop ();
 			#endif
@@ -518,10 +500,6 @@ namespace Crow
 		public Rectangles clipping {
 			get { return _redrawClip; }
 			set { _redrawClip = value; }
-		}
-		public List<GraphicObject> RedrawList {
-			get { return _gobjsToRedraw; }
-			set { _gobjsToRedraw = value; }
 		}
 		public void AddWidget(GraphicObject g)
 		{

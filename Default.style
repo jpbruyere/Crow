@@ -1,5 +1,5 @@
 ﻿Button, CheckBox, RadioButton, ComboBox, Expandable,
-MessageBox, Popper, Slider, Spinner, TextBox, Window  {
+MessageBox, Popper, Slider, Spinner, TextBox {
 	Focusable = true;
 	Height = Fit;
 }
@@ -33,6 +33,8 @@ TextBox {
 	Foreground = Black;
 }
 Window {
+	Focusable = true;
 	MinimumSize=50,50;
-	Width = Fit;
+	Width = 150;
+	Height = 150;
 }
