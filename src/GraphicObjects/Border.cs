@@ -24,11 +24,6 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("White")]
-		public override Fill Foreground {
-			get { return base.Foreground;}
-			set {base.Foreground = value;}
-		}
 		#endregion
 
 		#region GraphicObject override

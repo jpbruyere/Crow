@@ -70,7 +70,7 @@ namespace Crow
 				else
 					_scrollX = value;
 				NotifyValueChanged("ScrollX", _scrollX);
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 				Scrolled.Raise (this, new ScrollingEventArgs (Orientation.Horizontal));
 			}
 		}			
@@ -89,7 +89,7 @@ namespace Crow
 				else
 					_scrollY = value;
 				NotifyValueChanged("ScrollY", _scrollY);
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 				Scrolled.Raise (this, new ScrollingEventArgs (Orientation.Vertical));
 			}
 		}

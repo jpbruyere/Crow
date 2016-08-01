@@ -101,7 +101,7 @@ namespace Crow
 				if (value == _textAlignment)
 					return;
 				_textAlignment = value; 
-				RegisterForRedraw ();
+				RegisterForGraphicUpdate ();
 				NotifyValueChanged ("TextAlignment", _textAlignment);
 			}
         }
@@ -147,7 +147,7 @@ namespace Crow
 				lines = getLines;
 
 				NotifyValueChanged ("Text", _text);
-				this.RegisterForGraphicUpdate ();
+				RegisterForGraphicUpdate ();
             }
         }
 		[XmlAttributeAttribute][DefaultValue(false)]
@@ -596,7 +596,7 @@ namespace Crow
 
 			SelBegin = new Point(0,0);
 			SelRelease = new Point (lines.LastOrDefault ().Length, lines.Count-1);
-			RegisterForGraphicUpdate ();
+			RegisterForRedraw ();
 		}
 		public override void onUnfocused (object sender, EventArgs e)
 		{
@@ -604,7 +604,7 @@ namespace Crow
 
 			SelBegin = -1;
 			SelRelease = -1;
-			RegisterForGraphicUpdate ();
+			RegisterForRedraw ();
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
@@ -615,7 +615,7 @@ namespace Crow
 
 			updatemouseLocalPos (e.Position);
 
-			RegisterForGraphicUpdate();
+			RegisterForRedraw();
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{			
@@ -624,7 +624,7 @@ namespace Crow
 				SelBegin = -1;
 				SelRelease = -1;
 				SelectionInProgress = true;
-				RegisterForGraphicUpdate();//TODO:should put it in properties
+				RegisterForRedraw();//TODO:should put it in properties
 			}          
 
 			//done at the end to set 'hasFocus' value after testing it
@@ -639,7 +639,7 @@ namespace Crow
 			
 			updatemouseLocalPos (e.Position);
 			SelectionInProgress = false;
-			RegisterForGraphicUpdate ();
+			RegisterForRedraw ();
 		}
 		#endregion
 

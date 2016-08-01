@@ -38,3 +38,6 @@ Window {
 	Width = 150;
 	Height = 150;
 }
+Border {
+	Foreground = White;
+}

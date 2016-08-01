@@ -79,7 +79,7 @@ namespace Tests
 			this.KeyDown += KeyboardKeyDown1;
 
 			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
-			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Unsorted", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Unsorted", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/basicTests", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
@@ -101,16 +101,24 @@ namespace Tests
 				TestList.Add ("new string");
 				NotifyValueChanged ("TestList", TestList);
 				return;
-			} else if (e.Key == OpenTK.Input.Key.F2) {
+			} else if (e.Key == OpenTK.Input.Key.F4) {
 				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/testWindow.goml");
 				w.DataSource = this;
 				return;
-			} else if (e.Key != OpenTK.Input.Key.F3)
+			} else if (e.Key == OpenTK.Input.Key.F2)
+				idx--;
+			else if (e.Key == OpenTK.Input.Key.F3)
+				idx++;
+			else
 				return;
+		
 			CrowInterface.ClearInterface ();
-			idx++;
+
 			if (idx == testFiles.Length)
 				idx = 0;
+			else if (idx < 0)
+				idx = testFiles.Length - 1;
+			
 			this.Title = testFiles [idx] + ". Press <F3> to cycle examples.";
 			GraphicObject obj = CrowInterface.LoadInterface(testFiles[idx]);
 			obj.DataSource = this;

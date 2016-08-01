@@ -136,7 +136,7 @@ namespace Crow
 
 				//if no layouting remains in queue for item, registre for redraw
 				if (RegisteredLayoutings == LayoutingType.None && bmp == null)
-					this.RegisterForGraphicUpdate ();
+					Interface.CurrentInterface.EnqueueForRepaint (this);
 				
 				return true;
 			}

@@ -49,7 +49,7 @@ namespace Crow
             set
             {
                 base.HasFocus = value;
-                RegisterForGraphicUpdate();
+                RegisterForRedraw();
             }
         }
 
@@ -210,10 +210,6 @@ namespace Crow
 			default:
 				break;
 			}
-			if (Width < 0)
-				RegisterForLayouting (LayoutingType.Width);
-			if (Height < 0)
-				RegisterForLayouting (LayoutingType.Height);
 			RegisterForGraphicUpdate();
 		}
 		public override void onKeyPress (object sender, KeyPressEventArgs e)
@@ -225,10 +221,6 @@ namespace Crow
 			SelRelease = -1;
 			SelBegin = new Point(CurrentColumn, SelBegin.Y);
 
-			if (Width < 0)
-				RegisterForLayouting (LayoutingType.Width);
-			if (Height < 0)
-				RegisterForLayouting (LayoutingType.Height);
 			RegisterForGraphicUpdate();
 		}
         #endregion

@@ -55,7 +55,7 @@ namespace Crow
 				if (horizontalStretch == value)
 					return;
 				horizontalStretch = value;
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 				NotifyValueChanged ("HorizontalStretch", horizontalStretch);
 			}
 		}
@@ -67,8 +67,8 @@ namespace Crow
 				if (verticalStretch == value)
 					return;
 				verticalStretch = value;
+				RegisterForRedraw ();
 				NotifyValueChanged ("VerticalStretch", verticalStretch);
-
 			}
 		}
 		[XmlAttributeAttribute ()]
@@ -83,8 +83,6 @@ namespace Crow
 					return;
 
 				RegisterForGraphicUpdate ();
-				this.RegisterForLayouting (LayoutingType.Sizing);
-
 
 				_text = value;
 
