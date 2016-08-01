@@ -79,7 +79,7 @@ namespace Crow
 					return;
 				selColor = value;
 				NotifyValueChanged ("SelectionBackground", selColor);
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue("White")]
@@ -90,7 +90,7 @@ namespace Crow
 					return;
 				selFontColor = value;
 				NotifyValueChanged ("SelectionForeground", selFontColor);
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue(Alignment.Left)]
@@ -101,8 +101,7 @@ namespace Crow
 				if (value == _textAlignment)
 					return;
 				_textAlignment = value; 
-				RegisterForGraphicUpdate ();
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 				NotifyValueChanged ("TextAlignment", _textAlignment);
 			}
         }
@@ -113,7 +112,7 @@ namespace Crow
 				if (horizontalStretch == value)
 					return;
 				horizontalStretch = value; 
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 				NotifyValueChanged ("HorizontalStretch", horizontalStretch);
 			}
 		}
@@ -124,8 +123,8 @@ namespace Crow
 				if (verticalStretch == value)
 					return;
 				verticalStretch = value; 
+				RegisterForRedraw ();
 				NotifyValueChanged ("VerticalStretch", verticalStretch);
-
 			}
 		} 
 		[XmlAttributeAttribute][DefaultValue("label")]
@@ -147,9 +146,8 @@ namespace Crow
 
 				lines = getLines;
 
-				this.RegisterForGraphicUpdate ();
-				this.RegisterForLayouting (LayoutingType.Sizing);
 				NotifyValueChanged ("Text", _text);
+				this.RegisterForGraphicUpdate ();
             }
         }
 		[XmlAttributeAttribute][DefaultValue(false)]

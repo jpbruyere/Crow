@@ -342,7 +342,7 @@ namespace Crow
 					return;
 				_background = value;
 				NotifyValueChanged ("Background", _background);
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("White")]
@@ -353,7 +353,7 @@ namespace Crow
 					return;
 				_foreground = value;
 				NotifyValueChanged ("Foreground", _foreground);
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("sans,10")]
@@ -375,7 +375,7 @@ namespace Crow
 					return;
 				_cornerRadius = value;
 				NotifyValueChanged ("CornerRadius", _cornerRadius);
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
@@ -402,8 +402,8 @@ namespace Crow
 					return;
 
 				//ensure main win doesn't keep hidden childrens ref
-				if (!_isVisible && this.Contains (Interface.CurrentInterface.hoverWidget))
-					Interface.CurrentInterface.hoverWidget = null;
+				if (!_isVisible && this.Contains (Interface.CurrentInterface.HoverWidget))
+					Interface.CurrentInterface.HoverWidget = null;
 
 				if (Parent is GraphicObject)
 					(Parent as GraphicObject).RegisterForLayouting (LayoutingType.Sizing);
@@ -516,17 +516,17 @@ namespace Crow
 			//   those files being placed in a Styles folder
 			string styleKey = Style;
 			if (!string.IsNullOrEmpty (Style)) {
-				if (Interface.CurrentInterface.Styling.ContainsKey (Style)) {
-					styling.Add (Interface.CurrentInterface.Styling [Style]);
+				if (Interface.Styling.ContainsKey (Style)) {
+					styling.Add (Interface.Styling [Style]);
 				}
 			}
-			if (Interface.CurrentInterface.Styling.ContainsKey (thisType.FullName)) {
-				styling.Add (Interface.CurrentInterface.Styling [thisType.FullName]);
+			if (Interface.Styling.ContainsKey (thisType.FullName)) {
+				styling.Add (Interface.Styling [thisType.FullName]);
 				if (string.IsNullOrEmpty (styleKey))
 					styleKey = thisType.FullName;
 			}
-			if (Interface.CurrentInterface.Styling.ContainsKey (thisType.Name)) {
-				styling.Add (Interface.CurrentInterface.Styling [thisType.Name]);
+			if (Interface.Styling.ContainsKey (thisType.Name)) {
+				styling.Add (Interface.Styling [thisType.Name]);
 				if (string.IsNullOrEmpty (styleKey))
 					styleKey = thisType.Name;
 			}
@@ -701,15 +701,23 @@ namespace Crow
 			if (Parent != null)
 				Parent.RegisterClip (clip + Slot.Position + ClientRectangle.Position);
 		}
-		public bool IsQueueForGraphicUpdate = false;
-		/// <summary>
-		/// Clear chached object and add clipping region in redraw list of interface
-		/// </summary>
+		public bool IsQueueForRedraw = false;
+		/// <summary> Full update, taking care of sizing policy </summary>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForGraphicUpdate ()
 		{
-			Interface.RegisterForGraphicUpdate (this);
+			bmp = null;
+			if (Width == Measure.Fit || Height == Measure.Fit)
+				RegisterForLayouting (LayoutingType.Sizing);
+			Interface.CurrentInterface.EnqueueForRepaint (this);
 		}
-
+		/// <summary> query an update of the content, a redraw </summary>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void RegisterForRedraw ()
+		{
+			bmp = null;
+			Interface.CurrentInterface.EnqueueForRepaint (this);
+		}
 		#region Layouting
 		[XmlIgnore]public int LayoutingTries {
 			get { return layoutingTries; }
@@ -930,7 +938,7 @@ namespace Crow
 
 			//if no layouting remains in queue for item, registre for redraw
 			if (this.registeredLayoutings == LayoutingType.None && bmp == null)
-				RegisterForGraphicUpdate ();
+				Interface.CurrentInterface.EnqueueForRepaint (this);
 
 			return true;
 		}
@@ -1044,8 +1052,8 @@ namespace Crow
 		}
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
-			if (Interface.CurrentInterface.hoverWidget != this) {
-				Interface.CurrentInterface.hoverWidget = this;
+			if (Interface.CurrentInterface.HoverWidget != this) {
+				Interface.CurrentInterface.HoverWidget = this;
 				onMouseEnter (this, e);
 			}
 

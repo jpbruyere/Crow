@@ -183,8 +183,8 @@ namespace Crow
 		#region Mouse handling
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
-			if (Interface.CurrentInterface.hoverWidget != this) {
-				Interface.CurrentInterface.hoverWidget = this;
+			if (Interface.CurrentInterface.HoverWidget != this) {
+				Interface.CurrentInterface.HoverWidget = this;
 				onMouseEnter (this, e);
 			}
 

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack>
-	<Label Text="Press a key to cycle into the examples"/>
+	<Label Text="Press &lt;F3&gt; to cycle into the examples"/>
 	<Label Text="Those are basic tests used to validate changes"/>
 </VerticalStack>

@@ -44,7 +44,8 @@ namespace Crow
 	{
 		#region CTOR
 		static Interface(){
-			Interface.LoadCursors ();
+			LoadCursors ();
+			LoadStyling ();
 
 			FontRenderingOptions = new FontOptions ();
 			FontRenderingOptions.Antialias = Antialias.Subpixel;
@@ -54,12 +55,10 @@ namespace Crow
 		}
 		public Interface(){
 			Interface.CurrentInterface = this;
-			LoadStyling ();
 		}
 		#endregion
 
 		#region Static and constants
-		internal bool XmlLoading = false;
 		/// <summary> keep ressource path for debug msg </summary>
 		internal static string CurrentGOMLPath = "";
 		//used in templatedControl
@@ -87,32 +86,53 @@ namespace Crow
 		public static FontOptions FontRenderingOptions;
 		#endregion
 
+		internal bool XmlLoading = false;
+
 		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem> ();
-		public Queue<GraphicObject> GraphicUpdateQueue = new Queue<GraphicObject>();
-		public Dictionary<string, Dictionary<string, object>> Styling;
-		public string Clipboard;
-		public static void RegisterForGraphicUpdate(GraphicObject g)
+		public Queue<GraphicObject> DrawingQueue = new Queue<GraphicObject>();
+		public string Clipboard;//TODO:use object instead for complex copy paste
+		public void EnqueueForRepaint(GraphicObject g)
 		{
-			lock (CurrentInterface.GraphicUpdateQueue) {
-				if (g.IsQueueForGraphicUpdate)
+			lock (DrawingQueue) {
+				if (g.IsQueueForRedraw)
 					return;
-				if (CurrentInterface == null)
-					return;
-				CurrentInterface.GraphicUpdateQueue.Enqueue (g);
-				g.IsQueueForGraphicUpdate = true;
+				DrawingQueue.Enqueue (g);
+				g.IsQueueForRedraw = true;
 			}
 		}
 
-		#region default values loading helpers
+		#region default values and style loading
 		/// Default values of properties from GraphicObjects are retrieve from XML Attributes.
 		/// The reflexion process used to retrieve those values being very slow, it is compiled in MSIL
 		/// and injected as a dynamic method referenced in the DefaultValuesLoader Dictionnary.
 		/// The compilation is done on the first object instancing, and is also done for custom widgets
 		public delegate void loadDefaultInvoker(object instance);
 		public static Dictionary<String, loadDefaultInvoker> DefaultValuesLoader = new Dictionary<string, loadDefaultInvoker>();
-		#endregion
+		public static Dictionary<string, Dictionary<string, object>> Styling;
+		/// <summary> parse all styling data's and build global Styling Dictionary </summary>
+		static void LoadStyling() {
+			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
+			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
-		public static void LoadCursors(){
+			Styling = new Dictionary<string, Dictionary<string, object>> ();
+
+			//fetch styling info in this order, if member styling is alreadey referenced in previous
+			//assembly, it's ignored.
+			loadStylingFromAssembly (Assembly.GetEntryAssembly ());
+			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
+
+			Thread.CurrentThread.CurrentCulture = savedCulture;
+		}
+		/// <summary> Search for .style resources in assembly </summary>
+		static void loadStylingFromAssembly (Assembly assembly) {
+			foreach (string s in assembly
+				.GetManifestResourceNames ()
+				.Where (r => r.EndsWith (".style", StringComparison.OrdinalIgnoreCase))) {
+				new StyleReader (assembly, s)
+					.Dispose ();
+			}
+		}
+		static void LoadCursors(){
 			//Load cursors
 			XCursor.Cross = XCursorFile.Load("#Crow.Images.Icons.Cursors.cross").Cursors[0];
 			XCursor.Default = XCursorFile.Load("#Crow.Images.Icons.Cursors.arrow").Cursors[0];
@@ -123,6 +143,8 @@ namespace Crow
 			XCursor.H = XCursorFile.Load("#Crow.Images.Icons.Cursors.sb_h_double_arrow").Cursors[0];
 			XCursor.V = XCursorFile.Load("#Crow.Images.Icons.Cursors.sb_v_double_arrow").Cursors[0];
 		}
+		#endregion
+
 
 		#region Load/Save
 		public static Stream GetStreamFromPath (string path)
@@ -151,7 +173,7 @@ namespace Crow
 		/// Pre-read first node to set GraphicObject class for loading
 		/// and reset stream position to 0
 		/// </summary>
-		public static Type GetTopContainerOfGOMLStream (Stream stream)
+		public static Type GetTopContainerOfXMLStream (Stream stream)
 		{
 			string root = "Object";
 			stream.Seek (0, SeekOrigin.Begin);
@@ -198,7 +220,7 @@ namespace Crow
 			CurrentGOMLPath = path;
 			GraphicObject tmp = null;
 			using (Stream stream = GetStreamFromPath (path)) {
-				tmp = Load(stream, GetTopContainerOfGOMLStream(stream), hostClass);
+				tmp = Load(stream, GetTopContainerOfXMLStream(stream), hostClass);
 			}
 			Interface.XmlLoaderCount --;
 
@@ -249,30 +271,6 @@ namespace Crow
 				return tmp;
 			}
 		}
-
-		public void LoadStyling() {
-			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
-			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-
-			Styling = new Dictionary<string, Dictionary<string, object>> ();
-
-			//fetch styling info in this order, if member styling is alreadey referenced in previous
-			//assembly, it's ignored.
-			loadStylingFromAssembly (Assembly.GetEntryAssembly ());
-			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
-
-			Thread.CurrentThread.CurrentCulture = savedCulture;
-		}
-
-		void loadStylingFromAssembly (Assembly assembly) {
-			foreach (string s in assembly
-					.GetManifestResourceNames ()
-					 .Where (r => r.EndsWith (".style", StringComparison.OrdinalIgnoreCase))) {
-
-				StyleReader sr = new StyleReader (assembly, s);
-				sr.Dispose ();
-			}
-		}
 		#endregion
 
 		#if MEASURE_TIME
@@ -283,12 +281,10 @@ namespace Crow
 		#endif
 
 		public List<GraphicObject> GraphicTree = new List<GraphicObject>();
-		public Color Background = Color.Transparent;
 
-		internal static Interface currentWindow;
 		public static Interface CurrentInterface;
 
-		Rectangles _redrawClip = new Rectangles();//should find another way to access it from child
+		Rectangles _redrawClip = new Rectangles();
 
 		Context ctx;
 		Surface surf;
@@ -330,7 +326,7 @@ namespace Crow
 					#endif
 			}
 		}
-		public GraphicObject hoverWidget
+		public GraphicObject HoverWidget
 		{
 			get { return _hoverWidget; }
 			set {
@@ -380,24 +376,6 @@ namespace Crow
 			processDrawing ();
 
 			Monitor.Exit (UpdateMutex);
-
-			//			if (ToolTip.isVisible) {
-			//				ToolTip.panel.processkLayouting();
-			//				if (ToolTip.panel.layoutIsValid)
-			//					ToolTip.panel.Paint(ref ctx);
-			//			}
-			//			Debug.WriteLine("INTERFACE: layouting: {0} ticks \t graphical update {1} ticks \t drawing {2} ticks",
-			//			    layoutTime.ElapsedTicks,
-			//			    guTime.ElapsedTicks,
-			//			    drawingTime.ElapsedTicks);
-			//			Debug.WriteLine("INTERFACE: layouting: {0} ms \t graphical update {1} ms \t drawing {2} ms",
-			//			    layoutTime.ElapsedMilliseconds,
-			//			    guTime.ElapsedMilliseconds,
-			//			    drawingTime.ElapsedMilliseconds);
-
-			//			Debug.WriteLine("UPDATE: {0} ticks \t, {1} ms",
-			//				updateTime.ElapsedTicks,
-				//				updateTime.ElapsedMilliseconds);
 		}
 		void processLayouting(){
 			#if MEASURE_TIME
@@ -419,16 +397,16 @@ namespace Crow
 			#if MEASURE_TIME
 			clippingTime.Restart ();
 			#endif
-			lock (CurrentInterface.GraphicUpdateQueue) {
-				while (CurrentInterface.GraphicUpdateQueue.Count > 0) {
-					GraphicObject g = CurrentInterface.GraphicUpdateQueue.Dequeue ();
-					g.bmp = null;
-					g.IsQueueForGraphicUpdate = false;
+			lock (CurrentInterface.DrawingQueue) {
+				while (CurrentInterface.DrawingQueue.Count > 0) {
+					GraphicObject g = CurrentInterface.DrawingQueue.Dequeue ();
+					g.IsQueueForRedraw = false;
 					try {
 						if (g.Parent == null)
 							continue;
 						g.Parent.RegisterClip (g.LastPaintedSlot);
-						g.Parent.RegisterClip (g.getSlot ());
+						if (g.getSlot () != g.LastPaintedSlot)
+							g.Parent.RegisterClip (g.getSlot ());
 					} catch (Exception ex) {
 						Debug.WriteLine ("Error Register Clip: " + ex.ToString ());
 					}
@@ -519,7 +497,7 @@ namespace Crow
 			{
 				GraphicTree.Remove(g);
 				GraphicTree.Insert(0, g);
-				//g.registerClipRect ();
+				EnqueueForRepaint (g);
 			}
 		}
 		/// <summary> Remove all Graphic objects from top container </summary>
@@ -596,10 +574,10 @@ namespace Crow
 				return true;
 			}
 
-			if (hoverWidget != null) {
+			if (HoverWidget != null) {
 				//TODO, ensure object is still in the graphic tree
 				//check topmost graphicobject first
-				GraphicObject tmp = hoverWidget;
+				GraphicObject tmp = HoverWidget;
 				GraphicObject topc = null;
 				while (tmp is GraphicObject) {
 					topc = tmp;
@@ -610,7 +588,7 @@ namespace Crow
 					int i = 0;
 					while (i < idxhw) {
 						if (GraphicTree [i].MouseIsIn (e.Position)) {
-							hoverWidget.onMouseLeave (this, e);
+							HoverWidget.onMouseLeave (this, e);
 							GraphicTree [i].checkHoverWidget (e);
 							return true;
 						}
@@ -619,19 +597,19 @@ namespace Crow
 				}
 
 
-				if (hoverWidget.MouseIsIn (e.Position)) {
-					hoverWidget.checkHoverWidget (e);
+				if (HoverWidget.MouseIsIn (e.Position)) {
+					HoverWidget.checkHoverWidget (e);
 					return true;
 				} else {
-					hoverWidget.onMouseLeave (this, e);
+					HoverWidget.onMouseLeave (this, e);
 					//seek upward from last focused graph obj's
-					while (hoverWidget.Parent as GraphicObject != null) {
-						hoverWidget = hoverWidget.Parent as GraphicObject;
-						if (hoverWidget.MouseIsIn (e.Position)) {
-							hoverWidget.checkHoverWidget (e);
+					while (HoverWidget.Parent as GraphicObject != null) {
+						HoverWidget = HoverWidget.Parent as GraphicObject;
+						if (HoverWidget.MouseIsIn (e.Position)) {
+							HoverWidget.checkHoverWidget (e);
 							return true;
 						} else
-							hoverWidget.onMouseLeave (this, e);
+							HoverWidget.onMouseLeave (this, e);
 					}
 				}
 			}
@@ -645,7 +623,7 @@ namespace Crow
 					return true;
 				}
 			}
-			hoverWidget = null;
+			HoverWidget = null;
 			return false;
 		}
 		public bool ProcessMouseButtonUp(int button)
@@ -671,10 +649,10 @@ namespace Crow
 			Mouse.EnableBit (button);
 			MouseButtonEventArgs e = new MouseButtonEventArgs () { Mouse = Mouse };
 
-			if (hoverWidget == null)
+			if (HoverWidget == null)
 				return false;
 
-			hoverWidget.onMouseDown(hoverWidget,new BubblingMouseButtonEventArg(e));
+			HoverWidget.onMouseDown(HoverWidget,new BubblingMouseButtonEventArg(e));
 
 			if (FocusedWidget == null)
 				return true;
@@ -690,9 +668,9 @@ namespace Crow
 			Mouse.SetScrollRelative (0, delta);
 			MouseWheelEventArgs e = new MouseWheelEventArgs () { Mouse = Mouse, DeltaPrecise = delta };
 
-			if (hoverWidget == null)
+			if (HoverWidget == null)
 				return false;
-			hoverWidget.onMouseWheel (this, e);
+			HoverWidget.onMouseWheel (this, e);
 			return true;
 		}
 
