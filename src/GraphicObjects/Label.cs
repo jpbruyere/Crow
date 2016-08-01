@@ -101,7 +101,7 @@ namespace Crow
 				if (value == _textAlignment)
 					return;
 				_textAlignment = value; 
-				RegisterForGraphicUpdate ();
+				RegisterForRedraw ();
 				NotifyValueChanged ("TextAlignment", _textAlignment);
 			}
         }

@@ -241,10 +241,22 @@ namespace Crow
 					if (value < MinimumSize.Width || (value > MaximumSize.Width && MaximumSize.Width > 0))
 						return;
 				}
-
+				Measure lastWP = WidthPolicy;
 				_width = value;
 				NotifyValueChanged ("Width", _width);
-				NotifyValueChanged ("WidthPolicy", WidthPolicy);
+				if (WidthPolicy != lastWP) {
+					NotifyValueChanged ("WidthPolicy", WidthPolicy);
+					//contentSize in Stacks are only update on childLayoutChange, and the single stretched
+					//child of the stack is not counted in contentSize, so when changing size policy of a child
+					//we should adapt contentSize
+					//TODO:check case when child become stretched, and another stretched item already exists.
+					if (_parent is GenericStack) {//TODO:check if I should test Group instead
+						if (lastWP == Measure.Fit)
+							(_parent as GenericStack).contentSize.Width -= this.LastSlots.Width;
+						else
+							(_parent as GenericStack).contentSize.Width += this.LastSlots.Width;
+					}
+				}
 
 				this.RegisterForLayouting (LayoutingType.Width);
 			}
@@ -259,10 +271,18 @@ namespace Crow
 					if (value < MinimumSize.Height || (value > MaximumSize.Height && MaximumSize.Height > 0))
 						return;
 				}
-
+				Measure lastHP = HeightPolicy;
 				_height = value;
 				NotifyValueChanged ("Height", _height);
-				NotifyValueChanged ("HeightPolicy", HeightPolicy);
+				if (HeightPolicy != lastHP) {
+					NotifyValueChanged ("HeightPolicy", HeightPolicy);
+					if (_parent is GenericStack) {
+						if (lastHP == Measure.Fit)
+							(_parent as GenericStack).contentSize.Height -= this.LastSlots.Height;
+						else
+							(_parent as GenericStack).contentSize.Height += this.LastSlots.Height;
+					}
+				}
 
 				this.RegisterForLayouting (LayoutingType.Height);
 			}
@@ -497,14 +517,16 @@ namespace Crow
 					Interface.DefaultValuesLoader [Style] (this);
 					return;
 				}
-			}
-			if (Interface.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
-				Interface.DefaultValuesLoader [thisType.FullName] (this);
-				return;
-			}
-			if (Interface.DefaultValuesLoader.ContainsKey (thisType.Name)) {
-				Interface.DefaultValuesLoader [thisType.Name] (this);
-				return;
+			} else {
+				if (Interface.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
+					Interface.DefaultValuesLoader [thisType.FullName] (this);
+					return;
+				} else if (!Interface.Styling.ContainsKey (thisType.FullName)) {
+					if (Interface.DefaultValuesLoader.ContainsKey (thisType.Name)) {
+						Interface.DefaultValuesLoader [thisType.Name] (this);
+						return;
+					}
+				}
 			}
 
 			List<Dictionary<string, object>> styling = new List<Dictionary<string, object>>();
@@ -582,7 +604,10 @@ namespace Crow
 					}
 				}
 				if (styleIndex >= 0){
-					defaultValue = styling[styleIndex] [name];
+					if (pi.PropertyType.IsEnum)//maybe should be in parser..
+						defaultValue = Enum.Parse(pi.PropertyType, (string)styling[styleIndex] [name], true);
+					else
+						defaultValue = styling[styleIndex] [name];
 				}else {
 					DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof (DefaultValueAttribute));
 					if (dv == null)
@@ -685,8 +710,12 @@ namespace Crow
 			il.Emit(OpCodes.Ret);
 			#endregion
 
-			Interface.DefaultValuesLoader[styleKey] = (Interface.loadDefaultInvoker)dm.CreateDelegate(typeof(Interface.loadDefaultInvoker));
-			Interface.DefaultValuesLoader[styleKey] (this);
+			try {
+				Interface.DefaultValuesLoader[styleKey] = (Interface.loadDefaultInvoker)dm.CreateDelegate(typeof(Interface.loadDefaultInvoker));
+				Interface.DefaultValuesLoader[styleKey] (this);
+			} catch (Exception ex) {
+				throw new Exception ("Error applying style <" + styleKey + ">:", ex);
+			}
 		}
 
 		public virtual GraphicObject FindByName(string nameToFind){
@@ -723,7 +752,7 @@ namespace Crow
 			get { return layoutingTries; }
 			set { layoutingTries = value; }
 		}
-		protected Size contentSize;
+		internal Size contentSize;
 		/// <summary> return size of content + margins </summary>
 		protected virtual int measureRawSize (LayoutingType lt) {
 			return lt == LayoutingType.Width ?
