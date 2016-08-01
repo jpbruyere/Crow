@@ -412,7 +412,7 @@ namespace Crow
 
 				if (_isVisible)
 					RegisterForLayouting (LayoutingType.Sizing);
-				RegisterForGraphicUpdate ();
+				Interface.CurrentInterface.EnqueueForRepaint (this);
 
 				NotifyValueChanged ("Visible", _isVisible);
 			}
