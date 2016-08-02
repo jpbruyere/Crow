@@ -92,13 +92,6 @@ namespace Crow
 			return child == goToFind ? true : 
 				child == null ? false : child.Contains(goToFind);
 		}
-		public override void ChildrenLayoutingConstraints (ref LayoutingType layoutType)
-		{			
-			if (Width == Measure.Fit)
-				layoutType &= (~LayoutingType.X);
-			if (Height == Measure.Fit)
-				layoutType &= (~LayoutingType.Y);
-		}
 		public override bool UpdateLayout (LayoutingType layoutType)
 		{
 			if (child != null) {
