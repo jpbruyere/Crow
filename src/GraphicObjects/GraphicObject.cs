@@ -251,10 +251,12 @@ namespace Crow
 					//we should adapt contentSize
 					//TODO:check case when child become stretched, and another stretched item already exists.
 					if (_parent is GenericStack) {//TODO:check if I should test Group instead
-						if (lastWP == Measure.Fit)
-							(_parent as GenericStack).contentSize.Width -= this.LastSlots.Width;
-						else
-							(_parent as GenericStack).contentSize.Width += this.LastSlots.Width;
+						if ((_parent as GenericStack).Orientation == Orientation.Horizontal) {
+							if (lastWP == Measure.Fit)
+								(_parent as GenericStack).contentSize.Width -= this.LastSlots.Width;
+							else
+								(_parent as GenericStack).contentSize.Width += this.LastSlots.Width;
+						}
 					}
 				}
 
@@ -277,10 +279,12 @@ namespace Crow
 				if (HeightPolicy != lastHP) {
 					NotifyValueChanged ("HeightPolicy", HeightPolicy);
 					if (_parent is GenericStack) {
-						if (lastHP == Measure.Fit)
-							(_parent as GenericStack).contentSize.Height -= this.LastSlots.Height;
-						else
-							(_parent as GenericStack).contentSize.Height += this.LastSlots.Height;
+						if ((_parent as GenericStack).Orientation == Orientation.Vertical) {
+							if (lastHP == Measure.Fit)
+								(_parent as GenericStack).contentSize.Height -= this.LastSlots.Height;
+							else
+								(_parent as GenericStack).contentSize.Height += this.LastSlots.Height;
+						}
 					}
 				}
 
