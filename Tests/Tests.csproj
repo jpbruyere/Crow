@@ -52,7 +52,6 @@
     </Reference>
     <Reference Include="glib-sharp">
       <HintPath>$(SolutionDir)packages\GtkSharp.3.1.3\lib\net45\glib-sharp.dll</HintPath>
-      <Package>glib-sharp-3.0</Package>
     </Reference>
     <Reference Include="OpenTK">
       <HintPath>$(SolutionDir)packages\OpenTK.Next.1.2.2336.6514-pre\lib\net20\OpenTK.dll</HintPath>
@@ -69,6 +68,7 @@
     <Compile Include="OpenGL\Texture.cs" />
     <Compile Include="HelloWorld.cs" />
     <Compile Include="HelloCube.cs" />
+    <Compile Include="UIEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -323,9 +323,6 @@
     <None Include="Interfaces\Unsorted\test6.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Interfaces\Unsorted\test4.1.crow">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Interfaces\Unsorted\testMsgBox.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -347,13 +344,10 @@
     <None Include="Interfaces\Unsorted\testTypeViewer.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Interfaces\Unsorted\testLabel.crow">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Interfaces\Unsorted\testRadioButton2.crow">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Interfaces\Unsorted\testTreeView.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Unsorted\0.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

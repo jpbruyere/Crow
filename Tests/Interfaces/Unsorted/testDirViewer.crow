@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-	<VerticalStack Height="Fit" Width="Fit" Name="hstack" Margin="0" Spacing="Stretched">
+	<VerticalStack Height="Fit" Width="Fit" Name="hstack" Margin="0" Spacing="0">
 		<Border Height="Fit" Width="200" BorderWidth="2" CornerRadius="10">
 			<Label Name="labName" Text="{Name}" Width="Stretched" Height="Fit"/>
 		</Border>
@@ -15,7 +15,7 @@
 						 Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Scroll}">
 							<VerticalStack Width="{../../../../WidthPolicy}" Height="Fit" Name="List" Margin="0" VerticalAlignment="Top"/>
 						</Scroller>
-						<Scrollbar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" MaximumScroll="{../scroller1.MaximumScroll}"
+						<ScrollBar Name="scrollbar1" Scroll="{../scroller1.ScrollY}" MaximumScroll="{../scroller1.MaximumScroll}"
 							Orientation="Vertical" Width="10" Height="{../../../HeightPolicy}" />
 					</HorizontalStack>
 				</Border>

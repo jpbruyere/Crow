@@ -1,2 +1,2 @@
 ﻿<?xml version="1.0"?>
-<TreeView Height="400" Width="200" Data="{List2}" ItemTemplate="#Crow.Templates.TreeViewItem.crow"/>
+<TreeView Height="400" Width="200" Data="{List2}" ItemTemplate="#Crow.Templates.TreeItem.crow"/>

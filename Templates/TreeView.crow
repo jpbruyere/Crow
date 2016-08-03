@@ -1,7 +1,7 @@
 <Border Background="DimGray" BorderWidth="1" Margin="1" MinimumSize="100,100"
 		Width="{../WidthPolicy}" Height="{../HeightPolicy}">
-	<VerticalStack
-			Height="0" Width="0" Name="List" Margin="0" VerticalAlignment="Top"/>
+	<VerticalStack Width="{../WidthPolicy}" Height="{../HeightPolicy}"
+			 Name="List" Margin="0" VerticalAlignment="Top"/>
 
 </Border>
 
