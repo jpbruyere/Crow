@@ -22,7 +22,6 @@ using System;
 using System.Collections;
 using System.Xml.Serialization;
 using System.ComponentModel;
-//TODO: implement ItemTemplate node in xml
 using System.IO;
 using System.Diagnostics;
 using System.Xml;
@@ -47,11 +46,11 @@ namespace Crow
 		IList data;
 		int _selectedIndex;
 		string _itemTemplate;
-		int itemPerPage = 20;
-		MemoryStream templateStream = null;
-		Type templateBaseType = null;
+		int itemPerPage = 50;
 		Thread loadingThread = null;
 		volatile bool cancelLoading = false;
+
+		IMLStream templateStream = null;
 
 		[XmlAttributeAttribute]public IList Data {
 			get {
@@ -133,12 +132,7 @@ namespace Crow
 		}
 		#endregion
 		void loading(){			
-			lock (Interface.CurrentInterface.UpdateMutex) {
-				templateStream = new MemoryStream ();
-				using (Stream stream = Interface.GetStreamFromPath (ItemTemplate))
-					stream.CopyTo (templateStream);
-				templateBaseType = Interface.GetTopContainerOfXMLStream (templateStream);
-			}
+			templateStream = new IMLStream (ItemTemplate);
 			for (int i = 1; i <= (data.Count / itemPerPage) + 1; i++) {
 				if (cancelLoading)
 					return;
@@ -180,8 +174,8 @@ namespace Crow
 					break;
 				if (cancelLoading)
 					return;
-				templateStream.Seek (0, SeekOrigin.Begin);
-				GraphicObject g = Interface.Load (templateStream, templateBaseType);
+
+				GraphicObject g = Interface.Load (templateStream);
 				g.MouseClick += itemClick;
 
 				lock (Interface.CurrentInterface.UpdateMutex)

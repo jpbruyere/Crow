@@ -232,6 +232,10 @@ namespace Crow
 
 			return tmp;
 		}
+		internal static GraphicObject Load (IMLStream stream, object hostClass = null){
+			stream.Seek (0, SeekOrigin.Begin);
+			return Load(stream, stream.RootType, hostClass);
+		}
 		internal static GraphicObject Load (Stream stream, Type type, object hostClass = null)
 		{
 			#if DEBUG_LOAD

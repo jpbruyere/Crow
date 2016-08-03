@@ -134,6 +134,7 @@
     <Compile Include="src\CompilerServices\MemberReference.cs" />
     <Compile Include="src\CompilerServices\Bindings.cs" />
     <Compile Include="src\StyleReader.cs" />
+    <Compile Include="src\IMLStream.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
