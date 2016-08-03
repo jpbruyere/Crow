@@ -32,11 +32,14 @@ using System.Threading;
 namespace Crow
 {
 	[DefaultTemplate("#Crow.Templates.ListBox.goml")]
-	//[DefaultTemplate("#Crow.Templates.ItemTemplate.goml")]
-	public class ListBox : TemplatedControl//, IXmlSerializable
+	public class ListBox : TemplatedControl
 	{
 		#region CTOR
 		public ListBox () : base() {}
+		#endregion
+
+		#region events
+		public event EventHandler<SelectionChangeEventArgs> SelectedItemChanged;
 		#endregion
 
 		Group _list;
@@ -44,22 +47,45 @@ namespace Crow
 		IList data;
 		int _selectedIndex;
 		string _itemTemplate;
+		int itemPerPage = 100;
+		MemoryStream templateStream = null;
+		Type templateBaseType = null;
+		Thread loadingThread = null;
+		volatile bool cancelLoading = false;
 
-		public event EventHandler<SelectionChangeEventArgs> SelectedItemChanged;
+		[XmlAttributeAttribute]public IList Data {
+			get {
+				return data;
+			}
+			set {
+				if (value == data)
+					return;
+				
+				cancelLoadingThread ();
 
-		#region implemented abstract members of TemplatedControl
-		protected override void loadTemplate (GraphicObject template = null)
-		{
-			base.loadTemplate (template);
-			_list = this.child.FindByName ("List") as Group;
-			if (_list == null)
-				throw new Exception ("ListBox Template MUST contain a Goup named 'List'.");
-			_gsList = _list as GenericStack;
+				data = value;
+
+				NotifyValueChanged ("Data", data);
+
+				_list.ClearChildren ();
+				if (_gsList.Orientation == Orientation.Horizontal)
+					_gsList.Width = -1;
+				else
+					_gsList.Height = -1;
+
+				if (data == null)
+					return;
+
+				loadingThread = new Thread (loading);
+				loadingThread.IsBackground = true;
+				loadingThread.Start ();
+				//loadPage(1);
+
+				NotifyValueChanged ("SelectedIndex", _selectedIndex);
+				NotifyValueChanged ("SelectedItem", SelectedItem);
+				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
+			}
 		}
-
-
-		#endregion
-
 		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ItemTemplate.goml")]
 		public string ItemTemplate {
 			get { return _itemTemplate; }
@@ -78,13 +104,12 @@ namespace Crow
 				NotifyValueChanged("ItemTemplate", _itemTemplate);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(-1)]
-		public int SelectedIndex{
+		[XmlAttributeAttribute][DefaultValue(-1)]public int SelectedIndex{
 			get { return _selectedIndex; }
 			set { 
 				if (value == _selectedIndex)
 					return;
-				
+
 				_selectedIndex = value; 
 
 				NotifyValueChanged ("SelectedIndex", _selectedIndex);
@@ -92,42 +117,33 @@ namespace Crow
 				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
 			}
 		}
-		public object SelectedItem{
+		[XmlIgnore]public object SelectedItem{
 			get { return data == null ? null : _selectedIndex < 0 ? null : data[_selectedIndex]; }
 		}
-		[XmlAttributeAttribute]//[DefaultValue(null)]
-		public IList Data {
-			get {
-				return data;
-			}
-			set {
-				if (value == data)
-					return;
-				
-				data = value;
-
-				NotifyValueChanged ("Data", data);
-
-				_list.ClearChildren ();
-				if (_gsList.Orientation == Orientation.Horizontal)
-					_gsList.Width = -1;
-				else
-					_gsList.Height = -1;
-
-				if (data == null)
-					return;
-
-				loadPage (1);
-
-				NotifyValueChanged ("SelectedIndex", _selectedIndex);
-				NotifyValueChanged ("SelectedItem", SelectedItem);
-				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
-			}
+			
+		#region implemented abstract members of TemplatedControl
+		protected override void loadTemplate (GraphicObject template = null)
+		{
+			base.loadTemplate (template);
+			_list = this.child.FindByName ("List") as Group;
+			if (_list == null)
+				throw new Exception ("ListBox Template MUST contain a Goup widget named 'List'.");
+			_gsList = _list as GenericStack;
 		}
-		int itemPerPage = 50;
-		MemoryStream templateStream = null;
-		Type templateBaseType = null;
-
+		#endregion
+		void loading(){
+			for (int i = 1; i <= (data.Count / itemPerPage)+1; i++)
+				loadPage (i);
+		}
+		void cancelLoadingThread(){
+			if (loadingThread == null)
+				return;
+			if (!loadingThread.IsAlive)
+				return;
+			cancelLoading = true;
+			loadingThread.Join ();
+			cancelLoading = false;
+		}
 		void loadPage(int pageNum)
 		{
 			#if DEBUG_LOAD
@@ -144,66 +160,44 @@ namespace Crow
 				templateBaseType = Interface.GetTopContainerOfXMLStream (templateStream);
 			}
 
-			lock (Interface.CurrentInterface.UpdateMutex) {
-				
-				Group page = _list.Clone () as Group;
-				page.Name = "page" + pageNum;
-				//page.Background = Color.Green;
+			Group page = _list.Clone () as Group;
+			
+			page.Name = "page" + pageNum;
 
-				//reset size to fit in the dir of the stacking
-				//because _list total size is forced to approx size
-				if (_gsList.Orientation == Orientation.Horizontal) {
-					page.Width = -1;
-				} else {
-					page.Height = -1;
-//					Bindings.Add(new Binding 
-//						(new MemberReference (page, typeof(GraphicObject).GetMember ("Width")[0]), "../../WidthPolicy"));
-					//page.Bindings.Add(new Binding (page, "Width", "../../WidthPolicy"));
-					page.BindMember("Width", "../WidthPolicy");
-				}
-
-				for (int i = (pageNum - 1) * itemPerPage; i < pageNum * itemPerPage; i++) {
-					if (i >= data.Count)
-						break;
-					templateStream.Seek (0, SeekOrigin.Begin);
-					GraphicObject g = Interface.Load (templateStream, templateBaseType);
-					g.MouseClick += itemClick;
-					page.AddChild (g);
-					g.DataSource = data [i];
-					//g.LogicalParent = this;
-				}
-
-				_list.AddChild (page);
+			//reset size to fit in the dir of the stacking
+			//because _list total size is forced to approx size
+			if (_gsList.Orientation == Orientation.Horizontal) {
+				page.Width = Measure.Fit;
+				page.BindMember ("Height", "../HeightPolicy");
+			} else {
+				page.Height = Measure.Fit;
+				page.BindMember ("Width", "../WidthPolicy");
 			}
+
+			for (int i = (pageNum - 1) * itemPerPage; i < pageNum * itemPerPage; i++) {
+				if (i >= data.Count)
+					break;
+				if (cancelLoading == true)
+					return;
+				templateStream.Seek (0, SeekOrigin.Begin);
+				GraphicObject g = Interface.Load (templateStream, templateBaseType);
+				g.MouseClick += itemClick;
+
+				lock (Interface.CurrentInterface.UpdateMutex)
+					page.AddChild (g);
+				g.DataSource = data [i];
+				//g.LogicalParent = this;
+			}
+
+			lock (Interface.CurrentInterface.UpdateMutex)
+				_list.AddChild (page);
+				
 			#if DEBUG_LOAD
 			loadingTime.Stop ();
 			Debug.WriteLine("Listbox {2} Loading: {0} ticks \t, {1} ms",
 			loadingTime.ElapsedTicks,
 			loadingTime.ElapsedMilliseconds, this.ToString());
 			#endif
-		}
-		protected void _scroller_ValueChanged (object sender, ValueChangeEventArgs e)
-		{
-			if (_gsList == null)
-				return;
-			if (data == null)
-				return;
-			if (data.Count <= itemPerPage)
-				return;
-
-			if (_gsList.Orientation == Orientation.Horizontal) {
-			} else {
-				if (!string.Equals (e.MemberName, "ScrollY"))
-					return;
-
-				double scroll = (double)e.NewValue;
-				int pageHeight = (int)Math.Ceiling((double)_gsList.getSlot().Height / (double)data.Count * (double)itemPerPage);
-				int pagePtr = (int)Math.Ceiling((scroll + (double)pageHeight / 2.0) / (double)pageHeight);
-
-				for (int i = _gsList.Children.Count+1; i < pagePtr+1; i++) {
-					loadPage (i);					
-				}
-			}
 		}
 		protected void _list_LayoutChanged (object sender, LayoutingEventArgs e)
 		{
@@ -223,7 +217,7 @@ namespace Crow
 					return -1;
 				GenericStack page1 = _list.FindByName ("page1") as GenericStack;
 				if (page1 == null)
-					return - 1;
+					return -1;
 				
 				return page1.Orientation == Orientation.Horizontal ?
 					data.Count < itemPerPage ?
