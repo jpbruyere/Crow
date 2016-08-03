@@ -362,5 +362,12 @@ namespace Crow
 				c.ClearBinding ();
 			base.ClearBinding ();
 		}
+		public override GraphicObject DeepClone ()
+		{
+			Group tmp = base.DeepClone () as Group;
+			foreach (GraphicObject c in Children)
+				tmp.AddChild (c.DeepClone ());
+			return tmp;
+		}
 	}
 }

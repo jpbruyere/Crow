@@ -49,17 +49,7 @@ namespace Crow
 				caption = value; 
 				NotifyValueChanged ("Caption", caption);
 			}
-		}        
-		[XmlAttributeAttribute()][DefaultValue("#Crow.Images.Icons.checkbox.svg")]
-		public string Image {
-			get { return image; } 
-			set {
-				if (image == value)
-					return;
-				image = value; 
-				NotifyValueChanged ("Image", image);
-			}
-		} 
+		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public bool IsChecked
 		{

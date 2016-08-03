@@ -1443,17 +1443,20 @@ namespace Crow
 					continue;
 				if (pi.Name == "DataSource")
 					continue;
-//				object[] att = pi.GetCustomAttributes (false);
-//				foreach (object o in att) {
-//					XmlIgnoreAttribute xia = o as XmlIgnoreAttribute;
-//					if (xia != null)
-//						continue;
-//				}
 
 				pi.SetValue(result, pi.GetValue(this));
 			}
 			return result;
 		}
 		#endregion
+		/// <summary>
+		/// full GraphicTree clone with binding definition
+		/// </summary>
+		public virtual GraphicObject DeepClone(){
+			GraphicObject tmp = Clone () as GraphicObject;
+			foreach (Binding b in this.bindings)
+				tmp.Bindings.Add (new Binding (new MemberReference (tmp, b.Source.Member), b.Expression));
+			return tmp;
+		}
 	}
 }
