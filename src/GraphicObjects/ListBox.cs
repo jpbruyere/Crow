@@ -45,12 +45,9 @@ namespace Crow
 		GenericStack _gsList;
 		IList data;
 		int _selectedIndex;
-		string _itemTemplate;
 		int itemPerPage = 50;
 		Thread loadingThread = null;
 		volatile bool cancelLoading = false;
-
-		IMLStream templateStream = null;
 
 		[XmlAttributeAttribute]public IList Data {
 			get {
@@ -86,24 +83,7 @@ namespace Crow
 				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ItemTemplate.goml")]
-		public string ItemTemplate {
-			get { return _itemTemplate; }
-			set { 
-				if (value == _itemTemplate)
-					return;
 
-				_itemTemplate = value;
-
-				if (templateStream != null) {
-					templateStream.Dispose ();
-					templateStream = null;
-				}
-
-				//TODO:reload list with new template?
-				NotifyValueChanged("ItemTemplate", _itemTemplate);
-			}
-		}
 		[XmlAttributeAttribute][DefaultValue(-1)]public int SelectedIndex{
 			get { return _selectedIndex; }
 			set { 
@@ -131,8 +111,12 @@ namespace Crow
 			_gsList = _list as GenericStack;
 		}
 		#endregion
-		void loading(){			
-			templateStream = new IMLStream (ItemTemplate);
+		void loading(){
+			if (itemTemplates == null) {
+				itemTemplates = new Dictionary<string, IMLStream> ();
+				//TODO:check encoding
+				itemTemplates["default"] = new IMLStream (ItemTemplate);
+			}
 			for (int i = 1; i <= (data.Count / itemPerPage) + 1; i++) {
 				if (cancelLoading)
 					return;
@@ -174,8 +158,14 @@ namespace Crow
 					break;
 				if (cancelLoading)
 					return;
+				
+				GraphicObject g = null;
+				Type dataType = data [i].GetType ();
+				if (itemTemplates.ContainsKey (dataType.FullName))
+					g = Interface.Load (itemTemplates [dataType.FullName]);
+				else if (itemTemplates.ContainsKey ("default"))
+					g = Interface.Load (itemTemplates ["default"]);				
 
-				GraphicObject g = Interface.Load (templateStream);
 				g.MouseClick += itemClick;
 
 				lock (Interface.CurrentInterface.UpdateMutex)

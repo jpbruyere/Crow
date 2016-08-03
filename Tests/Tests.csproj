@@ -45,7 +45,7 @@
 	<Reference Include="gdk-sharp"/>
 	<Reference Include="gio-sharp"/>
 	<Reference Include="glib-sharp"/>
-	<Reference Include="OpenTK">
+    <Reference Include="OpenTK">
       <HintPath>$(SolutionDir)packages\OpenTK.Next.1.2.2336.6514-pre\lib\net20\OpenTK.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -339,6 +339,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Interfaces\Unsorted\0.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Unsorted\testItemTemplateTag.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

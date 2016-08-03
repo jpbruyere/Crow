@@ -30,6 +30,9 @@ namespace Crow
 				stream.CopyTo (this);
 			RootType = Interface.GetTopContainerOfXMLStream (this);
 		}
+		public IMLStream(Byte[] b) : base (b){			
+			RootType = Interface.GetTopContainerOfXMLStream (this);
+		}
 	}
 }
 
