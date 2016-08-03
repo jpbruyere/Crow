@@ -47,7 +47,7 @@ namespace Crow
 		IList data;
 		int _selectedIndex;
 		string _itemTemplate;
-		int itemPerPage = 100;
+		int itemPerPage = 20;
 		MemoryStream templateStream = null;
 		Type templateBaseType = null;
 		Thread loadingThread = null;
@@ -67,7 +67,8 @@ namespace Crow
 
 				NotifyValueChanged ("Data", data);
 
-				_list.ClearChildren ();
+				lock (Interface.CurrentInterface.UpdateMutex)
+					_list.ClearChildren ();
 				if (_gsList.Orientation == Orientation.Horizontal)
 					_gsList.Width = -1;
 				else
@@ -131,15 +132,24 @@ namespace Crow
 			_gsList = _list as GenericStack;
 		}
 		#endregion
-		void loading(){
-			for (int i = 1; i <= (data.Count / itemPerPage)+1; i++)
+		void loading(){			
+			lock (Interface.CurrentInterface.UpdateMutex) {
+				templateStream = new MemoryStream ();
+				using (Stream stream = Interface.GetStreamFromPath (ItemTemplate))
+					stream.CopyTo (templateStream);
+				templateBaseType = Interface.GetTopContainerOfXMLStream (templateStream);
+			}
+			for (int i = 1; i <= (data.Count / itemPerPage) + 1; i++) {
+				if (cancelLoading)
+					return;
 				loadPage (i);
+			}
 		}
 		void cancelLoadingThread(){
 			if (loadingThread == null)
 				return;
 			if (!loadingThread.IsAlive)
-				return;
+				return;			
 			cancelLoading = true;
 			loadingThread.Join ();
 			cancelLoading = false;
@@ -150,15 +160,6 @@ namespace Crow
 			Stopwatch loadingTime = new Stopwatch ();
 			loadingTime.Start ();
 			#endif
-
-			if (templateStream == null) {
-				templateStream = new MemoryStream ();
-				lock (ItemTemplate) {
-					using (Stream stream = Interface.GetStreamFromPath (ItemTemplate))
-						stream.CopyTo (templateStream);
-				}
-				templateBaseType = Interface.GetTopContainerOfXMLStream (templateStream);
-			}
 
 			Group page = _list.Clone () as Group;
 			
@@ -177,7 +178,7 @@ namespace Crow
 			for (int i = (pageNum - 1) * itemPerPage; i < pageNum * itemPerPage; i++) {
 				if (i >= data.Count)
 					break;
-				if (cancelLoading == true)
+				if (cancelLoading)
 					return;
 				templateStream.Seek (0, SeekOrigin.Begin);
 				GraphicObject g = Interface.Load (templateStream, templateBaseType);
