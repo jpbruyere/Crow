@@ -19,16 +19,8 @@ using System.Collections.Generic;
 
 namespace test2
 {
-	class GOLIBTest_DirViewer : OpenTKGameWindow, IValueChange
+	class GOLIBTest_DirViewer : OpenTKGameWindow
 	{
-		#region IValueChange implementation
-		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-		public void NotifyValueChanged(string name, object value)
-		{
-			ValueChanged.Raise (this, new ValueChangeEventArgs (name, value));
-		}
-		#endregion
-
 		public GOLIBTest_DirViewer ()
 			: base(1024, 600,"test")
 		{}

@@ -41,25 +41,15 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Drawing" />
-    <Reference Include="cairo-sharp">
-      <HintPath>$(SolutionDir)packages\GtkSharp.3.1.3\lib\net45\cairo-sharp.dll</HintPath>
-    </Reference>
-    <Reference Include="gdk-sharp">
-      <HintPath>$(SolutionDir)packages\GtkSharp.3.1.3\lib\net45\gdk-sharp.dll</HintPath>
-    </Reference>
-    <Reference Include="gio-sharp">
-      <HintPath>$(SolutionDir)packages\GtkSharp.3.1.3\lib\net45\gio-sharp.dll</HintPath>
-    </Reference>
-    <Reference Include="glib-sharp">
-      <HintPath>$(SolutionDir)packages\GtkSharp.3.1.3\lib\net45\glib-sharp.dll</HintPath>
-      <Package>glib-sharp-3.0</Package>
-    </Reference>
+	<Reference Include="cairo-sharp"/>
+	<Reference Include="gdk-sharp"/>
+	<Reference Include="gio-sharp"/>
+	<Reference Include="glib-sharp"/>
     <Reference Include="OpenTK">
       <HintPath>$(SolutionDir)packages\OpenTK.Next.1.2.2336.6514-pre\lib\net20\OpenTK.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)packages\GtkSharp.3.1.3\build\net45\GtkSharp.targets" Condition="Exists('$(SolutionDir)packages\GtkSharp.3.1.3\build\net45\GtkSharp.targets')" />
   <ItemGroup>
     <Compile Include="Interfaces\testBorder.goml.cs" />
     <Compile Include="BasicTests.cs" />
@@ -69,6 +59,7 @@
     <Compile Include="OpenGL\Texture.cs" />
     <Compile Include="HelloWorld.cs" />
     <Compile Include="HelloCube.cs" />
+    <Compile Include="UIEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -317,13 +308,7 @@
     <None Include="Interfaces\Unsorted\testColorList.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Interfaces\Unsorted\test4.crow">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Interfaces\Unsorted\test6.crow">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Interfaces\Unsorted\test4.1.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Interfaces\Unsorted\testMsgBox.crow">
@@ -347,13 +332,13 @@
     <None Include="Interfaces\Unsorted\testTypeViewer.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Interfaces\Unsorted\testLabel.crow">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Interfaces\Unsorted\testRadioButton2.crow">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Interfaces\Unsorted\testTreeView.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Unsorted\0.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Unsorted\testItemTemplateTag.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -384,6 +369,7 @@
     <EmbeddedResource Include="ui\LabelButton.style" />
     <EmbeddedResource Include="ui\Popper.template" />
     <EmbeddedResource Include="ui\MenuItem.style" />
+    <EmbeddedResource Include="test.style" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">

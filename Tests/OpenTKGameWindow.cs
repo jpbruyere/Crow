@@ -61,11 +61,13 @@ namespace Crow
 				ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
 				#if MEASURE_TIME
 				ValueChanged.Raise (this, new ValueChangeEventArgs ("update",
-					this.CrowInterface.clippingTime.ElapsedTicks.ToString () + " ticks"));
+					this.CrowInterface.updateTime.ElapsedTicks.ToString () + " ticks"));
 				ValueChanged.Raise (this, new ValueChangeEventArgs ("layouting",
 					this.CrowInterface.layoutTime.ElapsedTicks.ToString () + " ticks"));
 				ValueChanged.Raise (this, new ValueChangeEventArgs ("drawing",
 					this.CrowInterface.drawingTime.ElapsedTicks.ToString () + " ticks"));
+				ValueChanged.Raise (this, new ValueChangeEventArgs ("clipping",
+					this.CrowInterface.clippingTime.ElapsedTicks.ToString () + " ticks"));
 				#endif
 			}
 		}
@@ -82,6 +84,7 @@ namespace Crow
 		public string update = "";
 		public string drawing = "";
 		public string layouting = "";
+		public string clipping = "";
 		#endregion
 
 		#region ctor

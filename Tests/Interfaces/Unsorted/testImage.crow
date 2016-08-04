@@ -3,7 +3,7 @@
 	<HorizontalStack Fit="true" Background="hgradient|0:DarkRed|1:Transparent" Margin="5">
 		<Label Text="SCALED PROPORTIONNAL" Width="150"/>
 		<Image Width="50%" Height="Fit" Background="vgradient|0:SkyBlue|1:White" Path="#Tests.image.crow0.svg"/>
-<!--		<Image Margin="10" Background="vgradient|0:SkyBlue|1:White" Path="#Tests.image.crow0.svg" />
+		<Image Margin="10" Background="vgradient|0:SkyBlue|1:White" Path="#Tests.image.crow0.svg" />
 		<Image Background="vgradient|0:SkyBlue|1:White" Width="20" Height="20" Path="#Tests.image.crow0.svg" />
 		<Image Margin="2" Background="vgradient|0:SkyBlue|1:White" Width="20" Height="20" Path="#Tests.image.crow0.svg" />
 		<Image Background="vgradient|0:SkyBlue|1:White" Width="50" Height="100" Path="#Tests.image.crow0.svg" />
@@ -11,9 +11,9 @@
 		<Image Background="vgradient|0:SkyBlue|1:White" Width="100" Height="50" Path="#Tests.image.crow0.svg" />
 		<Image Margin="10" Background="vgradient|0:SkyBlue|1:White" Width="100" Height="50" Path="#Tests.image.crow0.svg" />
 		<Image Background="vgradient|0:SkyBlue|1:White" Width="50" Height="Fit" Path="#Tests.image.crow0.svg" />
-		<Image Margin="10" Background="vgradient|0:SkyBlue|1:White" Width="50" Height="Fit" Path="#Tests.image.crow0.svg" />-->
+		<Image Margin="10" Background="vgradient|0:SkyBlue|1:White" Width="50" Height="Fit" Path="#Tests.image.crow0.svg" />
 	</HorizontalStack>
-<!--	<HorizontalStack Fit="true" Background="hgradient|0:DarkRed|1:Transparent" Margin="5">
+	<HorizontalStack Fit="true" Background="hgradient|0:DarkRed|1:Transparent" Margin="5">
 		<Label Text="SCALED NOT PROPORTIONNAL" Width="150"/>
 		<Image KeepProportions="false" Background="vgradient|0:SkyBlue|1:White" Path="#Tests.image.crow0.svg" />
 		<Image KeepProportions="false" Margin="10" Background="vgradient|0:SkyBlue|1:White" Path="#Tests.image.crow0.svg" />
@@ -83,5 +83,5 @@
 		<Image Margin="10" Background="White" Path="#Tests.image.crow0.svg" />
 		<Image Background="White" Width="20" Height="10" Path="#Tests.image.crow0.svg" />
 		<Image Margin="1" Background="White" Width="20" Height="10" Path="#Tests.image.crow0.svg" />
-	</HorizontalStack>-->
+	</HorizontalStack>
 </VerticalStack>

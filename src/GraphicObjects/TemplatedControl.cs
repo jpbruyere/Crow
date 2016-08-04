@@ -25,6 +25,8 @@ using System.IO;
 using System.Xml;
 using System.Diagnostics;
 using System.Linq;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Crow
 {
@@ -61,6 +63,8 @@ namespace Crow
 		#endregion
 
 		string _template;
+		string _itemTemplate;
+		protected Dictionary<string, IMLStream> itemTemplates;
 
 		[XmlAttributeAttribute][DefaultValue(null)]
 		public string Template {
@@ -76,7 +80,19 @@ namespace Crow
 					loadTemplate (Interface.Load (_template, this));
 			}
 		}
+		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ItemTemplate.goml")]
+		public string ItemTemplate {
+			get { return _itemTemplate; }
+			set { 
+				if (value == _itemTemplate)
+					return;
 
+				_itemTemplate = value;
+
+				//TODO:reload list with new template?
+				NotifyValueChanged("ItemTemplate", _itemTemplate);
+			}
+		}
 		#region GraphicObject overrides
 		public override GraphicObject FindByName (string nameToFind)
 		{
@@ -115,12 +131,33 @@ namespace Crow
 					using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
 						//load template first if inlined
 
-						xr.Read (); //skip current node
+						xr.Read (); //read first child
+						xr.Read (); //skip root node
 
-						while (!xr.EOF) {
-							xr.Read (); //read first child
-							if (!xr.IsStartElement ())
+						while (!xr.EOF) {							
+							if (!xr.IsStartElement ()) {
+								xr.Read ();
 								continue;
+							}
+							if (xr.Name == "ItemTemplate") {
+								string dataType = "default", datas = "", itemTmp;
+								while (xr.MoveToNextAttribute ()) {
+									if (xr.Name == "DataType")
+										dataType = xr.Value;
+									else if (xr.Name == "Data")
+										datas = xr.Value;
+								}
+								xr.MoveToElement ();
+								itemTmp = xr.ReadInnerXml ();
+
+								if (itemTemplates == null)
+									itemTemplates = new Dictionary<string, IMLStream> ();
+								//TODO:check encoding
+								itemTemplates[dataType] = new IMLStream (Encoding.UTF8.GetBytes(itemTmp));
+								itemTemplates [dataType].Datas = datas;
+
+								continue;
+							}
 							if (xr.Name == "Template") {
 								xr.Read ();
 
@@ -129,12 +166,9 @@ namespace Crow
 								(go as IXmlSerializable).ReadXml (xr);
 
 								loadTemplate (go);
-
-								xr.Read ();//go close tag
-								xr.Read ();//Template close tag
-								break;
-							} else
-								xr.ReadInnerXml ();
+								continue;
+							}
+							xr.ReadInnerXml ();
 						}
 					}
 				} else
@@ -143,7 +177,7 @@ namespace Crow
 				//if no template found, load default one
 				if (this.child == null)
 					loadTemplate ();
-
+				
 				//normal xml read
 				using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
 					xr.Read ();

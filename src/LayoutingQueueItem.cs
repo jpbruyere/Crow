@@ -45,6 +45,8 @@ namespace Crow
 		public ILayoutable GraphicObject;
 		/// <summary> Bitfield containing the element of the layout to performs (x|y|width|height)</summary>
 		public LayoutingType LayoutType;
+		/// <summary> Unsuccessfull UpdateLayout and requeueing count </summary>
+		public int LayoutingTries, DiscardCount;
 
 		#region CTOR
 		public LayoutingQueueItem (LayoutingType _layoutType, ILayoutable _graphicObject)
@@ -58,7 +60,7 @@ namespace Crow
 
 		public void ProcessLayouting()
 		{
-			if (GraphicObject.Parent == null) {
+			if (GraphicObject.Parent == null) {//TODO:improve this
 				//cancel layouting for object without parent, maybe some were in queue when
 				//removed from a listbox
 				Debug.WriteLine ("ERROR: processLayouting, no parent for: " + this.ToString ());
@@ -68,16 +70,29 @@ namespace Crow
 			Debug.WriteLine ("Layouting => " + this.ToString ());
 			#endif
 			if (!GraphicObject.UpdateLayout (LayoutType)) {
-				#if DEBUG_LAYOUTING
-				Debug.WriteLine ("\tRequeuing => " + this.ToString ());
-				#endif
-				GraphicObject.LayoutingTries ++;
-				if (GraphicObject.LayoutingTries < Interface.MaxLayoutingTries) {
+				if (LayoutingTries < Interface.MaxLayoutingTries) {
+					#if DEBUG_LAYOUTING
+					Debug.WriteLine ("\tRequeuing  => " + this.ToString ());
+					#endif
+					LayoutingTries++;
 					GraphicObject.RegisteredLayoutings |= LayoutType;
 					Interface.CurrentInterface.LayoutingQueue.Enqueue (this);
+				} else if (DiscardCount < Interface.MaxDiscardCount) {
+					#if DEBUG_LAYOUTING
+					Debug.WriteLine ("\tDiscarding => " + this.ToString ());
+					#endif
+					LayoutingTries = 0;
+					DiscardCount++;
+					GraphicObject.RegisteredLayoutings |= LayoutType;
+					Interface.CurrentInterface.DiscardQueue.Enqueue (this);
 				}
+				//#if DEBUG_LAYOUTING
+				else
+					Debug.WriteLine ("\tDELETED    => " + this.ToString ());
+				//#endif
 			} else {
-				GraphicObject.LayoutingTries = 0;
+				DiscardCount = 0;
+				LayoutingTries = 0;
 			}
 		}
 

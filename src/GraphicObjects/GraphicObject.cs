@@ -25,9 +25,6 @@ namespace Crow
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
 
-
-		internal int layoutingTries = 0;
-
 		Rectangles clipping = new Rectangles();
 		public Rectangles Clipping { get { return clipping; }}
 
@@ -62,7 +59,7 @@ namespace Crow
 		#endregion
 
 		#region private fields
-		LayoutingType registeredLayoutings = LayoutingType.None;
+		LayoutingType registeredLayoutings = LayoutingType.All;
 		ILayoutable logicalParent;
 		ILayoutable _parent;
 		string _name = "unamed";
@@ -742,20 +739,18 @@ namespace Crow
 			bmp = null;
 			if (Width == Measure.Fit || Height == Measure.Fit)
 				RegisterForLayouting (LayoutingType.Sizing);
-			Interface.CurrentInterface.EnqueueForRepaint (this);
+			else if (RegisteredLayoutings == LayoutingType.None)
+				Interface.CurrentInterface.EnqueueForRepaint (this);
 		}
 		/// <summary> query an update of the content, a redraw </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForRedraw ()
 		{
 			bmp = null;
-			Interface.CurrentInterface.EnqueueForRepaint (this);
+			if (RegisteredLayoutings == LayoutingType.None)
+				Interface.CurrentInterface.EnqueueForRepaint (this);
 		}
 		#region Layouting
-		[XmlIgnore]public int LayoutingTries {
-			get { return layoutingTries; }
-			set { layoutingTries = value; }
-		}
 		internal Size contentSize;
 		/// <summary> return size of content + margins </summary>
 		protected virtual int measureRawSize (LayoutingType lt) {
@@ -1443,17 +1438,20 @@ namespace Crow
 					continue;
 				if (pi.Name == "DataSource")
 					continue;
-//				object[] att = pi.GetCustomAttributes (false);
-//				foreach (object o in att) {
-//					XmlIgnoreAttribute xia = o as XmlIgnoreAttribute;
-//					if (xia != null)
-//						continue;
-//				}
 
 				pi.SetValue(result, pi.GetValue(this));
 			}
 			return result;
 		}
 		#endregion
+		/// <summary>
+		/// full GraphicTree clone with binding definition
+		/// </summary>
+		public virtual GraphicObject DeepClone(){
+			GraphicObject tmp = Clone () as GraphicObject;
+			foreach (Binding b in this.bindings)
+				tmp.Bindings.Add (new Binding (new MemberReference (tmp, b.Source.Member), b.Expression));
+			return tmp;
+		}
 	}
 }

@@ -168,7 +168,9 @@ namespace Crow
 				Target = new MemberReference (tmp);
 			}
 			if (Target == null) {
+				#if DEBUG_BINDING
 				Debug.WriteLine ("Binding Source is null: " + Expression);
+				#endif
 				return false;
 			}
 
@@ -182,7 +184,9 @@ namespace Crow
 				return true;
 			}
 
+			#if DEBUG_BINDING
 			Debug.WriteLine ("Binding member not found: " + member);
+			#endif
 			Target = null;
 			return false;
 		}

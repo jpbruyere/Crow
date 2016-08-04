@@ -3,6 +3,7 @@ using Crow;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Reflection;
 
 
 namespace Tests
@@ -19,7 +20,10 @@ namespace Tests
 
 		#region Test values for Binding
 		public int intValue = 25;
-
+		DirectoryInfo curDir = new DirectoryInfo (Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+		public FileSystemInfo[] CurDirectory {
+			get { return curDir.GetFileSystemInfos (); }
+		}
 		public int IntValue {
 			get {
 				return intValue;
@@ -79,7 +83,6 @@ namespace Tests
 			this.KeyDown += KeyboardKeyDown1;
 
 			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Unsorted", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/basicTests", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
@@ -88,6 +91,7 @@ namespace Tests
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Splitter", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Expandable", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Unsorted", "*.crow")).ToArray ();
 
 			this.Title = testFiles [idx] + ". Press <F3> to switch example.";
 			CrowInterface.LoadInterface(testFiles[idx]).DataSource = this;
@@ -103,6 +107,10 @@ namespace Tests
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F4) {
 				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/testWindow.goml");
+				w.DataSource = this;
+				return;
+			} else if (e.Key == OpenTK.Input.Key.F5) {
+				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/testWindow2.goml");
 				w.DataSource = this;
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F2)

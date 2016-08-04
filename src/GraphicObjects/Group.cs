@@ -46,6 +46,7 @@ namespace Crow
 			Children.Add(g);
 			g.Parent = this as GraphicObject;
 			g.ResolveBindings ();
+			g.RegisteredLayoutings = LayoutingType.None;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 			g.LayoutChanged += OnChildLayoutChanges;
             return (T)child;
@@ -361,6 +362,13 @@ namespace Crow
 			foreach (GraphicObject c in Children)
 				c.ClearBinding ();
 			base.ClearBinding ();
+		}
+		public override GraphicObject DeepClone ()
+		{
+			Group tmp = base.DeepClone () as Group;
+			foreach (GraphicObject c in Children)
+				tmp.AddChild (c.DeepClone ());
+			return tmp;
 		}
 	}
 }

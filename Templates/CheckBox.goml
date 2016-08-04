@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0"?>
 <HorizontalStack Margin="1" Spacing="1" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
-	<Image Margin="2" Width="14"  Height="14" Path="{../../Image}" SvgSub="{../../IsChecked}"/>
+	<Image Margin="2" Width="14"  Height="14" Path="#Crow.Images.Icons.checkbox.svg"
+		SvgSub="{../../IsChecked}"/>
 	<Label Font="{../../Font}" Text="{../../Caption}" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}"/>
 </HorizontalStack>
