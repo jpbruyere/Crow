@@ -89,10 +89,13 @@ namespace Crow
 		internal bool XmlLoading = false;
 
 		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem> ();
+		public Queue<LayoutingQueueItem> ProcessedLayoutingQueue;
 		public Queue<GraphicObject> DrawingQueue = new Queue<GraphicObject>();
 		public string Clipboard;//TODO:use object instead for complex copy paste
 		public void EnqueueForRepaint(GraphicObject g)
 		{
+//			if (g.RegisteredLayoutings != LayoutingType.None)
+//				return;
 			lock (DrawingQueue) {
 				if (g.IsQueueForRedraw)
 					return;
@@ -405,6 +408,7 @@ namespace Crow
 					lqi.ProcessLayouting ();
 				}
 			}
+
 			#if MEASURE_TIME
 			layoutTime.Stop ();
 			#endif
@@ -499,6 +503,7 @@ namespace Crow
 		{
 			g.Parent = this;
 			GraphicTree.Insert (0, g);
+			g.RegisteredLayoutings = LayoutingType.None;
 			g.RegisterForLayouting (LayoutingType.Sizing);
 		}
 		public void DeleteWidget(GraphicObject g)

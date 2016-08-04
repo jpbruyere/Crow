@@ -46,6 +46,7 @@ namespace Crow
 			Children.Add(g);
 			g.Parent = this as GraphicObject;
 			g.ResolveBindings ();
+			g.RegisteredLayoutings = LayoutingType.None;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 			g.LayoutChanged += OnChildLayoutChanges;
             return (T)child;

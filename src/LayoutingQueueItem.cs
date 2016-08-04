@@ -45,6 +45,8 @@ namespace Crow
 		public ILayoutable GraphicObject;
 		/// <summary> Bitfield containing the element of the layout to performs (x|y|width|height)</summary>
 		public LayoutingType LayoutType;
+		/// <summary> Unsuccessfull UpdateLayout and requeueing count </summary>
+		public int LayoutingTries;
 
 		#region CTOR
 		public LayoutingQueueItem (LayoutingType _layoutType, ILayoutable _graphicObject)
@@ -58,7 +60,7 @@ namespace Crow
 
 		public void ProcessLayouting()
 		{
-			if (GraphicObject.Parent == null) {
+			if (GraphicObject.Parent == null) {//TODO:improve this
 				//cancel layouting for object without parent, maybe some were in queue when
 				//removed from a listbox
 				Debug.WriteLine ("ERROR: processLayouting, no parent for: " + this.ToString ());
@@ -71,14 +73,13 @@ namespace Crow
 				#if DEBUG_LAYOUTING
 				Debug.WriteLine ("\tRequeuing => " + this.ToString ());
 				#endif
-				GraphicObject.LayoutingTries ++;
-				if (GraphicObject.LayoutingTries < Interface.MaxLayoutingTries) {
+				LayoutingTries ++;
+				if (LayoutingTries < Interface.MaxLayoutingTries) {
 					GraphicObject.RegisteredLayoutings |= LayoutType;
 					Interface.CurrentInterface.LayoutingQueue.Enqueue (this);
 				}
-			} else {
-				GraphicObject.LayoutingTries = 0;
-			}
+			} else
+				LayoutingTries = 0;
 		}
 
 		public static implicit operator GraphicObject(LayoutingQueueItem queueItem)
