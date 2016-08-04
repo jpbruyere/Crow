@@ -101,8 +101,19 @@ namespace Crow
 		/// IDEA is to add a ScreenCoordinates function that use only lastPaintedSlots
 		/// </summary>
 		public Rectangle LastPaintedSlot;
+		/// <summary>Prevent requeuing multiple times the same widget</summary>
+		public bool IsQueueForRedraw = false;
+		/// <summary>Random value placeholder</summary>
 		public object Tag;
+		/// <summary>drawing Cache, if null, a redraw is done, cached or not</summary>
 		public byte[] bmp;
+		/// <summary>
+		/// This size is computed on each child' layout changes.
+		/// In stacking widget, it is used to compute the remaining space for the stretched
+		/// widget inside the stack, which is never added to the contentSize, instead, its size
+		/// is deducted from (parent.ClientRectangle - contentSize) 
+		/// </summary>
+		internal Size contentSize;
 		#endregion
 
 		#region ILayoutable
@@ -116,12 +127,10 @@ namespace Crow
 			get { return _parent; }
 			set { _parent = value; }
 		}
-
 		[XmlIgnore]public ILayoutable LogicalParent {
 			get { return logicalParent == null ? Parent : logicalParent; }
 			set { logicalParent = value; }
 		}
-
 		[XmlIgnore]public virtual Rectangle ClientRectangle {
 			get {
 				Rectangle cb = Slot.Size;
@@ -129,7 +138,6 @@ namespace Crow
 				return cb;
 			}
 		}
-
 		public virtual Rectangle ContextCoordinates(Rectangle r){
 			GraphicObject go = Parent as GraphicObject;
 			if (go == null)
@@ -731,7 +739,6 @@ namespace Crow
 			if (Parent != null)
 				Parent.RegisterClip (clip + Slot.Position + ClientRectangle.Position);
 		}
-		public bool IsQueueForRedraw = false;
 		/// <summary> Full update, taking care of sizing policy </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForGraphicUpdate ()
@@ -751,7 +758,11 @@ namespace Crow
 				Interface.CurrentInterface.EnqueueForRepaint (this);
 		}
 		#region Layouting
-		internal Size contentSize;
+
+		#if DEBUG_LAYOUTING
+		public List<LayoutingQueueItem> CurrentDrawLQIs = null;
+		public List<List<LayoutingQueueItem>> LQIs = new List<List<LayoutingQueueItem>>();
+		#endif
 		/// <summary> return size of content + margins </summary>
 		protected virtual int measureRawSize (LayoutingType lt) {
 			return lt == LayoutingType.Width ?
@@ -784,9 +795,6 @@ namespace Crow
 				if (layoutType == LayoutingType.None)
 					return;
 
-				#if DEBUG_LAYOUTING
-				Debug.WriteLine ("REGLayout => {1}->{0}", layoutType, this.ToString());
-				#endif
 				//enqueue LQI LayoutingTypes separately
 				if (layoutType.HasFlag (LayoutingType.Width))
 					Interface.CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
@@ -805,7 +813,8 @@ namespace Crow
 		public virtual void OnLayoutChanges(LayoutingType  layoutType)
 		{
 			#if DEBUG_LAYOUTING
-			Debug.WriteLine ("\t    " + LastSlots.ToString() + "\n\t => " + Slot.ToString ());
+			LayoutingQueueItem.currentLQI.Slot = LastSlots;
+			LayoutingQueueItem.currentLQI.Slot = Slot;
 			#endif
 
 			switch (layoutType) {
@@ -1029,6 +1038,12 @@ namespace Crow
 				return;
 
 			LastPaintedSlot = Slot;
+			#if DEBUG_LAYOUTING
+			if (CurrentDrawLQIs != null){
+				LQIs.Add (CurrentDrawLQIs);
+				CurrentDrawLQIs = null;
+			}
+			#endif
 
 			if (cacheEnabled) {
 				if (Slot.Width > Interface.MaxCacheSize || Slot.Height > Interface.MaxCacheSize)
