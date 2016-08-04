@@ -163,13 +163,12 @@ namespace Crow
 				IMLStream itemStream = null;
 				Type dataType = data [i].GetType ();
 
-				if (itemTemplates.ContainsKey (dataType.FullName)) {
+				if (itemTemplates.ContainsKey (dataType.FullName))
 					itemStream = itemTemplates [dataType.FullName];
-				} else {
+				else
 					itemStream = itemTemplates ["default"];
-				}
 
-				lock (Interface.CurrentInterface.UpdateMutex) {
+				lock (Interface.CurrentInterface.LayoutMutex) {
 					g = Interface.Load (itemStream);
 					page.AddChild (g);
 					g.DataSource = data [i];
@@ -181,7 +180,7 @@ namespace Crow
 				//g.LogicalParent = this;
 			}
 
-			lock (Interface.CurrentInterface.UpdateMutex)
+			lock (Interface.CurrentInterface.LayoutMutex)
 				_list.AddChild (page);
 
 			#if DEBUG_LOAD

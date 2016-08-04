@@ -46,7 +46,7 @@ namespace Crow
 		/// <summary> Bitfield containing the element of the layout to performs (x|y|width|height)</summary>
 		public LayoutingType LayoutType;
 		/// <summary> Unsuccessfull UpdateLayout and requeueing count </summary>
-		public int LayoutingTries;
+		public int LayoutingTries, DiscardCount;
 
 		#region CTOR
 		public LayoutingQueueItem (LayoutingType _layoutType, ILayoutable _graphicObject)
@@ -70,16 +70,30 @@ namespace Crow
 			Debug.WriteLine ("Layouting => " + this.ToString ());
 			#endif
 			if (!GraphicObject.UpdateLayout (LayoutType)) {
-				#if DEBUG_LAYOUTING
-				Debug.WriteLine ("\tRequeuing => " + this.ToString ());
-				#endif
-				LayoutingTries ++;
 				if (LayoutingTries < Interface.MaxLayoutingTries) {
+					#if DEBUG_LAYOUTING
+					Debug.WriteLine ("\tRequeuing  => " + this.ToString ());
+					#endif
+					LayoutingTries++;
 					GraphicObject.RegisteredLayoutings |= LayoutType;
 					Interface.CurrentInterface.LayoutingQueue.Enqueue (this);
+				} else if (DiscardCount < Interface.MaxDiscardCount) {
+					#if DEBUG_LAYOUTING
+					Debug.WriteLine ("\tDiscarding => " + this.ToString ());
+					#endif
+					LayoutingTries = 0;
+					DiscardCount++;
+					GraphicObject.RegisteredLayoutings |= LayoutType;
+					Interface.CurrentInterface.DiscardQueue.Enqueue (this);
 				}
-			} else
+				//#if DEBUG_LAYOUTING
+				else
+					Debug.WriteLine ("\tDELETED    => " + this.ToString ());
+				//#endif
+			} else {
+				DiscardCount = 0;
 				LayoutingTries = 0;
+			}
 		}
 
 		public static implicit operator GraphicObject(LayoutingQueueItem queueItem)
