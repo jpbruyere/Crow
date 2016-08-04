@@ -112,11 +112,11 @@ namespace Crow
 		}
 		#endregion
 		void loading(){
-			if (itemTemplates == null) {
+			if (itemTemplates == null)
 				itemTemplates = new Dictionary<string, IMLStream> ();
-				//TODO:check encoding
+			if (!itemTemplates.ContainsKey ("default"))
 				itemTemplates["default"] = new IMLStream (ItemTemplate);
-			}
+
 			for (int i = 1; i <= (data.Count / itemPerPage) + 1; i++) {
 				if (cancelLoading)
 					return;
@@ -160,23 +160,30 @@ namespace Crow
 					return;
 				
 				GraphicObject g = null;
+				IMLStream itemStream = null;
 				Type dataType = data [i].GetType ();
-				if (itemTemplates.ContainsKey (dataType.FullName))
-					g = Interface.Load (itemTemplates [dataType.FullName]);
-				else if (itemTemplates.ContainsKey ("default"))
-					g = Interface.Load (itemTemplates ["default"]);				
 
-				g.MouseClick += itemClick;
+				if (itemTemplates.ContainsKey (dataType.FullName)) {
+					itemStream = itemTemplates [dataType.FullName];
+				} else {
+					itemStream = itemTemplates ["default"];
+				}
 
-				lock (Interface.CurrentInterface.UpdateMutex)
+				lock (Interface.CurrentInterface.UpdateMutex) {
+					g = Interface.Load (itemStream);
 					page.AddChild (g);
-				g.DataSource = data [i];
+					g.DataSource = data [i];
+				}
+				g.MouseClick += itemClick;
+				if (!string.IsNullOrEmpty (itemStream.Datas)) {
+
+				}
 				//g.LogicalParent = this;
 			}
 
 			lock (Interface.CurrentInterface.UpdateMutex)
 				_list.AddChild (page);
-				
+
 			#if DEBUG_LOAD
 			loadingTime.Stop ();
 			Debug.WriteLine("Listbox {2} Loading: {0} ticks \t, {1} ms",
@@ -216,66 +223,6 @@ namespace Crow
 		void itemClick(object sender, MouseButtonEventArgs e){
 			SelectedIndex = data.IndexOf((sender as GraphicObject).DataSource);
 		}
-
-		#region IXmlSerializable
-//		public override System.Xml.Schema.XmlSchema GetSchema(){ return null; }
-//		public override void ReadXml(System.Xml.XmlReader reader)
-//		{
-//			//Template could be either an attribute containing path or expressed inlined
-//			//as a Template Element
-//			using (System.Xml.XmlReader subTree = reader.ReadSubtree())
-//			{
-//				subTree.Read ();
-//
-//				string template = reader.GetAttribute ("Template");
-//				string tmp = subTree.ReadOuterXml ();
-//
-//				//Load template from path set as attribute in templated control
-//				if (string.IsNullOrEmpty (template)) {					
-//					//seek for template tag first
-//					using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
-//						//load template first if inlined
-//
-//						xr.Read (); //skip current node
-//
-//						while (!xr.EOF) {
-//							xr.Read (); //read first child
-//							if (!xr.IsStartElement ())
-//								continue;
-//							if (xr.Name == "Template") {
-//								xr.Read ();
-//
-//								Type t = Type.GetType ("Crow." + xr.Name);
-//								GraphicObject go = (GraphicObject)Activator.CreateInstance (t);                                
-//								(go as IXmlSerializable).ReadXml (xr);
-//
-//								loadTemplate (go);
-//
-//								xr.Read ();//go close tag
-//								xr.Read ();//Template close tag
-//								break;
-//							} else {
-//								xr.ReadInnerXml ();
-//							}
-//						}
-//					}				
-//				} else
-//					loadTemplate (Interface.Load (template, this));
-//
-//
-//				//normal xml read
-//				using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
-//					xr.Read ();
-//					base.ReadXml(xr);
-//				}
-//			}
-//		}
-//		public override void WriteXml(System.Xml.XmlWriter writer)
-//		{
-//			//TODO:
-//			throw new NotImplementedException();
-//		}
-		#endregion
 	}
 }
 

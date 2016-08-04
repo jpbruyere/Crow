@@ -308,9 +308,6 @@
     <None Include="Interfaces\Unsorted\testColorList.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Interfaces\Unsorted\test4.crow">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Interfaces\Unsorted\test6.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -372,6 +369,7 @@
     <EmbeddedResource Include="ui\LabelButton.style" />
     <EmbeddedResource Include="ui\Popper.template" />
     <EmbeddedResource Include="ui\MenuItem.style" />
+    <EmbeddedResource Include="test.style" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">

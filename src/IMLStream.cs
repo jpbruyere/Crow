@@ -25,7 +25,9 @@ namespace Crow
 {
 	public class IMLStream : MemoryStream {
 		public Type RootType;
-		public IMLStream(string path) : base (){			
+		//TODO:this has nothing to do in there, I should derive IMLStream
+		public string Datas;
+		public IMLStream(string path) : base (){
 			using (Stream stream = Interface.GetStreamFromPath (path))
 				stream.CopyTo (this);
 			RootType = Interface.GetTopContainerOfXMLStream (this);

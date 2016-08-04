@@ -284,7 +284,7 @@ namespace Crow
 		#if MEASURE_TIME
 		public Stopwatch clippingTime = new Stopwatch ();
 		public Stopwatch layoutTime = new Stopwatch ();
-		public Stopwatch guTime = new Stopwatch ();
+		public Stopwatch updateTime = new Stopwatch ();
 		public Stopwatch drawingTime = new Stopwatch ();
 		#endif
 
@@ -377,11 +377,19 @@ namespace Crow
 			if (!Monitor.TryEnter (UpdateMutex))
 				return;
 
+			#if MEASURE_TIME
+			updateTime.Restart();
+			#endif
+
 			processLayouting ();
 
 			clippingRegistration ();
 
 			processDrawing ();
+
+			#if MEASURE_TIME
+			updateTime.Stop ();
+			#endif
 
 			Monitor.Exit (UpdateMutex);
 		}
