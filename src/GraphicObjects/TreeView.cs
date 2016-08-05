@@ -19,6 +19,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Xml.Serialization;
+using System.Diagnostics;
+using System.ComponentModel;
 
 namespace Crow
 {
@@ -27,8 +30,67 @@ namespace Crow
 	[DefaultTemplate("#Crow.Templates.TreeView.crow")]
 	public class TreeView : ListBox
 	{
+		GraphicObject selectedItemContainer = null;
+		Color selBackground;
+		Color selForeground;
+		bool isRoot;
+
+
 		public TreeView () : base()
 		{
+		}
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public virtual bool IsRoot {
+			get { return isRoot; }
+			set {
+				if (isRoot == value)
+					return;
+				isRoot = value;
+				NotifyValueChanged ("IsRoot", isRoot);
+			}
+		}
+
+		[XmlAttributeAttribute][DefaultValue("SteelBlue")]//DeepJungleGreen
+		public virtual Color SelectionBackground {
+			get { return selBackground; }
+			set {
+				if (value == selBackground)
+					return;
+				selBackground = value;
+				NotifyValueChanged ("SelectionBackground", selBackground);
+				RegisterForRedraw ();
+			}
+		}
+		[XmlAttributeAttribute][DefaultValue("White")]
+		public virtual Color SelectionForeground {
+			get { return selForeground; }
+			set {
+				if (value == selForeground)
+					return;
+				selForeground = value;
+				NotifyValueChanged ("SelectionForeground", selForeground);
+				RegisterForRedraw ();
+			}
+		}
+
+		[XmlIgnore]public override object SelectedItem {
+			get {
+				return selectedItemContainer == null ?
+					"" : selectedItemContainer.DataSource;
+			}
+		}
+		internal override void itemClick (object sender, MouseButtonEventArgs e)
+		{
+			GraphicObject tmp = sender as GraphicObject;
+			if (selectedItemContainer != null) {
+				selectedItemContainer.Foreground = Color.Transparent;
+				selectedItemContainer.Background = Color.Transparent;
+			}
+			selectedItemContainer = tmp;
+			selectedItemContainer.Foreground = SelectionForeground;
+			selectedItemContainer.Background = SelectionBackground;
+			NotifyValueChanged ("SelectedItem", SelectedItem);
+			raiseSelectedItemChanged ();
 		}
 	}
 }

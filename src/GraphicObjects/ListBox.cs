@@ -97,8 +97,11 @@ namespace Crow
 				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
 			}
 		}
-		[XmlIgnore]public object SelectedItem{
+		[XmlIgnore]public virtual object SelectedItem{
 			get { return data == null ? null : _selectedIndex < 0 ? null : data[_selectedIndex]; }
+		}
+		protected void raiseSelectedItemChanged(){
+			SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
 		}
 			
 		#region implemented abstract members of TemplatedControl
@@ -173,7 +176,19 @@ namespace Crow
 					page.AddChild (g);
 					g.DataSource = data [i];
 				}
-				g.MouseClick += itemClick;
+				if (this is TreeView) {
+					TreeView tv = this as TreeView;
+					while (!tv.IsRoot) {
+						ILayoutable tmp = tv.Parent;
+						while (!(tmp is TreeView)) {
+							tmp = tmp.Parent;
+						}
+						tv = tmp as TreeView;
+					}
+					g.MouseClick += tv.itemClick;
+				}else
+					g.MouseClick += itemClick;
+				
 				if (itemStream.Expand != null && g is Expandable) {
 					(g as Expandable).Expand += itemStream.Expand;
 				}
@@ -219,7 +234,7 @@ namespace Crow
 					(int)Math.Ceiling ((double)page1.Slot.Height / (double)itemPerPage * (double)(data.Count+1));
 			}
 		}
-		void itemClick(object sender, MouseButtonEventArgs e){
+		internal virtual void itemClick(object sender, MouseButtonEventArgs e){
 			SelectedIndex = data.IndexOf((sender as GraphicObject).DataSource);
 		}
 	}

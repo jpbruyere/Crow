@@ -99,6 +99,17 @@ namespace Crow
 			//prevent name searching in template
 			return nameToFind == this.Name ? this : null;
 		}
+		protected override void onDraw (Cairo.Context gr)
+		{
+			gr.Save ();
+			//clip to client zone
+			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+			gr.Clip ();
+
+			if (child != null)
+				child.Paint (ref gr);
+			gr.Restore ();
+		}
 		#endregion
 
 		protected virtual void loadTemplate(GraphicObject template = null)

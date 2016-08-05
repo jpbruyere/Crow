@@ -665,7 +665,7 @@ namespace Crow
 				mouseRepeatThread.Join ();
 			}
 
-			_activeWidget.onMouseUp (this, e);
+			_activeWidget.onMouseUp (_activeWidget, e);
 			activeWidget = null;
 			return true;
 		}

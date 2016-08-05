@@ -1136,10 +1136,13 @@ namespace Crow
 
 			MouseUp.Raise (this, e);
 
-			if (MouseIsIn (e.Position)&&HasFocus)
-				onMouseClick(sender,e);
+			if (MouseIsIn (e.Position) && IsActive)
+				onMouseClick (this, e);
 		}
 		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){
+			GraphicObject p = Parent as GraphicObject;
+			if (p != null)
+				p.onMouseClick(sender,e);
 			MouseClick.Raise (this, e);
 		}
 		public virtual void onMouseWheel(object sender, MouseWheelEventArgs e){

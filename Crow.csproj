@@ -221,11 +221,12 @@
     <EmbeddedResource Include="Images\crow0.svg" />
     <EmbeddedResource Include="Templates\TreeView.crow" />
     <EmbeddedResource Include="Templates\TabItem.crow" />
-    <EmbeddedResource Include="Templates\TreeItem.crow" />
     <EmbeddedResource Include="Templates\Dummy.goml" />
     <EmbeddedResource Include="Images\Icons\crow.png" />
     <EmbeddedResource Include="Images\Icons\crow.svg" />
     <EmbeddedResource Include="Default.style" />
+    <EmbeddedResource Include="Images\Icons\folder.svg" />
+    <EmbeddedResource Include="Images\Icons\file.svg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

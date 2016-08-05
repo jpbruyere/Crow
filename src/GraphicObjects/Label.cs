@@ -48,12 +48,13 @@ namespace Crow
         
 		#region private and protected fields
 		string _text = "label";
-        Alignment _textAlignment = Alignment.Left;
-		bool horizontalStretch = false;
-		bool verticalStretch = false;
-		bool _multiline = false;
-		Color selColor;
-		Color selFontColor;
+        Alignment _textAlignment;
+		bool horizontalStretch;
+		bool verticalStretch;
+		bool _selectable;
+		bool _multiline;
+		Color selBackground;
+		Color selForeground;
 		Point mouseLocalPos = -1;//mouse coord in widget space, filled only when clicked        
 		int _currentCol;        //0 based cursor position in string
 		int _currentLine;
@@ -73,23 +74,23 @@ namespace Crow
 
 		[XmlAttributeAttribute][DefaultValue("SteelBlue")]
 		public virtual Color SelectionBackground {
-			get { return selColor; }
+			get { return selBackground; }
 			set {
-				if (value == selColor)
+				if (value == selBackground)
 					return;
-				selColor = value;
-				NotifyValueChanged ("SelectionBackground", selColor);
+				selBackground = value;
+				NotifyValueChanged ("SelectionBackground", selBackground);
 				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue("White")]
 		public virtual Color SelectionForeground {
-			get { return selFontColor; }
+			get { return selForeground; }
 			set {
-				if (value == selFontColor)
+				if (value == selForeground)
 					return;
-				selFontColor = value;
-				NotifyValueChanged ("SelectionForeground", selFontColor);
+				selForeground = value;
+				NotifyValueChanged ("SelectionForeground", selForeground);
 				RegisterForRedraw ();
 			}
 		}
@@ -150,6 +151,21 @@ namespace Crow
 				RegisterForGraphicUpdate ();
             }
         }
+		[XmlAttributeAttribute][DefaultValue(false)]
+		public bool Selectable
+		{
+			get { return _selectable; }
+			set
+			{
+				if (value == _selectable)
+					return;
+				_selectable = value;
+				NotifyValueChanged ("Selectable", _selectable);
+				SelBegin = -1;
+				SelRelease = -1;
+				RegisterForRedraw ();
+			}
+		}
 		[XmlAttributeAttribute][DefaultValue(false)]
 		public bool Multiline
 		{
@@ -548,7 +564,7 @@ namespace Crow
 //					lineRect.X += (rText.Width - lineLength);
 				
 				if (SelRelease >= 0 && i >= selectionStart.Y && i <= selectionEnd.Y) {					
-					gr.SetSourceColor(selColor);
+					gr.SetSourceColor(selBackground);
 
 					Rectangle selRect = lineRect ;
 
@@ -594,6 +610,8 @@ namespace Crow
 		{
 			base.onFocused (sender, e);
 
+			if (!_selectable)
+				return;
 			SelBegin = new Point(0,0);
 			SelRelease = new Point (lines.LastOrDefault ().Length, lines.Count-1);
 			RegisterForRedraw ();
@@ -610,7 +628,7 @@ namespace Crow
 		{
 			base.onMouseMove (sender, e);
 
-			if (!(SelectionInProgress && HasFocus))
+			if (!(SelectionInProgress && HasFocus && _selectable))
 				return;
 
 			updatemouseLocalPos (e.Position);
@@ -619,7 +637,7 @@ namespace Crow
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{			
-			if (this.HasFocus){
+			if (this.HasFocus && _selectable){
 				updatemouseLocalPos (e.Position);
 				SelBegin = -1;
 				SelRelease = -1;
