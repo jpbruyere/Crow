@@ -125,9 +125,17 @@ namespace Crow
 			} else {
 				int ptr = 0;
 				ILayoutable tmp = Source.Instance as ILayoutable;
-				if (string.IsNullOrEmpty (bindingExp [0])) {
-					//if exp start with '/' => Graphic tree parsing start at top container
-					tmp = Interface.CurrentInterface as ILayoutable;
+				//if exp start with '/' => Graphic tree parsing start at source
+				if (string.IsNullOrEmpty (bindingExp [0]))
+					ptr++;
+				else if (bindingExp[0] == "."){ //search template root
+					do {
+						tmp = tmp.Parent;
+						if (tmp == null)
+							return false;
+						if (tmp is Interface)
+							throw new Exception ("Not in Templated Control");
+					} while (!(tmp is TemplatedControl));
 					ptr++;
 				}
 				while (ptr < bindingExp.Length - 1) {
@@ -168,7 +176,9 @@ namespace Crow
 				Target = new MemberReference (tmp);
 			}
 			if (Target == null) {
+				#if DEBUG_BINDING
 				Debug.WriteLine ("Binding Source is null: " + Expression);
+				#endif
 				return false;
 			}
 
@@ -182,7 +192,9 @@ namespace Crow
 				return true;
 			}
 
+			#if DEBUG_BINDING
 			Debug.WriteLine ("Binding member not found: " + member);
+			#endif
 			Target = null;
 			return false;
 		}

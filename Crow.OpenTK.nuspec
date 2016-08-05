@@ -2,10 +2,10 @@
 <package >
 	<metadata>
 		<id>Crow.OpenTK</id>
-		<version>0.4.5</version>
+		<version>0.4.6</version>
 		<title>C# Rapid Open Widget Toolkit</title>
 		<authors>JP Bruyere</authors>
-		<owners>Grand Tetras Software Team</owners>
+		<owners>Grand Tetras Software</owners>
 		<licenseUrl>https://www.gnu.org/licenses/gpl-3.0.html</licenseUrl>
 		<projectUrl>https://jpbruyere.github.io/Crow/</projectUrl>
 		<iconUrl>https://jpbruyere.github.io/Crow/images/crow.png</iconUrl>
@@ -26,7 +26,6 @@ For more information, please visit https://jpbruyere.github.io/Crow/.
 		<copyright>Copyright 2016</copyright>
 		<dependencies>
 			<dependency id="OpenTK.Next" version="1.2" />
-			<dependency id="GtkSharp" version="3.1" />
 		</dependencies>
         <tags>Crow OpenTK OpenGL Widget Interface GUI C# .Net Mono</tags>
         <references>
@@ -37,6 +36,9 @@ For more information, please visit https://jpbruyere.github.io/Crow/.
             <frameworkAssembly assemblyName="System.Drawing" />
             <frameworkAssembly assemblyName="System.Xml" />
         </frameworkAssemblies>
+		<contentFiles>
+			<files include="build/Release/Crow.dll.config" copyToOutput="true" />
+		</contentFiles>
 	</metadata>
 	<files>
 		<file src="Tests/OpenTKGameWindow.cs" target="content" />

@@ -49,7 +49,8 @@ namespace Crow
 		#region GraphicObject overrides
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{
-			IsExpanded = !IsExpanded;
+			if (this.HasFocus)
+				IsExpanded = !IsExpanded;
 			base.onMouseClick (sender, e);
 		}
 		#endregion

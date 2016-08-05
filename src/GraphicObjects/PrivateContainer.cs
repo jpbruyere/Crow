@@ -63,6 +63,7 @@ namespace Crow
 				child.Parent = this;
 				child.LayoutChanged += OnChildLayoutChanges;
 				contentSize = child.Slot.Size;
+				child.RegisteredLayoutings = LayoutingType.None;
 				child.RegisterForLayouting (LayoutingType.Sizing);
 			}
 
@@ -91,13 +92,6 @@ namespace Crow
 		{
 			return child == goToFind ? true : 
 				child == null ? false : child.Contains(goToFind);
-		}
-		public override void ChildrenLayoutingConstraints (ref LayoutingType layoutType)
-		{			
-			if (Width == Measure.Fit)
-				layoutType &= (~LayoutingType.X);
-			if (Height == Measure.Fit)
-				layoutType &= (~LayoutingType.Y);
 		}
 		public override bool UpdateLayout (LayoutingType layoutType)
 		{
@@ -175,28 +169,15 @@ namespace Crow
 		}
 		protected override void UpdateCache (Context ctx)
 		{
-			//ctx.Save ();
-
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 
 			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
 				Context gr = new Context (cache);
 
-				//clip to client zone
-				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
-				gr.Clip ();
-
 				if (Clipping.count > 0) {
-
 					Clipping.clearAndClip (gr);
 
-					if (child != null) {
-						
-						base.onDraw (gr);
-
-
-						child.Paint (ref gr);
-					}
+					onDraw (gr);
 				}
 					
 				gr.Dispose ();
@@ -205,33 +186,7 @@ namespace Crow
 				ctx.Paint ();
 			}
 			Clipping.Reset();
-
-			//ctx.Restore ();
 		}
-//		public override Rectangle ContextCoordinates (Rectangle r)
-//		{
-//			return
-//				Parent.ContextCoordinates(r) + Slot.Position + ClientRectangle.Position;
-//		}
-//		public override void Paint(ref Cairo.Context ctx)
-//		{
-//			if (!Visible)//check if necessary??
-//				return;
-//
-//			ctx.Save();
-//
-//			base.Paint(ref ctx);
-//
-//			//clip to client zone
-//			CairoHelpers.CairoRectangle (ctx, Parent.ContextCoordinates(ClientRectangle + Slot.Position), CornerRadius);
-//			ctx.Clip();
-//
-//			if (child != null)
-//				child.Paint(ref ctx);
-//
-//			ctx.Restore();            
-//		}
-
 		#endregion
 
 		#region Mouse handling
@@ -249,6 +204,13 @@ namespace Crow
 			if (child != null)
 				child.ClearBinding ();
 			base.ClearBinding ();
+		}
+		public override GraphicObject DeepClone ()
+		{
+			PrivateContainer tmp = base.DeepClone () as PrivateContainer;
+			if (child != null)
+					tmp.SetChild (child.DeepClone ());
+			return tmp;
 		}
 	}
 }

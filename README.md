@@ -12,7 +12,7 @@ You can visit the [Wiki](https://github.com/jpbruyere/Crow/wiki) or the [Project
 
 Please report bugs and issues on [GitHub](https://github.com/jpbruyere/Crow/issues)
 
-####Screen shots :
+###Screen shots :
 
 <table width="100%">
   <tr>
@@ -22,29 +22,44 @@ Please report bugs and issues on [GitHub](https://github.com/jpbruyere/Crow/issu
   </tr>
 </table>
 
-####Features :
+###Features :
 - **XML** interface definition.
 - Templates and styling
 - Dynamic binding system with code injection.
 - Inlined delegates in XML
 
-####Requirements :
-- **C#6** compatible compiler.
-- Mono >= 4.0 Framework on every os. (It solves the **String Encoding** problem.)
-- Cairo Graphic Library >= 1.10
-- OpenTK version assume you have OpenGL libraries installed on your system.
-- GTK Sharp. (At least glib, gio, gdk and cairo cil binding, atk, pango and gtk sharp may be removed from references)
+###Requirements :
+- Mono >= 4.0 Framework. 
+- [airo Graphic Library](https://cairographics.org/) >= 1.10 
+- [OpenTK](http://opentk.github.io/).
+- glib, gio, and gdk >= 3.0. (part of GTK project).
 
-####Using CROW in your OpenTK project :
-* add [Crow.OpenTK NuGet package](https://www.nuget.org/packages/Crow.OpenTK/) to your project.
-* Derive **OpenTKGameWindow** class.
-* Load some widget in the **OnLoad** override with `CrowInterface.LoadInterface` .
+###Installing dependencies
 
-####Build from sources :
+####On Linux
+For **mono**, You may install **mono-complete**, or only **xbuild**, **mono runtime** and minimal system **CIL** libs (system, xml, drawing)
+```bash
+sudo apt-get install mono-complete libcairo1.10-cil libgio3.0-cil libgdk3.0-cil libglib3.0-cil
 ```
+Or:
+```bash
+sudo apt-get install -y xbuild mono-runtime libmono-system-core4.0-cil libmono-system-xml4.0-cil libmono-system-drawing4.0-cil libcairo1.10-cil libgio3.0-cil libgdk3.0-cil libglib3.0-cil
+```
+####On Windows
+- Install [Mono and GTK#](http://www.mono-project.com/download/#download-win)
+- Add **CIL dll's** path to your environment **PATH** variable, and also **native dll's** path of cairo and gtk.
+
+    `set path=%path%;C:\Program Files (x86)\Mono\bin`
+
+###Build from sources :
+```bash
 git clone https://github.com/jpbruyere/Crow.git   	# Download source code from github
 cd Crow	                                    		# Enter the source directory
 nuget restore Crow.sln								# Restore nuget packages
-msbuild /p:Configuration=Release Crow.sln			# Build on .Net (Windows)
-xbuild  /p:Configuration=Release Crow.sln			# Build on Mono (Linux / Mac OS X)
+xbuild  /p:Configuration=Release Crow.sln			# Build with Mono 
 ```
+###Using CROW in your OpenTK project :
+* add [Crow.OpenTK NuGet package](https://www.nuget.org/packages/Crow.OpenTK/) to your project.
+* Derive **OpenTKGameWindow** class.
+* Load some widget in the **OnLoad** override with `CrowInterface.LoadInterface` .
+* Build your project with **mono**. (**xbuild**)

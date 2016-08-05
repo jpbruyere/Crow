@@ -134,6 +134,7 @@
     <Compile Include="src\CompilerServices\MemberReference.cs" />
     <Compile Include="src\CompilerServices\Bindings.cs" />
     <Compile Include="src\StyleReader.cs" />
+    <Compile Include="src\IMLStream.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -141,21 +142,12 @@
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Drawing" />
-    <Reference Include="cairo-sharp">
-      <HintPath>$(SolutionDir)packages\GtkSharp.3.1.3\lib\net45\cairo-sharp.dll</HintPath>
-    </Reference>
-    <Reference Include="gdk-sharp">
-      <HintPath>$(SolutionDir)packages\GtkSharp.3.1.3\lib\net45\gdk-sharp.dll</HintPath>
-    </Reference>
-    <Reference Include="gio-sharp">
-      <HintPath>$(SolutionDir)packages\GtkSharp.3.1.3\lib\net45\gio-sharp.dll</HintPath>
-    </Reference>
-    <Reference Include="glib-sharp">
-      <HintPath>$(SolutionDir)packages\GtkSharp.3.1.3\lib\net45\glib-sharp.dll</HintPath>
-    </Reference>
+	<Reference Include="cairo-sharp"/>
+	<Reference Include="gdk-sharp"/>
+	<Reference Include="gio-sharp"/>
+	<Reference Include="glib-sharp"/>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)packages\GtkSharp.3.1.3\build\net45\GtkSharp.targets" Condition="Exists('$(SolutionDir)packages\GtkSharp.3.1.3\build\net45\GtkSharp.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -229,13 +221,17 @@
     <EmbeddedResource Include="Images\crow0.svg" />
     <EmbeddedResource Include="Templates\TreeView.crow" />
     <EmbeddedResource Include="Templates\TabItem.crow" />
-    <EmbeddedResource Include="Templates\TreeItem.crow" />
     <EmbeddedResource Include="Templates\Dummy.goml" />
     <EmbeddedResource Include="Images\Icons\crow.png" />
     <EmbeddedResource Include="Images\Icons\crow.svg" />
     <EmbeddedResource Include="Default.style" />
+    <EmbeddedResource Include="Images\Icons\folder.svg" />
+    <EmbeddedResource Include="Images\Icons\file.svg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <None Include="Crow.dll.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

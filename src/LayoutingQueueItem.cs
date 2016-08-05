@@ -21,6 +21,7 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Crow
 {
@@ -42,48 +43,84 @@ namespace Crow
 	public class LayoutingQueueItem
 	{
 		/// <summary> Instance of widget to be layouted</summary>
-		public ILayoutable GraphicObject;
+		public ILayoutable Layoutable;
 		/// <summary> Bitfield containing the element of the layout to performs (x|y|width|height)</summary>
 		public LayoutingType LayoutType;
+		/// <summary> Unsuccessfull UpdateLayout and requeueing count </summary>
+		public int LayoutingTries, DiscardCount;
+
+		#if DEBUG_LAYOUTING
+		public static List<LayoutingQueueItem> processedLQIs = new List<LayoutingQueueItem>();
+		public static LayoutingQueueItem[] MultipleRunsLQIs {
+			get { return processedLQIs.Where(l=>l.LayoutingTries>2 || l.DiscardCount > 0).ToArray(); }
+		}
+		public static LayoutingQueueItem currentLQI = null;
+		public Stopwatch LQITime = new Stopwatch();
+		public List<LayoutingQueueItem> triggeredLQIs = new List<LayoutingQueueItem>();
+		public LayoutingQueueItem wasTriggeredBy = null;
+		public GraphicObject graphicObject {
+			get { return Layoutable as GraphicObject; }
+		}
+		public Rectangle Slot, NewSlot;
+		#endif
 
 		#region CTOR
 		public LayoutingQueueItem (LayoutingType _layoutType, ILayoutable _graphicObject)
 		{
 			LayoutType = _layoutType;
-			GraphicObject = _graphicObject;
-			GraphicObject.RegisteredLayoutings |= LayoutType;
+			Layoutable = _graphicObject;
+			Layoutable.RegisteredLayoutings |= LayoutType;
+			#if DEBUG_LAYOUTING
+			if (graphicObject.CurrentDrawLQIs == null)
+				graphicObject.CurrentDrawLQIs = new List<LayoutingQueueItem>();
+			graphicObject.CurrentDrawLQIs.Add(this);
+			if (currentLQI != null){
+				wasTriggeredBy = currentLQI;
+				currentLQI.triggeredLQIs.Add(this);
+			}
+			#endif
 		}
 		#endregion
 
 
 		public void ProcessLayouting()
 		{
-			if (GraphicObject.Parent == null) {
+			if (Layoutable.Parent == null) {//TODO:improve this
 				//cancel layouting for object without parent, maybe some were in queue when
 				//removed from a listbox
 				Debug.WriteLine ("ERROR: processLayouting, no parent for: " + this.ToString ());
 				return;
 			}
 			#if DEBUG_LAYOUTING
-			Debug.WriteLine ("Layouting => " + this.ToString ());
+			currentLQI = this;
+			processedLQIs.Add(this);
+			LQITime.Start();
 			#endif
-			if (!GraphicObject.UpdateLayout (LayoutType)) {
-				#if DEBUG_LAYOUTING
-				Debug.WriteLine ("\tRequeuing => " + this.ToString ());
-				#endif
-				GraphicObject.LayoutingTries ++;
-				if (GraphicObject.LayoutingTries < Interface.MaxLayoutingTries) {
-					GraphicObject.RegisteredLayoutings |= LayoutType;
+			if (!Layoutable.UpdateLayout (LayoutType)) {
+				if (LayoutingTries < Interface.MaxLayoutingTries) {
+					LayoutingTries++;
+					Layoutable.RegisteredLayoutings |= LayoutType;
 					Interface.CurrentInterface.LayoutingQueue.Enqueue (this);
+				} else if (DiscardCount < Interface.MaxDiscardCount) {
+					LayoutingTries = 0;
+					DiscardCount++;
+					Layoutable.RegisteredLayoutings |= LayoutType;
+					Interface.CurrentInterface.DiscardQueue.Enqueue (this);
 				}
-			} else {
-				GraphicObject.LayoutingTries = 0;
+				//#if DEBUG_LAYOUTING
+				else
+					Debug.WriteLine ("\tDELETED    => " + this.ToString ());
+				//#endif
 			}
+			#if DEBUG_LAYOUTING
+			currentLQI = null;
+			LQITime.Stop();
+			#endif
 		}
 
 		public static implicit operator GraphicObject(LayoutingQueueItem queueItem)
 		{
-			return queueItem.GraphicObject as GraphicObject;
+			return queueItem.Layoutable as GraphicObject;
 		}
 		public static implicit operator LayoutingType(LayoutingQueueItem lqi)
 		{
@@ -91,7 +128,13 @@ namespace Crow
 		}
 		public override string ToString ()
 		{
-			return string.Format ("{1}->{0}", LayoutType,GraphicObject.ToString());
+			#if DEBUG_LAYOUTING
+			return string.Format ("{2};{3};{4} {1}->{0}", LayoutType,Layoutable.ToString(),
+				LayoutingTries,DiscardCount,LQITime.ElapsedTicks);
+			#else
+			return string.Format ("{2};{3} {1}->{0}", LayoutType,Layoutable.ToString(),
+				LayoutingTries, DiscardCount);
+			#endif
 		}
 	}
 }

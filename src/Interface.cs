@@ -59,11 +59,6 @@ namespace Crow
 		#endregion
 
 		#region Static and constants
-		/// <summary> keep ressource path for debug msg </summary>
-		internal static string CurrentGOMLPath = "";
-		//used in templatedControl
-		internal static int XmlLoaderCount = 0;
-
 		public static int TabSize = 4;
 		public static string LineBreak = "\r\n";
 		//TODO: shold be declared in graphicObject
@@ -81,18 +76,30 @@ namespace Crow
 		public const int MaxCacheSize = 2048;
 		/// <summary> Above this count, the layouting is discard for the widget and it
 		/// will not be rendered on screen </summary>
-		public const int MaxLayoutingTries = 50;
+		public const int MaxLayoutingTries = 5;
+		public const int MaxDiscardCount = 10;
 		/// <summary> Global font rendering settings for Cairo </summary>
 		public static FontOptions FontRenderingOptions;
 		#endregion
 
 		internal bool XmlLoading = false;
 
+		public Dictionary<string,object> Ressources = new Dictionary<string, object>();
 		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem> ();
+		public Queue<LayoutingQueueItem> DiscardQueue;
+		public Queue<LayoutingQueueItem> ProcessedLayoutingQueue;
 		public Queue<GraphicObject> DrawingQueue = new Queue<GraphicObject>();
 		public string Clipboard;//TODO:use object instead for complex copy paste
 		public void EnqueueForRepaint(GraphicObject g)
 		{
+//			if (g.RegisteredLayoutings != LayoutingType.None)
+//				return;
+			ILayoutable l = g;
+			while (l.Parent != null)
+				l = l.Parent;
+			if (!(l is Interface))
+				return;
+
 			lock (DrawingQueue) {
 				if (g.IsQueueForRedraw)
 					return;
@@ -216,21 +223,22 @@ namespace Crow
 			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
-			Interface.XmlLoaderCount ++;
-			CurrentGOMLPath = path;
 			GraphicObject tmp = null;
 			try {
 				using (Stream stream = GetStreamFromPath (path)) {
 					tmp = Load(stream, GetTopContainerOfXMLStream(stream), hostClass);
 				}
 			} catch (Exception ex) {
-				throw new Exception ("Error loading <" + CurrentGOMLPath + ">:", ex);
+				throw new Exception ("Error loading <" + path + ">:", ex);
 			}
-			Interface.XmlLoaderCount --;
 
 			Thread.CurrentThread.CurrentCulture = savedCulture;
 
 			return tmp;
+		}
+		internal static GraphicObject Load (IMLStream stream, object hostClass = null){
+			stream.Seek (0, SeekOrigin.Begin);
+			return Load(stream, stream.RootType, hostClass);
 		}
 		internal static GraphicObject Load (Stream stream, Type type, object hostClass = null)
 		{
@@ -280,7 +288,7 @@ namespace Crow
 		#if MEASURE_TIME
 		public Stopwatch clippingTime = new Stopwatch ();
 		public Stopwatch layoutTime = new Stopwatch ();
-		public Stopwatch guTime = new Stopwatch ();
+		public Stopwatch updateTime = new Stopwatch ();
 		public Stopwatch drawingTime = new Stopwatch ();
 		#endif
 
@@ -373,11 +381,19 @@ namespace Crow
 			if (!Monitor.TryEnter (UpdateMutex))
 				return;
 
+			#if MEASURE_TIME
+			updateTime.Restart();
+			#endif
+
 			processLayouting ();
 
 			clippingRegistration ();
 
 			processDrawing ();
+
+			#if MEASURE_TIME
+			updateTime.Stop ();
+			#endif
 
 			Monitor.Exit (UpdateMutex);
 		}
@@ -385,14 +401,18 @@ namespace Crow
 			#if MEASURE_TIME
 			layoutTime.Restart();
 			#endif
+			DiscardQueue = new Queue<LayoutingQueueItem> ();
 			lock (LayoutMutex) {
 				//Debug.WriteLine ("======= Layouting queue start =======");
 				LayoutingQueueItem lqi = null;
-				while (Interface.CurrentInterface.LayoutingQueue.Count > 0) {
-					lqi = Interface.CurrentInterface.LayoutingQueue.Dequeue ();
+				while (LayoutingQueue.Count > 0) {
+					lqi = LayoutingQueue.Dequeue ();
 					lqi.ProcessLayouting ();
 				}
+				LayoutingQueue = DiscardQueue;
 			}
+			DiscardQueue = null;
+
 			#if MEASURE_TIME
 			layoutTime.Stop ();
 			#endif
@@ -487,6 +507,7 @@ namespace Crow
 		{
 			g.Parent = this;
 			GraphicTree.Insert (0, g);
+			g.RegisteredLayoutings = LayoutingType.None;
 			g.RegisterForLayouting (LayoutingType.Sizing);
 		}
 		public void DeleteWidget(GraphicObject g)
@@ -644,7 +665,7 @@ namespace Crow
 				mouseRepeatThread.Join ();
 			}
 
-			_activeWidget.onMouseUp (this, e);
+			_activeWidget.onMouseUp (_activeWidget, e);
 			activeWidget = null;
 			return true;
 		}

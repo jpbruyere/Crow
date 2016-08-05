@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0"?>
-<HorizontalStack Spacing="1" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
-	<Image Margin="2" Width="14" Height="14" Path="{../../Image}" SvgSub="{../../IsChecked}"/>
-	<Label Text="{../../Caption}" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}"/>
+<HorizontalStack Background="{./Background}" Spacing="1" Height="{./HeightPolicy}" Width="{./WidthPolicy}">
+	<Image Margin="2" Width="14" Height="14" Path="#Crow.Images.Icons.radiobutton.svg"
+		SvgSub="{./IsChecked}"/>
+	<Label Text="{./Caption}" Height="{./HeightPolicy}" Width="{./WidthPolicy}"/>
 </HorizontalStack>

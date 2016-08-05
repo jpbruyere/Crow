@@ -25,9 +25,6 @@ namespace Crow
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
 
-
-		internal int layoutingTries = 0;
-
 		Rectangles clipping = new Rectangles();
 		public Rectangles Clipping { get { return clipping; }}
 
@@ -62,7 +59,7 @@ namespace Crow
 		#endregion
 
 		#region private fields
-		LayoutingType registeredLayoutings = LayoutingType.None;
+		LayoutingType registeredLayoutings = LayoutingType.All;
 		ILayoutable logicalParent;
 		ILayoutable _parent;
 		string _name = "unamed";
@@ -104,8 +101,19 @@ namespace Crow
 		/// IDEA is to add a ScreenCoordinates function that use only lastPaintedSlots
 		/// </summary>
 		public Rectangle LastPaintedSlot;
+		/// <summary>Prevent requeuing multiple times the same widget</summary>
+		public bool IsQueueForRedraw = false;
+		/// <summary>Random value placeholder</summary>
 		public object Tag;
+		/// <summary>drawing Cache, if null, a redraw is done, cached or not</summary>
 		public byte[] bmp;
+		/// <summary>
+		/// This size is computed on each child' layout changes.
+		/// In stacking widget, it is used to compute the remaining space for the stretched
+		/// widget inside the stack, which is never added to the contentSize, instead, its size
+		/// is deducted from (parent.ClientRectangle - contentSize) 
+		/// </summary>
+		internal Size contentSize;
 		#endregion
 
 		#region ILayoutable
@@ -119,12 +127,10 @@ namespace Crow
 			get { return _parent; }
 			set { _parent = value; }
 		}
-
 		[XmlIgnore]public ILayoutable LogicalParent {
 			get { return logicalParent == null ? Parent : logicalParent; }
 			set { logicalParent = value; }
 		}
-
 		[XmlIgnore]public virtual Rectangle ClientRectangle {
 			get {
 				Rectangle cb = Slot.Size;
@@ -132,7 +138,6 @@ namespace Crow
 				return cb;
 			}
 		}
-
 		public virtual Rectangle ContextCoordinates(Rectangle r){
 			GraphicObject go = Parent as GraphicObject;
 			if (go == null)
@@ -734,7 +739,6 @@ namespace Crow
 			if (Parent != null)
 				Parent.RegisterClip (clip + Slot.Position + ClientRectangle.Position);
 		}
-		public bool IsQueueForRedraw = false;
 		/// <summary> Full update, taking care of sizing policy </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForGraphicUpdate ()
@@ -742,21 +746,23 @@ namespace Crow
 			bmp = null;
 			if (Width == Measure.Fit || Height == Measure.Fit)
 				RegisterForLayouting (LayoutingType.Sizing);
-			Interface.CurrentInterface.EnqueueForRepaint (this);
+			else if (RegisteredLayoutings == LayoutingType.None)
+				Interface.CurrentInterface.EnqueueForRepaint (this);
 		}
 		/// <summary> query an update of the content, a redraw </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForRedraw ()
 		{
 			bmp = null;
-			Interface.CurrentInterface.EnqueueForRepaint (this);
+			if (RegisteredLayoutings == LayoutingType.None)
+				Interface.CurrentInterface.EnqueueForRepaint (this);
 		}
 		#region Layouting
-		[XmlIgnore]public int LayoutingTries {
-			get { return layoutingTries; }
-			set { layoutingTries = value; }
-		}
-		internal Size contentSize;
+
+		#if DEBUG_LAYOUTING
+		public List<LayoutingQueueItem> CurrentDrawLQIs = null;
+		public List<List<LayoutingQueueItem>> LQIs = new List<List<LayoutingQueueItem>>();
+		#endif
 		/// <summary> return size of content + margins </summary>
 		protected virtual int measureRawSize (LayoutingType lt) {
 			return lt == LayoutingType.Width ?
@@ -789,9 +795,6 @@ namespace Crow
 				if (layoutType == LayoutingType.None)
 					return;
 
-				#if DEBUG_LAYOUTING
-				Debug.WriteLine ("REGLayout => {1}->{0}", layoutType, this.ToString());
-				#endif
 				//enqueue LQI LayoutingTypes separately
 				if (layoutType.HasFlag (LayoutingType.Width))
 					Interface.CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
@@ -810,7 +813,8 @@ namespace Crow
 		public virtual void OnLayoutChanges(LayoutingType  layoutType)
 		{
 			#if DEBUG_LAYOUTING
-			Debug.WriteLine ("\t    " + LastSlots.ToString() + "\n\t => " + Slot.ToString ());
+			LayoutingQueueItem.currentLQI.Slot = LastSlots;
+			LayoutingQueueItem.currentLQI.Slot = Slot;
 			#endif
 
 			switch (layoutType) {
@@ -1034,6 +1038,12 @@ namespace Crow
 				return;
 
 			LastPaintedSlot = Slot;
+			#if DEBUG_LAYOUTING
+			if (CurrentDrawLQIs != null){
+				LQIs.Add (CurrentDrawLQIs);
+				CurrentDrawLQIs = null;
+			}
+			#endif
 
 			if (cacheEnabled) {
 				if (Slot.Width > Interface.MaxCacheSize || Slot.Height > Interface.MaxCacheSize)
@@ -1126,10 +1136,13 @@ namespace Crow
 
 			MouseUp.Raise (this, e);
 
-			if (MouseIsIn (e.Position)&&HasFocus)
-				onMouseClick(sender,e);
+			if (MouseIsIn (e.Position) && IsActive)
+				onMouseClick (this, e);
 		}
 		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){
+			GraphicObject p = Parent as GraphicObject;
+			if (p != null)
+				p.onMouseClick(sender,e);
 			MouseClick.Raise (this, e);
 		}
 		public virtual void onMouseWheel(object sender, MouseWheelEventArgs e){
@@ -1443,17 +1456,20 @@ namespace Crow
 					continue;
 				if (pi.Name == "DataSource")
 					continue;
-//				object[] att = pi.GetCustomAttributes (false);
-//				foreach (object o in att) {
-//					XmlIgnoreAttribute xia = o as XmlIgnoreAttribute;
-//					if (xia != null)
-//						continue;
-//				}
 
 				pi.SetValue(result, pi.GetValue(this));
 			}
 			return result;
 		}
 		#endregion
+		/// <summary>
+		/// full GraphicTree clone with binding definition
+		/// </summary>
+		public virtual GraphicObject DeepClone(){
+			GraphicObject tmp = Clone () as GraphicObject;
+			foreach (Binding b in this.bindings)
+				tmp.Bindings.Add (new Binding (new MemberReference (tmp, b.Source.Member), b.Expression));
+			return tmp;
+		}
 	}
 }

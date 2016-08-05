@@ -1,4 +1,4 @@
 ﻿<?xml version="1.0"?>
-<MessageBox Title="message" Message="this is a message box"
-	Ok="onMsgBoxOk"
-	Cancel="onMsgBoxCancel"/>
+<MessageBox Title="message" Message="this is a message box"/>
+<!--	Ok="onMsgBoxOk"
+	Cancel="onMsgBoxCancel"/>-->

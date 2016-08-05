@@ -25,6 +25,8 @@ using System.IO;
 using System.Xml;
 using System.Diagnostics;
 using System.Linq;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Crow
 {
@@ -54,13 +56,15 @@ namespace Crow
 		#region CTOR
 		public TemplatedControl () : base()
 		{
-			if (Interface.XmlLoaderCount > 0)
+			if (Interface.CurrentInterface.XmlLoading)
 				return;
 			loadTemplate ();
 		}
 		#endregion
 
 		string _template;
+		string _itemTemplate;
+		public Dictionary<string, ItemTemplate> ItemTemplates;
 
 		[XmlAttributeAttribute][DefaultValue(null)]
 		public string Template {
@@ -76,12 +80,35 @@ namespace Crow
 					loadTemplate (Interface.Load (_template, this));
 			}
 		}
+		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ItemTemplate.goml")]
+		public string ItemTemplate {
+			get { return _itemTemplate; }
+			set { 
+				if (value == _itemTemplate)
+					return;
 
+				_itemTemplate = value;
+
+				//TODO:reload list with new template?
+				NotifyValueChanged("ItemTemplate", _itemTemplate);
+			}
+		}
 		#region GraphicObject overrides
 		public override GraphicObject FindByName (string nameToFind)
 		{
 			//prevent name searching in template
 			return nameToFind == this.Name ? this : null;
+		}
+		protected override void onDraw (Cairo.Context gr)
+		{
+			gr.Save ();
+			//clip to client zone
+			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+			gr.Clip ();
+
+			if (child != null)
+				child.Paint (ref gr);
+			gr.Restore ();
 		}
 		#endregion
 
@@ -115,12 +142,34 @@ namespace Crow
 					using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
 						//load template first if inlined
 
-						xr.Read (); //skip current node
+						xr.Read (); //read first child
+						xr.Read (); //skip root node
 
-						while (!xr.EOF) {
-							xr.Read (); //read first child
-							if (!xr.IsStartElement ())
+						while (!xr.EOF) {							
+							if (!xr.IsStartElement ()) {
+								xr.Read ();
 								continue;
+							}
+							if (xr.Name == "ItemTemplate") {
+								string dataType = "default", datas = "", itemTmp;
+								while (xr.MoveToNextAttribute ()) {
+									if (xr.Name == "DataType")
+										dataType = xr.Value;
+									else if (xr.Name == "Data")
+										datas = xr.Value;
+								}
+								xr.MoveToElement ();
+								itemTmp = xr.ReadInnerXml ();
+
+								if (ItemTemplates == null)
+									ItemTemplates = new Dictionary<string, ItemTemplate> ();
+								//TODO:check encoding
+								ItemTemplates[dataType] = new ItemTemplate (Encoding.UTF8.GetBytes(itemTmp));
+								if (!string.IsNullOrEmpty (datas))
+									ItemTemplates [dataType].CreateExpandDelegate(this, dataType, datas);
+
+								continue;
+							}
 							if (xr.Name == "Template") {
 								xr.Read ();
 
@@ -129,12 +178,9 @@ namespace Crow
 								(go as IXmlSerializable).ReadXml (xr);
 
 								loadTemplate (go);
-
-								xr.Read ();//go close tag
-								xr.Read ();//Template close tag
-								break;
-							} else
-								xr.ReadInnerXml ();
+								continue;
+							}
+							xr.ReadInnerXml ();
 						}
 					}
 				} else
@@ -143,7 +189,7 @@ namespace Crow
 				//if no template found, load default one
 				if (this.child == null)
 					loadTemplate ();
-
+				
 				//normal xml read
 				using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
 					xr.Read ();

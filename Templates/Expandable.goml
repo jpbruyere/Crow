@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="1" Foreground="LightGray" Height="{../HeightPolicy}" Width="{../WidthPolicy}" 
-		MouseClick="../onMouseClick">
-	<VerticalStack Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
-		<HorizontalStack Spacing="1" Height="-1" Width="{../../../WidthPolicy}">
+<Border BorderWidth="1" Foreground="{./Foreground}" Background="{./Background}"
+		Height="{./HeightPolicy}" Width="{./WidthPolicy}">
+	<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}">
+		<HorizontalStack Spacing="1" Height="-1" Width="{./WidthPolicy}">
 			<Image Margin="2" Width="12" Height="12"
-				Visible="{../../../../HasContent}"
-				Path="{../../../../Image}" 
-				SvgSub="{../../../../IsExpanded}"/>
-			<Label Text="{../../../../Caption}" Width="{../../../../WidthPolicy}"/>
+				Visible="{./HasContent}"
+				Path="{./Image}" 
+				SvgSub="{./IsExpanded}"/>
+			<Label Text="{./Caption}" Width="{./WidthPolicy}"/>
 		</HorizontalStack>
 		<Container Name="Content" Visible="false"
-			Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}"/>
+			Height="{./HeightPolicy}" Width="{./WidthPolicy}"/>
 	</VerticalStack>
 </Border>

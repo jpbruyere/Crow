@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack>
-	<Label Text="Press &lt;F3&gt; to cycle into the examples"/>
-	<Label Text="Those are basic tests used to validate changes"/>
+<VerticalStack Fit="true" VerticalAlignment="Top" Background="0.7,0.7,0.7,0.5"
+	Margin="10" CornerRadius="10">
+	<Label Font="20" Text="Press &lt;F3&gt; to cycle into the examples"/>
+	<Label Font="20" Text="Those are basic tests used to validate changes"/>
 </VerticalStack>

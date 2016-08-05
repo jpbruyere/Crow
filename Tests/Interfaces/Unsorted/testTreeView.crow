@@ -1,2 +1,43 @@
 ﻿<?xml version="1.0"?>
-<TreeView Height="400" Width="200" Data="{List2}" ItemTemplate="#Crow.Templates.TreeViewItem.crow"/>
+<HorizontalStack>
+	<TreeView IsRoot="true" Name="treeView" Height="100%" Width="40%" Data="{CurDirectory}" Background="DimGray">
+		<ItemTemplate DataType="System.IO.FileInfo">
+			<HorizontalStack Focusable="true"  Height="Fit" Width="Stretched" Background="{../Background}" >
+				<Image Margin="2" Width="14" Height="14"
+					Path="#Crow.Images.Icons.file.svg"/>
+				<Label Text="{Name}" Width="Stretched"
+					MouseEnter="{Background=hgradient|0:BlueCrayola|1:Transparent}"
+					MouseLeave="{Background=Transparent}"/>
+			</HorizontalStack>
+		</ItemTemplate>
+		<ItemTemplate DataType="System.IO.DirectoryInfo" Data="GetFileSystemInfos">		
+			<Expandable Caption="{Name}" >
+				<Template>
+					<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}">
+						<HorizontalStack Spacing="1" Height="Fit" Width="{./WidthPolicy}"
+								MouseEnter="{Background=hgradient|0:BlueCrayola|1:Transparent}"
+								MouseLeave="{Background=Transparent}">
+							<Image Margin="2" Width="12" Height="12"
+								Visible="{./HasContent}"
+								Path="{./Image}" 
+								SvgSub="{./IsExpanded}"/>
+							<Image Margin="2" Width="14" Height="14"
+								Path="#Crow.Images.Icons.folder.svg"/>
+							<Label Text="{./Caption}" Width="{./WidthPolicy}"/>
+						</HorizontalStack>
+						<Container Name="Content" Visible="false"
+								Height="{./HeightPolicy}" Width="{./WidthPolicy}"/>
+					</VerticalStack>
+				</Template>
+				<HorizontalStack Height="Fit" Width="{./WidthPolicy}">
+					<GraphicObject Width="12" Height="10"/>
+					<TreeView Name="List" Height="Fit" Width="{./WidthPolicy}"
+						Template="#Tests.Interfaces.treeList.crow" />
+				</HorizontalStack>
+			</Expandable>
+		</ItemTemplate>
+	</TreeView>
+	<Border Width="60%">
+		<Label Text="{../../treeView.SelectedItem}"/>
+	</Border>
+</HorizontalStack>
