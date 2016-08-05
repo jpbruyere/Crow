@@ -59,11 +59,6 @@ namespace Crow
 		#endregion
 
 		#region Static and constants
-		/// <summary> keep ressource path for debug msg </summary>
-		internal static string CurrentGOMLPath = "";
-		//used in templatedControl
-		internal static int XmlLoaderCount = 0;
-
 		public static int TabSize = 4;
 		public static string LineBreak = "\r\n";
 		//TODO: shold be declared in graphicObject
@@ -227,17 +222,14 @@ namespace Crow
 			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
-			Interface.XmlLoaderCount ++;
-			CurrentGOMLPath = path;
 			GraphicObject tmp = null;
 			try {
 				using (Stream stream = GetStreamFromPath (path)) {
 					tmp = Load(stream, GetTopContainerOfXMLStream(stream), hostClass);
 				}
 			} catch (Exception ex) {
-				throw new Exception ("Error loading <" + CurrentGOMLPath + ">:", ex);
+				throw new Exception ("Error loading <" + path + ">:", ex);
 			}
-			Interface.XmlLoaderCount --;
 
 			Thread.CurrentThread.CurrentCulture = savedCulture;
 

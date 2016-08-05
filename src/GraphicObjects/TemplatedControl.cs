@@ -56,7 +56,7 @@ namespace Crow
 		#region CTOR
 		public TemplatedControl () : base()
 		{
-			if (Interface.XmlLoaderCount > 0)
+			if (Interface.CurrentInterface.XmlLoading)
 				return;
 			loadTemplate ();
 		}
@@ -64,7 +64,7 @@ namespace Crow
 
 		string _template;
 		string _itemTemplate;
-		protected Dictionary<string, IMLStream> itemTemplates;
+		protected Dictionary<string, ItemTemplate> itemTemplates;
 
 		[XmlAttributeAttribute][DefaultValue(null)]
 		public string Template {
@@ -151,10 +151,10 @@ namespace Crow
 								itemTmp = xr.ReadInnerXml ();
 
 								if (itemTemplates == null)
-									itemTemplates = new Dictionary<string, IMLStream> ();
+									itemTemplates = new Dictionary<string, ItemTemplate> ();
 								//TODO:check encoding
-								itemTemplates[dataType] = new IMLStream (Encoding.UTF8.GetBytes(itemTmp));
-								itemTemplates [dataType].Datas = datas;
+								itemTemplates[dataType] = new ItemTemplate (Encoding.UTF8.GetBytes(itemTmp));
+								itemTemplates [dataType].CreateExpandDelegate(dataType, datas);
 
 								continue;
 							}

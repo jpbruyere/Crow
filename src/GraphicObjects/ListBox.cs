@@ -113,9 +113,9 @@ namespace Crow
 		#endregion
 		void loading(){
 			if (itemTemplates == null)
-				itemTemplates = new Dictionary<string, IMLStream> ();
+				itemTemplates = new Dictionary<string, ItemTemplate> ();
 			if (!itemTemplates.ContainsKey ("default"))
-				itemTemplates["default"] = new IMLStream (ItemTemplate);
+				itemTemplates["default"] = new ItemTemplate (ItemTemplate);
 
 			for (int i = 1; i <= (data.Count / itemPerPage) + 1; i++) {
 				if (cancelLoading)
@@ -160,7 +160,7 @@ namespace Crow
 					return;
 				
 				GraphicObject g = null;
-				IMLStream itemStream = null;
+				ItemTemplate itemStream = null;
 				Type dataType = data [i].GetType ();
 
 				if (itemTemplates.ContainsKey (dataType.FullName))
@@ -174,8 +174,8 @@ namespace Crow
 					g.DataSource = data [i];
 				}
 				g.MouseClick += itemClick;
-				if (!string.IsNullOrEmpty (itemStream.Datas)) {
-
+				if (itemStream.Expand != null && g is Expandable) {
+					(g as Expandable).Expand += itemStream.Expand;
 				}
 				//g.LogicalParent = this;
 			}

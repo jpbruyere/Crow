@@ -20,20 +20,56 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.IO;
+using System.Reflection;
+using System.Reflection.Emit;
 
 namespace Crow
 {
 	public class IMLStream : MemoryStream {
+		public string Path;
 		public Type RootType;
-		//TODO:this has nothing to do in there, I should derive IMLStream
-		public string Datas;
 		public IMLStream(string path) : base (){
+			Path = path;
 			using (Stream stream = Interface.GetStreamFromPath (path))
 				stream.CopyTo (this);
 			RootType = Interface.GetTopContainerOfXMLStream (this);
 		}
 		public IMLStream(Byte[] b) : base (b){			
 			RootType = Interface.GetTopContainerOfXMLStream (this);
+		}
+	}
+	public class ItemTemplate : IMLStream {		
+		public EventHandler Expand;
+
+		public ItemTemplate(string path)
+			: base(path){}
+		public ItemTemplate(Byte[] b)
+			: base(b){}
+
+		public void CreateExpandDelegate (string strDataType, string method){
+			Type dataType = Type.GetType(strDataType);
+			Type host_type = typeof(ItemTemplate);//not sure is the best place to put the dyn method
+			Type evt_type = typeof(EventHandler);
+
+			MethodInfo evtInvoke = evt_type.GetMethod ("Invoke");
+			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
+			Type handlerArgsType = evtParams [1].ParameterType;
+
+			Type [] args = { typeof (object), typeof (object), handlerArgsType };
+			DynamicMethod dm = new DynamicMethod ("dyn_expand_" + method,
+				typeof (void),
+				args,
+				host_type);
+
+
+			#region IL generation
+			ILGenerator il = dm.GetILGenerator (256);
+
+			il.Emit (OpCodes.Ret);
+
+			#endregion
+
+			Expand = (EventHandler)dm.CreateDelegate (evt_type, this);
 		}
 	}
 }
