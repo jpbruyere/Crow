@@ -64,7 +64,7 @@ namespace Crow
 
 		string _template;
 		string _itemTemplate;
-		protected Dictionary<string, ItemTemplate> itemTemplates;
+		public Dictionary<string, ItemTemplate> ItemTemplates;
 
 		[XmlAttributeAttribute][DefaultValue(null)]
 		public string Template {
@@ -150,12 +150,12 @@ namespace Crow
 								xr.MoveToElement ();
 								itemTmp = xr.ReadInnerXml ();
 
-								if (itemTemplates == null)
-									itemTemplates = new Dictionary<string, ItemTemplate> ();
+								if (ItemTemplates == null)
+									ItemTemplates = new Dictionary<string, ItemTemplate> ();
 								//TODO:check encoding
-								itemTemplates[dataType] = new ItemTemplate (Encoding.UTF8.GetBytes(itemTmp));
+								ItemTemplates[dataType] = new ItemTemplate (Encoding.UTF8.GetBytes(itemTmp));
 								if (!string.IsNullOrEmpty (datas))
-									itemTemplates [dataType].CreateExpandDelegate(dataType, datas);
+									ItemTemplates [dataType].CreateExpandDelegate(this, dataType, datas);
 
 								continue;
 							}

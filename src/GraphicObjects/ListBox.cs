@@ -112,10 +112,10 @@ namespace Crow
 		}
 		#endregion
 		void loading(){
-			if (itemTemplates == null)
-				itemTemplates = new Dictionary<string, ItemTemplate> ();
-			if (!itemTemplates.ContainsKey ("default"))
-				itemTemplates["default"] = new ItemTemplate (ItemTemplate);
+			if (ItemTemplates == null)
+				ItemTemplates = new Dictionary<string, ItemTemplate> ();
+			if (!ItemTemplates.ContainsKey ("default"))
+				ItemTemplates["default"] = new ItemTemplate (ItemTemplate);
 
 			for (int i = 1; i <= (data.Count / itemPerPage) + 1; i++) {
 				if (cancelLoading)
@@ -163,10 +163,10 @@ namespace Crow
 				ItemTemplate itemStream = null;
 				Type dataType = data [i].GetType ();
 
-				if (itemTemplates.ContainsKey (dataType.FullName))
-					itemStream = itemTemplates [dataType.FullName];
+				if (ItemTemplates.ContainsKey (dataType.FullName))
+					itemStream = ItemTemplates [dataType.FullName];
 				else
-					itemStream = itemTemplates ["default"];
+					itemStream = ItemTemplates ["default"];
 
 				lock (Interface.CurrentInterface.LayoutMutex) {
 					g = Interface.Load (itemStream);

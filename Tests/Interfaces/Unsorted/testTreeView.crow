@@ -1,27 +1,13 @@
 ﻿<?xml version="1.0"?>
 <TreeView Height="90%" Width="90%" Data="{CurDirectory}">
 	<ItemTemplate DataType="System.IO.FileInfo">
-		<Label Background="Mantis" Text="{Name}" Width="Stretched"/>
-<!--		<Expandable Caption="{}">
-			<Template>
-				<Border BorderWidth="1" Foreground="LightGray" Height="{../HeightPolicy}" Width="{../WidthPolicy}" 
-					MouseClick="../onMouseClick">
-					<VerticalStack Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
-						<HorizontalStack Spacing="1" Height="Fit" Width="{../../../WidthPolicy}">
-							<Image Margin="2" Width="12" Height="12" Path="{../../../../Image}" SvgSub="{../../../../SvgSub}"/>
-							<Label Text="{../../../../Caption}" Width="{../../../../WidthPolicy}"/>
-						</HorizontalStack>
-						<Container Name="Content" Visible="false" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}"/>
-					</VerticalStack>
-				</Border>
-			</Template>
-		</Expandable>-->
+		<Label Text="{Name}" Width="Stretched"/>
 	</ItemTemplate>
 	<ItemTemplate DataType="System.IO.DirectoryInfo" Data="GetFileSystemInfos">		
 		<Expandable Caption="{Name}" >
 			<Template>
 				<VerticalStack Height="{../HeightPolicy}" Width="{../WidthPolicy}">
-					<HorizontalStack Spacing="1" Height="-1" Width="{../../WidthPolicy}">
+					<HorizontalStack Spacing="1" Height="Fit" Width="{../../WidthPolicy}">
 						<Image Margin="2" Width="12" Height="12"
 							Visible="{../../../HasContent}"
 							Path="{../../../Image}" 
@@ -29,10 +15,14 @@
 						<Label Text="{../../../Caption}" Width="{../../../WidthPolicy}"/>
 					</HorizontalStack>
 					<Container Name="Content" Visible="false"
-						Height="{../../HeightPolicy}" Width="{../../WidthPolicy}"/>
+							Height="{../../HeightPolicy}" Width="{../../WidthPolicy}"/>
 				</VerticalStack>
 			</Template>
-			<ListBox Name="List" Height="Fit" Width="{../WidthPolicy}" />
+			<HorizontalStack Height="Fit" Width="{../WidthPolicy}">
+				<GraphicObject Width="12" Height="10"/>
+				<ListBox Name="List" Height="Fit" Width="{../../WidthPolicy}"
+					Template="#Tests.Interfaces.treeList.crow" />
+			</HorizontalStack>
 		</Expandable>
 	</ItemTemplate>
 </TreeView>

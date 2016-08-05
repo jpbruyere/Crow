@@ -46,9 +46,9 @@ namespace Crow
 		public ItemTemplate(Byte[] b)
 			: base(b){}
 
-		public void CreateExpandDelegate (string strDataType, string method){
+		public void CreateExpandDelegate (TemplatedControl host, string strDataType, string method){
 			Type dataType = Type.GetType(strDataType);
-			Type hostType = typeof(ItemTemplate);//not sure is the best place to put the dyn method
+			Type hostType = typeof(TemplatedControl);//not sure is the best place to put the dyn method
 			Type evtType = typeof(EventHandler);
 			Type listBoxType = typeof(ListBox);
 
@@ -65,13 +65,22 @@ namespace Crow
 
 			#region IL generation
 			ILGenerator il = dm.GetILGenerator (256);
+			il.DeclareLocal(typeof(GraphicObject));
 
 			il.Emit (OpCodes.Ldarg_1);
 
 			MethodInfo miFindByName = typeof(GraphicObject).GetMethod("FindByName");
 			il.Emit(OpCodes.Ldstr, "List");
 			il.Emit (OpCodes.Callvirt, miFindByName);
+			il.Emit (OpCodes.Stloc_0);
 
+			FieldInfo fiTemplates = typeof(TemplatedControl).GetField("ItemTemplates");
+			il.Emit (OpCodes.Ldloc_0);
+			il.Emit (OpCodes.Ldarg_0);
+			il.Emit (OpCodes.Ldfld, fiTemplates);
+			il.Emit (OpCodes.Stfld, fiTemplates);
+
+			il.Emit (OpCodes.Ldloc_0);
 			il.Emit (OpCodes.Ldarg_1);
 			il.Emit (OpCodes.Callvirt, typeof(GraphicObject).GetProperty("DataSource").GetGetMethod ());
 
@@ -84,7 +93,7 @@ namespace Crow
 
 			#endregion
 
-			Expand = (EventHandler)dm.CreateDelegate (evtType, this);
+			Expand = (EventHandler)dm.CreateDelegate (evtType, host);
 		}
 	}
 }

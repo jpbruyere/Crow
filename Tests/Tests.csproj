@@ -370,6 +370,7 @@
     <EmbeddedResource Include="ui\Popper.template" />
     <EmbeddedResource Include="ui\MenuItem.style" />
     <EmbeddedResource Include="test.style" />
+    <EmbeddedResource Include="Interfaces\treeList.crow" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">
