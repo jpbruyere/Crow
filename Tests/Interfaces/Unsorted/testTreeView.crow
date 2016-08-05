@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <TreeView Height="90%" Width="90%" Data="{CurDirectory}">
 	<ItemTemplate DataType="System.IO.FileInfo">
-		<Label Background="Mantis" Text="{}" Width="Stretched"/>
+		<Label Background="Mantis" Text="{Name}" Width="Stretched"/>
 <!--		<Expandable Caption="{}">
 			<Template>
 				<Border BorderWidth="1" Foreground="LightGray" Height="{../HeightPolicy}" Width="{../WidthPolicy}" 
@@ -32,6 +32,7 @@
 						Height="{../../HeightPolicy}" Width="{../../WidthPolicy}"/>
 				</VerticalStack>
 			</Template>
+			<ListBox Name="List" Height="Fit" Width="{../WidthPolicy}" />
 		</Expandable>
 	</ItemTemplate>
 </TreeView>

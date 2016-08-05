@@ -48,10 +48,11 @@ namespace Crow
 
 		public void CreateExpandDelegate (string strDataType, string method){
 			Type dataType = Type.GetType(strDataType);
-			Type host_type = typeof(ItemTemplate);//not sure is the best place to put the dyn method
-			Type evt_type = typeof(EventHandler);
+			Type hostType = typeof(ItemTemplate);//not sure is the best place to put the dyn method
+			Type evtType = typeof(EventHandler);
+			Type listBoxType = typeof(ListBox);
 
-			MethodInfo evtInvoke = evt_type.GetMethod ("Invoke");
+			MethodInfo evtInvoke = evtType.GetMethod ("Invoke");
 			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
 			Type handlerArgsType = evtParams [1].ParameterType;
 
@@ -59,17 +60,31 @@ namespace Crow
 			DynamicMethod dm = new DynamicMethod ("dyn_expand_" + method,
 				typeof (void),
 				args,
-				host_type);
+				hostType);
 
 
 			#region IL generation
 			ILGenerator il = dm.GetILGenerator (256);
 
+			il.Emit (OpCodes.Ldarg_1);
+
+			MethodInfo miFindByName = typeof(GraphicObject).GetMethod("FindByName");
+			il.Emit(OpCodes.Ldstr, "List");
+			il.Emit (OpCodes.Callvirt, miFindByName);
+
+			il.Emit (OpCodes.Ldarg_1);
+			il.Emit (OpCodes.Callvirt, typeof(GraphicObject).GetProperty("DataSource").GetGetMethod ());
+
+			MethodInfo miGetDatas = dataType.GetMethod (method, new Type[] {});
+			il.Emit (OpCodes.Callvirt, miGetDatas);
+
+			il.Emit (OpCodes.Callvirt, listBoxType.GetProperty("Data").GetSetMethod ());
+
 			il.Emit (OpCodes.Ret);
 
 			#endregion
 
-			Expand = (EventHandler)dm.CreateDelegate (evt_type, this);
+			Expand = (EventHandler)dm.CreateDelegate (evtType, this);
 		}
 	}
 }

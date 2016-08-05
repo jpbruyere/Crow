@@ -154,7 +154,8 @@ namespace Crow
 									itemTemplates = new Dictionary<string, ItemTemplate> ();
 								//TODO:check encoding
 								itemTemplates[dataType] = new ItemTemplate (Encoding.UTF8.GetBytes(itemTmp));
-								itemTemplates [dataType].CreateExpandDelegate(dataType, datas);
+								if (!string.IsNullOrEmpty (datas))
+									itemTemplates [dataType].CreateExpandDelegate(dataType, datas);
 
 								continue;
 							}

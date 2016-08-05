@@ -84,6 +84,7 @@ namespace Crow
 
 		internal bool XmlLoading = false;
 
+		public Dictionary<string,object> Ressources = new Dictionary<string, object>();
 		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem> ();
 		public Queue<LayoutingQueueItem> DiscardQueue;
 		public Queue<LayoutingQueueItem> ProcessedLayoutingQueue;
