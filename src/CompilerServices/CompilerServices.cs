@@ -31,7 +31,7 @@ namespace Crow
 						CompilerServices.CompileEventSource (b);
 						continue;
 					}
-					if (!b.FindTarget ())
+					if (!b.TryFindTarget ())
 						continue;
 					//register handler for event
 					if (b.Target.Method == null) {
@@ -53,7 +53,7 @@ namespace Crow
 					continue;
 				}
 
-				if (!b.FindTarget ())
+				if (!b.TryFindTarget ())
 					continue;
 
 				//group Bindings by target instanceq

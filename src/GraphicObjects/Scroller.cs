@@ -39,7 +39,7 @@ namespace Crow
 		public event EventHandler<ScrollingEventArgs> Scrolled;
 
 		#region public properties
-		[XmlAttributeAttribute][DefaultValue(false)]
+		[XmlAttributeAttribute][DefaultValue(true)]
 		public bool VerticalScrolling {
 			get { return _verticalScrolling; }
 			set { _verticalScrolling = value; }

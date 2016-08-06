@@ -72,7 +72,7 @@ namespace Crow
 		protected TextExtents te;
 		#endregion
 
-		[XmlAttributeAttribute][DefaultValue("SteelBlue")]
+		[XmlAttributeAttribute][DefaultValue("BlueGray")]
 		public virtual Color SelectionBackground {
 			get { return selBackground; }
 			set {

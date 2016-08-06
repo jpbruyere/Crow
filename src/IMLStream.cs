@@ -37,6 +37,25 @@ namespace Crow
 		public IMLStream(Byte[] b) : base (b){			
 			RootType = Interface.GetTopContainerOfXMLStream (this);
 		}
+		/// <summary>
+		/// Create a graphicObject instance from the this XML stream.
+		/// </summary>
+		public GraphicObject Instance {
+			get {
+				Seek (0, SeekOrigin.Begin);
+				return Interface.Load (this, this.RootType);
+			}
+		}
+		/// <summary>
+		/// Gets the xml source code as a string
+		/// </summary>
+		public string Source {
+			get {
+				Seek (0, SeekOrigin.Begin);
+				using (StreamReader sr = new StreamReader(this))
+					return sr.ReadToEnd();
+			}
+		}
 	}
 	public class ItemTemplate : IMLStream {		
 		public EventHandler Expand;

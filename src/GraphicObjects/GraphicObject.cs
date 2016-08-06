@@ -1072,6 +1072,9 @@ namespace Crow
 		public virtual void onKeyDown(object sender, KeyboardKeyEventArgs e){
 			KeyDown.Raise (sender, e);
 		}
+		public virtual void onKeyUp(object sender, KeyboardKeyEventArgs e){
+			KeyUp.Raise (sender, e);
+		}
 		public virtual void onKeyPress(object sender, KeyPressEventArgs e){
 			KeyPress.Raise (sender, e);
 		}

@@ -135,6 +135,7 @@
     <Compile Include="src\CompilerServices\Bindings.cs" />
     <Compile Include="src\StyleReader.cs" />
     <Compile Include="src\IMLStream.cs" />
+    <Compile Include="src\GraphicObjects\DirectoryView.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -227,6 +228,7 @@
     <EmbeddedResource Include="Default.style" />
     <EmbeddedResource Include="Images\Icons\folder.svg" />
     <EmbeddedResource Include="Images\Icons\file.svg" />
+    <EmbeddedResource Include="Templates\DirectoryView.crow" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

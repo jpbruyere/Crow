@@ -218,7 +218,7 @@ namespace Crow
 				xs.Serialize (s, graphicObject, xn);
 			}
 		}
-		public static GraphicObject Load (string path, object hostClass = null)
+		public static GraphicObject Load (string path)
 		{
 			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
@@ -226,7 +226,7 @@ namespace Crow
 			GraphicObject tmp = null;
 			try {
 				using (Stream stream = GetStreamFromPath (path)) {
-					tmp = Load(stream, GetTopContainerOfXMLStream(stream), hostClass);
+					tmp = Load(stream, GetTopContainerOfXMLStream(stream));
 				}
 			} catch (Exception ex) {
 				throw new Exception ("Error loading <" + path + ">:", ex);
@@ -236,11 +236,7 @@ namespace Crow
 
 			return tmp;
 		}
-		internal static GraphicObject Load (IMLStream stream, object hostClass = null){
-			stream.Seek (0, SeekOrigin.Begin);
-			return Load(stream, stream.RootType, hostClass);
-		}
-		internal static GraphicObject Load (Stream stream, Type type, object hostClass = null)
+		internal static GraphicObject Load (Stream stream, Type type)
 		{
 			#if DEBUG_LOAD
 			Stopwatch loadingTime = new Stopwatch ();
@@ -257,7 +253,6 @@ namespace Crow
 			XmlSerializer xs = new XmlSerializer (type);
 
 			result = (GraphicObject)xs.Deserialize (stream);
-			//result.DataSource = hostClass;
 			CurrentInterface.XmlLoading = false;
 
 			#if DEBUG_LOAD
@@ -277,7 +272,7 @@ namespace Crow
 		public GraphicObject LoadInterface (string path)
 		{
 			lock (UpdateMutex) {
-				GraphicObject tmp = Interface.Load (path, this);
+				GraphicObject tmp = Interface.Load (path);
 				AddWidget (tmp);
 
 				return tmp;
@@ -644,7 +639,8 @@ namespace Crow
 				GraphicObject g = GraphicTree[i];
 				if (g.MouseIsIn (e.Position)) {
 					g.checkHoverWidget (e);
-					PutOnTop (g);
+					if (g is Window)
+						PutOnTop (g);
 					return true;
 				}
 			}
@@ -716,6 +712,7 @@ namespace Crow
 
 		#region Keyboard
 		public bool ProcessKeyDown(int Key){
+			Keyboard.SetKeyState((Crow.Key)Key,true);
 			if (_focusedWidget == null)
 				return false;
 			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
@@ -723,9 +720,11 @@ namespace Crow
 			return true;
 		}
 		public bool ProcessKeyUp(int Key){
-			if (_activeWidget == null)
+			Keyboard.SetKeyState((Crow.Key)Key,false);
+			if (_focusedWidget == null)
 				return false;
-			//KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
+			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
+			_focusedWidget.onKeyUp (this, e);
 			return true;
 		}
 		public bool ProcessKeyPress(char Key){

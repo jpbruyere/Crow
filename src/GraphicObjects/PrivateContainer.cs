@@ -51,10 +51,11 @@ namespace Crow
 		{
 
 			if (child != null) {
+				child.ClearBinding ();
 				contentSize = new Size (0, 0);
 				child.LayoutChanged -= OnChildLayoutChanges;
-				this.RegisterForLayouting (LayoutingType.Sizing);
 				child.Parent = null;
+				this.RegisterForGraphicUpdate ();
 			}
 
 			child = _child as GraphicObject;

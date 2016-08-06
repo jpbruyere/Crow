@@ -172,7 +172,7 @@ namespace Crow
 					itemStream = ItemTemplates ["default"];
 
 				lock (Interface.CurrentInterface.LayoutMutex) {
-					g = Interface.Load (itemStream);
+					g = itemStream.Instance;
 					page.AddChild (g);
 					g.DataSource = data [i];
 				}
