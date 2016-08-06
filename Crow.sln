@@ -40,6 +40,13 @@ Global
 		$4.inheritsSet = Mono
 		$4.inheritsScope = text/x-csharp
 		$4.scope = text/x-csharp
+		$0.VersionControlPolicy = $5
+		$5.CommitMessageStyle = $6
+		$6.Indent = @\t
+		$6.FileSeparator = ", "
+		$6.LastFilePostfix = "@:\n  "
+		$6.Wrap = False
+		$5.inheritsSet = Mono
 		description = @C.R.O.W. c# Rapid Open Widgets\n\nCrow is a pure c# widget toolkit with XML definition of interface, bindings, styling...\n
 		version = 0.4
 	EndGlobalSection
