@@ -63,3 +63,4 @@ xbuild  /p:Configuration=Release Crow.sln			# Build with Mono
 * Derive **OpenTKGameWindow** class.
 * Load some widget in the **OnLoad** override with `CrowInterface.LoadInterface` .
 * Build your project with **mono**. (**xbuild**)
+- copy **Crow.dll.config** to output directory if you have trouble finding native libs.

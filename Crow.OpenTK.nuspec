@@ -32,17 +32,19 @@ For more information, please visit https://jpbruyere.github.io/Crow/.
             <reference file="Crow.dll" />
         </references>
         <frameworkAssemblies>
-            <frameworkAssembly assemblyName="System" />
-            <frameworkAssembly assemblyName="System.Drawing" />
-            <frameworkAssembly assemblyName="System.Xml" />
-        </frameworkAssemblies>
-		<contentFiles>
-			<files include="build/Release/Crow.dll.config" copyToOutput="true" />
-		</contentFiles>
+			<frameworkAssembly assemblyName="System" />
+			<frameworkAssembly assemblyName="System.Drawing" />
+			<frameworkAssembly assemblyName="System.Xml" />
+			<frameworkAssembly assemblyName="gio-sharp" />
+			<frameworkAssembly assemblyName="gdk-sharp" />
+			<frameworkAssembly assemblyName="glib-sharp" />
+			<frameworkAssembly assemblyName="cairo-sharp" />
+		</frameworkAssemblies>
 	</metadata>
 	<files>
 		<file src="Tests/OpenTKGameWindow.cs" target="content" />
 		<file src="Tests/OpenGL/*.cs" target="content/OpenGL" />
 		<file src="build/Release/Crow.dll" target="lib/net45" />
+		<file src="build/Release/Crow.dll.config" target="content" />
 	</files>
 </package>

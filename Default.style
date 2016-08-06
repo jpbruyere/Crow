@@ -32,6 +32,7 @@ TabItem {
 TextBox {
 	Background = White;
 	Foreground = Black;
+	Selectable = True;
 }
 Window {
 	Focusable = true;
