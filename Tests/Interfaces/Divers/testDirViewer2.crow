@@ -1,0 +1,22 @@
+﻿<?xml version="1.0"?>
+<HorizontalStack>
+	<Window Resizable="false" Focusable="true" Title="Open File..." Width="20%" Height="100%"
+			MinimumSize="10,1">
+		<DirectoryView Name="dv" Margin="10" Root="./" SelectedItemChanged="Tv_SelectedItemChanged"/>
+	</Window>
+	<Splitter/>
+	<VerticalStack Width="80%" Height="100%">
+		<Window Resizable="false" Focusable="true" Title="{../dv.SelectedItem}"
+				Height="50%" Width="Stretched"
+				MinimumSize="10,1">
+			<Container Margin="10" Name="crowContainer"/>
+		</Window>
+		<Splitter/>
+		<Window Resizable="false" Focusable="true" Title="{../dv.SelectedItem}"
+				Height="50%" Width="Stretched"
+				MinimumSize="10,1">
+			<TextBox Multiline="true" Margin="10" Height="Stretched"
+				Text="{CurSources}"/>
+		</Window>
+	</VerticalStack>
+</HorizontalStack>
