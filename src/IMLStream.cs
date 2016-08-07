@@ -22,6 +22,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Threading;
 
 namespace Crow
 {
@@ -42,8 +43,14 @@ namespace Crow
 		/// </summary>
 		public GraphicObject Instance {
 			get {
+				System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
+				Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
 				Seek (0, SeekOrigin.Begin);
-				return Interface.Load (this, this.RootType);
+				GraphicObject tmp = Interface.Load (this, this.RootType);
+
+				Thread.CurrentThread.CurrentCulture = savedCulture;
+				return tmp;
 			}
 		}
 		/// <summary>
