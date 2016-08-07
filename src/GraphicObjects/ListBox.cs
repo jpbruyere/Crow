@@ -104,7 +104,7 @@ namespace Crow
 			SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
 		}
 			
-		#region implemented abstract members of TemplatedControl
+		#region TemplatedControl override
 		protected override void loadTemplate (GraphicObject template = null)
 		{
 			base.loadTemplate (template);
@@ -114,6 +114,7 @@ namespace Crow
 			_gsList = _list as GenericStack;
 		}
 		#endregion
+
 		void loading(){
 			if (ItemTemplates == null)
 				ItemTemplates = new Dictionary<string, ItemTemplate> ();

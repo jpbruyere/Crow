@@ -1304,7 +1304,7 @@ namespace Crow
 				PropertyInfo pi = mi as PropertyInfo;
 
 				if (pi.GetSetMethod () == null) {
-					Debug.WriteLine ("GOML: Read only property in " + thisType.ToString() + " : " + name);
+					Debug.WriteLine ("XML: Read only property in " + thisType.ToString() + " : " + name);
 					return;
 				}
 

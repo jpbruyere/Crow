@@ -337,7 +337,7 @@ namespace Crow
 						}
 					}
 					if (t == null)
-						throw new Exception ("Crow." + subTree.Name + " type not found");
+						throw new Exception (subTree.Name + " type not found");
                     GraphicObject go = (GraphicObject)Activator.CreateInstance(t);
                     (go as IXmlSerializable).ReadXml(subTree);                    
                     AddChild(go);

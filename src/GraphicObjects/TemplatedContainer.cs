@@ -92,6 +92,9 @@ namespace Crow
 									t = expT;
 							}
 						}
+						if (t == null)
+							throw new Exception (xr.Name + " type not found");
+						
 						GraphicObject go = (GraphicObject)Activator.CreateInstance (t);                                
 
 						(go as IXmlSerializable).ReadXml (xr);

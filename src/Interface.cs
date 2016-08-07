@@ -108,7 +108,7 @@ namespace Crow
 			}
 		}
 
-		#region default values and style loading
+		#region Default values and Style loading
 		/// Default values of properties from GraphicObjects are retrieve from XML Attributes.
 		/// The reflexion process used to retrieve those values being very slow, it is compiled in MSIL
 		/// and injected as a dynamic method referenced in the DefaultValuesLoader Dictionnary.
