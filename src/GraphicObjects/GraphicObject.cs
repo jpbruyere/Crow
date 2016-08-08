@@ -12,16 +12,8 @@ using System.IO;
 
 namespace Crow
 {
-	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange, ICloneable, IBindable
+	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange, ICloneable
 	{
-		#region IBindable implementation
-		List<Binding> bindings = new List<Binding> ();
-		public List<Binding> Bindings {
-			get { return bindings; }
-		}
-
-		#endregion
-
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
 
@@ -513,7 +505,7 @@ namespace Crow
 		#endregion
 
 		/// <summary> Loads the default values from XML attributes default </summary>
-		protected virtual void loadDefaultValues()
+		public void loadDefaultValues()
 		{
 			#if DEBUG_LOAD
 			Debug.WriteLine ("LoadDefValues for " + this.ToString ());
@@ -581,151 +573,70 @@ namespace Crow
 				typeof(void),new Type[] {typeof(object)},thisType,true);
 
 			il = dm.GetILGenerator(256);
-
+			il.DeclareLocal(typeof(GraphicObject));
 			il.Emit(OpCodes.Nop);
+			//set local GraphicObject to root object passed as 1st argument
+			il.Emit (OpCodes.Ldarg_0);
+			il.Emit (OpCodes.Stloc_0);
 
-			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
-				string name = "";
-				object defaultValue = null;
-
-				#region retrieve custom attributes
+			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {				
 				if (pi.GetSetMethod () == null)
 					continue;
-
-				XmlIgnoreAttribute xia = (XmlIgnoreAttribute)pi.GetCustomAttribute (typeof(XmlIgnoreAttribute));
-				if (xia != null)
+				object defaultValue;
+				if (!getDefaultValue (pi, styling, out defaultValue))
 					continue;
-				XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
-				if (xaa != null) {
-					if (string.IsNullOrEmpty (xaa.AttributeName))
-						name = pi.Name;
-					else
-						name = xaa.AttributeName;
-				}
 
-				int styleIndex = -1;
-				if (styling.Count > 0){
-					for (int i = 0; i < styling.Count; i++) {
-						if (styling[i].ContainsKey (name)){
-							styleIndex = i;
-							break;
-						}
-					}
-				}
-				if (styleIndex >= 0){
-					if (pi.PropertyType.IsEnum)//maybe should be in parser..
-						defaultValue = Enum.Parse(pi.PropertyType, (string)styling[styleIndex] [name], true);
-					else
-						defaultValue = styling[styleIndex] [name];
-				}else {
-					DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof (DefaultValueAttribute));
-					if (dv == null)
-						continue;
-					defaultValue = dv.Value;
-				}
-				#endregion
-
-				il.Emit (OpCodes.Ldarg_0);
-
-				if (defaultValue == null) {
-					il.Emit (OpCodes.Ldnull);
-					il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
-					continue;
-				}
-				Type dvType = defaultValue.GetType ();
-
-				if (dvType.IsValueType) {
-					if (pi.PropertyType.IsValueType) {
-						if (pi.PropertyType.IsEnum) {
-							if (pi.PropertyType != dvType)
-								throw new Exception ("Enum mismatch in default values: " + pi.PropertyType.FullName);
-							il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (defaultValue));
-						} else {
-							switch (Type.GetTypeCode (dvType)) {
-							case TypeCode.Boolean:
-								if ((bool)defaultValue == true)
-									il.Emit (OpCodes.Ldc_I4_1);
-								else
-									il.Emit (OpCodes.Ldc_I4_0);
-								break;
-//						case TypeCode.Empty:
-//							break;
-//						case TypeCode.Object:
-//							break;
-//						case TypeCode.DBNull:
-//							break;
-//						case TypeCode.SByte:
-//							break;
-//						case TypeCode.Decimal:
-//							break;
-//						case TypeCode.DateTime:
-//							break;
-							case TypeCode.Char:
-								il.Emit (OpCodes.Ldc_I4, Convert.ToChar (defaultValue));
-								break;
-							case TypeCode.Byte:
-							case TypeCode.Int16:
-							case TypeCode.Int32:
-								il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (defaultValue));
-								break;
-							case TypeCode.UInt16:
-							case TypeCode.UInt32:
-								il.Emit (OpCodes.Ldc_I4, Convert.ToUInt32 (defaultValue));
-								break;
-							case TypeCode.Int64:
-								il.Emit (OpCodes.Ldc_I8, Convert.ToInt64 (defaultValue));
-								break;
-							case TypeCode.UInt64:
-								il.Emit (OpCodes.Ldc_I8, Convert.ToUInt64 (defaultValue));
-								break;
-							case TypeCode.Single:
-								il.Emit (OpCodes.Ldc_R4, Convert.ToSingle (defaultValue));
-								break;
-							case TypeCode.Double:
-								il.Emit (OpCodes.Ldc_R8, Convert.ToDouble (defaultValue));
-								break;
-							case TypeCode.String:
-								il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
-								break;
-							default:
-								il.Emit (OpCodes.Pop);
-								continue;
-							}
-						}
-					} else
-						throw new Exception ("Expecting valuetype in default values for: " + pi.Name);
-				}else{
-					//surely a class or struct
-					if (dvType != typeof(string))
-						throw new Exception ("Expecting String in default values for: " + pi.Name);
-					if (pi.PropertyType == typeof (string))
-						il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
-					else {
-						MethodInfo miParse = pi.PropertyType.GetMethod
-						                       ("Parse", BindingFlags.Static | BindingFlags.Public,
-						                        Type.DefaultBinder, new Type [] {typeof (string)},null);
-						if (miParse == null)
-							throw new Exception ("no Parse method found for: " + pi.PropertyType.FullName);
-
-						il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
-						il.Emit (OpCodes.Callvirt, miParse);
-
-						if (miParse.ReturnType != pi.PropertyType)
-							il.Emit (OpCodes.Unbox_Any, pi.PropertyType);
-					}
-				}
-				il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
+				CompilerServices.EmitSetValue (il, pi, defaultValue);
 			}
 			il.Emit(OpCodes.Ret);
 			#endregion
 
 			try {
-				Interface.DefaultValuesLoader[styleKey] = (Interface.loadDefaultInvoker)dm.CreateDelegate(typeof(Interface.loadDefaultInvoker));
+				Interface.DefaultValuesLoader[styleKey] = (Interface.LoaderInvoker)dm.CreateDelegate(typeof(Interface.LoaderInvoker));
 				Interface.DefaultValuesLoader[styleKey] (this);
 			} catch (Exception ex) {
 				throw new Exception ("Error applying style <" + styleKey + ">:", ex);
 			}
 		}
+		bool getDefaultValue(PropertyInfo pi, List<Dictionary<string, object>> styling,
+			out object defaultValue){
+			defaultValue = null;
+			string name = "";
+
+			XmlIgnoreAttribute xia = (XmlIgnoreAttribute)pi.GetCustomAttribute (typeof(XmlIgnoreAttribute));
+			if (xia != null)
+				return false;
+			XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
+			if (xaa != null) {
+				if (string.IsNullOrEmpty (xaa.AttributeName))
+					name = pi.Name;
+				else
+					name = xaa.AttributeName;
+			}
+
+			int styleIndex = -1;
+			if (styling.Count > 0){
+				for (int i = 0; i < styling.Count; i++) {
+					if (styling[i].ContainsKey (name)){
+						styleIndex = i;
+						break;
+					}
+				}
+			}
+			if (styleIndex >= 0){
+				if (pi.PropertyType.IsEnum)//maybe should be in parser..
+					defaultValue = Enum.Parse(pi.PropertyType, (string)styling[styleIndex] [name], true);
+				else
+					defaultValue = styling[styleIndex] [name];
+			}else {
+				DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof (DefaultValueAttribute));
+				if (dv == null)
+					return false;
+				defaultValue = dv.Value;
+			}
+			return true;
+		}
+
 
 		public virtual GraphicObject FindByName(string nameToFind){
 			return string.Equals(nameToFind, _name, StringComparison.Ordinal) ? this : null;
@@ -747,7 +658,7 @@ namespace Crow
 			if (Width == Measure.Fit || Height == Measure.Fit)
 				RegisterForLayouting (LayoutingType.Sizing);
 			else if (RegisteredLayoutings == LayoutingType.None)
-				Interface.CurrentInterface.EnqueueForRepaint (this);
+				CurrentInterface.EnqueueForRepaint (this);
 		}
 		/// <summary> query an update of the content, a redraw </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -755,8 +666,20 @@ namespace Crow
 		{
 			bmp = null;
 			if (RegisteredLayoutings == LayoutingType.None)
-				Interface.CurrentInterface.EnqueueForRepaint (this);
+				CurrentInterface.EnqueueForRepaint (this);
 		}
+		public Interface CurrentInterface {
+			get {
+				ILayoutable tmp = this.Parent;
+				while (tmp != null) {
+					if (tmp is Interface)
+						return tmp as Interface;
+					tmp = tmp.Parent;
+				}
+				return null;
+			}
+		}
+
 		#region Layouting
 
 		#if DEBUG_LAYOUTING
@@ -1200,18 +1123,15 @@ namespace Crow
 		}
 
 		#region Binding
-		public void BindMember(string _member, string _expression){
-			Bindings.Add(new Binding (this, _member, _expression));
-		}
 		public virtual void ResolveBindings()
 		{
-			if (Bindings.Count == 0)
-				return;
-			#if DEBUG_BINDING
-			Debug.WriteLine ("Resolve Bindings => " + this.ToString ());
-			#endif
-
-			CompilerServices.ResolveBindings (Bindings);
+//			if (Bindings.Count == 0)
+//				return;
+//			#if DEBUG_BINDING
+//			Debug.WriteLine ("Resolve Bindings => " + this.ToString ());
+//			#endif
+//
+//			CompilerServices.ResolveBindings (Bindings);
 		}
 
 		/// <summary>
@@ -1220,53 +1140,53 @@ namespace Crow
 		/// </summary>
 		public virtual void ClearBinding(){
 			//dont clear binding if dataSource is not null,
-			foreach (Binding b in Bindings) {
-				try {
-					if (!b.Resolved)
-						continue;
-					//cancel compiled events
-					if (b.Target == null){
-						continue;
-						#if DEBUG_BINDING
-						Debug.WriteLine("Clear binding canceled for => " + b.ToString());
-						#endif
-					}
-					if (b.Target.Instance != DataSource){
-						#if DEBUG_BINDING
-						Debug.WriteLine("Clear binding canceled for => " + b.ToString());
-						#endif
-						continue;
-					}
-					#if DEBUG_BINDING
-					Debug.WriteLine("ClearBinding => " + b.ToString());
-					#endif
-					if (string.IsNullOrEmpty (b.DynMethodId)) {
-						b.Resolved = false;
-						if (b.Source.Member.MemberType == MemberTypes.Event)
-							removeEventHandler (b);
-						//TODO:check if full reset is necessary
-						continue;
-					}
-					MemberReference mr = null;
-					if (b.Target == null)
-						mr = b.Source;
-					else
-						mr = b.Target;
-					Type dataSourceType = mr.Instance.GetType();
-					EventInfo evtInfo = dataSourceType.GetEvent ("ValueChanged");
-					FieldInfo evtFi = CompilerServices.GetEventHandlerField (dataSourceType, "ValueChanged");
-					MulticastDelegate multicastDelegate = evtFi.GetValue (mr.Instance) as MulticastDelegate;
-					if (multicastDelegate != null) {
-						foreach (Delegate d in multicastDelegate.GetInvocationList()) {
-							if (d.Method.Name == b.DynMethodId)
-								evtInfo.RemoveEventHandler (mr.Instance, d);
-						}
-					}
-					b.Reset ();
-				} catch (Exception ex) {
-					Debug.WriteLine("\t Error: " + ex.ToString());
-				}
-			}
+//			foreach (Binding b in Bindings) {
+//				try {
+//					if (!b.Resolved)
+//						continue;
+//					//cancel compiled events
+//					if (b.Target == null){
+//						continue;
+//						#if DEBUG_BINDING
+//						Debug.WriteLine("Clear binding canceled for => " + b.ToString());
+//						#endif
+//					}
+//					if (b.Target.Instance != DataSource){
+//						#if DEBUG_BINDING
+//						Debug.WriteLine("Clear binding canceled for => " + b.ToString());
+//						#endif
+//						continue;
+//					}
+//					#if DEBUG_BINDING
+//					Debug.WriteLine("ClearBinding => " + b.ToString());
+//					#endif
+//					if (string.IsNullOrEmpty (b.DynMethodId)) {
+//						b.Resolved = false;
+//						if (b.Source.Member.MemberType == MemberTypes.Event)
+//							removeEventHandler (b);
+//						//TODO:check if full reset is necessary
+//						continue;
+//					}
+//					MemberReference mr = null;
+//					if (b.Target == null)
+//						mr = b.Source;
+//					else
+//						mr = b.Target;
+//					Type dataSourceType = mr.Instance.GetType();
+//					EventInfo evtInfo = dataSourceType.GetEvent ("ValueChanged");
+//					FieldInfo evtFi = CompilerServices.GetEventHandlerField (dataSourceType, "ValueChanged");
+//					MulticastDelegate multicastDelegate = evtFi.GetValue (mr.Instance) as MulticastDelegate;
+//					if (multicastDelegate != null) {
+//						foreach (Delegate d in multicastDelegate.GetInvocationList()) {
+//							if (d.Method.Name == b.DynMethodId)
+//								evtInfo.RemoveEventHandler (mr.Instance, d);
+//						}
+//					}
+//					b.Reset ();
+//				} catch (Exception ex) {
+//					Debug.WriteLine("\t Error: " + ex.ToString());
+//				}
+//			}
 		}
 		void removeEventHandler(Binding b){
 			FieldInfo fiEvt = CompilerServices.GetEventHandlerField (b.Source.Instance.GetType(), b.Source.Member.Name);
@@ -1297,7 +1217,7 @@ namespace Crow
 				return;
 			}
 			if (mi.MemberType == MemberTypes.Event) {
-				this.Bindings.Add (new Binding (new MemberReference(this, mi), value));
+				Interface.RegisterBinding (new Binding (new MemberReference(this, mi), value));
 				return;
 			}
 			if (mi.MemberType == MemberTypes.Property) {
@@ -1318,7 +1238,7 @@ namespace Crow
 					if (!value.EndsWith("}", StringComparison.Ordinal))
 						throw new Exception (string.Format("XML:Malformed binding: {0}", value));
 
-					this.Bindings.Add (new Binding (new MemberReference(this, pi), value.Substring (1, value.Length - 2)));
+					Interface.RegisterBinding (new Binding (new MemberReference(this, pi), value.Substring (1, value.Length - 2)));
 					return;
 				}
 				if (pi.GetCustomAttribute (typeof(XmlIgnoreAttribute)) != null)
@@ -1341,21 +1261,34 @@ namespace Crow
 		}
 		public virtual void ReadXml (System.Xml.XmlReader reader)
 		{
-			if (reader.HasAttributes) {				
+			IMLInstantiatorBuilder ir = reader as IMLInstantiatorBuilder;
+			Type thisType = this.GetType ();
 
-				style = reader.GetAttribute ("Style");
+			if (ir.HasAttributes) {
+				style = ir.GetAttribute ("Style");
+				if (!string.IsNullOrEmpty (style)) {
+					PropertyInfo pi = thisType.GetProperty ("Style");
+					CompilerServices.EmitSetValue (ir.il, pi, style);
+				}
+			}
+			if (ir.HasAttributes) {
+				ir.il.Emit (OpCodes.Ldarg_0);
+				ir.il.Emit (OpCodes.Callvirt, typeof(GraphicObject).GetMethod ("loadDefaultValues"));
 
-				loadDefaultValues ();
-
-				while (reader.MoveToNextAttribute ()) {
-					if (reader.Name == "Style")
+				while (ir.MoveToNextAttribute ()) {
+					if (ir.Name == "Style")
 						continue;
 
-					affectMember (reader.Name, reader.Value);
+					PropertyInfo pi = thisType.GetProperty (ir.Name);
+
+					if (pi == null)
+						throw new Exception ("Member '" + ir.Name + "' not found in " + thisType.Name);
+
+					CompilerServices.EmitSetValue (ir.il, pi, ir.Value);
+
 				}
-				reader.MoveToElement ();
-			}else
-				loadDefaultValues ();
+				ir.MoveToElement ();
+			}
 		}
 		public virtual void WriteXml (System.Xml.XmlWriter writer)
 		{
@@ -1445,6 +1378,8 @@ namespace Crow
 		}
 		#endregion
 
+
+
 		#region ICloneable implementation
 		public object Clone ()
 		{
@@ -1470,8 +1405,8 @@ namespace Crow
 		/// </summary>
 		public virtual GraphicObject DeepClone(){
 			GraphicObject tmp = Clone () as GraphicObject;
-			foreach (Binding b in this.bindings)
-				tmp.Bindings.Add (new Binding (new MemberReference (tmp, b.Source.Member), b.Expression));
+//			foreach (Binding b in this.bindings)
+//				tmp.Bindings.Add (new Binding (new MemberReference (tmp, b.Source.Member), b.Expression));
 			return tmp;
 		}
 	}

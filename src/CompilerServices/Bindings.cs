@@ -41,6 +41,11 @@ namespace Crow
 		public string DynMethodId {
 			get { return dynMethodId; }
 		}
+		public Type SourceType {
+			get { return Source == null ? null 
+					: Source.Instance == null ? null 
+					: Source.Instance.GetType();}
+		}
 
 		public bool Resolved {
 			get { return resolved; }
@@ -185,12 +190,8 @@ namespace Crow
 			}
 
 			if (Target.TryFindMember (memberName)) {
-				if (TwoWayBinding) {
-					IBindable source = Target.Instance as IBindable;
-					if (source == null)
-						throw new Exception (Source.Instance + " does not implement IBindable for 2 way bindings");
-					source.Bindings.Add (new Binding (Target, Source));
-				}
+				if (TwoWayBinding)
+					Interface.RegisterBinding (new Binding (Target, Source));				
 			}
 			#if DEBUG_BINDING
 			else

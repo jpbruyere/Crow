@@ -29,11 +29,10 @@ namespace Crow
 		int _rowCount;
 		#endregion
 
-		public override T AddChild<T> (T child)
+		public override void AddChild (GraphicObject child)
 		{
-			T tmp = base.AddChild (child);
+			base.AddChild (child);
 			this.RegisterForLayouting (LayoutingType.ArrangeChildren);
-			return tmp;
 		}
 		public override void RemoveChild (GraphicObject child)
 		{
