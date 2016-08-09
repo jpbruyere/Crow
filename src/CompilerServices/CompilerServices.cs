@@ -14,163 +14,14 @@ namespace Crow
 	{
 		static MethodInfo miAddBinding = typeof(GraphicObject).GetMethod ("BindMember");
 
-		public static void BuildInstanciator(IMLInstantiatorBuilder builder, Type crowType){
-			string tmpXml = builder.ReadOuterXml ();
 
-			builder.il.Emit (OpCodes.Ldloc_0);//save current go onto the stack if child has to be added
-
-			if (typeof(TemplatedControl).IsAssignableFrom (crowType)) {
-				//if its a template, first read template elements
-				using (IMLInstantiatorBuilder reader = new IMLInstantiatorBuilder (builder.il, tmpXml)) {
-
-					string template = reader.GetAttribute ("Template");
-
-					bool inlineTemplate = false;
-					if (string.IsNullOrEmpty (template)) {
-						reader.Read ();
-
-						while (reader.Read ()) {
-							if (!reader.IsStartElement ())
-								continue;
-							if (reader.Name == "Template") {
-								inlineTemplate = true;
-								reader.Read ();
-
-								readChildren (reader, crowType);
-								continue;
-							}
-						}
-						if (!inlineTemplate) {
-							DefaultTemplate dt = (DefaultTemplate)crowType.GetCustomAttributes (typeof(DefaultTemplate), true).FirstOrDefault();
-							template = dt.Path;
-						}
-					} 
-					if (!inlineTemplate) {
-						reader.il.Emit (OpCodes.Ldloc_0);//Load  this templateControl ref
-
-						reader.il.Emit (OpCodes.Ldstr, template); //Load template path string
-						reader.il.Emit (OpCodes.Callvirt,//call Interface.Load(path)
-							typeof(Interface).GetMethod ("Load", BindingFlags.Static | BindingFlags.Public));
-					}
-					reader.il.Emit (OpCodes.Callvirt,//add child
-						typeof(TemplatedControl).GetMethod ("loadTemplate", BindingFlags.Instance | BindingFlags.NonPublic));
-				}
-			}
-
-			using (IMLInstantiatorBuilder reader = new IMLInstantiatorBuilder(builder.il,tmpXml)){
-				reader.Read ();
-
-				if (reader.HasAttributes) {
-					string style = reader.GetAttribute ("Style");
-					if (!string.IsNullOrEmpty (style)) {
-						PropertyInfo pi = crowType.GetProperty ("Style");
-						CompilerServices.EmitSetValue (reader.il, pi, style);
-					}
-				}
-				if (reader.HasAttributes) {
-					reader.il.Emit (OpCodes.Ldloc_0);
-					reader.il.Emit (OpCodes.Callvirt, typeof(GraphicObject).GetMethod ("loadDefaultValues"));
-
-					MethodInfo miAddBinding = typeof(GraphicObject).GetMethod ("BindMember");
-
-					while (reader.MoveToNextAttribute ()) {
-						if (reader.Name == "Style")
-							continue;
-
-						MemberInfo mi = crowType.GetMember (reader.Name).FirstOrDefault();
-						if (mi == null)
-							throw new Exception ("Member '" + reader.Name + "' not found in " + crowType.Name);
-						if (mi.MemberType == MemberTypes.Event) {
-							emitBindingCreation (reader.il, reader.Name, reader.Value);
-							continue;
-						}
-						PropertyInfo pi = mi as PropertyInfo;
-						if (pi == null)
-							throw new Exception ("Member '" + reader.Name + "' not found in " + crowType.Name);
-
-						if (reader.Value.StartsWith ("{")) {
-							emitBindingCreation (reader.il, reader.Name, reader.Value.Substring (1, reader.Value.Length - 2));
-						}else
-							CompilerServices.EmitSetValue (reader.il, pi, reader.Value);
-
-					}
-					reader.MoveToElement ();
-				}
-
-				if (reader.IsEmptyElement) {
-					reader.il.Emit (OpCodes.Pop);//pop saved ref to current object
-					return;
-				}
-
-				readChildren (reader, crowType);
-			}
-			builder.il.Emit (OpCodes.Pop);//pop saved ref to current object
-		}
-		static void emitBindingCreation(ILGenerator il, string memberName, string expression){
+		public static void emitBindingCreation(ILGenerator il, string memberName, string expression){
 			il.Emit (OpCodes.Ldloc_0);
 			il.Emit (OpCodes.Ldstr, memberName);
 			il.Emit (OpCodes.Ldstr, expression);
 			il.Emit (OpCodes.Callvirt, miAddBinding);
 		}
-		static void readChildren(IMLInstantiatorBuilder reader, Type crowType){
-			MethodInfo miAddChild = null;
-			bool endTagReached = false;
-			while (reader.Read()){
-				switch (reader.NodeType) {
-				case XmlNodeType.EndElement:
-					endTagReached = true;
-					break;
-				case XmlNodeType.Element:
-					//Templates
-					if (reader.Name == "Template" ||
-					    reader.Name == "ItemTemplate") {
-						reader.Skip ();
-						continue;
-					}
 
-
-					if (miAddChild == null) {
-						if (typeof(Group).IsAssignableFrom (crowType))
-							miAddChild = typeof(Group).GetMethod ("AddChild");
-						else if (typeof(Container).IsAssignableFrom (crowType))
-							miAddChild = typeof(Container).GetMethod ("SetChild");
-						else if (typeof(TemplatedContainer).IsAssignableFrom (crowType))
-							miAddChild = typeof(TemplatedContainer).GetProperty("Content").GetSetMethod();
-						else if (typeof(PrivateContainer).IsAssignableFrom (crowType))
-							miAddChild = typeof(PrivateContainer).GetMethod ("SetChild",
-								BindingFlags.Instance | BindingFlags.NonPublic);
-					}
-
-					//push current instance on stack for parenting
-					//loc_0 will be used for child
-					reader.il.Emit (OpCodes.Ldloc_0);
-
-					Type t = Type.GetType ("Crow." + reader.Name);
-					if (t == null) {
-						Assembly a = Assembly.GetEntryAssembly ();
-						foreach (Type expT in a.GetExportedTypes ()) {
-							if (expT.Name == reader.Name)
-								t = expT;
-						}
-					}
-					if (t == null)
-						throw new Exception (reader.Name + " type not found");
-
-					reader.il.Emit(OpCodes.Newobj, t.GetConstructors () [0]);
-					reader.il.Emit (OpCodes.Stloc_0);//child is now loc_0
-
-					BuildInstanciator(reader, t);
-
-					reader.il.Emit (OpCodes.Ldloc_0);//load child on stack for parenting
-					reader.il.Emit (OpCodes.Callvirt, miAddChild);
-					reader.il.Emit (OpCodes.Stloc_0); //reset local to current go
-					reader.il.Emit (OpCodes.Ldloc_0);//save current go onto the stack if child has to be added
-					break;
-				}
-				if (endTagReached)
-					break;
-			}			
-		}
 		public static void EmitSetValue(ILGenerator il, PropertyInfo pi, object val){
 			il.Emit (OpCodes.Ldloc_0);
 
@@ -283,6 +134,7 @@ namespace Crow
 			}
 			il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());			
 		}
+
 		public static void ResolveBindings (List<Binding> Bindings)
 		{
 			if (Bindings == null)
