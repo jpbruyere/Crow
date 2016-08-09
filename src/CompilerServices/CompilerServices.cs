@@ -51,11 +51,9 @@ namespace Crow
 						reader.il.Emit (OpCodes.Ldstr, template); //Load template path string
 						reader.il.Emit (OpCodes.Callvirt,//call Interface.Load(path)
 							typeof(Interface).GetMethod ("Load", BindingFlags.Static | BindingFlags.Public));
-						reader.il.Emit (OpCodes.Callvirt,//add child
-							typeof(PrivateContainer).GetMethod ("SetChild", BindingFlags.Instance | BindingFlags.NonPublic));						
 					}
-					reader.il.Emit (OpCodes.Ldloc_0);
-					reader.il.Emit (OpCodes.Callvirt, crowType.GetMethod ("ResolveBindings"));
+					reader.il.Emit (OpCodes.Callvirt,//add child
+						typeof(TemplatedControl).GetMethod ("loadTemplate", BindingFlags.Instance | BindingFlags.NonPublic));
 				}
 			}
 
@@ -124,6 +122,11 @@ namespace Crow
 					break;
 				case XmlNodeType.Element:
 					//Templates
+					if (reader.Name == "Template" ||
+					    reader.Name == "ItemTemplate") {
+						reader.Skip ();
+						continue;
+					}
 
 
 					if (miAddChild == null) {
@@ -131,6 +134,8 @@ namespace Crow
 							miAddChild = typeof(Group).GetMethod ("AddChild");
 						else if (typeof(Container).IsAssignableFrom (crowType))
 							miAddChild = typeof(Container).GetMethod ("SetChild");
+						else if (typeof(TemplatedContainer).IsAssignableFrom (crowType))
+							miAddChild = typeof(TemplatedContainer).GetProperty("Content").GetSetMethod();
 						else if (typeof(PrivateContainer).IsAssignableFrom (crowType))
 							miAddChild = typeof(PrivateContainer).GetMethod ("SetChild",
 								BindingFlags.Instance | BindingFlags.NonPublic);
