@@ -1,3 +1,6 @@
 ﻿<?xml version="1.0"?>
-
-	<Label/>
+<HorizontalStack Background="{./Background}" Margin="1" Spacing="1" Height="{./HeightPolicy}" Width="{./WidthPolicy}">
+	<Image Margin="2" Width="14"  Height="14" Path="#Crow.Images.Icons.checkbox.svg"
+		SvgSub="{./IsChecked}"/>
+	<Label Font="{./Font}" Text="{./Caption}" Height="{./HeightPolicy}" Width="{./WidthPolicy}"/>
+</HorizontalStack>

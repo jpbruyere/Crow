@@ -78,7 +78,10 @@ namespace Crow
 						if (pi == null)
 							throw new Exception ("Member '" + reader.Name + "' not found in " + crowType.Name);
 
-						CompilerServices.EmitSetValue (reader.il, pi, reader.Value);
+						if (reader.Value.StartsWith("{"))
+							Debug.WriteLine("Binding => " + pi.Name + ": " + reader.Value);
+						else
+							CompilerServices.EmitSetValue (reader.il, pi, reader.Value);
 
 					}
 					reader.MoveToElement ();
