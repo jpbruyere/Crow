@@ -47,7 +47,7 @@ namespace Crow
 
 		protected GraphicObject child;
 
-		protected virtual T SetChild<T>(T _child)
+		internal virtual void SetChild(GraphicObject _child)
 		{
 
 			if (child != null) {
@@ -67,8 +67,6 @@ namespace Crow
 				child.RegisteredLayoutings = LayoutingType.None;
 				child.RegisterForLayouting (LayoutingType.Sizing);
 			}
-
-			return (T)_child;
 		}
 
 		#region GraphicObject Overrides

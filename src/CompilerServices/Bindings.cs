@@ -41,6 +41,11 @@ namespace Crow
 		public string DynMethodId {
 			get { return dynMethodId; }
 		}
+		public Type SourceType {
+			get { return Source == null ? null 
+					: Source.Instance == null ? null 
+					: Source.Instance.GetType();}
+		}
 
 		public bool Resolved {
 			get { return resolved; }

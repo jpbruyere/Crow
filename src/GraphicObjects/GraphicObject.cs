@@ -513,7 +513,7 @@ namespace Crow
 		#endregion
 
 		/// <summary> Loads the default values from XML attributes default </summary>
-		protected virtual void loadDefaultValues()
+		public void loadDefaultValues()
 		{
 			#if DEBUG_LOAD
 			Debug.WriteLine ("LoadDefValues for " + this.ToString ());
@@ -581,151 +581,70 @@ namespace Crow
 				typeof(void),new Type[] {typeof(object)},thisType,true);
 
 			il = dm.GetILGenerator(256);
-
+			il.DeclareLocal(typeof(GraphicObject));
 			il.Emit(OpCodes.Nop);
+			//set local GraphicObject to root object passed as 1st argument
+			il.Emit (OpCodes.Ldarg_0);
+			il.Emit (OpCodes.Stloc_0);
 
-			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
-				string name = "";
-				object defaultValue = null;
-
-				#region retrieve custom attributes
+			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {				
 				if (pi.GetSetMethod () == null)
 					continue;
-
-				XmlIgnoreAttribute xia = (XmlIgnoreAttribute)pi.GetCustomAttribute (typeof(XmlIgnoreAttribute));
-				if (xia != null)
+				object defaultValue;
+				if (!getDefaultValue (pi, styling, out defaultValue))
 					continue;
-				XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
-				if (xaa != null) {
-					if (string.IsNullOrEmpty (xaa.AttributeName))
-						name = pi.Name;
-					else
-						name = xaa.AttributeName;
-				}
 
-				int styleIndex = -1;
-				if (styling.Count > 0){
-					for (int i = 0; i < styling.Count; i++) {
-						if (styling[i].ContainsKey (name)){
-							styleIndex = i;
-							break;
-						}
-					}
-				}
-				if (styleIndex >= 0){
-					if (pi.PropertyType.IsEnum)//maybe should be in parser..
-						defaultValue = Enum.Parse(pi.PropertyType, (string)styling[styleIndex] [name], true);
-					else
-						defaultValue = styling[styleIndex] [name];
-				}else {
-					DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof (DefaultValueAttribute));
-					if (dv == null)
-						continue;
-					defaultValue = dv.Value;
-				}
-				#endregion
-
-				il.Emit (OpCodes.Ldarg_0);
-
-				if (defaultValue == null) {
-					il.Emit (OpCodes.Ldnull);
-					il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
-					continue;
-				}
-				Type dvType = defaultValue.GetType ();
-
-				if (dvType.IsValueType) {
-					if (pi.PropertyType.IsValueType) {
-						if (pi.PropertyType.IsEnum) {
-							if (pi.PropertyType != dvType)
-								throw new Exception ("Enum mismatch in default values: " + pi.PropertyType.FullName);
-							il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (defaultValue));
-						} else {
-							switch (Type.GetTypeCode (dvType)) {
-							case TypeCode.Boolean:
-								if ((bool)defaultValue == true)
-									il.Emit (OpCodes.Ldc_I4_1);
-								else
-									il.Emit (OpCodes.Ldc_I4_0);
-								break;
-//						case TypeCode.Empty:
-//							break;
-//						case TypeCode.Object:
-//							break;
-//						case TypeCode.DBNull:
-//							break;
-//						case TypeCode.SByte:
-//							break;
-//						case TypeCode.Decimal:
-//							break;
-//						case TypeCode.DateTime:
-//							break;
-							case TypeCode.Char:
-								il.Emit (OpCodes.Ldc_I4, Convert.ToChar (defaultValue));
-								break;
-							case TypeCode.Byte:
-							case TypeCode.Int16:
-							case TypeCode.Int32:
-								il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (defaultValue));
-								break;
-							case TypeCode.UInt16:
-							case TypeCode.UInt32:
-								il.Emit (OpCodes.Ldc_I4, Convert.ToUInt32 (defaultValue));
-								break;
-							case TypeCode.Int64:
-								il.Emit (OpCodes.Ldc_I8, Convert.ToInt64 (defaultValue));
-								break;
-							case TypeCode.UInt64:
-								il.Emit (OpCodes.Ldc_I8, Convert.ToUInt64 (defaultValue));
-								break;
-							case TypeCode.Single:
-								il.Emit (OpCodes.Ldc_R4, Convert.ToSingle (defaultValue));
-								break;
-							case TypeCode.Double:
-								il.Emit (OpCodes.Ldc_R8, Convert.ToDouble (defaultValue));
-								break;
-							case TypeCode.String:
-								il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
-								break;
-							default:
-								il.Emit (OpCodes.Pop);
-								continue;
-							}
-						}
-					} else
-						throw new Exception ("Expecting valuetype in default values for: " + pi.Name);
-				}else{
-					//surely a class or struct
-					if (dvType != typeof(string))
-						throw new Exception ("Expecting String in default values for: " + pi.Name);
-					if (pi.PropertyType == typeof (string))
-						il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
-					else {
-						MethodInfo miParse = pi.PropertyType.GetMethod
-						                       ("Parse", BindingFlags.Static | BindingFlags.Public,
-						                        Type.DefaultBinder, new Type [] {typeof (string)},null);
-						if (miParse == null)
-							throw new Exception ("no Parse method found for: " + pi.PropertyType.FullName);
-
-						il.Emit (OpCodes.Ldstr, Convert.ToString (defaultValue));
-						il.Emit (OpCodes.Callvirt, miParse);
-
-						if (miParse.ReturnType != pi.PropertyType)
-							il.Emit (OpCodes.Unbox_Any, pi.PropertyType);
-					}
-				}
-				il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
+				CompilerServices.EmitSetValue (il, pi, defaultValue);
 			}
 			il.Emit(OpCodes.Ret);
 			#endregion
 
 			try {
-				Interface.DefaultValuesLoader[styleKey] = (Interface.loadDefaultInvoker)dm.CreateDelegate(typeof(Interface.loadDefaultInvoker));
+				Interface.DefaultValuesLoader[styleKey] = (Interface.LoaderInvoker)dm.CreateDelegate(typeof(Interface.LoaderInvoker));
 				Interface.DefaultValuesLoader[styleKey] (this);
 			} catch (Exception ex) {
 				throw new Exception ("Error applying style <" + styleKey + ">:", ex);
 			}
 		}
+		bool getDefaultValue(PropertyInfo pi, List<Dictionary<string, object>> styling,
+			out object defaultValue){
+			defaultValue = null;
+			string name = "";
+
+			XmlIgnoreAttribute xia = (XmlIgnoreAttribute)pi.GetCustomAttribute (typeof(XmlIgnoreAttribute));
+			if (xia != null)
+				return false;
+			XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
+			if (xaa != null) {
+				if (string.IsNullOrEmpty (xaa.AttributeName))
+					name = pi.Name;
+				else
+					name = xaa.AttributeName;
+			}
+
+			int styleIndex = -1;
+			if (styling.Count > 0){
+				for (int i = 0; i < styling.Count; i++) {
+					if (styling[i].ContainsKey (name)){
+						styleIndex = i;
+						break;
+					}
+				}
+			}
+			if (styleIndex >= 0){
+				if (pi.PropertyType.IsEnum)//maybe should be in parser..
+					defaultValue = Enum.Parse(pi.PropertyType, (string)styling[styleIndex] [name], true);
+				else
+					defaultValue = styling[styleIndex] [name];
+			}else {
+				DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof (DefaultValueAttribute));
+				if (dv == null)
+					return false;
+				defaultValue = dv.Value;
+			}
+			return true;
+		}
+
 
 		public virtual GraphicObject FindByName(string nameToFind){
 			return string.Equals(nameToFind, _name, StringComparison.Ordinal) ? this : null;
@@ -747,7 +666,7 @@ namespace Crow
 			if (Width == Measure.Fit || Height == Measure.Fit)
 				RegisterForLayouting (LayoutingType.Sizing);
 			else if (RegisteredLayoutings == LayoutingType.None)
-				Interface.CurrentInterface.EnqueueForRepaint (this);
+				CurrentInterface.EnqueueForRepaint (this);
 		}
 		/// <summary> query an update of the content, a redraw </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -755,8 +674,20 @@ namespace Crow
 		{
 			bmp = null;
 			if (RegisteredLayoutings == LayoutingType.None)
-				Interface.CurrentInterface.EnqueueForRepaint (this);
+				CurrentInterface.EnqueueForRepaint (this);
 		}
+		public Interface CurrentInterface {
+			get {
+				ILayoutable tmp = this.Parent;
+				while (tmp != null) {
+					if (tmp is Interface)
+						return tmp as Interface;
+					tmp = tmp.Parent;
+				}
+				return null;
+			}
+		}
+
 		#region Layouting
 
 		#if DEBUG_LAYOUTING

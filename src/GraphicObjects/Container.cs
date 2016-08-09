@@ -25,9 +25,9 @@ namespace Crow
 			get { return child; }
 			set { child = value; }
 		}
-		public virtual T SetChild<T> (T _child)
+		public virtual void SetChild(GraphicObject _child)
 		{
-			return base.SetChild (_child);
+			base.SetChild (_child);
 		}
 
 		#region IXmlSerializable

@@ -23,6 +23,10 @@ using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
+using System.Xml.Serialization;
+using System.Xml;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Crow
 {
@@ -33,10 +37,10 @@ namespace Crow
 			Path = path;
 			using (Stream stream = Interface.GetStreamFromPath (path))
 				stream.CopyTo (this);
-			RootType = Interface.GetTopContainerOfXMLStream (this);
+			//RootType = Interface.GetTopContainerOfXMLStream (this);
 		}
 		public IMLStream(Byte[] b) : base (b){			
-			RootType = Interface.GetTopContainerOfXMLStream (this);
+			//RootType = Interface.GetTopContainerOfXMLStream (this);
 		}
 		/// <summary>
 		/// Create a graphicObject instance from the this XML stream.
@@ -47,7 +51,7 @@ namespace Crow
 				Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
 				Seek (0, SeekOrigin.Begin);
-				GraphicObject tmp = Interface.Load (this, this.RootType);
+				GraphicObject tmp = null;//Interface.Load (this, this.RootType);
 
 				Thread.CurrentThread.CurrentCulture = savedCulture;
 				return tmp;

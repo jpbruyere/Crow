@@ -136,6 +136,8 @@
     <Compile Include="src\StyleReader.cs" />
     <Compile Include="src\IMLStream.cs" />
     <Compile Include="src\GraphicObjects\DirectoryView.cs" />
+    <Compile Include="src\IMLInstantiatorBuilder.cs" />
+    <Compile Include="src\Instantiator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
