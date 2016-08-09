@@ -666,7 +666,7 @@ namespace Crow
 			if (Width == Measure.Fit || Height == Measure.Fit)
 				RegisterForLayouting (LayoutingType.Sizing);
 			else if (RegisteredLayoutings == LayoutingType.None)
-				CurrentInterface.EnqueueForRepaint (this);
+				Interface.CurrentInterface.EnqueueForRepaint (this);
 		}
 		/// <summary> query an update of the content, a redraw </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -674,19 +674,19 @@ namespace Crow
 		{
 			bmp = null;
 			if (RegisteredLayoutings == LayoutingType.None)
-				CurrentInterface.EnqueueForRepaint (this);
+				Interface.CurrentInterface.EnqueueForRepaint (this);
 		}
-		public Interface CurrentInterface {
-			get {
-				ILayoutable tmp = this.Parent;
-				while (tmp != null) {
-					if (tmp is Interface)
-						return tmp as Interface;
-					tmp = tmp.Parent;
-				}
-				return null;
-			}
-		}
+//		public Interface CurrentInterface {
+//			get {
+//				ILayoutable tmp = this.Parent;
+//				while (tmp != null) {
+//					if (tmp is Interface)
+//						return tmp as Interface;
+//					tmp = tmp.Parent;
+//				}
+//				return null;
+//			}
+//		}
 
 		#region Layouting
 

@@ -12,6 +12,8 @@ namespace Crow
 {
 	public static class CompilerServices
 	{
+		static MethodInfo miAddBinding = typeof(GraphicObject).GetMethod ("BindMember");
+
 		public static void BuildInstanciator(IMLInstantiatorBuilder builder, Type crowType){
 			string tmpXml = builder.ReadOuterXml ();
 
@@ -52,6 +54,8 @@ namespace Crow
 						reader.il.Emit (OpCodes.Callvirt,//add child
 							typeof(PrivateContainer).GetMethod ("SetChild", BindingFlags.Instance | BindingFlags.NonPublic));						
 					}
+					reader.il.Emit (OpCodes.Ldloc_0);
+					reader.il.Emit (OpCodes.Callvirt, crowType.GetMethod ("ResolveBindings"));
 				}
 			}
 
@@ -69,18 +73,26 @@ namespace Crow
 					reader.il.Emit (OpCodes.Ldloc_0);
 					reader.il.Emit (OpCodes.Callvirt, typeof(GraphicObject).GetMethod ("loadDefaultValues"));
 
+					MethodInfo miAddBinding = typeof(GraphicObject).GetMethod ("BindMember");
+
 					while (reader.MoveToNextAttribute ()) {
 						if (reader.Name == "Style")
 							continue;
 
-						PropertyInfo pi = crowType.GetProperty (reader.Name);
-
+						MemberInfo mi = crowType.GetMember (reader.Name).FirstOrDefault();
+						if (mi == null)
+							throw new Exception ("Member '" + reader.Name + "' not found in " + crowType.Name);
+						if (mi.MemberType == MemberTypes.Event) {
+							emitBindingCreation (reader.il, reader.Name, reader.Value);
+							continue;
+						}
+						PropertyInfo pi = mi as PropertyInfo;
 						if (pi == null)
 							throw new Exception ("Member '" + reader.Name + "' not found in " + crowType.Name);
 
-						if (reader.Value.StartsWith("{"))
-							Debug.WriteLine("Binding => " + pi.Name + ": " + reader.Value);
-						else
+						if (reader.Value.StartsWith ("{")) {
+							emitBindingCreation (reader.il, reader.Name, reader.Value.Substring (1, reader.Value.Length - 2));
+						}else
 							CompilerServices.EmitSetValue (reader.il, pi, reader.Value);
 
 					}
@@ -95,6 +107,12 @@ namespace Crow
 				readChildren (reader, crowType);
 			}
 			builder.il.Emit (OpCodes.Pop);//pop saved ref to current object
+		}
+		static void emitBindingCreation(ILGenerator il, string memberName, string expression){
+			il.Emit (OpCodes.Ldloc_0);
+			il.Emit (OpCodes.Ldstr, memberName);
+			il.Emit (OpCodes.Ldstr, expression);
+			il.Emit (OpCodes.Callvirt, miAddBinding);
 		}
 		static void readChildren(IMLInstantiatorBuilder reader, Type crowType){
 			MethodInfo miAddChild = null;
