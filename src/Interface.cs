@@ -200,7 +200,7 @@ namespace Crow
 				if (!Instantiators.ContainsKey(path))
 					BuildInstaciator(path);
 				tmp = Instantiators [path].CreateInstance ();
-				
+
 			} catch (Exception ex) {
 				throw new Exception ("Error loading <" + path + ">:", ex);
 			}
@@ -220,14 +220,8 @@ namespace Crow
 			#endif
 
 			try {
-				using (Stream stream = GetStreamFromPath (path)) {
-					using (IMLInstantiatorBuilder itr = new IMLInstantiatorBuilder (stream)){
-						itr.ReadRootType();
-						itr.InitEmitter();
-						CompilerServices.BuildInstanciator(itr, itr.RootType);
-						itr.Read();//close tag
-						Instantiators[path] = itr.GetInstanciator();
-					}
+				using (IMLReader itr = new IMLReader (path)){
+					Instantiators[path] = itr.GetInstanciator();
 				}
 			} catch (Exception ex) {
 				throw new Exception ("Error loading <" + path + ">:", ex);
