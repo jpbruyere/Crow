@@ -107,10 +107,10 @@ namespace Crow
 					Layoutable.RegisteredLayoutings |= LayoutType;
 					Interface.CurrentInterface.DiscardQueue.Enqueue (this);
 				}
-				//#if DEBUG_LAYOUTING
+				#if DEBUG_LAYOUTING
 				else
 					Debug.WriteLine ("\tDELETED    => " + this.ToString ());
-				//#endif
+				#endif
 			}
 			#if DEBUG_LAYOUTING
 			currentLQI = null;

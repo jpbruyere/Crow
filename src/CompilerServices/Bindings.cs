@@ -128,10 +128,12 @@ namespace Crow
 				//datasource binding
 				object dataSource = (Source.Instance as GraphicObject).DataSource;
 				if (dataSource == null) {
+					#if DEBUG_BINDING
 					Debug.WriteLine ("\tDataSource is null => " + this.ToString());
+					#endif
 					return false;
 				}
-					
+
 				Target = new MemberReference (dataSource);
 				memberName = bindingExp [0];
 			} else {
@@ -153,7 +155,7 @@ namespace Crow
 				while (ptr < bindingExp.Length - 1) {
 					if (tmpTarget == null) {
 #if DEBUG_BINDING
-						Debug.WriteLine ("\tERROR: target not found => " + this.ToString());
+						Debug.WriteLine ("\tTarget not found => " + this.ToString());
 #endif
 						return false;
 					}
@@ -169,13 +171,11 @@ namespace Crow
 				}
 
 				if (tmpTarget == null) {
-#if DEBUG_BINDING
-					Debug.WriteLine ("\tERROR: Binding Target not found => " + this.ToString());
-#endif
+					#if DEBUG_BINDING
+					Debug.WriteLine ("\tBinding Target not found => " + this.ToString());
+					#endif
 					return false;
 				}
-
-				Target = new MemberReference (tmpTarget);
 
 				string [] bindTrg = bindingExp [ptr].Split ('.');
 
@@ -187,6 +187,14 @@ namespace Crow
 				} else
 					throw new Exception ("Syntax error in binding, expected 'go dot member'");
 
+				if (tmpTarget == null) {
+					#if DEBUG_BINDING
+					Debug.WriteLine ("\tBinding Target not found => " + this.ToString());
+					#endif
+					return false;
+				}
+
+				Target = new MemberReference (tmpTarget);
 			}
 
 			if (Target.TryFindMember (memberName)) {
