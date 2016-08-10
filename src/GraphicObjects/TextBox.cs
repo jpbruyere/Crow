@@ -29,14 +29,13 @@ namespace Crow
     public class TextBox : Label
     {
 		#region CTOR
+		public TextBox()
+		{ }
 		public TextBox(string _initialValue)
 			: base(_initialValue)
 		{
 
 		}
-
-		public TextBox()
-		{ }
 		#endregion
 
 		#region GraphicObject overrides

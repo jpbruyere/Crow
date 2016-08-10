@@ -133,7 +133,7 @@ namespace Crow
 								else if (reader.Name == "Path")
 									path = reader.Value;
 							}
-
+							reader.MoveToElement ();
 							using (IMLReader iTmp = new IMLReader (null, reader.ReadInnerXml ())) {
 								string uid = Guid.NewGuid ().ToString ();
 								Interface.Instantiators [uid] =
@@ -275,7 +275,7 @@ namespace Crow
 					if (t == null)
 						throw new Exception (reader.Name + " type not found");
 
-					reader.il.Emit(OpCodes.Newobj, t.GetConstructors () [0]);
+					reader.il.Emit(OpCodes.Newobj, t.GetConstructors () [0]);//TODO:search parameterless ctor
 					reader.il.Emit (OpCodes.Stloc_0);//child is now loc_0
 
 					reader.emitLoader(t);
