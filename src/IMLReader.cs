@@ -111,6 +111,7 @@ namespace Crow
 					string templatePath = reader.GetAttribute ("Template");
 					//string itemTemplatePath = reader.GetAttribute ("ItemTemplate");
 
+					List<string[]> itemTemplateIds = new List<string[]> ();
 					bool inlineTemplate = false;
 					reader.Read ();
 
@@ -121,7 +122,7 @@ namespace Crow
 							inlineTemplate = true;
 							reader.Read ();
 
-							readChildren (reader, crowType);
+							readChildren (reader, crowType,true);
 							continue;
 						} else if (reader.Name == "ItemTemplate") {
 							string dataType = "default", datas = "", path = "";
@@ -137,20 +138,10 @@ namespace Crow
 							using (IMLReader iTmp = new IMLReader (null, reader.ReadInnerXml ())) {
 								string uid = Guid.NewGuid ().ToString ();
 								Interface.Instantiators [uid] =
-								new ItemTemplate (iTmp.RootType, iTmp.GetLoader ());
-								reader.il.Emit (OpCodes.Ldloc_0);//load TempControl ref
-								reader.il.Emit (OpCodes.Ldfld,//load ItemTemplates dic field
-									typeof(TemplatedControl).GetField("ItemTemplates"));
-								reader.il.Emit (OpCodes.Ldstr, dataType);//load key
-								reader.il.Emit (OpCodes.Ldstr, uid);//load value
-								reader.il.Emit (OpCodes.Callvirt,
-									typeof(Interface).GetMethod ("GetItemTemplate"));
-								reader.il.Emit (OpCodes.Callvirt,
-									typeof(Dictionary<string, ItemTemplate>).GetMethod ("set_Item",
-										new Type[] { typeof(string), typeof(ItemTemplate) }));
+									new ItemTemplate (iTmp.RootType, iTmp.GetLoader (), dataType, datas);
+								
+								itemTemplateIds.Add (new string[] { dataType, uid, datas });
 							}
-//							if (!string.IsNullOrEmpty (datas))
-//								ItemTemplates [dataType].CreateExpandDelegate(this, dataType, datas);
 
 							continue;
 						}
@@ -171,6 +162,32 @@ namespace Crow
 								typeof(Interface).GetMethod ("Load", BindingFlags.Static | BindingFlags.Public));
 							reader.il.Emit (OpCodes.Callvirt,//add child
 								crowType.GetMethod ("loadTemplate", BindingFlags.Instance | BindingFlags.NonPublic));
+						}
+					}
+					foreach (string[] iTempId in itemTemplateIds) {
+						reader.il.Emit (OpCodes.Ldloc_0);//load TempControl ref
+						reader.il.Emit (OpCodes.Ldfld,//load ItemTemplates dic field
+							typeof(TemplatedControl).GetField("ItemTemplates"));
+						reader.il.Emit (OpCodes.Ldstr, iTempId[0]);//load key
+						reader.il.Emit (OpCodes.Ldstr, iTempId[1]);//load value
+						reader.il.Emit (OpCodes.Callvirt,
+							typeof(Interface).GetMethod ("GetItemTemplate"));
+						reader.il.Emit (OpCodes.Callvirt,
+							typeof(Dictionary<string, ItemTemplate>).GetMethod ("set_Item",
+								new Type[] { typeof(string), typeof(ItemTemplate) }));
+
+						if (!string.IsNullOrEmpty (iTempId [2])) {
+							//expand delegate creation
+							reader.il.Emit (OpCodes.Ldloc_0);//load TempControl ref
+							reader.il.Emit (OpCodes.Ldfld,//load ItemTemplates dic field
+								typeof(TemplatedControl).GetField ("ItemTemplates"));
+							reader.il.Emit (OpCodes.Ldstr, iTempId [0]);//load key
+							reader.il.Emit (OpCodes.Callvirt,
+								typeof(Dictionary<string, ItemTemplate>).GetMethod ("get_Item",
+									new Type[] { typeof(string) }));
+							reader.il.Emit (OpCodes.Ldloc_0);//load root of treeView
+							reader.il.Emit (OpCodes.Callvirt,
+								typeof(ItemTemplate).GetMethod ("CreateExpandDelegate"));
 						}
 					}
 				}
@@ -229,7 +246,7 @@ namespace Crow
 		/// <summary>
 		/// Parse child node an generate corresponding msil
 		/// </summary>
-		void readChildren(IMLReader reader, Type crowType){
+		void readChildren(IMLReader reader, Type crowType, bool templateLoading = false){
 			MethodInfo miAddChild = null;
 			bool endTagReached = false;
 			while (reader.Read()){
@@ -250,7 +267,7 @@ namespace Crow
 							miAddChild = typeof(Group).GetMethod ("AddChild");
 						else if (typeof(Container).IsAssignableFrom (crowType))
 							miAddChild = typeof(Container).GetMethod ("SetChild");
-						else if (typeof(TemplatedContainer).IsAssignableFrom (crowType))
+						else if (typeof(TemplatedContainer).IsAssignableFrom (crowType)&&!templateLoading)
 							miAddChild = typeof(TemplatedContainer).GetProperty("Content").GetSetMethod();
 						else if (typeof(TemplatedControl).IsAssignableFrom (crowType))
 							miAddChild = typeof(TemplatedControl).GetMethod ("loadTemplate",

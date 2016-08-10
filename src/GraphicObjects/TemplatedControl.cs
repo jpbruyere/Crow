@@ -167,10 +167,10 @@ namespace Crow
 
 								using (IMLReader iTmp = new IMLReader (null, itemTmp)) {
 									ItemTemplates [dataType] =
-										new ItemTemplate (iTmp.RootType, iTmp.GetLoader ());
+										new ItemTemplate (iTmp.RootType, iTmp.GetLoader (), dataType, datas);
 								}
 								if (!string.IsNullOrEmpty (datas))
-									ItemTemplates [dataType].CreateExpandDelegate(this, dataType, datas);
+									ItemTemplates [dataType].CreateExpandDelegate(this);
 
 								continue;
 							}

@@ -32,18 +32,22 @@ namespace Crow
 {
 	public class ItemTemplate : Instantiator {		
 		public EventHandler Expand;
+		string strDataType;
+		string fetchMethodName;
 
 		#region CTOR
 		public ItemTemplate(string path) 
 			: base(path) {
 		}
-		public ItemTemplate (Type _root, Interface.LoaderInvoker _loader)
+		public ItemTemplate (Type _root, Interface.LoaderInvoker _loader,string _dataType, string _fetchDataMethod)
 			:base(_root, _loader)
 		{
+			strDataType = _dataType;
+			fetchMethodName = _fetchDataMethod;
 		}
 		#endregion
 
-		public void CreateExpandDelegate (TemplatedControl host, string strDataType, string method){
+		public void CreateExpandDelegate (TemplatedControl host){
 			Type dataType = Type.GetType(strDataType);
 			Type hostType = typeof(TemplatedControl);//not sure is the best place to put the dyn method
 			Type evtType = typeof(EventHandler);
@@ -54,7 +58,7 @@ namespace Crow
 			Type handlerArgsType = evtParams [1].ParameterType;
 
 			Type [] args = { typeof (object), typeof (object), handlerArgsType };
-			DynamicMethod dm = new DynamicMethod ("dyn_expand_" + method,
+			DynamicMethod dm = new DynamicMethod ("dyn_expand_" + fetchMethodName,
 				typeof (void),
 				args,
 				hostType);
@@ -81,7 +85,7 @@ namespace Crow
 			il.Emit (OpCodes.Ldarg_1);
 			il.Emit (OpCodes.Callvirt, typeof(GraphicObject).GetProperty("DataSource").GetGetMethod ());
 
-			MethodInfo miGetDatas = dataType.GetMethod (method, new Type[] {});
+			MethodInfo miGetDatas = dataType.GetMethod (fetchMethodName, new Type[] {});
 			il.Emit (OpCodes.Callvirt, miGetDatas);
 
 			il.Emit (OpCodes.Callvirt, listBoxType.GetProperty("Data").GetSetMethod ());
