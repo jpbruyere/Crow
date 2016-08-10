@@ -9,7 +9,7 @@ using System.ComponentModel;
 
 namespace Crow
 {
-	[Serializable]
+	
 	public class ProgressBar : NumericControl
     {
 		#region CTOR
@@ -22,12 +22,6 @@ namespace Crow
 		}
 
 		#region GraphicObject overrides
-		[XmlAttributeAttribute()][DefaultValue("vgradient|0:BlueCrayola|0,5:SkyBlue|1:BlueCrayola")]
-		public override Fill Foreground {
-			get { return base.Foreground; }
-			set { base.Foreground = value; }
-		}
-
 		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);

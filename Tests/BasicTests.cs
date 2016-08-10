@@ -92,8 +92,8 @@ namespace Tests
 
 			this.KeyDown += KeyboardKeyDown1;
 
-			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/basicTests", "*.crow")).ToArray ();
+			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			testFiles = Directory.GetFiles (@"Interfaces/basicTests", "*.crow");
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
@@ -147,17 +147,17 @@ namespace Tests
 		}
 		void Tv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
 		{
-			FileInfo fi = e.NewValue as FileInfo;
-			if (fi == null)
-				return;
-			if (fi.Extension == ".crow" || fi.Extension == ".goml") {
-				IMLStream imls = new IMLStream (fi.FullName);
-				lock (CrowInterface.UpdateMutex) {
-					(CrowInterface.FindByName ("crowContainer") as Container).SetChild
-					(imls.Instance);
-					CurSources = imls.Source;
-				}
-			}
+//			FileInfo fi = e.NewValue as FileInfo;
+//			if (fi == null)
+//				return;
+//			if (fi.Extension == ".crow" || fi.Extension == ".goml") {
+//				IMLStream imls = new IMLStream (fi.FullName);
+//				lock (CrowInterface.UpdateMutex) {
+//					(CrowInterface.FindByName ("crowContainer") as Container).SetChild
+//					(imls.Instance);
+//					CurSources = imls.Source;
+//				}
+//			}
 		}
 		void onButClick(object send, MouseButtonEventArgs e)
 		{

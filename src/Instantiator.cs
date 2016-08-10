@@ -19,21 +19,51 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Threading;
 
 namespace Crow
 {
 	public class Instantiator
 	{
-		Type RootType;
-		Interface.LoaderInvoker Loader;
-		public Instantiator (Type _root, Interface.LoaderInvoker loader)
+		public Type RootType;
+		Interface.LoaderInvoker loader;
+
+		#region CTOR
+		public Instantiator (string path){
+			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
+			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
+			#if DEBUG_LOAD
+			Stopwatch loadingTime = new Stopwatch ();
+			loadingTime.Start ();
+			#endif
+			try {
+				using (IMLReader itr = new IMLReader (path)){
+					loader = itr.GetLoader ();
+					RootType = itr.RootType;
+				}
+			} catch (Exception ex) {
+				throw new Exception ("Error loading <" + path + ">:", ex);
+			}
+
+			#if DEBUG_LOAD
+			loadingTime.Stop ();
+			Debug.WriteLine ("IML Instantiator creation '{2}' : {0} ticks, {1} ms",
+			loadingTime.ElapsedTicks, loadingTime.ElapsedMilliseconds, path);
+			#endif
+
+			Thread.CurrentThread.CurrentCulture = savedCulture;			
+		}
+		public Instantiator (Type _root, Interface.LoaderInvoker _loader)
 		{
 			RootType = _root;
-			Loader = loader;
+			loader = _loader;
 		}
+		#endregion
+
 		public GraphicObject CreateInstance(){
 			GraphicObject tmp = (GraphicObject)Activator.CreateInstance(RootType);
-			Loader (tmp);
+			loader (tmp);
 			return tmp;
 		}
 	}

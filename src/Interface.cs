@@ -28,6 +28,7 @@ using System.Threading;
 using System.Xml;
 using System.Xml.Serialization;
 using Cairo;
+using System.Globalization;
 
 namespace Crow
 {
@@ -55,6 +56,7 @@ namespace Crow
 		}
 		public Interface(){
 			Interface.CurrentInterface = this;
+			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture; 
 		}
 		#endregion
 
@@ -195,47 +197,27 @@ namespace Crow
 			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
-			GraphicObject tmp = null;
 			try {
-				if (!Instantiators.ContainsKey(path))
-					BuildInstaciator(path);
-				tmp = Instantiators [path].CreateInstance ();
-
+				return GetInstantiator (path).CreateInstance ();
 			} catch (Exception ex) {
 				throw new Exception ("Error loading <" + path + ">:", ex);
 			}
 
 			Thread.CurrentThread.CurrentCulture = savedCulture;
-
-			return tmp;
 		}
-		public static void BuildInstaciator (string path)
-		{
-			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
-			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-
-			#if DEBUG_LOAD
-			Stopwatch loadingTime = new Stopwatch ();
-			loadingTime.Start ();
-			#endif
-
-			try {
-				using (IMLReader itr = new IMLReader (path)){
-					Instantiators[path] = itr.GetInstanciator();
-				}
-			} catch (Exception ex) {
-				throw new Exception ("Error loading <" + path + ">:", ex);
-			}
-
-			#if DEBUG_LOAD
-			loadingTime.Stop ();
-			Debug.WriteLine ("IML Loading '{2}' : {0} ticks, {1} ms",
-			loadingTime.ElapsedTicks, loadingTime.ElapsedMilliseconds, path);
-			#endif
-
-			Thread.CurrentThread.CurrentCulture = savedCulture;
+		/// <summary>
+		/// fetch it from cache or create it
+		/// </summary>
+		public static Instantiator GetInstantiator(string path){
+			if (!Instantiators.ContainsKey(path))
+				Instantiators [path] = new Instantiator(path);
+			return Instantiators [path];
 		}
-
+		public static ItemTemplate GetItemTemplate(string path){
+			if (!Instantiators.ContainsKey(path))
+				Instantiators [path] = new ItemTemplate(path);
+			return Instantiators [path] as ItemTemplate;
+		}
 		public GraphicObject LoadInterface (string path)
 		{
 			lock (UpdateMutex) {

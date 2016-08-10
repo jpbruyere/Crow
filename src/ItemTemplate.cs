@@ -30,51 +30,18 @@ using System.Diagnostics;
 
 namespace Crow
 {
-	public class IMLStream : MemoryStream {
-		public string Path;
-		public Type RootType;
-		public IMLStream(string path) : base (){
-			Path = path;
-			using (Stream stream = Interface.GetStreamFromPath (path))
-				stream.CopyTo (this);
-			//RootType = Interface.GetTopContainerOfXMLStream (this);
-		}
-		public IMLStream(Byte[] b) : base (b){			
-			//RootType = Interface.GetTopContainerOfXMLStream (this);
-		}
-		/// <summary>
-		/// Create a graphicObject instance from the this XML stream.
-		/// </summary>
-		public GraphicObject Instance {
-			get {
-				System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
-				Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-
-				Seek (0, SeekOrigin.Begin);
-				GraphicObject tmp = null;//Interface.Load (this, this.RootType);
-
-				Thread.CurrentThread.CurrentCulture = savedCulture;
-				return tmp;
-			}
-		}
-		/// <summary>
-		/// Gets the xml source code as a string
-		/// </summary>
-		public string Source {
-			get {
-				Seek (0, SeekOrigin.Begin);
-				using (StreamReader sr = new StreamReader(this))
-					return sr.ReadToEnd();
-			}
-		}
-	}
-	public class ItemTemplate : IMLStream {		
+	public class ItemTemplate : Instantiator {		
 		public EventHandler Expand;
 
-		public ItemTemplate(string path)
-			: base(path){}
-		public ItemTemplate(Byte[] b)
-			: base(b){}
+		#region CTOR
+		public ItemTemplate(string path) 
+			: base(path) {
+		}
+		public ItemTemplate (Type _root, Interface.LoaderInvoker _loader)
+			:base(_root, _loader)
+		{
+		}
+		#endregion
 
 		public void CreateExpandDelegate (TemplatedControl host, string strDataType, string method){
 			Type dataType = Type.GetType(strDataType);

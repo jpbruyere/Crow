@@ -43,3 +43,6 @@ Window {
 Border {
 	Foreground = White;
 }
+ProgressBar {
+	Foreground = vgradient|0:BlueCrayola|0.5:SkyBlue|1:BlueCrayola;
+}

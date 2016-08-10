@@ -24,11 +24,14 @@ using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Crow
 {
 	public class IMLReader : XmlTextReader
 	{
+		Interface.LoaderInvoker loader = null;
+
 		public string ImlPath;
 		public Stream ImlStream;
 		public Type RootType = null;
@@ -45,27 +48,40 @@ namespace Crow
 			: base(stream)
 		{
 			ImlStream = stream;
-			readRootType();
-			InitEmitter();
-			BuildInstanciator(RootType);
-			Read();//close tag
+			createInstantiator ();
 		}
+		/// <summary>
+		/// Used to parse xmlFrament with same code generator linked
+		/// If ilGen=null, a new Code Generator will be created.
+		/// </summary>
 		public IMLReader (ILGenerator ilGen, string xmlFragment)
 			: base(xmlFragment, XmlNodeType.Element,null){
 			il = ilGen;
+
+			if (il != null)
+				return;
+
+			createInstantiator();
 		}
 		#endregion
 
+		void createInstantiator(){
+			readRootType();
+			InitEmitter();
+			emitLoader(RootType);
+			Read();//close tag
+		}
 		/// <summary>
 		/// Finalize instatiator MSIL and return LoaderInvoker delegate
 		/// </summary>
-		public Instantiator GetInstanciator(){
+		public Interface.LoaderInvoker GetLoader(){
+			if (loader != null)
+				return loader;
+
 			il.Emit(OpCodes.Ret);
-
-			return new Instantiator (RootType,
-				(Interface.LoaderInvoker)dm.CreateDelegate (typeof(Interface.LoaderInvoker)));
+			loader = (Interface.LoaderInvoker)dm.CreateDelegate (typeof(Interface.LoaderInvoker));
+			return loader;
 		}
-
 		/// <summary>
 		/// Inits il generator, RootType must have been read first
 		/// </summary>
@@ -83,7 +99,7 @@ namespace Crow
 			il.Emit (OpCodes.Ldarg_0);
 			il.Emit (OpCodes.Stloc_0);
 		}
-		void BuildInstanciator(Type crowType){
+		void emitLoader(Type crowType){
 			string tmpXml = ReadOuterXml ();
 
 			il.Emit (OpCodes.Ldloc_0);//save current go onto the stack if child has to be added
@@ -92,10 +108,11 @@ namespace Crow
 				//if its a template, first read template elements
 				using (IMLReader reader = new IMLReader (il, tmpXml)) {
 
-					string template = reader.GetAttribute ("Template");
+					string templatePath = reader.GetAttribute ("Template");
+					//string itemTemplatePath = reader.GetAttribute ("ItemTemplate");
 
 					bool inlineTemplate = false;
-					if (string.IsNullOrEmpty (template)) {
+					if (string.IsNullOrEmpty (templatePath)) {
 						reader.Read ();
 
 						while (reader.Read ()) {
@@ -107,38 +124,48 @@ namespace Crow
 
 								readChildren (reader, crowType);
 								continue;
-							}else if (reader.Name == "ItemTemplate") {
+							} else if (reader.Name == "ItemTemplate") {
 								reader.Skip ();
-								//								string dataType = "default", datas = "", itemTmp;
-								//								while (reader.MoveToNextAttribute ()) {
-								//									if (reader.Name == "DataType")
-								//										dataType = reader.Value;
-								//									else if (reader.Name == "Data")
-								//										datas = reader.Value;
-								//								}
-								//
-								//								reader.Read();
-								//								itemTmp = .ReadInnerXml ();
-								//
-								//								if (ItemTemplates == null)
-								//									ItemTemplates = new Dictionary<string, ItemTemplate> ();
-								//								//TODO:check encoding
-								//								ItemTemplates[dataType] = new ItemTemplate (Encoding.UTF8.GetBytes(itemTmp));
-								//								if (!string.IsNullOrEmpty (datas))
-								//									ItemTemplates [dataType].CreateExpandDelegate(this, dataType, datas);
+								continue;
+
+								string dataType = "default", datas = "", path = "";
+								while (reader.MoveToNextAttribute ()) {
+									if (reader.Name == "DataType")
+										dataType = reader.Value;
+									else if (reader.Name == "Data")
+										datas = reader.Value;
+									else if (reader.Name == "Path")
+										path = reader.Value;
+								}
+
+								using (IMLReader iTmp = new IMLReader (null, reader.ReadInnerXml ())) {
+									string uid = Guid.NewGuid ().ToString ();
+									Interface.Instantiators [uid] =
+									new ItemTemplate (iTmp.RootType, iTmp.GetLoader ());
+									reader.il.Emit (OpCodes.Ldstr, dataType);
+									reader.il.Emit (OpCodes.Ldstr, uid);
+									reader.il.Emit (OpCodes.Callvirt,
+										typeof(Interface).GetMethod ("GetItemTemplate"));
+									reader.il.Emit (OpCodes.Callvirt,
+										typeof(Dictionary<string, ItemTemplate>).GetMethod ("Add",
+											new Type[] { typeof(string), typeof(ItemTemplate) }));
+								}
+//							if (!string.IsNullOrEmpty (datas))
+//								ItemTemplates [dataType].CreateExpandDelegate(this, dataType, datas);
 
 								continue;
 							}
-						}
-						if (!inlineTemplate) {
-							DefaultTemplate dt = (DefaultTemplate)crowType.GetCustomAttributes (typeof(DefaultTemplate), true).FirstOrDefault();
-							template = dt.Path;
+
+							if (!inlineTemplate) {
+								DefaultTemplate dt = (DefaultTemplate)crowType.GetCustomAttributes (typeof(DefaultTemplate), true).FirstOrDefault ();
+								templatePath = dt.Path;
+							}
 						}
 					}
 					if (!inlineTemplate) {
 						reader.il.Emit (OpCodes.Ldloc_0);//Load  this templateControl ref
 
-						reader.il.Emit (OpCodes.Ldstr, template); //Load template path string
+						reader.il.Emit (OpCodes.Ldstr, templatePath); //Load template path string
 						reader.il.Emit (OpCodes.Callvirt,//call Interface.Load(path)
 							typeof(Interface).GetMethod ("Load", BindingFlags.Static | BindingFlags.Public));
 					}
@@ -245,7 +272,7 @@ namespace Crow
 					reader.il.Emit(OpCodes.Newobj, t.GetConstructors () [0]);
 					reader.il.Emit (OpCodes.Stloc_0);//child is now loc_0
 
-					reader.BuildInstanciator(t);
+					reader.emitLoader(t);
 
 					reader.il.Emit (OpCodes.Ldloc_0);//load child on stack for parenting
 					reader.il.Emit (OpCodes.Callvirt, miAddChild);
