@@ -10,26 +10,4 @@
 		<Label Text="bottom center" Width="80" Height="30" Background="DarkBlue" TextAlignment="Bottom"/>
 		<Label Text="bottom right" Width="80" Height="30" Background="DarkBlue" TextAlignment="BottomRight"/>
 	</HorizontalStack>
-<!--	<HorizontalStack Fit="true">
-		<Label Text="label1" Foreground="LightBlue" Margin="5" Background="DarkRed"/>
-		<TextRun Text="textrun1" Width="Stretched"/>
-		<Button Text="Click Me"/>
-		<CheckBox/>
-		<GroupBox Caption="choice">
-			<VerticalStack>
-				<RadioButton Caption="Choice 1" IsChecked="true"/>
-				<RadioButton Caption="Choice 2"/>
-				<RadioButton Caption="Choice 3"/>
-			</VerticalStack>
-		</GroupBox>
-		<Expandable Caption="expand me">
-			<Label Text="this is a test"/>
-		</Expandable>
-		<Popper Caption="pop me">
-			<Label Background="Red"/>
-		</Popper>
-		<ComboBox/>
-	</HorizontalStack>
-	<MessageBox></MessageBox>
-	<Window><Label/></Window>-->
 </VerticalStack>

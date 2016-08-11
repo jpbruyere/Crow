@@ -38,19 +38,14 @@ namespace Crow
             get { return _multiSelect; }
             set { _multiSelect = value; }
         }
-			
-			
-        public virtual T AddChild<T>(T child)
-        {
-			GraphicObject g = child as GraphicObject;
+		public virtual void AddChild(GraphicObject g){
 			Children.Add(g);
-			g.Parent = this as GraphicObject;
+			g.Parent = this;
 			g.ResolveBindings ();
 			g.RegisteredLayoutings = LayoutingType.None;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 			g.LayoutChanged += OnChildLayoutChanges;
-            return (T)child;
-        }
+		}
         public virtual void RemoveChild(GraphicObject child)        
 		{
 			child.LayoutChanged -= OnChildLayoutChanges;
@@ -337,7 +332,7 @@ namespace Crow
 						}
 					}
 					if (t == null)
-						throw new Exception ("Crow." + subTree.Name + " type not found");
+						throw new Exception (subTree.Name + " type not found");
                     GraphicObject go = (GraphicObject)Activator.CreateInstance(t);
                     (go as IXmlSerializable).ReadXml(subTree);                    
                     AddChild(go);

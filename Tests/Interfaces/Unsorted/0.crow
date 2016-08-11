@@ -1,4 +1,2 @@
 ﻿<?xml version="1.0"?>
-<Container>
-<Button Caption="m"  />
-</Container>
+<Spinner/>

@@ -22,6 +22,7 @@ using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using Cairo;
+using System.Diagnostics;
 
 namespace Crow
 {
@@ -47,14 +48,15 @@ namespace Crow
 
 		protected GraphicObject child;
 
-		protected virtual T SetChild<T>(T _child)
+		internal virtual void SetChild(GraphicObject _child)
 		{
 
 			if (child != null) {
+				child.ClearBinding ();
 				contentSize = new Size (0, 0);
 				child.LayoutChanged -= OnChildLayoutChanges;
-				this.RegisterForLayouting (LayoutingType.Sizing);
 				child.Parent = null;
+				this.RegisterForGraphicUpdate ();
 			}
 
 			child = _child as GraphicObject;
@@ -66,8 +68,8 @@ namespace Crow
 				child.RegisteredLayoutings = LayoutingType.None;
 				child.RegisterForLayouting (LayoutingType.Sizing);
 			}
+			Debug.WriteLine ("privateContainer setChild");
 
-			return (T)_child;
 		}
 
 		#region GraphicObject Overrides

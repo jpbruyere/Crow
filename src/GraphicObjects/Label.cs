@@ -72,7 +72,7 @@ namespace Crow
 		protected TextExtents te;
 		#endregion
 
-		[XmlAttributeAttribute][DefaultValue("SteelBlue")]
+		[XmlAttributeAttribute][DefaultValue("BlueGray")]
 		public virtual Color SelectionBackground {
 			get { return selBackground; }
 			set {
@@ -489,28 +489,35 @@ namespace Crow
 			fe = gr.FontExtents;
 
 			#region draw text cursor
-			if (mouseLocalPos >= 0)
+			if (HasFocus && Selectable)
 			{
-				computeTextCursor(gr);
-
-				if (SelectionInProgress)
+				if (mouseLocalPos >= 0)
 				{
-					if (SelBegin < 0){
-						SelBegin = new Point(CurrentColumn, CurrentLine);
-						SelStartCursorPos = textCursorPos;
-						SelRelease = -1;
-					}else{
-						SelRelease = new Point(CurrentColumn, CurrentLine);
-						if (SelRelease == SelBegin)
+					computeTextCursor(gr);
+
+					if (SelectionInProgress)
+					{
+						if (SelBegin < 0){
+							SelBegin = new Point(CurrentColumn, CurrentLine);
+							SelStartCursorPos = textCursorPos;
 							SelRelease = -1;
-						else
-							SelEndCursorPos = textCursorPos;
-					}						
-				}
-			}else
-				computeTextCursorPosition(gr);
+						}else{
+							SelRelease = new Point(CurrentColumn, CurrentLine);
+							if (SelRelease == SelBegin)
+								SelRelease = -1;
+							else
+								SelEndCursorPos = textCursorPos;
+						}						
+					}
+				}else
+					computeTextCursorPosition(gr);
 
-
+				Foreground.SetAsSource (gr);
+				gr.LineWidth = 1.5;
+				gr.MoveTo(new PointD(textCursorPos + rText.X, rText.Y + CurrentLine * fe.Height));
+				gr.LineTo(new PointD(textCursorPos + rText.X, rText.Y + (CurrentLine + 1) * fe.Height));
+				gr.Stroke();
+			}
 			#endregion
 
 			//****** debug selection *************
@@ -535,15 +542,6 @@ namespace Crow
 //				gr.Fill ();
 //			}
 			//*******************
-
-			if (HasFocus )
-			{
-				Foreground.SetAsSource (gr);
-				gr.LineWidth = 1.5;
-				gr.MoveTo(new PointD(textCursorPos + rText.X, rText.Y + CurrentLine * fe.Height));
-				gr.LineTo(new PointD(textCursorPos + rText.X, rText.Y + (CurrentLine + 1) * fe.Height));
-				gr.Stroke();
-			}
 
 			for (int i = 0; i < lines.Count; i++) {				
 				string l = lines [i].Replace ("\t", new String (' ', Interface.TabSize));

@@ -52,6 +52,10 @@ namespace Crow
 			FontRenderingOptions.HintMetrics = HintMetrics.On;
 			FontRenderingOptions.HintStyle = HintStyle.Medium;
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
+
+			Thread tBindings = new Thread (BindingThread);
+			tBindings.IsBackground = true;
+			tBindings.Start ();
 		}
 		public Interface(){
 			Interface.CurrentInterface = this;
@@ -107,14 +111,16 @@ namespace Crow
 				g.IsQueueForRedraw = true;
 			}
 		}
+		//fast compiled IML instantiators
+		public static Dictionary<String, Instantiator> Instantiators = new Dictionary<string, Instantiator>();
 
-		#region default values and style loading
+		#region Default values and Style loading
 		/// Default values of properties from GraphicObjects are retrieve from XML Attributes.
 		/// The reflexion process used to retrieve those values being very slow, it is compiled in MSIL
 		/// and injected as a dynamic method referenced in the DefaultValuesLoader Dictionnary.
 		/// The compilation is done on the first object instancing, and is also done for custom widgets
-		public delegate void loadDefaultInvoker(object instance);
-		public static Dictionary<String, loadDefaultInvoker> DefaultValuesLoader = new Dictionary<string, loadDefaultInvoker>();
+		public delegate void LoaderInvoker(object instance);
+		public static Dictionary<String, LoaderInvoker> DefaultValuesLoader = new Dictionary<string, LoaderInvoker>();
 		public static Dictionary<string, Dictionary<string, object>> Styling;
 		/// <summary> parse all styling data's and build global Styling Dictionary </summary>
 		static void LoadStyling() {
@@ -176,36 +182,6 @@ namespace Crow
 			return stream;
 		}
 
-		/// <summary>
-		/// Pre-read first node to set GraphicObject class for loading
-		/// and reset stream position to 0
-		/// </summary>
-		public static Type GetTopContainerOfXMLStream (Stream stream)
-		{
-			string root = "Object";
-			stream.Seek (0, SeekOrigin.Begin);
-			using (XmlReader reader = XmlReader.Create (stream)) {
-				while (reader.Read ()) {
-					// first element is the root element
-					if (reader.NodeType == XmlNodeType.Element) {
-						root = reader.Name;
-						break;
-					}
-				}
-			}
-
-			Type t = Type.GetType ("Crow." + root);
-			if (t == null) {
-				Assembly a = Assembly.GetEntryAssembly ();
-				foreach (Type expT in a.GetExportedTypes ()) {
-					if (expT.Name == root)
-						t = expT;
-				}
-			}
-
-			stream.Seek (0, SeekOrigin.Begin);
-			return t;
-		}
 
 		public static void Save<T> (string file, T graphicObject)
 		{
@@ -218,16 +194,17 @@ namespace Crow
 				xs.Serialize (s, graphicObject, xn);
 			}
 		}
-		public static GraphicObject Load (string path, object hostClass = null)
+		public static GraphicObject Load (string path)
 		{
 			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
 			GraphicObject tmp = null;
 			try {
-				using (Stream stream = GetStreamFromPath (path)) {
-					tmp = Load(stream, GetTopContainerOfXMLStream(stream), hostClass);
-				}
+				if (!Instantiators.ContainsKey(path))
+					BuildInstaciator(path);
+				tmp = Instantiators [path].CreateInstance ();
+				
 			} catch (Exception ex) {
 				throw new Exception ("Error loading <" + path + ">:", ex);
 			}
@@ -236,48 +213,43 @@ namespace Crow
 
 			return tmp;
 		}
-		internal static GraphicObject Load (IMLStream stream, object hostClass = null){
-			stream.Seek (0, SeekOrigin.Begin);
-			return Load(stream, stream.RootType, hostClass);
-		}
-		internal static GraphicObject Load (Stream stream, Type type, object hostClass = null)
+		public static void BuildInstaciator (string path)
 		{
+			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
+			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
 			#if DEBUG_LOAD
 			Stopwatch loadingTime = new Stopwatch ();
 			loadingTime.Start ();
 			#endif
 
-			GraphicObject result;
-
-			CurrentInterface.XmlLoading = true;
-
-			XmlSerializerNamespaces xn = new XmlSerializerNamespaces ();
-			xn.Add ("", "");
-
-			XmlSerializer xs = new XmlSerializer (type);
-
-			result = (GraphicObject)xs.Deserialize (stream);
-			//result.DataSource = hostClass;
-			CurrentInterface.XmlLoading = false;
+			try {
+				using (Stream stream = GetStreamFromPath (path)) {
+					using (IMLInstantiatorBuilder itr = new IMLInstantiatorBuilder (stream)){
+						itr.ReadRootType();
+						itr.InitEmitter();
+						CompilerServices.BuildInstanciator(itr, itr.RootType);
+						itr.Read();//close tag
+						Instantiators[path] = itr.GetInstanciator();
+					}
+				}
+			} catch (Exception ex) {
+				throw new Exception ("Error loading <" + path + ">:", ex);
+			}
 
 			#if DEBUG_LOAD
-			FileStream fs = stream as FileStream;
-			if (fs!=null)
-				CurrentGOMLPath = fs.Name;
 			loadingTime.Stop ();
-			Debug.WriteLine ("GOML Loading ({2}->{3}): {0} ticks, {1} ms",
-				loadingTime.ElapsedTicks,
-				loadingTime.ElapsedMilliseconds,
-			CurrentGOMLPath, result.ToString());
+			Debug.WriteLine ("IML Loading '{2}' : {0} ticks, {1} ms",
+			loadingTime.ElapsedTicks, loadingTime.ElapsedMilliseconds, path);
 			#endif
 
-			return result;
+			Thread.CurrentThread.CurrentCulture = savedCulture;
 		}
 
 		public GraphicObject LoadInterface (string path)
 		{
 			lock (UpdateMutex) {
-				GraphicObject tmp = Interface.Load (path, this);
+				GraphicObject tmp = Interface.Load (path);
 				AddWidget (tmp);
 
 				return tmp;
@@ -293,6 +265,27 @@ namespace Crow
 		#endif
 
 		public List<GraphicObject> GraphicTree = new List<GraphicObject>();
+
+		public static List<Binding> Bindings = new List<Binding>();
+		public static void RegisterBinding (Binding b){
+			lock (Bindings)
+				Bindings.Add (b);
+		}
+		public static void BindingThread(){
+			while(true){
+				Binding[] unresolved;
+				lock (Bindings){
+					unresolved = Bindings.Where (b => !b.Resolved).ToArray ();
+				}
+				foreach (Binding ub in unresolved) {
+					if (ub.TryFindTarget ()) {
+						ub.Resolved = true;
+						Debug.WriteLine ("RESOLVED: " + ub);
+					}
+				}
+				Thread.Sleep (5);
+			}
+		}
 
 		public static Interface CurrentInterface;
 
@@ -644,7 +637,8 @@ namespace Crow
 				GraphicObject g = GraphicTree[i];
 				if (g.MouseIsIn (e.Position)) {
 					g.checkHoverWidget (e);
-					PutOnTop (g);
+					if (g is Window)
+						PutOnTop (g);
 					return true;
 				}
 			}
@@ -716,6 +710,7 @@ namespace Crow
 
 		#region Keyboard
 		public bool ProcessKeyDown(int Key){
+			Keyboard.SetKeyState((Crow.Key)Key,true);
 			if (_focusedWidget == null)
 				return false;
 			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
@@ -723,9 +718,11 @@ namespace Crow
 			return true;
 		}
 		public bool ProcessKeyUp(int Key){
-			if (_activeWidget == null)
+			Keyboard.SetKeyState((Crow.Key)Key,false);
+			if (_focusedWidget == null)
 				return false;
-			//KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
+			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
+			_focusedWidget.onKeyUp (this, e);
 			return true;
 		}
 		public bool ProcessKeyPress(char Key){

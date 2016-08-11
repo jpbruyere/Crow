@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0"?>
-<TreeView IsRoot="true" Name="treeView" Data="{CurDirectory}" Background="DimGray">
+<TreeView IsRoot="true" Name="treeView" Data="{./CurrentDirectory}"
+		SelectedItemChanged="./onSelectedItemChanged">
 	<ItemTemplate DataType="System.IO.FileInfo">
 		<HorizontalStack Focusable="true"  Height="Fit" Width="Stretched" Background="{../Background}" >
 			<Image Margin="2" Width="14" Height="14"
@@ -30,11 +31,8 @@
 			</Template>
 			<HorizontalStack Height="Fit" Width="{./WidthPolicy}">
 				<GraphicObject Width="12" Height="10"/>
-				<TreeView Name="List" Height="Fit" Width="{./WidthPolicy}">
-					<Template>
-						<VerticalStack Height="Fit" Width="{../WidthPolicy}" Name="List"/>
-					</Template>
-				</TreeView>
+				<TreeView Name="List" Height="Fit" Width="{./WidthPolicy}"
+					Template="#Tests.Interfaces.treeList.crow" />
 			</HorizontalStack>
 		</Expandable>
 	</ItemTemplate>

@@ -70,6 +70,16 @@ namespace Tests
 			}
 			get { return testList; }
 		}
+		string curSources = "";
+		public string CurSources {
+			get { return curSources; }
+			set {
+				if (value == curSources)
+					return;
+				curSources = value;
+				NotifyValueChanged ("CurSources", curSources);
+			}
+		}
 		#endregion
 
 		void OnClear (object sender, MouseButtonEventArgs e) => TestList = null;
@@ -83,9 +93,9 @@ namespace Tests
 			this.KeyDown += KeyboardKeyDown1;
 
 			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
-			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/basicTests", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/basicTests", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Stack", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Splitter", "*.crow")).ToArray ();
@@ -113,6 +123,10 @@ namespace Tests
 				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/testWindow2.goml");
 				w.DataSource = this;
 				return;
+			}else if (e.Key == OpenTK.Input.Key.F6) {
+				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/imlEditor.crow");
+				w.DataSource = this;
+				return;
 			} else if (e.Key == OpenTK.Input.Key.F2)
 				idx--;
 			else if (e.Key == OpenTK.Input.Key.F3)
@@ -131,7 +145,20 @@ namespace Tests
 			GraphicObject obj = CrowInterface.LoadInterface(testFiles[idx]);
 			obj.DataSource = this;
 		}
-
+		void Tv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
+		{
+			FileInfo fi = e.NewValue as FileInfo;
+			if (fi == null)
+				return;
+			if (fi.Extension == ".crow" || fi.Extension == ".goml") {
+				IMLStream imls = new IMLStream (fi.FullName);
+				lock (CrowInterface.UpdateMutex) {
+					(CrowInterface.FindByName ("crowContainer") as Container).SetChild
+					(imls.Instance);
+					CurSources = imls.Source;
+				}
+			}
+		}
 		void onButClick(object send, MouseButtonEventArgs e)
 		{
 			Console.WriteLine ("button clicked:" + send.ToString());
@@ -149,6 +176,12 @@ namespace Tests
 			Console.WriteLine ("starting example");
 			BasicTests win = new BasicTests ();
 			win.Run (30);
+		}
+		protected override void OnUpdateFrame (OpenTK.FrameEventArgs e)
+		{
+			base.OnUpdateFrame (e);
+			string test = e.Time.ToString ();
+			NotifyValueChanged ("PropertyLessBinding", test);
 		}
 	}
 }
