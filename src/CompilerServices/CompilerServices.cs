@@ -5,261 +5,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Xml;
 
 
 namespace Crow
 {
 	public static class CompilerServices
 	{
-		public static void BuildInstanciator(IMLInstantiatorBuilder builder, Type crowType){
-			string tmpXml = builder.ReadOuterXml ();
-
-			builder.il.Emit (OpCodes.Ldloc_0);//save current go onto the stack if child has to be added
-
-			if (typeof(TemplatedControl).IsAssignableFrom (crowType)) {
-				//if its a template, first read template elements
-				using (IMLInstantiatorBuilder reader = new IMLInstantiatorBuilder (builder.il, tmpXml)) {
-
-					string template = reader.GetAttribute ("Template");
-
-					bool inlineTemplate = false;
-					if (string.IsNullOrEmpty (template)) {
-						reader.Read ();
-
-						while (reader.Read ()) {
-							if (!reader.IsStartElement ())
-								continue;
-							if (reader.Name == "Template") {
-								inlineTemplate = true;
-								reader.Read ();
-
-								readChildren (reader, crowType);
-								continue;
-							}
-						}
-						if (!inlineTemplate) {
-							DefaultTemplate dt = (DefaultTemplate)crowType.GetCustomAttributes (typeof(DefaultTemplate), true).FirstOrDefault();
-							template = dt.Path;
-						}
-					} 
-					if (!inlineTemplate) {
-						reader.il.Emit (OpCodes.Ldloc_0);//Load  this templateControl ref
-
-						reader.il.Emit (OpCodes.Ldstr, template); //Load template path string
-						reader.il.Emit (OpCodes.Callvirt,//call Interface.Load(path)
-							typeof(Interface).GetMethod ("Load", BindingFlags.Static | BindingFlags.Public));
-						reader.il.Emit (OpCodes.Callvirt,//add child
-							typeof(PrivateContainer).GetMethod ("SetChild", BindingFlags.Instance | BindingFlags.NonPublic));						
-					}
-				}
-			}
-
-			using (IMLInstantiatorBuilder reader = new IMLInstantiatorBuilder(builder.il,tmpXml)){
-				reader.Read ();
-
-				if (reader.HasAttributes) {
-					string style = reader.GetAttribute ("Style");
-					if (!string.IsNullOrEmpty (style)) {
-						PropertyInfo pi = crowType.GetProperty ("Style");
-						CompilerServices.EmitSetValue (reader.il, pi, style);
-					}
-				}
-				if (reader.HasAttributes) {
-					reader.il.Emit (OpCodes.Ldloc_0);
-					reader.il.Emit (OpCodes.Callvirt, typeof(GraphicObject).GetMethod ("loadDefaultValues"));
-
-					while (reader.MoveToNextAttribute ()) {
-						if (reader.Name == "Style")
-							continue;
-
-						PropertyInfo pi = crowType.GetProperty (reader.Name);
-
-						if (pi == null)
-							throw new Exception ("Member '" + reader.Name + "' not found in " + crowType.Name);
-
-						if (reader.Value.StartsWith("{"))
-							Debug.WriteLine("Binding => " + pi.Name + ": " + reader.Value);
-						else
-							CompilerServices.EmitSetValue (reader.il, pi, reader.Value);
-
-					}
-					reader.MoveToElement ();
-				}
-
-				if (reader.IsEmptyElement) {
-					reader.il.Emit (OpCodes.Pop);//pop saved ref to current object
-					return;
-				}
-
-				readChildren (reader, crowType);
-			}
-			builder.il.Emit (OpCodes.Pop);//pop saved ref to current object
-		}
-		static void readChildren(IMLInstantiatorBuilder reader, Type crowType){
-			MethodInfo miAddChild = null;
-			bool endTagReached = false;
-			while (reader.Read()){
-				switch (reader.NodeType) {
-				case XmlNodeType.EndElement:
-					endTagReached = true;
-					break;
-				case XmlNodeType.Element:
-					//Templates
-
-
-					if (miAddChild == null) {
-						if (typeof(Group).IsAssignableFrom (crowType))
-							miAddChild = typeof(Group).GetMethod ("AddChild");
-						else if (typeof(Container).IsAssignableFrom (crowType))
-							miAddChild = typeof(Container).GetMethod ("SetChild");
-						else if (typeof(PrivateContainer).IsAssignableFrom (crowType))
-							miAddChild = typeof(PrivateContainer).GetMethod ("SetChild",
-								BindingFlags.Instance | BindingFlags.NonPublic);
-					}
-
-					//push current instance on stack for parenting
-					//loc_0 will be used for child
-					reader.il.Emit (OpCodes.Ldloc_0);
-
-					Type t = Type.GetType ("Crow." + reader.Name);
-					if (t == null) {
-						Assembly a = Assembly.GetEntryAssembly ();
-						foreach (Type expT in a.GetExportedTypes ()) {
-							if (expT.Name == reader.Name)
-								t = expT;
-						}
-					}
-					if (t == null)
-						throw new Exception (reader.Name + " type not found");
-
-					reader.il.Emit(OpCodes.Newobj, t.GetConstructors () [0]);
-					reader.il.Emit (OpCodes.Stloc_0);//child is now loc_0
-
-					BuildInstanciator(reader, t);
-
-					reader.il.Emit (OpCodes.Ldloc_0);//load child on stack for parenting
-					reader.il.Emit (OpCodes.Callvirt, miAddChild);
-					reader.il.Emit (OpCodes.Stloc_0); //reset local to current go
-					reader.il.Emit (OpCodes.Ldloc_0);//save current go onto the stack if child has to be added
-					break;
-				}
-				if (endTagReached)
-					break;
-			}			
-		}
-		public static void EmitSetValue(ILGenerator il, PropertyInfo pi, object val){
-			il.Emit (OpCodes.Ldloc_0);
-
-			if (val == null) {
-				il.Emit (OpCodes.Ldnull);
-				il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
-				return;
-			}
-			Type dvType = val.GetType ();
-
-			if (dvType.IsValueType) {
-				if (pi.PropertyType.IsValueType) {
-					if (pi.PropertyType.IsEnum) {
-						if (pi.PropertyType != dvType)
-							throw new Exception ("Enum mismatch in default values: " + pi.PropertyType.FullName);
-						il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (val));
-					} else {
-						switch (Type.GetTypeCode (dvType)) {
-						case TypeCode.Boolean:
-							if ((bool)val == true)
-								il.Emit (OpCodes.Ldc_I4_1);
-							else
-								il.Emit (OpCodes.Ldc_I4_0);
-							break;
-							//						case TypeCode.Empty:
-							//							break;
-							//						case TypeCode.Object:
-							//							break;
-							//						case TypeCode.DBNull:
-							//							break;
-							//						case TypeCode.SByte:
-							//							break;
-							//						case TypeCode.Decimal:
-							//							break;
-							//						case TypeCode.DateTime:
-							//							break;
-						case TypeCode.Char:
-							il.Emit (OpCodes.Ldc_I4, Convert.ToChar (val));
-							break;
-						case TypeCode.Byte:
-						case TypeCode.Int16:
-						case TypeCode.Int32:
-							il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (val));
-							break;
-						case TypeCode.UInt16:
-						case TypeCode.UInt32:
-							il.Emit (OpCodes.Ldc_I4, Convert.ToUInt32 (val));
-							break;
-						case TypeCode.Int64:
-							il.Emit (OpCodes.Ldc_I8, Convert.ToInt64 (val));
-							break;
-						case TypeCode.UInt64:
-							il.Emit (OpCodes.Ldc_I8, Convert.ToUInt64 (val));
-							break;
-						case TypeCode.Single:
-							il.Emit (OpCodes.Ldc_R4, Convert.ToSingle (val));
-							break;
-						case TypeCode.Double:
-							il.Emit (OpCodes.Ldc_R8, Convert.ToDouble (val));
-							break;
-						case TypeCode.String:
-							il.Emit (OpCodes.Ldstr, Convert.ToString (val));
-							break;
-						default:
-							il.Emit (OpCodes.Pop);
-							return;
-						}
-					}
-				} else
-					throw new Exception ("Expecting valuetype in default values for: " + pi.Name);
-			}else{
-				//surely a class or struct
-				if (dvType != typeof(string))
-					throw new Exception ("Expecting String in default values for: " + pi.Name);
-				if (pi.PropertyType == typeof(string))
-					il.Emit (OpCodes.Ldstr, Convert.ToString (val));
-				else if (pi.PropertyType.IsEnum) {
-					MethodInfo miParse = typeof(Enum).GetMethod
-						("Parse", BindingFlags.Static | BindingFlags.Public,
-							Type.DefaultBinder, new Type [] {typeof (Type), typeof (string), typeof (bool)}, null);
-
-					if (miParse == null)
-						throw new Exception ("Enum Parse method not found");
-
-					//load type of enum
-					il.Emit(OpCodes.Ldtoken, pi.PropertyType);
-					il.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle", new
-						Type[1]{typeof(RuntimeTypeHandle)}));
-					//load enum value name
-					il.Emit (OpCodes.Ldstr, Convert.ToString (val));//TODO:is this convert required?
-					//load false
-					il.Emit (OpCodes.Ldc_I4_0);
-					il.Emit (OpCodes.Callvirt, miParse);
-
-					if (miParse.ReturnType != pi.PropertyType)
-						il.Emit (OpCodes.Unbox_Any, pi.PropertyType);					
-				} else {
-					MethodInfo miParse = pi.PropertyType.GetMethod
-						("Parse", BindingFlags.Static | BindingFlags.Public,
-							Type.DefaultBinder, new Type [] {typeof (string)},null);
-					if (miParse == null)
-						throw new Exception ("no Parse method found for: " + pi.PropertyType.FullName);
-
-					il.Emit (OpCodes.Ldstr, Convert.ToString (val));//TODO:is this convert required?
-					il.Emit (OpCodes.Callvirt, miParse);
-
-					if (miParse.ReturnType != pi.PropertyType)
-						il.Emit (OpCodes.Unbox_Any, pi.PropertyType);
-				}
-			}
-			il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());			
-		}
 		public static void ResolveBindings (List<Binding> Bindings)
 		{
 			if (Bindings == null)
@@ -280,7 +31,7 @@ namespace Crow
 						CompilerServices.CompileEventSource (b);
 						continue;
 					}
-					if (!b.TryFindTarget ())
+					if (!b.FindTarget ())
 						continue;
 					//register handler for event
 					if (b.Target.Method == null) {
@@ -302,7 +53,7 @@ namespace Crow
 					continue;
 				}
 
-				if (!b.TryFindTarget ())
+				if (!b.FindTarget ())
 					continue;
 
 				//group Bindings by target instanceq

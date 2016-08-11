@@ -22,11 +22,6 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Threading;
-using System.Xml.Serialization;
-using System.Xml;
-using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Crow
 {
@@ -37,35 +32,10 @@ namespace Crow
 			Path = path;
 			using (Stream stream = Interface.GetStreamFromPath (path))
 				stream.CopyTo (this);
-			//RootType = Interface.GetTopContainerOfXMLStream (this);
+			RootType = Interface.GetTopContainerOfXMLStream (this);
 		}
 		public IMLStream(Byte[] b) : base (b){			
-			//RootType = Interface.GetTopContainerOfXMLStream (this);
-		}
-		/// <summary>
-		/// Create a graphicObject instance from the this XML stream.
-		/// </summary>
-		public GraphicObject Instance {
-			get {
-				System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
-				Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-
-				Seek (0, SeekOrigin.Begin);
-				GraphicObject tmp = null;//Interface.Load (this, this.RootType);
-
-				Thread.CurrentThread.CurrentCulture = savedCulture;
-				return tmp;
-			}
-		}
-		/// <summary>
-		/// Gets the xml source code as a string
-		/// </summary>
-		public string Source {
-			get {
-				Seek (0, SeekOrigin.Begin);
-				using (StreamReader sr = new StreamReader(this))
-					return sr.ReadToEnd();
-			}
+			RootType = Interface.GetTopContainerOfXMLStream (this);
 		}
 	}
 	public class ItemTemplate : IMLStream {		

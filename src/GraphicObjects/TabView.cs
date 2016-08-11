@@ -100,7 +100,7 @@ namespace Crow
 			set { }
 		}
 
-		public override void AddChild (GraphicObject child)
+		public override T AddChild<T> (T child)
 		{
 			TabItem ti = child as TabItem;
 			if (ti == null)
@@ -113,7 +113,7 @@ namespace Crow
 				SelectedTab = 0;
 			}
 
-			base.AddChild (child);
+			return base.AddChild (child);
 		}
 		public override void RemoveChild (GraphicObject child)
 		{

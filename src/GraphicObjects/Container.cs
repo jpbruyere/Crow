@@ -4,7 +4,6 @@ using System.Reflection;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
-using System.Diagnostics;
 
 namespace Crow
 {
@@ -26,10 +25,9 @@ namespace Crow
 			get { return child; }
 			set { child = value; }
 		}
-		public virtual void SetChild(GraphicObject _child)
+		public virtual T SetChild<T> (T _child)
 		{
-			Debug.WriteLine ("container setChild");
-			base.SetChild (_child);
+			return base.SetChild (_child);
 		}
 
 		#region IXmlSerializable

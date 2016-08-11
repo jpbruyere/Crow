@@ -1,8 +1,7 @@
 ﻿<?xml version="1.0"?>
 <Border Background="{./Background}" BorderWidth="1" Foreground="{./Foreground}" Height="Fit" Width="{./WidthPolicy}">
 	<HorizontalStack Spacing="1" Height="-1"  Width="{./WidthPolicy}">
-		<Image Margin="2" Width="12" Height="12"
-				Path="#Crow.Images.Icons.expandable.svg" SvgSub="{./IsPopped}"/>
+		<Image Margin="2" Width="12" Height="12" Path="{./Image}" SvgSub="{./IsPopped}"/>
 		<Label Text="{./Caption}"  Width="{./WidthPolicy}"/>
 	</HorizontalStack>
 </Border>

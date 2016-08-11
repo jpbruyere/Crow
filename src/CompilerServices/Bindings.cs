@@ -41,11 +41,6 @@ namespace Crow
 		public string DynMethodId {
 			get { return dynMethodId; }
 		}
-		public Type SourceType {
-			get { return Source == null ? null 
-					: Source.Instance == null ? null 
-					: Source.Instance.GetType();}
-		}
 
 		public bool Resolved {
 			get { return resolved; }
@@ -98,12 +93,12 @@ namespace Crow
 		/// resolve target expression
 		/// </summary>
 		/// <returns><c>true</c>, if target was found, <c>false</c> otherwise.</returns>
-		public bool TryFindTarget ()
+		public bool FindTarget ()
 		{
 			if (Target != null)
 				return true;
 
-			string memberName = null;
+			string member = null;
 
 			//if binding exp = '{}' => binding is done on datasource
 			if (string.IsNullOrEmpty (Expression)) {
@@ -123,82 +118,85 @@ namespace Crow
 
 			string [] bindingExp = expression.Split ('/');
 
-
 			if (bindingExp.Length == 1) {
 				//datasource binding
-				object dataSource = (Source.Instance as GraphicObject).DataSource;
-				if (dataSource == null) {
-					Debug.WriteLine ("\tDataSource is null => " + this.ToString());
-					return false;
-				}
-					
-				Target = new MemberReference (dataSource);
-				memberName = bindingExp [0];
+				Target = new MemberReference ((Source.Instance as GraphicObject).DataSource);
+				member = bindingExp [0];
 			} else {
 				int ptr = 0;
-				ILayoutable tmpTarget = Source.Instance as ILayoutable;
+				ILayoutable tmp = Source.Instance as ILayoutable;
 				//if exp start with '/' => Graphic tree parsing start at source
 				if (string.IsNullOrEmpty (bindingExp [0]))
 					ptr++;
 				else if (bindingExp[0] == "."){ //search template root
 					do {
-						tmpTarget = tmpTarget.Parent;
-						if (tmpTarget == null)
+						tmp = tmp.Parent;
+						if (tmp == null)
 							return false;
-						if (tmpTarget is Interface)
+						if (tmp is Interface)
 							throw new Exception ("Not in Templated Control");
-					} while (!(tmpTarget is TemplatedControl));
+					} while (!(tmp is TemplatedControl));
 					ptr++;
 				}
 				while (ptr < bindingExp.Length - 1) {
-					if (tmpTarget == null) {
+					if (tmp == null) {
 #if DEBUG_BINDING
 						Debug.WriteLine ("\tERROR: target not found => " + this.ToString());
 #endif
 						return false;
 					}
 					if (bindingExp [ptr] == "..")
-						tmpTarget = tmpTarget.LogicalParent;
+						tmp = tmp.LogicalParent;
 					else if (bindingExp [ptr] == ".") {
 						if (ptr > 0)
 							throw new Exception ("Syntax error in binding, './' may only appear in first position");
-						tmpTarget = Source.Instance as ILayoutable;
+						tmp = Source.Instance as ILayoutable;
 					} else
-						tmpTarget = (tmpTarget as GraphicObject).FindByName (bindingExp [ptr]);
+						tmp = (tmp as GraphicObject).FindByName (bindingExp [ptr]);
 					ptr++;
 				}
 
-				if (tmpTarget == null) {
+				if (tmp == null) {
 #if DEBUG_BINDING
-					Debug.WriteLine ("\tERROR: Binding Target not found => " + this.ToString());
+					Debug.WriteLine ("\tERROR: target not found => " + this.ToString());
 #endif
 					return false;
 				}
 
-				Target = new MemberReference (tmpTarget);
-
 				string [] bindTrg = bindingExp [ptr].Split ('.');
 
 				if (bindTrg.Length == 1)
-					memberName = bindTrg [0];
+					member = bindTrg [0];
 				else if (bindTrg.Length == 2) {
-					tmpTarget = (tmpTarget as GraphicObject).FindByName (bindTrg [0]);
-					memberName = bindTrg [1];
+					tmp = (tmp as GraphicObject).FindByName (bindTrg [0]);
+					member = bindTrg [1];
 				} else
 					throw new Exception ("Syntax error in binding, expected 'go dot member'");
 
+				Target = new MemberReference (tmp);
+			}
+			if (Target == null) {
+				#if DEBUG_BINDING
+				Debug.WriteLine ("Binding Source is null: " + Expression);
+				#endif
+				return false;
 			}
 
-			if (Target.TryFindMember (memberName)) {
-				if (TwoWayBinding)
-					Interface.RegisterBinding (new Binding (Target, Source));				
+			if (Target.TryFindMember (member)) {
+				if (TwoWayBinding) {
+					IBindable source = Target.Instance as IBindable;
+					if (source == null)
+						throw new Exception (Source.Instance + " does not implement IBindable for 2 way bindings");
+					source.Bindings.Add (new Binding (Target, Source));
+				}
+				return true;
 			}
+
 			#if DEBUG_BINDING
-			else
-				Debug.WriteLine ("Property less binding: " + Target + expression);
+			Debug.WriteLine ("Binding member not found: " + member);
 			#endif
-
-			return true;
+			Target = null;
+			return false;
 		}
 		public void Reset ()
 		{

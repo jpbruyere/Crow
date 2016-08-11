@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Container Name="container0" Foreground="White" BorderWidth="2" Margin="1"
+<Container Name="container0" Foreground="White" BorderWidth="2" Margin="100"
 			CornerRadius="50">
 	<Group Name="group0" Background="Green" Margin="20">
 		<HorizontalStack Name="hs0" Background="Blue" Margin="20">
@@ -18,4 +18,29 @@
 				MouseEnter="g_MouseEnter" MouseLeave="g_MouseLeave"/>
 		</HorizontalStack>
 	</Group>
+<!--	<Scroller Height="100" Width="300" Background="Green" VerticalScrolling="true" Margin="5">
+		<Group Name="MainGrp" Background="Red" VerticalAlignment="Top"
+			 Foreground="White" BorderWidth="2" Margin="10" Focusable="True" 
+			 Width="400" Height="200">
+			 <HorizontalStack>
+				<Button Width="Fit" Height="Fit" Margin="5" BorderWidth="2" Background="Gray">
+					<Label Text="button"/>
+				</Button>
+				<Button Width="Fit" Height="Fit" Margin="5" BorderWidth="2">
+					<Label Text="button"/>
+				</Button>
+				<Button Width="Fit" Height="Fit" Margin="5" BorderWidth="2">
+					<Label Text="button"/>
+				</Button>
+				<Button Width="Fit" Height="Fit" Margin="5" BorderWidth="2">
+					<Label Text="button"/>
+				</Button>
+				<Button Width="Fit" Height="200" Margin="5" BorderWidth="2" >
+					<Label Text="button"/>
+				</Button>	
+			</HorizontalStack>
+		</Group>
+	<Container Width="100" Height="200" Margin="5" BorderWidth="2" VerticalAlignment="Top"/>
+	</Scroller>-->
+
 </Container>

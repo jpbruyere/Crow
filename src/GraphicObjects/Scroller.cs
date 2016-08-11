@@ -39,7 +39,7 @@ namespace Crow
 		public event EventHandler<ScrollingEventArgs> Scrolled;
 
 		#region public properties
-		[XmlAttributeAttribute][DefaultValue(true)]
+		[XmlAttributeAttribute][DefaultValue(false)]
 		public bool VerticalScrolling {
 			get { return _verticalScrolling; }
 			set { _verticalScrolling = value; }
@@ -148,7 +148,7 @@ namespace Crow
 			ScrollY = 0;
 			ScrollX = 0;
 		}
-		public override void SetChild (GraphicObject _child)
+		public override T SetChild<T> (T _child)
 		{			
 			GraphicObject c = child as GraphicObject;
 			Group g = child as Group;
@@ -164,7 +164,7 @@ namespace Crow
 				if (g != null)
 					g.ChildrenCleared += onChildListCleared;				
 			}
-			base.SetChild (_child);
+			return base.SetChild (_child);
 		}
 		#endregion
 

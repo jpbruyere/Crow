@@ -37,53 +37,11 @@ namespace Crow
 
 		bool _isPopped;
 		string caption;
-		Alignment popDirection;
+		string image;
 		GraphicObject _content;
 
 		public event EventHandler Pop;
 		public event EventHandler Unpop;
-
-		#region Public Properties
-		[XmlAttributeAttribute()][DefaultValue("Popper")]
-		public string Caption {
-			get { return caption; } 
-			set {
-				if (caption == value)
-					return;
-				caption = value; 
-				NotifyValueChanged ("Caption", caption);
-			}
-		}
-		[XmlAttributeAttribute()][DefaultValue(false)]
-		public bool IsPopped
-		{
-			get { return _isPopped; }
-			set
-			{
-				if (value == _isPopped)
-					return;
-
-				_isPopped = value;
-				NotifyValueChanged ("IsPopped", _isPopped);
-
-				if (_isPopped)
-					onPop (this, null);
-				else
-					onUnpop (this, null);
-
-			}
-		}
-		[XmlAttributeAttribute()][DefaultValue(Alignment.Bottom)]
-		public virtual Alignment PopDirection {
-			get { return popDirection; }
-			set {
-				if (popDirection == value)
-					return;
-				popDirection = value;
-				NotifyValueChanged ("PopDirection", popDirection);
-			}
-		}
-		#endregion
 
 		public override GraphicObject Content {
 			get { return _content; }
@@ -151,7 +109,6 @@ namespace Crow
 			}
 		}
 
-		#region GraphicObject overrides
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
 			base.OnLayoutChanges (layoutType);
@@ -163,6 +120,7 @@ namespace Crow
 				_content.MinimumSize = new Size (this.Slot.Width, _content.MinimumSize.Height);			
 		}
 
+		#region GraphicObject overrides
 		public override void ClearBinding ()
 		{
 			//ensure popped window is cleared
@@ -196,6 +154,59 @@ namespace Crow
 					return;
 			} catch {}
 			IsPopped = false;
+		}
+		#endregion
+
+		#region Public Properties
+		[XmlAttributeAttribute()][DefaultValue("Popper")]
+		public string Caption {
+			get { return caption; } 
+			set {
+				if (caption == value)
+					return;
+				caption = value; 
+				NotifyValueChanged ("Caption", caption);
+			}
+		}        
+		[XmlAttributeAttribute()][DefaultValue("#Crow.Images.Icons.expandable.svg")]
+		public string Image {
+			get { return image; } 
+			set {
+				if (image == value)
+					return;
+				image = value; 
+				NotifyValueChanged ("Image", image);
+			}
+		} 
+		[XmlAttributeAttribute()][DefaultValue(false)]
+        public bool IsPopped
+        {
+			get { return _isPopped; }
+            set
+            {
+				if (value == _isPopped)
+					return;
+				
+				_isPopped = value;
+				NotifyValueChanged ("IsPopped", _isPopped);
+
+				if (_isPopped)
+					onPop (this, null);
+				else
+					onUnpop (this, null);
+				
+            }
+        }
+		Alignment popDirection;
+		[XmlAttributeAttribute()][DefaultValue(Alignment.Bottom)]
+		public virtual Alignment PopDirection {
+			get { return popDirection; }
+			set {
+				if (popDirection == value)
+					return;
+				popDirection = value;
+				NotifyValueChanged ("PopDirection", popDirection);
+			}
 		}
 		#endregion
 			

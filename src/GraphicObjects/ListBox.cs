@@ -104,7 +104,7 @@ namespace Crow
 			SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
 		}
 			
-		#region TemplatedControl override
+		#region implemented abstract members of TemplatedControl
 		protected override void loadTemplate (GraphicObject template = null)
 		{
 			base.loadTemplate (template);
@@ -114,7 +114,6 @@ namespace Crow
 			_gsList = _list as GenericStack;
 		}
 		#endregion
-
 		void loading(){
 			if (ItemTemplates == null)
 				ItemTemplates = new Dictionary<string, ItemTemplate> ();
@@ -151,10 +150,10 @@ namespace Crow
 			//because _list total size is forced to approx size
 			if (_gsList.Orientation == Orientation.Horizontal) {
 				page.Width = Measure.Fit;
-				Interface.Bindings.Add(new Binding (this, "Height", "../HeightPolicy"));
+				page.BindMember ("Height", "../HeightPolicy");
 			} else {
 				page.Height = Measure.Fit;
-				Interface.Bindings.Add(new Binding (this, "Width", "../WidthPolicy"));
+				page.BindMember ("Width", "../WidthPolicy");
 			}
 
 			for (int i = (pageNum - 1) * itemPerPage; i < pageNum * itemPerPage; i++) {
@@ -173,7 +172,7 @@ namespace Crow
 					itemStream = ItemTemplates ["default"];
 
 				lock (Interface.CurrentInterface.LayoutMutex) {
-					g = itemStream.Instance;
+					g = Interface.Load (itemStream);
 					page.AddChild (g);
 					g.DataSource = data [i];
 				}

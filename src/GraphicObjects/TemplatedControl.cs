@@ -27,7 +27,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
-using System.Reflection;
 
 namespace Crow
 {
@@ -78,7 +77,7 @@ namespace Crow
 				if (string.IsNullOrEmpty(_template))
 					loadTemplate ();
 				else
-					loadTemplate (Interface.Load (_template));
+					loadTemplate (Interface.Load (_template, this));
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ItemTemplate.goml")]
@@ -117,7 +116,7 @@ namespace Crow
 		{
 			if (template == null) {
 				DefaultTemplate dt = (DefaultTemplate)this.GetType ().GetCustomAttributes (typeof(DefaultTemplate), true).FirstOrDefault();
-				this.SetChild (Interface.Load (dt.Path));
+				this.SetChild (Interface.Load (dt.Path, this));
 			}else
 				this.SetChild (template);
 
@@ -175,13 +174,6 @@ namespace Crow
 								xr.Read ();
 
 								Type t = Type.GetType ("Crow." + xr.Name);
-								if (t == null) {
-									Assembly a = Assembly.GetEntryAssembly ();
-									foreach (Type expT in a.GetExportedTypes ()) {
-										if (expT.Name == xr.Name)
-											t = expT;
-									}
-								}
 								GraphicObject go = (GraphicObject)Activator.CreateInstance (t);
 								(go as IXmlSerializable).ReadXml (xr);
 
@@ -192,7 +184,7 @@ namespace Crow
 						}
 					}
 				} else
-					loadTemplate (Interface.Load (template));
+					loadTemplate (Interface.Load (template, this));
 
 				//if no template found, load default one
 				if (this.child == null)

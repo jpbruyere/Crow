@@ -1,10 +1,10 @@
 ﻿//
-//  Instantiator.cs
+//  IValueChange.cs
 //
 //  Author:
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
 //
-//  Copyright (c) 2016 jp
+//  Copyright (c) 2015 jp
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,23 +19,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Collections.Generic;
 
 namespace Crow
 {
-	public class Instantiator
+	public interface IBindable
 	{
-		Type RootType;
-		Interface.LoaderInvoker Loader;
-		public Instantiator (Type _root, Interface.LoaderInvoker loader)
-		{
-			RootType = _root;
-			Loader = loader;
-		}
-		public GraphicObject CreateInstance(){
-			GraphicObject tmp = (GraphicObject)Activator.CreateInstance(RootType);
-			Loader (tmp);
-			return tmp;
-		}
+		List<Binding> Bindings { get; }
+		object DataSource { get; set; }
 	}
 }
 
