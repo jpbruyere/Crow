@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Reflection;
+using System.Text;
+using System.Diagnostics;
 
 
 namespace Tests
@@ -147,17 +149,30 @@ namespace Tests
 		}
 		void Tv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
 		{
-//			FileInfo fi = e.NewValue as FileInfo;
-//			if (fi == null)
-//				return;
-//			if (fi.Extension == ".crow" || fi.Extension == ".goml") {
-//				IMLStream imls = new IMLStream (fi.FullName);
-//				lock (CrowInterface.UpdateMutex) {
-//					(CrowInterface.FindByName ("crowContainer") as Container).SetChild
-//					(imls.Instance);
-//					CurSources = imls.Source;
-//				}
-//			}
+			FileInfo fi = e.NewValue as FileInfo;
+			if (fi == null)
+				return;
+			if (fi.Extension == ".crow" || fi.Extension == ".goml") {
+				Instantiator i = new Instantiator(fi.FullName);
+				lock (CrowInterface.UpdateMutex) {
+					(CrowInterface.FindByName ("crowContainer") as Container).SetChild
+					(i.CreateInstance());
+					CurSources = i.GetImlSourcesCode();
+				}
+			}
+		}
+		void onImlSourceChanged(Object sender, TextChangeEventArgs e){
+			Instantiator i;
+			try {
+				i = Instantiator.CreateFromImlFragment (e.Text);
+			} catch (Exception ex) {
+				Debug.WriteLine (ex);
+				return;
+			}
+			lock (CrowInterface.UpdateMutex) {
+				(CrowInterface.FindByName ("crowContainer") as Container).SetChild
+				(i.CreateInstance());
+			}
 		}
 		void onButClick(object send, MouseButtonEventArgs e)
 		{

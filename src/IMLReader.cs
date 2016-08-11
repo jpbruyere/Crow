@@ -32,12 +32,25 @@ namespace Crow
 	{
 		Interface.LoaderInvoker loader = null;
 
-		public string ImlPath;
-		public Stream ImlStream;
-		public Type RootType = null;
+		string ImlPath;
+		Stream ImlStream;
 
 		DynamicMethod dm = null;
+
 		public ILGenerator il = null;
+		public Type RootType = null;
+
+		/// <summary>
+		/// Finalize instatiator MSIL and return LoaderInvoker delegate
+		/// </summary>
+		public Interface.LoaderInvoker GetLoader(){
+			if (loader != null)
+				return loader;
+
+			il.Emit(OpCodes.Ret);
+			loader = (Interface.LoaderInvoker)dm.CreateDelegate (typeof(Interface.LoaderInvoker));
+			return loader;
+		}
 
 		#region CTOR
 		public IMLReader (string path)
@@ -72,17 +85,6 @@ namespace Crow
 			Read();//close tag
 		}
 		/// <summary>
-		/// Finalize instatiator MSIL and return LoaderInvoker delegate
-		/// </summary>
-		public Interface.LoaderInvoker GetLoader(){
-			if (loader != null)
-				return loader;
-
-			il.Emit(OpCodes.Ret);
-			loader = (Interface.LoaderInvoker)dm.CreateDelegate (typeof(Interface.LoaderInvoker));
-			return loader;
-		}
-		/// <summary>
 		/// Inits il generator, RootType must have been read first
 		/// </summary>
 		void InitEmitter(){
@@ -114,16 +116,15 @@ namespace Crow
 					List<string[]> itemTemplateIds = new List<string[]> ();
 					bool inlineTemplate = false;
 					reader.Read ();
-
+					int depth = reader.Depth + 1;
 					while (reader.Read ()) {
-						if (!reader.IsStartElement ())
+						if (!reader.IsStartElement () || reader.Depth > depth)
 							continue;
 						if (reader.Name == "Template") {
 							inlineTemplate = true;
 							reader.Read ();
 
 							readChildren (reader, crowType,true);
-							continue;
 						} else if (reader.Name == "ItemTemplate") {
 							string dataType = "default", datas = "", path = "";
 							while (reader.MoveToNextAttribute ()) {
@@ -142,8 +143,6 @@ namespace Crow
 								
 								itemTemplateIds.Add (new string[] { dataType, uid, datas });
 							}
-
-							continue;
 						}
 					}
 

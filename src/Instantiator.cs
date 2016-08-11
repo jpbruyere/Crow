@@ -20,6 +20,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Threading;
+using System.IO;
+using System.Text;
 
 namespace Crow
 {
@@ -27,11 +29,12 @@ namespace Crow
 	{
 		public Type RootType;
 		Interface.LoaderInvoker loader;
+		string imlPath;
+
 
 		#region CTOR
 		public Instantiator (string path){
-			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
-			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+			imlPath = path;
 
 			#if DEBUG_LOAD
 			Stopwatch loadingTime = new Stopwatch ();
@@ -43,7 +46,7 @@ namespace Crow
 					RootType = itr.RootType;
 				}
 			} catch (Exception ex) {
-				throw new Exception ("Error loading <" + path + ">:", ex);
+				throw new Exception ("Error loading <" + path + ">:\n", ex);
 			}
 
 			#if DEBUG_LOAD
@@ -51,8 +54,30 @@ namespace Crow
 			Debug.WriteLine ("IML Instantiator creation '{2}' : {0} ticks, {1} ms",
 			loadingTime.ElapsedTicks, loadingTime.ElapsedMilliseconds, path);
 			#endif
-
-			Thread.CurrentThread.CurrentCulture = savedCulture;			
+		}
+		public static Instantiator CreateFromImlFragment(string fragment){
+			try {
+				using (Stream s = new MemoryStream(Encoding.UTF8.GetBytes(fragment))){
+					return new Instantiator(s);
+				}
+			} catch (Exception ex) {
+				throw new Exception ("Error loading fragment:\n" + fragment + "\n", ex);
+			}
+		}
+		public Instantiator (Stream stream){
+			#if DEBUG_LOAD
+			Stopwatch loadingTime = new Stopwatch ();
+			loadingTime.Start ();
+			#endif
+			using (IMLReader itr = new IMLReader (stream)){
+				loader = itr.GetLoader ();
+				RootType = itr.RootType;
+			}
+			#if DEBUG_LOAD
+			loadingTime.Stop ();
+			Debug.WriteLine ("IML Instantiator creation '{2}' : {0} ticks, {1} ms",
+			loadingTime.ElapsedTicks, loadingTime.ElapsedMilliseconds, path);
+			#endif
 		}
 		public Instantiator (Type _root, Interface.LoaderInvoker _loader)
 		{
@@ -65,6 +90,14 @@ namespace Crow
 			GraphicObject tmp = (GraphicObject)Activator.CreateInstance(RootType);
 			loader (tmp);
 			return tmp;
+		}
+		public string GetImlSourcesCode(){
+			try {
+				using (StreamReader sr = new StreamReader (imlPath))
+					return sr.ReadToEnd();
+			} catch (Exception ex) {
+				throw new Exception ("Error getting sources for <" + imlPath + ">:", ex);
+			}
 		}
 	}
 }
