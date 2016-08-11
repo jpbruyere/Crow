@@ -28,6 +28,7 @@ using System.Threading;
 using System.Xml;
 using System.Xml.Serialization;
 using Cairo;
+using System.Globalization;
 
 namespace Crow
 {
@@ -55,6 +56,7 @@ namespace Crow
 		}
 		public Interface(){
 			Interface.CurrentInterface = this;
+			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture; 
 		}
 		#endregion
 
@@ -82,7 +84,7 @@ namespace Crow
 		public static FontOptions FontRenderingOptions;
 		#endregion
 
-		internal bool XmlLoading = false;
+		internal bool XmlLoading = true;
 
 		public Dictionary<string,object> Ressources = new Dictionary<string, object>();
 		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem> ();
@@ -107,14 +109,16 @@ namespace Crow
 				g.IsQueueForRedraw = true;
 			}
 		}
+		//fast compiled IML instantiators
+		public static Dictionary<String, Instantiator> Instantiators = new Dictionary<string, Instantiator>();
 
 		#region Default values and Style loading
 		/// Default values of properties from GraphicObjects are retrieve from XML Attributes.
 		/// The reflexion process used to retrieve those values being very slow, it is compiled in MSIL
 		/// and injected as a dynamic method referenced in the DefaultValuesLoader Dictionnary.
 		/// The compilation is done on the first object instancing, and is also done for custom widgets
-		public delegate void loadDefaultInvoker(object instance);
-		public static Dictionary<String, loadDefaultInvoker> DefaultValuesLoader = new Dictionary<string, loadDefaultInvoker>();
+		public delegate void LoaderInvoker(object instance);
+		public static Dictionary<String, LoaderInvoker> DefaultValuesLoader = new Dictionary<string, LoaderInvoker>();
 		public static Dictionary<string, Dictionary<string, object>> Styling;
 		/// <summary> parse all styling data's and build global Styling Dictionary </summary>
 		static void LoadStyling() {
@@ -176,36 +180,6 @@ namespace Crow
 			return stream;
 		}
 
-		/// <summary>
-		/// Pre-read first node to set GraphicObject class for loading
-		/// and reset stream position to 0
-		/// </summary>
-		public static Type GetTopContainerOfXMLStream (Stream stream)
-		{
-			string root = "Object";
-			stream.Seek (0, SeekOrigin.Begin);
-			using (XmlReader reader = XmlReader.Create (stream)) {
-				while (reader.Read ()) {
-					// first element is the root element
-					if (reader.NodeType == XmlNodeType.Element) {
-						root = reader.Name;
-						break;
-					}
-				}
-			}
-
-			Type t = Type.GetType ("Crow." + root);
-			if (t == null) {
-				Assembly a = Assembly.GetEntryAssembly ();
-				foreach (Type expT in a.GetExportedTypes ()) {
-					if (expT.Name == root)
-						t = expT;
-				}
-			}
-
-			stream.Seek (0, SeekOrigin.Begin);
-			return t;
-		}
 
 		public static void Save<T> (string file, T graphicObject)
 		{
@@ -223,52 +197,27 @@ namespace Crow
 			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
-			GraphicObject tmp = null;
 			try {
-				using (Stream stream = GetStreamFromPath (path)) {
-					tmp = Load(stream, GetTopContainerOfXMLStream(stream));
-				}
+				return GetInstantiator (path).CreateInstance ();
 			} catch (Exception ex) {
 				throw new Exception ("Error loading <" + path + ">:", ex);
 			}
 
 			Thread.CurrentThread.CurrentCulture = savedCulture;
-
-			return tmp;
 		}
-		internal static GraphicObject Load (Stream stream, Type type)
-		{
-			#if DEBUG_LOAD
-			Stopwatch loadingTime = new Stopwatch ();
-			loadingTime.Start ();
-			#endif
-
-			GraphicObject result;
-
-			CurrentInterface.XmlLoading = true;
-
-			XmlSerializerNamespaces xn = new XmlSerializerNamespaces ();
-			xn.Add ("", "");
-
-			XmlSerializer xs = new XmlSerializer (type);
-
-			result = (GraphicObject)xs.Deserialize (stream);
-			CurrentInterface.XmlLoading = false;
-
-			#if DEBUG_LOAD
-			FileStream fs = stream as FileStream;
-			if (fs!=null)
-				CurrentGOMLPath = fs.Name;
-			loadingTime.Stop ();
-			Debug.WriteLine ("GOML Loading ({2}->{3}): {0} ticks, {1} ms",
-				loadingTime.ElapsedTicks,
-				loadingTime.ElapsedMilliseconds,
-			CurrentGOMLPath, result.ToString());
-			#endif
-
-			return result;
+		/// <summary>
+		/// fetch it from cache or create it
+		/// </summary>
+		public static Instantiator GetInstantiator(string path){
+			if (!Instantiators.ContainsKey(path))
+				Instantiators [path] = new Instantiator(path);
+			return Instantiators [path];
 		}
-
+		public static ItemTemplate GetItemTemplate(string path){
+			if (!Instantiators.ContainsKey(path))
+				Instantiators [path] = new ItemTemplate(path);
+			return Instantiators [path] as ItemTemplate;
+		}
 		public GraphicObject LoadInterface (string path)
 		{
 			lock (UpdateMutex) {

@@ -119,7 +119,7 @@ namespace Crow
 			if (ItemTemplates == null)
 				ItemTemplates = new Dictionary<string, ItemTemplate> ();
 			if (!ItemTemplates.ContainsKey ("default"))
-				ItemTemplates["default"] = new ItemTemplate (ItemTemplate);
+				ItemTemplates ["default"] = Interface.GetItemTemplate (ItemTemplate);
 
 			for (int i = 1; i <= (data.Count / itemPerPage) + 1; i++) {
 				if (cancelLoading)
@@ -164,16 +164,16 @@ namespace Crow
 					return;
 				
 				GraphicObject g = null;
-				ItemTemplate itemStream = null;
+				ItemTemplate iTemp = null;
 				Type dataType = data [i].GetType ();
 
 				if (ItemTemplates.ContainsKey (dataType.FullName))
-					itemStream = ItemTemplates [dataType.FullName];
+					iTemp = ItemTemplates [dataType.FullName];
 				else
-					itemStream = ItemTemplates ["default"];
+					iTemp = ItemTemplates ["default"];
 
 				lock (Interface.CurrentInterface.LayoutMutex) {
-					g = itemStream.Instance;
+					g = iTemp.CreateInstance();
 					page.AddChild (g);
 					g.DataSource = data [i];
 				}
@@ -190,8 +190,8 @@ namespace Crow
 				}else
 					g.MouseClick += itemClick;
 				
-				if (itemStream.Expand != null && g is Expandable) {
-					(g as Expandable).Expand += itemStream.Expand;
+				if (iTemp.Expand != null && g is Expandable) {
+					(g as Expandable).Expand += iTemp.Expand;
 				}
 				//g.LogicalParent = this;
 			}

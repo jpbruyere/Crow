@@ -65,8 +65,8 @@ namespace Crow
 
 		string _template;
 		string _itemTemplate;
-		public Dictionary<string, ItemTemplate> ItemTemplates;
-
+		public Dictionary<string, ItemTemplate> ItemTemplates = new Dictionary<string, Crow.ItemTemplate>();//TODO: dont instantiate if not used
+																									//but then i should test if null in msil gen
 		[XmlAttributeAttribute][DefaultValue(null)]
 		public string Template {
 			get { return _template; }
@@ -84,7 +84,7 @@ namespace Crow
 		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ItemTemplate.goml")]
 		public string ItemTemplate {
 			get { return _itemTemplate; }
-			set { 
+			set {
 				if (value == _itemTemplate)
 					return;
 
@@ -146,7 +146,7 @@ namespace Crow
 						xr.Read (); //read first child
 						xr.Read (); //skip root node
 
-						while (!xr.EOF) {							
+						while (!xr.EOF) {
 							if (!xr.IsStartElement ()) {
 								xr.Read ();
 								continue;
@@ -164,10 +164,13 @@ namespace Crow
 
 								if (ItemTemplates == null)
 									ItemTemplates = new Dictionary<string, ItemTemplate> ();
-								//TODO:check encoding
-								ItemTemplates[dataType] = new ItemTemplate (Encoding.UTF8.GetBytes(itemTmp));
+
+								using (IMLReader iTmp = new IMLReader (null, itemTmp)) {
+									ItemTemplates [dataType] =
+										new ItemTemplate (iTmp.RootType, iTmp.GetLoader (), dataType, datas);
+								}
 								if (!string.IsNullOrEmpty (datas))
-									ItemTemplates [dataType].CreateExpandDelegate(this, dataType, datas);
+									ItemTemplates [dataType].CreateExpandDelegate(this);
 
 								continue;
 							}
@@ -197,7 +200,7 @@ namespace Crow
 				//if no template found, load default one
 				if (this.child == null)
 					loadTemplate ();
-				
+
 				//normal xml read
 				using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
 					xr.Read ();

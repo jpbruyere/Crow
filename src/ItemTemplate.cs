@@ -23,56 +23,31 @@ using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
+using System.Xml.Serialization;
+using System.Xml;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Crow
 {
-	public class IMLStream : MemoryStream {
-		public string Path;
-		public Type RootType;
-		public IMLStream(string path) : base (){
-			Path = path;
-			using (Stream stream = Interface.GetStreamFromPath (path))
-				stream.CopyTo (this);
-			RootType = Interface.GetTopContainerOfXMLStream (this);
-		}
-		public IMLStream(Byte[] b) : base (b){			
-			RootType = Interface.GetTopContainerOfXMLStream (this);
-		}
-		/// <summary>
-		/// Create a graphicObject instance from the this XML stream.
-		/// </summary>
-		public GraphicObject Instance {
-			get {
-				System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
-				Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-
-				Seek (0, SeekOrigin.Begin);
-				GraphicObject tmp = Interface.Load (this, this.RootType);
-
-				Thread.CurrentThread.CurrentCulture = savedCulture;
-				return tmp;
-			}
-		}
-		/// <summary>
-		/// Gets the xml source code as a string
-		/// </summary>
-		public string Source {
-			get {
-				Seek (0, SeekOrigin.Begin);
-				using (StreamReader sr = new StreamReader(this))
-					return sr.ReadToEnd();
-			}
-		}
-	}
-	public class ItemTemplate : IMLStream {		
+	public class ItemTemplate : Instantiator {		
 		public EventHandler Expand;
+		string strDataType;
+		string fetchMethodName;
 
-		public ItemTemplate(string path)
-			: base(path){}
-		public ItemTemplate(Byte[] b)
-			: base(b){}
+		#region CTOR
+		public ItemTemplate(string path) 
+			: base(path) {
+		}
+		public ItemTemplate (Type _root, Interface.LoaderInvoker _loader,string _dataType, string _fetchDataMethod)
+			:base(_root, _loader)
+		{
+			strDataType = _dataType;
+			fetchMethodName = _fetchDataMethod;
+		}
+		#endregion
 
-		public void CreateExpandDelegate (TemplatedControl host, string strDataType, string method){
+		public void CreateExpandDelegate (TemplatedControl host){
 			Type dataType = Type.GetType(strDataType);
 			Type hostType = typeof(TemplatedControl);//not sure is the best place to put the dyn method
 			Type evtType = typeof(EventHandler);
@@ -83,7 +58,7 @@ namespace Crow
 			Type handlerArgsType = evtParams [1].ParameterType;
 
 			Type [] args = { typeof (object), typeof (object), handlerArgsType };
-			DynamicMethod dm = new DynamicMethod ("dyn_expand_" + method,
+			DynamicMethod dm = new DynamicMethod ("dyn_expand_" + fetchMethodName,
 				typeof (void),
 				args,
 				hostType);
@@ -110,7 +85,7 @@ namespace Crow
 			il.Emit (OpCodes.Ldarg_1);
 			il.Emit (OpCodes.Callvirt, typeof(GraphicObject).GetProperty("DataSource").GetGetMethod ());
 
-			MethodInfo miGetDatas = dataType.GetMethod (method, new Type[] {});
+			MethodInfo miGetDatas = dataType.GetMethod (fetchMethodName, new Type[] {});
 			il.Emit (OpCodes.Callvirt, miGetDatas);
 
 			il.Emit (OpCodes.Callvirt, listBoxType.GetProperty("Data").GetSetMethod ());

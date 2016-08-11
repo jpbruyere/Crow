@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<Slider Background="Blue" Width="100" Height="20"/>
+<!--<ScrollBar Orientation="Vertical" Maximum="100" Value="10"
+					Width="14" Height="300"/>-->
+<!--<ListBox Data="{TestList}" Width="50%" ItemTemplate="#Tests.Interfaces.colorItem.crow">
+	<Template>
+		<Border BorderWidth="1" Height="{../HeightPolicy}" Width="{../WidthPolicy}">
+			<HorizontalStack Margin="1" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}" >
+				<Scroller Name="scroller1" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}" 
+						Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}"
+						ValueChanged="../../../_scroller_ValueChanged">
+					<VerticalStack Width="{../../../../WidthPolicy}" Height="Fit" MinimumSize="10,10"
+						Name="List" Margin="0"
+						VerticalAlignment="Top"
+						HorizontalAlignment="Left"
+						LayoutChanged="../../../../_list_LayoutChanged"/>
+				</Scroller>
+				<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}" 
+					Maximum="{../scroller1.MaximumScroll}" Orientation="Vertical" 
+					Width="14" Height="{../../../HeightPolicy}" />
+			</HorizontalStack>
+		</Border>
+	</Template>
+</ListBox>-->
+<!--<ItemTemplate>
+<HorizontalStack
+			HorizontalAlignment="Left"
+			Height="Fit"  Margin="1" Focusable="true"
+			MouseEnter="{Background=hgradient|0:DarkRed|1:Mantis}"
+			MouseLeave="{Background=Transparent}">
+	<GraphicObject Height="12" Width="20" Background="{}" Margin="0" CornerRadius="3"/>
+	<Label Text="{Name}" Margin="0" Width="Stretched"/>
+</HorizontalStack>
+</ItemTemplate>-->

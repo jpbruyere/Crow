@@ -5,12 +5,136 @@ using System.Diagnostics;
 using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Xml;
 
 
 namespace Crow
 {
 	public static class CompilerServices
 	{
+		static MethodInfo miAddBinding = typeof(GraphicObject).GetMethod ("BindMember");
+
+
+		public static void emitBindingCreation(ILGenerator il, string memberName, string expression){
+			il.Emit (OpCodes.Ldloc_0);
+			il.Emit (OpCodes.Ldstr, memberName);
+			il.Emit (OpCodes.Ldstr, expression);
+			il.Emit (OpCodes.Callvirt, miAddBinding);
+		}
+
+		public static void EmitSetValue(ILGenerator il, PropertyInfo pi, object val){
+			il.Emit (OpCodes.Ldloc_0);
+
+			if (val == null) {
+				il.Emit (OpCodes.Ldnull);
+				il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
+				return;
+			}
+			Type dvType = val.GetType ();
+
+			if (dvType.IsValueType) {
+				if (pi.PropertyType.IsValueType) {
+					if (pi.PropertyType.IsEnum) {
+						if (pi.PropertyType != dvType)
+							throw new Exception ("Enum mismatch in default values: " + pi.PropertyType.FullName);
+						il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (val));
+					} else {
+						switch (Type.GetTypeCode (dvType)) {
+						case TypeCode.Boolean:
+							if ((bool)val == true)
+								il.Emit (OpCodes.Ldc_I4_1);
+							else
+								il.Emit (OpCodes.Ldc_I4_0);
+							break;
+							//						case TypeCode.Empty:
+							//							break;
+							//						case TypeCode.Object:
+							//							break;
+							//						case TypeCode.DBNull:
+							//							break;
+							//						case TypeCode.SByte:
+							//							break;
+							//						case TypeCode.Decimal:
+							//							break;
+							//						case TypeCode.DateTime:
+							//							break;
+						case TypeCode.Char:
+							il.Emit (OpCodes.Ldc_I4, Convert.ToChar (val));
+							break;
+						case TypeCode.Byte:
+						case TypeCode.Int16:
+						case TypeCode.Int32:
+							il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (val));
+							break;
+						case TypeCode.UInt16:
+						case TypeCode.UInt32:
+							il.Emit (OpCodes.Ldc_I4, Convert.ToUInt32 (val));
+							break;
+						case TypeCode.Int64:
+							il.Emit (OpCodes.Ldc_I8, Convert.ToInt64 (val));
+							break;
+						case TypeCode.UInt64:
+							il.Emit (OpCodes.Ldc_I8, Convert.ToUInt64 (val));
+							break;
+						case TypeCode.Single:
+							il.Emit (OpCodes.Ldc_R4, Convert.ToSingle (val));
+							break;
+						case TypeCode.Double:
+							il.Emit (OpCodes.Ldc_R8, Convert.ToDouble (val));
+							break;
+						case TypeCode.String:
+							il.Emit (OpCodes.Ldstr, Convert.ToString (val));
+							break;
+						default:
+							il.Emit (OpCodes.Pop);
+							return;
+						}
+					}
+				} else
+					throw new Exception ("Expecting valuetype in default values for: " + pi.Name);
+			}else{
+				//surely a class or struct
+				if (dvType != typeof(string))
+					throw new Exception ("Expecting String in default values for: " + pi.Name);
+				if (pi.PropertyType == typeof(string))
+					il.Emit (OpCodes.Ldstr, Convert.ToString (val));
+				else if (pi.PropertyType.IsEnum) {
+					MethodInfo miParse = typeof(Enum).GetMethod
+						("Parse", BindingFlags.Static | BindingFlags.Public,
+							Type.DefaultBinder, new Type [] {typeof (Type), typeof (string), typeof (bool)}, null);
+
+					if (miParse == null)
+						throw new Exception ("Enum Parse method not found");
+
+					//load type of enum
+					il.Emit(OpCodes.Ldtoken, pi.PropertyType);
+					il.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle", new
+						Type[1]{typeof(RuntimeTypeHandle)}));
+					//load enum value name
+					il.Emit (OpCodes.Ldstr, Convert.ToString (val));//TODO:is this convert required?
+					//load false
+					il.Emit (OpCodes.Ldc_I4_0);
+					il.Emit (OpCodes.Callvirt, miParse);
+
+					if (miParse.ReturnType != pi.PropertyType)
+						il.Emit (OpCodes.Unbox_Any, pi.PropertyType);					
+				} else {
+					MethodInfo miParse = pi.PropertyType.GetMethod
+						("Parse", BindingFlags.Static | BindingFlags.Public,
+							Type.DefaultBinder, new Type [] {typeof (string)},null);
+					if (miParse == null)
+						throw new Exception ("no Parse method found for: " + pi.PropertyType.FullName);
+
+					il.Emit (OpCodes.Ldstr, Convert.ToString (val));//TODO:is this convert required?
+					il.Emit (OpCodes.Callvirt, miParse);
+
+					if (miParse.ReturnType != pi.PropertyType)
+						il.Emit (OpCodes.Unbox_Any, pi.PropertyType);
+				}
+			}
+			il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());			
+		}
+
 		public static void ResolveBindings (List<Binding> Bindings)
 		{
 			if (Bindings == null)

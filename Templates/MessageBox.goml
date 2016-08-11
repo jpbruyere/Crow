@@ -22,7 +22,7 @@
 				Path="#Crow.Images.Icons.iconInfo.svg" />
 			<Label Font="serif, 12" Height="{./HeightPolicy}" Width="{./WidthPolicy}" Text="{./Message}"
 				TextAlignment="Left"
-				Multiline="true" WordWrap="true"/>		
+				Multiline="true" />		
 		</HorizontalStack>
 		<HorizontalStack Height="-1" Width="{./WidthPolicy}" Margin="3">
 			<GraphicObject Height="5"/>

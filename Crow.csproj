@@ -134,8 +134,10 @@
     <Compile Include="src\CompilerServices\MemberReference.cs" />
     <Compile Include="src\CompilerServices\Bindings.cs" />
     <Compile Include="src\StyleReader.cs" />
-    <Compile Include="src\IMLStream.cs" />
     <Compile Include="src\GraphicObjects\DirectoryView.cs" />
+    <Compile Include="src\Instantiator.cs" />
+    <Compile Include="src\IMLReader.cs" />
+    <Compile Include="src\ItemTemplate.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

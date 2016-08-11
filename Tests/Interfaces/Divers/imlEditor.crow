@@ -15,6 +15,7 @@
 					<TextBox Background="White" Height="Fit"
 							VerticalAlignment="Top"
 							TextAlignment="TopLeft" Font="mono, 10"
+							TextChanged="onImlSourceChanged"
 							Text="{CurSources}" Multiline="true"/>
 				</Scroller>
 				<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}" 

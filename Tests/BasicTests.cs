@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Reflection;
+using System.Text;
+using System.Diagnostics;
 
 
 namespace Tests
@@ -92,10 +94,10 @@ namespace Tests
 
 			this.KeyDown += KeyboardKeyDown1;
 
-			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
-			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/basicTests", "*.crow")).ToArray ();
+			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			testFiles = Directory.GetFiles (@"Interfaces/basicTests", "*.crow");
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Stack", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Splitter", "*.crow")).ToArray ();
@@ -151,12 +153,25 @@ namespace Tests
 			if (fi == null)
 				return;
 			if (fi.Extension == ".crow" || fi.Extension == ".goml") {
-				IMLStream imls = new IMLStream (fi.FullName);
+				Instantiator i = new Instantiator(fi.FullName);
 				lock (CrowInterface.UpdateMutex) {
 					(CrowInterface.FindByName ("crowContainer") as Container).SetChild
-					(imls.Instance);
-					CurSources = imls.Source;
+					(i.CreateInstance());
+					CurSources = i.GetImlSourcesCode();
 				}
+			}
+		}
+		void onImlSourceChanged(Object sender, TextChangeEventArgs e){
+			Instantiator i;
+			try {
+				i = Instantiator.CreateFromImlFragment (e.Text);
+			} catch (Exception ex) {
+				Debug.WriteLine (ex);
+				return;
+			}
+			lock (CrowInterface.UpdateMutex) {
+				(CrowInterface.FindByName ("crowContainer") as Container).SetChild
+				(i.CreateInstance());
 			}
 		}
 		void onButClick(object send, MouseButtonEventArgs e)
