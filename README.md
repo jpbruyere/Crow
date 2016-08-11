@@ -3,6 +3,8 @@
 
 **CROW** is a pure **C#** widget toolkit originally developed for easy GUI implementation for [OpenTK](http://opentk.github.io/).
 
+Crow is in early developement state, I'm working on a first beta (0.5).
+
 > Trying to make it as efficient as possible, it evolved as a full feature toolkit with templates, styles, compositing,  and bindings, allowing me to develop new OpenGL apps in a couple of hours.
 Running under Mono, With multi-platform libraries it should run on any target.
 
@@ -30,7 +32,7 @@ Please report bugs and issues on [GitHub](https://github.com/jpbruyere/Crow/issu
 
 ###Requirements :
 - Mono >= 4.0 Framework. 
-- [airo Graphic Library](https://cairographics.org/) >= 1.10 
+- [Cairo Graphic Library](https://cairographics.org/) >= 1.10 
 - [OpenTK](http://opentk.github.io/).
 - glib, gio, and gdk >= 3.0. (part of GTK project).
 
