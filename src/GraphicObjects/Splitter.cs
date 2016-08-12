@@ -78,30 +78,40 @@ namespace Crow
 				return;
 
 			GenericStack gs = Parent as GenericStack;
-			int ptrThis = gs.Children.IndexOf (this);
+			int ptrSplit = gs.Children.IndexOf (this);
+
+			if (ptrSplit == 0 || ptrSplit == gs.Children.Count - 1)
+				return;
 
 			if (gs.Orientation == Orientation.Horizontal) {
-				if (ptrThis >= 0){
-					if (!gs.Children [ptrThis - 1].Width.IsFixed)
-						gs.Children [ptrThis - 1].Width = gs.Children [ptrThis - 1].Slot.Width;
-					gs.Children [ptrThis - 1].Width = Math.Max(gs.Children [ptrThis - 1].Width + e.XDelta, 1);
-				}
-				if (ptrThis < gs.Children.Count - 1){
-					if (!gs.Children [ptrThis + 1].Width.IsFixed)
-						gs.Children [ptrThis + 1].Width = gs.Children [ptrThis + 1].Slot.Width;					
-					gs.Children [ptrThis + 1].Width = Math.Max(gs.Children [ptrThis + 1].Width - e.XDelta, 1);
-				}
+				if ((gs.Children [ptrSplit - 1].Width + e.XDelta <
+					gs.Children [ptrSplit - 1].MinimumSize.Width) ||
+					(gs.Children [ptrSplit + 1].Width - e.XDelta <
+						gs.Children [ptrSplit + 1].MinimumSize.Width))
+					return;
+				
+				if (!gs.Children [ptrSplit - 1].Width.IsFixed)
+					gs.Children [ptrSplit - 1].Width = gs.Children [ptrSplit - 1].Slot.Width;					
+				if (!gs.Children [ptrSplit + 1].Width.IsFixed)
+					gs.Children [ptrSplit + 1].Width = gs.Children [ptrSplit + 1].Slot.Width;
+				
+				gs.Children [ptrSplit - 1].Width = gs.Children [ptrSplit - 1].Width + e.XDelta;
+				gs.Children [ptrSplit + 1].Width = gs.Children [ptrSplit + 1].Width - e.XDelta;
+
 			} else {
-				if (ptrThis >= 0) {
-					if (!gs.Children [ptrThis - 1].Height.IsFixed)
-						gs.Children [ptrThis - 1].Height = gs.Children [ptrThis - 1].Slot.Height;
-					gs.Children [ptrThis - 1].Height = Math.Max (gs.Children [ptrThis - 1].Height + e.YDelta, 1);
-				}
-				if (ptrThis < gs.Children.Count - 1) {
-					if (!gs.Children [ptrThis + 1].Height.IsFixed)
-						gs.Children [ptrThis + 1].Height = gs.Children [ptrThis + 1].Slot.Height;
-					gs.Children [ptrThis + 1].Height = Math.Max (gs.Children [ptrThis + 1].Height - e.YDelta, 1);
-				}
+				if ((gs.Children [ptrSplit - 1].Height + e.YDelta <
+					gs.Children [ptrSplit - 1].MinimumSize.Height) ||
+					(gs.Children [ptrSplit + 1].Height - e.YDelta <
+						gs.Children [ptrSplit + 1].MinimumSize.Height))
+					return;
+				
+				if (!gs.Children [ptrSplit - 1].Height.IsFixed)
+					gs.Children [ptrSplit - 1].Height = gs.Children [ptrSplit - 1].Slot.Height;
+				if (!gs.Children [ptrSplit + 1].Height.IsFixed)
+					gs.Children [ptrSplit + 1].Height = gs.Children [ptrSplit + 1].Slot.Height;
+				
+				gs.Children [ptrSplit - 1].Height = gs.Children [ptrSplit - 1].Height + e.YDelta;
+				gs.Children [ptrSplit + 1].Height = gs.Children [ptrSplit + 1].Height - e.YDelta;
 			}
 		}
 		public override bool UpdateLayout (LayoutingType layoutType)

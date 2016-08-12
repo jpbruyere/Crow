@@ -23,10 +23,9 @@
 				TextAlignment="Left"
 				Multiline="true" />		
 		</HorizontalStack>
-		<HorizontalStack Margin="1"  Height="Fit" Width="60%" HorizontalAlignment="Right">
-			<Button Width="48%" Caption="Ok" MouseClick="./onOkButtonClick" />
-			<GraphicObject Width="4%" Height="5"/>
-			<Button Width="48%" Caption="Cancel" MouseClick="./onCancelButtonClick" />
+		<HorizontalStack Margin="1" Spacing="0" Height="Fit" Width="60%" HorizontalAlignment="Right">
+			<Button Width="50%" Caption="Ok" MouseClick="./onOkButtonClick" />
+			<Button Width="50%" Caption="Cancel" MouseClick="./onCancelButtonClick" />
 		</HorizontalStack>
 	</VerticalStack>
 </Border>

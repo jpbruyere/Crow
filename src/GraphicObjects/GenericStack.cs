@@ -175,7 +175,7 @@ namespace Crow
 							stretchedGO.Slot.Height = newH;
 							stretchedGO.bmp = null;
 #if DEBUG_LAYOUTING
-					Debug.WriteLine ("\tAdjusting Width of " + stretchedGO.ToString());
+					Debug.WriteLine ("\tAdjusting Height of " + stretchedGO.ToString());
 #endif
 							stretchedGO.LayoutChanged -= OnChildLayoutChanges;
 							stretchedGO.OnLayoutChanges (LayoutingType.Height);

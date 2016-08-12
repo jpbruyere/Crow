@@ -22,6 +22,7 @@ using System;
 using System.Threading;
 using System.IO;
 using System.Text;
+using System.Diagnostics;
 
 namespace Crow
 {
@@ -76,7 +77,7 @@ namespace Crow
 			#if DEBUG_LOAD
 			loadingTime.Stop ();
 			Debug.WriteLine ("IML Instantiator creation '{2}' : {0} ticks, {1} ms",
-			loadingTime.ElapsedTicks, loadingTime.ElapsedMilliseconds, path);
+				loadingTime.ElapsedTicks, loadingTime.ElapsedMilliseconds, imlPath);
 			#endif
 		}
 		public Instantiator (Type _root, Interface.LoaderInvoker _loader)

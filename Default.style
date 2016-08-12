@@ -50,6 +50,10 @@ Border {
 ProgressBar {
 	Foreground = vgradient|0:BlueCrayola|0.5:SkyBlue|1:BlueCrayola;
 }
+ScrollBar {
+	Maximum = 0;
+	Value = 0;
+}
 Icon {
 	Margin=1;
 	Width=12;

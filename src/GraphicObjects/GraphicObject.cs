@@ -512,6 +512,7 @@ namespace Crow
 		}
 		#endregion
 
+		#region Default and Style Values loading
 		/// <summary> Loads the default values from XML attributes default </summary>
 		public void loadDefaultValues()
 		{
@@ -664,7 +665,7 @@ namespace Crow
 			}
 			return true;
 		}
-
+		#endregion
 
 		public virtual GraphicObject FindByName(string nameToFind){
 			return string.Equals(nameToFind, _name, StringComparison.Ordinal) ? this : null;
@@ -986,6 +987,10 @@ namespace Crow
 		public virtual void Paint (ref Context ctx)
 		{
 			if (!Visible)
+				return;
+
+			//TODO:this test should not be necessary
+			if (Slot.Height < 0 || Slot.Width < 0)
 				return;
 
 			LastPaintedSlot = Slot;

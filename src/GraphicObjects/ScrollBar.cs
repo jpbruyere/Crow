@@ -14,11 +14,6 @@ namespace Crow
 		public ScrollBar() : base()	{}
 		#endregion
 
-		[XmlAttributeAttribute()][DefaultValue(0.0)]
-		public override double Maximum {
-			get { return base.Maximum; }
-			set { base.Maximum = value; }
-		}
 		[XmlAttributeAttribute()][DefaultValue(Orientation.Vertical)]
 		public virtual Orientation Orientation
 		{
