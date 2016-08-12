@@ -5,7 +5,6 @@ using OpenTK.Input;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.ScrollBar.goml")]
 	public class ScrollBar : NumericControl
 	{
 		Orientation _orientation;

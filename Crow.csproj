@@ -177,16 +177,10 @@
     <EmbeddedResource Include="Images\Icons\buttonB.svg" />
     <EmbeddedResource Include="Images\Icons\checkbox.svg" />
     <EmbeddedResource Include="Images\Icons\radiobutton.svg" />
-    <EmbeddedResource Include="Templates\RadioButton.goml" />
-    <EmbeddedResource Include="Templates\Slider.goml" />
-    <EmbeddedResource Include="Templates\Spinner.goml" />
     <EmbeddedResource Include="Templates\Spinner %28copier%29.goml" />
     <EmbeddedResource Include="Templates\ItemTemplate.goml" />
-    <EmbeddedResource Include="Templates\Expandable.goml" />
     <EmbeddedResource Include="Images\Icons\expandable.svg" />
     <EmbeddedResource Include="Templates\Checkbox2.goml" />
-    <EmbeddedResource Include="Templates\Popper.goml" />
-    <EmbeddedResource Include="Templates\Window.goml" />
     <EmbeddedResource Include="Images\Icons\tetra.png" />
     <EmbeddedResource Include="Images\Icons\exit.svg" />
     <EmbeddedResource Include="Templates\AnalogMeter0.goml" />
@@ -194,9 +188,7 @@
     <EmbeddedResource Include="Images\Icons\member.svg" />
     <EmbeddedResource Include="Images\Icons\exit2.svg" />
     <EmbeddedResource Include="Images\button.svg" />
-    <EmbeddedResource Include="Templates\MessageBox.goml" />
     <EmbeddedResource Include="Images\Icons\iconInfo.svg" />
-    <EmbeddedResource Include="Templates\FileDialog.goml" />
     <EmbeddedResource Include="Templates\tmpDirItem.goml" />
     <EmbeddedResource Include="Templates\ScrollingListBox.goml" />
     <EmbeddedResource Include="Templates\imgItemTemplate.goml" />
@@ -211,23 +203,65 @@
     <EmbeddedResource Include="Images\Icons\Cursors\hand" />
     <EmbeddedResource Include="Images\Icons\Cursors\help" />
     <EmbeddedResource Include="Images\Icons\Cursors\move" />
-    <EmbeddedResource Include="Templates\CheckBox.goml" />
-    <EmbeddedResource Include="Templates\ComboBox.goml" />
-    <EmbeddedResource Include="Templates\GroupBox.goml" />
-    <EmbeddedResource Include="Templates\ListBox.goml" />
-    <EmbeddedResource Include="Templates\ScrollBar.goml" />
-    <EmbeddedResource Include="Templates\Button.crow" />
     <EmbeddedResource Include="Templates\ArrowButTemplate.crow" />
     <EmbeddedResource Include="Images\crow0.svg" />
-    <EmbeddedResource Include="Templates\TreeView.crow" />
-    <EmbeddedResource Include="Templates\TabItem.crow" />
     <EmbeddedResource Include="Templates\Dummy.goml" />
     <EmbeddedResource Include="Images\Icons\crow.png" />
     <EmbeddedResource Include="Images\Icons\crow.svg" />
     <EmbeddedResource Include="Default.style" />
     <EmbeddedResource Include="Images\Icons\folder.svg" />
     <EmbeddedResource Include="Images\Icons\file.svg" />
-    <EmbeddedResource Include="Templates\DirectoryView.crow" />
+    <EmbeddedResource Include="Templates\Button.template">
+      <LogicalName>Crow.Button.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\CheckBox.template">
+      <LogicalName>Crow.CheckBox.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\ComboBox.template">
+      <LogicalName>Crow.ComboBox.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Expandable.template">
+      <LogicalName>Crow.Expandable.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\DirectoryView.template">
+      <LogicalName>Crow.DirectoryView.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\FileDialog.template">
+      <LogicalName>Crow.FileDialog.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\GroupBox.template">
+      <LogicalName>Crow.GroupBox.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\ListBox.template">
+      <LogicalName>Crow.ListBox.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\MessageBox.template">
+      <LogicalName>Crow.MessageBox.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Popper.template">
+      <LogicalName>Crow.Popper.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\RadioButton.template">
+      <LogicalName>Crow.RadioButton.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\ScrollBar.template">
+      <LogicalName>Crow.ScrollBar.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Slider.template">
+      <LogicalName>Crow.Slider.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Spinner.template">
+      <LogicalName>Crow.Spinner.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\TabItem.template">
+      <LogicalName>Crow.TabItem.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\TreeView.template">
+      <LogicalName>Crow.TreeView.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Window.template">
+      <LogicalName>Crow.Window.template</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

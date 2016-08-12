@@ -25,7 +25,6 @@ using System.ComponentModel;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.GroupBox.goml")]
     public class GroupBox : TemplatedContainer
     {		
 		string caption;

@@ -23,7 +23,6 @@ using System.ComponentModel;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.MessageBox.goml")]
 	public class MessageBox : Window
 	{
 		public MessageBox ():base(){}

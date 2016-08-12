@@ -22,7 +22,6 @@ using System;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.Spinner.goml")]
 	public class Spinner : NumericControl
 	{
 		#region CTOR

@@ -26,7 +26,6 @@ using System.Diagnostics;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.Window.goml")]
 	public class Window : TemplatedContainer
 	{
 		enum Direction

@@ -45,8 +45,9 @@ namespace Crow
 	{
 		#region CTOR
 		static Interface(){
-			LoadCursors ();
-			LoadStyling ();
+			loadCursors ();
+			loadStyling ();
+			findAvailableTemplates ();
 
 			FontRenderingOptions = new FontOptions ();
 			FontRenderingOptions.Antialias = Antialias.Subpixel;
@@ -121,18 +122,13 @@ namespace Crow
 		public static Dictionary<String, LoaderInvoker> DefaultValuesLoader = new Dictionary<string, LoaderInvoker>();
 		public static Dictionary<string, Style> Styling;
 		/// <summary> parse all styling data's and build global Styling Dictionary </summary>
-		static void LoadStyling() {
-			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
-			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-
+		static void loadStyling() {
 			Styling = new Dictionary<string, Style> ();
 
 			//fetch styling info in this order, if member styling is alreadey referenced in previous
 			//assembly, it's ignored.
 			loadStylingFromAssembly (Assembly.GetEntryAssembly ());
 			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
-
-			Thread.CurrentThread.CurrentCulture = savedCulture;
 		}
 		/// <summary> Search for .style resources in assembly </summary>
 		static void loadStylingFromAssembly (Assembly assembly) {
@@ -143,7 +139,7 @@ namespace Crow
 					.Dispose ();
 			}
 		}
-		static void LoadCursors(){
+		static void loadCursors(){
 			//Load cursors
 			XCursor.Cross = XCursorFile.Load("#Crow.Images.Icons.Cursors.cross").Cursors[0];
 			XCursor.Default = XCursorFile.Load("#Crow.Images.Icons.Cursors.arrow").Cursors[0];
@@ -156,6 +152,23 @@ namespace Crow
 		}
 		#endregion
 
+		#region Templates
+		public static Dictionary<String, string> DefaultTemplates = new Dictionary<string, string>();
+		static void findAvailableTemplates(){
+			searchTemplatesIn (Assembly.GetEntryAssembly ());
+			searchTemplatesIn (Assembly.GetExecutingAssembly ());
+		}
+		static void searchTemplatesIn(Assembly assembly){
+			foreach (string resId in assembly
+				.GetManifestResourceNames ()
+				.Where (r => r.EndsWith (".template", StringComparison.OrdinalIgnoreCase))) {
+				string clsName = resId.Substring (0, resId.Length - 9);
+				if (DefaultTemplates.ContainsKey (clsName))
+					continue;
+				DefaultTemplates[clsName] = "#" + resId;
+			}
+		}
+		#endregion
 
 		#region Load/Save
 		public static Stream GetStreamFromPath (string path)
@@ -194,16 +207,11 @@ namespace Crow
 		}
 		public static GraphicObject Load (string path)
 		{
-			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
-			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-
 			try {
 				return GetInstantiator (path).CreateInstance ();
 			} catch (Exception ex) {
 				throw new Exception ("Error loading <" + path + ">:", ex);
 			}
-
-			Thread.CurrentThread.CurrentCulture = savedCulture;
 		}
 		/// <summary>
 		/// fetch it from cache or create it

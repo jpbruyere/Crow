@@ -27,7 +27,6 @@ namespace Crow
 {
 	//treeview expect expandable child (or not)
 	//if their are expandable, some functions and events are added
-	[DefaultTemplate("#Crow.Templates.TreeView.crow")]
 	public class TreeView : ListBox
 	{
 		GraphicObject selectedItemContainer = null;

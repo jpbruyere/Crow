@@ -31,27 +31,6 @@ using System.Reflection;
 
 namespace Crow
 {
-	[AttributeUsage(AttributeTargets.Class)]
-	public class TemplateAttribute : Attribute
-	{
-		public string Path = "";
-		public TemplateAttribute(string path)
-		{
-			Path = path;
-		}
-	}
-
-	[AttributeUsage(AttributeTargets.Class)]
-	public class DefaultTemplate : TemplateAttribute
-	{
-		public DefaultTemplate(string path) : base(path){}
-	}
-	[AttributeUsage(AttributeTargets.Class)]
-	public class DefaultItemTemplate : TemplateAttribute
-	{
-		public DefaultItemTemplate(string path) : base(path){}
-	}
-
 	public abstract class TemplatedControl : PrivateContainer, IXmlSerializable
 	{
 		#region CTOR
@@ -116,8 +95,9 @@ namespace Crow
 		protected virtual void loadTemplate(GraphicObject template = null)
 		{
 			if (template == null) {
-				DefaultTemplate dt = (DefaultTemplate)this.GetType ().GetCustomAttributes (typeof(DefaultTemplate), true).FirstOrDefault();
-				this.SetChild (Interface.Load (dt.Path));
+				if (!Interface.DefaultTemplates.ContainsKey (this.GetType ().FullName))
+					throw new Exception (string.Format ("No default template found for '{0}'", this.GetType ().FullName));
+				this.SetChild (Interface.Load (Interface.DefaultTemplates[this.GetType ().FullName]));
 			}else
 				this.SetChild (template);
 

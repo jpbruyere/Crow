@@ -26,7 +26,6 @@ using OpenTK.Input;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.Popper.goml")]
     public class Popper : TemplatedContainer
     {		
 		#region CTOR

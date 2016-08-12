@@ -22,7 +22,6 @@ using System;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.Dummy.goml")]
 	public class DummyTemplate : TemplatedControl
 	{
 		public DummyTemplate () : base()

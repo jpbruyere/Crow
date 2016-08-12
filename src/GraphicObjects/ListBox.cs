@@ -30,7 +30,6 @@ using System.Threading;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.ListBox.goml")]
 	public class ListBox : TemplatedControl
 	{
 		#region CTOR

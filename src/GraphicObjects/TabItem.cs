@@ -25,7 +25,6 @@ using System.Diagnostics;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.TabItem.crow")]
 	public class TabItem : TemplatedContainer
 	{
 		#region Private fields

@@ -147,21 +147,16 @@ namespace Crow
 					}
 
 					if (!inlineTemplate) {
+						reader.il.Emit (OpCodes.Ldloc_0);//Load  this templateControl ref
 						if (string.IsNullOrEmpty (templatePath)) {
-							DefaultTemplate dt = (DefaultTemplate)crowType.GetCustomAttributes (typeof(DefaultTemplate), true).FirstOrDefault ();
-							if (dt!=null)
-								templatePath = dt.Path;
-						}
-
-						if (!string.IsNullOrEmpty (templatePath)) {
-							reader.il.Emit (OpCodes.Ldloc_0);//Load  this templateControl ref
-
+							reader.il.Emit (OpCodes.Ldnull);//default template loading
+						}else{
 							reader.il.Emit (OpCodes.Ldstr, templatePath); //Load template path string
 							reader.il.Emit (OpCodes.Callvirt,//call Interface.Load(path)
-								typeof(Interface).GetMethod ("Load", BindingFlags.Static | BindingFlags.Public));
-							reader.il.Emit (OpCodes.Callvirt,//add child
-								crowType.GetMethod ("loadTemplate", BindingFlags.Instance | BindingFlags.NonPublic));
+									typeof(Interface).GetMethod ("Load", BindingFlags.Static | BindingFlags.Public));
 						}
+						reader.il.Emit (OpCodes.Callvirt,//load template
+							crowType.GetMethod ("loadTemplate", BindingFlags.Instance | BindingFlags.NonPublic));
 					}
 					foreach (string[] iTempId in itemTemplateIds) {
 						reader.il.Emit (OpCodes.Ldloc_0);//load TempControl ref

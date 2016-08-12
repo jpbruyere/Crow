@@ -25,7 +25,6 @@ using System.IO;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.DirectoryView.crow")]
 	public class DirectoryView : TemplatedControl
 	{
 		#region CTOR
