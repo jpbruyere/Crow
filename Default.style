@@ -25,6 +25,9 @@ Splitter {
 	Focusable = true;
 	Background = DimGray;
 }
+TabView {
+	CacheEnabled = false;
+}
 TabItem {
 	Focusable = true;
 	CacheEnabled = false;
@@ -33,6 +36,7 @@ TextBox {
 	Background = White;
 	Foreground = Black;
 	Selectable = True;
+	Text = TextBox;
 }
 Window {
 	Focusable = true;
@@ -41,8 +45,17 @@ Window {
 	Height = 150;
 }
 Border {
-	Foreground = White;
+	Foreground = Gray;
 }
 ProgressBar {
 	Foreground = vgradient|0:BlueCrayola|0.5:SkyBlue|1:BlueCrayola;
+}
+Icon {
+	Margin=1;
+	Width=12;
+	Height=12; 
+}
+Control {
+	Margin=0;
+	Spacing=3;
 }

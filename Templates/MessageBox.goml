@@ -1,33 +1,32 @@
 <?xml version="1.0"?>
-<Border Height="{./HeightPolicy}" Width="{./WidthPolicy}" BorderWidth="1" Foreground="White" CornerRadius="10"
+<Border Height="{./HeightPolicy}" Width="{./WidthPolicy}" CornerRadius="0"
 				MouseEnter="./onBorderMouseEnter"
 				MouseLeave="./onBorderMouseLeave">
-	<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}" Background="0.4,0.4,0.4,0.4">
-		<Border BorderWidth="1" Foreground="White" Width="{./WidthPolicy}" Height="-1" 
-				Background="0.1,0.5,1,0,0.5">
-			<HorizontalStack Name="hs" Margin="1" Spacing="1" Width="{./WidthPolicy}" Height="Fit" >
+	<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}" Background="{./Background}">
+		<Border BorderWidth="0" Foreground="White" Width="{./WidthPolicy}" Height="Fit" 
+				Background="vgradient|0:0.4,0.6,0.0,0.5|1:0.0,0.8,0.8,0.9">
+			<HorizontalStack Name="hs" Margin="2" Spacing="1" Width="{./WidthPolicy}" Height="Fit" >
 				<GraphicObject Width="5" Height="5"/>
 				<Image Margin="1" Width="12" Height="12" Path="{./Icon}"/>
 				<Label Foreground="White" Width="{./WidthPolicy}" Margin="1" TextAlignment="Center" Text="{./Title}" />
 				<Border CornerRadius="6" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
 					MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
-					<Image Focusable="true" Name="Image" Margin="0" Width="0" Height="0" Path="#Crow.Images.Icons.exit2.svg"
+					<Image Focusable="true" Name="Image" Path="#Crow.Images.Icons.exit2.svg"
 						 MouseClick="./butQuitPress"/>
 				</Border>
 				<GraphicObject Width="5" Height="5"/>
 			</HorizontalStack>
 		</Border>
-		<HorizontalStack Spacing="3" Margin="3" Height="{./HeightPolicy}" Width="{./WidthPolicy}">
-			<Image Name="Image" Width="24" Height="24"
-				Path="#Crow.Images.Icons.iconInfo.svg" />
-			<Label Font="serif, 12" Height="{./HeightPolicy}" Width="{./WidthPolicy}" Text="{./Message}"
+		<HorizontalStack Margin="5" Height="{./HeightPolicy}" Width="{./WidthPolicy}">
+			<Image Name="Image" Width="20%" Height="20" Path="#Crow.Images.Icons.iconInfo.svg" />
+			<Label Margin="5" Font="serif, 10" Height="{./HeightPolicy}" Width="80%" Text="{./Message}"
 				TextAlignment="Left"
 				Multiline="true" />		
 		</HorizontalStack>
-		<HorizontalStack Height="-1" Width="{./WidthPolicy}" Margin="3">
-			<GraphicObject Height="5"/>
-			<Button Caption="Ok" MouseClick="./onOkButtonClick" Background="Gray"/>
-			<Button Caption="Cancel" MouseClick="./onCancelButtonClick" Background="Gray"/>
+		<HorizontalStack Margin="1"  Height="Fit" Width="60%" HorizontalAlignment="Right">
+			<Button Width="48%" Caption="Ok" MouseClick="./onOkButtonClick" />
+			<GraphicObject Width="4%" Height="5"/>
+			<Button Width="48%" Caption="Cancel" MouseClick="./onCancelButtonClick" />
 		</HorizontalStack>
 	</VerticalStack>
 </Border>

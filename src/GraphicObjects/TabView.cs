@@ -39,6 +39,7 @@ namespace Crow
 		{
 		}
 
+		#region public properties
 		[XmlAttributeAttribute()][DefaultValue(Orientation.Horizontal)]
 		public virtual Orientation Orientation
 		{
@@ -54,7 +55,7 @@ namespace Crow
 					NotifyValueChanged ("TabOrientation", Orientation.Horizontal);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(2)]
+		[XmlAttributeAttribute()][DefaultValue(20)]
 		public int Spacing
 		{
 			get { return _spacing; }
@@ -81,7 +82,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(22)]
+		[XmlAttributeAttribute()][DefaultValue("15")]
 		public virtual Measure TabThickness {
 			get { return tabThickness; }
 			set {
@@ -92,13 +93,7 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-
-		//prevent caching, because drawing order is different depending on selected tab
-		[XmlAttributeAttribute()][DefaultValue(false)]
-		public override bool CacheEnabled {
-			get {return false;}
-			set { }
-		}
+		#endregion
 
 		public override void AddChild (GraphicObject child)
 		{

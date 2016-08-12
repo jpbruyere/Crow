@@ -3,11 +3,21 @@
 	Font = droid, 10;
 	Margin = 1;
 	TextAlignment = Center;
-	Background = Jet;
+	Background = Onyx;
 }
 FpsDisp {
 	Font = droid , 12;
 	Width = 50%;
 	TextAlignment = Center;
 	Background = Teal;
+}
+CheckBox2 {
+	Background = Onyx;
+	Checked={Background=Mantis;Font=droid bold, 10};
+	Unchecked = {Background=Onyx;Font=droid,10};
+}
+RadioButton2 {
+	Background = Onyx;
+	Checked = {Background=Mantis;Font=droid bold, 10};
+	Unchecked = {Background=Onyx;Font=droid,10};
 }

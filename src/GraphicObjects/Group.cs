@@ -39,7 +39,8 @@ namespace Crow
             set { _multiSelect = value; }
         }
 		public virtual void AddChild(GraphicObject g){
-			Children.Add(g);
+			lock (children)
+				Children.Add(g);
 			g.Parent = this;
 			g.ResolveBindings ();
 			g.RegisteredLayoutings = LayoutingType.None;
@@ -51,7 +52,8 @@ namespace Crow
 			child.LayoutChanged -= OnChildLayoutChanges;
 			child.ClearBinding ();
 			//child.Parent = null;
-            Children.Remove(child);
+			lock (children)
+            	Children.Remove(child);
 
 			if (child == largestChild && Width == Measure.Fit)
 				searchLargestChild ();
@@ -241,9 +243,10 @@ namespace Crow
 			//clip to client zone
 			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
 			gr.Clip ();
-
-			foreach (GraphicObject g in Children) {
-				g.Paint (ref gr);
+			lock (children) {
+				foreach (GraphicObject g in Children) {
+					g.Paint (ref gr);
+				}
 			}
 			gr.Restore ();
 		}

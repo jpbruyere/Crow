@@ -100,6 +100,8 @@ namespace Crow
 					return;
 
 				_content.LogicalParent = this;
+				_content.HorizontalAlignment = HorizontalAlignment.Left;
+				_content.VerticalAlignment = VerticalAlignment.Top;
 				_content.LayoutChanged += _content_LayoutChanged;
 				_content.MouseLeave += onMouseLeave;
 			}
@@ -187,14 +189,6 @@ namespace Crow
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			if (MouseIsIn (e.Position))
-				return;
-			if (_content == null)
-				return;
-			try {
-				if (_content.MouseIsIn (e.Position))
-					return;
-			} catch {}
 			IsPopped = false;
 		}
 		#endregion

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Border BorderWidth="1" Height="{./HeightPolicy}" Width="{./WidthPolicy}">
+<Border BorderWidth="1" Height="{./HeightPolicy}" Width="{./WidthPolicy}" Background="{./Background}">
 	<HorizontalStack Margin="1" Height="{./HeightPolicy}" Width="{./WidthPolicy}" >
 		<Scroller Name="scroller1" Height="{./HeightPolicy}" Width="{./WidthPolicy}" 
 				Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}"

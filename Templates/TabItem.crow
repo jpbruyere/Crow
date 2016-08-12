@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <GenericStack Orientation="Vertical" Spacing="0"
-		Width="{../../WidthPolicy}" Height="{../../HeightPolicy}"
-		Background="vgradient|0:DimGray|1:Black"
-		MouseEnter="{Background=vgradient|0:Gray|1:Black}"
-		MouseLeave="{Background=vgradient|0:DimGray|1:Black}">
-	<HorizontalStack Margin="2" Left="{../../TabOffset}"
+		Width="{./WidthPolicy}" Height="{./HeightPolicy}"
+		Background="Onyx"
+		MouseEnter="{caption.Foreground=White}"
+		MouseLeave="{caption.Foreground=Gray}">
+	<HorizontalStack Margin="2" Left="{./TabOffset}"
 		Name="TabTitle"
 		HorizontalAlignment="Left"
 		Height="{../../../TabThickness}"
 		Width="Fit">
-		<Label Text="{../../../Caption}"/>
+		<Label Name="caption" Text="{./Caption}" Foreground="Gray"/>
 		<Border CornerRadius="5" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
 					MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
 			<Image Focusable="true" Name="Image" Margin="0" Width="Stretched" Height="Stretched" Path="#Crow.Images.Icons.exit2.svg"
@@ -17,6 +17,6 @@
 		</Border>
 	</HorizontalStack>
 	<Container
-		Name="Content" Width="{../../../WidthPolicy}" Height="{../../../HeightPolicy}"/>
+		Name="Content" Width="{./WidthPolicy}" Height="{./HeightPolicy}"/>
 </GenericStack>
 

@@ -538,7 +538,7 @@ namespace Crow
 				}
 			}
 
-			List<Dictionary<string, object>> styling = new List<Dictionary<string, object>>();
+			List<Style> styling = new List<Style>();
 
 			//Search for a style mathing :
 			//1: Full class name, with full namespace
@@ -587,7 +587,14 @@ namespace Crow
 			il.Emit (OpCodes.Ldarg_0);
 			il.Emit (OpCodes.Stloc_0);
 
-			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {				
+			foreach (EventInfo ei in thisType.GetEvents(BindingFlags.Public | BindingFlags.Instance)) {
+				string expression;
+				if (!getDefaultEvent(ei, styling, out expression))
+					continue;
+				CompilerServices.emitBindingCreation (il, ei.Name, expression);
+			}
+
+			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
 				if (pi.GetSetMethod () == null)
 					continue;
 				object defaultValue;
@@ -606,7 +613,20 @@ namespace Crow
 				throw new Exception ("Error applying style <" + styleKey + ">:", ex);
 			}
 		}
-		bool getDefaultValue(PropertyInfo pi, List<Dictionary<string, object>> styling,
+		bool getDefaultEvent(EventInfo ei, List<Style> styling,
+			out string expression){
+			expression = "";
+			if (styling.Count > 0){
+				for (int i = 0; i < styling.Count; i++) {
+					if (styling[i].ContainsKey (ei.Name)){
+						expression = (string)styling[i] [ei.Name];
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		bool getDefaultValue(PropertyInfo pi, List<Style> styling,
 			out object defaultValue){
 			defaultValue = null;
 			string name = "";

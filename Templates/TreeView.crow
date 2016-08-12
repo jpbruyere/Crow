@@ -1,7 +1,15 @@
-<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"
-	Background="{./Background}"
-	Height="{./HeightPolicy}" Width="{./WidthPolicy}"
-	ValueChanged="./_scroller_ValueChanged">
-	<VerticalStack LayoutChanged="./_list_LayoutChanged"
-		Height="Fit" Width="{./WidthPolicy}" Name="List" Margin="0" VerticalAlignment="Top"/>
-</Scroller>
+<HorizontalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}">
+	<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"
+		Background="{./Background}"
+		Height="{./HeightPolicy}" Width="{./WidthPolicy}"
+		ScrollY="{../scrollbar1.Value}"
+		ValueChanged="./_scroller_ValueChanged">
+		<VerticalStack LayoutChanged="./_list_LayoutChanged"
+			Height="Fit" Width="{./WidthPolicy}" Name="List" Margin="0" VerticalAlignment="Top"/>
+	</Scroller>
+	<ScrollBar
+		Name="scrollbar1"
+		Value="{../scroller1.ScrollY}"
+		Maximum="{../scroller1.MaximumScroll}"
+		Width="14" Orientation="Vertical"/>
+</HorizontalStack>

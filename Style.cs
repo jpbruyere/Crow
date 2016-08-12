@@ -1,10 +1,10 @@
 ﻿//
-//  Spinner.cs
+//  Style.cs
 //
 //  Author:
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
 //
-//  Copyright (c) 2015 jp
+//  Copyright (c) 2016 jp
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,32 +19,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Collections.Generic;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.Spinner.goml")]
-	public class Spinner : NumericControl
+	public class Style : Dictionary<string, object>
 	{
-		#region CTOR
-		public Spinner () : base()
+		public Dictionary<string, Style> SubStyles;
+		public Style () : base()
 		{
 		}
-		public Spinner (double minimum, double maximum, double step) : 
-		base (minimum, maximum, step)
-		{
-
-		}
-		#endregion
-
-		void onUp (object sender, MouseButtonEventArgs e)
-		{
-			Value += this.SmallIncrement;
-		}
-		void onDown (object sender, MouseButtonEventArgs e)
-		{
-			Value -= this.SmallIncrement;
-		}
-
 	}
 }
 

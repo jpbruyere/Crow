@@ -41,6 +41,18 @@ namespace Crow
 		string _root = "/";
 		bool _showFiles;
 
+		object _selectedItem;
+		[XmlIgnore]public object SelectedItem {
+			get {
+				return _selectedItem;
+			}
+			set { 
+				if (value == _selectedItem)
+					return;
+				_selectedItem = value;
+				NotifyValueChanged ("SelectedItem", _selectedItem);
+			}
+		}
 		[XmlAttributeAttribute()][DefaultValue(true)]
 		public virtual bool ShowFiles {
 			get { return _showFiles; }
@@ -66,6 +78,7 @@ namespace Crow
 			get { return new DirectoryInfo (Root).GetFileSystemInfos (); }
 		}
 		public void onSelectedItemChanged (object sender, SelectionChangeEventArgs e){
+			SelectedItem = e.NewValue;
 			SelectedItemChanged.Raise (this, e);
 		}
 	}

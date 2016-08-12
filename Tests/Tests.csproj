@@ -377,6 +377,7 @@
     <EmbeddedResource Include="ui\MenuItem.style" />
     <EmbeddedResource Include="test.style" />
     <EmbeddedResource Include="Interfaces\treeList.crow" />
+    <EmbeddedResource Include="Interfaces\CheckBox2.imlt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">

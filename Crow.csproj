@@ -138,6 +138,7 @@
     <Compile Include="src\Instantiator.cs" />
     <Compile Include="src\IMLReader.cs" />
     <Compile Include="src\ItemTemplate.cs" />
+    <Compile Include="Style.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -173,11 +174,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Images\Icons\updown.svg" />
     <EmbeddedResource Include="Images\Icons\IconAlerte.svg" />
-    <EmbeddedResource Include="Images\Icons\button.svg" />
     <EmbeddedResource Include="Images\Icons\buttonB.svg" />
-    <EmbeddedResource Include="Images\Icons\buttest.svg" />
-    <EmbeddedResource Include="Images\Icons\buttest2.svg" />
-    <EmbeddedResource Include="Images\Icons\buttest4.svg" />
     <EmbeddedResource Include="Images\Icons\checkbox.svg" />
     <EmbeddedResource Include="Images\Icons\radiobutton.svg" />
     <EmbeddedResource Include="Templates\RadioButton.goml" />

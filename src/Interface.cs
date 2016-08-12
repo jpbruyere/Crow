@@ -119,13 +119,13 @@ namespace Crow
 		/// The compilation is done on the first object instancing, and is also done for custom widgets
 		public delegate void LoaderInvoker(object instance);
 		public static Dictionary<String, LoaderInvoker> DefaultValuesLoader = new Dictionary<string, LoaderInvoker>();
-		public static Dictionary<string, Dictionary<string, object>> Styling;
+		public static Dictionary<string, Style> Styling;
 		/// <summary> parse all styling data's and build global Styling Dictionary </summary>
 		static void LoadStyling() {
 			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
-			Styling = new Dictionary<string, Dictionary<string, object>> ();
+			Styling = new Dictionary<string, Style> ();
 
 			//fetch styling info in this order, if member styling is alreadey referenced in previous
 			//assembly, it's ignored.

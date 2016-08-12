@@ -29,11 +29,14 @@ namespace Crow
 	{
 		enum readerState { classNames, propertyName, expression }
 		readerState state = readerState.classNames;
-
+		string resourceId;
+		int column = 1;
+		int line = 1;
 
 		public StyleReader (Assembly assembly, string resId)
 			: base(assembly.GetManifestResourceStream (resId))
 		{
+			resourceId = resId;
 			string styleKey = resId.Substring (0, resId.Length - 6);
 			string token = "";
 			List<string> targetsClasses = new List<string> ();
@@ -56,15 +59,15 @@ namespace Crow
 						//this file contains only properties,
 						//resource Id (minus .style extention) will determine the single target class
 						if (targetsClasses.Count > 1)
-							throw new Exception ("Unexpected token '='");
+							throwParserException ("Unexpected token '='");
 						else if (targetsClasses.Count == 1) {
 							if (!string.IsNullOrEmpty (token))
-								throw new Exception ("Unexpected token '='");
+								throwParserException ("Unexpected token '='");
 							currentProperty = targetsClasses [0];
 							targetsClasses [0] = styleKey;
 						}else{
 							if (string.IsNullOrEmpty (token))
-								throw new Exception ("Unexpected token '='");
+								throwParserException ("Unexpected token '='");
 							targetsClasses.Add (styleKey);
 							currentProperty = token;
 							token = "";
@@ -83,7 +86,7 @@ namespace Crow
 						token = "";
 					}else if (c == '}'){
 						if (!string.IsNullOrEmpty (token))
-							throw new Exception ("Unexpected token '" + c + "'");
+							throwParserException ("Unexpected token '" + c + "'");
 						targetsClasses = new List<string> ();
 						currentProperty = "";
 						state = readerState.classNames;
@@ -91,43 +94,78 @@ namespace Crow
 						token += c;
 					break;
 				case readerState.expression:
+					bool expressionIsFinished = false;
 					if (curlyBracketCount == 0) {
 						if (c == '{'){
-							if (string.IsNullOrEmpty(token))
-								throw new Exception ("Unexpected token '{'");
+							if (!string.IsNullOrEmpty(token.Trim()))
+								throwParserException ("Unexpected token '{'");
 							curlyBracketCount++;
 							token = "{";
 						}else if (c == '}')
-							throw new Exception ("Unexpected token '{'");
+							throwParserException ("Unexpected token '{'");
 						else if (c == ';') {
-							if (!string.IsNullOrEmpty (token)) {
-								string expression = token.Trim ();
-
-								foreach (string tc in targetsClasses) {
-									if (!Interface.Styling.ContainsKey (tc))
-										Interface.Styling [tc] = new Dictionary<string, object> ();
-									else if (Interface.Styling [tc].ContainsKey (currentProperty))
-										continue;
-									Interface.Styling [tc] [currentProperty] = expression;
-								}
-								token = "";
-							}
-							state = readerState.propertyName;
+							expressionIsFinished = true;
 						} else
 							token += c;
 					} else {
 						if (c == '{')
 							curlyBracketCount++;
-						else if (c == '}')
+						else if (c == '}') {
 							curlyBracketCount--;
+							if (curlyBracketCount == 0)
+								expressionIsFinished = true;
+						}
 						token += c;
+					}
+					if (expressionIsFinished) {
+						if (!string.IsNullOrEmpty (token)) {
+							string expression = token.Trim ();
+
+							foreach (string tc in targetsClasses) {
+								if (!Interface.Styling.ContainsKey (tc))
+									Interface.Styling [tc] = new Style ();
+								else if (Interface.Styling [tc].ContainsKey (currentProperty))
+									continue;
+								Interface.Styling [tc] [currentProperty] = expression;
+							}
+							token = "";
+						}
+						//allow omiting ';' if curly bracket close expression
+						while (!EndOfStream) {
+							if (Char.IsWhiteSpace((char)Peek()))
+								Read();
+							else
+								break;
+						}
+						if (this.Peek () == ';')
+							this.Read ();
+						state = readerState.propertyName;							
 					}
 					break;
 				}
 			}
 
 			if (curlyBracketCount > 0)
-				throw new Exception ("Unexpected end of file");
+				throwParserException ("Unexpected end of file");
+		}
+
+		public override int Read ()
+		{			
+			int tmp = base.Read ();
+			char c = (char)tmp;
+			if (c == '\n') {
+				line++;
+				column = 1;
+			} else if (c == '\t')
+				column += Interface.TabSize;
+			else if (c != '\r')
+				column++;
+			return tmp;
+		}
+
+		void throwParserException(string message){
+			throw new Exception (string.Format ("Style Reader Exception ({0},{1}): {2} in {3}.",
+				line, column, message, resourceId));
 		}
 	}
 }

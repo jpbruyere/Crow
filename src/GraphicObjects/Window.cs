@@ -45,6 +45,7 @@ namespace Crow
 		string _title;
 		string _icon;
 		bool _resizable;
+		bool _movable;
 		bool hoverBorder = false;
 
 		Container _contentContainer;
@@ -100,7 +101,16 @@ namespace Crow
 				NotifyValueChanged ("Resizable", _resizable);
 			}
 		}
-
+		[XmlAttributeAttribute()][DefaultValue(true)]
+		public bool Movable {
+			get {
+				return _movable;
+			}
+			set {
+				_movable = value;
+				NotifyValueChanged ("Movable", _movable);
+			}
+		}
 		#region GraphicObject Overrides
 		public override void ResolveBindings ()
 		{
@@ -120,7 +130,7 @@ namespace Crow
 				return;
 			}
 
-			if (this.HasFocus) {
+			if (this.HasFocus && _movable) {
 				if (e.Mouse.IsButtonDown (MouseButton.Left)) {
 					int currentLeft = this.Left;
 					int currentTop = this.Top;
