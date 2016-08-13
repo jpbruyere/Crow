@@ -67,12 +67,13 @@ namespace Crow
 						c.Slot.X = dx;
 						c.Slot.Y = dy;
 						largestChild = c.Slot.Width;
-					} else if (largestChild < c.Slot.Width){
-						largestChild = c.Slot.Width;
+					} else {
+						if (largestChild < c.Slot.Width)
+							largestChild = c.Slot.Width;
 						c.Slot.X = dx;
 						c.Slot.Y = dy;
-						dy += c.Slot.Height + Spacing;
 					}
+					dy += c.Slot.Height + Spacing;
 				}
 			}
 			bmp = null;
@@ -84,13 +85,13 @@ namespace Crow
 			//Debug.WriteLine ("child layout change: " + go.LastSlots.ToString() + " => " + go.Slot.ToString());
 			switch (arg.LayoutType) {
 			case LayoutingType.Width:
-				if (Orientation == Orientation.Vertical && go.Width == Measure.Stretched) {
+				if (Orientation == Orientation.Vertical && go.Width.Units == Unit.Percent) {
 					go.Width = Measure.Fit;
 					return;
 				}
 				break;
 			case LayoutingType.Height:
-				if (Orientation == Orientation.Horizontal && go.Height == Measure.Stretched) {
+				if (Orientation == Orientation.Horizontal && go.Height.Units == Unit.Percent) {
 					go.Height = Measure.Fit;
 					return;
 				}
@@ -105,12 +106,67 @@ namespace Crow
 		#region GraphicObject Overrides
 		protected override int measureRawSize (LayoutingType lt)
 		{
-			//Wrapper can't fit
-			if (lt == LayoutingType.Width)
-				Width = Measure.Stretched;
-			else
+			int tmp = 0;
+			//Wrapper can't fit in the direction of the wrapper
+			if (lt == LayoutingType.Width) {
+				if (Orientation == Orientation.Horizontal) {
+					Width = Measure.Stretched;
+					return -1;
+				} else if (RegisteredLayoutings.HasFlag (LayoutingType.Height))
+					return -1;
+				else {
+					int dy = 0;
+					int largestChild = 0;
+					lock (Children) {
+						foreach (GraphicObject c in Children) {
+							if (!c.Visible)
+								continue;
+							if (c.Height.Units == Unit.Percent &&
+								c.RegisteredLayoutings.HasFlag (LayoutingType.Height))
+								return -1;
+							if (dy + c.Slot.Height > ClientRectangle.Height) {
+								dy = 0;
+								tmp += largestChild + Spacing;
+								largestChild = c.Slot.Width;
+							} else if (largestChild < c.Slot.Width)
+								largestChild = c.Slot.Width;
+
+							dy += c.Slot.Height + Spacing;
+						}
+						if (dy == 0)
+							tmp -= Spacing;
+						return tmp + largestChild + 2 * Margin;
+					}
+				}
+			} else if (Orientation == Orientation.Vertical) {
 				Height = Measure.Stretched;
-			return -1;				
+				return -1;
+			} else if (RegisteredLayoutings.HasFlag (LayoutingType.Width))
+				return -1;
+			else {
+				int dx = 0;
+				int tallestChild = 0;
+				lock (Children) {
+					foreach (GraphicObject c in Children) {
+						if (!c.Visible)
+							continue;
+						if (c.Width.Units == Unit.Percent &&
+							c.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+							return -1;
+						if (dx + c.Slot.Width > ClientRectangle.Width) {
+							dx = 0;
+							tmp += tallestChild + Spacing;
+							tallestChild = c.Slot.Height;
+						} else if (tallestChild < c.Slot.Height)
+							tallestChild = c.Slot.Height;
+
+						dx += c.Slot.Width + Spacing;
+					}
+					if (dx == 0)
+						tmp -= Spacing;
+					return tmp + tallestChild + 2 * Margin;
+				}
+			}
 		}
 
 		public override bool UpdateLayout (LayoutingType layoutType)
@@ -145,12 +201,18 @@ namespace Crow
 					if (c.Width.Units == Unit.Percent)
 						c.RegisterForLayouting (LayoutingType.Width);
 				}
+				if (Height == Measure.Fit)
+					RegisterForLayouting (LayoutingType.Height);
+				RegisterForLayouting (LayoutingType.X);
 				break;
 			case LayoutingType.Height:
 				foreach (GraphicObject c in Children) {
 					if (c.Height.Units == Unit.Percent)
 						c.RegisterForLayouting (LayoutingType.Height);
 				}
+				if (Width == Measure.Fit)
+					RegisterForLayouting (LayoutingType.Width);
+				RegisterForLayouting (LayoutingType.Y);
 				break;
 			default:
 				return;

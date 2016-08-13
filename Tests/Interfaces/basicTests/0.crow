@@ -1,13 +1,14 @@
 <?xml version="1.0"?>
 <Window Width="50%" Height="50%">	
-	<Wrapper Margin="10" Background="Teal" Spacing="30" Width="50%">
+	<Wrapper Orientation="Horizontal" Height="Fit" Width="Fit" Margin="5" Background="Teal" Spacing="1" >
 		<GraphicObject Width="50" Height="50" Background="Mantis"/>
-		<GraphicObject Width="Stretched" Height="10" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
 		<GraphicObject Width="50%" Height="50" Background="Mantis"/>
-		<GraphicObject Width="Stretched" Height="50" Background="Mantis"/>
-		<GraphicObject Width="50" Height="70" Background="Mantis"/>
-		<GraphicObject Width="30" Height="Stretched" Background="Mantis"/>
 		<GraphicObject Width="50" Height="50" Background="Mantis"/>
-		<GraphicObject Width="Stretched" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50%" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
 	</Wrapper>
 </Window>
