@@ -200,8 +200,8 @@ namespace Crow
 			set { 
 				if (value == _currentLine)
 					return;
-				if (value > lines.Count)
-					_currentLine = lines.Count; 
+				if (value >= lines.Count)
+					_currentLine = lines.Count-1; 
 				else if (value < 0)
 					_currentLine = 0;
 				else
@@ -213,7 +213,13 @@ namespace Crow
 				NotifyValueChanged ("CurrentLine", _currentLine);
 			}
 		}
+		[XmlIgnore]public Point CurrentPosition {
+			get { return new Point(_currentCol, CurrentLine); }
+		}
 		//TODO:using HasFocus for drawing selection cause SelBegin and Release binding not to work
+		/// <summary>
+		/// Selection begin position in char units
+		/// </summary>
 		[XmlAttributeAttribute][DefaultValue("-1")]
 		public Point SelBegin {
 			get {
@@ -240,14 +246,19 @@ namespace Crow
 				NotifyValueChanged ("SelectedText", SelectedText);
 			}
 		}
-
-		[XmlIgnore]protected Char CurrentChar   //ordered selection start and end positions
+		/// <summary>
+		/// return char at CurrentLine, CurrentColumn
+		/// </summary>
+		[XmlIgnore]protected Char CurrentChar
 		{
 			get {
 				return lines [CurrentLine] [CurrentColumn];
 			}
 		}
-		[XmlIgnore]protected Point selectionStart   //ordered selection start and end positions
+		/// <summary>
+		/// ordered selection start and end positions in char units
+		/// </summary>
+		[XmlIgnore]protected Point selectionStart
 		{
 			get { 
 				return SelRelease < 0 || SelBegin.Y < SelRelease.Y ? SelBegin : 
@@ -315,10 +326,10 @@ namespace Crow
 		{
 			if (selectionIsEmpty) {				
 				if (CurrentColumn == 0) {
-					if (CurrentLine == 0)
+					if (CurrentLine == 0 && lines.Count == 1)
 						return;
-					CurrentLine--;
-					CurrentColumn = lines [CurrentLine].Length;
+					//CurrentLine--;
+					CurrentColumn = 0;//lines [CurrentLine].Length;
 					lines [CurrentLine] += lines [CurrentLine + 1];
 					lines.RemoveAt (CurrentLine + 1);
 					NotifyValueChanged ("Text", Text);
@@ -513,7 +524,7 @@ namespace Crow
 					computeTextCursorPosition(gr);
 
 				Foreground.SetAsSource (gr);
-				gr.LineWidth = 1.5;
+				gr.LineWidth = 1.0;
 				gr.MoveTo(new PointD(textCursorPos + rText.X, rText.Y + CurrentLine * fe.Height));
 				gr.LineTo(new PointD(textCursorPos + rText.X, rText.Y + (CurrentLine + 1) * fe.Height));
 				gr.Stroke();
@@ -654,6 +665,17 @@ namespace Crow
 				return;
 			
 			updatemouseLocalPos (e.Position);
+			SelectionInProgress = false;
+			RegisterForRedraw ();
+		}
+		public override void onMouseDoubleClick (object sender, MouseButtonEventArgs e)
+		{
+			base.onMouseDoubleClick (sender, e);
+
+			GotoWordStart ();
+			SelBegin = CurrentPosition;
+			GotoWordEnd ();
+			SelRelease = CurrentPosition;
 			SelectionInProgress = false;
 			RegisterForRedraw ();
 		}

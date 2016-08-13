@@ -62,6 +62,8 @@ namespace Crow
 		#endregion
 
 		#region Static and constants
+		public static int DoubleClick = 200;//ms
+		internal static Stopwatch clickTimer = new Stopwatch();
 		public static int TabSize = 4;
 		public static string LineBreak = "\r\n";
 		//TODO: shold be declared in graphicObject

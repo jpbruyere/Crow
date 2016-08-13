@@ -158,6 +158,7 @@ namespace Crow
 		public event EventHandler<MouseButtonEventArgs> MouseUp;
 		public event EventHandler<MouseButtonEventArgs> MouseDown;
 		public event EventHandler<MouseButtonEventArgs> MouseClick;
+		public event EventHandler<MouseButtonEventArgs> MouseDoubleClick;
 		public event EventHandler<MouseMoveEventArgs> MouseMove;
 		public event EventHandler<MouseMoveEventArgs> MouseEnter;
 		public event EventHandler<MouseMoveEventArgs> MouseLeave;
@@ -1099,10 +1100,26 @@ namespace Crow
 				onMouseClick (this, e);
 		}
 		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){
+
+			if (Interface.clickTimer.ElapsedMilliseconds > 0 &&
+			    Interface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick) {
+				Interface.clickTimer.Reset ();
+				Debug.WriteLine ("double click");
+				onMouseDoubleClick (this, e);
+				return;
+			} else
+				Interface.clickTimer.Restart ();
+			
 			GraphicObject p = Parent as GraphicObject;
 			if (p != null)
 				p.onMouseClick(sender,e);
 			MouseClick.Raise (this, e);
+		}
+		public virtual void onMouseDoubleClick(object sender, MouseButtonEventArgs e){
+			GraphicObject p = Parent as GraphicObject;
+			if (p != null)
+				p.onMouseDoubleClick(sender,e);
+			MouseDoubleClick.Raise (this, e);
 		}
 		public virtual void onMouseWheel(object sender, MouseWheelEventArgs e){
 			GraphicObject p = Parent as GraphicObject;
