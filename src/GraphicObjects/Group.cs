@@ -164,77 +164,6 @@ namespace Crow
 				break;
 			}
 		}
-		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
-		{
-			GraphicObject g = sender as GraphicObject;
-
-			switch (arg.LayoutType) {
-			case LayoutingType.Width:
-				if (Width != Measure.Fit)
-					return;
-				if (g.Slot.Width > contentSize.Width) {
-					largestChild = g;
-					contentSize.Width = g.Slot.Width;
-				} else if (g == largestChild)
-					searchLargestChild ();
-
-				this.RegisterForLayouting (LayoutingType.Width);
-				break;
-			case LayoutingType.Height:
-				if (Height != Measure.Fit)
-					return;
-				if (g.Slot.Height > contentSize.Height) {
-					tallestChild = g;
-					contentSize.Height = g.Slot.Height;
-				} else if (g == tallestChild)
-					searchTallestChild ();
-
-				this.RegisterForLayouting (LayoutingType.Height);
-				break;
-			}
-		}
-
-		//TODO: x,y position should be taken in account for computation of width and height
-		void resetChildrenMaxSize(){
-			largestChild = null;
-			tallestChild = null;
-			contentSize = 0;
-		}
-		void searchLargestChild(){
-			#if DEBUG_LAYOUTING
-			Debug.WriteLine("\tSearch largest child");
-			#endif
-			largestChild = null;
-			contentSize.Width = 0;
-			for (int i = 0; i < Children.Count; i++) {
-				if (!Children [i].Visible)
-					continue;
-				if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
-					continue;
-				if (Children [i].Slot.Width > contentSize.Width) {
-					contentSize.Width = Children [i].Slot.Width;
-					largestChild = Children [i];
-				}
-			}
-		}
-		void searchTallestChild(){
-			#if DEBUG_LAYOUTING
-			Debug.WriteLine("\tSearch tallest child");
-			#endif
-			tallestChild = null;
-			contentSize.Height = 0;
-			for (int i = 0; i < Children.Count; i++) {
-				if (!Children [i].Visible)
-					continue;
-				if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
-					continue;
-				if (Children [i].Slot.Height > contentSize.Height) {
-					contentSize.Height = Children [i].Slot.Height;
-					tallestChild = Children [i];
-				}
-			}
-		}
-
 		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
@@ -284,6 +213,76 @@ namespace Crow
 			Clipping.Reset();
 		}
 		#endregion
+
+		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
+		{
+			GraphicObject g = sender as GraphicObject;
+
+			switch (arg.LayoutType) {
+			case LayoutingType.Width:
+				if (Width != Measure.Fit)
+					return;
+				if (g.Slot.Width > contentSize.Width) {
+					largestChild = g;
+					contentSize.Width = g.Slot.Width;
+				} else if (g == largestChild)
+					searchLargestChild ();
+
+				this.RegisterForLayouting (LayoutingType.Width);
+				break;
+			case LayoutingType.Height:
+				if (Height != Measure.Fit)
+					return;
+				if (g.Slot.Height > contentSize.Height) {
+					tallestChild = g;
+					contentSize.Height = g.Slot.Height;
+				} else if (g == tallestChild)
+					searchTallestChild ();
+
+				this.RegisterForLayouting (LayoutingType.Height);
+				break;
+			}
+		}
+		//TODO: x,y position should be taken in account for computation of width and height
+		void resetChildrenMaxSize(){
+			largestChild = null;
+			tallestChild = null;
+			contentSize = 0;
+		}
+		void searchLargestChild(){
+			#if DEBUG_LAYOUTING
+			Debug.WriteLine("\tSearch largest child");
+			#endif
+			largestChild = null;
+			contentSize.Width = 0;
+			for (int i = 0; i < Children.Count; i++) {
+				if (!Children [i].Visible)
+					continue;
+				if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
+					continue;
+				if (Children [i].Slot.Width > contentSize.Width) {
+					contentSize.Width = Children [i].Slot.Width;
+					largestChild = Children [i];
+				}
+			}
+		}
+		void searchTallestChild(){
+			#if DEBUG_LAYOUTING
+			Debug.WriteLine("\tSearch tallest child");
+			#endif
+			tallestChild = null;
+			contentSize.Height = 0;
+			for (int i = 0; i < Children.Count; i++) {
+				if (!Children [i].Visible)
+					continue;
+				if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
+					continue;
+				if (Children [i].Slot.Height > contentSize.Height) {
+					contentSize.Height = Children [i].Slot.Height;
+					tallestChild = Children [i];
+				}
+			}
+		}
 
 	
 		#region Mouse handling

@@ -139,6 +139,7 @@
     <Compile Include="src\IMLReader.cs" />
     <Compile Include="src\ItemTemplate.cs" />
     <Compile Include="Style.cs" />
+    <Compile Include="src\GraphicObjects\Wrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
