@@ -37,7 +37,7 @@ namespace Crow
 			int dx = 0;
 			int dy = 0;
 
-			if (Orientation == Orientation.Horizontal) {
+			if (Orientation == Orientation.Vertical) {
 				int tallestChild = 0;
 				foreach (GraphicObject c in Children) {
 					if (!c.Visible)
@@ -85,13 +85,13 @@ namespace Crow
 			//Debug.WriteLine ("child layout change: " + go.LastSlots.ToString() + " => " + go.Slot.ToString());
 			switch (arg.LayoutType) {
 			case LayoutingType.Width:
-				if (Orientation == Orientation.Vertical && go.Width.Units == Unit.Percent) {
+				if (Orientation == Orientation.Horizontal && go.Width.Units == Unit.Percent) {
 					go.Width = Measure.Fit;
 					return;
 				}
 				break;
 			case LayoutingType.Height:
-				if (Orientation == Orientation.Horizontal && go.Height.Units == Unit.Percent) {
+				if (Orientation == Orientation.Vertical && go.Height.Units == Unit.Percent) {
 					go.Height = Measure.Fit;
 					return;
 				}
@@ -109,7 +109,7 @@ namespace Crow
 			int tmp = 0;
 			//Wrapper can't fit in the direction of the wrapper
 			if (lt == LayoutingType.Width) {
-				if (Orientation == Orientation.Horizontal) {
+				if (Orientation == Orientation.Vertical) {
 					Width = Measure.Stretched;
 					return -1;
 				} else if (RegisteredLayoutings.HasFlag (LayoutingType.Height))
@@ -138,7 +138,7 @@ namespace Crow
 						return tmp + largestChild + 2 * Margin;
 					}
 				}
-			} else if (Orientation == Orientation.Vertical) {
+			} else if (Orientation == Orientation.Horizontal) {
 				Height = Measure.Stretched;
 				return -1;
 			} else if (RegisteredLayoutings.HasFlag (LayoutingType.Width))
