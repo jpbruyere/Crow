@@ -82,9 +82,12 @@ namespace Crow
 		protected override void onDraw (Cairo.Context gr)
 		{
 			gr.Save ();
-			//clip to client zone
-			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
-			gr.Clip ();
+
+			if (ClipToClientRect) {
+				//clip to client zone
+				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+				gr.Clip ();
+			}
 
 			if (child != null)
 				child.Paint (ref gr);

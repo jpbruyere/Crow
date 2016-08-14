@@ -31,7 +31,7 @@ namespace Crow
 
             return arr[minp];
         }
-		public static void CairoRectangle(Cairo.Context gr, Rectangle r, double radius, bool stroke = false)
+		public static void CairoRectangle(Cairo.Context gr, Rectangle r, double radius, double stroke = 0.0)
 		{
 			if (radius > 0)
 				CairoHelpers.DrawRoundedRectangle (gr, r, radius, stroke);
@@ -42,10 +42,12 @@ namespace Crow
 		{
 			gr.Arc(r.X + r.Width/2, r.Y + r.Height/2, Math.Min(r.Width,r.Height)/2, 0, 2*Math.PI);
 		}
-		public static void DrawRoundedRectangle(Cairo.Context gr, Rectangle r, double radius, bool stroke = false)
+		public static void DrawRoundedRectangle(Cairo.Context gr, Rectangle r, double radius, double stroke = 0.0)
         {
-			if (stroke) {
-				DrawRoundedRectangle (gr, r.X + 0.5, r.Y + 0.5, r.Width - 1.0, r.Height - 1.0, radius);
+			if (stroke>0.0) {
+				gr.LineWidth = stroke;
+				double hsw = stroke / 2.0;
+				DrawRoundedRectangle (gr, r.X + hsw, r.Y + hsw, r.Width - stroke, r.Height - stroke, radius);
 				gr.Stroke ();
 			}else
 				DrawRoundedRectangle(gr, r.X, r.Y, r.Width, r.Height, radius);

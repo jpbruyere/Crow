@@ -215,9 +215,11 @@ namespace Crow
 			gr.Fill ();
 
 			gr.Save ();
-			//clip to scrolled client zone
-			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
-			gr.Clip ();
+			if (ClipToClientRect) {
+				//clip to scrolled client zone
+				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+				gr.Clip ();
+			}
 
 			gr.Translate (-ScrollX, -ScrollY);
 			if (child != null)

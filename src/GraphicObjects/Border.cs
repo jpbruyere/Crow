@@ -44,24 +44,25 @@ namespace Crow
 		{
 			Rectangle rBack = new Rectangle (Slot.Size);
 
-			rBack.Inflate (-Margin);
-			if (BorderWidth > 0) 
-				rBack.Inflate (-BorderWidth / 2);			
+			//rBack.Inflate (-Margin);
+//			if (BorderWidth > 0) 
+//				rBack.Inflate (-BorderWidth / 2);			
 
 			Background.SetAsSource (gr, rBack);
 			CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
 			gr.Fill ();
 
-			if (BorderWidth > 0) {
-				gr.LineWidth = BorderWidth;
+			if (BorderWidth > 0) {				
 				Foreground.SetAsSource (gr, rBack);
-				CairoHelpers.CairoRectangle(gr, rBack, CornerRadius, true);
+				CairoHelpers.CairoRectangle(gr, rBack, CornerRadius, BorderWidth);
 			}
 
 			gr.Save ();
-			//clip to client zone
-			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
-			gr.Clip ();
+			if (ClipToClientRect) {
+				//clip to client zone
+				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+				gr.Clip ();
+			}
 
 			if (child != null)
 				child.Paint (ref gr);

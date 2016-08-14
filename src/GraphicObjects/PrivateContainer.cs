@@ -158,9 +158,12 @@ namespace Crow
 			base.onDraw (gr);
 
 			gr.Save ();
-			//clip to client zone
-			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
-			gr.Clip ();
+
+			if (ClipToClientRect) {
+				//clip to client zone
+				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+				gr.Clip ();
+			}
 
 			if (child != null)
 				child.Paint (ref gr);

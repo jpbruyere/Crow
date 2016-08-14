@@ -159,9 +159,12 @@ namespace Crow
 			gr.Fill ();
 
 			gr.Save ();
-			//clip to client zone
-			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
-			gr.Clip ();
+
+			if (ClipToClientRect) {
+				//clip to client zone
+				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+				gr.Clip ();
+			}
 
 			for (int i = 0; i < Children.Count; i++) {
 				if (i == SelectedTab)

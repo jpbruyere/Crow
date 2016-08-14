@@ -102,18 +102,19 @@ namespace Crow
 		protected override void onDraw (Cairo.Context gr)
 		{
 			int spacing = (Parent as TabView).Spacing;
-			gr.MoveTo (0, TabTitle.Slot.Bottom);
-			gr.LineTo (TabTitle.Slot.Left - spacing, TabTitle.Slot.Bottom);
+
+			gr.MoveTo (0, TabTitle.Slot.Bottom-0.5);
+			gr.LineTo (TabTitle.Slot.Left - spacing, TabTitle.Slot.Bottom-0.5);
 			gr.CurveTo (
-				TabTitle.Slot.Left - spacing / 2, TabTitle.Slot.Bottom,
-				TabTitle.Slot.Left - spacing / 2, 1,
-				TabTitle.Slot.Left, 1);
-			gr.LineTo (TabTitle.Slot.Right, 1);
+				TabTitle.Slot.Left - spacing / 2, TabTitle.Slot.Bottom-0.5,
+				TabTitle.Slot.Left - spacing / 2, 0.5,
+				TabTitle.Slot.Left, 0.5);
+			gr.LineTo (TabTitle.Slot.Right, 0.5);
 			gr.CurveTo (
-				TabTitle.Slot.Right + spacing / 2, 1,
-				TabTitle.Slot.Right + spacing / 2, TabTitle.Slot.Bottom,
-				TabTitle.Slot.Right + spacing, TabTitle.Slot.Bottom);
-			gr.LineTo (Slot.Width, TabTitle.Slot.Bottom);
+				TabTitle.Slot.Right + spacing / 2, 0.5,
+				TabTitle.Slot.Right + spacing / 2, TabTitle.Slot.Bottom-0.5,
+				TabTitle.Slot.Right + spacing, TabTitle.Slot.Bottom-0.5);
+			gr.LineTo (Slot.Width, TabTitle.Slot.Bottom-0.5);
 
 			gr.LineWidth = 1;
 			Foreground.SetAsSource (gr);

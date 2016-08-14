@@ -81,6 +81,7 @@ namespace Crow
 		Size maximumSize = "0,0";
 		Size minimumSize = "0,0";
 		bool cacheEnabled = false;
+		bool clipToClientRect = true;
 		object dataSource;
 		string style;
 		#endregion
@@ -184,6 +185,17 @@ namespace Crow
 				NotifyValueChanged ("CacheEnabled", cacheEnabled);
 			}
 		}
+		[XmlAttributeAttribute()][DefaultValue(true)]
+		public virtual bool ClipToClientRect {
+			get { return clipToClientRect; }
+			set {
+				if (clipToClientRect == value)
+					return;
+				clipToClientRect = value;
+				NotifyValueChanged ("ClipToClientRect", clipToClientRect);
+				this.RegisterForRedraw ();
+			}
+		}
 		[XmlAttributeAttribute()][DefaultValue("unamed")]
 		public virtual string Name {
 			get { return name; }
@@ -238,6 +250,19 @@ namespace Crow
 				top = value;
 				NotifyValueChanged ("Top", top);
 				this.RegisterForLayouting (LayoutingType.Y);
+			}
+		}
+		/// <summary>
+		/// When set to True, the <see cref="T:Crow.GraphicObject"/>'s width and height will be set to Fit.
+		/// </summary>
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public virtual bool Fit {
+			get { return Width == Measure.Fit && Height == Measure.Fit ? true : false; }
+			set {
+				if (value == Fit)
+					return;
+
+				Width = Height = Measure.Fit;
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("Stretched")]
@@ -314,19 +339,6 @@ namespace Crow
 		[XmlIgnore]public virtual Measure HeightPolicy { get {
 				return Height.Units == Unit.Percent || Height.IsFixed ?
 					Measure.Stretched : Measure.Fit; } }
-		/// <summary>
-		/// When set to True, the <see cref="T:Crow.GraphicObject"/>'s width and height will be set to Fit.
-		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(false)]
-		public virtual bool Fit {
-			get { return Width == Measure.Fit && Height == Measure.Fit ? true : false; }
-			set {
-				if (value == Fit)
-					return;
-
-				Width = Height = Measure.Fit;
-			}
-		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool Focusable {
 			get { return focusable; }

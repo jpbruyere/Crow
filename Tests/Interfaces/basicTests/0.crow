@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<Border Width="80%" Height="80%" Background="DarkRed">
-	<TextBox Multiline="true" Font="mono, 12" Margin="0"
+<Group Background="SeaGreen" Fit="true" Margin="1">
+<Border Foreground="White" Margin="10" Width="Fit" Height="Fit" Background="DarkRed" BorderWidth="1">
+	<TextBox Multiline="true" Font="mono, 12" Margin="0" 
 		Text="this is a test of double click\n and here a second line of text\n and again a third one"/>
 </Border>
+</Group>
