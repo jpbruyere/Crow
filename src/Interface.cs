@@ -69,9 +69,9 @@ namespace Crow
 		//TODO: shold be declared in graphicObject
 		public static bool FocusOnHover = false;
 		/// <summary> Time to wait in millisecond before starting repeat loop</summary>
-		public static int DeviceRepeatDelay = 600;
+		public static int DeviceRepeatDelay = 700;
 		/// <summary> Time interval in millisecond between device event repeat</summary>
-		public static int DeviceRepeatInterval = 100;
+		public static int DeviceRepeatInterval = 40;
 		public static bool ReplaceTabsWithSpace = false;
 		/// <summary> Allow rendering of interface in development environment </summary>
 		public static bool DesignerMode = false;
@@ -332,6 +332,14 @@ namespace Crow
 					FocusedWidget.onMouseClick (this, new MouseButtonEventArgs (Mouse.X, Mouse.Y, MouseButton.Left, true));
 				}
 			}
+			if (keyboardRepeatCount > 0) {
+				int mc = keyboardRepeatCount;
+				keyboardRepeatCount -= mc;
+				for (int i = 0; i < mc; i++) {
+					_focusedWidget.onKeyDown (this, lastKeyDownEvt);
+				}
+			}
+
 			if (!Monitor.TryEnter (UpdateMutex))
 				return;
 
@@ -653,10 +661,52 @@ namespace Crow
 			HoverWidget.onMouseWheel (this, e);
 			return true;
 		}
+		#endregion
 
-		volatile bool mouseRepeatOn;
-		volatile int mouseRepeatCount;
-		Thread mouseRepeatThread;
+		#region Keyboard
+		public bool ProcessKeyDown(int Key){
+			Keyboard.SetKeyState((Crow.Key)Key,true);
+			if (_focusedWidget == null)
+				return false;
+			KeyboardKeyEventArgs e = lastKeyDownEvt = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
+			lastKeyDownEvt.IsRepeat = true;
+			_focusedWidget.onKeyDown (this, e);
+
+			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
+			keyboardRepeatThread.IsBackground = true;
+			keyboardRepeatThread.Start ();
+
+			return true;
+		}
+		public bool ProcessKeyUp(int Key){
+			Keyboard.SetKeyState((Crow.Key)Key,false);
+			if (_focusedWidget == null)
+				return false;
+			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
+
+			_focusedWidget.onKeyUp (this, e);
+
+			if (keyboardRepeatThread != null) {
+				keyboardRepeatOn = false;
+				keyboardRepeatThread.Abort();
+				keyboardRepeatThread.Join ();
+			}
+			return true;
+		}
+		public bool ProcessKeyPress(char Key){
+			if (_focusedWidget == null)
+				return false;
+			KeyPressEventArgs e = new KeyPressEventArgs(Key);
+			_focusedWidget.onKeyPress (this, e);
+			return true;
+		}
+		#endregion
+
+		#region Device Repeat Events
+		volatile bool mouseRepeatOn, keyboardRepeatOn;
+		volatile int mouseRepeatCount, keyboardRepeatCount;
+		Thread mouseRepeatThread, keyboardRepeatThread;
+		KeyboardKeyEventArgs lastKeyDownEvt;
 		void mouseRepeatThreadFunc()
 		{
 			mouseRepeatOn = true;
@@ -667,31 +717,15 @@ namespace Crow
 			}
 			mouseRepeatCount = 0;
 		}
-		#endregion
-
-		#region Keyboard
-		public bool ProcessKeyDown(int Key){
-			Keyboard.SetKeyState((Crow.Key)Key,true);
-			if (_focusedWidget == null)
-				return false;
-			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
-			_focusedWidget.onKeyDown (this, e);
-			return true;
-		}
-		public bool ProcessKeyUp(int Key){
-			Keyboard.SetKeyState((Crow.Key)Key,false);
-			if (_focusedWidget == null)
-				return false;
-			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
-			_focusedWidget.onKeyUp (this, e);
-			return true;
-		}
-		public bool ProcessKeyPress(char Key){
-			if (_focusedWidget == null)
-				return false;
-			KeyPressEventArgs e = new KeyPressEventArgs(Key);
-			_focusedWidget.onKeyPress (this, e);
-			return true;
+		void keyboardRepeatThreadFunc()
+		{
+			keyboardRepeatOn = true;
+			Thread.Sleep (Interface.DeviceRepeatDelay);
+			while (keyboardRepeatOn) {
+				keyboardRepeatCount++;
+				Thread.Sleep (Interface.DeviceRepeatInterval);
+			}
+			keyboardRepeatCount = 0;
 		}
 		#endregion
 

@@ -1,4 +1,14 @@
 ﻿<?xml version="1.0"?>
-<Container Background="Green" Margin="0">
-	<GraphicObject Margin="0" Width="90" Height="90%" Background="Red"/>
-</Container>
+<Window Width="50%" Height="50%">	
+	<Wrapper Orientation="Horizontal" Height="Fit" Width="Fit" Margin="5" Background="Teal" Spacing="1" >
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50%" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50%" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
+	</Wrapper>
+</Window>

@@ -298,11 +298,40 @@ namespace Crow
 		List<string> getLines {
 			get {				
 				return _multiline ?
-					Regex.Split (_text, "\r\n|\r|\n|" + @"\\n").ToList() :
+					Regex.Split (_text, "\r\n|\r|\n|\\\\n").ToList() :
 					new List<string>(new string[] { _text });
 			}
 		}
-
+		/// <summary>
+		/// Moves cursor one char to the left.
+		/// </summary>
+		/// <returns><c>true</c> if move succeed</returns>
+		public bool MoveLeft(){
+			int tmp = _currentCol - 1;
+			if (tmp < 0) {
+				if (_currentLine == 0)
+					return false;
+				CurrentLine--;
+				CurrentColumn = int.MaxValue;
+			} else
+				CurrentColumn = tmp;
+			return true;
+		}
+		/// <summary>
+		/// Moves cursor one char to the right.
+		/// </summary>
+		/// <returns><c>true</c> if move succeed</returns>
+		public bool MoveRight(){
+			int tmp = _currentCol + 1;
+			if (tmp > lines [_currentLine].Length){
+				if (CurrentLine == lines.Count - 1)
+					return false;
+				CurrentLine++;
+				CurrentColumn = 0;
+			} else
+				CurrentColumn = tmp;
+			return true;
+		}
 		public void GotoWordStart(){
 			CurrentColumn--;
 			//skip white spaces
@@ -315,6 +344,8 @@ namespace Crow
 		}
 		public void GotoWordEnd(){
 			//skip white spaces
+			if (CurrentColumn >= lines [CurrentLine].Length - 1)
+				return;
 			while (char.IsWhiteSpace (this.CurrentChar) && CurrentColumn < lines [CurrentLine].Length-1)
 				CurrentColumn++;
 			while (!char.IsWhiteSpace (this.CurrentChar) && CurrentColumn < lines [CurrentLine].Length-1)
@@ -328,8 +359,8 @@ namespace Crow
 				if (CurrentColumn == 0) {
 					if (CurrentLine == 0 && lines.Count == 1)
 						return;
-					//CurrentLine--;
-					CurrentColumn = 0;//lines [CurrentLine].Length;
+					CurrentLine--;
+					CurrentColumn = lines [CurrentLine].Length;
 					lines [CurrentLine] += lines [CurrentLine + 1];
 					lines.RemoveAt (CurrentLine + 1);
 					NotifyValueChanged ("Text", Text);
@@ -338,7 +369,7 @@ namespace Crow
 				CurrentColumn--;
 				lines [CurrentLine] = lines [CurrentLine].Remove (CurrentColumn, 1);
 			} else {				
-				int linesToRemove = selectionEnd.Y - selectionStart.Y;
+				int linesToRemove = selectionEnd.Y - selectionStart.Y + 1;
 				int l = selectionStart.Y;
 
 				if (linesToRemove > 0) {
@@ -347,8 +378,8 @@ namespace Crow
 					l++;
 					for (int c = 0; c < linesToRemove-1; c++)
 						lines.RemoveAt (l);
-					CurrentColumn = selectionStart.X;
 					CurrentLine = selectionStart.Y;
+					CurrentColumn = selectionStart.X;
 				} else 
 					lines [l] = lines [l].Remove (selectionStart.X, selectionEnd.X - selectionStart.X);
 				CurrentColumn = selectionStart.X;
@@ -363,8 +394,21 @@ namespace Crow
 		/// <param name="str">String.</param>
 		protected void Insert(string str)
 		{
-			lines [CurrentLine] = lines [CurrentLine].Insert (CurrentColumn, str);
-			CurrentColumn += str.Length;
+			if (!selectionIsEmpty)
+				this.DeleteChar ();
+			if (_multiline) {
+				string[] strLines = Regex.Split (str, "\r\n|\r|\n|" + @"\\n").ToArray();
+				lines [CurrentLine] = lines [CurrentLine].Insert (CurrentColumn, strLines[0]);
+				CurrentColumn += strLines[0].Length;
+				for (int i = 1; i < strLines.Length; i++) {
+					InsertLineBreak ();
+					lines [CurrentLine] = lines [CurrentLine].Insert (CurrentColumn, strLines[i]);
+					CurrentColumn += strLines[i].Length;
+				}
+			} else {
+				lines [CurrentLine] = lines [CurrentLine].Insert (CurrentColumn, str);
+				CurrentColumn += str.Length;
+			}
 			NotifyValueChanged ("Text", Text);
 		}
 		/// <summary>
