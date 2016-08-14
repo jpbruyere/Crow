@@ -55,8 +55,7 @@ namespace Crow
 			if (BorderWidth > 0) {
 				gr.LineWidth = BorderWidth;
 				Foreground.SetAsSource (gr, rBack);
-				CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
-				gr.Stroke ();
+				CairoHelpers.CairoRectangle(gr, rBack, CornerRadius, true);
 			}
 
 			gr.Save ();

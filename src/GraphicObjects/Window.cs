@@ -46,11 +46,15 @@ namespace Crow
 		bool _resizable;
 		bool _movable;
 		bool hoverBorder = false;
+		bool isMaximized = false;
+		Measure savedH, savedW;
 
 		Container _contentContainer;
 		Direction currentDirection = Direction.None;
 
 		public event EventHandler Closing;
+		public event EventHandler Maximized;
+		public event EventHandler Unmaximized;
 
 		#region CTOR
 		public Window () : base() {
@@ -74,6 +78,7 @@ namespace Crow
 		}
 		#endregion
 
+		#region public properties
 		[XmlAttributeAttribute()][DefaultValue("Window")]
 		public string Title {
 			get { return _title; } 
@@ -110,6 +115,24 @@ namespace Crow
 				NotifyValueChanged ("Movable", _movable);
 			}
 		}
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public bool IsMaximized {
+			get { return isMaximized; }
+			set{
+				if (value == isMaximized)
+					return;
+				isMaximized = value;
+
+				if (isMaximized)
+					onMaximized (this, null);
+				else
+					onUnmaximized (this, null);
+
+				NotifyValueChanged ("IsMaximized", isMaximized);
+			}
+		}
+		#endregion
+
 		#region GraphicObject Overrides
 		public override void ResolveBindings ()
 		{
@@ -272,19 +295,36 @@ namespace Crow
 			base.onMouseDown (sender, e);
 		}
 		#endregion
+		protected void onMaximized (object sender, EventArgs e){
+			savedW = this.Width;
+			savedH = this.Height;
+			this.Width = Measure.Stretched;
+			this.Height = Measure.Stretched;
 
-		public void onBorderMouseLeave (object sender, MouseMoveEventArgs e)
+			Maximized.Raise (sender, e);
+		}
+		protected void onUnmaximized (object sender, EventArgs e){
+			this.Width = savedW;
+			this.Height = savedH;
+
+			Unmaximized.Raise (sender, e);
+		}
+
+		protected void onBorderMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			hoverBorder = false;
 			currentDirection = Direction.None;
 			Interface.CurrentInterface.MouseCursor = XCursor.Default;
 		}
-		public void onBorderMouseEnter (object sender, MouseMoveEventArgs e)
+		protected void onBorderMouseEnter (object sender, MouseMoveEventArgs e)
 		{
 			hoverBorder = true;
 		}
 
 
+		protected void butMaximizePress (object sender, MouseButtonEventArgs e){
+			IsMaximized = !IsMaximized;
+		}
 		protected void butQuitPress (object sender, MouseButtonEventArgs e)
 		{
 			Interface.CurrentInterface.MouseCursor = XCursor.Default;

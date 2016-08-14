@@ -26,9 +26,13 @@ namespace Crow
 	public static class ExtensionsMethods
 	{
 		#region Cairo extensions
-		public static void Rectangle(this Cairo.Context ctx, Rectangle r)
+		public static void Rectangle(this Cairo.Context ctx, Rectangle r, bool stroke = false)
 		{
-			ctx.Rectangle (r.X, r.Y, r.Width, r.Height);
+			if (stroke) {
+				ctx.Rectangle (r.X + 0.5, r.Y + 0.5, r.Width - 1.0, r.Height - 1.0);
+				ctx.Stroke ();
+			}else
+				ctx.Rectangle (r.X, r.Y, r.Width, r.Height);
 		}
 		public static void SetSourceColor(this Cairo.Context ctx, Color c)
 		{

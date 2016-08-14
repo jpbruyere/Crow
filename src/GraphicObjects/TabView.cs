@@ -82,7 +82,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("15")]
+		[XmlAttributeAttribute()][DefaultValue("18")]
 		public virtual Measure TabThickness {
 			get { return tabThickness; }
 			set {

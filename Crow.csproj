@@ -263,6 +263,7 @@
     <EmbeddedResource Include="Templates\Window.template">
       <LogicalName>Crow.Window.template</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Images\Icons\Cursors\ibeam" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

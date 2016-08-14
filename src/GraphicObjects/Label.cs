@@ -569,8 +569,8 @@ namespace Crow
 
 				Foreground.SetAsSource (gr);
 				gr.LineWidth = 1.0;
-				gr.MoveTo(new PointD(textCursorPos + rText.X, rText.Y + CurrentLine * fe.Height));
-				gr.LineTo(new PointD(textCursorPos + rText.X, rText.Y + (CurrentLine + 1) * fe.Height));
+				gr.MoveTo (0.5 + textCursorPos + rText.X, rText.Y + CurrentLine * fe.Height);
+				gr.LineTo (0.5 + textCursorPos + rText.X, rText.Y + (CurrentLine + 1) * fe.Height);
 				gr.Stroke();
 			}
 			#endregion
@@ -603,9 +603,9 @@ namespace Crow
 				int lineLength = (int)gr.TextExtents (l).XAdvance;
 				Rectangle lineRect = new Rectangle (
 					rText.X,
-					rText.Y + (int)(i * fe.Height), 
-					lineLength, 
-					(int)fe.Height);
+					rText.Y + (int)Math.Ceiling(i * fe.Height), 
+					lineLength,
+					(int)Math.Ceiling(fe.Height));
 
 //				if (TextAlignment == Alignment.Center ||
 //					TextAlignment == Alignment.Top ||
@@ -658,6 +658,17 @@ namespace Crow
 				mouseLocalPos.X = 0;
 			if (mouseLocalPos.Y < 0)
 				mouseLocalPos.Y = 0;
+		}
+		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
+		{
+			base.onMouseEnter (sender, e);
+			if (Selectable)
+				Interface.CurrentInterface.MouseCursor = XCursor.Text;
+		}
+		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
+		{
+			base.onMouseLeave (sender, e);
+			Interface.CurrentInterface.MouseCursor = XCursor.Default;
 		}
 		public override void onFocused (object sender, EventArgs e)
 		{
