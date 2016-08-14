@@ -56,7 +56,6 @@ namespace Crow
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
 		}
 		public Interface(){
-			Interface.CurrentInterface = this;
 			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture; 
 		}
 		#endregion
@@ -208,10 +207,10 @@ namespace Crow
 				xs.Serialize (s, graphicObject, xn);
 			}
 		}
-		public static GraphicObject Load (string path)
+		public GraphicObject Load (string path)
 		{
 			try {
-				return GetInstantiator (path).CreateInstance ();
+				return GetInstantiator (path).CreateInstance (this);
 			} catch (Exception ex) {
 				throw new Exception ("Error loading <" + path + ">:", ex);
 			}
@@ -232,7 +231,7 @@ namespace Crow
 		public GraphicObject LoadInterface (string path)
 		{
 			lock (UpdateMutex) {
-				GraphicObject tmp = Interface.Load (path);
+				GraphicObject tmp = Load (path);
 				AddWidget (tmp);
 
 				return tmp;
@@ -248,8 +247,6 @@ namespace Crow
 		#endif
 
 		public List<GraphicObject> GraphicTree = new List<GraphicObject>();
-
-		public static Interface CurrentInterface;
 
 		Rectangles _redrawClip = new Rectangles();
 
@@ -324,8 +321,6 @@ namespace Crow
 
 
 		public void Update(){
-			CurrentInterface = this;
-
 			if (mouseRepeatCount > 0) {
 				int mc = mouseRepeatCount;
 				mouseRepeatCount -= mc;
@@ -384,9 +379,9 @@ namespace Crow
 			#if MEASURE_TIME
 			clippingTime.Restart ();
 			#endif
-			lock (CurrentInterface.DrawingQueue) {
-				while (CurrentInterface.DrawingQueue.Count > 0) {
-					GraphicObject g = CurrentInterface.DrawingQueue.Dequeue ();
+			lock (DrawingQueue) {
+				while (DrawingQueue.Count > 0) {
+					GraphicObject g = DrawingQueue.Dequeue ();
 					g.IsQueueForRedraw = false;
 					try {
 						if (g.Parent == null)
@@ -431,7 +426,7 @@ namespace Crow
 						#if DEBUG_CLIP_RECTANGLE
 						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
 						#endif
-						lock (Interface.CurrentInterface.RenderMutex) {
+						lock (RenderMutex) {
 							if (IsDirty)
 								DirtyRect += clipping.Bounds;
 							else

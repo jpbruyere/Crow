@@ -62,7 +62,7 @@ namespace Crow
 
 				NotifyValueChanged ("Data", data);
 
-				lock (Interface.CurrentInterface.UpdateMutex)
+				lock (CurrentInterface.UpdateMutex)
 					_list.ClearChildren ();
 				if (_gsList.Orientation == Orientation.Horizontal)
 					_gsList.Width = -1;
@@ -167,7 +167,7 @@ namespace Crow
 				//g.LogicalParent = this;
 			}
 
-			lock (Interface.CurrentInterface.LayoutMutex)
+			lock (CurrentInterface.LayoutMutex)
 				_list.AddChild (page);
 
 			#if DEBUG_LOAD
@@ -187,8 +187,8 @@ namespace Crow
 			else
 				iTemp = ItemTemplates ["default"];
 
-			lock (Interface.CurrentInterface.LayoutMutex) {
-				g = iTemp.CreateInstance();
+			lock (CurrentInterface.LayoutMutex) {
+				g = iTemp.CreateInstance(CurrentInterface);
 				page.AddChild (g);
 				g.DataSource = data [i];
 			}

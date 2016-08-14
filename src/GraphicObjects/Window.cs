@@ -144,11 +144,11 @@ namespace Crow
 		{
 			base.onMouseMove (sender, e);
 
-			Interface otkgw = Interface.CurrentInterface;
+			Interface otkgw = CurrentInterface;
 
 			if (!hoverBorder) {
 				currentDirection = Direction.None;
-				Interface.CurrentInterface.MouseCursor = XCursor.Default;
+				CurrentInterface.MouseCursor = XCursor.Default;
 				return;
 			}
 
@@ -314,7 +314,7 @@ namespace Crow
 		{
 			hoverBorder = false;
 			currentDirection = Direction.None;
-			Interface.CurrentInterface.MouseCursor = XCursor.Default;
+			CurrentInterface.MouseCursor = XCursor.Default;
 		}
 		protected void onBorderMouseEnter (object sender, MouseMoveEventArgs e)
 		{
@@ -327,13 +327,13 @@ namespace Crow
 		}
 		protected void butQuitPress (object sender, MouseButtonEventArgs e)
 		{
-			Interface.CurrentInterface.MouseCursor = XCursor.Default;
+			CurrentInterface.MouseCursor = XCursor.Default;
 			close ();
 		}
 
 		void close(){
 			Closing.Raise (this, null);
-			Interface.CurrentInterface.DeleteWidget (this);
+			CurrentInterface.DeleteWidget (this);
 		}
 	}
 }

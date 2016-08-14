@@ -60,7 +60,7 @@ namespace Crow
 			gr.Save ();
 			if (ClipToClientRect) {
 				//clip to client zone
-				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+				CairoHelpers.CairoRectangle (gr, ClientRectangle,Math.Max(0.0, CornerRadius-Margin));
 				gr.Clip ();
 			}
 

@@ -87,7 +87,7 @@ namespace Crow
 					if (!MoveRight ())
 						return;
 				}else if (e.Shift)
-					Interface.CurrentInterface.Clipboard = this.SelectedText;
+					CurrentInterface.Clipboard = this.SelectedText;
 				this.DeleteChar ();
 				break;
 			case Key.Enter:
@@ -136,9 +136,9 @@ namespace Crow
 				break;
 			case Key.Insert:
 				if (e.Shift)
-					this.Insert (Interface.CurrentInterface.Clipboard);
+					this.Insert (CurrentInterface.Clipboard);
 				else if (e.Control && !selectionIsEmpty)
-					Interface.CurrentInterface.Clipboard = this.SelectedText;
+					CurrentInterface.Clipboard = this.SelectedText;
 				break;
 			case Key.Left:
 				if (e.Shift) {

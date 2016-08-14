@@ -169,7 +169,7 @@ namespace Crow
 			//ensure popped window is cleared
 			if (Content != null) {
 				if (Content.Parent != null)
-					Interface.CurrentInterface.DeleteWidget (Content);
+					CurrentInterface.DeleteWidget (Content);
 			}
 			base.ClearBinding ();
 		}
@@ -194,21 +194,17 @@ namespace Crow
 			
 		public virtual void onPop(object sender, EventArgs e)
 		{
-			if (Interface.CurrentInterface == null)
-				return;
 			if (Content != null) {
 				Content.Visible = true;
 				if (Content.Parent == null)
-					Interface.CurrentInterface.AddWidget (Content);
-				Interface.CurrentInterface.PutOnTop (Content);
+					CurrentInterface.AddWidget (Content);
+				CurrentInterface.PutOnTop (Content);
 				_content_LayoutChanged (this, new LayoutingEventArgs (LayoutingType.Sizing));
 			}
 			Pop.Raise (this, e);
 		}
 		public virtual void onUnpop(object sender, EventArgs e)
 		{
-			if (Interface.CurrentInterface == null)
-				return;
 			if (Content != null)
 				Content.Visible = false;
 			Unpop.Raise (this, e);

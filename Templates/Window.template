@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<Border BorderWidth="1" Foreground="White" CornerRadius="20" Height="{./HeightPolicy}" Width="{./WidthPolicy}"
+<Border BorderWidth="1" Foreground="White" CornerRadius="{./CornerRadius}" Height="{./HeightPolicy}" Width="{./WidthPolicy}"
 				MouseEnter="./onBorderMouseEnter"
 				MouseLeave="./onBorderMouseLeave">
-	<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}">
+	<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}" Spacing="0">
 <!--		<Border Name="TitleBar" BorderWidth="1" Foreground="White" Width="{./WidthPolicy}" Height="Fit"
 				Background="vgradient|0:0.4,0.6,0.0,0.5|1:0.0,0.8,0.8,0.9">-->
 			<HorizontalStack Background="vgradient|0:0.4,0.6,0.0,0.5|1:0.0,0.8,0.8,0.9"

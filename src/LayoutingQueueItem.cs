@@ -101,12 +101,12 @@ namespace Crow
 				if (LayoutingTries < Interface.MaxLayoutingTries) {
 					LayoutingTries++;
 					Layoutable.RegisteredLayoutings |= LayoutType;
-					Interface.CurrentInterface.LayoutingQueue.Enqueue (this);
+					(Layoutable as GraphicObject).CurrentInterface.LayoutingQueue.Enqueue (this);
 				} else if (DiscardCount < Interface.MaxDiscardCount) {
 					LayoutingTries = 0;
 					DiscardCount++;
 					Layoutable.RegisteredLayoutings |= LayoutType;
-					Interface.CurrentInterface.DiscardQueue.Enqueue (this);
+					(Layoutable as GraphicObject).CurrentInterface.DiscardQueue.Enqueue (this);
 				}
 				#if DEBUG_LAYOUTING
 				else

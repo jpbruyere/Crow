@@ -13,8 +13,14 @@ namespace Crow
 	public static class CompilerServices
 	{
 		static MethodInfo miAddBinding = typeof(GraphicObject).GetMethod ("BindMember");
+		static FieldInfo miSetCurIface = typeof(GraphicObject).
+			GetField ("CurrentInterface", BindingFlags.NonPublic | BindingFlags.Instance);
 
-
+		public static void emitSetCurInterface(ILGenerator il){
+			il.Emit (OpCodes.Ldloc_0);
+			il.Emit (OpCodes.Ldarg_1);
+			il.Emit (OpCodes.Stfld, miSetCurIface);
+		}
 		public static void emitBindingCreation(ILGenerator il, string memberName, string expression){
 			il.Emit (OpCodes.Ldloc_0);
 			il.Emit (OpCodes.Ldstr, memberName);

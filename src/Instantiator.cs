@@ -26,10 +26,12 @@ using System.Diagnostics;
 
 namespace Crow
 {
+	public delegate void InstanciatorInvoker(object instance, Interface iface);
+
 	public class Instantiator
 	{
 		public Type RootType;
-		Interface.LoaderInvoker loader;
+		InstanciatorInvoker loader;
 		string imlPath;
 
 
@@ -80,16 +82,16 @@ namespace Crow
 				loadingTime.ElapsedTicks, loadingTime.ElapsedMilliseconds, imlPath);
 			#endif
 		}
-		public Instantiator (Type _root, Interface.LoaderInvoker _loader)
+		public Instantiator (Type _root, InstanciatorInvoker _loader)
 		{
 			RootType = _root;
 			loader = _loader;
 		}
 		#endregion
 
-		public GraphicObject CreateInstance(){
+		public GraphicObject CreateInstance(Interface iface){
 			GraphicObject tmp = (GraphicObject)Activator.CreateInstance(RootType);
-			loader (tmp);
+			loader (tmp, iface);
 			return tmp;
 		}
 		public string GetImlSourcesCode(){

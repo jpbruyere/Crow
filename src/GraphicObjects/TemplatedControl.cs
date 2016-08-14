@@ -36,9 +36,9 @@ namespace Crow
 		#region CTOR
 		public TemplatedControl () : base()
 		{
-			if (Interface.CurrentInterface.XmlLoading)
-				return;
-			loadTemplate ();
+//			if (CurrentInterface.XmlLoading)
+//				return;
+			//loadTemplate ();
 		}
 		#endregion
 
@@ -57,7 +57,7 @@ namespace Crow
 				if (string.IsNullOrEmpty(_template))
 					loadTemplate ();
 				else
-					loadTemplate (Interface.Load (_template));
+					loadTemplate (CurrentInterface.Load (_template));
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ItemTemplate.goml")]
@@ -100,7 +100,7 @@ namespace Crow
 			if (template == null) {
 				if (!Interface.DefaultTemplates.ContainsKey (this.GetType ().FullName))
 					throw new Exception (string.Format ("No default template found for '{0}'", this.GetType ().FullName));
-				this.SetChild (Interface.Load (Interface.DefaultTemplates[this.GetType ().FullName]));
+				this.SetChild (CurrentInterface.Load (Interface.DefaultTemplates[this.GetType ().FullName]));
 			}else
 				this.SetChild (template);
 
@@ -178,7 +178,7 @@ namespace Crow
 						}
 					}
 				} else
-					loadTemplate (Interface.Load (template));
+					loadTemplate (CurrentInterface.Load (template));
 
 				//if no template found, load default one
 				if (this.child == null)

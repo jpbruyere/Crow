@@ -42,14 +42,14 @@ namespace Crow
 			uid = currentUid;
 			currentUid++;
 
-			if (Interface.CurrentInterface.XmlLoading)
-				return;
-			loadDefaultValues ();
+//			if (CurrentInterface.XmlLoading)
+//				return;
+//			loadDefaultValues ();
 		}
 		public GraphicObject (Rectangle _bounds)
 		{
-			if (!Interface.CurrentInterface.XmlLoading)
-				loadDefaultValues ();
+//			if (!CurrentInterface.XmlLoading)
+//				loadDefaultValues ();
 			
 			Left = _bounds.Left;
 			Top = _bounds.Top;
@@ -443,12 +443,9 @@ namespace Crow
 
 				isVisible = value;
 
-				if (Interface.CurrentInterface == null)
-					return;
-
 				//ensure main win doesn't keep hidden childrens ref
-				if (!isVisible && this.Contains (Interface.CurrentInterface.HoverWidget))
-					Interface.CurrentInterface.HoverWidget = null;
+				if (!isVisible && this.Contains (CurrentInterface.HoverWidget))
+					CurrentInterface.HoverWidget = null;
 
 				if (Parent is GraphicObject)
 					(Parent as GraphicObject).RegisterForLayouting (LayoutingType.Sizing);
@@ -457,7 +454,7 @@ namespace Crow
 
 				if (isVisible)
 					RegisterForLayouting (LayoutingType.Sizing);
-				Interface.CurrentInterface.EnqueueForRepaint (this);
+				CurrentInterface.EnqueueForRepaint (this);
 
 				NotifyValueChanged ("Visible", isVisible);
 			}
@@ -722,7 +719,7 @@ namespace Crow
 			if (Width == Measure.Fit || Height == Measure.Fit)
 				RegisterForLayouting (LayoutingType.Sizing);
 			else if (RegisteredLayoutings == LayoutingType.None)
-				Interface.CurrentInterface.EnqueueForRepaint (this);
+				CurrentInterface.EnqueueForRepaint (this);
 		}
 		/// <summary> query an update of the content, a redraw </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -730,19 +727,9 @@ namespace Crow
 		{
 			bmp = null;
 			if (RegisteredLayoutings == LayoutingType.None)
-				Interface.CurrentInterface.EnqueueForRepaint (this);
+				CurrentInterface.EnqueueForRepaint (this);
 		}
-		//		public Interface CurrentInterface {
-		//			get {
-		//				ILayoutable tmp = this.Parent;
-		//				while (tmp != null) {
-		//					if (tmp is Interface)
-		//						return tmp as Interface;
-		//					tmp = tmp.Parent;
-		//				}
-		//				return null;
-		//			}
-		//		}
+		internal Interface CurrentInterface = null;
 		#endregion
 
 		#region Layouting
@@ -763,7 +750,7 @@ namespace Crow
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
 			if (Parent == null)
 				return;
-			lock (Interface.CurrentInterface.LayoutMutex) {
+			lock (CurrentInterface.LayoutMutex) {
 				//dont set position for stretched item
 				if (Width == Measure.Stretched)
 					layoutType &= (~LayoutingType.X);
@@ -785,15 +772,15 @@ namespace Crow
 
 				//enqueue LQI LayoutingTypes separately
 				if (layoutType.HasFlag (LayoutingType.Width))
-					Interface.CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
+					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
 				if (layoutType.HasFlag (LayoutingType.Height))
-					Interface.CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
+					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
 				if (layoutType.HasFlag (LayoutingType.X))
-					Interface.CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
+					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
 				if (layoutType.HasFlag (LayoutingType.Y))
-					Interface.CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
+					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
 				if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
-					Interface.CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
+					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
 			}
 		}
 
@@ -963,7 +950,7 @@ namespace Crow
 
 			//if no layouting remains in queue for item, registre for redraw
 			if (this.registeredLayoutings == LayoutingType.None && bmp == null)
-				Interface.CurrentInterface.EnqueueForRepaint (this);
+				CurrentInterface.EnqueueForRepaint (this);
 
 			return true;
 		}
@@ -1090,8 +1077,8 @@ namespace Crow
 		}
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
-			if (Interface.CurrentInterface.HoverWidget != this) {
-				Interface.CurrentInterface.HoverWidget = this;
+			if (CurrentInterface.HoverWidget != this) {
+				CurrentInterface.HoverWidget = this;
 				onMouseEnter (this, e);
 			}
 
@@ -1107,13 +1094,13 @@ namespace Crow
 			MouseMove.Raise (sender, e);
 		}
 		public virtual void onMouseDown(object sender, MouseButtonEventArgs e){
-			if (Interface.CurrentInterface.activeWidget == null)
-				Interface.CurrentInterface.activeWidget = this;
+			if (CurrentInterface.activeWidget == null)
+				CurrentInterface.activeWidget = this;
 			if (this.Focusable && !Interface.FocusOnHover) {
 				BubblingMouseButtonEventArg be = e as BubblingMouseButtonEventArg;
 				if (be.Focused == null) {
 					be.Focused = this;
-					Interface.CurrentInterface.FocusedWidget = this;
+					CurrentInterface.FocusedWidget = this;
 				}
 			}
 			//bubble event to the top
@@ -1464,6 +1451,7 @@ namespace Crow
 		{
 			Type type = this.GetType ();
 			GraphicObject result = (GraphicObject)Activator.CreateInstance (type);
+			result.CurrentInterface = CurrentInterface;
 
 			foreach (PropertyInfo pi in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
 				if (pi.GetSetMethod () == null)

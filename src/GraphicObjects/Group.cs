@@ -292,8 +292,8 @@ namespace Crow
 		#region Mouse handling
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
-			if (Interface.CurrentInterface.HoverWidget != this) {
-				Interface.CurrentInterface.HoverWidget = this;
+			if (CurrentInterface.HoverWidget != this) {
+				CurrentInterface.HoverWidget = this;
 				onMouseEnter (this, e);
 			}
 			for (int i = Children.Count - 1; i >= 0; i--) {

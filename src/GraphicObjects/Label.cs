@@ -663,12 +663,12 @@ namespace Crow
 		{
 			base.onMouseEnter (sender, e);
 			if (Selectable)
-				Interface.CurrentInterface.MouseCursor = XCursor.Text;
+				CurrentInterface.MouseCursor = XCursor.Text;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			Interface.CurrentInterface.MouseCursor = XCursor.Default;
+			CurrentInterface.MouseCursor = XCursor.Default;
 		}
 		public override void onFocused (object sender, EventArgs e)
 		{

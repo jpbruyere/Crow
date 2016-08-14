@@ -157,7 +157,7 @@ namespace Tests
 				Instantiator i = new Instantiator(fi.FullName);
 				lock (CrowInterface.UpdateMutex) {
 					(CrowInterface.FindByName ("crowContainer") as Container).SetChild
-					(i.CreateInstance());
+					(i.CreateInstance(CrowInterface));
 					CurSources = i.GetImlSourcesCode();
 				}
 			}
@@ -172,7 +172,7 @@ namespace Tests
 			}
 			lock (CrowInterface.UpdateMutex) {
 				(CrowInterface.FindByName ("crowContainer") as Container).SetChild
-				(i.CreateInstance());
+				(i.CreateInstance(CrowInterface));
 			}
 		}
 		void onButClick(object send, MouseButtonEventArgs e)
