@@ -36,7 +36,7 @@ namespace CrowIDE
 		}
 
 		public CrowIDE ()
-			: base(800, 600,"UIEditor")
+			: base(1024, 800,"UIEditor")
 		{
 		}
 
@@ -48,6 +48,9 @@ namespace CrowIDE
 			//GraphicObject go = this.CrowInterface.LoadInterface (@"ui/test.crow");
 			GraphicObject go = this.CrowInterface.LoadInterface (@"#CrowIDE.ui.imlEditor.crow");
 			go.DataSource = this;
+		}
+		protected void onCommandSave(object sender, MouseButtonEventArgs e){
+			System.Diagnostics.Debug.WriteLine("save");
 		}
 	}
 }

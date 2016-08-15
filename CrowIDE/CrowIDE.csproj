@@ -79,9 +79,12 @@
   <ItemGroup>
     <Folder Include="ui\" />
     <Folder Include="src\" />
+    <Folder Include="images\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ui\imlEditor.crow" />
+    <EmbeddedResource Include="images\save.svg" />
+    <EmbeddedResource Include="ui\IDE.style" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">

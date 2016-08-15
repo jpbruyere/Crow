@@ -31,10 +31,6 @@ namespace Crow
 	public class IMLReader : XmlTextReader
 	{
 		InstanciatorInvoker loader = null;
-
-		string ImlPath;
-		Stream ImlStream;
-
 		DynamicMethod dm = null;
 
 		public ILGenerator il = null;
@@ -55,12 +51,10 @@ namespace Crow
 		#region CTOR
 		public IMLReader (string path)
 			: this(Interface.GetStreamFromPath (path)){
-			ImlPath = path;
 		}
 		public IMLReader (Stream stream)
 			: base(stream)
 		{
-			ImlStream = stream;
 			createInstantiator ();
 		}
 		/// <summary>

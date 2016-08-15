@@ -29,26 +29,92 @@ namespace CrowIDE
 {
 	public class ImlVisualEditor : GraphicObject
 	{
+		#region CTOR
+		public ImlVisualEditor () : base()
+		{
+			imlVE = new Interface ();
+			Thread t = new Thread (interfaceThread);
+			t.IsBackground = true;
+			t.Start ();
+		}
+		#endregion
+
 		string imlPath;
 		Interface imlVE;
+		Instantiator itor;
+		string imlSource;
+
+		bool drawGrid;
+		int gridSpacing;
+
+		[XmlIgnore]public string ImlSource {
+			get { return imlSource; }
+			set {
+				if (imlSource == value)
+					return;
+				imlSource = value;
+
+				NotifyValueChanged ("ImlSource", ImlSource);
+
+				reloadFromSource ();
+			}
+		}
 
 		[XmlAttributeAttribute][DefaultValue("")]
-		public virtual string ImlPath {
+		public string ImlPath {
 			get { return imlPath; }
 			set {
 				if (imlPath == value)
 					return;
-				if (!File.Exists (value))
-					return;
+
 				imlPath = value;
+
 				NotifyValueChanged ("ImlPath", imlPath);
-				imlVE.ClearInterface ();
-				imlVE.LoadInterface (imlPath);
+
+				reloadFromPath ();
 			}
 		}
-		bool drawGrid;
+		void reloadFromSource(){
+			if (string.IsNullOrEmpty (imlSource)) {
+				reload_iTor (null);
+				return;
+			}
+
+			Instantiator iTmp;
+			try {
+				iTmp = Instantiator.CreateFromImlFragment (imlSource);
+			} catch (Exception ex) {
+				System.Diagnostics.Debug.WriteLine (ex.ToString());
+				return;
+			}
+
+			reload_iTor (iTmp);
+		}
+		void reloadFromPath(){
+			if (!File.Exists (imlPath)){
+				System.Diagnostics.Debug.WriteLine ("Path not found: " + imlPath);
+				reload_iTor (null);
+				return;
+			}
+			using (StreamReader sr = new StreamReader (imlPath)) {
+				ImlSource = sr.ReadToEnd ();
+			}
+		}
+		void reload_iTor(Instantiator new_iTot){
+			itor = new_iTot;
+			lock (imlVE.UpdateMutex) {
+				try {
+					imlVE.ClearInterface ();
+					if (itor != null)
+						imlVE.AddWidget(itor.CreateInstance(imlVE));
+
+				} catch (Exception ex) {
+					System.Diagnostics.Debug.WriteLine (ex.ToString());
+				}
+			}
+		}
 		[XmlAttributeAttribute()][DefaultValue(true)]
-		public virtual bool DrawGrid {
+		public bool DrawGrid {
 			get { return drawGrid; }
 			set {
 				if (drawGrid == value)
@@ -58,9 +124,8 @@ namespace CrowIDE
 				RegisterForRedraw ();
 			}
 		}
-		int gridSpacing;
 		[XmlAttributeAttribute()][DefaultValue(10)]
-		public virtual int GridSpacing {
+		public int GridSpacing {
 			get { return gridSpacing; }
 			set {
 				if (gridSpacing == value)
@@ -81,14 +146,21 @@ namespace CrowIDE
 		void interfaceThread()
 		{
 			while (true) {
-				imlVE.Update ();
+				try {
+					imlVE.Update ();
+				} catch (Exception ex) {
+					System.Diagnostics.Debug.WriteLine (ex.ToString ());
+					if (Monitor.IsEntered(imlVE.UpdateMutex))
+						Monitor.Exit (imlVE.UpdateMutex);
+				}
+
 
 				bool isDirty = false;
 
 				lock (imlVE.RenderMutex)
 					isDirty = imlVE.IsDirty;
 
-				if (imlVE.IsDirty) {
+				if (isDirty) {
 					lock (CurrentInterface.UpdateMutex)
 						RegisterForRedraw ();
 				}
@@ -96,6 +168,8 @@ namespace CrowIDE
 				Thread.Sleep (5);
 			}
 		}
+
+		#region GraphicObject overrides
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
 			base.OnLayoutChanges (layoutType);
@@ -106,11 +180,14 @@ namespace CrowIDE
 				break;
 			}
 		}
-		public override void RegisterForRedraw ()
+		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
-			base.RegisterForRedraw ();
-			lock(imlVE.UpdateMutex)
-				imlVE.clipping.AddRectangle (imlVE.ClientRectangle);
+			base.onMouseMove (sender, e);
+			GraphicObject oldHW = imlVE.HoverWidget;
+			Rectangle scr = this.ScreenCoordinates (this.getSlot ());
+			imlVE.ProcessMouseMove (e.X - scr.X, e.Y - scr.Y);
+			if (oldHW != imlVE.HoverWidget)
+				RegisterForRedraw ();
 		}
 		protected override void onDraw (Cairo.Context gr)
 		{
@@ -141,15 +218,23 @@ namespace CrowIDE
 			gr.Stroke ();
 
 			lock (imlVE.RenderMutex) {
-				if (imlVE.IsDirty) {
-					using (Cairo.Surface surf = new Cairo.ImageSurface (imlVE.dirtyBmp, Cairo.Format.Argb32,
-						imlVE.DirtyRect.Width, imlVE.DirtyRect.Height, imlVE.DirtyRect.Width * 4)) {
-						gr.SetSourceSurface (surf, imlVE.DirtyRect.Left, imlVE.DirtyRect.Top);
-						gr.Paint ();
-					}
-					imlVE.IsDirty = false;
+				using (Cairo.Surface surf = new Cairo.ImageSurface (imlVE.bmp, Cairo.Format.Argb32,
+					imlVE.ClientRectangle.Width, imlVE.ClientRectangle.Height, imlVE.ClientRectangle.Width * 4)) {
+					gr.SetSourceSurface (surf, cb.Left, cb.Top);
+					gr.Paint ();
 				}
+				imlVE.IsDirty = false;
 			}
+
+			if (imlVE.HoverWidget == null)
+				return;
+
+			Rectangle hr = imlVE.HoverWidget.ScreenCoordinates(imlVE.HoverWidget.getSlot ());
+			hr.Inflate (2);
+			gr.SetSourceColor (Color.LightGray);
+			gr.SetDash (new double[]{ 3.0, 3.0 },0.0);
+			gr.Rectangle (hr, 1.0);
 		}
+		#endregion
 	}
 }
