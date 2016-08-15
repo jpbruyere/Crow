@@ -31,24 +31,26 @@ namespace Crow
 
             return arr[minp];
         }
-		public static void CairoRectangle(Cairo.Context gr, Rectangle r, double radius)
+		public static void CairoRectangle(Cairo.Context gr, Rectangle r, double radius, double stroke = 0.0)
 		{
-			if (radius>0)
-				CairoHelpers.DrawRoundedRectangle(gr,r,radius);
+			if (radius > 0)
+				CairoHelpers.DrawRoundedRectangle (gr, r, radius, stroke);
 			else
-				gr.Rectangle (r);
+				gr.Rectangle (r, stroke);
 		}
 		public static void CairoCircle(Cairo.Context gr, Rectangle r)
 		{
 			gr.Arc(r.X + r.Width/2, r.Y + r.Height/2, Math.Min(r.Width,r.Height)/2, 0, 2*Math.PI);
 		}
-        public static void DrawRoundedRectangle(Cairo.Context gr, Rectangle r, double radius)
+		public static void DrawRoundedRectangle(Cairo.Context gr, Rectangle r, double radius, double stroke = 0.0)
         {
-            DrawRoundedRectangle(gr, r.X, r.Y, r.Width, r.Height, radius);
-        }
-        public static void DrawCurvedRectangle(Cairo.Context gr, Rectangle r)
-        {
-            DrawCurvedRectangle(gr, r.X, r.Y, r.Width, r.Height);
+			if (stroke>0.0) {
+				gr.LineWidth = stroke;
+				double hsw = stroke / 2.0;
+				DrawRoundedRectangle (gr, r.X + hsw, r.Y + hsw, r.Width - stroke, r.Height - stroke, radius);
+				gr.Stroke ();
+			}else
+				DrawRoundedRectangle(gr, r.X, r.Y, r.Width, r.Height, radius);
         }
         public static void DrawRoundedRectangle(Cairo.Context gr, double x, double y, double width, double height, double radius)
         {
@@ -66,16 +68,6 @@ namespace Crow
             gr.LineTo(x + radius, y + height);
             gr.Arc(x + radius, y + height - radius, radius, Math.PI / 2, Math.PI);
             gr.ClosePath();
-            gr.Restore();
-        }
-        public static void DrawCurvedRectangle(Cairo.Context gr, double x, double y, double width, double height)
-        {
-            gr.Save();
-            gr.MoveTo(x, y + height / 2);
-            gr.CurveTo(x, y, x, y, x + width / 2, y);
-            gr.CurveTo(x + width, y, x + width, y, x + width, y + height / 2);
-            gr.CurveTo(x + width, y + height, x + width, y + height, x + width / 2, y + height);
-            gr.CurveTo(x, y + height, x, y + height, x, y + height / 2);
             gr.Restore();
         }
         public static void StrokeRaisedRectangle(Cairo.Context gr, Rectangle r, double width = 1)

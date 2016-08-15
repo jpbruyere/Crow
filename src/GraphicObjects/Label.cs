@@ -200,8 +200,8 @@ namespace Crow
 			set { 
 				if (value == _currentLine)
 					return;
-				if (value > lines.Count)
-					_currentLine = lines.Count; 
+				if (value >= lines.Count)
+					_currentLine = lines.Count-1; 
 				else if (value < 0)
 					_currentLine = 0;
 				else
@@ -213,7 +213,13 @@ namespace Crow
 				NotifyValueChanged ("CurrentLine", _currentLine);
 			}
 		}
+		[XmlIgnore]public Point CurrentPosition {
+			get { return new Point(_currentCol, CurrentLine); }
+		}
 		//TODO:using HasFocus for drawing selection cause SelBegin and Release binding not to work
+		/// <summary>
+		/// Selection begin position in char units
+		/// </summary>
 		[XmlAttributeAttribute][DefaultValue("-1")]
 		public Point SelBegin {
 			get {
@@ -240,14 +246,19 @@ namespace Crow
 				NotifyValueChanged ("SelectedText", SelectedText);
 			}
 		}
-
-		[XmlIgnore]protected Char CurrentChar   //ordered selection start and end positions
+		/// <summary>
+		/// return char at CurrentLine, CurrentColumn
+		/// </summary>
+		[XmlIgnore]protected Char CurrentChar
 		{
 			get {
 				return lines [CurrentLine] [CurrentColumn];
 			}
 		}
-		[XmlIgnore]protected Point selectionStart   //ordered selection start and end positions
+		/// <summary>
+		/// ordered selection start and end positions in char units
+		/// </summary>
+		[XmlIgnore]protected Point selectionStart
 		{
 			get { 
 				return SelRelease < 0 || SelBegin.Y < SelRelease.Y ? SelBegin : 
@@ -287,11 +298,40 @@ namespace Crow
 		List<string> getLines {
 			get {				
 				return _multiline ?
-					Regex.Split (_text, "\r\n|\r|\n|" + @"\\n").ToList() :
+					Regex.Split (_text, "\r\n|\r|\n|\\\\n").ToList() :
 					new List<string>(new string[] { _text });
 			}
 		}
-
+		/// <summary>
+		/// Moves cursor one char to the left.
+		/// </summary>
+		/// <returns><c>true</c> if move succeed</returns>
+		public bool MoveLeft(){
+			int tmp = _currentCol - 1;
+			if (tmp < 0) {
+				if (_currentLine == 0)
+					return false;
+				CurrentLine--;
+				CurrentColumn = int.MaxValue;
+			} else
+				CurrentColumn = tmp;
+			return true;
+		}
+		/// <summary>
+		/// Moves cursor one char to the right.
+		/// </summary>
+		/// <returns><c>true</c> if move succeed</returns>
+		public bool MoveRight(){
+			int tmp = _currentCol + 1;
+			if (tmp > lines [_currentLine].Length){
+				if (CurrentLine == lines.Count - 1)
+					return false;
+				CurrentLine++;
+				CurrentColumn = 0;
+			} else
+				CurrentColumn = tmp;
+			return true;
+		}
 		public void GotoWordStart(){
 			CurrentColumn--;
 			//skip white spaces
@@ -304,6 +344,8 @@ namespace Crow
 		}
 		public void GotoWordEnd(){
 			//skip white spaces
+			if (CurrentColumn >= lines [CurrentLine].Length - 1)
+				return;
 			while (char.IsWhiteSpace (this.CurrentChar) && CurrentColumn < lines [CurrentLine].Length-1)
 				CurrentColumn++;
 			while (!char.IsWhiteSpace (this.CurrentChar) && CurrentColumn < lines [CurrentLine].Length-1)
@@ -315,7 +357,7 @@ namespace Crow
 		{
 			if (selectionIsEmpty) {				
 				if (CurrentColumn == 0) {
-					if (CurrentLine == 0)
+					if (CurrentLine == 0 && lines.Count == 1)
 						return;
 					CurrentLine--;
 					CurrentColumn = lines [CurrentLine].Length;
@@ -327,7 +369,7 @@ namespace Crow
 				CurrentColumn--;
 				lines [CurrentLine] = lines [CurrentLine].Remove (CurrentColumn, 1);
 			} else {				
-				int linesToRemove = selectionEnd.Y - selectionStart.Y;
+				int linesToRemove = selectionEnd.Y - selectionStart.Y + 1;
 				int l = selectionStart.Y;
 
 				if (linesToRemove > 0) {
@@ -336,8 +378,8 @@ namespace Crow
 					l++;
 					for (int c = 0; c < linesToRemove-1; c++)
 						lines.RemoveAt (l);
-					CurrentColumn = selectionStart.X;
 					CurrentLine = selectionStart.Y;
+					CurrentColumn = selectionStart.X;
 				} else 
 					lines [l] = lines [l].Remove (selectionStart.X, selectionEnd.X - selectionStart.X);
 				CurrentColumn = selectionStart.X;
@@ -352,8 +394,21 @@ namespace Crow
 		/// <param name="str">String.</param>
 		protected void Insert(string str)
 		{
-			lines [CurrentLine] = lines [CurrentLine].Insert (CurrentColumn, str);
-			CurrentColumn += str.Length;
+			if (!selectionIsEmpty)
+				this.DeleteChar ();
+			if (_multiline) {
+				string[] strLines = Regex.Split (str, "\r\n|\r|\n|" + @"\\n").ToArray();
+				lines [CurrentLine] = lines [CurrentLine].Insert (CurrentColumn, strLines[0]);
+				CurrentColumn += strLines[0].Length;
+				for (int i = 1; i < strLines.Length; i++) {
+					InsertLineBreak ();
+					lines [CurrentLine] = lines [CurrentLine].Insert (CurrentColumn, strLines[i]);
+					CurrentColumn += strLines[i].Length;
+				}
+			} else {
+				lines [CurrentLine] = lines [CurrentLine].Insert (CurrentColumn, str);
+				CurrentColumn += str.Length;
+			}
 			NotifyValueChanged ("Text", Text);
 		}
 		/// <summary>
@@ -513,9 +568,9 @@ namespace Crow
 					computeTextCursorPosition(gr);
 
 				Foreground.SetAsSource (gr);
-				gr.LineWidth = 1.5;
-				gr.MoveTo(new PointD(textCursorPos + rText.X, rText.Y + CurrentLine * fe.Height));
-				gr.LineTo(new PointD(textCursorPos + rText.X, rText.Y + (CurrentLine + 1) * fe.Height));
+				gr.LineWidth = 1.0;
+				gr.MoveTo (0.5 + textCursorPos + rText.X, rText.Y + CurrentLine * fe.Height);
+				gr.LineTo (0.5 + textCursorPos + rText.X, rText.Y + (CurrentLine + 1) * fe.Height);
 				gr.Stroke();
 			}
 			#endregion
@@ -548,9 +603,9 @@ namespace Crow
 				int lineLength = (int)gr.TextExtents (l).XAdvance;
 				Rectangle lineRect = new Rectangle (
 					rText.X,
-					rText.Y + (int)(i * fe.Height), 
-					lineLength, 
-					(int)fe.Height);
+					rText.Y + (int)Math.Ceiling(i * fe.Height), 
+					lineLength,
+					(int)Math.Ceiling(fe.Height));
 
 //				if (TextAlignment == Alignment.Center ||
 //					TextAlignment == Alignment.Top ||
@@ -604,6 +659,17 @@ namespace Crow
 			if (mouseLocalPos.Y < 0)
 				mouseLocalPos.Y = 0;
 		}
+		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
+		{
+			base.onMouseEnter (sender, e);
+			if (Selectable)
+				CurrentInterface.MouseCursor = XCursor.Text;
+		}
+		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
+		{
+			base.onMouseLeave (sender, e);
+			CurrentInterface.MouseCursor = XCursor.Default;
+		}
 		public override void onFocused (object sender, EventArgs e)
 		{
 			base.onFocused (sender, e);
@@ -654,6 +720,17 @@ namespace Crow
 				return;
 			
 			updatemouseLocalPos (e.Position);
+			SelectionInProgress = false;
+			RegisterForRedraw ();
+		}
+		public override void onMouseDoubleClick (object sender, MouseButtonEventArgs e)
+		{
+			base.onMouseDoubleClick (sender, e);
+
+			GotoWordStart ();
+			SelBegin = CurrentPosition;
+			GotoWordEnd ();
+			SelRelease = CurrentPosition;
 			SelectionInProgress = false;
 			RegisterForRedraw ();
 		}

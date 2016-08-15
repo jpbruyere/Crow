@@ -48,7 +48,7 @@ namespace Crow
 		public FileDialog ()
 		{
 			currentDir = new DirectoryInfo (Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
-			window = Interface.Load("#Crow.Templates.FileDialog.goml") as Window;
+			//window = Interface..Load("#Crow.Templates.FileDialog.goml") as Window;
 			window.DataSource = this;
 		}
 		#endregion

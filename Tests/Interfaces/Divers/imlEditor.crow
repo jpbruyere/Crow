@@ -14,7 +14,7 @@
 						ValueChanged="./_scroller_ValueChanged">
 					<TextBox Background="White" Height="Fit"
 							VerticalAlignment="Top"
-							TextAlignment="TopLeft" Font="mono, 10"
+							TextAlignment="TopLeft" Font="mono, 12"
 							TextChanged="onImlSourceChanged"
 							Text="{CurSources}" Multiline="true"/>
 				</Scroller>

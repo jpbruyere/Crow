@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <HorizontalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}">
 	<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"
 		Background="{./Background}"

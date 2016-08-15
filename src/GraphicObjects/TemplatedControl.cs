@@ -31,35 +31,14 @@ using System.Reflection;
 
 namespace Crow
 {
-	[AttributeUsage(AttributeTargets.Class)]
-	public class TemplateAttribute : Attribute
-	{
-		public string Path = "";
-		public TemplateAttribute(string path)
-		{
-			Path = path;
-		}
-	}
-
-	[AttributeUsage(AttributeTargets.Class)]
-	public class DefaultTemplate : TemplateAttribute
-	{
-		public DefaultTemplate(string path) : base(path){}
-	}
-	[AttributeUsage(AttributeTargets.Class)]
-	public class DefaultItemTemplate : TemplateAttribute
-	{
-		public DefaultItemTemplate(string path) : base(path){}
-	}
-
 	public abstract class TemplatedControl : PrivateContainer, IXmlSerializable
 	{
 		#region CTOR
 		public TemplatedControl () : base()
 		{
-			if (Interface.CurrentInterface.XmlLoading)
-				return;
-			loadTemplate ();
+//			if (CurrentInterface.XmlLoading)
+//				return;
+			//loadTemplate ();
 		}
 		#endregion
 
@@ -78,7 +57,7 @@ namespace Crow
 				if (string.IsNullOrEmpty(_template))
 					loadTemplate ();
 				else
-					loadTemplate (Interface.Load (_template));
+					loadTemplate (CurrentInterface.Load (_template));
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ItemTemplate.goml")]
@@ -103,9 +82,12 @@ namespace Crow
 		protected override void onDraw (Cairo.Context gr)
 		{
 			gr.Save ();
-			//clip to client zone
-			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
-			gr.Clip ();
+
+			if (ClipToClientRect) {
+				//clip to client zone
+				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+				gr.Clip ();
+			}
 
 			if (child != null)
 				child.Paint (ref gr);
@@ -116,8 +98,9 @@ namespace Crow
 		protected virtual void loadTemplate(GraphicObject template = null)
 		{
 			if (template == null) {
-				DefaultTemplate dt = (DefaultTemplate)this.GetType ().GetCustomAttributes (typeof(DefaultTemplate), true).FirstOrDefault();
-				this.SetChild (Interface.Load (dt.Path));
+				if (!Interface.DefaultTemplates.ContainsKey (this.GetType ().FullName))
+					throw new Exception (string.Format ("No default template found for '{0}'", this.GetType ().FullName));
+				this.SetChild (CurrentInterface.Load (Interface.DefaultTemplates[this.GetType ().FullName]));
 			}else
 				this.SetChild (template);
 
@@ -195,7 +178,7 @@ namespace Crow
 						}
 					}
 				} else
-					loadTemplate (Interface.Load (template));
+					loadTemplate (CurrentInterface.Load (template));
 
 				//if no template found, load default one
 				if (this.child == null)

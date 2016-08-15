@@ -25,7 +25,6 @@ using System.Xml.Serialization;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.Expandable.goml")]
     public class Expandable : TemplatedContainer
     {
 		#region CTOR

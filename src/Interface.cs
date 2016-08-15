@@ -45,8 +45,9 @@ namespace Crow
 	{
 		#region CTOR
 		static Interface(){
-			LoadCursors ();
-			LoadStyling ();
+			loadCursors ();
+			loadStyling ();
+			findAvailableTemplates ();
 
 			FontRenderingOptions = new FontOptions ();
 			FontRenderingOptions.Antialias = Antialias.Subpixel;
@@ -55,20 +56,21 @@ namespace Crow
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
 		}
 		public Interface(){
-			Interface.CurrentInterface = this;
 			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture; 
 		}
 		#endregion
 
 		#region Static and constants
+		public static int DoubleClick = 200;//ms
+		internal static Stopwatch clickTimer = new Stopwatch();
 		public static int TabSize = 4;
 		public static string LineBreak = "\r\n";
 		//TODO: shold be declared in graphicObject
 		public static bool FocusOnHover = false;
 		/// <summary> Time to wait in millisecond before starting repeat loop</summary>
-		public static int DeviceRepeatDelay = 600;
+		public static int DeviceRepeatDelay = 700;
 		/// <summary> Time interval in millisecond between device event repeat</summary>
-		public static int DeviceRepeatInterval = 100;
+		public static int DeviceRepeatInterval = 40;
 		public static bool ReplaceTabsWithSpace = false;
 		/// <summary> Allow rendering of interface in development environment </summary>
 		public static bool DesignerMode = false;
@@ -121,18 +123,13 @@ namespace Crow
 		public static Dictionary<String, LoaderInvoker> DefaultValuesLoader = new Dictionary<string, LoaderInvoker>();
 		public static Dictionary<string, Style> Styling;
 		/// <summary> parse all styling data's and build global Styling Dictionary </summary>
-		static void LoadStyling() {
-			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
-			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-
+		static void loadStyling() {
 			Styling = new Dictionary<string, Style> ();
 
 			//fetch styling info in this order, if member styling is alreadey referenced in previous
 			//assembly, it's ignored.
 			loadStylingFromAssembly (Assembly.GetEntryAssembly ());
 			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
-
-			Thread.CurrentThread.CurrentCulture = savedCulture;
 		}
 		/// <summary> Search for .style resources in assembly </summary>
 		static void loadStylingFromAssembly (Assembly assembly) {
@@ -143,7 +140,7 @@ namespace Crow
 					.Dispose ();
 			}
 		}
-		static void LoadCursors(){
+		static void loadCursors(){
 			//Load cursors
 			XCursor.Cross = XCursorFile.Load("#Crow.Images.Icons.Cursors.cross").Cursors[0];
 			XCursor.Default = XCursorFile.Load("#Crow.Images.Icons.Cursors.arrow").Cursors[0];
@@ -153,9 +150,27 @@ namespace Crow
 			XCursor.SE = XCursorFile.Load("#Crow.Images.Icons.Cursors.bottom_right_corner").Cursors[0];
 			XCursor.H = XCursorFile.Load("#Crow.Images.Icons.Cursors.sb_h_double_arrow").Cursors[0];
 			XCursor.V = XCursorFile.Load("#Crow.Images.Icons.Cursors.sb_v_double_arrow").Cursors[0];
+			XCursor.Text = XCursorFile.Load("#Crow.Images.Icons.Cursors.ibeam").Cursors[0];
 		}
 		#endregion
 
+		#region Templates
+		public static Dictionary<String, string> DefaultTemplates = new Dictionary<string, string>();
+		static void findAvailableTemplates(){
+			searchTemplatesIn (Assembly.GetEntryAssembly ());
+			searchTemplatesIn (Assembly.GetExecutingAssembly ());
+		}
+		static void searchTemplatesIn(Assembly assembly){
+			foreach (string resId in assembly
+				.GetManifestResourceNames ()
+				.Where (r => r.EndsWith (".template", StringComparison.OrdinalIgnoreCase))) {
+				string clsName = resId.Substring (0, resId.Length - 9);
+				if (DefaultTemplates.ContainsKey (clsName))
+					continue;
+				DefaultTemplates[clsName] = "#" + resId;
+			}
+		}
+		#endregion
 
 		#region Load/Save
 		public static Stream GetStreamFromPath (string path)
@@ -192,18 +207,13 @@ namespace Crow
 				xs.Serialize (s, graphicObject, xn);
 			}
 		}
-		public static GraphicObject Load (string path)
+		public GraphicObject Load (string path)
 		{
-			System.Globalization.CultureInfo savedCulture = Thread.CurrentThread.CurrentCulture;
-			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-
 			try {
-				return GetInstantiator (path).CreateInstance ();
+				return GetInstantiator (path).CreateInstance (this);
 			} catch (Exception ex) {
 				throw new Exception ("Error loading <" + path + ">:", ex);
 			}
-
-			Thread.CurrentThread.CurrentCulture = savedCulture;
 		}
 		/// <summary>
 		/// fetch it from cache or create it
@@ -221,7 +231,7 @@ namespace Crow
 		public GraphicObject LoadInterface (string path)
 		{
 			lock (UpdateMutex) {
-				GraphicObject tmp = Interface.Load (path);
+				GraphicObject tmp = Load (path);
 				AddWidget (tmp);
 
 				return tmp;
@@ -237,8 +247,6 @@ namespace Crow
 		#endif
 
 		public List<GraphicObject> GraphicTree = new List<GraphicObject>();
-
-		public static Interface CurrentInterface;
 
 		Rectangles _redrawClip = new Rectangles();
 
@@ -313,8 +321,6 @@ namespace Crow
 
 
 		public void Update(){
-			CurrentInterface = this;
-
 			if (mouseRepeatCount > 0) {
 				int mc = mouseRepeatCount;
 				mouseRepeatCount -= mc;
@@ -322,6 +328,14 @@ namespace Crow
 					FocusedWidget.onMouseClick (this, new MouseButtonEventArgs (Mouse.X, Mouse.Y, MouseButton.Left, true));
 				}
 			}
+			if (keyboardRepeatCount > 0) {
+				int mc = keyboardRepeatCount;
+				keyboardRepeatCount -= mc;
+				for (int i = 0; i < mc; i++) {
+					_focusedWidget.onKeyDown (this, lastKeyDownEvt);
+				}
+			}
+
 			if (!Monitor.TryEnter (UpdateMutex))
 				return;
 
@@ -365,9 +379,9 @@ namespace Crow
 			#if MEASURE_TIME
 			clippingTime.Restart ();
 			#endif
-			lock (CurrentInterface.DrawingQueue) {
-				while (CurrentInterface.DrawingQueue.Count > 0) {
-					GraphicObject g = CurrentInterface.DrawingQueue.Dequeue ();
+			lock (DrawingQueue) {
+				while (DrawingQueue.Count > 0) {
+					GraphicObject g = DrawingQueue.Dequeue ();
 					g.IsQueueForRedraw = false;
 					try {
 						if (g.Parent == null)
@@ -412,7 +426,7 @@ namespace Crow
 						#if DEBUG_CLIP_RECTANGLE
 						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
 						#endif
-						lock (Interface.CurrentInterface.RenderMutex) {
+						lock (RenderMutex) {
 							if (IsDirty)
 								DirtyRect += clipping.Bounds;
 							else
@@ -643,10 +657,52 @@ namespace Crow
 			HoverWidget.onMouseWheel (this, e);
 			return true;
 		}
+		#endregion
 
-		volatile bool mouseRepeatOn;
-		volatile int mouseRepeatCount;
-		Thread mouseRepeatThread;
+		#region Keyboard
+		public bool ProcessKeyDown(int Key){
+			Keyboard.SetKeyState((Crow.Key)Key,true);
+			if (_focusedWidget == null)
+				return false;
+			KeyboardKeyEventArgs e = lastKeyDownEvt = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
+			lastKeyDownEvt.IsRepeat = true;
+			_focusedWidget.onKeyDown (this, e);
+
+			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
+			keyboardRepeatThread.IsBackground = true;
+			keyboardRepeatThread.Start ();
+
+			return true;
+		}
+		public bool ProcessKeyUp(int Key){
+			Keyboard.SetKeyState((Crow.Key)Key,false);
+			if (_focusedWidget == null)
+				return false;
+			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
+
+			_focusedWidget.onKeyUp (this, e);
+
+			if (keyboardRepeatThread != null) {
+				keyboardRepeatOn = false;
+				keyboardRepeatThread.Abort();
+				keyboardRepeatThread.Join ();
+			}
+			return true;
+		}
+		public bool ProcessKeyPress(char Key){
+			if (_focusedWidget == null)
+				return false;
+			KeyPressEventArgs e = new KeyPressEventArgs(Key);
+			_focusedWidget.onKeyPress (this, e);
+			return true;
+		}
+		#endregion
+
+		#region Device Repeat Events
+		volatile bool mouseRepeatOn, keyboardRepeatOn;
+		volatile int mouseRepeatCount, keyboardRepeatCount;
+		Thread mouseRepeatThread, keyboardRepeatThread;
+		KeyboardKeyEventArgs lastKeyDownEvt;
 		void mouseRepeatThreadFunc()
 		{
 			mouseRepeatOn = true;
@@ -657,31 +713,15 @@ namespace Crow
 			}
 			mouseRepeatCount = 0;
 		}
-		#endregion
-
-		#region Keyboard
-		public bool ProcessKeyDown(int Key){
-			Keyboard.SetKeyState((Crow.Key)Key,true);
-			if (_focusedWidget == null)
-				return false;
-			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
-			_focusedWidget.onKeyDown (this, e);
-			return true;
-		}
-		public bool ProcessKeyUp(int Key){
-			Keyboard.SetKeyState((Crow.Key)Key,false);
-			if (_focusedWidget == null)
-				return false;
-			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
-			_focusedWidget.onKeyUp (this, e);
-			return true;
-		}
-		public bool ProcessKeyPress(char Key){
-			if (_focusedWidget == null)
-				return false;
-			KeyPressEventArgs e = new KeyPressEventArgs(Key);
-			_focusedWidget.onKeyPress (this, e);
-			return true;
+		void keyboardRepeatThreadFunc()
+		{
+			keyboardRepeatOn = true;
+			Thread.Sleep (Interface.DeviceRepeatDelay);
+			while (keyboardRepeatOn) {
+				keyboardRepeatCount++;
+				Thread.Sleep (Interface.DeviceRepeatInterval);
+			}
+			keyboardRepeatCount = 0;
 		}
 		#endregion
 

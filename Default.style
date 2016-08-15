@@ -3,6 +3,9 @@ MessageBox, Popper, Slider, Spinner, TextBox {
 	Focusable = true;
 	Height = Fit;
 }
+Wrapper {
+	Orientation = Vertical;
+}
 Button {
 	Width = Fit;
 }

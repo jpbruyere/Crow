@@ -39,7 +39,7 @@ namespace Crow
 		public ItemTemplate(string path) 
 			: base(path) {
 		}
-		public ItemTemplate (Type _root, Interface.LoaderInvoker _loader,string _dataType, string _fetchDataMethod)
+		public ItemTemplate (Type _root, InstanciatorInvoker _loader,string _dataType, string _fetchDataMethod)
 			:base(_root, _loader)
 		{
 			strDataType = _dataType;

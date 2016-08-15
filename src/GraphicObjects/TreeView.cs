@@ -27,7 +27,6 @@ namespace Crow
 {
 	//treeview expect expandable child (or not)
 	//if their are expandable, some functions and events are added
-	[DefaultTemplate("#Crow.Templates.TreeView.crow")]
 	public class TreeView : ListBox
 	{
 		GraphicObject selectedItemContainer = null;
@@ -78,6 +77,20 @@ namespace Crow
 				return selectedItemContainer == null ?
 					"" : selectedItemContainer.DataSource;
 			}
+		}
+
+		protected override void registerItemClick (GraphicObject g)
+		{
+			//register ItemClick on the Root node
+			TreeView tv = this as TreeView;
+			while (!tv.IsRoot) {
+				ILayoutable tmp = tv.Parent;
+				while (!(tmp is TreeView)) {
+					tmp = tmp.Parent;
+				}
+				tv = tmp as TreeView;
+			}
+			g.MouseClick += tv.itemClick;
 		}
 		internal override void itemClick (object sender, MouseButtonEventArgs e)
 		{

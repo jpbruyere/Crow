@@ -24,7 +24,6 @@ using System.Xml.Serialization;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.ComboBox.goml")]
 	public class ComboBox : ListBox
     {		
 		#region CTOR

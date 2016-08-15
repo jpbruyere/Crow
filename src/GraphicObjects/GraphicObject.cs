@@ -42,14 +42,14 @@ namespace Crow
 			uid = currentUid;
 			currentUid++;
 
-			if (Interface.CurrentInterface.XmlLoading)
-				return;
-			loadDefaultValues ();
+//			if (CurrentInterface.XmlLoading)
+//				return;
+//			loadDefaultValues ();
 		}
 		public GraphicObject (Rectangle _bounds)
 		{
-			if (!Interface.CurrentInterface.XmlLoading)
-				loadDefaultValues ();
+//			if (!CurrentInterface.XmlLoading)
+//				loadDefaultValues ();
 			
 			Left = _bounds.Left;
 			Top = _bounds.Top;
@@ -61,25 +61,27 @@ namespace Crow
 		#region private fields
 		LayoutingType registeredLayoutings = LayoutingType.All;
 		ILayoutable logicalParent;
-		ILayoutable _parent;
-		string _name = "unamed";
-		Fill _background = Color.Transparent;
-		Fill _foreground = Color.White;
-		Font _font = "droid, 10";
-		Measure _width, _height;
-		int _left, _top;
-		double _cornerRadius = 0;
-		int _margin = 0;
-		bool _focusable = false;
-		bool _hasFocus = false;
-		bool _isActive = false;
-		bool _mouseRepeat;
-		protected bool _isVisible = true;
-		VerticalAlignment _verticalAlignment = VerticalAlignment.Center;
-		HorizontalAlignment _horizontalAlignment = HorizontalAlignment.Center;
-		Size _maximumSize = "0,0";
-		Size _minimumSize = "0,0";
+		ILayoutable parent;
+		string name = "unamed";
+		Fill background = Color.Transparent;
+		Fill foreground = Color.White;
+		Font font = "droid, 10";
+		Measure width, height;
+		int left, top;
+		double cornerRadius = 0;
+		int margin = 0;
+		bool focusable = false;
+		bool hasFocus = false;
+		bool isActive = false;
+		bool mouseRepeat;
+		protected bool isVisible = true;
+		bool isEnabled = true;
+		VerticalAlignment verticalAlignment = VerticalAlignment.Center;
+		HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center;
+		Size maximumSize = "0,0";
+		Size minimumSize = "0,0";
 		bool cacheEnabled = false;
+		bool clipToClientRect = true;
 		object dataSource;
 		string style;
 		#endregion
@@ -124,8 +126,8 @@ namespace Crow
 		/// Parent in the graphic tree, used for rendering and layouting
 		/// </summary>
 		[XmlIgnore]public virtual ILayoutable Parent {
-			get { return _parent; }
-			set { _parent = value; }
+			get { return parent; }
+			set { parent = value; }
 		}
 		[XmlIgnore]public ILayoutable LogicalParent {
 			get { return logicalParent == null ? Parent : logicalParent; }
@@ -158,6 +160,7 @@ namespace Crow
 		public event EventHandler<MouseButtonEventArgs> MouseUp;
 		public event EventHandler<MouseButtonEventArgs> MouseDown;
 		public event EventHandler<MouseButtonEventArgs> MouseClick;
+		public event EventHandler<MouseButtonEventArgs> MouseDoubleClick;
 		public event EventHandler<MouseMoveEventArgs> MouseMove;
 		public event EventHandler<MouseMoveEventArgs> MouseEnter;
 		public event EventHandler<MouseMoveEventArgs> MouseLeave;
@@ -166,6 +169,8 @@ namespace Crow
 		public event EventHandler<KeyPressEventArgs> KeyPress;
 		public event EventHandler Focused;
 		public event EventHandler Unfocused;
+		public event EventHandler Enabled;
+		public event EventHandler Disabled;
 		public event EventHandler<LayoutingEventArgs> LayoutChanged;
 		#endregion
 
@@ -180,87 +185,111 @@ namespace Crow
 				NotifyValueChanged ("CacheEnabled", cacheEnabled);
 			}
 		}
+		[XmlAttributeAttribute()][DefaultValue(true)]
+		public virtual bool ClipToClientRect {
+			get { return clipToClientRect; }
+			set {
+				if (clipToClientRect == value)
+					return;
+				clipToClientRect = value;
+				NotifyValueChanged ("ClipToClientRect", clipToClientRect);
+				this.RegisterForRedraw ();
+			}
+		}
 		[XmlAttributeAttribute()][DefaultValue("unamed")]
 		public virtual string Name {
-			get { return _name; }
+			get { return name; }
 			set {
-				if (_name == value)
+				if (name == value)
 					return;
-				_name = value;
-				NotifyValueChanged("Name", _verticalAlignment);
+				name = value;
+				NotifyValueChanged("Name", verticalAlignment);
 			}
 		}
 		[XmlAttributeAttribute	()][DefaultValue(VerticalAlignment.Center)]
 		public virtual VerticalAlignment VerticalAlignment {
-			get { return _verticalAlignment; }
+			get { return verticalAlignment; }
 			set {
-				if (_verticalAlignment == value)
+				if (verticalAlignment == value)
 					return;
 
-				_verticalAlignment = value;
-				NotifyValueChanged("VerticalAlignment", _verticalAlignment);
+				verticalAlignment = value;
+				NotifyValueChanged("VerticalAlignment", verticalAlignment);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(HorizontalAlignment.Center)]
 		public virtual HorizontalAlignment HorizontalAlignment {
-			get { return _horizontalAlignment; }
+			get { return horizontalAlignment; }
 			set {
-				if (_horizontalAlignment == value)
+				if (horizontalAlignment == value)
 					return;
 
-				_horizontalAlignment = value;
-				NotifyValueChanged("HorizontalAlignment", _horizontalAlignment);
+				horizontalAlignment = value;
+				NotifyValueChanged("HorizontalAlignment", horizontalAlignment);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Left {
-			get { return _left; }
+			get { return left; }
 			set {
-				if (_left == value)
+				if (left == value)
 					return;
 
-				_left = value;
-				NotifyValueChanged ("Left", _left);
+				left = value;
+				NotifyValueChanged ("Left", left);
 				this.RegisterForLayouting (LayoutingType.X);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Top {
-			get { return _top; }
+			get { return top; }
 			set {
-				if (_top == value)
+				if (top == value)
 					return;
 
-				_top = value;
-				NotifyValueChanged ("Top", _top);
+				top = value;
+				NotifyValueChanged ("Top", top);
 				this.RegisterForLayouting (LayoutingType.Y);
+			}
+		}
+		/// <summary>
+		/// When set to True, the <see cref="T:Crow.GraphicObject"/>'s width and height will be set to Fit.
+		/// </summary>
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public virtual bool Fit {
+			get { return Width == Measure.Fit && Height == Measure.Fit ? true : false; }
+			set {
+				if (value == Fit)
+					return;
+
+				Width = Height = Measure.Fit;
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("Stretched")]
 		public virtual Measure Width {
-			get { return _width; }
+			get { return width; }
 			set {
-				if (_width == value)
+				if (width == value)
 					return;
 				if (value.IsFixed) {
 					if (value < MinimumSize.Width || (value > MaximumSize.Width && MaximumSize.Width > 0))
 						return;
 				}
 				Measure lastWP = WidthPolicy;
-				_width = value;
-				NotifyValueChanged ("Width", _width);
+				width = value;
+				NotifyValueChanged ("Width", width);
 				if (WidthPolicy != lastWP) {
 					NotifyValueChanged ("WidthPolicy", WidthPolicy);
 					//contentSize in Stacks are only update on childLayoutChange, and the single stretched
 					//child of the stack is not counted in contentSize, so when changing size policy of a child
 					//we should adapt contentSize
 					//TODO:check case when child become stretched, and another stretched item already exists.
-					if (_parent is GenericStack) {//TODO:check if I should test Group instead
-						if ((_parent as GenericStack).Orientation == Orientation.Horizontal) {
+					if (parent is GenericStack) {//TODO:check if I should test Group instead
+						if ((parent as GenericStack).Orientation == Orientation.Horizontal) {
 							if (lastWP == Measure.Fit)
-								(_parent as GenericStack).contentSize.Width -= this.LastSlots.Width;
+								(parent as GenericStack).contentSize.Width -= this.LastSlots.Width;
 							else
-								(_parent as GenericStack).contentSize.Width += this.LastSlots.Width;
+								(parent as GenericStack).contentSize.Width += this.LastSlots.Width;
 						}
 					}
 				}
@@ -270,25 +299,25 @@ namespace Crow
 		}
 		[XmlAttributeAttribute()][DefaultValue("Stretched")]
 		public virtual Measure Height {
-			get { return _height; }
+			get { return height; }
 			set {
-				if (_height == value)
+				if (height == value)
 					return;
 				if (value.IsFixed) {
 					if (value < MinimumSize.Height || (value > MaximumSize.Height && MaximumSize.Height > 0))
 						return;
 				}
 				Measure lastHP = HeightPolicy;
-				_height = value;
-				NotifyValueChanged ("Height", _height);
+				height = value;
+				NotifyValueChanged ("Height", height);
 				if (HeightPolicy != lastHP) {
 					NotifyValueChanged ("HeightPolicy", HeightPolicy);
-					if (_parent is GenericStack) {
-						if ((_parent as GenericStack).Orientation == Orientation.Vertical) {
+					if (parent is GenericStack) {
+						if ((parent as GenericStack).Orientation == Orientation.Vertical) {
 							if (lastHP == Measure.Fit)
-								(_parent as GenericStack).contentSize.Height -= this.LastSlots.Height;
+								(parent as GenericStack).contentSize.Height -= this.LastSlots.Height;
 							else
-								(_parent as GenericStack).contentSize.Height += this.LastSlots.Height;
+								(parent as GenericStack).contentSize.Height += this.LastSlots.Height;
 						}
 					}
 				}
@@ -310,165 +339,166 @@ namespace Crow
 		[XmlIgnore]public virtual Measure HeightPolicy { get {
 				return Height.Units == Unit.Percent || Height.IsFixed ?
 					Measure.Stretched : Measure.Fit; } }
-		/// <summary>
-		/// When set to True, the <see cref="T:Crow.GraphicObject"/>'s width and height will be set to Fit.
-		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(false)]
-		public virtual bool Fit {
-			get { return Width == Measure.Fit && Height == Measure.Fit ? true : false; }
-			set {
-				if (value == Fit)
-					return;
-
-				Width = Height = Measure.Fit;
-			}
-		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool Focusable {
-			get { return _focusable; }
+			get { return focusable; }
 			set {
-				if (_focusable == value)
+				if (focusable == value)
 					return;
-				_focusable = value;
-				NotifyValueChanged ("Focusable", _focusable);
+				focusable = value;
+				NotifyValueChanged ("Focusable", focusable);
 			}
 		}
 		[XmlIgnore]public virtual bool HasFocus {
-			get { return _hasFocus; }
+			get { return hasFocus; }
 			set {
-				if (value == _hasFocus)
+				if (value == hasFocus)
 					return;
 
-				_hasFocus = value;
-				NotifyValueChanged ("HasFocus", _hasFocus);
+				hasFocus = value;
+				NotifyValueChanged ("HasFocus", hasFocus);
 			}
 		}
 		[XmlIgnore]public virtual bool IsActive {
-			get { return _isActive; }
+			get { return isActive; }
 			set {
-				if (value == _isActive)
+				if (value == isActive)
 					return;
 
-				_isActive = value;
-				NotifyValueChanged ("IsActive", _isActive);
+				isActive = value;
+				NotifyValueChanged ("IsActive", isActive);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool MouseRepeat {
-			get { return _mouseRepeat; }
+			get { return mouseRepeat; }
 			set {
-				if (_mouseRepeat == value)
+				if (mouseRepeat == value)
 					return;
-				_mouseRepeat = value;
-				NotifyValueChanged ("MouseRepeat", _mouseRepeat);
+				mouseRepeat = value;
+				NotifyValueChanged ("MouseRepeat", mouseRepeat);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("Transparent")]
 		public virtual Fill Background {
-			get { return _background; }
+			get { return background; }
 			set {
-				if (_background == value)
+				if (background == value)
 					return;
-				_background = value;
-				NotifyValueChanged ("Background", _background);
+				background = value;
+				NotifyValueChanged ("Background", background);
 				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("White")]
 		public virtual Fill Foreground {
-			get { return _foreground; }
+			get { return foreground; }
 			set {
-				if (_foreground == value)
+				if (foreground == value)
 					return;
-				_foreground = value;
-				NotifyValueChanged ("Foreground", _foreground);
+				foreground = value;
+				NotifyValueChanged ("Foreground", foreground);
 				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("sans,10")]
 		public virtual Font Font {
-			get { return _font; }
+			get { return font; }
 			set {
-				if (value == _font)
+				if (value == font)
 					return;
-				_font = value;
-				NotifyValueChanged ("Font", _font);
+				font = value;
+				NotifyValueChanged ("Font", font);
 				RegisterForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0.0)]
 		public virtual double CornerRadius {
-			get { return _cornerRadius; }
+			get { return cornerRadius; }
 			set {
-				if (value == _cornerRadius)
+				if (value == cornerRadius)
 					return;
-				_cornerRadius = value;
-				NotifyValueChanged ("CornerRadius", _cornerRadius);
+				cornerRadius = value;
+				NotifyValueChanged ("CornerRadius", cornerRadius);
 				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Margin {
-			get { return _margin; }
+			get { return margin; }
 			set {
-				if (value == _margin)
+				if (value == margin)
 					return;
-				_margin = value;
-				NotifyValueChanged ("Margin", _margin);
+				margin = value;
+				NotifyValueChanged ("Margin", margin);
 				RegisterForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(true)]
+		[XmlAttributeAttribute][DefaultValue(true)]
 		public virtual bool Visible {
-			get { return _isVisible; }
+			get { return isVisible; }
 			set {
-				if (value == _isVisible)
+				if (value == isVisible)
 					return;
 
-				_isVisible = value;
-
-				if (Interface.CurrentInterface == null)
-					return;
+				isVisible = value;
 
 				//ensure main win doesn't keep hidden childrens ref
-				if (!_isVisible && this.Contains (Interface.CurrentInterface.HoverWidget))
-					Interface.CurrentInterface.HoverWidget = null;
+				if (!isVisible && this.Contains (CurrentInterface.HoverWidget))
+					CurrentInterface.HoverWidget = null;
 
 				if (Parent is GraphicObject)
 					(Parent as GraphicObject).RegisterForLayouting (LayoutingType.Sizing);
 				if (Parent is GenericStack)
 					(Parent as GraphicObject).RegisterForLayouting (LayoutingType.ArrangeChildren);
 
-				if (_isVisible)
+				if (isVisible)
 					RegisterForLayouting (LayoutingType.Sizing);
-				Interface.CurrentInterface.EnqueueForRepaint (this);
+				CurrentInterface.EnqueueForRepaint (this);
 
-				NotifyValueChanged ("Visible", _isVisible);
+				NotifyValueChanged ("Visible", isVisible);
+			}
+		}
+		[XmlAttributeAttribute][DefaultValue(true)]
+		public virtual bool IsEnabled {
+			get { return isEnabled; }
+			set {
+				if (value == isEnabled)
+					return;
+
+				isEnabled = value;
+
+				if (isEnabled)
+					onEnable (this, null);
+				else
+					onDisable (this, null);
+
+				NotifyValueChanged ("IsEnabled", isEnabled);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("1,1")]
 		public virtual Size MinimumSize {
-			get { return _minimumSize; }
+			get { return minimumSize; }
 			set {
-				if (value == _minimumSize)
+				if (value == minimumSize)
 					return;
 
-				_minimumSize = value;
+				minimumSize = value;
 
-				NotifyValueChanged ("MinimumSize", _minimumSize);
+				NotifyValueChanged ("MinimumSize", minimumSize);
 				RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("0,0")]
 		public virtual Size MaximumSize {
-			get { return _maximumSize; }
+			get { return maximumSize; }
 			set {
-				if (value == _maximumSize)
+				if (value == maximumSize)
 					return;
 
-				_maximumSize = value;
+				maximumSize = value;
 
-				NotifyValueChanged ("MaximumSize", _maximumSize);
+				NotifyValueChanged ("MaximumSize", maximumSize);
 				RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
@@ -668,11 +698,13 @@ namespace Crow
 		#endregion
 
 		public virtual GraphicObject FindByName(string nameToFind){
-			return string.Equals(nameToFind, _name, StringComparison.Ordinal) ? this : null;
+			return string.Equals(nameToFind, name, StringComparison.Ordinal) ? this : null;
 		}
 		public virtual bool Contains(GraphicObject goToFind){
 			return false;
 		}
+
+		#region Queuing
 		public virtual void RegisterClip(Rectangle clip){
 			if (CacheEnabled && bmp != null)
 				Clipping.AddRectangle (clip + ClientRectangle.Position);
@@ -687,7 +719,7 @@ namespace Crow
 			if (Width == Measure.Fit || Height == Measure.Fit)
 				RegisterForLayouting (LayoutingType.Sizing);
 			else if (RegisteredLayoutings == LayoutingType.None)
-				Interface.CurrentInterface.EnqueueForRepaint (this);
+				CurrentInterface.EnqueueForRepaint (this);
 		}
 		/// <summary> query an update of the content, a redraw </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -695,19 +727,10 @@ namespace Crow
 		{
 			bmp = null;
 			if (RegisteredLayoutings == LayoutingType.None)
-				Interface.CurrentInterface.EnqueueForRepaint (this);
+				CurrentInterface.EnqueueForRepaint (this);
 		}
-//		public Interface CurrentInterface {
-//			get {
-//				ILayoutable tmp = this.Parent;
-//				while (tmp != null) {
-//					if (tmp is Interface)
-//						return tmp as Interface;
-//					tmp = tmp.Parent;
-//				}
-//				return null;
-//			}
-//		}
+		internal Interface CurrentInterface = null;
+		#endregion
 
 		#region Layouting
 
@@ -727,7 +750,7 @@ namespace Crow
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
 			if (Parent == null)
 				return;
-			lock (Interface.CurrentInterface.LayoutMutex) {
+			lock (CurrentInterface.LayoutMutex) {
 				//dont set position for stretched item
 				if (Width == Measure.Stretched)
 					layoutType &= (~LayoutingType.X);
@@ -749,15 +772,15 @@ namespace Crow
 
 				//enqueue LQI LayoutingTypes separately
 				if (layoutType.HasFlag (LayoutingType.Width))
-					Interface.CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
+					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
 				if (layoutType.HasFlag (LayoutingType.Height))
-					Interface.CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
+					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
 				if (layoutType.HasFlag (LayoutingType.X))
-					Interface.CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
+					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
 				if (layoutType.HasFlag (LayoutingType.Y))
-					Interface.CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
+					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
 				if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
-					Interface.CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
+					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
 			}
 		}
 
@@ -927,7 +950,7 @@ namespace Crow
 
 			//if no layouting remains in queue for item, registre for redraw
 			if (this.registeredLayoutings == LayoutingType.None && bmp == null)
-				Interface.CurrentInterface.EnqueueForRepaint (this);
+				CurrentInterface.EnqueueForRepaint (this);
 
 			return true;
 		}
@@ -940,7 +963,7 @@ namespace Crow
 			Rectangle rBack = new Rectangle (Slot.Size);
 
 			Background.SetAsSource (gr, rBack);
-			CairoHelpers.CairoRectangle(gr,rBack,_cornerRadius);
+			CairoHelpers.CairoRectangle(gr,rBack,cornerRadius);
 			gr.Fill ();
 		}
 
@@ -1054,8 +1077,8 @@ namespace Crow
 		}
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
-			if (Interface.CurrentInterface.HoverWidget != this) {
-				Interface.CurrentInterface.HoverWidget = this;
+			if (CurrentInterface.HoverWidget != this) {
+				CurrentInterface.HoverWidget = this;
 				onMouseEnter (this, e);
 			}
 
@@ -1071,13 +1094,13 @@ namespace Crow
 			MouseMove.Raise (sender, e);
 		}
 		public virtual void onMouseDown(object sender, MouseButtonEventArgs e){
-			if (Interface.CurrentInterface.activeWidget == null)
-				Interface.CurrentInterface.activeWidget = this;
+			if (CurrentInterface.activeWidget == null)
+				CurrentInterface.activeWidget = this;
 			if (this.Focusable && !Interface.FocusOnHover) {
 				BubblingMouseButtonEventArg be = e as BubblingMouseButtonEventArg;
 				if (be.Focused == null) {
 					be.Focused = this;
-					Interface.CurrentInterface.FocusedWidget = this;
+					CurrentInterface.FocusedWidget = this;
 				}
 			}
 			//bubble event to the top
@@ -1099,10 +1122,26 @@ namespace Crow
 				onMouseClick (this, e);
 		}
 		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){
+
+			if (Interface.clickTimer.ElapsedMilliseconds > 0 &&
+			    Interface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick) {
+				Interface.clickTimer.Reset ();
+				Debug.WriteLine ("double click");
+				onMouseDoubleClick (this, e);
+				return;
+			} else
+				Interface.clickTimer.Restart ();
+			
 			GraphicObject p = Parent as GraphicObject;
 			if (p != null)
 				p.onMouseClick(sender,e);
 			MouseClick.Raise (this, e);
+		}
+		public virtual void onMouseDoubleClick(object sender, MouseButtonEventArgs e){
+			GraphicObject p = Parent as GraphicObject;
+			if (p != null)
+				p.onMouseDoubleClick(sender,e);
+			MouseDoubleClick.Raise (this, e);
 		}
 		public virtual void onMouseWheel(object sender, MouseWheelEventArgs e){
 			GraphicObject p = Parent as GraphicObject;
@@ -1110,21 +1149,6 @@ namespace Crow
 				p.onMouseWheel(this,e);
 
 			MouseWheelChanged.Raise (this, e);
-		}
-		public virtual void onFocused(object sender, EventArgs e){
-			#if DEBUG_FOCUS
-			Debug.WriteLine("Focused => " + this.ToString());
-			#endif
-			Focused.Raise (this, e);
-			this.HasFocus = true;
-		}
-		public virtual void onUnfocused(object sender, EventArgs e){
-			#if DEBUG_FOCUS
-			Debug.WriteLine("UnFocused => " + this.ToString());
-			#endif
-
-			Unfocused.Raise (this, e);
-			this.HasFocus = false;
 		}
 		public virtual void onMouseEnter(object sender, MouseMoveEventArgs e)
 		{
@@ -1142,6 +1166,27 @@ namespace Crow
 		}
 		#endregion
 
+		public virtual void onFocused(object sender, EventArgs e){
+			#if DEBUG_FOCUS
+			Debug.WriteLine("Focused => " + this.ToString());
+			#endif
+			Focused.Raise (this, e);
+			this.HasFocus = true;
+		}
+		public virtual void onUnfocused(object sender, EventArgs e){
+			#if DEBUG_FOCUS
+			Debug.WriteLine("UnFocused => " + this.ToString());
+			#endif
+
+			Unfocused.Raise (this, e);
+			this.HasFocus = false;
+		}
+		public virtual void onEnable(object sender, EventArgs e){
+			Enabled.Raise (this, e);
+		}
+		public virtual void onDisable(object sender, EventArgs e){
+			Disabled.Raise (this, e);
+		}
 		public override string ToString ()
 		{
 			string tmp ="";
@@ -1406,6 +1451,7 @@ namespace Crow
 		{
 			Type type = this.GetType ();
 			GraphicObject result = (GraphicObject)Activator.CreateInstance (type);
+			result.CurrentInterface = CurrentInterface;
 
 			foreach (PropertyInfo pi in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
 				if (pi.GetSetMethod () == null)

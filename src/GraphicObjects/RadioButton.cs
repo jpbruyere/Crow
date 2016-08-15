@@ -25,7 +25,6 @@ using System.Xml.Serialization;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.RadioButton.goml")]
     public class RadioButton : TemplatedControl
     {		        
 		string caption;

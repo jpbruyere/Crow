@@ -100,6 +100,7 @@ namespace Tests
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Stack", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Wrapper", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Splitter", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Expandable", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
@@ -156,7 +157,7 @@ namespace Tests
 				Instantiator i = new Instantiator(fi.FullName);
 				lock (CrowInterface.UpdateMutex) {
 					(CrowInterface.FindByName ("crowContainer") as Container).SetChild
-					(i.CreateInstance());
+					(i.CreateInstance(CrowInterface));
 					CurSources = i.GetImlSourcesCode();
 				}
 			}
@@ -171,7 +172,7 @@ namespace Tests
 			}
 			lock (CrowInterface.UpdateMutex) {
 				(CrowInterface.FindByName ("crowContainer") as Container).SetChild
-				(i.CreateInstance());
+				(i.CreateInstance(CrowInterface));
 			}
 		}
 		void onButClick(object send, MouseButtonEventArgs e)

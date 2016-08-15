@@ -12,7 +12,6 @@ using System.ComponentModel;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.Button.crow")]
     public class Button : TemplatedContainer
     {
 		string caption;
@@ -74,7 +73,7 @@ namespace Crow
 		}
 		#endregion
 
-		[XmlAttributeAttribute()][DefaultValue("Button")]
+		[XmlAttributeAttribute][DefaultValue("Button")]
 		public string Caption {
 			get { return caption; } 
 			set {
@@ -84,7 +83,7 @@ namespace Crow
 				NotifyValueChanged ("Caption", caption);
 			}
 		}        
-		[XmlAttributeAttribute()][DefaultValue("#Crow.Images.button.svg")]
+		[XmlAttributeAttribute][DefaultValue("#Crow.Images.button.svg")]
 		public string Image {
 			get { return image; } 
 			set {
@@ -94,7 +93,7 @@ namespace Crow
 				NotifyValueChanged ("Image", image);
 			}
 		} 
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[XmlAttributeAttribute][DefaultValue(false)]
 		public bool IsPressed
 		{
 			get { return isPressed; }

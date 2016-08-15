@@ -347,6 +347,12 @@
     <None Include="Interfaces\Divers\imlEditor.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Interfaces\Wrapper\1.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Wrapper\2.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />
@@ -358,6 +364,7 @@
     <Folder Include="Interfaces\Expandable\" />
     <Folder Include="Interfaces\Splitter\" />
     <Folder Include="Interfaces\Unsorted\" />
+    <Folder Include="Interfaces\Wrapper\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="image\tetra.png">

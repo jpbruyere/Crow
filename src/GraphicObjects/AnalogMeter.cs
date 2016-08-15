@@ -5,7 +5,6 @@ using Cairo;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.AnalogMeter0.goml")]
 	public class AnalogMeter : NumericControl
 	{
 		#region CTOR

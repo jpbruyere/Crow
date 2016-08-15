@@ -25,7 +25,6 @@ using System.Xml.Serialization;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.CheckBox.goml")]
 	public class CheckBox : TemplatedControl
 	{
 		string caption;

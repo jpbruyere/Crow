@@ -76,15 +76,18 @@ namespace Crow
 			switch (key)
 			{
 			case Key.Back:
+				if (CurrentPosition == 0)
+					return;
 				this.DeleteChar();
 				break;
 			case Key.Clear:
 				break;
 			case Key.Delete:
-				if (selectionIsEmpty)
-					CurrentColumn++;
-				else if (e.Shift)
-					Interface.CurrentInterface.Clipboard = this.SelectedText;
+				if (selectionIsEmpty) {
+					if (!MoveRight ())
+						return;
+				}else if (e.Shift)
+					CurrentInterface.Clipboard = this.SelectedText;
 				this.DeleteChar ();
 				break;
 			case Key.Enter:
@@ -119,11 +122,11 @@ namespace Crow
 			case Key.End:
 				if (e.Shift) {
 					if (selectionIsEmpty)
-						SelBegin = new Point (CurrentColumn, CurrentLine);
+						SelBegin = CurrentPosition;
 					if (e.Control)
 						CurrentLine = int.MaxValue;
 					CurrentColumn = int.MaxValue;
-					SelRelease = new Point (CurrentColumn, CurrentLine);
+					SelRelease = CurrentPosition;
 					break;
 				}
 				SelRelease = -1;
@@ -133,9 +136,9 @@ namespace Crow
 				break;
 			case Key.Insert:
 				if (e.Shift)
-					this.Insert (Interface.CurrentInterface.Clipboard);
-				else if (e.Control)
-					Interface.CurrentInterface.Clipboard = this.SelectedText;
+					this.Insert (CurrentInterface.Clipboard);
+				else if (e.Control && !selectionIsEmpty)
+					CurrentInterface.Clipboard = this.SelectedText;
 				break;
 			case Key.Left:
 				if (e.Shift) {
@@ -143,40 +146,40 @@ namespace Crow
 						SelBegin = new Point(CurrentColumn, CurrentLine);
 					if (e.Control)
 						GotoWordStart ();
-					else
-						CurrentColumn--;
-					SelRelease = new Point(CurrentColumn, CurrentLine);
+					else if (!MoveLeft ())
+						return;
+					SelRelease = CurrentPosition;
 					break;
 				}
 				SelRelease = -1;
 				if (e.Control)
 					GotoWordStart ();
 				else
-					CurrentColumn--;
+					MoveLeft();
 				break;
 			case Key.Right:
 				if (e.Shift) {
 					if (selectionIsEmpty)
-						SelBegin = new Point(CurrentColumn, CurrentLine);
+						SelBegin = CurrentPosition;
 					if (e.Control)
 						GotoWordEnd ();
-					else
-						CurrentColumn++;
-					SelRelease = new Point(CurrentColumn, CurrentLine);
+					else if (!MoveRight ())
+						return;
+					SelRelease = CurrentPosition;
 					break;
 				}
 				SelRelease = -1;
 				if (e.Control)
 					GotoWordEnd ();
 				else
-					CurrentColumn++;
+					MoveRight ();
 				break;
 			case Key.Up:
 				if (e.Shift) {
 					if (selectionIsEmpty)
-						SelBegin = new Point(CurrentColumn, CurrentLine);
+						SelBegin = CurrentPosition;
 					CurrentLine--;
-					SelRelease = new Point(CurrentColumn, CurrentLine);
+					SelRelease = CurrentPosition;
 					break;
 				}
 				SelRelease = -1;
@@ -185,9 +188,9 @@ namespace Crow
 			case Key.Down:
 				if (e.Shift) {
 					if (selectionIsEmpty)
-						SelBegin = new Point(CurrentColumn, CurrentLine);
+						SelBegin = CurrentPosition;
 					CurrentLine++;
-					SelRelease = new Point(CurrentColumn, CurrentLine);
+					SelRelease = CurrentPosition;
 					break;
 				}
 				SelRelease = -1;

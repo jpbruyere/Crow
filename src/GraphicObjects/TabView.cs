@@ -82,7 +82,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("15")]
+		[XmlAttributeAttribute()][DefaultValue("18")]
 		public virtual Measure TabThickness {
 			get { return tabThickness; }
 			set {
@@ -143,7 +143,7 @@ namespace Crow
 
 				//if no layouting remains in queue for item, registre for redraw
 				if (RegisteredLayoutings == LayoutingType.None && bmp == null)
-					Interface.CurrentInterface.EnqueueForRepaint (this);
+					CurrentInterface.EnqueueForRepaint (this);
 
 				return true;
 			}
@@ -159,9 +159,12 @@ namespace Crow
 			gr.Fill ();
 
 			gr.Save ();
-			//clip to client zone
-			CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
-			gr.Clip ();
+
+			if (ClipToClientRect) {
+				//clip to client zone
+				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+				gr.Clip ();
+			}
 
 			for (int i = 0; i < Children.Count; i++) {
 				if (i == SelectedTab)
@@ -178,8 +181,8 @@ namespace Crow
 		#region Mouse handling
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
-			if (Interface.CurrentInterface.HoverWidget != this) {
-				Interface.CurrentInterface.HoverWidget = this;
+			if (CurrentInterface.HoverWidget != this) {
+				CurrentInterface.HoverWidget = this;
 				onMouseEnter (this, e);
 			}
 

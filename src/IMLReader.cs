@@ -30,7 +30,7 @@ namespace Crow
 {
 	public class IMLReader : XmlTextReader
 	{
-		Interface.LoaderInvoker loader = null;
+		InstanciatorInvoker loader = null;
 
 		string ImlPath;
 		Stream ImlStream;
@@ -43,12 +43,12 @@ namespace Crow
 		/// <summary>
 		/// Finalize instatiator MSIL and return LoaderInvoker delegate
 		/// </summary>
-		public Interface.LoaderInvoker GetLoader(){
+		public InstanciatorInvoker GetLoader(){
 			if (loader != null)
 				return loader;
 
 			il.Emit(OpCodes.Ret);
-			loader = (Interface.LoaderInvoker)dm.CreateDelegate (typeof(Interface.LoaderInvoker));
+			loader = (InstanciatorInvoker)dm.CreateDelegate (typeof(InstanciatorInvoker));
 			return loader;
 		}
 
@@ -92,7 +92,7 @@ namespace Crow
 			dm = new DynamicMethod("dyn_instantiator",
 				MethodAttributes.Family | MethodAttributes.FamANDAssem | MethodAttributes.NewSlot,
 				CallingConventions.Standard,
-				typeof(void),new Type[] {typeof(object)}, RootType, true);
+				typeof(void),new Type[] {typeof(object), typeof(Interface)}, RootType, true);
 
 			il = dm.GetILGenerator(256);
 			il.DeclareLocal(typeof(GraphicObject));
@@ -100,6 +100,7 @@ namespace Crow
 			//set local GraphicObject to root object passed as 1st argument
 			il.Emit (OpCodes.Ldarg_0);
 			il.Emit (OpCodes.Stloc_0);
+			CompilerServices.emitSetCurInterface (il);
 		}
 		void emitLoader(Type crowType){
 			string tmpXml = ReadOuterXml ();
@@ -147,21 +148,17 @@ namespace Crow
 					}
 
 					if (!inlineTemplate) {
+						reader.il.Emit (OpCodes.Ldloc_0);//Load  this templateControl ref
 						if (string.IsNullOrEmpty (templatePath)) {
-							DefaultTemplate dt = (DefaultTemplate)crowType.GetCustomAttributes (typeof(DefaultTemplate), true).FirstOrDefault ();
-							if (dt!=null)
-								templatePath = dt.Path;
-						}
-
-						if (!string.IsNullOrEmpty (templatePath)) {
-							reader.il.Emit (OpCodes.Ldloc_0);//Load  this templateControl ref
-
+							reader.il.Emit (OpCodes.Ldnull);//default template loading
+						}else{
+							reader.il.Emit (OpCodes.Ldarg_1);//load currentInterface
 							reader.il.Emit (OpCodes.Ldstr, templatePath); //Load template path string
 							reader.il.Emit (OpCodes.Callvirt,//call Interface.Load(path)
-								typeof(Interface).GetMethod ("Load", BindingFlags.Static | BindingFlags.Public));
-							reader.il.Emit (OpCodes.Callvirt,//add child
-								crowType.GetMethod ("loadTemplate", BindingFlags.Instance | BindingFlags.NonPublic));
+									typeof(Interface).GetMethod ("Load", BindingFlags.Instance | BindingFlags.Public));
 						}
+						reader.il.Emit (OpCodes.Callvirt,//load template
+							crowType.GetMethod ("loadTemplate", BindingFlags.Instance | BindingFlags.NonPublic));
 					}
 					foreach (string[] iTempId in itemTemplateIds) {
 						reader.il.Emit (OpCodes.Ldloc_0);//load TempControl ref
@@ -293,6 +290,7 @@ namespace Crow
 
 					reader.il.Emit(OpCodes.Newobj, t.GetConstructors () [0]);//TODO:search parameterless ctor
 					reader.il.Emit (OpCodes.Stloc_0);//child is now loc_0
+					CompilerServices.emitSetCurInterface (il);
 
 					reader.emitLoader(t);
 

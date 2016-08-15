@@ -117,6 +117,7 @@ namespace Crow
 		public static XCursor Default;
 		public static XCursor Cross;
 		public static XCursor Arrow;
+		public static XCursor Text;
 		public static XCursor SW;
 		public static XCursor SE;
 		public static XCursor NW;

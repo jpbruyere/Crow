@@ -110,8 +110,6 @@ namespace Crow
 
 		void interfaceThread()
 		{
-			Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-
 			CrowInterface.Quit += Quit;
 			CrowInterface.MouseCursorChanged += CrowInterface_MouseCursorChanged;
 			while (CrowInterface.ClientRectangle.Size.Width == 0)

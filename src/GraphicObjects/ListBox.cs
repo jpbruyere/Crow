@@ -30,7 +30,6 @@ using System.Threading;
 
 namespace Crow
 {
-	[DefaultTemplate("#Crow.Templates.ListBox.goml")]
 	public class ListBox : TemplatedControl
 	{
 		#region CTOR
@@ -63,7 +62,7 @@ namespace Crow
 
 				NotifyValueChanged ("Data", data);
 
-				lock (Interface.CurrentInterface.UpdateMutex)
+				lock (CurrentInterface.UpdateMutex)
 					_list.ClearChildren ();
 				if (_gsList.Orientation == Orientation.Horizontal)
 					_gsList.Width = -1;
@@ -163,40 +162,12 @@ namespace Crow
 				if (cancelLoading)
 					return;
 				
-				GraphicObject g = null;
-				ItemTemplate iTemp = null;
-				Type dataType = data [i].GetType ();
+				loadItem (i, page);
 
-				if (ItemTemplates.ContainsKey (dataType.FullName))
-					iTemp = ItemTemplates [dataType.FullName];
-				else
-					iTemp = ItemTemplates ["default"];
-
-				lock (Interface.CurrentInterface.LayoutMutex) {
-					g = iTemp.CreateInstance();
-					page.AddChild (g);
-					g.DataSource = data [i];
-				}
-				if (this is TreeView) {
-					TreeView tv = this as TreeView;
-					while (!tv.IsRoot) {
-						ILayoutable tmp = tv.Parent;
-						while (!(tmp is TreeView)) {
-							tmp = tmp.Parent;
-						}
-						tv = tmp as TreeView;
-					}
-					g.MouseClick += tv.itemClick;
-				}else
-					g.MouseClick += itemClick;
-				
-				if (iTemp.Expand != null && g is Expandable) {
-					(g as Expandable).Expand += iTemp.Expand;
-				}
 				//g.LogicalParent = this;
 			}
 
-			lock (Interface.CurrentInterface.LayoutMutex)
+			lock (CurrentInterface.LayoutMutex)
 				_list.AddChild (page);
 
 			#if DEBUG_LOAD
@@ -205,6 +176,31 @@ namespace Crow
 			loadingTime.ElapsedTicks,
 			loadingTime.ElapsedMilliseconds, this.ToString());
 			#endif
+		}
+		protected void loadItem(int i, Group page){
+			GraphicObject g = null;
+			ItemTemplate iTemp = null;
+			Type dataType = data [i].GetType ();
+
+			if (ItemTemplates.ContainsKey (dataType.FullName))
+				iTemp = ItemTemplates [dataType.FullName];
+			else
+				iTemp = ItemTemplates ["default"];
+
+			lock (CurrentInterface.LayoutMutex) {
+				g = iTemp.CreateInstance(CurrentInterface);
+				page.AddChild (g);
+				g.DataSource = data [i];
+			}
+
+			registerItemClick (g);
+
+			if (iTemp.Expand != null && g is Expandable) {
+				(g as Expandable).Expand += iTemp.Expand;
+			}			
+		}
+		protected virtual void registerItemClick(GraphicObject g){
+			g.MouseClick += itemClick;
 		}
 		protected void _list_LayoutChanged (object sender, LayoutingEventArgs e)
 		{
