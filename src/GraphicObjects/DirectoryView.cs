@@ -77,6 +77,8 @@ namespace Crow
 			get { return new DirectoryInfo (Root).GetFileSystemInfos (); }
 		}
 		public void onSelectedItemChanged (object sender, SelectionChangeEventArgs e){
+			if (e.NewValue == SelectedItem)
+				return;
 			SelectedItem = e.NewValue;
 			SelectedItemChanged.Raise (this, e);
 		}

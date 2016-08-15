@@ -727,7 +727,7 @@ namespace Crow
 		}
 		/// <summary> query an update of the content, a redraw </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void RegisterForRedraw ()
+		public virtual void RegisterForRedraw ()
 		{
 			bmp = null;
 			if (RegisteredLayoutings == LayoutingType.None)
