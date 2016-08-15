@@ -1,27 +1,33 @@
 ﻿<?xml version="1.0"?>
 <Window Height="80%" Width="80%" CornerRadius="20">
-	<HorizontalStack>
-		<DirectoryView Name="dv" Root="./" SelectedItemChanged="Tv_SelectedItemChanged"
-			Width="20%" Height="100%" Margin="10"/>
-		<Splitter/>
-		<VerticalStack Width="80%" Height="100%">
-			<Container Height="50%" Margin="10" MinimumSize="10,10"
-					Name="crowContainer"/>
-			<Container/>
-			<HorizontalStack Height="50%" Margin="10" MinimumSize="10,1">
-				<Scroller Name="scroller1" Background="White"
-						Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}"
-						ValueChanged="./_scroller_ValueChanged">
-					<TextBox Background="White" Height="Fit"
-							VerticalAlignment="Top"
-							TextAlignment="TopLeft" Font="mono, 12"
-							TextChanged="onImlSourceChanged"
-							Text="{CurSources}" Multiline="true"/>
-				</Scroller>
-				<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}"
-					Maximum="{../scroller1.MaximumScroll}" Orientation="Vertical"
-					Width="14" />
-			</HorizontalStack>
-		</VerticalStack>
-	</HorizontalStack>
+	<VerticalStack>
+		<Border Margin="1" Background="Onyx" Height="Fit">
+			<Label Width="Stretched" Margin="1" Text="{../../dv.SelectedItem}"/>
+		</Border>
+		<HorizontalStack>
+			<DirectoryView Name="dv" Root="./" SelectedItemChanged="Tv_SelectedItemChanged"
+				Width="20%" Height="100%" Margin="10"/>
+			<Splitter/>
+			<VerticalStack Width="80%" Height="100%">
+				<ImlVisualEditor Height="50%" Margin="0" MinimumSize="10,10" Foreground="SkyBlue"
+					ImlPath="{../../../dv.SelectedItem}"
+					Name="crowContainer" Background="Onyx"/>
+				<Splitter/>
+				<HorizontalStack Height="50%" Margin="10" MinimumSize="10,1">
+					<Scroller Name="scroller1" Background="White"
+							Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}"
+							ValueChanged="./_scroller_ValueChanged">
+						<TextBox Background="White" Height="Fit"
+								VerticalAlignment="Top"
+								TextAlignment="TopLeft" Font="mono, 12"
+								TextChanged="onImlSourceChanged"
+								Text="{CurSources}" Multiline="true"/>
+					</Scroller>
+					<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}"
+						Maximum="{../scroller1.MaximumScroll}" Orientation="Vertical"
+						Width="14" />
+				</HorizontalStack>
+			</VerticalStack>
+		</HorizontalStack>
+	</VerticalStack>
 </Window>

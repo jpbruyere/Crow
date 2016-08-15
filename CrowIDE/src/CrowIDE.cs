@@ -45,9 +45,9 @@ namespace CrowIDE
 			base.OnLoad (e);
 
 			//this.CrowInterface.LoadInterface ("#CrowIDE.ui.imlEditor.crow").DataSource = this;
-			GraphicObject go = this.CrowInterface.LoadInterface (@"ui/test.crow");
+			//GraphicObject go = this.CrowInterface.LoadInterface (@"ui/test.crow");
+			GraphicObject go = this.CrowInterface.LoadInterface (@"#CrowIDE.ui.imlEditor.crow");
 			go.DataSource = this;
-			Interface i = go.CurrentInterface;
 		}
 	}
 }

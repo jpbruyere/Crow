@@ -23,6 +23,7 @@ using Crow;
 using System.Threading;
 using System.Xml.Serialization;
 using System.ComponentModel;
+using System.IO;
 
 namespace CrowIDE
 {
@@ -37,8 +38,12 @@ namespace CrowIDE
 			set {
 				if (imlPath == value)
 					return;
+				if (!File.Exists (value))
+					return;
 				imlPath = value;
 				NotifyValueChanged ("ImlPath", imlPath);
+				imlVE.ClearInterface ();
+				imlVE.LoadInterface (imlPath);
 			}
 		}
 		bool drawGrid;
@@ -68,7 +73,44 @@ namespace CrowIDE
 		public ImlVisualEditor () : base()
 		{
 			imlVE = new Interface ();
+			Thread t = new Thread (interfaceThread);
+			t.IsBackground = true;
+			t.Start ();
+		}
 
+		void interfaceThread()
+		{
+			while (true) {
+				imlVE.Update ();
+
+				bool isDirty = false;
+
+				lock (imlVE.RenderMutex)
+					isDirty = imlVE.IsDirty;
+
+				if (imlVE.IsDirty) {
+					lock (CurrentInterface.UpdateMutex)
+						RegisterForRedraw ();
+				}
+
+				Thread.Sleep (5);
+			}
+		}
+		public override void OnLayoutChanges (LayoutingType layoutType)
+		{
+			base.OnLayoutChanges (layoutType);
+			switch (layoutType) {
+			case LayoutingType.Width:
+			case LayoutingType.Height:
+				imlVE.ProcessResize (this.ClientRectangle.Size);
+				break;
+			}
+		}
+		public override void RegisterForRedraw ()
+		{
+			base.RegisterForRedraw ();
+			lock(imlVE.UpdateMutex)
+				imlVE.clipping.AddRectangle (imlVE.ClientRectangle);
 		}
 		protected override void onDraw (Cairo.Context gr)
 		{
@@ -78,17 +120,36 @@ namespace CrowIDE
 
 
 			Rectangle cb = ClientRectangle;
-
+			const double gridLineWidth = 0.1;
+			double glhw = gridLineWidth / 2.0;
 			int nbLines = cb.Width / gridSpacing ;
-			double x = gridSpacing + cb.Center.X - nbLines * gridSpacing;
+			double d = cb.Left + gridSpacing;
 			for (int i = 0; i < nbLines; i++) {
-				gr.MoveTo (x-0.5, cb.Y);
-				gr.LineTo (x-0.5, cb.Y);
+				gr.MoveTo (d-glhw, cb.Y);
+				gr.LineTo (d-glhw, cb.Bottom);
+				d += gridSpacing;
 			}
-
-			gr.LineWidth = 1.0;
+			nbLines = cb.Height / gridSpacing;
+			d = cb.Top + gridSpacing;
+			for (int i = 0; i < nbLines; i++) {
+				gr.MoveTo (cb.X, d - glhw);
+				gr.LineTo (cb.Right, d -glhw);
+				d += gridSpacing;
+			}
+			gr.LineWidth = gridLineWidth;
 			Foreground.SetAsSource (gr, cb);
 			gr.Stroke ();
+
+			lock (imlVE.RenderMutex) {
+				if (imlVE.IsDirty) {
+					using (Cairo.Surface surf = new Cairo.ImageSurface (imlVE.dirtyBmp, Cairo.Format.Argb32,
+						imlVE.DirtyRect.Width, imlVE.DirtyRect.Height, imlVE.DirtyRect.Width * 4)) {
+						gr.SetSourceSurface (surf, imlVE.DirtyRect.Left, imlVE.DirtyRect.Top);
+						gr.Paint ();
+					}
+					imlVE.IsDirty = false;
+				}
+			}
 		}
 	}
 }
