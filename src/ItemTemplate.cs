@@ -53,6 +53,8 @@ namespace Crow
 			Type evtType = typeof(EventHandler);
 			Type listBoxType = typeof(ListBox);
 
+			PropertyInfo piListData = listBoxType.GetProperty ("Data");
+
 			MethodInfo evtInvoke = evtType.GetMethod ("Invoke");
 			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
 			Type handlerArgsType = evtParams [1].ParameterType;
@@ -65,31 +67,48 @@ namespace Crow
 
 
 			#region IL generation
+			System.Reflection.Emit.Label gotoEnd;
+			System.Reflection.Emit.Label ifDataIsNull;
+
 			ILGenerator il = dm.GetILGenerator (256);
 			il.DeclareLocal(typeof(GraphicObject));
 
-			il.Emit (OpCodes.Ldarg_1);
+			gotoEnd = il.DefineLabel ();
+			ifDataIsNull = il.DefineLabel ();
+
+			il.Emit (OpCodes.Ldarg_1);//load sender of expand event
 
 			MethodInfo miFindByName = typeof(GraphicObject).GetMethod("FindByName");
 			il.Emit(OpCodes.Ldstr, "List");
 			il.Emit (OpCodes.Callvirt, miFindByName);
 			il.Emit (OpCodes.Stloc_0);
 
+			//check that 'Data' of list is not already set
+			il.Emit (OpCodes.Ldloc_0);
+			il.Emit (OpCodes.Callvirt, piListData.GetGetMethod ());
+			il.Emit (OpCodes.Brfalse, ifDataIsNull);
+			il.Emit (OpCodes.Br, gotoEnd);
+
+			il.MarkLabel(ifDataIsNull);
+			//copy the ref of ItemTemplates list TODO: maybe find another way to share it among the nodes?
 			FieldInfo fiTemplates = typeof(TemplatedControl).GetField("ItemTemplates");
 			il.Emit (OpCodes.Ldloc_0);
 			il.Emit (OpCodes.Ldarg_0);
 			il.Emit (OpCodes.Ldfld, fiTemplates);
 			il.Emit (OpCodes.Stfld, fiTemplates);
 
-			il.Emit (OpCodes.Ldloc_0);
-			il.Emit (OpCodes.Ldarg_1);
+			//call 'fetchMethodName' from the dataSource to build the sub nodes list
+			il.Emit (OpCodes.Ldloc_0);//push 'List' (of sub nodes) into the stack
+			il.Emit (OpCodes.Ldarg_1);//get the dataSource of the sender
 			il.Emit (OpCodes.Callvirt, typeof(GraphicObject).GetProperty("DataSource").GetGetMethod ());
 
 			MethodInfo miGetDatas = dataType.GetMethod (fetchMethodName, new Type[] {});
 			il.Emit (OpCodes.Callvirt, miGetDatas);
 
-			il.Emit (OpCodes.Callvirt, listBoxType.GetProperty("Data").GetSetMethod ());
+			//set 'return' from the fetch method as 'data' of the list
+			il.Emit (OpCodes.Callvirt, piListData.GetSetMethod ());
 
+			il.MarkLabel(gotoEnd);
 			il.Emit (OpCodes.Ret);
 
 			#endregion

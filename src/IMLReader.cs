@@ -203,8 +203,6 @@ namespace Crow
 				#region Attributes reading
 				if (reader.HasAttributes) {
 
-					MethodInfo miAddBinding = typeof(GraphicObject).GetMethod ("BindMember");
-
 					while (reader.MoveToNextAttribute ()) {
 						if (reader.Name == "Style")
 							continue;
