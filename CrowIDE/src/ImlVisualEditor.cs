@@ -230,10 +230,15 @@ namespace CrowIDE
 				return;
 
 			Rectangle hr = imlVE.HoverWidget.ScreenCoordinates(imlVE.HoverWidget.getSlot ());
+
+			gr.SetSourceColor (Color.LightGray);
+			gr.DrawCote (new Cairo.PointD (hr.X, hr.Center.Y), new Cairo.PointD (hr.Right, hr.Center.Y));
+			gr.DrawCote (new Cairo.PointD (hr.Center.X, hr.Y), new Cairo.PointD (hr.Center.X, hr.Bottom));
 			hr.Inflate (2);
 			gr.SetSourceColor (Color.LightGray);
 			gr.SetDash (new double[]{ 3.0, 3.0 },0.0);
 			gr.Rectangle (hr, 1.0);
+
 		}
 		#endregion
 	}
