@@ -18,9 +18,9 @@ Please report bugs and issues on [GitHub](https://github.com/jpbruyere/Crow/issu
 
 <table width="100%">
   <tr>
-    <td width="30%" align="center"><img src="https://jpbruyere.github.io/Crow/images/magic3d.png" alt="Magic3d" width="90%"/></td>
-    <td width="30%" align="center"><img src="https://jpbruyere.github.io/Crow/images/screenshot3.png" alt="Screen Shot" width="90%" /> </td>
-    <td width="30%" align="center"><img src="https://jpbruyere.github.io/Crow/images/screenshot1.png" alt="Screen Shot" width="90%"/> </td>
+    <td width="30%" align="center"><img src="https://jpbruyere.github.io/Crow/images/screenshot5.png" alt="CrowIDE" width="90%"/></td>
+    <td width="30%" align="center"><img src="https://jpbruyere.github.io/Crow/images/screenshot4.png" alt="Screen Shot" width="90%" /> </td>
+    <td width="30%" align="center"><img src="https://jpbruyere.github.io/Crow/images/screenshot3.png" alt="Screen Shot" width="90%"/> </td>
   </tr>
 </table>
 
