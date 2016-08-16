@@ -75,6 +75,7 @@
     <Compile Include="OpenGL\vaoMesh.cs" />
     <Compile Include="src\CrowIDE.cs" />
     <Compile Include="src\ImlVisualEditor.cs" />
+    <Compile Include="src\MembersView.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />
@@ -85,6 +86,9 @@
     <EmbeddedResource Include="ui\imlEditor.crow" />
     <EmbeddedResource Include="images\save.svg" />
     <EmbeddedResource Include="ui\IDE.style" />
+    <EmbeddedResource Include="ui\MembersView.template">
+      <LogicalName>CrowIDE.MembersView.template</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">

@@ -182,9 +182,17 @@ namespace Crow
 			ItemTemplate iTemp = null;
 			Type dataType = data [i].GetType ();
 
-			if (ItemTemplates.ContainsKey (dataType.FullName))
-				iTemp = ItemTemplates [dataType.FullName];
-			else
+			while (dataType.FullName != "System.Object") {
+				if (ItemTemplates.ContainsKey (dataType.FullName)) {
+					iTemp = ItemTemplates [dataType.FullName];
+					break;
+				}
+				dataType = dataType.BaseType;
+				if (dataType == null)
+					break;
+			}
+
+			if (iTemp == null)
 				iTemp = ItemTemplates ["default"];
 
 			lock (CurrentInterface.LayoutMutex) {

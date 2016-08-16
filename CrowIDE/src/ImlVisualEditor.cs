@@ -59,7 +59,6 @@ namespace CrowIDE
 				reloadFromSource ();
 			}
 		}
-
 		[XmlAttributeAttribute][DefaultValue("")]
 		public string ImlPath {
 			get { return imlPath; }
@@ -74,6 +73,9 @@ namespace CrowIDE
 				reloadFromPath ();
 			}
 		}
+
+
+
 		void reloadFromSource(){
 			if (string.IsNullOrEmpty (imlSource)) {
 				reload_iTor (null);
@@ -113,6 +115,7 @@ namespace CrowIDE
 				}
 			}
 		}
+
 		[XmlAttributeAttribute()][DefaultValue(true)]
 		public bool DrawGrid {
 			get { return drawGrid; }
@@ -135,14 +138,9 @@ namespace CrowIDE
 				RegisterForRedraw ();
 			}
 		}
-		public ImlVisualEditor () : base()
-		{
-			imlVE = new Interface ();
-			Thread t = new Thread (interfaceThread);
-			t.IsBackground = true;
-			t.Start ();
+		[XmlIgnore]public object SelectedItem {
+			get { return imlVE.HoverWidget; }
 		}
-
 		void interfaceThread()
 		{
 			while (true) {
@@ -186,8 +184,15 @@ namespace CrowIDE
 			GraphicObject oldHW = imlVE.HoverWidget;
 			Rectangle scr = this.ScreenCoordinates (this.getSlot ());
 			imlVE.ProcessMouseMove (e.X - scr.X, e.Y - scr.Y);
-			if (oldHW != imlVE.HoverWidget)
-				RegisterForRedraw ();
+			if (oldHW == imlVE.HoverWidget)
+				return;
+			RegisterForRedraw ();
+
+		}
+		public override void onMouseDown (object sender, MouseButtonEventArgs e)
+		{
+			base.onMouseDown (sender, e);
+			NotifyValueChanged ("SelectedItem", imlVE.HoverWidget);
 		}
 		protected override void onDraw (Cairo.Context gr)
 		{

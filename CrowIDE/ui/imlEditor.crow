@@ -11,12 +11,12 @@
 			<DirectoryView Name="dv" Root="./" SelectedItemChanged="Tv_SelectedItemChanged"
 				Width="20%" Height="100%" Margin="10"/>
 			<Splitter/>
-			<VerticalStack Height="100%">
-				<ImlVisualEditor Height="50%" Margin="0" MinimumSize="10,10" Foreground="SkyBlue"
+			<VerticalStack Width="60%">
+				<ImlVisualEditor Height="60%" Margin="0" MinimumSize="10,10" Foreground="SkyBlue"
 					ImlPath="{../../../dv.SelectedItem}"
 					Name="crowContainer" Background="Onyx"/>
 				<Splitter/>
-				<HorizontalStack Height="50%" Margin="10" MinimumSize="10,1">
+				<HorizontalStack Margin="10" MinimumSize="10,1">
 					<Scroller Name="scroller1" Background="White"
 							Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}"
 							ValueChanged="./_scroller_ValueChanged">
@@ -30,6 +30,21 @@
 						Width="14" />
 				</HorizontalStack>
 			</VerticalStack>
+			<Splitter/>
+			<MembersView Width="20%" Instance="{../crowContainer.SelectedItem}">
+				<ItemTemplate DataType="CrowIDE.PropertyContainer">
+					<HorizontalStack Focusable="true"  Height="Fit" Width="Stretched" Spacing="0"
+							MouseEnter="{Background=UnitedNationsBlue}"
+							MouseLeave="{Background=Transparent}" >
+						<Border Height="Fit" Width="50%" Foreground="DimGray">
+							<Label Margin="1" Text="{Name}" Height="Stretched" Width="Stretched"/>
+						</Border>
+						<Border Height="Fit" Width="50%" Foreground="DimGray">
+							<TextBox Margin="1" Text="{Value}" Height="Stretched" Width="Stretched"/>
+						</Border>
+					</HorizontalStack>
+				</ItemTemplate>
+			</MembersView>
 		</HorizontalStack>
 	</VerticalStack>
 </Window>
