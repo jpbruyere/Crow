@@ -14,10 +14,6 @@ namespace Crow
 			: base()
 		{
 		}
-		public Container(Rectangle _bounds)
-			: base(_bounds)
-		{
-		}
 		#endregion
 
 		[XmlIgnore]

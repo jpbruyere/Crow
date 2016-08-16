@@ -56,6 +56,7 @@ namespace Crow
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
 		}
 		public Interface(){
+			CurrentInterface = this;
 			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture; 
 		}
 		#endregion
@@ -86,7 +87,7 @@ namespace Crow
 		public static FontOptions FontRenderingOptions;
 		#endregion
 
-		internal bool XmlLoading = true;
+		internal static Interface CurrentInterface;
 
 		public Dictionary<string,object> Ressources = new Dictionary<string, object>();
 		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem> ();

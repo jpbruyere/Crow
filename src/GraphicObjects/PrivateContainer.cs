@@ -39,10 +39,6 @@ namespace Crow
 			: base()
 		{
 		}
-		public PrivateContainer(Rectangle _bounds)
-			: base(_bounds)
-		{
-		}
 		#endregion
 
 		protected GraphicObject child;

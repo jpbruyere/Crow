@@ -25,6 +25,21 @@ namespace Crow
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
 
+		Interface currentInterface = null;
+
+		public Interface CurrentInterface {
+			get {
+				if (currentInterface == null) {
+					currentInterface = Interface.CurrentInterface;
+					initialize ();
+				}
+				return currentInterface;
+			}
+			set {
+				currentInterface = value;
+			}
+		}
+
 		Rectangles clipping = new Rectangles();
 		public Rectangles Clipping { get { return clipping; }}
 
@@ -41,23 +56,11 @@ namespace Crow
 		{
 			uid = currentUid;
 			currentUid++;
-
-//			if (CurrentInterface.XmlLoading)
-//				return;
-//			loadDefaultValues ();
-		}
-		public GraphicObject (Rectangle _bounds)
-		{
-//			if (!CurrentInterface.XmlLoading)
-//				loadDefaultValues ();
-			
-			Left = _bounds.Left;
-			Top = _bounds.Top;
-			Width = _bounds.Width;
-			Height = _bounds.Height;
 		}
 		#endregion
-
+		internal protected virtual void initialize(){
+			loadDefaultValues ();
+		}
 		#region private fields
 		LayoutingType registeredLayoutings = LayoutingType.All;
 		ILayoutable logicalParent;
@@ -729,7 +732,6 @@ namespace Crow
 			if (RegisteredLayoutings == LayoutingType.None)
 				CurrentInterface.EnqueueForRepaint (this);
 		}
-		internal Interface CurrentInterface = null;
 		#endregion
 
 		#region Layouting

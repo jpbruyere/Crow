@@ -36,11 +36,14 @@ namespace Crow
 		#region CTOR
 		public TemplatedControl () : base()
 		{
-//			if (CurrentInterface.XmlLoading)
-//				return;
-			//loadTemplate ();
 		}
 		#endregion
+
+		internal protected override void initialize ()
+		{
+			loadTemplate ();
+			base.initialize ();
+		}
 
 		string _template;
 		string _itemTemplate;
