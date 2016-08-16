@@ -1,9 +1,0 @@
-﻿<?xml version="1.0"?>
-<Container Name="MainGrp" 
-	Width="600" Height="600" 
-	Background="White" Margin="10" Focusable="True">
-
-	<Button Margin="1" BorderWidth="0" Background="Gray" Width="400" Height="400">
-		<Image Path="image/u.svg"/>
-	</Button>	
-</Container>

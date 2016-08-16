@@ -3,6 +3,7 @@ Win_x86
 Crow.userprefs
 Debug
 packages
+*.nupkg
 /GOLib.suo
 /tmp
 /bin/*

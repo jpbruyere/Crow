@@ -1,13 +1,10 @@
-﻿<?xml version="1.0"?>
-<VerticalStack Height="Fit" Width="Fit">
-	<Label Width="Stretched"/>
-	<Expandable  Width="Fit" Background="Gray">
-		<Expandable Background="LightBlue">
-			<Expandable Background="Green">
-				<Expandable Background="LimeGreen">
-					<Expandable Background="DimGray">
+﻿<Expandable Width="Stretched"  Background="Gray">
+		<Expandable Width="Stretched" Background="LightBlue">
+			<Expandable Width="Stretched" Background="Green">
+				<Expandable Width="Stretched" Background="LimeGreen">
+					<Expandable Width="Stretched" Background="DimGray">
 						<Expandable Width="Stretched" Background="Yellow">
-							<Expandable Background="NavyBlue">
+							<Expandable Width="Stretched" Background="NavyBlue">
 								<Expandable Width="Stretched" Background="Blue">
 									<Expandable Width="Stretched" Background="BlueCrayola">
 										<Expandable Width="Stretched" Background="Green">
@@ -22,4 +19,3 @@
 			</Expandable>
 		</Expandable>
 	</Expandable>
-</VerticalStack>
