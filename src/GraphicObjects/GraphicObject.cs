@@ -477,6 +477,7 @@ namespace Crow
 					onDisable (this, null);
 
 				NotifyValueChanged ("IsEnabled", isEnabled);
+				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("1,1")]
@@ -1036,6 +1037,8 @@ namespace Crow
 					RecreateCache ();
 
 				UpdateCache (ctx);
+				if (!isEnabled)
+					paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);
 			} else {
 				Rectangle rb = Slot + Parent.ClientRectangle.Position;
 				ctx.Save ();
@@ -1043,9 +1046,18 @@ namespace Crow
 				ctx.Translate (rb.X, rb.Y);
 
 				onDraw (ctx);
+				if (!isEnabled)
+					paintDisabled (ctx, Slot);
 
 				ctx.Restore ();
 			}
+		}
+		void paintDisabled(Context gr, Rectangle rb){
+			gr.Operator = Operator.Xor;
+			gr.SetSourceRGBA (0.6, 0.6, 0.6, 0.3);
+			gr.Rectangle (rb);
+			gr.Fill ();
+			gr.Operator = Operator.Over;
 		}
 		#endregion
 
@@ -1064,7 +1076,7 @@ namespace Crow
 		#region Mouse handling
 		public virtual bool MouseIsIn(Point m)
 		{
-			if (!Visible)
+			if (!(Visible & isEnabled))
 				return false;
 			if (ScreenCoordinates (Slot).ContainsOrIsEqual (m)) {
 				Scroller scr = Parent as Scroller;
