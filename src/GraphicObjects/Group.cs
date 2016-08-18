@@ -27,8 +27,6 @@ namespace Crow
         bool _multiSelect = false;
 		List<GraphicObject> children = new List<GraphicObject>();
 
-        public GraphicObject activeWidget;
-
         public virtual List<GraphicObject> Children {
 			get { return children; }
 		}

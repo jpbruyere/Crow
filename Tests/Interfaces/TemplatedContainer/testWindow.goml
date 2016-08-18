@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Window Left="10" Top="10" Title="Test window" 
+<Window Left="10" Top="10" Title="Test window"
 		Width="250" Height="550" >
 	<VerticalStack Name="contentVSStack" Margin="10" Spacing="10" Background="0.4,0.4,0.4,0.4">
 		<Slider Name="slider" Height="12" Width="Stretched" CornerRadius="3"/>
@@ -43,7 +43,7 @@
 						</HorizontalStack>
 						<HorizontalStack Fit="true">
 							<Label Name="captionFps" Text="Fps:" Width="50" TextAlignment="Right"/>
-							<Label Name="valueFps" Text="{fps}" Font="droid , 12" Width="50" TextAlignment="Center" 
+							<Label Name="valueFps" Text="{fps}" Font="droid , 12" Width="50" TextAlignment="Center"
 								Background="vgradient|0:AoEnglish|1:Black"/>
 						</HorizontalStack>
 						<HorizontalStack Fit="true">
@@ -56,7 +56,7 @@
 							<Label Text="{fpsMax}" Font="droid , 12" Width="50" TextAlignment="Center"
 								Background="vgradient|0:AoEnglish|1:Black"/>
 						</HorizontalStack>
-					</VerticalStack>				
+					</VerticalStack>
 			</Container>
 		</Border>
 		<HorizontalStack Fit="true" Background="BlueCrayola" Margin="3">

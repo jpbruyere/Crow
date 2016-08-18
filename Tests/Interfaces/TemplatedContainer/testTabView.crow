@@ -32,4 +32,3 @@
 			Caption="Add new tab" Width="Fit" Height="30" MouseClick="onAddTabButClick"/>
 	</VerticalStack>
 </HorizontalStack>
-

@@ -140,6 +140,7 @@
     <Compile Include="src\ItemTemplate.cs" />
     <Compile Include="src\Style.cs" />
     <Compile Include="src\GraphicObjects\Wrapper.cs" />
+    <Compile Include="src\GraphicObjects\TemplatedGroup.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
