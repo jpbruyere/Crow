@@ -84,6 +84,9 @@ namespace Crow
 		}
 		protected override void onDraw (Cairo.Context gr)
 		{
+			//onDraw is overrided to prevent default drawing of background, template top container
+			//may have a binding to root background or a fixed one.
+			//this allow applying root background to random template component
 			gr.Save ();
 
 			if (ClipToClientRect) {

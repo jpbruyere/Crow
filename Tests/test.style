@@ -21,3 +21,11 @@ RadioButton2 {
 	Checked = {Background=Mantis;Font=droid bold, 10};
 	Unchecked = {Background=Onyx;Font=droid,10};
 }
+labPerf {
+	Font = droid, 8;
+	Width = 50%;
+}
+labPerfVal{
+	Font = droid, 8;
+	Width = 50%;
+}

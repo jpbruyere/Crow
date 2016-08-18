@@ -57,8 +57,8 @@ namespace Crow
 					fpsMin = _fps;
 					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMin", fpsMin));
 				}
-
-				ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
+				if (frameCpt % 3 == 0)
+					ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
 				#if MEASURE_TIME
 				ValueChanged.Raise (this, new ValueChangeEventArgs ("update",
 					this.CrowInterface.updateTime.ElapsedTicks.ToString () + " ticks"));
@@ -250,12 +250,14 @@ namespace Crow
 			fps = (int)RenderFrequency;
 
 
-			if (frameCpt > 50) {
+			if (frameCpt > 500) {
 				resetFps ();
 				frameCpt = 0;
+				#if DEBUG
 				GC.Collect();
 				GC.WaitForPendingFinalizers();
 				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
+				#endif
 			}
 			frameCpt++;
 		}

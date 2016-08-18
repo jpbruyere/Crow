@@ -85,7 +85,14 @@
 					</VerticalStack>
 				</HorizontalStack>
 			</GroupBox>
-			<Spinner Fit="true"/>
+			<HorizontalStack Height="Fit">
+				<Label Text="Spinner"/>
+				<Spinner Fit="true"/>
+			</HorizontalStack>
+			<HorizontalStack Height="Fit">
+				<Button Caption="Button"/>
+				<Button Caption="Button" IsEnabled="false"/>
+			</HorizontalStack>
 		</VerticalStack>
 		<VerticalStack Width="33%" Margin="5" Spacing="5">
 			<Expandable Background="DimGray">
