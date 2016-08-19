@@ -1,0 +1,17 @@
+﻿<?xml version="1.0"?>
+<Popper Caption="{./Caption}"  Background="{./Background}" PopDirection="{./Orientation}"
+	Foreground = "{./Foreground}"
+	Unpop = "{Foreground=LightGray;Background=Transparent}">
+	<Template>
+		<Label Text="{./Caption}"
+			MinimumSize = "120,0"
+			Margin="3" TextAlignment="Left"
+			Height="{./HeightPolicy}" Width="{./WidthPolicy}"
+			Font="{./Font}"
+			Background="{./Background}"
+			Foreground="{./Foreground}"/>
+	</Template>
+	<Border Foreground="LightGray" Fit="true">
+		<VerticalStack Name="ItemsContainer" Margin="2" Fit="true" Background="Onyx"/>
+	</Border>
+</Popper>

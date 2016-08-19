@@ -1,5 +1,5 @@
 ﻿//
-//  Style.cs
+//  Menu.cs
 //
 //  Author:
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
@@ -19,16 +19,38 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Collections.Generic;
+using System.Xml.Serialization;
+using System.ComponentModel;
 
 namespace Crow
 {
-	public class Style : Dictionary<string, object>
+	public class Menu : TemplatedGroup
 	{
-		public Dictionary<string, Style> SubStyles;//TODO:implement substyles for all tags inside a style
-		public Style () : base()
+		Orientation orientation;
+
+		[XmlAttributeAttribute()][DefaultValue(Orientation.Horizontal)]
+		public virtual Orientation Orientation {
+			get { return orientation; }
+			set {
+				if (orientation == value)
+					return;
+				orientation = value;
+				NotifyValueChanged ("Orientation", orientation);
+			}
+		}
+
+		public Menu () : base()
 		{
+		}
+
+		public override void AddItem (GraphicObject g)
+		{
+			base.AddItem (g);
+
+			if (orientation == Orientation.Horizontal)
+				g.NotifyValueChanged ("Orientation", Alignment.Bottom);
+			else
+				g.NotifyValueChanged ("Orientation", Alignment.Right);
 		}
 	}
 }
-

@@ -1,0 +1,7 @@
+﻿<?xml version="1.0"?>
+<MenuItem Caption="File">
+	<MenuItem Caption="New"/>
+	<MenuItem Caption="Open"/>
+	<MenuItem Caption="Save"/>
+	<MenuItem Caption="Quit"/>
+</MenuItem>

@@ -14,6 +14,20 @@ Label {
 	Width = Fit;
 	Margin = 0;
 }
+Menu {
+	Margin = 1;
+	Background = vgradient|0:DimGray|1:Onyx;
+	Height = Fit;
+	Width = Stretched;
+	VerticalAlignment = Top;
+}
+MenuItem {
+	Height = Fit;
+	Width = Fit;
+	Background = Transparent;
+	MouseEnter = {Background = Mantis;Foreground=Jet;}
+	MouseLeave = {Background=Transparent;Foreground=LightGray;};
+}
 MessageBox {
 	Width=200;
 	Title=MessageBox;

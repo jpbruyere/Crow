@@ -38,7 +38,7 @@ namespace Crow
 
 		public virtual void AddItem(GraphicObject g){
 			items.AddChild (g);
-			g.LogicalParent = this;
+			//g.LogicalParent = this;
 		}
 		public virtual void RemoveItem(GraphicObject g)
 		{
@@ -82,6 +82,19 @@ namespace Crow
 			}
 			return false;
 		}
+//		public override void ClearBinding ()
+//		{
+//			if (items != null)
+//				items.ClearBinding ();
+//
+//			base.ClearBinding ();
+//		}
+//		public override void ResolveBindings ()
+//		{
+//			base.ResolveBindings ();
+//			if (items != null)
+//				items.ResolveBindings ();
+//		}
 		#endregion
 
 		#region IXmlSerialisation Overrides

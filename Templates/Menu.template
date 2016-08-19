@@ -1,0 +1,3 @@
+﻿<?xml version="1.0"?>
+<HorizontalStack Name="ItemsContainer" Margin="2" Background="{./Background}"
+	Width="{./WidthPolicy}" Height="{./HeightPolicy}"/>

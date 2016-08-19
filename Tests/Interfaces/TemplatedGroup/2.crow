@@ -1,10 +1,11 @@
 ﻿<?xml version="1.0"?>
-<Menu>
+<Container>
+<MenuItem Caption="Menu">
 	<MenuItem Caption="File">
-		<MenuItem Caption="New"/>
-		<MenuItem Caption="Open"/>
-		<MenuItem Caption="Save"/>
-		<MenuItem Caption="Quit"/>
+		<MenuItem Caption="New"></MenuItem>
+		<MenuItem Caption="Open"></MenuItem>
+		<MenuItem Caption="Save"></MenuItem>
+		<MenuItem Caption="Quit"></MenuItem>
 	</MenuItem>
 	<MenuItem Caption="Edit">
 		<MenuItem Caption="Cut"/>
@@ -20,4 +21,5 @@
 		<MenuItem Caption="About"/>
 		<MenuItem Caption="Help"/>
 	</MenuItem>
-</Menu>
+</MenuItem>
+</Container>
