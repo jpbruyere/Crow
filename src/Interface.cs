@@ -467,7 +467,7 @@ namespace Crow
 			g.Parent = this;
 			GraphicTree.Insert (0, g);
 			g.RegisteredLayoutings = LayoutingType.None;
-			g.RegisterForLayouting (LayoutingType.Sizing);
+			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
 		public void DeleteWidget(GraphicObject g)
 		{
