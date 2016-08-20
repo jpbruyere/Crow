@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <Popper Caption="{./Caption}"  Background="{./Background}" PopDirection="{./Orientation}"
-	Foreground = "{./Foreground}" CanPop="{./HasChildren}"
+	Foreground = "{./Foreground}" CanPop="{./HasChildren}" MouseClick="./onMI_Click"
 	Unpop = "{Foreground=LightGray;Background=Transparent}">
 	<Template>
 		<Label Text="{./Caption}"

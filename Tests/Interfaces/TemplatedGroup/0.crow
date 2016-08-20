@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <Menu>
 	<MenuItem Caption="File">
-		<MenuItem Caption="New"/>
+		<MenuItem Caption="New" Execute="onNew"/>
 		<MenuItem Caption="Open"/>
 		<MenuItem Caption="Save"/>
 		<MenuItem Caption="Quit"/>

@@ -30,11 +30,10 @@ namespace Crow
 		public MenuItem () : base() {}
 		#endregion
 
-//		public event EventHandler Pop;
-//		public event EventHandler Unpop;
+		public event EventHandler Execute;
 
 		string caption;
-		Command command;
+		Command command;//TODO
 
 		[XmlAttributeAttribute()][DefaultValue(null)]
 		public virtual Command Command {
@@ -75,5 +74,11 @@ namespace Crow
 			base.AddItem (g);
 			g.NotifyValueChanged ("Orientation", Alignment.Right);
 		}
+
+		void onMI_Click (object sender, MouseButtonEventArgs e)
+		{
+			Execute.Raise (this, null);
+		}
 	}
 }
+

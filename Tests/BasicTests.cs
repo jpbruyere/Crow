@@ -199,5 +199,8 @@ namespace Tests
 			string test = e.Time.ToString ();
 			NotifyValueChanged ("PropertyLessBinding", test);
 		}
+		void onNew(object sender, EventArgs e){
+			Debug.WriteLine ("menu new clicked");
+		}
 	}
 }
