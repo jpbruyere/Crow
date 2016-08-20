@@ -34,7 +34,7 @@ namespace Crow
 		}	
 		#endregion
 
-		bool _isPopped;
+		bool _isPopped, _canPop;
 		string caption;
 		Alignment popDirection;
 		GraphicObject _content;
@@ -70,6 +70,19 @@ namespace Crow
 				else
 					onUnpop (this, null);
 
+			}
+		}
+		[XmlAttributeAttribute()][DefaultValue(true)]
+		public bool CanPop
+		{
+			get { return _canPop; }
+			set
+			{
+				if (value == _canPop)
+					return;
+
+				_canPop = value;
+				NotifyValueChanged ("CanPop", _canPop);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(Alignment.Bottom)]
@@ -182,7 +195,8 @@ namespace Crow
 
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{
-			IsPopped = !IsPopped;
+			if (_canPop)
+				IsPopped = !IsPopped;
 			base.onMouseClick (sender, e);
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)

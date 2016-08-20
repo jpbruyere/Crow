@@ -38,16 +38,20 @@ namespace Crow
 
 		public virtual void AddItem(GraphicObject g){
 			items.AddChild (g);
+			NotifyValueChanged ("HasChildren", true);
 			//g.LogicalParent = this;
 		}
 		public virtual void RemoveItem(GraphicObject g)
 		{
 			items.RemoveChild (g);
+			if (items.Children.Count == 0)
+				NotifyValueChanged ("HasChildren", false);
 		}
 
 		public virtual void ClearItems()
 		{
 			items.ClearChildren ();
+			NotifyValueChanged ("HasChildren", false);
 		}
 
 		protected override void loadTemplate(GraphicObject template = null)
@@ -57,6 +61,10 @@ namespace Crow
 			items = this.child.FindByName ("ItemsContainer") as Group;
 			if (items == null)
 				throw new Exception ("TemplatedGroup template Must contain a Group named 'ItemsContainer'");
+			if (items.Children.Count == 0)
+				NotifyValueChanged ("HasChildren", false);
+			else
+				NotifyValueChanged ("HasChildren", true);
 		}
 
 		#region GraphicObject overrides

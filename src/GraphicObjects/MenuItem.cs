@@ -34,6 +34,18 @@ namespace Crow
 //		public event EventHandler Unpop;
 
 		string caption;
+		Command command;
+
+		[XmlAttributeAttribute()][DefaultValue(null)]
+		public virtual Command Command {
+			get { return command; }
+			set {
+				if (command == value)
+					return;
+				command = value;
+				NotifyValueChanged ("Command", command);
+			}
+		}
 
 		[XmlAttributeAttribute][DefaultValue("MenuItem")]
 		public string Caption {
@@ -45,10 +57,6 @@ namespace Crow
 				NotifyValueChanged ("Caption", caption);
 			}
 		}
-//		[XmlIgnore]
-//		public virtual Alignment Orientation {
-//			get { return Parent is Menu ? (Parent as Menu).Orientation : (Parent as MenuItem); }
-//		}
 
 		Menu MenuRoot {
 			get {
