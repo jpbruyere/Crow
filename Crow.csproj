@@ -143,6 +143,7 @@
     <Compile Include="src\GraphicObjects\TemplatedGroup.cs" />
     <Compile Include="src\GraphicObjects\MenuItem.cs" />
     <Compile Include="src\GraphicObjects\Menu.cs" />
+    <Compile Include="src\Command.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
