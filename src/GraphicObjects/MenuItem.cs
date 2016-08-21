@@ -57,7 +57,7 @@ namespace Crow
 			}
 		}
 
-		Menu MenuRoot {
+		[XmlIgnore]Menu MenuRoot {
 			get {
 				ILayoutable tmp = Parent;
 				while (tmp != null) {

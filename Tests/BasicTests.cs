@@ -127,7 +127,7 @@ namespace Tests
 				w.DataSource = this;
 				return;
 			}else if (e.Key == OpenTK.Input.Key.F6) {
-				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/imlEditor.crow");
+				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/0.crow");
 				w.DataSource = this;
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F2)

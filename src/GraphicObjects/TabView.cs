@@ -26,6 +26,7 @@ using System.Diagnostics;
 
 namespace Crow
 {
+	//TODO:use TemplatedGroup
 	public class TabView : Group
 	{
 		#region Private fields
