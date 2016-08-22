@@ -748,10 +748,6 @@ namespace Crow
 
 		#region Layouting
 
-		#if DEBUG_LAYOUTING
-		public List<LayoutingQueueItem> CurrentDrawLQIs = null;
-		public List<List<LayoutingQueueItem>> LQIs = new List<List<LayoutingQueueItem>>();
-		#endif
 		/// <summary> return size of content + margins </summary>
 		protected virtual int measureRawSize (LayoutingType lt) {
 			return lt == LayoutingType.Width ?
@@ -802,8 +798,8 @@ namespace Crow
 		public virtual void OnLayoutChanges(LayoutingType  layoutType)
 		{
 			#if DEBUG_LAYOUTING
-			LayoutingQueueItem.currentLQI.Slot = LastSlots;
-			LayoutingQueueItem.currentLQI.NewSlot = Slot;
+			CurrentInterface.currentLQI.Slot = LastSlots;
+			CurrentInterface.currentLQI.NewSlot = Slot;
 			#endif
 
 			switch (layoutType) {
@@ -1031,12 +1027,6 @@ namespace Crow
 				return;
 
 			LastPaintedSlot = Slot;
-			#if DEBUG_LAYOUTING
-			if (CurrentDrawLQIs != null){
-				LQIs.Add (CurrentDrawLQIs);
-				CurrentDrawLQIs = null;
-			}
-			#endif
 
 			if (cacheEnabled) {
 				if (Slot.Width > Interface.MaxCacheSize || Slot.Height > Interface.MaxCacheSize)

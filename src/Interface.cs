@@ -320,7 +320,16 @@ namespace Crow
 		}
 		#endregion
 
-
+		#if DEBUG_LAYOUTING
+		public List<LQIList> LQIsTries = new List<LQIList>();
+		public LQIList curLQIsTries = new LQIList();
+		public List<LQIList> LQIs = new List<LQIList>();
+		public LQIList curLQIs = new LQIList();
+//		public static LayoutingQueueItem[] MultipleRunsLQIs {
+//			get { return curUpdateLQIs.Where(l=>l.LayoutingTries>2 || l.DiscardCount > 0).ToArray(); }
+//		}
+		public LayoutingQueueItem currentLQI = null;
+		#endif
 		public void Update(){
 			if (mouseRepeatCount > 0) {
 				int mc = mouseRepeatCount;
@@ -346,6 +355,15 @@ namespace Crow
 
 			processLayouting ();
 
+			#if DEBUG_LAYOUTING
+			if (curLQIsTries.Count > 0){
+				LQIsTries.Add(curLQIsTries);
+				curLQIsTries = new LQIList();
+				LQIs.Add(curLQIs);
+				curLQIs = new LQIList();
+			}
+			#endif
+
 			clippingRegistration ();
 
 			processDrawing ();
@@ -366,7 +384,14 @@ namespace Crow
 				LayoutingQueueItem lqi = null;
 				while (LayoutingQueue.Count > 0) {
 					lqi = LayoutingQueue.Dequeue ();
+					#if DEBUG_LAYOUTING
+					currentLQI = lqi;
+					curLQIsTries.Add(currentLQI);
+					#endif
 					lqi.ProcessLayouting ();
+					#if DEBUG_LAYOUTING
+					currentLQI = null;
+					#endif
 				}
 				LayoutingQueue = DiscardQueue;
 			}
@@ -496,6 +521,12 @@ namespace Crow
 				g.ClearBinding ();
 				GraphicTree.RemoveAt (0);
 			}
+			#if DEBUG_LAYOUTING
+			LQIsTries = new List<LQIList>();
+			curLQIsTries = new LQIList();
+			LQIs = new List<LQIList>();
+			curLQIs = new LQIList();
+			#endif
 		}
 		public GraphicObject FindByName (string nameToFind)
 		{

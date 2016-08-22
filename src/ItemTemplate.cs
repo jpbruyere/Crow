@@ -51,7 +51,6 @@ namespace Crow
 		#endregion
 
 		public void CreateExpandDelegate (TemplatedControl host){
-			Type dataType = Type.GetType(strDataType);
 			Type hostType = typeof(TemplatedControl);//not sure is the best place to put the dyn method
 			Type evtType = typeof(EventHandler);
 			Type listBoxType = typeof(ListBox);
@@ -105,7 +104,10 @@ namespace Crow
 			il.Emit (OpCodes.Ldarg_1);//get the dataSource of the sender
 			il.Emit (OpCodes.Callvirt, typeof(GraphicObject).GetProperty("DataSource").GetGetMethod ());
 
-			emitGetSubData(il, dataType);
+			if (fetchMethodName != "self"){//special keyword self allows the use of recurent list<<<
+				Type dataType = Type.GetType(strDataType);
+				emitGetSubData(il, dataType);
+			}
 
 			//set 'return' from the fetch method as 'data' of the list
 			il.Emit (OpCodes.Callvirt, piListData.GetSetMethod ());
@@ -124,8 +126,13 @@ namespace Crow
 
 			if (miGetDatas == null) {//in last resort, search among properties
 				PropertyInfo piDatas = dataType.GetProperty (fetchMethodName);
-				if (piDatas == null)
-					throw new Exception ("Fetch data member not found in ItemTemplate: " + fetchMethodName);
+				if (piDatas == null) {
+					FieldInfo fiDatas = dataType.GetField (fetchMethodName);
+					if (fiDatas == null)//and among fields
+						throw new Exception ("Fetch data member not found in ItemTemplate: " + fetchMethodName);
+					il.Emit (OpCodes.Ldfld, fiDatas);
+					return;
+				}
 				miGetDatas = piDatas.GetGetMethod ();
 				if (miGetDatas == null)
 					throw new Exception ("Read only property for fetching data in ItemTemplate: " + fetchMethodName);

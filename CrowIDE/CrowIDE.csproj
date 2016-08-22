@@ -76,6 +76,7 @@
     <Compile Include="src\CrowIDE.cs" />
     <Compile Include="src\ImlVisualEditor.cs" />
     <Compile Include="src\MembersView.cs" />
+    <Compile Include="src\Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />
@@ -89,6 +90,9 @@
     <EmbeddedResource Include="ui\MembersView.template">
       <LogicalName>CrowIDE.MembersView.template</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="ui\bindingExplorer.crow" />
+    <EmbeddedResource Include="ui\bindingExpITemp.crow" />
+    <EmbeddedResource Include="ui\LQIsExplorer.crow" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">

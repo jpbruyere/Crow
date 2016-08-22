@@ -24,6 +24,7 @@ using System.Threading;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.IO;
+using System.Collections.Generic;
 
 namespace CrowIDE
 {
@@ -47,6 +48,9 @@ namespace CrowIDE
 		bool drawGrid;
 		int gridSpacing;
 
+		[XmlIgnore]public List<LQIList> LQIs {
+			get { return imlVE.LQIs; }
+		}
 		[XmlIgnore]public string ImlSource {
 			get { return imlSource; }
 			set {

@@ -23,6 +23,9 @@ using System;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using Crow;
+using System.Reflection;
+using System.Collections.Generic;
+using System.Collections;
 
 namespace CrowIDE
 {
@@ -39,15 +42,42 @@ namespace CrowIDE
 			: base(1024, 800,"UIEditor")
 		{
 		}
+		ImlVisualEditor imlVE;
+		GraphicObject bindingExp, lqisExp;
 
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
 
+			this.KeyDown += CrowIDE_KeyDown;
+
 			//this.CrowInterface.LoadInterface ("#CrowIDE.ui.imlEditor.crow").DataSource = this;
 			//GraphicObject go = this.CrowInterface.LoadInterface (@"ui/test.crow");
 			GraphicObject go = this.CrowInterface.LoadInterface (@"#CrowIDE.ui.imlEditor.crow");
+			imlVE = go.FindByName ("crowContainer") as ImlVisualEditor;
 			go.DataSource = this;
+		}
+
+		void CrowIDE_KeyDown (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
+		{
+			if (e.Key == OpenTK.Input.Key.Escape) {
+				Quit (null, null);
+				return;
+			} else if (e.Key == OpenTK.Input.Key.F5) {
+				if (bindingExp != null) {
+					CrowInterface.DeleteWidget (bindingExp);
+				}
+				bindingExp = CrowInterface.LoadInterface ("#CrowIDE.ui.bindingExplorer.crow");
+				bindingExp.DataSource = imlVE;
+				return;
+			} else if (e.Key == OpenTK.Input.Key.F6) {
+				if (lqisExp != null) {
+					CrowInterface.DeleteWidget (lqisExp);
+				}
+				lqisExp = CrowInterface.LoadInterface ("#CrowIDE.ui.LQIsExplorer.crow");
+				lqisExp.DataSource = imlVE;
+				return;
+			}
 		}
 		protected void onCommandSave(object sender, MouseButtonEventArgs e){
 			System.Diagnostics.Debug.WriteLine("save");

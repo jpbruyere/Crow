@@ -1,0 +1,14 @@
+﻿<?xml version="1.0"?>
+<Window Width="50%" Height="50%" Background="DimGray">
+	<TreeView IsRoot="true" Name="treeView" Data="{GraphicTree}">
+		<ItemTemplate DataType="Crow.GraphicObject">
+			<Label Text="{Name}" Width="Stretched"
+					MouseEnter="{Background=hgradient|0:BlueCrayola|1:Transparent}"
+					MouseLeave="{Background=Transparent}"/>
+		</ItemTemplate>
+		<ItemTemplate DataType="Crow.Container" Data="GetChildren"
+			Path="#CrowIDE.ui.bindingExpITemp.crow"/>
+		<ItemTemplate DataType="Crow.Group" Data="GetChildren"
+			Path="#CrowIDE.ui.bindingExpITemp.crow"/>
+	</TreeView>
+</Window>
