@@ -10,7 +10,7 @@
 				MouseLeave="{Background=Transparent}"/>
 		</HorizontalStack>
 	</ItemTemplate>
-	<ItemTemplate DataType="System.IO.DirectoryInfo" Data="GetFileSystemInfos">		
+	<ItemTemplate DataType="System.IO.DirectoryInfo" Data="GetFileSystemInfos">
 		<Expandable Caption="{Name}" >
 			<Template>
 				<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}">
