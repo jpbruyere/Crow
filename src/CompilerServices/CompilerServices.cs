@@ -16,6 +16,18 @@ namespace Crow
 		static FieldInfo miSetCurIface = typeof(GraphicObject).GetField ("currentInterface",
 			BindingFlags.NonPublic | BindingFlags.Instance);
 
+		#region ValueChange Reflexion member info
+		static MethodInfo stringEquals = typeof (string).GetMethod
+			("Equals", new Type [3] { typeof (string), typeof (string), typeof (StringComparison) });
+		static EventInfo eiValueChange = typeof (IValueChange).GetEvent ("ValueChanged");
+		static MethodInfo miInvokeValueChange = eiValueChange.EventHandlerType.GetMethod ("Invoke");
+		static Type [] argsValueChange = { typeof (object), typeof (object), miInvokeValueChange.GetParameters () [1].ParameterType };
+		static FieldInfo fiNewValue = typeof (ValueChangeEventArgs).GetField ("NewValue");
+		static FieldInfo fiMbName = typeof (ValueChangeEventArgs).GetField ("MemberName");
+		static MethodInfo miValueChangeAdd = eiValueChange.GetAddMethod ();
+		#endregion
+
+
 		public static void emitSetCurInterface(ILGenerator il){
 			il.Emit (OpCodes.Ldloc_0);
 			il.Emit (OpCodes.Ldarg_1);
@@ -196,16 +208,7 @@ namespace Crow
 				b.Resolved = true;
 			}
 
-			MethodInfo stringEquals = typeof (string).GetMethod
-				("Equals", new Type [3] { typeof (string), typeof (string), typeof (StringComparison) });
 			Type target_Type = Bindings [0].Source.Instance.GetType ();
-			EventInfo ei = typeof (IValueChange).GetEvent ("ValueChanged");
-			MethodInfo evtInvoke = ei.EventHandlerType.GetMethod ("Invoke");
-			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
-			Type handlerArgsType = evtParams [1].ParameterType;
-			Type [] args = { typeof (object), typeof (object), handlerArgsType };
-			FieldInfo fiNewValue = typeof (ValueChangeEventArgs).GetField ("NewValue");
-			FieldInfo fiMbName = typeof (ValueChangeEventArgs).GetField ("MemberName");
 
 			//group;only one dynMethods by target (valuechanged event source)
 			//changed value name tested in switch
@@ -228,7 +231,7 @@ namespace Crow
 						MethodAttributes.Family | MethodAttributes.FamANDAssem | MethodAttributes.NewSlot,
 						CallingConventions.Standard,
 						typeof (void),
-						args,
+						argsValueChange,
 						target_Type, true);
 
 					il = dm.GetILGenerator (256);
@@ -376,9 +379,8 @@ namespace Crow
 				il.Emit (OpCodes.Pop);
 				il.Emit (OpCodes.Ret);
 
-				Delegate del = dm.CreateDelegate (ei.EventHandlerType, Bindings [0].Source.Instance);
-				MethodInfo addHandler = ei.GetAddMethod ();
-				addHandler.Invoke (grouped [0].Target.Instance, new object [] { del });
+				Delegate del = dm.CreateDelegate (eiValueChange.EventHandlerType, Bindings [0].Source.Instance);
+				miValueChangeAdd.Invoke (grouped [0].Target.Instance, new object [] { del });
 			}
 		}
 
@@ -588,6 +590,17 @@ namespace Crow
 			} while (curType != null);
 
 			return query;
+		}
+
+		public static MethodInfo SearchExtMethod(Type t, string methodName){
+			MethodInfo mi = null;
+			mi = GetExtensionMethods (Assembly.GetEntryAssembly(), t)
+				.Where (em => em.Name == methodName).FirstOrDefault ();
+			if (mi != null)
+				return mi;
+
+			return GetExtensionMethods (Assembly.GetExecutingAssembly(), t)
+				.Where (em => em.Name == methodName).FirstOrDefault ();
 		}
 	}
 }

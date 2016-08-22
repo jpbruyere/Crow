@@ -132,13 +132,23 @@ namespace Crow
 									path = reader.Value;
 							}
 							reader.MoveToElement ();
-							using (IMLReader iTmp = new IMLReader (null, reader.ReadInnerXml ())) {
-								string uid = Guid.NewGuid ().ToString ();
-								Interface.Instantiators [uid] =
-									new ItemTemplate (iTmp.RootType, iTmp.GetLoader (), dataType, datas);
-								
-								itemTemplateIds.Add (new string[] { dataType, uid, datas });
+
+							string itemTmpID;
+
+							if (string.IsNullOrEmpty (path)) {
+								using (IMLReader iTmp = new IMLReader (null, reader.ReadInnerXml ())) {
+									itemTmpID = Guid.NewGuid ().ToString ();
+									Interface.Instantiators [itemTmpID] =
+										new ItemTemplate (iTmp.RootType, iTmp.GetLoader (), dataType, datas);
+								}
+							}else{
+								if (!reader.IsEmptyElement)
+									throw new Exception ("ItemTemplate with Path attribute may not include sub nodes");
+								itemTmpID = path;
+								Interface.Instantiators [itemTmpID] =
+									new ItemTemplate (itemTmpID, dataType, datas);
 							}
+							itemTemplateIds.Add (new string[] { dataType, itemTmpID, datas });
 						}
 					}
 
