@@ -572,7 +572,7 @@ namespace Crow
 					int i = 0;
 					while (i < idxhw) {
 						if (GraphicTree [i].MouseIsIn (e.Position)) {
-							HoverWidget.onMouseLeave (this, e);
+							HoverWidget.onMouseLeave (HoverWidget, e);
 							GraphicTree [i].checkHoverWidget (e);
 							return true;
 						}
@@ -585,7 +585,7 @@ namespace Crow
 					HoverWidget.checkHoverWidget (e);
 					return true;
 				} else {
-					HoverWidget.onMouseLeave (this, e);
+					HoverWidget.onMouseLeave (HoverWidget, e);
 					//seek upward from last focused graph obj's
 					while (HoverWidget.Parent as GraphicObject != null) {
 						HoverWidget = HoverWidget.Parent as GraphicObject;
@@ -593,7 +593,7 @@ namespace Crow
 							HoverWidget.checkHoverWidget (e);
 							return true;
 						} else
-							HoverWidget.onMouseLeave (this, e);
+							HoverWidget.onMouseLeave (HoverWidget, e);
 					}
 				}
 			}
