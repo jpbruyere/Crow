@@ -54,8 +54,10 @@ namespace Crow
 		#region CTOR
 		public GraphicObject ()
 		{
+			#if DEBUG
 			uid = currentUid;
 			currentUid++;
+			#endif
 		}
 		#endregion
 		internal protected virtual void initialize(){
@@ -65,7 +67,7 @@ namespace Crow
 		LayoutingType registeredLayoutings = LayoutingType.All;
 		ILayoutable logicalParent;
 		ILayoutable parent;
-		string name = "unamed";
+		string name;
 		Fill background = Color.Transparent;
 		Fill foreground = Color.White;
 		Font font = "droid, 10";
@@ -199,14 +201,20 @@ namespace Crow
 				this.RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("unamed")]
+		[XmlAttributeAttribute()][DefaultValue(null)]
 		public virtual string Name {
-			get { return name; }
+			get {
+				#if DEBUG
+				return string.IsNullOrEmpty(name) ? this.GetType().Name + uid.ToString () : name;
+				#else
+				return name;
+				#endif
+			}
 			set {
 				if (name == value)
 					return;
 				name = value;
-				NotifyValueChanged("Name", verticalAlignment);
+				NotifyValueChanged("Name", name);
 			}
 		}
 		[XmlAttributeAttribute	()][DefaultValue(VerticalAlignment.Center)]
@@ -450,14 +458,17 @@ namespace Crow
 				if (!isVisible && this.Contains (CurrentInterface.HoverWidget))
 					CurrentInterface.HoverWidget = null;
 
-				if (Parent is GraphicObject)
-					(Parent as GraphicObject).RegisterForLayouting (LayoutingType.Sizing);
-				if (Parent is GenericStack)
-					(Parent as GraphicObject).RegisterForLayouting (LayoutingType.ArrangeChildren);
-
 				if (isVisible)
 					RegisterForLayouting (LayoutingType.Sizing);
-				CurrentInterface.EnqueueForRepaint (this);
+				else {
+					Slot.Width = 0;
+					LayoutChanged.Raise (this, new LayoutingEventArgs (LayoutingType.Width));
+					Slot.Height = 0;
+					LayoutChanged.Raise (this, new LayoutingEventArgs (LayoutingType.Height));
+					CurrentInterface.EnqueueForRepaint (this);
+					LastSlots.Width = LastSlots.Height = 0;
+				}
+
 
 				NotifyValueChanged ("Visible", isVisible);
 			}
@@ -792,7 +803,7 @@ namespace Crow
 		{
 			#if DEBUG_LAYOUTING
 			LayoutingQueueItem.currentLQI.Slot = LastSlots;
-			LayoutingQueueItem.currentLQI.Slot = Slot;
+			LayoutingQueueItem.currentLQI.NewSlot = Slot;
 			#endif
 
 			switch (layoutType) {
@@ -1200,18 +1211,6 @@ namespace Crow
 		public virtual void onDisable(object sender, EventArgs e){
 			Disabled.Raise (this, e);
 		}
-		public override string ToString ()
-		{
-			string tmp ="";
-
-			if (Parent != null)
-				tmp = Parent.ToString () + tmp;
-			#if DEBUG_LAYOUTING
-			return Name == "unamed" ? tmp + "." + this.GetType ().Name + uid.ToString(): tmp + "." + Name;
-			#else
-			return Name == "unamed" ? tmp + "." + this.GetType ().Name : tmp + "." + Name;
-			#endif
-		}
 
 		#region Binding
 		public void BindMember(string _member, string _expression){
@@ -1488,6 +1487,19 @@ namespace Crow
 			foreach (Binding b in this.bindings)
 				tmp.Bindings.Add (new Binding (new MemberReference (tmp, b.Source.Member), b.Expression));
 			return tmp;
+		}
+
+		public override string ToString ()
+		{
+			string tmp ="";
+
+			if (Parent != null)
+				tmp = Parent.ToString () + tmp;
+			#if DEBUG_LAYOUTING
+			return Name == "unamed" ? tmp + "." + this.GetType ().Name + uid.ToString(): tmp + "." + Name;
+			#else
+			return Name == "unamed" ? tmp + "." + this.GetType ().Name : tmp + "." + Name;
+			#endif
 		}
 	}
 }
