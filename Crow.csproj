@@ -138,7 +138,7 @@
     <Compile Include="src\Instantiator.cs" />
     <Compile Include="src\IMLReader.cs" />
     <Compile Include="src\ItemTemplate.cs" />
-    <Compile Include="Style.cs" />
+    <Compile Include="src\Style.cs" />
     <Compile Include="src\GraphicObjects\Wrapper.cs" />
   </ItemGroup>
   <ItemGroup>
