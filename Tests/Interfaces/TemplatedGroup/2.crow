@@ -1,25 +1,25 @@
 ﻿<?xml version="1.0"?>
-<Container>
-<MenuItem Caption="Menu">
-	<MenuItem Caption="File">
-		<MenuItem Caption="New"></MenuItem>
-		<MenuItem Caption="Open"></MenuItem>
-		<MenuItem Caption="Save"></MenuItem>
-		<MenuItem Caption="Quit"></MenuItem>
-	</MenuItem>
-	<MenuItem Caption="Edit">
-		<MenuItem Caption="Cut"/>
-		<MenuItem Caption="Copy"/>
-		<MenuItem Caption="Paste"/>
-		<MenuItem Caption="Special">
+<Menu>
+	<MenuItem Caption="Menu">
+		<MenuItem Caption="File">
+			<MenuItem Caption="New"></MenuItem>
+			<MenuItem Caption="Open"></MenuItem>
+			<MenuItem Caption="Save"></MenuItem>
+			<MenuItem Caption="Quit"></MenuItem>
+		</MenuItem>
+		<MenuItem Caption="Edit">
 			<MenuItem Caption="Cut"/>
 			<MenuItem Caption="Copy"/>
 			<MenuItem Caption="Paste"/>
+			<MenuItem Caption="Special">
+				<MenuItem Caption="Cut"/>
+				<MenuItem Caption="Copy"/>
+				<MenuItem Caption="Paste"/>
+			</MenuItem>
+		</MenuItem>
+		<MenuItem Caption="Help">
+			<MenuItem Caption="About"/>
+			<MenuItem Caption="Help"/>
 		</MenuItem>
 	</MenuItem>
-	<MenuItem Caption="Help">
-		<MenuItem Caption="About"/>
-		<MenuItem Caption="Help"/>
-	</MenuItem>
-</MenuItem>
-</Container>
+</Menu>

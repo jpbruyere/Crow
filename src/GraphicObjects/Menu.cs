@@ -48,9 +48,9 @@ namespace Crow
 			base.AddItem (g);
 
 			if (orientation == Orientation.Horizontal)
-				g.NotifyValueChanged ("Orientation", Alignment.Bottom);
+				g.NotifyValueChanged ("PopDirection", Alignment.Bottom);
 			else
-				g.NotifyValueChanged ("Orientation", Alignment.Right);
+				g.NotifyValueChanged ("PopDirection", Alignment.Right);
 		}
 	}
 }

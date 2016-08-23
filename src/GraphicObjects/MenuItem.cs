@@ -72,7 +72,7 @@ namespace Crow
 		public override void AddItem (GraphicObject g)
 		{
 			base.AddItem (g);
-			g.NotifyValueChanged ("Orientation", Alignment.Right);
+			g.NotifyValueChanged ("PopDirection", Alignment.Right);
 		}
 
 		void onMI_Click (object sender, MouseButtonEventArgs e)
