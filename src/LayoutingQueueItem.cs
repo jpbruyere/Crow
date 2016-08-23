@@ -142,12 +142,12 @@ namespace Crow
 			#endif
 		}
 	}
-	#if DEBUG_LAYOUTING
 	public class LQIList : List<LayoutingQueueItem>{
+		#if DEBUG_LAYOUTING
 		public List<LayoutingQueueItem> GetRootLQIs(){
 			return this.Where (lqi => lqi.wasTriggeredBy == null).ToList ();
 		}
+		#endif
 	}
-	#endif
 }
 
