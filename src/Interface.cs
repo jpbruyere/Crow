@@ -329,6 +329,8 @@ namespace Crow
 //			get { return curUpdateLQIs.Where(l=>l.LayoutingTries>2 || l.DiscardCount > 0).ToArray(); }
 //		}
 		public LayoutingQueueItem currentLQI = null;
+		#else
+		public List<LQIList> LQIs = null;//still create the var for CrowIDE
 		#endif
 		public void Update(){
 			if (mouseRepeatCount > 0) {
