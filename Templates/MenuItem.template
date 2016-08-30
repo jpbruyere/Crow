@@ -1,15 +1,24 @@
 ﻿<?xml version="1.0"?>
 <Popper Caption="{./Caption}"  Background="{./Background}" PopDirection="{./PopDirection}"
 	Foreground = "{./Foreground}" CanPop="{./HasChildren}" MouseClick="./onMI_Click"
-	Unpop = "{Foreground=LightGray;Background=Transparent}">
+	Unpop = "{Foreground=LightGray;Background=Transparent}"
+	Pop = "{Background = Mantis;Foreground=Jet}"
+	>
 	<Template>
-		<Label Text="{./Caption}"
-			MinimumSize = "120,0"
-			Margin="3" TextAlignment="Left"
-			Height="{./HeightPolicy}" Width="{./WidthPolicy}"
-			Font="{./Font}"
-			Background="{./Background}"
-			Foreground="{./Foreground}"/>
+		<Border Name="border1"
+				MouseEnter="{Foreground=vgradient|0:White|0.2:Gray|0.9:Gray|1:Black}"
+				MouseLeave="{Foreground=Transparent}"
+				MouseDown="{Foreground=vgradient|0:Black|0.05:Gray|0.85:Gray|1:White}"
+				MouseUp="{Foreground=vgradient|0:White|0.2:Gray|0.9:Gray|1:Black}"
+				Height="{./HeightPolicy}" Width="{./WidthPolicy}"
+				MinimumSize = "60,0"
+				Foreground="Transparent"
+				Background="{./Background}">
+			<Label Text="{./Caption}"
+				Foreground="{./Foreground}"
+				Margin="3" HorizontalAlignment="Left"
+				Font="{./Font}"	/>
+		</Border>
 	</Template>
 	<Border Foreground="DimGray" Fit="true">
 		<VerticalStack Name="ItemsContainer" Margin="2" Fit="true" Background="Onyx"/>

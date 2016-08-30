@@ -39,7 +39,6 @@ namespace Crow
 		public virtual void AddItem(GraphicObject g){
 			items.AddChild (g);
 			NotifyValueChanged ("HasChildren", true);
-			//g.LogicalParent = this;
 		}
 		public virtual void RemoveItem(GraphicObject g)
 		{
