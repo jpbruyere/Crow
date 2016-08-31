@@ -54,6 +54,15 @@ namespace Crow
 
 			return Content == null ? null : Content.FindByName (nameToFind);
 		}
+		public override bool Contains (GraphicObject goToFind)
+		{
+			if (Content == null)
+				return base.Contains (goToFind);
+
+			if (Content == goToFind)
+				return true;
+			return Content.Contains (goToFind);
+		}
 		#endregion
 
 		#region IXmlSerialisation Overrides
@@ -66,7 +75,7 @@ namespace Crow
 				//seek for template tag
 				using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
 					xr.Read ();
-					base.ReadXml (xr);		
+					base.ReadXml (xr);
 				}
 				//process content
 				using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
@@ -77,7 +86,7 @@ namespace Crow
 
 						if (!xr.IsStartElement ())
 							continue;
-						
+
 						if (xr.Name == "Template"){
 							xr.Skip ();
 							if (!xr.IsStartElement ())
@@ -94,8 +103,8 @@ namespace Crow
 						}
 						if (t == null)
 							throw new Exception (xr.Name + " type not found");
-						
-						GraphicObject go = (GraphicObject)Activator.CreateInstance (t);                                
+
+						GraphicObject go = (GraphicObject)Activator.CreateInstance (t);
 
 						(go as IXmlSerializable).ReadXml (xr);
 

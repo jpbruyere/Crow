@@ -572,8 +572,15 @@ namespace Crow
 					int i = 0;
 					while (i < idxhw) {
 						if (GraphicTree [i].MouseIsIn (e.Position)) {
-							//set evtarg to null to force mouseLeave without checking mouse pos
-							HoverWidget.onMouseLeave (HoverWidget, null);
+							while (HoverWidget != null) {
+								if (HoverWidget is Popper) {
+									if ((HoverWidget as Popper).Content == GraphicTree[i])
+										break;
+								}
+								HoverWidget.onMouseLeave (HoverWidget, e);
+								HoverWidget = HoverWidget.LogicalParent as GraphicObject;
+							}
+
 							GraphicTree [i].checkHoverWidget (e);
 							return true;
 						}
@@ -587,8 +594,15 @@ namespace Crow
 					return true;
 				} else {
 					HoverWidget.onMouseLeave (HoverWidget, e);
-					if (HoverWidget != null)
-						return true;
+					//seek upward from last focused graph obj's
+					while (HoverWidget.LogicalParent as GraphicObject != null) {
+						HoverWidget = HoverWidget.LogicalParent as GraphicObject;
+						if (HoverWidget.MouseIsIn (e.Position)) {
+							HoverWidget.checkHoverWidget (e);
+							return true;
+						} else
+							HoverWidget.onMouseLeave (HoverWidget, e);
+					}
 				}
 			}
 

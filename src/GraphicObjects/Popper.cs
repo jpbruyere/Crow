@@ -27,11 +27,11 @@ using OpenTK.Input;
 namespace Crow
 {
     public class Popper : TemplatedContainer
-    {		
+    {
 		#region CTOR
 		public Popper() : base()
 		{
-		}	
+		}
 		#endregion
 
 		bool _isPopped, _canPop;
@@ -45,11 +45,11 @@ namespace Crow
 		#region Public Properties
 		[XmlAttributeAttribute()][DefaultValue("Popper")]
 		public string Caption {
-			get { return caption; } 
+			get { return caption; }
 			set {
 				if (caption == value)
 					return;
-				caption = value; 
+				caption = value;
 				NotifyValueChanged ("Caption", caption);
 			}
 		}
@@ -99,14 +99,13 @@ namespace Crow
 
 		public override GraphicObject Content {
 			get { return _content; }
-			set { 
+			set {
 				if (_content != null) {
 					_content.LogicalParent = null;
 					_content.LayoutChanged -= _content_LayoutChanged;
-					_content.MouseLeave -= onMouseLeave;
 				}
-				
-				_content = value; 
+
+				_content = value;
 
 				if (_content == null)
 					return;
@@ -115,7 +114,6 @@ namespace Crow
 				_content.HorizontalAlignment = HorizontalAlignment.Left;
 				_content.VerticalAlignment = VerticalAlignment.Top;
 				_content.LayoutChanged += _content_LayoutChanged;
-				_content.MouseLeave += onMouseLeave;
 			}
 		}
 
@@ -172,9 +170,9 @@ namespace Crow
 
 			if (_content == null)
 				return;
-			
+
 			if (layoutType == LayoutingType.Width)
-				_content.MinimumSize = new Size (this.Slot.Width, _content.MinimumSize.Height);			
+				_content.MinimumSize = new Size (this.Slot.Width, _content.MinimumSize.Height);
 		}
 
 		public override void ClearBinding ()
@@ -201,11 +199,21 @@ namespace Crow
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
-			base.onMouseLeave (sender, e);
-			IsPopped = false;
+			if (!_isPopped || _content == null) {
+				base.onMouseLeave (sender, e);
+				System.Diagnostics.Debug.WriteLine ("NotPopped***popper mouse leave:"+ this.ToString());
+				return;
+			}
+
+			if (!_content.MouseIsIn (e.Position)) {
+				base.onMouseLeave (sender, e);
+				System.Diagnostics.Debug.WriteLine ("***popper mouse leave:"+ this.ToString());
+				IsPopped = false;
+				return;
+			}
 		}
 		#endregion
-			
+
 		public virtual void onPop(object sender, EventArgs e)
 		{
 			if (Content != null) {

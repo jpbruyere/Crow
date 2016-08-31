@@ -38,6 +38,16 @@ namespace Crow
 				NotifyValueChanged ("Orientation", orientation);
 			}
 		}
+		bool isOpened = false;
+		public bool IsOpened
+		{
+			get { return isOpened; }
+			set
+			{
+				isOpened = value;
+				System.Diagnostics.Debug.WriteLine ("is opened = " + isOpened);
+			}
+		}
 
 		public Menu () : base()
 		{
@@ -52,5 +62,11 @@ namespace Crow
 			else
 				g.NotifyValueChanged ("PopDirection", Alignment.Right);
 		}
+		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
+		{
+			base.onMouseLeave (sender, e);
+			IsOpened = false;
+		}
 	}
 }
+

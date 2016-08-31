@@ -26,6 +26,8 @@ MenuItem {
 	Width = Fit;
 	Background = Transparent;
 	Foreground = LightGray;
+	Open = {Background = Mantis;Foreground=Jet;}
+	Close = {Foreground=LightGray;Background=Transparent;}
 }
 MessageBox {
 	Width=200;

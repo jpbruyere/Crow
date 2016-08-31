@@ -30,12 +30,34 @@ namespace Crow
 		public MenuItem () : base() {}
 		#endregion
 
+		public event EventHandler Open;
+		public event EventHandler Close;
 		public event EventHandler Execute;
 
 		string caption;
 		Command command;//TODO
+		bool isOpened;
 
-		[XmlAttributeAttribute()][DefaultValue(null)]
+		[XmlAttributeAttribute][DefaultValue(false)]
+		public bool IsOpened {
+			//get { return MenuRoot == null ? false : MenuRoot.IsOpened; }
+			get { return isOpened; }
+			set {
+				if (isOpened == value)
+					return;
+				isOpened = value;
+				NotifyValueChanged ("IsOpened", isOpened);
+
+				if (isOpened) {
+					onOpen (this, null);
+					if (MenuRoot != null)
+						MenuRoot.IsOpened = true;
+				}else
+					onClose (this, null);
+			}
+		}
+
+		[XmlAttributeAttribute][DefaultValue(null)]
 		public virtual Command Command {
 			get { return command; }
 			set {
@@ -59,11 +81,11 @@ namespace Crow
 
 		[XmlIgnore]Menu MenuRoot {
 			get {
-				ILayoutable tmp = Parent;
+				ILayoutable tmp = LogicalParent;
 				while (tmp != null) {
 					if (tmp is Menu)
 						return tmp as Menu;
-					tmp = tmp.Parent;
+					tmp = tmp.LogicalParent;
 				}
 				return null;
 			}
@@ -78,6 +100,21 @@ namespace Crow
 		void onMI_Click (object sender, MouseButtonEventArgs e)
 		{
 			Execute.Raise (this, null);
+		}
+		void onOpen (object sender, EventArgs e){
+			MenuRoot.IsOpened = true;
+			Open.Raise (this, null);
+		}
+		void onClose (object sender, EventArgs e){
+			//MenuRoot.IsOpened = true;
+			Close.Raise (this, null);
+		}
+		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
+		{
+			base.onMouseEnter (sender, e);
+			if (MenuRoot == null || Items.Count == 0)
+				return;
+			IsOpened = MenuRoot.IsOpened;
 		}
 	}
 }

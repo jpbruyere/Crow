@@ -1176,17 +1176,6 @@ namespace Crow
 			Debug.WriteLine("MouseLeave => " + this.ToString());
 			#endif
 			MouseLeave.Raise (this, e);
-
-			GraphicObject p = Parent as GraphicObject;
-			CurrentInterface.HoverWidget = p;
-
-			if (p == null)
-				return;
-
-			if (p.MouseIsIn (e.Position)&&e!=null)
-				p.checkHoverWidget (e);
-			else
-				p.onMouseLeave (sender, e);
 		}
 		#endregion
 

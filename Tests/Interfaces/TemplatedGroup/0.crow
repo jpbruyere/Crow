@@ -6,11 +6,16 @@
 		<MenuItem Caption="Save"/>
 		<MenuItem Caption="Quit"/>
 	</MenuItem>
-	<MenuItem Caption="Edit">
+	<MenuItem Caption="Edit" Name="edit">
 		<MenuItem Caption="Cut"/>
 		<MenuItem Caption="Copy"/>
 		<MenuItem Caption="Paste"/>
-		<MenuItem Caption="Special">
+		<MenuItem Caption="Special" Name="special">
+			<MenuItem Caption="Cut"/>
+			<MenuItem Caption="Copy"/>
+			<MenuItem Caption="Paste"/>
+		</MenuItem>
+		<MenuItem Caption="Special2" Name="special">
 			<MenuItem Caption="Cut"/>
 			<MenuItem Caption="Copy"/>
 			<MenuItem Caption="Paste"/>

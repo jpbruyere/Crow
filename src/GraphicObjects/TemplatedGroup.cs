@@ -87,7 +87,7 @@ namespace Crow
 				if (w.Contains (goToFind))
 					return true;
 			}
-			return false;
+			return base.Contains(goToFind);
 		}
 //		public override void ClearBinding ()
 //		{
