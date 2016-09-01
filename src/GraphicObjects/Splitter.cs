@@ -138,15 +138,15 @@ namespace Crow
 			if (gs.Orientation == Orientation.Horizontal) {
 				newDelta -= e.XDelta;
 				if (size1 < 0)
-					size1 = go1.Slot.Width;
+					size1 = go1.Slot.Width + delta;
 				if (size2 < 0)
-					size2 = go2.Slot.Width;
+					size2 = go2.Slot.Width - delta;
 			} else {
 				newDelta -= e.YDelta;
 				if (size1 < 0)
-					size1 = go1.Slot.Height;
+					size1 = go1.Slot.Height + delta;
 				if (size2 < 0)
-					size2 = go2.Slot.Height;
+					size2 = go2.Slot.Height - delta;
 			}
 
 			if (size1 - newDelta < min1 || (max1 > 0 && size1 - newDelta > max1) ||
