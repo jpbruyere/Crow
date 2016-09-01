@@ -100,9 +100,11 @@ namespace Tests
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Stack", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Wrapper", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Splitter", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Expandable", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Splitter", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/TemplatedControl", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/TemplatedContainer", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/TemplatedGroup", "*.crow")).ToArray ();
 
 			this.Title = testFiles [idx] + ". Press <F3> to switch example.";
 			CrowInterface.LoadInterface(testFiles[idx]).DataSource = this;
@@ -117,15 +119,15 @@ namespace Tests
 				NotifyValueChanged ("TestList", TestList);
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F4) {
-				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/testWindow.goml");
+				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/TemplatedContainer/testWindow.goml");
 				w.DataSource = this;
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F5) {
-				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/testWindow2.goml");
+				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/TemplatedContainer/testWindow2.goml");
 				w.DataSource = this;
 				return;
 			}else if (e.Key == OpenTK.Input.Key.F6) {
-				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/imlEditor.crow");
+				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/0.crow");
 				w.DataSource = this;
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F2)
@@ -196,6 +198,9 @@ namespace Tests
 			base.OnUpdateFrame (e);
 			string test = e.Time.ToString ();
 			NotifyValueChanged ("PropertyLessBinding", test);
+		}
+		void onNew(object sender, EventArgs e){
+			Debug.WriteLine ("menu new clicked");
 		}
 	}
 }

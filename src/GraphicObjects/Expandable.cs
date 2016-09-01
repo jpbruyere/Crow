@@ -63,6 +63,7 @@ namespace Crow
 				NotifyValueChanged ("HasContent", HasContent);
 			}
 		}
+		//TODO: move loadTemplate and ResolveBinding in TemplatedContainer
 		protected override void loadTemplate(GraphicObject template = null)
 		{
 			base.loadTemplate (template);

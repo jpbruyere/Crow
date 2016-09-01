@@ -116,7 +116,7 @@ namespace Crow
 		/// This size is computed on each child' layout changes.
 		/// In stacking widget, it is used to compute the remaining space for the stretched
 		/// widget inside the stack, which is never added to the contentSize, instead, its size
-		/// is deducted from (parent.ClientRectangle - contentSize) 
+		/// is deducted from (parent.ClientRectangle - contentSize)
 		/// </summary>
 		internal Size contentSize;
 		#endregion
@@ -600,7 +600,7 @@ namespace Crow
 			if (string.IsNullOrEmpty (styleKey))
 				styleKey = thisType.FullName;
 
-			
+
 			//Reflexion being very slow compared to dyn method or delegates,
 			//I compile the initial values coded in the CustomAttribs of the class,
 			//all other instance of this type would not longer use reflexion to init properly
@@ -1140,12 +1140,11 @@ namespace Crow
 			if (Interface.clickTimer.ElapsedMilliseconds > 0 &&
 			    Interface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick) {
 				Interface.clickTimer.Reset ();
-				Debug.WriteLine ("double click");
 				onMouseDoubleClick (this, e);
 				return;
 			} else
 				Interface.clickTimer.Restart ();
-			
+
 			GraphicObject p = Parent as GraphicObject;
 			if (p != null)
 				p.onMouseClick(sender,e);
@@ -1160,7 +1159,7 @@ namespace Crow
 		public virtual void onMouseWheel(object sender, MouseWheelEventArgs e){
 			GraphicObject p = Parent as GraphicObject;
 			if (p != null)
-				p.onMouseWheel(this,e);
+				p.onMouseWheel(sender,e);
 
 			MouseWheelChanged.Raise (this, e);
 		}
@@ -1356,7 +1355,7 @@ namespace Crow
 		}
 		public virtual void ReadXml (System.Xml.XmlReader reader)
 		{
-			if (reader.HasAttributes) {				
+			if (reader.HasAttributes) {
 
 				style = reader.GetAttribute ("Style");
 

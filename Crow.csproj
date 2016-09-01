@@ -140,6 +140,10 @@
     <Compile Include="src\ItemTemplate.cs" />
     <Compile Include="src\Style.cs" />
     <Compile Include="src\GraphicObjects\Wrapper.cs" />
+    <Compile Include="src\GraphicObjects\TemplatedGroup.cs" />
+    <Compile Include="src\GraphicObjects\MenuItem.cs" />
+    <Compile Include="src\GraphicObjects\Menu.cs" />
+    <Compile Include="src\Command.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -265,6 +269,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Images\Icons\Cursors\ibeam" />
     <EmbeddedResource Include="Templates\treeList.crow" />
+    <EmbeddedResource Include="Templates\MenuItem.template">
+      <LogicalName>Crow.MenuItem.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Menu.template">
+      <LogicalName>Crow.Menu.template</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

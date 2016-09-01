@@ -107,6 +107,7 @@ namespace Crow
 
 			il.Emit (OpCodes.Ldloc_0);//save current go onto the stack if child has to be added
 
+			#region Template and TemplateItems loading
 			if (typeof(TemplatedControl).IsAssignableFrom (crowType)) {
 				//if its a template, first read template elements
 				using (IMLReader reader = new IMLReader (il, tmpXml)) {
@@ -188,10 +189,12 @@ namespace Crow
 					}
 				}
 			}
+			#endregion
 
 			using (IMLReader reader = new IMLReader(il,tmpXml)){
 				reader.Read ();
 
+				#region Styling and default values loading
 				if (reader.HasAttributes) {
 					string style = reader.GetAttribute ("Style");
 					if (!string.IsNullOrEmpty (style)) {
@@ -201,7 +204,9 @@ namespace Crow
 				}
 				reader.il.Emit (OpCodes.Ldloc_0);
 				reader.il.Emit (OpCodes.Callvirt, typeof(GraphicObject).GetMethod ("loadDefaultValues"));
+				#endregion
 
+				#region Attributes reading
 				if (reader.HasAttributes) {
 
 					MethodInfo miAddBinding = typeof(GraphicObject).GetMethod ("BindMember");
@@ -229,6 +234,7 @@ namespace Crow
 					}
 					reader.MoveToElement ();
 				}
+				#endregion
 
 				if (reader.IsEmptyElement) {
 					reader.il.Emit (OpCodes.Pop);//pop saved ref to current object
@@ -253,7 +259,7 @@ namespace Crow
 				case XmlNodeType.Element:
 					//Templates
 					if (reader.Name == "Template" ||
-						reader.Name == "ItemTemplate") {
+					    reader.Name == "ItemTemplate") {
 						reader.Skip ();
 						continue;
 					}
@@ -263,16 +269,18 @@ namespace Crow
 							miAddChild = typeof(Group).GetMethod ("AddChild");
 						else if (typeof(Container).IsAssignableFrom (crowType))
 							miAddChild = typeof(Container).GetMethod ("SetChild");
-						else if (typeof(TemplatedContainer).IsAssignableFrom (crowType)&&!templateLoading)
-							miAddChild = typeof(TemplatedContainer).GetProperty("Content").GetSetMethod();
+						else if (typeof(TemplatedContainer).IsAssignableFrom (crowType) && !templateLoading)
+							miAddChild = typeof(TemplatedContainer).GetProperty ("Content").GetSetMethod ();
+						else if (typeof(TemplatedGroup).IsAssignableFrom (crowType) && !templateLoading)
+							miAddChild = typeof(TemplatedGroup).GetMethod ("AddItem",
+								BindingFlags.Instance | BindingFlags.Public);
 						else if (typeof(TemplatedControl).IsAssignableFrom (crowType))
 							miAddChild = typeof(TemplatedControl).GetMethod ("loadTemplate",
-								BindingFlags.Instance | BindingFlags.NonPublic);						
+								BindingFlags.Instance | BindingFlags.NonPublic);
 						else if (typeof(PrivateContainer).IsAssignableFrom (crowType))
 							miAddChild = typeof(PrivateContainer).GetMethod ("SetChild",
 								BindingFlags.Instance | BindingFlags.NonPublic);
 					}
-
 					//push current instance on stack for parenting
 					//loc_0 will be used for child
 					reader.il.Emit (OpCodes.Ldloc_0);
@@ -288,13 +296,15 @@ namespace Crow
 					if (t == null)
 						throw new Exception (reader.Name + " type not found");
 
-					reader.il.Emit(OpCodes.Newobj, t.GetConstructors () [0]);//TODO:search parameterless ctor
+					reader.il.Emit (OpCodes.Newobj, t.GetConstructors () [0]);//TODO:search parameterless ctor
 					reader.il.Emit (OpCodes.Stloc_0);//child is now loc_0
 					CompilerServices.emitSetCurInterface (il);
 
-					reader.emitLoader(t);
+					reader.emitLoader (t);
 
 					reader.il.Emit (OpCodes.Ldloc_0);//load child on stack for parenting
+					if (miAddChild == null)
+						System.Diagnostics.Debugger.Break ();
 					reader.il.Emit (OpCodes.Callvirt, miAddChild);
 					reader.il.Emit (OpCodes.Stloc_0); //reset local to current go
 					reader.il.Emit (OpCodes.Ldloc_0);//save current go onto the stack if child has to be added

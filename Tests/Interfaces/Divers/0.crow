@@ -94,6 +94,7 @@
 				<Button Caption="Button" IsEnabled="false"/>
 			</HorizontalStack>
 		</VerticalStack>
+		<Splitter/>
 		<VerticalStack Width="33%" Margin="5" Spacing="5">
 			<Expandable Background="DimGray">
 				<Image Path="#Crow.Images.Icons.crow.svg"/>
@@ -136,6 +137,7 @@
 			</TabView>
 			<MessageBox Movable="false"/>
 		</VerticalStack>
+		<Splitter/>
 		<VerticalStack Width="33%" Margin="5">
 			<Border Margin="5" Background="Onyx" Height="Fit">
 				<Label Width="Stretched" Margin="1" Text="{../../dv.SelectedItem}"/>
@@ -143,6 +145,7 @@
 			<Border Margin="5" Background="Onyx" Height="50%">
 				<DirectoryView Name="dv" Root="./" Margin="1"/>
 			</Border>
+			<Splitter/>
 			<ListBox Data="{TestList}" Background="Onyx" Margin="5"
 					 ItemTemplate="#Tests.Interfaces.colorItem.crow"
 					 Template="#Crow.Templates.ScrollingListBox.goml"/>

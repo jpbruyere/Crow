@@ -22,47 +22,86 @@ using System;
 using System.Xml.Serialization;
 using System.Xml;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace Crow
 {
-	public abstract class TemplatedContainer : TemplatedControl
+	public abstract class TemplatedGroup : TemplatedControl
 	{
 		#region CTOR
-		public TemplatedContainer () : base(){}
+		public TemplatedGroup () : base(){}
 		#endregion
 
-		[XmlIgnore]public abstract GraphicObject Content{ get; set;}
+		protected Group items;
+
+		public virtual List<GraphicObject> Items{ get { return items.Children; }}
+
+		public virtual void AddItem(GraphicObject g){
+			items.AddChild (g);
+			NotifyValueChanged ("HasChildren", true);
+		}
+		public virtual void RemoveItem(GraphicObject g)
+		{
+			items.RemoveChild (g);
+			if (items.Children.Count == 0)
+				NotifyValueChanged ("HasChildren", false);
+		}
+
+		public virtual void ClearItems()
+		{
+			items.ClearChildren ();
+			NotifyValueChanged ("HasChildren", false);
+		}
+
+		protected override void loadTemplate(GraphicObject template = null)
+		{
+			base.loadTemplate (template);
+
+			items = this.child.FindByName ("ItemsContainer") as Group;
+			if (items == null)
+				throw new Exception ("TemplatedGroup template Must contain a Group named 'ItemsContainer'");
+			if (items.Children.Count == 0)
+				NotifyValueChanged ("HasChildren", false);
+			else
+				NotifyValueChanged ("HasChildren", true);
+		}
 
 		#region GraphicObject overrides
-		public override void ClearBinding ()
-		{
-			if (Content != null)
-				Content.ClearBinding ();
-
-			base.ClearBinding ();
-		}
-//		public override void ResolveBindings ()
-//		{
-//			base.ResolveBindings ();
-//			if (Content != null)
-//				Content.ResolveBindings ();
-//		}
 		public override GraphicObject FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)
 				return this;
 
-			return Content == null ? null : Content.FindByName (nameToFind);
+			foreach (GraphicObject w in Items) {
+				GraphicObject r = w.FindByName (nameToFind);
+				if (r != null)
+					return r;
+			}
+			return null;
 		}
 		public override bool Contains (GraphicObject goToFind)
 		{
-			if (Content == null)
-				return base.Contains (goToFind);
-
-			if (Content == goToFind)
-				return true;
-			return Content.Contains (goToFind);
+			foreach (GraphicObject w in Items) {
+				if (w == goToFind)
+					return true;
+				if (w.Contains (goToFind))
+					return true;
+			}
+			return base.Contains(goToFind);
 		}
+//		public override void ClearBinding ()
+//		{
+//			if (items != null)
+//				items.ClearBinding ();
+//
+//			base.ClearBinding ();
+//		}
+//		public override void ResolveBindings ()
+//		{
+//			base.ResolveBindings ();
+//			if (items != null)
+//				items.ResolveBindings ();
+//		}
 		#endregion
 
 		#region IXmlSerialisation Overrides
@@ -87,7 +126,7 @@ namespace Crow
 						if (!xr.IsStartElement ())
 							continue;
 
-						if (xr.Name == "Template"){
+						if (xr.Name == "Template" || Name == "ItemTemplate"){
 							xr.Skip ();
 							if (!xr.IsStartElement ())
 								continue;
@@ -108,7 +147,7 @@ namespace Crow
 
 						(go as IXmlSerializable).ReadXml (xr);
 
-						Content = go;
+						AddItem (go);
 
 						xr.Read (); //closing tag
 					}
@@ -118,16 +157,8 @@ namespace Crow
 		}
 		public override void WriteXml(System.Xml.XmlWriter writer)
 		{
-			base.WriteXml(writer);
-
-			if (Content == null)
-				return;
-			//TODO: if template is not the default one, we have to save it
-			writer.WriteStartElement(Content.GetType().Name);
-			(Content as IXmlSerializable).WriteXml(writer);
-			writer.WriteEndElement();
+			throw new NotImplementedException ();
 		}
 		#endregion
 	}
 }
-

@@ -467,7 +467,7 @@ namespace Crow
 			g.Parent = this;
 			GraphicTree.Insert (0, g);
 			g.RegisteredLayoutings = LayoutingType.None;
-			g.RegisterForLayouting (LayoutingType.Sizing);
+			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
 		public void DeleteWidget(GraphicObject g)
 		{
@@ -572,7 +572,15 @@ namespace Crow
 					int i = 0;
 					while (i < idxhw) {
 						if (GraphicTree [i].MouseIsIn (e.Position)) {
-							HoverWidget.onMouseLeave (this, e);
+							while (HoverWidget != null) {
+								if (HoverWidget is Popper) {
+									if ((HoverWidget as Popper).Content == GraphicTree[i])
+										break;
+								}
+								HoverWidget.onMouseLeave (HoverWidget, e);
+								HoverWidget = HoverWidget.LogicalParent as GraphicObject;
+							}
+
 							GraphicTree [i].checkHoverWidget (e);
 							return true;
 						}
@@ -585,27 +593,29 @@ namespace Crow
 					HoverWidget.checkHoverWidget (e);
 					return true;
 				} else {
-					HoverWidget.onMouseLeave (this, e);
+					HoverWidget.onMouseLeave (HoverWidget, e);
 					//seek upward from last focused graph obj's
-					while (HoverWidget.Parent as GraphicObject != null) {
-						HoverWidget = HoverWidget.Parent as GraphicObject;
+					while (HoverWidget.LogicalParent as GraphicObject != null) {
+						HoverWidget = HoverWidget.LogicalParent as GraphicObject;
 						if (HoverWidget.MouseIsIn (e.Position)) {
 							HoverWidget.checkHoverWidget (e);
 							return true;
 						} else
-							HoverWidget.onMouseLeave (this, e);
+							HoverWidget.onMouseLeave (HoverWidget, e);
 					}
 				}
 			}
 
 			//top level graphic obj's parsing
-			for (int i = 0; i < GraphicTree.Count; i++) {
-				GraphicObject g = GraphicTree[i];
-				if (g.MouseIsIn (e.Position)) {
-					g.checkHoverWidget (e);
-					if (g is Window)
-						PutOnTop (g);
-					return true;
+			lock (GraphicTree) {
+				for (int i = 0; i < GraphicTree.Count; i++) {
+					GraphicObject g = GraphicTree [i];
+					if (g.MouseIsIn (e.Position)) {
+						g.checkHoverWidget (e);
+						if (g is Window)
+							PutOnTop (g);
+						return true;
+					}
 				}
 			}
 			HoverWidget = null;

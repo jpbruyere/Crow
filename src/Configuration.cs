@@ -25,6 +25,7 @@ using System.Collections.Generic;
 
 namespace Crow
 {
+	//TODO:maybe create iterator
 	public static class Configuration
 	{
 		static string configPath, configFileName = "app.config";

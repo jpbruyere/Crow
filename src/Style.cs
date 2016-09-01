@@ -25,7 +25,7 @@ namespace Crow
 {
 	public class Style : Dictionary<string, object>
 	{
-		public Dictionary<string, Style> SubStyles;
+		public Dictionary<string, Style> SubStyles;//TODO:implement substyles for all tags inside a style
 		public Style () : base()
 		{
 		}
