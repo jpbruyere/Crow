@@ -143,7 +143,7 @@
 				<Label Width="Stretched" Margin="1" Text="{../../dv.SelectedItem}"/>
 			</Border>
 			<Border Margin="5" Background="Onyx" Height="50%">
-				<DirectoryView Name="dv" Root="./" Margin="1"/>
+				<DirectoryView Name="dv" CurrentDirectory="./" Margin="1"/>
 			</Border>
 			<Splitter/>
 			<ListBox Data="{TestList}" Background="Onyx" Margin="5"

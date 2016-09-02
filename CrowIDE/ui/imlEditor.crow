@@ -1,6 +1,23 @@
 ﻿<?xml version="1.0"?>
 <Window Height="99%" Width="99%" >
 	<VerticalStack>
+		<Menu>
+			<MenuItem Caption="File">
+				<MenuItem Caption="New"></MenuItem>
+				<MenuItem Caption="Open"></MenuItem>
+				<MenuItem Caption="Save"></MenuItem>
+				<MenuItem Caption="Quit"></MenuItem>
+			</MenuItem>
+			<MenuItem Caption="Edit">
+				<MenuItem Caption="Cut"/>
+				<MenuItem Caption="Copy"/>
+				<MenuItem Caption="Paste"/>
+			</MenuItem>
+			<MenuItem Caption="Help">
+				<MenuItem Caption="Help"/>
+				<MenuItem Caption="About"/>
+			</MenuItem>
+		</Menu>
 		<HorizontalStack Height="Fit" Margin="2">
 			<Image Style="icon" Path="#CrowIDE.images.save.svg" MouseClick="onCommandSave"/>
 		</HorizontalStack>
@@ -8,10 +25,10 @@
 			<Label Width="Stretched" Margin="1" Text="{../../dv.SelectedItem}"/>
 		</Border>
 		<HorizontalStack>
-			<DirectoryView Name="dv" Root="./" SelectedItemChanged="Tv_SelectedItemChanged"
+			<DirectoryView Name="dv" CurrentDirectory="./" SelectedItemChanged="Tv_SelectedItemChanged"
 				Width="20%" Height="100%" Margin="10"/>
 			<Splitter/>
-			<VerticalStack Width="60%">
+			<VerticalStack Width="Stretched">
 				<ImlVisualEditor Height="60%" Margin="0" MinimumSize="10,10" Foreground="SkyBlue"
 					ImlPath="{../../../dv.SelectedItem}"
 					Name="crowContainer" Background="Onyx"/>
