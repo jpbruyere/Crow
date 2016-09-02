@@ -14,7 +14,7 @@
 				Background="{./Background}">
 			<Label Text="{./Caption}"
 				Foreground="{./Foreground}"
-				Margin="3" HorizontalAlignment="Left"
+				Margin="1" HorizontalAlignment="Left"
 				Font="{./Font}"	/>
 		</Border>
 	</Template>

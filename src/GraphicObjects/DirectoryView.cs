@@ -37,8 +37,8 @@ namespace Crow
 		public event EventHandler<SelectionChangeEventArgs> SelectedItemChanged;
 		#endregion
 
-		string _root = "/";
-		bool _showFiles;
+		string currentDirectory = "/";
+		bool showFiles;
 
 		object _selectedItem;
 		[XmlIgnore]public object SelectedItem {
@@ -52,29 +52,33 @@ namespace Crow
 				NotifyValueChanged ("SelectedItem", _selectedItem);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(true)]
+		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool ShowFiles {
-			get { return _showFiles; }
+			get { return showFiles; }
 			set {
-				if (_showFiles == value)
+				if (showFiles == value)
 					return;
-				_showFiles = value;
-				NotifyValueChanged ("ShowFiles", _showFiles);
+				showFiles = value;
+				NotifyValueChanged ("ShowFiles", showFiles);
+				NotifyValueChanged ("FileSystemEntries", FileSystemEntries);
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue("/")]
-		public virtual string Root {
-			get { return _root; }
+		public virtual string CurrentDirectory {
+			get { return currentDirectory; }
 			set {
-				if (_root == value)
+				if (currentDirectory == value)
 					return;
-				_root = value;
-				NotifyValueChanged ("Root", _root);
-				NotifyValueChanged ("CurrentDirectory", CurrentDirectory);
+				currentDirectory = value;
+				NotifyValueChanged ("CurrentDirectory", currentDirectory);
+				NotifyValueChanged ("FileSystemEntries", FileSystemEntries);
 			}
 		}
-		[XmlIgnore]public FileSystemInfo[] CurrentDirectory {
-			get { return new DirectoryInfo (Root).GetFileSystemInfos (); }
+		[XmlIgnore]public FileSystemInfo[] FileSystemEntries {
+			get { 
+				return showFiles ? new DirectoryInfo (CurrentDirectory).GetFileSystemInfos ():
+					new DirectoryInfo(currentDirectory).GetDirectories(); 
+			}
 		}
 		public void onSelectedItemChanged (object sender, SelectionChangeEventArgs e){
 			if (e.NewValue == SelectedItem)
