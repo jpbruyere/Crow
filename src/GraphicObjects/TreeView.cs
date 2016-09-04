@@ -27,7 +27,7 @@ namespace Crow
 {
 	//treeview expect expandable child (or not)
 	//if their are expandable, some functions and events are added
-	public class TreeView : ListBox
+	public class TreeView : TemplatedGroup
 	{
 		GraphicObject selectedItemContainer = null;
 		Color selBackground;

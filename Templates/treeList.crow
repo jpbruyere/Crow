@@ -1,3 +1,3 @@
 <?xml version="1.0"?>
 <VerticalStack
-	Height="Fit" Width="{../WidthPolicy}" Name="List"/>
+	Height="Fit" Width="{../WidthPolicy}" Name="ItemsContainer"/>

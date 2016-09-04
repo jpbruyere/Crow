@@ -46,9 +46,6 @@ namespace Crow
 		}
 
 		string _template;
-		string _itemTemplate;
-		public Dictionary<string, ItemTemplate> ItemTemplates = new Dictionary<string, Crow.ItemTemplate>();//TODO: dont instantiate if not used
-																									//but then i should test if null in msil gen
 		[XmlAttributeAttribute][DefaultValue(null)]
 		public string Template {
 			get { return _template; }
@@ -63,19 +60,7 @@ namespace Crow
 					loadTemplate (CurrentInterface.Load (_template));
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ItemTemplate.goml")]
-		public string ItemTemplate {
-			get { return _itemTemplate; }
-			set {
-				if (value == _itemTemplate)
-					return;
 
-				_itemTemplate = value;
-
-				//TODO:reload list with new template?
-				NotifyValueChanged("ItemTemplate", _itemTemplate);
-			}
-		}
 		#region GraphicObject overrides
 		public override GraphicObject FindByName (string nameToFind)
 		{
@@ -86,7 +71,7 @@ namespace Crow
 		{
 			//onDraw is overrided to prevent default drawing of background, template top container
 			//may have a binding to root background or a fixed one.
-			//this allow applying root background to random template component
+			//this allow applying root background to random template's component
 			gr.Save ();
 
 			if (ClipToClientRect) {
@@ -113,6 +98,7 @@ namespace Crow
 			this.ResolveBindings ();
 		}
 
+		//TODO:IXmlSerializable is not used anymore
 		#region IXmlSerializable
 		public override System.Xml.Schema.XmlSchema GetSchema(){ return null; }
 		public override void ReadXml(System.Xml.XmlReader reader)
@@ -151,15 +137,15 @@ namespace Crow
 								xr.MoveToElement ();
 								itemTmp = xr.ReadInnerXml ();
 
-								if (ItemTemplates == null)
-									ItemTemplates = new Dictionary<string, ItemTemplate> ();
-
-								using (IMLReader iTmp = new IMLReader (null, itemTmp)) {
-									ItemTemplates [dataType] =
-										new ItemTemplate (iTmp.RootType, iTmp.GetLoader (), dataType, datas);
-								}
-								if (!string.IsNullOrEmpty (datas))
-									ItemTemplates [dataType].CreateExpandDelegate(this);
+//								if (ItemTemplates == null)
+//									ItemTemplates = new Dictionary<string, ItemTemplate> ();
+//
+//								using (IMLReader iTmp = new IMLReader (null, itemTmp)) {
+//									ItemTemplates [dataType] =
+//										new ItemTemplate (iTmp.RootType, iTmp.GetLoader (), dataType, datas);
+//								}
+//								if (!string.IsNullOrEmpty (datas))
+//									ItemTemplates [dataType].CreateExpandDelegate(this);
 
 								continue;
 							}
