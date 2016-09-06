@@ -32,7 +32,7 @@
 				<GraphicObject Width="12" Height="10"/>
 				<TreeView Name="List" Height="Fit" Width="{./WidthPolicy}">
 					<Template>
-						<VerticalStack Height="Fit" Width="{../WidthPolicy}" Name="List"/>
+						<VerticalStack Height="Fit" Width="{../WidthPolicy}" Name="ItemsContainer"/>
 					</Template>
 				</TreeView>
 			</HorizontalStack>

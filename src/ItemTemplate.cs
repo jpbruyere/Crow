@@ -50,12 +50,14 @@ namespace Crow
 		}
 		#endregion
 
-		public void CreateExpandDelegate (TemplatedControl host){
-			Type hostType = typeof(TemplatedControl);//not sure is the best place to put the dyn method
+		public void CreateExpandDelegate (TemplatedGroup host){
+			Type dataType = Type.GetType(strDataType);
+			Type tmpGrpType = typeof(TemplatedGroup);
+			Type hostType = tmpGrpType;//not sure is the best place to put the dyn method
 			Type evtType = typeof(EventHandler);
-			Type listBoxType = typeof(ListBox);
 
-			PropertyInfo piListData = listBoxType.GetProperty ("Data");
+
+			PropertyInfo piData = tmpGrpType.GetProperty ("Data");
 
 			MethodInfo evtInvoke = evtType.GetMethod ("Invoke");
 			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
@@ -87,13 +89,13 @@ namespace Crow
 
 			//check that 'Data' of list is not already set
 			il.Emit (OpCodes.Ldloc_0);
-			il.Emit (OpCodes.Callvirt, piListData.GetGetMethod ());
+			il.Emit (OpCodes.Callvirt, piData.GetGetMethod ());
 			il.Emit (OpCodes.Brfalse, ifDataIsNull);
 			il.Emit (OpCodes.Br, gotoEnd);
 
 			il.MarkLabel(ifDataIsNull);
 			//copy the ref of ItemTemplates list TODO: maybe find another way to share it among the nodes?
-			FieldInfo fiTemplates = typeof(TemplatedControl).GetField("ItemTemplates");
+			FieldInfo fiTemplates = tmpGrpType.GetField("ItemTemplates");
 			il.Emit (OpCodes.Ldloc_0);
 			il.Emit (OpCodes.Ldarg_0);
 			il.Emit (OpCodes.Ldfld, fiTemplates);
@@ -105,12 +107,11 @@ namespace Crow
 			il.Emit (OpCodes.Callvirt, typeof(GraphicObject).GetProperty("DataSource").GetGetMethod ());
 
 			if (fetchMethodName != "self"){//special keyword self allows the use of recurent list<<<
-				Type dataType = Type.GetType(strDataType);
 				emitGetSubData(il, dataType);
 			}
 
 			//set 'return' from the fetch method as 'data' of the list
-			il.Emit (OpCodes.Callvirt, piListData.GetSetMethod ());
+			il.Emit (OpCodes.Callvirt, piData.GetSetMethod ());
 
 			il.MarkLabel(gotoEnd);
 			il.Emit (OpCodes.Ret);

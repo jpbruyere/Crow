@@ -2,7 +2,7 @@ version: 0.4.{build}
 
 branches:
   only:
-  - appveyor
+  - master 
 
 clone_depth: 1
 
