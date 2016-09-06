@@ -47,11 +47,12 @@ namespace Crow
 		}
 		#endregion
 
-		public void CreateExpandDelegate (TemplatedControl host){
+		public void CreateExpandDelegate (TemplatedGroup host){
 			Type dataType = Type.GetType(strDataType);
-			Type hostType = typeof(TemplatedControl);//not sure is the best place to put the dyn method
+			Type tmpGrpType = typeof(TemplatedGroup);
+			Type hostType = tmpGrpType;//not sure is the best place to put the dyn method
 			Type evtType = typeof(EventHandler);
-			Type listBoxType = typeof(ListBox);
+
 
 			MethodInfo evtInvoke = evtType.GetMethod ("Invoke");
 			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
@@ -75,7 +76,7 @@ namespace Crow
 			il.Emit (OpCodes.Callvirt, miFindByName);
 			il.Emit (OpCodes.Stloc_0);
 
-			FieldInfo fiTemplates = typeof(TemplatedControl).GetField("ItemTemplates");
+			FieldInfo fiTemplates = typeof(TemplatedGroup).GetField("ItemTemplates");
 			il.Emit (OpCodes.Ldloc_0);
 			il.Emit (OpCodes.Ldarg_0);
 			il.Emit (OpCodes.Ldfld, fiTemplates);
@@ -88,7 +89,7 @@ namespace Crow
 			MethodInfo miGetDatas = dataType.GetMethod (fetchMethodName, new Type[] {});
 			il.Emit (OpCodes.Callvirt, miGetDatas);
 
-			il.Emit (OpCodes.Callvirt, listBoxType.GetProperty("Data").GetSetMethod ());
+			il.Emit (OpCodes.Callvirt, tmpGrpType.GetProperty("Data").GetSetMethod ());
 
 			il.Emit (OpCodes.Ret);
 

@@ -6,7 +6,7 @@
 		ScrollY="{../scrollbar1.Value}"
 		ValueChanged="./_scroller_ValueChanged">
 		<VerticalStack LayoutChanged="./_list_LayoutChanged"
-			Height="Fit" Width="{./WidthPolicy}" Name="List" Margin="0" VerticalAlignment="Top"/>
+			Height="Fit" Width="{./WidthPolicy}" Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
 	</Scroller>
 	<ScrollBar
 		Name="scrollbar1"
