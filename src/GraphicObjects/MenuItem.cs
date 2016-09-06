@@ -101,11 +101,11 @@ namespace Crow
 		{
 			Execute.Raise (this, null);
 		}
-		void onOpen (object sender, EventArgs e){
+		protected virtual void onOpen (object sender, EventArgs e){
 			MenuRoot.IsOpened = true;
 			Open.Raise (this, null);
 		}
-		void onClose (object sender, EventArgs e){
+		protected virtual void onClose (object sender, EventArgs e){
 			//MenuRoot.IsOpened = true;
 			Close.Raise (this, null);
 		}

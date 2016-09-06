@@ -27,17 +27,17 @@ namespace Crow
 {
 	//treeview expect expandable child (or not)
 	//if their are expandable, some functions and events are added
-	public class TreeView : ListBox
+	public class TreeView : TemplatedGroup
 	{
 		GraphicObject selectedItemContainer = null;
-		Color selBackground;
-		Color selForeground;
 		bool isRoot;
 
-
+		#region CTOR
 		public TreeView () : base()
 		{
 		}
+		#endregion
+
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool IsRoot {
 			get { return isRoot; }
@@ -46,29 +46,6 @@ namespace Crow
 					return;
 				isRoot = value;
 				NotifyValueChanged ("IsRoot", isRoot);
-			}
-		}
-
-		[XmlAttributeAttribute][DefaultValue("SteelBlue")]//DeepJungleGreen
-		public virtual Color SelectionBackground {
-			get { return selBackground; }
-			set {
-				if (value == selBackground)
-					return;
-				selBackground = value;
-				NotifyValueChanged ("SelectionBackground", selBackground);
-				RegisterForRedraw ();
-			}
-		}
-		[XmlAttributeAttribute][DefaultValue("White")]
-		public virtual Color SelectionForeground {
-			get { return selForeground; }
-			set {
-				if (value == selForeground)
-					return;
-				selForeground = value;
-				NotifyValueChanged ("SelectionForeground", selForeground);
-				RegisterForRedraw ();
 			}
 		}
 

@@ -145,8 +145,12 @@ namespace Tests
 				idx = testFiles.Length - 1;
 			
 			this.Title = testFiles [idx] + ". Press <F3> to cycle examples.";
-			GraphicObject obj = CrowInterface.LoadInterface(testFiles[idx]);
-			obj.DataSource = this;
+			try {
+				GraphicObject obj = CrowInterface.LoadInterface(testFiles[idx]);
+				obj.DataSource = this;
+			} catch (Exception ex) {
+				Debug.WriteLine (ex.Message + ex.InnerException);
+			}
 		}
 		void Tv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
 		{

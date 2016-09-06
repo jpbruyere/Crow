@@ -101,7 +101,7 @@ namespace Crow
 
 			il.Emit (OpCodes.Ldloc_0);//save current go onto the stack if child has to be added
 
-			#region Template and TemplateItems loading
+			#region Template and ItemTemplates loading
 			if (typeof(TemplatedControl).IsAssignableFrom (crowType)) {
 				//if its a template, first read template elements
 				using (IMLReader reader = new IMLReader (il, tmpXml)) {
@@ -168,7 +168,7 @@ namespace Crow
 					foreach (string[] iTempId in itemTemplateIds) {
 						reader.il.Emit (OpCodes.Ldloc_0);//load TempControl ref
 						reader.il.Emit (OpCodes.Ldfld,//load ItemTemplates dic field
-							typeof(TemplatedControl).GetField("ItemTemplates"));
+							typeof(TemplatedGroup).GetField("ItemTemplates"));
 						reader.il.Emit (OpCodes.Ldstr, iTempId[0]);//load key
 						reader.il.Emit (OpCodes.Ldstr, iTempId[1]);//load value
 						reader.il.Emit (OpCodes.Callvirt,
@@ -181,7 +181,7 @@ namespace Crow
 							//expand delegate creation
 							reader.il.Emit (OpCodes.Ldloc_0);//load TempControl ref
 							reader.il.Emit (OpCodes.Ldfld,//load ItemTemplates dic field
-								typeof(TemplatedControl).GetField ("ItemTemplates"));
+								typeof(TemplatedGroup).GetField ("ItemTemplates"));
 							reader.il.Emit (OpCodes.Ldstr, iTempId [0]);//load key
 							reader.il.Emit (OpCodes.Callvirt,
 								typeof(Dictionary<string, ItemTemplate>).GetMethod ("get_Item",

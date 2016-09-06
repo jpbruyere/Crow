@@ -5,7 +5,7 @@
 				Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}"
 				ValueChanged="./_scroller_ValueChanged">
 			<VerticalStack Width="{./WidthPolicy}" Height="-1" MinimumSize="10,10"
-				Name="List" Margin="0" VerticalAlignment="Top"
+				Name="ItemsContainer" Margin="0" VerticalAlignment="Top"
 				LayoutChanged="./_list_LayoutChanged"/>
 		</Scroller>
 		<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}" 
