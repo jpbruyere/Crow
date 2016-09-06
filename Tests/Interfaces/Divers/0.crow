@@ -139,14 +139,14 @@
 		</VerticalStack>
 		<Splitter/>
 		<VerticalStack Width="33%" Margin="5">
-			<Border Margin="5" Background="Onyx" Height="Fit">
+			<Border Margin="5" Height="Fit">
 				<Label Width="Stretched" Margin="1" Text="{../../dv.SelectedItem}"/>
 			</Border>
-			<Border Margin="5" Background="Onyx" Height="50%">
+			<Border Margin="5" Height="50%">
 				<DirectoryView Name="dv" CurrentDirectory="./" Margin="1"/>
 			</Border>
 			<Splitter/>
-			<ListBox Data="{TestList}" Background="Onyx" Margin="5"
+			<ListBox Data="{TestList}" Margin="5"
 					 ItemTemplate="#Tests.Interfaces.colorItem.crow"
 					 Template="#Crow.Templates.ScrollingListBox.goml"/>
 		</VerticalStack>
