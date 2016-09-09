@@ -15,6 +15,16 @@ namespace Crow
 		static MethodInfo miAddBinding = typeof(GraphicObject).GetMethod ("BindMember");
 		static FieldInfo miSetCurIface = typeof(GraphicObject).GetField ("currentInterface",
 			BindingFlags.NonPublic | BindingFlags.Instance);
+		static MethodInfo stringEquals = typeof (string).GetMethod
+			("Equals", new Type [3] { typeof (string), typeof (string), typeof (StringComparison) });
+		static FieldInfo fiNewValue = typeof (ValueChangeEventArgs).GetField ("NewValue");
+		static FieldInfo fiMbName = typeof (ValueChangeEventArgs).GetField ("MemberName");
+		static EventInfo eiValueChanged = typeof (IValueChange).GetEvent ("ValueChanged");
+		static Type [] dmValueChangedArgs = { typeof (object), typeof (object),
+			eiValueChanged.EventHandlerType.GetMethod ("Invoke").
+			GetParameters ()[1].ParameterType };
+		static MethodInfo miFindByName = typeof (GraphicObject).GetMethod ("FindByName");
+		
 
 		public static void emitSetCurInterface(ILGenerator il){
 			il.Emit (OpCodes.Ldloc_0);
@@ -165,7 +175,7 @@ namespace Crow
 						continue;
 					//register handler for event
 					if (b.Target.Method == null) {
-						Debug.WriteLine ("\tError: Handler Method not found: " + b.ToString ());
+						//Debug.WriteLine ("\tError: Handler Method not found: " + b.ToString ());
 						continue;
 					}
 					try {
@@ -178,7 +188,7 @@ namespace Crow
 #endif
 						b.Resolved = true;
 					} catch (Exception ex) {
-						Debug.WriteLine ("\tERROR: " + ex.ToString ());
+						//Debug.WriteLine ("\tERROR: " + ex.ToString ());
 					}
 					continue;
 				}
@@ -196,16 +206,7 @@ namespace Crow
 				b.Resolved = true;
 			}
 
-			MethodInfo stringEquals = typeof (string).GetMethod
-				("Equals", new Type [3] { typeof (string), typeof (string), typeof (StringComparison) });
 			Type target_Type = Bindings [0].Source.Instance.GetType ();
-			EventInfo ei = typeof (IValueChange).GetEvent ("ValueChanged");
-			MethodInfo evtInvoke = ei.EventHandlerType.GetMethod ("Invoke");
-			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
-			Type handlerArgsType = evtParams [1].ParameterType;
-			Type [] args = { typeof (object), typeof (object), handlerArgsType };
-			FieldInfo fiNewValue = typeof (ValueChangeEventArgs).GetField ("NewValue");
-			FieldInfo fiMbName = typeof (ValueChangeEventArgs).GetField ("MemberName");
 
 			//group;only one dynMethods by target (valuechanged event source)
 			//changed value name tested in switch
@@ -228,7 +229,7 @@ namespace Crow
 						MethodAttributes.Family | MethodAttributes.FamANDAssem | MethodAttributes.NewSlot,
 						CallingConventions.Standard,
 						typeof (void),
-						args,
+						dmValueChangedArgs,
 						target_Type, true);
 
 					il = dm.GetILGenerator (256);
@@ -376,8 +377,8 @@ namespace Crow
 				il.Emit (OpCodes.Pop);
 				il.Emit (OpCodes.Ret);
 
-				Delegate del = dm.CreateDelegate (ei.EventHandlerType, Bindings [0].Source.Instance);
-				MethodInfo addHandler = ei.GetAddMethod ();
+				Delegate del = dm.CreateDelegate (eiValueChanged.EventHandlerType, Bindings [0].Source.Instance);
+				MethodInfo addHandler = eiValueChanged.GetAddMethod ();
 				addHandler.Invoke (grouped [0].Target.Instance, new object [] { del });
 			}
 		}
@@ -436,11 +437,10 @@ namespace Crow
 				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack
 
 				string [] lopParts = lop.Split (new char [] { '.' });
-				if (lopParts.Length > 1) {//should search also for member of es.Source
-					MethodInfo FindByNameMi = typeof (GraphicObject).GetMethod ("FindByName");
+				if (lopParts.Length > 1) {//should search also for member of es.Source					
 					for (int j = 0; j < lopParts.Length - 1; j++) {
 						il.Emit (OpCodes.Ldstr, lopParts [j]);
-						il.Emit (OpCodes.Callvirt, FindByNameMi);
+						il.Emit (OpCodes.Callvirt, miFindByName);
 					}
 				}
 
