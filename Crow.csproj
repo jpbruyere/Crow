@@ -152,16 +152,16 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Drawing" />
     <Reference Include="cairo-sharp">
-      <Package>gtk-sharp-3.0</Package>
+      <Package>GtkSharp.3.1.3</Package>
     </Reference>
     <Reference Include="gdk-sharp">
-      <Package>gtk-sharp-2.0</Package>
+      <Package>GtkSharp.3.1.3</Package>
     </Reference>
     <Reference Include="gio-sharp">
-      <Package>gio-sharp-3.0</Package>
+      <Package>GtkSharp.3.1.3</Package>
     </Reference>
     <Reference Include="glib-sharp">
-      <Package>glib-sharp-3.0</Package>
+      <Package>GtkSharp.3.1.3</Package>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
