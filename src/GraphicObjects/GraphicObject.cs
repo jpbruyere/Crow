@@ -54,8 +54,10 @@ namespace Crow
 		#region CTOR
 		public GraphicObject ()
 		{
+			#if DEBUG
 			uid = currentUid;
 			currentUid++;
+			#endif
 		}
 		#endregion
 		internal protected virtual void initialize(){
@@ -65,7 +67,7 @@ namespace Crow
 		LayoutingType registeredLayoutings = LayoutingType.All;
 		ILayoutable logicalParent;
 		ILayoutable parent;
-		string name = "unamed";
+		string name;
 		Fill background = Color.Transparent;
 		Fill foreground = Color.White;
 		Font font = "droid, 10";
@@ -199,14 +201,20 @@ namespace Crow
 				this.RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("unamed")]
+		[XmlAttributeAttribute()][DefaultValue(null)]
 		public virtual string Name {
-			get { return name; }
+			get {
+				#if DEBUG
+				return string.IsNullOrEmpty(name) ? this.GetType().Name + uid.ToString () : name;
+				#else
+				return name;
+				#endif
+			}
 			set {
 				if (name == value)
 					return;
 				name = value;
-				NotifyValueChanged("Name", verticalAlignment);
+				NotifyValueChanged("Name", name);
 			}
 		}
 		[XmlAttributeAttribute	()][DefaultValue(VerticalAlignment.Center)]
@@ -333,15 +341,13 @@ namespace Crow
 		/// Fit or Stretched
 		/// </summary>
 		[XmlIgnore]public virtual Measure WidthPolicy { get {
-				return Width.Units == Unit.Percent || Width.IsFixed ?
-					Measure.Stretched : Measure.Fit; } }
+				return Width.IsFit ? Measure.Fit : Measure.Stretched; } }
 		/// <summary>
 		/// Used for binding on dimensions, this property will never hold fixed size, but instead only
 		/// Fit or Stretched
 		/// </summary>
 		[XmlIgnore]public virtual Measure HeightPolicy { get {
-				return Height.Units == Unit.Percent || Height.IsFixed ?
-					Measure.Stretched : Measure.Fit; } }
+				return Height.IsFit ? Measure.Fit : Measure.Stretched; } }
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool Focusable {
 			get { return focusable; }
@@ -450,14 +456,17 @@ namespace Crow
 				if (!isVisible && this.Contains (CurrentInterface.HoverWidget))
 					CurrentInterface.HoverWidget = null;
 
-				if (Parent is GraphicObject)
-					(Parent as GraphicObject).RegisterForLayouting (LayoutingType.Sizing);
-				if (Parent is GenericStack)
-					(Parent as GraphicObject).RegisterForLayouting (LayoutingType.ArrangeChildren);
-
 				if (isVisible)
 					RegisterForLayouting (LayoutingType.Sizing);
-				CurrentInterface.EnqueueForRepaint (this);
+				else {
+					Slot.Width = 0;
+					LayoutChanged.Raise (this, new LayoutingEventArgs (LayoutingType.Width));
+					Slot.Height = 0;
+					LayoutChanged.Raise (this, new LayoutingEventArgs (LayoutingType.Height));
+					CurrentInterface.EnqueueForRepaint (this);
+					LastSlots.Width = LastSlots.Height = 0;
+				}
+
 
 				NotifyValueChanged ("Visible", isVisible);
 			}
@@ -720,7 +729,7 @@ namespace Crow
 		public void RegisterForGraphicUpdate ()
 		{
 			bmp = null;
-			if (Width == Measure.Fit || Height == Measure.Fit)
+			if (Width.IsFit || Height.IsFit)
 				RegisterForLayouting (LayoutingType.Sizing);
 			else if (RegisteredLayoutings == LayoutingType.None)
 				CurrentInterface.EnqueueForRepaint (this);
@@ -737,10 +746,6 @@ namespace Crow
 
 		#region Layouting
 
-		#if DEBUG_LAYOUTING
-		public List<LayoutingQueueItem> CurrentDrawLQIs = null;
-		public List<List<LayoutingQueueItem>> LQIs = new List<List<LayoutingQueueItem>>();
-		#endif
 		/// <summary> return size of content + margins </summary>
 		protected virtual int measureRawSize (LayoutingType lt) {
 			return lt == LayoutingType.Width ?
@@ -754,6 +759,11 @@ namespace Crow
 			if (Parent == null)
 				return;
 			lock (CurrentInterface.LayoutMutex) {
+				//prevent queueing same LayoutingType for this
+				layoutType &= (~RegisteredLayoutings);
+
+				if (layoutType == LayoutingType.None)
+					return;
 				//dont set position for stretched item
 				if (Width == Measure.Stretched)
 					layoutType &= (~LayoutingType.X);
@@ -767,8 +777,8 @@ namespace Crow
 				if (Parent is GraphicObject)
 					(Parent as GraphicObject).ChildrenLayoutingConstraints (ref layoutType);
 
-				//prevent queueing same LayoutingType for this
-				layoutType &= (~RegisteredLayoutings);
+//				//prevent queueing same LayoutingType for this
+//				layoutType &= (~RegisteredLayoutings);
 
 				if (layoutType == LayoutingType.None)
 					return;
@@ -791,8 +801,8 @@ namespace Crow
 		public virtual void OnLayoutChanges(LayoutingType  layoutType)
 		{
 			#if DEBUG_LAYOUTING
-			LayoutingQueueItem.currentLQI.Slot = LastSlots;
-			LayoutingQueueItem.currentLQI.Slot = Slot;
+			CurrentInterface.currentLQI.Slot = LastSlots;
+			CurrentInterface.currentLQI.NewSlot = Slot;
 			#endif
 
 			switch (layoutType) {
@@ -1020,12 +1030,6 @@ namespace Crow
 				return;
 
 			LastPaintedSlot = Slot;
-			#if DEBUG_LAYOUTING
-			if (CurrentDrawLQIs != null){
-				LQIs.Add (CurrentDrawLQIs);
-				CurrentDrawLQIs = null;
-			}
-			#endif
 
 			if (cacheEnabled) {
 				if (Slot.Width > Interface.MaxCacheSize || Slot.Height > Interface.MaxCacheSize)
@@ -1199,18 +1203,6 @@ namespace Crow
 		}
 		public virtual void onDisable(object sender, EventArgs e){
 			Disabled.Raise (this, e);
-		}
-		public override string ToString ()
-		{
-			string tmp ="";
-
-			if (Parent != null)
-				tmp = Parent.ToString () + tmp;
-			#if DEBUG_LAYOUTING
-			return Name == "unamed" ? tmp + "." + this.GetType ().Name + uid.ToString(): tmp + "." + Name;
-			#else
-			return Name == "unamed" ? tmp + "." + this.GetType ().Name : tmp + "." + Name;
-			#endif
 		}
 
 		#region Binding
@@ -1488,6 +1480,19 @@ namespace Crow
 			foreach (Binding b in this.bindings)
 				tmp.Bindings.Add (new Binding (new MemberReference (tmp, b.Source.Member), b.Expression));
 			return tmp;
+		}
+
+		public override string ToString ()
+		{
+			string tmp ="";
+
+			if (Parent != null)
+				tmp = Parent.ToString () + tmp;
+			#if DEBUG_LAYOUTING
+			return Name == "unamed" ? tmp + "." + this.GetType ().Name + uid.ToString(): tmp + "." + Name;
+			#else
+			return Name == "unamed" ? tmp + "." + this.GetType ().Name : tmp + "." + Name;
+			#endif
 		}
 	}
 }

@@ -17,14 +17,18 @@ namespace Crow
 			BindingFlags.NonPublic | BindingFlags.Instance);
 		static MethodInfo stringEquals = typeof (string).GetMethod
 			("Equals", new Type [3] { typeof (string), typeof (string), typeof (StringComparison) });
-		static FieldInfo fiNewValue = typeof (ValueChangeEventArgs).GetField ("NewValue");
-		static FieldInfo fiMbName = typeof (ValueChangeEventArgs).GetField ("MemberName");
-		static EventInfo eiValueChanged = typeof (IValueChange).GetEvent ("ValueChanged");
-		static Type [] dmValueChangedArgs = { typeof (object), typeof (object),
-			eiValueChanged.EventHandlerType.GetMethod ("Invoke").
-			GetParameters ()[1].ParameterType };
 		static MethodInfo miFindByName = typeof (GraphicObject).GetMethod ("FindByName");
 		
+
+		#region ValueChange Reflexion member info
+		static EventInfo eiValueChange = typeof (IValueChange).GetEvent ("ValueChanged");
+		static MethodInfo miInvokeValueChange = eiValueChange.EventHandlerType.GetMethod ("Invoke");
+		static Type [] argsValueChange = { typeof (object), typeof (object), miInvokeValueChange.GetParameters () [1].ParameterType };
+		static FieldInfo fiNewValue = typeof (ValueChangeEventArgs).GetField ("NewValue");
+		static FieldInfo fiMbName = typeof (ValueChangeEventArgs).GetField ("MemberName");
+		static MethodInfo miValueChangeAdd = eiValueChange.GetAddMethod ();
+		#endregion
+
 
 		public static void emitSetCurInterface(ILGenerator il){
 			il.Emit (OpCodes.Ldloc_0);
@@ -229,7 +233,7 @@ namespace Crow
 						MethodAttributes.Family | MethodAttributes.FamANDAssem | MethodAttributes.NewSlot,
 						CallingConventions.Standard,
 						typeof (void),
-						dmValueChangedArgs,
+						argsValueChange,
 						target_Type, true);
 
 					il = dm.GetILGenerator (256);
@@ -377,9 +381,8 @@ namespace Crow
 				il.Emit (OpCodes.Pop);
 				il.Emit (OpCodes.Ret);
 
-				Delegate del = dm.CreateDelegate (eiValueChanged.EventHandlerType, Bindings [0].Source.Instance);
-				MethodInfo addHandler = eiValueChanged.GetAddMethod ();
-				addHandler.Invoke (grouped [0].Target.Instance, new object [] { del });
+				Delegate del = dm.CreateDelegate (eiValueChange.EventHandlerType, Bindings [0].Source.Instance);
+				miValueChangeAdd.Invoke (grouped [0].Target.Instance, new object [] { del });
 			}
 		}
 
@@ -588,6 +591,17 @@ namespace Crow
 			} while (curType != null);
 
 			return query;
+		}
+
+		public static MethodInfo SearchExtMethod(Type t, string methodName){
+			MethodInfo mi = null;
+			mi = GetExtensionMethods (Assembly.GetEntryAssembly(), t)
+				.Where (em => em.Name == methodName).FirstOrDefault ();
+			if (mi != null)
+				return mi;
+
+			return GetExtensionMethods (Assembly.GetExecutingAssembly(), t)
+				.Where (em => em.Name == methodName).FirstOrDefault ();
 		}
 	}
 }

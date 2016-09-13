@@ -51,17 +51,25 @@ namespace Crow
 		public int LayoutingTries, DiscardCount;
 
 		#if DEBUG_LAYOUTING
-		public static List<LayoutingQueueItem> processedLQIs = new List<LayoutingQueueItem>();
-		public static LayoutingQueueItem[] MultipleRunsLQIs {
-			get { return processedLQIs.Where(l=>l.LayoutingTries>2 || l.DiscardCount > 0).ToArray(); }
-		}
-		public static LayoutingQueueItem currentLQI = null;
 		public Stopwatch LQITime = new Stopwatch();
-		public List<LayoutingQueueItem> triggeredLQIs = new List<LayoutingQueueItem>();
+		public LQIList triggeredLQIs = new LQIList();
 		public LayoutingQueueItem wasTriggeredBy = null;
 		public GraphicObject graphicObject {
 			get { return Layoutable as GraphicObject; }
 		}
+		public string Name {
+			get { return graphicObject.Name; }
+		}
+		public string FullName {
+			get { return graphicObject.ToString(); }
+		}
+		public Measure Width {
+			get { return graphicObject.Width; }
+		}
+		public Measure Height {
+			get { return graphicObject.Height; }
+		}
+		public bool HasTriggeredLQIs { get { return triggeredLQIs.Count > 0; }}
 		public Rectangle Slot, NewSlot;
 		#endif
 
@@ -72,12 +80,11 @@ namespace Crow
 			Layoutable = _graphicObject;
 			Layoutable.RegisteredLayoutings |= LayoutType;
 			#if DEBUG_LAYOUTING
-			if (graphicObject.CurrentDrawLQIs == null)
-				graphicObject.CurrentDrawLQIs = new List<LayoutingQueueItem>();
-			graphicObject.CurrentDrawLQIs.Add(this);
-			if (currentLQI != null){
-				wasTriggeredBy = currentLQI;
-				currentLQI.triggeredLQIs.Add(this);
+			GraphicObject g = graphicObject;
+			g.CurrentInterface.curLQIs.Add(this);
+			if (g.CurrentInterface.currentLQI != null){
+				wasTriggeredBy = g.CurrentInterface.currentLQI;
+				g.CurrentInterface.currentLQI.triggeredLQIs.Add(this);
 			}
 			#endif
 		}
@@ -93,13 +100,11 @@ namespace Crow
 				return;
 			}
 			#if DEBUG_LAYOUTING
-			currentLQI = this;
-			processedLQIs.Add(this);
 			LQITime.Start();
 			#endif
+			LayoutingTries++;
 			if (!Layoutable.UpdateLayout (LayoutType)) {
 				if (LayoutingTries < Interface.MaxLayoutingTries) {
-					LayoutingTries++;
 					Layoutable.RegisteredLayoutings |= LayoutType;
 					(Layoutable as GraphicObject).CurrentInterface.LayoutingQueue.Enqueue (this);
 				} else if (DiscardCount < Interface.MaxDiscardCount) {
@@ -114,7 +119,6 @@ namespace Crow
 				#endif
 			}
 			#if DEBUG_LAYOUTING
-			currentLQI = null;
 			LQITime.Stop();
 			#endif
 		}
@@ -137,6 +141,13 @@ namespace Crow
 				LayoutingTries, DiscardCount);
 			#endif
 		}
+	}
+	public class LQIList : List<LayoutingQueueItem>{
+		#if DEBUG_LAYOUTING
+		public List<LayoutingQueueItem> GetRootLQIs(){
+			return this.Where (lqi => lqi.wasTriggeredBy == null).ToList ();
+		}
+		#endif
 	}
 }
 

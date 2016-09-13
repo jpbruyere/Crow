@@ -72,6 +72,8 @@ namespace Crow
 		internal override void itemClick (object sender, MouseButtonEventArgs e)
 		{
 			GraphicObject tmp = sender as GraphicObject;
+			if (!tmp.HasFocus)
+				return;
 			if (selectedItemContainer != null) {
 				selectedItemContainer.Foreground = Color.Transparent;
 				selectedItemContainer.Background = Color.Transparent;

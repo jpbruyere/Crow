@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<TreeView IsRoot="true" Name="treeView" Data="{./CurrentDirectory}"
+<TreeView IsRoot="true" Name="treeView" Data="{./FileSystemEntries}"
 		SelectedItemChanged="./onSelectedItemChanged">
 	<ItemTemplate DataType="System.IO.FileInfo">
 		<HorizontalStack Focusable="true"  Height="Fit" Width="Stretched" Background="{../Background}" >
@@ -10,7 +10,7 @@
 				MouseLeave="{Background=Transparent}"/>
 		</HorizontalStack>
 	</ItemTemplate>
-	<ItemTemplate DataType="System.IO.DirectoryInfo" Data="GetFileSystemInfos">		
+	<ItemTemplate DataType="System.IO.DirectoryInfo" Data="GetFileSystemInfos">
 		<Expandable Caption="{Name}" >
 			<Template>
 				<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}">
@@ -18,8 +18,7 @@
 							MouseEnter="{Background=hgradient|0:BlueCrayola|1:Transparent}"
 							MouseLeave="{Background=Transparent}">
 						<Image Margin="2" Width="12" Height="12"
-							Visible="{./HasContent}"
-							Path="{./Image}" 
+							Path="{./Image}"
 							SvgSub="{./IsExpanded}"/>
 						<Image Margin="2" Width="14" Height="14"
 							Path="#Crow.Images.Icons.folder.svg"/>

@@ -31,10 +31,6 @@ namespace Crow
 	public class IMLReader : XmlTextReader
 	{
 		InstanciatorInvoker loader = null;
-
-		string ImlPath;
-		Stream ImlStream;
-
 		DynamicMethod dm = null;
 
 		public ILGenerator il = null;
@@ -55,12 +51,10 @@ namespace Crow
 		#region CTOR
 		public IMLReader (string path)
 			: this(Interface.GetStreamFromPath (path)){
-			ImlPath = path;
 		}
 		public IMLReader (Stream stream)
 			: base(stream)
 		{
-			ImlStream = stream;
 			createInstantiator ();
 		}
 		/// <summary>
@@ -138,13 +132,23 @@ namespace Crow
 									path = reader.Value;
 							}
 							reader.MoveToElement ();
-							using (IMLReader iTmp = new IMLReader (null, reader.ReadInnerXml ())) {
-								string uid = Guid.NewGuid ().ToString ();
-								Interface.Instantiators [uid] =
-									new ItemTemplate (iTmp.RootType, iTmp.GetLoader (), dataType, datas);
-								
-								itemTemplateIds.Add (new string[] { dataType, uid, datas });
+
+							string itemTmpID;
+
+							if (string.IsNullOrEmpty (path)) {
+								using (IMLReader iTmp = new IMLReader (null, reader.ReadInnerXml ())) {
+									itemTmpID = Guid.NewGuid ().ToString ();
+									Interface.Instantiators [itemTmpID] =
+										new ItemTemplate (iTmp.RootType, iTmp.GetLoader (), dataType, datas);
+								}
+							}else{
+								if (!reader.IsEmptyElement)
+									throw new Exception ("ItemTemplate with Path attribute may not include sub nodes");
+								itemTmpID = path;
+								Interface.Instantiators [itemTmpID] =
+									new ItemTemplate (itemTmpID, dataType, datas);
 							}
+							itemTemplateIds.Add (new string[] { dataType, itemTmpID, datas });
 						}
 					}
 
@@ -208,8 +212,6 @@ namespace Crow
 
 				#region Attributes reading
 				if (reader.HasAttributes) {
-
-					MethodInfo miAddBinding = typeof(GraphicObject).GetMethod ("BindMember");
 
 					while (reader.MoveToNextAttribute ()) {
 						if (reader.Name == "Style")

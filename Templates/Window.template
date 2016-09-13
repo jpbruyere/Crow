@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<Border BorderWidth="1" Foreground="White" CornerRadius="{./CornerRadius}" Height="{./HeightPolicy}" Width="{./WidthPolicy}"
+<Border BorderWidth="1" Foreground="White" CornerRadius="{./CornerRadius}"
+				Background="{./Background}"
+				Height="{./HeightPolicy}" Width="{./WidthPolicy}"
 				MouseEnter="./onBorderMouseEnter"
 				MouseLeave="./onBorderMouseLeave">
 	<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}" Spacing="0">
