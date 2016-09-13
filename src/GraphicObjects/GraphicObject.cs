@@ -729,7 +729,7 @@ namespace Crow
 		public void RegisterForGraphicUpdate ()
 		{
 			bmp = null;
-			if (Width == Measure.Fit || Height == Measure.Fit)
+			if (Width.IsFit || Height.IsFit)
 				RegisterForLayouting (LayoutingType.Sizing);
 			else if (RegisteredLayoutings == LayoutingType.None)
 				CurrentInterface.EnqueueForRepaint (this);
@@ -759,6 +759,11 @@ namespace Crow
 			if (Parent == null)
 				return;
 			lock (CurrentInterface.LayoutMutex) {
+				//prevent queueing same LayoutingType for this
+				layoutType &= (~RegisteredLayoutings);
+
+				if (layoutType == LayoutingType.None)
+					return;
 				//dont set position for stretched item
 				if (Width == Measure.Stretched)
 					layoutType &= (~LayoutingType.X);
@@ -772,8 +777,8 @@ namespace Crow
 				if (Parent is GraphicObject)
 					(Parent as GraphicObject).ChildrenLayoutingConstraints (ref layoutType);
 
-				//prevent queueing same LayoutingType for this
-				layoutType &= (~RegisteredLayoutings);
+//				//prevent queueing same LayoutingType for this
+//				layoutType &= (~RegisteredLayoutings);
 
 				if (layoutType == LayoutingType.None)
 					return;
