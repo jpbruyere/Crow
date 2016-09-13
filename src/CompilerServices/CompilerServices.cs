@@ -18,7 +18,15 @@ namespace Crow
 		static MethodInfo stringEquals = typeof (string).GetMethod
 			("Equals", new Type [3] { typeof (string), typeof (string), typeof (StringComparison) });
 		static MethodInfo miFindByName = typeof (GraphicObject).GetMethod ("FindByName");
-		
+
+		public static MethodInfo miIFaceLoad = typeof(Interface).GetMethod ("Load", BindingFlags.Instance | BindingFlags.Public);
+		public static MethodInfo miGetITemp = typeof(Interface).GetMethod ("GetItemTemplate");
+		public static MethodInfo miAddITemp = typeof(Dictionary<string, ItemTemplate>).
+			GetMethod ("set_Item", new Type[] { typeof(string), typeof(ItemTemplate) });
+		public static MethodInfo miGetITempFromDic = typeof(Dictionary<string, ItemTemplate>).
+			GetMethod ("get_Item", new Type[] { typeof(string) });
+		public static FieldInfo fldItemTemplates = typeof(TemplatedGroup).GetField("ItemTemplates");
+		public static MethodInfo miCreateExpDel = typeof(ItemTemplate).GetMethod ("CreateExpandDelegate");
 
 		#region ValueChange Reflexion member info
 		static EventInfo eiValueChange = typeof (IValueChange).GetEvent ("ValueChanged");

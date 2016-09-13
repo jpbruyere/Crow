@@ -120,7 +120,7 @@ namespace Crow
 							inlineTemplate = true;
 							reader.Read ();
 
-							readChildren (reader, crowType,true);
+							readChildren (reader, crowType, true);
 						} else if (reader.Name == "ItemTemplate") {
 							string dataType = "default", datas = "", path = "";
 							while (reader.MoveToNextAttribute ()) {
@@ -160,35 +160,27 @@ namespace Crow
 							reader.il.Emit (OpCodes.Ldarg_1);//load currentInterface
 							reader.il.Emit (OpCodes.Ldstr, templatePath); //Load template path string
 							reader.il.Emit (OpCodes.Callvirt,//call Interface.Load(path)
-									typeof(Interface).GetMethod ("Load", BindingFlags.Instance | BindingFlags.Public));
+								CompilerServices.miIFaceLoad);
 						}
 						reader.il.Emit (OpCodes.Callvirt,//load template
 							crowType.GetMethod ("loadTemplate", BindingFlags.Instance | BindingFlags.NonPublic));
 					}
 					foreach (string[] iTempId in itemTemplateIds) {
 						reader.il.Emit (OpCodes.Ldloc_0);//load TempControl ref
-						reader.il.Emit (OpCodes.Ldfld,//load ItemTemplates dic field
-							typeof(TemplatedGroup).GetField("ItemTemplates"));
+						reader.il.Emit (OpCodes.Ldfld, CompilerServices.fldItemTemplates);//load ItemTemplates dic field
 						reader.il.Emit (OpCodes.Ldstr, iTempId[0]);//load key
 						reader.il.Emit (OpCodes.Ldstr, iTempId[1]);//load value
-						reader.il.Emit (OpCodes.Callvirt,
-							typeof(Interface).GetMethod ("GetItemTemplate"));
-						reader.il.Emit (OpCodes.Callvirt,
-							typeof(Dictionary<string, ItemTemplate>).GetMethod ("set_Item",
-								new Type[] { typeof(string), typeof(ItemTemplate) }));
+						reader.il.Emit (OpCodes.Callvirt, CompilerServices.miGetITemp);
+						reader.il.Emit (OpCodes.Callvirt, CompilerServices.miAddITemp);
 
 						if (!string.IsNullOrEmpty (iTempId [2])) {
 							//expand delegate creation
 							reader.il.Emit (OpCodes.Ldloc_0);//load TempControl ref
-							reader.il.Emit (OpCodes.Ldfld,//load ItemTemplates dic field
-								typeof(TemplatedGroup).GetField ("ItemTemplates"));
+							reader.il.Emit (OpCodes.Ldfld, CompilerServices.fldItemTemplates);
 							reader.il.Emit (OpCodes.Ldstr, iTempId [0]);//load key
-							reader.il.Emit (OpCodes.Callvirt,
-								typeof(Dictionary<string, ItemTemplate>).GetMethod ("get_Item",
-									new Type[] { typeof(string) }));
+							reader.il.Emit (OpCodes.Callvirt, CompilerServices.miGetITempFromDic);
 							reader.il.Emit (OpCodes.Ldloc_0);//load root of treeView
-							reader.il.Emit (OpCodes.Callvirt,
-								typeof(ItemTemplate).GetMethod ("CreateExpandDelegate"));
+							reader.il.Emit (OpCodes.Callvirt, CompilerServices.miCreateExpDel);
 						}
 					}
 				}
@@ -305,8 +297,6 @@ namespace Crow
 					reader.emitLoader (t);
 
 					reader.il.Emit (OpCodes.Ldloc_0);//load child on stack for parenting
-					if (miAddChild == null)
-						System.Diagnostics.Debugger.Break ();
 					reader.il.Emit (OpCodes.Callvirt, miAddChild);
 					reader.il.Emit (OpCodes.Stloc_0); //reset local to current go
 					reader.il.Emit (OpCodes.Ldloc_0);//save current go onto the stack if child has to be added
