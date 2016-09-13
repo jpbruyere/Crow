@@ -341,15 +341,13 @@ namespace Crow
 		/// Fit or Stretched
 		/// </summary>
 		[XmlIgnore]public virtual Measure WidthPolicy { get {
-				return Width.Units == Unit.Percent || Width.IsFixed ?
-					Measure.Stretched : Measure.Fit; } }
+				return Width.IsFit ? Measure.Fit : Measure.Stretched; } }
 		/// <summary>
 		/// Used for binding on dimensions, this property will never hold fixed size, but instead only
 		/// Fit or Stretched
 		/// </summary>
 		[XmlIgnore]public virtual Measure HeightPolicy { get {
-				return Height.Units == Unit.Percent || Height.IsFixed ?
-					Measure.Stretched : Measure.Fit; } }
+				return Height.IsFit ? Measure.Fit : Measure.Stretched; } }
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool Focusable {
 			get { return focusable; }

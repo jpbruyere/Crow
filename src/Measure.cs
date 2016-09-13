@@ -62,7 +62,7 @@ namespace Crow
 		/// True is size is fixed in pixels, this means not proportional, stretched nor fit.
 		/// </summary>
 		public bool IsFixed { get { return Value > 0 && Units == Unit.Pixel; }}
-
+		public bool IsFit { get { return Value == -1 && Units == Unit.Pixel; }}
 		#region Operators
 		public static implicit operator int(Measure m){
 			return m.Value;
