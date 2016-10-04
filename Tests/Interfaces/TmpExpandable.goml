@@ -3,10 +3,10 @@
 	<Label Text="{../../Caption}" Width="{../../WidthPolicy}"/>
 	<Container Name="Content" Visible="false" Height="{../../HeightPolicy}" Width="{../../WidthPolicy}"/>
 </VerticalStack>-->
-<Group BorderWidth="1" Foreground="LightGray" Height="{../HeightPolicy}" Width="{../WidthPolicy}" 
+<Group BorderWidth="1" Foreground="LightGray" 
 		MouseClick="../onMouseClick">
-	<VerticalStack Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
-		<Label Text="{../../../Caption}" Width="{../../../WidthPolicy}"/>
-		<Container Name="Content" Visible="false" Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}"/>
+	<VerticalStack>
+		<Label Text="{../../../Caption}"/>
+		<Container Name="Content" Visible="false"/>
 	</VerticalStack>
 </Group>

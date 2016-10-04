@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
-<Border BorderWidth="1" Margin="1" MinimumSize="10,10" Height="{./HeightPolicy}" Width="{./WidthPolicy}" >
+<Border BorderWidth="1" Margin="1" MinimumSize="10,10">
 	<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"
-		Height="{./HeightPolicy}" Width="{./WidthPolicy}"
 		ValueChanged="./_scroller_ValueChanged">
 		<VerticalStack LayoutChanged="./_list_LayoutChanged"
-			Height="Fit" Width="{./WidthPolicy}" Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
+			Height="Fit" Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
 	</Scroller>
 </Border>

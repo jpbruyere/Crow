@@ -1,15 +1,13 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="1" Foreground="{./Foreground}" Background="{./Background}"
-		Height="{./HeightPolicy}" Width="{./WidthPolicy}">
-	<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}">
-		<HorizontalStack Spacing="1" Height="Fit" Width="{./WidthPolicy}">
+<Border BorderWidth="1" Foreground="{./Foreground}" Background="{./Background}">
+	<VerticalStack>
+		<HorizontalStack Spacing="1" Height="Fit">
 			<Image Style="Icon" Margin="2"
 				Visible="{./HasContent}"
 				Path="{./Image}" 
 				SvgSub="{./IsExpanded}"/>
-			<Label Text="{./Caption}" Width="{./WidthPolicy}"/>
+			<Label Text="{./Caption}"/>
 		</HorizontalStack>
-		<Container Name="Content" Visible="false"
-			Height="{./HeightPolicy}" Width="{./WidthPolicy}"/>
+		<Container Name="Content" Visible="false"/>
 	</VerticalStack>
 </Border>

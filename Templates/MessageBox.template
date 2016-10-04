@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
-<Border Height="{./HeightPolicy}" Width="{./WidthPolicy}" CornerRadius="0"
+<Border	CornerRadius="0"
 				MouseEnter="./onBorderMouseEnter"
 				MouseLeave="./onBorderMouseLeave">
-	<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}" Background="{./Background}">
-		<Border BorderWidth="0" Foreground="White" Width="{./WidthPolicy}" Height="Fit" 
+	<VerticalStack Background="{./Background}">
+		<Border BorderWidth="0" Foreground="White" Height="Fit" 
 				Background="vgradient|0:0.4,0.6,0.0,0.5|1:0.0,0.8,0.8,0.9">
-			<HorizontalStack Name="hs" Margin="2" Spacing="1" Width="{./WidthPolicy}" Height="Fit" >
+			<HorizontalStack Name="hs" Margin="2" Spacing="1" Height="Fit" >
 				<GraphicObject Width="5" Height="5"/>
 				<Image Margin="1" Width="12" Height="12" Path="{./Icon}"/>
-				<Label Foreground="White" Width="{./WidthPolicy}" Margin="1" TextAlignment="Center" Text="{./Title}" />
+				<Label Width="Stretched" Foreground="White" Margin="1" TextAlignment="Center" Text="{./Title}" />
 				<Border CornerRadius="6" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
 					MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
 					<Image Focusable="true" Name="Image" Path="#Crow.Images.Icons.exit2.svg"
@@ -17,9 +17,9 @@
 				<GraphicObject Width="5" Height="5"/>
 			</HorizontalStack>
 		</Border>
-		<HorizontalStack Margin="5" Height="{./HeightPolicy}" Width="{./WidthPolicy}">
+		<HorizontalStack Margin="5">
 			<Image Name="Image" Width="20%" Height="20" Path="#Crow.Images.Icons.iconInfo.svg" />
-			<Label Margin="5" Font="serif, 10" Height="{./HeightPolicy}" Width="80%" Text="{./Message}"
+			<Label Margin="5" Font="serif, 10" Width="80%" Text="{./Message}"
 				TextAlignment="Left"
 				Multiline="true" />		
 		</HorizontalStack>
