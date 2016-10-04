@@ -9,6 +9,7 @@
 			Orientation="{./Orientation}"
 			Value="{./Value}"
 			Maximum="{./Maximum}"
+			Height="{./HeightPolicy}" Width="{./WidthPolicy}"
 			LargeIncrement="{./LargeIncrement}"
 			SmallIncrement="{./SmallIncrement}"
 			Background="hgradient|0:DimGray|0.1:Gray|0.95:Gray|1:White"
