@@ -1,3 +1,2 @@
 <?xml version="1.0"?>
-<VerticalStack
-	Height="Fit" Width="{../WidthPolicy}" Name="List"/>
+<VerticalStack Height="Fit" Name="List"/>
