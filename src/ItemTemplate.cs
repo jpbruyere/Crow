@@ -41,6 +41,7 @@ namespace Crow
 			: base(path) {
 			strDataType = _dataType;
 			fetchMethodName = _fetchDataMethod;
+
 		}
 		public ItemTemplate (Type _root, InstanciatorInvoker _loader,string _dataType, string _fetchDataMethod)
 			:base(_root, _loader)

@@ -129,7 +129,7 @@
 						<RadioButton/>
 					</VerticalStack>
 				</TabItem>
-				<TabItem Name="TabItem2" Caption="Tab 3" Background="Gray">
+				<TabItem Name="TabItem3" Caption="Tab 3" Background="Gray">
 					<Container Margin="5" CornerRadius="2">
 						<TextBox Height="Stretched" Margin="5" Multiline="true" TextAlignment="TopLeft"/>
 					</Container>
