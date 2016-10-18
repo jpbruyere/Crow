@@ -276,9 +276,13 @@ namespace Crow
 				Width = Height = Measure.Fit;
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("Stretched")]
+		[XmlAttributeAttribute()][DefaultValue("Inherit")]
 		public virtual Measure Width {
-			get { return width; }
+			get {
+				return width.Units == Unit.Inherit ?
+					Parent is GraphicObject ? (Parent as GraphicObject).WidthPolicy :
+					Measure.Stretched : width;
+			}
 			set {
 				if (width == value)
 					return;
@@ -308,9 +312,13 @@ namespace Crow
 				this.RegisterForLayouting (LayoutingType.Width);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("Stretched")]
+		[XmlAttributeAttribute()][DefaultValue("Inherit")]
 		public virtual Measure Height {
-			get { return height; }
+			get {
+				return height.Units == Unit.Inherit ?
+					Parent is GraphicObject ? (Parent as GraphicObject).HeightPolicy :
+					Measure.Stretched : height;
+			}
 			set {
 				if (height == value)
 					return;

@@ -14,17 +14,18 @@
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <NoWin32Manifest>False</NoWin32Manifest>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
     <DelaySign>False</DelaySign>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Description>C# Rapid Open Widget</Description>
     <BaseAddress>4194304</BaseAddress>
-    <ReleaseVersion>0.4</ReleaseVersion>
+    <ReleaseVersion>0.5</ReleaseVersion>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
+    <AssemblyOriginatorKeyFile>crow.key</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -144,6 +145,7 @@
     <Compile Include="src\GraphicObjects\MenuItem.cs" />
     <Compile Include="src\GraphicObjects\Menu.cs" />
     <Compile Include="src\Command.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -151,10 +153,10 @@
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Drawing" />
-	<Reference Include="cairo-sharp"/>
-	<Reference Include="gdk-sharp"/>
-	<Reference Include="gio-sharp"/>
-	<Reference Include="glib-sharp"/>
+    <Reference Include="cairo-sharp" />
+    <Reference Include="gdk-sharp" />
+    <Reference Include="gio-sharp" />
+    <Reference Include="glib-sharp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

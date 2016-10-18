@@ -10,6 +10,9 @@ using System.Diagnostics;
 
 namespace Crow
 {
+	/// <summary>
+	/// Universal Color structure
+	/// </summary>
 	public struct Color
     {
 		#region CTOR

@@ -1,13 +1,10 @@
 <?xml version="1.0"?>
-<Container Background="{./Background}" Height="{./HeightPolicy}" Width="{./WidthPolicy}">
-	<Group Height="{./HeightPolicy}" Width="{./WidthPolicy}">
-		<VerticalStack Spacing="0"
-			Height="{./HeightPolicy}" Width="{./WidthPolicy}">
-			<GraphicObject Height="6" Width="{./WidthPolicy}"/>
-			<Border  CornerRadius="5" BorderWidth="1" Margin="10" Foreground="{./Foreground}"
-				Height="{./HeightPolicy}" Width="{./WidthPolicy}">
-				<Container Name="Content" Margin="0" MinimumSize="70,10"
-						Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}"/>
+<Container Background="{./Background}">
+	<Group>
+		<VerticalStack Spacing="0">
+			<GraphicObject Height="6"/>
+			<Border  CornerRadius="5" BorderWidth="1" Margin="10" Foreground="{./Foreground}">
+				<Container Name="Content" Margin="0" MinimumSize="70,10"/>
 			</Border>
 		</VerticalStack>
 		<Label Text="{./Caption}" VerticalAlignment="Top" Left="8"
