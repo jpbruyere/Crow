@@ -56,7 +56,6 @@ namespace Crow
 			Type hostType = tmpGrpType;//not sure is the best place to put the dyn method
 			Type evtType = typeof(EventHandler);
 
-
 			PropertyInfo piData = tmpGrpType.GetProperty ("Data");
 
 			MethodInfo evtInvoke = evtType.GetMethod ("Invoke");

@@ -8,7 +8,6 @@
 				MouseLeave="{Foreground=Transparent}"
 				MouseDown="{Foreground=vgradient|0:Black|0.05:Gray|0.85:Gray|1:White}"
 				MouseUp="{Foreground=vgradient|0:White|0.2:Gray|0.9:Gray|1:Black}"
-				Height="{./HeightPolicy}" Width="{./WidthPolicy}"
 				MinimumSize = "60,0"
 				Foreground="Transparent"
 				Background="{./Background}">

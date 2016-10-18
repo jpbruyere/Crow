@@ -15,6 +15,8 @@ namespace Crow
 		static MethodInfo miAddBinding = typeof(GraphicObject).GetMethod ("BindMember");
 		static FieldInfo miSetCurIface = typeof(GraphicObject).GetField ("currentInterface",
 			BindingFlags.NonPublic | BindingFlags.Instance);
+		static MethodInfo miFindByName = typeof (GraphicObject).GetMethod ("FindByName");
+
 
 		#region ValueChange Reflexion member info
 		static MethodInfo stringEquals = typeof (string).GetMethod
@@ -177,7 +179,7 @@ namespace Crow
 						continue;
 					//register handler for event
 					if (b.Target.Method == null) {
-						Debug.WriteLine ("\tError: Handler Method not found: " + b.ToString ());
+						//Debug.WriteLine ("\tError: Handler Method not found: " + b.ToString ());
 						continue;
 					}
 					try {
@@ -190,7 +192,7 @@ namespace Crow
 #endif
 						b.Resolved = true;
 					} catch (Exception ex) {
-						Debug.WriteLine ("\tERROR: " + ex.ToString ());
+						//Debug.WriteLine ("\tERROR: " + ex.ToString ());
 					}
 					continue;
 				}
@@ -438,11 +440,10 @@ namespace Crow
 				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack
 
 				string [] lopParts = lop.Split (new char [] { '.' });
-				if (lopParts.Length > 1) {//should search also for member of es.Source
-					MethodInfo FindByNameMi = typeof (GraphicObject).GetMethod ("FindByName");
+				if (lopParts.Length > 1) {//should search also for member of es.Source					
 					for (int j = 0; j < lopParts.Length - 1; j++) {
 						il.Emit (OpCodes.Ldstr, lopParts [j]);
-						il.Emit (OpCodes.Callvirt, FindByNameMi);
+						il.Emit (OpCodes.Callvirt, miFindByName);
 					}
 				}
 
