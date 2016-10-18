@@ -362,7 +362,7 @@ namespace Crow
 						il.Emit (OpCodes.Callvirt, tostring.Method);
 					} else if (!sourceValueType.IsValueType)
 						il.Emit (OpCodes.Castclass, sourceValueType);
-					else if (b.Source.Property.PropertyType != sourceValueType) {
+					else if (b.Source.Property.PropertyType != sourceValueType && b.Source.Property.PropertyType != typeof(object)) {
 						il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (b.Source.Property.PropertyType));
 					} else
 						il.Emit (OpCodes.Unbox_Any, b.Source.Property.PropertyType);
