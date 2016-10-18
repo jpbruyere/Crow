@@ -226,6 +226,7 @@ namespace Crow
 
 				verticalAlignment = value;
 				NotifyValueChanged("VerticalAlignment", verticalAlignment);
+				RegisterForLayouting (LayoutingType.Y);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(HorizontalAlignment.Center)]
@@ -237,6 +238,7 @@ namespace Crow
 
 				horizontalAlignment = value;
 				NotifyValueChanged("HorizontalAlignment", horizontalAlignment);
+				RegisterForLayouting (LayoutingType.X);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
