@@ -27,12 +27,57 @@ using System.Collections.Generic;
 
 namespace CrowIDE
 {
-	public class PropertyContainer {
+	public class PropertyContainer : IBindable
+	{
+		public object DataSource {
+			get {
+				throw new NotImplementedException ();
+			}
+			set {
+				throw new NotImplementedException ();
+			}
+		}
+
+		#region IBindable implementation
+		List<Binding> bindings = new List<Binding> ();
+		public List<Binding> Bindings {
+			get { return bindings; }
+		}
+		#endregion
+
 		PropertyInfo pi;
 		object instance;
 
 		public string Name { get { return pi.Name; }}
-		public object Value { get { return pi.GetValue(instance); }}
+		public object Value {
+			get { return pi.GetValue(instance); }
+			set {
+				try {
+					if (pi.PropertyType != value.GetType() && pi.PropertyType != typeof(string)){
+						if (pi.PropertyType.IsEnum) {
+							pi.SetValue (instance, value);
+						} else {
+							MethodInfo me = pi.PropertyType.GetMethod
+								("Parse", BindingFlags.Static | BindingFlags.Public,
+									System.Type.DefaultBinder, new Type [] {typeof (string)},null);
+							pi.SetValue (instance, me.Invoke (null, new object[] { value }), null);
+						}
+					}else
+						pi.SetValue(instance, value);
+				} catch (Exception ex) {
+					System.Diagnostics.Debug.WriteLine ("Error setting property:"+ ex.ToString());
+				}
+
+			}
+		}
+		public string Type { get { return pi.PropertyType.IsEnum ?
+					"System.Enum"
+					: pi.PropertyType.FullName; }}
+		public string[] Choices {
+			get {
+				return Enum.GetNames (pi.PropertyType);
+			}
+		}
 
 		public PropertyContainer(PropertyInfo prop, object _instance){
 			pi = prop;
