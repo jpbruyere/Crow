@@ -404,6 +404,8 @@ namespace Crow
 			set {
 				if (background == value)
 					return;
+				if (value == null)
+					return;
 				background = value;
 				NotifyValueChanged ("Background", background);
 				RegisterForRedraw ();

@@ -93,6 +93,7 @@
     <EmbeddedResource Include="ui\bindingExplorer.crow" />
     <EmbeddedResource Include="ui\bindingExpITemp.crow" />
     <EmbeddedResource Include="ui\LQIsExplorer.crow" />
+    <EmbeddedResource Include="Default.style" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">

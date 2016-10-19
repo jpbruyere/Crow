@@ -308,7 +308,7 @@ namespace Crow
 					if (b.Target.Member != null)
 						il.Emit (OpCodes.Ldstr, b.Target.Member.Name);
 					else
-						il.Emit (OpCodes.Ldstr, b.Expression.Split ('/').LastOrDefault ());
+						il.Emit (OpCodes.Ldstr, b.Expression.Split ('/').LastOrDefault ().Split('.').LastOrDefault());
 					il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
 					il.Emit (OpCodes.Callvirt, stringEquals);
 					il.Emit (OpCodes.Brtrue, jumpTable [i]);
