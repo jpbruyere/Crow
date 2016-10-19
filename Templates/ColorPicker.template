@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<Border Background="{./Background}"	Foreground="{./Foreground}"
+		CornerRadius="{./CornerRadius}" BorderWidth="1">
+		<HorizontalStack Spacing="0">
+			<VerticalStack Margin="5">
+				<ColorSelector Focusable="true" Name="colorSelector" Margin="1" Width="200" Height="200" Background="DimGray"/>
+			</VerticalStack>
+			<VerticalStack Margin="5">
+				<HorizontalStack>
+					<Label Text="Red:" Width="50"/>
+					<Spinner Style="ColorSpinner" Value="{²../../../colorSelector.R}" Width="50"  />
+				</HorizontalStack>
+				<HorizontalStack>
+					<Label Text="Green:" Width="50"/>
+					<Spinner Style="ColorSpinner" Value="{²../../../colorSelector.G}" Width="50"  />
+				</HorizontalStack>
+				<HorizontalStack>
+					<Label Text="Blue:" Width="50"/>
+					<Spinner Style="ColorSpinner" Value="{²../../../colorSelector.B}" Width="50"  />
+				</HorizontalStack>
+				<HorizontalStack>
+					<Label Text="Alpha:" Width="50"/>
+					<Spinner Style="ColorSpinner" Value="{²../../../colorSelector.A}" Width="50"  />
+				</HorizontalStack>
+				<GraphicObject Width="30" Height="20" Background="{../../colorSelector.PointedColor}"/>
+				<Label Background="Jet" Text="{../../colorSelector.PointedColorName}"/>
+				<GraphicObject Width="30" Height="20" Background="{../../colorSelector.SelectedColor}"/>
+				<Label Background="Jet" Text="{../../colorSelector.SelectedColorName}"/>
+			</VerticalStack>
+		</HorizontalStack>
+</Border>

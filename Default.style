@@ -55,6 +55,7 @@ TextBox {
 	Foreground = Black;
 	Selectable = True;
 	Text = TextBox;
+	Margin = 1;
 }
 Window {
 	Focusable = true;
@@ -80,4 +81,9 @@ Icon {
 Control {
 	Margin=0;
 	Spacing=3;
+}
+ColorSpinner {
+	Minimum = 0;
+	Maximum = 255;
+	SmallIncrement = 1;
 }

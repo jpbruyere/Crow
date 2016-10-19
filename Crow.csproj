@@ -146,6 +146,8 @@
     <Compile Include="src\GraphicObjects\Menu.cs" />
     <Compile Include="src\Command.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\GraphicObjects\ColorPicker.cs" />
+    <Compile Include="src\GraphicObjects\ColorSelector.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -276,6 +278,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Templates\Menu.template">
       <LogicalName>Crow.Menu.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\ColorPicker.template">
+      <LogicalName>Crow.ColorPicker.template</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
