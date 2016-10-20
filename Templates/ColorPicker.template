@@ -3,29 +3,31 @@
 		CornerRadius="{./CornerRadius}" BorderWidth="1">
 		<HorizontalStack Spacing="0">
 			<VerticalStack Margin="5">
-				<ColorSelector Focusable="true" Name="colorSelector" Margin="1" Width="200" Height="200" Background="DimGray"/>
+				<SaturationValueSelector Focusable="true" Name="colorSelector" Margin="0" Width="200" Height="200" Background="DimGray"
+					Foreground="{../hueSelector.SelectedColor}"/>
+				<HueSelector Focusable="true" Name="hueSelector" Margin="0" Width="200" Height="20" Background="DimGray"/>
 			</VerticalStack>
-			<VerticalStack Margin="5">
-				<HorizontalStack>
+			<VerticalStack Margin="5" Height="Stretched">
+				<HorizontalStack Height="Fit" Width="Stretched">
+					<GraphicObject Width="40" Height="40" Background="{../../../colorSelector.SelectedColor}"/>
+					<Label Width="Stretched" Background="Jet" Text="{../../../colorSelector.SelectedColorName}" TextAlignment="Center"/>
+				</HorizontalStack>
+				<HorizontalStack Height="Fit">
 					<Label Text="Red:" Width="50"/>
 					<Spinner Style="ColorSpinner" Value="{²../../../colorSelector.R}" Width="50"  />
 				</HorizontalStack>
-				<HorizontalStack>
+				<HorizontalStack Height="Fit">
 					<Label Text="Green:" Width="50"/>
 					<Spinner Style="ColorSpinner" Value="{²../../../colorSelector.G}" Width="50"  />
 				</HorizontalStack>
-				<HorizontalStack>
+				<HorizontalStack Height="Fit">
 					<Label Text="Blue:" Width="50"/>
 					<Spinner Style="ColorSpinner" Value="{²../../../colorSelector.B}" Width="50"  />
 				</HorizontalStack>
-				<HorizontalStack>
+				<HorizontalStack Height="Fit">
 					<Label Text="Alpha:" Width="50"/>
 					<Spinner Style="ColorSpinner" Value="{²../../../colorSelector.A}" Width="50"  />
 				</HorizontalStack>
-				<GraphicObject Width="30" Height="20" Background="{../../colorSelector.PointedColor}"/>
-				<Label Background="Jet" Text="{../../colorSelector.PointedColorName}"/>
-				<GraphicObject Width="30" Height="20" Background="{../../colorSelector.SelectedColor}"/>
-				<Label Background="Jet" Text="{../../colorSelector.SelectedColorName}"/>
 			</VerticalStack>
 		</HorizontalStack>
 </Border>
