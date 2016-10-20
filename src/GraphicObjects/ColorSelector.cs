@@ -132,6 +132,7 @@ namespace Crow
 					NotifyValueChanged ("SelectedColorName", n);
 				else
 					NotifyValueChanged ("SelectedColorName", "-");
+				NotifyValueChanged ("HexColor", ((int)R).ToString ("X") + ((int)G).ToString ("X") + ((int)B).ToString ("X") + ((int)A).ToString ("X"));
 			}
 		}
 
