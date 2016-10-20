@@ -2,15 +2,18 @@
 <Border Background="{./Background}"	Foreground="{./Foreground}"
 		CornerRadius="{./CornerRadius}" BorderWidth="1">
 		<HorizontalStack Spacing="0">
-			<VerticalStack Margin="5">
-				<SaturationValueSelector Focusable="true" Name="colorSelector" Margin="0" Width="200" Height="200" Background="DimGray"
+			<VerticalStack Margin="10">
+				<SaturationValueSelector Focusable="true" Name="colorSelector" Margin="0" Width="140" Height="140" Background="DimGray"
 					Foreground="{../hueSelector.SelectedColor}"/>
-				<HueSelector Focusable="true" Name="hueSelector" Margin="0" Width="200" Height="20" Background="DimGray"/>
+				<HueSelector Focusable="true" Name="hueSelector" Margin="0" Width="140" Height="20" Background="DimGray"/>
 			</VerticalStack>
 			<VerticalStack Margin="5" Height="Stretched">
 				<HorizontalStack Height="Fit" Width="Stretched">
-					<GraphicObject Width="40" Height="40" Background="{../../../colorSelector.SelectedColor}"/>
-					<Label Width="Stretched" Background="Jet" Text="{../../../colorSelector.SelectedColorName}" TextAlignment="Center"/>
+					<GraphicObject Width="30" Height="30" Background="{../../../colorSelector.SelectedColor}"/>
+					<VerticalStack Margin="5">
+						<Label Focusable="true" Selectable="true" Width="Stretched" Text="{../../../../colorSelector.SelectedColorName}" />
+						<Label Focusable="true" Selectable="true" Width="Stretched" Text="{../../../../colorSelector.HexColor}" />
+					</VerticalStack>
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
 					<Label Text="Red:" Width="50"/>
