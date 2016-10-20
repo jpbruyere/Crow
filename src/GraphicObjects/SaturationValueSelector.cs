@@ -54,7 +54,7 @@ namespace Crow
 			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
 			gr.Fill();
 
-			SelectedColor = new SolidColor(getPixelAt(mousePos.X, mousePos.Y));
+			updateColor (false);
 		}
 		public override void Paint (ref Context ctx)
 		{
