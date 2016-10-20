@@ -72,7 +72,7 @@
 						<CheckBox Background="White" Margin="1" Caption="" IsChecked="{²Value}"/>
 					</HorizontalStack>
 				</ItemTemplate>
--				<ItemTemplate DataType="System.Enum">
+				<ItemTemplate DataType="System.Enum">
 					<HorizontalStack Focusable="true"  Height="Fit" Spacing="0"
 							MouseEnter="{Background=UnitedNationsBlue}"
 							MouseLeave="{Background=Transparent}" >
@@ -119,6 +119,25 @@
 						</ComboBox>
 					</HorizontalStack>
 				</ItemTemplate>
+				<ItemTemplate DataType="Crow.Fill">
+					<HorizontalStack Focusable="true"  Height="Fit" Spacing="0"
+							MouseEnter="{Background=UnitedNationsBlue}"
+							MouseLeave="{Background=Transparent}" >
+						<Label Margin="1" Text="{Name}" Height="Fit" Width="50%"/>
+						<Popper Foreground="{²Value}" Background="White" Margin="1" Caption="{²Value}">
+							<Template>
+								<HorizontalStack Spacing="3" Height="Fit" Background="{./Background}">
+									<Border Foreground="Black" Width="16" Height="10" CornerRadius="3"
+										Background="{./Foreground}">
+									</Border>
+									<Label Text="{./Caption}" Foreground="Black"/>
+								</HorizontalStack>
+							</Template>
+							<ColorPicker SelectedColor="{²Value}" Background="Onyx" Margin="5" Fit="True" />
+						</Popper>
+					</HorizontalStack>
+				</ItemTemplate>
+
 			</MembersView>
 		</HorizontalStack>
 	</VerticalStack>

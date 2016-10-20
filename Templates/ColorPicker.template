@@ -4,6 +4,7 @@
 		<HorizontalStack Spacing="0">
 			<VerticalStack Margin="10">
 				<SaturationValueSelector Focusable="true" Name="colorSelector" Margin="0" Width="140" Height="140" Background="DimGray"
+					SelectedColor="{²./SelectedColor}"
 					Foreground="{../hueSelector.SelectedColor}"/>
 				<HueSelector Focusable="true" Name="hueSelector" Margin="0" Width="140" Height="20" Background="DimGray"/>
 			</VerticalStack>
