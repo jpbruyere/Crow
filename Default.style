@@ -87,3 +87,8 @@ ColorSpinner {
 	Maximum = 255;
 	SmallIncrement = 1;
 }
+HSVSpinner {
+	Minimum = 0;
+	Maximum = 1;
+	SmallIncrement = 0.01;
+}

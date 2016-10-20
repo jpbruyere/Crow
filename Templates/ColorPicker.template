@@ -28,6 +28,18 @@
 					<Label Text="Alpha:" Width="50"/>
 					<Spinner Style="ColorSpinner" Value="{²../../../colorSelector.A}" Width="50"  />
 				</HorizontalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="Hue:" Width="50"/>
+					<Spinner Style="HSVSpinner" Value="{²../../../colorSelector.H}" Width="50"  />
+				</HorizontalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="Sat:" Width="50"/>
+					<Spinner Style="HSVSpinner" Value="{²../../../colorSelector.S}" Width="50"  />
+				</HorizontalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="Val:" Width="50"/>
+					<Spinner Style="HSVSpinner" Value="{²../../../colorSelector.V}" Width="50"  />
+				</HorizontalStack>
 			</VerticalStack>
 		</HorizontalStack>
 </Border>

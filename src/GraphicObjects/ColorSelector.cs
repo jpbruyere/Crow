@@ -33,8 +33,9 @@ namespace Crow
 		const double div = 255.0;
 		const double colDiv = 1.0 / div;
 
-		Fill pointedColor, selectedColor;
+		Fill selectedColor;
 		protected Point mousePos;
+		double h,s,v;
 
 		[XmlAttributeAttribute()]
 		public virtual double R {
@@ -44,6 +45,8 @@ namespace Crow
 					return;
 				Color c = (SelectedColor as SolidColor).color;
 				SelectedColor = new SolidColor (new Color (value * colDiv, c.G, c.B, c.A));
+				NotifyValueChanged ("R", R);
+				updateHSV ();
 			}
 		}
 		[XmlAttributeAttribute()]
@@ -54,6 +57,8 @@ namespace Crow
 					return;
 				Color c = (SelectedColor as SolidColor).color;
 				SelectedColor = new SolidColor (new Color (c.R, value * colDiv, c.B, c.A));
+				NotifyValueChanged ("G", G);
+				updateHSV ();
 			}
 		}
 		[XmlAttributeAttribute()]
@@ -64,6 +69,8 @@ namespace Crow
 					return;
 				Color c = (SelectedColor as SolidColor).color;
 				SelectedColor = new SolidColor (new Color (c.R, c.G, value * colDiv, c.A));
+				NotifyValueChanged ("B", B);
+				updateHSV ();
 			}
 		}
 		[XmlAttributeAttribute()]
@@ -74,23 +81,58 @@ namespace Crow
 					return;
 				Color c = (SelectedColor as SolidColor).color;
 				SelectedColor = new SolidColor (new Color (c.R, c.G, c.B, value * colDiv));
+				NotifyValueChanged ("A", A);
+				updateHSV ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("White")]
-		public virtual Fill PointedColor {
-			get { return pointedColor; }
+		[XmlAttributeAttribute()]
+		public virtual double H {
+			get { return Math.Round (h, 3); }
 			set {
-				if (pointedColor == value)
+				if (H == value)
 					return;
-				pointedColor = value; 
-				NotifyValueChanged ("PointedColor", pointedColor);
-				string n = (pointedColor as SolidColor).color.ToString ();
-				if (char.IsLetter(n[0]))
-					NotifyValueChanged ("PointedColorName", n);
-				else
-					NotifyValueChanged ("PointedColorName", "-");
+				h = value;
+				NotifyValueChanged ("H", H);
+				computeColorFromHSV ();
 			}
 		}
+		[XmlAttributeAttribute()]
+		public virtual double S {
+			get { return Math.Round (s, 2); }
+			set {
+				if (s == value)
+					return;
+				s = value;
+				NotifyValueChanged ("S", S);
+				computeColorFromHSV ();
+			}
+		}
+		[XmlAttributeAttribute()]
+		public virtual double V {
+			get { return Math.Round (v, 2); }
+			set {
+				if (v == value)
+					return;
+				v = value;
+				NotifyValueChanged ("V", V);
+				computeColorFromHSV ();
+			}
+		}
+//		[XmlAttributeAttribute()][DefaultValue("White")]
+//		public virtual Fill PointedColor {
+//			get { return pointedColor; }
+//			set {
+//				if (pointedColor == value)
+//					return;
+//				pointedColor = value; 
+//				NotifyValueChanged ("PointedColor", pointedColor);
+//				string n = (pointedColor as SolidColor).color.ToString ();
+//				if (char.IsLetter(n[0]))
+//					NotifyValueChanged ("PointedColorName", n);
+//				else
+//					NotifyValueChanged ("PointedColorName", "-");
+//			}
+//		}
 		[XmlAttributeAttribute()][DefaultValue("White")]
 		public virtual Fill SelectedColor {
 			get { return selectedColor; }
@@ -104,10 +146,6 @@ namespace Crow
 					NotifyValueChanged ("SelectedColorName", n);
 				else
 					NotifyValueChanged ("SelectedColorName", "-");
-				NotifyValueChanged ("R", R);
-				NotifyValueChanged ("G", G);
-				NotifyValueChanged ("B", B);
-				NotifyValueChanged ("A", A);
 			}
 		}
 
@@ -137,9 +175,18 @@ namespace Crow
 			mousePos.Y = Math.Max(cb.Y, mousePos.Y);
 			mousePos.Y = Math.Min(cb.Bottom-1, mousePos.Y);
 		}
-		virtual protected void updateColor(){
+		virtual protected void updateColor(bool redraw = true){
 			SelectedColor = new SolidColor(getPixelAt(mousePos.X, mousePos.Y));
-			RegisterForRedraw ();
+
+			updateHSV ();
+
+			NotifyValueChanged ("R", R);
+			NotifyValueChanged ("G", G);
+			NotifyValueChanged ("B", B);
+			NotifyValueChanged ("A", A);
+
+			if (redraw)
+				RegisterForRedraw ();
 		}
 
 		protected Color getPixelAt(int x, int y){
@@ -154,7 +201,78 @@ namespace Crow
 				(double)bmp[ptr] * colDiv,
 				(double)bmp[ptr + 3] * colDiv);
 		}
+		void updateHSV(){
+			Color c = (SelectedColor as SolidColor).color;
+			double min = Math.Min (c.R, Math.Min (c.G, c.B));	//Min. value of RGB
+			double max = Math.Max (c.R, Math.Max (c.G, c.B));	//Max. value of RGB
+			double diff = max - min;							//Delta RGB value
 
+			v = max;
+
+			if ( diff == 0 )//This is a gray, no chroma...
+			{
+				h = 0;
+				s = 0;
+			}else{//Chromatic data...				
+				s = diff / max;
+
+				double diffR = (((max - c.R) / 6.0) + (diff / 2.0)) / diff;
+				double diffG = (((max - c.G) / 6.0) + (diff / 2.0)) / diff;
+				double diffB = (((max - c.B) / 6.0) + (diff / 2.0)) / diff;
+
+				if (c.R == max)
+					h = diffB - diffG;
+				else if (c.G == max)
+					h = (1.0 / 3.0) + diffR - diffB;
+				else if (c.B == max)
+					h = (2.0 / 3.0) + diffG - diffR;
+				
+				if (h < 0)
+					h += 1;
+				if (h > 1)
+					h -= 1;
+				
+			}
+
+			NotifyValueChanged ("H", H);
+			NotifyValueChanged ("S", S);
+			NotifyValueChanged ("V", V);
+		}
+		void computeColorFromHSV(){
+			Color c = Color.Black;
+
+			if (s == 0) {//HSV from 0 to 1
+				c.R = v;
+				c.G = v;
+				c.B = v;
+			}else{
+				double var_h = h * 6.0;
+
+				if (var_h == 6.0)
+					var_h = 0;	//H must be < 1
+				double var_i = Math.Floor( var_h );	//Or ... var_i = floor( var_h )
+				double var_1 = v * ( 1.0 - s );
+				double var_2 = v * (1.0 - s * (var_h - var_i));
+				double var_3 = v * (1.0 - s * (1.0 - (var_h - var_i)));
+
+				if (var_i == 0.0) {
+					c.R = v;
+					c.G = var_3;
+					c.B = var_1;
+				}else if ( var_i == 1.0 ) { c.R = var_2 ; c.G = v     ; c.B = var_1; }
+				else if ( var_i == 2 ) { c.R = var_1 ; c.G = v     ; c.B = var_3; }
+				else if ( var_i == 3 ) { c.R = var_1 ; c.G = var_2 ; c.B = v;     }
+				else if ( var_i == 4 ) { c.R = var_3 ; c.G = var_1 ; c.B = v;    }
+				else                   { c.R = v     ; c.G = var_1 ; c.B = var_2; }
+			}
+
+			SelectedColor = new SolidColor (c);
+
+			NotifyValueChanged ("R", R);
+			NotifyValueChanged ("G", G);
+			NotifyValueChanged ("B", B);
+			NotifyValueChanged ("A", A);
+		}
 	}
 }
 
