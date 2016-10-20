@@ -26,52 +26,19 @@ namespace Crow
 {
 	public class ColorSelector : GraphicObject
 	{
-		const double colDiv = 1.0 / 255.0;
-
-		public ColorSelector ():base()
+		public ColorSelector (): base()
 		{
 		}
-		protected override void onDraw (Cairo.Context gr)
-		{
-			base.onDraw (gr);
 
-			Rectangle r = ClientRectangle;
+		const double div = 255.0;
+		const double colDiv = 1.0 / div;
 
-//			if (r.Width > r.Height) {
-//				int diff = r.Width - r.Height;
-//				r.Width = r.Height;
-//				r.X -= diff / 2;
-//			} else if (r.Height > r.Width) {
-//				int diff = r.Height - r.Width;
-//				r.Height = r.Width;
-//				r.Y += diff / 2;
-//			}
+		Fill pointedColor, selectedColor;
+		protected Point mousePos;
 
-			Crow.Gradient grad = new Gradient (Gradient.Type.Horizontal);
-
-			grad.Stops.Add (new Gradient.ColorStop (0, new Color (1, 0, 0, 1)));
-			grad.Stops.Add (new Gradient.ColorStop (0.2, new Color (1, 1, 0, 1)));
-			grad.Stops.Add (new Gradient.ColorStop (0.4, new Color (0, 1, 0, 1)));
-			grad.Stops.Add (new Gradient.ColorStop (0.6, new Color (0, 1, 1, 1)));
-			grad.Stops.Add (new Gradient.ColorStop (0.8, new Color (0, 0, 1, 1)));
-			grad.Stops.Add (new Gradient.ColorStop (1, new Color (1, 0, 0, 1)));
-
-			grad.SetAsSource (gr, r);
-			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
-			gr.Fill();
-
-			grad = new Gradient (Gradient.Type.Vertical);
-			grad.Stops.Add (new Gradient.ColorStop (0, new Color (1, 1, 1, 1)));
-			grad.Stops.Add (new Gradient.ColorStop (0.5, new Color (0, 0, 0, 0)));
-			grad.Stops.Add (new Gradient.ColorStop (1, new Color (0, 0, 0, 1)));
-
-			grad.SetAsSource (gr, r);
-			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
-			gr.Fill();
-		}
 		[XmlAttributeAttribute()]
 		public virtual double R {
-			get { return Math.Ceiling((selectedColor as SolidColor).color.R * 255.0); }
+			get { return Math.Round((selectedColor as SolidColor).color.R * div); }
 			set {
 				if (R == value)
 					return;
@@ -81,7 +48,7 @@ namespace Crow
 		}
 		[XmlAttributeAttribute()]
 		public virtual double G {
-			get { return Math.Ceiling((selectedColor as SolidColor).color.G * 255.0); }
+			get { return Math.Round((selectedColor as SolidColor).color.G * div); }
 			set {
 				if (G == value)
 					return;
@@ -91,7 +58,7 @@ namespace Crow
 		}
 		[XmlAttributeAttribute()]
 		public virtual double B {
-			get { return Math.Ceiling((selectedColor as SolidColor).color.B * 255.0); }
+			get { return Math.Round((selectedColor as SolidColor).color.B * div); }
 			set {
 				if (B == value)
 					return;
@@ -101,7 +68,7 @@ namespace Crow
 		}
 		[XmlAttributeAttribute()]
 		public virtual double A {
-			get { return Math.Ceiling((selectedColor as SolidColor).color.A * 255.0); }
+			get { return Math.Round((selectedColor as SolidColor).color.A * div); }
 			set {
 				if (A == value)
 					return;
@@ -109,8 +76,6 @@ namespace Crow
 				SelectedColor = new SolidColor (new Color (c.R, c.G, c.B, value * colDiv));
 			}
 		}
-
-		Fill pointedColor, selectedColor;
 		[XmlAttributeAttribute()][DefaultValue("White")]
 		public virtual Fill PointedColor {
 			get { return pointedColor; }
@@ -143,22 +108,44 @@ namespace Crow
 				NotifyValueChanged ("G", G);
 				NotifyValueChanged ("B", B);
 				NotifyValueChanged ("A", A);
-				//NotifyValueChanged ("A", sc.color.A);
 			}
-		} 
+		}
 
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
-			Rectangle r = ScreenCoordinates (Slot);
-			Point pos = e.Position - r.Position;
-			//System.Diagnostics.Debug.WriteLine ("{0} {1}", pos.X, pos.Y);
-			if (bmp == null)
+			if (bmp == null || CurrentInterface.Mouse.LeftButton == ButtonState.Released)
 				return;
-			PointedColor = new SolidColor(getPixelAt(pos.X, pos.Y));
+			updateMouseLocalPos (e.Position);
+			updateColor ();
 		}
 
-		Color getPixelAt(int x, int y){			
+		public override void onMouseClick (object sender, MouseButtonEventArgs e)
+		{
+			base.onMouseClick (sender, e);
+
+			updateMouseLocalPos (e.Position);
+			updateColor ();
+		}
+		void updateMouseLocalPos(Point mPos){
+			Rectangle r = ScreenCoordinates (Slot);
+			Rectangle cb = ClientRectangle;
+			mousePos = mPos - r.Position;
+
+			mousePos.X = Math.Max(cb.X, mousePos.X);
+			mousePos.X = Math.Min(cb.Right-1, mousePos.X);
+			mousePos.Y = Math.Max(cb.Y, mousePos.Y);
+			mousePos.Y = Math.Min(cb.Bottom-1, mousePos.Y);
+		}
+		virtual protected void updateColor(){
+			SelectedColor = new SolidColor(getPixelAt(mousePos.X, mousePos.Y));
+			RegisterForRedraw ();
+		}
+
+		protected Color getPixelAt(int x, int y){
+			if (bmp == null)
+				return Color.Transparent;
+
 			int ptr = y * Slot.Width * 4 + x * 4;
 
 			return new Color(
@@ -166,19 +153,8 @@ namespace Crow
 				(double)bmp[ptr + 1] * colDiv,
 				(double)bmp[ptr] * colDiv,
 				(double)bmp[ptr + 3] * colDiv);
-
-//			return new Color(
-//				1.0 / (double)bmp[ptr + 1],
-//				1.0 / (double)bmp[ptr + 2],
-//				1.0 / (double)bmp[ptr + 3],
-//				1.0 / (double)bmp[ptr]);
 		}
 
-		public override void onMouseClick (object sender, MouseButtonEventArgs e)
-		{			
-			base.onMouseClick (sender, e);
-			SelectedColor = PointedColor;
-		}
 	}
 }
 

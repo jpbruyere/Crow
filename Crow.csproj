@@ -148,6 +148,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\GraphicObjects\ColorPicker.cs" />
     <Compile Include="src\GraphicObjects\ColorSelector.cs" />
+    <Compile Include="src\GraphicObjects\HueSelector.cs" />
+    <Compile Include="src\GraphicObjects\SaturationValueSelector.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
