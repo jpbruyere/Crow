@@ -118,21 +118,7 @@ namespace Crow
 				computeColorFromHSV ();
 			}
 		}
-//		[XmlAttributeAttribute()][DefaultValue("White")]
-//		public virtual Fill PointedColor {
-//			get { return pointedColor; }
-//			set {
-//				if (pointedColor == value)
-//					return;
-//				pointedColor = value; 
-//				NotifyValueChanged ("PointedColor", pointedColor);
-//				string n = (pointedColor as SolidColor).color.ToString ();
-//				if (char.IsLetter(n[0]))
-//					NotifyValueChanged ("PointedColorName", n);
-//				else
-//					NotifyValueChanged ("PointedColorName", "-");
-//			}
-//		}
+
 		[XmlAttributeAttribute()][DefaultValue("White")]
 		public virtual Fill SelectedColor {
 			get { return selectedColor; }
@@ -155,7 +141,7 @@ namespace Crow
 			if (bmp == null || CurrentInterface.Mouse.LeftButton == ButtonState.Released)
 				return;
 			updateMouseLocalPos (e.Position);
-			updateColor ();
+			updateColorFromPicking ();
 		}
 
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)
@@ -163,7 +149,7 @@ namespace Crow
 			base.onMouseClick (sender, e);
 
 			updateMouseLocalPos (e.Position);
-			updateColor ();
+			updateColorFromPicking ();
 		}
 		void updateMouseLocalPos(Point mPos){
 			Rectangle r = ScreenCoordinates (Slot);
@@ -175,7 +161,7 @@ namespace Crow
 			mousePos.Y = Math.Max(cb.Y, mousePos.Y);
 			mousePos.Y = Math.Min(cb.Bottom-1, mousePos.Y);
 		}
-		virtual protected void updateColor(bool redraw = true){
+		virtual protected void updateColorFromPicking(bool redraw = true){
 			SelectedColor = new SolidColor(getPixelAt(mousePos.X, mousePos.Y));
 
 			updateHSV ();
