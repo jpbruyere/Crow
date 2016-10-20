@@ -1,2 +1,5 @@
 ﻿<?xml version="1.0"?>
-<ColorPicker Background="Onyx" Margin="5" Fit="True" Foreground="White"/>
+<VerticalStack>
+	<ColorPicker SelectedColor="Red" Name="colorPicker" Background="Onyx" Margin="5" Fit="True" />
+	<GraphicObject Width="100" Height="60" Background="{../colorPicker.SelectedColor}"/>
+</VerticalStack>

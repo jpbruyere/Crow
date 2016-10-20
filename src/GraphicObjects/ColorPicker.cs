@@ -30,65 +30,16 @@ namespace Crow
 		{
 		}
 
-		Color selectedColor;
-		float _red, _green, _blue, _alpha;
+		Fill selectedColor;
 
-		[XmlAttributeAttribute()]
-		public virtual double Red {
-			get { return selectedColor.R; }
-			set {
-				if (selectedColor.R == value)
-					return;
-				selectedColor.R = value; 
-				NotifyValueChanged ("Red", selectedColor.R);
-				NotifyValueChanged ("SelectedColor", new SolidColor(selectedColor));
-			}
-		}
-		[XmlAttributeAttribute()]
-		public virtual double Green {
-			get { return selectedColor.G; }
-			set {
-				if (selectedColor.G == value)
-					return;
-				selectedColor.G = value;
-				NotifyValueChanged ("Green", selectedColor.G);
-				NotifyValueChanged ("SelectedColor", new SolidColor(selectedColor));
-			}
-		}
-		[XmlAttributeAttribute()]
-		public virtual double Blue {
-			get { return selectedColor.B; }
-			set {
-				if (selectedColor.B == value)
-					return;
-				selectedColor.B = value;
-				NotifyValueChanged ("Blue", selectedColor.B);
-				NotifyValueChanged ("SelectedColor", new SolidColor(selectedColor));
-			}
-		}
-		[XmlAttributeAttribute()]
-		public virtual double Alpha {
-			get { return selectedColor.A; }
-			set {
-				if (selectedColor.A == value)
-					return;
-				selectedColor.A = value;
-				NotifyValueChanged ("Alpha", selectedColor.A);
-				NotifyValueChanged ("SelectedColor", new SolidColor(selectedColor));
-			}
-		}
-		[XmlAttributeAttribute()][DefaultValue("White")]
-		public virtual SolidColor SelectedColor {
+		[XmlAttributeAttribute]
+		public virtual Fill SelectedColor {
 			get { return selectedColor; }
-			set {				
-				if (selectedColor.Equals(value))
+			set {
+				if (selectedColor == value)
 					return;
-				selectedColor = value; 
-				NotifyValueChanged ("SelectedColor", new SolidColor(selectedColor));
-				NotifyValueChanged ("Alpha", selectedColor.A);
-				NotifyValueChanged ("Blue", selectedColor.B);
-				NotifyValueChanged ("Green", selectedColor.G);
-				NotifyValueChanged ("Red", selectedColor.R);
+				selectedColor = value;
+				NotifyValueChanged ("SelectedColor", selectedColor);
 			}
 		}
 	}

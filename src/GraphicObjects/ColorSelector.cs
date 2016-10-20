@@ -33,7 +33,7 @@ namespace Crow
 		const double div = 255.0;
 		const double colDiv = 1.0 / div;
 
-		Fill selectedColor;
+		Fill selectedColor = new SolidColor(Color.Red);
 		protected Point mousePos;
 		double h,s,v;
 
@@ -119,7 +119,7 @@ namespace Crow
 			}
 		}
 
-		[XmlAttributeAttribute()][DefaultValue("White")]
+		[XmlAttributeAttribute]
 		public virtual Fill SelectedColor {
 			get { return selectedColor; }
 			set {
