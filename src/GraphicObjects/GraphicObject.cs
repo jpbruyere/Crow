@@ -27,7 +27,7 @@ namespace Crow
 
 		Interface currentInterface = null;
 
-		public Interface CurrentInterface {
+		[XmlIgnore]public Interface CurrentInterface {
 			get {
 				if (currentInterface == null) {
 					currentInterface = Interface.CurrentInterface;
@@ -47,6 +47,7 @@ namespace Crow
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
 		public virtual void NotifyValueChanged(string MemberName, object _value)
 		{
+			//Debug.WriteLine ("Value changed: {0}->{1} = {2}", this, MemberName, _value);
 			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
 		}
 		#endregion

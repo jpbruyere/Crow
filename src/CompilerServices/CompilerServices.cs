@@ -381,8 +381,13 @@ namespace Crow
 				il.Emit (OpCodes.Pop);
 				il.Emit (OpCodes.Ret);
 
-				Delegate del = dm.CreateDelegate (eiValueChange.EventHandlerType, Bindings [0].Source.Instance);
-				miValueChangeAdd.Invoke (grouped [0].Target.Instance, new object [] { del });
+				try {
+					Delegate del = dm.CreateDelegate (eiValueChange.EventHandlerType, Bindings [0].Source.Instance);
+					miValueChangeAdd.Invoke (grouped [0].Target.Instance, new object [] { del });
+
+				} catch (Exception ex) {					
+					Debug.WriteLine ("Binding Delegate error for {0}: \n{1}", Bindings [0].Source.Instance, ex.ToString ());
+				}
 			}
 		}
 

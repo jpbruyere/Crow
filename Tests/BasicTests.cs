@@ -10,8 +10,21 @@ using System.Diagnostics;
 
 namespace Tests
 {
-	class BasicTests : OpenTKGameWindow
+	class BasicTests : OpenTKGameWindow, IBindable
 	{
+		#region IBindable implementation
+		public object DataSource {
+			get { return null; }
+			set {
+				throw new NotImplementedException ();
+			}
+		}
+		List<Binding> bindings = new List<Binding> ();
+		public List<Binding> Bindings {
+			get { return bindings; }
+		}
+		#endregion
+
 		public BasicTests ()
 			: base(800, 600,"test: press <F3> to toogle test files")
 		{
@@ -82,6 +95,17 @@ namespace Tests
 				NotifyValueChanged ("CurSources", curSources);
 			}
 		}
+		bool boolVal = true;
+		public bool BoolVal {
+			get { return boolVal; }
+			set {
+				if (boolVal == value)
+					return;
+				boolVal = value;
+				NotifyValueChanged ("BoolVal", boolVal);
+			}
+		}
+
 		#endregion
 
 		void OnClear (object sender, MouseButtonEventArgs e) => TestList = null;
@@ -94,7 +118,8 @@ namespace Tests
 
 			this.KeyDown += KeyboardKeyDown1;
 
-			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
+			testFiles = new string [] { @"Interfaces/Divers/test2WayBinding.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
@@ -108,6 +133,7 @@ namespace Tests
 
 			this.Title = testFiles [idx] + ". Press <F3> to switch example.";
 			CrowInterface.LoadInterface(testFiles[idx]).DataSource = this;
+			CompilerServices.ResolveBindings (this.Bindings);
 		}
 		void KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
