@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using Cairo;
+using System.Xml.Serialization;
 
 namespace Crow
 {
@@ -29,6 +30,33 @@ namespace Crow
 		{
 		}
 
+		double v, s;
+
+		[XmlAttributeAttribute()]
+		public virtual double V {
+			get { return v; }
+			set {
+				if (v == value)
+					return;
+				v = value;
+				NotifyValueChanged ("V", v);
+				mousePos.Y = (int)Math.Floor((1.0-v) * (double)ClientRectangle.Height);
+
+				CurrentInterface.EnqueueForRepaint (this);
+			}
+		}
+		[XmlAttributeAttribute()]
+		public virtual double S {
+			get { return s; }
+			set {
+				if (s == value)
+					return;
+				s = value;
+				NotifyValueChanged ("S", s);
+				mousePos.X = (int)Math.Floor(s * (double)ClientRectangle.Width);
+				CurrentInterface.EnqueueForRepaint (this);
+			}
+		}
 		protected override void onDraw (Cairo.Context gr)
 		{
 			base.onDraw (gr);
@@ -53,9 +81,8 @@ namespace Crow
 			grad.SetAsSource (gr, rGrad);
 			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
 			gr.Fill();
-
-			updateColorFromPicking (false);
 		}
+
 		public override void Paint (ref Context ctx)
 		{
 			base.Paint (ref ctx);
@@ -71,6 +98,17 @@ namespace Crow
 			ctx.Stroke ();
 
 			ctx.Restore ();
+		}
+
+		protected override void updateMouseLocalPos (Point mPos)
+		{
+			base.updateMouseLocalPos (mPos);
+
+			Rectangle cb = ClientRectangle;
+			s = (double)mousePos.X / (double)cb.Width;
+			v = 1.0 - (double)mousePos.Y / (double)cb.Height;
+			NotifyValueChanged ("S", s);
+			NotifyValueChanged ("V", v);
 		}
 	}
 }

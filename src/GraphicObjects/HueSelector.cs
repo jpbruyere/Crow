@@ -32,14 +32,32 @@ namespace Crow
 		}
 
 		Orientation _orientation;
+		double hue;
 
 		[XmlAttributeAttribute][DefaultValue(Orientation.Horizontal)]
 		public virtual Orientation Orientation
 		{
 			get { return _orientation; }
-			set { _orientation = value; }
+			set {
+				if (_orientation == value)
+					return;
+				_orientation = value;
+				NotifyValueChanged ("Orientation", _orientation);
+				RegisterForGraphicUpdate ();
+			}
 		}
+		[XmlAttributeAttribute()]
+		public virtual double Hue {
+			get { return hue; }
+			set {
+				if (hue == value)
+					return;
+				hue = value;
 
+				notifyHueChanged ();
+				updateMousePosFromHue ();
+			}
+		}
 		protected override void onDraw (Cairo.Context gr)
 		{
 			base.onDraw (gr);
@@ -89,6 +107,26 @@ namespace Crow
 			ctx.LineWidth = 1.0;
 			ctx.Stroke();
 			ctx.Restore ();
+		}
+		protected override void updateMouseLocalPos (Point mPos)
+		{
+			base.updateMouseLocalPos (mPos);
+			if (Orientation == Orientation.Horizontal)
+				hue = (double)mousePos.X / (double)ClientRectangle.Width;
+			else
+				hue = (double)mousePos.Y / (double)ClientRectangle.Height;
+			notifyHueChanged ();
+		}
+		void updateMousePosFromHue(){
+			if (Orientation == Orientation.Horizontal)
+				mousePos.X = (int)Math.Floor(hue * (double)ClientRectangle.Width);
+			else
+				mousePos.Y = (int)Math.Floor(hue * (double)ClientRectangle.Height);
+			CurrentInterface.EnqueueForRepaint (this);
+		}
+		void notifyHueChanged(){
+			NotifyValueChanged ("Hue", hue);
+			NotifyValueChanged ("HueColor", new SolidColor (Color.FromHSV (hue)));
 		}
 	}
 }
