@@ -124,11 +124,11 @@
 							MouseEnter="{Background=UnitedNationsBlue}"
 							MouseLeave="{Background=Transparent}" >
 						<Label Margin="1" Text="{Name}" Height="Fit" Width="50%"/>
-						<Popper Foreground="{²Value}" Background="White" Margin="1" Caption="{²Value}">
+						<Popper Background="White" Margin="1" Caption="{Value}">
 							<Template>
 								<HorizontalStack Spacing="3" Height="Fit" Background="{./Background}">
 									<Border Foreground="Black" Width="16" Height="10" CornerRadius="3"
-										Background="{./Foreground}">
+										Background="{Value}">
 									</Border>
 									<Label Text="{./Caption}" Foreground="Black"/>
 								</HorizontalStack>

@@ -27,21 +27,26 @@ using System.Collections.Generic;
 
 namespace CrowIDE
 {
-	public class PropertyContainer : IBindable
+	public class PropertyContainer : IBindable, IValueChange
 	{
+		#region IBindable implementation
 		public object DataSource {
-			get {
-				throw new NotImplementedException ();
-			}
+			get { return null; }
 			set {
 				throw new NotImplementedException ();
 			}
 		}
-
-		#region IBindable implementation
 		List<Binding> bindings = new List<Binding> ();
 		public List<Binding> Bindings {
 			get { return bindings; }
+		}
+		#endregion
+
+		#region IValueChange implementation
+		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+		public virtual void NotifyValueChanged(string MemberName, object _value)
+		{
+			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
 		}
 		#endregion
 
@@ -53,7 +58,7 @@ namespace CrowIDE
 			get { return pi.GetValue(instance); }
 			set {
 				try {
-					if (pi.PropertyType != value.GetType() && pi.PropertyType != typeof(string)){
+					if (!pi.PropertyType.IsAssignableFrom(value.GetType()) && pi.PropertyType != typeof(string)){
 						if (pi.PropertyType.IsEnum) {
 							pi.SetValue (instance, value);
 						} else {
@@ -67,7 +72,7 @@ namespace CrowIDE
 				} catch (Exception ex) {
 					System.Diagnostics.Debug.WriteLine ("Error setting property:"+ ex.ToString());
 				}
-
+				NotifyValueChanged ("Value", value);
 			}
 		}
 		public string Type { get { return pi.PropertyType.IsEnum ?
@@ -86,7 +91,7 @@ namespace CrowIDE
 
 	}
 	public class MembersView : ListBox
-	{
+	{		
 		object instance;
 
 		[XmlAttributeAttribute][DefaultValue(null)]

@@ -17,32 +17,32 @@
 					</VerticalStack>
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
-					<Label Text="Red:" Width="50"/>
-					<Spinner Style="ColorSpinner" Value="{²./R}" Width="50"  />
+					<Label Text="Red:" Width="40"/>
+					<Spinner Style="ColorSpinner" Value="{²./R}" Width="60"  />
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
-					<Label Text="Green:" Width="50"/>
-					<Spinner Style="ColorSpinner" Value="{²./G}" Width="50"  />
+					<Label Text="Green:" Width="40"/>
+					<Spinner Style="ColorSpinner" Value="{²./G}" Width="60"  />
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
-					<Label Text="Blue:" Width="50"/>
-					<Spinner Style="ColorSpinner" Value="{²./B}" Width="50"  />
+					<Label Text="Blue:" Width="40"/>
+					<Spinner Style="ColorSpinner" Value="{²./B}" Width="60"  />
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
-					<Label Text="Alpha:" Width="50"/>
-					<Spinner Style="ColorSpinner" Value="{²./A}" Width="50"  />
+					<Label Text="Alpha:" Width="40"/>
+					<Spinner Style="ColorSpinner" Value="{²./A}" Width="60"  />
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
-					<Label Text="Hue:" Width="50"/>
-					<Spinner Style="HSVSpinner" Value="{²../../../hueSelector.Hue}" Width="150"  />
+					<Label Text="Hue:" Width="40"/>
+					<Spinner Style="HSVSpinner" Value="{²../../../hueSelector.Hue}" Width="60"  />
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
-					<Label Text="Sat:" Width="50"/>
-					<Spinner Style="HSVSpinner" Value="{²../../../colorSelector.S}" Width="150"  />
+					<Label Text="Sat:" Width="40"/>
+					<Spinner Style="HSVSpinner" Value="{²../../../colorSelector.S}" Width="60"  />
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
-					<Label Text="Val:" Width="50"/>
-					<Spinner Style="HSVSpinner" Value="{²../../../colorSelector.V}" Width="150"  />
+					<Label Text="Val:" Width="40"/>
+					<Spinner Style="HSVSpinner" Value="{²../../../colorSelector.V}" Width="60"  />
 				</HorizontalStack>
 			</VerticalStack>
 		</HorizontalStack>

@@ -104,7 +104,7 @@ namespace Crow
 
 			CairoHelpers.CairoRectangle (ctx, r, 2);
 			ctx.SetSourceColor (Color.White);
-			ctx.LineWidth = 1.0;
+			ctx.LineWidth = 2.0;
 			ctx.Stroke();
 			ctx.Restore ();
 		}

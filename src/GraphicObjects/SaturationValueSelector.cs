@@ -65,9 +65,11 @@ namespace Crow
 			Rectangle rGrad = r;
 			rGrad.Inflate (-1);
 
-			Foreground.SetAsSource (gr, r);
-			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
-			gr.Fill();
+			if (Foreground != null) {//TODO:test if null should be removed
+				Foreground.SetAsSource (gr, r);
+				CairoHelpers.CairoRectangle (gr, r, CornerRadius);
+				gr.Fill ();
+			}
 
 			Crow.Gradient grad = new Gradient (Gradient.Type.Horizontal);
 			grad.Stops.Add (new Gradient.ColorStop (0, new Color (1, 1, 1, 1)));
