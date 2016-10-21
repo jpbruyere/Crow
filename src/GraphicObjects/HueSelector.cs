@@ -108,6 +108,16 @@ namespace Crow
 			ctx.Stroke();
 			ctx.Restore ();
 		}
+		public override void OnLayoutChanges (LayoutingType layoutType)
+		{
+			base.OnLayoutChanges (layoutType);
+
+			if (Orientation == Orientation.Horizontal) {
+				if (layoutType == LayoutingType.Width)
+					updateMousePosFromHue ();
+			} else if (layoutType == LayoutingType.Height)
+				updateMousePosFromHue ();
+		}
 		protected override void updateMouseLocalPos (Point mPos)
 		{
 			base.updateMouseLocalPos (mPos);
