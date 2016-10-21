@@ -110,6 +110,18 @@ namespace Crow
 			NotifyValueChanged ("S", s);
 			NotifyValueChanged ("V", v);
 		}
+		public override void OnLayoutChanges (LayoutingType layoutType)
+		{
+			base.OnLayoutChanges (layoutType);
+			switch (layoutType) {
+			case LayoutingType.Width:
+				mousePos.X = (int)Math.Floor(s * (double)ClientRectangle.Width);
+				break;
+			case LayoutingType.Height:
+				mousePos.Y = (int)Math.Floor((1.0-v) * (double)ClientRectangle.Height);
+				break;
+			}
+		}
 	}
 }
 
