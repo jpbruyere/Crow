@@ -63,6 +63,12 @@ Window {
 	Width = 150;
 	Height = 150;
 }
+FileDialog {
+	Focusable = true;
+	MinimumSize=50,50;
+	Width = 500;
+	Height = 300;
+}
 Border {
 	Foreground = Gray;
 }
