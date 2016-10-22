@@ -70,13 +70,13 @@ namespace Crow
 
 			Crow.Gradient grad = new Gradient (gt);
 
-			grad.Stops.Add (new Gradient.ColorStop (0, new Color (1, 0, 0, 1)));
+			grad.Stops.Add (new Gradient.ColorStop (0,     new Color (1, 0, 0, 1)));
 			grad.Stops.Add (new Gradient.ColorStop (0.167, new Color (1, 1, 0, 1)));
 			grad.Stops.Add (new Gradient.ColorStop (0.333, new Color (0, 1, 0, 1)));
-			grad.Stops.Add (new Gradient.ColorStop (0.5, new Color (0, 1, 1, 1)));
+			grad.Stops.Add (new Gradient.ColorStop (0.5,   new Color (0, 1, 1, 1)));
 			grad.Stops.Add (new Gradient.ColorStop (0.667, new Color (0, 0, 1, 1)));
 			grad.Stops.Add (new Gradient.ColorStop (0.833, new Color (1, 0, 1, 1)));
-			grad.Stops.Add (new Gradient.ColorStop (1, new Color (1, 0, 0, 1)));
+			grad.Stops.Add (new Gradient.ColorStop (1,     new Color (1, 0, 0, 1)));
 
 			grad.SetAsSource (gr, r);
 			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
