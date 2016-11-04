@@ -49,12 +49,6 @@ namespace Crow
 				_contentContainer.SetChild(value);
 			}
 		}
-		public override void ResolveBindings ()
-		{
-			base.ResolveBindings ();
-			if (_contentContainer != null)
-				_contentContainer.ResolveBindings ();
-		}
 		protected override void loadTemplate(GraphicObject template = null)
 		{
 			base.loadTemplate (template);

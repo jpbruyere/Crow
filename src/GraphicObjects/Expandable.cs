@@ -70,12 +70,6 @@ namespace Crow
 
 			_contentContainer = this.child.FindByName ("Content") as Container;
 		}
-		public override void ResolveBindings ()
-		{
-			base.ResolveBindings ();
-			if (Content != null)
-				Content.ResolveBindings ();
-		}
 
 		#region Public properties
 		[XmlAttributeAttribute()][DefaultValue("Expandable")]

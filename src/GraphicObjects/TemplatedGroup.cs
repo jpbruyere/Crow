@@ -307,8 +307,8 @@ namespace Crow
 //			//because items total size is forced to approx size
 //			if (_gsList.Orientation == Orientation.Horizontal) {
 //				page.Width = Measure.Fit;
-				page.BindMember ("Height", "../HeightPolicy");
-				page.BindMember ("Width", "../WidthPolicy");
+				//page.BindMember ("Height", "../HeightPolicy");
+				//page.BindMember ("Width", "../WidthPolicy");
 //			} else {
 //				page.Height = Measure.Fit;
 //				page.BindMember ("Width", "../WidthPolicy");

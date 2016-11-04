@@ -127,7 +127,6 @@
     <Compile Include="src\rsvg\RsvgSharp.SizeFuncNative.cs" />
     <Compile Include="src\rsvg\SizeFunc.cs" />
     <Compile Include="src\MouseCursorChangedEventArgs.cs" />
-    <Compile Include="src\GraphicObjects\IBindable.cs" />
     <Compile Include="src\Input\KeyPressEventArgs.cs" />
     <Compile Include="src\Configuration.cs" />
     <Compile Include="src\Measure.cs" />
@@ -144,6 +143,7 @@
     <Compile Include="src\GraphicObjects\MenuItem.cs" />
     <Compile Include="src\GraphicObjects\Menu.cs" />
     <Compile Include="src\Command.cs" />
+    <Compile Include="src\GraphicObjects\DataSourceChangeEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

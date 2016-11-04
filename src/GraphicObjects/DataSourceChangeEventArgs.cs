@@ -1,10 +1,10 @@
 ﻿//
-//  IValueChange.cs
+//  DataSourceChangeEventArg.cs
 //
 //  Author:
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
 //
-//  Copyright (c) 2015 jp
+//  Copyright (c) 2016 jp
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,14 +19,19 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Collections.Generic;
 
 namespace Crow
 {
-	public interface IBindable
+	public class DataSourceChangeEventArgs : EventArgs
 	{
-		List<Binding> Bindings { get; }
-		object DataSource { get; set; }
+		public object OldDataSource;
+		public object NewDataSource;
+
+		public DataSourceChangeEventArgs (object oldDataSource, object newDataSource) : base()
+		{
+			OldDataSource = oldDataSource;
+			NewDataSource = newDataSource;
+		}
 	}
 }
 

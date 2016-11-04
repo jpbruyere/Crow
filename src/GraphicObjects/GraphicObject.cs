@@ -12,16 +12,8 @@ using System.IO;
 
 namespace Crow
 {
-	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange, ICloneable, IBindable
+	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange, ICloneable
 	{
-		#region IBindable implementation
-		List<Binding> bindings = new List<Binding> ();
-		public List<Binding> Bindings {
-			get { return bindings; }
-		}
-
-		#endregion
-
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
 
@@ -87,7 +79,7 @@ namespace Crow
 		Size minimumSize = "0,0";
 		bool cacheEnabled = false;
 		bool clipToClientRect = true;
-		object dataSource;
+		protected object dataSource;
 		string style;
 		#endregion
 
@@ -136,7 +128,15 @@ namespace Crow
 		}
 		[XmlIgnore]public ILayoutable LogicalParent {
 			get { return logicalParent == null ? Parent : logicalParent; }
-			set { logicalParent = value; }
+			set { 
+				if (logicalParent == value)
+					return;
+				if (logicalParent != null)
+					(logicalParent as GraphicObject).DataSourceChanged -= onLogicalParentDataSourceChanged;
+				logicalParent = value; 
+				if (logicalParent != null)
+					(logicalParent as GraphicObject).DataSourceChanged += onLogicalParentDataSourceChanged;
+			}
 		}
 		[XmlIgnore]public virtual Rectangle ClientRectangle {
 			get {
@@ -177,6 +177,7 @@ namespace Crow
 		public event EventHandler Enabled;
 		public event EventHandler Disabled;
 		public event EventHandler<LayoutingEventArgs> LayoutChanged;
+		public event EventHandler<DataSourceChangeEventArgs> DataSourceChanged;
 		#endregion
 
 		#region public properties
@@ -365,6 +366,10 @@ namespace Crow
 					return;
 
 				hasFocus = value;
+				if (hasFocus)
+					onFocused (this, null);
+				else
+					onUnfocused (this, null);
 				NotifyValueChanged ("HasFocus", hasFocus);
 			}
 		}
@@ -515,25 +520,25 @@ namespace Crow
 				RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
+		/// <summary>
+		/// Seek first logical tree upward if logicalParent is set, or seek graphic tree for
+		/// a not null dataSource that will be active for all descendants having dataSource=null
+		/// </summary>
 		[XmlAttributeAttribute][DefaultValue(null)]
 		public virtual object DataSource {
 			set {
 				if (dataSource == value)
 					return;
-				#if DEBUG_BINDING
-				Debug.WriteLine("******************************");
-				Debug.WriteLine("New DataSource for => " + this.ToString());
-				Debug.WriteLine("\t- " + DataSource);
-				Debug.WriteLine("\t+ " + value);
-				#endif
 
-				this.ClearBinding ();
+				DataSourceChangeEventArgs dse = new DataSourceChangeEventArgs (dataSource, null);
 
 				dataSource = value;
 
-				this.ResolveBindings();
+				dse.NewDataSource = DataSource;
 
-				NotifyValueChanged ("DataSource", dataSource);
+				OnDataSourceChanged (this, dse);
+
+				NotifyValueChanged ("DataSource", DataSource);
 			}
 			get {
 				return dataSource == null ? LogicalParent == null ? null :
@@ -541,6 +546,25 @@ namespace Crow
 					(LogicalParent as GraphicObject).DataSource : null : dataSource;
 			}
 		}
+		protected virtual void onLogicalParentDataSourceChanged(object sender, DataSourceChangeEventArgs e){
+			ILayoutable tmp = Parent;
+			while (tmp != sender) {
+				if (!(tmp as GraphicObject).localDataSourceIsNull) {
+					OnDataSourceChanged (sender, e);
+					return;
+				}
+				tmp = tmp.Parent;
+			}
+		}
+		internal bool localDataSourceIsNull { get { return dataSource == null; } }
+
+		public virtual void OnDataSourceChanged(object sender, DataSourceChangeEventArgs e){			
+			DataSourceChanged.Raise (sender, e);
+			//#if DEBUG_BINDING
+			Debug.WriteLine("New DataSource for => {0} \n\t{1}=>{2}", this.ToString(),e.OldDataSource,e.NewDataSource);
+			//#endif
+		}
+			
 		[XmlAttributeAttribute]
 		public virtual string Style {
 			get { return style; }
@@ -1183,20 +1207,17 @@ namespace Crow
 		}
 		#endregion
 
-		public virtual void onFocused(object sender, EventArgs e){
+		protected virtual void onFocused(object sender, EventArgs e){
 			#if DEBUG_FOCUS
 			Debug.WriteLine("Focused => " + this.ToString());
 			#endif
 			Focused.Raise (this, e);
-			this.HasFocus = true;
 		}
-		public virtual void onUnfocused(object sender, EventArgs e){
+		protected virtual void onUnfocused(object sender, EventArgs e){
 			#if DEBUG_FOCUS
 			Debug.WriteLine("UnFocused => " + this.ToString());
 			#endif
-
 			Unfocused.Raise (this, e);
-			this.HasFocus = false;
 		}
 		public virtual void onEnable(object sender, EventArgs e){
 			Enabled.Raise (this, e);
@@ -1206,84 +1227,84 @@ namespace Crow
 		}
 
 		#region Binding
-		public void BindMember(string _member, string _expression){
-			Bindings.Add(new Binding (this, _member, _expression));
-		}
-		public virtual void ResolveBindings()
-		{
-			if (Bindings.Count == 0)
-				return;
-			#if DEBUG_BINDING
-			Debug.WriteLine ("Resolve Bindings => " + this.ToString ());
-			#endif
-
-			CompilerServices.ResolveBindings (Bindings);
-		}
+//		public void BindMember(string _member, string _expression){
+//			Bindings.Add(new Binding (this, _member, _expression));
+//		}
+//		public virtual void ResolveBindings()
+//		{
+//			if (Bindings.Count == 0)
+//				return;
+//			#if DEBUG_BINDING
+//			Debug.WriteLine ("Resolve Bindings => " + this.ToString ());
+//			#endif
+//
+//			CompilerServices.ResolveBindings (Bindings);
+//		}
 
 		/// <summary>
 		/// Remove dynamic delegates by ids from dataSource
 		///  and delete ref of this in Shared interface refs
 		/// </summary>
-		public virtual void ClearBinding(){
-			//dont clear binding if dataSource is not null,
-			foreach (Binding b in Bindings) {
-				try {
-					if (!b.Resolved)
-						continue;
-					//cancel compiled events
-					if (b.Target == null){
-						continue;
-						#if DEBUG_BINDING
-						Debug.WriteLine("Clear binding canceled for => " + b.ToString());
-						#endif
-					}
-					if (b.Target.Instance != DataSource){
-						#if DEBUG_BINDING
-						Debug.WriteLine("Clear binding canceled for => " + b.ToString());
-						#endif
-						continue;
-					}
-					#if DEBUG_BINDING
-					Debug.WriteLine("ClearBinding => " + b.ToString());
-					#endif
-					if (string.IsNullOrEmpty (b.DynMethodId)) {
-						b.Resolved = false;
-						if (b.Source.Member.MemberType == MemberTypes.Event)
-							removeEventHandler (b);
-						//TODO:check if full reset is necessary
-						continue;
-					}
-					MemberReference mr = null;
-					if (b.Target == null)
-						mr = b.Source;
-					else
-						mr = b.Target;
-					Type dataSourceType = mr.Instance.GetType();
-					EventInfo evtInfo = dataSourceType.GetEvent ("ValueChanged");
-					FieldInfo evtFi = CompilerServices.GetEventHandlerField (dataSourceType, "ValueChanged");
-					MulticastDelegate multicastDelegate = evtFi.GetValue (mr.Instance) as MulticastDelegate;
-					if (multicastDelegate != null) {
-						foreach (Delegate d in multicastDelegate.GetInvocationList()) {
-							if (d.Method.Name == b.DynMethodId)
-								evtInfo.RemoveEventHandler (mr.Instance, d);
-						}
-					}
-					b.Reset ();
-				} catch (Exception ex) {
-					Debug.WriteLine("\t Error: " + ex.ToString());
-				}
-			}
-		}
-		void removeEventHandler(Binding b){
-			FieldInfo fiEvt = CompilerServices.GetEventHandlerField (b.Source.Instance.GetType(), b.Source.Member.Name);
-			MulticastDelegate multiDel = fiEvt.GetValue (b.Source.Instance) as MulticastDelegate;
-			if (multiDel != null) {
-				foreach (Delegate d in multiDel.GetInvocationList()) {
-					if (d.Method.Name == b.Target.Member.Name)
-						b.Source.Event.RemoveEventHandler (b.Source.Instance, d);
-				}
-			}
-		}
+//		public virtual void ClearBinding(){
+//			//dont clear binding if dataSource is not null,
+//			foreach (Binding b in Bindings) {
+//				try {
+//					if (!b.Resolved)
+//						continue;
+//					//cancel compiled events
+//					if (b.Target == null){
+//						continue;
+//						#if DEBUG_BINDING
+//						Debug.WriteLine("Clear binding canceled for => " + b.ToString());
+//						#endif
+//					}
+//					if (b.Target.Instance != DataSource){
+//						#if DEBUG_BINDING
+//						Debug.WriteLine("Clear binding canceled for => " + b.ToString());
+//						#endif
+//						continue;
+//					}
+//					#if DEBUG_BINDING
+//					Debug.WriteLine("ClearBinding => " + b.ToString());
+//					#endif
+//					if (string.IsNullOrEmpty (b.DynMethodId)) {
+//						b.Resolved = false;
+//						if (b.Source.Member.MemberType == MemberTypes.Event)
+//							removeEventHandler (b);
+//						//TODO:check if full reset is necessary
+//						continue;
+//					}
+//					MemberReference mr = null;
+//					if (b.Target == null)
+//						mr = b.Source;
+//					else
+//						mr = b.Target;
+//					Type dataSourceType = mr.Instance.GetType();
+//					EventInfo evtInfo = dataSourceType.GetEvent ("ValueChanged");
+//					FieldInfo evtFi = CompilerServices.GetEventHandlerField (dataSourceType, "ValueChanged");
+//					MulticastDelegate multicastDelegate = evtFi.GetValue (mr.Instance) as MulticastDelegate;
+//					if (multicastDelegate != null) {
+//						foreach (Delegate d in multicastDelegate.GetInvocationList()) {
+//							if (d.Method.Name == b.DynMethodId)
+//								evtInfo.RemoveEventHandler (mr.Instance, d);
+//						}
+//					}
+//					b.Reset ();
+//				} catch (Exception ex) {
+//					Debug.WriteLine("\t Error: " + ex.ToString());
+//				}
+//			}
+//		}
+//		void removeEventHandler(Binding b){
+//			FieldInfo fiEvt = CompilerServices.GetEventHandlerField (b.Source.Instance.GetType(), b.Source.Member.Name);
+//			MulticastDelegate multiDel = fiEvt.GetValue (b.Source.Instance) as MulticastDelegate;
+//			if (multiDel != null) {
+//				foreach (Delegate d in multiDel.GetInvocationList()) {
+//					if (d.Method.Name == b.Target.Member.Name)
+//						b.Source.Event.RemoveEventHandler (b.Source.Instance, d);
+//				}
+//			}
+//		}
 		#endregion
 
 		#region IXmlSerializable
@@ -1291,60 +1312,60 @@ namespace Crow
 		{
 			return null;
 		}
-		void affectMember(string name, string value){
-			Type thisType = this.GetType ();
-
-			if (string.IsNullOrEmpty (value))
-				return;
-
-			MemberInfo mi = thisType.GetMember (name).FirstOrDefault();
-			if (mi == null) {
-				Debug.WriteLine ("XML: Unknown attribute in " + thisType.ToString() + " : " + name);
-				return;
-			}
-			if (mi.MemberType == MemberTypes.Event) {
-				this.Bindings.Add (new Binding (new MemberReference(this, mi), value));
-				return;
-			}
-			if (mi.MemberType == MemberTypes.Property) {
-				PropertyInfo pi = mi as PropertyInfo;
-
-				if (pi.GetSetMethod () == null) {
-					Debug.WriteLine ("XML: Read only property in " + thisType.ToString() + " : " + name);
-					return;
-				}
-
-				XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
-				if (xaa != null) {
-					if (!string.IsNullOrEmpty (xaa.AttributeName))
-						name = xaa.AttributeName;
-				}
-				if (value.StartsWith("{",StringComparison.Ordinal)) {
-					//binding
-					if (!value.EndsWith("}", StringComparison.Ordinal))
-						throw new Exception (string.Format("XML:Malformed binding: {0}", value));
-
-					this.Bindings.Add (new Binding (new MemberReference(this, pi), value.Substring (1, value.Length - 2)));
-					return;
-				}
-				if (pi.GetCustomAttribute (typeof(XmlIgnoreAttribute)) != null)
-					return;
-				if (xaa == null)//not define as xmlAttribute
-					return;
-
-				if (pi.PropertyType == typeof(string)) {
-					pi.SetValue (this, value, null);
-					return;
-				}
-
-				if (pi.PropertyType.IsEnum) {
-					pi.SetValue (this, Enum.Parse (pi.PropertyType, value), null);
-				} else {
-					MethodInfo me = pi.PropertyType.GetMethod ("Parse", new Type[] { typeof(string) });
-					pi.SetValue (this, me.Invoke (null, new string[] { value }), null);
-				}
-			}
-		}
+//		void affectMember(string name, string value){
+//			Type thisType = this.GetType ();
+//
+//			if (string.IsNullOrEmpty (value))
+//				return;
+//
+//			MemberInfo mi = thisType.GetMember (name).FirstOrDefault();
+//			if (mi == null) {
+//				Debug.WriteLine ("XML: Unknown attribute in " + thisType.ToString() + " : " + name);
+//				return;
+//			}
+//			if (mi.MemberType == MemberTypes.Event) {
+//				this.Bindings.Add (new Binding (new MemberReference(this, mi), value));
+//				return;
+//			}
+//			if (mi.MemberType == MemberTypes.Property) {
+//				PropertyInfo pi = mi as PropertyInfo;
+//
+//				if (pi.GetSetMethod () == null) {
+//					Debug.WriteLine ("XML: Read only property in " + thisType.ToString() + " : " + name);
+//					return;
+//				}
+//
+//				XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
+//				if (xaa != null) {
+//					if (!string.IsNullOrEmpty (xaa.AttributeName))
+//						name = xaa.AttributeName;
+//				}
+//				if (value.StartsWith("{",StringComparison.Ordinal)) {
+//					//binding
+//					if (!value.EndsWith("}", StringComparison.Ordinal))
+//						throw new Exception (string.Format("XML:Malformed binding: {0}", value));
+//
+//					this.Bindings.Add (new Binding (new MemberReference(this, pi), value.Substring (1, value.Length - 2)));
+//					return;
+//				}
+//				if (pi.GetCustomAttribute (typeof(XmlIgnoreAttribute)) != null)
+//					return;
+//				if (xaa == null)//not define as xmlAttribute
+//					return;
+//
+//				if (pi.PropertyType == typeof(string)) {
+//					pi.SetValue (this, value, null);
+//					return;
+//				}
+//
+//				if (pi.PropertyType.IsEnum) {
+//					pi.SetValue (this, Enum.Parse (pi.PropertyType, value), null);
+//				} else {
+//					MethodInfo me = pi.PropertyType.GetMethod ("Parse", new Type[] { typeof(string) });
+//					pi.SetValue (this, me.Invoke (null, new string[] { value }), null);
+//				}
+//			}
+//		}
 		public virtual void ReadXml (System.Xml.XmlReader reader)
 		{
 			if (reader.HasAttributes) {
@@ -1357,7 +1378,7 @@ namespace Crow
 					if (reader.Name == "Style")
 						continue;
 
-					affectMember (reader.Name, reader.Value);
+					//affectMember (reader.Name, reader.Value);
 				}
 				reader.MoveToElement ();
 			}else
@@ -1475,12 +1496,6 @@ namespace Crow
 		/// <summary>
 		/// full GraphicTree clone with binding definition
 		/// </summary>
-		public virtual GraphicObject DeepClone(){
-			GraphicObject tmp = Clone () as GraphicObject;
-			foreach (Binding b in this.bindings)
-				tmp.Bindings.Add (new Binding (new MemberReference (tmp, b.Source.Member), b.Expression));
-			return tmp;
-		}
 
 		public override string ToString ()
 		{

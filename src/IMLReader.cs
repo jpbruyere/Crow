@@ -196,6 +196,12 @@ namespace Crow
 			emitLoader(RootType);
 			Read();//close tag
 		}
+
+		void createBindingDelegates(){
+//			foreach (Dictionary<string, MemberAddress> pb in IMLCtx.PropertyBindings) {
+//				
+//			}
+		}
 		/// <summary>
 		/// Inits il generator, RootType must have been read first
 		/// </summary>
@@ -363,7 +369,7 @@ namespace Crow
 						if (reader.Value.StartsWith ("{")) {
 							readPropertyBinding(reader.Name, reader.Value.Substring (1, reader.Value.Length - 2));
 
-							CompilerServices.emitBindingCreation (reader.il, reader.Name, reader.Value.Substring (1, reader.Value.Length - 2));
+							//CompilerServices.emitBindingCreation (reader.il, reader.Name, reader.Value.Substring (1, reader.Value.Length - 2));
 						}else
 							CompilerServices.EmitSetValue (reader.il, pi, reader.Value);
 
@@ -445,11 +451,16 @@ namespace Crow
 					}
 				}
 				Node[] origine = new Node[nodeIdx + 1];
-				Array.Copy (target, origine, nodeIdx + 1);
+				try {
+					Array.Copy (target, origine, nodeIdx + 1);
 
-				int destLength = target.Length - nodeIdx;
-				Node[] dest = new Node[destLength];
-				Array.Copy (target, nodeIdx, dest, 0, destLength);
+					int destLength = target.Length - nodeIdx;
+					Node[] dest = new Node[destLength];
+					Array.Copy (target, nodeIdx, dest, 0, destLength);
+
+				} catch (Exception ex) {
+					System.Diagnostics.Debug.WriteLine (ex.ToString ());
+				}
 
 
 				nodeId = Node.AddressToString (origine);

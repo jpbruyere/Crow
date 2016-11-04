@@ -312,10 +312,10 @@ namespace Crow
 				if (_focusedWidget == value)
 					return;
 				if (_focusedWidget != null)
-					_focusedWidget.onUnfocused (this, null);
+					_focusedWidget.HasFocus = false;
 				_focusedWidget = value;
 				if (_focusedWidget != null)
-					_focusedWidget.onFocused (this, null);
+					_focusedWidget.HasFocus = true;
 			}
 		}
 		#endregion
@@ -499,7 +499,6 @@ namespace Crow
 		public void DeleteWidget(GraphicObject g)
 		{
 			g.Visible = false;//trick to ensure clip is added to refresh zone
-			g.ClearBinding();
 			GraphicTree.Remove (g);
 		}
 		public void PutOnTop(GraphicObject g)
@@ -520,7 +519,6 @@ namespace Crow
 				//to ObjectToRedraw list, and without parent, it fails
 				GraphicObject g = GraphicTree [i];
 				g.Visible = false;
-				g.ClearBinding ();
 				GraphicTree.RemoveAt (0);
 			}
 			#if DEBUG_LAYOUTING

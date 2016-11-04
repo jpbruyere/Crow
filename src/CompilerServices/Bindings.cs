@@ -199,10 +199,10 @@ namespace Crow
 
 			if (Target.TryFindMember (memberName)) {
 				if (TwoWayBinding) {
-					IBindable source = Target.Instance as IBindable;
-					if (source == null)
-						throw new Exception (Source.Instance + " does not implement IBindable for 2 way bindings");
-					source.Bindings.Add (new Binding (Target, Source));
+//					IBindable source = Target.Instance as IBindable;
+//					if (source == null)
+//						throw new Exception (Source.Instance + " does not implement IBindable for 2 way bindings");
+//					source.Bindings.Add (new Binding (Target, Source));
 				}
 			}
 			#if DEBUG_BINDING

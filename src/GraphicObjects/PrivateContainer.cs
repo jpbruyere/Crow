@@ -47,7 +47,6 @@ namespace Crow
 		{
 
 			if (child != null) {
-				child.ClearBinding ();
 				contentSize = new Size (0, 0);
 				child.LayoutChanged -= OnChildLayoutChanges;
 				child.Parent = null;
@@ -66,16 +65,7 @@ namespace Crow
 		}
 
 		#region GraphicObject Overrides
-		public override void ResolveBindings ()
-		{
-			base.ResolveBindings ();
-			if (child != null)
-				child.ResolveBindings ();
-		}
-		protected void ResolveBindingsWithNoRecurse ()
-		{
-			base.ResolveBindings ();
-		}
+
 		public override GraphicObject FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)
@@ -87,6 +77,13 @@ namespace Crow
 		{
 			return child == goToFind ? true : 
 				child == null ? false : child.Contains(goToFind);
+		}
+		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
+		{
+			base.OnDataSourceChanged (sender, e);
+			if (child != null)
+				if (child.localDataSourceIsNull)
+					child.OnDataSourceChanged (sender, e);
 		}
 		public override bool UpdateLayout (LayoutingType layoutType)
 		{
@@ -197,19 +194,6 @@ namespace Crow
 		}
 		#endregion
 
-		public override void ClearBinding ()
-		{
-			if (child != null)
-				child.ClearBinding ();
-			base.ClearBinding ();
-		}
-		public override GraphicObject DeepClone ()
-		{
-			PrivateContainer tmp = base.DeepClone () as PrivateContainer;
-			if (child != null)
-					tmp.SetChild (child.DeepClone ());
-			return tmp;
-		}
 	}
 }
 
