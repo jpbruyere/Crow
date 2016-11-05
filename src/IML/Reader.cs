@@ -26,9 +26,9 @@ using System.Reflection.Emit;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Crow
+namespace Crow.IML
 {
-	public class IMLReader : XmlTextReader
+	public class Reader : XmlTextReader
 	{
 		static MethodInfo[] miAddChild = new MethodInfo[]{			
 			typeof(Container).GetMethod ("SetChild"),
@@ -165,10 +165,10 @@ namespace Crow
 		//protected Stack<int> curTemplateDepth = new Stack<int>(new int[] {0});	//current template root depth
 
 		#region CTOR
-		public IMLReader (string path)
+		public Reader (string path)
 			: this(Interface.GetStreamFromPath (path)){
 		}
-		public IMLReader (Stream stream)
+		public Reader (Stream stream)
 			: base(stream)
 		{
 			createInstantiator ();
@@ -177,7 +177,7 @@ namespace Crow
 		/// Used to parse xmlFrament with same code generator linked
 		/// If ilGen=null, a new Code Generator will be created.
 		/// </summary>
-		public IMLReader (IMLContext ctx, string xmlFragment)
+		public Reader (IMLContext ctx, string xmlFragment)
 			: base(xmlFragment, XmlNodeType.Element,null){
 
 			IMLCtx = ctx;
@@ -243,7 +243,7 @@ namespace Crow
 			#region Template and ItemTemplates loading
 			if (IMLCtx.curSubNodeType >= SubNodeType.Template) {
 				//if its a template, first read template elements
-				using (IMLReader reader = new IMLReader (IMLCtx, tmpXml)) {
+				using (Reader reader = new Reader (IMLCtx, tmpXml)) {
 
 					string templatePath = reader.GetAttribute ("Template");
 
@@ -275,7 +275,7 @@ namespace Crow
 							string itemTmpID;
 
 							if (string.IsNullOrEmpty (path)) {
-								using (IMLReader iTmp = new IMLReader (null, reader.ReadInnerXml ())) {
+								using (Reader iTmp = new Reader (null, reader.ReadInnerXml ())) {
 									itemTmpID = Guid.NewGuid ().ToString ();
 									Interface.Instantiators [itemTmpID] =
 										new ItemTemplate (iTmp.RootType, iTmp.GetLoader (), dataType, datas);
@@ -330,7 +330,7 @@ namespace Crow
 			}
 			#endregion
 
-			using (IMLReader reader = new IMLReader(IMLCtx,tmpXml)){
+			using (Reader reader = new Reader(IMLCtx,tmpXml)){
 				reader.Read ();
 
 				#region Styling and default values loading
@@ -472,7 +472,7 @@ namespace Crow
 		/// <summary>
 		/// Parse child node an generate corresponding msil
 		/// </summary>
-		void readChildren(IMLReader reader){
+		void readChildren(Reader reader){
 			bool endTagReached = false;
 			while (reader.Read()){
 				switch (reader.NodeType) {

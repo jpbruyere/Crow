@@ -45,7 +45,7 @@ namespace Crow
 			loadingTime.Start ();
 			#endif
 			try {
-				using (IMLReader itr = new IMLReader (path)){
+				using (IML.Reader itr = new IML.Reader (path)){
 					loader = itr.GetLoader ();
 					RootType = itr.RootType;
 				}
@@ -73,7 +73,7 @@ namespace Crow
 			Stopwatch loadingTime = new Stopwatch ();
 			loadingTime.Start ();
 			#endif
-			using (IMLReader itr = new IMLReader (stream)){
+			using (IML.Reader itr = new IML.Reader (stream)){
 				loader = itr.GetLoader ();
 				RootType = itr.RootType;
 			}

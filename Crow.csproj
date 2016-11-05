@@ -135,7 +135,6 @@
     <Compile Include="src\StyleReader.cs" />
     <Compile Include="src\GraphicObjects\DirectoryView.cs" />
     <Compile Include="src\Instantiator.cs" />
-    <Compile Include="src\IMLReader.cs" />
     <Compile Include="src\ItemTemplate.cs" />
     <Compile Include="src\Style.cs" />
     <Compile Include="src\GraphicObjects\Wrapper.cs" />
@@ -144,6 +143,7 @@
     <Compile Include="src\GraphicObjects\Menu.cs" />
     <Compile Include="src\Command.cs" />
     <Compile Include="src\GraphicObjects\DataSourceChangeEventArgs.cs" />
+    <Compile Include="src\IML\Reader.cs"/>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -183,6 +183,7 @@
     <Folder Include="src\Fill\" />
     <Folder Include="src\Input\" />
     <Folder Include="src\rsvg\" />
+    <Folder Include="src\IML\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\Icons\updown.svg" />
