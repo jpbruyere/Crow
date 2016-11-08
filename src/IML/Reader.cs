@@ -29,15 +29,9 @@ using System.Collections.Generic;
 namespace Crow.IML
 {
 	public class Reader : XmlTextReader
-	{
-		static MethodInfo[] miAddChild = new MethodInfo[]{			
-			typeof(Container).GetMethod ("SetChild"),
-			typeof(Group).GetMethod ("AddChild"),
-			typeof(TemplatedControl).GetMethod ("loadTemplate", BindingFlags.Instance | BindingFlags.NonPublic),
-			typeof(TemplatedContainer).GetProperty ("Content").GetSetMethod (),
-			typeof(TemplatedGroup).GetMethod ("AddItem", BindingFlags.Instance | BindingFlags.Public),
-			//typeof(PrivateContainer).GetMethod ("SetChild",	BindingFlags.Instance | BindingFlags.NonPublic)
-		};
+	{		
+		static List<Type> CrowTypes = new List<Type> ();
+
 		public enum SubNodeType{
 			None,
 			Child,
@@ -47,102 +41,47 @@ namespace Crow.IML
 			Items,
 			ItemTemplate
 		}
-		public class Node {
-			public SubNodeType Type;
-			public int Index;
 
-			public Node(){}
-			public Node(SubNodeType snt, int _index = 0){
-				Type = snt;
-				Index = _index;
-			}
-			public static implicit operator SubNodeType(Node sn){
-				return sn.Type;
-			}
-			public static implicit operator string(Node sn){
-				return sn.ToString ();
-			}
-			public static implicit operator Node(SubNodeType sn){
-				return new Node (sn);
-			}
-			public override bool Equals (object obj)
-			{
-				return obj is Node && this == (Node)obj;
-			}
-			public override int GetHashCode() 
-			{
-				return Type.GetHashCode() ^ Index.GetHashCode();
-			}
-			public static bool operator ==(Node x, Node y) 
-			{
-				return x.Type == y.Type && x.Index == y.Index;
-			}
-			public static bool operator !=(Node x, Node y) 
-			{
-				return !(x == y);
-			}
-			public override string ToString ()
-			{
-				return string.Format ("{0}.{1}", (int)Type, Index);
-			}
-			public static Node Parse(string str){
-				string[] tmp = str.Trim ().Split ('.');
-				switch (tmp.Length) {
-				case 1:
-					return new Node ((SubNodeType)int.Parse (tmp [0]));
-				case 2:
-					return new Node ((SubNodeType)int.Parse (tmp [0]), int.Parse (tmp[1]));
-				case 0:
-				default:
-					return new Node ();
-				}
-			}
-			public static string AddressToString(Node[] address){
-				string tmp = "";
-				foreach (Node n in address) {
-					tmp += n.ToString () + ";";
-				}
-				return string.IsNullOrEmpty(tmp) ? tmp : tmp.Substring (0, tmp.Length - 1);
-			}
-			public static Node[] AddressFromString(string address) {
-				List<Node> nodes = new List<Node> ();
-				string[] tmp = address.Split (';');
-				for (int i = 0; i < tmp.Length; i++)
-					nodes.Add (Node.Parse (tmp [i]));
-				return nodes.ToArray();
-			}
-		}
+			//public static Node Parse(string str){
+			//	string[] tmp = str.Trim ().Split ('.');
+			//	switch (tmp.Length) {
+			//	case 1:
+			//		return new Node ((SubNodeType)int.Parse (tmp [0]));
+			//	case 2:
+			//		return new Node ((SubNodeType)int.Parse (tmp [0]), int.Parse (tmp[1]));
+			//	case 0:
+			//	default:
+			//		return new Node ();
+			//	}
+			//}
+			//public static string AddressToString(Node[] address){
+			//	string tmp = "";
+			//	foreach (Node n in address) {
+			//		tmp += n.ToString () + ";";
+			//	}
+			//	return string.IsNullOrEmpty(tmp) ? tmp : tmp.Substring (0, tmp.Length - 1);
+			//}
+			//public static Node[] AddressFromString(string address) {
+			//	List<Node> nodes = new List<Node> ();
+			//	string[] tmp = address.Split (';');
+			//	for (int i = 0; i < tmp.Length; i++)
+			//		nodes.Add (Node.Parse (tmp [i]));
+			//	return nodes.ToArray();
+			//}
 
-//		public class PropertyBinding {
-//			public string OriginePropertyName = "";
-//			public MemberAddress Destination;
-//		}
-		public class MemberAddress {			
-			public Node[] DestinationNode = null;
-			public string DestinationProperty = "";
 
-			public MemberAddress (){}
-			public MemberAddress (Node[] _node, string _property){
-				DestinationNode = _node;
-				DestinationProperty = _property;
-			}
-		}
+		//		public class PropertyBinding {
+		//			public string OriginePropertyName = "";
+		//			public MemberAddress Destination;
+		//		}
+
+		public Type RootType = null;
+		public Context context;
+
 		InstanciatorInvoker loader = null;
 		DynamicMethod dm = null;
 
-		public class IMLContext {
-			public ILGenerator il = null;
-			public SubNodeType curSubNodeType;
-			public Stack<Node> nodesStack = new Stack<Node>();
-
-			public Dictionary<string, string> Names =  new Dictionary<string, string>();
-			public Dictionary<string, Dictionary<string, MemberAddress>> PropertyBindings = new Dictionary<string, Dictionary<string, MemberAddress>>();
-		}
-
-		public Type RootType = null;
-		public IMLContext IMLCtx;
-
-		ILGenerator il { get { return IMLCtx.il; }}
+		ILGenerator il { get { return context.il; }}
 
 		/// <summary>
 		/// Finalize instatiator MSIL and return LoaderInvoker delegate
@@ -157,10 +96,10 @@ namespace Crow.IML
 		}
 
 		protected int curDepth {
-			get { return IMLCtx.nodesStack.Count - 1;}
+			get { return context.nodesStack.Count - 1;}
 		}
 		protected Node curNode {
-			get { return IMLCtx.nodesStack.Peek(); }
+			get { return context.nodesStack.Peek(); }
 		}
 		//protected Stack<int> curTemplateDepth = new Stack<int>(new int[] {0});	//current template root depth
 
@@ -177,10 +116,10 @@ namespace Crow.IML
 		/// Used to parse xmlFrament with same code generator linked
 		/// If ilGen=null, a new Code Generator will be created.
 		/// </summary>
-		public Reader (IMLContext ctx, string xmlFragment)
+		public Reader (Context ctx, string xmlFragment)
 			: base(xmlFragment, XmlNodeType.Element,null){
 
-			IMLCtx = ctx;
+			context = ctx;
 //
 //			if (IMLCtx != null)
 //				return;
@@ -190,8 +129,8 @@ namespace Crow.IML
 		#endregion
 
 		void createInstantiator(){
-			IMLCtx = new IMLContext();
-			readRootType();
+			context = new Context();
+			RootType = findRootType();
 			InitEmitter();
 			emitLoader(RootType);
 			Read();//close tag
@@ -212,7 +151,7 @@ namespace Crow.IML
 				CallingConventions.Standard,
 				typeof(void),new Type[] {typeof(object), typeof(Interface)}, RootType, true);
 
-			IMLCtx.il = dm.GetILGenerator(256);
+			context.il = dm.GetILGenerator(256);
 			il.DeclareLocal(typeof(GraphicObject));
 			il.Emit(OpCodes.Nop);
 			//set local GraphicObject to root object passed as 1st argument
@@ -221,34 +160,21 @@ namespace Crow.IML
 			CompilerServices.emitSetCurInterface (il);
 		}
 		void emitLoader(Type crowType){
-
-
-			if (typeof(Group).IsAssignableFrom (crowType))
-				IMLCtx.curSubNodeType = SubNodeType.Children;
-			else if (typeof(Container).IsAssignableFrom (crowType))
-				IMLCtx.curSubNodeType = SubNodeType.Child;
-			else if (typeof(TemplatedContainer).IsAssignableFrom (crowType))
-				IMLCtx.curSubNodeType = SubNodeType.Content;
-			else if (typeof(TemplatedGroup).IsAssignableFrom (crowType))
-				IMLCtx.curSubNodeType = SubNodeType.Items;
-			else if (typeof(TemplatedControl).IsAssignableFrom (crowType))
-				IMLCtx.curSubNodeType = SubNodeType.Template;
-			else
-				IMLCtx.curSubNodeType = SubNodeType.None;
+			Node expectedNode = new Node (crowType);
 
 			string tmpXml = ReadOuterXml ();
 
 			il.Emit (OpCodes.Ldloc_0);//save current go onto the stack if child has to be added
 
 			#region Template and ItemTemplates loading
-			if (IMLCtx.curSubNodeType >= SubNodeType.Template) {
+			if (expectedNode.IsTemplate) {
 				//if its a template, first read template elements
-				using (Reader reader = new Reader (IMLCtx, tmpXml)) {
+				using (Reader reader = new Reader (context, tmpXml)) {
+					List<string []> itemTemplateIds = new List<string []> ();
+					bool inlineTemplate = false;
 
 					string templatePath = reader.GetAttribute ("Template");
 
-					List<string[]> itemTemplateIds = new List<string[]> ();
-					bool inlineTemplate = false;
 					reader.Read ();
 					int depth = reader.Depth + 1;
 					while (reader.Read ()) {
@@ -257,9 +183,9 @@ namespace Crow.IML
 						if (reader.Name == "Template") {
 							inlineTemplate = true;
 							reader.Read ();
-							IMLCtx.nodesStack.Push(SubNodeType.Template);
+							context.nodesStack.Push (expectedNode);
 							readChildren (reader);
-							IMLCtx.nodesStack.Pop();
+							context.nodesStack.Pop();
 						} else if (reader.Name == "ItemTemplate") {
 							string dataType = "default", datas = "", path = "";
 							while (reader.MoveToNextAttribute ()) {
@@ -291,8 +217,8 @@ namespace Crow.IML
 						}
 					}
 
-					if (!inlineTemplate) {
-						reader.il.Emit (OpCodes.Ldloc_0);//Load  this templateControl ref
+					if (!inlineTemplate) {//load from path or default template
+						reader.il.Emit (OpCodes.Ldloc_0);//Load  current templatedControl ref
 						if (string.IsNullOrEmpty (templatePath)) {
 							reader.il.Emit (OpCodes.Ldnull);//default template loading
 						}else{
@@ -301,11 +227,7 @@ namespace Crow.IML
 							reader.il.Emit (OpCodes.Callvirt,//call Interface.Load(path)
 								CompilerServices.miIFaceLoad);
 						}
-						MethodInfo mitmp = crowType.GetMethod ("loadTemplate", BindingFlags.Instance | BindingFlags.NonPublic);
-						if (mitmp == null)
-							System.Diagnostics.Debugger.Break();
-						reader.il.Emit (OpCodes.Callvirt,//load template
-							mitmp);
+						reader.il.Emit (OpCodes.Callvirt, CompilerServices.miLoadTmp);//load template
 					}
 					//copy item templates (review this)
 					foreach (string[] iTempId in itemTemplateIds) {
@@ -327,22 +249,21 @@ namespace Crow.IML
 						}
 					}
 				}
+				expectedNode.Index++;
 			}
 			#endregion
 
-			using (Reader reader = new Reader(IMLCtx,tmpXml)){
+			using (Reader reader = new Reader (context, tmpXml)){
 				reader.Read ();
 
 				#region Styling and default values loading
 				if (reader.HasAttributes) {
 					string style = reader.GetAttribute ("Style");
-					if (!string.IsNullOrEmpty (style)) {
-						PropertyInfo pi = crowType.GetProperty ("Style");
-						CompilerServices.EmitSetValue (reader.il, pi, style);
-					}
+					if (!string.IsNullOrEmpty (style))						
+						CompilerServices.EmitSetValue (reader.il, CompilerServices.piStyle, style);					
 				}
 				reader.il.Emit (OpCodes.Ldloc_0);
-				reader.il.Emit (OpCodes.Callvirt, typeof(GraphicObject).GetMethod ("loadDefaultValues"));
+				reader.il.Emit (OpCodes.Callvirt, CompilerServices.miLoadDefaultVals);
 				#endregion
 
 				#region Attributes reading
@@ -364,9 +285,9 @@ namespace Crow.IML
 							throw new Exception ("Member '" + reader.Name + "' not found in " + crowType.Name);
 
 						if (pi.Name == "Name")
-							IMLCtx.Names.Add(reader.Value, Node.AddressToString(IMLCtx.nodesStack.ToArray()));
+							context.Names.Add(reader.Value, Node.AddressToString(context.nodesStack.ToArray()));
 						
-						if (reader.Value.StartsWith ("{")) {
+						if (reader.Value.StartsWith ("{", StringComparison.OrdinalIgnoreCase)) {
 							readPropertyBinding(reader.Name, reader.Value.Substring (1, reader.Value.Length - 2));
 
 							//CompilerServices.emitBindingCreation (reader.il, reader.Name, reader.Value.Substring (1, reader.Value.Length - 2));
@@ -382,21 +303,21 @@ namespace Crow.IML
 					reader.il.Emit (OpCodes.Pop);//pop saved ref to current object
 					return;
 				}
-				IMLCtx.nodesStack.Push (IMLCtx.curSubNodeType);
+				context.nodesStack.Push (expectedNode);
 				readChildren (reader);
-				IMLCtx.nodesStack.Pop ();
+				context.nodesStack.Pop ();
 			}
 			il.Emit (OpCodes.Pop);//pop saved ref to current object
 		}
 		void registerPropertyBinding(string origNode, string origProp, MemberAddress ma){
-			if (!IMLCtx.PropertyBindings.ContainsKey(origNode))
-				IMLCtx.PropertyBindings [origNode] = new Dictionary<string, MemberAddress> ();
-			IMLCtx.PropertyBindings [origNode] [origProp] = ma;
+			if (!context.PropertyBindings.ContainsKey(origNode))
+				context.PropertyBindings [origNode] = new Dictionary<string, MemberAddress> ();
+			context.PropertyBindings [origNode] [origProp] = ma;
 		}
 		void readPropertyBinding(string srcProperty, string expression){
 			//if binding exp = '{}' => binding is done on datasource
 			if (string.IsNullOrEmpty (expression)) {
-				registerPropertyBinding ("DS", "", new MemberAddress (IMLCtx.nodesStack.ToArray (), srcProperty));
+				registerPropertyBinding ("DS", "", new MemberAddress (context.nodesStack.ToArray (), srcProperty));
 				return;
 			}
 
@@ -410,13 +331,13 @@ namespace Crow.IML
 
 			if (bindingExp.Length == 1) {
 				registerPropertyBinding ("DS", bindingExp [0],
-					new MemberAddress (IMLCtx.nodesStack.ToArray (), srcProperty));
+					new MemberAddress (context.nodesStack.ToArray (), srcProperty));
 				return;
 			}
 				
 			string targetName = "";
 			string nodeId = "";
-			Node[] target = IMLCtx.nodesStack.ToArray ();
+			Node[] target = context.nodesStack.ToArray ();
 
 			int nodeIdx = target.Length - 1;//index of target in nodeStack 
 			int ptr = 0;//pointer in bindingExp splitted on '/'
@@ -428,7 +349,7 @@ namespace Crow.IML
 					nodeId = Node.AddressToString (target);
 					targetName = bindTrg [0];
 				}else if (bindTrg.Length == 2) {
-					nodeId = IMLCtx.Names [bindTrg [0]];
+					nodeId = context.Names [bindTrg [0]];
 					targetName = bindTrg [1];
 				} else
 					throw new Exception ("Syntax error in binding, expected 'go dot member'");
@@ -467,7 +388,7 @@ namespace Crow.IML
 				targetName = bindingExp [ptr];
 			}
 
-			registerPropertyBinding (nodeId, targetName, new MemberAddress (IMLCtx.nodesStack.ToArray (), srcProperty));
+			registerPropertyBinding (nodeId, targetName, new MemberAddress (context.nodesStack.ToArray (), srcProperty));
 		}
 		/// <summary>
 		/// Parse child node an generate corresponding msil
@@ -510,11 +431,11 @@ namespace Crow.IML
 					reader.emitLoader (t);
 
 					reader.il.Emit (OpCodes.Ldloc_0);//load child on stack for parenting
-					reader.il.Emit (OpCodes.Callvirt, miAddChild [(int)IMLCtx.nodesStack.Peek ().Type -1]);
+					reader.il.Emit (OpCodes.Callvirt, miAddChild [(int)context.nodesStack.Peek ().Type -1]);
 					reader.il.Emit (OpCodes.Stloc_0); //reset local to current go
 					reader.il.Emit (OpCodes.Ldloc_0);//save current go onto the stack if child has to be added
 
-					IMLCtx.nodesStack.Peek ().Index++;
+					context.nodesStack.Peek ().Index++;
 
 					break;
 				}
@@ -526,7 +447,7 @@ namespace Crow.IML
 		/// read first node to set GraphicObject class for loading
 		/// and let reader position on that node
 		/// </summary>
-		Type readRootType ()
+		Type findRootType ()
 		{
 			string root = "Object";
 			while (Read()) {
@@ -544,7 +465,6 @@ namespace Crow.IML
 						t = expT;
 				}
 			}
-			RootType = t;
 			return t;
 		}
 	}

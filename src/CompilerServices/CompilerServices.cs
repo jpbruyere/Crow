@@ -27,6 +27,15 @@ namespace Crow
 			GetMethod ("get_Item", new Type[] { typeof(string) });
 		public static FieldInfo fldItemTemplates = typeof(TemplatedGroup).GetField("ItemTemplates");
 		public static MethodInfo miCreateExpDel = typeof(ItemTemplate).GetMethod ("CreateExpandDelegate");
+		public static MethodInfo miLoadDefaultVals = typeof (GraphicObject).GetMethod ("loadDefaultValues");
+		public static PropertyInfo piStyle = typeof (GraphicObject).GetProperty ("Style");
+		#region tree handling methods
+		internal static MethodInfo miSetChild = typeof (Container).GetMethod ("SetChild");
+		internal static MethodInfo miAddChild = typeof (Group).GetMethod ("AddChild");
+		internal static MethodInfo miLoadTmp = typeof (TemplatedControl).GetMethod ("loadTemplate", BindingFlags.Instance | BindingFlags.NonPublic);
+		internal static MethodInfo miSetContent = typeof (TemplatedContainer).GetProperty ("Content").GetSetMethod ();
+		internal static MethodInfo miAddItem = typeof (TemplatedGroup).GetMethod ("AddItem", BindingFlags.Instance | BindingFlags.Public);
+		#endregion
 
 		#region ValueChange Reflexion member info
 		static EventInfo eiValueChange = typeof (IValueChange).GetEvent ("ValueChanged");
@@ -37,7 +46,10 @@ namespace Crow
 		static MethodInfo miValueChangeAdd = eiValueChange.GetAddMethod ();
 		#endregion
 
-
+		/// <summary>
+		/// Loc0 is the current graphic object and arg1 of loader is the current interface
+		/// </summary>
+		/// <param name="il">Il.</param>
 		public static void emitSetCurInterface(ILGenerator il){
 			il.Emit (OpCodes.Ldloc_0);
 			il.Emit (OpCodes.Ldarg_1);
