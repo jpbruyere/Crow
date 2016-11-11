@@ -30,6 +30,15 @@ namespace Crow.IML
 		{
 			return obj is NodeAddress && this == obj as NodeAddress;
 		}
+		public override int GetHashCode ()
+		{
+			unchecked {
+				int hash = 19;
+				foreach (Node n in this)
+					hash = hash * 31 + (n == null ? 0 : n.GetHashCode ());	
+				return hash;
+			}
+		}
 		public static bool operator == (NodeAddress x, NodeAddress y)
 		{
 			return x.SequenceEqual (y);
@@ -37,6 +46,14 @@ namespace Crow.IML
 		public static bool operator != (NodeAddress x, NodeAddress y)
 		{
 			return !(x == y);
+		}
+
+		public override string ToString ()
+		{
+			string tmp = "";
+			foreach (Node n in this)
+				tmp += string.Format ("{0}[{1}];", n.CrowType.Name, n.Index);			
+			return tmp;
 		}
 	}
 }
