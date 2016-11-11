@@ -20,7 +20,9 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Reflection.Emit;
+using System.Xml;
 
 namespace Crow.IML
 {
@@ -29,6 +31,10 @@ namespace Crow.IML
 	/// </summary>
 	public class Context
 	{
+		public XmlTextReader reader = null;
+		public Type RootType = null;
+		public Node CurrentNode = null;
+		public DynamicMethod dm = null;
 		public ILGenerator il = null;
 		//public SubNodeType curSubNodeType;
 		public Stack<Node> nodesStack = new Stack<Node> ();
@@ -36,8 +42,26 @@ namespace Crow.IML
 		public Dictionary<string, string> Names = new Dictionary<string, string> ();
 		public Dictionary<string, Dictionary<string, MemberAddress>> PropertyBindings = new Dictionary<string, Dictionary<string, MemberAddress>> ();
 
-		public Context ()
+		public Context (Type rootType)
 		{
+			RootType = rootType;
+			dm = new DynamicMethod ("dyn_instantiator",
+					MethodAttributes.Family | MethodAttributes.FamANDAssem | MethodAttributes.NewSlot,
+					CallingConventions.Standard,
+					typeof (void), new Type [] { typeof (object), typeof (Interface) }, RootType, true);
+			il = dm.GetILGenerator (256);
+
+			initILGen ();
 		}
+		void initILGen ()
+		{
+			il.DeclareLocal (typeof (GraphicObject));
+			il.Emit (OpCodes.Nop);
+			//set local GraphicObject to root object passed as 1st argument
+			il.Emit (OpCodes.Ldarg_0);
+			il.Emit (OpCodes.Stloc_0);
+			CompilerServices.emitSetCurInterface (il);
+		}
+
 	}
 }
