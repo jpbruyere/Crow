@@ -26,6 +26,11 @@ using System.Xml;
 
 namespace Crow.IML
 {
+	public class DataSourceBinding {
+		public bool TwoWay;
+		public MemberAddress Source;
+		public string DataSourceMember;
+	}
 	/// <summary>
 	/// Context while parsing IML
 	/// </summary>
@@ -42,23 +47,34 @@ namespace Crow.IML
 		public Dictionary<string, string> Names = new Dictionary<string, string> ();
 		public Dictionary<string, Dictionary<string, MemberAddress>> PropertyBindings = new Dictionary<string, Dictionary<string, MemberAddress>> ();
 
+		public Dictionary<NodeAddress, Dictionary<string, MemberAddress>> Bindings =
+			new Dictionary<NodeAddress, Dictionary<string, MemberAddress>>();
+		public List<DataSourceBinding> DataSourceBindings = new List<DataSourceBinding>();
+
 		public Context (Type rootType)
 		{
 			RootType = rootType;
 			dm = new DynamicMethod ("dyn_instantiator",
-					MethodAttributes.Family | MethodAttributes.FamANDAssem | MethodAttributes.NewSlot,
-					CallingConventions.Standard,
-					typeof (void), new Type [] { typeof (object), typeof (Interface) }, RootType, true);
+				typeof (void), new Type [] { typeof (Instantiator), typeof (object), typeof (Interface) }, true);
 			il = dm.GetILGenerator (256);
 
 			initILGen ();
 		}
+
+		public NodeAddress CurrentNodeAddress {
+			get { 
+				NodeAddress tmp = new NodeAddress(nodesStack.ToArray ());
+				tmp.Add (CurrentNode);
+				return tmp;
+			}
+		}
+
 		void initILGen ()
 		{
 			il.DeclareLocal (typeof (GraphicObject));
 			il.Emit (OpCodes.Nop);
 			//set local GraphicObject to root object passed as 1st argument
-			il.Emit (OpCodes.Ldarg_0);
+			il.Emit (OpCodes.Ldarg_1);
 			il.Emit (OpCodes.Stloc_0);
 			CompilerServices.emitSetCurInterface (il);
 		}

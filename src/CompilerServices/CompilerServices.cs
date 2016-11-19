@@ -15,7 +15,7 @@ namespace Crow
 		static MethodInfo miAddBinding = typeof(GraphicObject).GetMethod ("BindMember");
 		static FieldInfo miSetCurIface = typeof(GraphicObject).GetField ("currentInterface",
 			BindingFlags.NonPublic | BindingFlags.Instance);
-		static MethodInfo stringEquals = typeof (string).GetMethod
+		internal static MethodInfo stringEquals = typeof (string).GetMethod
 			("Equals", new Type [3] { typeof (string), typeof (string), typeof (StringComparison) });
 		static MethodInfo miFindByName = typeof (GraphicObject).GetMethod ("FindByName");
 
@@ -38,21 +38,35 @@ namespace Crow
 		#endregion
 
 		#region ValueChange Reflexion member info
-		static EventInfo eiValueChange = typeof (IValueChange).GetEvent ("ValueChanged");
-		static MethodInfo miInvokeValueChange = eiValueChange.EventHandlerType.GetMethod ("Invoke");
-		static Type [] argsValueChange = { typeof (object), typeof (object), miInvokeValueChange.GetParameters () [1].ParameterType };
-		static FieldInfo fiNewValue = typeof (ValueChangeEventArgs).GetField ("NewValue");
-		static FieldInfo fiMbName = typeof (ValueChangeEventArgs).GetField ("MemberName");
-		static MethodInfo miValueChangeAdd = eiValueChange.GetAddMethod ();
+		internal static EventInfo eiValueChange = typeof (IValueChange).GetEvent ("ValueChanged");
+		internal static MethodInfo miInvokeValueChange = eiValueChange.EventHandlerType.GetMethod ("Invoke");
+		internal static Type [] argsValueChange = { typeof (object), typeof (object), miInvokeValueChange.GetParameters () [1].ParameterType };
+		internal static FieldInfo fiNewValue = typeof (ValueChangeEventArgs).GetField ("NewValue");
+		internal static FieldInfo fiMbName = typeof (ValueChangeEventArgs).GetField ("MemberName");
+		internal static MethodInfo miValueChangeAdd = eiValueChange.GetAddMethod ();
+
+		internal static EventInfo eiDSChange = typeof (GraphicObject).GetEvent ("DataSourceChanged");
+		internal static MethodInfo miInvokeDSChange = eiDSChange.EventHandlerType.GetMethod ("Invoke");
+		internal static Type [] argsDSChange = {typeof (object), typeof (object), miInvokeDSChange.GetParameters () [1].ParameterType };
+		internal static FieldInfo fiDSCNewDS = typeof (DataSourceChangeEventArgs).GetField ("NewDataSource");
+
+		internal static MethodInfo miCreateBoundDelegate = typeof(DynamicMethod).
+			GetMethod("CreateDelegate", new Type[] { typeof(Type), typeof(object)});
+		internal static MethodInfo miObjToString = typeof(object).GetMethod("ToString");
+
+
+		internal static Type ehTypeDSChange = eiDSChange.EventHandlerType;
+		internal static FieldInfo fi_ehTypeDSChange  = typeof(CompilerServices).GetField("ehTypeDSChange", BindingFlags.Static | BindingFlags.NonPublic);
+
 		#endregion
 
 		/// <summary>
-		/// Loc0 is the current graphic object and arg1 of loader is the current interface
+		/// Loc0 is the current graphic object and arg2 of loader is the current interface
 		/// </summary>
 		/// <param name="il">Il.</param>
 		public static void emitSetCurInterface(ILGenerator il){
 			il.Emit (OpCodes.Ldloc_0);
-			il.Emit (OpCodes.Ldarg_1);
+			il.Emit (OpCodes.Ldarg_2);
 			il.Emit (OpCodes.Stfld, miSetCurIface);
 		}
 		public static void emitBindingCreation(ILGenerator il, string memberName, string expression){

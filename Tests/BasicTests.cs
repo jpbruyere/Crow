@@ -162,7 +162,7 @@ namespace Tests
 				lock (CrowInterface.UpdateMutex) {
 					(CrowInterface.FindByName ("crowContainer") as Container).SetChild
 					(i.CreateInstance(CrowInterface));
-					CurSources = i.GetImlSourcesCode();
+					//CurSources = i.GetImlSourcesCode();
 				}
 			}
 		}

@@ -19,20 +19,44 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Linq;
+using System.Reflection;
+
 namespace Crow.IML
 {
 	/// <summary>
 	/// Address member of a node
 	/// </summary>
 	public struct MemberAddress
-	{		
+	{
+		string memberName;
+		MemberInfo member;
 		public NodeAddress Address;
-		public string Name;
 
-		public MemberAddress (NodeAddress _address, string _member)
+//		public string Name {
+//			get { return memberName; } 
+//			set { memberName = value; }
+//		}
+
+		public MemberAddress (NodeAddress _address, string _member, bool findMember = true)
 		{
 			Address = _address;
-			Name = _member;
+			memberName = _member;
+			member = null;
+
+			if (!findMember)
+				return;
+			if (!tryFindMember ())
+				throw new Exception ("Member Not Found: " + memberName);
+		}
+		public MemberAddress (NodeAddress _address, MemberInfo _member)
+		{
+			Address = _address;
+			member = _member;
+			memberName = "";
+
+			if (member != null)
+				memberName = member.Name;
 		}
 
 		#region Equality Compare
@@ -42,16 +66,36 @@ namespace Crow.IML
 		}
 		public override int GetHashCode ()
 		{
-			return Address.GetHashCode () ^ Name.GetHashCode ();
+			return Address.GetHashCode () ^ member.GetHashCode ();
 		}
 		public static bool operator == (MemberAddress x, MemberAddress y)
 		{
-			return x.Address == y.Address && x.Name == y.Name;
+			return x.Address == y.Address && x.memberName == y.memberName;
 		}
 		public static bool operator != (MemberAddress x, MemberAddress y)
 		{
 			return !(x == y);
 		}
 		#endregion
+
+		bool tryFindMember ()
+		{
+			if (member != null)
+				throw new Exception ("member already found");
+			if (Address == null)
+				return false;
+			Type t = Address.LastOrDefault ().CrowType;
+			member = t.GetMember (memberName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance).FirstOrDefault ();
+
+			#region search for extensions methods if member not found in type
+			if (member == null && !string.IsNullOrEmpty (memberName)) {
+				Assembly a = Assembly.GetExecutingAssembly ();
+				string mn = memberName;
+				member = CompilerServices.GetExtensionMethods (a, t).Where (em => em.Name == mn).FirstOrDefault ();
+			}
+			#endregion
+
+			return member != null;
+		}
 	}
 }

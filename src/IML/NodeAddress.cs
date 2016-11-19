@@ -26,6 +26,8 @@ namespace Crow.IML
 {
 	public class NodeAddress : List<Node>
 	{
+		public NodeAddress (Node[] nodes) : base(nodes) { 
+		}
 		public override bool Equals (object obj)
 		{
 			return obj is NodeAddress && this == obj as NodeAddress;

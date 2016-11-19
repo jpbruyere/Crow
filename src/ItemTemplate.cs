@@ -45,7 +45,7 @@ namespace Crow
 		}
 		public ItemTemplate (Stream ImlFragment,string _dataType, string _fetchDataMethod)
 			:base(ImlFragment)
-		{+-
+		{
 			strDataType = _dataType;
 			fetchMethodName = _fetchDataMethod;
 		}
