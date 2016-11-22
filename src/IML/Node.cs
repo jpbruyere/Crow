@@ -20,6 +20,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Collections.Generic;
 
 namespace Crow.IML
 {
@@ -43,24 +45,19 @@ namespace Crow.IML
 		#region Equality Compare
 		public override bool Equals (object obj)
 		{
-			return obj is Node && this == (Node)obj;
+			if (obj == null) 
+				return false;			
+			Node n = (Node)obj;
+			return CrowType == n.CrowType && Index == n.Index;
 		}
 		public override int GetHashCode ()
 		{
 			return CrowType.GetHashCode () ^ Index.GetHashCode ();
 		}
-		public static bool operator == (Node x, Node y)
-		{
-			return x.CrowType == y.CrowType && x.Index == y.Index;
-		}
-		public static bool operator != (Node x, Node y)
-		{
-			return !(x == y);
-		}
 		#endregion
 
-		public bool IsTemplate {
-			get { return typeof (TemplatedControl).IsAssignableFrom (CrowType) && Index == 0; }
+		public bool HasTemplate {
+			get { return typeof (TemplatedControl).IsAssignableFrom (CrowType);}
 		}
 		public MethodInfo AddMethod {
 			get {
@@ -69,12 +66,34 @@ namespace Crow.IML
 				if (typeof (Container).IsAssignableFrom (CrowType))
 					return CompilerServices.miSetChild;
 				if (typeof (TemplatedContainer).IsAssignableFrom (CrowType))
-					return Index == 0 ? CompilerServices.miLoadTmp : CompilerServices.miSetContent;
+					return Index < 0 ? CompilerServices.miLoadTmp : CompilerServices.miSetContent;
 				if (typeof (TemplatedGroup).IsAssignableFrom (CrowType))
-					return Index == 0 ? CompilerServices.miLoadTmp : CompilerServices.miAddItem;
+					return Index < 0 ? CompilerServices.miLoadTmp : CompilerServices.miAddItem;
 				if (typeof (TemplatedControl).IsAssignableFrom (CrowType))
 					return CompilerServices.miLoadTmp;
 				return null;
+			}
+		}
+		public void EmitGetInstance (ILGenerator il){
+			if (typeof (Group).IsAssignableFrom (CrowType)) {
+				il.Emit (OpCodes.Ldfld, typeof(Group).GetField ("children", BindingFlags.Instance | BindingFlags.NonPublic));
+				il.Emit(OpCodes.Ldc_I4, Index);
+				il.Emit (OpCodes.Callvirt, typeof(List<GraphicObject>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
+				return;
+			}
+			if (typeof(Container).IsAssignableFrom (CrowType) || Index < 0) {
+				il.Emit (OpCodes.Ldfld, typeof(PrivateContainer).GetField ("child", BindingFlags.Instance | BindingFlags.NonPublic));
+				return;
+			}
+			if (typeof(TemplatedContainer).IsAssignableFrom (CrowType)) {
+				il.Emit (OpCodes.Callvirt, typeof(TemplatedContainer).GetProperty ("Content").GetGetMethod ());
+				return;
+			}
+			if (typeof(TemplatedGroup).IsAssignableFrom (CrowType)) {
+				il.Emit (OpCodes.Callvirt, typeof(TemplatedGroup).GetProperty ("Items").GetGetMethod ());
+				il.Emit(OpCodes.Ldc_I4, Index);
+				il.Emit (OpCodes.Callvirt, typeof(List<GraphicObject>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
+				return;
 			}
 		}
 

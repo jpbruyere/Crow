@@ -659,7 +659,7 @@ namespace Crow
 				string expression;
 				if (!getDefaultEvent(ei, styling, out expression))
 					continue;
-				CompilerServices.emitBindingCreation (il, ei.Name, expression);
+				//CompilerServices.emitBindingCreation (il, ei.Name, expression);
 			}
 
 			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {

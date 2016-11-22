@@ -44,13 +44,15 @@ namespace Crow.IML
 		//public SubNodeType curSubNodeType;
 		public Stack<Node> nodesStack = new Stack<Node> ();
 
-		public Dictionary<string, string> Names = new Dictionary<string, string> ();
+		public Dictionary<string, List<NodeAddress>> Names  = new Dictionary<string, List<NodeAddress>>();
 		public Dictionary<string, Dictionary<string, MemberAddress>> PropertyBindings = new Dictionary<string, Dictionary<string, MemberAddress>> ();
 
-		public Dictionary<NodeAddress, Dictionary<string, MemberAddress>> Bindings =
-			new Dictionary<NodeAddress, Dictionary<string, MemberAddress>>();
-		public List<DataSourceBinding> DataSourceBindings = new List<DataSourceBinding>();
-
+		public Dictionary<NodeAddress, Dictionary<string, List<MemberAddress>>> Bindings =
+			new Dictionary<NodeAddress, Dictionary<string, List<MemberAddress>>>();
+		//public List<DataSourceBinding> DataSourceBindings = new List<DataSourceBinding>();
+		public Dictionary<NamedNodeAddress, Dictionary<string, MemberAddress>> NamedBindings =
+			new Dictionary<NamedNodeAddress, Dictionary<string, MemberAddress>>();
+		
 		public Context (Type rootType)
 		{
 			RootType = rootType;

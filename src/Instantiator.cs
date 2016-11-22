@@ -85,7 +85,8 @@ namespace Crow
 
 		List<DynamicMethod> dsValueChangedDynMeths = new List<DynamicMethod>();
 		List<Delegate> dataSourceChangedDelegates = new List<Delegate>();
-
+		Dictionary<string, Delegate> bindingDelegates = new Dictionary<string, Delegate>();//valuechanged del
+		Dictionary<string, Delegate> bindingInitializer = new Dictionary<string, Delegate>();//initialize with actual values of binding origine
 		#region IML parsing
 		/// <summary>
 		/// Parses IML and build a dynamic method that will be used to instanciate one or multiple occurence of the IML file or fragment
@@ -132,7 +133,7 @@ namespace Crow
 
 			ctx.il.Emit (OpCodes.Ldloc_0);//save current go onto the stack if child has to be added
 
-			if (ctx.CurrentNode.IsTemplate)
+			if (ctx.CurrentNode.HasTemplate)
 				emitTemplateLoad (ctx, tmpXml);
 
 			emitGOLoad (ctx, tmpXml);
@@ -140,6 +141,7 @@ namespace Crow
 			ctx.il.Emit (OpCodes.Pop);//pop saved ref to current object
 		}
 		void emitTemplateLoad (Context ctx, string tmpXml) {
+			ctx.CurrentNode.Index--;//template indexing use -1
 			//if its a template, first read template elements
 			using (XmlTextReader reader = new XmlTextReader (tmpXml, XmlNodeType.Element, null)) {
 				List<string []> itemTemplateIds = new List<string []> ();
@@ -248,23 +250,22 @@ namespace Crow
 						if (mi == null)
 							throw new Exception ("Member '" + reader.Name + "' not found in " + ctx.CurrentNode.CrowType.Name);
 						if (mi.MemberType == MemberTypes.Event) {
-							CompilerServices.emitBindingCreation (ctx.il, reader.Name, reader.Value);
+							//CompilerServices.emitBindingCreation (ctx.il, reader.Name, reader.Value);
 							continue;
 						}
 						PropertyInfo pi = mi as PropertyInfo;
 						if (pi == null)
 							throw new Exception ("Member '" + reader.Name + "' not found in " + ctx.CurrentNode.CrowType.Name);
 
-						//if (pi.Name == "Name")
-						//	ctx.Names.Add (reader.Value, Node.AddressToString (ctx.nodesStack.ToArray ()));
-
-						if (reader.Value.StartsWith ("{", StringComparison.OrdinalIgnoreCase)) {
-							
-
+						if (pi.Name == "Name"){
+							if (!ctx.Names.ContainsKey(reader.Value))
+								ctx.Names[reader.Value] = new List<NodeAddress>();							
+							ctx.Names[reader.Value].Add(ctx.CurrentNodeAddress);
+						}
+						
+						if (reader.Value.StartsWith ("{", StringComparison.OrdinalIgnoreCase))
 							readPropertyBinding (ctx, reader.Name, reader.Value.Substring (1, reader.Value.Length - 2));
-
-							//CompilerServices.emitBindingCreation (reader.il, reader.Name, reader.Value.Substring (1, reader.Value.Length - 2));
-						} else
+						else
 							CompilerServices.EmitSetValue (ctx.il, pi, reader.Value);
 
 					}
@@ -280,6 +281,8 @@ namespace Crow
 				ctx.nodesStack.Push (ctx.CurrentNode);
 				readChildren (reader, ctx);
 				ctx.nodesStack.Pop ();
+
+				emitCheckAndBindValueChanged (ctx);
 			}
 		}
 		/// <summary>
@@ -338,6 +341,29 @@ namespace Crow
 		}
 		#endregion
 
+
+		void emitCheckAndBindValueChanged(Context ctx){
+			System.Reflection.Emit.Label labContinue = ctx.il.DefineLabel ();
+			string strNA = ctx.CurrentNodeAddress.ToString ();
+			//first, test if current node is in bindingDelegate dictionnary
+			ctx.il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
+			ctx.il.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("bindingDelegates", BindingFlags.Instance | BindingFlags.NonPublic));
+			ctx.il.Emit (OpCodes.Ldstr, strNA);//load binding id for current node
+			ctx.il.Emit (OpCodes.Call, typeof(Dictionary<string,Delegate>).GetMethod ("ContainsKey"));
+
+			ctx.il.Emit (OpCodes.Brfalse, labContinue);//if not present, do nothing
+
+			//fetch delegate
+			ctx.il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
+			ctx.il.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("bindingDelegates", BindingFlags.Instance | BindingFlags.NonPublic));
+			ctx.il.Emit (OpCodes.Ldstr, strNA);//load binding id for current node
+			ctx.il.Emit (OpCodes.Call, typeof(Dictionary<string, Delegate>).GetMethod ("get_Item", new Type[] { typeof(string) }));
+
+			//attach to valuechanged handler
+			ctx.il.Emit(OpCodes.Callvirt, typeof(IValueChange).GetEvent("ValueChanged").AddMethod);
+
+			ctx.il.MarkLabel (labContinue);
+		}
 		/// <summary>
 		/// Tries the find target.
 		/// </summary>
@@ -360,64 +386,62 @@ namespace Crow
 				twoWay = true;
 			}
 
-			string [] bindingExp = expression.Split ('/');
+			string[] bindingExp = expression.Split ('/');
 
 			if (bindingExp.Length == 1) {
 				//datasource binding
-				processDataSourceBinding(ctx, sourceMember, bindingExp [0]);
-
+				processDataSourceBinding (ctx, sourceMember, bindingExp [0]);
+				return;
 			}
-//			else {
-//				int ptr = 0;
-//
-//				//if exp start with '/' => Graphic tree parsing start at source
-//				if (string.IsNullOrEmpty (bindingExp [0]))
-//					ptr++;
-//				else if (bindingExp[0] == "."){ //search template root
-//					do {
-//						target = new NodeAddress(ctx.
-//						if (tmpTarget == null)
-//							return false;
-//						if (tmpTarget is Interface)
-//							throw new Exception ("Not in Templated Control");
-//					} while (!(tmpTarget is TemplatedControl));
-//					ptr++;
-//				}
-//				while (ptr < bindingExp.Length - 1) {
-//					if (tmpTarget == null) {
-//						#if DEBUG_BINDING
-//						Debug.WriteLine ("\tTarget not found => " + this.ToString());
-//						#endif
-//						return false;
-//					}
-//					if (bindingExp [ptr] == "..")
-//						tmpTarget = tmpTarget.LogicalParent;
-//					else if (bindingExp [ptr] == ".") {
-//						if (ptr > 0)
-//							throw new Exception ("Syntax error in binding, './' may only appear in first position");
-//						tmpTarget = Source.Instance as ILayoutable;
-//					} else
-//						tmpTarget = (tmpTarget as GraphicObject).FindByName (bindingExp [ptr]);
-//					ptr++;
-//				}
-//
-//				if (tmpTarget == null) {
-//					#if DEBUG_BINDING
-//					Debug.WriteLine ("\tBinding Target not found => " + this.ToString());
-//					#endif
-//					return false;
-//				}
-//
-//				string [] bindTrg = bindingExp [ptr].Split ('.');
-//
-//				if (bindTrg.Length == 1)
-//					memberName = bindTrg [0];
-//				else if (bindTrg.Length == 2) {
-//					tmpTarget = (tmpTarget as GraphicObject).FindByName (bindTrg [0]);
-//					memberName = bindTrg [1];
-//				} else
-//					throw new Exception ("Syntax error in binding, expected 'go dot member'");
-//
+
+			NodeAddress currentNode = ctx.CurrentNodeAddress;
+			int ptr = currentNode.Count - 1;
+
+			//if exp start with '/' => Graphic tree parsing start at source
+			if (string.IsNullOrEmpty (bindingExp [0])) {
+				//TODO:
+			} else if (bindingExp [0] == ".") { //search template root
+				while (ptr > 0) {
+					ptr--;
+					if (typeof(TemplatedControl).IsAssignableFrom (currentNode [ptr].CrowType))
+						break;
+				}
+			} else if (bindingExp [0] == "..") { //search starting at current node
+				int levelUp = bindingExp.Length - 1;
+				if (levelUp > ptr)
+					throw new Exception ("Binding error: try to bind outside IML source");
+				ptr -= levelUp;
+			}
+			Node[] targetNode = new Node[ptr+1];
+			Array.Copy (currentNode.ToArray (), targetNode, ptr + 1);
+			NodeAddress targetNA = new NodeAddress (targetNode);
+
+			string [] bindTrg = bindingExp [currentNode.Count - 1 - ptr].Split ('.');
+
+			if (bindTrg.Length == 1)
+				memberName = bindTrg [0];
+			else if (bindTrg.Length == 2) {
+				//named target
+				//TODO:
+
+				memberName = bindTrg [1];
+				return;
+			} else
+				throw new Exception ("Syntax error in binding, expected 'go dot member'");
+
+			Dictionary<string, List<MemberAddress>> nodeBindings = null;
+			if (ctx.Bindings.ContainsKey (targetNA))
+				nodeBindings = ctx.Bindings [targetNA];
+			else {
+				nodeBindings = new Dictionary<string, List<MemberAddress>> ();
+				ctx.Bindings [targetNA] = nodeBindings;
+			}
+
+			if (!nodeBindings.ContainsKey (memberName))
+				nodeBindings [memberName] = new List<MemberAddress> ();
+			nodeBindings [memberName].Add (new MemberAddress (currentNode, sourceMember));
+
+			//
 //				if (tmpTarget == null) {
 //					#if DEBUG_BINDING
 //					Debug.WriteLine ("\tBinding Target not found => " + this.ToString());
@@ -441,12 +465,14 @@ namespace Crow
 			Debug.WriteLine ("Property less binding: " + Target + expression);
 			#endif
 		}
-
+		/// <summary>
+		/// create the valuechanged handler, the datasourcechanged handler and emit event handling
+		/// </summary>
 		void processDataSourceBinding(Context ctx, string sourceMember, string dataSourceMember){
 			#region create valuechanged method
 			DynamicMethod dm = new DynamicMethod ("dyn_valueChanged",
 				typeof (void),
-				CompilerServices.argsValueChange, true);
+				CompilerServices.argsBoundValueChange, true);
 
 			ILGenerator il = dm.GetILGenerator (256);
 
@@ -476,6 +502,9 @@ namespace Crow
 			PropertyInfo piSource = ctx.CurrentNode.CrowType.GetProperty(sourceMember);
 			Type sourceValueType = piSource.PropertyType;
 
+			//il.Emit (OpCodes.Call, typeof(object).GetMethod("GetType"));
+			//il.Emit (OpCodes.Call, typeof(Type).GetProperty("IsValueType").GetGetMethod());
+
 			if (sourceValueType == typeof (string)) {
 				il.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
 			} else if (!sourceValueType.IsValueType)
@@ -486,8 +515,6 @@ namespace Crow
 				il.Emit (OpCodes.Unbox_Any, sourceValueType);
 
 			il.Emit (OpCodes.Callvirt, piSource.GetSetMethod ());
-			//il.Emit (OpCodes.Pop);
-			//il.Emit (OpCodes.Pop);
 
 			il.MarkLabel (endMethod);
 
@@ -510,57 +537,38 @@ namespace Crow
 				CompilerServices.argsDSChange, true);
 
 			il = dm.GetILGenerator (256);
-			//il.DeclareLocal (typeof(Object[]));
 
 			il.Emit (OpCodes.Nop);
 
-//			//load new datasource onto the stack for handler addition at the end
+			//load new datasource onto the stack for handler addition at the end
 			il.Emit (OpCodes.Ldarg_2);
 			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
 
-			#region Load cached delegate
+			//first we have to create delegate from cached dynMethod bound to the GraphicObject currently instanced
+
+			//Load cached delegate
 			il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
 			il.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("dsValueChangedDynMeths", BindingFlags.Instance | BindingFlags.NonPublic));
-			il.Emit(OpCodes.Ldc_I4, dmVC);
+			il.Emit(OpCodes.Ldc_I4, dmVC);//load index of dynmathod
 			il.Emit(OpCodes.Callvirt, typeof(List<DynamicMethod>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
-			#endregion
 
 			//load ds changed eventhandlertype
 			il.Emit(OpCodes.Ldtoken, typeof(EventHandler<ValueChangeEventArgs>));
 			il.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle", new
 				Type[1]{typeof(RuntimeTypeHandle)}));
-			//typeof (GraphicObject).GetEvent ("DataSourceChanged").EventHandlerType;
-			//il.Emit(OpCodes.Ldfld, typeof(CompilerServices).GetField("ehTypeDSChange", BindingFlags.Static | BindingFlags.NonPublic););
 
-			//create object[] for delegate creation parameters
-//			il.Emit (OpCodes.Ldc_I4_1);
-//			il.Emit (OpCodes.Newarr, typeof(object));
-//			il.Emit (OpCodes.Stloc_0);//save array ref
-//			il.Emit (OpCodes.Ldloc_0);//load array ref onto the stack
-//			il.Emit (OpCodes.Ldc_I4_0);//0 is the index of the dm in the array
-
-			//load datasource change source
-			il.Emit (OpCodes.Ldarg_1);
-			//il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
-
-			//create bound delegate
-			il.Emit (OpCodes.Call, CompilerServices.miCreateBoundDelegate);
-			//set delegete as index 0 in the object array
-//			il.Emit(OpCodes.Ldelem_I4);
+			il.Emit (OpCodes.Ldarg_1);//load datasource change source
+			il.Emit (OpCodes.Call, CompilerServices.miCreateBoundDelegate);//create bound delegate
 
 			//add new delegate to datasource valuechanged event
 			il.Emit(OpCodes.Callvirt, typeof(IValueChange).GetEvent("ValueChanged").AddMethod);//call add event			//il.Emit(OpCodes.Pop);
-			//il.Emit(OpCodes.Pop);
-			//il.Emit(OpCodes.Pop);
-			//il.Emit(OpCodes.Pop);
 			il.Emit (OpCodes.Ret);
 
-
-			#endregion
-
+			//store dschange delegate in instatiator instance for access while instancing graphic object
 			int delDSIndex = dataSourceChangedDelegates.Count;
 			Delegate del = dm.CreateDelegate (CompilerServices.ehTypeDSChange, this);
 			dataSourceChangedDelegates.Add(del);
+			#endregion
 
 			#region Emit datasourcechanged handler binding in the loader context
 			ctx.il.Emit(OpCodes.Ldloc_0);//load ref to current graphic object
@@ -568,12 +576,111 @@ namespace Crow
 			ctx.il.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("dataSourceChangedDelegates", BindingFlags.Instance | BindingFlags.NonPublic));
 			ctx.il.Emit(OpCodes.Ldc_I4, delDSIndex);//load delegate index
 			ctx.il.Emit(OpCodes.Callvirt, typeof(List<DynamicMethod>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
-
 			ctx.il.Emit(OpCodes.Callvirt, typeof(GraphicObject).GetEvent("DataSourceChanged").AddMethod);//call add event
 			#endregion
-			//miValueChangeAdd.Invoke (grouped [0].Target.Instance, new object [] { del });
 		}
-			
+
+		/// <summary>
+		/// Create and store in the instanciator the ValueChanged delegates
+		/// those delegates uses grtree functions to set destination value so they don't
+		/// need to be bound to destination instance as in the ancient system.
+		/// </summary>
+		void emitBindingDelegates(Context ctx){
+			foreach (KeyValuePair<NodeAddress,Dictionary<string, List<MemberAddress>>> bindings in ctx.Bindings ) {	
+
+				Type origineNodeType = bindings.Key.NodeType;
+
+				//value changed dyn method
+				DynamicMethod dm = new DynamicMethod ("dyn_valueChanged",
+					typeof (void), CompilerServices.argsValueChange, true);
+
+				ILGenerator il = dm.GetILGenerator (256);
+
+				System.Reflection.Emit.Label [] jumpTable = 
+					new System.Reflection.Emit.Label [bindings.Value.Count];
+				System.Reflection.Emit.Label endMethod = il.DefineLabel ();
+
+				il.DeclareLocal (typeof(object));
+
+				il.Emit (OpCodes.Nop);
+				il.Emit (OpCodes.Ldarg_0);//load source instance of ValueChanged event
+
+				//load source member name
+				il.Emit (OpCodes.Ldarg_1);
+				il.Emit (OpCodes.Ldfld, typeof(ValueChangeEventArgs).GetField ("MemberName"));
+
+				int i = 0;
+				foreach (KeyValuePair<string, List<MemberAddress>> bindingCase in bindings.Value ) {
+					Type origineType = origineNodeType.GetProperty (bindingCase.Key).PropertyType;
+
+					jumpTable [i] = il.DefineLabel ();
+					#region member name test
+					il.Emit (OpCodes.Ldstr, bindingCase.Key);//load name to test
+					il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
+					il.Emit (OpCodes.Callvirt, CompilerServices.stringEquals);
+					il.Emit (OpCodes.Brfalse, jumpTable [i]);//if not equal, jump to next case
+					#endregion
+
+					#region destination member affectations
+					foreach (MemberAddress ma in bindingCase.Value) {
+						//first we have to load destination instance onto the stack, it is access
+						//with graphic tree functions deducted from nodes topology
+						il.Emit (OpCodes.Ldarg_0);//load source instance of ValueChanged event
+
+						NodeAddress origine = bindings.Key;
+						NodeAddress destination = ma.Address;
+
+						if (origine.Count < destination.Count){
+							for (int j = origine.Count; j < destination.Count; j++)
+								destination[j].EmitGetInstance(il);
+						}else{
+							for (int j = destination.Count; j < origine.Count; j++)
+								il.Emit(OpCodes.Callvirt, typeof(ILayoutable).GetProperty("Parent").GetGetMethod());
+						}
+						//load new value
+						System.Reflection.Emit.Label labValueType = il.DefineLabel ();
+						il.Emit (OpCodes.Ldarg_1);
+						il.Emit (OpCodes.Ldfld, typeof (ValueChangeEventArgs).GetField ("NewValue"));
+
+						emitConvert(il,origineType, ma.Property.PropertyType);
+
+						//set value
+						il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());
+
+						il.Emit (OpCodes.Br, endMethod);
+						il.MarkLabel (jumpTable [i]);
+					}
+					#endregion
+
+					i++;
+				}
+				il.MarkLabel (endMethod);
+				il.Emit (OpCodes.Ret);
+
+				bindingDelegates [bindings.Key.ToString()] = dm.CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>));
+			}
+		}
+		void emitConvert(ILGenerator il, Type origType, Type destType){			
+			if (destType == typeof (string))
+				il.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
+			else if (origType.IsValueType) {
+				if (destType != origType)
+					il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (destType));
+				else
+					il.Emit (OpCodes.Unbox_Any, destType);
+			}else
+				il.Emit (OpCodes.Castclass, destType);
+		}
+		void emitConvertWorking(ILGenerator il, Type sourceValueType){
+			if (sourceValueType == typeof (string)) {
+				il.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
+			} else if (!sourceValueType.IsValueType)
+				il.Emit (OpCodes.Castclass, sourceValueType);
+			else if (sourceValueType != sourceValueType) {
+				il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (sourceValueType));
+			} else
+				il.Emit (OpCodes.Unbox_Any, sourceValueType);			
+		}
 		//public string GetImlSourcesCode(){
 		//	try {
 		//		using (StreamReader sr = new StreamReader (imlPath))

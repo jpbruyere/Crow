@@ -12,7 +12,6 @@ namespace Crow
 {
 	public static class CompilerServices
 	{
-		static MethodInfo miAddBinding = typeof(GraphicObject).GetMethod ("BindMember");
 		static FieldInfo miSetCurIface = typeof(GraphicObject).GetField ("currentInterface",
 			BindingFlags.NonPublic | BindingFlags.Instance);
 		internal static MethodInfo stringEquals = typeof (string).GetMethod
@@ -40,7 +39,8 @@ namespace Crow
 		#region ValueChange Reflexion member info
 		internal static EventInfo eiValueChange = typeof (IValueChange).GetEvent ("ValueChanged");
 		internal static MethodInfo miInvokeValueChange = eiValueChange.EventHandlerType.GetMethod ("Invoke");
-		internal static Type [] argsValueChange = { typeof (object), typeof (object), miInvokeValueChange.GetParameters () [1].ParameterType };
+		internal static Type [] argsBoundValueChange = { typeof (object), typeof (object), miInvokeValueChange.GetParameters () [1].ParameterType };
+		internal static Type [] argsValueChange = { typeof (object), miInvokeValueChange.GetParameters () [1].ParameterType };
 		internal static FieldInfo fiNewValue = typeof (ValueChangeEventArgs).GetField ("NewValue");
 		internal static FieldInfo fiMbName = typeof (ValueChangeEventArgs).GetField ("MemberName");
 		internal static MethodInfo miValueChangeAdd = eiValueChange.GetAddMethod ();
@@ -68,12 +68,6 @@ namespace Crow
 			il.Emit (OpCodes.Ldloc_0);
 			il.Emit (OpCodes.Ldarg_2);
 			il.Emit (OpCodes.Stfld, miSetCurIface);
-		}
-		public static void emitBindingCreation(ILGenerator il, string memberName, string expression){
-			il.Emit (OpCodes.Ldloc_0);
-			il.Emit (OpCodes.Ldstr, memberName);
-			il.Emit (OpCodes.Ldstr, expression);
-			il.Emit (OpCodes.Callvirt, miAddBinding);
 		}
 
 		public static void EmitSetValue(ILGenerator il, PropertyInfo pi, object val){
@@ -267,7 +261,7 @@ namespace Crow
 						MethodAttributes.Family | MethodAttributes.FamANDAssem | MethodAttributes.NewSlot,
 						CallingConventions.Standard,
 						typeof (void),
-						argsValueChange,
+						argsBoundValueChange,
 						target_Type, true);
 
 					il = dm.GetILGenerator (256);

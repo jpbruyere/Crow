@@ -30,9 +30,10 @@ namespace Crow.IML
 	public struct MemberAddress
 	{
 		string memberName;
-		MemberInfo member;
+		public MemberInfo member;
 		public NodeAddress Address;
 
+		public PropertyInfo Property { get { return member as PropertyInfo; }}
 //		public string Name {
 //			get { return memberName; } 
 //			set { memberName = value; }
