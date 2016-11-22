@@ -95,8 +95,7 @@ namespace Crow
 		void parseIML (XmlTextReader reader) {
 			Context ctx = new Context (findRootType (reader));
 
-			ctx.CurrentNode = new Node (ctx.RootType);
-			emitLoader (reader, ctx);
+			emitLoader (reader, ctx, ctx.RootType);
 
 			emitBindingDelegates (ctx);
 
@@ -130,17 +129,21 @@ namespace Crow
 			}
 			return t;
 		}
-		void emitLoader (XmlTextReader reader, Context ctx)
+		void emitLoader (XmlTextReader reader, Context ctx, Type newType)
 		{
+			ctx.nodesStack.Push(new Node (newType, ctx.CurrentIndex));
 			string tmpXml = reader.ReadOuterXml ();
 
-			if (ctx.CurrentNode.HasTemplate)
+			if (ctx.nodesStack.Peek().HasTemplate)
 				emitTemplateLoad (ctx, tmpXml);
 
 			emitGOLoad (ctx, tmpXml);
+
+			emitCheckAndBindValueChanged (ctx);
+
+			ctx.nodesStack.Pop ();
 		}
-		void emitTemplateLoad (Context ctx, string tmpXml) {
-			ctx.CurrentNode.Index--;//template indexing use -1
+		void emitTemplateLoad (Context ctx, string tmpXml) {			
 			//if its a template, first read template elements
 			using (XmlTextReader reader = new XmlTextReader (tmpXml, XmlNodeType.Element, null)) {
 				List<string []> itemTemplateIds = new List<string []> ();
@@ -156,9 +159,8 @@ namespace Crow
 					if (reader.Name == "Template") {
 						inlineTemplate = true;
 						reader.Read ();
-						ctx.nodesStack.Push (ctx.CurrentNode);
+						ctx.CurrentIndex = -1;
 						readChildren (reader, ctx);
-						ctx.nodesStack.Pop ();
 					} else if (reader.Name == "ItemTemplate") {
 						string dataType = "default", datas = "", path = "";
 						while (reader.MoveToNextAttribute ()) {
@@ -221,7 +223,7 @@ namespace Crow
 					}
 				}
 			}
-			ctx.CurrentNode.Index++;
+			ctx.nodesStack.IncrementCurrentNodeIndex ();
 		}
 
 		void emitGOLoad (Context ctx, string tmpXml) {
@@ -245,16 +247,16 @@ namespace Crow
 						if (reader.Name == "Style")
 							continue;
 
-						MemberInfo mi = ctx.CurrentNode.CrowType.GetMember (reader.Name).FirstOrDefault ();
+						MemberInfo mi = ctx.CurrentNodeType.GetMember (reader.Name).FirstOrDefault ();
 						if (mi == null)
-							throw new Exception ("Member '" + reader.Name + "' not found in " + ctx.CurrentNode.CrowType.Name);
+							throw new Exception ("Member '" + reader.Name + "' not found in " + ctx.CurrentNodeType.Name);
 						if (mi.MemberType == MemberTypes.Event) {
 							//CompilerServices.emitBindingCreation (ctx.il, reader.Name, reader.Value);
 							continue;
 						}
 						PropertyInfo pi = mi as PropertyInfo;
 						if (pi == null)
-							throw new Exception ("Member '" + reader.Name + "' not found in " + ctx.CurrentNode.CrowType.Name);
+							throw new Exception ("Member '" + reader.Name + "' not found in " + ctx.CurrentNodeType.Name);
 
 						if (pi.Name == "Name"){
 							if (!ctx.Names.ContainsKey(reader.Value))
@@ -273,12 +275,9 @@ namespace Crow
 				#endregion
 
 				if (!reader.IsEmptyElement) {
-					ctx.nodesStack.Push (ctx.CurrentNode);
+					ctx.CurrentIndex = 0;
 					readChildren (reader, ctx);
-					ctx.nodesStack.Pop ();
 				}
-
-				emitCheckAndBindValueChanged (ctx);
 			}
 		}
 		/// <summary>
@@ -295,7 +294,7 @@ namespace Crow
 				case XmlNodeType.Element:
 					//skip Templates
 					if (reader.Name == "Template" ||
-						reader.Name == "ItemTemplate") {
+					    reader.Name == "ItemTemplate") {
 						reader.Skip ();
 						continue;
 					}
@@ -320,14 +319,13 @@ namespace Crow
 					ctx.il.Emit (OpCodes.Stloc_0);//child is now loc_0
 					CompilerServices.emitSetCurInterface (ctx.il);
 
-					ctx.CurrentNode = new Node (t);
-					emitLoader (reader, ctx);
+					emitLoader (reader, ctx, t);
 
 					ctx.il.Emit (OpCodes.Ldloc_0);//load child on stack for parenting
-					ctx.il.Emit (OpCodes.Callvirt, ctx.nodesStack.Peek ().AddMethod);
+					ctx.il.Emit (OpCodes.Callvirt, ctx.CurrentAddMethod);
 					ctx.il.Emit (OpCodes.Stloc_0); //reset local to current go
 
-					ctx.nodesStack.Peek ().Index++;
+					ctx.CurrentIndex++;
 
 					break;
 				}
@@ -421,7 +419,7 @@ namespace Crow
 			Array.Copy (currentNode.ToArray (), targetNode, ptr + 1);
 			NodeAddress targetNA = new NodeAddress (targetNode);
 
-			string [] bindTrg = bindingExp [currentNode.Count - 1 - ptr].Split ('.');
+			string [] bindTrg = bindingExp.Last().Split ('.');
 
 			if (bindTrg.Length == 1)
 				memberName = bindTrg [0];
@@ -504,7 +502,7 @@ namespace Crow
 			//by default, source value type is deducted from target member type to allow
 			//memberless binding, if targetMember exists, it will be used to determine target
 			//value type for conversion
-			PropertyInfo piSource = ctx.CurrentNode.CrowType.GetProperty(sourceMember);
+			PropertyInfo piSource = ctx.CurrentNodeType.GetProperty(sourceMember);
 			Type sourceValueType = piSource.PropertyType;
 
 			//il.Emit (OpCodes.Call, typeof(object).GetMethod("GetType"));
@@ -642,17 +640,9 @@ namespace Crow
 						NodeAddress origine = bindings.Key;
 						NodeAddress destination = ma.Address;
 
-						if (origine.Count < destination.Count){
-							for (int j = origine.Count-1; j < destination.Count-1; j++){
-								destination[j].EmitGetInstance(ilInit);
-								destination[j].EmitGetInstance(il);
-							}
-						}else{
-							for (int j = destination.Count; j < origine.Count; j++){
-								ilInit.Emit(OpCodes.Callvirt, typeof(ILayoutable).GetProperty("Parent").GetGetMethod());
-								il.Emit(OpCodes.Callvirt, typeof(ILayoutable).GetProperty("Parent").GetGetMethod());
-							}
-						}
+						emitGetInstance(il,origine,destination);
+						emitGetInstance(ilInit,origine,destination);
+
 						//init dynmeth: load actual value
 						ilInit.Emit (OpCodes.Ldarg_0);
 						ilInit.Emit (OpCodes.Callvirt, origineNodeType.GetProperty (bindingCase.Key).GetGetMethod());
@@ -681,8 +671,38 @@ namespace Crow
 				il.Emit (OpCodes.Ret);
 
 				bindingDelegates [bindings.Key.ToString()] = dm.CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>));
-				bindingDelegates [bindings.Key.ToString()] = dmInit.CreateDelegate (typeof(Action<object>));
+				bindingInitializer [bindings.Key.ToString()] = dmInit.CreateDelegate (typeof(Action<object>));
 			}
+		}
+		void emitGetInstance (ILGenerator il, NodeAddress orig, NodeAddress dest){
+			if (orig.Count < dest.Count){
+				for (int i = orig.Count-1; i < dest.Count-1; i++){
+					if (typeof (Group).IsAssignableFrom (dest[i].CrowType)) {
+						il.Emit (OpCodes.Ldfld, typeof(Group).GetField ("children", BindingFlags.Instance | BindingFlags.NonPublic));
+						il.Emit(OpCodes.Ldc_I4, dest[i+1].Index);
+						il.Emit (OpCodes.Callvirt, typeof(List<GraphicObject>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
+						continue;
+					}
+					if (typeof(Container).IsAssignableFrom (dest[i].CrowType) || dest[i+1].Index < 0) {
+						il.Emit (OpCodes.Ldfld, typeof(PrivateContainer).GetField ("child", BindingFlags.Instance | BindingFlags.NonPublic));
+						continue;
+					}
+					if (typeof(TemplatedContainer).IsAssignableFrom (dest[i].CrowType)) {
+						il.Emit (OpCodes.Callvirt, typeof(TemplatedContainer).GetProperty ("Content").GetGetMethod ());
+						continue;
+					}
+					if (typeof(TemplatedGroup).IsAssignableFrom (dest[i].CrowType)) {
+						il.Emit (OpCodes.Callvirt, typeof(TemplatedGroup).GetProperty ("Items").GetGetMethod ());
+						il.Emit(OpCodes.Ldc_I4, dest[i+1].Index);
+						il.Emit (OpCodes.Callvirt, typeof(List<GraphicObject>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
+						continue;
+					}
+				}
+				return;
+			}
+
+			for (int j = dest.Count; j < orig.Count; j++)
+				il.Emit(OpCodes.Callvirt, typeof(ILayoutable).GetProperty("Parent").GetGetMethod());
 		}
 		void emitConvert(ILGenerator il, Type origType, Type destType){			
 			if (destType == typeof (string))

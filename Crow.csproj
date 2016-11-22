@@ -147,6 +147,7 @@
     <Compile Include="src\IML\NodeAddress.cs" />
     <Compile Include="src\IML\Node.cs" />
     <Compile Include="src\IML\MemberAddress.cs" />
+    <Compile Include="src\IML\NodeStack.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

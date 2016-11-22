@@ -28,7 +28,7 @@ namespace Crow.IML
 	/// <summary>
 	/// IML Node are the elements of the interface XML,
 	/// </summary>
-	public class Node
+	public struct Node
 	{
 		public Type CrowType;
 		/// <summary>
@@ -58,43 +58,6 @@ namespace Crow.IML
 
 		public bool HasTemplate {
 			get { return typeof (TemplatedControl).IsAssignableFrom (CrowType);}
-		}
-		public MethodInfo AddMethod {
-			get {
-				if (typeof (Group).IsAssignableFrom (CrowType))
-					return CompilerServices.miAddChild;
-				if (typeof (Container).IsAssignableFrom (CrowType))
-					return CompilerServices.miSetChild;
-				if (typeof (TemplatedContainer).IsAssignableFrom (CrowType))
-					return Index < 0 ? CompilerServices.miLoadTmp : CompilerServices.miSetContent;
-				if (typeof (TemplatedGroup).IsAssignableFrom (CrowType))
-					return Index < 0 ? CompilerServices.miLoadTmp : CompilerServices.miAddItem;
-				if (typeof (TemplatedControl).IsAssignableFrom (CrowType))
-					return CompilerServices.miLoadTmp;
-				return null;
-			}
-		}
-		public void EmitGetInstance (ILGenerator il){
-			if (typeof (Group).IsAssignableFrom (CrowType)) {
-				il.Emit (OpCodes.Ldfld, typeof(Group).GetField ("children", BindingFlags.Instance | BindingFlags.NonPublic));
-				il.Emit(OpCodes.Ldc_I4, Index);
-				il.Emit (OpCodes.Callvirt, typeof(List<GraphicObject>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
-				return;
-			}
-			if (typeof(Container).IsAssignableFrom (CrowType) || Index < 0) {
-				il.Emit (OpCodes.Ldfld, typeof(PrivateContainer).GetField ("child", BindingFlags.Instance | BindingFlags.NonPublic));
-				return;
-			}
-			if (typeof(TemplatedContainer).IsAssignableFrom (CrowType)) {
-				il.Emit (OpCodes.Callvirt, typeof(TemplatedContainer).GetProperty ("Content").GetGetMethod ());
-				return;
-			}
-			if (typeof(TemplatedGroup).IsAssignableFrom (CrowType)) {
-				il.Emit (OpCodes.Callvirt, typeof(TemplatedGroup).GetProperty ("Items").GetGetMethod ());
-				il.Emit(OpCodes.Ldc_I4, Index);
-				il.Emit (OpCodes.Callvirt, typeof(List<GraphicObject>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
-				return;
-			}
 		}
 
 		public static implicit operator string (Node sn)
