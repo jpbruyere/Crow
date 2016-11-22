@@ -362,6 +362,14 @@ namespace Crow
 			//attach to valuechanged handler
 			ctx.il.Emit(OpCodes.Callvirt, typeof(IValueChange).GetEvent("ValueChanged").AddMethod);
 
+			//call initializer 
+			ctx.il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
+			ctx.il.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("bindingInitializer", BindingFlags.Instance | BindingFlags.NonPublic));
+			ctx.il.Emit (OpCodes.Ldstr, strNA);//load binding id for current node
+			ctx.il.Emit (OpCodes.Call, typeof(Dictionary<string, Delegate>).GetMethod ("get_Item", new Type[] { typeof(string) }));
+
+			ctx.il.Emit(OpCodes.Callvirt, typeof(Func<object>).GetMethod("Invoke"));
+
 			ctx.il.MarkLabel (labContinue);
 		}
 		/// <summary>
@@ -590,6 +598,12 @@ namespace Crow
 
 				Type origineNodeType = bindings.Key.NodeType;
 
+				//init method, current instance passed as arg
+				DynamicMethod dmInit = new DynamicMethod ("dyn_initBinding",
+					typeof (void), new Type[] {typeof(object)}, true);
+				ILGenerator ilInit = dmInit.GetILGenerator (256);
+				ilInit.Emit (OpCodes.Nop);
+
 				//value changed dyn method
 				DynamicMethod dm = new DynamicMethod ("dyn_valueChanged",
 					typeof (void), CompilerServices.argsValueChange, true);
@@ -623,6 +637,8 @@ namespace Crow
 
 					#region destination member affectations
 					foreach (MemberAddress ma in bindingCase.Value) {
+						//for initialisation dynmeth, load current instance
+						ilInit.Emit(OpCodes.Ldarg_0);
 						//first we have to load destination instance onto the stack, it is access
 						//with graphic tree functions deducted from nodes topology
 						il.Emit (OpCodes.Ldarg_0);//load source instance of ValueChanged event
@@ -631,20 +647,30 @@ namespace Crow
 						NodeAddress destination = ma.Address;
 
 						if (origine.Count < destination.Count){
-							for (int j = origine.Count; j < destination.Count; j++)
+							for (int j = origine.Count; j < destination.Count; j++){
+								destination[j].EmitGetInstance(ilInit);
 								destination[j].EmitGetInstance(il);
+							}
 						}else{
-							for (int j = destination.Count; j < origine.Count; j++)
+							for (int j = destination.Count; j < origine.Count; j++){
+								ilInit.Emit(OpCodes.Callvirt, typeof(ILayoutable).GetProperty("Parent").GetGetMethod());
 								il.Emit(OpCodes.Callvirt, typeof(ILayoutable).GetProperty("Parent").GetGetMethod());
+							}
 						}
+						//init dynmeth: load actual value
+						ilInit.Emit (OpCodes.Ldarg_0);
+						ilInit.Emit (OpCodes.Callvirt, origineNodeType.GetProperty (bindingCase.Key).GetGetMethod());
+
 						//load new value
 						System.Reflection.Emit.Label labValueType = il.DefineLabel ();
 						il.Emit (OpCodes.Ldarg_1);
 						il.Emit (OpCodes.Ldfld, typeof (ValueChangeEventArgs).GetField ("NewValue"));
 
+						emitConvert(ilInit,origineType,ma.Property.PropertyType);
 						emitConvert(il,origineType, ma.Property.PropertyType);
 
 						//set value
+						ilInit.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());
 						il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());
 
 						il.Emit (OpCodes.Br, endMethod);
@@ -655,9 +681,11 @@ namespace Crow
 					i++;
 				}
 				il.MarkLabel (endMethod);
+				ilInit.Emit (OpCodes.Ret);
 				il.Emit (OpCodes.Ret);
 
 				bindingDelegates [bindings.Key.ToString()] = dm.CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>));
+				bindingDelegates [bindings.Key.ToString()] = dmInit.CreateDelegate (typeof(Func<object>));
 			}
 		}
 		void emitConvert(ILGenerator il, Type origType, Type destType){			
