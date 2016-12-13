@@ -124,7 +124,14 @@ namespace Crow
 		/// </summary>
 		[XmlIgnore]public virtual ILayoutable Parent {
 			get { return parent; }
-			set { parent = value; }
+			set {
+				if (parent == value)
+					return;
+				DataSourceChangeEventArgs e = new DataSourceChangeEventArgs (parent, value);
+				parent = value;
+
+				onParentChanged (this, e);
+			}
 		}
 		[XmlIgnore]public ILayoutable LogicalParent {
 			get { return logicalParent == null ? Parent : logicalParent; }
@@ -178,6 +185,7 @@ namespace Crow
 		public event EventHandler Disabled;
 		public event EventHandler<LayoutingEventArgs> LayoutChanged;
 		public event EventHandler<DataSourceChangeEventArgs> DataSourceChanged;
+		public event EventHandler<DataSourceChangeEventArgs> ParentChanged;
 		#endregion
 
 		#region public properties
@@ -1224,6 +1232,9 @@ namespace Crow
 		}
 		public virtual void onDisable(object sender, EventArgs e){
 			Disabled.Raise (this, e);
+		}
+		protected virtual void onParentChanged(object sender, DataSourceChangeEventArgs e) {
+			ParentChanged.Raise (sender, e);
 		}
 
 		#region Binding
