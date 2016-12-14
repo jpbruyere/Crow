@@ -631,6 +631,33 @@ namespace Crow
 			return GetExtensionMethods (Assembly.GetExecutingAssembly(), t)
 				.Where (em => em.Name == methodName).FirstOrDefault ();
 		}
+
+		public static MemberInfo getMemberInfoWithReflexion(object instance, string member){
+			return instance.GetType ().GetMember (member).FirstOrDefault();
+		}
+		public static object getValueWithReflexion(object instance, MemberInfo mi){
+			object tmp = null;
+			Type dstType = null;
+			if (mi == null)
+				return null;
+			if (mi.MemberType == MemberTypes.Property) {
+				PropertyInfo pi = mi as PropertyInfo;
+				tmp = pi.GetValue (instance);
+				dstType = pi.PropertyType;
+			}
+			if (mi.MemberType == MemberTypes.Field) {
+				FieldInfo fi = mi as FieldInfo;
+				tmp = fi.GetValue (instance);
+				dstType = fi.FieldType;
+			}
+			if (tmp != null)
+				return tmp;
+			if (dstType == typeof(string))
+				return "";
+			if (dstType.IsValueType)
+				return Activator.CreateInstance (dstType);
+			return null;
+		}
 	}
 }
 

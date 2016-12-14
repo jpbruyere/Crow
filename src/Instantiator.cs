@@ -745,14 +745,23 @@ namespace Crow
 			//value changed dyn method
 			DynamicMethod dm = new DynamicMethod ("dyn_tmpValueChanged",
 				typeof (void), CompilerServices.argsValueChange, true);
-
 			ILGenerator il = dm.GetILGenerator (256);
+
+			//create parentchanged dyn meth in parallel to have only one loop over bindings
+			DynamicMethod dmPC = new DynamicMethod ("dyn_parentChanged",
+				typeof (void),
+				CompilerServices.argsDSChange, true);
+			ILGenerator ilPC = dmPC.GetILGenerator (256);
+
+			il.Emit (OpCodes.Nop);
+			ilPC.Emit (OpCodes.Nop);
+
 
 			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
 			il.DeclareLocal (typeof(object));
-
-			il.Emit (OpCodes.Nop);
+			ilPC.DeclareLocal (typeof(object));//used for checking propery less bindings
+			ilPC.DeclareLocal (typeof(MemberInfo));//used for checking propery less bindings
 
 			int i = 0;
 			foreach (KeyValuePair<string, List<MemberAddress>> bindingCase in bindings ) {
@@ -773,26 +782,54 @@ namespace Crow
 				#region destination member affectations
 
 				foreach (MemberAddress ma in bindingCase.Value) {
+					//first we try to get memberInfo of new parent, if it doesn't exist, it's a propery less binding
+					ilPC.Emit (OpCodes.Ldarg_2);//load new parent onto the stack for handler addition
+					ilPC.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+					ilPC.Emit (OpCodes.Stloc_0);//save new parent
+					//get parent type
+					ilPC.Emit (OpCodes.Ldloc_0);//push parent instance
+					ilPC.Emit (OpCodes.Ldstr, bindingCase.Key);//load member name
+					ilPC.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getMemberInfoWithReflexion", BindingFlags.Static | BindingFlags.Public));
+					ilPC.Emit (OpCodes.Stloc_1);//save memberInfo
+					ilPC.Emit (OpCodes.Ldloc_1);//push mi for test if null
+					System.Reflection.Emit.Label propLessReturn = ilPC.DefineLabel ();
+					ilPC.Emit (OpCodes.Brfalse, propLessReturn);
+
+
 					//first we have to load destination instance onto the stack, it is access
 					//with graphic tree functions deducted from nodes topology
 					il.Emit (OpCodes.Ldarg_0);//load source instance of ValueChanged event
-
+					ilPC.Emit (OpCodes.Ldarg_2);//load destination instance to set actual value of member
+					ilPC.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
 					emitGetChild (il, typeof(TemplatedControl), -1);
 					emitGetInstance (il, ma.Address);
+					emitGetChild (ilPC, typeof(TemplatedControl), -1);
+					emitGetInstance (ilPC, ma.Address);
 
 					//load new value
 					il.Emit (OpCodes.Ldarg_1);
 					il.Emit (OpCodes.Ldfld, typeof (ValueChangeEventArgs).GetField ("NewValue"));
 
+					//for the parent changed dyn meth we need to fetch actual value for initialisation thrue reflexion
+					ilPC.Emit (OpCodes.Ldloc_0);//push parent instance
+					ilPC.Emit (OpCodes.Ldloc_1);//push mi for value fetching
+					ilPC.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getValueWithReflexion", BindingFlags.Static | BindingFlags.Public));
+
 					Type dstType = ma.Property.PropertyType;
-					if (dstType == typeof (string))
+					if (dstType == typeof (string)){
 						il.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
-					else if (dstType.IsValueType) {
-						il.Emit (OpCodes.Unbox_Any, dstType);//TODO:double check this
-					}else
+						ilPC.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
+					}else if (dstType.IsValueType) {
+						il.Emit (OpCodes.Unbox_Any, dstType);
+						ilPC.Emit (OpCodes.Unbox_Any, dstType);
+					}else{
 						il.Emit (OpCodes.Castclass, dstType);
+						ilPC.Emit (OpCodes.Castclass, dstType);
+					}
 
 					il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());
+					ilPC.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());
+					ilPC.MarkLabel(propLessReturn);
 				}
 				#endregion
 				il.Emit (OpCodes.Br, endMethod);
@@ -808,29 +845,22 @@ namespace Crow
 			templateBinding = dm.CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>));
 
 			#region emit ParentChanged handler
-			dm = new DynamicMethod ("dyn_parentChanged",
-				typeof (void),
-				CompilerServices.argsDSChange, true);
-
-			il = dm.GetILGenerator (256);
-
-			il.Emit (OpCodes.Nop);
 
 			//load new parent onto the stack for handler addition
-			il.Emit (OpCodes.Ldarg_2);
-			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+			ilPC.Emit (OpCodes.Ldarg_2);
+			ilPC.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
 
 			//Load cached delegate
-			il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
-			il.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("templateBinding", BindingFlags.Instance | BindingFlags.NonPublic));
+			ilPC.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
+			ilPC.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("templateBinding", BindingFlags.Instance | BindingFlags.NonPublic));
 
 			//add template bindings dynValueChanged delegate to new parent event
-			il.Emit(OpCodes.Callvirt, typeof(IValueChange).GetEvent("ValueChanged").AddMethod);//call add event
-			il.Emit (OpCodes.Ret);
+			ilPC.Emit(OpCodes.Callvirt, typeof(IValueChange).GetEvent("ValueChanged").AddMethod);//call add event
+			ilPC.Emit (OpCodes.Ret);
 
 			//store dschange delegate in instatiator instance for access while instancing graphic object
 			int delDSIndex = dataSourceChangedDelegates.Count;
-			dataSourceChangedDelegates.Add(dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
+			dataSourceChangedDelegates.Add(dmPC.CreateDelegate (CompilerServices.ehTypeDSChange, this));
 			#endregion
 
 			#region Emit datasourcechanged handler binding in the loader context
