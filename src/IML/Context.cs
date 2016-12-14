@@ -38,7 +38,6 @@ namespace Crow.IML
 	{
 		public XmlTextReader reader = null;
 		public Type RootType = null;
-		public int CurrentIndex = 0;
 
 		public DynamicMethod dm = null;
 		public ILGenerator il = null;
@@ -46,7 +45,6 @@ namespace Crow.IML
 		public NodeStack nodesStack = new NodeStack ();
 
 		public Dictionary<string, List<NodeAddress>> Names  = new Dictionary<string, List<NodeAddress>>();
-		public Dictionary<string, Dictionary<string, MemberAddress>> PropertyBindings = new Dictionary<string, Dictionary<string, MemberAddress>> ();
 
 		public Dictionary<NodeAddress, Dictionary<string, List<MemberAddress>>> Bindings =
 			new Dictionary<NodeAddress, Dictionary<string, List<MemberAddress>>>();
@@ -75,21 +73,6 @@ namespace Crow.IML
 			get { return nodesStack.Peek().CrowType; }
 		}
 
-		public MethodInfo CurrentAddMethod {
-			get {
-				if (typeof (Group).IsAssignableFrom (CurrentNodeType))
-					return CompilerServices.miAddChild;
-				if (typeof (Container).IsAssignableFrom (CurrentNodeType))
-					return CompilerServices.miSetChild;
-				if (typeof (TemplatedContainer).IsAssignableFrom (CurrentNodeType))
-					return CurrentIndex < 0 ? CompilerServices.miLoadTmp : CompilerServices.miSetContent;
-				if (typeof (TemplatedGroup).IsAssignableFrom (CurrentNodeType))
-					return CurrentIndex < 0 ? CompilerServices.miLoadTmp : CompilerServices.miAddItem;
-				if (typeof (TemplatedControl).IsAssignableFrom (CurrentNodeType))
-					return CompilerServices.miLoadTmp;
-				return null;
-			}
-		}
 		void initILGen ()
 		{
 			il.DeclareLocal (typeof (GraphicObject));

@@ -26,20 +26,33 @@ using System.Collections.Generic;
 namespace Crow.IML
 {
 	/// <summary>
-	/// IML Node are the elements of the interface XML,
+	/// IML Node are defined with a type and the index in the parent,
 	/// </summary>
 	public struct Node
 	{
+		/// <summary> Current node type</summary>
 		public Type CrowType;
-		/// <summary>
-		/// Indexer for group child, -1 for template
-		/// </summary>
+		/// <summary> Index in parent, -1 for template</summary>
 		public int Index;
 
 		public Node (Type crowType, int _index = 0)
 		{
 			CrowType = crowType;
 			Index = _index;
+		}
+
+		public MethodInfo GetAddMethod(int childIdx){
+			if (typeof (Group).IsAssignableFrom (CrowType))
+				return CompilerServices.miAddChild;
+			if (typeof (Container).IsAssignableFrom (CrowType))
+				return CompilerServices.miSetChild;
+			if (typeof (TemplatedContainer).IsAssignableFrom (CrowType))
+				return childIdx < 0 ? CompilerServices.miLoadTmp : CompilerServices.miSetContent;
+			if (typeof (TemplatedGroup).IsAssignableFrom (CrowType))
+				return childIdx < 0 ? CompilerServices.miLoadTmp : CompilerServices.miAddItem;
+			if (typeof (TemplatedControl).IsAssignableFrom (CrowType))
+				return CompilerServices.miLoadTmp;
+			return null;
 		}
 
 		#region Equality Compare

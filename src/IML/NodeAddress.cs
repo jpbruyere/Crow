@@ -31,7 +31,7 @@ namespace Crow.IML
 		public NodeAddress (Node[] nodes) : base(nodes) { 
 		}
 
-		public Type NodeType { get { return this[this.Count -1].CrowType; }}
+		public Type NodeType { get { return Count == 0 ? null : this[this.Count -1].CrowType; }}
 
 		public override bool Equals (object obj)
 		{

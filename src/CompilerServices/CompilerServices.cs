@@ -16,7 +16,7 @@ namespace Crow
 			BindingFlags.NonPublic | BindingFlags.Instance);
 		internal static MethodInfo stringEquals = typeof (string).GetMethod
 			("Equals", new Type [3] { typeof (string), typeof (string), typeof (StringComparison) });
-		static MethodInfo miFindByName = typeof (GraphicObject).GetMethod ("FindByName");
+		public static MethodInfo miFindByName = typeof (GraphicObject).GetMethod ("FindByName");
 
 		public static MethodInfo miIFaceLoad = typeof(Interface).GetMethod ("Load", BindingFlags.Instance | BindingFlags.Public);
 		public static MethodInfo miGetITemp = typeof(Interface).GetMethod ("GetItemTemplate");
