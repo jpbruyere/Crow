@@ -28,6 +28,7 @@ namespace Crow
 		public static MethodInfo miCreateExpDel = typeof(ItemTemplate).GetMethod ("CreateExpandDelegate");
 		public static MethodInfo miLoadDefaultVals = typeof (GraphicObject).GetMethod ("loadDefaultValues");
 		public static PropertyInfo piStyle = typeof (GraphicObject).GetProperty ("Style");
+		public static MethodInfo miGetTypeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle");
 		#region tree handling methods
 		internal static MethodInfo miSetChild = typeof (Container).GetMethod ("SetChild");
 		internal static MethodInfo miAddChild = typeof (Group).GetMethod ("AddChild");
@@ -634,6 +635,12 @@ namespace Crow
 
 		public static MemberInfo getMemberInfoWithReflexion(object instance, string member){
 			return instance.GetType ().GetMember (member).FirstOrDefault();
+		}
+		public static MethodInfo getMethodInfoWithReflexion(object instance, string method){
+			return instance.GetType ().GetMethod (method, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+		}
+		public static Type getEventHandlerType(object instance, string eventName){
+			return instance.GetType ().GetEvent (eventName).EventHandlerType;
 		}
 		public static object getValueWithReflexion(object instance, MemberInfo mi){
 			object tmp = null;

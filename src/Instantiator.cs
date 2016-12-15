@@ -251,15 +251,21 @@ namespace Crow
 						MemberInfo mi = ctx.CurrentNodeType.GetMember (reader.Name).FirstOrDefault ();
 						if (mi == null)
 							throw new Exception ("Member '" + reader.Name + "' not found in " + ctx.CurrentNodeType.Name);
+
 						if (mi.MemberType == MemberTypes.Event) {
-							if (reader.Value.StartsWith ("{", StringComparison.OrdinalIgnoreCase))
-								emitEventHandler(ctx, mi as EventInfo,reader.Value.Substring (1, reader.Value.Length - 2));
-							//else //emit handler binding
+							foreach (string exp in splitOnSemiColumnOutsideAccolades(reader.Value)) {
+								string trimed = exp.Trim();
+								if (trimed.StartsWith ("{", StringComparison.OrdinalIgnoreCase))
+									emitEventHandler (ctx, mi as EventInfo, trimed.Substring (1, trimed.Length - 2));
+								else
+									emitHandlerBinding (ctx, mi as EventInfo, trimed);
+							}
+
 							continue;
 						}
 						PropertyInfo pi = mi as PropertyInfo;
 						if (pi == null)
-							throw new Exception ("Member '" + reader.Name + "' not found in " + ctx.CurrentNodeType.Name);
+							throw new Exception ("Member '" + reader.Name + "' is not a property in " + ctx.CurrentNodeType.Name);
 
 						if (pi.Name == "Name"){
 							if (!ctx.Names.ContainsKey(reader.Value))
@@ -281,6 +287,30 @@ namespace Crow
 
 				ctx.nodesStack.ResetCurrentNodeIndex ();
 			}
+		}
+		string[] splitOnSemiColumnOutsideAccolades (string expression){
+			List<String> exps = new List<string>();
+			int accCount = 0;
+			int expPtr = 0;
+			for (int c = 0; c < expression.Length; c++) {
+				switch (expression[c]){
+				case '{':
+					accCount++;
+					break;
+				case '}':
+					accCount--;
+					break;
+				case ';':
+					if (accCount > 0)
+						break;
+					exps.Add(expression.Substring(expPtr, c - expPtr - 1));
+					expPtr = c + 1;
+					break;
+				}
+			}
+			if (exps.Count == 0)
+				exps.Add(expression);
+			return exps.ToArray ();
 		}
 		/// <summary>
 		/// Parse child node an generate corresponding msil
@@ -560,19 +590,18 @@ namespace Crow
 			dataSourceChangedDelegates.Add(dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
 			#endregion
 
-			#region Emit datasourcechanged handler binding in the loader context
-			ctx.il.Emit(OpCodes.Ldloc_0);//load ref to current graphic object
-			ctx.il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
-			ctx.il.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("dataSourceChangedDelegates", BindingFlags.Instance | BindingFlags.NonPublic));
-			ctx.il.Emit(OpCodes.Ldc_I4, delDSIndex);//load delegate index
-			ctx.il.Emit(OpCodes.Callvirt, typeof(List<Delegate>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
-			ctx.il.Emit(OpCodes.Callvirt, typeof(GraphicObject).GetEvent("DataSourceChanged").AddMethod);//call add event
-			#endregion
+			//Emit datasourcechanged handler binding in the loader context
+			ctx.emitDataSourceChangedHandlerAddition(delDSIndex);
 		}
+
+		#region Emit Helper
 		void dataSourceChangedEmitHelper(object dscSource, IValueChange dataSource, int dynMethIdx){
 			dataSource.ValueChanged +=
 				(EventHandler<ValueChangeEventArgs>)dsValueChangedDynMeths [dynMethIdx].CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>), dscSource);
 		}
+		#endregion
+
+
 		/// <summary>
 		/// Compile events expression in IML attributes, and store the result in the instanciator
 		/// Those handlers will be bound when instatiing
@@ -712,6 +741,58 @@ namespace Crow
 			ctx.il.Emit(OpCodes.Callvirt, typeof(List<Delegate>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
 			ctx.il.Emit(OpCodes.Callvirt, sourceEvent.AddMethod);//call add event
 			#endregion
+		}
+
+		void emitHandlerBinding (Context ctx, EventInfo sourceEvent, string expression){
+			string[] bindingExp = expression.Split ('/');
+
+			if (bindingExp.Length == 1) {
+				//datasource handler
+				//we need to bind datasource method to source event
+				DynamicMethod dm = new DynamicMethod ("dyn_dschangedForHandler",
+					typeof (void),
+					CompilerServices.argsDSChange, true);
+
+				ILGenerator il = dm.GetILGenerator (256);
+
+				il.DeclareLocal (typeof(MethodInfo));//used to cancel binding if method doesn't exist
+
+				il.Emit (OpCodes.Nop);
+
+				//fetch method in datasource and test if it exist
+				il.Emit (OpCodes.Ldarg_2);//load new datasource
+				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+				il.Emit (OpCodes.Ldstr, bindingExp[0]);//load handler method name
+				il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getMethodInfoWithReflexion", BindingFlags.Static | BindingFlags.Public));
+				il.Emit (OpCodes.Stloc_0);//save MethodInfo
+				il.Emit (OpCodes.Ldloc_0);//push mi for test if null
+				System.Reflection.Emit.Label methodNotFound = il.DefineLabel ();
+				il.Emit (OpCodes.Brfalse, methodNotFound);
+
+				il.Emit (OpCodes.Ldarg_1);//load datasource change source where the event handler is as 1st arg of handler.add
+
+				//loat handlerType of sourceEvent to create delegate (1st arg)
+				il.Emit(OpCodes.Ldtoken, sourceEvent.EventHandlerType);
+				il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
+				il.Emit (OpCodes.Ldarg_2);//load new datasource where the method is defined
+				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+				il.Emit (OpCodes.Ldloc_0);//load methodInfo (3rd arg)
+
+				il.Emit (OpCodes.Callvirt, typeof(Delegate).GetMethod ("CreateDelegate",
+					new Type[] {typeof(Type), typeof(object), typeof(MethodInfo)}));//create bound delegate
+				il.Emit(OpCodes.Callvirt, sourceEvent.AddMethod);//call add event
+
+				il.MarkLabel(methodNotFound);
+				il.Emit (OpCodes.Ret);
+
+				//store dschange delegate in instatiator instance for access while instancing graphic object
+				int delDSIndex = dataSourceChangedDelegates.Count;
+				dataSourceChangedDelegates.Add(dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
+
+				//Emit datasourcechanged handler binding in the loader context
+				ctx.emitDataSourceChangedHandlerAddition(delDSIndex);
+				return;
+			}
 		}
 
 		/// <summary>
