@@ -398,7 +398,6 @@ namespace Crow
 			}
 
 			NodeAddress currentNode = ctx.CurrentNodeAddress;
-
 			NodeAddress targetNA = getNodeAdressFromBindingExp (currentNode, bindingExp);
 
 			string [] bindTrg = bindingExp.Last().Split ('.');
@@ -450,6 +449,9 @@ namespace Crow
 			Debug.WriteLine ("Property less binding: " + Target + expression);
 			#endif
 		}
+		/// <summary>
+		/// Gets the node adress from binding expression splitted with '/' starting at a given node
+		/// </summary>
 		NodeAddress getNodeAdressFromBindingExp(NodeAddress currentNode, string[] bindingExp){
 			int ptr = currentNode.Count - 1;
 
@@ -463,7 +465,6 @@ namespace Crow
 						break;
 					ptr--;
 				}
-
 			} else if (bindingExp [0] == "..") { //search starting at current node
 				int levelUp = bindingExp.Length - 1;
 				if (levelUp > ptr)
@@ -511,9 +512,6 @@ namespace Crow
 			PropertyInfo piSource = ctx.CurrentNodeType.GetProperty(sourceMember);
 			Type sourceValueType = piSource.PropertyType;
 
-			//il.Emit (OpCodes.Call, typeof(object).GetMethod("GetType"));
-			//il.Emit (OpCodes.Call, typeof(Type).GetProperty("IsValueType").GetGetMethod());
-
 			if (sourceValueType == typeof (string)) {
 				il.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
 			} else if (!sourceValueType.IsValueType)
@@ -549,28 +547,12 @@ namespace Crow
 
 			il.Emit (OpCodes.Nop);
 
-			//load new datasource onto the stack for handler addition at the end
-			il.Emit (OpCodes.Ldarg_2);
-			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
-
-			//first we have to create delegate from cached dynMethod bound to the GraphicObject currently instanced
-
-			//Load cached delegate
 			il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
-			il.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("dsValueChangedDynMeths", BindingFlags.Instance | BindingFlags.NonPublic));
-			il.Emit(OpCodes.Ldc_I4, dmVC);//load index of dynmathod
-			il.Emit(OpCodes.Callvirt, typeof(List<DynamicMethod>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
-
-			//load ds changed eventhandlertype
-			il.Emit(OpCodes.Ldtoken, typeof(EventHandler<ValueChangeEventArgs>));
-			il.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle", new
-				Type[1]{typeof(RuntimeTypeHandle)}));
-
 			il.Emit (OpCodes.Ldarg_1);//load datasource change source
-			il.Emit (OpCodes.Call, CompilerServices.miCreateBoundDelegate);//create bound delegate
-
-			//add new delegate to datasource valuechanged event
-			il.Emit(OpCodes.Callvirt, typeof(IValueChange).GetEvent("ValueChanged").AddMethod);//call add event			//il.Emit(OpCodes.Pop);
+			il.Emit (OpCodes.Ldarg_2);//load new datasource
+			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+			il.Emit(OpCodes.Ldc_I4, dmVC);//load index of dynmathod
+			il.Emit (OpCodes.Call, typeof(Instantiator).GetMethod("dataSourceChangedEmitHelper", BindingFlags.Instance | BindingFlags.NonPublic));
 			il.Emit (OpCodes.Ret);
 
 			//store dschange delegate in instatiator instance for access while instancing graphic object
@@ -586,6 +568,10 @@ namespace Crow
 			ctx.il.Emit(OpCodes.Callvirt, typeof(List<Delegate>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
 			ctx.il.Emit(OpCodes.Callvirt, typeof(GraphicObject).GetEvent("DataSourceChanged").AddMethod);//call add event
 			#endregion
+		}
+		void dataSourceChangedEmitHelper(object dscSource, IValueChange dataSource, int dynMethIdx){
+			dataSource.ValueChanged +=
+				(EventHandler<ValueChangeEventArgs>)dsValueChangedDynMeths [dynMethIdx].CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>), dscSource);
 		}
 		/// <summary>
 		/// Compile events expression in IML attributes, and store the result in the instanciator
