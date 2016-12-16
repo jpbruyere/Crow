@@ -750,10 +750,19 @@ namespace Crow
 		}
 
 		void emitHandlerBinding (Context ctx, EventInfo sourceEvent, string expression){
-			string[] bindingExp = expression.Split ('/');
+			string memberName, namedNode;
+			NodeAddress currentNode = ctx.CurrentNodeAddress, targetNA;
 
-			if (bindingExp.Length == 1) {
-				//datasource handler
+			splitBindingExp (currentNode, expression, out targetNA, out memberName, out namedNode);
+
+			string bindOnEventName = null;
+
+			if (targetNA == null)//datasource handler
+				bindOnEventName = "DataSourceChanged";
+			else if (targetNA.Count == 0)//out of tree template handler
+				bindOnEventName = "ParentChanged";
+
+			if (!string.IsNullOrEmpty(bindOnEventName)){
 				//we need to bind datasource method to source event
 				DynamicMethod dm = new DynamicMethod ("dyn_dschangedForHandler",
 					typeof (void),
@@ -768,7 +777,7 @@ namespace Crow
 				//fetch method in datasource and test if it exist
 				il.Emit (OpCodes.Ldarg_2);//load new datasource
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
-				il.Emit (OpCodes.Ldstr, bindingExp[0]);//load handler method name
+				il.Emit (OpCodes.Ldstr, memberName);//load handler method name
 				il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getMethodInfoWithReflexion", BindingFlags.Static | BindingFlags.Public));
 				il.Emit (OpCodes.Stloc_0);//save MethodInfo
 				il.Emit (OpCodes.Ldloc_0);//push mi for test if null
@@ -795,8 +804,7 @@ namespace Crow
 				int delDSIndex = cachedDelegates.Count;
 				cachedDelegates.Add(dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
 
-				ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent("DataSourceChanged"));
-				return;
+				ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent(bindOnEventName));
 			}
 		}
 
