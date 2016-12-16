@@ -83,13 +83,13 @@ namespace Crow.IML
 			CompilerServices.emitSetCurInterface (il);
 		}
 
-		public void emitDataSourceChangedHandlerAddition(int index){
+		public void emitCachedDelegateHandlerAddition(int index, EventInfo evt){
 			il.Emit(OpCodes.Ldloc_0);//load ref to current graphic object
 			il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
-			il.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("dataSourceChangedDelegates", BindingFlags.Instance | BindingFlags.NonPublic));
+			il.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("cachedDelegates", BindingFlags.Instance | BindingFlags.NonPublic));
 			il.Emit(OpCodes.Ldc_I4, index);//load delegate index
 			il.Emit(OpCodes.Callvirt, typeof(List<Delegate>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
-			il.Emit(OpCodes.Callvirt, typeof(GraphicObject).GetEvent("DataSourceChanged").AddMethod);//call add event
+			il.Emit(OpCodes.Callvirt, evt.AddMethod);//call add event
 		}
 	}
 }

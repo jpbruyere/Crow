@@ -84,11 +84,9 @@ namespace Crow
 		}
 
 		List<DynamicMethod> dsValueChangedDynMeths = new List<DynamicMethod>();
-		List<Delegate> dataSourceChangedDelegates = new List<Delegate>();
-		List<Delegate> templateValueChangedDelegates = new List<Delegate>();
+		List<Delegate> cachedDelegates = new List<Delegate>();
 		Dictionary<string, Delegate> bindingDelegates = new Dictionary<string, Delegate>();//valuechanged del
 		Dictionary<string, Delegate> bindingInitializer = new Dictionary<string, Delegate>();//initialize with actual values of binding origine
-		List<Delegate> eventDynHandlers = new List<Delegate>();
 		Delegate templateBinding;
 
 		#region IML parsing
@@ -256,7 +254,7 @@ namespace Crow
 							foreach (string exp in splitOnSemiColumnOutsideAccolades(reader.Value)) {
 								string trimed = exp.Trim();
 								if (trimed.StartsWith ("{", StringComparison.OrdinalIgnoreCase))
-									emitEventHandler (ctx, mi as EventInfo, trimed.Substring (1, trimed.Length - 2));
+									compileAndStoreDynHandler (ctx, mi as EventInfo, trimed.Substring (1, trimed.Length - 2));
 								else
 									emitHandlerBinding (ctx, mi as EventInfo, trimed);
 							}
@@ -586,12 +584,11 @@ namespace Crow
 			il.Emit (OpCodes.Ret);
 
 			//store dschange delegate in instatiator instance for access while instancing graphic object
-			int delDSIndex = dataSourceChangedDelegates.Count;
-			dataSourceChangedDelegates.Add(dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
+			int delDSIndex = cachedDelegates.Count;
+			cachedDelegates.Add(dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
 			#endregion
 
-			//Emit datasourcechanged handler binding in the loader context
-			ctx.emitDataSourceChangedHandlerAddition(delDSIndex);
+			ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent("DataSourceChanged"));
 		}
 
 		#region Emit Helper
@@ -606,7 +603,7 @@ namespace Crow
 		/// Compile events expression in IML attributes, and store the result in the instanciator
 		/// Those handlers will be bound when instatiing
 		/// </summary>
-		void emitEventHandler (Context ctx, EventInfo sourceEvent, string expression)
+		void compileAndStoreDynHandler (Context ctx, EventInfo sourceEvent, string expression)
 		{
 			#if DEBUG_BINDING
 			Debug.WriteLine ("\tCompile Event Source ");
@@ -730,17 +727,9 @@ namespace Crow
 			#endregion
 
 			//store event handler dynamic method in instanciator
-			int dmIdx = eventDynHandlers.Count;
-			eventDynHandlers.Add (dm.CreateDelegate (sourceEvent.EventHandlerType));
-
-			#region Emit event handler binding in the loader context
-			ctx.il.Emit(OpCodes.Ldloc_0);//load ref to current graphic object
-			ctx.il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
-			ctx.il.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("eventDynHandlers", BindingFlags.Instance | BindingFlags.NonPublic));
-			ctx.il.Emit(OpCodes.Ldc_I4, dmIdx);//load delegate index
-			ctx.il.Emit(OpCodes.Callvirt, typeof(List<Delegate>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
-			ctx.il.Emit(OpCodes.Callvirt, sourceEvent.AddMethod);//call add event
-			#endregion
+			int dmIdx = cachedDelegates.Count;
+			cachedDelegates.Add (dm.CreateDelegate (sourceEvent.EventHandlerType));
+			ctx.emitCachedDelegateHandlerAddition(dmIdx, sourceEvent);
 		}
 
 		void emitHandlerBinding (Context ctx, EventInfo sourceEvent, string expression){
@@ -786,11 +775,10 @@ namespace Crow
 				il.Emit (OpCodes.Ret);
 
 				//store dschange delegate in instatiator instance for access while instancing graphic object
-				int delDSIndex = dataSourceChangedDelegates.Count;
-				dataSourceChangedDelegates.Add(dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
+				int delDSIndex = cachedDelegates.Count;
+				cachedDelegates.Add(dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
 
-				//Emit datasourcechanged handler binding in the loader context
-				ctx.emitDataSourceChangedHandlerAddition(delDSIndex);
+				ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent("DataSourceChanged"));
 				return;
 			}
 		}
@@ -926,19 +914,11 @@ namespace Crow
 			ilPC.Emit (OpCodes.Ret);
 
 			//store dschange delegate in instatiator instance for access while instancing graphic object
-			int delDSIndex = dataSourceChangedDelegates.Count;
-			dataSourceChangedDelegates.Add(dmPC.CreateDelegate (CompilerServices.ehTypeDSChange, this));
+			int delDSIndex = cachedDelegates.Count;
+			cachedDelegates.Add(dmPC.CreateDelegate (CompilerServices.ehTypeDSChange, this));
 			#endregion
 
-			#region Emit datasourcechanged handler binding in the loader context
-			ctx.il.Emit(OpCodes.Ldloc_0);//load ref to current graphic object
-			ctx.il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
-			ctx.il.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("dataSourceChangedDelegates", BindingFlags.Instance | BindingFlags.NonPublic));
-			ctx.il.Emit(OpCodes.Ldc_I4, delDSIndex);//load delegate index
-			ctx.il.Emit(OpCodes.Callvirt, typeof(List<Delegate>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
-			ctx.il.Emit(OpCodes.Callvirt, typeof(GraphicObject).GetEvent("ParentChanged").AddMethod);//call add event
-			#endregion
-
+			ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent("ParentChanged"));
 		}
 		void emitBindingDelegate(NodeAddress origine, Dictionary<string, List<MemberAddress>> bindings){
 			Type origineNodeType = origine.NodeType;
@@ -1014,9 +994,9 @@ namespace Crow
 
 				i++;
 			}
-			//il.Emit (OpCodes.Pop);
-			il.MarkLabel (endMethod);
+
 			ilInit.Emit (OpCodes.Ret);
+			il.MarkLabel (endMethod);
 			il.Emit (OpCodes.Ret);
 
 			bindingDelegates [origine.ToString()] = dm.CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>));
