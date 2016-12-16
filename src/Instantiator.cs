@@ -400,46 +400,87 @@ namespace Crow
 			ctx.il.MarkLabel (labContinue);
 		}
 
+		/// <summary>
+		/// Splits the binding expression
+		/// </summary>
+		/// <returns><c>true</c>, if it's a two ways binding, <c>false</c> otherwise.</returns>
+		/// <param name="currentNode">current node address</param>
+		/// <param name="expression">Binding expression</param>
+		/// <param name="na">node address, null if on dataSource, count=0 if template binding outside current graphic tree</param>
+		/// <param name="memberName">Member name.</param>
+		/// <param name="namedNode">Named node.</param>
+		bool splitBindingExp(NodeAddress currentNode, string expression, out NodeAddress na, out string memberName, out string namedNode){
+			namedNode = "";
+			if (string.IsNullOrEmpty (expression)) {
+				na = null;
+				memberName = "";
+			} else {
+				string[] bindingExp = expression.Split ('/');
+
+				if (bindingExp.Length == 1)
+					na = null;
+				else
+					na = getNodeAdressFromBindingExp (currentNode, bindingExp);
+
+				string [] bindTrg = bindingExp.Last().Split ('.');
+
+				if (bindTrg.Length == 1)
+					memberName = bindTrg [0];
+				else if (bindTrg.Length == 2) {
+					//named target
+					namedNode = bindTrg[0];
+					memberName = bindTrg [1];
+				} else
+					throw new Exception ("Syntax error in binding, expected 'go dot member'");				
+			}
+
+			return expression.StartsWith ("²");
+		}
+
 		void readPropertyBinding (Context ctx, string sourceMember, string expression)
 		{
-			MemberAddress targetMember;
-			NodeAddress target;
+			string memberName, namedNode;
+			NodeAddress currentNode = ctx.CurrentNodeAddress, targetNA;
 
-			string memberName = null;
-			bool twoWay = false;
+			bool twoWay = splitBindingExp (currentNode, expression, out targetNA, out memberName, out namedNode);
 
-			//if binding exp = '{}' => binding is done on datasource
-			if (string.IsNullOrEmpty (expression))
-				return;
-
-			if (expression.StartsWith ("²")) {
-				expression = expression.Substring (1);
-				twoWay = true;
-			}
-
-			string[] bindingExp = expression.Split ('/');
-
-			if (bindingExp.Length == 1) {
-				//datasource binding
-				processDataSourceBinding (ctx, sourceMember, bindingExp [0]);
+			if (targetNA == null) {//bind on data source
+				processDataSourceBinding (ctx, sourceMember, memberName);
 				return;
 			}
-
-			NodeAddress currentNode = ctx.CurrentNodeAddress;
-			NodeAddress targetNA = getNodeAdressFromBindingExp (currentNode, bindingExp);
-
-			string [] bindTrg = bindingExp.Last().Split ('.');
-
-			if (bindTrg.Length == 1)
-				memberName = bindTrg [0];
-			else if (bindTrg.Length == 2) {
-				//named target
-				//TODO:
-
-				memberName = bindTrg [1];
-				return;
-			} else
-				throw new Exception ("Syntax error in binding, expected 'go dot member'");
+			
+//			//if binding exp = '{}' => binding is done on datasource
+//			if (string.IsNullOrEmpty (expression))
+//				return;
+//
+//			if (expression.StartsWith ("²")) {
+//				expression = expression.Substring (1);
+//				twoWay = true;
+//			}
+//
+//			string[] bindingExp = expression.Split ('/');
+//
+//			if (bindingExp.Length == 1) {
+//				//datasource binding
+//				processDataSourceBinding (ctx, sourceMember, bindingExp [0]);
+//				return;
+//			}
+//
+//			NodeAddress currentNode = ctx.CurrentNodeAddress;
+//			NodeAddress targetNA = getNodeAdressFromBindingExp (currentNode, bindingExp);
+//
+//			string [] bindTrg = bindingExp.Last().Split ('.');
+//
+//			if (bindTrg.Length == 1)
+//				memberName = bindTrg [0];
+//			else if (bindTrg.Length == 2) {
+//				//named target
+//				//TODO:
+//
+//				memberName = bindTrg [1];
+//				return;
+//			} else
+//				throw new Exception ("Syntax error in binding, expected 'go dot member'");
 
 			Dictionary<string, List<MemberAddress>> nodeBindings = null;
 			if (ctx.Bindings.ContainsKey (targetNA))
@@ -452,30 +493,6 @@ namespace Crow
 			if (!nodeBindings.ContainsKey (memberName))
 				nodeBindings [memberName] = new List<MemberAddress> ();
 			nodeBindings [memberName].Add (new MemberAddress (currentNode, sourceMember));
-
-			//
-//				if (tmpTarget == null) {
-//					#if DEBUG_BINDING
-//					Debug.WriteLine ("\tBinding Target not found => " + this.ToString());
-//					#endif
-//					return false;
-//				}
-//
-//				Target = new MemberReference (tmpTarget);
-//			}
-//
-//			if (Target.TryFindMember (memberName)) {
-//				if (TwoWayBinding) {
-//					//					IBindable source = Target.Instance as IBindable;
-//					//					if (source == null)
-//					//						throw new Exception (Source.Instance + " does not implement IBindable for 2 way bindings");
-//					//					source.Bindings.Add (new Binding (Target, Source));
-//				}
-//			}
-			#if DEBUG_BINDING
-			else
-			Debug.WriteLine ("Property less binding: " + Target + expression);
-			#endif
 		}
 		/// <summary>
 		/// Gets the node adress from binding expression splitted with '/' starting at a given node
@@ -870,17 +887,8 @@ namespace Crow
 					ilPC.Emit (OpCodes.Ldloc_1);//push mi for value fetching
 					ilPC.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getValueWithReflexion", BindingFlags.Static | BindingFlags.Public));
 
-					Type dstType = ma.Property.PropertyType;
-					if (dstType == typeof (string)){
-						il.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
-						ilPC.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
-					}else if (dstType.IsValueType) {
-						il.Emit (OpCodes.Unbox_Any, dstType);
-						ilPC.Emit (OpCodes.Unbox_Any, dstType);
-					}else{
-						il.Emit (OpCodes.Castclass, dstType);
-						ilPC.Emit (OpCodes.Castclass, dstType);
-					}
+					emitConvert (il, ma.Property.PropertyType);
+					emitConvert (ilPC, ma.Property.PropertyType);
 
 					il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());
 					ilPC.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());
@@ -958,10 +966,12 @@ namespace Crow
 				#endregion
 
 				#region destination member affectations
-				Type origineType = origineNodeType.GetProperty (bindingCase.Key).PropertyType;
+				PropertyInfo piOrig = origineNodeType.GetProperty (bindingCase.Key);
+				Type origineType = null;
+				if (piOrig != null)
+					origineType = piOrig.PropertyType;
+				
 				foreach (MemberAddress ma in bindingCase.Value) {
-					//for initialisation dynmeth, load current instance
-					ilInit.Emit(OpCodes.Ldarg_0);
 					//first we have to load destination instance onto the stack, it is access
 					//with graphic tree functions deducted from nodes topology
 					il.Emit (OpCodes.Ldarg_0);//load source instance of ValueChanged event
@@ -969,23 +979,30 @@ namespace Crow
 					NodeAddress destination = ma.Address;
 
 					emitGetInstance (il, origine, destination);
-					emitGetInstance (ilInit, origine, destination);
 
-					//init dynmeth: load actual value
-					ilInit.Emit (OpCodes.Ldarg_0);
-					ilInit.Emit (OpCodes.Callvirt, origineNodeType.GetProperty (bindingCase.Key).GetGetMethod());
+					if (origineType != null){//prop less binding, no init requiered
+						//for initialisation dynmeth, load current instance
+						ilInit.Emit(OpCodes.Ldarg_0);
+						emitGetInstance (ilInit, origine, destination);
 
+						//init dynmeth: load actual value
+						ilInit.Emit (OpCodes.Ldarg_0);
+						ilInit.Emit (OpCodes.Callvirt, origineNodeType.GetProperty (bindingCase.Key).GetGetMethod());
+					}
 					//load new value
 					il.Emit (OpCodes.Ldarg_1);
 					il.Emit (OpCodes.Ldfld, typeof (ValueChangeEventArgs).GetField ("NewValue"));
 
-					if (origineType != ma.Property.PropertyType)//no unboxing required
-						emitConvert (ilInit, origineType, ma.Property.PropertyType);
-					emitConvert (il, origineType, ma.Property.PropertyType);//unboxing required
+					if (origineType == null)//property less binding
+						emitConvert (il, ma.Property.PropertyType);
+					else {
+						if (origineType != ma.Property.PropertyType)//no unboxing required
+							emitConvert (ilInit, origineType, ma.Property.PropertyType);
+						emitConvert (il, origineType, ma.Property.PropertyType);//unboxing required
 
-					//set value
-					ilInit.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());
-					il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());
+						ilInit.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());//set init value
+					}
+					il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());//set value on value changes
 
 				}
 				#endregion
@@ -1047,6 +1064,14 @@ namespace Crow
 					il.Emit (OpCodes.Unbox_Any, destType);//TODO:double check this
 			}else
 				il.Emit (OpCodes.Castclass, destType);
+		}
+		void emitConvert(ILGenerator il, Type dstType){
+			if (dstType == typeof (string))
+				il.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
+			else if (dstType.IsValueType)
+				il.Emit (OpCodes.Unbox_Any, dstType);
+			else
+				il.Emit (OpCodes.Castclass, dstType);
 		}
 		void emitConvertWorking(ILGenerator il, Type sourceValueType){
 			if (sourceValueType == typeof (string)) {
