@@ -431,7 +431,7 @@ namespace Crow
 					namedNode = bindTrg[0];
 					memberName = bindTrg [1];
 				} else
-					throw new Exception ("Syntax error in binding, expected 'go dot member'");				
+					throw new Exception ("Syntax error in binding, expected 'go dot member'");
 			}
 
 			return expression.StartsWith ("²");
@@ -445,10 +445,10 @@ namespace Crow
 			bool twoWay = splitBindingExp (currentNode, expression, out targetNA, out memberName, out namedNode);
 
 			if (targetNA == null) {//bind on data source
-				processDataSourceBinding (ctx, sourceMember, memberName);
+				emitDataSourceBindingDelegate (ctx, sourceMember, memberName);
 				return;
 			}
-			
+
 //			//if binding exp = '{}' => binding is done on datasource
 //			if (string.IsNullOrEmpty (expression))
 //				return;
@@ -519,93 +519,6 @@ namespace Crow
 			Node[] targetNode = new Node[ptr+1];
 			Array.Copy (currentNode.ToArray (), targetNode, ptr + 1);
 			return new NodeAddress (targetNode);
-		}
-		/// <summary>
-		/// create the valuechanged handler, the datasourcechanged handler and emit event handling
-		/// </summary>
-		void processDataSourceBinding(Context ctx, string sourceMember, string dataSourceMember){
-			#region create valuechanged method
-			DynamicMethod dm = new DynamicMethod ("dyn_DSvalueChanged",
-				typeof (void),
-				CompilerServices.argsBoundValueChange, true);
-
-			ILGenerator il = dm.GetILGenerator (256);
-
-			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
-
-			il.Emit (OpCodes.Nop);
-
-			//load value changed member name onto the stack
-			il.Emit (OpCodes.Ldarg_2);
-			il.Emit (OpCodes.Ldfld, CompilerServices.fiMbName);
-
-			//test if it's the expected one
-			il.Emit (OpCodes.Ldstr, dataSourceMember);
-			il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
-			il.Emit (OpCodes.Callvirt, CompilerServices.stringEquals);
-			il.Emit (OpCodes.Brfalse, endMethod);
-			//set destination member with valueChanged new value
-			//load destination ref
-			il.Emit (OpCodes.Ldarg_0);
-			//load new value onto the stack
-			il.Emit (OpCodes.Ldarg_2);
-			il.Emit (OpCodes.Ldfld, CompilerServices.fiNewValue);
-
-			//by default, source value type is deducted from target member type to allow
-			//memberless binding, if targetMember exists, it will be used to determine target
-			//value type for conversion
-			PropertyInfo piSource = ctx.CurrentNodeType.GetProperty(sourceMember);
-			Type sourceValueType = piSource.PropertyType;
-
-			if (sourceValueType == typeof (string)) {
-				il.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
-			} else if (!sourceValueType.IsValueType)
-				il.Emit (OpCodes.Castclass, sourceValueType);
-			else if (sourceValueType != sourceValueType) {
-				il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (sourceValueType));
-			} else
-				il.Emit (OpCodes.Unbox_Any, sourceValueType);
-
-			il.Emit (OpCodes.Callvirt, piSource.GetSetMethod ());
-
-			il.MarkLabel (endMethod);
-
-			il.Emit (OpCodes.Ret);
-
-			//vc dyn meth is stored in a cached list, it will be bound to datasource only
-			//when datasource of source graphic object changed
-			int dmVC = dsValueChangedDynMeths.Count;
-			//Delegate tmp = dm.CreateDelegate(typeof(EventHandler<ValueChangeEventArgs>), this);
-			dsValueChangedDynMeths.Add (dm);
-			#endregion
-
-			#region emit dataSourceChanged event handler
-			//now we create the datasource changed method that will init the destination member with
-			//the actual value of the origin member of the datasource and then will bind the value changed
-			//dyn methode.
-			//dm is bound to the instanciator instance to have access to cached dyn meth and delegates
-			dm = new DynamicMethod ("dyn_dschanged",
-				typeof (void),
-				CompilerServices.argsDSChange, true);
-
-			il = dm.GetILGenerator (256);
-
-			il.Emit (OpCodes.Nop);
-
-			il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
-			il.Emit (OpCodes.Ldarg_1);//load datasource change source
-			il.Emit (OpCodes.Ldarg_2);//load new datasource
-			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
-			il.Emit(OpCodes.Ldc_I4, dmVC);//load index of dynmathod
-			il.Emit (OpCodes.Call, typeof(Instantiator).GetMethod("dataSourceChangedEmitHelper", BindingFlags.Instance | BindingFlags.NonPublic));
-			il.Emit (OpCodes.Ret);
-
-			//store dschange delegate in instatiator instance for access while instancing graphic object
-			int delDSIndex = cachedDelegates.Count;
-			cachedDelegates.Add(dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
-			#endregion
-
-			ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent("DataSourceChanged"));
 		}
 
 		#region Emit Helper
@@ -891,11 +804,12 @@ namespace Crow
 					il.Emit (OpCodes.Ldfld, typeof (ValueChangeEventArgs).GetField ("NewValue"));
 
 					//for the parent changed dyn meth we need to fetch actual value for initialisation thrue reflexion
-					ilPC.Emit (OpCodes.Ldloc_0);//push parent instance
+					ilPC.Emit (OpCodes.Ldloc_0);//push root instance of instanciator as parentChanged source
 					ilPC.Emit (OpCodes.Ldloc_1);//push mi for value fetching
 					ilPC.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getValueWithReflexion", BindingFlags.Static | BindingFlags.Public));
 
-					emitConvert (il, ma.Property.PropertyType);
+					emitCeckAndConvert (il, ma.Property.PropertyType);
+
 					emitConvert (ilPC, ma.Property.PropertyType);
 
 					il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());
@@ -978,7 +892,7 @@ namespace Crow
 				Type origineType = null;
 				if (piOrig != null)
 					origineType = piOrig.PropertyType;
-				
+
 				foreach (MemberAddress ma in bindingCase.Value) {
 					//first we have to load destination instance onto the stack, it is access
 					//with graphic tree functions deducted from nodes topology
@@ -1004,7 +918,7 @@ namespace Crow
 					if (origineType == null)//property less binding
 						emitConvert (il, ma.Property.PropertyType);
 					else {
-						if (origineType != ma.Property.PropertyType)//no unboxing required
+						if (origineType != ma.Property.PropertyType)//else, no unboxing required
 							emitConvert (ilInit, origineType, ma.Property.PropertyType);
 						emitConvert (il, origineType, ma.Property.PropertyType);//unboxing required
 
@@ -1027,6 +941,89 @@ namespace Crow
 			bindingDelegates [origine.ToString()] = dm.CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>));
 			bindingInitializer [origine.ToString()] = dmInit.CreateDelegate (typeof(Action<object>));
 		}
+		/// <summary>
+		/// create the valuechanged handler, the datasourcechanged handler and emit event handling
+		/// </summary>
+		void emitDataSourceBindingDelegate(Context ctx, string sourceMember, string dataSourceMember){
+			#region create valuechanged method
+			DynamicMethod dm = new DynamicMethod ("dyn_DSvalueChanged",
+				typeof (void),
+				CompilerServices.argsBoundValueChange, true);
+
+			ILGenerator il = dm.GetILGenerator (256);
+
+			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
+
+			il.DeclareLocal (typeof(object));
+
+			il.Emit (OpCodes.Nop);
+
+			//load value changed member name onto the stack
+			il.Emit (OpCodes.Ldarg_2);
+			il.Emit (OpCodes.Ldfld, CompilerServices.fiMbName);
+
+			//test if it's the expected one
+			il.Emit (OpCodes.Ldstr, dataSourceMember);
+			il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
+			il.Emit (OpCodes.Callvirt, CompilerServices.stringEquals);
+			il.Emit (OpCodes.Brfalse, endMethod);
+			//set destination member with valueChanged new value
+			//load destination ref
+			il.Emit (OpCodes.Ldarg_0);
+			//load new value onto the stack
+			il.Emit (OpCodes.Ldarg_2);
+			il.Emit (OpCodes.Ldfld, CompilerServices.fiNewValue);
+
+			//by default, source value type is deducted from target member type to allow
+			//memberless binding, if targetMember exists, it will be used to determine target
+			//value type for conversion
+			PropertyInfo piOrigine = ctx.CurrentNodeType.GetProperty(sourceMember);
+
+			emitCeckAndConvert (il, piOrigine.PropertyType);
+
+			il.Emit (OpCodes.Callvirt, piOrigine.GetSetMethod ());
+
+			il.MarkLabel (endMethod);
+			il.Emit (OpCodes.Ret);
+
+			//vc dyn meth is stored in a cached list, it will be bound to datasource only
+			//when datasource of source graphic object changed
+			int dmVC = dsValueChangedDynMeths.Count;
+			//Delegate tmp = dm.CreateDelegate(typeof(EventHandler<ValueChangeEventArgs>), this);
+			dsValueChangedDynMeths.Add (dm);
+			#endregion
+
+			#region emit dataSourceChanged event handler
+			//now we create the datasource changed method that will init the destination member with
+			//the actual value of the origin member of the datasource and then will bind the value changed
+			//dyn methode.
+			//dm is bound to the instanciator instance to have access to cached dyn meth and delegates
+			dm = new DynamicMethod ("dyn_dschanged",
+				typeof (void),
+				CompilerServices.argsDSChange, true);
+
+			il = dm.GetILGenerator (256);
+
+			il.Emit (OpCodes.Nop);
+
+			il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
+			il.Emit (OpCodes.Ldarg_1);//load datasource change source
+			il.Emit (OpCodes.Ldarg_2);//load new datasource
+			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+			il.Emit(OpCodes.Ldc_I4, dmVC);//load index of dynmathod
+			il.Emit (OpCodes.Call, typeof(Instantiator).GetMethod("dataSourceChangedEmitHelper", BindingFlags.Instance | BindingFlags.NonPublic));
+			il.Emit (OpCodes.Ret);
+
+			//store dschange delegate in instatiator instance for access while instancing graphic object
+			int delDSIndex = cachedDelegates.Count;
+			cachedDelegates.Add(dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
+			#endregion
+
+			ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent("DataSourceChanged"));
+		}
+
+
+
 		void emitGetInstance (ILGenerator il, NodeAddress orig, NodeAddress dest){
 			if (orig.Count < dest.Count) {
 				for (int i = orig.Count - 1; i < dest.Count - 1; i++)
@@ -1099,6 +1096,40 @@ namespace Crow
 		//		throw new Exception ("Error getting sources for <" + imlPath + ">:", ex);
 		//	}
 		//}
+		/// <summary>
+		/// check type of current object on the stack, use loc_0 so store it
+		/// </summary>
+		/// <returns>The ceck and convert.</returns>
+		/// <param name="il">Il.</param>
+		/// <param name="dstType">Dst type.</param>
+		void emitCeckAndConvert(ILGenerator il, Type dstType){
+			System.Reflection.Emit.Label endConvert = il.DefineLabel ();
+			System.Reflection.Emit.Label convert = il.DefineLabel ();
+
+			il.Emit (OpCodes.Stloc_0);
+			il.Emit (OpCodes.Ldloc_0);
+			il.Emit (OpCodes.Callvirt, typeof(object).GetMethod ("GetType"));
+			il.Emit (OpCodes.Ldtoken, dstType);//push destination property type for testing
+			il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
+			il.Emit (OpCodes.Callvirt, typeof(object).GetMethod ("Equals", new Type[] { typeof(object) }));
+			il.Emit (OpCodes.Brfalse, convert);
+
+			il.Emit (OpCodes.Ldloc_0);
+			il.Emit (OpCodes.Unbox_Any, dstType);
+			il.Emit (OpCodes.Br, endConvert);
+
+			il.MarkLabel (convert);
+			il.Emit (OpCodes.Ldloc_0);
+			if (dstType == typeof(string)) {
+				il.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
+			} else if (dstType.IsPrimitive) {
+				il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (dstType));
+			} else {
+				il.Emit (OpCodes.Castclass, dstType);
+			}
+
+			il.MarkLabel (endConvert);
+		}
 	}
 }
 

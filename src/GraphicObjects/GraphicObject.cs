@@ -568,9 +568,9 @@ namespace Crow
 
 		public virtual void OnDataSourceChanged(object sender, DataSourceChangeEventArgs e){			
 			DataSourceChanged.Raise (this, e);
-			//#if DEBUG_BINDING
+			#if DEBUG_BINDING
 			Debug.WriteLine("New DataSource for => {0} \n\t{1}=>{2}", this.ToString(),e.OldDataSource,e.NewDataSource);
-			//#endif
+			#endif
 		}
 			
 		[XmlAttributeAttribute]
