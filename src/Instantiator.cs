@@ -522,9 +522,10 @@ namespace Crow
 		}
 
 		#region Emit Helper
-		void dataSourceChangedEmitHelper(object dscSource, IValueChange dataSource, int dynMethIdx){
-			dataSource.ValueChanged +=
-				(EventHandler<ValueChangeEventArgs>)dsValueChangedDynMeths [dynMethIdx].CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>), dscSource);
+		void dataSourceChangedEmitHelper(object dscSource, object dataSource, int dynMethIdx){
+			if (dataSource is IValueChange)
+				(dataSource as IValueChange).ValueChanged +=
+					(EventHandler<ValueChangeEventArgs>)dsValueChangedDynMeths [dynMethIdx].CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>), dscSource);
 		}
 		#endregion
 
@@ -741,7 +742,7 @@ namespace Crow
 			ILGenerator il = dm.GetILGenerator (256);
 
 			//create parentchanged dyn meth in parallel to have only one loop over bindings
-			DynamicMethod dmPC = new DynamicMethod ("dyn_parentChanged",
+			DynamicMethod dmPC = new DynamicMethod ("dyn_InitAndParentChanged",
 				typeof (void),
 				CompilerServices.argsDSChange, true);
 			ILGenerator ilPC = dmPC.GetILGenerator (256);
@@ -755,6 +756,12 @@ namespace Crow
 			il.DeclareLocal (typeof(object));
 			ilPC.DeclareLocal (typeof(object));//used for checking propery less bindings
 			ilPC.DeclareLocal (typeof(MemberInfo));//used for checking propery less bindings
+
+			//first check if null
+			System.Reflection.Emit.Label cancel = ilPC.DefineLabel ();
+			ilPC.Emit (OpCodes.Ldarg_2);//load new parent
+			ilPC.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+			ilPC.Emit (OpCodes.Brfalse, cancel);
 
 			int i = 0;
 			foreach (KeyValuePair<string, List<MemberAddress>> bindingCase in bindings ) {
@@ -841,6 +848,8 @@ namespace Crow
 
 			//add template bindings dynValueChanged delegate to new parent event
 			ilPC.Emit(OpCodes.Callvirt, typeof(IValueChange).GetEvent("ValueChanged").AddMethod);//call add event
+
+			ilPC.MarkLabel (cancel);
 			ilPC.Emit (OpCodes.Ret);
 
 			//store dschange delegate in instatiator instance for access while instancing graphic object
@@ -945,53 +954,60 @@ namespace Crow
 		/// create the valuechanged handler, the datasourcechanged handler and emit event handling
 		/// </summary>
 		void emitDataSourceBindingDelegate(Context ctx, string sourceMember, string dataSourceMember){
-			#region create valuechanged method
-			DynamicMethod dm = new DynamicMethod ("dyn_DSvalueChanged",
-				typeof (void),
-				CompilerServices.argsBoundValueChange, true);
-
-			ILGenerator il = dm.GetILGenerator (256);
-
-			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
-
-			il.DeclareLocal (typeof(object));
-
-			il.Emit (OpCodes.Nop);
-
-			//load value changed member name onto the stack
-			il.Emit (OpCodes.Ldarg_2);
-			il.Emit (OpCodes.Ldfld, CompilerServices.fiMbName);
-
-			//test if it's the expected one
-			il.Emit (OpCodes.Ldstr, dataSourceMember);
-			il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
-			il.Emit (OpCodes.Callvirt, CompilerServices.stringEquals);
-			il.Emit (OpCodes.Brfalse, endMethod);
-			//set destination member with valueChanged new value
-			//load destination ref
-			il.Emit (OpCodes.Ldarg_0);
-			//load new value onto the stack
-			il.Emit (OpCodes.Ldarg_2);
-			il.Emit (OpCodes.Ldfld, CompilerServices.fiNewValue);
-
-			//by default, source value type is deducted from target member type to allow
-			//memberless binding, if targetMember exists, it will be used to determine target
-			//value type for conversion
+			DynamicMethod dm = null;
+			ILGenerator il = null;
+			int dmVC = 0;
 			PropertyInfo piOrigine = ctx.CurrentNodeType.GetProperty(sourceMember);
+			//if no dataSource member name is provided, valuechange is not handle and datasource change
+			//will be used as origine value
+			if (!string.IsNullOrEmpty(dataSourceMember)){
+				#region create valuechanged method
+				dm = new DynamicMethod ("dyn_DSvalueChanged",
+					typeof (void),
+					CompilerServices.argsBoundValueChange, true);
 
-			emitCeckAndConvert (il, piOrigine.PropertyType);
+				il = dm.GetILGenerator (256);
 
-			il.Emit (OpCodes.Callvirt, piOrigine.GetSetMethod ());
+				System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
-			il.MarkLabel (endMethod);
-			il.Emit (OpCodes.Ret);
+				il.DeclareLocal (typeof(object));
 
-			//vc dyn meth is stored in a cached list, it will be bound to datasource only
-			//when datasource of source graphic object changed
-			int dmVC = dsValueChangedDynMeths.Count;
-			//Delegate tmp = dm.CreateDelegate(typeof(EventHandler<ValueChangeEventArgs>), this);
-			dsValueChangedDynMeths.Add (dm);
-			#endregion
+				il.Emit (OpCodes.Nop);
+
+				//load value changed member name onto the stack
+				il.Emit (OpCodes.Ldarg_2);
+				il.Emit (OpCodes.Ldfld, CompilerServices.fiMbName);
+
+				//test if it's the expected one
+				il.Emit (OpCodes.Ldstr, dataSourceMember);
+				il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
+				il.Emit (OpCodes.Callvirt, CompilerServices.stringEquals);
+				il.Emit (OpCodes.Brfalse, endMethod);
+				//set destination member with valueChanged new value
+				//load destination ref
+				il.Emit (OpCodes.Ldarg_0);
+				//load new value onto the stack
+				il.Emit (OpCodes.Ldarg_2);
+				il.Emit (OpCodes.Ldfld, CompilerServices.fiNewValue);
+
+				//by default, source value type is deducted from target member type to allow
+				//memberless binding, if targetMember exists, it will be used to determine target
+				//value type for conversion
+
+				emitCeckAndConvert (il, piOrigine.PropertyType);
+
+				il.Emit (OpCodes.Callvirt, piOrigine.GetSetMethod ());
+
+				il.MarkLabel (endMethod);
+				il.Emit (OpCodes.Ret);
+
+				//vc dyn meth is stored in a cached list, it will be bound to datasource only
+				//when datasource of source graphic object changed
+				dmVC = dsValueChangedDynMeths.Count;
+				//Delegate tmp = dm.CreateDelegate(typeof(EventHandler<ValueChangeEventArgs>), this);
+				dsValueChangedDynMeths.Add (dm);
+				#endregion
+			}
 
 			#region emit dataSourceChanged event handler
 			//now we create the datasource changed method that will init the destination member with
@@ -1004,14 +1020,53 @@ namespace Crow
 
 			il = dm.GetILGenerator (256);
 
+			il.DeclareLocal (typeof(object));//used for checking propery less bindings
+			il.DeclareLocal (typeof(MemberInfo));//used for checking propery less bindings
+			System.Reflection.Emit.Label cancel = il.DefineLabel ();
+			System.Reflection.Emit.Label cancelInit = il.DefineLabel ();
+
 			il.Emit (OpCodes.Nop);
 
-			il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
-			il.Emit (OpCodes.Ldarg_1);//load datasource change source
+			if (!string.IsNullOrEmpty(dataSourceMember)){
+				//first test if datasource is null
+				il.Emit (OpCodes.Ldarg_2);//load new datasource
+				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+				il.Emit (OpCodes.Brfalse, cancel);
+			}
+
+			//fetch initial Value
+			if (!string.IsNullOrEmpty(dataSourceMember)){
+				il.Emit (OpCodes.Ldarg_2);//load new datasource
+				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+				il.Emit (OpCodes.Ldstr, dataSourceMember);//load member name
+				il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getMemberInfoWithReflexion", BindingFlags.Static | BindingFlags.Public));
+				il.Emit (OpCodes.Stloc_1);//save memberInfo
+				il.Emit (OpCodes.Ldloc_1);//push mi for test if null
+				il.Emit (OpCodes.Brfalse, cancelInit);
+			}
+
+			il.Emit (OpCodes.Ldarg_1);//load source of dataSourceChanged which is the dest instance
 			il.Emit (OpCodes.Ldarg_2);//load new datasource
 			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
-			il.Emit(OpCodes.Ldc_I4, dmVC);//load index of dynmathod
-			il.Emit (OpCodes.Call, typeof(Instantiator).GetMethod("dataSourceChangedEmitHelper", BindingFlags.Instance | BindingFlags.NonPublic));
+			if (!string.IsNullOrEmpty(dataSourceMember)){
+				il.Emit (OpCodes.Ldloc_1);//push mi for value fetching
+				il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getValueWithReflexion", BindingFlags.Static | BindingFlags.Public));
+			}
+			emitCeckAndConvert (il, piOrigine.PropertyType);
+			il.Emit (OpCodes.Callvirt, piOrigine.GetSetMethod ());
+
+			if (!string.IsNullOrEmpty(dataSourceMember)){
+				il.MarkLabel(cancelInit);
+
+				il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
+				il.Emit (OpCodes.Ldarg_1);//load datasource change source
+				il.Emit (OpCodes.Ldarg_2);//load new datasource
+				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+				il.Emit(OpCodes.Ldc_I4, dmVC);//load index of dynmathod
+				il.Emit (OpCodes.Call, typeof(Instantiator).GetMethod("dataSourceChangedEmitHelper", BindingFlags.Instance | BindingFlags.NonPublic));
+
+				il.MarkLabel (cancel);
+			}
 			il.Emit (OpCodes.Ret);
 
 			//store dschange delegate in instatiator instance for access while instancing graphic object
@@ -1106,29 +1161,68 @@ namespace Crow
 			System.Reflection.Emit.Label endConvert = il.DefineLabel ();
 			System.Reflection.Emit.Label convert = il.DefineLabel ();
 
-			il.Emit (OpCodes.Stloc_0);
-			il.Emit (OpCodes.Ldloc_0);
-			il.Emit (OpCodes.Callvirt, typeof(object).GetMethod ("GetType"));
-			il.Emit (OpCodes.Ldtoken, dstType);//push destination property type for testing
-			il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
-			il.Emit (OpCodes.Callvirt, typeof(object).GetMethod ("Equals", new Type[] { typeof(object) }));
+			il.Emit (OpCodes.Dup);
+			il.Emit (OpCodes.Isinst, dstType);
 			il.Emit (OpCodes.Brfalse, convert);
 
-			il.Emit (OpCodes.Ldloc_0);
 			il.Emit (OpCodes.Unbox_Any, dstType);
 			il.Emit (OpCodes.Br, endConvert);
 
 			il.MarkLabel (convert);
-			il.Emit (OpCodes.Ldloc_0);
+
 			if (dstType == typeof(string)) {
 				il.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
 			} else if (dstType.IsPrimitive) {
+				//il.Emit (OpCodes.Unbox_Any, dstType);
 				il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (dstType));
-			} else {
-				il.Emit (OpCodes.Castclass, dstType);
+			} else if (dstType.IsValueType) {
+				il.Emit (OpCodes.Unbox_Any, dstType);
+			} else{
+				il.Emit (OpCodes.Stloc_0); //save orig value in loc0
+				il.Emit (OpCodes.Ldloc_0);
+				il.Emit (OpCodes.Callvirt, typeof(object).GetMethod ("GetType"));
+				il.Emit (OpCodes.Ldtoken, dstType);//push destination property type for testing
+				il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
+				il.Emit (OpCodes.Call, typeof(Instantiator).GetMethod ("getImplicitOp", BindingFlags.Static | BindingFlags.Public));
+				il.Emit (OpCodes.Dup);
+				convert = il.DefineLabel ();
+				il.Emit (OpCodes.Brtrue, convert);
+				il.Emit (OpCodes.Pop);
+				il.Emit (OpCodes.Ldloc_0);
+				il.Emit (OpCodes.Isinst, dstType);
+				il.Emit (OpCodes.Br, endConvert);
+
+				il.MarkLabel (convert);
+				il.Emit (OpCodes.Ldnull);//null instance for invoke
+				il.Emit (OpCodes.Ldc_I4_1);
+				il.Emit(OpCodes.Newarr, typeof(object));
+				il.Emit (OpCodes.Dup);//duplicate the array ref
+				il.Emit (OpCodes.Ldc_I4_0);//push the index 0
+				il.Emit (OpCodes.Ldloc_0);//push the orig value to convert
+				il.Emit (OpCodes.Stelem, typeof(object));//set the array element at index 0
+				il.Emit (OpCodes.Callvirt, typeof(MethodInfo).GetMethod("Invoke", new Type[] { typeof(object), typeof (object[])}));
 			}
 
 			il.MarkLabel (endConvert);
+		}
+
+		/// <summary>
+		/// search for an implicit conversion method in origine or destination classes
+		/// </summary>
+		public static MethodInfo getImplicitOp(Type origType, Type dstType){
+			foreach(MethodInfo mi in origType.GetMethods(BindingFlags.Public|BindingFlags.Static)){
+				if (mi.Name == "op_Implicit") {
+					if (mi.ReturnType == dstType && mi.GetParameters ().FirstOrDefault ().ParameterType == origType)
+						return mi;
+				}
+			}
+			foreach(MethodInfo mi in dstType.GetMethods(BindingFlags.Public|BindingFlags.Static)){
+				if (mi.Name == "op_Implicit") {
+					if (mi.ReturnType == dstType && mi.GetParameters ().FirstOrDefault ().ParameterType == origType)
+						return mi;
+				}
+			}
+			return null;
 		}
 	}
 }
