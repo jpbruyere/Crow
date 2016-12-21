@@ -3,8 +3,8 @@
 		Height="{./HeightPolicy}" Width="{./WidthPolicy}">
 	<Border BorderWidth="1" Height="{./HeightPolicy}" Width="80%"  Background="White" 
 		Foreground="DimGray" Margin="0">
-		<Label Foreground="DimGray" Height="{../../../HeightPolicy}" Width="Stretched"
-			Text="{../../../Value}" TextAlignment="Right" Margin="0"/>
+		<Label Foreground="DimGray" Height="{./HeightPolicy}" Width="Stretched"
+			Text="{./Value}" TextAlignment="Right" Margin="0"/>
 	</Border>
 	<VerticalStack MinimumSize="8,10" Width="20%" Height="Stretched" Spacing="0" Margin="0" Background="Red">
 		<Button MouseRepeat="true" Width="Stretched" Height="50%" Margin="0" MouseClick="./onUp"
