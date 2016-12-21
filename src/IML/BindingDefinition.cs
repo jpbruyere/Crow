@@ -50,6 +50,9 @@ namespace Crow.IML
 		}
 		#endregion
 
+		public bool IsDataSourceBinding { get { return TargetNA == null; }}
+		public bool HasUnresolvedTargetName { get { return !string.IsNullOrEmpty(TargetName); }}
+
 		/// <summary>
 		/// replace the target node address with corresponding named node address, and clear the target name once resolved
 		/// </summary>

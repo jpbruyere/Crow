@@ -48,10 +48,8 @@ namespace Crow.IML
 
 		public Dictionary<NodeAddress, Dictionary<string, List<MemberAddress>>> Bindings =
 			new Dictionary<NodeAddress, Dictionary<string, List<MemberAddress>>>();
-		//public List<DataSourceBinding> DataSourceBindings = new List<DataSourceBinding>();
-		public Dictionary<NamedNodeAddress, Dictionary<string, MemberAddress>> NamedBindings =
-			new Dictionary<NamedNodeAddress, Dictionary<string, MemberAddress>>();
-		
+		public List<BindingDefinition> UnresolvedTargets = new List<BindingDefinition>();
+
 		public Context (Type rootType)
 		{
 			RootType = rootType;
@@ -86,10 +84,45 @@ namespace Crow.IML
 			nodeBindings [origMember].Add (new MemberAddress (destNA, destMember));
 		}
 		public void StorePropertyBinding(BindingDefinition bindDef){
+			if (bindDef.HasUnresolvedTargetName) {
+				UnresolvedTargets.Add (bindDef);
+				return;
+			}
 			StorePropertyBinding (bindDef.TargetNA, bindDef.TargetMember, bindDef.SourceNA, bindDef.SourceMember);
-			if (bindDef.TwoWay)
-				StorePropertyBinding (bindDef.SourceNA, bindDef.SourceMember, bindDef.TargetNA, bindDef.TargetMember);
+//			if (bindDef.TwoWay)
+//				StorePropertyBinding (bindDef.SourceNA, bindDef.SourceMember, bindDef.TargetNA, bindDef.TargetMember);
 		}
+		public void StoreCurrentName(string name){
+			if (!Names.ContainsKey(name))
+				Names[name] = new List<NodeAddress>();
+			Names[name].Add(CurrentNodeAddress);
+		}
+		public void ResolveNames (){
+			foreach (BindingDefinition bd in UnresolvedTargets) {
+				if (!Names.ContainsKey (bd.TargetName))
+					throw new Exception ("Target Name '" + bd.TargetName + "' not found");
+				NodeAddress resolvedNA = null;
+				foreach (NodeAddress na in Names[bd.TargetName]) {
+					bool naMatch = true;
+					for (int i = 0; i < bd.TargetNA.Count; i++) {
+						if (bd.TargetNA [i] != na [i]) {
+							naMatch = false;
+							break;
+						}
+					}
+					if (naMatch) {
+						resolvedNA = na;
+						break;
+					}
+				}
+				if (resolvedNA == null)
+					throw new Exception ("Target Name '" + bd.TargetName + "' not found");
+
+				bd.ResolveTargetName (resolvedNA);
+				StorePropertyBinding (bd);
+			}
+		}
+
 		void initILGen ()
 		{
 			il.DeclareLocal (typeof (GraphicObject));

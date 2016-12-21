@@ -156,18 +156,10 @@
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Drawing" />
-    <Reference Include="cairo-sharp">
-      <Package>GtkSharp.3.1.3</Package>
-    </Reference>
-    <Reference Include="gdk-sharp">
-      <Package>GtkSharp.3.1.3</Package>
-    </Reference>
-    <Reference Include="gio-sharp">
-      <Package>GtkSharp.3.1.3</Package>
-    </Reference>
-    <Reference Include="glib-sharp">
-      <Package>GtkSharp.3.1.3</Package>
-    </Reference>
+    <Reference Include="cairo-sharp" />
+    <Reference Include="gdk-sharp" />
+    <Reference Include="gio-sharp" />
+    <Reference Include="glib-sharp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
