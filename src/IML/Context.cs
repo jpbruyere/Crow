@@ -72,7 +72,19 @@ namespace Crow.IML
 		public Type CurrentNodeType {
 			get { return nodesStack.Peek().CrowType; }
 		}
+		public void StorePropertyBinding(NodeAddress origNA, string origMember, NodeAddress destNA, string destMember){
+			Dictionary<string, List<MemberAddress>> nodeBindings = null;
+			if (Bindings.ContainsKey (origNA))
+				nodeBindings = Bindings [origNA];
+			else {
+				nodeBindings = new Dictionary<string, List<MemberAddress>> ();
+				Bindings [origNA] = nodeBindings;
+			}
 
+			if (!nodeBindings.ContainsKey (origMember))
+				nodeBindings [origMember] = new List<MemberAddress> ();
+			nodeBindings [origMember].Add (new MemberAddress (destNA, destMember));
+		}
 		void initILGen ()
 		{
 			il.DeclareLocal (typeof (GraphicObject));
