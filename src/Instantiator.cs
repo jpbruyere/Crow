@@ -39,11 +39,19 @@ namespace Crow
 	/// </summary>
 	public class Instantiator
 	{
+		static long curId = 0;
+		internal static long NewId {
+			get { return curId++; }
+		}
 		public Type RootType;
 		InstanciatorInvoker loader;
 
+		internal string sourcePath;
+
 		#region CTOR
-		public Instantiator (string path) : this (Interface.GetStreamFromPath(path)) {}
+		public Instantiator (string path) : this (Interface.GetStreamFromPath(path)) {
+			sourcePath = path;
+		}
 
 		public Instantiator (Stream stream)
 		{
@@ -177,7 +185,7 @@ namespace Crow
 						if (string.IsNullOrEmpty (path)) {
 							itemTmpID = Guid.NewGuid ().ToString ();
 							Interface.Instantiators [itemTmpID] =
-								new ItemTemplate (reader.ReadInnerXml (), dataType, datas);
+								new ItemTemplate (new MemoryStream (Encoding.UTF8.GetBytes (reader.ReadInnerXml ())), dataType, datas);
 
 						} else {
 							if (!reader.IsEmptyElement)
@@ -399,106 +407,69 @@ namespace Crow
 
 			ctx.il.MarkLabel (labContinue);
 		}
-
 		/// <summary>
 		/// Splits the binding expression
 		/// </summary>
-		/// <returns><c>true</c>, if it's a two ways binding, <c>false</c> otherwise.</returns>
-		/// <param name="currentNode">current node address</param>
-		/// <param name="expression">Binding expression</param>
-		/// <param name="na">node address, null if on dataSource, count=0 if template binding outside current graphic tree</param>
-		/// <param name="memberName">Member name.</param>
-		/// <param name="namedNode">Named node.</param>
-		bool splitBindingExp(NodeAddress currentNode, string expression, out NodeAddress na, out string memberName, out string namedNode){
-			namedNode = "";
+		/// <returns><c>true</c>, if it's a two way binding, <c>false</c> otherwise.</returns>
+		/// <param name="sourceNA">Source Node address</param>
+		/// <param name="expression">Expression.</param>
+		/// <param name="targetNA">Target Node Address</param>
+		/// <param name="targetMember">Target member name</param>
+		/// <param name="targetName">Target node name</param>
+		bool splitBindingExp(NodeAddress sourceNA, string expression, out NodeAddress targetNA, out string targetMember, out string targetName){
+			bool twoWay = false;
+			targetName = "";
 			if (string.IsNullOrEmpty (expression)) {
-				na = null;
-				memberName = "";
+				targetNA = null;
+				targetMember = "";
 			} else {
+				if (expression.StartsWith ("²")) {
+					twoWay = true;
+					expression = expression.Substring (1);
+				}
 				string[] bindingExp = expression.Split ('/');
 
 				if (bindingExp.Length == 1)
-					na = null;
+					targetNA = null;//datasource binding
 				else
-					na = getNodeAdressFromBindingExp (currentNode, bindingExp);
+					targetNA = getNodeAdressFromBindingExp (sourceNA, bindingExp);
 
 				string [] bindTrg = bindingExp.Last().Split ('.');
 
 				if (bindTrg.Length == 1)
-					memberName = bindTrg [0];
+					targetMember = bindTrg [0];
 				else if (bindTrg.Length == 2) {
 					//named target
-					namedNode = bindTrg[0];
-					memberName = bindTrg [1];
+					targetName = bindTrg[0];
+					targetMember = bindTrg [1];
 				} else
 					throw new Exception ("Syntax error in binding, expected 'go dot member'");
 			}
 
-			return expression.StartsWith ("²");
+			return twoWay;
 		}
 
 		void readPropertyBinding (Context ctx, string sourceMember, string expression)
 		{
-			string memberName, namedNode;
-			NodeAddress currentNode = ctx.CurrentNodeAddress, targetNA;
+			string targetMember, targetName;
+			NodeAddress sourceNA = ctx.CurrentNodeAddress, targetNA;
 
-			bool twoWay = splitBindingExp (currentNode, expression, out targetNA, out memberName, out namedNode);
+			bool twoWay = splitBindingExp (sourceNA, expression, out targetNA, out targetMember, out targetName);
 
 			if (targetNA == null) {//bind on data source
-				emitDataSourceBindingDelegate (ctx, sourceMember, memberName);
+				emitDataSourceBindingDelegate (ctx, sourceMember, targetMember);
 				return;
 			}
 
-//			//if binding exp = '{}' => binding is done on datasource
-//			if (string.IsNullOrEmpty (expression))
-//				return;
-//
-//			if (expression.StartsWith ("²")) {
-//				expression = expression.Substring (1);
-//				twoWay = true;
-//			}
-//
-//			string[] bindingExp = expression.Split ('/');
-//
-//			if (bindingExp.Length == 1) {
-//				//datasource binding
-//				processDataSourceBinding (ctx, sourceMember, bindingExp [0]);
-//				return;
-//			}
-//
-//			NodeAddress currentNode = ctx.CurrentNodeAddress;
-//			NodeAddress targetNA = getNodeAdressFromBindingExp (currentNode, bindingExp);
-//
-//			string [] bindTrg = bindingExp.Last().Split ('.');
-//
-//			if (bindTrg.Length == 1)
-//				memberName = bindTrg [0];
-//			else if (bindTrg.Length == 2) {
-//				//named target
-//				//TODO:
-//
-//				memberName = bindTrg [1];
-//				return;
-//			} else
-//				throw new Exception ("Syntax error in binding, expected 'go dot member'");
-
-			Dictionary<string, List<MemberAddress>> nodeBindings = null;
-			if (ctx.Bindings.ContainsKey (targetNA))
-				nodeBindings = ctx.Bindings [targetNA];
-			else {
-				nodeBindings = new Dictionary<string, List<MemberAddress>> ();
-				ctx.Bindings [targetNA] = nodeBindings;
-			}
-
-			if (!nodeBindings.ContainsKey (memberName))
-				nodeBindings [memberName] = new List<MemberAddress> ();
-			nodeBindings [memberName].Add (new MemberAddress (currentNode, sourceMember));
+			ctx.StorePropertyBinding (targetNA, targetMember, sourceNA, sourceMember);
+//			if (twoWay)
+//				ctx.StorePropertyBinding (currentNode, sourceMember, targetNA, memberName);
 		}
 		/// <summary>
 		/// Gets the node adress from binding expression splitted with '/' starting at a given node
 		/// </summary>
-		NodeAddress getNodeAdressFromBindingExp(NodeAddress currentNode, string[] bindingExp){
-			int ptr = currentNode.Count - 1;
+		NodeAddress getNodeAdressFromBindingExp(NodeAddress sourceAddr, string[] bindingExp){
+			int ptr = sourceAddr.Count - 1;
 
 			//if exp start with '/' => Graphic tree parsing start at source
 			if (string.IsNullOrEmpty (bindingExp [0])) {
@@ -506,7 +477,7 @@ namespace Crow
 			} else if (bindingExp [0] == ".") { //search template root
 				ptr--;
 				while (ptr >= 0) {
-					if (typeof(TemplatedControl).IsAssignableFrom (currentNode [ptr].CrowType))
+					if (typeof(TemplatedControl).IsAssignableFrom (sourceAddr [ptr].CrowType))
 						break;
 					ptr--;
 				}
@@ -517,7 +488,7 @@ namespace Crow
 				ptr -= levelUp;
 			}
 			Node[] targetNode = new Node[ptr+1];
-			Array.Copy (currentNode.ToArray (), targetNode, ptr + 1);
+			Array.Copy (sourceAddr.ToArray (), targetNode, ptr + 1);
 			return new NodeAddress (targetNode);
 		}
 
@@ -817,7 +788,7 @@ namespace Crow
 
 					emitCeckAndConvert (il, ma.Property.PropertyType);
 
-					emitConvert (ilPC, ma.Property.PropertyType);
+					emitCeckAndConvert (ilPC, ma.Property.PropertyType);
 
 					il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());
 					ilPC.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());
@@ -863,7 +834,7 @@ namespace Crow
 			Type origineNodeType = origine.NodeType;
 
 			//init method, current instance passed as arg
-			DynamicMethod dmInit = new DynamicMethod ("dyn_initBinding",
+			DynamicMethod dmInit = new DynamicMethod ("dyn_initBinding_" + NewId.ToString(),
 				typeof (void), new Type[] {typeof(object)}, true);
 			ILGenerator ilInit = dmInit.GetILGenerator (256);
 			ilInit.Emit (OpCodes.Nop);
@@ -877,6 +848,7 @@ namespace Crow
 			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
 			il.DeclareLocal (typeof(object));
+			LocalBuilder lb = ilInit.DeclareLocal (typeof(object));
 
 			il.Emit (OpCodes.Nop);
 
@@ -919,6 +891,13 @@ namespace Crow
 						//init dynmeth: load actual value
 						ilInit.Emit (OpCodes.Ldarg_0);
 						ilInit.Emit (OpCodes.Callvirt, origineNodeType.GetProperty (bindingCase.Key).GetGetMethod());
+						ilInit.Emit (OpCodes.Dup);
+						//ilInit.Emit (OpCodes.Pop);
+						if (origineNodeType.GetProperty (bindingCase.Key).PropertyType.IsValueType)
+							ilInit.Emit (OpCodes.Box, origineNodeType.GetProperty (bindingCase.Key).PropertyType);
+						ilInit.Emit (OpCodes.Stloc_0);//, lb.LocalIndex);
+
+						ilInit.EmitWriteLine (lb);
 					}
 					//load new value
 					il.Emit (OpCodes.Ldarg_1);
@@ -1115,15 +1094,22 @@ namespace Crow
 			}
 		}
 		void emitConvert(ILGenerator il, Type origType, Type destType){
-			if (destType == typeof (string))
+			if (destType == typeof(string))
 				il.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
 			else if (origType.IsValueType) {
 				if (destType != origType)
 					il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (destType));
 				else
 					il.Emit (OpCodes.Unbox_Any, destType);//TODO:double check this
-			}else
-				il.Emit (OpCodes.Castclass, destType);
+			} else {
+				if (origType.IsAssignableFrom(destType))
+					il.Emit (OpCodes.Castclass, destType);
+				else {
+					MethodInfo miIO = getImplicitOp (origType, destType);
+					if (miIO != null)
+						il.Emit (OpCodes.Callvirt, miIO);
+				}
+			}
 		}
 		void emitConvert(ILGenerator il, Type dstType){
 			if (dstType == typeof (string))
@@ -1133,24 +1119,6 @@ namespace Crow
 			else
 				il.Emit (OpCodes.Castclass, dstType);
 		}
-		void emitConvertWorking(ILGenerator il, Type sourceValueType){
-			if (sourceValueType == typeof (string)) {
-				il.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
-			} else if (!sourceValueType.IsValueType)
-				il.Emit (OpCodes.Castclass, sourceValueType);
-			else if (sourceValueType != sourceValueType) {
-				il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (sourceValueType));
-			} else
-				il.Emit (OpCodes.Unbox_Any, sourceValueType);
-		}
-		//public string GetImlSourcesCode(){
-		//	try {
-		//		using (StreamReader sr = new StreamReader (imlPath))
-		//			return sr.ReadToEnd();
-		//	} catch (Exception ex) {
-		//		throw new Exception ("Error getting sources for <" + imlPath + ">:", ex);
-		//	}
-		//}
 		/// <summary>
 		/// check type of current object on the stack, use loc_0 so store it
 		/// </summary>
@@ -1165,7 +1133,8 @@ namespace Crow
 			il.Emit (OpCodes.Isinst, dstType);
 			il.Emit (OpCodes.Brfalse, convert);
 
-			il.Emit (OpCodes.Unbox_Any, dstType);
+			if (dstType.IsValueType)
+				il.Emit (OpCodes.Unbox_Any, dstType);
 			il.Emit (OpCodes.Br, endConvert);
 
 			il.MarkLabel (convert);
