@@ -855,7 +855,6 @@ namespace Crow
 				Type origineType = null;
 				if (piOrig != null)
 					origineType = piOrig.PropertyType;
-
 				foreach (MemberAddress ma in bindingCase.Value) {
 					//first we have to load destination instance onto the stack, it is access
 					//with graphic tree functions deducted from nodes topology
@@ -878,12 +877,13 @@ namespace Crow
 					il.Emit (OpCodes.Ldarg_1);
 					il.Emit (OpCodes.Ldfld, typeof (ValueChangeEventArgs).GetField ("NewValue"));
 
-					if (origineType == null)//property less binding
+					if (origineType == null)//property less binding, no init
 						emitConvert (il, ma.Property.PropertyType);
 					else {
-						if (origineType != ma.Property.PropertyType)//else, no unboxing required
-							emitConvert (ilInit, origineType, ma.Property.PropertyType);
-						emitConvert (il, origineType, ma.Property.PropertyType);//unboxing required
+						if (origineType.IsValueType)
+							ilInit.Emit(OpCodes.Box, origineType);
+						emitConvert (ilInit, origineType, ma.Property.PropertyType);
+						emitConvert (il, origineType, ma.Property.PropertyType);
 
 						ilInit.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());//set init value
 					}
@@ -1101,6 +1101,8 @@ namespace Crow
 
 			if (dstType.IsValueType)
 				il.Emit (OpCodes.Unbox_Any, dstType);
+			else
+				il.Emit (OpCodes.Castclass, dstType);
 			il.Emit (OpCodes.Br, endConvert);
 
 			il.MarkLabel (convert);
