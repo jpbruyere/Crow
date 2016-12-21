@@ -148,6 +148,7 @@
     <Compile Include="src\IML\Node.cs" />
     <Compile Include="src\IML\MemberAddress.cs" />
     <Compile Include="src\IML\NodeStack.cs" />
+    <Compile Include="src\IML\BindingDefinition.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
