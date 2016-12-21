@@ -85,6 +85,11 @@ namespace Crow.IML
 				nodeBindings [origMember] = new List<MemberAddress> ();
 			nodeBindings [origMember].Add (new MemberAddress (destNA, destMember));
 		}
+		public void StorePropertyBinding(BindingDefinition bindDef){
+			StorePropertyBinding (bindDef.TargetNA, bindDef.TargetMember, bindDef.SourceNA, bindDef.SourceMember);
+			if (bindDef.TwoWay)
+				StorePropertyBinding (bindDef.SourceNA, bindDef.SourceMember, bindDef.TargetNA, bindDef.TargetMember);
+		}
 		void initILGen ()
 		{
 			il.DeclareLocal (typeof (GraphicObject));

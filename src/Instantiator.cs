@@ -416,54 +416,44 @@ namespace Crow
 		/// <param name="targetNA">Target Node Address</param>
 		/// <param name="targetMember">Target member name</param>
 		/// <param name="targetName">Target node name</param>
-		bool splitBindingExp(NodeAddress sourceNA, string expression, out NodeAddress targetNA, out string targetMember, out string targetName){
-			bool twoWay = false;
-			targetName = "";
+		BindingDefinition splitBindingExp(NodeAddress sourceNA, string sourceMember, string expression){
+			BindingDefinition bindingDef = new BindingDefinition(sourceNA, sourceMember);
 			if (string.IsNullOrEmpty (expression)) {
-				targetNA = null;
-				targetMember = "";
+				return bindingDef;
 			} else {
 				if (expression.StartsWith ("²")) {
-					twoWay = true;
+					bindingDef.TwoWay = true;
 					expression = expression.Substring (1);
 				}
 				string[] bindingExp = expression.Split ('/');
 
-				if (bindingExp.Length == 1)
-					targetNA = null;//datasource binding
-				else
-					targetNA = getNodeAdressFromBindingExp (sourceNA, bindingExp);
+				if (bindingExp.Length > 1)
+					bindingDef.TargetNA = getNodeAdressFromBindingExp (sourceNA, bindingExp);
 
 				string [] bindTrg = bindingExp.Last().Split ('.');
 
 				if (bindTrg.Length == 1)
-					targetMember = bindTrg [0];
+					bindingDef.TargetMember = bindTrg [0];
 				else if (bindTrg.Length == 2) {
 					//named target
-					targetName = bindTrg[0];
-					targetMember = bindTrg [1];
+					bindingDef.TargetName = bindTrg[0];
+					bindingDef.TargetMember = bindTrg [1];
 				} else
 					throw new Exception ("Syntax error in binding, expected 'go dot member'");
 			}
 
-			return twoWay;
+			return bindingDef;
 		}
 
 		void readPropertyBinding (Context ctx, string sourceMember, string expression)
-		{
-			string targetMember, targetName;
-			NodeAddress sourceNA = ctx.CurrentNodeAddress, targetNA;
+		{			
+			NodeAddress sourceNA = ctx.CurrentNodeAddress;
+			BindingDefinition bindingDef = splitBindingExp (sourceNA, sourceMember, expression);
 
-			bool twoWay = splitBindingExp (sourceNA, expression, out targetNA, out targetMember, out targetName);
-
-			if (targetNA == null) {//bind on data source
-				emitDataSourceBindingDelegate (ctx, sourceMember, targetMember);
-				return;
-			}
-
-			ctx.StorePropertyBinding (targetNA, targetMember, sourceNA, sourceMember);
-//			if (twoWay)
-//				ctx.StorePropertyBinding (currentNode, sourceMember, targetNA, memberName);
+			if (bindingDef.TargetNA == null)//bind on data source
+				emitDataSourceBindingDelegate (ctx, sourceMember, bindingDef.TargetMember);
+			else
+				ctx.StorePropertyBinding (bindingDef);
 		}
 		/// <summary>
 		/// Gets the node adress from binding expression splitted with '/' starting at a given node
@@ -634,17 +624,15 @@ namespace Crow
 			ctx.emitCachedDelegateHandlerAddition(dmIdx, sourceEvent);
 		}
 
-		void emitHandlerBinding (Context ctx, EventInfo sourceEvent, string expression){
-			string memberName, namedNode;
-			NodeAddress currentNode = ctx.CurrentNodeAddress, targetNA;
-
-			splitBindingExp (currentNode, expression, out targetNA, out memberName, out namedNode);
+		void emitHandlerBinding (Context ctx, EventInfo sourceEvent, string expression){			
+			NodeAddress currentNode = ctx.CurrentNodeAddress;
+			BindingDefinition bindingDef = splitBindingExp (currentNode, sourceEvent.Name, expression);
 
 			string bindOnEventName = null;
 
-			if (targetNA == null)//datasource handler
+			if (bindingDef.TargetNA == null)//datasource handler
 				bindOnEventName = "DataSourceChanged";
-			else if (targetNA.Count == 0)//out of tree template handler
+			else if (bindingDef.TargetNA.Count == 0)//out of tree template handler
 				bindOnEventName = "ParentChanged";
 
 			if (!string.IsNullOrEmpty(bindOnEventName)){
@@ -662,7 +650,7 @@ namespace Crow
 				//fetch method in datasource and test if it exist
 				il.Emit (OpCodes.Ldarg_2);//load new datasource
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
-				il.Emit (OpCodes.Ldstr, memberName);//load handler method name
+				il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);//load handler method name
 				il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getMethodInfoWithReflexion", BindingFlags.Static | BindingFlags.Public));
 				il.Emit (OpCodes.Stloc_0);//save MethodInfo
 				il.Emit (OpCodes.Ldloc_0);//push mi for test if null

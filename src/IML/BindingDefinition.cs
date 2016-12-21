@@ -27,14 +27,18 @@ namespace Crow.IML
 	/// </summary>
 	public class BindingDefinition
 	{
-		public NodeAddress SourceNA;
-		public string SourceMember;
-		public NodeAddress TargetNA;
-		public string TargetMember;
-		public string TargetName;
+		public NodeAddress SourceNA = null;
+		public string SourceMember = "";
+		public NodeAddress TargetNA = null;
+		public string TargetMember = "";
+		public string TargetName = "";
 		public bool TwoWay = false;
 
 		#region CTOR
+		public BindingDefinition (NodeAddress _sourceNA, string _sourceMember){
+			SourceNA = _sourceNA;
+			SourceMember = _sourceMember;
+		}
 		public BindingDefinition (NodeAddress _sourceNA, string _sourceMember, NodeAddress _targetNA, string _targetMember, string _targetName = "", bool _twoWay = false)
 		{
 			SourceNA = _sourceNA;
