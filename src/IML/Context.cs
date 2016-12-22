@@ -32,7 +32,7 @@ namespace Crow.IML
 		public string DataSourceMember;
 	}
 	/// <summary>
-	/// Context while parsing IML
+	/// Context while parsing IML, this will store what's needed only while parsing and not during instancing
 	/// </summary>
 	public class Context
 	{
@@ -44,11 +44,14 @@ namespace Crow.IML
 		//public SubNodeType curSubNodeType;
 		public NodeStack nodesStack = new NodeStack ();
 
+		/// <summary> store addresses of named node for name resolution at end of parsing </summary>
 		public Dictionary<string, List<NodeAddress>> Names  = new Dictionary<string, List<NodeAddress>>();
-
+		/// <summary> Store non datasource binding (in tree and template) by origine and orig member </summary>
 		public Dictionary<NodeAddress, Dictionary<string, List<MemberAddress>>> Bindings =
 			new Dictionary<NodeAddress, Dictionary<string, List<MemberAddress>>>();
+		/// <summary> Store binding with name in target, will be resolved at end of parsing </summary>
 		public List<BindingDefinition> UnresolvedTargets = new List<BindingDefinition>();
+
 
 		public Context (Type rootType)
 		{
@@ -97,33 +100,50 @@ namespace Crow.IML
 				Names[name] = new List<NodeAddress>();
 			Names[name].Add(CurrentNodeAddress);
 		}
-		public void ResolveNames (){
+		public void ProcessBindingDefinition(){//TODO:methodinfo fetching is redundant with early parsing
 			foreach (BindingDefinition bd in UnresolvedTargets) {
-				if (!Names.ContainsKey (bd.TargetName)) {
-					System.Diagnostics.Debug.WriteLine ("Target Name '" + bd.TargetName + "' not found");
-					continue;
-				}
-				NodeAddress resolvedNA = null;
-				foreach (NodeAddress na in Names[bd.TargetName]) {
-					bool naMatch = true;
-					for (int i = 0; i < bd.TargetNA.Count; i++) {
-						if (bd.TargetNA [i] != na [i]) {
-							naMatch = false;
-							break;
-						}
+				if (bd.HasUnresolvedTargetName) {
+					try {
+						ResolveName (bd);	
+					} catch (Exception ex) {
+						System.Diagnostics.Debug.WriteLine (ex.ToString ());
+						continue;
 					}
-					if (naMatch) {
-						resolvedNA = na;
+				}
+				
+				MemberInfo miSource = bd.SourceMemberAddress.member;
+				if (miSource == null)
+					throw new Exception ("Source member '" + bd.SourceMember + "' not found");
+				if (miSource.MemberType == MemberTypes.Event)
+					emitHandlerMethodAddition (bd, miSource as EventInfo);
+				else
+					StorePropertyBinding (bd);
+			}
+		}
+		public void ResolveName (BindingDefinition bd){
+
+			if (!Names.ContainsKey (bd.TargetName))
+				throw new Exception ("Target Name '" + bd.TargetName + "' not found");
+
+			NodeAddress resolvedNA = null;
+			foreach (NodeAddress na in Names[bd.TargetName]) {
+				bool naMatch = true;
+				for (int i = 0; i < bd.TargetNA.Count; i++) {
+					if (bd.TargetNA [i] != na [i]) {
+						naMatch = false;
 						break;
 					}
 				}
-				if (resolvedNA == null)
-					System.Diagnostics.Debug.WriteLine ("Target Name '" + bd.TargetName + "' not found");
-				else {
-					bd.ResolveTargetName (resolvedNA);
-					StorePropertyBinding (bd);
+				if (naMatch) {
+					resolvedNA = na;
+					break;
 				}
 			}
+
+			if (resolvedNA == null)
+				throw new Exception ("Target Name '" + bd.TargetName + "' not found");
+
+			bd.ResolveTargetName (resolvedNA);
 		}
 
 		void initILGen ()
@@ -143,6 +163,31 @@ namespace Crow.IML
 			il.Emit(OpCodes.Ldc_I4, index);//load delegate index
 			il.Emit(OpCodes.Callvirt, typeof(List<Delegate>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
 			il.Emit(OpCodes.Callvirt, evt.AddMethod);//call add event
+		}
+		/// <summary>
+		/// Emits the handler method addition, done at end of parsing, Loc_0 is root node instance
+		/// </summary>
+		/// <param name="bd">Bd.</param>
+		/// <param name="evt">passed as arg to prevent refetching it for the 3rd time</param>
+		public void emitHandlerMethodAddition(BindingDefinition bd, EventInfo evt){			
+			//fetch source instance with address for handler addition (as 1st arg of handler.add)
+			il.Emit (OpCodes.Ldloc_0);//push root
+			CompilerServices.emitGetInstance (il, bd.SourceNA);
+
+			//load handlerType of sourceEvent to create handler delegate (1st arg)
+			il.Emit (OpCodes.Ldtoken, evt.EventHandlerType);
+			il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
+			//load target the where the method is defined (2nd arg)
+			il.Emit (OpCodes.Ldloc_0);
+			CompilerServices.emitGetInstance (il, bd.TargetNA);
+			//load methodInfo (3rd arg)
+			il.Emit (OpCodes.Ldtoken, bd.TargetMemberAddress.member as MethodInfo);
+			il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
+
+			il.Emit (OpCodes.Callvirt, typeof(Delegate).GetMethod ("CreateDelegate",
+				new Type[] { typeof(Type), typeof(object), typeof(MethodInfo) }));//create bound delegate
+			
+			il.Emit (OpCodes.Callvirt, evt.AddMethod);//call add event
 		}
 	}
 }

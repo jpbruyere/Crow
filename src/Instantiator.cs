@@ -112,7 +112,7 @@ namespace Crow
 			foreach (int idx in templateCachedDelegateIndices)
 				ctx.emitCachedDelegateHandlerAddition(idx, typeof(GraphicObject).GetEvent("ParentChanged"));
 
-			ctx.ResolveNames ();
+			ctx.ProcessBindingDefinition ();
 
 			emitBindingDelegates (ctx);
 
@@ -546,7 +546,7 @@ namespace Crow
 
 				if (lopParts.Length > 1) {
 					NodeAddress lopNA = getNodeAdressFromBindingExp (currentNode, lopParts);
-					emitGetInstance (il, currentNode, lopNA);
+					CompilerServices.emitGetInstance (il, currentNode, lopNA);
 					lopType = lopNA.NodeType;
 				}
 
@@ -629,21 +629,11 @@ namespace Crow
 			NodeAddress currentNode = ctx.CurrentNodeAddress;
 			BindingDefinition bindingDef = splitBindingExp (currentNode, sourceEvent.Name, expression);
 
-			if (bindingDef.HasUnresolvedTargetName)
-				return;
-
-			string bindOnEventName = null;
-
-			if (bindingDef.TargetNA == null)//datasource handler
-				bindOnEventName = "DataSourceChanged";
-			else if (bindingDef.TargetNA.Count == 0)//out of tree template handler
-				bindOnEventName = "ParentChanged";
-
-			if (!string.IsNullOrEmpty(bindOnEventName)){
+			if (bindingDef.IsTemplateBinding | bindingDef.IsDataSourceBinding) {
 				//we need to bind datasource method to source event
 				DynamicMethod dm = new DynamicMethod ("dyn_dschangedForHandler",
-					typeof (void),
-					CompilerServices.argsBoundDSChange, true);
+					                   typeof(void),
+					                   CompilerServices.argsBoundDSChange, true);
 
 				ILGenerator il = dm.GetILGenerator (256);
 				System.Reflection.Emit.Label cancel = il.DefineLabel ();
@@ -659,7 +649,7 @@ namespace Crow
 				il.Emit (OpCodes.Ldarg_2);//load new datasource
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
 				il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);//load handler method name
-				il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getMethodInfoWithReflexion", BindingFlags.Static | BindingFlags.Public));
+				il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod ("getMethodInfoWithReflexion", BindingFlags.Static | BindingFlags.Public));
 				il.Emit (OpCodes.Stloc_0);//save MethodInfo
 				il.Emit (OpCodes.Ldloc_0);//push mi for test if null
 
@@ -667,18 +657,18 @@ namespace Crow
 
 				il.Emit (OpCodes.Ldarg_1);//load datasource change source where the event handler is as 1st arg of handler.add
 				if (bindingDef.IsTemplateBinding)//fetch source instance with address
-					emitGetInstance (il, bindingDef.SourceNA);
+					CompilerServices.emitGetInstance (il, bindingDef.SourceNA);
 
-				//loat handlerType of sourceEvent to create delegate (1st arg)
-				il.Emit(OpCodes.Ldtoken, sourceEvent.EventHandlerType);
+				//load handlerType of sourceEvent to create delegate (1st arg)
+				il.Emit (OpCodes.Ldtoken, sourceEvent.EventHandlerType);
 				il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
 				il.Emit (OpCodes.Ldarg_2);//load new datasource where the method is defined
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
 				il.Emit (OpCodes.Ldloc_0);//load methodInfo (3rd arg)
 
 				il.Emit (OpCodes.Callvirt, typeof(Delegate).GetMethod ("CreateDelegate",
-					new Type[] {typeof(Type), typeof(object), typeof(MethodInfo)}));//create bound delegate
-				il.Emit(OpCodes.Callvirt, sourceEvent.AddMethod);//call add event
+					new Type[] { typeof(Type), typeof(object), typeof(MethodInfo) }));//create bound delegate
+				il.Emit (OpCodes.Callvirt, sourceEvent.AddMethod);//call add event
 
 				System.Reflection.Emit.Label finish = il.DefineLabel ();
 				il.Emit (OpCodes.Br, finish);
@@ -689,12 +679,14 @@ namespace Crow
 
 				//store dschange delegate in instatiator instance for access while instancing graphic object
 				int delDSIndex = cachedDelegates.Count;
-				cachedDelegates.Add(dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
+				cachedDelegates.Add (dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
 
-				if (bindingDef.TargetNA == null)
-					ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent("DataSourceChanged"));
+				if (bindingDef.IsDataSourceBinding)
+					ctx.emitCachedDelegateHandlerAddition (delDSIndex, typeof(GraphicObject).GetEvent ("DataSourceChanged"));
 				else //template handler binding
-					templateCachedDelegateIndices.Add(delDSIndex);
+					templateCachedDelegateIndices.Add (delDSIndex);
+			} else {//normal in tree handler binding, store until tree is complete (end of parse)
+
 			}
 		}
 		/// <summary>
@@ -776,10 +768,10 @@ namespace Crow
 					il.Emit (OpCodes.Ldarg_0);//load source instance of ValueChanged event
 					ilPC.Emit (OpCodes.Ldarg_2);//load destination instance to set actual value of member
 					ilPC.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
-					emitGetChild (il, typeof(TemplatedControl), -1);
-					emitGetInstance (il, ma.Address);
-					emitGetChild (ilPC, typeof(TemplatedControl), -1);
-					emitGetInstance (ilPC, ma.Address);
+					CompilerServices.emitGetChild (il, typeof(TemplatedControl), -1);
+					CompilerServices.emitGetInstance (il, ma.Address);
+					CompilerServices.emitGetChild (ilPC, typeof(TemplatedControl), -1);
+					CompilerServices.emitGetInstance (ilPC, ma.Address);
 
 					//load new value
 					il.Emit (OpCodes.Ldarg_1);
@@ -790,9 +782,9 @@ namespace Crow
 					ilPC.Emit (OpCodes.Ldloc_1);//push mi for value fetching
 					ilPC.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getValueWithReflexion", BindingFlags.Static | BindingFlags.Public));
 
-					emitConvert (il, ma.Property.PropertyType);
+					CompilerServices.emitConvert (il, ma.Property.PropertyType);
 
-					emitConvert (ilPC, ma.Property.PropertyType);
+					CompilerServices.emitConvert (ilPC, ma.Property.PropertyType);
 
 					il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());
 					ilPC.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());
@@ -884,12 +876,12 @@ namespace Crow
 
 					NodeAddress destination = ma.Address;
 
-					emitGetInstance (il, origine, destination);
+					CompilerServices.emitGetInstance (il, origine, destination);
 
 					if (origineType != null){//prop less binding, no init requiered
 						//for initialisation dynmeth, load current instance
 						ilInit.Emit(OpCodes.Ldarg_0);
-						emitGetInstance (ilInit, origine, destination);
+						CompilerServices.emitGetInstance (ilInit, origine, destination);
 
 						//init dynmeth: load actual value
 						ilInit.Emit (OpCodes.Ldarg_0);
@@ -900,12 +892,12 @@ namespace Crow
 					il.Emit (OpCodes.Ldfld, typeof (ValueChangeEventArgs).GetField ("NewValue"));
 
 					if (origineType == null)//property less binding, no init
-						emitConvert (il, ma.Property.PropertyType);
+						CompilerServices.emitConvert (il, ma.Property.PropertyType);
 					else {
 						if (origineType.IsValueType)
 							ilInit.Emit(OpCodes.Box, origineType);
-						emitConvert (ilInit, origineType, ma.Property.PropertyType);
-						emitConvert (il, origineType, ma.Property.PropertyType);
+						CompilerServices.emitConvert (ilInit, origineType, ma.Property.PropertyType);
+						CompilerServices.emitConvert (il, origineType, ma.Property.PropertyType);
 
 						ilInit.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());//set init value
 					}
@@ -970,7 +962,7 @@ namespace Crow
 				//memberless binding, if targetMember exists, it will be used to determine target
 				//value type for conversion
 
-				emitConvert (il, piOrigine.PropertyType);
+				CompilerServices.emitConvert (il, piOrigine.PropertyType);
 
 				il.Emit (OpCodes.Callvirt, piOrigine.GetSetMethod ());
 
@@ -1028,7 +1020,7 @@ namespace Crow
 				il.Emit (OpCodes.Ldloc_1);//push mi for value fetching
 				il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getValueWithReflexion", BindingFlags.Static | BindingFlags.Public));
 			}
-			emitConvert (il, piOrigine.PropertyType);
+			CompilerServices.emitConvert (il, piOrigine.PropertyType);
 			il.Emit (OpCodes.Callvirt, piOrigine.GetSetMethod ());
 
 			if (!string.IsNullOrEmpty(dataSourceMember)){
@@ -1051,137 +1043,6 @@ namespace Crow
 			#endregion
 
 			ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent("DataSourceChanged"));
-		}
-
-		void emitGetInstance (ILGenerator il, NodeAddress orig, NodeAddress dest){
-			if (orig.Count < dest.Count) {
-				for (int i = orig.Count - 1; i < dest.Count - 1; i++)
-					emitGetChild (il, dest [i].CrowType, dest [i + 1].Index);
-			} else {
-				for (int j = dest.Count; j < orig.Count; j++)
-					il.Emit (OpCodes.Callvirt, typeof(ILayoutable).GetProperty ("Parent").GetGetMethod ());
-			}
-		}
-		void emitGetInstance (ILGenerator il, NodeAddress dest){
-			for (int i = 0; i < dest.Count - 1; i++)
-				emitGetChild (il, dest [i].CrowType, dest [i + 1].Index);
-		}
-		void emitGetChild(ILGenerator il, Type parentType, int index){
-			if (typeof (Group).IsAssignableFrom (parentType)) {
-				il.Emit (OpCodes.Ldfld, typeof(Group).GetField ("children", BindingFlags.Instance | BindingFlags.NonPublic));
-				il.Emit(OpCodes.Ldc_I4, index);
-				il.Emit (OpCodes.Callvirt, typeof(List<GraphicObject>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
-				return;
-			}
-			if (typeof(Container).IsAssignableFrom (parentType) || index < 0) {
-				il.Emit (OpCodes.Ldfld, typeof(PrivateContainer).GetField ("child", BindingFlags.Instance | BindingFlags.NonPublic));
-				return;
-			}
-			if (typeof(TemplatedContainer).IsAssignableFrom (parentType)) {
-				il.Emit (OpCodes.Callvirt, typeof(TemplatedContainer).GetProperty ("Content").GetGetMethod ());
-				return;
-			}
-			if (typeof(TemplatedGroup).IsAssignableFrom (parentType)) {
-				il.Emit (OpCodes.Callvirt, typeof(TemplatedGroup).GetProperty ("Items").GetGetMethod ());
-				il.Emit(OpCodes.Ldc_I4, index);
-				il.Emit (OpCodes.Callvirt, typeof(List<GraphicObject>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
-				return;
-			}
-		}
-		/// <summary>
-		/// Emit conversion from orig type to dest type
-		/// </summary>
-		void emitConvert(ILGenerator il, Type origType, Type destType){
-			if (destType == typeof(string))
-				il.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
-			else if (origType.IsValueType) {
-				if (destType != origType) {
-					il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (destType));
-				}else
-					il.Emit (OpCodes.Unbox_Any, destType);//TODO:double check this
-			} else {
-				if (origType.IsAssignableFrom(destType))
-					il.Emit (OpCodes.Castclass, destType);
-				else {
-					MethodInfo miIO = getImplicitOp (origType, destType);
-					if (miIO != null)
-						il.Emit (OpCodes.Callvirt, miIO);
-				}
-			}
-		}
-		/// <summary>
-		/// check type of current object on the stack and convert to dest type,
-		/// use loc_0 so store it as object!!!
-		/// </summary>
-		void emitConvert(ILGenerator il, Type dstType){
-			System.Reflection.Emit.Label endConvert = il.DefineLabel ();
-			System.Reflection.Emit.Label convert = il.DefineLabel ();
-
-			il.Emit (OpCodes.Dup);
-			il.Emit (OpCodes.Isinst, dstType);
-			il.Emit (OpCodes.Brfalse, convert);
-
-			if (dstType.IsValueType)
-				il.Emit (OpCodes.Unbox_Any, dstType);
-			else
-				il.Emit (OpCodes.Isinst, dstType);
-			il.Emit (OpCodes.Br, endConvert);
-
-			il.MarkLabel (convert);
-
-			if (dstType == typeof(string)) {
-				il.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
-			} else if (dstType.IsPrimitive) {
-				//il.Emit (OpCodes.Unbox_Any, dstType);
-				il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (dstType));
-			} else if (dstType.IsValueType) {
-				il.Emit (OpCodes.Unbox_Any, dstType);
-			} else{
-				il.Emit (OpCodes.Stloc_0); //save orig value in loc0
-				il.Emit (OpCodes.Ldloc_0);
-				il.Emit (OpCodes.Callvirt, typeof(object).GetMethod ("GetType"));
-				il.Emit (OpCodes.Ldtoken, dstType);//push destination property type for testing
-				il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
-				il.Emit (OpCodes.Call, typeof(Instantiator).GetMethod ("getImplicitOp", BindingFlags.Static | BindingFlags.Public));
-				il.Emit (OpCodes.Dup);
-				convert = il.DefineLabel ();
-				il.Emit (OpCodes.Brtrue, convert);
-				il.Emit (OpCodes.Pop);
-				il.Emit (OpCodes.Ldloc_0);
-				il.Emit (OpCodes.Isinst, dstType);
-				il.Emit (OpCodes.Br, endConvert);
-
-				il.MarkLabel (convert);
-				il.Emit (OpCodes.Ldnull);//null instance for invoke
-				il.Emit (OpCodes.Ldc_I4_1);
-				il.Emit(OpCodes.Newarr, typeof(object));
-				il.Emit (OpCodes.Dup);//duplicate the array ref
-				il.Emit (OpCodes.Ldc_I4_0);//push the index 0
-				il.Emit (OpCodes.Ldloc_0);//push the orig value to convert
-				il.Emit (OpCodes.Stelem, typeof(object));//set the array element at index 0
-				il.Emit (OpCodes.Callvirt, typeof(MethodInfo).GetMethod("Invoke", new Type[] { typeof(object), typeof (object[])}));
-			}
-
-			il.MarkLabel (endConvert);
-		}
-
-		/// <summary>
-		/// search for an implicit conversion method in origine or destination classes
-		/// </summary>
-		public static MethodInfo getImplicitOp(Type origType, Type dstType){
-			foreach(MethodInfo mi in origType.GetMethods(BindingFlags.Public|BindingFlags.Static)){
-				if (mi.Name == "op_Implicit") {
-					if (mi.ReturnType == dstType && mi.GetParameters ().FirstOrDefault ().ParameterType == origType)
-						return mi;
-				}
-			}
-			foreach(MethodInfo mi in dstType.GetMethods(BindingFlags.Public|BindingFlags.Static)){
-				if (mi.Name == "op_Implicit") {
-					if (mi.ReturnType == dstType && mi.GetParameters ().FirstOrDefault ().ParameterType == origType)
-						return mi;
-				}
-			}
-			return null;
 		}
 	}
 }

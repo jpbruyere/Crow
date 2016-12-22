@@ -53,6 +53,8 @@ namespace Crow.IML
 		public bool IsDataSourceBinding { get { return TargetNA == null; }}
 		public bool IsTemplateBinding { get { return IsDataSourceBinding ? false : TargetNA.Count == 0; }}
 		public bool HasUnresolvedTargetName { get { return !string.IsNullOrEmpty(TargetName); }}
+		public MemberAddress SourceMemberAddress { get { return new MemberAddress (SourceNA, SourceMember);}}
+		public MemberAddress TargetMemberAddress { get { return new MemberAddress (TargetNA, TargetMember);}}
 
 		/// <summary>
 		/// replace the target node address with corresponding named node address, and clear the target name once resolved
