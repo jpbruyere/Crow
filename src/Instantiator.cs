@@ -679,18 +679,38 @@ namespace Crow
 			il.Emit (OpCodes.Nop);
 			ilPC.Emit (OpCodes.Nop);
 
-
 			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
 			il.DeclareLocal (typeof(object));
 			ilPC.DeclareLocal (typeof(object));//used for checking propery less bindings
 			ilPC.DeclareLocal (typeof(MemberInfo));//used for checking propery less bindings
 
-			//first check if null
 			System.Reflection.Emit.Label cancel = ilPC.DefineLabel ();
+
+			#region Unregister previous parent event handler
+			//unregister previous parent handler if not null
+			ilPC.Emit (OpCodes.Ldarg_2);//load old parent
+			ilPC.Emit (OpCodes.Ldfld, typeof (DataSourceChangeEventArgs).GetField ("OldDataSource"));
+			ilPC.Emit (OpCodes.Brfalse, cancel);//old parent is null
+
+			ilPC.Emit (OpCodes.Ldarg_2);//load old parent
+			ilPC.Emit (OpCodes.Ldfld, typeof (DataSourceChangeEventArgs).GetField ("OldDataSource"));
+			//Load cached delegate
+			ilPC.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
+			ilPC.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("templateBinding", BindingFlags.Instance | BindingFlags.NonPublic));
+
+			//add template bindings dynValueChanged delegate to new parent event
+			ilPC.Emit(OpCodes.Callvirt, typeof(IValueChange).GetEvent("ValueChanged").RemoveMethod);//call remove event
+			#endregion
+
+			ilPC.MarkLabel(cancel);
+
+			#region check if new parent is null
+			cancel = ilPC.DefineLabel ();
 			ilPC.Emit (OpCodes.Ldarg_2);//load new parent
 			ilPC.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
-			ilPC.Emit (OpCodes.Brfalse, cancel);
+			ilPC.Emit (OpCodes.Brfalse, cancel);//new parent is null
+			#endregion
 
 			int i = 0;
 			foreach (KeyValuePair<string, List<MemberAddress>> bindingCase in bindings ) {
@@ -728,10 +748,11 @@ namespace Crow
 					//first we have to load destination instance onto the stack, it is access
 					//with graphic tree functions deducted from nodes topology
 					il.Emit (OpCodes.Ldarg_0);//load source instance of ValueChanged event
-					ilPC.Emit (OpCodes.Ldarg_2);//load destination instance to set actual value of member
-					ilPC.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
 					CompilerServices.emitGetChild (il, typeof(TemplatedControl), -1);
 					CompilerServices.emitGetInstance (il, ma.Address);
+
+					ilPC.Emit (OpCodes.Ldarg_2);//load destination instance to set actual value of member
+					ilPC.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
 					CompilerServices.emitGetChild (ilPC, typeof(TemplatedControl), -1);
 					CompilerServices.emitGetInstance (ilPC, ma.Address);
 
@@ -746,10 +767,18 @@ namespace Crow
 
 					CompilerServices.emitConvert (il, ma.Property.PropertyType);
 
+//					//box ValueType
+//					ilPC.Emit (OpCodes.Ldloc_1);//push mi to check if it's a valuetype
+//					ilPC.Emit (OpCodes.Call, typeof(PropertyInfo).GetProperty("PropertyType").GetGetMethod());
+//					ilPC.Emit (OpCodes.Call, typeof(Type).GetProperty("IsValueType").GetGetMethod());
+//					System.Reflection.Emit.Label noBoxingRequired = ilPC.DefineLabel ();
+//					ilPC.Emit (OpCodes.Brfalse, noBoxingRequired);
+
 					CompilerServices.emitConvert (ilPC, ma.Property.PropertyType);
 
 					il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());
 					ilPC.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());
+
 					ilPC.MarkLabel(propLessReturn);
 				}
 				#endregion
@@ -765,7 +794,7 @@ namespace Crow
 			//store template bindings in instanciator
 			templateBinding = dm.CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>));
 
-			#region emit ParentChanged handler
+			#region emit ParentChanged method
 
 			//load new parent onto the stack for handler addition
 			ilPC.Emit (OpCodes.Ldarg_2);
@@ -958,7 +987,7 @@ namespace Crow
 				il.Emit (OpCodes.Brfalse, cancel);
 			}
 
-			//fetch initial Value
+			#region fetch initial Value
 			if (!string.IsNullOrEmpty(dataSourceMember)){
 				il.Emit (OpCodes.Ldarg_2);//load new datasource
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
@@ -978,6 +1007,7 @@ namespace Crow
 			}
 			CompilerServices.emitConvert (il, piOrigine.PropertyType);
 			il.Emit (OpCodes.Callvirt, piOrigine.GetSetMethod ());
+			#endregion
 
 			if (!string.IsNullOrEmpty(dataSourceMember)){
 				il.MarkLabel(cancelInit);
