@@ -667,15 +667,22 @@ namespace Crow
 			return null;
 		}
 		public static void emitGetInstance (ILGenerator il, NodeAddress orig, NodeAddress dest){
-			if (orig.Count < dest.Count) {
-				for (int i = orig.Count - 1; i < dest.Count - 1; i++)
-					emitGetChild (il, dest [i].CrowType, dest [i + 1].Index);
-			} else {
-				for (int j = dest.Count; j < orig.Count; j++)
-					il.Emit (OpCodes.Callvirt, typeof(ILayoutable).GetProperty ("Parent").GetGetMethod ());
+			int ptr = 0;
+			while (orig [ptr] == dest [ptr]) {
+				ptr++;
+				if (ptr == orig.Count || ptr == dest.Count)
+					break;
+			}
+			for (int i = 0; i < orig.Count - ptr; i++)
+				il.Emit (OpCodes.Callvirt, typeof(ILayoutable).GetProperty ("Parent").GetGetMethod ());
+			while (ptr < dest.Count) {
+				emitGetChild (il, dest [ptr-1].CrowType, dest [ptr].Index);
+				ptr++;
 			}
 		}
 		public static void emitGetInstance (ILGenerator il, NodeAddress dest){
+			if (dest == null)
+				return;
 			for (int i = 0; i < dest.Count - 1; i++)
 				emitGetChild (il, dest [i].CrowType, dest [i + 1].Index);
 		}

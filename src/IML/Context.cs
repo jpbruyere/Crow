@@ -100,7 +100,7 @@ namespace Crow.IML
 				Names[name] = new List<NodeAddress>();
 			Names[name].Add(CurrentNodeAddress);
 		}
-		public void ProcessBindingDefinition(){//TODO:methodinfo fetching is redundant with early parsing
+		public void ResolveNamedTargets(){//TODO:methodinfo fetching is redundant with early parsing
 			foreach (BindingDefinition bd in UnresolvedTargets) {
 				if (bd.HasUnresolvedTargetName) {
 					try {
@@ -156,8 +156,12 @@ namespace Crow.IML
 			CompilerServices.emitSetCurInterface (il);
 		}
 
-		public void emitCachedDelegateHandlerAddition(int index, EventInfo evt){
+		/// <summary>
+		/// Emits cached delegate handler addition in the context of instantiator (ctx)
+		/// </summary>
+		public void emitCachedDelegateHandlerAddition(int index, EventInfo evt, NodeAddress address = null){
 			il.Emit(OpCodes.Ldloc_0);//load ref to current graphic object
+			CompilerServices.emitGetInstance (il, address);
 			il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
 			il.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("cachedDelegates", BindingFlags.Instance | BindingFlags.NonPublic));
 			il.Emit(OpCodes.Ldc_I4, index);//load delegate index

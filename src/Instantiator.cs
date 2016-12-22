@@ -94,8 +94,6 @@ namespace Crow
 		List<DynamicMethod> dsValueChangedDynMeths = new List<DynamicMethod>();
 		List<Delegate> cachedDelegates = new List<Delegate>();
 		List<int> templateCachedDelegateIndices = new List<int>();//store indices of template delegate to be handled by root parentChanged event
-		Dictionary<string, Delegate> bindingDelegates = new Dictionary<string, Delegate>();//valuechanged del
-		Dictionary<string, Delegate> bindingInitializer = new Dictionary<string, Delegate>();//initialize with actual values of binding origine
 		Delegate templateBinding;
 
 		#region IML parsing
@@ -112,7 +110,7 @@ namespace Crow
 			foreach (int idx in templateCachedDelegateIndices)
 				ctx.emitCachedDelegateHandlerAddition(idx, typeof(GraphicObject).GetEvent("ParentChanged"));
 
-			ctx.ProcessBindingDefinition ();
+			ctx.ResolveNamedTargets ();
 
 			emitBindingDelegates (ctx);
 
@@ -155,7 +153,7 @@ namespace Crow
 
 			emitGOLoad (ctx, tmpXml);
 
-			emitCheckAndBindValueChanged (ctx);
+			//emitCheckAndBindValueChanged (ctx);
 		}
 		void emitTemplateLoad (Context ctx, string tmpXml) {
 			//if its a template, first read template elements
@@ -384,7 +382,7 @@ namespace Crow
 			BindingDefinition bindingDef = splitBindingExp (sourceNA, sourceMember, expression);
 
 			if (bindingDef.IsDataSourceBinding)//bind on data source
-				emitDataSourceBindingDelegate (ctx, sourceMember, bindingDef.TargetMember);
+				emitDataSourceBindings (ctx, sourceMember, bindingDef.TargetMember);
 			else
 				ctx.StorePropertyBinding (bindingDef);
 		}
@@ -459,42 +457,6 @@ namespace Crow
 					(EventHandler<ValueChangeEventArgs>)dsValueChangedDynMeths [dynMethIdx].CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>), dscSource);
 		}
 		#endregion
-
-		/// <summary>
-		/// Emits in the instantiator ctx the search for normal (in the current graphic tree) property binding delegates for actual element,
-		/// and add event if found.
-		/// </summary>
-		void emitCheckAndBindValueChanged(Context ctx){
-			System.Reflection.Emit.Label labContinue = ctx.il.DefineLabel ();
-			string strNA = ctx.CurrentNodeAddress.ToString ();
-			//first, test if current node is in bindingDelegate dictionnary
-			ctx.il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
-			ctx.il.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("bindingDelegates", BindingFlags.Instance | BindingFlags.NonPublic));
-			ctx.il.Emit (OpCodes.Ldstr, strNA);//load binding id for current node
-			ctx.il.Emit (OpCodes.Call, typeof(Dictionary<string,Delegate>).GetMethod ("ContainsKey"));
-
-			ctx.il.Emit (OpCodes.Brfalse, labContinue);//if not present, do nothing
-
-			ctx.il.Emit (OpCodes.Ldloc_0);//load current instance for event add
-			//fetch delegate
-			ctx.il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
-			ctx.il.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("bindingDelegates", BindingFlags.Instance | BindingFlags.NonPublic));
-			ctx.il.Emit (OpCodes.Ldstr, strNA);//load binding id for current node
-			ctx.il.Emit (OpCodes.Callvirt, typeof(Dictionary<string, Delegate>).GetMethod ("get_Item", new Type[] { typeof(string) }));
-
-			//attach to valuechanged handler
-			ctx.il.Emit(OpCodes.Callvirt, typeof(IValueChange).GetEvent("ValueChanged").AddMethod);
-
-			//call initializer
-			ctx.il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
-			ctx.il.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("bindingInitializer", BindingFlags.Instance | BindingFlags.NonPublic));
-			ctx.il.Emit (OpCodes.Ldstr, strNA);//load binding id for current node
-			ctx.il.Emit (OpCodes.Call, typeof(Dictionary<string, Delegate>).GetMethod ("get_Item", new Type[] { typeof(string) }));
-			ctx.il.Emit (OpCodes.Ldloc_0);//load current instance, passed as arg to invoke initializer
-			ctx.il.Emit(OpCodes.Callvirt, typeof(Action<object>).GetMethod("Invoke"));
-
-			ctx.il.MarkLabel (labContinue);
-		}
 
 		/// <summary>
 		/// Compile events expression in IML attributes, and store the result in the instanciator
@@ -696,13 +658,13 @@ namespace Crow
 		/// </summary>
 		void emitBindingDelegates(Context ctx){
 			foreach (KeyValuePair<NodeAddress,Dictionary<string, List<MemberAddress>>> bindings in ctx.Bindings ) {
-				if (bindings.Key.Count == 0)
-					emitTemplateBindingDelegate (ctx, bindings.Value);
+				if (bindings.Key.Count == 0)//template binding
+					emitTemplateBindings (ctx, bindings.Value);
 				else
-					emitBindingDelegate (bindings.Key, bindings.Value);
+					emitPropertyBindings (ctx,  bindings.Key, bindings.Value);
 			}
 		}
-		void emitTemplateBindingDelegate(Context ctx, Dictionary<string, List<MemberAddress>> bindings){
+		void emitTemplateBindings(Context ctx, Dictionary<string, List<MemberAddress>> bindings){
 			//value changed dyn method
 			DynamicMethod dm = new DynamicMethod ("dyn_tmpValueChanged",
 				typeof (void), CompilerServices.argsValueChange, true);
@@ -826,14 +788,8 @@ namespace Crow
 
 			ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent("ParentChanged"));
 		}
-		void emitBindingDelegate(NodeAddress origine, Dictionary<string, List<MemberAddress>> bindings){
+		void emitPropertyBindings(Context ctx, NodeAddress origine, Dictionary<string, List<MemberAddress>> bindings){
 			Type origineNodeType = origine.NodeType;
-
-			//init method, current instance passed as arg
-			DynamicMethod dmInit = new DynamicMethod ("dyn_initBinding_" + NewId.ToString(),
-				typeof (void), new Type[] {typeof(object)}, true);
-			ILGenerator ilInit = dmInit.GetILGenerator (256);
-			ilInit.Emit (OpCodes.Nop);
 
 			//value changed dyn method
 			DynamicMethod dm = new DynamicMethod ("dyn_valueChanged",
@@ -844,7 +800,6 @@ namespace Crow
 			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
 			il.DeclareLocal (typeof(object));
-			ilInit.DeclareLocal (typeof(object));
 
 			il.Emit (OpCodes.Nop);
 
@@ -879,13 +834,14 @@ namespace Crow
 					CompilerServices.emitGetInstance (il, origine, destination);
 
 					if (origineType != null){//prop less binding, no init requiered
-						//for initialisation dynmeth, load current instance
-						ilInit.Emit(OpCodes.Ldarg_0);
-						CompilerServices.emitGetInstance (ilInit, origine, destination);
+						//for initialisation dynmeth, push destination instance loc_0 is root node in ctx
+						ctx.il.Emit(OpCodes.Ldloc_0);
+						CompilerServices.emitGetInstance (ctx.il, destination);
 
-						//init dynmeth: load actual value
-						ilInit.Emit (OpCodes.Ldarg_0);
-						ilInit.Emit (OpCodes.Callvirt, origineNodeType.GetProperty (bindingCase.Key).GetGetMethod());
+						//init dynmeth: load actual value from origine
+						ctx.il.Emit (OpCodes.Ldloc_0);
+						CompilerServices.emitGetInstance (ctx.il, origine);
+						ctx.il.Emit (OpCodes.Callvirt, origineNodeType.GetProperty (bindingCase.Key).GetGetMethod());
 					}
 					//load new value
 					il.Emit (OpCodes.Ldarg_1);
@@ -895,14 +851,13 @@ namespace Crow
 						CompilerServices.emitConvert (il, ma.Property.PropertyType);
 					else {
 						if (origineType.IsValueType)
-							ilInit.Emit(OpCodes.Box, origineType);
-						CompilerServices.emitConvert (ilInit, origineType, ma.Property.PropertyType);
+							ctx.il.Emit(OpCodes.Box, origineType);
+						CompilerServices.emitConvert (ctx.il, origineType, ma.Property.PropertyType);
 						CompilerServices.emitConvert (il, origineType, ma.Property.PropertyType);
 
-						ilInit.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());//set init value
+						ctx.il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());//set init value
 					}
 					il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());//set value on value changes
-
 				}
 				#endregion
 				il.Emit (OpCodes.Br, endMethod);
@@ -911,17 +866,18 @@ namespace Crow
 				i++;
 			}
 
-			ilInit.Emit (OpCodes.Ret);
 			il.MarkLabel (endMethod);
 			il.Emit (OpCodes.Ret);
 
-			bindingDelegates [origine.ToString()] = dm.CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>));
-			bindingInitializer [origine.ToString()] = dmInit.CreateDelegate (typeof(Action<object>));
+			//store and emit Add in ctx
+			int dmIdx = cachedDelegates.Count;
+			cachedDelegates.Add (dm.CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>)));
+			ctx.emitCachedDelegateHandlerAddition (dmIdx, typeof(IValueChange).GetEvent ("ValueChanged"), origine);
 		}
 		/// <summary>
 		/// create the valuechanged handler, the datasourcechanged handler and emit event handling
 		/// </summary>
-		void emitDataSourceBindingDelegate(Context ctx, string sourceMember, string dataSourceMember){
+		void emitDataSourceBindings(Context ctx, string sourceMember, string dataSourceMember){
 			DynamicMethod dm = null;
 			ILGenerator il = null;
 			int dmVC = 0;
