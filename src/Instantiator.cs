@@ -1124,7 +1124,7 @@ namespace Crow
 			if (dstType.IsValueType)
 				il.Emit (OpCodes.Unbox_Any, dstType);
 			else
-				il.Emit (OpCodes.Castclass, dstType);
+				il.Emit (OpCodes.Isinst, dstType);
 			il.Emit (OpCodes.Br, endConvert);
 
 			il.MarkLabel (convert);
