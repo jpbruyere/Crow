@@ -93,6 +93,7 @@ namespace Crow
 
 		List<DynamicMethod> dsValueChangedDynMeths = new List<DynamicMethod>();
 		List<Delegate> cachedDelegates = new List<Delegate>();
+		List<int> templateCachedDelegateIndices = new List<int>();//store indices of template delegate to be handled by root parentChanged event
 		Dictionary<string, Delegate> bindingDelegates = new Dictionary<string, Delegate>();//valuechanged del
 		Dictionary<string, Delegate> bindingInitializer = new Dictionary<string, Delegate>();//initialize with actual values of binding origine
 		Delegate templateBinding;
@@ -108,6 +109,10 @@ namespace Crow
 			emitLoader (reader, ctx);
 			ctx.nodesStack.Pop ();
 
+			foreach (int idx in templateCachedDelegateIndices)
+				ctx.emitCachedDelegateHandlerAddition(idx, typeof(GraphicObject).GetEvent("ParentChanged"));
+
+			ctx.ResolveNames ();
 
 			emitBindingDelegates (ctx);
 
@@ -455,6 +460,10 @@ namespace Crow
 		}
 		#endregion
 
+		/// <summary>
+		/// Emits in the instantiator ctx the search for normal (in the current graphic tree) property binding delegates for actual element,
+		/// and add event if found.
+		/// </summary>
 		void emitCheckAndBindValueChanged(Context ctx){
 			System.Reflection.Emit.Label labContinue = ctx.il.DefineLabel ();
 			string strNA = ctx.CurrentNodeAddress.ToString ();
@@ -497,7 +506,6 @@ namespace Crow
 			Debug.WriteLine ("\tCompile Event Source ");
 			#endif
 
-
 			#region Retrieve EventHandler parameter type
 			MethodInfo evtInvoke = sourceEvent.EventHandlerType.GetMethod ("Invoke");
 			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
@@ -509,10 +517,8 @@ namespace Crow
 				                   typeof(void),
 				                   args, true);
 
-
 			#region IL generation
 			NodeAddress currentNode = ctx.CurrentNodeAddress;
-			string strNA = currentNode.ToString();
 
 			ILGenerator il = dm.GetILGenerator (256);
 			il.Emit (OpCodes.Nop);
@@ -623,6 +629,9 @@ namespace Crow
 			NodeAddress currentNode = ctx.CurrentNodeAddress;
 			BindingDefinition bindingDef = splitBindingExp (currentNode, sourceEvent.Name, expression);
 
+			if (bindingDef.HasUnresolvedTargetName)
+				return;
+
 			string bindOnEventName = null;
 
 			if (bindingDef.TargetNA == null)//datasource handler
@@ -634,9 +643,10 @@ namespace Crow
 				//we need to bind datasource method to source event
 				DynamicMethod dm = new DynamicMethod ("dyn_dschangedForHandler",
 					typeof (void),
-					CompilerServices.argsDSChange, true);
+					CompilerServices.argsBoundDSChange, true);
 
 				ILGenerator il = dm.GetILGenerator (256);
+				System.Reflection.Emit.Label cancel = il.DefineLabel ();
 
 				il.DeclareLocal (typeof(MethodInfo));//used to cancel binding if method doesn't exist
 
@@ -645,14 +655,19 @@ namespace Crow
 				//fetch method in datasource and test if it exist
 				il.Emit (OpCodes.Ldarg_2);//load new datasource
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+				il.Emit (OpCodes.Brfalse, cancel);//cancel if new datasource is null
+				il.Emit (OpCodes.Ldarg_2);//load new datasource
+				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
 				il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);//load handler method name
 				il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getMethodInfoWithReflexion", BindingFlags.Static | BindingFlags.Public));
 				il.Emit (OpCodes.Stloc_0);//save MethodInfo
 				il.Emit (OpCodes.Ldloc_0);//push mi for test if null
-				System.Reflection.Emit.Label methodNotFound = il.DefineLabel ();
-				il.Emit (OpCodes.Brfalse, methodNotFound);
+
+				il.Emit (OpCodes.Brfalse, cancel);
 
 				il.Emit (OpCodes.Ldarg_1);//load datasource change source where the event handler is as 1st arg of handler.add
+				if (bindingDef.IsTemplateBinding)//fetch source instance with address
+					emitGetInstance (il, bindingDef.SourceNA);
 
 				//loat handlerType of sourceEvent to create delegate (1st arg)
 				il.Emit(OpCodes.Ldtoken, sourceEvent.EventHandlerType);
@@ -665,14 +680,21 @@ namespace Crow
 					new Type[] {typeof(Type), typeof(object), typeof(MethodInfo)}));//create bound delegate
 				il.Emit(OpCodes.Callvirt, sourceEvent.AddMethod);//call add event
 
-				il.MarkLabel(methodNotFound);
+				System.Reflection.Emit.Label finish = il.DefineLabel ();
+				il.Emit (OpCodes.Br, finish);
+				il.MarkLabel (cancel);
+				il.EmitWriteLine (sourcePath + ": Handler method not found: " + bindingDef.TargetMember);
+				il.MarkLabel (finish);
 				il.Emit (OpCodes.Ret);
 
 				//store dschange delegate in instatiator instance for access while instancing graphic object
 				int delDSIndex = cachedDelegates.Count;
 				cachedDelegates.Add(dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
 
-				ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent(bindOnEventName));
+				if (bindingDef.TargetNA == null)
+					ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent("DataSourceChanged"));
+				else //template handler binding
+					templateCachedDelegateIndices.Add(delDSIndex);
 			}
 		}
 		/// <summary>
@@ -697,7 +719,7 @@ namespace Crow
 			//create parentchanged dyn meth in parallel to have only one loop over bindings
 			DynamicMethod dmPC = new DynamicMethod ("dyn_InitAndParentChanged",
 				typeof (void),
-				CompilerServices.argsDSChange, true);
+				CompilerServices.argsBoundDSChange, true);
 			ILGenerator ilPC = dmPC.GetILGenerator (256);
 
 			il.Emit (OpCodes.Nop);
@@ -970,7 +992,7 @@ namespace Crow
 			//dm is bound to the instanciator instance to have access to cached dyn meth and delegates
 			dm = new DynamicMethod ("dyn_dschanged",
 				typeof (void),
-				CompilerServices.argsDSChange, true);
+				CompilerServices.argsBoundDSChange, true);
 
 			il = dm.GetILGenerator (256);
 
@@ -1073,9 +1095,9 @@ namespace Crow
 			if (destType == typeof(string))
 				il.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
 			else if (origType.IsValueType) {
-				if (destType != origType)
+				if (destType != origType) {
 					il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (destType));
-				else
+				}else
 					il.Emit (OpCodes.Unbox_Any, destType);//TODO:double check this
 			} else {
 				if (origType.IsAssignableFrom(destType))

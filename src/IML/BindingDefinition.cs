@@ -51,6 +51,7 @@ namespace Crow.IML
 		#endregion
 
 		public bool IsDataSourceBinding { get { return TargetNA == null; }}
+		public bool IsTemplateBinding { get { return IsDataSourceBinding ? false : TargetNA.Count == 0; }}
 		public bool HasUnresolvedTargetName { get { return !string.IsNullOrEmpty(TargetName); }}
 
 		/// <summary>

@@ -48,7 +48,7 @@ namespace Crow
 
 		internal static EventInfo eiDSChange = typeof (GraphicObject).GetEvent ("DataSourceChanged");
 		internal static MethodInfo miInvokeDSChange = eiDSChange.EventHandlerType.GetMethod ("Invoke");
-		internal static Type [] argsDSChange = {typeof (object), typeof (object), miInvokeDSChange.GetParameters () [1].ParameterType };
+		internal static Type [] argsBoundDSChange = {typeof (object), typeof (object), miInvokeDSChange.GetParameters () [1].ParameterType };
 		internal static FieldInfo fiDSCNewDS = typeof (DataSourceChangeEventArgs).GetField ("NewDataSource");
 
 		internal static MethodInfo miCreateBoundDelegate = typeof(DynamicMethod).

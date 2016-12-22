@@ -99,8 +99,10 @@ namespace Crow.IML
 		}
 		public void ResolveNames (){
 			foreach (BindingDefinition bd in UnresolvedTargets) {
-				if (!Names.ContainsKey (bd.TargetName))
-					throw new Exception ("Target Name '" + bd.TargetName + "' not found");
+				if (!Names.ContainsKey (bd.TargetName)) {
+					System.Diagnostics.Debug.WriteLine ("Target Name '" + bd.TargetName + "' not found");
+					continue;
+				}
 				NodeAddress resolvedNA = null;
 				foreach (NodeAddress na in Names[bd.TargetName]) {
 					bool naMatch = true;
@@ -116,10 +118,11 @@ namespace Crow.IML
 					}
 				}
 				if (resolvedNA == null)
-					throw new Exception ("Target Name '" + bd.TargetName + "' not found");
-
-				bd.ResolveTargetName (resolvedNA);
-				StorePropertyBinding (bd);
+					System.Diagnostics.Debug.WriteLine ("Target Name '" + bd.TargetName + "' not found");
+				else {
+					bd.ResolveTargetName (resolvedNA);
+					StorePropertyBinding (bd);
+				}
 			}
 		}
 
