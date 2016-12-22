@@ -406,7 +406,7 @@ namespace Crow
 				}
 			} else if (bindingExp [0] == "..") { //search starting at current node
 				int levelUp = bindingExp.Length - 1;
-				if (levelUp > ptr)
+				if (levelUp > ptr + 1)
 					throw new Exception ("Binding error: try to bind outside IML source");
 				ptr -= levelUp;
 			}
