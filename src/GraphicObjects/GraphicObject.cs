@@ -538,11 +538,8 @@ namespace Crow
 				if (dataSource == value)
 					return;
 
-				DataSourceChangeEventArgs dse = new DataSourceChangeEventArgs (dataSource, null);
-
+				DataSourceChangeEventArgs dse = new DataSourceChangeEventArgs (dataSource, value);
 				dataSource = value;
-
-				dse.NewDataSource = DataSource;
 
 				OnDataSourceChanged (this, dse);
 
@@ -1236,87 +1233,6 @@ namespace Crow
 		protected virtual void onParentChanged(object sender, DataSourceChangeEventArgs e) {
 			ParentChanged.Raise (sender, e);
 		}
-
-		#region Binding
-//		public void BindMember(string _member, string _expression){
-//			Bindings.Add(new Binding (this, _member, _expression));
-//		}
-//		public virtual void ResolveBindings()
-//		{
-//			if (Bindings.Count == 0)
-//				return;
-//			#if DEBUG_BINDING
-//			Debug.WriteLine ("Resolve Bindings => " + this.ToString ());
-//			#endif
-//
-//			CompilerServices.ResolveBindings (Bindings);
-//		}
-
-		/// <summary>
-		/// Remove dynamic delegates by ids from dataSource
-		///  and delete ref of this in Shared interface refs
-		/// </summary>
-//		public virtual void ClearBinding(){
-//			//dont clear binding if dataSource is not null,
-//			foreach (Binding b in Bindings) {
-//				try {
-//					if (!b.Resolved)
-//						continue;
-//					//cancel compiled events
-//					if (b.Target == null){
-//						continue;
-//						#if DEBUG_BINDING
-//						Debug.WriteLine("Clear binding canceled for => " + b.ToString());
-//						#endif
-//					}
-//					if (b.Target.Instance != DataSource){
-//						#if DEBUG_BINDING
-//						Debug.WriteLine("Clear binding canceled for => " + b.ToString());
-//						#endif
-//						continue;
-//					}
-//					#if DEBUG_BINDING
-//					Debug.WriteLine("ClearBinding => " + b.ToString());
-//					#endif
-//					if (string.IsNullOrEmpty (b.DynMethodId)) {
-//						b.Resolved = false;
-//						if (b.Source.Member.MemberType == MemberTypes.Event)
-//							removeEventHandler (b);
-//						//TODO:check if full reset is necessary
-//						continue;
-//					}
-//					MemberReference mr = null;
-//					if (b.Target == null)
-//						mr = b.Source;
-//					else
-//						mr = b.Target;
-//					Type dataSourceType = mr.Instance.GetType();
-//					EventInfo evtInfo = dataSourceType.GetEvent ("ValueChanged");
-//					FieldInfo evtFi = CompilerServices.GetEventHandlerField (dataSourceType, "ValueChanged");
-//					MulticastDelegate multicastDelegate = evtFi.GetValue (mr.Instance) as MulticastDelegate;
-//					if (multicastDelegate != null) {
-//						foreach (Delegate d in multicastDelegate.GetInvocationList()) {
-//							if (d.Method.Name == b.DynMethodId)
-//								evtInfo.RemoveEventHandler (mr.Instance, d);
-//						}
-//					}
-//					b.Reset ();
-//				} catch (Exception ex) {
-//					Debug.WriteLine("\t Error: " + ex.ToString());
-//				}
-//			}
-//		}
-//		void removeEventHandler(Binding b){
-//			FieldInfo fiEvt = CompilerServices.GetEventHandlerField (b.Source.Instance.GetType(), b.Source.Member.Name);
-//			MulticastDelegate multiDel = fiEvt.GetValue (b.Source.Instance) as MulticastDelegate;
-//			if (multiDel != null) {
-//				foreach (Delegate d in multiDel.GetInvocationList()) {
-//					if (d.Method.Name == b.Target.Member.Name)
-//						b.Source.Event.RemoveEventHandler (b.Source.Instance, d);
-//				}
-//			}
-//		}
-		#endregion
 
 		#region IXmlSerializable
 		public virtual System.Xml.Schema.XmlSchema GetSchema ()

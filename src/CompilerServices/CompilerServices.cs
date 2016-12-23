@@ -802,6 +802,23 @@ namespace Crow
 			}
 			return null;
 		}
+		/// <summary>
+		/// Removes delegate from event handler by name
+		/// </summary>
+		public static void RemoveEventHandler(object instance, string eventName, string delegateName){
+			Type t = instance.GetType ();
+			FieldInfo fiEvt = CompilerServices.GetEventHandlerField (t, eventName);
+			EventInfo eiEvt = t.GetEvent (eventName);
+			MulticastDelegate multiDel = fiEvt.GetValue (instance) as MulticastDelegate;
+			if (multiDel != null) {
+				foreach (Delegate d in multiDel.GetInvocationList()) {
+					if (d.Method.Name == delegateName) {
+						eiEvt.RemoveEventHandler (instance, d);
+						Debug.WriteLine ("event handler removed: " + delegateName + " in " + t.FullName);
+					}
+				}
+			}
+		}
 	}
 }
 

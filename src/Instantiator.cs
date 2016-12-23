@@ -352,6 +352,17 @@ namespace Crow
 		}
 		#endregion
 
+		void readPropertyBinding (Context ctx, string sourceMember, string expression)
+		{
+			NodeAddress sourceNA = ctx.CurrentNodeAddress;
+			BindingDefinition bindingDef = splitBindingExp (sourceNA, sourceMember, expression);
+
+			if (bindingDef.IsDataSourceBinding)//bind on data source
+				emitDataSourceBindings (ctx, sourceMember, bindingDef.TargetMember);
+			else
+				ctx.StorePropertyBinding (bindingDef);
+		}
+
 		string[] splitOnSemiColumnOutsideAccolades (string expression){
 			List<String> exps = new List<string>();
 			int accCount = 0;
@@ -375,16 +386,6 @@ namespace Crow
 			if (exps.Count == 0)
 				exps.Add(expression);
 			return exps.ToArray ();
-		}
-		void readPropertyBinding (Context ctx, string sourceMember, string expression)
-		{
-			NodeAddress sourceNA = ctx.CurrentNodeAddress;
-			BindingDefinition bindingDef = splitBindingExp (sourceNA, sourceMember, expression);
-
-			if (bindingDef.IsDataSourceBinding)//bind on data source
-				emitDataSourceBindings (ctx, sourceMember, bindingDef.TargetMember);
-			else
-				ctx.StorePropertyBinding (bindingDef);
 		}
 		/// <summary>
 		/// Gets the node adress from binding expression splitted with '/' starting at a given node
@@ -458,6 +459,7 @@ namespace Crow
 		}
 		#endregion
 
+		#region Event Bindings
 		/// <summary>
 		/// Compile events expression in IML attributes, and store the result in the instanciator
 		/// Those handlers will be bound when instatiing
@@ -587,13 +589,14 @@ namespace Crow
 			cachedDelegates.Add (dm.CreateDelegate (sourceEvent.EventHandlerType));
 			ctx.emitCachedDelegateHandlerAddition(dmIdx, sourceEvent);
 		}
+		/// <summary> Emits handler method bindings </summary>
 		void emitHandlerBinding (Context ctx, EventInfo sourceEvent, string expression){
 			NodeAddress currentNode = ctx.CurrentNodeAddress;
 			BindingDefinition bindingDef = splitBindingExp (currentNode, sourceEvent.Name, expression);
 
 			if (bindingDef.IsTemplateBinding | bindingDef.IsDataSourceBinding) {
 				//we need to bind datasource method to source event
-				DynamicMethod dm = new DynamicMethod ("dyn_dschangedForHandler",
+				DynamicMethod dm = new DynamicMethod ("dyn_dschangedForHandler" + NewId,
 					                   typeof(void),
 					                   CompilerServices.argsBoundDSChange, true);
 
@@ -603,6 +606,8 @@ namespace Crow
 				il.DeclareLocal (typeof(MethodInfo));//used to cancel binding if method doesn't exist
 
 				il.Emit (OpCodes.Nop);
+
+				emitRemoveOldDataSourceHandler(il, sourceEvent.Name, bindingDef.TargetMember);
 
 				//fetch method in datasource and test if it exist
 				il.Emit (OpCodes.Ldarg_2);//load new datasource
@@ -617,7 +622,7 @@ namespace Crow
 
 				il.Emit (OpCodes.Brfalse, cancel);
 
-				il.Emit (OpCodes.Ldarg_1);//load datasource change source where the event handler is as 1st arg of handler.add
+				il.Emit (OpCodes.Ldarg_1);//load datasource change source where the event is as 1st arg of handler.add
 				if (bindingDef.IsTemplateBinding)//fetch source instance with address
 					CompilerServices.emitGetInstance (il, bindingDef.SourceNA);
 
@@ -645,12 +650,15 @@ namespace Crow
 
 				if (bindingDef.IsDataSourceBinding)
 					ctx.emitCachedDelegateHandlerAddition (delDSIndex, typeof(GraphicObject).GetEvent ("DataSourceChanged"));
-				else //template handler binding
+				else //template handler binding, will be added to root parentChanged
 					templateCachedDelegateIndices.Add (delDSIndex);
 			} else {//normal in tree handler binding, store until tree is complete (end of parse)
 
 			}
 		}
+		#endregion
+
+		#region Property Bindings
 		/// <summary>
 		/// Create and store in the instanciator the ValueChanged delegates
 		/// those delegates uses grtree functions to set destination value so they don't
@@ -707,9 +715,9 @@ namespace Crow
 
 			#region check if new parent is null
 			cancel = ilPC.DefineLabel ();
-			ilPC.Emit (OpCodes.Ldarg_2);//load new parent
+			ilPC.Emit (OpCodes.Ldarg_2);//load datasource change arg
 			ilPC.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
-			ilPC.Emit (OpCodes.Brfalse, cancel);//new parent is null
+			ilPC.Emit (OpCodes.Brfalse, cancel);//new ds is null
 			#endregion
 
 			int i = 0;
@@ -913,9 +921,10 @@ namespace Crow
 			PropertyInfo piOrigine = ctx.CurrentNodeType.GetProperty(sourceMember);
 			//if no dataSource member name is provided, valuechange is not handle and datasource change
 			//will be used as origine value
+			string delName = "dyn_DSvalueChanged" + NewId;
 			if (!string.IsNullOrEmpty(dataSourceMember)){
 				#region create valuechanged method
-				dm = new DynamicMethod ("dyn_DSvalueChanged",
+				dm = new DynamicMethod (delName,
 					typeof (void),
 					CompilerServices.argsBoundValueChange, true);
 
@@ -957,7 +966,6 @@ namespace Crow
 				//vc dyn meth is stored in a cached list, it will be bound to datasource only
 				//when datasource of source graphic object changed
 				dmVC = dsValueChangedDynMeths.Count;
-				//Delegate tmp = dm.CreateDelegate(typeof(EventHandler<ValueChangeEventArgs>), this);
 				dsValueChangedDynMeths.Add (dm);
 				#endregion
 			}
@@ -980,11 +988,12 @@ namespace Crow
 
 			il.Emit (OpCodes.Nop);
 
+			emitRemoveOldDataSourceHandler(il, "ValueChanged", delName);
+
 			if (!string.IsNullOrEmpty(dataSourceMember)){
-				//first test if datasource is null
-				il.Emit (OpCodes.Ldarg_2);//load new datasource
+				il.Emit (OpCodes.Ldarg_2);//load datasource change arg
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
-				il.Emit (OpCodes.Brfalse, cancel);
+				il.Emit (OpCodes.Brfalse, cancel);//new ds is null
 			}
 
 			#region fetch initial Value
@@ -1030,6 +1039,25 @@ namespace Crow
 
 			ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent("DataSourceChanged"));
 		}
+		#endregion
+
+		/// <summary> Emits remove old data source event handler./summary>
+		void emitRemoveOldDataSourceHandler(ILGenerator il, string eventName, string delegateName){
+			System.Reflection.Emit.Label cancel = il.DefineLabel ();
+
+			il.Emit (OpCodes.Ldarg_2);//load old parent
+			il.Emit (OpCodes.Ldfld, typeof (DataSourceChangeEventArgs).GetField ("OldDataSource"));
+			il.Emit (OpCodes.Brfalse, cancel);//old parent is null
+
+			//remove handler
+			il.Emit (OpCodes.Ldarg_2);//1st arg load old datasource
+			il.Emit (OpCodes.Ldfld, typeof (DataSourceChangeEventArgs).GetField ("OldDataSource"));
+			il.Emit (OpCodes.Ldstr, eventName);//2nd arg event name
+			il.Emit (OpCodes.Ldstr, delegateName);//3d arg: delegate name
+			il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("RemoveEventHandler", BindingFlags.Static | BindingFlags.Public));
+			il.MarkLabel(cancel);
+		}
+
 	}
 }
 
