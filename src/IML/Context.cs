@@ -92,8 +92,8 @@ namespace Crow.IML
 				return;
 			}
 			StorePropertyBinding (bindDef.TargetNA, bindDef.TargetMember, bindDef.SourceNA, bindDef.SourceMember);
-//			if (bindDef.TwoWay)
-//				StorePropertyBinding (bindDef.SourceNA, bindDef.SourceMember, bindDef.TargetNA, bindDef.TargetMember);
+			if (bindDef.TwoWay)
+				StorePropertyBinding (bindDef.SourceNA, bindDef.SourceMember, bindDef.TargetNA, bindDef.TargetMember);
 		}
 		public void StoreCurrentName(string name){
 			if (!Names.ContainsKey(name))
