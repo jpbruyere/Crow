@@ -135,12 +135,12 @@ namespace Crow
 		}
 		[XmlIgnore]public ILayoutable LogicalParent {
 			get { return logicalParent == null ? Parent : logicalParent; }
-			set { 
+			set {
 				if (logicalParent == value)
 					return;
 				if (logicalParent != null)
 					(logicalParent as GraphicObject).DataSourceChanged -= onLogicalParentDataSourceChanged;
-				logicalParent = value; 
+				logicalParent = value;
 				if (logicalParent != null)
 					(logicalParent as GraphicObject).DataSourceChanged += onLogicalParentDataSourceChanged;
 			}
@@ -563,13 +563,13 @@ namespace Crow
 		}
 		internal bool localDataSourceIsNull { get { return dataSource == null; } }
 
-		public virtual void OnDataSourceChanged(object sender, DataSourceChangeEventArgs e){			
+		public virtual void OnDataSourceChanged(object sender, DataSourceChangeEventArgs e){
 			DataSourceChanged.Raise (this, e);
 			#if DEBUG_BINDING
 			Debug.WriteLine("New DataSource for => {0} \n\t{1}=>{2}", this.ToString(),e.OldDataSource,e.NewDataSource);
 			#endif
 		}
-			
+
 		[XmlAttributeAttribute]
 		public virtual string Style {
 			get { return style; }
@@ -664,7 +664,26 @@ namespace Crow
 				string expression;
 				if (!getDefaultEvent(ei, styling, out expression))
 					continue;
-				//CompilerServices.emitBindingCreation (il, ei.Name, expression);
+				//TODO:dynEventHandler could be cached somewhere, maybe a style instanciato class holding the styling delegate and bound to it.
+				foreach (string exp in CompilerServices.splitOnSemiColumnOutsideAccolades(expression)) {
+					string trimed = exp.Trim();
+					if (trimed.StartsWith ("{", StringComparison.OrdinalIgnoreCase)){
+						il.Emit (OpCodes.Ldloc_0);//load this as 1st arg of event Add
+
+						//push eventInfo as 1st arg of compile
+						il.Emit (OpCodes.Ldloc_0);
+						il.Emit (OpCodes.Call, typeof(object).GetMethod("GetType"));
+						il.Emit (OpCodes.Ldstr, ei.Name);//push event name
+						il.Emit (OpCodes.Call, typeof(Type).GetMethod("GetEvent", new Type[] {typeof(string)}));
+						//push expression as 2nd arg of compile
+						il.Emit (OpCodes.Ldstr, trimed.Substring (1, trimed.Length - 2));
+						il.Emit (OpCodes.Ldnull);
+						il.Emit (OpCodes.Callvirt, typeof(CompilerServices).GetMethod ("compileDynEventHandler", BindingFlags.Static | BindingFlags.Public));
+						il.Emit (OpCodes.Castclass, ei.EventHandlerType);
+						il.Emit (OpCodes.Callvirt, ei.AddMethod);
+					}else
+						Debug.WriteLine("error in styling, event not handled : " + trimed);
+				}
 			}
 
 			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {

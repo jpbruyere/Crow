@@ -819,6 +819,174 @@ namespace Crow
 				}
 			}
 		}
+		public static Delegate compileDynEventHandler(EventInfo sourceEvent, string expression, NodeAddress currentNode = null){
+			Type lopType = null;
+
+			if (currentNode == null)
+				lopType = sourceEvent.DeclaringType;
+			else
+				lopType = currentNode.NodeType;
+
+			#region Retrieve EventHandler parameter type
+			MethodInfo evtInvoke = sourceEvent.EventHandlerType.GetMethod ("Invoke");
+			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
+			Type handlerArgsType = evtParams [1].ParameterType;
+			#endregion
+
+			Type [] args = { typeof (object), handlerArgsType };
+			DynamicMethod dm = new DynamicMethod ("dyn_eventHandler",
+				typeof(void),
+				args, true);
+			ILGenerator il = dm.GetILGenerator (256);
+			il.Emit (OpCodes.Nop);
+
+			string [] srcLines = expression.Trim ().Split (new char [] { ';' });
+
+			foreach (string srcLine in srcLines) {
+				string statement = srcLine.Trim ();
+
+				string [] operandes = statement.Split (new char [] { '=' });
+				if (operandes.Length < 2) //not an affectation
+				{
+					//maybe we could handle here handler function name
+					continue;
+				}
+
+				string rop = operandes [operandes.Length - 1].Trim ();
+
+				#region LEFT OPERANDES
+				string [] lopParts = operandes [0].Trim ().Split ('/');
+				MemberInfo lopMI = null;
+
+				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack
+
+				if (lopParts.Length > 1) {
+					NodeAddress lopNA = getNodeAdressFromBindingExp (currentNode, lopParts);
+					CompilerServices.emitGetInstance (il, currentNode, lopNA);
+					lopType = lopNA.NodeType;
+				}
+
+				string [] bindTrg = lopParts.Last().Split ('.');
+
+				if (bindTrg.Length == 1)
+					lopMI = lopType.GetMember (bindTrg [0]).FirstOrDefault();
+				else if (bindTrg.Length == 2) {
+					//named target
+					//TODO:
+					il.Emit(OpCodes.Ldstr, bindTrg[0]);
+					il.Emit(OpCodes.Callvirt, typeof(GraphicObject).GetMethod("FindByName"));
+					lopMI = lopType.GetMember (bindTrg [1]).FirstOrDefault();
+				} else
+					throw new Exception ("Syntax error in binding, expected 'go dot member'");
+
+
+				if (lopMI == null)
+					throw new Exception (string.Format ("IML BINDING: Member not found"));
+
+				OpCode lopSetOpCode;
+				dynamic lopSetMI;
+				Type lopT = null;
+				switch (lopMI.MemberType) {
+				case MemberTypes.Property:
+					lopSetOpCode = OpCodes.Callvirt;
+					PropertyInfo lopPi = lopMI as PropertyInfo;
+					lopT = lopPi.PropertyType;
+					lopSetMI = lopPi.GetSetMethod ();
+					break;
+				case MemberTypes.Field:
+					lopSetOpCode = OpCodes.Stfld;
+					FieldInfo dstFi = lopMI as FieldInfo;
+					lopT = dstFi.FieldType;
+					lopSetMI = dstFi;
+					break;
+				default:
+					throw new Exception (string.Format ("GOML:member type not handle"));
+				}
+				#endregion
+
+				#region RIGHT OPERANDES
+				if (rop.StartsWith ("\'")) {
+					if (!rop.EndsWith ("\'"))
+						throw new Exception (string.Format
+							("GOML:malformed string constant in handler: {0}", rop));
+					string strcst = rop.Substring (1, rop.Length - 2);
+
+					il.Emit (OpCodes.Ldstr, strcst);
+
+				} else {
+					if (lopT.IsEnum)
+						throw new NotImplementedException ();
+
+					MethodInfo lopParseMi = lopT.GetMethod ("Parse");
+					if (lopParseMi == null)
+						throw new Exception (string.Format
+							("GOML:no parse method found in: {0}", lopT.Name));
+					il.Emit (OpCodes.Ldstr, rop);
+					il.Emit (OpCodes.Callvirt, lopParseMi);
+					il.Emit (OpCodes.Unbox_Any, lopT);
+				}
+
+				#endregion
+
+				//emit left operand assignment
+				il.Emit (lopSetOpCode, lopSetMI);
+			}
+
+			il.Emit (OpCodes.Ret);
+
+			return dm.CreateDelegate (sourceEvent.EventHandlerType);
+		}
+		public static string[] splitOnSemiColumnOutsideAccolades (string expression){
+			List<String> exps = new List<string>();
+			int accCount = 0;
+			int expPtr = 0;
+			for (int c = 0; c < expression.Length; c++) {
+				switch (expression[c]){
+				case '{':
+					accCount++;
+					break;
+				case '}':
+					accCount--;
+					break;
+				case ';':
+					if (accCount > 0)
+						break;
+					exps.Add(expression.Substring(expPtr, c - expPtr - 1));
+					expPtr = c + 1;
+					break;
+				}
+			}
+			if (exps.Count == 0)
+				exps.Add(expression);
+			return exps.ToArray ();
+		}
+		/// <summary>
+		/// Gets the node adress from binding expression splitted with '/' starting at a given node
+		/// </summary>
+		public static NodeAddress getNodeAdressFromBindingExp(NodeAddress sourceAddr, string[] bindingExp){
+			int ptr = sourceAddr.Count - 1;
+
+			//if exp start with '/' => Graphic tree parsing start at source
+			if (string.IsNullOrEmpty (bindingExp [0])) {
+				//TODO:
+			} else if (bindingExp [0] == ".") { //search template root
+				ptr--;
+				while (ptr >= 0) {
+					if (typeof(TemplatedControl).IsAssignableFrom (sourceAddr [ptr].CrowType))
+						break;
+					ptr--;
+				}
+			} else if (bindingExp [0] == "..") { //search starting at current node
+				int levelUp = bindingExp.Length - 1;
+				if (levelUp > ptr + 1)
+					throw new Exception ("Binding error: try to bind outside IML source");
+				ptr -= levelUp;
+			}
+			Node[] targetNode = new Node[ptr+1];
+			Array.Copy (sourceAddr.ToArray (), targetNode, ptr + 1);
+			return new NodeAddress (targetNode);
+		}
+
 	}
 }
 
