@@ -827,6 +827,21 @@ namespace Crow
 			emitRemoveOldDataSourceHandler(il, "ValueChanged", delName);
 
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
+				if (bindingDef.TwoWay){
+					System.Reflection.Emit.Label cancelRemove = il.DefineLabel ();
+					//remove handler if not null
+					il.Emit (OpCodes.Ldarg_2);//load old parent
+					il.Emit (OpCodes.Ldfld, typeof (DataSourceChangeEventArgs).GetField ("OldDataSource"));
+					il.Emit (OpCodes.Brfalse, cancelRemove);//old parent is null
+
+					//remove handler
+					il.Emit (OpCodes.Ldarg_2);//1st arg load old datasource
+					il.Emit (OpCodes.Ldfld, typeof (DataSourceChangeEventArgs).GetField ("OldDataSource"));
+					il.Emit (OpCodes.Ldstr, "ValueChanged");//2nd arg event name
+					il.Emit (OpCodes.Ldarg_1);//3d arg: instance bound to delegate (the source)
+					il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("RemoveEventHandlerByTarget", BindingFlags.Static | BindingFlags.Public));
+					il.MarkLabel(cancelRemove);
+				}
 				il.Emit (OpCodes.Ldarg_2);//load datasource change arg
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
 				il.Emit (OpCodes.Brfalse, cancel);//new ds is null
@@ -949,7 +964,7 @@ namespace Crow
 			il.Emit (OpCodes.Ldfld, typeof (DataSourceChangeEventArgs).GetField ("OldDataSource"));
 			il.Emit (OpCodes.Ldstr, eventName);//2nd arg event name
 			il.Emit (OpCodes.Ldstr, delegateName);//3d arg: delegate name
-			il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("RemoveEventHandler", BindingFlags.Static | BindingFlags.Public));
+			il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("RemoveEventHandlerByName", BindingFlags.Static | BindingFlags.Public));
 			il.MarkLabel(cancel);
 		}
 

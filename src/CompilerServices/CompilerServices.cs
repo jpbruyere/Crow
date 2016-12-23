@@ -167,7 +167,7 @@ namespace Crow
 					il.Emit (OpCodes.Callvirt, miParse);
 
 					if (miParse.ReturnType != pi.PropertyType)
-						il.Emit (OpCodes.Unbox_Any, pi.PropertyType);					
+						il.Emit (OpCodes.Unbox_Any, pi.PropertyType);
 				} else {
 					MethodInfo miParse = pi.PropertyType.GetMethod
 						("Parse", BindingFlags.Static | BindingFlags.Public,
@@ -182,7 +182,7 @@ namespace Crow
 						il.Emit (OpCodes.Unbox_Any, pi.PropertyType);
 				}
 			}
-			il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());			
+			il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
 		}
 
 		public static void ResolveBindings (List<Binding> Bindings)
@@ -470,7 +470,7 @@ namespace Crow
 				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack
 
 				string [] lopParts = lop.Split (new char [] { '.' });
-				if (lopParts.Length > 1) {//should search also for member of es.Source					
+				if (lopParts.Length > 1) {//should search also for member of es.Source
 					for (int j = 0; j < lopParts.Length - 1; j++) {
 						il.Emit (OpCodes.Ldstr, lopParts [j]);
 						il.Emit (OpCodes.Callvirt, miFindByName);
@@ -805,20 +805,34 @@ namespace Crow
 		/// <summary>
 		/// Removes delegate from event handler by name
 		/// </summary>
-		public static void RemoveEventHandler(object instance, string eventName, string delegateName){
+		public static void RemoveEventHandlerByName(object instance, string eventName, string delegateName){
 			Type t = instance.GetType ();
 			FieldInfo fiEvt = CompilerServices.GetEventHandlerField (t, eventName);
 			EventInfo eiEvt = t.GetEvent (eventName);
 			MulticastDelegate multiDel = fiEvt.GetValue (instance) as MulticastDelegate;
 			if (multiDel != null) {
 				foreach (Delegate d in multiDel.GetInvocationList()) {
-					if (d.Method.Name == delegateName) {
+					if (d.Method.Name == delegateName)
 						eiEvt.RemoveEventHandler (instance, d);
-						Debug.WriteLine ("event handler removed: " + delegateName + " in " + t.FullName);
-					}
 				}
 			}
 		}
+		/// <summary>
+		/// Removes delegate from event handler by searching for the object they are bond to
+		/// </summary>
+		public static void RemoveEventHandlerByTarget(object instance, string eventName, object target){
+			Type t = instance.GetType ();
+			FieldInfo fiEvt = CompilerServices.GetEventHandlerField (t, eventName);
+			EventInfo eiEvt = t.GetEvent (eventName);
+			MulticastDelegate multiDel = fiEvt.GetValue (instance) as MulticastDelegate;
+			if (multiDel != null) {
+				foreach (Delegate d in multiDel.GetInvocationList()) {
+					if (d.Target == target)
+						eiEvt.RemoveEventHandler (instance, d);
+				}
+			}
+		}
+
 		public static Delegate compileDynEventHandler(EventInfo sourceEvent, string expression, NodeAddress currentNode = null){
 			Type lopType = null;
 
