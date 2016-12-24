@@ -509,6 +509,93 @@ namespace Crow
 					emitPropertyBindings (ctx,  bindings.Key, bindings.Value);
 			}
 		}
+		void emitPropertyBindings(Context ctx, NodeAddress origine, Dictionary<string, List<MemberAddress>> bindings){
+			Type origineNodeType = origine.NodeType;
+
+			//value changed dyn method
+			DynamicMethod dm = new DynamicMethod ("dyn_valueChanged" + NewId,
+				typeof (void), CompilerServices.argsValueChange, true);
+			ILGenerator il = dm.GetILGenerator (256);
+
+			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
+
+			il.DeclareLocal (typeof(object));
+
+			il.Emit (OpCodes.Nop);
+
+			int i = 0;
+			foreach (KeyValuePair<string, List<MemberAddress>> bindingCase in bindings ) {
+
+				System.Reflection.Emit.Label nextTest = il.DefineLabel ();
+
+				#region member name test
+				//load source member name
+				il.Emit (OpCodes.Ldarg_1);
+				il.Emit (OpCodes.Ldfld, typeof(ValueChangeEventArgs).GetField ("MemberName"));
+
+				il.Emit (OpCodes.Ldstr, bindingCase.Key);//load name to test
+				il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
+				il.Emit (OpCodes.Callvirt, CompilerServices.stringEquals);
+				il.Emit (OpCodes.Brfalse, nextTest);//if not equal, jump to next case
+				#endregion
+
+				#region destination member affectations
+				PropertyInfo piOrig = origineNodeType.GetProperty (bindingCase.Key);
+				Type origineType = null;
+				if (piOrig != null)
+					origineType = piOrig.PropertyType;
+				foreach (MemberAddress ma in bindingCase.Value) {
+					if (ma.Address.Count == 0)
+						continue;//template binding
+					//first we have to load destination instance onto the stack, it is access
+					//with graphic tree functions deducted from nodes topology
+					il.Emit (OpCodes.Ldarg_0);//load source instance of ValueChanged event
+
+					NodeAddress destination = ma.Address;
+
+					CompilerServices.emitGetInstance (il, origine, destination);
+
+					if (origineType != null){//prop less binding, no init requiered
+						//for initialisation dynmeth, push destination instance loc_0 is root node in ctx
+						ctx.il.Emit(OpCodes.Ldloc_0);
+						CompilerServices.emitGetInstance (ctx.il, destination);
+
+						//init dynmeth: load actual value from origine
+						ctx.il.Emit (OpCodes.Ldloc_0);
+						CompilerServices.emitGetInstance (ctx.il, origine);
+						ctx.il.Emit (OpCodes.Callvirt, origineNodeType.GetProperty (bindingCase.Key).GetGetMethod());
+					}
+					//load new value
+					il.Emit (OpCodes.Ldarg_1);
+					il.Emit (OpCodes.Ldfld, typeof (ValueChangeEventArgs).GetField ("NewValue"));
+
+					if (origineType == null)//property less binding, no init
+						CompilerServices.emitConvert (il, ma.Property.PropertyType);
+					else {
+						if (origineType.IsValueType)
+							ctx.il.Emit(OpCodes.Box, origineType);
+						CompilerServices.emitConvert (ctx.il, origineType, ma.Property.PropertyType);
+						CompilerServices.emitConvert (il, origineType, ma.Property.PropertyType);
+
+						ctx.il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());//set init value
+					}
+					il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());//set value on value changes
+				}
+				#endregion
+				il.Emit (OpCodes.Br, endMethod);
+				il.MarkLabel (nextTest);
+
+				i++;
+			}
+
+			il.MarkLabel (endMethod);
+			il.Emit (OpCodes.Ret);
+
+			//store and emit Add in ctx
+			int dmIdx = cachedDelegates.Count;
+			cachedDelegates.Add (dm.CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>)));
+			ctx.emitCachedDelegateHandlerAddition (dmIdx, typeof(IValueChange).GetEvent ("ValueChanged"), origine);
+		}
 		void emitTemplateBindings(Context ctx, Dictionary<string, List<MemberAddress>> bindings){
 			//value changed dyn method
 			DynamicMethod dm = new DynamicMethod ("dyn_tmpValueChanged",
@@ -576,6 +663,8 @@ namespace Crow
 				#region destination member affectations
 
 				foreach (MemberAddress ma in bindingCase.Value) {
+					if (ma.Address.Count == 0)
+						continue;//template binding
 					//first we try to get memberInfo of new parent, if it doesn't exist, it's a propery less binding
 					ilPC.Emit (OpCodes.Ldarg_2);//load new parent onto the stack for handler addition
 					ilPC.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
@@ -612,12 +701,12 @@ namespace Crow
 
 					CompilerServices.emitConvert (il, ma.Property.PropertyType);
 
-//					//box ValueType
-//					ilPC.Emit (OpCodes.Ldloc_1);//push mi to check if it's a valuetype
-//					ilPC.Emit (OpCodes.Call, typeof(PropertyInfo).GetProperty("PropertyType").GetGetMethod());
-//					ilPC.Emit (OpCodes.Call, typeof(Type).GetProperty("IsValueType").GetGetMethod());
-//					System.Reflection.Emit.Label noBoxingRequired = ilPC.DefineLabel ();
-//					ilPC.Emit (OpCodes.Brfalse, noBoxingRequired);
+					//					//box ValueType
+					//					ilPC.Emit (OpCodes.Ldloc_1);//push mi to check if it's a valuetype
+					//					ilPC.Emit (OpCodes.Call, typeof(PropertyInfo).GetProperty("PropertyType").GetGetMethod());
+					//					ilPC.Emit (OpCodes.Call, typeof(Type).GetProperty("IsValueType").GetGetMethod());
+					//					System.Reflection.Emit.Label noBoxingRequired = ilPC.DefineLabel ();
+					//					ilPC.Emit (OpCodes.Brfalse, noBoxingRequired);
 
 					CompilerServices.emitConvert (ilPC, ma.Property.PropertyType);
 
@@ -661,91 +750,6 @@ namespace Crow
 			#endregion
 
 			ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent("ParentChanged"));
-		}
-		void emitPropertyBindings(Context ctx, NodeAddress origine, Dictionary<string, List<MemberAddress>> bindings){
-			Type origineNodeType = origine.NodeType;
-
-			//value changed dyn method
-			DynamicMethod dm = new DynamicMethod ("dyn_valueChanged" + NewId,
-				typeof (void), CompilerServices.argsValueChange, true);
-			ILGenerator il = dm.GetILGenerator (256);
-
-			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
-
-			il.DeclareLocal (typeof(object));
-
-			il.Emit (OpCodes.Nop);
-
-			int i = 0;
-			foreach (KeyValuePair<string, List<MemberAddress>> bindingCase in bindings ) {
-
-				System.Reflection.Emit.Label nextTest = il.DefineLabel ();
-
-				#region member name test
-				//load source member name
-				il.Emit (OpCodes.Ldarg_1);
-				il.Emit (OpCodes.Ldfld, typeof(ValueChangeEventArgs).GetField ("MemberName"));
-
-				il.Emit (OpCodes.Ldstr, bindingCase.Key);//load name to test
-				il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
-				il.Emit (OpCodes.Callvirt, CompilerServices.stringEquals);
-				il.Emit (OpCodes.Brfalse, nextTest);//if not equal, jump to next case
-				#endregion
-
-				#region destination member affectations
-				PropertyInfo piOrig = origineNodeType.GetProperty (bindingCase.Key);
-				Type origineType = null;
-				if (piOrig != null)
-					origineType = piOrig.PropertyType;
-				foreach (MemberAddress ma in bindingCase.Value) {
-					//first we have to load destination instance onto the stack, it is access
-					//with graphic tree functions deducted from nodes topology
-					il.Emit (OpCodes.Ldarg_0);//load source instance of ValueChanged event
-
-					NodeAddress destination = ma.Address;
-
-					CompilerServices.emitGetInstance (il, origine, destination);
-
-					if (origineType != null){//prop less binding, no init requiered
-						//for initialisation dynmeth, push destination instance loc_0 is root node in ctx
-						ctx.il.Emit(OpCodes.Ldloc_0);
-						CompilerServices.emitGetInstance (ctx.il, destination);
-
-						//init dynmeth: load actual value from origine
-						ctx.il.Emit (OpCodes.Ldloc_0);
-						CompilerServices.emitGetInstance (ctx.il, origine);
-						ctx.il.Emit (OpCodes.Callvirt, origineNodeType.GetProperty (bindingCase.Key).GetGetMethod());
-					}
-					//load new value
-					il.Emit (OpCodes.Ldarg_1);
-					il.Emit (OpCodes.Ldfld, typeof (ValueChangeEventArgs).GetField ("NewValue"));
-
-					if (origineType == null)//property less binding, no init
-						CompilerServices.emitConvert (il, ma.Property.PropertyType);
-					else {
-						if (origineType.IsValueType)
-							ctx.il.Emit(OpCodes.Box, origineType);
-						CompilerServices.emitConvert (ctx.il, origineType, ma.Property.PropertyType);
-						CompilerServices.emitConvert (il, origineType, ma.Property.PropertyType);
-
-						ctx.il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());//set init value
-					}
-					il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());//set value on value changes
-				}
-				#endregion
-				il.Emit (OpCodes.Br, endMethod);
-				il.MarkLabel (nextTest);
-
-				i++;
-			}
-
-			il.MarkLabel (endMethod);
-			il.Emit (OpCodes.Ret);
-
-			//store and emit Add in ctx
-			int dmIdx = cachedDelegates.Count;
-			cachedDelegates.Add (dm.CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>)));
-			ctx.emitCachedDelegateHandlerAddition (dmIdx, typeof(IValueChange).GetEvent ("ValueChanged"), origine);
 		}
 		/// <summary>
 		/// create the valuechanged handler, the datasourcechanged handler and emit event handling

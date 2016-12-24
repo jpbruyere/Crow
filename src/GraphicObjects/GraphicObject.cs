@@ -553,6 +553,10 @@ namespace Crow
 		}
 		protected virtual void onLogicalParentDataSourceChanged(object sender, DataSourceChangeEventArgs e){
 			ILayoutable tmp = Parent;
+			if (tmp == null) {
+				Debug.WriteLine ("parent is null for: " + this.ToString ());
+				return;
+			}
 			while (tmp != sender) {
 				if (!(tmp as GraphicObject).localDataSourceIsNull) {
 					OnDataSourceChanged (sender, e);

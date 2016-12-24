@@ -29,11 +29,12 @@ namespace Crow.IML
 	/// </summary>
 	public struct MemberAddress
 	{
-		string memberName;
+		public string memberName;
 		public MemberInfo member;
 		public NodeAddress Address;
 
 		public PropertyInfo Property { get { return member as PropertyInfo; }}
+		public bool IsTemplateBinding { get { return Address == null ? false : Address.Count == 0; }}
 //		public string Name {
 //			get { return memberName; } 
 //			set { memberName = value; }
@@ -44,6 +45,11 @@ namespace Crow.IML
 			Address = _address;
 			memberName = _member;
 			member = null;
+
+			if (Address == null)
+				return;
+			if (Address.Count == 0)
+				return;
 
 			if (!findMember)
 				return;
@@ -84,6 +90,8 @@ namespace Crow.IML
 			if (member != null)
 				throw new Exception ("member already found");
 			if (Address == null)
+				return false;
+			if (Address.Count == 0)
 				return false;
 			Type t = Address.LastOrDefault ().CrowType;
 			member = t.GetMember (memberName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance).FirstOrDefault ();
