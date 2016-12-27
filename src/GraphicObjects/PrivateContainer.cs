@@ -80,9 +80,9 @@ namespace Crow
 		}
 		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
 		{
-			base.OnDataSourceChanged (sender, e);
+			base.OnDataSourceChanged (this, e);
 			if (child != null)
-				if (child.localDataSourceIsNull)
+			if (child.localDataSourceIsNull & child.localLogicalParentIsNull)
 					child.OnDataSourceChanged (sender, e);
 		}
 		public override bool UpdateLayout (LayoutingType layoutType)

@@ -93,9 +93,9 @@ namespace Crow
 		#region GraphicObject overrides
 		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
 		{
-			base.OnDataSourceChanged (sender, e);
+			base.OnDataSourceChanged (this, e);
 			foreach (GraphicObject g in children)
-				if (g.localDataSourceIsNull)
+				if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
 					g.OnDataSourceChanged (sender, e);
 		}
 		public override GraphicObject FindByName (string nameToFind)

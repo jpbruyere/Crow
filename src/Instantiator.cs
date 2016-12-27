@@ -110,7 +110,7 @@ namespace Crow
 			ctx.nodesStack.Pop ();
 
 			foreach (int idx in templateCachedDelegateIndices)
-				ctx.emitCachedDelegateHandlerAddition(idx, typeof(GraphicObject).GetEvent("ParentChanged"));
+				ctx.emitCachedDelegateHandlerAddition(idx, typeof(GraphicObject).GetEvent("LogicalParentChanged"));
 
 			ctx.ResolveNamedTargets ();
 
@@ -418,9 +418,6 @@ namespace Crow
 		/// </summary>
 		void compileAndStoreDynHandler (Context ctx, EventInfo sourceEvent, string expression)
 		{
-			#if DEBUG_BINDING
-			Debug.WriteLine ("\tCompile Event Source ");
-			#endif
 			//store event handler dynamic method in instanciator
 			int dmIdx = cachedDelegates.Count;
 			cachedDelegates.Add (CompilerServices.compileDynEventHandler (sourceEvent, expression, ctx.CurrentNodeAddress));
@@ -444,7 +441,7 @@ namespace Crow
 
 				il.Emit (OpCodes.Nop);
 
-				emitRemoveOldDataSourceHandler(il, sourceEvent.Name, bindingDef.TargetMember);
+				emitRemoveOldDataSourceHandler (il, sourceEvent.Name, bindingDef.TargetMember, false);
 
 				//fetch method in datasource and test if it exist
 				il.Emit (OpCodes.Ldarg_2);//load new datasource
@@ -477,7 +474,7 @@ namespace Crow
 				System.Reflection.Emit.Label finish = il.DefineLabel ();
 				il.Emit (OpCodes.Br, finish);
 				il.MarkLabel (cancel);
-				il.EmitWriteLine (sourcePath + ": Handler method not found: " + bindingDef.TargetMember);
+				il.EmitWriteLine (string.Format ("Handler method '{0}' not found. {1}={2} ", bindingDef.TargetMember, sourceEvent.Name, expression));
 				il.MarkLabel (finish);
 				il.Emit (OpCodes.Ret);
 
@@ -545,17 +542,20 @@ namespace Crow
 				if (piOrig != null)
 					origineType = piOrig.PropertyType;
 				foreach (MemberAddress ma in bindingCase.Value) {
-					if (ma.Address.Count == 0)
-						continue;//template binding
 					//first we have to load destination instance onto the stack, it is access
 					//with graphic tree functions deducted from nodes topology
 					il.Emit (OpCodes.Ldarg_0);//load source instance of ValueChanged event
 
 					NodeAddress destination = ma.Address;
 
-					CompilerServices.emitGetInstance (il, origine, destination);
+					if (destination.Count == 0){//template reverse binding
+						//fetch destination instance (which is the template root)
+						for (int j = 0; j < origine.Count ; j++)
+							il.Emit(OpCodes.Callvirt, typeof(GraphicObject).GetProperty("LogicalParent").GetGetMethod());
+					}else
+						CompilerServices.emitGetInstance (il, origine, destination);
 
-					if (origineType != null){//prop less binding, no init requiered
+					if (origineType != null && destination.Count > 0){//else, prop less binding or reverse template bind, no init requiered
 						//for initialisation dynmeth, push destination instance loc_0 is root node in ctx
 						ctx.il.Emit(OpCodes.Ldloc_0);
 						CompilerServices.emitGetInstance (ctx.il, destination);
@@ -571,13 +571,18 @@ namespace Crow
 
 					if (origineType == null)//property less binding, no init
 						CompilerServices.emitConvert (il, ma.Property.PropertyType);
-					else {
+					else if (destination.Count > 0) {
 						if (origineType.IsValueType)
 							ctx.il.Emit(OpCodes.Box, origineType);
+
 						CompilerServices.emitConvert (ctx.il, origineType, ma.Property.PropertyType);
 						CompilerServices.emitConvert (il, origineType, ma.Property.PropertyType);
 
 						ctx.il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());//set init value
+					} else {// reverse templateBinding
+						il.Emit (OpCodes.Ldstr, ma.memberName);//arg 3 of setValueWithReflexion
+						il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("setValueWithReflexion", BindingFlags.Static | BindingFlags.Public));
+						continue;
 					}
 					il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());//set value on value changes
 				}
@@ -603,7 +608,7 @@ namespace Crow
 			ILGenerator il = dm.GetILGenerator (256);
 
 			//create parentchanged dyn meth in parallel to have only one loop over bindings
-			DynamicMethod dmPC = new DynamicMethod ("dyn_InitAndParentChanged",
+			DynamicMethod dmPC = new DynamicMethod ("dyn_InitAndLogicalParentChanged",
 				typeof (void),
 				CompilerServices.argsBoundDSChange, true);
 			ILGenerator ilPC = dmPC.GetILGenerator (256);
@@ -663,8 +668,10 @@ namespace Crow
 				#region destination member affectations
 
 				foreach (MemberAddress ma in bindingCase.Value) {
-					if (ma.Address.Count == 0)
+					if (ma.Address.Count == 0){
+						Debug.WriteLine("\t\tBUG: reverse template binding in normal template binding");
 						continue;//template binding
+					}
 					//first we try to get memberInfo of new parent, if it doesn't exist, it's a propery less binding
 					ilPC.Emit (OpCodes.Ldarg_2);//load new parent onto the stack for handler addition
 					ilPC.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
@@ -728,7 +735,7 @@ namespace Crow
 			//store template bindings in instanciator
 			templateBinding = dm.CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>));
 
-			#region emit ParentChanged method
+			#region emit LogicalParentChanged method
 
 			//load new parent onto the stack for handler addition
 			ilPC.Emit (OpCodes.Ldarg_2);
@@ -749,7 +756,7 @@ namespace Crow
 			cachedDelegates.Add(dmPC.CreateDelegate (CompilerServices.ehTypeDSChange, this));
 			#endregion
 
-			ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent("ParentChanged"));
+			ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent("LogicalParentChanged"));
 		}
 		/// <summary>
 		/// create the valuechanged handler, the datasourcechanged handler and emit event handling
@@ -956,7 +963,7 @@ namespace Crow
 		#endregion
 
 		/// <summary> Emits remove old data source event handler./summary>
-		void emitRemoveOldDataSourceHandler(ILGenerator il, string eventName, string delegateName){
+		void emitRemoveOldDataSourceHandler(ILGenerator il, string eventName, string delegateName, bool DSSide = true){
 			System.Reflection.Emit.Label cancel = il.DefineLabel ();
 
 			il.Emit (OpCodes.Ldarg_2);//load old parent
@@ -964,8 +971,11 @@ namespace Crow
 			il.Emit (OpCodes.Brfalse, cancel);//old parent is null
 
 			//remove handler
-			il.Emit (OpCodes.Ldarg_2);//1st arg load old datasource
-			il.Emit (OpCodes.Ldfld, typeof (DataSourceChangeEventArgs).GetField ("OldDataSource"));
+			if (DSSide){//event is defined in the dataSource instance
+				il.Emit (OpCodes.Ldarg_2);//1st arg load old datasource
+				il.Emit (OpCodes.Ldfld, typeof (DataSourceChangeEventArgs).GetField ("OldDataSource"));
+			}else//the event is in the source
+				il.Emit (OpCodes.Ldarg_1);//1st arg load old datasource
 			il.Emit (OpCodes.Ldstr, eventName);//2nd arg event name
 			il.Emit (OpCodes.Ldstr, delegateName);//3d arg: delegate name
 			il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("RemoveEventHandlerByName", BindingFlags.Static | BindingFlags.Public));

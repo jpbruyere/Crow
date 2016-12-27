@@ -518,6 +518,7 @@ namespace Crow
 				//TODO:parent is not reset to null because object will be added
 				//to ObjectToRedraw list, and without parent, it fails
 				GraphicObject g = GraphicTree [i];
+				g.DataSource = null;
 				g.Visible = false;
 				GraphicTree.RemoveAt (0);
 			}

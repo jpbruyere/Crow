@@ -42,7 +42,6 @@ namespace Crow
 		public event EventHandler<SelectionChangeEventArgs> SelectedItemChanged;
 		#endregion
 
-		Group _list;
 		IList data;
 		int _selectedIndex;
 		Color selBackground, selForeground;
@@ -160,10 +159,12 @@ namespace Crow
 
 		public virtual void AddItem(GraphicObject g){
 			items.AddChild (g);
+			g.LogicalParent = this;
 			NotifyValueChanged ("HasChildren", true);
 		}
 		public virtual void RemoveItem(GraphicObject g)
 		{
+			g.LogicalParent = null;
 			items.RemoveChild (g);
 			if (items.Children.Count == 0)
 				NotifyValueChanged ("HasChildren", false);

@@ -64,6 +64,21 @@ namespace Crow.IML
 			TargetNA = newTargetNA;
 			TargetName = "";
 		}
+
+		public override string ToString ()
+		{
+			string tmp = string.Format ("Source:{0}.{1}", SourceNA, SourceMember);
+			if (TwoWay)
+				tmp += " <=> ";
+			else
+				tmp += " <=  ";
+					
+			if (string.IsNullOrEmpty (TargetName))
+				tmp += string.Format ("Target:{0}.{1}]", TargetNA, TargetMember);
+			else
+				tmp += string.Format ("Target:{0}.{1}.{2}]", TargetNA, TargetName, TargetMember);
+			return tmp;
+		}
 	}
 }
 

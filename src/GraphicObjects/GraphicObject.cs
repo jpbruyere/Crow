@@ -140,9 +140,12 @@ namespace Crow
 					return;
 				if (logicalParent != null)
 					(logicalParent as GraphicObject).DataSourceChanged -= onLogicalParentDataSourceChanged;
+				DataSourceChangeEventArgs dsce = new DataSourceChangeEventArgs (LogicalParent, null);
 				logicalParent = value;
+				dsce.NewDataSource = LogicalParent;
 				if (logicalParent != null)
 					(logicalParent as GraphicObject).DataSourceChanged += onLogicalParentDataSourceChanged;
+				onLogicalParentChanged (this, dsce);
 			}
 		}
 		[XmlIgnore]public virtual Rectangle ClientRectangle {
@@ -186,6 +189,7 @@ namespace Crow
 		public event EventHandler<LayoutingEventArgs> LayoutChanged;
 		public event EventHandler<DataSourceChangeEventArgs> DataSourceChanged;
 		public event EventHandler<DataSourceChangeEventArgs> ParentChanged;
+		public event EventHandler<DataSourceChangeEventArgs> LogicalParentChanged;
 		#endregion
 
 		#region public properties
@@ -535,37 +539,30 @@ namespace Crow
 		[XmlAttributeAttribute][DefaultValue(null)]
 		public virtual object DataSource {
 			set {
-				if (dataSource == value)
+				if (DataSource == value)
 					return;
 
-				DataSourceChangeEventArgs dse = new DataSourceChangeEventArgs (dataSource, value);
+				DataSourceChangeEventArgs dse = new DataSourceChangeEventArgs (DataSource, null);
 				dataSource = value;
+				dse.NewDataSource = DataSource;
 
 				OnDataSourceChanged (this, dse);
 
 				NotifyValueChanged ("DataSource", DataSource);
 			}
 			get {
-				return dataSource == null ? LogicalParent == null ? null :
-					LogicalParent is GraphicObject ?
-					(LogicalParent as GraphicObject).DataSource : null : dataSource;
+				return dataSource == null ? 
+					LogicalParent == null ? null :
+					LogicalParent is GraphicObject ? (LogicalParent as GraphicObject).DataSource : null :
+					dataSource;
 			}
 		}
 		protected virtual void onLogicalParentDataSourceChanged(object sender, DataSourceChangeEventArgs e){
-			ILayoutable tmp = Parent;
-			if (tmp == null) {
-				Debug.WriteLine ("parent is null for: " + this.ToString ());
-				return;
-			}
-			while (tmp != sender) {
-				if (!(tmp as GraphicObject).localDataSourceIsNull) {
-					OnDataSourceChanged (sender, e);
-					return;
-				}
-				tmp = tmp.Parent;
-			}
+			if (localDataSourceIsNull)
+				OnDataSourceChanged (this, e);
 		}
 		internal bool localDataSourceIsNull { get { return dataSource == null; } }
+		internal bool localLogicalParentIsNull { get { return logicalParent == null; } }
 
 		public virtual void OnDataSourceChanged(object sender, DataSourceChangeEventArgs e){
 			DataSourceChanged.Raise (this, e);
@@ -1254,9 +1251,13 @@ namespace Crow
 			Disabled.Raise (this, e);
 		}
 		protected virtual void onParentChanged(object sender, DataSourceChangeEventArgs e) {
-			ParentChanged.Raise (sender, e);
+			ParentChanged.Raise (this, e);
+			if (logicalParent == null)
+				LogicalParentChanged.Raise (this, e);
 		}
-
+		protected virtual void onLogicalParentChanged(object sender, DataSourceChangeEventArgs e) {
+			LogicalParentChanged.Raise (this, e);
+		}
 		#region IXmlSerializable
 		public virtual System.Xml.Schema.XmlSchema GetSchema ()
 		{

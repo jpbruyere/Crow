@@ -643,6 +643,38 @@ namespace Crow
 		public static Type getEventHandlerType(object instance, string eventName){
 			return instance.GetType ().GetEvent (eventName).EventHandlerType;
 		}
+		public static void setValueWithReflexion(object dest, object value, string destMember){
+			Type destType = null;
+			Type origType = null;
+			object convertedVal = null;
+
+			MemberInfo miDest = getMemberInfoWithReflexion (dest, destMember);
+
+			if (miDest == null) {
+				Debug.WriteLine ("Reverse template binding error: " + destMember + " not found in " + dest);
+				return;
+			}
+
+			if (miDest.MemberType == MemberTypes.Property)
+				destType =(miDest as PropertyInfo).PropertyType;
+			else if (miDest.MemberType == MemberTypes.Field)
+				destType =(miDest as FieldInfo).FieldType;
+
+			if (value != null) {
+				origType = value.GetType ();
+				if (destType.IsAssignableFrom (origType))
+					convertedVal = Convert.ChangeType (value, destType);
+				else if (origType.IsPrimitive & destType.IsPrimitive)
+					convertedVal = GetConvertMethod (destType).Invoke (null, new Object[] { value });
+				else
+					convertedVal = getImplicitOp (origType, destType).Invoke (value, null);
+			}
+
+			if (miDest.MemberType == MemberTypes.Property)
+				(miDest as PropertyInfo).SetValue (dest, convertedVal);
+			else if (miDest.MemberType == MemberTypes.Field)
+				(miDest as FieldInfo).SetValue (dest, convertedVal);
+		}
 		public static object getValueWithReflexion(object instance, MemberInfo mi){
 			object tmp = null;
 			Type dstType = null;
@@ -674,7 +706,7 @@ namespace Crow
 					break;
 			}
 			for (int i = 0; i < orig.Count - ptr; i++)
-				il.Emit (OpCodes.Callvirt, typeof(ILayoutable).GetProperty ("Parent").GetGetMethod ());
+				il.Emit (OpCodes.Callvirt, typeof(ILayoutable).GetProperty ("LogicalParent").GetGetMethod ());
 			while (ptr < dest.Count) {
 				emitGetChild (il, dest [ptr-1].CrowType, dest [ptr].Index);
 				ptr++;
@@ -812,8 +844,12 @@ namespace Crow
 			MulticastDelegate multiDel = fiEvt.GetValue (instance) as MulticastDelegate;
 			if (multiDel != null) {
 				foreach (Delegate d in multiDel.GetInvocationList()) {
-					if (d.Method.Name == delegateName)
+					if (d.Method.Name == delegateName) {
 						eiEvt.RemoveEventHandler (instance, d);
+						#if DEBUG_BINDING
+						Debug.WriteLine ("\t{0} handler removed in {1} for: {2}", d.Method.Name,instance, eventName);
+						#endif
+					}
 				}
 			}
 		}
@@ -827,13 +863,21 @@ namespace Crow
 			MulticastDelegate multiDel = fiEvt.GetValue (instance) as MulticastDelegate;
 			if (multiDel != null) {
 				foreach (Delegate d in multiDel.GetInvocationList()) {
-					if (d.Target == target)
+					if (d.Target == target) {
 						eiEvt.RemoveEventHandler (instance, d);
+						#if DEBUG_BINDING
+						Debug.WriteLine ("\t{0} handler removed in {1} for: {2}", d.Method.Name,instance, eventName);
+						#endif
+					}
 				}
 			}
 		}
 
 		public static Delegate compileDynEventHandler(EventInfo sourceEvent, string expression, NodeAddress currentNode = null){
+			#if DEBUG_BINDING
+			Debug.WriteLine ("\tCompile Event {0}: {1}", sourceEvent.Name, expression);
+			#endif
+
 			Type lopType = null;
 
 			if (currentNode == null)
