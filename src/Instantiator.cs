@@ -474,7 +474,7 @@ namespace Crow
 				System.Reflection.Emit.Label finish = il.DefineLabel ();
 				il.Emit (OpCodes.Br, finish);
 				il.MarkLabel (cancel);
-				il.EmitWriteLine (string.Format ("Handler method '{0}' not found. {1}={2} ", bindingDef.TargetMember, sourceEvent.Name, expression));
+				il.EmitWriteLine (string.Format ("Handler method '{0}' for '{1}' not found in new dataSource ", bindingDef.TargetMember, sourceEvent.Name));
 				il.MarkLabel (finish);
 				il.Emit (OpCodes.Ret);
 
@@ -487,7 +487,9 @@ namespace Crow
 				else //template handler binding, will be added to root parentChanged
 					templateCachedDelegateIndices.Add (delDSIndex);
 			} else {//normal in tree handler binding, store until tree is complete (end of parse)
-
+				ctx.UnresolvedTargets.Add (new EventBinding (
+					bindingDef.SourceNA, sourceEvent,
+					bindingDef.TargetNA, bindingDef.TargetMember, bindingDef.TargetName));
 			}
 		}
 		#endregion
@@ -866,7 +868,7 @@ namespace Crow
 				il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getMemberInfoWithReflexion", BindingFlags.Static | BindingFlags.Public));
 				il.Emit (OpCodes.Stloc_1);//save memberInfo
 				il.Emit (OpCodes.Ldloc_1);//push mi for test if null
-				il.Emit (OpCodes.Brfalse, cancelInit);
+				il.Emit (OpCodes.Brfalse, cancel);
 			}
 
 			il.Emit (OpCodes.Ldarg_1);//load source of dataSourceChanged which is the dest instance
@@ -882,6 +884,11 @@ namespace Crow
 
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
 				il.MarkLabel(cancelInit);
+				//check if new dataSource implement IValueChange
+				il.Emit (OpCodes.Ldarg_2);//load new datasource
+				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+				il.Emit (OpCodes.Isinst, typeof(IValueChange));
+				il.Emit (OpCodes.Brfalse, cancel);
 
 				il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
 				il.Emit (OpCodes.Ldarg_1);//load datasource change source

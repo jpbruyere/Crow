@@ -1,11 +1,10 @@
 <?xml version="1.0"?>
-<Border BorderWidth="1" Foreground="White" CornerRadius="15"	
-	Height="{../HeightPolicy}" Width="{../WidthPolicy}"
+<Border BorderWidth="1" Foreground="White" CornerRadius="15"
 	MouseEnter="../onBorderMouseEnter"
 	MouseLeave="../onBorderMouseLeave"
 	Background="vgradient|0:0.6,0.6,0.6,0.9|1:0.4,0.4,0.4,0.6">
-	<VerticalStack Height="{../../HeightPolicy}" Width="{../../WidthPolicy}">
-		<HorizontalStack Height="Fit" Width="{../../../WidthPolicy}">
+	<VerticalStack>
+		<HorizontalStack Height="Fit">
 			<Label Margin="2" Font="{../../../../Font}" Text="{../../../../Title}" Width="Stretched"/>
 			<Border HorizontalAlignment="Right" Margin="0" VerticalAlignment="Top"
 				CornerRadius="6" BorderWidth="1" Foreground="Transparent"
@@ -15,7 +14,6 @@
 					 MouseClick="../../../../../butQuitPress"/>
 			</Border>
 		</HorizontalStack>
-		<Container Name="Content"
-			Height="{../../../HeightPolicy}" Width="{../../../WidthPolicy}"/>
+		<Container Name="Content"/>
 	</VerticalStack>
 </Border>

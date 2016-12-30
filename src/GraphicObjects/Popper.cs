@@ -119,7 +119,7 @@ namespace Crow
 
 		protected void _content_LayoutChanged (object sender, LayoutingEventArgs e)
 		{
-			ILayoutable tc = Content.Parent as ILayoutable;
+			ILayoutable tc = Content.Parent;
 			if (tc == null)
 				return;
 			Rectangle r = this.ScreenCoordinates (this.Slot);
@@ -186,13 +186,11 @@ namespace Crow
 		{
 			if (!_isPopped || _content == null) {
 				base.onMouseLeave (sender, e);
-				System.Diagnostics.Debug.WriteLine ("NotPopped***popper mouse leave:"+ this.ToString());
 				return;
 			}
 
 			if (!_content.MouseIsIn (e.Position)) {
 				base.onMouseLeave (sender, e);
-				System.Diagnostics.Debug.WriteLine ("***popper mouse leave:"+ this.ToString());
 				IsPopped = false;
 				return;
 			}

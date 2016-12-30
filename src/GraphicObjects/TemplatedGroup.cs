@@ -36,7 +36,7 @@ namespace Crow
 		#endregion
 
 		protected Group items;
-		string _itemTemplate;
+		string _itemTemplate, _dataTest;
 
 		#region events
 		public event EventHandler<SelectionChangeEventArgs> SelectedItemChanged;
@@ -55,6 +55,9 @@ namespace Crow
 		//but then i should test if null in msil gen
 		public Dictionary<string, ItemTemplate> ItemTemplates = new Dictionary<string, Crow.ItemTemplate>();
 
+		/// <summary>
+		/// Default item template
+		/// </summary>
 		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ItemTemplate.goml")]
 		public string ItemTemplate {
 			get { return _itemTemplate; }
@@ -80,6 +83,24 @@ namespace Crow
 			else
 				NotifyValueChanged ("HasChildren", true);
 		}
+		/// <summary>
+		/// Use to define condition on Data item for selecting among ItemTemplates.
+		/// Default value is 'TypeOf' for selecting Template depending on Type of Data.
+		/// Other possible values are properties of Data
+		/// </summary>
+		/// <value>The data property test.</value>
+		[XmlAttributeAttribute][DefaultValue("TypeOf")]
+		public string DataTest {
+			get { return _dataTest; }
+			set {
+				if (value == _dataTest)
+					return;
+
+				_dataTest = value;
+
+				NotifyValueChanged("DataTest", _dataTest);
+			}
+		}
 		#endregion
 
 		public virtual List<GraphicObject> Items{ get { return items.Children; }}
@@ -99,7 +120,9 @@ namespace Crow
 		[XmlIgnore]public virtual object SelectedItem{
 			get { return data == null ? null : _selectedIndex < 0 ? null : data[_selectedIndex]; }
 		}
-
+		[XmlIgnore]public bool HasItems {
+			get { return Items.Count > 0; }
+		}
 		[XmlAttributeAttribute]public IList Data {
 			get { return data; }
 			set {
@@ -112,7 +135,7 @@ namespace Crow
 
 				NotifyValueChanged ("Data", data);
 
-				lock (CurrentInterface.UpdateMutex)
+				//lock (CurrentInterface.UpdateMutex)
 					ClearItems ();
 
 				if (data == null)
@@ -126,6 +149,7 @@ namespace Crow
 				NotifyValueChanged ("SelectedIndex", _selectedIndex);
 				NotifyValueChanged ("SelectedItem", SelectedItem);
 				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
+				NotifyValueChanged ("HasItems", HasItems);
 			}
 		}
 
@@ -304,17 +328,6 @@ namespace Crow
 
 			page.Name = "page" + pageNum;
 
-//			//reset size to fit in the dir of the stacking
-//			//because items total size is forced to approx size
-//			if (_gsList.Orientation == Orientation.Horizontal) {
-//				page.Width = Measure.Fit;
-				//page.BindMember ("Height", "../HeightPolicy");
-				//page.BindMember ("Width", "../WidthPolicy");
-//			} else {
-//				page.Height = Measure.Fit;
-//				page.BindMember ("Width", "../WidthPolicy");
-//			}
-
 			for (int i = (pageNum - 1) * itemPerPage; i < pageNum * itemPerPage; i++) {
 				if (i >= data.Count)
 					break;
@@ -322,8 +335,6 @@ namespace Crow
 					return;
 
 				loadItem (i, page);
-
-				//g.LogicalParent = this;
 			}
 
 			lock (CurrentInterface.LayoutMutex)
@@ -336,27 +347,41 @@ namespace Crow
 			loadingTime.ElapsedMilliseconds, this.ToString());
 			#endif
 		}
+		string getItempKey(Type dataType, object o){
+			try {
+				return dataType.GetProperty (_dataTest).GetGetMethod ().Invoke (o, null).ToString();
+			} catch (Exception ex) {
+				return dataType.FullName;
+			}
+		}
 		protected void loadItem(int i, Group page){
 			GraphicObject g = null;
 			ItemTemplate iTemp = null;
 			Type dataType = data [i].GetType ();
+			string itempKey = dataType.FullName;
 
-			if (ItemTemplates.ContainsKey (dataType.FullName))
-				iTemp = ItemTemplates [dataType.FullName];
+			if (_dataTest != "TypeOf")
+				itempKey = getItempKey (dataType, data [i]);
+
+			if (ItemTemplates.ContainsKey (itempKey))
+					iTemp = ItemTemplates [itempKey];
 			else
 				iTemp = ItemTemplates ["default"];
 
 			lock (CurrentInterface.LayoutMutex) {
 				g = iTemp.CreateInstance(CurrentInterface);
 				page.AddChild (g);
-				g.DataSource = data [i];
+				registerItemClick (g);
 			}
-
-			registerItemClick (g);
 
 			if (iTemp.Expand != null && g is Expandable) {
 				(g as Expandable).Expand += iTemp.Expand;
-			}			
+				(g as Expandable).GetIsExpandable = iTemp.HasSubItems;
+			}
+			//g.LogicalParent = this;
+
+
+			g.DataSource = data [i];
 		}
 		protected virtual void registerItemClick(GraphicObject g){
 			g.MouseClick += itemClick;

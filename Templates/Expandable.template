@@ -1,15 +1,17 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="1" Foreground="{./Foreground}" Background="{./Background}"
-		Height="{./HeightPolicy}" Width="{./WidthPolicy}">
-	<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}">
-		<HorizontalStack Spacing="1" Height="Fit" Width="{./WidthPolicy}">
-			<Image Style="Icon" Margin="2"
-				Visible="{./HasContent}"
-				Path="{./Image}" 
-				SvgSub="{./IsExpanded}"/>
-			<Label Text="{./Caption}" Width="{./WidthPolicy}"/>
+<Border BorderWidth="1" Foreground="{./Foreground}" Background="{./Background}">
+	<VerticalStack>
+		<HorizontalStack Spacing="1" Height="Fit" MouseDoubleClick="./onClickForExpand">
+			<Container Margin="1" Width="10" Height="10" Focusable="true" MouseClick="./onClickForExpand"
+														MouseEnter="{Background=LightGray}"
+														MouseLeave="{Background=Transparent}">
+				<Image
+					Path="{./Image}"
+					Visible="{./IsExpandable}"
+					SvgSub="{./IsExpanded}"/>
+			</Container>
+			<Label Text="{./Caption}"/>
 		</HorizontalStack>
-		<Container Name="Content" Visible="false"
-			Height="{./HeightPolicy}" Width="{./WidthPolicy}"/>
+		<Container Name="Content" Visible="false"/>
 	</VerticalStack>
 </Border>

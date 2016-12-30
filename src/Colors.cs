@@ -10,6 +10,9 @@ using System.Diagnostics;
 
 namespace Crow
 {
+	/// <summary>
+	/// Universal Color structure
+	/// </summary>
 	public struct Color
     {
 		#region CTOR
@@ -1068,5 +1071,34 @@ namespace Crow
         {
             return (Color)s;
         }
+		public static Color FromHSV(double _h, double _v = 1.0, double _s = 1.0){
+			Color c = Color.Black;
+
+			if (_s == 0) {//HSV from 0 to 1
+				c.R = _v;
+				c.G = _v;
+				c.B = _v;
+			}else{
+				double var_h = _h * 6.0;
+
+				if (var_h == 6.0)
+					var_h = 0;	//H must be < 1
+				double var_i = Math.Floor( var_h );	//Or ... var_i = floor( var_h )
+				double var_1 = _v * ( 1.0 - _s );
+				double var_2 = _v * (1.0 - _s * (var_h - var_i));
+				double var_3 = _v * (1.0 - _s * (1.0 - (var_h - var_i)));
+
+				if (var_i == 0.0) {
+					c.R = _v;
+					c.G = var_3;
+					c.B = var_1;
+				}else if ( var_i == 1.0 ) { c.R = var_2 ; c.G = _v     ; c.B = var_1; }
+				else if ( var_i == 2 ) { c.R = var_1 ; c.G = _v     ; c.B = var_3; }
+				else if ( var_i == 3 ) { c.R = var_1 ; c.G = var_2 ; c.B = _v;     }
+				else if ( var_i == 4 ) { c.R = var_3 ; c.G = var_1 ; c.B = _v;    }
+				else                   { c.R = _v     ; c.G = var_1 ; c.B = var_2; }
+			}
+			return c;
+		}
     }
 }

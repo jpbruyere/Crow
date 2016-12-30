@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0"?>
-<TreeView IsRoot="true" Name="treeView" Data="{./FileSystemEntries}"
+<TreeView IsRoot="true" Name="treeView" Data="{./FileSystemEntries}" Background="{./Background}"
 		SelectedItemChanged="./onSelectedItemChanged">
 	<ItemTemplate DataType="System.IO.FileInfo">
-		<HorizontalStack Focusable="true"  Height="Fit" Width="Stretched" Background="{../Background}" >
+		<HorizontalStack Focusable="true"  Height="Fit" Width="Stretched" >
 			<Image Margin="2" Width="14" Height="14"
 				Path="#Crow.Images.Icons.file.svg"/>
 			<Label Text="{Name}" Width="Stretched"
@@ -13,24 +13,28 @@
 	<ItemTemplate DataType="System.IO.DirectoryInfo" Data="GetFileSystemInfos">
 		<Expandable Caption="{Name}" >
 			<Template>
-				<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}">
-					<HorizontalStack Spacing="1" Height="Fit" Width="{./WidthPolicy}"
+				<VerticalStack>
+					<HorizontalStack Spacing="1" Height="Fit" MouseDoubleClick="./onClickForExpand"
 							MouseEnter="{Background=hgradient|0:BlueCrayola|1:Transparent}"
 							MouseLeave="{Background=Transparent}">
-						<Image Margin="2" Width="12" Height="12"
-							Path="{./Image}"
-							SvgSub="{./IsExpanded}"/>
+						<Container Margin="1" Width="10" Height="10" Focusable="true" MouseClick="./onClickForExpand"
+							MouseEnter="{Background=LightGray}"
+							MouseLeave="{Background=Transparent}">
+							<Image
+								Path="{./Image}"
+								Visible="{./IsExpandable}"
+								SvgSub="{./IsExpanded}"/>
+						</Container>
 						<Image Margin="2" Width="14" Height="14"
 							Path="#Crow.Images.Icons.folder.svg"/>
-						<Label Text="{./Caption}" Width="{./WidthPolicy}"/>
+						<Label Text="{./Caption}"/>
 					</HorizontalStack>
-					<Container Name="Content" Visible="false"
-							Height="{./HeightPolicy}" Width="{./WidthPolicy}"/>
+					<Container Name="Content" Visible="false"/>
 				</VerticalStack>
 			</Template>
-			<HorizontalStack Height="Fit" Width="{./WidthPolicy}">
+			<HorizontalStack Height="Fit">
 				<GraphicObject Width="12" Height="10"/>
-				<TreeView Name="List" Height="Fit" Width="{./WidthPolicy}"
+				<TreeView Name="List" Height="Fit"
 					Template="#Crow.Templates.treeList.crow" />
 			</HorizontalStack>
 		</Expandable>

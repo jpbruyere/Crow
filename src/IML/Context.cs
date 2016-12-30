@@ -110,14 +110,16 @@ namespace Crow.IML
 						continue;
 					}
 				}
-				
+
+				if (bd is EventBinding) {
+					emitHandlerMethodAddition (bd as EventBinding);
+					continue;
+				}
+
 				MemberInfo miSource = bd.SourceMemberAddress.member;
 				if (miSource == null)
 					throw new Exception ("Source member '" + bd.SourceMember + "' not found");
-				if (miSource.MemberType == MemberTypes.Event)
-					emitHandlerMethodAddition (bd, miSource as EventInfo);
-				else
-					StorePropertyBinding (bd);
+				StorePropertyBinding (bd);
 			}
 		}
 		public void ResolveName (BindingDefinition bd){
@@ -173,25 +175,31 @@ namespace Crow.IML
 		/// </summary>
 		/// <param name="bd">Bd.</param>
 		/// <param name="evt">passed as arg to prevent refetching it for the 3rd time</param>
-		public void emitHandlerMethodAddition(BindingDefinition bd, EventInfo evt){			
+		public void emitHandlerMethodAddition(EventBinding bd){
 			//fetch source instance with address for handler addition (as 1st arg of handler.add)
 			il.Emit (OpCodes.Ldloc_0);//push root
 			CompilerServices.emitGetInstance (il, bd.SourceNA);
 
 			//load handlerType of sourceEvent to create handler delegate (1st arg)
-			il.Emit (OpCodes.Ldtoken, evt.EventHandlerType);
+			il.Emit (OpCodes.Ldtoken, bd.SourceEvent.EventHandlerType);
 			il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
 			//load target the where the method is defined (2nd arg)
 			il.Emit (OpCodes.Ldloc_0);
 			CompilerServices.emitGetInstance (il, bd.TargetNA);
 			//load methodInfo (3rd arg)
-			il.Emit (OpCodes.Ldtoken, bd.TargetMemberAddress.member as MethodInfo);
-			il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
+			il.Emit (OpCodes.Ldstr, bd.TargetMember);
+			//il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
 
-			il.Emit (OpCodes.Callvirt, typeof(Delegate).GetMethod ("CreateDelegate",
-				new Type[] { typeof(Type), typeof(object), typeof(MethodInfo) }));//create bound delegate
+			//il.Emit (OpCodes.Pop);
+			//il.Emit (OpCodes.Pop);
+			//il.Emit (OpCodes.Pop);
+			//il.Emit (OpCodes.Pop);
+			il.Emit (OpCodes.Callvirt, typeof(CompilerServices).GetMethod ("createDel", BindingFlags.Static | BindingFlags.NonPublic));
+			//il.Emit (OpCodes.Callvirt, typeof(Delegate).GetMethod ("CreateDelegate",
+			//	new Type[] { typeof(Type), typeof(object), typeof(MethodInfo) }));//create bound delegate
 			
-			il.Emit (OpCodes.Callvirt, evt.AddMethod);//call add event
+			il.Emit (OpCodes.Callvirt, bd.SourceEvent.AddMethod);//call add event
 		}
+
 	}
 }

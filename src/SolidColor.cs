@@ -12,7 +12,7 @@ namespace Crow
 {
 	public class SolidColor : Fill
     {
-		Color color = Color.Transparent;
+		public Color color = Color.Transparent;
 		#region CTOR
 		public SolidColor(Color c)
 		{

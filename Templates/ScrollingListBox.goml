@@ -1,15 +1,13 @@
 <?xml version="1.0"?>
-<Border BorderWidth="1" Height="{./HeightPolicy}" Width="{./WidthPolicy}" Background="{./Background}">
-	<HorizontalStack Margin="1" Height="{./HeightPolicy}" Width="{./WidthPolicy}" >
-		<Scroller Name="scroller1" Height="{./HeightPolicy}" Width="{./WidthPolicy}" 
-				Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}"
-				ValueChanged="./_scroller_ValueChanged">
-			<VerticalStack Width="{./WidthPolicy}" Height="-1" MinimumSize="10,10"
-				Name="ItemsContainer" Margin="0" VerticalAlignment="Top"
-				LayoutChanged="./_list_LayoutChanged"/>
+<Border BorderWidth="1" Background="{./Background}">
+	<HorizontalStack Margin="1">
+		<Scroller Name="scroller1" 
+				Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}">
+			<VerticalStack Height="Fit" MinimumSize="10,10"
+				Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
 		</Scroller>
 		<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}" 
 			Maximum="{../scroller1.MaximumScroll}" Orientation="Vertical" 
-			Width="14" Height="{./HeightPolicy}" />
+			Width="14" />
 	</HorizontalStack>
 </Border>

@@ -14,17 +14,18 @@
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <NoWin32Manifest>False</NoWin32Manifest>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
     <DelaySign>False</DelaySign>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Description>C# Rapid Open Widget</Description>
     <BaseAddress>4194304</BaseAddress>
-    <ReleaseVersion>0.4</ReleaseVersion>
+    <ReleaseVersion>0.5</ReleaseVersion>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
+    <AssemblyOriginatorKeyFile>crow.key</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,9 +35,8 @@
     <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <Optimize>True</Optimize>
-    <DebugType>None</DebugType>
-    <DefineConstants>__linux__;MEASURE_TIME</DefineConstants>
+    <Optimize>true</Optimize>
+    <DefineConstants>__linux__</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="src\Colors.cs" />
@@ -149,6 +149,12 @@
     <Compile Include="src\IML\MemberAddress.cs" />
     <Compile Include="src\IML\NodeStack.cs" />
     <Compile Include="src\IML\BindingDefinition.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\GraphicObjects\ColorPicker.cs" />
+    <Compile Include="src\GraphicObjects\ColorSelector.cs" />
+    <Compile Include="src\GraphicObjects\HueSelector.cs" />
+    <Compile Include="src\GraphicObjects\SaturationValueSelector.cs" />
+    <Compile Include="src\IML\EventBinding.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -280,6 +286,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Templates\Menu.template">
       <LogicalName>Crow.Menu.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\ColorPicker.template">
+      <LogicalName>Crow.ColorPicker.template</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

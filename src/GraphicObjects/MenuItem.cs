@@ -50,8 +50,8 @@ namespace Crow
 
 				if (isOpened) {
 					onOpen (this, null);
-					if (MenuRoot != null)
-						MenuRoot.IsOpened = true;
+//					if (MenuRoot != null)
+//						MenuRoot.IsOpened = true;
 				}else
 					onClose (this, null);
 			}
@@ -102,7 +102,7 @@ namespace Crow
 			Execute.Raise (this, null);
 		}
 		protected virtual void onOpen (object sender, EventArgs e){
-			MenuRoot.IsOpened = true;
+			//MenuRoot.IsOpened = true;
 			Open.Raise (this, null);
 		}
 		protected virtual void onClose (object sender, EventArgs e){

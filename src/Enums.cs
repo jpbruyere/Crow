@@ -11,7 +11,7 @@ namespace Crow
         Vertical
     }
 
-	public enum Alignment : byte
+	public enum Alignment 
     {
         Top = 0x01,
         Left = 0x02,

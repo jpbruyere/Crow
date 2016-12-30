@@ -25,7 +25,7 @@ namespace Crow
 	/// <summary>
 	/// Measurement unit
 	/// </summary>
-	public enum Unit { Pixel, Percent }
+	public enum Unit { Pixel, Percent, Inherit }
 	/// <summary>
 	/// Measure class allow proportional sizes as well as stretched and fit on content.
 	/// </summary>
@@ -49,7 +49,7 @@ namespace Crow
 		/// set to 100 Percents
 		/// </summary>
 		public static Measure Stretched = new Measure(100, Unit.Percent);
-
+		public static Measure Inherit = new Measure (0, Unit.Inherit);
 		#region CTOR
 		public Measure (int _value, Unit _units = Unit.Pixel)
 		{
@@ -98,7 +98,8 @@ namespace Crow
 		}
 		public override string ToString ()
 		{
-			return Value == -1 ? "Fit" :
+			return Units == Unit.Inherit ? "Inherit" :
+				Value == -1 ? "Fit" :
 				Units == Unit.Percent ? Value == 100 ? "Stretched" :
 				Value.ToString () + "%" : Value.ToString ();
 		}
@@ -111,10 +112,12 @@ namespace Crow
 			string st = s.Trim ();
 			int tmp = 0;
 
-			if (string.Equals ("Fit", st, StringComparison.Ordinal))
+			if (string.Equals ("Inherit", st, StringComparison.Ordinal))
+				return Measure.Inherit;
+			else if (string.Equals ("Fit", st, StringComparison.Ordinal))
 				return Measure.Fit;
 			else if (string.Equals ("Stretched", s, StringComparison.Ordinal))
-				return Measure.Stretched;
+				return Measure.Stretched;			
 			else {
 				if (st.EndsWith ("%", StringComparison.Ordinal)) {
 					if (int.TryParse (s.Substring(0, st.Length - 1), out tmp))

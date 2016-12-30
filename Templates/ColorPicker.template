@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<Border Background="{./Background}"	Foreground="{./Foreground}"
+		CornerRadius="{./CornerRadius}" BorderWidth="1">
+		<HorizontalStack Spacing="0">
+			<VerticalStack Margin="10">
+				<SaturationValueSelector S="{²./S}" V="{²./V}" Focusable="true" Name="colorSelector" Margin="0"
+					Foreground="{../hueSelector.HueColor}"
+					Width="140" Height="140" Background="DimGray"/>
+				<HueSelector Hue="{²./H}" Focusable="true" Name="hueSelector" Margin="0" Width="140" Height="20" Background="DimGray"/>
+			</VerticalStack>
+			<VerticalStack Margin="5" Height="Stretched">
+				<HorizontalStack Height="Fit" Width="Stretched">
+					<GraphicObject Width="40" Height="30" Background="{./SelectedColor}"/>
+					<VerticalStack Margin="2">
+						<Label Focusable="true" Selectable="true" Width="Stretched" Text="{./SelectedColor}" />
+						<Label Focusable="true" Selectable="true" Width="Stretched" Text="{./HexColor}" />
+					</VerticalStack>
+				</HorizontalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="Red:" Width="40"/>
+					<Spinner Style="ColorSpinner" Value="{²./R}" Width="60"  />
+				</HorizontalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="Green:" Width="40"/>
+					<Spinner Style="ColorSpinner" Value="{²./G}" Width="60"  />
+				</HorizontalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="Blue:" Width="40"/>
+					<Spinner Style="ColorSpinner" Value="{²./B}" Width="60"  />
+				</HorizontalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="Alpha:" Width="40"/>
+					<Spinner Style="ColorSpinner" Value="{²./A}" Width="60"  />
+				</HorizontalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="Hue:" Width="40"/>
+					<Spinner Style="HSVSpinner" Value="{²./H}" Width="60"  />
+				</HorizontalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="Sat:" Width="40"/>
+					<Spinner Style="HSVSpinner" Value="{²./S}" Width="60"  />
+				</HorizontalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="Val:" Width="40"/>
+					<Spinner Style="HSVSpinner" Value="{²./V}" Width="60"  />
+				</HorizontalStack>
+			</VerticalStack>
+		</HorizontalStack>
+</Border>

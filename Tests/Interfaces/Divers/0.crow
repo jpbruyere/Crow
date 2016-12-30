@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <Window Title="Showcase" Height="90%" Width="90%">
 	<HorizontalStack >
-		<VerticalStack Width="33%" Margin="5">
+		<VerticalStack Width="30%" Margin="5">
 			<GroupBox Caption="Performance" Height="Fit">
 				<VerticalStack Width="90%" Height="Fit" Spacing="2" >
 					<HorizontalStack Height="Fit">
@@ -38,14 +38,14 @@
 			<TextBox Text="TextBox" Multiline="true" Margin="3"/>
 			<HorizontalStack Height="Fit" Margin="5" Background="Onyx" CornerRadius="10">
 				<VerticalStack Spacing="5" Width="50%">
+					<CheckBox Fit="true" Caption="test"/>
 					<CheckBox Fit="true"/>
 					<CheckBox Fit="true"/>
-					<CheckBox Fit="true"/>
-					<CheckBox Fit="true"/>
+					<CheckBox Fit="true" IsChecked="true"/>
 				</VerticalStack>
 				<VerticalStack Spacing="5" Width="50%">
 					<RadioButton Fit="true"/>
-					<RadioButton Fit="true"/>
+					<RadioButton Fit="true" IsChecked="true"/>
 					<RadioButton Fit="true"/>
 					<RadioButton Fit="true"/>
 				</VerticalStack>
@@ -71,17 +71,17 @@
 			<GroupBox Caption="Templated controls" Height="Fit" Margin="5">
 				<HorizontalStack Height="Fit">
 					<VerticalStack Width="50%">
-						<CheckBox Template="#Tests.Interfaces.CheckBox2.imlt" Style="CheckBox2"/>
-						<CheckBox  Template="#Tests.Interfaces.CheckBox2.imlt" Style="CheckBox2"/>
-						<CheckBox  Template="#Tests.Interfaces.CheckBox2.imlt" Style="CheckBox2"/>
-						<CheckBox  Template="#Tests.Interfaces.CheckBox2.imlt" Style="CheckBox2"/>
+						<CheckBox IsChecked="true" Style="CheckBox2"/>
+						<CheckBox Style="CheckBox2"/>
+						<CheckBox Style="CheckBox2"/>
+						<CheckBox Style="CheckBox2"/>
 					</VerticalStack>
 					<Splitter/>
 					<VerticalStack Width="50%">
-						<RadioButton  Template="#Tests.Interfaces.CheckBox2.imlt" Style="RadioButton2"/>
-						<RadioButton  Template="#Tests.Interfaces.CheckBox2.imlt" Style="RadioButton2"/>
-						<RadioButton  Template="#Tests.Interfaces.CheckBox2.imlt" Style="RadioButton2"/>
-						<RadioButton  Template="#Tests.Interfaces.CheckBox2.imlt" Style="RadioButton2"/>
+						<RadioButton Style="RadioButton2"/>
+						<RadioButton Style="RadioButton2"/>
+						<RadioButton Style="RadioButton2"/>
+						<RadioButton Style="RadioButton2"/>
 					</VerticalStack>
 				</HorizontalStack>
 			</GroupBox>
@@ -95,11 +95,11 @@
 			</HorizontalStack>
 		</VerticalStack>
 		<Splitter/>
-		<VerticalStack Width="33%" Margin="5" Spacing="5">
+		<VerticalStack Width="40%" Margin="5" Spacing="5">
 			<Expandable Background="DimGray">
 				<Image Path="#Crow.Images.Icons.crow.svg"/>
 			</Expandable>
-			<Popper Background="DimGray" PopDirection="Bottom">
+			<Popper Background="DimGray" >
 				<Border Fit="True" Background="DimGray" CornerRadius="0" BorderWidth="1">
 					<Image Path="#Crow.Images.Icons.crow.svg" Width="100" Height="100" Margin="10"
 						MouseEnter="{Background=LightGray}"
@@ -107,11 +107,11 @@
 				</Border>
 			</Popper>
 			<Slider Height="10" Width="90%"/>
-			<Container Height="Fit" Background="Onyx" Margin="2" CornerRadius="5">
+			<Container Height="Fit" Width="200" Background="Onyx" Margin="2" CornerRadius="5">
 				<ProgressBar Background="DimGray" Height="10" Value="50"/>
 			</Container>
 			<Image Path="#Crow.Images.Icons.crow.svg" Width="60" Height="60" Background="LightGray" />
-			<TabView Name="tabview1"
+<!--			<TabView Name="tabview1"
 				Height="120" Orientation="Horizontal" Spacing="15">
 				<TabItem Name="TabItem1" Caption="Tab 1" Margin="0">
 					<VerticalStack Fit="true">
@@ -134,21 +134,24 @@
 						<TextBox Height="Stretched" Margin="5" Multiline="true" TextAlignment="TopLeft"/>
 					</Container>
 				</TabItem>
-			</TabView>
+			</TabView>-->
 			<MessageBox Movable="false"/>
+			<ColorPicker SelectedColor="{²../go.Background}" Name="colorPicker" Background="Onyx" Margin="5" Fit="True" />
+			<GraphicObject Name="go" Width="100" Height="60" Background="DarkBlue"/>
 		</VerticalStack>
 		<Splitter/>
-		<VerticalStack Width="33%" Margin="5">
+		<VerticalStack Width="30%" Margin="5">
 			<Border Margin="5" Height="Fit">
 				<Label Width="Stretched" Margin="1" Text="{../../dv.SelectedItem}"/>
 			</Border>
-			<Border Margin="5" Height="50%">
-				<DirectoryView Name="dv" CurrentDirectory="./" Margin="1"/>
+			<Border Margin="5" Height="30%">
+				<DirectoryView Name="dv" CurrentDirectory="/" Margin="1"/>
 			</Border>
 			<Splitter/>
 			<ListBox Data="{TestList}" Margin="5"
 					 ItemTemplate="#Tests.Interfaces.colorItem.crow"
-					 Template="#Crow.Templates.ScrollingListBox.goml"/>
+					 Template="#Crow.Templates.ScrollingListBox.goml"
+					 />
 		</VerticalStack>
 	</HorizontalStack>
 </Window>

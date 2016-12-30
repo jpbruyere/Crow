@@ -56,7 +56,6 @@ namespace Crow
 			GetMethod("CreateDelegate", new Type[] { typeof(Type), typeof(object)});
 		internal static MethodInfo miObjToString = typeof(object).GetMethod("ToString");
 
-
 		internal static Type ehTypeDSChange = eiDSChange.EventHandlerType;
 		internal static FieldInfo fi_ehTypeDSChange  = typeof(CompilerServices).GetField("ehTypeDSChange", BindingFlags.Static | BindingFlags.NonPublic);
 
@@ -338,7 +337,7 @@ namespace Crow
 					if (b.Target.Member != null)
 						il.Emit (OpCodes.Ldstr, b.Target.Member.Name);
 					else
-						il.Emit (OpCodes.Ldstr, b.Expression.Split ('/').LastOrDefault ());
+						il.Emit (OpCodes.Ldstr, b.Expression.Split ('/').LastOrDefault ().Split('.').LastOrDefault());
 					il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
 					il.Emit (OpCodes.Callvirt, stringEquals);
 					il.Emit (OpCodes.Brtrue, jumpTable [i]);
@@ -392,7 +391,7 @@ namespace Crow
 						il.Emit (OpCodes.Callvirt, tostring.Method);
 					} else if (!sourceValueType.IsValueType)
 						il.Emit (OpCodes.Castclass, sourceValueType);
-					else if (b.Source.Property.PropertyType != sourceValueType) {
+					else if (b.Source.Property.PropertyType != sourceValueType && b.Source.Property.PropertyType != typeof(object)) {
 						il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (b.Source.Property.PropertyType));
 					} else
 						il.Emit (OpCodes.Unbox_Any, b.Source.Property.PropertyType);
@@ -411,8 +410,13 @@ namespace Crow
 				il.Emit (OpCodes.Pop);
 				il.Emit (OpCodes.Ret);
 
-				Delegate del = dm.CreateDelegate (eiValueChange.EventHandlerType, Bindings [0].Source.Instance);
-				miValueChangeAdd.Invoke (grouped [0].Target.Instance, new object [] { del });
+				try {
+					Delegate del = dm.CreateDelegate (eiValueChange.EventHandlerType, Bindings [0].Source.Instance);
+					miValueChangeAdd.Invoke (grouped [0].Target.Instance, new object [] { del });
+
+				} catch (Exception ex) {					
+					Debug.WriteLine ("Binding Delegate error for {0}: \n{1}", Bindings [0].Source.Instance, ex.ToString ());
+				}
 			}
 		}
 
@@ -692,10 +696,11 @@ namespace Crow
 			}
 			if (tmp != null)
 				return tmp;
-			if (dstType == typeof(string))
+			if (dstType == typeof(string) || dstType == typeof(object))//TODO:object should be allowed to return null and not ""
 				return "";
 			if (dstType.IsValueType)
 				return Activator.CreateInstance (dstType);
+			
 			return null;
 		}
 		public static void emitGetInstance (ILGenerator il, NodeAddress orig, NodeAddress dest){
@@ -744,9 +749,20 @@ namespace Crow
 		/// Emit conversion from orig type to dest type
 		/// </summary>
 		public static void emitConvert(ILGenerator il, Type origType, Type destType){
-			if (destType == typeof(string))
+			if (destType == typeof(object))
+				return;
+			if (destType == typeof(string)) {
+				System.Reflection.Emit.Label emitNullStr = il.DefineLabel ();
+				System.Reflection.Emit.Label endConvert = il.DefineLabel ();
+				il.Emit (OpCodes.Dup);
+				il.Emit (OpCodes.Brfalse, emitNullStr);
 				il.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
-			else if (origType.IsValueType) {
+				il.Emit (OpCodes.Br, endConvert);
+				il.MarkLabel (emitNullStr);
+				il.Emit (OpCodes.Pop);//remove null string from stack
+				il.Emit (OpCodes.Ldstr, "");//replace with empty string
+				il.MarkLabel (endConvert);
+			}else if (origType.IsValueType) {
 				if (destType != origType) {
 					il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (destType));
 				}else
@@ -840,6 +856,10 @@ namespace Crow
 		public static void RemoveEventHandlerByName(object instance, string eventName, string delegateName){
 			Type t = instance.GetType ();
 			FieldInfo fiEvt = CompilerServices.GetEventHandlerField (t, eventName);
+			if (fiEvt == null) {
+				Debug.WriteLine ("RemoveHandlerByName: Event '" + eventName + "' not found in " + instance);
+				return;
+			}
 			EventInfo eiEvt = t.GetEvent (eventName);
 			MulticastDelegate multiDel = fiEvt.GetValue (instance) as MulticastDelegate;
 			if (multiDel != null) {
@@ -872,7 +892,13 @@ namespace Crow
 				}
 			}
 		}
-
+		internal static Delegate createDel(Type eventType, object instance, string method){
+			Type t = instance.GetType ();
+			MethodInfo mi = t.GetMethod (method);
+			if (mi == null)
+				return null;
+			return Delegate.CreateDelegate (eventType, instance, mi);
+		}
 		public static Delegate compileDynEventHandler(EventInfo sourceEvent, string expression, NodeAddress currentNode = null){
 			#if DEBUG_BINDING
 			Debug.WriteLine ("\tCompile Event {0}: {1}", sourceEvent.Name, expression);
@@ -1040,9 +1066,12 @@ namespace Crow
 					throw new Exception ("Binding error: try to bind outside IML source");
 				ptr -= levelUp;
 			}
-			Node[] targetNode = new Node[ptr+1];
-			Array.Copy (sourceAddr.ToArray (), targetNode, ptr + 1);
-			return new NodeAddress (targetNode);
+			//TODO:change Template special address identified with Nodecount = 0 to something not using array count to 0,
+			//here linq is working without limits checking in compile option
+			//but defining a 0 capacity array with limits cheking enabled, cause 'out of memory' error
+			return new NodeAddress (sourceAddr.Take(ptr+1).ToArray());//[ptr+1];
+			//Array.Copy (sourceAddr.ToArray (), targetNode, ptr + 1);
+			//return new NodeAddress (targetNode);
 		}
 
 	}

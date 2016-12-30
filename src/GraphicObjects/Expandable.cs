@@ -45,14 +45,12 @@ namespace Crow
 		public event EventHandler Collapse;
 		#endregion
 
-		#region GraphicObject overrides
-		public override void onMouseClick (object sender, MouseButtonEventArgs e)
+		public BooleanTestOnInstance GetIsExpandable;
+
+		public void onClickForExpand (object sender, MouseButtonEventArgs e)
 		{
-			if (this.HasFocus)
-				IsExpanded = !IsExpanded;
-			base.onMouseClick (sender, e);
+			IsExpanded = !IsExpanded;
 		}
-		#endregion
 
 		public override GraphicObject Content {
 			get {
@@ -72,7 +70,7 @@ namespace Crow
 		}
 
 		#region Public properties
-		[XmlAttributeAttribute()][DefaultValue("Expandable")]
+		[XmlAttributeAttribute][DefaultValue("Expandable")]
 		public string Caption {
 			get { return caption; } 
 			set {
@@ -82,7 +80,7 @@ namespace Crow
 				NotifyValueChanged ("Caption", caption);
 			}
 		}        
-		[XmlAttributeAttribute()][DefaultValue("#Crow.Images.Icons.expandable.svg")]
+		[XmlAttributeAttribute][DefaultValue("#Crow.Images.Icons.expandable.svg")]
 		public string Image {
 			get { return image; } 
 			set {
@@ -92,7 +90,7 @@ namespace Crow
 				NotifyValueChanged ("Image", image);
 			}
 		}     
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[XmlAttributeAttribute][DefaultValue(false)]
         public bool IsExpanded
         {
 			get { return _isExpanded; }
@@ -103,7 +101,9 @@ namespace Crow
 
 				_isExpanded = value;
 
-				if (!HasContent)
+				bool isExp = IsExpandable;
+				NotifyValueChanged ("IsExpandable", isExp);
+				if (!(HasContent & isExp))
 					_isExpanded = false;
 
 				NotifyValueChanged ("IsExpanded", _isExpanded);
@@ -117,7 +117,16 @@ namespace Crow
 		[XmlIgnore]public bool HasContent {
 			get { return _contentContainer == null ? false : _contentContainer.Child != null; }
 		}
-
+		[XmlIgnore]public bool IsExpandable {
+			get {
+				try {
+					return GetIsExpandable == null ? true : GetIsExpandable (this); 
+				} catch (Exception ex) {
+					System.Diagnostics.Debug.WriteLine ("Not Expandable error: " + ex.ToString ());
+					return false;
+				}		
+			}
+		}
 		#endregion
 
 		public virtual void onExpand(object sender, EventArgs e)

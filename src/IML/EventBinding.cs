@@ -1,5 +1,5 @@
 ﻿//
-//  DataSourceChangeEventArg.cs
+//  EventBinding.cs
 //
 //  Author:
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
@@ -19,23 +19,21 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Reflection;
 
-namespace Crow
+namespace Crow.IML
 {
-	public class DataSourceChangeEventArgs : EventArgs
+	public class EventBinding : BindingDefinition
 	{
-		public object OldDataSource;
-		public object NewDataSource;
+		public EventInfo SourceEvent;
 
-		public DataSourceChangeEventArgs (object oldDataSource, object newDataSource) : base()
+		#region CTOR
+		public EventBinding (NodeAddress _sourceNA, EventInfo _sourceEvt, NodeAddress _targetNA, string _targetMember, string _targetName = "")
+			: base (_sourceNA, _sourceEvt.Name, _targetNA, _targetMember, _targetName)
 		{
-			OldDataSource = oldDataSource;
-			NewDataSource = newDataSource;
+			SourceEvent = _sourceEvt;
 		}
-		public override string ToString ()
-		{
-			return string.Format ("DSChangeEA: {0} => {1}", OldDataSource, NewDataSource);
-		}
+		#endregion
 	}
 }
 
