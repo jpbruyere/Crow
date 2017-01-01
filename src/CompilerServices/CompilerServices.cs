@@ -98,7 +98,7 @@ namespace Crow
 		/// <param name="il">Il.</param>
 		public static void emitSetCurInterface(ILGenerator il){
 			il.Emit (OpCodes.Ldloc_0);
-			il.Emit (OpCodes.Ldarg_2);
+			il.Emit (OpCodes.Ldarg_1);
 			il.Emit (OpCodes.Stfld, miSetCurIface);
 		}
 

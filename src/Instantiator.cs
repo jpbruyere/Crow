@@ -32,7 +32,7 @@ using Crow.IML;
 
 namespace Crow
 {
-	public delegate void InstanciatorInvoker(object instance, Interface iface);
+	public delegate object InstanciatorInvoker(Interface iface);
 
 	/// <summary>
 	/// Instantiator
@@ -87,10 +87,8 @@ namespace Crow
 		}
 		#endregion
 
-		public GraphicObject CreateInstance(Interface iface){
-			GraphicObject tmp = (GraphicObject)Activator.CreateInstance(RootType);
-			loader (tmp, iface);
-			return tmp;
+		public GraphicObject CreateInstance(Interface iface){			
+			return loader (iface) as GraphicObject;
 		}
 
 		List<DynamicMethod> dsValueChangedDynMeths = new List<DynamicMethod>();
@@ -116,6 +114,7 @@ namespace Crow
 
 			emitBindingDelegates (ctx);
 
+			ctx.il.Emit (OpCodes.Ldloc_0);//load root obj to return
 			ctx.il.Emit(OpCodes.Ret);
 
 			reader.Read ();//close tag
@@ -209,7 +208,7 @@ namespace Crow
 					if (string.IsNullOrEmpty (templatePath)) {
 						ctx.il.Emit (OpCodes.Ldnull);//default template loading
 					} else {
-						ctx.il.Emit (OpCodes.Ldarg_2);//load currentInterface
+						ctx.il.Emit (OpCodes.Ldarg_1);//load currentInterface
 						ctx.il.Emit (OpCodes.Ldstr, templatePath); //Load template path string
 						ctx.il.Emit (OpCodes.Callvirt,//call Interface.Load(path)
 							CompilerServices.miIFaceLoad);

@@ -57,10 +57,15 @@ namespace Crow.IML
 		{
 			RootType = rootType;
 			dm = new DynamicMethod ("dyn_instantiator",
-				typeof (void), new Type [] { typeof (Instantiator), typeof (object), typeof (Interface) }, true);
+				CompilerServices.TObject, new Type [] { typeof (Instantiator), typeof (Interface) }, true);
 			il = dm.GetILGenerator (256);
 
-			initILGen ();
+			il.DeclareLocal (typeof (GraphicObject));
+			il.Emit (OpCodes.Nop);
+			//set local GraphicObject to root object 
+			il.Emit (OpCodes.Newobj, rootType.GetConstructors () [0]);
+			il.Emit (OpCodes.Stloc_0);
+			CompilerServices.emitSetCurInterface (il);
 		}
 
 		public NodeAddress CurrentNodeAddress {
@@ -146,16 +151,6 @@ namespace Crow.IML
 				throw new Exception ("Target Name '" + bd.TargetName + "' not found");
 
 			bd.ResolveTargetName (resolvedNA);
-		}
-
-		void initILGen ()
-		{
-			il.DeclareLocal (typeof (GraphicObject));
-			il.Emit (OpCodes.Nop);
-			//set local GraphicObject to root object passed as 1st argument
-			il.Emit (OpCodes.Ldarg_1);
-			il.Emit (OpCodes.Stloc_0);
-			CompilerServices.emitSetCurInterface (il);
 		}
 
 		/// <summary>
