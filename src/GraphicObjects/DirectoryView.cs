@@ -52,7 +52,7 @@ namespace Crow
 				NotifyValueChanged ("SelectedItem", _selectedItem);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[XmlAttributeAttribute()][DefaultValue(true)]
 		public virtual bool ShowFiles {
 			get { return showFiles; }
 			set {
@@ -76,8 +76,10 @@ namespace Crow
 		}
 		[XmlIgnore]public FileSystemInfo[] FileSystemEntries {
 			get { 
-				return showFiles ? new DirectoryInfo (CurrentDirectory).GetFileSystemInfos ():
-					new DirectoryInfo(currentDirectory).GetDirectories(); 
+				return string.IsNullOrEmpty(CurrentDirectory) ? null :
+					showFiles ?					
+					new DirectoryInfo (CurrentDirectory).GetFileSystemInfos () :
+					new DirectoryInfo(CurrentDirectory).GetDirectories(); 
 			}
 		}
 		public void onSelectedItemChanged (object sender, SelectionChangeEventArgs e){

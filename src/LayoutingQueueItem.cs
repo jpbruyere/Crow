@@ -96,7 +96,9 @@ namespace Crow
 			if (Layoutable.Parent == null) {//TODO:improve this
 				//cancel layouting for object without parent, maybe some were in queue when
 				//removed from a listbox
+				#if DEBUG_LAYOUTING
 				Debug.WriteLine ("ERROR: processLayouting, no parent for: " + this.ToString ());
+				#endif
 				return;
 			}
 			#if DEBUG_LAYOUTING

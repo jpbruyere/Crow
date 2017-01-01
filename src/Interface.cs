@@ -63,7 +63,8 @@ namespace Crow
 
 		#region Static and constants
 		public static int DoubleClick = 200;//ms
-		internal static Stopwatch clickTimer = new Stopwatch();
+		internal Stopwatch clickTimer = new Stopwatch();
+		internal GraphicObject eligibleForDoubleClick = null; 
 		public static int TabSize = 4;
 		public static string LineBreak = "\r\n";
 		//TODO: shold be declared in graphicObject
@@ -100,10 +101,10 @@ namespace Crow
 //			if (g.RegisteredLayoutings != LayoutingType.None)
 //				return;
 			ILayoutable l = g;
-			while (l.Parent != null)
-				l = l.Parent;
-			if (!(l is Interface))
-				return;
+//			while (l.Parent != null)
+//				l = l.Parent;
+//			if (!(l is Interface))
+//				return;
 
 			lock (DrawingQueue) {
 				if (g.IsQueueForRedraw)
@@ -312,10 +313,10 @@ namespace Crow
 				if (_focusedWidget == value)
 					return;
 				if (_focusedWidget != null)
-					_focusedWidget.onUnfocused (this, null);
+					_focusedWidget.HasFocus = false;
 				_focusedWidget = value;
 				if (_focusedWidget != null)
-					_focusedWidget.onFocused (this, null);
+					_focusedWidget.HasFocus = true;
 			}
 		}
 		#endregion
@@ -411,15 +412,9 @@ namespace Crow
 				while (DrawingQueue.Count > 0) {
 					GraphicObject g = DrawingQueue.Dequeue ();
 					g.IsQueueForRedraw = false;
-					try {
-						if (g.Parent == null)
-							continue;
-						g.Parent.RegisterClip (g.LastPaintedSlot);
-						if (g.getSlot () != g.LastPaintedSlot)
-							g.Parent.RegisterClip (g.getSlot ());
-					} catch (Exception ex) {
-						Debug.WriteLine ("Error Register Clip: " + ex.ToString ());
-					}
+					g.Parent.RegisterClip (g.LastPaintedSlot);
+					if (g.getSlot () != g.LastPaintedSlot)
+						g.Parent.RegisterClip (g.getSlot ());
 				}
 			}
 			#if MEASURE_TIME
@@ -499,7 +494,6 @@ namespace Crow
 		public void DeleteWidget(GraphicObject g)
 		{
 			g.Visible = false;//trick to ensure clip is added to refresh zone
-			g.ClearBinding();
 			GraphicTree.Remove (g);
 		}
 		public void PutOnTop(GraphicObject g)
@@ -519,8 +513,8 @@ namespace Crow
 				//TODO:parent is not reset to null because object will be added
 				//to ObjectToRedraw list, and without parent, it fails
 				GraphicObject g = GraphicTree [i];
+				g.DataSource = null;
 				g.Visible = false;
-				g.ClearBinding ();
 				GraphicTree.RemoveAt (0);
 			}
 			#if DEBUG_LAYOUTING

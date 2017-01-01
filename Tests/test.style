@@ -12,11 +12,13 @@ FpsDisp {
 	Background = Teal;
 }
 CheckBox2 {
+	Template= #Tests.Interfaces.CheckBox2.imlt;
 	Background = Onyx;
 	Checked={Background=Mantis;Font=droid bold, 10};
 	Unchecked = {Background=Onyx;Font=droid,10};
 }
 RadioButton2 {
+	Template=#Tests.Interfaces.CheckBox2.imlt;
 	Background = Onyx;
 	Checked = {Background=Mantis;Font=droid bold, 10};
 	Unchecked = {Background=Onyx;Font=droid,10};

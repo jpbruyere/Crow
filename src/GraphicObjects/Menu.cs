@@ -65,7 +65,7 @@ namespace Crow
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			IsOpened = false;
+			//IsOpened = false;
 		}
 	}
 }

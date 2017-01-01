@@ -12,22 +12,14 @@ using System.IO;
 
 namespace Crow
 {
-	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange, ICloneable, IBindable
+	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange, ICloneable
 	{
-		#region IBindable implementation
-		List<Binding> bindings = new List<Binding> ();
-		public List<Binding> Bindings {
-			get { return bindings; }
-		}
-
-		#endregion
-
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
 
 		Interface currentInterface = null;
 
-		public Interface CurrentInterface {
+		[XmlIgnore]public Interface CurrentInterface {
 			get {
 				if (currentInterface == null) {
 					currentInterface = Interface.CurrentInterface;
@@ -47,6 +39,7 @@ namespace Crow
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
 		public virtual void NotifyValueChanged(string MemberName, object _value)
 		{
+			//Debug.WriteLine ("Value changed: {0}->{1} = {2}", this, MemberName, _value);
 			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
 		}
 		#endregion
@@ -87,7 +80,7 @@ namespace Crow
 		Size minimumSize = "0,0";
 		bool cacheEnabled = false;
 		bool clipToClientRect = true;
-		object dataSource;
+		protected object dataSource;
 		string style;
 		#endregion
 
@@ -132,11 +125,29 @@ namespace Crow
 		/// </summary>
 		[XmlIgnore]public virtual ILayoutable Parent {
 			get { return parent; }
-			set { parent = value; }
+			set {
+				if (parent == value)
+					return;
+				DataSourceChangeEventArgs e = new DataSourceChangeEventArgs (parent, value);
+				parent = value;
+
+				onParentChanged (this, e);
+			}
 		}
 		[XmlIgnore]public ILayoutable LogicalParent {
 			get { return logicalParent == null ? Parent : logicalParent; }
-			set { logicalParent = value; }
+			set {
+				if (logicalParent == value)
+					return;
+				if (logicalParent != null)
+					(logicalParent as GraphicObject).DataSourceChanged -= onLogicalParentDataSourceChanged;
+				DataSourceChangeEventArgs dsce = new DataSourceChangeEventArgs (LogicalParent, null);
+				logicalParent = value;
+				dsce.NewDataSource = LogicalParent;
+				if (logicalParent != null)
+					(logicalParent as GraphicObject).DataSourceChanged += onLogicalParentDataSourceChanged;
+				onLogicalParentChanged (this, dsce);
+			}
 		}
 		[XmlIgnore]public virtual Rectangle ClientRectangle {
 			get {
@@ -177,6 +188,9 @@ namespace Crow
 		public event EventHandler Enabled;
 		public event EventHandler Disabled;
 		public event EventHandler<LayoutingEventArgs> LayoutChanged;
+		public event EventHandler<DataSourceChangeEventArgs> DataSourceChanged;
+		public event EventHandler<DataSourceChangeEventArgs> ParentChanged;
+		public event EventHandler<DataSourceChangeEventArgs> LogicalParentChanged;
 		#endregion
 
 		#region public properties
@@ -226,6 +240,7 @@ namespace Crow
 
 				verticalAlignment = value;
 				NotifyValueChanged("VerticalAlignment", verticalAlignment);
+				RegisterForLayouting (LayoutingType.Y);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(HorizontalAlignment.Center)]
@@ -237,6 +252,7 @@ namespace Crow
 
 				horizontalAlignment = value;
 				NotifyValueChanged("HorizontalAlignment", horizontalAlignment);
+				RegisterForLayouting (LayoutingType.X);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
@@ -373,6 +389,10 @@ namespace Crow
 					return;
 
 				hasFocus = value;
+				if (hasFocus)
+					onFocused (this, null);
+				else
+					onUnfocused (this, null);
 				NotifyValueChanged ("HasFocus", hasFocus);
 			}
 		}
@@ -401,6 +421,8 @@ namespace Crow
 			get { return background; }
 			set {
 				if (background == value)
+					return;
+				if (value == null)
 					return;
 				background = value;
 				NotifyValueChanged ("Background", background);
@@ -523,32 +545,45 @@ namespace Crow
 				RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
+		/// <summary>
+		/// Seek first logical tree upward if logicalParent is set, or seek graphic tree for
+		/// a not null dataSource that will be active for all descendants having dataSource=null
+		/// </summary>
 		[XmlAttributeAttribute][DefaultValue(null)]
 		public virtual object DataSource {
 			set {
-				if (dataSource == value)
+				if (DataSource == value)
 					return;
-				#if DEBUG_BINDING
-				Debug.WriteLine("******************************");
-				Debug.WriteLine("New DataSource for => " + this.ToString());
-				Debug.WriteLine("\t- " + DataSource);
-				Debug.WriteLine("\t+ " + value);
-				#endif
 
-				this.ClearBinding ();
-
+				DataSourceChangeEventArgs dse = new DataSourceChangeEventArgs (DataSource, null);
 				dataSource = value;
+				dse.NewDataSource = DataSource;
 
-				this.ResolveBindings();
+				OnDataSourceChanged (this, dse);
 
-				NotifyValueChanged ("DataSource", dataSource);
+				NotifyValueChanged ("DataSource", DataSource);
 			}
 			get {
-				return dataSource == null ? LogicalParent == null ? null :
-					LogicalParent is GraphicObject ?
-					(LogicalParent as GraphicObject).DataSource : null : dataSource;
+				return dataSource == null ? 
+					LogicalParent == null ? null :
+					LogicalParent is GraphicObject ? (LogicalParent as GraphicObject).DataSource : null :
+					dataSource;
 			}
 		}
+		protected virtual void onLogicalParentDataSourceChanged(object sender, DataSourceChangeEventArgs e){
+			if (localDataSourceIsNull)
+				OnDataSourceChanged (this, e);
+		}
+		internal bool localDataSourceIsNull { get { return dataSource == null; } }
+		internal bool localLogicalParentIsNull { get { return logicalParent == null; } }
+
+		public virtual void OnDataSourceChanged(object sender, DataSourceChangeEventArgs e){
+			DataSourceChanged.Raise (this, e);
+			#if DEBUG_BINDING
+			Debug.WriteLine("New DataSource for => {0} \n\t{1}=>{2}", this.ToString(),e.OldDataSource,e.NewDataSource);
+			#endif
+		}
+
 		[XmlAttributeAttribute]
 		public virtual string Style {
 			get { return style; }
@@ -630,10 +665,10 @@ namespace Crow
 			dm = new DynamicMethod("dyn_loadDefValues",
 				MethodAttributes.Family | MethodAttributes.FamANDAssem | MethodAttributes.NewSlot,
 				CallingConventions.Standard,
-				typeof(void),new Type[] {typeof(object)},thisType,true);
+				typeof(void),new Type[] {CompilerServices.TObject},thisType,true);
 
 			il = dm.GetILGenerator(256);
-			il.DeclareLocal(typeof(GraphicObject));
+			il.DeclareLocal(CompilerServices.TObject);
 			il.Emit(OpCodes.Nop);
 			//set local GraphicObject to root object passed as 1st argument
 			il.Emit (OpCodes.Ldarg_0);
@@ -643,7 +678,26 @@ namespace Crow
 				string expression;
 				if (!getDefaultEvent(ei, styling, out expression))
 					continue;
-				CompilerServices.emitBindingCreation (il, ei.Name, expression);
+				//TODO:dynEventHandler could be cached somewhere, maybe a style instanciato class holding the styling delegate and bound to it.
+				foreach (string exp in CompilerServices.splitOnSemiColumnOutsideAccolades(expression)) {
+					string trimed = exp.Trim();
+					if (trimed.StartsWith ("{", StringComparison.OrdinalIgnoreCase)){
+						il.Emit (OpCodes.Ldloc_0);//load this as 1st arg of event Add
+
+						//push eventInfo as 1st arg of compile
+						il.Emit (OpCodes.Ldloc_0);
+						il.Emit (OpCodes.Call, CompilerServices.miGetType);
+						il.Emit (OpCodes.Ldstr, ei.Name);//push event name
+						il.Emit (OpCodes.Call, CompilerServices.miGetEvent);
+						//push expression as 2nd arg of compile
+						il.Emit (OpCodes.Ldstr, trimed.Substring (1, trimed.Length - 2));
+						il.Emit (OpCodes.Ldnull);
+						il.Emit (OpCodes.Callvirt, CompilerServices.miCompileDynEventHandler);
+						il.Emit (OpCodes.Castclass, ei.EventHandlerType);
+						il.Emit (OpCodes.Callvirt, ei.AddMethod);
+					}else
+						Debug.WriteLine("error in styling, event not handled : " + trimed);
+				}
 			}
 
 			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
@@ -1030,9 +1084,6 @@ namespace Crow
 		/// of the widget </summary>
 		public virtual void Paint (ref Context ctx)
 		{
-			if (!Visible)
-				return;
-
 			//TODO:this test should not be necessary
 			if (Slot.Height < 0 || Slot.Width < 0)
 				return;
@@ -1120,6 +1171,12 @@ namespace Crow
 			MouseMove.Raise (sender, e);
 		}
 		public virtual void onMouseDown(object sender, MouseButtonEventArgs e){
+			if (CurrentInterface.eligibleForDoubleClick == this && CurrentInterface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick)
+				onMouseDoubleClick (this, e);
+			else
+				currentInterface.clickTimer.Restart();
+			CurrentInterface.eligibleForDoubleClick = null;
+			
 			if (CurrentInterface.activeWidget == null)
 				CurrentInterface.activeWidget = this;
 			if (this.Focusable && !Interface.FocusOnHover) {
@@ -1144,19 +1201,13 @@ namespace Crow
 
 			MouseUp.Raise (this, e);
 
-			if (MouseIsIn (e.Position) && IsActive)
+			if (MouseIsIn (e.Position) && IsActive) {
+				if (CurrentInterface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick)
+					CurrentInterface.eligibleForDoubleClick = this;
 				onMouseClick (this, e);
+			}
 		}
 		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){
-
-			if (Interface.clickTimer.ElapsedMilliseconds > 0 &&
-			    Interface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick) {
-				Interface.clickTimer.Reset ();
-				onMouseDoubleClick (this, e);
-				return;
-			} else
-				Interface.clickTimer.Restart ();
-
 			GraphicObject p = Parent as GraphicObject;
 			if (p != null)
 				p.onMouseClick(sender,e);
@@ -1191,20 +1242,17 @@ namespace Crow
 		}
 		#endregion
 
-		public virtual void onFocused(object sender, EventArgs e){
+		protected virtual void onFocused(object sender, EventArgs e){
 			#if DEBUG_FOCUS
 			Debug.WriteLine("Focused => " + this.ToString());
 			#endif
 			Focused.Raise (this, e);
-			this.HasFocus = true;
 		}
-		public virtual void onUnfocused(object sender, EventArgs e){
+		protected virtual void onUnfocused(object sender, EventArgs e){
 			#if DEBUG_FOCUS
 			Debug.WriteLine("UnFocused => " + this.ToString());
 			#endif
-
 			Unfocused.Raise (this, e);
-			this.HasFocus = false;
 		}
 		public virtual void onEnable(object sender, EventArgs e){
 			Enabled.Raise (this, e);
@@ -1212,147 +1260,73 @@ namespace Crow
 		public virtual void onDisable(object sender, EventArgs e){
 			Disabled.Raise (this, e);
 		}
-
-		#region Binding
-		public void BindMember(string _member, string _expression){
-			Bindings.Add(new Binding (this, _member, _expression));
+		protected virtual void onParentChanged(object sender, DataSourceChangeEventArgs e) {
+			ParentChanged.Raise (this, e);
+			if (logicalParent == null)
+				LogicalParentChanged.Raise (this, e);
 		}
-		public virtual void ResolveBindings()
-		{
-			if (Bindings.Count == 0)
-				return;
-			#if DEBUG_BINDING
-			Debug.WriteLine ("Resolve Bindings => " + this.ToString ());
-			#endif
-
-			CompilerServices.ResolveBindings (Bindings);
+		protected virtual void onLogicalParentChanged(object sender, DataSourceChangeEventArgs e) {
+			LogicalParentChanged.Raise (this, e);
 		}
-
-		/// <summary>
-		/// Remove dynamic delegates by ids from dataSource
-		///  and delete ref of this in Shared interface refs
-		/// </summary>
-		public virtual void ClearBinding(){
-			//dont clear binding if dataSource is not null,
-			foreach (Binding b in Bindings) {
-				try {
-					if (!b.Resolved)
-						continue;
-					//cancel compiled events
-					if (b.Target == null){
-						continue;
-						#if DEBUG_BINDING
-						Debug.WriteLine("Clear binding canceled for => " + b.ToString());
-						#endif
-					}
-					if (b.Target.Instance != DataSource){
-						#if DEBUG_BINDING
-						Debug.WriteLine("Clear binding canceled for => " + b.ToString());
-						#endif
-						continue;
-					}
-					#if DEBUG_BINDING
-					Debug.WriteLine("ClearBinding => " + b.ToString());
-					#endif
-					if (string.IsNullOrEmpty (b.DynMethodId)) {
-						b.Resolved = false;
-						if (b.Source.Member.MemberType == MemberTypes.Event)
-							removeEventHandler (b);
-						//TODO:check if full reset is necessary
-						continue;
-					}
-					MemberReference mr = null;
-					if (b.Target == null)
-						mr = b.Source;
-					else
-						mr = b.Target;
-					Type dataSourceType = mr.Instance.GetType();
-					EventInfo evtInfo = dataSourceType.GetEvent ("ValueChanged");
-					FieldInfo evtFi = CompilerServices.GetEventHandlerField (dataSourceType, "ValueChanged");
-					MulticastDelegate multicastDelegate = evtFi.GetValue (mr.Instance) as MulticastDelegate;
-					if (multicastDelegate != null) {
-						foreach (Delegate d in multicastDelegate.GetInvocationList()) {
-							if (d.Method.Name == b.DynMethodId)
-								evtInfo.RemoveEventHandler (mr.Instance, d);
-						}
-					}
-					b.Reset ();
-				} catch (Exception ex) {
-					Debug.WriteLine("\t Error: " + ex.ToString());
-				}
-			}
-		}
-		void removeEventHandler(Binding b){
-			FieldInfo fiEvt = CompilerServices.GetEventHandlerField (b.Source.Instance.GetType(), b.Source.Member.Name);
-			MulticastDelegate multiDel = fiEvt.GetValue (b.Source.Instance) as MulticastDelegate;
-			if (multiDel != null) {
-				foreach (Delegate d in multiDel.GetInvocationList()) {
-					if (d.Method.Name == b.Target.Member.Name)
-						b.Source.Event.RemoveEventHandler (b.Source.Instance, d);
-				}
-			}
-		}
-		#endregion
-
 		#region IXmlSerializable
 		public virtual System.Xml.Schema.XmlSchema GetSchema ()
 		{
 			return null;
 		}
-		void affectMember(string name, string value){
-			Type thisType = this.GetType ();
-
-			if (string.IsNullOrEmpty (value))
-				return;
-
-			MemberInfo mi = thisType.GetMember (name).FirstOrDefault();
-			if (mi == null) {
-				Debug.WriteLine ("XML: Unknown attribute in " + thisType.ToString() + " : " + name);
-				return;
-			}
-			if (mi.MemberType == MemberTypes.Event) {
-				this.Bindings.Add (new Binding (new MemberReference(this, mi), value));
-				return;
-			}
-			if (mi.MemberType == MemberTypes.Property) {
-				PropertyInfo pi = mi as PropertyInfo;
-
-				if (pi.GetSetMethod () == null) {
-					Debug.WriteLine ("XML: Read only property in " + thisType.ToString() + " : " + name);
-					return;
-				}
-
-				XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
-				if (xaa != null) {
-					if (!string.IsNullOrEmpty (xaa.AttributeName))
-						name = xaa.AttributeName;
-				}
-				if (value.StartsWith("{",StringComparison.Ordinal)) {
-					//binding
-					if (!value.EndsWith("}", StringComparison.Ordinal))
-						throw new Exception (string.Format("XML:Malformed binding: {0}", value));
-
-					this.Bindings.Add (new Binding (new MemberReference(this, pi), value.Substring (1, value.Length - 2)));
-					return;
-				}
-				if (pi.GetCustomAttribute (typeof(XmlIgnoreAttribute)) != null)
-					return;
-				if (xaa == null)//not define as xmlAttribute
-					return;
-
-				if (pi.PropertyType == typeof(string)) {
-					pi.SetValue (this, value, null);
-					return;
-				}
-
-				if (pi.PropertyType.IsEnum) {
-					pi.SetValue (this, Enum.Parse (pi.PropertyType, value), null);
-				} else {
-					MethodInfo me = pi.PropertyType.GetMethod ("Parse", new Type[] { typeof(string) });
-					pi.SetValue (this, me.Invoke (null, new string[] { value }), null);
-				}
-			}
-		}
+//		void affectMember(string name, string value){
+//			Type thisType = this.GetType ();
+//
+//			if (string.IsNullOrEmpty (value))
+//				return;
+//
+//			MemberInfo mi = thisType.GetMember (name).FirstOrDefault();
+//			if (mi == null) {
+//				Debug.WriteLine ("XML: Unknown attribute in " + thisType.ToString() + " : " + name);
+//				return;
+//			}
+//			if (mi.MemberType == MemberTypes.Event) {
+//				this.Bindings.Add (new Binding (new MemberReference(this, mi), value));
+//				return;
+//			}
+//			if (mi.MemberType == MemberTypes.Property) {
+//				PropertyInfo pi = mi as PropertyInfo;
+//
+//				if (pi.GetSetMethod () == null) {
+//					Debug.WriteLine ("XML: Read only property in " + thisType.ToString() + " : " + name);
+//					return;
+//				}
+//
+//				XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
+//				if (xaa != null) {
+//					if (!string.IsNullOrEmpty (xaa.AttributeName))
+//						name = xaa.AttributeName;
+//				}
+//				if (value.StartsWith("{",StringComparison.Ordinal)) {
+//					//binding
+//					if (!value.EndsWith("}", StringComparison.Ordinal))
+//						throw new Exception (string.Format("XML:Malformed binding: {0}", value));
+//
+//					this.Bindings.Add (new Binding (new MemberReference(this, pi), value.Substring (1, value.Length - 2)));
+//					return;
+//				}
+//				if (pi.GetCustomAttribute (typeof(XmlIgnoreAttribute)) != null)
+//					return;
+//				if (xaa == null)//not define as xmlAttribute
+//					return;
+//
+//				if (pi.PropertyType == typeof(string)) {
+//					pi.SetValue (this, value, null);
+//					return;
+//				}
+//
+//				if (pi.PropertyType.IsEnum) {
+//					pi.SetValue (this, Enum.Parse (pi.PropertyType, value), null);
+//				} else {
+//					MethodInfo me = pi.PropertyType.GetMethod ("Parse", new Type[] { typeof(string) });
+//					pi.SetValue (this, me.Invoke (null, new string[] { value }), null);
+//				}
+//			}
+//		}
 		public virtual void ReadXml (System.Xml.XmlReader reader)
 		{
 			if (reader.HasAttributes) {
@@ -1365,7 +1339,7 @@ namespace Crow
 					if (reader.Name == "Style")
 						continue;
 
-					affectMember (reader.Name, reader.Value);
+					//affectMember (reader.Name, reader.Value);
 				}
 				reader.MoveToElement ();
 			}else
@@ -1483,12 +1457,6 @@ namespace Crow
 		/// <summary>
 		/// full GraphicTree clone with binding definition
 		/// </summary>
-		public virtual GraphicObject DeepClone(){
-			GraphicObject tmp = Clone () as GraphicObject;
-			foreach (Binding b in this.bindings)
-				tmp.Bindings.Add (new Binding (new MemberReference (tmp, b.Source.Member), b.Expression));
-			return tmp;
-		}
 
 		public override string ToString ()
 		{

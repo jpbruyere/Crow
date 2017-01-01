@@ -3,4 +3,5 @@
 	Margin="10" CornerRadius="10">
 	<Label Font="20" Text="Press &lt;F3&gt; to cycle into the examples"/>
 	<Label Font="20" Text="Those are basic tests used to validate changes"/>
+	<Label Font="20" Text="{fps}"/>
 </VerticalStack>

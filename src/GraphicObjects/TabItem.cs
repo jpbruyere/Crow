@@ -46,14 +46,14 @@ namespace Crow
 				return _contentContainer == null ? null : _contentContainer.Child;
 			}
 			set {
+				if (Content != null) {
+					Content.LogicalParent = null;
+					_contentContainer.SetChild (null);
+				}
 				_contentContainer.SetChild(value);
+				if (value != null)
+					value.LogicalParent = this;
 			}
-		}
-		public override void ResolveBindings ()
-		{
-			base.ResolveBindings ();
-			if (_contentContainer != null)
-				_contentContainer.ResolveBindings ();
 		}
 		protected override void loadTemplate(GraphicObject template = null)
 		{

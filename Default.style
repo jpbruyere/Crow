@@ -55,12 +55,19 @@ TextBox {
 	Foreground = Black;
 	Selectable = True;
 	Text = TextBox;
+	Margin = 1;
 }
 Window {
 	Focusable = true;
 	MinimumSize=50,50;
 	Width = 150;
 	Height = 150;
+}
+FileDialog {
+	Focusable = true;
+	MinimumSize=50,50;
+	Width = 500;
+	Height = 300;
 }
 Border {
 	Foreground = Gray;
@@ -80,4 +87,14 @@ Icon {
 Control {
 	Margin=0;
 	Spacing=3;
+}
+ColorSpinner {
+	Minimum = 0;
+	Maximum = 255;
+	SmallIncrement = 1;
+}
+HSVSpinner {
+	Minimum = 0;
+	Maximum = 1;
+	SmallIncrement = 0.01;
 }

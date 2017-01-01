@@ -134,12 +134,6 @@ namespace Crow
 		#endregion
 
 		#region GraphicObject Overrides
-		public override void ResolveBindings ()
-		{
-			base.ResolveBindings ();
-			if (Content != null)
-				Content.ResolveBindings ();
-		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);

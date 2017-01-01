@@ -40,7 +40,6 @@ namespace Crow
 			lock (children)
 				Children.Add(g);
 			g.Parent = this;
-			g.ResolveBindings ();
 			g.RegisteredLayoutings = LayoutingType.None;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 			g.LayoutChanged += OnChildLayoutChanges;
@@ -48,7 +47,6 @@ namespace Crow
         public virtual void RemoveChild(GraphicObject child)        
 		{
 			child.LayoutChanged -= OnChildLayoutChanges;
-			child.ClearBinding ();
 			//child.Parent = null;
 			lock (children)
             	Children.Remove(child);
@@ -65,7 +63,6 @@ namespace Crow
 			while(Children.Count > 0){
 				GraphicObject g = Children[Children.Count-1];
 				g.LayoutChanged -= OnChildLayoutChanges;
-				g.ClearBinding ();
 				g.Parent = null;
 				Children.RemoveAt(Children.Count-1);
 			}
@@ -94,11 +91,12 @@ namespace Crow
 		}
 
 		#region GraphicObject overrides
-		public override void ResolveBindings ()
+		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
 		{
-			base.ResolveBindings ();
-			foreach (GraphicObject w in Children)
-				w.ResolveBindings ();
+			base.OnDataSourceChanged (this, e);
+			foreach (GraphicObject g in children)
+				if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
+					g.OnDataSourceChanged (sender, e);
 		}
 		public override GraphicObject FindByName (string nameToFind)
 		{
@@ -365,17 +363,5 @@ namespace Crow
     
 		#endregion
 
-		public override void ClearBinding(){
-			foreach (GraphicObject c in Children)
-				c.ClearBinding ();
-			base.ClearBinding ();
-		}
-		public override GraphicObject DeepClone ()
-		{
-			Group tmp = base.DeepClone () as Group;
-			foreach (GraphicObject c in Children)
-				tmp.AddChild (c.DeepClone ());
-			return tmp;
-		}
 	}
 }

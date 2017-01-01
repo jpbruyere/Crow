@@ -94,8 +94,6 @@ namespace Crow
 				this.SetChild (CurrentInterface.Load (Interface.DefaultTemplates[this.GetType ().FullName]));
 			}else
 				this.SetChild (template);
-
-			this.ResolveBindings ();
 		}
 
 		//TODO:IXmlSerializable is not used anymore

@@ -1,24 +1,112 @@
 <?xml version="1.0"?>
-<Window Caption="OpenFile" Height="300" Width="500">
-	<VerticalStack Margin="5">
-		<TextBox Margin="1" Width="0" Height="-1" Text="{CurrentPath}"/>
-		<HorizontalStack >
-			<ListBox Data="{Directories}" Width="-1" Height="0"
-				Background="0.5,0.5,0.5,0.5"
-				SelectedItemChanged="OnSelectedItemChanged"
-				Template="#Crow.Templates.ScrollingListBox.goml" 
-				ItemTemplate="#Crow.Templates.tmpDirItem.goml" >
-			</ListBox>
-			<ListBox Data="{Files}" Width="0" Height="0"
-				Background="0.5,0.5,0.5,0.5"
-				SelectedItemChanged="onFileListItemChanged"
-				Template="#Crow.Templates.ScrollingListBox.goml" 
-				ItemTemplate="#Crow.Templates.imgItemTemplate.goml">
-			</ListBox>
+<Border BorderWidth="1" Foreground="White" CornerRadius="{./CornerRadius}"
+				Background="{./Background}"
+				MouseEnter="./onBorderMouseEnter"
+				MouseLeave="./onBorderMouseLeave">
+	<VerticalStack Spacing="0">
+		<HorizontalStack Background="vgradient|0:0.4,0.6,0.0,0.5|1:0.0,0.8,0.8,0.9"
+				Name="hs" Margin="2" Spacing="0" Height="Fit">
+			<GraphicObject Width="5"/>
+			<Image Margin="1" Width="12" Height="12" Path="{./Icon}"/>
+			<Label Width="Stretched" Foreground="White" Margin="1" TextAlignment="Center" Text="{./Title}" />
+			<Border CornerRadius="6" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
+				MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
+				<Image Focusable="true" Name="Image" Margin="0" Width="Stretched" Height="Stretched" Path="#Crow.Images.Icons.exit2.svg"
+					 MouseClick="./butQuitPress"/>
+			</Border>
+			<GraphicObject Width="5"/>
 		</HorizontalStack>
-		<HorizontalStack Fit="true" HorizontalAlignment="Right">
-			<Button Caption="Ok" MouseClick="onFileSelect"/>
-			<Button Caption="Cancel"/>
-		</HorizontalStack>
+		<Container Name="Content" MinimumSize="50,50" Background="Onyx">
+			<VerticalStack Margin="5">
+				<TextBox Text="{²./CurrentDirectory}"/>
+				<HorizontalStack>
+					<DirectoryView ShowFiles="false" Name="dv" CurrentDirectory="{²./CurrentDirectory}" SelectedItemChanged="./Tv_SelectedItemChanged"
+						Width="50%" Margin="1">
+						<Template>
+							<TreeView IsRoot="true" Name="treeView" Data="{./FileSystemEntries}"
+									SelectedItemChanged="./onSelectedItemChanged">
+								<ItemTemplate DataType="System.IO.FileInfo">
+									<HorizontalStack Focusable="true"  Height="Fit" Width="Stretched" Background="{../Background}" >
+										<Image Margin="2" Width="14" Height="14"
+											Path="#Crow.Images.Icons.file.svg"/>
+										<Label Text="{Name}" Width="Stretched"
+											MouseEnter="{Background=hgradient|0:BlueCrayola|1:Transparent}"
+											MouseLeave="{Background=Transparent}"/>
+									</HorizontalStack>
+								</ItemTemplate>
+								<ItemTemplate DataType="System.IO.DirectoryInfo" Data="GetDirectories">
+									<Expandable Caption="{Name}" >
+										<Template>
+											<VerticalStack>
+												<HorizontalStack Spacing="1" Height="Fit" MouseDoubleClick="./onClickForExpand"
+														MouseEnter="{Background=hgradient|0:BlueCrayola|1:Transparent}"
+														MouseLeave="{Background=Transparent}">
+													<Container Margin="1" Width="10" Height="10" Focusable="true" MouseClick="./onClickForExpand"
+														MouseEnter="{Background=LightGray}"
+														MouseLeave="{Background=Transparent}">
+														<Image
+															Path="{./Image}"
+															Visible="{./IsExpandable}"
+															SvgSub="{./IsExpanded}"/>
+													</Container>
+													<Image Margin="2" Width="14" Height="14"
+														Path="#Crow.Images.Icons.folder.svg"/>
+													<Label Text="{./Caption}"/>
+												</HorizontalStack>
+												<Container Name="Content" Visible="false"/>
+											</VerticalStack>
+										</Template>
+										<HorizontalStack Height="Fit">
+											<GraphicObject Width="12" Height="10"/>
+											<TreeView Name="List" Height="Fit"
+												Template="#Crow.Templates.treeList.crow" />
+										</HorizontalStack>
+									</Expandable>
+								</ItemTemplate>
+							</TreeView>
+						</Template>
+					</DirectoryView>
+					<Splitter/>
+					<DirectoryView ShowFiles="true" Name="dv" CurrentDirectory="{../dv.SelectedItem}" 
+						Width="50%" Margin="1">
+						<Template>
+							<ListBox Name="fileView" Data="{./FileSystemEntries}">
+								<Template>
+									<Border BorderWidth="1" Margin="1" MinimumSize="10,10">
+										<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true">
+											<Wrapper Orientation="Horizontal" Height="Fit"
+												Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
+										</Scroller>
+									</Border>
+								</Template>
+								<ItemTemplate DataType="System.IO.FileInfo">
+									<HorizontalStack Focusable="true"  Height="Fit"   >
+										<Image Margin="2" Width="14" Height="14"
+											Path="#Crow.Images.Icons.file.svg"/>
+										<Label Text="{Name}"
+											MouseEnter="{Background=BlueCrayola}"
+											MouseLeave="{Background=Transparent}"/>
+									</HorizontalStack>
+								</ItemTemplate>
+								<ItemTemplate DataType="System.IO.DirectoryInfo">
+									<HorizontalStack Focusable="true"  Height="Fit" >
+										<Image Margin="2" Width="14" Height="14"
+											Path="#Crow.Images.Icons.folder.svg"/>
+										<Label Text="{Name}"
+											MouseEnter="{Background=BlueCrayola}"
+											MouseLeave="{Background=Transparent}"/>
+									</HorizontalStack>
+								</ItemTemplate>
+							</ListBox>
+						</Template>
+					</DirectoryView>
+				</HorizontalStack>
+				<TextBox Text="{../../dv.SelectedItem}"/>
+				<HorizontalStack Fit="true" HorizontalAlignment="Right">
+					<Button Caption="Ok" MouseClick="onFileSelect"/>
+					<Button Caption="Cancel"/>
+				</HorizontalStack>
+			</VerticalStack>
+		</Container>
 	</VerticalStack>
-</Window>
+</Border>
