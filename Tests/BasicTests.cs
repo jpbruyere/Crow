@@ -130,6 +130,8 @@ namespace Tests
 			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
 			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/test2WayBinding.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/testPropLess.crow" };
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Wrapper", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Splitter", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();

@@ -306,6 +306,7 @@ namespace Crow
 				if (cancelLoading)
 					return;
 				loadPage (i);
+				Thread.Sleep (1);
 			}
 		}
 		void cancelLoadingThread(){
@@ -324,7 +325,23 @@ namespace Crow
 			loadingTime.Start ();
 			#endif
 
-			Group page = items.Clone () as Group;
+			Group page;
+			if (typeof(Wrapper).IsAssignableFrom (items.GetType ())){
+				page = items;
+				itemPerPage = int.MaxValue;
+			}else if (typeof(GenericStack).IsAssignableFrom (items.GetType ())) {
+				GenericStack gs = new GenericStack ();
+				gs.CurrentInterface = items.CurrentInterface;
+				gs.initialize ();
+				gs.Orientation = (items as GenericStack).Orientation;
+				gs.Width = items.Width;
+				gs.Height = items.Height;
+				gs.VerticalAlignment = items.VerticalAlignment;
+				gs.HorizontalAlignment = items.HorizontalAlignment;
+				page = gs;
+
+			}else
+				page = Activator.CreateInstance (items.GetType ()) as Group;			
 
 			page.Name = "page" + pageNum;
 
@@ -337,6 +354,8 @@ namespace Crow
 				loadItem (i, page);
 			}
 
+			if (page == items)
+				return;
 			lock (CurrentInterface.LayoutMutex)
 				items.AddChild (page);
 

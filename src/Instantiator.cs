@@ -868,7 +868,7 @@ namespace Crow
 				il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getMemberInfoWithReflexion", BindingFlags.Static | BindingFlags.Public));
 				il.Emit (OpCodes.Stloc_1);//save memberInfo
 				il.Emit (OpCodes.Ldloc_1);//push mi for test if null
-				il.Emit (OpCodes.Brfalse, cancel);
+				il.Emit (OpCodes.Brfalse, cancelInit);//propertyLessBinding
 			}
 
 			il.Emit (OpCodes.Ldarg_1);//load source of dataSourceChanged which is the dest instance

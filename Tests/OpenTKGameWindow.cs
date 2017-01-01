@@ -117,7 +117,7 @@ namespace Crow
 			
 			while (true) {
 				CrowInterface.Update ();
-				Thread.Sleep (1);
+				//Thread.Sleep (1);
 			}
 		}
 
@@ -253,11 +253,11 @@ namespace Crow
 			if (frameCpt > 500) {
 				resetFps ();
 				frameCpt = 0;
-				#if DEBUG
-				GC.Collect();
-				GC.WaitForPendingFinalizers();
-				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
-				#endif
+//				#if DEBUG
+//				GC.Collect();
+//				GC.WaitForPendingFinalizers();
+//				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
+//				#endif
 			}
 			frameCpt++;
 		}
