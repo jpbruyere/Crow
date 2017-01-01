@@ -5,9 +5,9 @@
 		<Label Text="{../ColorList.SelectedItem}" Background="DarkGreen"/>
 		<Label Text="{Hover}" Background="DarkGreen"/>
 		<Button Caption="Clear" Width="Stretched" MouseClick="OnClear"/>
-<!--		<ListBox Name="ColorList" Data="{TestList}"  Width="200" Height="200" 
+		<ListBox Name="ColorList" Data="{TestList}"  Width="200" Height="200" 
 					 ItemTemplate="#Tests.Interfaces.colorItem.crow">			
 		</ListBox>
-		<Button Caption="Load list" Width="Stretched" MouseClick="OnLoadList"/>-->
+		<Button Caption="Load list" Width="Stretched" MouseClick="OnLoadList"/>
 	</VerticalStack>
 </Border>

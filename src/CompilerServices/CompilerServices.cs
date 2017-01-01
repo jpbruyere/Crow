@@ -456,7 +456,14 @@ namespace Crow
 			il.MarkLabel (convert);
 
 			if (dstType == typeof(string)) {
+				System.Reflection.Emit.Label emitNullStr = il.DefineLabel ();
+				il.Emit (OpCodes.Dup);
+				il.Emit (OpCodes.Brfalse, emitNullStr);
 				il.Emit (OpCodes.Callvirt, CompilerServices.miObjToString);
+				il.Emit (OpCodes.Br, endConvert);
+				il.MarkLabel (emitNullStr);
+				il.Emit (OpCodes.Pop);//remove null string from stack
+				il.Emit (OpCodes.Ldstr, "");//replace with empty string
 			} else if (dstType.IsPrimitive) {
 				//il.Emit (OpCodes.Unbox_Any, dstType);
 				il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (dstType));
@@ -464,7 +471,10 @@ namespace Crow
 				il.Emit (OpCodes.Unbox_Any, dstType);
 			} else{
 				il.Emit (OpCodes.Stloc_0); //save orig value in loc0
+				//first check if not null
 				il.Emit (OpCodes.Ldloc_0);
+				il.Emit (OpCodes.Dup);
+				il.Emit (OpCodes.Brfalse, endConvert);
 				il.Emit (OpCodes.Callvirt, miGetType);
 				il.Emit (OpCodes.Ldtoken, dstType);//push destination property type for testing
 				il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);

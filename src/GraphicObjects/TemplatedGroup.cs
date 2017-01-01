@@ -135,7 +135,7 @@ namespace Crow
 
 				NotifyValueChanged ("Data", data);
 
-				//lock (CurrentInterface.UpdateMutex)
+				lock (CurrentInterface.UpdateMutex)
 					ClearItems ();
 
 				if (data == null)
