@@ -101,10 +101,10 @@ namespace Crow
 //			if (g.RegisteredLayoutings != LayoutingType.None)
 //				return;
 			ILayoutable l = g;
-			while (l.Parent != null)
-				l = l.Parent;
-			if (!(l is Interface))
-				return;
+//			while (l.Parent != null)
+//				l = l.Parent;
+//			if (!(l is Interface))
+//				return;
 
 			lock (DrawingQueue) {
 				if (g.IsQueueForRedraw)
@@ -412,15 +412,9 @@ namespace Crow
 				while (DrawingQueue.Count > 0) {
 					GraphicObject g = DrawingQueue.Dequeue ();
 					g.IsQueueForRedraw = false;
-					try {
-						if (g.Parent == null)
-							continue;
-						g.Parent.RegisterClip (g.LastPaintedSlot);
-						if (g.getSlot () != g.LastPaintedSlot)
-							g.Parent.RegisterClip (g.getSlot ());
-					} catch (Exception ex) {
-						Debug.WriteLine ("Error Register Clip: " + ex.ToString ());
-					}
+					g.Parent.RegisterClip (g.LastPaintedSlot);
+					if (g.getSlot () != g.LastPaintedSlot)
+						g.Parent.RegisterClip (g.getSlot ());
 				}
 			}
 			#if MEASURE_TIME

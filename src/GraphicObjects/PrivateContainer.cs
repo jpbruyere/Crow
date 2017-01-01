@@ -158,8 +158,10 @@ namespace Crow
 				gr.Clip ();
 			}
 
-			if (child != null)
-				child.Paint (ref gr);
+			if (child != null) {
+				if (child.Visible)
+					child.Paint (ref gr);
+			}
 			gr.Restore ();
 		}
 		protected override void UpdateCache (Context ctx)

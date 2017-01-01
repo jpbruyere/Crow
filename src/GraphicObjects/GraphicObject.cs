@@ -1084,9 +1084,6 @@ namespace Crow
 		/// of the widget </summary>
 		public virtual void Paint (ref Context ctx)
 		{
-			if (!Visible)
-				return;
-
 			//TODO:this test should not be necessary
 			if (Slot.Height < 0 || Slot.Width < 0)
 				return;
