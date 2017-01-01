@@ -47,7 +47,7 @@ namespace Crow.IML
 			if (typeof (Container).IsAssignableFrom (CrowType))
 				return CompilerServices.miSetChild;
 			if (typeof (TemplatedContainer).IsAssignableFrom (CrowType))
-				return childIdx < 0 ? CompilerServices.miLoadTmp : CompilerServices.miSetContent;
+				return childIdx < 0 ? CompilerServices.miLoadTmp : CompilerServices.piContent.GetSetMethod();
 			if (typeof (TemplatedGroup).IsAssignableFrom (CrowType))
 				return childIdx < 0 ? CompilerServices.miLoadTmp : CompilerServices.miAddItem;
 			if (typeof (TemplatedControl).IsAssignableFrom (CrowType))

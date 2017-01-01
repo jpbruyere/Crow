@@ -7,6 +7,7 @@ namespace Crow
 {    
 	public struct Rectangle
     {
+		internal static Type TRectangle = typeof(Rectangle);
 		#region private fields
         int _x;
         int _y;
@@ -262,7 +263,7 @@ namespace Crow
 		}
 		public override bool Equals (object obj)
 		{
-			return (obj == null || obj.GetType() != typeof(Rectangle)) ?
+			return (obj == null || obj.GetType() != TRectangle) ?
 				false :
 				this == (Rectangle)obj;
 		}

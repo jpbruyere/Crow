@@ -65,7 +65,7 @@ namespace Crow
 			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
 			Type handlerArgsType = evtParams [1].ParameterType;
 
-			Type [] args = { typeof (object), typeof (object), handlerArgsType };
+			Type [] args = { CompilerServices.TObject, CompilerServices.TObject, handlerArgsType };
 
 			#region Expand dyn meth
 			//DM is bound to templatedGroup root (arg0)
@@ -85,7 +85,7 @@ namespace Crow
 			il.Emit (OpCodes.Ldarg_1);//load sender of expand event
 
 			il.Emit(OpCodes.Ldstr, "List");
-			il.Emit (OpCodes.Callvirt, typeof(GraphicObject).GetMethod("FindByName"));
+			il.Emit (OpCodes.Callvirt, CompilerServices.miFindByName);
 			il.Emit (OpCodes.Stloc_0);
 
 			//check that 'Data' of list is not already set
@@ -105,7 +105,7 @@ namespace Crow
 			//call 'fetchMethodName' from the dataSource to build the sub nodes list
 			il.Emit (OpCodes.Ldloc_0);//push 'List' (of sub nodes) into the stack
 			il.Emit (OpCodes.Ldarg_1);//get the dataSource of the sender
-			il.Emit (OpCodes.Callvirt, typeof(GraphicObject).GetProperty("DataSource").GetGetMethod ());
+			il.Emit (OpCodes.Callvirt, CompilerServices.miGetDataSource);
 
 			if (fetchMethodName != "self")//special keyword self allows the use of recurent list<<<
 				emitGetSubData(il, dataType);			
@@ -122,17 +122,17 @@ namespace Crow
 			#region Items counting dyn method
 			//dm is unbound, arg0 is instance of Item container to expand
 			dm = new DynamicMethod ("dyn_count_" + fetchMethodName,
-				typeof (bool), new Type[] {typeof(object)}, true);
+				typeof (bool), new Type[] {CompilerServices.TObject}, true);
 			il = dm.GetILGenerator (256);
 
 			//get the dataSource of the arg0
 			il.Emit (OpCodes.Ldarg_0);
-			il.Emit (OpCodes.Callvirt, typeof(GraphicObject).GetProperty("DataSource").GetGetMethod ());
+			il.Emit (OpCodes.Callvirt, CompilerServices.miGetDataSource);
 
 			if (fetchMethodName != "self")
 				emitGetSubData(il, dataType);
 			
-			il.Emit (OpCodes.Callvirt, typeof(System.Collections.ICollection).GetProperty("Count").GetGetMethod());
+			il.Emit (OpCodes.Callvirt, CompilerServices.miGetColCount);
 			il.Emit (OpCodes.Ldc_I4_0);
 			il.Emit (OpCodes.Cgt);
 			il.Emit (OpCodes.Ret);

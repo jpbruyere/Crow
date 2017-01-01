@@ -165,9 +165,9 @@ namespace Crow.IML
 			il.Emit(OpCodes.Ldloc_0);//load ref to current graphic object
 			CompilerServices.emitGetInstance (il, address);
 			il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
-			il.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("cachedDelegates", BindingFlags.Instance | BindingFlags.NonPublic));
+			il.Emit(OpCodes.Ldfld, CompilerServices.fiCachedDel);
 			il.Emit(OpCodes.Ldc_I4, index);//load delegate index
-			il.Emit(OpCodes.Callvirt, typeof(List<Delegate>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
+			il.Emit(OpCodes.Callvirt, CompilerServices.miGetDelegateListItem);
 			il.Emit(OpCodes.Callvirt, evt.AddMethod);//call add event
 		}
 		/// <summary>
@@ -188,16 +188,9 @@ namespace Crow.IML
 			CompilerServices.emitGetInstance (il, bd.TargetNA);
 			//load methodInfo (3rd arg)
 			il.Emit (OpCodes.Ldstr, bd.TargetMember);
-			//il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
 
-			//il.Emit (OpCodes.Pop);
-			//il.Emit (OpCodes.Pop);
-			//il.Emit (OpCodes.Pop);
-			//il.Emit (OpCodes.Pop);
-			il.Emit (OpCodes.Callvirt, typeof(CompilerServices).GetMethod ("createDel", BindingFlags.Static | BindingFlags.NonPublic));
-			//il.Emit (OpCodes.Callvirt, typeof(Delegate).GetMethod ("CreateDelegate",
-			//	new Type[] { typeof(Type), typeof(object), typeof(MethodInfo) }));//create bound delegate
-			
+			il.Emit (OpCodes.Callvirt, CompilerServices.miCreateDel);
+
 			il.Emit (OpCodes.Callvirt, bd.SourceEvent.AddMethod);//call add event
 		}
 

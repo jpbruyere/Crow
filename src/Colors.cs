@@ -15,6 +15,8 @@ namespace Crow
 	/// </summary>
 	public struct Color
     {
+		internal static Type TColor = typeof(Color);
+
 		#region CTOR
 		public Color(double _R, double _G, double _B, double _A)
 		{
@@ -1046,7 +1048,7 @@ namespace Crow
 		}
 		public override bool Equals (object obj)
 		{
-			return (obj == null || obj.GetType() != typeof(Color)) ?
+			return (obj == null || obj.GetType() != TColor) ?
 				false :
 				this == (Color)obj;
 		}

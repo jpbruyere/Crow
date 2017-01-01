@@ -110,7 +110,7 @@ namespace Crow
 			ctx.nodesStack.Pop ();
 
 			foreach (int idx in templateCachedDelegateIndices)
-				ctx.emitCachedDelegateHandlerAddition(idx, typeof(GraphicObject).GetEvent("LogicalParentChanged"));
+				ctx.emitCachedDelegateHandlerAddition(idx, CompilerServices.eiLogicalParentChanged);
 
 			ctx.ResolveNamedTargets ();
 
@@ -450,7 +450,7 @@ namespace Crow
 				il.Emit (OpCodes.Ldarg_2);//load new datasource
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
 				il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);//load handler method name
-				il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod ("getMethodInfoWithReflexion", BindingFlags.Static | BindingFlags.Public));
+				il.Emit (OpCodes.Call, CompilerServices.miGetMethInfoWithRefx);
 				il.Emit (OpCodes.Stloc_0);//save MethodInfo
 				il.Emit (OpCodes.Ldloc_0);//push mi for test if null
 
@@ -467,8 +467,7 @@ namespace Crow
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
 				il.Emit (OpCodes.Ldloc_0);//load methodInfo (3rd arg)
 
-				il.Emit (OpCodes.Callvirt, typeof(Delegate).GetMethod ("CreateDelegate",
-					new Type[] { typeof(Type), typeof(object), typeof(MethodInfo) }));//create bound delegate
+				il.Emit (OpCodes.Callvirt, CompilerServices.miCreateBoundDel);
 				il.Emit (OpCodes.Callvirt, sourceEvent.AddMethod);//call add event
 
 				System.Reflection.Emit.Label finish = il.DefineLabel ();
@@ -483,7 +482,7 @@ namespace Crow
 				cachedDelegates.Add (dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
 
 				if (bindingDef.IsDataSourceBinding)
-					ctx.emitCachedDelegateHandlerAddition (delDSIndex, typeof(GraphicObject).GetEvent ("DataSourceChanged"));
+					ctx.emitCachedDelegateHandlerAddition (delDSIndex, CompilerServices.eiDSChange);
 				else //template handler binding, will be added to root parentChanged
 					templateCachedDelegateIndices.Add (delDSIndex);
 			} else {//normal in tree handler binding, store until tree is complete (end of parse)
@@ -518,7 +517,7 @@ namespace Crow
 
 			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
-			il.DeclareLocal (typeof(object));
+			il.DeclareLocal (CompilerServices.TObject);
 
 			il.Emit (OpCodes.Nop);
 
@@ -530,7 +529,7 @@ namespace Crow
 				#region member name test
 				//load source member name
 				il.Emit (OpCodes.Ldarg_1);
-				il.Emit (OpCodes.Ldfld, typeof(ValueChangeEventArgs).GetField ("MemberName"));
+				il.Emit (OpCodes.Ldfld, CompilerServices.fiVCMbName);
 
 				il.Emit (OpCodes.Ldstr, bindingCase.Key);//load name to test
 				il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
@@ -553,7 +552,7 @@ namespace Crow
 					if (destination.Count == 0){//template reverse binding
 						//fetch destination instance (which is the template root)
 						for (int j = 0; j < origine.Count ; j++)
-							il.Emit(OpCodes.Callvirt, typeof(GraphicObject).GetProperty("LogicalParent").GetGetMethod());
+							il.Emit(OpCodes.Callvirt, CompilerServices.miGetLogicalParent);
 					}else
 						CompilerServices.emitGetInstance (il, origine, destination);
 
@@ -569,7 +568,7 @@ namespace Crow
 					}
 					//load new value
 					il.Emit (OpCodes.Ldarg_1);
-					il.Emit (OpCodes.Ldfld, typeof (ValueChangeEventArgs).GetField ("NewValue"));
+					il.Emit (OpCodes.Ldfld, CompilerServices.fiVCNewValue);
 
 					if (origineType == null)//property less binding, no init
 						CompilerServices.emitConvert (il, ma.Property.PropertyType);
@@ -583,7 +582,7 @@ namespace Crow
 						ctx.il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());//set init value
 					} else {// reverse templateBinding
 						il.Emit (OpCodes.Ldstr, ma.memberName);//arg 3 of setValueWithReflexion
-						il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("setValueWithReflexion", BindingFlags.Static | BindingFlags.Public));
+						il.Emit (OpCodes.Call, CompilerServices.miSetValWithRefx);
 						continue;
 					}
 					il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());//set value on value changes
@@ -601,7 +600,7 @@ namespace Crow
 			//store and emit Add in ctx
 			int dmIdx = cachedDelegates.Count;
 			cachedDelegates.Add (dm.CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>)));
-			ctx.emitCachedDelegateHandlerAddition (dmIdx, typeof(IValueChange).GetEvent ("ValueChanged"), origine);
+			ctx.emitCachedDelegateHandlerAddition (dmIdx, CompilerServices.eiValueChange, origine);
 		}
 		void emitTemplateBindings(Context ctx, Dictionary<string, List<MemberAddress>> bindings){
 			//value changed dyn method
@@ -620,8 +619,8 @@ namespace Crow
 
 			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
-			il.DeclareLocal (typeof(object));
-			ilPC.DeclareLocal (typeof(object));//used for checking propery less bindings
+			il.DeclareLocal (CompilerServices.TObject);
+			ilPC.DeclareLocal (CompilerServices.TObject);//used for checking propery less bindings
 			ilPC.DeclareLocal (typeof(MemberInfo));//used for checking propery less bindings
 
 			System.Reflection.Emit.Label cancel = ilPC.DefineLabel ();
@@ -629,17 +628,17 @@ namespace Crow
 			#region Unregister previous parent event handler
 			//unregister previous parent handler if not null
 			ilPC.Emit (OpCodes.Ldarg_2);//load old parent
-			ilPC.Emit (OpCodes.Ldfld, typeof (DataSourceChangeEventArgs).GetField ("OldDataSource"));
+			ilPC.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
 			ilPC.Emit (OpCodes.Brfalse, cancel);//old parent is null
 
 			ilPC.Emit (OpCodes.Ldarg_2);//load old parent
-			ilPC.Emit (OpCodes.Ldfld, typeof (DataSourceChangeEventArgs).GetField ("OldDataSource"));
+			ilPC.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
 			//Load cached delegate
 			ilPC.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
-			ilPC.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("templateBinding", BindingFlags.Instance | BindingFlags.NonPublic));
+			ilPC.Emit(OpCodes.Ldfld, CompilerServices.fiTemplateBinding);
 
 			//add template bindings dynValueChanged delegate to new parent event
-			ilPC.Emit(OpCodes.Callvirt, typeof(IValueChange).GetEvent("ValueChanged").RemoveMethod);//call remove event
+			ilPC.Emit(OpCodes.Callvirt, CompilerServices.eiValueChange.RemoveMethod);//call remove event
 			#endregion
 
 			ilPC.MarkLabel(cancel);
@@ -659,7 +658,7 @@ namespace Crow
 				#region member name test
 				//load source member name
 				il.Emit (OpCodes.Ldarg_1);
-				il.Emit (OpCodes.Ldfld, typeof(ValueChangeEventArgs).GetField ("MemberName"));
+				il.Emit (OpCodes.Ldfld, CompilerServices.fiVCMbName);
 
 				il.Emit (OpCodes.Ldstr, bindingCase.Key);//load name to test
 				il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
@@ -681,7 +680,7 @@ namespace Crow
 					//get parent type
 					ilPC.Emit (OpCodes.Ldloc_0);//push parent instance
 					ilPC.Emit (OpCodes.Ldstr, bindingCase.Key);//load member name
-					ilPC.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getMemberInfoWithReflexion", BindingFlags.Static | BindingFlags.Public));
+					ilPC.Emit (OpCodes.Call, CompilerServices.miGetMembIinfoWithRefx);
 					ilPC.Emit (OpCodes.Stloc_1);//save memberInfo
 					ilPC.Emit (OpCodes.Ldloc_1);//push mi for test if null
 					System.Reflection.Emit.Label propLessReturn = ilPC.DefineLabel ();
@@ -701,22 +700,14 @@ namespace Crow
 
 					//load new value
 					il.Emit (OpCodes.Ldarg_1);
-					il.Emit (OpCodes.Ldfld, typeof (ValueChangeEventArgs).GetField ("NewValue"));
+					il.Emit (OpCodes.Ldfld, CompilerServices.fiVCNewValue);
 
 					//for the parent changed dyn meth we need to fetch actual value for initialisation thrue reflexion
 					ilPC.Emit (OpCodes.Ldloc_0);//push root instance of instanciator as parentChanged source
 					ilPC.Emit (OpCodes.Ldloc_1);//push mi for value fetching
-					ilPC.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getValueWithReflexion", BindingFlags.Static | BindingFlags.Public));
+					ilPC.Emit (OpCodes.Call, CompilerServices.miGetValWithRefx);
 
 					CompilerServices.emitConvert (il, ma.Property.PropertyType);
-
-					//					//box ValueType
-					//					ilPC.Emit (OpCodes.Ldloc_1);//push mi to check if it's a valuetype
-					//					ilPC.Emit (OpCodes.Call, typeof(PropertyInfo).GetProperty("PropertyType").GetGetMethod());
-					//					ilPC.Emit (OpCodes.Call, typeof(Type).GetProperty("IsValueType").GetGetMethod());
-					//					System.Reflection.Emit.Label noBoxingRequired = ilPC.DefineLabel ();
-					//					ilPC.Emit (OpCodes.Brfalse, noBoxingRequired);
-
 					CompilerServices.emitConvert (ilPC, ma.Property.PropertyType);
 
 					il.Emit (OpCodes.Callvirt, ma.Property.GetSetMethod());
@@ -745,10 +736,10 @@ namespace Crow
 
 			//Load cached delegate
 			ilPC.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
-			ilPC.Emit(OpCodes.Ldfld, typeof(Instantiator).GetField("templateBinding", BindingFlags.Instance | BindingFlags.NonPublic));
+			ilPC.Emit(OpCodes.Ldfld, CompilerServices.fiTemplateBinding);
 
 			//add template bindings dynValueChanged delegate to new parent event
-			ilPC.Emit(OpCodes.Callvirt, typeof(IValueChange).GetEvent("ValueChanged").AddMethod);//call add event
+			ilPC.Emit(OpCodes.Callvirt, CompilerServices.eiValueChange.AddMethod);//call add event
 
 			ilPC.MarkLabel (cancel);
 			ilPC.Emit (OpCodes.Ret);
@@ -758,7 +749,7 @@ namespace Crow
 			cachedDelegates.Add(dmPC.CreateDelegate (CompilerServices.ehTypeDSChange, this));
 			#endregion
 
-			ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent("LogicalParentChanged"));
+			ctx.emitCachedDelegateHandlerAddition(delDSIndex, CompilerServices.eiLogicalParentChanged);
 		}
 		/// <summary>
 		/// create the valuechanged handler, the datasourcechanged handler and emit event handling
@@ -781,13 +772,13 @@ namespace Crow
 
 				System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
-				il.DeclareLocal (typeof(object));
+				il.DeclareLocal (CompilerServices.TObject);
 
 				il.Emit (OpCodes.Nop);
 
 				//load value changed member name onto the stack
 				il.Emit (OpCodes.Ldarg_2);
-				il.Emit (OpCodes.Ldfld, CompilerServices.fiMbName);
+				il.Emit (OpCodes.Ldfld, CompilerServices.fiVCMbName);
 
 				//test if it's the expected one
 				il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);
@@ -799,7 +790,7 @@ namespace Crow
 				il.Emit (OpCodes.Ldarg_0);
 				//load new value onto the stack
 				il.Emit (OpCodes.Ldarg_2);
-				il.Emit (OpCodes.Ldfld, CompilerServices.fiNewValue);
+				il.Emit (OpCodes.Ldfld, CompilerServices.fiVCNewValue);
 
 				//by default, source value type is deducted from target member type to allow
 				//memberless binding, if targetMember exists, it will be used to determine target
@@ -830,7 +821,7 @@ namespace Crow
 
 			il = dm.GetILGenerator (256);
 
-			il.DeclareLocal (typeof(object));//used for checking propery less bindings
+			il.DeclareLocal (CompilerServices.TObject);//used for checking propery less bindings
 			il.DeclareLocal (typeof(MemberInfo));//used for checking propery less bindings
 			System.Reflection.Emit.Label cancel = il.DefineLabel ();
 			System.Reflection.Emit.Label cancelInit = il.DefineLabel ();
@@ -844,15 +835,15 @@ namespace Crow
 					System.Reflection.Emit.Label cancelRemove = il.DefineLabel ();
 					//remove handler if not null
 					il.Emit (OpCodes.Ldarg_2);//load old parent
-					il.Emit (OpCodes.Ldfld, typeof (DataSourceChangeEventArgs).GetField ("OldDataSource"));
+					il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
 					il.Emit (OpCodes.Brfalse, cancelRemove);//old parent is null
 
 					//remove handler
 					il.Emit (OpCodes.Ldarg_2);//1st arg load old datasource
-					il.Emit (OpCodes.Ldfld, typeof (DataSourceChangeEventArgs).GetField ("OldDataSource"));
+					il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
 					il.Emit (OpCodes.Ldstr, "ValueChanged");//2nd arg event name
 					il.Emit (OpCodes.Ldarg_1);//3d arg: instance bound to delegate (the source)
-					il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("RemoveEventHandlerByTarget", BindingFlags.Static | BindingFlags.Public));
+					il.Emit (OpCodes.Call, CompilerServices.miRemEvtHdlByTarget);
 					il.MarkLabel(cancelRemove);
 				}
 				il.Emit (OpCodes.Ldarg_2);//load datasource change arg
@@ -865,7 +856,7 @@ namespace Crow
 				il.Emit (OpCodes.Ldarg_2);//load new datasource
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
 				il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);//load member name
-				il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getMemberInfoWithReflexion", BindingFlags.Static | BindingFlags.Public));
+				il.Emit (OpCodes.Call, CompilerServices.miGetMembIinfoWithRefx);
 				il.Emit (OpCodes.Stloc_1);//save memberInfo
 				il.Emit (OpCodes.Ldloc_1);//push mi for test if null
 				il.Emit (OpCodes.Brfalse, cancelInit);//propertyLessBinding
@@ -876,7 +867,7 @@ namespace Crow
 			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
 				il.Emit (OpCodes.Ldloc_1);//push mi for value fetching
-				il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("getValueWithReflexion", BindingFlags.Static | BindingFlags.Public));
+				il.Emit (OpCodes.Call, CompilerServices.miGetValWithRefx);
 			}
 			CompilerServices.emitConvert (il, piSource.PropertyType);
 			il.Emit (OpCodes.Callvirt, piSource.GetSetMethod ());
@@ -895,7 +886,7 @@ namespace Crow
 				il.Emit (OpCodes.Ldarg_2);//load new datasource
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
 				il.Emit(OpCodes.Ldc_I4, dmVC);//load index of dynmathod
-				il.Emit (OpCodes.Call, typeof(Instantiator).GetMethod("dataSourceChangedEmitHelper", BindingFlags.Instance | BindingFlags.NonPublic));
+				il.Emit (OpCodes.Call, CompilerServices.miDSChangeEmitHelper);
 
 				if (bindingDef.TwoWay){
 					il.Emit (OpCodes.Ldarg_1);//arg1: dataSourceChange source, the origine of the binding
@@ -903,7 +894,7 @@ namespace Crow
 					il.Emit (OpCodes.Ldarg_2);//arg3: new datasource
 					il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
 					il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);//arg4: dest member
-					il.Emit (OpCodes.Call, typeof(Instantiator).GetMethod("dataSourceReverseBinding", BindingFlags.Static | BindingFlags.NonPublic));
+					il.Emit (OpCodes.Call, CompilerServices.miDSReverseBinding);
 				}
 
 				il.MarkLabel (cancel);
@@ -915,7 +906,7 @@ namespace Crow
 			cachedDelegates.Add(dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
 			#endregion
 
-			ctx.emitCachedDelegateHandlerAddition(delDSIndex, typeof(GraphicObject).GetEvent("DataSourceChanged"));
+			ctx.emitCachedDelegateHandlerAddition(delDSIndex, CompilerServices.eiDSChange);
 		}
 		/// <summary>
 		/// Two way binding for datasource, graphicObj=>dataSource link, datasource value has priority
@@ -938,12 +929,12 @@ namespace Crow
 
 			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
-			il.DeclareLocal (typeof(object));
+			il.DeclareLocal (CompilerServices.TObject);
 			il.Emit (OpCodes.Nop);
 
 			//load value changed member name onto the stack
 			il.Emit (OpCodes.Ldarg_2);
-			il.Emit (OpCodes.Ldfld, CompilerServices.fiMbName);
+			il.Emit (OpCodes.Ldfld, CompilerServices.fiVCMbName);
 
 			//test if it's the expected one
 			il.Emit (OpCodes.Ldstr, origMember);
@@ -955,7 +946,7 @@ namespace Crow
 			il.Emit (OpCodes.Ldarg_0);
 			//load new value onto the stack
 			il.Emit (OpCodes.Ldarg_2);
-			il.Emit (OpCodes.Ldfld, CompilerServices.fiNewValue);
+			il.Emit (OpCodes.Ldfld, CompilerServices.fiVCNewValue);
 
 			CompilerServices.emitConvert (il, piOrig.PropertyType, piDest.PropertyType);
 
@@ -974,18 +965,18 @@ namespace Crow
 			System.Reflection.Emit.Label cancel = il.DefineLabel ();
 
 			il.Emit (OpCodes.Ldarg_2);//load old parent
-			il.Emit (OpCodes.Ldfld, typeof (DataSourceChangeEventArgs).GetField ("OldDataSource"));
+			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
 			il.Emit (OpCodes.Brfalse, cancel);//old parent is null
 
 			//remove handler
 			if (DSSide){//event is defined in the dataSource instance
 				il.Emit (OpCodes.Ldarg_2);//1st arg load old datasource
-				il.Emit (OpCodes.Ldfld, typeof (DataSourceChangeEventArgs).GetField ("OldDataSource"));
+				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
 			}else//the event is in the source
 				il.Emit (OpCodes.Ldarg_1);//1st arg load old datasource
 			il.Emit (OpCodes.Ldstr, eventName);//2nd arg event name
 			il.Emit (OpCodes.Ldstr, delegateName);//3d arg: delegate name
-			il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod("RemoveEventHandlerByName", BindingFlags.Static | BindingFlags.Public));
+			il.Emit (OpCodes.Call, CompilerServices.miRemEvtHdlByName);
 			il.MarkLabel(cancel);
 		}
 

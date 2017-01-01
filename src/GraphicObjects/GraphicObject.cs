@@ -665,10 +665,10 @@ namespace Crow
 			dm = new DynamicMethod("dyn_loadDefValues",
 				MethodAttributes.Family | MethodAttributes.FamANDAssem | MethodAttributes.NewSlot,
 				CallingConventions.Standard,
-				typeof(void),new Type[] {typeof(object)},thisType,true);
+				typeof(void),new Type[] {CompilerServices.TObject},thisType,true);
 
 			il = dm.GetILGenerator(256);
-			il.DeclareLocal(typeof(GraphicObject));
+			il.DeclareLocal(CompilerServices.TObject);
 			il.Emit(OpCodes.Nop);
 			//set local GraphicObject to root object passed as 1st argument
 			il.Emit (OpCodes.Ldarg_0);
@@ -686,13 +686,13 @@ namespace Crow
 
 						//push eventInfo as 1st arg of compile
 						il.Emit (OpCodes.Ldloc_0);
-						il.Emit (OpCodes.Call, typeof(object).GetMethod("GetType"));
+						il.Emit (OpCodes.Call, CompilerServices.miGetType);
 						il.Emit (OpCodes.Ldstr, ei.Name);//push event name
-						il.Emit (OpCodes.Call, typeof(Type).GetMethod("GetEvent", new Type[] {typeof(string)}));
+						il.Emit (OpCodes.Call, CompilerServices.miGetEvent);
 						//push expression as 2nd arg of compile
 						il.Emit (OpCodes.Ldstr, trimed.Substring (1, trimed.Length - 2));
 						il.Emit (OpCodes.Ldnull);
-						il.Emit (OpCodes.Callvirt, typeof(CompilerServices).GetMethod ("compileDynEventHandler", BindingFlags.Static | BindingFlags.Public));
+						il.Emit (OpCodes.Callvirt, CompilerServices.miCompileDynEventHandler);
 						il.Emit (OpCodes.Castclass, ei.EventHandlerType);
 						il.Emit (OpCodes.Callvirt, ei.AddMethod);
 					}else

@@ -13,52 +13,83 @@ namespace Crow
 {
 	public static class CompilerServices
 	{
-		static FieldInfo miSetCurIface = typeof(GraphicObject).GetField ("currentInterface",
-			BindingFlags.NonPublic | BindingFlags.Instance);
-		internal static MethodInfo stringEquals = typeof (string).GetMethod
-			("Equals", new Type [3] { typeof (string), typeof (string), typeof (StringComparison) });
-		public static MethodInfo miFindByName = typeof (GraphicObject).GetMethod ("FindByName");
+		internal static Type TObject = typeof(object);
+		internal static MethodInfo stringEquals = typeof (string).GetMethod("Equals", new Type [3] { typeof (string), typeof (string), typeof (StringComparison) });
+		internal static MethodInfo miObjToString = typeof(object).GetMethod("ToString");
+		internal static MethodInfo miGetType = typeof(object).GetMethod("GetType");
+		internal static MethodInfo miParseEnum = typeof(Enum).GetMethod("Parse", BindingFlags.Static | BindingFlags.Public,
+			Type.DefaultBinder, new Type [] {typeof (Type), typeof (string), typeof (bool)}, null);
 
-		public static MethodInfo miIFaceLoad = typeof(Interface).GetMethod ("Load", BindingFlags.Instance | BindingFlags.Public);
-		public static MethodInfo miGetITemp = typeof(Interface).GetMethod ("GetItemTemplate");
-		public static MethodInfo miAddITemp = typeof(Dictionary<string, ItemTemplate>).
-			GetMethod ("set_Item", new Type[] { typeof(string), typeof(ItemTemplate) });
-		public static MethodInfo miGetITempFromDic = typeof(Dictionary<string, ItemTemplate>).
-			GetMethod ("get_Item", new Type[] { typeof(string) });
-		public static FieldInfo fldItemTemplates = typeof(TemplatedGroup).GetField("ItemTemplates");
-		public static MethodInfo miCreateExpDel = typeof(ItemTemplate).GetMethod ("CreateExpandDelegate");
-		public static MethodInfo miLoadDefaultVals = typeof (GraphicObject).GetMethod ("loadDefaultValues");
-		public static PropertyInfo piStyle = typeof (GraphicObject).GetProperty ("Style");
-		public static MethodInfo miGetTypeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle");
+		internal static MethodInfo miGetTypeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle");
+		internal static MethodInfo miGetEvent = typeof(Type).GetMethod("GetEvent", new Type[] {typeof(string)});
+
+		internal static MethodInfo miMIInvoke = typeof(MethodInfo).GetMethod ("Invoke", new Type[] {
+			typeof(object),
+			typeof(object[])
+		});
+
+		internal static MethodInfo miCreateBoundDel = typeof(Delegate).GetMethod ("CreateDelegate", new Type[] { typeof(Type), typeof(object), typeof(MethodInfo) });//create bound delegate
+		internal static MethodInfo miGetColCount = typeof(System.Collections.ICollection).GetProperty("Count").GetGetMethod();
+		internal static MethodInfo miGetDelegateListItem = typeof(List<Delegate>).GetMethod("get_Item", new Type[] { typeof(Int32) });
+
+		internal static MethodInfo miCompileDynEventHandler = typeof(CompilerServices).GetMethod ("compileDynEventHandler", BindingFlags.Static | BindingFlags.Public);
+		internal static MethodInfo miRemEvtHdlByName = typeof(CompilerServices).GetMethod("RemoveEventHandlerByName", BindingFlags.Static | BindingFlags.Public);
+		internal static MethodInfo miRemEvtHdlByTarget = typeof(CompilerServices).GetMethod("RemoveEventHandlerByTarget", BindingFlags.Static | BindingFlags.Public);
+		internal static MethodInfo miGetMethInfoWithRefx = typeof(CompilerServices).GetMethod ("getMethodInfoWithReflexion", BindingFlags.Static | BindingFlags.Public);
+		internal static MethodInfo miGetMembIinfoWithRefx = typeof(CompilerServices).GetMethod("getMemberInfoWithReflexion", BindingFlags.Static | BindingFlags.Public);
+		internal static MethodInfo miSetValWithRefx = typeof(CompilerServices).GetMethod("setValueWithReflexion", BindingFlags.Static | BindingFlags.Public);
+		internal static MethodInfo miGetValWithRefx = typeof(CompilerServices).GetMethod("getValueWithReflexion", BindingFlags.Static | BindingFlags.Public);
+		internal static MethodInfo miCreateDel = typeof(CompilerServices).GetMethod ("createDel", BindingFlags.Static | BindingFlags.NonPublic);
+		internal static MethodInfo miGetImplOp = typeof(CompilerServices).GetMethod ("getImplicitOp", BindingFlags.Static | BindingFlags.Public);
+
+		internal static FieldInfo fiCachedDel = typeof(Instantiator).GetField("cachedDelegates", BindingFlags.Instance | BindingFlags.NonPublic);
+		internal static FieldInfo fiTemplateBinding = typeof(Instantiator).GetField("templateBinding", BindingFlags.Instance | BindingFlags.NonPublic);
+		internal static MethodInfo miDSChangeEmitHelper = typeof(Instantiator).GetMethod("dataSourceChangedEmitHelper", BindingFlags.Instance | BindingFlags.NonPublic);
+		internal static MethodInfo miDSReverseBinding = typeof(Instantiator).GetMethod("dataSourceReverseBinding", BindingFlags.Static | BindingFlags.NonPublic);
+
+		internal static FieldInfo miSetCurIface = typeof(GraphicObject).GetField ("currentInterface", BindingFlags.NonPublic | BindingFlags.Instance);
+		internal static MethodInfo miFindByName = typeof (GraphicObject).GetMethod ("FindByName");
+		internal static MethodInfo miGetGObjItem = typeof(List<GraphicObject>).GetMethod("get_Item", new Type[] { typeof(Int32) });
+		internal static MethodInfo miLoadDefaultVals = typeof (GraphicObject).GetMethod ("loadDefaultValues");
+		internal static PropertyInfo piStyle = typeof (GraphicObject).GetProperty ("Style");
+		internal static MethodInfo miGetLogicalParent = typeof(GraphicObject).GetProperty("LogicalParent").GetGetMethod();
+		internal static MethodInfo miGetDataSource = typeof(GraphicObject).GetProperty("DataSource").GetGetMethod ();
+		internal static EventInfo eiLogicalParentChanged = typeof(GraphicObject).GetEvent("LogicalParentChanged");
+
+		internal static MethodInfo miIFaceLoad = typeof(Interface).GetMethod ("Load", BindingFlags.Instance | BindingFlags.Public);
+		internal static MethodInfo miGetITemp = typeof(Interface).GetMethod ("GetItemTemplate");
+
+		internal static MethodInfo miAddITemp = typeof(Dictionary<string, ItemTemplate>).GetMethod ("set_Item", new Type[] { typeof(string), typeof(ItemTemplate) });
+		internal static MethodInfo miGetITempFromDic = typeof(Dictionary<string, ItemTemplate>).GetMethod ("get_Item", new Type[] { typeof(string) });
+		internal static FieldInfo fldItemTemplates = typeof(TemplatedGroup).GetField("ItemTemplates");
+		internal static MethodInfo miCreateExpDel = typeof(ItemTemplate).GetMethod ("CreateExpandDelegate");
+
 		#region tree handling methods
+		internal static FieldInfo fiChild = typeof(PrivateContainer).GetField ("child", BindingFlags.Instance | BindingFlags.NonPublic);
 		internal static MethodInfo miSetChild = typeof (Container).GetMethod ("SetChild");
 		internal static MethodInfo miAddChild = typeof (Group).GetMethod ("AddChild");
+		internal static FieldInfo fiChildren = typeof(Group).GetField ("children", BindingFlags.Instance | BindingFlags.NonPublic);
 		internal static MethodInfo miLoadTmp = typeof (TemplatedControl).GetMethod ("loadTemplate", BindingFlags.Instance | BindingFlags.NonPublic);
-		internal static MethodInfo miSetContent = typeof (TemplatedContainer).GetProperty ("Content").GetSetMethod ();
+		internal static PropertyInfo piContent = typeof(TemplatedContainer).GetProperty ("Content");
 		internal static MethodInfo miAddItem = typeof (TemplatedGroup).GetMethod ("AddItem", BindingFlags.Instance | BindingFlags.Public);
+		internal static MethodInfo miGetItems = typeof(TemplatedGroup).GetProperty ("Items").GetGetMethod ();
 		#endregion
 
-		#region ValueChange Reflexion member info
+		#region ValueChange & DSChange Reflexion member info
 		internal static EventInfo eiValueChange = typeof (IValueChange).GetEvent ("ValueChanged");
 		internal static MethodInfo miInvokeValueChange = eiValueChange.EventHandlerType.GetMethod ("Invoke");
 		internal static Type [] argsBoundValueChange = { typeof (object), typeof (object), miInvokeValueChange.GetParameters () [1].ParameterType };
 		internal static Type [] argsValueChange = { typeof (object), miInvokeValueChange.GetParameters () [1].ParameterType };
-		internal static FieldInfo fiNewValue = typeof (ValueChangeEventArgs).GetField ("NewValue");
-		internal static FieldInfo fiMbName = typeof (ValueChangeEventArgs).GetField ("MemberName");
+		internal static FieldInfo fiVCNewValue = typeof (ValueChangeEventArgs).GetField ("NewValue");
+		internal static FieldInfo fiVCMbName = typeof (ValueChangeEventArgs).GetField ("MemberName");
 		internal static MethodInfo miValueChangeAdd = eiValueChange.GetAddMethod ();
 
 		internal static EventInfo eiDSChange = typeof (GraphicObject).GetEvent ("DataSourceChanged");
 		internal static MethodInfo miInvokeDSChange = eiDSChange.EventHandlerType.GetMethod ("Invoke");
 		internal static Type [] argsBoundDSChange = {typeof (object), typeof (object), miInvokeDSChange.GetParameters () [1].ParameterType };
 		internal static FieldInfo fiDSCNewDS = typeof (DataSourceChangeEventArgs).GetField ("NewDataSource");
-
-		internal static MethodInfo miCreateBoundDelegate = typeof(DynamicMethod).
-			GetMethod("CreateDelegate", new Type[] { typeof(Type), typeof(object)});
-		internal static MethodInfo miObjToString = typeof(object).GetMethod("ToString");
-
+		internal static FieldInfo fiDSCOldDS = typeof (DataSourceChangeEventArgs).GetField ("OldDataSource");
 		internal static Type ehTypeDSChange = eiDSChange.EventHandlerType;
-		internal static FieldInfo fi_ehTypeDSChange  = typeof(CompilerServices).GetField("ehTypeDSChange", BindingFlags.Static | BindingFlags.NonPublic);
-
 		#endregion
 
 		/// <summary>
@@ -148,24 +179,16 @@ namespace Crow
 				if (pi.PropertyType == typeof(string))
 					il.Emit (OpCodes.Ldstr, Convert.ToString (val));
 				else if (pi.PropertyType.IsEnum) {
-					MethodInfo miParse = typeof(Enum).GetMethod
-						("Parse", BindingFlags.Static | BindingFlags.Public,
-							Type.DefaultBinder, new Type [] {typeof (Type), typeof (string), typeof (bool)}, null);
-
-					if (miParse == null)
-						throw new Exception ("Enum Parse method not found");
-
 					//load type of enum
 					il.Emit(OpCodes.Ldtoken, pi.PropertyType);
-					il.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle", new
-						Type[1]{typeof(RuntimeTypeHandle)}));
+					il.Emit(OpCodes.Call, CompilerServices.miGetTypeFromHandle);
 					//load enum value name
 					il.Emit (OpCodes.Ldstr, Convert.ToString (val));//TODO:is this convert required?
 					//load false
 					il.Emit (OpCodes.Ldc_I4_0);
-					il.Emit (OpCodes.Callvirt, miParse);
+					il.Emit (OpCodes.Callvirt, CompilerServices.miParseEnum);
 
-					if (miParse.ReturnType != pi.PropertyType)
+					if (CompilerServices.miParseEnum.ReturnType != pi.PropertyType)
 						il.Emit (OpCodes.Unbox_Any, pi.PropertyType);
 				} else {
 					MethodInfo miParse = pi.PropertyType.GetMethod
@@ -182,371 +205,6 @@ namespace Crow
 				}
 			}
 			il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
-		}
-
-		public static void ResolveBindings (List<Binding> Bindings)
-		{
-			if (Bindings == null)
-				return;
-			if (Bindings.Count == 0)
-				return;
-			//#if DEBUG_BINDING
-			//			Debug.WriteLine ("Resolve Bindings => " + this.ToString ());
-			//#endif
-			//grouped bindings by Instance of Source
-			Dictionary<object, List<Binding>> resolved = new Dictionary<object, List<Binding>> ();
-
-			foreach (Binding b in Bindings) {
-				if (b.Resolved)
-					continue;
-				if (b.Source.Member.MemberType == MemberTypes.Event) {
-					if (b.Expression.StartsWith ("{")) {
-						CompilerServices.CompileEventSource (b);
-						continue;
-					}
-					if (!b.TryFindTarget ())
-						continue;
-					//register handler for event
-					if (b.Target.Method == null) {
-						//Debug.WriteLine ("\tError: Handler Method not found: " + b.ToString ());
-						continue;
-					}
-					try {
-						MethodInfo addHandler = b.Source.Event.GetAddMethod ();
-						Delegate del = Delegate.CreateDelegate (b.Source.Event.EventHandlerType, b.Target.Instance, b.Target.Method);
-						addHandler.Invoke (b.Source.Instance, new object [] { del });
-
-#if DEBUG_BINDING
-						Debug.WriteLine ("\tHandler binded => " + b.ToString());
-#endif
-						b.Resolved = true;
-					} catch (Exception ex) {
-						//Debug.WriteLine ("\tERROR: " + ex.ToString ());
-					}
-					continue;
-				}
-
-				if (!b.TryFindTarget ())
-					continue;
-
-				//group Bindings by target instanceq
-				List<Binding> bindings = null;
-				if (!resolved.TryGetValue (b.Target.Instance, out bindings)) {
-					bindings = new List<Binding> ();
-					resolved [b.Target.Instance] = bindings;
-				}
-				bindings.Add (b);
-				b.Resolved = true;
-			}
-
-			Type target_Type = Bindings [0].Source.Instance.GetType ();
-
-			//group;only one dynMethods by target (valuechanged event source)
-			//changed value name tested in switch
-			//IEnumerable<Binding[]> groupedByTarget = resolved.GroupBy (g => g.Target.Instance, g => g, (k, g) => g.ToArray ());
-			foreach (List<Binding> grouped in resolved.Values) {
-				int i = 0;
-				Type source_Type = grouped [0].Target.Instance.GetType ();
-
-				DynamicMethod dm = null;
-				ILGenerator il = null;
-
-				System.Reflection.Emit.Label [] jumpTable = null;
-				System.Reflection.Emit.Label endMethod = new System.Reflection.Emit.Label ();
-
-				#region Retrieve EventHandler parameter type
-				//EventInfo ei = targetType.GetEvent ("ValueChanged");
-				//no dynamic update if ValueChanged interface is not implemented
-				if (source_Type.GetInterfaces ().Contains (typeof (IValueChange))) {
-					dm = new DynamicMethod (grouped [0].CreateNewDynMethodId (),
-						MethodAttributes.Family | MethodAttributes.FamANDAssem | MethodAttributes.NewSlot,
-						CallingConventions.Standard,
-						typeof (void),
-						argsBoundValueChange,
-						target_Type, true);
-
-					il = dm.GetILGenerator (256);
-
-					endMethod = il.DefineLabel ();
-					jumpTable = new System.Reflection.Emit.Label [grouped.Count];
-					for (i = 0; i < grouped.Count; i++)
-						jumpTable [i] = il.DefineLabel ();
-					il.DeclareLocal (typeof (string));
-					il.DeclareLocal (typeof (object));
-
-					il.Emit (OpCodes.Nop);
-					il.Emit (OpCodes.Ldarg_0);
-					//il.Emit(OpCodes.Isinst, sourceType);
-					//push new value onto stack
-					il.Emit (OpCodes.Ldarg_2);
-					il.Emit (OpCodes.Ldfld, fiNewValue);
-					il.Emit (OpCodes.Stloc_1);
-					//push name
-					il.Emit (OpCodes.Ldarg_2);
-					il.Emit (OpCodes.Ldfld, fiMbName);
-					il.Emit (OpCodes.Stloc_0);
-					il.Emit (OpCodes.Ldloc_0);
-					il.Emit (OpCodes.Brfalse, endMethod);
-				}
-				#endregion
-
-				i = 0;
-				foreach (Binding b in grouped) {
-					#region initialize target with actual value
-					object targetValue = null;
-					if (b.Target.Member != null) {
-						if (b.Target.Member.MemberType == MemberTypes.Property)
-							targetValue = b.Target.Property.GetGetMethod ().Invoke (b.Target.Instance, null);
-						else if (b.Target.Member.MemberType == MemberTypes.Field)
-							targetValue = b.Target.Field.GetValue (b.Target.Instance);
-						else if (b.Target.Member.MemberType == MemberTypes.Method) {
-							MethodInfo mthSrc = b.Target.Method;
-							if (mthSrc.IsDefined (typeof (ExtensionAttribute), false))
-								targetValue = mthSrc.Invoke (null, new object [] { b.Target.Instance });
-							else
-								targetValue = mthSrc.Invoke (b.Target.Instance, null);
-						} else
-							throw new Exception ("unandled source member type for binding");
-					} else if (string.IsNullOrEmpty (b.Expression))
-						targetValue = grouped [0].Target.Instance;//empty binding exp=> bound to target object by default
-																  //TODO: handle other dest type conversions
-					if (b.Source.Property.PropertyType == typeof (string)) {
-						if (targetValue == null) {
-							//set default value
-
-						} else
-							targetValue = targetValue.ToString ();
-					}
-					try {
-						if (targetValue != null)
-							b.Source.Property.GetSetMethod ().Invoke
-							(b.Source.Instance, new object [] { b.Source.Property.PropertyType.Cast (targetValue) });
-						else
-							b.Source.Property.GetSetMethod ().Invoke
-							(b.Source.Instance, new object [] { targetValue });
-					} catch (Exception ex) {
-						Debug.WriteLine (ex.ToString ());
-					}
-					#endregion
-
-					//if no dyn update, skip jump table
-					if (il == null)
-						continue;
-
-					il.Emit (OpCodes.Ldloc_0);
-					if (b.Target.Member != null)
-						il.Emit (OpCodes.Ldstr, b.Target.Member.Name);
-					else
-						il.Emit (OpCodes.Ldstr, b.Expression.Split ('/').LastOrDefault ().Split('.').LastOrDefault());
-					il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
-					il.Emit (OpCodes.Callvirt, stringEquals);
-					il.Emit (OpCodes.Brtrue, jumpTable [i]);
-					i++;
-				}
-
-				if (il == null)
-					continue;
-
-				il.Emit (OpCodes.Br, endMethod);
-
-				i = 0;
-				foreach (Binding b in grouped) {
-
-					il.MarkLabel (jumpTable [i]);
-
-
-					//load 2 times to check first for null
-					il.Emit (OpCodes.Ldloc_1);
-					il.Emit (OpCodes.Ldloc_1);
-
-					System.Reflection.Emit.Label labSetValue = il.DefineLabel ();
-					il.Emit (OpCodes.Brtrue, labSetValue);
-					//if null
-					il.Emit (OpCodes.Unbox_Any, b.Source.Property.PropertyType);
-					il.Emit (OpCodes.Callvirt, b.Source.Property.GetSetMethod ());
-					il.Emit (OpCodes.Br, endMethod);
-
-					il.MarkLabel (labSetValue);
-					//new value not null
-
-					//by default, source value type is deducted from target member type to allow
-					//memberless binding, if targetMember exists, it will be used to determine target
-					//value type for conversion
-					Type sourceValueType = b.Source.Property.PropertyType;
-					if (b.Target.Member != null) {
-						if (b.Target.Member.MemberType == MemberTypes.Property)
-							sourceValueType = b.Target.Property.PropertyType;
-						else if (b.Target.Member.MemberType == MemberTypes.Field)
-							sourceValueType = b.Target.Field.FieldType;
-						else
-							throw new Exception ("unhandle target member type in binding");
-					}
-
-
-
-					if (b.Source.Property.PropertyType == typeof (string)) {
-						MemberReference tostring = new MemberReference (b.Source.Instance);
-						if (!tostring.TryFindMember ("ToString"))
-							throw new Exception ("ToString method not found");
-						il.Emit (OpCodes.Callvirt, tostring.Method);
-					} else if (!sourceValueType.IsValueType)
-						il.Emit (OpCodes.Castclass, sourceValueType);
-					else if (b.Source.Property.PropertyType != sourceValueType && b.Source.Property.PropertyType != typeof(object)) {
-						il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (b.Source.Property.PropertyType));
-					} else
-						il.Emit (OpCodes.Unbox_Any, b.Source.Property.PropertyType);
-
-					il.Emit (OpCodes.Callvirt, b.Source.Property.GetSetMethod ());
-
-					//il.BeginCatchBlock (typeof (Exception));
-					//il.Emit (OpCodes.Pop);
-					//il.EndExceptionBlock ();
-
-					il.Emit (OpCodes.Br, endMethod);
-					i++;
-
-				}
-				il.MarkLabel (endMethod);
-				il.Emit (OpCodes.Pop);
-				il.Emit (OpCodes.Ret);
-
-				try {
-					Delegate del = dm.CreateDelegate (eiValueChange.EventHandlerType, Bindings [0].Source.Instance);
-					miValueChangeAdd.Invoke (grouped [0].Target.Instance, new object [] { del });
-
-				} catch (Exception ex) {					
-					Debug.WriteLine ("Binding Delegate error for {0}: \n{1}", Bindings [0].Source.Instance, ex.ToString ());
-				}
-			}
-		}
-
-		/// <summary>
-		/// Compile events expression in GOML attributes
-		/// </summary>
-		/// <param name="binding">Event binding details</param>
-		public static void CompileEventSource (Binding binding)
-		{
-#if DEBUG_BINDING
-			Debug.WriteLine ("\tCompile Event Source => " + binding.ToString());
-#endif
-
-			Type target_type = binding.Source.Instance.GetType ();
-
-			#region Retrieve EventHandler parameter type
-			MethodInfo evtInvoke = binding.Source.Event.EventHandlerType.GetMethod ("Invoke");
-			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
-			Type handlerArgsType = evtParams [1].ParameterType;
-			#endregion
-
-			Type [] args = { typeof (object), typeof (object), handlerArgsType };
-			DynamicMethod dm = new DynamicMethod (binding.CreateNewDynMethodId (),
-				typeof (void),
-				args,
-				target_type);
-
-
-			#region IL generation
-			ILGenerator il = dm.GetILGenerator (256);
-
-			string src = binding.Expression.Trim ();
-
-			if (!(src.StartsWith ("{") || src.EndsWith ("}")))
-				throw new Exception (string.Format ("GOML:Malformed {0} Event handler: {1}", binding.Source.Member.Name, binding.Expression));
-
-			src = src.Substring (1, src.Length - 2);
-			string [] srcLines = src.Split (new char [] { ';' });
-
-			foreach (string srcLine in srcLines) {
-				string statement = srcLine.Trim ();
-
-				string [] operandes = statement.Split (new char [] { '=' });
-				if (operandes.Length < 2) //not an affectation
-				{
-					continue;
-				}
-				string lop = operandes [0].Trim ();
-				string rop = operandes [operandes.Length - 1].Trim ();
-
-				#region LEFT OPERANDES
-				GraphicObject lopObj = binding.Source.Instance as GraphicObject;    //default left operand base object is
-																					//the first arg (object sender) of the event handler
-
-				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack
-
-				string [] lopParts = lop.Split (new char [] { '.' });
-				if (lopParts.Length > 1) {//should search also for member of es.Source
-					for (int j = 0; j < lopParts.Length - 1; j++) {
-						il.Emit (OpCodes.Ldstr, lopParts [j]);
-						il.Emit (OpCodes.Callvirt, miFindByName);
-					}
-				}
-
-				int i = lopParts.Length - 1;
-
-				MemberInfo [] lopMbis = lopObj.GetType ().GetMember (lopParts [i]);
-
-				if (lopMbis.Length < 1)
-					throw new Exception (string.Format ("CROW BINDING: Member not found '{0}'", lop));
-
-				OpCode lopSetOC;
-				dynamic lopSetMbi;
-				Type lopT = null;
-				switch (lopMbis [0].MemberType) {
-				case MemberTypes.Property:
-					PropertyInfo lopPi = target_type.GetProperty (lopParts [i]);
-					MethodInfo dstMi = lopPi.GetSetMethod ();
-					lopT = lopPi.PropertyType;
-					lopSetMbi = dstMi;
-					lopSetOC = OpCodes.Callvirt;
-					break;
-				case MemberTypes.Field:
-					FieldInfo dstFi = target_type.GetField (lopParts [i]);
-					lopT = dstFi.FieldType;
-					lopSetMbi = dstFi;
-					lopSetOC = OpCodes.Stfld;
-					break;
-				default:
-					throw new Exception (string.Format ("GOML:member type not handle: {0}", lopParts [i]));
-				}
-				#endregion
-
-				#region RIGHT OPERANDES
-				if (rop.StartsWith ("\'")) {
-					if (!rop.EndsWith ("\'"))
-						throw new Exception (string.Format
-							("GOML:malformed string constant in handler: {0}", rop));
-					string strcst = rop.Substring (1, rop.Length - 2);
-
-					il.Emit (OpCodes.Ldstr, strcst);
-
-				} else {
-					if (lopT.IsEnum)
-						throw new NotImplementedException ();
-
-					MethodInfo lopParseMi = lopT.GetMethod ("Parse");
-					if (lopParseMi == null)
-						throw new Exception (string.Format
-							("GOML:no parse method found in: {0}", lopT.Name));
-					il.Emit (OpCodes.Ldstr, rop);
-					il.Emit (OpCodes.Callvirt, lopParseMi);
-					il.Emit (OpCodes.Unbox_Any, lopT);
-				}
-
-				#endregion
-
-				//emit left operand assignment
-				il.Emit (lopSetOC, lopSetMbi);
-			}
-
-			il.Emit (OpCodes.Ret);
-
-			#endregion
-
-			Delegate del = dm.CreateDelegate (binding.Source.Event.EventHandlerType, binding.Source.Instance);
-			MethodInfo addHandler = binding.Source.Event.GetAddMethod ();
-			addHandler.Invoke (binding.Source.Instance, new object [] { del });
-
-			binding.Resolved = true;
 		}
 
 		#region conversions
@@ -696,11 +354,11 @@ namespace Crow
 			}
 			if (tmp != null)
 				return tmp;
-			if (dstType == typeof(string) || dstType == typeof(object))//TODO:object should be allowed to return null and not ""
+			if (dstType == typeof(string) || dstType == CompilerServices.TObject)//TODO:object should be allowed to return null and not ""
 				return "";
 			if (dstType.IsValueType)
 				return Activator.CreateInstance (dstType);
-			
+
 			return null;
 		}
 		public static void emitGetInstance (ILGenerator il, NodeAddress orig, NodeAddress dest){
@@ -711,7 +369,7 @@ namespace Crow
 					break;
 			}
 			for (int i = 0; i < orig.Count - ptr; i++)
-				il.Emit (OpCodes.Callvirt, typeof(ILayoutable).GetProperty ("LogicalParent").GetGetMethod ());
+				il.Emit (OpCodes.Callvirt, CompilerServices.miGetLogicalParent);
 			while (ptr < dest.Count) {
 				emitGetChild (il, dest [ptr-1].CrowType, dest [ptr].Index);
 				ptr++;
@@ -725,23 +383,23 @@ namespace Crow
 		}
 		public static void emitGetChild(ILGenerator il, Type parentType, int index){
 			if (typeof (Group).IsAssignableFrom (parentType)) {
-				il.Emit (OpCodes.Ldfld, typeof(Group).GetField ("children", BindingFlags.Instance | BindingFlags.NonPublic));
+				il.Emit (OpCodes.Ldfld, fiChildren);
 				il.Emit(OpCodes.Ldc_I4, index);
-				il.Emit (OpCodes.Callvirt, typeof(List<GraphicObject>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
+				il.Emit (OpCodes.Callvirt, miGetGObjItem);
 				return;
 			}
 			if (typeof(Container).IsAssignableFrom (parentType) || index < 0) {
-				il.Emit (OpCodes.Ldfld, typeof(PrivateContainer).GetField ("child", BindingFlags.Instance | BindingFlags.NonPublic));
+				il.Emit (OpCodes.Ldfld, fiChild);
 				return;
 			}
 			if (typeof(TemplatedContainer).IsAssignableFrom (parentType)) {
-				il.Emit (OpCodes.Callvirt, typeof(TemplatedContainer).GetProperty ("Content").GetGetMethod ());
+				il.Emit (OpCodes.Callvirt, piContent.GetGetMethod());
 				return;
 			}
 			if (typeof(TemplatedGroup).IsAssignableFrom (parentType)) {
-				il.Emit (OpCodes.Callvirt, typeof(TemplatedGroup).GetProperty ("Items").GetGetMethod ());
+				il.Emit (OpCodes.Callvirt, miGetItems);
 				il.Emit(OpCodes.Ldc_I4, index);
-				il.Emit (OpCodes.Callvirt, typeof(List<GraphicObject>).GetMethod("get_Item", new Type[] { typeof(Int32) }));
+				il.Emit (OpCodes.Callvirt, miGetGObjItem);
 				return;
 			}
 		}
@@ -749,7 +407,7 @@ namespace Crow
 		/// Emit conversion from orig type to dest type
 		/// </summary>
 		public static void emitConvert(ILGenerator il, Type origType, Type destType){
-			if (destType == typeof(object))
+			if (destType == CompilerServices.TObject)
 				return;
 			if (destType == typeof(string)) {
 				System.Reflection.Emit.Label emitNullStr = il.DefineLabel ();
@@ -807,10 +465,10 @@ namespace Crow
 			} else{
 				il.Emit (OpCodes.Stloc_0); //save orig value in loc0
 				il.Emit (OpCodes.Ldloc_0);
-				il.Emit (OpCodes.Callvirt, typeof(object).GetMethod ("GetType"));
+				il.Emit (OpCodes.Callvirt, miGetType);
 				il.Emit (OpCodes.Ldtoken, dstType);//push destination property type for testing
 				il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
-				il.Emit (OpCodes.Call, typeof(CompilerServices).GetMethod ("getImplicitOp", BindingFlags.Static | BindingFlags.Public));
+				il.Emit (OpCodes.Call, miGetImplOp);
 				il.Emit (OpCodes.Dup);
 				convert = il.DefineLabel ();
 				il.Emit (OpCodes.Brtrue, convert);
@@ -822,12 +480,12 @@ namespace Crow
 				il.MarkLabel (convert);
 				il.Emit (OpCodes.Ldnull);//null instance for invoke
 				il.Emit (OpCodes.Ldc_I4_1);
-				il.Emit(OpCodes.Newarr, typeof(object));
+				il.Emit(OpCodes.Newarr, CompilerServices.TObject);
 				il.Emit (OpCodes.Dup);//duplicate the array ref
 				il.Emit (OpCodes.Ldc_I4_0);//push the index 0
 				il.Emit (OpCodes.Ldloc_0);//push the orig value to convert
-				il.Emit (OpCodes.Stelem, typeof(object));//set the array element at index 0
-				il.Emit (OpCodes.Callvirt, typeof(MethodInfo).GetMethod("Invoke", new Type[] { typeof(object), typeof (object[])}));
+				il.Emit (OpCodes.Stelem, CompilerServices.TObject);//set the array element at index 0
+				il.Emit (OpCodes.Callvirt, miMIInvoke);
 			}
 
 			il.MarkLabel (endConvert);
@@ -917,7 +575,7 @@ namespace Crow
 			Type handlerArgsType = evtParams [1].ParameterType;
 			#endregion
 
-			Type [] args = { typeof (object), handlerArgsType };
+			Type [] args = { CompilerServices.TObject, handlerArgsType };
 			DynamicMethod dm = new DynamicMethod ("dyn_eventHandler",
 				typeof(void),
 				args, true);
@@ -958,7 +616,7 @@ namespace Crow
 					//named target
 					//TODO:
 					il.Emit(OpCodes.Ldstr, bindTrg[0]);
-					il.Emit(OpCodes.Callvirt, typeof(GraphicObject).GetMethod("FindByName"));
+					il.Emit(OpCodes.Callvirt, miFindByName);
 					lopMI = lopType.GetMember (bindTrg [1]).FirstOrDefault();
 				} else
 					throw new Exception ("Syntax error in binding, expected 'go dot member'");
