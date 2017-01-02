@@ -562,9 +562,11 @@ namespace Crow
 		}
 		internal static Delegate createDel(Type eventType, object instance, string method){
 			Type t = instance.GetType ();
-			MethodInfo mi = t.GetMethod (method);
-			if (mi == null)
+			MethodInfo mi = t.GetMethod (method, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+			if (mi == null) {
+				Debug.WriteLine ("Handler Method '{0}' not found in '{1}'", method, t);
 				return null;
+			}
 			return Delegate.CreateDelegate (eventType, instance, mi);
 		}
 		public static Delegate compileDynEventHandler(EventInfo sourceEvent, string expression, NodeAddress currentNode = null){

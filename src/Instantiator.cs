@@ -358,6 +358,10 @@ namespace Crow
 			NodeAddress sourceNA = ctx.CurrentNodeAddress;
 			BindingDefinition bindingDef = splitBindingExp (sourceNA, sourceMember, expression);
 
+			#if DEBUG_BINDING
+			Debug.WriteLine("Property Binding: " + bindingDef.ToString());
+			#endif
+
 			if (bindingDef.IsDataSourceBinding)//bind on data source
 				emitDataSourceBindings (ctx, bindingDef);
 			else
@@ -426,6 +430,10 @@ namespace Crow
 		void emitHandlerBinding (Context ctx, EventInfo sourceEvent, string expression){
 			NodeAddress currentNode = ctx.CurrentNodeAddress;
 			BindingDefinition bindingDef = splitBindingExp (currentNode, sourceEvent.Name, expression);
+
+			#if DEBUG_BINDING
+			Debug.WriteLine("Event Binding: " + bindingDef.ToString());
+			#endif
 
 			if (bindingDef.IsTemplateBinding | bindingDef.IsDataSourceBinding) {
 				//we need to bind datasource method to source event
