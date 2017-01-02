@@ -142,6 +142,9 @@ namespace Crow
 		{
 			return new Color (this.R, this.G, this.B, _A);
 		}
+		public void ResetName(){
+			Name = "";
+		}
 			
 		#region Predefined colors
         public static readonly Color Transparent = new Color(0, 0, 0, 0, "Transparent");
@@ -1075,7 +1078,7 @@ namespace Crow
         }
 		public static Color FromHSV(double _h, double _v = 1.0, double _s = 1.0){
 			Color c = Color.Black;
-
+			c.ResetName ();
 			if (_s == 0) {//HSV from 0 to 1
 				c.R = _v;
 				c.G = _v;
