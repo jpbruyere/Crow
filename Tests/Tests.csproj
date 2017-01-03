@@ -45,7 +45,7 @@
 	<Reference Include="gio-sharp"/>
 	<Reference Include="glib-sharp"/>
     <Reference Include="OpenTK">
-      <HintPath>..\packages\OpenTK.2.0.0\lib\net20\OpenTK.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\OpenTK.2.0.0\lib\net20\OpenTK.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
