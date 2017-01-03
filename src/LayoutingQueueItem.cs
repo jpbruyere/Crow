@@ -41,7 +41,7 @@ namespace Crow
 	/// <summary>
 	/// Element class of the LayoutingQueue
 	/// </summary>
-	public class LayoutingQueueItem
+	public struct LayoutingQueueItem
 	{
 		/// <summary> Instance of widget to be layouted</summary>
 		public ILayoutable Layoutable;
@@ -79,6 +79,8 @@ namespace Crow
 			LayoutType = _layoutType;
 			Layoutable = _graphicObject;
 			Layoutable.RegisteredLayoutings |= LayoutType;
+			LayoutingTries = 0;
+			DiscardCount = 0;
 			#if DEBUG_LAYOUTING
 			GraphicObject g = graphicObject;
 			g.CurrentInterface.curLQIs.Add(this);
@@ -121,6 +123,11 @@ namespace Crow
 				#endif
 			}
 			#if DEBUG_LAYOUTING
+			else{
+				if (LayoutingTries > 1 || DiscardCount > 0)
+					Debug.WriteLine (this.ToString ());
+			}
+
 			LQITime.Stop();
 			#endif
 		}

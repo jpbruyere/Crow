@@ -376,7 +376,7 @@ namespace Crow
 			DiscardQueue = new Queue<LayoutingQueueItem> ();
 			lock (LayoutMutex) {
 				//Debug.WriteLine ("======= Layouting queue start =======");
-				LayoutingQueueItem lqi = null;
+				LayoutingQueueItem lqi;
 				while (LayoutingQueue.Count > 0) {
 					lqi = LayoutingQueue.Dequeue ();
 					#if DEBUG_LAYOUTING
