@@ -98,14 +98,6 @@ namespace Crow
 		public string Clipboard;//TODO:use object instead for complex copy paste
 		public void EnqueueForRepaint(GraphicObject g)
 		{
-//			if (g.RegisteredLayoutings != LayoutingType.None)
-//				return;
-			ILayoutable l = g;
-//			while (l.Parent != null)
-//				l = l.Parent;
-//			if (!(l is Interface))
-//				return;
-
 			lock (DrawingQueue) {
 				if (g.IsQueueForRedraw)
 					return;
@@ -408,15 +400,16 @@ namespace Crow
 			#if MEASURE_TIME
 			clippingTime.Restart ();
 			#endif
-			lock (DrawingQueue) {
-				while (DrawingQueue.Count > 0) {
-					GraphicObject g = DrawingQueue.Dequeue ();
-					g.IsQueueForRedraw = false;
-					g.Parent.RegisterClip (g.LastPaintedSlot);
-					if (g.getSlot () != g.LastPaintedSlot)
-						g.Parent.RegisterClip (g.getSlot ());
-				}
+			GraphicObject g = null;
+			while (DrawingQueue.Count > 0) {
+				lock (DrawingQueue)
+					g = DrawingQueue.Dequeue ();
+				g.IsQueueForRedraw = false;
+				g.Parent.RegisterClip (g.LastPaintedSlot);
+				if (g.getSlot () != g.LastPaintedSlot)
+					g.Parent.RegisterClip (g.getSlot ());
 			}
+
 			#if MEASURE_TIME
 			clippingTime.Stop ();
 			#endif
@@ -427,8 +420,6 @@ namespace Crow
 			#endif
 			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
 				using (ctx = new Context (surf)){
-
-
 					if (clipping.count > 0) {
 						//Link.draw (ctx);
 						clipping.clearAndClip(ctx);

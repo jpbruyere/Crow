@@ -107,6 +107,7 @@ namespace Crow
 		public object Tag;
 		/// <summary>drawing Cache, if null, a redraw is done, cached or not</summary>
 		public byte[] bmp;
+		public bool IsDirty = true;
 		/// <summary>
 		/// This size is computed on each child' layout changes.
 		/// In stacking widget, it is used to compute the remaining space for the stretched
@@ -416,17 +417,23 @@ namespace Crow
 				NotifyValueChanged ("MouseRepeat", mouseRepeat);
 			}
 		}
+		bool clearBackground = false;
 		[XmlAttributeAttribute()][DefaultValue("Transparent")]
 		public virtual Fill Background {
 			get { return background; }
 			set {
 				if (background == value)
 					return;
+				clearBackground = false;
 				if (value == null)
 					return;
 				background = value;
 				NotifyValueChanged ("Background", background);
 				RegisterForRedraw ();
+				if (background is SolidColor) {
+					if ((Background as SolidColor).Equals (Color.Clear))
+						clearBackground = true;
+				}
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("White")]
@@ -781,7 +788,7 @@ namespace Crow
 
 		#region Queuing
 		public virtual void RegisterClip(Rectangle clip){
-			if (CacheEnabled && bmp != null)
+			if (CacheEnabled && !IsDirty)
 				Clipping.AddRectangle (clip + ClientRectangle.Position);
 			if (Parent != null)
 				Parent.RegisterClip (clip + Slot.Position + ClientRectangle.Position);
@@ -790,7 +797,7 @@ namespace Crow
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForGraphicUpdate ()
 		{
-			bmp = null;
+			IsDirty = true;
 			if (Width.IsFit || Height.IsFit)
 				RegisterForLayouting (LayoutingType.Sizing);
 			else if (RegisteredLayoutings == LayoutingType.None)
@@ -800,7 +807,7 @@ namespace Crow
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForRedraw ()
 		{
-			bmp = null;
+			IsDirty = true;
 			if (RegisteredLayoutings == LayoutingType.None)
 				CurrentInterface.EnqueueForRepaint (this);
 		}
@@ -913,7 +920,7 @@ namespace Crow
 				if (LastSlots.X == Slot.X)
 					break;
 
-				bmp = null;
+				IsDirty = true;
 
 				OnLayoutChanges (layoutType);
 
@@ -943,7 +950,7 @@ namespace Crow
 				if (LastSlots.Y == Slot.Y)
 					break;
 
-				bmp = null;
+				IsDirty = true;
 
 				OnLayoutChanges (layoutType);
 
@@ -979,7 +986,7 @@ namespace Crow
 				if (LastSlots.Width == Slot.Width)
 					break;
 
-				bmp = null;
+				IsDirty = true;
 
 				OnLayoutChanges (layoutType);
 
@@ -1015,7 +1022,7 @@ namespace Crow
 				if (LastSlots.Height == Slot.Height)
 					break;
 
-				bmp = null;
+				IsDirty = true;
 
 				OnLayoutChanges (layoutType);
 
@@ -1024,7 +1031,7 @@ namespace Crow
 			}
 
 			//if no layouting remains in queue for item, registre for redraw
-			if (this.registeredLayoutings == LayoutingType.None && bmp == null)
+			if (this.registeredLayoutings == LayoutingType.None && IsDirty)
 				CurrentInterface.EnqueueForRepaint (this);
 
 			return true;
@@ -1051,7 +1058,7 @@ namespace Crow
 
 			int bmpSize = Math.Abs (stride) * Slot.Height;
 			bmp = new byte[bmpSize];
-
+			IsDirty = false;
 			using (ImageSurface draw =
                 new ImageSurface(bmp, Format.Argb32, Slot.Width, Slot.Height, stride)) {
 				using (Context gr = new Context (draw)) {
@@ -1063,16 +1070,13 @@ namespace Crow
 		}
 		protected virtual void UpdateCache(Context ctx){
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
-			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
-				//TODO:improve equality test for basic color and Fill
-				if (this.Background is SolidColor) {
-					if ((this.Background as SolidColor).Equals (Color.Clear)) {
+			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {				
+				if (clearBackground) {
 						ctx.Save ();
 						ctx.Operator = Operator.Clear;
 						ctx.Rectangle (rb);
 						ctx.Fill ();
 						ctx.Restore ();
-					}
 				}
 				ctx.SetSourceSurface (cache, rb.X, rb.Y);
 				ctx.Paint ();
@@ -1096,7 +1100,7 @@ namespace Crow
 			}
 
 			if (cacheEnabled) {
-				if (bmp == null)
+				if (IsDirty)
 					RecreateCache ();
 
 				UpdateCache (ctx);

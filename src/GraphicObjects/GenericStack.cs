@@ -84,7 +84,7 @@ namespace Crow
 					d += c.Slot.Height + Spacing;
 				}
 			}
-			bmp = null;
+			IsDirty = true;
 		}
 		GraphicObject stretchedGO = null;
 		public override bool UpdateLayout (LayoutingType layoutType)
@@ -99,7 +99,7 @@ namespace Crow
 				ComputeChildrenPositions ();
 
 				//if no layouting remains in queue for item, registre for redraw
-				if (RegisteredLayoutings == LayoutingType.None && bmp == null)
+				if (RegisteredLayoutings == LayoutingType.None && IsDirty)
 					CurrentInterface.EnqueueForRepaint (this);
 
 				return true;
@@ -134,7 +134,7 @@ namespace Crow
 							newW = Math.Min (newW, stretchedGO.MaximumSize.Width);
 						if (newW != stretchedGO.Slot.Width) {							
 							stretchedGO.Slot.Width = newW;
-							stretchedGO.bmp = null;
+							stretchedGO.IsDirty = true;
 #if DEBUG_LAYOUTING
 					Debug.WriteLine ("\tAdjusting Width of " + stretchedGO.ToString());
 #endif
@@ -173,7 +173,7 @@ namespace Crow
 							newH = Math.Min (newH, stretchedGO.MaximumSize.Height);
 						if (newH != stretchedGO.Slot.Height) {
 							stretchedGO.Slot.Height = newH;
-							stretchedGO.bmp = null;
+							stretchedGO.IsDirty = true;
 #if DEBUG_LAYOUTING
 					Debug.WriteLine ("\tAdjusting Height of " + stretchedGO.ToString());
 #endif

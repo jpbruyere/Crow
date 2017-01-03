@@ -76,7 +76,7 @@ namespace Crow
 					dy += c.Slot.Height + Spacing;
 				}
 			}
-			bmp = null;
+			IsDirty = true;
 		}
 		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
@@ -180,7 +180,7 @@ namespace Crow
 				ComputeChildrenPositions ();
 
 				//if no layouting remains in queue for item, registre for redraw
-				if (RegisteredLayoutings == LayoutingType.None && bmp == null)
+				if (RegisteredLayoutings == LayoutingType.None && IsDirty)
 					CurrentInterface.EnqueueForRepaint (this);
 
 				return true;

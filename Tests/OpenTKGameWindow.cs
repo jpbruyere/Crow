@@ -184,7 +184,7 @@ namespace Crow
 			shader.SetMVP (projection);
 			GL.ActiveTexture (TextureUnit.Texture0);
 			GL.BindTexture (TextureTarget.Texture2D, texID);
-			lock (CrowInterface.RenderMutex) {
+			if (Monitor.TryEnter(CrowInterface.RenderMutex)) {
 				if (CrowInterface.IsDirty) {
 					GL.TexSubImage2D (TextureTarget.Texture2D, 0,
 						CrowInterface.DirtyRect.Left, CrowInterface.DirtyRect.Top,
@@ -192,6 +192,7 @@ namespace Crow
 						OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, CrowInterface.dirtyBmp);
 					CrowInterface.IsDirty = false;
 				}
+				Monitor.Exit (CrowInterface.RenderMutex);
 			}
 			quad.Render (BeginMode.TriangleStrip);
 			GL.BindTexture(TextureTarget.Texture2D, 0);
