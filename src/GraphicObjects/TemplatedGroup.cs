@@ -390,6 +390,7 @@ namespace Crow
 			lock (CurrentInterface.LayoutMutex) {
 				g = iTemp.CreateInstance(CurrentInterface);
 				page.AddChild (g);
+				//g.LogicalParent = this;
 				registerItemClick (g);
 			}
 
@@ -397,8 +398,6 @@ namespace Crow
 				(g as Expandable).Expand += iTemp.Expand;
 				(g as Expandable).GetIsExpandable = iTemp.HasSubItems;
 			}
-			//g.LogicalParent = this;
-
 
 			g.DataSource = data [i];
 		}

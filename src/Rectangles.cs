@@ -93,16 +93,11 @@ namespace Crow
 		}
 		public void clear(Context ctx)
         {
-            //ctx.Save();
-
             foreach (Rectangle r in list)
-            {
                 ctx.Rectangle(r);
-            }
             ctx.Operator = Operator.Clear;
             ctx.Fill();
             ctx.Operator = Operator.Over;
-            //ctx.Restore();
         }
 		public override string ToString ()
 		{
