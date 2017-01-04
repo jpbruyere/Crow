@@ -180,20 +180,37 @@ namespace Crow
 		{
 			if (_canPop)
 				IsPopped = !IsPopped;
-			base.onMouseClick (sender, e);
+			base.onMouseClick (this, e);
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
-			if (!_isPopped || _content == null) {
-				base.onMouseLeave (sender, e);
-				return;
+			base.onMouseLeave (this, e);
+			IsPopped = false;
+		}
+		public override bool MouseIsIn (Point m)
+		{
+			bool isInContent = false;
+			if (Content != null) {
+				if (Content.Parent != null)
+					isInContent = Content.MouseIsIn (m);
 			}
-
-			if (!_content.MouseIsIn (e.Position)) {
-				base.onMouseLeave (sender, e);
-				IsPopped = false;
-				return;
+			return base.MouseIsIn (m) || isInContent;
+		}
+		public override void checkHoverWidget (MouseMoveEventArgs e)
+		{
+			if (CurrentInterface.HoverWidget != this) {
+				CurrentInterface.HoverWidget = this;
+				onMouseEnter (this, e);
 			}
+			if (Content != null){
+				if (Content.Parent != null) {
+					if (Content.MouseIsIn (e.Position)) {
+						Content.checkHoverWidget (e);
+						return;
+					}
+				}
+			}
+			base.checkHoverWidget (e);
 		}
 		#endregion
 

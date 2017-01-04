@@ -582,24 +582,22 @@ namespace Crow
 				GraphicObject topc = null;
 				while (tmp is GraphicObject) {
 					topc = tmp;
-					tmp = tmp.Parent as GraphicObject;
+					tmp = tmp.LogicalParent as GraphicObject;
 				}
 				int idxhw = GraphicTree.IndexOf (topc);
 				if (idxhw != 0) {
 					int i = 0;
 					while (i < idxhw) {
-						if (GraphicTree [i].MouseIsIn (e.Position)) {
-							while (HoverWidget != null) {
-								if (HoverWidget is Popper) {
-									if ((HoverWidget as Popper).Content == GraphicTree[i])
-										break;
+						if (GraphicTree [i].localLogicalParentIsNull) {
+							if (GraphicTree [i].MouseIsIn (e.Position)) {
+								while (HoverWidget != null) {
+									HoverWidget.onMouseLeave (HoverWidget, e);
+									HoverWidget = HoverWidget.LogicalParent as GraphicObject;
 								}
-								HoverWidget.onMouseLeave (HoverWidget, e);
-								HoverWidget = HoverWidget.LogicalParent as GraphicObject;
-							}
 
-							GraphicTree [i].checkHoverWidget (e);
-							return true;
+								GraphicTree [i].checkHoverWidget (e);
+								return true;
+							}
 						}
 						i++;
 					}

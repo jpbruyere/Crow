@@ -40,7 +40,6 @@ namespace Crow
 
 		[XmlAttributeAttribute][DefaultValue(false)]
 		public bool IsOpened {
-			//get { return MenuRoot == null ? false : MenuRoot.IsOpened; }
 			get { return isOpened; }
 			set {
 				if (isOpened == value)
@@ -48,11 +47,9 @@ namespace Crow
 				isOpened = value;
 				NotifyValueChanged ("IsOpened", isOpened);
 
-				if (isOpened) {
+				if (isOpened)
 					onOpen (this, null);
-//					if (MenuRoot != null)
-//						MenuRoot.IsOpened = true;
-				}else
+				else
 					onClose (this, null);
 			}
 		}
@@ -102,19 +99,20 @@ namespace Crow
 			Execute.Raise (this, null);
 		}
 		protected virtual void onOpen (object sender, EventArgs e){
-			//MenuRoot.IsOpened = true;
 			Open.Raise (this, null);
 		}
 		protected virtual void onClose (object sender, EventArgs e){
-			//MenuRoot.IsOpened = true;
 			Close.Raise (this, null);
 		}
-		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
+		public override bool MouseIsIn (Point m)
 		{
-			base.onMouseEnter (sender, e);
-			if (MenuRoot == null || Items.Count == 0)
-				return;
-			IsOpened = MenuRoot.IsOpened;
+			return base.MouseIsIn (m) || child.MouseIsIn (m);
+		}
+		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
+		{
+			if (IsOpened)
+				IsOpened = false;
+			base.onMouseLeave (this, e);
 		}
 	}
 }
