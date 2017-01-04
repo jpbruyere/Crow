@@ -27,17 +27,17 @@ namespace Crow
 {
 	public class TabItem : TemplatedContainer
 	{
+		#region CTOR
+		public TabItem () : base() {}
+		#endregion
+
 		#region Private fields
 		string caption;
 		Container _contentContainer;
 		GraphicObject _tabTitle;
 		int tabOffset;
-		#endregion
-
-		#region CTOR
-		public TabItem () : base()
-		{
-		}
+		bool isSelected;
+		Measure tabThickness;
 		#endregion
 
 		#region TemplatedControl overrides
@@ -65,6 +65,17 @@ namespace Crow
 		internal GraphicObject TabTitle { get { return _tabTitle; }}
 		#endregion
 
+		[XmlAttributeAttribute][DefaultValue("18")]
+		public virtual Measure TabThickness {
+			get { return tabThickness; }
+			set {
+				if (tabThickness == value)
+					return;
+				tabThickness = value;
+				NotifyValueChanged ("TabThickness", tabThickness);
+				RegisterForGraphicUpdate ();
+			}
+		}
 		[XmlAttributeAttribute][DefaultValue(0)]
 		public virtual int TabOffset {
 			get { return tabOffset; }
@@ -88,7 +99,6 @@ namespace Crow
 				NotifyValueChanged ("Caption", caption);
 			}
 		}
-		bool isSelected;
 		[XmlAttributeAttribute][DefaultValue(false)]
 		public virtual bool IsSelected {
 			get { return isSelected; }
@@ -101,9 +111,11 @@ namespace Crow
 		}
 		protected override void onDraw (Cairo.Context gr)
 		{
+			gr.Save ();
+
 			int spacing = (Parent as TabView).Spacing;
 
-			gr.MoveTo (0, TabTitle.Slot.Bottom-0.5);
+			gr.MoveTo (0.5, TabTitle.Slot.Bottom-0.5);
 			gr.LineTo (TabTitle.Slot.Left - spacing, TabTitle.Slot.Bottom-0.5);
 			gr.CurveTo (
 				TabTitle.Slot.Left - spacing / 2, TabTitle.Slot.Bottom-0.5,
@@ -114,16 +126,16 @@ namespace Crow
 				TabTitle.Slot.Right + spacing / 2, 0.5,
 				TabTitle.Slot.Right + spacing / 2, TabTitle.Slot.Bottom-0.5,
 				TabTitle.Slot.Right + spacing, TabTitle.Slot.Bottom-0.5);
-			gr.LineTo (Slot.Width, TabTitle.Slot.Bottom-0.5);
+			gr.LineTo (Slot.Width-0.5, TabTitle.Slot.Bottom-0.5);
 
-			gr.LineWidth = 1;
+
+			gr.LineTo (Slot.Width-0.5, Slot.Height-0.5);
+			gr.LineTo (0.5, Slot.Height-0.5);
+			gr.ClosePath ();
+			gr.LineWidth = 2;
 			Foreground.SetAsSource (gr);
 			gr.StrokePreserve ();
 
-			gr.LineTo (Slot.Width, Slot.Height);
-			gr.LineTo (0, Slot.Height);
-			gr.ClosePath ();
-			gr.Save ();
 			gr.Clip ();
 			base.onDraw (gr);
 			gr.Restore ();
