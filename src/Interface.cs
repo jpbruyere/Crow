@@ -82,8 +82,8 @@ namespace Crow
 		public const int MaxCacheSize = 2048;
 		/// <summary> Above this count, the layouting is discard for the widget and it
 		/// will not be rendered on screen </summary>
-		public const int MaxLayoutingTries = 5;
-		public const int MaxDiscardCount = 10;
+		public const int MaxLayoutingTries = 3;
+		public const int MaxDiscardCount = 5;
 		/// <summary> Global font rendering settings for Cairo </summary>
 		public static FontOptions FontRenderingOptions;
 		#endregion
@@ -321,7 +321,7 @@ namespace Crow
 //		public static LayoutingQueueItem[] MultipleRunsLQIs {
 //			get { return curUpdateLQIs.Where(l=>l.LayoutingTries>2 || l.DiscardCount > 0).ToArray(); }
 //		}
-		public LayoutingQueueItem currentLQI = null;
+		public LayoutingQueueItem currentLQI;
 		#else
 		public List<LQIList> LQIs = null;//still create the var for CrowIDE
 		#endif
@@ -384,9 +384,6 @@ namespace Crow
 					curLQIsTries.Add(currentLQI);
 					#endif
 					lqi.ProcessLayouting ();
-					#if DEBUG_LAYOUTING
-					currentLQI = null;
-					#endif
 				}
 				LayoutingQueue = DiscardQueue;
 			}
@@ -406,8 +403,7 @@ namespace Crow
 					g = DrawingQueue.Dequeue ();
 				g.IsQueueForRedraw = false;
 				g.Parent.RegisterClip (g.LastPaintedSlot);
-				if (g.getSlot () != g.LastPaintedSlot)
-					g.Parent.RegisterClip (g.getSlot ());
+				g.Parent.RegisterClip (g.getSlot ());
 			}
 
 			#if MEASURE_TIME
@@ -454,12 +450,15 @@ namespace Crow
 							DirtyRect.Width = Math.Max (0, DirtyRect.Width);
 							DirtyRect.Height = Math.Max (0, DirtyRect.Height);
 
-							dirtyBmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
-							for (int y = 0; y < DirtyRect.Height; y++) {
-								Array.Copy (bmp,
-									((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
-									dirtyBmp, y * DirtyRect.Width * 4, DirtyRect.Width * 4);
-							}
+							if (DirtyRect.Width > 0) {
+								dirtyBmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
+								for (int y = 0; y < DirtyRect.Height; y++) {
+									Array.Copy (bmp,
+										((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
+										dirtyBmp, y * DirtyRect.Width * 4, DirtyRect.Width * 4);
+								}
+							} else
+								IsDirty = false;
 						}
 						clipping.Reset ();
 					}
