@@ -26,10 +26,14 @@ namespace Crow
 {
 	public class Menu : TemplatedGroup
 	{
+		#region CTOR
+		public Menu () : base() {}
+		#endregion
+
 		Orientation orientation;
 
 		[XmlAttributeAttribute()][DefaultValue(Orientation.Horizontal)]
-		public virtual Orientation Orientation {
+		public Orientation Orientation {
 			get { return orientation; }
 			set {
 				if (orientation == value)
@@ -38,23 +42,15 @@ namespace Crow
 				NotifyValueChanged ("Orientation", orientation);
 			}
 		}
-		bool isOpened = false;
-		public bool IsOpened
+		bool autoOpen = false;
+		[XmlIgnore]public bool AutomaticOpenning
 		{
-			get { return isOpened; }
-			set
-			{
-				isOpened = value;
-				System.Diagnostics.Debug.WriteLine ("is opened = " + isOpened);
-			}
-		}
-
-		public Menu () : base()
-		{
+			get { return autoOpen; }
+			set	{ autoOpen = value;	}
 		}
 
 		public override void AddItem (GraphicObject g)
-		{
+		{			
 			base.AddItem (g);
 
 			if (orientation == Orientation.Horizontal)
@@ -65,7 +61,7 @@ namespace Crow
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			//IsOpened = false;
+			AutomaticOpenning = false;
 		}
 	}
 }

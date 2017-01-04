@@ -24,7 +24,7 @@ using System.ComponentModel;
 
 namespace Crow
 {
-	public class MenuItem : TemplatedGroup
+	public class MenuItem : Menu
 	{
 		#region CTOR
 		public MenuItem () : base() {}
@@ -47,9 +47,10 @@ namespace Crow
 				isOpened = value;
 				NotifyValueChanged ("IsOpened", isOpened);
 
-				if (isOpened)
+				if (isOpened) {
 					onOpen (this, null);
-				else
+					(LogicalParent as Menu).AutomaticOpenning = true;
+				}else
 					onClose (this, null);
 			}
 		}
@@ -75,19 +76,7 @@ namespace Crow
 				NotifyValueChanged ("Caption", caption);
 			}
 		}
-
-		[XmlIgnore]Menu MenuRoot {
-			get {
-				ILayoutable tmp = LogicalParent;
-				while (tmp != null) {
-					if (tmp is Menu)
-						return tmp as Menu;
-					tmp = tmp.LogicalParent;
-				}
-				return null;
-			}
-		}
-
+			
 		public override void AddItem (GraphicObject g)
 		{
 			base.AddItem (g);
@@ -97,6 +86,8 @@ namespace Crow
 		void onMI_Click (object sender, MouseButtonEventArgs e)
 		{
 			Execute.Raise (this, null);
+			if(!IsOpened)
+				(LogicalParent as Menu).AutomaticOpenning = false;
 		}
 		protected virtual void onOpen (object sender, EventArgs e){
 			Open.Raise (this, null);
@@ -107,6 +98,12 @@ namespace Crow
 		public override bool MouseIsIn (Point m)
 		{
 			return base.MouseIsIn (m) || child.MouseIsIn (m);
+		}
+		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
+		{
+			base.onMouseEnter (sender, e);
+			if ((LogicalParent as Menu).AutomaticOpenning && items.Children.Count>0)
+				IsOpened = true;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
