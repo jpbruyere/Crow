@@ -1163,7 +1163,7 @@ namespace Crow
 				onMouseEnter (this, e);
 			}
 
-			this.onMouseMove (this, e);
+			this.onMouseMove (this, e);//without this, window border doesn't work, should be removed
 		}
 		public virtual void onMouseMove(object sender, MouseMoveEventArgs e)
 		{
