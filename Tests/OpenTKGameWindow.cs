@@ -22,6 +22,7 @@ using System;
 using System.Threading;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using System.Collections.Generic;
 
 namespace Crow
 {
@@ -60,14 +61,8 @@ namespace Crow
 				if (frameCpt % 3 == 0)
 					ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
 				#if MEASURE_TIME
-				ValueChanged.Raise (this, new ValueChangeEventArgs ("update",
-					this.CrowInterface.updateTime.ElapsedTicks.ToString () + " ticks"));
-				ValueChanged.Raise (this, new ValueChangeEventArgs ("layouting",
-					this.CrowInterface.layoutTime.ElapsedTicks.ToString () + " ticks"));
-				ValueChanged.Raise (this, new ValueChangeEventArgs ("drawing",
-					this.CrowInterface.drawingTime.ElapsedTicks.ToString () + " ticks"));
-				ValueChanged.Raise (this, new ValueChangeEventArgs ("clipping",
-					this.CrowInterface.clippingTime.ElapsedTicks.ToString () + " ticks"));
+				foreach (PerformanceMeasure m in PerfMeasures)
+					m.NotifyChanges();
 				#endif
 			}
 		}
@@ -101,12 +96,27 @@ namespace Crow
 		{
 			CrowInterface = new Interface ();
 
+			#if MEASURE_TIME
+			PerfMeasures = new List<PerformanceMeasure> (
+				new PerformanceMeasure[] {
+					this.CrowInterface.updateMeasure,
+					this.CrowInterface.layoutingMeasure,
+					this.CrowInterface.clippingMeasure,
+					this.CrowInterface.drawingMeasure
+				}
+			);
+			#endif
+
 			Thread t = new Thread (interfaceThread);
 			t.IsBackground = true;
 			t.Start ();
 		}
 
 		#endregion
+
+		#if MEASURE_TIME
+		public List<PerformanceMeasure> PerfMeasures;
+		#endif
 
 		void interfaceThread()
 		{

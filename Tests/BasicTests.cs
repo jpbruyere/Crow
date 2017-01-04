@@ -129,10 +129,6 @@ namespace Tests
 			//testFiles = new string [] { @"Interfaces/Unsorted/testFileDialog.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
 			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
-			//testFiles = new string [] { @"Interfaces/TemplatedContainer/test_Listbox.crow" };
-			//testFiles = new string [] { @"Interfaces/TemplatedControl/testItemTemplateTag.crow" };
-			//testFiles = new string [] { @"Interfaces/Divers/test2WayBinding.crow" };
-			//testFiles = new string [] { @"Interfaces/Divers/testPropLess.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
@@ -167,6 +163,10 @@ namespace Tests
 				return;
 			}else if (e.Key == OpenTK.Input.Key.F6) {
 				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/0.crow");
+				w.DataSource = this;
+				return;
+			}else if (e.Key == OpenTK.Input.Key.F7) {
+				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/perfMeasures.crow");
 				w.DataSource = this;
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F2)

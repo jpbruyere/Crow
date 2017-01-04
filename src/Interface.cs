@@ -234,10 +234,10 @@ namespace Crow
 		#endregion
 
 		#if MEASURE_TIME
-		public Stopwatch clippingTime = new Stopwatch ();
-		public Stopwatch layoutTime = new Stopwatch ();
-		public Stopwatch updateTime = new Stopwatch ();
-		public Stopwatch drawingTime = new Stopwatch ();
+		public PerformanceMeasure clippingMeasure = new PerformanceMeasure("Clipping", 100);
+		public PerformanceMeasure layoutingMeasure = new PerformanceMeasure("Layouting", 100);
+		public PerformanceMeasure updateMeasure = new PerformanceMeasure("Update", 100);
+		public PerformanceMeasure drawingMeasure = new PerformanceMeasure("Drawing", 100);
 		#endif
 
 		public List<GraphicObject> GraphicTree = new List<GraphicObject>();
@@ -345,7 +345,7 @@ namespace Crow
 				return;
 
 			#if MEASURE_TIME
-			updateTime.Restart();
+			updateMeasure.StartCycle();
 			#endif
 
 			processLayouting ();
@@ -364,14 +364,14 @@ namespace Crow
 			processDrawing ();
 
 			#if MEASURE_TIME
-			updateTime.Stop ();
+			updateMeasure.StopCycle();
 			#endif
 
 			Monitor.Exit (UpdateMutex);
 		}
 		void processLayouting(){
 			#if MEASURE_TIME
-			layoutTime.Restart();
+			layoutingMeasure.StartCycle();
 			#endif
 			DiscardQueue = new Queue<LayoutingQueueItem> ();
 			lock (LayoutMutex) {
@@ -390,12 +390,12 @@ namespace Crow
 			DiscardQueue = null;
 
 			#if MEASURE_TIME
-			layoutTime.Stop ();
+			layoutingMeasure.StopCycle();
 			#endif
 		}
 		void clippingRegistration(){
 			#if MEASURE_TIME
-			clippingTime.Restart ();
+			clippingMeasure.StartCycle();
 			#endif
 			GraphicObject g = null;
 			while (DrawingQueue.Count > 0) {
@@ -407,12 +407,12 @@ namespace Crow
 			}
 
 			#if MEASURE_TIME
-			clippingTime.Stop ();
+			clippingMeasure.StopCycle();
 			#endif
 		}
 		void processDrawing(){
 			#if MEASURE_TIME
-			drawingTime.Restart();
+			drawingMeasure.StartCycle();
 			#endif
 			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
 				using (ctx = new Context (surf)){
@@ -466,7 +466,7 @@ namespace Crow
 				}
 			}
 			#if MEASURE_TIME
-			drawingTime.Stop ();
+			drawingMeasure.StopCycle();
 			#endif
 		}
 

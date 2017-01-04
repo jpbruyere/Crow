@@ -155,6 +155,7 @@
     <Compile Include="src\GraphicObjects\HueSelector.cs" />
     <Compile Include="src\GraphicObjects\SaturationValueSelector.cs" />
     <Compile Include="src\IML\EventBinding.cs" />
+    <Compile Include="src\PerformanceMeasure.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

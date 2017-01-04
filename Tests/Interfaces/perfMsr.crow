@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<GroupBox CornerRadius="0" Margin="0" Caption="{Name}" Height="Fit" Width="160">
+	<VerticalStack>
+		<HorizontalStack>
+			<Label Text="Current:" Style="FpsLabel"/>
+			<Label Text="{current}" Style="FpsDisp"/>
+		</HorizontalStack>
+		<HorizontalStack>
+			<Label Text="Minimum:" Style="FpsLabel"/>
+			<Label Text="{minimum}" Style="FpsDisp"/>
+		</HorizontalStack>
+		<HorizontalStack>
+			<Label Text="Mean:" Style="FpsLabel"/>
+			<Label Text="{mean}" Style="FpsDisp"/>
+		</HorizontalStack>
+		<HorizontalStack>
+			<Label Text="Maximum:" Style="FpsLabel"/>
+			<Label Text="{maximum}" Style="FpsDisp"/>
+		</HorizontalStack>
+<!--		<HorizontalStack>
+			<Label Text="Total:" Style="FpsLabel"/>
+			<Label Text="{total}" Style="FpsDisp"/>
+		</HorizontalStack>
+		<HorizontalStack>
+			<Label Text="Cpt:" Style="FpsLabel"/>
+			<Label Text="{cptMeasures}" Style="FpsDisp"/>
+		</HorizontalStack>-->
+		<Button Caption="Reset" MouseClick="onResetClick"/>
+	</VerticalStack>
+</GroupBox>

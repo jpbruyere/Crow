@@ -303,6 +303,9 @@
     <None Include="Interfaces\Unsorted\testFileDialog.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Interfaces\Divers\perfMeasures.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />
@@ -336,6 +339,7 @@
     <EmbeddedResource Include="test.style" />
     <EmbeddedResource Include="Interfaces\treeList.crow" />
     <EmbeddedResource Include="Interfaces\CheckBox2.imlt" />
+    <EmbeddedResource Include="Interfaces\perfMsr.crow" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">
