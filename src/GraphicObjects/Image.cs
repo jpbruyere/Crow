@@ -50,9 +50,11 @@ namespace Crow
 						_pic = null;
 						return;
 					}
-					LoadImage (value);
-					_pic.Scaled = scaled;
-					_pic.KeepProportions = keepProps;
+					lock(CurrentInterface.LayoutMutex){
+						LoadImage (value);
+						_pic.Scaled = scaled;
+						_pic.KeepProportions = keepProps;
+					}
 				} catch (Exception ex) {
 					Debug.WriteLine (ex.Message);
 					_pic = null;
@@ -86,7 +88,6 @@ namespace Crow
 
 			_pic.LoadImage (path);
 			RegisterForGraphicUpdate ();
-			RegisterForLayouting (LayoutingType.Sizing);
 		}
 		#endregion
 
