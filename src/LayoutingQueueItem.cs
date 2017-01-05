@@ -38,10 +38,11 @@ namespace Crow
 		ArrangeChildren = 0x10,
 		All = 0xFF
 	}
+
 	/// <summary>
 	/// Element class of the LayoutingQueue
 	/// </summary>
-	public class LayoutingQueueItem
+	public struct LayoutingQueueItem
 	{
 		/// <summary> Instance of widget to be layouted</summary>
 		public ILayoutable Layoutable;
@@ -51,9 +52,7 @@ namespace Crow
 		public int LayoutingTries, DiscardCount;
 
 		#if DEBUG_LAYOUTING
-		public Stopwatch LQITime = new Stopwatch();
-		public LQIList triggeredLQIs = new LQIList();
-		public LayoutingQueueItem wasTriggeredBy = null;
+		public Stopwatch LQITime;
 		public GraphicObject graphicObject {
 			get { return Layoutable as GraphicObject; }
 		}
@@ -69,23 +68,21 @@ namespace Crow
 		public Measure Height {
 			get { return graphicObject.Height; }
 		}
-		public bool HasTriggeredLQIs { get { return triggeredLQIs.Count > 0; }}
 		public Rectangle Slot, NewSlot;
 		#endif
 
 		#region CTOR
 		public LayoutingQueueItem (LayoutingType _layoutType, ILayoutable _graphicObject)
-		{
+		{			
 			LayoutType = _layoutType;
 			Layoutable = _graphicObject;
 			Layoutable.RegisteredLayoutings |= LayoutType;
+			LayoutingTries = 0;
+			DiscardCount = 0;
 			#if DEBUG_LAYOUTING
-			GraphicObject g = graphicObject;
-			g.CurrentInterface.curLQIs.Add(this);
-			if (g.CurrentInterface.currentLQI != null){
-				wasTriggeredBy = g.CurrentInterface.currentLQI;
-				g.CurrentInterface.currentLQI.triggeredLQIs.Add(this);
-			}
+			LQITime = new Stopwatch();
+			Slot = Rectangle.Empty;
+			NewSlot = Rectangle.Empty;
 			#endif
 		}
 		#endregion
@@ -121,6 +118,10 @@ namespace Crow
 				#endif
 			}
 			#if DEBUG_LAYOUTING
+			else{
+				if (LayoutingTries > 2 || DiscardCount > 0)
+					Debug.WriteLine (this.ToString ());
+			}
 			LQITime.Stop();
 			#endif
 		}
@@ -145,11 +146,11 @@ namespace Crow
 		}
 	}
 	public class LQIList : List<LayoutingQueueItem>{
-		#if DEBUG_LAYOUTING
-		public List<LayoutingQueueItem> GetRootLQIs(){
-			return this.Where (lqi => lqi.wasTriggeredBy == null).ToList ();
-		}
-		#endif
+//		#if DEBUG_LAYOUTING
+//		public List<LayoutingQueueItem> GetRootLQIs(){
+//			return this.Where (lqi => lqi.wasTriggeredBy == null).ToList ();
+//		}
+//		#endif
 	}
 }
 

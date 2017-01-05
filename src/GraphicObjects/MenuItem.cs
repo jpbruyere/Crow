@@ -24,7 +24,7 @@ using System.ComponentModel;
 
 namespace Crow
 {
-	public class MenuItem : TemplatedGroup
+	public class MenuItem : Menu
 	{
 		#region CTOR
 		public MenuItem () : base() {}
@@ -40,7 +40,6 @@ namespace Crow
 
 		[XmlAttributeAttribute][DefaultValue(false)]
 		public bool IsOpened {
-			//get { return MenuRoot == null ? false : MenuRoot.IsOpened; }
 			get { return isOpened; }
 			set {
 				if (isOpened == value)
@@ -50,8 +49,7 @@ namespace Crow
 
 				if (isOpened) {
 					onOpen (this, null);
-					if (MenuRoot != null)
-						MenuRoot.IsOpened = true;
+					(LogicalParent as Menu).AutomaticOpenning = true;
 				}else
 					onClose (this, null);
 			}
@@ -78,19 +76,7 @@ namespace Crow
 				NotifyValueChanged ("Caption", caption);
 			}
 		}
-
-		[XmlIgnore]Menu MenuRoot {
-			get {
-				ILayoutable tmp = LogicalParent;
-				while (tmp != null) {
-					if (tmp is Menu)
-						return tmp as Menu;
-					tmp = tmp.LogicalParent;
-				}
-				return null;
-			}
-		}
-
+			
 		public override void AddItem (GraphicObject g)
 		{
 			base.AddItem (g);
@@ -100,21 +86,30 @@ namespace Crow
 		void onMI_Click (object sender, MouseButtonEventArgs e)
 		{
 			Execute.Raise (this, null);
+			if(!IsOpened)
+				(LogicalParent as Menu).AutomaticOpenning = false;
 		}
 		protected virtual void onOpen (object sender, EventArgs e){
-			MenuRoot.IsOpened = true;
 			Open.Raise (this, null);
 		}
 		protected virtual void onClose (object sender, EventArgs e){
-			//MenuRoot.IsOpened = true;
 			Close.Raise (this, null);
+		}
+		public override bool MouseIsIn (Point m)
+		{
+			return base.MouseIsIn (m) || child.MouseIsIn (m);
 		}
 		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseEnter (sender, e);
-			if (MenuRoot == null || Items.Count == 0)
-				return;
-			IsOpened = MenuRoot.IsOpened;
+			if ((LogicalParent as Menu).AutomaticOpenning && items.Children.Count>0)
+				IsOpened = true;
+		}
+		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
+		{
+			if (IsOpened)
+				IsOpened = false;
+			base.onMouseLeave (this, e);
 		}
 	}
 }

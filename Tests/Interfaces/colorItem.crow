@@ -5,6 +5,6 @@
 			MouseEnter="{Background=hgradient|0:DarkRed|1:Transparent}"
 			MouseLeave="{Background=Transparent}">
 	<GraphicObject Height="12" Width="20" Background="{}" Margin="0" CornerRadius="3"/>
-	<Label Text="{Name}" Margin="0" Width="Stretched"/>
+	<Label Text="{}" Margin="0" Width="Stretched"/>
 </HorizontalStack>
 

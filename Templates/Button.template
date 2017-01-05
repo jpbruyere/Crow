@@ -6,6 +6,5 @@
 	MouseDown="{Foreground=vgradient|0:Black|0.05:Gray|0.85:Gray|1:White}"
 	MouseUp="{Foreground=vgradient|0:White|0.2:Gray|0.9:Gray|1:Black}"		    
 	>
-<!--	<Image Height="0" Width="0" Margin="0" Path="{./Image}" SvgSub="{./SvgSub}"/>-->
 	<Label Font="{./Font}" Name="caption" Margin="3" Foreground="LightGray" Text="{./Caption}"/>
 </Border>

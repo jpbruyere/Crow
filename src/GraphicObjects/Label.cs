@@ -670,7 +670,7 @@ namespace Crow
 			base.onMouseLeave (sender, e);
 			CurrentInterface.MouseCursor = XCursor.Default;
 		}
-		public override void onFocused (object sender, EventArgs e)
+		protected override void onFocused (object sender, EventArgs e)
 		{
 			base.onFocused (sender, e);
 
@@ -680,7 +680,7 @@ namespace Crow
 			SelRelease = new Point (lines.LastOrDefault ().Length, lines.Count-1);
 			RegisterForRedraw ();
 		}
-		public override void onUnfocused (object sender, EventArgs e)
+		protected override void onUnfocused (object sender, EventArgs e)
 		{
 			base.onUnfocused (sender, e);
 

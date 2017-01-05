@@ -131,9 +131,21 @@ namespace Crow
 				hsvFromRGB ();
 			}
 		}
-
+		[XmlAttributeAttribute]
+		public virtual Color SelectedRawColor {
+			get { return curColor; }
+			set {				
+				if (curColor == value)
+					return;
+				curColor = value;
+				notifyCurColorHasChanged ();
+				notifyRGBAHasChanged ();
+				hsvFromRGB ();
+			}
+		}
 		void notifyCurColorHasChanged(){
 			NotifyValueChanged ("SelectedColor", SelectedColor);
+			NotifyValueChanged ("SelectedRawColor", curColor);
 			string n = curColor.ToString ();
 			if (char.IsLetter(n[0]))
 				NotifyValueChanged ("SelectedColorName", n);
@@ -154,6 +166,7 @@ namespace Crow
 		}
 		void hsvFromRGB(){
 			Color c = curColor;
+			c.ResetName ();
 			double min = Math.Min (c.R, Math.Min (c.G, c.B));	//Min. value of RGB
 			double max = Math.Max (c.R, Math.Max (c.G, c.B));	//Max. value of RGB
 			double diff = max - min;							//Delta RGB value
@@ -188,7 +201,7 @@ namespace Crow
 		}
 		void rgbFromHSV(){
 			Color c = Color.Black;
-
+			c.ResetName ();
 			if (s == 0) {//HSV from 0 to 1
 				c.R = v;
 				c.G = v;

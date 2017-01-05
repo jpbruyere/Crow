@@ -175,42 +175,42 @@ namespace Crow
 				_content.MinimumSize = new Size (this.Slot.Width, _content.MinimumSize.Height);
 		}
 
-		public override void ClearBinding ()
-		{
-			//ensure popped window is cleared
-			if (Content != null) {
-				if (Content.Parent != null)
-					CurrentInterface.DeleteWidget (Content);
-			}
-			base.ClearBinding ();
-		}
-		public override void ResolveBindings ()
-		{
-			base.ResolveBindings ();
-			if (Content != null)
-				Content.ResolveBindings ();
-		}
 
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{
 			if (_canPop)
 				IsPopped = !IsPopped;
-			base.onMouseClick (sender, e);
+			base.onMouseClick (this, e);
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
-			if (!_isPopped || _content == null) {
-				base.onMouseLeave (sender, e);
-				System.Diagnostics.Debug.WriteLine ("NotPopped***popper mouse leave:"+ this.ToString());
-				return;
+			base.onMouseLeave (this, e);
+			IsPopped = false;
+		}
+		public override bool MouseIsIn (Point m)
+		{
+			bool isInContent = false;
+			if (Content != null) {
+				if (Content.Parent != null)
+					isInContent = Content.MouseIsIn (m);
 			}
-
-			if (!_content.MouseIsIn (e.Position)) {
-				base.onMouseLeave (sender, e);
-				System.Diagnostics.Debug.WriteLine ("***popper mouse leave:"+ this.ToString());
-				IsPopped = false;
-				return;
+			return base.MouseIsIn (m) || isInContent;
+		}
+		public override void checkHoverWidget (MouseMoveEventArgs e)
+		{
+			if (CurrentInterface.HoverWidget != this) {
+				CurrentInterface.HoverWidget = this;
+				onMouseEnter (this, e);
 			}
+			if (Content != null){
+				if (Content.Parent != null) {
+					if (Content.MouseIsIn (e.Position)) {
+						Content.checkHoverWidget (e);
+						return;
+					}
+				}
+			}
+			base.checkHoverWidget (e);
 		}
 		#endregion
 

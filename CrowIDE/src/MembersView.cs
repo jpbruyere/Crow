@@ -27,22 +27,9 @@ using System.Collections.Generic;
 
 namespace CrowIDE
 {
-	public class PropertyContainer : IBindable, IValueChange
+	public class PropertyContainer : IValueChange
 	{
-		#region IBindable implementation
-		public object DataSource {
-			get { return null; }
-			set {
-				throw new NotImplementedException ();
-			}
-		}
-		List<Binding> bindings = new List<Binding> ();
-		public List<Binding> Bindings {
-			get { return bindings; }
-		}
-		#endregion
-
-		#region IValueChange implementation
+				#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
 		public virtual void NotifyValueChanged(string MemberName, object _value)
 		{

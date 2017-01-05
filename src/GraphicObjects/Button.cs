@@ -47,12 +47,6 @@ namespace Crow
 		#endregion
 
 		#region GraphicObject Overrides
-		public override void ResolveBindings ()
-		{
-			base.ResolveBindings ();
-			if (Content != null)
-				Content.ResolveBindings ();
-		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
 			IsPressed = true;

@@ -34,19 +34,6 @@ namespace Crow
 		[XmlIgnore]public abstract GraphicObject Content{ get; set;}
 
 		#region GraphicObject overrides
-		public override void ClearBinding ()
-		{
-			if (Content != null)
-				Content.ClearBinding ();
-
-			base.ClearBinding ();
-		}
-//		public override void ResolveBindings ()
-//		{
-//			base.ResolveBindings ();
-//			if (Content != null)
-//				Content.ResolveBindings ();
-//		}
 		public override GraphicObject FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)

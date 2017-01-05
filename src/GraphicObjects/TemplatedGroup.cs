@@ -42,7 +42,6 @@ namespace Crow
 		public event EventHandler<SelectionChangeEventArgs> SelectedItemChanged;
 		#endregion
 
-		Group _list;
 		IList data;
 		int _selectedIndex;
 		Color selBackground, selForeground;
@@ -121,7 +120,9 @@ namespace Crow
 		[XmlIgnore]public virtual object SelectedItem{
 			get { return data == null ? null : _selectedIndex < 0 ? null : data[_selectedIndex]; }
 		}
-
+		[XmlIgnore]public bool HasItems {
+			get { return Items.Count > 0; }
+		}
 		[XmlAttributeAttribute]public IList Data {
 			get { return data; }
 			set {
@@ -148,6 +149,7 @@ namespace Crow
 				NotifyValueChanged ("SelectedIndex", _selectedIndex);
 				NotifyValueChanged ("SelectedItem", SelectedItem);
 				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
+				NotifyValueChanged ("HasItems", HasItems);
 			}
 		}
 
@@ -181,10 +183,12 @@ namespace Crow
 
 		public virtual void AddItem(GraphicObject g){
 			items.AddChild (g);
+			g.LogicalParent = this;
 			NotifyValueChanged ("HasChildren", true);
 		}
 		public virtual void RemoveItem(GraphicObject g)
 		{
+			g.LogicalParent = null;
 			items.RemoveChild (g);
 			if (items.Children.Count == 0)
 				NotifyValueChanged ("HasChildren", false);
@@ -302,6 +306,7 @@ namespace Crow
 				if (cancelLoading)
 					return;
 				loadPage (i);
+				Thread.Sleep (1);
 			}
 		}
 		void cancelLoadingThread(){
@@ -320,7 +325,23 @@ namespace Crow
 			loadingTime.Start ();
 			#endif
 
-			Group page = items.Clone () as Group;
+			Group page;
+			if (typeof(Wrapper).IsAssignableFrom (items.GetType ())){
+				page = items;
+				itemPerPage = int.MaxValue;
+			}else if (typeof(GenericStack).IsAssignableFrom (items.GetType ())) {
+				GenericStack gs = new GenericStack ();
+				gs.CurrentInterface = items.CurrentInterface;
+				gs.initialize ();
+				gs.Orientation = (items as GenericStack).Orientation;
+				gs.Width = items.Width;
+				gs.Height = items.Height;
+				gs.VerticalAlignment = items.VerticalAlignment;
+				gs.HorizontalAlignment = items.HorizontalAlignment;
+				page = gs;
+
+			}else
+				page = Activator.CreateInstance (items.GetType ()) as Group;			
 
 			page.Name = "page" + pageNum;
 
@@ -331,10 +352,10 @@ namespace Crow
 					return;
 
 				loadItem (i, page);
-
-				//g.LogicalParent = this;
 			}
 
+			if (page == items)
+				return;
 			lock (CurrentInterface.LayoutMutex)
 				items.AddChild (page);
 
@@ -369,16 +390,16 @@ namespace Crow
 			lock (CurrentInterface.LayoutMutex) {
 				g = iTemp.CreateInstance(CurrentInterface);
 				page.AddChild (g);
-				g.DataSource = data [i];
-				if (typeof(IBindable).IsAssignableFrom (dataType))
-					CompilerServices.ResolveBindings ((data [i] as IBindable).Bindings);
+				//g.LogicalParent = this;
+				registerItemClick (g);
 			}
-
-			registerItemClick (g);
 
 			if (iTemp.Expand != null && g is Expandable) {
 				(g as Expandable).Expand += iTemp.Expand;
-			}			
+				(g as Expandable).GetIsExpandable = iTemp.HasSubItems;
+			}
+
+			g.DataSource = data [i];
 		}
 		protected virtual void registerItemClick(GraphicObject g){
 			g.MouseClick += itemClick;

@@ -10,9 +10,9 @@
 			</VerticalStack>
 			<VerticalStack Margin="5" Height="Stretched">
 				<HorizontalStack Height="Fit" Width="Stretched">
-					<GraphicObject Width="30" Height="30" Background="{./SelectedColor}"/>
-					<VerticalStack Margin="5">
-						<Label Focusable="true" Selectable="true" Width="Stretched" Text="{./SelectedColorName}" />
+					<GraphicObject Width="40" Height="30" Background="{./SelectedColor}"/>
+					<VerticalStack Margin="2">
+						<Label Focusable="true" Selectable="true" Width="Stretched" Text="{./SelectedColor}" />
 						<Label Focusable="true" Selectable="true" Width="Stretched" Text="{./HexColor}" />
 					</VerticalStack>
 				</HorizontalStack>
@@ -34,15 +34,15 @@
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
 					<Label Text="Hue:" Width="40"/>
-					<Spinner Style="HSVSpinner" Value="{²../../../hueSelector.Hue}" Width="60"  />
+					<Spinner Style="HSVSpinner" Value="{²./H}" Width="60"  />
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
 					<Label Text="Sat:" Width="40"/>
-					<Spinner Style="HSVSpinner" Value="{²../../../colorSelector.S}" Width="60"  />
+					<Spinner Style="HSVSpinner" Value="{²./S}" Width="60"  />
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
 					<Label Text="Val:" Width="40"/>
-					<Spinner Style="HSVSpinner" Value="{²../../../colorSelector.V}" Width="60"  />
+					<Spinner Style="HSVSpinner" Value="{²./V}" Width="60"  />
 				</HorizontalStack>
 			</VerticalStack>
 		</HorizontalStack>
