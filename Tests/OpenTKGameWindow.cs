@@ -32,7 +32,7 @@ namespace Crow
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
 		public virtual void NotifyValueChanged(string MemberName, object _value)
 		{
-			if (ValueChanged != null)				
+			if (ValueChanged != null)
 				ValueChanged.Invoke(this, new ValueChangeEventArgs(MemberName, _value));
 		}
 		#endregion
@@ -129,7 +129,7 @@ namespace Crow
 			CrowInterface.MouseCursorChanged += CrowInterface_MouseCursorChanged;
 			while (CrowInterface.ClientRectangle.Size.Width == 0)
 				Thread.Sleep (5);
-			
+
 			while (true) {
 				CrowInterface.Update ();
 				//Thread.Sleep (1);
@@ -167,6 +167,7 @@ namespace Crow
 		int[] pboHandles = new int[2];
 		int pboSize;
 		Rectangle pboRect;
+		bool pboReady = true;
 		public Shader shader;
 		public vaoMesh quad;
 		public Matrix4 projection;
@@ -216,22 +217,27 @@ namespace Crow
 
 			GL.ActiveTexture (TextureUnit.Texture0);
 			GL.BindTexture (TextureTarget.Texture2D, texID);
-			if (Monitor.TryEnter(CrowInterface.RenderMutex)) {				
+
+			if (pboReady) {
+				pboIdx = (pboIdx + 1) % 2;
+				pboNextIdx = (pboIdx + 1) % 2;
+
+				// bind the texture and PBO (texture is already binded
+				GL.BindBuffer(BufferTarget.PixelUnpackBuffer, pboHandles[pboIdx]);
+
+				// copy pixels from PBO to texture object
+				// Use offset instead of pointer.
+				GL.TexSubImage2D (TextureTarget.Texture2D, 0,
+					pboRect.Left, pboRect.Top,
+					pboRect.Width, pboRect.Height,
+					OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, IntPtr.Zero);
+				pboReady = false;
+			}
+
+			if (Monitor.TryEnter(CrowInterface.RenderMutex)) {
 				if (CrowInterface.IsDirty) {
-					pboIdx = (pboIdx + 1) % 2;
-					pboNextIdx = (pboIdx + 1) % 2;
-
-					// bind the texture and PBO (texture is already binded
-					GL.BindBuffer(BufferTarget.PixelUnpackBuffer, pboHandles[pboIdx]);
-
-					// copy pixels from PBO to texture object
-					// Use offset instead of pointer.
-					GL.TexSubImage2D (TextureTarget.Texture2D, 0,
-						pboRect.Left, pboRect.Top,
-						pboRect.Width, pboRect.Height,
-						OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, IntPtr.Zero);
-					
 					pboRect = CrowInterface.DirtyRect;
+					pboReady = true;
 					pboSize = 4 * CrowInterface.DirtyRect.Width * CrowInterface.DirtyRect.Height;
 					// bind PBO to update texture source
 					GL.BindBuffer(BufferTarget.PixelUnpackBuffer, pboHandles[pboNextIdx]);
