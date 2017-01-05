@@ -248,7 +248,8 @@ namespace Crow
 		Surface surf;
 		public byte[] bmp;
 		public byte[] dirtyBmp;
-		public bool IsDirty = false;
+		public int bmpSize, bmpStride;
+		public volatile bool IsDirty = false;
 		public Rectangle DirtyRect;
 		public object LayoutMutex = new object();
 		public object RenderMutex = new object();
@@ -415,7 +416,7 @@ namespace Crow
 			drawingMeasure.StartCycle ();
 			#endif
 			if (clipping.count > 0) {
-				using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
+				using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, bmpStride)) {
 					using (ctx = new Context (surf)) {
 						clipping.clearAndClip (ctx);
 
@@ -441,6 +442,7 @@ namespace Crow
 								DirtyRect += clipping.Bounds;
 							else
 								DirtyRect = clipping.Bounds;
+							
 							if (DirtyRect.Width > 0 && DirtyRect.Height > 0) {
 								DirtyRect.Left = Math.Max (0, DirtyRect.Left);
 								DirtyRect.Top = Math.Max (0, DirtyRect.Top);
@@ -541,8 +543,8 @@ namespace Crow
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
 
-				int stride = 4 * ClientRectangle.Width;
-				int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
+				bmpStride = 4 * ClientRectangle.Width;
+				bmpSize = Math.Abs (bmpStride) * ClientRectangle.Height;
 				bmp = new byte[bmpSize];
 
 				foreach (GraphicObject g in GraphicTree)
