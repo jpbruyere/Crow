@@ -57,14 +57,14 @@ namespace Crow
 		}
 		public Interface(){
 			CurrentInterface = this;
-			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture; 
+			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 		}
 		#endregion
 
 		#region Static and constants
 		public static int DoubleClick = 200;//ms
 		internal Stopwatch clickTimer = new Stopwatch();
-		internal GraphicObject eligibleForDoubleClick = null; 
+		internal GraphicObject eligibleForDoubleClick = null;
 		public static int TabSize = 4;
 		public static string LineBreak = "\r\n";
 		//TODO: shold be declared in graphicObject
@@ -412,16 +412,15 @@ namespace Crow
 		}
 		void processDrawing(){
 			#if MEASURE_TIME
-			drawingMeasure.StartCycle();
+			drawingMeasure.StartCycle ();
 			#endif
-			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
-				using (ctx = new Context (surf)){
-					if (clipping.count > 0) {
-						//Link.draw (ctx);
-						clipping.clearAndClip(ctx);
+			if (clipping.count > 0) {
+				using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
+					using (ctx = new Context (surf)) {
+						clipping.clearAndClip (ctx);
 
-						for (int i = GraphicTree.Count -1; i >= 0 ; i--){
-							GraphicObject p = GraphicTree[i];
+						for (int i = GraphicTree.Count - 1; i >= 0; i--) {
+							GraphicObject p = GraphicTree [i];
 							if (!p.Visible)
 								continue;
 							if (!clipping.intersect (p.Slot))
@@ -436,35 +435,47 @@ namespace Crow
 						#if DEBUG_CLIP_RECTANGLE
 						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
 						#endif
+
 						lock (RenderMutex) {
 							if (IsDirty)
 								DirtyRect += clipping.Bounds;
 							else
 								DirtyRect = clipping.Bounds;
-							IsDirty = true;
+							if (DirtyRect.Width > 0 && DirtyRect.Height > 0) {
+								DirtyRect.Left = Math.Max (0, DirtyRect.Left);
+								DirtyRect.Top = Math.Max (0, DirtyRect.Top);
+								DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
+								DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
+								DirtyRect.Width = Math.Max (0, DirtyRect.Width);
+								DirtyRect.Height = Math.Max (0, DirtyRect.Height);
 
-							DirtyRect.Left = Math.Max (0, DirtyRect.Left);
-							DirtyRect.Top = Math.Max (0, DirtyRect.Top);
-							DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
-							DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
-							DirtyRect.Width = Math.Max (0, DirtyRect.Width);
-							DirtyRect.Height = Math.Max (0, DirtyRect.Height);
-
-							if (DirtyRect.Width > 0) {
-								dirtyBmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
-								for (int y = 0; y < DirtyRect.Height; y++) {
-									Array.Copy (bmp,
-										((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
-										dirtyBmp, y * DirtyRect.Width * 4, DirtyRect.Width * 4);
+								if (DirtyRect.Width > 0 && DirtyRect.Height > 0) {
+									dirtyBmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
+									for (int y = 0; y < DirtyRect.Height; y++) {
+										Array.Copy (bmp,
+											((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
+											dirtyBmp, y * DirtyRect.Width * 4, DirtyRect.Width * 4);
+									}
+									IsDirty = true;
+									#if DEBUG_DIRTY_RECTANGLE
+									using (Surface drSurf = new ImageSurface (dirtyBmp, Format.Argb32, DirtyRect.Width, DirtyRect.Height, DirtyRect.Width * 4)) {
+										using (Context drctx = new Context (drSurf)) {
+											drctx.Rectangle (DirtyRect);
+											drctx.SetSourceRGB (1.0, 1.0, 0.0);
+											drctx.LineWidth = 2;
+											drctx.Stroke ();
+										}
+									}
+									#endif
 								}
-							} else
+							} else if (IsDirty)
 								IsDirty = false;
-						}
-						clipping.Reset ();
+						}//Release lock RenderMutex
 					}
-					//surf.WriteToPng (@"/mnt/data/test.png");
 				}
+				clipping.Reset ();
 			}
+
 			#if MEASURE_TIME
 			drawingMeasure.StopCycle();
 			#endif
