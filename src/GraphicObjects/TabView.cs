@@ -179,7 +179,7 @@ namespace Crow
 			if (SelectedTab > Children.Count - 1)
 				return;
 
-			if (((Children[SelectedTab] as TabItem).Content.Parent as GraphicObject).MouseIsIn(e.Position))
+			if ((Children[SelectedTab] as TabItem).Content.Parent.MouseIsIn(e.Position))
 			{
 				Children[SelectedTab].checkHoverWidget (e);
 				return;

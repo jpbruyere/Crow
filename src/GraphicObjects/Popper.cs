@@ -119,7 +119,7 @@ namespace Crow
 
 		protected void _content_LayoutChanged (object sender, LayoutingEventArgs e)
 		{
-			ILayoutable tc = Content.Parent;
+			GraphicObject tc = Content.Parent;
 			if (tc == null)
 				return;
 			Rectangle r = this.ScreenCoordinates (this.Slot);

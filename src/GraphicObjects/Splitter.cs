@@ -64,7 +64,7 @@ namespace Crow
 		}
 
 		#region GraphicObject override
-		public override ILayoutable Parent {
+		public override GraphicObject Parent {
 			get { return base.Parent; }
 			set {
 				if (value != null) {			

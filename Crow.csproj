@@ -61,7 +61,6 @@
     <Compile Include="src\GraphicObjects\Slider.cs" />
     <Compile Include="src\GraphicObjects\NumericControl.cs" />
     <Compile Include="src\GraphicObjects\Scroller.cs" />
-    <Compile Include="src\GraphicObjects\ILayoutable.cs" />
     <Compile Include="src\Enums.cs" />
     <Compile Include="src\GraphicObjects\GenericStack.cs" />
     <Compile Include="src\CompilerServices\CompilerServices.cs" />

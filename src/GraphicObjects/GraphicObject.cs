@@ -12,7 +12,7 @@ using System.IO;
 
 namespace Crow
 {
-	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange, ICloneable
+	public class GraphicObject : IXmlSerializable, IValueChange, ICloneable
 	{
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
@@ -58,8 +58,8 @@ namespace Crow
 		}
 		#region private fields
 		LayoutingType registeredLayoutings = LayoutingType.All;
-		ILayoutable logicalParent;
-		ILayoutable parent;
+		GraphicObject logicalParent;
+		GraphicObject parent;
 		string name;
 		Fill background = Color.Transparent;
 		Fill foreground = Color.White;
@@ -118,13 +118,13 @@ namespace Crow
 		#endregion
 
 		#region ILayoutable
-		[XmlIgnore]public LayoutingType RegisteredLayoutings { get { return registeredLayoutings; } set { registeredLayoutings = value; } }
+		[XmlIgnore]public virtual LayoutingType RegisteredLayoutings { get { return registeredLayoutings; } set { registeredLayoutings = value; } }
 		//TODO: it would save the recurent cost of a cast in event bubbling if parent type was GraphicObject
 		//		or we could add to the interface the mouse events
 		/// <summary>
 		/// Parent in the graphic tree, used for rendering and layouting
 		/// </summary>
-		[XmlIgnore]public virtual ILayoutable Parent {
+		[XmlIgnore]public virtual GraphicObject Parent {
 			get { return parent; }
 			set {
 				if (parent == value)
@@ -135,18 +135,18 @@ namespace Crow
 				onParentChanged (this, e);
 			}
 		}
-		[XmlIgnore]public ILayoutable LogicalParent {
+		[XmlIgnore]public GraphicObject LogicalParent {
 			get { return logicalParent == null ? Parent : logicalParent; }
 			set {
 				if (logicalParent == value)
 					return;
 				if (logicalParent != null)
-					(logicalParent as GraphicObject).DataSourceChanged -= onLogicalParentDataSourceChanged;
+					logicalParent.DataSourceChanged -= onLogicalParentDataSourceChanged;
 				DataSourceChangeEventArgs dsce = new DataSourceChangeEventArgs (LogicalParent, null);
 				logicalParent = value;
 				dsce.NewDataSource = LogicalParent;
 				if (logicalParent != null)
-					(logicalParent as GraphicObject).DataSourceChanged += onLogicalParentDataSourceChanged;
+					logicalParent.DataSourceChanged += onLogicalParentDataSourceChanged;
 				onLogicalParentChanged (this, dsce);
 			}
 		}
@@ -158,10 +158,9 @@ namespace Crow
 			}
 		}
 		public virtual Rectangle ContextCoordinates(Rectangle r){
-			GraphicObject go = Parent as GraphicObject;
-			if (go == null)
+			if (Parent is Interface)
 				return r + Parent.ClientRectangle.Position;
-			return go.CacheEnabled ?
+			return Parent.CacheEnabled ?
 				r + Parent.ClientRectangle.Position :
 				Parent.ContextCoordinates (r);
 		}
@@ -296,9 +295,7 @@ namespace Crow
 		[XmlAttributeAttribute()][DefaultValue("Inherit")]
 		public virtual Measure Width {
 			get {
-				return width.Units == Unit.Inherit ?
-					Parent is GraphicObject ? (Parent as GraphicObject).WidthPolicy :
-					Measure.Stretched : width;
+				return width.Units == Unit.Inherit ? Parent == null ? Measure.Stretched : Parent.WidthPolicy : width;
 			}
 			set {
 				if (width == value)
@@ -332,9 +329,7 @@ namespace Crow
 		[XmlAttributeAttribute()][DefaultValue("Inherit")]
 		public virtual Measure Height {
 			get {
-				return height.Units == Unit.Inherit ?
-					Parent is GraphicObject ? (Parent as GraphicObject).HeightPolicy :
-					Measure.Stretched : height;
+				return height.Units == Unit.Inherit ? Parent == null ? Measure.Stretched :Parent.HeightPolicy : height;
 			}
 			set {
 				if (height == value)
@@ -573,8 +568,7 @@ namespace Crow
 			get {
 				return dataSource == null ? 
 					LogicalParent == null ? null :
-					LogicalParent is GraphicObject ? (LogicalParent as GraphicObject).DataSource : null :
-					dataSource;
+					LogicalParent.DataSource : dataSource;
 			}
 		}
 		protected virtual void onLogicalParentDataSourceChanged(object sender, DataSourceChangeEventArgs e){
@@ -843,8 +837,7 @@ namespace Crow
 					layoutType &= (~LayoutingType.ArrangeChildren);
 
 				//apply constraints depending on parent type
-				if (Parent is GraphicObject)
-					(Parent as GraphicObject).ChildrenLayoutingConstraints (ref layoutType);
+				Parent.ChildrenLayoutingConstraints (ref layoutType);
 
 //				//prevent queueing same LayoutingType for this
 //				layoutType &= (~RegisteredLayoutings);
@@ -872,6 +865,7 @@ namespace Crow
 			#if DEBUG_LAYOUTING
 			CurrentInterface.currentLQI.Slot = LastSlots;
 			CurrentInterface.currentLQI.NewSlot = Slot;
+			Debug.WriteLine ("\t{0} => {1}",LastSlots,Slot);
 			#endif
 
 			switch (layoutType) {
@@ -1147,11 +1141,8 @@ namespace Crow
 				return false;
 			if (ScreenCoordinates (Slot).ContainsOrIsEqual (m)) {
 				Scroller scr = Parent as Scroller;
-				if (scr == null) {
-					if (Parent is GraphicObject)
-						return (Parent as GraphicObject).MouseIsIn (m);
-					else return true;
-				}
+				if (scr == null) 
+					return Parent.MouseIsIn (m);
 				return scr.MouseIsIn (scr.savedMousePos);
 			}
 			return false;
@@ -1167,10 +1158,8 @@ namespace Crow
 		}
 		public virtual void onMouseMove(object sender, MouseMoveEventArgs e)
 		{
-			//bubble event to the top
-			GraphicObject p = Parent as GraphicObject;
-			if (p != null)
-				p.onMouseMove(sender,e);
+			if (Parent != null)
+				Parent.onMouseMove(sender,e);
 
 			MouseMove.Raise (sender, e);
 		}
@@ -1191,17 +1180,15 @@ namespace Crow
 				}
 			}
 			//bubble event to the top
-			GraphicObject p = Parent as GraphicObject;
-			if (p != null)
-				p.onMouseDown(sender,e);
+			if (Parent != null)
+				Parent.onMouseDown(sender,e);
 
 			MouseDown.Raise (this, e);
 		}
 		public virtual void onMouseUp(object sender, MouseButtonEventArgs e){
 			//bubble event to the top
-			GraphicObject p = Parent as GraphicObject;
-			if (p != null)
-				p.onMouseUp(sender,e);
+			if (Parent != null)
+				Parent.onMouseUp(sender,e);
 
 			MouseUp.Raise (this, e);
 
@@ -1212,21 +1199,18 @@ namespace Crow
 			}
 		}
 		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){
-			GraphicObject p = Parent as GraphicObject;
-			if (p != null)
-				p.onMouseClick(sender,e);
+			if (Parent != null)
+				Parent.onMouseClick(sender,e);
 			MouseClick.Raise (this, e);
 		}
 		public virtual void onMouseDoubleClick(object sender, MouseButtonEventArgs e){
-			GraphicObject p = Parent as GraphicObject;
-			if (p != null)
-				p.onMouseDoubleClick(sender,e);
+			if (Parent != null)
+				Parent.onMouseDoubleClick(sender,e);
 			MouseDoubleClick.Raise (this, e);
 		}
 		public virtual void onMouseWheel(object sender, MouseWheelEventArgs e){
-			GraphicObject p = Parent as GraphicObject;
-			if (p != null)
-				p.onMouseWheel(sender,e);
+			if (Parent != null)
+				Parent.onMouseWheel(sender,e);
 
 			MouseWheelChanged.Raise (this, e);
 		}
