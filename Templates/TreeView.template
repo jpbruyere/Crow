@@ -2,9 +2,8 @@
 <HorizontalStack>
 	<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"
 		Background="{./Background}"
-		ScrollY="{../scrollbar1.Value}"
-		ValueChanged="./_scroller_ValueChanged">
-		<VerticalStack LayoutChanged="./_list_LayoutChanged"
+		ScrollY="{../scrollbar1.Value}">
+		<VerticalStack
 			Height="Fit" Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
 	</Scroller>
 	<ScrollBar

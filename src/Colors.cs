@@ -15,6 +15,8 @@ namespace Crow
 	/// </summary>
 	public struct Color
     {
+		internal static Type TColor = typeof(Color);
+
 		#region CTOR
 		public Color(double _R, double _G, double _B, double _A)
 		{
@@ -139,6 +141,9 @@ namespace Crow
 		public Color AdjustAlpha(double _A)
 		{
 			return new Color (this.R, this.G, this.B, _A);
+		}
+		public void ResetName(){
+			Name = "";
 		}
 			
 		#region Predefined colors
@@ -1046,7 +1051,7 @@ namespace Crow
 		}
 		public override bool Equals (object obj)
 		{
-			return (obj == null || obj.GetType() != typeof(Color)) ?
+			return (obj == null || obj.GetType() != TColor) ?
 				false :
 				this == (Color)obj;
 		}
@@ -1073,7 +1078,7 @@ namespace Crow
         }
 		public static Color FromHSV(double _h, double _v = 1.0, double _s = 1.0){
 			Color c = Color.Black;
-
+			c.ResetName ();
 			if (_s == 0) {//HSV from 0 to 1
 				c.R = _v;
 				c.G = _v;

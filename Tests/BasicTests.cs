@@ -10,21 +10,8 @@ using System.Diagnostics;
 
 namespace Tests
 {
-	class BasicTests : OpenTKGameWindow, IBindable
+	class BasicTests : OpenTKGameWindow
 	{
-		#region IBindable implementation
-		public object DataSource {
-			get { return null; }
-			set {
-				throw new NotImplementedException ();
-			}
-		}
-		List<Binding> bindings = new List<Binding> ();
-		public List<Binding> Bindings {
-			get { return bindings; }
-		}
-		#endregion
-
 		public BasicTests ()
 			: base(800, 600,"test: press <F3> to toogle test files")
 		{
@@ -34,8 +21,9 @@ namespace Tests
 		string[] testFiles;
 
 		#region Test values for Binding
-		public int intValue = 25;
+		public int intValue = 500;
 		DirectoryInfo curDir = new DirectoryInfo (Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+		//DirectoryInfo curDir = new DirectoryInfo (@"/mnt/data/Images");
 		public FileSystemInfo[] CurDirectory {
 			get { return curDir.GetFileSystemInfos (); }
 		}
@@ -64,19 +52,26 @@ namespace Tests
 				"string1",
 				"string2",
 				"string3",
-				"string4",
-				"string5",
-				"string6",
-				"string7",
-				"string8",
-				"string8",
-				"string8",
-				"string8",
-				"string8",
-				"string8",
-				"string9"
+//				"string4",
+//				"string5",
+//				"string6",
+//				"string7",
+//				"string8",
+//				"string8",
+//				"string8",
+//				"string8",
+//				"string8",
+//				"string8",
+//				"string9"
 			}
 		);
+		public IList<String> TestList2 {
+			set{
+				List2 = value;
+				NotifyValueChanged ("TestList2", testList);
+			}
+			get { return List2; }
+		}
 		IList<Color> testList = Color.ColorDic.ToList();
 		public IList<Color> TestList {
 			set{
@@ -118,22 +113,23 @@ namespace Tests
 
 			this.KeyDown += KeyboardKeyDown1;
 
+			//testFiles = new string [] { @"Interfaces/Unsorted/testFileDialog.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
-			testFiles = new string [] { @"Interfaces/Divers/test2WayBinding.crow" };
+			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Stack", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Wrapper", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Splitter", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/TemplatedControl", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/TemplatedContainer", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/TemplatedGroup", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Splitter", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Wrapper", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Unsorted", "*.crow")).ToArray ();
 
-			this.Title = testFiles [idx] + ". Press <F3> to switch example.";
+			object tc = Color.AirForceBlueRaf;
 			CrowInterface.LoadInterface(testFiles[idx]).DataSource = this;
-			CompilerServices.ResolveBindings (this.Bindings);
 		}
 		void KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
@@ -156,6 +152,10 @@ namespace Tests
 				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/0.crow");
 				w.DataSource = this;
 				return;
+			}else if (e.Key == OpenTK.Input.Key.F7) {
+				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/perfMeasures.crow");
+				w.DataSource = this;
+				return;
 			} else if (e.Key == OpenTK.Input.Key.F2)
 				idx--;
 			else if (e.Key == OpenTK.Input.Key.F3)
@@ -163,15 +163,16 @@ namespace Tests
 			else
 				return;
 		
-			CrowInterface.ClearInterface ();
-
-			if (idx == testFiles.Length)
-				idx = 0;
-			else if (idx < 0)
-				idx = testFiles.Length - 1;
-			
-			this.Title = testFiles [idx] + ". Press <F3> to cycle examples.";
 			try {
+				CrowInterface.ClearInterface ();
+
+				if (idx == testFiles.Length)
+					idx = 0;
+				else if (idx < 0)
+					idx = testFiles.Length - 1;
+				
+				this.Title = testFiles [idx] + ". Press <F3> to cycle examples.";
+
 				GraphicObject obj = CrowInterface.LoadInterface(testFiles[idx]);
 				obj.DataSource = this;
 			} catch (Exception ex) {
@@ -188,7 +189,7 @@ namespace Tests
 				lock (CrowInterface.UpdateMutex) {
 					(CrowInterface.FindByName ("crowContainer") as Container).SetChild
 					(i.CreateInstance(CrowInterface));
-					CurSources = i.GetImlSourcesCode();
+					//CurSources = i.GetImlSourcesCode();
 				}
 			}
 		}
@@ -221,12 +222,16 @@ namespace Tests
 		{
 			Console.WriteLine ("starting example");
 			BasicTests win = new BasicTests ();
+			win.VSync = OpenTK.VSyncMode.Adaptive;
 			win.Run (30);
 		}
 		protected override void OnUpdateFrame (OpenTK.FrameEventArgs e)
 		{
 			base.OnUpdateFrame (e);
 			string test = e.Time.ToString ();
+			IntValue++;
+			if (IntValue == 1000)
+				IntValue = 0;
 			NotifyValueChanged ("PropertyLessBinding", test);
 		}
 		void onNew(object sender, EventArgs e){

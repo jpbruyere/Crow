@@ -43,6 +43,9 @@ Splitter {
 	Focusable = true;
 	Background = DimGray;
 }
+Spinner {
+	Foreground = DimGray;
+}
 TabView {
 	CacheEnabled = false;
 }

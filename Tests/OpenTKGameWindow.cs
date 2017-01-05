@@ -22,6 +22,7 @@ using System;
 using System.Threading;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using System.Collections.Generic;
 
 namespace Crow
 {
@@ -60,14 +61,8 @@ namespace Crow
 				if (frameCpt % 3 == 0)
 					ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
 				#if MEASURE_TIME
-				ValueChanged.Raise (this, new ValueChangeEventArgs ("update",
-					this.CrowInterface.updateTime.ElapsedTicks.ToString () + " ticks"));
-				ValueChanged.Raise (this, new ValueChangeEventArgs ("layouting",
-					this.CrowInterface.layoutTime.ElapsedTicks.ToString () + " ticks"));
-				ValueChanged.Raise (this, new ValueChangeEventArgs ("drawing",
-					this.CrowInterface.drawingTime.ElapsedTicks.ToString () + " ticks"));
-				ValueChanged.Raise (this, new ValueChangeEventArgs ("clipping",
-					this.CrowInterface.clippingTime.ElapsedTicks.ToString () + " ticks"));
+				foreach (PerformanceMeasure m in PerfMeasures)
+					m.NotifyChanges();
 				#endif
 			}
 		}
@@ -85,6 +80,10 @@ namespace Crow
 		public string drawing = "";
 		public string layouting = "";
 		public string clipping = "";
+		#if MEASURE_TIME
+		public PerformanceMeasure glDrawMeasure = new PerformanceMeasure("OpenGL Draw", 10);
+		#endif
+
 		#endregion
 
 		#region ctor
@@ -101,12 +100,28 @@ namespace Crow
 		{
 			CrowInterface = new Interface ();
 
+			#if MEASURE_TIME
+			PerfMeasures = new List<PerformanceMeasure> (
+				new PerformanceMeasure[] {
+					this.CrowInterface.updateMeasure,
+					this.CrowInterface.layoutingMeasure,
+					this.CrowInterface.clippingMeasure,
+					this.CrowInterface.drawingMeasure,
+					this.glDrawMeasure
+				}
+			);
+			#endif
+
 			Thread t = new Thread (interfaceThread);
 			t.IsBackground = true;
 			t.Start ();
 		}
 
 		#endregion
+
+		#if MEASURE_TIME
+		public List<PerformanceMeasure> PerfMeasures;
+		#endif
 
 		void interfaceThread()
 		{
@@ -117,7 +132,7 @@ namespace Crow
 			
 			while (true) {
 				CrowInterface.Update ();
-				Thread.Sleep (1);
+				//Thread.Sleep (1);
 			}
 		}
 
@@ -174,6 +189,9 @@ namespace Crow
 		}
 		void OpenGLDraw()
 		{
+			#if MEASURE_TIME
+			glDrawMeasure.StartCycle();
+			#endif
 			bool blend, depthTest;
 			GL.GetBoolean (GetPName.Blend, out blend);
 			GL.GetBoolean (GetPName.DepthTest, out depthTest);
@@ -184,7 +202,7 @@ namespace Crow
 			shader.SetMVP (projection);
 			GL.ActiveTexture (TextureUnit.Texture0);
 			GL.BindTexture (TextureTarget.Texture2D, texID);
-			lock (CrowInterface.RenderMutex) {
+			if (Monitor.TryEnter(CrowInterface.RenderMutex)) {
 				if (CrowInterface.IsDirty) {
 					GL.TexSubImage2D (TextureTarget.Texture2D, 0,
 						CrowInterface.DirtyRect.Left, CrowInterface.DirtyRect.Top,
@@ -192,6 +210,7 @@ namespace Crow
 						OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, CrowInterface.dirtyBmp);
 					CrowInterface.IsDirty = false;
 				}
+				Monitor.Exit (CrowInterface.RenderMutex);
 			}
 			quad.Render (BeginMode.TriangleStrip);
 			GL.BindTexture(TextureTarget.Texture2D, 0);
@@ -200,6 +219,9 @@ namespace Crow
 				GL.Disable (EnableCap.Blend);
 			if (depthTest)
 				GL.Enable (EnableCap.DepthTest);
+			#if MEASURE_TIME
+			glDrawMeasure.StopCycle();
+			#endif
 		}
 		#endregion
 
@@ -253,11 +275,11 @@ namespace Crow
 			if (frameCpt > 500) {
 				resetFps ();
 				frameCpt = 0;
-				#if DEBUG
-				GC.Collect();
-				GC.WaitForPendingFinalizers();
-				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
-				#endif
+//				#if DEBUG
+//				GC.Collect();
+//				GC.WaitForPendingFinalizers();
+//				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
+//				#endif
 			}
 			frameCpt++;
 		}

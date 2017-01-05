@@ -63,7 +63,8 @@ namespace Crow
 
 		#region Static and constants
 		public static int DoubleClick = 200;//ms
-		internal static Stopwatch clickTimer = new Stopwatch();
+		internal Stopwatch clickTimer = new Stopwatch();
+		internal GraphicObject eligibleForDoubleClick = null; 
 		public static int TabSize = 4;
 		public static string LineBreak = "\r\n";
 		//TODO: shold be declared in graphicObject
@@ -81,8 +82,8 @@ namespace Crow
 		public const int MaxCacheSize = 2048;
 		/// <summary> Above this count, the layouting is discard for the widget and it
 		/// will not be rendered on screen </summary>
-		public const int MaxLayoutingTries = 5;
-		public const int MaxDiscardCount = 10;
+		public const int MaxLayoutingTries = 3;
+		public const int MaxDiscardCount = 5;
 		/// <summary> Global font rendering settings for Cairo </summary>
 		public static FontOptions FontRenderingOptions;
 		#endregion
@@ -97,14 +98,6 @@ namespace Crow
 		public string Clipboard;//TODO:use object instead for complex copy paste
 		public void EnqueueForRepaint(GraphicObject g)
 		{
-//			if (g.RegisteredLayoutings != LayoutingType.None)
-//				return;
-			ILayoutable l = g;
-			while (l.Parent != null)
-				l = l.Parent;
-			if (!(l is Interface))
-				return;
-
 			lock (DrawingQueue) {
 				if (g.IsQueueForRedraw)
 					return;
@@ -241,10 +234,10 @@ namespace Crow
 		#endregion
 
 		#if MEASURE_TIME
-		public Stopwatch clippingTime = new Stopwatch ();
-		public Stopwatch layoutTime = new Stopwatch ();
-		public Stopwatch updateTime = new Stopwatch ();
-		public Stopwatch drawingTime = new Stopwatch ();
+		public PerformanceMeasure clippingMeasure = new PerformanceMeasure("Clipping", 100);
+		public PerformanceMeasure layoutingMeasure = new PerformanceMeasure("Layouting", 100);
+		public PerformanceMeasure updateMeasure = new PerformanceMeasure("Update", 100);
+		public PerformanceMeasure drawingMeasure = new PerformanceMeasure("Drawing", 100);
 		#endif
 
 		public List<GraphicObject> GraphicTree = new List<GraphicObject>();
@@ -312,10 +305,10 @@ namespace Crow
 				if (_focusedWidget == value)
 					return;
 				if (_focusedWidget != null)
-					_focusedWidget.onUnfocused (this, null);
+					_focusedWidget.HasFocus = false;
 				_focusedWidget = value;
 				if (_focusedWidget != null)
-					_focusedWidget.onFocused (this, null);
+					_focusedWidget.HasFocus = true;
 			}
 		}
 		#endregion
@@ -328,7 +321,7 @@ namespace Crow
 //		public static LayoutingQueueItem[] MultipleRunsLQIs {
 //			get { return curUpdateLQIs.Where(l=>l.LayoutingTries>2 || l.DiscardCount > 0).ToArray(); }
 //		}
-		public LayoutingQueueItem currentLQI = null;
+		public LayoutingQueueItem currentLQI;
 		#else
 		public List<LQIList> LQIs = null;//still create the var for CrowIDE
 		#endif
@@ -352,7 +345,7 @@ namespace Crow
 				return;
 
 			#if MEASURE_TIME
-			updateTime.Restart();
+			updateMeasure.StartCycle();
 			#endif
 
 			processLayouting ();
@@ -371,19 +364,19 @@ namespace Crow
 			processDrawing ();
 
 			#if MEASURE_TIME
-			updateTime.Stop ();
+			updateMeasure.StopCycle();
 			#endif
 
 			Monitor.Exit (UpdateMutex);
 		}
 		void processLayouting(){
 			#if MEASURE_TIME
-			layoutTime.Restart();
+			layoutingMeasure.StartCycle();
 			#endif
 			DiscardQueue = new Queue<LayoutingQueueItem> ();
 			lock (LayoutMutex) {
 				//Debug.WriteLine ("======= Layouting queue start =======");
-				LayoutingQueueItem lqi = null;
+				LayoutingQueueItem lqi;
 				while (LayoutingQueue.Count > 0) {
 					lqi = LayoutingQueue.Dequeue ();
 					#if DEBUG_LAYOUTING
@@ -391,49 +384,38 @@ namespace Crow
 					curLQIsTries.Add(currentLQI);
 					#endif
 					lqi.ProcessLayouting ();
-					#if DEBUG_LAYOUTING
-					currentLQI = null;
-					#endif
 				}
 				LayoutingQueue = DiscardQueue;
 			}
 			DiscardQueue = null;
 
 			#if MEASURE_TIME
-			layoutTime.Stop ();
+			layoutingMeasure.StopCycle();
 			#endif
 		}
 		void clippingRegistration(){
 			#if MEASURE_TIME
-			clippingTime.Restart ();
+			clippingMeasure.StartCycle();
 			#endif
-			lock (DrawingQueue) {
-				while (DrawingQueue.Count > 0) {
-					GraphicObject g = DrawingQueue.Dequeue ();
-					g.IsQueueForRedraw = false;
-					try {
-						if (g.Parent == null)
-							continue;
-						g.Parent.RegisterClip (g.LastPaintedSlot);
-						if (g.getSlot () != g.LastPaintedSlot)
-							g.Parent.RegisterClip (g.getSlot ());
-					} catch (Exception ex) {
-						Debug.WriteLine ("Error Register Clip: " + ex.ToString ());
-					}
-				}
+			GraphicObject g = null;
+			while (DrawingQueue.Count > 0) {
+				lock (DrawingQueue)
+					g = DrawingQueue.Dequeue ();
+				g.IsQueueForRedraw = false;
+				g.Parent.RegisterClip (g.LastPaintedSlot);
+				g.Parent.RegisterClip (g.getSlot ());
 			}
+
 			#if MEASURE_TIME
-			clippingTime.Stop ();
+			clippingMeasure.StopCycle();
 			#endif
 		}
 		void processDrawing(){
 			#if MEASURE_TIME
-			drawingTime.Restart();
+			drawingMeasure.StartCycle();
 			#endif
 			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
 				using (ctx = new Context (surf)){
-
-
 					if (clipping.count > 0) {
 						//Link.draw (ctx);
 						clipping.clearAndClip(ctx);
@@ -468,12 +450,15 @@ namespace Crow
 							DirtyRect.Width = Math.Max (0, DirtyRect.Width);
 							DirtyRect.Height = Math.Max (0, DirtyRect.Height);
 
-							dirtyBmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
-							for (int y = 0; y < DirtyRect.Height; y++) {
-								Array.Copy (bmp,
-									((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
-									dirtyBmp, y * DirtyRect.Width * 4, DirtyRect.Width * 4);
-							}
+							if (DirtyRect.Width > 0) {
+								dirtyBmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
+								for (int y = 0; y < DirtyRect.Height; y++) {
+									Array.Copy (bmp,
+										((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
+										dirtyBmp, y * DirtyRect.Width * 4, DirtyRect.Width * 4);
+								}
+							} else
+								IsDirty = false;
 						}
 						clipping.Reset ();
 					}
@@ -481,7 +466,7 @@ namespace Crow
 				}
 			}
 			#if MEASURE_TIME
-			drawingTime.Stop ();
+			drawingMeasure.StopCycle();
 			#endif
 		}
 
@@ -499,7 +484,6 @@ namespace Crow
 		public void DeleteWidget(GraphicObject g)
 		{
 			g.Visible = false;//trick to ensure clip is added to refresh zone
-			g.ClearBinding();
 			GraphicTree.Remove (g);
 		}
 		public void PutOnTop(GraphicObject g)
@@ -519,8 +503,8 @@ namespace Crow
 				//TODO:parent is not reset to null because object will be added
 				//to ObjectToRedraw list, and without parent, it fails
 				GraphicObject g = GraphicTree [i];
+				g.DataSource = null;
 				g.Visible = false;
-				g.ClearBinding ();
 				GraphicTree.RemoveAt (0);
 			}
 			#if DEBUG_LAYOUTING
@@ -598,24 +582,22 @@ namespace Crow
 				GraphicObject topc = null;
 				while (tmp is GraphicObject) {
 					topc = tmp;
-					tmp = tmp.Parent as GraphicObject;
+					tmp = tmp.LogicalParent as GraphicObject;
 				}
 				int idxhw = GraphicTree.IndexOf (topc);
 				if (idxhw != 0) {
 					int i = 0;
 					while (i < idxhw) {
-						if (GraphicTree [i].MouseIsIn (e.Position)) {
-							while (HoverWidget != null) {
-								if (HoverWidget is Popper) {
-									if ((HoverWidget as Popper).Content == GraphicTree[i])
-										break;
+						if (GraphicTree [i].localLogicalParentIsNull) {
+							if (GraphicTree [i].MouseIsIn (e.Position)) {
+								while (HoverWidget != null) {
+									HoverWidget.onMouseLeave (HoverWidget, e);
+									HoverWidget = HoverWidget.LogicalParent as GraphicObject;
 								}
-								HoverWidget.onMouseLeave (HoverWidget, e);
-								HoverWidget = HoverWidget.LogicalParent as GraphicObject;
-							}
 
-							GraphicTree [i].checkHoverWidget (e);
-							return true;
+								GraphicTree [i].checkHoverWidget (e);
+								return true;
+							}
 						}
 						i++;
 					}

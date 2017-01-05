@@ -7,6 +7,7 @@ namespace Crow
 {    
 	public struct Rectangle
     {
+		internal static Type TRectangle = typeof(Rectangle);
 		#region private fields
         int _x;
         int _y;
@@ -200,34 +201,7 @@ namespace Crow
         {
             return r1.TopLeft == r2.TopLeft && r1.Size == r2.Size ? false : true;
         }
-        #endregion
-
-        public RectanglesRelations test(Rectangle r)
-        {
-            if (r == this)
-                return RectanglesRelations.Equal;
-
-            int nbrPtIncluded = 0;
-
-            if (this.ContainsOrIsEqual(r.TopLeft))
-                nbrPtIncluded++;
-            if (this.ContainsOrIsEqual(r.TopRight))
-                nbrPtIncluded++;
-            if (this.ContainsOrIsEqual(r.BottomLeft))
-                nbrPtIncluded++;
-            if (this.ContainsOrIsEqual(r.BottomRight))
-                nbrPtIncluded++;
-
-            switch (nbrPtIncluded)
-            {
-                case 0:
-                    return RectanglesRelations.NoRelation;
-                case 4:
-                    return RectanglesRelations.Contains;
-                default:
-                    return RectanglesRelations.Intersect;
-            }
-        }
+        #endregion        
 
 		public static readonly Rectangle Zero = new Rectangle(0, 0, 0, 0);
         public static Rectangle Empty
@@ -262,7 +236,7 @@ namespace Crow
 		}
 		public override bool Equals (object obj)
 		{
-			return (obj == null || obj.GetType() != typeof(Rectangle)) ?
+			return (obj == null || obj.GetType() != TRectangle) ?
 				false :
 				this == (Rectangle)obj;
 		}

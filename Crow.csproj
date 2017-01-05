@@ -35,9 +35,8 @@
     <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <Optimize>True</Optimize>
-    <DebugType>None</DebugType>
-    <DefineConstants>__linux__;MEASURE_TIME</DefineConstants>
+    <Optimize>true</Optimize>
+    <DefineConstants>__linux__</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="src\Colors.cs" />
@@ -128,16 +127,13 @@
     <Compile Include="src\rsvg\RsvgSharp.SizeFuncNative.cs" />
     <Compile Include="src\rsvg\SizeFunc.cs" />
     <Compile Include="src\MouseCursorChangedEventArgs.cs" />
-    <Compile Include="src\GraphicObjects\IBindable.cs" />
     <Compile Include="src\Input\KeyPressEventArgs.cs" />
     <Compile Include="src\Configuration.cs" />
     <Compile Include="src\Measure.cs" />
     <Compile Include="src\CompilerServices\MemberReference.cs" />
-    <Compile Include="src\CompilerServices\Bindings.cs" />
     <Compile Include="src\StyleReader.cs" />
     <Compile Include="src\GraphicObjects\DirectoryView.cs" />
     <Compile Include="src\Instantiator.cs" />
-    <Compile Include="src\IMLReader.cs" />
     <Compile Include="src\ItemTemplate.cs" />
     <Compile Include="src\Style.cs" />
     <Compile Include="src\GraphicObjects\Wrapper.cs" />
@@ -145,11 +141,20 @@
     <Compile Include="src\GraphicObjects\MenuItem.cs" />
     <Compile Include="src\GraphicObjects\Menu.cs" />
     <Compile Include="src\Command.cs" />
+    <Compile Include="src\GraphicObjects\DataSourceChangeEventArgs.cs" />
+    <Compile Include="src\IML\Context.cs" />
+    <Compile Include="src\IML\NodeAddress.cs" />
+    <Compile Include="src\IML\Node.cs" />
+    <Compile Include="src\IML\MemberAddress.cs" />
+    <Compile Include="src\IML\NodeStack.cs" />
+    <Compile Include="src\IML\BindingDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\GraphicObjects\ColorPicker.cs" />
     <Compile Include="src\GraphicObjects\ColorSelector.cs" />
     <Compile Include="src\GraphicObjects\HueSelector.cs" />
     <Compile Include="src\GraphicObjects\SaturationValueSelector.cs" />
+    <Compile Include="src\IML\EventBinding.cs" />
+    <Compile Include="src\PerformanceMeasure.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -181,6 +186,7 @@
     <Folder Include="src\Fill\" />
     <Folder Include="src\Input\" />
     <Folder Include="src\rsvg\" />
+    <Folder Include="src\IML\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\Icons\updown.svg" />

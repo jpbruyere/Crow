@@ -53,7 +53,7 @@ namespace Crow
 			if (!items.ContainsKey (key))
 				return default(T);
 			Type type = typeof(T);
-			MethodInfo miParse = type.GetMethod ("Parse", BindingFlags.Static);
+			MethodInfo miParse = type.GetMethod ("Parse", new Type[] {typeof(string)});
 			if (miParse == null)				
 				return (T)Convert.ChangeType (items [key], typeof(T));
 

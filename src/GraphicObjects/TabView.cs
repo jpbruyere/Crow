@@ -25,10 +25,13 @@ using Cairo;
 using System.Diagnostics;
 
 namespace Crow
-{
-	//TODO:use TemplatedGroup
+{	
 	public class TabView : Group
 	{
+		#region CTOR
+		public TabView () : base() {}
+		#endregion
+
 		#region Private fields
 		int _spacing;
 		Measure tabThickness;
@@ -36,9 +39,6 @@ namespace Crow
 		int selectedTab = 0;
 		#endregion
 
-		public TabView () : base()
-		{
-		}
 
 		#region public properties
 		[XmlAttributeAttribute()][DefaultValue(Orientation.Horizontal)]
@@ -56,7 +56,7 @@ namespace Crow
 					NotifyValueChanged ("TabOrientation", Orientation.Horizontal);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(20)]
+		[XmlAttributeAttribute()][DefaultValue(16)]
 		public int Spacing
 		{
 			get { return _spacing; }
@@ -81,17 +81,6 @@ namespace Crow
 
 				NotifyValueChanged ("SelectedTab", selectedTab);
 				RegisterForRedraw ();
-			}
-		}
-		[XmlAttributeAttribute()][DefaultValue("18")]
-		public virtual Measure TabThickness {
-			get { return tabThickness; }
-			set {
-				if (tabThickness == value)
-					return;
-				tabThickness = value;
-				NotifyValueChanged ("TabThickness", tabThickness);
-				RegisterForGraphicUpdate ();
 			}
 		}
 		#endregion
@@ -143,7 +132,7 @@ namespace Crow
 				}
 
 				//if no layouting remains in queue for item, registre for redraw
-				if (RegisteredLayoutings == LayoutingType.None && bmp == null)
+				if (RegisteredLayoutings == LayoutingType.None && IsDirty)
 					CurrentInterface.EnqueueForRepaint (this);
 
 				return true;
