@@ -158,13 +158,26 @@ namespace Crow
 		#endregion
 
 		#region graphic context
-		public int texID;
+		public int texID, pboIdx, pboNextIdx;
+		int[] pboHandles = new int[2];
+		int pboSize;
+		Rectangle pboRect;
 		public Shader shader;
 		public vaoMesh quad;
 		public Matrix4 projection;
 
 		void createContext()
 		{
+			if (GL.IsBuffer (pboHandles[0]))
+				GL.DeleteBuffers (2, pboHandles);
+			GL.GenBuffers (2, pboHandles);
+			pboRect = ClientRectangle;
+			pboSize= 4 * ClientRectangle.Width * ClientRectangle.Height;
+			GL.BindBuffer(BufferTarget.PixelUnpackBuffer, pboHandles[0]);
+			GL.BufferData(BufferTarget.PixelUnpackBuffer, pboSize, IntPtr.Zero, BufferUsageHint.StreamDraw);
+			GL.BindBuffer(BufferTarget.PixelUnpackBuffer, pboHandles[1]);
+			GL.BufferData(BufferTarget.PixelUnpackBuffer, pboSize, IntPtr.Zero, BufferUsageHint.StreamDraw);
+			GL.BindBuffer(BufferTarget.PixelUnpackBuffer, 0);
 			#region Create texture
 			if (GL.IsTexture(texID))
 				GL.DeleteTexture (texID);
@@ -192,14 +205,51 @@ namespace Crow
 
 			shader.Enable ();
 			shader.SetMVP (projection);
+
 			GL.ActiveTexture (TextureUnit.Texture0);
 			GL.BindTexture (TextureTarget.Texture2D, texID);
-			if (Monitor.TryEnter(CrowInterface.RenderMutex)) {
+			if (Monitor.TryEnter(CrowInterface.RenderMutex)) {				
 				if (CrowInterface.IsDirty) {
+					pboIdx = (pboIdx + 1) % 2;
+					pboNextIdx = (pboIdx + 1) % 2;
+
+					// bind the texture and PBO (texture is already binded
+					GL.BindBuffer(BufferTarget.PixelUnpackBuffer, pboHandles[pboIdx]);
+
+					// copy pixels from PBO to texture object
+					// Use offset instead of pointer.
 					GL.TexSubImage2D (TextureTarget.Texture2D, 0,
-						CrowInterface.DirtyRect.Left, CrowInterface.DirtyRect.Top,
-						CrowInterface.DirtyRect.Width, CrowInterface.DirtyRect.Height,
-						OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, CrowInterface.dirtyBmp);
+						pboRect.Left, pboRect.Top,
+						pboRect.Width, pboRect.Height,
+						OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, IntPtr.Zero);
+					
+					pboRect = CrowInterface.DirtyRect;
+					pboSize = 4 * CrowInterface.DirtyRect.Width * CrowInterface.DirtyRect.Height;
+					// bind PBO to update texture source
+					GL.BindBuffer(BufferTarget.PixelUnpackBuffer, pboHandles[pboNextIdx]);
+
+					// Note that glMapBufferARB() causes sync issue.
+					// If GPU is working with this buffer, glMapBufferARB() will wait(stall)
+					// until GPU to finish its job. To avoid waiting (idle), you can call
+					// first glBufferDataARB() with NULL pointer before glMapBufferARB().
+					// If you do that, the previous data in PBO will be discarded and
+					// glMapBufferARB() returns a new allocated pointer immediately
+					// even if GPU is still working with the previous data.
+					GL.BufferData(BufferTarget.PixelUnpackBuffer, pboSize,IntPtr.Zero, BufferUsageHint.StreamDraw);
+
+					// map the buffer object into client's memory
+					IntPtr ptr = GL.MapBuffer(BufferTarget.PixelUnpackBuffer,BufferAccess.WriteOnly);
+					if(ptr!=IntPtr.Zero)
+					{
+						// update data directly on the mapped buffer
+						System.Runtime.InteropServices.Marshal.Copy(CrowInterface.dirtyBmp,0,ptr,pboSize);
+						GL.UnmapBuffer(BufferTarget.PixelUnpackBuffer); // release the mapped buffer
+					}
+
+					// it is good idea to release PBOs with ID 0 after use.
+					// Once bound with 0, all pixel operations are back to normal ways.
+					GL.BindBuffer(BufferTarget.PixelUnpackBuffer, 0);
+
 					CrowInterface.IsDirty = false;
 				}
 				Monitor.Exit (CrowInterface.RenderMutex);
