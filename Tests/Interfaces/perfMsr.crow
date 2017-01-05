@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
-<GroupBox CornerRadius="0" Margin="0" Caption="{Name}" Height="Fit" Width="160">
-	<VerticalStack>
+
+	<VerticalStack Spacing="0" Fit="true" Width="160">
+		<HorizontalStack Background="Black">
+			<Label Text="{Name}" Width="Stretched" Font="doid bold, 10" Margin="2"/>
+			<Button Caption="Reset" MouseClick="onResetClick" Height="Fit"/>
+		</HorizontalStack>
 		<HorizontalStack>
 			<Label Text="Current:" Style="FpsLabel"/>
 			<Label Text="{current}" Style="FpsDisp"/>
@@ -25,6 +29,5 @@
 			<Label Text="Cpt:" Style="FpsLabel"/>
 			<Label Text="{cptMeasures}" Style="FpsDisp"/>
 		</HorizontalStack>-->
-		<Button Caption="Reset" MouseClick="onResetClick"/>
 	</VerticalStack>
-</GroupBox>
+

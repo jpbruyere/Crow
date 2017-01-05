@@ -1,13 +1,14 @@
 ﻿FpsLabel {
 	Width = 50%;
 	Font = droid, 10;
-	Margin = 1;
+	Margin = 0;
 	TextAlignment = Center;
 	Background = Onyx;
 }
 FpsDisp {
-	Font = droid , 12;
+	Font = droid bold, 10;
 	Width = 50%;
+	Margin = 0;
 	TextAlignment = Center;
 	Background = Teal;
 }
