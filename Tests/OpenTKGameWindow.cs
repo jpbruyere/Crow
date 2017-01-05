@@ -80,6 +80,10 @@ namespace Crow
 		public string drawing = "";
 		public string layouting = "";
 		public string clipping = "";
+		#if MEASURE_TIME
+		public PerformanceMeasure glDrawMeasure = new PerformanceMeasure("OpenGL Draw", 10);
+		#endif
+
 		#endregion
 
 		#region ctor
@@ -102,7 +106,8 @@ namespace Crow
 					this.CrowInterface.updateMeasure,
 					this.CrowInterface.layoutingMeasure,
 					this.CrowInterface.clippingMeasure,
-					this.CrowInterface.drawingMeasure
+					this.CrowInterface.drawingMeasure,
+					this.glDrawMeasure
 				}
 			);
 			#endif
@@ -184,6 +189,9 @@ namespace Crow
 		}
 		void OpenGLDraw()
 		{
+			#if MEASURE_TIME
+			glDrawMeasure.StartCycle();
+			#endif
 			bool blend, depthTest;
 			GL.GetBoolean (GetPName.Blend, out blend);
 			GL.GetBoolean (GetPName.DepthTest, out depthTest);
@@ -211,6 +219,9 @@ namespace Crow
 				GL.Disable (EnableCap.Blend);
 			if (depthTest)
 				GL.Enable (EnableCap.DepthTest);
+			#if MEASURE_TIME
+			glDrawMeasure.StopCycle();
+			#endif
 		}
 		#endregion
 
