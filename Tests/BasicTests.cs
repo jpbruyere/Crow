@@ -12,19 +12,6 @@ namespace Tests
 {
 	class BasicTests : OpenTKGameWindow
 	{
-		#region IBindable implementation
-		public object DataSource {
-			get { return null; }
-			set {
-				throw new NotImplementedException ();
-			}
-		}
-		List<Binding> bindings = new List<Binding> ();
-		public List<Binding> Bindings {
-			get { return bindings; }
-		}
-		#endregion
-
 		public BasicTests ()
 			: base(800, 600,"test: press <F3> to toogle test files")
 		{
