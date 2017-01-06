@@ -34,7 +34,7 @@ namespace Crow
 		static Configuration ()
 		{
 			items = new Dictionary<string, string> ();
-			string configRoot = 
+			string configRoot =
 				Path.Combine(
 					Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
 					".config");
@@ -46,7 +46,24 @@ namespace Crow
 
 			if (!Directory.Exists(configPath))
 				Directory.CreateDirectory (configPath);
-			load ();
+
+			string path = Path.Combine(configPath, configFileName);
+
+			if (File.Exists (path)) {
+				using (Stream s = new FileStream(path, FileMode.Open))
+					load (s);
+				return;
+			}
+
+			string defaultConfigResID = appName + ".default.config";
+			foreach (string resIds in a.GetManifestResourceNames()) {
+				if (string.Equals (defaultConfigResID, resIds, StringComparison.OrdinalIgnoreCase)) {
+					using (Stream s = a.GetManifestResourceStream (defaultConfigResID))
+						load (s);
+					return;
+				}
+			}
+			Console.WriteLine ("No Default Config found. ({0})", defaultConfigResID);
 		}
 		public static T Get<T>(string key)
 		{
@@ -54,7 +71,7 @@ namespace Crow
 				return default(T);
 			Type type = typeof(T);
 			MethodInfo miParse = type.GetMethod ("Parse", new Type[] {typeof(string)});
-			if (miParse == null)				
+			if (miParse == null)
 				return (T)Convert.ChangeType (items [key], typeof(T));
 
 			return (T)Convert.ChangeType (miParse.Invoke (null, new object[]{ items [key] }), type);
@@ -67,27 +84,22 @@ namespace Crow
 		static void save(){
 			using (Stream s = new FileStream(Path.Combine(configPath, configFileName),FileMode.Create)){
 				using (StreamWriter sw = new StreamWriter (s)) {
-					foreach (string key in items.Keys) {						
+					foreach (string key in items.Keys) {
 						sw.WriteLine(key + "=" + items[key]);
 					}
 				}
 			}
 		}
-		static void load(){			
-			string path = Path.Combine(configPath, configFileName);
-			if (!File.Exists (path))
-				return;
-			using (Stream s = new FileStream(path, FileMode.Open)){
-				using (StreamReader sr = new StreamReader (s)) {
-					while (!sr.EndOfStream) {						
-						string l = sr.ReadLine();
-						if (string.IsNullOrEmpty (l.Trim ()))
-							continue;
-						string[] tmp = l.Trim ().Split ('=');
-						if (tmp.Length != 2)
-							continue;
-						items[tmp [0].Trim ()] = tmp [1].Trim ();
-					}
+		static void load(Stream s){
+			using (StreamReader sr = new StreamReader (s)) {
+				while (!sr.EndOfStream) {
+					string l = sr.ReadLine();
+					if (string.IsNullOrEmpty (l.Trim ()))
+						continue;
+					string[] tmp = l.Trim ().Split ('=');
+					if (tmp.Length != 2)
+						continue;
+					items[tmp [0].Trim ()] = tmp [1].Trim ();
 				}
 			}
 		}
