@@ -57,14 +57,14 @@ namespace Crow
 		}
 		public Interface(){
 			CurrentInterface = this;
-			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture; 
+			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 		}
 		#endregion
 
 		#region Static and constants
 		public static int DoubleClick = 200;//ms
 		internal Stopwatch clickTimer = new Stopwatch();
-		internal GraphicObject eligibleForDoubleClick = null; 
+		internal GraphicObject eligibleForDoubleClick = null;
 		public static int TabSize = 4;
 		public static string LineBreak = "\r\n";
 		//TODO: shold be declared in graphicObject
@@ -441,7 +441,6 @@ namespace Crow
 								DirtyRect += clipping.Bounds;
 							else
 								DirtyRect = clipping.Bounds;
-							IsDirty = true;
 
 							DirtyRect.Left = Math.Max (0, DirtyRect.Left);
 							DirtyRect.Top = Math.Max (0, DirtyRect.Top);
@@ -450,13 +449,14 @@ namespace Crow
 							DirtyRect.Width = Math.Max (0, DirtyRect.Width);
 							DirtyRect.Height = Math.Max (0, DirtyRect.Height);
 
-							if (DirtyRect.Width > 0) {
+							if (DirtyRect.Width > 0 && DirtyRect.Height >0) {
 								dirtyBmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
 								for (int y = 0; y < DirtyRect.Height; y++) {
 									Array.Copy (bmp,
 										((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
 										dirtyBmp, y * DirtyRect.Width * 4, DirtyRect.Width * 4);
 								}
+								IsDirty = true;
 							} else
 								IsDirty = false;
 						}
