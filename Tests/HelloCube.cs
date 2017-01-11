@@ -26,7 +26,7 @@ using Crow;
 
 namespace Tests
 {
-	class HelloCube : OpenTKGameWindow
+	class HelloCube : CrowWindow
 	{
 		[STAThread]
 		static void Main ()

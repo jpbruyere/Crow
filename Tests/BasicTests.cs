@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace Tests
 {
-	class BasicTests : OpenTKGameWindow
+	class BasicTests : CrowWindow3D
 	{
 		public BasicTests ()
 			: base(800, 600,"test: press <F3> to toogle test files")

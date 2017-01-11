@@ -26,7 +26,7 @@ using Crow;
 
 namespace Tests
 {
-	class UIEditor : OpenTKGameWindow
+	class UIEditor : CrowWindow
 	{
 		[STAThread]
 		static void Main ()

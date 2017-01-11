@@ -3,7 +3,7 @@ using Crow;
 
 namespace Tests
 {
-	class HelloWorld : OpenTKGameWindow
+	class HelloWorld : CrowWindow
 	{
 		public HelloWorld ()
 			: base(800, 600,"Crow Test with OpenTK")
