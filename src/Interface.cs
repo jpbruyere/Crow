@@ -568,10 +568,10 @@ namespace Crow
 			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
 			e.Mouse = Mouse;
 
-			if (_activeWidget != null) {
+			if (activeWidget != null) {
 				//TODO, ensure object is still in the graphic tree
 				//send move evt even if mouse move outside bounds
-				_activeWidget.onMouseMove (this, e);
+				activeWidget.onMouseMove (this, e);
 				return true;
 			}
 

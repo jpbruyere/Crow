@@ -1172,7 +1172,7 @@ namespace Crow
 			if (p != null)
 				p.onMouseMove(sender,e);
 
-			MouseMove.Raise (sender, e);
+			MouseMove.Raise (this, e);
 		}
 		public virtual void onMouseDown(object sender, MouseButtonEventArgs e){
 			if (CurrentInterface.eligibleForDoubleClick == this && CurrentInterface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick)
