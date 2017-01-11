@@ -168,9 +168,9 @@ namespace Crow
 		public vaoMesh quad;
 		public Matrix4 projection;
 
+		/// <summary>Create the texture for the interface redering</summary>
 		void createContext()
 		{
-			#region Create texture
 			if (GL.IsTexture(texID))
 				GL.DeleteTexture (texID);
 			GL.GenTextures(1, out texID);
@@ -185,8 +185,8 @@ namespace Crow
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 
 			GL.BindTexture(TextureTarget.Texture2D, 0);
-			#endregion
 		}
+		/// <summary>Rendering of the interface</summary>
 		void OpenGLDraw()
 		{
 			#if MEASURE_TIME
@@ -225,15 +225,11 @@ namespace Crow
 		}
 		#endregion
 
-		/// <summary>
-		/// Override this method for your OpenGL rendering calls
-		/// </summary>
+		/// <summary>Override this method for your OpenGL rendering calls</summary>
 		public virtual void OnRender(FrameEventArgs e)
 		{
 		}
-		/// <summary>
-		/// Override this method to customize clear method between frames
-		/// </summary>
+		/// <summary>Override this method to customize clear method between frames</summary>
 		public virtual void GLClear()
 		{
 			GL.Clear (ClearBufferMask.ColorBufferBit|ClearBufferMask.DepthBufferBit);
@@ -254,11 +250,13 @@ namespace Crow
 
 			GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
+			#if DEBUG
 			Console.WriteLine("\n\n*************************************");
 			Console.WriteLine("GL version: " + GL.GetString (StringName.Version));
 			Console.WriteLine("GL vendor: " + GL.GetString (StringName.Vendor));
 			Console.WriteLine("GLSL version: " + GL.GetString (StringName.ShadingLanguageVersion));
 			Console.WriteLine("*************************************\n");
+			#endif
 
 			projection = OpenTK.Matrix4.CreateOrthographicOffCenter (-0.5f, 0.5f, -0.5f, 0.5f, 1, -1);
 
