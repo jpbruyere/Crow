@@ -163,37 +163,33 @@ namespace Crow
 		#endregion
 
 		#region graphic context
-		public int texID;
-		public Shader shader;
-		public vaoMesh quad;
-		public Matrix4 projection;
-		int[] viewport = new int[4];
-		public static Matrix4 modelview;
-		public static Matrix4 orthoMat//full screen quad rendering
-		= OpenTK.Matrix4.CreateOrthographicOffCenter (-0.5f, 0.5f, -0.5f, 0.5f, 1, -1);
-		Vector3 vEyeTarget = new Vector3(0f, 0f, 0f);
-		Vector3 vEye;
-		Vector3 vLookInit = Vector3.Normalize(new Vector3(0.0f, 0.0f, 1.0f));
-		Vector3 vLook;  // Camera vLook Vector
-		float zFar = 300.0f;
-		float zNear = 0.001f;
-		float fovY = (float)Math.PI / 4;
-		float eyeDist = 1.2f;
-		float MoveSpeed = 0.02f;
-		float RotationSpeed = 0.005f;
-		float ZoomSpeed = 0.22f;
-		float viewZangle, viewXangle;
+		int texID;
+		vaoMesh quad;
+		protected Shader shader;
+		protected Matrix4 projection, modelview;
+		protected int[] viewport = new int[4];
+		protected Vector3 vEyeTarget = new Vector3(0f, 0f, 0f);
+		protected Vector3 vEye;
+		protected Vector3 vLookInit = Vector3.Normalize(new Vector3(0.0f, 1.0f, 0.0f));
+		protected Vector3 vLook;  // Camera vLook Vector
+		protected float zNear = 0.001f, zFar = 300.0f;
+		protected float fovY = (float)Math.PI / 4;
+		protected float eyeDist = 1.2f;
+		protected float viewZangle, viewXangle;
+		protected const float MoveSpeed = 0.02f;
+		protected const float RotationSpeed = 0.005f;
+		protected const float ZoomSpeed = 0.22f;
 
-		public Vector4 vLight = new Vector4 (0.5f, 0.5f, -1f, 0f);
+		public Matrix4 interfaceModelView;
 
 		Rectangle iRect = new Rectangle(0,0,2048,2048);
-		float iRatio { get { return iRect.Height / (float)iRect.Width; }}
 
 		void initGL(){
 			GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			shader = new Shader ();
 			//quad = new Crow.vaoMesh (0, 0, 0, 1, iRect.Height / (float)iRect.Width, 1, -1);
 			quad = new Crow.vaoMesh (0, 0, 0, 1, 1, 1, -1);
+			interfaceModelView = Matrix4.CreateRotationX(MathHelper.PiOver2) * Matrix4.CreateTranslation(Vector3.UnitY);
 			createContext ();
 		}
 		/// <summary>Create the texture for the interface redering</summary>
@@ -215,7 +211,7 @@ namespace Crow
 			GL.BindTexture(TextureTarget.Texture2D, 0);
 		}
 		/// <summary>Rendering of the interface</summary>
-		void OpenGLDraw()
+		protected virtual void OpenGLDraw()
 		{
 			#if MEASURE_TIME
 			glDrawMeasure.StartCycle();
@@ -227,7 +223,7 @@ namespace Crow
 			GL.Disable (EnableCap.DepthTest);
 
 			shader.Enable ();
-			shader.SetMVP (modelview * projection);
+			shader.SetMVP (interfaceModelView * modelview * projection);
 			GL.ActiveTexture (TextureUnit.Texture0);
 			GL.BindTexture (TextureTarget.Texture2D, texID);
 			if (Monitor.TryEnter(CrowInterface.RenderMutex)) {
@@ -242,7 +238,7 @@ namespace Crow
 			}
 			quad.Render (BeginMode.TriangleStrip);
 			GL.BindTexture(TextureTarget.Texture2D, 0);
-
+			shader.SetMVP (modelview * projection);
 			if (!blend)
 				GL.Disable (EnableCap.Blend);
 			if (depthTest)
@@ -333,15 +329,20 @@ namespace Crow
 		}
 
 		Point mousePosition;
+		bool mouseIsInInterface = false;
 
 		void updateMousePosition(OpenTK.Input.MouseMoveEventArgs otk_e)
 		{
-			Vector3 vMouse = UnProject(ref projection, ref modelview, viewport, new Vector2 (otk_e.X, otk_e.Y)).Xyz;
-			Vector3 vMouseRay = Vector3.Normalize(vMouse - vEye);
-			float a = vEye.Z / vMouseRay.Z;
-			vMouse = vEye - vMouseRay * a;
+			Matrix4 mv = interfaceModelView * modelview;
+			Vector3 vMouse = UnProject(ref projection, ref mv, viewport, new Vector2 (otk_e.X, otk_e.Y)).Xyz;
+			Vector3 vE = vEye.Transform (interfaceModelView.Inverted());
+			Vector3 vMouseRay = Vector3.Normalize(vMouse - vE);
+			float a = vE.Z / vMouseRay.Z;
+			vMouse = vE - vMouseRay * a;
+			//vMouse = vMouse.Transform (interfaceModelView.Inverted());
 			mousePosition = new Point ((int)Math.Truncate ((vMouse.X + 0.5f) * iRect.Width),
 				iRect.Height - (int)Math.Truncate ((vMouse.Y + 0.5f) * iRect.Height));
+			mouseIsInInterface = mousePosition.X.IsInBetween (0, iRect.Width) & mousePosition.Y.IsInBetween (0, iRect.Height);
 			//System.Diagnostics.Debug.WriteLine ("vMouse={0} newPos={1}", vMouse, mousePosition);
 		}
 		public void UpdateViewMatrix()
@@ -351,10 +352,10 @@ namespace Crow
 			projection = Matrix4.CreatePerspectiveFieldOfView (fovY, r.Width / (float)r.Height, zNear, zFar);
 			vLook = vLookInit.Transform(
 				Matrix4.CreateRotationX (viewXangle)*
-				Matrix4.CreateRotationY (viewZangle));
+				Matrix4.CreateRotationZ (viewZangle));
 			vLook.Normalize();
 			vEye = vEyeTarget + vLook * eyeDist;
-			modelview = Matrix4.LookAt(vEye, vEyeTarget, Vector3.UnitY);
+			modelview = Matrix4.LookAt(vEye, vEyeTarget, Vector3.UnitZ);
 			GL.GetInteger(GetPName.Viewport, viewport);
 		}
 
@@ -362,57 +363,48 @@ namespace Crow
         {
 			updateMousePosition (otk_e);
 
-			if (mousePosition.X.IsInBetween (0, iRect.Width) & mousePosition.Y.IsInBetween (0, iRect.Height)
-				&!(Keyboard[OpenTK.Input.Key.ShiftLeft])) {
+			if (mouseIsInInterface & !(Keyboard [OpenTK.Input.Key.ShiftLeft])) {
 				if (CrowInterface.ProcessMouseMove (mousePosition.X, mousePosition.Y))
 					return;
-			}
-			if (Keyboard[OpenTK.Input.Key.ShiftLeft])
-			{
-				if (otk_e.Mouse.MiddleButton == OpenTK.Input.ButtonState.Pressed) {
-					viewZangle -= (float)otk_e.XDelta * RotationSpeed;
-					viewXangle -= (float)otk_e.YDelta * RotationSpeed;
-					UpdateViewMatrix ();
-				}else if (otk_e.Mouse.LeftButton == OpenTK.Input.ButtonState.Pressed) {
-					return;
-				}else if (otk_e.Mouse.RightButton == OpenTK.Input.ButtonState.Pressed) {
-					Vector2 v2Look = vLook.Xz.Normalized ();
-					Vector2 disp = v2Look.PerpendicularLeft * otk_e.XDelta * MoveSpeed +
-						v2Look * otk_e.YDelta * MoveSpeed;
-					vEyeTarget += new Vector3 (disp.X, disp.Y, 0);
-					UpdateViewMatrix();
-				}
+			} 
+			if (otk_e.Mouse.MiddleButton == OpenTK.Input.ButtonState.Pressed) {
+				viewZangle -= (float)otk_e.XDelta * RotationSpeed;
+				viewXangle += (float)otk_e.YDelta * RotationSpeed;
+				UpdateViewMatrix ();
+			} else if (otk_e.Mouse.LeftButton == OpenTK.Input.ButtonState.Pressed) {
 				return;
+			} else if (otk_e.Mouse.RightButton == OpenTK.Input.ButtonState.Pressed) {
+				Vector2 v2Look = vLook.Xy.Normalized ();
+				Vector2 disp = v2Look.PerpendicularLeft * otk_e.XDelta * MoveSpeed +
+				              v2Look * otk_e.YDelta * MoveSpeed;
+				vEyeTarget += new Vector3 (disp.X, disp.Y, 0);
+				UpdateViewMatrix ();
 			}
+
 			MouseMove.Raise (sender, otk_e);
         }
 
 		void Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
         {
-			if (mousePosition.X.IsInBetween (0, iRect.Width) & mousePosition.Y.IsInBetween (0, iRect.Height)) {
-				if (Keyboard [OpenTK.Input.Key.ShiftLeft])
-					return;
-				if (CrowInterface.ProcessMouseButtonUp ((int)otk_e.Button))
-					return;
-			}
-			MouseButtonUp.Raise (sender, otk_e);
+			if (mouseIsInInterface & !Keyboard [OpenTK.Input.Key.ShiftLeft])
+				CrowInterface.ProcessMouseButtonUp ((int)otk_e.Button);
+			else
+				MouseButtonUp.Raise (sender, otk_e);
         }
 		void Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
 		{
-			if (mousePosition.X.IsInBetween (0, iRect.Width) & mousePosition.Y.IsInBetween (0, iRect.Height)
-				&!(Keyboard[OpenTK.Input.Key.ShiftLeft])) {
-				if (CrowInterface.ProcessMouseButtonDown ((int)otk_e.Button))
-					return;
-			}
-			MouseButtonDown.Raise (sender, otk_e);
+			if (mouseIsInInterface & !Keyboard [OpenTK.Input.Key.ShiftLeft])
+				CrowInterface.ProcessMouseButtonDown ((int)otk_e.Button);
+			else
+				MouseButtonDown.Raise (sender, otk_e);
         }
 		void Mouse_WheelChanged(object sender, OpenTK.Input.MouseWheelEventArgs otk_e)
         {
-			if (mousePosition.X.IsInBetween (0, iRect.Width) & mousePosition.Y.IsInBetween (0, iRect.Height)
-				&!(Keyboard[OpenTK.Input.Key.ShiftLeft])) {
-				if (CrowInterface.ProcessMouseWheelChanged (otk_e.DeltaPrecise))
-					return;
+			if (mouseIsInInterface & !Keyboard [OpenTK.Input.Key.ShiftLeft]) {
+				CrowInterface.ProcessMouseWheelChanged (otk_e.DeltaPrecise);
+				return;
 			}
+
 			float speed = ZoomSpeed;
 			if (Keyboard[OpenTK.Input.Key.ControlLeft])
 				speed *= 20.0f;

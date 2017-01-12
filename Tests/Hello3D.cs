@@ -42,7 +42,7 @@ namespace Tests
 
 		vaoMesh cube;
 		Texture texture;
-		//Matrix4 projection, modelview;
+
 
 		void initGL(){
 			GL.Enable (EnableCap.CullFace);
@@ -87,7 +87,7 @@ namespace Tests
 		{			
 			base.OnRender (e);
 
-			shader.SetMVP(Matrix4.CreateTranslation(-Vector3.UnitZ) * Matrix4.CreateScale(0.1f)* modelview * projection);
+			shader.SetMVP(modelview * projection);
 
 			GL.BindTexture (TextureTarget.Texture2D, texture);
 			cube.Render (BeginMode.Triangles);
