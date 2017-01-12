@@ -32,7 +32,7 @@ namespace Crow
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
 		public virtual void NotifyValueChanged(string MemberName, object _value)
 		{
-			if (ValueChanged != null)				
+			if (ValueChanged != null)
 				ValueChanged.Invoke(this, new ValueChangeEventArgs(MemberName, _value));
 		}
 		#endregion
@@ -129,7 +129,7 @@ namespace Crow
 			CrowInterface.MouseCursorChanged += CrowInterface_MouseCursorChanged;
 			while (CrowInterface.ClientRectangle.Size.Width == 0)
 				Thread.Sleep (5);
-			
+
 			while (true) {
 				CrowInterface.Update ();
 				//Thread.Sleep (1);
@@ -167,11 +167,34 @@ namespace Crow
 		public Shader shader;
 		public vaoMesh quad;
 		public Matrix4 projection;
+		int[] viewport = new int[4];
+		public static Matrix4 modelview;
+		public static Matrix4 orthoMat//full screen quad rendering
+		= OpenTK.Matrix4.CreateOrthographicOffCenter (-0.5f, 0.5f, -0.5f, 0.5f, 1, -1);
+		Vector3 vEyeTarget = new Vector3(0f, 0f, 0f);
+		Vector3 vEye;
+		Vector3 vLookInit = Vector3.Normalize(new Vector3(0.0f, 0.0f, 1.0f));
+		Vector3 vLook;  // Camera vLook Vector
+		float zFar = 300.0f;
+		float zNear = 0.001f;
+		float fovY = (float)Math.PI / 4;
+		float eyeDist = 1.2f;
+		float MoveSpeed = 0.02f;
+		float RotationSpeed = 0.005f;
+		float ZoomSpeed = 0.22f;
+		float viewZangle, viewXangle;
+
+		public Vector4 vLight = new Vector4 (0.5f, 0.5f, -1f, 0f);
+
+		Rectangle iRect = new Rectangle(0,0,2048,2048);
+		float iRatio { get { return iRect.Height / (float)iRect.Width; }}
 
 		void initGL(){
 			GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			shader = new Shader ();
+			//quad = new Crow.vaoMesh (0, 0, 0, 1, iRect.Height / (float)iRect.Width, 1, -1);
 			quad = new Crow.vaoMesh (0, 0, 0, 1, 1, 1, -1);
+			createContext ();
 		}
 		/// <summary>Create the texture for the interface redering</summary>
 		void createContext()
@@ -183,7 +206,7 @@ namespace Crow
 			GL.BindTexture(TextureTarget.Texture2D, texID);
 
 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba,
-				ClientRectangle.Width, ClientRectangle.Height, 0,
+				iRect.Width, iRect.Height, 0,
 				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, CrowInterface.bmp);
 
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
@@ -262,6 +285,7 @@ namespace Crow
 			#endif
 
 			initGL ();
+			CrowInterface.ProcessResize (iRect);
 		}
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
@@ -296,17 +320,10 @@ namespace Crow
 		protected override void OnResize(EventArgs e)
 		{
 			base.OnResize (e);
-			CrowInterface.ProcessResize(
-				new Rectangle(
-				0,
-				0,
-				this.ClientRectangle.Width,
-				this.ClientRectangle.Height));
-			createContext ();
 			UpdateViewMatrix ();
 		}
 		#endregion
-		int[] viewport = new int[4];
+
 		#region Mouse Handling
 		void update_mouseButtonStates(ref MouseState e, OpenTK.Input.MouseState otk_e){
 			for (int i = 0; i < MouseState.MaxButtons; i++) {
@@ -314,54 +331,47 @@ namespace Crow
 					e.EnableBit (i);
 			}
 		}
-		public static Matrix4 modelview;
-		public static Matrix4 orthoMat//full screen quad rendering
-			= OpenTK.Matrix4.CreateOrthographicOffCenter (-0.5f, 0.5f, -0.5f, 0.5f, 1, -1);
-		Vector3 vEyeTarget = new Vector3(0f, 0f, 0f);
-		Vector3 vEye;
-		Vector3 vLookInit = Vector3.Normalize(new Vector3(0.0f, 0.0f, 1.0f));
-		Vector3 vLook;  // Camera vLook Vector
-		float zFar = 300.0f;
-		float zNear = 0.001f;
-		float fovY = (float)Math.PI / 4;
-		float eyeDist = 1.2f;
-		float MoveSpeed = 0.02f;
-		float RotationSpeed = 0.005f;
-		float ZoomSpeed = 0.22f;
-		float viewZangle, viewXangle;
-
-		public Vector4 vLight = new Vector4 (0.5f, 0.5f, -1f, 0f);
 
 		Point mousePosition;
 
 		void updateMousePosition(OpenTK.Input.MouseMoveEventArgs otk_e)
-		{			
+		{
 			Vector3 vMouse = UnProject(ref projection, ref modelview, viewport, new Vector2 (otk_e.X, otk_e.Y)).Xyz;
 			Vector3 vMouseRay = Vector3.Normalize(vMouse - vEye);
 			float a = vEye.Z / vMouseRay.Z;
 			vMouse = vEye - vMouseRay * a;
-			mousePosition = new Point ((int)Math.Truncate ((vMouse.X + 0.5f) * viewport [2]),
-				viewport [3] - (int)Math.Truncate ((vMouse.Y + 0.5f) * viewport [3]));			
+			mousePosition = new Point ((int)Math.Truncate ((vMouse.X + 0.5f) * iRect.Width),
+				iRect.Height - (int)Math.Truncate ((vMouse.Y + 0.5f) * iRect.Height));
+			//System.Diagnostics.Debug.WriteLine ("vMouse={0} newPos={1}", vMouse, mousePosition);
+		}
+		public void UpdateViewMatrix()
+		{
+			Rectangle r = this.ClientRectangle;
+			GL.Viewport( r.X, r.Y, r.Width, r.Height);
+			projection = Matrix4.CreatePerspectiveFieldOfView (fovY, r.Width / (float)r.Height, zNear, zFar);
+			vLook = vLookInit.Transform(
+				Matrix4.CreateRotationX (viewXangle)*
+				Matrix4.CreateRotationY (viewZangle));
+			vLook.Normalize();
+			vEye = vEyeTarget + vLook * eyeDist;
+			modelview = Matrix4.LookAt(vEye, vEyeTarget, Vector3.UnitY);
+			GL.GetInteger(GetPName.Viewport, viewport);
 		}
 
 		void Mouse_Move(object sender, OpenTK.Input.MouseMoveEventArgs otk_e)
         {
 			updateMousePosition (otk_e);
 
-			if (mousePosition.X.IsInBetween (0, ClientRectangle.Width) & mousePosition.Y.IsInBetween (0, ClientRectangle.Height)
+			if (mousePosition.X.IsInBetween (0, iRect.Width) & mousePosition.Y.IsInBetween (0, iRect.Height)
 				&!(Keyboard[OpenTK.Input.Key.ShiftLeft])) {
 				if (CrowInterface.ProcessMouseMove (mousePosition.X, mousePosition.Y))
 					return;
 			}
-			if (otk_e.XDelta != 0 || otk_e.YDelta != 0)
+			if (Keyboard[OpenTK.Input.Key.ShiftLeft])
 			{
 				if (otk_e.Mouse.MiddleButton == OpenTK.Input.ButtonState.Pressed) {
 					viewZangle -= (float)otk_e.XDelta * RotationSpeed;
 					viewXangle -= (float)otk_e.YDelta * RotationSpeed;
-//					if (viewXangle < - 0.75f)
-//						viewXangle = -0.75f;
-//					else if (viewXangle > MathHelper.PiOver4)
-//						viewXangle = MathHelper.PiOver4;
 					UpdateViewMatrix ();
 				}else if (otk_e.Mouse.LeftButton == OpenTK.Input.ButtonState.Pressed) {
 					return;
@@ -371,16 +381,17 @@ namespace Crow
 						v2Look * otk_e.YDelta * MoveSpeed;
 					vEyeTarget += new Vector3 (disp.X, disp.Y, 0);
 					UpdateViewMatrix();
-				}					
-				//System.Diagnostics.Debug.WriteLine ("vMouse={0} newPos={1}", vMouse, newPos);
+				}
+				return;
 			}
 			MouseMove.Raise (sender, otk_e);
         }
 
 		void Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
         {
-			if (mousePosition.X.IsInBetween (0, ClientRectangle.Width) & mousePosition.Y.IsInBetween (0, ClientRectangle.Height)
-				&!(Keyboard[OpenTK.Input.Key.ShiftLeft])) {
+			if (mousePosition.X.IsInBetween (0, iRect.Width) & mousePosition.Y.IsInBetween (0, iRect.Height)) {
+				if (Keyboard [OpenTK.Input.Key.ShiftLeft])
+					return;
 				if (CrowInterface.ProcessMouseButtonUp ((int)otk_e.Button))
 					return;
 			}
@@ -388,7 +399,7 @@ namespace Crow
         }
 		void Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
 		{
-			if (mousePosition.X.IsInBetween (0, ClientRectangle.Width) & mousePosition.Y.IsInBetween (0, ClientRectangle.Height)
+			if (mousePosition.X.IsInBetween (0, iRect.Width) & mousePosition.Y.IsInBetween (0, iRect.Height)
 				&!(Keyboard[OpenTK.Input.Key.ShiftLeft])) {
 				if (CrowInterface.ProcessMouseButtonDown ((int)otk_e.Button))
 					return;
@@ -397,7 +408,7 @@ namespace Crow
         }
 		void Mouse_WheelChanged(object sender, OpenTK.Input.MouseWheelEventArgs otk_e)
         {
-			if (mousePosition.X.IsInBetween (0, ClientRectangle.Width) & mousePosition.Y.IsInBetween (0, ClientRectangle.Height)
+			if (mousePosition.X.IsInBetween (0, iRect.Width) & mousePosition.Y.IsInBetween (0, iRect.Height)
 				&!(Keyboard[OpenTK.Input.Key.ShiftLeft])) {
 				if (CrowInterface.ProcessMouseWheelChanged (otk_e.DeltaPrecise))
 					return;
@@ -412,7 +423,7 @@ namespace Crow
 			else if (eyeDist > zFar)
 				eyeDist = zFar;
 			UpdateViewMatrix ();
-			
+
 			MouseWheelChanged.Raise (sender, otk_e);
         }
 		#endregion
@@ -434,19 +445,6 @@ namespace Crow
 		}
         #endregion
 
-		public void UpdateViewMatrix()
-		{
-			Rectangle r = this.ClientRectangle;
-			GL.Viewport( r.X, r.Y, r.Width, r.Height);
-			projection = Matrix4.CreatePerspectiveFieldOfView (fovY, r.Width / (float)r.Height, zNear, zFar);
-			vLook = vLookInit.Transform(
-				Matrix4.CreateRotationX (viewXangle)*
-				Matrix4.CreateRotationY (viewZangle));
-			vLook.Normalize();
-			vEye = vEyeTarget + vLook * eyeDist;
-			modelview = Matrix4.LookAt(vEye, vEyeTarget, Vector3.UnitY);
-			GL.GetInteger(GetPName.Viewport, viewport);
-		}
 		static Vector4 UnProject(ref Matrix4 projection, ref Matrix4 view, int[] viewport, Vector2 mouse)
 		{
 			Vector4 vec;
@@ -479,7 +477,7 @@ namespace Crow
 			return new Vector4 (f [0], f [1], f [2], f [3]);
 		}
 		public static Vector3 Transform(this Vector3 v, Matrix4 m){
-			return Vector4.Transform(new Vector4(v, 1), m).Xyz;			
+			return Vector4.Transform(new Vector4(v, 1), m).Xyz;
 		}
 		public static bool IsInBetween(this int v, int min, int max){
 			return v >= min & v <= max;
