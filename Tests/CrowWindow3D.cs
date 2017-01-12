@@ -26,66 +26,8 @@ using System.Collections.Generic;
 
 namespace Crow
 {
-	public class CrowWindow3D : GameWindow, IValueChange
+	public class CrowWindow3D : CrowWindow
     {
-		#region IValueChange implementation
-		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-		public virtual void NotifyValueChanged(string MemberName, object _value)
-		{
-			if (ValueChanged != null)
-				ValueChanged.Invoke(this, new ValueChangeEventArgs(MemberName, _value));
-		}
-		#endregion
-
-		public Interface CrowInterface;
-
-		#region FPS
-		int frameCpt = 0;
-		int _fps = 0;
-
-		public int fps {
-			get { return _fps; }
-			set {
-				if (_fps == value)
-					return;
-
-				_fps = value;
-
-				if (_fps > fpsMax) {
-					fpsMax = _fps;
-					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMax", fpsMax));
-				} else if (_fps < fpsMin) {
-					fpsMin = _fps;
-					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMin", fpsMin));
-				}
-				if (frameCpt % 3 == 0)
-					ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
-				#if MEASURE_TIME
-				foreach (PerformanceMeasure m in PerfMeasures)
-					m.NotifyChanges();
-				#endif
-			}
-		}
-
-		public int fpsMin = int.MaxValue;
-		public int fpsMax = 0;
-
-		void resetFps ()
-		{
-			fpsMin = int.MaxValue;
-			fpsMax = 0;
-			_fps = 0;
-		}
-		public string update = "";
-		public string drawing = "";
-		public string layouting = "";
-		public string clipping = "";
-		#if MEASURE_TIME
-		public PerformanceMeasure glDrawMeasure = new PerformanceMeasure("OpenGL Draw", 10);
-		#endif
-
-		#endregion
-
 		#region ctor
 		public CrowWindow3D(int _width = 800, int _height = 600, string _title="Crow",
 			int colors = 32, int depth = 24, int stencil = 0, int samples = 1,
@@ -98,75 +40,12 @@ namespace Crow
 		public CrowWindow3D (int width, int height, OpenTK.Graphics.GraphicsMode mode, string title, GameWindowFlags options, DisplayDevice device, int major, int minor, OpenTK.Graphics.GraphicsContextFlags flags)
 			: base(width,height,mode,title,options,device,major,minor,flags)
 		{
-			CrowInterface = new Interface ();
-
-			#if MEASURE_TIME
-			PerfMeasures = new List<PerformanceMeasure> (
-				new PerformanceMeasure[] {
-					this.CrowInterface.updateMeasure,
-					this.CrowInterface.layoutingMeasure,
-					this.CrowInterface.clippingMeasure,
-					this.CrowInterface.drawingMeasure,
-					this.glDrawMeasure
-				}
-			);
-			#endif
-
-			Thread t = new Thread (interfaceThread);
-			t.IsBackground = true;
-			t.Start ();
 		}
-
-		#endregion
-
-		#if MEASURE_TIME
-		public List<PerformanceMeasure> PerfMeasures;
-		#endif
-
-		void interfaceThread()
-		{
-			CrowInterface.Quit += Quit;
-			CrowInterface.MouseCursorChanged += CrowInterface_MouseCursorChanged;
-			while (CrowInterface.ClientRectangle.Size.Width == 0)
-				Thread.Sleep (5);
-
-			while (true) {
-				CrowInterface.Update ();
-				//Thread.Sleep (1);
-			}
-		}
-
-		public void Quit (object sender, EventArgs e)
-		{
-			this.Exit ();
-		}
-		void CrowInterface_MouseCursorChanged (object sender, MouseCursorChangedEventArgs e)
-		{
-			this.Cursor = new MouseCursor(
-				(int)e.NewCursor.Xhot,
-				(int)e.NewCursor.Yhot,
-				(int)e.NewCursor.Width,
-				(int)e.NewCursor.Height,
-				e.NewCursor.data);
-		}
-
-		#region Events
-		//those events are raised only if mouse isn't in a graphic object
-		public event EventHandler<OpenTK.Input.MouseWheelEventArgs> MouseWheelChanged;
-		public event EventHandler<OpenTK.Input.MouseButtonEventArgs> MouseButtonUp;
-		public event EventHandler<OpenTK.Input.MouseButtonEventArgs> MouseButtonDown;
-		public event EventHandler<OpenTK.Input.MouseButtonEventArgs> MouseClick;
-		public event EventHandler<OpenTK.Input.MouseMoveEventArgs> MouseMove;
-		public event EventHandler<OpenTK.Input.KeyboardKeyEventArgs> KeyboardKeyDown;
-		public event EventHandler<OpenTK.Input.KeyboardKeyEventArgs> KeyboardKeyUp;
 
 		#endregion
 
 		#region graphic context
-		int texID;
-		vaoMesh quad;
-		protected Shader shader;
-		protected Matrix4 projection, modelview;
+		protected Matrix4 modelview;
 		protected int[] viewport = new int[4];
 		protected Vector3 vEyeTarget = new Vector3(0f, 0f, 0f);
 		protected Vector3 vEye;
@@ -181,19 +60,23 @@ namespace Crow
 		protected const float ZoomSpeed = 0.22f;
 
 		public Matrix4 interfaceModelView;
-
 		Rectangle iRect = new Rectangle(0,0,2048,2048);
 
-		void initGL(){
+		protected override Matrix4 InterfaceMVP {
+			get { return interfaceModelView * modelview * projection; }
+		}
+
+		protected override void initGL(){
 			GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			shader = new Shader ();
 			//quad = new Crow.vaoMesh (0, 0, 0, 1, iRect.Height / (float)iRect.Width, 1, -1);
 			quad = new Crow.vaoMesh (0, 0, 0, 1, 1, 1, -1);
 			interfaceModelView = Matrix4.CreateRotationX(MathHelper.PiOver2) * Matrix4.CreateTranslation(Vector3.UnitY);
 			createContext ();
+			CrowInterface.ProcessResize (iRect);
 		}
 		/// <summary>Create the texture for the interface redering</summary>
-		void createContext()
+		protected override void createContext ()
 		{
 			if (GL.IsTexture(texID))
 				GL.DeleteTexture (texID);
@@ -210,124 +93,20 @@ namespace Crow
 
 			GL.BindTexture(TextureTarget.Texture2D, 0);
 		}
-		/// <summary>Rendering of the interface</summary>
-		protected virtual void OpenGLDraw()
-		{
-			#if MEASURE_TIME
-			glDrawMeasure.StartCycle();
-			#endif
-			bool blend, depthTest;
-			GL.GetBoolean (GetPName.Blend, out blend);
-			GL.GetBoolean (GetPName.DepthTest, out depthTest);
-			GL.Enable (EnableCap.Blend);
-			GL.Disable (EnableCap.DepthTest);
 
-			shader.Enable ();
-			shader.SetMVP (interfaceModelView * modelview * projection);
-			GL.ActiveTexture (TextureUnit.Texture0);
-			GL.BindTexture (TextureTarget.Texture2D, texID);
-			if (Monitor.TryEnter(CrowInterface.RenderMutex)) {
-				if (CrowInterface.IsDirty) {
-					GL.TexSubImage2D (TextureTarget.Texture2D, 0,
-						CrowInterface.DirtyRect.Left, CrowInterface.DirtyRect.Top,
-						CrowInterface.DirtyRect.Width, CrowInterface.DirtyRect.Height,
-						OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, CrowInterface.dirtyBmp);
-					CrowInterface.IsDirty = false;
-				}
-				Monitor.Exit (CrowInterface.RenderMutex);
-			}
-			quad.Render (BeginMode.TriangleStrip);
-			GL.BindTexture(TextureTarget.Texture2D, 0);
-			shader.SetMVP (modelview * projection);
-			if (!blend)
-				GL.Disable (EnableCap.Blend);
-			if (depthTest)
-				GL.Enable (EnableCap.DepthTest);
-			#if MEASURE_TIME
-			glDrawMeasure.StopCycle();
-			#endif
-		}
 		#endregion
 
-		/// <summary>Override this method for your OpenGL rendering calls</summary>
-		public virtual void OnRender(FrameEventArgs e)
-		{
-		}
-		/// <summary>Override this method to customize clear method between frames</summary>
-		public virtual void GLClear()
-		{
-			GL.Clear (ClearBufferMask.ColorBufferBit|ClearBufferMask.DepthBufferBit);
-		}
 
 		#region Game win overrides
-		protected override void OnLoad(EventArgs e)
-		{
-			base.OnLoad(e);
-
-			this.KeyPress += new EventHandler<OpenTK.KeyPressEventArgs>(OpenTKGameWindow_KeyPress);
-			Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
-			Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
-			Mouse.WheelChanged += new EventHandler<OpenTK.Input.MouseWheelEventArgs>(Mouse_WheelChanged);
-			Mouse.ButtonDown += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonDown);
-			Mouse.ButtonUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonUp);
-			Mouse.Move += new EventHandler<OpenTK.Input.MouseMoveEventArgs>(Mouse_Move);
-
-			#if DEBUG
-			Console.WriteLine("\n\n*************************************");
-			Console.WriteLine("GL version: " + GL.GetString (StringName.Version));
-			Console.WriteLine("GL vendor: " + GL.GetString (StringName.Vendor));
-			Console.WriteLine("GLSL version: " + GL.GetString (StringName.ShadingLanguageVersion));
-			Console.WriteLine("*************************************\n");
-			#endif
-
-			initGL ();
-			CrowInterface.ProcessResize (iRect);
-		}
-
-		protected override void OnUpdateFrame(FrameEventArgs e)
-		{
-			base.OnUpdateFrame(e);
-			fps = (int)RenderFrequency;
-
-
-			if (frameCpt > 500) {
-				resetFps ();
-				frameCpt = 0;
-//				#if DEBUG
-//				GC.Collect();
-//				GC.WaitForPendingFinalizers();
-//				NotifyValueChanged("memory", GC.GetTotalMemory (false).ToString());
-//				#endif
-			}
-			frameCpt++;
-		}
-		protected override void OnRenderFrame(FrameEventArgs e)
-		{
-			GLClear ();
-
-			base.OnRenderFrame(e);
-
-			OnRender (e);
-			OpenGLDraw ();
-
-			SwapBuffers ();
-		}
 
 		protected override void OnResize(EventArgs e)
 		{
-			base.OnResize (e);
+			//base.OnResize (e);
 			UpdateViewMatrix ();
 		}
 		#endregion
 
 		#region Mouse Handling
-		void update_mouseButtonStates(ref MouseState e, OpenTK.Input.MouseState otk_e){
-			for (int i = 0; i < MouseState.MaxButtons; i++) {
-				if (otk_e.IsButtonDown ((OpenTK.Input.MouseButton)i))
-					e.EnableBit (i);
-			}
-		}
-
 		Point mousePosition;
 		bool mouseIsInInterface = false;
 
@@ -359,7 +138,7 @@ namespace Crow
 			GL.GetInteger(GetPName.Viewport, viewport);
 		}
 
-		void Mouse_Move(object sender, OpenTK.Input.MouseMoveEventArgs otk_e)
+		protected override void Mouse_Move(object sender, OpenTK.Input.MouseMoveEventArgs otk_e)
         {
 			updateMousePosition (otk_e);
 
@@ -381,24 +160,24 @@ namespace Crow
 				UpdateViewMatrix ();
 			}
 
-			MouseMove.Raise (sender, otk_e);
+			//MouseMove.Raise (sender, otk_e);
         }
 
-		void Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
+		protected override void Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
         {
 			if (mouseIsInInterface & !Keyboard [OpenTK.Input.Key.ShiftLeft])
 				CrowInterface.ProcessMouseButtonUp ((int)otk_e.Button);
-			else
-				MouseButtonUp.Raise (sender, otk_e);
+//			else
+//				MouseButtonUp.Raise (sender, otk_e);
         }
-		void Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
+		protected override void Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
 		{
 			if (mouseIsInInterface & !Keyboard [OpenTK.Input.Key.ShiftLeft])
 				CrowInterface.ProcessMouseButtonDown ((int)otk_e.Button);
-			else
-				MouseButtonDown.Raise (sender, otk_e);
+//			else
+//				MouseButtonDown.Raise (sender, otk_e);
         }
-		void Mouse_WheelChanged(object sender, OpenTK.Input.MouseWheelEventArgs otk_e)
+		protected override void Mouse_WheelChanged(object sender, OpenTK.Input.MouseWheelEventArgs otk_e)
         {
 			if (mouseIsInInterface & !Keyboard [OpenTK.Input.Key.ShiftLeft]) {
 				CrowInterface.ProcessMouseWheelChanged (otk_e.DeltaPrecise);
@@ -416,26 +195,9 @@ namespace Crow
 				eyeDist = zFar;
 			UpdateViewMatrix ();
 
-			MouseWheelChanged.Raise (sender, otk_e);
+//			MouseWheelChanged.Raise (sender, otk_e);
         }
 		#endregion
-
-		#region keyboard Handling
-		void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
-		{
-			if (!CrowInterface.ProcessKeyDown((int)otk_e.Key))
-				KeyboardKeyDown.Raise (this, otk_e);
-        }
-		void Keyboard_KeyUp(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
-		{
-			if (!CrowInterface.ProcessKeyUp((int)otk_e.Key))
-				KeyboardKeyUp.Raise (this, otk_e);
-		}
-		void OpenTKGameWindow_KeyPress (object sender, OpenTK.KeyPressEventArgs e)
-		{
-			CrowInterface.ProcessKeyPress (e.KeyChar);
-		}
-        #endregion
 
 		static Vector4 UnProject(ref Matrix4 projection, ref Matrix4 view, int[] viewport, Vector2 mouse)
 		{

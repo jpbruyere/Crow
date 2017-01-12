@@ -168,8 +168,12 @@ namespace Crow
 		public vaoMesh quad;
 		public Matrix4 projection;
 
+		protected virtual Matrix4 InterfaceMVP {
+			get { return projection; }
+		}
+
 		/// <summary>Create the texture for the interface redering</summary>
-		void createContext()
+		protected virtual void createContext()
 		{
 			if (GL.IsTexture(texID))
 				GL.DeleteTexture (texID);
@@ -187,7 +191,7 @@ namespace Crow
 			GL.BindTexture(TextureTarget.Texture2D, 0);
 		}
 		/// <summary>Rendering of the interface</summary>
-		void OpenGLDraw()
+		protected virtual void OpenGLDraw()
 		{
 			#if MEASURE_TIME
 			glDrawMeasure.StartCycle();
@@ -199,7 +203,7 @@ namespace Crow
 			GL.Disable (EnableCap.DepthTest);
 
 			shader.Enable ();
-			shader.SetMVP (projection);
+			shader.SetMVP (InterfaceMVP);
 			GL.ActiveTexture (TextureUnit.Texture0);
 			GL.BindTexture (TextureTarget.Texture2D, texID);
 			if (Monitor.TryEnter(CrowInterface.RenderMutex)) {
@@ -234,7 +238,12 @@ namespace Crow
 		{
 			GL.Clear (ClearBufferMask.ColorBufferBit|ClearBufferMask.DepthBufferBit);
 		}
-
+		protected virtual void initGL(){
+			GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			projection = OpenTK.Matrix4.CreateOrthographicOffCenter (-0.5f, 0.5f, -0.5f, 0.5f, 1, -1);
+			shader = new Shader ();
+			quad = new Crow.vaoMesh (0, 0, 0, 1, 1, 1, -1);
+		}
 		#region Game win overrides
 		protected override void OnLoad(EventArgs e)
 		{
@@ -248,8 +257,6 @@ namespace Crow
 			Mouse.ButtonUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonUp);
 			Mouse.Move += new EventHandler<OpenTK.Input.MouseMoveEventArgs>(Mouse_Move);
 
-			GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
 			#if DEBUG
 			Console.WriteLine("\n\n*************************************");
 			Console.WriteLine("GL version: " + GL.GetString (StringName.Version));
@@ -258,10 +265,7 @@ namespace Crow
 			Console.WriteLine("*************************************\n");
 			#endif
 
-			projection = OpenTK.Matrix4.CreateOrthographicOffCenter (-0.5f, 0.5f, -0.5f, 0.5f, 1, -1);
-
-			shader = new Shader ();
-			quad = new Crow.vaoMesh (0, 0, 0, 1, 1, 1, -1);
+			initGL ();
 		}
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
@@ -314,22 +318,22 @@ namespace Crow
 					e.EnableBit (i);
 			}
 		}
-		void Mouse_Move(object sender, OpenTK.Input.MouseMoveEventArgs otk_e)
+		protected virtual void Mouse_Move(object sender, OpenTK.Input.MouseMoveEventArgs otk_e)
         {
 			if (!CrowInterface.ProcessMouseMove (otk_e.X, otk_e.Y))
 				MouseMove.Raise (sender, otk_e);
         }
-		void Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
+		protected virtual void Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
         {
 			if (!CrowInterface.ProcessMouseButtonUp ((int)otk_e.Button))
 				MouseButtonUp.Raise (sender, otk_e);
         }
-		void Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
+		protected virtual void Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
 		{
 			if (!CrowInterface.ProcessMouseButtonDown ((int)otk_e.Button))
 				MouseButtonDown.Raise (sender, otk_e);
         }
-		void Mouse_WheelChanged(object sender, OpenTK.Input.MouseWheelEventArgs otk_e)
+		protected virtual void Mouse_WheelChanged(object sender, OpenTK.Input.MouseWheelEventArgs otk_e)
         {
 			if (!CrowInterface.ProcessMouseWheelChanged (otk_e.DeltaPrecise))
 				MouseWheelChanged.Raise (sender, otk_e);
@@ -337,17 +341,17 @@ namespace Crow
 		#endregion
 
 		#region keyboard Handling
-		void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
+		protected virtual void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
 		{
 			if (!CrowInterface.ProcessKeyDown((int)otk_e.Key))
 				KeyboardKeyDown.Raise (this, otk_e);
         }
-		void Keyboard_KeyUp(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
+		protected virtual void Keyboard_KeyUp(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
 		{
 			if (!CrowInterface.ProcessKeyUp((int)otk_e.Key))
 				KeyboardKeyUp.Raise (this, otk_e);
 		}
-		void OpenTKGameWindow_KeyPress (object sender, OpenTK.KeyPressEventArgs e)
+		protected virtual void OpenTKGameWindow_KeyPress (object sender, OpenTK.KeyPressEventArgs e)
 		{
 			CrowInterface.ProcessKeyPress (e.KeyChar);
 		}
