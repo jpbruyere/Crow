@@ -26,7 +26,7 @@ using Crow;
 
 namespace Tests
 {
-	class Hello3D : CrowWindow3D
+	class Hello3D : CrowWindow
 	{
 		[STAThread]
 		static void Main ()
@@ -40,9 +40,23 @@ namespace Tests
 		{
 		}
 
+		public Matrix4 modelview, projection;
+		public int[] viewport = new int[4];
+		public Vector3 vEyeTarget = new Vector3(0f, 0f, 0f);
+		public Vector3 vEye;
+		public Vector3 vLookInit = Vector3.Normalize(new Vector3(-1.0f, -1.0f, 1.0f));
+		public Vector3 vLook;  // Camera vLook Vector
+		public float zNear = 0.001f, zFar = 300.0f;
+		public float fovY = (float)Math.PI / 4;
+		public float eyeDist = 10.2f;
+		public float viewZangle, viewXangle;
+		public const float MoveSpeed = 0.02f;
+		public const float RotationSpeed = 0.005f;
+		public const float ZoomSpeed = 0.22f;
+
 		vaoMesh cube;
 		Texture texture;
-
+		ProjectiveIFaceControler iface3D;
 
 		void initGL(){
 			GL.Enable (EnableCap.CullFace);
@@ -51,38 +65,30 @@ namespace Tests
 
 			cube = vaoMesh.CreateCube ();
 			texture = new Texture ("image/textest.png");
-
-//			projection =
-//				Matrix4.CreatePerspectiveFieldOfView (
-//					MathHelper.PiOver4,
-//					ClientRectangle.Width / (float)ClientRectangle.Height, 1.0f, 10.0f);
-//			modelview = Matrix4.LookAt(vEye*eyeDist, Vector3.Zero, Vector3.UnitZ);
 		}
-//		Vector3 vEye = new Vector3(1,1,1).Normalized();
-//		float eyeDist = 5f;
-//		const float rotSpeed = -0.03f;
+
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
 
-			//MouseMove += HelloCube_MouseMove;
+			MouseMove += HelloCube_MouseMove;
+			MouseWheelChanged += Hello3D_MouseWheelChanged;
 
-			CrowInterface.LoadInterface (@"Interfaces/Divers/0.crow");
+			iface3D = Add3DInterface (2048, 2048,
+				Matrix4.CreateScale (6f) *
+				Matrix4.CreateRotationX (MathHelper.PiOver2) *
+				Matrix4.CreateTranslation (Vector3.UnitY * -1.1f));
+			Load (@"Interfaces/Divers/0.crow").DataSource = this;
 			initGL ();
 			shader.Enable ();
 		}
 
-//		void HelloCube_MouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
-//		{
-//			if (e.Mouse.MiddleButton == OpenTK.Input.ButtonState.Pressed) {
-//				Vector2 vPerp = vEye.Xy.PerpendicularLeft;
-//				vEye = vEye.Transform (
-//					Matrix4.CreateFromAxisAngle (new Vector3 (vPerp.X, vPerp.Y, 0), e.YDelta * rotSpeed) *
-//					Matrix4.CreateRotationZ (e.XDelta * rotSpeed)
-//				).Normalized ();
-//				modelview = Matrix4.LookAt (vEye * eyeDist, Vector3.Zero, Vector3.UnitZ);
-//			}
-//		}
+		protected override void OnResize (EventArgs e)
+		{
+			base.OnResize (e);
+			UpdateViewMatrix ();
+		}
+
 		public override void OnRender (FrameEventArgs e)
 		{			
 			base.OnRender (e);
@@ -94,5 +100,50 @@ namespace Tests
 			GL.BindTexture (TextureTarget.Texture2D, 0);
 		}
 
+		public void UpdateViewMatrix()
+		{
+			Rectangle r = this.ClientRectangle;
+			GL.Viewport( r.X, r.Y, r.Width, r.Height);
+			projection = Matrix4.CreatePerspectiveFieldOfView (fovY, r.Width / (float)r.Height, zNear, zFar);
+			vLook = vLookInit.Transform(
+				Matrix4.CreateRotationX (viewXangle)*
+				Matrix4.CreateRotationZ (viewZangle));
+			vLook.Normalize();
+			vEye = vEyeTarget + vLook * eyeDist;
+			modelview = Matrix4.LookAt(vEye, vEyeTarget, Vector3.UnitZ);
+			GL.GetInteger(GetPName.Viewport, viewport);
+
+			iface3D.UpdateView (projection, modelview, viewport, vEye);
+		}
+
+		void HelloCube_MouseMove(object sender, OpenTK.Input.MouseMoveEventArgs otk_e)
+		{
+			if (otk_e.Mouse.MiddleButton == OpenTK.Input.ButtonState.Pressed) {
+				viewZangle -= (float)otk_e.XDelta * RotationSpeed;
+				viewXangle -= (float)otk_e.YDelta * RotationSpeed;
+				UpdateViewMatrix ();
+			} else if (otk_e.Mouse.LeftButton == OpenTK.Input.ButtonState.Pressed) {
+				return;
+			} else if (otk_e.Mouse.RightButton == OpenTK.Input.ButtonState.Pressed) {
+				Vector2 v2Look = vLook.Xy.Normalized ();
+				Vector2 disp = v2Look.PerpendicularLeft * otk_e.XDelta * MoveSpeed +
+					v2Look * otk_e.YDelta * MoveSpeed;
+				vEyeTarget += new Vector3 (disp.X, disp.Y, 0);
+				UpdateViewMatrix ();
+			}
+		}
+		void Hello3D_MouseWheelChanged (object sender, OpenTK.Input.MouseWheelEventArgs e)
+		{
+			float speed = ZoomSpeed;
+			if (Keyboard[OpenTK.Input.Key.ControlLeft])
+				speed *= 20.0f;
+
+			eyeDist -= e.Delta * speed;
+			if (eyeDist < zNear)
+				eyeDist = zNear;
+			else if (eyeDist > zFar)
+				eyeDist = zFar;
+			UpdateViewMatrix ();
+		}
 	}
 }

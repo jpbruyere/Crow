@@ -14,7 +14,7 @@ namespace Tests
 		{
 			base.OnLoad (e);
 
-			CrowInterface.AddWidget(new Label("Hello World"));
+			AddWidget(new Label("Hello World"));
 		}
 
 		[STAThread]

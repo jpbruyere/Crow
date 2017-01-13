@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace Tests
 {
-	class BasicTests : CrowWindow3D
+	class BasicTests : CrowWindow
 	{
 		public BasicTests ()
 			: base(800, 600,"test: press <F3> to toogle test files")
@@ -129,7 +129,7 @@ namespace Tests
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Unsorted", "*.crow")).ToArray ();
 
 			object tc = Color.AirForceBlueRaf;
-			CrowInterface.LoadInterface(testFiles[idx]).DataSource = this;
+			Load(testFiles[idx]).DataSource = this;
 		}
 		void KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
@@ -141,19 +141,19 @@ namespace Tests
 				NotifyValueChanged ("TestList", TestList);
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F4) {
-				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/TemplatedContainer/testWindow.goml");
+				GraphicObject w = Load ("Interfaces/TemplatedContainer/testWindow.goml");
 				w.DataSource = this;
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F5) {
-				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/TemplatedContainer/testWindow2.goml");
+				GraphicObject w = Load ("Interfaces/TemplatedContainer/testWindow2.goml");
 				w.DataSource = this;
 				return;
 			}else if (e.Key == OpenTK.Input.Key.F6) {
-				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/0.crow");
+				GraphicObject w = Load ("Interfaces/Divers/0.crow");
 				w.DataSource = this;
 				return;
 			}else if (e.Key == OpenTK.Input.Key.F7) {
-				GraphicObject w = CrowInterface.LoadInterface ("Interfaces/Divers/perfMeasures.crow");
+				GraphicObject w = Load ("Interfaces/Divers/perfMeasures.crow");
 				w.DataSource = this;
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F2)
@@ -162,61 +162,61 @@ namespace Tests
 				idx++;
 			else
 				return;
-		
+
 			try {
-				CrowInterface.ClearInterface ();
+				ClearInterface ();
 
 				if (idx == testFiles.Length)
 					idx = 0;
 				else if (idx < 0)
 					idx = testFiles.Length - 1;
-				
+
 				this.Title = testFiles [idx] + ". Press <F3> to cycle examples.";
 
-				GraphicObject obj = CrowInterface.LoadInterface(testFiles[idx]);
+				GraphicObject obj = Load (testFiles[idx]);
 				obj.DataSource = this;
 			} catch (Exception ex) {
 				Debug.WriteLine (ex.Message + ex.InnerException);
 			}
 		}
-		void Tv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
-		{
-			FileInfo fi = e.NewValue as FileInfo;
-			if (fi == null)
-				return;
-			if (fi.Extension == ".crow" || fi.Extension == ".goml") {
-				Instantiator i = new Instantiator(fi.FullName);
-				lock (CrowInterface.UpdateMutex) {
-					(CrowInterface.FindByName ("crowContainer") as Container).SetChild
-					(i.CreateInstance(CrowInterface));
-					//CurSources = i.GetImlSourcesCode();
-				}
-			}
-		}
-		void onImlSourceChanged(Object sender, TextChangeEventArgs e){
-			Instantiator i;
-			try {
-				i = Instantiator.CreateFromImlFragment (e.Text);
-			} catch (Exception ex) {
-				Debug.WriteLine (ex);
-				return;
-			}
-			lock (CrowInterface.UpdateMutex) {
-				(CrowInterface.FindByName ("crowContainer") as Container).SetChild
-				(i.CreateInstance(CrowInterface));
-			}
-		}
+//		void Tv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
+//		{
+//			FileInfo fi = e.NewValue as FileInfo;
+//			if (fi == null)
+//				return;
+//			if (fi.Extension == ".crow" || fi.Extension == ".goml") {
+//				Instantiator i = new Instantiator(fi.FullName);
+//				lock (ifaceControl.CrowInterface.UpdateMutex) {
+//					(ifaceControl.CrowInterface.FindByName ("crowContainer") as Container).SetChild
+//					(i.CreateInstance(ifaceControl.CrowInterface));
+//					//CurSources = i.GetImlSourcesCode();
+//				}
+//			}
+//		}
+//		void onImlSourceChanged(Object sender, TextChangeEventArgs e){
+//			Instantiator i;
+//			try {
+//				i = Instantiator.CreateFromImlFragment (e.Text);
+//			} catch (Exception ex) {
+//				Debug.WriteLine (ex);
+//				return;
+//			}
+//			lock (ifaceControl.CrowInterface.UpdateMutex) {
+//				(ifaceControl.CrowInterface.FindByName ("crowContainer") as Container).SetChild
+//				(i.CreateInstance(ifaceControl.CrowInterface));
+//			}
+//		}
 		void onButClick(object send, MouseButtonEventArgs e)
 		{
 			Console.WriteLine ("button clicked:" + send.ToString());
 		}
-		void onAddTabButClick(object sender, MouseButtonEventArgs e){
-
-			TabView tv = CrowInterface.FindByName("tabview1") as TabView;
-			if (tv == null)
-				return;
-			tv.AddChild (new TabItem () { Caption = "NewTab" });
-		}
+//		void onAddTabButClick(object sender, MouseButtonEventArgs e){
+//
+//			TabView tv = ifaceControl.CrowInterface.FindByName("tabview1") as TabView;
+//			if (tv == null)
+//				return;
+//			tv.AddChild (new TabItem () { Caption = "NewTab" });
+//		}
 		[STAThread]
 		static void Main ()
 		{

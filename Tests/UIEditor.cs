@@ -44,7 +44,7 @@ namespace Tests
 		{
 			base.OnLoad (e);
 
-			CrowInterface.AddWidget(
+			AddWidget(
 				new Window ()
 				{
 					Title = "Hello World"
