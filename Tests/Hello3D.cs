@@ -74,7 +74,7 @@ namespace Tests
 			MouseMove += HelloCube_MouseMove;
 			MouseWheelChanged += Hello3D_MouseWheelChanged;
 
-			iface3D = Add3DInterface (2048, 2048,
+			iface3D = Add3DInterface (800, 800,
 				Matrix4.CreateScale (6f) *
 				Matrix4.CreateRotationX (MathHelper.PiOver2) *
 				Matrix4.CreateTranslation (Vector3.UnitY * -1.1f));
