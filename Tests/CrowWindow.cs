@@ -186,6 +186,14 @@ namespace Crow
 							new Rectangle (0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height)));
 			return ifaceControl [interfaceIdx].CrowInterface.LoadInterface (path);
 		}
+		public GraphicObject FindByName (string nameToFind){
+			for (int i = 0; i < ifaceControl.Count; i++) {
+				GraphicObject tmp = ifaceControl [i].CrowInterface.FindByName (nameToFind);
+				if (tmp != null)
+					return tmp;
+			}
+			return null;
+		}
 		public void ClearInterface (int interfaceIdx = 0){
 			ifaceControl [interfaceIdx].CrowInterface.ClearInterface ();
 		}

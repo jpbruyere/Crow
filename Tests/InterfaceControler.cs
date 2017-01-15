@@ -53,7 +53,12 @@ namespace Crow
 		public override void ProcessResize (Rectangle newSize)
 		{
 		}
-
+		public override void OpenGLDraw ()
+		{
+			GL.Enable (EnableCap.DepthTest);
+			base.OpenGLDraw ();
+			GL.Disable (EnableCap.DepthTest);
+		}
 		public void UpdateView (Matrix4 _projection, Matrix4 _modelview, int[] _viewport, Vector3 _vEyePosition)
 		{
 			projection = _projection;
@@ -64,7 +69,7 @@ namespace Crow
 		public override bool ProcessMouseMove (int x, int y)
 		{
 			Matrix4 mv = ifaceModelMat * modelview;
-			Vector3 vMouse = Extensions.UnProject(ref projection, ref mv, viewport, new Vector2 (x, y)).Xyz;
+			Vector3 vMouse = UnProject(ref projection, ref mv, viewport, new Vector2 (x, y)).Xyz;
 			Vector3 vE = vEyePosition.Transform (ifaceModelMat.Inverted());
 			Vector3 vMouseRay = Vector3.Normalize(vMouse - vE);
 			float a = vE.Z / vMouseRay.Z;
@@ -75,6 +80,30 @@ namespace Crow
 			mouseIsInInterface = localMousePos.X.IsInBetween (0, iRect.Width) & localMousePos.Y.IsInBetween (0, iRect.Height);
 
 			return mouseIsInInterface ? CrowInterface.ProcessMouseMove (localMousePos.X, localMousePos.Y) : false;
+		}
+		Vector4 UnProject(ref Matrix4 projection, ref Matrix4 view, int[] viewport, Vector2 mouse)
+		{
+			Vector4 vec;
+
+			vec.X = 2.0f * mouse.X / (float)viewport[2] - 1;
+			vec.Y = -(2.0f * mouse.Y / (float)viewport[3] - 1);
+			vec.Z = 0f;
+			vec.W = 1.0f;
+
+			Matrix4 viewInv = Matrix4.Invert(view);
+			Matrix4 projInv = Matrix4.Invert(projection);
+
+			Vector4.Transform(ref vec, ref projInv, out vec);
+			Vector4.Transform(ref vec, ref viewInv, out vec);
+
+			if (vec.W > float.Epsilon || vec.W < float.Epsilon)
+			{
+				vec.X /= vec.W;
+				vec.Y /= vec.W;
+				vec.Z /= vec.W;
+			}
+
+			return vec;
 		}
 	}
 	public class InterfaceControler {
