@@ -83,9 +83,6 @@ namespace Crow
 //		{
 //			return new Color (v.X, v.Y, v.Z, v.W);
 //		}
-		public static implicit operator Fill(Color c){
-			return new SolidColor (c) as Fill;
-		}
 
 
 		public static bool operator ==(Color left, Color right)
