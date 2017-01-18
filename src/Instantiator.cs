@@ -822,7 +822,7 @@ namespace Crow
 			//the actual value of the origin member of the datasource and then will bind the value changed
 			//dyn methode.
 			//dm is bound to the instanciator instance to have access to cached dyn meth and delegates
-			dm = new DynamicMethod ("dyn_dschanged",
+			dm = new DynamicMethod ("dyn_dschanged" + NewId,
 				typeof (void),
 				CompilerServices.argsBoundDSChange, true);
 
@@ -846,10 +846,10 @@ namespace Crow
 					il.Emit (OpCodes.Brfalse, cancelRemove);//old parent is null
 
 					//remove handler
+					il.Emit (OpCodes.Ldarg_1);//3d arg: instance bound to delegate (the source)
+					il.Emit (OpCodes.Ldstr, "ValueChanged");//2nd arg event name
 					il.Emit (OpCodes.Ldarg_2);//1st arg load old datasource
 					il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
-					il.Emit (OpCodes.Ldstr, "ValueChanged");//2nd arg event name
-					il.Emit (OpCodes.Ldarg_1);//3d arg: instance bound to delegate (the source)
 					il.Emit (OpCodes.Call, CompilerServices.miRemEvtHdlByTarget);
 					il.MarkLabel(cancelRemove);
 				}
@@ -928,6 +928,11 @@ namespace Crow
 			Type tDest = dest.GetType ();
 			PropertyInfo piOrig = tOrig.GetProperty (origMember);
 			PropertyInfo piDest = tDest.GetProperty (destMember);
+
+			if (piDest == null) {
+				Debug.WriteLine ("Member '{0}' not found in new DataSource '{1}' of '{2}'", destMember, dest, orig);
+				return;
+			}
 
 			#region ValueChanged emit
 			DynamicMethod dm = new DynamicMethod ("dyn_valueChanged" + NewId,
