@@ -667,6 +667,8 @@ namespace Crow
 
 					il.Emit (OpCodes.Ldstr, strcst);
 
+				}else if (string.Equals(rop,"this",StringComparison.OrdinalIgnoreCase)){
+					il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack
 				} else {
 					if (lopT.IsEnum)
 						throw new NotImplementedException ();
