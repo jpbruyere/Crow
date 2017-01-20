@@ -237,71 +237,6 @@ namespace Crow
 		#endregion
 
 		#region Reflexion helpers
-		/// <summary>
-		/// Gets all extension methods defined in assembly for Type
-		/// </summary>
-		/// <returns>Extension methods enumerable</returns>
-		/// <param name="assembly">Assembly</param>
-		/// <param name="extendedType">Extended type to search for</param>
-		internal static IEnumerable<MethodInfo> GetExtensionMethods (Assembly assembly,
-			Type extendedType)
-		{
-			IEnumerable<MethodInfo> query = null;
-			Type curType = extendedType;
-
-			do {
-				query = from type in assembly.GetTypes ()
-						where type.IsSealed && !type.IsGenericType && !type.IsNested
-					from method in type.GetMethods (BindingFlags.Static
-						| BindingFlags.Public | BindingFlags.NonPublic)
-						where method.IsDefined (typeof (ExtensionAttribute), false)
-						where method.GetParameters () [0].ParameterType == curType
-					select method;
-
-				if (query.Count () > 0)
-					break;
-
-				curType = curType.BaseType;
-			} while (curType != null);
-
-			return query;
-		}
-		/// <summary>
-		/// search for extentions method in entry assembly then in crow assembly
-		/// </summary>
-		/// <returns>Extention MethodInfo</returns>
-		/// <param name="t">Extended type</param>
-		/// <param name="methodName">Extention method name</param>
-		internal static MethodInfo SearchExtMethod(Type t, string methodName){
-			MethodInfo mi = null;
-			mi = GetExtensionMethods (Assembly.GetEntryAssembly(), t)
-				.Where (em => em.Name == methodName).FirstOrDefault ();
-			if (mi != null)
-				return mi;
-
-			return GetExtensionMethods (Assembly.GetExecutingAssembly(), t)
-				.Where (em => em.Name == methodName).FirstOrDefault ();
-		}
-		/// <summary>
-		/// retrieve event handler in class or ancestors
-		/// </summary>
-		static FieldInfo getEventHandlerField (Type type, string eventName)
-		{
-			FieldInfo fi;
-			Type ty = type;
-			do {
-				fi = ty.GetField (eventName,
-					BindingFlags.NonPublic |
-					BindingFlags.Instance |
-					BindingFlags.GetField);
-				ty = ty.BaseType;
-				if (ty == null)
-					break;
-			} while (fi == null);
-			return fi;
-		}
-
-
 		static MemberInfo getMemberInfoWithReflexion(object instance, string member){
 			return instance.GetType ().GetMember (member)?.FirstOrDefault();
 		}
@@ -374,6 +309,87 @@ namespace Crow
 
 			return null;
 		}
+		/// <summary>
+		/// Gets all extension methods defined in assembly for Type
+		/// </summary>
+		/// <returns>Extension methods enumerable</returns>
+		/// <param name="assembly">Assembly</param>
+		/// <param name="extendedType">Extended type to search for</param>
+		internal static IEnumerable<MethodInfo> GetExtensionMethods (Assembly assembly,
+			Type extendedType)
+		{
+			IEnumerable<MethodInfo> query = null;
+			Type curType = extendedType;
+
+			do {
+				query = from type in assembly.GetTypes ()
+						where type.IsSealed && !type.IsGenericType && !type.IsNested
+					from method in type.GetMethods (BindingFlags.Static
+						| BindingFlags.Public | BindingFlags.NonPublic)
+						where method.IsDefined (typeof (ExtensionAttribute), false)
+						where method.GetParameters () [0].ParameterType == curType
+					select method;
+
+				if (query.Count () > 0)
+					break;
+
+				curType = curType.BaseType;
+			} while (curType != null);
+
+			return query;
+		}
+		/// <summary>
+		/// search for extentions method in entry assembly then in crow assembly
+		/// </summary>
+		/// <returns>Extention MethodInfo</returns>
+		/// <param name="t">Extended type</param>
+		/// <param name="methodName">Extention method name</param>
+		internal static MethodInfo SearchExtMethod(Type t, string methodName){
+			MethodInfo mi = null;
+			mi = GetExtensionMethods (Assembly.GetEntryAssembly(), t)
+				.Where (em => em.Name == methodName).FirstOrDefault ();
+			if (mi != null)
+				return mi;
+
+			return GetExtensionMethods (Assembly.GetExecutingAssembly(), t)
+				.Where (em => em.Name == methodName).FirstOrDefault ();
+		}
+		/// <summary>
+		/// retrieve event handler in class or ancestors
+		/// </summary>
+		static FieldInfo getEventHandlerField (Type type, string eventName)
+		{
+			FieldInfo fi;
+			Type ty = type;
+			do {
+				fi = ty.GetField (eventName,
+					BindingFlags.NonPublic |
+					BindingFlags.Instance |
+					BindingFlags.GetField);
+				ty = ty.BaseType;
+				if (ty == null)
+					break;
+			} while (fi == null);
+			return fi;
+		}
+		/// <summary>
+		/// search for an implicit conversion method in origine or destination classes
+		/// </summary>
+		static MethodInfo getImplicitOp(Type origType, Type dstType){
+			foreach(MethodInfo mi in origType.GetMethods(BindingFlags.Public|BindingFlags.Static)){
+				if (mi.Name == "op_Implicit") {
+					if (mi.ReturnType == dstType && mi.GetParameters ().FirstOrDefault ().ParameterType == origType)
+						return mi;
+				}
+			}
+			foreach(MethodInfo mi in dstType.GetMethods(BindingFlags.Public|BindingFlags.Static)){
+				if (mi.Name == "op_Implicit") {
+					if (mi.ReturnType == dstType && mi.GetParameters ().FirstOrDefault ().ParameterType == origType)
+						return mi;
+				}
+			}
+			return null;
+		}
 		#endregion
 
 		/// <summary>
@@ -432,6 +448,7 @@ namespace Crow
 				return;
 			}
 		}
+
 		/// <summary>
 		/// Emit MSIL for conversion from orig type to dest type
 		/// </summary>
@@ -529,24 +546,7 @@ namespace Crow
 
 			il.MarkLabel (endConvert);
 		}
-		/// <summary>
-		/// search for an implicit conversion method in origine or destination classes
-		/// </summary>
-		static MethodInfo getImplicitOp(Type origType, Type dstType){
-			foreach(MethodInfo mi in origType.GetMethods(BindingFlags.Public|BindingFlags.Static)){
-				if (mi.Name == "op_Implicit") {
-					if (mi.ReturnType == dstType && mi.GetParameters ().FirstOrDefault ().ParameterType == origType)
-						return mi;
-				}
-			}
-			foreach(MethodInfo mi in dstType.GetMethods(BindingFlags.Public|BindingFlags.Static)){
-				if (mi.Name == "op_Implicit") {
-					if (mi.ReturnType == dstType && mi.GetParameters ().FirstOrDefault ().ParameterType == origType)
-						return mi;
-				}
-			}
-			return null;
-		}
+
 		/// <summary>
 		/// Removes delegate from event handler by name
 		/// </summary>
@@ -601,6 +601,7 @@ namespace Crow
 			}
 			return Delegate.CreateDelegate (eventType, instance, mi);
 		}
+
 		public static Delegate compileDynEventHandler2(EventInfo sourceEvent, string expression, NodeAddress currentNode = null){
 			#if DEBUG_BINDING
 			Debug.WriteLine ("\tCompile Event {0}: {1}", sourceEvent.Name, expression);
@@ -647,7 +648,7 @@ namespace Crow
 				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
 
 				if (lopParts.Length > 1) {
-					NodeAddress lopNA = getNodeAdressFromBindingExp (currentNode, lopParts);
+					NodeAddress lopNA = getNodeAdressFromBindingExp (currentNode, ref operandes [0]);
 					CompilerServices.emitGetInstance (il, currentNode, lopNA);
 					lopType = lopNA.NodeType;
 				}
@@ -771,7 +772,7 @@ namespace Crow
 				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack
 
 				if (lopParts.Length > 1) {
-					NodeAddress lopNA = getNodeAdressFromBindingExp (currentNode, lopParts);
+					NodeAddress lopNA = getNodeAdressFromBindingExp (currentNode, ref operandes [0]);
 					CompilerServices.emitGetInstance (il, currentNode, lopNA);
 					lopType = lopNA.NodeType;
 				}
@@ -876,29 +877,31 @@ namespace Crow
 			return exps.ToArray ();
 		}
 
-
 		/// <summary>
-		/// Gets the node adress from binding expression splitted with '/' starting at a given node
+		/// Gets the node adress from binding expression starting at sourceAddr
+		/// and return in expression remaining part
 		/// </summary>
-		internal static NodeAddress getNodeAdressFromBindingExp(NodeAddress sourceAddr, string[] bindingExp){
+		internal static NodeAddress getNodeAdressFromBindingExp(NodeAddress sourceAddr, ref string expression){
 			int ptr = sourceAddr.Count - 1;
+			string[] splitedExp = expression.Split ('/');
 
-			//if exp start with '/' => Graphic tree parsing start at source
-			if (string.IsNullOrEmpty (bindingExp [0])) {
-				//TODO:
-			} else if (bindingExp [0] == ".") { //search template root
+			if (splitedExp.Length < 2)//dataSource binding
+				return null;
+
+			if (string.IsNullOrEmpty (splitedExp [0]) || splitedExp [0] == ".") {//search template root
 				ptr--;
 				while (ptr >= 0) {
 					if (typeof(TemplatedControl).IsAssignableFrom (sourceAddr [ptr].CrowType))
 						break;
 					ptr--;
 				}
-			} else if (bindingExp [0] == "..") { //search starting at current node
-				int levelUp = bindingExp.Length - 1;
+			} else if (splitedExp [0] == "..") { //search starting at current node
+				int levelUp = splitedExp.Length - 1;
 				if (levelUp > ptr + 1)
 					throw new Exception ("Binding error: try to bind outside IML source");
 				ptr -= levelUp;
 			}
+			expression = splitedExp [splitedExp.Length - 1];
 			//TODO:change Template special address identified with Nodecount = 0 to something not using array count to 0,
 			//here linq is working without limits checking in compile option
 			//but defining a 0 capacity array with limits cheking enabled, cause 'out of memory' error

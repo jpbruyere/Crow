@@ -87,7 +87,7 @@ namespace Crow
 		}
 		#endregion
 
-		public GraphicObject CreateInstance(Interface iface){			
+		public GraphicObject CreateInstance(Interface iface){
 			return loader (iface) as GraphicObject;
 		}
 
@@ -380,21 +380,22 @@ namespace Crow
 					bindingDef.TwoWay = true;
 					expression = expression.Substring (1);
 				}
-				string[] bindingExp = expression.Split ('/');
 
-				if (bindingExp.Length > 1)
-					bindingDef.TargetNA = CompilerServices.getNodeAdressFromBindingExp (sourceNA, bindingExp);
+				string exp = expression;
+				bindingDef.TargetNA = CompilerServices.getNodeAdressFromBindingExp (sourceNA, ref exp);
 
-				string [] bindTrg = bindingExp.Last().Split ('.');
+				string [] bindTrg = exp.Split ('.');
 
+				if (bindTrg.Length == 0)
+					throw new Exception ("invalid binding expression: " + expression);
 				if (bindTrg.Length == 1)
 					bindingDef.TargetMember = bindTrg [0];
-				else if (bindTrg.Length == 2) {
-					//named target
-					bindingDef.TargetName = bindTrg[0];
-					bindingDef.TargetMember = bindTrg [1];
-				} else
-					throw new Exception ("Syntax error in binding, expected 'go dot member'");
+				else {
+					if (!string.IsNullOrEmpty(bindTrg[0]))//searchByName
+						bindingDef.TargetName = bindTrg[0];
+
+					bindingDef.TargetMember = exp.Substring (bindTrg[0].Length + 1);
+				}
 			}
 
 			return bindingDef;
