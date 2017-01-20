@@ -356,7 +356,7 @@ namespace Crow
 		void readPropertyBinding (Context ctx, string sourceMember, string expression)
 		{
 			NodeAddress sourceNA = ctx.CurrentNodeAddress;
-			BindingDefinition bindingDef = splitBindingExp (sourceNA, sourceMember, expression);
+			BindingDefinition bindingDef = genBindingDef (sourceNA, sourceMember, expression);
 
 			#if DEBUG_BINDING
 			Debug.WriteLine("Property Binding: " + bindingDef.ToString());
@@ -369,15 +369,9 @@ namespace Crow
 		}
 
 		/// <summary>
-		/// Splits the binding expression
+		/// get BindingDefinition from binding expression
 		/// </summary>
-		/// <returns><c>true</c>, if it's a two way binding, <c>false</c> otherwise.</returns>
-		/// <param name="sourceNA">Source Node address</param>
-		/// <param name="expression">Expression.</param>
-		/// <param name="targetNA">Target Node Address</param>
-		/// <param name="targetMember">Target member name</param>
-		/// <param name="targetName">Target node name</param>
-		BindingDefinition splitBindingExp(NodeAddress sourceNA, string sourceMember, string expression){
+		BindingDefinition genBindingDef(NodeAddress sourceNA, string sourceMember, string expression){
 			BindingDefinition bindingDef = new BindingDefinition(sourceNA, sourceMember);
 			if (string.IsNullOrEmpty (expression)) {
 				return bindingDef;
@@ -429,7 +423,7 @@ namespace Crow
 		/// <summary> Emits handler method bindings </summary>
 		void emitHandlerBinding (Context ctx, EventInfo sourceEvent, string expression){
 			NodeAddress currentNode = ctx.CurrentNodeAddress;
-			BindingDefinition bindingDef = splitBindingExp (currentNode, sourceEvent.Name, expression);
+			BindingDefinition bindingDef = genBindingDef (currentNode, sourceEvent.Name, expression);
 
 			#if DEBUG_BINDING
 			Debug.WriteLine("Event Binding: " + bindingDef.ToString());
@@ -437,7 +431,7 @@ namespace Crow
 
 			if (bindingDef.IsTemplateBinding | bindingDef.IsDataSourceBinding) {
 				//we need to bind datasource method to source event
-				DynamicMethod dm = new DynamicMethod ("dyn_dschangedForHandler" + NewId,
+				DynamicMethod dm = new DynamicMethod ("dyn_dsORtmpChangedForHandler" + NewId,
 					                   typeof(void),
 					                   CompilerServices.argsBoundDSChange, true);
 

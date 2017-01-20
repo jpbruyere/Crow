@@ -705,7 +705,7 @@ namespace Crow
 				string expression;
 				if (!getDefaultEvent(ei, styling, out expression))
 					continue;
-				//TODO:dynEventHandler could be cached somewhere, maybe a style instanciato class holding the styling delegate and bound to it.
+				//TODO:dynEventHandler could be cached somewhere, maybe a style instanciator class holding the styling delegate and bound to it.
 				foreach (string exp in CompilerServices.splitOnSemiColumnOutsideAccolades(expression)) {
 					string trimed = exp.Trim();
 					if (trimed.StartsWith ("{", StringComparison.OrdinalIgnoreCase)){
@@ -718,6 +718,7 @@ namespace Crow
 						il.Emit (OpCodes.Call, CompilerServices.miGetEvent);
 						//push expression as 2nd arg of compile
 						il.Emit (OpCodes.Ldstr, trimed.Substring (1, trimed.Length - 2));
+						//push null as 3rd arg, currentNode, not known when instanciing
 						il.Emit (OpCodes.Ldnull);
 						il.Emit (OpCodes.Callvirt, CompilerServices.miCompileDynEventHandler);
 						il.Emit (OpCodes.Castclass, ei.EventHandlerType);
