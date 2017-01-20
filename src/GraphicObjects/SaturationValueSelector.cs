@@ -42,7 +42,7 @@ namespace Crow
 				NotifyValueChanged ("V", v);
 				mousePos.Y = (int)Math.Floor((1.0-v) * (double)ClientRectangle.Height);
 
-				CurrentInterface.EnqueueForRepaint (this);
+				RegisterForRedraw ();
 			}
 		}
 		[XmlAttributeAttribute()]
@@ -54,7 +54,8 @@ namespace Crow
 				s = value;
 				NotifyValueChanged ("S", s);
 				mousePos.X = (int)Math.Floor(s * (double)ClientRectangle.Width);
-				CurrentInterface.EnqueueForRepaint (this);
+
+				RegisterForRedraw ();
 			}
 		}
 		protected override void onDraw (Cairo.Context gr)
@@ -62,8 +63,6 @@ namespace Crow
 			base.onDraw (gr);
 
 			Rectangle r = ClientRectangle;
-			Rectangle rGrad = r;
-			rGrad.Inflate (-1);
 
 			if (Foreground != null) {//TODO:test if null should be removed
 				Foreground.SetAsSource (gr, r);
@@ -74,13 +73,13 @@ namespace Crow
 			Crow.Gradient grad = new Gradient (Gradient.Type.Horizontal);
 			grad.Stops.Add (new Gradient.ColorStop (0, new Color (1, 1, 1, 1)));
 			grad.Stops.Add (new Gradient.ColorStop (1, new Color (1, 1, 1, 0)));
-			grad.SetAsSource (gr, rGrad);
+			grad.SetAsSource (gr, r);
 			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
 			gr.Fill();
 			grad = new Gradient (Gradient.Type.Vertical);
 			grad.Stops.Add (new Gradient.ColorStop (0, new Color (0, 0, 0, 0)));
 			grad.Stops.Add (new Gradient.ColorStop (1, new Color (0, 0, 0, 1)));
-			grad.SetAsSource (gr, rGrad);
+			grad.SetAsSource (gr, r);
 			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
 			gr.Fill();
 		}
@@ -95,7 +94,7 @@ namespace Crow
 			ctx.Translate (rb.X, rb.Y);
 
 			ctx.SetSourceColor (Color.White);
-			ctx.Arc (mousePos.X, mousePos.Y, 3.0, 0, Math.PI * 2.0);
+			ctx.Arc (mousePos.X, mousePos.Y, 3.5, 0, Math.PI * 2.0);
 			ctx.LineWidth = 1.0;
 			ctx.Stroke ();
 
@@ -111,6 +110,8 @@ namespace Crow
 			v = 1.0 - (double)mousePos.Y / (double)cb.Height;
 			NotifyValueChanged ("S", s);
 			NotifyValueChanged ("V", v);
+
+			RegisterForRedraw ();
 		}
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{

@@ -91,6 +91,12 @@ Control {
 	Margin=0;
 	Spacing=3;
 }
+SaturationValueSelector {
+	Foreground=Red;
+}
+HueSelector {
+	ClipToClientRect=False;
+}
 ColorSpinner {
 	Minimum = 0;
 	Maximum = 255;

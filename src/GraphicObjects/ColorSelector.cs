@@ -54,36 +54,10 @@ namespace Crow
 			mousePos = mPos - r.Position;
 
 			mousePos.X = Math.Max(cb.X, mousePos.X);
-			mousePos.X = Math.Min(cb.Right-1, mousePos.X);
+			mousePos.X = Math.Min(cb.Right, mousePos.X);
 			mousePos.Y = Math.Max(cb.Y, mousePos.Y);
-			mousePos.Y = Math.Min(cb.Bottom-1, mousePos.Y);
+			mousePos.Y = Math.Min(cb.Bottom, mousePos.Y);
 		}
-//		virtual protected void updateColorFromPicking(bool redraw = true){
-//			SelectedColor = new SolidColor(getPixelAt(mousePos.X, mousePos.Y));
-//
-//			updateHSV ();
-//
-//			NotifyValueChanged ("R", R);
-//			NotifyValueChanged ("G", G);
-//			NotifyValueChanged ("B", B);
-//			NotifyValueChanged ("A", A);
-//
-//			if (redraw)
-//				RegisterForRedraw ();
-//		}
-//
-//		protected Color getPixelAt(int x, int y){
-//			if (bmp == null)
-//				return Color.Transparent;
-//
-//			int ptr = y * Slot.Width * 4 + x * 4;
-//
-//			return new Color(
-//				(double)bmp[ptr + 2] * colDiv,
-//				(double)bmp[ptr + 1] * colDiv,
-//				(double)bmp[ptr] * colDiv,
-//				(double)bmp[ptr + 3] * colDiv);
-//		}
 	}
 }
 
