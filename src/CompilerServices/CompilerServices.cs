@@ -648,7 +648,7 @@ namespace Crow
 				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
 
 				if (lopParts.Length > 1) {
-					NodeAddress lopNA = getNodeAdressFromBindingExp (currentNode, ref operandes [0]);
+					NodeAddress lopNA = currentNode.ResolveExpression (ref operandes [0]);
 					CompilerServices.emitGetInstance (il, currentNode, lopNA);
 					lopType = lopNA.NodeType;
 				}
@@ -772,7 +772,7 @@ namespace Crow
 				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack
 
 				if (lopParts.Length > 1) {
-					NodeAddress lopNA = getNodeAdressFromBindingExp (currentNode, ref operandes [0]);
+					NodeAddress lopNA = currentNode.ResolveExpression (ref operandes [0]);
 					CompilerServices.emitGetInstance (il, currentNode, lopNA);
 					lopType = lopNA.NodeType;
 				}
@@ -876,40 +876,6 @@ namespace Crow
 				exps.Add(expression);
 			return exps.ToArray ();
 		}
-
-		/// <summary>
-		/// Gets the node adress from binding expression starting at sourceAddr
-		/// and return in expression remaining part
-		/// </summary>
-		internal static NodeAddress getNodeAdressFromBindingExp(NodeAddress sourceAddr, ref string expression){
-			int ptr = sourceAddr.Count - 1;
-			string[] splitedExp = expression.Split ('/');
-
-			if (splitedExp.Length < 2)//dataSource binding
-				return null;
-
-			if (string.IsNullOrEmpty (splitedExp [0]) || splitedExp [0] == ".") {//search template root
-				ptr--;
-				while (ptr >= 0) {
-					if (typeof(TemplatedControl).IsAssignableFrom (sourceAddr [ptr].CrowType))
-						break;
-					ptr--;
-				}
-			} else if (splitedExp [0] == "..") { //search starting at current node
-				int levelUp = splitedExp.Length - 1;
-				if (levelUp > ptr + 1)
-					throw new Exception ("Binding error: try to bind outside IML source");
-				ptr -= levelUp;
-			}
-			expression = splitedExp [splitedExp.Length - 1];
-			//TODO:change Template special address identified with Nodecount = 0 to something not using array count to 0,
-			//here linq is working without limits checking in compile option
-			//but defining a 0 capacity array with limits cheking enabled, cause 'out of memory' error
-			return new NodeAddress (sourceAddr.Take(ptr+1).ToArray());//[ptr+1];
-			//Array.Copy (sourceAddr.ToArray (), targetNode, ptr + 1);
-			//return new NodeAddress (targetNode);
-		}
-
 	}
 }
 

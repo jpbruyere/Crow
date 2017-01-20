@@ -356,7 +356,7 @@ namespace Crow
 		void readPropertyBinding (Context ctx, string sourceMember, string expression)
 		{
 			NodeAddress sourceNA = ctx.CurrentNodeAddress;
-			BindingDefinition bindingDef = genBindingDef (sourceNA, sourceMember, expression);
+			BindingDefinition bindingDef = sourceNA.GetBindingDef (sourceMember, expression);
 
 			#if DEBUG_BINDING
 			Debug.WriteLine("Property Binding: " + bindingDef.ToString());
@@ -366,39 +366,6 @@ namespace Crow
 				emitDataSourceBindings (ctx, bindingDef);
 			else
 				ctx.StorePropertyBinding (bindingDef);
-		}
-
-		/// <summary>
-		/// get BindingDefinition from binding expression
-		/// </summary>
-		BindingDefinition genBindingDef(NodeAddress sourceNA, string sourceMember, string expression){
-			BindingDefinition bindingDef = new BindingDefinition(sourceNA, sourceMember);
-			if (string.IsNullOrEmpty (expression)) {
-				return bindingDef;
-			} else {
-				if (expression.StartsWith ("²")) {
-					bindingDef.TwoWay = true;
-					expression = expression.Substring (1);
-				}
-
-				string exp = expression;
-				bindingDef.TargetNA = CompilerServices.getNodeAdressFromBindingExp (sourceNA, ref exp);
-
-				string [] bindTrg = exp.Split ('.');
-
-				if (bindTrg.Length == 0)
-					throw new Exception ("invalid binding expression: " + expression);
-				if (bindTrg.Length == 1)
-					bindingDef.TargetMember = bindTrg [0];
-				else {
-					if (!string.IsNullOrEmpty(bindTrg[0]))//searchByName
-						bindingDef.TargetName = bindTrg[0];
-
-					bindingDef.TargetMember = exp.Substring (bindTrg[0].Length + 1);
-				}
-			}
-
-			return bindingDef;
 		}
 
 		#region Emit Helper
@@ -424,7 +391,7 @@ namespace Crow
 		/// <summary> Emits handler method bindings </summary>
 		void emitHandlerBinding (Context ctx, EventInfo sourceEvent, string expression){
 			NodeAddress currentNode = ctx.CurrentNodeAddress;
-			BindingDefinition bindingDef = genBindingDef (currentNode, sourceEvent.Name, expression);
+			BindingDefinition bindingDef = currentNode.GetBindingDef (sourceEvent.Name, expression);
 
 			#if DEBUG_BINDING
 			Debug.WriteLine("Event Binding: " + bindingDef.ToString());
