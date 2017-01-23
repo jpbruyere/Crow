@@ -42,6 +42,9 @@ namespace Crow
 		internal static MethodInfo miCreateDel = typeof(CompilerServices).GetMethod ("createDel", BindingFlags.Static | BindingFlags.NonPublic);
 		internal static MethodInfo miGetImplOp = typeof(CompilerServices).GetMethod ("getImplicitOp", BindingFlags.Static | BindingFlags.NonPublic);
 
+
+		internal static MethodInfo miGoUpLevels = typeof(CompilerServices).GetMethod("goUpNbLevels", BindingFlags.Static | BindingFlags.NonPublic);
+
 		internal static FieldInfo fiCachedDel = typeof(Instantiator).GetField("cachedDelegates", BindingFlags.Instance | BindingFlags.NonPublic);
 		internal static FieldInfo fiTemplateBinding = typeof(Instantiator).GetField("templateBinding", BindingFlags.Instance | BindingFlags.NonPublic);
 		internal static MethodInfo miDSChangeEmitHelper = typeof(Instantiator).GetMethod("dataSourceChangedEmitHelper", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -602,7 +605,7 @@ namespace Crow
 			return Delegate.CreateDelegate (eventType, instance, mi);
 		}
 
-		public static Delegate compileDynEventHandler2(EventInfo sourceEvent, string expression, NodeAddress currentNode = null){
+		internal static Delegate compileDynEventHandler(EventInfo sourceEvent, string expression, NodeAddress currentNode = null){
 			#if DEBUG_BINDING
 			Debug.WriteLine ("\tCompile Event {0}: {1}", sourceEvent.Name, expression);
 			#endif
@@ -630,95 +633,71 @@ namespace Crow
 			string [] srcLines = expression.Trim ().Split (new char [] { ';' });
 
 			foreach (string srcLine in srcLines) {
-				string statement = srcLine.Trim ();
-
-				string [] operandes = statement.Split (new char [] { '=' });
-				if (operandes.Length < 2) //not an affectation
-				{
-					//maybe we could handle here handler function name
+				if (string.IsNullOrEmpty (srcLine))
 					continue;
-				}
+				string [] operandes = srcLine.Trim ().Split (new char [] { '=' });
+				if (operandes.Length != 2) //not an affectation
+					throw new NotSupportedException ();
 
-				string rop = operandes [operandes.Length - 1].Trim ();
+				System.Reflection.Emit.Label cancel = il.DefineLabel ();
+				System.Reflection.Emit.Label cancelFinalSet = il.DefineLabel ();
+				System.Reflection.Emit.Label success = il.DefineLabel ();
 
-				#region LEFT OPERANDES
-				string [] lopParts = operandes [0].Trim ().Split ('.');
-				MemberInfo lopMI = null;
+				BindingMember lop = new BindingMember (operandes [0].Trim ());
+				BindingMember rop = new BindingMember (operandes [1].Trim ());
 
 				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
 
-				if (lopParts.Length > 1) {
-					NodeAddress lopNA = currentNode.ResolveExpression (ref operandes [0]);
-					CompilerServices.emitGetInstance (il, currentNode, lopNA);
-					lopType = lopNA.NodeType;
-				}
+				#region Left operande
+				PropertyInfo lopPI = null;
 
-				string [] bindTrg = lopParts.Last().Split ('.');
-
-				if (bindTrg.Length == 1)
-					lopMI = lopType.GetMember (bindTrg [0]).FirstOrDefault();
-				else if (bindTrg.Length == 2) {
-					//named target
-					//TODO:
-					il.Emit(OpCodes.Ldstr, bindTrg[0]);
-					il.Emit(OpCodes.Callvirt, miFindByName);
-					lopMI = lopType.GetMember (bindTrg [1]).FirstOrDefault();
-				} else
-					throw new Exception ("Syntax error in binding, expected 'go dot member'");
-
-
-				if (lopMI == null)
-					throw new Exception (string.Format ("IML BINDING: Member not found"));
-
-				OpCode lopSetOpCode;
-				dynamic lopSetMI;
-				Type lopT = null;
-				switch (lopMI.MemberType) {
-				case MemberTypes.Property:
-					lopSetOpCode = OpCodes.Callvirt;
-					PropertyInfo lopPi = lopMI as PropertyInfo;
-					lopT = lopPi.PropertyType;
-					lopSetMI = lopPi.GetSetMethod ();
-					break;
-				case MemberTypes.Field:
-					lopSetOpCode = OpCodes.Stfld;
-					FieldInfo dstFi = lopMI as FieldInfo;
-					lopT = dstFi.FieldType;
-					lopSetMI = dstFi;
-					break;
-				default:
-					throw new Exception (string.Format ("GOML:member type not handle"));
-				}
+				//in dyn handler, no datasource binding, so single name in expression are also handled as current node property
+				if (lop.IsSingleName)
+					lopPI = lopType.GetProperty (lop.Tokens [0]);
+				else if (lop.IsCurrentNodeProperty)
+					lopPI = lopType.GetProperty (lop.Tokens [1]);
+				else
+					lop.emitGetTarget (il, cancel);
 				#endregion
 
 				#region RIGHT OPERANDES
-				if (rop.StartsWith ("\'")) {
-					if (!rop.EndsWith ("\'"))
-						throw new Exception (string.Format
-							("GOML:malformed string constant in handler: {0}", rop));
-					string strcst = rop.Substring (1, rop.Length - 2);
+				if (rop.IsStringConstant){
+					il.Emit (OpCodes.Ldstr, rop.Tokens[0]);
+					lop.emitSetProperty (il, cancelFinalSet);
+				}else if (rop.LevelsUp ==0 && !string.IsNullOrEmpty(rop.Tokens[0])) {//parsable constant depending on lop type
+					//if left operand is member of current node, it's easy to fetch type, else we should use reflexion in msil
+					if (lopPI == null){//accept GraphicObj members, but it's restricive
+						//TODO: we should get the parse method by reflexion, or something else
+						lopPI = typeof(GraphicObject).GetProperty (lop.Tokens [lop.Tokens.Length-1]);
+						if (lopPI == null)
+							throw new NotSupportedException ();
+					}
 
-					il.Emit (OpCodes.Ldstr, strcst);
-
-				}else if (rop.StartsWith ("this",StringComparison.OrdinalIgnoreCase)){
-					il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack
-				} else {
-					if (lopT.IsEnum)
-						throw new NotImplementedException ();
-
-					MethodInfo lopParseMi = lopT.GetMethod ("Parse");
+					MethodInfo lopParseMi = lopPI.PropertyType.GetMethod ("Parse");
 					if (lopParseMi == null)
 						throw new Exception (string.Format
-							("GOML:no parse method found in: {0}", lopT.Name));
-					il.Emit (OpCodes.Ldstr, rop);
-					il.Emit (OpCodes.Callvirt, lopParseMi);
-					il.Emit (OpCodes.Unbox_Any, lopT);
-				}
+							("IML: no static 'Parse' method found in: {0}", lopPI.PropertyType.Name));
 
+					il.Emit (OpCodes.Ldstr, operandes [1].Trim ());
+					il.Emit (OpCodes.Callvirt, lopParseMi);
+					il.Emit (OpCodes.Unbox_Any, lopPI.PropertyType);
+
+					//emit left operand assignment
+					il.Emit (OpCodes.Callvirt, lopPI.GetSetMethod());
+				} else {//tree parsing and propert gets
+					rop.emitGetTarget (il, cancel);
+					rop.emitGetProperty (il, cancel);
+					lop.emitSetProperty (il, cancelFinalSet);
+				}
 				#endregion
 
-				//emit left operand assignment
-				il.Emit (lopSetOpCode, lopSetMI);
+				il.Emit (OpCodes.Br, success);
+
+				il.MarkLabel (cancelFinalSet);
+				il.Emit (OpCodes.Pop);	//pop null MemberInfo on the stack causing cancelation
+				il.MarkLabel (cancel);
+				il.Emit (OpCodes.Pop);	//pop null instance on the stack causing cancelation
+				il.MarkLabel (success);
 			}
 
 			il.Emit (OpCodes.Ret);
@@ -726,128 +705,20 @@ namespace Crow
 			return dm.CreateDelegate (sourceEvent.EventHandlerType);
 		}
 
-		internal static Delegate compileDynEventHandler(EventInfo sourceEvent, string expression, NodeAddress currentNode = null){
-			#if DEBUG_BINDING
-			Debug.WriteLine ("\tCompile Event {0}: {1}", sourceEvent.Name, expression);
-			#endif
-
-			Type lopType = null;
-
-			if (currentNode == null)
-				lopType = sourceEvent.DeclaringType;//TODO:double check if derived class could be returned
-			else
-				lopType = currentNode.NodeType;
-
-			#region Retrieve EventHandler parameter type
-			MethodInfo evtInvoke = sourceEvent.EventHandlerType.GetMethod ("Invoke");
-			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
-			Type handlerArgsType = evtParams [1].ParameterType;
-			#endregion
-
-			Type [] args = { CompilerServices.TObject, handlerArgsType };
-			DynamicMethod dm = new DynamicMethod ("dyn_eventHandler",
-				typeof(void),
-				args, true);
-			ILGenerator il = dm.GetILGenerator (256);
-			il.Emit (OpCodes.Nop);
-
-			string [] srcLines = expression.Trim ().Split (new char [] { ';' });
-
-			foreach (string srcLine in srcLines) {
-				string statement = srcLine.Trim ();
-
-				string [] operandes = statement.Split (new char [] { '=' });
-				if (operandes.Length < 2) //not an affectation
-				{
-					//maybe we could handle here handler function name
-					continue;
-				}
-
-				string rop = operandes [operandes.Length - 1].Trim ();
-
-				#region LEFT OPERANDES
-				string [] lopParts = operandes [0].Trim ().Split ('/');
-				MemberInfo lopMI = null;
-
-				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack
-
-				if (lopParts.Length > 1) {
-					NodeAddress lopNA = currentNode.ResolveExpression (ref operandes [0]);
-					CompilerServices.emitGetInstance (il, currentNode, lopNA);
-					lopType = lopNA.NodeType;
-				}
-
-				string [] bindTrg = lopParts.Last().Split ('.');
-
-				if (bindTrg.Length == 1)
-					lopMI = lopType.GetMember (bindTrg [0]).FirstOrDefault();
-				else if (bindTrg.Length == 2) {
-					//named target
-					//TODO:
-					il.Emit(OpCodes.Ldstr, bindTrg[0]);
-					il.Emit(OpCodes.Callvirt, miFindByName);
-					lopMI = lopType.GetMember (bindTrg [1]).FirstOrDefault();
-				} else
-					throw new Exception ("Syntax error in binding, expected 'go dot member'");
-
-
-				if (lopMI == null)
-					throw new Exception (string.Format ("IML BINDING: Member not found"));
-
-				OpCode lopSetOpCode;
-				dynamic lopSetMI;
-				Type lopT = null;
-				switch (lopMI.MemberType) {
-				case MemberTypes.Property:
-					lopSetOpCode = OpCodes.Callvirt;
-					PropertyInfo lopPi = lopMI as PropertyInfo;
-					lopT = lopPi.PropertyType;
-					lopSetMI = lopPi.GetSetMethod ();
-					break;
-				case MemberTypes.Field:
-					lopSetOpCode = OpCodes.Stfld;
-					FieldInfo dstFi = lopMI as FieldInfo;
-					lopT = dstFi.FieldType;
-					lopSetMI = dstFi;
-					break;
-				default:
-					throw new Exception (string.Format ("GOML:member type not handle"));
-				}
-				#endregion
-
-				#region RIGHT OPERANDES
-				if (rop.StartsWith ("\'")) {
-					if (!rop.EndsWith ("\'"))
-						throw new Exception (string.Format
-							("GOML:malformed string constant in handler: {0}", rop));
-					string strcst = rop.Substring (1, rop.Length - 2);
-
-					il.Emit (OpCodes.Ldstr, strcst);
-
-				}else if (rop.StartsWith ("this",StringComparison.OrdinalIgnoreCase)){
-					il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack
-				} else {
-					if (lopT.IsEnum)
-						throw new NotImplementedException ();
-
-					MethodInfo lopParseMi = lopT.GetMethod ("Parse");
-					if (lopParseMi == null)
-						throw new Exception (string.Format
-							("GOML:no parse method found in: {0}", lopT.Name));
-					il.Emit (OpCodes.Ldstr, rop);
-					il.Emit (OpCodes.Callvirt, lopParseMi);
-					il.Emit (OpCodes.Unbox_Any, lopT);
-				}
-
-				#endregion
-
-				//emit left operand assignment
-				il.Emit (lopSetOpCode, lopSetMI);
+		/// <summary>
+		/// MSIL helper, go n levels up
+		/// </summary>
+		/// <returns><c>true</c>, if logical parents are not null</returns>
+		/// <param name="instance">Start Instance</param>
+		/// <param name="levelCount">Levels to go upward</param>
+		internal static ILayoutable goUpNbLevels(ILayoutable instance, int levelCount){
+			ILayoutable tmp = instance;
+			int i = 0;
+			while (tmp != null && i < levelCount) {
+				tmp = tmp.LogicalParent;
+				i++;
 			}
-
-			il.Emit (OpCodes.Ret);
-
-			return dm.CreateDelegate (sourceEvent.EventHandlerType);
+			return tmp;
 		}
 		/// <summary>
 		/// Splits expression on semicolon but ignore those between accolades
