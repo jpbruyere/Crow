@@ -270,13 +270,17 @@ namespace Crow
 				destType =(miDest as FieldInfo).FieldType;
 
 			if (value != null) {
-				origType = value.GetType ();
-				if (destType.IsAssignableFrom (origType))
-					convertedVal = Convert.ChangeType (value, destType);
-				else if (origType.IsPrimitive & destType.IsPrimitive)
-					convertedVal = GetConvertMethod (destType).Invoke (null, new Object[] { value });
-				else
-					convertedVal = getImplicitOp (origType, destType).Invoke (value, null);
+				if (destType == TObject)//TODO: check that test of destType is not causing problems
+					convertedVal = value;
+				else {
+					origType = value.GetType ();
+					if (destType.IsAssignableFrom (origType))
+						convertedVal = Convert.ChangeType (value, destType);
+					else if (origType.IsPrimitive & destType.IsPrimitive)
+						convertedVal = GetConvertMethod (destType).Invoke (null, new Object[] { value });
+					else
+						convertedVal = getImplicitOp (origType, destType).Invoke (value, null);
+				}
 			}
 
 			if (miDest.MemberType == MemberTypes.Property)
@@ -663,7 +667,10 @@ namespace Crow
 				#region RIGHT OPERANDES
 				if (rop.IsStringConstant){
 					il.Emit (OpCodes.Ldstr, rop.Tokens[0]);
-					lop.emitSetProperty (il, cancelFinalSet);
+					lop.emitSetProperty (il);
+				}else if (rop.IsSingleName && rop.Tokens[0] == "this"){
+					il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
+					lop.emitSetProperty (il);
 				}else if (rop.LevelsUp ==0 && !string.IsNullOrEmpty(rop.Tokens[0])) {//parsable constant depending on lop type
 					//if left operand is member of current node, it's easy to fetch type, else we should use reflexion in msil
 					if (lopPI == null){//accept GraphicObj members, but it's restricive
@@ -685,9 +692,11 @@ namespace Crow
 					//emit left operand assignment
 					il.Emit (OpCodes.Callvirt, lopPI.GetSetMethod());
 				} else {//tree parsing and propert gets
-					rop.emitGetTarget (il, cancel);
-					rop.emitGetProperty (il, cancel);
-					lop.emitSetProperty (il, cancelFinalSet);
+					il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
+
+					rop.emitGetTarget (il, cancelFinalSet);
+					rop.emitGetProperty (il, cancelFinalSet);
+					lop.emitSetProperty (il);
 				}
 				#endregion
 

@@ -89,6 +89,7 @@ namespace Crow
 				} else {
 					while (splitedExp [ptr] == "..")
 						ptr++;
+					LevelsUp = ptr;
 				}
 			}
 			if (ptr != splitedExp.Length - 1)
@@ -109,7 +110,7 @@ namespace Crow
 				il.Emit (OpCodes.Dup);
 				il.Emit (OpCodes.Brfalse, nextLogicParent);
 			} else if (LevelsUp > 0) {//go upward in logical tree
-				il.Emit (OpCodes.Ldind_I4, LevelsUp);//push arg 2 of goUpLevels
+				il.Emit (OpCodes.Ldc_I4, LevelsUp);//push arg 2 of goUpLevels
 				il.Emit (OpCodes.Callvirt, CompilerServices.miGoUpLevels);
 				//test if null
 				il.Emit (OpCodes.Dup);
@@ -124,27 +125,34 @@ namespace Crow
 			}
 
 			for (int i = 1; i < Tokens.Length -1; i++) {
+				System.Reflection.Emit.Label miOK = il.DefineLabel ();
+				il.Emit (OpCodes.Dup);//duplicate instance
 				il.Emit (OpCodes.Ldstr, Tokens [i]);//load member name
 				il.Emit (OpCodes.Call, CompilerServices.miGetMembIinfoWithRefx);
 				il.Emit (OpCodes.Dup);
-				il.Emit (OpCodes.Brfalse, cancel);
+				il.Emit (OpCodes.Brtrue, miOK);
+				il.Emit (OpCodes.Pop);//pop dup instance
+				il.Emit (OpCodes.Br, cancel);
+				il.MarkLabel (miOK);
 				il.Emit (OpCodes.Call, CompilerServices.miGetValWithRefx);
 				il.Emit (OpCodes.Dup);
 				il.Emit (OpCodes.Brfalse, cancel);
 			}
 		}
 		public void emitGetProperty(ILGenerator il, System.Reflection.Emit.Label cancel) {
+			System.Reflection.Emit.Label miOK = il.DefineLabel ();
+			il.Emit (OpCodes.Dup);//duplicate instance
 			il.Emit (OpCodes.Ldstr, Tokens [Tokens.Length -1]);//load member name
 			il.Emit (OpCodes.Call, CompilerServices.miGetMembIinfoWithRefx);
 			il.Emit (OpCodes.Dup);
-			il.Emit (OpCodes.Brfalse, cancel);
+			il.Emit (OpCodes.Brtrue, miOK);
+			il.Emit (OpCodes.Pop);//pop dup instance
+			il.Emit (OpCodes.Br, cancel);
+			il.MarkLabel (miOK);
 			il.Emit (OpCodes.Call, CompilerServices.miGetValWithRefx);
 		}
-		public void emitSetProperty(ILGenerator il, System.Reflection.Emit.Label cancel) {
+		public void emitSetProperty(ILGenerator il) {
 			il.Emit (OpCodes.Ldstr, Tokens [Tokens.Length -1]);//load member name
-			il.Emit (OpCodes.Call, CompilerServices.miGetMembIinfoWithRefx);
-			il.Emit (OpCodes.Dup);
-			il.Emit (OpCodes.Brfalse, cancel);
 			il.Emit (OpCodes.Call, CompilerServices.miSetValWithRefx);
 		}
 	}
