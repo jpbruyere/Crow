@@ -46,6 +46,7 @@ namespace Crow
 		bool _resizable;
 		bool _movable;
 		bool hoverBorder = false;
+		bool alwaysOnTop = false;
 
 		Rectangle savedBounds;
 		bool _minimized = false;
@@ -145,6 +146,23 @@ namespace Crow
 		}
 		[XmlIgnore]public bool IsNormal {
 			get { return !(IsMaximized|_minimized); }
+		}
+		[XmlAttributeAttribute][DefaultValue(false)]
+		public bool AlwaysOnTop {
+			get {
+				return alwaysOnTop;
+			}
+			set {
+				if (alwaysOnTop == value)
+					return;
+				alwaysOnTop = value;
+				if (alwaysOnTop) {
+					CurrentInterface.PutOnTop (this);
+					CurrentInterface.TopWindows++;
+				}else
+					CurrentInterface.TopWindows--;
+				NotifyValueChanged ("AlwaysOnTop", alwaysOnTop);
+			}
 		}
 //		[XmlAttributeAttribute()][DefaultValue(WindowState.Normal)]
 //		public virtual WindowState State {
