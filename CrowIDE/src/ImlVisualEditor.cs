@@ -34,6 +34,7 @@ namespace CrowIDE
 		public ImlVisualEditor () : base()
 		{
 			imlVE = new Interface ();
+			imlVE.DesignMode = true;
 			Thread t = new Thread (interfaceThread);
 			t.IsBackground = true;
 			t.Start ();
@@ -78,6 +79,9 @@ namespace CrowIDE
 			}
 		}
 
+		public List<GraphicObject> GraphicTree {
+			get { return imlVE.GraphicTree; }
+		}
 
 
 		void reloadFromSource(){
@@ -105,6 +109,7 @@ namespace CrowIDE
 			using (StreamReader sr = new StreamReader (imlPath)) {
 				ImlSource = sr.ReadToEnd ();
 			}
+			NotifyValueChanged ("GraphicTree", GraphicTree);
 		}
 		void reload_iTor(Instantiator new_iTot){
 			itor = new_iTot;

@@ -67,7 +67,7 @@ namespace CrowIDE
 				if (bindingExp != null) {
 					CrowInterface.DeleteWidget (bindingExp);
 				}
-				bindingExp = CrowInterface.LoadInterface ("#CrowIDE.ui.bindingExplorer.crow");
+				bindingExp = CrowInterface.LoadInterface ("#CrowIDE.ui.GTreeExplorer.crow");
 				bindingExp.DataSource = imlVE;
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F6) {

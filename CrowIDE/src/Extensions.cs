@@ -26,10 +26,16 @@ namespace Crow
 	public static class Extensions
 	{
 		public static List<GraphicObject> GetChildren(this GraphicObject go){
-			if (go is Group)
+			Type goType = go.GetType();
+			if (typeof (Group).IsAssignableFrom (goType))
 				return (go as Group).Children;
-			if (go is Container)
+			if (typeof(Container).IsAssignableFrom (goType))
 				return new List<GraphicObject>( new GraphicObject[] { (go as Container).Child });
+			if (typeof(TemplatedContainer).IsAssignableFrom (goType))
+				return new List<GraphicObject>( new GraphicObject[] { (go as TemplatedContainer).Content });
+			if (typeof(TemplatedGroup).IsAssignableFrom (goType))
+				return (go as TemplatedGroup).Items;
+
 			return new List<GraphicObject>();
 		}
 	}

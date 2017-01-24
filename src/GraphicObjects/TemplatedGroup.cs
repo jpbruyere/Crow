@@ -106,11 +106,11 @@ namespace Crow
 		public virtual List<GraphicObject> Items{ get { return items.Children; }}
 		[XmlAttributeAttribute][DefaultValue(-1)]public int SelectedIndex{
 			get { return _selectedIndex; }
-			set { 
+			set {
 				if (value == _selectedIndex)
 					return;
 
-				_selectedIndex = value; 
+				_selectedIndex = value;
 
 				NotifyValueChanged ("SelectedIndex", _selectedIndex);
 				NotifyValueChanged ("SelectedItem", SelectedItem);
@@ -179,7 +179,7 @@ namespace Crow
 		protected void raiseSelectedItemChanged(){
 			SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
 		}
-			
+
 
 		public virtual void AddItem(GraphicObject g){
 			items.AddChild (g);
@@ -313,7 +313,7 @@ namespace Crow
 			if (loadingThread == null)
 				return;
 			if (!loadingThread.IsAlive)
-				return;			
+				return;
 			cancelLoading = true;
 			loadingThread.Join ();
 			cancelLoading = false;
@@ -341,7 +341,7 @@ namespace Crow
 				page = gs;
 
 			}else
-				page = Activator.CreateInstance (items.GetType ()) as Group;			
+				page = Activator.CreateInstance (items.GetType ()) as Group;
 
 			page.Name = "page" + pageNum;
 
@@ -383,9 +383,20 @@ namespace Crow
 				itempKey = getItempKey (dataType, data [i]);
 
 			if (ItemTemplates.ContainsKey (itempKey))
-					iTemp = ItemTemplates [itempKey];
-			else
-				iTemp = ItemTemplates ["default"];
+				iTemp = ItemTemplates [itempKey];
+			else {
+				foreach (string it in ItemTemplates.Keys) {
+					Type t = Type.GetType (it);
+					if (t == null)
+						continue;
+					if (t.IsAssignableFrom (dataType)) {//TODO:types could be cached
+						iTemp = ItemTemplates [it];
+						break;
+					}
+				}
+				if (iTemp == null)
+					iTemp = ItemTemplates ["default"];
+			}
 
 			lock (CurrentInterface.LayoutMutex) {
 				g = iTemp.CreateInstance(CurrentInterface);

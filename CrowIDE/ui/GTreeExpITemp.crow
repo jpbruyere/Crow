@@ -1,0 +1,28 @@
+﻿<?xml version="1.0"?>
+<Expandable Caption="{Name}" >
+	<Template>
+		<VerticalStack>
+			<HorizontalStack Spacing="1" Height="Fit" MouseDoubleClick="./onClickForExpand"
+					MouseEnter="{Background=hgradient|0:BlueCrayola|1:Transparent}"
+					MouseLeave="{Background=Transparent}">
+				<Container Margin="1" Width="10" Height="10" Focusable="true" MouseClick="./onClickForExpand"
+					MouseEnter="{Background=LightGray}"
+					MouseLeave="{Background=Transparent}">
+					<Image
+						Path="{./Image}"
+						Visible="{./IsExpandable}"
+						SvgSub="{./IsExpanded}"/>
+				</Container>
+				<Image Margin="2" Width="14" Height="14"
+					Path="#Crow.Images.Icons.folder.svg"/>
+				<Label Text="{./Caption}"/>
+			</HorizontalStack>
+			<Container Name="Content" Visible="false"/>
+		</VerticalStack>
+	</Template>
+	<HorizontalStack Height="Fit">
+		<GraphicObject Width="12" Height="10"/>
+		<TreeView Name="List" Height="Fit"
+			Template="#Crow.Templates.treeList.crow" />
+	</HorizontalStack>
+</Expandable>

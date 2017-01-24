@@ -28,8 +28,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -37,8 +35,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>0</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -47,15 +43,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="cairo-sharp">
       <Package>gtk-sharp-3.0</Package>
-    </Reference>
-    <Reference Include="gdk-sharp">
-      <Package>gtk-sharp-2.0</Package>
-    </Reference>
-    <Reference Include="gio-sharp">
-      <Package>gio-sharp-3.0</Package>
-    </Reference>
-    <Reference Include="glib-sharp">
-      <Package>glib-sharp-3.0</Package>
     </Reference>
     <Reference Include="OpenTK">
       <HintPath>$(SolutionDir)packages\OpenTK.2.0.0\lib\net20\OpenTK.dll</HintPath>
@@ -91,10 +78,10 @@
     <EmbeddedResource Include="ui\MembersView.template">
       <LogicalName>CrowIDE.MembersView.template</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="ui\bindingExplorer.crow" />
-    <EmbeddedResource Include="ui\bindingExpITemp.crow" />
     <EmbeddedResource Include="ui\LQIsExplorer.crow" />
     <EmbeddedResource Include="Default.style" />
+    <EmbeddedResource Include="ui\GTreeExplorer.crow" />
+    <EmbeddedResource Include="ui\GTreeExpITemp.crow" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">
