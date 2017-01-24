@@ -631,7 +631,7 @@ namespace Crow
 
 			List<Style> styling = new List<Style>();
 
-			//Search for a style mathing :
+			//Search for a style matching :
 			//1: Full class name, with full namespace
 			//2: class name
 			//3: style may have been registered with their ressource ID minus .style extention
@@ -1060,7 +1060,7 @@ namespace Crow
 			using (ImageSurface draw =
                 new ImageSurface(bmp, Format.Argb32, Slot.Width, Slot.Height, stride)) {
 				using (Context gr = new Context (draw)) {
-					gr.Antialias = Antialias.Subpixel;
+					gr.Antialias = Interface.Antialias;
 					onDraw (gr);
 				}
 				draw.Flush ();

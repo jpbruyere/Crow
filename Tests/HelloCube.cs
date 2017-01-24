@@ -26,7 +26,7 @@ using Crow;
 
 namespace Tests
 {
-	class HelloCube : OpenTKGameWindow
+	class HelloCube : CrowWindow
 	{
 		[STAThread]
 		static void Main ()
@@ -63,7 +63,7 @@ namespace Tests
 		{
 			base.OnLoad (e);
 
-			CrowInterface.AddWidget(
+			AddWidget(
 				new Window ()
 				{
 					Title = "Hello World"

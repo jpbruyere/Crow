@@ -55,11 +55,14 @@
     <Compile Include="BasicTests.cs" />
     <Compile Include="OpenGL\Shader.cs" />
     <Compile Include="OpenGL\vaoMesh.cs" />
-    <Compile Include="OpenTKGameWindow.cs" />
     <Compile Include="OpenGL\Texture.cs" />
     <Compile Include="HelloWorld.cs" />
     <Compile Include="HelloCube.cs" />
     <Compile Include="UIEditor.cs" />
+    <Compile Include="CrowWindow.cs" />
+    <Compile Include="Hello3D.cs" />
+    <Compile Include="OpenGL\Extensions.cs" />
+    <Compile Include="InterfaceControler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
