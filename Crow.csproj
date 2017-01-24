@@ -290,6 +290,12 @@
     <EmbeddedResource Include="Templates\ColorPicker.template">
       <LogicalName>Crow.ColorPicker.template</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Templates\ToolWindow.template">
+      <LogicalName>Crow.ToolWindow.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\Icons\maximize.svg" />
+    <EmbeddedResource Include="Images\Icons\minimize.svg" />
+    <EmbeddedResource Include="Images\Icons\normalize.svg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

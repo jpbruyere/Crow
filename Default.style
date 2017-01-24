@@ -62,6 +62,13 @@ TextBox {
 }
 Window {
 	Focusable = true;
+	MinimumSize=5,5;
+	Width = 150;
+	Height = 150;
+}
+ToolWindow {
+	Template = #Crow.ToolWindow.template;
+	Focusable = true;
 	MinimumSize=50,50;
 	Width = 150;
 	Height = 150;
