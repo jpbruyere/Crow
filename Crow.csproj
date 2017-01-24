@@ -123,9 +123,6 @@
     <Compile Include="src\rsvg\DimensionData.cs" />
     <Compile Include="src\rsvg\Global.cs" />
     <Compile Include="src\rsvg\Handle.cs" />
-    <Compile Include="src\rsvg\Pixbuf.cs" />
-    <Compile Include="src\rsvg\RsvgSharp.SizeFuncNative.cs" />
-    <Compile Include="src\rsvg\SizeFunc.cs" />
     <Compile Include="src\MouseCursorChangedEventArgs.cs" />
     <Compile Include="src\Input\KeyPressEventArgs.cs" />
     <Compile Include="src\Configuration.cs" />
@@ -155,6 +152,7 @@
     <Compile Include="src\GraphicObjects\SaturationValueSelector.cs" />
     <Compile Include="src\IML\EventBinding.cs" />
     <Compile Include="src\PerformanceMeasure.cs" />
+    <Compile Include="src\IML\BindingMember.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -162,10 +160,9 @@
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Drawing" />
-    <Reference Include="cairo-sharp" />
-    <Reference Include="gdk-sharp" />
-    <Reference Include="gio-sharp" />
-    <Reference Include="glib-sharp" />
+    <Reference Include="cairo-sharp">
+      <Package>gtk-sharp-3.0</Package>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

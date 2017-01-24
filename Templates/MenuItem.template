@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Popper Caption="{./Caption}"  Background="{./Background}" PopDirection="{./PopDirection}"
+<Popper Font="{./Font}" Caption="{./Caption}"  Background="{./Background}" PopDirection="{./PopDirection}"
 	Foreground = "{./Foreground}" CanPop="{./HasChildren}" MouseClick="./onMI_Click"
 	IsPopped="{²./IsOpened}">
 	<Template>

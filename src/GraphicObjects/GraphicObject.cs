@@ -82,6 +82,7 @@ namespace Crow
 		bool clipToClientRect = true;
 		protected object dataSource;
 		string style;
+		object tag;
 		#endregion
 
 		#region public fields
@@ -103,8 +104,6 @@ namespace Crow
 		public Rectangle LastPaintedSlot;
 		/// <summary>Prevent requeuing multiple times the same widget</summary>
 		public bool IsQueueForRedraw = false;
-		/// <summary>Random value placeholder</summary>
-		public object Tag;
 		/// <summary>drawing Cache, if null, a redraw is done, cached or not</summary>
 		public byte[] bmp;
 		public bool IsDirty = true;
@@ -195,7 +194,22 @@ namespace Crow
 		#endregion
 
 		#region public properties
-		[XmlAttributeAttribute()][DefaultValue(true)]
+		/// <summary>Random value placeholder</summary>
+		[XmlAttributeAttribute]
+		public object Tag {
+			get { return tag; }
+			set {
+				if (tag == value)
+					return;
+				tag = value;
+				NotifyValueChanged ("Tag", tag);
+			}
+		}
+		/// <summary>
+		/// If enabled, resulting bitmap of graphic object is cached in an byte array
+		/// speeding up rendering of complex object. Default is enabled.
+		/// </summary>
+		[XmlAttributeAttribute][DefaultValue(true)]
 		public virtual bool CacheEnabled {
 			get { return cacheEnabled; }
 			set {
@@ -205,7 +219,10 @@ namespace Crow
 				NotifyValueChanged ("CacheEnabled", cacheEnabled);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(true)]
+		/// <summary>
+		/// If true, rendering of GraphicObject is clipped inside client rectangle
+		/// </summary>
+		[XmlAttributeAttribute][DefaultValue(true)]
 		public virtual bool ClipToClientRect {
 			get { return clipToClientRect; }
 			set {
@@ -216,7 +233,10 @@ namespace Crow
 				this.RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(null)]
+		/// <summary>
+		/// Name is used in binding to reference other GraphicObjects inside the graphic tree
+		/// </summary>
+		[XmlAttributeAttribute][DefaultValue(null)]
 		public virtual string Name {
 			get {
 				#if DEBUG
@@ -682,7 +702,7 @@ namespace Crow
 				string expression;
 				if (!getDefaultEvent(ei, styling, out expression))
 					continue;
-				//TODO:dynEventHandler could be cached somewhere, maybe a style instanciato class holding the styling delegate and bound to it.
+				//TODO:dynEventHandler could be cached somewhere, maybe a style instanciator class holding the styling delegate and bound to it.
 				foreach (string exp in CompilerServices.splitOnSemiColumnOutsideAccolades(expression)) {
 					string trimed = exp.Trim();
 					if (trimed.StartsWith ("{", StringComparison.OrdinalIgnoreCase)){
@@ -695,6 +715,7 @@ namespace Crow
 						il.Emit (OpCodes.Call, CompilerServices.miGetEvent);
 						//push expression as 2nd arg of compile
 						il.Emit (OpCodes.Ldstr, trimed.Substring (1, trimed.Length - 2));
+						//push null as 3rd arg, currentNode, not known when instanciing
 						il.Emit (OpCodes.Ldnull);
 						il.Emit (OpCodes.Callvirt, CompilerServices.miCompileDynEventHandler);
 						il.Emit (OpCodes.Castclass, ei.EventHandlerType);

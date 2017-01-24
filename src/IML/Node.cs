@@ -30,16 +30,18 @@ namespace Crow.IML
 	/// </summary>
 	public struct Node
 	{
-		/// <summary> Current node type</summary>
-		public Type CrowType;
-		/// <summary> Index in parent, -1 for template</summary>
-		public int Index;
-
+		#region CTOR
 		public Node (Type crowType, int _index = 0)
 		{
 			CrowType = crowType;
 			Index = _index;
 		}
+		#endregion
+
+		/// <summary> Current node type</summary>
+		public Type CrowType;
+		/// <summary> Index in parent, -1 for template</summary>
+		public int Index;
 
 		public MethodInfo GetAddMethod(int childIdx){
 			if (typeof (Group).IsAssignableFrom (CrowType))

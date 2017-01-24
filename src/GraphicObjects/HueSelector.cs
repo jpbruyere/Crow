@@ -53,9 +53,9 @@ namespace Crow
 				if (hue == value)
 					return;
 				hue = value;
-
 				notifyHueChanged ();
 				updateMousePosFromHue ();
+				RegisterForRedraw ();
 			}
 		}
 		protected override void onDraw (Cairo.Context gr)
@@ -95,11 +95,11 @@ namespace Crow
 			ctx.SetSourceColor (Color.White);
 			Rectangle r = ClientRectangle;
 			if (Orientation == Orientation.Horizontal) {
-				r.Width = 5;
-				r.X = mousePos.X;
+				r.Width = 4;
+				r.X = mousePos.X - 2;
 			} else {
-				r.Height = 5;
-				r.Y = mousePos.Y;
+				r.Height = 4;
+				r.Y = mousePos.Y - 2;
 			}
 
 			CairoHelpers.CairoRectangle (ctx, r, 2);
@@ -126,13 +126,13 @@ namespace Crow
 			else
 				hue = (double)mousePos.Y / (double)ClientRectangle.Height;
 			notifyHueChanged ();
+			RegisterForRedraw ();
 		}
 		void updateMousePosFromHue(){
 			if (Orientation == Orientation.Horizontal)
 				mousePos.X = (int)Math.Floor(hue * (double)ClientRectangle.Width);
 			else
 				mousePos.Y = (int)Math.Floor(hue * (double)ClientRectangle.Height);
-			CurrentInterface.EnqueueForRepaint (this);
 		}
 		void notifyHueChanged(){
 			NotifyValueChanged ("Hue", hue);

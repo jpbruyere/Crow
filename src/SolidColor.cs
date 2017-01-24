@@ -43,11 +43,13 @@ namespace Crow
 		}
 		public static bool operator ==(SolidColor left, SolidColor right)
 		{
-			return left.color == right.color ? true : false;
+			return left is SolidColor ? right is SolidColor ? true : false :
+				left.color == right.color ? true : false;
 		}
 		public static bool operator !=(SolidColor left, SolidColor right)
 		{
-			return left.color == right.color ? false : true;
+			return left is SolidColor ? right is SolidColor ? false : true :
+				left.color == right.color ? false : true;
 
 		}
 		public override int GetHashCode ()

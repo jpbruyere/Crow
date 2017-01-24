@@ -87,7 +87,7 @@ namespace Crow
 		}
 		#endregion
 
-		public GraphicObject CreateInstance(Interface iface){			
+		public GraphicObject CreateInstance(Interface iface){
 			return loader (iface) as GraphicObject;
 		}
 
@@ -356,7 +356,7 @@ namespace Crow
 		void readPropertyBinding (Context ctx, string sourceMember, string expression)
 		{
 			NodeAddress sourceNA = ctx.CurrentNodeAddress;
-			BindingDefinition bindingDef = splitBindingExp (sourceNA, sourceMember, expression);
+			BindingDefinition bindingDef = sourceNA.GetBindingDef (sourceMember, expression);
 
 			#if DEBUG_BINDING
 			Debug.WriteLine("Property Binding: " + bindingDef.ToString());
@@ -366,44 +366,6 @@ namespace Crow
 				emitDataSourceBindings (ctx, bindingDef);
 			else
 				ctx.StorePropertyBinding (bindingDef);
-		}
-
-		/// <summary>
-		/// Splits the binding expression
-		/// </summary>
-		/// <returns><c>true</c>, if it's a two way binding, <c>false</c> otherwise.</returns>
-		/// <param name="sourceNA">Source Node address</param>
-		/// <param name="expression">Expression.</param>
-		/// <param name="targetNA">Target Node Address</param>
-		/// <param name="targetMember">Target member name</param>
-		/// <param name="targetName">Target node name</param>
-		BindingDefinition splitBindingExp(NodeAddress sourceNA, string sourceMember, string expression){
-			BindingDefinition bindingDef = new BindingDefinition(sourceNA, sourceMember);
-			if (string.IsNullOrEmpty (expression)) {
-				return bindingDef;
-			} else {
-				if (expression.StartsWith ("²")) {
-					bindingDef.TwoWay = true;
-					expression = expression.Substring (1);
-				}
-				string[] bindingExp = expression.Split ('/');
-
-				if (bindingExp.Length > 1)
-					bindingDef.TargetNA = CompilerServices.getNodeAdressFromBindingExp (sourceNA, bindingExp);
-
-				string [] bindTrg = bindingExp.Last().Split ('.');
-
-				if (bindTrg.Length == 1)
-					bindingDef.TargetMember = bindTrg [0];
-				else if (bindTrg.Length == 2) {
-					//named target
-					bindingDef.TargetName = bindTrg[0];
-					bindingDef.TargetMember = bindTrg [1];
-				} else
-					throw new Exception ("Syntax error in binding, expected 'go dot member'");
-			}
-
-			return bindingDef;
 		}
 
 		#region Emit Helper
@@ -429,7 +391,7 @@ namespace Crow
 		/// <summary> Emits handler method bindings </summary>
 		void emitHandlerBinding (Context ctx, EventInfo sourceEvent, string expression){
 			NodeAddress currentNode = ctx.CurrentNodeAddress;
-			BindingDefinition bindingDef = splitBindingExp (currentNode, sourceEvent.Name, expression);
+			BindingDefinition bindingDef = currentNode.GetBindingDef (sourceEvent.Name, expression);
 
 			#if DEBUG_BINDING
 			Debug.WriteLine("Event Binding: " + bindingDef.ToString());
@@ -437,7 +399,7 @@ namespace Crow
 
 			if (bindingDef.IsTemplateBinding | bindingDef.IsDataSourceBinding) {
 				//we need to bind datasource method to source event
-				DynamicMethod dm = new DynamicMethod ("dyn_dschangedForHandler" + NewId,
+				DynamicMethod dm = new DynamicMethod ("dyn_dsORtmpChangedForHandler" + NewId,
 					                   typeof(void),
 					                   CompilerServices.argsBoundDSChange, true);
 
@@ -822,7 +784,7 @@ namespace Crow
 			//the actual value of the origin member of the datasource and then will bind the value changed
 			//dyn methode.
 			//dm is bound to the instanciator instance to have access to cached dyn meth and delegates
-			dm = new DynamicMethod ("dyn_dschanged",
+			dm = new DynamicMethod ("dyn_dschanged" + NewId,
 				typeof (void),
 				CompilerServices.argsBoundDSChange, true);
 
@@ -846,10 +808,10 @@ namespace Crow
 					il.Emit (OpCodes.Brfalse, cancelRemove);//old parent is null
 
 					//remove handler
+					il.Emit (OpCodes.Ldarg_1);//3d arg: instance bound to delegate (the source)
+					il.Emit (OpCodes.Ldstr, "ValueChanged");//2nd arg event name
 					il.Emit (OpCodes.Ldarg_2);//1st arg load old datasource
 					il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
-					il.Emit (OpCodes.Ldstr, "ValueChanged");//2nd arg event name
-					il.Emit (OpCodes.Ldarg_1);//3d arg: instance bound to delegate (the source)
 					il.Emit (OpCodes.Call, CompilerServices.miRemEvtHdlByTarget);
 					il.MarkLabel(cancelRemove);
 				}
@@ -928,6 +890,11 @@ namespace Crow
 			Type tDest = dest.GetType ();
 			PropertyInfo piOrig = tOrig.GetProperty (origMember);
 			PropertyInfo piDest = tDest.GetProperty (destMember);
+
+			if (piDest == null) {
+				Debug.WriteLine ("Member '{0}' not found in new DataSource '{1}' of '{2}'", destMember, dest, orig);
+				return;
+			}
 
 			#region ValueChanged emit
 			DynamicMethod dm = new DynamicMethod ("dyn_valueChanged" + NewId,
