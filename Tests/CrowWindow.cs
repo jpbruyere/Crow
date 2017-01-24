@@ -170,7 +170,7 @@ namespace Crow
 
 		public ProjectiveIFaceControler Add3DInterface(int width, int height, Matrix4 ifaceModelMat){
 			ProjectiveIFaceControler tmp = new ProjectiveIFaceControler (new Rectangle (0, 0, width, height), ifaceModelMat);
-			ifaceControl.Add (tmp);
+			addInterfaceControler (tmp);
 			return tmp;
 		}
 		public GraphicObject AddWidget (GraphicObject g, int interfaceIdx = 0){
