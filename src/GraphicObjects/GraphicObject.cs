@@ -250,7 +250,6 @@ namespace Crow
 			set {
 				if (horizontalAlignment == value)
 					return;
-
 				horizontalAlignment = value;
 				NotifyValueChanged("HorizontalAlignment", horizontalAlignment);
 				RegisterForLayouting (LayoutingType.X);
@@ -262,7 +261,6 @@ namespace Crow
 			set {
 				if (left == value)
 					return;
-
 				left = value;
 				NotifyValueChanged ("Left", left);
 				this.RegisterForLayouting (LayoutingType.X);
@@ -274,7 +272,6 @@ namespace Crow
 			set {
 				if (top == value)
 					return;
-
 				top = value;
 				NotifyValueChanged ("Top", top);
 				this.RegisterForLayouting (LayoutingType.Y);
@@ -872,6 +869,7 @@ namespace Crow
 			#if DEBUG_LAYOUTING
 			CurrentInterface.currentLQI.Slot = LastSlots;
 			CurrentInterface.currentLQI.NewSlot = Slot;
+			Debug.WriteLine ("\t\t{0} => {1}",LastSlots,Slot);
 			#endif
 
 			switch (layoutType) {
