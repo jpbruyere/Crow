@@ -140,6 +140,8 @@ namespace Crow
 		/// on the first instance creation of a IML item.
 		/// </summary>
 		public static Dictionary<String, Instantiator> Instantiators = new Dictionary<string, Instantiator>();
+		public bool DesignMode = false;
+		public int TopWindows = 0;//window always on top count
 		#endregion
 
 		#region Private Fields
@@ -536,7 +538,12 @@ namespace Crow
 		public void AddWidget(GraphicObject g)
 		{
 			g.Parent = this;
-			GraphicTree.Insert (0, g);
+			int ptr = TopWindows;
+			if (g is Window) {
+				if ((g as Window).AlwaysOnTop)
+					ptr = 0;
+			}
+			GraphicTree.Insert (ptr, g);
 			g.RegisteredLayoutings = LayoutingType.None;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
@@ -549,10 +556,10 @@ namespace Crow
 		/// <summary> Put widget on top of other root widgets</summary>
 		public void PutOnTop(GraphicObject g)
 		{
-			if (GraphicTree.IndexOf(g) > 0)
+			if (GraphicTree.IndexOf(g) > TopWindows)
 			{
 				GraphicTree.Remove(g);
-				GraphicTree.Insert(0, g);
+				GraphicTree.Insert(TopWindows, g);
 				EnqueueForRepaint (g);
 			}
 		}
