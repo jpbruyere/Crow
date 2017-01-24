@@ -40,6 +40,8 @@ namespace Crow
 	/// 	- rendering and layouting queues and logic.
 	/// 	- helpers to load XML interfaces files
 	/// 	- global constants and variables of CROW
+	/// 	- Keyboard and Mouse logic
+	/// 	- the resulting bitmap of the interface
 	/// </summary>
 	public class Interface : ILayoutable
 	{
@@ -57,56 +59,99 @@ namespace Crow
 		}
 		public Interface(){
 			CurrentInterface = this;
-			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture; 
+			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 		}
 		#endregion
 
 		#region Static and constants
-		public static int DoubleClick = 200;//ms
-		internal Stopwatch clickTimer = new Stopwatch();
-		internal GraphicObject eligibleForDoubleClick = null; 
-		public static int TabSize = 4;
-		public static string LineBreak = "\r\n";
-		//TODO: shold be declared in graphicObject
+		/// <summary>If true, mouse focus is given when mouse is over control</summary>
 		public static bool FocusOnHover = false;
+		/// <summary> Threshold to catch borders for sizing </summary>
+		public static int BorderThreshold = 5;
+		/// <summary>Double click threshold in milisecond</summary>
+		public static int DoubleClick = 200;//max duration between two mouse_down evt for a dbl clk in milisec.
 		/// <summary> Time to wait in millisecond before starting repeat loop</summary>
 		public static int DeviceRepeatDelay = 700;
 		/// <summary> Time interval in millisecond between device event repeat</summary>
 		public static int DeviceRepeatInterval = 40;
+		/// <summary>Tabulation size in Text controls</summary>
+		public static int TabSize = 4;
 		public static bool ReplaceTabsWithSpace = false;
+		public static string LineBreak = "\r\n";
 		/// <summary> Allow rendering of interface in development environment </summary>
 		public static bool DesignerMode = false;
-		/// <summary> Threshold to catch borders for sizing </summary>
-		public static int BorderThreshold = 5;
 		/// <summary> Disable caching for a widget if this threshold is reached </summary>
 		public const int MaxCacheSize = 2048;
+		/// <summary> Above this count, the layouting is discard from the current
+		/// update cycle and requeued for the next</summary>
+		public const int MaxLayoutingTries = 3;
 		/// <summary> Above this count, the layouting is discard for the widget and it
 		/// will not be rendered on screen </summary>
-		public const int MaxLayoutingTries = 3;
 		public const int MaxDiscardCount = 5;
 		/// <summary> Global font rendering settings for Cairo </summary>
 		public static FontOptions FontRenderingOptions;
+		/// <summary> Global font rendering settings for Cairo </summary>
+		public static Antialias Antialias = Antialias.Subpixel;
+
+		/// <summary>
+		/// Each control need a ref to the root interface containing it, if not set in GraphicObject.currentInterface,
+		/// the ref of this one will be stored in GraphicObject.currentInterface
+		/// </summary>
+		internal static Interface CurrentInterface;
+		internal Stopwatch clickTimer = new Stopwatch();
+		internal GraphicObject eligibleForDoubleClick = null;
 		#endregion
 
-		internal static Interface CurrentInterface;
+		#region Events
+		public event EventHandler<MouseCursorChangedEventArgs> MouseCursorChanged;
+		public event EventHandler Quit;
+		#endregion
 
+		#region Public Fields
+		/// <summary>Graphic Tree of this interface</summary>
+		public List<GraphicObject> GraphicTree = new List<GraphicObject>();
+		/// <summary>Interface's resulting bitmap</summary>
+		public byte[] bmp;
+		/// <summary>resulting bitmap limited to last redrawn part</summary>
+		public byte[] dirtyBmp;
+		/// <summary>True when host has to repaint Interface</summary>
+		public bool IsDirty = false;
+		/// <summary>Coordinate of the dirty bmp on the original bmp</summary>
+		public Rectangle DirtyRect;
+		/// <summary>Locked for each layouting operation</summary>
+		public object LayoutMutex = new object();
+		/// <summary>Sync mutex between host and Crow for rendering operations (bmp, dirtyBmp,...)</summary>
+		public object RenderMutex = new object();
+		/// <summary>Global lock of the update cycle</summary>
+		public object UpdateMutex = new object();
+		//TODO:share resource instances
+		/// <summary>
+		/// Store loaded resources instances shared among controls to reduce memory footprint
+		/// </summary>
 		public Dictionary<string,object> Ressources = new Dictionary<string, object>();
+		/// <summary>The Main layouting queue.</summary>
 		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem> ();
+		/// <summary>Store discarded lqi between two updates</summary>
 		public Queue<LayoutingQueueItem> DiscardQueue;
-		public Queue<LayoutingQueueItem> ProcessedLayoutingQueue;
+		/// <summary>Main drawing queue, holding layouted controls</summary>
 		public Queue<GraphicObject> DrawingQueue = new Queue<GraphicObject>();
 		public string Clipboard;//TODO:use object instead for complex copy paste
-		public void EnqueueForRepaint(GraphicObject g)
-		{
-			lock (DrawingQueue) {
-				if (g.IsQueueForRedraw)
-					return;
-				DrawingQueue.Enqueue (g);
-				g.IsQueueForRedraw = true;
-			}
-		}
-		//fast compiled IML instantiators
+		/// <summary>each IML and fragments (such as inline Templates) are compiled as a Dynamic Method stored here
+		/// on the first instance creation of a IML item.
+		/// </summary>
 		public static Dictionary<String, Instantiator> Instantiators = new Dictionary<string, Instantiator>();
+		#endregion
+
+		#region Private Fields
+		/// <summary>Client rectangle in the host context</summary>
+		Rectangle clientRectangle;
+		/// <summary>Clipping rectangles on the root context</summary>
+		Rectangles clipping = new Rectangles();
+		/// <summary>Main Cairo context</summary>
+		Context ctx;
+		/// <summary>Main Cairo surface</summary>
+		Surface surf;
+		#endregion
 
 		#region Default values and Style loading
 		/// Default values of properties from GraphicObjects are retrieve from XML Attributes.
@@ -114,9 +159,11 @@ namespace Crow
 		/// and injected as a dynamic method referenced in the DefaultValuesLoader Dictionnary.
 		/// The compilation is done on the first object instancing, and is also done for custom widgets
 		public delegate void LoaderInvoker(object instance);
+		/// <summary>Store one loader per StyleKey</summary>
 		public static Dictionary<String, LoaderInvoker> DefaultValuesLoader = new Dictionary<string, LoaderInvoker>();
+		/// <summary>Store dictionnary of member/value per StyleKey</summary>
 		public static Dictionary<string, Style> Styling;
-		/// <summary> parse all styling data's and build global Styling Dictionary </summary>
+		/// <summary> parse all styling data's during application startup and build global Styling Dictionary </summary>
 		static void loadStyling() {
 			Styling = new Dictionary<string, Style> ();
 
@@ -149,7 +196,12 @@ namespace Crow
 		#endregion
 
 		#region Templates
-		public static Dictionary<String, string> DefaultTemplates = new Dictionary<string, string>();
+		/// <summary>Store one default templates resource ID per class.
+		/// Resource ID must be 'fullClassName.template' (not case sensitive)
+		/// Those found in application assembly have priority to the default Crow's one
+		/// </summary>
+		public static Dictionary<string, string> DefaultTemplates = new Dictionary<string, string>();
+		/// <summary>Finds available default templates at startup</summary>
 		static void findAvailableTemplates(){
 			searchTemplatesIn (Assembly.GetEntryAssembly ());
 			searchTemplatesIn (Assembly.GetExecutingAssembly ());
@@ -167,6 +219,10 @@ namespace Crow
 		#endregion
 
 		#region Load/Save
+		/// <summary>Open file or find a resource from path string</summary>
+		/// <returns>A file or resource stream</returns>
+		/// <param name="path">This could be a normal file path, or an embedded ressource ID
+		/// Resource ID's must be prefixed with '#' character</param>
 		public static Stream GetStreamFromPath (string path)
 		{
 			Stream stream = null;
@@ -189,7 +245,41 @@ namespace Crow
 			return stream;
 		}
 
+		/// <summary>Create an instance of a GraphicObject and add it to the GraphicTree
+		/// of this Interface</summary>
+		public GraphicObject LoadInterface (string path)
+		{
+			lock (UpdateMutex) {
+				GraphicObject tmp = Load (path);
+				AddWidget (tmp);
 
+				return tmp;
+			}
+		}
+		/// <summary>Create an instance of a GraphicObject linked to this interface but
+		/// not added to the GraphicTree</summary>
+		public GraphicObject Load (string path)
+		{
+			try {
+				return GetInstantiator (path).CreateInstance (this);
+			} catch (Exception ex) {
+				throw new Exception ("Error loading <" + path + ">:", ex);
+			}
+		}
+		/// <summary>Fetch it from cache or create it</summary>
+		public static Instantiator GetInstantiator(string path){
+			if (!Instantiators.ContainsKey(path))
+				Instantiators [path] = new Instantiator(path);
+			return Instantiators [path];
+		}
+		/// <summary>Item templates have additional properties for recursivity and
+		/// custom display per item type</summary>
+		public static ItemTemplate GetItemTemplate(string path){
+			if (!Instantiators.ContainsKey(path))
+				Instantiators [path] = new ItemTemplate(path);
+			return Instantiators [path] as ItemTemplate;
+		}
+		//TODO: .Net xml serialisation is no longer used, it has been replaced with instantiators
 		public static void Save<T> (string file, T graphicObject)
 		{
 			XmlSerializerNamespaces xn = new XmlSerializerNamespaces ();
@@ -201,64 +291,15 @@ namespace Crow
 				xs.Serialize (s, graphicObject, xn);
 			}
 		}
-		public GraphicObject Load (string path)
-		{
-			try {
-				return GetInstantiator (path).CreateInstance (this);
-			} catch (Exception ex) {
-				throw new Exception ("Error loading <" + path + ">:", ex);
-			}
-		}
-		/// <summary>
-		/// fetch it from cache or create it
-		/// </summary>
-		public static Instantiator GetInstantiator(string path){
-			if (!Instantiators.ContainsKey(path))
-				Instantiators [path] = new Instantiator(path);
-			return Instantiators [path];
-		}
-		public static ItemTemplate GetItemTemplate(string path){
-			if (!Instantiators.ContainsKey(path))
-				Instantiators [path] = new ItemTemplate(path);
-			return Instantiators [path] as ItemTemplate;
-		}
-		public GraphicObject LoadInterface (string path)
-		{
-			lock (UpdateMutex) {
-				GraphicObject tmp = Load (path);
-				AddWidget (tmp);
-
-				return tmp;
-			}
-		}
 		#endregion
-
-		#if MEASURE_TIME
-		public PerformanceMeasure clippingMeasure = new PerformanceMeasure("Clipping", 100);
-		public PerformanceMeasure layoutingMeasure = new PerformanceMeasure("Layouting", 100);
-		public PerformanceMeasure updateMeasure = new PerformanceMeasure("Update", 100);
-		public PerformanceMeasure drawingMeasure = new PerformanceMeasure("Drawing", 100);
-		#endif
-
-		public List<GraphicObject> GraphicTree = new List<GraphicObject>();
-
-		Rectangles _redrawClip = new Rectangles();
-
-		Context ctx;
-		Surface surf;
-		public byte[] bmp;
-		public byte[] dirtyBmp;
-		public bool IsDirty = false;
-		public Rectangle DirtyRect;
-		public object LayoutMutex = new object();
-		public object RenderMutex = new object();
-		public object UpdateMutex = new object();
 
 		#region focus
 		GraphicObject _activeWidget;	//button is pressed on widget
 		GraphicObject _hoverWidget;		//mouse is over
 		GraphicObject _focusedWidget;	//has keyboard (or other perif) focus
 
+		/// <summary>Widget is focused and button is down or another perif action is occuring
+		/// , it can not lose focus while Active</summary>
 		public GraphicObject activeWidget
 		{
 			get { return _activeWidget; }
@@ -284,6 +325,7 @@ namespace Crow
 					#endif
 			}
 		}
+		/// <summary>Pointer is over the widget</summary>
 		public GraphicObject HoverWidget
 		{
 			get { return _hoverWidget; }
@@ -299,6 +341,7 @@ namespace Crow
 				#endif
 			}
 		}
+		/// <summary>Widget has the keyboard or mouse focus</summary>
 		public GraphicObject FocusedWidget {
 			get { return _focusedWidget; }
 			set {
@@ -313,18 +356,27 @@ namespace Crow
 		}
 		#endregion
 
-		#if DEBUG_LAYOUTING
-		public List<LQIList> LQIsTries = new List<LQIList>();
-		public LQIList curLQIsTries = new LQIList();
-		public List<LQIList> LQIs = new List<LQIList>();
-		public LQIList curLQIs = new LQIList();
-//		public static LayoutingQueueItem[] MultipleRunsLQIs {
-//			get { return curUpdateLQIs.Where(l=>l.LayoutingTries>2 || l.DiscardCount > 0).ToArray(); }
-//		}
-		public LayoutingQueueItem currentLQI;
-		#else
-		public List<LQIList> LQIs = null;//still create the var for CrowIDE
-		#endif
+
+		#region UPDATE Loops
+		/// <summary>Enqueue Graphic object for Repaint, DrawingQueue is locked because
+		/// GraphObj's property Set methods could trigger an update from another thread</summary>
+		public void EnqueueForRepaint(GraphicObject g)
+		{
+			lock (DrawingQueue) {
+				if (g.IsQueueForRedraw)
+					return;
+				DrawingQueue.Enqueue (g);
+				g.IsQueueForRedraw = true;
+			}
+		}
+		/// <summary>Main Update loop, executed in this interface thread, lock the UpdateMutex
+		/// Steps:
+		/// 	- execute device Repeat events
+		/// 	- Layouting
+		/// 	- Clipping
+		/// 	- Drawing
+		/// Result: the Interface bitmap is drawn in memory (byte[] bmp) and a dirtyRect and bitmap are available
+		/// </summary>
 		public void Update(){
 			if (mouseRepeatCount > 0) {
 				int mc = mouseRepeatCount;
@@ -369,6 +421,9 @@ namespace Crow
 
 			Monitor.Exit (UpdateMutex);
 		}
+		/// <summary>Layouting loop, this is the first step of the udpate and process registered
+		/// Layouting queue items. Failing LQI's are requeued in this cycle until MaxTry is reached which
+		/// trigger an enqueue for the next Update Cycle</summary>
 		void processLayouting(){
 			#if MEASURE_TIME
 			layoutingMeasure.StartCycle();
@@ -393,6 +448,9 @@ namespace Crow
 			layoutingMeasure.StopCycle();
 			#endif
 		}
+		/// <summary>Degueue Widget to clip from DrawingQueue and register the last painted slot and the new one
+		/// Clipping rectangles are added at each level of the tree from leef to root, that's the way for the painting
+		/// operation to known if it should go down in the tree for further graphic updates and repaints</summary>
 		void clippingRegistration(){
 			#if MEASURE_TIME
 			clippingMeasure.StartCycle();
@@ -410,6 +468,8 @@ namespace Crow
 			clippingMeasure.StopCycle();
 			#endif
 		}
+		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
+		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
 		void processDrawing(){
 			#if MEASURE_TIME
 			drawingMeasure.StartCycle();
@@ -441,7 +501,6 @@ namespace Crow
 								DirtyRect += clipping.Bounds;
 							else
 								DirtyRect = clipping.Bounds;
-							IsDirty = true;
 
 							DirtyRect.Left = Math.Max (0, DirtyRect.Left);
 							DirtyRect.Top = Math.Max (0, DirtyRect.Top);
@@ -450,13 +509,14 @@ namespace Crow
 							DirtyRect.Width = Math.Max (0, DirtyRect.Width);
 							DirtyRect.Height = Math.Max (0, DirtyRect.Height);
 
-							if (DirtyRect.Width > 0) {
+							if (DirtyRect.Width > 0 && DirtyRect.Height >0) {
 								dirtyBmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
 								for (int y = 0; y < DirtyRect.Height; y++) {
 									Array.Copy (bmp,
 										((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
 										dirtyBmp, y * DirtyRect.Width * 4, DirtyRect.Width * 4);
 								}
+								IsDirty = true;
 							} else
 								IsDirty = false;
 						}
@@ -469,11 +529,10 @@ namespace Crow
 			drawingMeasure.StopCycle();
 			#endif
 		}
+		#endregion
 
-		public Rectangles clipping {
-			get { return _redrawClip; }
-			set { _redrawClip = value; }
-		}
+		#region GraphicTree handling
+		/// <summary>Add widget to the Graphic tree of this interface and register it for layouting</summary>
 		public void AddWidget(GraphicObject g)
 		{
 			g.Parent = this;
@@ -481,11 +540,13 @@ namespace Crow
 			g.RegisteredLayoutings = LayoutingType.None;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
+		/// <summary>Set visible state of widget to false and remove if from the graphic tree</summary>
 		public void DeleteWidget(GraphicObject g)
 		{
 			g.Visible = false;//trick to ensure clip is added to refresh zone
 			GraphicTree.Remove (g);
 		}
+		/// <summary> Put widget on top of other root widgets</summary>
 		public void PutOnTop(GraphicObject g)
 		{
 			if (GraphicTree.IndexOf(g) > 0)
@@ -514,6 +575,7 @@ namespace Crow
 			curLQIs = new LQIList();
 			#endif
 		}
+		/// <summary>Search a Graphic object in the tree named 'nameToFind'</summary>
 		public GraphicObject FindByName (string nameToFind)
 		{
 			foreach (GraphicObject w in GraphicTree) {
@@ -523,8 +585,7 @@ namespace Crow
 			}
 			return null;
 		}
-
-
+		#endregion
 
 		public void ProcessResize(Rectangle bounds){
 			lock (UpdateMutex) {
@@ -541,15 +602,11 @@ namespace Crow
 			}
 		}
 
+		#region Mouse and Keyboard Handling
 		XCursor cursor = XCursor.Default;
+
 		public MouseState Mouse;
 		public KeyboardState Keyboard;
-		Rectangle clientRectangle;
-
-		public event EventHandler<MouseCursorChangedEventArgs> MouseCursorChanged;
-		public event EventHandler Quit;
-
-		#region Mouse Handling
 
 		public XCursor MouseCursor {
 			set {
@@ -559,6 +616,8 @@ namespace Crow
 				MouseCursorChanged.Raise (this,new MouseCursorChangedEventArgs(cursor));
 			}
 		}
+		/// <summary>Processes mouse move events from the root container</summary>
+		/// <returns><c>true</c>if mouse is in the interface</returns>
 		public bool ProcessMouseMove(int x, int y)
 		{
 			int deltaX = x - Mouse.X;
@@ -683,9 +742,6 @@ namespace Crow
 			HoverWidget.onMouseWheel (this, e);
 			return true;
 		}
-		#endregion
-
-		#region Keyboard
 		public bool ProcessKeyDown(int Key){
 			Keyboard.SetKeyState((Crow.Key)Key,true);
 			if (_focusedWidget == null)
@@ -786,6 +842,25 @@ namespace Crow
 		}
 		public Rectangle getSlot () { return ClientRectangle; }
 		#endregion
+
+		#if MEASURE_TIME
+		public PerformanceMeasure clippingMeasure = new PerformanceMeasure("Clipping", 100);
+		public PerformanceMeasure layoutingMeasure = new PerformanceMeasure("Layouting", 100);
+		public PerformanceMeasure updateMeasure = new PerformanceMeasure("Update", 100);
+		public PerformanceMeasure drawingMeasure = new PerformanceMeasure("Drawing", 100);
+		#endif
+		#if DEBUG_LAYOUTING
+		public List<LQIList> LQIsTries = new List<LQIList>();
+		public LQIList curLQIsTries = new LQIList();
+		public List<LQIList> LQIs = new List<LQIList>();
+		public LQIList curLQIs = new LQIList();
+		//		public static LayoutingQueueItem[] MultipleRunsLQIs {
+		//			get { return curUpdateLQIs.Where(l=>l.LayoutingTries>2 || l.DiscardCount > 0).ToArray(); }
+		//		}
+		public LayoutingQueueItem currentLQI;
+		#else
+		public List<LQIList> LQIs = null;//still create the var for CrowIDE
+		#endif
 	}
 }
 

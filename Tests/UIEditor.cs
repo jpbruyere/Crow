@@ -26,7 +26,7 @@ using Crow;
 
 namespace Tests
 {
-	class UIEditor : OpenTKGameWindow
+	class UIEditor : CrowWindow
 	{
 		[STAThread]
 		static void Main ()
@@ -44,7 +44,7 @@ namespace Tests
 		{
 			base.OnLoad (e);
 
-			CrowInterface.AddWidget(
+			AddWidget(
 				new Window ()
 				{
 					Title = "Hello World"
