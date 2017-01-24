@@ -29,12 +29,12 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 
 namespace Crow
-{    
+{
     public class Label : GraphicObject
     {
 		#region CTOR
 		public Label()
-		{ 
+		{
 
 		}
 		public Label(string _text)
@@ -45,7 +45,7 @@ namespace Crow
 		#endregion
 
         //TODO:change protected to private
-        
+
 		#region private and protected fields
 		string _text = "label";
         Alignment _textAlignment;
@@ -55,7 +55,7 @@ namespace Crow
 		bool _multiline;
 		Color selBackground;
 		Color selForeground;
-		Point mouseLocalPos = -1;//mouse coord in widget space, filled only when clicked        
+		Point mouseLocalPos = -1;//mouse coord in widget space, filled only when clicked
 		int _currentCol;        //0 based cursor position in string
 		int _currentLine;
 		Point _selBegin = -1;	//selection start (row,column)
@@ -98,10 +98,10 @@ namespace Crow
 		public Alignment TextAlignment
         {
             get { return _textAlignment; }
-            set { 
+            set {
 				if (value == _textAlignment)
 					return;
-				_textAlignment = value; 
+				_textAlignment = value;
 				RegisterForRedraw ();
 				NotifyValueChanged ("TextAlignment", _textAlignment);
 			}
@@ -112,7 +112,7 @@ namespace Crow
 			set {
 				if (horizontalStretch == value)
 					return;
-				horizontalStretch = value; 
+				horizontalStretch = value;
 				RegisterForRedraw ();
 				NotifyValueChanged ("HorizontalStretch", horizontalStretch);
 			}
@@ -123,23 +123,23 @@ namespace Crow
 			set {
 				if (verticalStretch == value)
 					return;
-				verticalStretch = value; 
+				verticalStretch = value;
 				RegisterForRedraw ();
 				NotifyValueChanged ("VerticalStretch", verticalStretch);
 			}
-		} 
+		}
 		[XmlAttributeAttribute][DefaultValue("label")]
         public string Text
         {
-            get {				
-				return lines == null ? 
+            get {
+				return lines == null ?
 					_text : lines.Aggregate((i, j) => i + Interface.LineBreak + j);
 			}
             set
             {
 				if (string.Equals (value, _text, StringComparison.Ordinal))
                     return;
-					                                
+
                 _text = value;
 
 				if (string.IsNullOrEmpty(_text))
@@ -182,7 +182,7 @@ namespace Crow
 		[XmlAttributeAttribute][DefaultValue(0)]
 		public int CurrentColumn{
 			get { return _currentCol; }
-			set { 
+			set {
 				if (value == _currentCol)
 					return;
 				if (value < 0)
@@ -197,11 +197,11 @@ namespace Crow
 		[XmlAttributeAttribute][DefaultValue(0)]
 		public int CurrentLine{
 			get { return _currentLine; }
-			set { 
+			set {
 				if (value == _currentLine)
 					return;
 				if (value >= lines.Count)
-					_currentLine = lines.Count-1; 
+					_currentLine = lines.Count-1;
 				else if (value < 0)
 					_currentLine = 0;
 				else
@@ -232,7 +232,7 @@ namespace Crow
 				NotifyValueChanged ("SelBegin", _selBegin);
 				NotifyValueChanged ("SelectedText", SelectedText);
 			}
-		}			
+		}
 		[XmlAttributeAttribute][DefaultValue("-1")]
 		public Point SelRelease {
 			get {
@@ -260,24 +260,24 @@ namespace Crow
 		/// </summary>
 		[XmlIgnore]protected Point selectionStart
 		{
-			get { 
-				return SelRelease < 0 || SelBegin.Y < SelRelease.Y ? SelBegin : 
+			get {
+				return SelRelease < 0 || SelBegin.Y < SelRelease.Y ? SelBegin :
 					SelBegin.Y > SelRelease.Y ? SelRelease :
 					SelBegin.X < SelRelease.X ? SelBegin : SelRelease;
 			}
 		}
 		[XmlIgnore]public Point selectionEnd
-		{  
-			get { 
-				return SelRelease < 0 || SelBegin.Y > SelRelease.Y ? SelBegin : 
+		{
+			get {
+				return SelRelease < 0 || SelBegin.Y > SelRelease.Y ? SelBegin :
 					SelBegin.Y < SelRelease.Y ? SelRelease :
 					SelBegin.X > SelRelease.X ? SelBegin : SelRelease;
-			}		
+			}
 		}
 		[XmlIgnore]public string SelectedText
-		{ 
+		{
 			get {
-				
+
 				if (SelRelease < 0 || SelBegin < 0)
 					return "";
 				if (selectionStart.Y == selectionEnd.Y)
@@ -289,14 +289,14 @@ namespace Crow
 				}
 				tmp += Interface.LineBreak + lines [selectionEnd.Y].Substring (0, selectionEnd.X);
 				return tmp;
-			}			
+			}
 		}
 		[XmlIgnore]public bool selectionIsEmpty
 		{ get { return SelRelease < 0; } }
 
 		List<string> lines;
 		List<string> getLines {
-			get {				
+			get {
 				return _multiline ?
 					Regex.Split (_text, "\r\n|\r|\n|\\\\n").ToList() :
 					new List<string>(new string[] { _text });
@@ -355,7 +355,7 @@ namespace Crow
 		}
 		public void DeleteChar()
 		{
-			if (selectionIsEmpty) {				
+			if (selectionIsEmpty) {
 				if (CurrentColumn == 0) {
 					if (CurrentLine == 0 && lines.Count == 1)
 						return;
@@ -368,7 +368,7 @@ namespace Crow
 				}
 				CurrentColumn--;
 				lines [CurrentLine] = lines [CurrentLine].Remove (CurrentColumn, 1);
-			} else {				
+			} else {
 				int linesToRemove = selectionEnd.Y - selectionStart.Y + 1;
 				int l = selectionStart.Y;
 
@@ -380,7 +380,7 @@ namespace Crow
 						lines.RemoveAt (l);
 					CurrentLine = selectionStart.Y;
 					CurrentColumn = selectionStart.X;
-				} else 
+				} else
 					lines [l] = lines [l].Remove (selectionStart.X, selectionEnd.X - selectionStart.X);
 				CurrentColumn = selectionStart.X;
 				SelBegin = -1;
@@ -425,10 +425,10 @@ namespace Crow
 
 		#region GraphicObject overrides
 		protected override int measureRawSize(LayoutingType lt)
-        {			
+        {
 			if (lines == null)
 				lines = getLines;
-								
+
 			using (ImageSurface img = new ImageSurface (Format.Argb32, 10, 10)) {
 				using (Context gr = new Context (img)) {
 					//Cairo.FontFace cf = gr.GetContextFontFace ();
@@ -444,8 +444,8 @@ namespace Crow
 						int lc = lines.Count;
 						//ensure minimal height = text line height
 						if (lc == 0)
-							lc = 1; 
-						
+							lc = 1;
+
 						return (int)Math.Ceiling(fe.Height * lc) + Margin * 2;
 					}
 
@@ -494,7 +494,7 @@ namespace Crow
 				if (!horizontalStretch)
 					widthRatio = heightRatio;
 			}
-			
+
 			rText.Width = (int)(widthRatio * (float)rText.Width);
 			rText.Height = (int)(heightRatio * (float)rText.Height);
 
@@ -504,7 +504,7 @@ namespace Crow
 				rText.X = cb.X;
 				rText.Y = cb.Y;
 				break;
-			case Alignment.Top:   //ok						
+			case Alignment.Top:   //ok
 				rText.Y = cb.Y;
 				rText.X = cb.X + cb.Width / 2 - rText.Width / 2;
 				break;
@@ -560,7 +560,7 @@ namespace Crow
 								SelRelease = -1;
 							else
 								SelEndCursorPos = textCursorPos;
-						}						
+						}
 					}
 				}else
 					computeTextCursorPosition(gr);
@@ -578,8 +578,8 @@ namespace Crow
 //				gr.Color = Color.Green;
 //				Rectangle R = new Rectangle (
 //					             rText.X + (int)SelEndCursorPos - 2,
-//					             rText.Y + (int)(SelRelease.Y * fe.Height), 
-//					             4, 
+//					             rText.Y + (int)(SelRelease.Y * fe.Height),
+//					             4,
 //					             (int)fe.Height);
 //				gr.Rectangle (R);
 //				gr.Fill ();
@@ -588,20 +588,20 @@ namespace Crow
 //				gr.Color = Color.UnmellowYellow;
 //				Rectangle R = new Rectangle (
 //					rText.X + (int)SelStartCursorPos - 2,
-//					rText.Y + (int)(SelBegin.Y * fe.Height), 
-//					4, 
+//					rText.Y + (int)(SelBegin.Y * fe.Height),
+//					4,
 //					(int)fe.Height);
 //				gr.Rectangle (R);
 //				gr.Fill ();
 //			}
 			//*******************
 
-			for (int i = 0; i < lines.Count; i++) {				
+			for (int i = 0; i < lines.Count; i++) {
 				string l = lines [i].Replace ("\t", new String (' ', Interface.TabSize));
 				int lineLength = (int)gr.TextExtents (l).XAdvance;
 				Rectangle lineRect = new Rectangle (
 					rText.X,
-					rText.Y + (int)Math.Ceiling(i * fe.Height), 
+					rText.Y + (int)Math.Ceiling(i * fe.Height),
 					lineLength,
 					(int)Math.Ceiling(fe.Height));
 
@@ -613,35 +613,36 @@ namespace Crow
 //					TextAlignment == Alignment.TopRight ||
 //					TextAlignment == Alignment.BottomRight)
 //					lineRect.X += (rText.Width - lineLength);
-				
-				if (SelRelease >= 0 && i >= selectionStart.Y && i <= selectionEnd.Y) {					
-					gr.SetSourceColor(selBackground);
+				if (Selectable) {
+					if (SelRelease >= 0 && i >= selectionStart.Y && i <= selectionEnd.Y) {
+						gr.SetSourceColor (selBackground);
 
-					Rectangle selRect = lineRect ;
+						Rectangle selRect = lineRect;
 
-					int cpStart = (int)SelStartCursorPos,
+						int cpStart = (int)SelStartCursorPos,
 						cpEnd = (int)SelEndCursorPos;
 
-					if (SelBegin.Y > SelRelease.Y) {
-						cpStart = cpEnd;
-						cpEnd = (int)SelStartCursorPos;
-					}
+						if (SelBegin.Y > SelRelease.Y) {
+							cpStart = cpEnd;
+							cpEnd = (int)SelStartCursorPos;
+						}
 
-					if (i == selectionStart.Y) {
-						selRect.Width -= cpStart;
-						selRect.Left += cpStart;
-					}
-					if (i == selectionEnd.Y)				
-						selRect.Width -= (lineLength - cpEnd);					
+						if (i == selectionStart.Y) {
+							selRect.Width -= cpStart;
+							selRect.Left += cpStart;
+						}
+						if (i == selectionEnd.Y)
+							selRect.Width -= (lineLength - cpEnd);
 
-					gr.Rectangle (selRect);
-					gr.Fill ();
-				} 
+						gr.Rectangle (selRect);
+						gr.Fill ();
+					}
+				}
 
 				if (string.IsNullOrWhiteSpace (l))
 					continue;
 
-				Foreground.SetAsSource (gr);	
+				Foreground.SetAsSource (gr);
 				gr.MoveTo (lineRect.X, rText.Y + fe.Ascent + fe.Height * i);
 				gr.ShowText (l);
 				gr.Fill ();
@@ -698,14 +699,14 @@ namespace Crow
 			RegisterForRedraw();
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
-		{			
+		{
 			if (this.HasFocus && _selectable){
 				updatemouseLocalPos (e.Position);
 				SelBegin = -1;
 				SelRelease = -1;
 				SelectionInProgress = true;
 				RegisterForRedraw();//TODO:should put it in properties
-			}          
+			}
 
 			//done at the end to set 'hasFocus' value after testing it
 			base.onMouseDown (sender, e);
@@ -716,7 +717,7 @@ namespace Crow
 
 			if (!SelectionInProgress)
 				return;
-			
+
 			updatemouseLocalPos (e.Position);
 			SelectionInProgress = false;
 			RegisterForRedraw ();
@@ -739,7 +740,7 @@ namespace Crow
 		/// from mouseLocalPos
 		/// </summary>
 		void computeTextCursor(Context gr)
-		{			
+		{
 			TextExtents te;
 
 			double cPos = 0f;
@@ -755,7 +756,7 @@ namespace Crow
 				string c = lines [CurrentLine].Substring (i, 1);
 				if (c == "\t")
 					c = new string (' ', Interface.TabSize);
-				
+
 				te = gr.TextExtents(c);
 
 				double halfWidth = te.XAdvance / 2;
@@ -778,7 +779,7 @@ namespace Crow
 		}
 		/// <summary> Computes offsets in cairo units </summary>
 		void computeTextCursorPosition(Context gr)
-		{			
+		{
 			if (SelBegin >= 0)
 				SelStartCursorPos = GetXFromTextPointer (gr, SelBegin);
 			if (SelRelease >= 0)

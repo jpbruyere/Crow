@@ -32,15 +32,18 @@ namespace Crow
 		internal static MethodInfo miGetColCount = typeof(System.Collections.ICollection).GetProperty("Count").GetGetMethod();
 		internal static MethodInfo miGetDelegateListItem = typeof(List<Delegate>).GetMethod("get_Item", new Type[] { typeof(Int32) });
 
-		internal static MethodInfo miCompileDynEventHandler = typeof(CompilerServices).GetMethod ("compileDynEventHandler", BindingFlags.Static | BindingFlags.Public);
-		internal static MethodInfo miRemEvtHdlByName = typeof(CompilerServices).GetMethod("RemoveEventHandlerByName", BindingFlags.Static | BindingFlags.Public);
-		internal static MethodInfo miRemEvtHdlByTarget = typeof(CompilerServices).GetMethod("RemoveEventHandlerByTarget", BindingFlags.Static | BindingFlags.Public);
-		internal static MethodInfo miGetMethInfoWithRefx = typeof(CompilerServices).GetMethod ("getMethodInfoWithReflexion", BindingFlags.Static | BindingFlags.Public);
-		internal static MethodInfo miGetMembIinfoWithRefx = typeof(CompilerServices).GetMethod("getMemberInfoWithReflexion", BindingFlags.Static | BindingFlags.Public);
-		internal static MethodInfo miSetValWithRefx = typeof(CompilerServices).GetMethod("setValueWithReflexion", BindingFlags.Static | BindingFlags.Public);
-		internal static MethodInfo miGetValWithRefx = typeof(CompilerServices).GetMethod("getValueWithReflexion", BindingFlags.Static | BindingFlags.Public);
+		internal static MethodInfo miCompileDynEventHandler = typeof(CompilerServices).GetMethod ("compileDynEventHandler", BindingFlags.Static | BindingFlags.NonPublic);
+		internal static MethodInfo miRemEvtHdlByName = typeof(CompilerServices).GetMethod("removeEventHandlerByName", BindingFlags.Static | BindingFlags.NonPublic);
+		internal static MethodInfo miRemEvtHdlByTarget = typeof(CompilerServices).GetMethod("removeEventHandlerByTarget", BindingFlags.Static | BindingFlags.NonPublic);
+		internal static MethodInfo miGetMethInfoWithRefx = typeof(CompilerServices).GetMethod ("getMethodInfoWithReflexion", BindingFlags.Static | BindingFlags.NonPublic);
+		internal static MethodInfo miGetMembIinfoWithRefx = typeof(CompilerServices).GetMethod("getMemberInfoWithReflexion", BindingFlags.Static | BindingFlags.NonPublic);
+		internal static MethodInfo miSetValWithRefx = typeof(CompilerServices).GetMethod("setValueWithReflexion", BindingFlags.Static | BindingFlags.NonPublic);
+		internal static MethodInfo miGetValWithRefx = typeof(CompilerServices).GetMethod("getValueWithReflexion", BindingFlags.Static | BindingFlags.NonPublic);
 		internal static MethodInfo miCreateDel = typeof(CompilerServices).GetMethod ("createDel", BindingFlags.Static | BindingFlags.NonPublic);
-		internal static MethodInfo miGetImplOp = typeof(CompilerServices).GetMethod ("getImplicitOp", BindingFlags.Static | BindingFlags.Public);
+		internal static MethodInfo miGetImplOp = typeof(CompilerServices).GetMethod ("getImplicitOp", BindingFlags.Static | BindingFlags.NonPublic);
+
+
+		internal static MethodInfo miGoUpLevels = typeof(CompilerServices).GetMethod("goUpNbLevels", BindingFlags.Static | BindingFlags.NonPublic);
 
 		internal static FieldInfo fiCachedDel = typeof(Instantiator).GetField("cachedDelegates", BindingFlags.Instance | BindingFlags.NonPublic);
 		internal static FieldInfo fiTemplateBinding = typeof(Instantiator).GetField("templateBinding", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -236,76 +239,20 @@ namespace Crow
 		}
 		#endregion
 
-		/// <summary>
-		/// retrieve event handler in class or ancestors
-		/// </summary>
-		public static FieldInfo GetEventHandlerField (Type type, string eventName)
-		{
-			FieldInfo fi;
-			Type ty = type;
-			do {
-				fi = ty.GetField (eventName,
-					BindingFlags.NonPublic |
-					BindingFlags.Instance |
-					BindingFlags.GetField);
-				ty = ty.BaseType;
-				if (ty == null)
-					break;
-			} while (fi == null);
-			return fi;
+		#region Reflexion helpers
+		static MemberInfo getMemberInfoWithReflexion(object instance, string member){
+			return instance.GetType ().GetMember (member)?.FirstOrDefault();
 		}
-
-		/// <summary>
-		/// Gets extension methods defined in assembley for extendedType
-		/// </summary>
-		/// <returns>Extension methods enumerable</returns>
-		/// <param name="assembly">Assembly</param>
-		/// <param name="extendedType">Extended type to search for</param>
-		public static IEnumerable<MethodInfo> GetExtensionMethods (Assembly assembly,
-			Type extendedType)
-		{
-			IEnumerable<MethodInfo> query = null;
-			Type curType = extendedType;
-
-			do {
-				query = from type in assembly.GetTypes ()
-						where type.IsSealed && !type.IsGenericType && !type.IsNested
-						from method in type.GetMethods (BindingFlags.Static
-							| BindingFlags.Public | BindingFlags.NonPublic)
-						where method.IsDefined (typeof (ExtensionAttribute), false)
-						where method.GetParameters () [0].ParameterType == curType
-						select method;
-
-				if (query.Count () > 0)
-					break;
-
-				curType = curType.BaseType;
-			} while (curType != null);
-
-			return query;
-		}
-
-		public static MethodInfo SearchExtMethod(Type t, string methodName){
-			MethodInfo mi = null;
-			mi = GetExtensionMethods (Assembly.GetEntryAssembly(), t)
-				.Where (em => em.Name == methodName).FirstOrDefault ();
-			if (mi != null)
-				return mi;
-
-			return GetExtensionMethods (Assembly.GetExecutingAssembly(), t)
-				.Where (em => em.Name == methodName).FirstOrDefault ();
-		}
-
-		public static MemberInfo getMemberInfoWithReflexion(object instance, string member){
-			return instance.GetType ().GetMember (member).FirstOrDefault();
-		}
-		public static MethodInfo getMethodInfoWithReflexion(object instance, string method){
+		static MethodInfo getMethodInfoWithReflexion(object instance, string method){
 			return instance.GetType ().GetMethod (method, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 		}
-		public static Type getEventHandlerType(object instance, string eventName){
-			return instance.GetType ().GetEvent (eventName).EventHandlerType;
-		}
-		public static void setValueWithReflexion(object dest, object value, string destMember){
+		/// <summary>
+		/// set value, convert if required
+		/// </summary>
+		/// <param name="dest">Destination instance</param>
+		/// <param name="value">Value</param>
+		/// <param name="destMember">Destination member</param>
+		static void setValueWithReflexion(object dest, object value, string destMember){
 			Type destType = null;
 			Type origType = null;
 			object convertedVal = null;
@@ -323,13 +270,17 @@ namespace Crow
 				destType =(miDest as FieldInfo).FieldType;
 
 			if (value != null) {
-				origType = value.GetType ();
-				if (destType.IsAssignableFrom (origType))
-					convertedVal = Convert.ChangeType (value, destType);
-				else if (origType.IsPrimitive & destType.IsPrimitive)
-					convertedVal = GetConvertMethod (destType).Invoke (null, new Object[] { value });
-				else
-					convertedVal = getImplicitOp (origType, destType).Invoke (value, null);
+				if (destType == TObject)//TODO: check that test of destType is not causing problems
+					convertedVal = value;
+				else {
+					origType = value.GetType ();
+					if (destType.IsAssignableFrom (origType))
+						convertedVal = Convert.ChangeType (value, destType);
+					else if (origType.IsPrimitive & destType.IsPrimitive)
+						convertedVal = GetConvertMethod (destType).Invoke (null, new Object[] { value });
+					else
+						convertedVal = getImplicitOp (origType, destType).Invoke (value, null);
+				}
 			}
 
 			if (miDest.MemberType == MemberTypes.Property)
@@ -337,7 +288,11 @@ namespace Crow
 			else if (miDest.MemberType == MemberTypes.Field)
 				(miDest as FieldInfo).SetValue (dest, convertedVal);
 		}
-		public static object getValueWithReflexion(object instance, MemberInfo mi){
+		/// <summary>
+		/// Gets value with reflexion, return empty string ("") for string and object and return
+		/// default value for valueType data.
+		/// </summary>
+		static object getValueWithReflexion(object instance, MemberInfo mi){
 			object tmp = null;
 			Type dstType = null;
 			if (mi == null)
@@ -361,7 +316,93 @@ namespace Crow
 
 			return null;
 		}
-		public static void emitGetInstance (ILGenerator il, NodeAddress orig, NodeAddress dest){
+		/// <summary>
+		/// Gets all extension methods defined in assembly for Type
+		/// </summary>
+		/// <returns>Extension methods enumerable</returns>
+		/// <param name="assembly">Assembly</param>
+		/// <param name="extendedType">Extended type to search for</param>
+		internal static IEnumerable<MethodInfo> GetExtensionMethods (Assembly assembly,
+			Type extendedType)
+		{
+			IEnumerable<MethodInfo> query = null;
+			Type curType = extendedType;
+
+			do {
+				query = from type in assembly.GetTypes ()
+						where type.IsSealed && !type.IsGenericType && !type.IsNested
+					from method in type.GetMethods (BindingFlags.Static
+						| BindingFlags.Public | BindingFlags.NonPublic)
+						where method.IsDefined (typeof (ExtensionAttribute), false)
+						where method.GetParameters () [0].ParameterType == curType
+					select method;
+
+				if (query.Count () > 0)
+					break;
+
+				curType = curType.BaseType;
+			} while (curType != null);
+
+			return query;
+		}
+		/// <summary>
+		/// search for extentions method in entry assembly then in crow assembly
+		/// </summary>
+		/// <returns>Extention MethodInfo</returns>
+		/// <param name="t">Extended type</param>
+		/// <param name="methodName">Extention method name</param>
+		internal static MethodInfo SearchExtMethod(Type t, string methodName){
+			MethodInfo mi = null;
+			mi = GetExtensionMethods (Assembly.GetEntryAssembly(), t)
+				.Where (em => em.Name == methodName).FirstOrDefault ();
+			if (mi != null)
+				return mi;
+
+			return GetExtensionMethods (Assembly.GetExecutingAssembly(), t)
+				.Where (em => em.Name == methodName).FirstOrDefault ();
+		}
+		/// <summary>
+		/// retrieve event handler in class or ancestors
+		/// </summary>
+		static FieldInfo getEventHandlerField (Type type, string eventName)
+		{
+			FieldInfo fi;
+			Type ty = type;
+			do {
+				fi = ty.GetField (eventName,
+					BindingFlags.NonPublic |
+					BindingFlags.Instance |
+					BindingFlags.GetField);
+				ty = ty.BaseType;
+				if (ty == null)
+					break;
+			} while (fi == null);
+			return fi;
+		}
+		/// <summary>
+		/// search for an implicit conversion method in origine or destination classes
+		/// </summary>
+		static MethodInfo getImplicitOp(Type origType, Type dstType){
+			foreach(MethodInfo mi in origType.GetMethods(BindingFlags.Public|BindingFlags.Static)){
+				if (mi.Name == "op_Implicit") {
+					if (mi.ReturnType == dstType && mi.GetParameters ().FirstOrDefault ().ParameterType == origType)
+						return mi;
+				}
+			}
+			foreach(MethodInfo mi in dstType.GetMethods(BindingFlags.Public|BindingFlags.Static)){
+				if (mi.Name == "op_Implicit") {
+					if (mi.ReturnType == dstType && mi.GetParameters ().FirstOrDefault ().ParameterType == origType)
+						return mi;
+				}
+			}
+			return null;
+		}
+		#endregion
+
+		/// <summary>
+		/// Emits tree parsing command to fetch dest instance starting from orig node
+		/// </summary>
+		internal static void emitGetInstance (ILGenerator il, NodeAddress orig, NodeAddress dest){
 			int ptr = 0;
 			while (orig [ptr] == dest [ptr]) {
 				ptr++;
@@ -375,13 +416,24 @@ namespace Crow
 				ptr++;
 			}
 		}
-		public static void emitGetInstance (ILGenerator il, NodeAddress dest){
+		/// <summary>
+		/// Emits tree parsing commands to get child starting at root node
+		/// </summary>
+		/// <param name="il">MSIL generator</param>
+		/// <param name="dest">Absolute Node Address of the instance to get</param>
+		internal static void emitGetInstance (ILGenerator il, NodeAddress dest){
 			if (dest == null)
 				return;
 			for (int i = 0; i < dest.Count - 1; i++)
 				emitGetChild (il, dest [i].CrowType, dest [i + 1].Index);
 		}
-		public static void emitGetChild(ILGenerator il, Type parentType, int index){
+		/// <summary>
+		/// Emits msil to fetch chil instance of current GraphicObject on the stack
+		/// </summary>
+		/// <param name="il">Il generator</param>
+		/// <param name="parentType">Parent type</param>
+		/// <param name="index">Index of child, -1 for template root</param>
+		internal static void emitGetChild(ILGenerator il, Type parentType, int index){
 			if (typeof (Group).IsAssignableFrom (parentType)) {
 				il.Emit (OpCodes.Ldfld, fiChildren);
 				il.Emit(OpCodes.Ldc_I4, index);
@@ -403,10 +455,11 @@ namespace Crow
 				return;
 			}
 		}
+
 		/// <summary>
-		/// Emit conversion from orig type to dest type
+		/// Emit MSIL for conversion from orig type to dest type
 		/// </summary>
-		public static void emitConvert(ILGenerator il, Type origType, Type destType){
+		internal static void emitConvert(ILGenerator il, Type origType, Type destType){
 			if (destType == CompilerServices.TObject)
 				return;
 			if (destType == typeof(string)) {
@@ -439,7 +492,7 @@ namespace Crow
 		/// check type of current object on the stack and convert to dest type,
 		/// use loc_0 so store it as object!!!
 		/// </summary>
-		public static void emitConvert(ILGenerator il, Type dstType){
+		internal static void emitConvert(ILGenerator il, Type dstType){
 			System.Reflection.Emit.Label endConvert = il.DefineLabel ();
 			System.Reflection.Emit.Label convert = il.DefineLabel ();
 
@@ -500,30 +553,13 @@ namespace Crow
 
 			il.MarkLabel (endConvert);
 		}
-		/// <summary>
-		/// search for an implicit conversion method in origine or destination classes
-		/// </summary>
-		public static MethodInfo getImplicitOp(Type origType, Type dstType){
-			foreach(MethodInfo mi in origType.GetMethods(BindingFlags.Public|BindingFlags.Static)){
-				if (mi.Name == "op_Implicit") {
-					if (mi.ReturnType == dstType && mi.GetParameters ().FirstOrDefault ().ParameterType == origType)
-						return mi;
-				}
-			}
-			foreach(MethodInfo mi in dstType.GetMethods(BindingFlags.Public|BindingFlags.Static)){
-				if (mi.Name == "op_Implicit") {
-					if (mi.ReturnType == dstType && mi.GetParameters ().FirstOrDefault ().ParameterType == origType)
-						return mi;
-				}
-			}
-			return null;
-		}
+
 		/// <summary>
 		/// Removes delegate from event handler by name
 		/// </summary>
-		public static void RemoveEventHandlerByName(object instance, string eventName, string delegateName){
+		static void removeEventHandlerByName(object instance, string eventName, string delegateName){
 			Type t = instance.GetType ();
-			FieldInfo fiEvt = CompilerServices.GetEventHandlerField (t, eventName);
+			FieldInfo fiEvt = getEventHandlerField (t, eventName);
 			if (fiEvt == null) {
 				Debug.WriteLine ("RemoveHandlerByName: Event '" + eventName + "' not found in " + instance);
 				return;
@@ -544,9 +580,9 @@ namespace Crow
 		/// <summary>
 		/// Removes delegate from event handler by searching for the object they are bond to
 		/// </summary>
-		public static void RemoveEventHandlerByTarget(object instance, string eventName, object target){
+		static void removeEventHandlerByTarget(object instance, string eventName, object target){
 			Type t = instance.GetType ();
-			FieldInfo fiEvt = CompilerServices.GetEventHandlerField (t, eventName);
+			FieldInfo fiEvt = getEventHandlerField (t, eventName);
 			EventInfo eiEvt = t.GetEvent (eventName);
 			MulticastDelegate multiDel = fiEvt.GetValue (instance) as MulticastDelegate;
 			if (multiDel != null) {
@@ -560,7 +596,10 @@ namespace Crow
 				}
 			}
 		}
-		internal static Delegate createDel(Type eventType, object instance, string method){
+		/// <summary>
+		/// create delegate helper
+		/// </summary>
+		static Delegate createDel(Type eventType, object instance, string method){
 			Type t = instance.GetType ();
 			MethodInfo mi = t.GetMethod (method, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			if (mi == null) {
@@ -569,7 +608,8 @@ namespace Crow
 			}
 			return Delegate.CreateDelegate (eventType, instance, mi);
 		}
-		public static Delegate compileDynEventHandler(EventInfo sourceEvent, string expression, NodeAddress currentNode = null){
+
+		internal static Delegate compileDynEventHandler(EventInfo sourceEvent, string expression, NodeAddress currentNode = null){
 			#if DEBUG_BINDING
 			Debug.WriteLine ("\tCompile Event {0}: {1}", sourceEvent.Name, expression);
 			#endif
@@ -597,100 +637,102 @@ namespace Crow
 			string [] srcLines = expression.Trim ().Split (new char [] { ';' });
 
 			foreach (string srcLine in srcLines) {
-				string statement = srcLine.Trim ();
-
-				string [] operandes = statement.Split (new char [] { '=' });
-				if (operandes.Length < 2) //not an affectation
-				{
-					//maybe we could handle here handler function name
+				if (string.IsNullOrEmpty (srcLine))
 					continue;
-				}
+				string [] operandes = srcLine.Trim ().Split (new char [] { '=' });
+				if (operandes.Length != 2) //not an affectation
+					throw new NotSupportedException ();
 
-				string rop = operandes [operandes.Length - 1].Trim ();
+				System.Reflection.Emit.Label cancel = il.DefineLabel ();
+				System.Reflection.Emit.Label cancelFinalSet = il.DefineLabel ();
+				System.Reflection.Emit.Label success = il.DefineLabel ();
 
-				#region LEFT OPERANDES
-				string [] lopParts = operandes [0].Trim ().Split ('/');
-				MemberInfo lopMI = null;
+				BindingMember lop = new BindingMember (operandes [0].Trim ());
+				BindingMember rop = new BindingMember (operandes [1].Trim ());
 
-				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack
+				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
 
-				if (lopParts.Length > 1) {
-					NodeAddress lopNA = getNodeAdressFromBindingExp (currentNode, lopParts);
-					CompilerServices.emitGetInstance (il, currentNode, lopNA);
-					lopType = lopNA.NodeType;
-				}
+				#region Left operande
+				PropertyInfo lopPI = null;
 
-				string [] bindTrg = lopParts.Last().Split ('.');
-
-				if (bindTrg.Length == 1)
-					lopMI = lopType.GetMember (bindTrg [0]).FirstOrDefault();
-				else if (bindTrg.Length == 2) {
-					//named target
-					//TODO:
-					il.Emit(OpCodes.Ldstr, bindTrg[0]);
-					il.Emit(OpCodes.Callvirt, miFindByName);
-					lopMI = lopType.GetMember (bindTrg [1]).FirstOrDefault();
-				} else
-					throw new Exception ("Syntax error in binding, expected 'go dot member'");
-
-
-				if (lopMI == null)
-					throw new Exception (string.Format ("IML BINDING: Member not found"));
-
-				OpCode lopSetOpCode;
-				dynamic lopSetMI;
-				Type lopT = null;
-				switch (lopMI.MemberType) {
-				case MemberTypes.Property:
-					lopSetOpCode = OpCodes.Callvirt;
-					PropertyInfo lopPi = lopMI as PropertyInfo;
-					lopT = lopPi.PropertyType;
-					lopSetMI = lopPi.GetSetMethod ();
-					break;
-				case MemberTypes.Field:
-					lopSetOpCode = OpCodes.Stfld;
-					FieldInfo dstFi = lopMI as FieldInfo;
-					lopT = dstFi.FieldType;
-					lopSetMI = dstFi;
-					break;
-				default:
-					throw new Exception (string.Format ("GOML:member type not handle"));
-				}
+				//in dyn handler, no datasource binding, so single name in expression are also handled as current node property
+				if (lop.IsSingleName)
+					lopPI = lopType.GetProperty (lop.Tokens [0]);
+				else if (lop.IsCurrentNodeProperty)
+					lopPI = lopType.GetProperty (lop.Tokens [1]);
+				else
+					lop.emitGetTarget (il, cancel);
 				#endregion
 
 				#region RIGHT OPERANDES
-				if (rop.StartsWith ("\'")) {
-					if (!rop.EndsWith ("\'"))
-						throw new Exception (string.Format
-							("GOML:malformed string constant in handler: {0}", rop));
-					string strcst = rop.Substring (1, rop.Length - 2);
+				if (rop.IsStringConstant){
+					il.Emit (OpCodes.Ldstr, rop.Tokens[0]);
+					lop.emitSetProperty (il);
+				}else if (rop.IsSingleName && rop.Tokens[0] == "this"){
+					il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
+					lop.emitSetProperty (il);
+				}else if (rop.LevelsUp ==0 && !string.IsNullOrEmpty(rop.Tokens[0])) {//parsable constant depending on lop type
+					//if left operand is member of current node, it's easy to fetch type, else we should use reflexion in msil
+					if (lopPI == null){//accept GraphicObj members, but it's restricive
+						//TODO: we should get the parse method by reflexion, or something else
+						lopPI = typeof(GraphicObject).GetProperty (lop.Tokens [lop.Tokens.Length-1]);
+						if (lopPI == null)
+							throw new NotSupportedException ();
+					}
 
-					il.Emit (OpCodes.Ldstr, strcst);
-
-				} else {
-					if (lopT.IsEnum)
-						throw new NotImplementedException ();
-
-					MethodInfo lopParseMi = lopT.GetMethod ("Parse");
+					MethodInfo lopParseMi = lopPI.PropertyType.GetMethod ("Parse");
 					if (lopParseMi == null)
 						throw new Exception (string.Format
-							("GOML:no parse method found in: {0}", lopT.Name));
-					il.Emit (OpCodes.Ldstr, rop);
-					il.Emit (OpCodes.Callvirt, lopParseMi);
-					il.Emit (OpCodes.Unbox_Any, lopT);
-				}
+							("IML: no static 'Parse' method found in: {0}", lopPI.PropertyType.Name));
 
+					il.Emit (OpCodes.Ldstr, operandes [1].Trim ());
+					il.Emit (OpCodes.Callvirt, lopParseMi);
+					il.Emit (OpCodes.Unbox_Any, lopPI.PropertyType);
+
+					//emit left operand assignment
+					il.Emit (OpCodes.Callvirt, lopPI.GetSetMethod());
+				} else {//tree parsing and propert gets
+					il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
+
+					rop.emitGetTarget (il, cancelFinalSet);
+					rop.emitGetProperty (il, cancelFinalSet);
+					lop.emitSetProperty (il);
+				}
 				#endregion
 
-				//emit left operand assignment
-				il.Emit (lopSetOpCode, lopSetMI);
+				il.Emit (OpCodes.Br, success);
+
+				il.MarkLabel (cancelFinalSet);
+				il.Emit (OpCodes.Pop);	//pop null MemberInfo on the stack causing cancelation
+				il.MarkLabel (cancel);
+				il.Emit (OpCodes.Pop);	//pop null instance on the stack causing cancelation
+				il.MarkLabel (success);
 			}
 
 			il.Emit (OpCodes.Ret);
 
 			return dm.CreateDelegate (sourceEvent.EventHandlerType);
 		}
-		public static string[] splitOnSemiColumnOutsideAccolades (string expression){
+
+		/// <summary>
+		/// MSIL helper, go n levels up
+		/// </summary>
+		/// <returns><c>true</c>, if logical parents are not null</returns>
+		/// <param name="instance">Start Instance</param>
+		/// <param name="levelCount">Levels to go upward</param>
+		internal static ILayoutable goUpNbLevels(ILayoutable instance, int levelCount){
+			ILayoutable tmp = instance;
+			int i = 0;
+			while (tmp != null && i < levelCount) {
+				tmp = tmp.LogicalParent;
+				i++;
+			}
+			return tmp;
+		}
+		/// <summary>
+		/// Splits expression on semicolon but ignore those between accolades
+		/// </summary>
+		internal static string[] splitOnSemiColumnOutsideAccolades (string expression){
 			List<String> exps = new List<string>();
 			int accCount = 0;
 			int expPtr = 0;
@@ -714,36 +756,6 @@ namespace Crow
 				exps.Add(expression);
 			return exps.ToArray ();
 		}
-		/// <summary>
-		/// Gets the node adress from binding expression splitted with '/' starting at a given node
-		/// </summary>
-		public static NodeAddress getNodeAdressFromBindingExp(NodeAddress sourceAddr, string[] bindingExp){
-			int ptr = sourceAddr.Count - 1;
-
-			//if exp start with '/' => Graphic tree parsing start at source
-			if (string.IsNullOrEmpty (bindingExp [0])) {
-				//TODO:
-			} else if (bindingExp [0] == ".") { //search template root
-				ptr--;
-				while (ptr >= 0) {
-					if (typeof(TemplatedControl).IsAssignableFrom (sourceAddr [ptr].CrowType))
-						break;
-					ptr--;
-				}
-			} else if (bindingExp [0] == "..") { //search starting at current node
-				int levelUp = bindingExp.Length - 1;
-				if (levelUp > ptr + 1)
-					throw new Exception ("Binding error: try to bind outside IML source");
-				ptr -= levelUp;
-			}
-			//TODO:change Template special address identified with Nodecount = 0 to something not using array count to 0,
-			//here linq is working without limits checking in compile option
-			//but defining a 0 capacity array with limits cheking enabled, cause 'out of memory' error
-			return new NodeAddress (sourceAddr.Take(ptr+1).ToArray());//[ptr+1];
-			//Array.Copy (sourceAddr.ToArray (), targetNode, ptr + 1);
-			//return new NodeAddress (targetNode);
-		}
-
 	}
 }
 
