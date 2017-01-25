@@ -40,6 +40,7 @@ namespace Crow
 
 		#region events
 		public event EventHandler<SelectionChangeEventArgs> SelectedItemChanged;
+		public event EventHandler Loaded;
 		#endregion
 
 		IList data;
@@ -47,7 +48,7 @@ namespace Crow
 		Color selBackground, selForeground;
 
 		int itemPerPage = 50;
-		Thread loadingThread = null;
+		CrowThread loadingThread = null;
 		volatile bool cancelLoading = false;
 
 		#region Templating
@@ -141,8 +142,8 @@ namespace Crow
 				if (data == null)
 					return;
 
-				loadingThread = new Thread (loading);
-				loadingThread.IsBackground = true;
+				loadingThread = new CrowThread (this, loading);
+				loadingThread.Finished += (object sender, EventArgs e) => (sender as TemplatedGroup).Loaded.Raise (sender, e);
 				loadingThread.Start ();
 				//loadPage(1);
 
@@ -310,13 +311,8 @@ namespace Crow
 			}
 		}
 		void cancelLoadingThread(){
-			if (loadingThread == null)
-				return;
-			if (!loadingThread.IsAlive)
-				return;
-			cancelLoading = true;
-			loadingThread.Join ();
-			cancelLoading = false;
+			if (loadingThread != null)
+				loadingThread.Cancel ();
 		}
 		void loadPage(int pageNum)
 		{
@@ -374,6 +370,8 @@ namespace Crow
 			}
 		}
 		protected void loadItem(int i, Group page){
+			if (data [i] == null)//TODO:surely a threading sync problem
+				return;
 			GraphicObject g = null;
 			ItemTemplate iTemp = null;
 			Type dataType = data [i].GetType ();

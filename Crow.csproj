@@ -153,6 +153,7 @@
     <Compile Include="src\IML\EventBinding.cs" />
     <Compile Include="src\PerformanceMeasure.cs" />
     <Compile Include="src\IML\BindingMember.cs" />
+    <Compile Include="src\CrowThread.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

@@ -507,8 +507,10 @@ namespace Crow
 				isVisible = value;
 
 				//ensure main win doesn't keep hidden childrens ref
-				if (!isVisible && this.Contains (CurrentInterface.HoverWidget))
-					CurrentInterface.HoverWidget = null;
+				if (CurrentInterface.HoverWidget != null) {
+					if (!isVisible && this.Contains (CurrentInterface.HoverWidget))
+						CurrentInterface.HoverWidget = null;
+				}
 
 				if (isVisible)
 					RegisterForLayouting (LayoutingType.Sizing);
@@ -1200,8 +1202,8 @@ namespace Crow
 				currentInterface.clickTimer.Restart();
 			CurrentInterface.eligibleForDoubleClick = null;
 			
-			if (CurrentInterface.activeWidget == null)
-				CurrentInterface.activeWidget = this;
+			if (CurrentInterface.ActiveWidget == null)
+				CurrentInterface.ActiveWidget = this;
 			if (this.Focusable && !Interface.FocusOnHover) {
 				BubblingMouseButtonEventArg be = e as BubblingMouseButtonEventArg;
 				if (be.Focused == null) {

@@ -142,6 +142,7 @@ namespace Crow
 		public static Dictionary<String, Instantiator> Instantiators = new Dictionary<string, Instantiator>();
 		public bool DesignMode = false;
 		public int TopWindows = 0;//window always on top count
+		public List<CrowThread> CrowThreads = new List<CrowThread>();//used to monitor thread finished
 		#endregion
 
 		#region Private Fields
@@ -302,7 +303,7 @@ namespace Crow
 
 		/// <summary>Widget is focused and button is down or another perif action is occuring
 		/// , it can not lose focus while Active</summary>
-		public GraphicObject activeWidget
+		public GraphicObject ActiveWidget
 		{
 			get { return _activeWidget; }
 			set
@@ -394,6 +395,13 @@ namespace Crow
 					_focusedWidget.onKeyDown (this, lastKeyDownEvt);
 				}
 			}
+			CrowThread[] tmpThreads;
+			lock (CrowThreads) {
+				tmpThreads = new CrowThread[CrowThreads.Count];
+				Array.Copy (CrowThreads.ToArray (), tmpThreads, CrowThreads.Count);
+			}
+			for (int i = 0; i < tmpThreads.Length; i++)
+				tmpThreads [i].CheckState ();
 
 			if (!Monitor.TryEnter (UpdateMutex))
 				return;
@@ -535,14 +543,15 @@ namespace Crow
 
 		#region GraphicTree handling
 		/// <summary>Add widget to the Graphic tree of this interface and register it for layouting</summary>
-		public void AddWidget(GraphicObject g)
+		public void AddWidget(GraphicObject g, bool topMost = false)
 		{
 			g.Parent = this;
 			int ptr = TopWindows;
 			if (g is Window) {
 				if ((g as Window).AlwaysOnTop)
 					ptr = 0;
-			}
+			} else if (topMost)
+				ptr = 0;
 			GraphicTree.Insert (ptr, g);
 			g.RegisteredLayoutings = LayoutingType.None;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
@@ -554,12 +563,18 @@ namespace Crow
 			GraphicTree.Remove (g);
 		}
 		/// <summary> Put widget on top of other root widgets</summary>
-		public void PutOnTop(GraphicObject g)
+		public void PutOnTop(GraphicObject g, bool topMost = false)
 		{
-			if (GraphicTree.IndexOf(g) > TopWindows)
+			int ptr = TopWindows;
+			if (g is Window) {
+				if ((g as Window).AlwaysOnTop)
+					ptr = 0;
+			} else if (topMost)
+				ptr = 0;
+			if (GraphicTree.IndexOf(g) > ptr)
 			{
 				GraphicTree.Remove(g);
-				GraphicTree.Insert(TopWindows, g);
+				GraphicTree.Insert(ptr, g);
 				EnqueueForRepaint (g);
 			}
 		}
@@ -634,10 +649,10 @@ namespace Crow
 			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
 			e.Mouse = Mouse;
 
-			if (activeWidget != null) {
+			if (ActiveWidget != null) {
 				//TODO, ensure object is still in the graphic tree
 				//send move evt even if mouse move outside bounds
-				activeWidget.onMouseMove (this, e);
+				ActiveWidget.onMouseMove (this, e);
 				return true;
 			}
 
@@ -717,7 +732,7 @@ namespace Crow
 			}
 
 			_activeWidget.onMouseUp (_activeWidget, e);
-			activeWidget = null;
+			ActiveWidget = null;
 			return true;
 		}
 		public bool ProcessMouseButtonDown(int button)
