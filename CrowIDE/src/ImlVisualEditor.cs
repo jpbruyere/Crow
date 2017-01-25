@@ -45,10 +45,43 @@ namespace CrowIDE
 		Interface imlVE;
 		Instantiator itor;
 		string imlSource;
+		GraphicObject selectedItem;
 
 		bool drawGrid;
 		int gridSpacing;
 
+		[XmlAttributeAttribute][DefaultValue(true)]
+		public bool DrawGrid {
+			get { return drawGrid; }
+			set {
+				if (drawGrid == value)
+					return;
+				drawGrid = value;
+				NotifyValueChanged ("DrawGrid", drawGrid);
+				RegisterForRedraw ();
+			}
+		}
+		[XmlAttributeAttribute][DefaultValue(10)]
+		public int GridSpacing {
+			get { return gridSpacing; }
+			set {
+				if (gridSpacing == value)
+					return;
+				gridSpacing = value;
+				NotifyValueChanged ("GridSpacing", gridSpacing);
+				RegisterForRedraw ();
+			}
+		}
+		[XmlAttributeAttribute]public GraphicObject SelectedItem {
+			get { return selectedItem; }
+			set {
+				if (selectedItem == value)
+					return;
+				selectedItem = value;
+				NotifyValueChanged ("SelectedItem", selectedItem);
+				RegisterForRedraw ();
+			}
+		}
 		[XmlIgnore]public List<LQIList> LQIs {
 			get { return imlVE.LQIs; }
 		}
@@ -109,7 +142,9 @@ namespace CrowIDE
 			using (StreamReader sr = new StreamReader (imlPath)) {
 				ImlSource = sr.ReadToEnd ();
 			}
+			NotifyValueChanged ("GraphicTree", null);
 			NotifyValueChanged ("GraphicTree", GraphicTree);
+			SelectedItem = null;
 		}
 		void reload_iTor(Instantiator new_iTot){
 			itor = new_iTot;
@@ -125,31 +160,6 @@ namespace CrowIDE
 			}
 		}
 
-		[XmlAttributeAttribute()][DefaultValue(true)]
-		public bool DrawGrid {
-			get { return drawGrid; }
-			set {
-				if (drawGrid == value)
-					return;
-				drawGrid = value;
-				NotifyValueChanged ("DrawGrid", drawGrid);
-				RegisterForRedraw ();
-			}
-		}
-		[XmlAttributeAttribute()][DefaultValue(10)]
-		public int GridSpacing {
-			get { return gridSpacing; }
-			set {
-				if (gridSpacing == value)
-					return;
-				gridSpacing = value;
-				NotifyValueChanged ("GridSpacing", gridSpacing);
-				RegisterForRedraw ();
-			}
-		}
-		[XmlIgnore]public object SelectedItem {
-			get { return imlVE.HoverWidget; }
-		}
 		void interfaceThread()
 		{
 			while (true) {
@@ -201,7 +211,7 @@ namespace CrowIDE
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseDown (sender, e);
-			NotifyValueChanged ("SelectedItem", imlVE.HoverWidget);
+			SelectedItem = imlVE.HoverWidget;
 		}
 		protected override void onDraw (Cairo.Context gr)
 		{
@@ -240,19 +250,25 @@ namespace CrowIDE
 				imlVE.IsDirty = false;
 			}
 
-			if (imlVE.HoverWidget == null)
+			Rectangle hr;
+			if (imlVE.HoverWidget != null) {
+				hr = imlVE.HoverWidget.ScreenCoordinates (imlVE.HoverWidget.getSlot ());
+//			gr.SetSourceColor (Color.LightGray);
+//			gr.DrawCote (new Cairo.PointD (hr.X, hr.Center.Y), new Cairo.PointD (hr.Right, hr.Center.Y));
+//			gr.DrawCote (new Cairo.PointD (hr.Center.X, hr.Y), new Cairo.PointD (hr.Center.X, hr.Bottom));
+				//hr.Inflate (2);
+				gr.SetSourceColor (Color.LightGray);
+				gr.SetDash (new double[]{ 3.0, 3.0 }, 0.0);
+				gr.Rectangle (hr, 1.0);
+			}
+
+			if (SelectedItem == null)
 				return;
-
-			Rectangle hr = imlVE.HoverWidget.ScreenCoordinates(imlVE.HoverWidget.getSlot ());
-
-			gr.SetSourceColor (Color.LightGray);
-			gr.DrawCote (new Cairo.PointD (hr.X, hr.Center.Y), new Cairo.PointD (hr.Right, hr.Center.Y));
-			gr.DrawCote (new Cairo.PointD (hr.Center.X, hr.Y), new Cairo.PointD (hr.Center.X, hr.Bottom));
-			hr.Inflate (2);
-			gr.SetSourceColor (Color.LightGray);
-			gr.SetDash (new double[]{ 3.0, 3.0 },0.0);
+			hr = SelectedItem.ScreenCoordinates(SelectedItem.getSlot ());
+			hr.Inflate (1);
+			gr.SetSourceColor (Color.Yellow);
+			gr.SetDash (new double[]{ 5.0, 3.0 },0.0);
 			gr.Rectangle (hr, 1.0);
-
 		}
 		#endregion
 
@@ -265,10 +281,10 @@ namespace CrowIDE
 			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
 			e.Mouse = imlVE.Mouse;
 
-			if (imlVE.activeWidget != null) {
+			if (imlVE.ActiveWidget != null) {
 				//TODO, ensure object is still in the graphic tree
 				//send move evt even if mouse move outside bounds
-				imlVE.activeWidget.onMouseMove (this, e);
+				imlVE.ActiveWidget.onMouseMove (this, e);
 				return true;
 			}
 
@@ -332,6 +348,12 @@ namespace CrowIDE
 			}
 			imlVE.HoverWidget = null;
 			return false;
+
+		}
+
+		void GTView_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
+		{
+			SelectedItem = e.NewValue as GraphicObject;
 		}
 	}
 }

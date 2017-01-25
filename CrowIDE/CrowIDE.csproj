@@ -82,6 +82,7 @@
     <EmbeddedResource Include="Default.style" />
     <EmbeddedResource Include="ui\GTreeExplorer.crow" />
     <EmbeddedResource Include="ui\GTreeExpITemp.crow" />
+    <EmbeddedResource Include="ui\MemberView.crow" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">

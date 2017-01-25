@@ -1,18 +1,39 @@
 ﻿<?xml version="1.0"?>
-<Window Title="Graphic Tree" Width="20%" Height="90%" Background="DimGray" AlwaysOnTop="true">
-	<TreeView IsRoot="true" Name="treeView" Data="{GraphicTree}" Background="Jet">
-		<ItemTemplate>
-			<Label Text="{Name}" Width="Stretched"
-					MouseEnter="{Background=hgradient|0:BlueCrayola|1:Transparent}"
-					MouseLeave="{Background=Transparent}"/>
-		</ItemTemplate>
-		<ItemTemplate DataType="Crow.Group" Data="GetChildren"
-			Path="#CrowIDE.ui.GTreeExpITemp.crow"/>
-		<ItemTemplate DataType="Crow.Container" Data="GetChildren"
-			Path="#CrowIDE.ui.GTreeExpITemp.crow"/>
-		<ItemTemplate DataType="Crow.TemplatedContainer" Data="GetChildren"
-			Path="#CrowIDE.ui.GTreeExpITemp.crow"/>
-		<ItemTemplate DataType="Crow.TemplatedGroup" Data="GetChildren"
-			Path="#CrowIDE.ui.GTreeExpITemp.crow"/>
-	</TreeView>
+<Window Title="Graphic Tree" Width="20%" Height="70%" AlwaysOnTop="true">
+	<VerticalStack>
+		<Button Caption="Expand All" MouseClick="../treeView.onExpandAll_MouseClick"/>		
+		<TreeView IsRoot="true" Name="treeView" Data="{GraphicTree}"
+			SelectedItemChanged="GTView_SelectedItemChanged">
+<!--			<Template>
+				<HorizontalStack>
+					<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"
+						Background="{./Background}"
+						ScrollY="{../scrollbar1.Value}">
+						<VerticalStack
+							Height="Fit" Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
+					</Scroller>
+					<ScrollBar
+						Name="scrollbar1"
+						Value="{../scroller1.ScrollY}"
+						Maximum="{../scroller1.MaximumScroll}"
+						Width="12" Orientation="Vertical"/>
+				</HorizontalStack>
+			</Template>-->
+			<ItemTemplate>
+				<HorizontalStack Width="Stretched" Focusable="true">
+					<Label Text="{Name}"
+							MouseEnter="{Background=hgradient|0:BlueCrayola|1:Transparent}"
+							MouseLeave="{Background=Transparent}"/>
+				</HorizontalStack>
+			</ItemTemplate>
+			<ItemTemplate DataType="Crow.Group" Data="GetChildren"
+				Path="#CrowIDE.ui.GTreeExpITemp.crow"/>
+			<ItemTemplate DataType="Crow.Container" Data="GetChildren"
+				Path="#CrowIDE.ui.GTreeExpITemp.crow"/>
+			<ItemTemplate DataType="Crow.TemplatedContainer" Data="GetChildren"
+				Path="#CrowIDE.ui.GTreeExpITemp.crow"/>
+			<ItemTemplate DataType="Crow.TemplatedGroup" Data="GetChildren"
+				Path="#CrowIDE.ui.GTreeExpITemp.crow"/>
+		</TreeView>
+	</VerticalStack>
 </Window>

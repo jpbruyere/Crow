@@ -43,7 +43,6 @@ namespace CrowIDE
 		{
 		}
 		ImlVisualEditor imlVE;
-		GraphicObject bindingExp, lqisExp;
 
 		protected override void OnLoad (EventArgs e)
 		{
@@ -63,21 +62,30 @@ namespace CrowIDE
 			if (e.Key == OpenTK.Input.Key.Escape) {
 				Quit (null, null);
 				return;
+			} else if (e.Key == OpenTK.Input.Key.F4) {
+				loadWindow ("#CrowIDE.ui.MemberView.crow");
 			} else if (e.Key == OpenTK.Input.Key.F5) {
-				if (bindingExp != null) {
-					CrowInterface.DeleteWidget (bindingExp);
-				}
-				bindingExp = CrowInterface.LoadInterface ("#CrowIDE.ui.GTreeExplorer.crow");
-				bindingExp.DataSource = imlVE;
-				return;
+				loadWindow ("#CrowIDE.ui.GTreeExplorer.crow");
 			} else if (e.Key == OpenTK.Input.Key.F6) {
-				if (lqisExp != null) {
-					CrowInterface.DeleteWidget (lqisExp);
-				}
-				lqisExp = CrowInterface.LoadInterface ("#CrowIDE.ui.LQIsExplorer.crow");
-				lqisExp.DataSource = imlVE;
-				return;
+				loadWindow ("#CrowIDE.ui.LQIsExplorer.crow");
 			}
+		}
+		void loadWindow(string path){
+			try {
+				GraphicObject g = CrowInterface.FindByName (path);
+				if (g != null)
+					return;
+				g = CrowInterface.LoadInterface (path);
+				g.Name = path;
+				g.DataSource = imlVE;
+			} catch (Exception ex) {
+				System.Diagnostics.Debug.WriteLine (ex.ToString ());
+			}
+		}
+		void closeWindow (string path){
+			GraphicObject g = CrowInterface.FindByName (path);
+			if (g != null)
+				CrowInterface.DeleteWidget (g);
 		}
 		protected void onCommandSave(object sender, MouseButtonEventArgs e){
 			System.Diagnostics.Debug.WriteLine("save");

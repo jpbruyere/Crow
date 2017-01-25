@@ -29,7 +29,7 @@ namespace CrowIDE
 {
 	public class PropertyContainer : IValueChange
 	{
-				#region IValueChange implementation
+		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
 		public virtual void NotifyValueChanged(string MemberName, object _value)
 		{

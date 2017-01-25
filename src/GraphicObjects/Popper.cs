@@ -219,16 +219,17 @@ namespace Crow
 			if (Content != null) {
 				Content.Visible = true;
 				if (Content.Parent == null)
-					CurrentInterface.AddWidget (Content);
-				CurrentInterface.PutOnTop (Content);
+					CurrentInterface.AddWidget (Content, true);
+				CurrentInterface.PutOnTop (Content, true);
 				_content_LayoutChanged (this, new LayoutingEventArgs (LayoutingType.Sizing));
 			}
 			Pop.Raise (this, e);
 		}
 		public virtual void onUnpop(object sender, EventArgs e)
 		{
-			if (Content != null)
+			if (Content != null) {
 				Content.Visible = false;
+			}
 			Unpop.Raise (this, e);
 		}
 	}
