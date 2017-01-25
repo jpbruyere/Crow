@@ -506,12 +506,6 @@ namespace Crow
 
 				isVisible = value;
 
-				//ensure main win doesn't keep hidden childrens ref
-				if (CurrentInterface.HoverWidget != null) {
-					if (!isVisible && this.Contains (CurrentInterface.HoverWidget))
-						CurrentInterface.HoverWidget = null;
-				}
-
 				if (isVisible)
 					RegisterForLayouting (LayoutingType.Sizing);
 				else {
@@ -523,6 +517,8 @@ namespace Crow
 					LastSlots.Width = LastSlots.Height = 0;
 				}
 
+				//trigger a mouse to handle possible hover changes
+				CurrentInterface.ProcessMouseMove (CurrentInterface.Mouse.X, CurrentInterface.Mouse.Y);
 
 				NotifyValueChanged ("Visible", isVisible);
 			}
