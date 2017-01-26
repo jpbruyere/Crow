@@ -32,12 +32,14 @@ namespace Crow
 
 		public event EventHandler Open;
 		public event EventHandler Close;
-		public event EventHandler Execute;
 
 		string caption;
-		Command command;//TODO
+		Command command;
+		Picture icon;
 		bool isOpened;
+		Measure popWidth, popHeight;
 
+		#region Public properties
 		[XmlAttributeAttribute][DefaultValue(false)]
 		public bool IsOpened {
 			get { return isOpened; }
@@ -54,38 +56,87 @@ namespace Crow
 					onClose (this, null);
 			}
 		}
-
 		[XmlAttributeAttribute][DefaultValue(null)]
 		public virtual Command Command {
 			get { return command; }
 			set {
 				if (command == value)
 					return;
+
+				if (command != null) {
+					command.raiseAllValuesChanged ();
+					command.ValueChanged -= Command_ValueChanged;
+				}
+
 				command = value;
+
+				if (command != null) {
+					command.ValueChanged += Command_ValueChanged;
+					command.raiseAllValuesChanged ();
+				}
+
 				NotifyValueChanged ("Command", command);
 			}
 		}
-
 		[XmlAttributeAttribute][DefaultValue("MenuItem")]
 		public string Caption {
-			get { return caption; }
+			get { return Command == null ? caption : Command.Caption; }
 			set {
 				if (caption == value)
 					return;
 				caption = value;
-				NotifyValueChanged ("Caption", caption);
+
+				if (command == null)//raise value changed only if not bound to a command
+					NotifyValueChanged ("Caption", caption);
 			}
 		}
-			
+		[XmlAttributeAttribute]
+		public Picture Icon {
+			get { return Command == null ? icon : Command.Icon;; }
+			set {
+				if (icon == value)
+					return;
+				icon = value;
+				if (command == null)
+					NotifyValueChanged ("Icon", icon);
+			}
+		}
+		[XmlAttributeAttribute()][DefaultValue("Fit")]
+		public virtual Measure PopWidth {
+			get { return popWidth; }
+			set {
+				if (popWidth == value)
+					return;
+				popWidth = value;
+				NotifyValueChanged ("PopWidth", popWidth);
+			}
+		}
+		[XmlAttributeAttribute()][DefaultValue("Fit")]
+		public virtual Measure PopHeight {
+			get { return popHeight; }
+			set {
+				if (popHeight == value)
+					return;
+				popHeight = value;
+				NotifyValueChanged ("PopHeight", popHeight);
+			}
+		}
+		#endregion
+
 		public override void AddItem (GraphicObject g)
 		{
 			base.AddItem (g);
 			g.NotifyValueChanged ("PopDirection", Alignment.Right);
 		}
 
+		void Command_ValueChanged (object sender, ValueChangeEventArgs e)
+		{
+			NotifyValueChanged (e.MemberName, e.NewValue);
+		}
 		void onMI_Click (object sender, MouseButtonEventArgs e)
 		{
-			Execute.Raise (this, null);
+			if (command != null)
+				command.Execute ();
 			if(!IsOpened)
 				(LogicalParent as Menu).AutomaticOpenning = false;
 		}

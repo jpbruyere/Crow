@@ -11,13 +11,16 @@
 				MinimumSize = "60,0"
 				Foreground="Transparent"
 				Background="{./Background}">
-			<Label Text="{./Caption}"
-				Foreground="{./Foreground}"
-				Margin="1" HorizontalAlignment="Left"
-				Font="{./Font}"	/>
+			<HorizontalStack>
+				<Image Style="Icon" Picture="{../../../../Icon}"/>
+				<Label Text="{./Caption}"
+					Foreground="{./Foreground}"
+					Margin="3" HorizontalAlignment="Left"
+					Font="{./Font}"	/>
+			</HorizontalStack>
 		</Border>
 	</Template>
 	<Border Foreground="DimGray" Fit="true">
-		<VerticalStack Name="ItemsContainer" Margin="2" Fit="true" Background="Onyx"/>
+		<VerticalStack Name="ItemsContainer" Margin="0" Fit="true" Background="Onyx"/>
 	</Border>
 </Popper>

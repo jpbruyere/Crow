@@ -26,7 +26,6 @@ namespace Crow
 
 		public event EventHandler Pressed;
 		public event EventHandler Released;
-		public event EventHandler Clicked;
 
 		#region TemplatedContainer overrides
 		public override GraphicObject Content {
@@ -34,7 +33,7 @@ namespace Crow
 				return _contentContainer == null ? null : _contentContainer.Child;
 			}
 			set {
-				if (_contentContainer != null)					
+				if (_contentContainer != null)
 					_contentContainer.SetChild(value);
 			}
 		}
@@ -69,24 +68,24 @@ namespace Crow
 
 		[XmlAttributeAttribute][DefaultValue("Button")]
 		public string Caption {
-			get { return caption; } 
+			get { return caption; }
 			set {
 				if (caption == value)
 					return;
-				caption = value; 
+				caption = value;
 				NotifyValueChanged ("Caption", caption);
 			}
-		}        
+		}
 		[XmlAttributeAttribute][DefaultValue("#Crow.Images.button.svg")]
 		public string Image {
-			get { return image; } 
+			get { return image; }
 			set {
 				if (image == value)
 					return;
-				image = value; 
+				image = value;
 				NotifyValueChanged ("Image", image);
 			}
-		} 
+		}
 		[XmlAttributeAttribute][DefaultValue(false)]
 		public bool IsPressed
 		{
