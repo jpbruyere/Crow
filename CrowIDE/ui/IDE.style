@@ -1,9 +1,4 @@
-﻿icon {
-	Focusable=true;
-	Width=32;
-	Height=32;
-	Margin=2;
-	CornerRadius=5;
-	MouseEnter = {Background=UnitedNationsBlue;}
-	MouseLeave = {Background=Transparent;}
+﻿Icon {
+	Width=16;
+	Height=16;
 }

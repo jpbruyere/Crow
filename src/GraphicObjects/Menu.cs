@@ -31,8 +31,10 @@ namespace Crow
 		#endregion
 
 		Orientation orientation;
+		bool autoOpen = false;
 
-		[XmlAttributeAttribute()][DefaultValue(Orientation.Horizontal)]
+		#region Public properties
+		[XmlAttributeAttribute][DefaultValue(Orientation.Horizontal)]
 		public Orientation Orientation {
 			get { return orientation; }
 			set {
@@ -42,12 +44,12 @@ namespace Crow
 				NotifyValueChanged ("Orientation", orientation);
 			}
 		}
-		bool autoOpen = false;
 		[XmlIgnore]public bool AutomaticOpenning
 		{
 			get { return autoOpen; }
 			set	{ autoOpen = value;	}
 		}
+		#endregion
 
 		public override void AddItem (GraphicObject g)
 		{			

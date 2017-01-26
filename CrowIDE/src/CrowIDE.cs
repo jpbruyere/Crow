@@ -31,6 +31,16 @@ namespace CrowIDE
 {
 	class CrowIDE : OpenTKGameWindow
 	{
+		public Command CMDLoad = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Open"))) { Caption = "Open", Icon = new SvgPicture("#Crow.Icons.open-file.svg")};
+		public Command CMDSave = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Save"))) { Caption = "Save", Icon = new SvgPicture("#Crow.Icons.open-file.svg")};
+		public Command CMDQuit = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Quit"))) { Caption = "Quit", Icon = new SvgPicture("#Crow.Icons.exit-symbol.svg")};
+//		public Command CMDSave = new Command(actionOpenFile) { Caption = "Open...", Icon = new SvgPicture("#Crow.Icons.open-file.svg")};
+//		public Command CMDQuit = new Command(actionOpenFile) { Caption = "Open...", Icon = new SvgPicture("#Crow.Icons.open-file.svg")};
+		public Command CMDCut = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Cut"))) { Caption = "Cut", Icon = new SvgPicture("#Crow.Icons.scissors.svg")};
+		public Command CMDCopy = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Copy"))) { Caption = "Copy", Icon = new SvgPicture("#Crow.Icons.copy-file.svg")};
+		public Command CMDPaste = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Paste"))) { Caption = "Paste", Icon = new SvgPicture("#Crow.Icons.paste-on-document.svg")};
+		public Command CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Help"))) { Caption = "Help", Icon = new SvgPicture("#Crow.Icons.question.svg")};
+
 		[STAThread]
 		static void Main ()
 		{
@@ -87,8 +97,13 @@ namespace CrowIDE
 			if (g != null)
 				CrowInterface.DeleteWidget (g);
 		}
+
 		protected void onCommandSave(object sender, MouseButtonEventArgs e){
 			System.Diagnostics.Debug.WriteLine("save");
+		}
+
+		void actionOpenFile(){
+			System.Diagnostics.Debug.WriteLine ("OpenFile action");
 		}
 	}
 }

@@ -22,12 +22,10 @@ Menu {
 	VerticalAlignment = Top;
 }
 MenuItem {
-	Height = Fit;
-	Width = Fit;
 	Background = Transparent;
 	Foreground = LightGray;
-	Open = {Background = Mantis;Foreground=Jet;}
-	Close = {Foreground=LightGray;Background=Transparent;}
+	MouseEnter = {Background = vgradient|0:UnitedNationsBlue|1:Onyx;Foreground=White;}
+	MouseLeave = {Foreground=LightGray;Background=Transparent;}
 }
 MessageBox {
 	Width=200;
