@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <Popper Font="{./Font}" Caption="{./Caption}"  Background="{./Background}" PopDirection="{./PopDirection}"
 	Foreground = "{./Foreground}" CanPop="{./HasChildren}" MouseClick="./onMI_Click"
-	IsPopped="{²./IsOpened}">
+	IsPopped="{²./IsOpened}" PopWidth="{./PopWidth}" PopHeight="{./PopHeight}">
 	<Template>
 		<Border Name="border1"
 				MouseEnter="{Foreground=vgradient|0:White|0.2:Gray|0.9:Gray|1:Black}"
@@ -11,16 +11,13 @@
 				MinimumSize = "60,0"
 				Foreground="Transparent"
 				Background="{./Background}">
-			<HorizontalStack>
-				<Image Style="Icon" Picture="{../../../../Icon}"/>
 				<Label Text="{./Caption}"
 					Foreground="{./Foreground}"
-					Margin="3" HorizontalAlignment="Left"
+					Margin="1" HorizontalAlignment="Left"
 					Font="{./Font}"	/>
-			</HorizontalStack>
 		</Border>
 	</Template>
-	<Border Foreground="DimGray" Fit="true">
-		<VerticalStack Name="ItemsContainer" Margin="0" Fit="true" Background="Onyx"/>
+	<Border Foreground="DimGray" Width="{../PopWidth}" Height="{../PopHeight}" Background="Onyx">
+		<VerticalStack Name="ItemsContainer"/>
 	</Border>
 </Popper>

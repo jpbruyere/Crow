@@ -295,12 +295,12 @@
     <EmbeddedResource Include="Images\Icons\maximize.svg" />
     <EmbeddedResource Include="Images\Icons\minimize.svg" />
     <EmbeddedResource Include="Images\Icons\normalize.svg" />
-    <EmbeddedResource Include="Icons\open-file.svg"/>
-    <EmbeddedResource Include="Icons\scissors.svg"/>
-    <EmbeddedResource Include="Icons\copy-file.svg"/>
-    <EmbeddedResource Include="Icons\exit-symbol.svg"/>
-    <EmbeddedResource Include="Icons\paste-on-document.svg"/>
-    <EmbeddedResource Include="Icons\question.svg"/>
+    <EmbeddedResource Include="Icons\open-file.svg" />
+    <EmbeddedResource Include="Icons\scissors.svg" />
+    <EmbeddedResource Include="Icons\copy-file.svg" />
+    <EmbeddedResource Include="Icons\exit-symbol.svg" />
+    <EmbeddedResource Include="Icons\paste-on-document.svg" />
+    <EmbeddedResource Include="Icons\question.svg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
