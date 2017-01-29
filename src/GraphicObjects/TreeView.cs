@@ -48,7 +48,6 @@ namespace Crow
 				NotifyValueChanged ("IsRoot", isRoot);
 			}
 		}
-
 		[XmlIgnore]public override object SelectedItem {
 			get {
 				return selectedItemContainer == null ?
@@ -83,6 +82,32 @@ namespace Crow
 			selectedItemContainer.Background = SelectionBackground;
 			NotifyValueChanged ("SelectedItem", SelectedItem);
 			raiseSelectedItemChanged ();
+		}
+
+		void onExpandAll_MouseClick (object sender, MouseButtonEventArgs e)
+		{
+			ExpandAll ();
+		}
+
+		public void ExpandAll(){
+			foreach (Group grp in items.Children) {
+				foreach (GraphicObject go in grp.Children) {
+					Expandable exp = go as Expandable;
+					if (exp == null)
+						continue;
+					TreeView subTV = exp.FindByName ("List") as TreeView;
+					if (subTV == null)
+						continue;
+					EventHandler handler = null;
+					handler = delegate(object sender, EventArgs e) {
+						TreeView tv = sender as TreeView;
+						tv.Loaded -= handler;
+						tv.ExpandAll ();
+					};
+					subTV.Loaded += handler;
+					exp.IsExpanded = true;
+				}
+			}
 		}
 	}
 }

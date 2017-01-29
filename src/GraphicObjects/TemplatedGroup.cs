@@ -40,6 +40,7 @@ namespace Crow
 
 		#region events
 		public event EventHandler<SelectionChangeEventArgs> SelectedItemChanged;
+		public event EventHandler Loaded;
 		#endregion
 
 		IList data;
@@ -47,7 +48,7 @@ namespace Crow
 		Color selBackground, selForeground;
 
 		int itemPerPage = 50;
-		Thread loadingThread = null;
+		CrowThread loadingThread = null;
 		volatile bool cancelLoading = false;
 
 		#region Templating
@@ -106,11 +107,11 @@ namespace Crow
 		public virtual List<GraphicObject> Items{ get { return items.Children; }}
 		[XmlAttributeAttribute][DefaultValue(-1)]public int SelectedIndex{
 			get { return _selectedIndex; }
-			set { 
+			set {
 				if (value == _selectedIndex)
 					return;
 
-				_selectedIndex = value; 
+				_selectedIndex = value;
 
 				NotifyValueChanged ("SelectedIndex", _selectedIndex);
 				NotifyValueChanged ("SelectedItem", SelectedItem);
@@ -135,14 +136,14 @@ namespace Crow
 
 				NotifyValueChanged ("Data", data);
 
-				lock (CurrentInterface.UpdateMutex)
+				//lock (CurrentInterface.UpdateMutex)
 					ClearItems ();
 
 				if (data == null)
 					return;
 
-				loadingThread = new Thread (loading);
-				loadingThread.IsBackground = true;
+				loadingThread = new CrowThread (this, loading);
+				loadingThread.Finished += (object sender, EventArgs e) => (sender as TemplatedGroup).Loaded.Raise (sender, e);
 				loadingThread.Start ();
 				//loadPage(1);
 
@@ -179,7 +180,7 @@ namespace Crow
 		protected void raiseSelectedItemChanged(){
 			SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
 		}
-			
+
 
 		public virtual void AddItem(GraphicObject g){
 			items.AddChild (g);
@@ -271,8 +272,10 @@ namespace Crow
 						if (t == null) {
 							Assembly a = Assembly.GetEntryAssembly ();
 							foreach (Type expT in a.GetExportedTypes ()) {
-								if (expT.Name == xr.Name)
+								if (expT.Name == xr.Name) {
 									t = expT;
+									break;
+								}
 							}
 						}
 						if (t == null)
@@ -310,13 +313,8 @@ namespace Crow
 			}
 		}
 		void cancelLoadingThread(){
-			if (loadingThread == null)
-				return;
-			if (!loadingThread.IsAlive)
-				return;			
-			cancelLoading = true;
-			loadingThread.Join ();
-			cancelLoading = false;
+			if (loadingThread != null)
+				loadingThread.Cancel ();
 		}
 		void loadPage(int pageNum)
 		{
@@ -341,7 +339,7 @@ namespace Crow
 				page = gs;
 
 			}else
-				page = Activator.CreateInstance (items.GetType ()) as Group;			
+				page = Activator.CreateInstance (items.GetType ()) as Group;
 
 			page.Name = "page" + pageNum;
 
@@ -374,6 +372,8 @@ namespace Crow
 			}
 		}
 		protected void loadItem(int i, Group page){
+			if (data [i] == null)//TODO:surely a threading sync problem
+				return;
 			GraphicObject g = null;
 			ItemTemplate iTemp = null;
 			Type dataType = data [i].GetType ();
@@ -383,9 +383,29 @@ namespace Crow
 				itempKey = getItempKey (dataType, data [i]);
 
 			if (ItemTemplates.ContainsKey (itempKey))
-					iTemp = ItemTemplates [itempKey];
-			else
-				iTemp = ItemTemplates ["default"];
+				iTemp = ItemTemplates [itempKey];
+			else {
+				foreach (string it in ItemTemplates.Keys) {
+					Type t = Type.GetType (it);
+					if (t == null) {
+						Assembly a = Assembly.GetEntryAssembly ();
+						foreach (Type expT in a.GetExportedTypes ()) {
+							if (expT.Name == it) {
+								t = expT;
+								break;
+							}
+						}
+					}
+					if (t == null)
+						continue;
+					if (t.IsAssignableFrom (dataType)) {//TODO:types could be cached
+						iTemp = ItemTemplates [it];
+						break;
+					}
+				}
+				if (iTemp == null)
+					iTemp = ItemTemplates ["default"];
+			}
 
 			lock (CurrentInterface.LayoutMutex) {
 				g = iTemp.CreateInstance(CurrentInterface);

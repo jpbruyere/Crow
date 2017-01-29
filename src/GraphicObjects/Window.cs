@@ -46,15 +46,20 @@ namespace Crow
 		bool _resizable;
 		bool _movable;
 		bool hoverBorder = false;
-		bool isMaximized = false;
-		Measure savedH, savedW;
+		bool alwaysOnTop = false;
+
+		Rectangle savedBounds;
+		bool _minimized = false;
 
 		Container _contentContainer;
 		Direction currentDirection = Direction.None;
 
+		#region Events
 		public event EventHandler Closing;
 		public event EventHandler Maximized;
 		public event EventHandler Unmaximized;
+		public event EventHandler Minimize;
+		#endregion
 
 		#region CTOR
 		public Window () : base() {
@@ -64,73 +69,115 @@ namespace Crow
 
 		#region TemplatedContainer overrides
 		public override GraphicObject Content {
-			get {
-				return _contentContainer == null ? null : _contentContainer.Child;
-			}
-			set {
-				_contentContainer.SetChild(value);
-			}
+			get { return _contentContainer == null ? null : _contentContainer.Child; }
+			set { _contentContainer.SetChild(value); }
 		}
 		protected override void loadTemplate(GraphicObject template = null)
 		{
 			base.loadTemplate (template);
 			_contentContainer = this.child.FindByName ("Content") as Container;
+
+			NotifyValueChanged ("ShowNormal", false);
+			NotifyValueChanged ("ShowMinimize", true);
+			NotifyValueChanged ("ShowMaximize", true);
 		}
 		#endregion
 
 		#region public properties
-		[XmlAttributeAttribute()][DefaultValue("Window")]
+		[XmlAttributeAttribute][DefaultValue("Window")]
 		public string Title {
 			get { return _title; } 
 			set {
+				if (_title == value)
+					return;
 				_title = value;
 				NotifyValueChanged ("Title", _title);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("#Crow.Images.Icons.crow.png")]
+		[XmlAttributeAttribute][DefaultValue("#Crow.Images.Icons.crow.png")]
 		public string Icon {
 			get { return _icon; } 
 			set {
+				if (_icon == value)
+					return;
 				_icon = value;
 				NotifyValueChanged ("Icon", _icon);
 			}
 		} 
-		[XmlAttributeAttribute()][DefaultValue(true)]
+		[XmlAttributeAttribute][DefaultValue(true)]
 		public bool Resizable {
 			get {
 				return _resizable;
 			}
 			set {
+				if (_resizable == value)
+					return;
 				_resizable = value;
 				NotifyValueChanged ("Resizable", _resizable);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(true)]
+		[XmlAttributeAttribute][DefaultValue(true)]
 		public bool Movable {
 			get {
 				return _movable;
 			}
 			set {
+				if (_movable == value)
+					return;
 				_movable = value;
 				NotifyValueChanged ("Movable", _movable);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(false)]
-		public bool IsMaximized {
-			get { return isMaximized; }
+		[XmlAttributeAttribute][DefaultValue(false)]
+		public bool IsMinimized {
+			get { return _minimized; }
 			set{
-				if (value == isMaximized)
+				if (value == IsMinimized)
 					return;
-				isMaximized = value;
 
-				if (isMaximized)
-					onMaximized (this, null);
-				else
-					onUnmaximized (this, null);
+				_minimized = value;
+				_contentContainer.Visible = !_minimized;
 
-				NotifyValueChanged ("IsMaximized", isMaximized);
+				NotifyValueChanged ("IsMinimized", _minimized);
 			}
 		}
+		[XmlIgnore]public bool IsMaximized {
+			get { return Width == Measure.Stretched & Height == Measure.Stretched & !_minimized; }
+		}
+		[XmlIgnore]public bool IsNormal {
+			get { return !(IsMaximized|_minimized); }
+		}
+		[XmlAttributeAttribute][DefaultValue(false)]
+		public bool AlwaysOnTop {
+			get {
+				return alwaysOnTop;
+			}
+			set {
+				if (alwaysOnTop == value)
+					return;
+				alwaysOnTop = value;
+				if (alwaysOnTop) {
+					CurrentInterface.PutOnTop (this);
+					CurrentInterface.TopWindows++;
+				}else
+					CurrentInterface.TopWindows--;
+				NotifyValueChanged ("AlwaysOnTop", alwaysOnTop);
+			}
+		}
+//		[XmlAttributeAttribute()][DefaultValue(WindowState.Normal)]
+//		public virtual WindowState State {
+//			get { return _state; }
+//			set {
+//				if (_state == value)
+//					return;
+//				_state = value;
+//				NotifyValueChanged ("State", _state);
+//				NotifyValueChanged ("IsNormal", IsNormal);
+//				NotifyValueChanged ("IsMaximized", IsMaximized);
+//				NotifyValueChanged ("IsMinimized", IsMinimized);
+//				NotifyValueChanged ("IsNotMinimized", IsNotMinimized);
+//			}
+//		} 
 		#endregion
 
 		#region GraphicObject Overrides
@@ -219,14 +266,6 @@ namespace Crow
 					return;
 				}
 			}
-//			GraphicObject firstFocusableAncestor = otkgw.hoverWidget;
-//			while (firstFocusableAncestor != this) {
-//				if (firstFocusableAncestor == null)
-//					return;
-//				if (firstFocusableAncestor.Focusable)
-//					return;
-//				firstFocusableAncestor = firstFocusableAncestor.Parent as GraphicObject;
-//			}
 			if (Resizable) {
 				Direction lastDir = currentDirection;
 
@@ -289,21 +328,56 @@ namespace Crow
 			base.onMouseDown (sender, e);
 		}
 		#endregion
+
 		protected void onMaximized (object sender, EventArgs e){
-			savedW = this.Width;
-			savedH = this.Height;
-			this.Width = Measure.Stretched;
-			this.Height = Measure.Stretched;
+			lock (CurrentInterface.LayoutMutex) {
+				if (!IsMinimized)
+					savedBounds = this.LastPaintedSlot;
+				this.Left = this.Top = 0;
+				this.RegisterForLayouting (LayoutingType.Positioning);
+				this.Width = this.Height = Measure.Stretched;
+				IsMinimized = false;
+				Resizable = false;
+				NotifyValueChanged ("ShowNormal", true);
+				NotifyValueChanged ("ShowMinimize", true);
+				NotifyValueChanged ("ShowMaximize", false);
+			}
 
 			Maximized.Raise (sender, e);
+
+
+
 		}
 		protected void onUnmaximized (object sender, EventArgs e){
-			this.Width = savedW;
-			this.Height = savedH;
+			lock (CurrentInterface.LayoutMutex) {
+				this.Left = savedBounds.Left;
+				this.Top = savedBounds.Top;
+				this.Width = savedBounds.Width;
+				this.Height = savedBounds.Height;
+				IsMinimized = false;
+				Resizable = true;
+				NotifyValueChanged ("ShowNormal", false);
+				NotifyValueChanged ("ShowMinimize", true);
+				NotifyValueChanged ("ShowMaximize", true);
+			}
 
 			Unmaximized.Raise (sender, e);
 		}
+		protected void onMinimized (object sender, EventArgs e){
+			lock (CurrentInterface.LayoutMutex) {
+				if (IsNormal)
+					savedBounds = this.LastPaintedSlot;
+				Width = 200;
+				Height = 20;
+				Resizable = false;
+				IsMinimized = true;
+				NotifyValueChanged ("ShowNormal", true);
+				NotifyValueChanged ("ShowMinimize", false);
+				NotifyValueChanged ("ShowMaximize", true);
+			}
 
+			Minimize.Raise (sender, e);
+		}
 		protected void onBorderMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			hoverBorder = false;
@@ -316,9 +390,6 @@ namespace Crow
 		}
 
 
-		protected void butMaximizePress (object sender, MouseButtonEventArgs e){
-			IsMaximized = !IsMaximized;
-		}
 		protected void butQuitPress (object sender, MouseButtonEventArgs e)
 		{
 			CurrentInterface.MouseCursor = XCursor.Default;

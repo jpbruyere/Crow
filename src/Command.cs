@@ -35,16 +35,20 @@ namespace Crow
 		#endregion
 
 		#region CTOR
-		public Command ()
+		public Command (Action _executeAction)
 		{
+			execute = _executeAction;
 		}
 		#endregion
 
+		Action execute;
+
 		string caption;
+		Picture icon;
 		bool isEnabled;
 
-
-		[XmlAttributeAttribute()][DefaultValue(true)]
+		#region Public properties
+		[XmlAttributeAttribute][DefaultValue(true)]
 		public virtual bool IsEnabled {
 			get { return isEnabled; }
 			set {
@@ -54,7 +58,7 @@ namespace Crow
 				NotifyValueChanged ("IsEnabled", isEnabled);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("Unamed Command")]
+		[XmlAttributeAttribute][DefaultValue("Unamed Command")]
 		public virtual string Caption {
 			get { return caption; }
 			set {
@@ -65,5 +69,27 @@ namespace Crow
 
 			}
 		}
+		[XmlAttributeAttribute]
+		public Picture Icon {
+			get { return icon; }
+			set {
+				if (icon == value)
+					return;
+				icon = value;
+				NotifyValueChanged ("Icon", icon);
+			}
+		}
+		#endregion
+
+		public void Execute(){
+			if (execute != null)
+				execute ();
+		}
+		internal void raiseAllValuesChanged(){
+			NotifyValueChanged ("IsEnabled", isEnabled);
+			NotifyValueChanged ("Icon", icon);
+			NotifyValueChanged ("Caption", caption);
+		}
+
 	}
 }
