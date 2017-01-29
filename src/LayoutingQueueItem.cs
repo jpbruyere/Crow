@@ -83,6 +83,7 @@ namespace Crow
 			LQITime = new Stopwatch();
 			Slot = Rectangle.Empty;
 			NewSlot = Rectangle.Empty;
+			Debug.WriteLine ("\tRegister => " + this.ToString ());
 			#endif
 		}
 		#endregion
@@ -100,13 +101,20 @@ namespace Crow
 			}
 			#if DEBUG_LAYOUTING
 			LQITime.Start();
+			Debug.WriteLine ("=> " + this.ToString ());
 			#endif
 			LayoutingTries++;
 			if (!Layoutable.UpdateLayout (LayoutType)) {
+				#if DEBUG_LAYOUTING
+				Debug.WriteLine ("\t\tRequeued");
+				#endif
 				if (LayoutingTries < Interface.MaxLayoutingTries) {
 					Layoutable.RegisteredLayoutings |= LayoutType;
 					(Layoutable as GraphicObject).CurrentInterface.LayoutingQueue.Enqueue (this);
 				} else if (DiscardCount < Interface.MaxDiscardCount) {
+					#if DEBUG_LAYOUTING
+					Debug.WriteLine ("\t\tDiscarded");
+					#endif
 					LayoutingTries = 0;
 					DiscardCount++;
 					Layoutable.RegisteredLayoutings |= LayoutType;

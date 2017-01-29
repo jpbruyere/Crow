@@ -270,7 +270,6 @@ namespace Crow
 			set {
 				if (horizontalAlignment == value)
 					return;
-
 				horizontalAlignment = value;
 				NotifyValueChanged("HorizontalAlignment", horizontalAlignment);
 				RegisterForLayouting (LayoutingType.X);
@@ -282,7 +281,6 @@ namespace Crow
 			set {
 				if (left == value)
 					return;
-
 				left = value;
 				NotifyValueChanged ("Left", left);
 				this.RegisterForLayouting (LayoutingType.X);
@@ -294,7 +292,6 @@ namespace Crow
 			set {
 				if (top == value)
 					return;
-
 				top = value;
 				NotifyValueChanged ("Top", top);
 				this.RegisterForLayouting (LayoutingType.Y);
@@ -509,10 +506,6 @@ namespace Crow
 
 				isVisible = value;
 
-				//ensure main win doesn't keep hidden childrens ref
-				if (!isVisible && this.Contains (CurrentInterface.HoverWidget))
-					CurrentInterface.HoverWidget = null;
-
 				if (isVisible)
 					RegisterForLayouting (LayoutingType.Sizing);
 				else {
@@ -524,6 +517,8 @@ namespace Crow
 					LastSlots.Width = LastSlots.Height = 0;
 				}
 
+				//trigger a mouse to handle possible hover changes
+				CurrentInterface.ProcessMouseMove (CurrentInterface.Mouse.X, CurrentInterface.Mouse.Y);
 
 				NotifyValueChanged ("Visible", isVisible);
 			}
@@ -893,6 +888,7 @@ namespace Crow
 			#if DEBUG_LAYOUTING
 			CurrentInterface.currentLQI.Slot = LastSlots;
 			CurrentInterface.currentLQI.NewSlot = Slot;
+			Debug.WriteLine ("\t\t{0} => {1}",LastSlots,Slot);
 			#endif
 
 			switch (layoutType) {
@@ -1193,7 +1189,7 @@ namespace Crow
 			if (p != null)
 				p.onMouseMove(sender,e);
 
-			MouseMove.Raise (sender, e);
+			MouseMove.Raise (this, e);
 		}
 		public virtual void onMouseDown(object sender, MouseButtonEventArgs e){
 			if (CurrentInterface.eligibleForDoubleClick == this && CurrentInterface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick)
@@ -1202,8 +1198,8 @@ namespace Crow
 				currentInterface.clickTimer.Restart();
 			CurrentInterface.eligibleForDoubleClick = null;
 			
-			if (CurrentInterface.activeWidget == null)
-				CurrentInterface.activeWidget = this;
+			if (CurrentInterface.ActiveWidget == null)
+				CurrentInterface.ActiveWidget = this;
 			if (this.Focusable && !Interface.FocusOnHover) {
 				BubblingMouseButtonEventArg be = e as BubblingMouseButtonEventArg;
 				if (be.Focused == null) {

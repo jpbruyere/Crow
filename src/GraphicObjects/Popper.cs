@@ -38,6 +38,7 @@ namespace Crow
 		string caption;
 		Alignment popDirection;
 		GraphicObject _content;
+		Measure popWidth, popHeight;
 
 		public event EventHandler Pop;
 		public event EventHandler Unpop;
@@ -51,6 +52,26 @@ namespace Crow
 					return;
 				caption = value;
 				NotifyValueChanged ("Caption", caption);
+			}
+		}
+		[XmlAttributeAttribute()][DefaultValue("Fit")]
+		public virtual Measure PopWidth {
+			get { return popWidth; }
+			set {
+				if (popWidth == value)
+					return;
+				popWidth = value;
+				NotifyValueChanged ("PopWidth", popWidth);
+			}
+		}
+		[XmlAttributeAttribute()][DefaultValue("Fit")]
+		public virtual Measure PopHeight {
+			get { return popHeight; }
+			set {
+				if (popHeight == value)
+					return;
+				popHeight = value;
+				NotifyValueChanged ("PopHeight", popHeight);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
@@ -164,18 +185,6 @@ namespace Crow
 		}
 
 		#region GraphicObject overrides
-		public override void OnLayoutChanges (LayoutingType layoutType)
-		{
-			base.OnLayoutChanges (layoutType);
-
-			if (_content == null)
-				return;
-
-			if (layoutType == LayoutingType.Width)
-				_content.MinimumSize = new Size (this.Slot.Width, _content.MinimumSize.Height);
-		}
-
-
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{
 			if (_canPop)
@@ -219,16 +228,17 @@ namespace Crow
 			if (Content != null) {
 				Content.Visible = true;
 				if (Content.Parent == null)
-					CurrentInterface.AddWidget (Content);
-				CurrentInterface.PutOnTop (Content);
+					CurrentInterface.AddWidget (Content, true);
+				CurrentInterface.PutOnTop (Content, true);
 				_content_LayoutChanged (this, new LayoutingEventArgs (LayoutingType.Sizing));
 			}
 			Pop.Raise (this, e);
 		}
 		public virtual void onUnpop(object sender, EventArgs e)
 		{
-			if (Content != null)
+			if (Content != null) {
 				Content.Visible = false;
+			}
 			Unpop.Raise (this, e);
 		}
 	}

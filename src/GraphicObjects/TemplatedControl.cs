@@ -154,8 +154,10 @@ namespace Crow
 								if (t == null) {
 									Assembly a = Assembly.GetEntryAssembly ();
 									foreach (Type expT in a.GetExportedTypes ()) {
-										if (expT.Name == xr.Name)
+										if (expT.Name == xr.Name) {
 											t = expT;
+											break;
+										}
 									}
 								}
 								GraphicObject go = (GraphicObject)Activator.CreateInstance (t);

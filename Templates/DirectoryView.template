@@ -6,7 +6,7 @@
 			<Image Margin="2" Width="14" Height="14"
 				Path="#Crow.Images.Icons.file.svg"/>
 			<Label Text="{Name}" Width="Stretched"
-				MouseEnter="{Background=hgradient|0:BlueCrayola|1:Transparent}"
+				MouseEnter="{Background=vgradient|0:White|0.05:UnitedNationsBlue|1:Jet}"
 				MouseLeave="{Background=Transparent}"/>
 		</HorizontalStack>
 	</ItemTemplate>
@@ -15,7 +15,7 @@
 			<Template>
 				<VerticalStack>
 					<HorizontalStack Spacing="1" Height="Fit" MouseDoubleClick="./onClickForExpand"
-							MouseEnter="{Background=hgradient|0:BlueCrayola|1:Transparent}"
+							MouseEnter="{Background=vgradient|0:White|0.05:UnitedNationsBlue|1:Jet}"
 							MouseLeave="{Background=Transparent}">
 						<Container Margin="1" Width="10" Height="10" Focusable="true" MouseClick="./onClickForExpand"
 							MouseEnter="{Background=LightGray}"

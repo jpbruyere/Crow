@@ -29,6 +29,7 @@ namespace Crow
 					return;
 				_spacing = value; 
 				NotifyValueChanged ("Spacing", Spacing);
+				RegisterForLayouting (LayoutingType.Sizing|LayoutingType.ArrangeChildren);
 			}
         }
         [XmlAttributeAttribute()][DefaultValue(Orientation.Horizontal)]

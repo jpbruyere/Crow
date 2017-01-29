@@ -22,12 +22,11 @@ Menu {
 	VerticalAlignment = Top;
 }
 MenuItem {
-	Height = Fit;
-	Width = Fit;
+	Width = Stretched;
 	Background = Transparent;
 	Foreground = LightGray;
-	Open = {Background = Mantis;Foreground=Jet;}
-	Close = {Foreground=LightGray;Background=Transparent;}
+	MouseEnter = {Background = vgradient|0:UnitedNationsBlue|1:Onyx;Foreground=White;}
+	MouseLeave = {Foreground=LightGray;Background=Transparent;}
 }
 MessageBox {
 	Width=200;
@@ -61,6 +60,13 @@ TextBox {
 	Margin = 1;
 }
 Window {
+	Focusable = true;
+	MinimumSize=5,5;
+	Width = 150;
+	Height = 150;
+}
+ToolWindow {
+	Template = #Crow.ToolWindow.template;
 	Focusable = true;
 	MinimumSize=50,50;
 	Width = 150;

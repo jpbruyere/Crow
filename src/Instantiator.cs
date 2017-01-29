@@ -139,10 +139,14 @@ namespace Crow
 			if (t == null) {
 				Assembly a = Assembly.GetEntryAssembly ();
 				foreach (Type expT in a.GetExportedTypes ()) {
-					if (expT.Name == root)
+					if (expT.Name == root) {
 						t = expT;
+						break;
+					}
 				}
 			}
+			if (t == null)
+				throw new Exception ("IML parsing error: undefined root type (" + root + ")");
 			return t;
 		}
 		void emitLoader (XmlTextReader reader, Context ctx)
@@ -324,8 +328,10 @@ namespace Crow
 					if (t == null) {
 						Assembly a = Assembly.GetEntryAssembly ();
 						foreach (Type expT in a.GetExportedTypes ()) {
-							if (expT.Name == reader.Name)
+							if (expT.Name == reader.Name) {
 								t = expT;
+								break;
+							}
 						}
 					}
 					if (t == null)
