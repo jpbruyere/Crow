@@ -272,8 +272,10 @@ namespace Crow
 						if (t == null) {
 							Assembly a = Assembly.GetEntryAssembly ();
 							foreach (Type expT in a.GetExportedTypes ()) {
-								if (expT.Name == xr.Name)
+								if (expT.Name == xr.Name) {
 									t = expT;
+									break;
+								}
 							}
 						}
 						if (t == null)
@@ -385,6 +387,15 @@ namespace Crow
 			else {
 				foreach (string it in ItemTemplates.Keys) {
 					Type t = Type.GetType (it);
+					if (t == null) {
+						Assembly a = Assembly.GetEntryAssembly ();
+						foreach (Type expT in a.GetExportedTypes ()) {
+							if (expT.Name == it) {
+								t = expT;
+								break;
+							}
+						}
+					}
 					if (t == null)
 						continue;
 					if (t.IsAssignableFrom (dataType)) {//TODO:types could be cached

@@ -56,6 +56,19 @@ namespace Crow
 
 		public void CreateExpandDelegate (TemplatedGroup host){
 			Type dataType = Type.GetType(strDataType);
+			if (dataType == null) {
+				Assembly a = Assembly.GetEntryAssembly ();
+				foreach (Type expT in a.GetExportedTypes ()) {
+					if (expT.Name == strDataType) {
+						dataType = expT;
+						break;
+					}
+				}
+			}
+			if (dataType == null) {
+				Debug.WriteLine ("ItemTemplate error: DataType not found: {0}.", strDataType);
+				return;
+			}
 			Type tmpGrpType = typeof(TemplatedGroup);
 			Type evtType = typeof(EventHandler);
 
