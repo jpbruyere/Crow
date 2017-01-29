@@ -26,6 +26,8 @@ using Crow;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Collections;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace CrowIDE
 {
@@ -33,13 +35,16 @@ namespace CrowIDE
 	{
 		public Command CMDLoad = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Open"))) { Caption = "Open", Icon = new SvgPicture("#Crow.Icons.open-file.svg")};
 		public Command CMDSave = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Save"))) { Caption = "Save", Icon = new SvgPicture("#Crow.Icons.open-file.svg")};
-		public Command CMDQuit = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Quit"))) { Caption = "Quit", Icon = new SvgPicture("#Crow.Icons.exit-symbol.svg")};
+		public Command CMDQuit;
 //		public Command CMDSave = new Command(actionOpenFile) { Caption = "Open...", Icon = new SvgPicture("#Crow.Icons.open-file.svg")};
 //		public Command CMDQuit = new Command(actionOpenFile) { Caption = "Open...", Icon = new SvgPicture("#Crow.Icons.open-file.svg")};
 		public Command CMDCut = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Cut"))) { Caption = "Cut", Icon = new SvgPicture("#Crow.Icons.scissors.svg")};
 		public Command CMDCopy = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Copy"))) { Caption = "Copy", Icon = new SvgPicture("#Crow.Icons.copy-file.svg")};
 		public Command CMDPaste = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Paste"))) { Caption = "Paste", Icon = new SvgPicture("#Crow.Icons.paste-on-document.svg")};
 		public Command CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Help"))) { Caption = "Help", Icon = new SvgPicture("#Crow.Icons.question.svg")};
+		public Command CMDViewGTExp;
+		public Command CMDViewProps;
+		public Command CMDViewProj;
 
 		[STAThread]
 		static void Main ()
@@ -57,6 +62,11 @@ namespace CrowIDE
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
+
+			CMDQuit = new Command(new Action(() => Quit (null, null))) { Caption = "Quit", Icon = new SvgPicture("#Crow.Icons.exit-symbol.svg")};
+			CMDViewGTExp = new Command(new Action(() => loadWindow ("#CrowIDE.ui.GTreeExplorer.crow"))) { Caption = "Graphic Tree Explorer"};
+			CMDViewProps = new Command(new Action(() => loadWindow ("#CrowIDE.ui.MemberView.crow"))) { Caption = "Properties View"};
+			CMDViewProj = new Command(new Action(() => loadWindow ("#CrowIDE.ui.CSProjExplorer.crow"))) { Caption = "Project Explorer"};
 
 			this.KeyDown += CrowIDE_KeyDown;
 
@@ -78,6 +88,8 @@ namespace CrowIDE
 				loadWindow ("#CrowIDE.ui.GTreeExplorer.crow");
 			} else if (e.Key == OpenTK.Input.Key.F6) {
 				loadWindow ("#CrowIDE.ui.LQIsExplorer.crow");
+			} else if (e.Key == OpenTK.Input.Key.F7) {
+				loadWindow ("#CrowIDE.ui.CSProjExplorer.crow");
 			}
 		}
 		void loadWindow(string path){

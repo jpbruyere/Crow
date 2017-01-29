@@ -117,6 +117,18 @@ namespace CrowIDE
 		}
 
 
+		public CrowMSBuild.Project CSProj {
+			get {
+				CrowMSBuild.Project proj = null;
+				XmlSerializer serializer = new XmlSerializer(typeof(CrowMSBuild.Project));
+				string path=@"/mnt/data2/devel/crow/Tests/Tests.csproj";
+				using (StreamReader reader = new StreamReader (path)) {
+					proj = (CrowMSBuild.Project)serializer.Deserialize (reader);
+				}
+				return proj;
+			}
+		}
+
 		void reloadFromSource(){
 			if (string.IsNullOrEmpty (imlSource)) {
 				reload_iTor (null);

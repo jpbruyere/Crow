@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Window Title="Member View" Width="30%" Height="50%" Background="DimGray" AlwaysOnTop="true">
+<Window Title="Properties" Width="30%" Height="50%" Background="DimGray" AlwaysOnTop="true">
 	<MembersView Instance="{SelectedItem}" DataTest="Type">
 	<!--				<Template>
 			<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"

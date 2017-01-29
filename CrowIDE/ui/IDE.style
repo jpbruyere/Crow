@@ -1,4 +1,4 @@
-﻿Icon {
-	Width=16;
-	Height=16;
+﻿icon {
+	Width=14;
+	Height=14;
 }

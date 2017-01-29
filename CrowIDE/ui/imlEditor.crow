@@ -2,20 +2,25 @@
 <Window Height="Stretched" Width="Stretched" >
 	<VerticalStack>
 		<Menu>
-			<MenuItem Caption="File" Fit="True" PopWidth="200">
+			<MenuItem Caption="File" Fit="True" PopWidth="150">
 				<MenuItem Command="{CMDLoad}"/>
 				<MenuItem Command="{CMDLoad}"/>
 				<MenuItem Command="{CMDSave}"/>
 				<MenuItem Command="{CMDQuit}"/>
 			</MenuItem>
-			<MenuItem Caption="Edit" Fit="true" PopWidth="150">
-				<MenuItem Command="{CMDCut}" Width="Stretched"/>
-				<MenuItem Command="{CMDCopy}" Width="Stretched"/>
-				<MenuItem Command="{CMDPaste}" Width="Stretched"/>
+			<MenuItem Caption="Edit" Fit="true" PopWidth="120">
+				<MenuItem Command="{CMDCut}"/>
+				<MenuItem Command="{CMDCopy}"/>
+				<MenuItem Command="{CMDPaste}"/>
+			</MenuItem>
+			<MenuItem Caption="View" Fit="true" PopWidth="150">
+				<MenuItem Command="{CMDViewGTExp}"/>
+				<MenuItem Command="{CMDViewProps}"/>
+				<MenuItem Command="{CMDViewProj}"/>
 			</MenuItem>
 			<MenuItem Caption="Help" Fit="true" PopWidth="150">
-				<MenuItem Command="{CMDHelp}" Width="Stretched"/>
-				<MenuItem Caption="About" Width="Stretched"/>
+				<MenuItem Command="{CMDHelp}"/>
+				<MenuItem Caption="About"/>
 			</MenuItem>
 		</Menu>
 <!--		<HorizontalStack Height="Fit" Margin="2">

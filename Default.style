@@ -22,6 +22,7 @@ Menu {
 	VerticalAlignment = Top;
 }
 MenuItem {
+	Width = Stretched;
 	Background = Transparent;
 	Foreground = LightGray;
 	MouseEnter = {Background = vgradient|0:UnitedNationsBlue|1:Onyx;Foreground=White;}
