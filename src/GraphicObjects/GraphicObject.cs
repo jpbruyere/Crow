@@ -23,7 +23,7 @@ namespace Crow
 			get {
 				if (currentInterface == null) {
 					currentInterface = Interface.CurrentInterface;
-					initialize ();
+					Initialize ();
 				}
 				return currentInterface;
 			}
@@ -53,7 +53,13 @@ namespace Crow
 			#endif
 		}
 		#endregion
-		internal protected virtual void initialize(){
+
+		/// <summary>
+		/// Initialize this Graphic object instance by setting style and default values and loading template if required
+		/// </summary>
+		public virtual void Initialize(){
+			if (currentInterface == null)
+				currentInterface = Interface.CurrentInterface;
 			loadDefaultValues ();
 		}
 		#region private fields
@@ -513,7 +519,8 @@ namespace Crow
 					LayoutChanged.Raise (this, new LayoutingEventArgs (LayoutingType.Width));
 					Slot.Height = 0;
 					LayoutChanged.Raise (this, new LayoutingEventArgs (LayoutingType.Height));
-					CurrentInterface.EnqueueForRepaint (this);
+					if (this.parent != null)
+						CurrentInterface.EnqueueForRepaint (this);
 					LastSlots.Width = LastSlots.Height = 0;
 				}
 

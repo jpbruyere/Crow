@@ -31,7 +31,7 @@ namespace Crow
 		public TemplatedContainer () : base(){}
 		#endregion
 
-		[XmlIgnore]public abstract GraphicObject Content{ get; set;}
+		[XmlAttributeAttribute]public virtual GraphicObject Content{ get; set;}
 
 		#region GraphicObject overrides
 		public override GraphicObject FindByName (string nameToFind)

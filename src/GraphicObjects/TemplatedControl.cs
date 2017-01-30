@@ -39,10 +39,10 @@ namespace Crow
 		}
 		#endregion
 
-		internal protected override void initialize ()
+		public override void Initialize ()
 		{
 			loadTemplate ();
-			base.initialize ();
+			base.Initialize ();
 		}
 
 		string _template;

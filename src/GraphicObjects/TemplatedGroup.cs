@@ -330,7 +330,7 @@ namespace Crow
 			}else if (typeof(GenericStack).IsAssignableFrom (items.GetType ())) {
 				GenericStack gs = new GenericStack ();
 				gs.CurrentInterface = items.CurrentInterface;
-				gs.initialize ();
+				gs.Initialize ();
 				gs.Orientation = (items as GenericStack).Orientation;
 				gs.Width = items.Width;
 				gs.Height = items.Height;
