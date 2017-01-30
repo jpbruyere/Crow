@@ -23,6 +23,7 @@ Menu {
 }
 MenuItem {
 	Width = Stretched;
+	Height = Fit;
 	Background = Transparent;
 	Foreground = LightGray;
 	MouseEnter = {Background = vgradient|0:UnitedNationsBlue|1:Onyx;Foreground=White;}

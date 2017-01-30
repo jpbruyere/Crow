@@ -229,6 +229,8 @@ namespace Crow
 				Content.Visible = true;
 				if (Content.Parent == null)
 					CurrentInterface.AddWidget (Content, true);
+				if (Content.LogicalParent != this)
+					Content.LogicalParent = this;
 				CurrentInterface.PutOnTop (Content, true);
 				_content_LayoutChanged (this, new LayoutingEventArgs (LayoutingType.Sizing));
 			}
