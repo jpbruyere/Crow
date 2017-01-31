@@ -35,7 +35,6 @@ namespace Crow
 
 		#region Private fields
 		bool _isExpanded;
-		string caption;
 		string image;
 		Container _contentContainer;
 		#endregion
@@ -70,26 +69,16 @@ namespace Crow
 		}
 
 		#region Public properties
-		[XmlAttributeAttribute][DefaultValue("Expandable")]
-		public string Caption {
-			get { return caption; } 
-			set {
-				if (caption == value)
-					return;
-				caption = value; 
-				NotifyValueChanged ("Caption", caption);
-			}
-		}        
 		[XmlAttributeAttribute][DefaultValue("#Crow.Images.Icons.expandable.svg")]
 		public string Image {
-			get { return image; } 
+			get { return image; }
 			set {
 				if (image == value)
 					return;
-				image = value; 
+				image = value;
 				NotifyValueChanged ("Image", image);
 			}
-		}     
+		}
 		[XmlAttributeAttribute][DefaultValue(false)]
         public bool IsExpanded
         {
@@ -120,11 +109,11 @@ namespace Crow
 		[XmlIgnore]public bool IsExpandable {
 			get {
 				try {
-					return GetIsExpandable == null ? true : GetIsExpandable (this); 
+					return GetIsExpandable == null ? true : GetIsExpandable (this);
 				} catch (Exception ex) {
 					System.Diagnostics.Debug.WriteLine ("Not Expandable error: " + ex.ToString ());
 					return false;
-				}		
+				}
 			}
 		}
 		#endregion
@@ -133,14 +122,14 @@ namespace Crow
 		{
 			if (_contentContainer != null)
 				_contentContainer.Visible = true;
-			
+
 			Expand.Raise (this, e);
 		}
 		public virtual void onCollapse(object sender, EventArgs e)
 		{
 			if (_contentContainer != null)
 				_contentContainer.Visible = false;
-			
+
 			Collapse.Raise (this, e);
 		}
 	}

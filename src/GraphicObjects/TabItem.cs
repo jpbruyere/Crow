@@ -89,16 +89,7 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue("TabItem")]
-		public string Caption {
-			get { return caption; }
-			set {
-				if (caption == value)
-					return;
-				caption = value;
-				NotifyValueChanged ("Caption", caption);
-			}
-		}
+
 		[XmlAttributeAttribute][DefaultValue(false)]
 		public virtual bool IsSelected {
 			get { return isSelected; }

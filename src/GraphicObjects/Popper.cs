@@ -35,25 +35,14 @@ namespace Crow
 		#endregion
 
 		bool _isPopped, _canPop;
-		string caption;
 		Alignment popDirection;
 		GraphicObject _content;
 		Measure popWidth, popHeight;
 
-		public event EventHandler Pop;
-		public event EventHandler Unpop;
+		public event EventHandler Popped;
+		public event EventHandler Unpoped;
 
 		#region Public Properties
-		[XmlAttributeAttribute()][DefaultValue("Popper")]
-		public string Caption {
-			get { return caption; }
-			set {
-				if (caption == value)
-					return;
-				caption = value;
-				NotifyValueChanged ("Caption", caption);
-			}
-		}
 		[XmlAttributeAttribute()][DefaultValue("Fit")]
 		public virtual Measure PopWidth {
 			get { return popWidth; }
@@ -234,14 +223,14 @@ namespace Crow
 				CurrentInterface.PutOnTop (Content, true);
 				_content_LayoutChanged (this, new LayoutingEventArgs (LayoutingType.Sizing));
 			}
-			Pop.Raise (this, e);
+			Popped.Raise (this, e);
 		}
 		public virtual void onUnpop(object sender, EventArgs e)
 		{
 			if (Content != null) {
 				Content.Visible = false;
 			}
-			Unpop.Raise (this, e);
+			Unpoped.Raise (this, e);
 		}
 	}
 }
