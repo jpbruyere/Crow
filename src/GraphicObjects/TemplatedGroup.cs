@@ -324,10 +324,10 @@ namespace Crow
 			#endif
 
 			Group page;
-			if (typeof(Wrapper).IsAssignableFrom (items.GetType ())){
+			if (typeof(Wrapper).IsAssignableFrom (items.GetType ())) {
 				page = items;
 				itemPerPage = int.MaxValue;
-			}else if (typeof(GenericStack).IsAssignableFrom (items.GetType ())) {
+			} else if (typeof(GenericStack).IsAssignableFrom (items.GetType ())) {
 				GenericStack gs = new GenericStack ();
 				gs.CurrentInterface = items.CurrentInterface;
 				gs.Initialize ();
@@ -337,11 +337,11 @@ namespace Crow
 				gs.VerticalAlignment = items.VerticalAlignment;
 				gs.HorizontalAlignment = items.HorizontalAlignment;
 				page = gs;
-
-			}else
+				page.Name = "page" + pageNum;
+			} else {
 				page = Activator.CreateInstance (items.GetType ()) as Group;
-
-			page.Name = "page" + pageNum;
+				page.Name = "page" + pageNum;
+			}
 
 			for (int i = (pageNum - 1) * itemPerPage; i < pageNum * itemPerPage; i++) {
 				if (i >= data.Count)

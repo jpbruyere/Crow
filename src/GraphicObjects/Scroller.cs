@@ -44,7 +44,7 @@ namespace Crow
 			get { return _verticalScrolling; }
 			set { _verticalScrolling = value; }
 		}
-        
+
 		[XmlAttributeAttribute][DefaultValue(false)]
         public bool HorizontalScrolling {
 			get { return _horizontalScrolling; }
@@ -54,7 +54,7 @@ namespace Crow
 		public bool ScrollbarVisible {
 			get { return _scrollbarVisible; }
 			set { _scrollbarVisible = value; }
-		}			
+		}
 		[XmlAttributeAttribute][DefaultValue(0.0)]
 		public double ScrollX {
 			get {
@@ -73,7 +73,7 @@ namespace Crow
 				RegisterForRedraw ();
 				Scrolled.Raise (this, new ScrollingEventArgs (Orientation.Horizontal));
 			}
-		}			
+		}
 		[XmlAttributeAttribute][DefaultValue(0.0)]
 		public double ScrollY {
 			get {
@@ -98,9 +98,9 @@ namespace Crow
 		public int MaximumScroll {
 			get {
 				try {
-					return VerticalScrolling ? 
+					return VerticalScrolling ?
 						Math.Max(Child.Slot.Height - ClientRectangle.Height,0) :
-						Math.Max(Child.Slot.Width - ClientRectangle.Width,0);					
+						Math.Max(Child.Slot.Width - ClientRectangle.Width,0);
 				} catch {
 					return 0;
 				}
@@ -121,26 +121,30 @@ namespace Crow
             : base(){}
 
 		#region GraphicObject Overrides
-		//TODO:put this override in style
-		[XmlAttributeAttribute()][DefaultValue(false)]
-		public override bool CacheEnabled {
-			get { return base.CacheEnabled; }
-			set { base.CacheEnabled = value; }
+		public override void OnLayoutChanges (LayoutingType layoutType)
+		{
+			base.OnLayoutChanges (layoutType);
+
+			NotifyValueChanged("MaximumScroll", MaximumScroll);
 		}
 		void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
+			//Debug.WriteLine ("scroller childLayoutChanges");
 			int maxScroll = MaximumScroll;
+			//Debug.WriteLine ("maxscroll={0}", maxScroll);
 			if (_verticalScrolling) {
 				if (arg.LayoutType == LayoutingType.Height) {
 					if (maxScroll < ScrollY) {
-						Debug.WriteLine ("scrolly={0} maxscroll={1}", ScrollY, maxScroll);
+						//Debug.WriteLine ("scrolly={0} maxscroll={1}", ScrollY, maxScroll);
 						ScrollY = 0;
 					}
 					NotifyValueChanged("MaximumScroll", maxScroll);
 				}
 			} else if (arg.LayoutType == LayoutingType.Width) {
-				if (maxScroll < ScrollX)
+				if (maxScroll < ScrollX) {
+					//Debug.WriteLine ("scrolly={0} maxscroll={1}", ScrollY, maxScroll);
 					ScrollX = 0;
+				}
 				NotifyValueChanged("MaximumScroll", maxScroll);
 			}
 		}
@@ -149,7 +153,7 @@ namespace Crow
 			ScrollX = 0;
 		}
 		public override void SetChild (GraphicObject _child)
-		{			
+		{
 			GraphicObject c = child as GraphicObject;
 			Group g = child as Group;
 			if (c != null) {
@@ -162,46 +166,10 @@ namespace Crow
 			if (c != null) {
 				c.LayoutChanged += OnChildLayoutChanges;
 				if (g != null)
-					g.ChildrenCleared += onChildListCleared;				
+					g.ChildrenCleared += onChildListCleared;
 			}
 			base.SetChild (_child);
 		}
-		#endregion
-
-		#region Mouse handling
-		internal Point savedMousePos;
-		public override bool MouseIsIn (Point m)
-		{			
-			return Visible ? base.ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false; 
-		}
-		public override void checkHoverWidget (MouseMoveEventArgs e)
-		{
-			savedMousePos = e.Position;
-			Point m = e.Position - new Point ((int)ScrollX, (int)ScrollY);
-			base.checkHoverWidget (new MouseMoveEventArgs(m.X,m.Y,e.XDelta,e.YDelta));
-		}
-		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
-		{
-			if (Child == null)
-				return;
-			
-			if (VerticalScrolling )
-				ScrollY -= e.Delta * ScrollSpeed;
-            if (HorizontalScrolling )
-				ScrollX -= e.Delta * ScrollSpeed;
-        }
-		public override void onMouseMove (object sender, MouseMoveEventArgs e)
-		{
-			savedMousePos.X += e.XDelta;
-			savedMousePos.Y += e.YDelta;
-			base.onMouseMove (sender, new MouseMoveEventArgs(savedMousePos.X,savedMousePos.Y,e.XDelta,e.YDelta));
-		}
-		public override void RegisterClip (Rectangle clip)
-		{
-			base.RegisterClip (clip - new Point((int)ScrollX,(int)ScrollY));
-		}
-		#endregion
-
 		public override Rectangle ScreenCoordinates (Rectangle r)
 		{
 			return base.ScreenCoordinates (r) - new Point((int)ScrollX,(int)ScrollY);
@@ -226,5 +194,41 @@ namespace Crow
 				child.Paint (ref gr);
 			gr.Restore ();
 		}
+
+		#region Mouse handling
+		internal Point savedMousePos;
+		public override bool MouseIsIn (Point m)
+		{
+			return Visible ? base.ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false;
+		}
+		public override void checkHoverWidget (MouseMoveEventArgs e)
+		{
+			savedMousePos = e.Position;
+			Point m = e.Position - new Point ((int)ScrollX, (int)ScrollY);
+			base.checkHoverWidget (new MouseMoveEventArgs(m.X,m.Y,e.XDelta,e.YDelta));
+		}
+		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
+		{
+			if (Child == null)
+				return;
+
+			if (VerticalScrolling )
+				ScrollY -= e.Delta * ScrollSpeed;
+			if (HorizontalScrolling )
+				ScrollX -= e.Delta * ScrollSpeed;
+		}
+		public override void onMouseMove (object sender, MouseMoveEventArgs e)
+		{
+			savedMousePos.X += e.XDelta;
+			savedMousePos.Y += e.YDelta;
+			base.onMouseMove (sender, new MouseMoveEventArgs(savedMousePos.X,savedMousePos.Y,e.XDelta,e.YDelta));
+		}
+		public override void RegisterClip (Rectangle clip)
+		{
+			base.RegisterClip (clip - new Point((int)ScrollX,(int)ScrollY));
+		}
+		#endregion
+
+		#endregion
     }
 }

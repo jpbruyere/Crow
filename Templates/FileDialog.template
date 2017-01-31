@@ -17,11 +17,11 @@
 			<GraphicObject Width="5"/>
 		</HorizontalStack>
 		<Container Name="Content" MinimumSize="50,50" Background="Onyx">
-			<VerticalStack Margin="5">
+			<VerticalStack Margin="1">
 				<TextBox Text="{²./CurrentDirectory}"/>
-				<HorizontalStack>
+				<HorizontalStack Spacing="1">
 					<DirectoryView ShowFiles="false" Name="dv" CurrentDirectory="{²./CurrentDirectory}" SelectedItemChanged="./Tv_SelectedItemChanged"
-						Width="50%" Margin="1">
+						Width="50%" Margin="0">
 						<Template>
 							<TreeView IsRoot="true" Name="treeView" Data="{./FileSystemEntries}"
 									SelectedItemChanged="./onSelectedItemChanged">
@@ -68,15 +68,21 @@
 					</DirectoryView>
 					<Splitter/>
 					<DirectoryView ShowFiles="true" Name="dv" CurrentDirectory="{../dv.SelectedItem}" 
-						Width="50%" Margin="1">
+						Width="100%" Margin="0">
 						<Template>
 							<ListBox Name="fileView" Data="{./FileSystemEntries}">
 								<Template>
-									<Border BorderWidth="1" Margin="1" MinimumSize="10,10">
-										<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true">
-											<Wrapper Orientation="Horizontal" Height="Fit"
-												Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
-										</Scroller>
+									<Border BorderWidth="1" Margin="0" MinimumSize="10,10">
+										<VerticalStack>
+											<Scroller ScrollX="{../scrollbar1.Value}"  Name="scroller1"
+												VerticalScrolling="False" HorizontalScrolling="true">
+												<Wrapper Orientation="Horizontal" Width="Fit" HorizontalAlignment="Left"
+													Name="ItemsContainer" Margin="0" Spacing="1"/>
+											</Scroller>
+											<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollX}" 
+												Maximum="{../scroller1.MaximumScroll}" Orientation="Horizontal" 
+												Height="14" />
+										</VerticalStack>
 									</Border>
 								</Template>
 								<ItemTemplate DataType="System.IO.FileInfo">

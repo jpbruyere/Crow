@@ -99,6 +99,9 @@ ScrollBar {
 	Maximum = 0;
 	Value = 0;
 }
+Scroller {
+	CacheEnabled = false;
+}
 Icon {
 	Margin=1;
 	Width=12;

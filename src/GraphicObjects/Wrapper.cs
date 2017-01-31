@@ -82,19 +82,21 @@ namespace Crow
 		{
 			//children can't stretch in a wrapper
 			GraphicObject go = sender as GraphicObject;
-			//Debug.WriteLine ("child layout change: " + go.LastSlots.ToString() + " => " + go.Slot.ToString());
+			//System.Diagnostics.Debug.WriteLine ("wrapper child layout change: " + go.LastSlots.ToString() + " => " + go.Slot.ToString());
 			switch (arg.LayoutType) {
 			case LayoutingType.Width:
-				if (Orientation == Orientation.Horizontal && go.Width.Units == Unit.Percent) {
+				if (Orientation == Orientation.Horizontal && go.Width.Units == Unit.Percent){
 					go.Width = Measure.Fit;
 					return;
 				}
+				this.RegisterForLayouting (LayoutingType.Width);
 				break;
 			case LayoutingType.Height:
 				if (Orientation == Orientation.Vertical && go.Height.Units == Unit.Percent) {
 					go.Height = Measure.Fit;
 					return;
 				}
+				this.RegisterForLayouting (LayoutingType.Height);
 				break;
 			default:
 				return;
@@ -107,7 +109,7 @@ namespace Crow
 		protected override int measureRawSize (LayoutingType lt)
 		{
 			int tmp = 0;
-			//Wrapper can't fit in the direction of the wrapper
+			//Wrapper can't fit in the opposite direction of the wrapper, this func is called only if Fit
 			if (lt == LayoutingType.Width) {
 				if (Orientation == Orientation.Vertical) {
 					Width = Measure.Stretched;
@@ -194,7 +196,6 @@ namespace Crow
 			CurrentInterface.currentLQI.Slot = LastSlots;
 			CurrentInterface.currentLQI.Slot = Slot;
 			#endif
-
 			switch (layoutType) {
 			case LayoutingType.Width:
 				foreach (GraphicObject c in Children) {
@@ -218,7 +219,7 @@ namespace Crow
 				return;
 			}
 			RegisterForLayouting (LayoutingType.ArrangeChildren);
-			//LayoutChanged.Raise (this, new LayoutingEventArgs (layoutType));
+			raiseLayoutChanged (new LayoutingEventArgs (layoutType));
 		}
 		#endregion
 	}
