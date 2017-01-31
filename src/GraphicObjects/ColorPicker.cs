@@ -41,7 +41,7 @@ namespace Crow
 			get { return Math.Round(curColor.R * div); }
 			set {
 				if (R == value)
-					return;				
+					return;
 				curColor.R = value * colDiv;
 				NotifyValueChanged ("R", R);
 				hsvFromRGB ();
@@ -122,10 +122,14 @@ namespace Crow
 		public virtual Fill SelectedColor {
 			get { return new SolidColor(curColor); }
 			set {
-				Color c = (value as SolidColor).color;
-				if (curColor == c)
-					return;
-				curColor = c;
+				if (value == null)
+					curColor = default(Color);
+				else if (value is SolidColor) {
+					Color c = (value as SolidColor).color;
+					if (curColor == c)
+						return;
+					curColor = c;
+				}
 				notifyCurColorHasChanged ();
 				notifyRGBAHasChanged ();
 				hsvFromRGB ();
@@ -134,7 +138,7 @@ namespace Crow
 		[XmlAttributeAttribute]
 		public virtual Color SelectedRawColor {
 			get { return curColor; }
-			set {				
+			set {
 				if (curColor == value)
 					return;
 				curColor = value;
@@ -177,7 +181,7 @@ namespace Crow
 			{
 				h = 0;
 				s = 0;
-			}else{//Chromatic data...				
+			}else{//Chromatic data...
 				s = diff / max;
 
 				double diffR = (((max - c.R) / 6.0) + (diff / 2.0)) / diff;
@@ -200,34 +204,7 @@ namespace Crow
 			notifyHSVHasChanged ();
 		}
 		void rgbFromHSV(){
-			Color c = Color.Black;
-			c.ResetName ();
-			if (s == 0) {//HSV from 0 to 1
-				c.R = v;
-				c.G = v;
-				c.B = v;
-			}else{
-				double var_h = h * 6.0;
-
-				if (var_h == 6.0)
-					var_h = 0;	//H must be < 1
-				double var_i = Math.Floor( var_h );	//Or ... var_i = floor( var_h )
-				double var_1 = v * ( 1.0 - s );
-				double var_2 = v * (1.0 - s * (var_h - var_i));
-				double var_3 = v * (1.0 - s * (1.0 - (var_h - var_i)));
-
-				if (var_i == 0.0) {
-					c.R = v;
-					c.G = var_3;
-					c.B = var_1;
-				}else if ( var_i == 1.0 ) { c.R = var_2 ; c.G = v     ; c.B = var_1; }
-				else if ( var_i == 2 ) { c.R = var_1 ; c.G = v     ; c.B = var_3; }
-				else if ( var_i == 3 ) { c.R = var_1 ; c.G = var_2 ; c.B = v;     }
-				else if ( var_i == 4 ) { c.R = var_3 ; c.G = var_1 ; c.B = v;    }
-				else                   { c.R = v     ; c.G = var_1 ; c.B = var_2; }
-			}
-				
-			curColor = c;
+			curColor = Color.FromHSV (h, v, s, curColor.A);
 			notifyCurColorHasChanged ();
 			notifyRGBAHasChanged ();
 		}

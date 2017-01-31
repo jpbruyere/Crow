@@ -34,21 +34,21 @@ namespace Crow
 			B = _B;
 			Name = _name;
 			ColorDic.Add(this);
-		}        
+		}
 		#endregion
 
 		public static List<Color> ColorDic = new List<Color>();
 
-        internal string Name;   
+		internal string Name;
 
 		#region public fields
         public double A;
         public double R;
         public double G;
-        public double B;        
+		public double B;
 		#endregion
 
-		#region Operators	
+		#region Operators
         public static implicit operator string(Color c)
         {
             return c.ToString();
@@ -72,7 +72,7 @@ namespace Crow
 				double.Parse(c[0]),
 				double.Parse(c[1]),
 				double.Parse(c[2]),
-				double.Parse(c[3]));                    
+				double.Parse(c[3]));
 		}
 
 //		public static implicit operator OpenTK.Vector4(Color c)
@@ -131,6 +131,50 @@ namespace Crow
 		#endregion
 
 
+		public double Hue {
+			get {
+				double min = Math.Min (R, Math.Min (G, B));	//Min. value of RGB
+				double max = Math.Max (R, Math.Max (G, B));	//Max. value of RGB
+				double diff = max - min;							//Delta RGB value
+
+				if ( diff == 0 )//This is a gray, no chroma...
+					return 0;
+
+				double h = 0.0, s = diff / max;
+
+				double diffR = (((max - R) / 6.0) + (diff / 2.0)) / diff;
+				double diffG = (((max - G) / 6.0) + (diff / 2.0)) / diff;
+				double diffB = (((max - B) / 6.0) + (diff / 2.0)) / diff;
+
+				if (R == max)
+					h = diffB - diffG;
+				else if (G == max)
+					h = (1.0 / 3.0) + diffR - diffB;
+				else if (B == max)
+					h = (2.0 / 3.0) + diffG - diffR;
+
+				if (h < 0)
+					h += 1;
+				if (h > 1)
+					h -= 1;
+
+				return h;
+			}
+		}
+		public double Saturation {
+			get {
+				return Math.Max (R, Math.Max (G, B));	//Max. value of RGB
+			}
+		}
+		public double Value {
+			get {
+				double min = Math.Min (R, Math.Min (G, B));	//Min. value of RGB
+				double max = Math.Max (R, Math.Max (G, B));	//Max. value of RGB
+				double diff = max - min;							//Delta RGB value
+				return diff == 0 ? 0 : diff / max;
+			}
+		}
+
 		public float[] floatArray
 		{
 			get { return new float[]{ (float)R, (float)G, (float)B, (float)A }; }
@@ -142,7 +186,7 @@ namespace Crow
 		public void ResetName(){
 			Name = "";
 		}
-			
+
 		#region Predefined colors
         public static readonly Color Transparent = new Color(0, 0, 0, 0, "Transparent");
 		public static readonly Color Clear = new Color(-1, -1, -1, -1, "Clear");
@@ -1013,14 +1057,14 @@ namespace Crow
 		public static readonly Color Zaffre = new Color(0,0.0784313725490196,0.658823529411765,1.0,"Zaffre");
 		public static readonly Color ZinnwalditeBrown = new Color(0.172549019607843,0.0862745098039216,0.0313725490196078,1.0,"ZinnwalditeBrown");
 		#endregion
-		        
+
 		#region IXmlSerializable
 		public void ReadXml(System.Xml.XmlReader reader)
         {
-            string[] c = reader["Color"].Split(new char[] { ',' });            
-            R = double.Parse(c[0]);
-            G = double.Parse(c[1]);
-            B = double.Parse(c[2]);
+			string[] c = reader["Color"].Split(new char[] { ',' });
+			R = double.Parse(c[0]);
+			G = double.Parse(c[1]);
+			B = double.Parse(c[2]);
 			A = double.Parse(c[3]);
         }
         public void WriteXml(System.Xml.XmlWriter writer)
@@ -1073,9 +1117,10 @@ namespace Crow
         {
             return (Color)s;
         }
-		public static Color FromHSV(double _h, double _v = 1.0, double _s = 1.0){
+		public static Color FromHSV(double _h, double _v = 1.0, double _s = 1.0, double _alpha = 1.0){
 			Color c = Color.Black;
 			c.ResetName ();
+			c.A = _alpha;
 			if (_s == 0) {//HSV from 0 to 1
 				c.R = _v;
 				c.G = _v;
