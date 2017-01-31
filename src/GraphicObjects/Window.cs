@@ -41,7 +41,6 @@ namespace Crow
 			SE,
 		}
 
-		string _title;
 		string _icon;
 		bool _resizable;
 		bool _movable;
@@ -84,16 +83,6 @@ namespace Crow
 		#endregion
 
 		#region public properties
-		[XmlAttributeAttribute][DefaultValue("Window")]
-		public string Title {
-			get { return _title; } 
-			set {
-				if (_title == value)
-					return;
-				_title = value;
-				NotifyValueChanged ("Title", _title);
-			}
-		}
 		[XmlAttributeAttribute][DefaultValue("#Crow.Images.Icons.crow.png")]
 		public string Icon {
 			get { return _icon; } 

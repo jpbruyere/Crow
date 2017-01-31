@@ -47,7 +47,7 @@ namespace Tests
 			AddWidget(
 				new Window ()
 				{
-					Title = "Hello World"
+					Caption = "Hello World"
 				}
 			);
 		}
