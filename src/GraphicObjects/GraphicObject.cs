@@ -908,7 +908,9 @@ namespace Crow
 			}
 			LayoutChanged.Raise (this, new LayoutingEventArgs (layoutType));
 		}
-
+		internal protected void raiseLayoutChanged(LayoutingEventArgs e){
+			LayoutChanged.Raise (this, e);
+		}
 		/// <summary> Update layout component only one at a time, this is where the computation of alignement
 		/// and size take place.
 		/// The redrawing will only be triggered if final slot size has changed </summary>

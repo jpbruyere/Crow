@@ -1,0 +1,14 @@
+﻿<?xml version="1.0"?>
+<Window Caption="Horizontal Wrapper" Width="50%" Height="50%">
+	<Wrapper Orientation="Horizontal" Height="90%" Width="Fit" Margin="5" Background="Teal" Spacing="1" >
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50%" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50%" Background="Mantis"/>
+		<GraphicObject Width="50" Height="50" Background="Mantis"/>
+	</Wrapper>
+</Window>

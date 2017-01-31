@@ -41,9 +41,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Drawing" />
 	<Reference Include="cairo-sharp"/>
-	<Reference Include="gdk-sharp"/>
-	<Reference Include="gio-sharp"/>
-	<Reference Include="glib-sharp"/>
     <Reference Include="OpenTK">
       <HintPath>$(SolutionDir)packages\OpenTK.2.0.0\lib\net20\OpenTK.dll</HintPath>
       <Package>opentk</Package>
@@ -308,6 +305,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Interfaces\Divers\perfMeasures.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Wrapper\2.1.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Wrapper\1.1.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Wrapper\2.2.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
