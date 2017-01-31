@@ -3,10 +3,19 @@ MessageBox, Popper, Slider, Spinner, TextBox {
 	Focusable = true;
 	Height = Fit;
 }
+Border {
+	Foreground = Gray;
+}
+CheckBox { Caption = CheckBox; }
+RadioButton { Caption = RadioButton; }
+Expandable { Caption = Expandable; }
+Popper { Caption = Popper; }
+GroupBox { Caption = Group Box; }
 Wrapper {
 	Orientation = Vertical;
 }
 Button {
+	Caption = Button;
 	Width = Fit;
 }
 Label {
@@ -22,6 +31,7 @@ Menu {
 	VerticalAlignment = Top;
 }
 MenuItem {
+	Caption = MenuItem;
 	Width = Stretched;
 	Height = Fit;
 	Background = Transparent;
@@ -50,6 +60,7 @@ TabView {
 	CacheEnabled = false;
 }
 TabItem {
+	Caption = TabItem;
 	Focusable = true;
 	CacheEnabled = false;
 }
@@ -61,12 +72,14 @@ TextBox {
 	Margin = 1;
 }
 Window {
+	Caption = Window;
 	Focusable = true;
 	MinimumSize=5,5;
 	Width = 150;
 	Height = 150;
 }
 ToolWindow {
+	Caption = Window;
 	Template = #Crow.ToolWindow.template;
 	Focusable = true;
 	MinimumSize=50,50;
@@ -79,9 +92,6 @@ FileDialog {
 	Width = 500;
 	Height = 300;
 }
-Border {
-	Foreground = Gray;
-}
 ProgressBar {
 	Foreground = vgradient|0:BlueCrayola|0.5:SkyBlue|1:BlueCrayola;
 }
@@ -92,7 +102,7 @@ ScrollBar {
 Icon {
 	Margin=1;
 	Width=12;
-	Height=12; 
+	Height=12;
 }
 Control {
 	Margin=0;

@@ -78,17 +78,10 @@ namespace Crow
 				NotifyValueChanged ("Command", command);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue("MenuItem")]
-		public string Caption {
-			get { return Command == null ? caption : Command.Caption; }
-			set {
-				if (caption == value)
-					return;
-				caption = value;
-
-				if (command == null)//raise value changed only if not bound to a command
-					NotifyValueChanged ("Caption", caption);
-			}
+		[XmlAttributeAttribute]
+		public override string Caption {
+			get { return Command == null ? base.Caption : Command.Caption; }
+			set { base.Caption = value; }
 		}
 		[XmlAttributeAttribute]
 		public Picture Icon {

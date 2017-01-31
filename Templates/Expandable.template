@@ -6,7 +6,7 @@
 														MouseEnter="{Background=LightGray}"
 														MouseLeave="{Background=Transparent}">
 				<Image
-					Path="{./Image}"
+					Path="#Crow.Images.Icons.expandable.svg"
 					Visible="{./IsExpandable}"
 					SvgSub="{./IsExpanded}"/>
 			</Container>

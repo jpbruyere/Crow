@@ -14,7 +14,6 @@ namespace Crow
 {
     public class Button : TemplatedContainer
     {
-		string caption;
 		string image;
 		bool isPressed;
 		Container _contentContainer;
@@ -66,16 +65,6 @@ namespace Crow
 		}
 		#endregion
 
-		[XmlAttributeAttribute][DefaultValue("Button")]
-		public string Caption {
-			get { return caption; }
-			set {
-				if (caption == value)
-					return;
-				caption = value;
-				NotifyValueChanged ("Caption", caption);
-			}
-		}
 		[XmlAttributeAttribute][DefaultValue("#Crow.Images.button.svg")]
 		public string Image {
 			get { return image; }

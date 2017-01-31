@@ -39,13 +39,9 @@ namespace Crow
 		}
 		#endregion
 
-		public override void Initialize ()
-		{
-			loadTemplate ();
-			base.Initialize ();
-		}
-
 		string _template;
+		string caption;
+
 		[XmlAttributeAttribute][DefaultValue(null)]
 		public string Template {
 			get { return _template; }
@@ -60,8 +56,22 @@ namespace Crow
 					loadTemplate (CurrentInterface.Load (_template));
 			}
 		}
-
+		[XmlAttributeAttribute()][DefaultValue("Templated Control")]
+		public virtual string Caption {
+			get { return caption; }
+			set {
+				if (caption == value)
+					return;
+				caption = value;
+				NotifyValueChanged ("Caption", caption);
+			}
+		}
 		#region GraphicObject overrides
+		public override void Initialize ()
+		{
+			loadTemplate ();
+			base.Initialize ();
+		}
 		public override GraphicObject FindByName (string nameToFind)
 		{
 			//prevent name searching in template

@@ -27,8 +27,6 @@ namespace Crow
 {
     public class RadioButton : TemplatedControl
     {		        
-		string caption;
-		string image;
 		bool isChecked;
 
 		#region CTOR
@@ -56,16 +54,6 @@ namespace Crow
 		}
 		#endregion
 
-		[XmlAttributeAttribute()][DefaultValue("RadioButton")]
-		public string Caption {
-			get { return caption; } 
-			set {
-				if (caption == value)
-					return;
-				caption = value; 
-				NotifyValueChanged ("Caption", caption);
-			}
-		}        
         [XmlAttributeAttribute()][DefaultValue(false)]
         public bool IsChecked
         {

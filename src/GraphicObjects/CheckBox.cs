@@ -27,28 +27,16 @@ namespace Crow
 {
 	public class CheckBox : TemplatedControl
 	{
-		string caption;
-		string image;
 		bool isChecked;
 
 		#region CTOR
 		public CheckBox() : base()
-		{}							
+		{}
 		#endregion
 
 		public event EventHandler Checked;
 		public event EventHandler Unchecked;
 
-		[XmlAttributeAttribute()][DefaultValue("Checkbox")]
-		public string Caption {
-			get { return caption; } 
-			set {
-				if (caption == value)
-					return;
-				caption = value; 
-				NotifyValueChanged ("Caption", caption);
-			}
-		}
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public bool IsChecked
 		{
@@ -57,7 +45,7 @@ namespace Crow
 			{
 				if (isChecked == value)
 					return;
-				
+
 				isChecked = value;
 
 				NotifyValueChanged ("IsChecked", value);

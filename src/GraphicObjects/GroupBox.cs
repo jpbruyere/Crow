@@ -26,12 +26,11 @@ using System.ComponentModel;
 namespace Crow
 {
     public class GroupBox : TemplatedContainer
-    {		
-		string caption;
+    {
 		Container _contentContainer;
 
 		#region CTOR
-		public GroupBox() : base(){}	
+		public GroupBox() : base(){}
 		#endregion
 
 		#region Template overrides
@@ -50,16 +49,5 @@ namespace Crow
 			_contentContainer = this.child.FindByName ("Content") as Container;
 		}
 		#endregion
-
-		[XmlAttributeAttribute][DefaultValue("Groupbox")]
-		public string Caption {
-			get { return caption; } 
-			set {
-				if (caption == value)
-					return;
-				caption = value; 
-				NotifyValueChanged ("Caption", caption);
-			}
-		}        
 	}
 }
