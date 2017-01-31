@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Window Font="droid bold, 10" Title="Open GL" HorizontalAlignment="Left" Width="30%" Height="90%">
+<Window Font="droid bold, 10" Caption="Open GL" HorizontalAlignment="Left" Width="30%" Height="90%">
 	<VerticalStack>
 		<HorizontalStack Background="Jet" Height="Fit" Width="Stretched"  Margin="2">
 			<Popper Caption="File" Template="#Tests.ui.Popper.template" Width="Fit">

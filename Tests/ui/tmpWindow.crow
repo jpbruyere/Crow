@@ -5,7 +5,7 @@
 	Background="vgradient|0:0.6,0.6,0.6,0.9|1:0.4,0.4,0.4,0.6">
 	<VerticalStack>
 		<HorizontalStack Height="Fit">
-			<Label Margin="2" Font="{../../../../Font}" Text="{../../../../Title}" Width="Stretched"/>
+			<Label Margin="2" Font="{../../../../Font}" Text="{../../../../Caption}" Width="Stretched"/>
 			<Border HorizontalAlignment="Right" Margin="0" VerticalAlignment="Top"
 				CornerRadius="6" BorderWidth="1" Foreground="Transparent"
 				Height="12" Width="12"

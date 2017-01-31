@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Window Title="Showcase" Height="90%" Width="90%">
+<Window Caption="Showcase" Height="90%" Width="90%">
 	<HorizontalStack >
 		<VerticalStack Width="30%" Margin="5">
 			<GroupBox Caption="Performance" Height="Fit">
@@ -137,7 +137,8 @@
 			</TabView>-->
 			<MessageBox Movable="false"/>
 			<ColorPicker SelectedColor="{²../go.Background}" Name="colorPicker" Background="Onyx" Margin="5" Fit="True" />
-			<GraphicObject Name="go" Width="100" Height="60" Background="DarkBlue"/>
+			<GraphicObject Name="go" Width="100" Height="60" Background="{../../colorList.SelectedItem}"/>
+			<Label Text="{../../colorPicker.SelectedRawColor}"/>
 		</VerticalStack>
 		<Splitter/>
 		<VerticalStack Width="30%" Margin="5">
@@ -148,7 +149,7 @@
 				<DirectoryView Name="dv" CurrentDirectory="/" Margin="1"/>
 			</Border>
 			<Splitter/>
-			<ListBox Data="{TestList}" Margin="5"
+			<ListBox Name="colorList" Data="{TestList}" Margin="5"
 					 ItemTemplate="#Tests.Interfaces.colorItem.crow"
 					 Template="#Crow.Templates.ScrollingListBox.goml"
 					 />
