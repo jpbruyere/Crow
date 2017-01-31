@@ -475,16 +475,61 @@ namespace Crow
 				il.MarkLabel (endConvert);
 			}else if (origType.IsValueType) {
 				if (destType != origType) {
-					il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (destType));
+					MethodInfo miIO = getImplicitOp (origType, destType);
+					if (miIO != null) {
+						System.Reflection.Emit.Label emitCreateDefault = il.DefineLabel ();
+						System.Reflection.Emit.Label emitContinue = il.DefineLabel ();
+						LocalBuilder lbStruct = il.DeclareLocal (origType);
+						il.Emit (OpCodes.Dup);
+						il.Emit (OpCodes.Brfalse, emitCreateDefault);
+						il.Emit (OpCodes.Unbox_Any, origType);
+						il.Emit (OpCodes.Br, emitContinue);
+						il.MarkLabel (emitCreateDefault);
+						il.Emit (OpCodes.Pop);//pop null value
+						il.Emit (OpCodes.Ldloca, lbStruct);
+						il.Emit (OpCodes.Initobj, origType);
+						il.Emit (OpCodes.Ldloc, lbStruct);
+						il.MarkLabel (emitContinue);
+						il.Emit (OpCodes.Call, miIO);
+					}else
+						il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (destType));
 				}else
 					il.Emit (OpCodes.Unbox_Any, destType);//TODO:double check this
 			} else {
-				if (origType.IsAssignableFrom(destType))
+				if (destType.IsAssignableFrom(origType))
 					il.Emit (OpCodes.Castclass, destType);
 				else {
-					MethodInfo miIO = getImplicitOp (origType, destType);
-					if (miIO != null)
-						il.Emit (OpCodes.Callvirt, miIO);
+					//implicit conversion can't be defined from or to object base class,
+					//so we will check if object underlying type is one of the implicit converter of destType
+					if (origType == TObject) {//test all implicit converter to destType on obj
+						System.Reflection.Emit.Label emitTestNextImpOp;
+						System.Reflection.Emit.Label emitImpOpFound = il.DefineLabel ();
+						foreach (MethodInfo mi in destType.GetMethods(BindingFlags.Public|BindingFlags.Static)) {
+							if (mi.Name == "op_Implicit") {
+								if (mi.GetParameters () [0].ParameterType == destType)
+									continue;
+								emitTestNextImpOp = il.DefineLabel ();
+								il.Emit (OpCodes.Dup);
+								il.Emit (OpCodes.Isinst, mi.GetParameters () [0].ParameterType);
+								il.Emit (OpCodes.Brfalse, emitTestNextImpOp);
+								if (mi.GetParameters () [0].ParameterType.IsValueType)
+									il.Emit (OpCodes.Unbox_Any, mi.GetParameters () [0].ParameterType);
+								else
+									il.Emit (OpCodes.Isinst, mi.GetParameters () [0].ParameterType);
+
+								il.Emit (OpCodes.Call, mi);
+								il.Emit (OpCodes.Br, emitImpOpFound);
+
+								il.MarkLabel (emitTestNextImpOp);
+							}
+						}
+						//il.Emit (OpCodes.Br, emitImpOpNotFound);
+						il.MarkLabel (emitImpOpFound);
+					} else {//search both orig and dest types for implicit operators
+						MethodInfo miIO = getImplicitOp (origType, destType);
+						if (miIO != null)
+							il.Emit (OpCodes.Call, miIO);
+					}
 				}
 			}
 		}
