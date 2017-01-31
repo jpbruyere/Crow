@@ -43,7 +43,7 @@ namespace Crow
 			get { return ifaceModelMat * modelview * projection; }
 		}
 
-		public override void initGL(){			
+		public override void initGL(){
 			quad = new Crow.vaoMesh (0, 0, 0, 1, 1, 1, -1);
 			//ifaceModelMat = Matrix4.CreateRotationX(MathHelper.PiOver2) * Matrix4.CreateTranslation(Vector3.UnitY);
 			CrowInterface.ProcessResize(iRect);
@@ -106,7 +106,7 @@ namespace Crow
 			return vec;
 		}
 	}
-	public class InterfaceControler {
+	public class InterfaceControler : IDisposable {
 		public Interface CrowInterface;
 		public int texID;
 		public vaoMesh quad;
@@ -194,7 +194,7 @@ namespace Crow
 		#endregion
 
 		#region graphic context
-		public virtual void initGL(){			
+		public virtual void initGL(){
 			projection = OpenTK.Matrix4.CreateOrthographicOffCenter (-0.5f, 0.5f, -0.5f, 0.5f, 1, -1);
 			quad = new Crow.vaoMesh (0, 0, 0, 1, 1, 1, -1);
 			createContext ();
@@ -243,6 +243,18 @@ namespace Crow
 			glDrawMeasure.StopCycle();
 			#endif
 		}
+		#endregion
+
+		#region IDisposable implementation
+
+		public void Dispose ()
+		{
+			if (GL.IsTexture(texID))
+				GL.DeleteTexture (texID);
+			if (quad != null)
+				quad.Dispose ();
+		}
+
 		#endregion
 	}
 }
