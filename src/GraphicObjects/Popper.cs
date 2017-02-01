@@ -126,14 +126,12 @@ namespace Crow
 				_content.LayoutChanged += _content_LayoutChanged;
 			}
 		}
-
-		protected void _content_LayoutChanged (object sender, LayoutingEventArgs e)
-		{
+		void positionContent(LayoutingType lt){
 			ILayoutable tc = Content.Parent;
 			if (tc == null)
 				return;
 			Rectangle r = this.ScreenCoordinates (this.Slot);
-			if (e.LayoutType.HasFlag(LayoutingType.Width)) {
+			if (lt == LayoutingType.X) {
 				if (popDirection.HasFlag (Alignment.Right)) {
 					if (r.Right + Content.Slot.Width > tc.ClientRectangle.Right)
 						Content.Left = r.Left - Content.Slot.Width;
@@ -153,8 +151,7 @@ namespace Crow
 					} else
 						Content.Left = 0;
 				}
-			}
-			if (e.LayoutType.HasFlag(LayoutingType.Height)) {
+			}else if (lt == LayoutingType.Y) {
 				if (Content.Slot.Height < tc.ClientRectangle.Height) {
 					if (PopDirection.HasFlag (Alignment.Bottom)) {
 						if (r.Bottom + Content.Slot.Height > tc.ClientRectangle.Bottom)
@@ -171,6 +168,13 @@ namespace Crow
 				}else
 					Content.Top = 0;
 			}
+		}
+		protected void _content_LayoutChanged (object sender, LayoutingEventArgs e)
+		{
+			if (e.LayoutType.HasFlag (LayoutingType.Width))
+				positionContent (LayoutingType.X);
+			if (e.LayoutType.HasFlag(LayoutingType.Height))
+				positionContent (LayoutingType.Y);
 		}
 
 		#region GraphicObject overrides
