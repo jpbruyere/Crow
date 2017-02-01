@@ -46,7 +46,12 @@ namespace Crow
 
 			while (!EndOfStream) {
 				char c = (Char)Read ();
-
+				if (c == '/' && !EndOfStream) {
+					if ((char)Peek () == '/') {//process comment, skip until newline
+						ReadLine ();
+						continue;
+					}
+				}
 				switch (state) {
 				case readerState.classNames:
 					if (c.IsWhiteSpaceOrNewLine () || c == ',' || c == '{') {
