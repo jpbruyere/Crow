@@ -144,6 +144,9 @@ namespace Crow
 
 		public void Quit (object sender, EventArgs e)
 		{
+			foreach (InterfaceControler ic in ifaceControl) {
+				ic.Dispose ();
+			}
 			this.Exit ();
 		}
 		void CrowInterface_MouseCursorChanged (object sender, MouseCursorChangedEventArgs e)
