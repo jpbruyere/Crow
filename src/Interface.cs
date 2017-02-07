@@ -438,8 +438,9 @@ namespace Crow
 			#if MEASURE_TIME
 			layoutingMeasure.StartCycle();
 			#endif
-			DiscardQueue = new Queue<LayoutingQueueItem> ();
-			lock (LayoutMutex) {
+
+			if (Monitor.TryEnter (LayoutMutex)) {
+				DiscardQueue = new Queue<LayoutingQueueItem> ();
 				//Debug.WriteLine ("======= Layouting queue start =======");
 				LayoutingQueueItem lqi;
 				while (LayoutingQueue.Count > 0) {
@@ -451,8 +452,9 @@ namespace Crow
 					lqi.ProcessLayouting ();
 				}
 				LayoutingQueue = DiscardQueue;
+				Monitor.Exit (LayoutMutex);
+				DiscardQueue = null;
 			}
-			DiscardQueue = null;
 
 			#if MEASURE_TIME
 			layoutingMeasure.StopCycle();
@@ -552,7 +554,8 @@ namespace Crow
 					ptr = 0;
 			} else if (topMost)
 				ptr = 0;
-			GraphicTree.Insert (ptr, g);
+			lock (UpdateMutex)
+				GraphicTree.Insert (ptr, g);			
 			g.RegisteredLayoutings = LayoutingType.None;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
@@ -560,7 +563,8 @@ namespace Crow
 		public void DeleteWidget(GraphicObject g)
 		{
 			g.Visible = false;//trick to ensure clip is added to refresh zone
-			GraphicTree.Remove (g);
+			lock (UpdateMutex)
+				GraphicTree.Remove (g);
 		}
 		/// <summary> Put widget on top of other root widgets</summary>
 		public void PutOnTop(GraphicObject g, bool topMost = false)
@@ -573,8 +577,10 @@ namespace Crow
 				ptr = 0;
 			if (GraphicTree.IndexOf(g) > ptr)
 			{
-				GraphicTree.Remove(g);
-				GraphicTree.Insert(ptr, g);
+				lock (UpdateMutex) {
+					GraphicTree.Remove (g);
+					GraphicTree.Insert (ptr, g);
+				}
 				EnqueueForRepaint (g);
 			}
 		}
@@ -582,13 +588,15 @@ namespace Crow
 		public void ClearInterface()
 		{
 			int i = 0;
-			while (GraphicTree.Count>0) {
-				//TODO:parent is not reset to null because object will be added
-				//to ObjectToRedraw list, and without parent, it fails
-				GraphicObject g = GraphicTree [i];
-				g.DataSource = null;
-				g.Visible = false;
-				GraphicTree.RemoveAt (0);
+			lock (UpdateMutex) {
+				while (GraphicTree.Count > 0) {
+					//TODO:parent is not reset to null because object will be added
+					//to ObjectToRedraw list, and without parent, it fails
+					GraphicObject g = GraphicTree [i];
+					g.DataSource = null;
+					g.Visible = false;
+					GraphicTree.RemoveAt (0);
+				}
 			}
 			#if DEBUG_LAYOUTING
 			LQIsTries = new List<LQIList>();
