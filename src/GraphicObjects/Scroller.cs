@@ -136,14 +136,14 @@ namespace Crow
 				if (arg.LayoutType == LayoutingType.Height) {
 					if (maxScroll < ScrollY) {
 						//Debug.WriteLine ("scrolly={0} maxscroll={1}", ScrollY, maxScroll);
-						ScrollY = 0;
+						ScrollY = maxScroll;
 					}
 					NotifyValueChanged("MaximumScroll", maxScroll);
 				}
 			} else if (arg.LayoutType == LayoutingType.Width) {
 				if (maxScroll < ScrollX) {
 					//Debug.WriteLine ("scrolly={0} maxscroll={1}", ScrollY, maxScroll);
-					ScrollX = 0;
+					ScrollX = maxScroll;
 				}
 				NotifyValueChanged("MaximumScroll", maxScroll);
 			}

@@ -21,8 +21,6 @@
     <Description>C# Rapid Open Widget</Description>
     <BaseAddress>4194304</BaseAddress>
     <ReleaseVersion>0.5</ReleaseVersion>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
     <AssemblyOriginatorKeyFile>crow.key</AssemblyOriginatorKeyFile>

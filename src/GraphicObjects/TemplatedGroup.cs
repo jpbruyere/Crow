@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Collections;
 using System.Threading;
+using System.Linq;
 
 namespace Crow
 {
@@ -44,12 +45,14 @@ namespace Crow
 		#endregion
 
 		IList data;
-		int _selectedIndex;
+		int _selectedIndex = -1;
 		Color selBackground, selForeground;
 
 		int itemPerPage = 50;
 		CrowThread loadingThread = null;
 		volatile bool cancelLoading = false;
+
+		bool isPaged = false;
 
 		#region Templating
 		//TODO: dont instantiate ItemTemplates if not used
@@ -104,14 +107,29 @@ namespace Crow
 		}
 		#endregion
 
-		public virtual List<GraphicObject> Items{ get { return items.Children; }}
+		public virtual List<GraphicObject> Items{
+			get {
+				return isPaged ? items.Children.SelectMany(x => (x as Group).Children).ToList()
+				: items.Children;
+			}
+		}
 		[XmlAttributeAttribute][DefaultValue(-1)]public int SelectedIndex{
 			get { return _selectedIndex; }
 			set {
 				if (value == _selectedIndex)
 					return;
 
+				if (_selectedIndex >= 0) {
+					Items[_selectedIndex].Foreground = Color.Transparent;
+					Items[_selectedIndex].Background = Color.Transparent;
+				}
+
 				_selectedIndex = value;
+
+				if (_selectedIndex >= 0) {
+					Items[_selectedIndex].Foreground = SelectionForeground;
+					Items[_selectedIndex].Background = SelectionBackground;
+				}
 
 				NotifyValueChanged ("SelectedIndex", _selectedIndex);
 				NotifyValueChanged ("SelectedItem", SelectedItem);
@@ -197,6 +215,10 @@ namespace Crow
 
 		public virtual void ClearItems()
 		{
+			_selectedIndex = -1;
+			NotifyValueChanged ("SelectedIndex", _selectedIndex);
+			NotifyValueChanged ("SelectedItem", null);
+
 			items.ClearChildren ();
 			NotifyValueChanged ("HasChildren", false);
 		}
@@ -338,9 +360,11 @@ namespace Crow
 				gs.HorizontalAlignment = items.HorizontalAlignment;
 				page = gs;
 				page.Name = "page" + pageNum;
+				isPaged = true;
 			} else {
 				page = Activator.CreateInstance (items.GetType ()) as Group;
 				page.Name = "page" + pageNum;
+				isPaged = true;
 			}
 
 			for (int i = (pageNum - 1) * itemPerPage; i < pageNum * itemPerPage; i++) {

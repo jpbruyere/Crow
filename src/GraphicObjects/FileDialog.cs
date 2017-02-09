@@ -33,23 +33,27 @@ namespace Crow
 	{
 		string searchPattern, curDirectory;
 
+		#region events
+		public event EventHandler OkClicked;
+		#endregion
+
 		#region CTOR
 		public FileDialog () : base()
 		{
 		}
 		#endregion
-		//[DefaultValue(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments))]
+
 		[XmlAttributeAttribute][DefaultValue("/home")]
 		public virtual string CurrentDirectory {
 			get { return curDirectory; }
 			set {
 				if (curDirectory == value)
 					return;
-				curDirectory = value; 
+				curDirectory = value;
 				NotifyValueChanged ("CurrentDirectory", curDirectory);
 
 			}
-		} 
+		}
 
 		[XmlAttributeAttribute()][DefaultValue("*")]
 		public virtual string SearchPattern {
@@ -57,75 +61,43 @@ namespace Crow
 			set {
 				if (searchPattern == value)
 					return;
-				searchPattern = value; 
+				searchPattern = value;
 				NotifyValueChanged ("SearchPattern", searchPattern);
 
 			}
-		} 
+		}
+		string _selectedFile;
+		[XmlIgnore]public string SelectedFile {
+			get {
+				return _selectedFile;
+			}
+			set {
+				if (value == _selectedFile)
+					return;
+				_selectedFile = value;
+				NotifyValueChanged ("SelectedFile", _selectedFile);
+			}
+		}
+		public void onSelectedItemChanged (object sender, SelectionChangeEventArgs e){
 
-//		public DirectoryInfo[] Directories
-//		{
-//			get {
-//				//currentDir.GetDirectories
-//				List<DirectoryInfo> tmp = currentDir.GetDirectories ().Where(fi => !fi.Attributes.HasFlag(FileAttributes.Hidden)).ToList();
-//				if (currentDir.Parent != null)
-//					tmp.Insert (0, currentDir.Parent);
-//				return tmp.ToArray ();
-//			}
-//		}
-//		public FileInfo[] Files
-//		{
-//			get {
-//				string[] exts = searchPattern.Replace("*","").Split ('|');
-//				//return currentDir.GetFiles (searchPattern).Where(fi => !fi.Attributes.HasFlag(FileAttributes.Hidden)).ToArray();
-//				return currentDir.GetFiles().Where(f => exts.Any
-//					(x => f.Name.EndsWith (x, StringComparison.InvariantCultureIgnoreCase))).ToArray();
-//			}
-//		}
-
-//		void OnSelectedItemChanged (object sender, SelectionChangeEventArgs e)
-//		{
-//			currentDir = e.NewValue as DirectoryInfo;
-//			NotifyValueChanged ("CurrentPath", CurrentPath);
-//			NotifyValueChanged ("Directories", Directories);
-//			NotifyValueChanged ("Files", Files);
-//
-//		}
-//		void onFileListItemChanged (object sender, SelectionChangeEventArgs e)
-//		{
-//			selectedFile = e.NewValue as FileInfo;
-//		}
-//		void onFileSelect(object sender, MouseButtonEventArgs e){
-//			//OpenTKGameWindow.currentWindow.DeleteWidget(window);
-//		}
+			string tmp = "";
+			if (e.NewValue != null)
+				tmp = e.NewValue.ToString();
+			if (tmp == SelectedFile)
+				return;
+			SelectedFile = tmp;
+			//SelectedItemChanged.Raise (this, e);
+		}
+		void onFileSelect(object sender, MouseButtonEventArgs e){
+			OkClicked.Raise (this, null);
+			unloadDialog ((sender as GraphicObject).CurrentInterface);
+		}
+		void onCancel(object sender, MouseButtonEventArgs e){
+			unloadDialog ((sender as GraphicObject).CurrentInterface);
+		}
+		void unloadDialog(Interface host){
+			host.DeleteWidget (this);
+		}
 	}
-//	public class DirContainer: IValueChange
-//	{
-//		#region IValueChange implementation
-//		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-//		public void NotifyValueChanged(string name, object value)
-//		{
-//			ValueChanged.Raise (this, new ValueChangeEventArgs (name, value));
-//		}
-//		#endregion
-//
-//		public DirectoryInfo CurDir;
-//		public DirContainer(DirectoryInfo _dir){
-//			CurDir = _dir;
-//		}
-//		public string Name {
-//			get { return CurDir.Name; }
-//		}
-//
-//		void onDirUp(object sender, MouseButtonEventArgs e)
-//		{
-//
-//		}
-//		public void onMouseDown(object sender, MouseButtonEventArgs e)
-//		{
-//			Debug.WriteLine (sender.ToString ());
-//		}
-//
-//	}
 }
 
