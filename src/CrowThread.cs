@@ -51,7 +51,8 @@ namespace Crow
 				thread.Join ();
 				//cancelLoading = false;
 			}
-			Host.CurrentInterface.CrowThreads.Remove (this);
+			lock (Host.CurrentInterface.CrowThreads)
+				Host.CurrentInterface.CrowThreads.Remove (this);
 		}
 	}
 }

@@ -37,9 +37,10 @@ namespace Crow
             set { _multiSelect = value; }
         }
 		public virtual void AddChild(GraphicObject g){
-			lock (children)
-				Children.Add(g);
-			g.Parent = this;
+			lock (children) {
+				Children.Add (g);
+				g.Parent = this;
+			}
 			g.RegisteredLayoutings = LayoutingType.None;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 			g.LayoutChanged += OnChildLayoutChanges;
@@ -202,11 +203,13 @@ namespace Crow
 					CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
 					gr.Clip ();
 
-					foreach (GraphicObject c in Children) {
-						if (!c.Visible)
-							continue;
-						if (Clipping.intersect(c.Slot + ClientRectangle.Position))
-							c.Paint (ref gr);
+					lock (Children) {
+						foreach (GraphicObject c in Children) {
+							if (!c.Visible)
+								continue;
+							if (Clipping.intersect (c.Slot + ClientRectangle.Position))
+								c.Paint (ref gr);
+						}
 					}
 
 					#if DEBUG_CLIP_RECTANGLE

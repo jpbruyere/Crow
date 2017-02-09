@@ -335,22 +335,22 @@ namespace Crow
 		public void GotoWordStart(){
 			CurrentColumn--;
 			//skip white spaces
-			while (char.IsWhiteSpace (this.CurrentChar) && CurrentColumn > 0)
+			while (!char.IsLetterOrDigit (this.CurrentChar) && CurrentColumn > 0)
 				CurrentColumn--;
-			while (!char.IsWhiteSpace (lines [CurrentLine] [CurrentColumn]) && CurrentColumn > 0)
+			while (char.IsLetterOrDigit (lines [CurrentLine] [CurrentColumn]) && CurrentColumn > 0)
 				CurrentColumn--;
-			if (char.IsWhiteSpace (this.CurrentChar))
+			if (!char.IsLetterOrDigit (this.CurrentChar))
 				CurrentColumn++;
 		}
 		public void GotoWordEnd(){
 			//skip white spaces
 			if (CurrentColumn >= lines [CurrentLine].Length - 1)
 				return;
-			while (char.IsWhiteSpace (this.CurrentChar) && CurrentColumn < lines [CurrentLine].Length-1)
+			while (!char.IsLetterOrDigit (this.CurrentChar) && CurrentColumn < lines [CurrentLine].Length-1)
 				CurrentColumn++;
-			while (!char.IsWhiteSpace (this.CurrentChar) && CurrentColumn < lines [CurrentLine].Length-1)
+			while (char.IsLetterOrDigit (this.CurrentChar) && CurrentColumn < lines [CurrentLine].Length-1)
 				CurrentColumn++;
-			if (!char.IsWhiteSpace (this.CurrentChar))
+			if (char.IsLetterOrDigit (this.CurrentChar))
 				CurrentColumn++;
 		}
 		public void DeleteChar()
@@ -448,14 +448,17 @@ namespace Crow
 
 						return (int)Math.Ceiling(fe.Height * lc) + Margin * 2;
 					}
+					try {
+						foreach (string s in lines) {
+							string l = s.Replace("\t", new String (' ', Interface.TabSize));
 
-					foreach (string s in lines) {
-						string l = s.Replace("\t", new String (' ', Interface.TabSize));
+							TextExtents tmp = gr.TextExtents (l);
 
-						TextExtents tmp = gr.TextExtents (l);
-
-						if (tmp.XAdvance > te.XAdvance)
-							te = tmp;
+							if (tmp.XAdvance > te.XAdvance)
+								te = tmp;
+						}
+					} catch (Exception ex) {
+						return -1;
 					}
 					return (int)Math.Ceiling (te.XAdvance) + Margin * 2;
 				}
@@ -561,7 +564,8 @@ namespace Crow
 							else
 								SelEndCursorPos = textCursorPos;
 						}
-					}
+					}else
+						computeTextCursorPosition(gr);
 				}else
 					computeTextCursorPosition(gr);
 
@@ -575,21 +579,21 @@ namespace Crow
 
 			//****** debug selection *************
 //			if (SelRelease >= 0) {
-//				gr.Color = Color.Green;
+//				new SolidColor(Color.DarkGreen).SetAsSource(gr);
 //				Rectangle R = new Rectangle (
-//					             rText.X + (int)SelEndCursorPos - 2,
+//					             rText.X + (int)SelEndCursorPos - 3,
 //					             rText.Y + (int)(SelRelease.Y * fe.Height),
-//					             4,
+//					             6,
 //					             (int)fe.Height);
 //				gr.Rectangle (R);
 //				gr.Fill ();
 //			}
 //			if (SelBegin >= 0) {
-//				gr.Color = Color.UnmellowYellow;
+//				new SolidColor(Color.DarkRed).SetAsSource(gr);
 //				Rectangle R = new Rectangle (
-//					rText.X + (int)SelStartCursorPos - 2,
+//					rText.X + (int)SelStartCursorPos - 3,
 //					rText.Y + (int)(SelBegin.Y * fe.Height),
-//					4,
+//					6,
 //					(int)fe.Height);
 //				gr.Rectangle (R);
 //				gr.Fill ();
