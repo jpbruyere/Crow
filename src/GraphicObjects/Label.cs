@@ -617,6 +617,14 @@ namespace Crow
 //					TextAlignment == Alignment.TopRight ||
 //					TextAlignment == Alignment.BottomRight)
 //					lineRect.X += (rText.Width - lineLength);
+				if (string.IsNullOrWhiteSpace (l))
+					continue;
+
+				Foreground.SetAsSource (gr);
+				gr.MoveTo (lineRect.X, rText.Y + fe.Ascent + fe.Height * i);
+				gr.ShowText (l);
+				gr.Fill ();
+
 				if (Selectable) {
 					if (SelRelease >= 0 && i >= selectionStart.Y && i <= selectionEnd.Y) {
 						gr.SetSourceColor (selBackground);
@@ -639,17 +647,16 @@ namespace Crow
 							selRect.Width -= (lineLength - cpEnd);
 
 						gr.Rectangle (selRect);
+						gr.FillPreserve ();
+						gr.Save ();
+						gr.Clip ();
+						gr.SetSourceColor (SelectionForeground);
+						gr.MoveTo (lineRect.X, rText.Y + fe.Ascent + fe.Height * i);
+						gr.ShowText (l);
 						gr.Fill ();
+						gr.Restore ();
 					}
 				}
-
-				if (string.IsNullOrWhiteSpace (l))
-					continue;
-
-				Foreground.SetAsSource (gr);
-				gr.MoveTo (lineRect.X, rText.Y + fe.Ascent + fe.Height * i);
-				gr.ShowText (l);
-				gr.Fill ();
 			}
 		}
 		#endregion
