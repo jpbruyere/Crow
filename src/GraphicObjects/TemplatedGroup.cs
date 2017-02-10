@@ -163,7 +163,6 @@ namespace Crow
 				loadingThread = new CrowThread (this, loading);
 				loadingThread.Finished += (object sender, EventArgs e) => (sender as TemplatedGroup).Loaded.Raise (sender, e);
 				loadingThread.Start ();
-				//loadPage(1);
 
 				NotifyValueChanged ("SelectedIndex", _selectedIndex);
 				NotifyValueChanged ("SelectedItem", SelectedItem);

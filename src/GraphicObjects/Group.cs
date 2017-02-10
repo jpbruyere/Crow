@@ -38,8 +38,8 @@ namespace Crow
         }
 		public virtual void AddChild(GraphicObject g){
 			lock (children) {
-				Children.Add (g);
 				g.Parent = this;
+				Children.Add (g);
 			}
 			g.RegisteredLayoutings = LayoutingType.None;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);

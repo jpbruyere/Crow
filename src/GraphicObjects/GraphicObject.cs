@@ -1169,16 +1169,20 @@ namespace Crow
 		#region Mouse handling
 		public virtual bool MouseIsIn(Point m)
 		{
-			if (!(Visible & isEnabled))
-				return false;
-			if (ScreenCoordinates (Slot).ContainsOrIsEqual (m)) {
-				Scroller scr = Parent as Scroller;
-				if (scr == null) {
-					if (Parent is GraphicObject)
-						return (Parent as GraphicObject).MouseIsIn (m);
-					else return true;
+			try {
+				if (!(Visible & isEnabled))
+					return false;
+				if (ScreenCoordinates (Slot).ContainsOrIsEqual (m)) {
+					Scroller scr = Parent as Scroller;
+					if (scr == null) {
+						if (Parent is GraphicObject)
+							return (Parent as GraphicObject).MouseIsIn (m);
+						else return true;
+					}
+					return scr.MouseIsIn (scr.savedMousePos);
 				}
-				return scr.MouseIsIn (scr.savedMousePos);
+			} catch (Exception ex) {
+				return false;
 			}
 			return false;
 		}

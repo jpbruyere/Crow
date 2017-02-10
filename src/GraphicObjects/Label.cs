@@ -44,6 +44,13 @@ namespace Crow
 		}
 		#endregion
 
+		public event EventHandler<TextChangeEventArgs> TextChanged;
+
+		public virtual void OnTextChanged(Object sender, TextChangeEventArgs e)
+		{
+			NotifyValueChanged ("Text", Text);
+			TextChanged.Raise (this, e);
+		}
         //TODO:change protected to private
 
 		#region private and protected fields
@@ -147,7 +154,7 @@ namespace Crow
 
 				lines = getLines;
 
-				NotifyValueChanged ("Text", _text);
+				OnTextChanged (this, new TextChangeEventArgs (Text));
 				RegisterForGraphicUpdate ();
             }
         }
@@ -363,7 +370,8 @@ namespace Crow
 					CurrentColumn = lines [CurrentLine].Length;
 					lines [CurrentLine] += lines [CurrentLine + 1];
 					lines.RemoveAt (CurrentLine + 1);
-					NotifyValueChanged ("Text", Text);
+
+					OnTextChanged (this, new TextChangeEventArgs (Text));
 					return;
 				}
 				CurrentColumn--;
@@ -386,7 +394,7 @@ namespace Crow
 				SelBegin = -1;
 				SelRelease = -1;
 			}
-			NotifyValueChanged ("Text", Text);
+			OnTextChanged (this, new TextChangeEventArgs (Text));
 		}
 		/// <summary>
 		/// Insert new string at caret position, should be sure no line break is inside.
@@ -409,7 +417,7 @@ namespace Crow
 				lines [CurrentLine] = lines [CurrentLine].Insert (CurrentColumn, str);
 				CurrentColumn += str.Length;
 			}
-			NotifyValueChanged ("Text", Text);
+			OnTextChanged (this, new TextChangeEventArgs (Text));
 		}
 		/// <summary>
 		/// Insert a line break.
@@ -420,7 +428,7 @@ namespace Crow
 			lines [CurrentLine] = lines [CurrentLine].Substring (0, CurrentColumn);
 			CurrentLine++;
 			CurrentColumn = 0;
-			NotifyValueChanged ("Text", Text);
+			OnTextChanged (this, new TextChangeEventArgs (Text));
 		}
 
 		#region GraphicObject overrides

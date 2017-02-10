@@ -87,6 +87,7 @@ ToolWindow {
 	Height = 150;
 }
 FileDialog {
+	Template = #Crow.FileDialog.template;
 	Focusable = true;
 	MinimumSize=50,50;
 	Width = 500;
