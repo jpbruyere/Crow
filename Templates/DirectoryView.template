@@ -4,7 +4,7 @@
 	<ItemTemplate DataType="System.IO.FileInfo">
 		<HorizontalStack Focusable="true"  Height="Fit" Width="Stretched" >
 			<Image Margin="2" Width="14" Height="14"
-				Path="#Crow.Images.Icons.file.svg"/>
+				Path="#Crow.Icons.file.svg"/>
 			<Label Text="{Name}" Width="Stretched"
 				MouseEnter="{Background=vgradient|0:White|0.05:UnitedNationsBlue|1:Jet}"
 				MouseLeave="{Background=Transparent}"/>
@@ -26,7 +26,7 @@
 								SvgSub="{./IsExpanded}"/>
 						</Container>
 						<Image Margin="2" Width="14" Height="14"
-							Path="#Crow.Images.Icons.folder.svg"/>
+							Path="#Crow.Icons.folder.svg"/>
 						<Label Text="{./Caption}"/>
 					</HorizontalStack>
 					<Container Name="Content" Visible="false"/>

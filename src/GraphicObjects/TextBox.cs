@@ -58,13 +58,6 @@ namespace Crow
 			FontExtents fe = gr.FontExtents;
 		}
 		#endregion
-
-		public event EventHandler<TextChangeEventArgs> TextChanged;
-
-		public virtual void OnTextChanged(Object sender, TextChangeEventArgs e)
-		{
-			TextChanged.Raise (this, e);
-		}
 			
         #region Keyboard handling
 		public override void onKeyDown (object sender, KeyboardKeyEventArgs e)

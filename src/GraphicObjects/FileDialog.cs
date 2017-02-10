@@ -31,7 +31,7 @@ namespace Crow
 {
 	public class FileDialog: Window
 	{
-		string searchPattern, curDirectory;
+		string searchPattern, curDir, _selectedFile, _selectedDir;
 
 		#region events
 		public event EventHandler OkClicked;
@@ -45,17 +45,17 @@ namespace Crow
 
 		[XmlAttributeAttribute][DefaultValue("/home")]
 		public virtual string CurrentDirectory {
-			get { return curDirectory; }
+			get { return curDir; }
 			set {
-				if (curDirectory == value)
+				if (curDir == value)
 					return;
-				curDirectory = value;
-				NotifyValueChanged ("CurrentDirectory", curDirectory);
-
+				curDir = value;
+				NotifyValueChanged ("CurrentDirectory", curDir);
+				SelectedDirectory = curDir;
 			}
 		}
 
-		[XmlAttributeAttribute()][DefaultValue("*")]
+		[XmlAttributeAttribute][DefaultValue("*")]
 		public virtual string SearchPattern {
 			get { return searchPattern; }
 			set {
@@ -66,11 +66,8 @@ namespace Crow
 
 			}
 		}
-		string _selectedFile;
-		[XmlIgnore]public string SelectedFile {
-			get {
-				return _selectedFile;
-			}
+		[XmlAttributeAttribute]public string SelectedFile {
+			get { return _selectedFile; }
 			set {
 				if (value == _selectedFile)
 					return;
@@ -78,19 +75,44 @@ namespace Crow
 				NotifyValueChanged ("SelectedFile", _selectedFile);
 			}
 		}
-		public void onSelectedItemChanged (object sender, SelectionChangeEventArgs e){
+		[XmlAttributeAttribute]public string SelectedDirectory {
+			get { return _selectedDir; }
+			set {
+				if (value == _selectedDir)
+					return;
+				_selectedDir = value;
+				NotifyValueChanged ("SelectedDirectory", _selectedDir);
+			}
+		}
 
-			string tmp = "";
+		public void onFVSelectedItemChanged (object sender, SelectionChangeEventArgs e){
+			if (e.NewValue != null) {
+				if (File.GetAttributes (e.NewValue.ToString ()).HasFlag (FileAttributes.Directory)) {
+					SelectedDirectory = e.NewValue.ToString ();
+					SelectedFile = "";
+				} else {
+					SelectedDirectory = Path.GetDirectoryName (e.NewValue.ToString ());
+					SelectedFile = Path.GetFileName (e.NewValue.ToString ());
+				}
+			}
+		}
+		public void onDVSelectedItemChanged (object sender, SelectionChangeEventArgs e){
 			if (e.NewValue != null)
-				tmp = e.NewValue.ToString();
-			if (tmp == SelectedFile)
+				SelectedDirectory = e.NewValue.ToString();
+		}
+		public void goUpDirClick (object sender, MouseButtonEventArgs e){
+			string root = Directory.GetDirectoryRoot(CurrentDirectory);
+			if (CurrentDirectory == root)
 				return;
-			SelectedFile = tmp;
-			//SelectedItemChanged.Raise (this, e);
+			CurrentDirectory = Directory.GetParent(CurrentDirectory).FullName;
 		}
 		void onFileSelect(object sender, MouseButtonEventArgs e){
-			OkClicked.Raise (this, null);
-			unloadDialog ((sender as GraphicObject).CurrentInterface);
+			if (string.IsNullOrEmpty (SelectedFile))
+				CurrentDirectory = SelectedDirectory;
+			else {
+				OkClicked.Raise (this, null);
+				unloadDialog ((sender as GraphicObject).CurrentInterface);
+			}
 		}
 		void onCancel(object sender, MouseButtonEventArgs e){
 			unloadDialog ((sender as GraphicObject).CurrentInterface);

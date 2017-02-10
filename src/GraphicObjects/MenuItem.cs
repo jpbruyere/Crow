@@ -79,6 +79,11 @@ namespace Crow
 			}
 		}
 		[XmlAttributeAttribute]
+		public override bool IsEnabled {
+			get { return Command == null ? base.IsEnabled : Command.CanExecute; }
+			set { base.IsEnabled = value; }
+		}
+		[XmlAttributeAttribute]
 		public override string Caption {
 			get { return Command == null ? base.Caption : Command.Caption; }
 			set { base.Caption = value; }
@@ -124,7 +129,10 @@ namespace Crow
 
 		void Command_ValueChanged (object sender, ValueChangeEventArgs e)
 		{
-			NotifyValueChanged (e.MemberName, e.NewValue);
+			string mName = e.MemberName;
+			if (mName == "CanExecute")
+				mName = "IsEnabled";
+			NotifyValueChanged (mName, e.NewValue);
 		}
 		void onMI_Click (object sender, MouseButtonEventArgs e)
 		{
@@ -141,7 +149,7 @@ namespace Crow
 		}
 		public override bool MouseIsIn (Point m)
 		{
-			return base.MouseIsIn (m) || child.MouseIsIn (m);
+			return IsEnabled ? base.MouseIsIn (m) || child.MouseIsIn (m) : false;
 		}
 		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
 		{

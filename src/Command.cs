@@ -45,17 +45,17 @@ namespace Crow
 
 		string caption;
 		Picture icon;
-		bool isEnabled;
+		bool canExecute = true;
 
 		#region Public properties
 		[XmlAttributeAttribute][DefaultValue(true)]
-		public virtual bool IsEnabled {
-			get { return isEnabled; }
+		public virtual bool CanExecute {
+			get { return canExecute; }
 			set {
-				if (isEnabled == value)
+				if (canExecute == value)
 					return;
-				isEnabled = value;
-				NotifyValueChanged ("IsEnabled", isEnabled);
+				canExecute = value;
+				NotifyValueChanged ("CanExecute", canExecute);
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue("Unamed Command")]
@@ -82,11 +82,11 @@ namespace Crow
 		#endregion
 
 		public void Execute(){
-			if (execute != null)
+			if (execute != null && CanExecute)
 				execute ();
 		}
 		internal void raiseAllValuesChanged(){
-			NotifyValueChanged ("IsEnabled", isEnabled);
+			NotifyValueChanged ("CanExecute", canExecute);
 			NotifyValueChanged ("Icon", icon);
 			NotifyValueChanged ("Caption", caption);
 		}

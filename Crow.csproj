@@ -24,6 +24,8 @@
     <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
     <AssemblyOriginatorKeyFile>crow.key</AssemblyOriginatorKeyFile>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -299,6 +301,12 @@
     <EmbeddedResource Include="Icons\exit-symbol.svg" />
     <EmbeddedResource Include="Icons\paste-on-document.svg" />
     <EmbeddedResource Include="Icons\question.svg" />
+    <EmbeddedResource Include="Templates\FileDialog2.template">
+      <LogicalName>Crow.FileDialog2.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\folder.svg" />
+    <EmbeddedResource Include="Icons\file.svg" />
+    <EmbeddedResource Include="Icons\level-up.svg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
