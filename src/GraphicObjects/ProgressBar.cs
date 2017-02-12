@@ -26,10 +26,11 @@ namespace Crow
 		{
 			base.onDraw (gr);
 
+			if (Maximum == 0)
+				return;
+
 			Rectangle rBack = ClientRectangle;
-
 			rBack.Width = (int)((double)rBack.Width / Maximum * Value);
-
 			Foreground.SetAsSource (gr, rBack);
 
 			CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);

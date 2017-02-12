@@ -6,7 +6,7 @@
 			<VerticalStack Height="Fit" MinimumSize="10,10"
 				Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
 		</Scroller>
-		<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}" 
+		<ScrollBar Name="scrollbar1" Value="{²../scroller1.ScrollY}" 
 			Maximum="{../scroller1.MaximumScroll}" Orientation="Vertical" 
 			Width="14" />
 	</HorizontalStack>
