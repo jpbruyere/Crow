@@ -803,7 +803,7 @@ namespace Crow
 
 			il.Emit (OpCodes.Nop);
 
-			emitRemoveOldDataSourceHandler(il, "ValueChanged", delName);
+			emitRemoveOldDataSourceHandler(il, "ValueChanged", delName,false);
 
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
 				if (bindingDef.TwoWay){

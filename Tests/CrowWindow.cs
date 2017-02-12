@@ -183,6 +183,9 @@ namespace Crow
 			ifaceControl [interfaceIdx].CrowInterface.AddWidget (g);
 			return g;
 		}
+		public void DeleteWidget (GraphicObject g, int interfaceIdx = 0){
+			ifaceControl [interfaceIdx].CrowInterface.DeleteWidget (g);
+		}
 		public GraphicObject Load (string path, int interfaceIdx = 0){
 			if (ifaceControl.Count == 0)//create default orthogonal interface
 				addInterfaceControler (new InterfaceControler (
