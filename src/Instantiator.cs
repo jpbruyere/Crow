@@ -863,6 +863,8 @@ namespace Crow
 				il.Emit(OpCodes.Ldc_I4, dmVC);//load index of dynmathod
 				il.Emit (OpCodes.Call, CompilerServices.miDSChangeEmitHelper);
 
+				il.MarkLabel (cancel);
+
 				if (bindingDef.TwoWay){
 					il.Emit (OpCodes.Ldarg_1);//arg1: dataSourceChange source, the origine of the binding
 					il.Emit (OpCodes.Ldstr, bindingDef.SourceMember);//arg2: orig member
@@ -872,7 +874,6 @@ namespace Crow
 					il.Emit (OpCodes.Call, CompilerServices.miDSReverseBinding);
 				}
 
-				il.MarkLabel (cancel);
 			}
 			il.Emit (OpCodes.Ret);
 
@@ -901,6 +902,9 @@ namespace Crow
 				Debug.WriteLine ("Member '{0}' not found in new DataSource '{1}' of '{2}'", destMember, dest, orig);
 				return;
 			}
+			#if DEBUG_BINDING
+			Debug.WriteLine ("DS Reverse binding: Member '{0}' found in new DS '{1}' of '{2}'", destMember, dest, orig);
+			#endif
 
 			#region ValueChanged emit
 			DynamicMethod dm = new DynamicMethod ("dyn_valueChanged" + NewId,

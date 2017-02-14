@@ -12,6 +12,7 @@ namespace Crow
 		Picture _pic;
 		string _svgSub;
 		bool scaled, keepProps;
+		double opacity;
 
 		#region Public properties
 		[XmlAttributeAttribute][DefaultValue(true)]
@@ -84,6 +85,17 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
+		[XmlAttributeAttribute()][DefaultValue(1.0)]
+		public virtual double Opacity {
+			get { return opacity; }
+			set {
+				if (opacity == value)
+					return;
+				opacity = value;
+				NotifyValueChanged ("Faded", opacity);
+				RegisterForRedraw ();
+			}
+		}
 		#endregion
 
 		#region CTOR
@@ -129,6 +141,14 @@ namespace Crow
 				return;
 
 			_pic.Paint (gr, ClientRectangle, _svgSub);
+
+			if (Opacity<1.0) {
+				gr.SetSourceRGBA (0.0, 0.0, 0.0, 1.0-Opacity);
+				gr.Operator = Operator.DestOut;
+				gr.Rectangle (ClientRectangle);
+				gr.Fill ();
+				gr.Operator = Operator.Over;
+			}
 		}
 		#endregion
 	}
