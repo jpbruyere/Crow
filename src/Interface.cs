@@ -472,8 +472,12 @@ namespace Crow
 				lock (DrawingQueue)
 					g = DrawingQueue.Dequeue ();
 				g.IsQueueForRedraw = false;
-				g.Parent.RegisterClip (g.LastPaintedSlot);
-				g.Parent.RegisterClip (g.getSlot ());
+				if (g.Parent == null)
+					continue;
+				lock (g) {
+					g.Parent.RegisterClip (g.LastPaintedSlot);
+					g.Parent.RegisterClip (g.getSlot ());
+				}
 			}
 
 			#if MEASURE_TIME

@@ -135,7 +135,8 @@ namespace Crow
 				if (parent == value)
 					return;
 				DataSourceChangeEventArgs e = new DataSourceChangeEventArgs (parent, value);
-				parent = value;
+				lock (this)
+					parent = value;
 
 				onParentChanged (this, e);
 			}
@@ -1115,34 +1116,35 @@ namespace Crow
 		public virtual void Paint (ref Context ctx)
 		{
 			//TODO:this test should not be necessary
-			if (Slot.Height < 0 || Slot.Width < 0)
+			if (Slot.Height < 0 || Slot.Width < 0 || parent == null)
 				return;
+			lock (this) {
+				LastPaintedSlot = Slot;
 
-			LastPaintedSlot = Slot;
+				if (cacheEnabled) {
+					if (Slot.Width > Interface.MaxCacheSize || Slot.Height > Interface.MaxCacheSize)
+						cacheEnabled = false;
+				}
 
-			if (cacheEnabled) {
-				if (Slot.Width > Interface.MaxCacheSize || Slot.Height > Interface.MaxCacheSize)
-					cacheEnabled = false;
-			}
+				if (cacheEnabled) {
+					if (IsDirty)
+						RecreateCache ();
 
-			if (cacheEnabled) {
-				if (IsDirty)
-					RecreateCache ();
+					UpdateCache (ctx);
+					if (!isEnabled)
+						paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);
+				} else {
+					Rectangle rb = Slot + Parent.ClientRectangle.Position;
+					ctx.Save ();
 
-				UpdateCache (ctx);
-				if (!isEnabled)
-					paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);
-			} else {
-				Rectangle rb = Slot + Parent.ClientRectangle.Position;
-				ctx.Save ();
+					ctx.Translate (rb.X, rb.Y);
 
-				ctx.Translate (rb.X, rb.Y);
+					onDraw (ctx);
+					if (!isEnabled)
+						paintDisabled (ctx, Slot);
 
-				onDraw (ctx);
-				if (!isEnabled)
-					paintDisabled (ctx, Slot);
-
-				ctx.Restore ();
+					ctx.Restore ();
+				}
 			}
 		}
 		void paintDisabled(Context gr, Rectangle rb){

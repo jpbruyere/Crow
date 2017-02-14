@@ -61,11 +61,13 @@ namespace Crow
         }
 		public virtual void ClearChildren()
 		{
-			while(Children.Count > 0){
-				GraphicObject g = Children[Children.Count-1];
-				g.LayoutChanged -= OnChildLayoutChanges;
-				g.Parent = null;
-				Children.RemoveAt(Children.Count-1);
+			lock (children) {
+				while (Children.Count > 0) {
+					GraphicObject g = Children [Children.Count - 1];
+					g.LayoutChanged -= OnChildLayoutChanges;
+					g.Parent = null;
+					Children.RemoveAt (Children.Count - 1);
+				}
 			}
 
 			resetChildrenMaxSize ();
@@ -78,16 +80,20 @@ namespace Crow
 		{
 			if (Children.Contains(w))
 			{
-				Children.Remove(w);
-				Children.Add(w);
+				lock (children) {
+					Children.Remove (w);
+					Children.Add (w);
+				}
 			}
 		}
 		public void putWidgetOnBottom(GraphicObject w)
 		{
 			if (Children.Contains(w))
 			{
-				Children.Remove(w);
-				Children.Insert(0, w);
+				lock (children) {
+					Children.Remove (w);
+					Children.Insert (0, w);
+				}
 			}
 		}
 
@@ -95,21 +101,25 @@ namespace Crow
 		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
 		{
 			base.OnDataSourceChanged (this, e);
-			foreach (GraphicObject g in children)
-				if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
-					g.OnDataSourceChanged (sender, e);
+			lock (children) {
+				foreach (GraphicObject g in children)
+					if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
+						g.OnDataSourceChanged (sender, e);
+			}
 		}
 		public override GraphicObject FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)
 				return this;
-
-			foreach (GraphicObject w in Children) {
-				GraphicObject r = w.FindByName (nameToFind);
-				if (r != null)
-					return r;
+			GraphicObject tmp = null;
+			lock (children) {
+				foreach (GraphicObject w in Children) {
+					tmp = w.FindByName (nameToFind);
+					if (tmp != null)
+						break;
+				}
 			}
-			return null;
+			return tmp;
 		}
 		public override bool Contains (GraphicObject goToFind)
 		{
