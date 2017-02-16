@@ -171,7 +171,7 @@ namespace Crow
 			}
 		}
 
-		[XmlAttributeAttribute][DefaultValue("SteelBlue")]//DeepJungleGreen
+		[XmlAttributeAttribute][DefaultValue("SteelBlue")]
 		public virtual Color SelectionBackground {
 			get { return selBackground; }
 			set {
