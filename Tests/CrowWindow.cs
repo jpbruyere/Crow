@@ -221,10 +221,10 @@ namespace Crow
 			this.KeyPress += new EventHandler<OpenTK.KeyPressEventArgs>(OpenTKGameWindow_KeyPress);
 			Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
 			Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
-			Mouse.WheelChanged += new EventHandler<OpenTK.Input.MouseWheelEventArgs>(Mouse_WheelChanged);
-			Mouse.ButtonDown += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonDown);
-			Mouse.ButtonUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonUp);
-			Mouse.Move += new EventHandler<OpenTK.Input.MouseMoveEventArgs>(Mouse_Move);
+			Mouse.WheelChanged += new EventHandler<OpenTK.Input.MouseWheelEventArgs>(GL_Mouse_WheelChanged);
+			Mouse.ButtonDown += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(GL_Mouse_ButtonDown);
+			Mouse.ButtonUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(GL_Mouse_ButtonUp);
+			Mouse.Move += new EventHandler<OpenTK.Input.MouseMoveEventArgs>(GL_Mouse_Move);
 
 			#if DEBUG
 			Console.WriteLine("\n\n*************************************");
@@ -291,7 +291,7 @@ namespace Crow
 					e.EnableBit (i);
 			}
 		}
-		protected virtual void Mouse_Move(object sender, OpenTK.Input.MouseMoveEventArgs otk_e)
+		protected virtual void GL_Mouse_Move(object sender, OpenTK.Input.MouseMoveEventArgs otk_e)
         {
 			if (activeIdx == -2) {
 				focusedIdx = -1;
@@ -308,7 +308,7 @@ namespace Crow
 			if (focusedIdx < 0)
 				MouseMove.Raise (sender, otk_e);
         }
-		protected virtual void Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
+		protected virtual void GL_Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
         {
 			activeIdx = -2;
 			if (focusedIdx >= 0) {
@@ -317,7 +317,7 @@ namespace Crow
 			}
 			MouseButtonUp.Raise (sender, otk_e);
         }
-		protected virtual void Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
+		protected virtual void GL_Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
 		{
 			activeIdx = focusedIdx;
 			if (focusedIdx >= 0) {
@@ -326,7 +326,7 @@ namespace Crow
 			}
 			MouseButtonDown.Raise (sender, otk_e);
         }
-		protected virtual void Mouse_WheelChanged(object sender, OpenTK.Input.MouseWheelEventArgs otk_e)
+		protected virtual void GL_Mouse_WheelChanged(object sender, OpenTK.Input.MouseWheelEventArgs otk_e)
         {
 			if (focusedIdx >= 0) {
 				if (ifaceControl [focusedIdx].ProcessMouseWheelChanged (otk_e.DeltaPrecise))
