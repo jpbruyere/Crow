@@ -471,13 +471,8 @@ namespace Crow
 			while (DrawingQueue.Count > 0) {
 				lock (DrawingQueue)
 					g = DrawingQueue.Dequeue ();
-				g.IsQueueForRedraw = false;
-				if (g.Parent == null)
-					continue;
-				lock (g) {
-					g.Parent.RegisterClip (g.LastPaintedSlot);
-					g.Parent.RegisterClip (g.getSlot ());
-				}
+				lock (g)
+					g.ClippingRegistration ();
 			}
 
 			#if MEASURE_TIME
