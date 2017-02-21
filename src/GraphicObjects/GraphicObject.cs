@@ -516,13 +516,15 @@ namespace Crow
 				if (isVisible)
 					RegisterForLayouting (LayoutingType.Sizing);
 				else {
-					Slot.Width = 0;
-					LayoutChanged.Raise (this, new LayoutingEventArgs (LayoutingType.Width));
-					Slot.Height = 0;
-					LayoutChanged.Raise (this, new LayoutingEventArgs (LayoutingType.Height));
-					if (this.parent != null)
-						CurrentInterface.EnqueueForRepaint (this);
-					LastSlots.Width = LastSlots.Height = 0;
+					lock (CurrentInterface.UpdateMutex) {
+						Slot.Width = 0;
+						LayoutChanged.Raise (this, new LayoutingEventArgs (LayoutingType.Width));
+						Slot.Height = 0;
+						LayoutChanged.Raise (this, new LayoutingEventArgs (LayoutingType.Height));
+						if (this.parent != null)
+							CurrentInterface.EnqueueForRepaint (this);
+						LastSlots.Width = LastSlots.Height = 0;
+					}
 				}
 
 				//trigger a mouse to handle possible hover changes
@@ -594,7 +596,7 @@ namespace Crow
 				NotifyValueChanged ("DataSource", DataSource);
 			}
 			get {
-				return dataSource == null ? 
+				return dataSource == null ?
 					LogicalParent == null ? null :
 					LogicalParent is GraphicObject ? (LogicalParent as GraphicObject).DataSource : null :
 					dataSource;
@@ -811,6 +813,20 @@ namespace Crow
 		}
 
 		#region Queuing
+		/// <summary>
+		/// Register old and new slot for clipping
+		/// </summary>
+		public virtual void ClippingRegistration(){
+			IsQueueForRedraw = false;
+			if (Parent == null)
+				return;
+			Parent.RegisterClip (LastPaintedSlot);
+			Parent.RegisterClip (Slot);
+		}
+		/// <summary>
+		/// Add clip rectangle to this.clipping and propagate up to root
+		/// </summary>
+		/// <param name="clip">Clip rectangle</param>
 		public virtual void RegisterClip(Rectangle clip){
 			if (CacheEnabled && !IsDirty)
 				Clipping.AddRectangle (clip + ClientRectangle.Position);
@@ -1097,7 +1113,7 @@ namespace Crow
 		}
 		protected virtual void UpdateCache(Context ctx){
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
-			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {				
+			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
 				if (clearBackground) {
 						ctx.Save ();
 						ctx.Operator = Operator.Clear;
@@ -1119,8 +1135,6 @@ namespace Crow
 			if (Slot.Height < 0 || Slot.Width < 0 || parent == null)
 				return;
 			lock (this) {
-				LastPaintedSlot = Slot;
-
 				if (cacheEnabled) {
 					if (Slot.Width > Interface.MaxCacheSize || Slot.Height > Interface.MaxCacheSize)
 						cacheEnabled = false;
@@ -1145,6 +1159,7 @@ namespace Crow
 
 					ctx.Restore ();
 				}
+				LastPaintedSlot = Slot;
 			}
 		}
 		void paintDisabled(Context gr, Rectangle rb){
@@ -1212,7 +1227,7 @@ namespace Crow
 			else
 				currentInterface.clickTimer.Restart();
 			CurrentInterface.eligibleForDoubleClick = null;
-			
+
 			if (CurrentInterface.ActiveWidget == null)
 				CurrentInterface.ActiveWidget = this;
 			if (this.Focusable && !Interface.FocusOnHover) {
