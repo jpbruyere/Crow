@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Window Left="10" Top="10" Title="Test window"
+<Window Left="10" Top="10" Caption="Test window"
 		Width="250" Height="550" >
 	<VerticalStack Name="contentVSStack" Margin="10" Spacing="10" Background="0.4,0.4,0.4,0.4">
 		<Slider Name="slider" Height="12" Width="Stretched" CornerRadius="3"/>
