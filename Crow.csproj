@@ -23,6 +23,9 @@
     <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
     <AssemblyOriginatorKeyFile>crow.key</AssemblyOriginatorKeyFile>
+    <ReleaseVersion>0.5</ReleaseVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -306,7 +309,6 @@
     <EmbeddedResource Include="Icons\level-up.svg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="README.md" />
     <None Include="Crow.dll.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
