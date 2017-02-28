@@ -40,9 +40,11 @@ MenuItem {
 	MouseLeave = {Foreground=LightGray;Background=Transparent;}
 }
 MessageBox {
-	Width=200;
+	Background = 0.3,0.3,0.3,0.3;
+	Width = Fit;
 	Title=MessageBox;
-	MinimumSize=150,80;
+	Font = serif, 12;
+	MinimumSize = 200,120;
 }
 Slider {
 	Background = vgradient|0:Black|0.1:Gray|0.9:Gray|1:LightGray;

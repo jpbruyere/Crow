@@ -25,9 +25,21 @@ namespace Crow
 {
 	public class MessageBox : Window
 	{
-		public MessageBox ():base(){}
+		public enum Type {
+			Information,
+			YesNo,
+			Alert,
+			Error
+		}
+		public MessageBox (): base(){}
 
-		string message;
+		protected override void loadTemplate (GraphicObject template)
+		{
+			base.loadTemplate (template);
+			NotifyValueChanged ("MsgIcon", "#Crow.Images.Icons.Informations.svg");
+		}
+		string message, okMessage, cancelMessage;
+		Type msgType = Type.Information;
 
 		public event EventHandler Ok;
 		public event EventHandler Cancel;
@@ -43,7 +55,65 @@ namespace Crow
 				NotifyValueChanged ("Message", message);
 			}
 		}
-
+		[XmlAttributeAttribute][DefaultValue("Ok")]
+		public virtual string OkMessage
+		{
+			get { return okMessage; }
+			set {
+				if (okMessage == value)
+					return;
+				okMessage = value;
+				NotifyValueChanged ("OkMessage", okMessage);
+			}
+		}
+		[XmlAttributeAttribute][DefaultValue("Cancel")]
+		public virtual string CancelMessage
+		{
+			get { return cancelMessage; }
+			set {
+				if (cancelMessage == value)
+					return;
+				cancelMessage = value;
+				NotifyValueChanged ("CancelMessage", cancelMessage);
+			}
+		}
+		[XmlAttributeAttribute][DefaultValue("Information")]
+		public virtual Type MsgType
+		{
+			get { return msgType; }
+			set {
+				if (msgType == value)
+					return;
+				msgType = value;
+				NotifyValueChanged ("MsgType", msgType);
+				switch (msgType) {
+				case Type.Information:
+					NotifyValueChanged ("MsgIcon", "#Crow.Images.Icons.Informations.svg");
+					Caption = "Informations";
+					OkMessage = "Ok";
+					CancelMessage = "Cancel";
+					break;
+				case Type.YesNo:
+					NotifyValueChanged ("MsgIcon", "#Crow.Icons.question.svg");
+					Caption = "Choice";
+					OkMessage = "Yes";
+					CancelMessage = "No";
+					break;
+				case Type.Alert:
+					NotifyValueChanged ("MsgIcon", "#Crow.Images.Icons.IconAlerte.svg");
+					Caption = "Alert";
+					OkMessage = "Ok";
+					CancelMessage = "Cancel";
+					break;
+				case Type.Error:
+					NotifyValueChanged ("MsgIcon", "#Crow.Images.Icons.exit.svg");
+					Caption = "Error";
+					OkMessage = "Ok";
+					CancelMessage = "Cancel";
+					break;
+				}
+			}
+		}
 		void onOkButtonClick (object sender, EventArgs e)
 		{
 			Ok.Raise (this, null);
@@ -52,7 +122,20 @@ namespace Crow
 		{
 			Cancel.Raise (this, null);
 		}
-
+		public static MessageBox Show (Type msgBoxType, string message, string okMsg = "", string cancelMsg = ""){
+			lock (Interface.CurrentInterface.UpdateMutex) {
+				MessageBox mb = new MessageBox ();
+				mb.Initialize ();
+				mb.CurrentInterface.AddWidget (mb);
+				mb.MsgType = msgBoxType;
+				mb.Message = message;
+				if (!string.IsNullOrEmpty(okMsg))
+					mb.OkMessage = okMsg;
+				if (!string.IsNullOrEmpty(cancelMsg))
+					mb.CancelMessage = cancelMsg;
+				return mb;
+			}
+		}
 	}
 }
 

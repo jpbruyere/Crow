@@ -204,7 +204,9 @@
     <EmbeddedResource Include="Images\Icons\member.svg" />
     <EmbeddedResource Include="Images\Icons\exit2.svg" />
     <EmbeddedResource Include="Images\button.svg" />
-    <EmbeddedResource Include="Images\Icons\iconInfo.svg" />
+    <EmbeddedResource Include="Images\Icons\iconInfo.svg">
+      <LogicalName>Crow.Images.Icons.Informations.svg</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="Templates\tmpDirItem.goml" />
     <EmbeddedResource Include="Templates\ScrollingListBox.goml" />
     <EmbeddedResource Include="Templates\imgItemTemplate.goml" />
