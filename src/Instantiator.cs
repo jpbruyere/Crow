@@ -576,6 +576,11 @@ namespace Crow
 			int dmIdx = cachedDelegates.Count;
 			cachedDelegates.Add (dm.CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>)));
 			ctx.emitCachedDelegateHandlerAddition (dmIdx, CompilerServices.eiValueChange, origine);
+
+			#if DEBUG_BINDING
+			Debug.WriteLine("\tCrow property binding: " + dm.Name);
+			#endif
+
 		}
 		void emitTemplateBindings(Context ctx, Dictionary<string, List<MemberAddress>> bindings){
 			//value changed dyn method
@@ -803,23 +808,25 @@ namespace Crow
 
 			il.Emit (OpCodes.Nop);
 
-			emitRemoveOldDataSourceHandler(il, "ValueChanged", delName,false);
+			emitRemoveOldDataSourceHandler(il, "ValueChanged", delName, true);
 
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
 				if (bindingDef.TwoWay){
-					System.Reflection.Emit.Label cancelRemove = il.DefineLabel ();
-					//remove handler if not null
-					il.Emit (OpCodes.Ldarg_2);//load old parent
-					il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
-					il.Emit (OpCodes.Brfalse, cancelRemove);//old parent is null
+//					System.Reflection.Emit.Label cancelRemove = il.DefineLabel ();
+//					//remove handler if not null
+//					il.Emit (OpCodes.Ldarg_2);//load old parent
+//					il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
+//					il.Emit (OpCodes.Brfalse, cancelRemove);//old parent is null
 
 					//remove handler
-					il.Emit (OpCodes.Ldarg_1);//3d arg: instance bound to delegate (the source)
-					il.Emit (OpCodes.Ldstr, "ValueChanged");//2nd arg event name
-					il.Emit (OpCodes.Ldarg_2);//1st arg load old datasource
-					il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
-					il.Emit (OpCodes.Call, CompilerServices.miRemEvtHdlByTarget);
-					il.MarkLabel(cancelRemove);
+					emitRemoveOldDataSourceHandler(il, "ValueChanged", delName, false);
+
+//					il.Emit (OpCodes.Ldarg_1);//3d arg: instance bound to delegate (the source)
+//					il.Emit (OpCodes.Ldstr, "ValueChanged");//2nd arg event name
+//					il.Emit (OpCodes.Ldarg_2);//1st arg load old datasource
+//					il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
+//					il.Emit (OpCodes.Call, CompilerServices.miRemEvtHdlByTarget);
+//					il.MarkLabel(cancelRemove);
 				}
 				il.Emit (OpCodes.Ldarg_2);//load datasource change arg
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
@@ -883,6 +890,11 @@ namespace Crow
 			#endregion
 
 			ctx.emitCachedDelegateHandlerAddition(delDSIndex, CompilerServices.eiDSChange);
+
+			#if DEBUG_BINDING
+			Debug.WriteLine("\tDataSource ValueChanged: " + delName);
+			Debug.WriteLine("\tDataSource Changed: " + dm.Name);
+			#endif
 		}
 		/// <summary>
 		/// Two way binding for datasource, graphicObj=>dataSource link, datasource value has priority
