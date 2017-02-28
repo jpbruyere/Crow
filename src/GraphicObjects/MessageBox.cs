@@ -117,10 +117,12 @@ namespace Crow
 		void onOkButtonClick (object sender, EventArgs e)
 		{
 			Ok.Raise (this, null);
+			close ();
 		}
 		void onCancelButtonClick (object sender, EventArgs e)
 		{
 			Cancel.Raise (this, null);
+			close ();
 		}
 		public static MessageBox Show (Type msgBoxType, string message, string okMsg = "", string cancelMsg = ""){
 			lock (Interface.CurrentInterface.UpdateMutex) {
