@@ -385,7 +385,7 @@ namespace Crow
 			close ();
 		}
 
-		void close(){
+		protected void close(){
 			Closing.Raise (this, null);
 			CurrentInterface.DeleteWidget (this);
 		}
