@@ -516,13 +516,15 @@ namespace Crow
 				if (isVisible)
 					RegisterForLayouting (LayoutingType.Sizing);
 				else {
-					Slot.Width = 0;
-					LayoutChanged.Raise (this, new LayoutingEventArgs (LayoutingType.Width));
-					Slot.Height = 0;
-					LayoutChanged.Raise (this, new LayoutingEventArgs (LayoutingType.Height));
-					if (this.parent != null)
-						CurrentInterface.EnqueueForRepaint (this);
-					LastSlots.Width = LastSlots.Height = 0;
+					lock (CurrentInterface.UpdateMutex) {
+						Slot.Width = 0;
+						LayoutChanged.Raise (this, new LayoutingEventArgs (LayoutingType.Width));
+						Slot.Height = 0;
+						LayoutChanged.Raise (this, new LayoutingEventArgs (LayoutingType.Height));
+						if (this.parent != null)
+							CurrentInterface.EnqueueForRepaint (this);
+						LastSlots.Width = LastSlots.Height = 0;
+					}
 				}
 
 				//trigger a mouse to handle possible hover changes
