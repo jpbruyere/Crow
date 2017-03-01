@@ -804,6 +804,7 @@ namespace Crow
 			il.DeclareLocal (CompilerServices.TObject);//used for checking propery less bindings
 			il.DeclareLocal (typeof(MemberInfo));//used for checking propery less bindings
 			System.Reflection.Emit.Label cancel = il.DefineLabel ();
+			System.Reflection.Emit.Label newDSIsNull = il.DefineLabel ();
 			System.Reflection.Emit.Label cancelInit = il.DefineLabel ();
 
 			il.Emit (OpCodes.Nop);
@@ -830,7 +831,7 @@ namespace Crow
 				}
 				il.Emit (OpCodes.Ldarg_2);//load datasource change arg
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
-				il.Emit (OpCodes.Brfalse, cancel);//new ds is null
+				il.Emit (OpCodes.Brfalse, newDSIsNull);//new ds is null
 			}
 
 			#region fetch initial Value
@@ -882,6 +883,7 @@ namespace Crow
 				}
 
 			}
+			il.MarkLabel (newDSIsNull);
 			il.Emit (OpCodes.Ret);
 
 			//store dschange delegate in instatiator instance for access while instancing graphic object
