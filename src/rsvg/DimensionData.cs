@@ -1,3 +1,4 @@
+//Copyright GPL2
 namespace Rsvg {
 
 	using System;
