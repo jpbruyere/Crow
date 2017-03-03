@@ -856,8 +856,12 @@ namespace Crow
 		public virtual void RegisterClip(Rectangle clip){
 			if (CacheEnabled && !IsDirty)
 				Clipping.AddRectangle (clip + ClientRectangle.Position);
-			if (Parent != null)
-				Parent.RegisterClip (clip + Slot.Position + ClientRectangle.Position);
+			if (Parent == null)
+				return;
+			GraphicObject p = Parent as GraphicObject;
+			if (p?.IsDirty == true && p?.CacheEnabled == true)
+				return;
+			Parent.RegisterClip (clip + Slot.Position + ClientRectangle.Position);
 		}
 		/// <summary> Full update, taking care of sizing policy </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
