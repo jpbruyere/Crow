@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{793AEC6E-C4B4-4B34-9E4F-AE6B455F86A9}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>CrowX</RootNamespace>
+    <AssemblyName>CrowX</AssemblyName>
+    <ReleaseVersion>0.5</ReleaseVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <OutputPath>$(SolutionDir)build/$(Configuration)</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)build/obj/$(Configuration)</IntermediateOutputPath>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="Execute" command="${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Reference Include="cairo-sharp">
+      <Package>gtk-sharp-3.0</Package>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Crow.csproj">
+      <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
+      <Name>Crow</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CrowWindow.cs" />
+    <Compile Include="HelloWorld.cs" />
+    <Compile Include="X11\API.cs" />
+    <Compile Include="X11\Functions.cs" />
+    <Compile Include="X11\Structs.cs" />
+    <Compile Include="X11\X11KeyMap.cs" />
+    <Compile Include="X11\Bindings\DL.cs" />
+    <Compile Include="X11\Bindings\INotify.cs" />
+    <Compile Include="X11\Bindings\XI.cs" />
+    <Compile Include="X11\Bindings\Xkb.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="X11\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="X11\X11DisplayDevice.cs" />
+    <None Include="X11\X11Keyboard.cs" />
+    <None Include="X11\X11Mouse.cs" />
+    <None Include="X11\X11WindowInfo.cs" />
+    <None Include="X11\XI2Input.cs" />
+    <None Include="X11\XI2MouseKeyboard.cs" />
+    <None Include="X11\X11Input.cs" />
+    <None Include="X11\Bindings\Glx.cs" />
+  </ItemGroup>
+</Project>
