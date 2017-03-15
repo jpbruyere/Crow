@@ -99,6 +99,18 @@ namespace Crow
             else
                 return false;
         }
+		public static bool operator <(Size s1, Size s2)
+		{
+			if (s1.Width < s2.Width)
+				if (s1.Height <= s2.Height)
+					return true;
+			else
+				return false;
+			else if (s1.Width == s2.Width && s1.Height < s2.Height)
+				return true;
+
+			return false;
+		}
         public static bool operator >=(Size s1, Size s2)
         {
             if (s1.Width >= s2.Width && s1.Height >= s2.Height)
@@ -106,18 +118,13 @@ namespace Crow
             else
                 return false;
         }
-        public static bool operator <(Size s1, Size s2)
-        {
-            if (s1.Width < s2.Width)
-                if (s1.Height <= s2.Height)
-                    return true;
-                else
-                    return false;
-            else if (s1.Width == s2.Width && s1.Height < s2.Height)
-                return true;
-
-            return false;
-        }
+		public static bool operator <=(Size s1, Size s2)
+		{
+			if (s1.Width <= s2.Width && s1.Height <= s2.Height)
+				return true;
+			else
+				return false;
+		}
 		public static bool operator <(Size s, int i)
 		{
 			return s.Width < i && s.Height < i ? true : false;
@@ -126,13 +133,15 @@ namespace Crow
 		{
 			return s.Width <= i && s.Height <= i ? true : false;
 		}
-        public static bool operator <=(Size s1, Size s2)
-        {
-            if (s1.Width <= s2.Width && s1.Height <= s2.Height)
-                return true;
-            else
-                return false;
-        }
+		public static bool operator >(Size s, int i)
+		{
+			return s.Width > i && s.Height > i ? true : false;
+		}
+		public static bool operator >=(Size s, int i)
+		{
+			return s.Width >= i && s.Height >= i ? true : false;
+		}
+
         public static bool operator ==(Size s, int i)
         {
             if (s.Width == i && s.Height == i)
