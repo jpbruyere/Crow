@@ -147,7 +147,6 @@ namespace Crow
 		/// </summary>
 		public static Dictionary<String, Instantiator> Instantiators = new Dictionary<string, Instantiator>();
 		public bool DesignMode = false;
-		public int TopWindows = 0;//window always on top count
 		public List<CrowThread> CrowThreads = new List<CrowThread>();//used to monitor thread finished
 		#endregion
 
@@ -550,17 +549,25 @@ namespace Crow
 
 		#region GraphicTree handling
 		/// <summary>Add widget to the Graphic tree of this interface and register it for layouting</summary>
-		public void AddWidget(GraphicObject g, bool topMost = false)
+		public void AddWidget(GraphicObject g, bool isOverlay = false)
 		{
 			g.Parent = this;
-			int ptr = TopWindows;
-			if (g is Window) {
-				if ((g as Window).AlwaysOnTop)
-					ptr = 0;
-			} else if (topMost)
-				ptr = 0;
+			int ptr = 0;
+			Window newW = g as Window;
+			if (newW != null) {
+				while (ptr < GraphicTree.Count) {
+					Window w = GraphicTree [ptr] as Window;
+					if (w != null) {
+						if (newW.AlwaysOnTop || !w.AlwaysOnTop)
+							break;
+					}
+					ptr++;
+				}
+			}
+
 			lock (UpdateMutex)
-				GraphicTree.Insert (ptr, g);			
+				GraphicTree.Insert (ptr, g);
+
 			g.RegisteredLayoutings = LayoutingType.None;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
@@ -572,14 +579,20 @@ namespace Crow
 				GraphicTree.Remove (g);
 		}
 		/// <summary> Put widget on top of other root widgets</summary>
-		public void PutOnTop(GraphicObject g, bool topMost = false)
+		public void PutOnTop(GraphicObject g, bool isOverlay = false)
 		{
-			int ptr = TopWindows;
-			if (g is Window) {
-				if ((g as Window).AlwaysOnTop)
-					ptr = 0;
-			} else if (topMost)
-				ptr = 0;
+			int ptr = 0;
+			Window newW = g as Window;
+			if (newW != null) {
+				while (ptr < GraphicTree.Count) {
+					Window w = GraphicTree [ptr] as Window;
+					if (w != null) {
+						if (newW.AlwaysOnTop || !w.AlwaysOnTop)
+							break;
+					}
+					ptr++;
+				}
+			}
 			if (GraphicTree.IndexOf(g) > ptr)
 			{
 				lock (UpdateMutex) {

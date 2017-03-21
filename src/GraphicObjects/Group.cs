@@ -102,26 +102,26 @@ namespace Crow
 			ChildrenCleared.Raise (this, new EventArgs ());
 		}
 
-		public void putWidgetOnTop(GraphicObject w)
-		{
-			if (Children.Contains(w))
-			{
-				lock (children) {
-					Children.Remove (w);
-					Children.Add (w);
-				}
-			}
-		}
-		public void putWidgetOnBottom(GraphicObject w)
-		{
-			if (Children.Contains(w))
-			{
-				lock (children) {
-					Children.Remove (w);
-					Children.Insert (0, w);
-				}
-			}
-		}
+//		public void putWidgetOnTop(GraphicObject w)
+//		{
+//			if (Children.Contains(w))
+//			{
+//				lock (children) {
+//					Children.Remove (w);
+//					Children.Add (w);
+//				}
+//			}
+//		}
+//		public void putWidgetOnBottom(GraphicObject w)
+//		{
+//			if (Children.Contains(w))
+//			{
+//				lock (children) {
+//					Children.Remove (w);
+//					Children.Insert (0, w);
+//				}
+//			}
+//		}
 
 		#region GraphicObject overrides
 		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)

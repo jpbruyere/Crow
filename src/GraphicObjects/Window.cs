@@ -150,11 +150,10 @@ namespace Crow
 				if (alwaysOnTop == value)
 					return;
 				alwaysOnTop = value;
-				if (alwaysOnTop) {
+
+				if (alwaysOnTop && Parent != null)
 					CurrentInterface.PutOnTop (this);
-					CurrentInterface.TopWindows++;
-				}else
-					CurrentInterface.TopWindows--;
+
 				NotifyValueChanged ("AlwaysOnTop", alwaysOnTop);
 			}
 		}
