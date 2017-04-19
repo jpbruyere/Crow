@@ -82,7 +82,6 @@ namespace Crow
 		public static int DeviceRepeatInterval = 40;
 		/// <summary>Tabulation size in Text controls</summary>
 		public static int TabSize = 4;
-		public static bool ReplaceTabsWithSpace = false;
 		public static string LineBreak = "\r\n";
 		/// <summary> Allow rendering of interface in development environment </summary>
 		public static bool DesignerMode = false;
@@ -146,7 +145,6 @@ namespace Crow
 		/// on the first instance creation of a IML item.
 		/// </summary>
 		public static Dictionary<String, Instantiator> Instantiators = new Dictionary<string, Instantiator>();
-		public bool DesignMode = false;
 		public List<CrowThread> CrowThreads = new List<CrowThread>();//used to monitor thread finished
 		#endregion
 
@@ -575,6 +573,10 @@ namespace Crow
 		public void DeleteWidget(GraphicObject g)
 		{
 			g.Visible = false;//trick to ensure clip is added to refresh zone
+			if (_hoverWidget != null) {
+				if (g.Contains (_hoverWidget))
+					HoverWidget = null;
+			}
 			lock (UpdateMutex)
 				GraphicTree.Remove (g);
 		}
@@ -683,7 +685,6 @@ namespace Crow
 			}
 
 			if (HoverWidget != null) {
-				//TODO, ensure object is still in the graphic tree
 				//check topmost graphicobject first
 				GraphicObject tmp = HoverWidget;
 				GraphicObject topc = null;
@@ -709,7 +710,6 @@ namespace Crow
 						i++;
 					}
 				}
-
 
 				if (HoverWidget.MouseIsIn (e.Position)) {
 					HoverWidget.checkHoverWidget (e);
