@@ -75,6 +75,13 @@ namespace Crow
 		{
 			child.LayoutChanged -= OnChildLayoutChanges;
 			//child.Parent = null;
+
+			//check if HoverWidget is removed from Tree
+			if (CurrentInterface.HoverWidget != null) {
+				if (this.Contains (CurrentInterface.HoverWidget))
+					CurrentInterface.HoverWidget = null;
+			}
+
 			lock (children)
             	Children.Remove(child);
 
