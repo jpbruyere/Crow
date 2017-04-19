@@ -572,13 +572,15 @@ namespace Crow
 		/// <summary>Set visible state of widget to false and remove if from the graphic tree</summary>
 		public void DeleteWidget(GraphicObject g)
 		{
-			g.Visible = false;//trick to ensure clip is added to refresh zone
 			if (_hoverWidget != null) {
 				if (g.Contains (_hoverWidget))
 					HoverWidget = null;
 			}
-			lock (UpdateMutex)
+			lock (UpdateMutex) {
+				g.DataSource = null;
+				g.Visible = false;
 				GraphicTree.Remove (g);
+			}
 		}
 		/// <summary> Put widget on top of other root widgets</summary>
 		public void PutOnTop(GraphicObject g, bool isOverlay = false)
@@ -607,12 +609,11 @@ namespace Crow
 		/// <summary> Remove all Graphic objects from top container </summary>
 		public void ClearInterface()
 		{
-			int i = 0;
 			lock (UpdateMutex) {
 				while (GraphicTree.Count > 0) {
 					//TODO:parent is not reset to null because object will be added
 					//to ObjectToRedraw list, and without parent, it fails
-					GraphicObject g = GraphicTree [i];
+					GraphicObject g = GraphicTree [0];
 					g.DataSource = null;
 					g.Visible = false;
 					GraphicTree.RemoveAt (0);
@@ -625,6 +626,7 @@ namespace Crow
 			curLQIs = new LQIList();
 			#endif
 		}
+
 		/// <summary>Search a Graphic object in the tree named 'nameToFind'</summary>
 		public GraphicObject FindByName (string nameToFind)
 		{
