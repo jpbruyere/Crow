@@ -539,22 +539,10 @@ namespace Crow
 
 				isVisible = value;
 
-				if (isVisible)
-					RegisterForLayouting (LayoutingType.Sizing);
-				else {
-					lock (CurrentInterface.UpdateMutex) {
-						Slot.Width = 0;
-						LayoutChanged.Raise (this, new LayoutingEventArgs (LayoutingType.Width));
-						Slot.Height = 0;
-						LayoutChanged.Raise (this, new LayoutingEventArgs (LayoutingType.Height));
-						if (this.parent != null)
-							CurrentInterface.EnqueueForRepaint (this);
-						LastSlots.Width = LastSlots.Height = 0;
-					}
-				}
+				RegisterForLayouting (LayoutingType.Sizing);
 
 				//trigger a mouse to handle possible hover changes
-				CurrentInterface.ProcessMouseMove (CurrentInterface.Mouse.X, CurrentInterface.Mouse.Y);
+				//CurrentInterface.ProcessMouseMove (CurrentInterface.Mouse.X, CurrentInterface.Mouse.Y);
 
 				NotifyValueChanged ("Visible", isVisible);
 			}
@@ -854,14 +842,15 @@ namespace Crow
 		/// </summary>
 		/// <param name="clip">Clip rectangle</param>
 		public virtual void RegisterClip(Rectangle clip){
+			Rectangle  r = clip + ClientRectangle.Position;
 			if (CacheEnabled && !IsDirty)
-				Clipping.AddRectangle (clip + ClientRectangle.Position);
+				Clipping.AddRectangle (r);
 			if (Parent == null)
 				return;
 			GraphicObject p = Parent as GraphicObject;
 			if (p?.IsDirty == true && p?.CacheEnabled == true)
 				return;
-			Parent.RegisterClip (clip + Slot.Position + ClientRectangle.Position);
+			Parent.RegisterClip (r + Slot.Position);
 		}
 		/// <summary> Full update, taking care of sizing policy </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
