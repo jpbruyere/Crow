@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<Popper Name="popper" PopDirection="Bottom">
+	<Template>
+		<Border Foreground="Gray" CornerRadius="{../../CornerRadius}" BorderWidth="1"
+			MouseEnter="{Foreground=BlueCrayola}"
+			MouseLeave="{Foreground=Gray}">
+			<HorizontalStack Background="{../../../Background}" Margin="1">
+				<Label Font="{./Font}" MinimumSize="80,10" Margin="2" Foreground="White" Text="{../../../../SelectedItem}"/>
+				<Image Style="Icon" Path="#Crow.Images.Icons.updown.svg" SvgSub="down"/>
+			</HorizontalStack>
+		</Border>
+	</Template>
+	<Border BorderWidth="1" Margin="1" Background="Jet"
+		MinimumSize="{../../MinimumPopupSize}" Fit="true">
+		<Scroller Name="scroller1" Margin="2" VerticalScrolling="true"
+			MaximumSize="0,200"
+			HorizontalAlignment="Left">
+			<VerticalStack
+				Height="Fit" Name="ItemsContainer" Margin="0"
+				HorizontalAlignment="Left"
+				VerticalAlignment="Top"/>
+		</Scroller>
+	</Border>
+</Popper>

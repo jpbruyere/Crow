@@ -1,0 +1,198 @@
+﻿<?xml version="1.0"?>
+<Window Caption="Showcase" Height="90%" Width="90%">
+	<HorizontalStack Background="Onyx" Margin="5">
+		<VerticalStack Width="30%" >
+			<GroupBox Caption="Labels" Height="Fit">
+				<VerticalStack>
+					<Label/>
+					<Label/>
+					<Label/>
+				</VerticalStack>
+			</GroupBox>
+			<GroupBox Caption="Text boxes" Height="Fit">
+				<VerticalStack>
+					<TextBox/>
+					<TextBox/>
+					<TextBox/>
+				</VerticalStack>
+			</GroupBox>
+			<GroupBox Caption="Multiline text boxe" Height="Fit">
+				<TextBox TextAlignment="TopLeft" Multiline="true" Height="60"/>
+			</GroupBox>
+			<GroupBox Caption="Check boxes" Height="Fit">
+				<VerticalStack>
+					<CheckBox/>
+					<CheckBox/>
+					<CheckBox/>
+				</VerticalStack>
+			</GroupBox>
+			<GroupBox Caption="Radio buttons" Height="Fit">
+				<VerticalStack>
+					<RadioButton/>
+					<RadioButton/>
+					<RadioButton/>
+				</VerticalStack>
+			</GroupBox>
+			<GroupBox Caption="Spinner" Height="Fit">
+				<VerticalStack>
+					<Spinner Width="60"/>
+					<Spinner/>
+					<Spinner />
+				</VerticalStack>
+			</GroupBox>
+		</VerticalStack>
+		<VerticalStack Width="30%" >
+			<GroupBox Caption="Buttons" Height="Fit">
+				<VerticalStack>
+					<Button/>
+					<Button CornerRadius="5" Background="DimGray"/>
+					<Button/>
+				</VerticalStack>
+			</GroupBox>
+			<GroupBox Caption="Expandable" Height="Fit">
+				<VerticalStack>
+					<Expandable Width="Stretched"  Background="Gray">
+						<Expandable Width="Stretched" Background="LightBlue">
+							<Expandable Width="Stretched" Background="Green">
+								<Expandable Width="Stretched" Background="LimeGreen">
+									<Expandable Width="Stretched" Background="DimGray">
+										<Expandable Width="Stretched" Background="Yellow">
+											<Expandable Width="Stretched" Background="NavyBlue">
+												<Expandable Width="Stretched" Background="Blue">
+													<Expandable Width="Stretched" Background="BlueCrayola">
+														<Expandable Width="Stretched" Background="Green">
+															<Label Background="Red" Text="{fps}"/>
+														</Expandable>
+													</Expandable>
+												</Expandable>
+											</Expandable>
+										</Expandable>
+									</Expandable>
+								</Expandable>
+							</Expandable>
+						</Expandable>
+					</Expandable>
+					<Expandable>
+						<Expandable>
+							<Expandable>
+								<Expandable>
+									<Expandable>
+										<Expandable>
+											<Expandable>
+												<Expandable>
+													<Expandable>
+														<Label Background="Red" Text="{fps}"/>
+													</Expandable>
+												</Expandable>
+											</Expandable>
+										</Expandable>
+									</Expandable>
+								</Expandable>
+							</Expandable>
+						</Expandable>
+					</Expandable>
+					<Expandable Width="Stretched"  Background="Gray">
+						<Expandable Width="Stretched" Background="LightBlue">
+							<Expandable Width="Stretched" Background="Green">
+								<Expandable Width="Stretched" Background="LimeGreen">
+									<Expandable Width="Stretched" Background="DimGray">
+										<Expandable Width="Stretched" Background="Yellow">
+											<Expandable Width="Stretched" Background="NavyBlue">
+												<Expandable Width="Stretched" Background="Blue">
+													<Expandable Width="Stretched" Background="BlueCrayola">
+														<Expandable Width="Stretched" Background="Green">
+															<Label Background="Red" Text="{fps}"/>
+														</Expandable>
+													</Expandable>
+												</Expandable>
+											</Expandable>
+										</Expandable>
+									</Expandable>
+								</Expandable>
+							</Expandable>
+						</Expandable>
+					</Expandable>
+				</VerticalStack>
+			</GroupBox>
+			<GroupBox Caption="Popup" Height="Fit">
+				<VerticalStack>
+					<Popper Background="DimGray" >
+						<Border Fit="True" Background="DimGray" CornerRadius="5" BorderWidth="1">
+							<Image Path="#Crow.Images.Icons.crow.svg" Width="100" Height="100" Margin="10"/>
+						</Border>
+					</Popper>
+					<Popper Background="DimGray" >
+						<Border Fit="True" Background="DimGray" CornerRadius="5" BorderWidth="1">
+							<Image Path="#Crow.Images.Icons.crow.svg" Width="100" Height="100" Margin="10"/>
+						</Border>
+					</Popper>
+					<Popper Background="DimGray" >
+						<Border Fit="True" Background="DimGray" CornerRadius="5" BorderWidth="1">
+							<Image Path="#Crow.Images.Icons.crow.svg" Width="100" Height="100" Margin="10"/>
+						</Border>
+					</Popper>
+				</VerticalStack>
+			</GroupBox>
+			<GroupBox Caption="Menu" Height="Fit">
+				<Menu>
+					<MenuItem Caption="File" Width="Fit">
+						<MenuItem Caption="New" />
+						<MenuItem Caption="Open"/>
+						<MenuItem Caption="Save"/>
+						<MenuItem Caption="Quit"/>
+					</MenuItem>
+					<MenuItem Caption="Edit" Name="edit" Width="Fit">
+						<MenuItem Caption="Cut"/>
+						<MenuItem Caption="Copy"/>
+						<MenuItem Caption="Paste"/>
+						<MenuItem Caption="Special" Name="special" Width="Fit">
+							<MenuItem Caption="Cut"/>
+							<MenuItem Caption="Copy"/>
+							<MenuItem Caption="Paste"/>
+						</MenuItem>
+						<MenuItem Caption="Special2" Name="special" Width="Fit">
+							<MenuItem Caption="Cut"/>
+							<MenuItem Caption="Copy"/>
+							<MenuItem Caption="Paste"/>
+						</MenuItem>
+					</MenuItem>
+					<MenuItem Caption="Help" Width="Fit">
+						<MenuItem Caption="About"/>
+						<MenuItem Caption="Help"/>
+					</MenuItem>
+				</Menu>
+			</GroupBox>
+			<GroupBox Caption="Sliders" Height="Fit">
+				<VerticalStack>
+					<Slider Height="10" Width="90%"/>
+					<Slider Height="10" Width="90%"/>
+					<Slider Height="10" Width="90%"/>
+				</VerticalStack>
+			</GroupBox>
+		</VerticalStack>
+		<VerticalStack Width="35%">
+			<ColorPicker Background="Jet" Height="Fit"/>
+			<GroupBox Caption="Combo boxes" Height="Fit">
+				<VerticalStack>
+					<ComboBox Data="{List2}"/>
+					<ComboBox Data="{List2}" SelectedIndex="1"/>
+					<ComboBox Data="{List2}"/>
+				</VerticalStack>
+			</GroupBox>
+			<GroupBox Caption="Image" Height="Fit">
+				<Image Path="#Crow.Images.Icons.crow.svg" Width="100" Height="40" Margin="4"/>
+			</GroupBox>
+			<GroupBox Caption="List box" Height="Fit">
+				<ListBox Data="{List2}"/>
+			</GroupBox>
+			<VerticalStack Background="#Tests.image.screenshot--tech-frame.svg" Margin="16">
+				<Label Text="Tech Frame" Font="Mono bold, 12" HorizontalAlignment="Left" Background="Clear"/>
+				<VerticalStack Margin="4">
+					<Label Text="this is a tech frame"/>
+					<TextBox/>
+					<ProgressBar Height="6" Value="10"/>
+				</VerticalStack>
+			</VerticalStack>
+		</VerticalStack>
+	</HorizontalStack>
+</Window>

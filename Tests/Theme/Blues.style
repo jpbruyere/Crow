@@ -1,0 +1,39 @@
+﻿Icon {
+	Margin=1;
+	Width=14;
+	Height=14;
+}
+Border {
+	Foreground = Gray;
+}
+GroupBox {
+	Foreground = Gray;
+}
+CheckBox {
+	//Template = #Crow.Bluez.CheckBox.template;
+	Caption = Check Box;
+	CornerRadius = 5;
+	Width=Fit;
+	Background = vgradient|0:DimGray|1:Onyx;
+}
+RadioButton {
+	//Template = #Crow.Templates.bluez.RadioButton.template;
+	Caption = Radio But;
+	CornerRadius = 5;
+	Width=Fit;
+	Background = vgradient|0:DimGray|1:Onyx;
+}
+ComboBox {
+	//Template = #Crow.Templates.bluez.ComboBox.template;
+	CornerRadius = 5;
+	Width=Fit;
+	Background = vgradient|0:DimGray|1:Onyx;
+}
+Spinner {
+	//Template = #Crow.Templates.bluez.Spinner.template;
+	CornerRadius = 5;
+	Foreground = White;
+	Width=70;
+	Height=Fit;
+	Background = vgradient|0:DimGray|1:Onyx;
+}

@@ -309,6 +309,7 @@
     <EmbeddedResource Include="Icons\folder.svg" />
     <EmbeddedResource Include="Icons\file.svg" />
     <EmbeddedResource Include="Icons\level-up.svg" />
+    <EmbeddedResource Include="Images\Icons\arrows.svg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Crow.dll.config">

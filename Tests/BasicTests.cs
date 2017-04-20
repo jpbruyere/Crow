@@ -75,20 +75,9 @@ namespace Tests
 		}
 		public IList<String> List2 = new List<string>(new string[]
 			{
-				"string1",
-				"string2",
-				"string3",
-//				"string4",
-//				"string5",
-//				"string6",
-//				"string7",
-//				"string8",
-//				"string8",
-//				"string8",
-//				"string8",
-//				"string8",
-//				"string8",
-//				"string9"
+				"Item 1",
+				"Item 2",
+				"Item 3",
 			}
 		);
 		public IList<String> TestList2 {
@@ -142,6 +131,7 @@ namespace Tests
 			//testFiles = new string [] { @"Interfaces/Unsorted/testFileDialog.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
 			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
@@ -151,7 +141,6 @@ namespace Tests
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/TemplatedGroup", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Splitter", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Wrapper", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Unsorted", "*.crow")).ToArray ();
 
 			object tc = Color.AirForceBlueRaf;
@@ -163,8 +152,8 @@ namespace Tests
 				Quit (null, null);
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F1) {
-				TestList.Add ("new string");
-				NotifyValueChanged ("TestList", TestList);
+				GraphicObject w = Load ("Interfaces/TemplatedContainer/testMsgBox.crow");
+				w.DataSource = this;
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F4) {
 				GraphicObject w = Load ("Interfaces/TemplatedContainer/testWindow.goml");

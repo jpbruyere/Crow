@@ -6,6 +6,9 @@ MessageBox, Popper, Slider, Spinner, TextBox {
 Border {
 	Foreground = Gray;
 }
+GroupBox {
+	Foreground = Gray;
+}
 CheckBox { Caption = CheckBox; }
 RadioButton { Caption = RadioButton; }
 Expandable { Caption = Expandable; }
@@ -21,7 +24,7 @@ Button {
 Label {
 	Height = Fit;
 	Width = Fit;
-	Margin = 0;
+	Margin = 1;
 }
 Menu {
 	Margin = 1;
@@ -107,12 +110,12 @@ Scroller {
 }
 Icon {
 	Margin=1;
-	Width=12;
-	Height=12;
+	Width=14;
+	Height=14;
 }
 Control {
 	Margin=0;
-	Spacing=3;
+	Spacing=2;
 }
 SaturationValueSelector {
 	Foreground=Red;

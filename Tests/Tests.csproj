@@ -322,6 +322,9 @@
     <None Include="Interfaces\Wrapper\2.2.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Interfaces\Divers\1.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />
@@ -335,6 +338,7 @@
     <Folder Include="Interfaces\TemplatedControl\" />
     <Folder Include="Interfaces\TemplatedContainer\" />
     <Folder Include="Interfaces\TemplatedGroup\" />
+    <Folder Include="Theme\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="image\tetra.png">
@@ -356,6 +360,22 @@
     <EmbeddedResource Include="Interfaces\treeList.crow" />
     <EmbeddedResource Include="Interfaces\CheckBox2.imlt" />
     <EmbeddedResource Include="Interfaces\perfMsr.crow" />
+    <EmbeddedResource Include="image\screenshot--tech-frame.svg" />
+    <EmbeddedResource Include="Theme\Blues.style">
+      <LogicalName>Bluez.style</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Theme\bluez\CheckBox.template">
+      <LogicalName>Crow.CheckBox.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Theme\bluez\ComboBox.template">
+      <LogicalName>Crow.ComboBox.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Theme\bluez\RadioButton.template">
+      <LogicalName>Crow.RadioButton.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Theme\bluez\Spinner.template">
+      <LogicalName>Crow.Spinner.template</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">

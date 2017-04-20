@@ -1,0 +1,10 @@
+﻿<?xml version="1.0"?>
+<Border Foreground="Gray" CornerRadius="{./CornerRadius}" BorderWidth="1" Background="{./Background}"
+	MouseEnter="{Foreground=BlueCrayola}"
+	MouseLeave="{Foreground=Gray}">
+	<HorizontalStack  Margin="1">
+		<Image Style="Icon" Path="#Crow.Images.Icons.checkbox.svg"
+			SvgSub="{./IsChecked}"/>
+		<Label Font="{./Font}" Text="{./Caption}" Foreground="{./Foreground}" Margin="2"/>
+	</HorizontalStack>
+</Border>
