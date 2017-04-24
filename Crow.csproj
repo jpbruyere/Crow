@@ -213,6 +213,8 @@
     <Compile Include="src\Mono.Cairo\Win32Surface.cs" />
     <Compile Include="src\Mono.Cairo\XcbSurface.cs" />
     <Compile Include="src\Mono.Cairo\XlibSurface.cs" />
+    <Compile Include="src\GraphicObjects\DocksView.cs" />
+    <Compile Include="src\GraphicObjects\DockingView.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -365,6 +367,9 @@
     <EmbeddedResource Include="Icons\folder.svg" />
     <EmbeddedResource Include="Icons\file.svg" />
     <EmbeddedResource Include="Icons\level-up.svg" />
+    <EmbeddedResource Include="Templates\DockingView.template">
+      <LogicalName>Crow.DockingView.template</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="Crow.dll.config">

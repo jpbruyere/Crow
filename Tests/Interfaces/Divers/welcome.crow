@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack Fit="true" VerticalAlignment="Top" Background="0.7,0.7,0.7,0.5"
-	Margin="10" CornerRadius="10">
-	<Label Font="20" Text="Press &lt;F3&gt; to cycle into the examples"/>
-	<Label Font="20" Text="Those are basic tests used to validate changes"/>
-	<Label Font="20" Text="{fps}"/>
-</VerticalStack>
+<DocksView Background="Jet" Margin = "0">
+	<DockingView Focusable="true" Caption="View 1" Width="100" Height="100"/>
+	<DockingView Focusable="true" Resizable = "true" Caption="View 2" Width="100" Height="100"/>
+	<DockingView Focusable="true" Resizable = "true" Caption="View 3" Width="100" Height="100"/>
+	<DockingView Focusable="true" Resizable = "true" Caption="View 4" Width="100" Height="100"/>
+</DocksView>
