@@ -2,7 +2,7 @@
 <package >
 	<metadata>
 		<id>Crow.OpenTK</id>
-		<version>0.5.1</version>
+		<version>0.5.2</version>
 		<title>C# Rapid Open Widget Toolkit</title>
 		<authors>JP Bruyere</authors>
 		<owners>Grand Tetras Software</owners>
@@ -21,12 +21,7 @@ Crow.OpenTK is the OpenTK ready version.
 For more information, please visit https://jpbruyere.github.io/Crow/.
 		</summary>
 		<releaseNotes>
-- New binding system with precompiled delegates cached in instantiators
-- TemplatedGroup
-- lots of debug and improvements
-- Configuration class for easy global variables storing
-- Color Picker
-- ...			
+			- debug.
 		</releaseNotes>
 		<copyright>Copyright 2013-2017</copyright>
 		<dependencies>
