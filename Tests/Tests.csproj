@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>Tests.BasicTests</StartupObject>
+    <StartupObject>Tests.Showcase</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ReleaseVersion>0.5</ReleaseVersion>
@@ -28,16 +28,12 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <DefineConstants>DEBUG;TRACE;MEASURE_TIME</DefineConstants>
-    <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <WarningLevel>0</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -61,11 +57,11 @@
     <Compile Include="OpenGL\Texture.cs" />
     <Compile Include="HelloWorld.cs" />
     <Compile Include="HelloCube.cs" />
-    <Compile Include="UIEditor.cs" />
     <Compile Include="CrowWindow.cs" />
     <Compile Include="Hello3D.cs" />
     <Compile Include="OpenGL\Extensions.cs" />
     <Compile Include="InterfaceControler.cs" />
+    <Compile Include="Showcase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -356,6 +352,7 @@
     <EmbeddedResource Include="Interfaces\treeList.crow" />
     <EmbeddedResource Include="Interfaces\CheckBox2.imlt" />
     <EmbeddedResource Include="Interfaces\perfMsr.crow" />
+    <EmbeddedResource Include="ui\showcase.crow" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">
