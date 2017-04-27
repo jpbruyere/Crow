@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<HorizontalStack Background="Onyx" Margin="5">
+	<DirectoryView Name="dv" CurrentDirectory="Interfaces" Width="25%" SelectedItemChanged="Dv_SelectedItemChanged"
+		/>
+	<Splitter Width="6"/>
+	<VerticalStack>
+		<Container Name="CrowContainer" Height="60%" Background="SmokyBlack"/>
+		<Splitter/>
+		<HorizontalStack>
+			<Scroller Name="scroller1" Background="White"
+					Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}"
+					ValueChanged="./_scroller_ValueChanged">
+				<TextBox VerticalAlignment="Top" TextChanged="Tb_TextChanged"
+					Text="{source}" Multiline="true" TextAlignment="TopLeft"
+					Font="Courriernew 10"/>
+			</Scroller>
+			<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}"
+				Maximum="{../scroller1.MaximumScroll}" Orientation="Vertical"
+				Width="14" />
+		</HorizontalStack>
+	</VerticalStack>
+</HorizontalStack>
