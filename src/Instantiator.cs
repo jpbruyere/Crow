@@ -41,7 +41,12 @@ namespace Crow
 	public delegate object InstanciatorInvoker(Interface iface);
 
 	/// <summary>
-	/// Instantiator
+	/// Reflexion being very slow, the settings of the starting values for widgets are set by a dynamic method.
+	/// This method is created on the first instacing and is recalled for further widget instancing.
+	/// It include
+	/// 	- XML values setting
+	/// 	- Default values (appearing as attribute in C#)  loading
+	/// 	- Stiling
 	/// </summary>
 	public class Instantiator
 	{
@@ -205,8 +210,9 @@ namespace Crow
 						} else {
 							if (!reader.IsEmptyElement)
 								throw new Exception ("ItemTemplate with Path attribute may not include sub nodes");
-							itemTmpID = path;
-							Interface.Instantiators [itemTmpID] =
+							itemTmpID = path+dataType+datas;
+							if (!Interface.Instantiators.ContainsKey (itemTmpID))
+								Interface.Instantiators [itemTmpID] =
 										 new ItemTemplate (Interface.GetStreamFromPath (itemTmpID), dataType, datas);
 						}
 						itemTemplateIds.Add (new string [] { dataType, itemTmpID, datas });
