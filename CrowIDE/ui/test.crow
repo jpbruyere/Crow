@@ -1,0 +1,4 @@
+﻿<Container Margin="20" Background="Onyx">
+	<ImlVisualEditor Width="80%" Height="80%" Margin="0" MinimumSize="10,10" Foreground="SkyBlue"
+			Name="crowContainer" Background="Onyx"/>
+</Container>

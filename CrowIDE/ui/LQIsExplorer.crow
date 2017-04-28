@@ -1,0 +1,65 @@
+﻿<?xml version="1.0"?>
+<Window Width="50%" Height="50%" Background="DimGray">
+	<TreeView IsRoot="true" Name="treeView" Data="{LQIs}">
+		<ItemTemplate DataType="Crow.LayoutingQueueItem" Data="triggeredLQIs">
+			<Expandable>
+				<Template>
+					<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}">
+						<VerticalStack Fit="true" Margin="3" Background="Onyx"
+								HorizontalAlignment="Left"
+								MouseEnter="{Background=hgradient|0:BlueCrayola|1:Transparent}"
+								MouseLeave="{Background=Onyx}">
+							<Label Text="{FullName}" Font="droid, 8" Background="LightGray" Foreground="Black"/>
+							<HorizontalStack Fit="true" Spacing="10">
+								<Label Text="{LayoutingTries}" Foreground="SkyBlue"/>
+								<Label Text="{DiscardCount}" Foreground="Red"/>
+								<Label Text="{Name}" Font="droid bold"/>
+								<Label Text="{LayoutType}" Foreground="Maize"/>
+								<Label Text="{Width}"/>
+								<Label Text="{Height}"/>
+							</HorizontalStack>
+
+							<HorizontalStack Fit="true">
+								<Label Text="{Slot}"/>
+								<Label Text=" => "/>
+								<Label Text="{NewSlot}"/>
+							</HorizontalStack>
+							<GraphicObject Background="Mantis" Height="3" Visible="{HasTriggeredLQIs}"/>
+						</VerticalStack>
+						<Container Name="Content" Visible="false" HorizontalAlignment="Left"
+								Fit="true"/>
+					</VerticalStack>
+				</Template>
+				<HorizontalStack Height="Fit" Width="Fit">
+					<GraphicObject Width="20" Height="10"/>
+					<TreeView Name="List" Height="Fit" Width="Fit"
+						Template="#Crow.Templates.treeList.crow" />
+				</HorizontalStack>
+			</Expandable>
+		</ItemTemplate>
+		<ItemTemplate DataType="Crow.LQIList" Data="GetRootLQIs">
+			<Expandable Caption="{}" >
+				<Template>
+					<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}">
+						<HorizontalStack Spacing="1" Height="Fit" Width="{./WidthPolicy}"
+								MouseEnter="{Background=hgradient|0:BlueCrayola|1:Transparent}"
+								MouseLeave="{Background=Transparent}">
+							<Image Margin="2" Width="12" Height="12"
+
+								Path="{./Image}"
+								SvgSub="{./IsExpanded}"/>
+							<Label Text="{./Caption}" Width="{./WidthPolicy}"/>
+						</HorizontalStack>
+						<Container Name="Content" Visible="false"
+								Height="{./HeightPolicy}" Width="{./WidthPolicy}"/>
+					</VerticalStack>
+				</Template>
+				<HorizontalStack Height="Fit" Width="{./WidthPolicy}">
+					<GraphicObject Width="12" Height="10"/>
+					<TreeView Name="List" Height="Fit" Width="{./WidthPolicy}"
+						Template="#Crow.Templates.treeList.crow" />
+				</HorizontalStack>
+			</Expandable>
+		</ItemTemplate>
+	</TreeView>
+</Window>

@@ -1,0 +1,59 @@
+﻿<?xml version="1.0"?>
+<Window Caption="Graphic Tree" Width="20%" Height="70%" AlwaysOnTop="true">
+	<TreeView DataSource="{CSProj}" IsRoot="true" Name="treeView" Data="{ItemGroups}">
+	<ItemTemplate DataType="ItemGroupTypeItemReference">
+		<HorizontalStack>
+			<Label Text="Reference"/>
+			<Label Text="{Include}"/>
+		</HorizontalStack>
+	</ItemTemplate>
+	<ItemTemplate DataType="ItemGroupTypeItemCompile">
+		<HorizontalStack>
+			<Label Text="Compile"/>
+			<Label Text="{Include}"/>
+		</HorizontalStack>
+	</ItemTemplate>
+	<ItemTemplate DataType="ItemGroupTypeItemNone">
+		<HorizontalStack>
+			<Label Text="None"/>
+			<Label Text="{Include}"/>
+		</HorizontalStack>
+	</ItemTemplate>
+<!--	<ItemTemplate DataType="System.Object" Data="Items">
+		<HorizontalStack Focusable="true"  Height="Fit" Width="Stretched" >
+			<Label Text="{}" Width="Stretched"
+				MouseEnter="{Background=vgradient|0:White|0.05:UnitedNationsBlue|1:Jet}"
+				MouseLeave="{Background=Transparent}"/>
+		</HorizontalStack>
+	</ItemTemplate>-->
+	<ItemTemplate DataType="ItemGroup" Data="Items">
+		<Expandable Caption="ItemGroup" >
+<!--			<Template>
+				<VerticalStack>
+					<HorizontalStack Spacing="1" Height="Fit" MouseDoubleClick="./onClickForExpand"
+							MouseEnter="{Background=vgradient|0:White|0.05:UnitedNationsBlue|1:Jet}"
+							MouseLeave="{Background=Transparent}">
+						<Container Margin="1" Width="10" Height="10" Focusable="true" MouseClick="./onClickForExpand"
+							MouseEnter="{Background=LightGray}"
+							MouseLeave="{Background=Transparent}">
+							<Image
+								Path="{./Image}"
+								Visible="{./IsExpandable}"
+								SvgSub="{./IsExpanded}"/>
+						</Container>
+						<Image Margin="2" Width="14" Height="14"
+							Path="#Crow.Images.Icons.folder.svg"/>
+						<Label Text="{./Caption}"/>
+					</HorizontalStack>
+					<Container Name="Content" Visible="false"/>
+				</VerticalStack>
+			</Template>-->
+			<HorizontalStack Height="Fit">
+				<GraphicObject Width="12" Height="10"/>
+				<TreeView Name="List" Height="Fit"
+					Template="#Crow.Templates.treeList.crow" />
+			</HorizontalStack>
+		</Expandable>
+	</ItemTemplate>
+</TreeView>
+</Window>
