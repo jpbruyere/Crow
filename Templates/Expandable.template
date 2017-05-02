@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <Border BorderWidth="1" Foreground="{./Foreground}" Background="{./Background}">
 	<VerticalStack>
-		<HorizontalStack Spacing="1" Height="Fit" MouseDoubleClick="./onClickForExpand">
+		<HorizontalStack Spacing="1" Height="Fit" Focusable="true" MouseDoubleClick="./onClickForExpand">
 			<Container Margin="1" Width="10" Height="10" Focusable="true" MouseClick="./onClickForExpand"
 														MouseEnter="{Background=LightGray}"
 														MouseLeave="{Background=Transparent}">

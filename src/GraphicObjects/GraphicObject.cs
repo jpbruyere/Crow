@@ -1497,7 +1497,13 @@ namespace Crow
 				CurrentInterface.ActiveWidget = this;
 			if (this.Focusable && !(Interface.FocusOnHover || currentInterface.focusGiven)) {
 				CurrentInterface.FocusedWidget = this;
+				CurrentInterface.ActiveWidget = this;
 				currentInterface.focusGiven = true;
+				if (CurrentInterface.eligibleForDoubleClick == this && CurrentInterface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick)
+					onMouseDoubleClick (this, e);
+				else
+					currentInterface.clickTimer.Restart();
+				CurrentInterface.eligibleForDoubleClick = null;
 			}
 			//bubble event to the top
 			GraphicObject p = Parent as GraphicObject;
