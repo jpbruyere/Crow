@@ -190,6 +190,7 @@ namespace Crow
 		object tag;
 		bool isDragged;
 		bool allowDrag;
+		bool allowDrop;
 
 		#endregion
 
@@ -311,6 +312,8 @@ namespace Crow
 		public event EventHandler Enabled;
 		/// <summary>Occurs when the enabled state this object is set to false</summary>
 		public event EventHandler Disabled;
+		public event EventHandler Dragged;
+		public event EventHandler Dropped;
 		/// <summary>Occurs when one part of the rendering slot changed</summary>
 		public event EventHandler<LayoutingEventArgs> LayoutChanged;
 		/// <summary>Occurs when DataSource changed</summary>
@@ -1012,7 +1015,7 @@ namespace Crow
 		}
 
 		#region Drag&Drop
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[XmlAttributeAttribute][DefaultValue(false)]
 		public virtual bool AllowDrag {
 			get { return allowDrag; }
 			set {
@@ -1022,12 +1025,27 @@ namespace Crow
 				NotifyValueChanged ("AllowDrag", allowDrag);
 			}
 		}
-
-		public List<Type> AllowedDroppedTypes;
-
-		[XmlIgnore]public virtual bool AllowDrop {
-			get { return AllowedDroppedTypes?.Count>0; }
+		[XmlAttributeAttribute][DefaultValue(false)]
+		public virtual bool AllowDrop {
+			get { return allowDrop; }
+			set {
+				if (allowDrop == value)
+					return;
+				allowDrop = value;
+				NotifyValueChanged ("AllowDrop", allowDrop);
+			}
 		}
+
+//		public List<Type> AllowedDroppedTypes;
+//		public void AddAllowedDroppedType (Type newType){
+//			if (AllowedDroppedTypes == null)
+//				AllowedDroppedTypes = new List<Type> ();
+//			AllowedDroppedTypes.Add (newType);
+//			NotifyValueChanged ("AllowDrop", AllowDrop);
+//		}
+//		[XmlIgnore]public virtual bool AllowDrop {
+//			get { return AllowedDroppedTypes?.Count>0; }
+//		}
 		[XmlIgnore]public virtual bool IsDragged {
 			get { return isDragged; }
 			set {
@@ -1035,18 +1053,35 @@ namespace Crow
 					return;
 				isDragged = value;
 
-				if (isDragged)
+				if (isDragged) {
 					currentInterface.HoverWidget = null;
+					onStartDrag (this, null);
+				}
 
 				NotifyValueChanged ("IsDrag", IsDragged);
 			}
 		}
-
-		public void AddAllowedDroppedType (Type newType){
-			if (AllowedDroppedTypes == null)
-				AllowedDroppedTypes = new List<Type> ();
-			AllowedDroppedTypes.Add (newType);
-			NotifyValueChanged ("AllowDrop", AllowDrop);
+		/// <summary>
+		/// start dragging
+		/// </summary>
+		protected virtual void onStartDrag (object sender, EventArgs e){
+			Debug.WriteLine("DRAG => " + this.ToString());
+			Dragged.Raise (this, null);
+		}
+		/// <summary>
+		///  Occured when dragging ends without dropping
+		/// </summary>
+		protected virtual void onEndDrag (object sender, EventArgs e){
+			IsDragged = false;
+			Debug.WriteLine("END DRAG => " + this.ToString());
+		}
+		/// <summary>
+		/// Dragging end with a dropping
+		/// </summary>
+		protected virtual void onDrop (object sender, EventArgs e){
+			IsDragged = false;
+			Debug.WriteLine("DROPPED => " + this.ToString());
+			Dropped.Raise (this, null);
 		}
 		#endregion
 
@@ -1479,6 +1514,9 @@ namespace Crow
 		}
 		public virtual void onMouseMove(object sender, MouseMoveEventArgs e)
 		{
+			if (AllowDrag & !IsDragged & IsActive)
+				IsDragged = true;
+
 			//bubble event to the top
 			GraphicObject p = Parent as GraphicObject;
 			if (p != null)
@@ -1513,6 +1551,18 @@ namespace Crow
 			MouseDown.Raise (this, e);
 		}
 		public virtual void onMouseUp(object sender, MouseButtonEventArgs e){
+			if (IsDragged){
+				bool dropOK = false;
+				if (currentInterface.HoverWidget!=null) {
+					if (currentInterface.HoverWidget.AllowDrop)
+						dropOK = true;
+				}
+				if (dropOK)
+					onDrop (this, null);
+				else
+					onEndDrag (this, null);
+			}
+
 			//bubble event to the top
 			GraphicObject p = Parent as GraphicObject;
 			if (p != null)
