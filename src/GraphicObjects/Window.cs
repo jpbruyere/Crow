@@ -171,7 +171,33 @@ namespace Crow
 //		} 
 		#endregion
 
+		public void Raise (){
+			Group g = LogicalParent as Group;
+			if (g != null) {
+				g.PutWidgetOnTop (this);
+				return;
+			}
+			Interface i = LogicalParent as Interface;
+			if (i != null)
+				i.PutOnTop (this);
+		}
+
 		#region GraphicObject Overrides
+		protected override void onFocused (object sender, EventArgs e)
+		{
+			if (Interface.RaiseWhenFocused)
+				this.Raise ();
+
+			base.onFocused (sender, e);
+		}
+		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
+		{
+			if (Interface.FocusOnHover && !CurrentInterface.focusGiven) {
+				CurrentInterface.FocusedWidget = this;
+				CurrentInterface.focusGiven = true;
+			}
+			base.onMouseEnter (sender, e);
+		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);

@@ -96,6 +96,8 @@ namespace Crow
 		public static string CrowConfigRoot;
 		/// <summary>If true, mouse focus is given when mouse is over control</summary>
 		public static bool FocusOnHover = false;
+		/// <summary>Raise widget when it got focus </summary>
+		public static bool RaiseWhenFocused = true;
 		/// <summary> Threshold to catch borders for sizing </summary>
 		public static int BorderThreshold = 5;
 		/// <summary>Double click threshold in milisecond</summary>
@@ -129,6 +131,11 @@ namespace Crow
 		internal static Interface CurrentInterface;
 		internal Stopwatch clickTimer = new Stopwatch();
 		internal GraphicObject eligibleForDoubleClick = null;
+		/// <summary>
+		/// each time a processMouseEvent is called at the top level, the focusGiven is set to false, and if while bubbling up the event
+		/// give the focus to a new widget, this boolean is set to true to prevent giving focus multiple times for a single mouse event.
+		/// </summary>
+		internal bool focusGiven = false;
 		#endregion
 
 		#region Events
@@ -738,6 +745,8 @@ namespace Crow
 		/// <returns>true if mouse is in the interface</returns>
 		public bool ProcessMouseMove(int x, int y)
 		{
+			focusGiven = false;
+
 			int deltaX = x - Mouse.X;
 			int deltaY = y - Mouse.Y;
 			Mouse.X = x;
@@ -802,8 +811,6 @@ namespace Crow
 					GraphicObject g = GraphicTree [i];
 					if (g.MouseIsIn (e.Position)) {
 						g.checkHoverWidget (e);
-						if (g is Window)
-							PutOnTop (g);
 						return true;
 					}
 				}
@@ -818,6 +825,8 @@ namespace Crow
 		/// <param name="button">Button index</param>
 		public bool ProcessMouseButtonUp(int button)
 		{
+			focusGiven = false;
+
 			Mouse.DisableBit (button);
 			MouseButtonEventArgs e = new MouseButtonEventArgs () { Mouse = Mouse };
 
@@ -841,13 +850,15 @@ namespace Crow
 		/// <param name="button">Button index</param>
 		public bool ProcessMouseButtonDown(int button)
 		{
+			focusGiven = false;
+
 			Mouse.EnableBit (button);
 			MouseButtonEventArgs e = new MouseButtonEventArgs () { Mouse = Mouse };
 
 			if (HoverWidget == null)
 				return false;
 
-			HoverWidget.onMouseDown(HoverWidget,new BubblingMouseButtonEventArg(e));
+			HoverWidget.onMouseDown(HoverWidget, e);
 
 			if (FocusedWidget == null)
 				return true;

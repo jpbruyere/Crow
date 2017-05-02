@@ -97,7 +97,6 @@
     <Compile Include="src\GraphicObjects\ComboBox.cs" />
     <Compile Include="src\GraphicObjects\GroupBox.cs" />
     <Compile Include="src\GraphicObjects\ScrollBar.cs" />
-    <Compile Include="src\BubblingMouseButtonEventArgs.cs" />
     <Compile Include="src\SolidColor.cs" />
     <Compile Include="src\Gradient.cs" />
     <Compile Include="src\Fill\Fill.cs" />

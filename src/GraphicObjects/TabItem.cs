@@ -140,7 +140,7 @@ namespace Crow
 		#region Mouse Handling
 		public override bool MouseIsIn (Point m)
 		{
-			if (!Visible)
+			if (!(Visible & IsEnabled) || IsDragged)
 				return false;
 
 			bool mouseIsInTitle = TabTitle.ScreenCoordinates (TabTitle.Slot).ContainsOrIsEqual (m);

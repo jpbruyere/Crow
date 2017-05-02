@@ -188,6 +188,9 @@ namespace Crow
 		protected object dataSource;
 		string style;
 		object tag;
+		bool isDragged;
+		bool allowDrag;
+
 		#endregion
 
 		#region public fields
@@ -1008,6 +1011,45 @@ namespace Crow
 			return false;
 		}
 
+		#region Drag&Drop
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public virtual bool AllowDrag {
+			get { return allowDrag; }
+			set {
+				if (allowDrag == value)
+					return;
+				allowDrag = value;
+				NotifyValueChanged ("AllowDrag", allowDrag);
+			}
+		}
+
+		public List<Type> AllowedDroppedTypes;
+
+		[XmlIgnore]public virtual bool AllowDrop {
+			get { return AllowedDroppedTypes?.Count>0; }
+		}
+		[XmlIgnore]public virtual bool IsDragged {
+			get { return isDragged; }
+			set {
+				if (isDragged == value)
+					return;
+				isDragged = value;
+
+				if (isDragged)
+					currentInterface.HoverWidget = null;
+
+				NotifyValueChanged ("IsDrag", IsDragged);
+			}
+		}
+
+		public void AddAllowedDroppedType (Type newType){
+			if (AllowedDroppedTypes == null)
+				AllowedDroppedTypes = new List<Type> ();
+			AllowedDroppedTypes.Add (newType);
+			NotifyValueChanged ("AllowDrop", AllowDrop);
+		}
+		#endregion
+
 		#region Queuing
 		/// <summary>
 		/// Register old and new slot for clipping
@@ -1410,7 +1452,7 @@ namespace Crow
 		public virtual bool MouseIsIn(Point m)
 		{
 			try {
-				if (!(Visible & isEnabled))
+				if (!(Visible & isEnabled)||IsDragged)
 					return false;
 				if (ScreenCoordinates (Slot).ContainsOrIsEqual (m)) {
 					Scroller scr = Parent as Scroller;
@@ -1453,12 +1495,9 @@ namespace Crow
 
 			if (CurrentInterface.ActiveWidget == null)
 				CurrentInterface.ActiveWidget = this;
-			if (this.Focusable && !Interface.FocusOnHover) {
-				BubblingMouseButtonEventArg be = e as BubblingMouseButtonEventArg;
-				if (be.Focused == null) {
-					be.Focused = this;
-					CurrentInterface.FocusedWidget = this;
-				}
+			if (this.Focusable && !(Interface.FocusOnHover || currentInterface.focusGiven)) {
+				CurrentInterface.FocusedWidget = this;
+				currentInterface.focusGiven = true;
 			}
 			//bubble event to the top
 			GraphicObject p = Parent as GraphicObject;
