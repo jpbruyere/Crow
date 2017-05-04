@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <DocksView Background="Jet" Margin = "0">
-	<DockingView Focusable="true" Caption="View 1" Width="100" Height="100"/>
-	<DockingView Focusable="true" Resizable = "true" Caption="View 2" Width="100" Height="100"/>
-	<DockingView Focusable="true" Resizable = "true" Caption="View 3" Width="100" Height="100"/>
-	<DockingView Focusable="true" Resizable = "true" Caption="View 4" Width="100" Height="100"/>
+	<DockingView Focusable="true" Caption="View 1" Width="100" Height="100"><GraphicObject Background="Green"/></DockingView>
+	<DockingView Focusable="true" Resizable = "true" Caption="View 2" Width="100" Height="100"><GraphicObject Background="Blue"/></DockingView>
+	<DockingView Focusable="true" Resizable = "true" Caption="View 3" Width="100" Height="100"><GraphicObject Background="Yellow"/></DockingView>
+	<DockingView Focusable="true" Resizable = "true" Caption="View 4" Width="100" Height="100"><GraphicObject Background="Black"/></DockingView>
 </DocksView>
