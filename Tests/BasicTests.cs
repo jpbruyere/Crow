@@ -39,7 +39,7 @@ namespace Tests
 	class BasicTests : CrowWindow
 	{
 		public BasicTests ()
-			: base(800, 600,"test: press <F3> to toogle test files")
+			: base(1600, 900,"test: press <F3> to toogle test files")
 		{
 		}
 

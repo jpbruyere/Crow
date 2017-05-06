@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{4B57740A-75FB-4978-A8E8-8B1793B7474F}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>testDrm</RootNamespace>
+    <AssemblyName>testDrm</AssemblyName>
+    <ReleaseVersion>0.5</ReleaseVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <OutputPath>$(SolutionDir)build/$(Configuration)</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)build/obj/$(Configuration)</IntermediateOutputPath>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="Execute" command="${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
+    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
+    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="Main.cs" />
+    <Compile Include="src\Linux\Bindings\Drm.cs" />
+    <Compile Include="src\Linux\Bindings\Evdev.cs" />
+    <Compile Include="src\Linux\Bindings\Gbm.cs" />
+    <Compile Include="src\Linux\Bindings\Kms.cs" />
+    <Compile Include="src\Linux\Bindings\Libc.cs" />
+    <Compile Include="src\Linux\Bindings\LibInput.cs" />
+    <Compile Include="src\Linux\Bindings\Poll.cs" />
+    <Compile Include="src\Linux\Bindings\Terminal.cs" />
+    <Compile Include="src\Linux\Bindings\Udev.cs" />
+    <Compile Include="src\BlittableValueType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\DisplayResolution.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\Egl.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\DrmDevice.cs" />
+    <Compile Include="src\Linux\DefaultCursor.cs" />
+    <Compile Include="src\MouseCursor.cs" />
+    <Compile Include="src\WindowIcon.cs" />
+    <Compile Include="Mono.Cairo\Antialias.cs" />
+    <Compile Include="Mono.Cairo\Cairo.cs" />
+    <Compile Include="Mono.Cairo\CairoDebug.cs" />
+    <Compile Include="Mono.Cairo\Color.cs" />
+    <Compile Include="Mono.Cairo\Content.cs" />
+    <Compile Include="Mono.Cairo\Context.cs" />
+    <Compile Include="Mono.Cairo\DirectFBSurface.cs" />
+    <Compile Include="Mono.Cairo\Distance.cs" />
+    <Compile Include="Mono.Cairo\Extend.cs" />
+    <Compile Include="Mono.Cairo\FillRule.cs" />
+    <Compile Include="Mono.Cairo\Filter.cs" />
+    <Compile Include="Mono.Cairo\FontExtents.cs" />
+    <Compile Include="Mono.Cairo\FontFace.cs" />
+    <Compile Include="Mono.Cairo\FontOptions.cs" />
+    <Compile Include="Mono.Cairo\FontSlant.cs" />
+    <Compile Include="Mono.Cairo\FontType.cs" />
+    <Compile Include="Mono.Cairo\FontWeight.cs" />
+    <Compile Include="Mono.Cairo\Format.cs" />
+    <Compile Include="Mono.Cairo\GlitzSurface.cs" />
+    <Compile Include="Mono.Cairo\Glyph.cs" />
+    <Compile Include="Mono.Cairo\Gradient.cs" />
+    <Compile Include="Mono.Cairo\HintMetrics.cs" />
+    <Compile Include="Mono.Cairo\HintStyle.cs" />
+    <Compile Include="Mono.Cairo\ImageSurface.cs" />
+    <Compile Include="Mono.Cairo\LineCap.cs" />
+    <Compile Include="Mono.Cairo\LineJoin.cs" />
+    <Compile Include="Mono.Cairo\LinearGradient.cs" />
+    <Compile Include="Mono.Cairo\Matrix.cs" />
+    <Compile Include="Mono.Cairo\NativeMethods.cs" />
+    <Compile Include="Mono.Cairo\Operator.cs" />
+    <Compile Include="Mono.Cairo\PSSurface.cs" />
+    <Compile Include="Mono.Cairo\Path.cs" />
+    <Compile Include="Mono.Cairo\Pattern.cs" />
+    <Compile Include="Mono.Cairo\PatternType.cs" />
+    <Compile Include="Mono.Cairo\PdfSurface.cs" />
+    <Compile Include="Mono.Cairo\Point.cs" />
+    <Compile Include="Mono.Cairo\PointD.cs" />
+    <Compile Include="Mono.Cairo\RadialGradient.cs" />
+    <Compile Include="Mono.Cairo\Rectangle.cs" />
+    <Compile Include="Mono.Cairo\Region.cs" />
+    <Compile Include="Mono.Cairo\ScaledFont.cs" />
+    <Compile Include="Mono.Cairo\SolidPattern.cs" />
+    <Compile Include="Mono.Cairo\Status.cs" />
+    <Compile Include="Mono.Cairo\SubpixelOrder.cs" />
+    <Compile Include="Mono.Cairo\Surface.cs" />
+    <Compile Include="Mono.Cairo\SurfacePattern.cs" />
+    <Compile Include="Mono.Cairo\SurfaceType.cs" />
+    <Compile Include="Mono.Cairo\SvgSurface.cs" />
+    <Compile Include="Mono.Cairo\SvgVersion.cs" />
+    <Compile Include="Mono.Cairo\TextExtents.cs" />
+    <Compile Include="Mono.Cairo\Win32Surface.cs" />
+    <Compile Include="Mono.Cairo\XcbSurface.cs" />
+    <Compile Include="Mono.Cairo\XlibSurface.cs" />
+    <Compile Include="Mono.Cairo\Device.cs" />
+    <Compile Include="Mono.Cairo\GLSurface.cs" />
+    <Compile Include="Mono.Cairo\GLXDevice.cs" />
+    <Compile Include="Mono.Cairo\WGLDevice.cs" />
+    <Compile Include="Mono.Cairo\EGLDevice.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\" />
+    <Folder Include="Mono.Cairo\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Linux\LinuxFactory.cs" />
+    <None Include="src\Linux\LinuxGraphicsContext.cs" />
+    <None Include="src\Linux\LinuxInput.cs" />
+    <None Include="src\Linux\LinuxJoystick.cs">
+      <SubType>Code</SubType>
+    </None>
+    <None Include="src\Linux\LinuxKeyboardTTY.cs" />
+    <None Include="src\Linux\LinuxNativeWindow.cs" />
+    <None Include="src\Linux\LinuxWindowInfo.cs" />
+    <None Include="src\Linux\LinuxDisplayDriver.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Crow.csproj">
+      <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
+      <Name>Crow</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

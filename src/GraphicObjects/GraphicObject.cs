@@ -136,8 +136,9 @@ namespace Crow
 		public Rectangle LastPaintedSlot;
 		/// <summary>Prevent requeuing multiple times the same widget</summary>
 		public bool IsQueueForRedraw = false;
-		/// <summary>drawing Cache, if null, a redraw is done, cached or not</summary>
+		/// <summary>drawing Cache bitmap</summary>
 		public byte[] bmp;
+		/// <summary>if true, content has to be recreated</summary>
 		public bool IsDirty = true;
 		/// <summary>
 		/// This size is computed on each child' layout changes.

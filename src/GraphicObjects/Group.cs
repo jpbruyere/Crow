@@ -29,7 +29,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
 using Cairo;
-using OpenTK.Input;
 using System.Diagnostics;
 using System.Reflection;
 

@@ -89,7 +89,7 @@ namespace Crow
 		#endregion
 
 		#region ctor
-		public CrowWindow(int _width = 800, int _height = 600, string _title="Crow",
+		public CrowWindow(int _width = 1600, int _height = 900, string _title="Crow",
 			int colors = 32, int depth = 24, int stencil = 0, int samples = 1,
 			int major=3, int minor=3)
 			: this(_width, _height, new OpenTK.Graphics.GraphicsMode(colors, depth, stencil, samples),
