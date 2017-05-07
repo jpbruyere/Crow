@@ -33,14 +33,43 @@ using OpenTK.Platform.Egl;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace testDrm
+namespace Crow.Linux
 {
-	public class DrmDevice : IDisposable
+	public class Application : IDisposable
 	{
+		#region Crow interface
+		public Interface CrowInterface;
+		public bool mouseIsInInterface = false;
+
+		void interfaceThread()
+		{
+			while (CrowInterface.ClientRectangle.Size.Width == 0)
+				Thread.Sleep (5);
+
+			while (true) {
+				CrowInterface.Update ();
+				Thread.Sleep (1);
+			}
+		}
+		void initCrow (){
+			CrowInterface = new Interface ();
+
+			Thread t = new Thread (interfaceThread);
+			t.IsBackground = true;
+			t.Start ();
+
+			updateCrowInterfaceBounds ();
+		}
+		void updateCrowInterfaceBounds () {
+			CrowInterface.ProcessResize (new Size (originalMode.hdisplay, originalMode.vdisplay));
+		}
+		#endregion
+
 		volatile bool run = true;
 
-		int fd = 0;
+		int fd_gpu = 0;
 		int major, minor;
+
 		IntPtr gbm_device, gbm_surface, egl_display, egl_config, egl_surface, egl_ctx;
 
 		int r, g, b, a;
@@ -52,9 +81,8 @@ namespace testDrm
 
 		ModeInfo originalMode;
 
-		public IntPtr Connector;
-		public IntPtr Crtc;
-		public IntPtr Encoder;
+		public IntPtr Connector, Crtc, Encoder;
+		unsafe ModeCrtc* saved_crtc;
 		unsafe ModeConnector* pConnector { get { return (ModeConnector*)Connector; } }
 		unsafe ModeCrtc* pCrtc { get { return (ModeCrtc*)Crtc; } }
 		unsafe ModeEncoder* pEncoder { get { return (ModeEncoder*)Encoder; } }
@@ -62,18 +90,19 @@ namespace testDrm
 		Cairo.EGLDevice cairoDev;
 		Cairo.GLSurface cairoSurf;
 
-		public DrmDevice(string gpu_path = "/dev/dri/card0"){
-
+		public Application(string gpu_path = "/dev/dri/card0"){
+			DestroyFB = HandleDestroyFB;
+			DestroyFBPtr = Marshal.GetFunctionPointerForDelegate(DestroyFB);
 			PageFlip = HandlePageFlip;
-			PageFlipPtr = Marshal.GetFunctionPointerForDelegate(PageFlip);		
+			PageFlipPtr = Marshal.GetFunctionPointerForDelegate(PageFlip);
 
 			gbm_device = IntPtr.Zero;
 			egl_display = IntPtr.Zero;
 
-			fd = Libc.open(gpu_path, OpenFlags.ReadWrite | OpenFlags.CloseOnExec);
-			if (fd < 0)
+			fd_gpu = Libc.open(gpu_path, OpenFlags.ReadWrite | OpenFlags.CloseOnExec);
+			if (fd_gpu < 0)
 				throw new NotSupportedException("[KMS] Failed to open gpu");			
-			Console.WriteLine("[KMS] GPU '{0}' opened as fd:{1}", gpu_path, fd);
+			Console.WriteLine("[KMS] GPU '{0}' opened as fd:{1}", gpu_path, fd_gpu);
 
 			initDrm ();
 
@@ -84,17 +113,19 @@ namespace testDrm
 			initCairo ();
 
 			initInput ();
+
+			initCrow ();
 		}
 
 		#region init
 		unsafe void initDrm(){			
-			ModeRes* resources = (ModeRes*)Drm.ModeGetResources(fd);
+			ModeRes* resources = (ModeRes*)Drm.ModeGetResources(fd_gpu);
 			if (resources == null)
 				throw new NotSupportedException("[KMS] Drm.ModeGetResources failed.");
 
 			ModeConnector* connector = null;
 			for (int i = 0; i < resources->count_connectors; i++) {
-				connector = (ModeConnector*)Drm.ModeGetConnector (fd, *(resources->connectors + i));
+				connector = (ModeConnector*)Drm.ModeGetConnector (fd_gpu, *(resources->connectors + i));
 				if (connector != null) {
 					if (connector->connection == ModeConnection.Connected && connector->count_encoders > 0)
 						break;
@@ -106,14 +137,15 @@ namespace testDrm
 				throw new NotSupportedException("[KMS] No connected screen found");
 
 			Connector = (IntPtr)connector;
-			Encoder = Drm.ModeGetEncoder (fd, connector->encoder_id);
-			Crtc = Drm.ModeGetCrtc(fd, pEncoder->crtc_id);
+			Encoder = Drm.ModeGetEncoder (fd_gpu, connector->encoder_id);
+			Crtc = Drm.ModeGetCrtc(fd_gpu, pEncoder->crtc_id);
+			saved_crtc = (ModeCrtc*) Drm.ModeGetCrtc (fd_gpu, pEncoder->crtc_id);
 
 			originalMode = pCrtc->mode;
 			Console.WriteLine ("[DRM]: current mode = {0} X {1} at {2} Hz", originalMode.hdisplay, originalMode.vdisplay, originalMode.vrefresh);
 		}
 		void initGbm (){
-			gbm_device = Gbm.CreateDevice(fd);
+			gbm_device = Gbm.CreateDevice(fd_gpu);
 			if (gbm_device == IntPtr.Zero)
 				throw new NotSupportedException("[GBM] Failed to create GBM device");			
 
@@ -160,6 +192,7 @@ namespace testDrm
 			Console.WriteLine ("[EGL] Version: " +  Marshal.PtrToStringAuto (Egl.QueryString (egl_display, Egl.VERSION)));
 			Console.WriteLine ("[EGL] Vendor: " + Marshal.PtrToStringAuto (Egl.QueryString (egl_display, Egl.VENDOR)));
 			Console.WriteLine ("[EGL] Extensions: " + Marshal.PtrToStringAuto (Egl.QueryString (egl_display, Egl.EXTENSIONS)));
+			Console.WriteLine ("[EGL] Extensions: " + Marshal.PtrToStringAuto (Egl.QueryString(IntPtr.Zero, Egl.EXTENSIONS)));
 
 			if (!Egl.ChooseConfig(egl_display, attribList, configs, configs.Length, out num_configs) || num_configs == 0)
 				throw new NotSupportedException(String.Format("Failed to retrieve GraphicsMode, error {0}", Egl.GetError()));
@@ -193,9 +226,9 @@ namespace testDrm
 			cursor_default = CreateCursor(gbm_device, Cursors.Default);
 			cursor_empty = CreateCursor(gbm_device, Cursors.Empty);
 
-			SetCursor(MouseCursor.Default);
+			SetCursor(Cursors.Default);
 			unsafe {				
-				Drm.MoveCursor (fd, pEncoder->crtc_id, 50, 50);
+				Drm.MoveCursor (fd_gpu, pEncoder->crtc_id, 0, 0);
 			}
 		}
 
@@ -284,48 +317,92 @@ namespace testDrm
 			if (bo != BufferObject.Zero)
 			{
 				unsafe {
-					Drm.SetCursor (fd, pEncoder->crtc_id,
+					Console.WriteLine ("Cursor ({0},{1})", cursor.X, cursor.Y);
+					Drm.SetCursor (fd_gpu, pEncoder->crtc_id,
 						bo.Handle, bo.Width, bo.Height, cursor.X, cursor.Y);
 				}
 			}
 		}
 		#endregion
-		int x, y;
 
-		void drawR (Cairo.Context ctx, int inc, double r, double g, double b){
-			ctx.Rectangle (x+inc, y+inc, 200, 200);
-			ctx.SetSourceRGB (r, g, b);
-			ctx.Fill ();
+		int getFbFromBo (BufferObject bo){
+			int width = bo.Width;
+			int height = bo.Height;
+			int bpp = 32;
+			int depth = 24;
+			int stride = bo.Stride;
+			int hndBO = bo.Handle;
+
+			int fb;
+			int ret = Drm.ModeAddFB (fd_gpu, width, height,(byte)depth, (byte)bpp, stride, hndBO, out fb);
+			if (ret != 0)
+				throw new Exception ("[DRM]: ModeAddFB failed.");
+			bo.SetUserData ((IntPtr)fb, DestroyFBPtr);
+			return fb;
 		}
-		public void RenderingLoop(){
-			while (run){
+
+		public void Run(){
+			BufferObject bo;
+			int fb;
+
+			PollFD fds = new PollFD();
+			fds.fd = fd_gpu;
+			fds.events = PollFlags.In;
+
+			EventContext evctx = new EventContext();
+			evctx.version = EventContext.Version;
+			evctx.page_flip_handler = PageFlipPtr;
+
+			int timeout = -1;//block ? -1 : 0;
+
+			using (Cairo.Context ctx = new Cairo.Context (cairoSurf)) {
+				ctx.Rectangle (0, 0, originalMode.hdisplay, originalMode.vdisplay);
+				ctx.SetSourceRGB (0, 0, 0);
+				ctx.Fill ();
+			}
+
+			cairoSurf.SwapBuffers ();
+
+			bo = Gbm.LockFrontBuffer (gbm_surface);
+			fb = getFbFromBo (bo);
+
+			SetScanoutRegion (fb);
+
+			while (run){				
+				BufferObject next_bo;
+				bool update = false;
+
 				if (updateMousePos) {
 					lock (Sync) {
 						updateMousePos = false;
 						unsafe {	
-							Drm.MoveCursor (fd, pEncoder->crtc_id, MouseX, MouseY);
+							Drm.MoveCursor (fd_gpu, pEncoder->crtc_id, MouseX-8, MouseY-4);
 						}
 					}
 				}
 
-				if (x > 700) {
-					x = y = 0;
-				} else {
-					x+=1;
-					y+=1;
+				if (Monitor.TryEnter (CrowInterface.RenderMutex)) {
+					if (CrowInterface.IsDirty) {
+						CrowInterface.IsDirty = false;
+						update = true;
+						using (Cairo.Context ctx = new Cairo.Context (cairoSurf)) {
+							using (Cairo.Surface d = new Cairo.ImageSurface (CrowInterface.dirtyBmp, Cairo.Format.Argb32,
+								originalMode.hdisplay, originalMode.vdisplay, originalMode.hdisplay * 4)) {
+								ctx.SetSourceSurface (d, 0, 0);
+								ctx.Operator = Cairo.Operator.Source;
+								ctx.Paint ();
+							}
+						}
+					}
+					Monitor.Exit (CrowInterface.RenderMutex);
 				}
-				using (Cairo.Context ctx = new Cairo.Context (cairoSurf)) {
-					ctx.Rectangle (0, 0, 1024, 780);
-					ctx.SetSourceRGB (0, 0, 1);
-					ctx.Fill ();
-					drawR (ctx, 0, 0, 1, 0);
-				}
+
+				if (!update)
+					continue;
+				update = false;
+
 				cairoSurf.Flush ();
-
 				cairoSurf.SwapBuffers ();
-
-//				if (!Egl.SwapBuffers(egl_display, egl_surface))
-//					throw new NotSupportedException(string.Format("Failed to swap buffers for context {0} current. Error: {1}", gbm_device, Egl.GetError()));
 
 				if (Gbm.HasFreeBuffers (gbm_surface) == 0)
 					throw new Exception ("[GBM]: Out of free buffers.");
@@ -334,58 +411,47 @@ namespace testDrm
 				if (next_bo == BufferObject.Zero)
 					throw new Exception ("[GBM]: Failed to lock front buffer.");
 
-				int width = next_bo.Width;
-				int height = next_bo.Height;
-				int bpp = 32;
-				int depth = 24;
-				int stride = next_bo.Stride;
-				int hndBO = next_bo.Handle;
+				fb = getFbFromBo (next_bo);
 
-				int next_fb;
-				int ret = Drm.ModeAddFB (fd, width, height,(byte)depth, (byte)bpp, stride, hndBO, out next_fb);
-				if (ret != 0)
-					throw new Exception ("[DRM]: ModeAddFB failed.");
-
-				SetScanoutRegion (next_fb);
-
-				is_flip_queued = true;
 				unsafe{
-					ret = Drm.ModePageFlip (fd, pEncoder->crtc_id, next_fb, PageFlipFlags.FlipEvent, IntPtr.Zero);
-				}
-				if (ret < 0)
-					throw new Exception ("[DRM] Failed to enqueue framebuffer flip.");
+					int is_flip_queued = 1;
 
-				PollFD fds = new PollFD();
-				fds.fd = fd;
-				fds.events = PollFlags.In;
+					while (Drm.ModePageFlip (fd_gpu, pEncoder->crtc_id, fb, PageFlipFlags.FlipEvent, ref is_flip_queued) < 0) {
+						//Console.WriteLine ("[DRM] Failed to enqueue framebuffer flip.");				
+						continue;
+					}
 
-				EventContext evctx = new EventContext();
-				evctx.version = EventContext.Version;
-				evctx.page_flip_handler = PageFlipPtr;
+					while (is_flip_queued != 0)
+					{
+						fds.revents = 0;
+						if (Libc.poll (ref fds, 1, timeout) < 0)
+							break;						
 
-				int timeout = -1;//block ? -1 : 0;
+						if ((fds.revents & (PollFlags.Hup | PollFlags.Error)) != 0)
+							break;
 
-				while (is_flip_queued)
-				{
-					fds.revents = 0;
-					if (Libc.poll(ref fds, 1, timeout) < 0)
-						break;
+						if ((fds.revents & PollFlags.In) != 0)
+							Drm.HandleEvent (fd_gpu, ref evctx);
+						else
+							break;
+					}
+//					if (is_flip_queued != 0)
+//						Console.WriteLine ("flip canceled");
+					
+					Gbm.ReleaseBuffer (gbm_surface, bo);
+					Drm.ModeRmFB(fd_gpu, fb);
 
-					if ((fds.revents & (PollFlags.Hup | PollFlags.Error)) != 0)
-						break;
+					bo = next_bo;
+					next_bo = BufferObject.Zero;
 
-					if ((fds.revents & PollFlags.In) != 0)
-						Drm.HandleEvent(fd, ref evctx);
-					else
-						break;
 				}
 			}
 		}
 
 		#region rendering
-		BufferObject bo, next_bo;
-		int fb, next_fb;
-		bool is_flip_queued;
+
+
+
 		// We only support a SwapInterval of 0 (immediate)
 		// or 1 (vsynced).
 		// Todo: add support for SwapInterval of -1 (adaptive).
@@ -395,112 +461,23 @@ namespace testDrm
 		readonly IntPtr PageFlipPtr;
 		readonly PageFlipCallback PageFlip;
 
-		void HandlePageFlip(int fd,	int sequence, int tv_sec, int tv_usec, IntPtr user_data)
+		readonly IntPtr DestroyFBPtr;
+		readonly DestroyUserDataCallback DestroyFB;
+
+		void HandlePageFlip(int fd,	int sequence, int tv_sec, int tv_usec, ref int user_data)
 		{
-			is_flip_queued = false;
-			if (fb != 0)
-				Drm.ModeRmFB (fd, fb);
-			fb = next_fb;
-			next_fb = 0;
-			if (bo != BufferObject.Zero)
-				Gbm.ReleaseBuffer (gbm_surface, bo);
-			bo = next_bo;
-			next_bo = BufferObject.Zero;
+			user_data = 0;
 		}
 
-		static readonly DestroyUserDataCallback DestroyFB = HandleDestroyFB;
-		static void HandleDestroyFB(BufferObject bo, IntPtr data)
+
+		void HandleDestroyFB(BufferObject bo, IntPtr data)
 		{
+			Console.WriteLine ("DestroyFB");
 			IntPtr gbm = bo.Device;
 			int fb = data.ToInt32();
-			Debug.Print("[KMS] Destroying framebuffer {0}", fb);
 
 			if (fb != 0)
-				Drm.ModeRmFB(Gbm.DeviceGetFD(gbm), fb);
-		}
-
-		public void SwapBuffers()
-		{
-			if (!Egl.SwapBuffers(egl_display, egl_surface))
-				throw new NotSupportedException(string.Format("Failed to swap buffers for context {0} current. Error: {1}", gbm_device, Egl.GetError()));
-			
-			if (is_flip_queued)
-			{
-				// Todo: if we don't wait for the page flip,
-				// we drop all rendering buffers and get a crash
-				// in Egl.SwapBuffers(). We need to fix that
-				// before we can disable vsync.
-				WaitFlip(true); // WaitFlip(SwapInterval > 0)
-				if (is_flip_queued)
-				{
-					Debug.Print("[KMS] Dropping frame");
-					return;
-				}
-			}
-
-			next_bo = Gbm.LockFrontBuffer (gbm_surface);
-			int fb = GetFramebuffer(next_bo);
-			QueueFlip(fb);
-		}
-
-		public void Update()
-		{
-			WaitFlip(true);
-
-			if (!Egl.SwapBuffers(egl_display, egl_surface))
-				throw new NotSupportedException(string.Format("Failed to swap buffers for context {0} current. Error: {1}", gbm_device, Egl.GetError()));
-
-			bo = Gbm.LockFrontBuffer (gbm_surface);
-			int fb = GetFramebuffer(bo);
-			SetScanoutRegion(fb);
-		}
-
-
-		void WaitFlip(bool block)
-		{
-			PollFD fds = new PollFD();
-			fds.fd = fd;
-			fds.events = PollFlags.In;
-
-			EventContext evctx = new EventContext();
-			evctx.version = EventContext.Version;
-			evctx.page_flip_handler = PageFlipPtr;
-
-			int timeout = block ? -1 : 0;
-
-			while (is_flip_queued)
-			{
-				fds.revents = 0;
-				if (Libc.poll(ref fds, 1, timeout) < 0)
-					break;
-
-				if ((fds.revents & (PollFlags.Hup | PollFlags.Error)) != 0)
-					break;
-
-				if ((fds.revents & PollFlags.In) != 0)
-					Drm.HandleEvent(fd, ref evctx);
-				else
-					break;
-			}
-
-			// Page flip has taken place, update buffer objects
-			if (!is_flip_queued)
-			{				
-				Gbm.ReleaseBuffer(gbm_surface, bo);
-				bo = next_bo;
-			}
-		}
-
-		void QueueFlip(int buffer)
-		{
-			unsafe
-			{
-				int ret = Drm.ModePageFlip (fd, pEncoder->crtc_id, buffer, PageFlipFlags.FlipEvent, IntPtr.Zero);
-				if (ret < 0)
-					Debug.Print("[KMS] Failed to enqueue framebuffer flip. Error: {0}", ret);
-
-				is_flip_queued = true;
-			}
+				Drm.ModeRmFB(fd_gpu, fb);
 		}
 
 		void SetScanoutRegion(int buffer)
@@ -511,59 +488,12 @@ namespace testDrm
 				int connector_id = pConnector->connector_id;
 				int crtc_id = pEncoder->crtc_id;
 
-				int x = 0;
-				int y = 0;
-				int connector_count = 1;
-				int ret = Drm.ModeSetCrtc(fd, crtc_id, buffer, x, y, &connector_id, connector_count, mode);
+				int ret = Drm.ModeSetCrtc (fd_gpu, crtc_id, buffer, 0, 0, &connector_id, 1, mode);
 
 				if (ret != 0)
-				{
-					Debug.Print("[KMS] Drm.ModeSetCrtc{0}, {1}, {2}, {3}, {4:x}, {5}, {6:x}) failed. Error: {7}",
-						fd, crtc_id, buffer, x, y, (IntPtr)connector_id, connector_count, (IntPtr)mode, ret);
-				}
+					Debug.Print("[KMS] Drm.ModeSetCrtc{0}, {1}, {2} failed. Error: {3}",
+						fd_gpu, crtc_id, buffer, ret);				
 			}
-		}
-			
-		int GetFramebuffer(BufferObject bo)
-		{
-			if (bo == BufferObject.Zero)
-				goto fail;
-
-			int bo_handle = bo.Handle;
-			if (bo_handle == 0)
-			{
-				Debug.Print("[KMS] Gbm.BOGetHandle({0:x}) failed.", bo);
-				goto fail;
-			}
-
-			int width = bo.Width;
-			int height = bo.Height;
-			int bpp = 32;
-			int depth = 24;
-			int stride = bo.Stride;
-
-			if (width == 0 || height == 0 || bpp == 0)
-			{
-				Debug.Print("[KMS] Invalid framebuffer format: {0}x{1} {2} {3} {4}",
-					width, height, stride, bpp, depth);
-				goto fail;
-			}
-
-			int buffer;
-			int ret = Drm.ModeAddFB (fd, width, height,(byte)depth, (byte)bpp, stride, bo_handle,out buffer);
-			if (ret != 0)
-			{
-				Debug.Print("[KMS] Drm.ModeAddFB({0}, {1}, {2}, {3}, {4}, {5}, {6}) failed. Error: {7}",
-					fd, width, height, depth, bpp, stride, bo_handle, ret);
-				goto fail;
-			}
-
-			bo.SetUserData((IntPtr)buffer, DestroyFB);
-			return buffer;
-
-			fail:
-			Debug.Print("[Error] Failed to create framebuffer.");
-			return -1;
 		}
 		#endregion
 
@@ -574,14 +504,14 @@ namespace testDrm
 			cairoSurf.Dispose ();
 			cairoDev.Dispose ();
 
-			if (fb != 0)
-				Drm.ModeRmFB (fd, fb);
-			if (bo != BufferObject.Zero)
-				Gbm.ReleaseBuffer (gbm_surface, bo);			
-			if (next_fb != 0)
-				Drm.ModeRmFB (fd, next_fb);
-			if (next_bo != BufferObject.Zero)
-				Gbm.ReleaseBuffer (gbm_surface, next_bo);			
+//			if (fb != 0)
+//				Drm.ModeRmFB (fd_gpu, fb);
+//			if (bo != BufferObject.Zero)
+//				Gbm.ReleaseBuffer (gbm_surface, bo);			
+//			if (next_fb != 0)
+//				Drm.ModeRmFB (fd_gpu, next_fb);
+//			if (next_bo != BufferObject.Zero)
+//				Gbm.ReleaseBuffer (gbm_surface, next_bo);			
 
 			if (Egl.GetCurrentContext () == egl_ctx) {
 				Console.WriteLine ("destroying context");
@@ -591,23 +521,29 @@ namespace testDrm
 
 			cairoDev.Dispose ();
 
+			unsafe{
+				Drm.ModeSetCrtc (fd_gpu, saved_crtc->crtc_id, saved_crtc->buffer_id,
+					saved_crtc->x, saved_crtc->y, &pConnector->connector_id, 1, &saved_crtc->mode);
+				Drm.ModeFreeCrtc ((IntPtr)saved_crtc);
+			}
+
 			Drm.ModeFreeCrtc (Crtc);
 			Drm.ModeFreeConnector(Connector);
 			Drm.ModeFreeEncoder(Encoder);
-			Libc.close(fd);
+			Libc.close(fd_gpu);
 		}
 		#endregion
 
 		#region tests
 		unsafe void dumpDrmResources(){
-			ModeRes* resources = (ModeRes*)Drm.ModeGetResources(fd);
+			ModeRes* resources = (ModeRes*)Drm.ModeGetResources(fd_gpu);
 			if (resources == null)
 				throw new NotSupportedException("[KMS] Drm.ModeGetResources failed.");
 			Console.WriteLine("[KMS] DRM found {0} connectors", resources->count_connectors);
 
 			Console.WriteLine ("[ENCODERS]");
 			for (int j = 0; j < resources->count_encoders; j++) {							
-				ModeEncoder* e = (ModeEncoder*)Drm.ModeGetEncoder(fd, *(resources->encoders + j));
+				ModeEncoder* e = (ModeEncoder*)Drm.ModeGetEncoder(fd_gpu, *(resources->encoders + j));
 
 				if (e == null)
 					continue;
@@ -620,7 +556,7 @@ namespace testDrm
 			ModeConnector* connector = null;
 			for (int i = 0; i < resources->count_connectors; i++)
 			{
-				connector = (ModeConnector*)Drm.ModeGetConnector(fd, *(resources->connectors + i));
+				connector = (ModeConnector*)Drm.ModeGetConnector(fd_gpu, *(resources->connectors + i));
 				if (connector != null)
 				{
 					Console.WriteLine ("{0}\t{1}\t{2}\t{3}",
@@ -643,68 +579,6 @@ namespace testDrm
 					connector = null;
 				}
 			}
-		}
-
-		unsafe static void GetModes(LinuxDisplay display, DisplayResolution[] modes, out DisplayResolution current)
-		{
-			int mode_count = display.pConnector->count_modes;
-			Console.WriteLine("[KMS] Display supports {0} mode(s)", mode_count);
-			for (int i = 0; i < mode_count; i++)
-			{
-				ModeInfo* mode = display.pConnector->modes + i;
-				if (mode != null)
-				{
-					Console.WriteLine("Mode {0}: {1}x{2} @{3}", i,
-						mode->hdisplay, mode->vdisplay, mode->vrefresh);
-					DisplayResolution res = GetDisplayResolution(mode);
-					modes[i] = res;
-				}
-			}
-
-			if (display.pCrtc->mode_valid != 0)
-			{
-				ModeInfo cmode = display.pCrtc->mode;
-				current = GetDisplayResolution(&cmode);
-			}
-			else
-			{
-				current = GetDisplayResolution(display.pConnector->modes);
-			}
-			Console.WriteLine("Current mode: {0}", current.ToString());
-		}
-		unsafe static DisplayResolution GetDisplayResolution(ModeInfo* mode)
-		{
-			return new DisplayResolution(
-				0, 0,
-				mode->hdisplay, mode->vdisplay,
-				32, // This is actually part of the framebuffer, not the DisplayResolution
-				mode->vrefresh);
-		}
-
-		unsafe static ModeInfo* GetModeInfo(LinuxDisplay display, DisplayResolution resolution)
-		{
-			for (int i = 0; i < display.pConnector->count_modes; i++)
-			{
-				ModeInfo* mode = display.pConnector->modes + i;
-				if (mode != null &&
-					mode->hdisplay == resolution.Width &&
-					mode->vdisplay == resolution.Height)
-				{
-					return mode;
-				}
-			}
-			return null;
-		}
-
-		SurfaceFormat GetSurfaceFormat()
-		{
-			int format;
-			Egl.GetConfigAttrib(egl_display, egl_config,
-				Egl.NATIVE_VISUAL_ID, out format);
-			if (format == 0)
-				throw new Exception ("[KMS] Failed to retrieve EGL visual from GBM surface. Error: " + Egl.GetError());
-
-			return (SurfaceFormat)format;
 		}
 		#endregion
 
@@ -894,12 +768,12 @@ namespace testDrm
 //						HandlePointerAxis(GetMouse(device), LibInput.GetPointerEvent(pevent));
 //						break;
 //
-//					case InputEventType.PointerButton:
-//						HandlePointerButton(GetMouse(device), LibInput.GetPointerEvent(pevent));
-//						break;
+					case InputEventType.PointerButton:
+						handlePointerButton (LibInput.GetPointerEvent(pevent));
+						break;
 
 					case InputEventType.PointerMotion:
-						HandlePointerMotion(LibInput.GetPointerEvent(pevent));
+						handlePointerMotion (LibInput.GetPointerEvent(pevent));
 						break;
 
 //					case InputEventType.PointerMotionAbsolute:
@@ -914,13 +788,49 @@ namespace testDrm
 		int MouseX = 0, MouseY = 0;
 		volatile bool updateMousePos = true;
 
-		void HandlePointerMotion(PointerEvent e)
-		{			
-			MouseX += (int)e.DeltaX;
-			MouseY += (int)e.DeltaY;
-			updateMousePos = true;
+		int roundDelta (double d){
+			return d > 0 ? (int)Math.Ceiling(d) : (int)Math.Floor (d);
 		}
 
+		void handlePointerMotion(PointerEvent e)
+		{
+			MouseX += roundDelta (e.DeltaX);
+			MouseY += roundDelta (e.DeltaY);
+
+			Rectangle bounds = CrowInterface.ClientRectangle;
+			if (MouseX < bounds.Left)
+				MouseX = bounds.Left;
+			else if (MouseX > bounds.Right)
+				MouseX = bounds.Right;
+
+			if (MouseY < bounds.Top)
+				MouseY = bounds.Top;
+			else if (MouseY > bounds.Bottom)
+				MouseY = bounds.Bottom;
+			
+			CrowInterface.ProcessMouseMove (MouseX, MouseY);
+
+			updateMousePos = true;
+		}
+		void handlePointerButton (PointerEvent e)
+		{			
+			int but = 0;
+			switch (e.Button) {
+			case EvdevButton.LEFT:
+				but = 0;
+				break;
+			case EvdevButton.MIDDLE:
+				but = 1;
+				break;
+			case EvdevButton.RIGHT:
+				but = 2;
+				break;
+			}
+			if (e.ButtonState == OpenTK.Platform.Linux.ButtonState.Pressed)
+				CrowInterface.ProcessMouseButtonDown (but);
+			else
+				CrowInterface.ProcessMouseButtonUp (but);
+		}
 		#endregion
 	}
 }

@@ -4,8 +4,9 @@
 //
 // Author:
 //       Stefanos A. <stapostol@gmail.com>
+//		 Bruyère JP	 <jp_bruyere@hotmail.com>
 //
-// Copyright (c) 2006-2014 Stefanos Apostolopoulos
+// Copyright (c) 2006-2017 Stefanos Apostolopoulos
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +33,7 @@ using System.Runtime.InteropServices;
 
 #pragma warning disable 0649 // field is never assigned
 
-namespace OpenTK.Platform.Linux
+namespace Crow.Linux
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     delegate void VBlankCallback(int fd,
@@ -46,7 +47,7 @@ namespace OpenTK.Platform.Linux
         int sequence,
         int tv_sec,
         int tv_usec,
-        IntPtr user_data);
+		ref int user_data);
 
     class Drm
     {
@@ -86,7 +87,7 @@ namespace OpenTK.Platform.Linux
 
         [DllImport(lib, EntryPoint = "drmModePageFlip", CallingConvention = CallingConvention.Cdecl)]
         public static extern int ModePageFlip(int fd, int crtc_id, int fb_id,
-            PageFlipFlags flags, IntPtr user_data);
+			PageFlipFlags flags, ref int user_data);
 
         [DllImport(lib, EntryPoint = "drmModeSetCrtc", CallingConvention = CallingConvention.Cdecl)]
         unsafe public static extern int ModeSetCrtc(int fd, int crtcId, int bufferId,
@@ -97,7 +98,6 @@ namespace OpenTK.Platform.Linux
 
         [DllImport(lib, EntryPoint = "drmModeMoveCursor", CallingConvention = CallingConvention.Cdecl)]
         public static extern int MoveCursor(int fd, int crtcId, int x, int y);
-
     }
 
     enum ModeConnection

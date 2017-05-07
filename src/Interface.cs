@@ -511,28 +511,30 @@ namespace Crow
 						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
 						#endif
 						lock (RenderMutex) {
-							if (IsDirty)
-								DirtyRect += clipping.Bounds;
-							else
-								DirtyRect = clipping.Bounds;
-
-							DirtyRect.Left = Math.Max (0, DirtyRect.Left);
-							DirtyRect.Top = Math.Max (0, DirtyRect.Top);
-							DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
-							DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
-							DirtyRect.Width = Math.Max (0, DirtyRect.Width);
-							DirtyRect.Height = Math.Max (0, DirtyRect.Height);
-
-							if (DirtyRect.Width > 0 && DirtyRect.Height >0) {
-								dirtyBmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
-								for (int y = 0; y < DirtyRect.Height; y++) {
-									Array.Copy (bmp,
-										((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
-										dirtyBmp, y * DirtyRect.Width * 4, DirtyRect.Width * 4);
-								}
-								IsDirty = true;
-							} else
-								IsDirty = false;
+							Array.Copy (bmp, dirtyBmp, bmp.Length);
+							IsDirty = true;
+//							if (IsDirty)
+//								DirtyRect += clipping.Bounds;
+//							else
+//								DirtyRect = clipping.Bounds;
+//
+//							DirtyRect.Left = Math.Max (0, DirtyRect.Left);
+//							DirtyRect.Top = Math.Max (0, DirtyRect.Top);
+//							DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
+//							DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
+//							DirtyRect.Width = Math.Max (0, DirtyRect.Width);
+//							DirtyRect.Height = Math.Max (0, DirtyRect.Height);
+//
+//							if (DirtyRect.Width > 0 && DirtyRect.Height >0) {
+//								dirtyBmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
+//								for (int y = 0; y < DirtyRect.Height; y++) {
+//									Array.Copy (bmp,
+//										((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
+//										dirtyBmp, y * DirtyRect.Width * 4, DirtyRect.Width * 4);
+//								}
+//
+//							} else
+//								IsDirty = false;
 						}
 						clipping.Reset ();
 					}
@@ -646,6 +648,7 @@ namespace Crow
 				int stride = 4 * ClientRectangle.Width;
 				int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
 				bmp = new byte[bmpSize];
+				dirtyBmp = new byte[bmpSize];
 
 				foreach (GraphicObject g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);

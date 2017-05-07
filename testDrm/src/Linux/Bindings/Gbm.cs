@@ -30,7 +30,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace OpenTK.Platform.Linux
+namespace Crow.Linux
 {
     using Device = IntPtr; // struct gbm_device*
     using Surface = IntPtr;
@@ -68,7 +68,10 @@ namespace OpenTK.Platform.Linux
         public static extern int BOGetStride(IntPtr bo);
 
         [DllImport(lib, EntryPoint = "gbm_bo_set_user_data", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void BOSetUserData(IntPtr bo, IntPtr data, DestroyUserDataCallback callback);
+		public static extern void BOSetUserData(IntPtr bo, IntPtr data, IntPtr callback);
+
+//		[DllImport(lib, EntryPoint = "gbm_bo_get_user_data", CallingConvention = CallingConvention.Cdecl)]
+//		public static extern IntPtr BOGetUserData (IntPtr bo);
 
         [DllImport(lib, EntryPoint = "gbm_create_device", CallingConvention = CallingConvention.Cdecl)]
         public static extern Device CreateDevice(int fd);
@@ -206,7 +209,7 @@ namespace OpenTK.Platform.Linux
             }
         }
 
-        public void SetUserData(IntPtr data, DestroyUserDataCallback destroyFB)
+		public void SetUserData(IntPtr data, IntPtr destroyFB)
         {
             Gbm.BOSetUserData(buffer, data, destroyFB);
         }

@@ -154,6 +154,64 @@
     <Compile Include="src\PerformanceMeasure.cs" />
     <Compile Include="src\IML\BindingMember.cs" />
     <Compile Include="src\CrowThread.cs" />
+    <Compile Include="src\Mono.Cairo\Antialias.cs" />
+    <Compile Include="src\Mono.Cairo\Cairo.cs" />
+    <Compile Include="src\Mono.Cairo\CairoDebug.cs" />
+    <Compile Include="src\Mono.Cairo\Color.cs" />
+    <Compile Include="src\Mono.Cairo\Content.cs" />
+    <Compile Include="src\Mono.Cairo\Context.cs" />
+    <Compile Include="src\Mono.Cairo\Device.cs" />
+    <Compile Include="src\Mono.Cairo\DirectFBSurface.cs" />
+    <Compile Include="src\Mono.Cairo\Distance.cs" />
+    <Compile Include="src\Mono.Cairo\EGLDevice.cs" />
+    <Compile Include="src\Mono.Cairo\Extend.cs" />
+    <Compile Include="src\Mono.Cairo\FillRule.cs" />
+    <Compile Include="src\Mono.Cairo\Filter.cs" />
+    <Compile Include="src\Mono.Cairo\FontExtents.cs" />
+    <Compile Include="src\Mono.Cairo\FontFace.cs" />
+    <Compile Include="src\Mono.Cairo\FontOptions.cs" />
+    <Compile Include="src\Mono.Cairo\FontSlant.cs" />
+    <Compile Include="src\Mono.Cairo\FontType.cs" />
+    <Compile Include="src\Mono.Cairo\FontWeight.cs" />
+    <Compile Include="src\Mono.Cairo\Format.cs" />
+    <Compile Include="src\Mono.Cairo\GlitzSurface.cs" />
+    <Compile Include="src\Mono.Cairo\GLSurface.cs" />
+    <Compile Include="src\Mono.Cairo\GLXDevice.cs" />
+    <Compile Include="src\Mono.Cairo\Glyph.cs" />
+    <Compile Include="src\Mono.Cairo\Gradient.cs" />
+    <Compile Include="src\Mono.Cairo\HintMetrics.cs" />
+    <Compile Include="src\Mono.Cairo\HintStyle.cs" />
+    <Compile Include="src\Mono.Cairo\ImageSurface.cs" />
+    <Compile Include="src\Mono.Cairo\LinearGradient.cs" />
+    <Compile Include="src\Mono.Cairo\LineCap.cs" />
+    <Compile Include="src\Mono.Cairo\LineJoin.cs" />
+    <Compile Include="src\Mono.Cairo\Matrix.cs" />
+    <Compile Include="src\Mono.Cairo\NativeMethods.cs" />
+    <Compile Include="src\Mono.Cairo\Operator.cs" />
+    <Compile Include="src\Mono.Cairo\Path.cs" />
+    <Compile Include="src\Mono.Cairo\Pattern.cs" />
+    <Compile Include="src\Mono.Cairo\PatternType.cs" />
+    <Compile Include="src\Mono.Cairo\PdfSurface.cs" />
+    <Compile Include="src\Mono.Cairo\Point.cs" />
+    <Compile Include="src\Mono.Cairo\PointD.cs" />
+    <Compile Include="src\Mono.Cairo\PSSurface.cs" />
+    <Compile Include="src\Mono.Cairo\RadialGradient.cs" />
+    <Compile Include="src\Mono.Cairo\Rectangle.cs" />
+    <Compile Include="src\Mono.Cairo\Region.cs" />
+    <Compile Include="src\Mono.Cairo\ScaledFont.cs" />
+    <Compile Include="src\Mono.Cairo\SolidPattern.cs" />
+    <Compile Include="src\Mono.Cairo\Status.cs" />
+    <Compile Include="src\Mono.Cairo\SubpixelOrder.cs" />
+    <Compile Include="src\Mono.Cairo\Surface.cs" />
+    <Compile Include="src\Mono.Cairo\SurfacePattern.cs" />
+    <Compile Include="src\Mono.Cairo\SurfaceType.cs" />
+    <Compile Include="src\Mono.Cairo\SvgSurface.cs" />
+    <Compile Include="src\Mono.Cairo\SvgVersion.cs" />
+    <Compile Include="src\Mono.Cairo\TextExtents.cs" />
+    <Compile Include="src\Mono.Cairo\WGLDevice.cs" />
+    <Compile Include="src\Mono.Cairo\Win32Surface.cs" />
+    <Compile Include="src\Mono.Cairo\XcbSurface.cs" />
+    <Compile Include="src\Mono.Cairo\XlibSurface.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -161,9 +219,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Drawing" />
-    <Reference Include="cairo-sharp">
-      <Package>gtk-sharp-3.0</Package>
-    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
