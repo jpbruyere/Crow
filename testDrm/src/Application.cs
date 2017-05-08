@@ -61,7 +61,7 @@ namespace Crow.Linux
 			updateCrowInterfaceBounds ();
 		}
 		void updateCrowInterfaceBounds () {
-			CrowInterface.ProcessResize (new Size (originalMode.hdisplay, originalMode.vdisplay));
+			CrowInterface.ProcessResize (new Size (width, height));
 		}
 		#endregion
 
@@ -79,7 +79,8 @@ namespace Crow.Linux
 		BufferObject cursor_empty;
 
 
-		ModeInfo originalMode;
+		ModeInfo originalMode, currentMode;
+		int width, height;
 
 		public IntPtr Connector, Crtc, Encoder;
 		unsafe ModeCrtc* saved_crtc;
@@ -107,6 +108,8 @@ namespace Crow.Linux
 			initDrm ();
 
 			initGbm ();
+
+			setNewMode ();
 
 			initEgl ();
 
@@ -142,16 +145,57 @@ namespace Crow.Linux
 			saved_crtc = (ModeCrtc*) Drm.ModeGetCrtc (fd_gpu, pEncoder->crtc_id);
 
 			originalMode = pCrtc->mode;
-			Console.WriteLine ("[DRM]: current mode = {0} X {1} at {2} Hz", originalMode.hdisplay, originalMode.vdisplay, originalMode.vrefresh);
+			width = 1600;
+			height = 900;
+
+//			Console.WriteLine ("[DRM]: current mode = {0} X {1} at {2} Hz", width, height, currentMode.vrefresh);
 		}
 		void initGbm (){
 			gbm_device = Gbm.CreateDevice(fd_gpu);
 			if (gbm_device == IntPtr.Zero)
 				throw new NotSupportedException("[GBM] Failed to create GBM device");			
 
-			gbm_surface =  Gbm.CreateSurface(gbm_device, originalMode.hdisplay, originalMode.vdisplay, SurfaceFormat.ARGB8888, SurfaceFlags.Rendering | SurfaceFlags.Scanout);
+			gbm_surface =  Gbm.CreateSurface(gbm_device, width, height, SurfaceFormat.ARGB8888, SurfaceFlags.Rendering | SurfaceFlags.Scanout);
 			if (gbm_surface == IntPtr.Zero)
 				throw new NotSupportedException("[GBM] Failed to create GBM surface for rendering");						
+		}
+
+		void setNewMode (){
+			//118.25  1600 1696 1856 2112  900 903 908 934 -hsync +vsync
+			//currentMode = pCrtc->mode;
+			currentMode.clock = 118250;
+			currentMode.hdisplay = 1600;
+			currentMode.hsync_start = 1696;
+			currentMode.hsync_end = 1856;
+			currentMode.htotal = 2112;
+			currentMode.vdisplay = 900;
+			currentMode.vsync_start = 903;
+			currentMode.vsync_end = 908;
+			currentMode.vtotal = 934;
+			currentMode.flags |= (uint)ModeFlags.NHSYNC;
+			currentMode.flags |= (uint)ModeFlags.PVSYNC;
+			//			byte[] tmp = System.Text.Encoding.ASCII.GetBytes ("1600x900");
+			//			for (int i = 0; i < tmp.Length; i++) {
+			//				currentMode.name [i] = (sbyte)tmp [i];
+			//			}
+
+			unsafe
+			{
+				pCrtc->mode = currentMode;
+				ModeInfo* mode = (ModeInfo*)Marshal.AllocHGlobal (sizeof(ModeInfo));// pConnector->modes;
+				*mode = currentMode;
+				int connector_id = pConnector->connector_id;
+				int crtc_id = pEncoder->crtc_id;
+				BufferObject bo = Gbm.CreateBuffer(
+					gbm_device, width, height, SurfaceFormat.ARGB8888, SurfaceFlags.Scanout);
+				int nfb = getFbFromBo (bo);
+				int ret = Drm.ModeSetCrtc (fd_gpu, crtc_id, nfb, 0, 0, &connector_id, 1, mode);
+
+				if (ret != 0)
+					Console.WriteLine("[KMS] Drm.ModeSetCrtc failed. Error: " + ret);				
+			}
+//			width = currentMode.hdisplay;
+//			height = currentMode.vdisplay;			
 		}
 
 		unsafe void initEgl () {
@@ -235,7 +279,7 @@ namespace Crow.Linux
 		void initCairo (){
 			cairoDev = new Cairo.EGLDevice (egl_display, egl_ctx);
 
-			cairoSurf = new Cairo.GLSurface (cairoDev, egl_surface, originalMode.hdisplay, originalMode.vdisplay);
+			cairoSurf = new Cairo.GLSurface (cairoDev, egl_surface, width, height);
 			//cairoSurf = new Cairo.EGLSurface (cairoDev, egl_surface, 1600, 900);
 
 			cairoDev.SetThreadAware (false);
@@ -246,6 +290,7 @@ namespace Crow.Linux
 		#endregion
 
 		#region cursor
+
 		static BufferObject CreateCursor(IntPtr gbm, MouseCursor cursor)
 		{
 			if (cursor.Width > 64 || cursor.Height > 64)
@@ -356,7 +401,7 @@ namespace Crow.Linux
 			int timeout = -1;//block ? -1 : 0;
 
 			using (Cairo.Context ctx = new Cairo.Context (cairoSurf)) {
-				ctx.Rectangle (0, 0, originalMode.hdisplay, originalMode.vdisplay);
+				ctx.Rectangle (0, 0, width, height);
 				ctx.SetSourceRGB (0, 0, 0);
 				ctx.Fill ();
 			}
@@ -366,7 +411,7 @@ namespace Crow.Linux
 			bo = Gbm.LockFrontBuffer (gbm_surface);
 			fb = getFbFromBo (bo);
 
-			SetScanoutRegion (fb);
+			//SetScanoutRegion (fb);
 
 			while (run){				
 				BufferObject next_bo;
@@ -387,7 +432,7 @@ namespace Crow.Linux
 						update = true;
 						using (Cairo.Context ctx = new Cairo.Context (cairoSurf)) {
 							using (Cairo.Surface d = new Cairo.ImageSurface (CrowInterface.dirtyBmp, Cairo.Format.Argb32,
-								originalMode.hdisplay, originalMode.vdisplay, originalMode.hdisplay * 4)) {
+								width, height, width * 4)) {
 								ctx.SetSourceSurface (d, 0, 0);
 								ctx.Operator = Cairo.Operator.Source;
 								ctx.Paint ();
@@ -435,11 +480,11 @@ namespace Crow.Linux
 						else
 							break;
 					}
-//					if (is_flip_queued != 0)
-//						Console.WriteLine ("flip canceled");
+					if (is_flip_queued != 0)
+						Console.WriteLine ("flip canceled");
 					
 					Gbm.ReleaseBuffer (gbm_surface, bo);
-					Drm.ModeRmFB(fd_gpu, fb);
+					//Drm.ModeRmFB(fd_gpu, fb);
 
 					bo = next_bo;
 					next_bo = BufferObject.Zero;
@@ -493,6 +538,7 @@ namespace Crow.Linux
 				if (ret != 0)
 					Debug.Print("[KMS] Drm.ModeSetCrtc{0}, {1}, {2} failed. Error: {3}",
 						fd_gpu, crtc_id, buffer, ret);				
+				Console.WriteLine ("scanout region set: {0}x{1}", mode->hdisplay, mode->vdisplay);
 			}
 		}
 		#endregion

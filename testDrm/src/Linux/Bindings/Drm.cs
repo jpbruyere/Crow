@@ -156,7 +156,36 @@ namespace Crow.Linux
         FlipAsync = 0x02,
         FlipFlags = FlipEvent | FlipAsync
     }
-
+	[Flags]
+	enum ModeFlags
+	{
+		/* Video mode flags */
+		/* bit compatible with the xorg definitions. */
+		PHSYNC = 0x01,
+		NHSYNC = 0x02,
+		PVSYNC = 0x04,
+		NVSYNC = 0x08,
+		INTERLACE = 0x10,
+		DBLSCAN = 0x20,
+		CSYNC = 0x40,
+		PCSYNC = 0x80,
+		NCSYNC = 0x10,
+		HSKEW = 0x0200,
+		BCAST = 0x0400,
+		PIXMUX = 0x0800,
+		DBLCLK = 0x1000,
+		CLKDIV2 = 0x2000,
+//		FLAG_3D_MASK			(0x1f<<14)
+//		FLAG_3D_NONE = 0x0;
+//		FLAG_3D_FRAME_PACKING = 0x4000,
+//		FLAG_3D_FIELD_ALTERNATIVE = 0x8000,
+//		FLAG_3D_LINE_ALTERNATIVE	(3<<14)
+//		FLAG_3D_SIDE_BY_SIDE_FULL	(4<<14)
+//		FLAG_3D_L_DEPTH		(5<<14)
+//		FLAG_3D_L_DEPTH_GFX_GFX_DEPTH	(6<<14)
+//		FLAG_3D_TOP_AND_BOTTOM	(7<<14)
+//		FLAG_3D_SIDE_BY_SIDE_HALF	(8<<14)		
+	}
     [StructLayout(LayoutKind.Sequential)]
     struct EventContext
     {
