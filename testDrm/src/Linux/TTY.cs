@@ -1,5 +1,5 @@
 ﻿//
-// DrmKms.cs
+// TTY.cs
 //
 // Author:
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
@@ -24,64 +24,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
-using OpenTK.Platform.Linux;
-using OpenTK;
-using System.IO;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Threading;
 
-namespace Crow.Linux
+namespace Crow.Linux.VT
 {
-	public class Application : IDisposable
-	{
-		DRMContext drm;
-		public Interface CrowInterface;
-		public bool mouseIsInInterface = false;
+	internal class TTY  {
+		[DllImport("libc")]
+		static extern IntPtr ptsname(int fd);
+		[DllImport("libc")]
+		public static extern int unlockpt(int fd);
 
-		void interfaceThread()
-		{
-			while (CrowInterface.ClientRectangle.Size.Width == 0)
-				Thread.Sleep (5);
-
-			while (true) {
-				CrowInterface.Update ();
-				Thread.Sleep (1);
-			}
+		public static string GetFreePtsPath (int fd){
+			IntPtr pStr = ptsname (fd);
+			string name = Marshal.PtrToStringAnsi (pStr);
+			return name;
 		}
-
-
-		public Application(){
-			drm = new DRMContext();
-			CrowInterface = new Interface ();
-			drm.CrowInterface = CrowInterface;
-
-			Thread t = new Thread (interfaceThread);
-			t.IsBackground = true;
-			t.Start ();
-
-			CrowInterface.ProcessResize (new Size (drm.width, drm.height));
-			drm.updateCursor (XCursor.Default);
-
-			CrowInterface.MouseCursorChanged += CrowInterface_MouseCursorChanged;
-		}
-
-		void CrowInterface_MouseCursorChanged (object sender, MouseCursorChangedEventArgs e)
-		{
-			drm.updateCursor (e.NewCursor);
-		}
-
-		public void Run (){
-			drm.Run ();
-		}
-
-		#region IDisposable implementation
-		public void Dispose ()
-		{
-			drm.Dispose ();
-		}
-		#endregion
 	}
 }
 

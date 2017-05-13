@@ -31,7 +31,7 @@ using System.Collections.Generic;
 using System.Text;
 
 
-namespace OpenTK.Platform.Egl
+namespace Crow.Linux
 {
     using EGLNativeDisplayType = IntPtr;
     using EGLNativeWindowType = IntPtr;

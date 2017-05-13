@@ -39,6 +39,7 @@ namespace Crow
     [Flags]
     public enum KeyModifiers : byte
     {
+	None = 0,
 	/// <summary>
 	/// The alt key modifier (option on Mac).
 	/// </summary>
@@ -52,6 +53,11 @@ namespace Crow
 	/// <summary>
 	/// The shift key modifier.
 	/// </summary>
-	Shift = 1 << 2
+	Shift = 1 << 2,
+
+	/// <summary>
+	/// The shift key modifier.
+	/// </summary>
+	AltGr = 1 << 3
     }
 }

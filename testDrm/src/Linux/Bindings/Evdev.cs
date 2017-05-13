@@ -25,6 +25,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+using OpenTK;
+
+
 #endregion
 
 using System;
@@ -32,7 +35,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Crow;
 
-namespace OpenTK.Platform.Linux
+namespace Crow.Linux
 {
     // Bindings for linux/input.h
     class Evdev

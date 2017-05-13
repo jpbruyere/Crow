@@ -32,7 +32,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace OpenTK
+namespace Crow
 {
     #region BlittableValueType<T>
 

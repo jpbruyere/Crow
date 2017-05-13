@@ -33,7 +33,7 @@ using System.Text;
 
 #pragma warning disable 0649 // field is never assigned
 
-namespace OpenTK.Platform.Linux
+namespace Crow.Linux
 {
     partial class Libc
     {
@@ -69,11 +69,24 @@ namespace OpenTK.Platform.Linux
         [DllImport(lib)]
         public static extern int open(IntPtr pathname, OpenFlags flags);
 
+		[DllImport(lib)]
+		public static extern int posix_openpt (OpenFlags flags);
+
         [DllImport(lib)]
         public static extern int close(int fd);
 
         [DllImport(lib)]
         unsafe public static extern IntPtr read(int fd, void* buffer, UIntPtr count);
+		[DllImport(lib)]
+		unsafe public static extern uint write(int fd, void *buffer, int count); 
+
+		public static void write (int fd, byte[] b){
+			unsafe {
+				fixed (byte* pb = b) {
+					write (fd, pb, b.Length); 
+				}
+			}
+		}
 
         public static int read(int fd, out byte b)
         {

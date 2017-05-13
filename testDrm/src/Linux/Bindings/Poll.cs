@@ -30,7 +30,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace OpenTK.Platform.Linux
+namespace Crow.Linux
 {
     partial class Libc
     {

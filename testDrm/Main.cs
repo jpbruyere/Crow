@@ -40,9 +40,7 @@ namespace testDrm
 
 			using (Application drm = new Application ()) {
 				//drm.CrowInterface.LoadInterface (@"/mnt/data2/devel/crow/Tests/Interfaces/Divers/colorPicker.crow");
-				drm.CrowInterface.LoadInterface (@"/mnt/data2/devel/crow/Tests/Interfaces/Divers/0.crow");
-				drm.CrowInterface.LoadInterface (@"/mnt/data2/devel/crow/Tests/Interfaces/Divers/0.crow");
-				drm.CrowInterface.LoadInterface (@"/mnt/data2/devel/crow/Tests/Interfaces/Divers/0.crow");
+				drm.CrowInterface.LoadInterface ("#testDrm.ui.menu.crow");
 				drm.CrowInterface.LoadInterface (@"/mnt/data2/devel/crow/Tests/Interfaces/Divers/0.crow");
 				//drm.CrowInterface.LoadInterface (@"/mnt/data2/devel/crow/Tests/Interfaces/GraphicObject/2.crow");
 				drm.Run ();

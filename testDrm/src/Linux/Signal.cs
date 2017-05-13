@@ -1,11 +1,10 @@
-#region License
-//
-// LinuxWindowInfo.cs
+﻿//
+// Signals.cs
 //
 // Author:
-//       Stefanos A. <stapostol@gmail.com>
+//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
 //
-// Copyright (c) 2006-2014 Stefanos Apostolopoulos
+// Copyright (c) 2013-2017 Jean-Philippe Bruyère
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,33 +23,55 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-//
-#endregion
-
 using System;
-using System.Diagnostics;
-using OpenTK.Platform.Egl;
+using System.Runtime.InteropServices;
 
-namespace OpenTK.Platform.Linux
+namespace Linux
 {
-    class LinuxWindowInfo : EglWindowInfo
-    {
-        public int FD { get; private set; }
-        public LinuxDisplay DisplayDevice { get; private set; }
-        public IntPtr BufferManager { get; private set; }
+	public enum Signal : int {
+		SIGHUP		 = 1,
+		SIGINT		 = 2,
+		SIGQUIT		 = 3,
+		SIGILL		 = 4,
+		SIGTRAP		 = 5,
+		SIGABRT		 = 6,
+		SIGIOT		 = 6,
+		SIGBUS		 = 7,
+		SIGFPE		 = 8,
+		SIGKILL		 = 9,
+		SIGUSR1		= 10,
+		SIGSEGV		= 11,
+		SIGUSR2		= 12,
+		SIGPIPE		= 13,
+		SIGALRM		= 14,
+		SIGTERM		= 15,
+		SIGSTKFLT	= 16,
+		SIGCHLD		= 17,
+		SIGCONT		= 18,
+		SIGSTOP		= 19,
+		SIGTSTP		= 20,
+		SIGTTIN		= 21,
+		SIGTTOU		= 22,
+		SIGURG		= 23,
+		SIGXCPU		= 24,
+		SIGXFSZ		= 25,
+		SIGVTALRM	= 26,
+		SIGPROF		= 27,
+		SIGWINCH	= 28,
+		/// <summary>same as SIGPOLL</summary>
+		SIGIO		= 29,			
+		SIGPWR		= 30,
+		SIGSYS		= 31,
+		SIGUNUSED	= 31
+	}
 
-        public LinuxWindowInfo(IntPtr display, int fd, IntPtr gbm, LinuxDisplay display_device)
-            : base(IntPtr.Zero, display, IntPtr.Zero)
-        {
-            if (display_device == null)
-                throw new ArgumentNullException();
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	public delegate void SignalHandler(Signal signal);
 
-            FD = fd;
-            BufferManager = gbm;
-            DisplayDevice = display_device;
-            // The window handle and surface handle must
-            // be filled in manually once they are known.
-        }
-    }
+	public static class Kernel
+	{
+		[DllImport("libc")]
+		public static extern int signal(Signal s, SignalHandler handler);
+	}
 }
 

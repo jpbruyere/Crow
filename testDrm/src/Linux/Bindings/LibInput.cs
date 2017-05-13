@@ -33,7 +33,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace OpenTK.Platform.Linux
+namespace Crow.Linux
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     delegate int OpenRestrictedCallback(IntPtr path, int flags, IntPtr data);

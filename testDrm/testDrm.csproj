@@ -18,6 +18,7 @@
         <Command type="Execute" command="${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" />
       </CustomCommands>
     </CustomCommands>
+    <StartupObject>testDrm.Tests</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -59,14 +60,18 @@
     <Compile Include="src\DisplayResolution.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\Egl.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\Linux\DefaultCursor.cs" />
     <Compile Include="src\MouseCursor.cs" />
     <Compile Include="src\WindowIcon.cs" />
     <Compile Include="src\Application.cs" />
-    <Compile Include="src\DRMDevice.cs" />
+    <Compile Include="src\DRMContext.cs" />
+    <Compile Include="src\Linux\Bindings\Egl.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests.cs" />
+    <Compile Include="src\Linux\TTY.cs" />
+    <Compile Include="src\Linux\Signal.cs" />
+    <Compile Include="src\Linux\VT.cs" />
+    <Compile Include="src\Linux\DRM.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -76,23 +81,15 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\Linux\LinuxFactory.cs" />
-    <None Include="src\Linux\LinuxGraphicsContext.cs" />
-    <None Include="src\Linux\LinuxInput.cs" />
-    <None Include="src\Linux\LinuxJoystick.cs">
-      <SubType>Code</SubType>
-    </None>
-    <None Include="src\Linux\LinuxKeyboardTTY.cs" />
-    <None Include="src\Linux\LinuxNativeWindow.cs" />
-    <None Include="src\Linux\LinuxWindowInfo.cs" />
-    <None Include="src\Linux\LinuxDisplayDriver.cs" />
+    <Folder Include="ui\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">
       <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
       <Name>Crow</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ui\menu.crow" />
   </ItemGroup>
 </Project>
