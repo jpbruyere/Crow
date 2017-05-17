@@ -18,7 +18,7 @@
         <Command type="Execute" command="${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" />
       </CustomCommands>
     </CustomCommands>
-    <StartupObject>testDrm.Tests</StartupObject>
+    <StartupObject>testDrm.TestApp</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -64,7 +64,6 @@
     <Compile Include="src\Linux\Bindings\Egl.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="tests.cs" />
     <Compile Include="src\Linux\TTY.cs" />
     <Compile Include="src\Linux\Signal.cs" />
     <Compile Include="src\Linux\VT.cs" />
@@ -81,6 +80,7 @@
     <Compile Include="src\Linux\GBM\BufferObject.cs" />
     <Compile Include="src\Linux\GBM\Device.cs" />
     <Compile Include="src\Application.cs" />
+    <Compile Include="Main.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -104,9 +104,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ui\menu.crow" />
+    <EmbeddedResource Include="ui\0.crow" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\DRMContext.cs" />
-    <None Include="Main.cs" />
+    <None Include="tests.cs" />
   </ItemGroup>
 </Project>
