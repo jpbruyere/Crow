@@ -44,21 +44,19 @@ namespace Crow.Linux
 
     enum RenderApi
     {
-        ES = Egl.OPENGL_ES_API,
-        GL = Egl.OPENGL_API,
-        VG = Egl.OPENVG_API
+		ES = Egl.OPENGL_ES_API,
+		GL = Egl.OPENGL_API,
+		VG = Egl.OPENVG_API
     }
 
-    [Flags]
-    enum RenderableFlags
+    [Flags]enum RenderableFlags
     {
-        ES = Egl.OPENGL_ES_BIT,
-        ES2 = Egl.OPENGL_ES2_BIT,
-        ES3 = Egl.OPENGL_ES3_BIT,
-        GL = Egl.OPENGL_BIT,
-        VG = Egl.OPENVG_BIT,
+		ES = Egl.OPENGL_ES_BIT,
+		ES2 = Egl.OPENGL_ES2_BIT,
+		ES3 = Egl.OPENGL_ES3_BIT,
+		GL = Egl.OPENGL_BIT,
+		VG = Egl.OPENVG_BIT,
     }
-
     public enum ErrorCode
     {
         SUCCESS = 12288,
@@ -312,7 +310,7 @@ namespace Crow.Linux
         {
             IntPtr ptr = eglCreateContext(dpy, config, share_context, attrib_list);
             if (ptr == IntPtr.Zero)
-                throw new Exception(String.Format("Failed to create EGL context, error: {0}.", Egl.GetError()));
+                throw new Exception(String.Format("Failed to create EGL context, error: {0}.", GetError()));
             return ptr;
         }
 

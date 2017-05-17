@@ -26,6 +26,8 @@
 // THE SOFTWARE.
 //
 using OpenTK;
+using Linux;
+using Crow;
 
 
 #endregion
@@ -33,9 +35,8 @@ using OpenTK;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Crow;
 
-namespace Crow.Linux
+namespace Linux
 {
     // Bindings for linux/input.h
     class Evdev

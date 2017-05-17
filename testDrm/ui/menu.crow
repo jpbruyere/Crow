@@ -4,7 +4,7 @@
 		<MenuItem Caption="New" />
 		<MenuItem Caption="Open"/>
 		<MenuItem Caption="Save"/>
-		<MenuItem Caption="Quit"/>
+		<MenuItem Caption="Quit" MouseClick="onQuitClick"/>
 	</MenuItem>
 	<MenuItem Caption="Edit" Name="edit" Width="Fit">
 		<MenuItem Caption="Cut"/>

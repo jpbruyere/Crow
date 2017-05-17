@@ -163,7 +163,6 @@
     <Compile Include="src\Mono.Cairo\Device.cs" />
     <Compile Include="src\Mono.Cairo\DirectFBSurface.cs" />
     <Compile Include="src\Mono.Cairo\Distance.cs" />
-    <Compile Include="src\Mono.Cairo\EGLDevice.cs" />
     <Compile Include="src\Mono.Cairo\Extend.cs" />
     <Compile Include="src\Mono.Cairo\FillRule.cs" />
     <Compile Include="src\Mono.Cairo\Filter.cs" />
@@ -212,6 +211,9 @@
     <Compile Include="src\Mono.Cairo\Win32Surface.cs" />
     <Compile Include="src\Mono.Cairo\XcbSurface.cs" />
     <Compile Include="src\Mono.Cairo\XlibSurface.cs" />
+    <Compile Include="src\Mono.Cairo\EGLDevice.cs" />
+    <Compile Include="src\Mono.Cairo\DRMDevice.cs" />
+    <Compile Include="src\Mono.Cairo\DRMSurface.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

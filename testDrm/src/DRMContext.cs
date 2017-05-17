@@ -33,7 +33,7 @@ using OpenTK;
 using OpenTK.Platform.Linux;
 using System.IO.Compression;
 
-namespace Crow.Linux
+namespace Linux
 {
 	
 	internal class DRMContext : IDisposable
@@ -173,6 +173,7 @@ namespace Crow.Linux
 		unsafe void initEgl () {
 			int major, minor;
 			IntPtr[] configs = new IntPtr[1];
+
 			int[] contextAttrib = new int[] {
 				Egl.CONTEXT_CLIENT_VERSION, 2,
 				Egl.NONE
@@ -223,6 +224,7 @@ namespace Crow.Linux
 			// See what we really got
 			int r, g, b, a, d, s, sample_buffers, samples;
 			IntPtr active_config = configs[0];
+
 			Egl.GetConfigAttrib(egl_display, active_config, Egl.RED_SIZE, out r);
 			Egl.GetConfigAttrib(egl_display, active_config, Egl.GREEN_SIZE, out g);
 			Egl.GetConfigAttrib(egl_display, active_config, Egl.BLUE_SIZE, out b);
@@ -407,6 +409,7 @@ namespace Crow.Linux
 							Drm.HandleEvent (fd_gpu, ref evctx);
 						else
 							break;
+						Thread.Sleep (1);
 					}
 					if (is_flip_queued != 0)
 						Console.WriteLine ("flip canceled");

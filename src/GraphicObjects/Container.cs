@@ -33,7 +33,7 @@ using System.Threading;
 
 namespace Crow
 {
-    public class Container : PrivateContainer, IXmlSerializable
+    public class Container : PrivateContainer
     {
 		#region CTOR
 		public Container()
@@ -51,59 +51,6 @@ namespace Crow
 		{
 			base.SetChild (_child);
 		}
-
-		#region IXmlSerializable
-
-        public override System.Xml.Schema.XmlSchema GetSchema()
-        {
-            return null;
-        }
-        public override void ReadXml(System.Xml.XmlReader reader)
-        {
-			//only read attributes in GraphicObject IXmlReader implementation
-            base.ReadXml(reader);
-
-
-            using (System.Xml.XmlReader subTree = reader.ReadSubtree())
-            {
-                subTree.Read(); //skip current node
-                subTree.Read(); //read first child
-
-                if (!subTree.IsStartElement())
-                    return;
-
-                Type t = Type.GetType("Crow." + subTree.Name);
-				if (t == null) {
-					Assembly a = Assembly.GetEntryAssembly ();
-					foreach (Type expT in a.GetExportedTypes ()) {
-						if (expT.Name == subTree.Name) {
-							t = expT;
-							break;
-						}
-					}
-				}
-				GraphicObject go = (GraphicObject)Activator.CreateInstance(t);
-
-				(go as IXmlSerializable).ReadXml(subTree);
-
-				SetChild(go);
-
-                subTree.Read();//closing tag
-            }
-        }
-        public override void WriteXml(System.Xml.XmlWriter writer)
-        {
-            base.WriteXml(writer);
-
-            if (Child == null)
-                return;
-
-            writer.WriteStartElement(Child.GetType().Name);
-            (Child as IXmlSerializable).WriteXml(writer);
-            writer.WriteEndElement();
-        }
-    
-		#endregion
 	}
 }
 

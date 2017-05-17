@@ -925,6 +925,59 @@ namespace Cairo
 		internal static extern IntPtr cairo_gl_surface_create_for_egl (IntPtr device, IntPtr eglSurface, int width, int height);
 		#endregion
 
+		#region DRM Functions
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern IntPtr cairo_drm_device_get (IntPtr udev_device);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern IntPtr cairo_drm_device_get_for_fd (int fd);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern IntPtr cairo_drm_device_default ();
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern int cairo_drm_device_get_fd (IntPtr cairo_device);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern  void cairo_drm_device_throttle (IntPtr cairo_device);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern IntPtr cairo_drm_surface_create (IntPtr cairo_device, Format format,	int width, int height);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern IntPtr cairo_drm_surface_create_for_name (IntPtr cairo_device, uint name, Format format,	int width, int height, int stride);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern IntPtr cairo_drm_surface_create_from_cacheable_image (IntPtr cairo_device, IntPtr imageSurface);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern Status cairo_drm_surface_enable_scan_out (IntPtr drmSurface);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern IntPtr cairo_drm_surface_get_handle (IntPtr drmSurface);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern IntPtr cairo_drm_surface_get_name (IntPtr drmSurface);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern Format cairo_drm_surface_get_format (IntPtr drmSurface);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern int cairo_drm_surface_get_width (IntPtr drmSurface);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern int cairo_drm_surface_get_height (IntPtr drmSurface);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern int cairo_drm_surface_get_stride (IntPtr drmSurface);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern IntPtr cairo_drm_surface_map_to_image (IntPtr drmSurface);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern void	cairo_drm_surface_unmap (IntPtr drmSurface,	IntPtr imageSurface);
+		#endregion
+
 		#region Device
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern IntPtr cairo_device_reference (IntPtr device);

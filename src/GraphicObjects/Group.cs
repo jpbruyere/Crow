@@ -35,7 +35,7 @@ using System.Reflection;
 
 namespace Crow
 {
-	public class Group : GraphicObject, IXmlSerializable
+	public class Group : GraphicObject
     {
 		#region CTOR
 		public Group()
@@ -336,7 +336,6 @@ namespace Crow
 				}
 			}
 		}
-
 	
 		#region Mouse handling
 		public override void checkHoverWidget (MouseMoveEventArgs e)
@@ -355,60 +354,5 @@ namespace Crow
 			base.checkHoverWidget (e);
 		}
 		#endregion
-
-
-		#region IXmlSerializable
-
-        public override System.Xml.Schema.XmlSchema GetSchema()
-        {
-            return null;
-        }
-        public override void ReadXml(System.Xml.XmlReader reader)
-        {
-            base.ReadXml(reader);
-
-            using (System.Xml.XmlReader subTree = reader.ReadSubtree())
-            {
-                subTree.Read();
-
-                while (!subTree.EOF)
-                {
-                    subTree.Read();
-
-                    if (!subTree.IsStartElement())
-                        break;
-
-                    Type t = Type.GetType("Crow." + subTree.Name);
-					if (t == null) {
-						Assembly a = Assembly.GetEntryAssembly ();
-						foreach (Type expT in a.GetExportedTypes ()) {
-							if (expT.Name == subTree.Name) {
-								t = expT;
-								break;
-							}
-						}
-					}
-					if (t == null)
-						throw new Exception (subTree.Name + " type not found");
-                    GraphicObject go = (GraphicObject)Activator.CreateInstance(t);
-                    (go as IXmlSerializable).ReadXml(subTree);                    
-                    AddChild(go);
-                }
-            }
-        }
-        public override void WriteXml(System.Xml.XmlWriter writer)
-        {
-            base.WriteXml(writer);
-
-            foreach (GraphicObject go in Children)
-            {
-                writer.WriteStartElement(go.GetType().Name);
-                (go as IXmlSerializable).WriteXml(writer);
-                writer.WriteEndElement();
-            }
-        }
-    
-		#endregion
-
 	}
 }

@@ -30,7 +30,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Crow.Linux
+namespace Linux
 {
     partial class Libc
     {

@@ -1,5 +1,5 @@
 ﻿//
-// TemplatedContainer.cs
+// Plane.cs
 //
 // Author:
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
@@ -23,38 +23,60 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-
 using System;
-using System.Xml.Serialization;
-using System.Xml;
-using System.Reflection;
+using System.Runtime.InteropServices;
 
-namespace Crow
+namespace Linux.DRI
 {
-	public abstract class TemplatedContainer : TemplatedControl
+	[StructLayout(LayoutKind.Sequential)]
+	unsafe public struct drmPlane {
+		public uint count_formats;
+		public uint *formats;
+		public uint plane_id;
+
+		public uint crtc_id;
+		public uint fb_id;
+
+		public uint crtc_x, crtc_y;
+		public uint x, y;
+
+		public uint possible_crtcs;
+		public uint gamma_size;
+	}
+
+	unsafe public class Plane : IDisposable
 	{
-		#region CTOR
-		public TemplatedContainer () : base(){}
+		#region pinvoke
+		[DllImport("libdrm", EntryPoint = "drmModeGetPlane", CallingConvention = CallingConvention.Cdecl)]
+		unsafe internal static extern drmPlane* ModeGetPlane(int fd, uint id);
+		[DllImport("libdrm", EntryPoint = "drmModeFreePlane", CallingConvention = CallingConvention.Cdecl)]
+		unsafe internal static extern void ModeFreePlane(drmPlane* ptr);
 		#endregion
 
-		[XmlAttributeAttribute]public virtual GraphicObject Content{ get; set;}
+		drmPlane* handle;
 
-		#region GraphicObject overrides
-		public override GraphicObject FindByName (string nameToFind)
+		internal Plane (drmPlane* _handle)
 		{
-			if (Name == nameToFind)
-				return this;
-
-			return Content == null ? null : Content.FindByName (nameToFind);
+			handle = _handle;
 		}
-		public override bool Contains (GraphicObject goToFind)
-		{
-			if (Content == null)
-				return base.Contains (goToFind);
+			
+		public uint Id { get { return handle->plane_id; }}
 
-			if (Content == goToFind)
-				return true;
-			return Content.Contains (goToFind);
+		#region IDisposable implementation
+		~Plane(){
+			Dispose (false);
+		}
+		public void Dispose ()
+		{
+			Dispose (true);
+			GC.SuppressFinalize (this);
+		}
+		protected virtual void Dispose (bool disposing){
+			unsafe {
+				if (handle != null)
+					ModeFreePlane (handle);
+				handle = null;
+			}
 		}
 		#endregion
 	}

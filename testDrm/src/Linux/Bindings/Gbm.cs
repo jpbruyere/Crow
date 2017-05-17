@@ -30,24 +30,24 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Crow.Linux
+namespace Linux.gbm
 {
     using Device = IntPtr; // struct gbm_device*
     using Surface = IntPtr;
     using BufferObjectHandle = IntPtr;
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    delegate void DestroyUserDataCallback(BufferObject bo, IntPtr data);
+//    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+//    delegate void DestroyUserDataCallback(BufferObject bo, IntPtr data);
 
     class Gbm
     {
         const string lib = "gbm";
 
-        [DllImport(lib, EntryPoint = "gbm_bo_create", CallingConvention = CallingConvention.Cdecl)]
-        public static extern BufferObject CreateBuffer(Device gbm, int width, int height, SurfaceFormat format, SurfaceFlags flags);
+		[DllImport(lib, EntryPoint = "gbm_bo_create", CallingConvention = CallingConvention.Cdecl)]
+		unsafe public static extern gbm_bo* CreateBO (Device gbm, int width, int height, SurfaceFormat format, SurfaceFlags flags);
 
         [DllImport(lib, EntryPoint = "gbm_bo_destroy", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void DestroyBuffer(BufferObject bo);
+		unsafe public static extern void DestroyBuffer (gbm_bo* bo);
 
         [DllImport(lib, EntryPoint = "gbm_bo_write", CallingConvention = CallingConvention.Cdecl)]
         public static extern int BOWrite(IntPtr bo, IntPtr buf, IntPtr count);
@@ -58,6 +58,9 @@ namespace Crow.Linux
         [DllImport(lib, EntryPoint = "gbm_bo_get_handle", CallingConvention = CallingConvention.Cdecl)]
         public static extern BufferObjectHandle BOGetHandle(IntPtr bo);
 
+		[DllImport(lib, EntryPoint = "gbm_bo_get_handle", CallingConvention = CallingConvention.Cdecl)]
+		public static extern ulong BOGetHandle(ref gbm_bo bo);
+
         [DllImport(lib, EntryPoint = "gbm_bo_get_height", CallingConvention = CallingConvention.Cdecl)]
         public static extern int BOGetHeight(IntPtr bo);
 
@@ -67,8 +70,11 @@ namespace Crow.Linux
         [DllImport(lib, EntryPoint = "gbm_bo_get_stride", CallingConvention = CallingConvention.Cdecl)]
         public static extern int BOGetStride(IntPtr bo);
 
+		[DllImport(lib, EntryPoint = "gbm_bo_get_stride", CallingConvention = CallingConvention.Cdecl)]
+		public static extern uint BOGetStride (ref gbm_bo bo);
+
         [DllImport(lib, EntryPoint = "gbm_bo_set_user_data", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void BOSetUserData(IntPtr bo, IntPtr data, IntPtr callback);
+		public static extern void BOSetUserData(ref gbm_bo bo, IntPtr data, IntPtr callback);
 
 //		[DllImport(lib, EntryPoint = "gbm_bo_get_user_data", CallingConvention = CallingConvention.Cdecl)]
 //		public static extern IntPtr BOGetUserData (IntPtr bo);
@@ -93,19 +99,25 @@ namespace Crow.Linux
         public static extern bool IsFormatSupported(Device gbm, SurfaceFormat format, SurfaceFlags usage);
 
         [DllImport(lib, EntryPoint = "gbm_surface_lock_front_buffer", CallingConvention = CallingConvention.Cdecl)]
-        public static extern BufferObject LockFrontBuffer(Surface surface);
+        unsafe public static extern gbm_bo* LockFrontBuffer(Surface surface);
 
         [DllImport(lib, EntryPoint = "gbm_surface_release_buffer", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void ReleaseBuffer(Surface surface, BufferObject buffer);
+        unsafe public static extern void ReleaseBuffer(Surface surface, gbm_bo* buffer);
 
 		[DllImport(lib, EntryPoint = "gbm_surface_has_free_buffers", CallingConvention = CallingConvention.Cdecl)]
 		public static extern int HasFreeBuffers (Surface surface);
 
+		[DllImport(lib, EntryPoint = "gbm_bo_map", CallingConvention = CallingConvention.Cdecl)]
+		unsafe public static extern IntPtr	Map (gbm_bo* bo, uint x, uint y, uint width, uint height, TransferFlags flags, ref uint stride, out IntPtr data);
+
+		[DllImport(lib, EntryPoint = "gbm_bo_unmap", CallingConvention = CallingConvention.Cdecl)]
+		unsafe public static extern void Unmap (gbm_bo* bo, IntPtr data);
+
     }
 
-    enum SurfaceFormat
+    public enum SurfaceFormat : uint
     {
-        BigEndian = 1 << 31,
+        BigEndian = 1u << 31,
         C8 = ((int)('C') | ((int)('8') << 8) | ((int)(' ') << 16) | ((int)(' ') << 24)),
 
         RGB332 = ((int)('R') | ((int)('G') << 8) | ((int)('B') << 16) | ((int)('8') << 24)),
@@ -180,106 +192,134 @@ namespace Crow.Linux
         YUV444 = ((int)('Y') | ((int)('U') << 8) | ((int)('2') << 16) | ((int)('4') << 24)),
         YVU444 = ((int)('Y') | ((int)('V') << 8) | ((int)('2') << 16) | ((int)('4') << 24)),
     }
-
-    [Flags]
-    enum SurfaceFlags
+    
+	[Flags]public enum SurfaceFlags : uint
     {
         Scanout = (1 << 0),
         Cursor64x64 = (1 << 1),
         Rendering = (1 << 2),
         Write = (1 << 3),
-    }
+		Linear = (1 << 4),
+	}
+	[Flags]public enum TransferFlags : uint {
+		/// <summary> Buffer contents read back (or accessed directly) at transfer create time.</summary>
+		Read  = 1 << 0,
+		/// <summary> Buffer contents will be written back at unmap time (or modified as a result of being accessed directly).</summary>
+		Write = 1 << 1,
+		/// <summary>Read/modify/write</summary>
+		ReadWrite = Read | Write,
+	}
 
-    [StructLayout(LayoutKind.Sequential)]
-    struct BufferObject : IEquatable<BufferObject>
-    {
-        IntPtr buffer;
+	[StructLayout(LayoutKind.Sequential)]
+	public struct gbm_bo {
+		IntPtr device;
+		public uint Width, Height;
+		public SurfaceFormat Format;
+		public SurfaceFlags Flags;
 
-        public static readonly BufferObject Zero =
-            default(BufferObject);
-
-        public int Write(byte[] data)
-        {
-            unsafe
-            {
-                fixed (byte* pdata = data)
-                {
-                    return Gbm.BOWrite(buffer, (IntPtr)pdata, (IntPtr)data.Length);
-                }
-            }
-        }
-
+		public uint Handle32
+		{
+			get { return (uint)Gbm.BOGetHandle(ref this); }
+		}
+		public uint Stride
+		{
+			get { return Gbm.BOGetStride(ref this); }
+		}
 		public void SetUserData(IntPtr data, IntPtr destroyFB)
-        {
-            Gbm.BOSetUserData(buffer, data, destroyFB);
-        }
-
-        public Device Device
-        {
-            get { return Gbm.BOGetDevice(buffer); }
-        }
-
-        public int Handle
-        {
-            get { return Gbm.BOGetHandle(buffer).ToInt32(); }
-        }
-
-        public int Width
-        {
-            get { return Gbm.BOGetWidth(buffer); }
-        }
-
-        public int Height
-        {
-            get { return Gbm.BOGetHeight(buffer); }
-        }
-
-        public int Stride
-        {
-            get { return Gbm.BOGetStride(buffer); }
-        }
-
-        public void Dispose()
-        {
-            Gbm.DestroyBuffer(this);
-            buffer = IntPtr.Zero;
-        }
-
-        public static bool operator ==(BufferObject left, BufferObject right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(BufferObject left, BufferObject right)
-        {
-            return !left.Equals(right);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return
-                obj is BufferObject &&
-                this.Equals((BufferObject)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return buffer.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return string.Format("[BufferObject: {0}]", buffer);
-        }
-
-        #region IEquatable implementation
-
-        public bool Equals(BufferObject other)
-        {
-            return buffer == other.buffer;
-        }
-
-        #endregion
-    }
+		{
+			Gbm.BOSetUserData(ref this, data, destroyFB);
+		}
+	}
+//    [StructLayout(LayoutKind.Sequential)]
+//    public struct BufferObject : IEquatable<BufferObject>
+//    {
+//        IntPtr buffer;
+//
+//        public static readonly BufferObject Zero =
+//            default(BufferObject);
+//
+//        public int Write(byte[] data)
+//        {
+//            unsafe
+//            {
+//                fixed (byte* pdata = data)
+//                {
+//                    return Gbm.BOWrite(buffer, (IntPtr)pdata, (IntPtr)data.Length);
+//                }
+//            }
+//        }
+//
+//		public void SetUserData(IntPtr data, IntPtr destroyFB)
+//        {
+//            Gbm.BOSetUserData(buffer, data, destroyFB);
+//        }
+//
+//        public Device Device
+//        {
+//            get { return Gbm.BOGetDevice(buffer); }
+//        }
+//
+//        public int Handle
+//        {
+//            get { return Gbm.BOGetHandle(buffer).ToInt32(); }
+//        }
+//
+//        public int Width
+//        {
+//            get { return Gbm.BOGetWidth(buffer); }
+//        }
+//
+//        public int Height
+//        {
+//            get { return Gbm.BOGetHeight(buffer); }
+//        }
+//
+//        public int Stride
+//        {
+//            get { return Gbm.BOGetStride(buffer); }
+//        }
+//
+//        public void Dispose()
+//        {
+//            Gbm.DestroyBuffer(this);
+//            buffer = IntPtr.Zero;
+//        }
+//
+//        public static bool operator ==(BufferObject left, BufferObject right)
+//        {
+//            return left.Equals(right);
+//        }
+//
+//        public static bool operator !=(BufferObject left, BufferObject right)
+//        {
+//            return !left.Equals(right);
+//        }
+//
+//        public override bool Equals(object obj)
+//        {
+//            return
+//                obj is BufferObject &&
+//                this.Equals((BufferObject)obj);
+//        }
+//
+//        public override int GetHashCode()
+//        {
+//            return buffer.GetHashCode();
+//        }
+//
+//        public override string ToString()
+//        {
+//            return string.Format("[BufferObject: {0}]", buffer);
+//        }
+//
+//        #region IEquatable implementation
+//
+//        public bool Equals(BufferObject other)
+//        {
+//            return buffer == other.buffer;
+//        }
+//
+//        #endregion
+//    }
 }
 

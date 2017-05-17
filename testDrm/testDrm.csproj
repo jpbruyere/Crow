@@ -44,7 +44,6 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="Main.cs" />
     <Compile Include="src\Linux\Bindings\Drm.cs" />
     <Compile Include="src\Linux\Bindings\Evdev.cs" />
     <Compile Include="src\Linux\Bindings\Gbm.cs" />
@@ -62,8 +61,6 @@
     </Compile>
     <Compile Include="src\MouseCursor.cs" />
     <Compile Include="src\WindowIcon.cs" />
-    <Compile Include="src\Application.cs" />
-    <Compile Include="src\DRMContext.cs" />
     <Compile Include="src\Linux\Bindings\Egl.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -71,17 +68,33 @@
     <Compile Include="src\Linux\TTY.cs" />
     <Compile Include="src\Linux\Signal.cs" />
     <Compile Include="src\Linux\VT.cs" />
-    <Compile Include="src\Linux\DRM.cs" />
+    <Compile Include="src\Linux\DRI.cs" />
+    <Compile Include="src\Linux\DRI\Connector.cs" />
+    <Compile Include="src\Linux\DRI\Encoder.cs" />
+    <Compile Include="src\Linux\DRI\Resources.cs" />
+    <Compile Include="src\Linux\DRI\Crtc.cs" />
+    <Compile Include="src\Linux\DRI\Plane.cs" />
+    <Compile Include="src\Egl\EGL.cs" />
+    <Compile Include="src\Egl\Surface.cs" />
+    <Compile Include="src\Egl\Context.cs" />
+    <Compile Include="src\Linux\GBM\Surface.cs" />
+    <Compile Include="src\Linux\GBM\BufferObject.cs" />
+    <Compile Include="src\Linux\GBM\Device.cs" />
+    <Compile Include="src\Application.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
     <Folder Include="ui\" />
+    <Folder Include="src\Linux\DRI\" />
+    <Folder Include="src\Egl\" />
+    <Folder Include="src\Linux\GBM\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">
@@ -91,5 +104,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ui\menu.crow" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\DRMContext.cs" />
+    <None Include="Main.cs" />
   </ItemGroup>
 </Project>

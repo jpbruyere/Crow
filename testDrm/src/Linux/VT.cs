@@ -26,7 +26,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Crow.Linux.VT {
+namespace Linux.VT {
 	public enum KDMode : byte {
 		TEXT	= 0x00,
 		GRAPHICS= 0x01,
