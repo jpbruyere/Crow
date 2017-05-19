@@ -214,6 +214,7 @@
     <Compile Include="src\Mono.Cairo\EGLDevice.cs" />
     <Compile Include="src\Mono.Cairo\DRMDevice.cs" />
     <Compile Include="src\Mono.Cairo\DRMSurface.cs" />
+    <Compile Include="src\CrowMonitor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

@@ -40,7 +40,8 @@ using OpenTK.Platform.Linux;
 namespace Crow
 {
 	public class Application : IDisposable
-	{		
+	{
+		public bool Running = true;
 		DRI.GPUControler gpu;
 		Cairo.GLSurface cairoSurf;
 
@@ -61,9 +62,8 @@ namespace Crow
 //
 		Crow.XCursor cursor;
 		int previousVT = -1, appVT = -1;
-//
-		public Application(){			
 
+		public Application(){
 			if (Kernel.signal (Signal.SIGUSR1, switch_request_handle) < 0)
 				throw new Exception ("signal handler registation failed");			
 			if (Kernel.signal (Signal.SIGINT, sigint_handler) < 0)
@@ -83,17 +83,17 @@ namespace Crow
 			gpu = new DRI.GPUControler();
 			cairoSurf = gpu.CairoSurf;
 
-			cursor = Crow.XCursorFile.Load("#Crow.Images.Icons.Cursors.arrow").Cursors[0];
-
 			CrowInterface = new Interface ();
 
 			Thread t = new Thread (interfaceThread);
+			t.Name = "Interface";
 			t.IsBackground = true;
 			t.Start ();
 
 			initInput ();
 
 			CrowInterface.ProcessResize (new Size (gpu.Width, gpu.Height));
+			cursor = Crow.XCursorFile.Load("#Crow.Images.Icons.Cursors.arrow").Cursors[0];
 			gpu.updateCursor (cursor);
 			//CrowInterface.MouseCursorChanged += CrowInterface_MouseCursorChanged;
 		}
@@ -105,8 +105,8 @@ namespace Crow
 			}			
 		}
 		void sigint_handler (Signal s){
-			Console.WriteLine ("SIGINT catched");
-			//Running = false;
+			Console.WriteLine ("{0}: SIGINT catched", CrowMonitor.timer.ElapsedTicks);
+			Running = false;
 		}
 //		void CrowInterface_MouseCursorChanged (object sender, MouseCursorChangedEventArgs e)
 //		{
@@ -132,10 +132,16 @@ namespace Crow
 
 //			using (Cairo.Context ctx = new Cairo.Context (cairoSurf)) {
 //				ctx.Rectangle (0, 0, gpu.Width, gpu.Height);
-//				ctx.SetSourceRGB (0, 0, 0.1);
+//				ctx.SetSourceRGB (0, 0, 1);
+//				ctx.Fill ();
+//				ctx.Rectangle (5, 5, 50, 50);
+//				ctx.SetSourceRGB (1, 0, 0);
+//				ctx.Fill ();
+//				ctx.Rectangle (1550, 850, 50, 50);
+//				ctx.SetSourceRGB (0, 1, 0);
 //				ctx.Fill ();
 //			}
-			if (Monitor.TryEnter (CrowInterface.RenderMutex)) {
+			if (CrowMonitor.TryEnter (CrowInterface.RenderMutex, "cairo paint dirty rect on backend surf")) {
 				if (CrowInterface.IsDirty) {
 					CrowInterface.IsDirty = false;
 					update = true;
@@ -149,9 +155,9 @@ namespace Crow
 						}
 					}
 				}
-				Monitor.Exit (CrowInterface.RenderMutex);
+				CrowMonitor.Exit (CrowInterface.RenderMutex);
 			}
-
+//
 //			if (!update)
 //				return;
 //			update = false;
@@ -160,6 +166,8 @@ namespace Crow
 			cairoSurf.SwapBuffers ();
 
 			gpu.Update ();
+			//Thread.Sleep (1);
+			//gpu.MarkFBDirty ();
 		}
 
 
@@ -212,6 +220,7 @@ namespace Crow
 		void initInput (){
 			Semaphore ready = new Semaphore(0, 1);
 			input_thread = new Thread (InputThreadLoop);
+			input_thread.Name = "input_thread"; 
 			input_thread.IsBackground = true;
 			input_thread.Start(ready);
 		}

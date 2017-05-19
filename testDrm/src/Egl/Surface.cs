@@ -41,23 +41,26 @@ namespace EGL
 	{
 		#region pinvoke
 		[DllImportAttribute("libEGL.dll")]
-		public static extern  EGLSurface eglCreateWindowSurface(EGLDisplay dpy, EGLConfig config, IntPtr win, IntPtr attrib_list);
+		internal static extern  EGLSurface eglCreateWindowSurface(EGLDisplay dpy, EGLConfig config, IntPtr win, IntPtr attrib_list);
 		[DllImportAttribute("libEGL.dll")]
-		public static extern EGLSurface eglCreatePbufferSurface(EGLDisplay dpy, EGLConfig config, int[] attrib_list);
+		internal static extern EGLSurface eglCreatePbufferSurface(EGLDisplay dpy, EGLConfig config, int[] attrib_list);
 		[DllImportAttribute("libEGL.dll")]
-		public static extern EGLSurface eglCreatePixmapSurface(EGLDisplay dpy, EGLConfig config, EGLNativePixmapType pixmap, int[] attrib_list);
+		internal static extern EGLSurface eglCreatePixmapSurface(EGLDisplay dpy, EGLConfig config, EGLNativePixmapType pixmap, int[] attrib_list);
 		[DllImportAttribute("libEGL.dll")][return: MarshalAsAttribute(UnmanagedType.I1)]
-		public static extern bool eglDestroySurface(EGLDisplay dpy, EGLSurface surface);
+		internal static extern bool eglDestroySurface(EGLDisplay dpy, EGLSurface surface);
 		[DllImportAttribute("libEGL.dll")][return: MarshalAsAttribute(UnmanagedType.I1)]
-		public static extern bool eglQuerySurface(EGLDisplay dpy, EGLSurface surface, int attribute, out int value);
+		internal static extern bool eglQuerySurface(EGLDisplay dpy, EGLSurface surface, int attribute, out int value);
 		[DllImportAttribute("libEGL.dll")]
-		public static extern EGLSurface eglCreatePbufferFromClientBuffer(EGLDisplay dpy, int buftype, EGLClientBuffer buffer, EGLConfig config, int[] attrib_list);
+		internal static extern EGLSurface eglCreatePbufferFromClientBuffer(EGLDisplay dpy, int buftype, EGLClientBuffer buffer, EGLConfig config, int[] attrib_list);
 		[DllImportAttribute("libEGL.dll")][return: MarshalAsAttribute(UnmanagedType.I1)]
-		public static extern bool eglSurfaceAttrib(EGLDisplay dpy, EGLSurface surface, int attribute, int value);
+		internal static extern bool eglSurfaceAttrib(EGLDisplay dpy, EGLSurface surface, int attribute, int value);
 		[DllImportAttribute("libEGL.dll")][return: MarshalAsAttribute(UnmanagedType.I1)]
-		public static extern bool eglBindTexImage(EGLDisplay dpy, EGLSurface surface, int buffer);
+		internal static extern bool eglBindTexImage(EGLDisplay dpy, EGLSurface surface, int buffer);
 		[DllImportAttribute("libEGL.dll")][return: MarshalAsAttribute(UnmanagedType.I1)]
-		public static extern bool eglReleaseTexImage(EGLDisplay dpy, EGLSurface surface, int buffer);
+		internal static extern bool eglReleaseTexImage(EGLDisplay dpy, EGLSurface surface, int buffer);
+		[DllImportAttribute("libEGL.dll")][return: MarshalAsAttribute(UnmanagedType.I1)]
+		internal static extern bool eglSwapBuffers(EGLDisplay dpy, EGLSurface surface);
+
 		#endregion
 
 		Context ctx;
@@ -74,6 +77,10 @@ namespace EGL
 		public void MakeCurrent (){
 			if (!Context.MakeCurrent(ctx.dpy, handle, handle, ctx.ctx))
 				throw new NotSupportedException(string.Format("eglMakeCurrent on surface Failed: {0}",Context.GetError()));			
+		}
+		public void SwapBuffers () {
+			if (!eglSwapBuffers (ctx.dpy, handle))
+				throw new NotSupportedException(string.Format("eglSwapBuffers Failed: {0}",Context.GetError()));			
 		}
 
 		#region IDisposable implementation

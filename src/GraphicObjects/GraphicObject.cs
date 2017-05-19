@@ -40,6 +40,7 @@ namespace Crow
 {
 	public class GraphicObject : ILayoutable, IValueChange
 	{
+		internal NamedMutex mutex = new NamedMutex("GRAPHIC OBJECT");
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
 
@@ -162,8 +163,9 @@ namespace Crow
 				if (parent == value)
 					return;
 				DataSourceChangeEventArgs e = new DataSourceChangeEventArgs (parent, value);
-				lock (this)
-					parent = value;
+				CrowMonitor.Enter (mutex, "set parent of object");
+				parent = value;
+				CrowMonitor.Exit (mutex);
 
 				onParentChanged (this, e);
 			}
@@ -887,12 +889,12 @@ namespace Crow
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
 			if (Parent == null)
 				return;
-			lock (CurrentInterface.LayoutMutex) {
-				//prevent queueing same LayoutingType for this
-				layoutType &= (~RegisteredLayoutings);
+			CrowMonitor.Enter (CurrentInterface.LayoutMutex, "register for layouting");
+			//prevent queueing same LayoutingType for this
+			layoutType &= (~RegisteredLayoutings);
 
-				if (layoutType == LayoutingType.None)
-					return;
+			if (layoutType != LayoutingType.None) {
+					
 				//dont set position for stretched item
 				if (Width == Measure.Stretched)
 					layoutType &= (~LayoutingType.X);
@@ -909,21 +911,21 @@ namespace Crow
 //				//prevent queueing same LayoutingType for this
 //				layoutType &= (~RegisteredLayoutings);
 
-				if (layoutType == LayoutingType.None)
-					return;
-
-				//enqueue LQI LayoutingTypes separately
-				if (layoutType.HasFlag (LayoutingType.Width))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
-				if (layoutType.HasFlag (LayoutingType.Height))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
-				if (layoutType.HasFlag (LayoutingType.X))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
-				if (layoutType.HasFlag (LayoutingType.Y))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
-				if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
+				if (layoutType != LayoutingType.None) {					
+					//enqueue LQI LayoutingTypes separately
+					if (layoutType.HasFlag (LayoutingType.Width))
+						CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
+					if (layoutType.HasFlag (LayoutingType.Height))
+						CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
+					if (layoutType.HasFlag (LayoutingType.X))
+						CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
+					if (layoutType.HasFlag (LayoutingType.Y))
+						CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
+					if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
+						CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
+				}
 			}
+			CrowMonitor.Exit (CurrentInterface.LayoutMutex);
 		}
 
 		/// <summary> trigger dependant sizing component update </summary>
@@ -1154,33 +1156,36 @@ namespace Crow
 			//TODO:this test should not be necessary
 			if (Slot.Height < 0 || Slot.Width < 0 || parent == null)
 				return;
-			lock (this) {
-				if (cacheEnabled) {
-					if (Slot.Width > Interface.MaxCacheSize || Slot.Height > Interface.MaxCacheSize)
-						cacheEnabled = false;
-				}
+			
+			CrowMonitor.Enter (mutex, "Paint");
 
-				if (cacheEnabled) {
-					if (IsDirty)
-						RecreateCache ();
-
-					UpdateCache (ctx);
-					if (!isEnabled)
-						paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);
-				} else {
-					Rectangle rb = Slot + Parent.ClientRectangle.Position;
-					ctx.Save ();
-
-					ctx.Translate (rb.X, rb.Y);
-
-					onDraw (ctx);
-					if (!isEnabled)
-						paintDisabled (ctx, Slot);
-
-					ctx.Restore ();
-				}
-				LastPaintedSlot = Slot;
+			if (cacheEnabled) {
+				if (Slot.Width > Interface.MaxCacheSize || Slot.Height > Interface.MaxCacheSize)
+					cacheEnabled = false;
 			}
+
+			if (cacheEnabled) {
+				if (IsDirty)
+					RecreateCache ();
+
+				UpdateCache (ctx);
+				if (!isEnabled)
+					paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);
+			} else {
+				Rectangle rb = Slot + Parent.ClientRectangle.Position;
+				ctx.Save ();
+
+				ctx.Translate (rb.X, rb.Y);
+
+				onDraw (ctx);
+				if (!isEnabled)
+					paintDisabled (ctx, Slot);
+
+				ctx.Restore ();
+			}
+			LastPaintedSlot = Slot;
+
+			CrowMonitor.Exit (mutex);
 		}
 		void paintDisabled(Context gr, Rectangle rb){
 			gr.Operator = Operator.Xor;

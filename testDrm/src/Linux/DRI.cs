@@ -27,6 +27,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Linux.DRI {
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -124,7 +125,8 @@ namespace Linux.DRI {
 		Resources resources = null;
 		Connector connector = null;
 		Crtc currentCrtc = null;
-		ModeInfo currentMode;
+		ModeInfo currentMode, originalMode;
+		uint originalFB;
 
 		public GPUControler(string gpu_path = "/dev/dri/card0"){
 			fd_gpu = Libc.open(gpu_path, OpenFlags.ReadWrite | OpenFlags.CloseOnExec);
@@ -149,6 +151,42 @@ namespace Linux.DRI {
 		public int Width { get { return (int)currentMode.hdisplay; }}
 		public int Height { get { return (int)currentMode.vdisplay; }}
 
+		ModeInfo getNewMode(){
+			ModeInfo mode = currentCrtc.CurrentMode;
+			mode.clock = 118250;
+			mode.hdisplay = 1600;
+			mode.hsync_start = 1696;
+			mode.hsync_end = 1856;
+			mode.htotal = 2112;
+			mode.vdisplay = 900;
+			mode.vsync_start = 903;
+			mode.vsync_end = 908;
+			mode.vtotal = 934;
+			mode.flags |= (uint)VideoMode.NHSYNC;
+			mode.flags |= (uint)VideoMode.PVSYNC;
+			return mode;
+		}
+		unsafe void setNewMode(){
+			
+			//currentCrtc.handle->mode = currentMode;
+//			ModeInfo* mode = (ModeInfo*)Marshal.AllocHGlobal (sizeof(ModeInfo));// pConnector->modes;
+//			*mode = currentMode;
+
+			uint fb;
+			GBM.gbm_bo* bo = GBM.BufferObject.gbm_bo_create (gbmDev.handle, (uint)Width, (uint)Height, GBM.SurfaceFormat.ARGB8888, GBM.SurfaceFlags.Scanout);
+			int ret = drmModeAddFB (fd_gpu, (uint)Width, (uint)Height, (byte)depth, (byte)bpp, bo->Stride, (uint)bo->Handle32, out fb);
+			if (ret != 0)
+				Console.WriteLine ("addFb failed: {0}", ret);
+			bo->SetUserData ((IntPtr)fb, handleDestroyFB);
+
+			uint connId = connector.Id;
+			ret = drmModeSetCrtc (fd_gpu, currentCrtc.Id, fb, 0, 0, &connId, 1, ref currentMode);
+			if (ret != 0)
+				Console.WriteLine ("set new mode setCrtc failed: {0}", ret);
+			//GBM.BufferObject.gbm_bo_destroy (bo);
+
+			//Console.WriteLine ("new mode set to {0} x {1}", Width, Height);
+		}
 		bool defaultConfiguration (){
 			//select the first connected connector
 			foreach (Connector c in resources.Connectors) {
@@ -161,11 +199,16 @@ namespace Linux.DRI {
 				return false;
 			
 			currentCrtc = connector.CurrentEncoder.CurrentCrtc;
-			currentMode = currentCrtc.CurrentMode;
-			
+			originalMode = currentCrtc.CurrentMode;
+			originalFB = currentCrtc.CurrentFbId;
+			currentMode = getNewMode();
+
+
 			//configure a rendering stack
 			gbmSurf = new GBM.Surface (gbmDev, Width, Height,
 				GBM.SurfaceFlags.Rendering | GBM.SurfaceFlags.Scanout);
+
+			setNewMode ();
 
 			eglSurf = new EGL.Surface (eglctx, gbmSurf);
 			eglSurf.MakeCurrent ();
@@ -179,7 +222,17 @@ namespace Linux.DRI {
 
 			if (cairoDev.Acquire () != Cairo.Status.Success)
 				Console.WriteLine ("[Cairo]: Failed to acquire egl device.");
-			
+
+//			using (Cairo.Context ctx = new Cairo.Context (CairoSurf)) {
+//				ctx.Rectangle (0, 0, Width, Height);
+//				ctx.SetSourceRGB (0, 0, 1);
+//				ctx.Fill ();
+//			}
+//			CairoSurf.Flush ();
+//			CairoSurf.SwapBuffers ();
+//			Update ();
+
+			//Thread.Sleep (1);
 			return true;
 		}
 		void handleDestroyFB(ref GBM.gbm_bo bo, IntPtr data)
@@ -200,126 +253,38 @@ namespace Linux.DRI {
 			GBM.gbm_bo* bo;	
 			uint fb;
 
-//			PollFD fds = new PollFD();
-//			fds.fd = fd_gpu;
-//			fds.events = PollFlags.In;
-//
-//			EventContext evctx = new EventContext();
-//			evctx.version = EventContext.Version;
-//			evctx.page_flip_handler = PageFlipPtr;
-
-//			int timeout = -1;//block ? -1 : 0;
-//
-
 			if (!gbmSurf.HasFreeBuffers)
 				throw new NotSupportedException("[GBM] Out of free buffer");
 				
 			bo = gbmSurf.Lock ();
-			//fb = getFbFromBo (bo);
-			//unsafe {
-				//Console.WriteLine ("current fb: {0}", currentCrtc.CurrentFbId);
-				//if (currentCrtc.CurrentFbId == 0)
 
-				int ret = drmModeAddFB (fd_gpu, currentMode.hdisplay, currentMode.vdisplay, (byte)depth, (byte)bpp, bo->Stride, (uint)bo->Handle32, out fb);
-				if (ret != 0)
-					Console.WriteLine ("addFb failed: {0}", ret);				
-				//else
-				//	fb = currentCrtc.CurrentFbId;
-				bo->SetUserData ((IntPtr)fb, handleDestroyFB);
+			int ret = drmModeAddFB (fd_gpu, currentMode.hdisplay, currentMode.vdisplay, (byte)depth, (byte)bpp, bo->Stride, (uint)bo->Handle32, out fb);
+			if (ret != 0)
+				Console.WriteLine ("addFb failed: {0}", ret);
+			bo->SetUserData ((IntPtr)fb, handleDestroyFB);
 
-				uint connId = connector.Id;
-				ret = drmModeSetCrtc (fd_gpu, currentCrtc.Id, fb, 0, 0, &connId, 1, ref currentMode);
-				if (ret != 0)
-					Console.WriteLine ("setCrtc failed: {0}", ret);
-			//}
+			uint connId = connector.Id;
+			ret = drmModeSetCrtc (fd_gpu, currentCrtc.Id, fb, 0, 0, &connId, 1, ref currentMode);
+			if (ret != 0)
+				Console.WriteLine ("setCrtc failed: {0}", ret);
+
 			gbmSurf.Release (bo);
-
-			//bo.Dispose ();
-//
-//			SetScanoutRegion (fb);
-//			drmTimeOut.Restart();
-//
-//			while (run && drmTimeOut.ElapsedMilliseconds < 10000){				
-//				BufferObject next_bo;
-//				bool update = false;
-//
-//				if (updateMousePos) {
-//					lock (Sync) {
-//						updateMousePos = false;
-//						unsafe {	
-//							Drm.MoveCursor (fd_gpu, pEncoder->crtc_id, MouseX-8, MouseY-4);
-//						}
-//					}
-//				}
-//
-//				if (Monitor.TryEnter (CrowInterface.RenderMutex)) {
-//					if (CrowInterface.IsDirty) {
-//						CrowInterface.IsDirty = false;
-//						update = true;
-//						using (Cairo.Context ctx = new Cairo.Context (cairoSurf)) {
-//							using (Cairo.Surface d = new Cairo.ImageSurface (CrowInterface.dirtyBmp, Cairo.Format.Argb32,
-//								width, height, width * 4)) {
-//								ctx.SetSourceSurface (d, 0, 0);
-//								ctx.Operator = Cairo.Operator.Source;
-//								ctx.Paint ();
-//							}
-//						}
-//					}
-//					Monitor.Exit (CrowInterface.RenderMutex);
-//				}
-//
-//				if (!update)
-//					continue;
-//				update = false;
-//
-//				cairoSurf.Flush ();
-//				cairoSurf.SwapBuffers ();
-//
-//				if (Gbm.HasFreeBuffers (gbm_surface) == 0)
-//					throw new Exception ("[GBM]: Out of free buffers.");
-//
-//				next_bo = Gbm.LockFrontBuffer (gbm_surface);
-//				if (next_bo == BufferObject.Zero)
-//					throw new Exception ("[GBM]: Failed to lock front buffer.");
-//
-//				fb = getFbFromBo (next_bo);
-//
-//				unsafe{
-//					int is_flip_queued = 1;
-//
-//					while (Drm.ModePageFlip (fd_gpu, pEncoder->crtc_id, fb, PageFlipFlags.FlipEvent, ref is_flip_queued) < 0) {
-//						//Console.WriteLine ("[DRM] Failed to enqueue framebuffer flip.");				
-//						continue;
-//					}
-//
-//					while (is_flip_queued != 0)
-//					{
-//						fds.revents = 0;
-//						if (Libc.poll (ref fds, 1, timeout) < 0)
-//							break;						
-//
-//						if ((fds.revents & (PollFlags.Hup | PollFlags.Error)) != 0)
-//							break;
-//
-//						if ((fds.revents & PollFlags.In) != 0)
-//							Drm.HandleEvent (fd_gpu, ref evctx);
-//						else
-//							break;
-//						Thread.Sleep (1);
-//					}
-//					if (is_flip_queued != 0)
-//						Console.WriteLine ("flip canceled");
-//
-//					Gbm.ReleaseBuffer (gbm_surface, bo);
-//					//Drm.ModeRmFB(fd_gpu, fb);
-//
-//					bo = next_bo;
-//					next_bo = BufferObject.Zero;
-//
-//				}
-//			}
 		}
-
+		[StructLayout(LayoutKind.Sequential)]
+		struct drmClip {
+			public ushort x1;
+			public ushort y1;
+			public ushort x2;
+			public ushort y2;
+		}
+		unsafe public void MarkFBDirty(){
+			IntPtr pClip = Marshal.AllocHGlobal (sizeof(drmClip));
+			drmClip dc = new drmClip () { x1 = 0, y1 = 0, x2 = 500, y2 = 500 };
+			Marshal.StructureToPtr (dc, pClip,false);
+			int ret = drmModeDirtyFB (fd_gpu, currentCrtc.CurrentFbId, IntPtr.Zero, 0);
+			if (ret < 0)
+				Console.WriteLine ("set FB dirty failed: {0}", ret);
+		}
 		#region cursor
 		GBM.BufferObject boMouseCursor;
 
@@ -359,28 +324,7 @@ namespace Linux.DRI {
 			drmModeMoveCursor (fd_gpu, currentCrtc.Id, x, y);
 		}
 		#endregion
-//		void initGbm (){
-//			gbm_surface =  Gbm.CreateSurface(gbm_device, mode.hdisplay, mode.vdisplay, SurfaceFormat.ARGB8888, SurfaceFlags.Rendering | SurfaceFlags.Scanout);
-//			if (gbm_surface == IntPtr.Zero)
-//				throw new NotSupportedException("[GBM] Failed to create GBM surface for rendering");						
-//
-//			unsafe {
-//				gbm_bo* bo = Gbm.CreateBO (gbm_device, mode.hdisplay, mode.vdisplay, SurfaceFormat.ARGB8888, SurfaceFlags.Scanout);
-//				if (bo == null)
-//					Console.WriteLine ("failed to create a BufferObject for screen 0");
-//				else {
-//					uint fb_id = screens [0].BindBuffer (bo);
-//					//						if (paint (bo))
-//					//							Console.WriteLine ("[DRI] bo paint succeed");
-//					//						ModeDirtyFB (fd_gpu, fb_id, IntPtr.Zero, 0);
-//				}
-//				//					//Gbm.DestroyBuffer (bo);
-//				ModeAddFB (fd_gpu, bo->Width, bo->Height,(byte)depth, (byte)bpp, bo->Stride, bo->Handle32, out fb_id);
-//				bo->SetUserData ((IntPtr)fb_id, IntPtr.Zero);
-//
-//				int ret = ModeSetCrtc(fd_gpu, crtc_id, fb_id, x, y, &connector_id, 1, ref mode);
-//			}
-//		}
+
 //		unsafe public drmPlane GetPlane (uint id) {
 //			drmPlane p = new drmPlane();
 //			drmPlane* pPlane = ModeGetPlane (fd_gpu, id);
@@ -418,6 +362,13 @@ namespace Linux.DRI {
 				CairoSurf = null;
 			}
 
+			uint connId = connector.Id;
+			unsafe{
+				int ret = drmModeSetCrtc (fd_gpu, currentCrtc.Id, originalFB, 0, 0, &connId, 1, ref originalMode);
+				if (ret != 0)
+					Console.WriteLine ("restore Crtc failed: {0}", ret);
+			}
+
 			if (boMouseCursor != null)
 				boMouseCursor.Dispose ();
 			boMouseCursor = null;
@@ -452,9 +403,8 @@ namespace Linux.DRI {
 			byte bpp, uint stride, uint bo_handle, out uint buf_id);
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
 		public static extern int drmModeRmFB(int fd, int bufferId);
-		[DllImport(lib, EntryPoint = "drmModeDirtyFB", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int ModeDirtyFB(int fd, uint bufferId, IntPtr clips, uint num_clips);
-		
+		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		public static extern int drmModeDirtyFB(int fd, uint bufferId, IntPtr clips, uint num_clips);
 
 		[DllImport(lib, EntryPoint = "drmModeGetFB", CallingConvention = CallingConvention.Cdecl)]
 		unsafe internal static extern drmFrameBuffer* ModeGetFB(int fd, uint fb_id);
@@ -480,6 +430,9 @@ namespace Linux.DRI {
 
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
 		unsafe static extern int drmModeSetCrtc(int fd, uint crtcId, uint bufferId,	uint x, uint y, uint* connectors, int count, ref ModeInfo mode);
+
+		[DllImport(lib, EntryPoint = "drmModeSetCrtc", CallingConvention = CallingConvention.Cdecl)]
+		unsafe static extern int ModeSetCrtc(int fd, uint crtcId, uint bufferId,	uint x, uint y, uint* connectors, int count, ModeInfo* mode);
 
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern int drmModeSetCursor2(int fd, uint crtcId, uint bo_handle, uint width, uint height, int hot_x, int hot_y);

@@ -160,13 +160,15 @@ namespace Crow
 
 				NotifyValueChanged ("Data", data);
 
-				lock (CurrentInterface.LayoutMutex)
-					ClearItems ();
+				CrowMonitor.Enter (CurrentInterface.LayoutMutex, "templated group enclosing clearItems");
+				ClearItems ();
+				CrowMonitor.Exit (CurrentInterface.LayoutMutex);
 
 				if (data == null)
 					return;
 
 				loadingThread = new CrowThread (this, loading);
+				loadingThread.thread.Name = "list loading thread";
 				loadingThread.Finished += (object sender, EventArgs e) => (sender as TemplatedGroup).Loaded.Raise (sender, e);
 				loadingThread.Start ();
 
@@ -324,8 +326,9 @@ namespace Crow
 
 			if (page == items)
 				return;
-			lock (CurrentInterface.LayoutMutex)
-				items.AddChild (page);
+			CrowMonitor.Enter (CurrentInterface.LayoutMutex, "templeted group add chile (page)");
+			items.AddChild (page);
+			CrowMonitor.Exit (CurrentInterface.LayoutMutex);
 
 			#if DEBUG_LOAD
 			loadingTime.Stop ();
@@ -377,12 +380,13 @@ namespace Crow
 					iTemp = ItemTemplates ["default"];
 			}
 
-			lock (CurrentInterface.LayoutMutex) {
-				g = iTemp.CreateInstance(CurrentInterface);
-				page.AddChild (g);
-				//g.LogicalParent = this;
-				registerItemClick (g);
-			}
+			CrowMonitor.Enter (CurrentInterface.LayoutMutex, "templeted group add item to page");
+			g = iTemp.CreateInstance(CurrentInterface);
+			page.AddChild (g);
+			//g.LogicalParent = this;
+			registerItemClick (g);
+			CrowMonitor.Exit (CurrentInterface.LayoutMutex);
+
 
 			if (iTemp.Expand != null && g is Expandable) {
 				(g as Expandable).Expand += iTemp.Expand;

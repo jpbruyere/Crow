@@ -55,7 +55,7 @@ namespace Linux.GBM
 	{
 		#region pinvoke
 		[DllImport("gbm", CallingConvention = CallingConvention.Cdecl)]
-		static extern gbm_bo* gbm_bo_create (IntPtr gbm, uint width, uint height, SurfaceFormat format, SurfaceFlags flags);
+		internal static extern gbm_bo* gbm_bo_create (IntPtr gbm, uint width, uint height, SurfaceFormat format, SurfaceFlags flags);
 		[DllImport("gbm", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void gbm_bo_destroy (gbm_bo* bo);
 		[DllImport("gbm", CallingConvention = CallingConvention.Cdecl)]

@@ -124,11 +124,13 @@ namespace Crow
 		/// <summary>Coordinate of the dirty bmp on the original bmp</summary>
 		public Rectangle DirtyRect;
 		/// <summary>Locked for each layouting operation</summary>
-		public object LayoutMutex = new object();
+		public NamedMutex LayoutMutex = new NamedMutex("LAYOUTING");
 		/// <summary>Sync mutex between host and Crow for rendering operations (bmp, dirtyBmp,...)</summary>
-		public object RenderMutex = new object();
+		public NamedMutex DrawingQueueMutex = new NamedMutex("DRAWING QUEUE");
+		/// <summary>Sync mutex between host and Crow for rendering operations (bmp, dirtyBmp,...)</summary>
+		public NamedMutex RenderMutex = new NamedMutex("RENDERING");
 		/// <summary>Global lock of the update cycle</summary>
-		public object UpdateMutex = new object();
+		public NamedMutex UpdateMutex = new NamedMutex("UPDATE");
 		//TODO:share resource instances
 		/// <summary>
 		/// Store loaded resources instances shared among controls to reduce memory footprint
@@ -255,12 +257,11 @@ namespace Crow
 		/// of this Interface</summary>
 		public GraphicObject LoadInterface (string path)
 		{
-			lock (UpdateMutex) {
-				GraphicObject tmp = Load (path);
-				AddWidget (tmp);
-
-				return tmp;
-			}
+			CrowMonitor.Enter (UpdateMutex, "load interface");
+			GraphicObject tmp = Load (path);
+			AddWidget (tmp);
+			CrowMonitor.Exit (UpdateMutex);
+			return tmp;
 		}
 		/// <summary>Create an instance of a GraphicObject linked to this interface but
 		/// not added to the GraphicTree</summary>
@@ -368,12 +369,12 @@ namespace Crow
 		/// GraphObj's property Set methods could trigger an update from another thread</summary>
 		public void EnqueueForRepaint(GraphicObject g)
 		{
-			lock (DrawingQueue) {
-				if (g.IsQueueForRedraw)
-					return;
+			CrowMonitor.Enter (DrawingQueueMutex, "engueue for repaint");
+			if (!g.IsQueueForRedraw){				
 				DrawingQueue.Enqueue (g);
 				g.IsQueueForRedraw = true;
 			}
+			CrowMonitor.Exit (DrawingQueueMutex);
 		}
 		/// <summary>Main Update loop, executed in this interface thread, lock the UpdateMutex
 		/// Steps:
@@ -406,8 +407,9 @@ namespace Crow
 			for (int i = 0; i < tmpThreads.Length; i++)
 				tmpThreads [i].CheckState ();
 
-			if (!Monitor.TryEnter (UpdateMutex))
+			if (!CrowMonitor.TryEnter (UpdateMutex, "main update loop"))
 				return;
+			
 
 			#if MEASURE_TIME
 			updateMeasure.StartCycle();
@@ -432,7 +434,7 @@ namespace Crow
 			updateMeasure.StopCycle();
 			#endif
 
-			Monitor.Exit (UpdateMutex);
+			CrowMonitor.Exit (UpdateMutex);
 		}
 		/// <summary>Layouting loop, this is the first step of the udpate and process registered
 		/// Layouting queue items. Failing LQI's are requeued in this cycle until MaxTry is reached which
@@ -442,7 +444,7 @@ namespace Crow
 			layoutingMeasure.StartCycle();
 			#endif
 
-			if (Monitor.TryEnter (LayoutMutex)) {
+			if (CrowMonitor.TryEnter (LayoutMutex, "main layouting loop")) {
 				DiscardQueue = new Queue<LayoutingQueueItem> ();
 				//Debug.WriteLine ("======= Layouting queue start =======");
 				LayoutingQueueItem lqi;
@@ -455,7 +457,7 @@ namespace Crow
 					lqi.ProcessLayouting ();
 				}
 				LayoutingQueue = DiscardQueue;
-				Monitor.Exit (LayoutMutex);
+				CrowMonitor.Exit (LayoutMutex);
 				DiscardQueue = null;
 			}
 
@@ -472,10 +474,12 @@ namespace Crow
 			#endif
 			GraphicObject g = null;
 			while (DrawingQueue.Count > 0) {
-				lock (DrawingQueue)
-					g = DrawingQueue.Dequeue ();
-				lock (g)
-					g.ClippingRegistration ();
+				CrowMonitor.Enter (DrawingQueueMutex, "clipping registration");
+				g = DrawingQueue.Dequeue ();
+				CrowMonitor.Exit (DrawingQueueMutex);
+				CrowMonitor.Enter (g.mutex, "after dequeue, before entering clipping registration");
+				g.ClippingRegistration ();
+				CrowMonitor.Exit (g.mutex);
 			}
 
 			#if MEASURE_TIME
@@ -510,7 +514,7 @@ namespace Crow
 						#if DEBUG_CLIP_RECTANGLE
 						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
 						#endif
-						lock (RenderMutex) {
+						CrowMonitor.Enter (RenderMutex, "creating dirty rect");
 //							Array.Copy (bmp, dirtyBmp, bmp.Length);
 							IsDirty = true;
 							if (IsDirty)
@@ -535,7 +539,7 @@ namespace Crow
 
 							} else
 								IsDirty = false;
-						}
+						CrowMonitor.Exit (RenderMutex);
 						clipping.Reset ();
 					}
 					//surf.WriteToPng (@"/mnt/data/test.png");
@@ -565,8 +569,9 @@ namespace Crow
 				}
 			}
 
-			lock (UpdateMutex)
-				GraphicTree.Insert (ptr, g);
+			CrowMonitor.Enter (UpdateMutex, "interface add widget");
+			GraphicTree.Insert (ptr, g);
+			CrowMonitor.Exit (UpdateMutex);
 
 			g.RegisteredLayoutings = LayoutingType.None;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
@@ -578,11 +583,11 @@ namespace Crow
 				if (g.Contains (_hoverWidget))
 					HoverWidget = null;
 			}
-			lock (UpdateMutex) {
-				g.DataSource = null;
-				g.Visible = false;
-				GraphicTree.Remove (g);
-			}
+			CrowMonitor.Enter (UpdateMutex, "interface delete widget");
+			g.DataSource = null;
+			g.Visible = false;
+			GraphicTree.Remove (g);
+			CrowMonitor.Exit (UpdateMutex);
 		}
 		/// <summary> Put widget on top of other root widgets</summary>
 		public void PutOnTop(GraphicObject g, bool isOverlay = false)
@@ -601,17 +606,20 @@ namespace Crow
 			}
 			if (GraphicTree.IndexOf(g) > ptr)
 			{
-				lock (UpdateMutex) {
+				CrowMonitor.Enter (UpdateMutex, "interface put on top");
+
 					GraphicTree.Remove (g);
 					GraphicTree.Insert (ptr, g);
-				}
+				CrowMonitor.Exit (UpdateMutex);
+
 				EnqueueForRepaint (g);
 			}
 		}
 		/// <summary> Remove all Graphic objects from top container </summary>
 		public void ClearInterface()
 		{
-			lock (UpdateMutex) {
+			CrowMonitor.Enter (UpdateMutex, "clear interface");
+
 				while (GraphicTree.Count > 0) {
 					//TODO:parent is not reset to null because object will be added
 					//to ObjectToRedraw list, and without parent, it fails
@@ -620,7 +628,8 @@ namespace Crow
 					g.Visible = false;
 					GraphicTree.RemoveAt (0);
 				}
-			}
+			CrowMonitor.Exit (UpdateMutex);
+
 			#if DEBUG_LAYOUTING
 			LQIsTries = new List<LQIList>();
 			curLQIsTries = new LQIList();
@@ -642,7 +651,8 @@ namespace Crow
 		#endregion
 
 		public void ProcessResize(Rectangle bounds){
-			lock (UpdateMutex) {
+			CrowMonitor.Enter (UpdateMutex, "process resize");
+
 				clientRectangle = bounds;
 				int stride = 4 * ClientRectangle.Width;
 				int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
@@ -653,7 +663,8 @@ namespace Crow
 					g.RegisterForLayouting (LayoutingType.All);
 
 				clipping.AddRectangle (clientRectangle);
-			}
+			CrowMonitor.Exit (UpdateMutex);
+
 		}
 
 		#region Mouse and Keyboard Handling
@@ -733,17 +744,16 @@ namespace Crow
 			}
 
 			//top level graphic obj's parsing
-			lock (GraphicTree) {
-				for (int i = 0; i < GraphicTree.Count; i++) {
-					GraphicObject g = GraphicTree [i];
-					if (g.MouseIsIn (e.Position)) {
-						g.checkHoverWidget (e);
-						if (g is Window)
-							PutOnTop (g);
-						return true;
-					}
+			for (int i = 0; i < GraphicTree.Count; i++) {
+				GraphicObject g = GraphicTree [i];
+				if (g.MouseIsIn (e.Position)) {
+					g.checkHoverWidget (e);
+					if (g is Window)
+						PutOnTop (g);
+					return true;
 				}
 			}
+
 			HoverWidget = null;
 			return false;
 		}

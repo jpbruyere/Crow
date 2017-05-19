@@ -27,10 +27,10 @@
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
+    <OutputPath>$(SolutionDir)build\Debug</OutputPath>
+    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -40,7 +40,7 @@
     <ConsolePause>false</ConsolePause>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
+    <OutputPath>$(SolutionDir)build\Release</OutputPath>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -81,6 +81,7 @@
     <Compile Include="src\Linux\GBM\Device.cs" />
     <Compile Include="src\Application.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="testThreadMonitor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -105,6 +106,9 @@
   <ItemGroup>
     <EmbeddedResource Include="ui\menu.crow" />
     <EmbeddedResource Include="ui\0.crow" />
+    <EmbeddedResource Include="ui\1.crow" />
+    <EmbeddedResource Include="ui\2.crow" />
+    <EmbeddedResource Include="ui\colorItem.crow" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\DRMContext.cs" />

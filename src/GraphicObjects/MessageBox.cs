@@ -132,18 +132,20 @@ namespace Crow
 			close ();
 		}
 		public static MessageBox Show (Type msgBoxType, string message, string okMsg = "", string cancelMsg = ""){
-			lock (Interface.CurrentInterface.UpdateMutex) {
-				MessageBox mb = new MessageBox ();
-				mb.Initialize ();
-				mb.CurrentInterface.AddWidget (mb);
-				mb.MsgType = msgBoxType;
-				mb.Message = message;
-				if (!string.IsNullOrEmpty(okMsg))
-					mb.OkMessage = okMsg;
-				if (!string.IsNullOrEmpty(cancelMsg))
-					mb.CancelMessage = cancelMsg;
-				return mb;
-			}
+			MessageBox mb = null;
+			CrowMonitor.Enter (Interface.CurrentInterface.UpdateMutex, "message box show");
+			mb = new MessageBox ();
+			mb.Initialize ();
+			mb.CurrentInterface.AddWidget (mb);
+			mb.MsgType = msgBoxType;
+			mb.Message = message;
+			if (!string.IsNullOrEmpty(okMsg))
+				mb.OkMessage = okMsg;
+			if (!string.IsNullOrEmpty(cancelMsg))
+				mb.CancelMessage = cancelMsg;
+			CrowMonitor.Exit (Interface.CurrentInterface.UpdateMutex);
+			return mb;
+
 		}
 	}
 }

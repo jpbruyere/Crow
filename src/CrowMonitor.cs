@@ -1,5 +1,5 @@
 ﻿//
-// CrowThread.cs
+// CrowMonitor.cs
 //
 // Author:
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
@@ -23,42 +23,38 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-
 using System;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Crow
 {
-	/// <summary>
-	/// Thread monitored by current interface with Finished event when state==Stopped
-	/// </summary>
-	public class CrowThread {
-		internal Thread thread;
-		public event EventHandler Finished;
-		public GraphicObject Host;
-		public CrowThread (GraphicObject host, ThreadStart start){
-			thread = new Thread (start);
-			thread.IsBackground = true;
-			Host = host;
-			lock (Host.CurrentInterface.CrowThreads)
-				Host.CurrentInterface.CrowThreads.Add (this);
+	public class NamedMutex {
+		public string Name;
+		public NamedMutex (string name){
+			Name = name;
 		}
-		public void CheckState(){
-			if (thread.ThreadState != ThreadState.Stopped)
-				return;
-			Finished.Raise (Host, null);
-			lock (Host.CurrentInterface.CrowThreads)
-				Host.CurrentInterface.CrowThreads.Remove (this);
+	}
+	public static class CrowMonitor
+	{
+		public static Stopwatch timer = Stopwatch.StartNew();
+
+		public static bool TryEnter (NamedMutex mutex, string ctxName = "?"){
+			Console.WriteLine("{3}:TRY LCK:{0} => {1} ({2})", Thread.CurrentThread.Name, mutex.Name, ctxName, timer.ElapsedTicks);
+			bool locking = Monitor.TryEnter (mutex);
+			if (locking)
+				Console.WriteLine("{2}:\tLOCKED :{0} => {1} mutex", Thread.CurrentThread.Name, mutex.Name, timer.ElapsedTicks);
+			return locking;
+
 		}
-		public void Start() { thread.Start();}
-		public void Cancel(){
-			if (thread.IsAlive){
-				//cancelLoading = true;
-				thread.Join ();
-				//cancelLoading = false;
-			}
-			lock (Host.CurrentInterface.CrowThreads)
-				Host.CurrentInterface.CrowThreads.Remove (this);
+		public static void Enter (NamedMutex mutex, string ctxName = "?") {
+			Console.WriteLine("{3}:WAIT   :{0} => {1} ({2})", Thread.CurrentThread.Name, mutex.Name, ctxName, timer.ElapsedTicks);
+			Monitor.Enter (mutex);
+			Console.WriteLine("{3}:\tLOCKED :{0} => {1} mutex ({2})", Thread.CurrentThread.Name, mutex.Name, ctxName, timer.ElapsedTicks);
+		}
+		public static void Exit (NamedMutex mutex) {
+			Monitor.Exit (mutex);
+			Console.WriteLine("{2}:\tRELEASE:{0} => {1} mutex", Thread.CurrentThread.Name, mutex.Name, timer.ElapsedTicks);
 		}
 	}
 }

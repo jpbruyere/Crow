@@ -79,9 +79,9 @@ namespace Crow
 					if (string.IsNullOrEmpty(value))
 						Picture = null;
 					else {
-						lock(CurrentInterface.LayoutMutex){
-							LoadImage (value);
-						}
+						CrowMonitor.Enter(CurrentInterface.LayoutMutex, "load image");
+						LoadImage (value);
+						CrowMonitor.Exit(CurrentInterface.LayoutMutex);
 					}
 				} catch (Exception ex) {
 					Debug.WriteLine (ex.Message);
