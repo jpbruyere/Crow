@@ -1,0 +1,34 @@
+﻿<?xml version="1.0"?>
+<Window Caption="Performances" Height="160" Width="200">	
+	<VerticalStack Width="90%" Height="Fit" Spacing="1" Margin="10">
+		<HorizontalStack>
+			<Label Text="Frame:" Style="FpsLabel"/>
+			<Label Text="{frameTime}" Style="FpsDisp"/>
+		</HorizontalStack>
+		<HorizontalStack>
+			<Label Text="Frame Min:" Style="FpsLabel"/>
+			<Label Text="{frameMin}" Style="FpsDisp"/>
+		</HorizontalStack>
+		<HorizontalStack>
+			<Label Text="FrameMax:" Style="FpsLabel"/>
+			<Label Text="{frameMax}" Style="FpsDisp"/>
+		</HorizontalStack>
+		<HorizontalStack>
+			<Label Text="Update:" Style="FpsLabel"/>
+			<Label Text="{update}" Style="FpsDisp"/>
+		</HorizontalStack>
+		<HorizontalStack>
+			<Label Text="Layouting:" Style="FpsLabel"/>
+			<Label Text="{layouting}" Style="FpsDisp"/>
+		</HorizontalStack>
+		<HorizontalStack>
+			<Label Text="Clipping:" Style="FpsLabel"/>
+			<Label Text="{clipping}" Style="FpsDisp"/>
+		</HorizontalStack>
+		<HorizontalStack>
+			<Label Text="Drawing:" Style="FpsLabel"/>
+			<Label Text="{drawing}" Style="FpsDisp"/>
+		</HorizontalStack>
+	
+	</VerticalStack>
+</Window>

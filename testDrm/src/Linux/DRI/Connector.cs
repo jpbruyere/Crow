@@ -128,7 +128,7 @@ namespace Linux.DRI
 		#endregion
 
 		int fd_gpu;
-		drmConnector* handle;
+		internal drmConnector* handle;
 
 		#region ctor
 		public Connector (int _fd_gpu, uint _id)

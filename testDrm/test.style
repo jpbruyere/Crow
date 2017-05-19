@@ -1,0 +1,34 @@
+﻿FpsLabel {
+	Width = 50%;
+	Font = droid, 10;
+	Margin = 0;
+	TextAlignment = Center;
+	Background = Onyx;
+}
+FpsDisp {
+	Font = droid bold, 10;
+	Width = 50%;
+	Margin = 0;
+	TextAlignment = Center;
+	Background = Teal;
+}
+CheckBox2 {
+	Template= #Tests.Interfaces.CheckBox2.imlt;
+	Background = Onyx;
+	Checked={Background=Mantis;Font=droid bold, 10};
+	Unchecked = {Background=Onyx;Font=droid,10};
+}
+RadioButton2 {
+	Template=#Tests.Interfaces.CheckBox2.imlt;
+	Background = Onyx;
+	Checked = {Background=Mantis;Font=droid bold, 10};
+	Unchecked = {Background=Onyx;Font=droid,10};
+}
+labPerf {
+	Font = droid, 8;
+	Width = 50%;
+}
+labPerfVal{
+	Font = droid, 8;
+	Width = 50%;
+}

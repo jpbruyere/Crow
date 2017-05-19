@@ -50,7 +50,7 @@ namespace Linux.DRI
 		#endregion
 
 		int fd_gpu;
-		drmEncoder* handle;
+		internal drmEncoder* handle;
 
 		#region ctor
 		unsafe internal Encoder (int _fd_gpu, uint _id)

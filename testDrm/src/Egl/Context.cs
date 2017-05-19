@@ -290,9 +290,6 @@ namespace EGL
 		[DllImportAttribute("libEGL.dll", EntryPoint = "eglWaitNative")]
 		[return: MarshalAsAttribute(UnmanagedType.I1)]
 		public static extern bool WaitNative(int engine);
-		[DllImportAttribute("libEGL.dll", EntryPoint = "eglSwapBuffers")]
-		[return: MarshalAsAttribute(UnmanagedType.I1)]
-		public static extern bool SwapBuffers(EGLDisplay dpy, EGLSurface surface);
 		[DllImportAttribute("libEGL.dll", EntryPoint = "eglCopyBuffers")]
 		[return: MarshalAsAttribute(UnmanagedType.I1)]
 		public static extern bool CopyBuffers(EGLDisplay dpy, EGLSurface surface, EGLNativePixmapType target);

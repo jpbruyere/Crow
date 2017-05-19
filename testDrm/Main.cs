@@ -30,14 +30,18 @@ using System.Collections.Generic;
 using Cairo;
 using Crow.Linux;
 using Crow;
+using System.Reflection;
+using System.Linq;
 
 namespace testDrm
 {
 	
 	public class TestApp : Application, IValueChange 
 	{
+		[STAThread]
 		static void Main ()
 		{
+			System.Threading.Thread.CurrentThread.Name = "Main";
 			try {
 				using (TestApp crowApp = new TestApp ()) {
 					crowApp.Run ();
@@ -45,6 +49,7 @@ namespace testDrm
 			} catch (Exception ex) {
 				Console.WriteLine (ex.ToString ());
 			}
+			Console.WriteLine ("terminating");
 		}
 
 		#region IValueChange implementation
@@ -56,38 +61,114 @@ namespace testDrm
 		}
 		#endregion
 
-		public bool Running = true;
+
 
 		public TestApp () : base () {
 
 		}
-		int frTime = 0;
-		int frMin = int.MaxValue;
-		int frMax = 0;
+
+		public int frameTime = 0;
+		public int frameMin = int.MaxValue;
+		public int frameMax = 0;
+		#region Test values for Binding
+//		public int intValue = 500;
+//		DirectoryInfo curDir = new DirectoryInfo (System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+//		public FileSystemInfo[] CurDirectory {
+//			get { return curDir.GetFileSystemInfos (); }
+//		}
+//		public int IntValue {
+//			get {
+//				return intValue;
+//			}
+//			set {
+//				intValue = value;
+//				NotifyValueChanged ("IntValue", intValue);
+//			}
+//		}
+//		void onSpinnerValueChange(object sender, ValueChangeEventArgs e){
+//			if (e.MemberName != "Value")
+//				return;
+//			intValue = Convert.ToInt32(e.NewValue);
+//		}
+//		void change_alignment(object sender, EventArgs e){
+//			RadioButton rb = sender as RadioButton;
+//			if (rb == null)
+//				return;
+//			NotifyValueChanged ("alignment", Enum.Parse(typeof(Alignment), rb.Caption));
+//		}
+//		public IList<String> List2 = new List<string>(new string[]
+//			{
+//				"string1",
+//				"string2",
+//				"string3",
+//			}
+//		);
+//		public IList<String> TestList2 {
+//			set{
+//				List2 = value;
+//				NotifyValueChanged ("TestList2", testList);
+//			}
+//			get { return List2; }
+//		}
+		IList<Crow.Color> testList = Crow.Color.ColorDic;
+		public IList<Crow.Color> TestList {
+			set{
+				testList = value;
+				NotifyValueChanged ("TestList", testList);
+			}
+			get { return testList; }
+		}
+//		string curSources = "";
+//		public string CurSources {
+//			get { return curSources; }
+//			set {
+//				if (value == curSources)
+//					return;
+//				curSources = value;
+//				NotifyValueChanged ("CurSources", curSources);
+//			}
+//		}
+//		bool boolVal = true;
+//		public bool BoolVal {
+//			get { return boolVal; }
+//			set {
+//				if (boolVal == value)
+//					return;
+//				boolVal = value;
+//				NotifyValueChanged ("BoolVal", boolVal);
+//			}
+//		}
+
+		#endregion
 
 		public override void Run ()
-		{
+		{			
 			Stopwatch frame = new Stopwatch ();
-			Load ("#testDrm.ui.menu.crow").DataSource = this;
-			Load ("#testDrm.ui.0.crow").DataSource = this;
-			Load ("#testDrm.ui.0.crow").DataSource = this;
-			Load ("#testDrm.ui.0.crow").DataSource = this;
-			Load ("#testDrm.ui.0.crow").DataSource = this;
+//			Load ("#testDrm.ui.menu.crow").DataSource = this;
+//			Load ("#testDrm.ui.0.crow").DataSource = this;
+//			Load ("#testDrm.ui.0.crow").DataSource = this;
+//			Load ("#testDrm.ui.0.crow").DataSource = this;
 
+			System.Threading.Thread.Sleep (50);
+			Load ("#testDrm.ui.menu.crow").DataSource = this;
+			int i = 0;
 			while(Running){
 				try {
 					frame.Restart();
+					i++;
+
 					base.Run ();
+
 					frame.Stop();
-					frTime = (int)frame.ElapsedTicks;
-					NotifyValueChanged("frameTime", frTime);
-					if (frTime > frMax){
-						frMax = frTime;
-						NotifyValueChanged("frameMax", frMax);	
+					frameTime = (int)frame.ElapsedTicks;
+					NotifyValueChanged("frameTime", frameTime);
+					if (frameTime > frameMax){
+						frameMax = frameTime;
+						NotifyValueChanged("frameMax", frameMax);	
 					}
-					if (frTime < frMin){
-						frMin = frTime;
-						NotifyValueChanged("frameMin", frMin);	
+					if (frameTime < frameMin){
+						frameMin = frameTime;
+						NotifyValueChanged("frameMin", frameMin);	
 					}
 
 				} catch (Exception ex) {
@@ -98,6 +179,14 @@ namespace testDrm
 		void onQuitClick(object send, Crow.MouseButtonEventArgs e)
 		{
 			Running = false;
+		}
+		void onLoadClick(object send, Crow.MouseButtonEventArgs e)
+		{
+			Console.WriteLine ("********** LOADING ui item ******************");
+			GraphicObject go = Load ("#testDrm.ui.2.crow");
+			Console.WriteLine ("********** SETTING DATASOURCE ON ITEM ******************");
+			go.DataSource = this;
+			Console.WriteLine ("********** LOADING FINISHED ******************");
 		}
 	}
 }
