@@ -62,9 +62,27 @@ namespace testDrm
 		#endregion
 
 
+		#if MEASURE_TIME
+		public List<PerformanceMeasure> PerfMeasures;
+		public PerformanceMeasure glDrawMeasure = new PerformanceMeasure("OpenGL Draw", 10);
+		public Command CMDViewPerf, CMDViewCfg, CMDViewTest0;
+		#endif
 
 		public TestApp () : base () {
-
+			#if MEASURE_TIME
+			PerfMeasures = new List<PerformanceMeasure> (
+				new PerformanceMeasure[] {
+				this.CrowInterface.updateMeasure,
+				this.CrowInterface.layoutingMeasure,
+				this.CrowInterface.clippingMeasure,
+				this.CrowInterface.drawingMeasure,
+				this.glDrawMeasure
+				}
+			);
+			CMDViewPerf = new Command(new Action(() => Load ("#testDrm.ui.perfMeasures.crow").DataSource = this)) { Caption = "Performances"};
+			CMDViewCfg = new Command(new Action(() => Load ("#testDrm.ui.2.crow").DataSource = this)) { Caption = "Configuration"};
+			CMDViewTest0 = new Command(new Action(() => Load ("#testDrm.ui.0.crow").DataSource = this)) { Caption = "Test view 0"};
+			#endif
 		}
 
 		public int frameTime = 0;
@@ -141,15 +159,38 @@ namespace testDrm
 
 		#endregion
 
+		public int InterfaceSleep {
+			get { return ifaceSleep; }
+			set {
+				if (ifaceSleep == value)
+					return;
+				ifaceSleep = value;
+				NotifyValueChanged ("InterfaceSleep", ifaceSleep);
+			}
+		}
+		public int FlipPollSleep {
+			get { return gpu.FlipPollingSleep; }
+			set {
+				if (gpu.FlipPollingSleep == value)
+					return;
+				gpu.FlipPollingSleep = value;
+				NotifyValueChanged ("FlipPollSleep", gpu.FlipPollingSleep);
+			}
+		}
+		public int UpdateSleep {
+			get { return updateSleep; }
+			set {
+				if (updateSleep == value)
+					return;
+				updateSleep = value;
+				NotifyValueChanged ("UpdateSleep", updateSleep);
+			}
+		}
+
+
 		public override void Run ()
 		{			
 			Stopwatch frame = new Stopwatch ();
-//			Load ("#testDrm.ui.menu.crow").DataSource = this;
-//			Load ("#testDrm.ui.0.crow").DataSource = this;
-//			Load ("#testDrm.ui.0.crow").DataSource = this;
-//			Load ("#testDrm.ui.0.crow").DataSource = this;
-
-			System.Threading.Thread.Sleep (50);
 			Load ("#testDrm.ui.menu.crow").DataSource = this;
 			int i = 0;
 			while(Running){
@@ -158,7 +199,7 @@ namespace testDrm
 					i++;
 
 					base.Run ();
-
+					
 					frame.Stop();
 					frameTime = (int)frame.ElapsedTicks;
 					NotifyValueChanged("frameTime", frameTime);
@@ -170,7 +211,10 @@ namespace testDrm
 						frameMin = frameTime;
 						NotifyValueChanged("frameMin", frameMin);	
 					}
-
+					#if MEASURE_TIME
+					foreach (PerformanceMeasure m in PerfMeasures)
+						m.NotifyChanges();
+					#endif
 				} catch (Exception ex) {
 					Console.WriteLine (ex.ToString());
 				}
@@ -179,14 +223,6 @@ namespace testDrm
 		void onQuitClick(object send, Crow.MouseButtonEventArgs e)
 		{
 			Running = false;
-		}
-		void onLoadClick(object send, Crow.MouseButtonEventArgs e)
-		{
-			Console.WriteLine ("********** LOADING ui item ******************");
-			GraphicObject go = Load ("#testDrm.ui.2.crow");
-			Console.WriteLine ("********** SETTING DATASOURCE ON ITEM ******************");
-			go.DataSource = this;
-			Console.WriteLine ("********** LOADING FINISHED ******************");
 		}
 	}
 }

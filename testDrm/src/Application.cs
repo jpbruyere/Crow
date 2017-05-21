@@ -42,12 +42,14 @@ namespace Crow
 	public class Application : IDisposable
 	{
 		public bool Running = true;
-		DRI.GPUControler gpu;
+		protected DRI.DRIControler gpu;
 		Cairo.GLSurface cairoSurf;
 
-		public Interface CrowInterface;
+		protected Interface CrowInterface;
 
-		public bool mouseIsInInterface = false;
+		protected bool mouseIsInInterface = false;
+
+		protected volatile int ifaceSleep = 1, updateSleep = 0;
 
 		void interfaceThread()
 		{
@@ -56,7 +58,7 @@ namespace Crow
 
 			while (true) {
 				CrowInterface.Update ();
-				Thread.Sleep (1);
+				Thread.Sleep (ifaceSleep);
 			}
 		}
 //
@@ -80,7 +82,7 @@ namespace Crow
 				}
 			}
 
-			gpu = new DRI.GPUControler();
+			gpu = new DRI.DRIControler();
 			cairoSurf = gpu.CairoSurf;
 
 			CrowInterface = new Interface ();
@@ -93,34 +95,33 @@ namespace Crow
 			initInput ();
 
 			CrowInterface.ProcessResize (new Size (gpu.Width, gpu.Height));
-			cursor = Crow.XCursorFile.Load("#Crow.Images.Icons.Cursors.arrow").Cursors[0];
-			gpu.updateCursor (cursor);
-			//CrowInterface.MouseCursorChanged += CrowInterface_MouseCursorChanged;
+
+			gpu.updateCursor (XCursor.Default);
+			MouseX = gpu.Width / 2;
+			MouseY = gpu.Height / 2;
+			gpu.moveCursor ((uint)MouseX - 8, (uint)MouseY - 4);
+			CrowInterface.MouseCursorChanged += CrowInterface_MouseCursorChanged;
 		}
 		void switch_request_handle (Signal s){
-			Console.WriteLine ("switch request catched: " + s.ToString());
-			using (VT.VTControler master = new VT.VTControler ()) {
-				Libc.write (master.fd, Encoding.ASCII.GetBytes ("this is a test string"));
-				master.AcknoledgeSwitchRequest ();
-			}			
+//			Console.WriteLine ("switch request catched: " + s.ToString());
+//			using (VT.VTControler master = new VT.VTControler ()) {
+//				Libc.write (master.fd, Encoding.ASCII.GetBytes ("this is a test string"));
+//				master.AcknoledgeSwitchRequest ();
+//			}			
 		}
 		void sigint_handler (Signal s){
 			Console.WriteLine ("{0}: SIGINT catched");
 			Running = false;
 		}
-//		void CrowInterface_MouseCursorChanged (object sender, MouseCursorChangedEventArgs e)
-//		{
-//			gpu.updateCursor (e.NewCursor);
-//		}
+		void CrowInterface_MouseCursorChanged (object sender, MouseCursorChangedEventArgs e)
+		{
+			gpu.updateCursor (e.NewCursor);
+		}
 
 		public GraphicObject Load (string path){
 			return CrowInterface.LoadInterface (path);
 		}
 		public virtual void Run (){
-			updateCrow ();
-		}
-
-		public void updateCrow (){
 			bool update = false;
 
 			if (updateMousePos) {
@@ -130,17 +131,6 @@ namespace Crow
 				}
 			}
 
-//			using (Cairo.Context ctx = new Cairo.Context (cairoSurf)) {
-//				ctx.Rectangle (0, 0, gpu.Width, gpu.Height);
-//				ctx.SetSourceRGB (0, 0, 1);
-//				ctx.Fill ();
-//				ctx.Rectangle (5, 5, 50, 50);
-//				ctx.SetSourceRGB (1, 0, 0);
-//				ctx.Fill ();
-//				ctx.Rectangle (1550, 850, 50, 50);
-//				ctx.SetSourceRGB (0, 1, 0);
-//				ctx.Fill ();
-//			}
 			if (Monitor.TryEnter (CrowInterface.RenderMutex)) {
 				if (CrowInterface.IsDirty) {
 					CrowInterface.IsDirty = false;
@@ -157,20 +147,18 @@ namespace Crow
 				}
 				Monitor.Exit (CrowInterface.RenderMutex);
 			}
-//
-//			if (!update)
-//				return;
-//			update = false;
+
+			if (!update)
+				return;
+			update = false;
 
 			cairoSurf.Flush ();
 			cairoSurf.SwapBuffers ();
 
-			gpu.Update ();
-			//Thread.Sleep (1);
-			//gpu.MarkFBDirty ();
+			gpu.UpdateWithPageFlip ();
+			Thread.Sleep (updateSleep);
 		}
-
-
+			
 		#region INPUT
 		Thread input_thread;
 		long exit;

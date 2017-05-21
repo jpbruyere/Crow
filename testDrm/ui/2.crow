@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Window Caption="Performances" Height="160" Width="200">	
+<Window Caption="Performances" Height="160" Width="200" CornerRadius="5">	
 	<VerticalStack Width="90%" Height="Fit" Spacing="1" Margin="10">
 		<HorizontalStack>
 			<Label Text="Frame:" Style="FpsLabel"/>
@@ -29,6 +29,17 @@
 			<Label Text="Drawing:" Style="FpsLabel"/>
 			<Label Text="{drawing}" Style="FpsDisp"/>
 		</HorizontalStack>
-	
+		<HorizontalStack>
+			<Label Text="IfaceSleep:" Style="FpsLabel"/>
+			<Spinner Maximum="100" Fit="true" Value="{²InterfaceSleep}" />
+		</HorizontalStack>
+		<HorizontalStack>
+			<Label Text="FlipPollSleep:" Style="FpsLabel"/>
+			<Spinner Maximum="100" Fit="true" Value="{²FlipPollSleep}" />
+		</HorizontalStack>
+		<HorizontalStack>
+			<Label Text="UpdateSleep:" Style="FpsLabel"/>
+			<Spinner Maximum="100" Fit="true" Value="{²UpdateSleep}" />
+		</HorizontalStack>
 	</VerticalStack>
 </Window>

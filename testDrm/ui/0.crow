@@ -68,23 +68,7 @@
 					MouseDown="{Background=Mantis}"
 					MouseUp="{Background=Onyx}"/>
 			</HorizontalStack>
-			<GroupBox Caption="Templated controls" Height="Fit" Margin="5">
-				<HorizontalStack Height="Fit">
-					<VerticalStack Width="50%">
-						<CheckBox IsChecked="true" Style="CheckBox2"/>
-						<CheckBox Style="CheckBox2"/>
-						<CheckBox Style="CheckBox2"/>
-						<CheckBox Style="CheckBox2"/>
-					</VerticalStack>
-					<Splitter/>
-					<VerticalStack Width="50%">
-						<RadioButton Style="RadioButton2"/>
-						<RadioButton Style="RadioButton2"/>
-						<RadioButton Style="RadioButton2"/>
-						<RadioButton Style="RadioButton2"/>
-					</VerticalStack>
-				</HorizontalStack>
-			</GroupBox>
+
 			<HorizontalStack Height="Fit">
 				<Label Text="Spinner"/>
 				<Spinner Fit="true"/>
@@ -149,9 +133,9 @@
 				<DirectoryView Name="dv" CurrentDirectory="/" Margin="1"/>
 			</Border>
 			<Splitter/>-->
-<!--			<ListBox Name="colorList" Data="{TestList}" Margin="5"/>-->
-<!--					 ItemTemplate="#testDrm.ui.colorItem.crow"
-					 Template="#Crow.Templates.ScrollingListBox.goml"-->
+			<ListBox Name="colorList" Data="{TestList}" Margin="5"
+					 ItemTemplate="#testDrm.ui.colorItem.crow"
+					 Template="#Crow.Templates.ScrollingListBox.goml"/>
 		</VerticalStack>
 	</HorizontalStack>
 </Window>

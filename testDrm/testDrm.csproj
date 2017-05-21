@@ -24,7 +24,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <DefineConstants>DEBUG;MEASURE_TIME;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -67,7 +67,6 @@
     <Compile Include="src\Linux\TTY.cs" />
     <Compile Include="src\Linux\Signal.cs" />
     <Compile Include="src\Linux\VT.cs" />
-    <Compile Include="src\Linux\DRI.cs" />
     <Compile Include="src\Linux\DRI\Connector.cs" />
     <Compile Include="src\Linux\DRI\Encoder.cs" />
     <Compile Include="src\Linux\DRI\Resources.cs" />
@@ -81,6 +80,8 @@
     <Compile Include="src\Linux\GBM\Device.cs" />
     <Compile Include="src\Application.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="src\Linux\DRI\PlaneResources.cs" />
+    <Compile Include="src\Linux\DRI\DRIControler.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -109,6 +110,12 @@
     <EmbeddedResource Include="ui\2.crow" />
     <EmbeddedResource Include="ui\colorItem.crow" />
     <EmbeddedResource Include="test.style" />
+    <EmbeddedResource Include="ui\perfMsr.crow">
+      <LogicalName>ui.perfMsr.crow</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\perfMeasures.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\DRMContext.cs" />

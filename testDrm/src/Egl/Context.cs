@@ -409,6 +409,20 @@ namespace EGL
 			BlueSize,
 			AlphaSize
 		}
+		public void ResetMakeCurrent (){
+			if (!Context.MakeCurrent (dpy, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero))
+				Console.WriteLine ("egl clear current ctx failed");
+		}
+		public void DestroyContext (){
+			try {
+				if (ctx != IntPtr.Zero)
+					DestroyContext (dpy, ctx);
+			} catch (Exception ex) {
+				Console.WriteLine ("error disposing egl context: {0}", ex.ToString ());
+			}finally {
+				ctx = IntPtr.Zero;
+			}
+		}
 
 		#region IDisposable implementation
 		~Context(){
@@ -420,15 +434,8 @@ namespace EGL
 			GC.SuppressFinalize (this);
 		}
 		protected virtual void Dispose (bool disposing){
-			if (GetCurrentContext () == ctx) {
-				Console.WriteLine ("destroying context");
-				DestroyContext (dpy, ctx);
-			}else
-				Console.WriteLine ("not current");
-			
 			if (dpy != IntPtr.Zero)
 				Terminate (dpy);
-			dpy = IntPtr.Zero;
 		}
 		#endregion
 

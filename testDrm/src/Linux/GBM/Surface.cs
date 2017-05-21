@@ -130,7 +130,7 @@ namespace Linux.GBM
 		[DllImport("gbm", CallingConvention = CallingConvention.Cdecl)]
 		static extern IntPtr gbm_surface_create (IntPtr gbm, int width, int height, SurfaceFormat format, SurfaceFlags flags);
 		[DllImport("gbm", CallingConvention = CallingConvention.Cdecl)]
-		static extern void gbm_surface_destroy (IntPtr surface);
+		internal static extern void gbm_surface_destroy (IntPtr surface);
 		[DllImport("gbm", CallingConvention = CallingConvention.Cdecl)]
 		static extern gbm_bo* gbm_surface_lock_front_buffer (IntPtr surface);
 		[DllImport("gbm", CallingConvention = CallingConvention.Cdecl)]

@@ -6,6 +6,11 @@
 		<MenuItem Caption="Save"/>
 		<MenuItem Caption="Quit" MouseClick="onQuitClick"/>
 	</MenuItem>
+	<MenuItem Caption="View" Width="Fit">
+		<MenuItem Command="{CMDViewPerf}"/>
+		<MenuItem Command="{CMDViewCfg}"/>
+		<MenuItem Command="{CMDViewTest0}"/>
+	</MenuItem>
 	<MenuItem Caption="Edit" Name="edit" Width="Fit">
 		<MenuItem Caption="Cut"/>
 		<MenuItem Caption="Copy"/>

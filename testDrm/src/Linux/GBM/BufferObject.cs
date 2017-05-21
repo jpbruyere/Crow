@@ -29,7 +29,7 @@ using System.Runtime.InteropServices;
 namespace Linux.GBM 
 {
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-	public delegate void DestroyUserDataCallback(ref GBM.gbm_bo bo, IntPtr data);
+	public delegate void DestroyUserDataCallback(ref GBM.gbm_bo bo, ref uint data);
 
 	[StructLayout(LayoutKind.Sequential)]
 	public struct gbm_bo {
@@ -46,9 +46,9 @@ namespace Linux.GBM
 		{
 			get { return BufferObject.gbm_bo_get_stride(ref this); }
 		}
-		public void SetUserData(IntPtr data, DestroyUserDataCallback destroyFB)
+		public void SetUserData(ref uint data, DestroyUserDataCallback destroyFB)
 		{
-			BufferObject.gbm_bo_set_user_data(ref this, data, destroyFB);
+			BufferObject.gbm_bo_set_user_data(ref this, ref data, destroyFB);
 		}
 	}
 	unsafe public class BufferObject : IDisposable
@@ -58,6 +58,8 @@ namespace Linux.GBM
 		internal static extern gbm_bo* gbm_bo_create (IntPtr gbm, uint width, uint height, SurfaceFormat format, SurfaceFlags flags);
 		[DllImport("gbm", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void gbm_bo_destroy (gbm_bo* bo);
+		[DllImport("gbm", EntryPoint = "gbm_bo_destroy", CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void destryBO (ref gbm_bo bo);
 		[DllImport("gbm", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern int gbm_bo_write(gbm_bo* bo, IntPtr buf, IntPtr count);
 		[DllImport("gbm", CallingConvention = CallingConvention.Cdecl)]
@@ -71,11 +73,11 @@ namespace Linux.GBM
 		[DllImport("gbm", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern uint gbm_bo_get_stride (ref gbm_bo bo);
 		[DllImport("gbm", CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void gbm_bo_set_user_data(ref gbm_bo bo, IntPtr data, DestroyUserDataCallback callback);
+		internal static extern void gbm_bo_set_user_data(ref gbm_bo bo, ref uint data, DestroyUserDataCallback callback);
 		[DllImport("gbm", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern IntPtr gbm_bo_get_user_data (IntPtr bo);
 		[DllImport("gbm",  CallingConvention = CallingConvention.Cdecl)]
-		internal static extern IntPtr	gbm_bo_map (ref gbm_bo bo, uint x, uint y, uint width, uint height, TransferFlags flags, ref uint stride, out IntPtr data);
+		internal static extern IntPtr gbm_bo_map (ref gbm_bo bo, uint x, uint y, uint width, uint height, TransferFlags flags, ref uint stride, out IntPtr data);
 		[DllImport("gbm", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void gbm_bo_unmap (ref gbm_bo bo, IntPtr data);
 		#endregion

@@ -1,5 +1,5 @@
 ﻿//
-// Plane.cs
+// PlaneResources.cs
 //
 // Author:
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
@@ -28,55 +28,35 @@ using System.Runtime.InteropServices;
 
 namespace Linux.DRI
 {
-	public enum PlaneType {
-		Overlay = 0,
-		Primary = 1,
-		Cursor = 2
-	}
 	[StructLayout(LayoutKind.Sequential)]
-	unsafe public struct drmPlane {
-		public uint count_formats;
-		public uint *formats;
-		public uint plane_id;
-
-		public uint crtc_id;
-		public uint fb_id;
-
-		public uint crtc_x, crtc_y;
-		public uint x, y;
-
-		public uint possible_crtcs;
-		public uint gamma_size;
+	unsafe internal struct drmPlaneRes {
+		public uint count_planes;
+		public uint *planes;
 	}
 
-	unsafe public class Plane : IDisposable
+	unsafe public class PlaneResources : IDisposable
 	{
 		#region pinvoke
 		[DllImport("libdrm", CallingConvention = CallingConvention.Cdecl)]
-		unsafe internal static extern drmPlane* drmModeGetPlane(int fd, uint id);
+		unsafe internal static extern drmPlaneRes* drmModeGetPlaneResources(int fd);
 		[DllImport("libdrm", CallingConvention = CallingConvention.Cdecl)]
-		unsafe internal static extern void drmModeFreePlane(drmPlane* ptr);
-		[DllImport("libdrm", CallingConvention = CallingConvention.Cdecl)]
-		unsafe static extern int drmModeSetPlane(int fd, uint plane_id, uint crtc_id,
-			uint fb_id, uint flags,
-			int crtc_x, int crtc_y,
-			uint crtc_w, uint crtc_h,
-			uint src_x, uint src_y,
-			uint src_w, uint src_h);
-		
+		unsafe internal static extern void drmModeFreePlaneResources(drmPlaneRes* ptr);
 		#endregion
 
-		drmPlane* handle;
+		int gpu_fd;
+		drmPlaneRes* handle;
 
-		internal Plane (drmPlane* _handle)
+		internal PlaneResources (int fd_gpu)
 		{
-			handle = _handle;
+			gpu_fd = fd_gpu;
+			handle = drmModeGetPlaneResources (fd_gpu);
+
+			if (handle == null)
+				throw new NotSupportedException("[DRI] drmModeGetPlaneResources failed.");
 		}
-			
-		public uint Id { get { return handle->plane_id; }}
 
 		#region IDisposable implementation
-		~Plane(){
+		~PlaneResources(){
 			Dispose (false);
 		}
 		public void Dispose ()
@@ -87,7 +67,7 @@ namespace Linux.DRI
 		protected virtual void Dispose (bool disposing){
 			unsafe {
 				if (handle != null)
-					drmModeFreePlane (handle);
+					drmModeFreePlaneResources (handle);
 				handle = null;
 			}
 		}
