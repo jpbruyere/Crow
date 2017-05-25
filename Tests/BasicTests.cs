@@ -180,7 +180,7 @@ namespace Tests
 				return;
 			}else if (e.Key == OpenTK.Input.Key.F7) {
 				GraphicObject w = Load ("Interfaces/Divers/perfMeasures.crow");
-				w.DataSource = this;
+				w.DataSource = this.ifaceControl[0];
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F2)
 				idx--;
