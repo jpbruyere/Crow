@@ -63,20 +63,31 @@
     <Compile Include="src\Extensions.cs" />
     <Compile Include="src\Microsoft.Build.CommonTypes.cs" />
     <Compile Include="src\CrowIDEdrm.cs" />
-    <Compile Include="src\Application.cs" />
     <Compile Include="src\Signal.cs" />
-    <Compile Include="src\Bindings\Evdev.cs" />
-    <Compile Include="src\Bindings\LibInput.cs" />
-    <Compile Include="src\Bindings\Udev.cs" />
-    <Compile Include="src\DRIControler.cs" />
-    <Compile Include="src\BlittableValueType.cs">
-      <SubType>Code</SubType>
+    <Compile Include="..\testDrm\src\Linux\Bindings\Udev.cs">
+      <Link>src\Bindings\Udev.cs</Link>
+    </Compile>
+    <Compile Include="..\testDrm\src\Application.cs">
+      <Link>src\Application.cs</Link>
+    </Compile>
+    <Compile Include="..\testDrm\src\BlittableValueType.cs">
+      <Link>src\BlittableValueType.cs</Link>
+    </Compile>
+    <Compile Include="..\testDrm\src\Linux\Bindings\EvdevClass.cs">
+      <Link>src\Bindings\EvdevClass.cs</Link>
+    </Compile>
+    <Compile Include="..\testDrm\src\Linux\Bindings\LibInput.cs">
+      <Link>src\Bindings\LibInput.cs</Link>
+    </Compile>
+    <Compile Include="..\testDrm\src\Linux\DRIControler.cs">
+      <Link>src\DRIControler.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />
     <Folder Include="src\" />
     <Folder Include="images\" />
+    <Folder Include="src\Bindings\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ui\imlEditor.crow" />

@@ -28,6 +28,8 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using DRI.DRM;
+using GBM = DRI.GBM;
 
 namespace Linux.DRI {
 	#region DRM callback signatures
@@ -204,7 +206,7 @@ namespace Linux.DRI {
 				GBM.SurfaceFlags.Rendering | GBM.SurfaceFlags.Scanout);
 
 			eglSurf = new EGL.Surface (eglctx, gbmSurf);
-			eglSurf.MakeCurrent ();
+			//eglSurf.MakeCurrent ();
 
 			cairoDev = new Cairo.EGLDevice (eglctx.dpy, eglctx.ctx);
 
@@ -428,8 +430,7 @@ namespace Linux.DRI {
 			if (fb != 0)
 				if (drmModeRmFB (fd_gpu, fb) != 0)
 					Console.WriteLine ("DestroyFB failed");
-			if (eglctx != null)
-				eglctx.ResetMakeCurrent ();
+
 			if (cairoDev != null) {
 				cairoDev.Release ();
 				CairoSurf.Dispose ();

@@ -32,6 +32,8 @@ namespace Linux.Evdev
 		Grab	= 3,
 		Ungrab	= 4
 	}
+
+	#region Native structs
 	[StructLayout(LayoutKind.Sequential)]
 	public struct InputAbsInfo
 	{
@@ -41,7 +43,7 @@ namespace Linux.Evdev
 		public int Fuzz;
 		public int Flat;
 		public int Resolution;
-	};
+	}
 
 	[StructLayout(LayoutKind.Sequential)]
 	public struct InputId
@@ -101,6 +103,7 @@ namespace Linux.Evdev
 		public IntPtr Seconds;
 		public IntPtr MicroSeconds;
 	}
+	#endregion
 
 	public class Device : IDisposable
 	{

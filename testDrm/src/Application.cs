@@ -30,13 +30,11 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-using VT = Linux.VT;
-using DRI = Linux.DRI;
-
 using Linux;
+using Linux.VT;
 using System.Text;
-using OpenTK.Platform.Linux;
 using Linux.oldEvDev;
+using Linux.DRI;
 
 namespace Crow
 {
@@ -57,7 +55,7 @@ namespace Crow
 		public volatile RunState CurrentState = RunState.Running;
 
 		protected Interface CrowInterface;
-		protected DRI.DRIControler gpu;
+		protected DRIControler gpu;
 		protected Cairo.GLSurface cairoSurf { get { return gpu?.CairoSurf; }}
 
 		protected bool mouseIsInInterface = false;
@@ -88,14 +86,14 @@ namespace Crow
 			if (Kernel.signal (Signal.SIGINT, sigint_handler) < 0)
 				throw new Exception ("SIGINT handler registation failed");
 
-			using (VT.VTControler master = new VT.VTControler ()) {
+			using (VTControler master = new VTControler ()) {
 				previousVT = master.CurrentVT;
 				appVT = master.FirstAvailableVT;
 
 				master.SwitchTo (appVT);
 
 				try {
-					master.KDMode = VT.KDMode.GRAPHICS;
+					master.KDMode = KDMode.GRAPHICS;
 //					VT.vt_mode vtm = master.VTMode;
 //					vtm.mode = VT.SwitchMode.PROCESS;
 //					master.VTMode = vtm;
@@ -104,7 +102,7 @@ namespace Crow
 				}
 			}
 
-			initDri ();
+			gpu = new DRIControler();
 
 			initCrow ();
 
@@ -150,10 +148,6 @@ namespace Crow
 		}
 		#endregion
 
-		void initDri(){
-			gpu = new DRI.DRIControler();
-			//cairoSurf = gpu.CairoSurf;
-		}
 		void initCursor(){
 			gpu.updateCursor (XCursor.Default);
 			gpu.moveCursor ((uint)MouseX - 8, (uint)MouseY - 4);
@@ -161,7 +155,7 @@ namespace Crow
 
 		void switch_request_handle (Signal s){
 			Console.WriteLine ("****** switch request catched: " + s.ToString());
-			using (VT.VTControler master = new VT.VTControler ()) {
+			using (VTControler master = new VTControler ()) {
 				Libc.write (master.fd, Encoding.ASCII.GetBytes ("this is a test string"));
 				master.AcknoledgeSwitchRequest ();
 			}			
@@ -201,9 +195,9 @@ namespace Crow
 			}
 		}
 		protected virtual void uiDraw (){
-//			#if MEASURE_TIME
-//			glDrawMeasure.StartCycle();
-//			#endif
+			#if MEASURE_TIME
+			glDrawMeasure.StartCycle();
+			#endif
 
 			bool update = false;
 
@@ -231,12 +225,9 @@ namespace Crow
 				Monitor.Exit (CrowInterface.RenderMutex);
 			}
 
-//			if (!update)
-//				return;
-//			update = false;
-
-
-
+			if (!update)
+				return;
+			update = false;
 
 			cairoSurf.Flush ();
 			cairoSurf.SwapBuffers ();
@@ -244,9 +235,9 @@ namespace Crow
 			//gpu.UpdateWithPageFlip ();
 			gpu.Update();
 
-//			#if MEASURE_TIME
-//			glDrawMeasure.StopCycle ();
-//			#endif
+			#if MEASURE_TIME
+			glDrawMeasure.StopCycle ();
+			#endif
 		}
 			
 		#region INPUT
@@ -576,15 +567,12 @@ namespace Crow
 
 		void desactivate () {
 			CurrentState = RunState.Paused;
-
-			//cairoSurf = null;
 			gpu.Dispose ();
 			gpu = null;
 		}
 		void activate (){
-			initDri();
+			gpu = new DRIControler();
 			initCursor ();
-
 			CurrentState = RunState.Running;
 		}
 
@@ -602,7 +590,7 @@ namespace Crow
 				gpu.Dispose ();
 			gpu = null;
 
-			using (VT.VTControler master = new VT.VTControler ()) {
+			using (VTControler master = new VTControler ()) {
 				//				try {
 				//					master.KDMode = VT.KDMode.TEXT;
 				//				} catch (Exception ex) {

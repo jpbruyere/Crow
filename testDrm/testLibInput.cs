@@ -29,7 +29,6 @@ using Linux;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Crow;
-using OpenTK.Platform.Linux;
 using System.IO;
 
 namespace testDrm

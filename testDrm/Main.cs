@@ -28,7 +28,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Collections.Generic;
 using Cairo;
-using Crow.Linux;
 using Crow;
 using System.Reflection;
 using System.Linq;
@@ -244,7 +243,7 @@ namespace testDrm
 		{			
 			Stopwatch frame = Stopwatch.StartNew ();
 
-			testegldraw ();
+			//testegldraw ();
 
 			base.uiDraw ();
 					

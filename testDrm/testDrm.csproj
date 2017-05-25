@@ -19,7 +19,7 @@
         <Command type="Execute" command="${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" />
       </CustomCommands>
     </CustomCommands>
-    <StartupObject>testDrm.Tests</StartupObject>
+    <StartupObject>testDrm.TestApp</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,13 +51,9 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="src\Linux\Bindings\Drm.cs" />
-    <Compile Include="src\Linux\Bindings\Gbm.cs" />
-    <Compile Include="src\Linux\Bindings\Kms.cs" />
     <Compile Include="src\Linux\Bindings\Libc.cs" />
     <Compile Include="src\Linux\Bindings\LibInput.cs" />
     <Compile Include="src\Linux\Bindings\Poll.cs" />
-    <Compile Include="src\Linux\Bindings\Terminal.cs" />
     <Compile Include="src\Linux\Bindings\Udev.cs" />
     <Compile Include="src\BlittableValueType.cs">
       <SubType>Code</SubType>
@@ -67,33 +63,16 @@
     </Compile>
     <Compile Include="src\MouseCursor.cs" />
     <Compile Include="src\WindowIcon.cs" />
-    <Compile Include="src\Linux\Bindings\Egl.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\Linux\TTY.cs" />
     <Compile Include="src\Linux\Signal.cs" />
-    <Compile Include="src\Linux\VT.cs" />
-    <Compile Include="src\Linux\DRI\Connector.cs" />
-    <Compile Include="src\Linux\DRI\Encoder.cs" />
-    <Compile Include="src\Linux\DRI\Resources.cs" />
-    <Compile Include="src\Linux\DRI\Crtc.cs" />
-    <Compile Include="src\Linux\DRI\Plane.cs" />
-    <Compile Include="src\Egl\EGL.cs" />
-    <Compile Include="src\Egl\Surface.cs" />
-    <Compile Include="src\Egl\Context.cs" />
-    <Compile Include="src\Linux\GBM\Surface.cs" />
-    <Compile Include="src\Linux\GBM\BufferObject.cs" />
-    <Compile Include="src\Linux\GBM\Device.cs" />
     <Compile Include="src\Application.cs" />
     <Compile Include="Main.cs" />
-    <Compile Include="src\Linux\DRI\PlaneResources.cs" />
-    <Compile Include="src\Linux\DRI\DRIControler.cs" />
     <Compile Include="tests.cs" />
     <Compile Include="testLibInput.cs" />
     <Compile Include="src\EVDEV\Device.cs" />
     <Compile Include="src\Linux\Bindings\EvdevClass.cs" />
     <Compile Include="defineToEnum.cs" />
     <Compile Include="src\EVDEV\Enums.cs" />
+    <Compile Include="src\Linux\DRIControler.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -106,15 +85,16 @@
   <ItemGroup>
     <Folder Include="src\" />
     <Folder Include="ui\" />
-    <Folder Include="src\Linux\DRI\" />
-    <Folder Include="src\Egl\" />
-    <Folder Include="src\Linux\GBM\" />
     <Folder Include="src\EVDEV\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">
       <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
       <Name>Crow</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\DRI.net\DRI.net.csproj">
+      <Project>{0189EAEF-DCD4-42F8-A83A-2DEA82926671}</Project>
+      <Name>DRI.net</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

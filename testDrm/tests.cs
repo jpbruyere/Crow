@@ -24,7 +24,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
-using Crow.Linux;
 using System.Threading;
 using Linux;
 using System.Runtime.InteropServices;
@@ -41,6 +40,8 @@ using System.Diagnostics;
 
 using Linux.Evdev;
 using Linux.VT;
+using DRI.DRM;
+using DRI.DRM;
 
 namespace testDrm
 {
@@ -231,12 +232,12 @@ namespace testDrm
 			if (Kernel.signal (Signal.SIGINT, sigint_handler) < 0)
 				throw new Exception ("SIGINT handler registation failed");
 
-			using (VT.VTControler master = new VT.VTControler ()) {
+			using (VTControler master = new VTControler ()) {
 				previousVT = master.CurrentVT;
 				appVT = master.FirstAvailableVT;
 				master.SwitchTo (appVT);
 				try {
-					master.KDMode = VT.KDMode.GRAPHICS;
+					master.KDMode = KDMode.GRAPHICS;
 				} catch (Exception ex) {
 					Console.WriteLine (ex.ToString ());	
 				}
@@ -249,7 +250,7 @@ namespace testDrm
 				Console.WriteLine (ex.ToString ());
 			}
 
-			using (VT.VTControler master = new VT.VTControler ()) {
+			using (VTControler master = new VTControler ()) {
 				//				try {
 				//					master.KDMode = VT.KDMode.TEXT;
 				//				} catch (Exception ex) {
@@ -293,8 +294,8 @@ namespace testDrm
 
 		static void tty_switch2(){
 			int previousVT = -1, appVT = -1;
-			using(VT.VTControler master = new VT.VTControler()){
-				VT.vt_mode m = master.VTMode;
+			using(VTControler master = new VTControler()){
+				vt_mode m = master.VTMode;
 
 				Console.WriteLine ("Startup:");
 				Console.WriteLine ("\tVT{0}\t- KDMode: {1}", master.CurrentVT, master.KDMode);
@@ -310,7 +311,7 @@ namespace testDrm
 				m = master.VTMode;
 
 				try {
-					master.KDMode = VT.KDMode.GRAPHICS;
+					master.KDMode = KDMode.GRAPHICS;
 					//m.mode = VT.SwitchMode.AUTO;
 					//master.VTMode = m;
 
@@ -371,13 +372,13 @@ namespace testDrm
 			if (fd_gpu < 0)
 				throw new NotSupportedException("[DRI] Failed to open gpu");
 
-			using (DRI.Resources resources = new DRI.Resources (fd_gpu)) {
-				foreach (DRI.Connector e in resources.Connectors) {					
+			using (Resources resources = new Resources (fd_gpu)) {
+				foreach (Connector e in resources.Connectors) {					
 					Console.WriteLine (e.ToString ());
 				}
-				foreach (DRI.Encoder e in resources.Encoders)
-					Console.WriteLine (e.ToString ());
-				foreach (DRI.Crtc e in resources.Crtcs)
+//				foreach (DRM.Encoder e in resources.Encoders)
+//					Console.WriteLine (e.ToString ());
+				foreach (Crtc e in resources.Crtcs)
 					Console.WriteLine (e.ToString ());
 			}
 			
