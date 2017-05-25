@@ -52,10 +52,16 @@ namespace Linux
         public static extern int ioctl(int d, JoystickIoctlCode request, StringBuilder data);
 
         [DllImport(lib)]
-        public static extern int ioctl(int d, EvdevIoctl request, [Out] IntPtr data);
+        public static extern int ioctl(int d, Linux.oldEvDev.EvdevIoctl request, [Out] IntPtr data);
 
         [DllImport(lib)]
-        public static extern int ioctl(int d, uint request, [Out] IntPtr data);
+		public static extern int ioctl(int d, uint request, [Out] IntPtr data);
+
+		[DllImport(lib)]
+		public static extern int ioctl(int d, uint request, ref Evdev.KeyMapEntry kme);
+
+		[DllImport(lib)]
+		public static extern int ioctl(int d, uint request, [In, Out] int[] data);
 
         [DllImport(lib)]
         public static extern int ioctl(int d, KeyboardIoctlCode request, ref IntPtr data);
@@ -113,6 +119,17 @@ namespace Linux
         [DllImport(lib)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool isatty(int fd);
+
+		[DllImport(lib)]
+		public static extern int getgid ();
+		[DllImport(lib)]
+		public static extern int setpgid (int pid, int pgid);
+		[DllImport(lib)]
+		public static extern int getpgid (int pid);
+
+		//public static extern int setpgrp (int pgid);
+		[DllImport(lib)]
+		public static extern int getpgrp ();
     }
 
     enum ErrorNumber

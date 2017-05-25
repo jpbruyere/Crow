@@ -30,13 +30,9 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-using VT = Linux.VT;
-using DRI = Linux.DRI;
-
 using Linux;
+using Linux.VT;
 using System.Text;
-using OpenTK.Platform.Linux;
-using Linux.oldEvDev;
 
 namespace Crow
 {
@@ -88,14 +84,14 @@ namespace Crow
 			if (Kernel.signal (Signal.SIGINT, sigint_handler) < 0)
 				throw new Exception ("SIGINT handler registation failed");
 
-			using (VT.VTControler master = new VT.VTControler ()) {
+			using (VTControler master = new VTControler ()) {
 				previousVT = master.CurrentVT;
 				appVT = master.FirstAvailableVT;
 
 				master.SwitchTo (appVT);
 
 				try {
-					master.KDMode = VT.KDMode.GRAPHICS;
+					master.KDMode = KDMode.GRAPHICS;
 //					VT.vt_mode vtm = master.VTMode;
 //					vtm.mode = VT.SwitchMode.PROCESS;
 //					master.VTMode = vtm;
@@ -161,7 +157,7 @@ namespace Crow
 
 		void switch_request_handle (Signal s){
 			Console.WriteLine ("****** switch request catched: " + s.ToString());
-			using (VT.VTControler master = new VT.VTControler ()) {
+			using (VTControler master = new VTControler ()) {
 				Libc.write (master.fd, Encoding.ASCII.GetBytes ("this is a test string"));
 				master.AcknoledgeSwitchRequest ();
 			}			
@@ -254,7 +250,7 @@ namespace Crow
 		long exit;
 
 		static readonly object Sync = new object();
-		static readonly Crow.Key[] KeyMap = EvdevClass.KeyMap;
+		static readonly Crow.Key[] KeyMap = Evdev.KeyMap;
 		static long DeviceFDCount;
 
 		IntPtr udev;
@@ -519,7 +515,7 @@ namespace Crow
 
 		void handleKeyboard(KeyboardEvent e)
 		{			
-			int key = (int)EvdevClass.KeyMap [e.Key];
+			int key = (int)Evdev.KeyMap [e.Key];
 			Key k = (Key)key;
 			if (e.KeyState == KeyState.Pressed) {
 				CrowInterface.ProcessKeyDown (key);
@@ -602,7 +598,7 @@ namespace Crow
 				gpu.Dispose ();
 			gpu = null;
 
-			using (VT.VTControler master = new VT.VTControler ()) {
+			using (VTControler master = new VTControler ()) {
 				//				try {
 				//					master.KDMode = VT.KDMode.TEXT;
 				//				} catch (Exception ex) {

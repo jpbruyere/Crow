@@ -19,6 +19,7 @@
     </CustomCommands>
     <ReleaseVersion>0.5</ReleaseVersion>
     <StartupObject>CrowIDE.CrowIDE</StartupObject>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,7 +28,6 @@
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
     <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
   </PropertyGroup>
@@ -45,10 +45,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Drawing" />
-    <Reference Include="OpenTK">
-      <HintPath>$(SolutionDir)packages\OpenTK.2.0.0\lib\net20\OpenTK.dll</HintPath>
-      <Package>opentk</Package>
-    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -56,17 +52,26 @@
       <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
       <Name>Crow</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\DRI.net\DRI.net.csproj">
+      <Project>{0189EAEF-DCD4-42F8-A83A-2DEA82926671}</Project>
+      <Name>DRI.net</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="OpenTKGameWindow.cs" />
-    <Compile Include="OpenGL\Shader.cs" />
-    <Compile Include="OpenGL\Texture.cs" />
-    <Compile Include="OpenGL\vaoMesh.cs" />
-    <Compile Include="src\CrowIDE.cs" />
     <Compile Include="src\ImlVisualEditor.cs" />
     <Compile Include="src\MembersView.cs" />
     <Compile Include="src\Extensions.cs" />
     <Compile Include="src\Microsoft.Build.CommonTypes.cs" />
+    <Compile Include="src\CrowIDEdrm.cs" />
+    <Compile Include="src\Application.cs" />
+    <Compile Include="src\Signal.cs" />
+    <Compile Include="src\Bindings\Evdev.cs" />
+    <Compile Include="src\Bindings\LibInput.cs" />
+    <Compile Include="src\Bindings\Udev.cs" />
+    <Compile Include="src\DRIControler.cs" />
+    <Compile Include="src\BlittableValueType.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />
@@ -93,5 +98,6 @@
     <None Include="ui\test.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="src\CrowIDE.cs" />
   </ItemGroup>
 </Project>

@@ -66,12 +66,38 @@ namespace EGL
 		Context ctx;
 		internal EGLSurface handle;
 
+		Surface (Context _ctx, IntPtr config, int[] attrib_list){
+			ctx = _ctx;
+			handle = eglCreatePbufferSurface (ctx.dpy, config, attrib_list);
+			if (handle == IntPtr.Zero)
+				throw new NotSupportedException(String.Format("[EGL] Failed to create surface, error {0}.", EGL.Context.GetError()));			
+		}
 		public Surface (Context _ctx, Linux.GBM.Surface gbmSurf)
 		{
 			ctx = _ctx;
 			handle = eglCreateWindowSurface(ctx.dpy, ctx.currentCfg, gbmSurf.handle, IntPtr.Zero);
 			if (handle == IntPtr.Zero)
 				throw new NotSupportedException(String.Format("[EGL] Failed to create surface, error {0}.", EGL.Context.GetError()));
+		}
+		public static Surface CreatePBuffer (Context _ctx, int _width, int _height){
+			int[] config = new int[] 
+			{				
+				Egl.SURFACE_TYPE, Egl.PBUFFER_BIT,
+//				Egl.RENDERABLE_TYPE, Egl.OPENGL_BIT,
+//				Egl.RED_SIZE, 8, 
+//				Egl.GREEN_SIZE, 8, 
+//				Egl.BLUE_SIZE, 8,
+				Egl.NONE
+			};
+			int[] attribs = new int[] 
+			{				
+				Egl.WIDTH, _width,
+				Egl.HEIGHT, _height,
+				Egl.NONE
+			};
+			IntPtr cfg = _ctx.GetConfig (config);
+			Console.WriteLine ("pbuff cfg: {0}", cfg.ToString ());
+			return new Surface (_ctx, cfg, attribs);
 		}
 
 		public void MakeCurrent (){

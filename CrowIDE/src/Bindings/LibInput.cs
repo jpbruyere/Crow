@@ -275,7 +275,7 @@ namespace Linux
         public IntPtr BaseEvent { get { return GetBaseEvent(@event); } }
         public IntPtr Event { get { return @event; } }
         public uint Time { get { return GetTime(@event); } }
-        public Linux.oldEvDev.EvdevButton Button { get { return (Linux.oldEvDev.EvdevButton)GetButton(@event); } }
+        public EvdevButton Button { get { return (EvdevButton)GetButton(@event); } }
         public uint ButtonCount { get { return GetButtonCount(@event); } }
         public ButtonState ButtonState { get { return GetButtonState(@event); } }
         public bool HasAxis(PointerAxis axis) { return HasAxis(@event, axis) != 0; }

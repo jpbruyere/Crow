@@ -817,7 +817,7 @@ namespace Linux
 					Console.WriteLine ("keymap not found for: " + curModifiers + " " + (int)curModifiers);
 					return;
 				}
-//				string tmp = keymap [curModifiers] [e.Key];
+				string tmp = keymap [curModifiers] [e.Key];
 //				if (string.IsNullOrEmpty (tmp))
 //					return;
 //				if (char.IsControl (tmp[0]))

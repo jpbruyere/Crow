@@ -39,66 +39,139 @@ using System.Linq;
 using Crow;
 using System.Diagnostics;
 
-
+using Linux.Evdev;
+using Linux.VT;
 
 namespace testDrm
 {
-	public class TestApp : Application, IValueChange 
+	static class Tests
 	{
-		#region IValueChange implementation
-		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-		public virtual void NotifyValueChanged(string MemberName, object _value)
+		static void Main ()
 		{
-			//Debug.WriteLine ("Value changed: {0}->{1} = {2}", this, MemberName, _value);
-			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
+//			using (VTControler vt = new VTControler()){
+//				Console.WriteLine (vt.CurrentVT);
+//
+//				for (byte i = 0; i < 0x7F; i++) {
+//					Console.Write ("{0:X2}: ", i);
+//					printke (vt.GetKDBEntry (KbTable.Normal, i));
+//					printke (vt.GetKDBEntry (KbTable.Shift, i));
+//					printke (vt.GetKDBEntry (KbTable.Alt, i));
+//					Console.Write ("\n");
+//				}
+//			}
+//			//return;
+			testEVDEV ();
 		}
-		#endregion
+//		static void printke(KbEntry ke){
+//			string output = "";
+//			if (ke.KeyType.HasFlag (KtType.Latin))
+//				output = new string(new char[] {ke.ActionCode});
+//			if (ke.KeyType.HasFlag (KtType.Fn))
+//				break;
+//			if (ke.KeyType.HasFlag (KtType.Spec))
+//				break;
+//			if (ke.KeyType.HasFlag (KtType.Pad))
+//				break;
+//			if (ke.KeyType.HasFlag (KtType.Dead))
+//				break;
+//			if (ke.KeyType.HasFlag (KtType.Cons))
+//				break;
+//			if (ke.KeyType.HasFlag (KtType.Cur))
+//				break;
+//			if (ke.KeyType.HasFlag (KtType.Shift))
+//				break;
+//			if (ke.KeyType.HasFlag (KtType.Meta))
+//				break;
+//			if (ke.KeyType.HasFlag (KtType.Ascii))
+//				output = new string(new char[] {ke.ActionCode});
+//			if (ke.KeyType.HasFlag (KtType.Lock))
+//				break;
+//			if (ke.KeyType.HasFlag (KtType.Letter))
+//				output = new string(new char[] {ke.ActionCode});
+//			if (ke.KeyType.HasFlag (KtType.Slock))
+//				break;
+//			if (ke.KeyType.HasFlag (KtType.Dead2))
+//				break;
+//			if (ke.KeyType.HasFlag (KtType.Brl))
+//				break;
+//			
+////			if (!ke.KeyType.HasFlag(KtType.)|ke.KeyType.HasFlag(KtType.Letter))
+////				Console.Write ("{0:X4} '{1}' ", ke.kb_value, (char)ke.ActionCode);
+//		}
+		static void evThread (){
+			using (VTControler vt = new VTControler ()) {
+				using (Device dev = new Device (0)) {
+					Console.WriteLine (dev.Name);
+					Console.WriteLine ("Physical location: {0}", dev.PhysLocation);
+					Console.WriteLine ("\tbus:{0}\n\tvendor:{1}\n\tproduct:{2}\n\tversion:{3}",
+						dev.BusTypeId, dev.VendorId, dev.ProductId, dev.VersionId);
 
-		public bool Running = true;
-
-		public TestApp () : base () {
-			
-		}
-		int frTime = 0;
-		int frMin = int.MaxValue;
-		int frMax = 0;
-
-		public override void Run ()
-		{
-			Stopwatch frame = new Stopwatch ();
-			Load ("#testDrm.ui.menu.crow").DataSource = this;
-			Load ("#testDrm.ui.0.crow").DataSource = this;
-
-			while(Running){
-				try {
-					frame.Restart();
-					base.Run ();
-					frame.Stop();
-					frTime = (int)frame.ElapsedTicks;
-					NotifyValueChanged("frameTime", frTime);
-					if (frTime > frMax){
-						frMax = frTime;
-						NotifyValueChanged("frameMax", frMax);	
+					while (true) {
+						InputEvent evt;
+						if (!dev.GetNextEvent (out evt))
+							continue;
+					
 					}
-					if (frTime < frMin){
-						frMin = frTime;
-						NotifyValueChanged("frameMin", frMin);	
-					}
-
-				} catch (Exception ex) {
-					Console.WriteLine (ex.ToString());
 				}
 			}
 		}
-		void onQuitClick(object send, Crow.MouseButtonEventArgs e)
-		{
-			Running = false;
+		static void dumpDevices (){			
+			string[] devices = Directory.GetFiles("/dev/input", "event*");
+			foreach (string path in devices) {
+				using (Device dev = new Device (path)) {
+					Console.Write (dev.Name + " => ");
+					Console.WriteLine ("\tbus:{0} vendor:{1} product:{2} version:{3} path:{4}",
+						dev.BusTypeId, dev.VendorId, dev.ProductId, dev.VersionId, path);
+					if (dev.HasEventCodeOfType (EvType.Key, (uint)Linux.Evdev.KeyType.A))
+						Console.WriteLine ("\t\thas a key");					
+				}
+			}
 		}
-	}
-	static class Tests
-	{
+
+		static void testEVDEV (){
+			
+			using (Device dev = new Device (0)) {
+				Console.WriteLine (dev.Name);
+				Console.WriteLine ("Physical location: {0}", dev.PhysLocation);
+				Console.WriteLine ("\tbus:{0}\n\tvendor:{1}\n\tproduct:{2}\n\tversion:{3}",
+					dev.BusTypeId, dev.VendorId, dev.ProductId, dev.VersionId);
+				dev.test2 ();
+//
+//				if (!dev.TryGrab ()) {
+//					Console.WriteLine ("failed to grab device");
+//					return;
+//				}
+//				using (VTControler vt = new VTControler ()) {
+//					while (true) {
+//						InputEvent evt;
+//						if (!dev.GetNextEvent (out evt))
+//							continue;
+//						if (evt.Code == (ushort)Linux.Evdev.KeyType.Esc && evt.Value == 1)
+//							break;
+//						if (evt.Type != EvType.Key)
+//							continue;
+//						KbEntry ke = vt.GetKDBEntry (KbTable.Normal, (byte)evt.Code);
+//						Console.WriteLine (evt.ToString ());
+//						Console.WriteLine ("raw={0} {1} {2}", evt.Code, ke.KeyType, (char)ke.ActionCode);
+//					}
+//				}
+//				dev.TryRelease ();
+			}
+
+//
+//			Thread t = new Thread(evThread);
+//			t.IsBackground = true;
+//			t.Start ();
+//
+//			while (true)
+//				Console.ReadKey (true);
+		}
+
 		static void signal_handler (Signal s){
 			Console.WriteLine ("signal catched: " + s.ToString());
+		}
+		static void switch_request_handle (Signal s){
+			Console.WriteLine ("switch signal catched: " + s.ToString());
 		}
 		static void genEglConstCase (){
 			Dictionary<int,string> dic = new Dictionary<int, string> ();
@@ -150,16 +223,6 @@ namespace testDrm
 				}
 			}
 		}
-		static void Main ()
-		{
-			try {
-				using (TestApp crowApp = new TestApp ()) {
-					crowApp.Run ();
-				}
-			} catch (Exception ex) {
-				Console.WriteLine (ex.ToString ());
-			}
-		}
 		static void testApp () {
 			int previousVT = -1, appVT = -1;
 
@@ -196,56 +259,12 @@ namespace testDrm
 			}
 		}
 
-		static void testKMS(){
-			int previousVT = -1, appVT = -1;
 
-			if (Kernel.signal (Signal.SIGUSR1, switch_request_handle) < 0)
-				throw new Exception ("signal handler registation failed");			
-			if (Kernel.signal (Signal.SIGINT, sigint_handler) < 0)
-				throw new Exception ("SIGINT handler registation failed");
-
-			using (VT.VTControler master = new VT.VTControler ()) {
-				previousVT = master.CurrentVT;
-				appVT = master.FirstAvailableVT;
-				master.SwitchTo (appVT);
-				try {
-					master.KDMode = VT.KDMode.GRAPHICS;
-				} catch (Exception ex) {
-					Console.WriteLine (ex.ToString ());	
-				}
-			}
-			try {
-				using (DRI.GPUControler gpu = new DRI.GPUControler ()) {
-					
-//					int i = 0;
-//					while(running && i < 1000){
-//						try {
-//							gpu.Update ();
-//							i++;
-//						} catch (Exception ex) {
-//							Console.WriteLine (ex.ToString());
-//						}
-//
-//					}
-						
-
-				}
-			} catch (Exception ex) {
-				Console.WriteLine (ex.ToString ());
-			}
-
-			using (VT.VTControler master = new VT.VTControler ()) {
-				//				try {
-				//					master.KDMode = VT.KDMode.TEXT;
-				//				} catch (Exception ex) {
-				//					Console.WriteLine (ex.ToString ());	
-				//				}
-				master.SwitchTo (previousVT);
-			}
-		}
 
 		static void signalTest (){
 			if (Kernel.signal (Signal.SIGINT, signal_handler) < 0)
+				throw new Exception ("signal handler registation failed");
+			if (Kernel.signal (Signal.SIGUSR1, switch_request_handle) < 0)
 				throw new Exception ("signal handler registation failed");
 			Console.WriteLine ("Handler registered for {0}", Signal.SIGINT);
 			while (true)
@@ -335,13 +354,13 @@ namespace testDrm
 			//vtc.CurrentMode = VT.Mode.GRAPHICS;
 		}
 		static bool running = true;
-		static void switch_request_handle (Signal s){
-			Console.WriteLine ("switch request catched: " + s.ToString());
-			using (VT.VTControler master = new VT.VTControler ()) {
-				Libc.write (master.fd, Encoding.ASCII.GetBytes ("this is a test string"));
-				master.AcknoledgeSwitchRequest ();
-			}			
-		}
+//		static void switch_request_handle (Signal s){
+//			Console.WriteLine ("switch request catched: " + s.ToString());
+//			using (VT.VTControler master = new VT.VTControler ()) {
+//				Libc.write (master.fd, Encoding.ASCII.GetBytes ("this is a test string"));
+//				master.AcknoledgeSwitchRequest ();
+//			}			
+//		}
 		static void sigint_handler (Signal s){
 			Console.WriteLine ("SIGINT catched");
 			running = false;

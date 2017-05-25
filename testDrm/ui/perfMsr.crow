@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
-
 	<VerticalStack Spacing="0" Fit="true" Width="160">
 		<HorizontalStack Background="Black">
-			<Label Text="{Name}" Width="Stretched" Font="doid bold, 10" Margin="2"/>
-			<Button Caption="Reset" MouseClick="onResetClick" Height="Fit"/>
+			<Label Text="{Name}" Width="Stretched" Font="doid bold, 10" Margin="1"/>
+			<Button Caption="RAZ" MouseClick="onResetClick" Height="Fit"/>
 		</HorizontalStack>
 		<HorizontalStack>
 			<Label Text="Current:" Style="FpsLabel"/>

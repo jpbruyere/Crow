@@ -25,7 +25,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-using OpenTK;
 using Linux;
 using Crow;
 
@@ -415,7 +414,7 @@ namespace Linux
             unsafe
             {
                 sbyte* pname = stackalloc sbyte[129];
-                int ret = Libc.ioctl(fd, EvdevIoctl.Name128, new IntPtr(pname));
+				int ret = Libc.ioctl(fd, (uint)EvdevIoctl.Name128, new IntPtr(pname));
                 name = new string(pname);
                 return ret;
             }
@@ -428,7 +427,7 @@ namespace Linux
             {
                 fixed (EvdevInputId* pid = &id)
                 {
-                    return Libc.ioctl(fd, EvdevIoctl.Id, new IntPtr(pid));
+					return Libc.ioctl(fd, (uint)EvdevIoctl.Id, new IntPtr(pid));
                 }
             }
         }

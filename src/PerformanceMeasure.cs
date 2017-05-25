@@ -58,14 +58,16 @@ namespace Crow
 			computeStats ();
 		}
 		public void NotifyChanges(){
-			if (cptMeasures == 0)
-				return;
-			NotifyValueChanged("minimum", minimum);
-			NotifyValueChanged("maximum", maximum);
-			NotifyValueChanged("current", current);
-			//			NotifyValueChanged("total", total);
-			//			NotifyValueChanged("cptMeasures", cptMeasures);
-			NotifyValueChanged("mean", total / cptMeasures);
+			lock(this){
+				if (cptMeasures == 0)
+					return;
+				NotifyValueChanged("minimum", minimum);
+				NotifyValueChanged("maximum", maximum);
+				NotifyValueChanged("current", current);
+				//			NotifyValueChanged("total", total);
+				//			NotifyValueChanged("cptMeasures", cptMeasures);
+				NotifyValueChanged("mean", total / cptMeasures);
+			}
 		}
 
 		void computeStats(){			
@@ -85,7 +87,8 @@ namespace Crow
 			minimum = long.MaxValue;
 		}
 		void onResetClick(object sender, MouseButtonEventArgs e){
-			ResetStats();
+			lock(this)
+				ResetStats();
 		}
 	}
 }

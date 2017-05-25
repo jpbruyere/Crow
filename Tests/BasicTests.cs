@@ -41,6 +41,7 @@ namespace Tests
 		public BasicTests ()
 			: base(1600, 900,"test: press <F3> to toogle test files")
 		{
+
 		}
 
 		int idx = 0;
@@ -129,6 +130,12 @@ namespace Tests
 
 		#endregion
 
+		#if MEASURE_TIME
+		public List<PerformanceMeasure> PerfMeasures;
+		public PerformanceMeasure glDrawMeasure = new PerformanceMeasure("OpenGL Draw", 10);
+		public Command CMDViewPerf;
+		#endif
+
 		void OnClear (object sender, MouseButtonEventArgs e) => TestList = null;
 
 		void OnLoadList (object sender, MouseButtonEventArgs e) => TestList = Color.ColorDic.ToList();
@@ -142,6 +149,7 @@ namespace Tests
 			//testFiles = new string [] { @"Interfaces/Unsorted/testFileDialog.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
 			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			//testFiles = new string [] { @"#Tests.Interfaces.perfMsr.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
@@ -155,7 +163,19 @@ namespace Tests
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Unsorted", "*.crow")).ToArray ();
 
 			object tc = Color.AirForceBlueRaf;
-			Load(testFiles[idx]).DataSource = this;
+			Load (testFiles [idx]).DataSource = this;
+
+			#if MEASURE_TIME
+			PerfMeasures = new List<PerformanceMeasure> (
+				new PerformanceMeasure[] {
+					this.ifaceControl[0].CrowInterface.updateMeasure,
+					this.ifaceControl[0].CrowInterface.layoutingMeasure,
+					this.ifaceControl[0].CrowInterface.clippingMeasure,
+					this.ifaceControl[0].CrowInterface.drawingMeasure,
+					this.ifaceControl[0].glDrawMeasure
+				}
+			);
+			#endif
 		}
 		void KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
@@ -259,6 +279,10 @@ namespace Tests
 			if (IntValue == 1000)
 				IntValue = 0;
 			NotifyValueChanged ("PropertyLessBinding", test);
+			#if MEASURE_TIME
+			foreach (PerformanceMeasure m in PerfMeasures)
+				m.NotifyChanges();
+			#endif
 		}
 		void onNew(object sender, EventArgs e){
 			Debug.WriteLine ("menu new clicked");

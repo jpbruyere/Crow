@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0"?>
 <Menu>
 	<MenuItem Caption="File" Width="Fit">
-		<MenuItem Caption="New"  MouseClick="onLoadClick"/>
-		<MenuItem Caption="Open"/>
+		<MenuItem Caption="New"/>
+		<MenuItem Command="{CMDOpen}"/>
 		<MenuItem Caption="Save"/>
 		<MenuItem Caption="Quit" MouseClick="onQuitClick"/>
 	</MenuItem>

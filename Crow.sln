@@ -11,22 +11,30 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTK", "..\..\src\opentk-
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testDrm", "testDrm\testDrm.csproj", "{4B57740A-75FB-4978-A8E8-8B1793B7474F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRI.net", "..\DRI.net\DRI.net.csproj", "{0189EAEF-DCD4-42F8-A83A-2DEA82926671}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0189EAEF-DCD4-42F8-A83A-2DEA82926671}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0189EAEF-DCD4-42F8-A83A-2DEA82926671}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0189EAEF-DCD4-42F8-A83A-2DEA82926671}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0189EAEF-DCD4-42F8-A83A-2DEA82926671}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4B57740A-75FB-4978-A8E8-8B1793B7474F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4B57740A-75FB-4978-A8E8-8B1793B7474F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B57740A-75FB-4978-A8E8-8B1793B7474F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B57740A-75FB-4978-A8E8-8B1793B7474F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{74289092-9F70-4941-AFCB-DFD7BE2140B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74289092-9F70-4941-AFCB-DFD7BE2140B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74289092-9F70-4941-AFCB-DFD7BE2140B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74289092-9F70-4941-AFCB-DFD7BE2140B6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A37A7E14-0000-0000-0000-000000000000}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A37A7E14-0000-0000-0000-000000000000}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6D911CD-1D09-42FC-B300-9187190F2AE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6D911CD-1D09-42FC-B300-9187190F2AE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6D911CD-1D09-42FC-B300-9187190F2AE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6D911CD-1D09-42FC-B300-9187190F2AE1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

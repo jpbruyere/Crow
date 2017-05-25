@@ -65,10 +65,6 @@ namespace Crow
 				#endif
 				if (frameCpt % 3 == 0)
 					ValueChanged.Raise(this, new ValueChangeEventArgs ("fps", _fps));
-				#if MEASURE_TIME
-//				foreach (PerformanceMeasure m in PerfMeasures)
-//					m.NotifyChanges();
-				#endif
 			}
 		}
 

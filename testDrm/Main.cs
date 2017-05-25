@@ -32,6 +32,7 @@ using Crow.Linux;
 using Crow;
 using System.Reflection;
 using System.Linq;
+using System.Threading;
 
 namespace testDrm
 {
@@ -41,11 +42,22 @@ namespace testDrm
 		[STAThread]
 		static void Main ()
 		{
+//			int pid = Mono.Unix.Native.Syscall.getpid ();
+//			uint gid = Mono.Unix.Native.Syscall.getgid ();
+//			int sid =  Mono.Unix.Native.Syscall.getsid (0);
+//			int newsid = Mono.Unix.Native.Syscall.setsid ();
+//
+//			Console.WriteLine ("pid:{0} gid:{1} sid:{2}", pid, gid, sid);
+//			Console.WriteLine ("pid:{0} gid:{1} sid:{2}",
+//				Mono.Unix.Native.Syscall.getpid (),
+//				Mono.Unix.Native.Syscall.getgid (),
+//				Mono.Unix.Native.Syscall.getsid (0));			
+
 			System.Threading.Thread.CurrentThread.Name = "Main";
+
 			try {
-				using (TestApp crowApp = new TestApp ()) {
+				using (TestApp crowApp = new TestApp ())					
 					crowApp.Run ();
-				}
 			} catch (Exception ex) {
 				Console.WriteLine (ex.ToString ());
 			}
@@ -62,27 +74,33 @@ namespace testDrm
 		#endregion
 
 
-		#if MEASURE_TIME
-		public List<PerformanceMeasure> PerfMeasures;
-		public PerformanceMeasure glDrawMeasure = new PerformanceMeasure("OpenGL Draw", 10);
-		public Command CMDViewPerf, CMDViewCfg, CMDViewTest0;
-		#endif
+		public Command CMDViewPerf, CMDViewCfg, CMDViewTest0, CMDOpen;
 
 		public TestApp () : base () {
-			#if MEASURE_TIME
-			PerfMeasures = new List<PerformanceMeasure> (
-				new PerformanceMeasure[] {
-				this.CrowInterface.updateMeasure,
-				this.CrowInterface.layoutingMeasure,
-				this.CrowInterface.clippingMeasure,
-				this.CrowInterface.drawingMeasure,
-				this.glDrawMeasure
-				}
-			);
+			CrowInterface.KeyboardKeyDown += CrowInterface_KeyboardKeyDown;
+
 			CMDViewPerf = new Command(new Action(() => Load ("#testDrm.ui.perfMeasures.crow").DataSource = this)) { Caption = "Performances"};
 			CMDViewCfg = new Command(new Action(() => Load ("#testDrm.ui.2.crow").DataSource = this)) { Caption = "Configuration"};
 			CMDViewTest0 = new Command(new Action(() => Load ("#testDrm.ui.0.crow").DataSource = this)) { Caption = "Test view 0"};
-			#endif
+			CMDOpen = new Command(new Action(() => { 
+				lock (CrowInterface.UpdateMutex) CrowInterface.AddWidget(new FileDialog());})) { Caption = "Open"};
+
+			Load ("#testDrm.ui.menu.crow").DataSource = this;
+
+			initTests ();
+		}
+
+		void CrowInterface_KeyboardKeyDown (object sender, KeyboardKeyEventArgs e)
+		{
+			if (e.Alt){
+				if (e.Key >= Key.F1 && e.Key <= Key.F8){
+					int ttyNum = 0;
+
+					if (int.TryParse (e.Key.ToString ().Substring (1), out ttyNum))
+						Console.WriteLine ("tty switch {0}", ttyNum);
+					this.CurrentState = RunState.DesactivateRequest;
+				}
+			}
 		}
 
 		public int frameTime = 0;
@@ -187,39 +205,66 @@ namespace testDrm
 			}
 		}
 
+		EGL.Surface pbuff;
+		void initTests(){
 
-		public override void Run ()
-		{			
-			Stopwatch frame = new Stopwatch ();
-			Load ("#testDrm.ui.menu.crow").DataSource = this;
-			int i = 0;
-			while(Running){
-				try {
-					frame.Restart();
-					i++;
 
-					base.Run ();
-					
-					frame.Stop();
-					frameTime = (int)frame.ElapsedTicks;
-					NotifyValueChanged("frameTime", frameTime);
-					if (frameTime > frameMax){
-						frameMax = frameTime;
-						NotifyValueChanged("frameMax", frameMax);	
-					}
-					if (frameTime < frameMin){
-						frameMin = frameTime;
-						NotifyValueChanged("frameMin", frameMin);	
-					}
-					#if MEASURE_TIME
-					foreach (PerformanceMeasure m in PerfMeasures)
-						m.NotifyChanges();
-					#endif
-				} catch (Exception ex) {
-					Console.WriteLine (ex.ToString());
-				}
-			}
+
+//			pbuff = EGL.Surface.CreatePBuffer(gpu.eglctx,800,600);
+//			Console.WriteLine ("pbuff created successfully");
+//			Thread.Sleep (100);
+//			pbuff.Dispose ();
 		}
+		void testegldraw()
+		{
+			int width = 19;
+			int height = 19;
+			using (Cairo.ImageSurface img = new Cairo.ImageSurface (Cairo.Format.Argb32, gpu.Width, gpu.Height)) {
+				glDrawMeasure.StartCycle ();
+				using (Cairo.Context ctx = new Cairo.Context (img)) {
+					for (int x = 100; x < 800; x += 20) {
+						for (int y = 100; y < 800; y += 20) {
+							ctx.Rectangle (x, y, width, height);
+							ctx.SetSourceRGBA (x / 800.0, y / 800.0, 0.5, 0.5);
+							ctx.Fill ();
+						}
+					}
+				}
+				glDrawMeasure.StopCycle ();
+				using (Cairo.Context ctx = new Cairo.Context (cairoSurf)) {
+					ctx.SetSourceSurface (img, 0, 0);
+					ctx.Paint ();
+				}
+
+			}
+
+		}
+
+		protected override void uiDraw ()
+		{			
+			Stopwatch frame = Stopwatch.StartNew ();
+
+			testegldraw ();
+
+			base.uiDraw ();
+					
+			frame.Stop();
+			frameTime = (int)frame.ElapsedTicks;
+			NotifyValueChanged("frameTime", frameTime);
+			if (frameTime > frameMax){
+				frameMax = frameTime;
+				NotifyValueChanged("frameMax", frameMax);	
+			}
+			if (frameTime < frameMin){
+				frameMin = frameTime;
+				NotifyValueChanged("frameMin", frameMin);	
+			}
+			#if MEASURE_TIME
+			foreach (PerformanceMeasure m in PerfMeasures)
+				m.NotifyChanges();
+			#endif
+		}
+
 		void onQuitClick(object send, Crow.MouseButtonEventArgs e)
 		{
 			Running = false;

@@ -110,6 +110,14 @@ namespace Crow
 		#region Events
 		public event EventHandler<MouseCursorChangedEventArgs> MouseCursorChanged;
 		public event EventHandler Quit;
+
+		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
+		public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
+		public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
+		public event EventHandler<MouseButtonEventArgs> MouseClick;
+		public event EventHandler<MouseMoveEventArgs> MouseMove;
+		public event EventHandler<KeyboardKeyEventArgs> KeyboardKeyDown;
+		public event EventHandler<KeyboardKeyEventArgs> KeyboardKeyUp;
 		#endregion
 
 		#region Public Fields
@@ -387,15 +395,19 @@ namespace Crow
 			if (mouseRepeatCount > 0) {
 				int mc = mouseRepeatCount;
 				mouseRepeatCount -= mc;
-				for (int i = 0; i < mc; i++) {
-					FocusedWidget.onMouseClick (this, new MouseButtonEventArgs (Mouse.X, Mouse.Y, MouseButton.Left, true));
+				if (_focusedWidget != null) {
+					for (int i = 0; i < mc; i++) {
+						_focusedWidget.onMouseClick (this, new MouseButtonEventArgs (Mouse.X, Mouse.Y, MouseButton.Left, true));
+					}
 				}
 			}
 			if (keyboardRepeatCount > 0) {
 				int mc = keyboardRepeatCount;
 				keyboardRepeatCount -= mc;
-				for (int i = 0; i < mc; i++) {
-					_focusedWidget.onKeyDown (this, lastKeyDownEvt);
+				if (_focusedWidget != null) {
+					for (int i = 0; i < mc; i++) {
+						_focusedWidget.onKeyDown (this, lastKeyDownEvt);
+					}
 				}
 			}
 			CrowThread[] tmpThreads;
@@ -796,31 +808,36 @@ namespace Crow
 		}
 		public bool ProcessKeyDown(int Key){
 			Keyboard.SetKeyState((Crow.Key)Key,true);
-			if (_focusedWidget == null)
-				return false;
+
 			KeyboardKeyEventArgs e = lastKeyDownEvt = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
 			lastKeyDownEvt.IsRepeat = true;
-			_focusedWidget.onKeyDown (this, e);
+
+			KeyboardKeyDown.Raise (this, e);
 
 			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
 			keyboardRepeatThread.IsBackground = true;
 			keyboardRepeatThread.Start ();
 
+			if (_focusedWidget == null)
+				return false;
+			_focusedWidget.onKeyDown (this, e);
+
 			return true;
 		}
 		public bool ProcessKeyUp(int Key){
-			Keyboard.SetKeyState((Crow.Key)Key,false);
-			if (_focusedWidget == null)
-				return false;
+			Keyboard.SetKeyState ((Crow.Key)Key, false);
 			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
 
-			_focusedWidget.onKeyUp (this, e);
+			KeyboardKeyUp (this, e);
 
 			if (keyboardRepeatThread != null) {
 				keyboardRepeatOn = false;
 				keyboardRepeatThread.Abort();
 				keyboardRepeatThread.Join ();
 			}
+			if (_focusedWidget == null)
+				return false;
+			_focusedWidget.onKeyUp (this, e);
 			return true;
 		}
 		public bool ProcessKeyPress(char Key){

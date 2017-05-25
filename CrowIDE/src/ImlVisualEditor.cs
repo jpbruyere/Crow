@@ -269,7 +269,7 @@ namespace CrowIDE
 //			gr.DrawCote (new Cairo.PointD (hr.Center.X, hr.Y), new Cairo.PointD (hr.Center.X, hr.Bottom));
 				//hr.Inflate (2);
 				gr.SetSourceColor (Color.LightGray);
-				gr.SetDash (new double[]{ 3.0, 3.0 }, 0.0);
+				//gr.SetDash (new double[]{ 3.0, 2.0 }, 1.0);
 				gr.Rectangle (hr, 1.0);
 			}
 
@@ -278,7 +278,7 @@ namespace CrowIDE
 			hr = SelectedItem.ScreenCoordinates(SelectedItem.getSlot ());
 			hr.Inflate (1);
 			gr.SetSourceColor (Color.Yellow);
-			gr.SetDash (new double[]{ 5.0, 3.0 },0.0);
+			//gr.SetDash (new double[]{ 5.0, 3.0 },0.0);
 			gr.Rectangle (hr, 1.0);
 		}
 		#endregion

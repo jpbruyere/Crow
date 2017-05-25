@@ -15,10 +15,11 @@
     <IntermediateOutputPath>$(SolutionDir)build/obj/$(Configuration)</IntermediateOutputPath>
     <CustomCommands>
       <CustomCommands>
+        <Command type="BeforeExecute" command="sudo setcap CAP_SYS_ADMIN=+ep ${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" />
         <Command type="Execute" command="${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" />
       </CustomCommands>
     </CustomCommands>
-    <StartupObject>testDrm.TestApp</StartupObject>
+    <StartupObject>testDrm.Tests</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,7 +31,13 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
     <OutputPath>$(SolutionDir)build\Debug</OutputPath>
-    <Externalconsole>true</Externalconsole>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="BeforeExecute" command="sudo setcap CAP_SYS_ADMIN=+ep ${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" />
+        <Command type="Execute" command="${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" pauseExternalConsole="True" />
+      </CustomCommands>
+    </CustomCommands>
+    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -45,7 +52,6 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="src\Linux\Bindings\Drm.cs" />
-    <Compile Include="src\Linux\Bindings\Evdev.cs" />
     <Compile Include="src\Linux\Bindings\Gbm.cs" />
     <Compile Include="src\Linux\Bindings\Kms.cs" />
     <Compile Include="src\Linux\Bindings\Libc.cs" />
@@ -82,6 +88,12 @@
     <Compile Include="Main.cs" />
     <Compile Include="src\Linux\DRI\PlaneResources.cs" />
     <Compile Include="src\Linux\DRI\DRIControler.cs" />
+    <Compile Include="tests.cs" />
+    <Compile Include="testLibInput.cs" />
+    <Compile Include="src\EVDEV\Device.cs" />
+    <Compile Include="src\Linux\Bindings\EvdevClass.cs" />
+    <Compile Include="defineToEnum.cs" />
+    <Compile Include="src\EVDEV\Enums.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -89,6 +101,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="Mono.Posix" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
@@ -96,6 +109,7 @@
     <Folder Include="src\Linux\DRI\" />
     <Folder Include="src\Egl\" />
     <Folder Include="src\Linux\GBM\" />
+    <Folder Include="src\EVDEV\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">
@@ -119,6 +133,5 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="src\DRMContext.cs" />
-    <None Include="tests.cs" />
   </ItemGroup>
 </Project>

@@ -28,8 +28,11 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using DRI.DRM;
+using Linux;
 
-namespace Linux.DRI {
+
+namespace DRI {
 	#region DRM callback signatures
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	public delegate void VBlankCallback(int fd, int sequence, int tv_sec, int tv_usec, IntPtr user_data);
@@ -206,12 +209,13 @@ namespace Linux.DRI {
 			eglSurf = new EGL.Surface (eglctx, gbmSurf);
 			eglSurf.MakeCurrent ();
 
-			cairoDev = new Cairo.EGLDevice (eglctx.dpy, eglctx.ctx);
+			Console.WriteLine ("dpy:{0} ctx{1}", eglctx.dpy, eglctx.ctx);
 
+			cairoDev = new Cairo.EGLDevice (eglctx.dpy, eglctx.ctx);
 			CairoSurf = new Cairo.GLSurface (cairoDev, eglSurf.handle, Width, Height);
 			//cairoSurf = new Cairo.EGLSurface (cairoDev, egl_surface, 1600, 900);
 
-			cairoDev.SetThreadAware (true);
+			cairoDev.SetThreadAware (false);
 
 			if (cairoDev.Acquire () != Cairo.Status.Success)
 				Console.WriteLine ("[Cairo]: Failed to acquire egl device.");

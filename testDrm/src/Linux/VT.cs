@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 using System;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 namespace Linux.VT {
 	public enum KDMode : byte {
@@ -33,7 +34,7 @@ namespace Linux.VT {
 		TEXT0	= 0x02,	/* obsolete */
 		TEXT1	= 0x03	/* obsolete */
 	}
-	public enum SwitchMode : sbyte {
+	public enum SwitchMode : byte {
 		AUTO	= 0x00,	/* auto vt switching */
 		PROCESS	= 0x01,	/* process controls switching */
 		ACKACQ	= 0x02	/* acknowledge switch */
@@ -45,12 +46,17 @@ namespace Linux.VT {
 		UNICODE		= 0x03,
 		OFF			= 0x04,
 	}
+	[StructLayout(LayoutKind.Sequential)]
 	public struct vt_mode {
 		public SwitchMode mode;		/* vt mode */
-		public sbyte waitv;		/* if set, hang on writes if not active */
+		public byte waitv;		/* if set, hang on writes if not active */
 		public short relsig;	/* signal to raise on release req */
 		public short acqsig;	/* signal to raise on acquisition */
 		public short frsig;		/* unused (set to 0) */
+		public override string ToString ()
+		{
+			return string.Format ("[vt_mode]:waitv:{0} relsig:{1} acqsig:{2} switchmode:{3}", waitv, relsig, acqsig, mode);
+		}
 	}
 	public struct State {
 		public ushort v_active;	/* active vt */
@@ -62,13 +68,70 @@ namespace Linux.VT {
 		public ushort v_cols;		/* number of columns */
 		public ushort v_scrollsize;	/* number of lines of scrollback */
 	}
+	[StructLayout(LayoutKind.Sequential)]
+	unsafe public struct KbsEntry {
+		public byte kb_func;
+		fixed byte kb_string[512];
 
+		public string KbString {
+			get {
+				fixed(byte* bytes = kb_string) {
+					int i = 0;
+					List<byte> lb = new List<byte> ();
+					while (i<512){
+						byte b = (byte)*(bytes + i);
+						if ((int)b == 0)
+							break;
+						lb.Add (b);
+						i++;
+					}
+
+					string test = System.Text.Encoding.ASCII.GetString (lb.ToArray ());
+
+					return test;
+				}
+					
+			}
+		}
+	}
+	[StructLayout(LayoutKind.Sequential)]
 	public struct KbEntry {
-		public byte kb_table;
+		public KbTable kb_table;
 		public byte kb_index;
 		public ushort kb_value;
+
+		public byte ActionCode { get { return (byte)(kb_value & 0xff);}}
+		public KtType KeyType { get { return (KtType)(kb_value>>8); }}
+
+		public override string ToString ()
+		{
+			return string.Format ("KbEntry: {0} {1} {2}", kb_table, kb_index, kb_value);
+		}
+	}
+	[Flags]public enum KtType : byte {
+		Latin	= 0x00,	/* we depend on this being zero */
+		Fn		= 0x01,
+		Spec	= 0x02,
+		Pad		= 0x03,
+		Dead	= 0x04,
+		Cons	= 0x05,
+		Cur		= 0x06,
+		Shift	= 0x07,
+		Meta	= 0x08,
+		Ascii	= 0x09,
+		Lock	= 0x0a,
+		Letter	= 0x0b,	/* symbol that can be acted upon by CapsLock */
+		Slock	= 0x0c,
+		Dead2	= 0x0d,
+		Brl		= 0x0e
 	}
 
+	[Flags]public enum KbTable : byte {
+		Normal	= 0x00,
+		Shift	= 0x01,
+		Alt		= 0x02,
+		AltShift= 0x03
+	}
 	public class VTControler : IDisposable {
 		public int fd = -1;
 
@@ -81,7 +144,7 @@ namespace Linux.VT {
 		#endregion
 
 		/// <summary>set Graphic or Text mode for VT. </summary>
-		unsafe public KDMode KDMode {
+		public KDMode KDMode {
 			get {
 				KDMode m = 0;
 				if (ioctl (fd, KDGETMODE, ref m) < 0)
@@ -94,7 +157,7 @@ namespace Linux.VT {
 			}
 		}
 		/// <summary>set AUTO or PROCESS mode for VT. </summary>
-		unsafe public vt_mode VTMode {
+		public vt_mode VTMode {
 			get {
 				vt_mode m = new vt_mode();
 				if (ioctl (fd, VT_GETMODE, ref m) < 0)
@@ -106,7 +169,19 @@ namespace Linux.VT {
 					throw new Exception ("VTControler: failed to set VTMode for current VT");
 			}
 		}
-
+		/// <summary>get/set keyboard mode. </summary>
+		public KbdMode KbdMode {
+			get {
+				KbdMode m = 0;
+				if (ioctl (fd, KDGKBMODE, ref m) < 0)
+					throw new Exception ("VTControler: failed to get current keyboard mode");				
+				return m;
+			}
+			set {				
+				if (ioctl (fd, KDSKBMODE, (int)value) < 0)
+					throw new Exception ("VTControler: failed to set current keyboard mode");
+			}
+		}
 		/// <summary>
 		/// Switchs to V.
 		/// </summary>
@@ -147,6 +222,30 @@ namespace Linux.VT {
 			if (ioctl (fd, VT_RELDISP, ACKACQ)<0)
 				throw new Exception ("VTControler: failed to acknowledge switch with VT_RELDISP");
 		}
+		public void AtachProcessTOTTY (int ttyNum){
+			int ret =ioctl (fd, TIOCSCTTY, ttyNum);
+			if (ret<0)
+				throw new Exception (string.Format ("VTControler: failed to attach process to TTY {0}: {1}",ttyNum,ret));	
+		}
+		public void DetachProcess () {
+			if (ioctl (fd, TIOCNOTTY, 0)<0)
+				throw new Exception ("VTControler: failed to dettach process from TTY");			
+		}
+
+		public KbEntry GetKDBEntry (KbTable table, byte index){
+			KbEntry ke = new KbEntry() { kb_table = table, kb_index = index};
+			int ret = ioctl (fd, KDGKBENT, ref ke);
+			if (ret < 0)
+					throw new Exception ("VTControler: failed to get KDEntry: " + ret );	
+			return ke;
+		}
+		public string GetKbString (byte action_code){
+			KbsEntry ke = new KbsEntry() { kb_func = action_code};
+			int ret = ioctl (fd, KDGKBSENT, ref ke);
+			if (ret < 0)
+				throw new Exception ("VTControler: failed to get KDSEntry: " + ret );	
+			return ke.KbString;
+		}
 
 		#region IDisposable implementation
 		~VTControler(){
@@ -172,6 +271,8 @@ namespace Linux.VT {
 		const uint KDSKBMODE	= 0x4B45;	/* sets current keyboard mode */
 		const uint KDGKBENT		= 0x4B46;	/* gets one entry in translation table */
 		const uint KDSKBENT		= 0x4B47;	/* sets one entry in translation table */
+		const uint KDGKBSENT	= 0x4B48;	/* gets one function key string entry */
+		const uint KDSKBSENT	= 0x4B49;	/* sets one function key string entry */
 
 		const uint VT_OPENQRY	= 0x5600;	/* find available vt */
 		const uint VT_GETMODE	= 0x5601;	/* get mode of active vt */
@@ -187,11 +288,15 @@ namespace Linux.VT {
 		const uint VT_DISALLOCATE= 0x5608;	/* free memory associated to vt */
 
 		const uint VT_RESIZE	= 0x5609;	/* set kernel's idea of screensize */
+		const uint TIOCNOTTY	= 0x5422;	/* dettach process from tty */
+		const uint TIOCSCTTY	= 0x540E;	/* attach process to tty */
 		#endregion
 
 		#region ioctl overrides
 		[DllImport("libc")]
 		static extern int ioctl(int d, uint request, ref KbEntry entry);
+		[DllImport("libc")]
+		static extern int ioctl(int d, uint request, ref KbsEntry entry);
 		[DllImport("libc")]
 		static extern int ioctl(int d, uint request, ref KbdMode value);
 		[DllImport("libc")]

@@ -629,6 +629,10 @@ namespace Crow
 		/// Removes delegate from event handler by name
 		/// </summary>
 		static void removeEventHandlerByName(object instance, string eventName, string delegateName){
+			if (instance == null){
+				Debug.WriteLine ("RemoveHandlerByName: instance is NULL for Event '" + eventName);
+				return;
+			}
 			Type t = instance.GetType ();
 			FieldInfo fiEvt = getEventHandlerField (t, eventName);
 			if (fiEvt == null) {

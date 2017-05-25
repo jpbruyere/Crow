@@ -370,39 +370,65 @@ namespace EGL
 			ctx = CreateContext(dpy, currentCfg, IntPtr.Zero, contextAttrib);
 			if (ctx == IntPtr.Zero)
 				throw new NotSupportedException(String.Format("[EGL] Failed to create egl context, error {0}.", GetError()));
-			
-//			int[] attribs = new int[] {
-//				(int)Attribute.BufferSize,
-//				Egl.RED_SIZE,
-//				Egl.GREEN_SIZE,
-//				Egl.BLUE_SIZE,
-//				Egl.ALPHA_SIZE,
-//				(int)Attribute.DepthSize,
-//				//(int)Attribute.Height,
-//				Egl.WIDTH,
-//				(int)Attribute.Width,
-//				(int)Attribute.Samples,
-//				(int)Attribute.SampleBuffers,
-//				(int)Attribute.RenderableType,
-//				(int)Attribute.SurfaceType,
-//				(int)Attribute.Level,
-//				(int)Attribute.ConfigCaveat,
-//			};
-//
-//			for (int i = 0; i < configs.Length; i++) {
-//				IntPtr conf = configs[i];
-//				Console.Write ("{0,-3}:", i);
-//				for (int j = 0; j < attribs.Length; j++) {
-//					int value;
-//					GetConfigAttrib (dpy, conf, attribs[j], out value);	
-//					Console.Write ("\t{0} = {1}, ", EglConstToString ((int)attribs[j]), value);
-//				}
-//				Console.Write ("\n");
-//			}
-
 		}
 		#endregion
 
+		public IntPtr GetConfig (int[] desiredCfg){
+			int num_configs;
+			IntPtr[] configs = new IntPtr[1];
+			if (!ChooseConfig(dpy, desiredCfg, configs, 1, out num_configs)||num_configs<1)
+				throw new NotSupportedException(String.Format("[EGL] Failed to retrieve GraphicsMode, error {0}", GetError()));
+			return configs [0];
+		}
+		public IntPtr[] GetAllConfigs (){
+			int num_configs;
+			int[] desiredConfig = new int[] 
+			{				
+				Egl.SURFACE_TYPE, Egl.PBUFFER_BIT,
+				Egl.RENDERABLE_TYPE, Egl.OPENGL_BIT,
+				Egl.NONE
+			};
+
+			if (!ChooseConfig(dpy, desiredConfig, null, 0, out num_configs)||num_configs==0)
+				throw new NotSupportedException(String.Format("[EGL] Failed to retrieve GraphicsMode, error {0}", GetError()));
+			
+			IntPtr[] configs = new IntPtr[num_configs];
+			if (!ChooseConfig(dpy, null, configs, num_configs, out num_configs))
+				throw new NotSupportedException(String.Format("[EGL] Failed to retrieve GraphicsMode, error {0}", GetError()));
+			return configs;
+		}
+		public void DumpAllConf(){
+			Console.Write ("EGL Configs");
+			IntPtr[] configs = GetAllConfigs();
+			int[] attribs = new int[] {
+				(int)Attribute.BufferSize,
+				Egl.RED_SIZE,
+				Egl.GREEN_SIZE,
+				Egl.BLUE_SIZE,
+				Egl.ALPHA_SIZE,
+				(int)Attribute.DepthSize,
+				//(int)Attribute.Height,
+				Egl.WIDTH,
+				(int)Attribute.Width,
+				(int)Attribute.Samples,
+				(int)Attribute.SampleBuffers,
+				(int)Attribute.RenderableType,
+				(int)Attribute.SurfaceType,
+				(int)Attribute.Level,
+				(int)Attribute.ConfigCaveat,
+			};
+
+			for (int i = 0; i < configs.Length; i++) {
+				IntPtr conf = configs[i];
+				Console.Write ("{0,-3}:", i);
+				for (int j = 0; j < attribs.Length; j++) {
+					int value;
+					GetConfigAttrib (dpy, conf, attribs[j], out value);	
+					Console.Write ("\t{0} = {1}, ", EglConstToString ((int)attribs[j]), value);
+				}
+				Console.Write ("\n");
+			}
+		}
 		enum ConfigAttribute {
 			RedSize ,
 			GreenSize,
@@ -412,16 +438,6 @@ namespace EGL
 		public void ResetMakeCurrent (){
 			if (!Context.MakeCurrent (dpy, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero))
 				Console.WriteLine ("egl clear current ctx failed");
-		}
-		public void DestroyContext (){
-			try {
-				if (ctx != IntPtr.Zero)
-					DestroyContext (dpy, ctx);
-			} catch (Exception ex) {
-				Console.WriteLine ("error disposing egl context: {0}", ex.ToString ());
-			}finally {
-				ctx = IntPtr.Zero;
-			}
 		}
 
 		#region IDisposable implementation
@@ -434,8 +450,17 @@ namespace EGL
 			GC.SuppressFinalize (this);
 		}
 		protected virtual void Dispose (bool disposing){
-			if (dpy != IntPtr.Zero)
-				Terminate (dpy);
+			try {
+				if (ctx != IntPtr.Zero)
+					DestroyContext (dpy, ctx);
+				if (dpy != IntPtr.Zero)
+					Terminate (dpy);
+			} catch (Exception ex) {
+				Console.WriteLine ("error disposing egl context: {0}", ex.ToString ());
+			}finally {
+				ctx = IntPtr.Zero;
+				dpy = IntPtr.Zero;
+			}
 		}
 		#endregion
 

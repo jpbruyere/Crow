@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-<Window Focusable="true" Caption="Measures" Width="30%" Height="Fit" MinimumSize="100,100">
-	<ListBox Data="{PerfMeasures}" Fit="true"
-		ItemTemplate="#ui.perfMsr.crow"/>
+<Window Focusable="true" Caption="Measures" Width="200" Height="360" MinimumSize="100,100" Background="0.2,0.2,0.2,0.2" CornerRadius="10">
+	<ListBox Data="{PerfMeasures}" Fit="true" ItemTemplate="#ui.perfMsr.crow" Background="Transparent"/>
 </Window>
