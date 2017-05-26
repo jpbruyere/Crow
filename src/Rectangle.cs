@@ -28,73 +28,50 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
+using System.Runtime.InteropServices;
 
 namespace Crow
-{    
+{
+	[StructLayout(LayoutKind.Sequential)]
 	public struct Rectangle
     {
 		internal static Type TRectangle = typeof(Rectangle);
-		#region private fields
-        int _x;
-        int _y;
-        int _width;
-        int _height;
-		#endregion
+
+		public int X;
+		public int Y;
+		public int Width;
+		public int Height;
 
 		#region ctor
-        public Rectangle(Point p, Size s)
+		public Rectangle(Point p, Size s): this (p.X, p.Y, s.Width, s.Height)
+		{
+		}
+		public Rectangle(Size s) : this (0, 0, s.Width, s.Height)
         {
-            _x = p.X;
-            _y = p.Y;
-            _width = s.Width;
-            _height = s.Height;
-        }
-        public Rectangle(Size s)
-        {
-            _x = 0;
-            _y = 0;
-            _width = s.Width;
-            _height = s.Height;
         }
         public Rectangle(int x, int y, int width, int height)
         {
-            _x = x;
-            _y = y;
-            _width = width;
-            _height = height;
+			X = x;
+			Y = y;
+			Width = width;
+			Height = height;
         }
 		#endregion
 
 		#region PROPERTIES
-        [XmlIgnore]public int X{
-            get { return _x; }
-            set { _x = value; }
-        }
-		[XmlIgnore]public int Y{
-            get { return _y; }
-            set { _y = value; }
-        }
 		[XmlIgnore]public int Left{
-            get { return _x; }
-            set { _x = value; }
+            get { return X; }
+            set { X = value; }
         }
 		[XmlIgnore]public int Top{
-            get { return _y; }
-            set { _y = value; }
+            get { return Y; }
+            set { Y = value; }
         }
 		[XmlIgnore]public int Right{
-            get { return _x + _width; }
+            get { return X + Width; }
         }
 		[XmlIgnore]public int Bottom{
-            get { return _y + _height; }
-        }
-		[XmlIgnore]public int Width{
-            get { return _width; }
-            set { _width = value; }
-        }
-		[XmlIgnore]public int Height{
-            get { return _height; }
-            set { _height = value; }
+            get { return Y + Height; }
         }
 		[XmlIgnore]public Size Size{
             get { return new Size(Width, Height); }
@@ -169,7 +146,7 @@ namespace Crow
         public Rectangle Intersection(Rectangle r)
         {
             Rectangle result = new Rectangle();
-            
+
             if (r.Left >= this.Left)
                 result.Left = r.Left;
             else
@@ -227,7 +204,7 @@ namespace Crow
         {
             return r1.TopLeft == r2.TopLeft && r1.Size == r2.Size ? false : true;
         }
-        #endregion        
+        #endregion
 
 		public static readonly Rectangle Zero = new Rectangle(0, 0, 0, 0);
         public static Rectangle Empty
@@ -253,10 +230,10 @@ namespace Crow
 			{
 				int hash = 17;
 				// Suitable nullity checks etc, of course :)
-				hash = hash * 23 + _x.GetHashCode();
-				hash = hash * 23 + _y.GetHashCode();
-				hash = hash * 23 + _width.GetHashCode();
-				hash = hash * 23 + _height.GetHashCode();
+				hash = hash * 23 + X.GetHashCode();
+				hash = hash * 23 + Y.GetHashCode();
+				hash = hash * 23 + Width.GetHashCode();
+				hash = hash * 23 + Height.GetHashCode();
 				return hash;
 			}
 		}

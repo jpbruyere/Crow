@@ -42,7 +42,6 @@
     <Compile Include="src\Colors.cs" />
     <Compile Include="src\Point.cs" />
     <Compile Include="src\Rectangle.cs" />
-    <Compile Include="src\Rectangles.cs" />
     <Compile Include="src\Size.cs" />
     <Compile Include="src\GraphicObjects\GraphicObject.cs" />
     <Compile Include="src\GraphicObjects\Container.cs" />

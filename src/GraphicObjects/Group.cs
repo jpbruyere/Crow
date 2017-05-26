@@ -237,20 +237,28 @@ namespace Crow
 			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
 				Context gr = new Context (cache);
 
-				if (Clipping.count > 0) {
-					Clipping.clearAndClip (gr);
+				if (!Clipping.IsEmpty) {
+					for (int i = 0; i < Clipping.NumRectangles; i++)
+						gr.Rectangle(Clipping.GetRectangle(i));
+					gr.ClipPreserve();
+					gr.Operator = Operator.Clear;
+					gr.Fill();
+					gr.Operator = Operator.Over;
+
 					base.onDraw (gr);
 
-					//clip to client zone
-					CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
-					gr.Clip ();
+					if (ClipToClientRect) {
+						CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+						gr.Clip ();
+					}
 
 					lock (Children) {
 						foreach (GraphicObject c in Children) {
 							if (!c.Visible)
 								continue;
-							if (Clipping.intersect (c.Slot + ClientRectangle.Position))
-								c.Paint (ref gr);
+							if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
+								continue;
+							c.Paint (ref gr);
 						}
 					}
 
@@ -263,7 +271,8 @@ namespace Crow
 				ctx.SetSourceSurface (cache, rb.X, rb.Y);
 				ctx.Paint ();
 			}
-			Clipping.Reset();
+			Clipping.Dispose();
+			Clipping = new Region ();
 		}
 		#endregion
 

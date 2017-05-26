@@ -49,19 +49,6 @@ namespace testDrm
 	{
 		static void Main ()
 		{
-//			using (VTControler vt = new VTControler()){
-//				Console.WriteLine (vt.CurrentVT);
-//
-//				for (byte i = 0; i < 0x7F; i++) {
-//					Console.Write ("{0:X2}: ", i);
-//					printke (vt.GetKDBEntry (KbTable.Normal, i));
-//					printke (vt.GetKDBEntry (KbTable.Shift, i));
-//					printke (vt.GetKDBEntry (KbTable.Alt, i));
-//					Console.Write ("\n");
-//				}
-//			}
-//			//return;
-			testEVDEV ();
 		}
 //		static void printke(KbEntry ke){
 //			string output = "";

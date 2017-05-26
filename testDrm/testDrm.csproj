@@ -73,6 +73,8 @@
     <Compile Include="defineToEnum.cs" />
     <Compile Include="src\EVDEV\Enums.cs" />
     <Compile Include="src\Linux\DRIControler.cs" />
+    <Compile Include="testCairo.cs" />
+    <Compile Include="TestCrow.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -110,6 +112,7 @@
     <EmbeddedResource Include="ui\perfMeasures.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="ui\go.crow" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\DRMContext.cs" />

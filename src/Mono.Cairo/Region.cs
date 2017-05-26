@@ -25,13 +25,11 @@ using System.Runtime.InteropServices;
 
 namespace Cairo
 {
-
 	[StructLayout(LayoutKind.Sequential)]
-	public struct RectangleInt {
-		public int X;
-		public int Y;
-		public int Width;
-		public int Height;
+	public struct RectangleList {
+		public Status Status;
+		public IntPtr Rectangles;
+		public int NumRectangles;
 	}
 
 	public enum RegionOverlap {
@@ -63,14 +61,14 @@ namespace Cairo
 		{
 		}
 
-		public Region (RectangleInt rect)
+		public Region (Crow.Rectangle rect)
 		{
 			handle = NativeMethods.cairo_region_create_rectangle (ref rect);
 		}
 
-		public Region (RectangleInt[] rects)
+		public Region (RectangleList rects)
 		{
-			handle = NativeMethods.cairo_region_create_rectangles (rects, rects.Length);
+			handle = NativeMethods.cairo_region_create_rectangles (rects.Rectangles, rects.NumRectangles);
 		}
 
 		public Region Copy ()
@@ -78,6 +76,7 @@ namespace Cairo
 			return new Region (NativeMethods.cairo_region_copy (Handle), true);
 		}
 
+		#region IDisposable
 		~Region ()
 		{
 			Dispose (false);
@@ -100,6 +99,7 @@ namespace Cairo
 			NativeMethods.cairo_region_destroy (Handle);
 			handle = IntPtr.Zero;
 		}
+		#endregion
 
 		public override bool Equals (object obj)
 		{
@@ -115,9 +115,9 @@ namespace Cairo
 			get { return NativeMethods.cairo_region_status (Handle); }
 		}
 
-		public RectangleInt Extents {
+		public Crow.Rectangle Extents {
 			get {
-				RectangleInt result;
+				Crow.Rectangle result;
 				NativeMethods.cairo_region_get_extents (Handle, out result);
 				return result;
 			}
@@ -127,9 +127,9 @@ namespace Cairo
 			get { return NativeMethods.cairo_region_num_rectangles (Handle); }
 		}
 
-		public RectangleInt GetRectangle (int nth)
+		public Crow.Rectangle GetRectangle (int nth)
 		{
-			RectangleInt val;
+			Crow.Rectangle val;
 			NativeMethods.cairo_region_get_rectangle (Handle, nth, out val);
 			return val;
 		}
@@ -138,12 +138,12 @@ namespace Cairo
 			get { return NativeMethods.cairo_region_is_empty (Handle); }
 		}
 
-		public RegionOverlap ContainsPoint (RectangleInt rectangle)
+		public RegionOverlap Contains (Crow.Rectangle rectangle)
 		{
 			return NativeMethods.cairo_region_contains_rectangle (Handle, ref rectangle);
 		}
 
-		public bool ContainsPoint (int x, int y)
+		public bool Contains (int x, int y)
 		{
 			return NativeMethods.cairo_region_contains_point (Handle, x, y);
 		}
@@ -158,7 +158,7 @@ namespace Cairo
 			return NativeMethods.cairo_region_subtract (Handle, other.Handle);
 		}
 
-		public Status SubtractRectangle (RectangleInt rectangle)
+		public Status SubtractRectangle (Crow.Rectangle rectangle)
 		{
 			return NativeMethods.cairo_region_subtract_rectangle (Handle, ref rectangle);
 		}
@@ -168,7 +168,7 @@ namespace Cairo
 			return NativeMethods.cairo_region_intersect (Handle, other.Handle);
 		}
 
-		public Status IntersectRectangle (RectangleInt rectangle)
+		public Status IntersectRectangle (Crow.Rectangle rectangle)
 		{
 			return NativeMethods.cairo_region_intersect_rectangle (Handle, ref rectangle);
 		}
@@ -178,7 +178,7 @@ namespace Cairo
 			return NativeMethods.cairo_region_union (Handle, other.Handle);
 		}
 
-		public Status UnionRectangle (RectangleInt rectangle)
+		public Status UnionRectangle (Crow.Rectangle rectangle)
 		{
 			return NativeMethods.cairo_region_union_rectangle (Handle, ref rectangle);
 		}
@@ -188,7 +188,7 @@ namespace Cairo
 			return NativeMethods.cairo_region_xor (Handle, other.Handle);
 		}
 
-		public Status XorRectangle (RectangleInt rectangle)
+		public Status XorRectangle (Crow.Rectangle rectangle)
 		{
 			return NativeMethods.cairo_region_xor_rectangle (Handle, ref rectangle);
 		}

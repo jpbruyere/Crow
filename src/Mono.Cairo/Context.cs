@@ -563,7 +563,14 @@ namespace Cairo {
 		{
 			return NativeMethods.cairo_in_clip (handle, x, y);
 		}
-
+		public RectangleList GetClipRectangles (){
+			return (RectangleList)Marshal.PtrToStructure (NativeMethods.cairo_copy_clip_rectangle_list (handle), typeof(RectangleList));
+		}
+		public void ClipExtendRectangle (){
+			double x1, y1, x2, y2;
+			NativeMethods.cairo_clip_extents (handle, out x1, out y1, out x2, out y2);
+			NativeMethods.cairo_rectangle (handle, x1, y1, x2 - x1, y2 - y1); 
+		}
 		public bool InStroke (double x, double y)
 		{
 			return NativeMethods.cairo_in_stroke (handle, x, y);

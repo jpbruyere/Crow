@@ -58,8 +58,7 @@ namespace Crow
 			}
 		}
 
-		Rectangles clipping = new Rectangles();
-		public Rectangles Clipping { get { return clipping; }}
+		public Region Clipping = new Region();
 
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
@@ -845,7 +844,7 @@ namespace Crow
 		public virtual void RegisterClip(Rectangle clip){
 			Rectangle  r = clip + ClientRectangle.Position;
 			if (CacheEnabled && !IsDirty)
-				Clipping.AddRectangle (r);
+				Clipping.UnionRectangle (r);
 			if (Parent == null)
 				return;
 			GraphicObject p = Parent as GraphicObject;
@@ -1108,7 +1107,7 @@ namespace Crow
 			Rectangle rBack = new Rectangle (Slot.Size);
 
 			Background.SetAsSource (gr, rBack);
-			CairoHelpers.CairoRectangle(gr,rBack,cornerRadius);
+			CairoHelpers.CairoRectangle (gr, rBack, cornerRadius);
 			gr.Fill ();
 		}
 
@@ -1144,8 +1143,8 @@ namespace Crow
 				ctx.SetSourceSurface (cache, rb.X, rb.Y);
 				ctx.Paint ();
 			}
-			//Clipping.clearAndClip (ctx);
-			Clipping.Reset();
+			Clipping.Dispose ();
+			Clipping = new Region ();
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version
 		/// of the widget </summary>

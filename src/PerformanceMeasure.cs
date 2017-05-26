@@ -72,8 +72,8 @@ namespace Crow
 
 		void computeStats(){			
 			current = timer.ElapsedTicks;
-//			if (current < cancelLimit)
-//				return;
+			if (current < cancelLimit)
+				return;
 			cptMeasures++;
 			total += timer.ElapsedTicks;
 			if (timer.ElapsedTicks < minimum)
