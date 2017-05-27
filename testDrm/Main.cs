@@ -219,7 +219,9 @@ namespace testDrm
 			int width = 19;
 			int height = 19;
 			using (Cairo.ImageSurface img = new Cairo.ImageSurface (Cairo.Format.Argb32, gpu.Width, gpu.Height)) {
+				#if MEASURE_TIME
 				glDrawMeasure.StartCycle ();
+				#endif
 				using (Cairo.Context ctx = new Cairo.Context (img)) {
 					for (int x = 100; x < 800; x += 20) {
 						for (int y = 100; y < 800; y += 20) {
@@ -229,7 +231,9 @@ namespace testDrm
 						}
 					}
 				}
+				#if MEASURE_TIME
 				glDrawMeasure.StopCycle ();
+				#endif
 				using (Cairo.Context ctx = new Cairo.Context (cairoSurf)) {
 					ctx.SetSourceSurface (img, 0, 0);
 					ctx.Paint ();

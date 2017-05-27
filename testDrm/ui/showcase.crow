@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<Window Width="50%" Height="50%">
+	<VerticalStack>
+		<Menu>
+			<MenuItem Caption="File" Width="Fit">
+				<MenuItem Caption="New"/>
+				<MenuItem Command="{CMDOpen}"/>
+				<MenuItem Caption="Save"/>
+				<MenuItem Caption="Quit" MouseClick="onQuitClick"/>
+			</MenuItem>
+			<MenuItem Caption="View" Width="Fit">
+				<MenuItem Command="{CMDViewPerf}"/>
+				<MenuItem Command="{CMDViewCfg}"/>
+				<MenuItem Command="{CMDViewTest0}"/>
+			</MenuItem>
+			<MenuItem Caption="Edit" Name="edit" Width="Fit">
+				<MenuItem Caption="Cut"/>
+				<MenuItem Caption="Copy"/>
+				<MenuItem Caption="Paste"/>
+				<MenuItem Caption="Special" Name="special" Width="Fit">
+					<MenuItem Caption="Cut"/>
+					<MenuItem Caption="Copy"/>
+					<MenuItem Caption="Paste"/>
+				</MenuItem>
+				<MenuItem Caption="Special2" Name="special" Width="Fit">
+					<MenuItem Caption="Cut"/>
+					<MenuItem Caption="Copy"/>
+					<MenuItem Caption="Paste"/>
+				</MenuItem>
+			</MenuItem>
+			<MenuItem Caption="Help" Width="Fit">
+				<MenuItem Caption="About"/>
+				<MenuItem Caption="Help"/>
+			</MenuItem>
+		</Menu>
+		<HorizontalStack Background="Onyx" Margin="5">
+			<DirectoryView Name="dv" CurrentDirectory="Interfaces" Width="25%" SelectedItemChanged="Dv_SelectedItemChanged"
+				/>
+			<Splitter Width="6"/>
+			<VerticalStack>
+				<Container Name="CrowContainer" Height="60%" Background="SmokyBlack"/>
+				<Splitter/>
+				<HorizontalStack>
+					<Scroller Name="scroller1" Background="White"
+							Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}"
+							ValueChanged="./_scroller_ValueChanged">
+						<TextBox VerticalAlignment="Top" TextChanged="Tb_TextChanged"
+							Text="{source}" Multiline="true" TextAlignment="TopLeft"
+							Font="Courriernew 10"/>
+					</Scroller>
+					<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}"
+						Maximum="{../scroller1.MaximumScroll}" Orientation="Vertical"
+						Width="14" />
+				</HorizontalStack>
+			</VerticalStack>
+		</HorizontalStack>
+	</VerticalStack>
+</Window>

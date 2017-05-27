@@ -386,21 +386,7 @@ namespace Linux.oldEvDev
             return (uint)v;
         }
 
-        // Get absolute value / limits
-        public static int GetAbs(int fd, EvdevAxis axis, out InputAbsInfo info)
-        {
-            info = default(InputAbsInfo);
-            unsafe
-            {
-                fixed (InputAbsInfo* pinfo = &info)
-                {
-                    // EVIOCGABS(abs) = _IOR('E', 0x40 + (abs), struct input_absinfo)
-                    uint ioctl = IOCreate(DirectionFlags.Read, (int)axis + 0x40, BlittableValueType<InputAbsInfo>.Stride);
-                    int retval = Libc.ioctl(fd, ioctl, new IntPtr(pinfo));
-                    return retval;
-                }
-            }
-        }
+
 
         // Get supported event bits
         public static int GetBit(int fd, EvdevType ev, int length, IntPtr data)

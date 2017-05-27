@@ -25,20 +25,37 @@
 // THE SOFTWARE.
 using System;
 using Crow;
+using System.Runtime.InteropServices;
 
 namespace testDrm
 {
 	public class TestCrow
 	{
-		static void Main(){
-			Rectangle bounds = new Rectangle(0,0,1024,768);
-			Interface iface = new Interface();
-			iface.ProcessResize (bounds);
+		const string lib = "/home/jp/devel/testsharedlib/bin/Debug/libcrow.so";
 
-			iface.LoadInterface ("#testDrm.ui.go.crow");
+		[DllImport(lib)]
+		unsafe static extern Rectangle* allocate();
 
-			while (true)
-				iface.Update ();
+		[DllImport(lib)]
+		public static extern void update (int w, int h);
+
+
+		unsafe static Rectangle* rect;
+
+		unsafe static void Main(){
+			rect = allocate();
+			update (150, 160);
+			Console.WriteLine (rect->Height);
+			rect->Height = 200;
+			Console.WriteLine (rect->Height);
+//			Rectangle bounds = new Rectangle(0,0,1024,768);
+//			Interface iface = new Interface();
+//			iface.ProcessResize (bounds);
+//
+//			iface.LoadInterface ("#testDrm.ui.go.crow");
+//
+//			while (true)
+//				iface.Update ();
 		}
 	}
 }

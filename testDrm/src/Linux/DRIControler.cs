@@ -172,6 +172,8 @@ namespace Linux.DRI {
 			gbmDev = new GBM.Device (fd_gpu);
 			eglctx = new EGL.Context (gbmDev);
 
+			Console.WriteLine (eglctx.Extensions);
+			Console.WriteLine (eglctx.OffScreenExtensions);
 			try {
 				if (defaultConfiguration ())
 					Console.WriteLine ("default config ok");

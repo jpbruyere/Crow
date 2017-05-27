@@ -19,13 +19,13 @@
         <Command type="Execute" command="${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" />
       </CustomCommands>
     </CustomCommands>
-    <StartupObject>testDrm.TestApp</StartupObject>
+    <StartupObject>testDrm.TestCrow</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;MEASURE_TIME;</DefineConstants>
+    <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -37,7 +37,7 @@
         <Command type="Execute" command="${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" pauseExternalConsole="True" />
       </CustomCommands>
     </CustomCommands>
-    <ConsolePause>false</ConsolePause>
+    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -55,14 +55,6 @@
     <Compile Include="src\Linux\Bindings\LibInput.cs" />
     <Compile Include="src\Linux\Bindings\Poll.cs" />
     <Compile Include="src\Linux\Bindings\Udev.cs" />
-    <Compile Include="src\BlittableValueType.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\DisplayResolution.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\MouseCursor.cs" />
-    <Compile Include="src\WindowIcon.cs" />
     <Compile Include="src\Linux\Signal.cs" />
     <Compile Include="src\Application.cs" />
     <Compile Include="Main.cs" />
@@ -75,6 +67,7 @@
     <Compile Include="src\Linux\DRIControler.cs" />
     <Compile Include="testCairo.cs" />
     <Compile Include="TestCrow.cs" />
+    <Compile Include="Showcase.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -113,8 +106,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="ui\go.crow" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\DRMContext.cs" />
+    <EmbeddedResource Include="ui\showcase.crow" />
   </ItemGroup>
 </Project>

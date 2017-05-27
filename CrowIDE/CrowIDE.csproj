@@ -70,9 +70,6 @@
     <Compile Include="..\testDrm\src\Application.cs">
       <Link>src\Application.cs</Link>
     </Compile>
-    <Compile Include="..\testDrm\src\BlittableValueType.cs">
-      <Link>src\BlittableValueType.cs</Link>
-    </Compile>
     <Compile Include="..\testDrm\src\Linux\Bindings\EvdevClass.cs">
       <Link>src\Bindings\EvdevClass.cs</Link>
     </Compile>

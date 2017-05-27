@@ -27,7 +27,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <DefineConstants>DEBUG;TRACE;MEASURE_TIME</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;MEASURE_TIME0</DefineConstants>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
     <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
   </PropertyGroup>
