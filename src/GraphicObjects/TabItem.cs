@@ -106,28 +106,28 @@ namespace Crow
 				NotifyValueChanged ("IsSelected", isSelected);
 			}
 		}
-		protected override void onDraw (Cairo.Context gr)
+		unsafe protected override void onDraw (Cairo.Context gr)
 		{
 			gr.Save ();
 
 			int spacing = (Parent as TabView).Spacing;
 
-			gr.MoveTo (0.5, TabTitle.Slot.Bottom-0.5);
-			gr.LineTo (TabTitle.Slot.Left - spacing, TabTitle.Slot.Bottom-0.5);
+			gr.MoveTo (0.5, TabTitle.nativeHnd->Slot.Bottom-0.5);
+			gr.LineTo (TabTitle.nativeHnd->Slot.Left - spacing, TabTitle.nativeHnd->Slot.Bottom-0.5);
 			gr.CurveTo (
-				TabTitle.Slot.Left - spacing / 2, TabTitle.Slot.Bottom-0.5,
-				TabTitle.Slot.Left - spacing / 2, 0.5,
-				TabTitle.Slot.Left, 0.5);
-			gr.LineTo (TabTitle.Slot.Right, 0.5);
+				TabTitle.nativeHnd->Slot.Left - spacing / 2, TabTitle.nativeHnd->Slot.Bottom-0.5,
+				TabTitle.nativeHnd->Slot.Left - spacing / 2, 0.5,
+				TabTitle.nativeHnd->Slot.Left, 0.5);
+			gr.LineTo (TabTitle.nativeHnd->Slot.Right, 0.5);
 			gr.CurveTo (
-				TabTitle.Slot.Right + spacing / 2, 0.5,
-				TabTitle.Slot.Right + spacing / 2, TabTitle.Slot.Bottom-0.5,
-				TabTitle.Slot.Right + spacing, TabTitle.Slot.Bottom-0.5);
-			gr.LineTo (Slot.Width-0.5, TabTitle.Slot.Bottom-0.5);
+				TabTitle.nativeHnd->Slot.Right + spacing / 2, 0.5,
+				TabTitle.nativeHnd->Slot.Right + spacing / 2, TabTitle.nativeHnd->Slot.Bottom-0.5,
+				TabTitle.nativeHnd->Slot.Right + spacing, TabTitle.nativeHnd->Slot.Bottom-0.5);
+			gr.LineTo (nativeHnd->Slot.Width-0.5, TabTitle.nativeHnd->Slot.Bottom-0.5);
 
 
-			gr.LineTo (Slot.Width-0.5, Slot.Height-0.5);
-			gr.LineTo (0.5, Slot.Height-0.5);
+			gr.LineTo (nativeHnd->Slot.Width-0.5, nativeHnd->Slot.Height-0.5);
+			gr.LineTo (0.5, nativeHnd->Slot.Height-0.5);
 			gr.ClosePath ();
 			gr.LineWidth = 2;
 			Foreground.SetAsSource (gr);
@@ -139,16 +139,16 @@ namespace Crow
 		}
 
 		#region Mouse Handling
-		public override bool MouseIsIn (Point m)
+		unsafe public override bool MouseIsIn (Point m)
 		{
 			if (!Visible)
 				return false;
 
-			bool mouseIsInTitle = TabTitle.ScreenCoordinates (TabTitle.Slot).ContainsOrIsEqual (m);
+			bool mouseIsInTitle = TabTitle.ScreenCoordinates (TabTitle.nativeHnd->Slot).ContainsOrIsEqual (m);
 			if (!IsSelected)
 				return mouseIsInTitle;
 
-			return _contentContainer.ScreenCoordinates (_contentContainer.Slot).ContainsOrIsEqual (m)
+			return _contentContainer.ScreenCoordinates (_contentContainer.nativeHnd->Slot).ContainsOrIsEqual (m)
 				|| mouseIsInTitle;
 		}
 		bool holdCursor = false;
@@ -163,7 +163,7 @@ namespace Crow
 			holdCursor = false;
 			(Parent as TabView).UpdateLayout (LayoutingType.ArrangeChildren);
 		}
-		public override void onMouseMove (object sender, MouseMoveEventArgs e)
+		unsafe public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
 
@@ -174,14 +174,14 @@ namespace Crow
 			int tmp = TabOffset + e.XDelta;
 			if (tmp < tv.Spacing)
 				TabOffset = tv.Spacing;
-			else if (tmp > Parent.getSlot ().Width - TabTitle.Slot.Width - tv.Spacing)
-				TabOffset = Parent.getSlot ().Width - TabTitle.Slot.Width - tv.Spacing;
+			else if (tmp > Parent.getSlot ().Width - TabTitle.nativeHnd->Slot.Width - tv.Spacing)
+				TabOffset = Parent.getSlot ().Width - TabTitle.nativeHnd->Slot.Width - tv.Spacing;
 			else{
 				int idx = tv.Children.IndexOf (this);
 				if (idx > 0 && e.XDelta < 0) {
 					previous = tv.Children [idx - 1] as TabItem;
 
-					if (tmp < previous.TabOffset + previous.TabTitle.Slot.Width / 2) {
+					if (tmp < previous.TabOffset + previous.TabTitle.nativeHnd->Slot.Width / 2) {
 						tv.Children.RemoveAt (idx);
 						tv.Children.Insert (idx - 1, this);
 						tv.SelectedTab = idx - 1;
@@ -190,7 +190,7 @@ namespace Crow
 
 				}else if (idx < tv.Children.Count - 1 && e.XDelta > 0) {
 					next = tv.Children [idx + 1] as TabItem;
-					if (tmp > next.TabOffset - next.TabTitle.Slot.Width / 2){
+					if (tmp > next.TabOffset - next.TabTitle.nativeHnd->Slot.Width / 2){
 						tv.Children.RemoveAt (idx);
 						tv.Children.Insert (idx + 1, this);
 						tv.SelectedTab = idx + 1;

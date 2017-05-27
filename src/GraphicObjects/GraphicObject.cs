@@ -35,30 +35,66 @@ using Cairo;
 using System.Linq;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Crow
 {
-	public class GraphicObject : ILayoutable, IValueChange
+	[StructLayout(LayoutKind.Sequential)]
+	unsafe public struct NativeGO {
+		public NativeGO* Parent;
+		public int Left;
+		public int Top;
+		public Measure Width;
+		public Measure Height;
+		public int Margin;
+		public Size MinimumSize;
+		public Size MaximumSize;
+		byte visible;
+		public LayoutingType RegisteredLayoutings;
+		/// <summary>
+		/// Current size and position computed during layouting pass
+		/// </summary>
+		public Rectangle Slot;
+		/// <summary>
+		/// keep last slot components for each layouting pass to track
+		/// changes and trigger update of other component accordingly
+		/// </summary>
+		public Rectangle LastSlot;
+		/// <summary>
+		/// keep last slot painted on screen to clear traces if moved or resized
+		/// TODO: we should ensure the whole parsed widget tree is the last painted
+		/// version to clear effective oldslot if parents have been moved or resized.
+		/// IDEA is to add a ScreenCoordinates function that use only lastPaintedSlots
+		/// </summary>
+		public Rectangle LastPaintedSlot;
+		public VerticalAlignment VerticalAlignment;
+		public HorizontalAlignment HorizontalAlignment;
+
+		unsafe public bool Visible {
+			get { return visible > 0; }
+			set {
+				if (value)
+					visible = 1;
+				else
+					visible = 0;
+			}
+		}
+	}
+	public class GraphicObject : IValueChange, IDisposable
 	{
+		#region PINVOKE
+		const string lib = "/home/jp/devel/testsharedlib/bin/Debug/libcrow.so";
+		[DllImport(lib)]
+		unsafe static extern NativeGO* CreateGO();
+		[DllImport(lib)]
+		unsafe static extern void DestroyGO(NativeGO* go);
+		#endregion
+
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
 
-		Interface currentInterface = null;
 
-		[XmlIgnore]public Interface CurrentInterface {
-			get {
-				if (currentInterface == null) {
-					currentInterface = Interface.CurrentInterface;
-					Initialize ();
-				}
-				return currentInterface;
-			}
-			set {
-				currentInterface = value;
-			}
-		}
-
-		public Region Clipping = new Region();
+		unsafe internal NativeGO* nativeHnd;
 
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
@@ -72,6 +108,9 @@ namespace Crow
 		#region CTOR
 		public GraphicObject ()
 		{
+			unsafe {
+				nativeHnd = CreateGO ();
+			}
 			#if DEBUG
 			uid = currentUid;
 			currentUid++;
@@ -88,27 +127,20 @@ namespace Crow
 			loadDefaultValues ();
 		}
 		#region private fields
-		LayoutingType registeredLayoutings = LayoutingType.All;
-		ILayoutable logicalParent;
-		ILayoutable parent;
+
+		Interface currentInterface = null;
+		GraphicObject logicalParent;
+		GraphicObject parent;
 		string name;
 		Fill background = Color.Transparent;
 		Fill foreground = Color.White;
 		Font font = "droid, 10";
-		Measure width, height;
-		int left, top;
 		double cornerRadius = 0;
-		int margin = 0;
 		bool focusable = false;
 		bool hasFocus = false;
 		bool isActive = false;
 		bool mouseRepeat;
-		protected bool isVisible = true;
 		bool isEnabled = true;
-		VerticalAlignment verticalAlignment = VerticalAlignment.Center;
-		HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center;
-		Size maximumSize = "0,0";
-		Size minimumSize = "0,0";
 		bool cacheEnabled = false;
 		bool clipToClientRect = true;
 		protected object dataSource;
@@ -118,21 +150,9 @@ namespace Crow
 
 		#region public fields
 		/// <summary>
-		/// Current size and position computed during layouting pass
+		/// The clipping rectangles list
 		/// </summary>
-		public Rectangle Slot = new Rectangle ();
-		/// <summary>
-		/// keep last slot components for each layouting pass to track
-		/// changes and trigger update of other component accordingly
-		/// </summary>
-		public Rectangle LastSlots;
-		/// <summary>
-		/// keep last slot painted on screen to clear traces if moved or resized
-		/// TODO: we should ensure the whole parsed widget tree is the last painted
-		/// version to clear effective oldslot if parents have been moved or resized.
-		/// IDEA is to add a ScreenCoordinates function that use only lastPaintedSlots
-		/// </summary>
-		public Rectangle LastPaintedSlot;
+		public Region Clipping = new Region();
 		/// <summary>Prevent requeuing multiple times the same widget</summary>
 		public bool IsQueueForRedraw = false;
 		/// <summary>drawing Cache bitmap</summary>
@@ -149,51 +169,53 @@ namespace Crow
 		#endregion
 
 		#region ILayoutable
-		[XmlIgnore]public LayoutingType RegisteredLayoutings { get { return registeredLayoutings; } set { registeredLayoutings = value; } }
+		[XmlIgnore]unsafe public LayoutingType RegisteredLayoutings {
+			get { return nativeHnd->RegisteredLayoutings; } set { nativeHnd->RegisteredLayoutings = value; } }
 		//TODO: it would save the recurent cost of a cast in event bubbling if parent type was GraphicObject
 		//		or we could add to the interface the mouse events
 		/// <summary>
 		/// Parent in the graphic tree, used for rendering and layouting
 		/// </summary>
-		[XmlIgnore]public virtual ILayoutable Parent {
+		[XmlIgnore]public virtual GraphicObject Parent {
 			get { return parent; }
 			set {
 				if (parent == value)
 					return;
 				DataSourceChangeEventArgs e = new DataSourceChangeEventArgs (parent, value);
-				lock (this)
+				lock (this) {
 					parent = value;
+					//nativeHnd->Parent = value?.nativeHnd;
+				}
 
 				onParentChanged (this, e);
 			}
 		}
-		[XmlIgnore]public ILayoutable LogicalParent {
+		[XmlIgnore]public GraphicObject LogicalParent {
 			get { return logicalParent == null ? Parent : logicalParent; }
 			set {
 				if (logicalParent == value)
 					return;
 				if (logicalParent != null)
-					(logicalParent as GraphicObject).DataSourceChanged -= onLogicalParentDataSourceChanged;
+					logicalParent.DataSourceChanged -= onLogicalParentDataSourceChanged;
 				DataSourceChangeEventArgs dsce = new DataSourceChangeEventArgs (LogicalParent, null);
 				logicalParent = value;
 				dsce.NewDataSource = LogicalParent;
 				if (logicalParent != null)
-					(logicalParent as GraphicObject).DataSourceChanged += onLogicalParentDataSourceChanged;
+					logicalParent.DataSourceChanged += onLogicalParentDataSourceChanged;
 				onLogicalParentChanged (this, dsce);
 			}
 		}
-		[XmlIgnore]public virtual Rectangle ClientRectangle {
+		[XmlIgnore]unsafe public virtual Rectangle ClientRectangle {
 			get {
-				Rectangle cb = Slot.Size;
+				Rectangle cb = nativeHnd->Slot.Size;
 				cb.Inflate ( - Margin);
 				return cb;
 			}
 		}
 		public virtual Rectangle ContextCoordinates(Rectangle r){
-			GraphicObject go = Parent as GraphicObject;
-			if (go == null)
+			if (Parent is Interface)
 				return r + Parent.ClientRectangle.Position;
-			return go.CacheEnabled ?
+			return parent.CacheEnabled ?
 				r + Parent.ClientRectangle.Position :
 				Parent.ContextCoordinates (r);
 		}
@@ -201,7 +223,7 @@ namespace Crow
 			return
 				Parent.ScreenCoordinates(r) + Parent.getSlot().Position + Parent.ClientRectangle.Position;
 		}
-		public virtual Rectangle getSlot () { return Slot;}
+		unsafe public virtual Rectangle getSlot () { return nativeHnd->Slot;}
 		#endregion
 
 		#region EVENT HANDLERS
@@ -227,6 +249,18 @@ namespace Crow
 		#endregion
 
 		#region public properties
+		[XmlIgnore]public Interface CurrentInterface {
+			get {
+				if (currentInterface == null) {
+					currentInterface = Interface.CurrentInterface;
+					Initialize ();
+				}
+				return currentInterface;
+			}
+			set {
+				currentInterface = value;
+			}
+		}
 		/// <summary>Random value placeholder</summary>
 		[XmlAttributeAttribute]
 		public object Tag {
@@ -286,47 +320,51 @@ namespace Crow
 			}
 		}
 		[XmlAttributeAttribute	()][DefaultValue(VerticalAlignment.Center)]
-		public virtual VerticalAlignment VerticalAlignment {
-			get { return verticalAlignment; }
+		unsafe public virtual VerticalAlignment VerticalAlignment {
+			get { return nativeHnd->VerticalAlignment; }
 			set {
-				if (verticalAlignment == value)
+				if (nativeHnd->VerticalAlignment == value)
 					return;
 
-				verticalAlignment = value;
-				NotifyValueChanged("VerticalAlignment", verticalAlignment);
+				nativeHnd->VerticalAlignment = value;
+				NotifyValueChanged("VerticalAlignment", nativeHnd->VerticalAlignment);
 				RegisterForLayouting (LayoutingType.Y);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(HorizontalAlignment.Center)]
-		public virtual HorizontalAlignment HorizontalAlignment {
-			get { return horizontalAlignment; }
+		unsafe public virtual HorizontalAlignment HorizontalAlignment {
+			get { return nativeHnd->HorizontalAlignment; }
 			set {
-				if (horizontalAlignment == value)
+				if (nativeHnd->HorizontalAlignment == value)
 					return;
-				horizontalAlignment = value;
-				NotifyValueChanged("HorizontalAlignment", horizontalAlignment);
+				nativeHnd->HorizontalAlignment = value;
+				NotifyValueChanged("HorizontalAlignment", nativeHnd->HorizontalAlignment);
 				RegisterForLayouting (LayoutingType.X);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Left {
-			get { return left; }
+			get { unsafe { return nativeHnd->Left; } }
 			set {
-				if (left == value)
+				if (Left == value)
 					return;
-				left = value;
-				NotifyValueChanged ("Left", left);
+				unsafe {
+					nativeHnd->Left = value;
+				}
+				NotifyValueChanged ("Left", Left);
 				this.RegisterForLayouting (LayoutingType.X);
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Top {
-			get { return top; }
+			get { unsafe { return nativeHnd->Top; } }
 			set {
-				if (top == value)
+				if (Top == value)
 					return;
-				top = value;
-				NotifyValueChanged ("Top", top);
+				unsafe {
+					nativeHnd->Top = value;
+				}
+				NotifyValueChanged ("Top", Top);
 				this.RegisterForLayouting (LayoutingType.Y);
 			}
 		}
@@ -344,22 +382,21 @@ namespace Crow
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("Inherit")]
-		public virtual Measure Width {
+		unsafe public virtual Measure Width {
 			get {
-				return width.Units == Unit.Inherit ?
-					Parent is GraphicObject ? (Parent as GraphicObject).WidthPolicy :
-					Measure.Stretched : width;
+				return nativeHnd->Width.Units == Unit.Inherit ? Parent == null ?
+					Measure.Stretched :	Parent.WidthPolicy : nativeHnd->Width;
 			}
 			set {
-				if (width == value)
+				if (nativeHnd->Width == value)
 					return;
 				if (value.IsFixed) {
 					if (value < MinimumSize.Width || (value > MaximumSize.Width && MaximumSize.Width > 0))
 						return;
 				}
 				Measure lastWP = WidthPolicy;
-				width = value;
-				NotifyValueChanged ("Width", width);
+				nativeHnd->Width = value;
+				NotifyValueChanged ("Width", nativeHnd->Width);
 				if (WidthPolicy != lastWP) {
 					NotifyValueChanged ("WidthPolicy", WidthPolicy);
 					//contentSize in Stacks are only update on childLayoutChange, and the single stretched
@@ -369,9 +406,9 @@ namespace Crow
 					if (parent is GenericStack) {//TODO:check if I should test Group instead
 						if ((parent as GenericStack).Orientation == Orientation.Horizontal) {
 							if (lastWP == Measure.Fit)
-								(parent as GenericStack).contentSize.Width -= this.LastSlots.Width;
+								(parent as GenericStack).contentSize.Width -= nativeHnd->LastSlot.Width;
 							else
-								(parent as GenericStack).contentSize.Width += this.LastSlots.Width;
+								(parent as GenericStack).contentSize.Width += nativeHnd->LastSlot.Width;
 						}
 					}
 				}
@@ -380,34 +417,32 @@ namespace Crow
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("Inherit")]
-		public virtual Measure Height {
+		unsafe public virtual Measure Height {
 			get {
-				return height.Units == Unit.Inherit ?
-					Parent is GraphicObject ? (Parent as GraphicObject).HeightPolicy :
-					Measure.Stretched : height;
+				return nativeHnd->Height.Units == Unit.Inherit ? Parent == null ?
+					Measure.Stretched :	Parent.HeightPolicy : nativeHnd->Height;
 			}
 			set {
-				if (height == value)
+				if (nativeHnd->Height == value)
 					return;
 				if (value.IsFixed) {
 					if (value < MinimumSize.Height || (value > MaximumSize.Height && MaximumSize.Height > 0))
 						return;
 				}
 				Measure lastHP = HeightPolicy;
-				height = value;
-				NotifyValueChanged ("Height", height);
+				nativeHnd->Height = value;
+				NotifyValueChanged ("Height", nativeHnd->Height);
 				if (HeightPolicy != lastHP) {
 					NotifyValueChanged ("HeightPolicy", HeightPolicy);
 					if (parent is GenericStack) {
 						if ((parent as GenericStack).Orientation == Orientation.Vertical) {
 							if (lastHP == Measure.Fit)
-								(parent as GenericStack).contentSize.Height -= this.LastSlots.Height;
+								(parent as GenericStack).contentSize.Height -= nativeHnd->LastSlot.Height;
 							else
-								(parent as GenericStack).contentSize.Height += this.LastSlots.Height;
+								(parent as GenericStack).contentSize.Height += nativeHnd->LastSlot.Height;
 						}
 					}
 				}
-
 				this.RegisterForLayouting (LayoutingType.Height);
 			}
 		}
@@ -521,30 +556,33 @@ namespace Crow
 		}
 		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Margin {
-			get { return margin; }
+			get { unsafe { return nativeHnd->Margin; } }
 			set {
-				if (value == margin)
+				if (value == Margin)
 					return;
-				margin = value;
-				NotifyValueChanged ("Margin", margin);
+				unsafe {
+					nativeHnd->Margin = value;
+				}
+				NotifyValueChanged ("Margin", Margin);
 				RegisterForGraphicUpdate ();
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue(true)]
 		public virtual bool Visible {
-			get { return isVisible; }
+			get { unsafe { return nativeHnd->Visible;} }
 			set {
-				if (value == isVisible)
+				if (value == Visible)
 					return;
-
-				isVisible = value;
+				unsafe {
+					nativeHnd->Visible = value;
+				}
 
 				RegisterForLayouting (LayoutingType.Sizing);
 
 				//trigger a mouse to handle possible hover changes
 				//CurrentInterface.ProcessMouseMove (CurrentInterface.Mouse.X, CurrentInterface.Mouse.Y);
 
-				NotifyValueChanged ("Visible", isVisible);
+				NotifyValueChanged ("Visible", Visible);
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue(true)]
@@ -565,29 +603,32 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("1,1")]
+		[XmlAttributeAttribute][DefaultValue("1,1")]
 		public virtual Size MinimumSize {
-			get { return minimumSize; }
+			get { unsafe { return nativeHnd->MinimumSize;} }
 			set {
-				if (value == minimumSize)
+				if (value == MinimumSize)
 					return;
 
-				minimumSize = value;
+				unsafe {
+					nativeHnd->MinimumSize = value;
+				}
 
-				NotifyValueChanged ("MinimumSize", minimumSize);
+				NotifyValueChanged ("MinimumSize", MinimumSize);
 				RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("0,0")]
+		[XmlAttributeAttribute][DefaultValue("0,0")]
 		public virtual Size MaximumSize {
-			get { return maximumSize; }
+			get { unsafe { return nativeHnd->MaximumSize;} }
 			set {
-				if (value == maximumSize)
+				if (value == MaximumSize)
 					return;
+				unsafe {
+					nativeHnd->MaximumSize = value;
+				}
 
-				maximumSize = value;
-
-				NotifyValueChanged ("MaximumSize", maximumSize);
+				NotifyValueChanged ("MaximumSize", MaximumSize);
 				RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
@@ -612,8 +653,7 @@ namespace Crow
 			get {
 				return dataSource == null ?
 					LogicalParent == null ? null :
-					LogicalParent is GraphicObject ? (LogicalParent as GraphicObject).DataSource : null :
-					dataSource;
+					LogicalParent.DataSource : dataSource;
 			}
 		}
 		protected virtual void onLogicalParentDataSourceChanged(object sender, DataSourceChangeEventArgs e){
@@ -830,18 +870,18 @@ namespace Crow
 		/// <summary>
 		/// Register old and new slot for clipping
 		/// </summary>
-		public virtual void ClippingRegistration(){
+		unsafe public virtual void ClippingRegistration(){
 			IsQueueForRedraw = false;
 			if (Parent == null)
 				return;
-			Parent.RegisterClip (LastPaintedSlot);
-			Parent.RegisterClip (Slot);
+			Parent.RegisterClip (nativeHnd->LastPaintedSlot);
+			Parent.RegisterClip (nativeHnd->Slot);
 		}
 		/// <summary>
 		/// Add clip rectangle to this.clipping and propagate up to root
 		/// </summary>
 		/// <param name="clip">Clip rectangle</param>
-		public virtual void RegisterClip(Rectangle clip){
+		unsafe public virtual void RegisterClip(Rectangle clip){
 			Rectangle  r = clip + ClientRectangle.Position;
 			if (CacheEnabled && !IsDirty)
 				Clipping.UnionRectangle (r);
@@ -850,7 +890,7 @@ namespace Crow
 			GraphicObject p = Parent as GraphicObject;
 			if (p?.IsDirty == true && p?.CacheEnabled == true)
 				return;
-			Parent.RegisterClip (r + Slot.Position);
+			Parent.RegisterClip (r + nativeHnd->Slot.Position);
 		}
 		/// <summary> Full update, taking care of sizing policy </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -902,8 +942,7 @@ namespace Crow
 					layoutType &= (~LayoutingType.ArrangeChildren);
 
 				//apply constraints depending on parent type
-				if (Parent is GraphicObject)
-					(Parent as GraphicObject).ChildrenLayoutingConstraints (ref layoutType);
+				Parent.ChildrenLayoutingConstraints (ref layoutType);
 
 //				//prevent queueing same LayoutingType for this
 //				layoutType &= (~RegisteredLayoutings);
@@ -952,10 +991,10 @@ namespace Crow
 		/// The redrawing will only be triggered if final slot size has changed </summary>
 		/// <returns><c>true</c>, if layouting was possible, <c>false</c> if conditions were not
 		/// met and LQI has to be re-queued</returns>
-		public virtual bool UpdateLayout (LayoutingType layoutType)
+		unsafe public virtual bool UpdateLayout (LayoutingType layoutType)
 		{
 			//unset bit, it would be reset if LQI is re-queued
-			registeredLayoutings &= (~layoutType);
+			RegisteredLayoutings &= (~layoutType);
 
 			switch (layoutType) {
 			case LayoutingType.X:
@@ -967,26 +1006,26 @@ namespace Crow
 
 					switch (HorizontalAlignment) {
 					case HorizontalAlignment.Left:
-						Slot.X = 0;
+						nativeHnd->Slot.X = 0;
 						break;
 					case HorizontalAlignment.Right:
-						Slot.X = Parent.ClientRectangle.Width - Slot.Width;
+						nativeHnd->Slot.X = Parent.ClientRectangle.Width - nativeHnd->Slot.Width;
 						break;
 					case HorizontalAlignment.Center:
-						Slot.X = Parent.ClientRectangle.Width / 2 - Slot.Width / 2;
+						nativeHnd->Slot.X = Parent.ClientRectangle.Width / 2 - nativeHnd->Slot.Width / 2;
 						break;
 					}
 				} else
-					Slot.X = Left;
-
-				if (LastSlots.X == Slot.X)
+					nativeHnd->Slot.X = Left;
+				
+				if (nativeHnd->LastSlot.X == nativeHnd->Slot.X)
 					break;
 
 				IsDirty = true;
 
 				OnLayoutChanges (layoutType);
 
-				LastSlots.X = Slot.X;
+				nativeHnd->LastSlot.X = nativeHnd->Slot.X;
 				break;
 			case LayoutingType.Y:
 				if (Top == 0) {
@@ -997,103 +1036,103 @@ namespace Crow
 
 					switch (VerticalAlignment) {
 					case VerticalAlignment.Top://this could be processed even if parent Height is not known
-						Slot.Y = 0;
+						nativeHnd->Slot.Y = 0;
 						break;
 					case VerticalAlignment.Bottom:
-						Slot.Y = Parent.ClientRectangle.Height - Slot.Height;
+						nativeHnd->Slot.Y = Parent.ClientRectangle.Height - nativeHnd->Slot.Height;
 						break;
 					case VerticalAlignment.Center:
-						Slot.Y = Parent.ClientRectangle.Height / 2 - Slot.Height / 2;
+						nativeHnd->Slot.Y = Parent.ClientRectangle.Height / 2 - nativeHnd->Slot.Height / 2;
 						break;
 					}
 				} else
-					Slot.Y = Top;
+					nativeHnd->Slot.Y = Top;
 
-				if (LastSlots.Y == Slot.Y)
+				if (nativeHnd->LastSlot.Y == nativeHnd->Slot.Y)
 					break;
 
 				IsDirty = true;
 
 				OnLayoutChanges (layoutType);
 
-				LastSlots.Y = Slot.Y;
+				nativeHnd->LastSlot.Y = nativeHnd->Slot.Y;
 				break;
 			case LayoutingType.Width:
 				if (Visible) {
 					if (Width.IsFixed)
-						Slot.Width = Width;
+						nativeHnd->Slot.Width = Width;
 					else if (Width == Measure.Fit) {
-						Slot.Width = measureRawSize (LayoutingType.Width);
+						nativeHnd->Slot.Width = measureRawSize (LayoutingType.Width);
 					} else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width))
 						return false;
 					else if (Width == Measure.Stretched)
-						Slot.Width = Parent.ClientRectangle.Width;
+						nativeHnd->Slot.Width = Parent.ClientRectangle.Width;
 					else
-						Slot.Width = (int)Math.Round ((double)(Parent.ClientRectangle.Width * Width) / 100.0);
+						nativeHnd->Slot.Width = (int)Math.Round ((double)(Parent.ClientRectangle.Width * Width) / 100.0);
 
-					if (Slot.Width < 0)
+					if (nativeHnd->Slot.Width < 0)
 						return false;
 
 					//size constrain
-					if (Slot.Width < MinimumSize.Width) {
-						Slot.Width = MinimumSize.Width;
+					if (nativeHnd->Slot.Width < MinimumSize.Width) {
+						nativeHnd->Slot.Width = MinimumSize.Width;
 						//NotifyValueChanged ("WidthPolicy", Measure.Stretched);
-					} else if (Slot.Width > MaximumSize.Width && MaximumSize.Width > 0) {
-						Slot.Width = MaximumSize.Width;
+					} else if (nativeHnd->Slot.Width > MaximumSize.Width && MaximumSize.Width > 0) {
+						nativeHnd->Slot.Width = MaximumSize.Width;
 						//NotifyValueChanged ("WidthPolicy", Measure.Stretched);
 					}
 				} else
-					Slot.Width = 0;
+					nativeHnd->Slot.Width = 0;
 
-				if (LastSlots.Width == Slot.Width)
+				if (nativeHnd->LastSlot.Width == nativeHnd->Slot.Width)
 					break;
 
 				IsDirty = true;
 
 				OnLayoutChanges (layoutType);
 
-				LastSlots.Width = Slot.Width;
+				nativeHnd->LastSlot.Width = nativeHnd->Slot.Width;
 				break;
 			case LayoutingType.Height:
 				if (Visible) {
 					if (Height.IsFixed)
-						Slot.Height = Height;
+						nativeHnd->Slot.Height = Height;
 					else if (Height == Measure.Fit) {
-						Slot.Height = measureRawSize (LayoutingType.Height);
+						nativeHnd->Slot.Height = measureRawSize (LayoutingType.Height);
 					} else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height))
 						return false;
 					else if (Height == Measure.Stretched)
-						Slot.Height = Parent.ClientRectangle.Height;
+						nativeHnd->Slot.Height = Parent.ClientRectangle.Height;
 					else
-						Slot.Height = (int)Math.Round ((double)(Parent.ClientRectangle.Height * Height) / 100.0);
+						nativeHnd->Slot.Height = (int)Math.Round ((double)(Parent.ClientRectangle.Height * Height) / 100.0);
 
-					if (Slot.Height < 0)
+					if (nativeHnd->Slot.Height < 0)
 						return false;
 
 					//size constrain
-					if (Slot.Height < MinimumSize.Height) {
-						Slot.Height = MinimumSize.Height;
+					if (nativeHnd->Slot.Height < MinimumSize.Height) {
+						nativeHnd->Slot.Height = MinimumSize.Height;
 						//NotifyValueChanged ("HeightPolicy", Measure.Stretched);
-					} else if (Slot.Height > MaximumSize.Height && MaximumSize.Height > 0) {
-						Slot.Height = MaximumSize.Height;
+					} else if (nativeHnd->Slot.Height > MaximumSize.Height && MaximumSize.Height > 0) {
+						nativeHnd->Slot.Height = MaximumSize.Height;
 						//NotifyValueChanged ("HeightPolicy", Measure.Stretched);
 					}
 				} else
-					Slot.Height = 0;
+					nativeHnd->Slot.Height = 0;
 
-				if (LastSlots.Height == Slot.Height)
+				if (nativeHnd->LastSlot.Height == nativeHnd->Slot.Height)
 					break;
 
 				IsDirty = true;
 
 				OnLayoutChanges (layoutType);
 
-				LastSlots.Height = Slot.Height;
+				nativeHnd->LastSlot.Height = nativeHnd->Slot.Height;
 				break;
 			}
 
 			//if no layouting remains in queue for item, registre for redraw
-			if (this.registeredLayoutings == LayoutingType.None && IsDirty)
+			if (RegisteredLayoutings == LayoutingType.None && IsDirty)
 				CurrentInterface.EnqueueForRepaint (this);
 
 			return true;
@@ -1102,9 +1141,9 @@ namespace Crow
 
 		#region Rendering
 		/// <summary> This is the common overridable drawing routine to create new widget </summary>
-		protected virtual void onDraw(Context gr)
+		unsafe protected virtual void onDraw(Context gr)
 		{
-			Rectangle rBack = new Rectangle (Slot.Size);
+			Rectangle rBack = new Rectangle (nativeHnd->Slot.Size);
 
 			Background.SetAsSource (gr, rBack);
 			CairoHelpers.CairoRectangle (gr, rBack, cornerRadius);
@@ -1114,15 +1153,15 @@ namespace Crow
 		/// <summary>
 		/// Internal drawing context creation on a cached surface limited to slot size
 		/// this trigger the effective drawing routine </summary>
-		protected virtual void RecreateCache ()
+		unsafe protected virtual void RecreateCache ()
 		{
-			int stride = 4 * Slot.Width;
+			int stride = 4 * nativeHnd->Slot.Width;
 
-			int bmpSize = Math.Abs (stride) * Slot.Height;
+			int bmpSize = Math.Abs (stride) * nativeHnd->Slot.Height;
 			bmp = new byte[bmpSize];
 			IsDirty = false;
 			using (ImageSurface draw =
-                new ImageSurface(bmp, Format.Argb32, Slot.Width, Slot.Height, stride)) {
+				new ImageSurface(bmp, Format.Argb32, nativeHnd->Slot.Width, nativeHnd->Slot.Height, stride)) {
 				using (Context gr = new Context (draw)) {
 					gr.Antialias = Interface.Antialias;
 					onDraw (gr);
@@ -1130,9 +1169,9 @@ namespace Crow
 				draw.Flush ();
 			}
 		}
-		protected virtual void UpdateCache(Context ctx){
-			Rectangle rb = Slot + Parent.ClientRectangle.Position;
-			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
+		unsafe protected virtual void UpdateCache(Context ctx){
+			Rectangle rb = nativeHnd->Slot + Parent.ClientRectangle.Position;
+			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, nativeHnd->Slot.Width, nativeHnd->Slot.Height, 4 * nativeHnd->Slot.Width)) {
 				if (clearBackground) {
 						ctx.Save ();
 						ctx.Operator = Operator.Clear;
@@ -1148,14 +1187,14 @@ namespace Crow
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version
 		/// of the widget </summary>
-		public virtual void Paint (ref Context ctx)
+		unsafe public virtual void Paint (ref Context ctx)
 		{
 			//TODO:this test should not be necessary
-			if (Slot.Height < 0 || Slot.Width < 0 || parent == null)
+			if (nativeHnd->Slot.Height < 0 || nativeHnd->Slot.Width < 0 || parent == null)
 				return;
 			lock (this) {
 				if (cacheEnabled) {
-					if (Slot.Width > Interface.MaxCacheSize || Slot.Height > Interface.MaxCacheSize)
+					if (nativeHnd->Slot.Width > Interface.MaxCacheSize || nativeHnd->Slot.Height > Interface.MaxCacheSize)
 						cacheEnabled = false;
 				}
 
@@ -1165,20 +1204,20 @@ namespace Crow
 
 					UpdateCache (ctx);
 					if (!isEnabled)
-						paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);
+						paintDisabled (ctx, nativeHnd->Slot + Parent.ClientRectangle.Position);
 				} else {
-					Rectangle rb = Slot + Parent.ClientRectangle.Position;
+					Rectangle rb = nativeHnd->Slot + Parent.ClientRectangle.Position;
 					ctx.Save ();
 
 					ctx.Translate (rb.X, rb.Y);
 
 					onDraw (ctx);
 					if (!isEnabled)
-						paintDisabled (ctx, Slot);
+						paintDisabled (ctx, nativeHnd->Slot);
 
 					ctx.Restore ();
 				}
-				LastPaintedSlot = Slot;
+				nativeHnd->LastPaintedSlot = nativeHnd->Slot;
 			}
 		}
 		void paintDisabled(Context gr, Rectangle rb){
@@ -1203,18 +1242,15 @@ namespace Crow
         #endregion
 
 		#region Mouse handling
-		public virtual bool MouseIsIn(Point m)
+		unsafe public virtual bool MouseIsIn(Point m)
 		{
 			try {
 				if (!(Visible & isEnabled))
 					return false;
-				if (ScreenCoordinates (Slot).ContainsOrIsEqual (m)) {
+				if (ScreenCoordinates (nativeHnd->Slot).ContainsOrIsEqual (m)) {
 					Scroller scr = Parent as Scroller;
-					if (scr == null) {
-						if (Parent is GraphicObject)
-							return (Parent as GraphicObject).MouseIsIn (m);
-						else return true;
-					}
+					if (scr == null)
+						return Parent.MouseIsIn (m);
 					return scr.MouseIsIn (scr.savedMousePos);
 				}
 			} catch (Exception ex) {
@@ -1234,9 +1270,8 @@ namespace Crow
 		public virtual void onMouseMove(object sender, MouseMoveEventArgs e)
 		{
 			//bubble event to the top
-			GraphicObject p = Parent as GraphicObject;
-			if (p != null)
-				p.onMouseMove(sender,e);
+			if (Parent != null)
+				Parent.onMouseMove(sender,e);
 
 			MouseMove.Raise (this, e);
 		}
@@ -1257,17 +1292,15 @@ namespace Crow
 				}
 			}
 			//bubble event to the top
-			GraphicObject p = Parent as GraphicObject;
-			if (p != null)
-				p.onMouseDown(sender,e);
+			if (Parent != null)
+				Parent.onMouseDown(sender,e);
 
 			MouseDown.Raise (this, e);
 		}
 		public virtual void onMouseUp(object sender, MouseButtonEventArgs e){
 			//bubble event to the top
-			GraphicObject p = Parent as GraphicObject;
-			if (p != null)
-				p.onMouseUp(sender,e);
+			if (Parent != null)
+				Parent.onMouseUp(sender,e);
 
 			MouseUp.Raise (this, e);
 
@@ -1277,22 +1310,19 @@ namespace Crow
 				onMouseClick (this, e);
 			}
 		}
-		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){
-			GraphicObject p = Parent as GraphicObject;
-			if (p != null)
-				p.onMouseClick(sender,e);
+		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){			
+			if (Parent != null)
+				Parent.onMouseClick(sender,e);
 			MouseClick.Raise (this, e);
 		}
-		public virtual void onMouseDoubleClick(object sender, MouseButtonEventArgs e){
-			GraphicObject p = Parent as GraphicObject;
-			if (p != null)
-				p.onMouseDoubleClick(sender,e);
+		public virtual void onMouseDoubleClick(object sender, MouseButtonEventArgs e){			
+			if (Parent != null)
+				Parent.onMouseDoubleClick(sender,e);
 			MouseDoubleClick.Raise (this, e);
 		}
-		public virtual void onMouseWheel(object sender, MouseWheelEventArgs e){
-			GraphicObject p = Parent as GraphicObject;
-			if (p != null)
-				p.onMouseWheel(sender,e);
+		public virtual void onMouseWheel(object sender, MouseWheelEventArgs e){			
+			if (Parent != null)
+				Parent.onMouseWheel(sender,e);
 
 			MouseWheelChanged.Raise (this, e);
 		}
@@ -1351,5 +1381,25 @@ namespace Crow
 			return Name == "unamed" ? tmp + "." + this.GetType ().Name : tmp + "." + Name;
 			#endif
 		}
+		#region IDisposable implementation
+		~GraphicObject(){
+			Dispose (false);
+		}
+		public void Dispose ()
+		{
+			Dispose (true);
+			GC.SuppressFinalize (this);
+		}
+		bool disposed = false;
+		protected virtual void Dispose (bool disposing){
+			if (disposed)
+				return;
+			Clipping.Dispose ();
+			unsafe{
+				DestroyGO (nativeHnd);
+			}
+			disposed = true;
+		}
+		#endregion
 	}
 }

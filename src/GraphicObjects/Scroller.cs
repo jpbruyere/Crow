@@ -61,7 +61,7 @@ namespace Crow
 			set { _scrollbarVisible = value; }
 		}
 		[XmlAttributeAttribute][DefaultValue(0.0)]
-		public double ScrollX {
+		unsafe public double ScrollX {
 			get {
 				return _scrollX;
 			}
@@ -70,8 +70,8 @@ namespace Crow
 					return;
 				if (value < 0.0)
 					_scrollX = 0.0;
-				else if (value > Child.Slot.Width - ClientRectangle.Width)
-					_scrollX = Math.Max(0.0, Child.Slot.Width - ClientRectangle.Width);
+				else if (value > Child.nativeHnd->Slot.Width - ClientRectangle.Width)
+					_scrollX = Math.Max(0.0, Child.nativeHnd->Slot.Width - ClientRectangle.Width);
 				else
 					_scrollX = value;
 				NotifyValueChanged("ScrollX", _scrollX);
@@ -80,7 +80,7 @@ namespace Crow
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue(0.0)]
-		public double ScrollY {
+		unsafe public double ScrollY {
 			get {
 				return _scrollY;
 			}
@@ -89,8 +89,8 @@ namespace Crow
 					return;
 				if (value < 0.0)
 					_scrollY = 0.0;
-				else if (value > Child.Slot.Height - ClientRectangle.Height)
-					_scrollY = Math.Max(0.0,Child.Slot.Height - ClientRectangle.Height);
+				else if (value > Child.nativeHnd->Slot.Height - ClientRectangle.Height)
+					_scrollY = Math.Max(0.0,Child.nativeHnd->Slot.Height - ClientRectangle.Height);
 				else
 					_scrollY = value;
 				NotifyValueChanged("ScrollY", _scrollY);
@@ -100,12 +100,12 @@ namespace Crow
 		}
 
 		[XmlIgnore]
-		public int MaximumScroll {
+		unsafe public int MaximumScroll {
 			get {
 				try {
 					return VerticalScrolling ?
-						Math.Max(Child.Slot.Height - ClientRectangle.Height,0) :
-						Math.Max(Child.Slot.Width - ClientRectangle.Width,0);
+						Math.Max(Child.nativeHnd->Slot.Height - ClientRectangle.Height,0) :
+						Math.Max(Child.nativeHnd->Slot.Width - ClientRectangle.Width,0);
 				} catch {
 					return 0;
 				}
@@ -179,9 +179,9 @@ namespace Crow
 		{
 			return base.ScreenCoordinates (r) - new Point((int)ScrollX,(int)ScrollY);
 		}
-		protected override void onDraw (Context gr)
+		unsafe protected override void onDraw (Context gr)
 		{
-			Rectangle rBack = new Rectangle (Slot.Size);
+			Rectangle rBack = new Rectangle (nativeHnd->Slot.Size);
 
 			Background.SetAsSource (gr, rBack);
 			CairoHelpers.CairoRectangle(gr,rBack, CornerRadius);
@@ -202,9 +202,9 @@ namespace Crow
 
 		#region Mouse handling
 		internal Point savedMousePos;
-		public override bool MouseIsIn (Point m)
+		unsafe public override bool MouseIsIn (Point m)
 		{
-			return Visible ? base.ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false;
+			return Visible ? base.ScreenCoordinates(nativeHnd->Slot).ContainsOrIsEqual (m) : false;
 		}
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{

@@ -38,7 +38,7 @@ namespace Crow
 		{
 			layoutType &= (~LayoutingType.Positioning);
 		}
-		public override void ComputeChildrenPositions()
+		unsafe public override void ComputeChildrenPositions()
 		{
 			int dx = 0;
 			int dy = 0;
@@ -48,38 +48,38 @@ namespace Crow
 				foreach (GraphicObject c in Children) {
 					if (!c.Visible)
 						continue;
-					if (dx + c.Slot.Width > ClientRectangle.Width) {
+					if (dx + c.nativeHnd->Slot.Width > ClientRectangle.Width) {
 						dx = 0;
 						dy += tallestChild + Spacing;
-						c.Slot.X = dx;
-						c.Slot.Y = dy;
-						tallestChild = c.Slot.Height;
+						c.nativeHnd->Slot.X = dx;
+						c.nativeHnd->Slot.Y = dy;
+						tallestChild = c.nativeHnd->Slot.Height;
 					} else {
-						if (tallestChild < c.Slot.Height)
-							tallestChild = c.Slot.Height;
-						c.Slot.X = dx;
-						c.Slot.Y = dy;
+						if (tallestChild < c.nativeHnd->Slot.Height)
+							tallestChild = c.nativeHnd->Slot.Height;
+						c.nativeHnd->Slot.X = dx;
+						c.nativeHnd->Slot.Y = dy;
 					}
-					dx += c.Slot.Width + Spacing;
+					dx += c.nativeHnd->Slot.Width + Spacing;
 				}
 			} else {
 				int largestChild = 0;
 				foreach (GraphicObject c in Children) {
 					if (!c.Visible)
 						continue;
-					if (dy + c.Slot.Height > ClientRectangle.Height) {
+					if (dy + c.nativeHnd->Slot.Height > ClientRectangle.Height) {
 						dy = 0;
 						dx += largestChild + Spacing;
-						c.Slot.X = dx;
-						c.Slot.Y = dy;
-						largestChild = c.Slot.Width;
+						c.nativeHnd->Slot.X = dx;
+						c.nativeHnd->Slot.Y = dy;
+						largestChild = c.nativeHnd->Slot.Width;
 					} else {
-						if (largestChild < c.Slot.Width)
-							largestChild = c.Slot.Width;
-						c.Slot.X = dx;
-						c.Slot.Y = dy;
+						if (largestChild < c.nativeHnd->Slot.Width)
+							largestChild = c.nativeHnd->Slot.Width;
+						c.nativeHnd->Slot.X = dx;
+						c.nativeHnd->Slot.Y = dy;
 					}
-					dy += c.Slot.Height + Spacing;
+					dy += c.nativeHnd->Slot.Height + Spacing;
 				}
 			}
 			IsDirty = true;
@@ -112,7 +112,7 @@ namespace Crow
 		#endregion
 
 		#region GraphicObject Overrides
-		protected override int measureRawSize (LayoutingType lt)
+		unsafe protected override int measureRawSize (LayoutingType lt)
 		{
 			int tmp = 0;
 			//Wrapper can't fit in the opposite direction of the wrapper, this func is called only if Fit
@@ -132,14 +132,14 @@ namespace Crow
 							if (c.Height.Units == Unit.Percent &&
 								c.RegisteredLayoutings.HasFlag (LayoutingType.Height))
 								return -1;
-							if (dy + c.Slot.Height > ClientRectangle.Height) {
+							if (dy + c.nativeHnd->Slot.Height > ClientRectangle.Height) {
 								dy = 0;
 								tmp += largestChild + Spacing;
-								largestChild = c.Slot.Width;
-							} else if (largestChild < c.Slot.Width)
-								largestChild = c.Slot.Width;
+								largestChild = c.nativeHnd->Slot.Width;
+							} else if (largestChild < c.nativeHnd->Slot.Width)
+								largestChild = c.nativeHnd->Slot.Width;
 
-							dy += c.Slot.Height + Spacing;
+							dy += c.nativeHnd->Slot.Height + Spacing;
 						}
 						if (dy == 0)
 							tmp -= Spacing;
@@ -161,14 +161,14 @@ namespace Crow
 						if (c.Width.Units == Unit.Percent &&
 							c.RegisteredLayoutings.HasFlag (LayoutingType.Width))
 							return -1;
-						if (dx + c.Slot.Width > ClientRectangle.Width) {
+						if (dx + c.nativeHnd->Slot.Width > ClientRectangle.Width) {
 							dx = 0;
 							tmp += tallestChild + Spacing;
-							tallestChild = c.Slot.Height;
-						} else if (tallestChild < c.Slot.Height)
-							tallestChild = c.Slot.Height;
+							tallestChild = c.nativeHnd->Slot.Height;
+						} else if (tallestChild < c.nativeHnd->Slot.Height)
+							tallestChild = c.nativeHnd->Slot.Height;
 
-						dx += c.Slot.Width + Spacing;
+						dx += c.nativeHnd->Slot.Width + Spacing;
 					}
 					if (dx == 0)
 						tmp -= Spacing;

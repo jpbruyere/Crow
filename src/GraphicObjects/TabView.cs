@@ -115,7 +115,7 @@ namespace Crow
 				SelectedTab = selectedTab;
 		}
 		public override bool ArrangeChildren { get { return true; } }
-		public override bool UpdateLayout (LayoutingType layoutType)
+		unsafe public override bool UpdateLayout (LayoutingType layoutType)
 		{
 			RegisteredLayoutings &= (~layoutType);
 
@@ -129,11 +129,11 @@ namespace Crow
 					if (Orientation == Orientation.Horizontal) {
 						if (ti.TabTitle.RegisteredLayoutings.HasFlag (LayoutingType.Width))
 							return false;
-						curOffset += ti.TabTitle.Slot.Width + Spacing;
+						curOffset += ti.TabTitle.nativeHnd->Slot.Width + Spacing;
 					} else {
 						if (ti.TabTitle.RegisteredLayoutings.HasFlag (LayoutingType.Height))
 							return false;
-						curOffset += ti.TabTitle.Slot.Height + Spacing;
+						curOffset += ti.TabTitle.nativeHnd->Slot.Height + Spacing;
 					}
 				}
 
@@ -146,9 +146,9 @@ namespace Crow
 
 			return base.UpdateLayout(layoutType);
 		}
-		protected override void onDraw (Context gr)
+		unsafe protected override void onDraw (Context gr)
 		{
-			Rectangle rBack = new Rectangle (Slot.Size);
+			Rectangle rBack = new Rectangle (nativeHnd->Slot.Size);
 
 			Background.SetAsSource (gr, rBack);
 			CairoHelpers.CairoRectangle(gr,rBack, CornerRadius);
@@ -185,7 +185,7 @@ namespace Crow
 			if (SelectedTab > Children.Count - 1)
 				return;
 
-			if (((Children[SelectedTab] as TabItem).Content.Parent as GraphicObject).MouseIsIn(e.Position))
+			if ((Children[SelectedTab] as TabItem).Content.Parent.MouseIsIn(e.Position))
 			{
 				Children[SelectedTab].checkHoverWidget (e);
 				return;

@@ -44,12 +44,12 @@ namespace Crow
 			}
 		}
 
-		public override void OnLayoutChanges (LayoutingType layoutType)
+		unsafe public override void OnLayoutChanges (LayoutingType layoutType)
 		{
 			base.OnLayoutChanges (layoutType);
 
 			if (layoutType == LayoutingType.Width)
-				MinimumPopupSize = new Size (this.Slot.Width, minimumPopupSize.Height);			
+				MinimumPopupSize = new Size (this.nativeHnd->Slot.Width, minimumPopupSize.Height);			
 		}
 	}
 }

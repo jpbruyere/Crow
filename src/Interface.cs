@@ -49,7 +49,7 @@ namespace Crow
 	/// 	- Keyboard and Mouse logic
 	/// 	- the resulting bitmap of the interface
 	/// </summary>
-	public class Interface : ILayoutable
+	public class Interface : GraphicObject
 	{
 		#region CTOR
 		static Interface(){
@@ -496,7 +496,7 @@ namespace Crow
 		}
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
-		void processDrawing(){
+		unsafe void processDrawing(){
 			#if MEASURE_TIME
 			drawingMeasure.StartCycle();
 			#endif
@@ -515,7 +515,7 @@ namespace Crow
 							GraphicObject p = GraphicTree[i];
 							if (!p.Visible)
 								continue;
-							if (clipping.Contains (p.Slot) == RegionOverlap.Out)
+							if (clipping.Contains (p.nativeHnd->Slot) == RegionOverlap.Out)
 								continue;
 
 							ctx.Save ();
@@ -710,9 +710,9 @@ namespace Crow
 				//check topmost graphicobject first
 				GraphicObject tmp = HoverWidget;
 				GraphicObject topc = null;
-				while (tmp is GraphicObject) {
+				while (!(tmp is Interface)) {
 					topc = tmp;
-					tmp = tmp.LogicalParent as GraphicObject;
+					tmp = tmp.LogicalParent;
 				}
 				int idxhw = GraphicTree.IndexOf (topc);
 				if (idxhw != 0) {
@@ -722,7 +722,7 @@ namespace Crow
 							if (GraphicTree [i].MouseIsIn (e.Position)) {
 								while (HoverWidget != null) {
 									HoverWidget.onMouseLeave (HoverWidget, e);
-									HoverWidget = HoverWidget.LogicalParent as GraphicObject;
+									HoverWidget = HoverWidget.LogicalParent;
 								}
 
 								GraphicTree [i].checkHoverWidget (e);
@@ -739,8 +739,8 @@ namespace Crow
 				} else {
 					HoverWidget.onMouseLeave (HoverWidget, e);
 					//seek upward from last focused graph obj's
-					while (HoverWidget.LogicalParent as GraphicObject != null) {
-						HoverWidget = HoverWidget.LogicalParent as GraphicObject;
+					while (!(HoverWidget.LogicalParent is Interface)) {
+						HoverWidget = HoverWidget.LogicalParent;
 						if (HoverWidget.MouseIsIn (e.Position)) {
 							HoverWidget.checkHoverWidget (e);
 							return true;
@@ -853,6 +853,13 @@ namespace Crow
 			_focusedWidget.onKeyPress (this, e);
 			return true;
 		}
+		public override void onMouseMove (object sender, MouseMoveEventArgs e) {}
+		public override void onMouseUp (object sender, MouseButtonEventArgs e) {}
+		public override void onMouseDown (object sender, MouseButtonEventArgs e) {}
+		public override void onMouseClick (object sender, MouseButtonEventArgs e) {}
+		public override void onMouseDoubleClick (object sender, MouseButtonEventArgs e) {}
+		public override void onMouseWheel (object sender, MouseWheelEventArgs e) {}
+
 		#endregion
 
 		#region Device Repeat Events
@@ -882,41 +889,33 @@ namespace Crow
 		}
 		#endregion
 
-		#region ILayoutable implementation
-		public void RegisterClip(Rectangle r){
+		public override void RegisterClip(Rectangle r){
 			clipping.UnionRectangle (r);
 		}
-		public bool ArrangeChildren { get { return false; }}
-		public int LayoutingTries {
-			get { throw new NotImplementedException (); }
-			set { throw new NotImplementedException (); }
-		}
-		public LayoutingType RegisteredLayoutings {
-			get { return LayoutingType.None; }
-			set { throw new NotImplementedException (); }
-		}
-		public void RegisterForLayouting (LayoutingType layoutType) { throw new NotImplementedException (); }
-		public bool UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
-		public Rectangle ContextCoordinates (Rectangle r) { return r;}
-		public Rectangle ScreenCoordinates (Rectangle r) { return r; }
-
-		public ILayoutable Parent {
+		public override bool ArrangeChildren { get { return false; }}
+		public override void RegisterForLayouting (LayoutingType layoutType) { }
+		public override bool UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
+		public override Rectangle ContextCoordinates (Rectangle r) { return r;}
+		public override Rectangle ScreenCoordinates (Rectangle r) { return r; }
+		public override GraphicObject Parent {
 			get { return null; }
 			set { throw new NotImplementedException (); }
 		}
-		public ILayoutable LogicalParent {
-			get { return null; }
-			set { throw new NotImplementedException (); }
-		}
-
-		public Rectangle ClientRectangle {
+		public override Rectangle ClientRectangle {
 			get { return clientRectangle; }
 		}
-		public Interface HostContainer {
-			get { return this; }
+		public override Rectangle getSlot () { return ClientRectangle; }
+		public override Measure WidthPolicy { get { return Measure.Stretched; }}
+		public override Measure HeightPolicy { get { return Measure.Stretched; }}
+		public override Measure Width {
+			set { throw new NotImplementedException (); }
+			get { return clientRectangle.Width;	}
 		}
-		public Rectangle getSlot () { return ClientRectangle; }
-		#endregion
+		public override Measure Height {
+			set { throw new NotImplementedException (); }
+			get { return clientRectangle.Height;	}
+		}
+		public override bool MouseIsIn (Point m) => true;
 
 		#if MEASURE_TIME
 		public PerformanceMeasure clippingMeasure = new PerformanceMeasure("Clipping", 100);

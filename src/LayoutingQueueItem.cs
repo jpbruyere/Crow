@@ -28,6 +28,7 @@ using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Crow
 {
@@ -48,10 +49,11 @@ namespace Crow
 	/// <summary>
 	/// Element class of the LayoutingQueue
 	/// </summary>
+	[StructLayout(LayoutKind.Sequential)]
 	public struct LayoutingQueueItem
 	{
 		/// <summary> Instance of widget to be layouted</summary>
-		public ILayoutable Layoutable;
+		public GraphicObject Layoutable;
 		/// <summary> Bitfield containing the element of the layout to performs (x|y|width|height)</summary>
 		public LayoutingType LayoutType;
 		/// <summary> Unsuccessfull UpdateLayout and requeueing count </summary>
@@ -78,7 +80,7 @@ namespace Crow
 		#endif
 
 		#region CTOR
-		public LayoutingQueueItem (LayoutingType _layoutType, ILayoutable _graphicObject)
+		public LayoutingQueueItem (LayoutingType _layoutType, GraphicObject _graphicObject)
 		{			
 			LayoutType = _layoutType;
 			Layoutable = _graphicObject;
@@ -116,7 +118,7 @@ namespace Crow
 				#endif
 				if (LayoutingTries < Interface.MaxLayoutingTries) {
 					Layoutable.RegisteredLayoutings |= LayoutType;
-					(Layoutable as GraphicObject).CurrentInterface.LayoutingQueue.Enqueue (this);
+					Layoutable.CurrentInterface.LayoutingQueue.Enqueue (this);
 				} else if (DiscardCount < Interface.MaxDiscardCount) {
 					#if DEBUG_LAYOUTING
 					Debug.WriteLine ("\t\tDiscarded");
@@ -124,7 +126,7 @@ namespace Crow
 					LayoutingTries = 0;
 					DiscardCount++;
 					Layoutable.RegisteredLayoutings |= LayoutType;
-					(Layoutable as GraphicObject).CurrentInterface.DiscardQueue.Enqueue (this);
+					Layoutable.CurrentInterface.DiscardQueue.Enqueue (this);
 				}
 				#if DEBUG_LAYOUTING
 				else

@@ -174,7 +174,7 @@ namespace Crow
 		#endregion
 
 		#region GraphicObject Overrides
-		public override void onMouseMove (object sender, MouseMoveEventArgs e)
+		unsafe public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
 
@@ -193,22 +193,22 @@ namespace Crow
 					int currentWidth, currentHeight;
 
 					if (currentLeft == 0) {
-						currentLeft = this.Slot.Left;
+						currentLeft = this.nativeHnd->Slot.Left;
 						this.Left = currentLeft;
 					}
 					if (currentTop == 0) {
-						currentTop = this.Slot.Top;
+						currentTop = this.nativeHnd->Slot.Top;
 						this.Top = currentTop;
 					}
 					if (this.Width.IsFixed)
 						currentWidth = this.Width;
 					else
-						currentWidth = this.Slot.Width;
+						currentWidth = this.nativeHnd->Slot.Width;
 				
 					if (this.Height.IsFixed)
 						currentHeight = this.Height;
 					else
-						currentHeight = this.Slot.Height;
+						currentHeight = this.nativeHnd->Slot.Height;
 
 					switch (currentDirection) {
 					case Direction.None:
@@ -262,23 +262,23 @@ namespace Crow
 			if (Resizable) {
 				Direction lastDir = currentDirection;
 
-				if (Math.Abs (e.Position.Y - this.Slot.Y) < Interface.BorderThreshold) {
-					if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
+				if (Math.Abs (e.Position.Y - this.nativeHnd->Slot.Y) < Interface.BorderThreshold) {
+					if (Math.Abs (e.Position.X - this.nativeHnd->Slot.X) < Interface.BorderThreshold)
 						currentDirection = Direction.NW;
-					else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
+					else if (Math.Abs (e.Position.X - this.nativeHnd->Slot.Right) < Interface.BorderThreshold)
 						currentDirection = Direction.NE;
 					else
 						currentDirection = Direction.N;
-				} else if (Math.Abs (e.Position.Y - this.Slot.Bottom) < Interface.BorderThreshold) {
-					if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
+				} else if (Math.Abs (e.Position.Y - this.nativeHnd->Slot.Bottom) < Interface.BorderThreshold) {
+					if (Math.Abs (e.Position.X - this.nativeHnd->Slot.X) < Interface.BorderThreshold)
 						currentDirection = Direction.SW;
-					else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
+					else if (Math.Abs (e.Position.X - this.nativeHnd->Slot.Right) < Interface.BorderThreshold)
 						currentDirection = Direction.SE;
 					else
 						currentDirection = Direction.S;
-				} else if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
+				} else if (Math.Abs (e.Position.X - this.nativeHnd->Slot.X) < Interface.BorderThreshold)
 					currentDirection = Direction.W;
-				else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
+				else if (Math.Abs (e.Position.X - this.nativeHnd->Slot.Right) < Interface.BorderThreshold)
 					currentDirection = Direction.E;
 				else
 					currentDirection = Direction.None;
@@ -322,10 +322,10 @@ namespace Crow
 		}
 		#endregion
 
-		protected void onMaximized (object sender, EventArgs e){
+		unsafe protected void onMaximized (object sender, EventArgs e){
 			lock (CurrentInterface.LayoutMutex) {
 				if (!IsMinimized)
-					savedBounds = this.LastPaintedSlot;
+					savedBounds = nativeHnd->LastPaintedSlot;
 				this.Left = this.Top = 0;
 				this.RegisterForLayouting (LayoutingType.Positioning);
 				this.Width = this.Height = Measure.Stretched;
@@ -356,10 +356,10 @@ namespace Crow
 
 			Unmaximized.Raise (sender, e);
 		}
-		protected void onMinimized (object sender, EventArgs e){
+		unsafe protected void onMinimized (object sender, EventArgs e){
 			lock (CurrentInterface.LayoutMutex) {
 				if (IsNormal)
-					savedBounds = this.LastPaintedSlot;
+					savedBounds = nativeHnd->LastPaintedSlot;
 				Width = 200;
 				Height = 20;
 				Resizable = false;

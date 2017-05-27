@@ -66,7 +66,7 @@ namespace Crow
 			//register ItemClick on the Root node
 			TreeView tv = this as TreeView;
 			while (!tv.IsRoot) {
-				ILayoutable tmp = tv.Parent;
+				GraphicObject tmp = tv.Parent;
 				while (!(tmp is TreeView)) {
 					tmp = tmp.Parent;
 				}

@@ -675,8 +675,8 @@ namespace Crow
 		#endregion
 
 		#region Mouse handling
-		void updatemouseLocalPos(Point mpos){
-			mouseLocalPos = mpos - ScreenCoordinates(Slot).TopLeft - ClientRectangle.TopLeft;
+		unsafe void updatemouseLocalPos(Point mpos){
+			mouseLocalPos = mpos - ScreenCoordinates(nativeHnd->Slot).TopLeft - ClientRectangle.TopLeft;
 			if (mouseLocalPos.X < 0)
 				mouseLocalPos.X = 0;
 			if (mouseLocalPos.Y < 0)

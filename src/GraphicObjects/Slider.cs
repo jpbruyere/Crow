@@ -178,11 +178,11 @@ namespace Crow
         }
         
 		#region mouse handling
-		public override void onMouseDown (object sender, MouseButtonEventArgs e)
+		unsafe public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseDown (sender, e);
 
-			Rectangle cursInScreenCoord = ScreenCoordinates (cursor + Slot.Position);
+			Rectangle cursInScreenCoord = ScreenCoordinates (cursor + nativeHnd->Slot.Position);
 			if (cursInScreenCoord.ContainsOrIsEqual (e.Position))
 				holdCursor = true;
 			else if (_orientation == Orientation.Horizontal) {

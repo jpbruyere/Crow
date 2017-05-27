@@ -31,7 +31,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-    <DefineConstants>DEBUG_FOCUS0;DEBUG_LAYOUTING0;TRACE;DEBUG;__linux__;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
+    <DefineConstants>DEBUG_FOCUS0;DEBUG_LAYOUTING0;TRACE;DEBUG;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
     <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -60,7 +60,6 @@
     <Compile Include="src\GraphicObjects\Slider.cs" />
     <Compile Include="src\GraphicObjects\NumericControl.cs" />
     <Compile Include="src\GraphicObjects\Scroller.cs" />
-    <Compile Include="src\GraphicObjects\ILayoutable.cs" />
     <Compile Include="src\Enums.cs" />
     <Compile Include="src\GraphicObjects\GenericStack.cs" />
     <Compile Include="src\CompilerServices\CompilerServices.cs" />

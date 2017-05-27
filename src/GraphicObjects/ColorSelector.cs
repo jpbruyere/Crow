@@ -54,8 +54,8 @@ namespace Crow
 				updateMouseLocalPos (e.Position);
 		}
 
-		protected virtual void updateMouseLocalPos(Point mPos){
-			Rectangle r = ScreenCoordinates (Slot);
+		unsafe protected virtual void updateMouseLocalPos(Point mPos){
+			Rectangle r = ScreenCoordinates (nativeHnd->Slot);
 			Rectangle cb = ClientRectangle;
 			mousePos = mPos - r.Position;
 

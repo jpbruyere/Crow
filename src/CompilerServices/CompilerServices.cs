@@ -795,8 +795,8 @@ namespace Crow
 		/// <returns><c>true</c>, if logical parents are not null</returns>
 		/// <param name="instance">Start Instance</param>
 		/// <param name="levelCount">Levels to go upward</param>
-		internal static ILayoutable goUpNbLevels(ILayoutable instance, int levelCount){
-			ILayoutable tmp = instance;
+		internal static GraphicObject goUpNbLevels(GraphicObject instance, int levelCount){
+			GraphicObject tmp = instance;
 			int i = 0;
 			while (tmp != null && i < levelCount) {
 				tmp = tmp.LogicalParent;

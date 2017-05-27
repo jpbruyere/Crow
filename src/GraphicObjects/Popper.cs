@@ -130,43 +130,43 @@ namespace Crow
 				_content.LayoutChanged += _content_LayoutChanged;
 			}
 		}
-		void positionContent(LayoutingType lt){
-			ILayoutable tc = Content.Parent;
+		unsafe void positionContent(LayoutingType lt){
+			GraphicObject tc = Content.Parent;
 			if (tc == null)
 				return;
-			Rectangle r = this.ScreenCoordinates (this.Slot);
+			Rectangle r = this.ScreenCoordinates (this.nativeHnd->Slot);
 			if (lt == LayoutingType.X) {
 				if (popDirection.HasFlag (Alignment.Right)) {
-					if (r.Right + Content.Slot.Width > tc.ClientRectangle.Right)
-						Content.Left = r.Left - Content.Slot.Width;
+					if (r.Right + Content.nativeHnd->Slot.Width > tc.ClientRectangle.Right)
+						Content.Left = r.Left - Content.nativeHnd->Slot.Width;
 					else
 						Content.Left = r.Right;
 				} else if (popDirection.HasFlag (Alignment.Left)) {
-					if (r.Left - Content.Slot.Width < tc.ClientRectangle.Left)
+					if (r.Left - Content.nativeHnd->Slot.Width < tc.ClientRectangle.Left)
 						Content.Left = r.Right;
 					else
-						Content.Left = r.Left - Content.Slot.Width;
+						Content.Left = r.Left - Content.nativeHnd->Slot.Width;
 				} else {
-					if (Content.Slot.Width < tc.ClientRectangle.Width) {
-						if (r.Left + Content.Slot.Width > tc.ClientRectangle.Right)
-							Content.Left = tc.ClientRectangle.Right - Content.Slot.Width;
+					if (Content.nativeHnd->Slot.Width < tc.ClientRectangle.Width) {
+						if (r.Left + Content.nativeHnd->Slot.Width > tc.ClientRectangle.Right)
+							Content.Left = tc.ClientRectangle.Right - Content.nativeHnd->Slot.Width;
 						else
 							Content.Left = r.Left;
 					} else
 						Content.Left = 0;
 				}
 			}else if (lt == LayoutingType.Y) {
-				if (Content.Slot.Height < tc.ClientRectangle.Height) {
+				if (Content.nativeHnd->Slot.Height < tc.ClientRectangle.Height) {
 					if (PopDirection.HasFlag (Alignment.Bottom)) {
-						if (r.Bottom + Content.Slot.Height > tc.ClientRectangle.Bottom)
-							Content.Top = r.Top - Content.Slot.Height;
+						if (r.Bottom + Content.nativeHnd->Slot.Height > tc.ClientRectangle.Bottom)
+							Content.Top = r.Top - Content.nativeHnd->Slot.Height;
 						else
 							Content.Top = r.Bottom;
 					} else if (PopDirection.HasFlag (Alignment.Top)) {
-						if (r.Top - Content.Slot.Height < tc.ClientRectangle.Top)
+						if (r.Top - Content.nativeHnd->Slot.Height < tc.ClientRectangle.Top)
 							Content.Top = r.Bottom;
 						else
-							Content.Top = r.Top - Content.Slot.Height;
+							Content.Top = r.Top - Content.nativeHnd->Slot.Height;
 					} else
 						Content.Top = r.Top;
 				}else

@@ -93,22 +93,22 @@ namespace Crow
 			
 			return base.measureRawSize (lt);
 		}
-		public virtual void ComputeChildrenPositions()
+		unsafe public virtual void ComputeChildrenPositions()
 		{
 			int d = 0;
 			if (Orientation == Orientation.Horizontal) {
 				foreach (GraphicObject c in Children) {
 					if (!c.Visible)
 						continue;
-					c.Slot.X = d;
-					d += c.Slot.Width + Spacing;
+					c.nativeHnd->Slot.X = d;
+					d += c.nativeHnd->Slot.Width + Spacing;
 				}
 			} else {
 				foreach (GraphicObject c in Children) {
 					if (!c.Visible)
 						continue;					
-					c.Slot.Y = d;
-					d += c.Slot.Height + Spacing;
+					c.nativeHnd->Slot.Y = d;
+					d += c.nativeHnd->Slot.Height + Spacing;
 				}
 			}
 			IsDirty = true;
@@ -135,7 +135,7 @@ namespace Crow
 			return base.UpdateLayout(layoutType);
         }
 
-		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
+		unsafe public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
 			GraphicObject go = sender as GraphicObject;
 			//Debug.WriteLine ("child layout change: " + go.LastSlots.ToString() + " => " + go.Slot.ToString());
@@ -146,12 +146,12 @@ namespace Crow
 						if (stretchedGO == null && Width != Measure.Fit)
 							stretchedGO = go;
 						else if (stretchedGO != go) {
-							go.Slot.Width = 0;
+							go.nativeHnd->Slot.Width = 0;
 							go.Width = Measure.Fit;
 							return;
 						}
 					} else
-						contentSize.Width += go.Slot.Width - go.LastSlots.Width;
+						contentSize.Width += go.nativeHnd->Slot.Width - go.nativeHnd->LastSlot.Width;
 
 					if (stretchedGO != null) {
 						int newW = Math.Max (
@@ -159,8 +159,8 @@ namespace Crow
 							           stretchedGO.MinimumSize.Width);
 						if (stretchedGO.MaximumSize.Width > 0)
 							newW = Math.Min (newW, stretchedGO.MaximumSize.Width);
-						if (newW != stretchedGO.Slot.Width) {							
-							stretchedGO.Slot.Width = newW;
+						if (newW != stretchedGO.nativeHnd->Slot.Width) {							
+							stretchedGO.nativeHnd->Slot.Width = newW;
 							stretchedGO.IsDirty = true;
 #if DEBUG_LAYOUTING
 					Debug.WriteLine ("\tAdjusting Width of " + stretchedGO.ToString());
@@ -168,7 +168,7 @@ namespace Crow
 							stretchedGO.LayoutChanged -= OnChildLayoutChanges;
 							stretchedGO.OnLayoutChanges (LayoutingType.Width);
 							stretchedGO.LayoutChanged += OnChildLayoutChanges;
-							stretchedGO.LastSlots.Width = stretchedGO.Slot.Width;
+							stretchedGO.nativeHnd->LastSlot.Width = stretchedGO.nativeHnd->Slot.Width;
 						}
 					}
 					
@@ -185,12 +185,12 @@ namespace Crow
 						if (stretchedGO == null && Height != Measure.Fit)
 							stretchedGO = go;
 						else if (stretchedGO != go){
-							go.Slot.Height = 0;
+							go.nativeHnd->Slot.Height = 0;
 							go.Height = Measure.Fit;
 							return;
 						}
 					} else
-						contentSize.Height += go.Slot.Height - go.LastSlots.Height;
+						contentSize.Height += go.nativeHnd->Slot.Height - go.nativeHnd->LastSlot.Height;
 					
 					if (stretchedGO != null) {
 						int newH = Math.Max (
@@ -198,8 +198,8 @@ namespace Crow
 							stretchedGO.MinimumSize.Height);
 						if (stretchedGO.MaximumSize.Height > 0)
 							newH = Math.Min (newH, stretchedGO.MaximumSize.Height);
-						if (newH != stretchedGO.Slot.Height) {
-							stretchedGO.Slot.Height = newH;
+						if (newH != stretchedGO.nativeHnd->Slot.Height) {
+							stretchedGO.nativeHnd->Slot.Height = newH;
 							stretchedGO.IsDirty = true;
 #if DEBUG_LAYOUTING
 					Debug.WriteLine ("\tAdjusting Height of " + stretchedGO.ToString());
@@ -207,7 +207,7 @@ namespace Crow
 							stretchedGO.LayoutChanged -= OnChildLayoutChanges;
 							stretchedGO.OnLayoutChanges (LayoutingType.Height);
 							stretchedGO.LayoutChanged += OnChildLayoutChanges;
-							stretchedGO.LastSlots.Height = stretchedGO.Slot.Height;
+							stretchedGO.nativeHnd->LastSlot.Height = stretchedGO.nativeHnd->Slot.Height;
 						}
 					}
 

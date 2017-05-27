@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Window Caption="Performances" Height="160" Width="200" CornerRadius="5">	
+<Window Caption="Performances" Height="160" Width="200" CornerRadius="5" MinimumSize="50,50">	
 	<VerticalStack Width="90%" Height="Fit" Spacing="1" Margin="10">
 		<HorizontalStack>
 			<Label Text="Frame:" Style="FpsLabel"/>

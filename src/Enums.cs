@@ -37,7 +37,7 @@ namespace Crow
         Vertical
     }
 
-	public enum Alignment 
+	public enum Alignment  : byte
     {
         Top = 0x01,
         Left = 0x02,
@@ -49,16 +49,16 @@ namespace Crow
         BottomRight = 0x0c,
 		Center = 0x10
     }
-    public enum HorizontalAlignment
+    public enum HorizontalAlignment : byte
     {
+		Center,
         Left,
         Right,
-        Center,
     }
-    public enum VerticalAlignment
+    public enum VerticalAlignment : byte
     {
+		Center,
         Top,
         Bottom,
-        Center,
     }
 }

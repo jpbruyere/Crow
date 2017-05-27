@@ -49,7 +49,7 @@ namespace Crow
 
 		protected GraphicObject child;
 
-		internal virtual void SetChild(GraphicObject _child)
+		unsafe internal virtual void SetChild(GraphicObject _child)
 		{
 
 			if (child != null) {
@@ -69,7 +69,7 @@ namespace Crow
 			if (child != null) {
 				child.Parent = this;
 				child.LayoutChanged += OnChildLayoutChanges;
-				contentSize = child.Slot.Size;
+				contentSize = child.nativeHnd->Slot.Size;
 				child.RegisteredLayoutings = LayoutingType.None;
 				child.RegisterForLayouting (LayoutingType.Sizing);
 			}
@@ -141,19 +141,19 @@ namespace Crow
 				return;
 			child.RegisterForLayouting (ltChild);
 		}
-		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
+		unsafe public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{			
 			GraphicObject g = sender as GraphicObject;
 
 			if (arg.LayoutType == LayoutingType.Width) {
 				if (Width != Measure.Fit)
 					return;
-				contentSize.Width = g.Slot.Width;
+				contentSize.Width = g.nativeHnd->Slot.Width;
 				this.RegisterForLayouting (LayoutingType.Width);
 			}else if (arg.LayoutType == LayoutingType.Height){
 				if (Height != Measure.Fit)
 					return;
-				contentSize.Height = g.Slot.Height;
+				contentSize.Height = g.nativeHnd->Slot.Height;
 				this.RegisterForLayouting (LayoutingType.Height);
 			}
 		}
@@ -175,11 +175,11 @@ namespace Crow
 			}
 			gr.Restore ();
 		}
-		protected override void UpdateCache (Context ctx)
+		unsafe protected override void UpdateCache (Context ctx)
 		{
-			Rectangle rb = Slot + Parent.ClientRectangle.Position;
+			Rectangle rb = nativeHnd->Slot + Parent.ClientRectangle.Position;
 
-			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
+			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, nativeHnd->Slot.Width, nativeHnd->Slot.Height, 4 * nativeHnd->Slot.Width)) {
 				Context gr = new Context (cache);
 
 				if (!Clipping.IsEmpty) {

@@ -70,7 +70,7 @@ namespace Crow
 		}
 
 		#region GraphicObject override
-		public override ILayoutable Parent {
+		public override GraphicObject Parent {
 			get { return base.Parent; }
 			set {
 				if (value != null) {			
@@ -95,7 +95,7 @@ namespace Crow
 			base.onMouseLeave (sender, e);
 			CurrentInterface.MouseCursor = XCursor.Default;
 		}
-		public override void onMouseDown (object sender, MouseButtonEventArgs e)
+		unsafe public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseDown (sender, e);
 			go1 = go2 = null;
@@ -111,7 +111,7 @@ namespace Crow
 			go2 = gs.Children [ptrSplit + 1];
 
 			if (gs.Orientation == Orientation.Horizontal) {
-				initSplit (go1.Width, go1.Slot.Width, go2.Width, go2.Slot.Width);
+				initSplit (go1.Width, go1.nativeHnd->Slot.Width, go2.Width, go2.nativeHnd->Slot.Width);
 				min1 = go1.MinimumSize.Width;
 				min2 = go2.MinimumSize.Width;
 				max1 = go1.MaximumSize.Width;
@@ -121,7 +121,7 @@ namespace Crow
 				if (init2 >= 0)
 					go2.Width = init2;
 			} else {
-				initSplit (go1.Height, go1.Slot.Height, go2.Height, go2.Slot.Height);
+				initSplit (go1.Height, go1.nativeHnd->Slot.Height, go2.Height, go2.nativeHnd->Slot.Height);
 				min1 = go1.MinimumSize.Height;
 				min2 = go2.MinimumSize.Height;
 				max1 = go1.MaximumSize.Height;
@@ -132,7 +132,7 @@ namespace Crow
 					go2.Height = init2;
 			}
 		}
-		public override void onMouseMove (object sender, MouseMoveEventArgs e)
+		unsafe public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
 
@@ -144,15 +144,15 @@ namespace Crow
 			if (gs.Orientation == Orientation.Horizontal) {
 				newDelta -= e.XDelta;
 				if (size1 < 0)
-					size1 = go1.Slot.Width + delta;
+					size1 = go1.nativeHnd->Slot.Width + delta;
 				if (size2 < 0)
-					size2 = go2.Slot.Width - delta;
+					size2 = go2.nativeHnd->Slot.Width - delta;
 			} else {
 				newDelta -= e.YDelta;
 				if (size1 < 0)
-					size1 = go1.Slot.Height + delta;
+					size1 = go1.nativeHnd->Slot.Height + delta;
 				if (size2 < 0)
-					size2 = go2.Slot.Height - delta;
+					size2 = go2.nativeHnd->Slot.Height - delta;
 			}
 
 			if (size1 - newDelta < min1 || (max1 > 0 && size1 - newDelta > max1) ||
@@ -173,7 +173,7 @@ namespace Crow
 					go2.Height = init2 + delta;
 			}
 		}
-		public override void onMouseUp (object sender, MouseButtonEventArgs e)
+		unsafe public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseUp (sender, e);
 
@@ -182,18 +182,18 @@ namespace Crow
 			if (init1 >= 0 && u1 == Unit.Percent) {
 				if (gs.Orientation == Orientation.Horizontal)
 					go1.Width = new Measure ((int)Math.Ceiling (
-						go1.Width.Value * 100.0 / (double)gs.Slot.Width), Unit.Percent);
+						go1.Width.Value * 100.0 / (double)gs.nativeHnd->Slot.Width), Unit.Percent);
 				else
 					go1.Height = new Measure ((int)Math.Ceiling (
-						go1.Height.Value * 100.0 / (double)gs.Slot.Height), Unit.Percent);
+						go1.Height.Value * 100.0 / (double)gs.nativeHnd->Slot.Height), Unit.Percent);
 			}
 			if (init2 >= 0 && u2 == Unit.Percent) {
 				if (gs.Orientation == Orientation.Horizontal)
 					go2.Width = new Measure ((int)Math.Floor (
-						go2.Width.Value * 100.0 / (double)gs.Slot.Width), Unit.Percent);
+						go2.Width.Value * 100.0 / (double)gs.nativeHnd->Slot.Width), Unit.Percent);
 				else
 					go2.Height = new Measure ((int)Math.Floor (
-						go2.Height.Value * 100.0 / (double)gs.Slot.Height), Unit.Percent);
+						go2.Height.Value * 100.0 / (double)gs.nativeHnd->Slot.Height), Unit.Percent);
 			}
 		}
 		public override bool UpdateLayout (LayoutingType layoutType)

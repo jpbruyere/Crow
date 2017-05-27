@@ -66,9 +66,9 @@ namespace Crow
 			int tmp = base.measureRawSize (lt);
 			return tmp < 0 ? tmp : tmp + 2 * BorderWidth;
 		}
-		protected override void onDraw (Cairo.Context gr)
+		unsafe protected override void onDraw (Cairo.Context gr)
 		{
-			Rectangle rBack = new Rectangle (Slot.Size);
+			Rectangle rBack = new Rectangle (nativeHnd->Slot.Size);
 
 			//rBack.Inflate (-Margin);
 //			if (BorderWidth > 0) 

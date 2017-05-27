@@ -25,16 +25,18 @@
 // THE SOFTWARE.
 
 using System;
+using System.Runtime.InteropServices;
 
 namespace Crow
 {
 	/// <summary>
 	/// Measurement unit
 	/// </summary>
-	public enum Unit { Pixel, Percent, Inherit }
+	public enum Unit : byte { Pixel, Percent, Inherit }
 	/// <summary>
 	/// Measure class allow proportional sizes as well as stretched and fit on content.
 	/// </summary>
+	[StructLayout(LayoutKind.Sequential)]
 	public struct Measure
 	{
 		/// <summary>

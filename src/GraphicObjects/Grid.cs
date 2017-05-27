@@ -101,11 +101,11 @@ namespace Crow
 				this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 			}
 		}
-		public virtual int CaseWidth {
-			get { return (Slot.Width - (ColumnCount - 1) * Spacing) / ColumnCount; }
+		unsafe public virtual int CaseWidth {
+			get { return (nativeHnd->Slot.Width - (ColumnCount - 1) * Spacing) / ColumnCount; }
 		}
-		public virtual int CaseHeight {
-			get { return (Slot.Height - (RowCount - 1) * Spacing) / RowCount; }
+		unsafe public virtual int CaseHeight {
+			get { return (nativeHnd->Slot.Height - (RowCount - 1) * Spacing) / RowCount; }
 		}
 
 		#endregion

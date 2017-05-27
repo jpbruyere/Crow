@@ -405,7 +405,7 @@ namespace Crow
 //			} else if (e.LayoutType == LayoutingType.Height)
 //				_gsList.Height = approxSize;
 //		}
-		int approxSize
+		unsafe int approxSize
 		{
 			get {
 				if (data == null)
@@ -417,10 +417,10 @@ namespace Crow
 				return page1.Orientation == Orientation.Horizontal ?
 					data.Count < itemPerPage ?
 					-1:
-					(int)Math.Ceiling ((double)page1.Slot.Width / (double)itemPerPage * (double)(data.Count+1)):
+					(int)Math.Ceiling ((double)page1.nativeHnd->Slot.Width / (double)itemPerPage * (double)(data.Count+1)):
 					data.Count < itemPerPage ?
 					-1:
-					(int)Math.Ceiling ((double)page1.Slot.Height / (double)itemPerPage * (double)(data.Count+1));
+					(int)Math.Ceiling ((double)page1.nativeHnd->Slot.Height / (double)itemPerPage * (double)(data.Count+1));
 			}
 		}
 		internal virtual void itemClick(object sender, MouseButtonEventArgs e){

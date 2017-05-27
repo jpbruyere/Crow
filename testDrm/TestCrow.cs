@@ -26,6 +26,7 @@
 using System;
 using Crow;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace testDrm
 {
@@ -43,10 +44,25 @@ namespace testDrm
 		unsafe static Rectangle* rect;
 
 		unsafe static void Main(){
+			const int count = 10000;
 			rect = allocate();
-			update (150, 160);
-			Console.WriteLine (rect->Height);
-			rect->Height = 200;
+			Console.WriteLine ("function update");
+			Stopwatch sw = Stopwatch.StartNew ();
+			for (int i = 0; i < count; i++) {
+				update (150, 160);	
+			}
+			sw.Stop ();
+			Console.WriteLine ("{0} updates in {1} ticks and {2} ms", count, sw.ElapsedTicks, sw.ElapsedMilliseconds);
+
+			Console.WriteLine ("field update");
+			sw.Restart ();
+			for (int i = 0; i < count; i++) {
+				rect->Height = 200;
+				rect->Width = 250;
+			}
+			sw.Stop ();
+			Console.WriteLine ("{0} updates in {1} ticks and {2} ms", count, sw.ElapsedTicks, sw.ElapsedMilliseconds);
+
 			Console.WriteLine (rect->Height);
 //			Rectangle bounds = new Rectangle(0,0,1024,768);
 //			Interface iface = new Interface();

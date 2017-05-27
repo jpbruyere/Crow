@@ -89,11 +89,11 @@ namespace Crow
 			gr.Fill();
 		}
 
-		public override void Paint (ref Context ctx)
+		unsafe public override void Paint (ref Context ctx)
 		{
 			base.Paint (ref ctx);
 
-			Rectangle rb = Slot + Parent.ClientRectangle.Position;
+			Rectangle rb = nativeHnd->Slot + Parent.ClientRectangle.Position;
 			ctx.Save ();
 
 			ctx.Translate (rb.X, rb.Y);

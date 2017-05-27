@@ -230,11 +230,11 @@ namespace Crow
 			}
 			gr.Restore ();
 		}
-		protected override void UpdateCache (Context ctx)
+		unsafe protected override void UpdateCache (Context ctx)
 		{
-			Rectangle rb = Slot + Parent.ClientRectangle.Position;
+			Rectangle rb = nativeHnd->Slot + Parent.ClientRectangle.Position;
 
-			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
+			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, nativeHnd->Slot.Width, nativeHnd->Slot.Height, 4 * nativeHnd->Slot.Width)) {
 				Context gr = new Context (cache);
 
 				if (!Clipping.IsEmpty) {
@@ -256,7 +256,7 @@ namespace Crow
 						foreach (GraphicObject c in Children) {
 							if (!c.Visible)
 								continue;
-							if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
+							if (Clipping.Contains (c.nativeHnd->Slot + ClientRectangle.Position) == RegionOverlap.Out)
 								continue;
 							c.Paint (ref gr);
 						}
@@ -276,7 +276,7 @@ namespace Crow
 		}
 		#endregion
 
-		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
+		unsafe public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
 			GraphicObject g = sender as GraphicObject;
 
@@ -284,9 +284,9 @@ namespace Crow
 			case LayoutingType.Width:
 				if (Width != Measure.Fit)
 					return;
-				if (g.Slot.Width > contentSize.Width) {
+				if (g.nativeHnd->Slot.Width > contentSize.Width) {
 					largestChild = g;
-					contentSize.Width = g.Slot.Width;
+					contentSize.Width = g.nativeHnd->Slot.Width;
 				} else if (g == largestChild)
 					searchLargestChild ();
 
@@ -295,9 +295,9 @@ namespace Crow
 			case LayoutingType.Height:
 				if (Height != Measure.Fit)
 					return;
-				if (g.Slot.Height > contentSize.Height) {
+				if (g.nativeHnd->Slot.Height > contentSize.Height) {
 					tallestChild = g;
-					contentSize.Height = g.Slot.Height;
+					contentSize.Height = g.nativeHnd->Slot.Height;
 				} else if (g == tallestChild)
 					searchTallestChild ();
 
@@ -311,7 +311,7 @@ namespace Crow
 			tallestChild = null;
 			contentSize = 0;
 		}
-		void searchLargestChild(){
+		unsafe void searchLargestChild(){
 			#if DEBUG_LAYOUTING
 			Debug.WriteLine("\tSearch largest child");
 			#endif
@@ -322,13 +322,13 @@ namespace Crow
 					continue;
 				if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
 					continue;
-				if (Children [i].Slot.Width > contentSize.Width) {
-					contentSize.Width = Children [i].Slot.Width;
+				if (Children [i].nativeHnd->Slot.Width > contentSize.Width) {
+					contentSize.Width = Children [i].nativeHnd->Slot.Width;
 					largestChild = Children [i];
 				}
 			}
 		}
-		void searchTallestChild(){
+		unsafe void searchTallestChild(){
 			#if DEBUG_LAYOUTING
 			Debug.WriteLine("\tSearch tallest child");
 			#endif
@@ -339,8 +339,8 @@ namespace Crow
 					continue;
 				if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
 					continue;
-				if (Children [i].Slot.Height > contentSize.Height) {
-					contentSize.Height = Children [i].Slot.Height;
+				if (Children [i].nativeHnd->Slot.Height > contentSize.Height) {
+					contentSize.Height = Children [i].nativeHnd->Slot.Height;
 					tallestChild = Children [i];
 				}
 			}
