@@ -79,7 +79,7 @@ namespace Crow
 		internal static FieldInfo miSetCurIface = typeof(GraphicObject).GetField ("currentInterface", BindingFlags.NonPublic | BindingFlags.Instance);
 		internal static MethodInfo miFindByName = typeof (GraphicObject).GetMethod ("FindByName");
 		internal static MethodInfo miGetGObjItem = typeof(List<GraphicObject>).GetMethod("get_Item", new Type[] { typeof(Int32) });
-		internal static MethodInfo miLoadDefaultVals = typeof (GraphicObject).GetMethod ("loadDefaultValues");
+		internal static MethodInfo miLoadDefaultVals = typeof (GraphicObject).GetMethod ("loadDefaultValues", BindingFlags.NonPublic | BindingFlags.Instance);
 		internal static PropertyInfo piStyle = typeof (GraphicObject).GetProperty ("Style");
 		internal static MethodInfo miGetLogicalParent = typeof(GraphicObject).GetProperty("LogicalParent").GetGetMethod();
 		internal static MethodInfo miGetDataSource = typeof(GraphicObject).GetProperty("DataSource").GetGetMethod ();

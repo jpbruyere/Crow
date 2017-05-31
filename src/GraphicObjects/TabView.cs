@@ -114,7 +114,6 @@ namespace Crow
 			else
 				SelectedTab = selectedTab;
 		}
-		public override bool ArrangeChildren { get { return true; } }
 		unsafe public override bool UpdateLayout (LayoutingType layoutType)
 		{
 			RegisteredLayoutings &= (~layoutType);

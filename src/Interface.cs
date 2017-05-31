@@ -35,6 +35,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using Cairo;
 using System.Globalization;
+using Crow.Native;
 
 namespace Crow
 {
@@ -63,8 +64,13 @@ namespace Crow
 			FontRenderingOptions.HintStyle = HintStyle.Medium;
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
 		}
-		public Interface(){
+		public Interface() : base (true){
 			CurrentInterface = this;
+			layoutingCtx = LibCrow.crow_context_create ();
+			unsafe {
+				nativeHnd = LibCrow.crow_object_create ();
+			}
+
 			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 		}
 		#endregion
@@ -105,6 +111,7 @@ namespace Crow
 		internal static Interface CurrentInterface;
 		internal Stopwatch clickTimer = new Stopwatch();
 		internal GraphicObject eligibleForDoubleClick = null;
+		internal IntPtr layoutingCtx = IntPtr.Zero;
 		#endregion
 
 		#region Events
@@ -142,10 +149,6 @@ namespace Crow
 		/// Store loaded resources instances shared among controls to reduce memory footprint
 		/// </summary>
 		public Dictionary<string,object> Ressources = new Dictionary<string, object>();
-		/// <summary>The Main layouting queue.</summary>
-		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem> ();
-		/// <summary>Store discarded lqi between two updates</summary>
-		public Queue<LayoutingQueueItem> DiscardQueue;
 		/// <summary>Main drawing queue, holding layouted controls</summary>
 		public Queue<GraphicObject> DrawingQueue = new Queue<GraphicObject>();
 		public string Clipboard;//TODO:use object instead for complex copy paste
@@ -274,11 +277,11 @@ namespace Crow
 		/// not added to the GraphicTree</summary>
 		public GraphicObject Load (string path)
 		{
-			try {
+			//try {
 				return GetInstantiator (path).CreateInstance (this);
-			} catch (Exception ex) {
-				throw new Exception ("Error loading <" + path + ">:", ex);
-			}
+			//} catch (Exception ex) {
+			//	throw new Exception ("Error loading <" + path + ">:", ex);
+			//}
 		}
 		/// <summary>Fetch it from cache or create it</summary>
 		public static Instantiator GetInstantiator(string path){
@@ -453,24 +456,10 @@ namespace Crow
 			#if MEASURE_TIME
 			layoutingMeasure.StartCycle();
 			#endif
-
 			if (Monitor.TryEnter (LayoutMutex)) {
-				DiscardQueue = new Queue<LayoutingQueueItem> ();
-				//Debug.WriteLine ("======= Layouting queue start =======");
-				LayoutingQueueItem lqi;
-				while (LayoutingQueue.Count > 0) {
-					lqi = LayoutingQueue.Dequeue ();
-					#if DEBUG_LAYOUTING
-					currentLQI = lqi;
-					curLQIsTries.Add(currentLQI);
-					#endif
-					lqi.ProcessLayouting ();
-				}
-				LayoutingQueue = DiscardQueue;
+				LibCrow.crow_context_process_layouting (layoutingCtx);
 				Monitor.Exit (LayoutMutex);
-				DiscardQueue = null;
 			}
-
 			#if MEASURE_TIME
 			layoutingMeasure.StopCycle();
 			#endif
@@ -482,14 +471,7 @@ namespace Crow
 			#if MEASURE_TIME
 			clippingMeasure.StartCycle();
 			#endif
-			GraphicObject g = null;
-			while (DrawingQueue.Count > 0) {
-				lock (DrawingQueue)
-					g = DrawingQueue.Dequeue ();
-				lock (g)
-					g.ClippingRegistration ();
-			}
-
+			LibCrow.crow_context_process_layouting (layoutingCtx);
 			#if MEASURE_TIME
 			clippingMeasure.StopCycle();
 			#endif
@@ -661,6 +643,10 @@ namespace Crow
 
 		public void ProcessResize(Rectangle bounds){
 			lock (UpdateMutex) {
+				unsafe {
+					nativeHnd->Slot.Width = bounds.Width;
+					nativeHnd->Slot.Height = bounds.Height;
+				}
 				clientRectangle = bounds;
 				int stride = 4 * ClientRectangle.Width;
 				int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
@@ -892,7 +878,6 @@ namespace Crow
 		public override void RegisterClip(Rectangle r){
 			clipping.UnionRectangle (r);
 		}
-		public override bool ArrangeChildren { get { return false; }}
 		public override void RegisterForLayouting (LayoutingType layoutType) { }
 		public override bool UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public override Rectangle ContextCoordinates (Rectangle r) { return r;}
@@ -913,9 +898,17 @@ namespace Crow
 		}
 		public override Measure Height {
 			set { throw new NotImplementedException (); }
-			get { return clientRectangle.Height;	}
+			get { return clientRectangle.Height; }
 		}
 		public override bool MouseIsIn (Point m) => true;
+
+		#if DEBUG
+		public void DumpTo (string path) {
+			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
+				surf.WriteToPng (path);
+			}
+		}
+		#endif
 
 		#if MEASURE_TIME
 		public PerformanceMeasure clippingMeasure = new PerformanceMeasure("Clipping", 100);
@@ -933,8 +926,24 @@ namespace Crow
 		//		}
 		public LayoutingQueueItem currentLQI;
 		#else
-		public List<LQIList> LQIs = null;//still create the var for CrowIDE
+		//public List<LQIList> LQIs = null;//still create the var for CrowIDE
 		#endif
+		bool disposed = false;
+		protected override void Dispose (bool disposing)
+		{
+			if (disposed)
+				return;
+
+			if (disposing) {
+				clipping.Dispose ();
+			}
+
+			LibCrow.crow_context_destroy (layoutingCtx);
+
+			disposed = true;
+
+			base.Dispose (disposing);
+		}
 	}
 }
 

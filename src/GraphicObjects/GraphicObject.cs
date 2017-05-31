@@ -36,65 +36,20 @@ using System.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using Crow.Native;
 
 namespace Crow
 {
-	[StructLayout(LayoutKind.Sequential)]
-	unsafe public struct NativeGO {
-		public NativeGO* Parent;
-		public int Left;
-		public int Top;
-		public Measure Width;
-		public Measure Height;
-		public int Margin;
-		public Size MinimumSize;
-		public Size MaximumSize;
-		byte visible;
-		public LayoutingType RegisteredLayoutings;
-		/// <summary>
-		/// Current size and position computed during layouting pass
-		/// </summary>
-		public Rectangle Slot;
-		/// <summary>
-		/// keep last slot components for each layouting pass to track
-		/// changes and trigger update of other component accordingly
-		/// </summary>
-		public Rectangle LastSlot;
-		/// <summary>
-		/// keep last slot painted on screen to clear traces if moved or resized
-		/// TODO: we should ensure the whole parsed widget tree is the last painted
-		/// version to clear effective oldslot if parents have been moved or resized.
-		/// IDEA is to add a ScreenCoordinates function that use only lastPaintedSlots
-		/// </summary>
-		public Rectangle LastPaintedSlot;
-		public VerticalAlignment VerticalAlignment;
-		public HorizontalAlignment HorizontalAlignment;
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	public delegate void LayoutChangedCallBack (LayoutingType lt);
 
-		unsafe public bool Visible {
-			get { return visible > 0; }
-			set {
-				if (value)
-					visible = 1;
-				else
-					visible = 0;
-			}
-		}
-	}
 	public class GraphicObject : IValueChange, IDisposable
 	{
-		#region PINVOKE
-		const string lib = "/home/jp/devel/testsharedlib/bin/Debug/libcrow.so";
-		[DllImport(lib)]
-		unsafe static extern NativeGO* CreateGO();
-		[DllImport(lib)]
-		unsafe static extern void DestroyGO(NativeGO* go);
-		#endregion
-
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
 
 
-		unsafe internal NativeGO* nativeHnd;
+		unsafe internal crow_object_t* nativeHnd;
 
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
@@ -109,12 +64,17 @@ namespace Crow
 		public GraphicObject ()
 		{
 			unsafe {
-				nativeHnd = CreateGO ();
+				nativeHnd =  LibCrow.crow_object_create ();
+				LibCrow.crow_object_set_type (nativeHnd, CrowType.Simple);
+				nativeHnd->Context = Interface.CurrentInterface.layoutingCtx;
+				//nativeHnd->OnLayoutChanged = Marshal.GetFunctionPointerForDelegate((LayoutChangedCallBack)OnLayoutChanges);
 			}
 			#if DEBUG
 			uid = currentUid;
 			currentUid++;
 			#endif
+		}
+		internal protected GraphicObject (bool isInterface){
 		}
 		#endregion
 
@@ -124,6 +84,7 @@ namespace Crow
 		public virtual void Initialize(){
 			if (currentInterface == null)
 				currentInterface = Interface.CurrentInterface;
+
 			loadDefaultValues ();
 		}
 		#region private fields
@@ -157,8 +118,7 @@ namespace Crow
 		public bool IsQueueForRedraw = false;
 		/// <summary>drawing Cache bitmap</summary>
 		public byte[] bmp;
-		/// <summary>if true, content has to be recreated</summary>
-		public bool IsDirty = true;
+
 		/// <summary>
 		/// This size is computed on each child' layout changes.
 		/// In stacking widget, it is used to compute the remaining space for the stretched
@@ -176,7 +136,7 @@ namespace Crow
 		/// <summary>
 		/// Parent in the graphic tree, used for rendering and layouting
 		/// </summary>
-		[XmlIgnore]public virtual GraphicObject Parent {
+		[XmlIgnore]unsafe public virtual GraphicObject Parent {
 			get { return parent; }
 			set {
 				if (parent == value)
@@ -184,7 +144,10 @@ namespace Crow
 				DataSourceChangeEventArgs e = new DataSourceChangeEventArgs (parent, value);
 				lock (this) {
 					parent = value;
-					//nativeHnd->Parent = value?.nativeHnd;
+					if (parent == null)
+						nativeHnd->Parent = null;
+					else
+						nativeHnd->Parent = value.nativeHnd;
 				}
 
 				onParentChanged (this, e);
@@ -569,12 +532,15 @@ namespace Crow
 		}
 		[XmlAttributeAttribute][DefaultValue(true)]
 		public virtual bool Visible {
-			get { unsafe { return nativeHnd->Visible;} }
+			get { unsafe { return nativeHnd->Visible>0;} }
 			set {
 				if (value == Visible)
 					return;
 				unsafe {
-					nativeHnd->Visible = value;
+					if (value)
+						nativeHnd->Visible = 1;
+					else
+						nativeHnd->Visible = 0;
 				}
 
 				RegisterForLayouting (LayoutingType.Sizing);
@@ -585,6 +551,16 @@ namespace Crow
 				NotifyValueChanged ("Visible", Visible);
 			}
 		}
+		[XmlIgnore]unsafe public bool IsDirty {
+			get { return nativeHnd->IsDirty>0; }
+			set {
+				if (value)
+					nativeHnd->IsDirty = 1;
+				else
+					nativeHnd->IsDirty = 0;
+			}
+		}
+
 		[XmlAttributeAttribute][DefaultValue(true)]
 		public virtual bool IsEnabled {
 			get { return isEnabled; }
@@ -686,7 +662,7 @@ namespace Crow
 
 		#region Default and Style Values loading
 		/// <summary> Loads the default values from XML attributes default </summary>
-		public void loadDefaultValues()
+		internal void loadDefaultValues()
 		{
 			#if DEBUG_LOAD
 			Debug.WriteLine ("LoadDefValues for " + this.ToString ());
@@ -799,12 +775,12 @@ namespace Crow
 			il.Emit(OpCodes.Ret);
 			#endregion
 
-			try {
+			//try {
 				Interface.DefaultValuesLoader[styleKey] = (Interface.LoaderInvoker)dm.CreateDelegate(typeof(Interface.LoaderInvoker));
 				Interface.DefaultValuesLoader[styleKey] (this);
-			} catch (Exception ex) {
-				throw new Exception ("Error applying style <" + styleKey + ">:", ex);
-			}
+//			} catch (Exception ex) {
+//				throw new Exception ("Error applying style <" + styleKey + ">:", ex);
+//			}
 		}
 		bool getDefaultEvent(EventInfo ei, List<Style> styling,
 			out string expression){
@@ -922,55 +898,20 @@ namespace Crow
 		/// <summary> By default in groups, LayoutingType.ArrangeChildren is reset </summary>
 		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){
 		}
-		public virtual bool ArrangeChildren { get { return false; } }
-		public virtual void RegisterForLayouting(LayoutingType layoutType){
-			if (Parent == null)
-				return;
-			lock (CurrentInterface.LayoutMutex) {
-				//prevent queueing same LayoutingType for this
-				layoutType &= (~RegisteredLayoutings);
 
-				if (layoutType == LayoutingType.None)
-					return;
-				//dont set position for stretched item
-				if (Width == Measure.Stretched)
-					layoutType &= (~LayoutingType.X);
-				if (Height == Measure.Stretched)
-					layoutType &= (~LayoutingType.Y);
-
-				if (!ArrangeChildren)
-					layoutType &= (~LayoutingType.ArrangeChildren);
-
-				//apply constraints depending on parent type
-				Parent.ChildrenLayoutingConstraints (ref layoutType);
-
-//				//prevent queueing same LayoutingType for this
-//				layoutType &= (~RegisteredLayoutings);
-
-				if (layoutType == LayoutingType.None)
-					return;
-
-				//enqueue LQI LayoutingTypes separately
-				if (layoutType.HasFlag (LayoutingType.Width))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
-				if (layoutType.HasFlag (LayoutingType.Height))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
-				if (layoutType.HasFlag (LayoutingType.X))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
-				if (layoutType.HasFlag (LayoutingType.Y))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
-				if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
-			}
+		unsafe public virtual void RegisterForLayouting(LayoutingType layoutType){
+			LibCrow.crow_object_register_layouting (this.nativeHnd, layoutType);
 		}
 
 		/// <summary> trigger dependant sizing component update </summary>
 		public virtual void OnLayoutChanges(LayoutingType  layoutType)
 		{
 			#if DEBUG_LAYOUTING
-			CurrentInterface.currentLQI.Slot = LastSlots;
-			CurrentInterface.currentLQI.NewSlot = Slot;
-			Debug.WriteLine ("\t\t{0} => {1}",LastSlots,Slot);
+//			CurrentInterface.currentLQI.Slot = LastSlots;
+//			CurrentInterface.currentLQI.NewSlot = Slot;
+			unsafe{
+			Debug.WriteLine ("\t\t{0} => {1}", nativeHnd->LastSlot, nativeHnd->Slot);
+			}
 			#endif
 
 			switch (layoutType) {
@@ -980,8 +921,13 @@ namespace Crow
 			case LayoutingType.Height:
 				RegisterForLayouting (LayoutingType.Y);
 				break;
+			case LayoutingType.X:
+				Console.WriteLine (Name);
+				break;
 			}
-			LayoutChanged.Raise (this, new LayoutingEventArgs (layoutType));
+
+
+			//LayoutChanged.Raise (this, new LayoutingEventArgs (layoutType));
 		}
 		internal protected void raiseLayoutChanged(LayoutingEventArgs e){
 			LayoutChanged.Raise (this, e);
@@ -993,40 +939,23 @@ namespace Crow
 		/// met and LQI has to be re-queued</returns>
 		unsafe public virtual bool UpdateLayout (LayoutingType layoutType)
 		{
+			if (LibCrow.crow_object_do_layout (nativeHnd, layoutType)==0)
+				return false;
+			
 			//unset bit, it would be reset if LQI is re-queued
-			RegisteredLayoutings &= (~layoutType);
+			//RegisteredLayoutings &= (~layoutType);
 
 			switch (layoutType) {
-			case LayoutingType.X:
-				if (Left == 0) {
-
-					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width) ||
-					    RegisteredLayoutings.HasFlag (LayoutingType.Width))
-						return false;
-
-					switch (HorizontalAlignment) {
-					case HorizontalAlignment.Left:
-						nativeHnd->Slot.X = 0;
-						break;
-					case HorizontalAlignment.Right:
-						nativeHnd->Slot.X = Parent.ClientRectangle.Width - nativeHnd->Slot.Width;
-						break;
-					case HorizontalAlignment.Center:
-						nativeHnd->Slot.X = Parent.ClientRectangle.Width / 2 - nativeHnd->Slot.Width / 2;
-						break;
-					}
-				} else
-					nativeHnd->Slot.X = Left;
-				
-				if (nativeHnd->LastSlot.X == nativeHnd->Slot.X)
-					break;
-
-				IsDirty = true;
-
-				OnLayoutChanges (layoutType);
-
-				nativeHnd->LastSlot.X = nativeHnd->Slot.X;
-				break;
+//			case LayoutingType.X:				
+//				if (nativeHnd->LastSlot.X == nativeHnd->Slot.X)
+//					break;
+//
+//				IsDirty = true;
+//
+//				OnLayoutChanges (layoutType);
+//
+//				nativeHnd->LastSlot.X = nativeHnd->Slot.X;
+//				break;
 			case LayoutingType.Y:
 				if (Top == 0) {
 
@@ -1396,7 +1325,7 @@ namespace Crow
 				return;
 			Clipping.Dispose ();
 			unsafe{
-				DestroyGO (nativeHnd);
+				LibCrow.crow_object_destroy (nativeHnd);
 			}
 			disposed = true;
 		}

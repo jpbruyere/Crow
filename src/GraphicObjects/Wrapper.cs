@@ -199,8 +199,8 @@ namespace Crow
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
 			#if DEBUG_LAYOUTING
-			CurrentInterface.currentLQI.Slot = LastSlots;
-			CurrentInterface.currentLQI.Slot = Slot;
+//			CurrentInterface.currentLQI.Slot = LastSlots;
+//			CurrentInterface.currentLQI.Slot = Slot;
 			#endif
 			switch (layoutType) {
 			case LayoutingType.Width:

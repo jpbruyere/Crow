@@ -1,5 +1,5 @@
 ﻿//
-// TestCrow.cs
+// LibCrow.cs
 //
 // Author:
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
@@ -24,50 +24,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
-using Crow;
 using System.Runtime.InteropServices;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
-namespace testDrm
+namespace Crow.Native
 {
-	public class TestCrow
+	internal static class LibCrow
 	{
-		//const string lib = "/mnt/data2/devel/crow/libcrow/bin/Debug/libcrow.so";
-		const string lib = "/home/jp/devel/testsharedlib/bin/Debug/libcrow.so";
-
-		[StructLayout(LayoutKind.Sequential)]
-		public struct testStruct {
-			public object instance;
-			public int a;
-			public int b;
-		}
-
-		public class testClass {
-			public string alpha = "this is a test string";
-			public int a = 10,b=20;
-		}
-
+		#region PINVOKE
+		const string lib = "libcrow";
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void testAppDomain();
-
+		unsafe internal static extern IntPtr crow_context_create ();
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern int gimmePI (ref testStruct t);
+		unsafe internal static extern void crow_context_destroy (IntPtr ctx);
+		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		unsafe internal static extern void crow_context_process_layouting (IntPtr layCtx);
+		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		unsafe internal static extern void crow_context_process_clipping (IntPtr ctx);
 
-		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		internal static extern int gimme (ref testStruct t);
-
-		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		public extern object UnsafeGetValue (object obj);
-
-		static void Main(){
-			using (Interface iface = new Interface ()) {
-				iface.ProcessResize (new Rectangle (0, 0, 1024, 768));
-				iface.LoadInterface ("#testDrm.ui.go.crow");
-				iface.Update ();
-				iface.DumpTo ("/home/jp/test.png");
-			}
-		}
+		[DllImport(lib)]
+		unsafe internal static extern crow_object_t* crow_object_create();
+		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		unsafe internal static extern void crow_object_destroy(crow_object_t* go);
+		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		unsafe internal static extern void crow_object_set_type (crow_object_t* go, CrowType objType);
+		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		unsafe internal static extern byte crow_object_do_layout (crow_object_t* go, LayoutingType layout);
+		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		unsafe internal static extern void crow_object_register_layouting (crow_object_t* go, LayoutingType layout);
+		#endregion		
 	}
 }
 

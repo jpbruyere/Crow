@@ -19,7 +19,7 @@
         <Command type="Execute" command="${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" />
       </CustomCommands>
     </CustomCommands>
-    <StartupObject>testDrm.TestApp</StartupObject>
+    <StartupObject>testDrm.TestCrow</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,15 +29,14 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Externalconsole>true</Externalconsole>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\Debug</OutputPath>
+    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
     <CustomCommands>
       <CustomCommands>
-        <Command type="BeforeExecute" command="sudo setcap CAP_SYS_ADMIN=+ep ${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" />
-        <Command type="Execute" command="${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" pauseExternalConsole="True" />
+        <Command type="Execute" command="${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" externalConsole="True" pauseExternalConsole="True" />
       </CustomCommands>
     </CustomCommands>
-    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -47,7 +46,7 @@
     <ConsolePause>false</ConsolePause>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\Release</OutputPath>
+    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

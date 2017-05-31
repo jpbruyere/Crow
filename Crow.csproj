@@ -212,6 +212,8 @@
     <Compile Include="src\Mono.Cairo\EGLDevice.cs" />
     <Compile Include="src\Mono.Cairo\DRMDevice.cs" />
     <Compile Include="src\Mono.Cairo\DRMSurface.cs" />
+    <Compile Include="src\Crow.Native\crow_object_t.cs" />
+    <Compile Include="src\Crow.Native\LibCrow.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -241,6 +243,7 @@
     <Folder Include="src\rsvg\" />
     <Folder Include="src\IML\" />
     <Folder Include="Icons\" />
+    <Folder Include="src\Crow.Native\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\Icons\updown.svg" />
