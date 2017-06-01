@@ -31,6 +31,7 @@ using System.Xml.Serialization;
 using Cairo;
 using System.Diagnostics;
 using System.Reflection;
+using Crow.Native;
 
 
 namespace Crow
@@ -41,6 +42,16 @@ namespace Crow
 		public Group()
 			: base(){}
 		#endregion
+
+		protected override void initLibcrow ()
+		{
+			unsafe {
+				nativeHnd =  LibCrow.crow_object_create ();
+				LibCrow.crow_object_set_type (nativeHnd, CrowType.Group);
+				nativeHnd->IsDirty = 1;
+				nativeHnd->Context = Interface.CurrentInterface.layoutingCtx;
+			}			
+		}
 
 		#region EVENT HANDLERS
 		public event EventHandler<EventArgs> ChildrenCleared;
@@ -63,6 +74,9 @@ namespace Crow
         }
 		public virtual void AddChild(GraphicObject g){
 			lock (children) {
+				unsafe {
+					LibCrow.crow_object_child_add (this.nativeHnd, g.nativeHnd);
+				}
 				g.Parent = this;
 				Children.Add (g);
 			}

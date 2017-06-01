@@ -63,18 +63,20 @@ namespace Crow
 		#region CTOR
 		public GraphicObject ()
 		{
-			unsafe {
-				nativeHnd =  LibCrow.crow_object_create ();
-				LibCrow.crow_object_set_type (nativeHnd, CrowType.Simple);
-				nativeHnd->Context = Interface.CurrentInterface.layoutingCtx;
-				//nativeHnd->OnLayoutChanged = Marshal.GetFunctionPointerForDelegate((LayoutChangedCallBack)OnLayoutChanges);
-			}
+			initLibcrow ();
 			#if DEBUG
 			uid = currentUid;
 			currentUid++;
 			#endif
 		}
-		internal protected GraphicObject (bool isInterface){
+		protected virtual void initLibcrow (){
+			unsafe {
+				nativeHnd =  LibCrow.crow_object_create ();
+				LibCrow.crow_object_set_type (nativeHnd, CrowType.Simple);
+				nativeHnd->Context = Interface.CurrentInterface.layoutingCtx;
+				nativeHnd->IsDirty = 1;
+				//nativeHnd->OnLayoutChanged = Marshal.GetFunctionPointerForDelegate((LayoutChangedCallBack)OnLayoutChanges);
+			}
 		}
 		#endregion
 
@@ -102,7 +104,6 @@ namespace Crow
 		bool isActive = false;
 		bool mouseRepeat;
 		bool isEnabled = true;
-		bool cacheEnabled = false;
 		bool clipToClientRect = true;
 		protected object dataSource;
 		string style;
@@ -144,10 +145,10 @@ namespace Crow
 				DataSourceChangeEventArgs e = new DataSourceChangeEventArgs (parent, value);
 				lock (this) {
 					parent = value;
-					if (parent == null)
-						nativeHnd->Parent = null;
-					else
-						nativeHnd->Parent = value.nativeHnd;
+//					if (parent == null)
+//						nativeHnd->Parent = null;
+//					else
+//						nativeHnd->Parent = value.nativeHnd;
 				}
 
 				onParentChanged (this, e);
@@ -240,13 +241,16 @@ namespace Crow
 		/// speeding up rendering of complex object. Default is enabled.
 		/// </summary>
 		[XmlAttributeAttribute][DefaultValue(true)]
-		public virtual bool CacheEnabled {
-			get { return cacheEnabled; }
+		unsafe public virtual bool CacheEnabled {
+			get { return nativeHnd->CacheEnabled>0; }
 			set {
-				if (cacheEnabled == value)
+				if (CacheEnabled == value)
 					return;
-				cacheEnabled = value;
-				NotifyValueChanged ("CacheEnabled", cacheEnabled);
+				if (value)
+					nativeHnd->CacheEnabled = 1;
+				else
+					nativeHnd->CacheEnabled = 0;
+				NotifyValueChanged ("CacheEnabled", CacheEnabled);
 			}
 		}
 		/// <summary>
@@ -467,21 +471,26 @@ namespace Crow
 		}
 		bool clearBackground = false;
 		[XmlAttributeAttribute()][DefaultValue("Transparent")]
-		public virtual Fill Background {
+		unsafe public virtual Fill Background {
 			get { return background; }
 			set {
 				if (background == value)
 					return;
 				clearBackground = false;
+				if (nativeHnd->Background != IntPtr.Zero) {
+					Cairo.NativeMethods.cairo_pattern_destroy (nativeHnd->Background);
+					nativeHnd->Background = IntPtr.Zero;
+				}
 				if (value == null)
 					return;
 				background = value;
+				SolidColor sc = value as SolidColor;
+				if (sc != null) {
+					nativeHnd->Background = Cairo.NativeMethods.cairo_pattern_create_rgba (
+						sc.color.R, sc.color.G, sc.color.B, sc.color.A);
+				}
 				NotifyValueChanged ("Background", background);
 				RegisterForRedraw ();
-				if (background is SolidColor) {
-					if ((Background as SolidColor).Equals (Color.Clear))
-						clearBackground = true;
-				}
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("White")]
@@ -1122,12 +1131,12 @@ namespace Crow
 			if (nativeHnd->Slot.Height < 0 || nativeHnd->Slot.Width < 0 || parent == null)
 				return;
 			lock (this) {
-				if (cacheEnabled) {
+				if (CacheEnabled) {
 					if (nativeHnd->Slot.Width > Interface.MaxCacheSize || nativeHnd->Slot.Height > Interface.MaxCacheSize)
-						cacheEnabled = false;
+						CacheEnabled = false;
 				}
 
-				if (cacheEnabled) {
+				if (CacheEnabled) {
 					if (IsDirty)
 						RecreateCache ();
 

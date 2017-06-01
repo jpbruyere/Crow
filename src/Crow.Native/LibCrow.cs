@@ -33,13 +33,17 @@ namespace Crow.Native
 		#region PINVOKE
 		const string lib = "libcrow";
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
-		unsafe internal static extern IntPtr crow_context_create ();
+		internal static extern IntPtr crow_context_create ();
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
-		unsafe internal static extern void crow_context_destroy (IntPtr ctx);
+		internal static extern void crow_context_destroy (IntPtr ctx);
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
-		unsafe internal static extern void crow_context_process_layouting (IntPtr layCtx);
+		unsafe internal static extern void crow_context_set_root (IntPtr ctx, crow_object_t* root);
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
-		unsafe internal static extern void crow_context_process_clipping (IntPtr ctx);
+		internal static extern void crow_context_process_layouting (IntPtr ctx);
+		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void crow_context_process_clipping (IntPtr ctx);
+		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void crow_context_process_drawing (IntPtr ctx, IntPtr cairoCtx);
 
 		[DllImport(lib)]
 		unsafe internal static extern crow_object_t* crow_object_create();
@@ -50,7 +54,13 @@ namespace Crow.Native
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
 		unsafe internal static extern byte crow_object_do_layout (crow_object_t* go, LayoutingType layout);
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
-		unsafe internal static extern void crow_object_register_layouting (crow_object_t* go, LayoutingType layout);
+		unsafe internal static extern byte crow_object_register_layouting (crow_object_t* go, LayoutingType layout);
+
+
+		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		unsafe internal static extern void crow_object_child_add (crow_object_t* parent, crow_object_t* child);
+		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		unsafe internal static extern void crow_object_child_remove (crow_object_t* parent, crow_object_t* child);
 		#endregion		
 	}
 }

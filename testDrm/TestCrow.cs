@@ -62,6 +62,7 @@ namespace testDrm
 
 		static void Main(){
 			using (Interface iface = new Interface ()) {
+				Console.WriteLine ("is dirty: {0}", iface.IsDirty);
 				iface.ProcessResize (new Rectangle (0, 0, 1024, 768));
 				iface.LoadInterface ("#testDrm.ui.go.crow");
 				iface.Update ();

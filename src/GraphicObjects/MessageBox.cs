@@ -135,7 +135,7 @@ namespace Crow
 			lock (Interface.CurrentInterface.UpdateMutex) {
 				MessageBox mb = new MessageBox ();
 				mb.Initialize ();
-				mb.CurrentInterface.AddWidget (mb);
+				mb.CurrentInterface.AddChild (mb);
 				mb.MsgType = msgBoxType;
 				mb.Message = message;
 				if (!string.IsNullOrEmpty(okMsg))

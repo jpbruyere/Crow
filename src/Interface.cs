@@ -50,7 +50,7 @@ namespace Crow
 	/// 	- Keyboard and Mouse logic
 	/// 	- the resulting bitmap of the interface
 	/// </summary>
-	public class Interface : GraphicObject
+	public class Interface : Group
 	{
 		#region CTOR
 		static Interface(){
@@ -64,14 +64,21 @@ namespace Crow
 			FontRenderingOptions.HintStyle = HintStyle.Medium;
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
 		}
-		public Interface() : base (true){
+		public Interface() : base (){
+			CacheEnabled = true;
+			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+		}
+		protected override void initLibcrow ()
+		{
 			CurrentInterface = this;
 			layoutingCtx = LibCrow.crow_context_create ();
-			unsafe {
-				nativeHnd = LibCrow.crow_object_create ();
-			}
 
-			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+			base.initLibcrow ();
+
+			unsafe {				
+				LibCrow.crow_context_set_root (layoutingCtx, nativeHnd);
+				//nativeHnd->Background = Cairo.NativeMethods.cairo_pattern_create_rgb (1, 0, 1);
+			}
 		}
 		#endregion
 
@@ -268,7 +275,7 @@ namespace Crow
 		{
 			lock (UpdateMutex) {
 				GraphicObject tmp = Load (path);
-				AddWidget (tmp);
+				AddChild (tmp);
 
 				return tmp;
 			}
@@ -471,7 +478,7 @@ namespace Crow
 			#if MEASURE_TIME
 			clippingMeasure.StartCycle();
 			#endif
-			LibCrow.crow_context_process_layouting (layoutingCtx);
+			LibCrow.crow_context_process_clipping (layoutingCtx);
 			#if MEASURE_TIME
 			clippingMeasure.StopCycle();
 			#endif
@@ -483,161 +490,13 @@ namespace Crow
 			drawingMeasure.StartCycle();
 			#endif
 			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
-				using (ctx = new Context (surf)){
-					if (!clipping.IsEmpty) {
-
-						for (int i = 0; i < clipping.NumRectangles; i++)
-							ctx.Rectangle(clipping.GetRectangle(i));
-						ctx.ClipPreserve();
-						ctx.Operator = Operator.Clear;
-						ctx.Fill();
-						ctx.Operator = Operator.Over;
-
-						for (int i = GraphicTree.Count -1; i >= 0 ; i--){
-							GraphicObject p = GraphicTree[i];
-							if (!p.Visible)
-								continue;
-							if (clipping.Contains (p.nativeHnd->Slot) == RegionOverlap.Out)
-								continue;
-
-							ctx.Save ();
-							p.Paint (ref ctx);
-							ctx.Restore ();
-						}
-
-						#if DEBUG_CLIP_RECTANGLE
-						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
-						#endif
-						lock (RenderMutex) {
-//							Array.Copy (bmp, dirtyBmp, bmp.Length);
-
-							IsDirty = true;
-							if (IsDirty)
-								DirtyRect += clipping.Extents;
-							else
-								DirtyRect = clipping.Extents;
-
-							DirtyRect.Left = Math.Max (0, DirtyRect.Left);
-							DirtyRect.Top = Math.Max (0, DirtyRect.Top);
-							DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
-							DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
-							DirtyRect.Width = Math.Max (0, DirtyRect.Width);
-							DirtyRect.Height = Math.Max (0, DirtyRect.Height);
-
-							if (DirtyRect.Width > 0 && DirtyRect.Height >0) {
-								dirtyBmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
-								for (int y = 0; y < DirtyRect.Height; y++) {
-									Array.Copy (bmp,
-										((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
-										dirtyBmp, y * DirtyRect.Width * 4, DirtyRect.Width * 4);
-								}
-
-							} else
-								IsDirty = false;
-						}
-						clipping.Dispose ();
-						clipping = new Region ();
-					}
-					//surf.WriteToPng (@"/mnt/data/test.png");
+				using (ctx = new Context (surf)) {
+					LibCrow.crow_context_process_drawing (layoutingCtx,	ctx.Handle);
 				}
 			}
 			#if MEASURE_TIME
 			drawingMeasure.StopCycle();
 			#endif
-		}
-		#endregion
-
-		#region GraphicTree handling
-		/// <summary>Add widget to the Graphic tree of this interface and register it for layouting</summary>
-		public void AddWidget(GraphicObject g, bool isOverlay = false)
-		{
-			g.Parent = this;
-			int ptr = 0;
-			Window newW = g as Window;
-			if (newW != null) {
-				while (ptr < GraphicTree.Count) {
-					Window w = GraphicTree [ptr] as Window;
-					if (w != null) {
-						if (newW.AlwaysOnTop || !w.AlwaysOnTop)
-							break;
-					}
-					ptr++;
-				}
-			}
-
-			lock (UpdateMutex)
-				GraphicTree.Insert (ptr, g);
-
-			g.RegisteredLayoutings = LayoutingType.None;
-			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
-		}
-		/// <summary>Set visible state of widget to false and remove if from the graphic tree</summary>
-		public void DeleteWidget(GraphicObject g)
-		{
-			if (_hoverWidget != null) {
-				if (g.Contains (_hoverWidget))
-					HoverWidget = null;
-			}
-			lock (UpdateMutex) {
-				g.DataSource = null;
-				g.Visible = false;
-				GraphicTree.Remove (g);
-			}
-		}
-		/// <summary> Put widget on top of other root widgets</summary>
-		public void PutOnTop(GraphicObject g, bool isOverlay = false)
-		{
-			int ptr = 0;
-			Window newW = g as Window;
-			if (newW != null) {
-				while (ptr < GraphicTree.Count) {
-					Window w = GraphicTree [ptr] as Window;
-					if (w != null) {
-						if (newW.AlwaysOnTop || !w.AlwaysOnTop)
-							break;
-					}
-					ptr++;
-				}
-			}
-			if (GraphicTree.IndexOf(g) > ptr)
-			{
-				lock (UpdateMutex) {
-					GraphicTree.Remove (g);
-					GraphicTree.Insert (ptr, g);
-				}
-				EnqueueForRepaint (g);
-			}
-		}
-		/// <summary> Remove all Graphic objects from top container </summary>
-		public void ClearInterface()
-		{
-			lock (UpdateMutex) {
-				while (GraphicTree.Count > 0) {
-					//TODO:parent is not reset to null because object will be added
-					//to ObjectToRedraw list, and without parent, it fails
-					GraphicObject g = GraphicTree [0];
-					g.DataSource = null;
-					g.Visible = false;
-					GraphicTree.RemoveAt (0);
-				}
-			}
-			#if DEBUG_LAYOUTING
-			LQIsTries = new List<LQIList>();
-			curLQIsTries = new LQIList();
-			LQIs = new List<LQIList>();
-			curLQIs = new LQIList();
-			#endif
-		}
-
-		/// <summary>Search a Graphic object in the tree named 'nameToFind'</summary>
-		public GraphicObject FindByName (string nameToFind)
-		{
-			foreach (GraphicObject w in GraphicTree) {
-				GraphicObject r = w.FindByName (nameToFind);
-				if (r != null)
-					return r;
-			}
-			return null;
 		}
 		#endregion
 
@@ -742,8 +601,8 @@ namespace Crow
 					GraphicObject g = GraphicTree [i];
 					if (g.MouseIsIn (e.Position)) {
 						g.checkHoverWidget (e);
-						if (g is Window)
-							PutOnTop (g);
+//						if (g is Window)
+//							PutOnTop (g);
 						return true;
 					}
 				}

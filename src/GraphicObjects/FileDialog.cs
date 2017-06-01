@@ -124,7 +124,7 @@ namespace Crow
 			unloadDialog ((sender as GraphicObject).CurrentInterface);
 		}
 		void unloadDialog(Interface host){
-			host.DeleteWidget (this);
+			host.RemoveChild (this);
 		}
 	}
 }

@@ -41,6 +41,8 @@ namespace Crow.Native {
 		public int ChildrenCount;
 		public crow_object_t* Parent;
 		public crow_object_t** Children;
+		public crow_object_t* LargestChild;
+		public crow_object_t* TallestChild;
 		public int Left;
 		public int Top;
 		public Measure Width;
@@ -48,17 +50,19 @@ namespace Crow.Native {
 		public int Margin;
 		public Size MinimumSize;
 		public Size MaximumSize;
+		public IntPtr Background;
 		public byte Visible;
 		/// <summary>if true, content has to be recreated</summary>
 		public byte IsDirty;
 		public byte InClippingPool;
+		public byte CacheEnabled;
 		public IntPtr Clipping;
 		public LayoutingType RegisteredLayoutings;
+		public Size ContentSize;
 		/// <summary>
 		/// Current size and position computed during layouting pass
 		/// </summary>
 		public Rectangle Slot;
-		public Size ContentSize;
 		/// <summary>
 		/// keep last slot components for each layouting pass to track
 		/// changes and trigger update of other component accordingly
@@ -80,7 +84,7 @@ namespace Crow.Native {
 		public IntPtr OnLayoutChanged;
 		public IntPtr OnChildLayoutChanged;
 		public IntPtr ChildrenLayoutingConstraints;
+		public IntPtr UpdateCache;
 		public IntPtr OnDraw;
-
 	}		
 }

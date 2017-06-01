@@ -56,8 +56,6 @@
     <Compile Include="src\Linux\Bindings\Udev.cs" />
     <Compile Include="src\Linux\Signal.cs" />
     <Compile Include="src\Application.cs" />
-    <Compile Include="Main.cs" />
-    <Compile Include="tests.cs" />
     <Compile Include="testLibInput.cs" />
     <Compile Include="src\EVDEV\Device.cs" />
     <Compile Include="src\Linux\Bindings\EvdevClass.cs" />
@@ -66,7 +64,6 @@
     <Compile Include="src\Linux\DRIControler.cs" />
     <Compile Include="testCairo.cs" />
     <Compile Include="TestCrow.cs" />
-    <Compile Include="Showcase.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -106,5 +103,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ui\go.crow" />
     <EmbeddedResource Include="ui\showcase.crow" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Main.cs" />
+    <None Include="tests.cs" />
+    <None Include="Showcase.cs" />
   </ItemGroup>
 </Project>

@@ -1,2 +1,7 @@
 <?xml version="1.0"?>
-<GraphicObject Width="Stretched" Height="Stretched" Background="Mantis"/>
+<Group Margin="50" Width="Stretched" Height="Stretched" Background="DimGray">
+	<Group Margin="100" Background="Jet" Width="Stretched" Height="Stretched">
+		<GraphicObject Margin="50" Width="Stretched" Height="100" Background="Mantis"/>
+		<GraphicObject Margin="50" Width="Stretched" Height="100" Background="Maize" VerticalAlignment="Bottom"/>
+	</Group>
+</Group>

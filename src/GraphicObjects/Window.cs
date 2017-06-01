@@ -151,8 +151,8 @@ namespace Crow
 					return;
 				alwaysOnTop = value;
 
-				if (alwaysOnTop && Parent != null)
-					CurrentInterface.PutOnTop (this);
+//				if (alwaysOnTop && Parent != null)
+//					CurrentInterface.PutOnTop (this);
 
 				NotifyValueChanged ("AlwaysOnTop", alwaysOnTop);
 			}
@@ -391,7 +391,7 @@ namespace Crow
 
 		protected void close(){
 			Closing.Raise (this, null);
-			CurrentInterface.DeleteWidget (this);
+			CurrentInterface.RemoveChild (this);
 		}
 	}
 }
