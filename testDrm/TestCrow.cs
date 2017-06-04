@@ -34,7 +34,7 @@ namespace testDrm
 	public class TestCrow
 	{
 		//const string lib = "/mnt/data2/devel/crow/libcrow/bin/Debug/libcrow.so";
-		const string lib = "/home/jp/devel/testsharedlib/bin/Debug/libcrow.so";
+		const string lib = "libcrow.so";
 
 		[StructLayout(LayoutKind.Sequential)]
 		public struct testStruct {
@@ -48,26 +48,22 @@ namespace testDrm
 			public int a = 10,b=20;
 		}
 
-		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void testAppDomain();
-
-		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern int gimmePI (ref testStruct t);
-
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		internal static extern int gimme (ref testStruct t);
-
-		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		public extern object UnsafeGetValue (object obj);
+		unsafe extern static string gimme();
+		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void registerICall ();
 
 		static void Main(){
-			using (Interface iface = new Interface ()) {
+			registerICall ();
+			Console.WriteLine (gimme());
+
+			/*using (Interface iface = new Interface ()) {
 				Console.WriteLine ("is dirty: {0}", iface.IsDirty);
 				iface.ProcessResize (new Rectangle (0, 0, 1024, 768));
 				iface.LoadInterface ("#testDrm.ui.go.crow");
 				iface.Update ();
 				iface.DumpTo ("/home/jp/test.png");
-			}
+			}*/
 		}
 	}
 }
