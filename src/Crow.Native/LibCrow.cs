@@ -25,35 +25,38 @@
 // THE SOFTWARE.
 using System;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 
 namespace Crow.Native
 {
-	internal static class LibCrow
+	public static class LibCrow
 	{
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		public unsafe extern static string gimme();
 		#region PINVOKE
 		const string lib = "libcrow";
-		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal static extern IntPtr crow_context_create ();
-		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal static extern void crow_context_destroy (IntPtr ctx);
-		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		unsafe internal static extern void crow_context_set_root (IntPtr ctx, crow_object_t* root);
-		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal static extern void crow_context_process_layouting (IntPtr ctx);
-		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal static extern void crow_context_process_clipping (IntPtr ctx);
-		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal static extern void crow_context_process_drawing (IntPtr ctx, IntPtr cairoCtx);
 
-		[DllImport(lib)]
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		unsafe internal static extern crow_object_t* crow_object_create();
-		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		unsafe internal static extern void crow_object_destroy(crow_object_t* go);
-		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		unsafe internal static extern void crow_object_set_type (crow_object_t* go, CrowType objType);
-		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		unsafe internal static extern byte crow_object_do_layout (crow_object_t* go, LayoutingType layout);
-		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		unsafe internal static extern byte crow_object_register_layouting (crow_object_t* go, LayoutingType layout);
 
 

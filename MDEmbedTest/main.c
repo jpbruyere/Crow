@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <GL/gl.h>
 #include <GL/glext.h>
+#include "../../libcrow/libcrow.h"
 
 /*
  * Very simple mono embedding example.
@@ -26,16 +27,16 @@ static void main_function (MonoDomain *domain, const char *file, int argc, char*
 	assembly = mono_domain_assembly_open (domain, file);
 	if (!assembly)
 		exit (2);
-	a2 = mono_domain_assembly_open (domain, "test2.exe");
-	if (!a2)
-		exit (2);
+	//a2 = mono_domain_assembly_open (domain, "../build/Debug/testDrm.exe");
+	//if (!a2)
+	//	exit (2);
 	/*
 	 * mono_jit_exec() will run the Main() method in the assembly.
 	 * The return value needs to be looked up from
 	 * System.Environment.ExitCode.
 	 */
 	mono_jit_exec (domain, assembly, argc, argv);
-	mono_jit_exec (domain, a2, argc, argv);
+	//mono_jit_exec (domain, a2, argc, argv);
 }
 
 int 
@@ -65,7 +66,22 @@ main(int argc, char* argv[]) {
 	 * We add our special internal call, so that C# code
 	 * can call us back.
 	 */
-	mono_add_internal_call ("MonoEmbed::gimme", gimme);
+	mono_add_internal_call ("Crow.Native.LibCrow::gimme", gimme);
+	mono_add_internal_call ("Crow.Native.LibCrow::crow_context_create", crow_context_create);
+	mono_add_internal_call ("Crow.Native.LibCrow::crow_context_destroy", crow_context_destroy);
+	mono_add_internal_call ("Crow.Native.LibCrow::crow_context_set_root", crow_context_set_root);
+	mono_add_internal_call ("Crow.Native.LibCrow::crow_context_process_clipping", crow_context_process_clipping);
+	mono_add_internal_call ("Crow.Native.LibCrow::crow_context_process_layouting", crow_context_process_layouting);
+	mono_add_internal_call ("Crow.Native.LibCrow::crow_context_process_drawing", crow_context_process_drawing);
+
+	mono_add_internal_call ("Crow.Native.LibCrow::crow_object_create", crow_object_create);
+	mono_add_internal_call ("Crow.Native.LibCrow::crow_object_destroy", crow_object_destroy);
+	mono_add_internal_call ("Crow.Native.LibCrow::crow_object_set_type", crow_object_set_type);
+	mono_add_internal_call ("Crow.Native.LibCrow::crow_object_do_layout", crow_object_do_layout);
+	mono_add_internal_call ("Crow.Native.LibCrow::crow_object_register_layouting", crow_object_register_layouting);
+
+	mono_add_internal_call ("Crow.Native.LibCrow::crow_object_child_add", crow_object_child_add);
+	mono_add_internal_call ("Crow.Native.LibCrow::crow_object_child_remove", crow_object_child_remove);
 
 	main_function (domain, file, argc - 1, argv + 1);
 	

@@ -2,12 +2,13 @@ export PKG_CONFIG_PATH = /opt/mono/lib/pkgconfig
 
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -g -DDEBUG
-LDFLAGS = 
+LDFLAGS = -L/devel/crow/build/Debug 
 
 TARGET  = mdembed
 SOURCES = main.c
 OBJECTS = $(SOURCES:.c=.o)
 
+CFLAGS += -lcrow
 CFLAGS += `pkg-config --cflags --libs mono-2` 
 CFLAGS += `pkg-config --cflags --libs cairo` 
 CFLAGS += `pkg-config --cflags --libs gl`
@@ -28,4 +29,4 @@ clean:
 
 .PHONY: run
 run:
-	-./${TARGET} test.exe
+	-./${TARGET} ../build/Debug/testDrm.exe

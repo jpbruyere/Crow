@@ -24,7 +24,7 @@
     <CustomCommands>
       <CustomCommands>
         <Command type="Build" command="make" />
-        <Command type="Execute" command="make run" externalConsole="True" pauseExternalConsole="True" />
+        <Command type="Execute" command="make run" workingdir="" externalConsole="True" pauseExternalConsole="True" />
       </CustomCommands>
     </CustomCommands>
   </PropertyGroup>

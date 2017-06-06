@@ -48,22 +48,21 @@ namespace testDrm
 			public int a = 10,b=20;
 		}
 
-		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		unsafe extern static string gimme();
+
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void registerICall ();
 
 		static void Main(){
-			registerICall ();
-			Console.WriteLine (gimme());
+			//registerICall ();
+			Console.WriteLine (Crow.Native.LibCrow. gimme());
 
-			/*using (Interface iface = new Interface ()) {
+			using (Interface iface = new Interface ()) {
 				Console.WriteLine ("is dirty: {0}", iface.IsDirty);
 				iface.ProcessResize (new Rectangle (0, 0, 1024, 768));
 				iface.LoadInterface ("#testDrm.ui.go.crow");
 				iface.Update ();
 				iface.DumpTo ("/home/jp/test.png");
-			}*/
+			}
 		}
 	}
 }
