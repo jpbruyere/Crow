@@ -4,6 +4,7 @@ Crow.userprefs
 Debug
 packages
 *.o
+*.so
 *.nupkg
 /GOLib.suo
 /tmp
@@ -23,3 +24,5 @@ Tests/Tests.userprefs
 src/GraphicObjects/Panel.cs
 src/GraphicObjects/VerticalWrappingWidget.cs
 src/GraphicObjects/HorizontalWrappingWidget.cs
+MDEmbedTest/mdembed
+*.exe

@@ -73,6 +73,7 @@ main(int argc, char* argv[]) {
 	mono_add_internal_call ("Crow.Native.LibCrow::crow_context_process_clipping", crow_context_process_clipping);
 	mono_add_internal_call ("Crow.Native.LibCrow::crow_context_process_layouting", crow_context_process_layouting);
 	mono_add_internal_call ("Crow.Native.LibCrow::crow_context_process_drawing", crow_context_process_drawing);
+	mono_add_internal_call ("Crow.Native.LibCrow::crow_context_resize", crow_context_resize);
 
 	mono_add_internal_call ("Crow.Native.LibCrow::crow_object_create", crow_object_create);
 	mono_add_internal_call ("Crow.Native.LibCrow::crow_object_destroy", crow_object_destroy);

@@ -136,7 +136,9 @@ namespace Crow
 
 		#region Public Fields
 		/// <summary>Graphic Tree of this interface</summary>
-		public List<GraphicObject> GraphicTree = new List<GraphicObject>();
+		public GraphicObject[] GraphicTree = new GraphicObject[1024];
+		public int GraphiTreePointer = 0;
+
 		/// <summary>Interface's resulting bitmap</summary>
 		public byte[] bmp;
 		/// <summary>resulting bitmap limited to last redrawn part</summary>
@@ -501,21 +503,14 @@ namespace Crow
 		#endregion
 
 		public void ProcessResize(Rectangle bounds){
-			lock (UpdateMutex) {
-				unsafe {
-					nativeHnd->Slot.Width = bounds.Width;
-					nativeHnd->Slot.Height = bounds.Height;
-				}
+			lock (UpdateMutex) {				
 				clientRectangle = bounds;
 				int stride = 4 * ClientRectangle.Width;
 				int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
 				bmp = new byte[bmpSize];
 				dirtyBmp = new byte[bmpSize];
 
-				foreach (GraphicObject g in GraphicTree)
-					g.RegisterForLayouting (LayoutingType.All);
-
-				RegisterClip (clientRectangle);
+				LibCrow.crow_context_resize (layoutingCtx, bounds.Width, bounds.Height);
 			}
 		}
 
@@ -551,62 +546,62 @@ namespace Crow
 				return true;
 			}
 
-			if (HoverWidget != null) {
-				//check topmost graphicobject first
-				GraphicObject tmp = HoverWidget;
-				GraphicObject topc = null;
-				while (!(tmp is Interface)) {
-					topc = tmp;
-					tmp = tmp.LogicalParent;
-				}
-				int idxhw = GraphicTree.IndexOf (topc);
-				if (idxhw != 0) {
-					int i = 0;
-					while (i < idxhw) {
-						if (GraphicTree [i].localLogicalParentIsNull) {
-							if (GraphicTree [i].MouseIsIn (e.Position)) {
-								while (HoverWidget != null) {
-									HoverWidget.onMouseLeave (HoverWidget, e);
-									HoverWidget = HoverWidget.LogicalParent;
-								}
-
-								GraphicTree [i].checkHoverWidget (e);
-								return true;
-							}
-						}
-						i++;
-					}
-				}
-
-				if (HoverWidget.MouseIsIn (e.Position)) {
-					HoverWidget.checkHoverWidget (e);
-					return true;
-				} else {
-					HoverWidget.onMouseLeave (HoverWidget, e);
-					//seek upward from last focused graph obj's
-					while (!(HoverWidget.LogicalParent is Interface)) {
-						HoverWidget = HoverWidget.LogicalParent;
-						if (HoverWidget.MouseIsIn (e.Position)) {
-							HoverWidget.checkHoverWidget (e);
-							return true;
-						} else
-							HoverWidget.onMouseLeave (HoverWidget, e);
-					}
-				}
-			}
-
-			//top level graphic obj's parsing
-			lock (GraphicTree) {
-				for (int i = 0; i < GraphicTree.Count; i++) {
-					GraphicObject g = GraphicTree [i];
-					if (g.MouseIsIn (e.Position)) {
-						g.checkHoverWidget (e);
-//						if (g is Window)
-//							PutOnTop (g);
-						return true;
-					}
-				}
-			}
+//			if (HoverWidget != null) {
+//				//check topmost graphicobject first
+//				GraphicObject tmp = HoverWidget;
+//				GraphicObject topc = null;
+//				while (!(tmp is Interface)) {
+//					topc = tmp;
+//					tmp = tmp.LogicalParent;
+//				}
+//				int idxhw = GraphicTree.IndexOf (topc);
+//				if (idxhw != 0) {
+//					int i = 0;
+//					while (i < idxhw) {
+//						if (GraphicTree [i].localLogicalParentIsNull) {
+//							if (GraphicTree [i].MouseIsIn (e.Position)) {
+//								while (HoverWidget != null) {
+//									HoverWidget.onMouseLeave (HoverWidget, e);
+//									HoverWidget = HoverWidget.LogicalParent;
+//								}
+//
+//								GraphicTree [i].checkHoverWidget (e);
+//								return true;
+//							}
+//						}
+//						i++;
+//					}
+//				}
+//
+//				if (HoverWidget.MouseIsIn (e.Position)) {
+//					HoverWidget.checkHoverWidget (e);
+//					return true;
+//				} else {
+//					HoverWidget.onMouseLeave (HoverWidget, e);
+//					//seek upward from last focused graph obj's
+//					while (!(HoverWidget.LogicalParent is Interface)) {
+//						HoverWidget = HoverWidget.LogicalParent;
+//						if (HoverWidget.MouseIsIn (e.Position)) {
+//							HoverWidget.checkHoverWidget (e);
+//							return true;
+//						} else
+//							HoverWidget.onMouseLeave (HoverWidget, e);
+//					}
+//				}
+//			}
+//
+//			//top level graphic obj's parsing
+//			lock (GraphicTree) {
+//				for (int i = 0; i < GraphicTree.Count; i++) {
+//					GraphicObject g = GraphicTree [i];
+//					if (g.MouseIsIn (e.Position)) {
+//						g.checkHoverWidget (e);
+////						if (g is Window)
+////							PutOnTop (g);
+//						return true;
+//					}
+//				}
+//			}
 			HoverWidget = null;
 			return false;
 		}

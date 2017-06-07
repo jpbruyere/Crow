@@ -74,6 +74,9 @@ namespace Crow
 				nativeHnd =  LibCrow.crow_object_create ();
 				LibCrow.crow_object_set_type (nativeHnd, CrowType.Simple);
 				nativeHnd->Context = Interface.CurrentInterface.layoutingCtx;
+				nativeHnd->managedIdx = Interface.CurrentInterface.GraphiTreePointer;
+				Interface.CurrentInterface.GraphicTree [Interface.CurrentInterface.GraphiTreePointer] = this;
+				Interface.CurrentInterface.GraphiTreePointer++;
 				nativeHnd->IsDirty = 1;
 				//nativeHnd->OnLayoutChanged = Marshal.GetFunctionPointerForDelegate((LayoutChangedCallBack)OnLayoutChanges);
 			}

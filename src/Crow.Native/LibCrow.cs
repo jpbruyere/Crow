@@ -47,6 +47,8 @@ namespace Crow.Native
 		internal static extern void crow_context_process_clipping (IntPtr ctx);
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal static extern void crow_context_process_drawing (IntPtr ctx, IntPtr cairoCtx);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal static extern void crow_context_resize (IntPtr ctx, int width, int height);
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		unsafe internal static extern crow_object_t* crow_object_create();

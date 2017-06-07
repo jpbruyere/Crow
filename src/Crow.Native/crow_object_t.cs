@@ -37,6 +37,7 @@ namespace Crow.Native {
 	[StructLayout(LayoutKind.Sequential)]
 	unsafe public struct crow_object_t {
 		public CrowType TypeObj;
+		internal int managedIdx;//private managed ptr to allow libcrow to call instance methods
 		public IntPtr Context;
 		public int ChildrenCount;
 		public crow_object_t* Parent;
