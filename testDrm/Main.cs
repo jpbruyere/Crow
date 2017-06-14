@@ -55,8 +55,9 @@ namespace testDrm
 			System.Threading.Thread.CurrentThread.Name = "Main";
 
 			try {
-				using (TestApp crowApp = new TestApp ())					
+				using (TestApp crowApp = new TestApp ()){
 					crowApp.Run ();
+				}
 			} catch (Exception ex) {
 				Console.WriteLine (ex.ToString ());
 			}
@@ -73,7 +74,7 @@ namespace testDrm
 		#endregion
 
 
-		public Command CMDViewPerf, CMDViewCfg, CMDViewTest0, CMDOpen;
+		public Command CMDViewPerf, CMDViewCfg, CMDViewTest0, CMDViewGO, CMDOpen;
 
 		public TestApp () : base () {
 			CrowInterface.KeyboardKeyDown += CrowInterface_KeyboardKeyDown;
@@ -81,12 +82,13 @@ namespace testDrm
 			CMDViewPerf = new Command(new Action(() => Load ("#testDrm.ui.perfMeasures.crow").DataSource = this)) { Caption = "Performances"};
 			CMDViewCfg = new Command(new Action(() => Load ("#testDrm.ui.2.crow").DataSource = this)) { Caption = "Configuration"};
 			CMDViewTest0 = new Command(new Action(() => Load ("#testDrm.ui.0.crow").DataSource = this)) { Caption = "Test view 0"};
+			CMDViewGO = new Command(new Action(() => Load ("#testDrm.ui.go.crow").DataSource = this)) { Caption = "graphic test"};
 			CMDOpen = new Command(new Action(() => { 
 				lock (CrowInterface.UpdateMutex) CrowInterface.AddWidget(new FileDialog());})) { Caption = "Open"};
 
 			Load ("#testDrm.ui.menu.crow").DataSource = this;
 
-			initTests ();
+			//initTests ();
 		}
 
 		void CrowInterface_KeyboardKeyDown (object sender, KeyboardKeyEventArgs e)

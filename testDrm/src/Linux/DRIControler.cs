@@ -231,7 +231,7 @@ namespace Linux.DRI {
 			//setScanOutRegion();
 			//Thread.Sleep (100);
 
-			initPageFlipUpdate ();
+			//initPageFlipUpdate ();
 			return true;
 		}
 

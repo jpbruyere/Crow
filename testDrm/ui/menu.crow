@@ -10,6 +10,7 @@
 		<MenuItem Command="{CMDViewPerf}"/>
 		<MenuItem Command="{CMDViewCfg}"/>
 		<MenuItem Command="{CMDViewTest0}"/>
+		<MenuItem Command="{CMDViewGO}"/>
 	</MenuItem>
 	<MenuItem Caption="Edit" Name="edit" Width="Fit">
 		<MenuItem Caption="Cut"/>

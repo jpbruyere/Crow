@@ -14,4 +14,5 @@ FpsDisp {
 }
 Window {
 	Template = #Crow.ToolWindow.template;
+	Background = DimGray;
 }

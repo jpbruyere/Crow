@@ -101,7 +101,7 @@ namespace Crow
 					Console.WriteLine (ex.ToString ());	
 				}
 			}
-
+				
 			gpu = new DRIControler();
 
 			initCrow ();
@@ -591,11 +591,11 @@ namespace Crow
 			gpu = null;
 
 			using (VTControler master = new VTControler ()) {
-				//				try {
-				//					master.KDMode = VT.KDMode.TEXT;
-				//				} catch (Exception ex) {
-				//					Console.WriteLine (ex.ToString ());	
-				//				}
+				try {
+					master.KDMode = KDMode.TEXT;
+				} catch (Exception ex) {
+					Console.WriteLine (ex.ToString ());	
+				}
 				master.SwitchTo (previousVT);
 			}
 
