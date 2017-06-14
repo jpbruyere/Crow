@@ -97,18 +97,18 @@ namespace Crow
 		{
 			int d = 0;
 			if (Orientation == Orientation.Horizontal) {
-				foreach (GraphicObject c in Children) {
-					if (!c.Visible)
+				for (int i = 0; i < Children.Count; i++) {
+					if (!Children[i].Visible)
 						continue;
-					c.Slot.X = d;
-					d += c.Slot.Width + Spacing;
+					Children[i].Slot.X = d;
+					d += Children[i].Slot.Width + Spacing;
 				}
 			} else {
-				foreach (GraphicObject c in Children) {
-					if (!c.Visible)
+				for (int i = 0; i < Children.Count; i++) {
+					if (!Children[i].Visible)
 						continue;					
-					c.Slot.Y = d;
-					d += c.Slot.Height + Spacing;
+					Children[i].Slot.Y = d;
+					d += Children[i].Slot.Height + Spacing;
 				}
 			}
 			IsDirty = true;
