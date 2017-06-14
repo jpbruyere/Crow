@@ -630,8 +630,8 @@ namespace Crow
 		/// <summary>Search a Graphic object in the tree named 'nameToFind'</summary>
 		public GraphicObject FindByName (string nameToFind)
 		{
-			foreach (GraphicObject w in GraphicTree) {
-				GraphicObject r = w.FindByName (nameToFind);
+			for (int i = 0; i < GraphicTree.Count; i++) {
+				GraphicObject r = GraphicTree[i].FindByName (nameToFind);
 				if (r != null)
 					return r;
 			}
@@ -647,8 +647,8 @@ namespace Crow
 				int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
 				bmp = new byte[bmpSize];
 
-				foreach (GraphicObject g in GraphicTree)
-					g.RegisterForLayouting (LayoutingType.All);
+				for (int i = 0; i < GraphicTree.Count; i++)
+					GraphicTree[i].RegisterForLayouting (LayoutingType.All);
 
 				clipping.AddRectangle (clientRectangle);
 			}

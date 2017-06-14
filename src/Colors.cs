@@ -88,10 +88,9 @@ namespace Crow
 
 			if (c.Length == 1)
 			{
-				foreach (Color cr in ColorDic)
-				{
-					if (string.Equals(cr.Name,s,StringComparison.Ordinal))
-						return cr;
+				for (int i = 0; i < ColorDic.Count; i++) {
+					if (string.Equals(ColorDic [i].Name,s,StringComparison.Ordinal))
+						return ColorDic [i];
 				}
 			}
 			return new Color(
@@ -1127,12 +1126,10 @@ namespace Crow
 			if (!string.IsNullOrEmpty(Name))
 				return Name;
 
-			foreach (Color cr in ColorDic)
-			{
-				if (cr == this)
-				{
-					Name = cr.Name;
-					return cr.Name;
+			for (int i = 0; i < ColorDic.Count; i++) {
+				if (ColorDic[i] == this) {
+					Name = ColorDic[i].Name;
+					return ColorDic[i].Name;
 				}
 			}
 

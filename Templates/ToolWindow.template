@@ -19,6 +19,6 @@
 				<GraphicObject Width="5"/>
 			</HorizontalStack>
 <!--		</Border>-->
-		<Container Name="Content" MinimumSize="50,50" Background="0.5,0.5,0.5,0.5"/>
+		<Container Name="Content" MinimumSize="50,50" />
 	</VerticalStack>
 </Border>
