@@ -85,9 +85,6 @@
     <None Include="Interfaces\tmpDirItem.goml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Interfaces\GraphicObject\0.crow">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Interfaces\GraphicObject\1.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -356,6 +353,9 @@
     <EmbeddedResource Include="Interfaces\CheckBox2.imlt" />
     <EmbeddedResource Include="Interfaces\perfMsr.crow" />
     <EmbeddedResource Include="ui\showcase.crow" />
+    <EmbeddedResource Include="Interfaces\GraphicObject\0.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">

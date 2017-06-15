@@ -29,4 +29,4 @@ clean:
 
 .PHONY: run
 run:
-	-./${TARGET} ../build/Debug/testDrm.exe
+	-./${TARGET} ../build/Debug/Tests.exe

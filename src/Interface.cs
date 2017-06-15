@@ -382,6 +382,16 @@ namespace Crow
 		}
 		#endregion
 
+		public override void AddChild (GraphicObject g)
+		{
+			lock(RenderMutex)
+				base.AddChild (g);
+		}
+		public override void RemoveChild (GraphicObject child)
+		{
+			lock(RenderMutex)
+				base.RemoveChild (child);
+		}
 
 		#region UPDATE Loops
 		/// <summary>Enqueue Graphic object for Repaint, DrawingQueue is locked because

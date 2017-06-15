@@ -888,7 +888,7 @@ namespace Crow
 			if (Width.IsFit || Height.IsFit)
 				RegisterForLayouting (LayoutingType.Sizing);
 			else if (RegisteredLayoutings == LayoutingType.None)
-				CurrentInterface.EnqueueForRepaint (this);
+				LibCrow.crow_object_register_repaint (nativeHnd);
 		}
 		/// <summary> query an update of the content, a redraw </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -896,7 +896,7 @@ namespace Crow
 		{
 			IsDirty = true;
 			if (RegisteredLayoutings == LayoutingType.None)
-				CurrentInterface.EnqueueForRepaint (this);
+				LibCrow.crow_object_register_repaint (nativeHnd);
 		}
 		#endregion
 
@@ -912,7 +912,8 @@ namespace Crow
 		}
 
 		unsafe public virtual void RegisterForLayouting(LayoutingType layoutType){
-			LibCrow.crow_object_register_layouting (this.nativeHnd, layoutType);
+			lock (CurrentInterface.LayoutMutex)
+				LibCrow.crow_object_register_layouting (this.nativeHnd, layoutType);
 		}
 
 		/// <summary> trigger dependant sizing component update </summary>

@@ -182,11 +182,11 @@ namespace Crow
 			if (ifaceControl.Count == 0)//create default orthogonal interface
 				addInterfaceControler (new InterfaceControler (
 					new Rectangle (0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height)));
-			ifaceControl [interfaceIdx].CrowInterface.AddWidget (g);
+			ifaceControl [interfaceIdx].CrowInterface.AddChild (g);
 			return g;
 		}
 		public void DeleteWidget (GraphicObject g, int interfaceIdx = 0){
-			ifaceControl [interfaceIdx].CrowInterface.DeleteWidget (g);
+			ifaceControl [interfaceIdx].CrowInterface.RemoveChild (g);
 		}
 		public GraphicObject Load (string path, int interfaceIdx = 0){
 			if (ifaceControl.Count == 0)//create default orthogonal interface
@@ -203,7 +203,7 @@ namespace Crow
 			return null;
 		}
 		public void ClearInterface (int interfaceIdx = 0){
-			ifaceControl [interfaceIdx].CrowInterface.ClearInterface ();
+			ifaceControl [interfaceIdx].CrowInterface.ClearChildren ();
 		}
 		/// <summary>Override this method for your OpenGL rendering calls</summary>
 		public virtual void OnRender(FrameEventArgs e)

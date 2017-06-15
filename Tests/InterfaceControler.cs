@@ -162,7 +162,7 @@ namespace Crow
 
 			while (true) {
 				CrowInterface.Update ();
-				Thread.Sleep (3);
+				Thread.Sleep (1000);
 			}
 		}
 

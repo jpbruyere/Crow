@@ -60,6 +60,8 @@ namespace Crow.Native
 		unsafe internal static extern byte crow_object_do_layout (crow_object_t* go, LayoutingType layout);
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		unsafe internal static extern byte crow_object_register_layouting (crow_object_t* go, LayoutingType layout);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		unsafe internal static extern void crow_object_register_repaint (crow_object_t* go);
 
 
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl)]
