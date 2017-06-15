@@ -719,10 +719,10 @@ namespace Crow
 			//set local GraphicObject to root object passed as 1st argument
 			il.Emit (OpCodes.Ldarg_0);
 			il.Emit (OpCodes.Stloc_0);
-			EventInfo[] eis = thisType.GetEvents(BindingFlags.Public | BindingFlags.Instance);
-			for (int i = 0; i < eis.Length; i++) {
+
+			foreach (EventInfo ei in thisType.GetEvents(BindingFlags.Public | BindingFlags.Instance)) {
 				string expression;
-				if (!getDefaultEvent(eis[i], styling, out expression))
+				if (!getDefaultEvent(ei, styling, out expression))
 					continue;
 				//TODO:dynEventHandler could be cached somewhere, maybe a style instanciator class holding the styling delegate and bound to it.
 				foreach (string exp in CompilerServices.splitOnSemiColumnOutsideAccolades(expression)) {
@@ -733,15 +733,15 @@ namespace Crow
 						//push eventInfo as 1st arg of compile
 						il.Emit (OpCodes.Ldloc_0);
 						il.Emit (OpCodes.Call, CompilerServices.miGetType);
-						il.Emit (OpCodes.Ldstr, eis[i].Name);//push event name
+						il.Emit (OpCodes.Ldstr, ei.Name);//push event name
 						il.Emit (OpCodes.Call, CompilerServices.miGetEvent);
 						//push expression as 2nd arg of compile
 						il.Emit (OpCodes.Ldstr, trimed.Substring (1, trimed.Length - 2));
 						//push null as 3rd arg, currentNode, not known when instanciing
 						il.Emit (OpCodes.Ldnull);
 						il.Emit (OpCodes.Callvirt, CompilerServices.miCompileDynEventHandler);
-						il.Emit (OpCodes.Castclass, eis[i].EventHandlerType);
-						il.Emit (OpCodes.Callvirt, eis[i].AddMethod);
+						il.Emit (OpCodes.Castclass, ei.EventHandlerType);
+						il.Emit (OpCodes.Callvirt, ei.AddMethod);
 					}else
 						Debug.WriteLine("error in styling, event not handled : " + trimed);
 				}

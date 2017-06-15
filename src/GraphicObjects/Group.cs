@@ -135,10 +135,9 @@ namespace Crow
 		{
 			base.OnDataSourceChanged (this, e);
 			lock (children) {
-				for (int i = 0; i < children.Count; i++) {
-					if (children[i].localDataSourceIsNull & children[i].localLogicalParentIsNull)
-						children[i].OnDataSourceChanged (sender, e);
-				}
+				foreach (GraphicObject g in children)
+					if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
+						g.OnDataSourceChanged (sender, e);
 			}
 		}
 		public override GraphicObject FindByName (string nameToFind)
@@ -147,8 +146,8 @@ namespace Crow
 				return this;
 			GraphicObject tmp = null;
 			lock (children) {
-				for (int i = 0; i < children.Count; i++) {
-					tmp = children[i].FindByName (nameToFind);
+				foreach (GraphicObject w in Children) {
+					tmp = w.FindByName (nameToFind);
 					if (tmp != null)
 						break;
 				}
@@ -157,10 +156,10 @@ namespace Crow
 		}
 		public override bool Contains (GraphicObject goToFind)
 		{
-			for (int i = 0; i < children.Count; i++) {
-				if (children[i] == goToFind)
+			foreach (GraphicObject w in Children) {
+				if (w == goToFind)
 					return true;
-				if (children[i].Contains (goToFind))
+				if (w.Contains (goToFind))
 					return true;
 			}
 			return false;
@@ -196,19 +195,19 @@ namespace Crow
 			//position smaller objects in group when group size is fit
 			switch (layoutType) {
 			case LayoutingType.Width:
-				for (int i = 0; i < children.Count; i++) {
-					if (children[i].Width.Units == Unit.Percent)
-						children[i].RegisterForLayouting (LayoutingType.Width);
+				foreach (GraphicObject c in Children){
+					if (c.Width.Units == Unit.Percent)
+						c.RegisterForLayouting (LayoutingType.Width);
 					else
-						children[i].RegisterForLayouting (LayoutingType.X);
+						c.RegisterForLayouting (LayoutingType.X);
 				}
 				break;
 			case LayoutingType.Height:
-				for (int i = 0; i < children.Count; i++) {
-					if (children[i].Height.Units == Unit.Percent)
-						children[i].RegisterForLayouting (LayoutingType.Height);
+				foreach (GraphicObject c in Children) {
+					if (c.Height.Units == Unit.Percent)
+						c.RegisterForLayouting (LayoutingType.Height);
 					else
-						children[i].RegisterForLayouting (LayoutingType.Y);
+						c.RegisterForLayouting (LayoutingType.Y);
 				}
 				break;
 			}
@@ -226,8 +225,8 @@ namespace Crow
 			}
 
 			lock (children) {
-				for (int i = 0; i < children.Count; i++) {
-					children[i].Paint (ref gr);
+				foreach (GraphicObject g in Children) {
+					g.Paint (ref gr);
 				}
 			}
 			gr.Restore ();
@@ -248,12 +247,11 @@ namespace Crow
 					gr.Clip ();
 
 					lock (Children) {
-						for (int i = 0; i < children.Count; i++) {
-							if (!children[i].Visible)
+						foreach (GraphicObject c in Children) {
+							if (!c.Visible)
 								continue;
-							if (Clipping.Contains (children[i].Slot + ClientRectangle.Position) == RegionOverlap.Out)
-								continue;
-							children[i].Paint (ref gr);
+							if (Clipping.intersect (c.Slot + ClientRectangle.Position))
+								c.Paint (ref gr);
 						}
 					}
 
