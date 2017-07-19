@@ -160,7 +160,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Drawing" />
-    <Reference Include="cairo-sharp" />
     <Reference Include="Mono.Cairo" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
