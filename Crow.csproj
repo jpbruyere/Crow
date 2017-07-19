@@ -23,9 +23,6 @@
     <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
     <AssemblyOriginatorKeyFile>crow.key</AssemblyOriginatorKeyFile>
-    <ReleaseVersion>0.5</ReleaseVersion>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -154,6 +151,8 @@
     <Compile Include="src\PerformanceMeasure.cs" />
     <Compile Include="src\IML\BindingMember.cs" />
     <Compile Include="src\CrowThread.cs" />
+    <Compile Include="src\GraphicObjects\ScrollingObject.cs" />
+    <Compile Include="src\GraphicObjects\ScrollingTextBox.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -161,9 +160,8 @@
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Drawing" />
-    <Reference Include="cairo-sharp">
-      <Package>gtk-sharp-3.0</Package>
-    </Reference>
+    <Reference Include="cairo-sharp" />
+    <Reference Include="Mono.Cairo" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
