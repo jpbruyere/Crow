@@ -38,7 +38,7 @@ using System.IO;
 
 namespace Crow
 {
-	public class GraphicObject : IXmlSerializable, ILayoutable, IValueChange, ICloneable
+	public class GraphicObject : ILayoutable, IValueChange
 	{
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
@@ -58,8 +58,7 @@ namespace Crow
 			}
 		}
 
-		Rectangles clipping = new Rectangles();
-		public Rectangles Clipping { get { return clipping; }}
+		public Region Clipping;
 
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
@@ -73,20 +72,22 @@ namespace Crow
 		#region CTOR
 		public GraphicObject ()
 		{
+			Clipping = new Region ();
 			#if DEBUG
 			uid = currentUid;
 			currentUid++;
 			#endif
 		}
 		#endregion
-
+		internal bool initialized = false;
 		/// <summary>
 		/// Initialize this Graphic object instance by setting style and default values and loading template if required
 		/// </summary>
 		public virtual void Initialize(){
 			if (currentInterface == null)
-				currentInterface = Interface.CurrentInterface;
+				currentInterface = Interface.CurrentInterface;			
 			loadDefaultValues ();
+			initialized = true;
 		}
 		#region private fields
 		LayoutingType registeredLayoutings = LayoutingType.All;
@@ -844,7 +845,7 @@ namespace Crow
 		public virtual void RegisterClip(Rectangle clip){
 			Rectangle  r = clip + ClientRectangle.Position;
 			if (CacheEnabled && !IsDirty)
-				Clipping.AddRectangle (r);
+				Clipping.UnionRectangle (r);
 			if (Parent == null)
 				return;
 			GraphicObject p = Parent as GraphicObject;
@@ -1107,7 +1108,7 @@ namespace Crow
 			Rectangle rBack = new Rectangle (Slot.Size);
 
 			Background.SetAsSource (gr, rBack);
-			CairoHelpers.CairoRectangle(gr,rBack,cornerRadius);
+			CairoHelpers.CairoRectangle (gr, rBack, cornerRadius);
 			gr.Fill ();
 		}
 
@@ -1137,8 +1138,8 @@ namespace Crow
 			}
 			ctx.SetSourceSurface (bmp, rb.X, rb.Y);
 			ctx.Paint ();
-			//Clipping.clearAndClip (ctx);
-			Clipping.Reset();
+			Clipping.Dispose ();
+			Clipping = new Region ();
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version
 		/// of the widget </summary>
@@ -1332,195 +1333,6 @@ namespace Crow
 		protected virtual void onLogicalParentChanged(object sender, DataSourceChangeEventArgs e) {
 			LogicalParentChanged.Raise (this, e);
 		}
-		#region IXmlSerializable
-		public virtual System.Xml.Schema.XmlSchema GetSchema ()
-		{
-			return null;
-		}
-//		void affectMember(string name, string value){
-//			Type thisType = this.GetType ();
-//
-//			if (string.IsNullOrEmpty (value))
-//				return;
-//
-//			MemberInfo mi = thisType.GetMember (name).FirstOrDefault();
-//			if (mi == null) {
-//				Debug.WriteLine ("XML: Unknown attribute in " + thisType.ToString() + " : " + name);
-//				return;
-//			}
-//			if (mi.MemberType == MemberTypes.Event) {
-//				this.Bindings.Add (new Binding (new MemberReference(this, mi), value));
-//				return;
-//			}
-//			if (mi.MemberType == MemberTypes.Property) {
-//				PropertyInfo pi = mi as PropertyInfo;
-//
-//				if (pi.GetSetMethod () == null) {
-//					Debug.WriteLine ("XML: Read only property in " + thisType.ToString() + " : " + name);
-//					return;
-//				}
-//
-//				XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
-//				if (xaa != null) {
-//					if (!string.IsNullOrEmpty (xaa.AttributeName))
-//						name = xaa.AttributeName;
-//				}
-//				if (value.StartsWith("{",StringComparison.Ordinal)) {
-//					//binding
-//					if (!value.EndsWith("}", StringComparison.Ordinal))
-//						throw new Exception (string.Format("XML:Malformed binding: {0}", value));
-//
-//					this.Bindings.Add (new Binding (new MemberReference(this, pi), value.Substring (1, value.Length - 2)));
-//					return;
-//				}
-//				if (pi.GetCustomAttribute (typeof(XmlIgnoreAttribute)) != null)
-//					return;
-//				if (xaa == null)//not define as xmlAttribute
-//					return;
-//
-//				if (pi.PropertyType == typeof(string)) {
-//					pi.SetValue (this, value, null);
-//					return;
-//				}
-//
-//				if (pi.PropertyType.IsEnum) {
-//					pi.SetValue (this, Enum.Parse (pi.PropertyType, value), null);
-//				} else {
-//					MethodInfo me = pi.PropertyType.GetMethod ("Parse", new Type[] { typeof(string) });
-//					pi.SetValue (this, me.Invoke (null, new string[] { value }), null);
-//				}
-//			}
-//		}
-		public virtual void ReadXml (System.Xml.XmlReader reader)
-		{
-			if (reader.HasAttributes) {
-
-				style = reader.GetAttribute ("Style");
-
-				loadDefaultValues ();
-
-				while (reader.MoveToNextAttribute ()) {
-					if (reader.Name == "Style")
-						continue;
-
-					//affectMember (reader.Name, reader.Value);
-				}
-				reader.MoveToElement ();
-			}else
-				loadDefaultValues ();
-		}
-		public virtual void WriteXml (System.Xml.XmlWriter writer)
-		{
-			foreach (PropertyInfo pi in this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
-				if (pi.GetSetMethod () == null)
-					continue;
-
-				bool isAttribute = false;
-				bool hasDefaultValue = false;
-				bool ignore = false;
-				string name = "";
-				object value = null;
-				Type valueType = null;
-
-
-				MemberInfo mi = pi.GetGetMethod ();
-
-				if (mi == null)
-					continue;
-
-				value = pi.GetValue (this, null);
-				valueType = pi.PropertyType;
-				name = pi.Name;
-
-
-
-				object[] att = pi.GetCustomAttributes (false);
-
-				foreach (object o in att) {
-					XmlAttributeAttribute xaa = o as XmlAttributeAttribute;
-					if (xaa != null) {
-						isAttribute = true;
-						if (string.IsNullOrEmpty (xaa.AttributeName))
-							name = pi.Name;
-						else
-							name = xaa.AttributeName;
-						continue;
-					}
-
-					XmlIgnoreAttribute xia = o as XmlIgnoreAttribute;
-					if (xia != null) {
-						ignore = true;
-						continue;
-					}
-
-					DefaultValueAttribute dv = o as DefaultValueAttribute;
-					if (dv != null) {
-						if (dv.Value.Equals (value))
-							hasDefaultValue = true;
-						if (dv.Value.ToString () == value.ToString ())
-							hasDefaultValue = true;
-
-						continue;
-					}
-
-
-				}
-
-				if (hasDefaultValue || ignore || value==null)
-					continue;
-
-				if (isAttribute)
-					writer.WriteAttributeString (name, value.ToString ());
-				else {
-					if (valueType.GetInterface ("IXmlSerializable") == null)
-						continue;
-
-					(pi.GetValue (this, null) as IXmlSerializable).WriteXml (writer);
-				}
-			}
-			foreach (EventInfo ei in this.GetType().GetEvents()) {
-				FieldInfo fi = this.GetType().GetField(ei.Name,
-					BindingFlags.NonPublic |
-					BindingFlags.Instance |
-					BindingFlags.GetField);
-
-				Delegate dg = (System.Delegate)fi.GetValue (this);
-
-				if (dg == null)
-					continue;
-
-				foreach (Delegate d in dg.GetInvocationList()) {
-					if (!d.Method.Name.StartsWith ("<"))//Skipping empty handler, not clear it's trikky
-						writer.WriteAttributeString (ei.Name, d.Method.Name);
-				}
-			}
-		}
-		#endregion
-
-		#region ICloneable implementation
-		public object Clone ()
-		{
-			Type type = this.GetType ();
-			GraphicObject result = (GraphicObject)Activator.CreateInstance (type);
-			result.CurrentInterface = CurrentInterface;
-
-			foreach (PropertyInfo pi in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
-				if (pi.GetSetMethod () == null)
-					continue;
-
-				if (pi.GetCustomAttribute<XmlIgnoreAttribute> () != null)
-					continue;
-				if (pi.Name == "DataSource")
-					continue;
-
-				pi.SetValue(result, pi.GetValue(this));
-			}
-			return result;
-		}
-		#endregion
-		/// <summary>
-		/// full GraphicTree clone with binding definition
-		/// </summary>
 
 		public override string ToString ()
 		{

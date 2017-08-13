@@ -27,7 +27,6 @@
 using System;
 using System.IO;
 using System.Diagnostics;
-using OpenTK;
 using System.Collections.Generic;
 
 namespace Crow

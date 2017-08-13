@@ -27,7 +27,6 @@
 using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
-using OpenTK.Input;
 
 namespace Crow
 {
