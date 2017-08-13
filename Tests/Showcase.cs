@@ -67,7 +67,9 @@ namespace Tests
 		{
 			FileSystemInfo fi = e.NewValue as FileSystemInfo;
 			if (fi == null)
-				return;			
+				return;
+			if (fi is DirectoryInfo)
+				return;
 			lock (this.ifaceControl [0].CrowInterface.UpdateMutex) {
 				GraphicObject g = this.ifaceControl [0].CrowInterface.Load (fi.FullName);
 				crowContainer.SetChild (g);
