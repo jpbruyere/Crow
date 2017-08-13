@@ -126,7 +126,15 @@ namespace Crow
 		{
 			return s.Width <= i && s.Height <= i ? true : false;
 		}
-        public static bool operator <=(Size s1, Size s2)
+		public static bool operator >(Size s, int i)
+		{
+			return s.Width > i && s.Height > i ? true : false;
+		}
+		public static bool operator >=(Size s, int i)
+		{
+			return s.Width >= i && s.Height >= i ? true : false;
+		}
+		public static bool operator <=(Size s1, Size s2)
         {
             if (s1.Width <= s2.Width && s1.Height <= s2.Height)
                 return true;
