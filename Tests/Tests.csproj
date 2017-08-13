@@ -40,9 +40,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Drawing" />
-    <Reference Include="cairo-sharp">
-      <Package>gtk-sharp-3.0</Package>
-    </Reference>
     <Reference Include="OpenTK">
       <HintPath>$(SolutionDir)packages\OpenTK.2.0.0\lib\net20\OpenTK.dll</HintPath>
       <Package>opentk</Package>
