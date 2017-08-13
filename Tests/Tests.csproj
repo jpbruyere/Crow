@@ -28,12 +28,16 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <DefineConstants>DEBUG;TRACE;MEASURE_TIME</DefineConstants>
+    <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
+    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <WarningLevel>0</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
+    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -42,7 +46,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="OpenTK">
       <HintPath>$(SolutionDir)packages\OpenTK.2.0.0\lib\net20\OpenTK.dll</HintPath>
-      <Package>opentk</Package>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

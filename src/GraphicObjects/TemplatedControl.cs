@@ -37,7 +37,7 @@ using System.Reflection;
 
 namespace Crow
 {
-	public abstract class TemplatedControl : PrivateContainer, IXmlSerializable
+	public abstract class TemplatedControl : PrivateContainer
 	{
 		#region CTOR
 		public TemplatedControl () : base()
@@ -111,100 +111,6 @@ namespace Crow
 			}else
 				this.SetChild (template);
 		}
-
-		//TODO:IXmlSerializable is not used anymore
-		#region IXmlSerializable
-		public override System.Xml.Schema.XmlSchema GetSchema(){ return null; }
-		public override void ReadXml(System.Xml.XmlReader reader)
-		{
-			//Template could be either an attribute containing path or expressed inlined
-			//as a Template Element
-			using (System.Xml.XmlReader subTree = reader.ReadSubtree())
-			{
-				subTree.Read ();
-
-				string template = reader.GetAttribute ("Template");
-				string tmp = subTree.ReadOuterXml ();
-
-				//Load template from path set as attribute in templated control
-				if (string.IsNullOrEmpty (template)) {
-					//seek for template tag first
-					using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
-						//load template first if inlined
-
-						xr.Read (); //read first child
-						xr.Read (); //skip root node
-
-						while (!xr.EOF) {
-							if (!xr.IsStartElement ()) {
-								xr.Read ();
-								continue;
-							}
-							if (xr.Name == "ItemTemplate") {
-								string dataType = "default", datas = "", itemTmp;
-								while (xr.MoveToNextAttribute ()) {
-									if (xr.Name == "DataType")
-										dataType = xr.Value;
-									else if (xr.Name == "Data")
-										datas = xr.Value;
-								}
-								xr.MoveToElement ();
-								itemTmp = xr.ReadInnerXml ();
-
-//								if (ItemTemplates == null)
-//									ItemTemplates = new Dictionary<string, ItemTemplate> ();
-//
-//								using (IMLReader iTmp = new IMLReader (null, itemTmp)) {
-//									ItemTemplates [dataType] =
-//										new ItemTemplate (iTmp.RootType, iTmp.GetLoader (), dataType, datas);
-//								}
-//								if (!string.IsNullOrEmpty (datas))
-//									ItemTemplates [dataType].CreateExpandDelegate(this);
-
-								continue;
-							}
-							if (xr.Name == "Template") {
-								xr.Read ();
-
-								Type t = Type.GetType ("Crow." + xr.Name);
-								if (t == null) {
-									Assembly a = Assembly.GetEntryAssembly ();
-									foreach (Type expT in a.GetExportedTypes ()) {
-										if (expT.Name == xr.Name) {
-											t = expT;
-											break;
-										}
-									}
-								}
-								GraphicObject go = (GraphicObject)Activator.CreateInstance (t);
-								(go as IXmlSerializable).ReadXml (xr);
-
-								loadTemplate (go);
-								continue;
-							}
-							xr.ReadInnerXml ();
-						}
-					}
-				} else
-					loadTemplate (CurrentInterface.Load (template));
-
-				//if no template found, load default one
-				if (this.child == null)
-					loadTemplate ();
-
-				//normal xml read
-				using (XmlReader xr = new XmlTextReader (tmp, XmlNodeType.Element, null)) {
-					xr.Read ();
-					base.ReadXml(xr);
-				}
-			}
-		}
-		public override void WriteXml(System.Xml.XmlWriter writer)
-		{
-			//TODO:
-			throw new NotImplementedException();
-		}
-		#endregion
 	}
 }
 

@@ -110,6 +110,14 @@ namespace Crow
 		#region Events
 		public event EventHandler<MouseCursorChangedEventArgs> MouseCursorChanged;
 		public event EventHandler Quit;
+
+		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
+		public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
+		public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
+		public event EventHandler<MouseButtonEventArgs> MouseClick;
+		public event EventHandler<MouseMoveEventArgs> MouseMove;
+		public event EventHandler<KeyboardKeyEventArgs> KeyboardKeyDown;
+		public event EventHandler<KeyboardKeyEventArgs> KeyboardKeyUp;
 		#endregion
 
 		#region Public Fields
@@ -152,7 +160,7 @@ namespace Crow
 		/// <summary>Client rectangle in the host context</summary>
 		Rectangle clientRectangle;
 		/// <summary>Clipping rectangles on the root context</summary>
-		Rectangles clipping = new Rectangles();
+		Region clipping = new Region();
 		/// <summary>Main Cairo context</summary>
 		Context ctx;
 		/// <summary>Main Cairo surface</summary>
@@ -387,15 +395,19 @@ namespace Crow
 			if (mouseRepeatCount > 0) {
 				int mc = mouseRepeatCount;
 				mouseRepeatCount -= mc;
-				for (int i = 0; i < mc; i++) {
-					FocusedWidget.onMouseClick (this, new MouseButtonEventArgs (Mouse.X, Mouse.Y, MouseButton.Left, true));
+				if (_focusedWidget != null) {
+					for (int i = 0; i < mc; i++) {
+						_focusedWidget.onMouseClick (this, new MouseButtonEventArgs (Mouse.X, Mouse.Y, MouseButton.Left, true));
+					}
 				}
 			}
 			if (keyboardRepeatCount > 0) {
 				int mc = keyboardRepeatCount;
 				keyboardRepeatCount -= mc;
-				for (int i = 0; i < mc; i++) {
-					_focusedWidget.onKeyDown (this, lastKeyDownEvt);
+				if (_focusedWidget != null) {
+					for (int i = 0; i < mc; i++) {
+						_focusedWidget.onKeyDown (this, lastKeyDownEvt);
+					}
 				}
 			}
 			CrowThread[] tmpThreads;
@@ -490,20 +502,24 @@ namespace Crow
 			#endif
 			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
 				using (ctx = new Context (surf)){
-					if (clipping.count > 0) {
-						//Link.draw (ctx);
-						clipping.clearAndClip(ctx);
+					if (!clipping.IsEmpty) {
+
+						for (int i = 0; i < clipping.NumRectangles; i++)
+							ctx.Rectangle(clipping.GetRectangle(i));
+						ctx.ClipPreserve();
+						ctx.Operator = Operator.Clear;
+						ctx.Fill();
+						ctx.Operator = Operator.Over;
 
 						for (int i = GraphicTree.Count -1; i >= 0 ; i--){
 							GraphicObject p = GraphicTree[i];
 							if (!p.Visible)
 								continue;
-							if (!clipping.intersect (p.Slot))
+							if (clipping.Contains (p.Slot) == RegionOverlap.Out)
 								continue;
+
 							ctx.Save ();
-
 							p.Paint (ref ctx);
-
 							ctx.Restore ();
 						}
 
@@ -511,10 +527,13 @@ namespace Crow
 						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
 						#endif
 						lock (RenderMutex) {
+//							Array.Copy (bmp, dirtyBmp, bmp.Length);
+
+							IsDirty = true;
 							if (IsDirty)
-								DirtyRect += clipping.Bounds;
+								DirtyRect += clipping.Extents;
 							else
-								DirtyRect = clipping.Bounds;
+								DirtyRect = clipping.Extents;
 
 							DirtyRect.Left = Math.Max (0, DirtyRect.Left);
 							DirtyRect.Top = Math.Max (0, DirtyRect.Top);
@@ -530,11 +549,12 @@ namespace Crow
 										((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
 										dirtyBmp, y * DirtyRect.Width * 4, DirtyRect.Width * 4);
 								}
-								IsDirty = true;
+
 							} else
 								IsDirty = false;
 						}
-						clipping.Reset ();
+						clipping.Dispose ();
+						clipping = new Region ();
 					}
 					//surf.WriteToPng (@"/mnt/data/test.png");
 				}
@@ -642,15 +662,15 @@ namespace Crow
 		public void ProcessResize(Rectangle bounds){
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
-
 				int stride = 4 * ClientRectangle.Width;
 				int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
 				bmp = new byte[bmpSize];
+				dirtyBmp = new byte[bmpSize];
 
 				foreach (GraphicObject g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
 
-				clipping.AddRectangle (clientRectangle);
+				RegisterClip (clientRectangle);
 			}
 		}
 
@@ -859,7 +879,7 @@ namespace Crow
 
 		#region ILayoutable implementation
 		public void RegisterClip(Rectangle r){
-			clipping.AddRectangle (r);
+			clipping.UnionRectangle (r);
 		}
 		public bool ArrangeChildren { get { return false; }}
 		public int LayoutingTries {
