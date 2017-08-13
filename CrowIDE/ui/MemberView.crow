@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <Window Caption="Properties" Width="30%" Height="60%" AlwaysOnTop="true">
-	<MembersView Instance="{SelectedItem}" DataTest="Type">
+	<MembersView Instance="{SelectedItem}" DataTest="Type"  Background="DimGray">
 	<!--				<Template>
 			<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"
 				ValueChanged="./_scroller_ValueChanged">
@@ -21,7 +21,7 @@
 					MouseEnter="{Background=UnitedNationsBlue}"
 					MouseLeave="{Background=Transparent}" >
 				<Label Margin="1" Text="{Name}" Height="Fit" Width="50%"/>
-				<CheckBox Background="White" Margin="1" Caption="" IsChecked="{²Value}"/>
+				<CheckBox Background="White" Height="Stretched" Caption="" IsChecked="{²Value}"/>
 			</HorizontalStack>
 		</ItemTemplate>
 		<ItemTemplate DataType="System.Enum">
@@ -29,7 +29,7 @@
 					MouseEnter="{Background=UnitedNationsBlue}"
 					MouseLeave="{Background=Transparent}" >
 				<Label Margin="1" Text="{Name}" Height="Fit" Width="50%"/>
-				<ComboBox Margin="1"  Height="Fit" Width="50%" Data="{Choices}"
+				<ComboBox Margin="0"  Height="Stretched" Width="50%" Data="{Choices}"
 						SelectedIndex="{²Value}">
 					<Template>
 						<Popper Name="popper" PopDirection="Bottom">
@@ -76,7 +76,7 @@
 					MouseEnter="{Background=UnitedNationsBlue}"
 					MouseLeave="{Background=Transparent}" >
 				<Label Margin="1" Text="{Name}" Height="Fit" Width="50%"/>
-				<Popper Background="White" Margin="1" Caption="{Value}">
+				<Popper Background="White" Margin="0" Height="Stretched" Caption="{Value}">
 					<Template>
 						<HorizontalStack Spacing="3" Height="Fit" Background="{./Background}">
 							<Border Foreground="Black" Width="16" Height="10" CornerRadius="3"

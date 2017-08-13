@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <Border BorderWidth="5" Margin="1" MinimumSize="10,10">
 	<VerticalStack>
-		<Label Text="{./Instance}"/>
+		<Border Height="Fit">
+			<Label TextAlignment="Left" Text="{./Instance}" Width="Stretched"/>
+		</Border>
 		<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"		
 			ValueChanged="./_scroller_ValueChanged">
 			<VerticalStack LayoutChanged="./_list_LayoutChanged" Spacing="0"
