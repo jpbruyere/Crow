@@ -179,21 +179,18 @@ namespace Crow
 		{
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 
-			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
-				Context gr = new Context (cache);
+			Context gr = new Context (bmp);
 
-				if (Clipping.count > 0) {
-					Clipping.clearAndClip (gr);
+			if (Clipping.count > 0) {
+				Clipping.clearAndClip (gr);
 
-					onDraw (gr);
-				}
-					
-				gr.Dispose ();
-
-				ctx.SetSourceSurface (cache, rb.X, rb.Y);
-				ctx.Paint ();
+				onDraw (gr);
 			}
-			Clipping.Reset();
+				
+			gr.Dispose ();
+
+			ctx.SetSourceSurface (bmp, rb.X, rb.Y);
+			ctx.Paint ();
 		}
 		#endregion
 

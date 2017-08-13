@@ -137,7 +137,7 @@ namespace Crow
 		/// <summary>Prevent requeuing multiple times the same widget</summary>
 		public bool IsQueueForRedraw = false;
 		/// <summary>drawing Cache, if null, a redraw is done, cached or not</summary>
-		public byte[] bmp;
+		public Surface bmp;
 		public bool IsDirty = true;
 		/// <summary>
 		/// This size is computed on each child' layout changes.
@@ -1116,33 +1116,27 @@ namespace Crow
 		/// this trigger the effective drawing routine </summary>
 		protected virtual void RecreateCache ()
 		{
-			int stride = 4 * Slot.Width;
-
-			int bmpSize = Math.Abs (stride) * Slot.Height;
-			bmp = new byte[bmpSize];
 			IsDirty = false;
-			using (ImageSurface draw =
-                new ImageSurface(bmp, Format.Argb32, Slot.Width, Slot.Height, stride)) {
-				using (Context gr = new Context (draw)) {
-					gr.Antialias = Interface.Antialias;
-					onDraw (gr);
-				}
-				draw.Flush ();
+			if (bmp != null)
+				bmp.Dispose ();
+			bmp = new ImageSurface (Format.Argb32, Slot.Width, Slot.Height);
+			using (Context gr = new Context (bmp)) {
+				gr.Antialias = Interface.Antialias;
+				onDraw (gr);
 			}
+			bmp.Flush ();
 		}
 		protected virtual void UpdateCache(Context ctx){
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
-			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
-				if (clearBackground) {
-						ctx.Save ();
-						ctx.Operator = Operator.Clear;
-						ctx.Rectangle (rb);
-						ctx.Fill ();
-						ctx.Restore ();
-				}
-				ctx.SetSourceSurface (cache, rb.X, rb.Y);
-				ctx.Paint ();
+			if (clearBackground) {
+					ctx.Save ();
+					ctx.Operator = Operator.Clear;
+					ctx.Rectangle (rb);
+					ctx.Fill ();
+					ctx.Restore ();
 			}
+			ctx.SetSourceSurface (bmp, rb.X, rb.Y);
+			ctx.Paint ();
 			//Clipping.clearAndClip (ctx);
 			Clipping.Reset();
 		}

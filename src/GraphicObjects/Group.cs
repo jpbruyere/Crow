@@ -235,35 +235,35 @@ namespace Crow
 		{
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 
-			using (ImageSurface cache = new ImageSurface (bmp, Format.Argb32, Slot.Width, Slot.Height, 4 * Slot.Width)) {
-				Context gr = new Context (cache);
 
-				if (Clipping.count > 0) {
-					Clipping.clearAndClip (gr);
-					base.onDraw (gr);
+			Context gr = new Context (bmp);
 
-					//clip to client zone
-					CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
-					gr.Clip ();
+			if (Clipping.count > 0) {
+				Clipping.clearAndClip (gr);
+				base.onDraw (gr);
 
-					lock (Children) {
-						foreach (GraphicObject c in Children) {
-							if (!c.Visible)
-								continue;
-							if (Clipping.intersect (c.Slot + ClientRectangle.Position))
-								c.Paint (ref gr);
-						}
+				//clip to client zone
+				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+				gr.Clip ();
+
+				lock (Children) {
+					foreach (GraphicObject c in Children) {
+						if (!c.Visible)
+							continue;
+						if (Clipping.intersect (c.Slot + ClientRectangle.Position))
+							c.Paint (ref gr);
 					}
-
-					#if DEBUG_CLIP_RECTANGLE
-					Clipping.stroke (gr, Color.Amaranth.AdjustAlpha (0.8));
-					#endif
 				}
-				gr.Dispose ();
 
-				ctx.SetSourceSurface (cache, rb.X, rb.Y);
-				ctx.Paint ();
+				#if DEBUG_CLIP_RECTANGLE
+				Clipping.stroke (gr, Color.Amaranth.AdjustAlpha (0.8));
+				#endif
 			}
+			gr.Dispose ();
+
+			ctx.SetSourceSurface (bmp, rb.X, rb.Y);
+			ctx.Paint ();
+
 			Clipping.Reset();
 		}
 		#endregion
