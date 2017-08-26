@@ -212,7 +212,7 @@ namespace Crow
 					il.Emit(OpCodes.Ldtoken, pi.PropertyType);
 					il.Emit(OpCodes.Call, CompilerServices.miGetTypeFromHandle);
 					//load enum value name
-					il.Emit (OpCodes.Ldstr, Convert.ToString (val));//TODO:is this convert required?
+					il.Emit (OpCodes.Ldstr, Convert.ToString (val));//TODO:implement here string format?
 					//load false
 					il.Emit (OpCodes.Ldc_I4_0);
 					il.Emit (OpCodes.Callvirt, CompilerServices.miParseEnum);
@@ -751,15 +751,25 @@ namespace Crow
 							throw new NotSupportedException ();
 					}
 
-					MethodInfo lopParseMi = lopPI.PropertyType.GetMethod ("Parse");
-					if (lopParseMi == null)
-						throw new Exception (string.Format
-							("IML: no static 'Parse' method found in: {0}", lopPI.PropertyType.Name));
+					MethodInfo lopParseMi = CompilerServices.miParseEnum;
+					if (lopPI.PropertyType.IsEnum){
+						//load type of enum
+						il.Emit(OpCodes.Ldtoken, lopPI.PropertyType);
+						il.Emit(OpCodes.Call, CompilerServices.miGetTypeFromHandle);
+						//load enum value name
+						il.Emit (OpCodes.Ldstr, operandes [1].Trim ());
+						//load false
+						il.Emit (OpCodes.Ldc_I4_0);
+					}else{
+						lopParseMi = lopPI.PropertyType.GetMethod ("Parse");
+						if (lopParseMi == null)
+							throw new Exception (string.Format
+								("IML: no static 'Parse' method found in: {0}", lopPI.PropertyType.Name));
 
-					il.Emit (OpCodes.Ldstr, operandes [1].Trim ());
+						il.Emit (OpCodes.Ldstr, operandes [1].Trim ());
+					}
 					il.Emit (OpCodes.Callvirt, lopParseMi);
 					il.Emit (OpCodes.Unbox_Any, lopPI.PropertyType);
-
 					//emit left operand assignment
 					il.Emit (OpCodes.Callvirt, lopPI.GetSetMethod());
 				} else {//tree parsing and propert gets
