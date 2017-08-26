@@ -31,6 +31,12 @@ using System.Diagnostics;
 
 namespace Crow
 {
+	public enum BorderStyle {
+		Normal,
+		Raised,
+		Sunken
+	};
+
 	public class Border : Container
 	{
 		#region CTOR
@@ -39,14 +45,49 @@ namespace Crow
 
 		#region private fields
 		int _borderWidth;
+		BorderStyle _borderStyle;
+		Fill raiseColor = Color.Gray;
+		Fill sunkenColor = Color.Jet;
 		#endregion
 
 		#region public properties
+		[XmlAttributeAttribute]
+		public virtual Fill RaiseColor {
+			get { return raiseColor; }
+			set {
+				if (raiseColor == value)
+					return;
+				raiseColor = value;
+				NotifyValueChanged ("RaiseColor", raiseColor);
+				RegisterForRedraw ();
+			}
+		}
+		[XmlAttributeAttribute]
+		public virtual Fill SunkenColor {
+			get { return sunkenColor; }
+			set {
+				if (sunkenColor == value)
+					return;
+				sunkenColor = value;
+				NotifyValueChanged ("SunkenColor", sunkenColor);
+				RegisterForRedraw ();
+			}
+		}
 		[XmlAttributeAttribute()][DefaultValue(1)]
 		public virtual int BorderWidth {
 			get { return _borderWidth; }
 			set {
 				_borderWidth = value;
+				RegisterForGraphicUpdate ();
+			}
+		}
+		[XmlAttributeAttribute][DefaultValue(BorderStyle.Normal)]
+		public virtual BorderStyle BorderStyle {
+			get { return _borderStyle; }
+			set {
+				if (_borderStyle == value)
+					return;
+				_borderStyle = value;
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -81,6 +122,31 @@ namespace Crow
 			if (BorderWidth > 0) {				
 				Foreground.SetAsSource (gr, rBack);
 				CairoHelpers.CairoRectangle(gr, rBack, CornerRadius, BorderWidth);
+			}
+
+			if (BorderStyle != BorderStyle.Normal) {
+				gr.LineWidth = 1.0;
+				gr.SetSourceColor (sunkenColor);
+				gr.MoveTo (0.5 + rBack.Left, rBack.Bottom);
+				gr.LineTo (0.5 + rBack.Left, 0.5 + rBack.Y);
+				gr.LineTo (rBack.Right, 0.5 + rBack.Y);
+				if (BorderStyle == BorderStyle.Raised) {
+					gr.MoveTo (-1.5 + rBack.Right, 2.0 + rBack.Y);
+					gr.LineTo (-1.5 + rBack.Right, -1.5 + rBack.Bottom);
+					gr.LineTo (2.0 + rBack.Left, -1.5 + rBack.Bottom);
+					gr.Stroke ();
+					gr.SetSourceColor (raiseColor);
+					gr.MoveTo (1.5 + rBack.Left, -1.0 + rBack.Bottom);
+					gr.LineTo (1.5 + rBack.Left, 1.5 + rBack.Y);
+					gr.LineTo (rBack.Right, 1.5 + rBack.Y);
+				} else {
+					gr.Stroke ();
+					gr.SetSourceColor (raiseColor);
+				}
+				gr.MoveTo (-0.5 + rBack.Right, 1.5 + rBack.Y);
+				gr.LineTo (-0.5 + rBack.Right, -0.5 + rBack.Bottom);
+				gr.LineTo (1.0 + rBack.Left, -0.5 + rBack.Bottom);
+				gr.Stroke ();
 			}
 
 			gr.Save ();
