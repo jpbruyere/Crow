@@ -54,9 +54,9 @@ namespace Crow
 
 			if (child != null) {
 				//check if HoverWidget is removed from Tree
-				if (CurrentInterface.HoverWidget != null) {
-					if (this.Contains (CurrentInterface.HoverWidget))
-						CurrentInterface.HoverWidget = null;
+				if (currentInterface.HoverWidget != null) {
+					if (this.Contains (currentInterface.HoverWidget))
+						currentInterface.HoverWidget = null;
 				}
 				contentSize = new Size (0, 0);
 				child.LayoutChanged -= OnChildLayoutChanges;
