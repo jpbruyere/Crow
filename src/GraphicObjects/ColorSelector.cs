@@ -43,7 +43,7 @@ namespace Crow
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
-			if (CurrentInterface.Mouse.LeftButton == ButtonState.Released)
+			if (currentInterface.Mouse.LeftButton == ButtonState.Released)
 				return;
 			updateMouseLocalPos (e.Position);
 		}

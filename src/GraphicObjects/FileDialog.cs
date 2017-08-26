@@ -117,11 +117,11 @@ namespace Crow
 				CurrentDirectory = SelectedDirectory;
 			else {
 				OkClicked.Raise (this, null);
-				unloadDialog ((sender as GraphicObject).CurrentInterface);
+				unloadDialog ((sender as GraphicObject).currentInterface);
 			}
 		}
 		void onCancel(object sender, MouseButtonEventArgs e){
-			unloadDialog ((sender as GraphicObject).CurrentInterface);
+			unloadDialog ((sender as GraphicObject).currentInterface);
 		}
 		void unloadDialog(Interface host){
 			host.DeleteWidget (this);

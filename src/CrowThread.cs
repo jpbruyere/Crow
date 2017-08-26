@@ -40,15 +40,15 @@ namespace Crow
 			thread = new Thread (start);
 			thread.IsBackground = true;
 			Host = host;
-			lock (Host.CurrentInterface.CrowThreads)
-				Host.CurrentInterface.CrowThreads.Add (this);
+			lock (Host.currentInterface.CrowThreads)
+				Host.currentInterface.CrowThreads.Add (this);
 		}
 		public void CheckState(){
 			if (thread.ThreadState != ThreadState.Stopped)
 				return;
 			Finished.Raise (Host, null);
-			lock (Host.CurrentInterface.CrowThreads)
-				Host.CurrentInterface.CrowThreads.Remove (this);
+			lock (Host.currentInterface.CrowThreads)
+				Host.currentInterface.CrowThreads.Remove (this);
 		}
 		public void Start() { thread.Start();}
 		public void Cancel(){
@@ -57,8 +57,8 @@ namespace Crow
 				thread.Join ();
 				//cancelLoading = false;
 			}
-			lock (Host.CurrentInterface.CrowThreads)
-				Host.CurrentInterface.CrowThreads.Remove (this);
+			lock (Host.currentInterface.CrowThreads)
+				Host.currentInterface.CrowThreads.Remove (this);
 		}
 	}
 }

@@ -76,9 +76,9 @@ namespace Crow
 			//child.Parent = null;
 
 			//check if HoverWidget is removed from Tree
-			if (CurrentInterface.HoverWidget != null) {
-				if (this.Contains (CurrentInterface.HoverWidget))
-					CurrentInterface.HoverWidget = null;
+			if (currentInterface.HoverWidget != null) {
+				if (this.Contains (currentInterface.HoverWidget))
+					currentInterface.HoverWidget = null;
 			}
 
 			lock (children)
@@ -350,8 +350,8 @@ namespace Crow
 		#region Mouse handling
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
-			if (CurrentInterface.HoverWidget != this) {
-				CurrentInterface.HoverWidget = this;
+			if (currentInterface.HoverWidget != this) {
+				currentInterface.HoverWidget = this;
 				onMouseEnter (this, e);
 			}
 			for (int i = Children.Count - 1; i >= 0; i--) {

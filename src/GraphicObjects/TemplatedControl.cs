@@ -59,7 +59,7 @@ namespace Crow
 				if (string.IsNullOrEmpty(_template))
 					loadTemplate ();
 				else
-					loadTemplate (CurrentInterface.Load (_template));
+					loadTemplate (currentInterface.Load (_template));
 			}
 		}
 		[XmlAttributeAttribute()][DefaultValue("Templated Control")]
@@ -73,11 +73,6 @@ namespace Crow
 			}
 		}
 		#region GraphicObject overrides
-		public override void Initialize ()
-		{
-			loadTemplate ();
-			base.Initialize ();
-		}
 		public override GraphicObject FindByName (string nameToFind)
 		{
 			//prevent name searching in template
@@ -107,7 +102,7 @@ namespace Crow
 			if (template == null) {
 				if (!Interface.DefaultTemplates.ContainsKey (this.GetType ().FullName))
 					throw new Exception (string.Format ("No default template found for '{0}'", this.GetType ().FullName));
-				this.SetChild (CurrentInterface.Load (Interface.DefaultTemplates[this.GetType ().FullName]));
+				this.SetChild (currentInterface.Load (Interface.DefaultTemplates[this.GetType ().FullName]));
 			}else
 				this.SetChild (template);
 		}

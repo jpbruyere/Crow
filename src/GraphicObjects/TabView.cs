@@ -139,7 +139,7 @@ namespace Crow
 
 				//if no layouting remains in queue for item, registre for redraw
 				if (RegisteredLayoutings == LayoutingType.None && IsDirty)
-					CurrentInterface.EnqueueForRepaint (this);
+					currentInterface.EnqueueForRepaint (this);
 
 				return true;
 			}
@@ -177,8 +177,8 @@ namespace Crow
 		#region Mouse handling
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
-			if (CurrentInterface.HoverWidget != this) {
-				CurrentInterface.HoverWidget = this;
+			if (currentInterface.HoverWidget != this) {
+				currentInterface.HoverWidget = this;
 				onMouseEnter (this, e);
 			}
 
