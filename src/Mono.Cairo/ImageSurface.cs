@@ -100,5 +100,13 @@ namespace Cairo {
 		public int Stride {
 			get { return NativeMethods.cairo_image_surface_get_stride (Handle); }
 		}
+
+		public override Surface CreateSimilar (Content content, int width, int height)
+		{
+			IntPtr p = NativeMethods.cairo_surface_create_similar (
+				this.Handle, content, width, height);
+
+			return new Cairo.ImageSurface (p, true);
+		}
 	}
 }

@@ -114,7 +114,7 @@ namespace Cairo {
 		}
 
 
-		public Cairo.Surface CreateSimilar (
+		public virtual Cairo.Surface CreateSimilar (
 			Cairo.Content content, int width, int height)
 		{
 			IntPtr p = NativeMethods.cairo_surface_create_similar (

@@ -1120,7 +1120,7 @@ namespace Crow
 			IsDirty = false;
 			if (bmp != null)
 				bmp.Dispose ();
-			bmp = new ImageSurface (Format.Argb32, Slot.Width, Slot.Height);
+			bmp = CurrentInterface.bmp.CreateSimilar(Content.ColorAlpha, Slot.Width, Slot.Height);
 			using (Context gr = new Context (bmp)) {
 				gr.Antialias = Interface.Antialias;
 				onDraw (gr);

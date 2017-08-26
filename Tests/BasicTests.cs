@@ -30,16 +30,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Diagnostics;
+using Crow.SDL2;
+
+using Native;
+
+using XCBConnection = System.IntPtr;
+using XCBSetup = System.IntPtr;
+using XCBScreen = System.IntPtr;
+using XCBWindow = System.UInt32;
+using XCBColorMap = System.UInt32;
+using XCBVisualId = System.UInt32;
 
 
 namespace Tests
 {
-	class BasicTests : CrowWindow
+	class BasicTests : CrowWindow3
 	{
 		public BasicTests ()
-			: base(800, 600,"test: press <F3> to toogle test files")
+			//: base(800, 600,"test: press <F3> to toogle test files")
 		{
 		}
 
@@ -140,8 +151,8 @@ namespace Tests
 			this.KeyDown += KeyboardKeyDown1;
 
 			//testFiles = new string [] { @"Interfaces/Unsorted/testFileDialog.crow" };
-			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
-			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
@@ -180,7 +191,7 @@ namespace Tests
 				return;
 			}else if (e.Key == OpenTK.Input.Key.F7) {
 				GraphicObject w = Load ("Interfaces/Divers/perfMeasures.crow");
-				w.DataSource = this.ifaceControl[0];
+				w.DataSource = this;
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F2)
 				idx--;
@@ -190,7 +201,7 @@ namespace Tests
 				return;
 
 			try {
-				ClearInterface ();
+				CrowInterface.ClearInterface ();
 
 				if (idx == testFiles.Length)
 					idx = 0;

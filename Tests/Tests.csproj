@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>Tests.Showcase</StartupObject>
+    <StartupObject>Tests.BasicTests</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ReleaseVersion>0.5</ReleaseVersion>
@@ -26,10 +26,11 @@
     <Optimize>false</Optimize>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
     <DefineConstants>DEBUG;TRACE;MEASURE_TIME</DefineConstants>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
+    <OutputPath>$(SolutionDir)build\Debug</OutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -37,7 +38,8 @@
     <WarningLevel>0</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
+    <OutputPath>$(SolutionDir)build\Release</OutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -62,6 +64,13 @@
     <Compile Include="OpenGL\Extensions.cs" />
     <Compile Include="InterfaceControler.cs" />
     <Compile Include="Showcase.cs" />
+    <Compile Include="test-sdl2.cs" />
+    <Compile Include="test-sdl2 %28copier%29.cs" />
+    <Compile Include="sdl2.cs" />
+    <Compile Include="CrowWindow3.cs" />
+    <Compile Include="xcb.cs" />
+    <Compile Include="test_xcb.cs" />
+    <Compile Include="CrowWindow2.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">

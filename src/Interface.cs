@@ -124,9 +124,9 @@ namespace Crow
 		/// <summary>Graphic Tree of this interface</summary>
 		public List<GraphicObject> GraphicTree = new List<GraphicObject>();
 		/// <summary>Interface's resulting bitmap</summary>
-		public byte[] bmp;
+		public Surface bmp;
 		/// <summary>resulting bitmap limited to last redrawn part</summary>
-		public byte[] dirtyBmp;
+		public Surface dirtyBmp;
 		/// <summary>True when host has to repaint Interface</summary>
 		public bool IsDirty = false;
 		/// <summary>Coordinate of the dirty bmp on the original bmp</summary>
@@ -500,64 +500,62 @@ namespace Crow
 			#if MEASURE_TIME
 			drawingMeasure.StartCycle();
 			#endif
-			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
-				using (ctx = new Context (surf)){
-					if (!clipping.IsEmpty) {
 
-						for (int i = 0; i < clipping.NumRectangles; i++)
-							ctx.Rectangle(clipping.GetRectangle(i));
-						ctx.ClipPreserve();
-						ctx.Operator = Operator.Clear;
-						ctx.Fill();
-						ctx.Operator = Operator.Over;
+			using (ctx = new Context (bmp)){
+				if (!clipping.IsEmpty) {
 
-						for (int i = GraphicTree.Count -1; i >= 0 ; i--){
-							GraphicObject p = GraphicTree[i];
-							if (!p.Visible)
-								continue;
-							if (clipping.Contains (p.Slot) == RegionOverlap.Out)
-								continue;
+					for (int i = 0; i < clipping.NumRectangles; i++)
+						ctx.Rectangle(clipping.GetRectangle(i));
+					ctx.ClipPreserve();
+					ctx.Operator = Operator.Clear;
+					ctx.Fill();
+					ctx.Operator = Operator.Over;
 
-							ctx.Save ();
-							p.Paint (ref ctx);
-							ctx.Restore ();
-						}
+					for (int i = GraphicTree.Count -1; i >= 0 ; i--){
+						GraphicObject p = GraphicTree[i];
+						if (!p.Visible)
+							continue;
+						if (clipping.Contains (p.Slot) == RegionOverlap.Out)
+							continue;
 
-						#if DEBUG_CLIP_RECTANGLE
-						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
-						#endif
-						lock (RenderMutex) {
+						ctx.Save ();
+						p.Paint (ref ctx);
+						ctx.Restore ();
+					}
+
+					#if DEBUG_CLIP_RECTANGLE
+					clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
+					#endif
+					lock (RenderMutex) {
 //							Array.Copy (bmp, dirtyBmp, bmp.Length);
 
-							IsDirty = true;
-							if (IsDirty)
-								DirtyRect += clipping.Extents;
-							else
-								DirtyRect = clipping.Extents;
+						IsDirty = true;
+						if (IsDirty)
+							DirtyRect += clipping.Extents;
+						else
+							DirtyRect = clipping.Extents;
 
-							DirtyRect.Left = Math.Max (0, DirtyRect.Left);
-							DirtyRect.Top = Math.Max (0, DirtyRect.Top);
-							DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
-							DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
-							DirtyRect.Width = Math.Max (0, DirtyRect.Width);
-							DirtyRect.Height = Math.Max (0, DirtyRect.Height);
+						DirtyRect.Left = Math.Max (0, DirtyRect.Left);
+						DirtyRect.Top = Math.Max (0, DirtyRect.Top);
+						DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
+						DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
+						DirtyRect.Width = Math.Max (0, DirtyRect.Width);
+						DirtyRect.Height = Math.Max (0, DirtyRect.Height);
 
-							if (DirtyRect.Width > 0 && DirtyRect.Height >0) {
-								dirtyBmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
-								for (int y = 0; y < DirtyRect.Height; y++) {
-									Array.Copy (bmp,
-										((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
-										dirtyBmp, y * DirtyRect.Width * 4, DirtyRect.Width * 4);
-								}
-
-							} else
-								IsDirty = false;
-						}
-						clipping.Dispose ();
-						clipping = new Region ();
+						if (DirtyRect.Width > 0 && DirtyRect.Height >0) {
+							dirtyBmp?.Dispose ();
+							dirtyBmp = bmp.CreateSimilar (Content.ColorAlpha, DirtyRect.Width, DirtyRect.Height);
+							using (Context dctx = new Context (dirtyBmp)) {
+								dctx.SetSourceSurface (bmp, DirtyRect.Left, DirtyRect.Top);
+								dctx.Paint ();
+							}
+						} else
+							IsDirty = false;
 					}
-					//surf.WriteToPng (@"/mnt/data/test.png");
+					clipping.Dispose ();
+					clipping = new Region ();
 				}
+				//bmp.WriteToPng (@"/mnt/data/test.png");
 			}
 			#if MEASURE_TIME
 			drawingMeasure.StopCycle();
@@ -659,19 +657,10 @@ namespace Crow
 		}
 		#endregion
 
-		public void ProcessResize(Rectangle bounds){
-			lock (UpdateMutex) {
-				clientRectangle = bounds;
-				int stride = 4 * ClientRectangle.Width;
-				int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
-				bmp = new byte[bmpSize];
-				dirtyBmp = new byte[bmpSize];
-
-				foreach (GraphicObject g in GraphicTree)
-					g.RegisterForLayouting (LayoutingType.All);
-
-				RegisterClip (clientRectangle);
-			}
+		public void ProcessResize(){			
+			foreach (GraphicObject g in GraphicTree)
+				g.RegisterForLayouting (LayoutingType.All);
+			RegisterClip (clientRectangle);
 		}
 
 		#region Mouse and Keyboard Handling
@@ -906,6 +895,7 @@ namespace Crow
 
 		public Rectangle ClientRectangle {
 			get { return clientRectangle; }
+			set { clientRectangle = value; }
 		}
 		public Interface HostContainer {
 			get { return this; }

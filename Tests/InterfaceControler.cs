@@ -52,7 +52,8 @@ namespace Crow
 		public override void initGL(){
 			quad = new Crow.vaoMesh (0, 0, 0, 1, 1, 1, -1);
 			//ifaceModelMat = Matrix4.CreateRotationX(MathHelper.PiOver2) * Matrix4.CreateTranslation(Vector3.UnitY);
-			CrowInterface.ProcessResize(iRect);
+			//Cairo.Device dev = new Cairo.Device();
+			CrowInterface.ProcessResize();
 			createContext ();
 			//CrowInterface.ProcessResize (iRect);
 		}
@@ -162,14 +163,14 @@ namespace Crow
 
 			while (true) {
 				CrowInterface.Update ();
-				//Thread.Sleep (1);
+				Thread.Sleep (1);
 			}
 		}
 
 		#region Mouse And Keyboard handling
 		public virtual void ProcessResize(Rectangle newSize){
 			iRect = newSize;
-			CrowInterface.ProcessResize(newSize);
+			CrowInterface.ProcessResize();
 			createContext ();
 			GL.Viewport (0, 0, newSize.Width, newSize.Height);//TODO:find a better place for this
 		}
@@ -214,12 +215,16 @@ namespace Crow
 			GL.ActiveTexture (TextureUnit.Texture0);
 			GL.BindTexture(TextureTarget.Texture2D, texID);
 
+			byte[] data = null;
+			if (CrowInterface.bmp != null)
+				data = (CrowInterface.bmp as Cairo.ImageSurface).Data;
+
 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba,
 				iRect.Width, iRect.Height, 0,
-				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, CrowInterface.bmp);
+				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data);
 
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
 
 			GL.BindTexture(TextureTarget.Texture2D, 0);
 		}
@@ -234,10 +239,13 @@ namespace Crow
 			GL.BindTexture (TextureTarget.Texture2D, texID);
 			if (Monitor.TryEnter(CrowInterface.RenderMutex)) {
 				if (CrowInterface.IsDirty) {
+					byte[] data = null;
+					if (CrowInterface.dirtyBmp != null)
+						data = (CrowInterface.dirtyBmp as Cairo.ImageSurface).Data;
 					GL.TexSubImage2D (TextureTarget.Texture2D, 0,
 						CrowInterface.DirtyRect.Left, CrowInterface.DirtyRect.Top,
 						CrowInterface.DirtyRect.Width, CrowInterface.DirtyRect.Height,
-						OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, CrowInterface.dirtyBmp);
+						OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data);
 					CrowInterface.IsDirty = false;
 				}
 				Monitor.Exit (CrowInterface.RenderMutex);
