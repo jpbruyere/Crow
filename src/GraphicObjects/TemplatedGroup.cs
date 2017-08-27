@@ -56,7 +56,6 @@ namespace Crow
 
 		int itemPerPage = 50;
 		CrowThread loadingThread = null;
-		volatile bool cancelLoading = false;
 
 		bool isPaged = false;
 
@@ -274,7 +273,7 @@ namespace Crow
 				ItemTemplates ["default"] = Interface.GetItemTemplate (ItemTemplate);
 
 			for (int i = 1; i <= (data.Count / itemPerPage) + 1; i++) {
-				if (cancelLoading)
+				if ((bool)loadingThread?.cancel)
 					return;
 				loadPage (i);
 				Thread.Sleep (1);
@@ -316,7 +315,7 @@ namespace Crow
 			for (int i = (pageNum - 1) * itemPerPage; i < pageNum * itemPerPage; i++) {
 				if (i >= data.Count)
 					break;
-				if (cancelLoading)
+				if ((bool)loadingThread?.cancel)
 					return;
 
 				loadItem (i, page);
@@ -425,6 +424,13 @@ namespace Crow
 		}
 		internal virtual void itemClick(object sender, MouseButtonEventArgs e){
 			SelectedIndex = data.IndexOf((sender as GraphicObject).DataSource);
+		}
+
+		public override void Dispose ()
+		{
+			if (loadingThread != null)
+				loadingThread.Cancel ();
+			base.Dispose ();
 		}
 	}
 }

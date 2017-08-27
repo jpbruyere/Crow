@@ -33,6 +33,7 @@ namespace Crow
 	/// Thread monitored by current interface with Finished event when state==Stopped
 	/// </summary>
 	public class CrowThread {
+		public bool cancel = false;
 		Thread thread;
 		public event EventHandler Finished;
 		public GraphicObject Host;
@@ -53,6 +54,7 @@ namespace Crow
 		public void Start() { thread.Start();}
 		public void Cancel(){
 			if (thread.IsAlive){
+				cancel = true;
 				//cancelLoading = true;
 				thread.Join ();
 				//cancelLoading = false;

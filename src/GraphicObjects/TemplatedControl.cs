@@ -48,6 +48,9 @@ namespace Crow
 		string _template;
 		string caption;
 
+		/// <summary>
+		/// Template path
+		/// </summary>
 		[XmlAttributeAttribute][DefaultValue(null)]
 		public string Template {
 			get { return _template; }
@@ -99,6 +102,9 @@ namespace Crow
 
 		protected virtual void loadTemplate(GraphicObject template = null)
 		{
+			if (this.child != null)//template change, bindings has to be reset
+				this.ClearTemplateBinding();
+			
 			if (template == null) {
 				if (!Interface.DefaultTemplates.ContainsKey (this.GetType ().FullName))
 					throw new Exception (string.Format ("No default template found for '{0}'", this.GetType ().FullName));

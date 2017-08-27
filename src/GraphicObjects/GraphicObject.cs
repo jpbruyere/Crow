@@ -38,8 +38,27 @@ using System.IO;
 
 namespace Crow
 {
-	public class GraphicObject : ILayoutable, IValueChange
+	public class GraphicObject : ILayoutable, IValueChange, IDisposable
 	{
+		#region IDisposable implementation
+
+		public virtual void Dispose ()
+		{
+			#if DEBUG_DISPOSE
+			Debug.WriteLine ("{0} Disposed", this.ToString());
+			#endif
+
+			parent = null;
+			if (IsQueueForRedraw)
+				Debugger.Break ();
+			if (!localDataSourceIsNull)
+				DataSource = null;
+			Clipping?.Dispose ();
+			bmp?.Dispose ();
+		}
+
+		#endregion
+
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
 
@@ -804,12 +823,27 @@ namespace Crow
 		public virtual bool Contains(GraphicObject goToFind){
 			return false;
 		}
+		/// <summary>
+		/// return true if this is contained inside go
+		/// </summary>
+		public bool IsInside(GraphicObject go){
+			ILayoutable p = this.Parent;
+			while (p != null) {
+				if (p == go)
+					return true;
+				p = p.Parent;
+			}
+			return false;
+		}
 
 		#region Queuing
 		/// <summary>
 		/// Register old and new slot for clipping
 		/// </summary>
 		public virtual void ClippingRegistration(){
+			#if DEBUG_UPDATE
+			Debug.WriteLine (string.Format("ClippingRegistration -> {0}", this.ToString ()));
+			#endif
 			IsQueueForRedraw = false;
 			if (Parent == null)
 				return;
@@ -821,6 +855,9 @@ namespace Crow
 		/// </summary>
 		/// <param name="clip">Clip rectangle</param>
 		public virtual void RegisterClip(Rectangle clip){
+			#if DEBUG_UPDATE
+			Debug.WriteLine (string.Format("RegisterClip -> {1}:{0}", clip, this.ToString ()));
+			#endif
 			Rectangle  r = clip + ClientRectangle.Position;
 			if (CacheEnabled && !IsDirty)
 				Clipping.UnionRectangle (r);
@@ -835,6 +872,9 @@ namespace Crow
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForGraphicUpdate ()
 		{
+			#if DEBUG_UPDATE
+			Debug.WriteLine (string.Format("RegisterForGraphicUpdate -> {0}", this.ToString ()));
+			#endif
 			IsDirty = true;
 			if (Width.IsFit || Height.IsFit)
 				RegisterForLayouting (LayoutingType.Sizing);
@@ -845,6 +885,9 @@ namespace Crow
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForRedraw ()
 		{
+			#if DEBUG_UPDATE
+			Debug.WriteLine (string.Format("RegisterForRedraw -> {0}", this.ToString ()));
+			#endif
 			IsDirty = true;
 			if (RegisteredLayoutings == LayoutingType.None)
 				currentInterface.EnqueueForRepaint (this);
@@ -1091,6 +1134,9 @@ namespace Crow
 		/// this trigger the effective drawing routine </summary>
 		protected virtual void RecreateCache ()
 		{
+			#if DEBUG_UPDATE
+			Debug.WriteLine ("RecreateCache -> {0}", this.ToString ());
+			#endif
 			IsDirty = false;
 			if (bmp != null)
 				bmp.Dispose ();
@@ -1102,6 +1148,9 @@ namespace Crow
 			bmp.Flush ();
 		}
 		protected virtual void UpdateCache(Context ctx){
+			#if DEBUG_UPDATE
+			Debug.WriteLine ("UpdateCache -> {0}", this.ToString ());
+			#endif
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 			if (clearBackground) {
 					ctx.Save ();
@@ -1119,6 +1168,9 @@ namespace Crow
 		/// of the widget </summary>
 		public virtual void Paint (ref Context ctx)
 		{
+			#if DEBUG_UPDATE
+			Debug.WriteLine (string.Format("Paint -> {0}", this.ToString ()));
+			#endif
 			//TODO:this test should not be necessary
 			if (Slot.Height < 0 || Slot.Width < 0 || parent == null)
 				return;
@@ -1307,7 +1359,22 @@ namespace Crow
 		protected virtual void onLogicalParentChanged(object sender, DataSourceChangeEventArgs e) {
 			LogicalParentChanged.Raise (this, e);
 		}
-
+		internal void ClearTemplateBinding(){
+			#if DEBUG_UPDATE
+			Debug.WriteLine (string.Format("ClearTemplateBinding: {0}", this.ToString()));
+			#endif
+			if (ValueChanged == null)
+				return;
+			EventInfo eiEvt = this.GetType().GetEvent ("ValueChanged");
+			foreach (Delegate d in ValueChanged.GetInvocationList()) {
+				if (d.Method.Name == "dyn_tmpValueChanged") {
+					eiEvt.RemoveEventHandler (this, d);
+					#if DEBUG_BINDING
+					Debug.WriteLine ("\t{0} template binding handler removed in {1} for: {2}", d.Method.Name, this, "ValueChanged");
+					#endif
+				}
+			}
+		}
 		public override string ToString ()
 		{
 			string tmp ="";

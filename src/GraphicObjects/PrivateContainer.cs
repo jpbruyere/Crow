@@ -55,11 +55,12 @@ namespace Crow
 			if (child != null) {
 				//check if HoverWidget is removed from Tree
 				if (currentInterface.HoverWidget != null) {
-					if (this.Contains (currentInterface.HoverWidget))
+					if (currentInterface.HoverWidget.IsInside(this))
 						currentInterface.HoverWidget = null;
 				}
 				contentSize = new Size (0, 0);
 				child.LayoutChanged -= OnChildLayoutChanges;
+				child.Dispose ();
 				child.Parent = null;
 				this.RegisterForGraphicUpdate ();
 			}
@@ -212,6 +213,12 @@ namespace Crow
 		}
 		#endregion
 
+		public override void Dispose ()
+		{
+			if (child != null)
+				child.Dispose ();
+			base.Dispose ();
+		}
 	}
 }
 

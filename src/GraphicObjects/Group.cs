@@ -73,16 +73,17 @@ namespace Crow
         public virtual void RemoveChild(GraphicObject child)        
 		{
 			child.LayoutChanged -= OnChildLayoutChanges;
-			//child.Parent = null;
+			child.Parent = null;
 
 			//check if HoverWidget is removed from Tree
 			if (currentInterface.HoverWidget != null) {
-				if (this.Contains (currentInterface.HoverWidget))
+				if (currentInterface.HoverWidget.IsInside(this))
 					currentInterface.HoverWidget = null;
 			}
 
 			lock (children)
             	Children.Remove(child);
+			child.Dispose ();
 
 			if (child == largestChild && Width == Measure.Fit)
 				searchLargestChild ();
@@ -97,8 +98,8 @@ namespace Crow
 				while (Children.Count > 0) {
 					GraphicObject g = Children [Children.Count - 1];
 					g.LayoutChanged -= OnChildLayoutChanges;
-					g.Parent = null;
 					Children.RemoveAt (Children.Count - 1);
+					g.Dispose ();
 				}
 			}
 
@@ -364,5 +365,12 @@ namespace Crow
 			base.checkHoverWidget (e);
 		}
 		#endregion
+
+		public override void Dispose ()
+		{
+			foreach (GraphicObject c in children)
+				c.Dispose ();
+			base.Dispose ();
+		}
 	}
 }
