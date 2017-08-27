@@ -632,7 +632,9 @@ namespace Crow
 			Type t = instance.GetType ();
 			FieldInfo fiEvt = getEventHandlerField (t, eventName);
 			if (fiEvt == null) {
+				#if DEBUG_BINDING
 				Debug.WriteLine ("RemoveHandlerByName: Event '" + eventName + "' not found in " + instance);
+				#endif
 				return;
 			}
 			EventInfo eiEvt = t.GetEvent (eventName);

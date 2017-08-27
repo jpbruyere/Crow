@@ -593,14 +593,39 @@ namespace Crow
 		public void DeleteWidget(GraphicObject g)
 		{
 			if (_hoverWidget != null) {
-				if (g.Contains (_hoverWidget))
+				if (_hoverWidget.IsInside(g))
 					HoverWidget = null;
 			}
 			lock (UpdateMutex) {
-				g.DataSource = null;
-				g.Visible = false;
+				RegisterClip (g.ScreenCoordinates (g.LastPaintedSlot));
 				GraphicTree.Remove (g);
+				g.Parent = null;
+				g.Dispose ();
 			}
+		}
+		/// <summary> Remove all Graphic objects from top container </summary>
+		public void ClearInterface()
+		{
+			lock (UpdateMutex) {
+				while (GraphicTree.Count > 0) {
+					//TODO:parent is not reset to null because object will be added
+					//to ObjectToRedraw list, and without parent, it fails
+					GraphicObject g = GraphicTree [0];
+					if (_hoverWidget != null) {
+						if (_hoverWidget.IsInside(g))
+							HoverWidget = null;
+					}
+					RegisterClip (g.ScreenCoordinates (g.LastPaintedSlot));
+					GraphicTree.RemoveAt (0);
+					g.Dispose ();
+				}
+			}
+			#if DEBUG_LAYOUTING
+			LQIsTries = new List<LQIList>();
+			curLQIsTries = new LQIList();
+			LQIs = new List<LQIList>();
+			curLQIs = new LQIList();
+			#endif
 		}
 		/// <summary> Put widget on top of other root widgets</summary>
 		public void PutOnTop(GraphicObject g, bool isOverlay = false)
@@ -625,26 +650,6 @@ namespace Crow
 				}
 				EnqueueForRepaint (g);
 			}
-		}
-		/// <summary> Remove all Graphic objects from top container </summary>
-		public void ClearInterface()
-		{
-			lock (UpdateMutex) {
-				while (GraphicTree.Count > 0) {
-					//TODO:parent is not reset to null because object will be added
-					//to ObjectToRedraw list, and without parent, it fails
-					GraphicObject g = GraphicTree [0];
-					g.DataSource = null;
-					g.Visible = false;
-					GraphicTree.RemoveAt (0);
-				}
-			}
-			#if DEBUG_LAYOUTING
-			LQIsTries = new List<LQIList>();
-			curLQIsTries = new LQIList();
-			LQIs = new List<LQIList>();
-			curLQIs = new LQIList();
-			#endif
 		}
 
 		/// <summary>Search a Graphic object in the tree named 'nameToFind'</summary>
