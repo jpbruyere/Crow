@@ -62,7 +62,7 @@ namespace Crow
 				#if DEBUG_DISPOSE
 				Debug.WriteLine ("Disposing: {0}", this.ToString());
 				if (IsQueueForRedraw)
-					throw new Exception("Trying to dispose an object queued for Redraw: " + this.ToString()); 
+				throw new Exception("Trying to dispose an object queued for Redraw: " + this.ToString());
 				#endif
 				if (currentInterface.HoverWidget != null) {
 					if (currentInterface.HoverWidget.IsOrIsInside(this))
@@ -71,6 +71,10 @@ namespace Crow
 				if (currentInterface.ActiveWidget != null) {
 					if (currentInterface.ActiveWidget.IsOrIsInside (this))
 						currentInterface.ActiveWidget = null;
+				}
+				if (currentInterface.FocusedWidget != null) {
+					if (currentInterface.FocusedWidget.IsOrIsInside (this))
+						currentInterface.FocusedWidget = null;
 				}
 				if (!localDataSourceIsNull)
 					DataSource = null;
