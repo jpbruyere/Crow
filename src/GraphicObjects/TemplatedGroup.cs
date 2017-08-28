@@ -273,8 +273,10 @@ namespace Crow
 				ItemTemplates ["default"] = Interface.GetItemTemplate (ItemTemplate);
 
 			for (int i = 1; i <= (data.Count / itemPerPage) + 1; i++) {
-				if ((bool)loadingThread?.cancel)
+				if ((bool)loadingThread?.cancelRequested) {
+					this.Dispose ();
 					return;
+				}
 				loadPage (i);
 				Thread.Sleep (1);
 			}
@@ -315,8 +317,10 @@ namespace Crow
 			for (int i = (pageNum - 1) * itemPerPage; i < pageNum * itemPerPage; i++) {
 				if (i >= data.Count)
 					break;
-				if ((bool)loadingThread?.cancel)
+				if ((bool)loadingThread?.cancelRequested) {
+					page.Dispose ();
 					return;
+				}
 
 				loadItem (i, page);
 			}
@@ -336,7 +340,7 @@ namespace Crow
 		string getItempKey(Type dataType, object o){
 			try {
 				return dataType.GetProperty (_dataTest).GetGetMethod ().Invoke (o, null).ToString();
-			} catch (Exception ex) {
+			} catch  {
 				return dataType.FullName;
 			}
 		}
@@ -426,11 +430,11 @@ namespace Crow
 			SelectedIndex = data.IndexOf((sender as GraphicObject).DataSource);
 		}
 
-		public override void Dispose ()
+		protected override void Dispose (bool disposing)
 		{
-			if (loadingThread != null)
+			if (disposing && loadingThread != null)
 				loadingThread.Cancel ();
-			base.Dispose ();
+			base.Dispose (disposing);
 		}
 	}
 }

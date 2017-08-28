@@ -592,10 +592,6 @@ namespace Crow
 		/// <summary>Set visible state of widget to false and remove if from the graphic tree</summary>
 		public void DeleteWidget(GraphicObject g)
 		{
-			if (_hoverWidget != null) {
-				if (_hoverWidget.IsInside(g))
-					HoverWidget = null;
-			}
 			lock (UpdateMutex) {
 				RegisterClip (g.ScreenCoordinates (g.LastPaintedSlot));
 				GraphicTree.Remove (g);
@@ -611,10 +607,6 @@ namespace Crow
 					//TODO:parent is not reset to null because object will be added
 					//to ObjectToRedraw list, and without parent, it fails
 					GraphicObject g = GraphicTree [0];
-					if (_hoverWidget != null) {
-						if (_hoverWidget.IsInside(g))
-							HoverWidget = null;
-					}
 					RegisterClip (g.ScreenCoordinates (g.LastPaintedSlot));
 					GraphicTree.RemoveAt (0);
 					g.Dispose ();

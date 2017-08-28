@@ -240,5 +240,14 @@ namespace Crow
 			}
 			Unpoped.Raise (this, e);
 		}
+
+		protected override void Dispose (bool disposing)
+		{
+			if (_content != null && disposing) {
+				if (_content.Parent == null)
+					_content.Dispose ();
+			}
+			base.Dispose (disposing);
+		}
 	}
 }

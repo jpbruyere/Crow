@@ -41,22 +41,51 @@ namespace Crow
 	public class GraphicObject : ILayoutable, IValueChange, IDisposable
 	{
 		#region IDisposable implementation
+		protected bool disposed = false;
 
-		public virtual void Dispose ()
-		{
-			#if DEBUG_DISPOSE
-			Debug.WriteLine ("{0} Disposed", this.ToString());
-			#endif
+		public void Dispose(){  
+			Dispose(true);  
+			GC.SuppressFinalize(this);  
+		}  
+		~GraphicObject(){
+			Dispose(false);
+		}
+		protected virtual void Dispose(bool disposing){
+			if (disposed){
+				#if DEBUG_DISPOSE
+				Debug.WriteLine ("Trying to dispose already disposed obj: {0}", this.ToString());
+				#endif
+				return;
+			}
 
-			parent = null;
-			if (IsQueueForRedraw)
-				Debugger.Break ();
-			if (!localDataSourceIsNull)
-				DataSource = null;
+			if (disposing) {
+				#if DEBUG_DISPOSE
+				Debug.WriteLine ("Disposing: {0}", this.ToString());
+				if (IsQueueForRedraw)
+				throw new Exception("Trying to dispose an object queued for Redraw: " + this.ToString());
+				#endif
+				if (currentInterface.HoverWidget != null) {
+					if (currentInterface.HoverWidget.IsOrIsInside(this))
+						currentInterface.HoverWidget = null;
+				}
+				if (currentInterface.ActiveWidget != null) {
+					if (currentInterface.ActiveWidget.IsOrIsInside (this))
+						currentInterface.ActiveWidget = null;
+				}
+				if (currentInterface.FocusedWidget != null) {
+					if (currentInterface.FocusedWidget.IsOrIsInside (this))
+						currentInterface.FocusedWidget = null;
+				}
+				if (!localDataSourceIsNull)
+					DataSource = null;
+				parent = null;
+			} else
+				Debug.WriteLine ("!!! Finalized by GC: {0}", this.ToString ());
 			Clipping?.Dispose ();
 			bmp?.Dispose ();
-		}
+			disposed = true;
 
+		}  
 		#endregion
 
 		internal static ulong currentUid = 0;
@@ -826,7 +855,9 @@ namespace Crow
 		/// <summary>
 		/// return true if this is contained inside go
 		/// </summary>
-		public bool IsInside(GraphicObject go){
+		public bool IsOrIsInside(GraphicObject go){
+			if (this == go)
+				return true;
 			ILayoutable p = this.Parent;
 			while (p != null) {
 				if (p == go)
