@@ -73,13 +73,9 @@ namespace Crow
         public virtual void RemoveChild(GraphicObject child)        
 		{
 			child.LayoutChanged -= OnChildLayoutChanges;
-			child.Parent = null;
 
 			//check if HoverWidget is removed from Tree
-			if (currentInterface.HoverWidget != null) {
-				if (currentInterface.HoverWidget.IsInside(this))
-					currentInterface.HoverWidget = null;
-			}
+
 
 			lock (children)
             	Children.Remove(child);
@@ -366,11 +362,13 @@ namespace Crow
 		}
 		#endregion
 
-		public override void Dispose ()
+		protected override void Dispose (bool disposing)
 		{
-			foreach (GraphicObject c in children)
-				c.Dispose ();
-			base.Dispose ();
+			if (disposing) {
+				foreach (GraphicObject c in children)
+					c.Dispose ();
+			}
+			base.Dispose (disposing);
 		}
 	}
 }
