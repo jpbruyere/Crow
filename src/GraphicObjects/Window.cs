@@ -391,7 +391,12 @@ namespace Crow
 
 		protected void close(){
 			Closing.Raise (this, null);
-			currentInterface.DeleteWidget (this);
+			if (Parent is Interface)
+				(Parent as Interface).DeleteWidget (this);
+			else if (Parent is Group)
+				(Parent as Group).RemoveChild (this);
+			else if (Parent is PrivateContainer)
+				(Parent as Container).Child = null;
 		}
 	}
 }
