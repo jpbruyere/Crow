@@ -76,7 +76,7 @@ namespace Crow
 		internal static MethodInfo miDSChangeEmitHelper = typeof(Instantiator).GetMethod("dataSourceChangedEmitHelper", BindingFlags.Instance | BindingFlags.NonPublic);
 		internal static MethodInfo miDSReverseBinding = typeof(Instantiator).GetMethod("dataSourceReverseBinding", BindingFlags.Static | BindingFlags.NonPublic);
 
-		internal static FieldInfo miSetCurIface = typeof(GraphicObject).GetField ("currentInterface", BindingFlags.NonPublic | BindingFlags.Instance);
+		internal static FieldInfo miSetCurIface = typeof(GraphicObject).GetField ("currentInterface", BindingFlags.Public | BindingFlags.Instance);
 		internal static MethodInfo miFindByName = typeof (GraphicObject).GetMethod ("FindByName");
 		internal static MethodInfo miGetGObjItem = typeof(List<GraphicObject>).GetMethod("get_Item", new Type[] { typeof(Int32) });
 		internal static MethodInfo miLoadDefaultVals = typeof (GraphicObject).GetMethod ("loadDefaultValues");

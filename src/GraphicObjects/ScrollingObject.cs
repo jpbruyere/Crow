@@ -43,6 +43,11 @@ namespace Crow
 
 		int scrollX, scrollY, maxScrollX, maxScrollY, mouseWheelSpeed;
 
+		/// <summary>
+		/// if true, key stroke are handled in derrived class
+		/// </summary>
+		protected bool KeyEventsOverrides = false;
+
 		/// <summary> Horizontal Scrolling Position </summary>
 		[XmlAttributeAttribute][DefaultValue(0)]
 		public virtual int ScrollX {
@@ -142,14 +147,17 @@ namespace Crow
 		{
 			base.onMouseWheel (sender, e);
 			if (currentInterface.Keyboard.IsKeyDown (Key.ShiftLeft))
-				ScrollY += e.Delta * MouseWheelSpeed;
-			else
 				ScrollX += e.Delta * MouseWheelSpeed;
+			else
+				ScrollY -= e.Delta * MouseWheelSpeed;
 		}
 		/// <summary> Process scrolling with arrow keys, home and end keys. </summary>
 		public override void onKeyDown (object sender, KeyboardKeyEventArgs e)
 		{
 			base.onKeyDown (sender, e);
+
+			if (KeyEventsOverrides)
+				return;
 
 			switch (e.Key) {
 			case Key.Up:
