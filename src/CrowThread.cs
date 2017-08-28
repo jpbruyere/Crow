@@ -53,11 +53,9 @@ namespace Crow
 		}
 		public void Start() { thread.Start();}
 		public void Cancel(){
-			if (thread.IsAlive){
+			if (thread.IsAlive & !cancelRequested){
 				cancelRequested = true;
-				//cancelLoading = true;
 				thread.Join ();
-				//cancelLoading = false;
 			}
 			lock (Host.currentInterface.CrowThreads)
 				Host.currentInterface.CrowThreads.Remove (this);
