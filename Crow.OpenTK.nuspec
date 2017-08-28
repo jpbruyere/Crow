@@ -2,7 +2,7 @@
 <package >
 	<metadata>
 		<id>Crow.OpenTK</id>
-		<version>0.5.2</version>
+		<version>0.5.4</version>
 		<title>C# Rapid Open Widget Toolkit</title>
 		<authors>JP Bruyere</authors>
 		<owners>Grand Tetras Software</owners>
@@ -18,10 +18,19 @@ Crow.OpenTK is the OpenTK ready version.
 CROW is a pure C# widget toolkit with templates, styles, compositing, and bindings.
 Crow.OpenTK is the OpenTK ready version.
 
+Native libraries dependencies:
+	- cairo
+	- librsvg (and its dependencies (glib2, libxml, fontconfig, etc)
+
+Precompiled binaries of those libs are available at http://ftp.gnome.org/pub/GNOME/binaries/
+
 For more information, please visit https://jpbruyere.github.io/Crow/.
 		</summary>
 		<releaseNotes>
-			- debug.
+			- embed Cairo bindings in Crow.
+			- use of CairoRegion to handle clipping
+			- IDisposable for GraphicObject
+			- Border style Raised/Sunken
 		</releaseNotes>
 		<copyright>Copyright 2013-2017</copyright>
 		<dependencies>

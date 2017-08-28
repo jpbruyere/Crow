@@ -91,7 +91,7 @@ namespace Crow
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
 
-		internal Interface currentInterface = null;
+		public Interface currentInterface = null;
 
 		public Region Clipping;
 
