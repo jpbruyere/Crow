@@ -146,7 +146,7 @@ namespace Crow
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
 		{
 			base.onMouseWheel (sender, e);
-			if (currentInterface.Keyboard.IsKeyDown (Key.ShiftLeft))
+			if (CurrentInterface.Keyboard.IsKeyDown (Key.ShiftLeft))
 				ScrollX += e.Delta * MouseWheelSpeed;
 			else
 				ScrollY -= e.Delta * MouseWheelSpeed;

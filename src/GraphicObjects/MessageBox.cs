@@ -134,8 +134,8 @@ namespace Crow
 		public static MessageBox Show (Type msgBoxType, string message, string okMsg = "", string cancelMsg = ""){
 			lock (Interface.CurrentInterface.UpdateMutex) {
 				MessageBox mb = new MessageBox ();
-				mb.loadDefaultValues ();
-				mb.currentInterface.AddWidget (mb);
+				mb.Initialize ();
+				mb.CurrentInterface.AddWidget (mb);
 				mb.MsgType = msgBoxType;
 				mb.Message = message;
 				if (!string.IsNullOrEmpty(okMsg))

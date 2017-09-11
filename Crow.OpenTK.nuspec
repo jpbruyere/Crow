@@ -2,7 +2,7 @@
 <package >
 	<metadata>
 		<id>Crow.OpenTK</id>
-		<version>0.5.4</version>
+		<version>0.5.5</version>
 		<title>C# Rapid Open Widget Toolkit</title>
 		<authors>JP Bruyere</authors>
 		<owners>Grand Tetras Software</owners>
@@ -27,6 +27,7 @@ Precompiled binaries of those libs are available at http://ftp.gnome.org/pub/GNO
 For more information, please visit https://jpbruyere.github.io/Crow/.
 		</summary>
 		<releaseNotes>
+			- Bug fix (#35) of 0.5.4
 			- embed Cairo bindings in Crow.
 			- use of CairoRegion to handle clipping
 			- IDisposable for GraphicObject
