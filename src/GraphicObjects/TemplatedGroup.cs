@@ -159,7 +159,7 @@ namespace Crow
 
 				NotifyValueChanged ("Data", data);
 
-				lock (currentInterface.LayoutMutex)
+				lock (CurrentInterface.LayoutMutex)
 					ClearItems ();
 
 				if (data == null)
@@ -298,8 +298,8 @@ namespace Crow
 				itemPerPage = int.MaxValue;
 			} else if (typeof(GenericStack).IsAssignableFrom (items.GetType ())) {
 				GenericStack gs = new GenericStack ();
-				gs.currentInterface = items.currentInterface;
-				gs.loadDefaultValues ();
+				gs.CurrentInterface = items.CurrentInterface;
+				gs.Initialize ();
 				gs.Orientation = (items as GenericStack).Orientation;
 				gs.Width = items.Width;
 				gs.Height = items.Height;
@@ -327,7 +327,7 @@ namespace Crow
 
 			if (page == items)
 				return;
-			lock (currentInterface.LayoutMutex)
+			lock (CurrentInterface.LayoutMutex)
 				items.AddChild (page);
 
 			#if DEBUG_LOAD
@@ -380,8 +380,8 @@ namespace Crow
 					iTemp = ItemTemplates ["default"];
 			}
 
-			lock (currentInterface.LayoutMutex) {
-				g = iTemp.CreateInstance(currentInterface);
+			lock (CurrentInterface.LayoutMutex) {
+				g = iTemp.CreateInstance(CurrentInterface);
 				page.AddChild (g);
 				//g.LogicalParent = this;
 				registerItemClick (g);

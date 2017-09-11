@@ -73,9 +73,14 @@ namespace Crow
         public virtual void RemoveChild(GraphicObject child)        
 		{
 			child.LayoutChanged -= OnChildLayoutChanges;
+			//check if HoverWidget is removed from Tree
+			if (CurrentInterface.HoverWidget != null) {
+				if (this.Contains (CurrentInterface.HoverWidget))
+					CurrentInterface.HoverWidget = null;
+			}
 
 			lock (children)
-            	Children.Remove(child);
+				Children.Remove(child);
 			child.Dispose ();
 
 			if (child == largestChild && Width == Measure.Fit)
@@ -344,8 +349,8 @@ namespace Crow
 		#region Mouse handling
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
-			if (currentInterface.HoverWidget != this) {
-				currentInterface.HoverWidget = this;
+			if (CurrentInterface.HoverWidget != this) {
+				CurrentInterface.HoverWidget = this;
 				onMouseEnter (this, e);
 			}
 			for (int i = Children.Count - 1; i >= 0; i--) {

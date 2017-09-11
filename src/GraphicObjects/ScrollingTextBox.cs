@@ -464,12 +464,12 @@ namespace Crow
 		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseEnter (sender, e);
-			currentInterface.MouseCursor = XCursor.Text;
+			CurrentInterface.MouseCursor = XCursor.Text;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			currentInterface.MouseCursor = XCursor.Default;
+			CurrentInterface.MouseCursor = XCursor.Default;
 		}
 		protected override void onFocused (object sender, EventArgs e)
 		{
@@ -555,7 +555,7 @@ namespace Crow
 					if (!MoveRight ())
 						return;
 				}else if (e.Shift)
-					currentInterface.Clipboard = this.SelectedText;
+					CurrentInterface.Clipboard = this.SelectedText;
 				this.DeleteChar ();
 				break;
 			case Key.Enter:
@@ -601,9 +601,9 @@ namespace Crow
 				break;
 			case Key.Insert:
 				if (e.Shift)
-					this.Insert (currentInterface.Clipboard);
+					this.Insert (CurrentInterface.Clipboard);
 				else if (e.Control && !selectionIsEmpty)
-					currentInterface.Clipboard = this.SelectedText;
+					CurrentInterface.Clipboard = this.SelectedText;
 				break;
 			case Key.Left:
 				if (e.Shift) {

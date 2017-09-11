@@ -91,7 +91,20 @@ namespace Crow
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
 
-		public Interface currentInterface = null;
+		Interface currentInterface = null;
+
+		[XmlIgnore]public Interface CurrentInterface {
+			get {
+				if (currentInterface == null) {
+					currentInterface = Interface.CurrentInterface;
+					Initialize ();
+				}
+				return currentInterface;
+			}
+			set {
+				currentInterface = value;
+			}
+		}
 
 		public Region Clipping;
 
@@ -107,12 +120,23 @@ namespace Crow
 		#region CTOR
 		public GraphicObject ()
 		{
+			Clipping = new Region ();
 			#if DEBUG
 			uid = currentUid;
 			currentUid++;
 			#endif
 		}
 		#endregion
+		internal bool initialized = false;
+		/// <summary>
+		/// Initialize this Graphic object instance by setting style and default values and loading template if required
+		/// </summary>
+		public virtual void Initialize(){
+			if (currentInterface == null)
+				currentInterface = Interface.CurrentInterface;			
+			loadDefaultValues ();
+			initialized = true;
+		}
 		#region private fields
 		LayoutingType registeredLayoutings = LayoutingType.All;
 		ILayoutable logicalParent;
@@ -677,8 +701,6 @@ namespace Crow
 			Debug.WriteLine ("LoadDefValues for " + this.ToString ());
 			#endif
 
-			Clipping = new Region ();
-
 			Type thisType = this.GetType ();
 
 			if (!string.IsNullOrEmpty (Style)) {
@@ -910,7 +932,7 @@ namespace Crow
 			if (Width.IsFit || Height.IsFit)
 				RegisterForLayouting (LayoutingType.Sizing);
 			else if (RegisteredLayoutings == LayoutingType.None)
-				currentInterface.EnqueueForRepaint (this);
+				CurrentInterface.EnqueueForRepaint (this);
 		}
 		/// <summary> query an update of the content, a redraw </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -921,7 +943,7 @@ namespace Crow
 			#endif
 			IsDirty = true;
 			if (RegisteredLayoutings == LayoutingType.None)
-				currentInterface.EnqueueForRepaint (this);
+				CurrentInterface.EnqueueForRepaint (this);
 		}
 		#endregion
 
@@ -933,12 +955,13 @@ namespace Crow
 				contentSize.Width + 2 * Margin: contentSize.Height + 2 * Margin;
 		}
 		/// <summary> By default in groups, LayoutingType.ArrangeChildren is reset </summary>
-		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){}
+		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){
+		}
 		public virtual bool ArrangeChildren { get { return false; } }
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
 			if (Parent == null)
 				return;
-			lock (currentInterface.LayoutMutex) {
+			lock (CurrentInterface.LayoutMutex) {
 				//prevent queueing same LayoutingType for this
 				layoutType &= (~RegisteredLayoutings);
 
@@ -957,20 +980,23 @@ namespace Crow
 				if (Parent is GraphicObject)
 					(Parent as GraphicObject).ChildrenLayoutingConstraints (ref layoutType);
 
+//				//prevent queueing same LayoutingType for this
+//				layoutType &= (~RegisteredLayoutings);
+
 				if (layoutType == LayoutingType.None)
 					return;
 
 				//enqueue LQI LayoutingTypes separately
 				if (layoutType.HasFlag (LayoutingType.Width))
-					currentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
+					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
 				if (layoutType.HasFlag (LayoutingType.Height))
-					currentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
+					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
 				if (layoutType.HasFlag (LayoutingType.X))
-					currentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
+					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
 				if (layoutType.HasFlag (LayoutingType.Y))
-					currentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
+					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
 				if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
-					currentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
+					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
 			}
 		}
 
@@ -1143,7 +1169,7 @@ namespace Crow
 
 			//if no layouting remains in queue for item, registre for redraw
 			if (this.registeredLayoutings == LayoutingType.None && IsDirty)
-				currentInterface.EnqueueForRepaint (this);
+				CurrentInterface.EnqueueForRepaint (this);
 
 			return true;
 		}
@@ -1276,8 +1302,8 @@ namespace Crow
 		}
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
-			if (currentInterface.HoverWidget != this) {
-				currentInterface.HoverWidget = this;
+			if (CurrentInterface.HoverWidget != this) {
+				CurrentInterface.HoverWidget = this;
 				onMouseEnter (this, e);
 			}
 
@@ -1293,19 +1319,19 @@ namespace Crow
 			MouseMove.Raise (this, e);
 		}
 		public virtual void onMouseDown(object sender, MouseButtonEventArgs e){
-			if (currentInterface.eligibleForDoubleClick == this && currentInterface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick)
+			if (CurrentInterface.eligibleForDoubleClick == this && CurrentInterface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick)
 				onMouseDoubleClick (this, e);
 			else
 				currentInterface.clickTimer.Restart();
-			currentInterface.eligibleForDoubleClick = null;
+			CurrentInterface.eligibleForDoubleClick = null;
 
-			if (currentInterface.ActiveWidget == null)
-				currentInterface.ActiveWidget = this;
+			if (CurrentInterface.ActiveWidget == null)
+				CurrentInterface.ActiveWidget = this;
 			if (this.Focusable && !Interface.FocusOnHover) {
 				BubblingMouseButtonEventArg be = e as BubblingMouseButtonEventArg;
 				if (be.Focused == null) {
 					be.Focused = this;
-					currentInterface.FocusedWidget = this;
+					CurrentInterface.FocusedWidget = this;
 				}
 			}
 			//bubble event to the top
@@ -1324,8 +1350,8 @@ namespace Crow
 			MouseUp.Raise (this, e);
 
 			if (MouseIsIn (e.Position) && IsActive) {
-				if (currentInterface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick)
-					currentInterface.eligibleForDoubleClick = this;
+				if (CurrentInterface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick)
+					CurrentInterface.eligibleForDoubleClick = this;
 				onMouseClick (this, e);
 			}
 		}
