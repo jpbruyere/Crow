@@ -37,8 +37,8 @@ namespace Crow
 		bool _verticalScrolling;
 		bool _horizontalScrolling;
 		bool _scrollbarVisible;
-		double _scrollX = 0.0;
-		double _scrollY = 0.0;
+		int _scrollX = 0;
+		int _scrollY = 0;
 		int scrollSpeed;
 
 		public event EventHandler<ScrollingEventArgs> Scrolled;
@@ -60,18 +60,18 @@ namespace Crow
 			get { return _scrollbarVisible; }
 			set { _scrollbarVisible = value; }
 		}
-		[XmlAttributeAttribute][DefaultValue(0.0)]
-		public double ScrollX {
+		[XmlAttributeAttribute][DefaultValue(0)]
+		public int ScrollX {
 			get {
 				return _scrollX;
 			}
 			set {
 				if (_scrollX == value)
 					return;
-				if (value < 0.0)
-					_scrollX = 0.0;
+				if (value < 0)
+					_scrollX = 0;
 				else if (value > Child.Slot.Width - ClientRectangle.Width)
-					_scrollX = Math.Max(0.0, Child.Slot.Width - ClientRectangle.Width);
+					_scrollX = Math.Max(0, Child.Slot.Width - ClientRectangle.Width);
 				else
 					_scrollX = value;
 				NotifyValueChanged("ScrollX", _scrollX);
@@ -79,18 +79,18 @@ namespace Crow
 				Scrolled.Raise (this, new ScrollingEventArgs (Orientation.Horizontal));
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(0.0)]
-		public double ScrollY {
+		[XmlAttributeAttribute][DefaultValue(0)]
+		public int ScrollY {
 			get {
 				return _scrollY;
 			}
 			set {
 				if (_scrollY == value)
 					return;
-				if (value < 0.0)
-					_scrollY = 0.0;
+				if (value < 0)
+					_scrollY = 0;
 				else if (value > Child.Slot.Height - ClientRectangle.Height)
-					_scrollY = Math.Max(0.0,Child.Slot.Height - ClientRectangle.Height);
+					_scrollY = Math.Max(0,Child.Slot.Height - ClientRectangle.Height);
 				else
 					_scrollY = value;
 				NotifyValueChanged("ScrollY", _scrollY);
@@ -209,7 +209,7 @@ namespace Crow
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
 			savedMousePos = e.Position;
-			Point m = e.Position - new Point ((int)ScrollX, (int)ScrollY);
+			Point m = e.Position - new Point (ScrollX, ScrollY);
 			base.checkHoverWidget (new MouseMoveEventArgs(m.X,m.Y,e.XDelta,e.YDelta));
 		}
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
@@ -230,7 +230,7 @@ namespace Crow
 		}
 		public override void RegisterClip (Rectangle clip)
 		{
-			base.RegisterClip (clip - new Point((int)ScrollX,(int)ScrollY));
+			base.RegisterClip (clip - new Point(ScrollX,ScrollY));
 		}
 		#endregion
 
