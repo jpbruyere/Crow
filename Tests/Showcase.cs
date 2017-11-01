@@ -160,7 +160,7 @@ namespace Tests
 			}
 			get { return List2; }
 		}
-		IList<Color> testList = Color.ColorDic.ToList();
+		IList<Color> testList = Color.ColorDic.Values.ToList();
 		public IList<Color> TestList {
 			set{
 				testList = value;
@@ -193,7 +193,7 @@ namespace Tests
 
 		void OnClear (object sender, MouseButtonEventArgs e) => TestList = null;
 
-		void OnLoadList (object sender, MouseButtonEventArgs e) => TestList = Color.ColorDic.ToList();
+		void OnLoadList (object sender, MouseButtonEventArgs e) => TestList = Color.ColorDic.Values.ToList();
 
 	}
 

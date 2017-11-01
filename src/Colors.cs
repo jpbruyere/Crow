@@ -59,11 +59,11 @@ namespace Crow
 			G = _G;
 			B = _B;
 			Name = _name;
-			ColorDic.Add(this);
+			ColorDic.Add(_name,this);
 		}
 		#endregion
 
-		public static List<Color> ColorDic = new List<Color>();
+		public static Dictionary<string, Color> ColorDic = new Dictionary<string, Color>();
 
 		internal string Name;
 
@@ -88,11 +88,9 @@ namespace Crow
 
 			if (c.Length == 1)
 			{
-				foreach (Color cr in ColorDic)
-				{
-					if (string.Equals(cr.Name,s,StringComparison.Ordinal))
-						return cr;
-				}
+				if (ColorDic.ContainsKey (s))
+					return ColorDic[s];
+				throw new Exception ("Unknown color name: " + s);
 			}
 			return new Color(
 				double.Parse(c[0]),
@@ -1126,15 +1124,9 @@ namespace Crow
 		{
 			if (!string.IsNullOrEmpty(Name))
 				return Name;
-
-			foreach (Color cr in ColorDic)
-			{
-				if (cr == this)
-				{
-					Name = cr.Name;
-					return cr.Name;
-				}
-			}
+			Color tc = this;
+			if (ColorDic.ContainsValue (this))
+				return ColorDic.FirstOrDefault (c => c.Value == tc).Key;
 
 			return string.Format("{0},{1},{2},{3}", R, G, B, A);
 		}
