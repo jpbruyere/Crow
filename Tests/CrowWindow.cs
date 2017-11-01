@@ -109,12 +109,29 @@ namespace Crow
 		public List<InterfaceControler> ifaceControl = new List<InterfaceControler>();
 		int focusedIdx = -1, activeIdx = -2;
 
+		// TODO:We should be able to set the current interface programmaticaly
+		/// <summary>
+		/// Gets the currently focused interface, focus could have been given by creation of new iface controler and
+		/// not only by the mouse
+		/// </summary>
+		public Interface CurrentInterface {
+			get {
+				if (ifaceControl.Count == 0) {//create default orthogonal interface
+					addInterfaceControler (new InterfaceControler (
+						new Rectangle (0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height)));
+					focusedIdx = 0;
+				}
+				return ifaceControl [focusedIdx].CrowInterface;
+			}
+		}
+			
 		void addInterfaceControler(InterfaceControler ifaceControler)
 		{
 			ifaceControler.CrowInterface.Quit += Quit;
 			ifaceControler.CrowInterface.MouseCursorChanged += CrowInterface_MouseCursorChanged;
 
 			ifaceControl.Add (ifaceControler);
+			focusedIdx = ifaceControl.Count - 1;
 		}
 		void openGLDraw(){
 			//save GL states
@@ -190,6 +207,7 @@ namespace Crow
 			ifaceControl [interfaceIdx].CrowInterface.AddWidget (g);
 			return g;
 		}
+
 		public void DeleteWidget (GraphicObject g, int interfaceIdx = 0){
 			ifaceControl [interfaceIdx].CrowInterface.DeleteWidget (g);
 		}

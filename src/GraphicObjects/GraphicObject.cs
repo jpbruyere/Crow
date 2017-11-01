@@ -806,6 +806,13 @@ namespace Crow
 			}
 			return false;
 		}
+		/// <summary>
+		/// Gets the default value of the widget's property from either the style, or from xml default
+		/// </summary>
+		/// <returns><c>true</c>, if default value is defined, <c>false</c> otherwise.</returns>
+		/// <param name="pi">PropertyInfo</param>
+		/// <param name="styling">Styling informations</param>
+		/// <param name="defaultValue">output of Default value, null if not found</param>
 		bool getDefaultValue(PropertyInfo pi, List<Style> styling,
 			out object defaultValue){
 			defaultValue = null;
@@ -904,7 +911,7 @@ namespace Crow
 		public void RegisterForGraphicUpdate ()
 		{
 			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("RegisterForGraphicUpdate -> {0}", this.ToString ()));
+			Debug.WriteLine (string.Format("RegisterForGraphicUpdate (IsDirty set)-> {0}", this.ToString ()));
 			#endif
 			IsDirty = true;
 			if (Width.IsFit || Height.IsFit)
@@ -917,7 +924,7 @@ namespace Crow
 		public void RegisterForRedraw ()
 		{
 			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("RegisterForRedraw -> {0}", this.ToString ()));
+			Debug.WriteLine (string.Format("RegisterForRedraw (IsDirty set)-> {0}", this.ToString ()));
 			#endif
 			IsDirty = true;
 			if (RegisteredLayoutings == LayoutingType.None)
@@ -1003,6 +1010,9 @@ namespace Crow
 		/// met and LQI has to be re-queued</returns>
 		public virtual bool UpdateLayout (LayoutingType layoutType)
 		{
+			#if DEBUG_UPDATE
+			Debug.WriteLine (string.Format("UpdateLayout ({1})-> {0}", this.ToString (), layoutType));
+			#endif
 			//unset bit, it would be reset if LQI is re-queued
 			registeredLayoutings &= (~layoutType);
 
@@ -1153,6 +1163,10 @@ namespace Crow
 		/// <summary> This is the common overridable drawing routine to create new widget </summary>
 		protected virtual void onDraw(Context gr)
 		{
+			#if DEBUG_UPDATE
+			Debug.WriteLine (string.Format("OnDraw -> {0}", this.ToString ()));
+			#endif
+
 			Rectangle rBack = new Rectangle (Slot.Size);
 
 			Background.SetAsSource (gr, rBack);
@@ -1166,7 +1180,7 @@ namespace Crow
 		protected virtual void RecreateCache ()
 		{
 			#if DEBUG_UPDATE
-			Debug.WriteLine ("RecreateCache -> {0}", this.ToString ());
+			Debug.WriteLine (string.Format("RecreateCache -> {0}", this.ToString ()));
 			#endif
 			IsDirty = false;
 			if (bmp != null)
@@ -1180,7 +1194,7 @@ namespace Crow
 		}
 		protected virtual void UpdateCache(Context ctx){
 			#if DEBUG_UPDATE
-			Debug.WriteLine ("UpdateCache -> {0}", this.ToString ());
+			Debug.WriteLine (string.Format("UpdateCache -> {0}", this.ToString ()));
 			#endif
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 			if (clearBackground) {
