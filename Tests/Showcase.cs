@@ -70,8 +70,8 @@ namespace Tests
 				return;
 			if (fi is DirectoryInfo)
 				return;
-			lock (this.ifaceControl [0].CrowInterface.UpdateMutex) {
-				GraphicObject g = this.ifaceControl [0].CrowInterface.Load (fi.FullName);
+			lock (this.CurrentInterface.UpdateMutex) {
+				GraphicObject g = this.CurrentInterface.Load (fi.FullName);
 				crowContainer.SetChild (g);
 				g.DataSource = this;
 			}

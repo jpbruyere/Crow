@@ -373,9 +373,14 @@ namespace Crow
 
 		#region UPDATE Loops
 		/// <summary>Enqueue Graphic object for Repaint, DrawingQueue is locked because
-		/// GraphObj's property Set methods could trigger an update from another thread</summary>
+		/// GraphObj's property Set methods could trigger an update from another thread
+		/// Once in that queue, the layouting of obj and childs is ok, the next step
+		/// when dequeued is clipping registration</summary>
 		public void EnqueueForRepaint(GraphicObject g)
 		{
+			#if DEBUG_UPDATE
+			Debug.WriteLine (string.Format("\tEnqueueForRepaint -> {0}", g?.ToString ()));
+			#endif
 			lock (DrawingQueue) {
 				if (g.IsQueueForRedraw)
 					return;

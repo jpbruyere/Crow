@@ -40,7 +40,9 @@ namespace Tests
 		{
 			base.OnLoad (e);
 
-			AddWidget(new Label("Hello World"));
+
+			AddWidget(Instantiator.CreateFromImlFragment (@"<Border Fit='true' BorderWidth='2' BorderStyle='Normal'	MouseDown='{BorderStyle=Sunken}' MouseUp='{BorderStyle=Raised}'	MouseEnter='{BorderStyle=Raised}' MouseLeave='{BorderStyle=Normal}'><Label Margin='50'/></Border>").CreateInstance (CurrentInterface));
+			//Load(@"Interfaces/GraphicObject/0.crow");
 		}
 
 		[STAThread]

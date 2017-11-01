@@ -2,7 +2,7 @@
 <package >
 	<metadata>
 		<id>Crow.OpenTK</id>
-		<version>0.5.4</version>
+		<version>0.5.6</version>
 		<title>C# Rapid Open Widget Toolkit</title>
 		<authors>JP Bruyere</authors>
 		<owners>Grand Tetras Software</owners>
