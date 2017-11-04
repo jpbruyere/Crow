@@ -46,19 +46,19 @@ namespace Crow
 		#region private fields
 		int _borderWidth;
 		BorderStyle _borderStyle;
-		Fill raiseColor = Color.Gray;
+		Fill raisedColor = Color.Gray;
 		Fill sunkenColor = Color.Jet;
 		#endregion
 
 		#region public properties
 		[XmlAttributeAttribute]
-		public virtual Fill RaiseColor {
-			get { return raiseColor; }
+		public virtual Fill RaisedColor {
+			get { return raisedColor; }
 			set {
-				if (raiseColor == value)
+				if (raisedColor == value)
 					return;
-				raiseColor = value;
-				NotifyValueChanged ("RaiseColor", raiseColor);
+				raisedColor = value;
+				NotifyValueChanged ("RaisedColor", raisedColor);
 				RegisterForRedraw ();
 			}
 		}
@@ -109,90 +109,7 @@ namespace Crow
 		}
 		protected override void onDraw (Cairo.Context gr)
 		{
-			Rectangle rBack = new Rectangle (Slot.Size);
-
-			//rBack.Inflate (-Margin);
-//			if (BorderWidth > 0) 
-//				rBack.Inflate (-BorderWidth / 2);			
-
-			Background.SetAsSource (gr, rBack);
-			CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
-			gr.Fill ();
-
-			if (BorderStyle == BorderStyle.Normal) {
-				if (BorderWidth > 0) {
-					Foreground.SetAsSource (gr, rBack);
-					CairoHelpers.CairoRectangle(gr, rBack, CornerRadius, BorderWidth);
-				}
-			}else{
-				gr.LineWidth = 1.0;
-				if (CornerRadius > 0.0) {
-					double radius = CornerRadius;
-					if ((radius > rBack.Height / 2.0) || (radius > rBack.Width / 2.0))
-						radius = Math.Min(rBack.Height / 2.0, rBack.Width / 2.0);
-					gr.SetSourceColor (sunkenColor);
-					gr.MoveTo(0.5 + rBack.Left, -0.5 + rBack.Bottom - radius);
-					gr.ArcNegative   (0.5 + rBack.Left + radius, -0.5 + rBack.Bottom - radius, radius, Math.PI, Math.PI * 0.75);
-					gr.MoveTo(0.5 + rBack.Left, -0.5 + rBack.Bottom - radius);
-					gr.LineTo(0.5 + rBack.Left, 0.5 + rBack.Top + radius);
-					gr.Arc   (0.5 + rBack.Left + radius, 0.5 + rBack.Top + radius, radius, Math.PI , Math.PI*1.5);
-					gr.LineTo(-0.5 + rBack.Right - radius, 0.5 + rBack.Top);
-					gr.Arc   (-0.5 + rBack.Right - radius, 0.5 + rBack.Top + radius, radius, Math.PI*1.5 , Math.PI*1.75);
-					gr.Stroke();
-					if (BorderStyle == BorderStyle.Raised) {
-						gr.MoveTo (-1.5 + rBack.Right , 1.5 + rBack.Top + radius);
-						gr.ArcNegative (-0.5 + rBack.Right - radius, 0.5 + rBack.Top + radius, radius-1.0, 0, -Math.PI * 0.25);
-						gr.MoveTo (-1.5 + rBack.Right , 1.5 + rBack.Top + radius);
-						gr.LineTo (-1.5 + rBack.Right , -1.5 + rBack.Bottom - radius);
-						gr.Arc (-0.5 + rBack.Right -radius, -0.5 + rBack.Bottom - radius, radius-1.0, 0, Math.PI /2.0);
-						gr.LineTo (1.5 + rBack.Left + radius, -1.5 + rBack.Bottom);
-						gr.Arc (0.5 + rBack.Left + radius, -0.5 + rBack.Bottom - radius, radius-1.0, Math.PI / 2.0, Math.PI*0.75 );
-						gr.Stroke ();
-
-						gr.SetSourceColor (raiseColor);
-						gr.MoveTo (1.5 + rBack.Left, -1.5 + rBack.Bottom - radius);
-						gr.ArcNegative (0.5 + rBack.Left + radius, -0.5 + rBack.Bottom - radius, radius - 1.0, Math.PI, Math.PI * 0.75);
-						gr.MoveTo (1.5 + rBack.Left, -1.5 + rBack.Bottom - radius);
-						gr.LineTo (1.5 + rBack.Left, 1.5 + rBack.Top + radius);
-						gr.Arc (0.5 + rBack.Left + radius, 0.5 + rBack.Top + radius, radius - 1.0, Math.PI, Math.PI * 1.5);
-						gr.LineTo (-1.5 + rBack.Right - radius, 1.5 + rBack.Top);
-						gr.Arc (-0.5 + rBack.Right - radius, 0.5 + rBack.Top + radius, radius - 1.0, Math.PI * 1.5, Math.PI * 1.75);
-					} else {
-						gr.Stroke ();
-						gr.SetSourceColor (raiseColor);
-					}
-					gr.MoveTo (-0.5 + rBack.Right , 0.5 + rBack.Top + radius);
-					gr.ArcNegative (-0.5 + rBack.Right - radius, 0.5 + rBack.Top + radius, radius, 0, -Math.PI * 0.25);
-					gr.MoveTo (-0.5 + rBack.Right , 0.5 + rBack.Top + radius);
-					gr.LineTo (-0.5 + rBack.Right , -0.5 + rBack.Bottom - radius);
-					gr.Arc (-0.5 + rBack.Right -radius, -0.5 + rBack.Bottom - radius, radius, 0, Math.PI /2.0);
-					gr.LineTo (0.5 + rBack.Left + radius, -0.5 + rBack.Bottom);
-					gr.Arc (0.5 + rBack.Left + radius, -0.5 + rBack.Bottom - radius, radius, Math.PI / 2.0, Math.PI*0.75 );
-					gr.Stroke ();
-				} else {
-					gr.SetSourceColor (sunkenColor);
-					gr.MoveTo (0.5 + rBack.Left, rBack.Bottom);
-					gr.LineTo (0.5 + rBack.Left, 0.5 + rBack.Y);
-					gr.LineTo (rBack.Right, 0.5 + rBack.Y);
-					if (BorderStyle == BorderStyle.Raised) {
-						gr.MoveTo (-1.5 + rBack.Right, 2.0 + rBack.Y);
-						gr.LineTo (-1.5 + rBack.Right, -1.5 + rBack.Bottom);
-						gr.LineTo (2.0 + rBack.Left, -1.5 + rBack.Bottom);
-						gr.Stroke ();
-						gr.SetSourceColor (raiseColor);
-						gr.MoveTo (1.5 + rBack.Left, -1.0 + rBack.Bottom);
-						gr.LineTo (1.5 + rBack.Left, 1.5 + rBack.Y);
-						gr.LineTo (rBack.Right, 1.5 + rBack.Y);
-					} else {
-						gr.Stroke ();
-						gr.SetSourceColor (raiseColor);
-					}
-					gr.MoveTo (-0.5 + rBack.Right, 1.5 + rBack.Y);
-					gr.LineTo (-0.5 + rBack.Right, -0.5 + rBack.Bottom);
-					gr.LineTo (1.0 + rBack.Left, -0.5 + rBack.Bottom);
-					gr.Stroke ();
-				}
-			}
+			drawborder2 (gr);
 
 			gr.Save ();
 			if (ClipToClientRect) {
@@ -204,7 +121,132 @@ namespace Crow
 			if (child != null)
 				child.Paint (ref gr);
 			gr.Restore ();
-		}		
+		}
+		void drawborder2(Cairo.Context gr){
+			Rectangle rBack = new Rectangle (Slot.Size);
+
+			//rBack.Inflate (-Margin);
+			//			if (BorderWidth > 0)
+			//				rBack.Inflate (-BorderWidth / 2);
+
+			Background.SetAsSource (gr, rBack);
+			CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
+			gr.Fill ();
+
+
+			if (BorderStyle == BorderStyle.Normal) {
+				if (BorderWidth > 0) {
+					Foreground.SetAsSource (gr, rBack);
+					CairoHelpers.CairoRectangle (gr, rBack, CornerRadius, BorderWidth);
+				}
+			} else {
+				gr.LineWidth = 1.0;
+				if (CornerRadius > 0.0) {
+					double radius = CornerRadius;
+					if ((radius > rBack.Height / 2.0) || (radius > rBack.Width / 2.0))
+						radius = Math.Min (rBack.Height / 2.0, rBack.Width / 2.0);
+					gr.SetSourceColor (sunkenColor);
+					gr.MoveTo (0.5 + rBack.Left, -0.5 + rBack.Bottom - radius);
+					gr.ArcNegative (0.5 + rBack.Left + radius, -0.5 + rBack.Bottom - radius, radius, Math.PI, Math.PI * 0.75);
+					gr.MoveTo (0.5 + rBack.Left, -0.5 + rBack.Bottom - radius);
+					gr.LineTo (0.5 + rBack.Left, 0.5 + rBack.Top + radius);
+					gr.Arc (0.5 + rBack.Left + radius, 0.5 + rBack.Top + radius, radius, Math.PI, Math.PI * 1.5);
+					gr.LineTo (-0.5 + rBack.Right - radius, 0.5 + rBack.Top);
+					gr.Arc (-0.5 + rBack.Right - radius, 0.5 + rBack.Top + radius, radius, Math.PI * 1.5, Math.PI * 1.75);
+					gr.Stroke ();
+					if (BorderStyle == BorderStyle.Raised) {
+						gr.MoveTo (-1.5 + rBack.Right, 1.5 + rBack.Top + radius);
+						gr.ArcNegative (-0.5 + rBack.Right - radius, 0.5 + rBack.Top + radius, radius - 1.0, 0, -Math.PI * 0.25);
+						gr.MoveTo (-1.5 + rBack.Right, 1.5 + rBack.Top + radius);
+						gr.LineTo (-1.5 + rBack.Right, -1.5 + rBack.Bottom - radius);
+						gr.Arc (-0.5 + rBack.Right - radius, -0.5 + rBack.Bottom - radius, radius - 1.0, 0, Math.PI / 2.0);
+						gr.LineTo (1.5 + rBack.Left + radius, -1.5 + rBack.Bottom);
+						gr.Arc (0.5 + rBack.Left + radius, -0.5 + rBack.Bottom - radius, radius - 1.0, Math.PI / 2.0, Math.PI * 0.75);
+						gr.Stroke ();
+
+						gr.SetSourceColor (raisedColor);
+						gr.MoveTo (1.5 + rBack.Left, -1.5 + rBack.Bottom - radius);
+						gr.ArcNegative (0.5 + rBack.Left + radius, -0.5 + rBack.Bottom - radius, radius - 1.0, Math.PI, Math.PI * 0.75);
+						gr.MoveTo (1.5 + rBack.Left, -1.5 + rBack.Bottom - radius);
+						gr.LineTo (1.5 + rBack.Left, 1.5 + rBack.Top + radius);
+						gr.Arc (0.5 + rBack.Left + radius, 0.5 + rBack.Top + radius, radius - 1.0, Math.PI, Math.PI * 1.5);
+						gr.LineTo (-1.5 + rBack.Right - radius, 1.5 + rBack.Top);
+						gr.Arc (-0.5 + rBack.Right - radius, 0.5 + rBack.Top + radius, radius - 1.0, Math.PI * 1.5, Math.PI * 1.75);
+					} else {
+						gr.Stroke ();
+						gr.SetSourceColor (raisedColor);
+					}
+					gr.MoveTo (-0.5 + rBack.Right, 0.5 + rBack.Top + radius);
+					gr.ArcNegative (-0.5 + rBack.Right - radius, 0.5 + rBack.Top + radius, radius, 0, -Math.PI * 0.25);
+					gr.MoveTo (-0.5 + rBack.Right, 0.5 + rBack.Top + radius);
+					gr.LineTo (-0.5 + rBack.Right, -0.5 + rBack.Bottom - radius);
+					gr.Arc (-0.5 + rBack.Right - radius, -0.5 + rBack.Bottom - radius, radius, 0, Math.PI / 2.0);
+					gr.LineTo (0.5 + rBack.Left + radius, -0.5 + rBack.Bottom);
+					gr.Arc (0.5 + rBack.Left + radius, -0.5 + rBack.Bottom - radius, radius, Math.PI / 2.0, Math.PI * 0.75);
+					gr.Stroke ();
+				} else {
+					gr.SetSourceColor (sunkenColor);
+					gr.MoveTo (0.5 + rBack.Left, rBack.Bottom);
+					gr.LineTo (0.5 + rBack.Left, 0.5 + rBack.Y);
+					gr.LineTo (rBack.Right, 0.5 + rBack.Y);
+					if (BorderStyle == BorderStyle.Raised) {
+						gr.MoveTo (-1.5 + rBack.Right, 2.0 + rBack.Y);
+						gr.LineTo (-1.5 + rBack.Right, -1.5 + rBack.Bottom);
+						gr.LineTo (2.0 + rBack.Left, -1.5 + rBack.Bottom);
+						gr.Stroke ();
+						gr.SetSourceColor (raisedColor);
+						gr.MoveTo (1.5 + rBack.Left, -1.0 + rBack.Bottom);
+						gr.LineTo (1.5 + rBack.Left, 1.5 + rBack.Y);
+						gr.LineTo (rBack.Right, 1.5 + rBack.Y);
+					} else {
+						gr.Stroke ();
+						gr.SetSourceColor (raisedColor);
+					}
+					gr.MoveTo (-0.5 + rBack.Right, 1.5 + rBack.Y);
+					gr.LineTo (-0.5 + rBack.Right, -0.5 + rBack.Bottom);
+					gr.LineTo (1.0 + rBack.Left, -0.5 + rBack.Bottom);
+					gr.Stroke ();
+				}
+			}
+		}
+		void drawborder1(Cairo.Context gr){
+			Rectangle rBack = new Rectangle (Slot.Size);
+
+			//rBack.Inflate (-Margin);
+			//			if (BorderWidth > 0)
+			//				rBack.Inflate (-BorderWidth / 2);
+
+			Background.SetAsSource (gr, rBack);
+			CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
+			gr.Fill ();
+
+			double bw = _borderWidth;
+			double crad = CornerRadius;
+
+			if (bw > 0) {
+				if (BorderStyle == BorderStyle.Normal)
+					Foreground.SetAsSource (gr, rBack);
+				else {
+					if (BorderStyle == BorderStyle.Sunken)
+						gr.SetSourceColor (raisedColor);
+					else
+						gr.SetSourceColor (sunkenColor);
+
+					CairoHelpers.CairoRectangle (gr, rBack, crad, bw);
+
+					if (BorderStyle == BorderStyle.Sunken)
+						gr.SetSourceColor (sunkenColor);
+					else
+						gr.SetSourceColor (raisedColor);
+
+					bw /= 2.0;
+					rBack.Width -= (int)Math.Round(bw);
+					rBack.Height -= (int)Math.Round(bw);
+				}
+
+				CairoHelpers.CairoRectangle (gr, rBack, crad, bw);
+			}
+		}
 		#endregion
 	}
 }

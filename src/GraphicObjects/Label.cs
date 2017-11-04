@@ -265,7 +265,6 @@ namespace Crow
 		{
 			get {
 				return lines [CurrentLine] [CurrentColumn];
-				//return _currentCol > lines[CurrentLine].Length ? (char)0 : lines [CurrentLine] [CurrentColumn];
 			}
 		}
 		/// <summary>
