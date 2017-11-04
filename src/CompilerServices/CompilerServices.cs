@@ -295,18 +295,25 @@ namespace Crow
 			else if (miDest.MemberType == MemberTypes.Field)
 				destType =(miDest as FieldInfo).FieldType;
 
-			if (value != null) {
-				if (destType == TObject)//TODO: check that test of destType is not causing problems
-					convertedVal = value;
-				else {
-					origType = value.GetType ();
-					if (destType.IsAssignableFrom (origType))
-						convertedVal = Convert.ChangeType (value, destType);
-					else if (origType.IsPrimitive & destType.IsPrimitive)
-						convertedVal = GetConvertMethod (destType).Invoke (null, new Object[] { value });
-					else
-						convertedVal = getImplicitOp (origType, destType).Invoke (value, null);
+			try {
+				if (value != null) {
+					if (destType == TObject)//TODO: check that test of destType is not causing problems
+						convertedVal = value;
+					else {
+						origType = value.GetType ();
+						if (destType.IsAssignableFrom (origType))
+							convertedVal = Convert.ChangeType (value, destType);
+						else if (origType == typeof(string) & destType.IsPrimitive)
+							convertedVal = Convert.ChangeType(value, destType);
+						else if (origType.IsPrimitive & destType.IsPrimitive)
+							convertedVal = GetConvertMethod (destType).Invoke (null, new Object[] { value });
+						else
+							convertedVal = getImplicitOp (origType, destType).Invoke (value, null);
+					}
 				}
+			} catch (Exception ex) {
+				Debug.WriteLine (ex.ToString ());
+				return;
 			}
 
 			if (miDest.MemberType == MemberTypes.Property)
