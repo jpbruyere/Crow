@@ -165,14 +165,14 @@ namespace Crow
 				cursor = new Rectangle (new Size (_cursorSize, (int)(r.Height)));
 				p1 = r.TopLeft + new Point (_cursorSize / 2, r.Height / 2);
 				unity = (double)(r.Width - _cursorSize) / (Maximum - Minimum);
-				cursor.TopLeft = new Point (r.Left + (int)(Value * unity),
+				cursor.TopLeft = new Point (r.Left + (int)((Value - Minimum) * unity),
 					(int)(p1.Y - cursor.Height / 2));
 			} else {
 				cursor = new Rectangle (new Size ((int)(r.Width), _cursorSize));
 				p1 = r.TopLeft + new Point (r.Width / 2, _cursorSize / 2);
 				unity = (double)(r.Height - _cursorSize) / (Maximum - Minimum);
 				cursor.TopLeft = new Point ((int)(p1.X - r.Width / 2),
-					r.Top + (int)(Value * unity));				
+					r.Top + (int)((Value - Minimum) * unity));				
 			}
 			cursor.Inflate (-1);
         }
