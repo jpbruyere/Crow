@@ -265,6 +265,7 @@ namespace Crow
 		{
 			get {
 				return lines [CurrentLine] [CurrentColumn];
+				//return _currentCol > lines[CurrentLine].Length ? (char)0 : lines [CurrentLine] [CurrentColumn];
 			}
 		}
 		/// <summary>
@@ -774,6 +775,19 @@ namespace Crow
 			//fix cu
 			if (CurrentLine >= lines.Count)
 				CurrentLine = lines.Count - 1;
+
+			switch (TextAlignment) {
+			case Alignment.Center:
+			case Alignment.Top:
+			case Alignment.Bottom:
+				cPos+= ClientRectangle.Width - gr.TextExtents(lines [CurrentLine]).Width/2.0;
+				break;
+			case Alignment.Right:
+			case Alignment.TopRight:
+			case Alignment.BottomRight:
+				cPos += ClientRectangle.Width - gr.TextExtents(lines [CurrentLine]).Width;
+				break;
+			}
 
 			for (int i = 0; i < lines[CurrentLine].Length; i++)
 			{
