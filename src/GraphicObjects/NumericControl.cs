@@ -44,10 +44,24 @@ namespace Crow
 
 		#region private fields
 		double _actualValue, minValue, maxValue, smallStep, bigStep;
+		int _decimals;
 		#endregion
 
 		#region public properties
-		[XmlAttributeAttribute()][DefaultValue(0.0)]
+		[XmlAttributeAttribute][DefaultValue(2)]
+		public int Decimals
+		{
+			get { return _decimals; }
+			set
+			{
+				if (value == _decimals)
+					return;
+				_decimals = value;
+				NotifyValueChanged("Decimals",  _decimals);
+				RegisterForGraphicUpdate();
+			}
+		}
+		[XmlAttributeAttribute][DefaultValue(0.0)]
 		public virtual double Minimum {
 			get { return minValue; }
 			set {
@@ -59,7 +73,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(100.0)]
+		[XmlAttributeAttribute][DefaultValue(100.0)]
 		public virtual double Maximum
 		{
 			get { return maxValue; }
@@ -72,7 +86,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(1.0)]
+		[XmlAttributeAttribute][DefaultValue(1.0)]
 		public virtual double SmallIncrement
 		{
 			get { return smallStep; }
@@ -85,7 +99,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(5.0)]
+		[XmlAttributeAttribute][DefaultValue(5.0)]
 		public virtual double LargeIncrement
 		{
 			get { return bigStep; }
@@ -98,7 +112,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(0.0)]
+		[XmlAttributeAttribute][DefaultValue(0.0)]
 		public double Value
 		{
 			get { return _actualValue; }
@@ -113,6 +127,8 @@ namespace Crow
 					_actualValue = maxValue;
 				else                    
 					_actualValue = value;
+
+				_actualValue = Math.Round (_actualValue, _decimals);
 
 				NotifyValueChanged("Value",  _actualValue);
 				RegisterForGraphicUpdate();

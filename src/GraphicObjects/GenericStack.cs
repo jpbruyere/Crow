@@ -127,7 +127,7 @@ namespace Crow
 
 				//if no layouting remains in queue for item, registre for redraw
 				if (RegisteredLayoutings == LayoutingType.None && IsDirty)
-					currentInterface.EnqueueForRepaint (this);
+					CurrentInterface.EnqueueForRepaint (this);
 
 				return true;
 			}

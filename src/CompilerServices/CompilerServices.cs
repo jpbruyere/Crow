@@ -76,7 +76,7 @@ namespace Crow
 		internal static MethodInfo miDSChangeEmitHelper = typeof(Instantiator).GetMethod("dataSourceChangedEmitHelper", BindingFlags.Instance | BindingFlags.NonPublic);
 		internal static MethodInfo miDSReverseBinding = typeof(Instantiator).GetMethod("dataSourceReverseBinding", BindingFlags.Static | BindingFlags.NonPublic);
 
-		internal static FieldInfo miSetCurIface = typeof(GraphicObject).GetField ("currentInterface", BindingFlags.Public | BindingFlags.Instance);
+		internal static FieldInfo miSetCurIface = typeof(GraphicObject).GetField ("currentInterface", BindingFlags.NonPublic | BindingFlags.Instance);
 		internal static MethodInfo miFindByName = typeof (GraphicObject).GetMethod ("FindByName");
 		internal static MethodInfo miGetGObjItem = typeof(List<GraphicObject>).GetMethod("get_Item", new Type[] { typeof(Int32) });
 		internal static MethodInfo miLoadDefaultVals = typeof (GraphicObject).GetMethod ("loadDefaultValues");
@@ -295,18 +295,25 @@ namespace Crow
 			else if (miDest.MemberType == MemberTypes.Field)
 				destType =(miDest as FieldInfo).FieldType;
 
-			if (value != null) {
-				if (destType == TObject)//TODO: check that test of destType is not causing problems
-					convertedVal = value;
-				else {
-					origType = value.GetType ();
-					if (destType.IsAssignableFrom (origType))
-						convertedVal = Convert.ChangeType (value, destType);
-					else if (origType.IsPrimitive & destType.IsPrimitive)
-						convertedVal = GetConvertMethod (destType).Invoke (null, new Object[] { value });
-					else
-						convertedVal = getImplicitOp (origType, destType).Invoke (value, null);
+			try {
+				if (value != null) {
+					if (destType == TObject)//TODO: check that test of destType is not causing problems
+						convertedVal = value;
+					else {
+						origType = value.GetType ();
+						if (destType.IsAssignableFrom (origType))
+							convertedVal = Convert.ChangeType (value, destType);
+						else if (origType == typeof(string) & destType.IsPrimitive)
+							convertedVal = Convert.ChangeType(value, destType);
+						else if (origType.IsPrimitive & destType.IsPrimitive)
+							convertedVal = GetConvertMethod (destType).Invoke (null, new Object[] { value });
+						else
+							convertedVal = getImplicitOp (origType, destType).Invoke (value, null);
+					}
 				}
+			} catch (Exception ex) {
+				Debug.WriteLine (ex.ToString ());
+				return;
 			}
 
 			if (miDest.MemberType == MemberTypes.Property)

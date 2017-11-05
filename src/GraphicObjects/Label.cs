@@ -686,12 +686,12 @@ namespace Crow
 		{
 			base.onMouseEnter (sender, e);
 			if (Selectable)
-				currentInterface.MouseCursor = XCursor.Text;
+				CurrentInterface.MouseCursor = XCursor.Text;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			currentInterface.MouseCursor = XCursor.Default;
+			CurrentInterface.MouseCursor = XCursor.Default;
 		}
 		protected override void onFocused (object sender, EventArgs e)
 		{
@@ -774,6 +774,19 @@ namespace Crow
 			//fix cu
 			if (CurrentLine >= lines.Count)
 				CurrentLine = lines.Count - 1;
+
+			switch (TextAlignment) {
+			case Alignment.Center:
+			case Alignment.Top:
+			case Alignment.Bottom:
+				cPos+= ClientRectangle.Width - gr.TextExtents(lines [CurrentLine]).Width/2.0;
+				break;
+			case Alignment.Right:
+			case Alignment.TopRight:
+			case Alignment.BottomRight:
+				cPos += ClientRectangle.Width - gr.TextExtents(lines [CurrentLine]).Width;
+				break;
+			}
 
 			for (int i = 0; i < lines[CurrentLine].Length; i++)
 			{

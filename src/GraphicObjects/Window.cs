@@ -152,7 +152,7 @@ namespace Crow
 				alwaysOnTop = value;
 
 				if (alwaysOnTop && Parent != null)
-					currentInterface.PutOnTop (this);
+					CurrentInterface.PutOnTop (this);
 
 				NotifyValueChanged ("AlwaysOnTop", alwaysOnTop);
 			}
@@ -178,11 +178,11 @@ namespace Crow
 		{
 			base.onMouseMove (sender, e);
 
-			Interface otkgw = currentInterface;
+			Interface otkgw = CurrentInterface;
 
 			if (!hoverBorder) {
 				currentDirection = Direction.None;
-				currentInterface.MouseCursor = XCursor.Default;
+				CurrentInterface.MouseCursor = XCursor.Default;
 				return;
 			}
 
@@ -323,7 +323,7 @@ namespace Crow
 		#endregion
 
 		protected void onMaximized (object sender, EventArgs e){
-			lock (currentInterface.LayoutMutex) {
+			lock (CurrentInterface.LayoutMutex) {
 				if (!IsMinimized)
 					savedBounds = this.LastPaintedSlot;
 				this.Left = this.Top = 0;
@@ -342,7 +342,7 @@ namespace Crow
 
 		}
 		protected void onUnmaximized (object sender, EventArgs e){
-			lock (currentInterface.LayoutMutex) {
+			lock (CurrentInterface.LayoutMutex) {
 				this.Left = savedBounds.Left;
 				this.Top = savedBounds.Top;
 				this.Width = savedBounds.Width;
@@ -357,7 +357,7 @@ namespace Crow
 			Unmaximized.Raise (sender, e);
 		}
 		protected void onMinimized (object sender, EventArgs e){
-			lock (currentInterface.LayoutMutex) {
+			lock (CurrentInterface.LayoutMutex) {
 				if (IsNormal)
 					savedBounds = this.LastPaintedSlot;
 				Width = 200;
@@ -375,7 +375,7 @@ namespace Crow
 		{
 			hoverBorder = false;
 			currentDirection = Direction.None;
-			currentInterface.MouseCursor = XCursor.Default;
+			CurrentInterface.MouseCursor = XCursor.Default;
 		}
 		protected void onBorderMouseEnter (object sender, MouseMoveEventArgs e)
 		{
@@ -385,7 +385,7 @@ namespace Crow
 
 		protected void butQuitPress (object sender, MouseButtonEventArgs e)
 		{
-			currentInterface.MouseCursor = XCursor.Default;
+			CurrentInterface.MouseCursor = XCursor.Default;
 			close ();
 		}
 
