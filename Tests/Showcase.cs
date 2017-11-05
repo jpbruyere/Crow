@@ -61,6 +61,7 @@ namespace Tests
 			//I set an empty object as datasource at this level to force update when new
 			//widgets are added to the interface
 			crowContainer.DataSource = new object ();
+			hideError ();
 		}
 
 		void Dv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
@@ -70,10 +71,15 @@ namespace Tests
 				return;
 			if (fi is DirectoryInfo)
 				return;
+			hideError();
 			lock (this.CurrentInterface.UpdateMutex) {
-				GraphicObject g = this.CurrentInterface.Load (fi.FullName);
-				crowContainer.SetChild (g);
-				g.DataSource = this;
+				try {
+					GraphicObject g = this.CurrentInterface.Load (fi.FullName);
+					crowContainer.SetChild (g);
+					g.DataSource = this;
+				} catch (Exception ex) {
+					showError (ex);
+				}
 			}
 
 			string source = "";
@@ -85,8 +91,17 @@ namespace Tests
 			NotifyValueChanged ("source", source);
 		}
 
+		void showError(Exception ex) {
+			NotifyValueChanged ("ErrorMessage", ex.Message + ex.InnerException);
+			NotifyValueChanged ("ShowError", true);
+		}
+		void hideError () {
+			NotifyValueChanged ("ShowError", false);
+		}
+
 		void Tb_TextChanged (object sender, TextChangeEventArgs e)
 		{
+			hideError();
 			GraphicObject g = null;
 			try {
 				lock (this.ifaceControl [0].CrowInterface.UpdateMutex) {
@@ -96,15 +111,15 @@ namespace Tests
 					}
 					g = inst.CreateInstance (this.ifaceControl [0].CrowInterface);
 					crowContainer.SetChild (g);
-
-				}				
+					g.DataSource = this;
+				}
 			} catch (Exception ex) {
 				System.Diagnostics.Debug.WriteLine (ex.ToString ());
+				showError (ex);
 			}
-			g.DataSource = this;
 		}
 		public override void OnRender (FrameEventArgs e)
-		{			
+		{
 			base.OnRender (e);
 		}
 
