@@ -18,5 +18,7 @@
 				Maximum="{../scroller1.MaximumScroll}" Orientation="Vertical"
 				Width="14" />
 		</HorizontalStack>
+		<Label Visible="{ShowError}" Text="{ErrorMessage}" Background="Red" Foreground="White" Width="Stretched" Margin="2"
+			Multiline="true"/>
 	</VerticalStack>
 </HorizontalStack>
