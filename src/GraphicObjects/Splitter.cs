@@ -86,14 +86,14 @@ namespace Crow
 		{
 			base.onMouseEnter (sender, e);
 			if ((Parent as GenericStack).Orientation == Orientation.Horizontal)
-				currentInterface.MouseCursor = XCursor.H;
+				CurrentInterface.MouseCursor = XCursor.H;
 			else
-				currentInterface.MouseCursor = XCursor.V;
+				CurrentInterface.MouseCursor = XCursor.V;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			currentInterface.MouseCursor = XCursor.Default;
+			CurrentInterface.MouseCursor = XCursor.Default;
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{

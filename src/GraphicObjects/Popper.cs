@@ -204,8 +204,8 @@ namespace Crow
 		}
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
-			if (currentInterface.HoverWidget != this) {
-				currentInterface.HoverWidget = this;
+			if (CurrentInterface.HoverWidget != this) {
+				CurrentInterface.HoverWidget = this;
 				onMouseEnter (this, e);
 			}
 			if (Content != null){
@@ -225,10 +225,10 @@ namespace Crow
 			if (Content != null) {
 				Content.Visible = true;
 				if (Content.Parent == null)
-					currentInterface.AddWidget (Content, true);
+					CurrentInterface.AddWidget (Content, true);
 				if (Content.LogicalParent != this)
 					Content.LogicalParent = this;
-				currentInterface.PutOnTop (Content, true);
+				CurrentInterface.PutOnTop (Content, true);
 				_content_LayoutChanged (this, new LayoutingEventArgs (LayoutingType.Sizing));
 			}
 			Popped.Raise (this, e);

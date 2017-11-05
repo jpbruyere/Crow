@@ -2,14 +2,14 @@
 <Border Background="{./Background}"	Foreground="{./Foreground}"
 		CornerRadius="{./CornerRadius}" BorderWidth="1">
 		<HorizontalStack Spacing="0">
-			<VerticalStack Margin="4">
+			<VerticalStack Margin="5">
 				<SaturationValueSelector S="{²./S}" V="{²./V}" Focusable="true" Name="colorSelector" Margin="0"
 					Foreground="{../hueSelector.HueColor}"
-					Width="120" Height="120"/>
-				<HueSelector Hue="{²./H}" Focusable="true" Name="hueSelector" Margin="0" Width="120" Height="20"/>
+					Width="128" Height="128"/>
+				<HueSelector Hue="{²./H}" Focusable="true" Name="hueSelector" Margin="0" Width="128" Height="20"/>
 			</VerticalStack>
-			<VerticalStack Margin="4" Height="Stretched">
-				<HorizontalStack Height="Fit" Width="Stretched" Spacing="4">
+			<VerticalStack Margin="2" Spacing="0">
+				<HorizontalStack Height="Fit" Width="Stretched" Spacing="2">
 					<GraphicObject Width="34" Height="21" Background="{./SelectedColor}"/>
 					<Label Focusable="true" Selectable="true" Width="Stretched" Text="{./HexColor}" />
 				</HorizontalStack>

@@ -63,7 +63,7 @@ namespace Crow
 					ValueChanged.Raise(this, new ValueChangeEventArgs ("fpsMin", fpsMin));
 				}
 				#endif
-				if (frameCpt % 20 == 0) {
+				if (frameCpt % 3 == 0) {
 					ValueChanged.Raise (this, new ValueChangeEventArgs ("fps", _fps));
 					#if MEASURE_TIME
 					foreach (PerformanceMeasure m in ifaceControl[0].PerfMeasures)
