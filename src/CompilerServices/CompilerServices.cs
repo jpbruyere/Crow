@@ -386,8 +386,10 @@ namespace Crow
 		/// <param name="methodName">Extention method name</param>
 		internal static MethodInfo SearchExtMethod(Type t, string methodName){
 			MethodInfo mi = null;
-			mi = GetExtensionMethods (Assembly.GetEntryAssembly(), t)
-				.Where (em => em.Name == methodName).FirstOrDefault ();
+			Assembly entryAss = Assembly.GetEntryAssembly ();
+			if (entryAss!=null)
+				mi = GetExtensionMethods (entryAss, t)
+					.Where (em => em.Name == methodName).FirstOrDefault ();
 			if (mi != null)
 				return mi;
 

@@ -30,6 +30,8 @@ using System.ComponentModel;
 
 namespace Crow
 {
+	//TODO: I'm waiting c#8 for default interface members implementation to set NumericControl and other widget base
+	//mecanics as interface to allow multiple inheritance.
 	public abstract class NumericControl : TemplatedControl
 	{
 		#region CTOR

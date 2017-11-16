@@ -50,7 +50,7 @@ namespace Crow
 	/// 	- the resulting bitmap of the interface
 	/// </summary>
 	public class Interface : ILayoutable
-	{
+	{		
 		#region CTOR
 		static Interface(){
 			loadCursors ();
@@ -64,6 +64,7 @@ namespace Crow
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
 		}
 		public Interface(){
+			Console.WriteLine ("Interface CTOR");
 			CurrentInterface = this;
 			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 		}
@@ -188,6 +189,8 @@ namespace Crow
 		}
 		/// <summary> Search for .style resources in assembly </summary>
 		static void loadStylingFromAssembly (Assembly assembly) {
+			if (assembly == null)
+				return;
 			foreach (string s in assembly
 				.GetManifestResourceNames ()
 				.Where (r => r.EndsWith (".style", StringComparison.OrdinalIgnoreCase))) {
@@ -197,15 +200,15 @@ namespace Crow
 		}
 		static void loadCursors(){
 			//Load cursors
-			XCursor.Cross = XCursorFile.Load("#Crow.Images.Icons.Cursors.cross").Cursors[0];
-			XCursor.Default = XCursorFile.Load("#Crow.Images.Icons.Cursors.arrow").Cursors[0];
-			XCursor.NW = XCursorFile.Load("#Crow.Images.Icons.Cursors.top_left_corner").Cursors[0];
-			XCursor.NE = XCursorFile.Load("#Crow.Images.Icons.Cursors.top_right_corner").Cursors[0];
-			XCursor.SW = XCursorFile.Load("#Crow.Images.Icons.Cursors.bottom_left_corner").Cursors[0];
-			XCursor.SE = XCursorFile.Load("#Crow.Images.Icons.Cursors.bottom_right_corner").Cursors[0];
-			XCursor.H = XCursorFile.Load("#Crow.Images.Icons.Cursors.sb_h_double_arrow").Cursors[0];
-			XCursor.V = XCursorFile.Load("#Crow.Images.Icons.Cursors.sb_v_double_arrow").Cursors[0];
-			XCursor.Text = XCursorFile.Load("#Crow.Images.Icons.Cursors.ibeam").Cursors[0];
+			XCursor.Cross = XCursorFile.Load ("#Crow.Images.Icons.Cursors.cross").Cursors [0];
+			XCursor.Default = XCursorFile.Load ("#Crow.Images.Icons.Cursors.arrow").Cursors [0];
+			XCursor.NW = XCursorFile.Load ("#Crow.Images.Icons.Cursors.top_left_corner").Cursors [0];
+			XCursor.NE = XCursorFile.Load ("#Crow.Images.Icons.Cursors.top_right_corner").Cursors [0];
+			XCursor.SW = XCursorFile.Load ("#Crow.Images.Icons.Cursors.bottom_left_corner").Cursors [0];
+			XCursor.SE = XCursorFile.Load ("#Crow.Images.Icons.Cursors.bottom_right_corner").Cursors [0];
+			XCursor.H = XCursorFile.Load ("#Crow.Images.Icons.Cursors.sb_h_double_arrow").Cursors [0];
+			XCursor.V = XCursorFile.Load ("#Crow.Images.Icons.Cursors.sb_v_double_arrow").Cursors [0];
+			XCursor.Text = XCursorFile.Load ("#Crow.Images.Icons.Cursors.ibeam").Cursors [0];
 		}
 		#endregion
 
@@ -221,6 +224,8 @@ namespace Crow
 			searchTemplatesIn (Assembly.GetExecutingAssembly ());
 		}
 		static void searchTemplatesIn(Assembly assembly){
+			if (assembly == null)
+				return;
 			foreach (string resId in assembly
 				.GetManifestResourceNames ()
 				.Where (r => r.EndsWith (".template", StringComparison.OrdinalIgnoreCase))) {
@@ -240,12 +245,15 @@ namespace Crow
 		public static Stream GetStreamFromPath (string path)
 		{
 			Stream stream = null;
+			Assembly ass = null;
 
 			if (path.StartsWith ("#")) {
 				string resId = path.Substring (1);
 				//try/catch added to prevent nunit error
 				try {
-					stream = System.Reflection.Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
+					ass = Assembly.GetEntryAssembly ();
+					if (ass != null)
+						stream = ass.GetManifestResourceStream (resId);
 				} catch{}
 				if (stream == null)//try to find ressource in Crow assembly
 					stream = System.Reflection.Assembly.GetExecutingAssembly ().GetManifestResourceStream (resId);
@@ -661,7 +669,7 @@ namespace Crow
 		}
 		#endregion
 
-		public void ProcessResize(Rectangle bounds){
+		public void ProcessResize(Rectangle bounds){			
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
 				int stride = 4 * ClientRectangle.Width;

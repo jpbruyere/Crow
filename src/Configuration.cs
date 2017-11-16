@@ -68,7 +68,7 @@ namespace Crow
 		static Dictionary<string, ConfigItem> items;
 
 		static Configuration ()
-		{
+		{			
 			items = new Dictionary<string, ConfigItem> ();
 			string configRoot =
 				Path.Combine(

@@ -6,10 +6,10 @@ namespace Rsvg {
 	using System.Runtime.InteropServices;
 
 	public class Handle {
-
+		public const string librsvg = "rsvg";
 		public IntPtr Raw;
 
-		[DllImport("rsvg-2")]
+		[DllImport(librsvg)]
 		static extern IntPtr rsvg_handle_new();
 
 		public Handle ()
@@ -17,7 +17,7 @@ namespace Rsvg {
 			Raw = rsvg_handle_new();
 		}
 
-		[DllImport("rsvg-2")]
+		[DllImport(librsvg)]
 		static extern unsafe IntPtr rsvg_handle_new_from_data(byte[] data, UIntPtr n_data, out IntPtr error);
 
 		public unsafe Handle (byte[] data)
@@ -30,7 +30,7 @@ namespace Rsvg {
 			if (error != IntPtr.Zero) throw new Exception (error.ToString());
 		}
 
-		[DllImport("rsvg-2")]
+		[DllImport(librsvg)]
 		static extern unsafe IntPtr rsvg_handle_new_from_file(string file_name, out IntPtr error);
 
 		public unsafe Handle (string file_name)
@@ -40,10 +40,10 @@ namespace Rsvg {
 			if (error != IntPtr.Zero) throw new Exception (error.ToString());
 		}
 
-		[DllImport("rsvg-2")]
+		[DllImport(librsvg)]
 		static extern IntPtr rsvg_handle_get_base_uri(IntPtr raw);
 
-		[DllImport("rsvg-2")]
+		[DllImport(librsvg)]
 		static extern void rsvg_handle_set_dpi(IntPtr raw, double dpi);
 
 		public double Dpi {
@@ -52,7 +52,7 @@ namespace Rsvg {
 			}
 		}
 
-		[DllImport("rsvg-2")]
+		[DllImport(librsvg)]
 		static extern void rsvg_handle_render_cairo(IntPtr raw, IntPtr cr);
 
 		public void RenderCairo(Cairo.Context cr) {
@@ -61,14 +61,14 @@ namespace Rsvg {
 			}
 		}
 
-		[DllImport("rsvg-2")]
+		[DllImport(librsvg)]
 		static extern void rsvg_handle_set_dpi_x_y(IntPtr raw, double dpi_x, double dpi_y);
 
 		public void SetDpiXY(double dpi_x, double dpi_y) {
 			rsvg_handle_set_dpi_x_y(Raw, dpi_x, dpi_y);
 		}
 
-		[DllImport("rsvg-2")]
+		[DllImport(librsvg)]
 		static extern void rsvg_handle_get_dimensions(IntPtr raw, IntPtr dimension_data);
 
 		public Rsvg.DimensionData Dimensions {
@@ -82,7 +82,7 @@ namespace Rsvg {
 			}
 		}
 
-		[DllImport("rsvg-2")]
+		[DllImport(librsvg)]
 		static extern unsafe bool rsvg_handle_close(IntPtr raw, out IntPtr error);
 
 		public unsafe bool Close() {
@@ -92,7 +92,7 @@ namespace Rsvg {
 			return raw_ret;
 		}
 
-		[DllImport("rsvg-2")]
+		[DllImport(librsvg)]
 		static extern IntPtr rsvg_handle_get_title(IntPtr raw);
 
 		public string Title {
@@ -102,14 +102,14 @@ namespace Rsvg {
 			}
 		}
 
-		[DllImport("rsvg-2")]
+		[DllImport(librsvg)]
 		static extern void rsvg_handle_render_cairo_sub(IntPtr raw, IntPtr cr, string id);
 
 		public void RenderCairoSub(Cairo.Context cr, string id) {
 			rsvg_handle_render_cairo_sub(Raw, cr == null ? IntPtr.Zero : cr.Handle, id);
 		}
 
-		[DllImport("rsvg-2")]
+		[DllImport(librsvg)]
 		static extern IntPtr rsvg_handle_get_metadata(IntPtr raw);
 
 		public string Metadata {

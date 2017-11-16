@@ -336,13 +336,27 @@ namespace Crow
 					ctx.il.Emit (OpCodes.Ldloc_0);
 					ctx.il.Emit (OpCodes.Ldloc_0);
 
+					//TODO: optimize this
 					Type t = Type.GetType ("Crow." + reader.Name);
 					if (t == null) {
-						Assembly a = Assembly.GetEntryAssembly ();
-						foreach (Type expT in a.GetExportedTypes ()) {
+						Assembly ea = Assembly.GetEntryAssembly ();
+						foreach (Type expT in ea.GetExportedTypes ()) {
 							if (expT.Name == reader.Name) {
 								t = expT;
 								break;
+							}
+						}
+						if (t == null) {
+							foreach (AssemblyName an in Assembly.GetEntryAssembly().GetReferencedAssemblies()) {							
+								Assembly a = Assembly.Load (an);
+								foreach (Type expT in a.GetExportedTypes ()) {
+									if (expT.Name == reader.Name) {
+										t = expT;
+										break;
+									}
+								}
+								if (t != null)
+									break;
 							}
 						}
 					}
