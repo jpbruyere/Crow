@@ -870,14 +870,9 @@ namespace Cairo {
 
 		public void ShowText(string str)
 		{
-			NativeMethods.cairo_show_text (handle, TerminateUtf8(str));
+			NativeMethods.cairo_show_text (handle, str);
 		}
-
-		public void ShowText(byte[] utf8)
-		{
-			NativeMethods.cairo_show_text (handle, TerminateUtf8(utf8));
-		}
-
+			
 		public void TextPath(string str)
 		{
 			NativeMethods.cairo_text_path (handle, TerminateUtf8(str));
@@ -891,14 +886,7 @@ namespace Cairo {
 		public TextExtents TextExtents(string s)
 		{
 			TextExtents extents;
-			NativeMethods.cairo_text_extents (handle, TerminateUtf8(s), out extents);
-			return extents;
-		}
-
-		public TextExtents TextExtents(byte[] utf8)
-		{
-			TextExtents extents;
-			NativeMethods.cairo_text_extents (handle, TerminateUtf8(utf8), out extents);
+			NativeMethods.cairo_text_extents (handle, s, out extents);
 			return extents;
 		}
 

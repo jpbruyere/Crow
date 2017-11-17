@@ -213,7 +213,7 @@ namespace Cairo
 		[MethodImplAttribute(MethodImplOptions.InternalCall)][System.Security.SecuritySafeCriticalAttribute]
 		internal static extern IntPtr cairo_get_font_face (IntPtr cr);
 
-		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		[MethodImplAttribute(MethodImplOptions.InternalCall)][System.Security.SecuritySafeCriticalAttribute]
 		internal static extern void cairo_get_font_matrix (IntPtr cr, out Matrix matrix);
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)][System.Security.SecuritySafeCriticalAttribute]
@@ -637,7 +637,7 @@ namespace Cairo
 		internal static extern void cairo_scaled_font_text_extents (IntPtr scaled_font, byte[] utf8, out TextExtents extents);
 		#endregion
 
-		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		[MethodImplAttribute(MethodImplOptions.InternalCall)][System.Security.SecuritySafeCriticalAttribute]
 		internal static extern void cairo_select_font_face (IntPtr cr, string family, FontSlant slant, FontWeight weight);
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)][System.Security.SecuritySafeCriticalAttribute]
@@ -706,8 +706,8 @@ namespace Cairo
 		[MethodImplAttribute(MethodImplOptions.InternalCall)][System.Security.SecuritySafeCriticalAttribute]
 		internal static extern void cairo_show_page (IntPtr cr);
 
-		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern void cairo_show_text (IntPtr cr, byte[] utf8);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)][System.Security.SecuritySafeCriticalAttribute]
+		internal static extern void cairo_show_text (IntPtr cr, string str);
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)][System.Security.SecuritySafeCriticalAttribute]
 		internal static extern Status cairo_status (IntPtr cr);
@@ -794,8 +794,8 @@ namespace Cairo
 		internal static extern IntPtr cairo_svg_surface_restrict_to_version (IntPtr surface, SvgVersion version);
 		#endregion
 
-		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern void cairo_text_extents (IntPtr cr, byte[] utf8, out TextExtents extents);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)][System.Security.SecuritySafeCriticalAttribute]
+		internal static extern void cairo_text_extents (IntPtr cr, string txt, out TextExtents extents);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern void cairo_text_path (IntPtr ct, byte[] utf8);

@@ -799,6 +799,7 @@ namespace Crow
 			return true;
 		}
 		public bool ProcessKeyDown(int Key){
+			Console.WriteLine("keydown: {0}=>{1}", Key,(Crow.Key)Key);
 			Keyboard.SetKeyState((Crow.Key)Key,true);
 			if (_focusedWidget == null)
 				return false;
@@ -806,9 +807,9 @@ namespace Crow
 			lastKeyDownEvt.IsRepeat = true;
 			_focusedWidget.onKeyDown (this, e);
 
-			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
-			keyboardRepeatThread.IsBackground = true;
-			keyboardRepeatThread.Start ();
+//			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
+//			keyboardRepeatThread.IsBackground = true;
+//			keyboardRepeatThread.Start ();
 
 			return true;
 		}
@@ -820,14 +821,14 @@ namespace Crow
 
 			_focusedWidget.onKeyUp (this, e);
 
-			if (keyboardRepeatThread != null) {
-				keyboardRepeatOn = false;
-				keyboardRepeatThread.Abort();
-				keyboardRepeatThread.Join ();
-			}
+//			if (keyboardRepeatThread != null) {
+//				keyboardRepeatOn = false;
+//				keyboardRepeatThread.Abort();
+//				keyboardRepeatThread.Join ();
+//			}
 			return true;
 		}
-		public bool ProcessKeyPress(char Key){
+		public bool ProcessKeyPress(char Key){			
 			if (_focusedWidget == null)
 				return false;
 			KeyPressEventArgs e = new KeyPressEventArgs(Key);
