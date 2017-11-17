@@ -35,6 +35,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using Cairo;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace Crow
 {
@@ -50,7 +51,10 @@ namespace Crow
 	/// 	- the resulting bitmap of the interface
 	/// </summary>
 	public class Interface : ILayoutable
-	{		
+	{
+		[MethodImplAttribute(MethodImplOptions.InternalCall)][System.Security.SecuritySafeCriticalAttribute]
+		internal static extern void crow_mono_update(IntPtr region, byte[] bitmap);
+
 		#region CTOR
 		static Interface(){
 			loadCursors ();
@@ -64,7 +68,6 @@ namespace Crow
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
 		}
 		public Interface(){
-			Console.WriteLine ("Interface CTOR");
 			CurrentInterface = this;
 			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 		}
@@ -463,6 +466,7 @@ namespace Crow
 		/// Layouting queue items. Failing LQI's are requeued in this cycle until MaxTry is reached which
 		/// trigger an enqueue for the next Update Cycle</summary>
 		void processLayouting(){
+			//Console.WriteLine ("processLayouting");
 			#if MEASURE_TIME
 			layoutingMeasure.StartCycle();
 			#endif
@@ -492,6 +496,7 @@ namespace Crow
 		/// Clipping rectangles are added at each level of the tree from leef to root, that's the way for the painting
 		/// operation to known if it should go down in the tree for further graphic updates and repaints</summary>
 		void clippingRegistration(){
+			//Console.WriteLine ("clippingRegistration");
 			#if MEASURE_TIME
 			clippingMeasure.StartCycle();
 			#endif
@@ -510,19 +515,14 @@ namespace Crow
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
 		void processDrawing(){
+			//Console.WriteLine ("processDrawing");
 			#if MEASURE_TIME
 			drawingMeasure.StartCycle();
 			#endif
 			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
 				using (ctx = new Context (surf)){
 					if (!clipping.IsEmpty) {
-
-						for (int i = 0; i < clipping.NumRectangles; i++)
-							ctx.Rectangle(clipping.GetRectangle(i));
-						ctx.ClipPreserve();
-						ctx.Operator = Operator.Clear;
-						ctx.Fill();
-						ctx.Operator = Operator.Over;
+						clipping.ClipAndClear (ctx);
 
 						for (int i = GraphicTree.Count -1; i >= 0 ; i--){
 							GraphicObject p = GraphicTree[i];
@@ -539,33 +539,9 @@ namespace Crow
 						#if DEBUG_CLIP_RECTANGLE
 						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
 						#endif
-						lock (RenderMutex) {
-//							Array.Copy (bmp, dirtyBmp, bmp.Length);
 
-							IsDirty = true;
-							if (IsDirty)
-								DirtyRect += clipping.Extents;
-							else
-								DirtyRect = clipping.Extents;
+						crow_mono_update (clipping.Handle, bmp);
 
-							DirtyRect.Left = Math.Max (0, DirtyRect.Left);
-							DirtyRect.Top = Math.Max (0, DirtyRect.Top);
-							DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
-							DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
-							DirtyRect.Width = Math.Max (0, DirtyRect.Width);
-							DirtyRect.Height = Math.Max (0, DirtyRect.Height);
-
-							if (DirtyRect.Width > 0 && DirtyRect.Height >0) {
-								dirtyBmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
-								for (int y = 0; y < DirtyRect.Height; y++) {
-									Array.Copy (bmp,
-										((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
-										dirtyBmp, y * DirtyRect.Width * 4, DirtyRect.Width * 4);
-								}
-
-							} else
-								IsDirty = false;
-						}
 						clipping.Dispose ();
 						clipping = new Region ();
 					}
@@ -669,7 +645,7 @@ namespace Crow
 		}
 		#endregion
 
-		public void ProcessResize(Rectangle bounds){			
+		public void ProcessResize(Rectangle bounds){
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
 				int stride = 4 * ClientRectangle.Width;

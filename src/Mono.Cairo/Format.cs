@@ -32,7 +32,7 @@ using System;
 namespace Cairo
 {
 	[Serializable]
-	public enum Format
+	public enum Format : uint
 	{
 		Argb32	= 0,
 		Rgb24	= 1,

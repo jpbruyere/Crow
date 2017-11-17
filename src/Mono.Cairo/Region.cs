@@ -122,7 +122,9 @@ namespace Cairo
 				return result;
 			}
 		}
-
+		public void ClipAndClear (Context ctx) {
+			NativeMethods.crow_cairo_region_clear (ctx.Handle, Handle);
+		}
 		public int NumRectangles {
 			get { return NativeMethods.cairo_region_num_rectangles (Handle); }
 		}
