@@ -88,7 +88,7 @@ namespace Crow
 		{
 			//children can't stretch in a wrapper
 			GraphicObject go = sender as GraphicObject;
-			//System.Diagnostics.Debug.WriteLine ("wrapper child layout change: " + go.LastSlots.ToString() + " => " + go.Slot.ToString());
+			//Console.WriteLine ("wrapper child layout change: " + go.LastSlots.ToString() + " => " + go.Slot.ToString());
 			switch (arg.LayoutType) {
 			case LayoutingType.Width:
 				if (Orientation == Orientation.Horizontal && go.Width.Units == Unit.Percent){

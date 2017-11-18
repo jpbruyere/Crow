@@ -76,7 +76,7 @@ namespace Crow
 				}
 			}
 			if (dataType == null) {
-				Debug.WriteLine ("ItemTemplate error: DataType not found: {0}.", strDataType);
+				Console.WriteLine ("ItemTemplate error: DataType not found: {0}.", strDataType);
 				return;
 			}
 			Type tmpGrpType = typeof(TemplatedGroup);

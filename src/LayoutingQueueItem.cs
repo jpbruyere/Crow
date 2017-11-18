@@ -89,7 +89,7 @@ namespace Crow
 			LQITime = new Stopwatch();
 			Slot = Rectangle.Empty;
 			NewSlot = Rectangle.Empty;
-			Debug.WriteLine ("\tRegister => " + this.ToString ());
+			Console.WriteLine ("\tRegister => " + this.ToString ());
 			#endif
 		}
 		#endregion
@@ -101,25 +101,25 @@ namespace Crow
 				//cancel layouting for object without parent, maybe some were in queue when
 				//removed from a listbox
 				#if DEBUG_UPDATE || DEBUG_LAYOUTING
-				Debug.WriteLine ("ERROR: processLayouting, no parent for: " + this.ToString ());
+				Console.WriteLine ("ERROR: processLayouting, no parent for: " + this.ToString ());
 				#endif
 				return;
 			}
 			#if DEBUG_LAYOUTING
 			LQITime.Start();
-			Debug.WriteLine ("=> " + this.ToString ());
+			Console.WriteLine ("=> " + this.ToString ());
 			#endif
 			LayoutingTries++;
 			if (!Layoutable.UpdateLayout (LayoutType)) {
 				#if DEBUG_LAYOUTING
-				Debug.WriteLine ("\t\tRequeued");
+				Console.WriteLine ("\t\tRequeued");
 				#endif
 				if (LayoutingTries < Interface.MaxLayoutingTries) {
 					Layoutable.RegisteredLayoutings |= LayoutType;
 					(Layoutable as GraphicObject).CurrentInterface.LayoutingQueue.Enqueue (this);
 				} else if (DiscardCount < Interface.MaxDiscardCount) {
 					#if DEBUG_LAYOUTING
-					Debug.WriteLine ("\t\tDiscarded");
+					Console.WriteLine ("\t\tDiscarded");
 					#endif
 					LayoutingTries = 0;
 					DiscardCount++;
@@ -128,13 +128,13 @@ namespace Crow
 				}
 				#if DEBUG_LAYOUTING
 				else
-					Debug.WriteLine ("\tDELETED    => " + this.ToString ());
+					Console.WriteLine ("\tDELETED    => " + this.ToString ());
 				#endif
 			}
 			#if DEBUG_LAYOUTING
 			else{
 				if (LayoutingTries > 2 || DiscardCount > 0)
-					Debug.WriteLine (this.ToString ());
+					Console.WriteLine (this.ToString ());
 			}
 			LQITime.Stop();
 			#endif

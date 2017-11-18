@@ -286,7 +286,7 @@ namespace Crow
 			MemberInfo miDest = getMemberInfoWithReflexion (dest, destMember);
 
 			if (miDest == null) {
-				Debug.WriteLine ("Reverse template binding error: " + destMember + " not found in " + dest);
+				Console.WriteLine ("Reverse template binding error: " + destMember + " not found in " + dest);
 				return;
 			}
 
@@ -312,7 +312,7 @@ namespace Crow
 					}
 				}
 			} catch (Exception ex) {
-				Debug.WriteLine (ex.ToString ());
+				Console.WriteLine (ex.ToString ());
 				return;
 			}
 
@@ -642,7 +642,7 @@ namespace Crow
 			FieldInfo fiEvt = getEventHandlerField (t, eventName);
 			if (fiEvt == null) {
 				#if DEBUG_BINDING
-				Debug.WriteLine ("RemoveHandlerByName: Event '" + eventName + "' not found in " + instance);
+				Console.WriteLine ("RemoveHandlerByName: Event '" + eventName + "' not found in " + instance);
 				#endif
 				return;
 			}
@@ -653,7 +653,7 @@ namespace Crow
 					if (d.Method.Name == delegateName) {
 						eiEvt.RemoveEventHandler (instance, d);
 						#if DEBUG_BINDING
-						Debug.WriteLine ("\t{0} handler removed in {1} for: {2}", d.Method.Name,instance, eventName);
+						Console.WriteLine ("\t{0} handler removed in {1} for: {2}", d.Method.Name,instance, eventName);
 						#endif
 					}
 				}
@@ -672,7 +672,7 @@ namespace Crow
 					if (d.Target == target) {
 						eiEvt.RemoveEventHandler (instance, d);
 						#if DEBUG_BINDING
-						Debug.WriteLine ("\t{0} handler removed in {1} for: {2}", d.Method.Name,instance, eventName);
+						Console.WriteLine ("\t{0} handler removed in {1} for: {2}", d.Method.Name,instance, eventName);
 						#endif
 					}
 				}
@@ -685,7 +685,7 @@ namespace Crow
 			Type t = instance.GetType ();
 			MethodInfo mi = t.GetMethod (method, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			if (mi == null) {
-				Debug.WriteLine ("Handler Method '{0}' not found in '{1}'", method, t);
+				Console.WriteLine ("Handler Method '{0}' not found in '{1}'", method, t);
 				return null;
 			}
 			return Delegate.CreateDelegate (eventType, instance, mi);
@@ -693,7 +693,7 @@ namespace Crow
 
 		internal static Delegate compileDynEventHandler(EventInfo sourceEvent, string expression, NodeAddress currentNode = null){
 			#if DEBUG_BINDING
-			Debug.WriteLine ("\tCompile Event {0}: {1}", sourceEvent.Name, expression);
+			Console.WriteLine ("\tCompile Event {0}: {1}", sourceEvent.Name, expression);
 			#endif
 
 			Type lopType = null;

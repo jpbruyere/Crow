@@ -117,7 +117,7 @@ namespace Crow.IML
 					try {
 						ResolveName (bd);	
 					} catch (Exception ex) {
-						System.Diagnostics.Debug.WriteLine (ex.ToString ());
+						Console.WriteLine (ex.ToString ());
 						continue;
 					}
 				}

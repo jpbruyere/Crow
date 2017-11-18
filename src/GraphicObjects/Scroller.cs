@@ -134,20 +134,20 @@ namespace Crow
 		}
 		void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
-			//Debug.WriteLine ("scroller childLayoutChanges");
+			//Console.WriteLine ("scroller childLayoutChanges");
 			int maxScroll = MaximumScroll;
-			//Debug.WriteLine ("maxscroll={0}", maxScroll);
+			//Console.WriteLine ("maxscroll={0}", maxScroll);
 			if (_verticalScrolling) {
 				if (arg.LayoutType == LayoutingType.Height) {
 					if (maxScroll < ScrollY) {
-						//Debug.WriteLine ("scrolly={0} maxscroll={1}", ScrollY, maxScroll);
+						//Console.WriteLine ("scrolly={0} maxscroll={1}", ScrollY, maxScroll);
 						ScrollY = maxScroll;
 					}
 					NotifyValueChanged("MaximumScroll", maxScroll);
 				}
 			} else if (arg.LayoutType == LayoutingType.Width) {
 				if (maxScroll < ScrollX) {
-					//Debug.WriteLine ("scrolly={0} maxscroll={1}", ScrollY, maxScroll);
+					//Console.WriteLine ("scrolly={0} maxscroll={1}", ScrollY, maxScroll);
 					ScrollX = maxScroll;
 				}
 				NotifyValueChanged("MaximumScroll", maxScroll);

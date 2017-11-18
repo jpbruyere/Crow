@@ -332,7 +332,7 @@ namespace Crow
 
 			#if DEBUG_LOAD
 			loadingTime.Stop ();
-			Debug.WriteLine("Listbox {2} Loading: {0} ticks \t, {1} ms",
+			Console.WriteLine("Listbox {2} Loading: {0} ticks \t, {1} ms",
 			loadingTime.ElapsedTicks,
 			loadingTime.ElapsedMilliseconds, this.ToString());
 			#endif
@@ -400,7 +400,7 @@ namespace Crow
 //		protected void _list_LayoutChanged (object sender, LayoutingEventArgs e)
 //		{
 //			#if DEBUG_LAYOUTING
-//			Debug.WriteLine("list_LayoutChanged");
+//			Console.WriteLine("list_LayoutChanged");
 //			#endif
 //			if (_gsList.Orientation == Orientation.Horizontal) {
 //				if (e.LayoutType == LayoutingType.Width)

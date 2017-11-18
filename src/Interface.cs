@@ -50,8 +50,17 @@ namespace Crow
 	/// 	- Keyboard and Mouse logic
 	/// 	- the resulting bitmap of the interface
 	/// </summary>
-	public class Interface : ILayoutable
+	public class Interface : ILayoutable, IValueChange
 	{
+		#region IValueChange implementation
+		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+		public void NotifyValueChanged(string MemberName, object _value)
+		{
+			//Console.WriteLine ("Value changed: {0}->{1} = {2}", this, MemberName, _value);
+			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
+		}
+		#endregion
+
 		[MethodImplAttribute(MethodImplOptions.InternalCall)][System.Security.SecuritySafeCriticalAttribute]
 		internal static extern void crow_mono_update(IntPtr region, byte[] bitmap);
 
@@ -64,8 +73,8 @@ namespace Crow
 			FontRenderingOptions = new FontOptions ();
 			FontRenderingOptions.Antialias = Antialias.Subpixel;
 			FontRenderingOptions.HintMetrics = HintMetrics.On;
-			FontRenderingOptions.HintStyle = HintStyle.Medium;
-			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
+			FontRenderingOptions.HintStyle = HintStyle.Full;
+			//FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
 		}
 		public Interface(){
 			CurrentInterface = this;
@@ -277,7 +286,7 @@ namespace Crow
 			lock (UpdateMutex) {
 				GraphicObject tmp = Load (path);
 				AddWidget (tmp);
-
+				tmp.DataSource = this;
 				return tmp;
 			}
 		}
@@ -342,9 +351,9 @@ namespace Crow
 				{
 					_activeWidget.IsActive = true;
 					#if DEBUG_FOCUS
-					Debug.WriteLine("Active => " + _activeWidget.ToString());
+					Console.WriteLine("Active => " + _activeWidget.ToString());
 				}else
-					Debug.WriteLine("Active => null");
+					Console.WriteLine("Active => null");
 					#else
 				}
 					#endif
@@ -360,9 +369,9 @@ namespace Crow
 				_hoverWidget = value;
 				#if DEBUG_FOCUS
 				if (_hoverWidget != null)
-				Debug.WriteLine("Hover => " + _hoverWidget.ToString());
+				Console.WriteLine("Hover => " + _hoverWidget.ToString());
 				else
-				Debug.WriteLine("Hover => null");
+				Console.WriteLine("Hover => null");
 				#endif
 			}
 		}
@@ -390,7 +399,7 @@ namespace Crow
 		public void EnqueueForRepaint(GraphicObject g)
 		{
 			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("\tEnqueueForRepaint -> {0}", g?.ToString ()));
+			Console.WriteLine (string.Format("\tEnqueueForRepaint -> {0}", g?.ToString ()));
 			#endif
 			lock (DrawingQueue) {
 				if (g.IsQueueForRedraw)
@@ -407,12 +416,12 @@ namespace Crow
 		/// 	- Drawing
 		/// Result: the Interface bitmap is drawn in memory (byte[] bmp) and a dirtyRect and bitmap are available
 		/// </summary>
-		public void Update(){
-			if (mouseRepeatCount > 0) {
+		public void Update(){			
+			if (mouseRepeatCount > 0) {				
 				int mc = mouseRepeatCount;
 				mouseRepeatCount -= mc;
 				if (_focusedWidget != null) {
-					for (int i = 0; i < mc; i++) {
+					for (int i = 0; i < mc; i++) {						
 						_focusedWidget.onMouseClick (this, new MouseButtonEventArgs (Mouse.X, Mouse.Y, MouseButton.Left, true));
 					}
 				}
@@ -473,7 +482,7 @@ namespace Crow
 
 			if (Monitor.TryEnter (LayoutMutex)) {
 				DiscardQueue = new Queue<LayoutingQueueItem> ();
-				//Debug.WriteLine ("======= Layouting queue start =======");
+				//Console.WriteLine ("======= Layouting queue start =======");
 				LayoutingQueueItem lqi;
 				while (LayoutingQueue.Count > 0) {
 					lqi = LayoutingQueue.Dequeue ();
@@ -844,6 +853,7 @@ namespace Crow
 		KeyboardKeyEventArgs lastKeyDownEvt;
 		void mouseRepeatThreadFunc()
 		{
+			
 			mouseRepeatOn = true;
 			Thread.Sleep (Interface.DeviceRepeatDelay);
 			while (mouseRepeatOn) {

@@ -207,7 +207,7 @@ namespace Crow.IML2
 					Array.Copy (target, nodeIdx, dest, 0, destLength);
 
 				} catch (Exception ex) {
-					System.Diagnostics.Debug.WriteLine (ex.ToString ());
+					System.Diagnostics.Console.WriteLine (ex.ToString ());
 				}
 
 

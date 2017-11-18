@@ -174,7 +174,7 @@ namespace Crow
 				if (value == _selBegin)
 					return;
 				_selBegin = value;
-				System.Diagnostics.Debug.WriteLine ("SelBegin=" + _selBegin);
+				Console.WriteLine ("SelBegin=" + _selBegin);
 				NotifyValueChanged ("SelBegin", _selBegin);
 				NotifyValueChanged ("SelectedText", SelectedText);
 			}
@@ -423,7 +423,7 @@ namespace Crow
 					rLineY = cb.Y + i * fe.Height,
 					rLineW = lstr.Length * fe.MaxXAdvance;
 
-					System.Diagnostics.Debug.WriteLine ("sel start: " + selectionStart + " sel end: " + selectionEnd);
+					Console.WriteLine ("sel start: " + selectionStart + " sel end: " + selectionEnd);
 					if (curL == selectionStart.Y) {
 						rLineX += (selectionStart.X - ScrollX) * fe.MaxXAdvance;
 						rLineW -= selectionStart.X * fe.MaxXAdvance;
@@ -751,8 +751,8 @@ namespace Crow
 			visibleLines = (int)Math.Floor ((double)ClientRectangle.Height / fe.Height);
 			MaxScrollY = Math.Max (0, lines.Count - visibleLines);
 
-			System.Diagnostics.Debug.WriteLine ("update visible lines: " + visibleLines);
-			System.Diagnostics.Debug.WriteLine ("update MaxScrollY: " + MaxScrollY);
+			Console.WriteLine ("update visible lines: " + visibleLines);
+			Console.WriteLine ("update MaxScrollY: " + MaxScrollY);
 		}
 
 

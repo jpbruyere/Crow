@@ -312,7 +312,7 @@ namespace Crow
 		}
 		void searchLargestChild(){
 			#if DEBUG_LAYOUTING
-			Debug.WriteLine("\tSearch largest child");
+			Console.WriteLine("\tSearch largest child");
 			#endif
 			largestChild = null;
 			contentSize.Width = 0;
@@ -329,7 +329,7 @@ namespace Crow
 		}
 		void searchTallestChild(){
 			#if DEBUG_LAYOUTING
-			Debug.WriteLine("\tSearch tallest child");
+			Console.WriteLine("\tSearch tallest child");
 			#endif
 			tallestChild = null;
 			contentSize.Height = 0;

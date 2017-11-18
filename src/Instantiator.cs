@@ -77,7 +77,7 @@ namespace Crow
 			}
 #if DEBUG_LOAD
 			loadingTime.Stop ();
-			Debug.WriteLine ("IML Instantiator creation '{2}' : {0} ticks, {1} ms",
+			Console.WriteLine ("IML Instantiator creation '{2}' : {0} ticks, {1} ms",
 				loadingTime.ElapsedTicks, loadingTime.ElapsedMilliseconds, imlPath);
 #endif
 		}
@@ -391,7 +391,7 @@ namespace Crow
 			BindingDefinition bindingDef = sourceNA.GetBindingDef (sourceMember, expression);
 
 			#if DEBUG_BINDING
-			Debug.WriteLine("Property Binding: " + bindingDef.ToString());
+			Console.WriteLine("Property Binding: " + bindingDef.ToString());
 			#endif
 
 			if (bindingDef.IsDataSourceBinding)//bind on data source
@@ -426,7 +426,7 @@ namespace Crow
 			BindingDefinition bindingDef = currentNode.GetBindingDef (sourceEvent.Name, expression);
 
 			#if DEBUG_BINDING
-			Debug.WriteLine("Event Binding: " + bindingDef.ToString());
+			Console.WriteLine("Event Binding: " + bindingDef.ToString());
 			#endif
 
 			if (bindingDef.IsTemplateBinding | bindingDef.IsDataSourceBinding) {
@@ -604,7 +604,7 @@ namespace Crow
 			ctx.emitCachedDelegateHandlerAddition (dmIdx, CompilerServices.eiValueChange, origine);
 
 			#if DEBUG_BINDING
-			Debug.WriteLine("\tCrow property binding: " + dm.Name);
+			Console.WriteLine("\tCrow property binding: " + dm.Name);
 			#endif
 
 		}
@@ -676,7 +676,7 @@ namespace Crow
 
 				foreach (MemberAddress ma in bindingCase.Value) {
 					if (ma.Address.Count == 0){
-						Debug.WriteLine("\t\tBUG: reverse template binding in normal template binding");
+						Console.WriteLine("\t\tBUG: reverse template binding in normal template binding");
 						continue;//template binding
 					}
 					//first we try to get memberInfo of new parent, if it doesn't exist, it's a propery less binding
@@ -920,8 +920,8 @@ namespace Crow
 			ctx.emitCachedDelegateHandlerAddition(delDSIndex, CompilerServices.eiDSChange);
 
 			#if DEBUG_BINDING
-			Debug.WriteLine("\tDataSource ValueChanged: " + delName);
-			Debug.WriteLine("\tDataSource Changed: " + dm.Name);
+			Console.WriteLine("\tDataSource ValueChanged: " + delName);
+			Console.WriteLine("\tDataSource Changed: " + dm.Name);
 			#endif
 		}
 		/// <summary>
@@ -939,11 +939,11 @@ namespace Crow
 			PropertyInfo piDest = tDest.GetProperty (destMember);
 
 			if (piDest == null) {
-				Debug.WriteLine ("Member '{0}' not found in new DataSource '{1}' of '{2}'", destMember, dest, orig);
+				Console.WriteLine ("Member '{0}' not found in new DataSource '{1}' of '{2}'", destMember, dest, orig);
 				return;
 			}
 			#if DEBUG_BINDING
-			Debug.WriteLine ("DS Reverse binding: Member '{0}' found in new DS '{1}' of '{2}'", destMember, dest, orig);
+			Console.WriteLine ("DS Reverse binding: Member '{0}' found in new DS '{1}' of '{2}'", destMember, dest, orig);
 			#endif
 
 			#region ValueChanged emit

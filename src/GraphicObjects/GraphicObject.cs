@@ -53,14 +53,14 @@ namespace Crow
 		protected virtual void Dispose(bool disposing){
 			if (disposed){
 				#if DEBUG_DISPOSE
-				Debug.WriteLine ("Trying to dispose already disposed obj: {0}", this.ToString());
+				Console.WriteLine ("Trying to dispose already disposed obj: {0}", this.ToString());
 				#endif
 				return;
 			}
 
 			if (disposing) {
 				#if DEBUG_DISPOSE
-				Debug.WriteLine ("Disposing: {0}", this.ToString());
+				Console.WriteLine ("Disposing: {0}", this.ToString());
 				if (IsQueueForRedraw)
 				throw new Exception("Trying to dispose an object queued for Redraw: " + this.ToString());
 				#endif
@@ -80,7 +80,7 @@ namespace Crow
 					DataSource = null;
 				parent = null;
 			} else
-				Debug.WriteLine ("!!! Finalized by GC: {0}", this.ToString ());
+				Console.WriteLine ("!!! Finalized by GC: {0}", this.ToString ());
 			Clipping?.Dispose ();
 			bmp?.Dispose ();
 			disposed = true;
@@ -112,7 +112,7 @@ namespace Crow
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
 		public virtual void NotifyValueChanged(string MemberName, object _value)
 		{
-			//Debug.WriteLine ("Value changed: {0}->{1} = {2}", this, MemberName, _value);
+			//Console.WriteLine ("Value changed: {0}->{1} = {2}", this, MemberName, _value);
 			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
 		}
 		#endregion
@@ -675,7 +675,7 @@ namespace Crow
 		public virtual void OnDataSourceChanged(object sender, DataSourceChangeEventArgs e){
 			DataSourceChanged.Raise (this, e);
 			#if DEBUG_BINDING
-			Debug.WriteLine("New DataSource for => {0} \n\t{1}=>{2}", this.ToString(),e.OldDataSource,e.NewDataSource);
+			Console.WriteLine("New DataSource for => {0} \n\t{1}=>{2}", this.ToString(),e.OldDataSource,e.NewDataSource);
 			#endif
 		}
 
@@ -698,7 +698,7 @@ namespace Crow
 		public void loadDefaultValues()
 		{
 			#if DEBUG_LOAD
-			Debug.WriteLine ("LoadDefValues for " + this.ToString ());
+			Console.WriteLine ("LoadDefValues for " + this.ToString ());
 			#endif
 
 			Type thisType = this.GetType ();
@@ -792,7 +792,7 @@ namespace Crow
 						il.Emit (OpCodes.Castclass, ei.EventHandlerType);
 						il.Emit (OpCodes.Callvirt, ei.AddMethod);
 					}else
-						Debug.WriteLine("error in styling, event not handled : " + trimed);
+						Console.WriteLine("error in styling, event not handled : " + trimed);
 				}
 			}
 
@@ -902,7 +902,7 @@ namespace Crow
 		/// </summary>
 		public virtual void ClippingRegistration(){
 			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("ClippingRegistration -> {0}", this.ToString ()));
+			Console.WriteLine (string.Format("ClippingRegistration -> {0}", this.ToString ()));
 			#endif
 			IsQueueForRedraw = false;
 			if (Parent == null)
@@ -916,7 +916,7 @@ namespace Crow
 		/// <param name="clip">Clip rectangle</param>
 		public virtual void RegisterClip(Rectangle clip){
 			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("RegisterClip -> {1}:{0}", clip, this.ToString ()));
+			Console.WriteLine (string.Format("RegisterClip -> {1}:{0}", clip, this.ToString ()));
 			#endif
 			Rectangle  r = clip + ClientRectangle.Position;
 			if (CacheEnabled && !IsDirty)
@@ -933,7 +933,7 @@ namespace Crow
 		public void RegisterForGraphicUpdate ()
 		{
 			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("RegisterForGraphicUpdate (IsDirty set)-> {0}", this.ToString ()));
+			Console.WriteLine (string.Format("RegisterForGraphicUpdate (IsDirty set)-> {0}", this.ToString ()));
 			#endif
 			IsDirty = true;
 			if (Width.IsFit || Height.IsFit)
@@ -946,7 +946,7 @@ namespace Crow
 		public void RegisterForRedraw ()
 		{
 			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("RegisterForRedraw (IsDirty set)-> {0}", this.ToString ()));
+			Console.WriteLine (string.Format("RegisterForRedraw (IsDirty set)-> {0}", this.ToString ()));
 			#endif
 			IsDirty = true;
 			if (RegisteredLayoutings == LayoutingType.None)
@@ -1013,7 +1013,7 @@ namespace Crow
 			#if DEBUG_LAYOUTING
 			CurrentInterface.currentLQI.Slot = LastSlots;
 			CurrentInterface.currentLQI.NewSlot = Slot;
-			Debug.WriteLine ("\t\t{0} => {1}",LastSlots,Slot);
+			Console.WriteLine ("\t\t{0} => {1}",LastSlots,Slot);
 			#endif
 
 			switch (layoutType) {
@@ -1037,7 +1037,7 @@ namespace Crow
 		public virtual bool UpdateLayout (LayoutingType layoutType)
 		{
 			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("UpdateLayout ({1})-> {0}", this.ToString (), layoutType));
+			Console.WriteLine (string.Format("UpdateLayout ({1})-> {0}", this.ToString (), layoutType));
 			#endif
 			//unset bit, it would be reset if LQI is re-queued
 			registeredLayoutings &= (~layoutType);
@@ -1190,7 +1190,7 @@ namespace Crow
 		protected virtual void onDraw(Context gr)
 		{
 			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("OnDraw -> {0}", this.ToString ()));
+			Console.WriteLine (string.Format("OnDraw -> {0}", this.ToString ()));
 			#endif
 
 			Rectangle rBack = new Rectangle (Slot.Size);
@@ -1206,7 +1206,7 @@ namespace Crow
 		protected virtual void RecreateCache ()
 		{
 			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("RecreateCache -> {0}", this.ToString ()));
+			Console.WriteLine (string.Format("RecreateCache -> {0}", this.ToString ()));
 			#endif
 			IsDirty = false;
 			if (bmp != null)
@@ -1220,7 +1220,7 @@ namespace Crow
 		}
 		protected virtual void UpdateCache(Context ctx){
 			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("UpdateCache -> {0}", this.ToString ()));
+			Console.WriteLine (string.Format("UpdateCache -> {0}", this.ToString ()));
 			#endif
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 			if (clearBackground) {
@@ -1240,7 +1240,7 @@ namespace Crow
 		public virtual void Paint (ref Context ctx)
 		{
 			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("Paint -> {0}", this.ToString ()));
+			Console.WriteLine (string.Format("Paint -> {0}", this.ToString ()));
 			#endif
 			//TODO:this test should not be necessary
 			if (Slot.Height < 0 || Slot.Width < 0 || parent == null)
@@ -1391,14 +1391,14 @@ namespace Crow
 		public virtual void onMouseEnter(object sender, MouseMoveEventArgs e)
 		{
 			#if DEBUG_FOCUS
-			Debug.WriteLine("MouseEnter => " + this.ToString());
+			Console.WriteLine("MouseEnter => " + this.ToString());
 			#endif
 			MouseEnter.Raise (this, e);
 		}
 		public virtual void onMouseLeave(object sender, MouseMoveEventArgs e)
 		{
 			#if DEBUG_FOCUS
-			Debug.WriteLine("MouseLeave => " + this.ToString());
+			Console.WriteLine("MouseLeave => " + this.ToString());
 			#endif
 			MouseLeave.Raise (this, e);
 		}
@@ -1406,13 +1406,13 @@ namespace Crow
 
 		protected virtual void onFocused(object sender, EventArgs e){
 			#if DEBUG_FOCUS
-			Debug.WriteLine("Focused => " + this.ToString());
+			Console.WriteLine("Focused => " + this.ToString());
 			#endif
 			Focused.Raise (this, e);
 		}
 		protected virtual void onUnfocused(object sender, EventArgs e){
 			#if DEBUG_FOCUS
-			Debug.WriteLine("UnFocused => " + this.ToString());
+			Console.WriteLine("UnFocused => " + this.ToString());
 			#endif
 			Unfocused.Raise (this, e);
 		}
@@ -1432,7 +1432,7 @@ namespace Crow
 		}
 		internal void ClearTemplateBinding(){
 			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("ClearTemplateBinding: {0}", this.ToString()));
+			Console.WriteLine (string.Format("ClearTemplateBinding: {0}", this.ToString()));
 			#endif
 			if (ValueChanged == null)
 				return;
@@ -1441,7 +1441,7 @@ namespace Crow
 				if (d.Method.Name == "dyn_tmpValueChanged") {
 					eiEvt.RemoveEventHandler (this, d);
 					#if DEBUG_BINDING
-					Debug.WriteLine ("\t{0} template binding handler removed in {1} for: {2}", d.Method.Name, this, "ValueChanged");
+					Console.WriteLine ("\t{0} template binding handler removed in {1} for: {2}", d.Method.Name, this, "ValueChanged");
 					#endif
 				}
 			}

@@ -138,7 +138,7 @@ namespace Crow
 		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
 			GraphicObject go = sender as GraphicObject;
-			//Debug.WriteLine ("child layout change: " + go.LastSlots.ToString() + " => " + go.Slot.ToString());
+			//Console.WriteLine ("child layout change: " + go.LastSlots.ToString() + " => " + go.Slot.ToString());
 			switch (arg.LayoutType) {
 			case LayoutingType.Width:
 				if (Orientation == Orientation.Horizontal) {
@@ -163,7 +163,7 @@ namespace Crow
 							stretchedGO.Slot.Width = newW;
 							stretchedGO.IsDirty = true;
 #if DEBUG_LAYOUTING
-					Debug.WriteLine ("\tAdjusting Width of " + stretchedGO.ToString());
+					Console.WriteLine ("\tAdjusting Width of " + stretchedGO.ToString());
 #endif
 							stretchedGO.LayoutChanged -= OnChildLayoutChanges;
 							stretchedGO.OnLayoutChanges (LayoutingType.Width);
@@ -202,7 +202,7 @@ namespace Crow
 							stretchedGO.Slot.Height = newH;
 							stretchedGO.IsDirty = true;
 #if DEBUG_LAYOUTING
-					Debug.WriteLine ("\tAdjusting Height of " + stretchedGO.ToString());
+					Console.WriteLine ("\tAdjusting Height of " + stretchedGO.ToString());
 #endif
 							stretchedGO.LayoutChanged -= OnChildLayoutChanges;
 							stretchedGO.OnLayoutChanges (LayoutingType.Height);

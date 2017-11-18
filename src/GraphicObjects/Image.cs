@@ -84,7 +84,7 @@ namespace Crow
 						}
 					}
 				} catch (Exception ex) {
-					Debug.WriteLine (ex.Message);
+					Console.WriteLine (ex.Message);
 					_pic = null;
 				}
 				NotifyValueChanged ("Path", Path);

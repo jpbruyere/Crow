@@ -116,7 +116,7 @@ namespace Crow
 				try {
 					return GetIsExpandable == null ? true : GetIsExpandable (this);
 				} catch (Exception ex) {
-					System.Diagnostics.Debug.WriteLine ("Not Expandable error: " + ex.ToString ());
+					Console.WriteLine ("Not Expandable error: " + ex.ToString ());
 					return false;
 				}
 			}
