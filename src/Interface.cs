@@ -196,18 +196,31 @@ namespace Crow
 
 			//fetch styling info in this order, if member styling is alreadey referenced in previous
 			//assembly, it's ignored.
-			loadStylingFromAssembly (Assembly.GetEntryAssembly ());
-			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
+			loadStylingFrom (Directory.GetCurrentDirectory());
+			loadStylingFrom (Assembly.GetEntryAssembly ());
+			loadStylingFrom (Assembly.GetExecutingAssembly ());
 		}
 		/// <summary> Search for .style resources in assembly </summary>
-		static void loadStylingFromAssembly (Assembly assembly) {
+		static void loadStylingFrom (Assembly assembly) {
 			if (assembly == null)
 				return;
 			foreach (string s in assembly
 				.GetManifestResourceNames ()
 				.Where (r => r.EndsWith (".style", StringComparison.OrdinalIgnoreCase))) {
+				Console.WriteLine ("Loading style: {0}", s);
 				new StyleReader (assembly, s)
 					.Dispose ();
+			}
+		}
+		static void loadStylingFrom (string styleDirectory) {
+			if (!Directory.Exists(styleDirectory))
+				Console.WriteLine ("Error loading styles: {0} directory not found");
+			foreach (string s in Directory.GetFiles(styleDirectory, "*.style",SearchOption.AllDirectories)) {
+				using (Stream stream = new FileStream(s,FileMode.Open)){
+					Console.WriteLine ("Loading style: {0}", s);
+					new StyleReader (stream, s)
+						.Dispose ();
+				}
 			}
 		}
 		static void loadCursors(){

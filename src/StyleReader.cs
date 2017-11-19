@@ -40,7 +40,10 @@ namespace Crow
 		int line = 1;
 
 		public StyleReader (Assembly assembly, string resId)
-			: base(assembly.GetManifestResourceStream (resId))
+			: this(assembly.GetManifestResourceStream (resId), resId)
+		{}
+		public StyleReader (Stream stream, string resId)
+			: base(stream)
 		{
 			resourceId = resId;
 			string styleKey = resId.Substring (0, resId.Length - 6);
