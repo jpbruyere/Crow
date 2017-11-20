@@ -126,7 +126,6 @@
     <Compile Include="src\Input\KeyPressEventArgs.cs" />
     <Compile Include="src\Configuration.cs" />
     <Compile Include="src\Measure.cs" />
-    <Compile Include="src\CompilerServices\MemberReference.cs" />
     <Compile Include="src\StyleReader.cs" />
     <Compile Include="src\GraphicObjects\DirectoryView.cs" />
     <Compile Include="src\Instantiator.cs" />
