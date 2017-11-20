@@ -534,11 +534,11 @@ namespace Crow
 						lock (RenderMutex) {
 //							Array.Copy (bmp, dirtyBmp, bmp.Length);
 
-							IsDirty = true;
 							if (IsDirty)
 								DirtyRect += clipping.Extents;
 							else
 								DirtyRect = clipping.Extents;
+							IsDirty = true;
 
 							DirtyRect.Left = Math.Max (0, DirtyRect.Left);
 							DirtyRect.Top = Math.Max (0, DirtyRect.Top);
