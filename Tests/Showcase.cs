@@ -114,7 +114,7 @@ namespace Tests
 					g.DataSource = this;
 				}
 			} catch (Exception ex) {
-				System.Diagnostics.Debug.WriteLine (ex.ToString ());
+				System.Diagnostics.Console.WriteLine (ex.ToString ());
 				showError (ex);
 			}
 		}

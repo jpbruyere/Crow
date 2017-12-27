@@ -60,7 +60,7 @@ namespace Crow
 					GL.GenerateMipmap (GenerateMipmapTarget.Texture2D);
 
 				} catch (Exception ex) {
-					Debug.WriteLine ("Error loading texture: " + Map + ":" + ex.Message);
+					Console.WriteLine ("Error loading texture: " + Map + ":" + ex.Message);
 				}
 			}
 		}

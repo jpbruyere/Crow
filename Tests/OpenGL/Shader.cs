@@ -209,8 +209,8 @@ namespace Crow
 			GL.GetProgramInfoLog(pgmId, out info);
 
 			if (!string.IsNullOrEmpty (info)) {
-				Debug.WriteLine ("Linkage:");
-				Debug.WriteLine (info);
+				Console.WriteLine ("Linkage:");
+				Console.WriteLine (info);
 			}
 
 			info = null;
@@ -218,8 +218,8 @@ namespace Crow
 			GL.ValidateProgram(pgmId);
 			GL.GetProgramInfoLog(pgmId, out info);
 			if (!string.IsNullOrEmpty (info)) {
-				Debug.WriteLine ("Validation:");
-				Debug.WriteLine (info);
+				Console.WriteLine ("Validation:");
+				Console.WriteLine (info);
 			}
 
 			GL.UseProgram (pgmId);
@@ -302,14 +302,14 @@ namespace Crow
 
 			string info;
 			GL.GetShaderInfoLog(shader, out info);
-			Debug.WriteLine(info);
+			Console.WriteLine(info);
 
 			int compileResult;
 			GL.GetShader(shader, ShaderParameter.CompileStatus, out compileResult);
 			if (compileResult != 1)
 			{
-				Debug.WriteLine("Compile Error!");
-				Debug.WriteLine(source);
+				Console.WriteLine("Compile Error!");
+				Console.WriteLine(source);
 			}
 		}
 		public override string ToString ()

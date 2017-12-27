@@ -80,8 +80,6 @@ namespace Crow
         }
         public static void DrawRoundedRectangle(Cairo.Context gr, double x, double y, double width, double height, double radius)
         {
-            gr.Save();
-
             if ((radius > height / 2) || (radius > width / 2))
                 radius = min(height / 2, width / 2);
 
@@ -94,7 +92,6 @@ namespace Crow
             gr.LineTo(x + radius, y + height);
             gr.Arc(x + radius, y + height - radius, radius, Math.PI / 2, Math.PI);
             gr.ClosePath();
-            gr.Restore();
         }
         public static void StrokeRaisedRectangle(Cairo.Context gr, Rectangle r, double width = 1)
         {

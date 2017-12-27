@@ -87,7 +87,7 @@ namespace test2
 		}
 		public void onMouseDown(object sender, MouseButtonEventArgs e)
 		{
-			Debug.WriteLine (sender.ToString ());
+			Console.WriteLine (sender.ToString ());
 		}
 		void OnSelectedItemChanged (object sender, SelectionChangeEventArgs e)
 		{

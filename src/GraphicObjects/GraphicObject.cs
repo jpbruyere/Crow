@@ -546,7 +546,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("sans,10")]
+		[XmlAttributeAttribute()][DefaultValue("sans,12")]
 		public virtual Font Font {
 			get { return font; }
 			set {

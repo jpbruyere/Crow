@@ -202,7 +202,7 @@ namespace Tests
 				GraphicObject obj = Load (testFiles[idx]);
 				obj.DataSource = this;
 			} catch (Exception ex) {
-				Debug.WriteLine (ex.Message + ex.InnerException);
+				Console.WriteLine (ex.Message + ex.InnerException);
 			}
 		}
 //		void Tv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
@@ -224,7 +224,7 @@ namespace Tests
 //			try {
 //				i = Instantiator.CreateFromImlFragment (e.Text);
 //			} catch (Exception ex) {
-//				Debug.WriteLine (ex);
+//				Console.WriteLine (ex);
 //				return;
 //			}
 //			lock (ifaceControl.CrowInterface.UpdateMutex) {
@@ -261,7 +261,7 @@ namespace Tests
 			NotifyValueChanged ("PropertyLessBinding", test);
 		}
 		void onNew(object sender, EventArgs e){
-			Debug.WriteLine ("menu new clicked");
+			Console.WriteLine ("menu new clicked");
 		}
 	}
 }
