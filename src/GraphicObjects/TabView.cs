@@ -35,7 +35,8 @@ namespace Crow
 	public class TabView : Group
 	{
 		#region CTOR
-		public TabView () : base() {}
+		public TabView() : base(){}
+		public TabView (Interface iface) : base(iface){}
 		#endregion
 
 		#region Private fields

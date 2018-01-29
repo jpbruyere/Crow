@@ -33,9 +33,8 @@ namespace Crow
     public class Popper : TemplatedContainer
     {
 		#region CTOR
-		public Popper() : base()
-		{
-		}
+		public Popper () : base(){}
+		public Popper (Interface iface) : base(iface){}
 		#endregion
 
 		bool _isPopped, _canPop;

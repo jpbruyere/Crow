@@ -31,13 +31,9 @@ namespace Crow
 	public class Spinner : NumericControl
 	{
 		#region CTOR
-		public Spinner () : base()
+		public Spinner() : base(){}
+		public Spinner (Interface iface) : base(iface)
 		{
-		}
-		public Spinner (double minimum, double maximum, double step) : 
-		base (minimum, maximum, step)
-		{
-
 		}
 		#endregion
 

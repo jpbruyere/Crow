@@ -32,12 +32,12 @@ namespace Crow
 {
 	public class CheckBox : TemplatedControl
 	{
-		bool isChecked;
-
 		#region CTOR
-		public CheckBox() : base()
-		{}
+		public CheckBox () : base(){}
+		public CheckBox (Interface iface) : base(iface){}
 		#endregion
+
+		bool isChecked;
 
 		public event EventHandler Checked;
 		public event EventHandler Unchecked;

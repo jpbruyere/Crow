@@ -37,16 +37,15 @@ namespace Crow
 {
 	public class FileDialog: Window
 	{
+		#region CTOR
+		public FileDialog () : base(){}
+		public FileDialog (Interface iface) : base(iface){}
+		#endregion
+
 		string searchPattern, curDir, _selectedFile, _selectedDir;
 
 		#region events
 		public event EventHandler OkClicked;
-		#endregion
-
-		#region CTOR
-		public FileDialog () : base()
-		{
-		}
 		#endregion
 
 		[XmlAttributeAttribute][DefaultValue("/home")]

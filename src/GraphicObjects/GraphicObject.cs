@@ -64,17 +64,17 @@ namespace Crow
 				if (IsQueueForRedraw)
 				throw new Exception("Trying to dispose an object queued for Redraw: " + this.ToString());
 				#endif
-				if (currentInterface.HoverWidget != null) {
-					if (currentInterface.HoverWidget.IsOrIsInside(this))
-						currentInterface.HoverWidget = null;
+				if (CurrentInterface.HoverWidget != null) {
+					if (CurrentInterface.HoverWidget.IsOrIsInside(this))
+						CurrentInterface.HoverWidget = null;
 				}
-				if (currentInterface.ActiveWidget != null) {
-					if (currentInterface.ActiveWidget.IsOrIsInside (this))
-						currentInterface.ActiveWidget = null;
+				if (CurrentInterface.ActiveWidget != null) {
+					if (CurrentInterface.ActiveWidget.IsOrIsInside (this))
+						CurrentInterface.ActiveWidget = null;
 				}
-				if (currentInterface.FocusedWidget != null) {
-					if (currentInterface.FocusedWidget.IsOrIsInside (this))
-						currentInterface.FocusedWidget = null;
+				if (CurrentInterface.FocusedWidget != null) {
+					if (CurrentInterface.FocusedWidget.IsOrIsInside (this))
+						CurrentInterface.FocusedWidget = null;
 				}
 				if (!localDataSourceIsNull)
 					DataSource = null;
@@ -91,20 +91,7 @@ namespace Crow
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
 
-		Interface currentInterface = null;
-
-		[XmlIgnore]public Interface CurrentInterface {
-			get {
-				if (currentInterface == null) {
-					currentInterface = Interface.CurrentInterface;
-					Initialize ();
-				}
-				return currentInterface;
-			}
-			set {
-				currentInterface = value;
-			}
-		}
+		public Interface CurrentInterface = null;
 
 		public Region Clipping;
 
@@ -118,13 +105,20 @@ namespace Crow
 		#endregion
 
 		#region CTOR
-		public GraphicObject ()
-		{
+		/// <summary>
+		/// default private parameter less constructor use in instantiators
+		/// </summary>
+		protected GraphicObject () {
 			Clipping = new Region ();
 			#if DEBUG
 			uid = currentUid;
 			currentUid++;
-			#endif
+			#endif			
+		}
+		public GraphicObject (Interface iface) : this()
+		{
+			CurrentInterface = iface;
+			Initialize ();
 		}
 		#endregion
 		internal bool initialized = false;
@@ -132,8 +126,8 @@ namespace Crow
 		/// Initialize this Graphic object instance by setting style and default values and loading template if required
 		/// </summary>
 		public virtual void Initialize(){
-			if (currentInterface == null)
-				currentInterface = Interface.CurrentInterface;			
+//			if (CurrentInterface == null)
+//				CurrentInterface = Interface.CurrentInterface;			
 			loadDefaultValues ();
 			initialized = true;
 		}
@@ -1336,7 +1330,7 @@ namespace Crow
 			if (CurrentInterface.eligibleForDoubleClick == this && CurrentInterface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick)
 				onMouseDoubleClick (this, e);
 			else
-				currentInterface.clickTimer.Restart();
+				CurrentInterface.clickTimer.Restart();
 			CurrentInterface.eligibleForDoubleClick = null;
 
 			if (CurrentInterface.ActiveWidget == null)

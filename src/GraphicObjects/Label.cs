@@ -38,15 +38,17 @@ namespace Crow
     public class Label : GraphicObject
     {
 		#region CTOR
-		public Label()
+		public Label () : base(){}
+
+		public Label(Interface iface) : base(iface)
 		{
 
 		}
-		public Label(string _text)
-			: base()
-		{
-			Text = _text;
-		}
+//		public Label(string _text)
+//			: base()
+//		{
+//			Text = _text;
+//		}
 		#endregion
 
 		public event EventHandler<TextChangeEventArgs> TextChanged;

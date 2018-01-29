@@ -69,7 +69,7 @@ namespace Tests
 			base.OnLoad (e);
 
 			AddWidget(
-				new Window ()
+				new Window (this.CurrentInterface)
 				{
 					Caption = "Hello World"
 				}

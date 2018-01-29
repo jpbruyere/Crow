@@ -125,7 +125,8 @@ namespace Crow
 		#endregion
 
 		#region CTOR
-		public Image () : base()
+		public Image () : base(){}
+		public Image (Interface iface) : base(iface)
 		{
 		}
 		#endregion

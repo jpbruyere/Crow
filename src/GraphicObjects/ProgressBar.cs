@@ -39,7 +39,8 @@ namespace Crow
 	public class ProgressBar : NumericControl
     {
 		#region CTOR
-		public ProgressBar() : base(){}
+		public ProgressBar () : base(){}
+		public ProgressBar(Interface iface) : base(iface){}
 		#endregion
 
 		protected override void loadTemplate (GraphicObject template)

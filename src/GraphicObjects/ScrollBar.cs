@@ -35,7 +35,8 @@ namespace Crow
 		Orientation _orientation;
 
 		#region CTOR
-		public ScrollBar() : base()	{}
+		public ScrollBar () : base(){}
+		public ScrollBar(Interface iface) : base(iface)	{}
 		#endregion
 
 		[XmlAttributeAttribute()][DefaultValue(Orientation.Vertical)]

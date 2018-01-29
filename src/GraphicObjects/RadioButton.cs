@@ -35,7 +35,8 @@ namespace Crow
 		bool isChecked;
 
 		#region CTOR
-		public RadioButton() : base(){}	
+		public RadioButton () : base(){}
+		public RadioButton(Interface iface) : base(iface){}	
 		#endregion
 
 		public event EventHandler Checked;

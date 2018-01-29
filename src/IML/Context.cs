@@ -68,8 +68,13 @@ namespace Crow.IML
 
 			il.DeclareLocal (typeof (GraphicObject));
 			il.Emit (OpCodes.Nop);
-			//set local GraphicObject to root object 
-			il.Emit (OpCodes.Newobj, rootType.GetConstructors () [0]);
+			//set local GraphicObject to root object
+			ConstructorInfo ci = rootType.GetConstructor (
+					BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, 
+					null, Type.EmptyTypes, null);
+			if (ci == null)
+				throw new Exception ("No default parameterless constructor found in " + rootType.Name);			
+			il.Emit (OpCodes.Newobj, ci);
 			il.Emit (OpCodes.Stloc_0);
 			CompilerServices.emitSetCurInterface (il);
 		}

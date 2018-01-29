@@ -35,12 +35,13 @@ namespace Crow
 	public class Slider : NumericControl
     {
 		#region CTOR
-		public Slider() : base()
+		public Slider() : base(){}
+		public Slider(Interface iface) : base(iface)
 		{}
-		public Slider(double minimum, double maximum, double step)
-			: base(minimum,maximum,step)
-		{
-		}
+//		public Slider(double minimum, double maximum, double step)
+//			: base(minimum,maximum,step)
+//		{
+//		}
 		#endregion
 
 		#region implemented abstract members of TemplatedControl

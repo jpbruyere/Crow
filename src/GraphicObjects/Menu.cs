@@ -33,7 +33,8 @@ namespace Crow
 	public class Menu : TemplatedGroup
 	{
 		#region CTOR
-		public Menu () : base() {}
+		public Menu () : base(){}
+		public Menu (Interface iface) : base(iface) {}
 		#endregion
 
 		Orientation orientation;

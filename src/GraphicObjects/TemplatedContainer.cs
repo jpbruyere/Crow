@@ -34,7 +34,8 @@ namespace Crow
 	public abstract class TemplatedContainer : TemplatedControl
 	{
 		#region CTOR
-		public TemplatedContainer () : base(){}
+		public TemplatedContainer() : base(){}
+		public TemplatedContainer (Interface iface) : base(iface){}
 		#endregion
 
 		[XmlAttributeAttribute]public virtual GraphicObject Content{ get; set;}

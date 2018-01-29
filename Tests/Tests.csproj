@@ -50,7 +50,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="Interfaces\testBorder.goml.cs" />
     <Compile Include="BasicTests.cs" />
     <Compile Include="OpenGL\Shader.cs" />
     <Compile Include="OpenGL\vaoMesh.cs" />

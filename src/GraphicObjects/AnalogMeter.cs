@@ -34,12 +34,8 @@ namespace Crow
 	public class AnalogMeter : NumericControl
 	{
 		#region CTOR
-		public AnalogMeter() : base()
-		{}
-		public AnalogMeter(double minimum, double maximum, double step)
-			: base(minimum,maximum,step)
-		{
-		}
+		public AnalogMeter () : base(){}
+		public AnalogMeter (Interface iface) : base(iface){}
 		#endregion
 
 		#region GraphicObject Overrides

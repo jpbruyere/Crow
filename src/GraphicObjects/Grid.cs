@@ -43,8 +43,8 @@ namespace Crow
     public class Grid : Group
     {
 		#region CTOR
-		public Grid()
-			: base()
+		public Grid () : base(){}
+		public Grid(Interface iface) : base(iface)
 		{            
 		}
 		#endregion
