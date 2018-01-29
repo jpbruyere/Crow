@@ -65,16 +65,7 @@ namespace Crow
 		#endregion
 
 		public void CreateExpandDelegate (TemplatedGroup host){
-			Type dataType = Type.GetType(strDataType);
-			if (dataType == null) {
-				Assembly a = Assembly.GetEntryAssembly ();
-				foreach (Type expT in a.GetExportedTypes ()) {
-					if (expT.Name == strDataType) {
-						dataType = expT;
-						break;
-					}
-				}
-			}
+			Type dataType = CompilerServices.tryGetType(strDataType);
 			if (dataType == null) {
 				Debug.WriteLine ("ItemTemplate error: DataType not found: {0}.", strDataType);
 				return;

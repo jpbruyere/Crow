@@ -93,7 +93,7 @@ namespace Crow
 					return new Instantiator (s);
 				}
 			} catch (Exception ex) {
-				throw new Exception ("Error loading fragment:\n" + fragment + "\n", ex);
+				throw new Exception ("Error loading IML fragment:\n" + fragment + "\n", ex);
 			}
 		}
 		#endregion
@@ -145,17 +145,7 @@ namespace Crow
 					break;
 				}
 			}
-
-			Type t = Type.GetType ("Crow." + root);
-			if (t == null) {
-				Assembly a = Assembly.GetEntryAssembly ();
-				foreach (Type expT in a.GetExportedTypes ()) {
-					if (expT.Name == root) {
-						t = expT;
-						break;
-					}
-				}
-			}
+			Type t = tryGetGOType (root);
 			if (t == null)
 				throw new Exception ("IML parsing error: undefined root type (" + root + ")");
 			return t;
@@ -177,9 +167,9 @@ namespace Crow
 				List<string[]> itemTemplateIds = new List<string[]> ();
 				bool inlineTemplate = false;
 
+				reader.Read ();
 				string templatePath = reader.GetAttribute ("Template");
 
-				reader.Read ();
 				int depth = reader.Depth + 1;
 				while (reader.Read ()) {
 					if (!reader.IsStartElement () || reader.Depth > depth)
@@ -310,7 +300,6 @@ namespace Crow
 				ctx.nodesStack.ResetCurrentNodeIndex ();
 			}
 		}
-
 		/// <summary>
 		/// Parse child node an generate corresponding msil
 		/// </summary>
@@ -336,16 +325,7 @@ namespace Crow
 					ctx.il.Emit (OpCodes.Ldloc_0);
 					ctx.il.Emit (OpCodes.Ldloc_0);
 
-					Type t = Type.GetType ("Crow." + reader.Name);
-					if (t == null) {
-						Assembly a = Assembly.GetEntryAssembly ();
-						foreach (Type expT in a.GetExportedTypes ()) {
-							if (expT.Name == reader.Name) {
-								t = expT;
-								break;
-							}
-						}
-					}
+					Type t = tryGetGOType (reader.Name);
 					if (t == null)
 						throw new Exception (reader.Name + " type not found");
 
@@ -391,6 +371,25 @@ namespace Crow
 			if (dataSource is IValueChange)
 				(dataSource as IValueChange).ValueChanged +=
 					(EventHandler<ValueChangeEventArgs>)dsValueChangedDynMeths [dynMethIdx].CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>), dscSource);
+		}
+		/// <summary> Emits remove old data source event handler./summary>
+		void emitRemoveOldDataSourceHandler(ILGenerator il, string eventName, string delegateName, bool DSSide = true){
+			System.Reflection.Emit.Label cancel = il.DefineLabel ();
+
+			il.Emit (OpCodes.Ldarg_2);//load old parent
+			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
+			il.Emit (OpCodes.Brfalse, cancel);//old parent is null
+
+			//remove handler
+			if (DSSide){//event is defined in the dataSource instance
+				il.Emit (OpCodes.Ldarg_2);//1st arg load old datasource
+				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
+			}else//the event is in the source
+				il.Emit (OpCodes.Ldarg_1);//1st arg load old datasource
+			il.Emit (OpCodes.Ldstr, eventName);//2nd arg event name
+			il.Emit (OpCodes.Ldstr, delegateName);//3d arg: delegate name
+			il.Emit (OpCodes.Call, CompilerServices.miRemEvtHdlByName);
+			il.MarkLabel(cancel);
 		}
 		#endregion
 
@@ -970,26 +969,23 @@ namespace Crow
 		}
 		#endregion
 
-		/// <summary> Emits remove old data source event handler./summary>
-		void emitRemoveOldDataSourceHandler(ILGenerator il, string eventName, string delegateName, bool DSSide = true){
-			System.Reflection.Emit.Label cancel = il.DefineLabel ();
-
-			il.Emit (OpCodes.Ldarg_2);//load old parent
-			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
-			il.Emit (OpCodes.Brfalse, cancel);//old parent is null
-
-			//remove handler
-			if (DSSide){//event is defined in the dataSource instance
-				il.Emit (OpCodes.Ldarg_2);//1st arg load old datasource
-				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
-			}else//the event is in the source
-				il.Emit (OpCodes.Ldarg_1);//1st arg load old datasource
-			il.Emit (OpCodes.Ldstr, eventName);//2nd arg event name
-			il.Emit (OpCodes.Ldstr, delegateName);//3d arg: delegate name
-			il.Emit (OpCodes.Call, CompilerServices.miRemEvtHdlByName);
-			il.MarkLabel(cancel);
+		/// <summary>
+		/// search for graphic object type in crow assembly, if not found,
+		/// search for type independently of namespace in entry assembly
+		/// </summary>
+		/// <returns>the corresponding type object</returns>
+		/// <param name="typeName">graphic object type name without its namespace</param>
+		Type tryGetGOType (string typeName){
+			Type t = Type.GetType ("Crow." + typeName);
+			if (t != null)
+				return t;
+			Assembly a = Assembly.GetEntryAssembly ();
+			foreach (Type expT in a.GetExportedTypes ()) {
+				if (expT.Name == typeName)
+					return expT;
+			}
+			return null;
 		}
-
 	}
 }
 

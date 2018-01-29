@@ -846,6 +846,23 @@ namespace Crow
 				exps.Add(expression);
 			return exps.ToArray ();
 		}
+		/// <summary>
+		/// Try to get the type named strDataType, search first in crow assembly then in
+		/// entry assembly.
+		/// </summary>
+		/// <returns>the corresponding type object if found</returns>
+		/// <param name="strDataType">type name</param>
+		internal static Type tryGetType (string strDataType){
+			Type dataType = Type.GetType(strDataType);
+			if (dataType != null)
+				return dataType;
+			Assembly a = Assembly.GetEntryAssembly ();
+			foreach (Type expT in a.GetExportedTypes ()) {
+				if (expT.Name == strDataType)
+					return dataType;
+			}
+			return null;
+		}
 	}
 }
 
