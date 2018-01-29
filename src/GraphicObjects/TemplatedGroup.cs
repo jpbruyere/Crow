@@ -266,6 +266,9 @@ namespace Crow
 //		}
 		#endregion
 
+		/// <summary>
+		/// Items loading thread
+		/// </summary>
 		void loading(){
 			if (ItemTemplates == null)
 				ItemTemplates = new Dictionary<string, ItemTemplate> ();
@@ -359,16 +362,7 @@ namespace Crow
 				iTemp = ItemTemplates [itempKey];
 			else {
 				foreach (string it in ItemTemplates.Keys) {
-					Type t = Type.GetType (it);
-					if (t == null) {
-						Assembly a = Assembly.GetEntryAssembly ();
-						foreach (Type expT in a.GetExportedTypes ()) {
-							if (expT.Name == it) {
-								t = expT;
-								break;
-							}
-						}
-					}
+					Type t = CompilerServices.tryGetType (it);
 					if (t == null)
 						continue;
 					if (t.IsAssignableFrom (dataType)) {//TODO:types could be cached
