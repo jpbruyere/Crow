@@ -34,10 +34,12 @@ namespace Crow
 {
     public class HorizontalStack : GenericStack
     {
-        public HorizontalStack()
-            : base()
+		#region CTOR
+		public HorizontalStack () : base(){}
+		public HorizontalStack(Interface iface) : base(iface)
         {            
         }
+		#endregion
 
         [XmlIgnore]
         public override Orientation Orientation

@@ -34,7 +34,8 @@ namespace Crow
 	public class TabItem : TemplatedContainer
 	{
 		#region CTOR
-		public TabItem () : base() {}
+		public TabItem() : base(){}
+		public TabItem (Interface iface) : base(iface){}
 		#endregion
 
 		#region Private fields

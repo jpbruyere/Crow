@@ -33,9 +33,8 @@ namespace Crow
     public class Expandable : TemplatedContainer
     {
 		#region CTOR
-		public Expandable() : base()
-		{
-		}
+		public Expandable () : base(){}
+		public Expandable (Interface iface) : base(iface){}
 		#endregion
 
 		#region Private fields

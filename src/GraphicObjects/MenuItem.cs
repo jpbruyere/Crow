@@ -33,7 +33,8 @@ namespace Crow
 	public class MenuItem : Menu
 	{
 		#region CTOR
-		public MenuItem () : base() {}
+		public MenuItem () : base(){}
+		public MenuItem (Interface iface) : base(iface) {}
 		#endregion
 
 		public event EventHandler Open;

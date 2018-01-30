@@ -32,7 +32,8 @@ namespace Crow
 {
 	public class SaturationValueSelector : ColorSelector
 	{
-		public SaturationValueSelector () : base()
+		public SaturationValueSelector () : base(){}
+		public SaturationValueSelector (Interface iface) : base(iface)
 		{
 		}
 

@@ -36,16 +36,17 @@ namespace Crow
 	public class GraduatedSlider : Slider
     {     
 		#region CTOR
-		public GraduatedSlider() : base()
+		public GraduatedSlider () : base(){}
+		public GraduatedSlider(Interface iface) : base(iface)
 		{}
-		public GraduatedSlider(double minimum, double maximum, double step)
-            : base()
-        {
-			Minimum = minimum;
-			Maximum = maximum;
-			SmallIncrement = step;
-			LargeIncrement = step * 5;
-        }
+//		public GraduatedSlider(double minimum, double maximum, double step)
+//            : base()
+//        {
+//			Minimum = minimum;
+//			Maximum = maximum;
+//			SmallIncrement = step;
+//			LargeIncrement = step * 5;
+//        }
 		#endregion
 
 		protected override void DrawGraduations(Context gr, PointD pStart, PointD pEnd)

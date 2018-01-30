@@ -32,9 +32,10 @@ namespace Crow
 {
 	public class ColorSelector : GraphicObject
 	{
-		public ColorSelector (): base()
-		{
-		}
+		#region CTOR
+		public ColorSelector () : base(){}
+		public ColorSelector (Interface iface) : base(iface){}
+		#endregion
 
 		const double div = 255.0;
 		const double colDiv = 1.0 / div;

@@ -30,9 +30,10 @@ using System.Xml.Serialization;
 namespace Crow
 {
 	public class ComboBox : ListBox
-    {		
+    {
 		#region CTOR
-		public ComboBox() : base(){	}	
+		public ComboBox () : base(){}
+		public ComboBox (Interface iface) : base(iface){}
 		#endregion
 
 		Size minimumPopupSize = "10,10";

@@ -161,6 +161,12 @@ namespace Crow
 
 			//emitCheckAndBindValueChanged (ctx);
 		}
+		/// <summary>
+		/// process template and item template definition prior to
+		/// other attributes or childs processing
+		/// </summary>
+		/// <param name="ctx">Loading Context</param>
+		/// <param name="tmpXml">xml fragment</param>
 		void emitTemplateLoad (Context ctx, string tmpXml) {
 			//if its a template, first read template elements
 			using (XmlTextReader reader = new XmlTextReader (tmpXml, XmlNodeType.Element, null)) {
@@ -242,11 +248,17 @@ namespace Crow
 				}
 			}
 		}
+		/// <summary>
+		/// process styling, attributes and children loading.
+		/// </summary>
+		/// <param name="ctx">parsing context</param>
+		/// <param name="tmpXml">xml fragment</param>
 		void emitGOLoad (Context ctx, string tmpXml) {
 			using (XmlTextReader reader = new XmlTextReader (tmpXml, XmlNodeType.Element, null)) {
 				reader.Read ();
 
 				#region Styling and default values loading
+				//first check for Style attribute then trigger default value loading
 				if (reader.HasAttributes) {
 					string style = reader.GetAttribute ("Style");
 					if (!string.IsNullOrEmpty (style))
@@ -328,8 +340,12 @@ namespace Crow
 					Type t = tryGetGOType (reader.Name);
 					if (t == null)
 						throw new Exception (reader.Name + " type not found");
-
-					ctx.il.Emit (OpCodes.Newobj, t.GetConstructors () [0]);//TODO:search parameterless ctor
+					ConstructorInfo ci = t.GetConstructor (
+						                     BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,  
+						null, Type.EmptyTypes, null);
+					if (ci == null)
+						throw new Exception ("No default parameterless constructor found in " + t.Name);					
+					ctx.il.Emit (OpCodes.Newobj, ci);
 					ctx.il.Emit (OpCodes.Stloc_0);//child is now loc_0
 					CompilerServices.emitSetCurInterface (ctx.il);
 

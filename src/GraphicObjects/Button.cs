@@ -40,14 +40,14 @@ namespace Crow
 {
     public class Button : TemplatedContainer
     {
+		#region CTOR
+		public Button() : base() {}
+		public Button (Interface iface) : base(iface){}
+		#endregion
+
 		string image;
 		bool isPressed;
 		Container _contentContainer;
-
-		#region CTOR
-        public Button() : base()
-        {}
-		#endregion
 
 		public event EventHandler Pressed;
 		public event EventHandler Released;

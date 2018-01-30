@@ -66,9 +66,8 @@ namespace Crow
 		#endregion
 
 		#region CTOR
-		public Window () : base() {
-			
-		}
+		public Window() : base(){}
+		public Window (Interface iface) : base(iface){}
 		#endregion
 
 		#region TemplatedContainer overrides

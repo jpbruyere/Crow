@@ -30,8 +30,10 @@ namespace Crow
 {
 	public class Wrapper : GenericStack
 	{
-		public Wrapper () : base()
-		{}
+		#region CTOR
+		public Wrapper() : base(){}
+		public Wrapper (Interface iface) : base(iface){}
+		#endregion
 
 		#region Group Overrides
 		public override void ChildrenLayoutingConstraints (ref LayoutingType layoutType)

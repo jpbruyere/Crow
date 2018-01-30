@@ -34,10 +34,8 @@ namespace Crow
 	public class GenericStack : Group
     {
 		#region CTOR
-		public GenericStack()
-			: base()
-		{            
-		}
+		public GenericStack () : base(){}
+		public GenericStack(Interface iface) : base(iface){}
 		#endregion
 
 		#region Private fields

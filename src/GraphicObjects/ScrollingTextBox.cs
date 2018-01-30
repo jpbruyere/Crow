@@ -42,6 +42,9 @@ namespace Crow
 	public class ScrollingTextBox : ScrollingObject
 	{
 		#region CTOR
+		public ScrollingTextBox (Interface iface):base(iface){
+			KeyEventsOverrides = true;
+		}
 		public ScrollingTextBox ():base()
 		{
 			KeyEventsOverrides = true;

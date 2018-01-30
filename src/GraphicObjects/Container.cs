@@ -36,17 +36,18 @@ namespace Crow
     public class Container : PrivateContainer
     {
 		#region CTOR
-		public Container()
-			: base()
-		{
-		}
+		public Container () : base(){}
+		public Container (Interface iface) : base(iface){}
 		#endregion
 
-		[XmlIgnore]
-		public GraphicObject Child {
+		[XmlIgnore]public GraphicObject Child {
 			get { return child; }
-			set { child = value; }
+			set { base.SetChild(value); }
 		}
+		/// <summary>
+		/// override this to handle specific steps in child addition in derived class,
+		/// and don't forget to call the base.SetChild
+		/// </summary>
 		public virtual void SetChild(GraphicObject _child)
 		{
 			base.SetChild (_child);

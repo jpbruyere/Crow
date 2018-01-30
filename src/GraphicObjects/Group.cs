@@ -38,8 +38,8 @@ namespace Crow
 	public class Group : GraphicObject
     {
 		#region CTOR
-		public Group()
-			: base(){}
+		public Group () : base(){}
+		public Group(Interface iface) : base(iface){}
 		#endregion
 
 		#region EVENT HANDLERS
