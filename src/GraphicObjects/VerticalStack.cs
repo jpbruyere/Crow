@@ -33,8 +33,8 @@ namespace Crow
 {
     public class VerticalStack : GenericStack
     {
-        public VerticalStack()
-            : base()
+		public VerticalStack() : base(){}
+		public VerticalStack(Interface iface) : base(iface)
         {
         }
 

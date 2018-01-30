@@ -33,9 +33,12 @@ namespace Crow
 {
 	public class HueSelector : ColorSelector
 	{
-		public HueSelector () : base()
+		#region CTOR
+		public HueSelector () : base(){}
+		public HueSelector (Interface iface) : base(iface)
 		{
 		}
+		#endregion
 
 		Orientation _orientation;
 		double hue;

@@ -108,7 +108,6 @@
     <Compile Include="src\GraphicObjects\TreeView.cs" />
     <Compile Include="src\GraphicObjects\TabView.cs" />
     <Compile Include="src\GraphicObjects\TabItem.cs" />
-    <Compile Include="src\GraphicObjects\DummyTemplate.cs" />
     <Compile Include="src\Input\KeyboardKeyEventArgs.cs" />
     <Compile Include="src\Input\Buttons.cs" />
     <Compile Include="src\Input\ButtonState.cs" />

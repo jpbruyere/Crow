@@ -32,9 +32,10 @@ namespace Crow
 {
 	public class ColorPicker : TemplatedControl
 	{
-		public ColorPicker () : base ()
-		{
-		}
+		#region CTOR
+		public ColorPicker () : base(){}
+		public ColorPicker (Interface iface) : base(iface){}
+		#endregion
 
 		const double div = 255.0;
 		const double colDiv = 1.0 / div;

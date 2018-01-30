@@ -41,6 +41,7 @@ namespace Crow
 	{
 		#region CTOR
 		public Border () : base(){}
+		public Border (Interface iface) : base(iface){}
 		#endregion
 
 		#region private fields

@@ -32,13 +32,17 @@ namespace Crow
 {
 	public class MessageBox : Window
 	{
+		#region CTOR
+		public MessageBox () : base(){}
+		public MessageBox (Interface iface) : base(iface){}
+		#endregion
+
 		public enum Type {
 			Information,
 			YesNo,
 			Alert,
 			Error
 		}
-		public MessageBox (): base(){}
 
 		protected override void loadTemplate (GraphicObject template)
 		{
@@ -133,8 +137,7 @@ namespace Crow
 		}
 		public static MessageBox Show (Type msgBoxType, string message, string okMsg = "", string cancelMsg = ""){
 			lock (Interface.CurrentInterface.UpdateMutex) {
-				MessageBox mb = new MessageBox ();
-				mb.Initialize ();
+				MessageBox mb = new MessageBox (Interface.CurrentInterface);
 				mb.CurrentInterface.AddWidget (mb);
 				mb.MsgType = msgBoxType;
 				mb.Message = message;

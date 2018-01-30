@@ -32,6 +32,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
+using System.Text;
 
 namespace Tests
 {
@@ -106,7 +107,7 @@ namespace Tests
 			try {
 				lock (this.ifaceControl [0].CrowInterface.UpdateMutex) {
 					Instantiator inst = null;
-					using (MemoryStream ms = new MemoryStream (System.Text.Encoding.Unicode.GetBytes (e.Text))){
+					using (MemoryStream ms = new MemoryStream (Encoding.UTF8.GetBytes (e.Text))){
 						inst = new Instantiator (ms);
 					}
 					g = inst.CreateInstance (this.ifaceControl [0].CrowInterface);

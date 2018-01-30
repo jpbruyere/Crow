@@ -34,6 +34,11 @@ namespace Crow
 {
 	public class Scroller : Container
 	{
+		#region CTOR
+		public Scroller () : base(){}
+		public Scroller (Interface iface) : base(iface){}
+		#endregion
+
 		bool _verticalScrolling;
 		bool _horizontalScrolling;
 		bool _scrollbarVisible;
@@ -121,9 +126,6 @@ namespace Crow
 			}
 		}
 		#endregion
-
-        public Scroller()
-            : base(){}
 
 		#region GraphicObject Overrides
 		public override void OnLayoutChanges (LayoutingType layoutType)

@@ -35,7 +35,8 @@ namespace Crow
 		Container _contentContainer;
 
 		#region CTOR
-		public GroupBox() : base(){}
+		public GroupBox () : base(){}
+		public GroupBox(Interface iface) : base(iface){}
 		#endregion
 
 		#region Template overrides

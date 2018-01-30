@@ -39,7 +39,8 @@ namespace Crow
 	public abstract class TemplatedGroup : TemplatedControl
 	{
 		#region CTOR
-		public TemplatedGroup () : base(){}
+		public TemplatedGroup() : base(){}
+		public TemplatedGroup (Interface iface) : base(iface){}
 		#endregion
 
 		protected Group items;
@@ -300,9 +301,7 @@ namespace Crow
 				page = items;
 				itemPerPage = int.MaxValue;
 			} else if (typeof(GenericStack).IsAssignableFrom (items.GetType ())) {
-				GenericStack gs = new GenericStack ();
-				gs.CurrentInterface = items.CurrentInterface;
-				gs.Initialize ();
+				GenericStack gs = new GenericStack (items.CurrentInterface);
 				gs.Orientation = (items as GenericStack).Orientation;
 				gs.Width = items.Width;
 				gs.Height = items.Height;

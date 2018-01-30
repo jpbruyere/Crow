@@ -40,9 +40,18 @@ namespace Tests
 		{
 			base.OnLoad (e);
 
+			Container c = (Container) Instantiator.CreateFromImlFragment (@"<Border BorderWidth='1' Background='Red' Foreground='White' Width='50%'></Border>").CreateInstance (CurrentInterface);
+			GraphicObject obj = new GraphicObject (this.CurrentInterface) 
+			{
+				Background = Color.AirForceBlueRaf,
+				Margin = 10,
+				Width = 100,
+				Height = 100
+			};
+			c.SetChild (obj);
+			AddWidget (c);
 
-			AddWidget(Instantiator.CreateFromImlFragment (@"<Border Fit='true' BorderWidth='2' BorderStyle='Normal'	MouseDown='{BorderStyle=Sunken}' MouseUp='{BorderStyle=Raised}'	MouseEnter='{BorderStyle=Raised}' MouseLeave='{BorderStyle=Normal}'><Label Margin='50'/></Border>").CreateInstance (CurrentInterface));
-			//Load(@"Interfaces/GraphicObject/0.crow");
+			//Load(@"Interfaces/GraphicObject/2.crow");
 		}
 
 		[STAThread]

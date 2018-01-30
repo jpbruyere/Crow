@@ -39,15 +39,8 @@ namespace Crow
 	public class TextRun : GraphicObject
 	{
 		#region CTOR
-		public TextRun ()
-		{
-
-		}
-		public TextRun (string _text)
-			: base ()
-		{
-			Text = _text;
-		}
+		public TextRun () : base(){}
+		public TextRun (Interface iface) : base (iface){}
 		#endregion
 
 		//TODO:change protected to private

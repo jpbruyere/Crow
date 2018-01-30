@@ -39,7 +39,8 @@ namespace Crow
 		bool isRoot;
 
 		#region CTOR
-		public TreeView () : base()
+		public TreeView() : base(){}
+		public TreeView (Interface iface) : base(iface)
 		{
 		}
 		#endregion
