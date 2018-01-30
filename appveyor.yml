@@ -7,7 +7,7 @@ branches:
 clone_depth: 1
 
 before_build:
-- cmd: nuget restore
+- cmd: nuget restore Crow.sln
 
 build_script:
     - set path=%path%;C:\Program Files (x86)\Mono\bin
