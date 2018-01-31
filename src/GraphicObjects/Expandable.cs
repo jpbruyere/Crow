@@ -30,6 +30,9 @@ using System.Xml.Serialization;
 
 namespace Crow
 {
+	/// <summary>
+	/// templated control whose content can be hidden and shown on demand
+	/// </summary>
     public class Expandable : TemplatedContainer
     {
 		#region CTOR
@@ -40,21 +43,31 @@ namespace Crow
 		#region Private fields
 		bool _isExpanded;
 		string image;
-		Container _contentContainer;
 		#endregion
 
 		#region Event Handlers
+		/// <summary>
+		/// Occurs when control is expanded.
+		/// </summary>
 		public event EventHandler Expand;
+		/// <summary>
+		/// Occurs when control is collapsed.
+		/// </summary>
 		public event EventHandler Collapse;
 		#endregion
 
 		public BooleanTestOnInstance GetIsExpandable;
 
+		/// <summary>
+		/// mouse click event handler for easy expand triggering in IML
+		/// </summary>
 		public void onClickForExpand (object sender, MouseButtonEventArgs e)
 		{
 			IsExpanded = !IsExpanded;
 		}
-
+		/// <summary>
+		/// Implement the abstract Content property of TemplatedControl
+		/// </summary>
 		public override GraphicObject Content {
 			get {
 				return _contentContainer == null ? null : _contentContainer.Child;

@@ -31,12 +31,18 @@ using System.Diagnostics;
 
 namespace Crow
 {
+	/// <summary>
+	/// provide an easy way to get 3d border for buttons
+	/// </summary>
 	public enum BorderStyle {
 		Normal,
 		Raised,
 		Sunken
 	};
 
+	/// <summary>
+	/// simple container with border
+	/// </summary>
 	public class Border : Container
 	{
 		#region CTOR
@@ -52,6 +58,9 @@ namespace Crow
 		#endregion
 
 		#region public properties
+		/// <summary>
+		/// use to define the colors of the 3d border
+		/// </summary>
 		[XmlAttributeAttribute]
 		public virtual Fill RaisedColor {
 			get { return raisedColor; }
@@ -63,6 +72,9 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
+		/// <summary>
+		/// use to define the colors of the 3d border
+		/// </summary>
 		[XmlAttributeAttribute]
 		public virtual Fill SunkenColor {
 			get { return sunkenColor; }
@@ -74,6 +86,9 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
+		/// <summary>
+		/// border width in pixels
+		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue(1)]
 		public virtual int BorderWidth {
 			get { return _borderWidth; }
@@ -82,6 +97,9 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
+		/// <summary>
+		/// allow 3d border effects
+		/// </summary>
 		[XmlAttributeAttribute][DefaultValue(BorderStyle.Normal)]
 		public virtual BorderStyle BorderStyle {
 			get { return _borderStyle; }

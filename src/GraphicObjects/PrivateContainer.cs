@@ -33,7 +33,7 @@ namespace Crow
 {
 	/// <summary>
 	/// Implement drawing and layouting for a single child, but
-	/// does not implement IXmlSerialisation to allow reuse of container
+	/// does not expose child to allow reuse of container
 	/// behaviour for widgets that have other xml hierarchy: example
 	/// TemplatedControl may have 3 children (template,templateItem,content) but
 	/// behave exactely as a container for layouting and drawing

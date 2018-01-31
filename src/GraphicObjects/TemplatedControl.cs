@@ -37,6 +37,9 @@ using System.Reflection;
 
 namespace Crow
 {
+	/// <summary>
+	/// Base class for all templated widget
+	/// </summary>
 	public abstract class TemplatedControl : PrivateContainer
 	{
 		#region CTOR
@@ -64,6 +67,9 @@ namespace Crow
 					loadTemplate (CurrentInterface.Load (_template));
 			}
 		}
+		/// <summary>
+		/// caption property being recurrent in templated widget, it is declared here.
+		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue("Templated Control")]
 		public virtual string Caption {
 			get { return caption; }
@@ -74,22 +80,33 @@ namespace Crow
 				NotifyValueChanged ("Caption", caption);
 			}
 		}
+
 		#region GraphicObject overrides
+
 		public override void Initialize ()
 		{
 			loadTemplate ();
 			base.Initialize ();
 		}
+		/// <summary>
+		/// override search method from GraphicObject to prevent
+		/// searching inside template
+		/// </summary>
+		/// <returns>widget identified by name, or null if not found</returns>
+		/// <param name="nameToFind">widget's name to find</param>
 		public override GraphicObject FindByName (string nameToFind)
 		{
 			//prevent name searching in template
 			return nameToFind == this.Name ? this : null;
 		}
+		/// <summary>
+		///onDraw is overrided to prevent default drawing of background, template top container
+		///may have a binding to root background or a fixed one.
+		///this allow applying root background to random template's component
+		/// </summary>
+		/// <param name="gr">Backend context</param>
 		protected override void onDraw (Cairo.Context gr)
 		{
-			//onDraw is overrided to prevent default drawing of background, template top container
-			//may have a binding to root background or a fixed one.
-			//this allow applying root background to random template's component
 			gr.Save ();
 
 			if (ClipToClientRect) {
@@ -104,6 +121,10 @@ namespace Crow
 		}
 		#endregion
 
+		/// <summary>
+		/// Loads the template.
+		/// </summary>
+		/// <param name="template">Optional template instance</param>
 		protected virtual void loadTemplate(GraphicObject template = null)
 		{
 			if (this.child != null)//template change, bindings has to be reset

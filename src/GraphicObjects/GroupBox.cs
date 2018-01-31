@@ -31,15 +31,13 @@ using System.ComponentModel;
 namespace Crow
 {
     public class GroupBox : TemplatedContainer
-    {
-		Container _contentContainer;
-
+    {		
 		#region CTOR
 		public GroupBox () : base(){}
 		public GroupBox(Interface iface) : base(iface){}
 		#endregion
 
-		#region Template overrides
+		#region TemplatedContainer implementation
 		public override GraphicObject Content {
 			get {
 				return _contentContainer == null ? null : _contentContainer.Child;
