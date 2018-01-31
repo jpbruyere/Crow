@@ -47,7 +47,6 @@ namespace Crow
 
 		string image;
 		bool isPressed;
-		Container _contentContainer;
 
 		public event EventHandler Pressed;
 		public event EventHandler Released;

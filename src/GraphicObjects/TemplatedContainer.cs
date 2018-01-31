@@ -38,6 +38,8 @@ namespace Crow
 		public TemplatedContainer (Interface iface) : base(iface){}
 		#endregion
 
+		protected Container _contentContainer;
+
 		[XmlAttributeAttribute]public virtual GraphicObject Content{ get; set;}
 
 		#region GraphicObject overrides

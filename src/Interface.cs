@@ -53,6 +53,14 @@ namespace Crow
 	{
 		#region CTOR
 		static Interface(){
+			CrowConfigRoot =
+				System.IO.Path.Combine(
+					Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+					".config");
+			CrowConfigRoot = System.IO.Path.Combine (CrowConfigRoot, "crow");
+			if (!Directory.Exists (CrowConfigRoot))
+				Directory.CreateDirectory (CrowConfigRoot);
+
 			loadCursors ();
 			loadStyling ();
 			findAvailableTemplates ();
@@ -70,6 +78,10 @@ namespace Crow
 		#endregion
 
 		#region Static and constants
+		/// <summary>
+		/// Crow configuration root path
+		/// </summary>
+		public static string CrowConfigRoot;
 		/// <summary>If true, mouse focus is given when mouse is over control</summary>
 		public static bool FocusOnHover = false;
 		/// <summary> Threshold to catch borders for sizing </summary>
@@ -217,8 +229,21 @@ namespace Crow
 		public static Dictionary<string, string> DefaultTemplates = new Dictionary<string, string>();
 		/// <summary>Finds available default templates at startup</summary>
 		static void findAvailableTemplates(){
+			searchTemplatesOnDisk ("./");
+			string defTemplatePath = System.IO.Path.Combine (CrowConfigRoot, "defaultTemplates");
+			searchTemplatesOnDisk (defTemplatePath);
 			searchTemplatesIn (Assembly.GetEntryAssembly ());
 			searchTemplatesIn (Assembly.GetExecutingAssembly ());
+		}
+		static void searchTemplatesOnDisk (string templatePath){
+			if (!Directory.Exists (templatePath))
+				return;
+			foreach (string f in Directory.GetFiles(templatePath, "*.template",SearchOption.AllDirectories)) {
+				string clsName = System.IO.Path.GetFileNameWithoutExtension(f);
+				if (DefaultTemplates.ContainsKey (clsName))
+					continue;
+				DefaultTemplates [clsName] = f;
+			}
 		}
 		static void searchTemplatesIn(Assembly assembly){
 			foreach (string resId in assembly

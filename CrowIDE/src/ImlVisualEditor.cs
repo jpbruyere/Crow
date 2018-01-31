@@ -189,7 +189,7 @@ namespace CrowIDE
 					isDirty = imlVE.IsDirty;
 
 				if (isDirty) {
-					lock (currentInterface.UpdateMutex)
+					lock (CurrentInterface.UpdateMutex)
 						RegisterForRedraw ();
 				}
 

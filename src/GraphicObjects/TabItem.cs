@@ -39,9 +39,7 @@ namespace Crow
 		#endregion
 
 		#region Private fields
-		string caption;
-		Container _contentContainer;
-		GraphicObject _tabTitle;
+		GraphicObject titleWidget;
 		int tabOffset;
 		bool isSelected;
 		Measure tabThickness;
@@ -67,9 +65,9 @@ namespace Crow
 			base.loadTemplate (template);
 
 			_contentContainer = this.child.FindByName ("Content") as Container;
-			_tabTitle = this.child.FindByName ("TabTitle");
+			titleWidget = this.child.FindByName ("TabTitle");
 		}
-		internal GraphicObject TabTitle { get { return _tabTitle; }}
+		internal GraphicObject TabTitle { get { return titleWidget; }}
 		#endregion
 
 		[XmlAttributeAttribute][DefaultValue("18")]

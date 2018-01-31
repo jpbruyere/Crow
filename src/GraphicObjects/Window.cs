@@ -55,7 +55,6 @@ namespace Crow
 		Rectangle savedBounds;
 		bool _minimized = false;
 
-		Container _contentContainer;
 		Direction currentDirection = Direction.None;
 
 		#region Events
