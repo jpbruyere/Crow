@@ -1054,7 +1054,7 @@ namespace Crow
 				isDragged = value;
 
 				if (isDragged) {
-					currentInterface.HoverWidget = null;
+					CurrentInterface.HoverWidget = null;
 					onStartDrag (this, null);
 				}
 
@@ -1533,14 +1533,14 @@ namespace Crow
 
 			if (CurrentInterface.ActiveWidget == null)
 				CurrentInterface.ActiveWidget = this;
-			if (this.Focusable && !(Interface.FocusOnHover || currentInterface.focusGiven)) {
+			if (this.Focusable && !(Interface.FocusOnHover || CurrentInterface.focusGiven)) {
 				CurrentInterface.FocusedWidget = this;
 				CurrentInterface.ActiveWidget = this;
-				currentInterface.focusGiven = true;
+				CurrentInterface.focusGiven = true;
 				if (CurrentInterface.eligibleForDoubleClick == this && CurrentInterface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick)
 					onMouseDoubleClick (this, e);
 				else
-					currentInterface.clickTimer.Restart();
+					CurrentInterface.clickTimer.Restart();
 				CurrentInterface.eligibleForDoubleClick = null;
 			}
 			//bubble event to the top
@@ -1553,8 +1553,8 @@ namespace Crow
 		public virtual void onMouseUp(object sender, MouseButtonEventArgs e){
 			if (IsDragged){
 				bool dropOK = false;
-				if (currentInterface.HoverWidget!=null) {
-					if (currentInterface.HoverWidget.AllowDrop)
+				if (CurrentInterface.HoverWidget!=null) {
+					if (CurrentInterface.HoverWidget.AllowDrop)
 						dropOK = true;
 				}
 				if (dropOK)
