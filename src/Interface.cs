@@ -39,15 +39,27 @@ using System.Globalization;
 namespace Crow
 {
 	/// <summary>
-	/// The Interface Class is the top container of the application.
-	/// It provides the Dirty bitmap and zone of the interface to be drawn on screen
+	/// The Interface Class is the root of crow graphic trees. It is thread safe allowing
+	/// application to run multiple interfaces in different threads.
+	/// It provides the Dirty bitmap and zone of the interface to be drawn on screen.
 	///
 	/// The Interface contains :
 	/// 	- rendering and layouting queues and logic.
-	/// 	- helpers to load XML interfaces files
-	/// 	- global constants and variables of CROW
+	/// 	- helpers to load XML interfaces files directely bound to this interface
+	/// 	- global static constants and variables of CROW
 	/// 	- Keyboard and Mouse logic
 	/// 	- the resulting bitmap of the interface
+	/// 
+	/// the master branch and the nuget package includes an OpenTK renderer which allows
+	/// the creation of multiple threaded interfaces.
+	/// 
+	/// If you intend to create another renderer (GDK, vulkan, etc) the minimal step is to
+	/// put an interface instance as member of your root object and call (optionally in another thread) the update function
+	/// at regular interval. Then you have to call
+	/// mouse, keyboard and resize functions of the interface when those events occurs in the host app.
+	/// 
+	/// The resulting surface (a byte array in the OpenTK renderer) is made available and protected with the
+	/// RenderMutex of the interface.
 	/// </summary>
 	public class Interface : ILayoutable
 	{
@@ -305,13 +317,15 @@ namespace Crow
 				throw new Exception ("Error loading <" + path + ">:", ex);
 			}
 		}
-		/// <summary>Fetch it from cache or create it</summary>
+		/// <summary>Fetch instantiator it from cache or create it</summary>
 		public static Instantiator GetInstantiator(string path){
 			if (!Instantiators.ContainsKey(path))
 				Instantiators [path] = new Instantiator(path);
 			return Instantiators [path];
 		}
-		/// <summary>Item templates have additional properties for recursivity and
+		/// <summary>Item templates are derived from instantiator, this function
+		/// try to fetch the requested one in the cache or create it.
+		/// They have additional properties for recursivity and
 		/// custom display per item type</summary>
 		public static ItemTemplate GetItemTemplate(string path){
 			if (!Instantiators.ContainsKey(path))
@@ -395,12 +409,11 @@ namespace Crow
 		}
 		#endregion
 
-
 		#region UPDATE Loops
 		/// <summary>Enqueue Graphic object for Repaint, DrawingQueue is locked because
 		/// GraphObj's property Set methods could trigger an update from another thread
-		/// Once in that queue, the layouting of obj and childs is ok, the next step
-		/// when dequeued is clipping registration</summary>
+		/// Once in that queue, that means that the layouting of obj and childs have succeed,
+		/// the next step when dequeued will be clipping registration</summary>
 		public void EnqueueForRepaint(GraphicObject g)
 		{
 			#if DEBUG_UPDATE
@@ -413,7 +426,7 @@ namespace Crow
 				g.IsQueueForRedraw = true;
 			}
 		}
-		/// <summary>Main Update loop, executed in this interface thread, lock the UpdateMutex
+		/// <summary>Main Update loop, executed in this interface thread, protected by the UpdateMutex
 		/// Steps:
 		/// 	- execute device Repeat events
 		/// 	- Layouting
@@ -686,6 +699,11 @@ namespace Crow
 		}
 		#endregion
 
+		/// <summary>
+		/// Resize the interface. This function should be called by the host
+		/// when window resize event occurs. 
+		/// </summary>
+		/// <param name="bounds">bounding box of the interface</param>
 		public void ProcessResize(Rectangle bounds){
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
@@ -715,8 +733,9 @@ namespace Crow
 				MouseCursorChanged.Raise (this,new MouseCursorChangedEventArgs(cursor));
 			}
 		}
-		/// <summary>Processes mouse move events from the root container</summary>
-		/// <returns><c>true</c>if mouse is in the interface</returns>
+		/// <summary>Processes mouse move events from the root container, this function
+		/// should be called by the host on mouse move event to forward events to crow interfaces</summary>
+		/// <returns>true if mouse is in the interface</returns>
 		public bool ProcessMouseMove(int x, int y)
 		{
 			int deltaX = x - Mouse.X;
@@ -792,6 +811,11 @@ namespace Crow
 			HoverWidget = null;
 			return false;
 		}
+		/// <summary>
+		/// Forward the mouse up event from the host to the crow interface
+		/// </summary>
+		/// <returns>return true, if interface handled the event, false otherwise.</returns>
+		/// <param name="button">Button index</param>
 		public bool ProcessMouseButtonUp(int button)
 		{
 			Mouse.DisableBit (button);
@@ -810,6 +834,11 @@ namespace Crow
 			ActiveWidget = null;
 			return true;
 		}
+		/// <summary>
+		/// Forward the mouse down event from the host to the crow interface
+		/// </summary>
+		/// <returns>return true, if interface handled the event, false otherwise.</returns>
+		/// <param name="button">Button index</param>
 		public bool ProcessMouseButtonDown(int button)
 		{
 			Mouse.EnableBit (button);
@@ -829,6 +858,11 @@ namespace Crow
 			mouseRepeatThread.Start ();
 			return true;
 		}
+		/// <summary>
+		/// Forward the mouse wheel event from the host to the crow interface
+		/// </summary>
+		/// <returns>return true, if interface handled the event, false otherwise.</returns>
+		/// <param name="button">Button index</param>
 		public bool ProcessMouseWheelChanged(float delta)
 		{
 			Mouse.SetScrollRelative (0, delta);
@@ -839,6 +873,11 @@ namespace Crow
 			HoverWidget.onMouseWheel (this, e);
 			return true;
 		}
+		/// <summary>
+		/// Forward key down event from the host to the crow interface
+		/// </summary>
+		/// <returns>return true, if interface handled the event, false otherwise.</returns>
+		/// <param name="button">Button index</param>
 		public bool ProcessKeyDown(int Key){
 			Keyboard.SetKeyState((Crow.Key)Key,true);
 			if (_focusedWidget == null)
@@ -853,6 +892,11 @@ namespace Crow
 
 			return true;
 		}
+		/// <summary>
+		/// Forward key up event from the host to the crow interface
+		/// </summary>
+		/// <returns>return true, if interface handled the event, false otherwise.</returns>
+		/// <param name="button">Button index</param>
 		public bool ProcessKeyUp(int Key){
 			Keyboard.SetKeyState((Crow.Key)Key,false);
 			if (_focusedWidget == null)
@@ -868,6 +912,11 @@ namespace Crow
 			}
 			return true;
 		}
+		/// <summary>
+		/// Forward a translated key press event from the host to the crow interface
+		/// </summary>
+		/// <returns>return true, if interface handled the event, false otherwise.</returns>
+		/// <param name="button">Button index</param>
 		public bool ProcessKeyPress(char Key){
 			if (_focusedWidget == null)
 				return false;

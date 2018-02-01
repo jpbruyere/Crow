@@ -38,6 +38,9 @@ using System.IO;
 
 namespace Crow
 {
+	/// <summary>
+	/// This is the base class for all the graphic trees elements
+	/// </summary>
 	public class GraphicObject : ILayoutable, IValueChange, IDisposable
 	{
 		#region IDisposable implementation
@@ -91,12 +94,29 @@ namespace Crow
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
 
+		/// <summary>
+		/// interface this widget is bound to, this should not be changed once the instance is created
+		/// </summary>
 		public Interface CurrentInterface = null;
 
+		/// <summary>
+		/// contains the dirty rectangles in the coordinate system of the cache. those dirty zones
+		/// are repeated at each cached levels of the tree with correspondig coordinate system. This is done
+		/// in a dedicated step of the update between layouting and drawing.
+		/// </summary>
 		public Region Clipping;
 
 		#region IValueChange implementation
+		/// <summary>
+		/// Raise to notify that the value of a property has changed, the binding system
+		/// rely mainly on this event. the member name may not be present in the class, this is 
+		/// used in **propertyless** bindings, this allow to raise custom named events without needing
+		/// to create an new one in the class or a new property.
+		/// </summary>
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+		/// <summary>
+		/// Helper function to raise the value changed event
+		/// </summary>
 		public virtual void NotifyValueChanged(string MemberName, object _value)
 		{
 			//Debug.WriteLine ("Value changed: {0}->{1} = {2}", this, MemberName, _value);
@@ -106,7 +126,9 @@ namespace Crow
 
 		#region CTOR
 		/// <summary>
-		/// default private parameter less constructor use in instantiators
+		/// default private parameter less constructor use in instantiators, it should not be used
+		/// when creating widget from code because widgets has to be bound to an interface before any other
+		/// action.
 		/// </summary>
 		protected GraphicObject () {
 			Clipping = new Region ();
@@ -115,6 +137,16 @@ namespace Crow
 			currentUid++;
 			#endif			
 		}
+		/// <summary>
+		/// This constructor **must** be used when creating widget from code.
+		///
+		/// When creating new widgets derived from GraphicObject, both parameterless and this constructors are
+		/// facultatives, the compiler will create the parameterless one automaticaly if no other one exists.
+		/// But if you intend to be able to create instances of the new widget in code and override the constructor
+		/// with the Interface parameter, you **must** also provide the override of the parameterless constructor because
+		/// compiler will not create it automatically because of the presence of the other one.
+		/// </summary>
+		/// <param name="iface">Iface.</param>
 		public GraphicObject (Interface iface) : this()
 		{
 			CurrentInterface = iface;
@@ -126,8 +158,6 @@ namespace Crow
 		/// Initialize this Graphic object instance by setting style and default values and loading template if required
 		/// </summary>
 		public virtual void Initialize(){
-//			if (CurrentInterface == null)
-//				CurrentInterface = Interface.CurrentInterface;			
 			loadDefaultValues ();
 			initialized = true;
 		}
@@ -248,24 +278,43 @@ namespace Crow
 		#endregion
 
 		#region EVENT HANDLERS
+		/// <summary>Occurs when mouse wheel is rolled in this object. It bubbles to the root</summary>
 		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
+		/// <summary>Occurs when mouse button is released in this object. It bubbles to the root</summary>
 		public event EventHandler<MouseButtonEventArgs> MouseUp;
+		/// <summary>Occurs when mouse button is pressed in this object. It bubbles to the root</summary>
 		public event EventHandler<MouseButtonEventArgs> MouseDown;
+		/// <summary>Occurs when mouse button has been pressed then relesed in this object. It bubbles to the root</summary>
 		public event EventHandler<MouseButtonEventArgs> MouseClick;
+		/// <summary>Occurs when mouse button has been pressed then relesed 2 times in this object. It bubbles to the root</summary>
 		public event EventHandler<MouseButtonEventArgs> MouseDoubleClick;
+		/// <summary>Occurs when mouse mouve in this object. It bubbles to the root</summary>
 		public event EventHandler<MouseMoveEventArgs> MouseMove;
+		/// <summary>Occurs when mouse enter this object</summary>
 		public event EventHandler<MouseMoveEventArgs> MouseEnter;
+		/// <summary>Occurs when mouse leave this object</summary>
 		public event EventHandler<MouseMoveEventArgs> MouseLeave;
+		/// <summary>Occurs when key is pressed when this object is active</summary>
 		public event EventHandler<KeyboardKeyEventArgs> KeyDown;
+		/// <summary>Occurs when key is released when this object is active</summary>
 		public event EventHandler<KeyboardKeyEventArgs> KeyUp;
+		/// <summary>Occurs when translated key event occurs in the host when this object is active</summary>
 		public event EventHandler<KeyPressEventArgs> KeyPress;
+		/// <summary>Occurs when this object received focus</summary>
 		public event EventHandler Focused;
+		/// <summary>Occurs when this object loose focus</summary>
 		public event EventHandler Unfocused;
+		/// <summary>Occurs when the enabled state this object is set to true</summary>
 		public event EventHandler Enabled;
+		/// <summary>Occurs when the enabled state this object is set to false</summary>
 		public event EventHandler Disabled;
+		/// <summary>Occurs when one part of the rendering slot changed</summary>
 		public event EventHandler<LayoutingEventArgs> LayoutChanged;
+		/// <summary>Occurs when DataSource changed</summary>
 		public event EventHandler<DataSourceChangeEventArgs> DataSourceChanged;
+		/// <summary>Occurs when the parent has changed</summary>
 		public event EventHandler<DataSourceChangeEventArgs> ParentChanged;
+		/// <summary>Occurs when the logical parent has changed</summary>
 		public event EventHandler<DataSourceChangeEventArgs> LogicalParentChanged;
 		#endregion
 
@@ -282,7 +331,7 @@ namespace Crow
 			}
 		}
 		/// <summary>
-		/// If enabled, resulting bitmap of graphic object is cached in an byte array
+		/// If enabled, resulting bitmap of graphic object is cached
 		/// speeding up rendering of complex object. Default is enabled.
 		/// </summary>
 		[XmlAttributeAttribute][DefaultValue(true)]
@@ -311,6 +360,8 @@ namespace Crow
 		}
 		/// <summary>
 		/// Name is used in binding to reference other GraphicObjects inside the graphic tree
+		/// and by template controls to find special element in their template implementation such
+		/// as a container or a group to put children in.
 		/// </summary>
 		[XmlAttributeAttribute][DefaultValue(null)]
 		public virtual string Name {
@@ -328,6 +379,10 @@ namespace Crow
 				NotifyValueChanged("Name", name);
 			}
 		}
+		/// <summary>
+		/// Vertical alignment inside parent, disabled if height is stretched
+		/// or top coordinate is not null
+		/// </summary>
 		[XmlAttributeAttribute	()][DefaultValue(VerticalAlignment.Center)]
 		public virtual VerticalAlignment VerticalAlignment {
 			get { return verticalAlignment; }
@@ -340,6 +395,10 @@ namespace Crow
 				RegisterForLayouting (LayoutingType.Y);
 			}
 		}
+		/// <summary>
+		/// Horizontal alignment inside parent, disabled if width is stretched
+		/// or left coordinate is not null
+		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue(HorizontalAlignment.Center)]
 		public virtual HorizontalAlignment HorizontalAlignment {
 			get { return horizontalAlignment; }
@@ -351,6 +410,9 @@ namespace Crow
 				RegisterForLayouting (LayoutingType.X);
 			}
 		}
+		/// <summary>
+		/// x position inside parent
+		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Left {
 			get { return left; }
@@ -362,6 +424,9 @@ namespace Crow
 				this.RegisterForLayouting (LayoutingType.X);
 			}
 		}
+		/// <summary>
+		/// y position inside parent
+		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Top {
 			get { return top; }
@@ -374,7 +439,7 @@ namespace Crow
 			}
 		}
 		/// <summary>
-		/// When set to True, the <see cref="T:Crow.GraphicObject"/>'s width and height will be set to Fit.
+		/// Helper property used to set width and height to fit in one call
 		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool Fit {
@@ -386,6 +451,10 @@ namespace Crow
 				Width = Height = Measure.Fit;
 			}
 		}
+		/// <summary>
+		/// Width of this control, by default inherited from parent. May have special values
+		/// such as Stretched or Fit. It may be proportionnal or absolute.
+		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue("Inherit")]
 		public virtual Measure Width {
 			get {
@@ -422,6 +491,10 @@ namespace Crow
 				this.RegisterForLayouting (LayoutingType.Width);
 			}
 		}
+		/// <summary>
+		/// Height of this control, by default inherited from parent. May have special values
+		/// such as Stretched or Fit. It may be proportionnal or absolute.
+		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue("Inherit")]
 		public virtual Measure Height {
 			get {
@@ -456,16 +529,20 @@ namespace Crow
 		}
 		/// <summary>
 		/// Used for binding on dimensions, this property will never hold fixed size, but instead only
-		/// Fit or Stretched
+		/// Fit or Stretched, **with inherited state implementation, it is not longer used in binding**
 		/// </summary>
 		[XmlIgnore]public virtual Measure WidthPolicy { get {
 				return Width.IsFit ? Measure.Fit : Measure.Stretched; } }
 		/// <summary>
 		/// Used for binding on dimensions, this property will never hold fixed size, but instead only
-		/// Fit or Stretched
+		/// Fit or Stretched, **with inherited state implementation, it is not longer used in binding**
 		/// </summary>
 		[XmlIgnore]public virtual Measure HeightPolicy { get {
 				return Height.IsFit ? Measure.Fit : Measure.Stretched; } }
+		/// <summary>
+		/// Indicate that this object may received focus or not, if not focusable all the descendants are 
+		/// affected.
+		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool Focusable {
 			get { return focusable; }
@@ -476,6 +553,9 @@ namespace Crow
 				NotifyValueChanged ("Focusable", focusable);
 			}
 		}
+		/// <summary>
+		/// True when this control has the focus, only one control per interface may have it.
+		/// </summary>
 		[XmlIgnore]public virtual bool HasFocus {
 			get { return hasFocus; }
 			set {
@@ -490,6 +570,10 @@ namespace Crow
 				NotifyValueChanged ("HasFocus", hasFocus);
 			}
 		}
+		/// <summary>
+		/// true if this control is active, this means that mouse has been pressed in it and not yet released. It could 
+		/// be used for other two states periferic action.
+		/// </summary>
 		[XmlIgnore]public virtual bool IsActive {
 			get { return isActive; }
 			set {
@@ -500,6 +584,9 @@ namespace Crow
 				NotifyValueChanged ("IsActive", isActive);
 			}
 		}
+		/// <summary>
+		/// true if holding mouse button down should trigger multiple click events
+		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue(false)]
 		public virtual bool MouseRepeat {
 			get { return mouseRepeat; }
@@ -511,6 +598,9 @@ namespace Crow
 			}
 		}
 		bool clearBackground = false;
+		/// <summary>
+		/// background fill of the control, maybe solid color, gradient, image, or svg
+		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue("Transparent")]
 		public virtual Fill Background {
 			get { return background; }
@@ -529,6 +619,9 @@ namespace Crow
 				}
 			}
 		}
+		/// <summary>
+		/// Foreground fill of the control, usage may be different among derived controls
+		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue("White")]
 		public virtual Fill Foreground {
 			get { return foreground; }
@@ -540,6 +633,9 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
+		/// <summary>
+		/// Font being used in many controls, it is defined in the base GraphicObject class.
+		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue("sans,10")]
 		public virtual Font Font {
 			get { return font; }
@@ -551,6 +647,9 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
+		/// <summary>
+		/// to get rounded corners
+		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue(0.0)]
 		public virtual double CornerRadius {
 			get { return cornerRadius; }
@@ -562,6 +661,10 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
+		/// <summary>
+		/// This is a single integer for the 4 direction, a gap between the control and it's container,
+		/// by default it is filled with the background.
+		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue(0)]
 		public virtual int Margin {
 			get { return margin; }
@@ -573,6 +676,9 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
+		/// <summary>
+		/// set the visible state of the control, invisible controls does reserve space in the layouting system.
+		/// </summary>
 		[XmlAttributeAttribute][DefaultValue(true)]
 		public virtual bool Visible {
 			get { return isVisible; }
@@ -590,6 +696,10 @@ namespace Crow
 				NotifyValueChanged ("Visible", isVisible);
 			}
 		}
+		/// <summary>
+		/// get or set the enabled state, disabling a control will affect focuability and
+		/// also it's rendering which will be grayed
+		/// </summary>
 		[XmlAttributeAttribute][DefaultValue(true)]
 		public virtual bool IsEnabled {
 			get { return isEnabled; }
@@ -608,6 +718,9 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
+		/// <summary>
+		/// Minimal width and  height for this control
+		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue("1,1")]
 		public virtual Size MinimumSize {
 			get { return minimumSize; }
@@ -621,6 +734,9 @@ namespace Crow
 				RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
+		/// <summary>
+		/// Maximum width and  height for this control, unlimited if null.
+		/// </summary>
 		[XmlAttributeAttribute()][DefaultValue("0,0")]
 		public virtual Size MaximumSize {
 			get { return maximumSize; }
@@ -672,7 +788,9 @@ namespace Crow
 			Debug.WriteLine("New DataSource for => {0} \n\t{1}=>{2}", this.ToString(),e.OldDataSource,e.NewDataSource);
 			#endif
 		}
-
+		/// <summary>
+		/// Style key to use for this control
+		/// </summary>
 		[XmlAttributeAttribute]
 		public virtual string Style {
 			get { return style; }

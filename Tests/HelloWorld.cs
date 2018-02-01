@@ -39,19 +39,7 @@ namespace Tests
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-
-			Container c = (Container) Instantiator.CreateFromImlFragment (@"<Border BorderWidth='1' Background='Red' Foreground='White' Width='50%'></Border>").CreateInstance (CurrentInterface);
-			GraphicObject obj = new GraphicObject (this.CurrentInterface) 
-			{
-				Background = Color.AirForceBlueRaf,
-				Margin = 10,
-				Width = 100,
-				Height = 100
-			};
-			c.SetChild (obj);
-			AddWidget (c);
-
-			//Load(@"Interfaces/GraphicObject/2.crow");
+			AddWidget (new Label (CurrentInterface) { Text = "Hello World" });
 		}
 
 		[STAThread]
