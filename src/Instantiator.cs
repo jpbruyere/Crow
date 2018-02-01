@@ -43,10 +43,14 @@ namespace Crow
 	/// <summary>
 	/// Reflexion being very slow, the settings of the starting values for widgets are set by a dynamic method.
 	/// This method is created on the first instacing and is recalled for further widget instancing.
-	/// It include
+	/// 
+	/// It includes:
 	/// 	- XML values setting
 	/// 	- Default values (appearing as attribute in C#)  loading
-	/// 	- Stiling
+	/// 	- Styling
+	/// 
+	/// Instantiators are shared amongs interfaces. Their are stored with their path as key, and inlined template
+	/// and itemtemplate are stored with a generated uuid
 	/// </summary>
 	public class Instantiator
 	{
@@ -63,9 +67,15 @@ namespace Crow
 		internal string sourcePath;
 
 		#region CTOR
+		/// <summary>
+		/// Initializes a new instance of the Instantiator class.
+		/// </summary>
 		public Instantiator (string path) : this (Interface.GetStreamFromPath(path)) {
 			sourcePath = path;
 		}
+		/// <summary>
+		/// Initializes a new instance of the Instantiator class.
+		/// </summary>
 		public Instantiator (Stream stream)
 		{
 #if DEBUG_LOAD
@@ -81,11 +91,17 @@ namespace Crow
 				loadingTime.ElapsedTicks, loadingTime.ElapsedMilliseconds, imlPath);
 #endif
 		}
+		//TODO:check if still used
 		public Instantiator (Type _root, InstanciatorInvoker _loader)
 		{
 			RootType = _root;
 			loader = _loader;
 		}
+		/// <summary>
+		/// Create a new instantiator from IML fragment provided directely as a string
+		/// </summary>
+		/// <returns>A new instantiator</returns>
+		/// <param name="fragment">IML string</param>
 		public static Instantiator CreateFromImlFragment (string fragment)
 		{
 			try {
@@ -98,13 +114,22 @@ namespace Crow
 		}
 		#endregion
 
+		/// <summary>
+		/// Creates a new instance of the GraphicObject compiled in the instantiator
+		/// and bind it the an interface
+		/// </summary>
+		/// <returns>The new graphic object instance</returns>
+		/// <param name="iface">The interface to bind to</param>
 		public GraphicObject CreateInstance(Interface iface){
 			return loader (iface) as GraphicObject;
 		}
 
 		List<DynamicMethod> dsValueChangedDynMeths = new List<DynamicMethod>();
 		List<Delegate> cachedDelegates = new List<Delegate>();
-		List<int> templateCachedDelegateIndices = new List<int>();//store indices of template delegate to be handled by root parentChanged event
+		/// <summary>
+		/// store indices of template delegate to be handled by root parentChanged event
+		/// </summary>
+		List<int> templateCachedDelegateIndices = new List<int>();
 		Delegate templateBinding;
 
 		#region IML parsing
