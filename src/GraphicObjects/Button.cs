@@ -38,6 +38,9 @@ using System.ComponentModel;
 
 namespace Crow
 {
+	/// <summary>
+	/// templated button control
+	/// </summary>
     public class Button : TemplatedContainer
     {
 		#region CTOR

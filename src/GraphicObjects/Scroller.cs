@@ -32,6 +32,9 @@ using Cairo;
 
 namespace Crow
 {
+	/// <summary>
+	/// scrolling surface, to be contained in a smaller container in which it will be scrolled
+	/// </summary>
 	public class Scroller : Container
 	{
 		#region CTOR

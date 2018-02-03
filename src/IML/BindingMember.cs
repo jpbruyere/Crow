@@ -27,14 +27,16 @@
 using System;
 using System.Reflection.Emit;
 
-namespace Crow
+namespace Crow.IML
 {
 	/// <summary>
-	/// Expression token, a variable, a string constant or a parsable constant (having a static Parse method)
-	/// '../' => 1 level up in graphic tree
-	/// './' or '/' => template root level
-	/// '.Name1.Name2' current level properties
-	/// 'name.prop' named descendant in graphic tree, search with 'FindByName' method of GraphicObject
+	/// Binding expression parser.
+	/// 
+	/// Valid tokens in binding expression:
+	/// - '../' => 1 level up in graphic tree
+	/// - './' or '/' => template root level
+	/// - '.Name1.Name2' current level properties
+	/// - 'name.prop' named descendant in graphic tree, search with 'FindByName' method of GraphicObject
 	/// </summary>
 	public class BindingMember
 	{
@@ -71,7 +73,14 @@ namespace Crow
 		public bool IsSingleName { get { return LevelsUp == 0 && Tokens.Length == 1; }}
 
 		#region CTOR
+		/// <summary>
+		/// Initializes a new instance of BindingMember.
+		/// </summary>
 		public BindingMember (){}
+		/// <summary>
+		/// Initializes a new instance of BindingMember by parsing the string passed as argument
+		/// </summary>
+		/// <param name="expression">binding expression</param>
 		public BindingMember (string expression){
 			if (string.IsNullOrEmpty (expression))
 				return;
@@ -104,6 +113,11 @@ namespace Crow
 		}
 		#endregion
 
+		/// <summary>
+		/// Emits the MSIL instructions to get the target of the binding expression
+		/// </summary>
+		/// <param name="il">current MSIL generator</param>
+		/// <param name="cancel">cancel branching in MSIL if something go wrong</param>
 		public void emitGetTarget(ILGenerator il, System.Reflection.Emit.Label cancel){
 
 			if (IsTemplateBinding) {
@@ -145,6 +159,11 @@ namespace Crow
 				il.Emit (OpCodes.Brfalse, cancel);
 			}
 		}
+		/// <summary>
+		/// Emit the MSIL instructions to get the target property of the binding expression
+		/// </summary>
+		/// <param name="il">current MSIL generator</param>
+		/// <param name="cancel">cancel branching in MSIL if something go wrong</param>
 		public void emitGetProperty(ILGenerator il, System.Reflection.Emit.Label cancel) {
 			System.Reflection.Emit.Label miOK = il.DefineLabel ();
 			il.Emit (OpCodes.Dup);//duplicate instance
@@ -157,6 +176,10 @@ namespace Crow
 			il.MarkLabel (miOK);
 			il.Emit (OpCodes.Call, CompilerServices.miGetValWithRefx);
 		}
+		/// <summary>
+		/// Emit the MSIL instructions to set the target property of the binding expression
+		/// </summary>
+		/// <param name="il">current MSIL generator</param>
 		public void emitSetProperty(ILGenerator il) {
 			il.Emit (OpCodes.Ldstr, Tokens [Tokens.Length -1]);//load member name
 			il.Emit (OpCodes.Call, CompilerServices.miSetValWithRefx);

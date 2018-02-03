@@ -36,26 +36,32 @@ for easy c# code linking.
   </a>
 </p>
 
-You can visit the [Wiki](https://github.com/jpbruyere/Crow/wiki) or the [Project Site](https://jpbruyere.github.io/Crow/)
-for documentation and tutorials.
+For **documentation** and **tutorials** visit the [Wiki](https://github.com/jpbruyere/Crow/wiki)
+or the [Project Site](https://jpbruyere.github.io/Crow/).
 
 Please report bugs and issues on [GitHub](https://github.com/jpbruyere/Crow/issues)
 
 ## Getting Start
+
 ### Requirements
-- [mono > 4.5](http://www.mono-project.com/)
+- [mono > 4.5](http://www.mono-project.com/download/)
 - [Cairo Graphic Library](https://cairographics.org/) >= 1.10 
 - [rsvg library](https://developer.gnome.org/rsvg/) for svg rendering
 - [nuget](https://www.nuget.org/).
+
 ### Building from source
+
 _[Git](https://git-scm.com) has to be installed._
+
 ```bash
 git clone https://github.com/jpbruyere/Crow.git     # Download source code from github
 cd Crow                                             # Enter the source directory
 nuget restore Crow.sln                              # Restore nuget packages
 xbuild  /p:Configuration=Release Crow.sln           # Build with Mono 
 ```
+
 ### Using nuget
+
 * add [Crow.OpenTK NuGet package](https://www.nuget.org/packages/Crow.OpenTK/) to your project.
 * Derive **CrowWindow** class.
 * Load some widget in the **OnLoad** override with `CrowWindow.Load` .

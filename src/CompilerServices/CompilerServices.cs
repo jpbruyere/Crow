@@ -35,7 +35,7 @@ using System.Xml;
 using Crow.IML;
 
 
-namespace Crow
+namespace Crow.IML
 {
 	public static class CompilerServices
 	{

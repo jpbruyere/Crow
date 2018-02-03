@@ -32,6 +32,10 @@ using System.Diagnostics;
 
 namespace Crow
 {
+	/// <summary>
+	/// templated numeric control to select a value
+	/// by slidding a cursor
+	/// </summary>
 	public class Slider : NumericControl
     {
 		#region CTOR

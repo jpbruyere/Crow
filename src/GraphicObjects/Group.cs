@@ -70,7 +70,7 @@ namespace Crow
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 			g.LayoutChanged += OnChildLayoutChanges;
 		}
-        public virtual void RemoveChild(GraphicObject child)        
+        public virtual void RemoveChild(GraphicObject child)
 		{
 			child.LayoutChanged -= OnChildLayoutChanges;
 			//check if HoverWidget is removed from Tree
@@ -87,7 +87,7 @@ namespace Crow
 				searchLargestChild ();
 			if (child == tallestChild && Height == Measure.Fit)
 				searchTallestChild ();
-			
+
 			this.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
         }
 		public virtual void ClearChildren()
@@ -107,26 +107,26 @@ namespace Crow
 			ChildrenCleared.Raise (this, new EventArgs ());
 		}
 
-//		public void putWidgetOnTop(GraphicObject w)
-//		{
-//			if (Children.Contains(w))
-//			{
-//				lock (children) {
-//					Children.Remove (w);
-//					Children.Add (w);
-//				}
-//			}
-//		}
-//		public void putWidgetOnBottom(GraphicObject w)
-//		{
-//			if (Children.Contains(w))
-//			{
-//				lock (children) {
-//					Children.Remove (w);
-//					Children.Insert (0, w);
-//				}
-//			}
-//		}
+		public void putWidgetOnTop(GraphicObject w)
+		{
+			if (Children.Contains(w))
+			{
+				lock (children) {
+					Children.Remove (w);
+					Children.Add (w);
+				}
+			}
+		}
+		public void putWidgetOnBottom(GraphicObject w)
+		{
+			if (Children.Contains(w))
+			{
+				lock (children) {
+					Children.Remove (w);
+					Children.Insert (0, w);
+				}
+			}
+		}
 
 		#region GraphicObject overrides
 		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
@@ -185,7 +185,7 @@ namespace Crow
 			}
 			return base.measureRawSize (lt);
 		}
-			
+
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
 			base.OnLayoutChanges (layoutType);
@@ -345,7 +345,7 @@ namespace Crow
 			}
 		}
 
-	
+
 		#region Mouse handling
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{

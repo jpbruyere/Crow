@@ -32,6 +32,9 @@ using System.Xml.Serialization;
 
 namespace Crow
 {
+	/// <summary>
+	/// group control stacking its children horizontally
+	/// </summary>
     public class HorizontalStack : GenericStack
     {
 		#region CTOR

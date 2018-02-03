@@ -29,6 +29,9 @@ using System.Xml.Serialization;
 
 namespace Crow
 {
+	/// <summary>
+	/// templated control for selecting value in a pop up list
+	/// </summary>
 	public class ComboBox : ListBox
     {
 		#region CTOR

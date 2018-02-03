@@ -137,7 +137,7 @@ namespace Crow
 		/// Parses IML and build a dynamic method that will be used to instanciate one or multiple occurence of the IML file or fragment
 		/// </summary>
 		void parseIML (XmlTextReader reader) {
-			Context ctx = new Context (findRootType (reader));
+			IMLContext ctx = new IMLContext (findRootType (reader));
 
 			ctx.nodesStack.Push (new Node (ctx.RootType));
 			emitLoader (reader, ctx);
@@ -175,7 +175,7 @@ namespace Crow
 				throw new Exception ("IML parsing error: undefined root type (" + root + ")");
 			return t;
 		}
-		void emitLoader (XmlTextReader reader, Context ctx)
+		void emitLoader (XmlTextReader reader, IMLContext ctx)
 		{
 			string tmpXml = reader.ReadOuterXml ();
 
@@ -192,7 +192,7 @@ namespace Crow
 		/// </summary>
 		/// <param name="ctx">Loading Context</param>
 		/// <param name="tmpXml">xml fragment</param>
-		void emitTemplateLoad (Context ctx, string tmpXml) {
+		void emitTemplateLoad (IMLContext ctx, string tmpXml) {
 			//if its a template, first read template elements
 			using (XmlTextReader reader = new XmlTextReader (tmpXml, XmlNodeType.Element, null)) {
 				List<string[]> itemTemplateIds = new List<string[]> ();
@@ -278,7 +278,7 @@ namespace Crow
 		/// </summary>
 		/// <param name="ctx">parsing context</param>
 		/// <param name="tmpXml">xml fragment</param>
-		void emitGOLoad (Context ctx, string tmpXml) {
+		void emitGOLoad (IMLContext ctx, string tmpXml) {
 			using (XmlTextReader reader = new XmlTextReader (tmpXml, XmlNodeType.Element, null)) {
 				reader.Read ();
 
@@ -340,7 +340,7 @@ namespace Crow
 		/// <summary>
 		/// Parse child node an generate corresponding msil
 		/// </summary>
-		void readChildren (XmlTextReader reader, Context ctx, int startingIdx = 0)
+		void readChildren (XmlTextReader reader, IMLContext ctx, int startingIdx = 0)
 		{
 			bool endTagReached = false;
 			int nodeIdx = startingIdx;
@@ -392,7 +392,7 @@ namespace Crow
 		}
 		#endregion
 
-		void readPropertyBinding (Context ctx, string sourceMember, string expression)
+		void readPropertyBinding (IMLContext ctx, string sourceMember, string expression)
 		{
 			NodeAddress sourceNA = ctx.CurrentNodeAddress;
 			BindingDefinition bindingDef = sourceNA.GetBindingDef (sourceMember, expression);
@@ -439,7 +439,7 @@ namespace Crow
 		/// Compile events expression in IML attributes, and store the result in the instanciator
 		/// Those handlers will be bound when instatiing
 		/// </summary>
-		void compileAndStoreDynHandler (Context ctx, EventInfo sourceEvent, string expression)
+		void compileAndStoreDynHandler (IMLContext ctx, EventInfo sourceEvent, string expression)
 		{
 			//store event handler dynamic method in instanciator
 			int dmIdx = cachedDelegates.Count;
@@ -447,7 +447,7 @@ namespace Crow
 			ctx.emitCachedDelegateHandlerAddition(dmIdx, sourceEvent);
 		}
 		/// <summary> Emits handler method bindings </summary>
-		void emitHandlerBinding (Context ctx, EventInfo sourceEvent, string expression){
+		void emitHandlerBinding (IMLContext ctx, EventInfo sourceEvent, string expression){
 			NodeAddress currentNode = ctx.CurrentNodeAddress;
 			BindingDefinition bindingDef = currentNode.GetBindingDef (sourceEvent.Name, expression);
 
@@ -526,7 +526,7 @@ namespace Crow
 		/// those delegates uses grtree functions to set destination value so they don't
 		/// need to be bound to destination instance as in the ancient system.
 		/// </summary>
-		void emitBindingDelegates(Context ctx){
+		void emitBindingDelegates(IMLContext ctx){
 			foreach (KeyValuePair<NodeAddress,Dictionary<string, List<MemberAddress>>> bindings in ctx.Bindings ) {
 				if (bindings.Key.Count == 0)//template binding
 					emitTemplateBindings (ctx, bindings.Value);
@@ -534,7 +534,7 @@ namespace Crow
 					emitPropertyBindings (ctx,  bindings.Key, bindings.Value);
 			}
 		}
-		void emitPropertyBindings(Context ctx, NodeAddress origine, Dictionary<string, List<MemberAddress>> bindings){
+		void emitPropertyBindings(IMLContext ctx, NodeAddress origine, Dictionary<string, List<MemberAddress>> bindings){
 			Type origineNodeType = origine.NodeType;
 
 			//value changed dyn method
@@ -634,7 +634,7 @@ namespace Crow
 			#endif
 
 		}
-		void emitTemplateBindings(Context ctx, Dictionary<string, List<MemberAddress>> bindings){
+		void emitTemplateBindings(IMLContext ctx, Dictionary<string, List<MemberAddress>> bindings){
 			//value changed dyn method
 			DynamicMethod dm = new DynamicMethod ("dyn_tmpValueChanged",
 				typeof (void), CompilerServices.argsValueChange, true);
@@ -786,7 +786,7 @@ namespace Crow
 		/// <summary>
 		/// create the valuechanged handler, the datasourcechanged handler and emit event handling
 		/// </summary>
-		void emitDataSourceBindings(Context ctx, BindingDefinition bindingDef){
+		void emitDataSourceBindings(IMLContext ctx, BindingDefinition bindingDef){
 			DynamicMethod dm = null;
 			ILGenerator il = null;
 			int dmVC = 0;

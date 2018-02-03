@@ -66,7 +66,7 @@ namespace Tests
 		void initGL(){
 			GL.Enable (EnableCap.CullFace);
 			GL.Enable (EnableCap.Blend);
-			GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
 			cube = vaoMesh.CreateCube ();
 			texture = new Texture ("image/textest.png");
@@ -76,8 +76,8 @@ namespace Tests
 		{
 			base.OnLoad (e);
 
-			MouseMove += HelloCube_MouseMove;
-			MouseWheelChanged += Hello3D_MouseWheelChanged;
+			CrowMouseMove += HelloCube_MouseMove;
+			CrowMouseWheel += Hello3D_MouseWheelChanged;
 
 			iface3D = Add3DInterface (800, 800,
 				Matrix4.CreateScale (6f) *
@@ -140,8 +140,8 @@ namespace Tests
 		void Hello3D_MouseWheelChanged (object sender, OpenTK.Input.MouseWheelEventArgs e)
 		{
 			float speed = ZoomSpeed;
-			if (Keyboard[OpenTK.Input.Key.ControlLeft])
-				speed *= 20.0f;
+			//if (Keyboard[OpenTK.Input.Key.ControlLeft])
+			//	speed *= 20.0f;
 
 			eyeDist -= e.Delta * speed;
 			if (eyeDist < zNear)

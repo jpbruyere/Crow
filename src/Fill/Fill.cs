@@ -29,8 +29,16 @@ using System.Collections.Generic;
 
 namespace Crow
 {
+	/// <summary>
+	/// base class for drawing content to paint on backend
+	/// </summary>
 	public abstract class Fill
 	{
+		/// <summary>
+		/// set content of fill as source for drawing operations on the backend context
+		/// </summary>
+		/// <param name="ctx">backend context</param>
+		/// <param name="bounds">drawing operation bounding box</param>
 		public abstract void SetAsSource (Cairo.Context ctx, Rectangle bounds = default(Rectangle));
 		public static object Parse (string s){
 			if (string.IsNullOrEmpty (s))

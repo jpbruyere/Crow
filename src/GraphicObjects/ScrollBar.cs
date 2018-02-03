@@ -30,8 +30,13 @@ using System.ComponentModel;
 
 namespace Crow
 {
+	/// <summary>
+	/// templeted numeric control
+	/// </summary>
 	public class ScrollBar : NumericControl
 	{
+		//TODO:could be replaced by a template for a Slider
+
 		Orientation _orientation;
 
 		#region CTOR

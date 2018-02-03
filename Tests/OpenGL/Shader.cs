@@ -51,7 +51,7 @@ namespace Crow
 						GeomSourcePath;
 		#region Sources
 		protected string _vertSource = @"
-			#version 330
+			#version 300 es
 			precision lowp float;
 
 			uniform mat4 mvp;
@@ -68,7 +68,7 @@ namespace Crow
 			}";
 
 		protected string _fragSource = @"
-			#version 330
+			#version 300 es
 			precision lowp float;
 
 			uniform sampler2D tex;

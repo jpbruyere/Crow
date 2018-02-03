@@ -30,6 +30,9 @@ using System.ComponentModel;
 
 namespace Crow
 {
+	/// <summary>
+	/// helper class to bind in one step icon, caption, action, and validity tests to a controls 
+	/// </summary>
 	public class Command : IValueChange
 	{
 		#region IValueChange implementation
@@ -41,6 +44,10 @@ namespace Crow
 		#endregion
 
 		#region CTOR
+		/// <summary>
+		/// Initializes a new instance of Command with the action pass as argument.
+		/// </summary>
+		/// <param name="_executeAction">action to excecute when command is triggered</param>
 		public Command (Action _executeAction)
 		{
 			execute = _executeAction;
@@ -54,6 +61,9 @@ namespace Crow
 		bool canExecute = true;
 
 		#region Public properties
+		/// <summary>
+		/// if true, action defined in this command may be executed,
+		/// </summary>
 		[XmlAttributeAttribute][DefaultValue(true)]
 		public virtual bool CanExecute {
 			get { return canExecute; }
@@ -64,6 +74,9 @@ namespace Crow
 				NotifyValueChanged ("CanExecute", canExecute);
 			}
 		}
+		/// <summary>
+		/// label to display in the bound control
+		/// </summary>
 		[XmlAttributeAttribute][DefaultValue("Unamed Command")]
 		public virtual string Caption {
 			get { return caption; }
@@ -75,6 +88,9 @@ namespace Crow
 
 			}
 		}
+		/// <summary>
+		/// Icon to display in the bound control
+		/// </summary>
 		[XmlAttributeAttribute]
 		public Picture Icon {
 			get { return icon; }
@@ -87,6 +103,9 @@ namespace Crow
 		}
 		#endregion
 
+		/// <summary>
+		/// trigger the execution of the command
+		/// </summary>
 		public void Execute(){
 			if (execute != null && CanExecute)
 				execute ();

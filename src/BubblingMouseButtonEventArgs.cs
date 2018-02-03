@@ -28,12 +28,13 @@ using System;
 
 namespace Crow
 {
+	/// <summary>
+	/// Store focused widget while bubbling mouse down event to the top
+	/// </summary>
 	public class BubblingMouseButtonEventArg: MouseButtonEventArgs
 	{
 		public GraphicObject Focused;
-		public BubblingMouseButtonEventArg(MouseButtonEventArgs mbe) : base(mbe){
-			
-		}
+		public BubblingMouseButtonEventArg(MouseButtonEventArgs mbe) : base(mbe){}
 	}
 }
 

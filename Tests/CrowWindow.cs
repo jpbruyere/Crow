@@ -185,13 +185,13 @@ namespace Crow
 
 		#region Events
 		//those events are raised only if mouse isn't in a graphic object
-		public event EventHandler<OpenTK.Input.MouseWheelEventArgs> MouseWheelChanged;
-		public event EventHandler<OpenTK.Input.MouseButtonEventArgs> MouseButtonUp;
-		public event EventHandler<OpenTK.Input.MouseButtonEventArgs> MouseButtonDown;
-		public event EventHandler<OpenTK.Input.MouseButtonEventArgs> MouseClick;
-		public event EventHandler<OpenTK.Input.MouseMoveEventArgs> MouseMove;
-		public event EventHandler<OpenTK.Input.KeyboardKeyEventArgs> KeyboardKeyDown;
-		public event EventHandler<OpenTK.Input.KeyboardKeyEventArgs> KeyboardKeyUp;
+		public event EventHandler<OpenTK.Input.MouseWheelEventArgs> CrowMouseWheel;
+		public event EventHandler<OpenTK.Input.MouseButtonEventArgs> CrowMouseUp;
+		public event EventHandler<OpenTK.Input.MouseButtonEventArgs> CrowMouseDown;
+		public event EventHandler<OpenTK.Input.MouseButtonEventArgs> CrowMouseClick;
+		public event EventHandler<OpenTK.Input.MouseMoveEventArgs> CrowMouseMove;
+		public event EventHandler<OpenTK.Input.KeyboardKeyEventArgs> CrowKeyDown;
+		public event EventHandler<OpenTK.Input.KeyboardKeyEventArgs> CrowKeyUp;
 
 		#endregion
 
@@ -244,12 +244,13 @@ namespace Crow
 			base.OnLoad(e);
 
 			this.KeyPress += new EventHandler<OpenTK.KeyPressEventArgs>(OpenTKGameWindow_KeyPress);
-			Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
-			Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
-			Mouse.WheelChanged += new EventHandler<OpenTK.Input.MouseWheelEventArgs>(GL_Mouse_WheelChanged);
-			Mouse.ButtonDown += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(GL_Mouse_ButtonDown);
-			Mouse.ButtonUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(GL_Mouse_ButtonUp);
-			Mouse.Move += new EventHandler<OpenTK.Input.MouseMoveEventArgs>(GL_Mouse_Move);
+			KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
+			KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
+
+			MouseWheel += new EventHandler<OpenTK.Input.MouseWheelEventArgs>(GL_Mouse_WheelChanged);
+			MouseDown += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(GL_Mouse_ButtonDown);
+			MouseUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(GL_Mouse_ButtonUp);
+			MouseMove += new EventHandler<OpenTK.Input.MouseMoveEventArgs>(GL_Mouse_Move);
 
 			#if DEBUG
 			Console.WriteLine("\n\n*************************************");
@@ -331,7 +332,7 @@ namespace Crow
 				return;
 			}
 			if (focusedIdx < 0)
-				MouseMove.Raise (sender, otk_e);
+				CrowMouseMove.Raise (sender, otk_e);
         }
 		protected virtual void GL_Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
         {
@@ -340,7 +341,7 @@ namespace Crow
 				if (ifaceControl [focusedIdx].ProcessMouseButtonUp ((int)otk_e.Button))
 					return;
 			}
-			MouseButtonUp.Raise (sender, otk_e);
+			CrowMouseUp.Raise (sender, otk_e);
         }
 		protected virtual void GL_Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
 		{
@@ -349,7 +350,7 @@ namespace Crow
 				if (ifaceControl [focusedIdx].ProcessMouseButtonDown ((int)otk_e.Button))
 					return;
 			}
-			MouseButtonDown.Raise (sender, otk_e);
+			CrowMouseDown.Raise (sender, otk_e);
         }
 		protected virtual void GL_Mouse_WheelChanged(object sender, OpenTK.Input.MouseWheelEventArgs otk_e)
         {
@@ -357,7 +358,7 @@ namespace Crow
 				if (ifaceControl [focusedIdx].ProcessMouseWheelChanged (otk_e.DeltaPrecise))
 					return;
 			}
-			MouseWheelChanged.Raise (sender, otk_e);
+			CrowMouseWheel.Raise (sender, otk_e);
         }
 
 		protected virtual void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
@@ -366,7 +367,7 @@ namespace Crow
 				if (ifaceControl [focusedIdx].ProcessKeyDown((int)otk_e.Key))
 					return;
 			}
-			KeyboardKeyDown.Raise (this, otk_e);
+			CrowKeyDown.Raise (this, otk_e);
         }
 		protected virtual void Keyboard_KeyUp(object sender, OpenTK.Input.KeyboardKeyEventArgs otk_e)
 		{
@@ -374,7 +375,7 @@ namespace Crow
 				if (ifaceControl [focusedIdx].ProcessKeyUp((int)otk_e.Key))
 					return;
 			}
-			KeyboardKeyUp.Raise (this, otk_e);
+			CrowKeyUp.Raise (this, otk_e);
 		}
 		protected virtual void OpenTKGameWindow_KeyPress (object sender, OpenTK.KeyPressEventArgs e)
 		{

@@ -33,6 +33,9 @@ using Cairo;
 
 namespace Crow
 {
+	/// <summary>
+	/// generic class to build scrolling control in both directions
+	/// </summary>
 	public class ScrollingObject : GraphicObject
 	{
 		#region CTOR

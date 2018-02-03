@@ -749,7 +749,8 @@ namespace Crow
 				//TODO, ensure object is still in the graphic tree
 				//send move evt even if mouse move outside bounds
 				ActiveWidget.onMouseMove (this, e);
-				return true;
+				if (!ActiveWidget.IsDragged)//if active is dragged, process mouse move as it was not visible.
+					return true;
 			}
 
 			if (HoverWidget != null) {

@@ -28,6 +28,10 @@ using System;
 
 namespace Crow
 {
+	/// <summary>
+	/// group control that arrange its children in a direction and jump to
+	/// the next line or row when no room is left
+	/// </summary>
 	public class Wrapper : GenericStack
 	{
 		#region CTOR

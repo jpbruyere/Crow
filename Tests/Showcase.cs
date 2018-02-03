@@ -56,6 +56,7 @@ namespace Tests
 		{
 			base.OnLoad (e);
 
+			this.CrowKeyDown += Showcase_CrowKeyDown;
 			GraphicObject g = Load ("#Tests.ui.showcase.crow");
 			g.DataSource = this;
 			crowContainer = g.FindByName ("CrowContainer") as Container;
@@ -63,6 +64,14 @@ namespace Tests
 			//widgets are added to the interface
 			crowContainer.DataSource = new object ();
 			hideError ();
+		}
+
+		void Showcase_CrowKeyDown (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
+		{
+			if (e.Key == OpenTK.Input.Key.Escape) {
+				Quit (null, null);
+				return;
+			}
 		}
 
 		void Dv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)

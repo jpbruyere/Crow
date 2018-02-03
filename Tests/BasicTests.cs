@@ -39,7 +39,7 @@ namespace Tests
 	class BasicTests : CrowWindow
 	{
 		public BasicTests ()
-			: base(800, 600,"test: press <F3> to toogle test files")
+			: base(1280, 800,"test: press <F3> to toogle test files")
 		{
 		}
 
@@ -141,7 +141,7 @@ namespace Tests
 
 			//testFiles = new string [] { @"Interfaces/Unsorted/testFileDialog.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
-			testFiles = new string [] { @"Interfaces/TemplatedContainer/testTabView.crow" };
+			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
@@ -246,10 +246,13 @@ namespace Tests
 		[STAThread]
 		static void Main ()
 		{
+			TextWriterTraceListener listener = new TextWriterTraceListener ("listen.txt");
+			Debug.Listeners.Add (listener);
 			Console.WriteLine ("starting example");
 			BasicTests win = new BasicTests ();
 			win.VSync = OpenTK.VSyncMode.Adaptive;
 			win.Run (30);
+			listener.Dispose ();
 		}
 		protected override void OnUpdateFrame (OpenTK.FrameEventArgs e)
 		{

@@ -28,6 +28,10 @@ using System;
 
 namespace Crow
 {
+	/// <summary>
+	/// templated control for selecting a numeric value by clicking on
+	/// up and down buttons
+	/// </summary>
 	public class Spinner : NumericControl
 	{
 		#region CTOR

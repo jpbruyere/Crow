@@ -30,6 +30,9 @@ using System.ComponentModel;
 
 namespace Crow
 {
+	/// <summary>
+	/// simple squarred rgb color selector
+	/// </summary>
 	public class ColorSelector : GraphicObject
 	{
 		#region CTOR

@@ -30,6 +30,9 @@ using System.ComponentModel;
 
 namespace Crow
 {
+	/// <summary>
+	/// templated container accepting one child
+	/// </summary>
     public class GroupBox : TemplatedContainer
     {		
 		#region CTOR
