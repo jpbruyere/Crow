@@ -30,6 +30,9 @@ using System.ComponentModel;
 
 namespace Crow
 {
+	/// <summary>
+	/// templated color selector control
+	/// </summary>
 	public class ColorPicker : TemplatedControl
 	{
 		#region CTOR

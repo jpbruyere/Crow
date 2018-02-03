@@ -35,9 +35,9 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("Grand Tetra Software")]
 [assembly: AssemblyProduct ("Crow")]
-[assembly: AssemblyCopyright ("Copyright (c) 2016 - Jean-Philippe Bruyère <jp_bruyere@hotmail.com>")]
+[assembly: AssemblyCopyright ("Copyright (c) 2018 - Jean-Philippe Bruyère <jp_bruyere@hotmail.com>")]
 [assembly: AssemblyTrademark ("")]
-[assembly: AssemblyCulture ("en-US")]
+[assembly: AssemblyCulture ("")]
 
 // The assembly version has the format "{Major}.{Minor}.{Build}.{Revision}".
 // The form "{Major}.{Minor}.*" will automatically update the build and revision,

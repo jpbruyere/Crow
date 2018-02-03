@@ -21,7 +21,7 @@
 							MouseEnter="{Foreground=DimGray}"
 							MouseLeave="{Foreground=Transparent}">
 						<HorizontalStack Spacing="1">
-							<Image Margin="1" Width="10" Height="10" Focusable="true" MouseClick="./onClickForExpand"
+							<Image Margin="1" Width="9" Height="9" Focusable="true" MouseClick="./onClickForExpand"
 								Path="{./Image}"
 								Visible="{./IsExpandable}"
 								SvgSub="{./IsExpanded}"

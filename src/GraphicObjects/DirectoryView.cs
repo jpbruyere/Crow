@@ -31,6 +31,9 @@ using System.IO;
 
 namespace Crow
 {
+	/// <summary>
+	/// templated directory viewer
+	/// </summary>
 	public class DirectoryView : TemplatedControl
 	{
 		#region CTOR

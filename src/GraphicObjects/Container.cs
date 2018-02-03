@@ -33,6 +33,9 @@ using System.Threading;
 
 namespace Crow
 {
+	/// <summary>
+	/// simple container accepting one child
+	/// </summary>
     public class Container : PrivateContainer
     {
 		#region CTOR

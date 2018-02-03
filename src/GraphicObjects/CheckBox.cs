@@ -30,6 +30,9 @@ using System.Xml.Serialization;
 
 namespace Crow
 {
+	/// <summary>
+	/// templated checkbox control
+	/// </summary>
 	public class CheckBox : TemplatedControl
 	{
 		#region CTOR

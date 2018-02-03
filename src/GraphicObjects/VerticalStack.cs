@@ -31,6 +31,9 @@ using System.Text;
 
 namespace Crow
 {
+	/// <summary>
+	/// group control stacking its children vertically
+	/// </summary>
     public class VerticalStack : GenericStack
     {
 		public VerticalStack() : base(){}

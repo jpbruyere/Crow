@@ -30,6 +30,10 @@ using System.ComponentModel;
 
 namespace Crow
 {
+	/// <summary>
+	/// control to add between children of a Stack to allow them to be resized
+	/// with the pointer
+	/// </summary>
 	public class Splitter : GraphicObject
 	{
 		#region CTOR

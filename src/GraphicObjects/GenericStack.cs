@@ -31,6 +31,9 @@ using System;
 
 namespace Crow
 {
+	/// <summary>
+	/// group container that stacked its children horizontally or vertically
+	/// </summary>
 	public class GenericStack : Group
     {
 		#region CTOR

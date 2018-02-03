@@ -136,7 +136,6 @@
     <Compile Include="src\GraphicObjects\Menu.cs" />
     <Compile Include="src\Command.cs" />
     <Compile Include="src\GraphicObjects\DataSourceChangeEventArgs.cs" />
-    <Compile Include="src\IML\Context.cs" />
     <Compile Include="src\IML\NodeAddress.cs" />
     <Compile Include="src\IML\Node.cs" />
     <Compile Include="src\IML\MemberAddress.cs" />
@@ -213,6 +212,10 @@
     <Compile Include="src\Mono.Cairo\Win32Surface.cs" />
     <Compile Include="src\Mono.Cairo\XcbSurface.cs" />
     <Compile Include="src\Mono.Cairo\XlibSurface.cs" />
+    <Compile Include="src\GraphicObjects\DocksView.cs" />
+    <Compile Include="src\GraphicObjects\DockingView.cs" />
+    <Compile Include="src\IML\IMLContext.cs" />
+    <Compile Include="src\Mono.Cairo\MeshPattern.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -365,6 +368,9 @@
     <EmbeddedResource Include="Icons\folder.svg" />
     <EmbeddedResource Include="Icons\file.svg" />
     <EmbeddedResource Include="Icons\level-up.svg" />
+    <EmbeddedResource Include="Templates\DockingView.template">
+      <LogicalName>Crow.DockingView.template</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="Crow.dll.config">

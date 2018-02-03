@@ -35,6 +35,9 @@ using System.Text.RegularExpressions;
 
 namespace Crow
 {
+	/// <summary>
+	/// templated control for selecting files
+	/// </summary>
 	public class FileDialog: Window
 	{
 		#region CTOR

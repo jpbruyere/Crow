@@ -63,6 +63,9 @@ namespace Crow
 		}
 		#endregion
 
+		/// <summary>
+		/// color names dictionary
+		/// </summary>
 		public static Dictionary<string, Color> ColorDic = new Dictionary<string, Color>();
 
 		internal string Name;
@@ -154,7 +157,9 @@ namespace Crow
 		}
 		#endregion
 
-
+		/// <summary>
+		/// compute the hue of the color
+		/// </summary>
 		public double Hue {
 			get {
 				double min = Math.Min (R, Math.Min (G, B));	//Min. value of RGB
@@ -185,11 +190,18 @@ namespace Crow
 				return h;
 			}
 		}
+		/// <summary>
+		/// compute the saturation of the color
+		/// </summary>
 		public double Saturation {
 			get {
 				return Math.Max (R, Math.Max (G, B));	//Max. value of RGB
 			}
 		}
+		/// <summary>
+		/// compute the RGB intensity of the color
+		/// </summary>
+		/// <value>The value.</value>
 		public double Value {
 			get {
 				double min = Math.Min (R, Math.Min (G, B));	//Min. value of RGB
@@ -203,6 +215,11 @@ namespace Crow
 		{
 			get { return new float[]{ (float)R, (float)G, (float)B, (float)A }; }
 		}
+		/// <summary>
+		/// return a copy of the color with the alpha component modified
+		/// </summary>
+		/// <returns>new modified color</returns>
+		/// <param name="_A">normalized alpha component</param>
 		public Color AdjustAlpha(double _A)
 		{
 			return new Color (this.R, this.G, this.B, _A);

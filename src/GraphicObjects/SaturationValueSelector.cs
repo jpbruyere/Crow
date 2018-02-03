@@ -89,6 +89,7 @@ namespace Crow
 			grad.SetAsSource (gr, r);
 			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
 			gr.Fill();
+
 		}
 
 		public override void Paint (ref Context ctx)

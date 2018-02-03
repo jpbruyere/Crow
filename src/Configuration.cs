@@ -32,6 +32,9 @@ using System.Threading;
 
 namespace Crow
 {
+	/// <summary>
+	/// single element of configuration
+	/// </summary>
 	public class ConfigItem {
 		Type type;
 		internal object curVal;
@@ -59,8 +62,26 @@ namespace Crow
 		}
 	}
 	/// <summary>
-	/// Application wide Configuration utility
+	/// Application wide Configuration store utility
+	/// 
+	/// configuration files are automatically stored in **_user/.config/appname/app.config_** on close and every minutes
+	/// if some items have changed.
+	/// New items are automaticaly added on first use. Configuration class expose one templated Get and one Templated Set, so
+	/// creating, storing and retrieving config items is simple as:
+	/// 
+	/// ```csharp\n
+	///     //storing\n
+	///     Configuration.Set ("Option1", 42);\n
+	///     //loading\n
+	///     int op1 = Configuration.Get<int> ("Option1");\n
+	/// ```\n
 	/// </summary>
+	/// 
+	/// **.config**  file are simple text files with per line, a key/value pair of the form `option=value`. Keys have to be unique
+	/// in the application scope.
+	/// 
+	/// When running the application for the first time, some default options may be necessary. Their can be defined
+	/// in a special embedded resource text file with the key '**appname.default.config**'
 	public static class Configuration
 	{
 		volatile static bool isDirty = false;
@@ -118,10 +139,19 @@ namespace Crow
 				Thread.Sleep (1000);
 			}
 		}
+		/// <summary>
+		/// retrive the value of the configuration key given in parameter
+		/// </summary>
+		/// <param name="key">option name</param>
 		public static T Get<T>(string key)
 		{
 			return !items.ContainsKey (key) ? default(T) : items [key].GetValue<T> ();
 		}
+		/// <summary>
+		/// store the value of the configuration key given in parameter
+		/// </summary>
+		/// <param name="key">option name</param>
+		/// <param name="value">value for that option</param>
 		public static void Set<T>(string key, T value)
 		{
 			if (!items.ContainsKey (key)) {

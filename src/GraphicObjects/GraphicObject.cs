@@ -32,9 +32,8 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using Cairo;
-using System.Linq;
 using System.Diagnostics;
-using System.IO;
+using Crow.IML;
 
 namespace Crow
 {
@@ -188,6 +187,10 @@ namespace Crow
 		protected object dataSource;
 		string style;
 		object tag;
+		bool isDragged;
+		bool allowDrag;
+		bool allowDrop;
+
 		#endregion
 
 		#region public fields
@@ -308,6 +311,8 @@ namespace Crow
 		public event EventHandler Enabled;
 		/// <summary>Occurs when the enabled state this object is set to false</summary>
 		public event EventHandler Disabled;
+		public event EventHandler Dragged;
+		public event EventHandler Dropped;
 		/// <summary>Occurs when one part of the rendering slot changed</summary>
 		public event EventHandler<LayoutingEventArgs> LayoutChanged;
 		/// <summary>Occurs when DataSource changed</summary>
@@ -1008,6 +1013,77 @@ namespace Crow
 			return false;
 		}
 
+		#region Drag&Drop
+		[XmlAttributeAttribute][DefaultValue(false)]
+		public virtual bool AllowDrag {
+			get { return allowDrag; }
+			set {
+				if (allowDrag == value)
+					return;
+				allowDrag = value;
+				NotifyValueChanged ("AllowDrag", allowDrag);
+			}
+		}
+		[XmlAttributeAttribute][DefaultValue(false)]
+		public virtual bool AllowDrop {
+			get { return allowDrop; }
+			set {
+				if (allowDrop == value)
+					return;
+				allowDrop = value;
+				NotifyValueChanged ("AllowDrop", allowDrop);
+			}
+		}
+
+//		public List<Type> AllowedDroppedTypes;
+//		public void AddAllowedDroppedType (Type newType){
+//			if (AllowedDroppedTypes == null)
+//				AllowedDroppedTypes = new List<Type> ();
+//			AllowedDroppedTypes.Add (newType);
+//			NotifyValueChanged ("AllowDrop", AllowDrop);
+//		}
+//		[XmlIgnore]public virtual bool AllowDrop {
+//			get { return AllowedDroppedTypes?.Count>0; }
+//		}
+		[XmlIgnore]public virtual bool IsDragged {
+			get { return isDragged; }
+			set {
+				if (isDragged == value)
+					return;
+				isDragged = value;
+
+				if (isDragged) {
+					CurrentInterface.HoverWidget = null;
+					onStartDrag (this, null);
+				}
+
+				NotifyValueChanged ("IsDrag", IsDragged);
+			}
+		}
+		/// <summary>
+		/// start dragging
+		/// </summary>
+		protected virtual void onStartDrag (object sender, EventArgs e){
+			Debug.WriteLine("DRAG => " + this.ToString());
+			Dragged.Raise (this, null);
+		}
+		/// <summary>
+		///  Occured when dragging ends without dropping
+		/// </summary>
+		protected virtual void onEndDrag (object sender, EventArgs e){
+			IsDragged = false;
+			Debug.WriteLine("END DRAG => " + this.ToString());
+		}
+		/// <summary>
+		/// Dragging end with a dropping
+		/// </summary>
+		protected virtual void onDrop (object sender, EventArgs e){
+			IsDragged = false;
+			Debug.WriteLine("DROPPED => " + this.ToString());
+			Dropped.Raise (this, null);
+		}
+		#endregion
+
 		#region Queuing
 		/// <summary>
 		/// Register old and new slot for clipping
@@ -1299,7 +1375,7 @@ namespace Crow
 
 		#region Rendering
 		/// <summary> This is the common overridable drawing routine to create new widget </summary>
-		protected virtual void onDraw(Context gr)
+		protected virtual void onDraw(Cairo.Context gr)
 		{
 			#if DEBUG_UPDATE
 			Debug.WriteLine (string.Format("OnDraw -> {0}", this.ToString ()));
@@ -1324,13 +1400,13 @@ namespace Crow
 			if (bmp != null)
 				bmp.Dispose ();
 			bmp = new ImageSurface (Format.Argb32, Slot.Width, Slot.Height);
-			using (Context gr = new Context (bmp)) {
+			using (Cairo.Context gr = new Cairo.Context (bmp)) {
 				gr.Antialias = Interface.Antialias;
 				onDraw (gr);
 			}
 			bmp.Flush ();
 		}
-		protected virtual void UpdateCache(Context ctx){
+		protected virtual void UpdateCache(Cairo.Context ctx){
 			#if DEBUG_UPDATE
 			Debug.WriteLine (string.Format("UpdateCache -> {0}", this.ToString ()));
 			#endif
@@ -1349,7 +1425,7 @@ namespace Crow
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version
 		/// of the widget </summary>
-		public virtual void Paint (ref Context ctx)
+		public virtual void Paint (ref Cairo.Context ctx)
 		{
 			#if DEBUG_UPDATE
 			Debug.WriteLine (string.Format("Paint -> {0}", this.ToString ()));
@@ -1385,7 +1461,7 @@ namespace Crow
 				LastPaintedSlot = Slot;
 			}
 		}
-		void paintDisabled(Context gr, Rectangle rb){
+		void paintDisabled(Cairo.Context gr, Rectangle rb){
 			gr.Operator = Operator.Xor;
 			gr.SetSourceRGBA (0.6, 0.6, 0.6, 0.3);
 			gr.Rectangle (rb);
@@ -1410,7 +1486,7 @@ namespace Crow
 		public virtual bool MouseIsIn(Point m)
 		{
 			try {
-				if (!(Visible & isEnabled))
+				if (!(Visible & isEnabled)||IsDragged)
 					return false;
 				if (ScreenCoordinates (Slot).ContainsOrIsEqual (m)) {
 					Scroller scr = Parent as Scroller;
@@ -1437,6 +1513,9 @@ namespace Crow
 		}
 		public virtual void onMouseMove(object sender, MouseMoveEventArgs e)
 		{
+			if (AllowDrag & !IsDragged & IsActive)
+				IsDragged = true;
+
 			//bubble event to the top
 			GraphicObject p = Parent as GraphicObject;
 			if (p != null)
@@ -1468,6 +1547,18 @@ namespace Crow
 			MouseDown.Raise (this, e);
 		}
 		public virtual void onMouseUp(object sender, MouseButtonEventArgs e){
+			if (IsDragged){
+				bool dropOK = false;
+				if (CurrentInterface.HoverWidget!=null) {
+					if (CurrentInterface.HoverWidget.AllowDrop)
+						dropOK = true;
+				}
+				if (dropOK)
+					onDrop (this, null);
+				else
+					onEndDrag (this, null);
+			}
+
 			//bubble event to the top
 			GraphicObject p = Parent as GraphicObject;
 			if (p != null)
