@@ -27,38 +27,88 @@
 using System;
 using System.IO;
 using Cairo;
+using System.Collections.Generic;
 
 namespace Crow
 {
+	/// <summary>
+	/// store data and dimensions for resource sharing
+	/// </summary>
+	internal class sharedPicture {
+		//TODO: restructure this whith clever conceptual classes
+		public object Data;
+		public Size Dims;
+		public sharedPicture (object _data, Size _dims){
+			Data = _data;
+			Dims = _dims;
+		}
+	}
+	/// <summary>
+	/// virtual class for loading and drawing picture in the interface
+	/// 
+	/// Every loaded resources are stored in a dictonary with their path as key and shared
+	/// among interface elements
+	/// </summary>
 	public abstract class Picture : Fill
 	{
+		/// <summary>
+		/// share a single store for picture resources among usage in different controls
+		/// </summary>
+		internal static Dictionary<string, sharedPicture> sharedResources = new Dictionary<string, sharedPicture>();
+
+		/// <summary>
+		/// path of the picture
+		/// </summary>
 		public string Path;
+		/// <summary>
+		/// unscaled dimensions fetched on loading
+		/// </summary>
 		public Size Dimensions;
+		/// <summary>
+		/// if true and image has to be scalled, it will be scaled in both direction
+		/// equaly
+		/// </summary>
 		public bool KeepProportions = false;
+		/// <summary>
+		/// allow or not the picture to be scalled on request by the painter
+		/// </summary>
 		public bool Scaled = true;
 
+		#region CTOR
+		/// <summary>
+		/// Initializes a new instance of Picture.
+		/// </summary>
 		public Picture ()
 		{
 		}
+		/// <summary>
+		/// Initializes a new instance of Picture by loading the image pointed by the path argument
+		/// </summary>
+		/// <param name="path">image path, may be embedded</param>
 		public Picture (string path)
 		{
-			LoadImage (path);
+			Load (path);
 		}
-
-		#region Image Loading
-		public void LoadImage (string path)
-		{
-			loadFromStream (Interface.GetStreamFromPath (path));
-
-			Path = path;
-		}
-			
-		protected abstract void loadFromStream(Stream stream);
 		#endregion
 
+		#region Image Loading
+		/// <summary>
+		/// load the image for rendering from the stream given as argument
+		/// </summary>
+		/// <param name="stream">picture stream</param>
+		public abstract void Load(string path);
+		#endregion
+
+		/// <summary>
+		/// abstract method to paint the image in the rectangle given in arguments according
+		/// to the Scale and keepProportion parameters.
+		/// </summary>
+		/// <param name="gr">drawing Backend context</param>
+		/// <param name="rect">bounds of the target surface to paint</param>
+		/// <param name="subPart">used for svg only</param>
 		public abstract void Paint(Context ctx, Rectangle rect, string subPart = "");
 
-
+		#region Operators
 		public static implicit operator Picture(string path)
 		{
 			if (string.IsNullOrEmpty (path))
@@ -71,7 +121,7 @@ namespace Crow
 			else 
 				_pic = new BmpPicture ();
 
-			_pic.LoadImage (path);			
+			_pic.Load (path);			
 
 			return _pic;
 		}
@@ -79,6 +129,7 @@ namespace Crow
 		{
 			return _pic == null ? null : _pic.Path;
 		}
+		#endregion
 
 		public static object Parse(string path)
 		{
@@ -92,7 +143,7 @@ namespace Crow
 			else 
 				_pic = new BmpPicture ();
 
-			_pic.LoadImage (path);			
+			_pic.Load (path);			
 
 			return _pic;
 		}

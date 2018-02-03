@@ -30,20 +30,47 @@ using Cairo;
 
 namespace Crow
 {
+
+	/// <summary>
+	/// Derived from FILL for loading and drawing bitmaps in the interface
+	/// </summary>
 	public class BmpPicture : Picture
 	{
-		byte[] image;
+		byte[] image = null;
 
+		#region CTOR
+		/// <summary>
+		/// Initializes a new instance of BmpPicture.
+		/// </summary>
 		public BmpPicture ()
 		{}
+		/// <summary>
+		/// Initializes a new instance of BmpPicture by loading the image pointed by the path argument
+		/// </summary>
+		/// <param name="path">image path, may be embedded</param>
 		public BmpPicture (string path) : base(path)
 		{}
-		protected override void loadFromStream (Stream stream)
+		#endregion
+		/// <summary>
+		/// load the image for rendering from the path given as argument
+		/// </summary>
+		/// <param name="path">image path, may be embedded</param>
+		public override void Load (string path)
 		{
-			using (MemoryStream ms = new MemoryStream ()) {
-				stream.CopyTo (ms);
-				loadBitmap (new System.Drawing.Bitmap (ms));	
+			Path = path;
+			if (sharedResources.ContainsKey (path)) {
+				sharedPicture sp = sharedResources [path];
+				image = (byte[])sp.Data;
+				Dimensions = sp.Dims;
+				return;
 			}
+			using (Stream stream = Interface.GetStreamFromPath (path)) {
+				using (MemoryStream ms = new MemoryStream ()) {
+					stream.CopyTo (ms);
+					loadBitmap (new System.Drawing.Bitmap (ms));	
+				}
+			}
+			sharedResources [path] = new sharedPicture (image, Dimensions);
 		}
 
 		//load image via System.Drawing.Bitmap, cairo load png only
@@ -103,6 +130,13 @@ namespace Crow
 		}
 		#endregion
 
+		/// <summary>
+		/// paint the image in the rectangle given in arguments according
+		/// to the Scale and keepProportion parameters.
+		/// </summary>
+		/// <param name="gr">drawing Backend context</param>
+		/// <param name="rect">bounds of the target surface to paint</param>
+		/// <param name="subPart">used for svg only</param>
 		public override void Paint (Cairo.Context gr, Rectangle rect, string subPart = "")
 		{
 			float widthRatio = 1f;
