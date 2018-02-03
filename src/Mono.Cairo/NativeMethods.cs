@@ -445,6 +445,51 @@ namespace Cairo
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern Status cairo_pattern_status (IntPtr pattern);
+
+		//mesh pattern
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern IntPtr cairo_pattern_create_mesh ();
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern void cairo_mesh_pattern_begin_patch (IntPtr pattern);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern void cairo_mesh_pattern_end_patch (IntPtr pattern);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern void cairo_mesh_pattern_move_to (IntPtr pattern, double x, double y);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern void cairo_mesh_pattern_line_to (IntPtr pattern, double x, double y);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern void cairo_mesh_pattern_curve_to (IntPtr pattern, double x1, double y1,
+			double x2, double y2, double x3, double y3);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern void cairo_mesh_pattern_set_control_point (IntPtr pattern, uint point_num, double x, double y);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern void cairo_mesh_pattern_set_corner_color_rgb (IntPtr pattern, uint corner_num,
+			double r, double g, double b);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern void cairo_mesh_pattern_set_corner_color_rgba (IntPtr pattern, uint corner_num,
+			double r, double g, double b, double a);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern Status cairo_mesh_pattern_get_patch_count (IntPtr pattern, out uint count);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern IntPtr cairo_mesh_pattern_get_path (IntPtr pattern, uint patch_num);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern Status cairo_mesh_pattern_get_control_point (IntPtr pattern,
+			uint patch_num, uint point_num, out double x, out double y);
+
+		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+		internal static extern Status cairo_mesh_pattern_get_corner_color_rgba (IntPtr pattern,
+			uint patch_num, uint point_num, out double r, out double g, out double b, out double a);
 		#endregion
 
 		#region PdfSurface

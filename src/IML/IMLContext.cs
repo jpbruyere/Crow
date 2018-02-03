@@ -40,7 +40,7 @@ namespace Crow.IML
 	/// <summary>
 	/// Context while parsing IML, this will store what's needed only while parsing and not during instancing
 	/// </summary>
-	public class Context
+	public class IMLContext
 	{
 		public XmlTextReader reader = null;
 		public Type RootType = null;
@@ -59,7 +59,7 @@ namespace Crow.IML
 		public List<BindingDefinition> UnresolvedTargets = new List<BindingDefinition>();
 
 
-		public Context (Type rootType)
+		public IMLContext (Type rootType)
 		{
 			RootType = rootType;
 			dm = new DynamicMethod ("dyn_instantiator",

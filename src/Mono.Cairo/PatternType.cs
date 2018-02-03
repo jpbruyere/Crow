@@ -37,6 +37,8 @@ namespace Cairo {
 		Surface,
 		Linear,
 		Radial,
+		Mesh,
+		RasterSource
 	}
 }
 

@@ -88,6 +88,13 @@ ToolWindow {
 	Width = 150;
 	Height = 150;
 }
+DocksView {
+	AllowDrop = true;
+}
+DockingView {
+	Focusable = true;
+	AllowDrag = true;
+}
 FileDialog {
 	Template = #Crow.FileDialog.template;
 	Focusable = true;
