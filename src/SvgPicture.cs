@@ -30,22 +30,45 @@ using Cairo;
 
 namespace Crow
 {
+	/// <summary>
+	/// Derived from FILL for loading and drawing SVG images in the interface
+	/// </summary>
 	public class SvgPicture : Picture
 	{
 		Rsvg.Handle hSVG;
 
+		#region CTOR
+		/// <summary>
+		/// Initializes a new instance of SvgPicture.
+		/// </summary>
 		public SvgPicture ()
 		{}
+		/// <summary>
+		/// Initializes a new instance of SvgPicture by loading the SVG file pointed by the path argument
+		/// </summary>
+		/// <param name="path">image path, may be embedded</param>
 		public SvgPicture (string path) : base(path)
 		{}
-		protected override void loadFromStream (Stream stream)
-		{
-			using (MemoryStream ms = new MemoryStream ()) {
-				stream.CopyTo (ms);
+		#endregion
 
-				hSVG = new Rsvg.Handle (ms.ToArray ());
-				Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
+		public override void Load (string path)
+		{
+			Path = path;
+			if (sharedResources.ContainsKey (path)) {
+				sharedPicture sp = sharedResources [path];
+				hSVG = (Rsvg.Handle)sp.Data;
+				Dimensions = sp.Dims;
+				return;
 			}
+			using (Stream stream = Interface.GetStreamFromPath (path)) {
+				using (MemoryStream ms = new MemoryStream ()) {
+					stream.CopyTo (ms);
+
+					hSVG = new Rsvg.Handle (ms.ToArray ());
+					Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
+				}
+			}
+			sharedResources [path] = new sharedPicture (hSVG, Dimensions);
 		}
 
 		#region implemented abstract members of Fill
@@ -79,7 +102,14 @@ namespace Crow
 			}	
 		}
 		#endregion
-			
+
+		/// <summary>
+		/// paint the image in the rectangle given in arguments according
+		/// to the Scale and keepProportion parameters.
+		/// </summary>
+		/// <param name="gr">drawing Backend context</param>
+		/// <param name="rect">bounds of the target surface to paint</param>
+		/// <param name="subPart">limit rendering to svg part named 'subPart'</param>
 		public override void Paint (Cairo.Context gr, Rectangle rect, string subPart = "")
 		{
 			float widthRatio = 1f;
