@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using Cairo;
 
 namespace Crow
 {
@@ -38,8 +39,8 @@ namespace Crow
 		/// set content of fill as source for drawing operations on the backend context
 		/// </summary>
 		/// <param name="ctx">backend context</param>
-		/// <param name="bounds">drawing operation bounding box</param>
-		public abstract void SetAsSource (Cairo.Context ctx, Rectangle bounds = default(Rectangle));
+		/// <param name="bounds">paint operation bounding box, unused for SolidColor</param>
+		public abstract void SetAsSource (Context ctx, Rectangle bounds = default(Rectangle));
 		public static object Parse (string s){
 			if (string.IsNullOrEmpty (s))
 				return null;

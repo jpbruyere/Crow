@@ -169,9 +169,9 @@ namespace Cairo {
 			NativeMethods.cairo_surface_mark_dirty (Handle);
 		}
 
-		public void MarkDirty (Rectangle rectangle)
+		public void MarkDirty (Crow.Rectangle rectangle)
 		{
-			NativeMethods.cairo_surface_mark_dirty_rectangle (Handle, (int)rectangle.X, (int)rectangle.Y, (int)rectangle.Width, (int)rectangle.Height);
+			NativeMethods.cairo_surface_mark_dirty_rectangle (Handle, rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
 		}
 
 		public IntPtr Handle {

@@ -91,7 +91,7 @@ namespace Crow
 			}
 
 			using (ImageSurface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
-				using (Cairo.Context gr = new Context (tmp)) {
+				using (Context gr = new Context (tmp)) {
 					gr.Translate (bounds.Left, bounds.Top);
 					gr.Scale (widthRatio, heightRatio);
 					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
@@ -110,7 +110,7 @@ namespace Crow
 		/// <param name="gr">drawing Backend context</param>
 		/// <param name="rect">bounds of the target surface to paint</param>
 		/// <param name="subPart">limit rendering to svg part named 'subPart'</param>
-		public override void Paint (Cairo.Context gr, Rectangle rect, string subPart = "")
+		public override void Paint (Context gr, Rectangle rect, string subPart = "")
 		{
 			float widthRatio = 1f;
 			float heightRatio = 1f;

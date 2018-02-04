@@ -1,4 +1,7 @@
 //Copyright GPL2
+using Cairo;
+
+
 namespace Rsvg {
 
 	using System;
@@ -55,7 +58,7 @@ namespace Rsvg {
 		[DllImport("rsvg-2")]
 		static extern void rsvg_handle_render_cairo(IntPtr raw, IntPtr cr);
 
-		public void RenderCairo(Cairo.Context cr) {
+		public void RenderCairo(Context cr) {
 			unsafe{
 				rsvg_handle_render_cairo (Raw, cr == null ? IntPtr.Zero : cr.Handle);
 			}

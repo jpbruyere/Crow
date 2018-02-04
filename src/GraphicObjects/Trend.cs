@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.ComponentModel;
+using Cairo;
 
 namespace Crow
 {
@@ -139,7 +140,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		protected override void onDraw (Cairo.Context gr)
+		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
 
