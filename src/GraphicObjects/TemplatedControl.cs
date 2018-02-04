@@ -34,6 +34,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using Cairo;
 
 namespace Crow
 {
@@ -105,7 +106,7 @@ namespace Crow
 		///this allow applying root background to random template's component
 		/// </summary>
 		/// <param name="gr">Backend context</param>
-		protected override void onDraw (Cairo.Context gr)
+		protected override void onDraw (Context gr)
 		{
 			gr.Save ();
 

@@ -65,7 +65,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		protected override void onDraw (Cairo.Context gr)
+		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
 

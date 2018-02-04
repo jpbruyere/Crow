@@ -67,11 +67,13 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		protected override void onDraw (Cairo.Context gr)
+		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
 
 			Rectangle r = ClientRectangle;
+			r.Height -= 4;
+			r.Y += 2;
 
 			Gradient.Type gt = Gradient.Type.Horizontal;
 			if (Orientation == Orientation.Vertical)
@@ -111,9 +113,9 @@ namespace Crow
 				r.Y = mousePos.Y - 2;
 			}
 
-			CairoHelpers.CairoRectangle (ctx, r, 2);
+			CairoHelpers.CairoRectangle (ctx, r, 1);
 			ctx.SetSourceColor (Color.White);
-			ctx.LineWidth = 2.0;
+			ctx.LineWidth = 1.0;
 			ctx.Stroke();
 			ctx.Restore ();
 		}

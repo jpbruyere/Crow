@@ -44,7 +44,7 @@ Please report bugs and issues on [GitHub](https://github.com/jpbruyere/Crow/issu
 ## Getting Start
 
 ### Requirements
-- [mono > 4.5](http://www.mono-project.com/download/)
+- [mono > 5.0](http://www.mono-project.com/download/)
 - [Cairo Graphic Library](https://cairographics.org/) >= 1.10 
 - [rsvg library](https://developer.gnome.org/rsvg/) for svg rendering
 - [nuget](https://www.nuget.org/).

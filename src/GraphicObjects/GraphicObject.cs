@@ -38,7 +38,7 @@ using Crow.IML;
 namespace Crow
 {
 	/// <summary>
-	/// This is the base class for all the graphic trees elements
+	/// The base class for all the graphic tree elements.
 	/// </summary>
 	public class GraphicObject : ILayoutable, IValueChange, IDisposable
 	{
@@ -1375,7 +1375,7 @@ namespace Crow
 
 		#region Rendering
 		/// <summary> This is the common overridable drawing routine to create new widget </summary>
-		protected virtual void onDraw(Cairo.Context gr)
+		protected virtual void onDraw(Context gr)
 		{
 			#if DEBUG_UPDATE
 			Debug.WriteLine (string.Format("OnDraw -> {0}", this.ToString ()));
@@ -1400,13 +1400,13 @@ namespace Crow
 			if (bmp != null)
 				bmp.Dispose ();
 			bmp = new ImageSurface (Format.Argb32, Slot.Width, Slot.Height);
-			using (Cairo.Context gr = new Cairo.Context (bmp)) {
+			using (Context gr = new Context (bmp)) {
 				gr.Antialias = Interface.Antialias;
 				onDraw (gr);
 			}
 			bmp.Flush ();
 		}
-		protected virtual void UpdateCache(Cairo.Context ctx){
+		protected virtual void UpdateCache(Context ctx){
 			#if DEBUG_UPDATE
 			Debug.WriteLine (string.Format("UpdateCache -> {0}", this.ToString ()));
 			#endif
@@ -1425,7 +1425,7 @@ namespace Crow
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version
 		/// of the widget </summary>
-		public virtual void Paint (ref Cairo.Context ctx)
+		public virtual void Paint (ref Context ctx)
 		{
 			#if DEBUG_UPDATE
 			Debug.WriteLine (string.Format("Paint -> {0}", this.ToString ()));
@@ -1461,7 +1461,7 @@ namespace Crow
 				LastPaintedSlot = Slot;
 			}
 		}
-		void paintDisabled(Cairo.Context gr, Rectangle rb){
+		void paintDisabled(Context gr, Rectangle rb){
 			gr.Operator = Operator.Xor;
 			gr.SetSourceRGBA (0.6, 0.6, 0.6, 0.3);
 			gr.Rectangle (rb);

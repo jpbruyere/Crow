@@ -28,6 +28,7 @@ using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
+using Cairo;
 
 namespace Crow
 {
@@ -126,7 +127,7 @@ namespace Crow
 			int tmp = base.measureRawSize (lt);
 			return tmp < 0 ? tmp : tmp + 2 * BorderWidth;
 		}
-		protected override void onDraw (Cairo.Context gr)
+		protected override void onDraw (Context gr)
 		{
 			drawborder2 (gr);
 
@@ -141,7 +142,7 @@ namespace Crow
 				child.Paint (ref gr);
 			gr.Restore ();
 		}
-		void drawborder2(Cairo.Context gr){
+		void drawborder2(Context gr){
 			Rectangle rBack = new Rectangle (Slot.Size);
 
 			//rBack.Inflate (-Margin);
@@ -228,7 +229,7 @@ namespace Crow
 				}
 			}
 		}
-		void drawborder1(Cairo.Context gr){
+		void drawborder1(Context gr){
 			Rectangle rBack = new Rectangle (Slot.Size);
 
 			//rBack.Inflate (-Margin);

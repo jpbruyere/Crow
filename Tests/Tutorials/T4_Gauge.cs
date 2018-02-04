@@ -1,5 +1,5 @@
 //
-// HelloCube.cs
+// HelloWorld.cs
 //
 // Author:
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
@@ -25,66 +25,32 @@
 // THE SOFTWARE.
 
 using System;
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
 using Crow;
 
-namespace Tests
+namespace Tutorials
 {
-	class HelloCube : CrowWindow
+	class T4_Gauge : CrowWindow
 	{
-		[STAThread]
-		static void Main ()
+		public T4_Gauge ()
+			: base(800, 600,"Simple Gauge Tutorial")
 		{
-			HelloCube win = new HelloCube ();
-			win.Run (30);
-		}
-
-		public HelloCube ()
-			: base(800, 600,"Crow Test with OpenTK")
-		{
-		}
-
-		vaoMesh cube;
-		Texture texture;
-		Matrix4 projection, modelview;
-
-		void initGL(){
-			GL.Enable (EnableCap.CullFace);
-			GL.Enable (EnableCap.Blend);
-			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-
-			cube = vaoMesh.CreateCube ();
-			texture = new Texture ("image/textest.png");
-
-			projection =
-				Matrix4.CreatePerspectiveFieldOfView (
-					MathHelper.PiOver4,
-					ClientRectangle.Width / (float)ClientRectangle.Height, 1.0f, 10.0f);
-			modelview = Matrix4.LookAt(new Vector3(5,5,5), Vector3.Zero, Vector3.UnitZ);
 		}
 
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-
-			AddWidget(
-				new Window (this.CurrentInterface)
-				{
-					Caption = "Hello World"
-				}
-			);
-			initGL ();
+			AddWidget (new SimpleGauge (CurrentInterface) {
+				Level = 40,
+				Width = 30, Height = "50%",
+				Foreground = Color.UnitedNationsBlue, Background = Color.Jet
+			});
 		}
-		public override void OnRender (FrameEventArgs e)
-		{			
-			base.OnRender (e);
 
-			shader.SetMVP(modelview * projection);
-
-			GL.BindTexture (TextureTarget.Texture2D, texture);
-			cube.Render (BeginMode.Triangles);
-			GL.BindTexture (TextureTarget.Texture2D, 0);
+		[STAThread]
+		static void Main ()
+		{
+			T4_Gauge win = new T4_Gauge ();
+			win.Run (30);
 		}
 	}
 }

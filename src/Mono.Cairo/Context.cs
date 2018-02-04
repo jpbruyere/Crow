@@ -450,7 +450,7 @@ namespace Cairo {
 			NativeMethods.cairo_arc_negative (handle, xc, yc, radius, angle1, angle2);
 		}
 
-		public void Rectangle (Rectangle rectangle)
+		public void Rectangle (Crow.Rectangle rectangle)
 		{
 			Rectangle (rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
 		}
@@ -518,11 +518,11 @@ namespace Cairo {
 			NativeMethods.cairo_stroke_preserve (handle);
 		}
 
-		public Rectangle StrokeExtents ()
+		public Crow.Rectangle StrokeExtents ()
 		{
 			double x1, y1, x2, y2;
 			NativeMethods.cairo_stroke_extents (handle, out x1, out y1, out x2, out y2);
-			return new Rectangle (x1, y1, x2 - x1, y2 - y1);
+			return new Crow.Rectangle ((int)x1, (int)y1, (int)(x2 - x1), (int)(y2 - y1));
 		}
 
 		public void Fill ()
@@ -530,11 +530,11 @@ namespace Cairo {
 			NativeMethods.cairo_fill (handle);
 		}
 
-		public Rectangle FillExtents ()
+		public Crow.Rectangle FillExtents ()
 		{
 			double x1, y1, x2, y2;
 			NativeMethods.cairo_fill_extents (handle, out x1, out y1, out x2, out y2);
-			return new Rectangle (x1, y1, x2 - x1, y2 - y1);
+			return new Crow.Rectangle ((int)x1, (int)y1, (int)(x2 - x1), (int)(y2 - y1));
 		}
 
 		public void FillPreserve ()

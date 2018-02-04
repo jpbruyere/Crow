@@ -36,7 +36,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Crow.IML;
 
-namespace Crow
+namespace Crow.IML
 {
 	public delegate object InstanciatorInvoker(Interface iface);
 
@@ -123,7 +123,15 @@ namespace Crow
 		public GraphicObject CreateInstance(Interface iface){
 			return loader (iface) as GraphicObject;
 		}
-
+		/// <summary>
+		/// Creates a new instance of T compiled in the instantiator
+		/// and bind it the an interface
+		/// </summary>
+		/// <returns>The new T instance</returns>
+		/// <param name="iface">The interface to bind to</param>
+		public T CreateInstance<T>(Interface iface){
+			return (T)loader (iface);
+		}
 		List<DynamicMethod> dsValueChangedDynMeths = new List<DynamicMethod>();
 		List<Delegate> cachedDelegates = new List<Delegate>();
 		/// <summary>

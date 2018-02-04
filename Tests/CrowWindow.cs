@@ -211,12 +211,35 @@ namespace Crow
 		public void DeleteWidget (GraphicObject g, int interfaceIdx = 0){
 			ifaceControl [interfaceIdx].CrowInterface.DeleteWidget (g);
 		}
-		public GraphicObject Load (string path, int interfaceIdx = 0){
+		/// <summary>
+		/// check if a default interface exists, create one if not
+		/// </summary>
+		void checkDefaultIFace (){
 			if (ifaceControl.Count == 0)//create default orthogonal interface
 				addInterfaceControler (new InterfaceControler (
-							new Rectangle (0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height)));
+					new Rectangle (0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height)));			
+		}
+		/// <summary>
+		/// Load the content of the IML file pointed by path and add it to the current interface
+		/// graphic tree.
+		/// </summary>
+		/// <param name="path">the path of the IML file to load</param>
+		/// <param name="interfaceIdx">interface index to bind to, a default one is created if none exists</param>
+		public GraphicObject Load (string path, int interfaceIdx = 0){
+			checkDefaultIFace();
 			return ifaceControl [interfaceIdx].CrowInterface.LoadInterface (path);
 		}
+		/// <summary>
+		/// Load the content of the IML string passed as first argument and add it to the current interface
+		/// graphic tree.
+		/// </summary>
+		/// <param name="path">a valid IML string</param>
+		/// <param name="interfaceIdx">interface index to bind to, a default one is created if none exists</param>
+		public void LoadIMLFragment (string imlFragment, int interfaceIdx = 0){
+			checkDefaultIFace();
+			ifaceControl [interfaceIdx].CrowInterface.LoadIMLFragment (imlFragment);
+		}
+
 		public GraphicObject FindByName (string nameToFind){
 			for (int i = 0; i < ifaceControl.Count; i++) {
 				GraphicObject tmp = ifaceControl [i].CrowInterface.FindByName (nameToFind);

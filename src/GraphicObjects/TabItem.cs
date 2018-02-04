@@ -28,6 +28,7 @@ using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
+using Cairo;
 
 namespace Crow
 {
@@ -105,7 +106,7 @@ namespace Crow
 				NotifyValueChanged ("IsSelected", isSelected);
 			}
 		}
-		protected override void onDraw (Cairo.Context gr)
+		protected override void onDraw (Context gr)
 		{
 			gr.Save ();
 

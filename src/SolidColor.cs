@@ -31,6 +31,7 @@ using System.Text;
 using System.Xml.Serialization;
 using System.Reflection;
 using System.Diagnostics;
+using Cairo;
 
 
 
@@ -48,7 +49,7 @@ namespace Crow
 
 		#region implemented abstract members of Fill
 
-		public override void SetAsSource (Cairo.Context ctx, Rectangle bounds = default(Rectangle))
+		public override void SetAsSource (Context ctx, Rectangle bounds = default(Rectangle))
 		{
 			ctx.SetSourceRGBA (color.R, color.G, color.B, color.A);
 		}

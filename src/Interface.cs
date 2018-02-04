@@ -35,6 +35,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using Cairo;
 using System.Globalization;
+using Crow.IML;
 
 namespace Crow
 {
@@ -212,6 +213,8 @@ namespace Crow
 		}
 		/// <summary> Search for .style resources in assembly </summary>
 		static void loadStylingFromAssembly (Assembly assembly) {
+			if (assembly == null)
+				return;
 			foreach (string s in assembly
 				.GetManifestResourceNames ()
 				.Where (r => r.EndsWith (".style", StringComparison.OrdinalIgnoreCase))) {
@@ -221,9 +224,9 @@ namespace Crow
 		}
 		static void loadCursors(){
 			//Load cursors
-			XCursor.Cross = XCursorFile.Load("#Crow.Images.Icons.Cursors.cross").Cursors[0];
-			XCursor.Default = XCursorFile.Load("#Crow.Images.Icons.Cursors.arrow").Cursors[0];
-			XCursor.NW = XCursorFile.Load("#Crow.Images.Icons.Cursors.top_left_corner").Cursors[0];
+			XCursor.Cross = XCursorFile.Load("#Crow.Images.Icons.Cursors.cross").Cursors[3];
+			XCursor.Default = XCursorFile.Load("#Crow.Images.Icons.Cursors.arrow").Cursors[3];
+			XCursor.NW = XCursorFile.Load("#Crow.Images.Icons.Cursors.top_left_corner").Cursors[3];
 			XCursor.NE = XCursorFile.Load("#Crow.Images.Icons.Cursors.top_right_corner").Cursors[0];
 			XCursor.SW = XCursorFile.Load("#Crow.Images.Icons.Cursors.bottom_left_corner").Cursors[0];
 			XCursor.SE = XCursorFile.Load("#Crow.Images.Icons.Cursors.bottom_right_corner").Cursors[0];
@@ -258,6 +261,8 @@ namespace Crow
 			}
 		}
 		static void searchTemplatesIn(Assembly assembly){
+			if (assembly == null)
+				return;
 			foreach (string resId in assembly
 				.GetManifestResourceNames ()
 				.Where (r => r.EndsWith (".template", StringComparison.OrdinalIgnoreCase))) {
@@ -295,7 +300,18 @@ namespace Crow
 			}
 			return stream;
 		}
-
+		/// <summary>
+		/// Add the content of the IML fragment to the graphic tree of this interface
+		/// </summary>
+		/// <returns>return the new instance for convenience, may be ignored</returns>
+		/// <param name="imlFragment">a valid IML string</param>
+		public GraphicObject LoadIMLFragment (string imlFragment) {
+			lock (UpdateMutex) {
+				GraphicObject tmp = Instantiator.CreateFromImlFragment (imlFragment).CreateInstance(this);
+				AddWidget (tmp);
+				return tmp;
+			}
+		}
 		/// <summary>Create an instance of a GraphicObject and add it to the GraphicTree
 		/// of this Interface</summary>
 		public GraphicObject LoadInterface (string path)
@@ -303,7 +319,6 @@ namespace Crow
 			lock (UpdateMutex) {
 				GraphicObject tmp = Load (path);
 				AddWidget (tmp);
-
 				return tmp;
 			}
 		}
