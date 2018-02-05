@@ -54,24 +54,6 @@ namespace Crow
 		public event EventHandler Pressed;
 		public event EventHandler Released;
 
-		#region TemplatedContainer overrides
-		public override GraphicObject Content {
-			get {
-				return _contentContainer == null ? null : _contentContainer.Child;
-			}
-			set {
-				if (_contentContainer != null)
-					_contentContainer.SetChild(value);
-			}
-		}
-		protected override void loadTemplate(GraphicObject template = null)
-		{
-			base.loadTemplate (template);
-
-			_contentContainer = this.child.FindByName ("Content") as Container;
-		}
-		#endregion
-
 		#region GraphicObject Overrides
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{

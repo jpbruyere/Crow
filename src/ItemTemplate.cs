@@ -63,6 +63,12 @@ namespace Crow
 			strDataType = _dataType;
 			fetchMethodName = _fetchDataMethod;
 		}
+		public ItemTemplate (XmlReader reader, string _dataType = null, string _fetchDataMethod = null)
+			:base(reader)
+		{
+			strDataType = _dataType;
+			fetchMethodName = _fetchDataMethod;
+		}
 		#endregion
 
 		public void CreateExpandDelegate (TemplatedGroup host){

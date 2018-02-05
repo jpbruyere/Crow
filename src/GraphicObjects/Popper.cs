@@ -39,7 +39,7 @@ namespace Crow
 
 		bool _isPopped, _canPop;
 		Alignment popDirection;
-		GraphicObject _contentContainer;
+		GraphicObject _content;
 		Measure popWidth, popHeight;
 
 		public event EventHandler Popped;
@@ -111,22 +111,22 @@ namespace Crow
 		#endregion
 
 		public override GraphicObject Content {
-			get { return _contentContainer; }
+			get { return _content; }
 			set {
-				if (_contentContainer != null) {
-					_contentContainer.LogicalParent = null;
-					_contentContainer.LayoutChanged -= _content_LayoutChanged;
+				if (_content != null) {
+					_content.LogicalParent = null;
+					_content.LayoutChanged -= _content_LayoutChanged;
 				}
 
-				_contentContainer = value;
+				_content = value;
 
-				if (_contentContainer == null)
+				if (_content == null)
 					return;
 
-				_contentContainer.LogicalParent = this;
-				_contentContainer.HorizontalAlignment = HorizontalAlignment.Left;
-				_contentContainer.VerticalAlignment = VerticalAlignment.Top;
-				_contentContainer.LayoutChanged += _content_LayoutChanged;
+				_content.LogicalParent = this;
+				_content.HorizontalAlignment = HorizontalAlignment.Left;
+				_content.VerticalAlignment = VerticalAlignment.Top;
+				_content.LayoutChanged += _content_LayoutChanged;
 			}
 		}
 		void positionContent(LayoutingType lt){
@@ -242,9 +242,9 @@ namespace Crow
 
 		protected override void Dispose (bool disposing)
 		{
-			if (_contentContainer != null && disposing) {
-				if (_contentContainer.Parent == null)
-					_contentContainer.Dispose ();
+			if (_content != null && disposing) {
+				if (_content.Parent == null)
+					_content.Dispose ();
 			}
 			base.Dispose (disposing);
 		}

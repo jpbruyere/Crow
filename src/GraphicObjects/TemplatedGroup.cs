@@ -67,7 +67,11 @@ namespace Crow
 		public Dictionary<string, ItemTemplate> ItemTemplates = new Dictionary<string, Crow.ItemTemplate>();
 
 		/// <summary>
-		/// Default item template
+		/// Item templates file path, on disk or embedded.
+		/// 
+		/// ItemTemplate file may contains either a single template without the
+		/// ItemTemplate enclosing tag, or several item templates each enclosed
+		/// in a separate tag
 		/// </summary>
 		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ItemTemplate.goml")]
 		public string ItemTemplate {
@@ -272,10 +276,8 @@ namespace Crow
 		/// Items loading thread
 		/// </summary>
 		void loading(){
-			if (ItemTemplates == null)
-				ItemTemplates = new Dictionary<string, ItemTemplate> ();
-			if (!ItemTemplates.ContainsKey ("default"))
-				ItemTemplates ["default"] = Interface.GetItemTemplate (ItemTemplate);
+			//if (!ItemTemplates.ContainsKey ("default"))
+			//	ItemTemplates ["default"] = Interface.GetItemTemplate (ItemTemplate);
 
 			for (int i = 1; i <= (data.Count / itemPerPage) + 1; i++) {
 				if ((bool)loadingThread?.cancelRequested) {

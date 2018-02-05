@@ -370,6 +370,7 @@
     <EmbeddedResource Include="Templates\DockingView.template">
       <LogicalName>Crow.DockingView.template</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Templates\FileItems.template" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Crow.dll.config">

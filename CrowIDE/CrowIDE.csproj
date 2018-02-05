@@ -40,6 +40,12 @@
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
     <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
+    <StartAction>Program</StartAction>
+    <StartProgram>%24{TargetName}</StartProgram>
+    <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -47,7 +53,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="OpenTK">
       <HintPath>$(SolutionDir)packages\OpenTK.2.0.0\lib\net20\OpenTK.dll</HintPath>
-      <Package>opentk</Package>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -58,7 +63,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="OpenTKGameWindow.cs" />
     <Compile Include="OpenGL\Shader.cs" />
     <Compile Include="OpenGL\Texture.cs" />
     <Compile Include="OpenGL\vaoMesh.cs" />
@@ -67,6 +71,9 @@
     <Compile Include="src\MembersView.cs" />
     <Compile Include="src\Extensions.cs" />
     <Compile Include="src\Microsoft.Build.CommonTypes.cs" />
+    <Compile Include="src\CrowWindow.cs" />
+    <Compile Include="src\InterfaceControler.cs" />
+    <Compile Include="OpenGL\Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />

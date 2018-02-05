@@ -31,7 +31,7 @@ using System.IO;
 
 namespace CrowIDE
 {
-	class CrowIDE : OpenTKGameWindow
+	class CrowIDE : CrowWindow
 	{
 		public Command CMDLoad = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Open"))) { Caption = "Open", Icon = new SvgPicture("#Crow.Icons.open-file.svg")};
 		public Command CMDSave = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Save"))) { Caption = "Save", Icon = new SvgPicture("#Crow.Icons.open-file.svg")};
@@ -72,7 +72,7 @@ namespace CrowIDE
 
 			//this.CrowInterface.LoadInterface ("#CrowIDE.ui.imlEditor.crow").DataSource = this;
 			//GraphicObject go = this.CrowInterface.LoadInterface (@"ui/test.crow");
-			GraphicObject go = this.CrowInterface.LoadInterface (@"#CrowIDE.ui.imlEditor.crow");
+			GraphicObject go = CurrentInterface.LoadInterface (@"#CrowIDE.ui.imlEditor.crow");
 			imlVE = go.FindByName ("crowContainer") as ImlVisualEditor;
 			go.DataSource = this;
 		}
@@ -94,10 +94,10 @@ namespace CrowIDE
 		}
 		void loadWindow(string path){
 			try {
-				GraphicObject g = CrowInterface.FindByName (path);
+				GraphicObject g = CurrentInterface.FindByName (path);
 				if (g != null)
 					return;
-				g = CrowInterface.LoadInterface (path);
+				g = CurrentInterface.LoadInterface (path);
 				g.Name = path;
 				g.DataSource = imlVE;
 			} catch (Exception ex) {
@@ -105,9 +105,9 @@ namespace CrowIDE
 			}
 		}
 		void closeWindow (string path){
-			GraphicObject g = CrowInterface.FindByName (path);
+			GraphicObject g = CurrentInterface.FindByName (path);
 			if (g != null)
-				CrowInterface.DeleteWidget (g);
+				CurrentInterface.DeleteWidget (g);
 		}
 
 		protected void onCommandSave(object sender, MouseButtonEventArgs e){

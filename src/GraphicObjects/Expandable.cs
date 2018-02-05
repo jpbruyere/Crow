@@ -65,25 +65,6 @@ namespace Crow
 		{
 			IsExpanded = !IsExpanded;
 		}
-		/// <summary>
-		/// Implement the abstract Content property of TemplatedControl
-		/// </summary>
-		public override GraphicObject Content {
-			get {
-				return _contentContainer == null ? null : _contentContainer.Child;
-			}
-			set {
-				_contentContainer.SetChild(value);
-				NotifyValueChanged ("HasContent", HasContent);
-			}
-		}
-		//TODO: move loadTemplate and ResolveBinding in TemplatedContainer
-		protected override void loadTemplate(GraphicObject template = null)
-		{
-			base.loadTemplate (template);
-
-			_contentContainer = this.child.FindByName ("Content") as Container;
-		}
 
 		#region Public properties
 		[XmlAttributeAttribute][DefaultValue("#Crow.Images.Icons.expandable.svg")]
@@ -120,9 +101,6 @@ namespace Crow
 					onCollapse (this, null);
             }
         }
-		[XmlIgnore]public bool HasContent {
-			get { return _contentContainer == null ? false : _contentContainer.Child != null; }
-		}
 		[XmlIgnore]public bool IsExpandable {
 			get {
 				try {
