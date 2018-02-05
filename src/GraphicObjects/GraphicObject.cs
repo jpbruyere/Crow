@@ -205,10 +205,10 @@ namespace Crow
 		public Rectangle LastSlots;
 		/// <summary>
 		/// keep last slot painted on screen to clear traces if moved or resized
-		/// TODO: we should ensure the whole parsed widget tree is the last painted
 		/// version to clear effective oldslot if parents have been moved or resized.
 		/// IDEA is to add a ScreenCoordinates function that use only lastPaintedSlots
 		/// </summary>
+		//TODO: we should ensure the whole parsed widget tree is the last painted
 		public Rectangle LastPaintedSlot;
 		/// <summary>Prevent requeuing multiple times the same widget</summary>
 		public bool IsQueueForRedraw = false;

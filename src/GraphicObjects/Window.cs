@@ -70,14 +70,9 @@ namespace Crow
 		#endregion
 
 		#region TemplatedContainer overrides
-		public override GraphicObject Content {
-			get { return _contentContainer == null ? null : _contentContainer.Child; }
-			set { _contentContainer.SetChild(value); }
-		}
 		protected override void loadTemplate(GraphicObject template = null)
 		{
 			base.loadTemplate (template);
-			_contentContainer = this.child.FindByName ("Content") as Container;
 
 			NotifyValueChanged ("ShowNormal", false);
 			NotifyValueChanged ("ShowMinimize", true);

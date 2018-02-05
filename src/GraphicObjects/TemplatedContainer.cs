@@ -31,7 +31,12 @@ using System.Reflection;
 
 namespace Crow
 {
-	public abstract class TemplatedContainer : TemplatedControl
+	/// <summary>
+	/// base class for new containers that will use templates.
+	/// 
+	/// TemplatedControl's **must** provide a widget of the [`Container`](Container) class named **_'Content'_** inside their template tree
+	/// </summary>
+	public class TemplatedContainer : TemplatedControl
 	{
 		#region CTOR
 		public TemplatedContainer() : base(){}
@@ -40,7 +45,27 @@ namespace Crow
 
 		protected Container _contentContainer;
 
-		[XmlAttributeAttribute]public virtual GraphicObject Content{ get; set;}
+		/// <summary>
+		/// Single child of this templated container.
+		/// </summary>
+		public virtual GraphicObject Content {
+			get {
+				return _contentContainer == null ? null : _contentContainer.Child;
+			}
+			set {
+				_contentContainer.SetChild(value);
+				NotifyValueChanged ("HasContent", HasContent);
+			}
+		}
+		[XmlIgnore]public bool HasContent {
+			get { return _contentContainer?.Child != null; }
+		}
+		//TODO: move loadTemplate and ResolveBinding in TemplatedContainer
+		protected override void loadTemplate(GraphicObject template = null)
+		{
+			base.loadTemplate (template);
+			_contentContainer = this.child.FindByName ("Content") as Container;
+		}
 
 		#region GraphicObject overrides
 		public override GraphicObject FindByName (string nameToFind)

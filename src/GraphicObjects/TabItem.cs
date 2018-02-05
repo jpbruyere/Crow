@@ -65,7 +65,6 @@ namespace Crow
 		{
 			base.loadTemplate (template);
 
-			_contentContainer = this.child.FindByName ("Content") as Container;
 			titleWidget = this.child.FindByName ("TabTitle");
 		}
 		internal GraphicObject TabTitle { get { return titleWidget; }}

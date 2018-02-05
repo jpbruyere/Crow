@@ -28,7 +28,8 @@
 				<DirectoryView ShowFiles="true" Name="fv" CurrentDirectory="{./CurrentDirectory}" SelectedItemChanged="./onFVSelectedItemChanged"
 						Width="100%" Margin="0" MouseDoubleClick="./onFileSelect">
 						<Template>
-							<ListBox Name="fileView" Data="{./FileSystemEntries}" SelectedItemChanged="./onSelectedItemChanged">
+							<ListBox ItemTemplate="#Crow.Templates.FileItems.template" Name="fileView" Data="{./FileSystemEntries}"
+								SelectedItemChanged="./onSelectedItemChanged">
 								<Template>
 									<HorizontalStack>
 										<Scroller ScrollX="{../scrollbar1.Value}"  Name="scroller1"
@@ -41,27 +42,6 @@
 											Width="14" />
 									</HorizontalStack>
 								</Template>
-								<ItemTemplate DataType="System.IO.FileInfo">
-									<HorizontalStack Focusable="true"  Height="Fit">
-										<Image Margin="2" Width="16" Height="16"
-											Path="#Crow.Icons.file.svg"/>
-											<Label Text="{Name}" Width="Stretched"
-												MouseEnter="{Background=BlueCrayola}"
-												MouseLeave="{Background=Transparent}"/>
-									</HorizontalStack>
-								</ItemTemplate>
-								<ItemTemplate DataType="System.IO.DirectoryInfo">
-									<Border Foreground="Transparent" Focusable="true" Height="Fit">
-										<HorizontalStack
-												MouseEnter="{Background=BlueCrayola}"
-												MouseLeave="{Background=Transparent}">
-											<Image Margin="2" Width="16" Height="16"
-												Path="#Crow.Icons.folder.svg"/>
-											<Label Text="{Name}" Width="Stretched"/>
-											<Label Text="{LastAccessTime}" />
-										</HorizontalStack>
-									</Border>
-								</ItemTemplate>
 							</ListBox>
 						</Template>
 					</DirectoryView>

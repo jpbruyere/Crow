@@ -82,14 +82,22 @@ namespace Crow.IML
 			Stopwatch loadingTime = new Stopwatch ();
 			loadingTime.Start ();
 #endif
-			using (XmlTextReader itr = new XmlTextReader (stream)) {
+			using (XmlReader itr = XmlReader.Create (stream)) {
 				parseIML (itr);
 			}
+			stream.Dispose ();
 #if DEBUG_LOAD
 			loadingTime.Stop ();
 			Debug.WriteLine ("IML Instantiator creation '{2}' : {0} ticks, {1} ms",
 				loadingTime.ElapsedTicks, loadingTime.ElapsedMilliseconds, imlPath);
 #endif
+		}
+		/// <summary>
+		/// Initializes a new instance of the Instantiator class with an already openned xml reader
+		/// positionned on the start tag inside the itemTemplate
+		/// </summary>
+		public Instantiator (XmlReader itr){
+			parseIML (itr);
 		}
 		//TODO:check if still used
 		public Instantiator (Type _root, InstanciatorInvoker _loader)
@@ -144,7 +152,7 @@ namespace Crow.IML
 		/// <summary>
 		/// Parses IML and build a dynamic method that will be used to instanciate one or multiple occurence of the IML file or fragment
 		/// </summary>
-		void parseIML (XmlTextReader reader) {
+		void parseIML (XmlReader reader) {
 			IMLContext ctx = new IMLContext (findRootType (reader));
 
 			ctx.nodesStack.Push (new Node (ctx.RootType));
@@ -169,21 +177,21 @@ namespace Crow.IML
 		/// read first node to set GraphicObject class for loading
 		/// and let reader position on that node
 		/// </summary>
-		Type findRootType (XmlTextReader reader)
+		Type findRootType (XmlReader reader)
 		{
 			string root = "Object";
-			while (reader.Read ()) {
-				if (reader.NodeType == XmlNodeType.Element) {
-					root = reader.Name;
-					break;
-				}
-			}
+			while (reader.NodeType != XmlNodeType.Element)
+				reader.Read ();
+			root = reader.Name;
 			Type t = tryGetGOType (root);
 			if (t == null)
 				throw new Exception ("IML parsing error: undefined root type (" + root + ")");
 			return t;
 		}
-		void emitLoader (XmlTextReader reader, IMLContext ctx)
+		/// <summary>
+		/// main parsing entry point
+		/// </summary>
+		void emitLoader (XmlReader reader, IMLContext ctx)
 		{
 			string tmpXml = reader.ReadOuterXml ();
 
@@ -193,6 +201,41 @@ namespace Crow.IML
 			emitGOLoad (ctx, tmpXml);
 
 			//emitCheckAndBindValueChanged (ctx);
+		}
+		/// <summary>
+		/// Parses the item template tag.
+		/// </summary>
+		/// <returns>the string triplet dataType, itemTmpID read as attribute of this tag</returns>
+		/// <param name="reader">current xml text reader</param>
+		/// /// <param name="itemTemplatePath">file containing the templates if its a dedicated one</param>
+		string[] parseItemTemplateTag (XmlReader reader, string itemTemplatePath = "") {
+			string dataType = "default", datas = "", path = "";
+			while (reader.MoveToNextAttribute ()) {
+				if (reader.Name == "DataType")
+					dataType = reader.Value;
+				else if (reader.Name == "Data")
+					datas = reader.Value;
+				else if (reader.Name == "Path")
+					path = reader.Value;
+			}
+			reader.MoveToElement ();
+
+			string itemTmpID = itemTemplatePath;
+
+			if (string.IsNullOrEmpty (path)) {
+				itemTmpID += Guid.NewGuid ().ToString ();
+				Interface.Instantiators [itemTmpID] =
+					new ItemTemplate (new MemoryStream (Encoding.UTF8.GetBytes (reader.ReadInnerXml ())), dataType, datas);
+
+			} else {
+				if (!reader.IsEmptyElement)
+					throw new Exception ("ItemTemplate with Path attribute set may not include sub nodes");
+				itemTmpID += path+dataType+datas;
+				if (!Interface.Instantiators.ContainsKey (itemTmpID))
+					Interface.Instantiators [itemTmpID] =
+						new ItemTemplate (Interface.GetStreamFromPath (path), dataType, datas);
+			}
+			return new string [] { dataType, itemTmpID, datas };
 		}
 		/// <summary>
 		/// process template and item template definition prior to
@@ -208,6 +251,7 @@ namespace Crow.IML
 
 				reader.Read ();
 				string templatePath = reader.GetAttribute ("Template");
+				string itemTemplatePath = reader.GetAttribute ("ItemTemplate");
 
 				int depth = reader.Depth + 1;
 				while (reader.Read ()) {
@@ -217,35 +261,8 @@ namespace Crow.IML
 						inlineTemplate = true;
 						reader.Read ();
 						readChildren (reader, ctx, -1);
-					} else if (reader.Name == "ItemTemplate") {
-						string dataType = "default", datas = "", path = "";
-						while (reader.MoveToNextAttribute ()) {
-							if (reader.Name == "DataType")
-								dataType = reader.Value;
-							else if (reader.Name == "Data")
-								datas = reader.Value;
-							else if (reader.Name == "Path")
-								path = reader.Value;
-						}
-						reader.MoveToElement ();
-
-						string itemTmpID;
-
-						if (string.IsNullOrEmpty (path)) {
-							itemTmpID = Guid.NewGuid ().ToString ();
-							Interface.Instantiators [itemTmpID] =
-								new ItemTemplate (new MemoryStream (Encoding.UTF8.GetBytes (reader.ReadInnerXml ())), dataType, datas);
-
-						} else {
-							if (!reader.IsEmptyElement)
-								throw new Exception ("ItemTemplate with Path attribute may not include sub nodes");
-							itemTmpID = path+dataType+datas;
-							if (!Interface.Instantiators.ContainsKey (itemTmpID))
-								Interface.Instantiators [itemTmpID] =
-										 new ItemTemplate (Interface.GetStreamFromPath (itemTmpID), dataType, datas);
-						}
-						itemTemplateIds.Add (new string [] { dataType, itemTmpID, datas });
-					}
+					} else if (reader.Name == "ItemTemplate")
+						itemTemplateIds.Add (parseItemTemplateTag (reader));					
 				}
 
 				if (!inlineTemplate) {//load from path or default template
@@ -259,6 +276,36 @@ namespace Crow.IML
 							CompilerServices.miIFaceLoad);
 					}
 					ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miLoadTmp);//load template
+				}
+				if (itemTemplateIds.Count == 0) {
+					//try to load ItemTemplate(s) from ItemTemplate attribute of TemplatedGroup
+					if (!string.IsNullOrEmpty (itemTemplatePath)) {
+						//check if it is already loaded in cache as a single itemTemplate instantiator
+						if (Interface.Instantiators.ContainsKey (itemTemplatePath)) {
+							itemTemplateIds.Add (new string [] { "default", itemTemplatePath, "" });
+						} else {
+							using (Stream stream = Interface.GetStreamFromPath (itemTemplatePath)) {
+								//itemtemplate files may have multiple root nodes
+								XmlReaderSettings itrSettings = new XmlReaderSettings { ConformanceLevel = ConformanceLevel.Fragment };
+								using (XmlReader itr = XmlReader.Create (stream, itrSettings)) {									
+									while (itr.Read ()) {
+										if (!itr.IsStartElement ())
+											continue;
+										if (itr.NodeType == XmlNodeType.Element) {
+											if (itr.Name != "ItemTemplate") {
+												//the file contains a single template to use as default
+												Interface.Instantiators [itemTemplatePath] =
+													new ItemTemplate (itr);
+												itemTemplateIds.Add (new string [] { "default", itemTemplatePath, "" });
+												break;//we should be at the end of the file
+											}
+											itemTemplateIds.Add (parseItemTemplateTag (itr, itemTemplatePath));
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 				//copy item templates (review this)
 				foreach (string [] iTempId in itemTemplateIds) {
