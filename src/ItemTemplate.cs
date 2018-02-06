@@ -43,6 +43,9 @@ namespace Crow
 
 	/// <summary>
 	/// Derived from Instantiator with sub data fetching facilities for hierarchical data access.
+	/// 
+	/// ItemTemplate stores the dynamic method for instantiating the control tree defined in a valid IML file.
+	/// 
 	/// </summary>
 	public class ItemTemplate : Instantiator {
 		public EventHandler Expand;
@@ -51,18 +54,36 @@ namespace Crow
 		string fetchMethodName;
 
 		#region CTOR
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Crow.ItemTemplate"/> class by parsing the file passed as argument.
+		/// </summary>
+		/// <param name="path">IML file to parse</param>
+		/// <param name="_dataType">type this item will be choosen for, or member of the data item</param>
+		/// <param name="_fetchDataMethod">for hierarchical data, method to call for children fetching</param>
 		public ItemTemplate(string path, string _dataType = null, string _fetchDataMethod = null)
 			: base(path) {
 			strDataType = _dataType;
 			fetchMethodName = _fetchDataMethod;
 
 		}
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Crow.ItemTemplate"/> class by parsing the IML fragment passed as arg.
+		/// </summary>
+		/// <param name="path">IML fragment to parse</param>
+		/// <param name="_dataType">type this item will be choosen for, or member of the data item</param>
+		/// <param name="_fetchDataMethod">for hierarchical data, method to call for children fetching</param>
 		public ItemTemplate (Stream ImlFragment, string _dataType, string _fetchDataMethod)
 			:base(ImlFragment)
 		{
 			strDataType = _dataType;
 			fetchMethodName = _fetchDataMethod;
 		}
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Crow.ItemTemplate"/> class using the opened XmlReader in args.
+		/// </summary>
+		/// <param name="path">XML reader positionned before or at the root node</param>
+		/// <param name="_dataType">type this item will be choosen for, or member of the data item</param>
+		/// <param name="_fetchDataMethod">for hierarchical data, method to call for children fetching</param>
 		public ItemTemplate (XmlReader reader, string _dataType = null, string _fetchDataMethod = null)
 			:base(reader)
 		{
@@ -71,6 +92,10 @@ namespace Crow
 		}
 		#endregion
 
+		/// <summary>
+		/// Creates the expand delegate.
+		/// </summary>
+		/// <param name="host">Host.</param>
 		public void CreateExpandDelegate (TemplatedGroup host){
 			Type dataType = CompilerServices.tryGetType(strDataType);
 			if (dataType == null) {

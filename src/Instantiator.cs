@@ -207,7 +207,7 @@ namespace Crow.IML
 		/// </summary>
 		/// <returns>the string triplet dataType, itemTmpID read as attribute of this tag</returns>
 		/// <param name="reader">current xml text reader</param>
-		/// /// <param name="itemTemplatePath">file containing the templates if its a dedicated one</param>
+		/// <param name="itemTemplatePath">file containing the templates if its a dedicated one</param>
 		string[] parseItemTemplateTag (XmlReader reader, string itemTemplatePath = "") {
 			string dataType = "default", datas = "", path = "";
 			while (reader.MoveToNextAttribute ()) {
@@ -307,6 +307,11 @@ namespace Crow.IML
 						}
 					}
 				}
+				if (!ctx.nodesStack.Peek ().IsTemplatedGroup)
+					return;
+				//add the default item template if no default is defined
+				if (!itemTemplateIds.Any(ids=>ids[0] == "default"))
+					itemTemplateIds.Add (new string [] { "default", "#Crow.DefaultItem.template", "" });
 				//copy item templates (review this)
 				foreach (string [] iTempId in itemTemplateIds) {
 					ctx.il.Emit (OpCodes.Ldloc_0);//load TempControl ref

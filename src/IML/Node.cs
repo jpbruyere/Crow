@@ -85,6 +85,9 @@ namespace Crow.IML
 		public bool HasTemplate {
 			get { return typeof (TemplatedControl).IsAssignableFrom (CrowType);}
 		}
+		public bool IsTemplatedGroup {
+			get { return typeof (TemplatedGroup).IsAssignableFrom (CrowType);}
+		}
 
 		public static implicit operator string (Node sn)
 		{

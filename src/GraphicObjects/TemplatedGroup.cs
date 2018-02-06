@@ -71,9 +71,9 @@ namespace Crow
 		/// 
 		/// ItemTemplate file may contains either a single template without the
 		/// ItemTemplate enclosing tag, or several item templates each enclosed
-		/// in a separate tag
+		/// in a separate tag.
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue("#Crow.Templates.ItemTemplate.goml")]
+		[XmlAttributeAttribute]
 		public string ItemTemplate {
 			get { return _itemTemplate; }
 			set {
@@ -344,7 +344,7 @@ namespace Crow
 		}
 		string getItempKey(Type dataType, object o){
 			try {
-				return dataType.GetProperty (_dataTest).GetGetMethod ().Invoke (o, null).ToString();
+				return dataType.GetProperty (_dataTest).GetGetMethod ().Invoke (o, null)?.ToString();
 			} catch  {
 				return dataType.FullName;
 			}
