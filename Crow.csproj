@@ -252,7 +252,6 @@
     <EmbeddedResource Include="Images\Icons\checkbox.svg" />
     <EmbeddedResource Include="Images\Icons\radiobutton.svg" />
     <EmbeddedResource Include="Templates\Spinner %28copier%29.goml" />
-    <EmbeddedResource Include="Templates\ItemTemplate.goml" />
     <EmbeddedResource Include="Images\Icons\expandable.svg" />
     <EmbeddedResource Include="Templates\Checkbox2.goml" />
     <EmbeddedResource Include="Images\Icons\tetra.png" />
@@ -371,6 +370,9 @@
       <LogicalName>Crow.DockingView.template</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="Templates\FileItems.template" />
+    <EmbeddedResource Include="Templates\DefaultItem.template">
+      <LogicalName>Crow.DefaultItem.template</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="Crow.dll.config">
