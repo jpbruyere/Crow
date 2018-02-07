@@ -136,6 +136,15 @@ namespace Crow
 			base.OnLayoutChanges (layoutType);
 
 			NotifyValueChanged("MaximumScroll", MaximumScroll);
+			if (layoutType == LayoutingType.Height) {
+				NotifyValueChanged ("PageHeight", Slot.Height);
+				if (child?.Slot.Height > 0)
+					NotifyValueChanged ("ChildHeightRatio", Slot.Height * Slot.Height / child.Slot.Height);
+			} else {
+				NotifyValueChanged ("PageWidth", Slot.Width);
+				if (child?.Slot.Width > 0)
+					NotifyValueChanged ("ChildWidthRatio", Slot.Width * Slot.Width / child.Slot.Width);
+			}
 		}
 		void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
@@ -149,6 +158,8 @@ namespace Crow
 						ScrollY = maxScroll;
 					}
 					NotifyValueChanged("MaximumScroll", maxScroll);
+					if (child?.Slot.Height > 0)
+						NotifyValueChanged ("ChildHeightRatio", Slot.Height * Slot.Height / child.Slot.Height);
 				}
 			} else if (arg.LayoutType == LayoutingType.Width) {
 				if (maxScroll < ScrollX) {
@@ -156,6 +167,8 @@ namespace Crow
 					ScrollX = maxScroll;
 				}
 				NotifyValueChanged("MaximumScroll", maxScroll);
+				if (child?.Slot.Width > 0)
+					NotifyValueChanged ("ChildWidthRatio", Slot.Width * Slot.Width / child.Slot.Width);
 			}
 		}
 		void onChildListCleared(object sender, EventArgs e){

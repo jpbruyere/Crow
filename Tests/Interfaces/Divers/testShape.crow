@@ -1,0 +1,6 @@
+﻿<?xml version="1.0"?>
+<Container Fit="true" >
+	<Shape Foreground="Transparent" Background="Onyx" Path="M 5.5,0.5 L 10.5,10.5 L 0.5,10.5 Z"
+		MouseEnter="{Background=hgradient|0:Jet|0.5:BlueCrayola|1:Black}"
+		MouseLeave="{Background=Onyx}"/>
+</Container>

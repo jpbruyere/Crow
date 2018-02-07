@@ -848,7 +848,11 @@ namespace Crow
 			}
 
 			_activeWidget.onMouseUp (_activeWidget, e);
+			GraphicObject lastActive = _activeWidget;
 			ActiveWidget = null;
+			if (!lastActive.MouseIsIn (Mouse.Position)) {
+				ProcessMouseMove (Mouse.X, Mouse.Y);
+			}
 			return true;
 		}
 		/// <summary>

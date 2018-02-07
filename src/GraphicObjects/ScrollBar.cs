@@ -38,6 +38,7 @@ namespace Crow
 		//TODO:could be replaced by a template for a Slider
 
 		Orientation _orientation;
+		int _cursorSize;
 
 		#region CTOR
 		protected ScrollBar () : base(){}
@@ -54,6 +55,17 @@ namespace Crow
 				_orientation = value;
 				NotifyValueChanged ("Orientation", _orientation);
 				RegisterForGraphicUpdate ();
+			}
+		}
+		[XmlAttributeAttribute()][DefaultValue(20)]
+		public virtual int CursorSize {
+			get { return _cursorSize; }
+			set {
+				if (_cursorSize == value)
+					return;
+				_cursorSize = value;
+				RegisterForGraphicUpdate ();
+				NotifyValueChanged ("CursorSize", _cursorSize);
 			}
 		}
 		public void onScrollBack (object sender, MouseButtonEventArgs e)

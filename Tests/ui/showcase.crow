@@ -14,6 +14,8 @@
 					Font="Courriernew 10"/>
 			</Scroller>
 			<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}"
+				LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
+				CursorSize="{../scroller1.ChildHeightRatio}"
 				Maximum="{../scroller1.MaximumScroll}" Orientation="Vertical"
 				Width="14" />
 		</HorizontalStack>

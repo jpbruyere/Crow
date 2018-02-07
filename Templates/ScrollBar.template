@@ -1,21 +1,18 @@
 <?xml version="1.0"?>
-<Border BorderWidth="1" Foreground="LightGray">
+<Border BorderWidth="1" Foreground="Jet">
 	<GenericStack Orientation="{./Orientation}" Spacing="0">
-		<Button MouseRepeat="true" Width="12" Height="12" MouseClick="./onScrollBack"
-			Template="#Crow.Templates.ArrowBut.template">
-			<Image Margin="1" Path="#Crow.Images.Icons.updown.svg" SvgSub="up"/>
-		</Button>
+		<Shape Style="ArrowBut"	MouseClick="./onScrollBack" Path="M 5.5,0.5 L 10.5,10.5 L 0.5,10.5 Z"/>
 		<Slider Name="Slider"
 			Orientation="{./Orientation}"
 			Value="{²./Value}"
 			Maximum="{./Maximum}"
+			CursorSize="{./CursorSize}"
 			Height="{./HeightPolicy}" Width="{./WidthPolicy}"
 			LargeIncrement="{./LargeIncrement}"
 			SmallIncrement="{./SmallIncrement}"
+			CursorColor="hgradient|0:Gray|1:Jet"
+			Foreground="Jet"
 			Background="hgradient|0:DimGray|0.1:Gray|0.95:Gray|1:White"/>
-		<Button MouseRepeat="true" Width="12" Height="12" MouseClick="./onScrollForth"
-			Template="#Crow.Templates.ArrowBut.template">
-			<Image Margin="1" Path="#Crow.Images.Icons.updown.svg" SvgSub="down"/>
-		</Button>
+		<Shape Style="ArrowBut"	MouseClick="./onScrollForth" Path="M 0.5,0.5 L 10.5,0.5 L 5.5,10.5 Z"/>
 	</GenericStack>
 </Border>

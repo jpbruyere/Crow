@@ -147,3 +147,16 @@ CheckBoxAlt {
 	Checked={Background=DarkSlateGray;Foreground=LightGray;};
 	Unchecked = {Background=Transparent;Foreground=DimGray;};
 }
+
+ArrowBut {
+	MouseRepeat=true;
+	Height=Fit;
+	Width=Fit;
+	Focusable=true;
+	Foreground=Jet;
+	Background=hgradient|0:Gray|1:Jet;
+	MouseDown={Background=hgradient|0:White|0.2:BlueCrayola|1:Jet};
+	MouseUp={Background=hgradient|0:Gray|1:Jet};
+	MouseEnter={Foreground=Black};
+	MouseLeave={Foreground=Jet};
+}
