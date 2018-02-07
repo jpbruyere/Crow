@@ -37,7 +37,7 @@ namespace Crow
 	public class DirectoryView : TemplatedControl
 	{
 		#region CTOR
-		public DirectoryView () : base(){}
+		protected DirectoryView() : base(){}
 		public DirectoryView (Interface iface) : base(iface){}
 		#endregion
 

@@ -34,7 +34,7 @@ namespace Crow
 	public class HueSelector : ColorSelector
 	{
 		#region CTOR
-		public HueSelector () : base(){}
+		protected HueSelector () : base(){}
 		public HueSelector (Interface iface) : base(iface)
 		{
 		}

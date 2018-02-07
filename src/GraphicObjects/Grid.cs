@@ -43,7 +43,7 @@ namespace Crow
     public class Grid : Group
     {
 		#region CTOR
-		public Grid () : base(){}
+		protected Grid () : base(){}
 		public Grid(Interface iface) : base(iface)
 		{            
 		}
@@ -55,17 +55,6 @@ namespace Crow
 		int _rowCount;
 		#endregion
 
-		public override void AddChild (GraphicObject child)
-		{
-			base.AddChild (child);
-			this.RegisterForLayouting (LayoutingType.ArrangeChildren);
-		}
-		public override void RemoveChild (GraphicObject child)
-		{
-			base.RemoveChild (child);
-			this.RegisterForLayouting (LayoutingType.ArrangeChildren);
-		}
-
 		#region Public Properties
         [XmlAttributeAttribute()][DefaultValue(2)]
         public int Spacing
@@ -73,7 +62,7 @@ namespace Crow
 			get { return _spacing; }
             set { _spacing = value; }
         }
-        [XmlAttributeAttribute()][DefaultValue(1)]
+        [XmlAttributeAttribute()][DefaultValue(2)]
         public virtual int ColumnCount
         {
             get { return _columnCount; }
@@ -87,7 +76,7 @@ namespace Crow
 				this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 			}
         }
-		[XmlAttributeAttribute()][DefaultValue(1)]
+		[XmlAttributeAttribute()][DefaultValue(2)]
 		public virtual int RowCount
 		{
 			get { return _rowCount; }
@@ -127,6 +116,12 @@ namespace Crow
 //
 //			return tmp;
 //		}
+		public override void ChildrenLayoutingConstraints (ref LayoutingType layoutType)
+		{
+			//Prevent child repositionning
+			layoutType &= (~LayoutingType.Positioning);
+		}
+		public override bool ArrangeChildren { get { return true; } }
 		public virtual void ComputeChildrenPositions()
 		{
 			int slotWidth = CaseWidth;
@@ -139,17 +134,18 @@ namespace Crow
 					GraphicObject c = Children [idx];
 					if (!c.Visible)
 						continue;
-					//ensure Item are not realigned
-					c.HorizontalAlignment = HorizontalAlignment.Left;
-					c.VerticalAlignment = VerticalAlignment.Top;
-					c.Left = curX * (slotWidth + Spacing);
-					c.Top = curY * (slotHeight + Spacing);
-					c.Width = slotWidth;
-					c.Height = slotHeight;
+					c.Slot.X = curX * (slotWidth + Spacing);
+					c.Slot.Y = curY * (slotHeight + Spacing);
+					//c.Slot.Width = slotWidth;
+					//c.Slot.Height = slotHeight;
 				}
 			}
+			IsDirty = true;
 		}
-
+		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
+		{
+			//base.OnChildLayoutChanges (sender, arg);
+		}
 
 		public override bool UpdateLayout (LayoutingType layoutType)
 		{

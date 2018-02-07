@@ -35,7 +35,7 @@ namespace Crow
 	public class Wrapper : GenericStack
 	{
 		#region CTOR
-		public Wrapper() : base(){}
+		protected Wrapper() : base(){}
 		public Wrapper (Interface iface) : base(iface){}
 		#endregion
 

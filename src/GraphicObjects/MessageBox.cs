@@ -33,7 +33,7 @@ namespace Crow
 	public class MessageBox : Window
 	{
 		#region CTOR
-		public MessageBox () : base(){}
+		protected MessageBox () : base(){}
 		public MessageBox (Interface iface) : base(iface){}
 		#endregion
 

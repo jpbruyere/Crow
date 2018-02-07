@@ -7,11 +7,11 @@
 	</Border>
 	<VerticalStack MinimumSize="8,10" Width="20%" Height="Stretched" Spacing="0" Margin="0" Background="Red">
 		<Button MouseRepeat="true" Width="Stretched" Height="50%" Margin="0" MouseClick="./onUp"
-			Template="#Crow.Templates.ArrowButTemplate.crow">
+			Template="#Crow.Templates.ArrowBut.template">
 			<Image Path="#Crow.Images.Icons.updown.svg" SvgSub="up" Margin="0"/>
 		</Button>				
 		<Button MouseRepeat="true" Width="Stretched" Height="50%" Margin="0" MouseClick="./onDown" 
-			Template="#Crow.Templates.ArrowButTemplate.crow">
+			Template="#Crow.Templates.ArrowBut.template">
 			<Image Path="#Crow.Images.Icons.updown.svg" SvgSub="down" Margin="0"/>
 		</Button>
 	</VerticalStack>

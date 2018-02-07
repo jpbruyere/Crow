@@ -36,7 +36,7 @@ namespace Crow
 	public class ColorPicker : TemplatedControl
 	{
 		#region CTOR
-		public ColorPicker () : base(){}
+		protected ColorPicker() : base(){}
 		public ColorPicker (Interface iface) : base(iface){}
 		#endregion
 

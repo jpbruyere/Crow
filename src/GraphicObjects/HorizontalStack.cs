@@ -38,7 +38,7 @@ namespace Crow
     public class HorizontalStack : GenericStack
     {
 		#region CTOR
-		public HorizontalStack () : base(){}
+		protected HorizontalStack () : base(){}
 		public HorizontalStack(Interface iface) : base(iface)
         {            
         }

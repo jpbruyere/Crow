@@ -33,7 +33,7 @@ namespace Crow
     public class Popper : TemplatedContainer
     {
 		#region CTOR
-		public Popper () : base(){}
+		protected Popper () : base(){}
 		public Popper (Interface iface) : base(iface){}
 		#endregion
 

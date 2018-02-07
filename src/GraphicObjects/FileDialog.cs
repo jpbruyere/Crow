@@ -41,7 +41,7 @@ namespace Crow
 	public class FileDialog: Window
 	{
 		#region CTOR
-		public FileDialog () : base(){}
+		protected FileDialog() : base(){}
 		public FileDialog (Interface iface) : base(iface){}
 		#endregion
 

@@ -50,10 +50,11 @@ namespace Crow
 				values.RemoveAt (0);
 			RegisterForRedraw ();
 		}
-
-		public Trend ()
+		#region CTOR
+		protected Trend () : base()
 		{
 		}
+		#endregion
 		[XmlIgnore]public virtual int NewValue {
 			set {
 				AddValue (value);

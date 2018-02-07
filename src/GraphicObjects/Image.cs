@@ -33,6 +33,11 @@ using System.Diagnostics;
 
 namespace Crow
 {
+	/// <summary>
+	/// Base widget to display an image. Accepts bitmaps and SVGs.
+	/// </summary>
+	/// <remarks>
+	/// </remarks>
 	public class Image : GraphicObject
 	{
 		Picture _pic;
@@ -41,6 +46,9 @@ namespace Crow
 		double opacity;
 
 		#region Public properties
+		/// <summary>
+		/// If false, original size will be kept in any case.
+		/// </summary>
 		[XmlAttributeAttribute][DefaultValue(true)]
 		public virtual bool Scaled {
 			get { return scaled; }
@@ -55,6 +63,9 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
+		/// <summary>
+		/// If image is scaled, proportions will be preserved.
+		/// </summary>
 		[XmlAttributeAttribute][DefaultValue(true)]
 		public virtual bool KeepProportions {
 			get { return keepProps; }
@@ -69,6 +80,9 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
+		/// <summary>
+		/// Image file path, may be on disk or embedded. Accepts bitmaps or SVG drawings.
+		/// </summary>
         [XmlAttributeAttribute]
 		public string Path {
 			get { return _pic == null ? "" : _pic.Path; }
@@ -90,6 +104,10 @@ namespace Crow
 				NotifyValueChanged ("Path", Path);
 			}
 		}
+		/// <summary>
+		/// Used only for svg images, repaint only node named referenced in SvgSub.
+		/// If null, all the svg is rendered
+		/// </summary>
 		[XmlAttributeAttribute]
 		public string SvgSub {
 			get { return _svgSub; }
@@ -100,6 +118,10 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
+		/// <summary>
+		/// Object holding the image data once loaded, may be used directely to pupulate this control without 
+		/// specifying a path.
+		/// </summary>
 		[XmlAttributeAttribute]
 		public Picture Picture {
 			get { return _pic; }
@@ -111,6 +133,10 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
+		/// <summary>
+		/// Opacity parameter for the image
+		/// </summary>
+		// TODO:could be moved in GraphicObject
 		[XmlAttributeAttribute()][DefaultValue(1.0)]
 		public virtual double Opacity {
 			get { return opacity; }
@@ -125,7 +151,14 @@ namespace Crow
 		#endregion
 
 		#region CTOR
-		public Image () : base(){}
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Crow.Image"/> class.
+		/// </summary>
+		protected Image () : base(){}
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Crow.Image"/> class from code
+		/// </summary>
+		/// <param name="iface">interface to bound to</param>
 		public Image (Interface iface) : base(iface)
 		{
 		}

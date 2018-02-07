@@ -63,7 +63,6 @@
     <Compile Include="src\Enums.cs" />
     <Compile Include="src\GraphicObjects\GenericStack.cs" />
     <Compile Include="src\CompilerServices\CompilerServices.cs" />
-    <Compile Include="src\GraphicObjects\AnalogMeter.cs" />
     <Compile Include="src\GraphicObjects\Border.cs" />
     <Compile Include="src\Font.cs" />
     <Compile Include="src\GraphicObjects\Window.cs" />
@@ -211,8 +210,6 @@
     <Compile Include="src\Mono.Cairo\Win32Surface.cs" />
     <Compile Include="src\Mono.Cairo\XcbSurface.cs" />
     <Compile Include="src\Mono.Cairo\XlibSurface.cs" />
-    <Compile Include="src\GraphicObjects\DocksView.cs" />
-    <Compile Include="src\GraphicObjects\DockingView.cs" />
     <Compile Include="src\IML\IMLContext.cs" />
     <Compile Include="src\Mono.Cairo\MeshPattern.cs" />
   </ItemGroup>
@@ -251,12 +248,9 @@
     <EmbeddedResource Include="Images\Icons\buttonB.svg" />
     <EmbeddedResource Include="Images\Icons\checkbox.svg" />
     <EmbeddedResource Include="Images\Icons\radiobutton.svg" />
-    <EmbeddedResource Include="Templates\Spinner %28copier%29.goml" />
     <EmbeddedResource Include="Images\Icons\expandable.svg" />
-    <EmbeddedResource Include="Templates\Checkbox2.goml" />
     <EmbeddedResource Include="Images\Icons\tetra.png" />
     <EmbeddedResource Include="Images\Icons\exit.svg" />
-    <EmbeddedResource Include="Templates\AnalogMeter0.goml" />
     <EmbeddedResource Include="Images\meter.svg" />
     <EmbeddedResource Include="Images\Icons\member.svg" />
     <EmbeddedResource Include="Images\Icons\exit2.svg" />
@@ -264,9 +258,6 @@
     <EmbeddedResource Include="Images\Icons\iconInfo.svg">
       <LogicalName>Crow.Images.Icons.Informations.svg</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="Templates\tmpDirItem.goml" />
-    <EmbeddedResource Include="Templates\ScrollingListBox.goml" />
-    <EmbeddedResource Include="Templates\imgItemTemplate.goml" />
     <EmbeddedResource Include="Images\Icons\Cursors\cross" />
     <EmbeddedResource Include="Images\Icons\Cursors\bottom_left_corner" />
     <EmbeddedResource Include="Images\Icons\Cursors\bottom_right_corner" />
@@ -278,9 +269,7 @@
     <EmbeddedResource Include="Images\Icons\Cursors\hand" />
     <EmbeddedResource Include="Images\Icons\Cursors\help" />
     <EmbeddedResource Include="Images\Icons\Cursors\move" />
-    <EmbeddedResource Include="Templates\ArrowButTemplate.crow" />
     <EmbeddedResource Include="Images\crow0.svg" />
-    <EmbeddedResource Include="Templates\Dummy.goml" />
     <EmbeddedResource Include="Images\Icons\crow.png" />
     <EmbeddedResource Include="Images\Icons\crow.svg" />
     <EmbeddedResource Include="Default.style" />
@@ -338,7 +327,6 @@
       <LogicalName>Crow.Window.template</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="Images\Icons\Cursors\ibeam" />
-    <EmbeddedResource Include="Templates\treeList.crow" />
     <EmbeddedResource Include="Templates\MenuItem.template">
       <LogicalName>Crow.MenuItem.template</LogicalName>
     </EmbeddedResource>
@@ -360,19 +348,17 @@
     <EmbeddedResource Include="Icons\exit-symbol.svg" />
     <EmbeddedResource Include="Icons\paste-on-document.svg" />
     <EmbeddedResource Include="Icons\question.svg" />
-    <EmbeddedResource Include="Templates\FileDialog2.template">
-      <LogicalName>Crow.FileDialog2.template</LogicalName>
-    </EmbeddedResource>
     <EmbeddedResource Include="Icons\folder.svg" />
     <EmbeddedResource Include="Icons\file.svg" />
     <EmbeddedResource Include="Icons\level-up.svg" />
-    <EmbeddedResource Include="Templates\DockingView.template">
-      <LogicalName>Crow.DockingView.template</LogicalName>
-    </EmbeddedResource>
     <EmbeddedResource Include="Templates\FileItems.template" />
     <EmbeddedResource Include="Templates\DefaultItem.template">
       <LogicalName>Crow.DefaultItem.template</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Templates\ScrollingListBox.template" />
+    <EmbeddedResource Include="Templates\imgItem.template" />
+    <EmbeddedResource Include="Templates\ArrowBut.template" />
+    <EmbeddedResource Include="Templates\treeList.template" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Crow.dll.config">

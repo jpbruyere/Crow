@@ -39,7 +39,7 @@ namespace Crow
 	public class ProgressBar : NumericControl
     {
 		#region CTOR
-		public ProgressBar () : base(){}
+		protected ProgressBar () : base(){}
 		public ProgressBar(Interface iface) : base(iface){}
 		#endregion
 

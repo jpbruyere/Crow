@@ -40,7 +40,7 @@ namespace Crow
 		Orientation _orientation;
 
 		#region CTOR
-		public ScrollBar () : base(){}
+		protected ScrollBar () : base(){}
 		public ScrollBar(Interface iface) : base(iface)	{}
 		#endregion
 

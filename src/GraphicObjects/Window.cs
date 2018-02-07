@@ -65,7 +65,7 @@ namespace Crow
 		#endregion
 
 		#region CTOR
-		public Window() : base(){}
+		protected Window() : base(){}
 		public Window (Interface iface) : base(iface){}
 		#endregion
 

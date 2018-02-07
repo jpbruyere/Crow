@@ -35,7 +35,7 @@ namespace Crow
 	public class ComboBox : ListBox
     {
 		#region CTOR
-		public ComboBox () : base(){}
+		protected ComboBox() : base(){}
 		public ComboBox (Interface iface) : base(iface){}
 		#endregion
 

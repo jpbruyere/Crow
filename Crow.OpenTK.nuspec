@@ -2,40 +2,32 @@
 <package >
 	<metadata>
 		<id>Crow.OpenTK</id>
-		<version>0.5.6</version>
+		<version>0.6.0-pre1</version>
 		<title>C# Rapid Open Widget Toolkit</title>
 		<authors>JP Bruyere</authors>
 		<owners>Grand Tetras Software</owners>
 		<licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
-		<projectUrl>https://jpbruyere.github.io/Crow/</projectUrl>
+		<projectUrl>https://github.com/jpbruyere/Crow/wiki</projectUrl>
 		<iconUrl>https://jpbruyere.github.io/Crow/images/crow.png</iconUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>
-CROW is a pure C# widget toolkit with templates, styles, compositing, and bindings.
+C.R.O.W. is a widget toolkit and rendering engine entirely developed in C# with templates, styles, compositing, and bindings.
 Crow.OpenTK is the OpenTK ready version.
 		</description>
 		<summary>
-CROW is a pure C# widget toolkit with templates, styles, compositing, and bindings.
-Crow.OpenTK is the OpenTK ready version.
 
-Native libraries dependencies:
-	- cairo
-	- librsvg (and its dependencies (glib2, libxml, fontconfig, etc)
-
-Precompiled binaries of those libs are available at http://ftp.gnome.org/pub/GNOME/binaries/
-
-For more information, please visit https://jpbruyere.github.io/Crow/.
 		</summary>
 		<releaseNotes>
-			- Bug fix (#35) of 0.5.4
-			- embed Cairo bindings in Crow.
-			- use of CairoRegion to handle clipping
-			- IDisposable for GraphicObject
-			- Border style Raised/Sunken
+			- Bug fix #36
+			- group item templates in single file
+			- instantiation from code clarification
+			- Only run on mono >= 5.0
+			- Cairo mesh patterns support.
+			- Image resources sharing among controls.            
 		</releaseNotes>
 		<copyright>Copyright 2013-2017</copyright>
 		<dependencies>
-			<dependency id="OpenTK" version="2.0" />
+			<dependency id="OpenTK" version="3.0.0-git00041" />
 		</dependencies>
         <tags>Crow OpenTK OpenGL Widget Interface GUI C# .Net Mono</tags>
         <references>

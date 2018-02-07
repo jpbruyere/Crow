@@ -43,7 +43,8 @@ namespace Crow
 	/// The Interface Class is the root of crow graphic trees. It is thread safe allowing
 	/// application to run multiple interfaces in different threads.
 	/// It provides the Dirty bitmap and zone of the interface to be drawn on screen.
-	///
+	/// </summary>
+	/// <remarks>
 	/// The Interface contains :
 	/// 	- rendering and layouting queues and logic.
 	/// 	- helpers to load XML interfaces files directely bound to this interface
@@ -61,7 +62,7 @@ namespace Crow
 	/// 
 	/// The resulting surface (a byte array in the OpenTK renderer) is made available and protected with the
 	/// RenderMutex of the interface.
-	/// </summary>
+	/// </remarks>
 	public class Interface : ILayoutable
 	{
 		#region CTOR

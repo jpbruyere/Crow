@@ -38,7 +38,7 @@ namespace Crow
     public class Label : GraphicObject
     {
 		#region CTOR
-		public Label () : base(){}
+		protected Label () : base(){}
 
 		public Label(Interface iface) : base(iface)
 		{

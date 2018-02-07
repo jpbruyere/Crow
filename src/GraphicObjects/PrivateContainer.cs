@@ -41,7 +41,7 @@ namespace Crow
 	public class PrivateContainer : GraphicObject
 	{
 		#region CTOR
-		public PrivateContainer () : base(){}
+		protected PrivateContainer () : base(){}
 		public PrivateContainer (Interface iface) : base(iface){}
 		#endregion
 

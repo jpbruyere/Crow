@@ -36,7 +36,7 @@ namespace Crow
     public class GroupBox : TemplatedContainer
     {		
 		#region CTOR
-		public GroupBox () : base(){}
+		protected GroupBox () : base(){}
 		public GroupBox(Interface iface) : base(iface){}
 		#endregion
 	}

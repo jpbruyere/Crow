@@ -38,7 +38,7 @@ namespace Crow
 	public class Scroller : Container
 	{
 		#region CTOR
-		public Scroller () : base(){}
+		protected Scroller () : base(){}
 		public Scroller (Interface iface) : base(iface){}
 		#endregion
 
