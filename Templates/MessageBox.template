@@ -4,11 +4,11 @@
 				MouseLeave="./onBorderMouseLeave">
 	<VerticalStack Background="{./Background}">
 		<Border BorderWidth="0" Foreground="White" Height="Fit" Width="Stretched" MinimumSize="200,0"
-				Background="vgradient|0:0.4,0.6,0.0,0.5|1:0.0,0.8,0.8,0.9">
+				Background="{./TitleBarBackground}">
 			<HorizontalStack Name="hs" Margin="2" Spacing="1" Height="Fit" >
 				<GraphicObject Width="5" Height="5"/>
 				<Image Margin="1" Width="12" Height="12" Path="{./Icon}"/>
-				<Label Width="Stretched" Foreground="White" Margin="1" TextAlignment="Center" Text="{./Caption}" />
+				<Label Width="Stretched" Foreground="{./TitleBarForeground}" Margin="1" TextAlignment="Center" Text="{./Caption}" />
 				<Border CornerRadius="3" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
 					MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
 					<Image Focusable="true" Name="Image" Path="#Crow.Images.Icons.exit2.svg"

@@ -28,6 +28,8 @@ using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Crow
 {
@@ -46,7 +48,8 @@ namespace Crow
 		#endregion
 
 		string currentDirectory = "/";
-		bool showFiles;
+		bool showFiles, showHidden;
+		string fileMask = "*.*";
 
 		object _selectedItem;
 		[XmlIgnore]public object SelectedItem {
@@ -71,6 +74,28 @@ namespace Crow
 				NotifyValueChanged ("FileSystemEntries", FileSystemEntries);
 			}
 		}
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public virtual bool ShowHidden {
+			get { return showHidden; }
+			set {
+				if (showHidden == value)
+					return;
+				showHidden = value;
+				NotifyValueChanged ("ShowHidden", showHidden);
+				NotifyValueChanged ("FileSystemEntries", FileSystemEntries);
+			}
+		}
+		[XmlAttributeAttribute][DefaultValue("*.*")]
+		public virtual string FileMask {
+			get { return fileMask; }
+			set {
+				if (fileMask == value)
+					return;
+				fileMask = value;
+				NotifyValueChanged ("FileMask", fileMask);
+				NotifyValueChanged ("FileSystemEntries", FileSystemEntries);
+			}
+		}
 		[XmlAttributeAttribute][DefaultValue("/")]
 		public virtual string CurrentDirectory {
 			get { return currentDirectory; }
@@ -83,11 +108,21 @@ namespace Crow
 			}
 		}
 		[XmlIgnore]public FileSystemInfo[] FileSystemEntries {
-			get { 
-				return string.IsNullOrEmpty(CurrentDirectory) ? null :
-					showFiles ?					
-					new DirectoryInfo (CurrentDirectory).GetFileSystemInfos () :
-					new DirectoryInfo(CurrentDirectory).GetDirectories(); 
+			get {
+				try {
+					if (string.IsNullOrEmpty(CurrentDirectory))
+						return null;
+					DirectoryInfo di = new DirectoryInfo(CurrentDirectory);
+					List<FileSystemInfo> fi = new List<FileSystemInfo> (di.GetDirectories());
+					if (showFiles && !string.IsNullOrEmpty(fileMask))
+						fi.AddRange(di.GetFiles(fileMask));
+					return showHidden ?
+						fi.ToArray() :
+						fi.Where(f=>!f.Attributes.HasFlag (FileAttributes.Hidden)).ToArray();
+				} catch (Exception ex) {
+					Console.WriteLine (ex.ToString ());
+					return null;
+				}
 			}
 		}
 		public void onSelectedItemChanged (object sender, SelectionChangeEventArgs e){

@@ -359,6 +359,7 @@
     <EmbeddedResource Include="Templates\imgItem.template" />
     <EmbeddedResource Include="Templates\ArrowBut.template" />
     <EmbeddedResource Include="Templates\treeList.template" />
+    <EmbeddedResource Include="Templates\CheckBox2.template" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Crow.dll.config">

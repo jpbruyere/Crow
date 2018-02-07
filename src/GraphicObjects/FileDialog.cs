@@ -46,6 +46,7 @@ namespace Crow
 		#endregion
 
 		string searchPattern, curDir, _selectedFile, _selectedDir;
+		bool showHidden, showFiles;
 
 		#region events
 		public event EventHandler OkClicked;
@@ -72,6 +73,26 @@ namespace Crow
 				searchPattern = value;
 				NotifyValueChanged ("SearchPattern", searchPattern);
 
+			}
+		}
+		[XmlAttributeAttribute()][DefaultValue(false)]
+		public virtual bool ShowHidden {
+			get { return showHidden; }
+			set {
+				if (showHidden == value)
+					return;
+				showHidden = value;
+				NotifyValueChanged ("ShowHidden", showHidden);
+			}
+		}
+		[XmlAttributeAttribute()][DefaultValue(true)]
+		public virtual bool ShowFiles {
+			get { return showFiles; }
+			set {
+				if (showFiles == value)
+					return;
+				showFiles = value;
+				NotifyValueChanged ("ShowFiles", showFiles);
 			}
 		}
 		[XmlAttributeAttribute]public string SelectedFile {
@@ -119,14 +140,11 @@ namespace Crow
 				CurrentDirectory = SelectedDirectory;
 			else {
 				OkClicked.Raise (this, null);
-				unloadDialog ((sender as GraphicObject).CurrentInterface);
+				CurrentInterface.DeleteWidget (this);
 			}
 		}
 		void onCancel(object sender, MouseButtonEventArgs e){
-			unloadDialog ((sender as GraphicObject).CurrentInterface);
-		}
-		void unloadDialog(Interface host){
-			host.DeleteWidget (this);
+			CurrentInterface.DeleteWidget (this);
 		}
 	}
 }

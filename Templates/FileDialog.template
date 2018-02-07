@@ -4,11 +4,11 @@
 				MouseEnter="./onBorderMouseEnter"
 				MouseLeave="./onBorderMouseLeave">
 	<VerticalStack Spacing="0">
-		<HorizontalStack Background="vgradient|0:0.4,0.6,0.0,0.5|1:0.0,0.8,0.8,0.9"
+		<HorizontalStack Background="{./TitleBarBackground}"
 				Name="hs" Margin="2" Spacing="0" Height="Fit">
 			<GraphicObject Width="5"/>
 			<Image Margin="1" Width="12" Height="12" Path="{./Icon}"/>
-			<Label Width="Stretched" Foreground="White" Margin="1" TextAlignment="Center" Text="{./Caption}" />
+			<Label Width="Stretched" Foreground="{./TitleBarForeground}" Margin="1" TextAlignment="Center" Text="{./Caption}" />
 			<Border CornerRadius="0" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
 				MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
 				<Image Focusable="true" Name="Image" Margin="0" Width="Stretched" Height="Stretched" Path="#Crow.Images.Icons.exit2.svg"
@@ -23,30 +23,36 @@
 						<Image Margin="2" Width="14" Height="14"
 							Path="#Crow.Icons.level-up.svg"/>
 					</Button>
-					<TextBox Text="{²./CurrentDirectory}"/>
+					<TextBox Style="TxtInFileDialog" Text="{²./CurrentDirectory}"/>
 				</HorizontalStack>
-				<DirectoryView ShowFiles="true" Name="fv" CurrentDirectory="{./CurrentDirectory}" SelectedItemChanged="./onFVSelectedItemChanged"
+				<DirectoryView ShowHidden="{²../cbShowHidden.IsChecked}" FileMask="{²../txtFileMask.Text}" ShowFiles="{²../cbShowFiles.IsChecked}" Name="fv" CurrentDirectory="{./CurrentDirectory}" SelectedItemChanged="./onFVSelectedItemChanged"
 						Width="100%" Margin="0" MouseDoubleClick="./onFileSelect">
-						<Template>
-							<ListBox ItemTemplate="#Crow.Templates.FileItems.template" Name="fileView" Data="{./FileSystemEntries}"
-								SelectedItemChanged="./onSelectedItemChanged">
-								<Template>
-									<HorizontalStack>
-										<Scroller ScrollX="{../scrollbar1.Value}"  Name="scroller1"
-											VerticalScrolling="true" HorizontalScrolling="false">
-											<VerticalStack Height="Fit" VerticalAlignment="Top"
-												Name="ItemsContainer" Margin="0" Spacing="1"/>
-										</Scroller>
-										<ScrollBar Name="scrollbar1" Value="{²../scroller1.ScrollY}"
-											Maximum="{../scroller1.MaximumScroll}" Orientation="Vertical"
-											Width="14" />
-									</HorizontalStack>
-								</Template>
-							</ListBox>
-						</Template>
-					</DirectoryView>
-				<TextBox Text="{./SelectedDirectory}"/>
-				<TextBox Text="{²./SelectedFile}"/>
+					<Template>
+						<ListBox ItemTemplate="#Crow.Templates.FileItems.template" Name="fileView" Data="{./FileSystemEntries}"
+							SelectedItemChanged="./onSelectedItemChanged">
+							<Template>
+								<HorizontalStack>
+									<Scroller ScrollX="{../scrollbar1.Value}"  Name="scroller1"
+										VerticalScrolling="true" HorizontalScrolling="false">
+										<VerticalStack Height="Fit" VerticalAlignment="Top"
+											Name="ItemsContainer" Margin="0" Spacing="1"/>
+									</Scroller>
+									<ScrollBar Name="scrollbar1" Value="{²../scroller1.ScrollY}"
+										Maximum="{../scroller1.MaximumScroll}" Orientation="Vertical"
+										Width="14" />
+								</HorizontalStack>
+							</Template>
+						</ListBox>
+					</Template>
+				</DirectoryView>
+				<HorizontalStack Height="Fit">
+					<TextBox Style="TxtInFileDialog" Text="{²./SelectedFile}"/>
+					<TextBox Style="TxtInFileDialog" Width="50" Name="txtFileMask" Text="{²./SearchPattern}"/>
+				</HorizontalStack>
+				<HorizontalStack Margin="5" Fit="true" HorizontalAlignment="Right">
+					<CheckBox Style="CheckBoxAlt" Name="cbShowFiles" Caption="Show Files" IsChecked="{²./ShowFiles}"/>
+					<CheckBox Style="CheckBoxAlt" Name="cbShowHidden" Caption="Show Hidden" IsChecked="{²./ShowHidden}"/>
+				</HorizontalStack>
 				<HorizontalStack Fit="true" HorizontalAlignment="Right">
 					<Button Caption="Ok" MouseClick="./onFileSelect"/>
 					<Button Caption="Cancel" MouseClick="./onCancel"/>

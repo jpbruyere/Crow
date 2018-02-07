@@ -31,6 +31,10 @@ using System.Reflection;
 
 namespace Crow
 {
+	/// <summary>
+	/// Parser for style files.
+	/// </summary>
+	//TODO: style key shared by different class may use only first encouneter class setter, which can cause bug.
 	public class StyleReader : StreamReader
 	{
 		enum readerState { classNames, propertyName, expression }
