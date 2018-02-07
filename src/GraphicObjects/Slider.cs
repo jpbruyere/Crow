@@ -83,7 +83,7 @@ namespace Crow
 		public virtual int CursorSize {
 			get { return _cursorSize; }
 			set {
-				if (_cursorSize == value)
+				if (_cursorSize == value || value < 8)
 					return;
 				_cursorSize = value;
 				RegisterForGraphicUpdate ();
@@ -132,9 +132,14 @@ namespace Crow
 			if (_orientation == Orientation.Horizontal) {
 				pStart = r.TopLeft + new Point (_cursorSize / 2, r.Height / 2);
 				pEnd = r.TopRight + new Point (-_cursorSize / 2, r.Height / 2);
+				pStart.Y += 0.5;
+				pEnd.Y += 0.5;
 			} else {
 				pStart = r.TopLeft + new Point (r.Width / 2, _cursorSize / 2);
 				pEnd = r.BottomLeft + new Point (r.Width / 2,- _cursorSize / 2);
+				pStart.X += 0.5;
+				pEnd.X += 0.5;
+
 			}
 
 			DrawGraduations (gr, pStart,pEnd);

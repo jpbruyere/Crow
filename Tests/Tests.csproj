@@ -341,6 +341,9 @@
     </None>
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
+    <None Include="Interfaces\Divers\testShape.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />

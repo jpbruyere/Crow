@@ -212,6 +212,7 @@
     <Compile Include="src\Mono.Cairo\XlibSurface.cs" />
     <Compile Include="src\IML\IMLContext.cs" />
     <Compile Include="src\Mono.Cairo\MeshPattern.cs" />
+    <Compile Include="src\GraphicObjects\Shape.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

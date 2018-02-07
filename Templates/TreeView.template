@@ -8,6 +8,8 @@
 	</Scroller>
 	<ScrollBar
 		Name="scrollbar1"
+		LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
+		CursorSize="{../scroller1.ChildHeightRatio}"
 		Value="{../scroller1.ScrollY}"
 		Maximum="{../scroller1.MaximumScroll}"
 		Width="14" Orientation="Vertical"/>
