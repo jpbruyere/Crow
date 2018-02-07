@@ -36,7 +36,7 @@ namespace Crow
 	public class CheckBox : TemplatedControl
 	{
 		#region CTOR
-		public CheckBox () : base(){}
+		protected CheckBox() : base(){}
 		public CheckBox (Interface iface) : base(iface){}
 		#endregion
 

@@ -39,7 +39,7 @@ namespace Crow
 	public class TemplatedContainer : TemplatedControl
 	{
 		#region CTOR
-		public TemplatedContainer() : base(){}
+		protected TemplatedContainer() : base(){}
 		public TemplatedContainer (Interface iface) : base(iface){}
 		#endregion
 

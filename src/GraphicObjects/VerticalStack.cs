@@ -36,10 +36,12 @@ namespace Crow
 	/// </summary>
     public class VerticalStack : GenericStack
     {
-		public VerticalStack() : base(){}
+		#region CTOR
+		protected VerticalStack() : base(){}
 		public VerticalStack(Interface iface) : base(iface)
         {
         }
+		#endregion
 
         [System.Xml.Serialization.XmlIgnore]
         public override Orientation Orientation

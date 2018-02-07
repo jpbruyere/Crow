@@ -44,7 +44,7 @@ namespace Crow
 	public abstract class TemplatedControl : PrivateContainer
 	{
 		#region CTOR
-		public TemplatedControl() : base(){}
+		protected TemplatedControl() : base(){}
 		public TemplatedControl (Interface iface) : base(iface){}
 		#endregion
 

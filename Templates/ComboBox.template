@@ -6,7 +6,7 @@
 				<TextBox MinimumSize="80,10" Margin="1" Foreground="Black" Background="White"
 					Text="{../../../../SelectedItem}"/>
 				<Button Width="14" Height="14" Focusable="false"
-					Template="#Crow.Templates.ArrowButTemplate.crow">
+					Template="#Crow.Templates.ArrowBut.template">
 					<Image Margin="0"  Path="#Crow.Images.Icons.updown.svg" SvgSub="down"/>
 				</Button>
 			</HorizontalStack>

@@ -1,8 +1,8 @@
 ﻿//
-// AnalogMeter.cs
+// SimpleGauge.cs
 //
 // Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
+//       jp <>
 //
 // Copyright (c) 2013-2017 Jean-Philippe Bruyère
 //
@@ -23,46 +23,67 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-
 using System;
-using System.Xml.Serialization;
-using System.ComponentModel;
+using Crow;
 using Cairo;
 
-namespace Crow
-{
-	public class AnalogMeter : NumericControl
+namespace Tutorials2
+{	
+	/// <summary>
+	/// Hexa container.
+	/// </summary>
+	/// <remarks>
+	/// </remarks>
+	public class HexaContainer : Container
 	{
-		#region CTOR
-		public AnalogMeter () : base(){}
-		public AnalogMeter (Interface iface) : base(iface){}
-		#endregion
+		const double pi3 = Math.PI / 3.0;
 
-		#region GraphicObject Overrides
+		public HexaContainer () : base() {}
+		public HexaContainer (Interface iface): base (iface){}
+
 		protected override void onDraw (Context gr)
-		{			
-			base.onDraw (gr);
-
-			Rectangle r = ClientRectangle;
-			Point m = r.Center;
-
+		{
 			gr.Save ();
 
+			if (ClipToClientRect) {
+				//clip to client zone
+				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+				gr.Clip ();
+			}
 
-			double aUnit = Math.PI*2.0 / (Maximum - Minimum);
-			gr.Translate (m.X, r.Height *1.1);
-			gr.Rotate (Value/4.0 * aUnit - Math.PI/4.0);
-			gr.Translate (-m.X, -m.Y);
+			Rectangle r = ClientRectangle;
+			double radius = 0,
+			cx = r.Width / 2.0 + r.X,
+			cy = r.Height / 2.0 + r.Y;
 
-			gr.LineWidth = 2;
+			if (r.Width > r.Height)
+				radius = r.Height / 2.0;
+			else
+				radius = r.Width / 2.0;
+
+			double dx = Math.Sin (pi3) * radius;
+			double dy = Math.Cos (pi3) * radius;
+
+			gr.MoveTo (cx - radius, cy);
+			gr.LineTo (cx - dy, cy - dx);
+			gr.LineTo (cx + dy, cy - dx);
+			gr.LineTo (cx + radius, cy);
+			gr.LineTo (cx + dy, cy + dx);
+			gr.LineTo (cx - dy, cy + dx);
+			gr.ClosePath ();
+
+			gr.LineWidth = 1;
+			Background.SetAsSource (gr);
+			gr.FillPreserve ();
 			Foreground.SetAsSource (gr);
-			gr.MoveTo (m.X,0.0);
-			gr.LineTo (m.X, -m.Y*0.5);
 			gr.Stroke ();
 
+			if (child != null) {
+				if (child.Visible)
+					child.Paint (ref gr);
+			}
 			gr.Restore ();
 		}
-		#endregion
 	}
 }
 

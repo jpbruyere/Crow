@@ -39,7 +39,7 @@ namespace Crow
 	public class ScrollingObject : GraphicObject
 	{
 		#region CTOR
-		public ScrollingObject ():base(){}
+		protected ScrollingObject ():base(){}
 		public ScrollingObject (Interface iface):base(iface){}
 		#endregion
 

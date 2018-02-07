@@ -39,7 +39,7 @@ namespace Crow
 	public class TextRun : GraphicObject
 	{
 		#region CTOR
-		public TextRun () : base(){}
+		protected TextRun () : base(){}
 		public TextRun (Interface iface) : base (iface){}
 		#endregion
 

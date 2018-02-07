@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<Border	CornerRadius="0"
+				MouseEnter="./onBorderMouseEnter"
+				MouseLeave="./onBorderMouseLeave">
+	<VerticalStack Background="{./Background}">
+		<Border BorderWidth="0" Foreground="White" Height="Fit" Width="Stretched" MinimumSize="200,0"
+				Background="vgradient|0:0.4,0.6,0.0,0.5|1:0.0,0.8,0.8,0.9">
+			<HorizontalStack Name="hs" Margin="2" Spacing="1" Height="Fit" >
+				<GraphicObject Width="5" Height="5"/>
+				<Image Margin="1" Width="12" Height="12" Path="{./Icon}"/>
+				<Label Width="Stretched" Foreground="White" Margin="1" TextAlignment="Center" Text="{./Caption}" />
+				<Border CornerRadius="3" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
+					MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
+					<Image Focusable="true" Name="Image" Path="#Crow.Images.Icons.exit2.svg"
+						 MouseClick="./butQuitPress"/>
+				</Border>
+				<GraphicObject Width="5" Height="5"/>
+			</HorizontalStack>
+		</Border>
+		<HorizontalStack Margin="5">
+			<Image Name="Image" Width="20%" Height="30" Path="{./MsgIcon}" />
+			<Label Margin="5" Font="{./Font}" Width="Fit" Text="{./Message}"
+				TextAlignment="Left"
+				Multiline="true" />		
+		</HorizontalStack>
+		<HorizontalStack Margin="1" Spacing="0" Height="Fit" Width="60%" HorizontalAlignment="Right">
+			<Button Width="50%" Caption="{./OkMessage}" MouseClick="./onOkButtonClick" />
+			<Button Width="50%" Caption="{./CancelMessage}" MouseClick="./onCancelButtonClick" />
+		</HorizontalStack>
+	</VerticalStack>
+</Border>

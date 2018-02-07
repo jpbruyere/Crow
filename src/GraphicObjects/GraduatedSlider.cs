@@ -36,7 +36,7 @@ namespace Crow
 	public class GraduatedSlider : Slider
     {     
 		#region CTOR
-		public GraduatedSlider () : base(){}
+		protected GraduatedSlider() : base(){}
 		public GraduatedSlider(Interface iface) : base(iface)
 		{}
 //		public GraduatedSlider(double minimum, double maximum, double step)

@@ -40,7 +40,7 @@ namespace Crow
 	public abstract class TemplatedGroup : TemplatedControl
 	{
 		#region CTOR
-		public TemplatedGroup() : base(){}
+		protected TemplatedGroup() : base(){}
 		public TemplatedGroup (Interface iface) : base(iface){}
 		#endregion
 

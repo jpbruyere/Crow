@@ -36,7 +36,7 @@ namespace Crow
 	public class ColorSelector : GraphicObject
 	{
 		#region CTOR
-		public ColorSelector () : base(){}
+		protected ColorSelector() : base(){}
 		public ColorSelector (Interface iface) : base(iface){}
 		#endregion
 

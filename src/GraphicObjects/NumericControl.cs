@@ -33,7 +33,7 @@ namespace Crow
 	public abstract class NumericControl : TemplatedControl
 	{
 		#region CTOR
-		public NumericControl () : base(){}
+		protected NumericControl () : base(){}
 		public NumericControl (Interface iface) : base(iface)
 		{
 		}

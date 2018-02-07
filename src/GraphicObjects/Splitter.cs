@@ -37,7 +37,7 @@ namespace Crow
 	public class Splitter : GraphicObject
 	{
 		#region CTOR
-		public Splitter() : base(){}
+		protected Splitter() : base(){}
 		public Splitter (Interface iface) : base(iface){}
 		#endregion
 

@@ -34,7 +34,7 @@ namespace Crow
     public class TextBox : Label
     {
 		#region CTOR
-		public TextBox() : base(){}
+		protected TextBox() : base(){}
 		public TextBox(Interface iface) : base(iface)
 		{ }
 //		public TextBox(string _initialValue)

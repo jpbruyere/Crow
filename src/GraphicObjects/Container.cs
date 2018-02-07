@@ -39,7 +39,7 @@ namespace Crow
     public class Container : PrivateContainer
     {
 		#region CTOR
-		public Container () : base(){}
+		protected Container() : base(){}
 		public Container (Interface iface) : base(iface){}
 		#endregion
 

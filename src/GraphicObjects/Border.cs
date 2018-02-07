@@ -47,7 +47,7 @@ namespace Crow
 	public class Border : Container
 	{
 		#region CTOR
-		public Border () : base(){}
+		protected Border () : base(){}
 		public Border (Interface iface) : base(iface){}
 		#endregion
 

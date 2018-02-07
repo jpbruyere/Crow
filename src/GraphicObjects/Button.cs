@@ -44,7 +44,7 @@ namespace Crow
     public class Button : TemplatedContainer
     {
 		#region CTOR
-		public Button() : base() {}
+		protected Button() : base() {}
 		public Button (Interface iface) : base(iface){}
 		#endregion
 

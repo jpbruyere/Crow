@@ -35,7 +35,7 @@ namespace Crow
 	public class Spinner : NumericControl
 	{
 		#region CTOR
-		public Spinner() : base(){}
+		protected Spinner() : base(){}
 		public Spinner (Interface iface) : base(iface)
 		{
 		}

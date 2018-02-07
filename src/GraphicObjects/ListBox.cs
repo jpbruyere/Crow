@@ -39,7 +39,7 @@ namespace Crow
 	public class ListBox : TemplatedGroup
 	{
 		#region CTOR
-		public ListBox () : base(){}
+		protected ListBox () : base(){}
 		public ListBox (Interface iface) : base(iface) {}
 		#endregion
 

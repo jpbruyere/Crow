@@ -30,7 +30,7 @@ namespace Crow
 	public class DockingView : Window
 	{
 		#region CTOR
-		public DockingView () : base ()
+		protected DockingView() : base ()
 		{
 		}
 		#endregion
