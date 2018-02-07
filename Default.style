@@ -137,3 +137,13 @@ HSVSpinner {
 	Maximum = 1;
 	SmallIncrement = 0.01;
 }
+TxtInFileDialog {
+	Margine = 1;
+	Font = droid, 12;
+}
+CheckBoxAlt {
+	Template= #Crow.Templates.CheckBox2.template;
+	Background = Transparent;
+	Checked={Background=DarkSlateGray;Foreground=LightGray;};
+	Unchecked = {Background=Transparent;Foreground=DimGray;};
+}

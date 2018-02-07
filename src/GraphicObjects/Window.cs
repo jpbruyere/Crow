@@ -51,6 +51,8 @@ namespace Crow
 		bool _movable;
 		protected bool hoverBorder = false;
 		bool alwaysOnTop = false;
+		Fill titleBarBackground = Color.UnitedNationsBlue;
+		Fill titleBarForeground = Color.White;
 
 		Rectangle savedBounds;
 		bool _minimized = false;
@@ -91,6 +93,34 @@ namespace Crow
 				NotifyValueChanged ("Icon", _icon);
 			}
 		} 
+		/// <summary>
+		/// Background of the title bar if any.
+		/// </summary>
+		[XmlAttributeAttribute][DefaultValue("vgradient|0:Onyx|1:UnitedNationsBlue")]
+		public virtual Fill TitleBarBackground {
+			get { return titleBarBackground; }
+			set {
+				if (titleBarBackground == value)
+					return;
+				titleBarBackground = value;
+				NotifyValueChanged ("TitleBarBackground", titleBarBackground);
+				RegisterForRedraw ();
+			}
+		}
+		/// <summary>
+		/// Foreground of the title bar, usualy used for the window caption color.
+		/// </summary>
+		[XmlAttributeAttribute][DefaultValue("White")]
+		public virtual Fill TitleBarForeground {
+			get { return titleBarForeground; }
+			set {
+				if (titleBarForeground == value)
+					return;
+				titleBarForeground = value;
+				NotifyValueChanged ("TitleBarForeground", titleBarForeground);
+				RegisterForRedraw ();
+			}
+		}
 		[XmlAttributeAttribute][DefaultValue(true)]
 		public bool Resizable {
 			get {

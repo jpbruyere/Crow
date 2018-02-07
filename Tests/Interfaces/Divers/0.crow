@@ -151,7 +151,7 @@
 			<Splitter/>-->
 			<ListBox Name="colorList" Data="{TestList}" Margin="5"
 					 ItemTemplate="#Tests.Interfaces.colorItem.crow"
-					 Template="#Crow.Templates.ScrollingListBox.templat"
+					 Template="#Crow.Templates.ScrollingListBox.template"
 					 />
 		</VerticalStack>
 	</HorizontalStack>
