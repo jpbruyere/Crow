@@ -46,6 +46,12 @@
     <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Custom Command' ">
+    <StartAction>Program</StartAction>
+    <StartProgram>%24{TargetName}</StartProgram>
+    <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -63,17 +69,31 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="OpenGL\Shader.cs" />
-    <Compile Include="OpenGL\Texture.cs" />
-    <Compile Include="OpenGL\vaoMesh.cs" />
     <Compile Include="src\CrowIDE.cs" />
     <Compile Include="src\ImlVisualEditor.cs" />
     <Compile Include="src\MembersView.cs" />
     <Compile Include="src\Extensions.cs" />
-    <Compile Include="src\Microsoft.Build.CommonTypes.cs" />
-    <Compile Include="src\CrowWindow.cs" />
-    <Compile Include="src\InterfaceControler.cs" />
-    <Compile Include="OpenGL\Extensions.cs" />
+    <Compile Include="src\Solution.cs" />
+    <Compile Include="src\Project.cs" />
+    <Compile Include="src\VerticalLine.cs" />
+    <Compile Include="..\Tests\OpenGL\Extensions.cs">
+      <Link>src\OpenGL\Extensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Tests\OpenGL\Shader.cs">
+      <Link>src\OpenGL\Shader.cs</Link>
+    </Compile>
+    <Compile Include="..\Tests\OpenGL\Texture.cs">
+      <Link>src\OpenGL\Texture.cs</Link>
+    </Compile>
+    <Compile Include="..\Tests\OpenGL\vaoMesh.cs">
+      <Link>src\OpenGL\vaoMesh.cs</Link>
+    </Compile>
+    <Compile Include="..\Tests\CrowWindow.cs">
+      <Link>src\CrowWindow.cs</Link>
+    </Compile>
+    <Compile Include="..\Tests\InterfaceControler.cs">
+      <Link>src\InterfaceControler.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />
@@ -95,6 +115,12 @@
       <LogicalName>Crow.MenuItem.template</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="ui\CSProjExplorer.crow" />
+    <EmbeddedResource Include="ui\ProjectProperties.crow" />
+    <EmbeddedResource Include="ui\TreeExpandable.template">
+      <LogicalName>Crow.TreeExpandable.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\ProjectTree.template" />
+    <EmbeddedResource Include="ui\MembersItem.template" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">

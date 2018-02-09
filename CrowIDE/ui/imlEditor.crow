@@ -13,6 +13,9 @@
 				<MenuItem Command="{CMDCopy}"/>
 				<MenuItem Command="{CMDPaste}"/>
 			</MenuItem>
+			<MenuItem Caption="Project" Fit="true" PopWidth="120">
+				<MenuItem Command="{CMDViewProjProps}"/>
+			</MenuItem>
 			<MenuItem Caption="View" Fit="true" PopWidth="150">
 				<MenuItem Command="{CMDViewGTExp}"/>
 				<MenuItem Command="{CMDViewProps}"/>
@@ -30,12 +33,14 @@
 			<Label Width="Stretched" Margin="1" Text="{../../dv.SelectedItem}"/>
 		</Border>
 		<HorizontalStack>
-			<DirectoryView Name="dv" CurrentDirectory="./" SelectedItemChanged="Tv_SelectedItemChanged"
-				Width="20%" Height="100%" Margin="0"/>
+			<TreeView Name="treeview" Width="20%" Height="100%" IsRoot="true"
+				DataSource="{CurrentSolution}" Data="{Projects}"				
+				ItemTemplate="#CrowIDE.ui.ProjectTree.template"/>
 			<Splitter/>
 			<VerticalStack Width="Stretched">
 				<ImlVisualEditor Height="60%" Margin="0" MinimumSize="10,10" Foreground="SkyBlue"
-					ImlPath="{../../../dv.SelectedItem}" SelectedItem="{²SelectedItem}"
+					Project="{CurrentProject}"
+					ProjectNode="{../../../treeview.SelectedItem}" SelectedItem="{²SelectedItem}"
 					Name="crowContainer" Background="Onyx"/>
 				<Splitter/>
 				<HorizontalStack Margin="10" MinimumSize="10,1">
@@ -53,6 +58,8 @@
 				</HorizontalStack>
 			</VerticalStack>
 			<Splitter/>
+			<MembersView Width="30%" Instance="{../crowContainer.SelectedItem}" DataTest="Type"  Background="DimGray"
+				ItemTemplate="#CrowIDE.ui.MembersItem.template"/>
 		</HorizontalStack>
 	</VerticalStack>
 </Window>

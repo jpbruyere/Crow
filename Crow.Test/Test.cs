@@ -46,7 +46,7 @@ namespace UnitTest
 
 			foreach (string s in tests) {
 				string fileName = Path.Combine ("Interfaces", s + ".crow");
-				iface.LoadInterface (fileName);
+				iface.AddWidget (fileName);
 
 				iface.Update ();
 				iface.Update ();

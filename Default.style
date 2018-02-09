@@ -45,6 +45,7 @@ MessageBox {
 	Title=MessageBox;
 	Font = serif, 12;
 	MinimumSize = 200,120;
+	AlwaysOnTop = true;
 }
 Slider {
 	Background = vgradient|0:Black|0.1:Gray|0.9:Gray|1:LightGray;
@@ -97,6 +98,7 @@ DockingView {
 }
 FileDialog {
 	Template = #Crow.FileDialog.template;
+	AlwaysOnTop = true;
 	Focusable = true;
 	MinimumSize=50,50;
 	Width = 500;

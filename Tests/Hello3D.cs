@@ -66,7 +66,7 @@ namespace Tests
 		void initGL(){
 			GL.Enable (EnableCap.CullFace);
 			GL.Enable (EnableCap.Blend);
-			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+			GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
 			cube = vaoMesh.CreateCube ();
 			texture = new Texture ("image/textest.png");

@@ -120,7 +120,6 @@ namespace Crow
 					NotifyValueChanged ("MsgIcon", "#Crow.Images.Icons.exit.svg");
 					Caption = "Error";
 					OkMessage = "Ok";
-					CancelMessage = "Cancel";
 					break;
 				}
 			}
@@ -136,7 +135,7 @@ namespace Crow
 			close ();
 		}
 		public static MessageBox Show (Type msgBoxType, string message, string okMsg = "", string cancelMsg = ""){
-			lock (Interface.CurrentInterface.UpdateMutex) {
+			//lock (Interface.CurrentInterface.UpdateMutex) {
 				MessageBox mb = new MessageBox (Interface.CurrentInterface);
 				mb.CurrentInterface.AddWidget (mb);
 				mb.MsgType = msgBoxType;
@@ -146,7 +145,7 @@ namespace Crow
 				if (!string.IsNullOrEmpty(cancelMsg))
 					mb.CancelMessage = cancelMsg;
 				return mb;
-			}
+			//}
 		}
 	}
 }

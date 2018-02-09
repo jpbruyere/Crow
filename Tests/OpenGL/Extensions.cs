@@ -24,7 +24,7 @@ using Crow;
 
 namespace Crow
 {
-	public static class Extensions {
+	public static partial class Extensions {
 		public static Vector4 ToVector4(this Color c){
 			float[] f = c.floatArray;
 			return new Vector4 (f [0], f [1], f [2], f [3]);

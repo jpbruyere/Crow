@@ -1,0 +1,20 @@
+﻿<?xml version="1.0"?>
+<VerticalStack>
+	<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"
+			Foreground="Transparent"
+			MouseEnter="{Foreground=DimGray}"
+			MouseLeave="{Foreground=Transparent}">
+		<HorizontalStack Spacing="1">
+			<Image Margin="1" Width="9" Height="9" Focusable="true" MouseClick="./onClickForExpand"
+				Path="{./Image}"
+				Visible="{./IsExpandable}"
+				SvgSub="{./IsExpanded}"
+				MouseEnter="{Background=LightGray}"
+				MouseLeave="{Background=Transparent}"/>
+			<Image Margin="1" Width="14" Height="14"
+				Path="#Crow.Icons.folder.svg"/>
+			<Label Text="{./Caption}"/>
+		</HorizontalStack>
+	</Border>
+	<Container Name="Content" Visible="false"/>
+</VerticalStack>

@@ -41,7 +41,6 @@ namespace CrowIDE
 		}
 		#endregion
 
-		string imlPath;
 		Interface imlVE;
 		Instantiator itor;
 		string imlSource;
@@ -99,19 +98,33 @@ namespace CrowIDE
 		}
 		[XmlAttributeAttribute][DefaultValue("")]
 		public string ImlPath {
-			get { return imlPath; }
+			get { return projectItem?.Path; }
+		}
+		ProjectItem projectItem;
+		Project project;
+
+		[XmlAttributeAttribute]
+		public Project Project {
+			get { return project; }
+			set { project = value;	}
+		}
+		[XmlAttributeAttribute]
+		public ProjectNode ProjectNode {
+			get { return projectItem; }
 			set {
-				if (imlPath == value)
+				if (projectItem == value)
 					return;
 
-				imlPath = value;
+				if (!(value is ProjectItem))
+					return;
 
-				NotifyValueChanged ("ImlPath", imlPath);
+				projectItem = value as ProjectItem;
+
+				NotifyValueChanged ("ImlPath", ImlPath);
 
 				reloadFromPath ();
 			}
 		}
-
 		public List<GraphicObject> GraphicTree {
 			get { return imlVE.GraphicTree; }
 		}
@@ -146,12 +159,13 @@ namespace CrowIDE
 			reload_iTor (iTmp);
 		}
 		void reloadFromPath(){
-			if (!File.Exists (imlPath)){
-				System.Diagnostics.Debug.WriteLine ("Path not found: " + imlPath);
+			string path = Path.Combine (projectItem?.Project.RootDir,projectItem?.Path);
+			if (!File.Exists (path)){
+				System.Diagnostics.Debug.WriteLine ("Path not found: " + path);
 				reload_iTor (null);
 				return;
 			}
-			using (StreamReader sr = new StreamReader (imlPath)) {
+			using (StreamReader sr = new StreamReader (path)) {
 				ImlSource = sr.ReadToEnd ();
 			}
 			NotifyValueChanged ("GraphicTree", null);

@@ -227,7 +227,7 @@ namespace Crow
 		/// <param name="interfaceIdx">interface index to bind to, a default one is created if none exists</param>
 		public GraphicObject Load (string path, int interfaceIdx = 0){
 			checkDefaultIFace();
-			return ifaceControl [interfaceIdx].CrowInterface.LoadInterface (path);
+			return ifaceControl [interfaceIdx].CrowInterface.AddWidget (path);
 		}
 		/// <summary>
 		/// Load the content of the IML string passed as first argument and add it to the current interface

@@ -361,6 +361,10 @@
     <EmbeddedResource Include="Templates\ArrowBut.template" />
     <EmbeddedResource Include="Templates\treeList.template" />
     <EmbeddedResource Include="Templates\CheckBox2.template" />
+    <EmbeddedResource Include="Icons\assembly.svg" />
+    <EmbeddedResource Include="Templates\Tooltip.template">
+      <LogicalName>Crow.Tooltip.template</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="Crow.dll.config">

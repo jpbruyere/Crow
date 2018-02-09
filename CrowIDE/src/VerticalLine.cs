@@ -1,8 +1,8 @@
-//
-// HelloWorld.cs
+﻿//
+// VerticalLine.cs
 //
 // Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
+//       jp <>
 //
 // Copyright (c) 2013-2017 Jean-Philippe Bruyère
 //
@@ -23,31 +23,35 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-
 using System;
 using Crow;
-using Tutorials;
 
-namespace Tests
+namespace CrowIDE
 {
-	class HelloWorld : CrowWindow
+	public class VerticalLine : GraphicObject
 	{
-		public HelloWorld ()
-			: base(800, 600,"Crow Test with OpenTK")
+		public VerticalLine () : base()
 		{
 		}
 
-		protected override void OnLoad (EventArgs e)
+		protected override void onDraw (Cairo.Context gr)
 		{
-			base.OnLoad (e);
-			LoadIMLFragment (@"<SimpleGauge Level='40' Margin='5' Background='Jet' Foreground='Gray' Width='30' Height='50%'/>");
-		}
+			base.onDraw (gr);
+			Foreground.SetAsSource (gr);
+			Rectangle r = ClientRectangle;
+			double x = r.Center.X - 0.5;
+			double y;
+			gr.LineWidth = 1;
+			gr.MoveTo (x, r.Y);
+			gr.LineTo (x, r.Bottom-8);
 
-		[STAThread]
-		static void Main ()
-		{
-			HelloWorld win = new HelloWorld ();
-			win.Run (30);
+			for (y = 8.5+r.Y; y < r.Bottom; y += 18) {
+				gr.MoveTo (x, y);
+				gr.LineTo (x * 2, y);
+			}
+
+			gr.Stroke ();
 		}
 	}
 }
+

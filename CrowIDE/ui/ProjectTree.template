@@ -1,0 +1,86 @@
+﻿<?xml version="1.0"?>
+<ItemTemplate>
+	<Label Text="{}" Background="DarkRed" Foreground="White"/>
+</ItemTemplate>
+<ItemTemplate DataType="CrowIDE.Project" Data="RootItems">
+	<Expandable Caption="{Name}" Template="#Crow.TreeExpandable.template" >
+		<HorizontalStack Height="Fit">
+			<GraphicObject Width="8" Height="10"/>
+			<TreeView Name="List" Height="Fit" DataTest="Type"
+				Template="#Crow.Templates.treeList.template" />
+		</HorizontalStack>
+	</Expandable>
+</ItemTemplate>
+<ItemTemplate DataType="ReferenceGroup" Data="ChildNodes">
+	<Expandable Caption="{DisplayName}" Template="#Crow.TreeExpandable.template" >
+		<HorizontalStack Height="Fit">
+			<GraphicObject Width="8" Height="10"/>
+			<TreeView Name="List" Height="Fit" DataTest="Type"
+				Template="#Crow.Templates.treeList.template" />
+		</HorizontalStack>
+	</Expandable>
+</ItemTemplate>
+<ItemTemplate DataType="VirtualGroup" Data="ChildNodes">
+	<Expandable Caption="{DisplayName}" Template="#Crow.TreeExpandable.template" >
+		<HorizontalStack Height="Fit">
+			<GraphicObject Width="8" Height="10"/>
+			<TreeView Name="List" Height="Fit" DataTest="Type"
+				Template="#Crow.Templates.treeList.template" />
+		</HorizontalStack>
+	</Expandable>
+</ItemTemplate>
+<ItemTemplate DataType="Folder">
+	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
+			MouseEnter="{Foreground=DimGray}"
+			MouseLeave="{Foreground=Transparent}">
+		<HorizontalStack>
+			<Image Margin="1" Width="14" Height="14"
+				Path="#Crow.Icons.folder.svg"/>
+			<Label Text="{DisplayName}" Width="Stretched"/>
+		</HorizontalStack>
+	</Border>
+</ItemTemplate>
+<ItemTemplate DataType="Reference">
+	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
+			MouseEnter="{Foreground=DimGray}"
+			MouseLeave="{Foreground=Transparent}">
+		<HorizontalStack>
+			<Image Margin="1" Width="14" Height="14"
+				Path="#Crow.Icons.assembly.svg"/>
+			<Label Text="{DisplayName}" Width="Stretched"/>
+		</HorizontalStack>
+	</Border>
+</ItemTemplate>
+<ItemTemplate DataType="Compile">	
+	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
+			MouseEnter="{Foreground=DimGray}"
+			MouseLeave="{Foreground=Transparent}">
+		<HorizontalStack>			
+			<Image Margin="1" Width="14" Height="14"
+				Path="#Crow.Icons.file.svg"/>
+			<Label Text="{DisplayName}" Width="Stretched"/>
+		</HorizontalStack>
+	</Border>
+</ItemTemplate>
+<ItemTemplate DataType="EmbeddedResource">
+	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
+			MouseEnter="{Foreground=DimGray}"
+			MouseLeave="{Foreground=Transparent}">
+		<HorizontalStack>
+			<Image Margin="1" Width="14" Height="14"
+				Path="#Crow.Icons.file.svg"/>
+			<Label Text="{DisplayName}" Width="Stretched"/>
+		</HorizontalStack>
+	</Border>
+</ItemTemplate>
+<ItemTemplate DataType="None">
+	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
+			MouseEnter="{Foreground=DimGray}"
+			MouseLeave="{Foreground=Transparent}">
+		<HorizontalStack>
+			<Image Margin="1" Width="14" Height="14"
+				Path="#Crow.Icons.file.svg"/>
+			<Label Text="{DisplayName}" Width="Stretched"/>
+		</HorizontalStack>
+	</Border>
+</ItemTemplate>

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Border BorderWidth="5" Margin="1" MinimumSize="10,10">
+<Window Template="#Crow.ToolWindow.template" Caption="Properties" MinimumSize="10,10" Width="Stretched" Height="Stretched">
 	<VerticalStack>
 		<Border Height="Fit">
 			<Label TextAlignment="Left" Text="{./Instance}" Width="Stretched"/>
@@ -10,4 +10,4 @@
 				Height="Fit" Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
 		</Scroller>
 	</VerticalStack>
-</Border>
+</Window>

@@ -560,7 +560,7 @@ namespace Crow.IML
 				System.Reflection.Emit.Label finish = il.DefineLabel ();
 				il.Emit (OpCodes.Br, finish);
 				il.MarkLabel (cancel);
-				il.EmitWriteLine (string.Format ("Handler method '{0}' for '{1}' not found in new dataSource ", bindingDef.TargetMember, sourceEvent.Name));
+				il.EmitWriteLine (string.Format ("Handler method '{0}' for '{1}' not found in new dataSource", bindingDef.TargetMember, sourceEvent.Name));
 				il.MarkLabel (finish);
 				il.Emit (OpCodes.Ret);
 
