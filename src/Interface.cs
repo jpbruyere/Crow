@@ -88,6 +88,8 @@ namespace Crow
 		public Interface(){
 			CurrentInterface = this;
 			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
+			initTooltip ();
 		}
 		#endregion
 
@@ -100,6 +102,8 @@ namespace Crow
 		public static bool FocusOnHover = false;
 		/// <summary> Threshold to catch borders for sizing </summary>
 		public static int BorderThreshold = 5;
+		/// <summary> delay before tooltip appear </summary>
+		public static int ToolTipDelay = 500;
 		/// <summary>Double click threshold in milisecond</summary>
 		public static int DoubleClick = 200;//max duration between two mouse_down evt for a dbl clk in milisec.
 		/// <summary> Time to wait in millisecond before starting repeat loop</summary>
@@ -313,9 +317,12 @@ namespace Crow
 				return tmp;
 			}
 		}
-		/// <summary>Create an instance of a GraphicObject and add it to the GraphicTree
-		/// of this Interface</summary>
-		public GraphicObject LoadInterface (string path)
+		/// <summary>
+		/// Create an instance of a GraphicObject and add it to the GraphicTree of this Interface
+		/// </summary>
+		/// <returns>new instance of graphic object created</returns>
+		/// <param name="path">path of the iml file to load</param>
+		public GraphicObject AddWidget (string path)
 		{
 			lock (UpdateMutex) {
 				GraphicObject tmp = Load (path);
@@ -323,8 +330,11 @@ namespace Crow
 				return tmp;
 			}
 		}
-		/// <summary>Create an instance of a GraphicObject linked to this interface but
-		/// not added to the GraphicTree</summary>
+		/// <summary>
+		/// Create an instance of a GraphicObject linked to this interface but not added to the GraphicTree
+		/// </summary>
+		/// <returns>new instance of graphic object created</returns>
+		/// <param name="path">path of the iml file to load</param>
 		public GraphicObject Load (string path)
 		{
 			try {
@@ -333,7 +343,11 @@ namespace Crow
 				throw new Exception ("Error loading <" + path + ">:", ex);
 			}
 		}
-		/// <summary>Fetch instantiator it from cache or create it</summary>
+		/// <summary>
+		/// Fetch instantiator from cache or create it.
+		/// </summary>
+		/// <returns>new Instantiator</returns>
+		/// <param name="path">path of the iml file to load</param>
 		public static Instantiator GetInstantiator(string path){
 			if (!Instantiators.ContainsKey(path))
 				Instantiators [path] = new Instantiator(path);
@@ -626,7 +640,7 @@ namespace Crow
 
 		#region GraphicTree handling
 		/// <summary>Add widget to the Graphic tree of this interface and register it for layouting</summary>
-		public void AddWidget(GraphicObject g, bool isOverlay = false)
+		public void AddWidget(GraphicObject g)
 		{
 			g.Parent = this;
 			int ptr = 0;
@@ -648,7 +662,7 @@ namespace Crow
 			g.RegisteredLayoutings = LayoutingType.None;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
-		/// <summary>Set visible state of widget to false and remove if from the graphic tree</summary>
+		/// <summary>Set visible state of widget to false and delete if from the graphic tree</summary>
 		public void DeleteWidget(GraphicObject g)
 		{
 			lock (UpdateMutex) {
@@ -656,6 +670,15 @@ namespace Crow
 				GraphicTree.Remove (g);
 				g.Parent = null;
 				g.Dispose ();
+			}
+		}
+		/// <summary>Set visible state of widget to false and remove if from the graphic tree</summary>
+		public void RemoveWidget(GraphicObject g)
+		{
+			lock (UpdateMutex) {
+				RegisterClip (g.ScreenCoordinates (g.LastPaintedSlot));
+				GraphicTree.Remove (g);
+				g.Parent = null;
 			}
 		}
 		/// <summary> Remove all Graphic objects from top container </summary>
@@ -770,6 +793,7 @@ namespace Crow
 			}
 
 			if (HoverWidget != null) {
+				resetTooltip ();
 				//check topmost graphicobject first
 				GraphicObject tmp = HoverWidget;
 				GraphicObject topc = null;
@@ -944,6 +968,50 @@ namespace Crow
 			KeyPressEventArgs e = new KeyPressEventArgs(Key);
 			_focusedWidget.onKeyPress (this, e);
 			return true;
+		}
+		#endregion
+
+		#region Tooltip handling
+		Stopwatch tooltipTimer = new Stopwatch();
+		GraphicObject ToolTipContainer = null;
+		volatile bool tooltipVisible = false;
+
+		void initTooltip () {
+			ToolTipContainer = Load  ("#Crow.Tooltip.template");
+			Thread t = new Thread (toolTipThreadFunc);
+			t.IsBackground = true;
+			t.Start ();
+		}
+		void toolTipThreadFunc ()
+		{
+			while(true) {
+				if (tooltipTimer.ElapsedMilliseconds > ToolTipDelay) {
+					if (!tooltipVisible) {
+						GraphicObject g = _hoverWidget;
+						while (g != null) {
+							if (!string.IsNullOrEmpty (g.Tooltip)) {
+								AddWidget (ToolTipContainer);
+								ToolTipContainer.DataSource = g;
+								ToolTipContainer.Top = Mouse.Y + 10;
+								ToolTipContainer.Left = Mouse.X + 10;
+								tooltipVisible = true;
+								break;
+							}
+							g = g.LogicalParent as GraphicObject;
+						}
+					}
+				}
+				Thread.Sleep (200);	
+			}
+
+		}
+		void resetTooltip () {
+			if (tooltipVisible) {
+				//ToolTipContainer.DataSource = null;
+				RemoveWidget (ToolTipContainer);
+				tooltipVisible = false;
+			}
+			tooltipTimer.Restart ();
 		}
 		#endregion
 

@@ -224,7 +224,7 @@ namespace Crow
 			if (Content != null) {
 				Content.Visible = true;
 				if (Content.Parent == null)
-					CurrentInterface.AddWidget (Content, true);
+					CurrentInterface.AddWidget (Content);
 				if (Content.LogicalParent != this)
 					Content.LogicalParent = this;
 				CurrentInterface.PutOnTop (Content, true);

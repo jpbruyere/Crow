@@ -4,27 +4,27 @@
 		<VerticalStack Width="30%" Margin="5">
 			<GroupBox Caption="Performance" Height="Fit">
 				<VerticalStack Width="90%" Height="Fit" Spacing="2" >
-					<HorizontalStack Height="Fit">
+					<HorizontalStack Height="Fit" Tooltip="Frame per second">
 						<Label Text="Fps:" Style="FpsLabel"/>
 						<Label Text="{fps}" Style="FpsDisp"/>
 					</HorizontalStack>
-					<HorizontalStack Height="Fit">
+					<HorizontalStack Height="Fit" Tooltip="Minimum Frame per second">
 						<Label Text="Min:" Style="FpsLabel"/>
 						<Label Text="{fpsMin}" Style="FpsDisp"/>
 					</HorizontalStack>
-					<HorizontalStack Height="Fit">
+					<HorizontalStack Height="Fit" Tooltip="Maximum Frame per second">
 						<Label Text="Max:" Style="FpsLabel"/>
 						<Label Text="{fpsMax}" Style="FpsDisp"/>
 					</HorizontalStack>
-					<HorizontalStack Height="Fit">
+					<HorizontalStack Height="Fit" Tooltip="Update loop duration">
 						<Label Text="Update:" Style="FpsLabel"/>
 						<Label Text="{update}" Style="FpsDisp"/>
 					</HorizontalStack>
-					<HorizontalStack Height="Fit">
+					<HorizontalStack Height="Fit" Tooltip="Layouting process duration">
 						<Label Text="Layouting:" Style="FpsLabel"/>
 						<Label Text="{layouting}" Style="FpsDisp"/>
 					</HorizontalStack>
-					<HorizontalStack Height="Fit">
+					<HorizontalStack Height="Fit" Tooltip="Clipping duration">
 						<Label Text="Clipping:" Style="FpsLabel"/>
 						<Label Text="{clipping}" Style="FpsDisp"/>
 					</HorizontalStack>

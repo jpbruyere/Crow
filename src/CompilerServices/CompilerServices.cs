@@ -67,6 +67,7 @@ namespace Crow.IML
 		internal static MethodInfo miGetValWithRefx = typeof(CompilerServices).GetMethod("getValueWithReflexion", BindingFlags.Static | BindingFlags.NonPublic);
 		internal static MethodInfo miCreateDel = typeof(CompilerServices).GetMethod ("createDel", BindingFlags.Static | BindingFlags.NonPublic);
 		internal static MethodInfo miGetImplOp = typeof(CompilerServices).GetMethod ("getImplicitOp", BindingFlags.Static | BindingFlags.NonPublic);
+		internal static MethodInfo miGetDataTypeAndFetch = typeof(CompilerServices).GetMethod("getDataTypeAndFetch", BindingFlags.Static | BindingFlags.NonPublic);
 
 
 		internal static MethodInfo miGoUpLevels = typeof(CompilerServices).GetMethod("goUpNbLevels", BindingFlags.Static | BindingFlags.NonPublic);
@@ -92,7 +93,7 @@ namespace Crow.IML
 		internal static MethodInfo miGetITempFromDic = typeof(Dictionary<string, ItemTemplate>).GetMethod ("get_Item", new Type[] { typeof(string) });
 		internal static FieldInfo fldItemTemplates = typeof(TemplatedGroup).GetField("ItemTemplates");
 		internal static MethodInfo miCreateExpDel = typeof(ItemTemplate).GetMethod ("CreateExpandDelegate");
-
+		internal static FieldInfo fiFetchMethodName = typeof(ItemTemplate).GetField("fetchMethodName", BindingFlags.Instance | BindingFlags.NonPublic);
 		#region tree handling methods
 		internal static FieldInfo fiChild = typeof(PrivateContainer).GetField ("child", BindingFlags.Instance | BindingFlags.NonPublic);
 		internal static MethodInfo miSetChild = typeof (Container).GetMethod ("SetChild");
@@ -330,22 +331,27 @@ namespace Crow.IML
 			Type dstType = null;
 			if (mi == null)
 				return null;
-			if (mi.MemberType == MemberTypes.Property) {
-				PropertyInfo pi = mi as PropertyInfo;
-				tmp = pi.GetValue (instance);
-				dstType = pi.PropertyType;
-			}
-			if (mi.MemberType == MemberTypes.Field) {
-				FieldInfo fi = mi as FieldInfo;
-				tmp = fi.GetValue (instance);
-				dstType = fi.FieldType;
-			}
-			if (tmp != null)
-				return tmp;
-			if (dstType == typeof(string) || dstType == CompilerServices.TObject)//TODO:object should be allowed to return null and not ""
+			try {
+				if (mi.MemberType == MemberTypes.Property) {
+					PropertyInfo pi = mi as PropertyInfo;
+					tmp = pi.GetValue (instance);
+					dstType = pi.PropertyType;
+				}
+				if (mi.MemberType == MemberTypes.Field) {
+					FieldInfo fi = mi as FieldInfo;
+					tmp = fi.GetValue (instance);
+					dstType = fi.FieldType;
+				}
+				if (tmp != null)
+					return tmp;
+				if (dstType == typeof(string) || dstType == CompilerServices.TObject)//TODO:object should be allowed to return null and not ""
+					return "";
+				if (dstType.IsValueType)
+					return Activator.CreateInstance (dstType);				
+			} catch (Exception ex) {
+				Debug.WriteLine (ex.ToString ());
 				return "";
-			if (dstType.IsValueType)
-				return Activator.CreateInstance (dstType);
+			}
 
 			return null;
 		}
@@ -862,6 +868,28 @@ namespace Crow.IML
 					return dataType;
 			}
 			return null;
+		}
+
+		internal static object getDataTypeAndFetch (object data, string fetchMethod){
+			Type dataType = data.GetType();
+			MethodInfo miGetDatas = dataType.GetMethod (fetchMethod, new Type[] {});
+			if (miGetDatas == null)
+				miGetDatas = CompilerServices.SearchExtMethod (dataType, fetchMethod);
+
+			if (miGetDatas == null) {//in last resort, search among properties
+				PropertyInfo piDatas = dataType.GetProperty (fetchMethod);
+				if (piDatas == null) {
+					FieldInfo fiDatas = dataType.GetField (fetchMethod);
+					if (fiDatas == null)//and among fields
+						throw new Exception ("Fetch data member not found in ItemTemplate: " + fetchMethod);
+					return fiDatas.GetValue (data);
+				}
+				miGetDatas = piDatas.GetGetMethod ();
+				if (miGetDatas == null)
+					throw new Exception ("Read only property for fetching data in ItemTemplate: " + fetchMethod);
+			}
+			object tmp = miGetDatas.Invoke (data, null);
+			return tmp;
 		}
 	}
 }

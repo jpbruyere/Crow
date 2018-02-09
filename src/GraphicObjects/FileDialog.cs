@@ -52,6 +52,9 @@ namespace Crow
 		public event EventHandler OkClicked;
 		#endregion
 
+		public string SelectedFileFullPath {
+			get { return Path.Combine (SelectedDirectory, SelectedFile); }
+		}
 		[XmlAttributeAttribute][DefaultValue("/home")]
 		public virtual string CurrentDirectory {
 			get { return curDir; }

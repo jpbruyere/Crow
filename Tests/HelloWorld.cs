@@ -26,6 +26,7 @@
 
 using System;
 using Crow;
+using Tutorials;
 
 namespace Tests
 {
@@ -39,7 +40,7 @@ namespace Tests
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-			AddWidget (new Label (CurrentInterface) { Text = "Hello World" });
+			LoadIMLFragment (@"<SimpleGauge Level='40' Margin='5' Background='Jet' Foreground='Gray' Width='30' Height='50%'/>");
 		}
 
 		[STAThread]

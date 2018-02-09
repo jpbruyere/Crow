@@ -98,7 +98,9 @@ namespace Tests
 			}
 			get { return List2; }
 		}
-		IList<Color> testList = Color.ColorDic.Values.ToList();
+		IList<Color> testList = Color.ColorDic.Values.OrderBy(c=>c.Hue)
+			.ThenBy(c=>c.Value).ThenBy(c=>c.Saturation)
+			.ToList();
 		public IList<Color> TestList {
 			set{
 				testList = value;
@@ -154,7 +156,6 @@ namespace Tests
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Unsorted", "*.crow")).ToArray ();
 
-			object tc = Color.AirForceBlueRaf;
 			Load(testFiles[idx]).DataSource = this;
 		}
 		void KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
@@ -201,8 +202,8 @@ namespace Tests
 
 				GraphicObject obj = Load (testFiles[idx]);
 				obj.DataSource = this;
-			} catch (Exception ex) {
-				Debug.WriteLine (ex.Message + ex.InnerException);
+			} catch (Exception ex) {				
+				MessageBox.Show (MessageBox.Type.Error, ex.Message + "\n" + ex.InnerException);
 			}
 		}
 //		void Tv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
@@ -246,13 +247,18 @@ namespace Tests
 		[STAThread]
 		static void Main ()
 		{
-			TextWriterTraceListener listener = new TextWriterTraceListener ("listen.txt");
+			#if DEBUG
+			TextWriterTraceListener listener = new TextWriterTraceListener ("debug.log");
 			Debug.Listeners.Add (listener);
+			#endif
+
 			Console.WriteLine ("starting example");
 			BasicTests win = new BasicTests ();
 			win.VSync = OpenTK.VSyncMode.Adaptive;
 			win.Run (30);
+			#if DEBUG
 			listener.Dispose ();
+			#endif
 		}
 		protected override void OnUpdateFrame (OpenTK.FrameEventArgs e)
 		{

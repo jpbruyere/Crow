@@ -808,6 +808,17 @@ namespace Crow
 				NotifyValueChanged ("Style", style);
 			}
 		}
+		string tooltip;
+		[XmlAttributeAttribute]
+		public virtual string Tooltip {
+			get { return tooltip; }
+			set {
+				if (tooltip == value)
+					return;
+				tooltip = value;
+				NotifyValueChanged("Tooltip", tooltip);
+			}
+		}
 		#endregion
 
 		#region Default and Style Values loading
