@@ -51,7 +51,7 @@
 			<HorizontalStack Height="Fit">
 				<GraphicObject Width="12" Height="10"/>
 				<TreeView Name="List" Height="Fit"
-					Template="#Crow.Templates.treeList.crow" />
+					Template="#Crow.Templates.treeList.template" />
 			</HorizontalStack>
 		</Expandable>
 	</ItemTemplate>

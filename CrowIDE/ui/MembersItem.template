@@ -21,7 +21,7 @@
 			MouseLeave="{Background=Transparent}" >
 		<Label Margin="1" Text="{Name}" Height="Fit" Width="50%"/>
 		<ComboBox Margin="0"  Height="Stretched" Width="50%" Data="{Choices}"
-				SelectedIndex="{²Value}">
+				SelectedItem="{²Value}">
 			<Template>
 				<Popper Name="popper" PopDirection="Bottom">
 					<Template>

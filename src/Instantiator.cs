@@ -890,6 +890,9 @@ namespace Crow.IML
 
 				CompilerServices.emitConvert (il, piSource.PropertyType);
 
+				if (!piSource.CanWrite)
+					throw new Exception ("Source member of bindind is read only:" + piSource.ToString());
+
 				il.Emit (OpCodes.Callvirt, piSource.GetSetMethod ());
 
 				il.MarkLabel (endMethod);

@@ -24,6 +24,7 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CrowIDE
 {
@@ -47,7 +48,10 @@ namespace CrowIDE
 				try {
 					if (!pi.PropertyType.IsAssignableFrom(value.GetType()) && pi.PropertyType != typeof(string)){
 						if (pi.PropertyType.IsEnum) {
-							pi.SetValue (instance, value);
+							if (value is string) {
+								pi.SetValue (instance, Enum.Parse (pi.PropertyType, (string)value));
+							}else
+								pi.SetValue (instance, value);
 						} else {
 							MethodInfo me = pi.PropertyType.GetMethod
 								("Parse", BindingFlags.Static | BindingFlags.Public,
@@ -65,9 +69,9 @@ namespace CrowIDE
 		public string Type { get { return pi.PropertyType.IsEnum ?
 					"System.Enum"
 					: pi.PropertyType.FullName; }}
-		public string[] Choices {
+		public object[] Choices {
 			get {
-				return Enum.GetNames (pi.PropertyType);
+				return Enum.GetValues (pi.PropertyType).Cast<object>().ToArray();
 			}
 		}
 
