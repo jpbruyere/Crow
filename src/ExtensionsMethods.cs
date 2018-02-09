@@ -125,6 +125,14 @@ namespace Crow
 		{
 			return c == '\t' || c == '\r' || c == '\n' || char.IsWhiteSpace (c);
 		}
+		public static object GetDefaultValue(this object obj)
+		{			
+			Type t = obj.GetType ();
+			if (t.IsValueType)
+				return Activator.CreateInstance (t);
+			
+			return null;
+		}
 	}
 }
 

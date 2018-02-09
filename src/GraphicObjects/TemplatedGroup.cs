@@ -148,7 +148,18 @@ namespace Crow
 			}
 		}
 		[XmlIgnore]public virtual object SelectedItem{
-			get { return data == null ? null : _selectedIndex < 0 ? null : data[_selectedIndex]; }
+			get { return data == null ? null : _selectedIndex < 0 ? data.GetDefaultValue() : data[_selectedIndex]; }
+			set {
+				if (data == null) {
+					SelectedIndex = -1;
+					return;
+				}
+				//TODO:double check if value type will be notified to binding sys
+				if (value == SelectedItem)
+					return;
+				
+				SelectedIndex = data.IndexOf (value);
+			}
 		}
 		[XmlIgnore]public bool HasItems {
 			get { return Items.Count > 0; }

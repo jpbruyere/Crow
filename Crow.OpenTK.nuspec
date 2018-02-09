@@ -2,7 +2,7 @@
 <package >
 	<metadata>
 		<id>Crow.OpenTK</id>
-		<version>0.6.0-pre1</version>
+		<version>0.6.0</version>
 		<title>C# Rapid Open Widget Toolkit</title>
 		<authors>JP Bruyere</authors>
 		<owners>Grand Tetras Software</owners>
@@ -21,13 +21,15 @@ Crow.OpenTK is the OpenTK ready version.
 			- Bug fix #36
 			- group item templates in single file
 			- instantiation from code clarification
-			- Only run on mono >= 5.0
 			- Cairo mesh patterns support.
-			- Image resources sharing among controls.            
+			- Image resources sharing among controls.
+			- Some small api changes (LoadInterface replaced by AddWidget overload
+			- Documentations
+			- Tooltip for GraphicObject class		
 		</releaseNotes>
-		<copyright>Copyright 2013-2017</copyright>
+		<copyright>Copyright 2013-2018</copyright>
 		<dependencies>
-			<dependency id="OpenTK" version="3.0.0-git00041" />
+			<dependency id="OpenTK" version="2.0.0" />
 		</dependencies>
         <tags>Crow OpenTK OpenGL Widget Interface GUI C# .Net Mono</tags>
         <references>
