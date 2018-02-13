@@ -1,5 +1,9 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <VerticalStack Height="50%" Width="80%">
+	<HorizontalStack Height="Fit">
+		<Label Text="Selected Tab:"/>
+		<Label Text="{../../tabview1.SelectedTab}"/>
+	</HorizontalStack>
 	<TabView Name="tabview1" Orientation="Horizontal" Spacing="24">
 		<TabItem Name="TabItem1" Caption="tab item 1">
 			<VerticalStack Margin="20">
@@ -17,12 +21,12 @@
 				<RadioButton/>
 			</VerticalStack>
 		</TabItem>
-		<TabItem Name="TabItem2" Caption="tab item 3" Background="Gray">
+		<TabItem Name="TabItem3" Caption="tab item 3" Background="Gray">
 			<Container Margin="5" CornerRadius="2" >
 				<TextBox Margin="5" Multiline="true" TextAlignment="TopLeft"/>
 			</Container>
 		</TabItem>
-		<TabItem Name="TabItem2" Caption="tab item 4" Margin="0" Background="Gray">
+		<TabItem Name="TabItem4" Caption="tab item 4" Margin="0" Background="Gray">
 			<TextBox/>
 		</TabItem>
 	</TabView>

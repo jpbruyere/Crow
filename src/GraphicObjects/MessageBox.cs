@@ -134,9 +134,9 @@ namespace Crow
 			Cancel.Raise (this, null);
 			close ();
 		}
-		public static MessageBox Show (Type msgBoxType, string message, string okMsg = "", string cancelMsg = ""){
+		public static MessageBox Show (Interface iface, Type msgBoxType, string message, string okMsg = "", string cancelMsg = ""){
 			//lock (Interface.CurrentInterface.UpdateMutex) {
-				MessageBox mb = new MessageBox (Interface.CurrentInterface);
+				MessageBox mb = new MessageBox (iface);
 				mb.CurrentInterface.AddWidget (mb);
 				mb.MsgType = msgBoxType;
 				mb.Message = message;

@@ -29,13 +29,14 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using Cairo;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Crow
 {	
 	public class TabView : Group
 	{
 		#region CTOR
-		protected TabView() : base(){}
+		public TabView() : base(){}
 		public TabView (Interface iface) : base(iface){}
 		#endregion
 
@@ -45,7 +46,6 @@ namespace Crow
 		Orientation _orientation;
 		int selectedTab = 0;
 		#endregion
-
 
 		#region public properties
 		[XmlAttributeAttribute()][DefaultValue(Orientation.Horizontal)]
@@ -92,6 +92,12 @@ namespace Crow
 		}
 		#endregion
 
+		void Ti_TabTitle_LayoutChanged (object sender, LayoutingEventArgs e)
+		{
+			if (e.LayoutType == LayoutingType.Width)
+				this.RegisterForLayouting (LayoutingType.ArrangeChildren);
+		}
+
 		public override void AddChild (GraphicObject child)
 		{
 			TabItem ti = child as TabItem;
@@ -99,22 +105,28 @@ namespace Crow
 				throw new Exception ("TabView control accept only TabItem as child.");
 
 			ti.MouseDown += Ti_MouseDown;
-
-			if (Children.Count == 0) {
-				ti.IsSelected = true;
-				SelectedTab = 0;
-			}
+			ti.TabTitle.LayoutChanged += Ti_TabTitle_LayoutChanged;
 
 			base.AddChild (child);
+
+			SelectedTab = ti.ViewIndex = Children.Count - 1;
 		}
+
 		public override void RemoveChild (GraphicObject child)
 		{
-			base.RemoveChild (child);
-			if (selectedTab > Children.Count - 1)
+			TabItem ti = child as TabItem;
+			if (ti == null)
+				throw new Exception ("TabView control accept only TabItem as child.");
+
+			ti.MouseDown -= Ti_MouseDown;
+			ti.TabTitle.LayoutChanged -= Ti_TabTitle_LayoutChanged;
+
+			if (selectedTab > Children.Count - 2)
 				SelectedTab--;
-			else
-				SelectedTab = selectedTab;
+			
+			base.RemoveChild (child);
 		}
+
 		public override bool ArrangeChildren { get { return true; } }
 		public override bool UpdateLayout (LayoutingType layoutType)
 		{
@@ -122,19 +134,20 @@ namespace Crow
 
 			if (layoutType == LayoutingType.ArrangeChildren) {
 				int curOffset = Spacing;
-				for (int i = 0; i < Children.Count; i++) {
-					if (!Children [i].Visible)
+				TabItem[] tabItms = Children.Cast<TabItem>().OrderBy (t=>t.ViewIndex).ToArray();
+				for (int i = 0; i < tabItms.Length; i++) {
+					if (!tabItms [i].Visible)
 						continue;
-					TabItem ti = Children [i] as TabItem;
-					ti.TabOffset = curOffset;
+					if (!tabItms [i].HoldCursor)
+						tabItms [i].TabOffset = curOffset;
 					if (Orientation == Orientation.Horizontal) {
-						if (ti.TabTitle.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+						if (tabItms [i].TabTitle.RegisteredLayoutings.HasFlag (LayoutingType.Width))
 							return false;
-						curOffset += ti.TabTitle.Slot.Width + Spacing;
+						curOffset += tabItms [i].TabTitle.Slot.Width + Spacing;
 					} else {
-						if (ti.TabTitle.RegisteredLayoutings.HasFlag (LayoutingType.Height))
+						if (tabItms [i].TabTitle.RegisteredLayoutings.HasFlag (LayoutingType.Height))
 							return false;
-						curOffset += ti.TabTitle.Slot.Height + Spacing;
+						curOffset += tabItms [i].TabTitle.Slot.Height + Spacing;
 					}
 				}
 
@@ -163,15 +176,17 @@ namespace Crow
 				gr.Clip ();
 			}
 
-			for (int i = 0; i < Children.Count; i++) {
-				if (i == SelectedTab)
-					continue;
-				Children [i].Paint (ref gr);
+			lock (Children) {
+				TabItem[] tabItms = Children.Cast<TabItem> ().OrderBy (t => t.ViewIndex).ToArray ();
+				for (int i = 0; i < tabItms.Length; i++) {
+					if (tabItms [i] == Children [SelectedTab])
+						continue;
+					tabItms [i].Paint (ref gr);
+				}
+
+				if (SelectedTab < tabItms.Length && SelectedTab >= 0)
+					Children [SelectedTab].Paint (ref gr);
 			}
-
-			if (SelectedTab < Children.Count && SelectedTab >= 0)
-				Children [SelectedTab].Paint (ref gr);
-
 			gr.Restore ();
 		}
 
@@ -191,11 +206,11 @@ namespace Crow
 				Children[SelectedTab].checkHoverWidget (e);
 				return;
 			}
-			for (int i = Children.Count - 1; i >= 0; i--) {
-				TabItem ti = Children [i] as TabItem;
-				if (ti.TabTitle.MouseIsIn(e.Position))
+			TabItem[] tabItms = Children.Cast<TabItem>().OrderBy (t=>t.ViewIndex).ToArray();
+			for (int i = tabItms.Length - 1; i >= 0; i--) {				
+				if (tabItms [i].TabTitle.MouseIsIn(e.Position))
 				{
-					Children[i].checkHoverWidget (e);
+					tabItms [i].checkHoverWidget (e);
 					return;
 				}
 			}

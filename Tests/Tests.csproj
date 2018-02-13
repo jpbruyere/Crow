@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>Tests.Showcase</StartupObject>
+    <StartupObject>Tests.BasicTests</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ReleaseVersion>0.5</ReleaseVersion>
@@ -40,6 +40,18 @@
     <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
+    <StartAction>Program</StartAction>
+    <StartProgram>%24{TargetName}</StartProgram>
+    <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Custom Command' ">
+    <StartAction>Program</StartAction>
+    <StartProgram>%24{TargetName}</StartProgram>
+    <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Custom Command' ">
     <StartAction>Program</StartAction>
     <StartProgram>%24{TargetName}</StartProgram>
     <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
@@ -389,6 +401,9 @@
     <EmbeddedResource Include="ui\showcase.crow" />
     <EmbeddedResource Include="Tutorials\test.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Interfaces\TabItem.template">
+      <LogicalName>Crow.TabItem.template</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -47,7 +47,7 @@ namespace Crow
 
 		protected GraphicObject child;
 
-		internal virtual void SetChild(GraphicObject _child)
+		protected virtual void SetChild(GraphicObject _child)
 		{
 
 			if (child != null) {
@@ -204,6 +204,7 @@ namespace Crow
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
 			base.checkHoverWidget (e);
+
 			if (child != null) 
 				if (child.MouseIsIn (e.Position)) 
 					child.checkHoverWidget (e);

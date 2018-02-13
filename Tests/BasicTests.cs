@@ -143,7 +143,9 @@ namespace Tests
 
 			//testFiles = new string [] { @"Interfaces/Unsorted/testFileDialog.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
-			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			//testFiles = new string [] { @"Interfaces/TemplatedContainer/testTabView.crow" };
+			testFiles = new string [] { @"Interfaces/TemplatedControl/testSpinner.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
@@ -203,7 +205,7 @@ namespace Tests
 				GraphicObject obj = Load (testFiles[idx]);
 				obj.DataSource = this;
 			} catch (Exception ex) {				
-				MessageBox.Show (MessageBox.Type.Error, ex.Message + "\n" + ex.InnerException);
+				MessageBox.Show (CurrentInterface, MessageBox.Type.Error, ex.Message + "\n" + ex.InnerException);
 			}
 		}
 //		void Tv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)

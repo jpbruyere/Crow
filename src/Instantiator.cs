@@ -560,8 +560,13 @@ namespace Crow.IML
 				System.Reflection.Emit.Label finish = il.DefineLabel ();
 				il.Emit (OpCodes.Br, finish);
 				il.MarkLabel (cancel);
-				il.EmitWriteLine (string.Format ("Handler method '{0}' for '{1}' not found in new dataSource", bindingDef.TargetMember, sourceEvent.Name));
+				#if DEBUG_BINDING
+				il.EmitWriteLine (string.Format ("Handler method '{0}' for '{1}' NOT FOUND in new dataSource", bindingDef.TargetMember, sourceEvent.Name));
+				#endif
 				il.MarkLabel (finish);
+				#if DEBUG_BINDING
+				il.EmitWriteLine (string.Format ("Handler method '{0}' for '{1}' FOUND in new dataSource", bindingDef.TargetMember, sourceEvent.Name));
+				#endif
 				il.Emit (OpCodes.Ret);
 
 				//store dschange delegate in instatiator instance for access while instancing graphic object
@@ -1075,18 +1080,23 @@ namespace Crow.IML
 
 		/// <summary>
 		/// search for graphic object type in crow assembly, if not found,
-		/// search for type independently of namespace in entry assembly
+		/// search for type independently of namespace in all the loaded assemblies
 		/// </summary>
+		/// <remarks>
+		/// </remarks>
 		/// <returns>the corresponding type object</returns>
 		/// <param name="typeName">graphic object type name without its namespace</param>
 		Type tryGetGOType (string typeName){
 			Type t = Type.GetType ("Crow." + typeName);
 			if (t != null)
-				return t;
-			Assembly a = Assembly.GetEntryAssembly ();
-			foreach (Type expT in a.GetExportedTypes ()) {
-				if (expT.Name == typeName)
-					return expT;
+				return t;			
+			foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies()) {
+				if (a.IsDynamic)
+					continue;
+				foreach (Type expT in a.GetExportedTypes ()) {
+					if (expT.Name == typeName)
+						return expT;
+				}
 			}
 			return null;
 		}
