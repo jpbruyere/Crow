@@ -200,10 +200,13 @@ namespace Crow
 			addInterfaceControler (tmp);
 			return tmp;
 		}
+		public GraphicObject AddWidget (string path)
+		{			
+			GraphicObject tmp = Load (path);
+			return tmp;
+		}
 		public GraphicObject AddWidget (GraphicObject g, int interfaceIdx = 0){
-			if (ifaceControl.Count == 0)//create default orthogonal interface
-				addInterfaceControler (new InterfaceControler (
-					new Rectangle (0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height)));
+			checkDefaultIFace ();
 			ifaceControl [interfaceIdx].CrowInterface.AddWidget (g);
 			return g;
 		}

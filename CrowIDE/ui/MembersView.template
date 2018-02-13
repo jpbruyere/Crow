@@ -2,7 +2,7 @@
 <Window Template="#Crow.ToolWindow.template" Caption="Properties" MinimumSize="10,10" Width="Stretched" Height="Stretched">
 	<VerticalStack>
 		<Border Height="Fit">
-			<Label TextAlignment="Left" Text="{../../../../Instance}" Width="Stretched"/>
+			<Label TextAlignment="Left" Text="{../../../../SelectedItemName}" Width="Stretched"/>
 		</Border>
 		<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"		
 			ValueChanged="./_scroller_ValueChanged">

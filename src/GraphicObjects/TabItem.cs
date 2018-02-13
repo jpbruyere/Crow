@@ -29,6 +29,7 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
 using Cairo;
+using System.Linq;
 
 namespace Crow
 {
@@ -38,6 +39,8 @@ namespace Crow
 		protected TabItem() : base(){}
 		public TabItem (Interface iface) : base(iface){}
 		#endregion
+
+		public event EventHandler QueryClose;
 
 		#region Private fields
 		GraphicObject titleWidget;
@@ -69,6 +72,21 @@ namespace Crow
 		}
 		internal GraphicObject TabTitle { get { return titleWidget; }}
 		#endregion
+
+		/// <summary>
+		/// order of redrawing, items can't be reordered in TemplatedGroup due to data linked, so we need another index
+		/// instead of children list order
+		/// </summary>
+		public int viewIndex = 0;
+		public virtual int ViewIndex {
+			get { return viewIndex; }
+			set {
+				if (viewIndex == value)
+					return;
+				viewIndex = value;
+				NotifyValueChanged ("ViewIndex", viewIndex);
+			}
+		}
 
 		[XmlAttributeAttribute][DefaultValue("18")]
 		public virtual Measure TabThickness {
@@ -128,7 +146,7 @@ namespace Crow
 			gr.LineTo (Slot.Width-0.5, Slot.Height-0.5);
 			gr.LineTo (0.5, Slot.Height-0.5);
 			gr.ClosePath ();
-			gr.LineWidth = 2;
+			gr.LineWidth = 1;
 			Foreground.SetAsSource (gr);
 			gr.StrokePreserve ();
 
@@ -138,6 +156,8 @@ namespace Crow
 		}
 
 		#region Mouse Handling
+		public bool HoldCursor = false;
+
 		public override bool MouseIsIn (Point m)
 		{
 			if (!(Visible & IsEnabled) || IsDragged)
@@ -150,23 +170,22 @@ namespace Crow
 			return _contentContainer.ScreenCoordinates (_contentContainer.Slot).ContainsOrIsEqual (m)
 				|| mouseIsInTitle;
 		}
-		bool holdCursor = false;
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseDown (sender, e);
-			holdCursor = true;
+			HoldCursor = true;
 		}
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseUp (sender, e);
-			holdCursor = false;
+			HoldCursor = false;
 			(Parent as TabView).UpdateLayout (LayoutingType.ArrangeChildren);
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
 
-			if (!(HasFocus&&holdCursor))
+			if (!(HasFocus && HoldCursor))
 				return;
 			TabView tv = Parent as TabView;
 			TabItem previous = null, next = null;
@@ -176,31 +195,28 @@ namespace Crow
 			else if (tmp > Parent.getSlot ().Width - TabTitle.Slot.Width - tv.Spacing)
 				TabOffset = Parent.getSlot ().Width - TabTitle.Slot.Width - tv.Spacing;
 			else{
-				int idx = tv.Children.IndexOf (this);
-				if (idx > 0 && e.XDelta < 0) {
-					previous = tv.Children [idx - 1] as TabItem;
-
+				TabItem[] tabItms = tv.Children.Cast<TabItem>().OrderBy (t=>t.ViewIndex).ToArray();
+				if (ViewIndex > 0 && e.XDelta < 0) {
+					previous = tabItms [ViewIndex - 1];
 					if (tmp < previous.TabOffset + previous.TabTitle.Slot.Width / 2) {
-						tv.Children.RemoveAt (idx);
-						tv.Children.Insert (idx - 1, this);
-						tv.SelectedTab = idx - 1;
+						previous.ViewIndex = ViewIndex;
+						ViewIndex--;
 						tv.UpdateLayout (LayoutingType.ArrangeChildren);
 					}
 
-				}else if (idx < tv.Children.Count - 1 && e.XDelta > 0) {
-					next = tv.Children [idx + 1] as TabItem;
+				}else if (ViewIndex < tabItms.Length - 1 && e.XDelta > 0) {
+					next = tabItms [ViewIndex + 1];
 					if (tmp > next.TabOffset - next.TabTitle.Slot.Width / 2){
-						tv.Children.RemoveAt (idx);
-						tv.Children.Insert (idx + 1, this);
-						tv.SelectedTab = idx + 1;
+						next.ViewIndex = ViewIndex;
+						ViewIndex++;
 						tv.UpdateLayout (LayoutingType.ArrangeChildren);
 					}
 				}
 				TabOffset = tmp;
 			}
 		}
-		public void butCloseTabClick (object sender, MouseButtonEventArgs e){
-			(Parent as TabView).RemoveChild(this);
+		public void butCloseTabClick (object sender, MouseButtonEventArgs e){			
+			QueryClose.Raise (this, null);
 		}
 		#endregion
 

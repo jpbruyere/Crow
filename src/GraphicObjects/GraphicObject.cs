@@ -363,6 +363,11 @@ namespace Crow
 				this.RegisterForRedraw ();
 			}
 		}
+		#if DEBUG
+		[XmlIgnore]public string TreePath {
+			get { return this.GetType().Name + uid.ToString ();	}
+		}
+		#endif
 		/// <summary>
 		/// Name is used in binding to reference other GraphicObjects inside the graphic tree
 		/// and by template controls to find special element in their template implementation such
@@ -785,7 +790,7 @@ namespace Crow
 				OnDataSourceChanged (this, e);
 		}
 		internal bool localDataSourceIsNull { get { return dataSource == null; } }
-		internal bool localLogicalParentIsNull { get { return logicalParent == null; } }
+		public bool localLogicalParentIsNull { get { return logicalParent == null; } }
 
 		public virtual void OnDataSourceChanged(object sender, DataSourceChangeEventArgs e){
 			DataSourceChanged.Raise (this, e);

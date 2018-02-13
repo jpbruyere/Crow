@@ -52,6 +52,12 @@
     <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Custom Command' ">
+    <StartAction>Program</StartAction>
+    <StartProgram>%24{TargetName}</StartProgram>
+    <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -66,6 +72,10 @@
     <ProjectReference Include="..\Crow.csproj">
       <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
       <Name>Crow</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\gts\CrowEdit\Crow.Coding\Crow.Coding.csproj">
+      <Project>{78842EE4-8A2F-4C75-AEC6-C95F15AD3994}</Project>
+      <Name>Crow.Coding</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -94,6 +104,9 @@
     <Compile Include="..\Tests\InterfaceControler.cs">
       <Link>src\InterfaceControler.cs</Link>
     </Compile>
+    <Compile Include="src\DesignInterface.cs" />
+    <Compile Include="src\EditPane.cs" />
+    <Compile Include="src\ProjectNodes.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />
@@ -101,7 +114,6 @@
     <Folder Include="images\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ui\imlEditor.crow" />
     <EmbeddedResource Include="images\save.svg" />
     <EmbeddedResource Include="ui\IDE.style" />
     <EmbeddedResource Include="ui\MembersView.template">
@@ -121,10 +133,44 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ui\ProjectTree.template" />
     <EmbeddedResource Include="ui\MembersItem.template" />
+    <EmbeddedResource Include="ui\EditPane.template">
+      <LogicalName>CrowIDE.EditPane.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\EditPaneItems.template" />
+    <EmbeddedResource Include="ui\CrowIDE.crow" />
+    <EmbeddedResource Include="ui\icons\blank-file.svg" />
+    <EmbeddedResource Include="ui\icons\sign-out.svg" />
+    <EmbeddedResource Include="ui\icons\copy-file.svg" />
+    <EmbeddedResource Include="ui\icons\paste-on-document.svg" />
+    <EmbeddedResource Include="ui\icons\scissors.svg" />
+    <EmbeddedResource Include="ui\icons\reply.svg" />
+    <EmbeddedResource Include="ui\icons\share-arrow.svg" />
+    <EmbeddedResource Include="ui\icons\question.svg" />
+    <EmbeddedResource Include="ui\icons\inbox.svg" />
+    <EmbeddedResource Include="ui\icons\outbox.svg" />
+    <EmbeddedResource Include="ui\icons\tools.svg" />
+    <EmbeddedResource Include="ui\TabItem.template">
+      <LogicalName>Crow.TabItem.template</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="ui\icons\center-align.svg" />
+    <None Include="ui\icons\cogwheel.svg" />
+    <None Include="ui\icons\edit.svg" />
+    <None Include="ui\icons\file-code.svg" />
+    <None Include="ui\icons\folder.svg" />
+    <None Include="ui\icons\font-file.svg" />
+    <None Include="ui\icons\light-bulb.svg" />
+    <None Include="ui\icons\paragraph.svg" />
+    <None Include="ui\icons\previous.svg" />
+    <None Include="ui\icons\search.svg" />
+    <None Include="ui\icons\text-file.svg" />
+    <None Include="ui\icons\text-label.svg" />
+    <None Include="ui\icons\zoom-in.svg" />
+    <None Include="ui\icons\zoom-out.svg" />
+    <None Include="ui\icons\basic_floppydisk.svg" />
   </ItemGroup>
 </Project>

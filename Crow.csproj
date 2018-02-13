@@ -30,12 +30,14 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-    <DefineConstants>DEBUG_UPDATE0;DEBUG_FOCUS0;DEBUG_LAYOUTING0;TRACE0;DEBUG;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
+    <DefineConstants>DEBUG_UPDATE0;DEBUG_FOCUS0;DEBUG_LAYOUTING0;TRACE0;DEBUG;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING;DEBUG_CLIP_RECTANGLE0</DefineConstants>
     <Optimize>false</Optimize>
+    <OutputPath>$(SolutionDir)build\Debug</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
     <DefineConstants>__linux__</DefineConstants>
+    <OutputPath>$(SolutionDir)build\Release</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="src\Colors.cs" />
@@ -213,6 +215,10 @@
     <Compile Include="src\IML\IMLContext.cs" />
     <Compile Include="src\Mono.Cairo\MeshPattern.cs" />
     <Compile Include="src\GraphicObjects\Shape.cs" />
+    <Compile Include="src\GraphicObjects\MDIContainer.cs" />
+    <Compile Include="src\IListChanged.cs" />
+    <Compile Include="src\ObservableList.cs" />
+    <Compile Include="src\GraphicObjects\IMLContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

@@ -31,91 +31,48 @@ using System.IO;
 using Crow.IML;
 using System.Xml;
 using System.Linq;
+using Crow.Coding;
 
 namespace CrowIDE
 {
-	public enum ItemType {
-		ReferenceGroup,
-		Reference,
-		ProjectReference,
-		VirtualGroup,
-		Folder,
-		None,
-		Compile,
-		EmbeddedResource,
-	}
-
-	public class ProjectNode {
-		ItemType type;
-		string name;
-
-		public Project Project;
-
-		List<ProjectNode> childNodes = new List<ProjectNode>();
-
-		public virtual ItemType Type {
-			get { return type; }
-		}
-		public virtual string DisplayName {
-			get { return name; }
-		}
-		public List<ProjectNode> ChildNodes {
-			get { return childNodes;	}
-		}
-
-		public void SortChilds () {
-			foreach (ProjectNode pn in childNodes)
-				pn.SortChilds ();			
-			childNodes = childNodes.OrderBy(c=>c.Type).ThenBy(cn=>cn.DisplayName).ToList();
-		}
-
-		#region CTOR
-		public ProjectNode (Project project, ItemType _type, string _name) : this(project){			
-			type = _type;
-			name = _name;
-		}
-		public ProjectNode (Project project){
-			Project = project;
-		}
-		#endregion
-	}
-	public class ProjectItem : ProjectNode {
-		public XmlNode node;
-		public string Path {
-			get {
-				return node.Attributes["Include"]?.Value.Replace('\\','/');
-			}
-		}
-		public override ItemType Type {
-			get { 
-				return (ItemType)Enum.Parse (typeof(ItemType), node.Name, true);
-			}
-		}
-		public override string DisplayName {
-			get { 
-				return Type == ItemType.Reference ?
-					Path :
-					Path.Split ('\\', '/').LastOrDefault();
-			}
-		}
-
-		public ProjectItem (Project project, XmlNode _node) : base (project){
-			node = _node;
-		}
-	}
-
-
 	class CrowIDE : CrowWindow
 	{
-		public Command CMDSave = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Save"))) { Caption = "Save", Icon = new SvgPicture("#Crow.Icons.open-file.svg")};
-//		public Command CMDSave = new Command(actionOpenFile) { Caption = "Open...", Icon = new SvgPicture("#Crow.Icons.open-file.svg")};
-//		public Command CMDQuit = new Command(actionOpenFile) { Caption = "Open...", Icon = new SvgPicture("#Crow.Icons.open-file.svg")};
-		public Command CMDCut = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Cut"))) { Caption = "Cut", Icon = new SvgPicture("#Crow.Icons.scissors.svg")};
-		public Command CMDCopy = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Copy"))) { Caption = "Copy", Icon = new SvgPicture("#Crow.Icons.copy-file.svg")};
-		public Command CMDPaste = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Paste"))) { Caption = "Paste", Icon = new SvgPicture("#Crow.Icons.paste-on-document.svg")};
-		public Command CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("Help"))) { Caption = "Help", Icon = new SvgPicture("#Crow.Icons.question.svg")};
+		public Command CMDNew, CMDOpen, CMDSave, CMDSaveAs, CMDQuit,
+		CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp,
+		CMDAbout, CMDOptions,
+		CMDViewGTExp, CMDViewProps, CMDViewProj, CMDViewProjProps,
+		CMDCompile;
 
-		public Command CMDLoad, CMDQuit, CMDViewGTExp, CMDViewProps, CMDViewProj, CMDViewProjProps;
+		void initCommands () {
+			CMDNew = new Command(new Action(() => newFile())) { Caption = "New", Icon = new SvgPicture("#CrowIDE.ui.icons.blank-file.svg"), CanExecute = false};
+			CMDOpen = new Command(new Action(() => openFileDialog())) { Caption = "Open...", Icon = new SvgPicture("#CrowIDE.ui.icons.outbox.svg")};
+			CMDSave = new Command(new Action(() => saveFileDialog())) { Caption = "Save", Icon = new SvgPicture("#CrowIDE.ui.icons.inbox.svg"), CanExecute = false};
+			CMDSaveAs = new Command(new Action(() => saveFileDialog())) { Caption = "Save As...", Icon = new SvgPicture("#CrowIDE.ui.icons.inbox.svg"), CanExecute = false};
+			CMDQuit = new Command(new Action(() => Quit (null, null))) { Caption = "Quit", Icon = new SvgPicture("#CrowIDE.ui.icons.sign-out.svg")};
+			CMDUndo = new Command(new Action(() => undo())) { Caption = "Undo", Icon = new SvgPicture("#CrowIDE.ui.icons.reply.svg"), CanExecute = false};
+			CMDRedo = new Command(new Action(() => redo())) { Caption = "Redo", Icon = new SvgPicture("#CrowIDE.ui.icons.share-arrow.svg"), CanExecute = false};
+			CMDCut = new Command(new Action(() => Quit (null, null))) { Caption = "Cut", Icon = new SvgPicture("#CrowIDE.ui.icons.scissors.svg"), CanExecute = false};
+			CMDCopy = new Command(new Action(() => Quit (null, null))) { Caption = "Copy", Icon = new SvgPicture("#CrowIDE.ui.icons.copy-file.svg"), CanExecute = false};
+			CMDPaste = new Command(new Action(() => Quit (null, null))) { Caption = "Paste", Icon = new SvgPicture("#CrowIDE.ui.icons.paste-on-document.svg"), CanExecute = false};
+			CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("help"))) { Caption = "Help", Icon = new SvgPicture("#CrowIDE.ui.icons.question.svg")};
+			CMDOptions = new Command(new Action(() => openOptionsDialog())) { Caption = "Editor Options", Icon = new SvgPicture("#CrowIDE.ui.icons.tools.svg")};
+
+			CMDViewGTExp = new Command(new Action(() => loadWindow ("#CrowIDE.ui.GTreeExplorer.crow"))) { Caption = "Graphic Tree Explorer"};
+			CMDViewProps = new Command(new Action(() => loadWindow ("#CrowIDE.ui.MemberView.crow"))) { Caption = "Properties View"};
+			CMDCompile = new Command(new Action(() => compileSolution())) { Caption = "Compile"};
+			CMDViewProj = new Command(new Action(() => loadWindow ("#CrowIDE.ui.CSProjExplorer.crow"))) { Caption = "Project Explorer"};
+			CMDViewProjProps = new Command(new Action(loadProjProps) ){ Caption = "Project Properties"};
+		}
+
+		void openFileDialog () {			
+			AddWidget (instFileDlg.CreateInstance(CurrentInterface)).DataSource = this;
+		}
+		void openOptionsDialog(){}
+		void newFile() {}
+		void saveFileDialog() {}
+		void undo() {}
+		void redo() {}
+
 
 		[STAThread]
 		static void Main ()
@@ -129,44 +86,43 @@ namespace CrowIDE
 		{
 		}
 		ImlVisualEditor imlVE;
+		SourceEditor srcEditor;
 
 		Instantiator instFileDlg;
 
 		Solution currentSolution;
-		Project currentProject;
-		TreeView tv;
-
-		public IList<Project> Projects { get {return null;}}
 
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
 
-			ReopenLastSolution = true;
-
 			instFileDlg = Instantiator.CreateFromImlFragment
 				("<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}' SearchPattern='*.*' OkClicked='onFileOpen'/>");
 
-			CMDLoad = new Command(new Action(()=>openFileDialog())) { Caption = "Open", Icon = new SvgPicture("#Crow.Icons.open-file.svg")};
-			CMDQuit = new Command(new Action(() => Quit (null, null))) { Caption = "Quit", Icon = new SvgPicture("#Crow.Icons.exit-symbol.svg")};
-			CMDViewGTExp = new Command(new Action(() => loadWindow ("#CrowIDE.ui.GTreeExplorer.crow"))) { Caption = "Graphic Tree Explorer"};
-			CMDViewProps = new Command(new Action(() => loadWindow ("#CrowIDE.ui.MemberView.crow"))) { Caption = "Properties View"};
-			CMDViewProj = new Command(new Action(() => loadWindow ("#CrowIDE.ui.CSProjExplorer.crow"))) { Caption = "Project Explorer"};
-			CMDViewProjProps = new Command(new Action(loadProjProps) ){ Caption = "Project Properties"};
+			initCommands ();
+
 			this.KeyDown += CrowIDE_KeyDown;
 
 			//this.CrowInterface.LoadInterface ("#CrowIDE.ui.imlEditor.crow").DataSource = this;
 			//GraphicObject go = this.CrowInterface.LoadInterface (@"ui/test.crow");
-			GraphicObject go = CurrentInterface.AddWidget (@"#CrowIDE.ui.imlEditor.crow");
+			GraphicObject go = AddWidget (@"#CrowIDE.ui.CrowIDE.crow");
 			imlVE = go.FindByName ("crowContainer") as ImlVisualEditor;
-			go.DataSource = this;
-
 			if (ReopenLastSolution && !string.IsNullOrEmpty(LastOpenSolution))
 				CurrentSolution = Solution.LoadSolution (LastOpenSolution);
+
+			go.DataSource = this;
+
 		}
 
 		void loadProjProps () {
-			loadWindow ("#CrowIDE.ui.ProjectProperties.crow", currentProject);
+			//loadWindow ("#CrowIDE.ui.ProjectProperties.crow", currentProject);
+		}
+		void compileSolution () {
+			//ProjectItem pi = CurrentSolution.SelectedItem;
+			Project p = CurrentSolution?.Projects[1];
+			if (p == null)
+				return;
+			p.Compile ();
 		}
 
 		public string CurrentDirectory {
@@ -176,7 +132,7 @@ namespace CrowIDE
 			}
 		}
 		public Solution CurrentSolution {
-			get { return CurrentSolution; }
+			get { return currentSolution; }
 			set {
 				if (currentSolution == value)
 					return;
@@ -184,12 +140,7 @@ namespace CrowIDE
 				NotifyValueChanged ("CurrentSolution", currentSolution);
 			}
 		}
-		public string LastOpenProject {
-			get { return Crow.Configuration.Get<string>("LastOpenProject");}
-			set {
-				Crow.Configuration.Set ("LastOpenProject", value);
-			}
-		}
+
 		public string LastOpenSolution {
 			get { return Crow.Configuration.Get<string>("LastOpenSolution");}
 			set {
@@ -207,9 +158,6 @@ namespace CrowIDE
 				Crow.Configuration.Set ("ReopenLastSolution", value);
 				NotifyValueChanged ("ReopenLastSolution", value);
 			}
-		}
-		void openFileDialog () {			
-			AddWidget (instFileDlg.CreateInstance(CurrentInterface)).DataSource = this;
 		}
 
 		public void onFileOpen (object sender, EventArgs e)

@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ItemTemplate>
+	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose"/>
+</ItemTemplate>
+<ItemTemplate DataType=".svg">
+	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
+		<Image Path="{AbsolutePath}"/>
+	</TabItem>
+</ItemTemplate>
+<ItemTemplate DataType=".crow">		
+	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
+		<VerticalStack>
+			<Label Width="Stretched" Margin="1" Text="{HoverWidget}"/>
+			<ImlVisualEditor Height="60%" Margin="0" MinimumSize="10,10" Foreground="SkyBlue"					
+				ProjectNode="{}" SelectedItem="{²SelectedItem}"
+				Name="crowContainer" Background="Onyx"/>
+			<Splitter/>
+			<HorizontalStack Height="Stretched" >
+				<SourceEditor Focusable="true" Name="editor" Font="monospace, 12" VerticalAlignment="Top" Margin="10"
+						Foreground="Jet" Background="White" Width="Stretched" Height="Stretched"
+						 FilePath="{AbsolutePath}"  KeyDown="textView_KeyDown"/>
+				<ScrollBar Name="scrollbarY" Value="{²../editor.ScrollY}"
+						   LargeIncrement="{../editor.VisibleLines}"
+						   CursorSize="{../editor.ChildHeightRatio}"
+					Maximum="{../editor.MaxScrollY}" Orientation="Vertical"
+					Width="14" />
+			</HorizontalStack>
+			<ScrollBar Name="scrollbarX" Value="{²../editor.ScrollX}"
+					Maximum="{../editor.MaxScrollX}" Orientation="Horizontal"
+					Height="14" />
+			<HorizontalStack Height="Fit">
+				<GraphicObject Height="5" Width="Stretched"/>
+				<GraphicObject Background="Red" Width="10" Height="10" Visible="{IsDirty}"/>
+				<Label Text="column:"/>
+				<Label Text="{../../editor.CurrentColumn}"/>
+				<Label Text="Line:"/>
+				<Label Text="{../../editor.CurrentLine}"/>
+				<Label Text="ScrollX:"/>
+				<Label Text="{../../editor.ScrollX}"/>
+			</HorizontalStack>
+		</VerticalStack>
+	</TabItem>
+</ItemTemplate>

@@ -132,7 +132,7 @@ namespace Crow
 		/// Each control need a ref to the root interface containing it, if not set in GraphicObject.currentInterface,
 		/// the ref of this one will be stored in GraphicObject.currentInterface
 		/// </summary>
-		internal static Interface CurrentInterface;
+		protected static Interface CurrentInterface;
 		internal Stopwatch clickTimer = new Stopwatch();
 		internal GraphicObject eligibleForDoubleClick = null;
 		#endregion
@@ -337,11 +337,11 @@ namespace Crow
 		/// <param name="path">path of the iml file to load</param>
 		public GraphicObject Load (string path)
 		{
-			try {
+			//try {
 				return GetInstantiator (path).CreateInstance (this);
-			} catch (Exception ex) {
-				throw new Exception ("Error loading <" + path + ">:", ex);
-			}
+			//} catch (Exception ex) {
+			//	throw new Exception ("Error loading <" + path + ">:", ex);
+			//}
 		}
 		/// <summary>
 		/// Fetch instantiator from cache or create it.
@@ -409,7 +409,7 @@ namespace Crow
 			}
 		}
 		/// <summary>Pointer is over the widget</summary>
-		public GraphicObject HoverWidget
+		public virtual GraphicObject HoverWidget
 		{
 			get { return _hoverWidget; }
 			set {
@@ -775,7 +775,7 @@ namespace Crow
 		/// <summary>Processes mouse move events from the root container, this function
 		/// should be called by the host on mouse move event to forward events to crow interfaces</summary>
 		/// <returns>true if mouse is in the interface</returns>
-		public bool ProcessMouseMove(int x, int y)
+		public virtual bool ProcessMouseMove(int x, int y)
 		{
 			int deltaX = x - Mouse.X;
 			int deltaY = y - Mouse.Y;

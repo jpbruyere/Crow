@@ -38,7 +38,7 @@ namespace Crow
 	public class Group : GraphicObject
     {
 		#region CTOR
-		protected Group () : base(){}
+		public Group () : base() {}
 		public Group(Interface iface) : base(iface){}
 		#endregion
 
@@ -90,6 +90,18 @@ namespace Crow
 
 			this.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
         }
+		public virtual void InsertChild (int idx, GraphicObject g) {
+			lock (children) {
+				g.Parent = this;
+				Children.Insert (idx, g);
+			}
+			g.RegisteredLayoutings = LayoutingType.None;
+			g.LayoutChanged += OnChildLayoutChanges;
+			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
+		}
+		public virtual void RemoveChild (int idx) {
+			RemoveChild (children[idx]);
+		}
 		public virtual void ClearChildren()
 		{
 			lock (children) {

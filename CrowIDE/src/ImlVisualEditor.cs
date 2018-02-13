@@ -34,20 +34,22 @@ namespace CrowIDE
 		#region CTOR
 		public ImlVisualEditor () : base()
 		{
-			imlVE = new Interface ();
+			imlVE = new DesignInterface ();
 			Thread t = new Thread (interfaceThread);
 			t.IsBackground = true;
 			t.Start ();
 		}
 		#endregion
 
-		Interface imlVE;
+		DesignInterface imlVE;
 		Instantiator itor;
-		string imlSource;
 		GraphicObject selectedItem;
+		string imlSource;
+		ProjectItem projectItem;
 
 		bool drawGrid;
 		int gridSpacing;
+
 
 		[XmlAttributeAttribute][DefaultValue(true)]
 		public bool DrawGrid {
@@ -81,6 +83,17 @@ namespace CrowIDE
 				RegisterForRedraw ();
 			}
 		}
+		/// <summary>Pointer is over the widget</summary>
+		public virtual GraphicObject HoverWidget
+		{
+			get { return imlVE.HoverWidget; }
+			set {
+				if (HoverWidget == value)
+					return;
+				imlVE.HoverWidget = value;
+				NotifyValueChanged ("HoverWidget", HoverWidget);
+			}
+		}
 		[XmlIgnore]public List<LQIList> LQIs {
 			get { return imlVE.LQIs; }
 		}
@@ -100,14 +113,8 @@ namespace CrowIDE
 		public string ImlPath {
 			get { return projectItem?.Path; }
 		}
-		ProjectItem projectItem;
-		Project project;
 
-		[XmlAttributeAttribute]
-		public Project Project {
-			get { return project; }
-			set { project = value;	}
-		}
+
 		[XmlAttributeAttribute]
 		public ProjectNode ProjectNode {
 			get { return projectItem; }
@@ -212,19 +219,19 @@ namespace CrowIDE
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
-			base.onMouseMove (sender, e);
-			GraphicObject oldHW = imlVE.HoverWidget;
+			//base.onMouseMove (sender, e);
+			GraphicObject oldHW = HoverWidget;
 			Rectangle scr = this.ScreenCoordinates (this.getSlot ());
 			ProcessMouseMove (e.X - scr.X, e.Y - scr.Y);
-			if (oldHW == imlVE.HoverWidget)
+			if (oldHW == HoverWidget)
 				return;
 			RegisterForRedraw ();
 
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
-			base.onMouseDown (sender, e);
-			SelectedItem = imlVE.HoverWidget;
+			//base.onMouseDown (sender, e);
+			SelectedItem = HoverWidget;
 		}
 		protected override void onDraw (Cairo.Context gr)
 		{
@@ -264,8 +271,8 @@ namespace CrowIDE
 			}
 
 			Rectangle hr;
-			if (imlVE.HoverWidget != null) {
-				hr = imlVE.HoverWidget.ScreenCoordinates (imlVE.HoverWidget.getSlot ());
+			if (HoverWidget != null) {
+				hr = HoverWidget.ScreenCoordinates (HoverWidget.getSlot ());
 //			gr.SetSourceColor (Color.LightGray);
 //			gr.DrawCote (new Cairo.PointD (hr.X, hr.Center.Y), new Cairo.PointD (hr.Right, hr.Center.Y));
 //			gr.DrawCote (new Cairo.PointD (hr.Center.X, hr.Y), new Cairo.PointD (hr.Center.X, hr.Bottom));
@@ -285,6 +292,42 @@ namespace CrowIDE
 		}
 		#endregion
 
+		void WidgetCheckOver (GraphicObject go, MouseMoveEventArgs e){
+			Type tGo = go.GetType();
+			if (typeof(TemplatedGroup).IsAssignableFrom (tGo)) {
+				
+			} else if (typeof(TemplatedContainer).IsAssignableFrom (tGo)) {
+				TemplatedContainer c = go as TemplatedContainer;
+				if (c.Content?.MouseIsIn (e.Position) == true) {					
+					WidgetCheckOver (c.Content, e);
+					return;
+				}
+			} else if (typeof(TemplatedControl).IsAssignableFrom (tGo)) {
+			} else if (typeof(Group).IsAssignableFrom (tGo)) {
+				Group c = go as Group;
+				for (int i = c.Children.Count -1; i >= 0; i--) {
+					if (c.Children[i].MouseIsIn (e.Position)) {					
+						WidgetCheckOver (c.Children[i], e);
+						return;
+					}
+				}
+			} else if (typeof(Crow.Container).IsAssignableFrom (tGo)) {
+				Crow.Container c = go as Crow.Container;
+				if (c.Child?.MouseIsIn (e.Position)==true) {					
+					WidgetCheckOver (c.Child, e);
+					return;
+				}
+			}
+			HoverWidget = go;
+			WidgetMouseEnter (go, e);
+		}
+		void WidgetMouseLeave (GraphicObject go, MouseMoveEventArgs e){
+
+		}
+		void WidgetMouseEnter (GraphicObject go, MouseMoveEventArgs e){
+
+		}
+		void WidgetMouseMove (GraphicObject go, MouseMoveEventArgs e){}
 		public bool ProcessMouseMove(int x, int y)
 		{
 			int deltaX = x - imlVE.Mouse.X;
@@ -297,14 +340,14 @@ namespace CrowIDE
 			if (imlVE.ActiveWidget != null) {
 				//TODO, ensure object is still in the graphic tree
 				//send move evt even if mouse move outside bounds
-				imlVE.ActiveWidget.onMouseMove (this, e);
+				WidgetMouseMove (imlVE.ActiveWidget, e);
 				return true;
 			}
 
-			if (imlVE.HoverWidget != null) {
+			if (HoverWidget != null) {
 				//TODO, ensure object is still in the graphic tree
 				//check topmost graphicobject first
-				GraphicObject tmp = imlVE.HoverWidget;
+				GraphicObject tmp = HoverWidget;
 				GraphicObject topc = null;
 				while (tmp is GraphicObject) {
 					topc = tmp;
@@ -317,11 +360,11 @@ namespace CrowIDE
 						if (imlVE.GraphicTree [i].LogicalParent == imlVE.GraphicTree [i].Parent) {
 							if (imlVE.GraphicTree [i].MouseIsIn (e.Position)) {
 								while (imlVE.HoverWidget != null) {
-									imlVE.HoverWidget.onMouseLeave (imlVE.HoverWidget, e);
+									WidgetMouseLeave (imlVE.HoverWidget, e);
 									imlVE.HoverWidget = imlVE.HoverWidget.LogicalParent as GraphicObject;
 								}
 
-								imlVE.GraphicTree [i].checkHoverWidget (e);
+								WidgetCheckOver (GraphicTree [i], e);
 								return true;
 							}
 						}
@@ -331,18 +374,18 @@ namespace CrowIDE
 
 
 				if (imlVE.HoverWidget.MouseIsIn (e.Position)) {
-					imlVE.HoverWidget.checkHoverWidget (e);
+					WidgetCheckOver (imlVE.HoverWidget, (e));
 					return true;
 				} else {
-					imlVE.HoverWidget.onMouseLeave (imlVE.HoverWidget, e);
+					WidgetMouseLeave (imlVE.HoverWidget, e);
 					//seek upward from last focused graph obj's
 					while (imlVE.HoverWidget.LogicalParent as GraphicObject != null) {
 						imlVE.HoverWidget = imlVE.HoverWidget.LogicalParent as GraphicObject;
 						if (imlVE.HoverWidget.MouseIsIn (e.Position)) {
-							imlVE.HoverWidget.checkHoverWidget (e);
+							WidgetCheckOver (imlVE.HoverWidget, e);
 							return true;
 						} else
-							imlVE.HoverWidget.onMouseLeave (imlVE.HoverWidget, e);
+							WidgetMouseLeave (imlVE.HoverWidget, e);
 					}
 				}
 			}
@@ -352,9 +395,7 @@ namespace CrowIDE
 				for (int i = 0; i < imlVE.GraphicTree.Count; i++) {
 					GraphicObject g = imlVE.GraphicTree [i];
 					if (g.MouseIsIn (e.Position)) {
-						g.checkHoverWidget (e);
-						if (g is Window)
-							imlVE.PutOnTop (g);
+						WidgetCheckOver (g, e);
 						return true;
 					}
 				}

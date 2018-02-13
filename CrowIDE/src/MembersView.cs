@@ -93,6 +93,10 @@ namespace CrowIDE
 					return;
 				instance = value;
 				NotifyValueChanged ("Instance", instance);
+				if (Instance is GraphicObject)
+					NotifyValueChanged ("SelectedItemName", (Instance as GraphicObject).Name);
+				else
+					NotifyValueChanged ("SelectedItemName", "");
 
 				if (instance == null) {
 					Data = null;

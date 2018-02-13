@@ -19,8 +19,9 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using Crow;
 
-namespace CrowIDE{
+namespace CrowIDE{	
 	public class SolutionProject {
 		public string ProjectHostGuid;
 		public string ProjectName;
@@ -30,8 +31,64 @@ namespace CrowIDE{
 	/// <summary>
 /// .sln loaded into class.
 /// </summary>
-	public class Solution
+	public class Solution: IValueChange
 	{
+		#region IValueChange implementation
+		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+		public virtual void NotifyValueChanged(string MemberName, object _value)
+		{
+			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
+		}
+		#endregion
+
+		ObservableList<ProjectItem> openedItems = new ObservableList<ProjectItem>();
+		public ObservableList<ProjectItem> OpenedItems {
+			get { return openedItems; }
+			set {
+				if (openedItems == value)
+					return;
+				openedItems = value;
+				NotifyValueChanged ("OpenedItems", openedItems);
+			}
+		}
+		ProjectItem selectedItem = null;
+		object selectedItemElement = null;
+
+		public ProjectItem SelectedItem {
+			get { return selectedItem; }
+			set {
+				if (selectedItem == value)
+					return;
+				selectedItem = value;
+				NotifyValueChanged ("SelectedItem", selectedItem);
+			}
+		}
+		public object SelectedItemElement {
+			get { return selectedItemElement; }
+			set {
+				if (selectedItemElement == value)
+					return;
+				selectedItemElement = value;
+				NotifyValueChanged ("SelectedItemElement", selectedItemElement);
+			}
+		}
+
+		void onSelectedItemChanged (object sender, SelectionChangeEventArgs e){			
+			ProjectItem pi = e.NewValue as ProjectItem;
+			if (pi == null)
+				return;
+			if (openedItems.Contains (pi))
+				return;
+			openedItems.AddElement (pi);
+		}
+		public void OnCloseTab (object sender, MouseButtonEventArgs e){			
+			
+			openedItems.RemoveElement ((sender as GraphicObject).DataSource as ProjectItem);
+		}
+		public void CloseItem (ProjectItem pi) {
+			openedItems.RemoveElement (pi);
+		}
+
 	    /// <summary>
 	    /// Solution name
 	    /// </summary>
@@ -53,7 +110,7 @@ namespace CrowIDE{
 	    [ExcludeFromCodeCoverage]
 	    public override string ToString()
 	    {
-	        return "Solution, name = " + name;
+	        return "Solution: " + name;
 	    }
 
 	    /// <summary>
@@ -76,6 +133,7 @@ namespace CrowIDE{
 			}
 		}
 
+		#region Solution properties
 	    double slnVer;                                      // 11.00 - vs2010, 12.00 - vs2015
 
 	    /// <summary>
@@ -119,13 +177,18 @@ namespace CrowIDE{
 	    {
 	        return configurations.Select(x => x.Split('|')[0]).Distinct();
 	    }
+		#endregion
 
 
+		#region CTOR
 	    /// <summary>
 	    /// Creates new solution.
 	    /// </summary>
 	    public Solution() { }
+		#endregion
 
+
+		#region Loading from SLN file	
 	    /// <summary>
 	    /// Loads visual studio .sln solution
 	    /// </summary>
@@ -272,7 +335,7 @@ namespace CrowIDE{
 	            String v = m4.Groups[1].Value;
 	            new Regex("\\s*?({[A-F0-9-]+}) = ({[A-F0-9-]+})[\r\n]+", RegexOptions.Multiline).Replace(v, new MatchEvaluator(m5 =>
 	            {
-	                String[] args = m5.Groups.Cast<Group>().Skip(1).Select(x => x.Value).ToArray();
+	                String[] args = m5.Groups.Cast<System.Text.RegularExpressions.Group>().Skip(1).Select(x => x.Value).ToArray();
 	                SolutionProject child = s.projects.Where(x => args[0] == x.ProjectGuid).FirstOrDefault();
 	                SolutionProject parent = s.projects.Where(x => args[1] == x.ProjectGuid).FirstOrDefault();
 //	                parent.nodes.Add(child);
@@ -285,5 +348,6 @@ namespace CrowIDE{
 
 	        return s;
 	    } //LoadSolution
-	} //class Solution
+		#endregion
+	} 
 }

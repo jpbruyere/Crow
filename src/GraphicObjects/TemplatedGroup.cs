@@ -172,7 +172,19 @@ namespace Crow
 
 				cancelLoadingThread ();
 
+				if (data is IObservableList) {
+					IObservableList ol = data as IObservableList;
+					ol.ListAdd -= Ol_ListAdd;
+					ol.ListRemove -= Ol_ListRemove;
+				}
+
 				data = value;
+
+				if (data is IObservableList) {
+					IObservableList ol = data as IObservableList;
+					ol.ListAdd += Ol_ListAdd;
+					ol.ListRemove += Ol_ListRemove;
+				}
 
 				NotifyValueChanged ("Data", data);
 
@@ -191,6 +203,27 @@ namespace Crow
 				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
 				NotifyValueChanged ("HasItems", HasItems);
 			}
+		}
+
+		void Ol_ListRemove (object sender, ListChangedEventArg e)
+		{
+			if (this.isPaged) {
+				int p = e.Index / itemPerPage;
+				int i = e.Index % itemPerPage;
+				(items.Children [p] as Group).RemoveChild (i);
+			} else
+				items.RemoveChild (e.Index);
+		}
+
+		void Ol_ListAdd (object sender, ListChangedEventArg e)
+		{
+			if (this.isPaged) {
+				throw new NotImplementedException();
+//				int p = e.Index / itemPerPage;
+//				int i = e.Index % itemPerPage;
+//				(items.Children [p] as Group).InsertChild (i, e.Element);
+			} else
+				loadItem (e.Index, items);
 		}
 
 		[XmlAttributeAttribute][DefaultValue("SteelBlue")]
@@ -311,7 +344,7 @@ namespace Crow
 			#endif
 
 			Group page;
-			if (typeof(Wrapper).IsAssignableFrom (items.GetType ())) {
+			if (typeof(TabView).IsAssignableFrom (items.GetType ())||typeof(Wrapper).IsAssignableFrom (items.GetType ())) {
 				page = items;
 				itemPerPage = int.MaxValue;
 			} else if (typeof(GenericStack).IsAssignableFrom (items.GetType ())) {
@@ -326,6 +359,8 @@ namespace Crow
 				isPaged = true;
 			} else {
 				page = Activator.CreateInstance (items.GetType ()) as Group;
+				page.CurrentInterface = items.CurrentInterface;
+				page.Initialize ();
 				page.Name = "page" + pageNum;
 				isPaged = true;
 			}

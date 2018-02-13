@@ -8,4 +8,5 @@
 		<Spinner Value="5"/>
 		<Button/>
 	</HorizontalStack>
+	<IMLContainer Path="Interfaces/Divers/colorPicker.crow"/>
 </VerticalStack>

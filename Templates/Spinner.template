@@ -1,18 +1,12 @@
 <?xml version="1.0"?>
-<HorizontalStack MinimumSize="40,10" Name="hstack" Margin="0" Spacing="0">
-	<Border BorderWidth="1" Width="80%"  Background="White" 
+<HorizontalStack MinimumSize="40,13" Name="hstack" Margin="0" Spacing="0">
+	<Border BorderWidth="1" Width="75%"  Background="White" 
 		Foreground="{./Foreground}" Margin="0">
 		<TextBox Foreground="{./Foreground}" Font="{./Font}" Width="Stretched"
 			Text="{²./Value}" TextAlignment="Right" Margin="0"/>
 	</Border>
-	<VerticalStack MinimumSize="8,10" Width="20%" Height="Stretched" Spacing="0" Margin="0" Background="Red">
-		<Button MouseRepeat="true" Width="Stretched" Height="50%" Margin="0" MouseClick="./onUp"
-			Template="#Crow.Templates.ArrowBut.template">
-			<Image Path="#Crow.Images.Icons.updown.svg" SvgSub="up" Margin="0"/>
-		</Button>				
-		<Button MouseRepeat="true" Width="Stretched" Height="50%" Margin="0" MouseClick="./onDown" 
-			Template="#Crow.Templates.ArrowBut.template">
-			<Image Path="#Crow.Images.Icons.updown.svg" SvgSub="down" Margin="0"/>
-		</Button>
+	<VerticalStack MinimumSize="13,13" Width="25%" Height="Stretched" Spacing="0" Margin="0">
+		<Shape Style="ArrowBut"	Height="50%" MouseClick="./onUp" Path="M 5.5,0.5 L 10.5,6.5 L 0.5,6.5 Z"/>			
+		<Shape Style="ArrowBut"	Height="50%" MouseClick="./onDown" Path="M 0.5,0.5 L 10.5,0.5 L 5.5,6.5 Z"/>			
 	</VerticalStack>
 </HorizontalStack>

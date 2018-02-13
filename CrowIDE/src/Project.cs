@@ -28,16 +28,18 @@ using System.Xml;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.CSharp;
+using System.CodeDom.Compiler;
 
 namespace CrowIDE
-{
+{	
 	public class Project {
 		string path;
 		XmlDocument xmlDoc;
 		XmlNode nodeProject;
 		XmlNode nodeProps;
 		XmlNodeList nodesItems;
-		Solution solution;
+		public Solution solution;
 
 		public string Name {
 			get { return solution.projects.FirstOrDefault(p=>p.ProjectGuid == ProjectGuid).ProjectName; }
@@ -120,7 +122,7 @@ namespace CrowIDE
 					case ItemType.None:
 					case ItemType.EmbeddedResource:						
 						ProjectNode curNode = root;
-						string[] folds = pn.Path.Split ('\\', '/');
+						string[] folds = pn.Path.Split ('/');
 						for (int i = 0; i < folds.Length - 1; i++) {
 							ProjectNode nextNode = curNode.ChildNodes.FirstOrDefault (n => n.DisplayName == folds [i] && n.Type == ItemType.VirtualGroup);
 							if (nextNode == null) {
@@ -159,6 +161,25 @@ namespace CrowIDE
 			nodesItems = xmlDoc.SelectNodes ("/Project/ItemGroup");
 
 		}
+	
+	
+		public void Compile () {
+			CSharpCodeProvider cp = new CSharpCodeProvider();
+
+			CompilerParameters parameters = new CompilerParameters();
+
+			foreach (ProjectItem pi in Items.Where (p=>p.Type == ItemType.Reference)) {
+				parameters.ReferencedAssemblies.Add (pi.Path);
+			}
+				
+			parameters.GenerateInMemory = true;
+			// True - exe file generation, false - dll file generation
+			parameters.GenerateExecutable = true;
+
+			string[] files = Items.Where (p => p.Type == ItemType.Compile).Select (p => p.AbsolutePath).ToArray();
+
+			CompilerResults results = cp.CompileAssemblyFromFile(parameters, files);
+		}	
 	}
 }
 
