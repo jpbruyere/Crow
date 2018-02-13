@@ -43,8 +43,8 @@ namespace Crow
 		int column = 1;
 		int line = 1;
 
-		public StyleReader (Assembly assembly, string resId)
-			: base(assembly.GetManifestResourceStream (resId))
+		public StyleReader (Interface iface, Stream stream, string resId)
+			: base(stream)
 		{
 			resourceId = resId;
 			string styleKey = resId.Substring (0, resId.Length - 6);
@@ -137,11 +137,11 @@ namespace Crow
 							string expression = token.Trim ();
 
 							foreach (string tc in targetsClasses) {
-								if (!Interface.Styling.ContainsKey (tc))
-									Interface.Styling [tc] = new Style ();
-								else if (Interface.Styling [tc].ContainsKey (currentProperty))
+								if (!iface.Styling.ContainsKey (tc))
+									iface.Styling [tc] = new Style ();
+								else if (iface.Styling [tc].ContainsKey (currentProperty))
 									continue;
-								Interface.Styling [tc] [currentProperty] = expression;
+								iface.Styling [tc] [currentProperty] = expression;
 							}
 							token = "";
 						}

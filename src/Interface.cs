@@ -76,7 +76,6 @@ namespace Crow
 				Directory.CreateDirectory (CrowConfigRoot);
 
 			loadCursors ();
-			loadStyling ();
 			findAvailableTemplates ();
 
 			FontRenderingOptions = new FontOptions ();
@@ -88,7 +87,7 @@ namespace Crow
 		public Interface(){
 			CurrentInterface = this;
 			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-
+			loadStyling ();
 			initTooltip ();
 		}
 		#endregion
@@ -204,11 +203,11 @@ namespace Crow
 		/// The compilation is done on the first object instancing, and is also done for custom widgets
 		public delegate void LoaderInvoker(object instance);
 		/// <summary>Store one loader per StyleKey</summary>
-		public static Dictionary<String, LoaderInvoker> DefaultValuesLoader = new Dictionary<string, LoaderInvoker>();
+		public Dictionary<String, LoaderInvoker> DefaultValuesLoader = new Dictionary<string, LoaderInvoker>();
 		/// <summary>Store dictionnary of member/value per StyleKey</summary>
-		public static Dictionary<string, Style> Styling;
+		public Dictionary<string, Style> Styling;
 		/// <summary> parse all styling data's during application startup and build global Styling Dictionary </summary>
-		static void loadStyling() {
+		protected virtual void loadStyling() {
 			Styling = new Dictionary<string, Style> ();
 
 			//fetch styling info in this order, if member styling is alreadey referenced in previous
@@ -217,14 +216,16 @@ namespace Crow
 			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
 		}
 		/// <summary> Search for .style resources in assembly </summary>
-		static void loadStylingFromAssembly (Assembly assembly) {
+		void loadStylingFromAssembly (Assembly assembly) {
 			if (assembly == null)
 				return;
 			foreach (string s in assembly
 				.GetManifestResourceNames ()
 				.Where (r => r.EndsWith (".style", StringComparison.OrdinalIgnoreCase))) {
-				new StyleReader (assembly, s)
-					.Dispose ();
+				using (Stream stream = assembly.GetManifestResourceStream (s)) {
+					new StyleReader (this, stream, s);
+				}
+
 			}
 		}
 		static void loadCursors(){
