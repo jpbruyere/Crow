@@ -837,17 +837,17 @@ namespace Crow
 			Type thisType = this.GetType ();
 
 			if (!string.IsNullOrEmpty (Style)) {
-				if (Interface.DefaultValuesLoader.ContainsKey (Style)) {
-					Interface.DefaultValuesLoader [Style] (this);
+				if (CurrentInterface.DefaultValuesLoader.ContainsKey (Style)) {
+					CurrentInterface.DefaultValuesLoader [Style] (this);
 					return;
 				}
 			} else {
-				if (Interface.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
-					Interface.DefaultValuesLoader [thisType.FullName] (this);
+				if (CurrentInterface.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
+					CurrentInterface.DefaultValuesLoader [thisType.FullName] (this);
 					return;
-				} else if (!Interface.Styling.ContainsKey (thisType.FullName)) {
-					if (Interface.DefaultValuesLoader.ContainsKey (thisType.Name)) {
-						Interface.DefaultValuesLoader [thisType.Name] (this);
+				} else if (!CurrentInterface.Styling.ContainsKey (thisType.FullName)) {
+					if (CurrentInterface.DefaultValuesLoader.ContainsKey (thisType.Name)) {
+						CurrentInterface.DefaultValuesLoader [thisType.Name] (this);
 						return;
 					}
 				}
@@ -862,17 +862,17 @@ namespace Crow
 			//   those files being placed in a Styles folder
 			string styleKey = Style;
 			if (!string.IsNullOrEmpty (Style)) {
-				if (Interface.Styling.ContainsKey (Style)) {
-					styling.Add (Interface.Styling [Style]);
+				if (CurrentInterface.Styling.ContainsKey (Style)) {
+					styling.Add (CurrentInterface.Styling [Style]);
 				}
 			}
-			if (Interface.Styling.ContainsKey (thisType.FullName)) {
-				styling.Add (Interface.Styling [thisType.FullName]);
+			if (CurrentInterface.Styling.ContainsKey (thisType.FullName)) {
+				styling.Add (CurrentInterface.Styling [thisType.FullName]);
 				if (string.IsNullOrEmpty (styleKey))
 					styleKey = thisType.FullName;
 			}
-			if (Interface.Styling.ContainsKey (thisType.Name)) {
-				styling.Add (Interface.Styling [thisType.Name]);
+			if (CurrentInterface.Styling.ContainsKey (thisType.Name)) {
+				styling.Add (CurrentInterface.Styling [thisType.Name]);
 				if (string.IsNullOrEmpty (styleKey))
 					styleKey = thisType.Name;
 			}
@@ -942,8 +942,8 @@ namespace Crow
 			#endregion
 
 			try {
-				Interface.DefaultValuesLoader[styleKey] = (Interface.LoaderInvoker)dm.CreateDelegate(typeof(Interface.LoaderInvoker));
-				Interface.DefaultValuesLoader[styleKey] (this);
+				CurrentInterface.DefaultValuesLoader[styleKey] = (Interface.LoaderInvoker)dm.CreateDelegate(typeof(Interface.LoaderInvoker));
+				CurrentInterface.DefaultValuesLoader[styleKey] (this);
 			} catch (Exception ex) {
 				throw new Exception ("Error applying style <" + styleKey + ">:", ex);
 			}

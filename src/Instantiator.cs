@@ -146,11 +146,14 @@ namespace Crow.IML
 		/// store indices of template delegate to be handled by root parentChanged event
 		/// </summary>
 		List<int> templateCachedDelegateIndices = new List<int>();
+		/// <summary>
+		/// Store template bindings in the instantiator
+		/// </summary>
 		Delegate templateBinding;
 
 		#region IML parsing
 		/// <summary>
-		/// Parses IML and build a dynamic method that will be used to instanciate one or multiple occurence of the IML file or fragment
+		/// Parses IML and build a dynamic method that will be used to instantiate one or multiple occurences of the IML file or fragment
 		/// </summary>
 		void parseIML (XmlReader reader) {
 			IMLContext ctx = new IMLContext (findRootType (reader));
