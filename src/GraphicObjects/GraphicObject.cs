@@ -1516,42 +1516,15 @@ namespace Crow
 		public virtual bool PointIsIn(ref Point m)
 		{			
 			if (!(Visible & isEnabled)||IsDragged)
-				return false;				
-			ILayoutable tmp = Parent;
-			//while (tmp != null){
+				return false;
 			if (!parent.PointIsIn(ref m))
 				return false;
 			m -= (parent.getSlot().Position + parent.ClientRectangle.Position) ;
-
 			return Slot.ContainsOrIsEqual (m);					
 		}
 		public virtual bool MouseIsIn(Point m)
-		{
-			Point p = m;
-			return PointIsIn (ref m);
-//			try {
-//				if (!(Visible & isEnabled)||IsDragged)
-//					return false;				
-//				ILayoutable tmp = Parent;
-//				//while (tmp != null){
-//				if (!parent.MouseIsIn(m))
-//					return false;
-//				m -= (parent.getSlot().Position + parent.ClientRectangle.Position) ;
-//
-//				return slot.ContainsOrIsEqual (m);
-////					Scroller scr = tmp as Scroller;						
-////					if (scr != null) {
-////						m.Y += scr.ScrollY;
-////						m.X += scr.ScrollX;
-////					}					
-////					tmp = tmp.Parent;
-//				//}
-//
-//				//}
-//			} catch (Exception ex) {
-//				return false;
-//			}
-			//return false;
+		{			
+			return (!(Visible & isEnabled)||IsDragged) ? false : PointIsIn (ref m);
 		}
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{

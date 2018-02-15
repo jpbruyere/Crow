@@ -223,20 +223,8 @@ namespace Crow
 
 		public override bool PointIsIn (ref Point m)
 		{
-//			if (!(Visible & IsEnabled)||IsDragged)
-//				return false;				
-//			ILayoutable tmp = Parent;
-//			//while (tmp != null){
-//			if (!Parent.PointIsIn(ref m))
-//				return false;
-//			m -= (Parent.getSlot().Position + Parent.ClientRectangle.Position);
-//			if (!Slot.ContainsOrIsEqual (m) || child==null)
-//				return false;
-//			m += new Point (ScrollX, ScrollY);
-//			return true;
 			if (!base.PointIsIn(ref m))
 				return false;
-			//m -= (Parent.getSlot().Position + Parent.ClientRectangle.Position);
 			if (!Slot.ContainsOrIsEqual (m) || child==null)
 				return false;
 			m += new Point (ScrollX, ScrollY);
