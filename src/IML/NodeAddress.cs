@@ -54,18 +54,21 @@ namespace Crow.IML
 			if (splitedExp.Length < 2)//dataSource binding
 				return null;
 
-			if (string.IsNullOrEmpty (splitedExp [0]) || splitedExp [0] == ".") {//search template root
-				ptr--;
-				while (ptr >= 0) {
-					if (typeof(TemplatedControl).IsAssignableFrom (this [ptr].CrowType))
-						break;
+			if (!string.IsNullOrEmpty (splitedExp [0])) {//else bind on current node
+				//return new NodeAddress (this.Take(ptr+1).ToArray());
+				if (splitedExp [0] == ".") {//search template root
 					ptr--;
+					while (ptr >= 0) {
+						if (typeof(TemplatedControl).IsAssignableFrom (this [ptr].CrowType))
+							break;
+						ptr--;
+					}
+				} else if (splitedExp [0] == "..") { //search starting at current node
+					int levelUp = splitedExp.Length - 1;
+					if (levelUp > ptr + 1)
+						throw new Exception ("Binding error: try to bind outside IML source");
+					ptr -= levelUp;
 				}
-			} else if (splitedExp [0] == "..") { //search starting at current node
-				int levelUp = splitedExp.Length - 1;
-				if (levelUp > ptr + 1)
-					throw new Exception ("Binding error: try to bind outside IML source");
-				ptr -= levelUp;
 			}
 			expression = splitedExp [splitedExp.Length - 1];
 			//TODO:change Template special address identified with Nodecount = 0 to something not using array count to 0,

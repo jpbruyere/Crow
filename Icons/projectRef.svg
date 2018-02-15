@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   viewBox="0 0 64 64"
+   height="64"
+   width="64"
+   id="svg2"
+   version="1.1">  
+  <defs id="defs6" />
+  <g>
+	   <path fill="#007fff" stroke="#111111" stroke-width="2" d="m1.655043,19.482317l17.905939,-17.913175l25.323143,0l17.905937,17.913175l0,25.333551l-17.905937,17.913147l-25.323143,0l-17.905939,-17.913147l0,-25.333551z" id="svg_2"/>
+	  <path
+	     d="M 15,33.964845 A 6.2543149,5.8551034 0 0 1 8.7456846,39.819949 6.2543149,5.8551034 0 0 1 2.4913703,33.964845 6.2543149,5.8551034 0 0 1 8.7456846,28.109741 6.2543149,5.8551034 0 0 1 15,33.964845 Z M 30.205524,19.726298 h 24.484978 c 3.833495,0 6.919666,3.88699 6.919666,8.715226 v 11.046641 c 0,4.828235 -3.086171,8.715225 -6.919666,8.715225 H 30.205524 c -3.833494,0 -6.919665,-3.88699 -6.919665,-8.715225 V 28.441524 c 0,-4.828236 3.086171,-8.715226 6.919665,-8.715226 z M 15,33.964845 h 8.285859"
+	     style="opacity:1;fill:#a0a8ab;fill-opacity:1;stroke:#181818;stroke-width:2;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+	     id="path819" />
+  </g>
+</svg>

@@ -257,6 +257,12 @@ namespace Crow
 	    this.IsPressed = pressed;
 	}
 
+	public MouseButtonEventArgs(MouseButton button)
+		: base()
+	{
+		this.button = button;
+	}
+
 	/// <summary>
 	/// Constructs a new <see cref="MouseButtonEventArgs"/> instance.
 	/// </summary>

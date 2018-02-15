@@ -45,7 +45,7 @@ namespace Crow
 		void RegisterForLayouting(LayoutingType layoutType);
 		void RegisterClip(Rectangle clip);
 		bool UpdateLayout(LayoutingType layoutType);
-
+		bool PointIsIn(ref Point m);
 
 		Rectangle ContextCoordinates(Rectangle r);
 		Rectangle ScreenCoordinates (Rectangle r);

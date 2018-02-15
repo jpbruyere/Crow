@@ -71,9 +71,9 @@ namespace Crow
 	/// 
 	/// ```csharp\n
 	///     //storing\n
-	///     Configuration.Set ("Option1", 42);\n
+	///     Configuration.Global.Set ("Option1", 42);\n
 	///     //loading\n
-	///     int op1 = Configuration.Get<int> ("Option1");\n
+	///     int op1 = Configuration.Global.Get<int> ("Option1");\n
 	/// ```\n
 	/// </summary>
 	/// 
@@ -82,15 +82,28 @@ namespace Crow
 	/// 
 	/// When running the application for the first time, some default options may be necessary. Their can be defined
 	/// in a special embedded resource text file with the key '**appname.default.config**'
-	public static class Configuration
+	public class Configuration
 	{
-		volatile static bool isDirty = false;
-		static string configPath, configFileName = "app.config";
-		static Dictionary<string, ConfigItem> items;
+		volatile bool isDirty = false;
+		string configPath;
+		Dictionary<string, ConfigItem> items = new Dictionary<string, ConfigItem> ();
+		static Configuration  globalConfig;
 
+		public static Configuration Global { get { return globalConfig; } }
+
+		public Configuration (string path, Stream defaultConf = null) {
+			configPath = path;
+			if (File.Exists (configPath)) {
+				using (Stream s = new FileStream (configPath, FileMode.Open))
+					load (s);
+				
+			} else if (defaultConf != null) {				
+				load (defaultConf);
+			}
+			startSavingThread ();
+		}
 		static Configuration ()
 		{
-			items = new Dictionary<string, ConfigItem> ();
 			string configRoot =
 				Path.Combine(
 					Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
@@ -98,39 +111,29 @@ namespace Crow
 
 			Assembly a = Assembly.GetEntryAssembly ();
 			string appName = a.GetName().Name;
+			string globalConfigPath = Path.Combine (configRoot, appName);
 
-			configPath = Path.Combine (configRoot, appName);
+			if (!Directory.Exists (globalConfigPath))
+				Directory.CreateDirectory (globalConfigPath);
 
-			if (!Directory.Exists(configPath))
-				Directory.CreateDirectory (configPath);
+			globalConfigPath = Path.Combine (globalConfigPath, "global.config");
 
-			string path = Path.Combine(configPath, configFileName);
-
-			if (File.Exists (path)) {
-				using (Stream s = new FileStream (path, FileMode.Open))
-					load (s);
-			} else {
-				string defaultConfigResID = appName + ".default.config";
-				bool found = false;
-				foreach (string resIds in a.GetManifestResourceNames()) {
-					if (string.Equals (defaultConfigResID, resIds, StringComparison.OrdinalIgnoreCase)) {
-						using (Stream s = a.GetManifestResourceStream (defaultConfigResID))
-							load (s);
-						found = true;
-						break;
-					}
+			string defaultConfigResID = appName + ".default.config";
+			foreach (string resIds in a.GetManifestResourceNames()) {
+				if (string.Equals (defaultConfigResID, resIds, StringComparison.OrdinalIgnoreCase)) {
+				using (Stream s = a.GetManifestResourceStream (defaultConfigResID))
+					globalConfig = new Configuration (globalConfigPath, s);
+					return;
 				}
-				if (!found)
-					Console.WriteLine ("No Default Config found. ({0})", defaultConfigResID);
 			}
-			startSavingThread ();
+			globalConfig = new Configuration (globalConfigPath);
 		}
-		static void startSavingThread(){
+		void startSavingThread(){
 			Thread t = new Thread (savingThread);
 			t.IsBackground = true;
 			t.Start ();
 		}
-		static void savingThread(){
+		void savingThread(){
 			while(true){
 				if (isDirty) {
 					save ();
@@ -143,7 +146,7 @@ namespace Crow
 		/// retrive the value of the configuration key given in parameter
 		/// </summary>
 		/// <param name="key">option name</param>
-		public static T Get<T>(string key)
+		public T Get<T>(string key)
 		{
 			return !items.ContainsKey (key) ? default(T) : items [key].GetValue<T> ();
 		}
@@ -152,7 +155,7 @@ namespace Crow
 		/// </summary>
 		/// <param name="key">option name</param>
 		/// <param name="value">value for that option</param>
-		public static void Set<T>(string key, T value)
+		public void Set<T>(string key, T value)
 		{
 			if (!items.ContainsKey (key)) {
 				lock(items)
@@ -161,8 +164,8 @@ namespace Crow
 				items[key].Set (value);
 			isDirty = true;
 		}
-		static void save(){
-			using (Stream s = new FileStream(Path.Combine(configPath, configFileName),FileMode.Create)){
+		void save(){
+			using (Stream s = new FileStream(configPath,FileMode.Create)){
 				using (StreamWriter sw = new StreamWriter (s)) {
 					lock (items) {
 						foreach (string key in items.Keys) {
@@ -172,7 +175,7 @@ namespace Crow
 				}
 			}
 		}
-		static void load(Stream s){
+		void load(Stream s){
 			using (StreamReader sr = new StreamReader (s)) {
 				while (!sr.EndOfStream) {
 					string l = sr.ReadLine();

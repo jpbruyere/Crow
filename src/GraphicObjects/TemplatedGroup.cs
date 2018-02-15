@@ -344,7 +344,9 @@ namespace Crow
 			#endif
 
 			Group page;
-			if (typeof(TabView).IsAssignableFrom (items.GetType ())||typeof(Wrapper).IsAssignableFrom (items.GetType ())) {
+			if (typeof(TabView).IsAssignableFrom (items.GetType ())||
+				typeof(Menu).IsAssignableFrom (this.GetType())||
+				typeof(Wrapper).IsAssignableFrom (items.GetType ())) {
 				page = items;
 				itemPerPage = int.MaxValue;
 			} else if (typeof(GenericStack).IsAssignableFrom (items.GetType ())) {
@@ -425,7 +427,8 @@ namespace Crow
 			lock (CurrentInterface.LayoutMutex) {
 				g = iTemp.CreateInstance(CurrentInterface);
 				page.AddChild (g);
-				//g.LogicalParent = this;
+//				if (isPaged)
+//					g.LogicalParent = this;
 				registerItemClick (g);
 			}
 

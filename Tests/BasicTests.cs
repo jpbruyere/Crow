@@ -47,6 +47,7 @@ namespace Tests
 		string[] testFiles;
 
 		#region Test values for Binding
+		public List<Crow.Command> Commands;
 		public int intValue = 500;
 		DirectoryInfo curDir = new DirectoryInfo (Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
 		//DirectoryInfo curDir = new DirectoryInfo (@"/mnt/data/Images");
@@ -135,9 +136,29 @@ namespace Tests
 
 		void OnLoadList (object sender, MouseButtonEventArgs e) => TestList = Color.ColorDic.Values.ToList();
 
+		void command1(){
+			Console.WriteLine("command1 triggered");
+		}
+		void command2(){
+			Console.WriteLine("command2 triggered");
+		}
+		void command3(){
+			Console.WriteLine("command3 triggered");
+		}
+		void command4(){
+			Console.WriteLine("command4 triggered");
+		}
+
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
+
+			Commands = new List<Crow.Command> (new Crow.Command[] {
+				new Crow.Command(new Action(() => command1())) { Caption = "command1"},
+				new Crow.Command(new Action(() => command2())) { Caption = "command2"},
+				new Crow.Command(new Action(() => command3())) { Caption = "command3"},
+				new Crow.Command(new Action(() => command4())) { Caption = "command4"},
+			});
 
 			this.KeyDown += KeyboardKeyDown1;
 
@@ -145,7 +166,10 @@ namespace Tests
 			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
 			//testFiles = new string [] { @"Interfaces/TemplatedContainer/testTabView.crow" };
-			testFiles = new string [] { @"Interfaces/TemplatedControl/testSpinner.crow" };
+			//testFiles = new string [] { @"Interfaces/TemplatedControl/testSpinner.crow" };
+			//testFiles = new string [] { @"Interfaces/GraphicObject/testCtxMenu.crow" };
+			testFiles = new string [] { @"Interfaces/TemplatedControl/testItemTemplateTag.crow" };
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
@@ -155,7 +179,6 @@ namespace Tests
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/TemplatedGroup", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Splitter", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Wrapper", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Unsorted", "*.crow")).ToArray ();
 
 			Load(testFiles[idx]).DataSource = this;
