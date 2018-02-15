@@ -192,20 +192,12 @@ namespace Crow
 			base.onMouseLeave (this, e);
 			IsPopped = false;
 		}
-//		public override bool PointIsIn (ref Point m)
-//		{
-//			if (!base.PointIsIn (ref m))
-//				return false;
-//			
-//		}
 		public override bool MouseIsIn (Point m)
-		{
-			bool isInContent = false;
-			if (Content != null) {
-				if (Content.Parent != null)
-					isInContent = Content.MouseIsIn (m);
-			}
-			return base.MouseIsIn (m) || isInContent;
+		{			
+			if (Content?.Parent != null)
+				if (Content.MouseIsIn (m))
+					return true;
+			return base.MouseIsIn (m);
 		}
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
