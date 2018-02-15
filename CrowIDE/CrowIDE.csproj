@@ -107,6 +107,7 @@
     <Compile Include="src\DesignInterface.cs" />
     <Compile Include="src\EditPane.cs" />
     <Compile Include="src\ProjectNodes.cs" />
+    <Compile Include="src\SolutionControler.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />

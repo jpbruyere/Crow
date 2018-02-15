@@ -75,6 +75,15 @@ namespace Crow
 			if (!Directory.Exists (CrowConfigRoot))
 				Directory.CreateDirectory (CrowConfigRoot);
 
+			//ensure all assemblies are loaded, because IML could contains classes not instanciated in source
+//			foreach (string af in Directory.GetFiles (AppDomain.CurrentDomain.BaseDirectory, "*.dll")){
+//				try {
+//					Assembly.LoadFrom (af);	
+//				} catch (Exception ex) {
+//					Console.WriteLine ("{0} not loaded as assembly.", af);
+//				}
+//			}
+
 			loadCursors ();
 			findAvailableTemplates ();
 
@@ -89,6 +98,7 @@ namespace Crow
 			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 			loadStyling ();
 			initTooltip ();
+			initContextMenus ();
 		}
 		#endregion
 
@@ -676,6 +686,12 @@ namespace Crow
 		/// <summary>Set visible state of widget to false and remove if from the graphic tree</summary>
 		public void RemoveWidget(GraphicObject g)
 		{
+			if (g.Contains(HoverWidget)) {
+				while (HoverWidget != g.LogicalParent) {
+					HoverWidget.onMouseLeave (HoverWidget, null);
+					HoverWidget = HoverWidget.LogicalParent as GraphicObject;
+				}
+			}
 			lock (UpdateMutex) {
 				RegisterClip (g.ScreenCoordinates (g.LastPaintedSlot));
 				GraphicTree.Remove (g);
@@ -861,7 +877,7 @@ namespace Crow
 		public bool ProcessMouseButtonUp(int button)
 		{
 			Mouse.DisableBit (button);
-			MouseButtonEventArgs e = new MouseButtonEventArgs () { Mouse = Mouse };
+			MouseButtonEventArgs e = new MouseButtonEventArgs ((Crow.MouseButton)button) { Mouse = Mouse };
 
 			if (_activeWidget == null)
 				return false;
@@ -888,7 +904,7 @@ namespace Crow
 		public bool ProcessMouseButtonDown(int button)
 		{
 			Mouse.EnableBit (button);
-			MouseButtonEventArgs e = new MouseButtonEventArgs () { Mouse = Mouse };
+			MouseButtonEventArgs e = new MouseButtonEventArgs ((Crow.MouseButton)button) { Mouse = Mouse };
 
 			if (HoverWidget == null)
 				return false;
@@ -1016,6 +1032,31 @@ namespace Crow
 		}
 		#endregion
 
+		#region Contextual menu
+		MenuItem ctxMenuContainer;
+		void initContextMenus (){
+			ctxMenuContainer = Load  ("#Crow.ContextMenu.template") as MenuItem;
+		}
+
+		public void ShowContextMenu (GraphicObject go) {
+
+			if (ctxMenuContainer.Parent == null)
+				this.AddWidget (ctxMenuContainer);
+			else
+				ctxMenuContainer.IsOpened = true;
+			
+			ctxMenuContainer.LogicalParent = go;
+			ctxMenuContainer.DataSource = go;
+
+			PutOnTop (ctxMenuContainer, true);
+			ctxMenuContainer.Left = Mouse.X - 5;
+			ctxMenuContainer.Top = Mouse.Y - 5;
+
+			HoverWidget = ctxMenuContainer;
+			ctxMenuContainer.onMouseEnter (ctxMenuContainer, new MouseMoveEventArgs (Mouse.X, Mouse.Y, 0, 0));
+		}
+		#endregion
+
 		#region Device Repeat Events
 		volatile bool mouseRepeatOn, keyboardRepeatOn;
 		volatile int mouseRepeatCount, keyboardRepeatCount;
@@ -1044,6 +1085,10 @@ namespace Crow
 		#endregion
 
 		#region ILayoutable implementation
+		public virtual bool PointIsIn(ref Point m)
+		{
+			return true;
+		}
 		public void RegisterClip(Rectangle r){
 			clipping.UnionRectangle (r);
 		}

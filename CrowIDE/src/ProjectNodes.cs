@@ -83,8 +83,7 @@ namespace CrowIDE
 			foreach (ProjectNode pn in childNodes)
 				pn.SortChilds ();			
 			childNodes = childNodes.OrderBy(c=>c.Type).ThenBy(cn=>cn.DisplayName).ToList();
-		}
-
+		}			
 	}
 	public class ProjectItem : ProjectNode {
 		#region CTOR
@@ -94,9 +93,6 @@ namespace CrowIDE
 		#endregion
 
 		public XmlNode node;
-		object selectedItem;
-
-
 
 		public string Extension {
 			get { return System.IO.Path.GetExtension (Path); }
@@ -123,6 +119,32 @@ namespace CrowIDE
 					Path.Split ('/').LastOrDefault();
 			}
 		}
+
+	}
+	public class ProjectReference : ProjectItem {
+		public ProjectReference (ProjectItem pi) : base (pi.Project, pi.node){
+		}
+		public string ProjectGUID {
+			get {
+				return node.SelectSingleNode ("Project")?.InnerText;
+			}
+		}
+		public override string DisplayName {
+			get {
+				return node.SelectSingleNode ("Name").InnerText;
+			}
+		}
+	}
+	public class ProjectFile : ProjectItem {
+		public ProjectFile (ProjectItem pi) : base (pi.Project, pi.node){			
+		}
+
+		object selectedItem;
+		public string LogicalName {
+			get {
+				return node.SelectSingleNode ("LogicalName")?.InnerText;
+			}
+		}
 		public string Source {
 			get {
 				using (StreamReader sr = new StreamReader (AbsolutePath)) {
@@ -145,11 +167,10 @@ namespace CrowIDE
 			Project.solution.CloseItem (this);
 		}
 	}
-	public class ImlProjectItem : ProjectItem 
+	public class ImlProjectItem : ProjectFile
 	{
 		#region CTOR
-		public ImlProjectItem (Project project, XmlNode _node) : base (project, _node){
-			node = _node;
+		public ImlProjectItem (ProjectItem pi) : base (pi){			
 		}
 		#endregion
 

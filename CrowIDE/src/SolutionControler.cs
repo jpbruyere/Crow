@@ -1,8 +1,8 @@
 ﻿//
-// ILayoutable.cs
+// SolutionControler.cs
 //
 // Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
+//       Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // Copyright (c) 2013-2017 Jean-Philippe Bruyère
 //
@@ -23,33 +23,15 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-
 using System;
-using System.Collections.Generic;
 
-namespace Crow
+namespace CrowIDE
 {
-	public interface ILayoutable
+	public class SolutionControler
 	{
-		/// <summary> Parent in the graphic tree </summary>
-		ILayoutable Parent { get; set; }
-		/// <summary> The logical parent (used mainly for bindings) as opposed
-		///  to the parent in the graphic tree </summary>
-		ILayoutable LogicalParent { get; set; }
-
-		Rectangle ClientRectangle { get; }
-		Rectangle getSlot();
-
-		bool ArrangeChildren { get; }
-		LayoutingType RegisteredLayoutings { get; set; }
-		void RegisterForLayouting(LayoutingType layoutType);
-		void RegisterClip(Rectangle clip);
-		bool UpdateLayout(LayoutingType layoutType);
-		bool PointIsIn(ref Point m);
-
-		Rectangle ContextCoordinates(Rectangle r);
-		Rectangle ScreenCoordinates (Rectangle r);
-
+		public SolutionControler ()
+		{
+		}
 	}
 }
 

@@ -192,6 +192,12 @@ namespace Crow
 			base.onMouseLeave (this, e);
 			IsPopped = false;
 		}
+//		public override bool PointIsIn (ref Point m)
+//		{
+//			if (!base.PointIsIn (ref m))
+//				return false;
+//			
+//		}
 		public override bool MouseIsIn (Point m)
 		{
 			bool isInContent = false;

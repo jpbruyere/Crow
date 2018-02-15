@@ -86,7 +86,6 @@ namespace CrowIDE
 		{
 		}
 		ImlVisualEditor imlVE;
-		SourceEditor srcEditor;
 
 		Instantiator instFileDlg;
 
@@ -97,7 +96,7 @@ namespace CrowIDE
 			base.OnLoad (e);
 
 			instFileDlg = Instantiator.CreateFromImlFragment
-				("<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}' SearchPattern='*.*' OkClicked='onFileOpen'/>");
+				("<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}' SearchPattern='*.sln' OkClicked='onFileOpen'/>");
 
 			initCommands ();
 
@@ -126,9 +125,9 @@ namespace CrowIDE
 		}
 
 		public string CurrentDirectory {
-			get { return Crow.Configuration.Get<string>("CurrentDirectory");}
+			get { return Crow.Configuration.Global.Get<string>("CurrentDirectory");}
 			set {
-				Crow.Configuration.Set ("CurrentDirectory", value);
+				Crow.Configuration.Global.Set ("CurrentDirectory", value);
 			}
 		}
 		public Solution CurrentSolution {
@@ -142,20 +141,20 @@ namespace CrowIDE
 		}
 
 		public string LastOpenSolution {
-			get { return Crow.Configuration.Get<string>("LastOpenSolution");}
+			get { return Crow.Configuration.Global.Get<string>("LastOpenSolution");}
 			set {
 				if (LastOpenSolution == value)
 					return;
-				Crow.Configuration.Set ("LastOpenSolution", value);
+				Crow.Configuration.Global.Set ("LastOpenSolution", value);
 				NotifyValueChanged ("LastOpenSolution", value);
 			}
 		}
 		public bool ReopenLastSolution {
-			get { return Crow.Configuration.Get<bool>("ReopenLastSolution");}
+			get { return Crow.Configuration.Global.Get<bool>("ReopenLastSolution");}
 			set {
 				if (ReopenLastSolution == value)
 					return;
-				Crow.Configuration.Set ("ReopenLastSolution", value);
+				Crow.Configuration.Global.Set ("ReopenLastSolution", value);
 				NotifyValueChanged ("ReopenLastSolution", value);
 			}
 		}
@@ -184,15 +183,16 @@ namespace CrowIDE
 			if (e.Key == OpenTK.Input.Key.Escape) {
 				Quit (null, null);
 				return;
-			} else if (e.Key == OpenTK.Input.Key.F4) {
-				loadWindow ("#CrowIDE.ui.MemberView.crow");
-			} else if (e.Key == OpenTK.Input.Key.F5) {
-				loadWindow ("#CrowIDE.ui.GTreeExplorer.crow");
-			} else if (e.Key == OpenTK.Input.Key.F6) {
-				loadWindow ("#CrowIDE.ui.LQIsExplorer.crow");
-			} else if (e.Key == OpenTK.Input.Key.F7) {
-				loadWindow ("#CrowIDE.ui.CSProjExplorer.crow");
 			}
+//			else if (e.Key == OpenTK.Input.Key.F4) {
+//				loadWindow ("#CrowIDE.ui.MemberView.crow");
+//			} else if (e.Key == OpenTK.Input.Key.F5) {
+//				loadWindow ("#CrowIDE.ui.GTreeExplorer.crow");
+//			} else if (e.Key == OpenTK.Input.Key.F6) {
+//				loadWindow ("#CrowIDE.ui.LQIsExplorer.crow");
+//			} else if (e.Key == OpenTK.Input.Key.F7) {
+//				loadWindow ("#CrowIDE.ui.CSProjExplorer.crow");
+//			}
 		}
 		void loadWindow(string path, object dataSource = null){
 			try {

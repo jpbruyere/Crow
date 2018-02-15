@@ -77,12 +77,11 @@ namespace Crow
 		}
 		public override bool Contains (GraphicObject goToFind)
 		{
-			if (Content == null)
-				return base.Contains (goToFind);
-
 			if (Content == goToFind)
 				return true;
-			return Content.Contains (goToFind);
+			if (Content?.Contains (goToFind) == true)
+				return true;
+			return base.Contains (goToFind);
 		}
 		#endregion
 	}

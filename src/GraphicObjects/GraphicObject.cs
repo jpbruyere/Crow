@@ -190,7 +190,8 @@ namespace Crow
 		bool isDragged;
 		bool allowDrag;
 		bool allowDrop;
-
+		string tooltip;
+		IList<Command> contextCommands;
 		#endregion
 
 		#region public fields
@@ -764,7 +765,7 @@ namespace Crow
 		/// Seek first logical tree upward if logicalParent is set, or seek graphic tree for
 		/// a not null dataSource that will be active for all descendants having dataSource=null
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue(null)]
+		[XmlAttributeAttribute]//[DefaultValue(null)]
 		public virtual object DataSource {
 			set {
 				if (DataSource == value)
@@ -773,6 +774,10 @@ namespace Crow
 				DataSourceChangeEventArgs dse = new DataSourceChangeEventArgs (DataSource, null);
 				dataSource = value;
 				dse.NewDataSource = DataSource;
+
+				//prevent setting null causing stack overflow in specific case
+				if (dse.NewDataSource == dse.OldDataSource)
+					return;
 
 				OnDataSourceChanged (this, dse);
 
@@ -813,7 +818,6 @@ namespace Crow
 				NotifyValueChanged ("Style", style);
 			}
 		}
-		string tooltip;
 		[XmlAttributeAttribute]
 		public virtual string Tooltip {
 			get { return tooltip; }
@@ -822,6 +826,16 @@ namespace Crow
 					return;
 				tooltip = value;
 				NotifyValueChanged("Tooltip", tooltip);
+			}
+		}
+		[XmlAttributeAttribute]
+		public IList<Command> ContextCommands {
+			get { return contextCommands; }
+			set {
+				if (contextCommands == value)
+					return;
+				contextCommands = value;
+				NotifyValueChanged("ContextCommands", contextCommands);
 			}
 		}
 		#endregion
@@ -1499,24 +1513,45 @@ namespace Crow
         #endregion
 
 		#region Mouse handling
+		public virtual bool PointIsIn(ref Point m)
+		{			
+			if (!(Visible & isEnabled)||IsDragged)
+				return false;				
+			ILayoutable tmp = Parent;
+			//while (tmp != null){
+			if (!parent.PointIsIn(ref m))
+				return false;
+			m -= (parent.getSlot().Position + parent.ClientRectangle.Position) ;
+
+			return Slot.ContainsOrIsEqual (m);					
+		}
 		public virtual bool MouseIsIn(Point m)
 		{
-			try {
-				if (!(Visible & isEnabled)||IsDragged)
-					return false;
-				if (ScreenCoordinates (Slot).ContainsOrIsEqual (m)) {
-					Scroller scr = Parent as Scroller;
-					if (scr == null) {
-						if (Parent is GraphicObject)
-							return (Parent as GraphicObject).MouseIsIn (m);
-						else return true;
-					}
-					return scr.MouseIsIn (scr.savedMousePos);
-				}
-			} catch (Exception ex) {
-				return false;
-			}
-			return false;
+			Point p = m;
+			return PointIsIn (ref m);
+//			try {
+//				if (!(Visible & isEnabled)||IsDragged)
+//					return false;				
+//				ILayoutable tmp = Parent;
+//				//while (tmp != null){
+//				if (!parent.MouseIsIn(m))
+//					return false;
+//				m -= (parent.getSlot().Position + parent.ClientRectangle.Position) ;
+//
+//				return slot.ContainsOrIsEqual (m);
+////					Scroller scr = tmp as Scroller;						
+////					if (scr != null) {
+////						m.Y += scr.ScrollY;
+////						m.X += scr.ScrollX;
+////					}					
+////					tmp = tmp.Parent;
+//				//}
+//
+//				//}
+//			} catch (Exception ex) {
+//				return false;
+//			}
+			//return false;
 		}
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
@@ -1525,7 +1560,7 @@ namespace Crow
 				onMouseEnter (this, e);
 			}
 
-			this.onMouseMove (this, e);//without this, window border doesn't work, should be removed
+			//this.onMouseMove (this, e);//without this, window border doesn't work, should be removed
 		}
 		public virtual void onMouseMove(object sender, MouseMoveEventArgs e)
 		{
@@ -1553,6 +1588,8 @@ namespace Crow
 				if (be.Focused == null) {
 					be.Focused = this;
 					CurrentInterface.FocusedWidget = this;
+					if (e.Button == MouseButton.Right && this.ContextCommands != null)
+						CurrentInterface.ShowContextMenu (this);					
 				}
 			}
 			//bubble event to the top

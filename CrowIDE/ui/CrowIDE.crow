@@ -31,19 +31,34 @@
 				<MenuItem Command="{CMDHelp}"/>
 			</MenuItem>
 		</Menu>
-<!--		<HorizontalStack Height="Fit" Margin="2">
-			<Image Style="icon" Path="#CrowIDE.images.save.svg" MouseClick="onCommandSave"/>
-		</HorizontalStack>-->
-		<HorizontalStack DataSource="{CurrentSolution}">
-			<TreeView Name="treeview" Width="20%" Height="100%" IsRoot="true"
-				Data="{Projects}" SelectedItemChanged="onSelectedItemChanged"
-				ItemTemplate="#CrowIDE.ui.ProjectTree.template"/>
+		<VerticalStack DataSource="{CurrentSolution}">
+			<HorizontalStack Height="80%">
+				<EditPane SelectedItem="{²SelectedItem}" SelectedItemElement="{²SelectedItemElement}" Data="{OpenedItems}" DataTest="Extension"
+					ItemTemplate="#CrowIDE.ui.EditPaneItems.template"/>
+				<Splitter/>
+				<VerticalStack Width="30%">
+					<TreeView Name="treeview" Height="50%" IsRoot="true"
+						Data="{Projects}" SelectedItemChanged="onSelectedItemChanged"
+						ItemTemplate="#CrowIDE.ui.ProjectTree.template"/>
+					<Splitter/>
+					<MembersView Instance="{SelectedItemElement}" DataTest="Type"  Background="DimGray"
+						ItemTemplate="#CrowIDE.ui.MembersItem.template"/>
+				</VerticalStack>
+			</HorizontalStack>
 			<Splitter/>
-			<EditPane SelectedItem="{²SelectedItem}" SelectedItemElement="{²SelectedItemElement}" Data="{OpenedItems}" DataTest="Extension"
-				ItemTemplate="#CrowIDE.ui.EditPaneItems.template"/>
-			<Splitter/>
-			<MembersView Width="30%" Instance="{SelectedItemElement}" DataTest="Type"  Background="DimGray"
-				ItemTemplate="#CrowIDE.ui.MembersItem.template"/>
-		</HorizontalStack>
+			<ListBox Width="Stretched" Data="{CompilerErrors}">
+				<ItemTemplate>
+					<HorizontalStack Height="Fit" Margin="0" Focusable="true" Spacing="15"
+							MouseEnter="{Background=SteelBlue}"
+							MouseLeave="{Background=Transparent}">						
+						<Image Width="16" Height="16" Path="#Crow.Icons.compiler_error.svg" SvgSub="{IsWarning}"/>
+						<Label Text="{Line}" Width="30" />
+						<Label Text="{ErrorText}" Width="60%"/>
+						<Label Text="{FileName}" Width="Fit"/>
+					</HorizontalStack>
+				</ItemTemplate>
+			</ListBox>
+		</VerticalStack>
+		
 	</VerticalStack>
 </Window>

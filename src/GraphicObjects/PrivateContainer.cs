@@ -92,7 +92,7 @@ namespace Crow
 			base.OnDataSourceChanged (this, e);
 			if (child != null)
 			if (child.localDataSourceIsNull & child.localLogicalParentIsNull)
-					child.OnDataSourceChanged (sender, e);
+				child.OnDataSourceChanged (child, e);
 		}
 		public override bool UpdateLayout (LayoutingType layoutType)
 		{

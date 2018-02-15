@@ -54,6 +54,11 @@ namespace CrowIDE
 			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 		}
 
+		protected override void loadStyling ()
+		{
+			base.loadStyling ();
+		}
+
 		public override bool ProcessMouseMove (int x, int y)
 		{
 			int deltaX = x - Mouse.X;

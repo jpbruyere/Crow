@@ -30,7 +30,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-    <DefineConstants>DEBUG_UPDATE0;DEBUG_FOCUS0;DEBUG_LAYOUTING0;TRACE0;DEBUG;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING;DEBUG_CLIP_RECTANGLE0</DefineConstants>
+    <DefineConstants>DEBUG_UPDATE0;DEBUG_FOCUS0;DEBUG_LAYOUTING0;TRACE0;DEBUG;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
     <Optimize>false</Optimize>
     <OutputPath>$(SolutionDir)build\Debug</OutputPath>
   </PropertyGroup>
@@ -371,10 +371,18 @@
     <EmbeddedResource Include="Templates\Tooltip.template">
       <LogicalName>Crow.Tooltip.template</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Templates\ContextMenu.template">
+      <LogicalName>Crow.ContextMenu.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\compiler_error.svg" />
+    <EmbeddedResource Include="Icons\project.svg" />
+    <EmbeddedResource Include="Icons\projectRef.svg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Crow.dll.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Icons\compiler_warning.svg" />
+    <None Include="Icons\compiler_warning_orange.svg" />
   </ItemGroup>
 </Project>

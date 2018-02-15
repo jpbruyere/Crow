@@ -147,7 +147,7 @@ namespace Crow
 			lock (children) {
 				foreach (GraphicObject g in children)
 					if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
-						g.OnDataSourceChanged (sender, e);
+						g.OnDataSourceChanged (g, e);
 			}
 		}
 		public override GraphicObject FindByName (string nameToFind)

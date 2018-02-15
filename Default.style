@@ -29,6 +29,7 @@ Menu {
 	Height = Fit;
 	Width = Stretched;
 	VerticalAlignment = Top;
+	SelectionBackground = Transparent;
 }
 MenuItem {
 	Caption = MenuItem;
@@ -38,6 +39,7 @@ MenuItem {
 	Foreground = LightGray;
 	MouseEnter = {Background = vgradient|0:UnitedNationsBlue|1:Onyx;Foreground=White;}
 	MouseLeave = {Foreground=LightGray;Background=Transparent;}
+	SelectionBackground = Transparent;
 }
 MessageBox {
 	Background = 0.3,0.3,0.3,0.3;

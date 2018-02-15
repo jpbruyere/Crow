@@ -41,7 +41,10 @@ namespace CrowIDE{
 		}
 		#endregion
 
+		ProjectItem selectedItem = null;
+		object selectedItemElement = null;
 		ObservableList<ProjectItem> openedItems = new ObservableList<ProjectItem>();
+
 		public ObservableList<ProjectItem> OpenedItems {
 			get { return openedItems; }
 			set {
@@ -51,9 +54,6 @@ namespace CrowIDE{
 				NotifyValueChanged ("OpenedItems", openedItems);
 			}
 		}
-		ProjectItem selectedItem = null;
-		object selectedItemElement = null;
-
 		public ProjectItem SelectedItem {
 			get { return selectedItem; }
 			set {
@@ -71,6 +71,47 @@ namespace CrowIDE{
 				selectedItemElement = value;
 				NotifyValueChanged ("SelectedItemElement", selectedItemElement);
 			}
+		}
+		public string DisplayName {
+			get { return name; }
+		}
+		/// <summary>
+		/// Gets solution path
+		/// </summary>
+		public String SolutionFolder
+		{
+			get { return Path.GetDirectoryName (path); }
+		}
+
+//		public System.CodeDom.Compiler.CompilerErrorCollection CompilationErrors {
+//			get {
+//				System.CodeDom.Compiler.CompilerErrorCollection tmp = Projects.SelectMany<Project>
+//					(p => p.CompilationResults.Errors);
+//				return tmp;
+//			}
+//		}
+		public List<System.CodeDom.Compiler.CompilerError> CompilerErrors {
+			get {
+				int errCount = 0;
+				for (int i = 0; i < Projects.Count; i++) {
+					if (Projects [i].CompilationResults != null)
+						errCount += Projects [i].CompilationResults.Errors.Count;
+				}
+				System.CodeDom.Compiler.CompilerError[] tmp = new System.CodeDom.Compiler.CompilerError[errCount];
+
+				int ptr = 0;
+				for (int i = 0; i < Projects.Count; i++) {
+					if (Projects [i].CompilationResults == null)
+						continue;
+					Projects [i].CompilationResults.Errors.CopyTo (tmp,ptr);
+					ptr += Projects [i].CompilationResults.Errors.Count;
+				}
+				return new List<System.CodeDom.Compiler.CompilerError>(tmp);
+			}
+		}
+
+		public void UpdateErrorList () {
+			NotifyValueChanged ("CompilerErrors", CompilerErrors);
 		}
 
 		void onSelectedItemChanged (object sender, SelectionChangeEventArgs e){			
@@ -92,17 +133,12 @@ namespace CrowIDE{
 	    /// <summary>
 	    /// Solution name
 	    /// </summary>
-	    public String name;
-
-		public string DisplayName {
-			get { return name; }
-		}
-
-	    /// <summary>
-	    /// File path from where solution was loaded.
-	    /// </summary>
-	    [XmlIgnore]
-	    public String path;
+	    String name;
+		/// <summary>
+		/// File path from where solution was loaded.
+		/// </summary>
+		[XmlIgnore]
+		String path;
 
 	    /// <summary>
 	    /// Solution name for debugger.
@@ -112,27 +148,7 @@ namespace CrowIDE{
 	    {
 	        return "Solution: " + name;
 	    }
-
-	    /// <summary>
-	    /// Gets solution path
-	    /// </summary>
-	    /// <returns></returns>
-	    public String SolutionFolder
-	    {
-			get { return Path.GetDirectoryName (path); }
-	    }
-
-		public IList<Project> Projects {
-			get {
-				List<Project> tmp = new List<Project> ();
-				foreach (SolutionProject p in projects) {
-					string pp = Path.Combine (SolutionFolder, p.RelativePath.Replace('\\','/'));
-					tmp.Add (new Project (pp, this));
-				}
-				return tmp;
-			}
-		}
-
+			
 		#region Solution properties
 	    double slnVer;                                      // 11.00 - vs2010, 12.00 - vs2015
 
@@ -154,7 +170,7 @@ namespace CrowIDE{
 	    /// <summary>
 	    /// List of project included into solution.
 	    /// </summary>
-	    public List<SolutionProject> projects = new List<SolutionProject>();
+	    public List<Project> Projects = new List<Project>();
 
 	    /// <summary>
 	    /// List of configuration list, in form "{Configuration}|{Platform}", for example "Release|Win32".
@@ -179,6 +195,23 @@ namespace CrowIDE{
 	    }
 		#endregion
 
+		public Configuration UserConfig;
+
+		public Project StartupProject {
+			get { return Projects?.FirstOrDefault (p => p.ProjectGuid == UserConfig.Get<string> ("StartupProject")); }
+			set {
+				if (value == StartupProject)
+					return;
+				if (value == null)
+					UserConfig.Set ("StartupProject", "");
+				else {
+					UserConfig.Set ("StartupProject", value.ProjectGuid);
+					value.NotifyValueChanged("IsStartupProject", true);
+				}
+				NotifyValueChanged ("StartupProject", StartupProject);
+
+			}
+		}
 
 		#region CTOR
 	    /// <summary>
@@ -227,7 +260,7 @@ namespace CrowIDE{
 
 	        reProjects.Replace(slnTxt, new MatchEvaluator(m =>
 	        {
-	            SolutionProject p = new SolutionProject();
+	            SolutionProject p = new SolutionProject ();
 
 	            foreach (String g in reProjects.GetGroupNames())
 	            {
@@ -263,7 +296,7 @@ namespace CrowIDE{
 	                //
 	                var ProjectDependencies = new Regex("\\s*?({[A-F0-9-]+}) = ({[A-F0-9-]+})[\r\n]+", RegexOptions.Multiline).Matches(depsv).Cast<Match>().Select(x => x.Groups[1].Value).ToList();
 	            } //foreach
-	            s.projects.Add(p);
+				s.Projects.Add(new Project (s, p));
 	            return "";
 	        }
 	        )
@@ -285,7 +318,7 @@ namespace CrowIDE{
 	                String action = m3.Groups[3].Value;
 	                String projectConfig = m3.Groups[4].Value;
 
-	                SolutionProject p = s.projects.Where(x => x.ProjectGuid == guid).FirstOrDefault();
+	                Project p = s.Projects.Where(x => x.ProjectGuid == guid).FirstOrDefault();
 	                if (p == null)
 	                    continue;
 
@@ -336,15 +369,17 @@ namespace CrowIDE{
 	            new Regex("\\s*?({[A-F0-9-]+}) = ({[A-F0-9-]+})[\r\n]+", RegexOptions.Multiline).Replace(v, new MatchEvaluator(m5 =>
 	            {
 	                String[] args = m5.Groups.Cast<System.Text.RegularExpressions.Group>().Skip(1).Select(x => x.Value).ToArray();
-	                SolutionProject child = s.projects.Where(x => args[0] == x.ProjectGuid).FirstOrDefault();
-	                SolutionProject parent = s.projects.Where(x => args[1] == x.ProjectGuid).FirstOrDefault();
-//	                parent.nodes.Add(child);
-//	                child.parent = parent;
+	                Project child = s.Projects.Where(x => args[0] == x.ProjectGuid).FirstOrDefault();
+	                Project parent = s.Projects.Where(x => args[1] == x.ProjectGuid).FirstOrDefault();
+	                parent.dependantProjects.Add(child);
+	                child.ParentProject = parent;
 	                return "";
 	            }));
 	            return "";
 	        }
 	        ));
+
+			s.UserConfig = new Configuration (s.path + ".user");
 
 	        return s;
 	    } //LoadSolution

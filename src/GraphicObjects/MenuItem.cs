@@ -40,7 +40,6 @@ namespace Crow
 		public event EventHandler Open;
 		public event EventHandler Close;
 
-		string caption;
 		Command command;
 		Picture icon;
 		bool isOpened;
@@ -58,7 +57,8 @@ namespace Crow
 
 				if (isOpened) {
 					onOpen (this, null);
-					(LogicalParent as Menu).AutomaticOpenning = true;
+					if (LogicalParent is Menu)
+						(LogicalParent as Menu).AutomaticOpenning = true;
 				}else
 					onClose (this, null);
 			}
@@ -143,8 +143,10 @@ namespace Crow
 		}
 		void onMI_Click (object sender, MouseButtonEventArgs e)
 		{
-			if (command != null)
+			if (command != null) {
 				command.Execute ();
+				closeMenu ();
+			}
 			if(!IsOpened)
 				(LogicalParent as Menu).AutomaticOpenning = false;
 		}
@@ -152,6 +154,7 @@ namespace Crow
 			Open.Raise (this, null);
 		}
 		protected virtual void onClose (object sender, EventArgs e){
+			System.Diagnostics.Debug.WriteLine ("close: " + this.ToString());
 			Close.Raise (this, null);
 		}
 		public override bool MouseIsIn (Point m)
@@ -169,6 +172,14 @@ namespace Crow
 			if (IsOpened)
 				IsOpened = false;
 			base.onMouseLeave (this, e);
+		}
+
+		void closeMenu () {
+			MenuItem tmp = LogicalParent as MenuItem;
+			while (tmp != null) {
+				tmp.IsOpened = false;
+				tmp = tmp.LogicalParent as MenuItem;
+			}
 		}
 	}
 }

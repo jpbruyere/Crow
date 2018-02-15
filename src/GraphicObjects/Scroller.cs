@@ -219,17 +219,39 @@ namespace Crow
 		}
 
 		#region Mouse handling
-		internal Point savedMousePos;
-		public override bool MouseIsIn (Point m)
+		//internal Point savedMousePos;
+
+		public override bool PointIsIn (ref Point m)
 		{
-			return Visible ? base.ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false;
+//			if (!(Visible & IsEnabled)||IsDragged)
+//				return false;				
+//			ILayoutable tmp = Parent;
+//			//while (tmp != null){
+//			if (!Parent.PointIsIn(ref m))
+//				return false;
+//			m -= (Parent.getSlot().Position + Parent.ClientRectangle.Position);
+//			if (!Slot.ContainsOrIsEqual (m) || child==null)
+//				return false;
+//			m += new Point (ScrollX, ScrollY);
+//			return true;
+			if (!base.PointIsIn(ref m))
+				return false;
+			//m -= (Parent.getSlot().Position + Parent.ClientRectangle.Position);
+			if (!Slot.ContainsOrIsEqual (m) || child==null)
+				return false;
+			m += new Point (ScrollX, ScrollY);
+			return true;
 		}
-		public override void checkHoverWidget (MouseMoveEventArgs e)
-		{
-			savedMousePos = e.Position;
-			Point m = e.Position - new Point (ScrollX, ScrollY);
-			base.checkHoverWidget (new MouseMoveEventArgs(m.X,m.Y,e.XDelta,e.YDelta));
-		}
+//		public override bool MouseIsIn (Point m)
+//		{
+//			return Visible ? base.ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false;
+//		}
+//		public override void checkHoverWidget (MouseMoveEventArgs e)
+//		{
+//			savedMousePos = e.Position;
+//			Point m = e.Position - new Point (ScrollX, ScrollY);
+//			base.checkHoverWidget (new MouseMoveEventArgs(m.X,m.Y,e.XDelta,e.YDelta));
+//		}
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
 		{
 			if (Child == null)
@@ -240,12 +262,12 @@ namespace Crow
 			if (HorizontalScrolling )
 				ScrollX -= e.Delta * ScrollSpeed;
 		}
-		public override void onMouseMove (object sender, MouseMoveEventArgs e)
-		{
-			savedMousePos.X += e.XDelta;
-			savedMousePos.Y += e.YDelta;
-			base.onMouseMove (sender, new MouseMoveEventArgs(savedMousePos.X,savedMousePos.Y,e.XDelta,e.YDelta));
-		}
+//		public override void onMouseMove (object sender, MouseMoveEventArgs e)
+//		{
+//			savedMousePos.X += e.XDelta;
+//			savedMousePos.Y += e.YDelta;
+//			base.onMouseMove (sender, new MouseMoveEventArgs(savedMousePos.X,savedMousePos.Y,e.XDelta,e.YDelta));
+//		}
 		public override void RegisterClip (Rectangle clip)
 		{
 			base.RegisterClip (clip - new Point(ScrollX,ScrollY));
