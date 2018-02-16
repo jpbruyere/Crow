@@ -76,13 +76,13 @@ namespace Crow
 				Directory.CreateDirectory (CrowConfigRoot);
 
 			//ensure all assemblies are loaded, because IML could contains classes not instanciated in source
-//			foreach (string af in Directory.GetFiles (AppDomain.CurrentDomain.BaseDirectory, "*.dll")){
-//				try {
-//					Assembly.LoadFrom (af);	
-//				} catch (Exception ex) {
-//					Console.WriteLine ("{0} not loaded as assembly.", af);
-//				}
-//			}
+			foreach (string af in Directory.GetFiles (AppDomain.CurrentDomain.BaseDirectory, "*.dll")){
+				try {
+					Assembly.LoadFrom (af);	
+				} catch (Exception ex) {
+					Console.WriteLine ("{0} not loaded as assembly.", af);
+				}
+			}
 
 			loadCursors ();
 			findAvailableTemplates ();
@@ -830,6 +830,7 @@ namespace Crow
 								}
 
 								GraphicTree [i].checkHoverWidget (e);
+								HoverWidget.onMouseMove (this, e);
 								return true;
 							}
 						}
@@ -839,6 +840,7 @@ namespace Crow
 
 				if (HoverWidget.MouseIsIn (e.Position)) {
 					HoverWidget.checkHoverWidget (e);
+					HoverWidget.onMouseMove (this, e);
 					return true;
 				} else {
 					HoverWidget.onMouseLeave (HoverWidget, e);
@@ -847,6 +849,7 @@ namespace Crow
 						HoverWidget = HoverWidget.LogicalParent as GraphicObject;
 						if (HoverWidget.MouseIsIn (e.Position)) {
 							HoverWidget.checkHoverWidget (e);
+							HoverWidget.onMouseMove (this, e);
 							return true;
 						} else
 							HoverWidget.onMouseLeave (HoverWidget, e);
@@ -862,6 +865,7 @@ namespace Crow
 						g.checkHoverWidget (e);
 						if (g is Window)
 							PutOnTop (g);
+						HoverWidget.onMouseMove (this, e);
 						return true;
 					}
 				}
