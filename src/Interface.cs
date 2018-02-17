@@ -90,7 +90,7 @@ namespace Crow
 			FontRenderingOptions = new FontOptions ();
 			FontRenderingOptions.Antialias = Antialias.Subpixel;
 			FontRenderingOptions.HintMetrics = HintMetrics.On;
-			FontRenderingOptions.HintStyle = HintStyle.Medium;
+			FontRenderingOptions.HintStyle = HintStyle.Full;
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
 		}
 		public Interface(){
@@ -822,11 +822,11 @@ namespace Crow
 				if (idxhw != 0) {
 					int i = 0;
 					while (i < idxhw) {
-						if (GraphicTree [i].localLogicalParentIsNull) {
+						if (!GraphicTree [i].isPopup) {
 							if (GraphicTree [i].MouseIsIn (e.Position)) {
 								while (HoverWidget != null) {
 									HoverWidget.onMouseLeave (HoverWidget, e);
-									HoverWidget = HoverWidget.LogicalParent as GraphicObject;
+									HoverWidget = HoverWidget.focusParent;
 								}
 
 								GraphicTree [i].checkHoverWidget (e);
@@ -845,8 +845,8 @@ namespace Crow
 				} else {
 					HoverWidget.onMouseLeave (HoverWidget, e);
 					//seek upward from last focused graph obj's
-					while (HoverWidget.LogicalParent as GraphicObject != null) {
-						HoverWidget = HoverWidget.LogicalParent as GraphicObject;
+					while (HoverWidget.focusParent != null) {
+						HoverWidget = HoverWidget.focusParent;
 						if (HoverWidget.MouseIsIn (e.Position)) {
 							HoverWidget.checkHoverWidget (e);
 							HoverWidget.onMouseMove (this, e);
@@ -1048,7 +1048,8 @@ namespace Crow
 				this.AddWidget (ctxMenuContainer);
 			else
 				ctxMenuContainer.IsOpened = true;
-			
+
+			ctxMenuContainer.isPopup = true;
 			ctxMenuContainer.LogicalParent = go;
 			ctxMenuContainer.DataSource = go;
 
