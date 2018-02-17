@@ -93,6 +93,11 @@ namespace Crow
 		internal static ulong currentUid = 0;
 		internal ulong uid = 0;
 
+		internal bool isPopup = false;
+		internal GraphicObject focusParent {
+			get { return (isPopup ? LogicalParent : parent) as GraphicObject; }
+		}
+
 		/// <summary>
 		/// interface this widget is bound to, this should not be changed once the instance is created
 		/// </summary>
@@ -1541,7 +1546,7 @@ namespace Crow
 				IsDragged = true;
 
 			//bubble event to the top
-			GraphicObject p = Parent as GraphicObject;
+			GraphicObject p = focusParent;
 			if (p != null)
 				p.onMouseMove(sender,e);
 
@@ -1566,7 +1571,7 @@ namespace Crow
 				}
 			}
 			//bubble event to the top
-			GraphicObject p = Parent as GraphicObject;
+			GraphicObject p = focusParent;
 			if (p != null)
 				p.onMouseDown(sender,e);
 
@@ -1586,7 +1591,7 @@ namespace Crow
 			}
 
 			//bubble event to the top
-			GraphicObject p = Parent as GraphicObject;
+			GraphicObject p = focusParent;
 			if (p != null)
 				p.onMouseUp(sender,e);
 
@@ -1599,19 +1604,19 @@ namespace Crow
 			}
 		}
 		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){
-			GraphicObject p = Parent as GraphicObject;
+			GraphicObject p = focusParent;
 			if (p != null)
 				p.onMouseClick(sender,e);
 			MouseClick.Raise (this, e);
 		}
 		public virtual void onMouseDoubleClick(object sender, MouseButtonEventArgs e){
-			GraphicObject p = Parent as GraphicObject;
+			GraphicObject p = focusParent;
 			if (p != null)
 				p.onMouseDoubleClick(sender,e);
 			MouseDoubleClick.Raise (this, e);
 		}
 		public virtual void onMouseWheel(object sender, MouseWheelEventArgs e){
-			GraphicObject p = Parent as GraphicObject;
+			GraphicObject p = focusParent;
 			if (p != null)
 				p.onMouseWheel(sender,e);
 

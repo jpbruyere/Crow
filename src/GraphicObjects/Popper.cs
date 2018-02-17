@@ -72,10 +72,14 @@ namespace Crow
 			get { return _isPopped; }
 			set
 			{
+				if (!_canPop & value)
+					return;					
+				
 				if (value == _isPopped)
 					return;
 
 				_isPopped = value;
+
 				NotifyValueChanged ("IsPopped", _isPopped);
 
 				if (_isPopped)
@@ -115,6 +119,7 @@ namespace Crow
 			set {
 				if (_content != null) {
 					_content.LogicalParent = null;
+					_content.isPopup = false;
 					_content.LayoutChanged -= _content_LayoutChanged;
 				}
 
@@ -124,6 +129,7 @@ namespace Crow
 					return;
 
 				_content.LogicalParent = this;
+				_content.isPopup = true;
 				_content.HorizontalAlignment = HorizontalAlignment.Left;
 				_content.VerticalAlignment = VerticalAlignment.Top;
 				_content.LayoutChanged += _content_LayoutChanged;
@@ -181,12 +187,6 @@ namespace Crow
 		}
 
 		#region GraphicObject overrides
-		public override void onMouseClick (object sender, MouseButtonEventArgs e)
-		{
-			if (_canPop)
-				IsPopped = !IsPopped;
-			base.onMouseClick (this, e);
-		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (this, e);
