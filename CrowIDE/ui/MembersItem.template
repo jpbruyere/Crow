@@ -25,16 +25,20 @@
 			<Template>
 				<Popper Name="popper" PopDirection="Bottom">
 					<Template>
-						<Border CornerRadius="0" Foreground="LightGray" Background="White">
-							<HorizontalStack Margin="0" Spacing="1">
-								<Label Width="Stretched" MinimumSize="80,10" Margin="1" Foreground="Black" Background="White"
-									Text="{../../../../SelectedItem}"/>
-								<Button Width="12" Height="12" Focusable="false"
-									Template="#Crow.Templates.ArrowBut.template">
-									<Image Margin="1"  Path="#Crow.Images.Icons.updown.svg" SvgSub="down"/>
-								</Button>
-							</HorizontalStack>
-						</Border>
+						<CheckBox Caption="{./Caption}" IsChecked="{²./IsPopped}" Foreground="{./Foreground}" Background="{./Background}">
+							<Template>
+								<Border CornerRadius="0" Foreground="LightGray" Background="White">
+									<HorizontalStack Margin="0" Spacing="1">
+										<Label Width="Stretched" MinimumSize="80,10" Margin="1" Foreground="Black" Background="White"
+											Text="{../../../../../SelectedItem}"/>
+										<Button Width="12" Height="12" Focusable="false"
+											Template="#Crow.Templates.ArrowBut.template">
+											<Image Margin="1"  Path="#Crow.Images.Icons.updown.svg" SvgSub="down"/>
+										</Button>
+									</HorizontalStack>
+								</Border>
+							</Template>
+						</CheckBox>
 					</Template>
 					<Border Background="White" BorderWidth="1" Margin="1" Foreground="Black"
 						MinimumSize="{../../MinimumPopupSize}" Fit="true">
@@ -69,12 +73,16 @@
 		<Label Margin="1" Text="{Name}" Height="Fit" Width="50%"/>
 		<Popper Background="White" Margin="0" Height="Stretched" Caption="{Value}">
 			<Template>
-				<HorizontalStack Spacing="3" Height="Fit" Background="{./Background}">
-					<Border Foreground="Black" Width="16" Height="10" CornerRadius="3"
-						Background="{Value}">
-					</Border>
-					<Label Text="{./Caption}" Foreground="Black"/>
-				</HorizontalStack>
+				<CheckBox Caption="{./Caption}" IsChecked="{²./IsPopped}" Foreground="{./Foreground}" Background="{./Background}">
+					<Template>
+						<HorizontalStack Spacing="3" Height="Fit" Background="{./Background}">
+							<Border Foreground="Black" Width="16" Height="10" CornerRadius="3"
+								Background="{Value}">
+							</Border>
+							<Label Text="{./Caption}" Foreground="Black"/>
+						</HorizontalStack>
+					</Template>
+				</CheckBox>
 			</Template>
 			<ColorPicker SelectedColor="{²Value}" Background="Onyx" Margin="5" Fit="True" />
 		</Popper>

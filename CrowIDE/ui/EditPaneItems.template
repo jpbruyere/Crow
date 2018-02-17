@@ -45,7 +45,7 @@
 				Name="crowContainer" Background="Onyx"/>
 			<Splitter/>
 			<HorizontalStack Height="Stretched" >
-				<SourceEditor Focusable="true" Name="editor" Font="monospace, 12" VerticalAlignment="Top" Margin="10"
+				<SourceEditor Focusable="true" Name="editor" Font="monospace, 11" VerticalAlignment="Top" Margin="10"
 						Foreground="Jet" Background="White" Width="Stretched" Height="Stretched"
 						 FilePath="{AbsolutePath}"  KeyDown="textView_KeyDown"/>
 				<ScrollBar Name="scrollbarY" Value="{²../editor.ScrollY}"

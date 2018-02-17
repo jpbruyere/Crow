@@ -124,9 +124,6 @@
     <EmbeddedResource Include="ui\GTreeExplorer.crow" />
     <EmbeddedResource Include="ui\GTreeExpITemp.crow" />
     <EmbeddedResource Include="ui\MemberView.crow" />
-    <EmbeddedResource Include="ui\MenuItem.template">
-      <LogicalName>Crow.MenuItem.template</LogicalName>
-    </EmbeddedResource>
     <EmbeddedResource Include="ui\CSProjExplorer.crow" />
     <EmbeddedResource Include="ui\ProjectProperties.crow" />
     <EmbeddedResource Include="ui\TreeExpandable.template">
@@ -173,5 +170,8 @@
     <None Include="ui\icons\zoom-in.svg" />
     <None Include="ui\icons\zoom-out.svg" />
     <None Include="ui\icons\basic_floppydisk.svg" />
+    <None Include="ui\MenuItem.template">
+      <LogicalName>Crow.MenuItem.template</LogicalName>
+    </None>
   </ItemGroup>
 </Project>
