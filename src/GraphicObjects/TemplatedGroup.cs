@@ -34,6 +34,7 @@ using System.Collections;
 using System.Threading;
 using System.Linq;
 using Crow.IML;
+using System.Diagnostics;
 
 namespace Crow
 {
@@ -45,7 +46,7 @@ namespace Crow
 		#endregion
 
 		protected Group items;
-		string _itemTemplate, _dataTest;
+		string _itemTemplate, dataTest;
 
 		#region events
 		public event EventHandler<SelectionChangeEventArgs> SelectedItemChanged;
@@ -66,6 +67,11 @@ namespace Crow
 		//but then i should test if null in msil gen
 		public Dictionary<string, ItemTemplate> ItemTemplates = new Dictionary<string, Crow.ItemTemplate>();
 
+		/// <summary>
+		/// Keep track of expanded subnodes and closed time to unload
+		/// </summary>
+		//Dictionary<GraphicObject, Stopwatch> nodes = new Dictionary<GraphicObject, Stopwatch>();
+		internal List<GraphicObject> nodes = new List<GraphicObject>();
 		/// <summary>
 		/// Item templates file path, on disk or embedded.
 		/// 
@@ -106,14 +112,14 @@ namespace Crow
 		/// <value>The data property test.</value>
 		[XmlAttributeAttribute][DefaultValue("TypeOf")]
 		public string DataTest {
-			get { return _dataTest; }
+			get { return dataTest; }
 			set {
-				if (value == _dataTest)
+				if (value == dataTest)
 					return;
 
-				_dataTest = value;
+				dataTest = value;
 
-				NotifyValueChanged("DataTest", _dataTest);
+				NotifyValueChanged("DataTest", dataTest);
 			}
 		}
 		#endregion
@@ -170,7 +176,7 @@ namespace Crow
 				if (value == data)
 					return;
 
-				cancelLoadingThread ();
+				//cancelLoadingThread ();
 
 				if (data is IObservableList) {
 					IObservableList ol = data as IObservableList;
@@ -188,15 +194,17 @@ namespace Crow
 
 				NotifyValueChanged ("Data", data);
 
-				lock (CurrentInterface.LayoutMutex)
+				//lock (CurrentInterface.LayoutMutex)
 					ClearItems ();
 
 				if (data == null)
 					return;
 
-				loadingThread = new CrowThread (this, loading);
-				loadingThread.Finished += (object sender, EventArgs e) => (sender as TemplatedGroup).Loaded.Raise (sender, e);
-				loadingThread.Start ();
+//				loadingThread = new CrowThread (this, loading);
+//				loadingThread.Finished += (object sender, EventArgs e) => (sender as TemplatedGroup).Loaded.Raise (sender, e);
+//				loadingThread.Start ();
+
+				loadPage (data, items, dataTest);
 
 				NotifyValueChanged ("SelectedIndex", _selectedIndex);
 				NotifyValueChanged ("SelectedItem", SelectedItem);
@@ -223,7 +231,7 @@ namespace Crow
 //				int i = e.Index % itemPerPage;
 //				(items.Children [p] as Group).InsertChild (i, e.Element);
 			} else
-				loadItem (e.Index, items);
+				loadItem (e.Element, items, dataTest);
 		}
 
 		[XmlAttributeAttribute][DefaultValue("SteelBlue")]
@@ -319,69 +327,62 @@ namespace Crow
 		/// <summary>
 		/// Items loading thread
 		/// </summary>
-		void loading(){
-			//if (!ItemTemplates.ContainsKey ("default"))
-			//	ItemTemplates ["default"] = Interface.GetItemTemplate (ItemTemplate);
-
-			for (int i = 1; i <= (data.Count / itemPerPage) + 1; i++) {
-				if ((bool)loadingThread?.cancelRequested) {
-					this.Dispose ();
-					return;
-				}
-				loadPage (i);
-				Thread.Sleep (1);
-			}
-		}
+//		void loading(){
+//			//if (!ItemTemplates.ContainsKey ("default"))
+//			//	ItemTemplates ["default"] = Interface.GetItemTemplate (ItemTemplate);
+//
+//			for (int i = 1; i <= (data.Count / itemPerPage) + 1; i++) {
+//				if ((bool)loadingThread?.cancelRequested) {
+//					this.Dispose ();
+//					return;
+//				}
+//				loadPage (i);
+//				Thread.Sleep (1);
+//			}
+//		}
 		void cancelLoadingThread(){
 			if (loadingThread != null)
 				loadingThread.Cancel ();
 		}
-		void loadPage(int pageNum)
+		void loadPage(IList _data, Group page, string _dataTest)
 		{
 			#if DEBUG_LOAD
 			Stopwatch loadingTime = new Stopwatch ();
 			loadingTime.Start ();
 			#endif
 
-			Group page;
-			if (typeof(TabView).IsAssignableFrom (items.GetType ())||
-				typeof(Menu).IsAssignableFrom (this.GetType())||
-				typeof(Wrapper).IsAssignableFrom (items.GetType ())) {
-				page = items;
+
+//			if (typeof(TabView).IsAssignableFrom (items.GetType ())||
+//				typeof(Menu).IsAssignableFrom (this.GetType())||
+//				typeof(Wrapper).IsAssignableFrom (items.GetType ())) {
+				//page = items;
 				itemPerPage = int.MaxValue;
-			} else if (typeof(GenericStack).IsAssignableFrom (items.GetType ())) {
-				GenericStack gs = new GenericStack (items.CurrentInterface);
-				gs.Orientation = (items as GenericStack).Orientation;
-				gs.Width = items.Width;
-				gs.Height = items.Height;
-				gs.VerticalAlignment = items.VerticalAlignment;
-				gs.HorizontalAlignment = items.HorizontalAlignment;
-				page = gs;
-				page.Name = "page" + pageNum;
-				isPaged = true;
-			} else {
-				page = Activator.CreateInstance (items.GetType ()) as Group;
-				page.CurrentInterface = items.CurrentInterface;
-				page.Initialize ();
-				page.Name = "page" + pageNum;
-				isPaged = true;
+//			} else if (typeof(GenericStack).IsAssignableFrom (items.GetType ())) {
+//				GenericStack gs = new GenericStack (items.CurrentInterface);
+//				gs.Orientation = (items as GenericStack).Orientation;
+//				gs.Width = items.Width;
+//				gs.Height = items.Height;
+//				gs.VerticalAlignment = items.VerticalAlignment;
+//				gs.HorizontalAlignment = items.HorizontalAlignment;
+//				page = gs;
+//				page.Name = "page" + pageNum;
+//				isPaged = true;
+//			} else {
+//				page = Activator.CreateInstance (items.GetType ()) as Group;
+//				page.CurrentInterface = items.CurrentInterface;
+//				page.Initialize ();
+//				page.Name = "page" + pageNum;
+//				isPaged = true;
+//			}
+
+			for (int i = 0; i < _data.Count; i++) {
+				loadItem (_data[i], page, _dataTest);
 			}
 
-			for (int i = (pageNum - 1) * itemPerPage; i < pageNum * itemPerPage; i++) {
-				if (i >= data.Count)
-					break;
-				if ((bool)loadingThread?.cancelRequested) {
-					page.Dispose ();
-					return;
-				}
-
-				loadItem (i, page);
-			}
-
-			if (page == items)
-				return;
-			lock (CurrentInterface.LayoutMutex)
-				items.AddChild (page);
+//			if (page == items)
+//				return;
+//			lock (CurrentInterface.LayoutMutex)
+//				items.AddChild (page);
 
 			#if DEBUG_LOAD
 			loadingTime.Stop ();
@@ -390,23 +391,23 @@ namespace Crow
 			loadingTime.ElapsedMilliseconds, this.ToString());
 			#endif
 		}
-		string getItempKey(Type dataType, object o){
+		string getItempKey(Type dataType, object o, string propertyName){
 			try {
-				return dataType.GetProperty (_dataTest).GetGetMethod ().Invoke (o, null)?.ToString();
+				return dataType.GetProperty (propertyName).GetGetMethod ().Invoke (o, null)?.ToString();
 			} catch  {
 				return dataType.FullName;
 			}
 		}
-		protected void loadItem(int i, Group page){
-			if (data [i] == null)//TODO:surely a threading sync problem
+		protected void loadItem(object o, Group page, string _dataTest){
+			if (o == null)//TODO:surely a threading sync problem
 				return;
 			GraphicObject g = null;
 			ItemTemplate iTemp = null;
-			Type dataType = data [i].GetType ();
+			Type dataType = o.GetType ();
 			string itempKey = dataType.FullName;
 
 			if (_dataTest != "TypeOf")
-				itempKey = getItempKey (dataType, data [i]);
+				itempKey = getItempKey (dataType, o, _dataTest);
 
 			if (ItemTemplates.ContainsKey (itempKey))
 				iTemp = ItemTemplates [itempKey];
@@ -437,7 +438,7 @@ namespace Crow
 				(g as Expandable).GetIsExpandable = iTemp.HasSubItems;
 			}
 
-			g.DataSource = data [i];
+			g.DataSource = o;
 		}
 		protected virtual void registerItemClick(GraphicObject g){
 			g.MouseClick += itemClick;
@@ -473,6 +474,13 @@ namespace Crow
 		}
 		internal virtual void itemClick(object sender, MouseButtonEventArgs e){
 			SelectedIndex = data.IndexOf((sender as GraphicObject).DataSource);
+		}
+
+		bool emitHelperIsAlreadyExpanded (GraphicObject go){
+			if (nodes.Contains (go))
+				return true;
+			nodes.Add (go);
+			return false;
 		}
 
 		protected override void Dispose (bool disposing)

@@ -225,7 +225,7 @@ namespace Crow.IML
 		/// <param name="reader">current xml text reader</param>
 		/// <param name="itemTemplatePath">file containing the templates if its a dedicated one</param>
 		string[] parseItemTemplateTag (XmlReader reader, string itemTemplatePath = "") {
-			string dataType = "default", datas = "", path = "";
+			string dataType = "default", datas = "", path = "", dataTest = "TypeOf";
 			while (reader.MoveToNextAttribute ()) {
 				if (reader.Name == "DataType")
 					dataType = reader.Value;
@@ -233,6 +233,8 @@ namespace Crow.IML
 					datas = reader.Value;
 				else if (reader.Name == "Path")
 					path = reader.Value;
+				else if (reader.Name == "DataTest")
+					dataTest = reader.Value;
 			}
 			reader.MoveToElement ();
 
@@ -241,7 +243,7 @@ namespace Crow.IML
 			if (string.IsNullOrEmpty (path)) {
 				itemTmpID += Guid.NewGuid ().ToString ();
 				Interface.Instantiators [itemTmpID] =
-					new ItemTemplate (new MemoryStream (Encoding.UTF8.GetBytes (reader.ReadInnerXml ())), dataType, datas);
+					new ItemTemplate (new MemoryStream (Encoding.UTF8.GetBytes (reader.ReadInnerXml ())), dataTest, dataType, datas);
 
 			} else {
 				if (!reader.IsEmptyElement)
@@ -249,9 +251,9 @@ namespace Crow.IML
 				itemTmpID += path+dataType+datas;
 				if (!Interface.Instantiators.ContainsKey (itemTmpID))
 					Interface.Instantiators [itemTmpID] =
-						new ItemTemplate (Interface.GetStreamFromPath (path), dataType, datas);
+						new ItemTemplate (Interface.GetStreamFromPath (path), dataTest, dataType, datas);
 			}
-			return new string [] { dataType, itemTmpID, datas };
+			return new string [] { dataType, itemTmpID, datas, dataTest };
 		}
 		/// <summary>
 		/// process template and item template definition prior to
@@ -312,7 +314,7 @@ namespace Crow.IML
 												//the file contains a single template to use as default
 												Interface.Instantiators [itemTemplatePath] =
 													new ItemTemplate (itr);
-												itemTemplateIds.Add (new string [] { "default", itemTemplatePath, "" });
+												itemTemplateIds.Add (new string [] { "default", itemTemplatePath, "", "TypeOf" });
 												break;//we should be at the end of the file
 											}
 											itemTemplateIds.Add (parseItemTemplateTag (itr, itemTemplatePath));
@@ -327,7 +329,7 @@ namespace Crow.IML
 					return;
 				//add the default item template if no default is defined
 				if (!itemTemplateIds.Any(ids=>ids[0] == "default"))
-					itemTemplateIds.Add (new string [] { "default", "#Crow.DefaultItem.template", "" });
+					itemTemplateIds.Add (new string [] { "default", "#Crow.DefaultItem.template", "", "TypeOf"});
 				//copy item templates (review this)
 				foreach (string [] iTempId in itemTemplateIds) {
 					ctx.il.Emit (OpCodes.Ldloc_0);//load TempControl ref
