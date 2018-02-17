@@ -38,6 +38,13 @@ using Crow.IML;
 
 namespace Crow.IML
 {
+	public class InstantiatorException : Exception {
+		public string Path;
+		public InstantiatorException (string path, Exception innerException)
+			: base ("ITor exception in " + path, innerException){
+			Path = path;
+		}
+	}
 	public delegate object InstanciatorInvoker(Interface iface);
 
 	/// <summary>
@@ -70,27 +77,33 @@ namespace Crow.IML
 		/// <summary>
 		/// Initializes a new instance of the Instantiator class.
 		/// </summary>
-		public Instantiator (string path) : this (Interface.GetStreamFromPath(path)) {
-			sourcePath = path;
+		public Instantiator (string path) : this (Interface.GetStreamFromPath(path), path) {
+			
 		}
 		/// <summary>
 		/// Initializes a new instance of the Instantiator class.
 		/// </summary>
-		public Instantiator (Stream stream)
+		public Instantiator (Stream stream, string srcPath = null)
 		{
-#if DEBUG_LOAD
+			sourcePath = srcPath;
+			#if DEBUG_LOAD
 			Stopwatch loadingTime = new Stopwatch ();
 			loadingTime.Start ();
-#endif
-			using (XmlReader itr = XmlReader.Create (stream)) {
-				parseIML (itr);
-			}
-			stream.Dispose ();
-#if DEBUG_LOAD
-			loadingTime.Stop ();
-			Debug.WriteLine ("IML Instantiator creation '{2}' : {0} ticks, {1} ms",
+			#endif
+			try {
+				using (XmlReader itr = XmlReader.Create (stream)) {
+					parseIML (itr);
+				}
+				stream.Dispose ();
+			} catch (Exception ex) {
+				throw new InstantiatorException(sourcePath, ex);
+			} finally {
+				#if DEBUG_LOAD
+				loadingTime.Stop ();
+				Debug.WriteLine ("IML Instantiator creation '{2}' : {0} ticks, {1} ms",
 				loadingTime.ElapsedTicks, loadingTime.ElapsedMilliseconds, imlPath);
-#endif
+				#endif
+			}
 		}
 		/// <summary>
 		/// Initializes a new instance of the Instantiator class with an already openned xml reader

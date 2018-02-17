@@ -88,7 +88,7 @@ namespace Tests
 					GraphicObject g = this.CurrentInterface.Load (fi.FullName);
 					crowContainer.SetChild (g);
 					g.DataSource = this;
-				} catch (Exception ex) {
+				} catch (InstantiatorException ex) {
 					showError (ex);
 				}
 			}
@@ -102,8 +102,8 @@ namespace Tests
 			NotifyValueChanged ("source", source);
 		}
 
-		void showError(Exception ex) {
-			NotifyValueChanged ("ErrorMessage", ex.Message + ex.InnerException);
+		void showError(InstantiatorException ex) {
+			NotifyValueChanged ("ErrorMessage", ex.Path + ": " + ex.InnerException.Message);
 			NotifyValueChanged ("ShowError", true);
 		}
 		void hideError () {
@@ -124,7 +124,7 @@ namespace Tests
 					crowContainer.SetChild (g);
 					g.DataSource = this;
 				}
-			} catch (Exception ex) {
+			} catch (InstantiatorException ex) {
 				System.Diagnostics.Debug.WriteLine (ex.ToString ());
 				showError (ex);
 			}
