@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="1" Foreground="{./Foreground}" Background="{./Background}">
+<Border Style="ControlBorder" Foreground="{./Foreground}" Background="{./Background}">
 	<VerticalStack>
 		<HorizontalStack Spacing="1" Height="Fit" MouseDoubleClick="./onClickForExpand">
 			<Container Margin="1" Width="9" Height="9" Focusable="true" MouseClick="./onClickForExpand"
@@ -10,7 +10,7 @@
 					Visible="{./IsExpandable}"
 					SvgSub="{./IsExpanded}"/>
 			</Container>
-			<Label Text="{./Caption}"/>
+			<Label Style="ControlCaption" Text="{./Caption}"/>
 		</HorizontalStack>
 		<Container Name="Content" Visible="false"/>
 	</VerticalStack>

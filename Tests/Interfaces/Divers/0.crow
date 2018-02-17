@@ -96,10 +96,10 @@
 		</VerticalStack>
 		<Splitter/>
 		<VerticalStack Width="40%" Margin="5" Spacing="5">
-			<Expandable Background="DimGray">
+			<Expandable>
 				<Image Path="#Crow.Images.Icons.crow.svg"/>
 			</Expandable>
-			<Popper Background="DimGray" >
+			<Popper>
 				<Border Fit="True" Background="DimGray" CornerRadius="0" BorderWidth="1">
 					<Image Path="#Crow.Images.Icons.crow.svg" Width="100" Height="100" Margin="10"
 						MouseEnter="{Background=LightGray}"
