@@ -93,7 +93,6 @@
     <Compile Include="src\SelectionChangeEventArgs.cs" />
     <Compile Include="src\ValueChangeEventArgs.cs" />
     <Compile Include="src\GraphicObjects\FileDialog.cs" />
-    <Compile Include="src\GraphicObjects\CheckBox.cs" />
     <Compile Include="src\GraphicObjects\ComboBox.cs" />
     <Compile Include="src\GraphicObjects\GroupBox.cs" />
     <Compile Include="src\GraphicObjects\ScrollBar.cs" />
@@ -219,6 +218,8 @@
     <Compile Include="src\IListChanged.cs" />
     <Compile Include="src\ObservableList.cs" />
     <Compile Include="src\GraphicObjects\IMLContainer.cs" />
+    <Compile Include="src\GraphicObjects\CheckBox.cs" />
+    <Compile Include="src\GraphicObjects\Switch.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
