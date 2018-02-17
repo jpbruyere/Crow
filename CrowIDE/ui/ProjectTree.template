@@ -2,7 +2,7 @@
 <ItemTemplate>
 	<Label Text="{}" Background="DarkRed" Foreground="White"/>
 </ItemTemplate>
-<ItemTemplate DataType="CrowIDE.Project" Data="RootItems">
+<ItemTemplate DataType="CrowIDE.Project" Data="RootItems" DataTest="Type">
 	<Expandable Caption="{Name}" ContextCommands="{Commands}" >
 		<Template>
 			<VerticalStack>
@@ -28,30 +28,27 @@
 		</Template>
 		<HorizontalStack Height="Fit">
 			<GraphicObject Width="8" Height="10"/>
-			<TreeView Name="List" Height="Fit" DataTest="Type"
-				Template="#Crow.Templates.treeList.template" />
+			<VerticalStack Height="Fit" Name="ItemsContainer"/>
 		</HorizontalStack>
 	</Expandable>
 </ItemTemplate>
-<ItemTemplate DataType="ReferenceGroup" Data="ChildNodes">
+<ItemTemplate DataType="ReferenceGroup" Data="ChildNodes" DataTest="Type">
 	<Expandable Caption="{DisplayName}" Template="#Crow.TreeExpandable.template" >
 		<HorizontalStack Height="Fit">
 			<GraphicObject Width="8" Height="10"/>
-			<TreeView Name="List" Height="Fit" DataTest="Type"
-				Template="#Crow.Templates.treeList.template" />
+			<VerticalStack Height="Fit" Name="ItemsContainer"/>
 		</HorizontalStack>
 	</Expandable>
 </ItemTemplate>
-<ItemTemplate DataType="VirtualGroup" Data="ChildNodes">
+<ItemTemplate DataType="VirtualGroup" Data="ChildNodes" DataTest="Type">
 	<Expandable Caption="{DisplayName}" Template="#Crow.TreeExpandable.template" >
 		<HorizontalStack Height="Fit">
 			<GraphicObject Width="8" Height="10"/>
-			<TreeView Name="List" Height="Fit" DataTest="Type"
-				Template="#Crow.Templates.treeList.template" />
+			<VerticalStack Height="Fit" Name="ItemsContainer"/>
 		</HorizontalStack>
 	</Expandable>
 </ItemTemplate>
-<ItemTemplate DataType="Folder">
+<ItemTemplate DataType="Folder" DataTest="Type">
 	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
 			MouseEnter="{Foreground=DimGray}"
 			MouseLeave="{Foreground=Transparent}">
@@ -62,7 +59,7 @@
 		</HorizontalStack>
 	</Border>
 </ItemTemplate>
-<ItemTemplate DataType="Reference">
+<ItemTemplate DataType="Reference" DataTest="Type">
 	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
 			MouseEnter="{Foreground=DimGray}"
 			MouseLeave="{Foreground=Transparent}">
@@ -73,7 +70,7 @@
 		</HorizontalStack>
 	</Border>
 </ItemTemplate>
-<ItemTemplate DataType="ProjectReference">
+<ItemTemplate DataType="ProjectReference" DataTest="Type">
 	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
 			MouseEnter="{Foreground=DimGray}"
 			MouseLeave="{Foreground=Transparent}">
@@ -84,7 +81,7 @@
 		</HorizontalStack>
 	</Border>
 </ItemTemplate>
-<ItemTemplate DataType="Compile">	
+<ItemTemplate DataType="Compile" DataTest="Type">	
 	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
 			MouseEnter="{Foreground=DimGray}"
 			MouseLeave="{Foreground=Transparent}">
@@ -95,7 +92,7 @@
 		</HorizontalStack>
 	</Border>
 </ItemTemplate>
-<ItemTemplate DataType="EmbeddedResource">
+<ItemTemplate DataType="EmbeddedResource" DataTest="Type">
 	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
 			MouseEnter="{Foreground=DimGray}"
 			MouseLeave="{Foreground=Transparent}">
@@ -106,7 +103,7 @@
 		</HorizontalStack>
 	</Border>
 </ItemTemplate>
-<ItemTemplate DataType="None">
+<ItemTemplate DataType="None" DataTest="Type">
 	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
 			MouseEnter="{Foreground=DimGray}"
 			MouseLeave="{Foreground=Transparent}">

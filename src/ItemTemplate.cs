@@ -52,6 +52,7 @@ namespace Crow
 		public BooleanTestOnInstance HasSubItems;
 		string strDataType;
 		string fetchMethodName;
+		string dataTest;
 
 		#region CTOR
 		/// <summary>
@@ -60,10 +61,11 @@ namespace Crow
 		/// <param name="path">IML file to parse</param>
 		/// <param name="_dataType">type this item will be choosen for, or member of the data item</param>
 		/// <param name="_fetchDataMethod">for hierarchical data, method to call for children fetching</param>
-		public ItemTemplate(string path, string _dataType = null, string _fetchDataMethod = null)
+		public ItemTemplate(string path, string _dataTest = "TypeOf", string _dataType = null, string _fetchDataMethod = null)
 			: base(path) {
 			strDataType = _dataType;
 			fetchMethodName = _fetchDataMethod;
+			dataTest = _dataTest;
 
 		}
 		/// <summary>
@@ -72,11 +74,12 @@ namespace Crow
 		/// <param name="path">IML fragment to parse</param>
 		/// <param name="_dataType">type this item will be choosen for, or member of the data item</param>
 		/// <param name="_fetchDataMethod">for hierarchical data, method to call for children fetching</param>
-		public ItemTemplate (Stream ImlFragment, string _dataType, string _fetchDataMethod)
+		public ItemTemplate (Stream ImlFragment, string _dataTest, string _dataType, string _fetchDataMethod)
 			:base(ImlFragment)
 		{
 			strDataType = _dataType;
 			fetchMethodName = _fetchDataMethod;
+			dataTest = _dataTest;
 		}
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Crow.ItemTemplate"/> class using the opened XmlReader in args.
@@ -84,11 +87,12 @@ namespace Crow
 		/// <param name="path">XML reader positionned before or at the root node</param>
 		/// <param name="_dataType">type this item will be choosen for, or member of the data item</param>
 		/// <param name="_fetchDataMethod">for hierarchical data, method to call for children fetching</param>
-		public ItemTemplate (XmlReader reader, string _dataType = null, string _fetchDataMethod = null)
+		public ItemTemplate (XmlReader reader, string _dataTest = "TypeOf" , string _dataType = null, string _fetchDataMethod = null)
 			:base(reader)
 		{
 			strDataType = _dataType;
 			fetchMethodName = _fetchDataMethod;
+			dataTest = _dataTest;
 		}
 		#endregion
 
@@ -108,7 +112,7 @@ namespace Crow
 			Type tmpGrpType = typeof(TemplatedGroup);
 			Type evtType = typeof(EventHandler);
 
-			PropertyInfo piData = tmpGrpType.GetProperty ("Data");
+			//PropertyInfo piData = tmpGrpType.GetProperty ("Data");
 
 			MethodInfo evtInvoke = evtType.GetMethod ("Invoke");
 			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
@@ -120,41 +124,55 @@ namespace Crow
 			//DM is bound to templatedGroup root (arg0)
 			//arg1 is the sender of the expand event
 			DynamicMethod dm = new DynamicMethod ("dyn_expand_" + fetchMethodName,
-				typeof (void), args, true);
+				typeof (void), args,typeof(TemplatedGroup), true);
 
 			System.Reflection.Emit.Label gotoEnd;
 			System.Reflection.Emit.Label ifDataIsNull;
+			System.Reflection.Emit.Label gotoItemsContainerNotFound;
 
 			ILGenerator il = dm.GetILGenerator (256);
 			il.DeclareLocal(typeof(GraphicObject));
 
 			gotoEnd = il.DefineLabel ();
 			ifDataIsNull = il.DefineLabel ();
+			gotoItemsContainerNotFound = il.DefineLabel ();
 
 			il.Emit (OpCodes.Ldarg_1);//load sender of expand event
-
-			il.Emit(OpCodes.Ldstr, "List");
+			il.Emit(OpCodes.Ldstr, "ItemsContainer");//load name to find
 			il.Emit (OpCodes.Callvirt, CompilerServices.miFindByName);
-			il.Emit (OpCodes.Stloc_0);
+			il.Emit (OpCodes.Stloc_0);//save items container as loc0
 
-			//check that 'Data' of list is not already set
+			//ensure ItemsContainer is not null
 			il.Emit (OpCodes.Ldloc_0);
-			il.Emit (OpCodes.Callvirt, piData.GetGetMethod ());
-			il.Emit (OpCodes.Brfalse, ifDataIsNull);
-			il.Emit (OpCodes.Br, gotoEnd);
+			il.Emit (OpCodes.Brfalse, gotoItemsContainerNotFound);
 
-			il.MarkLabel(ifDataIsNull);
+			//check that node is not already expanded
+			il.Emit (OpCodes.Ldarg_0);//push root TemplatedGroup into the stack
+			il.Emit (OpCodes.Ldarg_1);
+			il.Emit (OpCodes.Call, CompilerServices.miIsAlreadyExpanded);
+			il.Emit (OpCodes.Brtrue, gotoEnd);
+//			il.Emit (OpCodes.Ldloc_0);
+//			il.Emit (OpCodes.Callvirt, piData.GetGetMethod ());
+//			il.Emit (OpCodes.Brfalse, ifDataIsNull);
+//			il.Emit (OpCodes.Br, gotoEnd);
+
+//			il.MarkLabel(ifDataIsNull);
+
 			//copy the ref of ItemTemplates list TODO: maybe find another way to share it among the nodes?
-			FieldInfo fiTemplates = tmpGrpType.GetField("ItemTemplates");
-			il.Emit (OpCodes.Ldloc_0);
-			il.Emit (OpCodes.Ldarg_0);
-			il.Emit (OpCodes.Ldfld, fiTemplates);
-			il.Emit (OpCodes.Stfld, fiTemplates);
+//			FieldInfo fiTemplates = tmpGrpType.GetField("ItemTemplates");
+//			il.Emit (OpCodes.Ldloc_0);
+//			il.Emit (OpCodes.Ldarg_0);
+//			il.Emit (OpCodes.Ldfld, fiTemplates);
+//			il.Emit (OpCodes.Stfld, fiTemplates);
 
 			//call 'fetchMethodName' from the dataSource to build the sub nodes list
-			il.Emit (OpCodes.Ldloc_0);//push 'List' (of sub nodes) into the stack
-			il.Emit (OpCodes.Ldarg_1);//get the dataSource of the sender
-			il.Emit (OpCodes.Callvirt, CompilerServices.miGetDataSource);
+			//il.Emit (OpCodes.Ldarg_0);//load root templatedGroop
+
+			il.Emit (OpCodes.Ldarg_0);//push root TemplatedGroup into the stack
+			il.Emit (OpCodes.Ldarg_1);//load sender node of expand
+			il.Emit (OpCodes.Callvirt, CompilerServices.miGetDataSource);//get the dataSource of the sender
+
+
 
 			if (fetchMethodName != "self") {//special keyword self allows the use of recurent list<<<
 				if (dataType == null) {
@@ -167,7 +185,15 @@ namespace Crow
 					emitGetSubData(il, dataType);			
 			}
 			//set 'return' from the fetch method as 'data' of the list
-			il.Emit (OpCodes.Callvirt, piData.GetSetMethod ());
+			//il.Emit (OpCodes.Callvirt, piData.GetSetMethod ());
+			il.Emit (OpCodes.Ldloc_0);//load second arg of loadPage, the sender node
+			il.Emit (OpCodes.Ldstr, dataTest);//load 3rd arg, dataTest kind on subitems
+			il.Emit (OpCodes.Callvirt, CompilerServices.miLoadPage);
+			il.Emit (OpCodes.Br, gotoEnd);
+
+			il.MarkLabel(gotoItemsContainerNotFound);
+			il.EmitWriteLine("ItemsContainer not found in ItemTemplate for " + host.ToString());
+
 
 			il.MarkLabel(gotoEnd);
 			il.Emit (OpCodes.Ret);
@@ -203,7 +229,6 @@ namespace Crow
 			HasSubItems = (BooleanTestOnInstance)dm.CreateDelegate (typeof(BooleanTestOnInstance));
 			#endregion
 		}
-
 		//data is on the stack
 		void emitGetSubData(ILGenerator il, Type dataType){
 			MethodInfo miGetDatas = dataType.GetMethod (fetchMethodName, new Type[] {});

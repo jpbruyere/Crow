@@ -1,8 +1,10 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<ItemTemplate>
-	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose"/>
+<ItemTemplate>	
+	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
+		<Label Text="Error" Background="Red"/>
+	</TabItem>
 </ItemTemplate>
-<ItemTemplate DataType=".cs">
+<ItemTemplate DataType=".cs" DataTest="Extension">
 	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
 		<VerticalStack>
 			<HorizontalStack Height="Stretched" >
@@ -31,12 +33,12 @@
 		</VerticalStack>
 	</TabItem>
 </ItemTemplate>
-<ItemTemplate DataType=".svg">
+<ItemTemplate DataType=".svg" DataTest="Extension">
 	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
 		<Image Path="{AbsolutePath}"/>
 	</TabItem>
 </ItemTemplate>
-<ItemTemplate DataType=".crow">		
+<ItemTemplate DataType=".crow" DataTest="Extension">		
 	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
 		<VerticalStack>
 			<Label Width="Stretched" Margin="1" Text="{HoverWidget}"/>
