@@ -1,19 +1,20 @@
 <?xml version="1.0"?>
 <HorizontalStack Background="Onyx" Margin="10" Width="90%" Height="90%" Spacing="100" Focusable="true">
-	<Container StartDrag="{Background=Yellow}" EndDrag="{Background=Mantis}" Focusable="true" Fit="true"
-			MouseEnter="{/txt.Foreground=Red;Background=Blue}" MouseLeave="{/txt.Foreground=White}"
+	<Container Name="source" StartDrag="{Background=Jet}" EndDrag="{Background=Mantis}" Focusable="true" Fit="true"
+			Drop="{../target.Background=Green}"
+			MouseEnter="{/txt.Foreground=Red}" MouseLeave="{/txt.Foreground=White}" MouseClick="{Background=Mantis}"
 			AllowDrag="true" Width="200" Height="200" Background="Mantis">
 		<VerticalStack Margin="50">
 			<Label Name="txt" Text="Drag me" Foreground="Gray"/>
-			<Label Text="Dragged" Visible="{/IsDragged}"/>
+			<Label Text="Dragged" Visible="{../../IsDragged}" Foreground="Gray"/>
 		</VerticalStack>
 	</Container>
-	<Container StartDrag="{Background=Yellow}" EndDrag="{Background=Mantis}" Focusable="true" Fit="true"
+	<Container Name="target" DragEnter="{Background=Mantis}" DragLeave="{Background=Jet}" Focusable="true" Fit="true"
 			MouseEnter="{/txt.Foreground=Red}" MouseLeave="{/txt.Foreground=White}"
-			AllowDrop="true"  Background="Mantis">
+			AllowDrop="true"  Background="Jet">
 		<VerticalStack Margin="50">
 			<Label Name="txt" Text="Drop here" Foreground="Gray"/>
-			<Label Text="Dragged" Visible="{/IsDragged}"/>
+			<Label Text="Dragged" Visible="{../../IsDragged}" Foreground="Gray"/>
 		</VerticalStack>
 	</Container>
 </HorizontalStack>

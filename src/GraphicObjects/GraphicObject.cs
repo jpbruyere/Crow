@@ -318,8 +318,10 @@ namespace Crow
 		/// <summary>Occurs when the enabled state this object is set to false</summary>
 		public event EventHandler Disabled;
 		public event EventHandler StartDrag;
+		public event EventHandler DragEnter;
+		public event EventHandler DragLeave;
 		public event EventHandler EndDrag;
-		public event EventHandler Dropped;
+		public event EventHandler Drop;
 		/// <summary>Occurs when one part of the rendering slot changed</summary>
 		public event EventHandler<LayoutingEventArgs> LayoutChanged;
 		/// <summary>Occurs when DataSource changed</summary>
@@ -1088,37 +1090,42 @@ namespace Crow
 					return;
 				isDragged = value;
 
-				if (isDragged) {
-					CurrentInterface.HoverWidget = null;
-					onStartDrag (this, null);
-				}
-
-				NotifyValueChanged ("IsDrag", IsDragged);
+				NotifyValueChanged ("IsDragged", IsDragged);
 			}
 		}
 		/// <summary>
-		/// start dragging
+		/// fired when drag and drop operation start
 		/// </summary>
-		protected virtual void onStartDrag (object sender, EventArgs e){
-			Debug.WriteLine("DRAG => " + this.ToString());
-			StartDrag.Raise (this, null);
+		protected virtual void onStartDrag (object sender, DragDropEventArgs e){
+			CurrentInterface.HoverWidget = this.focusParent;
+			IsDragged = true;
+			StartDrag.Raise (this, e);
+			Debug.WriteLine(this.ToString() + " : START DRAG => " + e.ToString());
 		}
 		/// <summary>
 		///  Occured when dragging ends without dropping
 		/// </summary>
-		protected virtual void onEndDrag (object sender, EventArgs e){
+		protected virtual void onEndDrag (object sender, DragDropEventArgs e){			
 			IsDragged = false;
-			EndDrag.Raise (this, null);
-			Debug.WriteLine("END DRAG => " + this.ToString());
+			EndDrag.Raise (this, e);
+			Debug.WriteLine(this.ToString() + " : END DRAG => " + e.ToString());
 		}
-		/// <summary>
-		/// Dragging end with a dropping
-		/// </summary>
-		protected virtual void onDrop (object sender, EventArgs e){
+		protected virtual void onDragEnter (object sender, DragDropEventArgs e){
+			e.DropTarget = this;
+			DragEnter.Raise (this, e);
+			Debug.WriteLine(this.ToString() + " : DRAG Enter => " + e.ToString());
+		}
+		protected virtual void onDragLeave (object sender, DragDropEventArgs e){			
+			e.DropTarget = null;
+			DragLeave.Raise (this, e);
+			Debug.WriteLine(this.ToString() + " : DRAG Leave => " + e.ToString());
+		}
+		protected virtual void onDrop (object sender, DragDropEventArgs e){			
 			IsDragged = false;
-			Debug.WriteLine("DROPPED => " + this.ToString());
-			Dropped.Raise (this, null);
+			Drop.Raise (this, e);
+			Debug.WriteLine(this.ToString() + " : DROP => " + e.ToString());
 		}
+
 		#endregion
 
 		#region Queuing
@@ -1544,8 +1551,12 @@ namespace Crow
 		}
 		public virtual void onMouseMove(object sender, MouseMoveEventArgs e)
 		{
-			if (AllowDrag & !IsDragged & IsActive)
-				IsDragged = true;
+			if (AllowDrag & HasFocus & e.Mouse.LeftButton == ButtonState.Pressed) {
+				if (CurrentInterface.DragAndDropOperation == null) {
+					CurrentInterface.DragAndDropOperation = new DragDropEventArgs (this);
+					onStartDrag (this, CurrentInterface.DragAndDropOperation);
+				}
+			}
 
 			//bubble event to the top
 			GraphicObject p = focusParent;
@@ -1582,16 +1593,14 @@ namespace Crow
 			Debug.WriteLine("MOUSE UP => " + this.ToString());
 			#endif
 
-			if (IsDragged){
-				bool dropOK = false;
-				if (CurrentInterface.HoverWidget!=null) {
-					if (CurrentInterface.HoverWidget.AllowDrop)
-						dropOK = true;
+			if (CurrentInterface.DragAndDropOperation != null){
+				if (CurrentInterface.DragAndDropOperation.DragSource == this) {
+					if (CurrentInterface.DragAndDropOperation.DropTarget != null)
+						onDrop (this, CurrentInterface.DragAndDropOperation);
+					else
+						onEndDrag (this, CurrentInterface.DragAndDropOperation);
+					CurrentInterface.DragAndDropOperation = null;
 				}
-				if (dropOK)
-					onDrop (this, null);
-				else
-					onEndDrag (this, null);
 			}
 
 			//bubble event to the top
@@ -1631,6 +1640,14 @@ namespace Crow
 			#if DEBUG_FOCUS
 			Debug.WriteLine("MouseEnter => " + this.ToString());
 			#endif
+
+			if (CurrentInterface.DragAndDropOperation != null) {
+				if (this.AllowDrop) {
+					if (CurrentInterface.DragAndDropOperation.DragSource != this && CurrentInterface.DragAndDropOperation.DropTarget != this)
+						onDragEnter (this, CurrentInterface.DragAndDropOperation);					
+				}
+			}
+
 			MouseEnter.Raise (this, e);
 		}
 		public virtual void onMouseLeave(object sender, MouseMoveEventArgs e)
@@ -1638,6 +1655,10 @@ namespace Crow
 			#if DEBUG_FOCUS
 			Debug.WriteLine("MouseLeave => " + this.ToString());
 			#endif
+			if (CurrentInterface.DragAndDropOperation != null) {
+				if (CurrentInterface.DragAndDropOperation.DropTarget == this)
+					onDragLeave (this, CurrentInterface.DragAndDropOperation);
+			}
 			MouseLeave.Raise (this, e);
 		}
 		#endregion
