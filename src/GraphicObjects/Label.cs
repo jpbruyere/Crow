@@ -740,7 +740,8 @@ namespace Crow
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseUp (sender, e);
-
+			if (!(this.HasFocus || _selectable))
+				return;
 			if (!SelectionInProgress)
 				return;
 
@@ -751,7 +752,9 @@ namespace Crow
 		public override void onMouseDoubleClick (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseDoubleClick (sender, e);
-
+			if (!(this.HasFocus || _selectable))
+				return;
+			
 			GotoWordStart ();
 			SelBegin = CurrentPosition;
 			GotoWordEnd ();
