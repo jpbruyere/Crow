@@ -429,8 +429,8 @@ namespace Crow
 				g = iTemp.CreateInstance(CurrentInterface);
 				page.AddChild (g);
 //				if (isPaged)
-//					g.LogicalParent = this;
-				registerItemClick (g);
+				g.LogicalParent = this;
+				g.MouseDown += itemClick;
 			}
 
 			if (iTemp.Expand != null && g is Expandable) {
@@ -439,9 +439,6 @@ namespace Crow
 			}
 
 			g.DataSource = o;
-		}
-		protected virtual void registerItemClick(GraphicObject g){
-			g.MouseClick += itemClick;
 		}
 //		protected void _list_LayoutChanged (object sender, LayoutingEventArgs e)
 //		{
