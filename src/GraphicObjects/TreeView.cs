@@ -62,19 +62,6 @@ namespace Crow
 			}
 		}
 
-		protected override void registerItemClick (GraphicObject g)
-		{
-			//register ItemClick on the Root node
-			TreeView tv = this as TreeView;
-			while (!tv.IsRoot) {
-				ILayoutable tmp = tv.Parent;
-				while (!(tmp is TreeView)) {
-					tmp = tmp.Parent;
-				}
-				tv = tmp as TreeView;
-			}
-			g.MouseClick += tv.itemClick;
-		}
 		internal override void itemClick (object sender, MouseButtonEventArgs e)
 		{
 			GraphicObject tmp = sender as GraphicObject;
