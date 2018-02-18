@@ -206,6 +206,8 @@ namespace Crow
 		/// </summary>
 		public static Dictionary<String, Instantiator> Instantiators = new Dictionary<string, Instantiator>();
 		public List<CrowThread> CrowThreads = new List<CrowThread>();//used to monitor thread finished
+
+		public DragDropEventArgs DragAndDropOperation = null;
 		#endregion
 
 		#region Private Fields
@@ -824,12 +826,11 @@ namespace Crow
 			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
 			e.Mouse = Mouse;
 
-			if (ActiveWidget != null) {
+			if (ActiveWidget != null&& DragAndDropOperation == null) {
 				//TODO, ensure object is still in the graphic tree
 				//send move evt even if mouse move outside bounds
 				ActiveWidget.onMouseMove (this, e);
-				if (!ActiveWidget.IsDragged)//if active is dragged, process mouse move as it was not visible.
-					return true;
+				return true;
 			}
 
 			if (HoverWidget != null) {
