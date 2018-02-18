@@ -686,12 +686,12 @@ namespace Crow
 		/// <summary>Set visible state of widget to false and remove if from the graphic tree</summary>
 		public void RemoveWidget(GraphicObject g)
 		{
-			if (g.Contains(HoverWidget)) {
-				while (HoverWidget != g.LogicalParent) {
-					HoverWidget.onMouseLeave (HoverWidget, null);
-					HoverWidget = HoverWidget.LogicalParent as GraphicObject;
-				}
-			}
+//			if (g.Contains(HoverWidget)) {
+//				while (HoverWidget != g.focusParent) {
+//					HoverWidget.onMouseLeave (HoverWidget, null);
+//					HoverWidget = HoverWidget.focusParent;
+//				}
+//			}
 			lock (UpdateMutex) {
 				RegisterClip (g.ScreenCoordinates (g.LastPaintedSlot));
 				GraphicTree.Remove (g);
@@ -882,7 +882,6 @@ namespace Crow
 		{
 			Mouse.DisableBit (button);
 			MouseButtonEventArgs e = new MouseButtonEventArgs ((Crow.MouseButton)button) { Mouse = Mouse };
-
 			if (_activeWidget == null)
 				return false;
 

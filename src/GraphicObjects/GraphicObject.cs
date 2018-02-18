@@ -1553,6 +1553,9 @@ namespace Crow
 			MouseMove.Raise (this, e);
 		}
 		public virtual void onMouseDown(object sender, MouseButtonEventArgs e){
+			#if DEBUG_FOCUS
+			Debug.WriteLine("MOUSE DOWN => " + this.ToString());
+			#endif
 			if (CurrentInterface.eligibleForDoubleClick == this && CurrentInterface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick)
 				onMouseDoubleClick (this, e);
 			else
@@ -1578,6 +1581,10 @@ namespace Crow
 			MouseDown.Raise (this, e);
 		}
 		public virtual void onMouseUp(object sender, MouseButtonEventArgs e){
+			#if DEBUG_FOCUS
+			Debug.WriteLine("MOUSE UP => " + this.ToString());
+			#endif
+
 			if (IsDragged){
 				bool dropOK = false;
 				if (CurrentInterface.HoverWidget!=null) {
@@ -1604,12 +1611,18 @@ namespace Crow
 			}
 		}
 		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){
+			#if DEBUG_FOCUS
+			Debug.WriteLine("CLICK => " + this.ToString());
+			#endif
 			GraphicObject p = focusParent;
 			if (p != null)
 				p.onMouseClick(sender,e);
 			MouseClick.Raise (this, e);
 		}
 		public virtual void onMouseDoubleClick(object sender, MouseButtonEventArgs e){
+			#if DEBUG_FOCUS
+			Debug.WriteLine("DOUBLE CLICK => " + this.ToString());
+			#endif
 			GraphicObject p = focusParent;
 			if (p != null)
 				p.onMouseDoubleClick(sender,e);
