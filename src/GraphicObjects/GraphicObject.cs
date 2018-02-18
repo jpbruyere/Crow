@@ -317,7 +317,8 @@ namespace Crow
 		public event EventHandler Enabled;
 		/// <summary>Occurs when the enabled state this object is set to false</summary>
 		public event EventHandler Disabled;
-		public event EventHandler Dragged;
+		public event EventHandler StartDrag;
+		public event EventHandler EndDrag;
 		public event EventHandler Dropped;
 		/// <summary>Occurs when one part of the rendering slot changed</summary>
 		public event EventHandler<LayoutingEventArgs> LayoutChanged;
@@ -1100,13 +1101,14 @@ namespace Crow
 		/// </summary>
 		protected virtual void onStartDrag (object sender, EventArgs e){
 			Debug.WriteLine("DRAG => " + this.ToString());
-			Dragged.Raise (this, null);
+			StartDrag.Raise (this, null);
 		}
 		/// <summary>
 		///  Occured when dragging ends without dropping
 		/// </summary>
 		protected virtual void onEndDrag (object sender, EventArgs e){
 			IsDragged = false;
+			EndDrag.Raise (this, null);
 			Debug.WriteLine("END DRAG => " + this.ToString());
 		}
 		/// <summary>

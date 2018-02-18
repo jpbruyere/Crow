@@ -97,8 +97,10 @@ namespace Crow.IML
 					IsStringConstant = true;
 					return;
 				}
+			} else if (string.IsNullOrEmpty (splitedExp [0])) {
+				ptr++;
 			} else {
-				if (string.IsNullOrEmpty (splitedExp [0]) || splitedExp [0] == ".") {//template root
+				 if (splitedExp [0] == ".") {//template root
 					LevelsUp = -1;
 					ptr++;
 				} else {

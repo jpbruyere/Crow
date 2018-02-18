@@ -1,9 +1,19 @@
 <?xml version="1.0"?>
-<VerticalStack MinimumSize="50,50" Background="Onyx" Margin="10" Width="90%" Height="90%">
-	<GraphicObject Margin="10" Width="Stretched" Height="Fit" Background="Mantis"
-			MinimumSize="10,10"/>
-	<GraphicObject Margin="10" Width="Stretched" Height="Fit" Background="Mantis"
-			MinimumSize="10,10"/>
-	<GraphicObject Margin="10" Width="Stretched" Height="Fit" Background="Mantis"
-			MinimumSize="10,10"/>
-</VerticalStack>
+<HorizontalStack Background="Onyx" Margin="10" Width="90%" Height="90%" Spacing="100" Focusable="true">
+	<Container StartDrag="{Background=Yellow}" EndDrag="{Background=Mantis}" Focusable="true" Fit="true"
+			MouseEnter="{/txt.Foreground=Red;Background=Blue}" MouseLeave="{/txt.Foreground=White}"
+			AllowDrag="true" Width="200" Height="200" Background="Mantis">
+		<VerticalStack Margin="50">
+			<Label Name="txt" Text="Drag me" Foreground="Gray"/>
+			<Label Text="Dragged" Visible="{/IsDragged}"/>
+		</VerticalStack>
+	</Container>
+	<Container StartDrag="{Background=Yellow}" EndDrag="{Background=Mantis}" Focusable="true" Fit="true"
+			MouseEnter="{/txt.Foreground=Red}" MouseLeave="{/txt.Foreground=White}"
+			AllowDrop="true"  Background="Mantis">
+		<VerticalStack Margin="50">
+			<Label Name="txt" Text="Drop here" Foreground="Gray"/>
+			<Label Text="Dragged" Visible="{/IsDragged}"/>
+		</VerticalStack>
+	</Container>
+</HorizontalStack>
