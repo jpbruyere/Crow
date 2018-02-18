@@ -1556,11 +1556,6 @@ namespace Crow
 			#if DEBUG_FOCUS
 			Debug.WriteLine("MOUSE DOWN => " + this.ToString());
 			#endif
-			if (CurrentInterface.eligibleForDoubleClick == this && CurrentInterface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick)
-				onMouseDoubleClick (this, e);
-			else
-				CurrentInterface.clickTimer.Restart();
-			CurrentInterface.eligibleForDoubleClick = null;
 
 			if (CurrentInterface.ActiveWidget == null)
 				CurrentInterface.ActiveWidget = this;
@@ -1603,12 +1598,6 @@ namespace Crow
 				p.onMouseUp(sender,e);
 
 			MouseUp.Raise (this, e);
-
-			if (MouseIsIn (e.Position) && IsActive) {
-				if (CurrentInterface.clickTimer.ElapsedMilliseconds < Interface.DoubleClick)
-					CurrentInterface.eligibleForDoubleClick = this;
-				onMouseClick (this, e);
-			}
 		}
 		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){
 			#if DEBUG_FOCUS
