@@ -99,10 +99,10 @@ namespace Tests
 			}
 			get { return List2; }
 		}
-		IList<Color> testList = Color.ColorDic.Values.OrderBy(c=>c.Hue)
-			.ThenBy(c=>c.Value).ThenBy(c=>c.Saturation)
+		List<Color> testList = Color.ColorDic.Values//.OrderBy(c=>c.Hue)
+			//.ThenBy(c=>c.Value).ThenBy(c=>c.Saturation)
 			.ToList();
-		public IList<Color> TestList {
+		public List<Color> TestList {
 			set{
 				testList = value;
 				NotifyValueChanged ("TestList", testList);

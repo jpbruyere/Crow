@@ -43,7 +43,7 @@ namespace Crow
 		public event EventHandler Unchecked;
 
 		#region GraphicObject overrides
-		public override void onMouseClick (object sender, MouseButtonEventArgs e)
+		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{						
 			Group pg = Parent as Group;
 			if (pg != null) {
@@ -56,7 +56,7 @@ namespace Crow
 			} else
 				IsChecked = !IsChecked;
 
-			base.onMouseClick (sender, e);
+			base.onMouseDown (sender, e);
 		}
 		#endregion
 

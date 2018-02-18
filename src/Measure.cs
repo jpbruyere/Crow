@@ -49,7 +49,7 @@ namespace Crow
 		/// <summary>
 		/// Fit on content, this special measure is defined as a fixed integer set to -1 pixel
 		/// </summary>
-		public static Measure Fit = new Measure(-1);
+		public static Measure Fit = new Measure(-1,Unit.Percent);
 		/// <summary>
 		/// Stretched into parent client area. This special measure is defined as a proportional cote
 		/// set to 100 Percents
@@ -67,8 +67,8 @@ namespace Crow
 		/// <summary>
 		/// True is size is fixed in pixels, this means not proportional, stretched nor fit.
 		/// </summary>
-		public bool IsFixed { get { return Value > 0 && Units == Unit.Pixel; }}
-		public bool IsFit { get { return Value == -1 && Units == Unit.Pixel; }}
+		public bool IsFixed { get { return Units == Unit.Pixel; }}
+		public bool IsFit { get { return Value == -1 && Units == Unit.Percent; }}
 		#region Operators
 		public static implicit operator int(Measure m){
 			return m.Value;

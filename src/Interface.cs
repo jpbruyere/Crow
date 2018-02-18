@@ -114,7 +114,7 @@ namespace Crow
 		/// <summary> delay before tooltip appear </summary>
 		public static int ToolTipDelay = 500;
 		/// <summary>Double click threshold in milisecond</summary>
-		public static int DoubleClick = 200;//max duration between two mouse_down evt for a dbl clk in milisec.
+		public static int DoubleClick = 250;//max duration between two mouse_down evt for a dbl clk in milisec.
 		/// <summary> Time to wait in millisecond before starting repeat loop</summary>
 		public static int DeviceRepeatDelay = 700;
 		/// <summary> Time interval in millisecond between device event repeat</summary>
@@ -143,7 +143,20 @@ namespace Crow
 		/// </summary>
 		protected static Interface CurrentInterface;
 		internal Stopwatch clickTimer = new Stopwatch();
-		internal GraphicObject eligibleForDoubleClick = null;
+		GraphicObject armedClickSender = null;
+		MouseButtonEventArgs armedClickEvtArgs = null;
+//		internal GraphicObject EligibleForDoubleClick {
+//			get { return eligibleForDoubleClick; }
+//			set {
+//				eligibleForDoubleClick = value;
+//				clickTimer.Restart ();
+//			}
+//		}
+		internal void armeClick (GraphicObject sender, MouseButtonEventArgs e){
+			armedClickSender = sender;
+			armedClickEvtArgs = e;
+			clickTimer.Restart ();
+		}
 		#endregion
 
 		#region Events
@@ -476,12 +489,18 @@ namespace Crow
 		/// Result: the Interface bitmap is drawn in memory (byte[] bmp) and a dirtyRect and bitmap are available
 		/// </summary>
 		public void Update(){
+			if (armedClickSender != null && clickTimer.ElapsedMilliseconds >= Interface.DoubleClick) {
+				armedClickSender.onMouseClick (armedClickSender, armedClickEvtArgs);				
+				armedClickSender = null;
+			}
+
 			if (mouseRepeatCount > 0) {
 				int mc = mouseRepeatCount;
 				mouseRepeatCount -= mc;
 				if (_focusedWidget != null) {
+					mouseRepeatTriggeredAtLeastOnce = true;
 					for (int i = 0; i < mc; i++) {
-						_focusedWidget.onMouseClick (this, new MouseButtonEventArgs (Mouse.X, Mouse.Y, MouseButton.Left, true));
+						_focusedWidget.onMouseDown (this, new BubblingMouseButtonEventArg(Mouse.X, Mouse.Y, MouseButton.Left, true));
 					}
 				}
 			}
@@ -794,6 +813,10 @@ namespace Crow
 		/// <returns>true if mouse is in the interface</returns>
 		public virtual bool ProcessMouseMove(int x, int y)
 		{
+			if (armedClickSender != null) {
+				armedClickSender.onMouseClick (armedClickSender, armedClickEvtArgs);
+				armedClickSender = null;
+			}
 			int deltaX = x - Mouse.X;
 			int deltaY = y - Mouse.Y;
 			Mouse.X = x;
@@ -890,13 +913,18 @@ namespace Crow
 				mouseRepeatThread.Abort();
 				mouseRepeatThread.Join ();
 			}
-
-			_activeWidget.onMouseUp (_activeWidget, e);
-			GraphicObject lastActive = _activeWidget;
-			ActiveWidget = null;
-			if (!lastActive.MouseIsIn (Mouse.Position)) {
-				ProcessMouseMove (Mouse.X, Mouse.Y);
+			if (!mouseRepeatTriggeredAtLeastOnce) {
+				if (_activeWidget.MouseIsIn (e.Position))
+					armeClick (_activeWidget, e);				
 			}
+			mouseRepeatTriggeredAtLeastOnce = false;
+			_activeWidget.onMouseUp (_activeWidget, e);
+
+//			GraphicObject lastActive = _activeWidget;
+			ActiveWidget = null;
+//			if (!lastActive.MouseIsIn (Mouse.Position)) {
+//				ProcessMouseMove (Mouse.X, Mouse.Y);
+//			}
 			return true;
 		}
 		/// <summary>
@@ -911,6 +939,18 @@ namespace Crow
 
 			if (HoverWidget == null)
 				return false;
+
+			if (HoverWidget == armedClickSender) {
+				if (clickTimer.ElapsedMilliseconds < Interface.DoubleClick) {
+					armedClickSender.onMouseDoubleClick (armedClickSender, e);
+					armedClickSender = null;
+					return true;
+				}
+					
+			}
+			if (armedClickSender!=null)
+				armedClickSender.onMouseClick (armedClickSender, armedClickEvtArgs);				
+			armedClickSender = null;
 
 			HoverWidget.onMouseDown(HoverWidget,new BubblingMouseButtonEventArg(e));
 
@@ -1062,13 +1102,14 @@ namespace Crow
 		#endregion
 
 		#region Device Repeat Events
-		volatile bool mouseRepeatOn, keyboardRepeatOn;
+		volatile bool mouseRepeatOn, keyboardRepeatOn, mouseRepeatTriggeredAtLeastOnce = false;
 		volatile int mouseRepeatCount, keyboardRepeatCount;
 		Thread mouseRepeatThread, keyboardRepeatThread;
 		KeyboardKeyEventArgs lastKeyDownEvt;
 		void mouseRepeatThreadFunc()
 		{
 			mouseRepeatOn = true;
+			mouseRepeatTriggeredAtLeastOnce = false;
 			Thread.Sleep (Interface.DeviceRepeatDelay);
 			while (mouseRepeatOn) {
 				mouseRepeatCount++;

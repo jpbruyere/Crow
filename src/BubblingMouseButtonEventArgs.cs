@@ -35,6 +35,9 @@ namespace Crow
 	{
 		public GraphicObject Focused;
 		public BubblingMouseButtonEventArg(MouseButtonEventArgs mbe) : base(mbe){}
+		public BubblingMouseButtonEventArg(int x, int y, MouseButton button, bool pressed)
+			: base (x,y,button,pressed){}
+
 	}
 }
 
