@@ -167,8 +167,9 @@ namespace Tests
 			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
 			//testFiles = new string [] { @"Interfaces/TemplatedContainer/testTabView.crow" };
 			//testFiles = new string [] { @"Interfaces/TemplatedControl/testSpinner.crow" };
-			//testFiles = new string [] { @"Interfaces/GraphicObject/testCtxMenu.crow" };
-			testFiles = new string [] { @"Interfaces/TemplatedControl/testItemTemplateTag.crow" };
+			testFiles = new string [] { @"Interfaces/DragAndDrop/0.crow" };
+			//testFiles = new string [] { @"Interfaces/TemplatedControl/testItemTemplateTag.crow" };
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/DragAndDrop", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();

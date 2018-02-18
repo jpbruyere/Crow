@@ -365,6 +365,9 @@
     <None Include="Interfaces\GraphicObject\testCtxMenu.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Interfaces\DragAndDrop\0.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />
@@ -380,6 +383,7 @@
     <Folder Include="Interfaces\TemplatedGroup\" />
     <Folder Include="GraphicObjects\" />
     <Folder Include="Tutorials\" />
+    <Folder Include="Interfaces\DragAndDrop\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="image\tetra.png">
