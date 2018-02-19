@@ -4,8 +4,8 @@
 		<Label Text="Selected Tab:"/>
 		<Label Text="{../../tabview1.SelectedTab}"/>
 	</HorizontalStack>
-	<TabView Name="tabview1" Orientation="Horizontal" Spacing="24">
-		<TabItem Name="TabItem1" Caption="tab item 1">
+	<TabView Name="tabview1" Orientation="Horizontal" Spacing="24" Margin="50">
+		<TabItem Name="TabItem1" Caption="tab item 1" >
 			<VerticalStack Margin="20">
 				<CheckBox/>
 				<CheckBox/>

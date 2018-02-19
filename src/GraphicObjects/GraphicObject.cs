@@ -1527,6 +1527,12 @@ namespace Crow
         #endregion
 
 		#region Mouse handling
+		/// <summary>
+		/// Recursive local coordinate point test.
+		/// After test on parent, point m is in local coord system.
+		/// </summary>
+		/// <returns>return true, if point is in the bounds of this control</returns>
+		/// <param name="m">by ref point to test, init value is not kept</param>
 		public virtual bool PointIsIn(ref Point m)
 		{			
 			if (!(Visible & isEnabled)||IsDragged)
