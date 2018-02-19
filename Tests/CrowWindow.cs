@@ -116,11 +116,7 @@ namespace Crow
 		/// </summary>
 		public Interface CurrentInterface {
 			get {
-				if (ifaceControl.Count == 0) {//create default orthogonal interface
-					addInterfaceControler (new InterfaceControler (
-						new Rectangle (0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height)));
-					focusedIdx = 0;
-				}
+				checkDefaultIFace ();
 				return ifaceControl [focusedIdx].CrowInterface;
 			}
 		}
@@ -218,9 +214,11 @@ namespace Crow
 		/// check if a default interface exists, create one if not
 		/// </summary>
 		void checkDefaultIFace (){
-			if (ifaceControl.Count == 0)//create default orthogonal interface
+			if (ifaceControl.Count == 0) {//create default orthogonal interface
 				addInterfaceControler (new InterfaceControler (
-					new Rectangle (0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height)));			
+					new Rectangle (0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height)));
+				focusedIdx = 0;
+			}
 		}
 		/// <summary>
 		/// Load the content of the IML file pointed by path and add it to the current interface
@@ -345,20 +343,17 @@ namespace Crow
 		}
 		protected virtual void GL_Mouse_Move(object sender, OpenTK.Input.MouseMoveEventArgs otk_e)
         {
-			if (activeIdx == -2) {
-				focusedIdx = -1;
+			if (activeIdx == -2) {				
 				for (int i = 0; i < ifaceControl.Count; i++) {
 					if (ifaceControl [i].ProcessMouseMove (otk_e.X, otk_e.Y)) {
 						focusedIdx = i;
 						return;
 					}
 				}
-			} else if (focusedIdx >= 0) {
-				ifaceControl [focusedIdx].ProcessMouseMove (otk_e.X, otk_e.Y);
-				return;
-			}
-			if (focusedIdx < 0)
-				CrowMouseMove.Raise (sender, otk_e);
+			} if (ifaceControl [focusedIdx].ProcessMouseMove (otk_e.X, otk_e.Y))
+				return;			
+
+			CrowMouseMove.Raise (sender, otk_e);
         }
 		protected virtual void GL_Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)
         {
