@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0"?>
 <GenericStack Orientation="Vertical" Spacing="0"
-		Background="Onyx"
+		Background="{./Background}"
 		MouseEnter="{/caption.Foreground=White}"
 		MouseLeave="{/caption.Foreground=Gray}">
 	<HorizontalStack Margin="2" Left="{./TabOffset}"
-		Name="TabTitle"
+		Name="TabTitle" Background="{./Background}"
 		HorizontalAlignment="Left"
 		Height="{./TabThickness}"
 		Width="Fit">

@@ -4,8 +4,8 @@
 		<Label Text="Selected Tab:"/>
 		<Label Text="{../../tabview1.SelectedTab}"/>
 	</HorizontalStack>
-	<TabView Name="tabview1" Orientation="Horizontal" Spacing="24" Margin="50">
-		<TabItem Name="TabItem1" Caption="tab item 1" >
+	<TabView Name="tabview1" Background="Onyx" Orientation="Horizontal" Spacing="14" Margin="50">
+		<TabItem Name="TabItem1" Caption="tab item 1" Background="Onyx">
 			<VerticalStack Margin="20">
 				<CheckBox/>
 				<CheckBox/>
@@ -13,20 +13,20 @@
 				<CheckBox/>
 			</VerticalStack>
 		</TabItem>
-		<TabItem Name="TabItem2" Caption="tab item 2" Background="Gray">
-			<VerticalStack Background="DimGray" Height="Fit" Margin="10">
+		<TabItem Name="TabItem2" Caption="tab item 2" Background="Onyx">
+			<VerticalStack Height="Fit" Margin="10">
 				<RadioButton Fit="true"/>
 				<RadioButton/>
 				<RadioButton/>
 				<RadioButton/>
 			</VerticalStack>
 		</TabItem>
-		<TabItem Name="TabItem3" Caption="tab item 3" Background="Gray">
+		<TabItem Name="TabItem3" Background="Onyx" Caption="tab item 3">
 			<Container Margin="5" CornerRadius="2" >
 				<TextBox Margin="5" Multiline="true" TextAlignment="TopLeft"/>
 			</Container>
 		</TabItem>
-		<TabItem Name="TabItem4" Caption="tab item 4" Margin="0" Background="Gray">
+		<TabItem Name="TabItem4" Background="Onyx" Caption="tab item 4" Margin="0">
 			<TextBox/>
 		</TabItem>
 	</TabView>
