@@ -33,7 +33,7 @@ namespace Crow
 {
 	public class Window : TemplatedContainer
 	{
-		protected enum Direction
+		public enum Direction
 		{
 			None,
 			N,
@@ -196,6 +196,83 @@ namespace Crow
 //		} 
 		#endregion
 
+		/// <summary>
+		/// Moves the and resize with the same function entry point, the direction give the kind of move or resize
+		/// </summary>
+		/// <param name="XDelta">mouse delta on the X axis</param>
+		/// <param name="YDelta">mouse delta on the Y axis</param>
+		/// <param name="currentDirection">Current Direction of the operation, none for moving, other value for resizing in the given direction</param>
+		public void MoveAndResize (int XDelta, int YDelta, Direction currentDirection = (Direction)0) {
+			int currentLeft = this.Left;
+			int currentTop = this.Top;
+			int currentWidth, currentHeight;
+
+			if (currentLeft == 0) {
+				currentLeft = this.Slot.Left;
+				this.Left = currentLeft;
+			}
+			if (currentTop == 0) {
+				currentTop = this.Slot.Top;
+				this.Top = currentTop;
+			}
+			if (this.Width.IsFixed)
+				currentWidth = this.Width;
+			else
+				currentWidth = this.Slot.Width;
+
+			if (this.Height.IsFixed)
+				currentHeight = this.Height;
+			else
+				currentHeight = this.Slot.Height;
+
+			switch (currentDirection) {
+			case Direction.None:
+				this.Left = currentLeft + XDelta;				
+				this.Top = currentTop + YDelta;
+				break;
+			case Direction.N:
+				this.Height = currentHeight - YDelta;
+				if (this.Height == currentHeight - YDelta)
+					this.Top = currentTop + YDelta;
+				break;
+			case Direction.S:
+				this.Height = currentHeight + YDelta;
+				break;
+			case Direction.W:
+				this.Width = currentWidth - XDelta;
+				if (this.Width == currentWidth - XDelta)
+					this.Left = currentLeft + XDelta;
+				break;
+			case Direction.E:
+				this.Width = currentWidth + XDelta;
+				break;
+			case Direction.NW:
+				this.Height = currentHeight - YDelta;
+				if (this.Height == currentHeight - YDelta)
+					this.Top = currentTop + YDelta;
+				this.Width = currentWidth - XDelta;
+				if (this.Width == currentWidth - XDelta)
+					this.Left = currentLeft + XDelta;
+				break;
+			case Direction.NE:
+				this.Height = currentHeight - YDelta;
+				if (this.Height == currentHeight - YDelta)
+					this.Top = currentTop + YDelta;
+				this.Width = currentWidth + XDelta;
+				break;
+			case Direction.SW:
+				this.Width = currentWidth - XDelta;
+				if (this.Width == currentWidth - XDelta)
+					this.Left = currentLeft + XDelta;
+				this.Height = currentHeight + YDelta;
+				break;
+			case Direction.SE:
+				this.Height = currentHeight + YDelta;
+				this.Width = currentWidth + XDelta;
+				break;
+			}			
+		}
+
 		#region GraphicObject Overrides
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
@@ -211,74 +288,7 @@ namespace Crow
 
 			if (this.HasFocus && _movable) {
 				if (e.Mouse.IsButtonDown (MouseButton.Left)) {
-					int currentLeft = this.Left;
-					int currentTop = this.Top;
-					int currentWidth, currentHeight;
-
-					if (currentLeft == 0) {
-						currentLeft = this.Slot.Left;
-						this.Left = currentLeft;
-					}
-					if (currentTop == 0) {
-						currentTop = this.Slot.Top;
-						this.Top = currentTop;
-					}
-					if (this.Width.IsFixed)
-						currentWidth = this.Width;
-					else
-						currentWidth = this.Slot.Width;
-				
-					if (this.Height.IsFixed)
-						currentHeight = this.Height;
-					else
-						currentHeight = this.Slot.Height;
-
-					switch (currentDirection) {
-					case Direction.None:
-						this.Left = currentLeft + e.XDelta;				
-						this.Top = currentTop + e.YDelta;
-						break;
-					case Direction.N:
-						this.Height = currentHeight - e.YDelta;
-						if (this.Height == currentHeight - e.YDelta)
-							this.Top = currentTop + e.YDelta;
-						break;
-					case Direction.S:
-						this.Height = currentHeight + e.YDelta;
-						break;
-					case Direction.W:
-						this.Width = currentWidth - e.XDelta;
-						if (this.Width == currentWidth - e.XDelta)
-							this.Left = currentLeft + e.XDelta;
-						break;
-					case Direction.E:
-						this.Width = currentWidth + e.XDelta;
-						break;
-					case Direction.NW:
-						this.Height = currentHeight - e.YDelta;
-						if (this.Height == currentHeight - e.YDelta)
-							this.Top = currentTop + e.YDelta;
-						this.Width = currentWidth - e.XDelta;
-						if (this.Width == currentWidth - e.XDelta)
-							this.Left = currentLeft + e.XDelta;
-						break;
-					case Direction.NE:
-						this.Height = currentHeight - e.YDelta;
-						if (this.Height == currentHeight - e.YDelta)
-							this.Top = currentTop + e.YDelta;
-						this.Width = currentWidth + e.XDelta;
-						break;
-					case Direction.SW:
-						this.Width = currentWidth - e.XDelta;
-						if (this.Width == currentWidth - e.XDelta)
-							this.Left = currentLeft + e.XDelta;
-						this.Height = currentHeight + e.YDelta;
-						break;
-					case Direction.SE:
-						this.Height = currentHeight + e.YDelta;
-						this.Width = currentWidth + e.XDelta;
-						break;
-					}
+					MoveAndResize (e.XDelta, e.YDelta, currentDirection);
 					return;
 				}
 			}
@@ -360,9 +370,6 @@ namespace Crow
 			}
 
 			Maximized.Raise (sender, e);
-
-
-
 		}
 		protected void onUnmaximized (object sender, EventArgs e){
 			lock (CurrentInterface.LayoutMutex) {

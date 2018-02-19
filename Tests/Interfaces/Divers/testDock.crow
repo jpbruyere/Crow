@@ -1,0 +1,7 @@
+﻿<?xml version="1.0"?>
+<Docker Background="Jet" Margin = "0" Focusable="true" >
+	<DockWindow Focusable="true" Caption="View 1" Width="100" Height="100"><GraphicObject Background="Green"/></DockWindow>
+	<DockWindow Focusable="true" Caption="View 2" Resizable = "true" Width="100" Height="100"><GraphicObject Background="Blue"/></DockWindow>
+	<DockWindow Focusable="true" Caption="View 3" Resizable = "true" Width="100" Height="100"><GraphicObject Background="Yellow"/></DockWindow>
+	<DockWindow Focusable="true" Caption="View 4" Resizable = "true" Width="100" Height="100"><GraphicObject Background="Black"/></DockWindow>
+</Docker>
