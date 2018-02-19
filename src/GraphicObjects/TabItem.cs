@@ -157,18 +157,15 @@ namespace Crow
 
 		#region Mouse Handling
 		public bool HoldCursor = false;
-
-		public override bool MouseIsIn (Point m)
+		public override bool PointIsIn (ref Point m)
 		{
-			if (!(Visible & IsEnabled) || IsDragged)
-				return false;
+			TabView tv = Parent as TabView;
+			bool tmp = base.PointIsIn (ref m);
 
-			bool mouseIsInTitle = TabTitle.ScreenCoordinates (TabTitle.Slot).ContainsOrIsEqual (m);
-			if (!IsSelected)
-				return mouseIsInTitle;
-
-			return _contentContainer.ScreenCoordinates (_contentContainer.Slot).ContainsOrIsEqual (m)
-				|| mouseIsInTitle;
+			if (m.Y < tabThickness)
+				return TabTitle.Slot.ContainsOrIsEqual (m);
+			else
+				return this.isSelected && tmp;
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
