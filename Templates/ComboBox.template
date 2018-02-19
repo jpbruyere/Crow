@@ -1,16 +1,20 @@
 <?xml version="1.0"?>
-<Popper Name="popper" PopDirection="Bottom">
+<Popper Caption="{./SelectedItem}" Name="popper" PopDirection="Bottom" Foreground="{./Foreground}" Background="{./Background}">
 	<Template>
-		<Border CornerRadius="0" Foreground="LightGray">
-			<HorizontalStack Margin="0" Spacing="1">
-				<TextBox MinimumSize="80,10" Margin="1" Foreground="Black" Background="White"
-					Text="{../../../../SelectedItem}"/>
-				<Button Width="14" Height="14" Focusable="false"
-					Template="#Crow.Templates.ArrowBut.template">
-					<Image Margin="0"  Path="#Crow.Images.Icons.updown.svg" SvgSub="down"/>
-				</Button>
-			</HorizontalStack>
-		</Border>
+		<CheckBox Caption="{./Caption}" IsChecked="{²./IsPopped}" Foreground="{./Foreground}" Background="{./Background}">
+			<Template>
+				<Border CornerRadius="0" Foreground="LightGray">
+					<HorizontalStack Margin="0" Spacing="1">
+						<TextBox MinimumSize="80,10" Margin="1" Foreground="Black" Background="White"
+							Text="{./Caption}"/>
+						<Button Width="14" Height="14" Focusable="false"
+							Template="#Crow.Templates.ArrowBut.template">
+							<Image Margin="0"  Path="#Crow.Images.Icons.updown.svg" SvgSub="down"/>
+						</Button>
+					</HorizontalStack>
+				</Border>
+			</Template>
+		</CheckBox>
 	</Template>
 	<Border Background="DimGray" BorderWidth="1" Margin="1"
 		MinimumSize="{../../MinimumPopupSize}" Fit="true">

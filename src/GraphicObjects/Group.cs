@@ -263,7 +263,7 @@ namespace Crow
 					gr.Clip ();
 				}
 
-				lock (Children) {
+				lock (children) {
 					foreach (GraphicObject c in Children) {
 						if (!c.Visible)
 							continue;
