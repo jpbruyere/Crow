@@ -220,6 +220,8 @@
     <Compile Include="src\ObservableList.cs" />
     <Compile Include="src\GraphicObjects\IMLContainer.cs" />
     <Compile Include="src\DragDropEventArgs.cs" />
+    <Compile Include="src\GraphicObjects\Docker.cs" />
+    <Compile Include="src\GraphicObjects\DockWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -378,6 +380,9 @@
     <EmbeddedResource Include="Icons\compiler_error.svg" />
     <EmbeddedResource Include="Icons\project.svg" />
     <EmbeddedResource Include="Icons\projectRef.svg" />
+    <EmbeddedResource Include="Templates\DockWindow.template">
+      <LogicalName>Crow.DockWindow.template</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="Crow.dll.config">

@@ -58,6 +58,12 @@ MenuItem {
 	MouseLeave = {Foreground=LightGray;Background=Transparent;}
 	SelectionBackground = Transparent;
 }
+Docker {
+	AllowDrop = true;
+}
+DockWindow {
+	AllowDrag = true;
+}
 MessageBox {
 	Background = 0.3,0.3,0.3,0.3;
 	Width = Fit;
