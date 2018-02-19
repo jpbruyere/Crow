@@ -176,7 +176,7 @@ namespace Crow
 				if (value == data)
 					return;
 
-				//cancelLoadingThread ();
+				cancelLoadingThread ();
 
 				if (data is IObservableList) {
 					IObservableList ol = data as IObservableList;
@@ -200,11 +200,9 @@ namespace Crow
 				if (data == null)
 					return;
 
-//				loadingThread = new CrowThread (this, loading);
-//				loadingThread.Finished += (object sender, EventArgs e) => (sender as TemplatedGroup).Loaded.Raise (sender, e);
-//				loadingThread.Start ();
-
-				loadPage (data, items, dataTest);
+				loadingThread = new CrowThread (this, loading);
+				loadingThread.Finished += (object sender, EventArgs e) => (sender as TemplatedGroup).Loaded.Raise (sender, e);
+				loadingThread.Start ();
 
 				NotifyValueChanged ("SelectedIndex", _selectedIndex);
 				NotifyValueChanged ("SelectedItem", SelectedItem);
@@ -327,7 +325,9 @@ namespace Crow
 		/// <summary>
 		/// Items loading thread
 		/// </summary>
-//		void loading(){
+		void loading(){
+			loadPage (data, items, dataTest);
+		}
 //			//if (!ItemTemplates.ContainsKey ("default"))
 //			//	ItemTemplates ["default"] = Interface.GetItemTemplate (ItemTemplate);
 //
