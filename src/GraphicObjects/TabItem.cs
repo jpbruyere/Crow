@@ -159,13 +159,13 @@ namespace Crow
 		public bool HoldCursor = false;
 		public override bool PointIsIn (ref Point m)
 		{
-			TabView tv = Parent as TabView;
-			bool tmp = base.PointIsIn (ref m);
+			if (!base.PointIsIn (ref m))
+				return false;
 
 			if (m.Y < tabThickness)
 				return TabTitle.Slot.ContainsOrIsEqual (m);
 			else
-				return this.isSelected && tmp;
+				return this.isSelected;
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
@@ -214,6 +214,10 @@ namespace Crow
 		}
 		public void butCloseTabClick (object sender, MouseButtonEventArgs e){			
 			QueryClose.Raise (this, null);
+			//if tab is used as a templated item root in a templatedGroup, local datasource
+			//is not null, in this case, removing the data entries will delete automatically the item
+			if (localDataSourceIsNull)
+				(Parent as TabView).DeleteChild (this);
 		}
 		#endregion
 

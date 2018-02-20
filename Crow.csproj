@@ -379,6 +379,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Icons\compiler_error.svg" />
     <EmbeddedResource Include="Icons\project.svg" />
+    <EmbeddedResource Include="Icons\crowproj.svg" />
     <EmbeddedResource Include="Icons\projectRef.svg" />
     <EmbeddedResource Include="Templates\DockWindow.template">
       <LogicalName>Crow.DockWindow.template</LogicalName>

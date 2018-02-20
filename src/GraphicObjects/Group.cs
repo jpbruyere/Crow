@@ -62,7 +62,7 @@ namespace Crow
             set { _multiSelect = value; }
         }
 		public virtual void AddChild(GraphicObject g){
-			lock (children) {
+			lock (Children) {
 				g.Parent = this;
 				Children.Add (g);
 			}
@@ -79,9 +79,8 @@ namespace Crow
 					CurrentInterface.HoverWidget = null;
 			}
 
-			lock (children)
+			lock (Children)
 				Children.Remove(child);
-			child.Dispose ();
 
 			if (child == largestChild && Width == Measure.Fit)
 				searchLargestChild ();
@@ -89,9 +88,15 @@ namespace Crow
 				searchTallestChild ();
 
 			this.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
+
+		}
+        public virtual void DeleteChild(GraphicObject child)
+		{
+			RemoveChild (child);
+			child.Dispose ();
         }
 		public virtual void InsertChild (int idx, GraphicObject g) {
-			lock (children) {
+			lock (Children) {
 				g.Parent = this;
 				Children.Insert (idx, g);
 			}
@@ -99,12 +104,12 @@ namespace Crow
 			g.LayoutChanged += OnChildLayoutChanges;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
-		public virtual void RemoveChild (int idx) {
-			RemoveChild (children[idx]);
+		public virtual void DeleteChild (int idx) {
+			DeleteChild (children[idx]);
 		}
 		public virtual void ClearChildren()
 		{
-			lock (children) {
+			lock (Children) {
 				while (Children.Count > 0) {
 					GraphicObject g = Children [Children.Count - 1];
 					g.LayoutChanged -= OnChildLayoutChanges;
@@ -123,7 +128,7 @@ namespace Crow
 		{
 			if (Children.Contains(w))
 			{
-				lock (children) {
+				lock (Children) {
 					Children.Remove (w);
 					Children.Add (w);
 				}
@@ -133,7 +138,7 @@ namespace Crow
 		{
 			if (Children.Contains(w))
 			{
-				lock (children) {
+				lock (Children) {
 					Children.Remove (w);
 					Children.Insert (0, w);
 				}
@@ -144,7 +149,7 @@ namespace Crow
 		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
 		{
 			base.OnDataSourceChanged (this, e);
-			lock (children) {
+			lock (Children) {
 				foreach (GraphicObject g in children)
 					if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
 						g.OnDataSourceChanged (g, e);
@@ -155,7 +160,7 @@ namespace Crow
 			if (Name == nameToFind)
 				return this;
 			GraphicObject tmp = null;
-			lock (children) {
+			lock (Children) {
 				foreach (GraphicObject w in Children) {
 					tmp = w.FindByName (nameToFind);
 					if (tmp != null)
@@ -234,7 +239,7 @@ namespace Crow
 				gr.Clip ();
 			}
 
-			lock (children) {
+			lock (Children) {
 				foreach (GraphicObject g in Children) {
 					g.Paint (ref gr);
 				}
@@ -263,7 +268,7 @@ namespace Crow
 					gr.Clip ();
 				}
 
-				lock (children) {
+				lock (Children) {
 					foreach (GraphicObject c in Children) {
 						if (!c.Visible)
 							continue;
@@ -374,6 +379,21 @@ namespace Crow
 			}
 			base.checkHoverWidget (e);
 		}
+//		public override bool PointIsIn (ref Point m)
+//		{
+//			if (!base.PointIsIn (ref m))
+//				return false;
+//			if (CurrentInterface.HoverWidget == this)
+//				return true;
+//			lock (Children) {
+//				for (int i = Children.Count - 1; i >= 0; i--) {
+//					if (Children [i].Slot.ContainsOrIsEqual (m) && !(bool)CurrentInterface.HoverWidget?.IsOrIsInside(Children[i])) {						
+//						return false;
+//					}
+//				}
+//			}
+//			return true;
+//		}
 		#endregion
 
 		protected override void Dispose (bool disposing)

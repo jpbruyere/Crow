@@ -424,7 +424,7 @@ namespace Crow
 			if (Parent is Interface)
 				(Parent as Interface).DeleteWidget (this);
 			else if (Parent is Group)
-				(Parent as Group).RemoveChild (this);
+				(Parent as Group).DeleteChild (this);
 			else if (Parent is PrivateContainer)
 				(Parent as Container).Child = null;
 		}

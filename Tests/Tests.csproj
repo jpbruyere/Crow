@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>Tests.BasicTests</StartupObject>
+    <StartupObject>Tests.Showcase</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ReleaseVersion>0.5</ReleaseVersion>
@@ -243,9 +243,6 @@
     <None Include="Interfaces\Divers\welcome.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Interfaces\Unsorted\testTypeViewer.goml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Interfaces\Divers\testPropLess.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -268,9 +265,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Interfaces\Divers\3.crow">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Interfaces\Divers\testDock.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Interfaces\TemplatedContainer\0.crow">
@@ -345,9 +339,6 @@
     <None Include="Interfaces\Divers\test2WayBinding.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Interfaces\Unsorted\testFileDialog.crow">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Interfaces\Divers\perfMeasures.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -365,10 +356,22 @@
     <None Include="Interfaces\Divers\testShape.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Interfaces\GraphicObject\testCtxMenu.crow">
+    <None Include="Interfaces\DragAndDrop\0.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Interfaces\DragAndDrop\0.crow">
+    <None Include="Interfaces\Divers\testIMLContainer.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Divers\testCtxMenu.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Divers\testFileDialog.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Experimental\testTypeViewer.goml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Experimental\testDock.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -379,7 +382,6 @@
     <Folder Include="Interfaces\Group\" />
     <Folder Include="Interfaces\Divers\" />
     <Folder Include="Interfaces\Splitter\" />
-    <Folder Include="Interfaces\Unsorted\" />
     <Folder Include="Interfaces\Wrapper\" />
     <Folder Include="Interfaces\TemplatedControl\" />
     <Folder Include="Interfaces\TemplatedContainer\" />
@@ -387,6 +389,7 @@
     <Folder Include="GraphicObjects\" />
     <Folder Include="Tutorials\" />
     <Folder Include="Interfaces\DragAndDrop\" />
+    <Folder Include="Interfaces\Experimental\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="image\tetra.png">

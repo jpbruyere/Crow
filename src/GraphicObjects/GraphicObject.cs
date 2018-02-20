@@ -243,10 +243,11 @@ namespace Crow
 				if (parent == value)
 					return;
 				DataSourceChangeEventArgs e = new DataSourceChangeEventArgs (parent, value);
-				lock (this)
+				lock (CurrentInterface.LayoutMutex) {
 					parent = value;
-
-				onParentChanged (this, e);
+				}
+					onParentChanged (this, e);
+				
 			}
 		}
 		[XmlIgnore]public ILayoutable LogicalParent {
@@ -786,8 +787,9 @@ namespace Crow
 				//prevent setting null causing stack overflow in specific case
 				if (dse.NewDataSource == dse.OldDataSource)
 					return;
-
-				OnDataSourceChanged (this, dse);
+				lock (CurrentInterface.LayoutMutex) {
+					OnDataSourceChanged (this, dse);
+				}
 
 				NotifyValueChanged ("DataSource", DataSource);
 			}
@@ -1097,7 +1099,7 @@ namespace Crow
 		/// fired when drag and drop operation start
 		/// </summary>
 		protected virtual void onStartDrag (object sender, DragDropEventArgs e){
-			CurrentInterface.HoverWidget = this.focusParent;
+			CurrentInterface.HoverWidget = null;
 			IsDragged = true;
 			StartDrag.Raise (this, e);
 			Debug.WriteLine(this.ToString() + " : START DRAG => " + e.ToString());
@@ -1136,11 +1138,13 @@ namespace Crow
 			#if DEBUG_UPDATE
 			Debug.WriteLine (string.Format("ClippingRegistration -> {0}", this.ToString ()));
 			#endif
-			IsQueueForRedraw = false;
-			if (Parent == null)
-				return;
-			Parent.RegisterClip (LastPaintedSlot);
-			Parent.RegisterClip (Slot);
+			lock(CurrentInterface.LayoutMutex){
+				IsQueueForRedraw = false;
+				if (Parent == null)
+					return;
+				Parent.RegisterClip (LastPaintedSlot);
+				Parent.RegisterClip (Slot);
+			}
 		}
 		/// <summary>
 		/// Add clip rectangle to this.clipping and propagate up to root

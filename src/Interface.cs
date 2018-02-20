@@ -590,9 +590,8 @@ namespace Crow
 			GraphicObject g = null;
 			while (DrawingQueue.Count > 0) {
 				lock (DrawingQueue)
-					g = DrawingQueue.Dequeue ();
-				lock (g)
-					g.ClippingRegistration ();
+					g = DrawingQueue.Dequeue ();				
+				g.ClippingRegistration ();
 			}
 
 			#if MEASURE_TIME
