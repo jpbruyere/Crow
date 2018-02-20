@@ -112,7 +112,7 @@ namespace Crow
 			SelectedTab = ti.ViewIndex = Children.Count - 1;
 		}
 
-		public override void RemoveChild (GraphicObject child)
+		public override void DeleteChild (GraphicObject child)
 		{
 			TabItem ti = child as TabItem;
 			if (ti == null)
@@ -124,7 +124,7 @@ namespace Crow
 			if (selectedTab > Children.Count - 2)
 				SelectedTab--;
 			
-			base.RemoveChild (child);
+			base.DeleteChild (child);
 		}
 
 		public override bool ArrangeChildren { get { return true; } }

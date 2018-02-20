@@ -148,8 +148,8 @@
 		<VerticalStack Width="30%" Margin="5">
 <!--			<Border Margin="5" Height="Fit">
 				<Label Width="Stretched" Margin="1" Text="{../../dv.SelectedItem}"/>
-			</Border>-->
-<!--			<Border Margin="5" Height="30%">
+			</Border>
+			<Border Margin="5" Height="30%">
 				<DirectoryView Name="dv" CurrentDirectory="/" Margin="1"/>
 			</Border>
 			<Splitter/>-->

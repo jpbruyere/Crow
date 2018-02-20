@@ -216,9 +216,9 @@ namespace Crow
 			if (this.isPaged) {
 				int p = e.Index / itemPerPage;
 				int i = e.Index % itemPerPage;
-				(items.Children [p] as Group).RemoveChild (i);
+				(items.Children [p] as Group).DeleteChild (i);
 			} else
-				items.RemoveChild (e.Index);
+				items.DeleteChild (e.Index);
 		}
 
 		void Ol_ListAdd (object sender, ListChangedEventArg e)
@@ -268,7 +268,7 @@ namespace Crow
 		public virtual void RemoveItem(GraphicObject g)
 		{
 			g.LogicalParent = null;
-			items.RemoveChild (g);
+			items.DeleteChild (g);
 			if (items.Children.Count == 0)
 				NotifyValueChanged ("HasChildren", false);
 		}
@@ -375,8 +375,10 @@ namespace Crow
 //				isPaged = true;
 //			}
 
-			for (int i = 0; i < _data.Count; i++) {
+			for (int i = 0; i < _data.Count; i++) {				
 				loadItem (_data[i], page, _dataTest);
+				if (loadingThread.cancelRequested)
+					break;
 			}
 
 //			if (page == items)
@@ -425,13 +427,13 @@ namespace Crow
 					iTemp = ItemTemplates ["default"];
 			}
 
-			lock (CurrentInterface.LayoutMutex) {
+			//lock (CurrentInterface.LayoutMutex) {
 				g = iTemp.CreateInstance(CurrentInterface);
 				page.AddChild (g);
 //				if (isPaged)
 				g.LogicalParent = this;
 				g.MouseDown += itemClick;
-			}
+			//}
 
 			if (iTemp.Expand != null && g is Expandable) {
 				(g as Expandable).Expand += iTemp.Expand;

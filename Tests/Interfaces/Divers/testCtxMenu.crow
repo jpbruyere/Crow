@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
-<GraphicObject MouseEnter="{Background=Red}" MouseLeave="{Background=Green}" Margin="10" Width="50%" Height="50%" Focusable="true"
+<GraphicObject Margin="10" Width="50%" Height="50%" Focusable="true"
 		Background="hgradient|0:Red|0.25:Blue|0.5:Green|0.75:Yellow|1:Red"
 		MinimumSize="50,50" ContextCommands="{Commands}"/>

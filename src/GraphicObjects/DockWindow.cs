@@ -52,63 +52,98 @@ namespace Crow
 				NotifyValueChanged ("IsDocked", isDocked);
 			}
 		}
-		public override void OnLayoutChanges (LayoutingType layoutType)
+		public Alignment DockingPosition {
+			get { return docking; }
+			set {
+				if (docking == value)
+					return;
+				docking = value;
+				NotifyValueChanged ("DockingPosition", DockingPosition);
+			}
+		}
+		protected override void onDrop (object sender, DragDropEventArgs e)
 		{
-			base.OnLayoutChanges (layoutType);
-
-			if (isDocked)
-				return;
-			
+			base.onDrop (sender, e);
 			Docker dv = Parent as Docker;
-			if (dv == null)
-				return;
-
-			Rectangle dvCliRect = dv.ClientRectangle;
-
-			if (layoutType == LayoutingType.X) {
-				if (Slot.X < dv.DockingThreshold)
-					dock (Alignment.Left);
-				else if (Slot.Right > dvCliRect.Width - dv.DockingThreshold)
-					dock (Alignment.Right);
-			}else if (layoutType == LayoutingType.Y) {
-				if (Slot.Y < dv.DockingThreshold)
-					dock (Alignment.Top);
-				else if (Slot.Bottom > dvCliRect.Height - dv.DockingThreshold)
-					dock (Alignment.Bottom);
-			}
+			dv.Dock (this);
 		}
+		public override bool PointIsIn (ref Point m)
+		{			
+			if (!base.PointIsIn(ref m))
+				return false;
 
-		public override void onMouseMove (object sender, MouseMoveEventArgs e)
-		{
-			lastMousePos = e.Position;
-
-			if (this.HasFocus && e.Mouse.IsButtonDown (MouseButton.Left) && IsDocked) {
-				Docker dv = Parent as Docker;
-				if (docking == Alignment.Left) {
-					if (lastMousePos.X - undockingMousePosOrig.X > dv.DockingThreshold)
-						undock ();
-				} else if (docking == Alignment.Right) {
-					if (undockingMousePosOrig.X - lastMousePos.X > dv.DockingThreshold)
-						undock ();
-				} else if (docking == Alignment.Top) {
-					if (lastMousePos.Y - undockingMousePosOrig.Y > dv.DockingThreshold)
-						undock ();
-				} else if (docking == Alignment.Bottom) {
-					if (undockingMousePosOrig.Y - lastMousePos.Y > dv.DockingThreshold)
-						undock ();
+			Group p = Parent as Group;
+			if (p != null) {
+				lock (p.Children) {
+					for (int i = p.Children.Count - 1; i >= 0; i--) {
+						if (p.Children [i] == this)
+							break;
+						if (p.Children [i].Slot.ContainsOrIsEqual (m)) {						
+							return false;
+						}
+					}
 				}
-				return;
 			}
-
-			base.onMouseMove (sender, e);
+			return Slot.ContainsOrIsEqual(m);
 		}
-		public override void onMouseDown (object sender, MouseButtonEventArgs e)
-		{
-			base.onMouseDown (sender, e);
 
-			if (this.HasFocus && IsDocked && e.Button == MouseButton.Left)
-				undockingMousePosOrig = lastMousePos;
-		}
+//		public override void OnLayoutChanges (LayoutingType layoutType)
+//		{
+//			base.OnLayoutChanges (layoutType);
+//
+//			if (isDocked)
+//				return;
+			
+//			Docker dv = Parent as Docker;
+//			if (dv == null)
+//				return;
+//
+//			Rectangle dvCliRect = dv.ClientRectangle;
+//
+//			if (layoutType == LayoutingType.X) {
+//				if (Slot.X < dv.DockingThreshold)
+//					dock (Alignment.Left);
+//				else if (Slot.Right > dvCliRect.Width - dv.DockingThreshold)
+//					dock (Alignment.Right);
+//			}else if (layoutType == LayoutingType.Y) {
+//				if (Slot.Y < dv.DockingThreshold)
+//					dock (Alignment.Top);
+//				else if (Slot.Bottom > dvCliRect.Height - dv.DockingThreshold)
+//					dock (Alignment.Bottom);
+//			}
+//		}
+//
+//		public override void onMouseMove (object sender, MouseMoveEventArgs e)
+//		{
+//			lastMousePos = e.Position;
+//
+//			if (this.HasFocus && e.Mouse.IsButtonDown (MouseButton.Left) && IsDocked) {
+//				Docker dv = Parent as Docker;
+//				if (docking == Alignment.Left) {
+//					if (lastMousePos.X - undockingMousePosOrig.X > dv.DockingThreshold)
+//						undock ();
+//				} else if (docking == Alignment.Right) {
+//					if (undockingMousePosOrig.X - lastMousePos.X > dv.DockingThreshold)
+//						undock ();
+//				} else if (docking == Alignment.Top) {
+//					if (lastMousePos.Y - undockingMousePosOrig.Y > dv.DockingThreshold)
+//						undock ();
+//				} else if (docking == Alignment.Bottom) {
+//					if (undockingMousePosOrig.Y - lastMousePos.Y > dv.DockingThreshold)
+//						undock ();
+//				}
+//				return;
+//			}
+//
+//			base.onMouseMove (sender, e);
+//		}
+//		public override void onMouseDown (object sender, MouseButtonEventArgs e)
+//		{
+//			base.onMouseDown (sender, e);
+//
+//			if (this.HasFocus && IsDocked && e.Button == MouseButton.Left)
+//				undockingMousePosOrig = lastMousePos;
+//		}
 
 //		protected override void onBorderMouseEnter (object sender, MouseMoveEventArgs e)
 //		{

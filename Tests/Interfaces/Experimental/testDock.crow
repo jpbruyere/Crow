@@ -1,0 +1,19 @@
+﻿<?xml version="1.0"?>
+<!--<Docker Background="Jet" Margin = "0" Focusable="true" >
+	<DockWindow Focusable="true" Caption="View 1" Width="100" Height="100"><GraphicObject Background="Green"/></DockWindow>
+	<DockWindow Focusable="true" Caption="View 2" Resizable = "true" Width="100" Height="100"><GraphicObject Background="Blue"/></DockWindow>
+	<DockWindow Focusable="true" Caption="View 3" Resizable = "true" Width="100" Height="100"><GraphicObject Background="Yellow"/></DockWindow>
+	<DockWindow Focusable="true" Caption="View 4" Resizable = "true" Width="100" Height="100"><GraphicObject Background="Black"/></DockWindow>
+</Docker>-->
+<!--<Group Background="Jet" Margin = "0" Focusable="true" >
+	<Window Top="100" Left="100" Focusable="true" Caption="View 1" Width="300" Height="300"><GraphicObject Background="Green" Focusable="true" MouseEnter="{Background=Gray}" MouseLeave="{Background=Green}"/></Window>
+	<Window Top="200" Left="200" Focusable="true" Caption="View 2" Resizable = "true" Width="300" Height="300"><GraphicObject Focusable="true" Background="Blue" MouseEnter="{Background=Gray}" MouseLeave="{Background=Blue}"/></Window>
+	<Window Top="300" Left="300" Focusable="true" Caption="View 3" Resizable = "true" Width="300" Height="300"><GraphicObject Focusable="true" Background="Yellow" MouseEnter="{Background=Gray}" MouseLeave="{Background=Yellow}"/></Window>
+	<Window Top="400" Left="400" Focusable="true" Caption="View 4" Resizable = "true" Width="300" Height="300"><GraphicObject Focusable="true" Background="Black" MouseEnter="{Background=Gray}" MouseLeave="{Background=Black}"/></Window>
+</Group>-->
+<Docker Background="Jet" Margin = "0" Focusable="true" >
+	<DockWindow Top="100" Left="100" Focusable="true" Caption="View 1" Width="300" Height="300"><GraphicObject Background="Green" Focusable="true" MouseEnter="{Background=Gray}" MouseLeave="{Background=Green}"/></DockWindow>
+	<DockWindow Top="200" Left="200" Focusable="true" Caption="View 2" Resizable = "true" Width="300" Height="300"><GraphicObject Focusable="true" Background="Blue" MouseEnter="{Background=Gray}" MouseLeave="{Background=Blue}"/></DockWindow>
+	<DockWindow Top="300" Left="300" Focusable="true" Caption="View 3" Resizable = "true" Width="300" Height="300"><GraphicObject Focusable="true" Background="Yellow" MouseEnter="{Background=Gray}" MouseLeave="{Background=Yellow}"/></DockWindow>
+	<DockWindow Top="400" Left="400" Focusable="true" Caption="View 4" Resizable = "true" Width="300" Height="300"><GraphicObject Focusable="true" Background="Black" MouseEnter="{Background=Gray}" MouseLeave="{Background=Black}"/></DockWindow>
+</Docker>

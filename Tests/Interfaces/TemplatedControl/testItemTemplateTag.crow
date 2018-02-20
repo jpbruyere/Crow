@@ -6,16 +6,15 @@
 			<Template>
 				<Border BorderWidth="1">
 					<HorizontalStack Margin="1">
-						<Scroller Name="scroller1"
+						<Scroller Name="scroller1" 
 								Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}">
 							<VerticalStack Height="Fit" MinimumSize="10,10"
-								Name="ItemsContainer" Margin="0"
-								VerticalAlignment="Top"
-								HorizontalAlignment="Left"/>
+								Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
 						</Scroller>
-						<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}"
-							Maximum="{../scroller1.MaximumScroll}" Orientation="Vertical"
-							Width="14"/>
+						<ScrollBar Name="scrollbar1" Value="{²../scroller1.ScrollY}"
+							LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30" CursorSize="{../scroller1.ChildHeightRatio}"
+							Maximum="{../scroller1.MaximumScroll}" Orientation="Vertical" 
+							Width="14" />
 					</HorizontalStack>
 				</Border>
 			</Template>
@@ -31,8 +30,8 @@
 			</ItemTemplate>
 		</ListBox>
 		<HorizontalStack Fit="true" HorizontalAlignment="Right">
-			<Button Caption="Load list" MouseClick="OnLoadList"/>
-			<Button Caption="Clear" MouseClick="OnClear"/>
+			<Button Caption="Load list" MouseDown="OnLoadList"/>
+			<Button Caption="Clear" MouseDown="OnClear"/>
 		</HorizontalStack>
 	</VerticalStack>
 </Border>

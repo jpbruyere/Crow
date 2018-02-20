@@ -39,12 +39,18 @@ namespace Tests
 	class BasicTests : CrowWindow
 	{
 		public BasicTests ()
-			: base(1280, 800,"test: press <F3> to toogle test files")
+			: base(800, 600,"test: press <F3> to toogle test files")
 		{
 		}
 
 		int idx = 0;
 		string[] testFiles;
+
+		public Version CrowVersion {
+			get {
+				return System.Reflection.Assembly.GetAssembly(typeof(GraphicObject)).GetName().Version;
+			}
+		}
 
 		#region Test values for Binding
 		public List<Crow.Command> Commands;
@@ -162,31 +168,26 @@ namespace Tests
 
 			this.KeyDown += KeyboardKeyDown1;
 
-			//testFiles = new string [] { @"Interfaces/Unsorted/testFileDialog.crow" };
-			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
 			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
-			//testFiles = new string [] { @"Interfaces/TemplatedContainer/testTabView.crow" };
-			//testFiles = new string [] { @"Interfaces/TemplatedControl/testSpinner.crow" };
-			//testFiles = new string [] { @"Interfaces/DragAndDrop/0.crow" };
-			//testFiles = new string [] { @"Interfaces/TemplatedControl/testItemTemplateTag.crow" };
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/TemplatedControl", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Stack", "*.crow")).ToArray ();
-
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/TemplatedControl", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/TemplatedContainer", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/TemplatedGroup", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Splitter", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Wrapper", "*.crow")).ToArray ();
+			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/DragAndDrop", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Unsorted", "*.crow")).ToArray ();
+			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Experimental", "*.crow")).ToArray ();
 
 			Load(testFiles[idx]).DataSource = this;
 		}
 		void KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
+			try {
+				
 			if (e.Key == OpenTK.Input.Key.Escape) {
 				Quit (null, null);
 				return;
@@ -217,7 +218,6 @@ namespace Tests
 			else
 				return;
 
-			try {
 				ClearInterface ();
 
 				if (idx == testFiles.Length)
@@ -230,7 +230,7 @@ namespace Tests
 				GraphicObject obj = Load (testFiles[idx]);
 				obj.DataSource = this;
 			} catch (Exception ex) {				
-				MessageBox.Show (CurrentInterface, MessageBox.Type.Error, ex.Message + "\n" + ex.InnerException);
+				MessageBox.Show (CurrentInterface, MessageBox.Type.Error, ex.Message + "\n" + ex.InnerException.Message);
 			}
 		}
 //		void Tv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
@@ -264,13 +264,17 @@ namespace Tests
 		{
 			Console.WriteLine ("button clicked:" + send.ToString());
 		}
-//		void onAddTabButClick(object sender, MouseButtonEventArgs e){
-//
-//			TabView tv = ifaceControl.CrowInterface.FindByName("tabview1") as TabView;
-//			if (tv == null)
-//				return;
-//			tv.AddChild (new TabItem () { Caption = "NewTab" });
-//		}
+		void onAddTabButClick(object sender, MouseButtonEventArgs e){
+
+			TabView tv = FindByName("tabview1") as TabView;
+			if (tv == null)
+				return;
+			//tv.AddChild (new TabItem (CurrentInterface) { Caption = "NewTab" });
+			lock (CurrentInterface.UpdateMutex) {
+				tv.AddChild (Crow.IML.Instantiator.CreateFromImlFragment
+					(@"<TabItem Caption='New tab' Background='Blue'><Label/></TabItem>").CreateInstance (CurrentInterface));
+			}
+		}
 		[STAThread]
 		static void Main ()
 		{
