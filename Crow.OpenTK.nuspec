@@ -2,7 +2,7 @@
 <package >
 	<metadata>
 		<id>Crow.OpenTK</id>
-		<version>0.6.0</version>
+		<version>0.7.0</version>
 		<title>C# Rapid Open Widget Toolkit</title>
 		<authors>JP Bruyere</authors>
 		<owners>Grand Tetras Software</owners>
@@ -18,14 +18,24 @@ Crow.OpenTK is the OpenTK ready version.
 
 		</summary>
 		<releaseNotes>
-			- Bug fix #36
-			- group item templates in single file
-			- instantiation from code clarification
-			- Cairo mesh patterns support.
-			- Image resources sharing among controls.
-			- Some small api changes (LoadInterface replaced by AddWidget overload
-			- Documentations
-			- Tooltip for GraphicObject class		
+		
+- new mouse move handling, improve perf, introduce new recursive method in GraphicObject 'PointIsIn (ref Point p)'
+- new TemplatedGroup architecture: in hierarchical group, TemplatedGroup are no longer required on each node, only a container with 'ItemsContainer' should be provided in ItemTemplates with sub data fetching.
+- Delete and Remove widget differentiation in group.
+- Drag and Drop basics implemented, not fully tested.
+- binding address starting with '/' start search at current node, not in template.
+- Fit measure units changed from Pixel to Percent.
+- prevent mouse evt on label not selectable.
+- crowIDE wip, need CrowEdit reference (available on GitHub).
+- CheckBox reused as base in several template which need 2 states inherited from it.
+- FocusParent internal variable, allow easyer popup parenting while keeping logical parenting usefull for other things.
+- InstantiatorException with file name.
+- load all assemblies in bin dir at startup to allow usage of several Widget assemblies.
+- Context menu basic mechanic, may be improved.
+- ObservableList that could be used as data source for TempletedGroups.
+- Configuration no longer static to allow multiple config files handling in single application.
+- styling is no longer static in iface to allow different styling context between ifaces.
+
 		</releaseNotes>
 		<copyright>Copyright 2013-2018</copyright>
 		<dependencies>
