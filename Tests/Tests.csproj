@@ -11,7 +11,7 @@
     <StartupObject>Tests.Showcase</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ReleaseVersion>0.5</ReleaseVersion>
+    <ReleaseVersion>0.7</ReleaseVersion>
     <OutputPath>$(SolutionDir)build/$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)build/obj/$(Configuration)</IntermediateOutputPath>
     <CustomCommands>

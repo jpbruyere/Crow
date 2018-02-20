@@ -73,10 +73,6 @@
       <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
       <Name>Crow</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\gts\CrowEdit\Crow.Coding\Crow.Coding.csproj">
-      <Project>{78842EE4-8A2F-4C75-AEC6-C95F15AD3994}</Project>
-      <Name>Crow.Coding</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\CrowIDE.cs" />
