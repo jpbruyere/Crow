@@ -200,7 +200,7 @@ namespace Tests
 				w.DataSource = this;
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F5) {
-				GraphicObject w = Load ("Interfaces/Unsorted/testFileDialog.crow");
+				GraphicObject w = Load ("Interfaces/Divers/testFileDialog.crow");
 				w.DataSource = this;
 				return;
 			}else if (e.Key == OpenTK.Input.Key.F6) {
