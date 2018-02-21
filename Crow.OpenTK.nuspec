@@ -2,7 +2,7 @@
 <package >
 	<metadata>
 		<id>Crow.OpenTK</id>
-		<version>0.7.0</version>
+		<version>0.7.1</version>
 		<title>C# Rapid Open Widget Toolkit</title>
 		<authors>JP Bruyere</authors>
 		<owners>Grand Tetras Software</owners>
@@ -18,7 +18,8 @@ Crow.OpenTK is the OpenTK ready version.
 
 		</summary>
 		<releaseNotes>
-		
+- 0.7.1: implement ReaderWriterLock for solving threading problems
+
 - new mouse move handling, improve perf, introduce new recursive method in GraphicObject 'PointIsIn (ref Point p)'
 - new TemplatedGroup architecture: in hierarchical group, TemplatedGroup are no longer required on each node, only a container with 'ItemsContainer' should be provided in ItemTemplates with sub data fetching.
 - Delete and Remove widget differentiation in group.
