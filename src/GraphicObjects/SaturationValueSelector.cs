@@ -101,9 +101,13 @@ namespace Crow
 
 			ctx.Translate (rb.X, rb.Y);
 
-			ctx.SetSourceColor (Color.White);
+			ctx.SetSourceColor (Color.Jet);
 			ctx.Arc (mousePos.X, mousePos.Y, 3.5, 0, Math.PI * 2.0);
-			ctx.LineWidth = 1.0;
+			ctx.LineWidth = 0.5;
+			ctx.Stroke ();
+			ctx.Translate (-0.5, -0.5);
+			ctx.Arc (mousePos.X, mousePos.Y, 3.5, 0, Math.PI * 2.0);
+			ctx.SetSourceColor (Color.White);
 			ctx.Stroke ();
 
 			ctx.Restore ();
