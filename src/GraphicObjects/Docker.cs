@@ -146,13 +146,15 @@ namespace Crow
 				gr.Clip ();
 			}
 
-			lock (Children) {
-				foreach (GraphicObject g in Children) {
-					if (CurrentInterface.DragAndDropOperation?.DragSource == g)
-						continue;
-					g.Paint (ref gr);
-				}
+			childrenRWLock.EnterReadLock ();
+
+			foreach (GraphicObject g in Children) {
+				if (CurrentInterface.DragAndDropOperation?.DragSource == g)
+					continue;
+				g.Paint (ref gr);
 			}
+
+			childrenRWLock.ExitReadLock ();
 
 			if (showDockingTarget) {
 				Rectangle r;

@@ -34,6 +34,7 @@ using System.Runtime.CompilerServices;
 using Cairo;
 using System.Diagnostics;
 using Crow.IML;
+using System.Threading;
 
 namespace Crow
 {
@@ -42,6 +43,8 @@ namespace Crow
 	/// </summary>
 	public class GraphicObject : ILayoutable, IValueChange, IDisposable
 	{
+		internal ReaderWriterLockSlim parentRWLock = new ReaderWriterLockSlim();
+
 		#region IDisposable implementation
 		protected bool disposed = false;
 
@@ -66,6 +69,7 @@ namespace Crow
 				if (IsQueueForRedraw)
 				throw new Exception("Trying to dispose an object queued for Redraw: " + this.ToString());
 				#endif
+
 				if (CurrentInterface.HoverWidget != null) {
 					if (CurrentInterface.HoverWidget.IsOrIsInside(this))
 						CurrentInterface.HoverWidget = null;
@@ -80,13 +84,15 @@ namespace Crow
 				}
 				if (!localDataSourceIsNull)
 					DataSource = null;
+
+				parentRWLock.EnterWriteLock();
 				parent = null;
+				parentRWLock.ExitWriteLock();
 			} else
 				Debug.WriteLine ("!!! Finalized by GC: {0}", this.ToString ());
 			Clipping?.Dispose ();
 			bmp?.Dispose ();
 			disposed = true;
-
 		}  
 		#endregion
 
@@ -217,7 +223,7 @@ namespace Crow
 		//TODO: we should ensure the whole parsed widget tree is the last painted
 		public Rectangle LastPaintedSlot;
 		/// <summary>Prevent requeuing multiple times the same widget</summary>
-		public bool IsQueueForRedraw = false;
+		public bool IsQueueForClipping = false;
 		/// <summary>drawing Cache, if null, a redraw is done, cached or not</summary>
 		public Surface bmp;
 		public bool IsDirty = true;
@@ -243,11 +249,12 @@ namespace Crow
 				if (parent == value)
 					return;
 				DataSourceChangeEventArgs e = new DataSourceChangeEventArgs (parent, value);
-				lock (CurrentInterface.LayoutMutex) {
-					parent = value;
-				}
-					onParentChanged (this, e);
-				
+
+				parentRWLock.EnterWriteLock();
+				parent = value;
+				parentRWLock.ExitWriteLock();
+									
+				onParentChanged (this, e);
 			}
 		}
 		[XmlIgnore]public ILayoutable LogicalParent {
@@ -774,7 +781,7 @@ namespace Crow
 		/// Seek first logical tree upward if logicalParent is set, or seek graphic tree for
 		/// a not null dataSource that will be active for all descendants having dataSource=null
 		/// </summary>
-		[XmlAttributeAttribute]//[DefaultValue(null)]
+		[XmlAttributeAttribute]
 		public virtual object DataSource {
 			set {
 				if (DataSource == value)
@@ -784,12 +791,11 @@ namespace Crow
 				dataSource = value;
 				dse.NewDataSource = DataSource;
 
-				//prevent setting null causing stack overflow in specific case
 				if (dse.NewDataSource == dse.OldDataSource)
 					return;
-				lock (CurrentInterface.LayoutMutex) {
-					OnDataSourceChanged (this, dse);
-				}
+			
+				OnDataSourceChanged (this, dse);
+
 
 				NotifyValueChanged ("DataSource", DataSource);
 			}
@@ -854,9 +860,9 @@ namespace Crow
 		/// <summary> Loads the default values from XML attributes default </summary>
 		public void loadDefaultValues()
 		{
-			#if DEBUG_LOAD
-			Debug.WriteLine ("LoadDefValues for " + this.ToString ());
-			#endif
+//			#if DEBUG_LOAD
+//			Debug.WriteLine ("LoadDefValues for " + this.ToString ());
+//			#endif
 
 			Type thisType = this.GetType ();
 
@@ -1138,13 +1144,12 @@ namespace Crow
 			#if DEBUG_UPDATE
 			Debug.WriteLine (string.Format("ClippingRegistration -> {0}", this.ToString ()));
 			#endif
-			lock(CurrentInterface.LayoutMutex){
-				IsQueueForRedraw = false;
-				if (Parent == null)
-					return;
+			parentRWLock.EnterReadLock ();
+			if (parent != null) {					
 				Parent.RegisterClip (LastPaintedSlot);
 				Parent.RegisterClip (Slot);
 			}
+			parentRWLock.ExitReadLock ();
 		}
 		/// <summary>
 		/// Add clip rectangle to this.clipping and propagate up to root

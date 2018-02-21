@@ -31,12 +31,15 @@ using System.Xml.Serialization;
 using Cairo;
 using System.Diagnostics;
 using System.Reflection;
+using System.Threading;
 
 
 namespace Crow
 {
 	public class Group : GraphicObject
     {
+		protected ReaderWriterLockSlim childrenRWLock = new ReaderWriterLockSlim();
+
 		#region CTOR
 		public Group () : base() {}
 		public Group(Interface iface) : base(iface){}
@@ -62,10 +65,13 @@ namespace Crow
             set { _multiSelect = value; }
         }
 		public virtual void AddChild(GraphicObject g){
-			lock (Children) {
-				g.Parent = this;
-				Children.Add (g);
-			}
+			childrenRWLock.EnterWriteLock();
+
+			g.Parent = this;
+			Children.Add (g);
+
+			childrenRWLock.ExitWriteLock();
+
 			g.RegisteredLayoutings = LayoutingType.None;
 			g.LayoutChanged += OnChildLayoutChanges;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
@@ -79,8 +85,11 @@ namespace Crow
 					CurrentInterface.HoverWidget = null;
 			}
 
-			lock (Children)
-				Children.Remove(child);
+			childrenRWLock.EnterWriteLock ();
+
+			Children.Remove(child);
+
+			childrenRWLock.ExitWriteLock ();
 
 			if (child == largestChild && Width == Measure.Fit)
 				searchLargestChild ();
@@ -96,10 +105,13 @@ namespace Crow
 			child.Dispose ();
         }
 		public virtual void InsertChild (int idx, GraphicObject g) {
-			lock (Children) {
-				g.Parent = this;
-				Children.Insert (idx, g);
-			}
+			childrenRWLock.EnterWriteLock ();
+				
+			g.Parent = this;
+			Children.Insert (idx, g);
+
+			childrenRWLock.ExitWriteLock ();
+
 			g.RegisteredLayoutings = LayoutingType.None;
 			g.LayoutChanged += OnChildLayoutChanges;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
@@ -109,14 +121,16 @@ namespace Crow
 		}
 		public virtual void ClearChildren()
 		{
-			lock (Children) {
-				while (Children.Count > 0) {
-					GraphicObject g = Children [Children.Count - 1];
-					g.LayoutChanged -= OnChildLayoutChanges;
-					Children.RemoveAt (Children.Count - 1);
-					g.Dispose ();
-				}
+			childrenRWLock.EnterWriteLock ();
+
+			while (Children.Count > 0) {
+				GraphicObject g = Children [Children.Count - 1];
+				g.LayoutChanged -= OnChildLayoutChanges;
+				Children.RemoveAt (Children.Count - 1);
+				g.Dispose ();
 			}
+
+			childrenRWLock.ExitWriteLock ();
 
 			resetChildrenMaxSize ();
 
@@ -128,20 +142,24 @@ namespace Crow
 		{
 			if (Children.Contains(w))
 			{
-				lock (Children) {
-					Children.Remove (w);
-					Children.Add (w);
-				}
+				childrenRWLock.EnterWriteLock ();
+
+				Children.Remove (w);
+				Children.Add (w);
+
+				childrenRWLock.ExitWriteLock ();
 			}
 		}
 		public void putWidgetOnBottom(GraphicObject w)
 		{
 			if (Children.Contains(w))
 			{
-				lock (Children) {
-					Children.Remove (w);
-					Children.Insert (0, w);
-				}
+				childrenRWLock.EnterWriteLock ();
+
+				Children.Remove (w);
+				Children.Insert (0, w);
+
+				childrenRWLock.ExitWriteLock ();
 			}
 		}
 
@@ -149,24 +167,31 @@ namespace Crow
 		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
 		{
 			base.OnDataSourceChanged (this, e);
-			lock (Children) {
-				foreach (GraphicObject g in children)
-					if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
-						g.OnDataSourceChanged (g, e);
-			}
+
+			childrenRWLock.EnterReadLock ();
+
+			foreach (GraphicObject g in children)
+				if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
+					g.OnDataSourceChanged (g, e);
+			
+			childrenRWLock.ExitReadLock ();
 		}
 		public override GraphicObject FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)
 				return this;
 			GraphicObject tmp = null;
-			lock (Children) {
-				foreach (GraphicObject w in Children) {
-					tmp = w.FindByName (nameToFind);
-					if (tmp != null)
-						break;
-				}
+
+			childrenRWLock.EnterReadLock ();
+
+			foreach (GraphicObject w in Children) {
+				tmp = w.FindByName (nameToFind);
+				if (tmp != null)
+					break;
 			}
+
+			childrenRWLock.ExitReadLock ();
+
 			return tmp;
 		}
 		public override bool Contains (GraphicObject goToFind)
@@ -207,10 +232,11 @@ namespace Crow
 		{
 			base.OnLayoutChanges (layoutType);
 
+			childrenRWLock.EnterReadLock ();
 			//position smaller objects in group when group size is fit
 			switch (layoutType) {
 			case LayoutingType.Width:
-				foreach (GraphicObject c in Children){
+				foreach (GraphicObject c in Children) {
 					if (c.Width.Units == Unit.Percent)
 						c.RegisterForLayouting (LayoutingType.Width);
 					else
@@ -226,6 +252,7 @@ namespace Crow
 				}
 				break;
 			}
+			childrenRWLock.ExitReadLock ();
 		}
 		protected override void onDraw (Context gr)
 		{
@@ -239,11 +266,13 @@ namespace Crow
 				gr.Clip ();
 			}
 
-			lock (Children) {
+			childrenRWLock.EnterReadLock ();
+
 				foreach (GraphicObject g in Children) {
 					g.Paint (ref gr);
 				}
-			}
+
+			childrenRWLock.ExitReadLock ();
 			gr.Restore ();
 		}
 		protected override void UpdateCache (Context ctx)
@@ -268,15 +297,17 @@ namespace Crow
 					gr.Clip ();
 				}
 
-				lock (Children) {
-					foreach (GraphicObject c in Children) {
-						if (!c.Visible)
-							continue;
-						if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
-							continue;
-						c.Paint (ref gr);
-					}
+				childrenRWLock.EnterReadLock ();
+
+				foreach (GraphicObject c in Children) {
+					if (!c.Visible)
+						continue;
+					if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
+						continue;
+					c.Paint (ref gr);
 				}
+
+				childrenRWLock.ExitReadLock ();
 
 				#if DEBUG_CLIP_RECTANGLE
 				Clipping.stroke (gr, Color.Amaranth.AdjustAlpha (0.8));
