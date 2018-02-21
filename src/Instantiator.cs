@@ -101,7 +101,7 @@ namespace Crow.IML
 				#if DEBUG_LOAD
 				loadingTime.Stop ();
 				Debug.WriteLine ("IML Instantiator creation '{2}' : {0} ticks, {1} ms",
-				loadingTime.ElapsedTicks, loadingTime.ElapsedMilliseconds, imlPath);
+				loadingTime.ElapsedTicks, loadingTime.ElapsedMilliseconds, sourcePath);
 				#endif
 			}
 		}

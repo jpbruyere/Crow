@@ -131,26 +131,32 @@ namespace Crow
 				else {
 					int dy = 0;
 					int largestChild = 0;
-					lock (Children) {
-						foreach (GraphicObject c in Children) {
-							if (!c.Visible)
-								continue;
-							if (c.Height.Units == Unit.Percent &&
-								c.RegisteredLayoutings.HasFlag (LayoutingType.Height))
-								return -1;
-							if (dy + c.Slot.Height > ClientRectangle.Height) {
-								dy = 0;
-								tmp += largestChild + Spacing;
-								largestChild = c.Slot.Width;
-							} else if (largestChild < c.Slot.Width)
-								largestChild = c.Slot.Width;
 
-							dy += c.Slot.Height + Spacing;
+					childrenRWLock.EnterReadLock();
+
+					foreach (GraphicObject c in Children) {
+						if (!c.Visible)
+							continue;
+						if (c.Height.Units == Unit.Percent &&
+						    c.RegisteredLayoutings.HasFlag (LayoutingType.Height)) {
+							childrenRWLock.ExitReadLock();
+							return -1;
 						}
-						if (dy == 0)
-							tmp -= Spacing;
-						return tmp + largestChild + 2 * Margin;
+						if (dy + c.Slot.Height > ClientRectangle.Height) {
+							dy = 0;
+							tmp += largestChild + Spacing;
+							largestChild = c.Slot.Width;
+						} else if (largestChild < c.Slot.Width)
+							largestChild = c.Slot.Width;
+
+						dy += c.Slot.Height + Spacing;
 					}
+
+					childrenRWLock.ExitReadLock ();
+
+					if (dy == 0)
+						tmp -= Spacing;
+					return tmp + largestChild + 2 * Margin;
 				}
 			} else if (Orientation == Orientation.Horizontal) {
 				Height = Measure.Stretched;
@@ -160,26 +166,32 @@ namespace Crow
 			else {
 				int dx = 0;
 				int tallestChild = 0;
-				lock (Children) {
-					foreach (GraphicObject c in Children) {
-						if (!c.Visible)
-							continue;
-						if (c.Width.Units == Unit.Percent &&
-							c.RegisteredLayoutings.HasFlag (LayoutingType.Width))
-							return -1;
-						if (dx + c.Slot.Width > ClientRectangle.Width) {
-							dx = 0;
-							tmp += tallestChild + Spacing;
-							tallestChild = c.Slot.Height;
-						} else if (tallestChild < c.Slot.Height)
-							tallestChild = c.Slot.Height;
 
-						dx += c.Slot.Width + Spacing;
+				childrenRWLock.EnterReadLock();
+
+				foreach (GraphicObject c in Children) {
+					if (!c.Visible)
+						continue;
+					if (c.Width.Units == Unit.Percent &&
+					    c.RegisteredLayoutings.HasFlag (LayoutingType.Width)) {
+						childrenRWLock.ExitReadLock();
+						return -1;
 					}
-					if (dx == 0)
-						tmp -= Spacing;
-					return tmp + tallestChild + 2 * Margin;
+					if (dx + c.Slot.Width > ClientRectangle.Width) {
+						dx = 0;
+						tmp += tallestChild + Spacing;
+						tallestChild = c.Slot.Height;
+					} else if (tallestChild < c.Slot.Height)
+						tallestChild = c.Slot.Height;
+
+					dx += c.Slot.Width + Spacing;
 				}
+
+				childrenRWLock.ExitReadLock();
+
+				if (dx == 0)
+					tmp -= Spacing;
+				return tmp + tallestChild + 2 * Margin;
 			}
 		}
 

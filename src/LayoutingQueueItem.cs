@@ -97,12 +97,21 @@ namespace Crow
 
 		public void ProcessLayouting()
 		{
-			if (Layoutable.Parent == null) {//TODO:improve this
+			GraphicObject go = Layoutable as GraphicObject;
+			if (go == null) {
+				Debug.WriteLine ("ERROR: processLayouting on something else than a graphic object: " + this.ToString ());
+				return;
+			}
+
+			go.parentRWLock.EnterReadLock ();
+
+			if (go.Parent == null) {//TODO:improve this
 				//cancel layouting for object without parent, maybe some were in queue when
 				//removed from a listbox
 				#if DEBUG_UPDATE || DEBUG_LAYOUTING
 				Debug.WriteLine ("ERROR: processLayouting, no parent for: " + this.ToString ());
 				#endif
+				go.parentRWLock.ExitReadLock ();
 				return;
 			}
 			#if DEBUG_LAYOUTING
@@ -138,6 +147,7 @@ namespace Crow
 			}
 			LQITime.Stop();
 			#endif
+			go.parentRWLock.ExitReadLock ();
 		}
 
 		public static implicit operator GraphicObject(LayoutingQueueItem queueItem)

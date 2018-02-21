@@ -176,17 +176,20 @@ namespace Crow
 				gr.Clip ();
 			}
 
-			lock (Children) {
-				TabItem[] tabItms = Children.Cast<TabItem> ().OrderBy (t => t.ViewIndex).ToArray ();
-				for (int i = 0; i < tabItms.Length; i++) {
-					if (tabItms [i] == Children [SelectedTab])
-						continue;
-					tabItms [i].Paint (ref gr);
-				}
+			childrenRWLock.EnterReadLock ();
 
-				if (SelectedTab < tabItms.Length && SelectedTab >= 0)
-					Children [SelectedTab].Paint (ref gr);
+			TabItem[] tabItms = Children.Cast<TabItem> ().OrderBy (t => t.ViewIndex).ToArray ();
+			for (int i = 0; i < tabItms.Length; i++) {
+				if (tabItms [i] == Children [SelectedTab])
+					continue;
+				tabItms [i].Paint (ref gr);
 			}
+
+			if (SelectedTab < tabItms.Length && SelectedTab >= 0)
+				Children [SelectedTab].Paint (ref gr);
+
+			childrenRWLock.ExitReadLock ();
+		
 			gr.Restore ();
 		}
 

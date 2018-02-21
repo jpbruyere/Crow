@@ -189,6 +189,8 @@ namespace Crow
 		public object RenderMutex = new object();
 		/// <summary>Global lock of the update cycle</summary>
 		public object UpdateMutex = new object();
+		/// <summary>Global lock of the clipping queue</summary>
+		public object ClippingMutex = new object();
 		//TODO:share resource instances
 		/// <summary>
 		/// Store loaded resources instances shared among controls to reduce memory footprint
@@ -199,7 +201,7 @@ namespace Crow
 		/// <summary>Store discarded lqi between two updates</summary>
 		public Queue<LayoutingQueueItem> DiscardQueue;
 		/// <summary>Main drawing queue, holding layouted controls</summary>
-		public Queue<GraphicObject> DrawingQueue = new Queue<GraphicObject>();
+		public Queue<GraphicObject> ClippingQueue = new Queue<GraphicObject>();
 		public string Clipboard;//TODO:use object instead for complex copy paste
 		/// <summary>each IML and fragments (such as inline Templates) are compiled as a Dynamic Method stored here
 		/// on the first instance creation of a IML item.
@@ -475,11 +477,11 @@ namespace Crow
 			#if DEBUG_UPDATE
 			Debug.WriteLine (string.Format("\tEnqueueForRepaint -> {0}", g?.ToString ()));
 			#endif
-			lock (DrawingQueue) {
-				if (g.IsQueueForRedraw)
+			lock (ClippingMutex) {
+				if (g.IsQueueForClipping)
 					return;
-				DrawingQueue.Enqueue (g);
-				g.IsQueueForRedraw = true;
+				ClippingQueue.Enqueue (g);
+				g.IsQueueForClipping = true;
 			}
 		}
 		/// <summary>Main Update loop, executed in this interface thread, protected by the UpdateMutex
@@ -588,9 +590,11 @@ namespace Crow
 			clippingMeasure.StartCycle();
 			#endif
 			GraphicObject g = null;
-			while (DrawingQueue.Count > 0) {
-				lock (DrawingQueue)
-					g = DrawingQueue.Dequeue ();				
+			while (ClippingQueue.Count > 0) {
+				lock (ClippingMutex) {
+					g = ClippingQueue.Dequeue ();
+					g.IsQueueForClipping = false;
+				}
 				g.ClippingRegistration ();
 			}
 
