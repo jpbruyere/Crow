@@ -427,13 +427,13 @@ namespace Crow
 					iTemp = ItemTemplates ["default"];
 			}
 
-			//lock (CurrentInterface.LayoutMutex) {
+			lock (CurrentInterface.LayoutMutex) {
 				g = iTemp.CreateInstance(CurrentInterface);
 				page.AddChild (g);
 //				if (isPaged)
 				g.LogicalParent = this;
 				g.MouseDown += itemClick;
-			//}
+			}
 
 			if (iTemp.Expand != null && g is Expandable) {
 				(g as Expandable).Expand += iTemp.Expand;

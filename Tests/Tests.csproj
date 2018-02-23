@@ -8,10 +8,10 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>Tests.Showcase</StartupObject>
+    <StartupObject>Tests.BasicTests</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ReleaseVersion>0.7</ReleaseVersion>
+    <ReleaseVersion>0.5</ReleaseVersion>
     <OutputPath>$(SolutionDir)build/$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)build/obj/$(Configuration)</IntermediateOutputPath>
     <CustomCommands>
@@ -103,6 +103,7 @@
     <Compile Include="Tutorials\T4_Gauge.cs" />
     <Compile Include="Tutorials\T2_IML.cs" />
     <Compile Include="GraphicObjects\HexaContainer.cs" />
+    <Compile Include="GraphicObjects\TechBorder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -133,11 +134,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Interfaces\Container\0.crow">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Interfaces\Container\1.crow">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="Interfaces\Container\1.crow" />
     <None Include="Interfaces\Container\2.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

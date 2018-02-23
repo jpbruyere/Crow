@@ -14,7 +14,7 @@
 		<MenuItem Command="{}" Width="150" PopWidth="120" SelectionBackground="Transparent">
 			<Template>
 				<Popper Font="{./Font}" Caption="{./Caption}"  Background="{./Background}" PopDirection="{./PopDirection}"
-					Foreground = "{./Foreground}" CanPop="{./HasChildren}" MouseClick="./onMI_Click"
+					Foreground = "{./Foreground}" CanPop="{./HasChildren}" MouseDown="./onMI_Click"
 					IsPopped="{²./IsOpened}" PopWidth="{./PopWidth}" PopHeight="{./PopHeight}">
 					<Template>
 						<Border Name="border1"
