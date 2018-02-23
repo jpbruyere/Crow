@@ -61,8 +61,8 @@ namespace Crow
 		/// <param name="path">IML file to parse</param>
 		/// <param name="_dataType">type this item will be choosen for, or member of the data item</param>
 		/// <param name="_fetchDataMethod">for hierarchical data, method to call for children fetching</param>
-		public ItemTemplate(string path, string _dataTest = "TypeOf", string _dataType = null, string _fetchDataMethod = null)
-			: base(path) {
+		public ItemTemplate(Interface _iface, string path, string _dataTest = "TypeOf", string _dataType = null, string _fetchDataMethod = null)
+			: base(_iface, path) {
 			strDataType = _dataType;
 			fetchMethodName = _fetchDataMethod;
 			dataTest = _dataTest;
@@ -74,8 +74,8 @@ namespace Crow
 		/// <param name="path">IML fragment to parse</param>
 		/// <param name="_dataType">type this item will be choosen for, or member of the data item</param>
 		/// <param name="_fetchDataMethod">for hierarchical data, method to call for children fetching</param>
-		public ItemTemplate (Stream ImlFragment, string _dataTest, string _dataType, string _fetchDataMethod)
-			:base(ImlFragment)
+		public ItemTemplate (Interface _iface, Stream ImlFragment, string _dataTest, string _dataType, string _fetchDataMethod)
+			:base(_iface, ImlFragment)
 		{
 			strDataType = _dataType;
 			fetchMethodName = _fetchDataMethod;
@@ -87,8 +87,8 @@ namespace Crow
 		/// <param name="path">XML reader positionned before or at the root node</param>
 		/// <param name="_dataType">type this item will be choosen for, or member of the data item</param>
 		/// <param name="_fetchDataMethod">for hierarchical data, method to call for children fetching</param>
-		public ItemTemplate (XmlReader reader, string _dataTest = "TypeOf" , string _dataType = null, string _fetchDataMethod = null)
-			:base(reader)
+		public ItemTemplate (Interface _iface, XmlReader reader, string _dataTest = "TypeOf" , string _dataType = null, string _fetchDataMethod = null)
+			:base(_iface, reader)
 		{
 			strDataType = _dataType;
 			fetchMethodName = _fetchDataMethod;

@@ -35,12 +35,12 @@ namespace Crow
 		static Instantiator instStack, instSplit, instSpacer;
 		#region CTOR
 		static Docker () {
-			instStack = Instantiator.CreateFromImlFragment(@"<GenericStack Background='Blue' AllowDrop='true' DragEnter='onStackDragEnter'/>");
-			instSplit = Instantiator.CreateFromImlFragment(@"<Splitter/>");
-			instSpacer = Instantiator.CreateFromImlFragment(@"<GraphicObject Background='Red' IsEnabled='false'/>");
 		}
 		public Docker () : base ()
 		{
+			instStack = Instantiator.CreateFromImlFragment(CurrentInterface, @"<GenericStack Background='Blue' AllowDrop='true' DragEnter='onStackDragEnter'/>");
+			instSplit = Instantiator.CreateFromImlFragment(CurrentInterface, @"<Splitter/>");
+			instSpacer = Instantiator.CreateFromImlFragment(CurrentInterface, @"<GraphicObject Background='Red' IsEnabled='false'/>");
 		}
 		#endregion
 
@@ -196,7 +196,7 @@ namespace Crow
 				return;
 			lock (CurrentInterface.UpdateMutex) {
 
-				Splitter splitter = instSplit.CreateInstance<Splitter> (CurrentInterface);
+				Splitter splitter = instSplit.CreateInstance<Splitter> ();
 
 				dw.Resizable = false;
 				dw.Left = dw.Top = 0;
@@ -204,7 +204,7 @@ namespace Crow
 
 				Rectangle r;
 				if (mainStack == null) {
-					mainStack = instStack.CreateInstance<GenericStack> (CurrentInterface);
+					mainStack = instStack.CreateInstance<GenericStack> ();
 					this.AddChild (mainStack);
 					this.putWidgetOnBottom (mainStack);
 					r = ClientRectangle;

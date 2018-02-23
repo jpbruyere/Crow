@@ -144,7 +144,7 @@ namespace CrowIDE
 
 			Instantiator iTmp;
 			try {
-				iTmp = Instantiator.CreateFromImlFragment (imlSource);
+				iTmp = Instantiator.CreateFromImlFragment (imlVE, imlSource);
 			} catch (Exception ex) {
 				System.Diagnostics.Debug.WriteLine (ex.ToString());
 				return;
@@ -172,7 +172,7 @@ namespace CrowIDE
 				try {
 					imlVE.ClearInterface ();
 					if (itor != null)
-						imlVE.AddWidget(itor.CreateInstance(imlVE));
+						imlVE.AddWidget(itor.CreateInstance());
 
 				} catch (Exception ex) {
 					System.Diagnostics.Debug.WriteLine (ex.ToString());

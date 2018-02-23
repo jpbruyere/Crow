@@ -70,6 +70,7 @@ namespace Crow.IML
 
 		public Type RootType;
 		InstanciatorInvoker loader;
+		protected Interface iface;
 
 		internal string sourcePath;
 
@@ -77,14 +78,15 @@ namespace Crow.IML
 		/// <summary>
 		/// Initializes a new instance of the Instantiator class.
 		/// </summary>
-		public Instantiator (string path) : this (Interface.GetStreamFromPath(path), path) {
+		public Instantiator (Interface _iface, string path) : this (_iface, Interface.GetStreamFromPath(path), path) {
 			
 		}
 		/// <summary>
 		/// Initializes a new instance of the Instantiator class.
 		/// </summary>
-		public Instantiator (Stream stream, string srcPath = null)
+		public Instantiator (Interface _iface, Stream stream, string srcPath = null)
 		{
+			iface = _iface;
 			sourcePath = srcPath;
 			#if DEBUG_LOAD
 			Stopwatch loadingTime = new Stopwatch ();
@@ -109,12 +111,14 @@ namespace Crow.IML
 		/// Initializes a new instance of the Instantiator class with an already openned xml reader
 		/// positionned on the start tag inside the itemTemplate
 		/// </summary>
-		public Instantiator (XmlReader itr){
+		public Instantiator (Interface _iface, XmlReader itr){
+			iface = _iface;
 			parseIML (itr);
 		}
 		//TODO:check if still used
-		public Instantiator (Type _root, InstanciatorInvoker _loader)
+		public Instantiator (Interface _iface, Type _root, InstanciatorInvoker _loader)
 		{
+			iface = _iface;
 			RootType = _root;
 			loader = _loader;
 		}
@@ -123,11 +127,11 @@ namespace Crow.IML
 		/// </summary>
 		/// <returns>A new instantiator</returns>
 		/// <param name="fragment">IML string</param>
-		public static Instantiator CreateFromImlFragment (string fragment)
+		public static Instantiator CreateFromImlFragment (Interface _iface, string fragment)
 		{
 			try {
 				using (Stream s = new MemoryStream (Encoding.UTF8.GetBytes (fragment))) {
-					return new Instantiator (s);
+					return new Instantiator (_iface, s);
 				}
 			} catch (Exception ex) {
 				throw new Exception ("Error loading IML fragment:\n" + fragment + "\n", ex);
@@ -141,7 +145,7 @@ namespace Crow.IML
 		/// </summary>
 		/// <returns>The new graphic object instance</returns>
 		/// <param name="iface">The interface to bind to</param>
-		public GraphicObject CreateInstance(Interface iface){
+		public GraphicObject CreateInstance(){
 			return loader (iface) as GraphicObject;
 		}
 		/// <summary>
@@ -150,7 +154,7 @@ namespace Crow.IML
 		/// </summary>
 		/// <returns>The new T instance</returns>
 		/// <param name="iface">The interface to bind to</param>
-		public T CreateInstance<T>(Interface iface){
+		public T CreateInstance<T>(){
 			return (T)loader (iface);
 		}
 		List<DynamicMethod> dsValueChangedDynMeths = new List<DynamicMethod>();
@@ -242,16 +246,16 @@ namespace Crow.IML
 
 			if (string.IsNullOrEmpty (path)) {
 				itemTmpID += Guid.NewGuid ().ToString ();
-				Interface.Instantiators [itemTmpID] =
-					new ItemTemplate (new MemoryStream (Encoding.UTF8.GetBytes (reader.ReadInnerXml ())), dataTest, dataType, datas);
+				iface.Instantiators [itemTmpID] =
+					new ItemTemplate (iface, new MemoryStream (Encoding.UTF8.GetBytes (reader.ReadInnerXml ())), dataTest, dataType, datas);
 
 			} else {
 				if (!reader.IsEmptyElement)
 					throw new Exception ("ItemTemplate with Path attribute set may not include sub nodes");
 				itemTmpID += path+dataType+datas;
-				if (!Interface.Instantiators.ContainsKey (itemTmpID))
-					Interface.Instantiators [itemTmpID] =
-						new ItemTemplate (Interface.GetStreamFromPath (path), dataTest, dataType, datas);
+				if (!iface.Instantiators.ContainsKey (itemTmpID))
+					iface.Instantiators [itemTmpID] =
+						new ItemTemplate (iface, Interface.GetStreamFromPath (path), dataTest, dataType, datas);
 			}
 			return new string [] { dataType, itemTmpID, datas, dataTest };
 		}
@@ -299,7 +303,7 @@ namespace Crow.IML
 					//try to load ItemTemplate(s) from ItemTemplate attribute of TemplatedGroup
 					if (!string.IsNullOrEmpty (itemTemplatePath)) {
 						//check if it is already loaded in cache as a single itemTemplate instantiator
-						if (Interface.Instantiators.ContainsKey (itemTemplatePath)) {
+						if (iface.Instantiators.ContainsKey (itemTemplatePath)) {
 							itemTemplateIds.Add (new string [] { "default", itemTemplatePath, "" });
 						} else {
 							using (Stream stream = Interface.GetStreamFromPath (itemTemplatePath)) {
@@ -312,8 +316,8 @@ namespace Crow.IML
 										if (itr.NodeType == XmlNodeType.Element) {
 											if (itr.Name != "ItemTemplate") {
 												//the file contains a single template to use as default
-												Interface.Instantiators [itemTemplatePath] =
-													new ItemTemplate (itr);
+												iface.Instantiators [itemTemplatePath] =
+													new ItemTemplate (iface, itr);
 												itemTemplateIds.Add (new string [] { "default", itemTemplatePath, "", "TypeOf" });
 												break;//we should be at the end of the file
 											}
@@ -334,8 +338,12 @@ namespace Crow.IML
 				foreach (string [] iTempId in itemTemplateIds) {
 					ctx.il.Emit (OpCodes.Ldloc_0);//load TempControl ref
 					ctx.il.Emit (OpCodes.Ldfld, CompilerServices.fldItemTemplates);//load ItemTemplates dic field
+
+					//prepare argument to add itemTemplate to templated group dic of ItemTemplates
 					ctx.il.Emit (OpCodes.Ldstr, iTempId [0]);//load key
-					ctx.il.Emit (OpCodes.Ldstr, iTempId [1]);//load value
+					//load itemTemplate
+					ctx.il.Emit (OpCodes.Ldarg_1);//load currentInterface
+					ctx.il.Emit (OpCodes.Ldstr, iTempId [1]);//load path
 					ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miGetITemp);
 					ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miAddITemp);
 

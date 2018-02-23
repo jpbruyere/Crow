@@ -428,7 +428,7 @@ namespace Crow
 			}
 
 			lock (CurrentInterface.LayoutMutex) {
-				g = iTemp.CreateInstance(CurrentInterface);
+				g = iTemp.CreateInstance();
 				page.AddChild (g);
 //				if (isPaged)
 				g.LogicalParent = this;

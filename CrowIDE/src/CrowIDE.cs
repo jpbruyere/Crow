@@ -65,7 +65,7 @@ namespace CrowIDE
 		}
 
 		void openFileDialog () {			
-			AddWidget (instFileDlg.CreateInstance(CurrentInterface)).DataSource = this;
+			AddWidget (instFileDlg.CreateInstance()).DataSource = this;
 		}
 		void openOptionsDialog(){}
 		void newFile() {}
@@ -96,7 +96,7 @@ namespace CrowIDE
 			base.OnLoad (e);
 
 			instFileDlg = Instantiator.CreateFromImlFragment
-				("<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}' SearchPattern='*.sln' OkClicked='onFileOpen'/>");
+				(CurrentInterface, "<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}' SearchPattern='*.sln' OkClicked='onFileOpen'/>");
 
 			initCommands ();
 
