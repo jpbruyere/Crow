@@ -89,7 +89,6 @@ namespace Crow
 			}
 
 			loadCursors ();
-			findAvailableTemplates ();
 
 			FontRenderingOptions = new FontOptions ();
 			FontRenderingOptions.Antialias = Antialias.Subpixel;
@@ -101,6 +100,7 @@ namespace Crow
 			CurrentInterface = this;
 			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 			loadStyling ();
+			findAvailableTemplates ();
 			initTooltip ();
 			initContextMenus ();
 		}
@@ -210,7 +210,7 @@ namespace Crow
 		/// <summary>each IML and fragments (such as inline Templates) are compiled as a Dynamic Method stored here
 		/// on the first instance creation of a IML item.
 		/// </summary>
-		public static Dictionary<String, Instantiator> Instantiators = new Dictionary<string, Instantiator>();
+		public Dictionary<String, Instantiator> Instantiators = new Dictionary<string, Instantiator>();
 		public List<CrowThread> CrowThreads = new List<CrowThread>();//used to monitor thread finished
 
 		public DragDropEventArgs DragAndDropOperation = null;
@@ -278,16 +278,16 @@ namespace Crow
 		/// Resource ID must be 'fullClassName.template' (not case sensitive)
 		/// Those found in application assembly have priority to the default Crow's one
 		/// </summary>
-		public static Dictionary<string, string> DefaultTemplates = new Dictionary<string, string>();
+		public Dictionary<string, string> DefaultTemplates = new Dictionary<string, string>();
 		/// <summary>Finds available default templates at startup</summary>
-		static void findAvailableTemplates(){
+		void findAvailableTemplates(){
 			searchTemplatesOnDisk ("./");
 			string defTemplatePath = System.IO.Path.Combine (CrowConfigRoot, "defaultTemplates");
 			searchTemplatesOnDisk (defTemplatePath);
 			searchTemplatesIn (Assembly.GetEntryAssembly ());
 			searchTemplatesIn (Assembly.GetExecutingAssembly ());
 		}
-		static void searchTemplatesOnDisk (string templatePath){
+		void searchTemplatesOnDisk (string templatePath){
 			if (!Directory.Exists (templatePath))
 				return;
 			foreach (string f in Directory.GetFiles(templatePath, "*.template",SearchOption.AllDirectories)) {
@@ -297,7 +297,7 @@ namespace Crow
 				DefaultTemplates [clsName] = f;
 			}
 		}
-		static void searchTemplatesIn(Assembly assembly){
+		void searchTemplatesIn(Assembly assembly){
 			if (assembly == null)
 				return;
 			foreach (string resId in assembly
@@ -344,7 +344,7 @@ namespace Crow
 		/// <param name="imlFragment">a valid IML string</param>
 		public GraphicObject LoadIMLFragment (string imlFragment) {
 			lock (UpdateMutex) {
-				GraphicObject tmp = Instantiator.CreateFromImlFragment (imlFragment).CreateInstance(this);
+				GraphicObject tmp = Instantiator.CreateFromImlFragment (this, imlFragment).CreateInstance();
 				AddWidget (tmp);
 				return tmp;
 			}
@@ -370,7 +370,7 @@ namespace Crow
 		public GraphicObject Load (string path)
 		{
 			//try {
-				return GetInstantiator (path).CreateInstance (this);
+				return GetInstantiator (path).CreateInstance ();
 			//} catch (Exception ex) {
 			//	throw new Exception ("Error loading <" + path + ">:", ex);
 			//}
@@ -380,22 +380,22 @@ namespace Crow
 		/// </summary>
 		/// <returns>new Instantiator</returns>
 		/// <param name="path">path of the iml file to load</param>
-		public static Instantiator GetInstantiator(string path){
+		public Instantiator GetInstantiator(string path){
 			if (!Instantiators.ContainsKey(path))
-				Instantiators [path] = new Instantiator(path);
+				Instantiators [path] = new Instantiator(this, path);
 			return Instantiators [path];
 		}
 		/// <summary>Item templates are derived from instantiator, this function
 		/// try to fetch the requested one in the cache or create it.
 		/// They have additional properties for recursivity and
 		/// custom display per item type</summary>
-		public static ItemTemplate GetItemTemplate(string path){
+		public ItemTemplate GetItemTemplate(string path){
 			if (!Instantiators.ContainsKey(path))
-				Instantiators [path] = new ItemTemplate(path);
+				Instantiators [path] = new ItemTemplate(this, path);
 			return Instantiators [path] as ItemTemplate;
 		}
 		//TODO: .Net xml serialisation is no longer used, it has been replaced with instantiators
-		public static void Save<T> (string file, T graphicObject)
+		public void Save<T> (string file, T graphicObject)
 		{
 			XmlSerializerNamespaces xn = new XmlSerializerNamespaces ();
 			xn.Add ("", "");

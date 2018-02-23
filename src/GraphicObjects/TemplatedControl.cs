@@ -133,9 +133,9 @@ namespace Crow
 				this.ClearTemplateBinding();
 			
 			if (template == null) {
-				if (!Interface.DefaultTemplates.ContainsKey (this.GetType ().FullName))
+				if (!CurrentInterface.DefaultTemplates.ContainsKey (this.GetType ().FullName))
 					throw new Exception (string.Format ("No default template found for '{0}'", this.GetType ().FullName));
-				this.SetChild (CurrentInterface.Load (Interface.DefaultTemplates[this.GetType ().FullName]));
+				this.SetChild (CurrentInterface.Load (CurrentInterface.DefaultTemplates[this.GetType ().FullName]));
 			}else
 				this.SetChild (template);
 		}
