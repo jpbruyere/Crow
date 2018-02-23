@@ -143,11 +143,11 @@ namespace Crow
 				CurrentDirectory = SelectedDirectory;
 			else {
 				OkClicked.Raise (this, null);
-				CurrentInterface.DeleteWidget (this);
+				IFace.DeleteWidget (this);
 			}
 		}
 		void onCancel(object sender, MouseButtonEventArgs e){
-			CurrentInterface.DeleteWidget (this);
+			IFace.DeleteWidget (this);
 		}
 	}
 }

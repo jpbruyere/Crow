@@ -271,8 +271,8 @@ namespace Tests
 				return;
 			//tv.AddChild (new TabItem (CurrentInterface) { Caption = "NewTab" });
 			lock (CurrentInterface.UpdateMutex) {
-				tv.AddChild (Crow.IML.Instantiator.CreateFromImlFragment
-					(@"<TabItem Caption='New tab' Background='Blue'><Label/></TabItem>").CreateInstance (CurrentInterface));
+				tv.AddChild (CurrentInterface.LoadIMLFragment
+					(@"<TabItem Caption='New tab' Background='Blue'><Label/></TabItem>"));
 			}
 		}
 		[STAThread]

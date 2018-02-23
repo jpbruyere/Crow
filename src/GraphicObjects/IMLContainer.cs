@@ -41,7 +41,7 @@ namespace Crow
 				if (path == value)
 					return;
 				path = value;
-				this.SetChild (CurrentInterface.Load (path));
+				this.SetChild (IFace.Load (path));
 				NotifyValueChanged ("Path", path);
 			}
 		}

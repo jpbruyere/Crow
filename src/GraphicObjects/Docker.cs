@@ -38,9 +38,9 @@ namespace Crow
 		}
 		public Docker () : base ()
 		{
-			instStack = Instantiator.CreateFromImlFragment(CurrentInterface, @"<GenericStack Background='Blue' AllowDrop='true' DragEnter='onStackDragEnter'/>");
-			instSplit = Instantiator.CreateFromImlFragment(CurrentInterface, @"<Splitter/>");
-			instSpacer = Instantiator.CreateFromImlFragment(CurrentInterface, @"<GraphicObject Background='Red' IsEnabled='false'/>");
+			instStack = IFace.CreateITorFromIMLFragment (@"<GenericStack Background='Blue' AllowDrop='true' DragEnter='onStackDragEnter'/>");
+			instSplit = IFace.CreateITorFromIMLFragment (@"<Splitter/>");
+			instSpacer = IFace.CreateITorFromIMLFragment (@"<GraphicObject Background='Red' IsEnabled='false'/>");
 		}
 		#endregion
 
@@ -85,9 +85,9 @@ namespace Crow
 
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{			
-			if (CurrentInterface.DragAndDropOperation?.DragSource as DockWindow != null) {
-				DockWindow dw = CurrentInterface.DragAndDropOperation?.DragSource as DockWindow;
-				if (CurrentInterface.DragAndDropOperation.DragSource.Parent == this && !dw.IsDocked)
+			if (IFace.DragAndDropOperation?.DragSource as DockWindow != null) {
+				DockWindow dw = IFace.DragAndDropOperation?.DragSource as DockWindow;
+				if (IFace.DragAndDropOperation.DragSource.Parent == this && !dw.IsDocked)
 					dw.MoveAndResize (e.XDelta, e.YDelta);
 
 				Rectangle r = ClientRectangle;
@@ -149,7 +149,7 @@ namespace Crow
 			childrenRWLock.EnterReadLock ();
 
 			foreach (GraphicObject g in Children) {
-				if (CurrentInterface.DragAndDropOperation?.DragSource == g)
+				if (IFace.DragAndDropOperation?.DragSource == g)
 					continue;
 				g.Paint (ref gr);
 			}
@@ -184,8 +184,8 @@ namespace Crow
 				gr.Stroke ();
 			}
 
-			if (CurrentInterface.DragAndDropOperation != null)
-				CurrentInterface.DragAndDropOperation.DragSource.Paint (ref gr);
+			if (IFace.DragAndDropOperation != null)
+				IFace.DragAndDropOperation.DragSource.Paint (ref gr);
 
 
 			gr.Restore ();	
@@ -194,7 +194,7 @@ namespace Crow
 		public void Dock(DockWindow dw){
 			if (dockingDirection == Alignment.Center)
 				return;
-			lock (CurrentInterface.UpdateMutex) {
+			lock (IFace.UpdateMutex) {
 
 				Splitter splitter = instSplit.CreateInstance<Splitter> ();
 
