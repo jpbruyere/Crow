@@ -41,7 +41,7 @@
 						Data="{Projects}" SelectedItemChanged="onSelectedItemChanged"
 						ItemTemplate="#CrowIDE.ui.ProjectTree.template"/>
 					<Splitter/>
-					<MembersView Instance="{SelectedItemElement}" DataTest="Type"  Background="DimGray"
+					<MembersView Instance="{SelectedItemElement}" DataTest="Type"
 						ItemTemplate="#CrowIDE.ui.MembersItem.template"/>
 				</VerticalStack>
 			</HorizontalStack>

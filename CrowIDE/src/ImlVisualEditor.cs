@@ -286,6 +286,7 @@ namespace CrowIDE
 				return;
 			hr = SelectedItem.ScreenCoordinates(SelectedItem.getSlot ());
 			hr.Inflate (1);
+			gr.LineWidth = 2;
 			gr.SetSourceColor (Color.Yellow);
 			gr.SetDash (new double[]{ 5.0, 3.0 },0.0);
 			gr.Rectangle (hr, 1.0);

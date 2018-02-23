@@ -182,13 +182,14 @@ namespace CrowIDE
 		{
 			if (e.Key == OpenTK.Input.Key.Escape) {
 				Quit (null, null);
-				return;
-			}
-//			else if (e.Key == OpenTK.Input.Key.F4) {
-//				loadWindow ("#CrowIDE.ui.MemberView.crow");
-//			} else if (e.Key == OpenTK.Input.Key.F5) {
-//				loadWindow ("#CrowIDE.ui.GTreeExplorer.crow");
-//			} else if (e.Key == OpenTK.Input.Key.F6) {
+			} else if (e.Key == OpenTK.Input.Key.F5) {
+				try {
+					CurrentSolution.StartupProject.Compile ();	
+				} catch (Exception ex) {
+					Console.WriteLine (ex.ToString ());
+				}
+
+			}// else if (e.Key == OpenTK.Input.Key.F6) {
 //				loadWindow ("#CrowIDE.ui.LQIsExplorer.crow");
 //			} else if (e.Key == OpenTK.Input.Key.F7) {
 //				loadWindow ("#CrowIDE.ui.CSProjExplorer.crow");

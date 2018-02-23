@@ -309,6 +309,8 @@ namespace CrowIDE{
 	        }
 	        ));
 
+			Console.WriteLine ("******** CONFIG ***************");
+
 	        new Regex("GlobalSection\\(ProjectConfigurationPlatforms\\).*?[\r\n]+(.*?)EndGlobalSection[\r\n]+", RegexOptions.Singleline).Replace(slnTxt, new MatchEvaluator(m2 =>
 	        {
 	            foreach (Match m3 in new Regex("\\s*({[A-F0-9-]+})\\.(.*?)\\.(.*?)\\s+=\\s+(.*?)[\r\n]+").Matches(m2.Groups[1].ToString()))
@@ -321,6 +323,8 @@ namespace CrowIDE{
 	                Project p = s.Projects.Where(x => x.ProjectGuid == guid).FirstOrDefault();
 	                if (p == null)
 	                    continue;
+
+						Console.WriteLine ("{0},{1},{2},{3}",guid,solutionConfig,action,projectConfig);
 
 	                int iConfigIndex = s.configurations.IndexOf(solutionConfig);
 	                if (iConfigIndex == -1)

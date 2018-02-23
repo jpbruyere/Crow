@@ -24,15 +24,15 @@
     <AssemblyOriginatorKeyFile>crow.key</AssemblyOriginatorKeyFile>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ReleaseVersion>0.7</ReleaseVersion>
+    <ReleaseVersion>0.5</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-    <DefineConstants>DEBUG_UPDATE0;DEBUG_FOCUS0;DEBUG_DISPOSE0;DEBUG_LAYOUTING0;TRACE0;DEBUG;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
     <Optimize>false</Optimize>
     <OutputPath>$(SolutionDir)build\Debug</OutputPath>
+    <DefineConstants>DEBUG_UPDATE0;DEBUG_FOCUS0;DEBUG_DISPOSE0;DEBUG_LAYOUTING0;TRACE0;DEBUG;MEASURE_TIME;DEBUG_LOAD;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -361,6 +361,7 @@
     <EmbeddedResource Include="Icons\folder.svg" />
     <EmbeddedResource Include="Icons\file.svg" />
     <EmbeddedResource Include="Icons\level-up.svg" />
+    <EmbeddedResource Include="Icons\frame.svg" />
     <EmbeddedResource Include="Templates\FileItems.template" />
     <EmbeddedResource Include="Templates\DefaultItem.template">
       <LogicalName>Crow.DefaultItem.template</LogicalName>

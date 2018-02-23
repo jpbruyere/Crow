@@ -119,7 +119,9 @@ namespace CrowIDE
 					Path.Split ('/').LastOrDefault();
 			}
 		}
-
+		public string HintPath {
+			get { return node.SelectSingleNode ("HintPath")?.InnerText; }
+		}
 	}
 	public class ProjectReference : ProjectItem {
 		public ProjectReference (ProjectItem pi) : base (pi.Project, pi.node){
@@ -135,11 +137,18 @@ namespace CrowIDE
 			}
 		}
 	}
+	public enum CopyToOutputState {
+		Never,
+		Always,
+		PreserveNewest
+	}
 	public class ProjectFile : ProjectItem {
+		bool isDirty = false;
+		object selectedItem;
+
 		public ProjectFile (ProjectItem pi) : base (pi.Project, pi.node){			
 		}
 
-		object selectedItem;
 		public string LogicalName {
 			get {
 				return node.SelectSingleNode ("LogicalName")?.InnerText;
@@ -162,7 +171,16 @@ namespace CrowIDE
 				NotifyValueChanged ("SelectedItem", selectedItem);
 			}
 		}
-
+		public CopyToOutputState CopyToOutputDirectory {
+			get {
+				XmlNode xn = node.SelectSingleNode ("CopyToOutputDirectory");
+				if (xn == null)
+					return CopyToOutputState.Never;
+				CopyToOutputState tmp = (CopyToOutputState)Enum.Parse (typeof(CopyToOutputState), xn.InnerText, true);
+				return tmp;
+				//return xn == null ? CopyToOutputState.Never : (CopyToOutputState)Enum.Parse (typeof(CopyToOutputState), xn.InnerText, true);
+			}
+		}
 		public void OnQueryClose (object sender, EventArgs e){
 			Project.solution.CloseItem (this);
 		}

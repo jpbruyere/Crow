@@ -1091,16 +1091,18 @@ namespace Crow
 
 		public void ShowContextMenu (GraphicObject go) {
 
-			if (ctxMenuContainer.Parent == null)
-				this.AddWidget (ctxMenuContainer);
-			else
-				ctxMenuContainer.IsOpened = true;
+			lock (UpdateMutex) {
+				if (ctxMenuContainer.Parent == null)
+					this.AddWidget (ctxMenuContainer);
+				else
+					ctxMenuContainer.IsOpened = true;
 
-			ctxMenuContainer.isPopup = true;
-			ctxMenuContainer.LogicalParent = go;
-			ctxMenuContainer.DataSource = go;
+				ctxMenuContainer.isPopup = true;
+				ctxMenuContainer.LogicalParent = go;
+				ctxMenuContainer.DataSource = go;
 
-			PutOnTop (ctxMenuContainer, true);
+				PutOnTop (ctxMenuContainer, true);
+			}
 			ctxMenuContainer.Left = Mouse.X - 5;
 			ctxMenuContainer.Top = Mouse.Y - 5;
 
