@@ -125,7 +125,7 @@ namespace Crow
 				#endif
 				if (LayoutingTries < Interface.MaxLayoutingTries) {
 					Layoutable.RegisteredLayoutings |= LayoutType;
-					(Layoutable as GraphicObject).CurrentInterface.LayoutingQueue.Enqueue (this);
+					(Layoutable as GraphicObject).IFace.LayoutingQueue.Enqueue (this);
 				} else if (DiscardCount < Interface.MaxDiscardCount) {
 					#if DEBUG_LAYOUTING
 					Debug.WriteLine ("\t\tDiscarded");
@@ -133,7 +133,7 @@ namespace Crow
 					LayoutingTries = 0;
 					DiscardCount++;
 					Layoutable.RegisteredLayoutings |= LayoutType;
-					(Layoutable as GraphicObject).CurrentInterface.DiscardQueue.Enqueue (this);
+					(Layoutable as GraphicObject).IFace.DiscardQueue.Enqueue (this);
 				}
 				#if DEBUG_LAYOUTING
 				else

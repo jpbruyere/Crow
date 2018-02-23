@@ -344,10 +344,18 @@ namespace Crow
 		/// <param name="imlFragment">a valid IML string</param>
 		public GraphicObject LoadIMLFragment (string imlFragment) {
 			lock (UpdateMutex) {
-				GraphicObject tmp = Instantiator.CreateFromImlFragment (this, imlFragment).CreateInstance();
+				GraphicObject tmp = CreateITorFromIMLFragment (imlFragment).CreateInstance();
 				AddWidget (tmp);
 				return tmp;
 			}
+		}
+		/// <summary>
+		/// Add the content of the IML fragment to the graphic tree of this interface
+		/// </summary>
+		/// <returns>return the new instance for convenience, may be ignored</returns>
+		/// <param name="imlFragment">a valid IML string</param>
+		public Instantiator CreateITorFromIMLFragment (string imlFragment) {			
+			return Instantiator.CreateFromImlFragment (this, imlFragment);
 		}
 		/// <summary>
 		/// Create an instance of a GraphicObject and add it to the GraphicTree of this Interface

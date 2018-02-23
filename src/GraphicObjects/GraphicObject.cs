@@ -70,17 +70,17 @@ namespace Crow
 				throw new Exception("Trying to dispose an object queued for Redraw: " + this.ToString());
 				#endif
 
-				if (CurrentInterface.HoverWidget != null) {
-					if (CurrentInterface.HoverWidget.IsOrIsInside(this))
-						CurrentInterface.HoverWidget = null;
+				if (IFace.HoverWidget != null) {
+					if (IFace.HoverWidget.IsOrIsInside(this))
+						IFace.HoverWidget = null;
 				}
-				if (CurrentInterface.ActiveWidget != null) {
-					if (CurrentInterface.ActiveWidget.IsOrIsInside (this))
-						CurrentInterface.ActiveWidget = null;
+				if (IFace.ActiveWidget != null) {
+					if (IFace.ActiveWidget.IsOrIsInside (this))
+						IFace.ActiveWidget = null;
 				}
-				if (CurrentInterface.FocusedWidget != null) {
-					if (CurrentInterface.FocusedWidget.IsOrIsInside (this))
-						CurrentInterface.FocusedWidget = null;
+				if (IFace.FocusedWidget != null) {
+					if (IFace.FocusedWidget.IsOrIsInside (this))
+						IFace.FocusedWidget = null;
 				}
 				if (!localDataSourceIsNull)
 					DataSource = null;
@@ -107,7 +107,7 @@ namespace Crow
 		/// <summary>
 		/// interface this widget is bound to, this should not be changed once the instance is created
 		/// </summary>
-		public Interface CurrentInterface = null;
+		public Interface IFace = null;
 
 		/// <summary>
 		/// contains the dirty rectangles in the coordinate system of the cache. those dirty zones
@@ -159,7 +159,7 @@ namespace Crow
 		/// <param name="iface">Iface.</param>
 		public GraphicObject (Interface iface) : this()
 		{
-			CurrentInterface = iface;
+			IFace = iface;
 			Initialize ();
 		}
 		#endregion
@@ -867,17 +867,17 @@ namespace Crow
 			Type thisType = this.GetType ();
 
 			if (!string.IsNullOrEmpty (Style)) {
-				if (CurrentInterface.DefaultValuesLoader.ContainsKey (Style)) {
-					CurrentInterface.DefaultValuesLoader [Style] (this);
+				if (IFace.DefaultValuesLoader.ContainsKey (Style)) {
+					IFace.DefaultValuesLoader [Style] (this);
 					return;
 				}
 			} else {
-				if (CurrentInterface.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
-					CurrentInterface.DefaultValuesLoader [thisType.FullName] (this);
+				if (IFace.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
+					IFace.DefaultValuesLoader [thisType.FullName] (this);
 					return;
-				} else if (!CurrentInterface.Styling.ContainsKey (thisType.FullName)) {
-					if (CurrentInterface.DefaultValuesLoader.ContainsKey (thisType.Name)) {
-						CurrentInterface.DefaultValuesLoader [thisType.Name] (this);
+				} else if (!IFace.Styling.ContainsKey (thisType.FullName)) {
+					if (IFace.DefaultValuesLoader.ContainsKey (thisType.Name)) {
+						IFace.DefaultValuesLoader [thisType.Name] (this);
 						return;
 					}
 				}
@@ -892,17 +892,17 @@ namespace Crow
 			//   those files being placed in a Styles folder
 			string styleKey = Style;
 			if (!string.IsNullOrEmpty (Style)) {
-				if (CurrentInterface.Styling.ContainsKey (Style)) {
-					styling.Add (CurrentInterface.Styling [Style]);
+				if (IFace.Styling.ContainsKey (Style)) {
+					styling.Add (IFace.Styling [Style]);
 				}
 			}
-			if (CurrentInterface.Styling.ContainsKey (thisType.FullName)) {
-				styling.Add (CurrentInterface.Styling [thisType.FullName]);
+			if (IFace.Styling.ContainsKey (thisType.FullName)) {
+				styling.Add (IFace.Styling [thisType.FullName]);
 				if (string.IsNullOrEmpty (styleKey))
 					styleKey = thisType.FullName;
 			}
-			if (CurrentInterface.Styling.ContainsKey (thisType.Name)) {
-				styling.Add (CurrentInterface.Styling [thisType.Name]);
+			if (IFace.Styling.ContainsKey (thisType.Name)) {
+				styling.Add (IFace.Styling [thisType.Name]);
 				if (string.IsNullOrEmpty (styleKey))
 					styleKey = thisType.Name;
 			}
@@ -972,8 +972,8 @@ namespace Crow
 			#endregion
 
 			try {
-				CurrentInterface.DefaultValuesLoader[styleKey] = (Interface.LoaderInvoker)dm.CreateDelegate(typeof(Interface.LoaderInvoker));
-				CurrentInterface.DefaultValuesLoader[styleKey] (this);
+				IFace.DefaultValuesLoader[styleKey] = (Interface.LoaderInvoker)dm.CreateDelegate(typeof(Interface.LoaderInvoker));
+				IFace.DefaultValuesLoader[styleKey] (this);
 			} catch (Exception ex) {
 				throw new Exception ("Error applying style <" + styleKey + ">:", ex);
 			}
@@ -1105,7 +1105,7 @@ namespace Crow
 		/// fired when drag and drop operation start
 		/// </summary>
 		protected virtual void onStartDrag (object sender, DragDropEventArgs e){
-			CurrentInterface.HoverWidget = null;
+			IFace.HoverWidget = null;
 			IsDragged = true;
 			StartDrag.Raise (this, e);
 			Debug.WriteLine(this.ToString() + " : START DRAG => " + e.ToString());
@@ -1180,7 +1180,7 @@ namespace Crow
 			if (Width.IsFit || Height.IsFit)
 				RegisterForLayouting (LayoutingType.Sizing);
 			else if (RegisteredLayoutings == LayoutingType.None)
-				CurrentInterface.EnqueueForRepaint (this);
+				IFace.EnqueueForRepaint (this);
 		}
 		/// <summary> query an update of the content, a redraw </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1191,7 +1191,7 @@ namespace Crow
 			#endif
 			IsDirty = true;
 			if (RegisteredLayoutings == LayoutingType.None)
-				CurrentInterface.EnqueueForRepaint (this);
+				IFace.EnqueueForRepaint (this);
 		}
 		#endregion
 
@@ -1209,7 +1209,7 @@ namespace Crow
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
 			if (Parent == null)
 				return;
-			lock (CurrentInterface.LayoutMutex) {
+			lock (IFace.LayoutMutex) {
 				//prevent queueing same LayoutingType for this
 				layoutType &= (~RegisteredLayoutings);
 
@@ -1236,15 +1236,15 @@ namespace Crow
 
 				//enqueue LQI LayoutingTypes separately
 				if (layoutType.HasFlag (LayoutingType.Width))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
+					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
 				if (layoutType.HasFlag (LayoutingType.Height))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
+					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
 				if (layoutType.HasFlag (LayoutingType.X))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
+					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
 				if (layoutType.HasFlag (LayoutingType.Y))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
+					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
 				if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
+					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
 			}
 		}
 
@@ -1420,7 +1420,7 @@ namespace Crow
 
 			//if no layouting remains in queue for item, registre for redraw
 			if (this.registeredLayoutings == LayoutingType.None && IsDirty)
-				CurrentInterface.EnqueueForRepaint (this);
+				IFace.EnqueueForRepaint (this);
 
 			return true;
 		}
@@ -1557,8 +1557,8 @@ namespace Crow
 		}
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
-			if (CurrentInterface.HoverWidget != this) {
-				CurrentInterface.HoverWidget = this;
+			if (IFace.HoverWidget != this) {
+				IFace.HoverWidget = this;
 				onMouseEnter (this, e);
 			}
 
@@ -1567,9 +1567,9 @@ namespace Crow
 		public virtual void onMouseMove(object sender, MouseMoveEventArgs e)
 		{
 			if (AllowDrag & HasFocus & e.Mouse.LeftButton == ButtonState.Pressed) {
-				if (CurrentInterface.DragAndDropOperation == null) {
-					CurrentInterface.DragAndDropOperation = new DragDropEventArgs (this);
-					onStartDrag (this, CurrentInterface.DragAndDropOperation);
+				if (IFace.DragAndDropOperation == null) {
+					IFace.DragAndDropOperation = new DragDropEventArgs (this);
+					onStartDrag (this, IFace.DragAndDropOperation);
 				}
 			}
 
@@ -1585,15 +1585,15 @@ namespace Crow
 			Debug.WriteLine("MOUSE DOWN => " + this.ToString());
 			#endif
 
-			if (CurrentInterface.ActiveWidget == null)
-				CurrentInterface.ActiveWidget = this;
+			if (IFace.ActiveWidget == null)
+				IFace.ActiveWidget = this;
 			if (this.Focusable && !Interface.FocusOnHover) {
 				BubblingMouseButtonEventArg be = e as BubblingMouseButtonEventArg;
 				if (be.Focused == null) {
 					be.Focused = this;
-					CurrentInterface.FocusedWidget = this;
+					IFace.FocusedWidget = this;
 					if (e.Button == MouseButton.Right && this.ContextCommands != null)
-						CurrentInterface.ShowContextMenu (this);					
+						IFace.ShowContextMenu (this);					
 				}
 			}
 			//bubble event to the top
@@ -1608,13 +1608,13 @@ namespace Crow
 			Debug.WriteLine("MOUSE UP => " + this.ToString());
 			#endif
 
-			if (CurrentInterface.DragAndDropOperation != null){
-				if (CurrentInterface.DragAndDropOperation.DragSource == this) {
-					if (CurrentInterface.DragAndDropOperation.DropTarget != null)
-						onDrop (this, CurrentInterface.DragAndDropOperation);
+			if (IFace.DragAndDropOperation != null){
+				if (IFace.DragAndDropOperation.DragSource == this) {
+					if (IFace.DragAndDropOperation.DropTarget != null)
+						onDrop (this, IFace.DragAndDropOperation);
 					else
-						onEndDrag (this, CurrentInterface.DragAndDropOperation);
-					CurrentInterface.DragAndDropOperation = null;
+						onEndDrag (this, IFace.DragAndDropOperation);
+					IFace.DragAndDropOperation = null;
 				}
 			}
 
@@ -1656,10 +1656,10 @@ namespace Crow
 			Debug.WriteLine("MouseEnter => " + this.ToString());
 			#endif
 
-			if (CurrentInterface.DragAndDropOperation != null) {
+			if (IFace.DragAndDropOperation != null) {
 				if (this.AllowDrop) {
-					if (CurrentInterface.DragAndDropOperation.DragSource != this && CurrentInterface.DragAndDropOperation.DropTarget != this)
-						onDragEnter (this, CurrentInterface.DragAndDropOperation);					
+					if (IFace.DragAndDropOperation.DragSource != this && IFace.DragAndDropOperation.DropTarget != this)
+						onDragEnter (this, IFace.DragAndDropOperation);					
 				}
 			}
 
@@ -1670,9 +1670,9 @@ namespace Crow
 			#if DEBUG_FOCUS
 			Debug.WriteLine("MouseLeave => " + this.ToString());
 			#endif
-			if (CurrentInterface.DragAndDropOperation != null) {
-				if (CurrentInterface.DragAndDropOperation.DropTarget == this)
-					onDragLeave (this, CurrentInterface.DragAndDropOperation);
+			if (IFace.DragAndDropOperation != null) {
+				if (IFace.DragAndDropOperation.DropTarget == this)
+					onDragLeave (this, IFace.DragAndDropOperation);
 			}
 			MouseLeave.Raise (this, e);
 		}

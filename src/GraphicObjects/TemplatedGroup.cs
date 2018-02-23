@@ -427,7 +427,7 @@ namespace Crow
 					iTemp = ItemTemplates ["default"];
 			}
 
-			lock (CurrentInterface.LayoutMutex) {
+			lock (IFace.LayoutMutex) {
 				g = iTemp.CreateInstance();
 				page.AddChild (g);
 //				if (isPaged)
