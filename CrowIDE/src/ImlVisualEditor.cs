@@ -27,7 +27,7 @@ using System.IO;
 using System.Collections.Generic;
 using Crow.IML;
 
-namespace CrowIDE
+namespace Crow.Coding
 {
 	public class ImlVisualEditor : GraphicObject
 	{
@@ -42,14 +42,12 @@ namespace CrowIDE
 		#endregion
 
 		DesignInterface imlVE;
-		Instantiator itor;
 		GraphicObject selectedItem;
-		string imlSource;
-		ProjectItem projectItem;
+		ImlProjectItem projectItem;
+		Exception imlError = null;
 
 		bool drawGrid;
 		int gridSpacing;
-
 
 		[XmlAttributeAttribute][DefaultValue(true)]
 		public bool DrawGrid {
@@ -97,23 +95,6 @@ namespace CrowIDE
 		[XmlIgnore]public List<LQIList> LQIs {
 			get { return imlVE.LQIs; }
 		}
-		[XmlIgnore]public string ImlSource {
-			get { return imlSource; }
-			set {
-				if (imlSource == value)
-					return;
-				imlSource = value;
-
-				NotifyValueChanged ("ImlSource", ImlSource);
-
-				reloadFromSource ();
-			}
-		}
-		[XmlAttributeAttribute][DefaultValue("")]
-		public string ImlPath {
-			get { return projectItem?.Path; }
-		}
-
 
 		[XmlAttributeAttribute]
 		public ProjectNode ProjectNode {
@@ -122,62 +103,56 @@ namespace CrowIDE
 				if (projectItem == value)
 					return;
 
-				if (!(value is ProjectItem))
-					return;
 
-				projectItem = value as ProjectItem;
+				if (projectItem != null)
+					projectItem.ValueChanged -= ProjectItem_ValueChanged;
 
-				NotifyValueChanged ("ImlPath", ImlPath);
+				projectItem = value as ImlProjectItem;
 
-				reloadFromPath ();
+				if (projectItem != null)
+					projectItem.ValueChanged += ProjectItem_ValueChanged;
+
+				NotifyValueChanged ("ProjectNode", projectItem);
+
+				reload ();
 			}
 		}
+
+		void ProjectItem_ValueChanged (object sender, ValueChangeEventArgs e)
+		{
+			if (e.MemberName == "Source")
+				reload ();			
+		}
+
+		[XmlIgnore]public Exception IMLError {
+			get { return imlError; }
+			set {
+				if (imlError == value)
+					return;
+				imlError = value;
+				NotifyValueChanged ("IMLError", imlError);
+			}
+		}
+
+		void reload(){
+			if (projectItem == null)				
+				return;
+			
+			try {
+				imlVE.ProjFile = projectItem;
+				imlVE.Styling = projectItem.Project.solution.Styling;
+				imlVE.DefaultTemplates = projectItem.Project.solution.DefaultTemplates;
+				imlVE.Instantiators = new Dictionary<string, Instantiator>();
+				imlVE.ClearInterface();
+				imlVE.LoadIMLFragment(projectItem.Source);
+				IMLError = null;
+			} catch (Exception ex) {
+				IMLError = ex;
+			}
+		}
+
 		public List<GraphicObject> GraphicTree {
 			get { return imlVE.GraphicTree; }
-		}
-
-		void reloadFromSource(){
-			if (string.IsNullOrEmpty (imlSource)) {
-				reload_iTor (null);
-				return;
-			}
-
-			Instantiator iTmp;
-			try {
-				iTmp = Instantiator.CreateFromImlFragment (imlVE, imlSource);
-			} catch (Exception ex) {
-				System.Diagnostics.Debug.WriteLine (ex.ToString());
-				return;
-			}
-
-			reload_iTor (iTmp);
-		}
-		void reloadFromPath(){
-			string path = Path.Combine (projectItem?.Project.RootDir,projectItem?.Path);
-			if (!File.Exists (path)){
-				System.Diagnostics.Debug.WriteLine ("Path not found: " + path);
-				reload_iTor (null);
-				return;
-			}
-			using (StreamReader sr = new StreamReader (path)) {
-				ImlSource = sr.ReadToEnd ();
-			}
-			NotifyValueChanged ("GraphicTree", null);
-			NotifyValueChanged ("GraphicTree", GraphicTree);
-			SelectedItem = null;
-		}
-		void reload_iTor(Instantiator new_iTot){
-			itor = new_iTot;
-			lock (imlVE.UpdateMutex) {
-				try {
-					imlVE.ClearInterface ();
-					if (itor != null)
-						imlVE.AddWidget(itor.CreateInstance());
-
-				} catch (Exception ex) {
-					System.Diagnostics.Debug.WriteLine (ex.ToString());
-				}
-			}
 		}
 
 		void interfaceThread()
@@ -202,7 +177,7 @@ namespace CrowIDE
 						RegisterForRedraw ();
 				}
 
-				Thread.Sleep (2);
+				Thread.Sleep (10);
 			}
 		}
 
@@ -282,7 +257,7 @@ namespace CrowIDE
 				gr.Rectangle (hr, 1.0);
 			}
 
-			if (SelectedItem == null)
+			if (SelectedItem?.Parent == null)
 				return;
 			hr = SelectedItem.ScreenCoordinates(SelectedItem.getSlot ());
 			hr.Inflate (1);

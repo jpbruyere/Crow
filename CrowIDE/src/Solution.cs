@@ -21,7 +21,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using Crow;
 
-namespace CrowIDE{	
+namespace Crow.Coding{	
 	public class SolutionProject {
 		public string ProjectHostGuid;
 		public string ProjectName;
@@ -44,6 +44,29 @@ namespace CrowIDE{
 		ProjectItem selectedItem = null;
 		object selectedItemElement = null;
 		ObservableList<ProjectItem> openedItems = new ObservableList<ProjectItem>();
+
+		public Dictionary<string, Style> Styling;
+		public Dictionary<string, string> DefaultTemplates;
+
+		//TODO: check project dependencies if no startup proj
+
+		public void ReloadStyling () {
+			Styling = new Dictionary<string, Style> ();
+			if (StartupProject != null)
+				StartupProject.GetStyling ();
+		}
+
+		public void ReloadDefaultTemplates () {
+			DefaultTemplates = new Dictionary<string, string>();
+			if (StartupProject != null)
+				StartupProject.GetDefaultTemplates ();
+		}
+		public bool GetProjectFileFromPath (string path, out ProjectFile pi){
+			pi = null;
+			return StartupProject == null ? false :
+				StartupProject.GetProjectFileFromPath (path, out pi);
+		}
+
 
 		public ObservableList<ProjectItem> OpenedItems {
 			get { return openedItems; }
@@ -209,7 +232,8 @@ namespace CrowIDE{
 					value.NotifyValueChanged("IsStartupProject", true);
 				}
 				NotifyValueChanged ("StartupProject", StartupProject);
-
+				ReloadStyling ();
+				ReloadDefaultTemplates ();
 			}
 		}
 
@@ -384,7 +408,8 @@ namespace CrowIDE{
 	        ));
 
 			s.UserConfig = new Configuration (s.path + ".user");
-
+			s.ReloadStyling ();
+			s.ReloadDefaultTemplates ();
 	        return s;
 	    } //LoadSolution
 		#endregion

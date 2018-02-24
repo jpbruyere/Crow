@@ -30,7 +30,7 @@ using System.Xml;
 using System.IO;
 using Crow;
 
-namespace CrowIDE
+namespace Crow.Coding
 {
 	public enum ItemType {
 		ReferenceGroup,
@@ -144,11 +144,24 @@ namespace CrowIDE
 	}
 	public class ProjectFile : ProjectItem {
 		bool isDirty = false;
+		bool isOpened = false;
+//		bool isSelected = false;
+		DateTime accessTime;
+		string source;
 		object selectedItem;
+
 
 		public ProjectFile (ProjectItem pi) : base (pi.Project, pi.node){			
 		}
 
+		public string ResourceID {
+			get {				
+				return Type != ItemType.EmbeddedResource ? null :
+					node.SelectSingleNode ("LogicalName") == null ?
+					Project.Name + "." + Path.Replace ('/', '.') :
+					LogicalName;
+			}
+		}
 		public string LogicalName {
 			get {
 				return node.SelectSingleNode ("LogicalName")?.InnerText;
@@ -156,11 +169,39 @@ namespace CrowIDE
 		}
 		public string Source {
 			get {
-				using (StreamReader sr = new StreamReader (AbsolutePath)) {
-					return sr.ReadToEnd ();
-				}				
+				if (!isOpened) {
+					accessTime = System.IO.File.GetLastWriteTime (AbsolutePath);
+					using (StreamReader sr = new StreamReader (AbsolutePath)) {
+						source = sr.ReadToEnd ();
+					}
+					isOpened = true;
+					isDirty = false;
+				} else {
+					if (DateTime.Compare (
+						    accessTime,
+						    System.IO.File.GetLastWriteTime (AbsolutePath)) < 0)
+						Console.WriteLine ("File has been modified outside CrowIDE");
+				}
+				return source;
+			}
+			set {
+				if (source == value)
+					return;
+				source = value;
+				NotifyValueChanged ("Source", source);
 			}
 		}
+			
+//		public bool IsSelected {
+//			get { return isSelected; }
+//			set { 
+//				if (isSelected == value)
+//					return;
+//				isSelected = value;
+//				NotifyValueChanged ("IsSelected", isSelected);				
+//			}
+//		}
+
 		public object SelectedItem {
 			get { return selectedItem; }
 			set {

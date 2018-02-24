@@ -27,20 +27,14 @@ using System;
 using Crow;
 using System.Linq;
 
-namespace CrowIDE
+namespace Crow.Coding
 {
 	public class EditPane : TemplatedGroup
 	{
 		public EditPane () : base()
 		{
 		}
-		public override object SelectedItem {
-			get { return base.SelectedItem;	}
-			set {
-				base.SelectedItem = value;
-				//Items.FirstOrDefault (i=>i.DataSource == value).
-			}
-		}
+
 		object selectedItemElement = null;
 
 		public object SelectedItemElement {

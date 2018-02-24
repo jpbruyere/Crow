@@ -134,6 +134,7 @@ namespace Crow
 			iRect = ifaceBounds;
 
 			CrowInterface = new Interface ();
+			CrowInterface.Init ();
 
 			#if MEASURE_TIME
 			PerfMeasures = new List<PerformanceMeasure> (

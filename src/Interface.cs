@@ -97,14 +97,17 @@ namespace Crow
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
 		}
 		public Interface(){
-			CurrentInterface = this;
 			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+		}
+		#endregion
+
+		public void Init () {
+			CurrentInterface = this;
 			loadStyling ();
 			findAvailableTemplates ();
 			initTooltip ();
 			initContextMenus ();
 		}
-		#endregion
 
 		#region Static and constants
 		/// <summary>
@@ -125,7 +128,7 @@ namespace Crow
 		public static int DeviceRepeatInterval = 40;
 		/// <summary>Tabulation size in Text controls</summary>
 		public static int TabSize = 4;
-		public static string LineBreak = "\r\n";
+		public static string LineBreak = "\n";
 		/// <summary> Allow rendering of interface in development environment </summary>
 		public static bool DesignerMode = false;
 		/// <summary> Disable caching for a widget if this threshold is reached </summary>
@@ -254,7 +257,7 @@ namespace Crow
 				.GetManifestResourceNames ()
 				.Where (r => r.EndsWith (".style", StringComparison.OrdinalIgnoreCase))) {
 				using (Stream stream = assembly.GetManifestResourceStream (s)) {
-					new StyleReader (this, stream, s);
+					new StyleReader (this.Styling, stream, s);
 				}
 
 			}
@@ -278,9 +281,10 @@ namespace Crow
 		/// Resource ID must be 'fullClassName.template' (not case sensitive)
 		/// Those found in application assembly have priority to the default Crow's one
 		/// </summary>
-		public Dictionary<string, string> DefaultTemplates = new Dictionary<string, string>();
+		public Dictionary<string, string> DefaultTemplates;
 		/// <summary>Finds available default templates at startup</summary>
 		void findAvailableTemplates(){
+			DefaultTemplates = new Dictionary<string, string>();
 			searchTemplatesOnDisk ("./");
 			string defTemplatePath = System.IO.Path.Combine (CrowConfigRoot, "defaultTemplates");
 			searchTemplatesOnDisk (defTemplatePath);
@@ -375,7 +379,7 @@ namespace Crow
 		/// </summary>
 		/// <returns>new instance of graphic object created</returns>
 		/// <param name="path">path of the iml file to load</param>
-		public GraphicObject Load (string path)
+		public virtual GraphicObject Load (string path)
 		{
 			//try {
 				return GetInstantiator (path).CreateInstance ();
@@ -388,7 +392,7 @@ namespace Crow
 		/// </summary>
 		/// <returns>new Instantiator</returns>
 		/// <param name="path">path of the iml file to load</param>
-		public Instantiator GetInstantiator(string path){
+		public virtual Instantiator GetInstantiator(string path){
 			if (!Instantiators.ContainsKey(path))
 				Instantiators [path] = new Instantiator(this, path);
 			return Instantiators [path];
@@ -397,7 +401,7 @@ namespace Crow
 		/// try to fetch the requested one in the cache or create it.
 		/// They have additional properties for recursivity and
 		/// custom display per item type</summary>
-		public ItemTemplate GetItemTemplate(string path){
+		public virtual ItemTemplate GetItemTemplate(string path){
 			if (!Instantiators.ContainsKey(path))
 				Instantiators [path] = new ItemTemplate(this, path);
 			return Instantiators [path] as ItemTemplate;
@@ -1052,7 +1056,7 @@ namespace Crow
 		GraphicObject ToolTipContainer = null;
 		volatile bool tooltipVisible = false;
 
-		void initTooltip () {
+		protected void initTooltip () {
 			ToolTipContainer = Load  ("#Crow.Tooltip.template");
 			Thread t = new Thread (toolTipThreadFunc);
 			t.IsBackground = true;
@@ -1093,7 +1097,7 @@ namespace Crow
 
 		#region Contextual menu
 		MenuItem ctxMenuContainer;
-		void initContextMenus (){
+		protected void initContextMenus (){
 			ctxMenuContainer = Load  ("#Crow.ContextMenu.template") as MenuItem;
 		}
 

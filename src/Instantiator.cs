@@ -134,7 +134,7 @@ namespace Crow.IML
 					return new Instantiator (_iface, s);
 				}
 			} catch (Exception ex) {
-				throw new Exception ("Error loading IML fragment:\n" + fragment + "\n", ex);
+				throw new Exception ("IML Error: " + ex.Message);
 			}
 		}
 		#endregion

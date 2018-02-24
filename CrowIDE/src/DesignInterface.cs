@@ -27,7 +27,7 @@ using System;
 using Crow;
 using System.Globalization;
 
-namespace CrowIDE
+namespace Crow.Coding
 {
 	public class DesignInterface : Interface, IValueChange
 	{
@@ -48,17 +48,35 @@ namespace CrowIDE
 			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
 		}
 		#endregion
+
 		public DesignInterface ()
 		{
-			CurrentInterface = this;
-			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 		}
 
-		protected override void loadStyling ()
+		public ProjectFile ProjFile;
+
+		public override GraphicObject Load (string path)
 		{
-			base.loadStyling ();
+			ProjectFile pi;
+			if (ProjFile.Project.solution.GetProjectFileFromPath (path, out pi))
+				return CreateITorFromIMLFragment (pi.Source).CreateInstance();			
+			return null;
 		}
+		public override Crow.IML.Instantiator GetInstantiator (string path)
+		{			
+			System.Diagnostics.Debugger.Break ();
+			return null;
+		}
+		public override ItemTemplate GetItemTemplate (string path)
+		{
+			ProjectFile pi;
 
+			if (ProjFile.Project.solution.GetProjectFileFromPath (path, out pi))
+				return new ItemTemplate (this, pi.AbsolutePath);
+
+			System.Diagnostics.Debugger.Break ();
+			return null;
+		}
 		public override bool ProcessMouseMove (int x, int y)
 		{
 			int deltaX = x - Mouse.X;

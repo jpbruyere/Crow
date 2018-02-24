@@ -7,7 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{B6D911CD-1D09-42FC-B300-9187190F2AE1}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>CrowIDE</RootNamespace>
+    <RootNamespace>Crow.Coding</RootNamespace>
     <AssemblyName>CrowIDE</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>$(SolutionDir)build/$(Configuration)</OutputPath>
@@ -18,7 +18,7 @@
       </CustomCommands>
     </CustomCommands>
     <ReleaseVersion>0.5</ReleaseVersion>
-    <StartupObject>CrowIDE.CrowIDE</StartupObject>
+    <StartupObject>Crow.Coding.CrowIDE</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -28,8 +28,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -37,8 +35,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>0</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
     <StartAction>Program</StartAction>
@@ -73,10 +69,6 @@
       <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
       <Name>Crow</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\gts\CrowEdit\Crow.Coding\Crow.Coding.csproj">
-      <Project>{78842EE4-8A2F-4C75-AEC6-C95F15AD3994}</Project>
-      <Name>Crow.Coding</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\CrowIDE.cs" />
@@ -109,17 +101,29 @@
     <Compile Include="src\ProjectNodes.cs" />
     <Compile Include="src\SolutionControler.cs" />
     <Compile Include="src\INetProject.cs" />
+    <Compile Include="src\SourceEditor\CodeBuffer.cs" />
+    <Compile Include="src\SourceEditor\CodeBufferEventArgs.cs" />
+    <Compile Include="src\SourceEditor\CodeLine.cs" />
+    <Compile Include="src\SourceEditor\CSharpParser.cs" />
+    <Compile Include="src\SourceEditor\Node.cs" />
+    <Compile Include="src\SourceEditor\Parser.cs" />
+    <Compile Include="src\SourceEditor\ParsingException.cs" />
+    <Compile Include="src\SourceEditor\SourceEditor.cs" />
+    <Compile Include="src\SourceEditor\TextFormatting.cs" />
+    <Compile Include="src\SourceEditor\Token.cs" />
+    <Compile Include="src\SourceEditor\XMLParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />
     <Folder Include="src\" />
     <Folder Include="images\" />
+    <Folder Include="src\SourceEditor\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="images\save.svg" />
     <EmbeddedResource Include="ui\IDE.style" />
     <EmbeddedResource Include="ui\MembersView.template">
-      <LogicalName>CrowIDE.MembersView.template</LogicalName>
+      <LogicalName>Crow.Coding.MembersView.template</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="ui\LQIsExplorer.crow" />
     <EmbeddedResource Include="ui\GTreeExplorer.crow" />
@@ -133,7 +137,7 @@
     <EmbeddedResource Include="ui\ProjectTree.template" />
     <EmbeddedResource Include="ui\MembersItem.template" />
     <EmbeddedResource Include="ui\EditPane.template">
-      <LogicalName>CrowIDE.EditPane.template</LogicalName>
+      <LogicalName>Crow.Coding.EditPane.template</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="ui\EditPaneItems.template" />
     <EmbeddedResource Include="ui\CrowIDE.crow" />

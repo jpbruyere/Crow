@@ -33,16 +33,16 @@
 		</Menu>
 		<VerticalStack DataSource="{CurrentSolution}">
 			<HorizontalStack Height="80%">
-				<EditPane SelectedItem="{²SelectedItem}" SelectedItemElement="{²SelectedItemElement}" Data="{OpenedItems}" DataTest="Extension"
-					ItemTemplate="#CrowIDE.ui.EditPaneItems.template"/>
+				<EditPane SelectedItem="{SelectedItem}" SelectedItemElement="{²SelectedItemElement}" Data="{OpenedItems}" DataTest="Extension"
+					ItemTemplate="#Crow.Coding.ui.EditPaneItems.template"/>
 				<Splitter/>
 				<VerticalStack Width="30%">
 					<TreeView Name="treeview" Height="50%" IsRoot="true"
 						Data="{Projects}" SelectedItemChanged="onSelectedItemChanged"
-						ItemTemplate="#CrowIDE.ui.ProjectTree.template"/>
+						ItemTemplate="#Crow.Coding.ui.ProjectTree.template"/>
 					<Splitter/>
 					<MembersView Instance="{SelectedItemElement}" DataTest="Type"
-						ItemTemplate="#CrowIDE.ui.MembersItem.template"/>
+						ItemTemplate="#Crow.Coding.ui.MembersItem.template"/>
 				</VerticalStack>
 			</HorizontalStack>
 			<Splitter/>

@@ -26,7 +26,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CrowIDE
+namespace Crow.Coding
 {
 	public class PropertyContainer : IValueChange
 	{

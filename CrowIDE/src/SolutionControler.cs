@@ -25,7 +25,7 @@
 // THE SOFTWARE.
 using System;
 
-namespace CrowIDE
+namespace Crow.Coding
 {
 	public class SolutionControler
 	{

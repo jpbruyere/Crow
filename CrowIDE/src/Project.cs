@@ -33,7 +33,7 @@ using System.CodeDom.Compiler;
 using Crow;
 using System.Text.RegularExpressions;
 
-namespace CrowIDE
+namespace Crow.Coding
 {	
 	public class Project: IValueChange
 	{
@@ -270,9 +270,7 @@ namespace CrowIDE
 			}
 			return tmp;
 		}
-		public string Compile () {
-			GetStyling ();
-
+		public string Compile () {			
 			if (ParentProject != null)
 				ParentProject.Compile ();
 
@@ -378,13 +376,83 @@ namespace CrowIDE
 			solution.UpdateErrorList ();
 
 			return parameters.OutputAssembly;
-		}	
+		}
 
-	
+		public bool GetProjectFileFromPath (string path, out ProjectFile pi){
+			if (path.StartsWith ("#"))
+				pi = flattenNodes.OfType<ProjectFile> ().FirstOrDefault 
+					(pp => pp.Type == ItemType.EmbeddedResource && pp.ResourceID == path.Substring (1));
+			else
+				pi = flattenNodes.OfType<ProjectFile> ().FirstOrDefault (pp => pp.Path == path);
+
+			if (pi != null)
+				return true;
+
+			foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference>()) {				
+				Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);
+				if (p == null)
+					throw new Exception ("referenced project not found");
+				if (p.GetProjectFileFromPath (path, out pi))
+					return true;
+			}
+			//TODO: search referenced assemblies
+			return false;
+		}
+
+		public void GetDefaultTemplates () {
+			IEnumerable<ProjectFile> tmpFiles =
+				flattenNodes.OfType<ProjectFile> ().Where (pp => pp.Extension == ".template" );
+			
+			foreach (ProjectFile pi in tmpFiles.Where(
+				pp=>pp.Type == ItemType.None &&	pp.CopyToOutputDirectory != CopyToOutputState.Never)) {
+
+				string clsName = System.IO.Path.GetFileNameWithoutExtension(pi.Path);
+				if (solution.DefaultTemplates.ContainsKey (clsName))
+					continue;
+				solution.DefaultTemplates [clsName] = pi.AbsolutePath;
+			}
+			foreach (ProjectFile pi in tmpFiles.Where(pp=>pp.Type == ItemType.EmbeddedResource)) {				
+				string resId = pi.ResourceID;
+				string clsName = resId.Substring (0, resId.Length - 9);
+				if (solution.DefaultTemplates.ContainsKey (clsName))
+					continue;
+				solution.DefaultTemplates [clsName] = pi.Path;
+			}
+
+			foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference>()) {				
+				Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);
+				if (p == null)
+					throw new Exception ("referenced project not found");
+				p.GetDefaultTemplates ();
+			}
+		}
+//		void searchTemplatesIn(Assembly assembly){
+//			if (assembly == null)
+//				return;
+//			foreach (string resId in assembly
+//				.GetManifestResourceNames ()
+//				.Where (r => r.EndsWith (".template", StringComparison.OrdinalIgnoreCase))) {
+//				string clsName = resId.Substring (0, resId.Length - 9);
+//				if (DefaultTemplates.ContainsKey (clsName))
+//					continue;
+//				DefaultTemplates[clsName] = "#" + resId;
+//			}
+//		}
+
 		public void GetStyling () {
-			foreach (ProjectFile pi in flattenNodes.OfType<ProjectFile> ().Where (pp=>pp.Type == ItemType.EmbeddedResource)) {
-				Console.WriteLine (pi.Extension);
-			}			
+			foreach (ProjectFile pi in flattenNodes.OfType<ProjectFile> ().Where (pp=>pp.Type == ItemType.EmbeddedResource && pp.Extension == ".style")) {
+				using (Stream s = new MemoryStream (System.Text.Encoding.UTF8.GetBytes(pi.Source))) {
+					new StyleReader (solution.Styling, s, pi.ResourceID);
+				}
+			}
+			foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference>()) {				
+				Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);
+				if (p == null)
+					throw new Exception ("referenced project not found");
+				p.GetStyling();
+			}
+
+			//TODO:get styling from referenced assemblies
 		}
 	}
 }

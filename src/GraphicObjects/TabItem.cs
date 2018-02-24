@@ -217,7 +217,7 @@ namespace Crow
 			//if tab is used as a templated item root in a templatedGroup, local datasource
 			//is not null, in this case, removing the data entries will delete automatically the item
 			if (localDataSourceIsNull)
-				(Parent as TabView).DeleteChild (this);
+				(Parent as TabView)?.DeleteChild (this);
 		}
 		#endregion
 

@@ -2,7 +2,7 @@
 <ItemTemplate>
 	<Label Text="{}" Background="DarkRed" Foreground="White"/>
 </ItemTemplate>
-<ItemTemplate DataType="CrowIDE.Project" Data="RootItems" DataTest="Type">
+<ItemTemplate DataType="Crow.Coding.Project" Data="RootItems" DataTest="Type">
 	<Expandable Caption="{Name}" ContextCommands="{Commands}" >
 		<Template>
 			<VerticalStack>
