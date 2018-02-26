@@ -7,7 +7,7 @@
 		<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"
 			Background="{./Background}"
 			ScrollY="{../scrollbar1.Value}">
-			<VerticalStack
+			<VerticalStack Spacing="1"
 				Height="Fit" Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
 		</Scroller>
 		<ScrollBar

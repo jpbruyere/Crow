@@ -117,6 +117,7 @@
     <Compile Include="src\SourceEditor\Token.cs" />
     <Compile Include="src\SourceEditor\XMLParser.cs" />
     <Compile Include="src\SourceEditor\StyleParser.cs" />
+    <Compile Include="src\PropertyContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />

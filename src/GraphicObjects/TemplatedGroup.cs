@@ -40,6 +40,24 @@ namespace Crow
 {
 	public abstract class TemplatedGroup : TemplatedControl
 	{
+		#if DESIGN_MODE
+		public override void getIML (System.Xml.XmlDocument doc, System.Xml.XmlNode parentElem)
+		{
+			if (this.design_isTGItem)
+				return;
+			base.getIML (doc, parentElem);
+
+			if (string.IsNullOrEmpty(_itemTemplate)) {
+				foreach (ItemTemplate it in ItemTemplates.Values) 
+					it.getIML (doc, parentElem.LastChild);				
+			}
+
+			foreach (GraphicObject g in Items) {
+				g.getIML (doc, parentElem.LastChild);	
+			}
+		}
+		#endif
+
 		#region CTOR
 		protected TemplatedGroup() : base(){}
 		public TemplatedGroup (Interface iface) : base(iface){}
@@ -429,6 +447,9 @@ namespace Crow
 
 			lock (IFace.LayoutMutex) {
 				g = iTemp.CreateInstance();
+				#if DESIGN_MODE
+				g.design_isTGItem = true;
+				#endif
 				page.AddChild (g);
 //				if (isPaged)
 				g.LogicalParent = this;

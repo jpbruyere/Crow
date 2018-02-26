@@ -2,3 +2,16 @@
 	Width=14;
 	Height=14;
 }
+MemberViewLabel {
+	Margin=1;
+	Height=Fit;
+	Width=50%;
+	Background=White;
+}
+MemberViewHStack {
+	Focusable=true;
+	Height=Fit;
+	Spacing=1;
+	MouseEnter={Background=UnitedNationsBlue};
+	MouseLeave={Background=Transparent};
+}

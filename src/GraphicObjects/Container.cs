@@ -38,6 +38,18 @@ namespace Crow
 	/// </summary>
     public class Container : PrivateContainer
     {
+		#if DESIGN_MODE
+		public override void getIML (System.Xml.XmlDocument doc, System.Xml.XmlNode parentElem)
+		{
+			if (this.design_isTGItem)
+				return;
+			base.getIML (doc, parentElem);
+			if (child == null)
+				return;
+			child.getIML (doc, parentElem.LastChild);
+		}
+		#endif
+
 		#region CTOR
 		protected Container() : base(){}
 		public Container (Interface iface) : base(iface){}

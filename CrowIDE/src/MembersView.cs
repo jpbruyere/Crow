@@ -25,62 +25,10 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
+using Cairo;
 
 namespace Crow.Coding
-{
-	public class PropertyContainer : IValueChange
-	{
-		#region IValueChange implementation
-		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-		public virtual void NotifyValueChanged(string MemberName, object _value)
-		{
-			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
-		}
-		#endregion
-
-		PropertyInfo pi;
-		object instance;
-
-		public string Name { get { return pi.Name; }}
-		public object Value {
-			get { return pi.GetValue(instance); }
-			set {
-				try {
-					if (!pi.PropertyType.IsAssignableFrom(value.GetType()) && pi.PropertyType != typeof(string)){
-						if (pi.PropertyType.IsEnum) {
-							if (value is string) {
-								pi.SetValue (instance, Enum.Parse (pi.PropertyType, (string)value));
-							}else
-								pi.SetValue (instance, value);
-						} else {
-							MethodInfo me = pi.PropertyType.GetMethod
-								("Parse", BindingFlags.Static | BindingFlags.Public,
-									System.Type.DefaultBinder, new Type [] {typeof (string)},null);
-							pi.SetValue (instance, me.Invoke (null, new object[] { value }), null);
-						}
-					}else
-						pi.SetValue(instance, value);
-				} catch (Exception ex) {
-					System.Diagnostics.Debug.WriteLine ("Error setting property:"+ ex.ToString());
-				}
-				NotifyValueChanged ("Value", value);
-			}
-		}
-		public string Type { get { return pi.PropertyType.IsEnum ?
-					"System.Enum"
-					: pi.PropertyType.FullName; }}
-		public object[] Choices {
-			get {
-				return Enum.GetValues (pi.PropertyType).Cast<object>().ToArray();
-			}
-		}
-
-		public PropertyContainer(PropertyInfo prop, object _instance){
-			pi = prop;
-			instance = _instance;
-		}
-
-	}
+{	
 	public class MembersView : ListBox
 	{		
 		object instance;
@@ -116,11 +64,26 @@ namespace Crow.Coding
 						props.Add (new PropertyContainer (pi, instance));
 					}
 				}
-				Data = props.ToArray ();
+				Data = props.OrderBy(p=>p.Name).ToArray ();
 			}
 		}
 		public MembersView () : base()
 		{
 		}
+
+//		public override void Paint (ref Context ctx)
+//		{
+//			base.Paint (ref ctx);
+//
+//			if (SelectedIndex < 0)
+//				return;
+//
+//			Rectangle r =  Parent.ContextCoordinates(Items [SelectedIndex].Slot);
+//			ctx.SetSourceRGB (0, 0, 1);
+//			ctx.Rectangle (r);
+//			ctx.LineWidth = 2;
+//			ctx.Stroke ();
+//		}
+
 	}
 }

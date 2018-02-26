@@ -43,6 +43,20 @@ namespace Crow
 	/// </summary>
 	public abstract class TemplatedControl : PrivateContainer
 	{
+		#if DESIGN_MODE
+		public bool design_inlineTemplate = false;
+		public override void getIML (System.Xml.XmlDocument doc, System.Xml.XmlNode parentElem)
+		{
+			if (this.design_isTGItem)
+				return;
+			base.getIML (doc, parentElem);
+			if (child == null || !design_inlineTemplate)
+				return;
+			XmlElement xe = doc.CreateElement("Template");
+			child.getIML (doc, xe);
+			parentElem.LastChild.AppendChild (xe);
+		}
+		#endif
 		#region CTOR
 		protected TemplatedControl() : base(){}
 		public TemplatedControl (Interface iface) : base(iface){}
