@@ -48,6 +48,48 @@ namespace Crow
 	/// 
 	/// </summary>
 	public class ItemTemplate : Instantiator {
+		#if DESIGN_MODE
+		public void getIML (System.Xml.XmlDocument doc, System.Xml.XmlNode parentElem){		
+			if (sourcePath == "#Crow.DefaultItem.template")
+				return;
+			
+			XmlElement xe = doc.CreateElement("ItemTemplate");
+			XmlAttribute xa = null;
+
+			if (string.IsNullOrEmpty (sourcePath)) {
+				//inline item template
+				using (GraphicObject go = this.CreateInstance())
+					go.getIML (doc, xe);
+			} else {
+				xa = doc.CreateAttribute ("Path");
+				xa.Value = sourcePath;
+				xe.Attributes.Append (xa);
+			}
+
+			if (strDataType != "default") {
+				xa = doc.CreateAttribute ("DataType");
+				xa.Value = strDataType;
+				xe.Attributes.Append (xa);
+
+				if (dataTest != "TypeOf"){
+					xa = doc.CreateAttribute ("DataTest");
+					xa.Value = dataTest;
+					xe.Attributes.Append (xa);
+				}
+			}
+
+			if (!string.IsNullOrEmpty(fetchMethodName)){
+				xa = doc.CreateAttribute ("Data");
+				xa.Value = fetchMethodName;
+				xe.Attributes.Append (xa);
+			}
+				
+			parentElem.AppendChild (xe);
+
+				
+		}
+		#endif
+
 		public EventHandler Expand;
 		public BooleanTestOnInstance HasSubItems;
 		string strDataType;
@@ -61,7 +103,7 @@ namespace Crow
 		/// <param name="path">IML file to parse</param>
 		/// <param name="_dataType">type this item will be choosen for, or member of the data item</param>
 		/// <param name="_fetchDataMethod">for hierarchical data, method to call for children fetching</param>
-		public ItemTemplate(Interface _iface, string path, string _dataTest = "TypeOf", string _dataType = null, string _fetchDataMethod = null)
+		public ItemTemplate(Interface _iface, string path, string _dataTest = "TypeOf", string _dataType = "default", string _fetchDataMethod = null)
 			: base(_iface, path) {
 			strDataType = _dataType;
 			fetchMethodName = _fetchDataMethod;
@@ -251,6 +293,9 @@ namespace Crow
 
 			il.Emit (OpCodes.Callvirt, miGetDatas);
 		}
+
+	
+	
 	}
 }
 

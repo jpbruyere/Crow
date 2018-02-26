@@ -263,7 +263,7 @@ namespace Crow.IML
 				itemTmpID += path+dataType+datas;
 				if (!iface.Instantiators.ContainsKey (itemTmpID))
 					iface.Instantiators [itemTmpID] =
-						new ItemTemplate (iface, Interface.GetStreamFromPath (path), dataTest, dataType, datas);
+						new ItemTemplate (iface, path, dataTest, dataType, datas);
 			}
 			return new string [] { dataType, itemTmpID, datas, dataTest };
 		}
@@ -289,6 +289,11 @@ namespace Crow.IML
 						continue;
 					if (reader.Name == "Template") {
 						inlineTemplate = true;
+						#if DESIGN_MODE
+						ctx.il.Emit (OpCodes.Ldloc_0);
+						ctx.il.Emit (OpCodes.Ldc_I4_1);
+						ctx.il.Emit (OpCodes.Stfld, typeof(TemplatedControl).GetField("design_inlineTemplate"));
+						#endif
 						reader.Read ();
 						readChildren (reader, ctx, -1);
 					} else if (reader.Name == "ItemTemplate")

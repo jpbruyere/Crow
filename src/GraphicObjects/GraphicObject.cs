@@ -36,6 +36,12 @@ using System.Diagnostics;
 using Crow.IML;
 using System.Threading;
 
+
+#if DESIGN_MODE
+using System.Xml;
+using System.IO;
+#endif
+
 namespace Crow
 {
 	/// <summary>
@@ -50,6 +56,42 @@ namespace Crow
 		public int design_column;
 		public string design_imlPath;
 		public Dictionary<string,string> design_members = new Dictionary<string, string>();
+		public bool design_isTGItem = false;
+
+		public string GetIML(){
+			XmlDocument doc = new XmlDocument( );
+
+			using (StringWriter sw = new StringWriter ()) {
+				XmlWriterSettings settings = new XmlWriterSettings {
+					Indent = true,
+					IndentChars = "\t",
+				};
+				using (XmlWriter xtw = XmlWriter.Create (sw, settings)) {
+					//(1) the xml declaration is recommended, but not mandatory
+					XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration ("1.0", "UTF-8", null);
+					doc.InsertBefore (xmlDeclaration, null);
+					getIML (doc, (XmlNode)doc);
+					doc.WriteTo (xtw);
+				}
+				return sw.ToString ();
+			}
+		}
+
+		public virtual void getIML(XmlDocument doc, XmlNode parentElem) {
+			if (this.design_isTGItem)
+				return;
+			
+			XmlElement xe = doc.CreateElement(this.GetType().Name);
+
+			foreach (KeyValuePair<string,string> kv in design_members) {
+				XmlAttribute xa = doc.CreateAttribute (kv.Key);
+				xa.Value = kv.Value;
+				xe.Attributes.Append (xa);
+			}
+
+			parentElem.AppendChild (xe);
+		}
+
 		#endif
 
 		#region IDisposable implementation
