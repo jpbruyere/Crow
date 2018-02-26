@@ -45,6 +45,13 @@ namespace Crow
 	{
 		internal ReaderWriterLockSlim parentRWLock = new ReaderWriterLockSlim();
 
+		#if DESIGN_MODE
+		public int design_line;
+		public int design_column;
+		public string design_imlPath;
+		public Dictionary<string,string> design_members = new Dictionary<string, string>();
+		#endif
+
 		#region IDisposable implementation
 		protected bool disposed = false;
 
