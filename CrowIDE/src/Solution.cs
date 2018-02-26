@@ -139,11 +139,11 @@ namespace Crow.Coding{
 
 		void onSelectedItemChanged (object sender, SelectionChangeEventArgs e){			
 			ProjectItem pi = e.NewValue as ProjectItem;
-			if (pi == null)
-				return;
-			if (openedItems.Contains (pi))
-				return;
-			openedItems.AddElement (pi);
+			if (pi != null) {				
+				if (!openedItems.Contains (pi))
+					openedItems.AddElement (pi);
+			}
+			this.SelectedItem = pi;
 		}
 		public void OnCloseTab (object sender, MouseButtonEventArgs e){			
 			

@@ -4,90 +4,12 @@
 		<Label Text="Error" Background="Red"/>
 	</TabItem>
 </ItemTemplate>
-<ItemTemplate DataType=".cs" DataTest="Extension">
-	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
-		<VerticalStack>
-			<HorizontalStack Height="Stretched" >
-				<SourceEditor Focusable="true" Name="editor" Font="monospace, 12" VerticalAlignment="Top" Margin="10"
-						Foreground="Jet" Background="White" Width="Stretched" Height="Stretched"
-						ProjectNode="{}"  KeyDown="textView_KeyDown"/>
-				<ScrollBar Name="scrollbarY" Value="{²../editor.ScrollY}"
-						   LargeIncrement="{../editor.VisibleLines}"
-						   CursorSize="{../editor.ChildHeightRatio}"
-					Maximum="{../editor.MaxScrollY}" Orientation="Vertical"
-					Width="14" />
-			</HorizontalStack>
-			<ScrollBar Name="scrollbarX" Value="{²../editor.ScrollX}"
-					Maximum="{../editor.MaxScrollX}" Orientation="Horizontal"
-					Height="14" />			
-			<HorizontalStack Height="Fit">
-				<GraphicObject Height="5" Width="Stretched"/>
-				<GraphicObject Background="Red" Width="5" Height="5" Visible="{../../editor.IsDirty}"/>
-				<Label Text="column:"/>
-				<Label Text="{../../editor.CurrentColumn}"/>
-				<Label Text="Line:"/>
-				<Label Text="{../../editor.CurrentLine}"/>
-				<Label Text="ScrollX:"/>
-				<Label Text="{../../editor.ScrollX}"/>
-			</HorizontalStack>
-		</VerticalStack>
-	</TabItem>
-</ItemTemplate>
 <ItemTemplate DataType=".svg" DataTest="Extension">
 	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
 		<Image Path="{AbsolutePath}"/>
 	</TabItem>
 </ItemTemplate>
-<ItemTemplate DataType=".style" DataTest="Extension">
-	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
-		<HorizontalStack>
-			<Scroller Name="scroller1" Background="White"
-					Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}"
-					ValueChanged="./_scroller_ValueChanged">
-				<TextBox VerticalAlignment="Top"
-					Text="{²Source}" Multiline="true" TextAlignment="TopLeft"
-					Font="Courriernew 10"/>
-			</Scroller>
-			<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}"
-				LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
-				CursorSize="{../scroller1.ChildHeightRatio}"
-				Maximum="{../scroller1.MaximumScroll}" Orientation="Vertical"
-				Width="14" />
-		</HorizontalStack>
-	</TabItem>
-</ItemTemplate>
-<ItemTemplate DataType=".crow" DataTest="Extension">		
-	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
-		<VerticalStack>
-			<Label Width="Stretched" Margin="1" Text="{HoverWidget}"/>
-			<ImlVisualEditor Height="60%" Margin="0" MinimumSize="10,10" Foreground="SkyBlue"					
-				ProjectNode="{}" SelectedItem="{²SelectedItem}"
-				Name="crowContainer" Background="Onyx"/>
-			<Splitter/>
-			<HorizontalStack Height="Stretched" >
-				<SourceEditor Focusable="true" Name="editor" Font="monospace, 11" VerticalAlignment="Top" Margin="10"
-						Foreground="Jet" Background="White" Width="Stretched" Height="Stretched"
-						ProjectNode="{}"  KeyDown="textView_KeyDown"/>
-				<ScrollBar Name="scrollbarY" Value="{²../editor.ScrollY}"
-						   LargeIncrement="{../editor.VisibleLines}"
-						   CursorSize="{../editor.ChildHeightRatio}"
-					Maximum="{../editor.MaxScrollY}" Orientation="Vertical"
-					Width="14" />
-			</HorizontalStack>
-			<ScrollBar Name="scrollbarX" Value="{²../editor.ScrollX}"
-					Maximum="{../editor.MaxScrollX}" Orientation="Horizontal"
-					Height="14" />
-			<HorizontalStack Height="Fit">
-				<Label DataSource="{../../crowContainer.IMLError}" Background="Red" Fit="true" Text="{Message}"/>
-				<GraphicObject Height="5" Width="Stretched"/>
-				<GraphicObject Background="Red" Width="5" Height="5" Visible="{../../editor.IsDirty}"/>
-				<Label Text="column:"/>
-				<Label Text="{../../editor.CurrentColumn}"/>
-				<Label Text="Line:"/>
-				<Label Text="{../../editor.CurrentLine}"/>
-				<Label Text="ScrollX:"/>
-				<Label Text="{../../editor.ScrollX}"/>
-			</HorizontalStack>
-		</VerticalStack>
-	</TabItem>
-</ItemTemplate>
+<ItemTemplate Path="#Crow.Coding.ui.SrcEdit.itemp" DataType=".cs" DataTest="Extension"/>
+<ItemTemplate Path="#Crow.Coding.ui.SrcEdit.itemp" DataType=".style" DataTest="Extension"/>
+<ItemTemplate Path="#Crow.Coding.ui.IMLEdit.itemp" DataType=".crow" DataTest="Extension"/>
+<ItemTemplate Path="#Crow.Coding.ui.IMLEdit.itemp" DataType=".template" DataTest="Extension"/>

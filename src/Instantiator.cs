@@ -41,7 +41,7 @@ namespace Crow.IML
 	public class InstantiatorException : Exception {
 		public string Path;
 		public InstantiatorException (string path, Exception innerException)
-			: base ("ITor exception in " + path, innerException){
+			: base ("ITor error:" + path, innerException){
 			Path = path;
 		}
 	}
@@ -129,13 +129,13 @@ namespace Crow.IML
 		/// <param name="fragment">IML string</param>
 		public static Instantiator CreateFromImlFragment (Interface _iface, string fragment)
 		{
-			try {
+//			try {
 				using (Stream s = new MemoryStream (Encoding.UTF8.GetBytes (fragment))) {
 					return new Instantiator (_iface, s);
 				}
-			} catch (Exception ex) {
-				throw new Exception ("IML Error: " + ex.Message);
-			}
+//			} catch (Exception ex) {
+//				throw new Exception ("IML Error: " + ex.Message);
+//			}
 		}
 		#endregion
 
@@ -213,6 +213,13 @@ namespace Crow.IML
 		/// </summary>
 		void emitLoader (XmlReader reader, IMLContext ctx)
 		{
+			int curLine = ctx.curLine;
+
+			#if DESIGN_MODE
+			IXmlLineInfo li = (IXmlLineInfo)reader;
+			ctx.curLine += li.LineNumber - 1;
+			#endif
+
 			string tmpXml = reader.ReadOuterXml ();
 
 			if (ctx.nodesStack.Peek().HasTemplate)
@@ -220,6 +227,7 @@ namespace Crow.IML
 
 			emitGOLoad (ctx, tmpXml);
 
+			ctx.curLine = curLine;
 			//emitCheckAndBindValueChanged (ctx);
 		}
 		/// <summary>
@@ -334,7 +342,7 @@ namespace Crow.IML
 				//add the default item template if no default is defined
 				if (!itemTemplateIds.Any(ids=>ids[0] == "default"))
 					itemTemplateIds.Add (new string [] { "default", "#Crow.DefaultItem.template", "", "TypeOf"});
-				//copy item templates (review this)
+				//get item templates 
 				foreach (string [] iTempId in itemTemplateIds) {
 					ctx.il.Emit (OpCodes.Ldloc_0);//load TempControl ref
 					ctx.il.Emit (OpCodes.Ldfld, CompilerServices.fldItemTemplates);//load ItemTemplates dic field
@@ -368,6 +376,21 @@ namespace Crow.IML
 			using (XmlTextReader reader = new XmlTextReader (tmpXml, XmlNodeType.Element, null)) {
 				reader.Read ();
 
+				#if DESIGN_MODE
+				IXmlLineInfo li = (IXmlLineInfo)reader;
+				ctx.il.Emit (OpCodes.Ldloc_0);
+				ctx.il.Emit (OpCodes.Ldc_I4, ctx.curLine + li.LineNumber);
+				ctx.il.Emit (OpCodes.Stfld, typeof(GraphicObject).GetField("design_line"));
+				ctx.il.Emit (OpCodes.Ldloc_0);
+				ctx.il.Emit (OpCodes.Ldc_I4, li.LinePosition);
+				ctx.il.Emit (OpCodes.Stfld, typeof(GraphicObject).GetField("design_column"));
+				if (!string.IsNullOrEmpty (sourcePath)) {
+					ctx.il.Emit (OpCodes.Ldloc_0);
+					ctx.il.Emit (OpCodes.Ldstr, sourcePath);
+					ctx.il.Emit (OpCodes.Stfld, typeof(GraphicObject).GetField("design_imlPath"));
+				}
+				#endif
+
 				#region Styling and default values loading
 				//first check for Style attribute then trigger default value loading
 				if (reader.HasAttributes) {
@@ -385,6 +408,20 @@ namespace Crow.IML
 					while (reader.MoveToNextAttribute ()) {
 						if (reader.Name == "Style")
 							continue;
+
+						#if DESIGN_MODE
+						//store member value in iml
+						ctx.il.Emit (OpCodes.Ldloc_0);
+						ctx.il.Emit (OpCodes.Ldfld, typeof(GraphicObject).GetField("design_members"));
+						ctx.il.Emit (OpCodes.Ldstr, reader.Name);
+						if (string.IsNullOrEmpty (reader.Value))
+							ctx.il.Emit (OpCodes.Ldnull);
+						else
+							ctx.il.Emit (OpCodes.Ldstr, reader.Value);
+						ctx.il.Emit (OpCodes.Call, 
+							typeof(Dictionary<string, string>).GetMethod ("set_Item", new Type[] { typeof(string), typeof(string) }));
+						#endif
+
 
 						MemberInfo mi = ctx.CurrentNodeType.GetMember (reader.Name).FirstOrDefault ();
 						if (mi == null)

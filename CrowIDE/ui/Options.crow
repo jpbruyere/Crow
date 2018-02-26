@@ -1,0 +1,10 @@
+﻿<?xml version="1.0"?>
+<Window Caption="Graphic Tree" Width="20%" Height="70%" AlwaysOnTop="true">
+	<TabView>
+		<TabItem Caption="Editor">
+			<VerticalStack>
+				<CheckBox Caption="Print Line Numbers" IsChecked=""/>
+			</VerticalStack>
+		</TabItem>
+	</TabView>
+</Window>

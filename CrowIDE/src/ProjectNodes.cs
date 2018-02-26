@@ -42,7 +42,11 @@ namespace Crow.Coding
 		Compile,
 		EmbeddedResource,
 	}
-
+	public enum CopyToOutputState {
+		Never,
+		Always,
+		PreserveNewest
+	}
 	public class ProjectNode  : IValueChange
 	{
 		#region IValueChange implementation
@@ -137,21 +141,23 @@ namespace Crow.Coding
 			}
 		}
 	}
-	public enum CopyToOutputState {
-		Never,
-		Always,
-		PreserveNewest
-	}
-	public class ProjectFile : ProjectItem {
-		bool isDirty = false;
+
+	public class ProjectFile : ProjectItem {		
 		bool isOpened = false;
-//		bool isSelected = false;
 		DateTime accessTime;
 		string source;
+		string origSource;
 		object selectedItem;
 
+		public List<Crow.Command> Commands;
 
-		public ProjectFile (ProjectItem pi) : base (pi.Project, pi.node){			
+		public ProjectFile (ProjectItem pi) : base (pi.Project, pi.node){
+			Commands = new List<Crow.Command> (new Crow.Command[] {
+				new Crow.Command(new Action(() => Open())) 
+				{ Caption = "Open", Icon = new SvgPicture("#Crow.Coding.ui.icons.outbox.svg"), CanExecute = false},
+				new Crow.Command(new Action(() => Save()))
+				{ Caption = "Save", Icon = new SvgPicture("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false},
+			});
 		}
 
 		public string ResourceID {
@@ -169,14 +175,9 @@ namespace Crow.Coding
 		}
 		public string Source {
 			get {
-				if (!isOpened) {
-					accessTime = System.IO.File.GetLastWriteTime (AbsolutePath);
-					using (StreamReader sr = new StreamReader (AbsolutePath)) {
-						source = sr.ReadToEnd ();
-					}
-					isOpened = true;
-					isDirty = false;
-				} else {
+				if (!isOpened)
+					Open ();
+				else {
 					if (DateTime.Compare (
 						    accessTime,
 						    System.IO.File.GetLastWriteTime (AbsolutePath)) < 0)
@@ -189,9 +190,31 @@ namespace Crow.Coding
 					return;
 				source = value;
 				NotifyValueChanged ("Source", source);
+				NotifyValueChanged ("IsDirty", IsDirty);
 			}
 		}
-			
+		public bool IsDirty {
+			get { return source != origSource; }
+		}
+		int curLine, curColumn;
+		public int CurrentColumn{
+			get { return curColumn; }
+			set {
+				if (curColumn == value)
+					return;
+				curColumn = value;
+				NotifyValueChanged ("CurrentColumn", curColumn);
+			}
+		}
+		public int CurrentLine{
+			get { return curLine; }
+			set {
+				if (curLine == value)
+					return;
+				curLine = value;
+				NotifyValueChanged ("CurrentLine", curLine);
+			}
+		}
 //		public bool IsSelected {
 //			get { return isSelected; }
 //			set { 
@@ -212,16 +235,36 @@ namespace Crow.Coding
 				NotifyValueChanged ("SelectedItem", selectedItem);
 			}
 		}
+
 		public CopyToOutputState CopyToOutputDirectory {
 			get {
 				XmlNode xn = node.SelectSingleNode ("CopyToOutputDirectory");
-				if (xn == null)
-					return CopyToOutputState.Never;
-				CopyToOutputState tmp = (CopyToOutputState)Enum.Parse (typeof(CopyToOutputState), xn.InnerText, true);
-				return tmp;
-				//return xn == null ? CopyToOutputState.Never : (CopyToOutputState)Enum.Parse (typeof(CopyToOutputState), xn.InnerText, true);
+//				if (xn == null)
+//					return CopyToOutputState.Never;
+//				CopyToOutputState tmp = (CopyToOutputState)Enum.Parse (typeof(CopyToOutputState), xn.InnerText, true);
+//				return tmp;
+				return xn == null ? CopyToOutputState.Never :
+					(CopyToOutputState)Enum.Parse (typeof(CopyToOutputState), xn.InnerText, true);
 			}
 		}
+
+		public void Open () {
+			accessTime = System.IO.File.GetLastWriteTime (AbsolutePath);
+			using (StreamReader sr = new StreamReader (AbsolutePath)) {
+				source = sr.ReadToEnd ();
+			}
+			isOpened = true;
+			origSource = source;
+			NotifyValueChanged ("IsDirty", false);
+		}
+		public void Save () {
+			using (StreamWriter sw = new StreamWriter (AbsolutePath)) {
+				sw.Write (source);
+			}
+			origSource = source;
+			NotifyValueChanged ("IsDirty", false);
+		}
+
 		public void OnQueryClose (object sender, EventArgs e){
 			Project.solution.CloseItem (this);
 		}

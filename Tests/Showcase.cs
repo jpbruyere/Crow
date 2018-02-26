@@ -118,9 +118,9 @@ namespace Tests
 				lock (this.ifaceControl [0].CrowInterface.UpdateMutex) {
 					Instantiator inst = null;
 					using (MemoryStream ms = new MemoryStream (Encoding.UTF8.GetBytes (e.Text))){
-						inst = new Instantiator (ms);
+						inst = new Instantiator (this.ifaceControl [0].CrowInterface, ms);
 					}
-					g = inst.CreateInstance (this.ifaceControl [0].CrowInterface);
+					g = inst.CreateInstance ();
 					crowContainer.SetChild (g);
 					g.DataSource = this;
 				}

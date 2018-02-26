@@ -17,16 +17,16 @@ namespace Crow.Coding
 			BlockCommentStart = Parser.TokenType.BlockCommentStart,
 			BlockComment = Parser.TokenType.BlockComment,
 			BlockCommentEnd = Parser.TokenType.BlockCommentEnd,
-			Affectation = Parser.TokenType.Affectation,
-			XMLDecl = Parser.TokenType.Preprocessor,
-			ElementStart,
-			ElementEnd,
-			ElementClosing = Parser.TokenType.StatementEnding,
 			ElementName = Parser.TokenType.Type,
 			AttributeName = Parser.TokenType.Identifier,
+			ElementClosing = Parser.TokenType.StatementEnding,
+			Affectation = Parser.TokenType.Affectation,
 			AttributeValueOpening = Parser.TokenType.StringLitteralOpening,
 			AttributeValueClosing = Parser.TokenType.StringLitteralClosing,
 			AttributeValue = Parser.TokenType.StringLitteral,
+			XMLDecl = Parser.TokenType.Preprocessor,
+			ElementStart = 50,
+			ElementEnd = 51,
 		}
 
 		public enum States
@@ -221,9 +221,14 @@ namespace Crow.Coding
 						while (nextCharIsValidCharName)
 							readToCurrTok ();
 						saveAndResetCurrentTok (TokenType.AttributeName);
+
+						SkipWhiteSpaces ();
+
 						if (Peek () != '=')
 							throw new ParsingException (this, "Expecting: '='");
 						readAndResetCurrentTok (TokenType.Affectation, true);
+
+						SkipWhiteSpaces ();
 
 						char openAttVal = Peek ();
 						if (openAttVal != '"' && openAttVal != '\'')
@@ -250,7 +255,6 @@ namespace Crow.Coding
 
 			cl.EndingState = (int)curState;
 		}
-
 		public override void SyntaxAnalysis ()
 		{
 			RootNode = new Node () { Name = "RootNode", Type="Root" };

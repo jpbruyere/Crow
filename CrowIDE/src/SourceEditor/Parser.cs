@@ -3,6 +3,7 @@ using System.IO;
 using Crow;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 
 namespace Crow.Coding
 {
@@ -16,27 +17,28 @@ namespace Crow.Coding
 		/// see XMLParser for example.
 		/// </summary>
 		public enum TokenType {
-			Unknown,
-			WhiteSpace,
-			NewLine,
-			LineComment,
-			BlockCommentStart,
-			BlockComment,
-			BlockCommentEnd,
-			Type,
-			Identifier,
-			Indexer,
-			OpenBlock,
-			CloseBlock,
-			StatementEnding,
-			UnaryOp,
-			BinaryOp,
-			Affectation,
-			StringLitteralOpening,
-			StringLitteralClosing,
-			StringLitteral,
-			NumericLitteral,
-			Preprocessor,
+			Unknown = 0,
+			WhiteSpace = 1,
+			NewLine = 2,
+			LineComment = 3,
+			BlockCommentStart = 4,
+			BlockComment = 5,
+			BlockCommentEnd = 6,
+			Type = 7,
+			Identifier = 8,
+			Indexer = 9,
+			OpenBlock = 10,
+			CloseBlock = 11,
+			StatementEnding = 12,
+			UnaryOp = 13,
+			BinaryOp = 14,
+			Affectation = 15,
+			StringLitteralOpening = 16,
+			StringLitteralClosing = 17,
+			StringLitteral = 18,
+			NumericLitteral = 19,
+			Preprocessor = 20,
+			Keyword = 21,
 		}
 
 		#region CTOR
@@ -196,6 +198,17 @@ namespace Crow.Coding
 			currentTok = default(Token);
 		}
 		/// <summary>
+		/// Save current token into current TokensLine after having skipped white spaces and raz current token
+		/// </summary>
+		protected void saveAndResetAfterWhiteSpaceSkipping() {			
+			buffer[currentLine].Tokens.Add (currentTok);
+			currentTok = default(Token);
+			if (WpToken == null)
+				return;
+			buffer[currentLine].Tokens.Add ((Token)WpToken);
+			WpToken = null;
+		}
+		/// <summary>
 		/// read one char and add current token to current TokensLine, current token is reset
 		/// </summary>
 		/// <param name="type">Type of the token</param>
@@ -211,6 +224,14 @@ namespace Crow.Coding
 		protected void saveAndResetCurrentTok(System.Enum type) {
 			currentTok.Type = (TokenType)type;
 			saveAndResetCurrentTok ();
+		}
+		/// <summary>
+		/// Save current tok after having skipped white spaces
+		/// </summary>
+		/// <param name="type">set the type of the tok</param>
+		protected void saveAndResetAfterWhiteSpaceSkipping(System.Enum type) {
+			currentTok.Type = (TokenType)type;
+			saveAndResetAfterWhiteSpaceSkipping ();
 		}
 		/// <summary>
 		/// Peek next char, emit '\n' if current column > buffer's line length
@@ -253,10 +274,13 @@ namespace Crow.Coding
 		/// </summary>
 		/// <returns>string read</returns>
 		protected virtual string ReadLine () {
-			string tmp = "";
-			while (!eol)
-				tmp += Read ();
-			return tmp;
+			StringBuilder tmp = new StringBuilder();
+			char c = Read ();
+			while (!eol) {
+				tmp.Append (c);
+				c = Read ();
+			}
+			return tmp.ToString();
 		}
 		/// <summary>
 		/// read until end expression is reached or end of line.
@@ -278,20 +302,30 @@ namespace Crow.Coding
 			return tmp;
 		}
 		/// <summary>
-		/// skip white spaces, but not line break. Save spaces in a WhiteSpace token.
+		/// skip white spaces, but not line break. Save spaces in a WhiteSpace token and dont
+		/// save it directely if currentTok is not null
 		/// </summary>
 		protected void SkipWhiteSpaces () {
-			if (currentTok.Type != TokenType.Unknown)
-				throw new ParsingException (this, "current token should be reset to unknown (0) before skiping white spaces");
+			if (WpToken != null)
+				throw new ParsingException (this, "white space token already pending");
+			Token wp = default(Token);
 			while (!eol) {
 				if (!char.IsWhiteSpace (Peek ())||Peek()=='\n')
 					break;
-				readToCurrTok (currentTok.Type == TokenType.Unknown);
-				currentTok.Type = TokenType.WhiteSpace;
+				if (wp.Type == TokenType.Unknown)
+					wp.Start = CurrentPosition;
+				wp += Read();
+				wp.Type = TokenType.WhiteSpace;
 			}
-			if (currentTok.Type != TokenType.Unknown)
-				saveAndResetCurrentTok ();
+			if (wp.Type == TokenType.Unknown)
+				return;
+			wp.End = CurrentPosition;
+			if (currentTok.Type == TokenType.Unknown)
+				buffer [currentLine].Tokens.Add (wp);
+			else
+				WpToken = wp;
 		}
+		protected object WpToken = null;
 		#endregion
 	}
 }

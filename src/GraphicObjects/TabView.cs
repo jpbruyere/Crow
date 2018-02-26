@@ -78,6 +78,9 @@ namespace Crow
 		public virtual int SelectedTab {
 			get { return selectedTab; }
 			set {
+				if (value < 0)//prevent TemplatedGroup index binding set to -1
+					return;
+				
 				if (selectedTab < Children.Count && SelectedTab >= 0)
 					(Children [selectedTab] as TabItem).IsSelected = false;
 

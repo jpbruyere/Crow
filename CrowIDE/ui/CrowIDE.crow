@@ -32,6 +32,7 @@
 			</MenuItem>
 		</Menu>
 		<VerticalStack DataSource="{CurrentSolution}">
+			<Label Background="Gray" Text="{SelectedItem}" Width="Stretched" TextAlignment="Left"/>
 			<HorizontalStack Height="80%">
 				<EditPane SelectedItem="{SelectedItem}" SelectedItemElement="{²SelectedItemElement}" Data="{OpenedItems}" DataTest="Extension"
 					ItemTemplate="#Crow.Coding.ui.EditPaneItems.template"/>
@@ -48,11 +49,11 @@
 			<Splitter/>
 			<ListBox Width="Stretched" Data="{CompilerErrors}">
 				<ItemTemplate>
-					<HorizontalStack Height="Fit" Margin="0" Focusable="true" Spacing="15"
+					<HorizontalStack Height="Fit" Margin="0" Focusable="true" Spacing="10"
 							MouseEnter="{Background=SteelBlue}"
 							MouseLeave="{Background=Transparent}">						
-						<Image Width="16" Height="16" Path="#Crow.Icons.compiler_error.svg" SvgSub="{IsWarning}"/>
-						<Label Text="{Line}" Width="30" />
+						<Image Width="10" Height="10" Path="#Crow.Icons.compiler_error.svg" SvgSub="{IsWarning}"/>
+						<Label Text="{Line}" Width="25" TextAlignment="Right"/>
 						<Label Text="{ErrorText}" Width="60%"/>
 						<Label Text="{FileName}" Width="Fit"/>
 					</HorizontalStack>

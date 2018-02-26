@@ -88,7 +88,9 @@ namespace Crow.Coding
 			set {
 				if (HoverWidget == value)
 					return;
+				
 				imlVE.HoverWidget = value;
+
 				NotifyValueChanged ("HoverWidget", HoverWidget);
 			}
 		}
@@ -131,7 +133,11 @@ namespace Crow.Coding
 					return;
 				imlError = value;
 				NotifyValueChanged ("IMLError", imlError);
+				NotifyValueChanged ("HasError", HasError);
 			}
+		}
+		[XmlIgnore]public bool HasError {
+			get { return imlError != null; }
 		}
 
 		void reload(){
@@ -147,7 +153,8 @@ namespace Crow.Coding
 				imlVE.LoadIMLFragment(projectItem.Source);
 				IMLError = null;
 			} catch (Exception ex) {
-				IMLError = ex;
+				IMLError = ex.InnerException;
+				Console.WriteLine (ex.ToString ());
 			}
 		}
 
@@ -207,6 +214,12 @@ namespace Crow.Coding
 		{
 			//base.onMouseDown (sender, e);
 			SelectedItem = HoverWidget;
+
+			if (SelectedItem != null && projectItem != null) {
+				projectItem.CurrentLine = HoverWidget.design_line;
+				projectItem.CurrentColumn = HoverWidget.design_column;
+			}
+
 		}
 		protected override void onDraw (Cairo.Context gr)
 		{

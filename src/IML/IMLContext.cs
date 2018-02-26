@@ -42,7 +42,8 @@ namespace Crow.IML
 	/// </summary>
 	public class IMLContext
 	{
-		public XmlTextReader reader = null;
+		public XmlReader reader = null;
+		public int curLine = 0;
 		public Type RootType = null;
 
 		public DynamicMethod dm = null;

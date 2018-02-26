@@ -32,7 +32,7 @@
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <Optimize>false</Optimize>
     <OutputPath>$(SolutionDir)build\Debug</OutputPath>
-    <DefineConstants>DEBUG_UPDATE0;DEBUG_FOCUS0;DEBUG_DISPOSE0;DEBUG_LAYOUTING0;TRACE0;DEBUG;MEASURE_TIME;DEBUG_LOAD;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
+    <DefineConstants>DESIGN_MODE;DEBUG_UPDATE0;DEBUG_FOCUS0;DEBUG_DISPOSE0;DEBUG_LAYOUTING0;TRACE0;DEBUG;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>

@@ -338,7 +338,7 @@ namespace Crow.Coding
 
 				if (_currentCol >  lines [_currentLine].Length)
 					_currentCol = lines [_currentLine].Length;
-				Debug.WriteLine ("buff cur line: " + _currentLine);
+				//Debug.WriteLine ("buff cur line: " + _currentLine);
 				PositionChanged.Raise (this, null);
 			}
 		}

@@ -94,6 +94,7 @@
 </ItemTemplate>
 <ItemTemplate DataType="EmbeddedResource" DataTest="Type">
 	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
+			ContextCommands="{Commands}"
 			MouseEnter="{Foreground=DimGray}"
 			MouseLeave="{Foreground=Transparent}">
 		<HorizontalStack>

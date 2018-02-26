@@ -73,11 +73,7 @@ namespace Crow.Coding
 			}
 		}
 		public bool IsStartupProject {
-			get { 
-				bool result = solution.StartupProject == this; 
-				System.Diagnostics.Debug.WriteLine ("is startup project tested for {0} => {1}", this.ProjectGuid, result);
-				return result;
-			}
+			get { return solution.StartupProject == this; }
 		}
 		public string Path {
 			get { return System.IO.Path.Combine (solution.SolutionFolder, solutionProject.RelativePath.Replace('\\','/')); }
@@ -327,8 +323,11 @@ namespace Crow.Coding
 				}
 				parameters.ReferencedAssemblies.Add (pi.Path);
 				string fullHintPath = System.IO.Path.GetFullPath(System.IO.Path.Combine (RootDir, pi.HintPath.Replace('\\','/')));
-				if (File.Exists(fullHintPath))
-					File.Copy (fullHintPath, System.IO.Path.Combine(outputDir, System.IO.Path.GetFileName(fullHintPath)));
+				if (File.Exists (fullHintPath)) {
+					string outPath = System.IO.Path.Combine (outputDir, System.IO.Path.GetFileName (fullHintPath));
+					if (!File.Exists(outPath))
+						File.Copy (fullHintPath, outPath);
+				}
 			}
 			parameters.CompilerOptions += " /reference:/usr/lib/mono/4.5/System.Core.dll";
 			parameters.CompilerOptions += " /reference:/usr/lib/mono/4.5/mscorlib.dll";
