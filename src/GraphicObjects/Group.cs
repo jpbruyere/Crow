@@ -39,6 +39,20 @@ namespace Crow
 	public class Group : GraphicObject
     {
 		#if DESIGN_MODE
+		public override bool FindByDesignID(string designID, out GraphicObject go){
+			go = null;
+			if (base.FindByDesignID (designID, out go))
+				return true;
+			childrenRWLock.EnterReadLock ();
+			foreach (GraphicObject w in Children) {
+				if (!w.FindByDesignID (designID, out go))
+					continue;
+				childrenRWLock.ExitReadLock ();
+				return true;
+			}
+			childrenRWLock.ExitReadLock ();
+			return false;
+		}
 		public override void getIML (System.Xml.XmlDocument doc, System.Xml.XmlNode parentElem)
 		{
 			if (this.design_isTGItem)
