@@ -7,24 +7,24 @@ using System.Linq;
 
 namespace Crow.Coding
 {
-	public class XMLParser : Parser
+	public class XMLParser : BufferParser
 	{
 		public new enum TokenType {
-			Unknown = Parser.TokenType.Unknown,
-			WhiteSpace = Parser.TokenType.WhiteSpace,
-			NewLine = Parser.TokenType.NewLine,
-			LineComment = Parser.TokenType.LineComment,
-			BlockCommentStart = Parser.TokenType.BlockCommentStart,
-			BlockComment = Parser.TokenType.BlockComment,
-			BlockCommentEnd = Parser.TokenType.BlockCommentEnd,
-			ElementName = Parser.TokenType.Type,
-			AttributeName = Parser.TokenType.Identifier,
-			ElementClosing = Parser.TokenType.StatementEnding,
-			Affectation = Parser.TokenType.Affectation,
-			AttributeValueOpening = Parser.TokenType.StringLitteralOpening,
-			AttributeValueClosing = Parser.TokenType.StringLitteralClosing,
-			AttributeValue = Parser.TokenType.StringLitteral,
-			XMLDecl = Parser.TokenType.Preprocessor,
+			Unknown = BufferParser.TokenType.Unknown,
+			WhiteSpace = BufferParser.TokenType.WhiteSpace,
+			NewLine = BufferParser.TokenType.NewLine,
+			LineComment = BufferParser.TokenType.LineComment,
+			BlockCommentStart = BufferParser.TokenType.BlockCommentStart,
+			BlockComment = BufferParser.TokenType.BlockComment,
+			BlockCommentEnd = BufferParser.TokenType.BlockCommentEnd,
+			ElementName = BufferParser.TokenType.Type,
+			AttributeName = BufferParser.TokenType.Identifier,
+			ElementClosing = BufferParser.TokenType.StatementEnding,
+			Affectation = BufferParser.TokenType.Affectation,
+			AttributeValueOpening = BufferParser.TokenType.StringLitteralOpening,
+			AttributeValueClosing = BufferParser.TokenType.StringLitteralClosing,
+			AttributeValue = BufferParser.TokenType.StringLitteral,
+			XMLDecl = BufferParser.TokenType.Preprocessor,
 			ElementStart = 50,
 			ElementEnd = 51,
 		}
@@ -82,7 +82,7 @@ namespace Crow.Coding
 		}
 		#endregion
 
-		public override void SetLineInError (ParsingException ex)
+		public override void SetLineInError (ParserException ex)
 		{
 			base.SetLineInError (ex);
 			//buffer[ex.Line].Tokens.EndingState = (int)States.init;
@@ -111,7 +111,7 @@ namespace Crow.Coding
 
 				if (Peek () == '\n') {
 					if (currentTok != TokenType.Unknown)
-						throw new ParsingException (this, "Unexpected end of line");
+						throw new ParserException (currentLine, currentColumn, "Unexpected end of line");
 					Read ();
 					eol = true;
 					continue;
@@ -122,7 +122,7 @@ namespace Crow.Coding
 						Debugger.Break ();
 
 					currentTok.Start = CurrentPosition;
-					currentTok.Type = (Parser.TokenType)TokenType.BlockComment;
+					currentTok.Type = (BufferParser.TokenType)TokenType.BlockComment;
 					currentTok += ReadLineUntil ("-->");
 					if (Peek (3) == "-->") {
 						readToCurrTok (3);
@@ -138,11 +138,11 @@ namespace Crow.Coding
 					switch (Peek()) {
 					case '?':
 						if (curState != States.init)
-							throw new ParsingException (this, "xml decl may appear only on first line");
+							throw new ParserException (currentLine, currentColumn, "xml decl may appear only on first line");
 						readToCurrTok ();
 						currentTok += ReadLineUntil ("?>");
 						if (Peek (2) != "?>")
-							throw new ParsingException (this, "expecting '?>'");
+							throw new ParserException (currentLine, currentColumn, "expecting '?>'");
 						readToCurrTok (2);
 						saveAndResetCurrentTok (TokenType.XMLDecl);
 						curState = States.prolog;
@@ -153,7 +153,7 @@ namespace Crow.Coding
 						case '-':
 							readToCurrTok ();
 							if (Peek () != '-')
-								throw new ParsingException (this, "Expecting comment start tag");
+								throw new ParserException (currentLine, currentColumn, "Expecting comment start tag");
 							readToCurrTok ();
 							currentTok += ReadLineUntil ("--");
 							if (Peek (3) == "-->") {
@@ -163,12 +163,12 @@ namespace Crow.Coding
 							saveAndResetCurrentTok (TokenType.BlockComment);
 							break;
 						default:
-							throw new ParsingException(this, "error");
+							throw new ParserException (currentLine, currentColumn, "error");
 						}
 						break;
 					default:
 						if (!(curState == States.Content || curState == States.XML || curState == States.init || curState == States.prolog))
-							throw new ParsingException (this, "Unexpected char: '<'");
+							throw new ParserException (currentLine, currentColumn, "Unexpected char: '<'");
 						if (Peek () == '/') {
 							curState = States.EndTag;
 							readToCurrTok ();
@@ -179,7 +179,7 @@ namespace Crow.Coding
 						}
 
 						if (!nextCharIsValidCharStartName)
-							throw new ParsingException (this, "Expected element name");
+							throw new ParserException (currentLine, currentColumn, "Expected element name");
 
 						readToCurrTok (true);
 						while (nextCharIsValidCharName)
@@ -191,10 +191,10 @@ namespace Crow.Coding
 					break;
 				case '/':
 					if (curState != States.StartTag)
-						throw new ParsingException (this, "Unexpected char: '/'");
+						throw new ParserException (currentLine, currentColumn, "Unexpected char: '/'");
 					readToCurrTok (true);
 					if (Peek () != '>')
-						throw new ParsingException (this, "Expecting '>'");
+						throw new ParserException (currentLine, currentColumn, "Expecting '>'");
 					readAndResetCurrentTok (TokenType.ElementEnd);
 
 					curState = States.XML;
@@ -209,14 +209,14 @@ namespace Crow.Coding
 						curState = States.Content;
 						break;
 					default:
-						throw new ParsingException (this, "Unexpected char: '>'");
+						throw new ParserException (currentLine, currentColumn, "Unexpected char: '>'");
 					}
 					break;
 				default:
 					switch (curState) {
 					case States.StartTag:
 						if (!nextCharIsValidCharStartName)
-							throw new ParsingException (this, "Expected attribute name");
+							throw new ParserException (currentLine, currentColumn, "Expected attribute name");
 						readToCurrTok (true);
 						while (nextCharIsValidCharName)
 							readToCurrTok ();
@@ -225,14 +225,14 @@ namespace Crow.Coding
 						SkipWhiteSpaces ();
 
 						if (Peek () != '=')
-							throw new ParsingException (this, "Expecting: '='");
+							throw new ParserException (currentLine, currentColumn, "Expecting: '='");
 						readAndResetCurrentTok (TokenType.Affectation, true);
 
 						SkipWhiteSpaces ();
 
 						char openAttVal = Peek ();
 						if (openAttVal != '"' && openAttVal != '\'')
-							throw new ParsingException (this, "Expecting attribute value enclosed either in '\"' or in \"'\"");
+							throw new ParserException (currentLine, currentColumn, "Expecting attribute value enclosed either in '\"' or in \"'\"");
 						readAndResetCurrentTok (TokenType.AttributeValueOpening, true);
 
 						currentTok.Start = CurrentPosition;
@@ -240,11 +240,11 @@ namespace Crow.Coding
 						saveAndResetCurrentTok (TokenType.AttributeValue);
 
 						if (Peek () != openAttVal)
-							throw new ParsingException (this, string.Format ("Expecting {0}", openAttVal));
+							throw new ParserException (currentLine, currentColumn, string.Format ("Expecting {0}", openAttVal));
 						readAndResetCurrentTok (TokenType.AttributeValueClosing, true);
 						break;
 					default:
-						throw new ParsingException (this, "unexpected char: " + Peek ());
+						throw new ParserException (currentLine, currentColumn, "unexpected char: " + Peek ());
 					}
 					break;
 				}
@@ -283,7 +283,7 @@ namespace Crow.Coding
 						if (tokPtr < cl.Tokens.Count) {
 							if ((XMLParser.TokenType)cl.Tokens [tokPtr].Type == TokenType.ElementName &&
 								cl.Tokens [tokPtr].Content != currentNode.Name)
-								throw new ParsingException (this, "Closing tag mismatch");
+								throw new ParserException (currentLine, currentColumn, "Closing tag mismatch");
 						}
 						currentNode.EndLine = cl;
 						currentNode = currentNode.Parent;

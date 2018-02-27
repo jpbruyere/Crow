@@ -222,6 +222,7 @@
     <Compile Include="src\DragDropEventArgs.cs" />
     <Compile Include="src\GraphicObjects\Docker.cs" />
     <Compile Include="src\GraphicObjects\DockWindow.cs" />
+    <Compile Include="src\ParsingException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

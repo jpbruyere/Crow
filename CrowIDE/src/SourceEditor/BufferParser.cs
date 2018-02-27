@@ -10,7 +10,7 @@ namespace Crow.Coding
 	/// <summary>
 	/// base class for tokenizing sources
 	/// </summary>
-	public abstract class Parser
+	public abstract class BufferParser
 	{
 		/// <summary>
 		/// Default tokens, this enum may be overriden in derived parser with the new keyword,
@@ -42,7 +42,7 @@ namespace Crow.Coding
 		}
 
 		#region CTOR
-		public Parser (CodeBuffer _buffer)
+		public BufferParser (CodeBuffer _buffer)
 		{
 			buffer = _buffer;
 
@@ -108,7 +108,7 @@ namespace Crow.Coding
 			//							continue;
 			//						}
 			//						parser.CurrentPosition = tls [fstTK + 1].Start;
-			//						parser.SetLineInError(new ParsingException(parser, "closing tag not corresponding"));
+			//						parser.SetLineInError(new ParserException(parser, "closing tag not corresponding"));
 			//					}
 			//
 			//				}
@@ -123,8 +123,8 @@ namespace Crow.Coding
 				SyntaxAnalysis ();
 			} catch (Exception ex) {
 				Debug.WriteLine ("Syntax Error: " + ex.ToString ());
-				if (ex is ParsingException)
-					SetLineInError (ex as ParsingException);
+				if (ex is ParserException)
+					SetLineInError (ex as ParserException);
 			}
 		}
 		public void tryParseBufferLine(int lPtr) {
@@ -137,8 +137,8 @@ namespace Crow.Coding
 				ParseCurrentLine ();
 			} catch (Exception ex) {
 				Debug.WriteLine (ex.ToString ());
-				if (ex is ParsingException)
-					SetLineInError (ex as ParsingException);
+				if (ex is ParserException)
+					SetLineInError (ex as ParserException);
 			}
 
 		}
@@ -163,7 +163,7 @@ namespace Crow.Coding
 		public abstract void ParseCurrentLine();
 		public abstract void SyntaxAnalysis ();
 
-		public virtual void SetLineInError(ParsingException ex) {
+		public virtual void SetLineInError(ParserException ex) {
 			currentTok = default(Token);
 			if (ex.Line >= buffer.LineCount)
 				ex.Line = buffer.LineCount - 1;
@@ -220,7 +220,7 @@ namespace Crow.Coding
 		/// </summary>
 		protected virtual char Peek() {
 			if (eol)
-				throw new ParsingException (this, "Unexpected End of line");
+				throw new ParserException (currentLine, currentColumn, "Unexpected End of line");
 			return currentColumn < buffer [currentLine].Length ?
 				buffer [currentLine] [currentColumn] : '\n';
 		}
@@ -233,7 +233,7 @@ namespace Crow.Coding
 		/// <param name="length">Length.</param>
 		protected virtual string Peek(int length) {
 			if (eol)
-				throw new ParsingException (this, "Unexpected End of Line");
+				throw new ParserException (currentLine, currentColumn, "Unexpected End of Line");
 			int lg = Math.Min(length, Math.Max (buffer [currentLine].Length - currentColumn, buffer [currentLine].Length - currentColumn - length));
 			if (lg == 0)
 				return "";
@@ -287,7 +287,7 @@ namespace Crow.Coding
 		/// </summary>
 		protected void SkipWhiteSpaces () {
 			if (currentTok.Type != TokenType.Unknown)
-				throw new ParsingException (this, "current token should be reset to unknown (0) before skiping white spaces");
+				throw new ParserException (currentLine, currentColumn, "current token should be reset to unknown (0) before skiping white spaces");
 			while (!eol) {
 				if (!char.IsWhiteSpace (Peek ())||Peek()=='\n')
 					break;

@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Crow.Coding
 {
-	public class CSharpParser : Parser
+	public class CSharpParser : BufferParser
 	{
 		#region keywords
 		string[] keywords = new string[] {
@@ -171,7 +171,7 @@ namespace Crow.Coding
 
 				if (Peek () == '\n') {
 					if (currentTok != TokenType.Unknown)
-						throw new ParsingException (this, "Unexpected end of line");
+						throw new ParserException (currentLine, currentColumn, "Unexpected end of line");
 					Read ();
 					eol = true;
 					continue;
@@ -182,7 +182,7 @@ namespace Crow.Coding
 						Debugger.Break ();
 
 					currentTok.Start = CurrentPosition;
-					currentTok.Type = (Parser.TokenType)TokenType.BlockComment;
+					currentTok.Type = (BufferParser.TokenType)TokenType.BlockComment;
 					currentTok += ReadLineUntil ("*/");
 					if (Peek (2) == "*/") {
 						readToCurrTok (2);

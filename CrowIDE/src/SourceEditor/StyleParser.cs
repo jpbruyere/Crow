@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Crow.Coding
 {
-	public class StyleParser : Parser
+	public class StyleParser : BufferParser
 	{
 		enum States { init, classNames, members, value, endOfStatement }
 
@@ -15,15 +15,13 @@ namespace Crow.Coding
 		{
 		}
 
-		#region Regular Expression for validity checks
-		private static Regex rxValidChar = new Regex(@"\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}|\p{Mn}|\p{Mc}|\p{Nd}|\p{Pc}|\p{Cf}");
-		private static Regex rxNameStartChar = new Regex(@"_|\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}");															
-		private static Regex rxNameChar = new Regex(@"\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}|\p{Mn}|\p{Mc}|\p{Nd}|\p{Pc}|\p{Cf}");
-		private static Regex rxDecimal = new Regex(@"[0-9]+");
-		private static Regex rxHexadecimal = new Regex(@"[0-9a-fA-F]+");
-		#endregion
-
 		#region Character ValidityCheck
+		static Regex rxValidChar = new Regex(@"\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}|\p{Mn}|\p{Mc}|\p{Nd}|\p{Pc}|\p{Cf}");
+		static Regex rxNameStartChar = new Regex(@"_|\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}");															
+		static Regex rxNameChar = new Regex(@"\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}|\p{Mn}|\p{Mc}|\p{Nd}|\p{Pc}|\p{Cf}");
+		static Regex rxDecimal = new Regex(@"[0-9]+");
+		static Regex rxHexadecimal = new Regex(@"[0-9a-fA-F]+");
+
 		public bool nextCharIsValidCharStartName
 		{
 			get { return rxNameStartChar.IsMatch(new string(new char[]{Peek()})); }
@@ -58,7 +56,7 @@ namespace Crow.Coding
 
 				if (Peek () == '\n') {
 					if (currentTok != TokenType.Unknown)
-						throw new ParsingException (this, "Unexpected end of line");
+						throw new ParserException (currentLine, currentColumn, "Unexpected end of line");
 					Read ();
 					eol = true;
 					continue;
@@ -80,31 +78,31 @@ namespace Crow.Coding
 					break;
 				case ',':
 					if (curState != States.init || curState != States.classNames )
-						throw new ParsingException (this, "Unexpected char ','");
+						throw new ParserException (currentLine, currentColumn, "Unexpected char ','");
 					readAndResetCurrentTok (TokenType.UnaryOp, true);
 					curState = States.classNames;
 					break;
 				case '{':
 					if (!(curState == States.init || curState == States.classNames))
-						throw new ParsingException (this, "Unexpected char '{'");
+						throw new ParserException (currentLine, currentColumn, "Unexpected char '{'");
 					readAndResetCurrentTok (TokenType.OpenBlock, true);
 					curState = States.members;
 					break;
 				case '}':
 					if (curState != States.members)
-						throw new ParsingException (this, "Unexpected char '}'");
+						throw new ParserException (currentLine, currentColumn, "Unexpected char '}'");
 					readAndResetCurrentTok (TokenType.CloseBlock, true);
 					curState = States.classNames;
 					break;
 				case '=':
 					if (curState == States.classNames)
-						throw new ParsingException (this, "Unexpected char '='");
+						throw new ParserException (currentLine, currentColumn, "Unexpected char '='");
 					readAndResetCurrentTok (TokenType.Affectation, true);
 					curState = States.value;
 					break;
 				case '"':
 					if (curState != States.value)
-						throw new ParsingException (this, "Unexpected char '\"'");					
+						throw new ParserException (currentLine, currentColumn, "Unexpected char '\"'");					
 					readAndResetCurrentTok (TokenType.StringLitteralOpening, true);
 
 					while (!eol) {
@@ -115,7 +113,7 @@ namespace Crow.Coding
 							break;
 					}
 					if (eol)
-						throw new ParsingException (this, "Unexpected end of line");
+						throw new ParserException (currentLine, currentColumn, "Unexpected end of line");
 					saveAndResetCurrentTok (TokenType.StringLitteral);
 
 					readAndResetCurrentTok (TokenType.StringLitteralClosing, true);
@@ -123,17 +121,17 @@ namespace Crow.Coding
 					break;
 				case ';':
 					if (curState != States.endOfStatement)
-						throw new ParsingException (this, "Unexpected end of statement");					
+						throw new ParserException (currentLine, currentColumn, "Unexpected end of statement");					
 					readAndResetCurrentTok (TokenType.StatementEnding, true);
 					curState = States.members;
 					break;
 				default:
 					if (currentTok.Type != TokenType.Unknown)
-						throw new ParsingException (this, "error curtok not null");
+						throw new ParserException (currentLine, currentColumn, "error curtok not null");
 					if (curState == States.value)
-						throw new ParsingException (this, "expecting value enclosed in '\"'");
+						throw new ParserException (currentLine, currentColumn, "expecting value enclosed in '\"'");
 					if (curState == States.endOfStatement)
-						throw new ParsingException (this, "expecting end of statement");					
+						throw new ParserException (currentLine, currentColumn, "expecting end of statement");					
 					
 					if (nextCharIsValidCharStartName) {						
 						readToCurrTok (true);

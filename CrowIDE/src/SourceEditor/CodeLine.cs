@@ -10,7 +10,7 @@ namespace Crow.Coding
 		public List<Token> Tokens;
 		public int EndingState = 0;
 		public Node SyntacticNode;
-		public ParsingException exception;
+		public ParserException exception;
 
 		public CodeLine (string _content){
 			Content = _content;
@@ -52,7 +52,7 @@ namespace Crow.Coding
 			}
 		}
 
-		public void SetLineInError (ParsingException ex) {
+		public void SetLineInError (ParserException ex) {
 			Tokens = null; 
 			exception = ex;
 		}

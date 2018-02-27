@@ -58,10 +58,10 @@ namespace Crow.Coding
 			formatting.Add ((int)XMLParser.TokenType.AttributeValue, new TextFormatting (Color.TractorRed, Color.Transparent, false, true));
 			formatting.Add ((int)XMLParser.TokenType.XMLDecl, new TextFormatting (Color.AoEnglish, Color.Transparent));
 
-			formatting.Add ((int)Parser.TokenType.BlockComment, new TextFormatting (Color.Gray, Color.Transparent, false, true));
-			formatting.Add ((int)Parser.TokenType.LineComment, new TextFormatting (Color.Gray, Color.Transparent, false, true));
-			formatting.Add ((int)Parser.TokenType.Affectation, new TextFormatting (Color.Black, Color.Transparent));
-			formatting.Add ((int)Parser.TokenType.Keyword, new TextFormatting (Color.DarkCyan, Color.Transparent));
+			formatting.Add ((int)BufferParser.TokenType.BlockComment, new TextFormatting (Color.Gray, Color.Transparent, false, true));
+			formatting.Add ((int)BufferParser.TokenType.LineComment, new TextFormatting (Color.Gray, Color.Transparent, false, true));
+			formatting.Add ((int)BufferParser.TokenType.Affectation, new TextFormatting (Color.Black, Color.Transparent));
+			formatting.Add ((int)BufferParser.TokenType.Keyword, new TextFormatting (Color.DarkCyan, Color.Transparent));
 
 			parsing.Add (".crow", "Crow.Coding.XMLParser");
 			parsing.Add (".template", "Crow.Coding.XMLParser");
@@ -122,7 +122,7 @@ namespace Crow.Coding
 		int printedCurrentLine = 0;//Index of the currentline in the PrintedLines array
 
 		CodeBuffer buffer;
-		Parser parser;
+		BufferParser parser;
 		List<CodeLine> PrintedLines;//list of lines visible in the Editor depending on scrolling and folding
 
 		Dictionary<int, TextFormatting> formatting = new Dictionary<int, TextFormatting>();
@@ -348,7 +348,7 @@ namespace Crow.Coding
 			}
 		}
 
-		Parser getParserFromExt (string extension) {
+		BufferParser getParserFromExt (string extension) {
 			if (string.IsNullOrEmpty(extension))
 				return null;
 			if (!parsing.ContainsKey(extension))
@@ -356,7 +356,7 @@ namespace Crow.Coding
 			Type parserType = Type.GetType (parsing [extension]);
 			if (parserType == null)
 				return null;
-			return (Parser)Activator.CreateInstance (parserType, buffer );
+			return (BufferParser)Activator.CreateInstance (parserType, buffer );
 		}
 
 		#region Public Crow Properties

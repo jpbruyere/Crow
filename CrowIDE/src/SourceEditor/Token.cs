@@ -24,7 +24,7 @@ namespace Crow.Coding
 {
 	public struct Token
 	{
-		public Parser.TokenType Type;
+		public BufferParser.TokenType Type;
 		public string Content;
 		public Point Start;
 		public Point End;

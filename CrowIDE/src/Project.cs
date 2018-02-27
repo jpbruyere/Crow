@@ -439,10 +439,14 @@ namespace Crow.Coding
 //		}
 
 		public void GetStyling () {
-			foreach (ProjectFile pi in flattenNodes.OfType<ProjectFile> ().Where (pp=>pp.Type == ItemType.EmbeddedResource && pp.Extension == ".style")) {
-				using (Stream s = new MemoryStream (System.Text.Encoding.UTF8.GetBytes(pi.Source))) {
-					new StyleReader (solution.Styling, s, pi.ResourceID);
+			try {
+				foreach (ProjectFile pi in flattenNodes.OfType<ProjectFile> ().Where (pp=>pp.Type == ItemType.EmbeddedResource && pp.Extension == ".style")) {
+					using (Stream s = new MemoryStream (System.Text.Encoding.UTF8.GetBytes(pi.Source))) {
+						new StyleReader (solution.Styling, s, pi.ResourceID);
+					}
 				}
+			} catch (Exception ex) {
+				Console.WriteLine (ex.ToString ());
 			}
 			foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference>()) {				
 				Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);

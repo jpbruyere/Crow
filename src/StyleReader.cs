@@ -28,6 +28,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using Crow.Coding;
 
 namespace Crow
 {
@@ -37,11 +39,48 @@ namespace Crow
 	//TODO: style key shared by different class may use only first encouneter class setter, which can cause bug.
 	public class StyleReader : StreamReader
 	{
-		enum readerState { classNames, propertyName, expression }
-		readerState state = readerState.classNames;
+		enum States { init, classNames, members, value, endOfStatement }
+
+		States curState = States.init;
+
 		string resourceId;
 		int column = 1;
 		int line = 1;
+
+		#region Character ValidityCheck
+		static Regex rxValidChar = new Regex(@"\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}|\p{Mn}|\p{Mc}|\p{Nd}|\p{Pc}|\p{Cf}");
+		static Regex rxNameStartChar = new Regex(@"_|\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}");															
+		static Regex rxNameChar = new Regex(@"\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}|\p{Mn}|\p{Mc}|\p{Nd}|\p{Pc}|\p{Cf}");
+		static Regex rxDecimal = new Regex(@"[0-9]+");
+		static Regex rxHexadecimal = new Regex(@"[0-9a-fA-F]+");
+
+		public bool nextCharIsValidCharStartName
+		{
+			get { return rxNameStartChar.IsMatch(new string(new char[]{PeekChar()})); }
+		}
+		public bool nextCharIsValidCharName
+		{
+			get { return rxNameChar.IsMatch(new string(new char[]{PeekChar()})); }
+		}
+		#endregion
+
+		char ReadChar () {
+			column++;
+			return (Char)Read();
+		}
+		char PeekChar () {
+			return (Char)Peek();
+		}
+		void SkipWhiteSpaceAndLineBreak (){
+			while (!EndOfStream){				
+				if (!PeekChar ().IsWhiteSpaceOrNewLine ())
+					break;
+				if (ReadChar () == '\n') {
+					line++;
+					column = 0;
+				}
+			}
+		}
 
 		public StyleReader (Dictionary<string, Style> styling, Stream stream, string resId)
 			: base(stream)
@@ -52,116 +91,95 @@ namespace Crow
 			List<string> targetsClasses = new List<string> ();
 			string currentProperty = "";
 
-			int curlyBracketCount = 0;
-
 			while (!EndOfStream) {
-				char c = (Char)Read ();
-				if (c == '/' && !EndOfStream) {
-					if ((char)Peek () == '/') {//process comment, skip until newline
-						ReadLine ();
-						continue;
-					}
-				}
-				switch (state) {
-				case readerState.classNames:
-					if (c.IsWhiteSpaceOrNewLine () || c == ',' || c == '{') {
-						if (!string.IsNullOrEmpty (token))
-							targetsClasses.Add (token);
-						if (c == '{')
-							state = readerState.propertyName;
-						token = "";
-					}else if (c=='='){
-						//this file contains only properties,
-						//resource Id (minus .style extention) will determine the single target class
-						if (targetsClasses.Count > 1)
-							throwParserException ("Unexpected token '='");
-						else if (targetsClasses.Count == 1) {
-							if (!string.IsNullOrEmpty (token))
-								throwParserException ("Unexpected token '='");
-							currentProperty = targetsClasses [0];
-							targetsClasses [0] = styleKey;
-						}else{
-							if (string.IsNullOrEmpty (token))
-								throwParserException ("Unexpected token '='");
-							targetsClasses.Add (styleKey);
-							currentProperty = token;
-							token = "";
-						}
-						state = readerState.expression;
-					}else
-						token += c;
+				SkipWhiteSpaceAndLineBreak ();
+				if (EndOfStream)
 					break;
-				case readerState.propertyName:
-					if (c.IsWhiteSpaceOrNewLine () || c == '=') {
-						if (!string.IsNullOrEmpty (token))
-							currentProperty = token;
-						if (c == '=')
-							state = readerState.expression;
 
-						token = "";
-					}else if (c == '}'){
-						if (!string.IsNullOrEmpty (token))
-							throwParserException ("Unexpected token '" + c + "'");
-						targetsClasses = new List<string> ();
-						currentProperty = "";
-						state = readerState.classNames;
-					} else
-						token += c;
+				switch (Peek()) {
+				case '/':
+					ReadChar ();
+					if (PeekChar () != '/')
+						throw new ParserException (line, column, "Unexpected char '/'");
+					ReadLine ();
 					break;
-				case readerState.expression:
-					bool expressionIsFinished = false;
-					if (curlyBracketCount == 0) {
-						if (c == '{'){
-							if (!string.IsNullOrEmpty(token.Trim()))
-								throwParserException ("Unexpected token '{'");
-							curlyBracketCount++;
-							token = "{";
-						}else if (c == '}')
-							throwParserException ("Unexpected token '{'");
-						else if (c == ';') {
-							expressionIsFinished = true;
-						} else
-							token += c;
-					} else {
-						if (c == '{')
-							curlyBracketCount++;
-						else if (c == '}') {
-							curlyBracketCount--;
-							if (curlyBracketCount == 0)
-								expressionIsFinished = true;
-						}
-						token += c;
-					}
-					if (expressionIsFinished) {
-						if (!string.IsNullOrEmpty (token)) {
-							string expression = token.Trim ();
+				case ',':
+					ReadChar ();
+					if (!(curState == States.init || curState == States.classNames) || string.IsNullOrEmpty (token))
+						throw new ParserException (line, column, "Unexpected char ','");
+					targetsClasses.Add (token);
+					token = "";
+					curState = States.classNames;
+					break;
+				case '{':
+					ReadChar ();
+					if (!(curState == States.init || curState == States.classNames) || string.IsNullOrEmpty (token))
+						throw new ParserException (line, column, "Unexpected char '{'");					
+					targetsClasses.Add (token);
+					token = "";
+					curState = States.members;
+					break;
+				case '}':
+					ReadChar ();
+					if (curState != States.members)
+						throw new ParserException (line, column, "Unexpected char '}'");					
+					curState = States.classNames;
+					targetsClasses.Clear ();
+					break;
+				case '=':
+					ReadChar ();
+					if (!(curState == States.init || curState == States.members))
+						throw new ParserException (line, column, "Unexpected char '='");
+					currentProperty = token;
+					token = "";
+					curState = States.value;
+					break;
+				case '"':
+					if (curState != States.value)
+						throw new ParserException (line, column, "Unexpected char '\"'");					
+					ReadChar ();
 
-							foreach (string tc in targetsClasses) {
-								if (!styling.ContainsKey (tc))
-									styling [tc] = new Style ();
-								else if (styling [tc].ContainsKey (currentProperty))
-									continue;
-								styling [tc] [currentProperty] = expression;
-							}
-							token = "";
+					while (!EndOfStream) {
+						char c = PeekChar();
+						if (c == '\"') {
+							ReadChar ();
+							break;
 						}
-						//allow omiting ';' if curly bracket close expression
-						while (!EndOfStream) {
-							if (Char.IsWhiteSpace((char)Peek()))
-								Read();
-							else
-								break;
-						}
-						if (this.Peek () == ';')
-							this.Read ();
-						state = readerState.propertyName;							
+						token += ReadChar();
+						if (c == '\\' && !EndOfStream)
+							token += ReadChar();						
+					}
+					curState = States.endOfStatement;
+					break;
+				case ';':
+					if (curState != States.endOfStatement)
+						throw new ParserException (line, column, "Unexpected end of statement");					
+					ReadChar ();
+					foreach (string tc in targetsClasses) {
+						if (!styling.ContainsKey (tc))
+							styling [tc] = new Style ();
+						else if (styling [tc].ContainsKey (currentProperty))
+							continue;
+						styling [tc] [currentProperty] = token;
+						System.Diagnostics.Debug.WriteLine ("Style: {0}.{1} = {2}", tc, currentProperty, token);
+					}
+					token = "";
+					curState = States.members;
+					break;
+				default:
+					if (curState == States.value)
+						throw new ParserException (line, column, "expecting value enclosed in '\"'");
+					if (curState == States.endOfStatement)
+						throw new ParserException (line, column, "expecting end of statement");
+
+					if (nextCharIsValidCharStartName) {
+						token += ReadChar();
+						while (nextCharIsValidCharName)
+							token += ReadChar();
 					}
 					break;
 				}
 			}
-
-			if (curlyBracketCount > 0)
-				throwParserException ("Unexpected end of file");
 		}
 
 		public override int Read ()

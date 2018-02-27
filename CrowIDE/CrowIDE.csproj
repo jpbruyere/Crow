@@ -110,14 +110,13 @@
     <Compile Include="src\SourceEditor\CodeLine.cs" />
     <Compile Include="src\SourceEditor\CSharpParser.cs" />
     <Compile Include="src\SourceEditor\Node.cs" />
-    <Compile Include="src\SourceEditor\Parser.cs" />
-    <Compile Include="src\SourceEditor\ParsingException.cs" />
     <Compile Include="src\SourceEditor\SourceEditor.cs" />
     <Compile Include="src\SourceEditor\TextFormatting.cs" />
     <Compile Include="src\SourceEditor\Token.cs" />
     <Compile Include="src\SourceEditor\XMLParser.cs" />
     <Compile Include="src\SourceEditor\StyleParser.cs" />
     <Compile Include="src\PropertyContainer.cs" />
+    <Compile Include="src\SourceEditor\BufferParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />
