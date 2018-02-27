@@ -198,17 +198,6 @@ namespace Crow.Coding
 			currentTok = default(Token);
 		}
 		/// <summary>
-		/// Save current token into current TokensLine after having skipped white spaces and raz current token
-		/// </summary>
-		protected void saveAndResetAfterWhiteSpaceSkipping() {			
-			buffer[currentLine].Tokens.Add (currentTok);
-			currentTok = default(Token);
-			if (WpToken == null)
-				return;
-			buffer[currentLine].Tokens.Add ((Token)WpToken);
-			WpToken = null;
-		}
-		/// <summary>
 		/// read one char and add current token to current TokensLine, current token is reset
 		/// </summary>
 		/// <param name="type">Type of the token</param>
@@ -224,14 +213,6 @@ namespace Crow.Coding
 		protected void saveAndResetCurrentTok(System.Enum type) {
 			currentTok.Type = (TokenType)type;
 			saveAndResetCurrentTok ();
-		}
-		/// <summary>
-		/// Save current tok after having skipped white spaces
-		/// </summary>
-		/// <param name="type">set the type of the tok</param>
-		protected void saveAndResetAfterWhiteSpaceSkipping(System.Enum type) {
-			currentTok.Type = (TokenType)type;
-			saveAndResetAfterWhiteSpaceSkipping ();
 		}
 		/// <summary>
 		/// Peek next char, emit '\n' if current column > buffer's line length
@@ -302,30 +283,20 @@ namespace Crow.Coding
 			return tmp;
 		}
 		/// <summary>
-		/// skip white spaces, but not line break. Save spaces in a WhiteSpace token and dont
-		/// save it directely if currentTok is not null
+		/// skip white spaces, but not line break. Save spaces in a WhiteSpace token.
 		/// </summary>
 		protected void SkipWhiteSpaces () {
-			if (WpToken != null)
-				throw new ParsingException (this, "white space token already pending");
-			Token wp = default(Token);
+			if (currentTok.Type != TokenType.Unknown)
+				throw new ParsingException (this, "current token should be reset to unknown (0) before skiping white spaces");
 			while (!eol) {
 				if (!char.IsWhiteSpace (Peek ())||Peek()=='\n')
 					break;
-				if (wp.Type == TokenType.Unknown)
-					wp.Start = CurrentPosition;
-				wp += Read();
-				wp.Type = TokenType.WhiteSpace;
+				readToCurrTok (currentTok.Type == TokenType.Unknown);
+				currentTok.Type = TokenType.WhiteSpace;
 			}
-			if (wp.Type == TokenType.Unknown)
-				return;
-			wp.End = CurrentPosition;
-			if (currentTok.Type == TokenType.Unknown)
-				buffer [currentLine].Tokens.Add (wp);
-			else
-				WpToken = wp;
+			if (currentTok.Type != TokenType.Unknown)
+				saveAndResetCurrentTok ();
 		}
-		protected object WpToken = null;
 		#endregion
 	}
 }

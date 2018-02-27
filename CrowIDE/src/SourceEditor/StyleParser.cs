@@ -9,7 +9,7 @@ namespace Crow.Coding
 {
 	public class StyleParser : Parser
 	{
-		enum States { init, classNames, members }
+		enum States { init, classNames, members, value, endOfStatement }
 
 		public StyleParser (CodeBuffer _buffer) : base(_buffer)
 		{
@@ -41,7 +41,6 @@ namespace Crow.Coding
 			Debug.WriteLine (string.Format("parsing line:{0}", currentLine));
 			CodeLine cl = buffer [currentLine];
 			cl.Tokens = new List<Token> ();
-			WpToken = null;
 
 			//retrieve current parser state from previous line
 			if (currentLine > 0)
@@ -80,62 +79,68 @@ namespace Crow.Coding
 					}
 					break;
 				case ',':
-					if (currentTok.Type != TokenType.Identifier || curState == States.members )					
+					if (curState != States.init || curState != States.classNames )
 						throw new ParsingException (this, "Unexpected char ','");
-					saveAndResetAfterWhiteSpaceSkipping (TokenType.Type);//save previous token as class
-					readToCurrTok (true);
-					saveAndResetCurrentTok (TokenType.UnaryOp);
+					readAndResetCurrentTok (TokenType.UnaryOp, true);
 					curState = States.classNames;
 					break;
 				case '{':
-					if (currentTok.Type != TokenType.Identifier || curState == States.members)
-						throw new ParsingException (this, "Unexpected char '}'");
-
-					saveAndResetAfterWhiteSpaceSkipping (TokenType.Type);//save previous token as class
-
-					readToCurrTok (true);
-					saveAndResetCurrentTok (TokenType.OpenBlock);
+					if (!(curState == States.init || curState == States.classNames))
+						throw new ParsingException (this, "Unexpected char '{'");
+					readAndResetCurrentTok (TokenType.OpenBlock, true);
 					curState = States.members;
 					break;
 				case '}':
 					if (curState != States.members)
 						throw new ParsingException (this, "Unexpected char '}'");
-					readToCurrTok (true);
-					saveAndResetCurrentTok (TokenType.CloseBlock);
+					readAndResetCurrentTok (TokenType.CloseBlock, true);
 					curState = States.classNames;
 					break;
 				case '=':
-					if (currentTok.Type != TokenType.Identifier)
+					if (curState == States.classNames)
 						throw new ParsingException (this, "Unexpected char '='");
+					readAndResetCurrentTok (TokenType.Affectation, true);
+					curState = States.value;
+					break;
+				case '"':
+					if (curState != States.value)
+						throw new ParsingException (this, "Unexpected char '\"'");					
+					readAndResetCurrentTok (TokenType.StringLitteralOpening, true);
 
-					saveAndResetAfterWhiteSpaceSkipping ();//save previous token as propertyname
-
-					curState = States.members;
-
-					readToCurrTok (true);
-					saveAndResetCurrentTok (TokenType.Affectation);
-
-					SkipWhiteSpaces ();
-
-					currentTok+=ReadLineUntil(";");
+					while (!eol) {
+						currentTok += ReadLineUntil ("\"");
+						if (currentTok.Content [currentTok.Content.Length - 1] == '\\')
+							readToCurrTok ();
+						else
+							break;
+					}
+					if (eol)
+						throw new ParsingException (this, "Unexpected end of line");
 					saveAndResetCurrentTok (TokenType.StringLitteral);
 
-					if (Peek() != ';')
-						throw new ParsingException (this, "Expecting ';'");
-					readToCurrTok (true);
-					saveAndResetCurrentTok (TokenType.StatementEnding);
+					readAndResetCurrentTok (TokenType.StringLitteralClosing, true);
+					curState = States.endOfStatement;
+					break;
+				case ';':
+					if (curState != States.endOfStatement)
+						throw new ParsingException (this, "Unexpected end of statement");					
+					readAndResetCurrentTok (TokenType.StatementEnding, true);
+					curState = States.members;
 					break;
 				default:
 					if (currentTok.Type != TokenType.Unknown)
-						throw new ParsingException (this, "error");
+						throw new ParsingException (this, "error curtok not null");
+					if (curState == States.value)
+						throw new ParsingException (this, "expecting value enclosed in '\"'");
+					if (curState == States.endOfStatement)
+						throw new ParsingException (this, "expecting end of statement");					
 					
 					if (nextCharIsValidCharStartName) {						
 						readToCurrTok (true);
 						while (nextCharIsValidCharName)
 							readToCurrTok ();
 					}
-					currentTok.Type = TokenType.Identifier;
-					currentTok.End = CurrentPosition;
+					saveAndResetCurrentTok (TokenType.Identifier);
 					break;
 				}
 			}
