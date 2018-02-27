@@ -141,7 +141,6 @@
       <LogicalName>Crow.TreeExpandable.template</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="ui\ProjectTree.template" />
-    <EmbeddedResource Include="ui\MembersItem.template" />
     <EmbeddedResource Include="ui\EditPane.template">
       <LogicalName>Crow.Coding.EditPane.template</LogicalName>
     </EmbeddedResource>
@@ -167,6 +166,8 @@
     <EmbeddedResource Include="ui\Options.crow" />
     <EmbeddedResource Include="ui\IMLEdit.itemp" />
     <EmbeddedResource Include="ui\SrcEdit.itemp" />
+    <EmbeddedResource Include="ui\IcoBut.template" />
+    <EmbeddedResource Include="ui\MembersItem.template" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">

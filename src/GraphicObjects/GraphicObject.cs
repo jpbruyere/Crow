@@ -52,11 +52,22 @@ namespace Crow
 		internal ReaderWriterLockSlim parentRWLock = new ReaderWriterLockSlim();
 
 		#if DESIGN_MODE
+		public volatile bool HasChanged = false;
+		public string design_id;
 		public int design_line;
 		public int design_column;
 		public string design_imlPath;
 		public Dictionary<string,string> design_members = new Dictionary<string, string>();
 		public bool design_isTGItem = false;
+
+		public virtual bool FindByDesignID(string designID, out GraphicObject go){
+			go = null;
+			if (this.design_id == designID){
+				go = this;
+				return true;
+			}
+			return false;
+		}
 
 		public string GetIML(){
 			XmlDocument doc = new XmlDocument( );
@@ -73,6 +84,7 @@ namespace Crow
 					getIML (doc, (XmlNode)doc);
 					doc.WriteTo (xtw);
 				}
+				this.HasChanged = false;
 				return sw.ToString ();
 			}
 		}

@@ -74,6 +74,13 @@ namespace Crow.IML
 
 		internal string sourcePath;
 
+		#if DESIGN_MODE
+		public static int NextInstantiatorID = 0;
+		public int currentInstantiatorID = 0;
+		int currentDesignID = 0;
+		internal string NextDesignID { get { return string.Format ("{0}_{1}",currentInstantiatorID, currentDesignID++); }}
+		#endif
+
 		#region CTOR
 		/// <summary>
 		/// Initializes a new instance of the Instantiator class.
@@ -86,6 +93,9 @@ namespace Crow.IML
 		/// </summary>
 		public Instantiator (Interface _iface, Stream stream, string srcPath = null)
 		{
+			#if DESIGN_MODE
+			currentInstantiatorID = NextInstantiatorID++;
+			#endif
 			iface = _iface;
 			sourcePath = srcPath;
 			#if DEBUG_LOAD
@@ -112,12 +122,18 @@ namespace Crow.IML
 		/// positionned on the start tag inside the itemTemplate
 		/// </summary>
 		public Instantiator (Interface _iface, XmlReader itr){
+			#if DESIGN_MODE
+			currentInstantiatorID = NextInstantiatorID++;
+			#endif
 			iface = _iface;
 			parseIML (itr);
 		}
 		//TODO:check if still used
 		public Instantiator (Interface _iface, Type _root, InstanciatorInvoker _loader)
 		{
+			#if DESIGN_MODE
+			currentInstantiatorID = NextInstantiatorID++;
+			#endif
 			iface = _iface;
 			RootType = _root;
 			loader = _loader;
@@ -383,6 +399,9 @@ namespace Crow.IML
 
 				#if DESIGN_MODE
 				IXmlLineInfo li = (IXmlLineInfo)reader;
+				ctx.il.Emit (OpCodes.Ldloc_0);
+				ctx.il.Emit (OpCodes.Ldstr, this.NextDesignID);
+				ctx.il.Emit (OpCodes.Stfld, typeof(GraphicObject).GetField("design_id"));
 				ctx.il.Emit (OpCodes.Ldloc_0);
 				ctx.il.Emit (OpCodes.Ldc_I4, ctx.curLine + li.LineNumber);
 				ctx.il.Emit (OpCodes.Stfld, typeof(GraphicObject).GetField("design_line"));

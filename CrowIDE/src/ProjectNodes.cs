@@ -29,6 +29,7 @@ using System.Linq;
 using System.Xml;
 using System.IO;
 using Crow;
+using System.Threading;
 
 namespace Crow.Coding
 {
@@ -61,17 +62,24 @@ namespace Crow.Coding
 		public ProjectNode (Project project, ItemType _type, string _name) : this(project){			
 			type = _type;
 			name = _name;
+			initCommands ();
 		}
 		public ProjectNode (Project project){
 			Project = project;
+			initCommands ();
 		}
 		#endregion
+
+		void initCommands () {
+			Commands = new List<Crow.Command> ();
+		}
 
 		ItemType type;
 		string name;
 		List<ProjectNode> childNodes = new List<ProjectNode>();
 
 		public Project Project;
+		public List<Crow.Command> Commands;//list of command available for that node
 
 		public virtual ItemType Type {
 			get { return type; }
@@ -143,21 +151,29 @@ namespace Crow.Coding
 	}
 
 	public class ProjectFile : ProjectItem {		
-		bool isOpened = false;
+		protected bool isOpened = false;
 		DateTime accessTime;
 		string source;
 		string origSource;
 		object selectedItem;
+		int curLine, curColumn;
 
-		public List<Crow.Command> Commands;
+		internal ReaderWriterLockSlim srcEditMtx = new ReaderWriterLockSlim();
 
-		public ProjectFile (ProjectItem pi) : base (pi.Project, pi.node){
-			Commands = new List<Crow.Command> (new Crow.Command[] {
-				new Crow.Command(new Action(() => Open())) 
-				{ Caption = "Open", Icon = new SvgPicture("#Crow.Coding.ui.icons.outbox.svg"), CanExecute = false},
-				new Crow.Command(new Action(() => Save()))
-				{ Caption = "Save", Icon = new SvgPicture("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false},
-			});
+		public Dictionary<object, bool> RegisteredEditors = new Dictionary<object, bool>();
+
+		Crow.Command cmdSave, cmdOpen;
+
+		public ProjectFile (ProjectItem pi)
+			: base (pi.Project, pi.node) {
+
+			cmdSave = new Crow.Command (new Action (() => Save ()))
+				{ Caption = "Save", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false };
+			cmdOpen = new Crow.Command (new Action (() => Open ())) 
+				{ Caption = "Open", Icon = new SvgPicture ("#Crow.Coding.ui.icons.outbox.svg"), CanExecute = false };
+
+			Commands.Insert (0, cmdOpen);
+			Commands.Insert (1, cmdSave);
 		}
 
 		public string ResourceID {
@@ -171,6 +187,28 @@ namespace Crow.Coding
 		public string LogicalName {
 			get {
 				return node.SelectSingleNode ("LogicalName")?.InnerText;
+			}
+		}
+
+		public void UnregisterEditor (object editor){
+			lock(RegisteredEditors){
+				RegisteredEditors.Remove (editor);
+			}
+		}
+		public void RegisterEditor (object editor) {
+			lock(RegisteredEditors){
+				RegisteredEditors.Add (editor, false);
+			}
+		}
+		public void UpdateSource (object sender, string newSrc){
+			System.Diagnostics.Debug.WriteLine ("update source by {0}", sender);
+			Source = newSrc;
+			lock (RegisteredEditors) {
+				object[] keys = RegisteredEditors.Keys.ToArray ();
+				foreach (object editor in keys) {
+					if (editor != sender)
+						RegisteredEditors [editor] = false;
+				}
 			}
 		}
 		public string Source {
@@ -188,15 +226,19 @@ namespace Crow.Coding
 			set {
 				if (source == value)
 					return;
+				
+				srcEditMtx.EnterWriteLock ();
+
 				source = value;
 				NotifyValueChanged ("Source", source);
 				NotifyValueChanged ("IsDirty", IsDirty);
+
+				srcEditMtx.ExitWriteLock ();
 			}
 		}
 		public bool IsDirty {
 			get { return source != origSource; }
 		}
-		int curLine, curColumn;
 		public int CurrentColumn{
 			get { return curColumn; }
 			set {
@@ -215,15 +257,6 @@ namespace Crow.Coding
 				NotifyValueChanged ("CurrentLine", curLine);
 			}
 		}
-//		public bool IsSelected {
-//			get { return isSelected; }
-//			set { 
-//				if (isSelected == value)
-//					return;
-//				isSelected = value;
-//				NotifyValueChanged ("IsSelected", isSelected);				
-//			}
-//		}
 
 		public object SelectedItem {
 			get { return selectedItem; }
@@ -239,10 +272,6 @@ namespace Crow.Coding
 		public CopyToOutputState CopyToOutputDirectory {
 			get {
 				XmlNode xn = node.SelectSingleNode ("CopyToOutputDirectory");
-//				if (xn == null)
-//					return CopyToOutputState.Never;
-//				CopyToOutputState tmp = (CopyToOutputState)Enum.Parse (typeof(CopyToOutputState), xn.InnerText, true);
-//				return tmp;
 				return xn == null ? CopyToOutputState.Never :
 					(CopyToOutputState)Enum.Parse (typeof(CopyToOutputState), xn.InnerText, true);
 			}
@@ -266,6 +295,8 @@ namespace Crow.Coding
 		}
 
 		public void OnQueryClose (object sender, EventArgs e){
+			if (IsDirty)
+				Console.WriteLine ("closing unsaved file");
 			Project.solution.CloseItem (this);
 		}
 	}
@@ -276,6 +307,21 @@ namespace Crow.Coding
 		}
 		#endregion
 
+		GraphicObject instance;
+
+		/// <summary>
+		/// instance created with an instantiator from the source by a DesignInterface,
+		/// for now, the one in ImlVisualEditor
+		/// </summary>
+		public GraphicObject Instance {
+			get { return instance; }
+			set {
+				if (instance == value)
+					return;
+				instance = value;
+				NotifyValueChanged ("Instance", instance);
+			}
+		}
 	}
 }
 

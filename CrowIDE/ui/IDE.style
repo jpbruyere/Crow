@@ -15,3 +15,11 @@ MemberViewHStack {
 	MouseEnter={Background=UnitedNationsBlue};
 	MouseLeave={Background=Transparent};
 }
+
+IcoBut {
+	Template = #Crow.Coding.ui.IcoBut.template;
+	MinimumSize = 10,10;
+	Width = 8;
+	Height = 14;
+	Background = White;
+}

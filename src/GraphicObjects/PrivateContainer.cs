@@ -45,6 +45,14 @@ namespace Crow
 		public PrivateContainer (Interface iface) : base(iface){}
 		#endregion
 
+		#if DESIGN_MODE
+		public override bool FindByDesignID(string designID, out GraphicObject go){
+			go = null;
+			if (base.FindByDesignID (designID, out go))
+				return true;
+			return (bool)child?.FindByDesignID (designID, out go);				
+		}
+		#endif
 		protected GraphicObject child;
 
 		protected virtual void SetChild(GraphicObject _child)

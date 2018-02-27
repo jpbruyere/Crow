@@ -86,10 +86,25 @@ namespace Crow.Coding
 		string oldSource = "";
 		void updateSourceThreadFunc (){
 			while (true) {
-				if (projNode != null && buffer != null) {
-					string newSrc = buffer.FullText;
-					if (projNode.Source != newSrc)
-						projNode.Source = newSrc;
+				if (projFile != null && buffer != null) {
+					if (!projFile.RegisteredEditors [this]) {
+						loadSource ();
+						isDirty = false;
+						oldSource = projFile.Source;
+						projFile.RegisteredEditors [this] = true;
+					}
+					if (Monitor.TryEnter (buffer.EditMutex)) {
+						string newsrc = "";
+						bool wasDirty = false;
+						if (isDirty) {
+							isDirty = false;
+							wasDirty = true;
+							newsrc = buffer.FullText;
+						}
+						Monitor.Exit (buffer.EditMutex);
+						if (wasDirty) 
+							projFile.UpdateSource (this, newsrc);						
+					}
 				}
 				Thread.Sleep (100);
 			}
@@ -99,7 +114,7 @@ namespace Crow.Coding
 
 		#region private and protected fields
 		bool foldingEnabled = true;
-		ProjectFile projNode = null;
+		ProjectFile projFile = null;
 		int leftMargin = 0;	//margin used to display line numbers, folding errors,etc...
 		int visibleLines = 1;
 		int visibleColumns = 1;
@@ -203,6 +218,8 @@ namespace Crow.Coding
 			buffer.ToogleFolding (line);
 		}
 
+		volatile bool isDirty = false;
+
 		#region Buffer events handlers
 		void Buffer_BufferCleared (object sender, EventArgs e)
 		{
@@ -213,6 +230,7 @@ namespace Crow.Coding
 			PrintedLines = null;
 			RegisterForGraphicUpdate ();
 			notifyPositionChanged ();
+			isDirty = true;
 		}
 		void Buffer_LineAdditionEvent (object sender, CodeBufferEventArgs e)
 		{
@@ -237,6 +255,7 @@ namespace Crow.Coding
 			updateMaxScrollY ();
 			RegisterForGraphicUpdate ();
 			notifyPositionChanged ();
+			isDirty = true;
 		}
 		void Buffer_LineRemoveEvent (object sender, CodeBufferEventArgs e)
 		{
@@ -254,6 +273,7 @@ namespace Crow.Coding
 			updateMaxScrollY ();
 			RegisterForGraphicUpdate ();
 			notifyPositionChanged ();
+			isDirty = true;
 		}
 		void Buffer_LineUpadateEvent (object sender, CodeBufferEventArgs e)
 		{
@@ -273,6 +293,7 @@ namespace Crow.Coding
 			
 			RegisterForGraphicUpdate ();
 			notifyPositionChanged ();
+			isDirty = true;
 		}
 		void Buffer_PositionChanged (object sender, EventArgs e)
 		{
@@ -356,39 +377,45 @@ namespace Crow.Coding
 		public ProjectFile ProjectNode
 		{
 			get {
-				return projNode;
+				return projFile;
 			}
 			set
 			{
-				if (projNode == value)
+				if (projFile == value)
 					return;
 
-				projNode = value;
+				if (projFile != null)
+					projFile.UnregisterEditor (this);
 
-				NotifyValueChanged ("ProjectNode", projNode);
+				projFile = value;
+				NotifyValueChanged ("ProjectNode", projFile);
 
-				if (projNode == null)
+				if (projFile == null)
 					return;
-				
-				if (!File.Exists (projNode.AbsolutePath))
-					return;
 
-				parser = getParserFromExt (System.IO.Path.GetExtension (projNode.Extension));
+				parser = getParserFromExt (System.IO.Path.GetExtension (projFile.Extension));
 
-				try {
-					buffer.Load (projNode.Source);
-					oldSource = projNode.Source;
-				} catch (Exception ex) {
-					Debug.WriteLine (ex.ToString ());
-				}
+				projFile.RegisterEditor (this);
 
-				updateMaxScrollY ();
-				MaxScrollX = Math.Max (0, buffer.longestLineCharCount - visibleColumns);
-				updatePrintedLines ();
-
-				RegisterForGraphicUpdate ();
 			}
 		}
+		void loadSource () {
+			
+			try {
+				buffer.Load (projFile.Source);
+			} catch (Exception ex) {
+				Debug.WriteLine (ex.ToString ());
+			}
+
+			projFile.RegisteredEditors [this] = true;
+
+			updateMaxScrollY ();
+			MaxScrollX = Math.Max (0, buffer.longestLineCharCount - visibleColumns);
+			updatePrintedLines ();
+
+			RegisterForGraphicUpdate ();
+		}
+
 		[XmlAttributeAttribute][DefaultValue("BlueGray")]
 		public virtual Color SelectionBackground {
 			get { return selBackground; }

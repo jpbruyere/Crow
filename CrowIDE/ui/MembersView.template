@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <VerticalStack>
 	<Border Height="Fit">
-		<Label TextAlignment="Left" Text="{../../../SelectedItemName}" Width="Stretched"/>
+		<Label TextAlignment="Left" Text="{./SelectedItemName}" Width="Stretched"/>
 	</Border>
 	<HorizontalStack>
 		<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"

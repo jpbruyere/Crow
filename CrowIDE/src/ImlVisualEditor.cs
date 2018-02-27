@@ -43,7 +43,7 @@ namespace Crow.Coding
 
 		DesignInterface imlVE;
 		GraphicObject selectedItem;
-		ImlProjectItem projectItem;
+		ImlProjectItem projFile;
 		Exception imlError = null;
 
 		bool drawGrid;
@@ -97,33 +97,25 @@ namespace Crow.Coding
 		[XmlIgnore]public List<LQIList> LQIs {
 			get { return imlVE.LQIs; }
 		}
-
-		[XmlAttributeAttribute]
+			
 		public ProjectNode ProjectNode {
-			get { return projectItem; }
+			get { return projFile; }
 			set {
-				if (projectItem == value)
+				if (projFile == value)
 					return;
 
+				if (projFile != null)
+					projFile.UnregisterEditor (this);
+				
+				projFile = value as ImlProjectItem;
 
-				if (projectItem != null)
-					projectItem.ValueChanged -= ProjectItem_ValueChanged;
+				imlVE.ProjFile = projFile;
 
-				projectItem = value as ImlProjectItem;
+				if (projFile != null)
+					projFile.RegisterEditor (this);
 
-				if (projectItem != null)
-					projectItem.ValueChanged += ProjectItem_ValueChanged;
-
-				NotifyValueChanged ("ProjectNode", projectItem);
-
-				reload ();
+				NotifyValueChanged ("ProjectNode", projFile);
 			}
-		}
-
-		void ProjectItem_ValueChanged (object sender, ValueChangeEventArgs e)
-		{
-			if (e.MemberName == "Source")
-				reload ();			
 		}
 
 		[XmlIgnore]public Exception IMLError {
@@ -140,24 +132,6 @@ namespace Crow.Coding
 			get { return imlError != null; }
 		}
 
-		void reload(){
-			if (projectItem == null)				
-				return;
-			
-			try {
-				imlVE.ProjFile = projectItem;
-				imlVE.Styling = projectItem.Project.solution.Styling;
-				imlVE.DefaultTemplates = projectItem.Project.solution.DefaultTemplates;
-				imlVE.Instantiators = new Dictionary<string, Instantiator>();
-				imlVE.ClearInterface();
-				imlVE.LoadIMLFragment(projectItem.Source);
-				IMLError = null;
-			} catch (Exception ex) {
-				IMLError = ex.InnerException;
-				Console.WriteLine (ex.ToString ());
-			}
-		}
-
 		public List<GraphicObject> GraphicTree {
 			get { return imlVE.GraphicTree; }
 		}
@@ -166,9 +140,29 @@ namespace Crow.Coding
 		{
 			while (true) {
 				try {
+					if (!projFile.RegisteredEditors[this]){
+						string selItemDesignID = null;
+						if (SelectedItem!=null)
+							selItemDesignID = SelectedItem.design_id;
+						imlVE.ClearInterface();
+						Instantiator.NextInstantiatorID = 0;
+						imlVE.Styling = projFile.Project.solution.Styling;
+						imlVE.DefaultTemplates = projFile.Project.solution.DefaultTemplates;
+						imlVE.Instantiators = new Dictionary<string, Instantiator>();
+						imlVE.LoadIMLFragment(projFile.Source);
+						projFile.Instance = imlVE.GraphicTree[0];
+						GraphicObject go = null;
+						if (selItemDesignID!=null)
+							projFile.Instance.FindByDesignID(selItemDesignID,out go);						
+						SelectedItem = go;
+						IMLError = null;
+						projFile.RegisteredEditors[this] = true;
+					}else if ((bool)projFile.Instance?.HasChanged){
+						projFile.UpdateSource(this, projFile.Instance.GetIML());
+					}
 					imlVE.Update ();
 				} catch (Exception ex) {
-					System.Diagnostics.Debug.WriteLine (ex.ToString ());
+					IMLError = ex.InnerException;
 					if (Monitor.IsEntered(imlVE.UpdateMutex))
 						Monitor.Exit (imlVE.UpdateMutex);
 				}
@@ -215,9 +209,9 @@ namespace Crow.Coding
 			//base.onMouseDown (sender, e);
 			SelectedItem = HoverWidget;
 
-			if (SelectedItem != null && projectItem != null) {
-				projectItem.CurrentLine = HoverWidget.design_line;
-				projectItem.CurrentColumn = HoverWidget.design_column;
+			if (SelectedItem != null && projFile != null) {
+				projFile.CurrentLine = SelectedItem.design_line;
+				projFile.CurrentColumn = SelectedItem.design_column;
 			}
 
 		}

@@ -32,6 +32,12 @@ namespace Crow.Coding
 	public class MembersView : ListBox
 	{		
 		object instance;
+		ImlProjectItem projFile;
+
+		public MembersView () : base() {}
+
+		//cache property containers per type
+		Dictionary<string,PropertyContainer[]> propContainersCache = new Dictionary<string, PropertyContainer[]>();
 
 		[XmlAttributeAttribute][DefaultValue(null)]
 		public virtual object Instance {
@@ -39,36 +45,70 @@ namespace Crow.Coding
 			set {
 				if (instance == value)
 					return;
+				object lastInst = instance;
+
 				instance = value;
 				NotifyValueChanged ("Instance", instance);
-				if (Instance is GraphicObject)
-					NotifyValueChanged ("SelectedItemName", (Instance as GraphicObject).Name);
-				else
+
+				if (Instance is GraphicObject) {
+					NotifyValueChanged ("SelectedItemName", Instance.GetType().Name + (Instance as GraphicObject).design_id
+						+ ":" + (Instance as GraphicObject).design_imlPath );
+				}else
 					NotifyValueChanged ("SelectedItemName", "");
 
-				if (instance == null) {
+				if (instance == null) { 
 					Data = null;
 					return;
+				}	
+
+				Type it = instance.GetType ();
+				if (!propContainersCache.ContainsKey (it.FullName)) {
+					MemberInfo[] members = it.GetMembers (BindingFlags.Public | BindingFlags.Instance);
+					List<PropertyContainer> props = new List<PropertyContainer> ();
+					foreach (MemberInfo m in members) {
+						if (m.MemberType == MemberTypes.Property) {
+							PropertyInfo pi = m as PropertyInfo;
+							if (!pi.CanWrite)
+								continue;
+							if (pi.GetCustomAttribute (typeof(XmlIgnoreAttribute)) != null)
+								continue;
+							props.Add (new PropertyContainer (this, pi));
+						}
+					}
+					propContainersCache.Add (it.FullName, props.OrderBy (p => p.Name).ToArray ());
 				}
 
-				MemberInfo[] members = instance.GetType ().GetMembers (BindingFlags.Public | BindingFlags.Instance);
+				Data = propContainersCache [it.FullName];
 
-				List<PropertyContainer> props = new List<PropertyContainer> ();
-				foreach (MemberInfo m in members) {
-					if (m.MemberType == MemberTypes.Property) {
-						PropertyInfo pi = m as PropertyInfo;
-						if (!pi.CanWrite)
-							continue;
-						if (pi.GetCustomAttribute (typeof(XmlIgnoreAttribute)) != null)
-							continue;
-						props.Add (new PropertyContainer (pi, instance));
+				if (lastInst != instance) {
+					foreach (PropertyContainer pc in propContainersCache [it.FullName]) {
+						pc.NotifyValueChanged ("Value", pc.Value);
 					}
 				}
-				Data = props.OrderBy(p=>p.Name).ToArray ();
 			}
 		}
-		public MembersView () : base()
-		{
+		public ImlProjectItem ProjectNode {
+			get { return projFile; }
+			set {
+				if (projFile == value)
+					return;
+				
+//				if (projFile != null)
+//					projFile.UnregisterEditor (this);
+				
+				projFile = value;
+
+//				if (projFile != null)
+//					projFile.RegisterEditor (this);
+
+				NotifyValueChanged ("ProjectNode", projFile);
+			}
+		}
+
+		public void updateSource () {
+			if (projFile == null)
+				return;
+			projFile.UpdateSource (this, (Instance as GraphicObject).GetIML ());
 		}
 
 //		public override void Paint (ref Context ctx)

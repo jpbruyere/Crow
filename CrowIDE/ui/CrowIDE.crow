@@ -42,7 +42,8 @@
 						Data="{Projects}" SelectedItemChanged="onSelectedItemChanged"
 						ItemTemplate="#Crow.Coding.ui.ProjectTree.template"/>
 					<Splitter/>
-					<MembersView Instance="{SelectedItemElement}" DataTest="Type"
+					<MembersView ProjectNode="{SelectedItem}"
+						Instance="{SelectedItemElement}" DataTest="Type"
 						ItemTemplate="#Crow.Coding.ui.MembersItem.template"/>
 				</VerticalStack>
 			</HorizontalStack>

@@ -26,6 +26,8 @@
 using System;
 using System.Reflection;
 using System.Linq;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Crow.Coding
 {
@@ -39,44 +41,84 @@ namespace Crow.Coding
 		}
 		#endregion
 
+		public List<Crow.Command> Commands;
 		PropertyInfo pi;
-		object instance;
-		GraphicObject go;
+		MembersView mview;
+//		object instance;
+//		GraphicObject go;
+
+		public PropertyContainer(MembersView mv, PropertyInfo prop){
+			mview = mv;
+			pi = prop;
+//			instance = _instance;
+//			go = instance as GraphicObject;
+
+			Commands = new List<Crow.Command> (new Crow.Command[] {
+				new Crow.Command(new Action(() => Reset())) { Caption = "Reset to default"},
+			});
+		}
 
 		public string Name { get { return pi.Name; }}
 		public object Value {
-			get { return go.design_members.ContainsKey(Name) ?
-				go.design_members[Name] : pi.GetValue(instance); }
+			get {
+				return pi.GetValue(mview.ProjectNode.SelectedItem);
+//				GraphicObject inst = mview.ProjectNode.SelectedItem as GraphicObject;
+//				Debug.WriteLine("read {0}.{1}", inst.Name, Name);
+//				if (!inst.design_members.ContainsKey (Name))
+//					return pi.GetValue (inst);
+//				
+//				if (inst.design_members [Name].StartsWith ("{"))
+//					return inst.design_members [Name];
+//				else
+//					return pi.GetValue (inst);
+			}
 			set {
-				if (go.design_members.ContainsKey (Name)) {
-					if (go.design_members [Name] == (string)value)
-						return;
+				try {
+					GraphicObject inst = mview.ProjectNode.SelectedItem as GraphicObject;
+					string valstr = null;
+					if (value != null)
+						valstr = value.ToString();
+					if (inst.design_members.ContainsKey (Name)) {
+						if (inst.design_members [Name] == valstr)
+							return;
+						Debug.WriteLine("update {0} : {1} = {2}", inst.Name, Name, valstr);
+						inst.design_members [Name] = value.ToString();
+					} else {
+						Debug.WriteLine("add {0} : {1} = {2}", inst.Name, Name, valstr);
+						inst.design_members.Add (Name, value.ToString());
+					}				
+
+					if (!pi.PropertyType.IsAssignableFrom(value.GetType()) && pi.PropertyType != typeof(string)){
+						if (pi.PropertyType.IsEnum) {
+							if (value is string) {
+								pi.SetValue (inst, Enum.Parse (pi.PropertyType, (string)value));
+							}else
+								pi.SetValue (inst, value);
+						} else {
+							MethodInfo me = pi.PropertyType.GetMethod
+								("Parse", BindingFlags.Static | BindingFlags.Public,
+									System.Type.DefaultBinder, new Type [] {typeof (string)},null);
+							pi.SetValue (inst, me.Invoke (null, new object[] { value }), null);
+						}
+					}else
+						pi.SetValue(inst, value);
+					
+					mview.ProjectNode.Instance.HasChanged = true;
+					NotifyValueChanged ("Value", value);
+					NotifyValueChanged ("LabForeground", LabForeground);
+				} catch (Exception ex) {
+					System.Diagnostics.Debug.WriteLine ("Error setting property:"+ ex.ToString());
 				}
-				go.design_members [Name] = (string)value;
-//				try {
-//					if (!pi.PropertyType.IsAssignableFrom(value.GetType()) && pi.PropertyType != typeof(string)){
-//						if (pi.PropertyType.IsEnum) {
-//							if (value is string) {
-//								pi.SetValue (instance, Enum.Parse (pi.PropertyType, (string)value));
-//							}else
-//								pi.SetValue (instance, value);
-//						} else {
-//							MethodInfo me = pi.PropertyType.GetMethod
-//								("Parse", BindingFlags.Static | BindingFlags.Public,
-//									System.Type.DefaultBinder, new Type [] {typeof (string)},null);
-//							pi.SetValue (instance, me.Invoke (null, new object[] { value }), null);
-//						}
-//					}else
-//						pi.SetValue(instance, value);
-//				} catch (Exception ex) {
-//					System.Diagnostics.Debug.WriteLine ("Error setting property:"+ ex.ToString());
-//				}
-				NotifyValueChanged ("Value", value);
+				//
 			}
 		}
+		/// <summary>
+		/// for style attribute which is a string, return Style as type
+		/// </summary>
 		public string Type { get { return pi.PropertyType.IsEnum ?
 				"System.Enum"
-					: pi.PropertyType.FullName; }}
+					: pi.Name == "Style" ? "Style" : pi.PropertyType.FullName; }}
+		
 		public object[] Choices {
 			get {
 				return Enum.GetValues (pi.PropertyType).Cast<object>().ToArray();
@@ -84,14 +126,23 @@ namespace Crow.Coding
 		}
 
 		public Fill LabForeground {
-			get { return go.design_members.ContainsKey(Name) ? Color.Black : Color.DimGray;}
+			get { return (mview.ProjectNode.SelectedItem as GraphicObject).design_members.ContainsKey(Name) ? Color.Black : Color.DimGray;}
 		}
 
-		public PropertyContainer(PropertyInfo prop, object _instance){
-			pi = prop;
-			instance = _instance;
-			go = instance as GraphicObject;
+		/// <summary>
+		/// reset to default value
+		/// </summary>
+		public void Reset () {
+			GraphicObject inst = mview.ProjectNode.SelectedItem as GraphicObject;
+			if (!inst.design_members.ContainsKey (Name))
+				return;
+			inst.design_members.Remove (Name);
+			//NotifyValueChanged ("Value", Value);
+			mview.ProjectNode.Instance.HasChanged = true;
+			//should reinstantiate to get default
 		}
+
+
 
 	}
 }

@@ -1,15 +1,15 @@
-﻿<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0"?>
 <ItemTemplate>	
 	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
 		<Label Text="Error" Background="Red"/>
 	</TabItem>
 </ItemTemplate>
-<ItemTemplate DataType=".svg" DataTest="Extension">
+<ItemTemplate DataType=".svg">
 	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
 		<Image Path="{AbsolutePath}"/>
 	</TabItem>
 </ItemTemplate>
-<ItemTemplate Path="#Crow.Coding.ui.SrcEdit.itemp" DataType=".cs" DataTest="Extension"/>
-<ItemTemplate Path="#Crow.Coding.ui.SrcEdit.itemp" DataType=".style" DataTest="Extension"/>
-<ItemTemplate Path="#Crow.Coding.ui.IMLEdit.itemp" DataType=".crow" DataTest="Extension"/>
-<ItemTemplate Path="#Crow.Coding.ui.IMLEdit.itemp" DataType=".template" DataTest="Extension"/>
+<ItemTemplate Path="#Crow.Coding.ui.SrcEdit.itemp" DataType=".cs"/>
+<ItemTemplate Path="#Crow.Coding.ui.SrcEdit.itemp" DataType=".style"/>
+<ItemTemplate Path="#Crow.Coding.ui.IMLEdit.itemp" DataType=".crow"/>
+<ItemTemplate Path="#Crow.Coding.ui.IMLEdit.itemp" DataType=".template"/>

@@ -31,9 +31,7 @@ namespace Crow.Coding
 {
 	public class EditPane : TemplatedGroup
 	{
-		public EditPane () : base()
-		{
-		}
+		public EditPane () {}
 
 		object selectedItemElement = null;
 
