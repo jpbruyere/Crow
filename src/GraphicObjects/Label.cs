@@ -623,9 +623,9 @@ namespace Crow
 				int lineLength = (int)gr.TextExtents (l).XAdvance;
 				Rectangle lineRect = new Rectangle (
 					rText.X,
-					rText.Y + (int)Math.Floor((double)i * (fe.Ascent+fe.Descent)),
+					rText.Y + i * (int)(fe.Ascent+fe.Descent),
 					lineLength,
-					(int)Math.Ceiling((fe.Ascent+fe.Descent)));
+					(int)(fe.Ascent+fe.Descent));
 
 //				if (TextAlignment == Alignment.Center ||
 //					TextAlignment == Alignment.Top ||
@@ -669,7 +669,7 @@ namespace Crow
 						gr.Save ();
 						gr.Clip ();
 						gr.SetSourceColor (SelectionForeground);
-						gr.MoveTo (lineRect.X, (double)rText.Y + fe.Ascent + (fe.Ascent+fe.Descent) * i);
+						gr.MoveTo (lineRect.X, rText.Y + fe.Ascent + (fe.Ascent+fe.Descent) * i);
 						gr.ShowText (l);
 						gr.Fill ();
 						gr.Restore ();
