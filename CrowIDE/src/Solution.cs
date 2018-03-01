@@ -55,7 +55,9 @@ namespace Crow.Coding{
 			if (StartupProject != null)
 				StartupProject.GetStyling ();
 		}
-
+		public string[] AvailaibleStyles {
+			get { return Styling == null ? new string[] {} : Styling.Keys.ToArray();}
+		}
 		public void ReloadDefaultTemplates () {
 			DefaultTemplates = new Dictionary<string, string>();
 			if (StartupProject != null)

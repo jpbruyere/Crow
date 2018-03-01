@@ -123,6 +123,7 @@
     <Folder Include="src\" />
     <Folder Include="images\" />
     <Folder Include="src\SourceEditor\" />
+    <Folder Include="ui\ItemTemplates\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="images\save.svg" />
@@ -167,6 +168,8 @@
     <EmbeddedResource Include="ui\SrcEdit.itemp" />
     <EmbeddedResource Include="ui\IcoBut.template" />
     <EmbeddedResource Include="ui\MembersItem.template" />
+    <EmbeddedResource Include="ui\ItemTemplates\Enum.template" />
+    <EmbeddedResource Include="ui\ItemTemplates\Fill.template" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">

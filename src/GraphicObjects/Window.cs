@@ -47,8 +47,9 @@ namespace Crow
 		}
 
 		string _icon;
-		bool _resizable;
-		bool _movable;
+		bool resizable;
+		bool movable;
+		bool modal;
 		protected bool hoverBorder = false;
 		bool alwaysOnTop = false;
 		Fill titleBarBackground = Color.UnitedNationsBlue;
@@ -124,25 +125,37 @@ namespace Crow
 		[XmlAttributeAttribute][DefaultValue(true)]
 		public bool Resizable {
 			get {
-				return _resizable;
+				return resizable;
 			}
 			set {
-				if (_resizable == value)
+				if (resizable == value)
 					return;
-				_resizable = value;
-				NotifyValueChanged ("Resizable", _resizable);
+				resizable = value;
+				NotifyValueChanged ("Resizable", resizable);
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue(true)]
 		public bool Movable {
 			get {
-				return _movable;
+				return movable;
 			}
 			set {
-				if (_movable == value)
+				if (movable == value)
 					return;
-				_movable = value;
-				NotifyValueChanged ("Movable", _movable);
+				movable = value;
+				NotifyValueChanged ("Movable", movable);
+			}
+		}
+		[XmlAttributeAttribute][DefaultValue(false)]
+		public bool Modal {
+			get {
+				return modal;
+			}
+			set {
+				if (modal == value)
+					return;
+				modal = value;
+				NotifyValueChanged ("Modal", modal);
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue(false)]
@@ -167,17 +180,18 @@ namespace Crow
 		[XmlAttributeAttribute][DefaultValue(false)]
 		public bool AlwaysOnTop {
 			get {
-				return alwaysOnTop;
+				return modal ? true : alwaysOnTop;
 			}
 			set {
 				if (alwaysOnTop == value)
 					return;
+				
 				alwaysOnTop = value;
 
-				if (alwaysOnTop && Parent != null)
+				if (AlwaysOnTop && Parent != null)
 					IFace.PutOnTop (this);
 
-				NotifyValueChanged ("AlwaysOnTop", alwaysOnTop);
+				NotifyValueChanged ("AlwaysOnTop", AlwaysOnTop);
 			}
 		}
 //		[XmlAttributeAttribute()][DefaultValue(WindowState.Normal)]
@@ -286,7 +300,7 @@ namespace Crow
 				return;
 			}
 
-			if (this.HasFocus && _movable) {
+			if (this.HasFocus && movable) {
 				if (e.Mouse.IsButtonDown (MouseButton.Left)) {
 					MoveAndResize (e.XDelta, e.YDelta, currentDirection);
 					return;
@@ -352,6 +366,10 @@ namespace Crow
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseDown (sender, e);
+		}
+		public override bool MouseIsIn (Point m)
+		{
+			return modal ? true : base.MouseIsIn (m);
 		}
 		#endregion
 

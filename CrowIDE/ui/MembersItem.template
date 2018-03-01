@@ -11,72 +11,7 @@
 		<CheckBox Background="White" Foreground = "{LabForeground}" Height="Stretched" Caption="" IsChecked="{²Value}"/>
 	</HorizontalStack>
 </ItemTemplate>
-<ItemTemplate DataType="System.Enum">
-	<HorizontalStack Style="MemberViewHStack" ContextCommands="{Commands}">
-		<Label Style="MemberViewLabel" Text="{Name}" Foreground = "{LabForeground}"/>
-		<ComboBox Margin="0"  Height="Stretched" Width="50%" Data="{Choices}"
-				SelectedItem="{²Value}">
-			<Template>
-				<Popper Name="popper" PopDirection="Bottom">
-					<Template>
-						<CheckBox Caption="{./Caption}" IsChecked="{²./IsPopped}" Foreground="{./Foreground}" Background="{./Background}">
-							<Template>
-								<Border CornerRadius="0" Foreground="LightGray" Background="White">
-									<HorizontalStack Margin="0" Spacing="1">
-										<Label Width="Stretched" MinimumSize="80,10" Margin="1" Foreground = "{LabForeground}" Background="White"
-											Text="{../../../../../SelectedItem}"/>
-										<Button Width="12" Height="12" Focusable="false"
-											Template="#Crow.Templates.ArrowBut.template">
-											<Image Margin="1" Path="#Crow.Images.Icons.updown.svg" SvgSub="down"/>
-										</Button>
-									</HorizontalStack>
-								</Border>
-							</Template>
-						</CheckBox>
-					</Template>
-					<Border Background="White" BorderWidth="1" Margin="1" Foreground="Black"
-						MinimumSize="{../../MinimumPopupSize}" Fit="true">
-						<Scroller Name="scroller1" Margin="2" VerticalScrolling="true"
-							MaximumSize="0,200"
-							HorizontalAlignment="Left"
-							ValueChanged="../../../_scroller_ValueChanged">
-							<VerticalStack LayoutChanged="../../../../_list_LayoutChanged"
-								MouseClick="../../../onMouseClick" Focusable="True"
-								Height="Fit" Name="ItemsContainer" Margin="0"
-								HorizontalAlignment="Left"
-								VerticalAlignment="Top"/>
-						</Scroller>
-					</Border>
-				</Popper>
-			</Template>
-			<ItemTemplate>
-				<Container Fit="true" Margin="0" Focusable="true"
-						HorizontalAlignment="Left"
-						MouseEnter="{Background=SteelBlue}"
-						MouseLeave="{Background=Transparent}">
-					<Label Text="{}" Foreground="Black"/>
-				</Container>
-			</ItemTemplate>
-		</ComboBox>
-	</HorizontalStack>
-</ItemTemplate>
-<ItemTemplate DataType="Crow.Fill">
-	<HorizontalStack Style="MemberViewHStack" ContextCommands="{Commands}">
-		<Label Style="MemberViewLabel" Text="{Name}" Foreground = "{LabForeground}"/>
-		<Popper Height="Stretched" Caption="{Value}">
-			<Template>
-				<CheckBox Caption="{./Caption}" IsChecked="{²./IsPopped}">
-					<Template>
-						<HorizontalStack Margin="1" Height="Stretched" Spacing="3" Background="White">
-							<Border Foreground="{LabForeground}" Width="18" Height="12" CornerRadius="3"
-								Background="{Value}">
-							</Border>
-							<Label Width="Stretched" Text="{./Caption}" Foreground="{LabForeground}"/>
-						</HorizontalStack>
-					</Template>
-				</CheckBox>
-			</Template>
-			<ColorPicker SelectedColor="{²Value}" Background="Onyx" Margin="5" Fit="True" />
-		</Popper>
-	</HorizontalStack>
-</ItemTemplate>
+<ItemTemplate Path="#Crow.Coding.ui.ItemTemplates.Enum.template" DataType="System.Enum" />
+<ItemTemplate Path="#Crow.Coding.ui.ItemTemplates.Enum.template" DataType="Style" />
+<ItemTemplate Path="#Crow.Coding.ui.ItemTemplates.Fill.template" DataType="Crow.Fill"/>
+	

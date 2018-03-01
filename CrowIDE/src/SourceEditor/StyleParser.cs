@@ -79,7 +79,7 @@ namespace Crow.Coding
 				case ',':
 					if (curState != States.init || curState != States.classNames )
 						throw new ParserException (currentLine, currentColumn, "Unexpected char ','");
-					readAndResetCurrentTok (TokenType.UnaryOp, true);
+					readAndResetCurrentTok (TokenType.OperatorOrPunctuation, true);
 					curState = States.classNames;
 					break;
 				case '{':
@@ -97,7 +97,8 @@ namespace Crow.Coding
 				case '=':
 					if (curState == States.classNames)
 						throw new ParserException (currentLine, currentColumn, "Unexpected char '='");
-					readAndResetCurrentTok (TokenType.Affectation, true);
+					setPreviousTokOfTypeTo (TokenType.Type, TokenType.Identifier);
+					readAndResetCurrentTok (TokenType.OperatorOrPunctuation, true);
 					curState = States.value;
 					break;
 				case '"':
@@ -138,7 +139,7 @@ namespace Crow.Coding
 						while (nextCharIsValidCharName)
 							readToCurrTok ();
 					}
-					saveAndResetCurrentTok (TokenType.Identifier);
+					saveAndResetCurrentTok (TokenType.Type);
 					break;
 				}
 			}
@@ -151,6 +152,33 @@ namespace Crow.Coding
 		public override void SyntaxAnalysis ()
 		{
 			RootNode = new Node () { Name = "RootNode", Type="Root" };
+
+			Node currentNode = RootNode;
+
+			for (int i = 0; i < buffer.LineCount; i++) {
+				CodeLine cl = buffer[i];
+				if (cl.Tokens == null)
+					continue;
+				cl.SyntacticNode = null;
+
+				int tokPtr = 0;
+				while (tokPtr < cl.Tokens.Count) {
+					switch (cl.Tokens [tokPtr].Type) {
+					case TokenType.OpenBlock:						
+						Node newElt = new Node () { Name = cl.Tokens [tokPtr].Content, StartLine = cl };
+						currentNode.AddChild (newElt);
+						currentNode = newElt;
+						if (cl.SyntacticNode == null)
+							cl.SyntacticNode = newElt;
+						break;
+					case TokenType.CloseBlock:						
+						currentNode.EndLine = cl;
+						currentNode = currentNode.Parent;
+						break;
+					}
+					tokPtr++;
+				}
+			}
 		}
 	}
 }

@@ -168,7 +168,7 @@ namespace Crow.Coding
 			: base (pi.Project, pi.node) {
 
 			cmdSave = new Crow.Command (new Action (() => Save ()))
-				{ Caption = "Save", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false };
+				{ Caption = "Save", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = true };
 			cmdOpen = new Crow.Command (new Action (() => Open ())) 
 				{ Caption = "Open", Icon = new SvgPicture ("#Crow.Coding.ui.icons.outbox.svg"), CanExecute = false };
 
@@ -293,11 +293,31 @@ namespace Crow.Coding
 			origSource = source;
 			NotifyValueChanged ("IsDirty", false);
 		}
+		public void Close () {
+			origSource = null;
+			isOpened = false;
+			Project.solution.CloseItem (this);
+		}
 
 		public void OnQueryClose (object sender, EventArgs e){
-			if (IsDirty)
-				Console.WriteLine ("closing unsaved file");
-			Project.solution.CloseItem (this);
+			if (IsDirty) {
+				MessageBox mb = MessageBox.ShowModal (CrowIDE.MainIFace,
+					                MessageBox.Type.YesNoCancel, $"{DisplayName} has unsaved changes.\nSave it now?");
+				mb.Yes += onClickSaveAndCloseNow;
+				mb.No += onClickCloseNow;
+			} else
+				Close ();
+		}
+
+		void onClickCloseNow (object sender, EventArgs e)
+		{
+			Close ();
+		}
+
+		void onClickSaveAndCloseNow (object sender, EventArgs e)
+		{
+			Save ();
+			Close ();
 		}
 	}
 	public class ImlProjectItem : ProjectFile

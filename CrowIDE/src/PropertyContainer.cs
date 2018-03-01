@@ -121,7 +121,9 @@ namespace Crow.Coding
 		
 		public object[] Choices {
 			get {
-				return Enum.GetValues (pi.PropertyType).Cast<object>().ToArray();
+				return pi.PropertyType.IsEnum ?
+					Enum.GetValues (pi.PropertyType).Cast<object>().ToArray() :
+					mview.ProjectNode.Project.solution.AvailaibleStyles;
 			}
 		}
 

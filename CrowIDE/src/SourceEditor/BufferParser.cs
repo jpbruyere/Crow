@@ -24,21 +24,24 @@ namespace Crow.Coding
 			BlockCommentStart = 4,
 			BlockComment = 5,
 			BlockCommentEnd = 6,
-			Type = 7,
+			Preprocessor = 7,
 			Identifier = 8,
-			Indexer = 9,
+			Keyword = 9,
 			OpenBlock = 10,
 			CloseBlock = 11,
 			StatementEnding = 12,
-			UnaryOp = 13,
-			BinaryOp = 14,
-			Affectation = 15,
+			OperatorOrPunctuation = 13,
+			IntegerLitteral = 14,
+			RealLitteral = 15,
 			StringLitteralOpening = 16,
 			StringLitteralClosing = 17,
 			StringLitteral = 18,
-			NumericLitteral = 19,
-			Preprocessor = 20,
-			Keyword = 21,
+			CharLitteralOpening = 19,
+			CharLitteralClosing = 20,
+			CharLitteral = 21,
+			BoolLitteral = 22,
+			NullLitteral = 23,			 
+			Type = 24,
 		}
 
 		#region CTOR
@@ -70,11 +73,69 @@ namespace Crow.Coding
 		void Buffer_LineUpadateEvent (object sender, CodeBufferEventArgs e)
 		{
 			for (int i = 0; i < e.LineCount; i++)
-				tryParseBufferLine (e.LineStart + i);
+				TryParseBufferLine (e.LineStart + i);
 			reparseSource ();
 		}
 		#endregion
 
+		internal int currentLine = 0;
+		internal int currentColumn = 0;
+
+		protected CodeBuffer buffer;
+		protected Token currentTok;
+		protected bool eol = true;
+		protected Point CurrentPosition {
+			get { return new Point (currentLine, currentColumn); }
+			set {
+				currentLine = value.Y;
+				currentColumn = value.X;
+			}
+		}
+
+		public Node RootNode;
+
+		public abstract void ParseCurrentLine();
+		public abstract void SyntaxAnalysis ();
+		public void reparseSource () {
+			for (int i = 0; i < buffer.LineCount; i++) {
+				if (!buffer[i].IsParsed)
+					TryParseBufferLine (i);
+			}
+			try {
+				SyntaxAnalysis ();
+			} catch (Exception ex) {
+				Debug.WriteLine ("Syntax Error: " + ex.ToString ());
+				if (ex is ParserException)
+					SetLineInError (ex as ParserException);
+			}
+		}
+		public void TryParseBufferLine(int lPtr) {
+			buffer [lPtr].exception = null;
+			currentLine = lPtr;
+			currentColumn = 0;
+			eol = false;
+
+			try {
+				ParseCurrentLine ();
+			} catch (Exception ex) {
+				Debug.WriteLine (ex.ToString ());
+				if (ex is ParserException)
+					SetLineInError (ex as ParserException);
+			}
+
+		}
+
+		public virtual void SetLineInError(ParserException ex) {
+			currentTok = default(Token);
+			if (ex.Line >= buffer.LineCount)
+				ex.Line = buffer.LineCount - 1;
+			if (buffer [ex.Line].IsFolded)
+				buffer.ToogleFolding (ex.Line);
+			buffer [ex.Line].SetLineInError (ex);
+		}
+		public virtual string LineBrkRegex {
+			get { return @"\r\n|\r|\n|\\\\n"; }
+		}
 		void updateFolding () {
 			//			Stack<TokenList> foldings = new Stack<TokenList>();
 			//			bool inStartTag = false;
@@ -113,63 +174,6 @@ namespace Crow.Coding
 			//
 			//				}
 			//			}
-		}
-		public void reparseSource () {
-			for (int i = 0; i < buffer.LineCount; i++) {
-				if (!buffer[i].IsParsed)
-					tryParseBufferLine (i);
-			}
-			try {
-				SyntaxAnalysis ();
-			} catch (Exception ex) {
-				Debug.WriteLine ("Syntax Error: " + ex.ToString ());
-				if (ex is ParserException)
-					SetLineInError (ex as ParserException);
-			}
-		}
-		public void tryParseBufferLine(int lPtr) {
-			buffer [lPtr].exception = null;
-			currentLine = lPtr;
-			currentColumn = 0;
-			eol = false;
-
-			try {
-				ParseCurrentLine ();
-			} catch (Exception ex) {
-				Debug.WriteLine (ex.ToString ());
-				if (ex is ParserException)
-					SetLineInError (ex as ParserException);
-			}
-
-		}
-
-		protected CodeBuffer buffer;
-
-		internal int currentLine = 0;
-		internal int currentColumn = 0;
-		protected Token currentTok;
-		protected bool eol = true;
-
-		public Node RootNode;
-
-		protected Point CurrentPosition {
-			get { return new Point (currentLine, currentColumn); }
-			set {
-				currentLine = value.Y;
-				currentColumn = value.X;
-			}
-		}
-
-		public abstract void ParseCurrentLine();
-		public abstract void SyntaxAnalysis ();
-
-		public virtual void SetLineInError(ParserException ex) {
-			currentTok = default(Token);
-			if (ex.Line >= buffer.LineCount)
-				ex.Line = buffer.LineCount - 1;
-			if (buffer [ex.Line].IsFolded)
-				buffer.ToogleFolding (ex.Line);
-			buffer [ex.Line].SetLineInError (ex);
 		}
 
 		#region low level parsing
@@ -213,6 +217,20 @@ namespace Crow.Coding
 		protected void saveAndResetCurrentTok(System.Enum type) {
 			currentTok.Type = (TokenType)type;
 			saveAndResetCurrentTok ();
+		}
+		protected void setPreviousTokOfTypeTo (TokenType inType, TokenType newType) {
+			for (int i = currentLine; i >= 0; i--) {
+				int j = buffer [i].Tokens.Count - 1;
+				while (j >= 0) {
+					if (buffer [i].Tokens [j].Type == inType) {
+						Token t = buffer [i].Tokens [j];
+						t.Type = newType;
+						buffer [i].Tokens [j] = t;
+						return;
+					}
+					j--;
+				}				
+			}
 		}
 		/// <summary>
 		/// Peek next char, emit '\n' if current column > buffer's line length

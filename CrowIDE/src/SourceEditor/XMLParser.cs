@@ -20,7 +20,7 @@ namespace Crow.Coding
 			ElementName = BufferParser.TokenType.Type,
 			AttributeName = BufferParser.TokenType.Identifier,
 			ElementClosing = BufferParser.TokenType.StatementEnding,
-			Affectation = BufferParser.TokenType.Affectation,
+			Affectation = BufferParser.TokenType.OperatorOrPunctuation,
 			AttributeValueOpening = BufferParser.TokenType.StringLitteralOpening,
 			AttributeValueClosing = BufferParser.TokenType.StringLitteralClosing,
 			AttributeValue = BufferParser.TokenType.StringLitteral,

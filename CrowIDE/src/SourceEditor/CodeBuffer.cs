@@ -44,12 +44,6 @@ namespace Crow.Coding
 		public event EventHandler PositionChanged;
 		#endregion
 
-		#region CTOR
-		public CodeBuffer () {
-
-		}
-		#endregion
-
 		string lineBreak = Interface.LineBreak;
 		List<CodeLine> lines = new List<CodeLine>();
 		public int longestLineIdx = 0;
@@ -138,13 +132,13 @@ namespace Crow.Coding
 				FoldingEvent.Raise (this, new CodeBufferEventArgs (line));
 			}
 		}
-		public void Load(string rawSource) {
+		public void Load(string rawSource, string lineBrkRegex = @"\r\n|\r|\n|\\\n") {
 			this.Clear();
 
 			if (string.IsNullOrEmpty (rawSource))
 				return;
 
-			AddRange (Regex.Split (rawSource, "\r\n|\r|\n|\\\\n"));
+			AddRange (Regex.Split (rawSource, lineBrkRegex));
 
 			lineBreak = detectLineBreakKind (rawSource);
 		}
@@ -237,6 +231,28 @@ namespace Crow.Coding
 		public int GetEndNodeIndex (int line) {
 			return IndexOf (this [line].SyntacticNode.EndLine);
 		}
+
+		int ConverteTabulatedPosOfCurLine (int column) {
+			int tmp = 0;
+			int i = 0;
+			while (i < lines [_currentLine].Content.Length){
+				if (lines [_currentLine].Content [i] == '\t')
+					tmp += 4;
+				else
+					tmp++;
+				if (tmp > column)
+					break;
+				i++;
+			}
+			return i;
+		}
+
+		int CurrentTabulatedColumn {
+			get {
+				return lines [_currentLine].Content.Substring (0, _currentCol).
+					Replace ("\t", new String (' ', Interface.TabSize)).Length;
+			}
+		}
 		/// <summary>
 		/// Gets visual position computed from actual buffer position
 		/// </summary>
@@ -303,6 +319,7 @@ namespace Crow.Coding
 		}
 		public bool SelectionIsEmpty
 		{ get { return selEndPos == selStartPos; } }
+		int requestedColumn = -1;
 		/// <summary>
 		/// Current column in buffer coordinate, tabulation = 1 char
 		/// </summary>
@@ -313,10 +330,13 @@ namespace Crow.Coding
 					return;
 				if (value < 0)
 					_currentCol = 0;
-				else if (value >  lines [_currentLine].Length)
+				else if (value > lines [_currentLine].Length)
 					_currentCol = lines [_currentLine].Length;
 				else
 					_currentCol = value;
+
+				requestedColumn = CurrentTabulatedColumn;
+				//requestedColumn = _currentCol;
 
 				PositionChanged.Raise (this, null);
 			}
@@ -335,9 +355,14 @@ namespace Crow.Coding
 					_currentLine = 0;
 				else
 					_currentLine = value;
-
-				if (_currentCol >  lines [_currentLine].Length)
+//				if (_currentCol < 0)
+//					requestedColumn = tabu _currentCol;
+				int tabulatedRequestedCol = ConverteTabulatedPosOfCurLine(requestedColumn);
+				if (requestedColumn > lines [_currentLine].PrintableLength)
 					_currentCol = lines [_currentLine].Length;
+				else
+					//_currentCol = requestedColumn;
+					_currentCol = tabulatedRequestedCol;
 				//Debug.WriteLine ("buff cur line: " + _currentLine);
 				PositionChanged.Raise (this, null);
 			}

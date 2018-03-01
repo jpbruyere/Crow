@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Crow.Coding
 {
@@ -50,6 +51,9 @@ namespace Crow.Coding
 			get {
 				return string.IsNullOrEmpty (Content) ? 0 : Content.Length;
 			}
+		}
+		public int FirstNonBlankTokIndex {
+			get { return Tokens == null ? -1 : Tokens.FindIndex (tk=>tk.Type != BufferParser.TokenType.WhiteSpace); }
 		}
 
 		public void SetLineInError (ParserException ex) {

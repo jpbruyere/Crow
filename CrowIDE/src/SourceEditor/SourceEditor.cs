@@ -60,7 +60,7 @@ namespace Crow.Coding
 
 			formatting.Add ((int)BufferParser.TokenType.BlockComment, new TextFormatting (Color.Gray, Color.Transparent, false, true));
 			formatting.Add ((int)BufferParser.TokenType.LineComment, new TextFormatting (Color.Gray, Color.Transparent, false, true));
-			formatting.Add ((int)BufferParser.TokenType.Affectation, new TextFormatting (Color.Black, Color.Transparent));
+			formatting.Add ((int)BufferParser.TokenType.OperatorOrPunctuation, new TextFormatting (Color.Black, Color.Transparent));
 			formatting.Add ((int)BufferParser.TokenType.Keyword, new TextFormatting (Color.DarkCyan, Color.Transparent));
 
 			parsing.Add (".crow", "Crow.Coding.XMLParser");
@@ -164,6 +164,7 @@ namespace Crow.Coding
 			NotifyValueChanged ("VisibleLines", visibleLines);
 			updateMaxScrollY ();
 			updatePrintedLines ();
+			RegisterForGraphicUpdate ();
 //			System.Diagnostics.Debug.WriteLine ("update visible lines: " + visibleLines);
 //			System.Diagnostics.Debug.WriteLine ("update MaxScrollY: " + MaxScrollY);
 		}
@@ -210,7 +211,6 @@ namespace Crow.Coding
 					i++;
 				}
 			}
-			RegisterForGraphicUpdate ();
 		}
 		void toogleFolding (int line) {
 			if (parser == null || !foldingEnabled)
@@ -244,7 +244,7 @@ namespace Crow.Coding
 					buffer.longestLineIdx++;
 				if (parser == null)
 					continue;
-				parser.tryParseBufferLine (e.LineStart + i);
+				parser.TryParseBufferLine (e.LineStart + i);
 			}
 			measureLeftMargin ();
 
@@ -309,6 +309,7 @@ namespace Crow.Coding
 		void Buffer_FoldingEvent (object sender, CodeBufferEventArgs e)
 		{
 			updatePrintedLines ();
+			updateOnScreenCurLineFromBuffCurLine ();
 			updateMaxScrollY ();
 			RegisterForGraphicUpdate ();
 		}
@@ -402,7 +403,12 @@ namespace Crow.Coding
 		void loadSource () {
 			
 			try {
-				buffer.Load (projFile.Source);
+				
+				if (parser == null)
+					buffer.Load (projFile.Source);
+				else//parser may have special linebrk rules
+					buffer.Load (projFile.Source, parser.LineBrkRegex);
+				
 			} catch (Exception ex) {
 				Debug.WriteLine (ex.ToString ());
 			}
@@ -464,6 +470,8 @@ namespace Crow.Coding
 					return;
 				base.ScrollY = value;
 				updatePrintedLines ();
+				updateOnScreenCurLineFromBuffCurLine ();
+				RegisterForGraphicUpdate ();
 			}
 		}
 
@@ -783,7 +791,7 @@ namespace Crow.Coding
 				if (buffer.SelectionInProgress){
 					selStartCol = getTabulatedColumn (buffer.SelectionStart);
 					selEndCol = getTabulatedColumn (buffer.SelectionEnd);
-				}else if (HasFocus){
+				}else if (HasFocus && printedCurrentLine >= 0){
 					gr.LineWidth = 1.0;
 					double cursorX = cb.X + (getTabulatedColumn(buffer.CurrentPosition) - ScrollX) * fe.MaxXAdvance + leftMargin;
 					gr.MoveTo (0.5 + cursorX, cb.Y + (printedCurrentLine) * fe.Height);
@@ -806,7 +814,7 @@ namespace Crow.Coding
 
 		#region Mouse handling
 
-		void updateCurrentPos(){
+		void updateCurrentPosFromMouseLocalPos(){
 			PrintedCurrentLine = (int)Math.Max (0, Math.Floor (mouseLocalPos.Y / fe.Height));
 			int curVisualCol = ScrollX +  (int)Math.Round ((mouseLocalPos.X - leftMargin) / fe.MaxXAdvance);
 
@@ -855,7 +863,7 @@ namespace Crow.Coding
 				return;
 
 			//mouse is down
-			updateCurrentPos();
+			updateCurrentPosFromMouseLocalPos();
 			buffer.SetSelEndPos ();
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
@@ -876,7 +884,7 @@ namespace Crow.Coding
 				return;
 			}
 
-			updateCurrentPos ();
+			updateCurrentPosFromMouseLocalPos ();
 			buffer.SetSelStartPos ();
 		}
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)

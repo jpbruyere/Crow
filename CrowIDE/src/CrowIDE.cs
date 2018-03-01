@@ -90,12 +90,11 @@ namespace Crow.Coding
 		Instantiator instFileDlg;
 		Solution currentSolution;
 
+		public static Interface MainIFace;
+
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
-
-			instFileDlg = Instantiator.CreateFromImlFragment
-				(CurrentInterface, "<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}' SearchPattern='*.sln' OkClicked='onFileOpen'/>");
 
 			initCommands ();
 
@@ -104,11 +103,16 @@ namespace Crow.Coding
 			//this.CrowInterface.LoadInterface ("#Crow.Coding.ui.imlEditor.crow").DataSource = this;
 			//GraphicObject go = this.CrowInterface.LoadInterface (@"ui/test.crow");
 			GraphicObject go = AddWidget (@"#Crow.Coding.ui.CrowIDE.crow");
+
+			MainIFace = ifaceControl[0].CrowInterface;
+
 			if (ReopenLastSolution && !string.IsNullOrEmpty(LastOpenSolution))
 				CurrentSolution = Solution.LoadSolution (LastOpenSolution);
 
 			go.DataSource = this;
 
+			instFileDlg = Instantiator.CreateFromImlFragment
+				(MainIFace, "<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}' SearchPattern='*.sln' OkClicked='onFileOpen'/>");
 		}
 
 		void loadProjProps () {
@@ -195,10 +199,10 @@ namespace Crow.Coding
 		}
 		void loadWindow(string path, object dataSource = null){
 			try {
-				GraphicObject g = CurrentInterface.FindByName (path);
+				GraphicObject g = MainIFace.FindByName (path);
 				if (g != null)
 					return;
-				g = CurrentInterface.AddWidget (path);
+				g = MainIFace.AddWidget (path);
 				g.Name = path;
 				g.DataSource = dataSource;
 			} catch (Exception ex) {
@@ -206,9 +210,9 @@ namespace Crow.Coding
 			}
 		}
 		void closeWindow (string path){
-			GraphicObject g = CurrentInterface.FindByName (path);
+			GraphicObject g = MainIFace.FindByName (path);
 			if (g != null)
-				CurrentInterface.DeleteWidget (g);
+				MainIFace.DeleteWidget (g);
 		}
 
 		protected void onCommandSave(object sender, MouseButtonEventArgs e){
