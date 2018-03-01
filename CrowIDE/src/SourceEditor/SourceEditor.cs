@@ -160,7 +160,7 @@ namespace Crow.Coding
 		/// Updates visible line in widget, adapt max scroll y and updatePrintedLines
 		/// </summary>
 		void updateVisibleLines(){
-			visibleLines = (int)Math.Floor ((double)ClientRectangle.Height / fe.Height);
+			visibleLines = (int)Math.Floor ((double)ClientRectangle.Height / (fe.Ascent+fe.Descent));
 			NotifyValueChanged ("VisibleLines", visibleLines);
 			updateMaxScrollY ();
 			updatePrintedLines ();
@@ -536,13 +536,13 @@ namespace Crow.Coding
 			CodeLine cl = PrintedLines[i];
 			int lineIndex = buffer.IndexOf(cl);
 
-			double y = cb.Y + fe.Height * i, x = cb.X;
+			double y = cb.Y + (fe.Ascent+fe.Descent) * i, x = cb.X;
 
 			//Draw line numbering
 			Color mgFg = Color.Gray;
 			Color mgBg = Color.White;
 			if (PrintLineNumbers){
-				Rectangle mgR = new Rectangle ((int)x, (int)y, leftMargin - leftMarginGap, (int)Math.Ceiling(fe.Height));
+				Rectangle mgR = new Rectangle ((int)x, (int)y, leftMargin - leftMarginGap, (int)Math.Ceiling((fe.Ascent+fe.Descent)));
 				if (cl.exception != null) {
 					mgBg = Color.Red;
 					if (buffer.CurrentLine == lineIndex)
@@ -570,7 +570,7 @@ namespace Crow.Coding
 				if (cl.IsFoldable) {
 					if (cl.SyntacticNode.StartLine != cl.SyntacticNode.EndLine) {
 						gr.SetSourceColor (Color.Black);
-						Rectangle rFld = new Rectangle (cb.X + leftMargin - leftMarginGap - foldSize, (int)(y + fe.Height / 2.0 - foldSize / 2.0), foldSize, foldSize);
+						Rectangle rFld = new Rectangle (cb.X + leftMargin - leftMarginGap - foldSize, (int)(y + (fe.Ascent+fe.Descent) / 2.0 - foldSize / 2.0), foldSize, foldSize);
 						gr.Rectangle (rFld, 1.0);
 						if (cl.IsFolded) {
 							gr.MoveTo (rFld.Center.X + 0.5, rFld.Y + 2);
@@ -615,8 +615,8 @@ namespace Crow.Coding
 //			else if (HasFocus){
 //				gr.LineWidth = 1.0;
 //				double cursorX = + leftMargin + cb.X + (CurrentColumn - ScrollX) * fe.MaxXAdvance;
-//				gr.MoveTo (0.5 + cursorX, cb.Y + printedCurrentLine * fe.Height);
-//				gr.LineTo (0.5 + cursorX, cb.Y + (printedCurrentLine + 1) * fe.Height);
+//				gr.MoveTo (0.5 + cursorX, cb.Y + printedCurrentLine * (fe.Ascent+fe.Descent));
+//				gr.LineTo (0.5 + cursorX, cb.Y + (printedCurrentLine + 1) * (fe.Ascent+fe.Descent));
 //				gr.Stroke();
 //			}
 //			#endregion
@@ -652,7 +652,7 @@ namespace Crow.Coding
 
 				gr.Save ();
 				gr.Operator = Operator.Source;
-				gr.Rectangle (rLineX, rLineY, rLineW, fe.Height);
+				gr.Rectangle (rLineX, rLineY, rLineW, (fe.Ascent+fe.Descent));
 				gr.SetSourceColor (SelectionBackground);
 				gr.FillPreserve ();
 				gr.Clip ();
@@ -720,7 +720,7 @@ namespace Crow.Coding
 
 					gr.Save ();
 					gr.Operator = Operator.Source;
-					gr.Rectangle (rLineX, rLineY, rLineW, fe.Height);
+					gr.Rectangle (rLineX, rLineY, rLineW, (fe.Ascent+fe.Descent));
 					gr.SetSourceColor (selbg);
 					gr.FillPreserve ();
 					gr.Clip ();
@@ -759,7 +759,7 @@ namespace Crow.Coding
 		protected override int measureRawSize(LayoutingType lt)
 		{
 			if (lt == LayoutingType.Height)
-				return (int)Math.Ceiling(fe.Height * buffer.LineCount) + Margin * 2;
+				return (int)Math.Ceiling((fe.Ascent+fe.Descent) * buffer.LineCount) + Margin * 2;
 
 			return (int)(fe.MaxXAdvance * buffer.longestLineCharCount) + Margin * 2 + leftMargin;
 		}
@@ -794,8 +794,8 @@ namespace Crow.Coding
 				}else if (HasFocus && printedCurrentLine >= 0){
 					gr.LineWidth = 1.0;
 					double cursorX = cb.X + (getTabulatedColumn(buffer.CurrentPosition) - ScrollX) * fe.MaxXAdvance + leftMargin;
-					gr.MoveTo (0.5 + cursorX, cb.Y + (printedCurrentLine) * fe.Height);
-					gr.LineTo (0.5 + cursorX, cb.Y + (printedCurrentLine + 1) * fe.Height);
+					gr.MoveTo (0.5 + cursorX, cb.Y + (printedCurrentLine) * (fe.Ascent+fe.Descent));
+					gr.LineTo (0.5 + cursorX, cb.Y + (printedCurrentLine + 1) * (fe.Ascent+fe.Descent));
 					gr.Stroke();
 				}
 				#endregion
@@ -815,7 +815,7 @@ namespace Crow.Coding
 		#region Mouse handling
 
 		void updateCurrentPosFromMouseLocalPos(){
-			PrintedCurrentLine = (int)Math.Max (0, Math.Floor (mouseLocalPos.Y / fe.Height));
+			PrintedCurrentLine = (int)Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent+fe.Descent)));
 			int curVisualCol = ScrollX +  (int)Math.Round ((mouseLocalPos.X - leftMargin) / fe.MaxXAdvance);
 
 			int i = 0;
@@ -880,7 +880,7 @@ namespace Crow.Coding
 			}
 
 			if (mouseLocalPos.X < leftMargin) {
-				toogleFolding (buffer.IndexOf (PrintedLines [(int)Math.Max (0, Math.Floor (mouseLocalPos.Y / fe.Height))]));
+				toogleFolding (buffer.IndexOf (PrintedLines [(int)Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent+fe.Descent)))]));
 				return;
 			}
 
