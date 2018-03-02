@@ -35,6 +35,14 @@ namespace Crow.Coding
 
 		object selectedItemElement = null;
 
+		public override int SelectedIndex {
+			get {
+				return base.SelectedIndex;
+			}
+			set {
+				base.SelectedIndex = value;
+			}
+		}
 		public object SelectedItemElement {
 			get { return selectedItemElement; }
 			set {

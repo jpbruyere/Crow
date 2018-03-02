@@ -42,6 +42,7 @@ namespace Crow.Coding
 		#endregion
 
 		public List<Crow.Command> Commands;
+		Command cmdReset, cmdGoToStyle;
 		PropertyInfo pi;
 		MembersView mview;
 //		object instance;
@@ -53,9 +54,10 @@ namespace Crow.Coding
 //			instance = _instance;
 //			go = instance as GraphicObject;
 
-			Commands = new List<Crow.Command> (new Crow.Command[] {
-				new Crow.Command(new Action(() => Reset())) { Caption = "Reset to default"},
-			});
+			cmdReset = new Crow.Command (new Action (() => Reset ())) { Caption = "Reset to default" };
+			cmdGoToStyle = new Crow.Command (new Action (() => GotoStyle ())) { Caption = "Goto style" };
+
+			Commands = new List<Crow.Command> (new Crow.Command[] { cmdReset, cmdGoToStyle });
 		}
 
 		public string Name { get { return pi.Name; }}
@@ -128,7 +130,10 @@ namespace Crow.Coding
 		}
 
 		public Fill LabForeground {
-			get { return (mview.ProjectNode.SelectedItem as GraphicObject).design_members.ContainsKey(Name) ? Color.Black : Color.DimGray;}
+			get {
+				GraphicObject go = mview.ProjectNode.SelectedItem as GraphicObject;
+				return go.design_members.ContainsKey (Name) ? Color.Black :
+					go.design_defaults.ContainsKey(Name) ? Color.DarkBlue :	Color.DimGray;}
 		}
 
 		/// <summary>
@@ -143,7 +148,20 @@ namespace Crow.Coding
 			mview.ProjectNode.Instance.HasChanged = true;
 			//should reinstantiate to get default
 		}
-
+		public void GotoStyle(){
+			GraphicObject inst = mview.ProjectNode.SelectedItem as GraphicObject;
+			if (!inst.design_defaults.ContainsKey (Name))
+				return;
+			FileLocation fl = inst.design_defaults [Name];
+			ProjectFile pf;
+			if (!mview.ProjectNode.Project.TryGetProjectFileFromPath ("#" + fl.FilePath, out pf))
+				return;
+			Solution s = mview.ProjectNode.Project.solution;
+			if (!s.OpenedItems.Contains (pf))				
+				s.OpenedItems.Add (pf);
+			//pf.CurrentLine = fl.Line;
+			//pf.CurrentColumn = fl.Column;
+		}
 
 
 	}

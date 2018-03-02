@@ -52,12 +52,22 @@ namespace Crow
 		internal ReaderWriterLockSlim parentRWLock = new ReaderWriterLockSlim();
 
 		#if DESIGN_MODE
+		static MethodInfo miDesignAddDefLoc = typeof(GraphicObject).GetMethod("design_add_default_location",
+			BindingFlags.Instance | BindingFlags.NonPublic);
 		public volatile bool HasChanged = false;
 		public string design_id;
 		public int design_line;
 		public int design_column;
 		public string design_imlPath;
 		public Dictionary<string,string> design_members = new Dictionary<string, string>();
+		public Dictionary<string,FileLocation> design_defaults = new Dictionary<string, FileLocation>();
+		internal void design_add_default_location (string memberName, string path, int line, int col) {
+			if (design_defaults.ContainsKey(memberName)){
+				Console.WriteLine ("default value localtion already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
+				return;
+			}
+			design_defaults.Add(memberName, new FileLocation(path,line,col));
+		}
 		public bool design_isTGItem = false;
 
 		public virtual bool FindByDesignID(string designID, out GraphicObject go){
@@ -932,16 +942,12 @@ namespace Crow
 					IFace.DefaultValuesLoader [Style] (this);
 					return;
 				}
-			} else {
-				if (IFace.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
-					IFace.DefaultValuesLoader [thisType.FullName] (this);
-					return;
-				} else if (!IFace.Styling.ContainsKey (thisType.FullName)) {
-					if (IFace.DefaultValuesLoader.ContainsKey (thisType.Name)) {
-						IFace.DefaultValuesLoader [thisType.Name] (this);
-						return;
-					}
-				}
+			} else if (IFace.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
+				IFace.DefaultValuesLoader [thisType.FullName] (this);
+				return;
+			} else 	if (IFace.DefaultValuesLoader.ContainsKey (thisType.Name)) {
+				IFace.DefaultValuesLoader [thisType.Name] (this);
+				return;
 			}
 
 			List<Style> styling = new List<Style>();
@@ -970,7 +976,6 @@ namespace Crow
 
 			if (string.IsNullOrEmpty (styleKey))
 				styleKey = thisType.FullName;
-
 
 			//Reflexion being very slow compared to dyn method or delegates,
 			//I compile the initial values coded in the CustomAttribs of the class,
@@ -1023,9 +1028,50 @@ namespace Crow
 			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
 				if (pi.GetSetMethod () == null)
 					continue;
-				object defaultValue;
-				if (!getDefaultValue (pi, styling, out defaultValue))
+				XmlIgnoreAttribute xia = (XmlIgnoreAttribute)pi.GetCustomAttribute (typeof(XmlIgnoreAttribute));
+				if (xia != null)
 					continue;
+
+				object defaultValue;
+				string name = "";
+				XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
+				if (xaa != null) {
+					if (string.IsNullOrEmpty (xaa.AttributeName))
+						name = pi.Name;
+					else
+						name = xaa.AttributeName;
+				}
+				int styleIndex = -1;
+				if (styling.Count > 0){
+					for (int i = 0; i < styling.Count; i++) {
+						if (styling[i].ContainsKey (name)){
+							styleIndex = i;
+							break;
+						}
+					}
+				}
+				if (styleIndex >= 0){
+					if (pi.PropertyType.IsEnum)//maybe should be in parser..
+						defaultValue = Enum.Parse(pi.PropertyType, (string)styling[styleIndex] [name], true);
+					else
+						defaultValue = styling[styleIndex] [name];
+
+					#if DESIGN_MODE
+					FileLocation fl = styling[styleIndex].Locations[name];
+					il.Emit (OpCodes.Ldloc_0);
+					il.Emit (OpCodes.Ldstr, name);
+					il.Emit (OpCodes.Ldstr, fl.FilePath);
+					il.Emit (OpCodes.Ldc_I4, fl.Line);
+					il.Emit (OpCodes.Ldc_I4, fl.Column);
+					il.Emit (OpCodes.Call, miDesignAddDefLoc);
+					#endif
+
+				}else {
+					DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof (DefaultValueAttribute));
+					if (dv == null)
+						continue;
+					defaultValue = dv.Value;
+				}
 
 				CompilerServices.EmitSetValue (il, pi, defaultValue);
 			}
@@ -1051,51 +1097,6 @@ namespace Crow
 				}
 			}
 			return false;
-		}
-		/// <summary>
-		/// Gets the default value of the widget's property from either the style, or from xml default
-		/// </summary>
-		/// <returns><c>true</c>, if default value is defined, <c>false</c> otherwise.</returns>
-		/// <param name="pi">PropertyInfo</param>
-		/// <param name="styling">Styling informations</param>
-		/// <param name="defaultValue">output of Default value, null if not found</param>
-		bool getDefaultValue(PropertyInfo pi, List<Style> styling,
-			out object defaultValue){
-			defaultValue = null;
-			string name = "";
-
-			XmlIgnoreAttribute xia = (XmlIgnoreAttribute)pi.GetCustomAttribute (typeof(XmlIgnoreAttribute));
-			if (xia != null)
-				return false;
-			XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
-			if (xaa != null) {
-				if (string.IsNullOrEmpty (xaa.AttributeName))
-					name = pi.Name;
-				else
-					name = xaa.AttributeName;
-			}
-
-			int styleIndex = -1;
-			if (styling.Count > 0){
-				for (int i = 0; i < styling.Count; i++) {
-					if (styling[i].ContainsKey (name)){
-						styleIndex = i;
-						break;
-					}
-				}
-			}
-			if (styleIndex >= 0){
-				if (pi.PropertyType.IsEnum)//maybe should be in parser..
-					defaultValue = Enum.Parse(pi.PropertyType, (string)styling[styleIndex] [name], true);
-				else
-					defaultValue = styling[styleIndex] [name];
-			}else {
-				DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof (DefaultValueAttribute));
-				if (dv == null)
-					return false;
-				defaultValue = dv.Value;
-			}
-			return true;
 		}
 		#endregion
 

@@ -43,7 +43,6 @@ namespace Crow
 
 		States curState = States.init;
 
-		string resourceId;
 		int column = 1;
 		int line = 1;
 
@@ -84,8 +83,7 @@ namespace Crow
 
 		public StyleReader (Dictionary<string, Style> styling, Stream stream, string resId)
 			: base(stream)
-		{
-			resourceId = resId;
+		{			
 			string styleKey = resId.Substring (0, resId.Length - 6);
 			string token = "";
 			List<string> targetsClasses = new List<string> ();
@@ -100,13 +98,13 @@ namespace Crow
 				case '/':
 					ReadChar ();
 					if (PeekChar () != '/')
-						throw new ParserException (line, column, "Unexpected char '/'");
+						throw new ParserException (line, column, "Unexpected char '/'", resId);
 					ReadLine ();
 					break;
 				case ',':
 					ReadChar ();
 					if (!(curState == States.init || curState == States.classNames) || string.IsNullOrEmpty (token))
-						throw new ParserException (line, column, "Unexpected char ','");
+						throw new ParserException (line, column, "Unexpected char ','", resId);
 					targetsClasses.Add (token);
 					token = "";
 					curState = States.classNames;
@@ -114,7 +112,7 @@ namespace Crow
 				case '{':
 					ReadChar ();
 					if (!(curState == States.init || curState == States.classNames) || string.IsNullOrEmpty (token))
-						throw new ParserException (line, column, "Unexpected char '{'");					
+						throw new ParserException (line, column, "Unexpected char '{'", resId);
 					targetsClasses.Add (token);
 					token = "";
 					curState = States.members;
@@ -122,21 +120,21 @@ namespace Crow
 				case '}':
 					ReadChar ();
 					if (curState != States.members)
-						throw new ParserException (line, column, "Unexpected char '}'");					
+						throw new ParserException (line, column, "Unexpected char '}'", resId);
 					curState = States.classNames;
 					targetsClasses.Clear ();
 					break;
 				case '=':
 					ReadChar ();
 					if (!(curState == States.init || curState == States.members))
-						throw new ParserException (line, column, "Unexpected char '='");
+						throw new ParserException (line, column, "Unexpected char '='", resId);
 					currentProperty = token;
 					token = "";
 					curState = States.value;
 					break;
 				case '"':
 					if (curState != States.value)
-						throw new ParserException (line, column, "Unexpected char '\"'");					
+						throw new ParserException (line, column, "Unexpected char '\"'", resId);					
 					ReadChar ();
 
 					while (!EndOfStream) {
@@ -153,7 +151,7 @@ namespace Crow
 					break;
 				case ';':
 					if (curState != States.endOfStatement)
-						throw new ParserException (line, column, "Unexpected end of statement");					
+						throw new ParserException (line, column, "Unexpected end of statement", resId);					
 					ReadChar ();
 					foreach (string tc in targetsClasses) {
 						if (!styling.ContainsKey (tc))
@@ -161,16 +159,19 @@ namespace Crow
 						else if (styling [tc].ContainsKey (currentProperty))
 							continue;
 						styling [tc] [currentProperty] = token;
-						System.Diagnostics.Debug.WriteLine ("Style: {0}.{1} = {2}", tc, currentProperty, token);
+						#if DESIGN_MODE
+						styling [tc].Locations[currentProperty] = new FileLocation(resId, line,column);
+						#endif
+						System.Diagnostics.Debug.WriteLine ("Style: {3} : {0}.{1} = {2}", tc, currentProperty, token, resId);
 					}
 					token = "";
 					curState = States.members;
 					break;
 				default:
 					if (curState == States.value)
-						throw new ParserException (line, column, "expecting value enclosed in '\"'");
+						throw new ParserException (line, column, "expecting value enclosed in '\"'", resId);
 					if (curState == States.endOfStatement)
-						throw new ParserException (line, column, "expecting end of statement");
+						throw new ParserException (line, column, "expecting end of statement", resId);
 
 					if (nextCharIsValidCharStartName) {
 						token += ReadChar();
@@ -194,11 +195,6 @@ namespace Crow
 			else if (c != '\r')
 				column++;
 			return tmp;
-		}
-
-		void throwParserException(string message){
-			throw new Exception (string.Format ("Style Reader Exception ({0},{1}): {2} in {3}.",
-				line, column, message, resourceId));
 		}
 	}
 }

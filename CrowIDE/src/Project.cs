@@ -377,7 +377,12 @@ namespace Crow.Coding
 			return parameters.OutputAssembly;
 		}
 
-		public bool GetProjectFileFromPath (string path, out ProjectFile pi){
+		public bool TryGetProjectFileFromAbsolutePath (string absolutePath, out ProjectFile pi){
+			pi = flattenNodes.OfType<ProjectFile> ().FirstOrDefault 
+				(pp => pp.AbsolutePath == absolutePath);
+			return pi != null;
+		}
+		public bool TryGetProjectFileFromPath (string path, out ProjectFile pi){
 			if (path.StartsWith ("#"))
 				pi = flattenNodes.OfType<ProjectFile> ().FirstOrDefault 
 					(pp => pp.Type == ItemType.EmbeddedResource && pp.ResourceID == path.Substring (1));
@@ -391,7 +396,7 @@ namespace Crow.Coding
 				Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);
 				if (p == null)
 					throw new Exception ("referenced project not found");
-				if (p.GetProjectFileFromPath (path, out pi))
+				if (p.TryGetProjectFileFromPath (path, out pi))
 					return true;
 			}
 			//TODO: search referenced assemblies

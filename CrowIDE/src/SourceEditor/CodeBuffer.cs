@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Crow.Coding
 {
@@ -31,7 +32,8 @@ namespace Crow.Coding
 	/// </summary>
 	public class CodeBuffer
 	{
-		public object EditMutex = new object();
+		public ReaderWriterLockSlim editMutex = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+
 		//those events are handled in SourceEditor to help keeping sync between textbuffer,parser and editor.
 		//modified lines are marked for reparse
 		#region Events
@@ -65,72 +67,72 @@ namespace Crow.Coding
 			set {
 				if (lines [i] == value)
 					return;
-				lock (EditMutex) {
-					lines [i] = value;
-					LineUpadateEvent.Raise (this, new CodeBufferEventArgs (i));
-				}
+				editMutex.EnterWriteLock ();
+				lines [i] = value;
+				LineUpadateEvent.Raise (this, new CodeBufferEventArgs (i));
+				editMutex.ExitWriteLock ();
 			}
 		}
 
 		public void RemoveAt(int i){
-			lock (EditMutex) {
-				lines.RemoveAt (i);
-				LineRemoveEvent.Raise (this, new CodeBufferEventArgs (i));
-			}
+			editMutex.EnterWriteLock ();
+			lines.RemoveAt (i);
+			LineRemoveEvent.Raise (this, new CodeBufferEventArgs (i));
+			editMutex.ExitWriteLock ();
 		}
 		public void Insert(int i, string item){
-			lock (EditMutex) {
-				lines.Insert (i, item);
-				LineAdditionEvent.Raise (this, new CodeBufferEventArgs (i));
-			}
+			editMutex.EnterWriteLock ();
+			lines.Insert (i, item);
+			LineAdditionEvent.Raise (this, new CodeBufferEventArgs (i));
+			editMutex.ExitWriteLock ();
 		}
 		public void Add(CodeLine item){
-			lock (EditMutex) {
-				lines.Add (item);
-				LineAdditionEvent.Raise (this, new CodeBufferEventArgs (lines.Count - 1));
-			}
+			editMutex.EnterWriteLock ();
+			lines.Add (item);
+			LineAdditionEvent.Raise (this, new CodeBufferEventArgs (lines.Count - 1));
+			editMutex.ExitWriteLock ();
 		}
 		public void AddRange (string[] items){
 			int start = lines.Count;
-			lock (EditMutex) {
-				for (int i = 0; i < items.Length; i++)
-					lines.Add (items [i]);
-				LineAdditionEvent.Raise (this, new CodeBufferEventArgs (start, items.Length));
-			}
+			editMutex.EnterWriteLock ();
+			for (int i = 0; i < items.Length; i++)
+				lines.Add (items [i]);
+			LineAdditionEvent.Raise (this, new CodeBufferEventArgs (start, items.Length));
+			editMutex.ExitWriteLock ();
 		}
 		public void AddRange (CodeLine[] items){
 			int start = lines.Count;
-			lock (EditMutex) {
-				lines.AddRange (items);
-				LineAdditionEvent.Raise (this, new CodeBufferEventArgs (start, items.Length));
-			}
+			editMutex.EnterWriteLock ();
+			lines.AddRange (items);
+			LineAdditionEvent.Raise (this, new CodeBufferEventArgs (start, items.Length));
+			editMutex.ExitWriteLock ();
 		}
 		public void Clear () {
-			lock (EditMutex) {
-				longestLineCharCount = 0;
-				lines.Clear ();
-				BufferCleared.Raise (this, null);
-			}
+			editMutex.EnterWriteLock ();
+			longestLineCharCount = 0;
+			lines.Clear ();
+			BufferCleared.Raise (this, null);
+			editMutex.ExitWriteLock ();
 		}
 		public void UpdateLine(int i, string newContent){
-			lock (EditMutex) {
-				this [i].Content = newContent;
-				LineUpadateEvent.Raise (this, new CodeBufferEventArgs (i));
-			}
+			editMutex.EnterWriteLock ();
+			this [i].Content = newContent;
+			LineUpadateEvent.Raise (this, new CodeBufferEventArgs (i));
+			editMutex.ExitWriteLock ();
 		}
 		public void AppenedLine(int i, string newContent){
-			lock (EditMutex) {
-				this [i].Content += newContent;
-				LineUpadateEvent.Raise (this, new CodeBufferEventArgs (i));
-			}
+			editMutex.EnterWriteLock ();
+			this [i].Content += newContent;
+			LineUpadateEvent.Raise (this, new CodeBufferEventArgs (i));
+			editMutex.ExitWriteLock ();
 		}
 		public void ToogleFolding (int line) {
 			if (!this [line].IsFoldable)
 				return;
-			lock (EditMutex) {
-				this [line].IsFolded = !this [line].IsFolded;
-				FoldingEvent.Raise (this, new CodeBufferEventArgs (line));
-			}
+			editMutex.EnterWriteLock ();
+			this [line].IsFolded = !this [line].IsFolded;
+			FoldingEvent.Raise (this, new CodeBufferEventArgs (line));
+			editMutex.ExitWriteLock ();
 		}
 		public void Load(string rawSource, string lineBrkRegex = @"\r\n|\r|\n|\\\n") {
 			this.Clear();
@@ -410,37 +412,40 @@ namespace Crow.Coding
 		}
 		public void DeleteChar()
 		{
-			lock (EditMutex) {
-				if (SelectionIsEmpty) {
-					if (CurrentColumn == 0) {
-						if (CurrentLine == 0)
-							return;
-						CurrentLine--;
-						CurrentColumn = this [CurrentLine].Length;
-						AppenedLine (CurrentLine, this [CurrentLine + 1].Content);
-						RemoveAt (CurrentLine + 1);
+			editMutex.EnterWriteLock ();
+			if (SelectionIsEmpty) {
+				if (CurrentColumn == 0) {
+					if (CurrentLine == 0) {
+						editMutex.ExitWriteLock ();
 						return;
 					}
-					CurrentColumn--;
-					UpdateLine (CurrentLine, this [CurrentLine].Content.Remove (CurrentColumn, 1));
-				} else {
-					int linesToRemove = SelectionEnd.Y - SelectionStart.Y + 1;
-					int l = SelectionStart.Y;
-
-					if (linesToRemove > 0) {
-						UpdateLine (l, this [l].Content.Remove (SelectionStart.X, this [l].Length - SelectionStart.X) +
-						this [SelectionEnd.Y].Content.Substring (SelectionEnd.X, this [SelectionEnd.Y].Length - SelectionEnd.X));
-						l++;
-						for (int c = 0; c < linesToRemove - 1; c++)
-							RemoveAt (l);
-						CurrentLine = SelectionStart.Y;
-						CurrentColumn = SelectionStart.X;
-					} else
-						UpdateLine (l, this [l].Content.Remove (SelectionStart.X, SelectionEnd.X - SelectionStart.X));
-					CurrentColumn = SelectionStart.X;
-					ResetSelection ();
+					CurrentLine--;
+					CurrentColumn = this [CurrentLine].Length;
+					AppenedLine (CurrentLine, this [CurrentLine + 1].Content);
+					RemoveAt (CurrentLine + 1);
+					editMutex.ExitWriteLock ();
+					return;
 				}
+				CurrentColumn--;
+				UpdateLine (CurrentLine, this [CurrentLine].Content.Remove (CurrentColumn, 1));
+			} else {
+				int linesToRemove = SelectionEnd.Y - SelectionStart.Y + 1;
+				int l = SelectionStart.Y;
+
+				if (linesToRemove > 0) {
+					UpdateLine (l, this [l].Content.Remove (SelectionStart.X, this [l].Length - SelectionStart.X) +
+					this [SelectionEnd.Y].Content.Substring (SelectionEnd.X, this [SelectionEnd.Y].Length - SelectionEnd.X));
+					l++;
+					for (int c = 0; c < linesToRemove - 1; c++)
+						RemoveAt (l);
+					CurrentLine = SelectionStart.Y;
+					CurrentColumn = SelectionStart.X;
+				} else
+					UpdateLine (l, this [l].Content.Remove (SelectionStart.X, SelectionEnd.X - SelectionStart.X));
+				CurrentColumn = SelectionStart.X;
+				ResetSelection ();
 			}
+			editMutex.ExitWriteLock ();
 		}
 		/// <summary>
 		/// Insert new string at caret position, should be sure no line break is inside.

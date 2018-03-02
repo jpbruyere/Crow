@@ -66,9 +66,8 @@ namespace Crow.Coding{
 		public bool GetProjectFileFromPath (string path, out ProjectFile pi){
 			pi = null;
 			return StartupProject == null ? false :
-				StartupProject.GetProjectFileFromPath (path, out pi);
+				StartupProject.TryGetProjectFileFromPath (path, out pi);
 		}
-
 
 		public ObservableList<ProjectItem> OpenedItems {
 			get { return openedItems; }
@@ -139,20 +138,49 @@ namespace Crow.Coding{
 			NotifyValueChanged ("CompilerErrors", CompilerErrors);
 		}
 
+		void saveOpenedItemsInUserConfig (){			
+			UserConfig.Set ("OpenedItems", openedItems.Select(o => o.AbsolutePath).Aggregate((a,b)=>a + ";" + b));
+		}
+		void reopenItemsSavedInUserConfig () {
+			string tmp = UserConfig.Get<string> ("OpenedItems");
+			string sel = UserConfig.Get<string> ("SelectedProjItems");
+			ProjectFile selItem = null;
+			if (string.IsNullOrEmpty (tmp))
+				return;
+			foreach (string f in tmp.Split(';')) {
+				foreach (Project p in Projects) {
+					ProjectFile pi;
+					if (p.TryGetProjectFileFromAbsolutePath (f, out pi)) {
+						OpenedItems.Add (pi);
+						if (pi.AbsolutePath == sel)
+							selItem = pi;
+						break;
+					}
+				}
+			}
+			SelectedItem = selItem;//BUG: loading in another thread focused last loaded pf
+		}
+
 		void onSelectedItemChanged (object sender, SelectionChangeEventArgs e){			
 			ProjectItem pi = e.NewValue as ProjectItem;
 			if (pi != null) {				
-				if (!openedItems.Contains (pi))
+				if (!openedItems.Contains (pi)) {
 					openedItems.AddElement (pi);
+					saveOpenedItemsInUserConfig ();
+				}
 			}
 			this.SelectedItem = pi;
+			UserConfig.Set ("SelectedProjItems", SelectedItem?.AbsolutePath);
 		}
 		public void OnCloseTab (object sender, MouseButtonEventArgs e){			
-			
+			Console.WriteLine ("OnCloseTab");
 			openedItems.RemoveElement ((sender as GraphicObject).DataSource as ProjectItem);
+			saveOpenedItemsInUserConfig ();
 		}
 		public void CloseItem (ProjectItem pi) {
+			Console.WriteLine ("CloseItem");
 			openedItems.RemoveElement (pi);
+			saveOpenedItemsInUserConfig ();
 		}
 
 	    /// <summary>
@@ -243,7 +271,9 @@ namespace Crow.Coding{
 	    /// <summary>
 	    /// Creates new solution.
 	    /// </summary>
-	    public Solution() { }
+	    public Solution() { 
+		}
+
 		#endregion
 
 
@@ -412,6 +442,7 @@ namespace Crow.Coding{
 			s.UserConfig = new Configuration (s.path + ".user");
 			s.ReloadStyling ();
 			s.ReloadDefaultTemplates ();
+			s.reopenItemsSavedInUserConfig ();
 	        return s;
 	    } //LoadSolution
 		#endregion

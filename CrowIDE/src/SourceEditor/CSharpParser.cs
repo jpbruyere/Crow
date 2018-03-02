@@ -150,7 +150,7 @@ namespace Crow.Coding
 
 		public override void ParseCurrentLine ()
 		{
-			Debug.WriteLine (string.Format("parsing line:{0}", currentLine));
+			//Debug.WriteLine (string.Format("parsing line:{0}", currentLine));
 			CodeLine cl = buffer [currentLine];
 			cl.Tokens = new List<Token> ();
 

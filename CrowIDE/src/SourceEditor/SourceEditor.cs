@@ -93,18 +93,18 @@ namespace Crow.Coding
 						oldSource = projFile.Source;
 						projFile.RegisteredEditors [this] = true;
 					}
-					if (Monitor.TryEnter (buffer.EditMutex)) {
-						string newsrc = "";
-						bool wasDirty = false;
-						if (isDirty) {
-							isDirty = false;
-							wasDirty = true;
-							newsrc = buffer.FullText;
-						}
-						Monitor.Exit (buffer.EditMutex);
-						if (wasDirty) 
-							projFile.UpdateSource (this, newsrc);						
+					buffer.editMutex.EnterWriteLock ();
+					string newsrc = "";
+					bool wasDirty = false;
+					if (isDirty) {
+						isDirty = false;
+						wasDirty = true;
+						newsrc = buffer.FullText;
 					}
+					buffer.editMutex.ExitWriteLock ();
+					if (wasDirty) 
+						projFile.UpdateSource (this, newsrc);						
+					
 				}
 				Thread.Sleep (100);
 			}
@@ -187,30 +187,30 @@ namespace Crow.Coding
 			}
 		}			
 		void updatePrintedLines () {
-			lock (buffer.EditMutex) {
-				PrintedLines = new List<CodeLine> ();
-				int curL = 0;
-				int i = 0;
+			buffer.editMutex.EnterReadLock ();
+			PrintedLines = new List<CodeLine> ();
+			int curL = 0;
+			int i = 0;
 
-				while (curL < buffer.LineCount && i < ScrollY) {
-					if (buffer [curL].IsFolded)
-						curL = buffer.GetEndNodeIndex (curL);
-					curL++;
-					i++;
-				}
-
-				firstPrintedLine = curL;
-				i = 0;
-				while (i < visibleLines && curL < buffer.LineCount) {
-					PrintedLines.Add (buffer [curL]);
-
-					if (buffer [curL].IsFolded)
-						curL = buffer.GetEndNodeIndex (curL);
-
-					curL++;
-					i++;
-				}
+			while (curL < buffer.LineCount && i < ScrollY) {
+				if (buffer [curL].IsFolded)
+					curL = buffer.GetEndNodeIndex (curL);
+				curL++;
+				i++;
 			}
+
+			firstPrintedLine = curL;
+			i = 0;
+			while (i < visibleLines && curL < buffer.LineCount) {
+				PrintedLines.Add (buffer [curL]);
+
+				if (buffer [curL].IsFolded)
+					curL = buffer.GetEndNodeIndex (curL);
+
+				curL++;
+				i++;
+			}
+			buffer.editMutex.ExitReadLock ();
 		}
 		void toogleFolding (int line) {
 			if (parser == null || !foldingEnabled)
@@ -786,29 +786,29 @@ namespace Crow.Coding
 
 			Foreground.SetAsSource (gr);
 
-			lock (buffer.EditMutex) {
-				#region draw text cursor
-				if (buffer.SelectionInProgress){
-					selStartCol = getTabulatedColumn (buffer.SelectionStart);
-					selEndCol = getTabulatedColumn (buffer.SelectionEnd);
-				}else if (HasFocus && printedCurrentLine >= 0){
-					gr.LineWidth = 1.0;
-					double cursorX = cb.X + (getTabulatedColumn(buffer.CurrentPosition) - ScrollX) * fe.MaxXAdvance + leftMargin;
-					gr.MoveTo (0.5 + cursorX, cb.Y + (printedCurrentLine) * (fe.Ascent+fe.Descent));
-					gr.LineTo (0.5 + cursorX, cb.Y + (printedCurrentLine + 1) * (fe.Ascent+fe.Descent));
-					gr.Stroke();
-				}
-				#endregion
+			buffer.editMutex.EnterReadLock ();
+			#region draw text cursor
+			if (buffer.SelectionInProgress){
+				selStartCol = getTabulatedColumn (buffer.SelectionStart);
+				selEndCol = getTabulatedColumn (buffer.SelectionEnd);
+			}else if (HasFocus && printedCurrentLine >= 0){
+				gr.LineWidth = 1.0;
+				double cursorX = cb.X + (getTabulatedColumn(buffer.CurrentPosition) - ScrollX) * fe.MaxXAdvance + leftMargin;
+				gr.MoveTo (0.5 + cursorX, cb.Y + (printedCurrentLine) * (fe.Ascent+fe.Descent));
+				gr.LineTo (0.5 + cursorX, cb.Y + (printedCurrentLine + 1) * (fe.Ascent+fe.Descent));
+				gr.Stroke();
+			}
+			#endregion
 
-				if (PrintedLines != null) {
-					for (int i = 0; i < visibleLines; i++) {
-						if (i + ScrollY >= buffer.UnfoldedLines)//TODO:need optimize
-							break;
-						drawLine (gr, cb, i);
-					}
+			if (PrintedLines != null) {
+				for (int i = 0; i < visibleLines; i++) {
+					if (i + ScrollY >= buffer.UnfoldedLines)//TODO:need optimize
+						break;
+					drawLine (gr, cb, i);
 				}
 			}
-			//System.Threading.Monitor.Exit (buffer.EditMutex);
+			buffer.editMutex.ExitReadLock ();
+
 		}
 		#endregion
 

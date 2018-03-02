@@ -524,15 +524,7 @@ namespace Crow
 					}
 				}
 			}
-			if (keyboardRepeatCount > 0) {
-				int mc = keyboardRepeatCount;
-				keyboardRepeatCount -= mc;
-				if (_focusedWidget != null) {
-					for (int i = 0; i < mc; i++) {
-						_focusedWidget.onKeyDown (this, lastKeyDownEvt);
-					}
-				}
-			}
+
 			CrowThread[] tmpThreads;
 			lock (CrowThreads) {
 				tmpThreads = new CrowThread[CrowThreads.Count];
@@ -1011,9 +1003,9 @@ namespace Crow
 			lastKeyDownEvt.IsRepeat = true;
 			_focusedWidget.onKeyDown (this, e);
 
-			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
-			keyboardRepeatThread.IsBackground = true;
-			keyboardRepeatThread.Start ();
+//			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
+//			keyboardRepeatThread.IsBackground = true;
+//			keyboardRepeatThread.Start ();
 
 			return true;
 		}
@@ -1030,11 +1022,11 @@ namespace Crow
 
 			_focusedWidget.onKeyUp (this, e);
 
-			if (keyboardRepeatThread != null) {
-				keyboardRepeatOn = false;
-				keyboardRepeatThread.Abort();
-				keyboardRepeatThread.Join ();
-			}
+//			if (keyboardRepeatThread != null) {
+//				keyboardRepeatOn = false;
+//				keyboardRepeatThread.Abort();
+//				keyboardRepeatThread.Join ();
+//			}
 			return true;
 		}
 		/// <summary>

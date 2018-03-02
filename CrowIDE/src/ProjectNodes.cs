@@ -95,7 +95,11 @@ namespace Crow.Coding
 			foreach (ProjectNode pn in childNodes)
 				pn.SortChilds ();			
 			childNodes = childNodes.OrderBy(c=>c.Type).ThenBy(cn=>cn.DisplayName).ToList();
-		}			
+		}
+		public override string ToString ()
+		{
+			return DisplayName;
+		}
 	}
 	public class ProjectItem : ProjectNode {
 		#region CTOR

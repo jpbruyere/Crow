@@ -169,7 +169,8 @@ namespace Crow
 				using (StreamWriter sw = new StreamWriter (s)) {
 					lock (items) {
 						foreach (string key in items.Keys) {
-							sw.WriteLine (key + "=" + (string)items [key].curVal.ToString ());
+							if (items [key].curVal != null)
+								sw.WriteLine (key + "=" + (string)items [key].curVal.ToString ());
 						}
 					}
 				}

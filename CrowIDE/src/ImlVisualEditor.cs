@@ -147,6 +147,7 @@ namespace Crow.Coding
 						imlVE.ClearInterface();
 						Instantiator.NextInstantiatorID = 0;
 						imlVE.Styling = projFile.Project.solution.Styling;
+						imlVE.DefaultValuesLoader.Clear();
 						imlVE.DefaultTemplates = projFile.Project.solution.DefaultTemplates;
 						imlVE.Instantiators = new Dictionary<string, Instantiator>();
 						imlVE.LoadIMLFragment(projFile.Source);

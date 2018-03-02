@@ -34,7 +34,7 @@
 		<VerticalStack DataSource="{CurrentSolution}">
 			<Label Background="Gray" Text="{SelectedItem}" Width="Stretched" TextAlignment="Left"/>
 			<HorizontalStack Height="80%">
-				<EditPane SelectedItem="{SelectedItem}" SelectedItemElement="{²SelectedItemElement}" Data="{OpenedItems}" DataTest="Extension"
+				<EditPane SelectedItem="{²SelectedItem}" SelectedItemElement="{²SelectedItemElement}" Data="{OpenedItems}" DataTest="Extension"
 					ItemTemplate="#Crow.Coding.ui.EditPaneItems.template"/>
 				<Splitter/>
 				<VerticalStack Width="30%">
