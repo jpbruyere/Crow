@@ -6,14 +6,14 @@ namespace Crow.Coding
 	{
 		public int Line;
 		public int Column;
-		public ParserException(int line, int column, string txt)
-			: base(string.Format("Parser exception ({0},{1}): {2}", line, column, txt))
+		public ParserException(int line, int column, string txt, string source = null)
+			: base(string.Format("{3}:({0},{1}): {2}", line, column, txt, source))
 		{
 			Line = line;
 			Column = column;
 		}
-		public ParserException(int line, int column, string txt, Exception innerException)
-			: base(string.Format("Parser exception ({0},{1}): {2}", line, column, txt), innerException)
+		public ParserException(int line, int column, string txt, Exception innerException, string source = null)
+			: base(string.Format("{3}:({0},{1}): {2}", line, column, txt, source), innerException)
 		{}
 	}
 }
