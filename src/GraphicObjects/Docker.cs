@@ -55,14 +55,13 @@ namespace Crow
 					return;
 				dockingThreshold = value; 
 				NotifyValueChanged ("DockingThreshold", dockingThreshold);
-
 			}
 		}
 
 		protected override void onInitialized (object sender, EventArgs e)
 		{
 			base.onInitialized (sender, e);
-			CenterDockedObj = new GraphicObject (IFace) { IsEnabled = false };
+			CenterDockedObj = new GraphicObject (IFace) { IsEnabled = false, Background = Color.Cobalt };
 		}
 
 		public override void AddChild (GraphicObject g)
@@ -77,10 +76,13 @@ namespace Crow
 				DockWindow dw = IFace.DragAndDropOperation.DragSource as DockWindow;
 				if (!dw.IsDocked)
 					dw.MoveAndResize (e.XDelta, e.YDelta);
-				if (SubStack == null) {				
-					SubStack = new DockStack (IFace);
+				if (SubStack == null) {
+					DockStack ds = new DockStack (IFace);
+					SubStack = ds;
 					InsertChild (0, SubStack);
-					SubStack.LogicalParent = this;
+					ds.LogicalParent = this;
+					ds.AddChild (CenterDockedObj);
+					ds.SubStack = CenterDockedObj;
 				}
 			}
 			base.onMouseMove (sender, e);

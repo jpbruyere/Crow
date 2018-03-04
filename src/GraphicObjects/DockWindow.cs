@@ -37,7 +37,7 @@ namespace Crow
 
 		int undockThreshold = 4;
 		bool isDocked = false;
-		Alignment docking = Alignment.Center;
+		Alignment docking = Alignment.Undefined;
 
 		Point lastMousePos;	//last known mouse pos in this control
 		Point undockingMousePosOrig; //mouse pos when docking was donne, use for undocking on mouse move
@@ -148,7 +148,7 @@ namespace Crow
 		}
 		protected override void onDrop (object sender, DragDropEventArgs e)
 		{
-			if (!isDocked && DockingPosition != Alignment.Center)
+			if (!isDocked && DockingPosition != Alignment.Undefined)
 				dock (e.DropTarget as DockStack);
 			base.onDrop (sender, e);
 		}
@@ -165,10 +165,13 @@ namespace Crow
 				this.Height = savedSlot.Height;
 
 				IsDocked = false;
+				DockingPosition = Alignment.Undefined;
 				Resizable = wasResizable;
 			}
 		}
-		void dock (DockStack target){			
+		void dock (DockStack target){
+			if (RootDock.CenterDockedObj is DockWindow && DockingPosition == Alignment.Center)
+				return;
 			lock (IFace.UpdateMutex) {
 				IsDocked = true;
 				undockingMousePosOrig = lastMousePos;
