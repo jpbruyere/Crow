@@ -469,7 +469,7 @@ namespace Crow
 				{
 					_hoverWidget.IsHover = true;
 					#if DEBUG_FOCUS
-					Debug.WriteLine("Hover => " + _activeWidget.ToString());
+					Debug.WriteLine("Hover => " + _hoverWidget.ToString());
 					}else
 					Debug.WriteLine("Hover => null");
 					#else

@@ -43,7 +43,7 @@ namespace Crow
 		#endregion
 
 		//GenericStack rootStack = null;
-		DockStack stack = null;
+		public DockStack SubStack = null;
 		int dockingThreshold;
 
 		List<DockWindow> windows = new List<DockWindow>();
@@ -77,10 +77,10 @@ namespace Crow
 				DockWindow dw = IFace.DragAndDropOperation.DragSource as DockWindow;
 				if (!dw.IsDocked)
 					dw.MoveAndResize (e.XDelta, e.YDelta);
-				if (stack == null) {				
-					stack = new DockStack (IFace);
-					InsertChild (0, stack);
-					stack.LogicalParent = this;
+				if (SubStack == null) {				
+					SubStack = new DockStack (IFace);
+					InsertChild (0, SubStack);
+					SubStack.LogicalParent = this;
 				}
 			}
 			base.onMouseMove (sender, e);

@@ -35,7 +35,7 @@ namespace Crow
 		}
 		#endregion
 
-		int undockThreshold = 10;
+		int undockThreshold = 4;
 		bool isDocked = false;
 		Alignment docking = Alignment.Center;
 

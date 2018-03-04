@@ -184,15 +184,21 @@ namespace Crow
 				return;
 			DockStack dsp = Parent as DockStack;
 			if (dsp == null) {
-				SubStack = null;
 				RemoveChild (0);
+				if (SubStack is DockStack) {
+					Docker dk = Parent as Docker;
+					dk.RemoveChild (this);
+					dk.InsertChild (0, SubStack);
+					dk.SubStack = SubStack as DockStack;
+				}
+				SubStack = null;
 				return;
 			}
 			GraphicObject g = Children [0];
 			RemoveChild (g);
 			int i = dsp.Children.IndexOf (this);
 			dsp.RemoveChild (this);
-			dsp.AddChild (g);
+			dsp.InsertChild (i, g);
 			dsp.SubStack = g;
 //			if (SubStack is DockStack) {
 //
@@ -267,7 +273,7 @@ namespace Crow
 					activeStack.AddChild (activeStack.SubStack);
 				} else {
 					activeStack.InsertChild (0, dw);
-					activeStack.InsertChild (0, splitter);
+					activeStack.InsertChild (1, splitter);
 				}
 				break;
 			case Alignment.Right:
@@ -291,7 +297,7 @@ namespace Crow
 				return;
 			instStack = IFace.CreateITorFromIMLFragment (@"<DockStack/>");
 			instSplit = IFace.CreateITorFromIMLFragment (@"<Splitter/>");
-			instSpacer = IFace.CreateITorFromIMLFragment (@"<GraphicObject Background='Jet' IsEnabled='false'/>");
+			instSpacer = IFace.CreateITorFromIMLFragment (@"<GraphicObject Background='DarkCyan' IsEnabled='false'/>");
 		}
 
 	}
