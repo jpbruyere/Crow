@@ -106,6 +106,9 @@ namespace Crow
 		}
 		#endregion
 
+		public static Orientation GetOrientation(this Alignment a){
+			return (a==Alignment.Left) ||(a==Alignment.Right) ? Orientation.Horizontal : Orientation.Vertical;
+		}
 		public static void Raise(this EventHandler handler, object sender, EventArgs e)
 		{
 			if(handler != null)

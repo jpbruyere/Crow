@@ -111,11 +111,11 @@ ToolWindow {
 }
 Docker {
 	AllowDrop = "false";
-	Margin="0";
+	Margin="5";
 	Focusable="true";
 }
 DockStack {
-	Margin="1";
+	Margin="5";
 	AllowDrop = "true";
 	Focusable="true";
 	//DragEnter="{Background=DarkBlue}";
