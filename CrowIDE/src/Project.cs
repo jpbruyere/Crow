@@ -46,6 +46,7 @@ namespace Crow.Coding
 		#endregion
 
 		bool isLoaded = false;
+		bool isExpanded;
 		XmlDocument xmlDoc;
 		XmlNode nodeProject;
 		XmlNode nodeProps;
@@ -70,6 +71,17 @@ namespace Crow.Coding
 					return;
 				isLoaded = value;
 				NotifyValueChanged ("IsLoaded", isLoaded);
+			}
+		}
+		public bool IsExpanded
+		{
+			get { return isExpanded; }
+			set
+			{
+				if (value == isExpanded)
+					return;
+				isExpanded = value;
+				NotifyValueChanged ("IsExpanded", isExpanded);
 			}
 		}
 		public bool IsStartupProject {
@@ -100,17 +112,17 @@ namespace Crow.Coding
 			flattenNodes = new List<ProjectNode> ();
 
 			ProjectNode refs = new ProjectNode (this, ItemType.ReferenceGroup, "References");
-			root.ChildNodes.Add (refs);
+			root.AddChild (refs);
 
 			foreach (ProjectItem pn in items) {
 				switch (pn.Type) {
 				case ItemType.Reference:
-					refs.ChildNodes.Add (pn);
+					refs.AddChild (pn);
 					flattenNodes.Add (pn);
 					break;					
 				case ItemType.ProjectReference:
 					ProjectReference pr = new ProjectReference (pn); 
-					refs.ChildNodes.Add (pr);
+					refs.AddChild (pr);
 					flattenNodes.Add (pr);
 					break;					
 				case ItemType.Compile:
@@ -122,7 +134,7 @@ namespace Crow.Coding
 						ProjectNode nextNode = curNode.ChildNodes.FirstOrDefault (n => n.DisplayName == folds [i] && n.Type == ItemType.VirtualGroup);
 						if (nextNode == null) {
 							nextNode = new ProjectNode (this, ItemType.VirtualGroup, folds [i]);
-							curNode.ChildNodes.Add (nextNode);
+							curNode.AddChild (nextNode);
 						}
 						curNode = nextNode;
 					}
@@ -136,7 +148,7 @@ namespace Crow.Coding
 						f = new ProjectFile (pn);
 						break;
 					}
-					curNode.ChildNodes.Add (f);
+					curNode.AddChild (f);
 					flattenNodes.Add (f);
 					break;
 				}

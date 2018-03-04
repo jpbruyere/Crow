@@ -44,6 +44,8 @@ namespace Crow.Coding
 	/// </summary>
 	public class SourceEditor : ScrollingObject
 	{
+		public ReaderWriterLockSlim seMutex = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+
 		#region CTOR
 		public SourceEditor (): base()
 		{
@@ -91,6 +93,8 @@ namespace Crow.Coding
 						loadSource ();
 						isDirty = false;
 						oldSource = projFile.Source;
+						CurrentLine = requestedLine;
+						CurrentColumn = requestedCol;
 						projFile.RegisteredEditors [this] = true;
 					}
 					buffer.editMutex.EnterWriteLock ();
@@ -153,7 +157,7 @@ namespace Crow.Coding
 		}
 		void findLongestLineAndUpdateMaxScrollX() {
 			buffer.FindLongestVisualLine ();
-			MaxScrollX = Math.Max (0, buffer.longestLineCharCount - visibleColumns);
+			updateMaxScrollX ();
 //			Debug.WriteLine ("SourceEditor: Find Longest line and update maxscrollx: {0} visible cols:{1}", MaxScrollX, visibleColumns);
 		}
 		/// <summary>
@@ -170,10 +174,15 @@ namespace Crow.Coding
 		}
 		void updateVisibleColumns(){
 			visibleColumns = (int)Math.Floor ((double)(ClientRectangle.Width - leftMargin)/ fe.MaxXAdvance);
-			MaxScrollX = Math.Max (0, buffer.longestLineCharCount - visibleColumns);
-
+			NotifyValueChanged ("VisibleColumns", visibleColumns);
+			updateMaxScrollX ();
 //			System.Diagnostics.Debug.WriteLine ("update visible columns: {0} leftMargin:{1}",visibleColumns, leftMargin);
 //			System.Diagnostics.Debug.WriteLine ("update MaxScrollX: " + MaxScrollX);
+		}
+		void updateMaxScrollX () {
+			MaxScrollX = Math.Max (0, buffer.longestLineCharCount - visibleColumns);
+			if (buffer.longestLineCharCount > 0)
+				NotifyValueChanged ("ChildWidthRatio", Slot.Width * visibleColumns / buffer.longestLineCharCount);			
 		}
 		void updateMaxScrollY () {
 			if (parser == null || !foldingEnabled) {
@@ -188,6 +197,8 @@ namespace Crow.Coding
 		}			
 		void updatePrintedLines () {
 			buffer.editMutex.EnterReadLock ();
+			seMutex.EnterWriteLock ();
+
 			PrintedLines = new List<CodeLine> ();
 			int curL = 0;
 			int i = 0;
@@ -210,7 +221,9 @@ namespace Crow.Coding
 				curL++;
 				i++;
 			}
+
 			buffer.editMutex.ExitReadLock ();
+			seMutex.ExitWriteLock ();
 		}
 		void toogleFolding (int line) {
 			if (parser == null || !foldingEnabled)
@@ -223,6 +236,8 @@ namespace Crow.Coding
 		#region Buffer events handlers
 		void Buffer_BufferCleared (object sender, EventArgs e)
 		{
+			seMutex.EnterWriteLock ();
+
 			buffer.longestLineCharCount = 0;
 			buffer.longestLineIdx = 0;
 			measureLeftMargin ();
@@ -231,6 +246,8 @@ namespace Crow.Coding
 			RegisterForGraphicUpdate ();
 			notifyPositionChanged ();
 			isDirty = true;
+
+			seMutex.ExitWriteLock ();
 		}
 		void Buffer_LineAdditionEvent (object sender, CodeBufferEventArgs e)
 		{
@@ -297,6 +314,14 @@ namespace Crow.Coding
 		}
 		void Buffer_PositionChanged (object sender, EventArgs e)
 		{
+			Console.WriteLine ("Position changes: ({0},{1})", buffer.CurrentLine, buffer.CurrentColumn);
+			int cc = buffer.CurrentTabulatedColumn;
+
+			if (cc > visibleColumns + ScrollX) {
+				ScrollX = cc - visibleColumns;
+			} else if (cc < ScrollX)
+				ScrollX = cc;
+			
 			RegisterForGraphicUpdate ();
 			updateOnScreenCurLineFromBuffCurLine ();
 			notifyPositionChanged ();
@@ -318,22 +343,29 @@ namespace Crow.Coding
 		public int CurrentColumn{
 			get { return buffer == null ? 0 : buffer.CurrentColumn+1; }
 			set {
-				try {
+				try {					
+					if (value - 1 == buffer.CurrentColumn)
+						return;
 					buffer.CurrentColumn = value - 1;
 				} catch (Exception ex) {
+					requestedCol = value - 1;
 					Console.WriteLine ("Error cur column: " + ex.ToString ());
 				}
 			}
 		}
+		int requestedLine = 0, requestedCol = 0;
 		public int CurrentLine{
 			get { return buffer == null ? 0 : buffer.CurrentLine+1; }
 			set {
 				try {
 					int l = value - 1;
+					if (l == buffer.CurrentLine)
+						return;
 					buffer.CurrentLine = l;
 					if (buffer [l].IsFolded)
 						buffer.ToogleFolding (l);					
 				} catch (Exception ex) {
+					requestedLine = value - 1;
 					Console.WriteLine ("Error cur column: " + ex.ToString ());
 				}
 			}
@@ -800,6 +832,8 @@ namespace Crow.Coding
 			}
 			#endregion
 
+			seMutex.EnterReadLock ();
+
 			if (PrintedLines != null) {
 				for (int i = 0; i < visibleLines; i++) {
 					if (i + ScrollY >= buffer.UnfoldedLines)//TODO:need optimize
@@ -807,6 +841,9 @@ namespace Crow.Coding
 					drawLine (gr, cb, i);
 				}
 			}
+
+			seMutex.ExitReadLock ();
+
 			buffer.editMutex.ExitReadLock ();
 
 		}

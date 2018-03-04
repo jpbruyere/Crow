@@ -103,13 +103,16 @@ namespace Crow.Coding
 			//this.CrowInterface.LoadInterface ("#Crow.Coding.ui.imlEditor.crow").DataSource = this;
 			//GraphicObject go = this.CrowInterface.LoadInterface (@"ui/test.crow");
 			GraphicObject go = AddWidget (@"#Crow.Coding.ui.CrowIDE.crow");
+			go.DataSource = this;
 
 			MainIFace = ifaceControl[0].CrowInterface;
 
-			if (ReopenLastSolution && !string.IsNullOrEmpty(LastOpenSolution))
+			if (ReopenLastSolution && !string.IsNullOrEmpty (LastOpenSolution)) {
 				CurrentSolution = Solution.LoadSolution (LastOpenSolution);
+				//lock(MainIFace.UpdateMutex)
+				CurrentSolution.ReopenItemsSavedInUserConfig ();
+			}
 
-			go.DataSource = this;
 
 			instFileDlg = Instantiator.CreateFromImlFragment
 				(MainIFace, "<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}' SearchPattern='*.sln' OkClicked='onFileOpen'/>");

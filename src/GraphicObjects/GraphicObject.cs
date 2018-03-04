@@ -52,24 +52,37 @@ namespace Crow
 		internal ReaderWriterLockSlim parentRWLock = new ReaderWriterLockSlim();
 
 		#if DESIGN_MODE
-		static MethodInfo miDesignAddDefLoc = typeof(GraphicObject).GetMethod("design_add_default_location",
+		static MethodInfo miDesignAddDefLoc = typeof(GraphicObject).GetMethod("design_add_style_location",
 			BindingFlags.Instance | BindingFlags.NonPublic);
-		public volatile bool HasChanged = false;
+		static MethodInfo miDesignAddValLoc = typeof(GraphicObject).GetMethod("design_add_iml_location",
+			BindingFlags.Instance | BindingFlags.NonPublic);
+		
+		public volatile bool design_HasChanged = false;
 		public string design_id;
 		public int design_line;
 		public int design_column;
 		public string design_imlPath;
-		public Dictionary<string,string> design_members = new Dictionary<string, string>();
-		public Dictionary<string,FileLocation> design_defaults = new Dictionary<string, FileLocation>();
-		internal void design_add_default_location (string memberName, string path, int line, int col) {
-			if (design_defaults.ContainsKey(memberName)){
+		public bool design_isTGItem = false;//true if this is a templated item's root
+		public Dictionary<string,string> design_iml_values = new Dictionary<string, string>();
+		public Dictionary<string,string> design_style_values = new Dictionary<string, string>();
+		//public Dictionary<string,FileLocation> design_iml_locations = new Dictionary<string, FileLocation>();
+		public Dictionary<string,FileLocation> design_style_locations = new Dictionary<string, FileLocation>();
+
+		internal void design_add_style_location (string memberName, string path, int line, int col) {
+			if (design_style_locations.ContainsKey(memberName)){
 				Console.WriteLine ("default value localtion already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
 				return;
 			}
-			design_defaults.Add(memberName, new FileLocation(path,line,col));
+			design_style_locations.Add(memberName, new FileLocation(path,line,col));
 		}
-		public bool design_isTGItem = false;
-
+//		internal void design_add_iml_location (string memberName, string path, int line, int col) {
+//			if (design_iml_locations.ContainsKey(memberName)){
+//				Console.WriteLine ("IML value localtion already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
+//				return;
+//			}
+//			design_iml_locations.Add(memberName, new FileLocation(path,line,col));
+//		}
+			
 		public virtual bool FindByDesignID(string designID, out GraphicObject go){
 			go = null;
 			if (this.design_id == designID){
@@ -94,7 +107,7 @@ namespace Crow
 					getIML (doc, (XmlNode)doc);
 					doc.WriteTo (xtw);
 				}
-				this.HasChanged = false;
+				this.design_HasChanged = false;
 				return sw.ToString ();
 			}
 		}
@@ -105,7 +118,7 @@ namespace Crow
 			
 			XmlElement xe = doc.CreateElement(this.GetType().Name);
 
-			foreach (KeyValuePair<string,string> kv in design_members) {
+			foreach (KeyValuePair<string,string> kv in design_iml_values) {
 				XmlAttribute xa = doc.CreateAttribute (kv.Key);
 				xa.Value = kv.Value;
 				xe.Attributes.Append (xa);
@@ -257,6 +270,7 @@ namespace Crow
 		bool focusable = false;
 		bool hasFocus = false;
 		bool isActive = false;
+		bool isHover = false;
 		bool mouseRepeat;
 		protected bool isVisible = true;
 		bool isEnabled = true;
@@ -307,6 +321,9 @@ namespace Crow
 		internal Size contentSize;
 		#endregion
 
+		public void ResetSlots () {
+			LastSlots = LastPaintedSlot = Slot = default(Rectangle);
+		}
 		#region ILayoutable
 		[XmlIgnore]public LayoutingType RegisteredLayoutings { get { return registeredLayoutings; } set { registeredLayoutings = value; } }
 		//TODO: it would save the recurent cost of a cast in event bubbling if parent type was GraphicObject
@@ -364,6 +381,14 @@ namespace Crow
 		}
 		public virtual Rectangle getSlot () { return Slot;}
 		#endregion
+		public Point ScreenPointToLocal(Point p){
+			Point pt = p - ScreenCoordinates(Slot).TopLeft - ClientRectangle.TopLeft;
+			if (pt.X < 0)
+				pt.X = 0;
+			if (pt.Y < 0)
+				pt.Y = 0;
+			return pt;
+		}
 
 		#region EVENT HANDLERS
 		/// <summary>Occurs when mouse wheel is rolled in this object. It bubbles to the root</summary>
@@ -392,7 +417,11 @@ namespace Crow
 		public event EventHandler Focused;
 		/// <summary>Occurs when this object loose focus</summary>
 		public event EventHandler Unfocused;
-		/// <summary>Occurs when the enabled state this object is set to true</summary>
+		/// <summary>Occurs when mouse is over</summary>
+		public event EventHandler Hover;
+		/// <summary>Occurs when this control is no longer the Hover one</summary>
+		public event EventHandler UnHover;
+		/// <summary>Occurs when this object loose focus</summary>
 		public event EventHandler Enabled;
 		/// <summary>Occurs when the enabled state this object is set to false</summary>
 		public event EventHandler Disabled;
@@ -413,7 +442,7 @@ namespace Crow
 
 		#region public properties
 		/// <summary>Random value placeholder</summary>
-		[XmlAttributeAttribute]
+		[DesignCategory ("Divers")]
 		public object Tag {
 			get { return tag; }
 			set {
@@ -427,7 +456,7 @@ namespace Crow
 		/// If enabled, resulting bitmap of graphic object is cached
 		/// speeding up rendering of complex object. Default is enabled.
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue(true)]
+		[DesignCategory ("Behavior")][DefaultValue(true)]
 		public virtual bool CacheEnabled {
 			get { return cacheEnabled; }
 			set {
@@ -440,7 +469,7 @@ namespace Crow
 		/// <summary>
 		/// If true, rendering of GraphicObject is clipped inside client rectangle
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue(true)]
+		[DesignCategory ("Appearance")][DefaultValue(true)]
 		public virtual bool ClipToClientRect {
 			get { return clipToClientRect; }
 			set {
@@ -461,7 +490,7 @@ namespace Crow
 		/// and by template controls to find special element in their template implementation such
 		/// as a container or a group to put children in.
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue(null)]
+		[DesignCategory ("Divers")][DefaultValue(null)]
 		public virtual string Name {
 			get {
 				#if DEBUG
@@ -481,7 +510,7 @@ namespace Crow
 		/// Vertical alignment inside parent, disabled if height is stretched
 		/// or top coordinate is not null
 		/// </summary>
-		[XmlAttributeAttribute	()][DefaultValue(VerticalAlignment.Center)]
+		[DesignCategory ("Layout")][DefaultValue(VerticalAlignment.Center)]
 		public virtual VerticalAlignment VerticalAlignment {
 			get { return verticalAlignment; }
 			set {
@@ -497,7 +526,7 @@ namespace Crow
 		/// Horizontal alignment inside parent, disabled if width is stretched
 		/// or left coordinate is not null
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(HorizontalAlignment.Center)]
+		[DesignCategory ("Layout")][DefaultValue(HorizontalAlignment.Center)]
 		public virtual HorizontalAlignment HorizontalAlignment {
 			get { return horizontalAlignment; }
 			set {
@@ -511,7 +540,7 @@ namespace Crow
 		/// <summary>
 		/// x position inside parent
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(0)]
+		[DesignCategory ("Layout")][DefaultValue(0)]
 		public virtual int Left {
 			get { return left; }
 			set {
@@ -525,7 +554,7 @@ namespace Crow
 		/// <summary>
 		/// y position inside parent
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(0)]
+		[DesignCategory ("Layout")][DefaultValue(0)]
 		public virtual int Top {
 			get { return top; }
 			set {
@@ -539,7 +568,7 @@ namespace Crow
 		/// <summary>
 		/// Helper property used to set width and height to fit in one call
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[DesignCategory ("Layout")][DefaultValue(false)]
 		public virtual bool Fit {
 			get { return Width == Measure.Fit && Height == Measure.Fit ? true : false; }
 			set {
@@ -553,7 +582,7 @@ namespace Crow
 		/// Width of this control, by default inherited from parent. May have special values
 		/// such as Stretched or Fit. It may be proportionnal or absolute.
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue("Inherit")]
+		[DesignCategory ("Layout")][DefaultValue("Inherit")]
 		public virtual Measure Width {
 			get {
 				return width.Units == Unit.Inherit ?
@@ -593,7 +622,7 @@ namespace Crow
 		/// Height of this control, by default inherited from parent. May have special values
 		/// such as Stretched or Fit. It may be proportionnal or absolute.
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue("Inherit")]
+		[DesignCategory ("Layout")][DefaultValue("Inherit")]
 		public virtual Measure Height {
 			get {
 				return height.Units == Unit.Inherit ?
@@ -641,7 +670,7 @@ namespace Crow
 		/// Indicate that this object may received focus or not, if not focusable all the descendants are 
 		/// affected.
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[DesignCategory ("Behaviour")][DefaultValue(false)]
 		public virtual bool Focusable {
 			get { return focusable; }
 			set {
@@ -683,9 +712,28 @@ namespace Crow
 			}
 		}
 		/// <summary>
+		/// true if this control has the pointer hover
+		/// </summary>
+		[XmlIgnore]public virtual bool IsHover {
+			get { return isHover; }
+			set {
+				if (value == isHover)
+					return;
+
+				isHover = value;
+
+				if (isHover)
+					onHover (this, null);
+				else
+					onUnHover (this, null);
+
+				NotifyValueChanged ("IsHover", isHover);
+			}
+		}
+		/// <summary>
 		/// true if holding mouse button down should trigger multiple click events
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[DesignCategory ("Behaviour")][DefaultValue(false)]
 		public virtual bool MouseRepeat {
 			get { return mouseRepeat; }
 			set {
@@ -699,7 +747,7 @@ namespace Crow
 		/// <summary>
 		/// background fill of the control, maybe solid color, gradient, image, or svg
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue("Transparent")]
+		[DesignCategory ("Appearance")][DefaultValue("Transparent")]
 		public virtual Fill Background {
 			get { return background; }
 			set {
@@ -720,7 +768,7 @@ namespace Crow
 		/// <summary>
 		/// Foreground fill of the control, usage may be different among derived controls
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue("White")]
+		[DesignCategory ("Appearance")][DefaultValue("White")]
 		public virtual Fill Foreground {
 			get { return foreground; }
 			set {
@@ -734,7 +782,7 @@ namespace Crow
 		/// <summary>
 		/// Font being used in many controls, it is defined in the base GraphicObject class.
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue("sans,10")]
+		[DesignCategory ("Appearance")][DefaultValue("sans,10")]
 		public virtual Font Font {
 			get { return font; }
 			set {
@@ -748,7 +796,7 @@ namespace Crow
 		/// <summary>
 		/// to get rounded corners
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(0.0)]
+		[DesignCategory ("Appearance")][DefaultValue(0.0)]
 		public virtual double CornerRadius {
 			get { return cornerRadius; }
 			set {
@@ -763,7 +811,7 @@ namespace Crow
 		/// This is a single integer for the 4 direction, a gap between the control and it's container,
 		/// by default it is filled with the background.
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(0)]
+		[DesignCategory ("Layout")][DefaultValue(0)]
 		public virtual int Margin {
 			get { return margin; }
 			set {
@@ -777,7 +825,7 @@ namespace Crow
 		/// <summary>
 		/// set the visible state of the control, invisible controls does reserve space in the layouting system.
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue(true)]
+		[DesignCategory ("Appearance")][DefaultValue(true)]
 		public virtual bool Visible {
 			get { return isVisible; }
 			set {
@@ -798,7 +846,7 @@ namespace Crow
 		/// get or set the enabled state, disabling a control will affect focuability and
 		/// also it's rendering which will be grayed
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue(true)]
+		[DesignCategory ("Behaviour")][DefaultValue(true)]
 		public virtual bool IsEnabled {
 			get { return isEnabled; }
 			set {
@@ -819,7 +867,7 @@ namespace Crow
 		/// <summary>
 		/// Minimal width and  height for this control
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue("1,1")]
+		[DesignCategory ("Layout")][DefaultValue("1,1")]
 		public virtual Size MinimumSize {
 			get { return minimumSize; }
 			set {
@@ -835,7 +883,7 @@ namespace Crow
 		/// <summary>
 		/// Maximum width and  height for this control, unlimited if null.
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue("0,0")]
+		[DesignCategory ("Layout")][DefaultValue("0,0")]
 		public virtual Size MaximumSize {
 			get { return maximumSize; }
 			set {
@@ -852,7 +900,7 @@ namespace Crow
 		/// Seek first logical tree upward if logicalParent is set, or seek graphic tree for
 		/// a not null dataSource that will be active for all descendants having dataSource=null
 		/// </summary>
-		[XmlAttributeAttribute]
+		[DesignCategory ("Data")]
 		public virtual object DataSource {
 			set {
 				if (DataSource == value)
@@ -893,7 +941,7 @@ namespace Crow
 		/// <summary>
 		/// Style key to use for this control
 		/// </summary>
-		[XmlAttributeAttribute]
+		[DesignCategory ("Appearance")]
 		public virtual string Style {
 			get { return style; }
 			set {
@@ -905,7 +953,7 @@ namespace Crow
 				NotifyValueChanged ("Style", style);
 			}
 		}
-		[XmlAttributeAttribute]
+		[DesignCategory ("Divers")]
 		public virtual string Tooltip {
 			get { return tooltip; }
 			set {
@@ -915,7 +963,7 @@ namespace Crow
 				NotifyValueChanged("Tooltip", tooltip);
 			}
 		}
-		[XmlAttributeAttribute]
+		[DesignCategory ("Divers")]
 		public IList<Command> ContextCommands {
 			get { return contextCommands; }
 			set {
@@ -1040,7 +1088,9 @@ namespace Crow
 						name = pi.Name;
 					else
 						name = xaa.AttributeName;
-				}
+				}else
+					name = pi.Name;
+				
 				int styleIndex = -1;
 				if (styling.Count > 0){
 					for (int i = 0; i < styling.Count; i++) {
@@ -1057,13 +1107,21 @@ namespace Crow
 						defaultValue = styling[styleIndex] [name];
 
 					#if DESIGN_MODE
-					FileLocation fl = styling[styleIndex].Locations[name];
-					il.Emit (OpCodes.Ldloc_0);
-					il.Emit (OpCodes.Ldstr, name);
-					il.Emit (OpCodes.Ldstr, fl.FilePath);
-					il.Emit (OpCodes.Ldc_I4, fl.Line);
-					il.Emit (OpCodes.Ldc_I4, fl.Column);
-					il.Emit (OpCodes.Call, miDesignAddDefLoc);
+					if (defaultValue != null){
+						FileLocation fl = styling[styleIndex].Locations[name];
+						il.Emit (OpCodes.Ldloc_0);
+						il.Emit (OpCodes.Ldstr, name);
+						il.Emit (OpCodes.Ldstr, fl.FilePath);
+						il.Emit (OpCodes.Ldc_I4, fl.Line);
+						il.Emit (OpCodes.Ldc_I4, fl.Column);
+						il.Emit (OpCodes.Call, miDesignAddDefLoc);
+
+						il.Emit (OpCodes.Ldloc_0);
+						il.Emit (OpCodes.Ldfld, typeof(GraphicObject).GetField("design_style_values"));
+						il.Emit (OpCodes.Ldstr, name);
+						il.Emit (OpCodes.Ldstr, defaultValue.ToString());
+						il.Emit (OpCodes.Call, CompilerServices.miDicStrStrAdd);
+					}
 					#endif
 
 				}else {
@@ -1122,7 +1180,7 @@ namespace Crow
 		}
 
 		#region Drag&Drop
-		[XmlAttributeAttribute][DefaultValue(false)]
+		[DesignCategory ("DragAndDrop")][DefaultValue(false)]
 		public virtual bool AllowDrag {
 			get { return allowDrag; }
 			set {
@@ -1132,7 +1190,7 @@ namespace Crow
 				NotifyValueChanged ("AllowDrag", allowDrag);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(false)]
+		[DesignCategory ("DragAndDrop")][DefaultValue(false)]
 		public virtual bool AllowDrop {
 			get { return allowDrop; }
 			set {
@@ -1193,7 +1251,11 @@ namespace Crow
 		protected virtual void onDrop (object sender, DragDropEventArgs e){			
 			IsDragged = false;
 			Drop.Raise (this, e);
+			//e.DropTarget.onDragLeave (this, e);//raise drag leave in target
 			Debug.WriteLine(this.ToString() + " : DROP => " + e.ToString());
+		}
+		public bool IsDropTarget {
+			get { return IFace.DragAndDropOperation?.DropTarget == this; }
 		}
 
 		#endregion
@@ -1314,8 +1376,8 @@ namespace Crow
 		public virtual void OnLayoutChanges(LayoutingType  layoutType)
 		{
 			#if DEBUG_LAYOUTING
-			CurrentInterface.currentLQI.Slot = LastSlots;
-			CurrentInterface.currentLQI.NewSlot = Slot;
+			IFace.currentLQI.Slot = LastSlots;
+			IFace.currentLQI.NewSlot = Slot;
 			Debug.WriteLine ("\t\t{0} => {1}",LastSlots,Slot);
 			#endif
 
@@ -1717,14 +1779,6 @@ namespace Crow
 			#if DEBUG_FOCUS
 			Debug.WriteLine("MouseEnter => " + this.ToString());
 			#endif
-
-			if (IFace.DragAndDropOperation != null) {
-				if (this.AllowDrop) {
-					if (IFace.DragAndDropOperation.DragSource != this && IFace.DragAndDropOperation.DropTarget != this)
-						onDragEnter (this, IFace.DragAndDropOperation);					
-				}
-			}
-
 			MouseEnter.Raise (this, e);
 		}
 		public virtual void onMouseLeave(object sender, MouseMoveEventArgs e)
@@ -1732,11 +1786,31 @@ namespace Crow
 			#if DEBUG_FOCUS
 			Debug.WriteLine("MouseLeave => " + this.ToString());
 			#endif
+			MouseLeave.Raise (this, e);
+		}
+		public virtual void onHover(object sender, EventArgs e)
+		{
+			#if DEBUG_FOCUS
+			Debug.WriteLine("MouseHover => " + this.ToString());
+			#endif
+			if (IFace.DragAndDropOperation != null) {
+				if (this.AllowDrop) {
+					if (IFace.DragAndDropOperation.DragSource != this && IFace.DragAndDropOperation.DropTarget != this)
+						onDragEnter (this, IFace.DragAndDropOperation);					
+				}
+			}
+			Hover.Raise (this, e);
+		}
+		public virtual void onUnHover(object sender, EventArgs e)
+		{
+			#if DEBUG_FOCUS
+			Debug.WriteLine("MouseUnHover => " + this.ToString());
+			#endif
 			if (IFace.DragAndDropOperation != null) {
 				if (IFace.DragAndDropOperation.DropTarget == this)
 					onDragLeave (this, IFace.DragAndDropOperation);
 			}
-			MouseLeave.Raise (this, e);
+			UnHover.Raise (this, e);
 		}
 		#endregion
 

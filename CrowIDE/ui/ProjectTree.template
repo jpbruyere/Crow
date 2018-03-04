@@ -3,7 +3,7 @@
 	<Label Text="{}" Background="DarkRed" Foreground="White"/>
 </ItemTemplate>
 <ItemTemplate DataType="Crow.Coding.Project" Data="RootItems" DataTest="Type">
-	<Expandable Caption="{Name}" ContextCommands="{Commands}" >
+	<Expandable Caption="{Name}" ContextCommands="{Commands}" IsExpanded="{²IsExpanded}">
 		<Template>
 			<VerticalStack>
 				<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"						
@@ -32,8 +32,8 @@
 		</HorizontalStack>
 	</Expandable>
 </ItemTemplate>
-<ItemTemplate DataType="ReferenceGroup" Data="ChildNodes" DataTest="Type">
-	<Expandable Caption="{DisplayName}" Template="#Crow.TreeExpandable.template" >
+<ItemTemplate DataType="ReferenceGroup" Data="ChildNodes" DataTest="Type" >
+	<Expandable Caption="{DisplayName}" Template="#Crow.TreeExpandable.template" IsExpanded="{²IsExpanded}">
 		<HorizontalStack Height="Fit">
 			<GraphicObject Width="8" Height="10"/>
 			<VerticalStack Height="Fit" Name="ItemsContainer"/>
@@ -41,7 +41,7 @@
 	</Expandable>
 </ItemTemplate>
 <ItemTemplate DataType="VirtualGroup" Data="ChildNodes" DataTest="Type">
-	<Expandable Caption="{DisplayName}" Template="#Crow.TreeExpandable.template" >
+	<Expandable Caption="{DisplayName}" Template="#Crow.TreeExpandable.template" IsExpanded="{²IsExpanded}">
 		<HorizontalStack Height="Fit">
 			<GraphicObject Width="8" Height="10"/>
 			<VerticalStack Height="Fit" Name="ItemsContainer"/>

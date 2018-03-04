@@ -69,70 +69,70 @@ namespace Crow.Coding
 					return;
 				editMutex.EnterWriteLock ();
 				lines [i] = value;
-				LineUpadateEvent.Raise (this, new CodeBufferEventArgs (i));
 				editMutex.ExitWriteLock ();
+				LineUpadateEvent.Raise (this, new CodeBufferEventArgs (i));
 			}
 		}
 
 		public void RemoveAt(int i){
 			editMutex.EnterWriteLock ();
 			lines.RemoveAt (i);
-			LineRemoveEvent.Raise (this, new CodeBufferEventArgs (i));
 			editMutex.ExitWriteLock ();
+			LineRemoveEvent.Raise (this, new CodeBufferEventArgs (i));
 		}
 		public void Insert(int i, string item){
 			editMutex.EnterWriteLock ();
 			lines.Insert (i, item);
-			LineAdditionEvent.Raise (this, new CodeBufferEventArgs (i));
 			editMutex.ExitWriteLock ();
+			LineAdditionEvent.Raise (this, new CodeBufferEventArgs (i));
 		}
 		public void Add(CodeLine item){
 			editMutex.EnterWriteLock ();
 			lines.Add (item);
-			LineAdditionEvent.Raise (this, new CodeBufferEventArgs (lines.Count - 1));
 			editMutex.ExitWriteLock ();
+			LineAdditionEvent.Raise (this, new CodeBufferEventArgs (lines.Count - 1));
 		}
 		public void AddRange (string[] items){
 			int start = lines.Count;
 			editMutex.EnterWriteLock ();
 			for (int i = 0; i < items.Length; i++)
 				lines.Add (items [i]);
-			LineAdditionEvent.Raise (this, new CodeBufferEventArgs (start, items.Length));
 			editMutex.ExitWriteLock ();
+			LineAdditionEvent.Raise (this, new CodeBufferEventArgs (start, items.Length));
 		}
 		public void AddRange (CodeLine[] items){
 			int start = lines.Count;
 			editMutex.EnterWriteLock ();
 			lines.AddRange (items);
-			LineAdditionEvent.Raise (this, new CodeBufferEventArgs (start, items.Length));
 			editMutex.ExitWriteLock ();
+			LineAdditionEvent.Raise (this, new CodeBufferEventArgs (start, items.Length));
 		}
 		public void Clear () {
 			editMutex.EnterWriteLock ();
 			longestLineCharCount = 0;
 			lines.Clear ();
-			BufferCleared.Raise (this, null);
 			editMutex.ExitWriteLock ();
+			BufferCleared.Raise (this, null);
 		}
 		public void UpdateLine(int i, string newContent){
 			editMutex.EnterWriteLock ();
 			this [i].Content = newContent;
-			LineUpadateEvent.Raise (this, new CodeBufferEventArgs (i));
 			editMutex.ExitWriteLock ();
+			LineUpadateEvent.Raise (this, new CodeBufferEventArgs (i));
 		}
 		public void AppenedLine(int i, string newContent){
 			editMutex.EnterWriteLock ();
 			this [i].Content += newContent;
-			LineUpadateEvent.Raise (this, new CodeBufferEventArgs (i));
 			editMutex.ExitWriteLock ();
+			LineUpadateEvent.Raise (this, new CodeBufferEventArgs (i));
 		}
 		public void ToogleFolding (int line) {
 			if (!this [line].IsFoldable)
 				return;
 			editMutex.EnterWriteLock ();
 			this [line].IsFolded = !this [line].IsFolded;
-			FoldingEvent.Raise (this, new CodeBufferEventArgs (line));
 			editMutex.ExitWriteLock ();
+			FoldingEvent.Raise (this, new CodeBufferEventArgs (line));
 		}
 		public void Load(string rawSource, string lineBrkRegex = @"\r\n|\r|\n|\\\n") {
 			this.Clear();
@@ -150,13 +150,15 @@ namespace Crow.Coding
 		/// </summary>
 		public void FindLongestVisualLine(){
 			longestLineCharCount = 0;
+			editMutex.EnterReadLock ();
 			for (int i = 0; i < this.LineCount; i++) {
 				if (lines[i].PrintableLength > longestLineCharCount) {
 					longestLineCharCount = lines[i].PrintableLength;
 					longestLineIdx = i;
 				}
 			}
-			Debug.WriteLine ("Longest line: {0}->{1}", longestLineIdx, longestLineCharCount);
+			editMutex.ExitReadLock ();
+			//Debug.WriteLine ("Longest line: {0}->{1}", longestLineIdx, longestLineCharCount);
 		}
 		/// <summary> line break could be '\r' or '\n' or '\r\n' </summary>
 		static string detectLineBreakKind(string buffer){
@@ -190,9 +192,11 @@ namespace Crow.Coding
 				if (lines.Count == 0)
 					return "";
 				string tmp = "";
+				editMutex.EnterReadLock ();
 				for (int i = 0; i < lines.Count -1; i++)
 					tmp += lines [i].Content + this.lineBreak;
 				tmp += lines [lines.Count - 1].Content;
+				editMutex.ExitReadLock ();
 				return tmp;
 			}
 		}
@@ -203,12 +207,14 @@ namespace Crow.Coding
 		public int UnfoldedLines {
 			get {
 				int i = 0, vl = 0;
+				editMutex.EnterReadLock ();
 				while (i < LineCount) {
 					if (this [i].IsFolded)
 						i = GetEndNodeIndex (i);
 					i++;
 					vl++;
 				}
+				editMutex.ExitReadLock ();
 				//Debug.WriteLine ("unfolded lines: " + vl);
 				return vl;
 			}
@@ -249,7 +255,7 @@ namespace Crow.Coding
 			return i;
 		}
 
-		int CurrentTabulatedColumn {
+		public int CurrentTabulatedColumn {
 			get {
 				return lines [_currentLine].Content.Substring (0, _currentCol).
 					Replace ("\t", new String (' ', Interface.TabSize)).Length;
@@ -330,6 +336,9 @@ namespace Crow.Coding
 			set {
 				if (value == _currentCol)
 					return;
+
+				editMutex.EnterReadLock ();
+
 				if (value < 0)
 					_currentCol = 0;
 				else if (value > lines [_currentLine].Length)
@@ -338,7 +347,8 @@ namespace Crow.Coding
 					_currentCol = value;
 
 				requestedColumn = CurrentTabulatedColumn;
-				//requestedColumn = _currentCol;
+
+				editMutex.ExitReadLock ();
 
 				PositionChanged.Raise (this, null);
 			}
@@ -351,6 +361,9 @@ namespace Crow.Coding
 			set {
 				if (value == _currentLine)
 					return;
+
+				editMutex.EnterReadLock ();
+
 				if (value >= lines.Count)
 					_currentLine = lines.Count-1;
 				else if (value < 0)
@@ -366,6 +379,9 @@ namespace Crow.Coding
 					//_currentCol = requestedColumn;
 					_currentCol = tabulatedRequestedCol;
 				//Debug.WriteLine ("buff cur line: " + _currentLine);
+
+				editMutex.ExitReadLock();
+
 				PositionChanged.Raise (this, null);
 			}
 		}

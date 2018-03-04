@@ -77,7 +77,6 @@
   <ItemGroup>
     <Compile Include="src\CrowIDE.cs" />
     <Compile Include="src\ImlVisualEditor.cs" />
-    <Compile Include="src\MembersView.cs" />
     <Compile Include="src\Extensions.cs" />
     <Compile Include="src\Solution.cs" />
     <Compile Include="src\Project.cs" />
@@ -115,8 +114,10 @@
     <Compile Include="src\SourceEditor\Token.cs" />
     <Compile Include="src\SourceEditor\XMLParser.cs" />
     <Compile Include="src\SourceEditor\StyleParser.cs" />
-    <Compile Include="src\PropertyContainer.cs" />
     <Compile Include="src\SourceEditor\BufferParser.cs" />
+    <Compile Include="src\MemberView\MembersView.cs" />
+    <Compile Include="src\MemberView\PropertyContainer.cs" />
+    <Compile Include="src\MemberView\CategoryContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />
@@ -124,6 +125,7 @@
     <Folder Include="images\" />
     <Folder Include="src\SourceEditor\" />
     <Folder Include="ui\ItemTemplates\" />
+    <Folder Include="src\MemberView\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="images\save.svg" />

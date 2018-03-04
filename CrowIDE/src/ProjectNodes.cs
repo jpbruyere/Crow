@@ -74,6 +74,8 @@ namespace Crow.Coding
 			Commands = new List<Crow.Command> ();
 		}
 
+		ProjectNode parent;
+		bool isExpanded;
 		ItemType type;
 		string name;
 		List<ProjectNode> childNodes = new List<ProjectNode>();
@@ -81,6 +83,10 @@ namespace Crow.Coding
 		public Project Project;
 		public List<Crow.Command> Commands;//list of command available for that node
 
+		public ProjectNode Parent {
+			get { return parent; }
+			set { parent = value; }
+		}
 		public virtual ItemType Type {
 			get { return type; }
 		}
@@ -90,12 +96,32 @@ namespace Crow.Coding
 		public List<ProjectNode> ChildNodes {
 			get { return childNodes;	}
 		}
-
+		public void AddChild (ProjectNode pn) {
+			childNodes.Add(pn);
+			pn.Parent = this;
+		}
+		public void RemoveChild (ProjectNode pn){
+			pn.Parent = null;
+			childNodes.Remove (pn);
+		}
 		public void SortChilds () {
 			foreach (ProjectNode pn in childNodes)
 				pn.SortChilds ();			
 			childNodes = childNodes.OrderBy(c=>c.Type).ThenBy(cn=>cn.DisplayName).ToList();
 		}
+
+		public bool IsExpanded
+		{
+			get { return isExpanded; }
+			set
+			{
+				if (value == isExpanded)
+					return;
+				isExpanded = value;
+				NotifyValueChanged ("IsExpanded", isExpanded);
+			}
+		}
+
 		public override string ToString ()
 		{
 			return DisplayName;

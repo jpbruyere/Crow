@@ -138,10 +138,13 @@ namespace Crow.Coding{
 			NotifyValueChanged ("CompilerErrors", CompilerErrors);
 		}
 
-		void saveOpenedItemsInUserConfig (){			
-			UserConfig.Set ("OpenedItems", openedItems.Select(o => o.AbsolutePath).Aggregate((a,b)=>a + ";" + b));
+		void saveOpenedItemsInUserConfig (){
+			if (openedItems.Count == 0)
+				UserConfig.Set ("OpenedItems", "");
+			else
+				UserConfig.Set ("OpenedItems", openedItems.Select(o => o.AbsolutePath).Aggregate((a,b)=>a + ";" + b));
 		}
-		void reopenItemsSavedInUserConfig () {
+		public void ReopenItemsSavedInUserConfig () {
 			string tmp = UserConfig.Get<string> ("OpenedItems");
 			string sel = UserConfig.Get<string> ("SelectedProjItems");
 			ProjectFile selItem = null;
@@ -151,7 +154,13 @@ namespace Crow.Coding{
 				foreach (Project p in Projects) {
 					ProjectFile pi;
 					if (p.TryGetProjectFileFromAbsolutePath (f, out pi)) {
-						OpenedItems.Add (pi);
+						OpenedItems.AddElement (pi);
+						pi.Project.IsExpanded = true;
+						ProjectNode pn = pi.Parent;
+						while (pn != null) {
+							pn.IsExpanded = true;
+							pn = pn.Parent;
+						}
 						if (pi.AbsolutePath == sel)
 							selItem = pi;
 						break;
@@ -442,7 +451,6 @@ namespace Crow.Coding{
 			s.UserConfig = new Configuration (s.path + ".user");
 			s.ReloadStyling ();
 			s.ReloadDefaultTemplates ();
-			s.reopenItemsSavedInUserConfig ();
 	        return s;
 	    } //LoadSolution
 		#endregion

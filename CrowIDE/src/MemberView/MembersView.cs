@@ -38,6 +38,7 @@ namespace Crow.Coding
 
 		//cache property containers per type
 		Dictionary<string,PropertyContainer[]> propContainersCache = new Dictionary<string, PropertyContainer[]>();
+		Dictionary<string,List<CategoryContainer>> categoryContainersCache = new Dictionary<string,List<CategoryContainer>> ();
 
 		[XmlAttributeAttribute][DefaultValue(null)]
 		public virtual object Instance {
@@ -78,7 +79,13 @@ namespace Crow.Coding
 					propContainersCache.Add (it.FullName, props.OrderBy (p => p.Name).ToArray ());
 				}
 
-				Data = propContainersCache [it.FullName];
+				List<CategoryContainer> categories = new List<CategoryContainer> ();
+
+				foreach (IGrouping<string,PropertyContainer> ig in propContainersCache[it.FullName].GroupBy(pc=>pc.DesignCategory)) {
+					categories.Add(new CategoryContainer(ig.Key, ig.ToArray()));
+				}
+
+				Data = categories;
 
 				if (lastInst != instance) {
 					foreach (PropertyContainer pc in propContainersCache [it.FullName]) {

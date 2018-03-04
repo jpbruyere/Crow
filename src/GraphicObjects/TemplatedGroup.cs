@@ -457,8 +457,9 @@ namespace Crow
 			}
 
 			if (iTemp.Expand != null && g is Expandable) {
-				(g as Expandable).Expand += iTemp.Expand;
-				(g as Expandable).GetIsExpandable = iTemp.HasSubItems;
+				Expandable e = g as Expandable;
+				e.Expand += iTemp.Expand;
+				e.GetIsExpandable = iTemp.HasSubItems;
 			}
 
 			g.DataSource = o;

@@ -158,7 +158,7 @@ namespace Crow.Coding
 						SelectedItem = go;
 						IMLError = null;
 						projFile.RegisteredEditors[this] = true;
-					}else if ((bool)projFile.Instance?.HasChanged){
+					}else if ((bool)projFile.Instance?.design_HasChanged){
 						projFile.UpdateSource(this, projFile.Instance.GetIML());
 					}
 					imlVE.Update ();

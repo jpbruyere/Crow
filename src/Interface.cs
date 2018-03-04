@@ -459,13 +459,22 @@ namespace Crow
 			set {
 				if (_hoverWidget == value)
 					return;
-				_hoverWidget = value;
-				#if DEBUG_FOCUS
+
 				if (_hoverWidget != null)
-				Debug.WriteLine("Hover => " + _hoverWidget.ToString());
-				else
-				Debug.WriteLine("Hover => null");
-				#endif
+					_hoverWidget.IsHover = false;
+
+				_hoverWidget = value;
+
+				if (_hoverWidget != null)
+				{
+					_hoverWidget.IsHover = true;
+					#if DEBUG_FOCUS
+					Debug.WriteLine("Hover => " + _activeWidget.ToString());
+					}else
+					Debug.WriteLine("Hover => null");
+					#else
+				}
+					#endif
 			}
 		}
 		/// <summary>Widget has the keyboard or mouse focus</summary>

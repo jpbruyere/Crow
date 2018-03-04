@@ -108,11 +108,11 @@ namespace Crow
 				//force sizing to fit if sizing on children and child has stretched size
 				switch (layoutType) {
 				case LayoutingType.Width:
-					if (Width == Measure.Fit && child.Width.Units == Unit.Percent)
+					if (Width == Measure.Fit && child.Width.IsRelativeToParent)
 						child.Width = Measure.Fit;
 					break;
 				case LayoutingType.Height:
-					if (Height == Measure.Fit && child.Height.Units == Unit.Percent)
+					if (Height == Measure.Fit && child.Height.IsRelativeToParent)
 						child.Height = Measure.Fit;
 					break;
 				}
@@ -129,14 +129,14 @@ namespace Crow
 			LayoutingType ltChild = LayoutingType.None;
 
 			if (layoutType == LayoutingType.Width) {
-				if (child.Width.Units == Unit.Percent) {
+				if (child.Width.IsRelativeToParent) {
 					ltChild |= LayoutingType.Width;
 					if (child.Width.Value < 100 && child.Left == 0)
 						ltChild |= LayoutingType.X;
 				} else if (child.Left == 0)
 					ltChild |= LayoutingType.X;
 			} else if (layoutType == LayoutingType.Height) {
-				if (child.Height.Units == Unit.Percent) {
+				if (child.Height.IsRelativeToParent) {
 					ltChild |= LayoutingType.Height;
 					if (child.Height.Value < 100 && child.Top == 0)
 						ltChild |= LayoutingType.Y;

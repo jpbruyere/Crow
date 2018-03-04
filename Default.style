@@ -58,12 +58,6 @@ MenuItem {
 	MouseLeave = "{Foreground=LightGray;Background=Transparent;}";
 	SelectionBackground = "Transparent";
 }
-Docker {
-	AllowDrop = "true";
-}
-DockWindow {
-	AllowDrag = "true";
-}
 MessageBox {
 	Background = "0.1,0.1,0.2,0.7";
 	Width = "Fit";
@@ -79,7 +73,8 @@ Slider {
 }
 Splitter {
 	Focusable = "true";
-	Background = "DimGray";
+	Margin = "1";
+	Background = "White";
 }
 Spinner {
 	Foreground = "DimGray";
@@ -114,10 +109,20 @@ ToolWindow {
 	Width = "150";
 	Height = "150";
 }
-DocksView {
-	AllowDrop = "true";
+Docker {
+	AllowDrop = "false";
+	Margin="0";
+	Focusable="true";
 }
-DockingView {
+DockStack {
+	Margin="1";
+	AllowDrop = "true";
+	Focusable="true";
+	DragEnter="{Background=DarkBlue}";
+	DragLeave="{Background=Jet}";
+	EndDrag="{Background=Jet}";
+}
+DockWindow {
 	Focusable = "true";
 	AllowDrag = "true";
 }

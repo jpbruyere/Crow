@@ -69,6 +69,7 @@ namespace Crow
 		/// </summary>
 		public bool IsFixed { get { return Units == Unit.Pixel; }}
 		public bool IsFit { get { return Value == -1 && Units == Unit.Percent; }}
+		public bool IsRelativeToParent { get { return Value >= 0 && Units == Unit.Percent; }}
 		#region Operators
 		public static implicit operator int(Measure m){
 			return m.Value;

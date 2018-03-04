@@ -1,11 +1,17 @@
 ﻿<?xml version="1.0"?>
-<Docker >
-	<DockWindow Left="100" Top="100" Width="150" Height="150" Background="DarkRed"/>
-	<DockWindow Left="200" Top="200" Width="150" Height="150" Background="DarkGreen"/>
-	<DockWindow Left="300" Top="300" Width="150" Height="150" Background="Blue"/>
-	<DockWindow Left="400" Top="400" Width="150" Height="150" Background="DarkYellow"/>
-	<DockWindow Left="500" Top="500" Width="150" Height="150" Background="Yellow"/>
-</Docker>
+<Window Width="600" Height="500">
+<VerticalStack Margin="20" Background="Jet" Spacing="10">
+	<GraphicObject Height="100" Width="500" Background="Green"/>
+	<Splitter/>
+	<HorizontalStack>
+		<GraphicObject Height="Stretched" Width="100" Background="Red"/>
+		<Splitter/>
+		<GraphicObject Height="Stretched" Width="100" Background="DarkRed"/>
+	</HorizontalStack>
+	<Splitter/>
+	<GraphicObject Height="100" Width="500" Background="Green"/>
+</VerticalStack>
+</Window>
 <!--<Group Background="Jet" Margin = "0" Focusable="true" >
 	<Window Top="100" Left="100" Focusable="true" Caption="View 1" Width="300" Height="300"><GraphicObject Background="Green" Focusable="true" MouseEnter="{Background=Gray}" MouseLeave="{Background=Green}"/></Window>
 	<Window Top="200" Left="200" Focusable="true" Caption="View 2" Resizable = "true" Width="300" Height="300"><GraphicObject Focusable="true" Background="Blue" MouseEnter="{Background=Gray}" MouseLeave="{Background=Blue}"/></Window>
