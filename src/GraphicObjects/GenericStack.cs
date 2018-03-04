@@ -234,6 +234,7 @@ namespace Crow
 		{
 			base.RemoveChild (child);
 			if (child == stretchedGO) {
+				stretchedGO.LastSlots = default(Rectangle);
 				stretchedGO = null;
 				RegisterForLayouting (LayoutingType.Sizing);
 				return;

@@ -247,13 +247,13 @@ namespace Crow
 			Initialize ();
 		}
 		#endregion
-		internal bool initialized = false;
+		//internal bool initialized = false;
 		/// <summary>
 		/// Initialize this Graphic object instance by setting style and default values and loading template if required
 		/// </summary>
 		public virtual void Initialize(){
 			loadDefaultValues ();
-			initialized = true;
+			//initialized = true;
 		}
 		#region private fields
 		LayoutingType registeredLayoutings = LayoutingType.All;
@@ -321,9 +321,6 @@ namespace Crow
 		internal Size contentSize;
 		#endregion
 
-		public void ResetSlots () {
-			LastSlots = LastPaintedSlot = Slot = default(Rectangle);
-		}
 		#region ILayoutable
 		[XmlIgnore]public LayoutingType RegisteredLayoutings { get { return registeredLayoutings; } set { registeredLayoutings = value; } }
 		//TODO: it would save the recurent cost of a cast in event bubbling if parent type was GraphicObject
@@ -426,11 +423,21 @@ namespace Crow
 		public event EventHandler Enabled;
 		/// <summary>Occurs when the enabled state this object is set to false</summary>
 		public event EventHandler Disabled;
+
+		#region DragAndDrop Events
 		public event EventHandler StartDrag;
 		public event EventHandler DragEnter;
 		public event EventHandler DragLeave;
 		public event EventHandler EndDrag;
 		public event EventHandler Drop;
+		#endregion
+
+		/// <summary>
+		/// Occurs when default value and styling are loaded, and for templated control,
+		/// template is also loaded. Bindings should be functionnal as well.
+		/// </summary>
+		public event EventHandler Initialized;
+
 		/// <summary>Occurs when one part of the rendering slot changed</summary>
 		public event EventHandler<LayoutingEventArgs> LayoutChanged;
 		/// <summary>Occurs when DataSource changed</summary>
@@ -1143,6 +1150,10 @@ namespace Crow
 			} catch (Exception ex) {
 				throw new Exception ("Error applying style <" + styleKey + ">:", ex);
 			}
+			onInitialized (this, null);
+		}
+		protected virtual void onInitialized (object sender, EventArgs e){
+			Initialized.Raise(sender, e);
 		}
 		bool getDefaultEvent(EventInfo ei, List<Style> styling,
 			out string expression){

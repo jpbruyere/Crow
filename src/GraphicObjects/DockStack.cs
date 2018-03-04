@@ -30,18 +30,41 @@ namespace Crow
 {
 	public class DockStack : GenericStack
 	{
-		internal static Instantiator instStack, instSplit, instSpacer;
+		internal static Instantiator instStack, instSplit;//, instSpacer;
 
 		int dockingDiv = 5;
-
 		GraphicObject subStack = null;
+
+		Docker rootDock { get { return LogicalParent as Docker; }}
+
 		public GraphicObject SubStack {
 			get { return subStack;}
 			set{ subStack=value; }
 		}
 
+		#region CTor
 		public DockStack ()	{}
 		public DockStack (Interface iface) : base (iface) {}
+		#endregion
+
+		protected override void onInitialized (object sender, EventArgs e)
+		{
+			base.onInitialized (sender, e);
+			instStack = IFace.CreateITorFromIMLFragment (@"<DockStack/>");
+			instSplit = IFace.CreateITorFromIMLFragment (@"<Splitter/>");
+			//instSpacer = IFace.CreateITorFromIMLFragment (@"<GraphicObject Background='Transparent' IsEnabled='false'/>");
+		}
+
+		public override void AddChild (GraphicObject g)
+		{
+			base.AddChild (g);
+			g.LogicalParent = this.LogicalParent;
+		}
+		public override void InsertChild (int idx, GraphicObject g)
+		{
+			base.InsertChild (idx, g);
+			g.LogicalParent = this.LogicalParent;
+		}
 
 		public override bool PointIsIn (ref Point m)
 		{			
@@ -64,16 +87,6 @@ namespace Crow
 			}
 			return Slot.ContainsOrIsEqual(m);
 		}
-//		protected override void onDragEnter (object sender, DragDropEventArgs e)
-//		{
-//			base.onDragEnter (sender, e);
-//			showDock = true;
-//		}
-//		protected override void onDragLeave (object sender, DragDropEventArgs e)
-//		{
-//			base.onDragLeave (sender, e);
-//			showDock = false;
-//		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			if (IsDropTarget) {				
@@ -108,9 +121,18 @@ namespace Crow
 			}
 			base.onMouseMove (sender, e);
 		}
-		static Orientation GetOrientation (Alignment a){
-			return (a==Alignment.Left) ||(a==Alignment.Right) ? Orientation.Horizontal : Orientation.Vertical;
+
+		protected override void onDragEnter (object sender, DragDropEventArgs e)
+		{
+			base.onDragEnter (sender, e);
+			RegisterForGraphicUpdate ();
 		}
+		protected override void onDragLeave (object sender, DragDropEventArgs e)
+		{
+			base.onDragLeave (sender, e);
+			RegisterForGraphicUpdate ();
+		}
+
 		protected override void onDraw (Cairo.Context gr)
 		{
 			gr.Save ();
@@ -145,7 +167,7 @@ namespace Crow
 				
 				Rectangle r;
 
-				if (GetOrientation (dw.DockingPosition) == Orientation || SubStack == null)
+				if (dw.DockingPosition.GetOrientation() == Orientation || SubStack == null)
 					r = ClientRectangle;
 				else
 					r = SubStack.ClientRectangle + SubStack.Slot.Position + ClientRectangle.TopLeft;
@@ -172,13 +194,16 @@ namespace Crow
 			}
 			gr.Restore ();	
 		}
+
 		public void Undock (DockWindow dw){
+			int dwIdx = Children.IndexOf(dw);
+
 			RemoveChild(dw);
 
 			if (dw.DockingPosition == Alignment.Left || dw.DockingPosition == Alignment.Top)				
-				RemoveChild (0);
+				RemoveChild (dwIdx);
 			 else
-				RemoveChild (Children.Count - 1);
+				RemoveChild (dwIdx - 1);
 
 			if (Children.Count > 1)
 				return;
@@ -200,22 +225,8 @@ namespace Crow
 			dsp.RemoveChild (this);
 			dsp.InsertChild (i, g);
 			dsp.SubStack = g;
-//			if (SubStack is DockStack) {
-//
-//			} else {
-//				int i = p.Children.IndexOf (this);
-//				p.RemoveChild (this);
-//				if (p is DockStack) {
-//					DockStack dsp = p as DockStack;
-//					dsp.SubStack = instSpacer.CreateInstance ();
-//					dsp.AddChild (dsp.SubStack);
-//				}
-//			}
-
 		}
 		public void Dock(DockWindow dw){
-			checkInstantiators();
-
 			Splitter splitter = instSplit.CreateInstance<Splitter> ();
 			Rectangle r = ClientRectangle;
 
@@ -226,12 +237,12 @@ namespace Crow
 
 			if (SubStack == null) {
 				activeStack = this;
-				SubStack = instSpacer.CreateInstance ();
-			}else if (GetOrientation (dw.DockingPosition) != Orientation) {
+				SubStack = rootDock.CenterDockedObj;
+			}else if (dw.DockingPosition.GetOrientation() != Orientation) {
 				int i = Children.IndexOf (SubStack);
 				RemoveChild (SubStack);
 				activeStack = instStack.CreateInstance<DockStack> ();
-				activeStack.SubStack = instSpacer.CreateInstance ();
+				activeStack.SubStack = rootDock.CenterDockedObj;
 				SubStack = activeStack;
 				InsertChild(i, activeStack);				 
 			}
@@ -247,7 +258,7 @@ namespace Crow
 					activeStack.AddChild (activeStack.SubStack);
 				} else {
 					activeStack.InsertChild (0, dw);
-					activeStack.InsertChild (0, splitter);
+					activeStack.InsertChild (1, splitter);
 				}
 				break;
 			case Alignment.Bottom:
@@ -291,15 +302,6 @@ namespace Crow
 				break;
 			}
 		}
-
-		void checkInstantiators () {
-			if (instStack != null)
-				return;
-			instStack = IFace.CreateITorFromIMLFragment (@"<DockStack/>");
-			instSplit = IFace.CreateITorFromIMLFragment (@"<Splitter/>");
-			instSpacer = IFace.CreateITorFromIMLFragment (@"<GraphicObject Background='Transparent' IsEnabled='false'/>");
-		}
-
 	}
 }
 

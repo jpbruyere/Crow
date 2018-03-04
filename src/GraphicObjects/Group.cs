@@ -115,7 +115,6 @@ namespace Crow
 
 			Children.Remove(child);
 			child.Parent = null;
-			//child.ResetSlots ();
 
 			childrenRWLock.ExitWriteLock ();
 
