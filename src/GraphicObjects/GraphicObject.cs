@@ -1806,9 +1806,17 @@ namespace Crow
 			Debug.WriteLine("MouseHover => " + this.ToString());
 			#endif
 			if (IFace.DragAndDropOperation != null) {
-				if (this.AllowDrop) {
-					if (IFace.DragAndDropOperation.DragSource != this && IFace.DragAndDropOperation.DropTarget != this)
-						onDragEnter (this, IFace.DragAndDropOperation);					
+				GraphicObject g = this;
+				while (g != null) {
+					if (g.AllowDrop) {
+						if (IFace.DragAndDropOperation.DragSource != this && IFace.DragAndDropOperation.DropTarget != this) {
+							if (IFace.DragAndDropOperation.DropTarget != null)
+								IFace.DragAndDropOperation.DropTarget.onDragLeave (this, IFace.DragAndDropOperation);
+							g.onDragEnter (this, IFace.DragAndDropOperation);
+						}
+						break;
+					}
+					g = g.focusParent;
 				}
 			}
 			Hover.Raise (this, e);
@@ -1818,10 +1826,6 @@ namespace Crow
 			#if DEBUG_FOCUS
 			Debug.WriteLine("MouseUnHover => " + this.ToString());
 			#endif
-			if (IFace.DragAndDropOperation != null) {
-				if (IFace.DragAndDropOperation.DropTarget == this)
-					onDragLeave (this, IFace.DragAndDropOperation);
-			}
 			UnHover.Raise (this, e);
 		}
 		#endregion

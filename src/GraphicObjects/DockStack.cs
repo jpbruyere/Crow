@@ -113,8 +113,13 @@ namespace Crow
 					dw.DockingPosition = Alignment.Top;
 				else if (lm.Y > r.Bottom - vTreshold)
 					dw.DockingPosition = Alignment.Bottom;
-				else
-					dw.DockingPosition = Alignment.Center;
+				else {
+					r.Inflate (-r.Width / 3, -r.Height / 3);
+					if (r.ContainsOrIsEqual(lm))
+						dw.DockingPosition = Alignment.Center;
+					else
+						dw.DockingPosition = Alignment.Undefined;
+				}
 
 				if (curDockPos != dw.DockingPosition)
 					RegisterForGraphicUpdate ();
@@ -167,10 +172,13 @@ namespace Crow
 				
 				Rectangle r;
 
-				if (dw.DockingPosition.GetOrientation() == Orientation || SubStack == null)
+				if ((dw.DockingPosition.GetOrientation () == Orientation || SubStack == null)&&dw.DockingPosition != Alignment.Center) {
 					r = ClientRectangle;
-				else
-					r = SubStack.ClientRectangle + SubStack.Slot.Position + ClientRectangle.TopLeft;
+					Console.WriteLine ("Same rect substack=" + SubStack);
+				}else {
+					r = subStack.ClientRectangle + subStack.Slot.Position + ClientRectangle.TopLeft;
+					Console.WriteLine ("sub rect");
+				}
 				
 				switch (dw.DockingPosition) {
 				case Alignment.Top:
@@ -185,6 +193,10 @@ namespace Crow
 				case Alignment.Right:
 					gr.Rectangle (r.Right - r.Width / dockingDiv, r.Top, r.Width / dockingDiv, r.Height);
 					break;
+				case Alignment.Center:
+					r.Inflate (-Math.Min (r.Width, r.Height) / dockingDiv);
+					gr.Rectangle (r);
+					break;
 				}
 				gr.LineWidth = 1;
 				gr.SetSourceRGBA (0.4, 0.4, 0.9, 0.4);
@@ -196,35 +208,53 @@ namespace Crow
 		}
 
 		public void Undock (DockWindow dw){
-			int dwIdx = Children.IndexOf(dw);
+			int idx = Children.IndexOf(dw);
 
 			RemoveChild(dw);
 
-			if (dw.DockingPosition == Alignment.Left || dw.DockingPosition == Alignment.Top)				
-				RemoveChild (dwIdx);
-			 else
-				RemoveChild (dwIdx - 1);
+			if (rootDock.CenterDockedObj == dw) {				
+				rootDock.CenterDockedObj = new GraphicObject (IFace) { IsEnabled = false, Background = Color.AmberSaeEce.AdjustAlpha(0.3) };
+				InsertChild (idx, rootDock.CenterDockedObj);
+				SubStack = rootDock.CenterDockedObj;
+			}else if (dw.DockingPosition == Alignment.Left || dw.DockingPosition == Alignment.Top)				
+				RemoveChild (idx);
+			else
+				RemoveChild (idx - 1);
 
 			if (Children.Count > 1)
 				return;
+
 			DockStack dsp = Parent as DockStack;
-			if (dsp == null) {
-				RemoveChild (0);
-				if (SubStack is DockStack) {
-					Docker dk = Parent as Docker;
-					dk.RemoveChild (this);
-					dk.InsertChild (0, SubStack);
-					dk.SubStack = SubStack as DockStack;
-				}
-				SubStack = null;
+			if (dsp == null)
 				return;
-			}
-			GraphicObject g = Children [0];
-			RemoveChild (g);
-			int i = dsp.Children.IndexOf (this);
+
+			RemoveChild (0);
+			idx = dsp.Children.IndexOf (this);
 			dsp.RemoveChild (this);
-			dsp.InsertChild (i, g);
-			dsp.SubStack = g;
+			dsp.InsertChild (idx, SubStack);
+			dsp.SubStack = SubStack;
+			return;
+
+//			Docker dk = Parent as Docker;
+//			dk.RemoveChild (this);
+//			dk.AddChild (SubStack);
+//			dk.SubStack = SubStack;
+
+//				if (SubStack is DockStack) {
+//					Docker dk = Parent as Docker;
+//					dk.RemoveChild (this);
+//					dk.InsertChild (0, SubStack);
+//					dk.SubStack = SubStack as DockStack;
+//				}
+//				SubStack = null;
+//				return;
+//			}
+//			GraphicObject g = Children [0];
+//			RemoveChild (g);
+//			int i = dsp.Children.IndexOf (this);
+//			dsp.RemoveChild (this);
+//			dsp.InsertChild (i, g);
+//			dsp.SubStack = g;
 		}
 		public void Dock(DockWindow dw){
 			Splitter splitter = instSplit.CreateInstance<Splitter> ();
@@ -235,70 +265,52 @@ namespace Crow
 
 			DockStack activeStack = this;
 
-			if (SubStack == null) {
+			if (Children.Count == 1) {
 				activeStack = this;
-				SubStack = rootDock.CenterDockedObj;
+				Orientation = dw.DockingPosition.GetOrientation ();
 			}else if (dw.DockingPosition.GetOrientation() != Orientation) {
-				int i = Children.IndexOf (SubStack);
-				RemoveChild (SubStack);
+				int i = Children.IndexOf (rootDock.CenterDockedObj);
+				RemoveChild (rootDock.CenterDockedObj);
 				activeStack = instStack.CreateInstance<DockStack> ();
 				activeStack.SubStack = rootDock.CenterDockedObj;
 				SubStack = activeStack;
-				InsertChild(i, activeStack);				 
+				InsertChild(i, activeStack);
+				activeStack.AddChild (rootDock.CenterDockedObj);
+				activeStack.Orientation = dw.DockingPosition.GetOrientation ();
 			}
 
 			switch (dw.DockingPosition) {
 			case Alignment.Top:						
 				dw.Height = vTreshold;
 				dw.Width = Measure.Stretched;
-				if (activeStack.Children.Count == 0) {
-					activeStack.Orientation = Orientation.Vertical;
-					activeStack.AddChild (dw);
-					activeStack.AddChild (splitter);
-					activeStack.AddChild (activeStack.SubStack);
-				} else {
-					activeStack.InsertChild (0, dw);
-					activeStack.InsertChild (1, splitter);
-				}
+				activeStack.InsertChild (0, dw);
+				activeStack.InsertChild (1, splitter);
 				break;
 			case Alignment.Bottom:
 				dw.Height = vTreshold;
 				dw.Width = Measure.Stretched;
-				if (activeStack.Children.Count == 0) {
-					activeStack.Orientation = Orientation.Vertical;
-					activeStack.AddChild (activeStack.SubStack);
-					activeStack.AddChild (splitter);
-					activeStack.AddChild (dw);
-				} else {
-					activeStack.AddChild (splitter);
-					activeStack.AddChild (dw);
-				}
+				activeStack.AddChild (splitter);
+				activeStack.AddChild (dw);
 				break;
 			case Alignment.Left:
 				dw.Width = hTreshold;
 				dw.Height = Measure.Stretched;
-				if (activeStack.Children.Count == 0) {
-					activeStack.Orientation = Orientation.Horizontal;
-					activeStack.AddChild (dw);
-					activeStack.AddChild (splitter);
-					activeStack.AddChild (activeStack.SubStack);
-				} else {
-					activeStack.InsertChild (0, dw);
-					activeStack.InsertChild (1, splitter);
-				}
+				activeStack.InsertChild (0, dw);
+				activeStack.InsertChild (1, splitter);
 				break;
 			case Alignment.Right:
 				dw.Width = hTreshold;
 				dw.Height = Measure.Stretched;
-				if (activeStack.Children.Count == 0) {
-					activeStack.Orientation = Orientation.Horizontal;
-					activeStack.AddChild (activeStack.SubStack);
-					activeStack.AddChild (splitter);
-					activeStack.AddChild (dw);
-				} else {
-					activeStack.AddChild (splitter);
-					activeStack.AddChild (dw);
-				}
+				activeStack.AddChild (splitter);
+				activeStack.AddChild (dw);
+				break;
+			case Alignment.Center:
+				dw.Width = dw.Height = Measure.Stretched;				 
+				int i = activeStack.Children.IndexOf (rootDock.CenterDockedObj);
+				activeStack.DeleteChild (i);
+				activeStack.InsertChild (i, dw);
+				activeStack.SubStack = dw;
+				rootDock.CenterDockedObj= dw;
 				break;
 			}
 		}

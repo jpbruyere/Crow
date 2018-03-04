@@ -47,7 +47,8 @@ namespace Crow
 		Bottom = 0x08,
         BottomLeft = 0x0a,
         BottomRight = 0x0c,
-		Center = 0x10
+		Center = 0x10,
+		Undefined = 0x40
     }
     public enum HorizontalAlignment
     {
