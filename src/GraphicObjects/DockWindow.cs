@@ -87,32 +87,6 @@ namespace Crow
 			return Slot.ContainsOrIsEqual(m);
 		}
 
-//		public override void OnLayoutChanges (LayoutingType layoutType)
-//		{
-//			base.OnLayoutChanges (layoutType);
-//
-//			if (isDocked)
-//				return;
-			
-//			Docker dv = Parent as Docker;
-//			if (dv == null)
-//				return;
-//
-//			Rectangle dvCliRect = dv.ClientRectangle;
-//
-//			if (layoutType == LayoutingType.X) {
-//				if (Slot.X < dv.DockingThreshold)
-//					dock (Alignment.Left);
-//				else if (Slot.Right > dvCliRect.Width - dv.DockingThreshold)
-//					dock (Alignment.Right);
-//			}else if (layoutType == LayoutingType.Y) {
-//				if (Slot.Y < dv.DockingThreshold)
-//					dock (Alignment.Top);
-//				else if (Slot.Bottom > dvCliRect.Height - dv.DockingThreshold)
-//					dock (Alignment.Bottom);
-//			}
-//		}
-//
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			lastMousePos = e.Position;
@@ -172,9 +146,10 @@ namespace Crow
 		void dock (DockStack target){
 			if (RootDock.CenterDockedObj is DockWindow && DockingPosition == Alignment.Center)
 				return;
+			
 			lock (IFace.UpdateMutex) {
 				IsDocked = true;
-				undockingMousePosOrig = lastMousePos;
+				//undockingMousePosOrig = lastMousePos;
 				savedSlot = this.LastPaintedSlot;
 				wasResizable = Resizable;
 				Resizable = false;

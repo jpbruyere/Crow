@@ -61,13 +61,20 @@ namespace Crow
 		protected override void onInitialized (object sender, EventArgs e)
 		{
 			base.onInitialized (sender, e);
-			CenterDockedObj = new GraphicObject (IFace) { IsEnabled = false, Background = Color.Cobalt };
+			CenterDockedObj = new GraphicObject (IFace) { IsEnabled = false };
 		}
 
 		public override void AddChild (GraphicObject g)
 		{				
 			base.AddChild (g);
 			g.LogicalParent = this;
+		}
+		public override void RemoveChild (GraphicObject child)
+		{
+			lock (IFace.UpdateMutex) {
+				RegisterClip (ScreenCoordinates (LastPaintedSlot));
+			}
+			base.RemoveChild (child);
 		}
 
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
