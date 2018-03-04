@@ -73,8 +73,8 @@ Slider {
 }
 Splitter {
 	Focusable = "true";
-	Margin = "1";
-	Background = "White";
+	Margin = "2";
+	Background = "Gray";
 }
 Spinner {
 	Foreground = "DimGray";

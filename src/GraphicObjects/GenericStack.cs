@@ -235,6 +235,7 @@ namespace Crow
 			base.RemoveChild (child);
 			if (child == stretchedGO) {
 				stretchedGO = null;
+				RegisterForLayouting (LayoutingType.Sizing);
 				return;
 			}
 			if (Orientation == Orientation.Horizontal) {
@@ -244,9 +245,6 @@ namespace Crow
 				contentSize.Height -= child.LastSlots.Height;
 				adjustStretchedGo (LayoutingType.Height);
 			}
-
-
-//			RegisterForLayouting (LayoutingType.ArrangeChildren);
 		}
 	}
 }

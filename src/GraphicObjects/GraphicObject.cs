@@ -340,6 +340,7 @@ namespace Crow
 
 				parentRWLock.EnterWriteLock();
 				parent = value;
+				Slot = default(Rectangle);
 				parentRWLock.ExitWriteLock();
 									
 				onParentChanged (this, e);
