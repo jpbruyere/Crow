@@ -118,9 +118,9 @@ DockStack {
 	Margin="1";
 	AllowDrop = "true";
 	Focusable="true";
-	DragEnter="{Background=DarkBlue}";
-	DragLeave="{Background=Jet}";
-	EndDrag="{Background=Jet}";
+	//DragEnter="{Background=DarkBlue}";
+	//DragLeave="{Background=Jet}";
+	//EndDrag="{Background=Jet}";
 }
 DockWindow {
 	Focusable = "true";

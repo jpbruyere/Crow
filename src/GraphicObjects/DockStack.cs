@@ -297,7 +297,7 @@ namespace Crow
 				return;
 			instStack = IFace.CreateITorFromIMLFragment (@"<DockStack/>");
 			instSplit = IFace.CreateITorFromIMLFragment (@"<Splitter/>");
-			instSpacer = IFace.CreateITorFromIMLFragment (@"<GraphicObject Background='DarkCyan' IsEnabled='false'/>");
+			instSpacer = IFace.CreateITorFromIMLFragment (@"<GraphicObject Background='Transparent' IsEnabled='false'/>");
 		}
 
 	}

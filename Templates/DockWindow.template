@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<GraphicObject Background="{./Background}"/>
-<!--<Border BorderWidth="1" Foreground="White" CornerRadius="{./CornerRadius}"
+<!--<GraphicObject Background="{./Background}"/>-->
+<Border BorderWidth="1" Foreground="White" CornerRadius="{./CornerRadius}"
 				Background="{./Background}"
 				MouseEnter="./onBorderMouseEnter"
 				MouseLeave="./onBorderMouseLeave">
@@ -19,4 +19,4 @@
 		</HorizontalStack>
 		<Container Name="Content" MinimumSize="50,50" Background="0.5,0.5,0.5,0.5"/>
 	</VerticalStack>
-</Border>-->
+</Border>

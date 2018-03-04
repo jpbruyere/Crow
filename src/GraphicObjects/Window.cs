@@ -437,14 +437,21 @@ namespace Crow
 			close ();
 		}
 
-		protected void close(){
+		protected virtual void close(){
 			Closing.Raise (this, null);
 			if (Parent is Interface)
 				(Parent as Interface).DeleteWidget (this);
-			else if (Parent is Group)
-				(Parent as Group).DeleteChild (this);
-			else if (Parent is PrivateContainer)
-				(Parent as Container).Child = null;
+			else {
+				GraphicObject p = Parent as GraphicObject;
+				if (p is Group) {
+					lock (IFace.UpdateMutex) {
+						RegisterClip (p.ScreenCoordinates (p.LastPaintedSlot));
+						(p as Group).DeleteChild (this);
+					}
+					//(Parent as Group).RegisterForRedraw ();
+				} else if (Parent is PrivateContainer)
+					(Parent as Container).Child = null;
+			}
 		}
 	}
 }
