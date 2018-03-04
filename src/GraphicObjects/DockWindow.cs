@@ -183,6 +183,12 @@ namespace Crow
 				target.Dock (this);
 			}
 		}
+		protected override void close ()
+		{
+			if (isDocked)
+				Undock ();
+			base.close ();
+		}
 	}
 }
 
