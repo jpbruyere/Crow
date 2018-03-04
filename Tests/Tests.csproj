@@ -373,6 +373,9 @@
     <None Include="Interfaces\Experimental\testDock.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Interfaces\Experimental\testStack.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />

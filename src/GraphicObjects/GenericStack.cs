@@ -136,6 +136,46 @@ namespace Crow
 			return base.UpdateLayout(layoutType);
         }
 
+		void adjustStretchedGo (LayoutingType lt){
+			if (stretchedGO == null)
+				return;
+			if (lt == LayoutingType.Width) {
+				int newW = Math.Max (
+					           this.ClientRectangle.Width - contentSize.Width - Spacing * (Children.Count - 1),
+					           stretchedGO.MinimumSize.Width);
+				if (stretchedGO.MaximumSize.Width > 0)
+					newW = Math.Min (newW, stretchedGO.MaximumSize.Width);
+				if (newW != stretchedGO.Slot.Width) {							
+					stretchedGO.Slot.Width = newW;
+					stretchedGO.IsDirty = true;
+					#if DEBUG_LAYOUTING
+				Debug.WriteLine ("\tAdjusting Width of " + stretchedGO.ToString());
+					#endif
+					stretchedGO.LayoutChanged -= OnChildLayoutChanges;
+					stretchedGO.OnLayoutChanges (LayoutingType.Width);
+					stretchedGO.LayoutChanged += OnChildLayoutChanges;
+					stretchedGO.LastSlots.Width = stretchedGO.Slot.Width;
+				}
+			} else {
+				int newH = Math.Max (
+					this.ClientRectangle.Height - contentSize.Height - Spacing * (Children.Count - 1),
+					stretchedGO.MinimumSize.Height);
+				if (stretchedGO.MaximumSize.Height > 0)
+					newH = Math.Min (newH, stretchedGO.MaximumSize.Height);
+				if (newH != stretchedGO.Slot.Height) {
+					stretchedGO.Slot.Height = newH;
+					stretchedGO.IsDirty = true;
+					#if DEBUG_LAYOUTING
+					Debug.WriteLine ("\tAdjusting Height of " + stretchedGO.ToString());
+					#endif
+					stretchedGO.LayoutChanged -= OnChildLayoutChanges;
+					stretchedGO.OnLayoutChanges (LayoutingType.Height);
+					stretchedGO.LayoutChanged += OnChildLayoutChanges;
+					stretchedGO.LastSlots.Height = stretchedGO.Slot.Height;
+				}				
+			}
+		}
+
 		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
 			GraphicObject go = sender as GraphicObject;
@@ -154,24 +194,7 @@ namespace Crow
 					} else
 						contentSize.Width += go.Slot.Width - go.LastSlots.Width;
 
-					if (stretchedGO != null) {
-						int newW = Math.Max (
-							           this.ClientRectangle.Width - contentSize.Width - Spacing * (Children.Count - 1),
-							           stretchedGO.MinimumSize.Width);
-						if (stretchedGO.MaximumSize.Width > 0)
-							newW = Math.Min (newW, stretchedGO.MaximumSize.Width);
-						if (newW != stretchedGO.Slot.Width) {							
-							stretchedGO.Slot.Width = newW;
-							stretchedGO.IsDirty = true;
-#if DEBUG_LAYOUTING
-					Debug.WriteLine ("\tAdjusting Width of " + stretchedGO.ToString());
-#endif
-							stretchedGO.LayoutChanged -= OnChildLayoutChanges;
-							stretchedGO.OnLayoutChanges (LayoutingType.Width);
-							stretchedGO.LayoutChanged += OnChildLayoutChanges;
-							stretchedGO.LastSlots.Width = stretchedGO.Slot.Width;
-						}
-					}
+					adjustStretchedGo (LayoutingType.Width);					
 					
 					if (Width == Measure.Fit)
 						this.RegisterForLayouting (LayoutingType.Width);
@@ -193,24 +216,7 @@ namespace Crow
 					} else
 						contentSize.Height += go.Slot.Height - go.LastSlots.Height;
 					
-					if (stretchedGO != null) {
-						int newH = Math.Max (
-							this.ClientRectangle.Height - contentSize.Height - Spacing * (Children.Count - 1),
-							stretchedGO.MinimumSize.Height);
-						if (stretchedGO.MaximumSize.Height > 0)
-							newH = Math.Min (newH, stretchedGO.MaximumSize.Height);
-						if (newH != stretchedGO.Slot.Height) {
-							stretchedGO.Slot.Height = newH;
-							stretchedGO.IsDirty = true;
-#if DEBUG_LAYOUTING
-					Debug.WriteLine ("\tAdjusting Height of " + stretchedGO.ToString());
-#endif
-							stretchedGO.LayoutChanged -= OnChildLayoutChanges;
-							stretchedGO.OnLayoutChanges (LayoutingType.Height);
-							stretchedGO.LayoutChanged += OnChildLayoutChanges;
-							stretchedGO.LastSlots.Height = stretchedGO.Slot.Height;
-						}
-					}
+					adjustStretchedGo (LayoutingType.Height);
 
 					if (Height == Measure.Fit)
 						this.RegisterForLayouting (LayoutingType.Height);
@@ -224,6 +230,23 @@ namespace Crow
 		}
 		#endregion
 
-    
+    	public override void RemoveChild (GraphicObject child)
+		{
+			base.RemoveChild (child);
+			if (child == stretchedGO) {
+				stretchedGO = null;
+				return;
+			}
+			if (Orientation == Orientation.Horizontal) {
+				contentSize.Width -= child.LastSlots.Width;
+				adjustStretchedGo (LayoutingType.Width);
+			} else {
+				contentSize.Height -= child.LastSlots.Height;
+				adjustStretchedGo (LayoutingType.Height);
+			}
+
+
+//			RegisterForLayouting (LayoutingType.ArrangeChildren);
+		}
 	}
 }

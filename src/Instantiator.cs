@@ -388,6 +388,21 @@ namespace Crow.IML
 				}
 			}
 		}
+
+		#if DESIGN_MODE
+		void emitSetDesignAttribute (IMLContext ctx, string name, string value){
+			//store member value in iml
+			ctx.il.Emit (OpCodes.Ldloc_0);
+			ctx.il.Emit (OpCodes.Ldfld, typeof(GraphicObject).GetField("design_iml_values"));
+			ctx.il.Emit (OpCodes.Ldstr, name);
+			if (string.IsNullOrEmpty (value))
+				ctx.il.Emit (OpCodes.Ldnull);
+			else
+				ctx.il.Emit (OpCodes.Ldstr, value);
+			ctx.il.Emit (OpCodes.Call, CompilerServices.miDicStrStrAdd);
+		}
+		#endif
+
 		/// <summary>
 		/// process styling, attributes and children loading.
 		/// </summary>
@@ -419,8 +434,12 @@ namespace Crow.IML
 				//first check for Style attribute then trigger default value loading
 				if (reader.HasAttributes) {
 					string style = reader.GetAttribute ("Style");
-					if (!string.IsNullOrEmpty (style))
+					if (!string.IsNullOrEmpty (style)){
 						CompilerServices.EmitSetValue (ctx.il, CompilerServices.piStyle, style);
+						#if DESIGN_MODE
+						emitSetDesignAttribute (ctx, "Style", style);
+						#endif
+					}
 				}
 				ctx.il.Emit (OpCodes.Ldloc_0);
 				ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miLoadDefaultVals);
@@ -434,18 +453,8 @@ namespace Crow.IML
 							continue;
 
 						#if DESIGN_MODE
-						//store member value in iml
-						ctx.il.Emit (OpCodes.Ldloc_0);
-						ctx.il.Emit (OpCodes.Ldfld, typeof(GraphicObject).GetField("design_members"));
-						ctx.il.Emit (OpCodes.Ldstr, reader.Name);
-						if (string.IsNullOrEmpty (reader.Value))
-							ctx.il.Emit (OpCodes.Ldnull);
-						else
-							ctx.il.Emit (OpCodes.Ldstr, reader.Value);
-						ctx.il.Emit (OpCodes.Call, 
-							typeof(Dictionary<string, string>).GetMethod ("set_Item", new Type[] { typeof(string), typeof(string) }));
+						emitSetDesignAttribute (ctx, reader.Name, reader.Value);
 						#endif
-
 
 						MemberInfo mi = ctx.CurrentNodeType.GetMember (reader.Name).FirstOrDefault ();
 						if (mi == null)

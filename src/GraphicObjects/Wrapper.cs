@@ -104,7 +104,7 @@ namespace Crow
 				this.RegisterForLayouting (LayoutingType.Width);
 				break;
 			case LayoutingType.Height:
-				if (Orientation == Orientation.Vertical && go.Height.Units == Unit.Percent) {
+				if (Orientation == Orientation.Vertical && go.Height.IsRelativeToParent) {
 					go.Height = Measure.Fit;
 					return;
 				}
@@ -137,7 +137,7 @@ namespace Crow
 					foreach (GraphicObject c in Children) {
 						if (!c.Visible)
 							continue;
-						if (c.Height.Units == Unit.Percent &&
+						if (c.Height.IsRelativeToParent &&
 						    c.RegisteredLayoutings.HasFlag (LayoutingType.Height)) {
 							childrenRWLock.ExitReadLock();
 							return -1;
@@ -172,7 +172,7 @@ namespace Crow
 				foreach (GraphicObject c in Children) {
 					if (!c.Visible)
 						continue;
-					if (c.Width.Units == Unit.Percent &&
+					if (c.Width.IsRelativeToParent &&
 					    c.RegisteredLayoutings.HasFlag (LayoutingType.Width)) {
 						childrenRWLock.ExitReadLock();
 						return -1;
@@ -217,13 +217,13 @@ namespace Crow
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
 			#if DEBUG_LAYOUTING
-			CurrentInterface.currentLQI.Slot = LastSlots;
-			CurrentInterface.currentLQI.Slot = Slot;
+			IFace.currentLQI.Slot = LastSlots;
+			IFace.currentLQI.Slot = Slot;
 			#endif
 			switch (layoutType) {
 			case LayoutingType.Width:
 				foreach (GraphicObject c in Children) {
-					if (c.Width.Units == Unit.Percent)
+					if (c.Width.IsRelativeToParent)
 						c.RegisterForLayouting (LayoutingType.Width);
 				}
 				if (Height == Measure.Fit)
@@ -232,7 +232,7 @@ namespace Crow
 				break;
 			case LayoutingType.Height:
 				foreach (GraphicObject c in Children) {
-					if (c.Height.Units == Unit.Percent)
+					if (c.Height.IsRelativeToParent)
 						c.RegisterForLayouting (LayoutingType.Height);
 				}
 				if (Width == Measure.Fit)

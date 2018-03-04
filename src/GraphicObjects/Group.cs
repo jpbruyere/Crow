@@ -114,6 +114,8 @@ namespace Crow
 			childrenRWLock.EnterWriteLock ();
 
 			Children.Remove(child);
+			child.Parent = null;
+			//child.ResetSlots ();
 
 			childrenRWLock.ExitWriteLock ();
 
@@ -141,6 +143,9 @@ namespace Crow
 			g.RegisteredLayoutings = LayoutingType.None;
 			g.LayoutChanged += OnChildLayoutChanges;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
+		}
+		public virtual void RemoveChild (int idx) {
+			RemoveChild (children[idx]);
 		}
 		public virtual void DeleteChild (int idx) {
 			DeleteChild (children[idx]);
@@ -263,7 +268,7 @@ namespace Crow
 			switch (layoutType) {
 			case LayoutingType.Width:
 				foreach (GraphicObject c in Children) {
-					if (c.Width.Units == Unit.Percent)
+					if (c.Width.IsRelativeToParent)
 						c.RegisterForLayouting (LayoutingType.Width);
 					else
 						c.RegisterForLayouting (LayoutingType.X);
@@ -271,7 +276,7 @@ namespace Crow
 				break;
 			case LayoutingType.Height:
 				foreach (GraphicObject c in Children) {
-					if (c.Height.Units == Unit.Percent)
+					if (c.Height.IsRelativeToParent)
 						c.RegisterForLayouting (LayoutingType.Height);
 					else
 						c.RegisterForLayouting (LayoutingType.Y);
@@ -294,9 +299,9 @@ namespace Crow
 
 			childrenRWLock.EnterReadLock ();
 
-				foreach (GraphicObject g in Children) {
-					g.Paint (ref gr);
-				}
+			foreach (GraphicObject g in Children) {
+				g.Paint (ref gr);
+			}
 
 			childrenRWLock.ExitReadLock ();
 			gr.Restore ();

@@ -97,6 +97,11 @@ namespace Crow.IML
 		
 		internal static MethodInfo miCreateExpDel = typeof(ItemTemplate).GetMethod ("CreateExpandDelegate");
 		internal static FieldInfo fiFetchMethodName = typeof(ItemTemplate).GetField("fetchMethodName", BindingFlags.Instance | BindingFlags.NonPublic);
+
+		#if DESIGN_MODE
+		internal static MethodInfo miDicStrStrAdd = typeof(Dictionary<string, string>).GetMethod ("set_Item", new Type[] { typeof(string), typeof(string) });
+		#endif
+
 		#region tree handling methods
 		internal static FieldInfo fiChild = typeof(PrivateContainer).GetField ("child", BindingFlags.Instance | BindingFlags.NonPublic);
 		internal static MethodInfo miSetChild = typeof (Container).GetMethod ("SetChild");

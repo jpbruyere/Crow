@@ -77,7 +77,7 @@ namespace Crow
 				NotifyValueChanged ("Image", image);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(false)]
+		[DefaultValue(false)]
         public bool IsExpanded
         {
 			get { return _isExpanded; }

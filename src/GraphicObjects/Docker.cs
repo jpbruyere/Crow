@@ -27,45 +27,32 @@ using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using Crow.IML;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Crow
 {
 	public class Docker : Group
-	{
-		static Instantiator instStack, instSplit, instSpacer;
+	{		
 		#region CTOR
 		static Docker () {
 		}
 		public Docker () : base ()
 		{
-			instStack = IFace.CreateITorFromIMLFragment (@"<GenericStack Background='Blue' AllowDrop='true' DragEnter='onStackDragEnter'/>");
-			instSplit = IFace.CreateITorFromIMLFragment (@"<Splitter/>");
-			instSpacer = IFace.CreateITorFromIMLFragment (@"<GraphicObject Background='Red' IsEnabled='false'/>");
 		}
 		#endregion
 
-		GenericStack rootStack = null;
+		//GenericStack rootStack = null;
+		DockStack stack = null;
+		int dockingThreshold;
+
+		List<DockWindow> windows = new List<DockWindow>();
 
 		public override void AddChild (GraphicObject g)
-		{
-			DockWindow dw = g as DockWindow;
-			if (dw == null)
-				throw new Exception ("Docker accept only DockWindow as child");
-			
+		{				
 			base.AddChild (g);
-
-			dw.LogicalParent = this;
+			g.LogicalParent = this;
 		}
-		public override void RemoveChild (GraphicObject child)
-		{
-			child.LogicalParent = null;
-
-
-			base.RemoveChild (child);
-		}
-
-		GenericStack mainStack = null;
-		int dockingThreshold;
 
 		[XmlAttributeAttribute][DefaultValue(10)]
 		public virtual int DockingThreshold {
@@ -79,57 +66,39 @@ namespace Crow
 			}
 		}
 
-		bool showDockingTarget = false;
-		Alignment dockingDirection = Alignment.Center;
-		int dockingDiv = 5;
+		//bool showDockingTarget = false;
+		//Alignment dockingDirection = Alignment.Center;
+		//int dockingDiv = 8;
+		//bool showDock = false;
 
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{			
 			if (IFace.DragAndDropOperation?.DragSource as DockWindow != null) {
-				DockWindow dw = IFace.DragAndDropOperation?.DragSource as DockWindow;
-				if (IFace.DragAndDropOperation.DragSource.Parent == this && !dw.IsDocked)
+				DockWindow dw = IFace.DragAndDropOperation.DragSource as DockWindow;
+				if (!dw.IsDocked)
 					dw.MoveAndResize (e.XDelta, e.YDelta);
-
-				Rectangle r = ClientRectangle;
-				int vTreshold = r.Height / dockingDiv;
-				int hTreshold = r.Width / dockingDiv;
-
-
-				bool showDock = true;
-
-				if (dw.Slot.Left < hTreshold)
-					dockingDirection = Alignment.Left;
-				else if (dw.Slot.Right > r.Right - hTreshold)
-					dockingDirection = Alignment.Right;
-				else if (dw.Slot.Top < vTreshold)
-					dockingDirection = Alignment.Top;
-				else if (dw.Slot.Bottom > r.Bottom - vTreshold)
-					dockingDirection = Alignment.Bottom;
-				else {
-					dockingDirection = Alignment.Center;
-					showDock = false;
+				if (stack == null) {				
+					stack = new DockStack (IFace);
+					InsertChild (0, stack);
+					stack.LogicalParent = this;
 				}
-
-				showDockingTarget = showDock;
-
-				RegisterForGraphicUpdate ();
-
-				//System.Diagnostics.Debug.WriteLine ("Dock: {0}", dockingDirection);
-			} else
-				showDockingTarget = false;
-
+			}
 			base.onMouseMove (sender, e);
 		}
+		/*
 		protected override void onDragEnter (object sender, DragDropEventArgs e)
 		{
 			base.onDragEnter (sender, e);
+			showDock = true;
+			Console.WriteLine ("showdock=" + showDock);
 		}
-		void onStackDragEnter (object sender, DragDropEventArgs e)
+		protected override void onDragLeave (object sender, DragDropEventArgs e)
 		{
-			base.onDragEnter (sender, e);
-
-			mainStack = sender as GenericStack;
+			base.onDragLeave (sender, e);
+			showDock = false;
+			Console.WriteLine ("showdock=" + showDock);
 		}
+
 		protected override void onDraw (Cairo.Context gr)
 		{
 			gr.Save ();
@@ -149,8 +118,8 @@ namespace Crow
 			childrenRWLock.EnterReadLock ();
 
 			foreach (GraphicObject g in Children) {
-				if (IFace.DragAndDropOperation?.DragSource == g)
-					continue;
+//				if (IFace.DragAndDropOperation?.DragSource == g)
+//					continue;
 				g.Paint (ref gr);
 			}
 
@@ -158,10 +127,10 @@ namespace Crow
 
 			if (showDockingTarget) {
 				Rectangle r;
-				if (mainStack == null)
+				if (stack == null)
 					r = ClientRectangle;
 				else
-					r = mainStack.ClientRectangle;
+					r = stack.ClientRectangle;
 				
 				switch (dockingDirection) {
 				case Alignment.Top:
@@ -184,73 +153,83 @@ namespace Crow
 				gr.Stroke ();
 			}
 
-			if (IFace.DragAndDropOperation != null)
-				IFace.DragAndDropOperation.DragSource.Paint (ref gr);
-
-
 			gr.Restore ();	
 		}
+*/
 
+		/*
 		public void Dock(DockWindow dw){
+			checkInstantiators();
+
 			if (dockingDirection == Alignment.Center)
 				return;
+			
 			lock (IFace.UpdateMutex) {
 
 				Splitter splitter = instSplit.CreateInstance<Splitter> ();
+				Rectangle r = ClientRectangle;
 
-				dw.Resizable = false;
-				dw.Left = dw.Top = 0;
-				this.RemoveChild (dw);
-
-				Rectangle r;
-				if (mainStack == null) {
-					mainStack = instStack.CreateInstance<GenericStack> ();
-					this.AddChild (mainStack);
-					this.putWidgetOnBottom (mainStack);
-					r = ClientRectangle;
-				} else
-					r = mainStack.ClientRectangle;				
+				if (stack == null) {
+					stack = instStack.CreateInstance<GenericStack> ();
+					this.AddChild (stack);
+					this.putWidgetOnBottom (stack);
+				} 
 				 
 				int vTreshold = r.Height / dockingDiv;
 				int hTreshold = r.Width / dockingDiv;
 
 				switch (dockingDirection) {
 				case Alignment.Top:						
-					dw.Width = Measure.Stretched;
-					mainStack.Orientation = Orientation.Vertical;
-					mainStack.AddChild (dw);
-					mainStack.AddChild (splitter);
-					//mainStack.AddChild (instSpacer.CreateInstance (CurrentInterface));
+					dw.Height = vTreshold;
+					stack.Orientation = Orientation.Vertical;
+					if (stack.Children.Count == 0) {
+						stack.AddChild (dw);
+						stack.AddChild (splitter);
+						stack.AddChild (instSpacer.CreateInstance ());
+					} else {
+						stack.AddChild (splitter);
+						stack.AddChild (dw);
+					}
 					break;
 				case Alignment.Bottom:
-					dw.Width = Measure.Stretched;
-					mainStack.Orientation = Orientation.Vertical;
-					//mainStack.AddChild (instSpacer.CreateInstance (CurrentInterface));
-					mainStack.AddChild (splitter);
-					mainStack.AddChild (dw);
+					dw.Height = vTreshold;
+					stack.Orientation = Orientation.Vertical;
+					if (stack.Children.Count == 0) {
+						stack.AddChild (instSpacer.CreateInstance ());
+						stack.AddChild (splitter);
+						stack.AddChild (dw);
+					} else {
+						stack.InsertChild (0, dw);
+						stack.InsertChild (0, splitter);
+					}
 					break;
 				case Alignment.Left:
-					dw.Height = Measure.Stretched;
-					mainStack.Orientation = Orientation.Horizontal;
-					mainStack.AddChild (dw);
-					mainStack.AddChild (splitter);
-					//mainStack.AddChild (instSpacer.CreateInstance (CurrentInterface));
+					dw.Width = hTreshold;
+					stack.Orientation = Orientation.Horizontal;
+					if (stack.Children.Count == 0) {
+						stack.AddChild (dw);
+						stack.AddChild (splitter);
+						stack.AddChild (instSpacer.CreateInstance ());
+					} else {
+						stack.AddChild (splitter);
+						stack.AddChild (dw);
+					}
 					break;
 				case Alignment.Right:
-					dw.Height = Measure.Stretched;
-					mainStack.Orientation = Orientation.Horizontal;
-					//mainStack.AddChild (instSpacer.CreateInstance (CurrentInterface));
-					mainStack.AddChild (splitter);
-					mainStack.AddChild (dw);
+					dw.Width = hTreshold;
+					stack.Orientation = Orientation.Horizontal;
+					if (stack.Children.Count == 0) {
+						stack.AddChild (instSpacer.CreateInstance ());
+						stack.AddChild (splitter);
+						stack.AddChild (dw);
+					} else {
+						stack.InsertChild (0, dw);
+						stack.InsertChild (0, splitter);
+					}
 					break;
 				}
-
 			}
-		}
-		protected override void onDrop (object sender, DragDropEventArgs e)
-		{
-			base.onDrop (sender, e);
-		}
+		}*/
 	}
 }
 

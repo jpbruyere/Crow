@@ -162,7 +162,7 @@ namespace Crow
 						#if DESIGN_MODE
 						styling [tc].Locations[currentProperty] = new FileLocation(resId, line,column);
 						#endif
-						System.Diagnostics.Debug.WriteLine ("Style: {3} : {0}.{1} = {2}", tc, currentProperty, token, resId);
+						//System.Diagnostics.Debug.WriteLine ("Style: {3} : {0}.{1} = {2}", tc, currentProperty, token, resId);
 					}
 					token = "";
 					curState = States.members;
