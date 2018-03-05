@@ -18,6 +18,8 @@
 				<MenuItem Command="{CMDOptions}"/>
 			</MenuItem>
 			<MenuItem Caption="View" Fit="true" PopWidth="150">
+				<MenuItem Command="{CMDViewSolution}"/>
+				<MenuItem Command="{CMDViewErrors}"/>
 				<MenuItem Command="{CMDViewGTExp}"/>
 				<MenuItem Command="{CMDViewProps}"/>
 				<MenuItem Command="{CMDViewProj}"/>
@@ -31,36 +33,19 @@
 				<MenuItem Command="{CMDHelp}"/>
 			</MenuItem>
 		</Menu>
-		<VerticalStack DataSource="{CurrentSolution}">
-			<Label Background="Gray" Text="{SelectedItem}" Width="Stretched" TextAlignment="Left"/>
-			<HorizontalStack Height="80%">
+		<Docker Name="mainDock">
+			<DockWindow DataSource="{CurrentSolution}" Name="winEditor" Caption="Edit View" Width="70%" Height="80%">
+				<Template>
+					<Border BorderWidth="1" Foreground="Jet" CornerRadius="{./CornerRadius}"
+									Background="{./Background}"
+									MouseEnter="./onBorderMouseEnter"
+									MouseLeave="./onBorderMouseLeave">
+						<Container Name="Content" MinimumSize="50,50"/>
+					</Border>
+				</Template>
 				<EditPane SelectedItem="{²SelectedItem}" SelectedItemElement="{²SelectedItemElement}" Data="{OpenedItems}" DataTest="Extension"
 					ItemTemplate="#Crow.Coding.ui.EditPaneItems.template"/>
-				<Splitter/>
-				<VerticalStack Width="30%">
-					<TreeView Name="treeview" Height="50%" IsRoot="true"
-						Data="{Projects}" SelectedItemChanged="onSelectedItemChanged"
-						ItemTemplate="#Crow.Coding.ui.ProjectTree.template"/>
-					<Splitter/>
-					<MembersView ProjectNode="{SelectedItem}"
-						Instance="{SelectedItemElement}" DataTest="Type"
-						ItemTemplate="#Crow.Coding.ui.MembersItem.template"/>
-				</VerticalStack>
-			</HorizontalStack>
-			<Splitter/>
-			<ListBox Width="Stretched" Data="{CompilerErrors}">
-				<ItemTemplate>
-					<HorizontalStack Height="Fit" Margin="0" Focusable="true" Spacing="10"
-							MouseEnter="{Background=SteelBlue}"
-							MouseLeave="{Background=Transparent}">						
-						<Image Width="10" Height="10" Path="#Crow.Icons.compiler_error.svg" SvgSub="{IsWarning}"/>
-						<Label Text="{Line}" Width="25" TextAlignment="Right"/>
-						<Label Text="{ErrorText}" Width="60%"/>
-						<Label Text="{FileName}" Width="Fit"/>
-					</HorizontalStack>
-				</ItemTemplate>
-			</ListBox>
-		</VerticalStack>
-		
+			</DockWindow>
+		</Docker>
 	</VerticalStack>
 </Window>

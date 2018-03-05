@@ -71,9 +71,9 @@ namespace Crow
 		}
 		public override void RemoveChild (GraphicObject child)
 		{
-			lock (IFace.UpdateMutex) {
-				RegisterClip (ScreenCoordinates (LastPaintedSlot));
-			}
+//			lock (IFace.UpdateMutex) {
+//				RegisterClip (ScreenCoordinates (LastPaintedSlot));
+//			}
 			base.RemoveChild (child);
 		}
 

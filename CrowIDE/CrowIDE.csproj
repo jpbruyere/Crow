@@ -126,6 +126,7 @@
     <Folder Include="src\SourceEditor\" />
     <Folder Include="ui\ItemTemplates\" />
     <Folder Include="src\MemberView\" />
+    <Folder Include="ui\DockWindows\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="images\save.svg" />
@@ -172,6 +173,9 @@
     <EmbeddedResource Include="ui\MembersItem.template" />
     <EmbeddedResource Include="ui\ItemTemplates\Enum.template" />
     <EmbeddedResource Include="ui\ItemTemplates\Fill.template" />
+    <EmbeddedResource Include="ui\DockWindows\winEditor.crow" />
+    <EmbeddedResource Include="ui\DockWindows\winErrors.crow" />
+    <EmbeddedResource Include="ui\DockWindows\winSolution.crow" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">

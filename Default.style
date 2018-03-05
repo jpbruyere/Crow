@@ -73,7 +73,7 @@ Slider {
 }
 Splitter {
 	Focusable = "true";
-	Margin = "2";
+	Margin = "1";
 	Background = "Gray";
 }
 Spinner {
@@ -111,11 +111,11 @@ ToolWindow {
 }
 Docker {
 	AllowDrop = "false";
-	Margin="1";
+	Margin="0";
 	Focusable="true";
 }
 DockStack {
-	Margin="3";
+	Margin="1";
 	AllowDrop = "true";
 	Focusable="true";
 	//DragEnter="{Background=Blue}";
@@ -125,6 +125,7 @@ DockStack {
 DockWindow {
 	Focusable = "true";
 	AllowDrag = "true";
+	Margin="0";
 }
 FileDialog {
 	Template = "#Crow.FileDialog.template";

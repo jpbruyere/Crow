@@ -1,0 +1,12 @@
+﻿<?xml version="1.0"?>
+<DockWindow DataSource="{CurrentSolution}" Name="winSolution" Caption="Solution" Width="30%" Height="80%">
+	<VerticalStack>
+		<TreeView Name="treeview" IsRoot="true" Height="50%"
+			Data="{Projects}" SelectedItemChanged="onSelectedItemChanged"
+			ItemTemplate="#Crow.Coding.ui.ProjectTree.template"/>
+		<Splitter/>
+		<MembersView ProjectNode="{SelectedItem}"
+			Instance="{SelectedItemElement}" DataTest="Type"
+			ItemTemplate="#Crow.Coding.ui.MembersItem.template"/>
+	</VerticalStack>
+</DockWindow>

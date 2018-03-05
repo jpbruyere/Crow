@@ -41,7 +41,7 @@ namespace Crow.Coding
 		public Command CMDNew, CMDOpen, CMDSave, CMDSaveAs, CMDQuit,
 		CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp,
 		CMDAbout, CMDOptions,
-		CMDViewGTExp, CMDViewProps, CMDViewProj, CMDViewProjProps,
+		CMDViewGTExp, CMDViewProps, CMDViewProj, CMDViewProjProps, CMDViewErrors, CMDViewSolution,
 		CMDCompile;
 
 		void initCommands () {
@@ -57,6 +57,11 @@ namespace Crow.Coding
 			CMDPaste = new Command(new Action(() => Quit (null, null))) { Caption = "Paste", Icon = new SvgPicture("#Crow.Coding.ui.icons.paste-on-document.svg"), CanExecute = false};
 			CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("help"))) { Caption = "Help", Icon = new SvgPicture("#Crow.Coding.ui.icons.question.svg")};
 			CMDOptions = new Command(new Action(() => openOptionsDialog())) { Caption = "Editor Options", Icon = new SvgPicture("#Crow.Coding.ui.icons.tools.svg")};
+
+			CMDViewErrors = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winErrors.crow")))
+			{ Caption = "Errors pane"};
+			CMDViewSolution = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winSolution.crow")))
+			{ Caption = "Solution Tree"};
 
 			CMDViewGTExp = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.GTreeExplorer.crow"))) { Caption = "Graphic Tree Explorer"};
 			CMDViewProps = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.MemberView.crow"))) { Caption = "Properties View"};
@@ -89,6 +94,7 @@ namespace Crow.Coding
 
 		Instantiator instFileDlg;
 		Solution currentSolution;
+		Docker mainDock;
 
 		public static Interface MainIFace;
 
@@ -107,12 +113,13 @@ namespace Crow.Coding
 
 			MainIFace = ifaceControl[0].CrowInterface;
 
+			mainDock = go.FindByName ("mainDock") as Docker;
+
 			if (ReopenLastSolution && !string.IsNullOrEmpty (LastOpenSolution)) {
 				CurrentSolution = Solution.LoadSolution (LastOpenSolution);
 				//lock(MainIFace.UpdateMutex)
 				CurrentSolution.ReopenItemsSavedInUserConfig ();
 			}
-
 
 			instFileDlg = Instantiator.CreateFromImlFragment
 				(MainIFace, "<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}' SearchPattern='*.sln' OkClicked='onFileOpen'/>");
@@ -199,6 +206,21 @@ namespace Crow.Coding
 //			} else if (e.Key == OpenTK.Input.Key.F7) {
 //				loadWindow ("#Crow.Coding.ui.CSProjExplorer.crow");
 //			}
+		}
+		void loadDockWindow(string path){
+			lock (MainIFace.UpdateMutex) {
+				try {
+					GraphicObject g = MainIFace.FindByName (path);
+					if (g != null)
+						return;
+					g = MainIFace.Load (path);
+					mainDock.AddChild (g);
+					g.Name = path;
+					g.DataSource = CurrentSolution;
+				} catch (Exception ex) {
+					System.Diagnostics.Debug.WriteLine (ex.ToString ());
+				}
+			}
 		}
 		void loadWindow(string path, object dataSource = null){
 			try {

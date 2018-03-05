@@ -187,7 +187,7 @@ namespace Crow.Coding{
 			saveOpenedItemsInUserConfig ();
 		}
 		public void CloseItem (ProjectItem pi) {
-			Console.WriteLine ("CloseItem");
+			Console.WriteLine ("CloseItem: " + pi.ToString());
 			openedItems.RemoveElement (pi);
 			saveOpenedItemsInUserConfig ();
 		}

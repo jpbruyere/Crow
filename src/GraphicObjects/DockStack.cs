@@ -29,10 +29,8 @@ using Crow.IML;
 namespace Crow
 {
 	public class DockStack : GenericStack
-	{
-		internal static Instantiator instStack, instSplit;//, instSpacer;
-
-		int dockingDiv = 5;
+	{		
+		int dockingDiv = 6;
 		GraphicObject subStack = null;
 
 		Docker rootDock { get { return LogicalParent as Docker; }}
@@ -46,14 +44,6 @@ namespace Crow
 		public DockStack ()	{}
 		public DockStack (Interface iface) : base (iface) {}
 		#endregion
-
-		protected override void onInitialized (object sender, EventArgs e)
-		{
-			base.onInitialized (sender, e);
-			instStack = IFace.CreateITorFromIMLFragment (@"<DockStack/>");
-			instSplit = IFace.CreateITorFromIMLFragment (@"<Splitter/>");
-			//instSpacer = IFace.CreateITorFromIMLFragment (@"<GraphicObject Background='Transparent' IsEnabled='false'/>");
-		}
 
 		public override void AddChild (GraphicObject g)
 		{
@@ -236,8 +226,7 @@ namespace Crow
 			dsp.SubStack = SubStack;
 			return;
 		}
-		public void Dock(DockWindow dw){
-			Splitter splitter = instSplit.CreateInstance<Splitter> ();
+		public void Dock(DockWindow dw){			
 			Rectangle r = ClientRectangle;
 
 			int vTreshold = r.Height / dockingDiv;
@@ -249,7 +238,7 @@ namespace Crow
 				activeStack = this;
 				Orientation = dw.DockingPosition.GetOrientation ();
 			}else if (dw.DockingPosition.GetOrientation() != Orientation) {				
-				activeStack = instStack.CreateInstance<DockStack> ();
+				activeStack = new DockStack (IFace);
 				int ci = Children.IndexOf (rootDock.CenterDockedObj);
 				if (ci  <0 ){
 					DockStack dsp = Parent as DockStack;
@@ -284,24 +273,24 @@ namespace Crow
 				dw.Height = vTreshold;
 				dw.Width = Measure.Stretched;
 				activeStack.InsertChild (0, dw);
-				activeStack.InsertChild (1, splitter);
+				activeStack.InsertChild (1, new Splitter(IFace));
 				break;
 			case Alignment.Bottom:
 				dw.Height = vTreshold;
 				dw.Width = Measure.Stretched;
-				activeStack.AddChild (splitter);
+				activeStack.AddChild (new Splitter(IFace));
 				activeStack.AddChild (dw);
 				break;
 			case Alignment.Left:
 				dw.Width = hTreshold;
 				dw.Height = Measure.Stretched;
 				activeStack.InsertChild (0, dw);
-				activeStack.InsertChild (1, splitter);
+				activeStack.InsertChild (1, new Splitter(IFace));
 				break;
 			case Alignment.Right:
 				dw.Width = hTreshold;
 				dw.Height = Measure.Stretched;
-				activeStack.AddChild (splitter);
+				activeStack.AddChild (new Splitter(IFace));
 				activeStack.AddChild (dw);
 				break;
 			case Alignment.Center:
