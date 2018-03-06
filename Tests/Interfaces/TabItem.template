@@ -3,20 +3,23 @@
 		Background="{./Background}"
 		MouseEnter="{/caption.Foreground=White}"
 		MouseLeave="{/caption.Foreground=Gray}">
-	<HorizontalStack Margin="2" Left="{./TabOffset}"
-		Name="TabTitle" Background="{./Background}"
+	<HorizontalStack Left="{./TabOffset}"
+		Name="TabTitle"
 		HorizontalAlignment="Left"
-		Height="{./TabThickness}"
-		Width="Fit">
+		Height="{./TabHeight}"
+		Width="{./TabWidth}">
 		<Label Name="caption" Text="{./Caption}" Foreground="Gray"/>
 		<Label Text="{./ViewIndex}" Foreground="Green"/>
 		<Label Text="{./TabOffset}" Foreground="Red"/>
+		<GraphicObject Height="1"/>
 		<Border CornerRadius="5" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
 					MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
 			<Image Focusable="true" Name="Image" Margin="0" Width="Stretched" Height="Stretched" Path="#Crow.Images.Icons.exit2.svg"
 				 MouseClick="./butCloseTabClick"/>
 		</Border>
 	</HorizontalStack>
-	<Container Name="Content"/>
+	<Container Margin="20">
+		<Container Background="Jet" Name="Content"/>
+	</Container>
 </GenericStack>
 

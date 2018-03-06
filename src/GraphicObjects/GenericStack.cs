@@ -28,6 +28,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Xml.Serialization;
 using System;
+using System.Linq;
 
 namespace Crow
 {
@@ -79,13 +80,8 @@ namespace Crow
 		}
 		protected override int measureRawSize (LayoutingType lt)
 		{
-			int totSpace = 0;
-			for (int i = 0; i < Children.Count; i++) {
-				if (Children [i].Visible)
-					totSpace += Spacing;
-			}
-			if (totSpace > 0)
-				totSpace -= Spacing;
+			int totSpace = Spacing * (Children.Count (c => c.Visible) - 1);
+
 			if (lt == LayoutingType.Width) {
 				if (Orientation == Orientation.Horizontal)
 					return contentSize.Width + totSpace + 2 * Margin;

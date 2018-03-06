@@ -6,8 +6,8 @@
 	<HorizontalStack Margin="2" Left="{./TabOffset}"
 		Name="TabTitle"
 		HorizontalAlignment="Left"
-		Height="{./TabThickness}"
-		Width="Fit">
+		Height="{./TabHeight}"
+		Width="{./TabWidth}">
 		<Label Name="caption" Text="{./Caption}" Foreground="Gray"/>
 		<Border CornerRadius="5" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
 					MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">

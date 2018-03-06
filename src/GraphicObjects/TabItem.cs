@@ -42,6 +42,8 @@ namespace Crow
 
 		public event EventHandler QueryClose;
 
+		internal TabView tview = null;
+
 		#region Private fields
 		GraphicObject titleWidget;
 		int tabOffset;
@@ -87,20 +89,9 @@ namespace Crow
 				NotifyValueChanged ("ViewIndex", viewIndex);
 			}
 		}
-
-		[XmlAttributeAttribute][DefaultValue("18")]
-		public virtual Measure TabThickness {
-			get { return tabThickness; }
-			set {
-				if (tabThickness == value)
-					return;
-				tabThickness = value;
-				NotifyValueChanged ("TabThickness", tabThickness);
-				RegisterForGraphicUpdate ();
-			}
-		}
+			
 		[XmlAttributeAttribute][DefaultValue(0)]
-		public virtual int TabOffset {
+		public int TabOffset {
 			get { return tabOffset; }
 			set {
 				if (tabOffset == value)
@@ -112,7 +103,12 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-
+		public Measure TabHeight {
+			get { return tview == null ? Measure.Fit : tview.TabHeight; }
+		}
+		public Measure TabWidth {
+			get { return tview == null ? Measure.Fit : tview.TabWidth; }
+		}
 		[XmlAttributeAttribute][DefaultValue(false)]
 		public virtual bool IsSelected {
 			get { return isSelected; }
@@ -127,20 +123,23 @@ namespace Crow
 		{
 			gr.Save ();
 
-			int spacing = (Parent as TabView).Spacing;
+			TabView tv = Parent as TabView;
 
-			gr.MoveTo (0.5, TabTitle.Slot.Bottom-0.5);
-			gr.LineTo (TabTitle.Slot.Left - spacing, TabTitle.Slot.Bottom-0.5);
+			Rectangle r = TabTitle.Slot;
+			r.Width = TabWidth;
+
+			gr.MoveTo (0.5, r.Bottom-0.5);
+			gr.LineTo (r.Left - tv.LeftSlope, r.Bottom-0.5);
 			gr.CurveTo (
-				TabTitle.Slot.Left - spacing / 2, TabTitle.Slot.Bottom-0.5,
-				TabTitle.Slot.Left - spacing / 2, 0.5,
-				TabTitle.Slot.Left, 0.5);
-			gr.LineTo (TabTitle.Slot.Right, 0.5);
+				r.Left - tv.LeftSlope / 2, r.Bottom-0.5,
+				r.Left - tv.LeftSlope / 2, 0.5,
+				r.Left, 0.5);
+			gr.LineTo (r.Right, 0.5);
 			gr.CurveTo (
-				TabTitle.Slot.Right + spacing / 2, 0.5,
-				TabTitle.Slot.Right + spacing / 2, TabTitle.Slot.Bottom-0.5,
-				TabTitle.Slot.Right + spacing, TabTitle.Slot.Bottom-0.5);
-			gr.LineTo (Slot.Width-0.5, TabTitle.Slot.Bottom-0.5);
+				r.Right + tv.RightSlope / 2, 0.5,
+				r.Right + tv.RightSlope / 2, r.Bottom-0.5,
+				r.Right + tv.RightSlope, r.Bottom-0.5);
+			gr.LineTo (Slot.Width-0.5, r.Bottom-0.5);
 
 
 			gr.LineTo (Slot.Width-0.5, Slot.Height-0.5);
@@ -149,7 +148,6 @@ namespace Crow
 			gr.LineWidth = 1;
 			Foreground.SetAsSource (gr);
 			gr.StrokePreserve ();
-
 			gr.Clip ();
 			base.onDraw (gr);
 			gr.Restore ();
@@ -162,7 +160,7 @@ namespace Crow
 			if (!base.PointIsIn (ref m))
 				return false;
 
-			if (m.Y < tabThickness)
+			if (m.Y < tview.TabHeight)
 				return TabTitle.Slot.ContainsOrIsEqual (m);
 			else
 				return this.isSelected;
@@ -176,7 +174,7 @@ namespace Crow
 		{
 			base.onMouseUp (sender, e);
 			HoldCursor = false;
-			(Parent as TabView).UpdateLayout (LayoutingType.ArrangeChildren);
+			tview.UpdateLayout (LayoutingType.ArrangeChildren);
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
@@ -185,25 +183,26 @@ namespace Crow
 			if (!(HasFocus && HoldCursor))
 				return;
 			TabView tv = Parent as TabView;
-			TabItem previous = null, next = null;
+			Rectangle cb = ClientRectangle;
+
 			int tmp = TabOffset + e.XDelta;
-			if (tmp < tv.Spacing)
-				TabOffset = tv.Spacing;
-			else if (tmp > Parent.getSlot ().Width - TabTitle.Slot.Width - tv.Spacing)
-				TabOffset = Parent.getSlot ().Width - TabTitle.Slot.Width - tv.Spacing;
+			if (tmp < tview.LeftSlope)
+				TabOffset = tview.LeftSlope;
+			else if (tmp > cb.Width - tv.RightSlope - tv.TabWidth)
+				TabOffset = cb.Width - tv.RightSlope - tv.TabWidth;
 			else{
 				TabItem[] tabItms = tv.Children.Cast<TabItem>().OrderBy (t=>t.ViewIndex).ToArray();
 				if (ViewIndex > 0 && e.XDelta < 0) {
-					previous = tabItms [ViewIndex - 1];
-					if (tmp < previous.TabOffset + previous.TabTitle.Slot.Width / 2) {
+					TabItem previous = tabItms [ViewIndex - 1];
+					if (tmp < previous.TabOffset + tview.TabWidth / 2) {
 						previous.ViewIndex = ViewIndex;
 						ViewIndex--;
 						tv.UpdateLayout (LayoutingType.ArrangeChildren);
 					}
 
 				}else if (ViewIndex < tabItms.Length - 1 && e.XDelta > 0) {
-					next = tabItms [ViewIndex + 1];
-					if (tmp > next.TabOffset - next.TabTitle.Slot.Width / 2){
+					TabItem next = tabItms [ViewIndex + 1];
+					if (tmp > next.TabOffset - tview.TabWidth / 2){
 						next.ViewIndex = ViewIndex;
 						ViewIndex++;
 						tv.UpdateLayout (LayoutingType.ArrangeChildren);
