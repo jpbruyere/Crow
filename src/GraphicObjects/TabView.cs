@@ -41,14 +41,16 @@ namespace Crow
 		#endregion
 
 		#region Private fields
-		int _spacing;
-		Measure tabThickness;
+		int spacing;
+		int leftSlope;
+		int rightSlope;
+		Measure tabHeight, tabWidth;
 		Orientation _orientation;
-		int selectedTab = 0;
+		int selectedTab;
 		#endregion
 
 		#region public properties
-		[XmlAttributeAttribute()][DefaultValue(Orientation.Horizontal)]
+		[DefaultValue(Orientation.Horizontal)]
 		public virtual Orientation Orientation
 		{
 			get { return _orientation; }
@@ -60,33 +62,83 @@ namespace Crow
 				if (_orientation == Orientation.Horizontal)
 					NotifyValueChanged ("TabOrientation", Orientation.Vertical);
 				else
-					NotifyValueChanged ("TabOrientation", Orientation.Horizontal);
+					NotifyValueChanged ("TabOrientation", Orientation.Horizontal);				
+				this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(16)]
-		public int Spacing
+		[DefaultValue(16)]
+		public int LeftSlope
 		{
-			get { return _spacing; }
+			get { return leftSlope; }
 			set {
-				if (_spacing == value)
+				if (leftSlope == value)
 					return;
-				_spacing = value;
-				NotifyValueChanged ("Spacing", Spacing);
+				leftSlope = value;
+				NotifyValueChanged ("leftSlope", leftSlope);
+				tabSizeHasChanged = true;
+				//RegisterForLayouting (LayoutingType.ArrangeChildren);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(0)]
+		bool tabSizeHasChanged = false;
+		[DefaultValue(16)]
+		public int RightSlope
+		{
+			get { return rightSlope; }
+			set {
+				if (rightSlope == value)
+					return;
+				rightSlope = value;
+				NotifyValueChanged ("RightSlope", rightSlope);
+				tabSizeHasChanged = true;
+				//RegisterForLayouting (LayoutingType.ArrangeChildren);
+			}
+		}
+		[DefaultValue("18")]
+		public Measure TabHeight {
+			get { return tabHeight; }
+			set {
+				if (tabHeight == value)
+					return;
+				tabHeight = value;
+				NotifyValueChanged ("TabHeight", tabHeight);
+//				childrenRWLock.EnterReadLock ();
+//				foreach (GraphicObject ti in Children) {
+//					ti.NotifyValueChanged ("TabHeight", tabHeight);
+//				}
+//				childrenRWLock.ExitReadLock ();
+				RegisterForLayouting (LayoutingType.ArrangeChildren);
+			}
+		}
+		[DefaultValue("120")]
+		public Measure TabWidth {
+			get { return tabWidth; }
+			set {
+				if (tabWidth == value)
+					return;
+				tabWidth = value;
+				NotifyValueChanged ("TabWidth", tabWidth);
+//
+//				childrenRWLock.EnterReadLock ();
+//				foreach (GraphicObject ti in Children) { 
+//					ti.NotifyValueChanged ("TabWidth", tabWidth);
+//				}
+//				childrenRWLock.ExitReadLock ();
+				RegisterForLayouting (LayoutingType.ArrangeChildren);
+			}
+		}
+
 		public virtual int SelectedTab {
 			get { return selectedTab; }
 			set {
-				if (value < 0)//prevent TemplatedGroup index binding set to -1
+				if (value == selectedTab)
 					return;
-				
-				if (selectedTab < Children.Count && SelectedTab >= 0)
+
+				if (selectedTab < Children.Count && selectedTab >= 0)
 					(Children [selectedTab] as TabItem).IsSelected = false;
 
 				selectedTab = value;
 
-				if (selectedTab < Children.Count && SelectedTab >= 0)
+				if (selectedTab < Children.Count && selectedTab >= 0)
 					(Children [selectedTab] as TabItem).IsSelected = true;
 
 				NotifyValueChanged ("SelectedTab", selectedTab);
@@ -94,12 +146,6 @@ namespace Crow
 			}
 		}
 		#endregion
-
-		void Ti_TabTitle_LayoutChanged (object sender, LayoutingEventArgs e)
-		{
-			if (e.LayoutType == LayoutingType.Width)
-				this.RegisterForLayouting (LayoutingType.ArrangeChildren);
-		}
 
 		public override void AddChild (GraphicObject child)
 		{
@@ -109,13 +155,14 @@ namespace Crow
 
 			ti.MouseDown += Ti_MouseDown;
 			ti.TabTitle.LayoutChanged += Ti_TabTitle_LayoutChanged;
+			ti.tview = this;
 
 			base.AddChild (child);
 
 			SelectedTab = ti.ViewIndex = Children.Count - 1;
+			this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 		}
-
-		public override void DeleteChild (GraphicObject child)
+		public override void RemoveChild (GraphicObject child)
 		{
 			TabItem ti = child as TabItem;
 			if (ti == null)
@@ -123,11 +170,30 @@ namespace Crow
 
 			ti.MouseDown -= Ti_MouseDown;
 			ti.TabTitle.LayoutChanged -= Ti_TabTitle_LayoutChanged;
+			ti.tview = null;
 
-			if (selectedTab > Children.Count - 2)
-				SelectedTab--;
-			
-			base.DeleteChild (child);
+			childrenRWLock.EnterReadLock ();
+
+			TabItem[] tabItms = Children.Cast<TabItem>().OrderBy (t=>t.ViewIndex).ToArray();
+			int selTabViewIdx = -1;
+
+			if (SelectedTab < tabItms.Length && SelectedTab >= 0)
+				selTabViewIdx = (Children [SelectedTab] as TabItem).ViewIndex;
+
+			for (int i = selTabViewIdx+1; i < tabItms.Length; i++)
+				tabItms [i].ViewIndex--;
+
+			if (selTabViewIdx > tabItms.Length - 2)
+				selTabViewIdx = tabItms.Length - 2;
+
+			if (selTabViewIdx < 0)
+				SelectedTab = -1;
+			else
+				SelectedTab = Children.IndexOf (tabItms [selTabViewIdx]);
+
+			childrenRWLock.ExitReadLock ();
+
+			base.RemoveChild (child);
 		}
 
 		public override bool ArrangeChildren { get { return true; } }
@@ -135,23 +201,29 @@ namespace Crow
 		{
 			RegisteredLayoutings &= (~layoutType);
 
-			if (layoutType == LayoutingType.ArrangeChildren) {
-				int curOffset = Spacing;
+			if (layoutType == LayoutingType.ArrangeChildren && Children.Count > 0) {
+				Rectangle cb = ClientRectangle;
+
+				int tabSpace = tabWidth + leftSlope;
+				int computedSpacing = Math.Min(tabSpace, (cb.Width - rightSlope - leftSlope) / (Children.Count (c => c.Visible == true)));
+
 				TabItem[] tabItms = Children.Cast<TabItem>().OrderBy (t=>t.ViewIndex).ToArray();
+				int curOffset = leftSlope;
+
 				for (int i = 0; i < tabItms.Length; i++) {
 					if (!tabItms [i].Visible)
 						continue;
+//					if (tabSizeHasChanged) {
+						tabItms [i].NotifyValueChanged ("TabHeight", tabHeight);
+						tabItms [i].NotifyValueChanged ("TabWidth", tabWidth);
+//						tabSizeHasChanged = false;
+//					}
 					if (!tabItms [i].HoldCursor)
 						tabItms [i].TabOffset = curOffset;
 					if (Orientation == Orientation.Horizontal) {
-						if (tabItms [i].TabTitle.RegisteredLayoutings.HasFlag (LayoutingType.Width))
-							return false;
-						curOffset += tabItms [i].TabTitle.Slot.Width + Spacing;
-					} else {
-						if (tabItms [i].TabTitle.RegisteredLayoutings.HasFlag (LayoutingType.Height))
-							return false;
-						curOffset += tabItms [i].TabTitle.Slot.Height + Spacing;
-					}
+						curOffset += computedSpacing;
+					} else
+						curOffset += computedSpacing;					
 				}
 
 				//if no layouting remains in queue for item, registre for redraw
@@ -163,6 +235,21 @@ namespace Crow
 
 			return base.UpdateLayout(layoutType);
 		}
+//		public override void OnLayoutChanges (LayoutingType layoutType)
+//		{
+//			if (_orientation == Orientation.Horizontal) {
+//				if (layoutType == LayoutingType.Width) {
+//					computedSpacingOk = false;
+//					RegisterForLayouting (LayoutingType.ArrangeChildren);
+//				}
+//			} else if (layoutType == LayoutingType.Height) {
+//				computedSpacingOk = false;
+//				RegisterForLayouting (LayoutingType.ArrangeChildren);
+//			}
+//			
+//			base.OnLayoutChanges (layoutType);
+//		}
+
 		protected override void onDraw (Context gr)
 		{
 			Rectangle rBack = new Rectangle (Slot.Size);
@@ -182,47 +269,35 @@ namespace Crow
 			childrenRWLock.EnterReadLock ();
 
 			TabItem[] tabItms = Children.Cast<TabItem> ().OrderBy (t => t.ViewIndex).ToArray ();
-			for (int i = 0; i < tabItms.Length; i++) {
-				if (tabItms [i] == Children [SelectedTab])
-					continue;
-				tabItms [i].Paint (ref gr);
-			}
 
+			int selTabViewIdx = -1;
 			if (SelectedTab < tabItms.Length && SelectedTab >= 0)
-				Children [SelectedTab].Paint (ref gr);
+				selTabViewIdx = (Children [SelectedTab] as TabItem).ViewIndex;
 
 			childrenRWLock.ExitReadLock ();
+
+			int i = 0;
+			while (i < selTabViewIdx) {
+				tabItms [i].Paint (ref gr);
+				i++;
+			}
+			i = tabItms.Length - 1;
+			while (i > selTabViewIdx) {
+				tabItms [i].Paint (ref gr);
+				i--;
+			}
+
+			if (selTabViewIdx >= 0)
+				tabItms [selTabViewIdx].Paint (ref gr);
 		
 			gr.Restore ();
 		}
 
-		#region Mouse handling
-		public override void checkHoverWidget (MouseMoveEventArgs e)
+		void Ti_TabTitle_LayoutChanged (object sender, LayoutingEventArgs e)
 		{
-			if (IFace.HoverWidget != this) {
-				IFace.HoverWidget = this;
-				onMouseEnter (this, e);
-			}
-
-			if (SelectedTab > Children.Count - 1)
-				return;
-
-			if (((Children[SelectedTab] as TabItem).Content.Parent as GraphicObject).MouseIsIn(e.Position))
-			{
-				Children[SelectedTab].checkHoverWidget (e);
-				return;
-			}
-			TabItem[] tabItms = Children.Cast<TabItem>().OrderBy (t=>t.ViewIndex).ToArray();
-			for (int i = tabItms.Length - 1; i >= 0; i--) {				
-				if (tabItms [i].TabTitle.MouseIsIn(e.Position))
-				{
-					tabItms [i].checkHoverWidget (e);
-					return;
-				}
-			}
+			if (e.LayoutType == LayoutingType.X)				
+				RegisterForLayouting (LayoutingType.ArrangeChildren);			
 		}
-		#endregion
-
 		void Ti_MouseDown (object sender, MouseButtonEventArgs e)
 		{
 			SelectedTab = Children.IndexOf (sender as GraphicObject);
