@@ -81,11 +81,15 @@ Spinner {
 }
 TabView {
 	CacheEnabled = "false";
+	AllowDrop = "true";
 }
 TabItem {
 	Caption = "TabItem";
 	Focusable = "true";
-	CacheEnabled = "false";
+	CacheEnabled = "true";
+	//MouseEnter = "{Background = Cobalt;Foreground=White;}";
+	//MouseLeave = "{Foreground=LightGray;Background=Jet;}";
+	AllowDrag = "true";
 }
 TextBox {
 	Background = "White";

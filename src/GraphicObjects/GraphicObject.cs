@@ -1266,6 +1266,10 @@ namespace Crow
 			//e.DropTarget.onDragLeave (this, e);//raise drag leave in target
 			Debug.WriteLine(this.ToString() + " : DROP => " + e.ToString());
 		}
+		public virtual void OnDragMove(object sender, MouseMoveEventArgs e, DragDropEventArgs dde)
+		{
+
+		}
 		public bool IsDropTarget {
 			get { return IFace.DragAndDropOperation?.DropTarget == this; }
 		}
@@ -1709,6 +1713,11 @@ namespace Crow
 				}
 			}
 
+			//dont bubble event if dragged, mouse move is routed directely from iface
+			//to let other control behind have mouse entering
+			if (isDragged)
+				return;
+			
 			//bubble event to the top
 			GraphicObject p = focusParent;
 			if (p != null)
