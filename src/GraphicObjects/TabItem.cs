@@ -153,6 +153,79 @@ namespace Crow
 			gr.Restore ();
 		}
 
+		Point dragStartPoint;
+		int dragThreshold = 16;
+		int dis = 128;
+		internal TabView savedParent = null;
+
+		void makeFloating (TabView tv) {			
+			lock (IFace.UpdateMutex) {				
+				ImageSurface di = new ImageSurface (Format.Argb32, dis, dis);
+				IFace.DragImageHeight = dis;
+				IFace.DragImageWidth = dis;
+				using (Context ctx = new Context (di)) {
+					double div = Math.Max (LastPaintedSlot.Width, LastPaintedSlot.Height);
+					double s = (double)dis / div;
+					ctx.Scale (s, s);
+					if (bmp == null)
+						this.onDraw (ctx);
+					else {
+						if (LastPaintedSlot.Width>LastPaintedSlot.Height)
+							ctx.SetSourceSurface (bmp, 0, (LastPaintedSlot.Width-LastPaintedSlot.Height)/2);
+						else
+							ctx.SetSourceSurface (bmp, (LastPaintedSlot.Height-LastPaintedSlot.Width)/2, 0);
+
+						ctx.Paint ();
+					}
+				}
+				IFace.DragImage = di;
+			}
+			tv.RemoveChild (this);
+			savedParent = tv;
+		}
+
+		public override ILayoutable Parent {
+			get {
+				return base.Parent;
+			}
+			set {
+				base.Parent = value;
+				if (value != null) {
+					dragStartPoint = IFace.Mouse.Position;
+					savedParent = value as TabView;
+				}
+			}
+		}
+		protected override void onStartDrag (object sender, DragDropEventArgs e)
+		{
+			base.onStartDrag (sender, e);
+
+			dragStartPoint = IFace.Mouse.Position;
+		}
+		protected override void onEndDrag (object sender, DragDropEventArgs e)
+		{
+			base.onEndDrag (sender, e);
+
+			if (Parent != null)
+				return;
+
+			savedParent.AddChild (this);
+
+			IFace.ClearDragImage ();
+		}
+		protected override void onDrop (object sender, DragDropEventArgs e)
+		{
+			base.onDrop (sender, e);
+			if (Parent != null)
+				return;
+			TabView tv = e.DropTarget as TabView;
+			if (tv == null)
+				return;
+
+			IFace.ClearDragImage ();
+
+			tv.AddChild (this);
+		}
 		#region Mouse Handling
 		public bool HoldCursor = false;
 		public override bool PointIsIn (ref Point m)
@@ -180,17 +253,28 @@ namespace Crow
 		{
 			base.onMouseMove (sender, e);
 
+			if (Parent == null)
+				return;
+			
 			if (!(HasFocus && HoldCursor))
 				return;
+
 			TabView tv = Parent as TabView;
+			if (Math.Abs (e.Position.Y - dragStartPoint.Y) > dragThreshold ||
+				Math.Abs (e.Position.X - dragStartPoint.X) > dragThreshold) {
+				makeFloating (tv);
+				return;
+			}
+
 			Rectangle cb = ClientRectangle;
 
 			int tmp = TabOffset + e.XDelta;
-			if (tmp < tview.LeftSlope)
+			if (tmp < tview.LeftSlope) {				
 				TabOffset = tview.LeftSlope;
-			else if (tmp > cb.Width - tv.RightSlope - tv.TabWidth)
+			} else if (tmp > cb.Width - tv.RightSlope - tv.TabWidth) {
 				TabOffset = cb.Width - tv.RightSlope - tv.TabWidth;
-			else{
+			}else{
+				dragStartPoint.X = e.Position.X;
 				TabItem[] tabItms = tv.Children.Cast<TabItem>().OrderBy (t=>t.ViewIndex).ToArray();
 				if (ViewIndex > 0 && e.XDelta < 0) {
 					TabItem previous = tabItms [ViewIndex - 1];

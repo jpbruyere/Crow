@@ -1,10 +1,11 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<VerticalStack Height="90%" Width="95%">
+<Group Height="90%" Width="95%">
+<VerticalStack >
 	<HorizontalStack Height="Fit">
 		<Label Text="Selected Tab:"/>
 		<Label Text="{../../tabview1.SelectedTab}"/>
 	</HorizontalStack>
-	<TabView Name="tabview1" Background="Onyx" Orientation="Horizontal" Margin="20">
+	<TabView Name="tabview1" Background="Onyx" Orientation="Horizontal">
 		<TabItem Name="TabItem1" Caption="tab item 1" Background="Onyx">
 			<VerticalStack Margin="20">
 				<CheckBox/>
@@ -33,3 +34,4 @@
 	<Button Background="vgradient|0:DimGray|1:Black" HorizontalAlignment="Right"
 		Caption="Add new tab" Width="Fit" Height="30" MouseDown="onAddTabButClick"/>
 </VerticalStack>
+</Group>

@@ -217,6 +217,15 @@ namespace Crow
 		public List<CrowThread> CrowThreads = new List<CrowThread>();//used to monitor thread finished
 
 		public DragDropEventArgs DragAndDropOperation = null;
+		public Surface DragImage = null;
+		public int DragImageWidth, DragImageHeight, DragImageX, DragImageY;
+		public void ClearDragImage () {
+			lock (UpdateMutex) {				
+				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));				
+				DragImage.Dispose();
+				DragImage = null;
+			}			
+		}
 		#endregion
 
 		#region Private Fields
@@ -625,12 +634,15 @@ namespace Crow
 			#if MEASURE_TIME
 			drawingMeasure.StartCycle();
 			#endif
+			if (DragImage != null)
+				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
 			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
 				using (ctx = new Context (surf)){
 					if (!clipping.IsEmpty) {
 
 						for (int i = 0; i < clipping.NumRectangles; i++)
 							ctx.Rectangle(clipping.GetRectangle(i));
+						
 						ctx.ClipPreserve();
 						ctx.Operator = Operator.Clear;
 						ctx.Fill();
@@ -646,6 +658,22 @@ namespace Crow
 							ctx.Save ();
 							p.Paint (ref ctx);
 							ctx.Restore ();
+						}
+
+						if (DragAndDropOperation != null) {
+							if (DragImage != null) {
+								DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
+								DragImageX = Mouse.X - DragImageWidth / 2;
+								DragImageY = Mouse.Y - DragImageHeight / 2;
+								ctx.Save ();
+								ctx.ResetClip ();
+								ctx.SetSourceSurface (DragImage, DragImageX, DragImageY);
+								ctx.PaintWithAlpha (0.8);
+								ctx.Restore ();
+								DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
+								IsDirty = true;
+								//Console.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
+							}
 						}
 
 						#if DEBUG_CLIP_RECTANGLE
@@ -846,12 +874,15 @@ namespace Crow
 			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
 			e.Mouse = Mouse;
 
-			if (ActiveWidget != null&& DragAndDropOperation == null) {
+			if (ActiveWidget != null && DragAndDropOperation == null) {
 				//TODO, ensure object is still in the graphic tree
 				//send move evt even if mouse move outside bounds
 				ActiveWidget.onMouseMove (this, e);
 				return true;
 			}
+
+			if (DragAndDropOperation != null)//drag source cant have hover event, so move has to be handle here
+				DragAndDropOperation.DragSource.onMouseMove (this, e);			
 
 			if (HoverWidget != null) {
 				resetTooltip ();

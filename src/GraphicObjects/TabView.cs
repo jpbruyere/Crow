@@ -205,25 +205,30 @@ namespace Crow
 				Rectangle cb = ClientRectangle;
 
 				int tabSpace = tabWidth + leftSlope;
-				int computedSpacing = Math.Min(tabSpace, (cb.Width - rightSlope - leftSlope) / (Children.Count (c => c.Visible == true)));
+				int tc = Children.Count (c => c.Visible == true)-1;
+				if (tc > 0)
+					tabSpace = Math.Min(tabSpace, (cb.Width-tabSpace-rightSlope) / tc);
 
+				//Console.WriteLine ("tabspace: {0} cb:{1}", tabSpace, cb);
+
+				childrenRWLock.EnterReadLock();
 				TabItem[] tabItms = Children.Cast<TabItem>().OrderBy (t=>t.ViewIndex).ToArray();
+				childrenRWLock.ExitReadLock();
 				int curOffset = leftSlope;
 
 				for (int i = 0; i < tabItms.Length; i++) {
 					if (!tabItms [i].Visible)
 						continue;
-//					if (tabSizeHasChanged) {
-						tabItms [i].NotifyValueChanged ("TabHeight", tabHeight);
-						tabItms [i].NotifyValueChanged ("TabWidth", tabWidth);
-//						tabSizeHasChanged = false;
-//					}
-					if (!tabItms [i].HoldCursor)
+					tabItms [i].NotifyValueChanged ("TabHeight", tabHeight);
+					tabItms [i].NotifyValueChanged ("TabWidth", tabWidth);
+					if (!tabItms [i].HoldCursor) {
 						tabItms [i].TabOffset = curOffset;
+						//Console.WriteLine ("offset: {0}=>{1}", tabItms [i].Name, tabItms [i].TabOffset);
+					}
 					if (Orientation == Orientation.Horizontal) {
-						curOffset += computedSpacing;
+						curOffset += tabSpace;
 					} else
-						curOffset += computedSpacing;					
+						curOffset += tabSpace;					
 				}
 
 				//if no layouting remains in queue for item, registre for redraw
@@ -235,20 +240,16 @@ namespace Crow
 
 			return base.UpdateLayout(layoutType);
 		}
-//		public override void OnLayoutChanges (LayoutingType layoutType)
-//		{
-//			if (_orientation == Orientation.Horizontal) {
-//				if (layoutType == LayoutingType.Width) {
-//					computedSpacingOk = false;
-//					RegisterForLayouting (LayoutingType.ArrangeChildren);
-//				}
-//			} else if (layoutType == LayoutingType.Height) {
-//				computedSpacingOk = false;
-//				RegisterForLayouting (LayoutingType.ArrangeChildren);
-//			}
-//			
-//			base.OnLayoutChanges (layoutType);
-//		}
+		public override void OnLayoutChanges (LayoutingType layoutType)
+		{
+			if (_orientation == Orientation.Horizontal) {
+				if (layoutType == LayoutingType.Width)
+					RegisterForLayouting (LayoutingType.ArrangeChildren);				
+			} else if (layoutType == LayoutingType.Height)
+				RegisterForLayouting (LayoutingType.ArrangeChildren);			
+			
+			base.OnLayoutChanges (layoutType);
+		}
 
 		protected override void onDraw (Context gr)
 		{
@@ -268,7 +269,8 @@ namespace Crow
 
 			childrenRWLock.EnterReadLock ();
 
-			TabItem[] tabItms = Children.Cast<TabItem> ().OrderBy (t => t.ViewIndex).ToArray ();
+			TabItem[] tabItms = Children.Where(tt=>tt.Visible).Cast<TabItem> ().
+				OrderBy (t => t.ViewIndex).ToArray ();
 
 			int selTabViewIdx = -1;
 			if (SelectedTab < tabItms.Length && SelectedTab >= 0)
@@ -291,6 +293,28 @@ namespace Crow
 				tabItms [selTabViewIdx].Paint (ref gr);
 		
 			gr.Restore ();
+		}
+
+		protected override void onDragEnter (object sender, DragDropEventArgs e)
+		{
+			base.onDragEnter (sender, e);
+
+			TabItem ti = e.DragSource as TabItem;
+			if (ti == null)
+				return;
+			if (ti.Parent != null || ti.savedParent == this)
+				return;
+
+			this.AddChild (ti);
+
+			Point p = ScreenPointToLocal (IFace.Mouse.Position) - Margin;
+
+			p.X = Math.Max (leftSlope, p.X);
+			p.X = Math.Min (ClientRectangle.Width - rightSlope - tabWidth, p.X);
+			ti.TabOffset = p.X;
+
+			IFace.ClearDragImage ();
+
 		}
 
 		void Ti_TabTitle_LayoutChanged (object sender, LayoutingEventArgs e)
