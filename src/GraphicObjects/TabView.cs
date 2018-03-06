@@ -41,7 +41,7 @@ namespace Crow
 		#endregion
 
 		#region Private fields
-		int spacing;
+		int adjustedTab = -1;
 		int leftSlope;
 		int rightSlope;
 		Measure tabHeight, tabWidth;
@@ -111,12 +111,12 @@ namespace Crow
 		}
 		[DefaultValue("120")]
 		public Measure TabWidth {
-			get { return tabWidth; }
+			get { return adjustedTab > 0 ? (Measure)adjustedTab : tabWidth; }
 			set {
 				if (tabWidth == value)
 					return;
 				tabWidth = value;
-				NotifyValueChanged ("TabWidth", tabWidth);
+				NotifyValueChanged ("TabWidth", TabWidth);
 //
 //				childrenRWLock.EnterReadLock ();
 //				foreach (GraphicObject ti in Children) { 
@@ -205,11 +205,17 @@ namespace Crow
 				Rectangle cb = ClientRectangle;
 
 				int tabSpace = tabWidth + leftSlope;
-				int tc = Children.Count (c => c.Visible == true)-1;
-				if (tc > 0)
-					tabSpace = Math.Min(tabSpace, (cb.Width-tabSpace-rightSlope) / tc);
+				int tc = Children.Count (c => c.Visible == true);
 
-				//Console.WriteLine ("tabspace: {0} cb:{1}", tabSpace, cb);
+				if (tc > 0)
+					tabSpace = Math.Min(tabSpace, (cb.Width-rightSlope) / tc);
+
+				if (tabSpace < tabWidth + leftSlope)
+					adjustedTab = tabSpace - leftSlope;
+				else
+					adjustedTab = -1;
+
+				Console.WriteLine ("tabspace: {0} tw:{1}", tabSpace, tabWidth);
 
 				childrenRWLock.EnterReadLock();
 				TabItem[] tabItms = Children.Cast<TabItem>().OrderBy (t=>t.ViewIndex).ToArray();
@@ -220,7 +226,7 @@ namespace Crow
 					if (!tabItms [i].Visible)
 						continue;
 					tabItms [i].NotifyValueChanged ("TabHeight", tabHeight);
-					tabItms [i].NotifyValueChanged ("TabWidth", tabWidth);
+					tabItms [i].NotifyValueChanged ("TabWidth", TabWidth);
 					if (!tabItms [i].HoldCursor) {
 						tabItms [i].TabOffset = curOffset;
 						//Console.WriteLine ("offset: {0}=>{1}", tabItms [i].Name, tabItms [i].TabOffset);
@@ -310,7 +316,7 @@ namespace Crow
 			Point p = ScreenPointToLocal (IFace.Mouse.Position) - Margin;
 
 			p.X = Math.Max (leftSlope, p.X);
-			p.X = Math.Min (ClientRectangle.Width - rightSlope - tabWidth, p.X);
+			p.X = Math.Min (ClientRectangle.Width - rightSlope - TabWidth, p.X);
 			ti.TabOffset = p.X;
 
 			IFace.ClearDragImage ();
