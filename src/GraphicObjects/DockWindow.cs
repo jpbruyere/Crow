@@ -39,7 +39,6 @@ namespace Crow
 		bool isDocked = false;
 		Alignment docking = Alignment.Undefined;
 
-		Point lastMousePos;	//last known mouse pos in this control
 		Point undockingMousePosOrig; //mouse pos when docking was donne, use for undocking on mouse move
 		Rectangle savedSlot;	//last undocked slot recalled when view is undocked
 		bool wasResizable;
@@ -89,13 +88,14 @@ namespace Crow
 
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
-			lastMousePos = e.Position;
+//			if (this.HasFocus && e.Mouse.IsButtonDown (MouseButton.Left) && IsDocked) {
+//				if (Math.Abs (e.Position.X - undockingMousePosOrig.X) > 10 ||
+//				    Math.Abs (e.Position.X - undockingMousePosOrig.X) > 10)
+//					Undock ();
+//			}
 
-			if (this.HasFocus && e.Mouse.IsButtonDown (MouseButton.Left) && IsDocked) {
-				if (Math.Abs (e.Position.X - undockingMousePosOrig.X) > 10 ||
-				    Math.Abs (e.Position.X - undockingMousePosOrig.X) > 10)
-					Undock ();
-			}
+			if (this.HasFocus && e.Mouse.IsButtonDown (MouseButton.Left) && IsDocked)
+				CheckUndock (e.Position);
 
 			base.onMouseMove (sender, e);
 		}
@@ -107,6 +107,8 @@ namespace Crow
 				undockingMousePosOrig = e.Position;
 		}
 		public bool CheckUndock (Point mousePos) {
+			if (DockingPosition == Alignment.Center)
+				return false;
 			if (Math.Abs (mousePos.X - undockingMousePosOrig.X) < undockThreshold ||
 			    Math.Abs (mousePos.X - undockingMousePosOrig.X) < undockThreshold)
 				return false;
@@ -143,10 +145,8 @@ namespace Crow
 				Resizable = wasResizable;
 			}
 		}
+
 		void dock (DockStack target){
-			if (RootDock.CenterDockedObj is DockWindow && DockingPosition == Alignment.Center)
-				return;
-			
 			lock (IFace.UpdateMutex) {
 				IsDocked = true;
 				//undockingMousePosOrig = lastMousePos;
@@ -156,16 +156,22 @@ namespace Crow
 				LastSlots = LastPaintedSlot = Slot = default(Rectangle);
 				Left = Top = 0;
 
-				RootDock.RemoveChild (this);
+				Group g = Parent as Group;
+				g.RemoveChild (this);
 
 				target.Dock (this);
 			}
 		}
+
 		protected override void close ()
 		{
 			if (isDocked)
 				Undock ();
 			base.close ();
+		}
+
+		public string ExportWinConfigs () {			
+			return string.Format ("{0};{1};{2}", this.Name, DockingPosition, savedSlot);
 		}
 	}
 }

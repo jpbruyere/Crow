@@ -29,16 +29,8 @@ using Crow.IML;
 namespace Crow
 {
 	public class DockStack : GenericStack
-	{		
-		int dockingDiv = 6;
-		GraphicObject subStack = null;
-
+	{
 		Docker rootDock { get { return LogicalParent as Docker; }}
-
-		public GraphicObject SubStack {
-			get { return subStack;}
-			set{ subStack=value; }
-		}
 
 		#region CTor
 		public DockStack ()	{}
@@ -77,40 +69,93 @@ namespace Crow
 			}
 			return Slot.ContainsOrIsEqual(m);
 		}
+
+//		public override void OnLayoutChanges (LayoutingType layoutType)
+//		{
+//			base.OnLayoutChanges (layoutType);
+//
+//			if ((layoutType & LayoutingType.Sizing) > 0)
+//				computeRects();			
+//		}
+
+		Rectangle rIn = default(Rectangle);
+		double dockThresh = 0.2;
+		GraphicObject focusedChild;
+		internal GraphicObject stretchedChild;
+
+		void getFocusedChild (Point lm) {
+			Rectangle cb = ClientRectangle;
+
+			childrenRWLock.EnterReadLock ();
+			foreach (GraphicObject c in Children) {
+				Rectangle bounds = c.Slot + cb.Position;
+				if (!bounds.ContainsOrIsEqual (lm))
+					continue;
+				rIn = bounds;
+				focusedChild = c;
+				break;
+			}
+			childrenRWLock.ExitReadLock ();			
+		}
+
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			if (IsDropTarget) {				
 				DockWindow dw = IFace.DragAndDropOperation.DragSource as DockWindow;
 				if (dw.IsDocked) {
-					if (!dw.CheckUndock (e.Position)) {
+					//if (!dw.CheckUndock (e.Position)) {
 						base.onMouseMove (sender, e);
 						return;
-					}						
+					//}						
 				}
-				Point lm = ScreenPointToLocal (e.Position);
-
-				Rectangle r = ClientRectangle;
-				int vTreshold = r.Height / dockingDiv;
-				int hTreshold = r.Width / dockingDiv;
 
 				Alignment curDockPos = dw.DockingPosition;
+				dw.DockingPosition = Alignment.Undefined;
 
-				if (lm.X < hTreshold)
-					dw.DockingPosition = Alignment.Left;
-				else if (lm.X > r.Right - hTreshold)
-					dw.DockingPosition = Alignment.Right;
-				else if (lm.Y < vTreshold)
-					dw.DockingPosition = Alignment.Top;
-				else if (lm.Y > r.Bottom - vTreshold)
-					dw.DockingPosition = Alignment.Bottom;
-				else if (this.Children.Contains (rootDock.CenterDockedObj) && !(rootDock.CenterDockedObj is DockWindow)) {
-					r.Inflate (-r.Width / 3, -r.Height / 3);
-					if (r.ContainsOrIsEqual (lm))
+				Rectangle cb = ClientRectangle;
+				Point lm = ScreenPointToLocal (e.Position);
+
+				if (Children.Count == 0) {
+					Rectangle r = cb;
+					r.Inflate (r.Width / -5, r.Height / -5);
+					if (r.ContainsOrIsEqual(lm))
 						dw.DockingPosition = Alignment.Center;
-					else
-						dw.DockingPosition = Alignment.Undefined;
-				} else
-					dw.DockingPosition = Alignment.Undefined;
+				} else {
+					rIn = cb;
+
+					if (Orientation == Orientation.Horizontal || Children.Count == 1) {
+						if (lm.Y > cb.Top + cb.Height / 3 && lm.Y < cb.Bottom - cb.Height / 3) {
+							if (lm.X < cb.Left + cb.Width / 3)
+								dw.DockingPosition = Alignment.Left;
+							else if (lm.X > cb.Right - cb.Width / 3)
+								dw.DockingPosition = Alignment.Right;							
+						} else {
+							getFocusedChild (lm);
+							if (focusedChild != null) {
+								if (lm.Y < rIn.Top + rIn.Height / 3)
+									dw.DockingPosition = Alignment.Top;
+								else if (lm.Y > rIn.Bottom - rIn.Height / 3)
+									dw.DockingPosition = Alignment.Bottom;										
+							}
+						}
+					}
+					if (Orientation == Orientation.Vertical || Children.Count == 1) {
+						if (lm.X > cb.Left + cb.Width / 3 && lm.X < cb.Right - cb.Width / 3) {
+							if (lm.Y < cb.Top + cb.Height / 3)
+								dw.DockingPosition = Alignment.Top;
+							else if (lm.Y > cb.Bottom - cb.Height / 3)
+								dw.DockingPosition = Alignment.Bottom;							
+						} else {
+							getFocusedChild (lm);
+							if (focusedChild != null) {
+								if (lm.X < rIn.Left + rIn.Width / 3)
+									dw.DockingPosition = Alignment.Left;
+								else if (lm.X > rIn.Right - rIn.Width / 3)
+									dw.DockingPosition = Alignment.Right;										
+							}
+						}
+					}
+				}
 
 				if (curDockPos != dw.DockingPosition)
 					RegisterForGraphicUpdate ();
@@ -160,32 +205,28 @@ namespace Crow
 
 			DockWindow dw = IFace.DragAndDropOperation.DragSource as DockWindow;
 			if (!dw.IsDocked) {
-				
-				Rectangle r;
+				Rectangle cb = ClientRectangle;
+				double minDim = Math.Min (cb.Width, cb.Height);
 
-				if ((dw.DockingPosition.GetOrientation () == Orientation || SubStack == null)&&dw.DockingPosition != Alignment.Center) {
-					r = ClientRectangle;
-					Console.WriteLine ("Same rect substack=" + SubStack);
-				}else {
-					r = subStack.ClientRectangle + subStack.Slot.Position + ClientRectangle.TopLeft;
-					Console.WriteLine ("sub rect");
-				}
-				
+				Rectangle r = rIn;
+				if (Children.Count <= 1 || dw.DockingPosition.GetOrientation()==Orientation )
+					r = cb;
+
 				switch (dw.DockingPosition) {
 				case Alignment.Top:
-					gr.Rectangle (r.Left, r.Top, r.Width, r.Height / dockingDiv);
+					gr.Rectangle (r.Left, r.Top, r.Width, r.Height * dockThresh);
 					break;
 				case Alignment.Bottom:
-					gr.Rectangle (r.Left, r.Bottom - r.Height / dockingDiv, r.Width, r.Height / dockingDiv);
+					gr.Rectangle (r.Left, r.Bottom - r.Height * dockThresh, r.Width, r.Height * dockThresh);
 					break;
 				case Alignment.Left:
-					gr.Rectangle (r.Left, r.Top, r.Width / dockingDiv, r.Height);
+					gr.Rectangle (r.Left, r.Top, r.Width * dockThresh, r.Height);
 					break;
 				case Alignment.Right:
-					gr.Rectangle (r.Right - r.Width / dockingDiv, r.Top, r.Width / dockingDiv, r.Height);
+					gr.Rectangle (r.Right - r.Width * dockThresh, r.Top, r.Width * dockThresh, r.Height);
 					break;
 				case Alignment.Center:
-					r.Inflate (-Math.Min (r.Width, r.Height) / dockingDiv);
+					r.Inflate ((int)Math.Ceiling (Math.Min (r.Width, r.Height) * -0.05));
 					gr.Rectangle (r);
 					break;
 				}
@@ -197,77 +238,37 @@ namespace Crow
 			}
 			gr.Restore ();	
 		}
-
-		public void Undock (DockWindow dw){
-			int idx = Children.IndexOf(dw);
-
-			RemoveChild(dw);
-
-			if (rootDock.CenterDockedObj == dw) {				
-				rootDock.CenterDockedObj = new GraphicObject (IFace) { IsEnabled = false };
-				InsertChild (idx, rootDock.CenterDockedObj);
-				SubStack = rootDock.CenterDockedObj;
-			}else if (dw.DockingPosition == Alignment.Left || dw.DockingPosition == Alignment.Top)				
-				RemoveChild (idx);
-			else
-				RemoveChild (idx - 1);
-
-			if (Children.Count > 1)
-				return;
-
-			DockStack dsp = Parent as DockStack;
-			if (dsp == null)
-				return;
-
-			RemoveChild (0);
-			idx = dsp.Children.IndexOf (this);
-			dsp.RemoveChild (this);
-			dsp.InsertChild (idx, SubStack);
-			dsp.SubStack = SubStack;
-			return;
-		}
-		public void Dock(DockWindow dw){			
-			Rectangle r = ClientRectangle;
-
-			int vTreshold = r.Height / dockingDiv;
-			int hTreshold = r.Width / dockingDiv;
-
+			
+		public void Dock(DockWindow dw){
 			DockStack activeStack = this;
-			Console.WriteLine ("******* Dockingtack {0}", this.Name);
+
 			if (Children.Count == 1) {
-				activeStack = this;
 				Orientation = dw.DockingPosition.GetOrientation ();
-			}else if (dw.DockingPosition.GetOrientation() != Orientation) {				
-				activeStack = new DockStack (IFace);
-				int ci = Children.IndexOf (rootDock.CenterDockedObj);
-				if (ci  <0 ){
-					DockStack dsp = Parent as DockStack;
-					if (dsp != null) {
-						int idx = dsp.Children.IndexOf (this);
-						dsp.RemoveChild (this);
-						dsp.SubStack = activeStack;
-						dsp.InsertChild (idx, activeStack);
-						activeStack.SubStack = this;
-						activeStack.AddChild (this);
-					} else {
-						Docker dk = Parent as Docker;
-						dk.RemoveChild (this);
-						dk.InsertChild (0, activeStack);
-						dk.SubStack = activeStack;
-						activeStack.AddChild (this);
-						activeStack.SubStack = this;
-					}
-				}else{
-					int i = Children.IndexOf (SubStack);
-					RemoveChild (SubStack);
-					activeStack.SubStack = SubStack;
-					SubStack = activeStack;
-					InsertChild(i, activeStack);
-					activeStack.AddChild (activeStack.SubStack);
+				if (Children [0] is DockWindow) {
+					(Children [0] as DockWindow).DockingPosition = dw.DockingPosition.GetOpposite ();
 				}
+			} else if (Children.Count > 0 && dw.DockingPosition.GetOrientation () != Orientation) {
+				activeStack = new DockStack (IFace);
 				activeStack.Orientation = dw.DockingPosition.GetOrientation ();
+				activeStack.Width = focusedChild.Width;
+				activeStack.Height = focusedChild.Height;
+				int idx = Children.IndexOf (focusedChild);
+				RemoveChild (focusedChild);
+				focusedChild.Height = Measure.Stretched;
+				focusedChild.Width = Measure.Stretched;
+				InsertChild (idx, activeStack);
+				activeStack.AddChild (focusedChild);
+				activeStack.stretchedChild = focusedChild;
+				if (focusedChild is DockWindow)
+					(focusedChild as DockWindow).DockingPosition = dw.DockingPosition.GetOpposite ();
+				focusedChild = null;
 			}
-			Console.WriteLine ("Docking {0} in {1}", dw.Name, activeStack.Name);
+
+			Rectangle r = ClientRectangle;
+			int vTreshold = (int)(r.Height * dockThresh);
+			int hTreshold = (int)(r.Width * dockThresh);
+
+			Console.WriteLine ("Docking {0} as {2} in {1}", dw.Name, activeStack.Name, dw.DockingPosition);
 			switch (dw.DockingPosition) {
 			case Alignment.Top:						
 				dw.Height = vTreshold;
@@ -294,14 +295,62 @@ namespace Crow
 				activeStack.AddChild (dw);
 				break;
 			case Alignment.Center:
-				dw.Width = dw.Height = Measure.Stretched;				 
-				int i = activeStack.Children.IndexOf (rootDock.CenterDockedObj);
-				activeStack.DeleteChild (i);
-				activeStack.InsertChild (i, dw);
-				activeStack.SubStack = dw;
-				rootDock.CenterDockedObj= dw;
+				dw.Width = dw.Height = Measure.Stretched;
+				AddChild (dw);
+				stretchedChild = dw;
 				break;
 			}
+		}
+		public void Undock (DockWindow dw){
+			int idx = Children.IndexOf(dw);
+
+			RemoveChild(dw);
+
+			if (Children.Count == 0)
+				return;
+
+			if (dw.DockingPosition == Alignment.Left || dw.DockingPosition == Alignment.Top) {				
+				RemoveChild (idx);
+				if (stretchedChild == dw) {
+					stretchedChild = Children [idx];
+					stretchedChild.Width = stretchedChild.Height = Measure.Stretched;
+				}
+			} else {
+				RemoveChild (idx - 1);
+				if (stretchedChild == dw) {
+					stretchedChild = Children [idx-2];
+					stretchedChild.Width = stretchedChild.Height = Measure.Stretched;
+				}
+			}
+
+			if (Children.Count == 1) {
+				DockStack dsp = Parent as DockStack;
+				if (dsp == null) {
+					Children [0].Width = Children [0].Height = Measure.Stretched;
+					return;
+				}				
+				//remove level and move remaining obj to level above
+				GraphicObject g = Children [0];
+				RemoveChild (g);
+				idx = dsp.Children.IndexOf (this);
+				dsp.RemoveChild (this);
+				dsp.InsertChild (idx, g);
+				g.Width = this.Width;
+				g.Height = this.Height;
+				if (dsp.stretchedChild == this)
+					dsp.stretchedChild = g;
+				dsp.checkAlignments ();
+			} else
+				checkAlignments ();
+		}
+
+		internal void checkAlignments () {
+			DockWindow dw = Children[0] as DockWindow;
+			if (dw != null)
+				dw.DockingPosition = (Orientation == Orientation.Horizontal ? Alignment.Left : Alignment.Top);
+			dw = Children[Children.Count - 1] as DockWindow;
+			if (dw != null)
+				dw.DockingPosition = (Orientation == Orientation.Horizontal ? Alignment.Right : Alignment.Bottom);
 		}
 	}
 }

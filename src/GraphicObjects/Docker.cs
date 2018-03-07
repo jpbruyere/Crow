@@ -44,8 +44,6 @@ namespace Crow
 
 		int dockingThreshold;
 
-		public DockStack SubStack = null;
-		public GraphicObject CenterDockedObj = null;
 
 		[XmlAttributeAttribute][DefaultValue(10)]
 		public virtual int DockingThreshold {
@@ -58,41 +56,28 @@ namespace Crow
 			}
 		}
 
-		protected override void onInitialized (object sender, EventArgs e)
-		{
-			base.onInitialized (sender, e);
-			CenterDockedObj = new GraphicObject (IFace) { IsEnabled = false };
-		}
-
 		public override void AddChild (GraphicObject g)
 		{				
 			base.AddChild (g);
 			g.LogicalParent = this;
-		}
-		public override void RemoveChild (GraphicObject child)
-		{
-//			lock (IFace.UpdateMutex) {
-//				RegisterClip (ScreenCoordinates (LastPaintedSlot));
-//			}
-			base.RemoveChild (child);
 		}
 
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{			
 			if (IFace.DragAndDropOperation?.DragSource as DockWindow != null) {
 				DockWindow dw = IFace.DragAndDropOperation.DragSource as DockWindow;
-				if (!dw.IsDocked)
-					dw.MoveAndResize (e.XDelta, e.YDelta);
-				if (SubStack == null) {
-					DockStack ds = new DockStack (IFace);
-					SubStack = ds;
-					InsertChild (0, SubStack);
-					ds.LogicalParent = this;
-					ds.AddChild (CenterDockedObj);
-					ds.SubStack = CenterDockedObj;
+				if (!dw.IsDocked) {
+					Rectangle r = dw.ScreenCoordinates (dw.Slot);
+					Point p = ScreenPointToLocal (e.Position);
+					dw.Left = p.X - r.Width / 2;
+					dw.Top = p.Y - r.Height / 2;
 				}
 			}
 			base.onMouseMove (sender, e);
+		}
+
+		public string ExportWinConfigs () {
+			return "";	
 		}
 	}
 }

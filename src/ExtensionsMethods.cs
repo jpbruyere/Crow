@@ -109,6 +109,27 @@ namespace Crow
 		public static Orientation GetOrientation(this Alignment a){
 			return (a==Alignment.Left) ||(a==Alignment.Right) ? Orientation.Horizontal : Orientation.Vertical;
 		}
+		public static Alignment GetOpposite(this Alignment a){
+			switch (a) {
+			case Alignment.Left:
+				return Alignment.Right;
+			case Alignment.Right:
+				return Alignment.Left;
+			case Alignment.Top:
+				return Alignment.Bottom;
+			case Alignment.Bottom:
+				return Alignment.Top;
+			case Alignment.TopLeft:
+				return Alignment.BottomRight;
+			case Alignment.TopRight:
+				return Alignment.BottomLeft;
+			case Alignment.BottomLeft:
+				return Alignment.TopRight;
+			case Alignment.BottomRight:
+				return Alignment.TopLeft;			
+			}
+			return Alignment.Center;
+		}
 		public static void Raise(this EventHandler handler, object sender, EventArgs e)
 		{
 			if(handler != null)

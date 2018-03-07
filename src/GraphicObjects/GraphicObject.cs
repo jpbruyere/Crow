@@ -604,23 +604,24 @@ namespace Crow
 					if (value < MinimumSize.Width || (value > MaximumSize.Width && MaximumSize.Width > 0))
 						return;
 				}
-				Measure lastWP = WidthPolicy;
+				Measure old = width;
 				width = value;
 				NotifyValueChanged ("Width", width);
-				if (WidthPolicy != lastWP) {
-					NotifyValueChanged ("WidthPolicy", WidthPolicy);
+				if (width == Measure.Stretched || old == Measure.Stretched) {
+					//NotifyValueChanged ("WidthPolicy", width.Policy);
 					//contentSize in Stacks are only update on childLayoutChange, and the single stretched
 					//child of the stack is not counted in contentSize, so when changing size policy of a child
 					//we should adapt contentSize
 					//TODO:check case when child become stretched, and another stretched item already exists.
-					if (parent is GenericStack) {//TODO:check if I should test Group instead
-						if ((parent as GenericStack).Orientation == Orientation.Horizontal) {
-							if (lastWP == Measure.Fit)
-								(parent as GenericStack).contentSize.Width -= this.LastSlots.Width;
+					GenericStack gs = Parent as GenericStack;
+					if (gs != null){ //TODO:check if I should test Group instead
+						if (gs.Orientation == Orientation.Horizontal) {
+							if (width == Measure.Stretched)
+								gs.contentSize.Width -= this.LastSlots.Width;
 							else
-								(parent as GenericStack).contentSize.Width += this.LastSlots.Width;
+								gs.contentSize.Width += this.LastSlots.Width;
 						}
-					}
+					}							
 				}
 
 				this.RegisterForLayouting (LayoutingType.Width);
@@ -644,17 +645,18 @@ namespace Crow
 					if (value < MinimumSize.Height || (value > MaximumSize.Height && MaximumSize.Height > 0))
 						return;
 				}
-				Measure lastHP = HeightPolicy;
+				Measure old = height;
 				height = value;
 				NotifyValueChanged ("Height", height);
-				if (HeightPolicy != lastHP) {
-					NotifyValueChanged ("HeightPolicy", HeightPolicy);
-					if (parent is GenericStack) {
-						if ((parent as GenericStack).Orientation == Orientation.Vertical) {
-							if (lastHP == Measure.Fit)
-								(parent as GenericStack).contentSize.Height -= this.LastSlots.Height;
+				if (height == Measure.Stretched || old == Measure.Stretched) {
+					//NotifyValueChanged ("HeightPolicy", HeightPolicy);
+					GenericStack gs = Parent as GenericStack;
+					if (gs != null){ //TODO:check if I should test Group instead
+						if (gs.Orientation == Orientation.Vertical) {
+							if (height == Measure.Stretched)
+								gs.contentSize.Height -= this.LastSlots.Height;
 							else
-								(parent as GenericStack).contentSize.Height += this.LastSlots.Height;
+								gs.contentSize.Height += this.LastSlots.Height;
 						}
 					}
 				}
@@ -663,13 +665,13 @@ namespace Crow
 			}
 		}
 		/// <summary>
-		/// Used for binding on dimensions, this property will never hold fixed size, but instead only
+		/// Was Used for binding on dimensions, this property will never hold fixed size, but instead only
 		/// Fit or Stretched, **with inherited state implementation, it is not longer used in binding**
 		/// </summary>
 		[XmlIgnore]public virtual Measure WidthPolicy { get {
 				return Width.IsFit ? Measure.Fit : Measure.Stretched; } }
 		/// <summary>
-		/// Used for binding on dimensions, this property will never hold fixed size, but instead only
+		/// Was Used for binding on dimensions, this property will never hold fixed size, but instead only
 		/// Fit or Stretched, **with inherited state implementation, it is not longer used in binding**
 		/// </summary>
 		[XmlIgnore]public virtual Measure HeightPolicy { get {
