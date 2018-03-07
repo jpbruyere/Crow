@@ -176,6 +176,7 @@
     <EmbeddedResource Include="ui\DockWindows\winEditor.crow" />
     <EmbeddedResource Include="ui\DockWindows\winErrors.crow" />
     <EmbeddedResource Include="ui\DockWindows\winSolution.crow" />
+    <EmbeddedResource Include="ui\DockWindows\winProperties.crow" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">

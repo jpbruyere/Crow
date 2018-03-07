@@ -41,7 +41,7 @@ namespace Crow.Coding
 		public Command CMDNew, CMDOpen, CMDSave, CMDSaveAs, CMDQuit,
 		CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp,
 		CMDAbout, CMDOptions,
-		CMDViewGTExp, CMDViewProps, CMDViewProj, CMDViewProjProps, CMDViewErrors, CMDViewSolution,
+		CMDViewGTExp, CMDViewProps, CMDViewProj, CMDViewProjProps, CMDViewErrors, CMDViewSolution, CMDViewEditor, CMDViewProperties,
 		CMDCompile;
 
 		void initCommands () {
@@ -62,6 +62,10 @@ namespace Crow.Coding
 			{ Caption = "Errors pane"};
 			CMDViewSolution = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winSolution.crow")))
 			{ Caption = "Solution Tree"};
+			CMDViewEditor = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winEditor.crow")))
+			{ Caption = "Editor Pane"};
+			CMDViewProperties = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winProperties.crow")))
+			{ Caption = "Properties"};
 
 			CMDViewGTExp = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.GTreeExplorer.crow"))) { Caption = "Graphic Tree Explorer"};
 			CMDViewProps = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.MemberView.crow"))) { Caption = "Properties View"};
@@ -123,6 +127,10 @@ namespace Crow.Coding
 
 			instFileDlg = Instantiator.CreateFromImlFragment
 				(MainIFace, "<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}' SearchPattern='*.sln' OkClicked='onFileOpen'/>");
+
+			DockWindow dw = loadDockWindow ("#Crow.Coding.ui.DockWindows.winEditor.crow");
+			dw.DockingPosition = Alignment.Center;
+			dw.Dock (mainDock.Children [0] as DockStack);
 		}
 
 		void loadProjProps () {
@@ -207,19 +215,20 @@ namespace Crow.Coding
 //				loadWindow ("#Crow.Coding.ui.CSProjExplorer.crow");
 //			}
 		}
-		void loadDockWindow(string path){
+		DockWindow loadDockWindow(string path){
 			lock (MainIFace.UpdateMutex) {
-				try {
-					GraphicObject g = MainIFace.FindByName (path);
-					if (g != null)
-						return;
-					g = MainIFace.Load (path);
-					mainDock.AddChild (g);
-					g.Name = path;
-					g.DataSource = CurrentSolution;
-				} catch (Exception ex) {
-					System.Diagnostics.Debug.WriteLine (ex.ToString ());
+				GraphicObject g = MainIFace.FindByName (path);
+				if (g == null){
+					try {					
+							g = MainIFace.Load (path);
+							mainDock.AddChild (g);
+							g.Name = path;
+							g.DataSource = CurrentSolution;
+					} catch (Exception ex) {
+						System.Diagnostics.Debug.WriteLine (ex.ToString ());
+					}
 				}
+				return g as DockWindow;
 			}
 		}
 		void loadWindow(string path, object dataSource = null){

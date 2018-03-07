@@ -19,6 +19,8 @@
 			</MenuItem>
 			<MenuItem Caption="View" Fit="true" PopWidth="150">
 				<MenuItem Command="{CMDViewSolution}"/>
+				<MenuItem Command="{CMDViewEditor}"/>
+				<MenuItem Command="{CMDViewProperties}"/>
 				<MenuItem Command="{CMDViewErrors}"/>
 				<MenuItem Command="{CMDViewGTExp}"/>
 				<MenuItem Command="{CMDViewProps}"/>
@@ -34,7 +36,8 @@
 			</MenuItem>
 		</Menu>
 		<Docker Name="mainDock">
-			<DockWindow DataSource="{CurrentSolution}" Name="winEditor" Caption="Edit View" Width="70%" Height="80%">
+			<DockStack />
+<!--			<DockWindow DataSource="{CurrentSolution}" Name="winEditor" Caption="Edit View" Width="70%" Height="80%">
 				<Template>
 					<Border BorderWidth="1" Foreground="Jet" CornerRadius="{./CornerRadius}"
 									Background="{./Background}"
@@ -45,7 +48,7 @@
 				</Template>
 				<EditPane SelectedItem="{²SelectedItem}" SelectedItemElement="{²SelectedItemElement}" Data="{OpenedItems}" DataTest="Extension"
 					ItemTemplate="#Crow.Coding.ui.EditPaneItems.template"/>
-			</DockWindow>
+			</DockWindow>-->
 		</Docker>
 	</VerticalStack>
 </Window>

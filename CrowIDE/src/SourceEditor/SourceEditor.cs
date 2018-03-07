@@ -115,6 +115,7 @@ namespace Crow.Coding
 		}
 		const int leftMarginGap = 3;//gap between items in margin and text
 		const int foldSize = 9;//folding rectangles size
+		const int foldMargin = 30;//folding rectangles size
 
 		#region private and protected fields
 		bool foldingEnabled = true;
@@ -150,7 +151,7 @@ namespace Crow.Coding
 			if (PrintLineNumbers)
 				leftMargin += (int)Math.Ceiling((double)buffer.LineCount.ToString().Length * fe.MaxXAdvance) +6;
 			if (foldingEnabled)
-				leftMargin += foldSize;
+				leftMargin += foldMargin;
 			if (leftMargin > 0)
 				leftMargin += leftMarginGap;
 			updateVisibleColumns ();
@@ -597,21 +598,47 @@ namespace Crow.Coding
 			}
 
 
+
 			//draw folding
 			if (foldingEnabled){
+
+				Rectangle rFld = new Rectangle (cb.X + leftMargin - leftMarginGap - foldMargin,
+					(int)(y + (fe.Ascent + fe.Descent) / 2.0 - foldSize / 2.0), foldSize, foldSize);
+
+				gr.SetSourceColor (Color.Black);
+
+				int level = 0;
+
+				if (currentNode != null) {
+					if (cl == currentNode.EndLine)
+						currentNode = currentNode.Parent;
+					if (currentNode != null)
+						level = currentNode.Level;
+				}
+
+				rFld.Left += level * 5;
+
 				if (cl.IsFoldable) {
-					if (cl.SyntacticNode.StartLine != cl.SyntacticNode.EndLine) {
-						gr.SetSourceColor (Color.Black);
-						Rectangle rFld = new Rectangle (cb.X + leftMargin - leftMarginGap - foldSize, (int)(y + (fe.Ascent+fe.Descent) / 2.0 - foldSize / 2.0), foldSize, foldSize);
-						gr.Rectangle (rFld, 1.0);
-						if (cl.IsFolded) {
-							gr.MoveTo (rFld.Center.X + 0.5, rFld.Y + 2);
-							gr.LineTo (rFld.Center.X + 0.5, rFld.Bottom - 2);
-						}
-						gr.MoveTo (rFld.Left + 2, rFld.Center.Y + 0.5);
-						gr.LineTo (rFld.Right - 2, rFld.Center.Y + 0.5);
-						gr.Stroke ();
-					}
+					gr.Rectangle (rFld, 1.0);
+					if (cl.IsFolded) {
+						gr.MoveTo (rFld.Center.X + 0.5, rFld.Y + 2);
+						gr.LineTo (rFld.Center.X + 0.5, rFld.Bottom - 2);
+					}else
+						currentNode = cl.SyntacticNode;
+					
+					gr.MoveTo (rFld.Left + 2, rFld.Center.Y + 0.5);
+					gr.LineTo (rFld.Right - 2, rFld.Center.Y + 0.5);
+					gr.Stroke ();
+
+//				} else if (currentNode != null){
+//					if (cl == currentNode.EndLine)
+//						currentNode = currentNode.Parent;
+//					if (currentNode != null) {
+//						int level = currentNode.Level;
+//						gr.MoveTo (rFld.Center.X + 0.5 + level * 5, y);
+//						gr.LineTo (rFld.Center.X + 0.5 + level * 5, y + fe.Ascent + fe.Descent);
+//						gr.Stroke ();
+//					}
 				}
 			}
 
@@ -623,6 +650,7 @@ namespace Crow.Coding
 			else
 				drawParsedCodeLine (gr, x, y, i, lineIndex);
 		}
+		Node currentNode = null;
 //		void drawParsed(Context gr){
 //			if (PrintedLines == null)
 //				return;
@@ -834,9 +862,21 @@ namespace Crow.Coding
 
 			seMutex.EnterReadLock ();
 
-			if (PrintedLines != null) {
+			if (PrintedLines != null) {				
+				int unfoldedLines = buffer.UnfoldedLines;
+				currentNode = null;
+				CodeLine cl = PrintedLines[0];
+				int li = buffer.IndexOf(cl);
+				while (li > 0) {
+					if (buffer [li].IsFoldable) {
+						currentNode = buffer [li].SyntacticNode;
+						break;
+					}
+					li--;
+				}
+
 				for (int i = 0; i < visibleLines; i++) {
-					if (i + ScrollY >= buffer.UnfoldedLines)//TODO:need optimize
+					if (i + ScrollY >= unfoldedLines)//TODO:need optimize
 						break;
 					drawLine (gr, cb, i);
 				}

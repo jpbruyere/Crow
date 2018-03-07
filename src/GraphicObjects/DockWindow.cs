@@ -24,6 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using System.Xml.Serialization;
 
 namespace Crow
 {
@@ -52,8 +53,11 @@ namespace Crow
 					return;
 				isDocked = value;
 				NotifyValueChanged ("IsDocked", isDocked);
+				NotifyValueChanged ("IsFloating", !isDocked);
 			}
 		}
+		[XmlIgnore] public bool IsFloating { get { return !isDocked; }}
+
 		public Alignment DockingPosition {
 			get { return docking; }
 			set {
@@ -125,7 +129,7 @@ namespace Crow
 		protected override void onDrop (object sender, DragDropEventArgs e)
 		{
 			if (!isDocked && DockingPosition != Alignment.Undefined)
-				dock (e.DropTarget as DockStack);
+				Dock (e.DropTarget as DockStack);
 			base.onDrop (sender, e);
 		}
 		public void Undock () {
@@ -146,7 +150,7 @@ namespace Crow
 			}
 		}
 
-		void dock (DockStack target){
+		public void Dock (DockStack target){
 			lock (IFace.UpdateMutex) {
 				IsDocked = true;
 				//undockingMousePosOrig = lastMousePos;

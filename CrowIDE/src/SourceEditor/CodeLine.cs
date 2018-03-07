@@ -32,7 +32,9 @@ namespace Crow.Coding
 				//LineUpadateEvent.Raise (this, new CodeBufferEventArgs (i));
 			}
 		}
-		public bool IsFoldable { get { return SyntacticNode != null; } }
+		public bool IsFoldable { get { return SyntacticNode == null ? false :
+				SyntacticNode.EndLine != SyntacticNode.StartLine && SyntacticNode.EndLine != null; } }
+		public int FoldingLevel { get { return IsFoldable ? SyntacticNode.Level : 0; } }
 		public bool IsFolded = false;
 		public bool IsParsed {
 			get { return Tokens != null; }

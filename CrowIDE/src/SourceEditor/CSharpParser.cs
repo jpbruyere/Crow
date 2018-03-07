@@ -287,7 +287,7 @@ namespace Crow.Coding
 					}
 
 					if (cl.Tokens [tokPtr].Type == TokenType.LineComment && onlyWhiteSpace) {
-						currentNode = addChildNode (currentNode, cl, tokPtr);
+						int startLine = ptrLine;
 						ptrLine++;
 						while (ptrLine < buffer.LineCount) {
 							int idx = buffer [ptrLine].FirstNonBlankTokIndex;
@@ -297,7 +297,11 @@ namespace Crow.Coding
 								break;
 							ptrLine++;
 						}
-						closeNodeAndGoUp (ref currentNode, buffer [ptrLine]);
+						ptrLine--;
+						if (ptrLine - startLine > 0) {
+							currentNode = addChildNode (currentNode, cl, tokPtr);
+							closeNodeAndGoUp (ref currentNode, buffer [ptrLine]);
+						}
 						break;
 					}
 
@@ -307,6 +311,12 @@ namespace Crow.Coding
 						break;
 					case TokenType.CloseBlock:						
 						closeNodeAndGoUp (ref currentNode, cl);
+						break;
+					case TokenType.Preprocessor:
+						if (cl.Tokens [tokPtr].Content.StartsWith ("#region")) {
+							currentNode = addChildNode (currentNode, cl, tokPtr);
+						}else if (cl.Tokens [tokPtr].Content.StartsWith("#endregion"))
+							closeNodeAndGoUp (ref currentNode, cl);
 						break;
 					}
 					onlyWhiteSpace = false;

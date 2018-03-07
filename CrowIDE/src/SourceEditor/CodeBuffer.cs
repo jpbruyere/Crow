@@ -209,8 +209,13 @@ namespace Crow.Coding
 				int i = 0, vl = 0;
 				editMutex.EnterReadLock ();
 				while (i < LineCount) {
-					if (this [i].IsFolded)
+					if (this [i].IsFolded) {
 						i = GetEndNodeIndex (i);
+						if (i < 0) {
+							Console.WriteLine ("error folding");
+							break;
+						}
+					}
 					i++;
 					vl++;
 				}

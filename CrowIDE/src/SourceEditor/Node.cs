@@ -23,6 +23,10 @@ namespace Crow.Coding
 			Children.Add (child);
 		}
 
+		public int Level {
+			get { return Parent == null ? 1 : Parent.Level + 1; } 
+		}
+
 		public override string ToString ()
 		{
 			return string.Format ("Name:{0}, Type:{1}\n\tparent:{2}", Name, Type, Parent);
