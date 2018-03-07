@@ -115,7 +115,8 @@ namespace Crow.Coding
 		}
 		const int leftMarginGap = 3;//gap between items in margin and text
 		const int foldSize = 9;//folding rectangles size
-		const int foldMargin = 30;//folding rectangles size
+		const int foldMargin = 50;//folding margin size
+		const int foldHSpace = 7;//folding level tabulation x
 
 		#region private and protected fields
 		bool foldingEnabled = true;
@@ -608,15 +609,18 @@ namespace Crow.Coding
 				gr.SetSourceColor (Color.Black);
 
 				int level = 0;
+				bool closingNode = false;
 
 				if (currentNode != null) {
-					if (cl == currentNode.EndLine)
+					if (cl == currentNode.EndLine) {
 						currentNode = currentNode.Parent;
+						closingNode = true;
+					}
 					if (currentNode != null)
-						level = currentNode.Level;
+						level = currentNode.Level - 1;
 				}
 
-				rFld.Left += level * 5;
+				rFld.Left += level * foldHSpace;
 
 				if (cl.IsFoldable) {
 					gr.Rectangle (rFld, 1.0);
@@ -630,16 +634,26 @@ namespace Crow.Coding
 					gr.LineTo (rFld.Right - 2, rFld.Center.Y + 0.5);
 					gr.Stroke ();
 
-//				} else if (currentNode != null){
-//					if (cl == currentNode.EndLine)
-//						currentNode = currentNode.Parent;
-//					if (currentNode != null) {
-//						int level = currentNode.Level;
-//						gr.MoveTo (rFld.Center.X + 0.5 + level * 5, y);
-//						gr.LineTo (rFld.Center.X + 0.5 + level * 5, y + fe.Ascent + fe.Descent);
-//						gr.Stroke ();
-//					}
+				} 
+			
+				if (closingNode) {
+					gr.MoveTo (rFld.Center.X + 0.5, y);
+					gr.LineTo (rFld.Center.X + 0.5, y + fe.Ascent / 2 + 0.5);
+					gr.LineTo (rFld.Center.X + 0.5 + foldSize / 2, y + fe.Ascent / 2 + 0.5);
+					closingNode = false;
 				}
+
+
+				while (level > 0) {
+					level--;
+					rFld.Left -= foldHSpace;
+					gr.MoveTo (rFld.Center.X + 0.5, y);
+					gr.LineTo (rFld.Center.X + 0.5, y + fe.Ascent + fe.Descent);
+				}
+				gr.SetDash (new double[]{ 1.5 },0.0);
+				gr.Stroke ();
+				gr.SetDash (new double[]{}, 0.0);
+
 			}
 
 			gr.SetSourceColor (Foreground);
@@ -867,7 +881,7 @@ namespace Crow.Coding
 				currentNode = null;
 				CodeLine cl = PrintedLines[0];
 				int li = buffer.IndexOf(cl);
-				while (li > 0) {
+				while (li >= 0) {
 					if (buffer [li].IsFoldable) {
 						currentNode = buffer [li].SyntacticNode;
 						break;
