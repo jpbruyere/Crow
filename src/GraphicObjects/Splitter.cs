@@ -43,7 +43,7 @@ namespace Crow
 
 		int thickness;
 
-		[XmlAttributeAttribute][DefaultValue(3)]
+		[XmlAttributeAttribute][DefaultValue(1)]
 		public virtual int Thickness {
 			get { return thickness; }
 			set {
@@ -216,6 +216,20 @@ namespace Crow
 					Height = Measure.Stretched;
 			}
 			return base.UpdateLayout (layoutType);
+		}
+		public override bool PointIsIn (ref Point m)
+		{
+			if (!(Visible & IsEnabled)||IsDragged)
+				return false;
+			if (!Parent.PointIsIn(ref m))
+				return false;
+			m -= (Parent.getSlot().Position + Parent.ClientRectangle.Position) ;
+			Rectangle r = Slot;
+			if (Width == Measure.Stretched)
+				r.Inflate (0, 5);
+			else
+				r.Inflate (5, 0);
+			return r.ContainsOrIsEqual (m);	
 		}
 		#endregion
 	}
