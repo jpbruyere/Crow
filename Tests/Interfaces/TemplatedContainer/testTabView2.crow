@@ -31,7 +31,7 @@
 		<Button Background="vgradient|0:DimGray|1:Black" HorizontalAlignment="Right"
 			Caption="Add new tab" Width="Fit" Height="30" MouseDown="onAddTabButClick"/>	
 	</VerticalStack>
-<!--	<VerticalStack Width="40%">	
+	<VerticalStack Width="40%">	
 		<HorizontalStack Height="Fit">
 			<Label Text="Selected Tab:"/>
 			<Label Text="{../../tabview2.SelectedTab}"/>
@@ -61,5 +61,5 @@
 		</TabView>
 		<Button Background="vgradient|0:DimGray|1:Black" HorizontalAlignment="Right"
 			Caption="Add new tab" Width="Fit" Height="30" MouseDown="onAddTabButClick2"/>	
-	</VerticalStack>-->
+	</VerticalStack>
 </HorizontalStack>

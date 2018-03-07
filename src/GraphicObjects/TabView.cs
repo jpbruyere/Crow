@@ -215,7 +215,7 @@ namespace Crow
 				else
 					adjustedTab = -1;
 
-				Console.WriteLine ("tabspace: {0} tw:{1}", tabSpace, tabWidth);
+				//Console.WriteLine ("tabspace: {0} tw:{1}", tabSpace, tabWidth);
 
 				childrenRWLock.EnterReadLock();
 				TabItem[] tabItms = Children.Cast<TabItem>().OrderBy (t=>t.ViewIndex).ToArray();
@@ -227,7 +227,7 @@ namespace Crow
 						continue;
 					tabItms [i].NotifyValueChanged ("TabHeight", tabHeight);
 					tabItms [i].NotifyValueChanged ("TabWidth", TabWidth);
-					if (!tabItms [i].HoldCursor) {
+					if (!tabItms [i].IsDragged) {
 						tabItms [i].TabOffset = curOffset;
 						//Console.WriteLine ("offset: {0}=>{1}", tabItms [i].Name, tabItms [i].TabOffset);
 					}

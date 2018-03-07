@@ -227,7 +227,6 @@ namespace Crow
 			tv.AddChild (this);
 		}
 		#region Mouse Handling
-		public bool HoldCursor = false;
 		public override bool PointIsIn (ref Point m)
 		{
 			if (!base.PointIsIn (ref m))
@@ -238,15 +237,9 @@ namespace Crow
 			else
 				return this.isSelected;
 		}
-		public override void onMouseDown (object sender, MouseButtonEventArgs e)
-		{
-			base.onMouseDown (sender, e);
-			HoldCursor = true;
-		}
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseUp (sender, e);
-			HoldCursor = false;
 			tview.UpdateLayout (LayoutingType.ArrangeChildren);
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
@@ -256,7 +249,7 @@ namespace Crow
 			if (Parent == null)
 				return;
 			
-			if (!(HasFocus && HoldCursor))
+			if (!IsDragged)
 				return;
 
 			TabView tv = Parent as TabView;
