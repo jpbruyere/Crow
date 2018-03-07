@@ -80,8 +80,7 @@ namespace Crow
 		}
 		protected override int measureRawSize (LayoutingType lt)
 		{
-			int totSpace = Spacing * (Children.Count (c => c.Visible) - 1);
-
+			int totSpace = Math.Max(0, Spacing * (Children.Count (c => c.Visible) - 1));
 			if (lt == LayoutingType.Width) {
 				if (Orientation == Orientation.Horizontal)
 					return contentSize.Width + totSpace + 2 * Margin;
