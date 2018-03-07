@@ -1,15 +1,16 @@
 <?xml version="1.0"?>
 <!--<GraphicObject Background="{./Background}"/>-->
-<Border BorderWidth="1" Foreground="White" CornerRadius="{./CornerRadius}"
+<Border BorderWidth="1" Foreground="Black" CornerRadius="{./CornerRadius}"
 				Background="{./Background}"
 				MouseEnter="./onBorderMouseEnter"
 				MouseLeave="./onBorderMouseLeave">
 	<VerticalStack Spacing="0">
+		<Label Visible="{./IsDocked}" Width="Stretched" Foreground="White" Margin="0" TextAlignment="Left" Text="{./Caption}" />
 		<HorizontalStack Background="vgradient|0:0.5,0.6,0.5,0.5|1:0.2,0.3,0.3,0.7"
-				Name="hs" Margin="0" Spacing="0" Height="Fit">
+				Name="hs" Margin="0" Spacing="0" Height="Fit" Visible="{./IsFloating}">
 			<GraphicObject Width="5"/>
 			<Image Margin="1" Width="10" Height="10" Path="{./Icon}"/>
-			<Label Width="Stretched" Foreground="White" Margin="1" TextAlignment="Center" Text="{./Caption}" />
+			<Label Width="Stretched" Foreground="White" Margin="1" TextAlignment="Left" Text="{./Caption}" />
 			<Border CornerRadius="6" BorderWidth="1" Foreground="Transparent"  Height="10" Width="10"
 				MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
 				<Image Focusable="true" Name="Image" Margin="0" Width="Stretched" Height="Stretched" Path="#Crow.Images.Icons.exit2.svg"
