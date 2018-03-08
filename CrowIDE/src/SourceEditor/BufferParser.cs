@@ -81,6 +81,17 @@ namespace Crow.Coding
 		internal int currentLine = 0;
 		internal int currentColumn = 0;
 
+		int syntTreeDepth = 0;
+		public int SyntacticTreeDepth {
+			get { return syntTreeDepth;}
+			set {
+				syntTreeDepth = value;
+				if (syntTreeDepth > SyntacticTreeMaxDepth)
+					SyntacticTreeMaxDepth = syntTreeDepth;
+			}
+		}
+		public int SyntacticTreeMaxDepth = 0;
+
 		protected CodeBuffer buffer;
 		protected Token currentTok;
 		protected bool eol = true;
@@ -177,6 +188,10 @@ namespace Crow.Coding
 		}
 
 		#region low level parsing
+		protected void addCharToCurTok(char c, Point position){
+			currentTok.Start = position;
+			currentTok += c;
+		}
 		/// <summary>
 		/// Read one char from current position in buffer and store it into the current token
 		/// </summary>
@@ -268,6 +283,15 @@ namespace Crow.Coding
 			currentColumn++;
 			return c;
 		}
+		protected virtual string Read(int charCount){
+			string tmp = "";
+			for (int i = 0; i < charCount; i++) {
+				if (eol)
+					break;
+				tmp += Read ();
+			}
+			return tmp;
+		}
 		/// <summary>
 		/// read until end of line is reached
 		/// </summary>
@@ -316,5 +340,9 @@ namespace Crow.Coding
 				saveAndResetCurrentTok ();
 		}
 		#endregion
+
+		protected void throwParserException(string msg){
+			throw new ParserException (currentLine, currentColumn, msg);
+		}
 	}
 }

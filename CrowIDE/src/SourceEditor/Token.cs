@@ -38,6 +38,7 @@ namespace Crow.Coding
 //			Content = content;
 //		}
 
+		public bool IsNull { get { return IsEmpty && Type == BufferParser.TokenType.Unknown; }}
 		public bool IsEmpty { get { return string.IsNullOrEmpty(Content); }}
 
 		public static bool operator == (Token t, System.Enum tt){

@@ -63,7 +63,7 @@ namespace Crow.Coding
 			formatting.Add ((int)BufferParser.TokenType.BlockComment, new TextFormatting (Color.Gray, Color.Transparent, false, true));
 			formatting.Add ((int)BufferParser.TokenType.LineComment, new TextFormatting (Color.Gray, Color.Transparent, false, true));
 			formatting.Add ((int)BufferParser.TokenType.OperatorOrPunctuation, new TextFormatting (Color.Black, Color.Transparent));
-			formatting.Add ((int)BufferParser.TokenType.Keyword, new TextFormatting (Color.DarkCyan, Color.Transparent));
+			//formatting.Add ((int)BufferParser.TokenType.Keyword, new TextFormatting (Color.DarkCyan, Color.Transparent));
 
 			parsing.Add (".crow", "Crow.Coding.XMLParser");
 			parsing.Add (".template", "Crow.Coding.XMLParser");
@@ -115,8 +115,8 @@ namespace Crow.Coding
 		}
 		const int leftMarginGap = 3;//gap between items in margin and text
 		const int foldSize = 9;//folding rectangles size
-		const int foldMargin = 50;//folding margin size
-		const int foldHSpace = 7;//folding level tabulation x
+		const int foldHSpace = 4;//folding level tabulation x
+		int foldMargin { get { return parser == null ? 0 : parser.SyntacticTreeMaxDepth * foldHSpace; }}//folding margin size
 
 		#region private and protected fields
 		bool foldingEnabled = true;
@@ -154,7 +154,7 @@ namespace Crow.Coding
 			if (foldingEnabled)
 				leftMargin += foldMargin;
 			if (leftMargin > 0)
-				leftMargin += leftMarginGap;
+				leftMargin += leftMarginGap;			
 			updateVisibleColumns ();
 		}
 		void findLongestLineAndUpdateMaxScrollX() {
@@ -265,10 +265,11 @@ namespace Crow.Coding
 					continue;
 				parser.TryParseBufferLine (e.LineStart + i);
 			}
-			measureLeftMargin ();
 
 			if (parser != null)
 				parser.reparseSource ();
+
+			measureLeftMargin ();
 
 			updatePrintedLines ();
 			updateMaxScrollY ();
@@ -607,6 +608,7 @@ namespace Crow.Coding
 					(int)(y + (fe.Ascent + fe.Descent) / 2.0 - foldSize / 2.0), foldSize, foldSize);
 
 				gr.SetSourceColor (Color.Black);
+				gr.LineWidth = 1.0;
 
 				int level = 0;
 				bool closingNode = false;
@@ -620,9 +622,27 @@ namespace Crow.Coding
 						level = currentNode.Level - 1;
 				}
 
-				rFld.Left += level * foldHSpace;
+				for (int l = 0; l < level; l++) {					
+					gr.MoveTo (rFld.Center.X + 0.5, y);
+					gr.LineTo (rFld.Center.X + 0.5, y + fe.Ascent + fe.Descent);
+					rFld.Left += foldHSpace;
+				}
+				if (closingNode) {
+					gr.MoveTo (rFld.Center.X + 0.5, y);
+					gr.LineTo (rFld.Center.X + 0.5, y + fe.Ascent / 2 + 0.5);
+					gr.LineTo (rFld.Center.X + 0.5 + foldSize / 2, y + fe.Ascent / 2 + 0.5);
+					closingNode = false;
+				}
+				gr.SetDash (new double[]{ 1.5 },0.0);
+				gr.SetSourceColor (Color.Gray);
+				gr.Stroke ();
+				gr.SetDash (new double[]{}, 0.0);
 
 				if (cl.IsFoldable) {
+					gr.Rectangle (rFld);
+					gr.SetSourceColor (Color.White);
+					gr.Fill();
+					gr.SetSourceColor (Color.Black);
 					gr.Rectangle (rFld, 1.0);
 					if (cl.IsFolded) {
 						gr.MoveTo (rFld.Center.X + 0.5, rFld.Y + 2);
@@ -633,27 +653,7 @@ namespace Crow.Coding
 					gr.MoveTo (rFld.Left + 2, rFld.Center.Y + 0.5);
 					gr.LineTo (rFld.Right - 2, rFld.Center.Y + 0.5);
 					gr.Stroke ();
-
 				} 
-			
-				if (closingNode) {
-					gr.MoveTo (rFld.Center.X + 0.5, y);
-					gr.LineTo (rFld.Center.X + 0.5, y + fe.Ascent / 2 + 0.5);
-					gr.LineTo (rFld.Center.X + 0.5 + foldSize / 2, y + fe.Ascent / 2 + 0.5);
-					closingNode = false;
-				}
-
-
-				while (level > 0) {
-					level--;
-					rFld.Left -= foldHSpace;
-					gr.MoveTo (rFld.Center.X + 0.5, y);
-					gr.LineTo (rFld.Center.X + 0.5, y + fe.Ascent + fe.Descent);
-				}
-				gr.SetDash (new double[]{ 1.5 },0.0);
-				gr.Stroke ();
-				gr.SetDash (new double[]{}, 0.0);
-
 			}
 
 			gr.SetSourceColor (Foreground);
@@ -880,11 +880,14 @@ namespace Crow.Coding
 				int unfoldedLines = buffer.UnfoldedLines;
 				currentNode = null;
 				CodeLine cl = PrintedLines[0];
-				int li = buffer.IndexOf(cl);
+				int idx0 = buffer.IndexOf(cl);
+				int li = idx0-1;
 				while (li >= 0) {
-					if (buffer [li].IsFoldable) {
-						currentNode = buffer [li].SyntacticNode;
-						break;
+					if (buffer [li].IsFoldable && !buffer [li].IsFolded) {
+						if (buffer.IndexOf(buffer [li].SyntacticNode.EndLine) > idx0){
+							currentNode = buffer [li].SyntacticNode;
+							break;
+						}
 					}
 					li--;
 				}

@@ -135,13 +135,20 @@ namespace Crow.Coding
 		static Regex rxDecimal = new Regex(@"[0-9]+");
 		static Regex rxHexadecimal = new Regex(@"[0-9a-fA-F]+");
 
+		public static bool CharIsValidCharStartName (char c) {
+			return rxNameStartChar.IsMatch(new string(new char[]{c}));
+		}
+		public static bool CharIsValidCharName (char c) {
+			return rxNameChar.IsMatch(new string(new char[]{c}));
+		}
+
 		public bool nextCharIsValidCharStartName
 		{
-			get { return rxNameStartChar.IsMatch(new string(new char[]{Peek()})); }
+			get { return CharIsValidCharStartName(Peek()); }
 		}
 		public bool nextCharIsValidCharName
 		{
-			get { return rxNameChar.IsMatch(new string(new char[]{Peek()})); }
+			get { return CharIsValidCharName(Peek()); }
 		}
 		#endregion
 
@@ -164,23 +171,10 @@ namespace Crow.Coding
 			States previousEndingState = (States)cl.EndingState;
 
 			while (! eol) {
-				SkipWhiteSpaces ();
-
-				if (eol)
-					break;
-
-				if (Peek () == '\n') {
-					if (currentTok != TokenType.Unknown)
-						throw new ParserException (currentLine, currentColumn, "Unexpected end of line");
-					Read ();
-					eol = true;
-					continue;
-				}
+				if (currentTok.IsNull)
+					SkipWhiteSpaces ();
 
 				if (curState == States.BlockComment) {
-					if (currentTok != TokenType.Unknown)
-						Debugger.Break ();
-
 					currentTok.Start = CurrentPosition;
 					currentTok.Type = (BufferParser.TokenType)TokenType.BlockComment;
 					currentTok += ReadLineUntil ("*/");
@@ -193,6 +187,11 @@ namespace Crow.Coding
 				}
 
 				switch (Peek()) {
+				case '\n':
+					eol = true;
+					if (!currentTok.IsNull)
+						saveAndResetCurrentTok ();
+					break;
 				case '#':
 					readToCurrTok (true);
 					currentTok += ReadLine ();
@@ -221,21 +220,83 @@ namespace Crow.Coding
 						break;
 					}
 					break;
-				default:					
-					if (nextCharIsValidCharStartName) {						
-						readToCurrTok (true);
-						while (nextCharIsValidCharName)
-							readToCurrTok ();
-
-						if (keywords.Contains (currentTok.Content))
-							saveAndResetCurrentTok (TokenType.Keyword);
-						else
-							saveAndResetCurrentTok (TokenType.Identifier);
-						continue;
+				case '{':
+					if (currentTok.IsNull)
+						readAndResetCurrentTok (TokenType.OpenBlock, true);
+					else
+						readToCurrTok ();
+					break;
+				case '}':
+					if (currentTok.IsNull)
+						readAndResetCurrentTok (TokenType.CloseBlock, true);
+					else
+						readToCurrTok ();					
+					break;
+				case '\\'://unicode escape sequence
+					if (!(currentTok.Type == TokenType.Identifier ||
+					    currentTok.IsEmpty || currentTok.Type == TokenType.StringLitteral || currentTok.Type == TokenType.CharLitteral)) {
+						saveAndResetCurrentTok ();
 					}
-					readToCurrTok (true);
-					currentTok+=ReadLine ();
-					saveAndResetCurrentTok (TokenType.Unknown);
+					Point pos = CurrentPosition;
+					Read ();
+					char escChar = Read ();
+
+					if (escChar == 'u') {
+						char c = char.ConvertFromUtf32 (int.Parse (Read (4), System.Globalization.NumberStyles.HexNumber))[0];
+						if (currentTok.IsEmpty) {
+							if (!CharIsValidCharStartName (c))
+								throwParserException ("expecting identifier start");							
+							currentTok.Start = pos;
+							currentTok.Type = TokenType.Identifier;
+						} else if (currentTok.Type == TokenType.Identifier) {
+							if (!CharIsValidCharName (c))
+								throwParserException ("expecting identifier valid char");						
+						}
+						currentTok += c;
+						break;
+					}
+					currentTok += new String (new char[] { '\\', escChar });
+					break;
+				case '\'':
+					if (currentTok.IsNull) {
+						readAndResetCurrentTok (TokenType.CharLitteralOpening, true);
+						currentTok.Type = TokenType.CharLitteral;
+					} else if (currentTok.Type == TokenType.CharLitteral) {
+						saveAndResetCurrentTok ();
+						readAndResetCurrentTok (TokenType.CharLitteralClosing, true);
+					} else if (currentTok.Type == TokenType.StringLitteral){
+						readToCurrTok ();
+					} else
+						throwParserException ("unexpected character: (\')");						
+					break;
+				case '"':
+					if (currentTok.IsNull) {
+						readAndResetCurrentTok (TokenType.StringLitteralOpening, true);
+						currentTok.Type = TokenType.StringLitteral;
+					} else if (currentTok.Type == TokenType.StringLitteral) {
+						saveAndResetCurrentTok ();
+						readAndResetCurrentTok (TokenType.StringLitteralClosing, true);
+					} else
+						throwParserException ("unexpected character: (\")");
+					break;
+				default:
+					if (currentTok.Type == TokenType.StringLitteral || currentTok.Type == TokenType.CharLitteral) {
+						readToCurrTok (currentTok.IsEmpty);
+					} else if (currentTok.IsNull) {
+						if (nextCharIsValidCharStartName) {						
+							readToCurrTok (true);
+							while (nextCharIsValidCharName)
+								readToCurrTok ();
+
+							if (keywords.Contains (currentTok.Content))
+								saveAndResetCurrentTok (TokenType.Keyword);
+							else
+								saveAndResetCurrentTok (TokenType.Identifier);
+							continue;
+						} else
+							readAndResetCurrentTok(TokenType.Unknown, true);
+					} else
+						readAndResetCurrentTok(TokenType.Unknown, true);					
 					break;
 				}
 			}
@@ -245,21 +306,41 @@ namespace Crow.Coding
 
 			cl.EndingState = (int)curState;
 		}
-
-		Node addChildNode (Node curNode, CodeLine cl, int tokPtr) {
-			Node n = new Node () { Name = cl.Tokens [tokPtr].Content, StartLine = cl };
+		
+		Node addChildNode (Node curNode, CodeLine cl, int tokPtr, string type = "") {
+			Node n = new Node () { Name = cl.Tokens [tokPtr].Content, StartLine = cl, Type = type };
 			curNode.AddChild (n);
 			if (cl.SyntacticNode == null)
 				cl.SyntacticNode = n;
+			SyntacticTreeDepth++;
 			return n;
 		}
+		void closeNodeAndGoUp (ref Node n, CodeLine cl, string type = ""){
+			while (n != null) {
+				if (n.Type == type) {
+					n.EndLine = cl;
+					n = n.Parent;
+					SyntacticTreeDepth--;
+					break;
+				}
+				n = n.Parent;
+				SyntacticTreeDepth--;
+			}
+//			if (n.StartLine == cl){//prevent single line node
+//				n.Parent.Children.Remove (n);
+//				if (cl.SyntacticNode == n)
+//					cl.SyntacticNode = null;
+//			}else				
+
+		}
 		void closeNodeAndGoUp (ref Node n, CodeLine cl){
-			if (n.StartLine == cl){//prevent single line node
-				n.Parent.Children.Remove (n);
-				if (cl.SyntacticNode == n)
-					cl.SyntacticNode = null;
-			}else				
-				n.EndLine = cl;
+			//			if (n.StartLine == cl){//prevent single line node
+			//				n.Parent.Children.Remove (n);
+			//				if (cl.SyntacticNode == n)
+			//					cl.SyntacticNode = null;
+			//			}else	
+			SyntacticTreeDepth--;
+			n.EndLine = cl;
 			n = n.Parent;
 		}
 
@@ -268,6 +349,7 @@ namespace Crow.Coding
 			RootNode = new Node () { Name = "RootNode", Type="Root" };
 
 			Node currentNode = RootNode;
+			SyntacticTreeDepth = SyntacticTreeMaxDepth = 0;
 
 			int ptrLine = 0;
 			while (ptrLine < buffer.LineCount) {
@@ -299,8 +381,8 @@ namespace Crow.Coding
 						}
 						ptrLine--;
 						if (ptrLine - startLine > 0) {
-							currentNode = addChildNode (currentNode, cl, tokPtr);
-							closeNodeAndGoUp (ref currentNode, buffer [ptrLine]);
+							currentNode = addChildNode (currentNode, cl, tokPtr, "comment");
+							closeNodeAndGoUp (ref currentNode, buffer [ptrLine], "comment");
 						}
 						break;
 					}
@@ -314,13 +396,24 @@ namespace Crow.Coding
 						break;
 					case TokenType.Preprocessor:
 						if (cl.Tokens [tokPtr].Content.StartsWith ("#region")) {
-							currentNode = addChildNode (currentNode, cl, tokPtr);
-						}else if (cl.Tokens [tokPtr].Content.StartsWith("#endregion"))
-							closeNodeAndGoUp (ref currentNode, cl);
+							currentNode = addChildNode (currentNode, cl, tokPtr, "region");
+						} else if (cl.Tokens [tokPtr].Content.StartsWith ("#endregion")) {
+							
+							closeNodeAndGoUp (ref currentNode, cl,"region");
+						}
 						break;
 					}
 					onlyWhiteSpace = false;
 					tokPtr++;
+				}
+				ptrLine++;
+			}
+			ptrLine = 0;
+			while (ptrLine < buffer.LineCount) {
+				CodeLine cl = buffer [ptrLine];
+				if (cl.IsFoldable) {
+					if (cl.SyntacticNode.Type == "comment" || cl.SyntacticNode.Type == "region")
+						cl.IsFolded = true;
 				}
 				ptrLine++;
 			}

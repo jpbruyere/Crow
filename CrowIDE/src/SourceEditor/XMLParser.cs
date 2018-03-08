@@ -17,8 +17,8 @@ namespace Crow.Coding
 			BlockCommentStart = BufferParser.TokenType.BlockCommentStart,
 			BlockComment = BufferParser.TokenType.BlockComment,
 			BlockCommentEnd = BufferParser.TokenType.BlockCommentEnd,
-			ElementName = BufferParser.TokenType.Type,
-			AttributeName = BufferParser.TokenType.Identifier,
+			ElementName = BufferParser.TokenType.Identifier,
+			AttributeName = BufferParser.TokenType.Keyword,
 			ElementClosing = BufferParser.TokenType.StatementEnding,
 			Affectation = BufferParser.TokenType.OperatorOrPunctuation,
 			AttributeValueOpening = BufferParser.TokenType.StringLitteralOpening,
@@ -260,6 +260,7 @@ namespace Crow.Coding
 			RootNode = new Node () { Name = "RootNode", Type="Root" };
 
 			Node currentNode = RootNode;
+			SyntacticTreeDepth = SyntacticTreeMaxDepth = 0;
 
 			for (int i = 0; i < buffer.LineCount; i++) {
 				CodeLine cl = buffer[i];
@@ -277,6 +278,7 @@ namespace Crow.Coding
 						currentNode = newElt;
 						if (cl.SyntacticNode == null)
 							cl.SyntacticNode = newElt;
+						SyntacticTreeDepth++;
 						break;
 					case TokenType.ElementEnd:
 						tokPtr++;
@@ -287,6 +289,7 @@ namespace Crow.Coding
 						}
 						currentNode.EndLine = cl;
 						currentNode = currentNode.Parent;
+						SyntacticTreeDepth--;
 						break;
 					case TokenType.ElementClosing:
 						//currentNode = currentNode.Parent;

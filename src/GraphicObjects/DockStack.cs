@@ -204,6 +204,8 @@ namespace Crow
 			}
 
 			DockWindow dw = IFace.DragAndDropOperation.DragSource as DockWindow;
+			if (dw == null)
+				return;
 			if (!dw.IsDocked) {
 				Rectangle cb = ClientRectangle;
 				double minDim = Math.Min (cb.Width, cb.Height);

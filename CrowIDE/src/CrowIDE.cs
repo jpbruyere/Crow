@@ -131,6 +131,9 @@ namespace Crow.Coding
 			DockWindow dw = loadDockWindow ("#Crow.Coding.ui.DockWindows.winEditor.crow");
 			dw.DockingPosition = Alignment.Center;
 			dw.Dock (mainDock.Children [0] as DockStack);
+			dw = loadDockWindow ("#Crow.Coding.ui.DockWindows.winSolution.crow");
+			dw.DockingPosition = Alignment.Right;
+			dw.Dock (mainDock.Children [0] as DockStack);
 		}
 
 		void loadProjProps () {
