@@ -191,19 +191,30 @@ namespace Crow.Coding
 		internal ReaderWriterLockSlim srcEditMtx = new ReaderWriterLockSlim();
 
 		public Dictionary<object, bool> RegisteredEditors = new Dictionary<object, bool>();
+		List<String> undoStack = new List<string>();
+		List<String> redoStack = new List<string>();
 
-		Crow.Command cmdSave, cmdOpen;
+		public Crow.Command cmdSave, cmdSaveAs, cmdOpen, cmdUndo, cmdRedo;
 
 		public ProjectFile (ProjectItem pi)
 			: base (pi.Project, pi.node) {
 
 			cmdSave = new Crow.Command (new Action (() => Save ()))
-				{ Caption = "Save", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = true };
+			{ Caption = "Save", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false };
+			cmdSave = new Crow.Command (new Action (() => SaveAs ()))
+			{ Caption = "Save As ..", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false };
 			cmdOpen = new Crow.Command (new Action (() => Open ())) 
 				{ Caption = "Open", Icon = new SvgPicture ("#Crow.Coding.ui.icons.outbox.svg"), CanExecute = false };
-
+			cmdUndo = new Crow.Command (new Action (() => Undo (null))) 
+			{ Caption = "Undo", Icon = new SvgPicture ("#Crow.Coding.icons.undo.svg"), CanExecute = false };
+			cmdRedo = new Crow.Command (new Action (() => Redo (null))) 
+			{ Caption = "Redo", Icon = new SvgPicture ("#Crow.Coding.icons.redo.svg"), CanExecute = false };
+				
 			Commands.Insert (0, cmdOpen);
 			Commands.Insert (1, cmdSave);
+
+			//Commands.Add (cmdUndo);
+			//Commands.Add (cmdRedo);
 		}
 
 		public string ResourceID {
@@ -233,6 +244,9 @@ namespace Crow.Coding
 		public void UpdateSource (object sender, string newSrc){
 			System.Diagnostics.Debug.WriteLine ("update source by {0}", sender);
 			Source = newSrc;
+			signalOtherRegisteredEditors (sender);
+		}
+		void signalOtherRegisteredEditors (object sender) {
 			lock (RegisteredEditors) {
 				object[] keys = RegisteredEditors.Keys.ToArray ();
 				foreach (object editor in keys) {
@@ -259,11 +273,16 @@ namespace Crow.Coding
 				
 				srcEditMtx.EnterWriteLock ();
 
+				undoStack.Add (source);
+				cmdUndo.CanExecute = true;
+				redoStack.Clear ();
+				cmdRedo.CanExecute = false;
 				source = value;
+
 				NotifyValueChanged ("Source", source);
 				NotifyValueChanged ("IsDirty", IsDirty);
 
-				cmdSave.CanExecute = IsDirty;
+				cmdSave.CanExecute = cmdSaveAs.CanExecute = IsDirty;
 
 				srcEditMtx.ExitWriteLock ();
 			}
@@ -327,11 +346,69 @@ namespace Crow.Coding
 			origSource = source;
 			NotifyValueChanged ("IsDirty", false);
 		}
+		public void SaveAs () {
+			if (!IsDirty)
+				return;
+			using (StreamWriter sw = new StreamWriter (AbsolutePath)) {
+				sw.Write (source);
+			}
+			origSource = source;
+			NotifyValueChanged ("IsDirty", false);
+		}
 		public void Close () {
 			origSource = null;
 			isOpened = false;
 			Project.solution.CloseItem (this);
 		}
+		public void Undo(object sender){
+			undo();
+			signalOtherRegisteredEditors (sender);
+		}
+		public void Redo(object sender){
+			redo();
+			signalOtherRegisteredEditors (sender);
+		}
+
+		void undo () {			
+			if (undoStack.Count == 0)
+				return;
+			
+			srcEditMtx.EnterWriteLock ();
+			string step = undoStack [undoStack.Count -1];
+			redoStack.Add (source);
+			cmdRedo.CanExecute = true;
+			undoStack.RemoveAt(undoStack.Count -1);
+
+			source = step;
+
+			NotifyValueChanged ("Source", source);
+			NotifyValueChanged ("IsDirty", IsDirty);
+			cmdSave.CanExecute = IsDirty;
+
+			if (undoStack.Count == 0)
+				cmdUndo.CanExecute = false;
+			srcEditMtx.ExitWriteLock ();
+		}
+
+		void redo () {
+			if (redoStack.Count == 0)
+				return;
+			srcEditMtx.EnterWriteLock ();
+			string step = redoStack [redoStack.Count -1];
+			undoStack.Add (source);
+			cmdUndo.CanExecute = true;
+			redoStack.RemoveAt(redoStack.Count -1);
+			source = step;
+			NotifyValueChanged ("Source", source);
+			NotifyValueChanged ("IsDirty", IsDirty);
+			cmdSave.CanExecute = IsDirty;
+
+			if (redoStack.Count == 0)
+				cmdRedo.CanExecute = false;
+			srcEditMtx.ExitWriteLock ();
+
+		}
+
 
 		public void OnQueryClose (object sender, EventArgs e){
 			if (IsDirty) {

@@ -208,9 +208,13 @@ namespace Crow.Coding
 			buffer.ToogleFolding (line);
 		}
 
+		#region Editor overrides
 		protected override void updateEditorFromProjFile ()
 		{
+			buffer.editMutex.EnterWriteLock ();
 			loadSource ();
+			buffer.editMutex.ExitWriteLock ();
+
 			isDirty = false;
 			oldSource = projFile.Source;
 			CurrentLine = requestedLine;
@@ -231,6 +235,7 @@ namespace Crow.Coding
 		protected override bool IsReady {
 			get { return buffer != null; }
 		}
+		#endregion
 
 		#region Buffer events handlers
 		void Buffer_BufferCleared (object sender, EventArgs e)
@@ -830,6 +835,8 @@ namespace Crow.Coding
 			Foreground.SetAsSource (gr);
 
 			buffer.editMutex.EnterReadLock ();
+			editorMutex.EnterReadLock ();
+
 			#region draw text cursor
 			if (buffer.SelectionInProgress){
 				selStartCol = getTabulatedColumn (buffer.SelectionStart);
@@ -842,8 +849,6 @@ namespace Crow.Coding
 				gr.Stroke();
 			}
 			#endregion
-
-			editorMutex.EnterReadLock ();
 
 			if (PrintedLines != null) {				
 				int unfoldedLines = buffer.UnfoldedLines;
@@ -1000,6 +1005,17 @@ namespace Crow.Coding
 				switch (key) {
 				case Key.S:
 					projFile.Save ();
+					break;
+				case Key.W:
+					editorMutex.EnterWriteLock ();
+					if (e.Shift)
+						projFile.Redo (null);
+					else
+						projFile.Undo (null);
+					editorMutex.ExitWriteLock ();
+					break;
+				default:
+					Console.WriteLine ("");
 					break;
 				}
 			}

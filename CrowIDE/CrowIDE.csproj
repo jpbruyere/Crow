@@ -253,6 +253,8 @@
     <EmbeddedResource Include="icons\compile.svg" />
     <EmbeddedResource Include="icons\edit.svg" />
     <EmbeddedResource Include="icons\text-file.svg" />
+    <EmbeddedResource Include="icons\undo.svg" />
+    <EmbeddedResource Include="icons\redo.svg" />
     <EmbeddedResource Include="ui\SourceEditor.crow" />
   </ItemGroup>
   <ItemGroup>

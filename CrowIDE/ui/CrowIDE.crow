@@ -2,16 +2,16 @@
 <Window Height="Stretched" Width="Stretched" >
 	<VerticalStack>
 		<Menu>
-			<MenuItem Caption="File" Width="Fit" PopWidth="120">
+			<MenuItem Caption="File" Width="Fit" PopWidth="120" DataSource="{CurrentSolution}">
 				<MenuItem Command="{CMDNew}" />
 				<MenuItem Command="{CMDOpen}" />
-				<MenuItem Command="{CMDSave}" />
-				<MenuItem Command="{CMDSaveAs}" />
+				<MenuItem DataSource="{SelectedItem}" Command="{cmdSave}" />
+				<MenuItem DataSource="{SelectedItem}" Command="{cmdSaveAs}" />
 				<MenuItem Command="{CMDQuit}" />
 			</MenuItem>
-			<MenuItem Caption="Edit" Name="edit" Width="Fit" PopWidth="100">
-				<MenuItem Command="{CMDUndo}" />
-				<MenuItem Command="{CMDRedo}" />
+			<MenuItem Caption="Edit" Name="edit" Width="Fit" PopWidth="100" DataSource="{CurrentSolution}">
+				<MenuItem DataSource="{SelectedItem}" Command="{cmdUndo}" />
+				<MenuItem DataSource="{SelectedItem}" Command="{cmdRedo}" />
 				<MenuItem Command="{CMDCut}" />
 				<MenuItem Command="{CMDCopy}" />
 				<MenuItem Command="{CMDPaste}" />

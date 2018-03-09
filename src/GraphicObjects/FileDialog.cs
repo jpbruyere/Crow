@@ -149,6 +149,7 @@ namespace Crow
 		void onCancel(object sender, MouseButtonEventArgs e){
 			IFace.DeleteWidget (this);
 		}
+
 	}
 }
 
