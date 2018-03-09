@@ -59,7 +59,7 @@ namespace Crow.Coding
 		}
 
 		public void SetLineInError (ParserException ex) {
-			Tokens = null; 
+			Tokens = null;
 			exception = ex;
 		}
 

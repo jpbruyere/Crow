@@ -26,30 +26,29 @@ using System.ComponentModel;
 using System.IO;
 using System.Collections.Generic;
 using Crow.IML;
+using System.Text;
+using System.Xml;
 
 namespace Crow.Coding
 {
-	public class ImlVisualEditor : GraphicObject
+	public class ImlVisualEditor : Editor
 	{
 		#region CTOR
 		public ImlVisualEditor () : base()
 		{
 			imlVE = new DesignInterface ();
-			Thread t = new Thread (interfaceThread);
-			t.IsBackground = true;
-			t.Start ();
 		}
 		#endregion
 
 		DesignInterface imlVE;
 		GraphicObject selectedItem;
-		ImlProjectItem projFile;
+		ImlProjectItem imlProjFile;
 		Exception imlError = null;
 
-		bool drawGrid;
+		bool drawGrid, snapToGrid;
 		int gridSpacing;
 
-		[XmlAttributeAttribute][DefaultValue(true)]
+		[DefaultValue(true)]
 		public bool DrawGrid {
 			get { return drawGrid; }
 			set {
@@ -60,7 +59,17 @@ namespace Crow.Coding
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(10)]
+		[DefaultValue(true)]
+		public bool SnapToGrid {
+			get { return snapToGrid; }
+			set {
+				if (snapToGrid == value)
+					return;
+				snapToGrid = value;
+				NotifyValueChanged ("SnapToGrid", snapToGrid);
+			}
+		}
+		[DefaultValue(10)]
 		public int GridSpacing {
 			get { return gridSpacing; }
 			set {
@@ -81,7 +90,7 @@ namespace Crow.Coding
 				RegisterForRedraw ();
 			}
 		}
-		/// <summary>Pointer is over the widget</summary>
+		/// <summary>PoinprojFilever the widget</summary>
 		public virtual GraphicObject HoverWidget
 		{
 			get { return imlVE.HoverWidget; }
@@ -97,89 +106,97 @@ namespace Crow.Coding
 		[XmlIgnore]public List<LQIList> LQIs {
 			get { return imlVE.LQIs; }
 		}
-			
-		public ProjectNode ProjectNode {
-			get { return projFile; }
-			set {
-				if (projFile == value)
-					return;
 
-				if (projFile != null)
-					projFile.UnregisterEditor (this);
-				
-				projFile = value as ImlProjectItem;
-
-				imlVE.ProjFile = projFile;
-
-				if (projFile != null)
-					projFile.RegisterEditor (this);
-
-				NotifyValueChanged ("ProjectNode", projFile);
+		public override ProjectFile ProjectNode {
+			get {
+				return base.ProjectNode;
 			}
-		}
-
-		[XmlIgnore]public Exception IMLError {
-			get { return imlError; }
 			set {
-				if (imlError == value)
-					return;
-				imlError = value;
-				NotifyValueChanged ("IMLError", imlError);
-				NotifyValueChanged ("HasError", HasError);
+				base.ProjectNode = value;
+				imlProjFile = projFile as ImlProjectItem;
+				imlVE.ProjFile = imlProjFile;
 			}
-		}
-		[XmlIgnore]public bool HasError {
-			get { return imlError != null; }
 		}
 
 		public List<GraphicObject> GraphicTree {
 			get { return imlVE.GraphicTree; }
 		}
-
-		void interfaceThread()
+		protected override void updateProjFileFromEditor ()
 		{
-			while (true) {
-				try {
-					if (!projFile.RegisteredEditors[this]){
-						string selItemDesignID = null;
-						if (SelectedItem!=null)
-							selItemDesignID = SelectedItem.design_id;
-						imlVE.ClearInterface();
-						Instantiator.NextInstantiatorID = 0;
-						imlVE.Styling = projFile.Project.solution.Styling;
-						imlVE.DefaultValuesLoader.Clear();
-						imlVE.DefaultTemplates = projFile.Project.solution.DefaultTemplates;
-						imlVE.Instantiators = new Dictionary<string, Instantiator>();
-						imlVE.LoadIMLFragment(projFile.Source);
-						projFile.Instance = imlVE.GraphicTree[0];
-						GraphicObject go = null;
-						if (selItemDesignID!=null)
-							projFile.Instance.FindByDesignID(selItemDesignID,out go);						
-						SelectedItem = go;
-						IMLError = null;
-						projFile.RegisteredEditors[this] = true;
-					}else if ((bool)projFile.Instance?.design_HasChanged){
-						projFile.UpdateSource(this, projFile.Instance.GetIML());
+			try {
+				projFile.UpdateSource(this, imlProjFile.Instance.GetIML());
+			} catch (Exception ex) {
+				Error = ex.InnerException;
+				if (Monitor.IsEntered(imlVE.UpdateMutex))
+					Monitor.Exit (imlVE.UpdateMutex);
+			}
+		}
+		protected override void updateEditorFromProjFile () {
+			try {
+				string selItemDesignID = null;
+				if (SelectedItem!=null)
+					selItemDesignID = SelectedItem.design_id;
+				imlVE.ClearInterface();
+				Instantiator.NextInstantiatorID = 0;
+				imlVE.Styling = projFile.Project.solution.Styling;
+				imlVE.DefaultValuesLoader.Clear();
+				imlVE.DefaultTemplates = projFile.Project.solution.DefaultTemplates;
+				imlVE.Instantiators = new Dictionary<string, Instantiator>();
+
+				//prevent error on empty file
+				bool emptyFile = true;
+				string src = projFile.Source;
+				using (Stream s = new MemoryStream (Encoding.UTF8.GetBytes (src))) {
+					using (XmlReader itr = XmlReader.Create (s)) {
+						while(itr.Read()){
+							if (itr.NodeType == XmlNodeType.Element){
+								emptyFile = false;
+								break;
+							}
+						}
 					}
-					imlVE.Update ();
-				} catch (Exception ex) {
-					IMLError = ex.InnerException;
-					if (Monitor.IsEntered(imlVE.UpdateMutex))
-						Monitor.Exit (imlVE.UpdateMutex);
 				}
+				GraphicObject go = null;
+				Error = null;
 
+				if (emptyFile){
+					imlProjFile.Instance = null;
+				}else{
+					imlVE.LoadIMLFragment(src);
+					imlProjFile.Instance = imlVE.GraphicTree[0];
+					if (selItemDesignID!=null)
+						imlProjFile.Instance.FindByDesignID(selItemDesignID,out go);						
 
-				bool isDirty = false;
-
-				lock (imlVE.RenderMutex)
-					isDirty = imlVE.IsDirty;
-
-				if (isDirty) {
-					lock (IFace.UpdateMutex)
-						RegisterForRedraw ();
 				}
+				SelectedItem = go;
+			} catch (Exception ex) {
+				Error = ex.InnerException;
+				if (Monitor.IsEntered(imlVE.UpdateMutex))
+					Monitor.Exit (imlVE.UpdateMutex);
+			}
+		}
 
-				Thread.Sleep (10);
+		protected override bool EditorIsDirty {
+			get { return (bool)imlProjFile.Instance?.design_HasChanged; }
+			set {
+				if (GraphicTree [0] != null)
+					GraphicTree [0].design_HasChanged = value;			
+			}
+		}
+		protected override bool IsReady {
+			get { return imlVE != null && imlProjFile != null; }
+		}
+		protected override void updateCheckPostProcess ()
+		{
+			imlVE.Update ();
+			bool isDirty = false;
+
+			lock (imlVE.RenderMutex)
+				isDirty = imlVE.IsDirty;
+
+			if (isDirty) {
+				lock (IFace.UpdateMutex)
+					RegisterForRedraw ();
 			}
 		}
 
@@ -194,59 +211,7 @@ namespace Crow.Coding
 				break;
 			}
 		}
-		bool tryAddDraggedObjTo(GraphicObject g){
-			lock (imlVE.UpdateMutex) {
-				if (g.GetType ().IsSubclassOf (typeof(Container))) {
-					Container c = g as Container;
-					c.SetChild (draggedObj);
-					GraphicTree [0].design_HasChanged = true;
-				} else if (g.GetType ().IsSubclassOf (typeof(Group))) {
-					Group c = g as Group;
-					c.AddChild (draggedObj);
-				} else
-					return false;
-				GraphicTree [0].design_HasChanged = true;
-				draggedObjContainer = g;
-			}
-			return true;
-		}
-		bool isPossibleContainer (GraphicObject g){
-			if (g.GetType().IsSubclassOf(typeof(Container))){
-				Container c = g as Container;
-				return c.Child == null;
-			}
-			return g.GetType ().IsSubclassOf (typeof(Group));
-		}
-		void removeDraggedObjFrom(){
-			if (draggedObjContainer == null)
-				return;
-			lock (imlVE.UpdateMutex) {
-				if (draggedObjContainer.GetType().IsSubclassOf(typeof(Container))){
-					Container c = draggedObjContainer as Container;
-					c.SetChild (null);
-					GraphicTree [0].design_HasChanged = true;
-					//Console.WriteLine ("remove {0} from {1}", draggedObj, c);
-				}else if (draggedObjContainer.GetType().IsSubclassOf(typeof(Group))){
-					Group c = draggedObjContainer as Group;
-					c.RemoveChild (draggedObj);
-					GraphicTree [0].design_HasChanged = true;
-					//Console.WriteLine ("remove {0} from {1}", draggedObj, c);
-				}//else
-				//	Console.WriteLine ("Error removing dragged obj");
-			}
-			draggedObjContainer = null;
-		}
-		public void ClearDraggedObj (bool removeFromTree = true) {
-			//Console.WriteLine ("Clear dragged obj {0}, remove from tree = {1}", draggedObj, removeFromTree);
-			if (removeFromTree)
-				removeDraggedObjFrom ();
-			draggedObjContainer = null;
-			if (draggedObj == null)
-				return;
-			if (removeFromTree)
-				draggedObj.Dispose ();
-			draggedObj = null;
-		}
+
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
@@ -279,6 +244,7 @@ namespace Crow.Coding
 			}
 
 		}
+
 		protected override void onDraw (Cairo.Context gr)
 		{
 			base.onDraw (gr);
@@ -338,30 +304,86 @@ namespace Crow.Coding
 			gr.Rectangle (hr, 1.0);
 		}
 
-		public GraphicObject draggedObj = null;
-		public GraphicObject draggedObjContainer = null;
-
 		protected override void onDragEnter (object sender, DragDropEventArgs e)
 		{
 			base.onDragEnter (sender, e);
 			GraphicObjectDesignContainer godc = e.DragSource.DataSource as GraphicObjectDesignContainer;
 			if (godc == null)
 				return;
-			Console.WriteLine ("IMLEditor Drag Enter");
-
-			lock (imlVE.UpdateMutex) {
-				draggedObj = imlVE.CreateITorFromIMLFragment ("<" + godc.CrowType.Name + "/>").CreateInstance ();
-			}
+			createDraggedObj (godc.CrowType);
 		}
 		protected override void onDragLeave (object sender, DragDropEventArgs e)
 		{
 			base.onDragLeave (sender, e);
 
-			Console.WriteLine ("IMLEditor Drag Enter");
-
 			ClearDraggedObj ();
 		}
 		#endregion
+
+		#region draggedObj handling
+		public GraphicObject draggedObj = null;
+		public GraphicObject draggedObjContainer = null;
+
+		bool tryAddDraggedObjTo(GraphicObject g){
+			lock (imlVE.UpdateMutex) {
+				if (g.GetType ().IsSubclassOf (typeof(Container))) {
+					Container c = g as Container;
+					c.SetChild (draggedObj);
+					EditorIsDirty = true;
+				} else if (g.GetType ().IsSubclassOf (typeof(Group))) {
+					Group c = g as Group;
+					c.AddChild (draggedObj);
+				} else
+					return false;
+				EditorIsDirty = true;
+				draggedObjContainer = g;
+			}
+			return true;
+		}
+		bool isPossibleContainer (GraphicObject g){
+			if (g.GetType().IsSubclassOf(typeof(Container))){
+				Container c = g as Container;
+				return c.Child == null;
+			}
+			return g.GetType ().IsSubclassOf (typeof(Group));
+		}
+		void removeDraggedObjFrom(){
+			if (draggedObjContainer == null)
+				return;
+			lock (imlVE.UpdateMutex) {
+				if (draggedObjContainer.GetType().IsSubclassOf(typeof(Container))){
+					Container c = draggedObjContainer as Container;
+					c.SetChild (null);
+					EditorIsDirty = true;
+					//Console.WriteLine ("remove {0} from {1}", draggedObj, c);
+				}else if (draggedObjContainer.GetType().IsSubclassOf(typeof(Group))){
+					Group c = draggedObjContainer as Group;
+					c.RemoveChild (draggedObj);
+					EditorIsDirty = true;
+					//Console.WriteLine ("remove {0} from {1}", draggedObj, c);
+				}//else
+				//	Console.WriteLine ("Error removing dragged obj");
+			}
+			draggedObjContainer = null;
+		}
+		void createDraggedObj (Type crowType) {
+			lock (imlVE.UpdateMutex) {
+				draggedObj = imlVE.CreateITorFromIMLFragment ("<" + crowType.Name + "/>").CreateInstance ();
+			}
+		}
+		public void ClearDraggedObj (bool removeFromTree = true) {
+			//Console.WriteLine ("Clear dragged obj {0}, remove from tree = {1}", draggedObj, removeFromTree);
+			if (removeFromTree)
+				removeDraggedObjFrom ();
+			draggedObjContainer = null;
+			if (draggedObj == null)
+				return;
+			if (removeFromTree)
+				draggedObj.Dispose ();
+			draggedObj = null;
+		}
+		#endregion
+
 
 		void WidgetCheckOver (GraphicObject go, MouseMoveEventArgs e){
 			Type tGo = go.GetType();

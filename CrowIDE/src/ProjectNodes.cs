@@ -263,6 +263,8 @@ namespace Crow.Coding
 				NotifyValueChanged ("Source", source);
 				NotifyValueChanged ("IsDirty", IsDirty);
 
+				cmdSave.CanExecute = IsDirty;
+
 				srcEditMtx.ExitWriteLock ();
 			}
 		}
@@ -317,6 +319,8 @@ namespace Crow.Coding
 			NotifyValueChanged ("IsDirty", false);
 		}
 		public void Save () {
+			if (!IsDirty)
+				return;
 			using (StreamWriter sw = new StreamWriter (AbsolutePath)) {
 				sw.Write (source);
 			}

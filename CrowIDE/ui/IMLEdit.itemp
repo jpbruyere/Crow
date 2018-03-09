@@ -6,35 +6,11 @@
 			AllowDrop="true"
 			ProjectNode="{}" SelectedItem="{²SelectedItem}"
 			Name="crowContainer" Background="Onyx"/>
-		<Splitter/>
-		<HorizontalStack Height="Stretched" >
-			<SourceEditor Focusable="true" Name="editor" Font="monospace, 12" VerticalAlignment="Top" Margin="4"
-					Foreground="Jet" Background="White" Width="Stretched" Height="Stretched"
-					CurrentLine="{²CurrentLine}" CurrentColumn="{²CurrentColumn}"
-					PrintLineNumbers="true"
-					ProjectNode="{}"  KeyDown="textView_KeyDown"/>
-			<ScrollBar Name="scrollbarY" Value="{²../editor.ScrollY}"
-					   LargeIncrement="{../editor.VisibleLines}"
-					   CursorSize="{../editor.ChildHeightRatio}"
-				Maximum="{../editor.MaxScrollY}" Orientation="Vertical"
-				Width="14" />
-		</HorizontalStack>
-		<ScrollBar Name="scrollbarX" Value="{²../editor.ScrollX}"
-				Maximum="{../editor.MaxScrollX}" Orientation="Horizontal"
-				Height="14" />
-		<Label DataSource="{../../crowContainer.IMLError}" Text="{Message}"
-			Visible="{../../crowContainer.HasError}"
+		<Label DataSource="{../crowContainer.Error}" Text="{Message}"
+			Visible="{../crowContainer.HasError}"
 			Height="Fit" Width="Stretched" Background="DarkRed" Foreground="White"
-			TextAlignment="TopLeft" Multiline="true"/>			
-		<HorizontalStack Height="Fit">				
-			<GraphicObject Height="5" Width="Stretched"/>
-			<GraphicObject Background="Red" Width="5" Height="5" Visible="{IsDirty}"/>
-			<Label Text="column:"/>
-			<Label Text="{CurrentColumn}" Font="droid bold, 10"/>
-			<Label Text="line:"/>
-			<Label Text="{CurrentLine}" Font="droid bold, 10"/>
-			<Label Text="ScrollX:"/>
-			<Label Text="{../../editor.ScrollX}"/>
-		</HorizontalStack>
+			TextAlignment="TopLeft" Multiline="true"/>
+		<Splitter/>
+		<IMLContainer Path="#Crow.Coding.ui.SourceEditor.crow"/>
 	</VerticalStack>
 </TabItem>

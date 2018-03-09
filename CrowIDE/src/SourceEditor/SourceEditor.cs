@@ -42,10 +42,8 @@ namespace Crow.Coding
 	/// <summary>
 	/// Scrolling text box optimized for monospace fonts, for coding
 	/// </summary>
-	public class SourceEditor : ScrollingObject
-	{
-		public ReaderWriterLockSlim seMutex = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-
+	public class SourceEditor : Editor
+	{		
 		#region CTOR
 		public SourceEditor (): base()
 		{
@@ -66,6 +64,7 @@ namespace Crow.Coding
 			//formatting.Add ((int)BufferParser.TokenType.Keyword, new TextFormatting (Color.DarkCyan, Color.Transparent));
 
 			parsing.Add (".crow", "Crow.Coding.XMLParser");
+			parsing.Add (".svg", "Crow.Coding.XMLParser");
 			parsing.Add (".template", "Crow.Coding.XMLParser");
 			parsing.Add (".cs", "Crow.Coding.CSharpParser");
 			parsing.Add (".style", "Crow.Coding.StyleParser");
@@ -79,40 +78,14 @@ namespace Crow.Coding
 			buffer.PositionChanged += Buffer_PositionChanged;
 			buffer.FoldingEvent += Buffer_FoldingEvent;
 			buffer.Add (new CodeLine(""));
-
-			Thread updateSource = new Thread (updateSourceThreadFunc);
-			updateSource.IsBackground = true;
-			updateSource.Start ();
 		}
 		#endregion
+
 		string oldSource = "";
-		void updateSourceThreadFunc (){
-			while (true) {
-				if (projFile != null && buffer != null) {
-					if (!projFile.RegisteredEditors [this]) {
-						loadSource ();
-						isDirty = false;
-						oldSource = projFile.Source;
-						CurrentLine = requestedLine;
-						CurrentColumn = requestedCol;
-						projFile.RegisteredEditors [this] = true;
-					}
-					buffer.editMutex.EnterWriteLock ();
-					string newsrc = "";
-					bool wasDirty = false;
-					if (isDirty) {
-						isDirty = false;
-						wasDirty = true;
-						newsrc = buffer.FullText;
-					}
-					buffer.editMutex.ExitWriteLock ();
-					if (wasDirty) 
-						projFile.UpdateSource (this, newsrc);						
-					
-				}
-				Thread.Sleep (100);
-			}
-		}
+		//save requested position on error, and try it on next move
+		int requestedLine = 0, requestedCol = 0;
+		volatile bool isDirty = false;
+
 		const int leftMarginGap = 3;//gap between items in margin and text
 		const int foldSize = 9;//folding rectangles size
 		const int foldHSpace = 4;//folding level tabulation x
@@ -120,7 +93,6 @@ namespace Crow.Coding
 
 		#region private and protected fields
 		bool foldingEnabled = true;
-		ProjectFile projFile = null;
 		int leftMargin = 0;	//margin used to display line numbers, folding errors,etc...
 		int visibleLines = 1;
 		int visibleColumns = 1;
@@ -199,7 +171,7 @@ namespace Crow.Coding
 		}			
 		void updatePrintedLines () {
 			buffer.editMutex.EnterReadLock ();
-			seMutex.EnterWriteLock ();
+			editorMutex.EnterWriteLock ();
 
 			PrintedLines = new List<CodeLine> ();
 			int curL = 0;
@@ -225,7 +197,10 @@ namespace Crow.Coding
 			}
 
 			buffer.editMutex.ExitReadLock ();
-			seMutex.ExitWriteLock ();
+			editorMutex.ExitWriteLock ();
+		}
+		void updateOnScreenCurLineFromBuffCurLine(){
+			printedCurrentLine = PrintedLines.IndexOf (buffer.CurrentCodeLine);
 		}
 		void toogleFolding (int line) {
 			if (parser == null || !foldingEnabled)
@@ -233,12 +208,34 @@ namespace Crow.Coding
 			buffer.ToogleFolding (line);
 		}
 
-		volatile bool isDirty = false;
+		protected override void updateEditorFromProjFile ()
+		{
+			loadSource ();
+			isDirty = false;
+			oldSource = projFile.Source;
+			CurrentLine = requestedLine;
+			CurrentColumn = requestedCol;
+			projFile.RegisteredEditors [this] = true;
+		}
+		protected override void updateProjFileFromEditor ()
+		{
+			buffer.editMutex.EnterWriteLock ();
+			string newsrc = buffer.FullText;
+			buffer.editMutex.ExitWriteLock ();
+			projFile.UpdateSource (this, newsrc);
+		}
+		protected override bool EditorIsDirty {
+			get { return isDirty; }
+			set { isDirty = value; }
+		}
+		protected override bool IsReady {
+			get { return buffer != null; }
+		}
 
 		#region Buffer events handlers
 		void Buffer_BufferCleared (object sender, EventArgs e)
 		{
-			seMutex.EnterWriteLock ();
+			editorMutex.EnterWriteLock ();
 
 			buffer.longestLineCharCount = 0;
 			buffer.longestLineIdx = 0;
@@ -249,7 +246,7 @@ namespace Crow.Coding
 			notifyPositionChanged ();
 			isDirty = true;
 
-			seMutex.ExitWriteLock ();
+			editorMutex.ExitWriteLock ();
 		}
 		void Buffer_LineAdditionEvent (object sender, CodeBufferEventArgs e)
 		{
@@ -343,20 +340,18 @@ namespace Crow.Coding
 		}
 		#endregion
 
-		public int CurrentColumn{
-			get { return buffer == null ? 0 : buffer.CurrentColumn+1; }
-			set {
-				try {					
-					if (value - 1 == buffer.CurrentColumn)
-						return;
-					buffer.CurrentColumn = value - 1;
-				} catch (Exception ex) {
-					requestedCol = value - 1;
-					Console.WriteLine ("Error cur column: " + ex.ToString ());
-				}
+		void notifyPositionChanged (){
+			try {				
+				NotifyValueChanged ("CurrentLine", buffer.CurrentLine+1);
+				NotifyValueChanged ("CurrentColumn", buffer.CurrentColumn+1);
+				NotifyValueChanged ("CurrentLineHasError", CurrentLineHasError);
+				NotifyValueChanged ("CurrentLineError", CurrentLineError);
+			} catch (Exception ex) {
+				Console.WriteLine (ex.ToString ());
 			}
 		}
-		int requestedLine = 0, requestedCol = 0;
+			
+		#region Public Crow Properties
 		public int CurrentLine{
 			get { return buffer == null ? 0 : buffer.CurrentLine+1; }
 			set {
@@ -373,30 +368,19 @@ namespace Crow.Coding
 				}
 			}
 		}
-
-		void notifyPositionChanged (){
-			try {
-				
-				NotifyValueChanged ("CurrentLine", buffer.CurrentLine+1);
-				NotifyValueChanged ("CurrentColumn", buffer.CurrentColumn+1);
-			} catch (Exception ex) {
-				Console.WriteLine (ex.ToString ());
+		public int CurrentColumn{
+			get { return buffer == null ? 0 : buffer.CurrentColumn+1; }
+			set {
+				try {					
+					if (value - 1 == buffer.CurrentColumn)
+						return;
+					buffer.CurrentColumn = value - 1;
+				} catch (Exception ex) {
+					requestedCol = value - 1;
+					Console.WriteLine ("Error cur column: " + ex.ToString ());
+				}
 			}
 		}
-
-		BufferParser getParserFromExt (string extension) {
-			if (string.IsNullOrEmpty(extension))
-				return null;
-			if (!parsing.ContainsKey(extension))
-				return null;
-			Type parserType = Type.GetType (parsing [extension]);
-			if (parserType == null)
-				return null;
-			return (BufferParser)Activator.CreateInstance (parserType, buffer );
-		}
-
-		#region Public Crow Properties
-		[XmlAttributeAttribute]
 		public bool PrintLineNumbers
 		{
 			get { return Configuration.Global.Get<bool> ("PrintLineNumbers"); }
@@ -409,55 +393,7 @@ namespace Crow.Coding
 				RegisterForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute]
-		public ProjectFile ProjectNode
-		{
-			get {
-				return projFile;
-			}
-			set
-			{
-				if (projFile == value)
-					return;
-
-				if (projFile != null)
-					projFile.UnregisterEditor (this);
-
-				projFile = value;
-				NotifyValueChanged ("ProjectNode", projFile);
-
-				if (projFile == null)
-					return;
-
-				parser = getParserFromExt (System.IO.Path.GetExtension (projFile.Extension));
-
-				projFile.RegisterEditor (this);
-
-			}
-		}
-		void loadSource () {
-			
-			try {
-				
-				if (parser == null)
-					buffer.Load (projFile.Source);
-				else//parser may have special linebrk rules
-					buffer.Load (projFile.Source, parser.LineBrkRegex);
-				
-			} catch (Exception ex) {
-				Debug.WriteLine (ex.ToString ());
-			}
-
-			projFile.RegisteredEditors [this] = true;
-
-			updateMaxScrollY ();
-			MaxScrollX = Math.Max (0, buffer.longestLineCharCount - visibleColumns);
-			updatePrintedLines ();
-
-			RegisterForGraphicUpdate ();
-		}
-
-		[XmlAttributeAttribute][DefaultValue("BlueGray")]
+		[DefaultValue("BlueGray")]
 		public virtual Color SelectionBackground {
 			get { return selBackground; }
 			set {
@@ -468,7 +404,7 @@ namespace Crow.Coding
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue("White")]
+		[DefaultValue("White")]
 		public virtual Color SelectionForeground {
 			get { return selForeground; }
 			set {
@@ -479,23 +415,6 @@ namespace Crow.Coding
 				RegisterForRedraw ();
 			}
 		}
-
-//		[XmlIgnore]public string SelectedText
-//		{
-//			get {
-//				if (!selectionIsEmpty)
-//					buffer.SetSelection (selectionStart, selectionEnd);
-//				return buffer.SelectedText;
-//			}
-//		}
-
-		#endregion
-
-
-		void updateOnScreenCurLineFromBuffCurLine(){
-			printedCurrentLine = PrintedLines.IndexOf (buffer.CurrentCodeLine);
-		}
-
 		public override int ScrollY {
 			get {
 				return base.ScrollY;
@@ -508,6 +427,56 @@ namespace Crow.Coding
 				updateOnScreenCurLineFromBuffCurLine ();
 				RegisterForGraphicUpdate ();
 			}
+		}
+		public ParserException CurrentLineError {
+			get { return buffer?.CurrentCodeLine?.exception; }
+		}
+		public bool CurrentLineHasError {
+			get { return buffer == null ? false : buffer.CurrentCodeLine == null ? false :
+				buffer.CurrentCodeLine.exception != null; }
+		}
+		public override ProjectFile ProjectNode {
+			get {
+				return base.ProjectNode;
+			}
+			set {
+				base.ProjectNode = value;
+				if (projFile != null)
+					parser = getParserFromExt (System.IO.Path.GetExtension (projFile.Extension));
+			}
+		}
+		#endregion
+
+		BufferParser getParserFromExt (string extension) {
+			if (string.IsNullOrEmpty(extension))
+				return null;
+			if (!parsing.ContainsKey(extension))
+				return null;
+			Type parserType = Type.GetType (parsing [extension]);
+			if (parserType == null)
+				return null;
+			return (BufferParser)Activator.CreateInstance (parserType, buffer );
+		}
+		void loadSource () {
+
+			try {
+
+				if (parser == null)
+					buffer.Load (projFile.Source);
+				else//parser may have special linebrk rules
+					buffer.Load (projFile.Source, parser.LineBrkRegex);
+
+			} catch (Exception ex) {
+				Debug.WriteLine (ex.ToString ());
+			}
+
+			projFile.RegisteredEditors [this] = true;
+
+			updateMaxScrollY ();
+			MaxScrollX = Math.Max (0, buffer.longestLineCharCount - visibleColumns);
+			updatePrintedLines ();
+
+			RegisterForGraphicUpdate ();
 		}
 
 		/// <summary>
@@ -874,7 +843,7 @@ namespace Crow.Coding
 			}
 			#endregion
 
-			seMutex.EnterReadLock ();
+			editorMutex.EnterReadLock ();
 
 			if (PrintedLines != null) {				
 				int unfoldedLines = buffer.UnfoldedLines;
@@ -899,7 +868,7 @@ namespace Crow.Coding
 				}
 			}
 
-			seMutex.ExitReadLock ();
+			editorMutex.ExitReadLock ();
 
 			buffer.editMutex.ExitReadLock ();
 
@@ -1026,6 +995,14 @@ namespace Crow.Coding
 			//base.onKeyDown (sender, e);
 
 			Key key = e.Key;
+
+			if (e.Control) {
+				switch (key) {
+				case Key.S:
+					projFile.Save ();
+					break;
+				}
+			}
 
 			switch (key)
 			{

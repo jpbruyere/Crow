@@ -71,6 +71,11 @@ namespace Crow
 			sharedResources [path] = new sharedPicture (hSVG, Dimensions);
 		}
 
+		public void LoadSvgFragment (string fragment) {			
+			hSVG = new Rsvg.Handle (System.Text.Encoding.Unicode.GetBytes(fragment));
+			Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
+		}
+
 		#region implemented abstract members of Fill
 
 		public override void SetAsSource (Context ctx, Rectangle bounds = default(Rectangle))
@@ -112,6 +117,8 @@ namespace Crow
 		/// <param name="subPart">limit rendering to svg part named 'subPart'</param>
 		public override void Paint (Context gr, Rectangle rect, string subPart = "")
 		{
+			if (hSVG == null)
+				return;
 			float widthRatio = 1f;
 			float heightRatio = 1f;
 

@@ -113,6 +113,8 @@
     <Compile Include="src\MemberView\PropertyContainer.cs" />
     <Compile Include="src\MemberView\CategoryContainer.cs" />
     <Compile Include="src\GraphicObjectDesignContainer.cs" />
+    <Compile Include="src\Editor.cs" />
+    <Compile Include="src\SvgEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />
@@ -179,43 +181,27 @@
     <EmbeddedResource Include="icons\toolbox\bullets.svg" />
     <EmbeddedResource Include="icons\toolbox\calendar.svg" />
     <EmbeddedResource Include="icons\toolbox\check-square-1.svg" />
-    <EmbeddedResource Include="icons\toolbox\curly-brackets.svg" />
     <EmbeddedResource Include="icons\toolbox\database.svg" />
     <EmbeddedResource Include="icons\toolbox\ellipsis.svg" />
-    <EmbeddedResource Include="icons\toolbox\eraser.svg" />
     <EmbeddedResource Include="icons\toolbox\file-code.svg" />
-    <EmbeddedResource Include="icons\toolbox\gear.svg" />
     <EmbeddedResource Include="icons\toolbox\grab.svg" />
     <EmbeddedResource Include="icons\toolbox\hash.svg" />
-    <EmbeddedResource Include="icons\toolbox\light-bulb.svg" />
     <EmbeddedResource Include="icons\toolbox\line-list.svg" />
     <EmbeddedResource Include="icons\toolbox\list.svg" />
-    <EmbeddedResource Include="icons\toolbox\move-arrows.svg" />
     <EmbeddedResource Include="icons\toolbox\package.svg" />
-    <EmbeddedResource Include="icons\toolbox\paint-brush.svg" />
-    <EmbeddedResource Include="icons\toolbox\pin.svg" />
     <EmbeddedResource Include="icons\toolbox\pointer.svg" />
     <EmbeddedResource Include="icons\toolbox\puzzle-piece.svg" />
     <EmbeddedResource Include="icons\toolbox\refresh-file.svg" />
-    <EmbeddedResource Include="icons\toolbox\search.svg" />
     <EmbeddedResource Include="icons\toolbox\sliders.svg" />
     <EmbeddedResource Include="icons\toolbox\split-browser-1.svg" />
     <EmbeddedResource Include="icons\toolbox\table.svg" />
     <EmbeddedResource Include="icons\toolbox\tasks.svg" />
-    <EmbeddedResource Include="icons\toolbox\tools.svg" />
-    <EmbeddedResource Include="icons\toolbox\trash.svg" />
-    <EmbeddedResource Include="icons\toolbox\zoom-in.svg" />
-    <EmbeddedResource Include="icons\toolbox\zoom-out.svg" />
-    <EmbeddedResource Include="icons\toolbox\dot-inside-a-circle.svg" />
-    <EmbeddedResource Include="icons\toolbox\edit.svg" />
     <EmbeddedResource Include="icons\toolbox\picture-file.svg" />
-    <EmbeddedResource Include="icons\toolbox\text-file.svg" />
     <EmbeddedResource Include="icons\toolbox\warning.svg" />
     <EmbeddedResource Include="icons\toolbox\Crow.Button.svg" />
     <EmbeddedResource Include="icons\toolbox\Crow.TextBox.svg" />
     <EmbeddedResource Include="icons\toolbox\Crow.Label.svg" />
     <EmbeddedResource Include="icons\toolbox\Crow.CheckBox.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.RadioButton.svg" />
     <EmbeddedResource Include="icons\toolbox\Crow.Spinner.svg" />
     <EmbeddedResource Include="icons\toolbox\Crow.Container.svg" />
     <EmbeddedResource Include="icons\toolbox\Crow.Group.svg" />
@@ -251,6 +237,23 @@
     <EmbeddedResource Include="icons\toolbox\Crow.Expandable.svg" />
     <EmbeddedResource Include="icons\toolbox\Crow.DirectoryView.svg" />
     <EmbeddedResource Include="icons\toolbox\Crow.MessageBox.svg" />
+    <EmbeddedResource Include="icons\toolbox\options.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.RadioButton.svg" />
+    <EmbeddedResource Include="icons\move-arrows.svg" />
+    <EmbeddedResource Include="icons\eraser.svg" />
+    <EmbeddedResource Include="icons\light-bulb.svg" />
+    <EmbeddedResource Include="icons\pin.svg" />
+    <EmbeddedResource Include="icons\paint-brush.svg" />
+    <EmbeddedResource Include="icons\tools.svg" />
+    <EmbeddedResource Include="icons\trash.svg" />
+    <EmbeddedResource Include="icons\zoom-in.svg" />
+    <EmbeddedResource Include="icons\zoom-out.svg" />
+    <EmbeddedResource Include="icons\search.svg" />
+    <EmbeddedResource Include="icons\curly-brackets.svg" />
+    <EmbeddedResource Include="icons\compile.svg" />
+    <EmbeddedResource Include="icons\edit.svg" />
+    <EmbeddedResource Include="icons\text-file.svg" />
+    <EmbeddedResource Include="ui\SourceEditor.crow" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">

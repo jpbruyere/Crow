@@ -216,18 +216,35 @@ namespace Crow.Coding
 
 		#endregion
 
+		Crow.Command cmdSave, cmdOpen, cmdCompile, cmdSetAsStartProj, cmdNewFile;
 
 		public Project (Solution sol, SolutionProject sp) {
 			solutionProject = sp;
 
 			solution = sol;
-			
-			Commands = new List<Crow.Command> (new Crow.Command[] {
-				new Crow.Command(new Action(() => Compile())) { Caption = "Compile"},
-				new Crow.Command(new Action(() => setAsStartupProject())) { Caption = "Set as Startup Project"},
-			});
+
+			cmdSave = new Crow.Command (new Action (() => Save ()))
+			{ Caption = "Save", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = true };
+			cmdOpen = new Crow.Command (new Action (() => Load ())) 
+			{ Caption = "Open", Icon = new SvgPicture ("#Crow.Coding.ui.icons.outbox.svg"), CanExecute = false };
+			cmdCompile = new Crow.Command (new Action (() => Compile ())) {
+				Caption = "Compile",
+				Icon = "#Crow.Coding.icons.compile.svg"
+			};
+			cmdSetAsStartProj = new Crow.Command (new Action (() => setAsStartupProject ())) {
+				Caption = "Set as Startup Project"
+			};
+			cmdNewFile = new Crow.Command (new Action (() => AddNewFile ())) {
+				Caption = "Add New File"
+			};
+
+			Commands = new List<Crow.Command> (new Crow.Command[] {cmdOpen,cmdSave,cmdSetAsStartProj,cmdCompile,cmdNewFile});
 
 			Load ();
+		}
+
+		public void AddNewFile () {
+			
 		}
 
 		public void Load () {
@@ -252,6 +269,10 @@ namespace Crow.Coding
 			buildTreeNodes ();
 
 			IsLoaded = true;
+		}
+
+		public void Save () {
+			
 		}
 
 		void setAsStartupProject () {
