@@ -425,11 +425,11 @@ namespace Crow
 		public event EventHandler Disabled;
 
 		#region DragAndDrop Events
-		public event EventHandler StartDrag;
-		public event EventHandler DragEnter;
-		public event EventHandler DragLeave;
-		public event EventHandler EndDrag;
-		public event EventHandler Drop;
+		public event EventHandler<DragDropEventArgs> StartDrag;
+		public event EventHandler<DragDropEventArgs> DragEnter;
+		public event EventHandler<DragDropEventArgs> DragLeave;
+		public event EventHandler<DragDropEventArgs> EndDrag;
+		public event EventHandler<DragDropEventArgs> Drop;
 		#endregion
 
 		/// <summary>
@@ -1242,7 +1242,9 @@ namespace Crow
 			IFace.HoverWidget = null;
 			IsDragged = true;
 			StartDrag.Raise (this, e);
+			#if DEBUG_DRAGNDROP
 			Debug.WriteLine(this.ToString() + " : START DRAG => " + e.ToString());
+			#endif
 		}
 		/// <summary>
 		///  Occured when dragging ends without dropping
@@ -1250,27 +1252,31 @@ namespace Crow
 		protected virtual void onEndDrag (object sender, DragDropEventArgs e){			
 			IsDragged = false;
 			EndDrag.Raise (this, e);
+			#if DEBUG_DRAGNDROP
 			Debug.WriteLine(this.ToString() + " : END DRAG => " + e.ToString());
+			#endif
 		}
 		protected virtual void onDragEnter (object sender, DragDropEventArgs e){
 			e.DropTarget = this;
 			DragEnter.Raise (this, e);
+			#if DEBUG_DRAGNDROP
 			Debug.WriteLine(this.ToString() + " : DRAG Enter => " + e.ToString());
+			#endif
 		}
 		protected virtual void onDragLeave (object sender, DragDropEventArgs e){			
 			e.DropTarget = null;
 			DragLeave.Raise (this, e);
+			#if DEBUG_DRAGNDROP
 			Debug.WriteLine(this.ToString() + " : DRAG Leave => " + e.ToString());
+			#endif
 		}
 		protected virtual void onDrop (object sender, DragDropEventArgs e){			
 			IsDragged = false;
 			Drop.Raise (this, e);
 			//e.DropTarget.onDragLeave (this, e);//raise drag leave in target
+			#if DEBUG_DRAGNDROP
 			Debug.WriteLine(this.ToString() + " : DROP => " + e.ToString());
-		}
-		public virtual void OnDragMove(object sender, MouseMoveEventArgs e, DragDropEventArgs dde)
-		{
-
+			#endif
 		}
 		public bool IsDropTarget {
 			get { return IFace.DragAndDropOperation?.DropTarget == this; }
@@ -1397,6 +1403,11 @@ namespace Crow
 			IFace.currentLQI.Slot = LastSlots;
 			IFace.currentLQI.NewSlot = Slot;
 			Debug.WriteLine ("\t\t{0} => {1}",LastSlots,Slot);
+			#endif
+			#if DESIGN_MODE
+			if (IFace.GetType().Name == "DesignInterface"){
+				Debug.WriteLine ("\t\t{2}: {0} => {1}",LastSlots,Slot,this.name);
+			}
 			#endif
 
 			switch (layoutType) {
@@ -1860,6 +1871,13 @@ namespace Crow
 			Disabled.Raise (this, e);
 		}
 		protected virtual void onParentChanged(object sender, DataSourceChangeEventArgs e) {
+//			if (e.NewDataSource != null) {
+//				if (width == Measure.Inherit)
+//					RegisterForLayouting (LayoutingType.Width);
+//				if (height == Measure.Inherit)
+//					RegisterForLayouting (LayoutingType.Height);
+//			}
+			
 			ParentChanged.Raise (this, e);
 			if (logicalParent == null)
 				LogicalParentChanged.Raise (this, e);

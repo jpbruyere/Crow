@@ -69,7 +69,8 @@ MessageBox {
 Slider {
 	Background = "vgradient|0:Black|0.1:Gray|0.9:Gray|1:LightGray";
 	Foreground = "Gray";
-	Width = "Fit";
+	Height = "10";
+	Value="5";
 }
 Splitter {
 	Focusable = "true";

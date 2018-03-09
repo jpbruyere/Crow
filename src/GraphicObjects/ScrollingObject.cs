@@ -36,6 +36,7 @@ namespace Crow
 	/// <summary>
 	/// generic class to build scrolling control in both directions
 	/// </summary>
+	[DesignIgnore]
 	public class ScrollingObject : GraphicObject
 	{
 		#region CTOR

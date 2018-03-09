@@ -151,7 +151,6 @@
     <Compile Include="src\IML\BindingMember.cs" />
     <Compile Include="src\CrowThread.cs" />
     <Compile Include="src\GraphicObjects\ScrollingObject.cs" />
-    <Compile Include="src\GraphicObjects\ScrollingTextBox.cs" />
     <Compile Include="src\Mono.Cairo\Antialias.cs" />
     <Compile Include="src\Mono.Cairo\Cairo.cs" />
     <Compile Include="src\Mono.Cairo\CairoDebug.cs" />
@@ -215,7 +214,6 @@
     <Compile Include="src\IML\IMLContext.cs" />
     <Compile Include="src\Mono.Cairo\MeshPattern.cs" />
     <Compile Include="src\GraphicObjects\Shape.cs" />
-    <Compile Include="src\GraphicObjects\MDIContainer.cs" />
     <Compile Include="src\IListChanged.cs" />
     <Compile Include="src\ObservableList.cs" />
     <Compile Include="src\GraphicObjects\IMLContainer.cs" />
