@@ -33,6 +33,7 @@ namespace Crow
 	/// <summary>
 	/// simple squarred rgb color selector
 	/// </summary>
+	[DesignIgnore]
 	public class ColorSelector : GraphicObject
 	{
 		#region CTOR

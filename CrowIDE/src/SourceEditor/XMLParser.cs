@@ -255,12 +255,11 @@ namespace Crow.Coding
 
 			cl.EndingState = (int)curState;
 		}
+
 		public override void SyntaxAnalysis ()
 		{
-			RootNode = new Node () { Name = "RootNode", Type="Root" };
-
+			initSyntaxAnalysis ();
 			Node currentNode = RootNode;
-			SyntacticTreeDepth = SyntacticTreeMaxDepth = 0;
 
 			for (int i = 0; i < buffer.LineCount; i++) {
 				CodeLine cl = buffer[i];
@@ -273,23 +272,16 @@ namespace Crow.Coding
 					switch ((XMLParser.TokenType)cl.Tokens [tokPtr].Type) {
 					case TokenType.ElementStart:
 						tokPtr++;
-						Node newElt = new Node () { Name = cl.Tokens [tokPtr].Content, StartLine = cl };
-						currentNode.AddChild (newElt);
-						currentNode = newElt;
-						if (cl.SyntacticNode == null)
-							cl.SyntacticNode = newElt;
-						SyntacticTreeDepth++;
+						currentNode = addChildNode (currentNode, cl, tokPtr, "Element");
 						break;
 					case TokenType.ElementEnd:
 						tokPtr++;
 						if (tokPtr < cl.Tokens.Count) {
 							if ((XMLParser.TokenType)cl.Tokens [tokPtr].Type == TokenType.ElementName &&
-								cl.Tokens [tokPtr].Content != currentNode.Name)
+							    cl.Tokens [tokPtr].Content != currentNode.Name)
 								throw new ParserException (currentLine, currentColumn, "Closing tag mismatch");
 						}
-						currentNode.EndLine = cl;
-						currentNode = currentNode.Parent;
-						SyntacticTreeDepth--;
+						closeNodeAndGoUp (ref currentNode, cl, "Element");
 						break;
 					case TokenType.ElementClosing:
 						//currentNode = currentNode.Parent;

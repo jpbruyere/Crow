@@ -341,6 +341,38 @@ namespace Crow.Coding
 		}
 		#endregion
 
+		protected Node addChildNode (Node curNode, CodeLine cl, int tokPtr, string type = "") {
+			Node n = new Node () { Name = cl.Tokens [tokPtr].Content, StartLine = cl, Type = type };
+			curNode.AddChild (n);
+			if (cl.SyntacticNode == null)
+				cl.SyntacticNode = n;
+			SyntacticTreeDepth++;
+			return n;
+		}
+		protected void closeNodeAndGoUp (ref Node n, CodeLine cl, string type = ""){
+			while (n != null) {
+				if (n.Type == type) {
+					n.EndLine = cl;
+					n = n.Parent;
+					SyntacticTreeDepth--;
+					break;
+				}
+				n = n.Parent;
+				SyntacticTreeDepth--;
+			}
+		}
+		protected void closeNodeAndGoUp (ref Node n, CodeLine cl){
+			SyntacticTreeDepth--;
+			n.EndLine = cl;
+			n = n.Parent;
+		}
+
+		protected void initSyntaxAnalysis () {
+			RootNode = new Node () { Name = "RootNode", Type="Root" };
+			SyntacticTreeDepth = SyntacticTreeMaxDepth = 0;
+		}
+
+
 		protected void throwParserException(string msg){
 			throw new ParserException (currentLine, currentColumn, msg);
 		}

@@ -38,6 +38,7 @@ namespace Crow
 	/// TemplatedControl may have 3 children (template,templateItem,content) but
 	/// behave exactely as a container for layouting and drawing
 	/// </summary>
+	[DesignIgnore]
 	public class PrivateContainer : GraphicObject
 	{
 		#region CTOR
@@ -64,9 +65,8 @@ namespace Crow
 					if (this.Contains (IFace.HoverWidget))
 						IFace.HoverWidget = null;
 				}
-				contentSize = new Size (0, 0);
+				contentSize = default(Size);
 				child.LayoutChanged -= OnChildLayoutChanges;
-				child.Dispose ();
 				this.RegisterForGraphicUpdate ();
 			}
 
@@ -75,10 +75,18 @@ namespace Crow
 			if (child != null) {
 				child.Parent = this;
 				child.LayoutChanged += OnChildLayoutChanges;
+				child.Slot = child.LastSlots = default(Rectangle);
 				contentSize = child.Slot.Size;
 				child.RegisteredLayoutings = LayoutingType.None;
 				child.RegisterForLayouting (LayoutingType.Sizing);
 			}
+		}
+		//dispose child if not null
+		protected virtual void deleteChild () {
+			GraphicObject g = child;
+			SetChild (null);
+			if (g != null)
+				g.Dispose ();
 		}
 
 		#region GraphicObject Overrides

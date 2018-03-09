@@ -28,6 +28,7 @@ using Crow.IML;
 
 namespace Crow
 {
+	[DesignIgnore]
 	public class DockStack : GenericStack
 	{
 		Docker rootDock { get { return LogicalParent as Docker; }}

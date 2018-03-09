@@ -126,6 +126,20 @@ namespace Crow.Coding
 			editMutex.ExitWriteLock ();
 			LineUpadateEvent.Raise (this, new CodeBufferEventArgs (i));
 		}
+		public void RemoveLeadingTab (int l) {
+			if (this [l] [0] == '\t') {
+				UpdateLine (l, this [l].Content.Substring (1));
+				return;
+			}
+			int i = 0;
+			while (i < Interface.TabSize) {
+				if (this [l] [i] != ' ')
+					break;
+				i++;
+			}
+			if (i > 0)
+				UpdateLine (l, this [l].Content.Substring (i));
+		}
 		public void ToogleFolding (int line) {
 			if (!this [line].IsFoldable)
 				return;
@@ -290,6 +304,15 @@ namespace Crow.Coding
 		}
 		public void SetSelEndPos () {
 			selEndPos = CurrentPosition;
+			SelectionChanged.Raise (this, null);
+		}
+		public void SetSelectionOnFullLines () {
+			if (!SelectionInProgress)
+				return;
+			Point s = new Point (0, SelectionStart.Y);
+			Point e = new Point (this [SelectionEnd.Y].Length, SelectionEnd.Y);
+			selStartPos = s;
+			selEndPos = e;
 			SelectionChanged.Raise (this, null);
 		}
 		/// <summary>

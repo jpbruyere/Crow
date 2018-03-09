@@ -307,49 +307,10 @@ namespace Crow.Coding
 			cl.EndingState = (int)curState;
 		}
 		
-		Node addChildNode (Node curNode, CodeLine cl, int tokPtr, string type = "") {
-			Node n = new Node () { Name = cl.Tokens [tokPtr].Content, StartLine = cl, Type = type };
-			curNode.AddChild (n);
-			if (cl.SyntacticNode == null)
-				cl.SyntacticNode = n;
-			SyntacticTreeDepth++;
-			return n;
-		}
-		void closeNodeAndGoUp (ref Node n, CodeLine cl, string type = ""){
-			while (n != null) {
-				if (n.Type == type) {
-					n.EndLine = cl;
-					n = n.Parent;
-					SyntacticTreeDepth--;
-					break;
-				}
-				n = n.Parent;
-				SyntacticTreeDepth--;
-			}
-//			if (n.StartLine == cl){//prevent single line node
-//				n.Parent.Children.Remove (n);
-//				if (cl.SyntacticNode == n)
-//					cl.SyntacticNode = null;
-//			}else				
-
-		}
-		void closeNodeAndGoUp (ref Node n, CodeLine cl){
-			//			if (n.StartLine == cl){//prevent single line node
-			//				n.Parent.Children.Remove (n);
-			//				if (cl.SyntacticNode == n)
-			//					cl.SyntacticNode = null;
-			//			}else	
-			SyntacticTreeDepth--;
-			n.EndLine = cl;
-			n = n.Parent;
-		}
-
 		public override void SyntaxAnalysis ()
 		{
-			RootNode = new Node () { Name = "RootNode", Type="Root" };
-
+			initSyntaxAnalysis ();
 			Node currentNode = RootNode;
-			SyntacticTreeDepth = SyntacticTreeMaxDepth = 0;
 
 			int ptrLine = 0;
 			while (ptrLine < buffer.LineCount) {

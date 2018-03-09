@@ -908,7 +908,22 @@ namespace Crow.Coding
 
 		#region Mouse handling
 
-		void updateCurrentPosFromMouseLocalPos(){
+		int hoverLine = -1;
+		public int HoverLine {
+			get { return hoverLine; }
+			set { 
+				if (hoverLine == value)
+					return;
+				hoverLine = value;
+				NotifyValueChanged ("HoverLine", hoverLine);				
+			}
+		}
+		void updateHoverLine () {
+			int hvl = (int)Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent+fe.Descent)));
+			hvl = Math.Min (PrintedLines.Count, hvl);
+			HoverLine = buffer.IndexOf (PrintedLines[hvl]);
+		}
+		void updateCurrentPosFromMouseLocalPos(){			
 			PrintedCurrentLine = (int)Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent+fe.Descent)));
 			int curVisualCol = ScrollX +  (int)Math.Round ((mouseLocalPos.X - leftMargin) / fe.MaxXAdvance);
 
@@ -922,9 +937,6 @@ namespace Crow.Coding
 				buffCol++;
 			}
 			buffer.CurrentColumn = buffCol;
-
-//			if (mouseLocalPos.Y < 0)
-//				ScrollY--;
 		}
 		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
 		{
@@ -944,6 +956,8 @@ namespace Crow.Coding
 			base.onMouseMove (sender, e);
 
 			mouseLocalPos = e.Position - ScreenCoordinates(Slot).TopLeft - ClientRectangle.TopLeft;
+
+			updateHoverLine ();
 
 			if (!e.Mouse.IsButtonDown (MouseButton.Left)) {
 				if (mouseLocalPos.X < leftMargin)
@@ -1157,7 +1171,26 @@ namespace Crow.Coding
 			case Key.RWin:
 				break;
 			case Key.Tab:
-				buffer.Insert ("\t");
+				if (e.Shift) {
+					if (buffer.SelectionIsEmpty ||
+						(buffer.SelectionStart.Y == buffer.SelectionEnd.Y)) {
+						//TODO
+						break;
+					}
+					for (int i = buffer.SelectionStart.Y; i <= buffer.SelectionEnd.Y; i++)
+						buffer.RemoveLeadingTab (i);
+					buffer.SetSelectionOnFullLines ();
+				} else {
+					if (buffer.SelectionIsEmpty ||
+						(buffer.SelectionStart.Y == buffer.SelectionEnd.Y)) {
+						buffer.Insert ("\t");
+						break;
+					}
+					for (int i = buffer.SelectionStart.Y; i <= buffer.SelectionEnd.Y; i++) {
+						buffer.UpdateLine (i, "\t" + buffer [i].Content);
+					}
+				}
+
 				break;
 			case Key.F8:
 				toogleFolding (buffer.CurrentLine);

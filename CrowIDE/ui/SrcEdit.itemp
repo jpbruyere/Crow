@@ -19,12 +19,14 @@
 				Height="14" />			
 		<HorizontalStack Height="Fit">
 			<GraphicObject Height="5" Width="Stretched"/>
-			<GraphicObject Background="Red" Width="5" Height="5" Visible="{../../editor.IsDirty}"/>
-			<Label Text="Line:"/>
+			<GraphicObject Background="Red" Width="5" Height="5" Visible="{IsDirty}"/>
+			<Label Text="Line:" Foreground="Gray"/>
 			<Label Text="{CurrentLine}"/>
-			<Label Text="column:"/>
+			<GraphicObject Height="5" Width="10"/>
+			<Label Text="column:" Foreground="Gray"/>
 			<Label Text="{CurrentColumn}"/>
-			<Label Text="ScrollX:"/>
+			<GraphicObject Height="5" Width="10"/>
+			<Label Text="ScrollX:" Foreground="Gray"/>
 			<Label Text="{../../editor.ScrollX}"/>
 		</HorizontalStack>
 	</VerticalStack>

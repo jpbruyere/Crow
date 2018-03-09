@@ -112,11 +112,11 @@ namespace Crow.Coding
 			}
 		}
 
-		public void updateSource () {
-			if (projFile == null)
-				return;
-			projFile.UpdateSource (this, (Instance as GraphicObject).GetIML ());
-		}
+//		public void updateSource () {
+//			if (projFile == null)
+//				return;
+//			projFile.UpdateSource (this, (Instance as GraphicObject).GetIML ());
+//		}
 
 //		public override void Paint (ref Context ctx)
 //		{

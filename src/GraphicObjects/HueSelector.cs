@@ -31,6 +31,7 @@ using Cairo;
 
 namespace Crow
 {
+	[DesignIgnore]
 	public class HueSelector : ColorSelector
 	{
 		#region CTOR

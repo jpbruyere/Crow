@@ -44,6 +44,7 @@ namespace Crow.Coding{
 		ProjectItem selectedItem = null;
 		object selectedItemElement = null;
 		ObservableList<ProjectItem> openedItems = new ObservableList<ProjectItem>();
+		ObservableList<GraphicObjectDesignContainer> toolboxItems;
 
 		public Dictionary<string, Style> Styling;
 		public Dictionary<string, string> DefaultTemplates;
@@ -63,6 +64,17 @@ namespace Crow.Coding{
 			if (StartupProject != null)
 				StartupProject.GetDefaultTemplates ();
 		}
+		public void updateToolboxItems () {
+			Type[] crowItems = AppDomain.CurrentDomain.GetAssemblies ()
+				.SelectMany (t => t.GetTypes ())
+				.Where (t => t.IsClass && !t.IsAbstract && t.IsPublic &&					
+					t.Namespace == "Crow" && t.IsSubclassOf(typeof(GraphicObject)) &&
+					t.GetCustomAttribute<DesignIgnore>(false) == null).ToArray ();
+			ToolboxItems = new ObservableList<GraphicObjectDesignContainer> ();
+			foreach (Type ci in crowItems) {
+				toolboxItems.AddElement(new GraphicObjectDesignContainer(ci));
+			}
+		}
 		public bool GetProjectFileFromPath (string path, out ProjectFile pi){
 			pi = null;
 			return StartupProject == null ? false :
@@ -77,6 +89,16 @@ namespace Crow.Coding{
 				openedItems = value;
 				NotifyValueChanged ("OpenedItems", openedItems);
 			}
+		}
+
+		public ObservableList<GraphicObjectDesignContainer> ToolboxItems {
+			get { return toolboxItems; }
+			set {
+				if (toolboxItems == value)
+					return;
+				toolboxItems = value;
+				NotifyValueChanged ("ToolboxItems", toolboxItems);
+			}			
 		}
 		public ProjectItem SelectedItem {
 			get { return selectedItem; }
@@ -451,6 +473,7 @@ namespace Crow.Coding{
 			s.UserConfig = new Configuration (s.path + ".user");
 			s.ReloadStyling ();
 			s.ReloadDefaultTemplates ();
+			s.updateToolboxItems ();
 	        return s;
 	    } //LoadSolution
 		#endregion

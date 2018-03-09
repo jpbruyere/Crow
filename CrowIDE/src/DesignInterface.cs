@@ -26,6 +26,9 @@
 using System;
 using Crow;
 using System.Globalization;
+using System.Threading;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Crow.Coding
 {
@@ -155,6 +158,34 @@ namespace Crow.Coding
 			}
 			HoverWidget = null;
 			return false;		
+		}
+	
+		protected override void processLayouting ()
+		{
+			#if MEASURE_TIME
+			layoutingMeasure.StartCycle();
+			#endif
+
+			if (Monitor.TryEnter (LayoutMutex)) {
+				DiscardQueue = new Queue<LayoutingQueueItem> ();
+				LayoutingQueueItem lqi;
+				while (LayoutingQueue.Count > 0) {
+					lqi = LayoutingQueue.Dequeue ();
+					Console.WriteLine (lqi.ToString ());
+					#if DEBUG_LAYOUTING
+					currentLQI = lqi;
+					curLQIsTries.Add(currentLQI);
+					#endif
+					lqi.ProcessLayouting ();
+				}
+				LayoutingQueue = DiscardQueue;
+				Monitor.Exit (LayoutMutex);
+				DiscardQueue = null;
+			}
+
+			#if MEASURE_TIME
+			layoutingMeasure.StopCycle();
+			#endif
 		}
 	}
 }

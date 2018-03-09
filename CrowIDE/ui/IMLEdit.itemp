@@ -2,7 +2,8 @@
 <TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
 	<VerticalStack>
 		<Label Width="Stretched" Margin="1" Text="{HoverWidget}"/>
-		<ImlVisualEditor Height="60%" Margin="0" MinimumSize="10,10" Foreground="SkyBlue"					
+		<ImlVisualEditor Height="60%" Margin="0" MinimumSize="10,10" Foreground="SkyBlue"
+			AllowDrop="true"
 			ProjectNode="{}" SelectedItem="{²SelectedItem}"
 			Name="crowContainer" Background="Onyx"/>
 		<Splitter/>

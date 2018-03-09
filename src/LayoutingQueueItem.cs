@@ -98,10 +98,10 @@ namespace Crow
 		public void ProcessLayouting()
 		{
 			GraphicObject go = Layoutable as GraphicObject;
-			if (go == null) {
-				Debug.WriteLine ("ERROR: processLayouting on something else than a graphic object: " + this.ToString ());
-				return;
-			}
+//			if (go == null) {
+//				Debug.WriteLine ("ERROR: processLayouting on something else than a graphic object: " + this.ToString ());
+//				return;
+//			}
 
 			go.parentRWLock.EnterReadLock ();
 

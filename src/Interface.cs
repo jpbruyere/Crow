@@ -582,7 +582,7 @@ namespace Crow
 		/// <summary>Layouting loop, this is the first step of the udpate and process registered
 		/// Layouting queue items. Failing LQI's are requeued in this cycle until MaxTry is reached which
 		/// trigger an enqueue for the next Update Cycle</summary>
-		void processLayouting(){
+		protected virtual void processLayouting(){
 			#if MEASURE_TIME
 			layoutingMeasure.StartCycle();
 			#endif

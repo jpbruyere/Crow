@@ -30,6 +30,7 @@ using System.Xml.Serialization;
 
 namespace Crow
 {
+	[DesignIgnore]
 	public class SaturationValueSelector : ColorSelector
 	{
 		public SaturationValueSelector () : base(){}

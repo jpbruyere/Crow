@@ -42,6 +42,7 @@ namespace Crow.Coding
 		CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp,
 		CMDAbout, CMDOptions,
 		CMDViewGTExp, CMDViewProps, CMDViewProj, CMDViewProjProps, CMDViewErrors, CMDViewSolution, CMDViewEditor, CMDViewProperties,
+		CMDViewToolbox,
 		CMDCompile;
 
 		void initCommands () {
@@ -66,6 +67,8 @@ namespace Crow.Coding
 			{ Caption = "Editor Pane"};
 			CMDViewProperties = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winProperties.crow")))
 			{ Caption = "Properties"};
+			CMDViewToolbox = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winToolbox.crow")))
+			{ Caption = "Toolbox"};
 
 			CMDViewGTExp = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.GTreeExplorer.crow"))) { Caption = "Graphic Tree Explorer"};
 			CMDViewProps = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.MemberView.crow"))) { Caption = "Properties View"};
@@ -134,6 +137,10 @@ namespace Crow.Coding
 			dw = loadDockWindow ("#Crow.Coding.ui.DockWindows.winSolution.crow");
 			dw.DockingPosition = Alignment.Right;
 			dw.Dock (mainDock.Children [0] as DockStack);
+			dw = loadDockWindow ("#Crow.Coding.ui.DockWindows.winToolbox.crow");
+			dw.DockingPosition = Alignment.Left;
+			dw.Dock (mainDock.Children [0] as DockStack);
+
 		}
 
 		void loadProjProps () {
