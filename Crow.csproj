@@ -386,6 +386,9 @@
     <EmbeddedResource Include="Templates\DockWindow.template">
       <LogicalName>Crow.DockWindow.template</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Templates\HScrollBar.template">
+      <LogicalName>Crow.HScrollBar.template</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="Crow.dll.config">

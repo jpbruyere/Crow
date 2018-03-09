@@ -68,7 +68,7 @@ namespace Crow
 		protected double unity;
 
 		#region Public properties
-		[XmlAttributeAttribute()][DefaultValue("vgradient|0:White|0,1:LightGray|0,9:LightGray|1:DimGray")]
+		[DefaultValue("vgradient|0:White|0,1:LightGray|0,9:LightGray|1:DimGray")]
 		public virtual Fill CursorColor {
 			get { return _cursorColor; }
 			set {
@@ -79,7 +79,7 @@ namespace Crow
 				NotifyValueChanged ("CursorColor", _cursorColor);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(20)]
+		[DefaultValue(20)]
 		public virtual int CursorSize {
 			get { return _cursorSize; }
 			set {
@@ -90,7 +90,7 @@ namespace Crow
 				NotifyValueChanged ("CursorSize", _cursorSize);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(Orientation.Horizontal)]
+		[DefaultValue(Orientation.Horizontal)]
 		public virtual Orientation Orientation
 		{
 			get { return _orientation; }
@@ -105,7 +105,7 @@ namespace Crow
 		}
 		#endregion
 
-		[XmlAttributeAttribute()][DefaultValue(10.0)]
+		[DefaultValue(10.0)]
 		public override double Maximum {
 			get { return base.Maximum; }
 			set {				

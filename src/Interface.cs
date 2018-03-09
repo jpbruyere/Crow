@@ -1131,15 +1131,16 @@ namespace Crow
 		MenuItem ctxMenuContainer;
 		protected void initContextMenus (){
 			ctxMenuContainer = Load  ("#Crow.ContextMenu.template") as MenuItem;
+			ctxMenuContainer.LayoutChanged += CtxMenuContainer_LayoutChanged;
 		}
 
 		void CtxMenuContainer_LayoutChanged (object sender, LayoutingEventArgs e)
 		{
 			Rectangle r = ctxMenuContainer.ScreenCoordinates (ctxMenuContainer.Slot);
-			if (e.LayoutType == LayoutingType.Width) {
+			if (e.LayoutType == LayoutingType.Width || e.LayoutType == LayoutingType.X) {
 				if (r.Right > this.clientRectangle.Right)
 					ctxMenuContainer.Left = this.clientRectangle.Right - ctxMenuContainer.Slot.Width;
-			}else if (e.LayoutType == LayoutingType.Width) {
+			}else if (e.LayoutType == LayoutingType.Width || e.LayoutType == LayoutingType.Y) {
 				if (r.Bottom > this.clientRectangle.Bottom)
 					ctxMenuContainer.Top = this.clientRectangle.Bottom - ctxMenuContainer.Slot.Height;
 			}

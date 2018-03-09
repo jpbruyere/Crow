@@ -148,6 +148,11 @@ ScrollBar {
 	Maximum = "0";
 	Value = "0";
 }
+HScrollBar {
+	Template = "#Crow.HScrollBar.template";
+	Maximum = "0";
+	Value = "0";
+}
 Scroller {
 	CacheEnabled = "false";
 }
@@ -191,6 +196,18 @@ ArrowBut {
 	Background="hgradient|0:Gray|1:Jet";
 	MouseDown="{Background=hgradient|0:White|0.4:BlueCrayola|1:Jet}";
 	MouseUp="{Background=hgradient|0:Gray|1:Jet}";
+	MouseEnter="{Foreground=Black}";
+	MouseLeave="{Foreground=Jet}";
+}
+HArrowBut {
+	MouseRepeat="true";
+	Height="Fit";
+	Width="Fit";
+	Focusable="true";
+	Foreground="Jet";
+	Background="vgradient|0:Gray|1:Jet";
+	MouseDown="{Background=vgradient|0:White|0.4:BlueCrayola|1:Jet}";
+	MouseUp="{Background=vgradient|0:Gray|1:Jet}";
 	MouseEnter="{Foreground=Black}";
 	MouseLeave="{Foreground=Jet}";
 }
