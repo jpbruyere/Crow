@@ -276,7 +276,11 @@ namespace Crow.IML
 
 		#region Reflexion helpers
 		static MemberInfo getMemberInfoWithReflexion(object instance, string member){
-			return instance.GetType ().GetMember (member)?.FirstOrDefault();
+			Type t = instance.GetType();
+			MemberInfo mi = t.GetMember (member)?.FirstOrDefault();
+			if (mi == null)
+				mi = CompilerServices.SearchExtMethod (t, member);
+			return mi;
 		}
 		static MethodInfo getMethodInfoWithReflexion(object instance, string method){
 			return instance.GetType ().GetMethod (method, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
@@ -344,12 +348,20 @@ namespace Crow.IML
 					PropertyInfo pi = mi as PropertyInfo;
 					tmp = pi.GetValue (instance);
 					dstType = pi.PropertyType;
-				}
-				if (mi.MemberType == MemberTypes.Field) {
+				}else if (mi.MemberType == MemberTypes.Field) {
 					FieldInfo fi = mi as FieldInfo;
 					tmp = fi.GetValue (instance);
 					dstType = fi.FieldType;
+				}else if (mi.MemberType == MemberTypes.Method) {
+					MethodInfo gi = mi as MethodInfo;
+					if (gi.IsStatic)
+						tmp = gi.Invoke(null, new object[] {instance});
+					else
+						tmp = gi.Invoke(instance, null);
+					dstType = gi.ReturnType;
 				}
+
+
 				if (tmp != null)
 					return tmp;
 				if (dstType == typeof(string) || dstType == CompilerServices.TObject)//TODO:object should be allowed to return null and not ""
@@ -693,7 +705,7 @@ namespace Crow.IML
 		/// <summary>
 		/// create delegate helper
 		/// </summary>
-		static Delegate createDel(Type eventType, object instance, string method){
+		static Delegate createDel(object instance, Type eventType, string method){
 			Type t = instance.GetType ();
 			MethodInfo mi = t.GetMethod (method, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			if (mi == null) {

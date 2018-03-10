@@ -167,6 +167,17 @@ namespace Crow
 			this.RegisterForLayouting (LayoutingType.Sizing);
 			ChildrenCleared.Raise (this, new EventArgs ());
 		}
+		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
+		{
+			base.OnDataSourceChanged (this, e);
+
+			childrenRWLock.EnterReadLock ();
+			foreach (GraphicObject g in Children) {
+				if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
+					g.OnDataSourceChanged (g, e);	
+			}
+			childrenRWLock.ExitReadLock ();
+		}
 
 		public void putWidgetOnTop(GraphicObject w)
 		{
@@ -194,18 +205,7 @@ namespace Crow
 		}
 
 		#region GraphicObject overrides
-		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
-		{
-			base.OnDataSourceChanged (this, e);
 
-			childrenRWLock.EnterReadLock ();
-
-			foreach (GraphicObject g in children)
-				if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
-					g.OnDataSourceChanged (g, e);
-			
-			childrenRWLock.ExitReadLock ();
-		}
 		public override GraphicObject FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)

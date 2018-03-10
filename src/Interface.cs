@@ -88,8 +88,6 @@ namespace Crow
 				}
 			}
 
-			loadCursors ();
-
 			FontRenderingOptions = new FontOptions ();
 			FontRenderingOptions.Antialias = Antialias.Subpixel;
 			FontRenderingOptions.HintMetrics = HintMetrics.On;
@@ -103,6 +101,7 @@ namespace Crow
 
 		public void Init () {
 			CurrentInterface = this;
+			loadCursors ();
 			loadStyling ();
 			findAvailableTemplates ();
 			initTooltip ();
@@ -271,17 +270,17 @@ namespace Crow
 
 			}
 		}
-		static void loadCursors(){
+		void loadCursors(){
 			//Load cursors
-			XCursor.Cross = XCursorFile.Load("#Crow.Images.Icons.Cursors.cross").Cursors[0];
-			XCursor.Default = XCursorFile.Load("#Crow.Images.Icons.Cursors.arrow").Cursors[0];
-			XCursor.NW = XCursorFile.Load("#Crow.Images.Icons.Cursors.top_left_corner").Cursors[0];
-			XCursor.NE = XCursorFile.Load("#Crow.Images.Icons.Cursors.top_right_corner").Cursors[0];
-			XCursor.SW = XCursorFile.Load("#Crow.Images.Icons.Cursors.bottom_left_corner").Cursors[0];
-			XCursor.SE = XCursorFile.Load("#Crow.Images.Icons.Cursors.bottom_right_corner").Cursors[0];
-			XCursor.H = XCursorFile.Load("#Crow.Images.Icons.Cursors.sb_h_double_arrow").Cursors[0];
-			XCursor.V = XCursorFile.Load("#Crow.Images.Icons.Cursors.sb_v_double_arrow").Cursors[0];
-			XCursor.Text = XCursorFile.Load("#Crow.Images.Icons.Cursors.ibeam").Cursors[0];
+			XCursor.Cross = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.cross").Cursors[0];
+			XCursor.Default = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.arrow").Cursors[0];
+			XCursor.NW = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.top_left_corner").Cursors[0];
+			XCursor.NE = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.top_right_corner").Cursors[0];
+			XCursor.SW = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.bottom_left_corner").Cursors[0];
+			XCursor.SE = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.bottom_right_corner").Cursors[0];
+			XCursor.H = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.sb_h_double_arrow").Cursors[0];
+			XCursor.V = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.sb_v_double_arrow").Cursors[0];
+			XCursor.Text = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.ibeam").Cursors[0];
 		}
 		#endregion
 
@@ -329,7 +328,28 @@ namespace Crow
 		/// <returns>A file or resource stream</returns>
 		/// <param name="path">This could be a normal file path, or an embedded ressource ID
 		/// Resource ID's must be prefixed with '#' character</param>
-		public static Stream GetStreamFromPath (string path)
+		public virtual Stream GetStreamFromPath (string path)
+		{
+			Stream stream = null;
+
+			if (path.StartsWith ("#")) {
+				string resId = path.Substring (1);
+				//try/catch added to prevent nunit error
+				try {
+					stream = System.Reflection.Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
+				} catch{}
+				if (stream == null)//try to find ressource in Crow assembly
+					stream = System.Reflection.Assembly.GetExecutingAssembly ().GetManifestResourceStream (resId);
+				if (stream == null)
+					throw new Exception ("Resource not found: " + path);
+			} else {
+				if (!File.Exists (path))
+					throw new FileNotFoundException ("File not found: ", path);
+				stream = new FileStream (path, FileMode.Open, FileAccess.Read);
+			}
+			return stream;
+		}
+		public static Stream StaticGetStreamFromPath (string path)
 		{
 			Stream stream = null;
 

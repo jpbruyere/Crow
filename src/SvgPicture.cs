@@ -51,7 +51,7 @@ namespace Crow
 		{}
 		#endregion
 
-		public override void Load (string path)
+		public override void Load (Interface iface, string path)
 		{
 			Path = path;
 			if (sharedResources.ContainsKey (path)) {
@@ -60,7 +60,7 @@ namespace Crow
 				Dimensions = sp.Dims;
 				return;
 			}
-			using (Stream stream = Interface.GetStreamFromPath (path)) {
+			using (Stream stream = iface.GetStreamFromPath (path)) {
 				using (MemoryStream ms = new MemoryStream ()) {
 					stream.CopyTo (ms);
 
