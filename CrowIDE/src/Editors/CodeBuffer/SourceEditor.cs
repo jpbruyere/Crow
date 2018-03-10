@@ -850,7 +850,7 @@ namespace Crow.Coding
 			}
 			#endregion
 
-			if (PrintedLines != null) {				
+			if (PrintedLines?.Count > 0) {				
 				int unfoldedLines = buffer.UnfoldedLines;
 				currentNode = null;
 				CodeLine cl = PrintedLines[0];

@@ -96,7 +96,7 @@ namespace Crow.Coding
 						updateCheckPostProcess ();
 					}
 				}
-				Thread.Sleep (50);
+				Thread.Sleep (10);
 			}	
 		}
 	}

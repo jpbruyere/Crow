@@ -1,28 +1,29 @@
 ﻿<?xml version="1.0"?>
-<Expandable Caption="{Name}" >
+<Expandable Caption="{Name}" IsExpanded="{²IsExpanded}">
 	<Template>
 		<VerticalStack>
-			<HorizontalStack Spacing="1" Height="Fit" MouseDoubleClick="./onClickForExpand" Background="{./Background}">
-				<Container Margin="1" Width="10" Height="10" Focusable="true" MouseClick="./onClickForExpand"
-					MouseEnter="{Background=LightGray}"
-					MouseLeave="{Background=Transparent}">
-					<Image
+			<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"						
+					Foreground="Transparent"
+					MouseEnter="{Foreground=DimGray}"
+					MouseLeave="{Foreground=Transparent}">
+				<HorizontalStack Spacing="1">
+					<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
 						Path="{./Image}"
 						Visible="{./IsExpandable}"
-						SvgSub="{./IsExpanded}"/>
-				</Container>
-				<Image Margin="2" Width="14" Height="14"
-					Path="#Crow.Icons.folder.svg"/>
-				<Label Text="{./Caption}"
-						MouseEnter="{Background=hgradient|0:BlueCrayola|1:Transparent}"
+						SvgSub="{./IsExpanded}"
+						MouseEnter="{Background=LightGray}"
 						MouseLeave="{Background=Transparent}"/>
-			</HorizontalStack>
+					<Border Width="16" Height="16" Foreground="Black" Background="White">
+						<Image Margin="2" Path="{GetIcon}" />
+					</Border>
+					<Label Text="{./Caption}"/>
+				</HorizontalStack>
+			</Border>
 			<Container Name="Content" Visible="false"/>
 		</VerticalStack>
 	</Template>
 	<HorizontalStack Height="Fit">
-		<GraphicObject Width="12" Height="10"/>
-		<TreeView Name="List" Height="Fit"
-			Template="#Crow.Templates.treeList.template" />
+		<GraphicObject Width="8" Height="10"/>
+		<VerticalStack Height="Fit" Name="ItemsContainer"/>
 	</HorizontalStack>
 </Expandable>

@@ -177,14 +177,28 @@ namespace Crow.Coding
 		}
 
 		protected override bool EditorIsDirty {
-			get { return (bool)imlProjFile.Instance?.design_HasChanged; }
+			get { return imlProjFile == null ? false :
+				imlProjFile.Instance == null ? false : imlProjFile.Instance.design_HasChanged; }
 			set {
 				if (GraphicTree [0] != null)
 					GraphicTree [0].design_HasChanged = value;			
 			}
 		}
 		protected override bool IsReady {
-			get { return imlVE != null && imlProjFile != null; }
+			get { return updateEnabled && imlVE != null && imlProjFile != null; }
+		}
+		bool updateEnabled;
+		/// <summary>
+		/// use to disable update if tab is not the visible one
+		/// </summary>
+		public bool UpdateEnabled {
+			get { return updateEnabled; }
+			set { 
+				if (value == updateEnabled)
+					return;
+				updateEnabled = value;
+				NotifyValueChanged ("UpdateEnabled", updateEnabled);
+			}
 		}
 		protected override void updateCheckPostProcess ()
 		{

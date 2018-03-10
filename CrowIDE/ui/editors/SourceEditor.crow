@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <VerticalStack>
-	<HorizontalStack Height="Stretched" >
+	<HorizontalStack >
 		<SourceEditor Focusable="true" Name="editor" Font="monospace, 12" VerticalAlignment="Top" Margin="10"
 				CurrentLine="{²CurrentLine}" CurrentColumn="{²CurrentColumn}"
 				Foreground="Jet" Background="White" Width="Stretched" Height="Stretched"

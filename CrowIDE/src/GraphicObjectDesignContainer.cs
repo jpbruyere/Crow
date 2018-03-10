@@ -52,7 +52,7 @@ namespace Crow.Coding
 				go.IFace.DragImageHeight = dis;
 				go.IFace.DragImageWidth = dis;
 				SvgPicture pic = new SvgPicture ();
-				pic.Load (IconPath);
+				pic.Load (go.IFace, IconPath);
 				ImageSurface img = new ImageSurface (Format.Argb32, dis, dis);
 				using (Context ctx = new Context (img)) {
 					Rectangle r = new Rectangle (0, 0, dis, dis);

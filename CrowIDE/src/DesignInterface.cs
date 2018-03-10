@@ -29,6 +29,7 @@ using System.Globalization;
 using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 
 namespace Crow.Coding
 {
@@ -78,6 +79,16 @@ namespace Crow.Coding
 				return new ItemTemplate (this, pi.AbsolutePath);
 
 			System.Diagnostics.Debugger.Break ();
+			return null;
+		}
+		public override System.IO.Stream GetStreamFromPath (string path)
+		{
+			ProjectFile pi;
+			if (ProjFile.Project.solution.GetProjectFileFromPath (path, out pi)) {
+				return new FileStream (pi.AbsolutePath, FileMode.Open);	
+			}
+			
+			Console.WriteLine ("File not found: {0}", path);
 			return null;
 		}
 		public override bool ProcessMouseMove (int x, int y)
@@ -171,7 +182,7 @@ namespace Crow.Coding
 				LayoutingQueueItem lqi;
 				while (LayoutingQueue.Count > 0) {
 					lqi = LayoutingQueue.Dequeue ();
-					Console.WriteLine (lqi.ToString ());
+					//Console.WriteLine (lqi.ToString ());
 					#if DEBUG_LAYOUTING
 					currentLQI = lqi;
 					curLQIsTries.Add(currentLQI);

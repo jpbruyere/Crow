@@ -5,6 +5,7 @@
 			<MenuItem Caption="File" Width="Fit" PopWidth="120" DataSource="{CurrentSolution}">
 				<MenuItem Command="{CMDNew}" />
 				<MenuItem Command="{CMDOpen}" />
+				<MenuItem Command="{cmdCloseSolution}" />
 				<MenuItem DataSource="{SelectedItem}" Command="{cmdSave}" />
 				<MenuItem DataSource="{SelectedItem}" Command="{cmdSaveAs}" />
 				<MenuItem Command="{CMDQuit}" />

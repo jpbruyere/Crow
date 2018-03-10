@@ -144,7 +144,12 @@ namespace Crow
 				handler(sender, e);
 			}
 		}
-
+		public static byte[] GetBytes(this string str)
+		{
+			byte[] bytes = new byte[str.Length * sizeof(char)];
+			System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+			return bytes;
+		}
 		public static bool IsWhiteSpaceOrNewLine (this char c)
 		{
 			return c == '\t' || c == '\r' || c == '\n' || char.IsWhiteSpace (c);

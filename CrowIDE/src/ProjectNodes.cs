@@ -200,15 +200,15 @@ namespace Crow.Coding
 			: base (pi.Project, pi.node) {
 
 			cmdSave = new Crow.Command (new Action (() => Save ()))
-			{ Caption = "Save", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false };
-			cmdSave = new Crow.Command (new Action (() => SaveAs ()))
-			{ Caption = "Save As ..", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false };
+				{ Caption = "Save", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false };
+			cmdSaveAs = new Crow.Command (new Action (() => SaveAs ()))
+				{ Caption = "Save As ..", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false };
 			cmdOpen = new Crow.Command (new Action (() => Open ())) 
 				{ Caption = "Open", Icon = new SvgPicture ("#Crow.Coding.ui.icons.outbox.svg"), CanExecute = false };
 			cmdUndo = new Crow.Command (new Action (() => Undo (null))) 
-			{ Caption = "Undo", Icon = new SvgPicture ("#Crow.Coding.icons.undo.svg"), CanExecute = false };
+				{ Caption = "Undo", Icon = new SvgPicture ("#Crow.Coding.icons.undo.svg"), CanExecute = false };
 			cmdRedo = new Crow.Command (new Action (() => Redo (null))) 
-			{ Caption = "Redo", Icon = new SvgPicture ("#Crow.Coding.icons.redo.svg"), CanExecute = false };
+				{ Caption = "Redo", Icon = new SvgPicture ("#Crow.Coding.icons.redo.svg"), CanExecute = false };
 				
 			Commands.Insert (0, cmdOpen);
 			Commands.Insert (1, cmdSave);
@@ -452,6 +452,14 @@ namespace Crow.Coding
 				instance = value;
 				NotifyValueChanged ("Instance", instance);
 			}
+		}
+
+		public List<GraphicObject> GraphicTree { 
+			get { return new List<GraphicObject> (new GraphicObject[] {instance}); }
+		}
+
+		void GTView_SelectedItemChanged (object sender, SelectionChangeEventArgs e){
+			SelectedItem = e.NewValue;
 		}
 	}
 }

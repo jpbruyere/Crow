@@ -90,7 +90,7 @@ namespace Crow
 			}
 		}
 			
-		[XmlAttributeAttribute][DefaultValue(0)]
+		[DefaultValue(0)]
 		public int TabOffset {
 			get { return tabOffset; }
 			set {
@@ -109,7 +109,7 @@ namespace Crow
 		public Measure TabWidth {
 			get { return tview == null ? Measure.Fit : tview.TabWidth; }
 		}
-		[XmlAttributeAttribute][DefaultValue(false)]
+		[DefaultValue(false)]
 		public virtual bool IsSelected {
 			get { return isSelected; }
 			set {

@@ -214,6 +214,15 @@ namespace Crow.Coding{
 			saveOpenedItemsInUserConfig ();
 		}
 
+		public void CloseSolution () {
+			while (openedItems.Count > 0) {
+				openedItems.RemoveElement (openedItems [0]);
+			}
+			while (toolboxItems.Count > 0) {
+				toolboxItems.RemoveElement (toolboxItems [0]);
+			}
+			NotifyValueChanged ("Projects", null);
+		}
 	    /// <summary>
 	    /// Solution name
 	    /// </summary>

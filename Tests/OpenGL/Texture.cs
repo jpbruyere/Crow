@@ -37,7 +37,7 @@ namespace Crow
 		        
 		public Texture(string _mapPath, bool flipY = true)
         {
-			using (Stream s = Interface.GetStreamFromPath (_mapPath)) {
+			using (Stream s = Interface.StaticGetStreamFromPath (_mapPath)) {
 
 				try {
 					Map = _mapPath;

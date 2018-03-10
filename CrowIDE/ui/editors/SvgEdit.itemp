@@ -1,13 +1,8 @@
-﻿<?xml version="1.0"?>
-<ItemTemplate>	
-	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
-		<Label Text="Error" Background="Red"/>
-	</TabItem>
-</ItemTemplate>
-<ItemTemplate DataType=".svg">
-	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
-		<VerticalStack>
-			<HorizontalStack Height="50%" >
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
+	<VerticalStack>
+		<VerticalStack Height="50%">
+			<HorizontalStack >
 				<SvgEditor Margin="10" ProjectNode="{}" Focusable="true" Name="editor" MouseWheelSpeed="20" Foreground="Black"/>
 				<ScrollBar Name="scrollbarY" Value="{²../editor.ScrollY}"
 						   LargeIncrement="10"
@@ -26,17 +21,12 @@
 				<!--<Spinner Name="sldZoom" Value="{²../../editor.Zoom}" Maximum="800" Minimum="1" SmallIncrement="10" LargeIncrement="50" Width="40" />-->
 				<Slider Value="{²../../editor.Zoom}" CursorSize="2" Height="8" Maximum="800" Minimum="1" SmallIncrement="1" LargeIncrement="10" Width="100" />
 			</HorizontalStack>
-
-			<Splitter/>
-			<IMLContainer Path="#Crow.Coding.ui.SourceEditor.crow"/>
-			<Label DataSource="{../editor.Error}" Text="{Message}"
-				Visible="{../editor.HasError}"
-				Height="Fit" Width="Stretched" Background="DarkRed" Foreground="White"
-				TextAlignment="TopLeft" Multiline="true"/>
 		</VerticalStack>
-	</TabItem>
-</ItemTemplate>
-<ItemTemplate Path="#Crow.Coding.ui.SrcEdit.itemp" DataType=".cs"/>
-<ItemTemplate Path="#Crow.Coding.ui.SrcEdit.itemp" DataType=".style"/>
-<ItemTemplate Path="#Crow.Coding.ui.IMLEdit.itemp" DataType=".crow"/>
-<ItemTemplate Path="#Crow.Coding.ui.IMLEdit.itemp" DataType=".template"/>
+		<Splitter/>
+		<IMLContainer Path="#Crow.Coding.ui.SourceEditor.crow"/>
+		<Label DataSource="{../editor.Error}" Text="{Message}"
+			Visible="{../editor.HasError}"
+			Height="Fit" Width="Stretched" Background="DarkRed" Foreground="White"
+			TextAlignment="TopLeft" Multiline="true"/>
+	</VerticalStack>
+</TabItem>

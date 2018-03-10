@@ -38,7 +38,7 @@ namespace Crow.Coding
 {
 	class CrowIDE : CrowWindow
 	{
-		public Command CMDNew, CMDOpen, CMDSave, CMDSaveAs, CMDQuit,
+		public Command CMDNew, CMDOpen, CMDSave, CMDSaveAs, cmdCloseSolution, CMDQuit,
 		CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp,
 		CMDAbout, CMDOptions,
 		CMDViewGTExp, CMDViewProps, CMDViewProj, CMDViewProjProps, CMDViewErrors, CMDViewSolution, CMDViewEditor, CMDViewProperties,
@@ -59,6 +59,8 @@ namespace Crow.Coding
 			CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("help"))) { Caption = "Help", Icon = new SvgPicture("#Crow.Coding.ui.icons.question.svg")};
 			CMDOptions = new Command(new Action(() => openOptionsDialog())) { Caption = "Editor Options", Icon = new SvgPicture("#Crow.Coding.ui.icons.tools.svg")};
 
+			cmdCloseSolution = new Command(new Action(() => closeSolution())) { Caption = "Close Solution", Icon = new SvgPicture("#Crow.Coding.ui.icons.paste-on-document.svg"), CanExecute = true};
+
 			CMDViewErrors = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winErrors.crow")))
 			{ Caption = "Errors pane"};
 			CMDViewSolution = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winSolution.crow")))
@@ -70,7 +72,7 @@ namespace Crow.Coding
 			CMDViewToolbox = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winToolbox.crow")))
 			{ Caption = "Toolbox"};
 
-			CMDViewGTExp = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.GTreeExplorer.crow"))) { Caption = "Graphic Tree Explorer"};
+			CMDViewGTExp = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.GTreeExplorer.crow"))) { Caption = "Graphic Tree Explorer"};
 			CMDViewProps = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.MemberView.crow"))) { Caption = "Properties View"};
 			CMDCompile = new Command(new Action(() => compileSolution())) { Caption = "Compile"};
 			CMDViewProj = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.CSProjExplorer.crow"))) { Caption = "Project Explorer"};
@@ -85,7 +87,11 @@ namespace Crow.Coding
 		void saveFileDialog() {}
 		void undo() {}
 		void redo() {}
-
+		void closeSolution (){
+			if (currentSolution != null)
+				currentSolution.CloseSolution ();
+			CurrentSolution = null;
+		}
 
 		[STAThread]
 		static void Main ()
@@ -166,7 +172,9 @@ namespace Crow.Coding
 				if (currentSolution == value)
 					return;
 				currentSolution = value;
-				NotifyValueChanged ("CurrentSolution", currentSolution);
+				lock (MainIFace) {
+					NotifyValueChanged ("CurrentSolution", currentSolution);
+				}
 			}
 		}
 

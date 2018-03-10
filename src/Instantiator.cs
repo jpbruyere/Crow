@@ -85,7 +85,7 @@ namespace Crow.IML
 		/// <summary>
 		/// Initializes a new instance of the Instantiator class.
 		/// </summary>
-		public Instantiator (Interface _iface, string path) : this (_iface, Interface.GetStreamFromPath(path), path) {
+		public Instantiator (Interface _iface, string path) : this (_iface, _iface.GetStreamFromPath(path), path) {
 			
 		}
 		/// <summary>
@@ -335,7 +335,7 @@ namespace Crow.IML
 						if (iface.Instantiators.ContainsKey (itemTemplatePath)) {
 							itemTemplateIds.Add (new string [] { "default", itemTemplatePath, "" });
 						} else {
-							using (Stream stream = Interface.GetStreamFromPath (itemTemplatePath)) {
+							using (Stream stream = iface.GetStreamFromPath (itemTemplatePath)) {
 								//itemtemplate files may have multiple root nodes
 								XmlReaderSettings itrSettings = new XmlReaderSettings { ConformanceLevel = ConformanceLevel.Fragment };
 								using (XmlReader itr = XmlReader.Create (stream, itrSettings)) {									

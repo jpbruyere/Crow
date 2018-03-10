@@ -87,7 +87,7 @@ namespace Crow
 		/// <param name="path">image path, may be embedded</param>
 		public Picture (string path)
 		{
-			Load (path);
+			Path = path;
 		}
 		#endregion
 
@@ -96,7 +96,7 @@ namespace Crow
 		/// load the image for rendering from the stream given as argument
 		/// </summary>
 		/// <param name="stream">picture stream</param>
-		public abstract void Load(string path);
+		public abstract void Load(Interface iface, string path);
 		#endregion
 
 		/// <summary>
@@ -117,11 +117,9 @@ namespace Crow
 			Picture _pic = null;
 
 			if (path.EndsWith (".svg", true, System.Globalization.CultureInfo.InvariantCulture)) 
-				_pic = new SvgPicture ();
+				_pic = new SvgPicture (path);
 			else 
-				_pic = new BmpPicture ();
-
-			_pic.Load (path);			
+				_pic = new BmpPicture (path);
 
 			return _pic;
 		}
@@ -139,11 +137,9 @@ namespace Crow
 			Picture _pic = null;
 
 			if (path.EndsWith (".svg", true, System.Globalization.CultureInfo.InvariantCulture)) 
-				_pic = new SvgPicture ();
+				_pic = new SvgPicture (path);
 			else 
-				_pic = new BmpPicture ();
-
-			_pic.Load (path);			
+				_pic = new BmpPicture (path);
 
 			return _pic;
 		}

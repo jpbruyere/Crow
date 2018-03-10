@@ -70,7 +70,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\CrowIDE.cs" />
-    <Compile Include="src\ImlVisualEditor.cs" />
     <Compile Include="src\Extensions.cs" />
     <Compile Include="src\Solution.cs" />
     <Compile Include="src\Project.cs" />
@@ -94,36 +93,40 @@
       <Link>src\InterfaceControler.cs</Link>
     </Compile>
     <Compile Include="src\DesignInterface.cs" />
-    <Compile Include="src\EditPane.cs" />
     <Compile Include="src\ProjectNodes.cs" />
     <Compile Include="src\SolutionControler.cs" />
     <Compile Include="src\INetProject.cs" />
-    <Compile Include="src\SourceEditor\CodeBuffer.cs" />
-    <Compile Include="src\SourceEditor\CodeBufferEventArgs.cs" />
-    <Compile Include="src\SourceEditor\CodeLine.cs" />
-    <Compile Include="src\SourceEditor\CSharpParser.cs" />
-    <Compile Include="src\SourceEditor\Node.cs" />
-    <Compile Include="src\SourceEditor\SourceEditor.cs" />
-    <Compile Include="src\SourceEditor\TextFormatting.cs" />
-    <Compile Include="src\SourceEditor\Token.cs" />
-    <Compile Include="src\SourceEditor\XMLParser.cs" />
-    <Compile Include="src\SourceEditor\StyleParser.cs" />
-    <Compile Include="src\SourceEditor\BufferParser.cs" />
     <Compile Include="src\MemberView\MembersView.cs" />
     <Compile Include="src\MemberView\PropertyContainer.cs" />
     <Compile Include="src\MemberView\CategoryContainer.cs" />
     <Compile Include="src\GraphicObjectDesignContainer.cs" />
-    <Compile Include="src\Editor.cs" />
-    <Compile Include="src\SvgEditor.cs" />
+    <Compile Include="src\Editors\Editor.cs" />
+    <Compile Include="src\Editors\EditPane.cs" />
+    <Compile Include="src\Editors\ImlVisualEditor.cs" />
+    <Compile Include="src\Editors\SvgEditor.cs" />
+    <Compile Include="src\Editors\Parsers\BufferParser.cs" />
+    <Compile Include="src\Editors\Parsers\CSharpParser.cs" />
+    <Compile Include="src\Editors\Parsers\StyleParser.cs" />
+    <Compile Include="src\Editors\Parsers\XMLParser.cs" />
+    <Compile Include="src\Editors\CodeBuffer\CodeBuffer.cs" />
+    <Compile Include="src\Editors\CodeBuffer\CodeBufferEventArgs.cs" />
+    <Compile Include="src\Editors\CodeBuffer\CodeLine.cs" />
+    <Compile Include="src\Editors\CodeBuffer\Node.cs" />
+    <Compile Include="src\Editors\CodeBuffer\SourceEditor.cs" />
+    <Compile Include="src\Editors\CodeBuffer\TextFormatting.cs" />
+    <Compile Include="src\Editors\CodeBuffer\Token.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />
     <Folder Include="src\" />
     <Folder Include="images\" />
-    <Folder Include="src\SourceEditor\" />
     <Folder Include="ui\ItemTemplates\" />
     <Folder Include="src\MemberView\" />
     <Folder Include="ui\DockWindows\" />
+    <Folder Include="ui\editors\" />
+    <Folder Include="src\Editors\" />
+    <Folder Include="src\Editors\Parsers\" />
+    <Folder Include="src\Editors\CodeBuffer\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="images\save.svg" />
@@ -141,10 +144,6 @@
       <LogicalName>Crow.TreeExpandable.template</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="ui\ProjectTree.template" />
-    <EmbeddedResource Include="ui\EditPane.template">
-      <LogicalName>Crow.Coding.EditPane.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ui\EditPaneItems.template" />
     <EmbeddedResource Include="ui\CrowIDE.crow" />
     <EmbeddedResource Include="ui\icons\blank-file.svg" />
     <EmbeddedResource Include="ui\icons\sign-out.svg" />
@@ -164,8 +163,6 @@
       <LogicalName>Crow.MenuItem.template</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="ui\Options.crow" />
-    <EmbeddedResource Include="ui\IMLEdit.itemp" />
-    <EmbeddedResource Include="ui\SrcEdit.itemp" />
     <EmbeddedResource Include="ui\IcoBut.template" />
     <EmbeddedResource Include="ui\MembersItem.template" />
     <EmbeddedResource Include="ui\ItemTemplates\Enum.template" />
@@ -255,7 +252,27 @@
     <EmbeddedResource Include="icons\text-file.svg" />
     <EmbeddedResource Include="icons\undo.svg" />
     <EmbeddedResource Include="icons\redo.svg" />
-    <EmbeddedResource Include="ui\SourceEditor.crow" />
+    <EmbeddedResource Include="ui\ContextMenu.template">
+      <LogicalName>Crow.ContextMenu.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\editors\EditPane.template">
+      <LogicalName>Crow.Coding.EditPane.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\editors\EditPaneItems.template">
+      <LogicalName>Crow.Coding.ui.EditPaneItems.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\editors\IMLEdit.itemp">
+      <LogicalName>Crow.Coding.ui.IMLEdit.itemp</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\editors\SourceEditor.crow">
+      <LogicalName>Crow.Coding.ui.SourceEditor.crow</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\editors\SrcEdit.itemp">
+      <LogicalName>Crow.Coding.ui.SrcEdit.itemp</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\editors\SvgEdit.itemp">
+      <LogicalName>Crow.Coding.ui.SvgEdit.itemp</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">

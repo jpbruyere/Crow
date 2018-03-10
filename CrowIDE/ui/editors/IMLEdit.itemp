@@ -3,14 +3,14 @@
 	<VerticalStack>
 		<Label Width="Stretched" Margin="1" Text="{HoverWidget}"/>
 		<ImlVisualEditor Height="60%" Margin="0" MinimumSize="10,10" Foreground="SkyBlue"
-			AllowDrop="true"
+			AllowDrop="true" UpdateEnabled="{../../IsSelected}"
 			ProjectNode="{}" SelectedItem="{²SelectedItem}"
 			Name="crowContainer" Background="Onyx"/>
+		<Splitter/>
+		<IMLContainer Path="#Crow.Coding.ui.SourceEditor.crow"/>
 		<Label DataSource="{../crowContainer.Error}" Text="{Message}"
 			Visible="{../crowContainer.HasError}"
 			Height="Fit" Width="Stretched" Background="DarkRed" Foreground="White"
 			TextAlignment="TopLeft" Multiline="true"/>
-		<Splitter/>
-		<IMLContainer Path="#Crow.Coding.ui.SourceEditor.crow"/>
 	</VerticalStack>
 </TabItem>

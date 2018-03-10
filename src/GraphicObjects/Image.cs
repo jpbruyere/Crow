@@ -169,11 +169,11 @@ namespace Crow
 		{
 			Picture pic;
 			if (path.EndsWith (".svg", true, System.Globalization.CultureInfo.InvariantCulture))
-				pic = new SvgPicture ();
+				pic = new SvgPicture (path);
 			else
-				pic = new BmpPicture ();
+				pic = new BmpPicture (path);
 
-			pic.Load (path);
+			pic.Load (IFace, path);
 			pic.Scaled = scaled;
 			pic.KeepProportions = keepProps;
 

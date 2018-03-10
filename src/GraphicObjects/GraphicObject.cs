@@ -1404,11 +1404,11 @@ namespace Crow
 			IFace.currentLQI.NewSlot = Slot;
 			Debug.WriteLine ("\t\t{0} => {1}",LastSlots,Slot);
 			#endif
-			#if DESIGN_MODE
-			if (IFace.GetType().Name == "DesignInterface"){
-				Debug.WriteLine ("\t\t{2}: {0} => {1}",LastSlots,Slot,this.name);
-			}
-			#endif
+//			#if DESIGN_MODE
+//			if (IFace.GetType().Name == "DesignInterface"){
+//				Debug.WriteLine ("\t\t{2}: {0} => {1}",LastSlots,Slot,this.name);
+//			}
+//			#endif
 
 			switch (layoutType) {
 			case LayoutingType.Width:
