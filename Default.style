@@ -132,6 +132,8 @@ DockWindow {
 	Focusable = "true";
 	AllowDrag = "true";
 	Margin="0";
+	Width="200";
+	Height="200";
 }
 FileDialog {
 	Template = "#Crow.FileDialog.template";
