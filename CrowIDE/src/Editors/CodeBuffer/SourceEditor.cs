@@ -47,7 +47,7 @@ namespace Crow.Coding
 		#region CTOR
 		public SourceEditor (): base()
 		{
-			formatting.Add ((int)XMLParser.TokenType.AttributeName, new TextFormatting (Color.Teal, Color.Transparent));
+			formatting.Add ((int)XMLParser.TokenType.AttributeName, new TextFormatting (Color.DarkJungleGreen, Color.Transparent));
 			formatting.Add ((int)XMLParser.TokenType.ElementName, new TextFormatting (Color.DarkBlue, Color.Transparent));
 			formatting.Add ((int)XMLParser.TokenType.ElementStart, new TextFormatting (Color.Black, Color.Transparent));
 			formatting.Add ((int)XMLParser.TokenType.ElementEnd, new TextFormatting (Color.Black, Color.Transparent));
@@ -61,6 +61,7 @@ namespace Crow.Coding
 			formatting.Add ((int)BufferParser.TokenType.BlockComment, new TextFormatting (Color.Gray, Color.Transparent, false, true));
 			formatting.Add ((int)BufferParser.TokenType.LineComment, new TextFormatting (Color.Gray, Color.Transparent, false, true));
 			formatting.Add ((int)BufferParser.TokenType.OperatorOrPunctuation, new TextFormatting (Color.Black, Color.Transparent));
+			formatting.Add ((int)BufferParser.TokenType.Keyword, new TextFormatting (Color.Teal, Color.Transparent));
 			//formatting.Add ((int)BufferParser.TokenType.Keyword, new TextFormatting (Color.DarkCyan, Color.Transparent));
 
 			parsing.Add (".crow", "Crow.Coding.XMLParser");
@@ -86,7 +87,7 @@ namespace Crow.Coding
 		int requestedLine = 0, requestedCol = 0;
 		volatile bool isDirty = false;
 
-		const int leftMarginGap = 3;//gap between items in margin and text
+		const int leftMarginGap = 10;//gap between items in margin and text
 		const int foldSize = 9;//folding rectangles size
 		const int foldHSpace = 4;//folding level tabulation x
 		int foldMargin { get { return parser == null ? 0 : parser.SyntacticTreeMaxDepth * foldHSpace; }}//folding margin size
