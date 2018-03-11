@@ -93,7 +93,6 @@
       <Link>src\InterfaceControler.cs</Link>
     </Compile>
     <Compile Include="src\DesignInterface.cs" />
-    <Compile Include="src\ProjectNodes.cs" />
     <Compile Include="src\SolutionControler.cs" />
     <Compile Include="src\INetProject.cs" />
     <Compile Include="src\MemberView\MembersView.cs" />
@@ -115,6 +114,11 @@
     <Compile Include="src\Editors\CodeBuffer\SourceEditor.cs" />
     <Compile Include="src\Editors\CodeBuffer\TextFormatting.cs" />
     <Compile Include="src\Editors\CodeBuffer\Token.cs" />
+    <Compile Include="src\ProjectTree\ProjectNodes.cs" />
+    <Compile Include="src\ProjectTree\ProjectItem.cs" />
+    <Compile Include="src\ProjectTree\ProjectReference.cs" />
+    <Compile Include="src\ProjectTree\ProjectFile.cs" />
+    <Compile Include="src\ProjectTree\ImlProjectItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />
@@ -127,6 +131,7 @@
     <Folder Include="src\Editors\" />
     <Folder Include="src\Editors\Parsers\" />
     <Folder Include="src\Editors\CodeBuffer\" />
+    <Folder Include="src\ProjectTree\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="images\save.svg" />
@@ -135,8 +140,6 @@
       <LogicalName>Crow.Coding.MembersView.template</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="ui\LQIsExplorer.crow" />
-    <EmbeddedResource Include="ui\GTreeExplorer.crow" />
-    <EmbeddedResource Include="ui\GTreeExpITemp.crow" />
     <EmbeddedResource Include="ui\MemberView.crow" />
     <EmbeddedResource Include="ui\CSProjExplorer.crow" />
     <EmbeddedResource Include="ui\ProjectProperties.crow" />
@@ -147,14 +150,9 @@
     <EmbeddedResource Include="ui\CrowIDE.crow" />
     <EmbeddedResource Include="ui\icons\blank-file.svg" />
     <EmbeddedResource Include="ui\icons\sign-out.svg" />
-    <EmbeddedResource Include="ui\icons\copy-file.svg" />
-    <EmbeddedResource Include="ui\icons\paste-on-document.svg" />
-    <EmbeddedResource Include="ui\icons\scissors.svg" />
     <EmbeddedResource Include="ui\icons\reply.svg" />
     <EmbeddedResource Include="ui\icons\share-arrow.svg" />
     <EmbeddedResource Include="ui\icons\question.svg" />
-    <EmbeddedResource Include="ui\icons\inbox.svg" />
-    <EmbeddedResource Include="ui\icons\outbox.svg" />
     <EmbeddedResource Include="ui\icons\tools.svg" />
     <EmbeddedResource Include="ui\TabItem.template">
       <LogicalName>Crow.TabItem.template</LogicalName>
@@ -273,6 +271,16 @@
     <EmbeddedResource Include="ui\editors\SvgEdit.itemp">
       <LogicalName>Crow.Coding.ui.SvgEdit.itemp</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="ui\DockWindows\winGTExplorer.crow" />
+    <EmbeddedResource Include="ui\DockWindows\GTreeExpITemp.crow" />
+    <EmbeddedResource Include="icons\copy-file.svg" />
+    <EmbeddedResource Include="icons\paste-on-document.svg" />
+    <EmbeddedResource Include="icons\scissors.svg" />
+    <EmbeddedResource Include="icons\question.svg" />
+    <EmbeddedResource Include="icons\blank-file.svg" />
+    <EmbeddedResource Include="icons\save.svg" />
+    <EmbeddedResource Include="icons\open.svg" />
+    <EmbeddedResource Include="ui\NewFile.crow" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">

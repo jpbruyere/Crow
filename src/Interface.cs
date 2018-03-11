@@ -410,11 +410,11 @@ namespace Crow
 		/// <param name="path">path of the iml file to load</param>
 		public virtual GraphicObject Load (string path)
 		{
-			//try {
+			try {
 				return GetInstantiator (path).CreateInstance ();
-			//} catch (Exception ex) {
-			//	throw new Exception ("Error loading <" + path + ">:", ex);
-			//}
+			} catch (Exception ex) {
+				throw new Exception ("Error loading <" + path + ">:", ex);
+			}
 		}
 		/// <summary>
 		/// Fetch instantiator from cache or create it.
@@ -434,18 +434,6 @@ namespace Crow
 			if (!Instantiators.ContainsKey(path))
 				Instantiators [path] = new ItemTemplate(this, path);
 			return Instantiators [path] as ItemTemplate;
-		}
-		//TODO: .Net xml serialisation is no longer used, it has been replaced with instantiators
-		public void Save<T> (string file, T graphicObject)
-		{
-			XmlSerializerNamespaces xn = new XmlSerializerNamespaces ();
-			xn.Add ("", "");
-			XmlSerializer xs = new XmlSerializer (typeof(T));
-
-			xs = new XmlSerializer (typeof(T));
-			using (Stream s = new FileStream (file, FileMode.Create)) {
-				xs.Serialize (s, graphicObject, xn);
-			}
 		}
 		#endregion
 

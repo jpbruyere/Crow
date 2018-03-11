@@ -32,154 +32,7 @@ using Crow;
 using System.Threading;
 
 namespace Crow.Coding
-{
-	public enum ItemType {
-		ReferenceGroup,
-		Reference,
-		ProjectReference,
-		VirtualGroup,
-		Folder,
-		None,
-		Compile,
-		EmbeddedResource,
-	}
-	public enum CopyToOutputState {
-		Never,
-		Always,
-		PreserveNewest
-	}
-	public class ProjectNode  : IValueChange
-	{
-		#region IValueChange implementation
-		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-		public virtual void NotifyValueChanged(string MemberName, object _value)
-		{
-			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
-		}
-		#endregion
-
-		#region CTOR
-		public ProjectNode (Project project, ItemType _type, string _name) : this(project){			
-			type = _type;
-			name = _name;
-			initCommands ();
-		}
-		public ProjectNode (Project project){
-			Project = project;
-			initCommands ();
-		}
-		#endregion
-
-		void initCommands () {
-			Commands = new List<Crow.Command> ();
-		}
-
-		ProjectNode parent;
-		bool isExpanded;
-		ItemType type;
-		string name;
-		List<ProjectNode> childNodes = new List<ProjectNode>();
-
-		public Project Project;
-		public List<Crow.Command> Commands;//list of command available for that node
-
-		public ProjectNode Parent {
-			get { return parent; }
-			set { parent = value; }
-		}
-		public virtual ItemType Type {
-			get { return type; }
-		}
-		public virtual string DisplayName {
-			get { return name; }
-		}
-		public List<ProjectNode> ChildNodes {
-			get { return childNodes;	}
-		}
-		public void AddChild (ProjectNode pn) {
-			childNodes.Add(pn);
-			pn.Parent = this;
-		}
-		public void RemoveChild (ProjectNode pn){
-			pn.Parent = null;
-			childNodes.Remove (pn);
-		}
-		public void SortChilds () {
-			foreach (ProjectNode pn in childNodes)
-				pn.SortChilds ();			
-			childNodes = childNodes.OrderBy(c=>c.Type).ThenBy(cn=>cn.DisplayName).ToList();
-		}
-
-		public bool IsExpanded
-		{
-			get { return isExpanded; }
-			set
-			{
-				if (value == isExpanded)
-					return;
-				isExpanded = value;
-				NotifyValueChanged ("IsExpanded", isExpanded);
-			}
-		}
-
-		public override string ToString ()
-		{
-			return DisplayName;
-		}
-	}
-	public class ProjectItem : ProjectNode {
-		#region CTOR
-		public ProjectItem (Project project, XmlNode _node) : base (project){
-			node = _node;
-		}
-		#endregion
-
-		public XmlNode node;
-
-		public string Extension {
-			get { return System.IO.Path.GetExtension (Path); }
-		}
-		public string Path {
-			get {
-				return node.Attributes["Include"]?.Value.Replace('\\','/');
-			}
-		}
-		public string AbsolutePath {
-			get {
-				return System.IO.Path.Combine (Project.RootDir, Path);
-			}
-		}
-		public override ItemType Type {
-			get { 
-				return (ItemType)Enum.Parse (typeof(ItemType), node.Name, true);
-			}
-		}
-		public override string DisplayName {
-			get { 
-				return Type == ItemType.Reference ?
-					Path :
-					Path.Split ('/').LastOrDefault();
-			}
-		}
-		public string HintPath {
-			get { return node.SelectSingleNode ("HintPath")?.InnerText; }
-		}
-	}
-	public class ProjectReference : ProjectItem {
-		public ProjectReference (ProjectItem pi) : base (pi.Project, pi.node){
-		}
-		public string ProjectGUID {
-			get {
-				return node.SelectSingleNode ("Project")?.InnerText;
-			}
-		}
-		public override string DisplayName {
-			get {
-				return node.SelectSingleNode ("Name").InnerText;
-			}
-		}
-	}
-
+{	
 	public class ProjectFile : ProjectItem {		
 		protected bool isOpened = false;
 		DateTime accessTime;
@@ -196,25 +49,27 @@ namespace Crow.Coding
 
 		public Crow.Command cmdSave, cmdSaveAs, cmdOpen, cmdUndo, cmdRedo;
 
+		void initCommands (){
+			cmdSave = new Crow.Command (new Action (() => Save ()))
+			{ Caption = "Save", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false };
+			cmdSaveAs = new Crow.Command (new Action (() => SaveAs ()))
+			{ Caption = "Save As ..", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false };
+			cmdOpen = new Crow.Command (new Action (() => Open ())) 
+			{ Caption = "Open", Icon = new SvgPicture ("#Crow.Coding.ui.icons.outbox.svg"), CanExecute = false };
+			cmdUndo = new Crow.Command (new Action (() => Undo (null))) 
+			{ Caption = "Undo", Icon = new SvgPicture ("#Crow.Coding.icons.undo.svg"), CanExecute = false };
+			cmdRedo = new Crow.Command (new Action (() => Redo (null))) 
+			{ Caption = "Redo", Icon = new SvgPicture ("#Crow.Coding.icons.redo.svg"), CanExecute = false };
+
+			Commands.Insert (0, cmdOpen);
+			Commands.Insert (1, cmdSave);			
+		}
+		public ProjectFile () {
+			initCommands();
+		}
 		public ProjectFile (ProjectItem pi)
 			: base (pi.Project, pi.node) {
-
-			cmdSave = new Crow.Command (new Action (() => Save ()))
-				{ Caption = "Save", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false };
-			cmdSaveAs = new Crow.Command (new Action (() => SaveAs ()))
-				{ Caption = "Save As ..", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false };
-			cmdOpen = new Crow.Command (new Action (() => Open ())) 
-				{ Caption = "Open", Icon = new SvgPicture ("#Crow.Coding.ui.icons.outbox.svg"), CanExecute = false };
-			cmdUndo = new Crow.Command (new Action (() => Undo (null))) 
-				{ Caption = "Undo", Icon = new SvgPicture ("#Crow.Coding.icons.undo.svg"), CanExecute = false };
-			cmdRedo = new Crow.Command (new Action (() => Redo (null))) 
-				{ Caption = "Redo", Icon = new SvgPicture ("#Crow.Coding.icons.redo.svg"), CanExecute = false };
-				
-			Commands.Insert (0, cmdOpen);
-			Commands.Insert (1, cmdSave);
-
-			//Commands.Add (cmdUndo);
-			//Commands.Add (cmdRedo);
+			initCommands ();
 		}
 
 		public string ResourceID {
@@ -429,37 +284,6 @@ namespace Crow.Coding
 		{
 			Save ();
 			Close ();
-		}
-	}
-	public class ImlProjectItem : ProjectFile
-	{
-		#region CTOR
-		public ImlProjectItem (ProjectItem pi) : base (pi){			
-		}
-		#endregion
-
-		GraphicObject instance;
-
-		/// <summary>
-		/// instance created with an instantiator from the source by a DesignInterface,
-		/// for now, the one in ImlVisualEditor
-		/// </summary>
-		public GraphicObject Instance {
-			get { return instance; }
-			set {
-				if (instance == value)
-					return;
-				instance = value;
-				NotifyValueChanged ("Instance", instance);
-			}
-		}
-
-		public List<GraphicObject> GraphicTree { 
-			get { return new List<GraphicObject> (new GraphicObject[] {instance}); }
-		}
-
-		void GTView_SelectedItemChanged (object sender, SelectionChangeEventArgs e){
-			SelectedItem = e.NewValue;
 		}
 	}
 }

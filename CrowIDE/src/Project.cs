@@ -52,6 +52,34 @@ namespace Crow.Coding
 		XmlNode nodeProps;
 		XmlNodeList nodesItems;
 		SolutionProject solutionProject;
+		Crow.Command cmdSave, cmdOpen, cmdCompile, cmdSetAsStartProj, cmdNewFile;
+
+		#region CTOR
+		public Project (Solution sol, SolutionProject sp) {
+			solutionProject = sp;
+
+			solution = sol;
+
+			cmdSave = new Crow.Command (new Action (() => Save ()))
+			{ Caption = "Save", Icon = new SvgPicture ("#Crow.Coding.icons.save.svg"), CanExecute = true };
+			cmdOpen = new Crow.Command (new Action (() => Load ())) 
+			{ Caption = "Open", Icon = new SvgPicture ("#Crow.Coding.icons.open.svg"), CanExecute = false };
+			cmdCompile = new Crow.Command (new Action (() => Compile ())) {
+				Caption = "Compile",
+				Icon = "#Crow.Coding.icons.compile.svg"
+			};
+			cmdSetAsStartProj = new Crow.Command (new Action (() => setAsStartupProject ())) {
+				Caption = "Set as Startup Project"
+			};
+			cmdNewFile = new Crow.Command (new Action (() => AddNewFile ())) {
+				Caption = "Add New File", Icon = new SvgPicture ("#Crow.Coding.icons.blank-file.svg"), CanExecute = true
+			};
+
+			Commands = new List<Crow.Command> (new Crow.Command[] {cmdOpen,cmdSave,cmdSetAsStartProj,cmdCompile,cmdNewFile});
+
+			Load ();
+		}
+		#endregion
 
 		public Solution solution;
 		public List<Crow.Command> Commands;
@@ -216,35 +244,9 @@ namespace Crow.Coding
 
 		#endregion
 
-		Crow.Command cmdSave, cmdOpen, cmdCompile, cmdSetAsStartProj, cmdNewFile;
-
-		public Project (Solution sol, SolutionProject sp) {
-			solutionProject = sp;
-
-			solution = sol;
-
-			cmdSave = new Crow.Command (new Action (() => Save ()))
-			{ Caption = "Save", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = true };
-			cmdOpen = new Crow.Command (new Action (() => Load ())) 
-			{ Caption = "Open", Icon = new SvgPicture ("#Crow.Coding.ui.icons.outbox.svg"), CanExecute = false };
-			cmdCompile = new Crow.Command (new Action (() => Compile ())) {
-				Caption = "Compile",
-				Icon = "#Crow.Coding.icons.compile.svg"
-			};
-			cmdSetAsStartProj = new Crow.Command (new Action (() => setAsStartupProject ())) {
-				Caption = "Set as Startup Project"
-			};
-			cmdNewFile = new Crow.Command (new Action (() => AddNewFile ())) {
-				Caption = "Add New File"
-			};
-
-			Commands = new List<Crow.Command> (new Crow.Command[] {cmdOpen,cmdSave,cmdSetAsStartProj,cmdCompile,cmdNewFile});
-
-			Load ();
-		}
 
 		public void AddNewFile () {
-			
+			Window.Show(CrowIDE.MainIFace, "#Crow.Coding.ui.NewFile.crow",true).DataSource = this;
 		}
 
 		public void Load () {

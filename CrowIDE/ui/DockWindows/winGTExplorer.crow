@@ -7,7 +7,8 @@
 			<ItemTemplate>
 				<Border Width="Stretched" Focusable="true" Foreground="Transparent">
 					<HorizontalStack Spacing="5">
-						<Border Width="16" Height="16" Foreground="Black" Background="White">
+						<GraphicObject Width="5" Height="5"/>
+						<Border Width="16" Height="16" Foreground="Black" Background="Jet">
 							<Image Margin="2" Path="{GetIcon}" />
 						</Border>
 						<Label Text="{Name}" Width="Stretched"/>
@@ -15,13 +16,13 @@
 				</Border>
 			</ItemTemplate>
 			<ItemTemplate DataType="Crow.Group" Data="GetChildren"
-				Path="#Crow.Coding.ui.GTreeExpITemp.crow"/>
+				Path="#Crow.Coding.ui.DockWindows.GTreeExpITemp.crow"/>
 			<ItemTemplate DataType="Crow.Container" Data="GetChildren"
-				Path="#Crow.Coding.ui.GTreeExpITemp.crow"/>
+				Path="#Crow.Coding.ui.DockWindows.GTreeExpITemp.crow"/>
 			<ItemTemplate DataType="Crow.TemplatedContainer" Data="GetChildren"
-				Path="#Crow.Coding.ui.GTreeExpITemp.crow"/>
+				Path="#Crow.Coding.ui.DockWindows.GTreeExpITemp.crow"/>
 			<ItemTemplate DataType="Crow.TemplatedGroup" Data="GetChildren"
-				Path="#Crow.Coding.ui.GTreeExpITemp.crow"/>
+				Path="#Crow.Coding.ui.DockWindows.GTreeExpITemp.crow"/>
 		</TreeView>
 	</VerticalStack>
 </DockWindow>

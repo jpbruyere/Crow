@@ -25,6 +25,7 @@ namespace Crow.Coding
 			AttributeValueClosing = BufferParser.TokenType.StringLitteralClosing,
 			AttributeValue = BufferParser.TokenType.StringLitteral,
 			XMLDecl = BufferParser.TokenType.Preprocessor,
+			Doctype = BufferParser.TokenType.Keyword,
 			ElementStart = 50,
 			ElementEnd = 51,
 		}
@@ -162,7 +163,15 @@ namespace Crow.Coding
 								curState = States.BlockComment;
 							saveAndResetCurrentTok (TokenType.BlockComment);
 							break;
-						default:
+						case 'D':
+						case 'd':
+							string tmp = Read (7);
+							currentTok += tmp;
+							if (!string.Equals (tmp, "DOCTYPE", StringComparison.OrdinalIgnoreCase))
+								throw new ParserException (currentLine, currentColumn, "Expecting 'doctype'");
+							saveAndResetCurrentTok (TokenType.Doctype);
+							break;
+						default:							
 							throw new ParserException (currentLine, currentColumn, "error");
 						}
 						break;

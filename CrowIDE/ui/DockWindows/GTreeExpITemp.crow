@@ -13,7 +13,7 @@
 						SvgSub="{./IsExpanded}"
 						MouseEnter="{Background=LightGray}"
 						MouseLeave="{Background=Transparent}"/>
-					<Border Width="16" Height="16" Foreground="Black" Background="White">
+					<Border Width="16" Height="16" Foreground="Black" Background="Jet">
 						<Image Margin="2" Path="{GetIcon}" />
 					</Border>
 					<Label Text="{./Caption}"/>

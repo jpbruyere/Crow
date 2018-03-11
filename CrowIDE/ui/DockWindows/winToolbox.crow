@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<DockWindow DataSource="{CurrentSolution}" Name="winToolbox" Caption="Toolbox" Width="10%" Height="80%">
+<DockWindow DataSource="{CurrentSolution}" Name="winToolbox" Caption="Toolbox" Width="20%">
 	<ListBox Margin="3" Data="{ToolboxItems}" SelectionBackground="SkyBlue">
 		<Template>
 			<Wrapper Name="ItemsContainer" Orientation="Vertical" Spacing="0"/>
@@ -7,10 +7,9 @@
 		<ItemTemplate>
 			<Container Fit="true" Focusable="true" Tooltip="{DisplayName}" Margin="2" AllowDrag="true"
 				StartDrag="onStartDrag" EndDrag="onEndDrag" Drop="onDrop">
-				<Border Background="Silver" Margin="0"
-					Foreground="Transparent" BorderWidth="1"
-					MouseDown="{Foreground=vgradient|0:Black|0.05:Gray|0.85:Gray|1:White}"
-					MouseUp="{Foreground=vgradient|0:White|0.2:Gray|0.9:Gray|1:Black}">
+				<Border Foreground="Black" Background="Jet" Margin="0" BorderWidth="1"
+					MouseEnter="{Foreground=White}"
+					MouseLeave="{Foreground=Black}">
 					<Image Path="{IconPath}" Margin="3"  Width="20" Height="20" />
 				</Border>
 			</Container>

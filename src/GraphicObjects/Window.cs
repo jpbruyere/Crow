@@ -453,6 +453,14 @@ namespace Crow
 					(Parent as Container).Child = null;
 			}
 		}
+
+		public static Window Show (Interface iface, string imlPath, bool modal = false){
+			lock (iface.UpdateMutex) {
+				Window w = iface.AddWidget (imlPath) as Window;
+				w.Modal = modal;
+				return w;
+			}
+		}
 	}
 }
 

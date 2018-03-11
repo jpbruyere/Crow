@@ -64,6 +64,7 @@
 			MouseEnter="{Foreground=DimGray}"
 			MouseLeave="{Foreground=Transparent}">
 		<HorizontalStack>
+			<GraphicObject Width="5" Height="5"/>
 			<Image Margin="1" Width="14" Height="14"
 				Path="#Crow.Icons.assembly.svg"/>
 			<Label Text="{DisplayName}" Width="Stretched"/>
@@ -75,6 +76,7 @@
 			MouseEnter="{Foreground=DimGray}"
 			MouseLeave="{Foreground=Transparent}">
 		<HorizontalStack>
+			<GraphicObject Width="5" Height="5"/>
 			<Image Margin="1" Width="14" Height="14"
 				Path="#Crow.Icons.projectRef.svg"/>
 			<Label Text="{DisplayName}" Width="Stretched"/>
@@ -86,6 +88,7 @@
 			MouseEnter="{Foreground=DimGray}"
 			MouseLeave="{Foreground=Transparent}">
 		<HorizontalStack>			
+			<GraphicObject Width="5" Height="5"/>
 			<Image Margin="1" Width="14" Height="14"
 				Path="#Crow.Icons.file.svg"/>
 			<Label Text="{DisplayName}" Width="Stretched"/>
@@ -98,6 +101,7 @@
 			MouseEnter="{Foreground=DimGray}"
 			MouseLeave="{Foreground=Transparent}">
 		<HorizontalStack>
+			<GraphicObject Width="5" Height="5"/>
 			<Image Margin="1" Width="14" Height="14"
 				Path="#Crow.Icons.file.svg"/>
 			<Label Text="{DisplayName}" Width="Stretched"/>
@@ -109,6 +113,7 @@
 			MouseEnter="{Foreground=DimGray}"
 			MouseLeave="{Foreground=Transparent}">
 		<HorizontalStack>
+			<GraphicObject Width="5" Height="5"/>
 			<Image Margin="1" Width="14" Height="14"
 				Path="#Crow.Icons.file.svg"/>
 			<Label Text="{DisplayName}" Width="Stretched"/>

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<DockWindow DataSource="{CurrentSolution}" Name="winErrors" Caption="Errors" Width="70%" Height="20%">
+<DockWindow DataSource="{CurrentSolution}" Name="winErrors" Caption="Errors"  Width="20%">
 	<ListBox Width="Stretched" Data="{CompilerErrors}">
 		<ItemTemplate>
 			<HorizontalStack Height="Fit" Margin="0" Focusable="true" Spacing="10"

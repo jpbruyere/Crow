@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<DockWindow DataSource="{CurrentSolution}" Name="winProperties" Caption="Properties" Width="30%" Height="80%">
+<DockWindow DataSource="{CurrentSolution}" Name="winProperties" Caption="Properties"  Width="20%">
 	<MembersView ProjectNode="{SelectedItem}"
 		Instance="{SelectedItemElement}" DataTest="Type"
 		ItemTemplate="#Crow.Coding.ui.MembersItem.template"/>

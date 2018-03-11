@@ -46,18 +46,18 @@ namespace Crow.Coding
 		CMDCompile;
 
 		void initCommands () {
-			CMDNew = new Command(new Action(() => newFile())) { Caption = "New", Icon = new SvgPicture("#Crow.Coding.ui.icons.blank-file.svg"), CanExecute = false};
+			CMDNew = new Command(new Action(() => newFile())) { Caption = "New", Icon = new SvgPicture("#Crow.Coding.ui.icons.blank-file.svg"), CanExecute = true};
 			CMDOpen = new Command(new Action(() => openFileDialog())) { Caption = "Open...", Icon = new SvgPicture("#Crow.Coding.ui.icons.outbox.svg")};
 			CMDSave = new Command(new Action(() => saveFileDialog())) { Caption = "Save", Icon = new SvgPicture("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false};
 			CMDSaveAs = new Command(new Action(() => saveFileDialog())) { Caption = "Save As...", Icon = new SvgPicture("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false};
 			CMDQuit = new Command(new Action(() => Quit (null, null))) { Caption = "Quit", Icon = new SvgPicture("#Crow.Coding.ui.icons.sign-out.svg")};
-			CMDUndo = new Command(new Action(() => undo())) { Caption = "Undo", Icon = new SvgPicture("#Crow.Coding.ui.icons.reply.svg"), CanExecute = false};
-			CMDRedo = new Command(new Action(() => redo())) { Caption = "Redo", Icon = new SvgPicture("#Crow.Coding.ui.icons.share-arrow.svg"), CanExecute = false};
-			CMDCut = new Command(new Action(() => Quit (null, null))) { Caption = "Cut", Icon = new SvgPicture("#Crow.Coding.ui.icons.scissors.svg"), CanExecute = false};
-			CMDCopy = new Command(new Action(() => Quit (null, null))) { Caption = "Copy", Icon = new SvgPicture("#Crow.Coding.ui.icons.copy-file.svg"), CanExecute = false};
-			CMDPaste = new Command(new Action(() => Quit (null, null))) { Caption = "Paste", Icon = new SvgPicture("#Crow.Coding.ui.icons.paste-on-document.svg"), CanExecute = false};
-			CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("help"))) { Caption = "Help", Icon = new SvgPicture("#Crow.Coding.ui.icons.question.svg")};
-			CMDOptions = new Command(new Action(() => openOptionsDialog())) { Caption = "Editor Options", Icon = new SvgPicture("#Crow.Coding.ui.icons.tools.svg")};
+			CMDUndo = new Command(new Action(() => undo())) { Caption = "Undo", Icon = new SvgPicture("#Crow.Coding.icons.undo.svg"), CanExecute = false};
+			CMDRedo = new Command(new Action(() => redo())) { Caption = "Redo", Icon = new SvgPicture("#Crow.Coding.icons.redo.svg"), CanExecute = false};
+			CMDCut = new Command(new Action(() => Quit (null, null))) { Caption = "Cut", Icon = new SvgPicture("#Crow.Coding.icons.scissors.svg"), CanExecute = false};
+			CMDCopy = new Command(new Action(() => Quit (null, null))) { Caption = "Copy", Icon = new SvgPicture("#Crow.Coding.icons.copy-file.svg"), CanExecute = false};
+			CMDPaste = new Command(new Action(() => Quit (null, null))) { Caption = "Paste", Icon = new SvgPicture("#Crow.Coding.icons.paste-on-document.svg"), CanExecute = false};
+			CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("help"))) { Caption = "Help", Icon = new SvgPicture("#Crow.Coding.icons.question.svg")};
+			CMDOptions = new Command(new Action(() => openOptionsDialog())) { Caption = "Editor Options", Icon = new SvgPicture("#Crow.Coding.icons.tools.svg")};
 
 			cmdCloseSolution = new Command(new Action(() => closeSolution())) { Caption = "Close Solution", Icon = new SvgPicture("#Crow.Coding.ui.icons.paste-on-document.svg"), CanExecute = true};
 
@@ -72,7 +72,7 @@ namespace Crow.Coding
 			CMDViewToolbox = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winToolbox.crow")))
 			{ Caption = "Toolbox"};
 
-			CMDViewGTExp = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.GTreeExplorer.crow"))) { Caption = "Graphic Tree Explorer"};
+			CMDViewGTExp = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winGTExplorer.crow"))) { Caption = "Graphic Tree Explorer"};
 			CMDViewProps = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.MemberView.crow"))) { Caption = "Properties View"};
 			CMDCompile = new Command(new Action(() => compileSolution())) { Caption = "Compile"};
 			CMDViewProj = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.CSProjExplorer.crow"))) { Caption = "Project Explorer"};
@@ -83,7 +83,9 @@ namespace Crow.Coding
 			AddWidget (instFileDlg.CreateInstance()).DataSource = this;
 		}
 		void openOptionsDialog(){}
-		void newFile() {}
+		void newFile() {			
+			currentSolution.OpenedItems.AddElement(new ProjectFile());
+		}
 		void saveFileDialog() {}
 		void undo() {}
 		void redo() {}
