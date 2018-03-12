@@ -23,3 +23,17 @@ IcoBut {
 	Height = "14";
 	Background = "White";
 }
+
+ProjTreeIcon {
+	Margin="1";
+	Width="14";
+	Height="14";
+}
+
+WinSchema {
+	Template="#Crow.Coding.ui.DockWindows.WinSchemaItem.template";
+	Focusable = "true";
+	MinimumSize="150,50";
+	Width = "Fit";
+	Height = "Fit";
+}

@@ -42,7 +42,7 @@ namespace Crow.Coding
 		CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp,
 		CMDAbout, CMDOptions,
 		CMDViewGTExp, CMDViewProps, CMDViewProj, CMDViewProjProps, CMDViewErrors, CMDViewSolution, CMDViewEditor, CMDViewProperties,
-		CMDViewToolbox,
+		CMDViewToolbox, CMDViewSchema,
 		CMDCompile;
 
 		void initCommands () {
@@ -59,24 +59,28 @@ namespace Crow.Coding
 			CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("help"))) { Caption = "Help", Icon = new SvgPicture("#Crow.Coding.icons.question.svg")};
 			CMDOptions = new Command(new Action(() => openOptionsDialog())) { Caption = "Editor Options", Icon = new SvgPicture("#Crow.Coding.icons.tools.svg")};
 
-			cmdCloseSolution = new Command(new Action(() => closeSolution())) { Caption = "Close Solution", Icon = new SvgPicture("#Crow.Coding.ui.icons.paste-on-document.svg"), CanExecute = true};
+			cmdCloseSolution = new Command(new Action(() => closeSolution()))
+			{ Caption = "Close Solution", Icon = new SvgPicture("#Crow.Coding.ui.icons.paste-on-document.svg"), CanExecute = false};
 
 			CMDViewErrors = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winErrors.crow")))
 			{ Caption = "Errors pane"};
 			CMDViewSolution = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winSolution.crow")))
-			{ Caption = "Solution Tree"};
+			{ Caption = "Solution Tree", CanExecute = false};
 			CMDViewEditor = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winEditor.crow")))
 			{ Caption = "Editor Pane"};
 			CMDViewProperties = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winProperties.crow")))
 			{ Caption = "Properties"};
 			CMDViewToolbox = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winToolbox.crow")))
-			{ Caption = "Toolbox"};
-
-			CMDViewGTExp = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winGTExplorer.crow"))) { Caption = "Graphic Tree Explorer"};
-			CMDViewProps = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.MemberView.crow"))) { Caption = "Properties View"};
-			CMDCompile = new Command(new Action(() => compileSolution())) { Caption = "Compile"};
-			CMDViewProj = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.CSProjExplorer.crow"))) { Caption = "Project Explorer"};
-			CMDViewProjProps = new Command(new Action(loadProjProps) ){ Caption = "Project Properties"};
+			{ Caption = "Toolbox", CanExecute = false};
+			CMDViewSchema = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winSchema.crow")))
+			{ Caption = "IML Shematic View", CanExecute = true};
+				
+			CMDViewGTExp = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winGTExplorer.crow")))
+			{ Caption = "Graphic Tree Explorer", CanExecute = false};
+			CMDCompile = new Command(new Action(() => compileSolution()))
+			{ Caption = "Compile", CanExecute = false};
+			CMDViewProjProps = new Command(new Action(loadProjProps))
+			{ Caption = "Project Properties", CanExecute = false};
 		}
 
 		void openFileDialog () {			
@@ -109,6 +113,7 @@ namespace Crow.Coding
 
 		Instantiator instFileDlg;
 		Solution currentSolution;
+		Project currentProject;
 		Docker mainDock;
 
 		public static Interface MainIFace;
@@ -152,7 +157,7 @@ namespace Crow.Coding
 		}
 
 		void loadProjProps () {
-			//loadWindow ("#Crow.Coding.ui.ProjectProperties.crow", currentProject);
+			loadWindow ("#Crow.Coding.ui.ProjectProperties.crow");
 		}
 		void compileSolution () {
 			//ProjectItem pi = CurrentSolution.SelectedItem;
@@ -173,9 +178,29 @@ namespace Crow.Coding
 			set {
 				if (currentSolution == value)
 					return;
+				
 				currentSolution = value;
+
+				CMDCompile.CanExecute = (currentSolution != null);
+				cmdCloseSolution.CanExecute = (currentSolution != null);
+				CMDViewSolution.CanExecute = (currentSolution != null);
+				
 				lock (MainIFace) {
 					NotifyValueChanged ("CurrentSolution", currentSolution);
+				}
+			}
+		}
+		public Project CurrentProject {
+			get { return currentProject; }
+			set {
+				if (currentProject == value)
+					return;
+				currentProject = value;
+
+				CMDViewProjProps.CanExecute = (currentProject != null);
+				
+				lock (MainIFace) {
+					NotifyValueChanged ("CurrentProject", currentProject);
 				}
 			}
 		}

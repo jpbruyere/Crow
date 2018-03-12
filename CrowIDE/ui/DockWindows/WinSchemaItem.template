@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<Border BorderWidth="1" Foreground="Black" CornerRadius="10"
+				Background="Gray"
+				MouseEnter="./onBorderMouseEnter"
+				MouseLeave="./onBorderMouseLeave">
+	<VerticalStack Spacing="0">
+		<HorizontalStack Background="Teal" Margin="0" Spacing="0" Height="Fit" Width="Stretched">				
+			<Label Width="Stretched" Margin="0" TextAlignment="Center" Text="{./Caption}" />
+		</HorizontalStack>
+		<GraphicObject Background="Black" Height="1"/>
+		<Container Margin="5" Name="Content" Width="Fit"/>
+	</VerticalStack>
+</Border>

@@ -84,17 +84,15 @@ namespace Crow.Coding
 
 		protected void backgroundThreadFunc () {
 			while (true) {
-				if (IsReady) {
-					if (projFile != null) {
-						if (!projFile.RegisteredEditors [this]) {
-							projFile.RegisteredEditors [this] = true;
-							updateEditorFromProjFile ();
-						} else if (EditorIsDirty) {
-							EditorIsDirty = false;
-							updateProjFileFromEditor ();
-						}
-						updateCheckPostProcess ();
+				if (IsReady) {				
+					if (!projFile.RegisteredEditors [this]) {
+						projFile.RegisteredEditors [this] = true;
+						updateEditorFromProjFile ();
+					} else if (EditorIsDirty) {
+						EditorIsDirty = false;
+						updateProjFileFromEditor ();
 					}
+					updateCheckPostProcess ();
 				}
 				Thread.Sleep (10);
 			}	

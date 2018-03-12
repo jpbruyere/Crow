@@ -234,7 +234,7 @@ namespace Crow.Coding
 			set { isDirty = value; }
 		}
 		protected override bool IsReady {
-			get { return buffer != null; }
+			get { return projFile != null && buffer != null; }
 		}
 		#endregion
 

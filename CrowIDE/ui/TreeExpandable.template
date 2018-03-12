@@ -4,15 +4,15 @@
 			Foreground="Transparent"
 			MouseEnter="{Foreground=DimGray}"
 			MouseLeave="{Foreground=Transparent}">
-		<HorizontalStack Spacing="1">
+		<HorizontalStack Spacing="5">
 			<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
 				Path="{./Image}"
 				Visible="{./IsExpandable}"
 				SvgSub="{./IsExpanded}"
 				MouseEnter="{Background=LightGray}"
 				MouseLeave="{Background=Transparent}"/>
-			<Image Margin="1" Width="14" Height="14"
-				Path="#Crow.Icons.folder.svg"/>
+			<Image Margin="0" Width="16" Height="16"
+				Path="#Crow.Coding.icons.folder.svg" SvgSub="{./IsExpanded}"/>
 			<Label Text="{./Caption}"/>
 		</HorizontalStack>
 	</Border>

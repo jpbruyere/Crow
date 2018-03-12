@@ -17,7 +17,7 @@
 							SvgSub="{./IsExpanded}"
 							MouseEnter="{Background=LightGray}"
 							MouseLeave="{Background=Transparent}"/>
-						<Image Margin="1" Width="14" Height="14"
+						<Image Style="ProjTreeIcon"
 							Path="#Crow.Icons.crowproj.svg"/>
 						<GraphicObject Width="2" Height="9" Background="Green" Visible="{IsStartupProject}"/>
 						<Label Text="{./Caption}"/>
@@ -53,7 +53,7 @@
 			MouseEnter="{Foreground=DimGray}"
 			MouseLeave="{Foreground=Transparent}">
 		<HorizontalStack>
-			<Image Margin="1" Width="14" Height="14"
+			<Image Style="ProjTreeIcon"
 				Path="#Crow.Icons.folder.svg"/>
 			<Label Text="{DisplayName}" Width="Stretched"/>
 		</HorizontalStack>
@@ -65,7 +65,7 @@
 			MouseLeave="{Foreground=Transparent}">
 		<HorizontalStack>
 			<GraphicObject Width="5" Height="5"/>
-			<Image Margin="1" Width="14" Height="14"
+			<Image Style="ProjTreeIcon"
 				Path="#Crow.Icons.assembly.svg"/>
 			<Label Text="{DisplayName}" Width="Stretched"/>
 		</HorizontalStack>
@@ -77,7 +77,7 @@
 			MouseLeave="{Foreground=Transparent}">
 		<HorizontalStack>
 			<GraphicObject Width="5" Height="5"/>
-			<Image Margin="1" Width="14" Height="14"
+			<Image Style="ProjTreeIcon"
 				Path="#Crow.Icons.projectRef.svg"/>
 			<Label Text="{DisplayName}" Width="Stretched"/>
 		</HorizontalStack>
@@ -89,8 +89,8 @@
 			MouseLeave="{Foreground=Transparent}">
 		<HorizontalStack>			
 			<GraphicObject Width="5" Height="5"/>
-			<Image Margin="1" Width="14" Height="14"
-				Path="#Crow.Icons.file.svg"/>
+			<Image Style="ProjTreeIcon"
+				Path="#Crow.Coding.icons.file.svg"/>
 			<Label Text="{DisplayName}" Width="Stretched"/>
 		</HorizontalStack>
 	</Border>
@@ -102,8 +102,8 @@
 			MouseLeave="{Foreground=Transparent}">
 		<HorizontalStack>
 			<GraphicObject Width="5" Height="5"/>
-			<Image Margin="1" Width="14" Height="14"
-				Path="#Crow.Icons.file.svg"/>
+			<Image Style="ProjTreeIcon"
+				Path="#Crow.Coding.icons.file.svg"/>
 			<Label Text="{DisplayName}" Width="Stretched"/>
 		</HorizontalStack>
 	</Border>
@@ -114,8 +114,8 @@
 			MouseLeave="{Foreground=Transparent}">
 		<HorizontalStack>
 			<GraphicObject Width="5" Height="5"/>
-			<Image Margin="1" Width="14" Height="14"
-				Path="#Crow.Icons.file.svg"/>
+			<Image Style="ProjTreeIcon"
+				Path="#Crow.Coding.icons.file.svg"/>
 			<Label Text="{DisplayName}" Width="Stretched"/>
 		</HorizontalStack>
 	</Border>

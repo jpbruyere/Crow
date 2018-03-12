@@ -9,3 +9,9 @@
 <ItemTemplate Path="#Crow.Coding.ui.SrcEdit.itemp" DataType=".style"/>
 <ItemTemplate Path="#Crow.Coding.ui.IMLEdit.itemp" DataType=".crow"/>
 <ItemTemplate Path="#Crow.Coding.ui.IMLEdit.itemp" DataType=".template"/>
+<ItemTemplate DataType=".goml">
+	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
+		<IMLContainer Path="#Crow.Coding.ui.TextEditor.crow"/>
+	</TabItem>
+</ItemTemplate>
+

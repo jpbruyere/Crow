@@ -47,6 +47,7 @@ namespace Crow.Coding
 
 		bool drawGrid, snapToGrid;
 		int gridSpacing;
+		bool updateEnabled;
 
 		[DefaultValue(true)]
 		public bool DrawGrid {
@@ -80,7 +81,7 @@ namespace Crow.Coding
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute]public GraphicObject SelectedItem {
+		public GraphicObject SelectedItem {
 			get { return selectedItem; }
 			set {
 				if (selectedItem == value)
@@ -88,6 +89,18 @@ namespace Crow.Coding
 				selectedItem = value;
 				NotifyValueChanged ("SelectedItem", selectedItem);
 				RegisterForRedraw ();
+			}
+		}
+		/// <summary>
+		/// use to disable update if tab is not the visible one
+		/// </summary>
+		public bool UpdateEnabled {
+			get { return updateEnabled; }
+			set { 
+				if (value == updateEnabled)
+					return;
+				updateEnabled = value;
+				NotifyValueChanged ("UpdateEnabled", updateEnabled);
 			}
 		}
 		/// <summary>PoinprojFilever the widget</summary>
@@ -107,6 +120,11 @@ namespace Crow.Coding
 			get { return imlVE.LQIs; }
 		}
 
+		public List<GraphicObject> GraphicTree {
+			get { return imlVE.GraphicTree; }
+		}
+
+		#region editor overrides
 		public override ProjectFile ProjectNode {
 			get {
 				return base.ProjectNode;
@@ -117,10 +135,18 @@ namespace Crow.Coding
 				imlVE.ProjFile = imlProjFile;
 			}
 		}
-
-		public List<GraphicObject> GraphicTree {
-			get { return imlVE.GraphicTree; }
+		protected override bool EditorIsDirty {
+			get { return imlProjFile == null ? false :
+				imlProjFile.Instance == null ? false : imlProjFile.Instance.design_HasChanged; }
+			set {
+				if (GraphicTree [0] != null)
+					GraphicTree [0].design_HasChanged = value;			
+			}
 		}
+		protected override bool IsReady {
+			get { return updateEnabled && imlVE != null && imlProjFile != null; }
+		}
+
 		protected override void updateProjFileFromEditor ()
 		{
 			try {
@@ -175,31 +201,6 @@ namespace Crow.Coding
 					Monitor.Exit (imlVE.UpdateMutex);
 			}
 		}
-
-		protected override bool EditorIsDirty {
-			get { return imlProjFile == null ? false :
-				imlProjFile.Instance == null ? false : imlProjFile.Instance.design_HasChanged; }
-			set {
-				if (GraphicTree [0] != null)
-					GraphicTree [0].design_HasChanged = value;			
-			}
-		}
-		protected override bool IsReady {
-			get { return updateEnabled && imlVE != null && imlProjFile != null; }
-		}
-		bool updateEnabled;
-		/// <summary>
-		/// use to disable update if tab is not the visible one
-		/// </summary>
-		public bool UpdateEnabled {
-			get { return updateEnabled; }
-			set { 
-				if (value == updateEnabled)
-					return;
-				updateEnabled = value;
-				NotifyValueChanged ("UpdateEnabled", updateEnabled);
-			}
-		}
 		protected override void updateCheckPostProcess ()
 		{
 			imlVE.Update ();
@@ -213,6 +214,7 @@ namespace Crow.Coding
 					RegisterForRedraw ();
 			}
 		}
+		#endregion
 
 		#region GraphicObject overrides
 		public override void OnLayoutChanges (LayoutingType layoutType)
@@ -397,7 +399,6 @@ namespace Crow.Coding
 			draggedObj = null;
 		}
 		#endregion
-
 
 		void WidgetCheckOver (GraphicObject go, MouseMoveEventArgs e){
 			Type tGo = go.GetType();
