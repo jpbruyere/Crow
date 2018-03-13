@@ -140,7 +140,8 @@ namespace Tests
 
 		void OnClear (object sender, MouseButtonEventArgs e) => TestList = null;
 
-		void OnLoadList (object sender, MouseButtonEventArgs e) => TestList = Color.ColorDic.Values.ToList();
+		void OnLoadList (object sender, MouseButtonEventArgs e) => TestList =
+			Color.ColorDic.Values.OrderBy(c=>c.Hue).ToList();
 
 		void command1(){
 			Console.WriteLine("command1 triggered");
@@ -159,6 +160,14 @@ namespace Tests
 		{
 			base.OnLoad (e);
 
+			foreach (Color c in Color.ColorDic.Values) {
+				if (string.IsNullOrEmpty(c.htmlCode))
+					Console.WriteLine ("no htmlcode for {0}", c.Name);
+				else if (c.htmlCode.Substring(1) != c.HtmlCode)
+					Console.WriteLine ("{2} orig: {0} comp: {1}",c.htmlCode, c.HtmlCode, c.Name);
+			}
+
+
 			Commands = new List<Crow.Command> (new Crow.Command[] {
 				new Crow.Command(new Action(() => command1())) { Caption = "command1"},
 				new Crow.Command(new Action(() => command2())) { Caption = "command2"},
@@ -168,7 +177,8 @@ namespace Tests
 
 			this.KeyDown += KeyboardKeyDown1;
 
-			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
@@ -230,7 +240,7 @@ namespace Tests
 				GraphicObject obj = Load (testFiles[idx]);
 				obj.DataSource = this;
 			} catch (Exception ex) {				
-				MessageBox.Show (CurrentInterface, MessageBox.Type.Error, ex.Message + "\n" + ex.InnerException.Message);
+				MessageBox.Show (CurrentInterface, MessageBox.Type.Error, ex.Message + "\n" + ex.InnerException.Message).Modal = true;
 			}
 		}
 //		void Tv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)

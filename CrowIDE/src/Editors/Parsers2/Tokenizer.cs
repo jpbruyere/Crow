@@ -1,5 +1,5 @@
 ﻿//
-// IListChanged.cs
+// Tokenizer.cs
 //
 // Author:
 //       Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
@@ -24,24 +24,44 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using Crow.Text;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
-namespace Crow
-{	
-	public class ObservableList<T> : List<T> , IObservableList {
-		public event EventHandler<ListChangedEventArg> ListAdd;
-		public event EventHandler<ListChangedEventArg> ListRemove;		
+namespace Crow.Coding2
+{
+	public static class TokenType {
+		public const int Undefine = 0;
+		public const int WhiteSpace = 0;
+	}
+	public class Token {
+		public int ptr;
+		public int length;
+	}
 
-		public void AddElement (T elem) {
-			this.Add(elem);
-			ListAdd.Raise (this, new ListChangedEventArg (this.Count - 1, elem));
+	public class Tokenizer
+	{
+		#region Regular Expression for validity checks
+		public Regex rxValidChar = new Regex(@"\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}|\p{Mn}|\p{Mc}|\p{Nd}|\p{Pc}|\p{Cf}");
+		public Regex rxNameStartChar = new Regex(@"_|\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}");
+		public Regex rxNameChar = new Regex(@"\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}|\p{Mn}|\p{Mc}|\p{Nd}|\p{Pc}|\p{Cf}");
+		public Regex rxNewLineChar = new Regex(@"\u000D|\u000A|\u0085|\u2028|\u2029");
+		public Regex rxWhiteSpaceChar = new Regex(@"\p{Zs}|\u0009|\u000B|\u000C");
+		public Regex rxDecimal = new Regex(@"[0-9]+");
+		public Regex rxHexadecimal = new Regex(@"[0-9a-fA-F]+");
+		#endregion
+
+		public List<Token> Tokens;
+
+		public Tokenizer (TextBuffer buffer)
+		{
 		}
-		public void RemoveElement (T elem) {
-			System.Diagnostics.Debug.WriteLine ("remove elem:" + elem);
-			int idx = this.IndexOf (elem);
-			this.RemoveAt (idx);
-			ListRemove.Raise (this, new ListChangedEventArg (idx, elem));
+
+
+		public void Tokenize () {
+			
 		}
+
 	}
 }
 

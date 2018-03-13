@@ -5,8 +5,8 @@
 			<Label Text="Selected Tab:"/>
 			<Label Text="{../../tabview1.SelectedTab}"/>
 		</HorizontalStack>
-		<TabView Name="tabview1" Background="Onyx" Orientation="Horizontal" Margin="5" >
-			<TabItem Name="TabItem1" Caption="tab-1.1" Background="Onyx">
+		<TabView Name="tabview1" Background="DimGray" Orientation="Horizontal" Margin="5" >
+			<TabItem Name="TabItem1" Caption="tab-1.1" Background="DimGray">
 				<VerticalStack Margin="20">
 					<CheckBox/>
 					<CheckBox/>
@@ -14,7 +14,7 @@
 					<CheckBox/>
 				</VerticalStack>
 			</TabItem>
-			<TabItem Name="TabItem2" Caption="tab-1.2" Background="Onyx">
+			<TabItem Name="TabItem2" Caption="tab-1.2" Background="DimGray">
 				<VerticalStack Height="Fit" Margin="10">
 					<RadioButton Fit="true"/>
 					<RadioButton/>
@@ -22,7 +22,7 @@
 					<RadioButton/>
 				</VerticalStack>
 			</TabItem>
-			<TabItem Name="TabItem3" Background="Onyx" Caption="tab-1.3">
+			<TabItem Name="TabItem3" Background="DimGray" Caption="tab-1.3">
 				<Container Margin="5" CornerRadius="2" >
 					<TextBox Margin="5" Multiline="true" TextAlignment="TopLeft"/>
 				</Container>
@@ -36,8 +36,8 @@
 			<Label Text="Selected Tab:"/>
 			<Label Text="{../../tabview2.SelectedTab}"/>
 		</HorizontalStack>
-		<TabView Name="tabview2" Background="Onyx" Orientation="Horizontal" >
-			<TabItem Name="TabItem1" Caption="tab-2.1" Background="Onyx">
+		<TabView Name="tabview2" Background="DimGray" Orientation="Horizontal" >
+			<TabItem Name="TabItem1" Caption="tab-2.1" Background="DimGray">
 				<VerticalStack Margin="20">
 					<CheckBox/>
 					<CheckBox/>
@@ -45,7 +45,7 @@
 					<CheckBox/>
 				</VerticalStack>
 			</TabItem>
-			<TabItem Name="TabItem2" Caption="tab-2.2" Background="Onyx">
+			<TabItem Name="TabItem2" Caption="tab-2.2" Background="DimGray">
 				<VerticalStack Height="Fit" Margin="10">
 					<RadioButton Fit="true"/>
 					<RadioButton/>
@@ -53,7 +53,7 @@
 					<RadioButton/>
 				</VerticalStack>
 			</TabItem>
-			<TabItem Name="TabItem3" Background="Onyx" Caption="tab-2.3">
+			<TabItem Name="TabItem3" Background="DimGray" Caption="tab-2.3">
 				<Container Margin="5" CornerRadius="2" >
 					<TextBox Margin="5" Multiline="true" TextAlignment="TopLeft"/>
 				</Container>

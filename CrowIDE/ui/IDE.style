@@ -12,7 +12,7 @@ MemberViewHStack {
 	Focusable="true";
 	Height="Fit";
 	Spacing="1";
-	MouseEnter="{Background=UnitedNationsBlue}";
+	MouseEnter="{Background=SteelBlue}";
 	MouseLeave="{Background=Transparent}";
 }
 
@@ -24,16 +24,28 @@ IcoBut {
 	Background = "White";
 }
 
-ProjTreeIcon {
-	Margin="1";
-	Width="14";
-	Height="14";
-}
-
 WinSchema {
 	Template="#Crow.Coding.ui.DockWindows.WinSchemaItem.template";
 	Focusable = "true";
 	MinimumSize="150,50";
 	Width = "Fit";
 	Height = "Fit";
+}
+TabItem {
+	Background="Jet";
+}
+TreeItemBorder {
+	CornerRadius="2";
+	Margin="0";
+	Focusable="true";
+	Height="Fit";
+	Width="Stretched";
+	Foreground="Transparent";
+	MouseEnter="{Foreground=DimGray}";
+	MouseLeave="{Foreground=Transparent}";
+}
+TreeIcon {
+	Margin="0";
+	Width="14";
+	Height="14";
 }

@@ -6,10 +6,7 @@
 	<Expandable Caption="{Name}" ContextCommands="{Commands}" IsExpanded="{²IsExpanded}">
 		<Template>
 			<VerticalStack>
-				<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"						
-						Foreground="Transparent"
-						MouseEnter="{Foreground=DimGray}"
-						MouseLeave="{Foreground=Transparent}">
+				<Border Style="TreeItemBorder" MouseDoubleClick="./onClickForExpand">
 					<HorizontalStack Spacing="1">
 						<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
 							Path="{./Image}"
@@ -17,7 +14,7 @@
 							SvgSub="{./IsExpanded}"
 							MouseEnter="{Background=LightGray}"
 							MouseLeave="{Background=Transparent}"/>
-						<Image Style="ProjTreeIcon"
+						<Image Style="TreeIcon"
 							Path="#Crow.Icons.crowproj.svg"/>
 						<GraphicObject Width="2" Height="9" Background="Green" Visible="{IsStartupProject}"/>
 						<Label Text="{./Caption}"/>
@@ -49,9 +46,7 @@
 	</Expandable>
 </ItemTemplate>
 <ItemTemplate DataType="Folder" DataTest="Type">
-	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
-			MouseEnter="{Foreground=DimGray}"
-			MouseLeave="{Foreground=Transparent}">
+	<Border Style="TreeItemBorder" ContextCommands="{Commands}">
 		<HorizontalStack>
 			<Image Style="ProjTreeIcon"
 				Path="#Crow.Icons.folder.svg"/>
@@ -60,61 +55,50 @@
 	</Border>
 </ItemTemplate>
 <ItemTemplate DataType="Reference" DataTest="Type">
-	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
-			MouseEnter="{Foreground=DimGray}"
-			MouseLeave="{Foreground=Transparent}">
+	<Border Style="TreeItemBorder" ContextCommands="{Commands}">
 		<HorizontalStack>
 			<GraphicObject Width="5" Height="5"/>
-			<Image Style="ProjTreeIcon"
+			<Image Style="TreeIcon"
 				Path="#Crow.Icons.assembly.svg"/>
 			<Label Text="{DisplayName}" Width="Stretched"/>
 		</HorizontalStack>
 	</Border>
 </ItemTemplate>
 <ItemTemplate DataType="ProjectReference" DataTest="Type">
-	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
-			MouseEnter="{Foreground=DimGray}"
-			MouseLeave="{Foreground=Transparent}">
+	<Border Style="TreeItemBorder" ContextCommands="{Commands}">
 		<HorizontalStack>
 			<GraphicObject Width="5" Height="5"/>
-			<Image Style="ProjTreeIcon"
+			<Image Style="TreeIcon"
 				Path="#Crow.Icons.projectRef.svg"/>
 			<Label Text="{DisplayName}" Width="Stretched"/>
 		</HorizontalStack>
 	</Border>
 </ItemTemplate>
 <ItemTemplate DataType="Compile" DataTest="Type">	
-	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
-			MouseEnter="{Foreground=DimGray}"
-			MouseLeave="{Foreground=Transparent}">
+	<Border Style="TreeItemBorder" ContextCommands="{Commands}">
 		<HorizontalStack>			
 			<GraphicObject Width="5" Height="5"/>
-			<Image Style="ProjTreeIcon"
+			<Image Style="TreeIcon"
 				Path="#Crow.Coding.icons.file.svg"/>
 			<Label Text="{DisplayName}" Width="Stretched"/>
 		</HorizontalStack>
 	</Border>
 </ItemTemplate>
 <ItemTemplate DataType="EmbeddedResource" DataTest="Type">
-	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
-			ContextCommands="{Commands}"
-			MouseEnter="{Foreground=DimGray}"
-			MouseLeave="{Foreground=Transparent}">
+	<Border Style="TreeItemBorder" ContextCommands="{Commands}">
 		<HorizontalStack>
 			<GraphicObject Width="5" Height="5"/>
-			<Image Style="ProjTreeIcon"
+			<Image Style="TreeIcon"
 				Path="#Crow.Coding.icons.file.svg"/>
 			<Label Text="{DisplayName}" Width="Stretched"/>
 		</HorizontalStack>
 	</Border>
 </ItemTemplate>
 <ItemTemplate DataType="None" DataTest="Type">
-	<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
-			MouseEnter="{Foreground=DimGray}"
-			MouseLeave="{Foreground=Transparent}">
+	<Border Style="TreeItemBorder">
 		<HorizontalStack>
 			<GraphicObject Width="5" Height="5"/>
-			<Image Style="ProjTreeIcon"
+			<Image Style="TreeIcon"
 				Path="#Crow.Coding.icons.file.svg"/>
 			<Label Text="{DisplayName}" Width="Stretched"/>
 		</HorizontalStack>

@@ -4,7 +4,7 @@
 	Background="Red">
 	<Template>
 		<HorizontalStack>
-			<Border Background="DimGray" Foreground="Jet" CornerRadius="5">
+			<Border Background="DimGray" Foreground="DimGray" CornerRadius="5">
 			<GenericStack Orientation="{./Orientation}" Name="ItemsContainer"
 				Margin="2"/>
 			</Border>
@@ -32,7 +32,7 @@
 									Font="{./Font}"	/>
 						</Border>
 					</Template>
-					<Border Foreground="DimGray" Width="{../PopWidth}" Height="{../PopHeight}" Background="Onyx">
+					<Border Foreground="DimGray" Width="{../PopWidth}" Height="{../PopHeight}" Background="DimGray">
 						<VerticalStack Name="ItemsContainer"/>
 					</Border>
 				</Popper>

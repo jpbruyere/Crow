@@ -170,7 +170,13 @@ namespace Crow.Coding
 					switch (pn.Extension) {
 					case ".crow":
 					case ".template":
+					case ".goml":
+					case ".itemp":
+					case ".imtl":
 						f = new ImlProjectItem (pn);
+						break;
+					case ".style":
+						f = new StyleProjectItem (pn);
 						break;
 					default:
 						f = new ProjectFile (pn);

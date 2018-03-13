@@ -31,7 +31,7 @@
 								</HorizontalStack>
 						</Border>
 					</Template>
-					<Border Foreground="DimGray" Width="{../PopWidth}" Height="{../PopHeight}" Background="Onyx">
+					<Border Foreground="DimGray" Width="{../PopWidth}" Height="{../PopHeight}" Background="DimGray">
 						<VerticalStack Name="ItemsContainer"/>
 					</Border>
 				</Popper>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack>
 	<Docker>
-		<DockStack Background="Onyx"/>
+		<DockStack Background="DimGray"/>
 		<DockWindow Width="150" Height="150" Background="DarkRed" />
 		<DockWindow Width="150" Height="150" Background="DarkGreen"/>
 		<DockWindow Width="150" Height="150" Background="Blue"/>
@@ -9,11 +9,11 @@
 		<DockWindow Width="150" Height="150" Background="Yellow"/>
 		<DockWindow Width="150" Height="150" Background="BrownWeb"/>
 	</Docker>
-<!---		<DockWindow Left="400" Top="400" Width="150" Height="150" Background="Teal"/>
+<!---		<DockWindow Left="400" Top="400" Width="150" Height="150" Background="MediumSeaGreen"/>
 		<DockWindow Left="450" Top="450" Width="150" Height="150" Background="Maize"/>-->
 	
 </VerticalStack>
-<!--<Group Background="Jet" Margin = "0" Focusable="true" >
+<!--<Group Background="DimGray" Margin = "0" Focusable="true" >
 	<Window Top="100" Left="100" Focusable="true" Caption="View 1" Width="300" Height="300"><GraphicObject Background="Green" Focusable="true" MouseEnter="{Background=Gray}" MouseLeave="{Background=Green}"/></Window>
 	<Window Top="200" Left="200" Focusable="true" Caption="View 2" Resizable = "true" Width="300" Height="300"><GraphicObject Focusable="true" Background="Blue" MouseEnter="{Background=Gray}" MouseLeave="{Background=Blue}"/></Window>
 	<Window Top="300" Left="300" Focusable="true" Caption="View 3" Resizable = "true" Width="300" Height="300"><GraphicObject Focusable="true" Background="Yellow" MouseEnter="{Background=Gray}" MouseLeave="{Background=Yellow}"/></Window>

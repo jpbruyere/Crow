@@ -23,7 +23,7 @@
 			</Template>
 		</CheckBox>
 	</Template>
-	<Border Foreground="DimGray" Width="{../PopWidth}" Height="{../PopHeight}" Background="Onyx">
+	<Border Foreground="DimGray" Width="{../PopWidth}" Height="{../PopHeight}" Background="Jet">
 		<VerticalStack Name="ItemsContainer"/>
 	</Border>
 </Popper>

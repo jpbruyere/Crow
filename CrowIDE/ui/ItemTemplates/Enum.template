@@ -25,8 +25,7 @@
 					MinimumSize="{../../MinimumPopupSize}" Fit="true">
 					<Scroller Name="scroller1" Margin="2" VerticalScrolling="true"
 						MaximumSize="0,200"
-						HorizontalAlignment="Left"
-						ValueChanged="../../../_scroller_ValueChanged">
+						HorizontalAlignment="Left">
 						<VerticalStack LayoutChanged="../../../../_list_LayoutChanged"
 							MouseClick="../../../onMouseClick" Focusable="True"
 							Height="Fit" Name="ItemsContainer" Margin="0"

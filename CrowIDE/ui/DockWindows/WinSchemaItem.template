@@ -4,7 +4,7 @@
 				MouseEnter="./onBorderMouseEnter"
 				MouseLeave="./onBorderMouseLeave">
 	<VerticalStack Spacing="0">
-		<HorizontalStack Background="Teal" Margin="0" Spacing="0" Height="Fit" Width="Stretched">				
+		<HorizontalStack Background="MediumSeaGreen" Margin="0" Spacing="0" Height="Fit" Width="Stretched">				
 			<Label Width="Stretched" Margin="0" TextAlignment="Center" Text="{./Caption}" />
 		</HorizontalStack>
 		<GraphicObject Background="Black" Height="1"/>

@@ -28,6 +28,51 @@ namespace Crow.Coding{
 		public string RelativePath;
 		public string ProjectGuid;
 	}
+	public class StyleItemContainer {
+		public object Value;
+		public string Name;
+		public StyleItemContainer(string name, object _value){
+			Name = name;
+			Value = _value;
+		}
+	}
+	public class StyleContainer : IValueChange {
+		#region IValueChange implementation
+		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+		public virtual void NotifyValueChanged(string MemberName, object _value)
+		{
+			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
+		}
+		#endregion
+
+		Style style;
+		bool isExpanded;
+
+		public string Name;
+		public List<StyleItemContainer> Items;
+		public bool IsExpanded
+		{
+			get { return isExpanded; }
+			set
+			{
+				if (value == isExpanded)
+					return;
+				isExpanded = value;
+				NotifyValueChanged ("IsExpanded", isExpanded);
+			}
+		}
+		public StyleContainer(string name, Style _style){
+			Name = name;
+			style = _style;
+
+			Items = new List<StyleItemContainer> ();
+			foreach (string k in style.Keys) {
+				Items.Add(new StyleItemContainer(k, style[k]));
+			}
+		}
+	}
+
+
 	/// <summary>
 /// .sln loaded into class.
 /// </summary>
@@ -49,12 +94,21 @@ namespace Crow.Coding{
 		public Dictionary<string, Style> Styling;
 		public Dictionary<string, string> DefaultTemplates;
 
+		public List<Style> Styles { get { return Styling.Values.ToList(); }}
+		public List<StyleContainer> StylingContainers;
 		//TODO: check project dependencies if no startup proj
 
 		public void ReloadStyling () {
 			Styling = new Dictionary<string, Style> ();
 			if (StartupProject != null)
 				StartupProject.GetStyling ();
+//			StylingContainers = new List<StyleContainer> ();
+//			foreach (string k in Styling.Keys) {
+//				StylingContainers.Add (new StyleContainer (k, Styling [k]));
+//			}
+			foreach (ImlProjectItem pf in openedItems.OfType<ImlProjectItem>()) {
+				pf.SignalEditorOfType<ImlVisualEditor> ();
+			}
 		}
 		public string[] AvailaibleStyles {
 			get { return Styling == null ? new string[] {} : Styling.Keys.ToArray();}

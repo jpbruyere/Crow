@@ -5,28 +5,8 @@
 		<TextBox Margin="1" Text="{²Value}" Height="Fit" Foreground = "{LabForeground}"/>
 	</HorizontalStack>
 </ItemTemplate>
-<ItemTemplate DataType="Crow.Coding.CategoryContainer" Data="Properties" DataTest="Type">
-	<Expandable Caption="{Name}" IsExpanded="{IsExpanded}" Background="Gray" Foreground="Black">
-		<Template>
-			<VerticalStack>
-				<HorizontalStack Spacing="1" Height="Fit" MouseDoubleClick="./onClickForExpand" Background="Gray">
-					<Container Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
-																MouseEnter="{Background=LightGray}"
-																MouseLeave="{Background=Transparent}">
-						<Image
-							Path="#Crow.Images.Icons.expandable.svg"
-							Visible="{./IsExpandable}"
-							SvgSub="{./IsExpanded}"/>
-					</Container>
-					<Label Foreground="White" Text="{./Caption}"/>
-				</HorizontalStack>
-				<Container Name="Content" Visible="false"/>
-			</VerticalStack>
-		</Template>
-		<VerticalStack Spacing="1" Height="Fit" Name="ItemsContainer"
-			Margin="0" VerticalAlignment="Top"/>
-	</Expandable>
-</ItemTemplate>
+<ItemTemplate Path="#Crow.Coding.ui.CategoryExp.template" DataType="Crow.Coding.CategoryContainer"
+	Data="Properties" DataTest="Type"/>
 <ItemTemplate DataType="System.Boolean" >
 	<HorizontalStack Style="MemberViewHStack" ContextCommands="{Commands}">
 		<Label Style="MemberViewLabel" Text="{Name}" Foreground = "{LabForeground}"/>

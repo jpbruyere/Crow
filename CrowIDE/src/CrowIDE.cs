@@ -42,7 +42,7 @@ namespace Crow.Coding
 		CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp,
 		CMDAbout, CMDOptions,
 		CMDViewGTExp, CMDViewProps, CMDViewProj, CMDViewProjProps, CMDViewErrors, CMDViewSolution, CMDViewEditor, CMDViewProperties,
-		CMDViewToolbox, CMDViewSchema,
+		CMDViewToolbox, CMDViewSchema, CMDViewStyling,
 		CMDCompile;
 
 		void initCommands () {
@@ -57,7 +57,7 @@ namespace Crow.Coding
 			CMDCopy = new Command(new Action(() => Quit (null, null))) { Caption = "Copy", Icon = new SvgPicture("#Crow.Coding.icons.copy-file.svg"), CanExecute = false};
 			CMDPaste = new Command(new Action(() => Quit (null, null))) { Caption = "Paste", Icon = new SvgPicture("#Crow.Coding.icons.paste-on-document.svg"), CanExecute = false};
 			CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("help"))) { Caption = "Help", Icon = new SvgPicture("#Crow.Coding.icons.question.svg")};
-			CMDOptions = new Command(new Action(() => openOptionsDialog())) { Caption = "Editor Options", Icon = new SvgPicture("#Crow.Coding.icons.tools.svg")};
+			CMDOptions = new Command(new Action(() => loadWindow("#Crow.Coding.ui.Options.crow"))) { Caption = "Editor Options", Icon = new SvgPicture("#Crow.Coding.icons.tools.svg")};
 
 			cmdCloseSolution = new Command(new Action(() => closeSolution()))
 			{ Caption = "Close Solution", Icon = new SvgPicture("#Crow.Coding.ui.icons.paste-on-document.svg"), CanExecute = false};
@@ -74,6 +74,8 @@ namespace Crow.Coding
 			{ Caption = "Toolbox", CanExecute = false};
 			CMDViewSchema = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winSchema.crow")))
 			{ Caption = "IML Shematic View", CanExecute = true};
+			CMDViewStyling = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winStyleView.crow")))
+			{ Caption = "Styling Explorer", CanExecute = true};
 				
 			CMDViewGTExp = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winGTExplorer.crow")))
 			{ Caption = "Graphic Tree Explorer", CanExecute = false};
@@ -103,12 +105,13 @@ namespace Crow.Coding
 		static void Main ()
 		{
 			CrowIDE win = new CrowIDE ();
+			MainWin = win;
 			win.Run (30);
 		}
 
 		public CrowIDE ()
 			: base(1024, 800,"UIEditor")
-		{
+		{			
 		}
 
 		Instantiator instFileDlg;
@@ -117,6 +120,7 @@ namespace Crow.Coding
 		Docker mainDock;
 
 		public static Interface MainIFace;
+		public static CrowIDE MainWin;
 
 		protected override void OnLoad (EventArgs e)
 		{

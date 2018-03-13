@@ -111,7 +111,6 @@
     <Compile Include="src\Editors\CodeBuffer\CodeBufferEventArgs.cs" />
     <Compile Include="src\Editors\CodeBuffer\CodeLine.cs" />
     <Compile Include="src\Editors\CodeBuffer\Node.cs" />
-    <Compile Include="src\Editors\CodeBuffer\SourceEditor.cs" />
     <Compile Include="src\Editors\CodeBuffer\TextFormatting.cs" />
     <Compile Include="src\Editors\CodeBuffer\Token.cs" />
     <Compile Include="src\ProjectTree\ProjectNodes.cs" />
@@ -122,6 +121,10 @@
     <Compile Include="src\Editors\CodeBuffer\TextBuffer.cs" />
     <Compile Include="src\Editors\CodeBuffer\TextEditor.cs" />
     <Compile Include="src\Editors\ImlSchematicEditor.cs" />
+    <Compile Include="src\Editors\CodeBuffer\TextBufferEventArgs.cs" />
+    <Compile Include="src\Editors\Parsers2\Tokenizer.cs" />
+    <Compile Include="src\Editors\SourceEditor.cs" />
+    <Compile Include="src\ProjectTree\StyleProjectItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />
@@ -135,6 +138,7 @@
     <Folder Include="src\Editors\Parsers\" />
     <Folder Include="src\Editors\CodeBuffer\" />
     <Folder Include="src\ProjectTree\" />
+    <Folder Include="src\Editors\Parsers2\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="images\save.svg" />
@@ -290,6 +294,8 @@
     <EmbeddedResource Include="ui\editors\TextEditor.crow">
       <LogicalName>Crow.Coding.ui.TextEditor.crow</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="ui\DockWindows\winStyleView.crow" />
+    <EmbeddedResource Include="ui\CategoryExp.template" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">

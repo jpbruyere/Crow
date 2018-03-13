@@ -3,7 +3,7 @@
 	<HorizontalStack >
 		<TextEditor Focusable="true" Name="editor" Font="monospace, 12" VerticalAlignment="Top" Margin="1"
 				CurrentLine="{²CurrentLine}" CurrentColumn="{²CurrentColumn}"
-				Foreground="Jet" Background="White" Width="Stretched" Height="Stretched"
+				Foreground="DimGray" Background="White" Width="Stretched" Height="Stretched"
 				ProjectNode="{}"  KeyDown="textView_KeyDown"/>
 		<ScrollBar Name="scrollbarY" Value="{²../editor.ScrollY}"
 				   LargeIncrement="{../editor.VisibleLines}"

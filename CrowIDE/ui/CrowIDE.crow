@@ -22,6 +22,7 @@
 				<MenuItem Command="{CMDViewSolution}"/>
 				<MenuItem Command="{CMDViewEditor}"/>
 				<MenuItem Command="{CMDViewProperties}"/>
+				<MenuItem Command="{CMDViewStyling}"/>
 				<MenuItem Command="{CMDViewToolbox}"/>
 				<MenuItem Command="{CMDViewErrors}"/>
 				<MenuItem Command="{CMDViewGTExp}"/>
@@ -41,7 +42,7 @@
 			<DockStack />
 <!--			<DockWindow DataSource="{CurrentSolution}" Name="winEditor" Caption="Edit View" Width="70%" Height="80%">
 				<Template>
-					<Border BorderWidth="1" Foreground="Jet" CornerRadius="{./CornerRadius}"
+					<Border BorderWidth="1" Foreground="DimGray" CornerRadius="{./CornerRadius}"
 									Background="{./Background}"
 									MouseEnter="./onBorderMouseEnter"
 									MouseLeave="./onBorderMouseLeave">

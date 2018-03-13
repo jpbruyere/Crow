@@ -266,7 +266,7 @@ namespace Crow.Coding
 		/// <param name="length">Length.</param>
 		protected virtual string Peek(int length) {
 			if (eol)
-				throw new ParserException (currentLine, currentColumn, "Unexpected End of Line");
+				return "";//throw new ParserException (currentLine, currentColumn, "Unexpected End of Line");
 			int lg = Math.Min(length, Math.Max (buffer [currentLine].Length - currentColumn, buffer [currentLine].Length - currentColumn - length));
 			if (lg == 0)
 				return "";

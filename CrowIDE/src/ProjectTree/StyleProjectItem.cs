@@ -33,56 +33,17 @@ using System.Threading;
 
 namespace Crow.Coding
 {
-	public class ImlProjectItem : ProjectFile
+	public class StyleProjectItem : ProjectFile
 	{
 		#region CTOR
-		public ImlProjectItem (ProjectItem pi) : base (pi){			
+		public StyleProjectItem (ProjectItem pi) : base (pi){			
 		}
 		#endregion
 
-		GraphicObject instance;
-		Measure designWidth, designHeight;
-
-		/// <summary>
-		/// instance created with an instantiator from the source by a DesignInterface,
-		/// for now, the one in ImlVisualEditor
-		/// </summary>
-		public GraphicObject Instance {
-			get { return instance; }
-			set {
-				if (instance == value)
-					return;
-				instance = value;
-				NotifyValueChanged ("Instance", instance);
-			}
-		}
-			
-		public Measure DesignWidth {
-			get { return designWidth; }
-			set { 
-				if (designWidth == value)
-					return;
-				designWidth = value;
-				NotifyValueChanged ("DesignWidth", designWidth);
-			}
-		}
-		public Measure DesignHeight {
-			get { return designHeight; }
-			set {
-				if (designHeight == value)
-					return;
-				designHeight = value;
-				NotifyValueChanged ("DesignHeight", designHeight);
-			}
-		}
-
-
-		public List<GraphicObject> GraphicTree { 
-			get { return new List<GraphicObject> (new GraphicObject[] {instance}); }
-		}
-
-		void GTView_SelectedItemChanged (object sender, SelectionChangeEventArgs e){
-			SelectedItem = e.NewValue;
+		public override void UpdateSource (object sender, string newSrc)
+		{
+			base.UpdateSource (sender, newSrc);
+			Project.solution.ReloadStyling ();
 		}
 	}
 }

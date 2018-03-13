@@ -96,12 +96,24 @@ namespace Crow.Coding
 				RegisteredEditors.Add (editor, false);
 			}
 		}
-		public void UpdateSource (object sender, string newSrc){
+		public virtual void UpdateSource (object sender, string newSrc){
 			System.Diagnostics.Debug.WriteLine ("update source by {0}", sender);
 			Source = newSrc;
 			signalOtherRegisteredEditors (sender);
 		}
-		void signalOtherRegisteredEditors (object sender) {
+		public void SignalEditorOfType<T> (){
+			lock (RegisteredEditors) {
+				object[] keys = RegisteredEditors.Keys.ToArray ();
+				foreach (object ed in keys) {
+					T editor = (T)ed;
+					if (editor == null)
+						continue;
+					RegisteredEditors [editor] = false;
+					break;
+				}
+			}
+		}
+		protected void signalOtherRegisteredEditors (object sender) {
 			lock (RegisteredEditors) {
 				object[] keys = RegisteredEditors.Keys.ToArray ();
 				foreach (object editor in keys) {
@@ -192,7 +204,7 @@ namespace Crow.Coding
 			origSource = source;
 			NotifyValueChanged ("IsDirty", false);
 		}
-		public void Save () {
+		public virtual void Save () {
 			if (!IsDirty)
 				return;
 			using (StreamWriter sw = new StreamWriter (AbsolutePath)) {
@@ -201,7 +213,7 @@ namespace Crow.Coding
 			origSource = source;
 			NotifyValueChanged ("IsDirty", false);
 		}
-		public void SaveAs () {
+		public virtual void SaveAs () {
 			if (!IsDirty)
 				return;
 			using (StreamWriter sw = new StreamWriter (AbsolutePath)) {
@@ -279,7 +291,6 @@ namespace Crow.Coding
 		{
 			Close ();
 		}
-
 		void onClickSaveAndCloseNow (object sender, EventArgs e)
 		{
 			Save ();

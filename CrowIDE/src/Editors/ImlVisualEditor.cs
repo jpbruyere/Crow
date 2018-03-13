@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using Crow.IML;
 using System.Text;
 using System.Xml;
+using System.Diagnostics;
 
 namespace Crow.Coding
 {
@@ -46,7 +47,8 @@ namespace Crow.Coding
 		Exception imlError = null;
 
 		bool drawGrid, snapToGrid;
-		int gridSpacing;
+		int gridSpacing, zoom = 100;
+		Measure designWidth, designHeight;
 		bool updateEnabled;
 
 		[DefaultValue(true)]
@@ -81,6 +83,42 @@ namespace Crow.Coding
 				RegisterForRedraw ();
 			}
 		}
+		[DefaultValue(100)]
+		public int Zoom {
+			get { return zoom; }
+			set {
+				if (zoom == value)
+					return;
+				
+				zoom = value;
+				NotifyValueChanged ("Zoom", zoom);
+				Width = (int)(designWidth * zoom / 100.0);
+				Height = (int)(designHeight * zoom / 100.0);
+			}
+		}
+		[DefaultValue("512")]
+		public Measure DesignWidth {
+			get { return designWidth; }
+			set { 
+				if (designWidth == value)
+					return;
+				designWidth = value;
+				NotifyValueChanged ("DesignWidth", designWidth);
+				Width = (int)(designWidth * zoom / 100.0);
+			}
+		}
+		[DefaultValue("512")]
+		public Measure DesignHeight {
+			get { return designHeight; }
+			set {
+				if (designHeight == value)
+					return;
+				designHeight = value;
+				NotifyValueChanged ("DesignHeight", designHeight);
+				Height = (int)(designHeight * zoom / 100.0);
+			}
+		}
+
 		public GraphicObject SelectedItem {
 			get { return selectedItem; }
 			set {
@@ -149,6 +187,7 @@ namespace Crow.Coding
 
 		protected override void updateProjFileFromEditor ()
 		{
+			Debug.WriteLine("\t\tImlEditor updateProjFileFromEditor");
 			try {
 				projFile.UpdateSource(this, imlProjFile.Instance.GetIML());
 			} catch (Exception ex) {
@@ -158,6 +197,7 @@ namespace Crow.Coding
 			}
 		}
 		protected override void updateEditorFromProjFile () {
+			Debug.WriteLine("\t\tImlEditor updateEditorFromProjFile");
 			try {
 				string selItemDesignID = null;
 				if (SelectedItem!=null)
@@ -196,7 +236,7 @@ namespace Crow.Coding
 				}
 				SelectedItem = go;
 			} catch (Exception ex) {
-				Error = ex.InnerException;
+				Error = ex;
 				if (Monitor.IsEntered(imlVE.UpdateMutex))
 					Monitor.Exit (imlVE.UpdateMutex);
 			}
@@ -223,11 +263,10 @@ namespace Crow.Coding
 			switch (layoutType) {
 			case LayoutingType.Width:
 			case LayoutingType.Height:
-				imlVE.ProcessResize (this.ClientRectangle.Size);
+				imlVE.ProcessResize (new Size(designWidth,designHeight));
 				break;
 			}
 		}
-
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
@@ -264,29 +303,38 @@ namespace Crow.Coding
 		protected override void onDraw (Cairo.Context gr)
 		{
 			base.onDraw (gr);
-			if (!drawGrid)
-				return;
 
+			Rectangle cb = new Rectangle (0, 0, designWidth, designHeight);// ClientRectangle;
 
-			Rectangle cb = ClientRectangle;
-			const double gridLineWidth = 0.1;
-			double glhw = gridLineWidth / 2.0;
-			int nbLines = cb.Width / gridSpacing ;
-			double d = cb.Left + gridSpacing;
-			for (int i = 0; i < nbLines; i++) {
-				gr.MoveTo (d-glhw, cb.Y);
-				gr.LineTo (d-glhw, cb.Bottom);
-				d += gridSpacing;
+			gr.Save ();
+
+			double z = zoom / 100.0;
+
+			gr.Scale (z, z);
+
+			if (drawGrid) {
+				double gridLineWidth = 0.2 / z;
+				double glhw = gridLineWidth / 2.0;
+				int nbLines = cb.Width / gridSpacing;
+				double d = cb.Left + gridSpacing;
+				for (int i = 0; i < nbLines; i++) {
+					gr.MoveTo (d - glhw, cb.Y);
+					gr.LineTo (d - glhw, cb.Bottom);
+					d += gridSpacing;
+				}
+				nbLines = cb.Height / gridSpacing;
+				d = cb.Top + gridSpacing;
+				for (int i = 0; i < nbLines; i++) {
+					gr.MoveTo (cb.X, d - glhw);
+					gr.LineTo (cb.Right, d - glhw);
+					d += gridSpacing;
+				}
+				gr.LineWidth = gridLineWidth;
+				Foreground.SetAsSource (gr, cb);
+				gr.Stroke ();
 			}
-			nbLines = cb.Height / gridSpacing;
-			d = cb.Top + gridSpacing;
-			for (int i = 0; i < nbLines; i++) {
-				gr.MoveTo (cb.X, d - glhw);
-				gr.LineTo (cb.Right, d -glhw);
-				d += gridSpacing;
-			}
-			gr.LineWidth = gridLineWidth;
-			Foreground.SetAsSource (gr, cb);
+			gr.SetSourceColor (Color.Black);
+			gr.Rectangle (cb, 1.0 / z);
 			gr.Stroke ();
 
 			lock (imlVE.RenderMutex) {
@@ -310,14 +358,16 @@ namespace Crow.Coding
 				gr.Rectangle (hr, 1.0);
 			}
 
-			if (SelectedItem?.Parent == null)
-				return;
-			hr = SelectedItem.ScreenCoordinates(SelectedItem.getSlot ());
-			hr.Inflate (1);
-			gr.LineWidth = 2;
-			gr.SetSourceColor (Color.Yellow);
-			gr.SetDash (new double[]{ 5.0, 3.0 },0.0);
-			gr.Rectangle (hr, 1.0);
+			if (SelectedItem?.Parent != null) {
+				
+				hr = SelectedItem.ScreenCoordinates (SelectedItem.getSlot ());
+				hr.Inflate (1);
+				gr.LineWidth = 2;
+				gr.SetSourceColor (Color.Yellow);
+				gr.SetDash (new double[]{ 5.0, 3.0 }, 0.0);
+				gr.Rectangle (hr, 1.0);
+			}
+			gr.Restore ();
 		}
 
 		protected override void onDragEnter (object sender, DragDropEventArgs e)
@@ -436,6 +486,7 @@ namespace Crow.Coding
 
 		}
 		void WidgetMouseMove (GraphicObject go, MouseMoveEventArgs e){}
+
 		public bool ProcessMouseMove(int x, int y)
 		{
 			int deltaX = x - imlVE.Mouse.X;
@@ -459,22 +510,21 @@ namespace Crow.Coding
 				GraphicObject topc = null;
 				while (tmp is GraphicObject) {
 					topc = tmp;
-					tmp = tmp.LogicalParent as GraphicObject;
+					tmp = tmp.focusParent;
 				}
 				int idxhw = imlVE.GraphicTree.IndexOf (topc);
 				if (idxhw != 0) {
 					int i = 0;
-					while (i < idxhw) {
-						if (imlVE.GraphicTree [i].LogicalParent == imlVE.GraphicTree [i].Parent) {
-							if (imlVE.GraphicTree [i].MouseIsIn (e.Position)) {
-								while (imlVE.HoverWidget != null) {
-									WidgetMouseLeave (imlVE.HoverWidget, e);
-									imlVE.HoverWidget = imlVE.HoverWidget.LogicalParent as GraphicObject;
-								}
-
-								WidgetCheckOver (GraphicTree [i], e);
-								return true;
+					while (i < idxhw) {						
+						if (GraphicTree [i].MouseIsIn (e.Position)) {
+							while (HoverWidget != null) {
+								WidgetMouseLeave (imlVE.HoverWidget, e);
+								HoverWidget = HoverWidget.focusParent;
 							}
+
+							GraphicTree [i].checkHoverWidget (e);
+							WidgetMouseMove (imlVE.HoverWidget, e);
+							return true;
 						}
 						i++;
 					}
@@ -483,14 +533,16 @@ namespace Crow.Coding
 
 				if (imlVE.HoverWidget.MouseIsIn (e.Position)) {
 					WidgetCheckOver (imlVE.HoverWidget, (e));
+					WidgetMouseMove (imlVE.HoverWidget, e);
 					return true;
 				} else {
 					WidgetMouseLeave (imlVE.HoverWidget, e);
 					//seek upward from last focused graph obj's
-					while (imlVE.HoverWidget.LogicalParent as GraphicObject != null) {
+					while (imlVE.HoverWidget.focusParent != null) {
 						imlVE.HoverWidget = imlVE.HoverWidget.LogicalParent as GraphicObject;
 						if (imlVE.HoverWidget.MouseIsIn (e.Position)) {
 							WidgetCheckOver (imlVE.HoverWidget, e);
+							WidgetMouseMove (imlVE.HoverWidget, e);
 							return true;
 						} else
 							WidgetMouseLeave (imlVE.HoverWidget, e);
@@ -504,6 +556,7 @@ namespace Crow.Coding
 					GraphicObject g = imlVE.GraphicTree [i];
 					if (g.MouseIsIn (e.Position)) {
 						WidgetCheckOver (g, e);
+						WidgetMouseMove (imlVE.HoverWidget, e);
 						return true;
 					}
 				}

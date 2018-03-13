@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack>
-	<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"
-			Foreground="Transparent"
-			MouseEnter="{Foreground=DimGray}"
-			MouseLeave="{Foreground=Transparent}">
+	<Border Style="TreeItemBorder" MouseDoubleClick="./onClickForExpand">
 		<HorizontalStack Spacing="5">
 			<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
 				Path="{./Image}"
@@ -11,7 +8,7 @@
 				SvgSub="{./IsExpanded}"
 				MouseEnter="{Background=LightGray}"
 				MouseLeave="{Background=Transparent}"/>
-			<Image Margin="0" Width="16" Height="16"
+			<Image Style="TreeIcon"
 				Path="#Crow.Coding.icons.folder.svg" SvgSub="{./IsExpanded}"/>
 			<Label Text="{./Caption}"/>
 		</HorizontalStack>

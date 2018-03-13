@@ -421,7 +421,7 @@ namespace Crow
 		/// </summary>
 		/// <returns>new Instantiator</returns>
 		/// <param name="path">path of the iml file to load</param>
-		public virtual Instantiator GetInstantiator(string path){
+		public Instantiator GetInstantiator(string path){
 			if (!Instantiators.ContainsKey(path))
 				Instantiators [path] = new Instantiator(this, path);
 			return Instantiators [path];
@@ -899,7 +899,7 @@ namespace Crow
 				GraphicObject topc = null;
 				while (tmp is GraphicObject) {
 					topc = tmp;
-					tmp = tmp.LogicalParent as GraphicObject;
+					tmp = tmp.focusParent;
 				}
 				int idxhw = GraphicTree.IndexOf (topc);
 				if (idxhw != 0) {

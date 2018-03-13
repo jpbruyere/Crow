@@ -66,21 +66,6 @@ namespace Crow.Coding
 				return CreateITorFromIMLFragment (pi.Source).CreateInstance();			
 			return null;
 		}
-		public override Crow.IML.Instantiator GetInstantiator (string path)
-		{			
-			System.Diagnostics.Debugger.Break ();
-			return null;
-		}
-		public override ItemTemplate GetItemTemplate (string path)
-		{
-			ProjectFile pi;
-
-			if (ProjFile.Project.solution.GetProjectFileFromPath (path, out pi))
-				return new ItemTemplate (this, pi.AbsolutePath);
-
-			System.Diagnostics.Debugger.Break ();
-			return null;
-		}
 		public override System.IO.Stream GetStreamFromPath (string path)
 		{
 			ProjectFile pi;

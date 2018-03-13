@@ -26,7 +26,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Text;
 
-namespace Crow.Coding
+namespace Crow.Text
 {
 	/// <summary>
 	/// Code buffer, lines are arranged in a List<string>, new line chars are removed during string.split on '\n...',
@@ -38,9 +38,9 @@ namespace Crow.Coding
 		Regex reghexLineBrk = new Regex(@"\r\n|\r|\n|\\\n");//original text line break regex
 
 		#region Events
-		public event EventHandler<CodeBufferEventArgs> LineUpadateEvent;
-		public event EventHandler<CodeBufferEventArgs> LineRemoveEvent;
-		public event EventHandler<CodeBufferEventArgs> LineAdditionEvent;
+		public event EventHandler<TextBufferEventArgs> LineUpadateEvent;
+		public event EventHandler<TextBufferEventArgs> LineRemoveEvent;
+		public event EventHandler<TextBufferEventArgs> LineAdditionEvent;
 		public event EventHandler BufferCleared;
 		public event EventHandler SelectionChanged;
 		public event EventHandler PositionChanged;
@@ -137,7 +137,7 @@ namespace Crow.Coding
 			buffer.Remove (GetBufferIndexOfLine (i), lineLength [i]);
 			lineLength.RemoveAt (i);
 			editMutex.ExitWriteLock ();
-			LineRemoveEvent.Raise (this, new CodeBufferEventArgs (i));
+			LineRemoveEvent.Raise (this, new TextBufferEventArgs (i));
 		}
 		/// <summary>
 		/// insert string without linebreaks at position i in buff
@@ -149,7 +149,7 @@ namespace Crow.Coding
 			buffer.Insert (this [i], str);
 			lineLength.Insert (i, str.Length);
 			editMutex.ExitWriteLock ();
-			LineAdditionEvent.Raise (this, new CodeBufferEventArgs (i));
+			LineAdditionEvent.Raise (this, new TextBufferEventArgs (i));
 		}
 		public void AddLine(string str){
 			editMutex.EnterWriteLock ();
@@ -159,7 +159,7 @@ namespace Crow.Coding
 				lineLength.Add (0);
 			}
 			editMutex.ExitWriteLock ();
-			LineAdditionEvent.Raise (this, new CodeBufferEventArgs (lineLength.Count - 1));
+			LineAdditionEvent.Raise (this, new TextBufferEventArgs (lineLength.Count - 1));
 		}
 		public void AddRange (string[] items){
 			int start = lineLength.Count;
@@ -167,7 +167,7 @@ namespace Crow.Coding
 			for (int i = 0; i < items.Length; i++)
 				AddLine (items [i]);
 			editMutex.ExitWriteLock ();
-			LineAdditionEvent.Raise (this, new CodeBufferEventArgs (start, items.Length));
+			LineAdditionEvent.Raise (this, new TextBufferEventArgs (start, items.Length));
 		}
 		public void Clear () {
 			editMutex.EnterWriteLock ();
@@ -183,7 +183,7 @@ namespace Crow.Coding
 			buffer.Insert (ptrL, newContent);
 			lineLength [i] = newContent.Length;
 			editMutex.ExitWriteLock ();
-			LineUpadateEvent.Raise (this, new CodeBufferEventArgs (i));
+			LineUpadateEvent.Raise (this, new TextBufferEventArgs (i));
 		}
 		public void AppenedLine(int i, string newContent){
 			editMutex.EnterWriteLock ();
@@ -193,7 +193,7 @@ namespace Crow.Coding
 			buffer.Insert(ptr, newContent);
 			lineLength [i] += newContent.Length;
 			editMutex.ExitWriteLock ();
-			LineUpadateEvent.Raise (this, new CodeBufferEventArgs (i));
+			LineUpadateEvent.Raise (this, new TextBufferEventArgs (i));
 		}
 		/// <summary>
 		/// Insert new string at caret position, should be sure no line break is inside.

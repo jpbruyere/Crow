@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0"?>
-<Window Caption="Graphic Tree" Width="20%" Height="70%" AlwaysOnTop="true">
+<Window Caption="Crow IDE Options" Width="80%" Height="70%" Background="DimGray">
 	<TabView>
 		<TabItem Caption="Editor">
-			<VerticalStack>
-				<CheckBox Caption="Print Line Numbers" IsChecked=""/>
+			<VerticalStack Margin="10">
+				<CheckBox Caption="Print Line Numbers" IsChecked="False"/>
 			</VerticalStack>
 		</TabItem>
 	</TabView>

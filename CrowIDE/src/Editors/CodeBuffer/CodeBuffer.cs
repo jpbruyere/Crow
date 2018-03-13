@@ -63,7 +63,7 @@ namespace Crow.Coding
 
 		public CodeLine this[int i]
 		{
-			get { return lines[i]; }
+			get { return i < LineCount ? lines[i] : null; }
 			set {
 				if (lines [i] == value)
 					return;
@@ -392,7 +392,9 @@ namespace Crow.Coding
 
 				editMutex.EnterReadLock ();
 
-				if (value >= lines.Count)
+				if (LineCount == 0)
+					_currentLine = 0;
+				else if (value >= lines.Count)
 					_currentLine = lines.Count-1;
 				else if (value < 0)
 					_currentLine = 0;

@@ -73,6 +73,8 @@ namespace Crow.Coding
 			}
 			set {
 				try {
+					if (value == Value)
+						return;
 					GraphicObject g = Instance;
 					string valstr = null, oldval = null;
 
@@ -116,12 +118,14 @@ namespace Crow.Coding
 						}
 					}else
 						pi.SetValue(g, value);
-					
+
+					Debug.WriteLine("\t\tPropContainer set design_dirty to instance");
+
 					mview.ProjectNode.Instance.design_HasChanged = true;
 					NotifyValueChanged ("Value", value);
 					NotifyValueChanged ("LabForeground", LabForeground);
 				} catch (Exception ex) {
-					System.Diagnostics.Debug.WriteLine ("Error setting property:"+ ex.ToString());
+					Debug.WriteLine ("Error setting property:"+ ex.ToString());
 				}
 				//
 			}
@@ -184,8 +188,10 @@ namespace Crow.Coding
 			if (!inst.design_iml_values.ContainsKey (Name))
 				return;
 			inst.design_iml_values.Remove (Name);
-			//NotifyValueChanged ("Value", Value);
-			mview.ProjectNode.Instance.design_HasChanged = true;
+
+			NotifyValueChanged ("LabForeground", LabForeground);
+			mview.ProjectNode.UpdateSource(this, mview.ProjectNode.Instance.GetIML());
+			//mview.ProjectNode.Instance.design_HasChanged = true;
 			//should reinstantiate to get default
 		}
 		public void GotoStyle(){
@@ -199,6 +205,7 @@ namespace Crow.Coding
 			Solution s = mview.ProjectNode.Project.solution;
 			if (!s.OpenedItems.Contains (pf))				
 				s.OpenedItems.AddElement (pf);
+			Debug.WriteLine (fl);
 			pf.CurrentLine = fl.Line;
 			pf.CurrentColumn = fl.Column;
 		}

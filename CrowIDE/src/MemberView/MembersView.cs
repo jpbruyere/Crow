@@ -37,7 +37,7 @@ namespace Crow.Coding
 		public MembersView () : base() {}
 
 		//cache property containers per type
-		Dictionary<string,PropertyContainer[]> propContainersCache = new Dictionary<string, PropertyContainer[]>();
+		//Dictionary<string,PropertyContainer[]> propContainersCache = new Dictionary<string, PropertyContainer[]>();
 		Dictionary<string,List<CategoryContainer>> categoryContainersCache = new Dictionary<string,List<CategoryContainer>> ();
 
 		[XmlAttributeAttribute][DefaultValue(null)]
@@ -63,7 +63,7 @@ namespace Crow.Coding
 				}	
 
 				Type it = instance.GetType ();
-				if (!propContainersCache.ContainsKey (it.FullName)) {
+				if (!categoryContainersCache.ContainsKey (it.FullName)) {
 					MemberInfo[] members = it.GetMembers (BindingFlags.Public | BindingFlags.Instance);
 					List<PropertyContainer> props = new List<PropertyContainer> ();
 					foreach (MemberInfo m in members) {
@@ -76,20 +76,24 @@ namespace Crow.Coding
 							props.Add (new PropertyContainer (this, pi));
 						}
 					}
-					propContainersCache.Add (it.FullName, props.OrderBy (p => p.Name).ToArray ());
+					//propContainersCache.Add (it.FullName, props.OrderBy (p => p.Name).ToArray ());
+					List<CategoryContainer> categories = new List<CategoryContainer> ();
+
+					foreach (IGrouping<string,PropertyContainer> ig in props.OrderBy (p => p.Name).GroupBy(pc=>pc.DesignCategory)) {
+						categories.Add(new CategoryContainer(ig.Key, ig.ToArray()));
+					}
+					categoryContainersCache.Add (it.FullName, categories);
 				}
 
-				List<CategoryContainer> categories = new List<CategoryContainer> ();
 
-				foreach (IGrouping<string,PropertyContainer> ig in propContainersCache[it.FullName].GroupBy(pc=>pc.DesignCategory)) {
-					categories.Add(new CategoryContainer(ig.Key, ig.ToArray()));
-				}
-
-				Data = categories;
+				Data = categoryContainersCache[it.FullName];
 
 				if (lastInst != instance) {
-					foreach (PropertyContainer pc in propContainersCache [it.FullName]) {
-						pc.NotifyValueChanged ("Value", pc.Value);
+					foreach (CategoryContainer cc in categoryContainersCache [it.FullName]) {
+						foreach (PropertyContainer pc in cc.Properties) {
+							pc.NotifyValueChanged ("Value", pc.Value);
+							pc.NotifyValueChanged ("LabForeground", pc.LabForeground);
+						}
 					}
 				}
 			}

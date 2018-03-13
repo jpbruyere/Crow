@@ -7,7 +7,7 @@
 		<ItemTemplate>
 			<Container Fit="true" Focusable="true" Tooltip="{DisplayName}" Margin="2" AllowDrag="true"
 				StartDrag="onStartDrag" EndDrag="onEndDrag" Drop="onDrop">
-				<Border Foreground="Black" Background="Jet" Margin="0" BorderWidth="1"
+				<Border Foreground="Black" Background="DimGray" Margin="0" BorderWidth="1"
 					MouseEnter="{Foreground=White}"
 					MouseLeave="{Foreground=Black}">
 					<Image Path="{IconPath}" Margin="3"  Width="20" Height="20" />

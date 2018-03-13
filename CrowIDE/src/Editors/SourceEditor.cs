@@ -47,16 +47,16 @@ namespace Crow.Coding
 		#region CTOR
 		public SourceEditor (): base()
 		{
-			formatting.Add ((int)XMLParser.TokenType.AttributeName, new TextFormatting (Color.DarkJungleGreen, Color.Transparent));
+			formatting.Add ((int)XMLParser.TokenType.AttributeName, new TextFormatting (Color.DarkSlateGray, Color.Transparent));
 			formatting.Add ((int)XMLParser.TokenType.ElementName, new TextFormatting (Color.DarkBlue, Color.Transparent));
 			formatting.Add ((int)XMLParser.TokenType.ElementStart, new TextFormatting (Color.Black, Color.Transparent));
 			formatting.Add ((int)XMLParser.TokenType.ElementEnd, new TextFormatting (Color.Black, Color.Transparent));
 			formatting.Add ((int)XMLParser.TokenType.ElementClosing, new TextFormatting (Color.Black, Color.Transparent));
 
-			formatting.Add ((int)XMLParser.TokenType.AttributeValueOpening, new TextFormatting (Color.Carmine, Color.Transparent));
-			formatting.Add ((int)XMLParser.TokenType.AttributeValueClosing, new TextFormatting (Color.Carmine, Color.Transparent));
-			formatting.Add ((int)XMLParser.TokenType.AttributeValue, new TextFormatting (Color.TractorRed, Color.Transparent, false, true));
-			formatting.Add ((int)XMLParser.TokenType.XMLDecl, new TextFormatting (Color.AoEnglish, Color.Transparent));
+			formatting.Add ((int)XMLParser.TokenType.AttributeValueOpening, new TextFormatting (Color.Crimson, Color.Transparent));
+			formatting.Add ((int)XMLParser.TokenType.AttributeValueClosing, new TextFormatting (Color.Crimson, Color.Transparent));
+			formatting.Add ((int)XMLParser.TokenType.AttributeValue, new TextFormatting (Color.FireBrick, Color.Transparent, false, true));
+			formatting.Add ((int)XMLParser.TokenType.XMLDecl, new TextFormatting (Color.ForestGreen, Color.Transparent));
 
 			formatting.Add ((int)BufferParser.TokenType.BlockComment, new TextFormatting (Color.Gray, Color.Transparent, false, true));
 			formatting.Add ((int)BufferParser.TokenType.LineComment, new TextFormatting (Color.Gray, Color.Transparent, false, true));
@@ -212,6 +212,8 @@ namespace Crow.Coding
 		#region Editor overrides
 		protected override void updateEditorFromProjFile ()
 		{
+			Debug.WriteLine("\t\tSourceEditor updateEditorFromProjFile");
+
 			buffer.editMutex.EnterWriteLock ();
 			loadSource ();
 			buffer.editMutex.ExitWriteLock ();
@@ -224,6 +226,8 @@ namespace Crow.Coding
 		}
 		protected override void updateProjFileFromEditor ()
 		{
+			Debug.WriteLine("\t\tSourceEditor updateProjFileFromEditor");
+
 			buffer.editMutex.EnterWriteLock ();
 			string newsrc = buffer.FullText;
 			buffer.editMutex.ExitWriteLock ();
@@ -366,7 +370,7 @@ namespace Crow.Coding
 					if (l == buffer.CurrentLine)
 						return;
 					buffer.CurrentLine = l;
-					if (buffer [l].IsFolded)
+					if ((bool)buffer [l]?.IsFolded)
 						buffer.ToogleFolding (l);					
 				} catch (Exception ex) {
 					requestedLine = value - 1;
@@ -399,7 +403,7 @@ namespace Crow.Coding
 				RegisterForGraphicUpdate ();
 			}
 		}
-		[DefaultValue("BlueGray")]
+		[DefaultValue("SteelBlue")]
 		public virtual Color SelectionBackground {
 			get { return selBackground; }
 			set {

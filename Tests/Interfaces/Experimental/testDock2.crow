@@ -6,7 +6,7 @@
 	<DockWindow Left="400" Top="400" Width="150" Height="150" Background="DarkYellow"/>
 	<DockWindow Left="500" Top="500" Width="150" Height="150" Background="Yellow"/>
 </Docker>
-<!--<Group Background="Jet" Margin = "0" Focusable="true" >
+<!--<Group Background="DimGray" Margin = "0" Focusable="true" >
 	<Window Top="100" Left="100" Focusable="true" Caption="View 1" Width="300" Height="300"><GraphicObject Background="Green" Focusable="true" MouseEnter="{Background=Gray}" MouseLeave="{Background=Green}"/></Window>
 	<Window Top="200" Left="200" Focusable="true" Caption="View 2" Resizable = "true" Width="300" Height="300"><GraphicObject Focusable="true" Background="Blue" MouseEnter="{Background=Gray}" MouseLeave="{Background=Blue}"/></Window>
 	<Window Top="300" Left="300" Focusable="true" Caption="View 3" Resizable = "true" Width="300" Height="300"><GraphicObject Focusable="true" Background="Yellow" MouseEnter="{Background=Gray}" MouseLeave="{Background=Yellow}"/></Window>

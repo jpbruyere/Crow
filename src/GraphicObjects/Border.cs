@@ -55,7 +55,7 @@ namespace Crow
 		int _borderWidth;
 		BorderStyle _borderStyle;
 		Fill raisedColor = Color.Gray;
-		Fill sunkenColor = Color.Jet;
+		Fill sunkenColor = Color.DimGray;
 		#endregion
 
 		#region public properties

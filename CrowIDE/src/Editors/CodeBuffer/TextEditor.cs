@@ -37,12 +37,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
-namespace Crow.Coding
+namespace Crow.Text
 {
 	/// <summary>
 	/// Scrolling text box optimized for monospace fonts, for coding
 	/// </summary>
-	public class TextEditor : Editor
+	public class TextEditor : Crow.Coding.Editor
 	{		
 		#region CTOR
 		public TextEditor (): base()
@@ -152,20 +152,20 @@ namespace Crow.Coding
 
 			editorMutex.ExitWriteLock ();
 		}
-		void Buffer_LineAdditionEvent (object sender, CodeBufferEventArgs e)
+		void Buffer_LineAdditionEvent (object sender, TextBufferEventArgs e)
 		{
 			updateMaxScrollY ();
 			RegisterForGraphicUpdate ();
 			isDirty = true;
 		}
-		void Buffer_LineRemoveEvent (object sender, CodeBufferEventArgs e)
+		void Buffer_LineRemoveEvent (object sender, TextBufferEventArgs e)
 		{
 			updateMaxScrollY ();
 			RegisterForGraphicUpdate ();
 			notifyPositionChanged ();
 			isDirty = true;
 		}
-		void Buffer_LineUpadateEvent (object sender, CodeBufferEventArgs e)
+		void Buffer_LineUpadateEvent (object sender, TextBufferEventArgs e)
 		{
 			RegisterForGraphicUpdate ();
 			notifyPositionChanged ();
