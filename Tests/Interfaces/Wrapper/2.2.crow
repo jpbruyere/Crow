@@ -2,34 +2,34 @@
 <Window Caption="Horizontal Wrapper" Width="50%" Height="50%">
 	<VerticalStack Margin="1">
 		<Scroller Name="scroller1" ScrollX="{../scrollbar1.Value}" VerticalScrolling="False" HorizontalScrolling="true" Margin="1" Background="BlueCrayola">
-			<Wrapper HorizontalAlignment="Left" Orientation="Horizontal" Height="100%" Width="Fit" Margin="0" Background="Teal" Spacing="1" >
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50%" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50%" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50%" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50%" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50%" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50%" Background="Mantis"/>
-				<GraphicObject Width="50" Height="50" Background="Mantis"/>
+			<Wrapper HorizontalAlignment="Left" Orientation="Horizontal" Height="100%" Width="Fit" Margin="0" Background="MediumSeaGreen" Spacing="1" >
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50%" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50%" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50%" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50%" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50%" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50%" Background="SeaGreen"/>
+				<GraphicObject Width="50" Height="50" Background="SeaGreen"/>
 			</Wrapper>
 		</Scroller>
 		<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollX}" 

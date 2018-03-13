@@ -16,7 +16,7 @@
 			</Border>
 			<GraphicObject Width="5"/>
 		</HorizontalStack>
-		<Container Name="Content" MinimumSize="50,50" Background="Onyx">
+		<Container Name="Content" MinimumSize="50,50" Background="DimGray">
 			<VerticalStack Margin="1">
 				<HorizontalStack Height="Fit">
 					<Button Fit="true" Caption="Up" MouseClick="./goUpDirClick">

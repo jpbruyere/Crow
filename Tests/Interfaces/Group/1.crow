@@ -1,32 +1,32 @@
 <?xml version="1.0"?>
-<Group Background="Onyx" Margin="10" Width="90%" Height="90%">
-	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
+<Group Background="DimGray" Margin="10" Width="90%" Height="90%">
+	<GraphicObject Margin="10" Width="20%" Height="20%" Background="SeaGreen"
 			VerticalAlignment="Top"
 			HorizontalAlignment="Left"
 			MinimumSize="10,10"/>
-	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
+	<GraphicObject Margin="10" Width="20%" Height="20%" Background="SeaGreen"
 			VerticalAlignment="Top"
 			MinimumSize="10,10"/>
-	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
+	<GraphicObject Margin="10" Width="20%" Height="20%" Background="SeaGreen"
 			VerticalAlignment="Top"
 			HorizontalAlignment="Right"
 			MinimumSize="10,10"/>
-	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
+	<GraphicObject Margin="10" Width="20%" Height="20%" Background="SeaGreen"
 			HorizontalAlignment="Left"
 			MinimumSize="10,10"/>
-	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
+	<GraphicObject Margin="10" Width="20%" Height="20%" Background="SeaGreen"
 			MinimumSize="10,10"/>
-	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
+	<GraphicObject Margin="10" Width="20%" Height="20%" Background="SeaGreen"
 			HorizontalAlignment="Right"
 			MinimumSize="10,10"/>
-	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
+	<GraphicObject Margin="10" Width="20%" Height="20%" Background="SeaGreen"
 			VerticalAlignment="Bottom"
 			HorizontalAlignment="Left"
 			MinimumSize="10,10"/>
-	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
+	<GraphicObject Margin="10" Width="20%" Height="20%" Background="SeaGreen"
 			VerticalAlignment="Bottom"
 			MinimumSize="10,10"/>
-	<GraphicObject Margin="10" Width="20%" Height="20%" Background="Mantis"
+	<GraphicObject Margin="10" Width="20%" Height="20%" Background="SeaGreen"
 			VerticalAlignment="Bottom"
 			HorizontalAlignment="Right"
 			MinimumSize="10,10"/>

@@ -18,7 +18,7 @@
 		</Border>
 	</HorizontalStack>
 	<Container Margin="20">
-		<Container Background="Jet" Name="Content"/>
+		<Container Background="DimGray" Name="Content"/>
 	</Container>
 </GenericStack>
 

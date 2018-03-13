@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
-<HorizontalStack Background="Onyx" Margin="5">
+<HorizontalStack Background="Jet" Margin="5">
 	<DirectoryView Name="dv" CurrentDirectory="Interfaces" Width="25%" SelectedItemChanged="Dv_SelectedItemChanged"/>
 	<Splitter Width="6"/>
 	<VerticalStack>
-		<Container Name="CrowContainer" Height="60%" Background="SmokyBlack"/>
+		<Container Name="CrowContainer" Height="60%" Background="DimGray"/>
 		<Splitter/>
 		<HorizontalStack>
 			<Scroller Name="scroller1" Background="White"

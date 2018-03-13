@@ -52,7 +52,7 @@ namespace Crow
 		bool modal;
 		protected bool hoverBorder = false;
 		bool alwaysOnTop = false;
-		Fill titleBarBackground = Color.UnitedNationsBlue;
+		Fill titleBarBackground = Color.SteelBlue;
 		Fill titleBarForeground = Color.White;
 
 		Rectangle savedBounds;
@@ -97,7 +97,7 @@ namespace Crow
 		/// <summary>
 		/// Background of the title bar if any.
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue("vgradient|0:Onyx|1:UnitedNationsBlue")]
+		[XmlAttributeAttribute][DefaultValue("vgradient|0:Onyx|1:SteelBlue")]
 		public virtual Fill TitleBarBackground {
 			get { return titleBarBackground; }
 			set {

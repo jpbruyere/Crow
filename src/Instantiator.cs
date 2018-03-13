@@ -145,13 +145,9 @@ namespace Crow.IML
 		/// <param name="fragment">IML string</param>
 		public static Instantiator CreateFromImlFragment (Interface _iface, string fragment)
 		{
-//			try {
-				using (Stream s = new MemoryStream (Encoding.UTF8.GetBytes (fragment))) {
-					return new Instantiator (_iface, s);
-				}
-//			} catch (Exception ex) {
-//				throw new Exception ("IML Error: " + ex.Message);
-//			}
+			using (Stream s = new MemoryStream (Encoding.UTF8.GetBytes (fragment))) {
+				return new Instantiator (_iface, s);
+			}
 		}
 		#endregion
 

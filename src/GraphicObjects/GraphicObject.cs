@@ -184,7 +184,7 @@ namespace Crow
 		internal ulong uid = 0;
 
 		internal bool isPopup = false;
-		internal GraphicObject focusParent {
+		public GraphicObject focusParent {
 			get { return (isPopup ? LogicalParent : parent) as GraphicObject; }
 		}
 

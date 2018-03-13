@@ -1,2 +1,2 @@
 ﻿<?xml version="1.0"?>
-<Label Margin="50" MinimumSize="10,10" Background="Onyx" Text="{PropertyLessBinding}"/>
+<Label Margin="50" MinimumSize="10,10" Background="DimGray" Text="{PropertyLessBinding}"/>

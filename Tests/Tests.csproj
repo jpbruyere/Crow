@@ -29,7 +29,7 @@
     <ConsolePause>false</ConsolePause>
     <DefineConstants>DEBUG;TRACE;MEASURE_TIME</DefineConstants>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
+    <OutputPath>$(SolutionDir)build\Debug</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -37,7 +37,7 @@
     <WarningLevel>0</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
+    <OutputPath>$(SolutionDir)build\Release</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
     <StartAction>Program</StartAction>

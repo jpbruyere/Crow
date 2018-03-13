@@ -42,7 +42,7 @@ namespace Tutorials
 			AddWidget (new SimpleGauge (CurrentInterface) {
 				Level = 40,
 				Width = 30, Height = "50%",
-				Foreground = Color.UnitedNationsBlue, Background = Color.Jet
+				Foreground = Color.DarkBlue, Background = Color.DimGray
 			});
 		}
 
