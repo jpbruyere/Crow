@@ -64,11 +64,9 @@ namespace Crow
 		public static Cairo.PointD Multiply(this Cairo.PointD p1, double v){
 			return new Cairo.PointD(p1.X * v, p1.Y * v);
 		}
-		public static void DrawCote(this Cairo.Context ctx, Cairo.PointD p1, Cairo.PointD p2, double stroke = 1.0)
-		{
-			const double arrowWidth = 4.0;
-			const double arrowLength = 10.0;
-
+		public static void DrawCote(this Cairo.Context ctx, Cairo.PointD p1, Cairo.PointD p2,
+			double stroke = 1.0, bool fill = false, double arrowWidth = 3.0, double arrowLength = 7.0)
+		{			
 			Cairo.PointD vDir = p2.Substract(p1);
 			vDir = vDir.GetNormalized ();
 			Cairo.PointD vPerp = vDir.GetPerp ();
@@ -80,21 +78,77 @@ namespace Crow
 
 			ctx.MoveTo (p1);
 			ctx.LineTo (pA0.Add (vA));
-			ctx.LineTo (pA0.Substract (vA));
+			if (fill)
+				ctx.LineTo (pA0.Substract (vA));
+			else
+				ctx.MoveTo (pA0.Substract (vA));
+			
 			ctx.LineTo (p1);
 
 			ctx.MoveTo (p2);
 			ctx.LineTo (pA1.Add (vA));
-			ctx.LineTo (pA1.Substract (vA));
+			if (fill)
+				ctx.LineTo (pA1.Substract (vA));
+			else
+				ctx.MoveTo (pA1.Substract (vA));
 			ctx.LineTo (p2);
 
-			ctx.Fill ();
+			if (fill)
+				ctx.Fill ();
 
 			ctx.MoveTo (p1);
 			ctx.LineTo (p2);
 			ctx.LineWidth = stroke;
 			ctx.Stroke ();
+		}
+		public static void DrawCoteInverse(this Cairo.Context ctx, Cairo.PointD p1, Cairo.PointD p2,
+			double stroke = 1.0, bool fill = false, double arrowWidth = 3.0, double arrowLength = 7.0)
+		{			
+			Cairo.PointD vDir = p2.Substract(p1);
+			vDir = vDir.GetNormalized ();
+			Cairo.PointD vPerp = vDir.GetPerp ();
 
+			Cairo.PointD pA0 = p1.Add(vDir.Multiply(arrowLength));
+			Cairo.PointD pA1 = p2.Substract(vDir.Multiply(arrowLength));
+
+			Cairo.PointD vA = vPerp.Multiply (arrowWidth);
+
+			ctx.MoveTo (p1.Add (vA));
+			ctx.LineTo (pA0);
+			ctx.LineTo (p1.Substract (vA));
+			if (fill)
+				ctx.LineTo (p1.Add (vA));
+
+			ctx.MoveTo (p2.Add (vA));
+			ctx.LineTo (pA1);
+			ctx.LineTo (p2.Substract (vA));
+
+			if (fill) {
+				ctx.LineTo (p2.Add (vA));
+				ctx.Fill ();
+			}
+
+			ctx.MoveTo (pA0);
+			ctx.LineTo (pA1);
+			ctx.LineWidth = stroke;
+			ctx.Stroke ();
+		}
+		public static void DrawCoteFixed(this Cairo.Context ctx, Cairo.PointD p1, Cairo.PointD p2,
+			double stroke = 1.0, double coteWidth = 3.0)
+		{			
+			Cairo.PointD vDir = p2.Substract(p1);
+			vDir = vDir.GetNormalized ();
+			Cairo.PointD vPerp = vDir.GetPerp ();
+			Cairo.PointD vA = vPerp.Multiply (coteWidth);
+
+			ctx.MoveTo (p1.Add (vA));
+			ctx.LineTo (p1.Substract (vA));
+			ctx.MoveTo (p2.Add (vA));
+			ctx.LineTo (p2.Substract (vA));
+			ctx.MoveTo (p1);
+			ctx.LineTo (p2);
+			ctx.LineWidth = stroke;
+			ctx.Stroke ();
 		}
 		public static void SetSourceColor(this Cairo.Context ctx, Color c)
 		{

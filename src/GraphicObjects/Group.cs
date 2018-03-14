@@ -64,7 +64,7 @@ namespace Crow
 		}
 		#endif
 
-		protected ReaderWriterLockSlim childrenRWLock = new ReaderWriterLockSlim();
+		protected ReaderWriterLockSlim childrenRWLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
 		#region CTOR
 		public Group () : base() {}

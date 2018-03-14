@@ -110,6 +110,8 @@ namespace Crow
 				cc.B = int.Parse (s.Substring (5, 2), System.Globalization.NumberStyles.HexNumber) / 255.0;
 				if (s.Length > 7)
 					cc.A = int.Parse (s.Substring (7, 2), System.Globalization.NumberStyles.HexNumber) / 255.0;
+				else
+					cc.A = 1.0;
 				return cc;
 			}
 
