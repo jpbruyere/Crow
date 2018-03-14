@@ -218,7 +218,6 @@
     <Compile Include="src\ObservableList.cs" />
     <Compile Include="src\GraphicObjects\IMLContainer.cs" />
     <Compile Include="src\DragDropEventArgs.cs" />
-    <Compile Include="src\GraphicObjects\Docker.cs" />
     <Compile Include="src\GraphicObjects\DockWindow.cs" />
     <Compile Include="src\ParsingException.cs" />
     <Compile Include="src\IMLAttributes.cs" />

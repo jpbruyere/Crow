@@ -44,8 +44,6 @@ namespace Crow
 		Rectangle savedSlot;	//last undocked slot recalled when view is undocked
 		bool wasResizable;
 
-		public Docker RootDock { get { return LogicalParent as Docker; }}
-
 		public bool IsDocked {
 			get { return isDocked; }
 			set {
@@ -137,7 +135,7 @@ namespace Crow
 				DockStack ds = Parent as DockStack;
 				ds.Undock (this);
 
-				RootDock.AddChild (this);
+				IFace.AddWidget (this);
 
 				this.Left = savedSlot.Left;
 				this.Top = savedSlot.Top;
@@ -160,8 +158,7 @@ namespace Crow
 				LastSlots = LastPaintedSlot = Slot = default(Rectangle);
 				Left = Top = 0;
 
-				Group g = Parent as Group;
-				g.RemoveChild (this);
+				IFace.RemoveWidget (this);
 
 				target.Dock (this);
 			}

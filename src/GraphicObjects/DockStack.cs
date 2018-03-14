@@ -30,9 +30,7 @@ namespace Crow
 {
 	[DesignIgnore]
 	public class DockStack : GenericStack
-	{
-		Docker rootDock { get { return LogicalParent as Docker; }}
-
+	{		
 		#region CTor
 		public DockStack ()	{}
 		public DockStack (Interface iface) : base (iface) {}
@@ -41,7 +39,10 @@ namespace Crow
 		public override void AddChild (GraphicObject g)
 		{
 			base.AddChild (g);
-			g.LogicalParent = this.LogicalParent;
+			if (localLogicalParentIsNull)
+				g.LogicalParent = this;
+			else
+				g.LogicalParent = this.LogicalParent;
 		}
 		public override void InsertChild (int idx, GraphicObject g)
 		{
