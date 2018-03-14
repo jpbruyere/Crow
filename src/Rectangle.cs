@@ -124,6 +124,14 @@ namespace Crow
 		{
 			Inflate (delta, delta);
 		}
+		public Rectangle Inflated (int delta) {
+			return Inflated (delta,delta);
+		}
+		public Rectangle Inflated (int deltaX, int deltaY) {
+			Rectangle r = this;
+			r.Inflate (deltaX, deltaY);
+			return r;
+		}
         public bool ContainsOrIsEqual(Point p)
         {
             return (p.X >= X && p.X <= X + Width && p.Y >= Y && p.Y <= Y + Height) ?

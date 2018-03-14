@@ -58,6 +58,9 @@ namespace Crow
 		public static Cairo.PointD Substract(this Cairo.PointD p1, Cairo.PointD p2){
 			return new Cairo.PointD(p1.X - p2.X, p1.Y - p2.Y);
 		}
+		public static Cairo.PointD Divide(this Cairo.PointD p1, double d){
+			return new Cairo.PointD(p1.X / d, p1.Y / d);
+		}
 		public static Cairo.PointD Add(this Cairo.PointD p1, Cairo.PointD p2){
 			return new Cairo.PointD(p1.X + p2.X, p1.Y + p2.Y);
 		}
