@@ -42,7 +42,7 @@ namespace Crow.Coding
 		CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp,
 		CMDAbout, CMDOptions,
 		CMDViewGTExp, CMDViewProps, CMDViewProj, CMDViewProjProps, CMDViewErrors, CMDViewSolution, CMDViewEditor, CMDViewProperties,
-		CMDViewToolbox, CMDViewSchema, CMDViewStyling,
+		CMDViewToolbox, CMDViewSchema, CMDViewStyling,CMDViewDesign,
 		CMDCompile;
 
 		void initCommands () {
@@ -70,6 +70,8 @@ namespace Crow.Coding
 			{ Caption = "Editor Pane"};
 			CMDViewProperties = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winProperties.crow")))
 			{ Caption = "Properties"};
+			CMDViewDesign = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winDesign.crow")))
+			{ Caption = "Quick Design", CanExecute = true};
 			CMDViewToolbox = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winToolbox.crow")))
 			{ Caption = "Toolbox", CanExecute = false};
 			CMDViewSchema = new Command(new Action(() => loadDockWindow ("#Crow.Coding.ui.DockWindows.winSchema.crow")))

@@ -32,8 +32,7 @@
 							SelectedItemChanged="./onSelectedItemChanged">
 							<Template>
 								<HorizontalStack>
-									<Scroller ScrollX="{../scrollbar1.Value}"  Name="scroller1"
-										VerticalScrolling="true" HorizontalScrolling="false">
+									<Scroller ScrollX="{../scrollbar1.Value}"  Name="scroller1">
 										<VerticalStack Height="Fit" VerticalAlignment="Top"
 											Name="ItemsContainer" Margin="0" Spacing="1"/>
 									</Scroller>

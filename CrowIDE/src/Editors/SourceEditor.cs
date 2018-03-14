@@ -894,7 +894,8 @@ namespace Crow.Coding
 				if (hoverLine == value)
 					return;
 				hoverLine = value;
-				NotifyValueChanged ("HoverLine", hoverLine);				
+				NotifyValueChanged ("HoverLine", hoverLine);
+				NotifyValueChanged ("HoverError", buffer [hoverLine].exception);
 			}
 		}
 		void updateHoverLine () {

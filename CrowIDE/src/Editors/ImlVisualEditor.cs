@@ -58,7 +58,9 @@ namespace Crow.Coding
 		Measure designWidth, designHeight;
 		bool updateEnabled;
 
-		SvgPicture icoMove, icoStyle;
+		Picture icoMove, icoStyle;
+		Rectangle rIcons = default(Rectangle);
+		Size iconSize = new Size(10,10);
 
 		public List<Crow.Command> Commands;
 		Crow.Command cmdDelete;
@@ -72,8 +74,8 @@ namespace Crow.Coding
 		void initIcons () {
 			icoMove = new SvgPicture ();
 			icoMove.Load (IFace, "#Crow.Coding.icons.move-arrows.svg");
-			icoStyle = new SvgPicture ();
-			icoStyle.Load (IFace, "#Crow.Coding.icons.palette.svg");
+//			icoStyle = new SvgPicture ();
+//			icoStyle.Load (IFace, "#Crow.Coding.icons.palette.svg");
 		}
 
 		[DefaultValue(true)]
@@ -283,6 +285,10 @@ namespace Crow.Coding
 		}
 		protected override void updateCheckPostProcess ()
 		{
+			if (Error != null) {
+				RegisterForRedraw ();
+				return;
+			}
 			imlVE.Update ();
 			bool isDirty = false;
 
@@ -375,8 +381,6 @@ namespace Crow.Coding
 			}
 
 		}
-		Rectangle rIcons = default(Rectangle);
-		Size iconSize = new Size(10,10);
 
 		protected override void onDraw (Cairo.Context gr)
 		{
@@ -411,9 +415,6 @@ namespace Crow.Coding
 				Foreground.SetAsSource (gr, cb);
 				gr.Stroke ();
 			}
-			gr.SetSourceColor (Color.Black);
-			gr.Rectangle (cb, 1.0 / z);
-			gr.Stroke ();
 
 			lock (imlVE.RenderMutex) {
 				using (Cairo.Surface surf = new Cairo.ImageSurface (imlVE.bmp, Cairo.Format.Argb32,
@@ -423,6 +424,15 @@ namespace Crow.Coding
 				}
 				imlVE.IsDirty = false;
 			}
+			if (Error == null) {
+				gr.SetSourceColor (Color.Black);
+				gr.Rectangle (cb, 1.0 / z);
+			} else {
+				gr.SetSourceColor (Color.LavenderBlush);
+				gr.Rectangle (cb, 2.0 / z);
+				drawCenteredTextLine(gr, cb.Center, Error.InnerException?.Message);
+			}
+			gr.Stroke ();
 
 			Rectangle hr;
 
@@ -481,7 +491,7 @@ namespace Crow.Coding
 			gr.Restore ();
 		}
 
-		void drawIcon (Context gr, SvgPicture pic, Rectangle r) {
+		void drawIcon (Context gr, Picture pic, Rectangle r) {
 //			gr.SetSourceColor (Color.Black);
 //			CairoHelpers.CairoRectangle (gr, r.Inflated (1), 2, 1.0);
 			gr.SetSourceColor (Color.White);
@@ -544,6 +554,9 @@ namespace Crow.Coding
 			gr.Operator = Operator.Over;			
 		}
 
+		void drawCenteredTextLine (Context gr, Point center, string txt){
+			drawCenteredTextLine (gr, new PointD(center.X,center.Y), txt);
+		}
 		void drawCenteredTextLine (Context gr, PointD center, string txt){
 			FontExtents fe = gr.FontExtents;
 			TextExtents te = gr.TextExtents (txt);
@@ -855,84 +868,6 @@ namespace Crow.Coding
 			return false;
 
 		}
-//		public bool ProcessMouseMove(int x, int y)
-//		{
-//			int deltaX = x - imlVE.Mouse.X;
-//			int deltaY = y - imlVE.Mouse.Y;
-//			imlVE.Mouse.X = x;
-//			imlVE.Mouse.Y = y;
-//			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
-//			e.Mouse = imlVE.Mouse;
-//
-//			if (imlVE.ActiveWidget != null) {
-//				//TODO, ensure object is still in the graphic tree
-//				//send move evt even if mouse move outside bounds
-//				WidgetMouseMove (imlVE.ActiveWidget, e);
-//				return true;
-//			}
-//
-//			if (HoverWidget != null) {
-//				//TODO, ensure object is still in the graphic tree
-//				//check topmost graphicobject first
-//				GraphicObject tmp = HoverWidget;
-//				GraphicObject topc = null;
-//				while (tmp is GraphicObject) {
-//					topc = tmp;
-//					tmp = tmp.LogicalParent as GraphicObject;
-//				}
-//				int idxhw = imlVE.GraphicTree.IndexOf (topc);
-//				if (idxhw != 0) {
-//					int i = 0;
-//					while (i < idxhw) {						
-//						if (GraphicTree [i].MouseIsIn (e.Position)) {
-//							while (HoverWidget != null) {
-//								WidgetMouseLeave (imlVE.HoverWidget, e);
-//								HoverWidget = HoverWidget.focusParent;
-//							}
-//
-//							GraphicTree [i].checkHoverWidget (e);
-//							WidgetMouseMove (imlVE.HoverWidget, e);
-//							return true;
-//						}
-//						i++;
-//					}
-//				}
-//
-//
-//				if (imlVE.HoverWidget.MouseIsIn (e.Position)) {
-//					WidgetCheckOver (imlVE.HoverWidget, (e));
-//					WidgetMouseMove (imlVE.HoverWidget, e);
-//					return true;
-//				} else {
-//					WidgetMouseLeave (imlVE.HoverWidget, e);
-//					//seek upward from last focused graph obj's
-//					while (imlVE.HoverWidget.focusParent != null) {
-//						imlVE.HoverWidget = imlVE.HoverWidget.LogicalParent as GraphicObject;
-//						if (imlVE.HoverWidget.MouseIsIn (e.Position)) {
-//							WidgetCheckOver (imlVE.HoverWidget, e);
-//							WidgetMouseMove (imlVE.HoverWidget, e);
-//							return true;
-//						} else
-//							WidgetMouseLeave (imlVE.HoverWidget, e);
-//					}
-//				}
-//			}
-//
-//			//top level graphic obj's parsing
-//			lock (imlVE.GraphicTree) {
-//				for (int i = 0; i < imlVE.GraphicTree.Count; i++) {
-//					GraphicObject g = imlVE.GraphicTree [i];
-//					if (g.MouseIsIn (e.Position)) {
-//						WidgetCheckOver (g, e);
-//						WidgetMouseMove (imlVE.HoverWidget, e);
-//						return true;
-//					}
-//				}
-//			}
-//			imlVE.HoverWidget = null;
-//			return false;
-//
-//		}
 
 		void GTView_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
 		{

@@ -7,7 +7,7 @@
 		<Splitter/>
 		<HorizontalStack>
 			<Scroller Name="scroller1" Background="White"
-					Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}"
+					Margin="2" ScrollY="{../scrollbar1.Value}"
 					ValueChanged="./_scroller_ValueChanged">
 				<TextBox VerticalAlignment="Top" TextChanged="Tb_TextChanged"
 					Text="{source}" Multiline="true" TextAlignment="TopLeft"

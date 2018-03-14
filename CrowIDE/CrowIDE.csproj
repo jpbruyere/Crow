@@ -297,6 +297,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ui\DockWindows\winStyleView.crow" />
     <EmbeddedResource Include="ui\CategoryExp.template" />
+    <EmbeddedResource Include="ui\DockWindows\winDesign.crow" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">

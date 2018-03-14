@@ -1020,13 +1020,16 @@ namespace Crow
 			if (!string.IsNullOrEmpty (Style)) {
 				if (IFace.DefaultValuesLoader.ContainsKey (Style)) {
 					IFace.DefaultValuesLoader [Style] (this);
+					onInitialized (this, null);
 					return;
 				}
 			} else if (IFace.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
 				IFace.DefaultValuesLoader [thisType.FullName] (this);
+				onInitialized (this, null);
 				return;
 			} else 	if (IFace.DefaultValuesLoader.ContainsKey (thisType.Name)) {
 				IFace.DefaultValuesLoader [thisType.Name] (this);
+				onInitialized (this, null);
 				return;
 			}
 

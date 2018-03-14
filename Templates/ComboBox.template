@@ -18,7 +18,7 @@
 	</Template>
 	<Border Background="DimGray" BorderWidth="1" Margin="1"
 		MinimumSize="{../../MinimumPopupSize}" Fit="true">
-		<Scroller Name="scroller1" Margin="2" VerticalScrolling="true"
+		<Scroller Name="scroller1" Margin="2" 
 			MaximumSize="0,200"
 			HorizontalAlignment="Left">
 			<VerticalStack

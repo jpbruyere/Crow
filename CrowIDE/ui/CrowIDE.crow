@@ -22,6 +22,7 @@
 				<MenuItem Command="{CMDViewSolution}"/>
 				<MenuItem Command="{CMDViewEditor}"/>
 				<MenuItem Command="{CMDViewProperties}"/>
+				<MenuItem Command="{CMDViewDesign}"/>
 				<MenuItem Command="{CMDViewStyling}"/>
 				<MenuItem Command="{CMDViewToolbox}"/>
 				<MenuItem Command="{CMDViewErrors}"/>

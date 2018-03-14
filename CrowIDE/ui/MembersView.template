@@ -4,7 +4,7 @@
 		<Label TextAlignment="Left" Text="{./SelectedItemName}" Width="Stretched"/>
 	</Border>
 	<HorizontalStack>
-		<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"
+		<Scroller  Name="scroller1" Margin="1" 
 			Background="{./Background}"
 			ScrollY="{../scrollbar1.Value}">
 			<VerticalStack Spacing="1"

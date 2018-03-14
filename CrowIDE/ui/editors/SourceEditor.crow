@@ -17,8 +17,11 @@
 			CursorSize="{../editor.ChildWidthRatio}"
 			Height="14" />			
 	<HorizontalStack Height="Fit">
-		<GraphicObject Height="5" Width="Stretched"/>
+		<Label Text="{../../editor.HoverError}" Width="Stretched"/>
 		<GraphicObject Background="Red" Width="5" Height="5" Visible="{IsDirty}"/>
+		<Label Text="Hover Line:" Foreground="Gray"/>
+		<Label Text="{../../editor.HoverLine}"/>
+		<GraphicObject Height="5" Width="10"/>
 		<Label Text="Line:" Foreground="Gray"/>
 		<Label Text="{CurrentLine}"/>
 		<GraphicObject Height="5" Width="10"/>

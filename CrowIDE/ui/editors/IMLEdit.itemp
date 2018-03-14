@@ -4,23 +4,18 @@
 		<HorizontalStack Height="Fit" Margin="2" Background="DimGray" Spacing="5">
 			<HorizontalStack Width="Fit" Spacing="1">
 				<Label Text="Design Size:"/>
-				<TextBox Text="{²../../../editor.DesignWidth}" Width="50" TextAlignment="Right"/>
+				<TextBox Text="{²../../../editor.DesignWidth}" Width="40" TextAlignment="Right"/>
 				<Label Text="X"/>
-				<TextBox Text="{²../../../editor.DesignHeight}" Width="50" TextAlignment="Right"/>
+				<TextBox Text="{²../../../editor.DesignHeight}" Width="40" TextAlignment="Right"/>
 			</HorizontalStack>
 			<HorizontalStack Width="Fit" Spacing="1">
 				<Label Text="Zoom:"/>
-				<Slider Value="{²../../../editor.Zoom}" Width="150" Height="10" Minimum="10" Maximum="400" SmallIncrement="5" LargeIncrement="50"/>
+				<Slider Value="{²../../../editor.Zoom}" Width="100" Height="10" Minimum="10" Maximum="200" SmallIncrement="10" LargeIncrement="50"/>
 				<Label Text="{../../../editor.Zoom}"/>
-			</HorizontalStack>
-			<HorizontalStack Width="Fit" Spacing="1">				
-				<Label Text="{../../../editor.Width}"/>
-				<Label Text="X"/>
-				<Label Text="{../../../editor.Height}"/>
 			</HorizontalStack>
 			<HorizontalStack Width="Fit" Spacing="1">
 				<Label Text="Grid Spacing:"/>
-				<Slider Value="{²../../../editor.GridSpacing}" Width="200" Height="10" Minimum="5" Maximum="100" SmallIncrement="5" LargeIncrement="20"/>
+				<Slider Value="{²../../../editor.GridSpacing}" Width="100" Height="10" Minimum="5" Maximum="100" SmallIncrement="5" LargeIncrement="20"/>
 				<TextBox Text="{../../../editor.GridSpacing}"/>
 			</HorizontalStack>
 		</HorizontalStack>
@@ -28,7 +23,7 @@
 		<VerticalStack Height="60%" Width="Stretched" Margin="0" MinimumSize="10,10">
 			<HorizontalStack>
 				<Scroller Name="scroller1" 
-						Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}">
+						Margin="2" ScrollY="{../scrollbar1.Value}">
 					<ImlVisualEditor  Foreground="SkyBlue" Name="editor" Background="Gray"						
 						VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10"
 						Width="512" Height="512" ContextCommands="{/Commands}"
@@ -36,22 +31,23 @@
 						UpdateEnabled="{../../../../../IsSelected}"
 						ProjectNode="{}" SelectedItem="{²SelectedItem}"/>
 				</Scroller>
-				<ScrollBar Name="scrollbar1" Value="{²../scroller1.ScrollY}"
-					LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30" CursorSize="{../scroller1.ChildHeightRatio}"
-					Maximum="{../scroller1.MaximumScroll}" Orientation="Vertical" 
+				<ScrollBar Name="scrollbar1" Orientation="Vertical"
+					Value="{²../scroller1.ScrollY}"	Maximum="{../scroller1.MaxScrollY}" 
+					CursorSize="{../scroller1.ChildHeightRatio}"
+					LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
 					Width="14" />
 			</HorizontalStack>
-			<!--<ScrollBar Style="HScrollBar" Name="scrollbarX" Value="{²../scroller1.ScrollX}"
-					Maximum="{../scroller1.MaxScrollX}" Orientation="Horizontal"
-					LargeIncrement="{../editor.VisibleColumns}"
-					CursorSize="{../editor.ChildWidthRatio}"
-					Height="14" />-->
+			<ScrollBar Style="HScrollBar" Name="scrollbarX" Orientation="Horizontal"
+					Value="{²../scroller1.ScrollX}" Maximum="{../scroller1.MaxScrollX}" 
+					CursorSize="{../scroller1.ChildWidthRatio}" 
+					LargeIncrement="{../scroller1.PageWidth}" SmallIncrement="30"
+					Height="14" />
 		</VerticalStack>
 		<Splitter/>
 		<IMLContainer Path="#Crow.Coding.ui.SourceEditor.crow"/>
-		<Label DataSource="{../editor.Error}" Text="{}"
+<!--		<Label DataSource="{../editor.Error}" Text="{}"
 			Visible="{../editor.HasError}"
 			Height="Fit" Width="Stretched" Background="DarkRed" Foreground="White"
-			TextAlignment="TopLeft" Multiline="true"/>
+			TextAlignment="TopLeft" Multiline="true"/>-->
 	</VerticalStack>
 </TabItem>

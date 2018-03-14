@@ -23,7 +23,7 @@
 				</Template>
 				<Border Background="White" BorderWidth="1" Margin="1" Foreground="Black"
 					MinimumSize="{../../MinimumPopupSize}" Fit="true">
-					<Scroller Name="scroller1" Margin="2" VerticalScrolling="true"
+					<Scroller Name="scroller1" Margin="2" 
 						MaximumSize="0,200"
 						HorizontalAlignment="Left">
 						<VerticalStack LayoutChanged="../../../../_list_LayoutChanged"
