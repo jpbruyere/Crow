@@ -131,6 +131,7 @@ DockWindow {
 	Background = "Onyx";
 	Focusable = "true";
 	AllowDrag = "true";
+	AlwaysOnTop = "true";
 	Margin="0";
 	Width="200";
 	Height="200";

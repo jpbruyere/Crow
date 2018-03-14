@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
-<DockWindow DataSource="{CurrentSolution}" Name="winSolution" Caption="Solution"  Width="20%">
-	<TreeView Name="treeview" IsRoot="true"
+<DockWindow Name="winSolution" Caption="Solution"  Width="20%">
+	<TreeView Name="treeview" IsRoot="true" DataSource="{CurrentSolution}"
 		Data="{Projects}" SelectedItemChanged="onSelectedItemChanged"
 		ItemTemplate="#Crow.Coding.ui.ProjectTree.template"/>
 </DockWindow>

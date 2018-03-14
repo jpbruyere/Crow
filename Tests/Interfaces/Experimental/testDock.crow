@@ -1,18 +1,11 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack>
-	<Docker>
-		<DockStack Background="DimGray"/>
-		<DockWindow Width="150" Height="150" Background="DarkRed" />
-		<DockWindow Width="150" Height="150" Background="DarkGreen"/>
-		<DockWindow Width="150" Height="150" Background="Blue"/>
-		<DockWindow Width="150" Height="150" Background="DarkYellow"/>
-		<DockWindow Width="150" Height="150" Background="Yellow"/>
-		<DockWindow Width="150" Height="150" Background="BrownWeb"/>
-	</Docker>
+<Window Height="50%" Width="60%">
+	<DockStack Background="#60101050" Margin="10"/>
+</Window>
 <!---		<DockWindow Left="400" Top="400" Width="150" Height="150" Background="MediumSeaGreen"/>
 		<DockWindow Left="450" Top="450" Width="150" Height="150" Background="Maize"/>-->
 	
-</VerticalStack>
+
 <!--<Group Background="DimGray" Margin = "0" Focusable="true" >
 	<Window Top="100" Left="100" Focusable="true" Caption="View 1" Width="300" Height="300"><GraphicObject Background="Green" Focusable="true" MouseEnter="{Background=Gray}" MouseLeave="{Background=Green}"/></Window>
 	<Window Top="200" Left="200" Focusable="true" Caption="View 2" Resizable = "true" Width="300" Height="300"><GraphicObject Focusable="true" Background="Blue" MouseEnter="{Background=Gray}" MouseLeave="{Background=Blue}"/></Window>

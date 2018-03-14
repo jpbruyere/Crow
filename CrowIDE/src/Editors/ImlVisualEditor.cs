@@ -60,7 +60,7 @@ namespace Crow.Coding
 
 		Picture icoMove, icoStyle;
 		Rectangle rIcons = default(Rectangle);
-		Size iconSize = new Size(10,10);
+		Size iconSize = new Size(11,11);
 
 		public List<Crow.Command> Commands;
 		Crow.Command cmdDelete;
@@ -375,10 +375,10 @@ namespace Crow.Coding
 			}
 			SelectedItem = HoverWidget;
 
-			if (SelectedItem != null && projFile != null) {
-				projFile.CurrentLine = SelectedItem.design_line;
-				projFile.CurrentColumn = SelectedItem.design_column;
-			}
+//			if (SelectedItem != null && projFile != null) {
+//				projFile.CurrentLine = SelectedItem.design_line;
+//				projFile.CurrentColumn = SelectedItem.design_column;
+//			}
 
 		}
 
@@ -430,7 +430,14 @@ namespace Crow.Coding
 			} else {
 				gr.SetSourceColor (Color.LavenderBlush);
 				gr.Rectangle (cb, 2.0 / z);
-				drawCenteredTextLine(gr, cb.Center, Error.InnerException?.Message);
+				string[] lerrs = Error.ToString ().Split ('\n');
+				Point p = cb.Center;
+				p.Y -= lerrs.Length * 20;
+				foreach (string le in lerrs) {
+					drawCenteredTextLine(gr, p, le);
+					p.Y += 20;
+
+				}
 			}
 			gr.Stroke ();
 
@@ -558,6 +565,8 @@ namespace Crow.Coding
 			drawCenteredTextLine (gr, new PointD(center.X,center.Y), txt);
 		}
 		void drawCenteredTextLine (Context gr, PointD center, string txt){
+			if (string.IsNullOrEmpty(txt))
+				return;
 			FontExtents fe = gr.FontExtents;
 			TextExtents te = gr.TextExtents (txt);
 

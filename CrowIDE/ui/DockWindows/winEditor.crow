@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<DockWindow DataSource="{CurrentSolution}" Name="winEditor" Caption="Edit View">
-	<EditPane SelectedItem="{²SelectedItem}" SelectedItemElement="{²SelectedItemElement}" Data="{OpenedItems}" DataTest="Extension"
+<DockWindow Name="winEditor" Caption="Edit View">
+	<EditPane DataSource="{CurrentSolution}" SelectedItem="{²SelectedItem}" SelectedItemElement="{²SelectedItemElement}" Data="{OpenedItems}" DataTest="Extension"
 		ItemTemplate="#Crow.Coding.ui.EditPaneItems.template"/>
 </DockWindow>

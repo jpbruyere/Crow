@@ -22,8 +22,7 @@
 		<Label DataSource="{../editor.HoverWidget}" Width="Stretched" Margin="1" Text="{Name}"/>
 		<VerticalStack Height="60%" Width="Stretched" Margin="0" MinimumSize="10,10">
 			<HorizontalStack>
-				<Scroller Name="scroller1" 
-						Margin="2" ScrollY="{../scrollbar1.Value}">
+				<Scroller Name="scroller1" Margin="2" >
 					<ImlVisualEditor  Foreground="SkyBlue" Name="editor" Background="Gray"						
 						VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10"
 						Width="512" Height="512" ContextCommands="{/Commands}"

@@ -39,8 +39,8 @@
 			</MenuItem>
 		</Menu>
 <!--		<Label DataSource="{CurrentSolution}" Text="{SelectedItemElement}" Width="Stretched"/>-->
-		<Docker Name="mainDock">
-			<DockStack />
+<!--		<Docker >-->
+			<DockStack Name="mainDock"/>
 <!--			<DockWindow DataSource="{CurrentSolution}" Name="winEditor" Caption="Edit View" Width="70%" Height="80%">
 				<Template>
 					<Border BorderWidth="1" Foreground="DimGray" CornerRadius="{./CornerRadius}"
@@ -53,6 +53,6 @@
 				<EditPane SelectedItem="{²SelectedItem}" SelectedItemElement="{²SelectedItemElement}" Data="{OpenedItems}" DataTest="Extension"
 					ItemTemplate="#Crow.Coding.ui.EditPaneItems.template"/>
 			</DockWindow>-->
-		</Docker>
+<!--		</Docker>-->
 	</VerticalStack>
 </Window>

@@ -177,7 +177,8 @@ namespace Tests
 
 			this.KeyDown += KeyboardKeyDown1;
 
-			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			testFiles = new string [] { @"Interfaces/Experimental/testDock.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
@@ -193,6 +194,13 @@ namespace Tests
 			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Experimental", "*.crow")).ToArray ();
 
 			Load(testFiles[idx]).DataSource = this;
+
+			LoadIMLFragment (@"<DockWindow Width=""150"" Height=""150"" Background=""DarkRed"" />", 0);
+			LoadIMLFragment (@"<DockWindow Width=""200"" Height=""150"" Background=""DarkGreen"" />", 0);
+			LoadIMLFragment (@"<DockWindow Width=""250"" Height=""150"" Background=""Brown"" />", 0);
+			LoadIMLFragment (@"<DockWindow Width=""300"" Height=""150"" Background=""DarkBlue"" />", 0);
+
+
 		}
 		void KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
