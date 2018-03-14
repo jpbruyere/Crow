@@ -42,160 +42,159 @@ namespace Crow
 		public Scroller (Interface iface) : base(iface){}
 		#endregion
 
-		bool _verticalScrolling;
-		bool _horizontalScrolling;
-		bool _scrollbarVisible;
-		int _scrollX = 0;
-		int _scrollY = 0;
-		int scrollSpeed;
-
 		public event EventHandler<ScrollingEventArgs> Scrolled;
 
+		int scrollX, scrollY, maxScrollX, maxScrollY, scrollSpeed;
+
+		/// <summary>
+		/// if true, key stroke are handled in derrived class
+		/// </summary>
+		protected bool KeyEventsOverrides = false;
+
 		#region public properties
-		[XmlAttributeAttribute][DefaultValue(true)]
-		public bool VerticalScrolling {
-			get { return _verticalScrolling; }
-			set { _verticalScrolling = value; }
-		}
-
-		[XmlAttributeAttribute][DefaultValue(false)]
-        public bool HorizontalScrolling {
-			get { return _horizontalScrolling; }
-			set { _horizontalScrolling = value; }
-		}
-		[XmlAttributeAttribute][DefaultValue(true)]
-		public bool ScrollbarVisible {
-			get { return _scrollbarVisible; }
-			set { _scrollbarVisible = value; }
-		}
+		/// <summary> Horizontal Scrolling Position </summary>
 		[XmlAttributeAttribute][DefaultValue(0)]
-		public int ScrollX {
-			get {
-				return _scrollX;
-			}
+		public virtual int ScrollX {
+			get { return scrollX; }
 			set {
-				if (_scrollX == value)
+				if (scrollX == value)
 					return;
-				if (value < 0)
-					_scrollX = 0;
-				else if (value > Child.Slot.Width - ClientRectangle.Width)
-					_scrollX = Math.Max(0, Child.Slot.Width - ClientRectangle.Width);
-				else
-					_scrollX = value;
-				NotifyValueChanged("ScrollX", _scrollX);
-				RegisterForRedraw ();
-				Scrolled.Raise (this, new ScrollingEventArgs (Orientation.Horizontal));
+
+				int newS = value;
+				if (newS < 0)
+					newS = 0;
+				else if (newS > maxScrollX)
+					newS = maxScrollX;
+
+				if (newS == scrollX)
+					return;
+
+				scrollX = value;
+
+				NotifyValueChanged ("ScrollX", scrollX);
+				RegisterForGraphicUpdate ();
 			}
 		}
+		/// <summary> Vertical Scrolling Position </summary>
 		[XmlAttributeAttribute][DefaultValue(0)]
-		public int ScrollY {
-			get {
-				return _scrollY;
-			}
+		public virtual int ScrollY {
+			get { return scrollY; }
 			set {
-				if (_scrollY == value)
+				if (scrollY == value)
 					return;
-				if (value < 0)
-					_scrollY = 0;
-				else if (value > Child.Slot.Height - ClientRectangle.Height)
-					_scrollY = Math.Max(0,Child.Slot.Height - ClientRectangle.Height);
-				else
-					_scrollY = value;
-				NotifyValueChanged("ScrollY", _scrollY);
-				RegisterForRedraw ();
-				Scrolled.Raise (this, new ScrollingEventArgs (Orientation.Vertical));
+
+				int newS = value;
+				if (newS < 0)
+					newS = 0;
+				else if (newS > maxScrollY)
+					newS = maxScrollY;
+
+				if (newS == scrollY)
+					return;
+
+				scrollY = value;
+
+				NotifyValueChanged ("ScrollY", scrollY);
+				RegisterForGraphicUpdate ();
 			}
 		}
+		/// <summary> Horizontal Scrolling maximum value </summary>
+		[XmlAttributeAttribute][DefaultValue(0)]
+		public virtual int MaxScrollX {
+			get { return maxScrollX; }
+			set {
+				if (maxScrollX == value)
+					return;
 
-		[XmlIgnore]
-		public int MaximumScroll {
-			get {
-				try {
-					return VerticalScrolling ?
-						Math.Max(Child.Slot.Height - ClientRectangle.Height,0) :
-						Math.Max(Child.Slot.Width - ClientRectangle.Width,0);
-				} catch {
-					return 0;
-				}
+				maxScrollX = value;
+
+				if (scrollX > maxScrollX)
+					ScrollX = maxScrollX;
+
+				NotifyValueChanged ("MaxScrollX", maxScrollX);
+				RegisterForGraphicUpdate ();
 			}
 		}
+		/// <summary> Vertical Scrolling maximum value </summary>
+		[XmlAttributeAttribute][DefaultValue(0)]
+		public virtual int MaxScrollY {
+			get { return maxScrollY; }
+			set {
+				if (maxScrollY == value)
+					return;
 
-		[XmlAttributeAttribute][DefaultValue(30)]
-		public int ScrollSpeed {
+				maxScrollY = value;
+
+				if (scrollY > maxScrollY)
+					ScrollY = maxScrollY;
+
+				NotifyValueChanged ("MaxScrollY", maxScrollY);
+				RegisterForGraphicUpdate ();
+			}
+		}
+		/// <summary> Mouse Wheel Scrolling multiplier </summary>
+		[XmlAttributeAttribute][DefaultValue(50)]
+		public virtual int ScrollSpeed {
 			get { return scrollSpeed; }
 			set {
+				if (scrollSpeed == value)
+					return;
+
 				scrollSpeed = value;
-				NotifyValueChanged("ScrollSpeed", scrollSpeed);
+
+				NotifyValueChanged ("ScrollSpeed", scrollSpeed);
 			}
 		}
 		#endregion
 
+		public override void SetChild (GraphicObject _child)
+		{
+			Group g = child as Group;
+			if (g != null)
+				g.ChildrenCleared -= onChildListCleared;
+			
+			base.SetChild (_child);
+
+			g = _child as Group;
+			if (g != null)
+				g.ChildrenCleared += onChildListCleared;			
+		}
+		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
+		{
+			base.OnChildLayoutChanges (sender, arg);
+			updateMaxScroll (arg.LayoutType);
+		}
+
+
 		#region GraphicObject Overrides
+		public override Rectangle ScreenCoordinates (Rectangle r)
+		{
+			return base.ScreenCoordinates (r) - new Point((int)ScrollX,(int)ScrollY);
+		}
+		public override bool PointIsIn (ref Point m)
+		{
+			if (!base.PointIsIn(ref m))
+				return false;
+			if (!Slot.ContainsOrIsEqual (m) || child==null)
+				return false;
+			m += new Point (ScrollX, ScrollY);
+			return true;
+		}
+		public override void RegisterClip (Rectangle clip)
+		{
+			base.RegisterClip (clip - new Point(ScrollX,ScrollY));
+		}
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
 			base.OnLayoutChanges (layoutType);
 
-			NotifyValueChanged("MaximumScroll", MaximumScroll);
-			if (layoutType == LayoutingType.Height) {
+			if (layoutType == LayoutingType.Height)
 				NotifyValueChanged ("PageHeight", Slot.Height);
-				if (child?.Slot.Height > 0)
-					NotifyValueChanged ("ChildHeightRatio", Slot.Height * Slot.Height / child.Slot.Height);
-			} else {
+			else if (layoutType == LayoutingType.Width)
 				NotifyValueChanged ("PageWidth", Slot.Width);
-				if (child?.Slot.Width > 0)
-					NotifyValueChanged ("ChildWidthRatio", Slot.Width * Slot.Width / child.Slot.Width);
-			}
-		}
-		void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
-		{
-			//Debug.WriteLine ("scroller childLayoutChanges");
-			int maxScroll = MaximumScroll;
-			//Debug.WriteLine ("maxscroll={0}", maxScroll);
-			if (_verticalScrolling) {
-				if (arg.LayoutType == LayoutingType.Height) {
-					if (maxScroll < ScrollY) {
-						//Debug.WriteLine ("scrolly={0} maxscroll={1}", ScrollY, maxScroll);
-						ScrollY = maxScroll;
-					}
-					NotifyValueChanged("MaximumScroll", maxScroll);
-					if (child?.Slot.Height > 0)
-						NotifyValueChanged ("ChildHeightRatio", Slot.Height * Slot.Height / child.Slot.Height);
-				}
-			} else if (arg.LayoutType == LayoutingType.Width) {
-				if (maxScroll < ScrollX) {
-					//Debug.WriteLine ("scrolly={0} maxscroll={1}", ScrollY, maxScroll);
-					ScrollX = maxScroll;
-				}
-				NotifyValueChanged("MaximumScroll", maxScroll);
-				if (child?.Slot.Width > 0)
-					NotifyValueChanged ("ChildWidthRatio", Slot.Width * Slot.Width / child.Slot.Width);
-			}
-		}
-		void onChildListCleared(object sender, EventArgs e){
-			ScrollY = 0;
-			ScrollX = 0;
-		}
-		public override void SetChild (GraphicObject _child)
-		{
-			GraphicObject c = child as GraphicObject;
-			Group g = child as Group;
-			if (c != null) {
-				c.LayoutChanged -= OnChildLayoutChanges;
-				if (g != null)
-					g.ChildrenCleared -= onChildListCleared;
-			}
-			c = _child as GraphicObject;
-			g = _child as Group;
-			if (c != null) {
-				c.LayoutChanged += OnChildLayoutChanges;
-				if (g != null)
-					g.ChildrenCleared += onChildListCleared;
-			}
-			base.SetChild (_child);
-		}
-		public override Rectangle ScreenCoordinates (Rectangle r)
-		{
-			return base.ScreenCoordinates (r) - new Point((int)ScrollX,(int)ScrollY);
+			else
+				return;
+			updateMaxScroll(layoutType);
 		}
 		protected override void onDraw (Context gr)
 		{
@@ -218,50 +217,75 @@ namespace Crow
 			gr.Restore ();
 		}
 
-		#region Mouse handling
-		//internal Point savedMousePos;
-
-		public override bool PointIsIn (ref Point m)
-		{
-			if (!base.PointIsIn(ref m))
-				return false;
-			if (!Slot.ContainsOrIsEqual (m) || child==null)
-				return false;
-			m += new Point (ScrollX, ScrollY);
-			return true;
-		}
-//		public override bool MouseIsIn (Point m)
-//		{
-//			return Visible ? base.ScreenCoordinates(Slot).ContainsOrIsEqual (m) : false;
-//		}
-//		public override void checkHoverWidget (MouseMoveEventArgs e)
-//		{
-//			savedMousePos = e.Position;
-//			Point m = e.Position - new Point (ScrollX, ScrollY);
-//			base.checkHoverWidget (new MouseMoveEventArgs(m.X,m.Y,e.XDelta,e.YDelta));
-//		}
+		#region Mouse & Keyboard
+		/// <summary> Process scrolling vertically, or if shift is down, vertically </summary>
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
 		{
-			if (Child == null)
+			base.onMouseWheel (sender, e);
+			if (IFace.Keyboard.IsKeyDown (Key.ShiftLeft))
+				ScrollX += e.Delta * ScrollSpeed;
+			else
+				ScrollY -= e.Delta * ScrollSpeed;
+		}
+		/// <summary> Process scrolling with arrow keys, home and end keys. </summary>
+		public override void onKeyDown (object sender, KeyboardKeyEventArgs e)
+		{
+			base.onKeyDown (sender, e);
+
+			if (KeyEventsOverrides)
 				return;
 
-			if (VerticalScrolling )
-				ScrollY -= e.Delta * ScrollSpeed;
-			if (HorizontalScrolling )
-				ScrollX -= e.Delta * ScrollSpeed;
-		}
-//		public override void onMouseMove (object sender, MouseMoveEventArgs e)
-//		{
-//			savedMousePos.X += e.XDelta;
-//			savedMousePos.Y += e.YDelta;
-//			base.onMouseMove (sender, new MouseMoveEventArgs(savedMousePos.X,savedMousePos.Y,e.XDelta,e.YDelta));
-//		}
-		public override void RegisterClip (Rectangle clip)
-		{
-			base.RegisterClip (clip - new Point(ScrollX,ScrollY));
+			switch (e.Key) {
+			case Key.Up:
+				ScrollY--;
+				break;
+			case Key.Down:
+				ScrollY++;
+				break;
+			case Key.Left:
+				ScrollX--;
+				break;
+			case Key.Right:
+				ScrollX++;
+				break;
+			case Key.Home:
+				ScrollX = 0;
+				ScrollY = 0;
+				break;
+			case Key.End:
+				ScrollX = MaxScrollX;
+				ScrollY = MaxScrollY;
+				break;
+			}
 		}
 		#endregion
 
 		#endregion
+
+		void updateMaxScroll (LayoutingType lt){
+			if (Child == null) {
+				MaxScrollX = 0;
+				MaxScrollY = 0;
+				return;
+			}
+
+			Rectangle cb = ClientRectangle;
+
+			if (lt == LayoutingType.Height) {
+				MaxScrollY = child.Slot.Height - cb.Height;
+				if (child.Slot.Height > 0)
+					NotifyValueChanged ("ChildHeightRatio", Slot.Height * Slot.Height / child.Slot.Height);			
+			} else if (lt == LayoutingType.Width) {
+				MaxScrollX = child.Slot.Width - cb.Width;
+				if (child.Slot.Width > 0)
+					NotifyValueChanged ("ChildWidthRatio", Slot.Width * Slot.Width / child.Slot.Width);
+			}
+		}
+		void onChildListCleared(object sender, EventArgs e){
+			ScrollY = 0;
+			ScrollX = 0;
+		}
+
+
     }
 }
