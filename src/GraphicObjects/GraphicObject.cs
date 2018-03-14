@@ -126,7 +126,24 @@ namespace Crow
 
 			parentElem.AppendChild (xe);
 		}
-
+		public Surface CreateIcon (int dragIconSize = 32) {
+			ImageSurface di = new ImageSurface (Format.Argb32, dragIconSize, dragIconSize);
+			using (Context ctx = new Context (di)) {
+				double div = Math.Max (LastPaintedSlot.Width, LastPaintedSlot.Height);
+				double s = (double)dragIconSize / div;
+				ctx.Scale (s, s);
+				if (bmp == null)
+					this.onDraw (ctx);
+				else {
+					if (LastPaintedSlot.Width>LastPaintedSlot.Height)
+						ctx.SetSourceSurface (bmp, 0, (LastPaintedSlot.Width-LastPaintedSlot.Height)/2);
+					else
+						ctx.SetSourceSurface (bmp, (LastPaintedSlot.Height-LastPaintedSlot.Width)/2, 0);
+					ctx.Paint ();
+				}
+			}
+			return di;
+		}			
 		#endif
 
 		#region IDisposable implementation
@@ -337,7 +354,7 @@ namespace Crow
 
 				parentRWLock.EnterWriteLock();
 				parent = value;
-				Slot = default(Rectangle);
+				Slot = LastSlots = default(Rectangle);
 				parentRWLock.ExitWriteLock();
 									
 				onParentChanged (this, e);
@@ -374,8 +391,13 @@ namespace Crow
 				Parent.ContextCoordinates (r);
 		}
 		public virtual Rectangle ScreenCoordinates (Rectangle r){
-			return
-				Parent.ScreenCoordinates(r) + Parent.getSlot().Position + Parent.ClientRectangle.Position;
+			try {
+				return
+					Parent.ScreenCoordinates(r) + Parent.getSlot().Position + Parent.ClientRectangle.Position;				
+			} catch (Exception ex) {
+				Debug.WriteLine (ex);
+				return default(Rectangle);
+			}
 		}
 		public virtual Rectangle getSlot () { return Slot;}
 		#endregion

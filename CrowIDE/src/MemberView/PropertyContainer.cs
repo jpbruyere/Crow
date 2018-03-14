@@ -69,7 +69,7 @@ namespace Crow.Coding
 		public string Name { get { return pi.Name; }}
 		public object Value {
 			get {
-				return mview.ProjectNode.SelectedItem == null ? null : pi.GetValue(mview.ProjectNode.SelectedItem);
+				return mview.ProjectNode?.SelectedItem == null ? null : pi.GetValue(mview.ProjectNode.SelectedItem);
 			}
 			set {
 				try {

@@ -32,6 +32,7 @@ WinSchema {
 	Height = "Fit";
 }
 TabItem {
+	AllowDrag="false";
 	Background="Jet";
 }
 TreeItemBorder {

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<DockWindow DataSource="{CurrentSolution}" Name="winToolbox" Caption="Toolbox" Width="20%">
+<DockWindow DataSource="{CurrentSolution}" Name="winToolbox" Caption="Toolbox" Width="60">
 	<ListBox Margin="3" Data="{ToolboxItems}" SelectionBackground="SkyBlue">
 		<Template>
 			<Wrapper Name="ItemsContainer" Orientation="Vertical" Spacing="0"/>

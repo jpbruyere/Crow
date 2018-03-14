@@ -29,6 +29,7 @@ using Crow.IML;
 using System.Text;
 using System.Xml;
 using System.Diagnostics;
+using Cairo;
 
 namespace Crow.Coding
 {
@@ -38,18 +39,28 @@ namespace Crow.Coding
 		public ImlVisualEditor () : base()
 		{
 			imlVE = new DesignInterface ();
+			initCommands ();
 		}
 		#endregion
 
 		DesignInterface imlVE;
 		GraphicObject selectedItem;
 		ImlProjectItem imlProjFile;
-		Exception imlError = null;
 
+		bool editorIsDirty = false;//needed when tree is empty
 		bool drawGrid, snapToGrid;
 		int gridSpacing, zoom = 100;
 		Measure designWidth, designHeight;
 		bool updateEnabled;
+
+		public List<Crow.Command> Commands;
+		Crow.Command cmdDelete;
+
+		void initCommands () {
+			cmdDelete = new Crow.Command (new Action (() => deleteObject (SelectedItem)))
+				{ Caption = "Delete", Icon = new SvgPicture ("#Crow.Coding.icons.save.svg"), CanExecute = true };
+			Commands = new List<Crow.Command> (new Crow.Command[] { cmdDelete });
+		}
 
 		[DefaultValue(true)]
 		public bool DrawGrid {
@@ -107,7 +118,7 @@ namespace Crow.Coding
 				Width = (int)(designWidth * zoom / 100.0);
 			}
 		}
-		[DefaultValue("512")]
+		[DefaultValue("400")]
 		public Measure DesignHeight {
 			get { return designHeight; }
 			set {
@@ -125,8 +136,27 @@ namespace Crow.Coding
 				if (selectedItem == value)
 					return;
 				selectedItem = value;
+
+				if (selectedItem == null)
+					cmdDelete.CanExecute = false;
+				else
+					cmdDelete.CanExecute = true;
+				
 				NotifyValueChanged ("SelectedItem", selectedItem);
-				RegisterForRedraw ();
+				RegisterForGraphicUpdate ();
+			}
+		}
+		/// <summary>PoinprojFilever the widget</summary>
+		public virtual GraphicObject HoverWidget
+		{
+			get { return imlVE.HoverWidget; }
+			set {
+				if (HoverWidget == value)
+					return;
+
+				imlVE.HoverWidget = value;
+
+				NotifyValueChanged ("HoverWidget", HoverWidget);
 			}
 		}
 		/// <summary>
@@ -141,25 +171,13 @@ namespace Crow.Coding
 				NotifyValueChanged ("UpdateEnabled", updateEnabled);
 			}
 		}
-		/// <summary>PoinprojFilever the widget</summary>
-		public virtual GraphicObject HoverWidget
-		{
-			get { return imlVE.HoverWidget; }
-			set {
-				if (HoverWidget == value)
-					return;
-				
-				imlVE.HoverWidget = value;
-
-				NotifyValueChanged ("HoverWidget", HoverWidget);
-			}
-		}
-		[XmlIgnore]public List<LQIList> LQIs {
-			get { return imlVE.LQIs; }
-		}
 
 		public List<GraphicObject> GraphicTree {
 			get { return imlVE.GraphicTree; }
+		}
+
+		[XmlIgnore]public List<LQIList> LQIs {
+			get { return imlVE.LQIs; }
 		}
 
 		#region editor overrides
@@ -173,10 +191,15 @@ namespace Crow.Coding
 				imlVE.ProjFile = imlProjFile;
 			}
 		}
+
 		protected override bool EditorIsDirty {
 			get { return imlProjFile == null ? false :
-				imlProjFile.Instance == null ? false : imlProjFile.Instance.design_HasChanged; }
+				imlProjFile.Instance == null ? editorIsDirty :
+				imlProjFile.Instance.design_HasChanged | editorIsDirty; }
 			set {
+				editorIsDirty = value;
+				if (GraphicTree.Count == 0)
+					return;
 				if (GraphicTree [0] != null)
 					GraphicTree [0].design_HasChanged = value;			
 			}
@@ -189,7 +212,10 @@ namespace Crow.Coding
 		{
 			Debug.WriteLine("\t\tImlEditor updateProjFileFromEditor");
 			try {
-				projFile.UpdateSource(this, imlProjFile.Instance.GetIML());
+				if (imlProjFile.Instance == null)
+					projFile.UpdateSource(this, @"<?xml version=""1.0""?>");
+				else
+					projFile.UpdateSource(this, imlProjFile.Instance.GetIML());
 			} catch (Exception ex) {
 				Error = ex.InnerException;
 				if (Monitor.IsEntered(imlVE.UpdateMutex))
@@ -267,6 +293,7 @@ namespace Crow.Coding
 				break;
 			}
 		}
+
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
@@ -275,22 +302,57 @@ namespace Crow.Coding
 			Rectangle scr = this.ScreenCoordinates (this.getSlot ());
 			ProcessMouseMove (e.X - scr.X, e.Y - scr.Y);
 
-			if (oldHW == HoverWidget)
-				return;
+			GraphicObject newHW = HoverWidget;
 
 			if (draggedObj != null) {
-				if (isPossibleContainer (HoverWidget) && draggedObjContainer != HoverWidget) {
-					removeDraggedObjFrom ();
-					tryAddDraggedObjTo (HoverWidget);
+				if (draggedObj.Parent == null) {
+					if (tryAddObjectTo (newHW, draggedObj)) {
+						RegisterForRedraw ();
+						return;
+					}
+				} else if (newHW != draggedObj) {
+					//lock (imlVE.UpdateMutex) {
+					ILayoutable possibleParent = getPossibleParent (newHW, draggedObj);
+					if (possibleParent == null) {
+						Group g = newHW.Parent as Group;
+						if (g != null && g != draggedObj) {
+							removeObject (draggedObj);
+							g.InsertChild (g.Children.IndexOf (newHW), draggedObj);
+							RegisterForRedraw ();
+							return;
+						}
+					} else if (possibleParent != draggedObj.Parent) {
+						removeObject (draggedObj);
+						if (tryAddObjectTo (possibleParent, draggedObj)) {
+							RegisterForRedraw ();
+							return;
+						}
+					}
+					//}
 				}
-			}
+			}			
 
+			if (oldHW == newHW)
+				return;
 			RegisterForRedraw ();
 
 		}
+		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
+		{
+			base.onMouseEnter (sender, e);
+			IFace.FocusedWidget = this;
+		}
+		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
+		{
+			base.onMouseLeave (sender, e);
+			IFace.FocusedWidget = null;
+		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
-			//base.onMouseDown (sender, e);
+			if (e.Mouse.RightButton == ButtonState.Pressed) {
+				base.onMouseDown (sender, e);
+				return;
+			}
 			SelectedItem = HoverWidget;
 
 			if (SelectedItem != null && projFile != null) {
@@ -349,27 +411,69 @@ namespace Crow.Coding
 			Rectangle hr;
 			if (HoverWidget != null) {
 				hr = HoverWidget.ScreenCoordinates (HoverWidget.getSlot ());
-//			gr.SetSourceColor (Color.LightGray);
-//			gr.DrawCote (new Cairo.PointD (hr.X, hr.Center.Y), new Cairo.PointD (hr.Right, hr.Center.Y));
-//			gr.DrawCote (new Cairo.PointD (hr.Center.X, hr.Y), new Cairo.PointD (hr.Center.X, hr.Bottom));
-				//hr.Inflate (2);
-				gr.SetSourceColor (Color.LightGray);
-				gr.SetDash (new double[]{ 3.0, 3.0 }, 0.0);
-				gr.Rectangle (hr, 1.0);
+				gr.SetSourceColor (Color.White);
+				//gr.SetDash (new double[]{ 5.0, 3.0 }, 0.0);
+				gr.Rectangle (hr, 0.4 / z);
 			}
 
 			if (SelectedItem?.Parent != null) {
-				
-				hr = SelectedItem.ScreenCoordinates (SelectedItem.getSlot ());
-				hr.Inflate (1);
-				gr.LineWidth = 2;
-				gr.SetSourceColor (Color.Yellow);
-				gr.SetDash (new double[]{ 5.0, 3.0 }, 0.0);
-				gr.Rectangle (hr, 1.0);
+				GraphicObject g = SelectedItem;
+				hr = g.ScreenCoordinates (g.getSlot ());
+
+
+				//gr.SetDash (new double[]{ 2.0, 2.0 }, 0.0);
+				gr.SetSourceColor (Color.Black);
+				//gr.Operator = Operator.Add;
+				drawDesignOverlay (gr, g, cb, hr, 1.0 / z, 4.0);
+				gr.SetSourceColor (Color.White);
+				drawDesignOverlay (gr, g, cb, hr, 1.0 / z, 4.5);
 			}
 			gr.Restore ();
 		}
+		void drawDesignOverlay (Context gr, GraphicObject g, Rectangle cb, Rectangle hr, double coteStroke, double space = 4.5){
+			double z = zoom / 100.0;
+			double coteW = 3, coteL = 5;
+			bool fill = true;
+			Cairo.PointD p1 = new Cairo.PointD (hr.X + 0.5, hr.Y - space);
+			Cairo.PointD p2 = new Cairo.PointD (hr.Right - 0.5, hr.Y - space);
 
+			if (p1.Y < cb.Top) {
+				if (hr.Bottom > cb.Bottom - space)
+					p1.Y = p2.Y = hr.Bottom - space;
+				else
+					p1.Y = p2.Y = hr.Bottom + space;
+			}
+
+			if (g.Width.IsFit)
+				gr.DrawCoteInverse (p1, p2, coteStroke, fill, coteW, coteL);
+			else if (g.Width.IsRelativeToParent)
+				gr.DrawCote (p1, p2, coteStroke, fill, coteW, coteL);
+			else if (g.Width.IsFixed)
+				gr.DrawCoteFixed(p1, p2, coteStroke * 2.0, coteW);
+
+			p1 = new Cairo.PointD (hr.X - space, hr.Top + 0.5);
+			p2 = new Cairo.PointD (hr.X - space, hr.Bottom - 0.5);
+
+			if (p1.X < cb.Left) {
+				if (hr.Right > cb.Right - space)
+					p1.X = p2.X = hr.Right - space;
+				else
+					p1.X = p2.X = hr.Right + space;
+			} 
+			if (g.Height.IsFit)
+				gr.DrawCoteInverse (p1, p2, coteStroke, fill, coteW, coteL);
+			else if (g.Height.IsRelativeToParent)
+				gr.DrawCote (p1, p2, coteStroke, fill, coteW, coteL);
+			else if (g.Width.IsFixed)
+				gr.DrawCoteFixed(p1, p2, coteStroke * 2.0, coteW);
+
+			//				hr.Inflate (2);
+			//gr.SetDash (new double[]{ 1.0, 4.0 }, 0.0);
+			//gr.SetSourceColor (Color.Gray);
+//			gr.Rectangle (hr,coteStroke);
+//			gr.Stroke ();
+			gr.Operator = Operator.Over;			
+		}
 		protected override void onDragEnter (object sender, DragDropEventArgs e)
 		{
 			base.onDragEnter (sender, e);
@@ -381,74 +485,172 @@ namespace Crow.Coding
 		protected override void onDragLeave (object sender, DragDropEventArgs e)
 		{
 			base.onDragLeave (sender, e);
-
+			GraphicObjectDesignContainer godc = e.DragSource.DataSource as GraphicObjectDesignContainer;
+			if (godc == null)
+				return;
 			ClearDraggedObj ();
+		}
+
+		protected override void onStartDrag (object sender, DragDropEventArgs e)
+		{
+			base.onStartDrag (sender, e);
+			if (SelectedItem == null)
+				return;
+			
+			GraphicObject dumy = new GraphicObject (IFace);
+			dumy.EndDrag += dumyOnEndDrag;
+			dumy.Drop += dumyOnDrop;
+			dumy.IsDragged = true;
+			IFace.ActiveWidget = dumy;
+			e.DragSource.IsDragged = false;
+			IFace.DragAndDropOperation.DragSource = dumy;
+			draggedObj = SelectedItem;
+			int dragIconSize = 48;
+			lock (IFace.UpdateMutex) {
+				IFace.DragImageHeight = dragIconSize;
+				IFace.DragImageWidth = dragIconSize;
+				IFace.DragImage = draggedObj.CreateIcon(dragIconSize);
+			}					
+			removeObject (draggedObj);
+			SelectedItem = null;
+			HoverWidget = null;
+		}
+		void dumyOnEndDrag (object sender, DragDropEventArgs e)
+		{			
+			IFace.ClearDragImage ();
+		}
+		void dumyOnDrop (object sender, DragDropEventArgs e)
+		{
+			ClearDraggedObj (false);
+			IFace.ClearDragImage ();
 		}
 		#endregion
 
-		#region draggedObj handling
-		public GraphicObject draggedObj = null;
-		public GraphicObject draggedObjContainer = null;
 
-		bool tryAddDraggedObjTo(GraphicObject g){
-			lock (imlVE.UpdateMutex) {
-				if (g.GetType ().IsSubclassOf (typeof(Container))) {
-					Container c = g as Container;
-					c.SetChild (draggedObj);
-					EditorIsDirty = true;
-				} else if (g.GetType ().IsSubclassOf (typeof(Group))) {
-					Group c = g as Group;
-					c.AddChild (draggedObj);
-				} else
-					return false;
-				EditorIsDirty = true;
-				draggedObjContainer = g;
-			}
-			return true;
-		}
-		bool isPossibleContainer (GraphicObject g){
-			if (g.GetType().IsSubclassOf(typeof(Container))){
-				Container c = g as Container;
-				return c.Child == null;
-			}
-			return g.GetType ().IsSubclassOf (typeof(Group));
-		}
-		void removeDraggedObjFrom(){
-			if (draggedObjContainer == null)
-				return;
-			lock (imlVE.UpdateMutex) {
-				if (draggedObjContainer.GetType().IsSubclassOf(typeof(Container))){
-					Container c = draggedObjContainer as Container;
-					c.SetChild (null);
-					EditorIsDirty = true;
-					//Console.WriteLine ("remove {0} from {1}", draggedObj, c);
-				}else if (draggedObjContainer.GetType().IsSubclassOf(typeof(Group))){
-					Group c = draggedObjContainer as Group;
-					c.RemoveChild (draggedObj);
-					EditorIsDirty = true;
-					//Console.WriteLine ("remove {0} from {1}", draggedObj, c);
-				}//else
-				//	Console.WriteLine ("Error removing dragged obj");
-			}
-			draggedObjContainer = null;
-		}
+		#region draggedObj handling
+
+		public GraphicObject draggedObj = null;
+
 		void createDraggedObj (Type crowType) {
 			lock (imlVE.UpdateMutex) {
 				draggedObj = imlVE.CreateITorFromIMLFragment ("<" + crowType.Name + "/>").CreateInstance ();
 			}
 		}
+
 		public void ClearDraggedObj (bool removeFromTree = true) {
-			//Console.WriteLine ("Clear dragged obj {0}, remove from tree = {1}", draggedObj, removeFromTree);
 			if (removeFromTree)
-				removeDraggedObjFrom ();
-			draggedObjContainer = null;
-			if (draggedObj == null)
-				return;
-			if (removeFromTree)
-				draggedObj.Dispose ();
+				deleteObject (draggedObj);			
 			draggedObj = null;
 		}
 		#endregion
+
+		void removeObject (GraphicObject go) {
+			if (go == null)
+				return;
+			if (go.Parent == null)
+				return;		
+//			lock (imlVE.UpdateMutex) {
+				Interface i = go.Parent as Interface;
+				if (i != null) {
+					i.RemoveWidget (go);
+					imlProjFile.Instance = null;
+				} else {
+					Container c = go.Parent as Container;
+					if (c != null) 
+						c.SetChild (null);
+					else {
+						TemplatedContainer tc = go.Parent as TemplatedContainer;
+						if (tc != null)
+							tc.Content = null;
+						else {
+							Group g = go.Parent as Group;
+							if (g != null)
+								g.RemoveChild (go);
+						}
+					}
+				}					
+				EditorIsDirty = true;
+			//}
+		}
+		void deleteObject (GraphicObject go) {
+			if (go == null)
+				return;
+			//lock (imlVE.UpdateMutex) {
+				removeObject (go);
+				go.Dispose ();
+			//}
+		}
+
+		ILayoutable getPossibleParent (ILayoutable parent, GraphicObject go) {
+			if (go == null)
+				return null;
+//			lock (imlVE.UpdateMutex) {
+				
+				Interface i = null;
+				if (parent == null)
+					i = imlVE;
+				else
+					i = parent as Interface;
+				if (i != null)
+					return i.GraphicTree.Count > 0 ? null : i;
+				
+				Container c = parent as Container;
+				if (c != null)
+					return c.Child == null || c.Child == go ? c : null;						
+				
+				TemplatedContainer tc = parent as TemplatedContainer;
+				if (tc != null)
+					return tc.Content == null || tc.Content == go? tc : null;
+				
+				return parent as Group;
+//			}
+		}
+		bool tryAddObjectTo (ILayoutable parent, GraphicObject go) {
+			if (go == null)
+				return false;
+//			lock (imlVE.UpdateMutex) {
+			Interface i = null;
+			if (parent == null)
+				i = imlVE;
+			else
+				i = parent as Interface;
+			if (i != null) {
+				if (i.GraphicTree.Count > 0)
+					return false;
+				i.AddWidget (go);
+				imlProjFile.Instance = go;
+				EditorIsDirty = true;
+				return true;
+			}
+			Container c = parent as Container;
+			if (c != null) {
+				if (c.Child != null)
+					return false;
+					//return tryAddObjectTo (c.Parent, go);
+				c.SetChild (go);
+				EditorIsDirty = true;
+				return true;
+			}
+			TemplatedContainer tc = parent as TemplatedContainer;
+			if (tc != null) {
+				if (tc.Content != null)
+					return false;
+				//return tryAddObjectTo (c.Parent, go);
+				tc.Content = (go);
+				EditorIsDirty = true;
+				return true;
+			}
+			Group g = parent as Group;
+			if (g != null) {
+				g.AddChild (go);
+				EditorIsDirty = true;
+				return true;
+			}
+			return false;//tryAddObjectTo (parent.Parent, go);
+//			}
+		}
+
+
 
 		void WidgetCheckOver (GraphicObject go, MouseMoveEventArgs e){
 			Type tGo = go.GetType();
@@ -510,21 +712,22 @@ namespace Crow.Coding
 				GraphicObject topc = null;
 				while (tmp is GraphicObject) {
 					topc = tmp;
-					tmp = tmp.focusParent;
+					tmp = tmp.LogicalParent as GraphicObject;
 				}
 				int idxhw = imlVE.GraphicTree.IndexOf (topc);
 				if (idxhw != 0) {
 					int i = 0;
-					while (i < idxhw) {						
-						if (GraphicTree [i].MouseIsIn (e.Position)) {
-							while (HoverWidget != null) {
-								WidgetMouseLeave (imlVE.HoverWidget, e);
-								HoverWidget = HoverWidget.focusParent;
-							}
+					while (i < idxhw) {
+						if (imlVE.GraphicTree [i].LogicalParent == imlVE.GraphicTree [i].Parent) {
+							if (imlVE.GraphicTree [i].MouseIsIn (e.Position)) {
+								while (imlVE.HoverWidget != null) {
+									WidgetMouseLeave (imlVE.HoverWidget, e);
+									imlVE.HoverWidget = imlVE.HoverWidget.LogicalParent as GraphicObject;
+								}
 
-							GraphicTree [i].checkHoverWidget (e);
-							WidgetMouseMove (imlVE.HoverWidget, e);
-							return true;
+								WidgetCheckOver (GraphicTree [i], e);
+								return true;
+							}
 						}
 						i++;
 					}
@@ -533,16 +736,14 @@ namespace Crow.Coding
 
 				if (imlVE.HoverWidget.MouseIsIn (e.Position)) {
 					WidgetCheckOver (imlVE.HoverWidget, (e));
-					WidgetMouseMove (imlVE.HoverWidget, e);
 					return true;
 				} else {
 					WidgetMouseLeave (imlVE.HoverWidget, e);
 					//seek upward from last focused graph obj's
-					while (imlVE.HoverWidget.focusParent != null) {
+					while (imlVE.HoverWidget.LogicalParent as GraphicObject != null) {
 						imlVE.HoverWidget = imlVE.HoverWidget.LogicalParent as GraphicObject;
 						if (imlVE.HoverWidget.MouseIsIn (e.Position)) {
 							WidgetCheckOver (imlVE.HoverWidget, e);
-							WidgetMouseMove (imlVE.HoverWidget, e);
 							return true;
 						} else
 							WidgetMouseLeave (imlVE.HoverWidget, e);
@@ -556,7 +757,6 @@ namespace Crow.Coding
 					GraphicObject g = imlVE.GraphicTree [i];
 					if (g.MouseIsIn (e.Position)) {
 						WidgetCheckOver (g, e);
-						WidgetMouseMove (imlVE.HoverWidget, e);
 						return true;
 					}
 				}
@@ -565,10 +765,101 @@ namespace Crow.Coding
 			return false;
 
 		}
+//		public bool ProcessMouseMove(int x, int y)
+//		{
+//			int deltaX = x - imlVE.Mouse.X;
+//			int deltaY = y - imlVE.Mouse.Y;
+//			imlVE.Mouse.X = x;
+//			imlVE.Mouse.Y = y;
+//			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
+//			e.Mouse = imlVE.Mouse;
+//
+//			if (imlVE.ActiveWidget != null) {
+//				//TODO, ensure object is still in the graphic tree
+//				//send move evt even if mouse move outside bounds
+//				WidgetMouseMove (imlVE.ActiveWidget, e);
+//				return true;
+//			}
+//
+//			if (HoverWidget != null) {
+//				//TODO, ensure object is still in the graphic tree
+//				//check topmost graphicobject first
+//				GraphicObject tmp = HoverWidget;
+//				GraphicObject topc = null;
+//				while (tmp is GraphicObject) {
+//					topc = tmp;
+//					tmp = tmp.LogicalParent as GraphicObject;
+//				}
+//				int idxhw = imlVE.GraphicTree.IndexOf (topc);
+//				if (idxhw != 0) {
+//					int i = 0;
+//					while (i < idxhw) {						
+//						if (GraphicTree [i].MouseIsIn (e.Position)) {
+//							while (HoverWidget != null) {
+//								WidgetMouseLeave (imlVE.HoverWidget, e);
+//								HoverWidget = HoverWidget.focusParent;
+//							}
+//
+//							GraphicTree [i].checkHoverWidget (e);
+//							WidgetMouseMove (imlVE.HoverWidget, e);
+//							return true;
+//						}
+//						i++;
+//					}
+//				}
+//
+//
+//				if (imlVE.HoverWidget.MouseIsIn (e.Position)) {
+//					WidgetCheckOver (imlVE.HoverWidget, (e));
+//					WidgetMouseMove (imlVE.HoverWidget, e);
+//					return true;
+//				} else {
+//					WidgetMouseLeave (imlVE.HoverWidget, e);
+//					//seek upward from last focused graph obj's
+//					while (imlVE.HoverWidget.focusParent != null) {
+//						imlVE.HoverWidget = imlVE.HoverWidget.LogicalParent as GraphicObject;
+//						if (imlVE.HoverWidget.MouseIsIn (e.Position)) {
+//							WidgetCheckOver (imlVE.HoverWidget, e);
+//							WidgetMouseMove (imlVE.HoverWidget, e);
+//							return true;
+//						} else
+//							WidgetMouseLeave (imlVE.HoverWidget, e);
+//					}
+//				}
+//			}
+//
+//			//top level graphic obj's parsing
+//			lock (imlVE.GraphicTree) {
+//				for (int i = 0; i < imlVE.GraphicTree.Count; i++) {
+//					GraphicObject g = imlVE.GraphicTree [i];
+//					if (g.MouseIsIn (e.Position)) {
+//						WidgetCheckOver (g, e);
+//						WidgetMouseMove (imlVE.HoverWidget, e);
+//						return true;
+//					}
+//				}
+//			}
+//			imlVE.HoverWidget = null;
+//			return false;
+//
+//		}
 
 		void GTView_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
 		{
 			SelectedItem = e.NewValue as GraphicObject;
+		}
+
+
+		public override void onKeyDown (object sender, KeyboardKeyEventArgs e)
+		{
+		
+			switch (e.Key) {
+			case Key.Delete:
+				if (selectedItem == null)
+					return;
+				deleteObject (selectedItem);
+				break;
+			}
 		}
 	}
 }

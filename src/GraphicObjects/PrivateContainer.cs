@@ -75,7 +75,6 @@ namespace Crow
 			if (child != null) {
 				child.Parent = this;
 				child.LayoutChanged += OnChildLayoutChanges;
-				child.Slot = child.LastSlots = default(Rectangle);
 				contentSize = child.Slot.Size;
 				child.RegisteredLayoutings = LayoutingType.None;
 				child.RegisterForLayouting (LayoutingType.Sizing);

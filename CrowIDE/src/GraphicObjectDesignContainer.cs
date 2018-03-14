@@ -30,6 +30,14 @@ namespace Crow.Coding
 {
 	public class GraphicObjectDesignContainer
 	{
+		#region CTOR
+		public GraphicObjectDesignContainer (Type crowType)
+		{
+			CrowType = crowType;
+		}
+		#endregion
+
+		int dragIconSize = 32;
 		public Type CrowType;
 
 		public string IconPath {
@@ -38,24 +46,18 @@ namespace Crow.Coding
 		public string DisplayName {
 			get { return CrowType.Name; }
 		}
-			
-		public GraphicObjectDesignContainer (Type crowType)
-		{
-			CrowType = crowType;
-		}
-		int dis = 32;
 		void onStartDrag (object sender, EventArgs e)
 		{
 			GraphicObject go = sender as GraphicObject;
 
 			lock (go.IFace.UpdateMutex) {				
-				go.IFace.DragImageHeight = dis;
-				go.IFace.DragImageWidth = dis;
+				go.IFace.DragImageHeight = dragIconSize;
+				go.IFace.DragImageWidth = dragIconSize;
 				SvgPicture pic = new SvgPicture ();
 				pic.Load (go.IFace, IconPath);
-				ImageSurface img = new ImageSurface (Format.Argb32, dis, dis);
+				ImageSurface img = new ImageSurface (Format.Argb32, dragIconSize, dragIconSize);
 				using (Context ctx = new Context (img)) {
-					Rectangle r = new Rectangle (0, 0, dis, dis);
+					Rectangle r = new Rectangle (0, 0, dragIconSize, dragIconSize);
 					pic.Paint (ctx, r);	
 					ctx.Operator = Operator.In;
 					ctx.SetSourceRGBA (1.0, 1.0, 1.0, 1.0);

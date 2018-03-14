@@ -20,7 +20,7 @@
 			</HorizontalStack>
 			<HorizontalStack Width="Fit" Spacing="1">
 				<Label Text="Grid Spacing:"/>
-				<Slider Value="{²../../../editor.GridSpacing}" Width="150" Height="10" Minimum="1" Maximum="100"/>
+				<Slider Value="{²../../../editor.GridSpacing}" Width="150" Height="10" Minimum="5" Maximum="100"/>
 				<TextBox Text="{../../../editor.GridSpacing}"/>
 			</HorizontalStack>
 		</HorizontalStack>
@@ -31,8 +31,9 @@
 						Margin="2" VerticalScrolling="true" ScrollY="{../scrollbar1.Value}">
 					<ImlVisualEditor  Foreground="SkyBlue" Name="editor" Background="Gray"						
 						VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10"
-						Width="512" Height="512"
-						AllowDrop="true" UpdateEnabled="{../../../../../IsSelected}"
+						Width="512" Height="512" ContextCommands="{/Commands}"
+						AllowDrop="true" AllowDrag="true" Focusable="true"
+						UpdateEnabled="{../../../../../IsSelected}"
 						ProjectNode="{}" SelectedItem="{²SelectedItem}"/>
 				</Scroller>
 				<ScrollBar Name="scrollbar1" Value="{²../scroller1.ScrollY}"

@@ -6,7 +6,7 @@
 	<Expandable Caption="{Name}" ContextCommands="{Commands}" IsExpanded="{²IsExpanded}">
 		<Template>
 			<VerticalStack>
-				<Border Style="TreeItemBorder" MouseDoubleClick="./onClickForExpand">
+				<Border Style="TreeItemBorder" Focusable="false" MouseDoubleClick="./onClickForExpand">
 					<HorizontalStack Spacing="1">
 						<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
 							Path="{./Image}"

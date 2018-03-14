@@ -37,7 +37,7 @@
 				<MenuItem Command="{CMDHelp}"/>
 			</MenuItem>
 		</Menu>
-		<Label DataSource="{CurrentSolution}" Text="{SelectedItemElement}" Width="Stretched"/>
+<!--		<Label DataSource="{CurrentSolution}" Text="{SelectedItemElement}" Width="Stretched"/>-->
 		<Docker Name="mainDock">
 			<DockStack />
 <!--			<DockWindow DataSource="{CurrentSolution}" Name="winEditor" Caption="Edit View" Width="70%" Height="80%">

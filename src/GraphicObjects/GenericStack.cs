@@ -227,20 +227,20 @@ namespace Crow
 
     	public override void RemoveChild (GraphicObject child)
 		{
+			if (child != stretchedGO) {
+				if (Orientation == Orientation.Horizontal)
+					contentSize.Width -= child.LastSlots.Width;
+				else 
+					contentSize.Height -= child.LastSlots.Height;				
+			}
 			base.RemoveChild (child);
 			if (child == stretchedGO) {
-				//stretchedGO.LastSlots = default(Rectangle);
 				stretchedGO = null;
 				RegisterForLayouting (LayoutingType.Sizing);
-				return;
-			}
-			if (Orientation == Orientation.Horizontal) {
-				contentSize.Width -= child.LastSlots.Width;
+			}else if (Orientation == Orientation.Horizontal) 				
 				adjustStretchedGo (LayoutingType.Width);
-			} else {
-				contentSize.Height -= child.LastSlots.Height;
-				adjustStretchedGo (LayoutingType.Height);
-			}
+			else				
+				adjustStretchedGo (LayoutingType.Height);			
 		}
 	}
 }

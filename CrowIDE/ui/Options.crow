@@ -1,10 +1,24 @@
 ﻿<?xml version="1.0"?>
-<Window Caption="Crow IDE Options" Width="80%" Height="70%" Background="DimGray">
+<Window Caption="Crow IDE Options" Width="80%" Height="70%" Background="DimGray" Modal="true">
 	<TabView>
-		<TabItem Caption="Editor">
+		<TabItem Caption="IML Visual Editor">
 			<VerticalStack Margin="10">
-				<CheckBox Caption="Print Line Numbers" IsChecked="False"/>
+				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
+				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
+				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
+				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
+				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
 			</VerticalStack>
 		</TabItem>
+		<TabItem Caption="Text Editor">
+			<VerticalStack Margin="10">
+				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
+				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
+				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
+				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
+				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
+			</VerticalStack>
+		</TabItem>
+
 	</TabView>
 </Window>
