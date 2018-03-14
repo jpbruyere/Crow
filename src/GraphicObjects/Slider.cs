@@ -215,11 +215,27 @@ namespace Crow
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
-			if (holdCursor) {
-				if (_orientation == Orientation.Horizontal)
-					Value += (double)e.XDelta / unity;
-				else
-					Value += (double)e.YDelta / unity;
+			if (holdCursor) {				
+				Point m = ScreenPointToLocal (e.Position);
+				Rectangle r = ClientRectangle;
+
+				if (_orientation == Orientation.Horizontal) {
+					if (r.Width - _cursorSize == 0)
+						return;					
+					double unit = (Maximum - Minimum) / (double)(r.Width - _cursorSize);
+					double tmp = (double)m.X * unit;
+					tmp -= tmp % SmallIncrement;
+					Value = tmp;
+				} else {
+					if (r.Height - _cursorSize == 0)
+						return;					
+					double unit = (Maximum - Minimum) / (double)(r.Height - _cursorSize);
+					double tmp = (double)m.Y * unit;
+					tmp -= tmp % SmallIncrement;
+					Value = tmp;
+				}
+
+
 			}
 			
 			base.onMouseMove (sender, e);
