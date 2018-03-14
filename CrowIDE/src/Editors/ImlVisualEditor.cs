@@ -43,6 +43,11 @@ namespace Crow.Coding
 		}
 		#endregion
 
+		protected override void onInitialized (object sender, EventArgs e)
+		{
+			initIcons ();
+			base.onInitialized (sender, e);
+		}
 		DesignInterface imlVE;
 		GraphicObject selectedItem;
 		ImlProjectItem imlProjFile;
@@ -53,6 +58,8 @@ namespace Crow.Coding
 		Measure designWidth, designHeight;
 		bool updateEnabled;
 
+		SvgPicture icoMove, icoStyle;
+
 		public List<Crow.Command> Commands;
 		Crow.Command cmdDelete;
 
@@ -60,6 +67,13 @@ namespace Crow.Coding
 			cmdDelete = new Crow.Command (new Action (() => deleteObject (SelectedItem)))
 				{ Caption = "Delete", Icon = new SvgPicture ("#Crow.Coding.icons.save.svg"), CanExecute = true };
 			Commands = new List<Crow.Command> (new Crow.Command[] { cmdDelete });
+		}
+
+		void initIcons () {
+			icoMove = new SvgPicture ();
+			icoMove.Load (IFace, "#Crow.Coding.icons.move-arrows.svg");
+			icoStyle = new SvgPicture ();
+			icoStyle.Load (IFace, "#Crow.Coding.icons.palette.svg");
 		}
 
 		[DefaultValue(true)]
@@ -361,6 +375,8 @@ namespace Crow.Coding
 			}
 
 		}
+		Rectangle rIcons = default(Rectangle);
+		Size iconSize = new Size(10,10);
 
 		protected override void onDraw (Cairo.Context gr)
 		{
@@ -409,26 +425,71 @@ namespace Crow.Coding
 			}
 
 			Rectangle hr;
-			if (HoverWidget != null) {
-				hr = HoverWidget.ScreenCoordinates (HoverWidget.getSlot ());
-				gr.SetSourceColor (Color.White);
-				//gr.SetDash (new double[]{ 5.0, 3.0 }, 0.0);
-				gr.Rectangle (hr, 0.4 / z);
-			}
 
 			if (SelectedItem?.Parent != null) {
+
+				gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+				gr.SetFontSize (Font.Size);
+				gr.FontOptions = Interface.FontRenderingOptions;
+				gr.Antialias = Interface.Antialias;
+
 				GraphicObject g = SelectedItem;
 				hr = g.ScreenCoordinates (g.getSlot ());
 
+//				Rectangle rIcons = new Rectangle (iconSize);
+//				rIcons.Width *= 4; 
+//				rIcons.Top = hr.Bottom;
+//				rIcons.Left = hr.Right - rIcons.Width + iconSize.Width;
+				Rectangle rIcoMove = new Rectangle (hr.BottomRight, iconSize);
+//				Rectangle rIcoStyle = rIcoMove;
+//				rIcoStyle.Left += iconSize.Width + 4;
 
-				//gr.SetDash (new double[]{ 2.0, 2.0 }, 0.0);
-				gr.SetSourceColor (Color.Black);
-				//gr.Operator = Operator.Add;
-				drawDesignOverlay (gr, g, cb, hr, 1.0 / z, 4.0);
-				gr.SetSourceColor (Color.White);
-				drawDesignOverlay (gr, g, cb, hr, 1.0 / z, 4.5);
+				using (Surface mask = new ImageSurface (Format.Argb32, cb.Width, cb.Height)) {
+					using (Context ctx = new Context (mask)) {
+						ctx.Save();
+						ctx.SetSourceRGBA(1.0,1.0,1.0,0.4);
+						ctx.Paint ();
+						ctx.Rectangle (hr);
+						ctx.Operator = Operator.Clear;
+						ctx.Fill ();
+					}
+
+					gr.SetSourceSurface (mask, 0, 0);
+					gr.Paint ();
+
+					using (Surface ol = new ImageSurface (Format.Argb32, cb.Width, cb.Height)) {
+						using (Context ctx = new Context (ol)) {
+							ctx.SetSourceColor (Color.Black);
+							drawDesignOverlay (ctx, g, cb, hr, 0.4 / z, 4.5);
+						}
+							
+						gr.SetSourceSurface (ol, 0, 0);
+						gr.Paint ();
+					}
+
+					drawIcon (gr, icoMove, rIcoMove);
+					//drawIcon (gr, icoStyle, rIcoStyle);
+
+				}						
+			}
+			if (HoverWidget != null) {
+				hr = HoverWidget.ScreenCoordinates (HoverWidget.getSlot ());
+				gr.SetSourceColor (Color.SkyBlue);
+				//gr.SetDash (new double[]{ 5.0, 3.0 }, 0.0);
+				gr.Rectangle (hr, 0.4 / z);
 			}
 			gr.Restore ();
+		}
+
+		void drawIcon (Context gr, SvgPicture pic, Rectangle r) {
+//			gr.SetSourceColor (Color.Black);
+//			CairoHelpers.CairoRectangle (gr, r.Inflated (1), 2, 1.0);
+			gr.SetSourceColor (Color.White);
+			CairoHelpers.CairoRectangle (gr, r.Inflated (1), 2);
+			gr.Fill ();
+			gr.Operator = Operator.Clear;
+			pic.Paint (gr, r);
+			gr.Operator = Operator.Over;
 		}
 		void drawDesignOverlay (Context gr, GraphicObject g, Rectangle cb, Rectangle hr, double coteStroke, double space = 4.5){
 			double z = zoom / 100.0;
@@ -446,10 +507,14 @@ namespace Crow.Coding
 
 			if (g.Width.IsFit)
 				gr.DrawCoteInverse (p1, p2, coteStroke, fill, coteW, coteL);
-			else if (g.Width.IsRelativeToParent)
+			else if (g.Width.IsRelativeToParent) {
 				gr.DrawCote (p1, p2, coteStroke, fill, coteW, coteL);
-			else if (g.Width.IsFixed)
-				gr.DrawCoteFixed(p1, p2, coteStroke * 2.0, coteW);
+				if (g.Width.Value < 100)
+					drawCenteredTextLine (gr, p1.Add(p2.Substract(p1).Divide (2)), g.Width.ToString());
+			}else if (g.Width.IsFixed) {
+				gr.DrawCoteFixed (p1, p2, coteStroke * 2.0, coteW);
+				drawCenteredTextLine (gr, p1.Add(p2.Substract(p1).Divide (2)), g.Width.Value.ToString());
+			}
 
 			p1 = new Cairo.PointD (hr.X - space, hr.Top + 0.5);
 			p2 = new Cairo.PointD (hr.X - space, hr.Bottom - 0.5);
@@ -462,10 +527,14 @@ namespace Crow.Coding
 			} 
 			if (g.Height.IsFit)
 				gr.DrawCoteInverse (p1, p2, coteStroke, fill, coteW, coteL);
-			else if (g.Height.IsRelativeToParent)
+			else if (g.Height.IsRelativeToParent){
 				gr.DrawCote (p1, p2, coteStroke, fill, coteW, coteL);
-			else if (g.Width.IsFixed)
-				gr.DrawCoteFixed(p1, p2, coteStroke * 2.0, coteW);
+				if (g.Height.Value < 100)
+					drawCenteredTextLine (gr, p1.Add(p2.Substract(p1).Divide (2)), g.Height.ToString());
+			}else if (g.Width.IsFixed) {
+				gr.DrawCoteFixed (p1, p2, coteStroke * 2.0, coteW);
+				drawCenteredTextLine (gr, p1.Add(p2.Substract(p1).Divide (2)), g.Height.Value.ToString());
+			}
 
 			//				hr.Inflate (2);
 			//gr.SetDash (new double[]{ 1.0, 4.0 }, 0.0);
@@ -473,6 +542,27 @@ namespace Crow.Coding
 //			gr.Rectangle (hr,coteStroke);
 //			gr.Stroke ();
 			gr.Operator = Operator.Over;			
+		}
+
+		void drawCenteredTextLine (Context gr, PointD center, string txt){
+			FontExtents fe = gr.FontExtents;
+			TextExtents te = gr.TextExtents (txt);
+
+			Rectangle rText = new Rectangle(
+				(int)(center.X - te.Width / 2), (int)(center.Y - (fe.Ascent + fe.Descent) / 2),
+				(int)te.Width, (int)(fe.Ascent + fe.Descent));
+
+			gr.Operator = Operator.Clear;
+			Rectangle r = rText;
+			r.Inflate (2);
+			gr.Rectangle (r);
+			gr.Fill ();
+			gr.Operator = Operator.Over;
+
+			gr.MoveTo (rText.X, rText.Y + fe.Ascent);
+			gr.ShowText (txt);
+			gr.Fill ();
+
 		}
 		protected override void onDragEnter (object sender, DragDropEventArgs e)
 		{
@@ -858,6 +948,9 @@ namespace Crow.Coding
 				if (selectedItem == null)
 					return;
 				deleteObject (selectedItem);
+				break;
+			case Key.Escape:
+				SelectedItem = null;
 				break;
 			}
 		}

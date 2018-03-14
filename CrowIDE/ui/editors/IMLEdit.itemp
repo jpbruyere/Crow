@@ -20,7 +20,7 @@
 			</HorizontalStack>
 			<HorizontalStack Width="Fit" Spacing="1">
 				<Label Text="Grid Spacing:"/>
-				<Slider Value="{²../../../editor.GridSpacing}" Width="150" Height="10" Minimum="5" Maximum="100"/>
+				<Slider Value="{²../../../editor.GridSpacing}" Width="200" Height="10" Minimum="5" Maximum="100" SmallIncrement="5" LargeIncrement="20"/>
 				<TextBox Text="{../../../editor.GridSpacing}"/>
 			</HorizontalStack>
 		</HorizontalStack>

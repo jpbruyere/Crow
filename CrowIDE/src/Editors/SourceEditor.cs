@@ -374,7 +374,7 @@ namespace Crow.Coding
 						buffer.ToogleFolding (l);					
 				} catch (Exception ex) {
 					requestedLine = value - 1;
-					Console.WriteLine ("Error cur column: " + ex.ToString ());
+					Console.WriteLine ("Error cur column: " + ex);
 				}
 			}
 		}

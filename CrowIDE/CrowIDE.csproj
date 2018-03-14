@@ -258,6 +258,7 @@
     <EmbeddedResource Include="icons\redo.svg" />
     <EmbeddedResource Include="icons\folder.svg" />
     <EmbeddedResource Include="icons\file.svg" />
+    <EmbeddedResource Include="icons\palette.svg" />
     <EmbeddedResource Include="ui\ContextMenu.template">
       <LogicalName>Crow.ContextMenu.template</LogicalName>
     </EmbeddedResource>

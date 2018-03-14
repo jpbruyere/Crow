@@ -249,9 +249,10 @@ namespace Crow.Coding
 
 		void CrowIDE_KeyDown (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
-			if (e.Key == OpenTK.Input.Key.Escape) {
-				Quit (null, null);
-			} else if (e.Key == OpenTK.Input.Key.F5) {
+//			if (e.Key == OpenTK.Input.Key.Escape) {
+//				Quit (null, null);
+//			} else
+			if (e.Key == OpenTK.Input.Key.F5) {
 				try {
 					CurrentSolution.StartupProject.Compile ();	
 				} catch (Exception ex) {
