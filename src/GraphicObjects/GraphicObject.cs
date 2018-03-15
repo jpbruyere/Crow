@@ -298,6 +298,7 @@ namespace Crow
 		bool cacheEnabled = false;
 		bool clipToClientRect = true;
 		protected object dataSource;
+		bool rootDataLevel;
 		string style;
 		object tag;
 		bool isDragged;
@@ -944,17 +945,34 @@ namespace Crow
 
 				if (dse.NewDataSource == dse.OldDataSource)
 					return;
-			
-				OnDataSourceChanged (this, dse);
 
-
-				NotifyValueChanged ("DataSource", DataSource);
+				if (value != null)
+					rootDataLevel = true;
+				
+				lock (IFace.LayoutMutex) {
+					OnDataSourceChanged (this, dse);
+					NotifyValueChanged ("DataSource", DataSource);
+				}
 			}
 			get {
-				return dataSource == null ?
+				return rootDataLevel ? dataSource : dataSource == null ?
 					LogicalParent == null ? null :
 					LogicalParent is GraphicObject ? (LogicalParent as GraphicObject).DataSource : null :
 					dataSource;
+			}
+		}
+		/// <summary>
+		/// If true, rendering of GraphicObject is clipped inside client rectangle
+		/// </summary>
+		[DesignCategory ("Data")][DefaultValue(false)]
+		public virtual bool RootDataLevel {
+			get { return rootDataLevel; }
+			set {
+				if (rootDataLevel == value)
+					return;
+				rootDataLevel = value;
+				NotifyValueChanged ("RootDataLevel", rootDataLevel);
+				this.RegisterForRedraw ();
 			}
 		}
 		protected virtual void onLogicalParentDataSourceChanged(object sender, DataSourceChangeEventArgs e){
