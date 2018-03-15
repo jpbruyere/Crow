@@ -122,7 +122,7 @@ namespace Crow
 			}
 		}
 
-		protected override int measureRawSize (LayoutingType lt)
+		protected override int measureRawSize(LayoutingType lt)
 		{
 			int tmp = base.measureRawSize (lt);
 			return tmp < 0 ? tmp : tmp + 2 * BorderWidth;

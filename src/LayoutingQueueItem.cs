@@ -98,14 +98,12 @@ namespace Crow
 		public void ProcessLayouting()
 		{
 			GraphicObject go = Layoutable as GraphicObject;
-//			if (go == null) {
-//				Debug.WriteLine ("ERROR: processLayouting on something else than a graphic object: " + this.ToString ());
-//				return;
-//			}
 
 			go.parentRWLock.EnterReadLock ();
 
 			if (go.Parent == null) {//TODO:improve this
+				go.registeredLayoutings &= (~LayoutType);
+				go.requestedLayoutings |= LayoutType;
 				//cancel layouting for object without parent, maybe some were in queue when
 				//removed from a listbox
 				#if DEBUG_UPDATE || DEBUG_LAYOUTING
@@ -114,6 +112,7 @@ namespace Crow
 				go.parentRWLock.ExitReadLock ();
 				return;
 			}
+
 			#if DEBUG_LAYOUTING
 			LQITime.Start();
 			Debug.WriteLine ("=> " + this.ToString ());
@@ -135,11 +134,12 @@ namespace Crow
 					Layoutable.RegisteredLayoutings |= LayoutType;
 					(Layoutable as GraphicObject).IFace.DiscardQueue.Enqueue (this);
 				}
-//				#if DEBUG_LAYOUTING
+				//#if DEBUG_LAYOUTING
 				else
 					Debug.WriteLine ("\tDELETED    => " + this.ToString ());
-//				#endif
+				//#endif
 			}
+
 			else{
 				if (LayoutingTries > 2 || DiscardCount > 0)
 					Debug.WriteLine (this.ToString ());

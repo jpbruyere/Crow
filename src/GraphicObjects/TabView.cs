@@ -237,9 +237,7 @@ namespace Crow
 						curOffset += tabSpace;					
 				}
 
-				//if no layouting remains in queue for item, registre for redraw
-				if (RegisteredLayoutings == LayoutingType.None && IsDirty)
-					IFace.EnqueueForRepaint (this);
+				EnqueueForRepaint ();
 
 				return true;
 			}

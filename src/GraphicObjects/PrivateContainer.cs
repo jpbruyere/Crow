@@ -68,9 +68,13 @@ namespace Crow
 				contentSize = default(Size);
 				child.LayoutChanged -= OnChildLayoutChanges;
 				this.RegisterForGraphicUpdate ();
-			}
 
-			child = _child as GraphicObject;
+				GraphicObject tmp = child;
+				child = null;
+				tmp.Parent = null;
+			}
+				
+			child = _child;
 
 			if (child != null) {
 				child.Parent = this;

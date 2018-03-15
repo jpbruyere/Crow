@@ -145,7 +145,7 @@ namespace Crow
 		}
 
 		#region GraphicObject overrides
-		protected override int measureRawSize (LayoutingType lt)
+		protected override int measureRawSize(LayoutingType lt)
 		{
 			if (lines == null)
 				lines = getLines;

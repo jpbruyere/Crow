@@ -273,7 +273,8 @@ namespace Crow
 			//initialized = true;
 		}
 		#region private fields
-		LayoutingType registeredLayoutings = LayoutingType.All;
+		public LayoutingType registeredLayoutings = LayoutingType.None;
+		public LayoutingType requestedLayoutings = LayoutingType.All;
 		ILayoutable logicalParent;
 		ILayoutable parent;
 		string name;
@@ -949,10 +950,10 @@ namespace Crow
 				if (value != null)
 					rootDataLevel = true;
 				
-				lock (IFace.LayoutMutex) {
+				//lock (IFace.LayoutMutex) {
 					OnDataSourceChanged (this, dse);
 					NotifyValueChanged ("DataSource", DataSource);
-				}
+				//}
 			}
 			get {
 				return rootDataLevel ? dataSource : dataSource == null ?
@@ -961,20 +962,20 @@ namespace Crow
 					dataSource;
 			}
 		}
-		/// <summary>
-		/// If true, rendering of GraphicObject is clipped inside client rectangle
-		/// </summary>
-		[DesignCategory ("Data")][DefaultValue(false)]
-		public virtual bool RootDataLevel {
-			get { return rootDataLevel; }
-			set {
-				if (rootDataLevel == value)
-					return;
-				rootDataLevel = value;
-				NotifyValueChanged ("RootDataLevel", rootDataLevel);
-				this.RegisterForRedraw ();
-			}
-		}
+//		/// <summary>
+//		/// If true, rendering of GraphicObject is clipped inside client rectangle
+//		/// </summary>
+//		[DesignCategory ("Data")][DefaultValue(false)]
+//		public virtual bool RootDataLevel {
+//			get { return rootDataLevel; }
+//			set {
+//				if (rootDataLevel == value)
+//					return;
+//				rootDataLevel = value;
+//				NotifyValueChanged ("RootDataLevel", rootDataLevel);
+//				this.RegisterForRedraw ();
+//			}
+//		}
 		protected virtual void onLogicalParentDataSourceChanged(object sender, DataSourceChangeEventArgs e){
 			if (localDataSourceIsNull)
 				OnDataSourceChanged (this, e);
@@ -1370,19 +1371,24 @@ namespace Crow
 			IsDirty = true;
 			if (Width.IsFit || Height.IsFit)
 				RegisterForLayouting (LayoutingType.Sizing);
-			else if (RegisteredLayoutings == LayoutingType.None)
-				IFace.EnqueueForRepaint (this);
+			else
+				EnqueueForRepaint ();
 		}
 		/// <summary> query an update of the content, a redraw </summary>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForRedraw ()
 		{
 			#if DEBUG_UPDATE
 			Debug.WriteLine (string.Format("RegisterForRedraw (IsDirty set)-> {0}", this.ToString ()));
 			#endif
 			IsDirty = true;
-			if (RegisteredLayoutings == LayoutingType.None)
-				IFace.EnqueueForRepaint (this);
+			EnqueueForRepaint ();
+		}
+		protected void EnqueueForRepaint (){
+			//if no layouting remains in queue for item, registre for redraw
+			if (requestedLayoutings != LayoutingType.None)
+				RegisterForLayouting (LayoutingType.None);
+			else if (RegisteredLayoutings == LayoutingType.None && IsDirty)
+				IFace.EnqueueForRepaint (this);			
 		}
 		#endregion
 
@@ -1398,46 +1404,56 @@ namespace Crow
 		}
 		public virtual bool ArrangeChildren { get { return false; } }
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
-			if (Parent == null)
+			if (Parent == null || !Monitor.TryEnter(IFace.LayoutMutex)) {
+				requestedLayoutings |= layoutType;
+//				if (registeredLayoutings != LayoutingType.None)
+//					Debugger.Break ();
 				return;
-			lock (IFace.LayoutMutex) {
-				//prevent queueing same LayoutingType for this
-				layoutType &= (~RegisteredLayoutings);
+			}
+			layoutType |= requestedLayoutings;
+			requestedLayoutings = LayoutingType.None;
+			layoutType &= (~RegisteredLayoutings);//prevent queueing same LayoutingType for this
 
-				if (layoutType == LayoutingType.None)
-					return;
-				//dont set position for stretched item
-				if (Width == Measure.Stretched)
-					layoutType &= (~LayoutingType.X);
-				if (Height == Measure.Stretched)
-					layoutType &= (~LayoutingType.Y);
+			if (layoutType == LayoutingType.None) {
+				Monitor.Exit (IFace.LayoutMutex);
+				return;
+			}
+			//dont set position for stretched item
+			if (Width == Measure.Stretched)
+				layoutType &= (~LayoutingType.X);
+			if (Height == Measure.Stretched)
+				layoutType &= (~LayoutingType.Y);
 
-				if (!ArrangeChildren)
-					layoutType &= (~LayoutingType.ArrangeChildren);
+			if (!ArrangeChildren)
+				layoutType &= (~LayoutingType.ArrangeChildren);
 
-				//apply constraints depending on parent type
-				if (Parent is GraphicObject)
-					(Parent as GraphicObject).ChildrenLayoutingConstraints (ref layoutType);
+			//apply constraints depending on parent type
+			if (Parent is GraphicObject)
+				(Parent as GraphicObject).ChildrenLayoutingConstraints (ref layoutType);
 
 //				//prevent queueing same LayoutingType for this
 //				layoutType &= (~RegisteredLayoutings);
 
-				if (layoutType == LayoutingType.None)
-					return;
-
-				//enqueue LQI LayoutingTypes separately
-				if (layoutType.HasFlag (LayoutingType.Width))
-					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
-				if (layoutType.HasFlag (LayoutingType.Height))
-					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
-				if (layoutType.HasFlag (LayoutingType.X))
-					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
-				if (layoutType.HasFlag (LayoutingType.Y))
-					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
-				if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
-					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
+			if (layoutType == LayoutingType.None) {
+				Monitor.Exit (IFace.LayoutMutex);
+				return;
 			}
+
+			//enqueue LQI LayoutingTypes separately
+			if (layoutType.HasFlag (LayoutingType.Width))
+				IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
+			if (layoutType.HasFlag (LayoutingType.Height))
+				IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
+			if (layoutType.HasFlag (LayoutingType.X))
+				IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
+			if (layoutType.HasFlag (LayoutingType.Y))
+				IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
+			if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
+				IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
+			
+			Monitor.Exit (IFace.LayoutMutex);
 		}
+
 
 		/// <summary> trigger dependant sizing component update </summary>
 		public virtual void OnLayoutChanges(LayoutingType  layoutType)
@@ -1608,15 +1624,16 @@ namespace Crow
 
 				IsDirty = true;
 
+//				if (Name == "colIco" && Slot.Height < 5)
+//					Debugger.Break ();
+				
 				OnLayoutChanges (layoutType);
 
 				LastSlots.Height = Slot.Height;
 				break;
 			}
 
-			//if no layouting remains in queue for item, registre for redraw
-			if (this.registeredLayoutings == LayoutingType.None && IsDirty)
-				IFace.EnqueueForRepaint (this);
+			EnqueueForRepaint ();
 
 			return true;
 		}
@@ -1913,13 +1930,8 @@ namespace Crow
 		public virtual void onDisable(object sender, EventArgs e){
 			Disabled.Raise (this, e);
 		}
-		protected virtual void onParentChanged(object sender, DataSourceChangeEventArgs e) {
-//			if (e.NewDataSource != null) {
-//				if (width == Measure.Inherit)
-//					RegisterForLayouting (LayoutingType.Width);
-//				if (height == Measure.Inherit)
-//					RegisterForLayouting (LayoutingType.Height);
-//			}
+		protected virtual void onParentChanged(object sender, DataSourceChangeEventArgs e) {			
+			RegisterForLayouting (LayoutingType.None);
 			
 			ParentChanged.Raise (this, e);
 			if (logicalParent == null)

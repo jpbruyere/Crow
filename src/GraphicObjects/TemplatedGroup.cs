@@ -242,12 +242,14 @@ namespace Crow
 		void Ol_ListAdd (object sender, ListChangedEventArg e)
 		{
 			if (this.isPaged) {
-				throw new NotImplementedException();
+				throw new NotImplementedException ();
 //				int p = e.Index / itemPerPage;
 //				int i = e.Index % itemPerPage;
 //				(items.Children [p] as Group).InsertChild (i, e.Element);
-			} else
-				loadItem (e.Element, items, dataTest);
+			} else {
+				lock(IFace.UpdateMutex)
+					loadItem (e.Element, items, dataTest);
+			}
 		}
 
 		[XmlAttributeAttribute][DefaultValue("SteelBlue")]
@@ -445,16 +447,19 @@ namespace Crow
 					iTemp = ItemTemplates ["default"];
 			}
 
-			lock (IFace.LayoutMutex) {
-				g = iTemp.CreateInstance();
+			//lock (IFace.LayoutMutex) {
+				g = iTemp.CreateInstance ();
+			
 				#if DESIGN_MODE
 				g.design_isTGItem = true;
 				#endif
+
+
 				page.AddChild (g);
 //				if (isPaged)
 				g.LogicalParent = this;
 				g.MouseDown += itemClick;
-			}
+			//}
 
 			if (iTemp.Expand != null && g is Expandable) {
 				Expandable e = g as Expandable;

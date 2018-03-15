@@ -78,9 +78,11 @@ namespace Crow
 			else
 				layoutType &= (~LayoutingType.Y);			
 		}
-		protected override int measureRawSize (LayoutingType lt)
+		protected override int measureRawSize(LayoutingType lt)
 		{
+			childrenRWLock.EnterReadLock ();
 			int totSpace = Math.Max(0, Spacing * (Children.Count (c => c.Visible) - 1));
+			childrenRWLock.ExitReadLock ();
 			if (lt == LayoutingType.Width) {
 				if (Orientation == Orientation.Horizontal)
 					return contentSize.Width + totSpace + 2 * Margin;
@@ -92,6 +94,7 @@ namespace Crow
 		public virtual void ComputeChildrenPositions()
 		{
 			int d = 0;
+			childrenRWLock.EnterReadLock ();
 			if (Orientation == Orientation.Horizontal) {
 				foreach (GraphicObject c in Children) {
 					if (!c.Visible)
@@ -107,6 +110,7 @@ namespace Crow
 					d += c.Slot.Height + Spacing;
 				}
 			}
+			childrenRWLock.ExitReadLock ();
 			IsDirty = true;
 		}
 		GraphicObject stretchedGO = null;
@@ -121,9 +125,7 @@ namespace Crow
 				//in the direction of stacking.
 				ComputeChildrenPositions ();
 
-				//if no layouting remains in queue for item, registre for redraw
-				if (RegisteredLayoutings == LayoutingType.None && IsDirty)
-					IFace.EnqueueForRepaint (this);
+				EnqueueForRepaint();
 
 				return true;
 			}

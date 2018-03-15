@@ -79,7 +79,7 @@ namespace Crow.Coding
 		protected abstract void updateEditorFromProjFile ();
 		protected abstract void updateProjFileFromEditor ();
 		protected abstract bool EditorIsDirty { get; set; }
-		protected virtual bool IsReady { get { return true; }}
+		protected virtual bool IsReady { get { return projFile != null; }}
 		protected virtual void updateCheckPostProcess () {}
 
 		protected void backgroundThreadFunc () {

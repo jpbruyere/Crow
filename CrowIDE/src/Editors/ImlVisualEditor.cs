@@ -432,7 +432,7 @@ namespace Crow.Coding
 				gr.Rectangle (cb, 2.0 / z);
 				string[] lerrs = Error.ToString ().Split ('\n');
 				Point p = cb.Center;
-				p.Y -= lerrs.Length * 20;
+				p.Y = 20;
 				foreach (string le in lerrs) {
 					drawCenteredTextLine(gr, p, le);
 					p.Y += 20;

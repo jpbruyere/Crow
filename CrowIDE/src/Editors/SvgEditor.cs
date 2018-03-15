@@ -91,7 +91,7 @@ namespace Crow.Coding
 		#endregion
 
 		#region GraphicObject overrides
-		protected override int measureRawSize (LayoutingType lt)
+		protected override int measureRawSize(LayoutingType lt)
 		{
 			if (_pic == null)
 				return 2 * Margin;
