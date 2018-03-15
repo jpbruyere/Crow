@@ -118,7 +118,7 @@ namespace Crow
 		#endregion
 
 		#region GraphicObject Overrides
-		protected override int measureRawSize (LayoutingType lt)
+		protected override int measureRawSize(LayoutingType lt)
 		{
 			int tmp = 0;
 			//Wrapper can't fit in the opposite direction of the wrapper, this func is called only if Fit
@@ -194,7 +194,6 @@ namespace Crow
 				return tmp + tallestChild + 2 * Margin;
 			}
 		}
-
 		public override bool UpdateLayout (LayoutingType layoutType)
 		{
 			RegisteredLayoutings &= (~layoutType);
@@ -205,9 +204,7 @@ namespace Crow
 
 				ComputeChildrenPositions ();
 
-				//if no layouting remains in queue for item, registre for redraw
-				if (RegisteredLayoutings == LayoutingType.None && IsDirty)
-					IFace.EnqueueForRepaint (this);
+				EnqueueForRepaint ();
 
 				return true;
 			}

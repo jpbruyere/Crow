@@ -243,14 +243,14 @@ namespace Crow
 					if (largestChild == null) {
 						//if still null, not possible to determine a width
 						//because all children are stretched, force first one to fit
-						Children [0].Width = Measure.Fit;
+						//Children [0].Width = Measure.Fit;
 						return -1;//cancel actual sizing to let child computation take place
 					}
 				} else {
 					if (tallestChild == null)
 						searchTallestChild ();
 					if (tallestChild == null) {
-						Children [0].Height = Measure.Fit;
+						//Children [0].Height = Measure.Fit;
 						return -1;
 					}
 				}
@@ -394,6 +394,7 @@ namespace Crow
 			#endif
 			largestChild = null;
 			contentSize.Width = 0;
+			childrenRWLock.EnterReadLock ();
 			for (int i = 0; i < Children.Count; i++) {
 				if (!Children [i].Visible)
 					continue;
@@ -404,6 +405,7 @@ namespace Crow
 					largestChild = Children [i];
 				}
 			}
+			childrenRWLock.ExitReadLock ();
 		}
 		void searchTallestChild(){
 			#if DEBUG_LAYOUTING
@@ -411,6 +413,7 @@ namespace Crow
 			#endif
 			tallestChild = null;
 			contentSize.Height = 0;
+			childrenRWLock.EnterReadLock ();
 			for (int i = 0; i < Children.Count; i++) {
 				if (!Children [i].Visible)
 					continue;
@@ -421,6 +424,7 @@ namespace Crow
 					tallestChild = Children [i];
 				}
 			}
+			childrenRWLock.ExitReadLock ();
 		}
 
 

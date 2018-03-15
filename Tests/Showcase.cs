@@ -63,7 +63,7 @@ namespace Tests
 			crowContainer = g.FindByName ("CrowContainer") as Container;
 			//I set an empty object as datasource at this level to force update when new
 			//widgets are added to the interface
-			crowContainer.DataSource = new object ();
+			//crowContainer.DataSource = new object ();
 			hideError ();
 		}
 

@@ -177,9 +177,13 @@ namespace Tests
 
 			this.KeyDown += KeyboardKeyDown1;
 
-			testFiles = new string [] { @"Interfaces/Experimental/testDock.crow" };
+			//testFiles = new string [] { @"Interfaces/Experimental/testDock.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/0.crow" };
+			testFiles = new string [] { @"Interfaces/TemplatedContainer/testTreeView.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
+//			testFiles = new string[] { @"Interfaces/TemplatedControl/testItemTemplateTag.crow" };
+
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
@@ -195,10 +199,10 @@ namespace Tests
 
 			Load(testFiles[idx]).DataSource = this;
 
-			LoadIMLFragment (@"<DockWindow Width=""150"" Height=""150"" Background=""DarkRed"" />", 0);
-			LoadIMLFragment (@"<DockWindow Width=""200"" Height=""150"" Background=""DarkGreen"" />", 0);
-			LoadIMLFragment (@"<DockWindow Width=""250"" Height=""150"" Background=""Brown"" />", 0);
-			LoadIMLFragment (@"<DockWindow Width=""300"" Height=""150"" Background=""DarkBlue"" />", 0);
+//			LoadIMLFragment (@"<DockWindow Width=""150"" Height=""150"" Background=""DarkRed"" />", 0);
+//			LoadIMLFragment (@"<DockWindow Width=""200"" Height=""150"" Background=""DarkGreen"" />", 0);
+//			LoadIMLFragment (@"<DockWindow Width=""250"" Height=""150"" Background=""Brown"" />", 0);
+//			LoadIMLFragment (@"<DockWindow Width=""300"" Height=""150"" Background=""DarkBlue"" />", 0);
 
 
 		}

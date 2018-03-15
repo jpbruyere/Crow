@@ -587,6 +587,9 @@ namespace Crow
 
 			Monitor.Exit (UpdateMutex);
 		}
+		#if DEBUG_LAYOUTING
+		public string BreakingName;
+		#endif
 		/// <summary>Layouting loop, this is the first step of the udpate and process registered
 		/// Layouting queue items. Failing LQI's are requeued in this cycle until MaxTry is reached which
 		/// trigger an enqueue for the next Update Cycle</summary>
@@ -604,6 +607,8 @@ namespace Crow
 					#if DEBUG_LAYOUTING
 					currentLQI = lqi;
 					curLQIsTries.Add(currentLQI);
+					if (lqi.graphicObject.Name == BreakingName)
+						Debugger.Break();
 					#endif
 					lqi.ProcessLayouting ();
 				}
