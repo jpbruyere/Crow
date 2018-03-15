@@ -477,7 +477,7 @@ namespace Crow.Coding
 					using (Surface ol = new ImageSurface (Format.Argb32, cb.Width, cb.Height)) {
 						using (Context ctx = new Context (ol)) {
 							ctx.SetSourceColor (Color.Black);
-							drawDesignOverlay (ctx, g, cb, hr, 0.4 / z, 4.5);
+							drawDesignOverlay (ctx, g, cb, hr, 0.4 / z, 6.5);
 						}
 							
 						gr.SetSourceSurface (ol, 0, 0);
@@ -508,7 +508,7 @@ namespace Crow.Coding
 			pic.Paint (gr, r);
 			gr.Operator = Operator.Over;
 		}
-		void drawDesignOverlay (Context gr, GraphicObject g, Rectangle cb, Rectangle hr, double coteStroke, double space = 4.5){
+		void drawDesignOverlay (Context gr, GraphicObject g, Rectangle cb, Rectangle hr, double coteStroke, double space = 6.5){
 			double z = zoom / 100.0;
 			double coteW = 3, coteL = 5;
 			bool fill = true;
