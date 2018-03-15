@@ -135,16 +135,16 @@ namespace Crow
 					Layoutable.RegisteredLayoutings |= LayoutType;
 					(Layoutable as GraphicObject).IFace.DiscardQueue.Enqueue (this);
 				}
-				#if DEBUG_LAYOUTING
+//				#if DEBUG_LAYOUTING
 				else
 					Debug.WriteLine ("\tDELETED    => " + this.ToString ());
-				#endif
+//				#endif
 			}
-			#if DEBUG_LAYOUTING
 			else{
 				if (LayoutingTries > 2 || DiscardCount > 0)
 					Debug.WriteLine (this.ToString ());
 			}
+			#if DEBUG_LAYOUTING
 			LQITime.Stop();
 			#endif
 			go.parentRWLock.ExitReadLock ();
