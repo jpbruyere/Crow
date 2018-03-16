@@ -285,11 +285,23 @@ namespace Crow
 				//if (HeightPolicy == Measure.Fit) {
 				if (tallestChild == null)
 					searchTallestChild (true);
+				if (tallestChild == null) {
+					if (Children.Count > 0)
+						Children [0].Height = Measure.Fit;
+					else
+						tallestChild.Height = Measure.Fit;
+				}
 				//}
 			} else if (lt == LayoutingType.Width) {
 				//if (WidthPolicy == Measure.Fit) {
 				if (largestChild == null)
 					searchLargestChild (true);
+				if (largestChild == null) {
+					if (Children.Count > 0)
+						Children [0].Width = Measure.Fit;
+					else
+						largestChild.Width = Measure.Fit;
+				}
 				//}
 			}
 		}
