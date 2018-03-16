@@ -62,12 +62,13 @@ namespace Crow
 				sharedPicture sp = sharedResources [path];
 				image = (byte[])sp.Data;
 				Dimensions = sp.Dims;
-				return;
+			} else {
+				using (Stream stream = iface.GetStreamFromPath (path)) {				
+					loadBitmap (new System.Drawing.Bitmap (stream));	
+				}
+				sharedResources [path] = new sharedPicture (image, Dimensions);
 			}
-			using (Stream stream = iface.GetStreamFromPath (path)) {				
-				loadBitmap (new System.Drawing.Bitmap (stream));	
-			}
-			sharedResources [path] = new sharedPicture (image, Dimensions);
+			Loaded = true;
 		}
 
 		//load image via System.Drawing.Bitmap, cairo load png only

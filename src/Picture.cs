@@ -74,6 +74,8 @@ namespace Crow
 		/// </summary>
 		public bool Scaled = true;
 
+		public bool Loaded = false;
+
 		#region CTOR
 		/// <summary>
 		/// Initializes a new instance of Picture.

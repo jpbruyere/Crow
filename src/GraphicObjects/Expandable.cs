@@ -127,5 +127,13 @@ namespace Crow
 
 			Collapse.Raise (this, e);
 		}
+
+		public override void onKeyDown (object sender, KeyboardKeyEventArgs e)
+		{
+			base.onKeyDown (sender, e);
+
+			if (e.Key == Key.Plus || e.Key == Key.KeypadPlus)
+				IsExpanded = !IsExpanded;
+		}
 	}
 }

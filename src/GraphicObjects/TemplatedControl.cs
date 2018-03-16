@@ -123,17 +123,25 @@ namespace Crow
 		/// <param name="gr">Backend context</param>
 		protected override void onDraw (Context gr)
 		{
-			gr.Save ();
+			if (child != null) {
 
-			if (ClipToClientRect) {
-				//clip to client zone
-				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
-				gr.Clip ();
+				gr.Save ();
+
+				if (ClipToClientRect) {
+					//clip to client zone
+					CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+					gr.Clip ();
+				}
+
+				if (child.requestedLayoutings != LayoutingType.None) 
+					child.RegisterForLayouting ();
+				else if (child.Visible)
+					child.Paint (ref gr);
+
+				gr.Restore ();
 			}
 
-			if (child != null)
-				child.Paint (ref gr);
-			gr.Restore ();
+
 		}
 		#endregion
 

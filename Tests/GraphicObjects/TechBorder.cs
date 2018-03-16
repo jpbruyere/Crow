@@ -33,7 +33,7 @@ namespace Tests
 		public TechBorder () : base() {}
 		public TechBorder (Interface iface): base (iface){}
 
-		protected override int measureRawSize(LayoutingType lt)
+		public override int measureRawSize(LayoutingType lt)
 		{
 			return base.measureRawSize (lt) + 6;
 		}

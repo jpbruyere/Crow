@@ -14,7 +14,7 @@
 						Foreground="Transparent"
 						Background="{./Background}">
 						<HorizontalStack HorizontalAlignment="Left" Margin="1">
-							<Image MaximumSize="10,10" Picture="{../../../../../Icon}"/>
+							<Image Width="10" Height="10" Picture="{../../../../../Icon}" />
 							<Label Text="{./Caption}"
 								Foreground="{./Foreground}"
 								Font="{./Font}"	/>

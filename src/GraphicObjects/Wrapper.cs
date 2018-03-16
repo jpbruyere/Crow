@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using Cairo;
 
 namespace Crow
 {
@@ -118,7 +119,7 @@ namespace Crow
 		#endregion
 
 		#region GraphicObject Overrides
-		protected override int measureRawSize(LayoutingType lt)
+		public override int measureRawSize(LayoutingType lt)
 		{
 			int tmp = 0;
 			//Wrapper can't fit in the opposite direction of the wrapper, this func is called only if Fit
@@ -219,19 +220,23 @@ namespace Crow
 			#endif
 			switch (layoutType) {
 			case LayoutingType.Width:
+				childrenRWLock.EnterReadLock ();
 				foreach (GraphicObject c in Children) {
 					if (c.Width.IsRelativeToParent)
 						c.RegisterForLayouting (LayoutingType.Width);
 				}
+				childrenRWLock.ExitReadLock ();
 				if (Height == Measure.Fit)
 					RegisterForLayouting (LayoutingType.Height);
 				RegisterForLayouting (LayoutingType.X);
 				break;
 			case LayoutingType.Height:
+				childrenRWLock.EnterReadLock ();
 				foreach (GraphicObject c in Children) {
 					if (c.Height.IsRelativeToParent)
 						c.RegisterForLayouting (LayoutingType.Height);
 				}
+				childrenRWLock.ExitReadLock ();
 				if (Width == Measure.Fit)
 					RegisterForLayouting (LayoutingType.Width);
 				RegisterForLayouting (LayoutingType.Y);

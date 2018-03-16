@@ -58,26 +58,27 @@ namespace Crow
 				sharedPicture sp = sharedResources [path];
 				hSVG = (Rsvg.Handle)sp.Data;
 				Dimensions = sp.Dims;
-				return;
-			}
-			using (Stream stream = iface.GetStreamFromPath (path)) {
-				using (MemoryStream ms = new MemoryStream ()) {
-					stream.CopyTo (ms);
+			} else {
+				using (Stream stream = iface.GetStreamFromPath (path)) {
+					using (MemoryStream ms = new MemoryStream ()) {
+						stream.CopyTo (ms);
 
-					hSVG = new Rsvg.Handle (ms.ToArray ());
-					Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
+						hSVG = new Rsvg.Handle (ms.ToArray ());
+						Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
+					}
 				}
+				sharedResources [path] = new sharedPicture (hSVG, Dimensions);
 			}
-			sharedResources [path] = new sharedPicture (hSVG, Dimensions);
+			Loaded = true;
 		}
 
 		public void LoadSvgFragment (string fragment) {			
 			hSVG = new Rsvg.Handle (System.Text.Encoding.Unicode.GetBytes(fragment));
 			Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
+			Loaded = true;
 		}
 
 		#region implemented abstract members of Fill
-
 		public override void SetAsSource (Context ctx, Rectangle bounds = default(Rectangle))
 		{
 			float widthRatio = 1f;

@@ -178,19 +178,22 @@ namespace Crow
 		{
 			base.onDraw (gr);
 
-			gr.Save ();
-
-			if (ClipToClientRect) {
-				//clip to client zone
-				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
-				gr.Clip ();
-			}
-
 			if (child != null) {
-				if (child.Visible)
+				gr.Save ();
+
+				if (ClipToClientRect) {
+					//clip to client zone
+					CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+					gr.Clip ();
+				}
+
+				if (child.requestedLayoutings != LayoutingType.None) 
+					child.RegisterForLayouting ();
+				else if (child.Visible)
 					child.Paint (ref gr);
+
+				gr.Restore ();
 			}
-			gr.Restore ();
 		}
 		protected override void UpdateCache (Context ctx)
 		{

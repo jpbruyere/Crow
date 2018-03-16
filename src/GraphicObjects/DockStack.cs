@@ -196,8 +196,14 @@ namespace Crow
 
 			childrenRWLock.EnterReadLock ();
 
-			foreach (GraphicObject g in Children)
-				g.Paint (ref gr);			
+			foreach (GraphicObject g in Children) {
+				if (!g.Visible)
+					continue;
+				if (g.requestedLayoutings != LayoutingType.None) 
+					g.RegisterForLayouting ();
+				else
+					g.Paint (ref gr);
+			}
 
 			childrenRWLock.ExitReadLock ();
 

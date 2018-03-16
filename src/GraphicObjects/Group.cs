@@ -32,6 +32,7 @@ using Cairo;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
+using System.Linq;
 
 
 namespace Crow
@@ -234,26 +235,16 @@ namespace Crow
 			}
 			return false;
 		}
-		protected override int measureRawSize (LayoutingType lt)
+		public override int measureRawSize (LayoutingType lt)
 		{
-			if (Children.Count > 0) {
-				if (lt == LayoutingType.Width) {
-					if (largestChild == null)
-						searchLargestChild ();
-					if (largestChild == null) {
-						//if still null, not possible to determine a width
-						//because all children are stretched, force first one to fit
-						//Children [0].Width = Measure.Fit;
-						return -1;//cancel actual sizing to let child computation take place
-					}
-				} else {
-					if (tallestChild == null)
-						searchTallestChild ();
-					if (tallestChild == null) {
-						//Children [0].Height = Measure.Fit;
+			if (lt == LayoutingType.Width) {
+				if (largestChild == null) {
+					if (!searchLargestChild ())
 						return -1;
-					}
 				}
+			} else if (tallestChild == null) {										
+				if (!searchTallestChild ())
+					return -1;
 			}
 			return base.measureRawSize (lt);
 		}
@@ -284,6 +275,24 @@ namespace Crow
 			}
 			childrenRWLock.ExitReadLock ();
 		}
+		// TODO: this could be reworked to measure each item
+		public override void LayoutingDiscardCheck (LayoutingType lt)
+		{
+			if (Children.Count == 0)
+				return;
+			base.LayoutingDiscardCheck (lt);
+			if (lt == LayoutingType.Height) {
+				//if (HeightPolicy == Measure.Fit) {
+				if (tallestChild == null)
+					searchTallestChild (true);
+				//}
+			} else if (lt == LayoutingType.Width) {
+				//if (WidthPolicy == Measure.Fit) {
+				if (largestChild == null)
+					searchLargestChild (true);
+				//}
+			}
+		}
 		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
@@ -297,12 +306,18 @@ namespace Crow
 			}
 
 			childrenRWLock.EnterReadLock ();
+			List<GraphicObject> visibles = Children.Where (c => c.Visible).ToList ();
+			childrenRWLock.ExitReadLock ();
+			if (visibles.Count == 0)
+				return;
 
-			foreach (GraphicObject g in Children) {
-				g.Paint (ref gr);
+			foreach (GraphicObject g in visibles) {
+				if (g.requestedLayoutings != LayoutingType.None) 
+					g.RegisterForLayouting ();
+				else
+					g.Paint (ref gr);
 			}
 
-			childrenRWLock.ExitReadLock ();
 			gr.Restore ();
 		}
 		protected override void UpdateCache (Context ctx)
@@ -328,16 +343,19 @@ namespace Crow
 				}
 
 				childrenRWLock.EnterReadLock ();
-
-				foreach (GraphicObject c in Children) {
-					if (!c.Visible)
-						continue;
+				List<GraphicObject> visibles = Children.Where (c => c.Visible).ToList();
+				childrenRWLock.ExitReadLock ();
+				if (visibles.Count == 0)
+					return;
+				
+				foreach (GraphicObject c in visibles) {
 					if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
 						continue;
-					c.Paint (ref gr);
+					if (c.requestedLayoutings != LayoutingType.None) 
+						c.RegisterForLayouting ();
+					else
+						c.Paint (ref gr);
 				}
-
-				childrenRWLock.ExitReadLock ();
 
 				#if DEBUG_CLIP_RECTANGLE
 				Clipping.stroke (gr, Color.Amaranth.AdjustAlpha (0.8));
@@ -388,43 +406,59 @@ namespace Crow
 			tallestChild = null;
 			contentSize = 0;
 		}
-		void searchLargestChild(){
+		bool searchLargestChild(bool measure = false){
 			#if DEBUG_LAYOUTING
 			Debug.WriteLine("\tSearch largest child");
 			#endif
 			largestChild = null;
 			contentSize.Width = 0;
 			childrenRWLock.EnterReadLock ();
-			for (int i = 0; i < Children.Count; i++) {
-				if (!Children [i].Visible)
-					continue;
-				if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
-					continue;
-				if (Children [i].Slot.Width > contentSize.Width) {
-					contentSize.Width = Children [i].Slot.Width;
-					largestChild = Children [i];
+			List<GraphicObject> visibles = Children.Where (c => c.Visible).ToList();
+			childrenRWLock.ExitReadLock ();
+			if (visibles.Count == 0)
+				return true;
+			foreach (GraphicObject c in visibles) {
+				int childWidth = 0;
+				if (measure)
+					childWidth = c.measureRawSize (LayoutingType.Width);
+				else {					
+					if (c.RegisteredLayoutings.HasFlag (LayoutingType.Width))
+						return false;
+					childWidth = c.Slot.Width;
+				}
+				if (childWidth > contentSize.Width) {
+					contentSize.Width = childWidth;
+					largestChild = c;
 				}
 			}
-			childrenRWLock.ExitReadLock ();
+			return true;
 		}
-		void searchTallestChild(){
+		bool searchTallestChild(bool measure = false){
 			#if DEBUG_LAYOUTING
 			Debug.WriteLine("\tSearch tallest child");
 			#endif
 			tallestChild = null;
 			contentSize.Height = 0;
 			childrenRWLock.EnterReadLock ();
-			for (int i = 0; i < Children.Count; i++) {
-				if (!Children [i].Visible)
-					continue;
-				if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
-					continue;
-				if (Children [i].Slot.Height > contentSize.Height) {
-					contentSize.Height = Children [i].Slot.Height;
-					tallestChild = Children [i];
+			List<GraphicObject> visibles = Children.Where (c => c.Visible).ToList();
+			childrenRWLock.ExitReadLock ();
+			if (visibles.Count == 0)
+				return true;
+			foreach (GraphicObject c in visibles) {
+				int childHeight = 0;
+				if (measure)
+					childHeight = c.measureRawSize (LayoutingType.Height);
+				else {
+					if (c.RegisteredLayoutings.HasFlag (LayoutingType.Height))
+						return false;
+					childHeight = c.Slot.Height;
+				}
+				if (childHeight > contentSize.Height) {
+					contentSize.Height = childHeight;
+					tallestChild = c;
 				}
 			}
-			childrenRWLock.ExitReadLock ();
+			return true;
 		}
 
 
@@ -444,21 +478,6 @@ namespace Crow
 			}
 			base.checkHoverWidget (e);
 		}
-//		public override bool PointIsIn (ref Point m)
-//		{
-//			if (!base.PointIsIn (ref m))
-//				return false;
-//			if (CurrentInterface.HoverWidget == this)
-//				return true;
-//			lock (Children) {
-//				for (int i = Children.Count - 1; i >= 0; i--) {
-//					if (Children [i].Slot.ContainsOrIsEqual (m) && !(bool)CurrentInterface.HoverWidget?.IsOrIsInside(Children[i])) {						
-//						return false;
-//					}
-//				}
-//			}
-//			return true;
-//		}
 		#endregion
 
 		protected override void Dispose (bool disposing)

@@ -78,16 +78,22 @@ namespace Crow
 			else
 				layoutType &= (~LayoutingType.Y);			
 		}
-		protected override int measureRawSize(LayoutingType lt)
+		public override int measureRawSize(LayoutingType lt)
 		{
 			childrenRWLock.EnterReadLock ();
 			int totSpace = Math.Max(0, Spacing * (Children.Count (c => c.Visible) - 1));
 			childrenRWLock.ExitReadLock ();
 			if (lt == LayoutingType.Width) {
-				if (Orientation == Orientation.Horizontal)
+				if (Orientation == Orientation.Horizontal) {
+					if (stretchedGO != null)
+						totSpace += stretchedGO.Slot.Width;
 					return contentSize.Width + totSpace + 2 * Margin;
-			}else if (Orientation == Orientation.Vertical)
-				return contentSize.Height + totSpace + 2 * Margin;							
+				}
+			} else if (Orientation == Orientation.Vertical) {
+				if (stretchedGO != null)
+					totSpace += stretchedGO.Slot.Height;				
+				return contentSize.Height + totSpace + 2 * Margin;
+			}
 			
 			return base.measureRawSize (lt);
 		}
@@ -136,10 +142,21 @@ namespace Crow
 		void adjustStretchedGo (LayoutingType lt){
 			if (stretchedGO == null)
 				return;
+			if (!stretchedGO.Visible) {
+				stretchedGO = null;
+				return;
+			}
+				
 			if (lt == LayoutingType.Width) {
-				int newW = Math.Max (
+				int newW = 0;
+
+				if (Width == Measure.Fit)
+					newW = stretchedGO.measureRawSize (LayoutingType.Width);
+				else 
+					newW = Math.Max (
 					           this.ClientRectangle.Width - contentSize.Width - Spacing * (Children.Count - 1),
 					           stretchedGO.MinimumSize.Width);
+				
 				if (stretchedGO.MaximumSize.Width > 0)
 					newW = Math.Min (newW, stretchedGO.MaximumSize.Width);
 				if (newW != stretchedGO.Slot.Width) {							
@@ -154,9 +171,15 @@ namespace Crow
 					stretchedGO.LastSlots.Width = stretchedGO.Slot.Width;
 				}
 			} else {
-				int newH = Math.Max (
-					this.ClientRectangle.Height - contentSize.Height - Spacing * (Children.Count - 1),
-					stretchedGO.MinimumSize.Height);
+				int newH = 0;
+
+				if (Height == Measure.Fit)
+					newH = stretchedGO.measureRawSize (LayoutingType.Height);
+				else
+					newH = Math.Max (
+						this.ClientRectangle.Height - contentSize.Height - Spacing * (Children.Count - 1),
+						stretchedGO.MinimumSize.Height);
+				
 				if (stretchedGO.MaximumSize.Height > 0)
 					newH = Math.Min (newH, stretchedGO.MaximumSize.Height);
 				if (newH != stretchedGO.Slot.Height) {
@@ -181,7 +204,7 @@ namespace Crow
 			case LayoutingType.Width:
 				if (Orientation == Orientation.Horizontal) {
 					if (go.Width == Measure.Stretched) {
-						if (stretchedGO == null && Width != Measure.Fit)
+						if (stretchedGO == null)
 							stretchedGO = go;
 						else if (stretchedGO != go) {
 							go.Slot.Width = 0;
@@ -203,7 +226,7 @@ namespace Crow
 			case LayoutingType.Height:
 				if (Orientation == Orientation.Vertical) {
 					if (go.Height == Measure.Stretched) {
-						if (stretchedGO == null && Height != Measure.Fit)
+						if (stretchedGO == null)
 							stretchedGO = go;
 						else if (stretchedGO != go){
 							go.Slot.Height = 0;
@@ -244,5 +267,11 @@ namespace Crow
 			else				
 				adjustStretchedGo (LayoutingType.Height);			
 		}
+//		public override void LayoutingDiscardCheck (LayoutingType lt)
+//		{
+//			if ((lt == LayoutingType.Height && _orientation == Orientation.Horizontal) ||
+//				(lt == LayoutingType.Width && _orientation == Orientation.Vertical))
+//				base.LayoutingDiscardCheck (lt);
+//		}
 	}
 }
