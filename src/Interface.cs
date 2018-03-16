@@ -134,10 +134,10 @@ namespace Crow
 		public const int MaxCacheSize = 2048;
 		/// <summary> Above this count, the layouting is discard from the current
 		/// update cycle and requeued for the next</summary>
-		public const int MaxLayoutingTries = 3;
+		public const int MaxLayoutingTries = 30;
 		/// <summary> Above this count, the layouting is discard for the widget and it
 		/// will not be rendered on screen </summary>
-		public const int MaxDiscardCount = 5;
+		public const int MaxDiscardCount = 3;
 		/// <summary> Global font rendering settings for Cairo </summary>
 		public static FontOptions FontRenderingOptions;
 		/// <summary> Global font rendering settings for Cairo </summary>

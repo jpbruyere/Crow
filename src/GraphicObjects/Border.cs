@@ -122,7 +122,7 @@ namespace Crow
 			}
 		}
 
-		protected override int measureRawSize(LayoutingType lt)
+		public override int measureRawSize(LayoutingType lt)
 		{
 			int tmp = base.measureRawSize (lt);
 			return tmp < 0 ? tmp : tmp + 2 * BorderWidth;
@@ -130,17 +130,20 @@ namespace Crow
 		protected override void onDraw (Context gr)
 		{
 			drawborder2 (gr);
+			if (child != null) {
+				gr.Save ();
+				if (ClipToClientRect) {
+					//clip to client zone
+					CairoHelpers.CairoRectangle (gr, ClientRectangle,Math.Max(0.0, CornerRadius-Margin));
+					gr.Clip ();
+				}
 
-			gr.Save ();
-			if (ClipToClientRect) {
-				//clip to client zone
-				CairoHelpers.CairoRectangle (gr, ClientRectangle,Math.Max(0.0, CornerRadius-Margin));
-				gr.Clip ();
+				if (child.requestedLayoutings != LayoutingType.None) 
+					child.RegisterForLayouting ();
+				else if (child.Visible)
+					child.Paint (ref gr);
+				gr.Restore ();
 			}
-
-			if (child != null)
-				child.Paint (ref gr);
-			gr.Restore ();
 		}
 		void drawborder2(Context gr){
 			Rectangle rBack = new Rectangle (Slot.Size);

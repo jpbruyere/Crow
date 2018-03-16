@@ -663,6 +663,8 @@ namespace Crow
 					Measure.Stretched : height;
 			}
 			set {
+				if (Name == "colIco" && value == Measure.Fit)
+					Debugger.Break ();
 				if (height == value)
 					return;
 				if (value.IsFixed) {
@@ -1386,7 +1388,7 @@ namespace Crow
 		protected void EnqueueForRepaint (){
 			//if no layouting remains in queue for item, registre for redraw
 			if (requestedLayoutings != LayoutingType.None)
-				RegisterForLayouting (LayoutingType.None);
+				RegisterForLayouting ();
 			else if (RegisteredLayoutings == LayoutingType.None && IsDirty)
 				IFace.EnqueueForRepaint (this);			
 		}
@@ -1395,7 +1397,7 @@ namespace Crow
 		#region Layouting
 
 		/// <summary> return size of content + margins </summary>
-		protected virtual int measureRawSize (LayoutingType lt) {
+		public virtual int measureRawSize (LayoutingType lt) {
 			return lt == LayoutingType.Width ?
 				contentSize.Width + 2 * Margin: contentSize.Height + 2 * Margin;
 		}
@@ -1403,7 +1405,7 @@ namespace Crow
 		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){
 		}
 		public virtual bool ArrangeChildren { get { return false; } }
-		public virtual void RegisterForLayouting(LayoutingType layoutType){
+		public virtual void RegisterForLayouting(LayoutingType layoutType = LayoutingType.None){
 			if (Parent == null || !Monitor.TryEnter(IFace.LayoutMutex)) {
 				requestedLayoutings |= layoutType;
 //				if (registeredLayoutings != LayoutingType.None)
@@ -1468,7 +1470,6 @@ namespace Crow
 //				Debug.WriteLine ("\t\t{2}: {0} => {1}",LastSlots,Slot,this.name);
 //			}
 //			#endif
-
 			switch (layoutType) {
 			case LayoutingType.Width:
 				RegisterForLayouting (LayoutingType.X);
@@ -1497,25 +1498,28 @@ namespace Crow
 
 			switch (layoutType) {
 			case LayoutingType.X:
-				if (Left == 0) {
+				if (Visible) {
+					if (Left == 0) {
 
-					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width) ||
-					    RegisteredLayoutings.HasFlag (LayoutingType.Width))
-						return false;
+						if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width) ||
+						    RegisteredLayoutings.HasFlag (LayoutingType.Width))
+							return false;
 
-					switch (HorizontalAlignment) {
-					case HorizontalAlignment.Left:
-						Slot.X = 0;
-						break;
-					case HorizontalAlignment.Right:
-						Slot.X = Parent.ClientRectangle.Width - Slot.Width;
-						break;
-					case HorizontalAlignment.Center:
-						Slot.X = Parent.ClientRectangle.Width / 2 - Slot.Width / 2;
-						break;
-					}
+						switch (HorizontalAlignment) {
+						case HorizontalAlignment.Left:
+							Slot.X = 0;
+							break;
+						case HorizontalAlignment.Right:
+							Slot.X = Parent.ClientRectangle.Width - Slot.Width;
+							break;
+						case HorizontalAlignment.Center:
+							Slot.X = Parent.ClientRectangle.Width / 2 - Slot.Width / 2;
+							break;
+						}
+					} else
+						Slot.X = Left;
 				} else
-					Slot.X = Left;
+					Slot.X = 0;
 
 				if (LastSlots.X == Slot.X)
 					break;
@@ -1527,26 +1531,29 @@ namespace Crow
 				LastSlots.X = Slot.X;
 				break;
 			case LayoutingType.Y:
-				if (Top == 0) {
+				if (Visible) {
+					if (Top == 0) {
 
-					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height) ||
-					    RegisteredLayoutings.HasFlag (LayoutingType.Height))
-						return false;
+						if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height) ||
+						    RegisteredLayoutings.HasFlag (LayoutingType.Height))
+							return false;
 
-					switch (VerticalAlignment) {
-					case VerticalAlignment.Top://this could be processed even if parent Height is not known
-						Slot.Y = 0;
-						break;
-					case VerticalAlignment.Bottom:
-						Slot.Y = Parent.ClientRectangle.Height - Slot.Height;
-						break;
-					case VerticalAlignment.Center:
-						Slot.Y = Parent.ClientRectangle.Height / 2 - Slot.Height / 2;
-						break;
-					}
+						switch (VerticalAlignment) {
+						case VerticalAlignment.Top://this could be processed even if parent Height is not known
+							Slot.Y = 0;
+							break;
+						case VerticalAlignment.Bottom:
+							Slot.Y = Parent.ClientRectangle.Height - Slot.Height;
+							break;
+						case VerticalAlignment.Center:
+							Slot.Y = Parent.ClientRectangle.Height / 2 - Slot.Height / 2;
+							break;
+						}
+					} else
+						Slot.Y = Top;
 				} else
-					Slot.Y = Top;
-
+					Slot.Y = 0;
+				
 				if (LastSlots.Y == Slot.Y)
 					break;
 
@@ -1636,6 +1643,16 @@ namespace Crow
 			EnqueueForRepaint ();
 
 			return true;
+		}
+		/// <summary>
+		/// Run after layouting item has been discarded for the first time,
+		/// check if sizing has no conflicting rules like fit container, and children all
+		/// stretched.
+		/// </summary>
+		public virtual void LayoutingDiscardCheck (LayoutingType lt) {
+			//#if DEBUG_LAYOUTING
+			Debug.WriteLine ("LayoutingDiscardCheck for {0}",this.ToString());
+			// #endif
 		}
 		#endregion
 
@@ -1738,9 +1755,17 @@ namespace Crow
 
         #region Keyboard handling
 		public virtual void onKeyDown(object sender, KeyboardKeyEventArgs e){
+			GraphicObject p = focusParent;
+			if (p != null)
+				p.onKeyDown(sender,e);
+			
 			KeyDown.Raise (sender, e);
 		}
 		public virtual void onKeyUp(object sender, KeyboardKeyEventArgs e){
+			GraphicObject p = focusParent;
+			if (p != null)
+				p.onKeyUp(sender,e);
+
 			KeyUp.Raise (sender, e);
 		}
 		public virtual void onKeyPress(object sender, KeyPressEventArgs e){
@@ -1931,7 +1956,7 @@ namespace Crow
 			Disabled.Raise (this, e);
 		}
 		protected virtual void onParentChanged(object sender, DataSourceChangeEventArgs e) {			
-			RegisterForLayouting (LayoutingType.None);
+			RegisterForLayouting ();
 			
 			ParentChanged.Raise (this, e);
 			if (logicalParent == null)

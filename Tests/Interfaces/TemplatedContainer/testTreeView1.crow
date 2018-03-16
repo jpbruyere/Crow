@@ -1,0 +1,35 @@
+﻿<?xml version="1.0"?>
+<Container Width="500">
+	<TreeView Data="{TestTree}" Focusable="true">
+		<Template>
+				<VerticalStack
+					Height="Fit" Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
+		</Template>
+		<ItemTemplate DataType="Tests.TestContainer" Data="Children">
+			<Expandable Caption="{Name}" Focusable="true">
+				<Template>
+					<VerticalStack>
+						<HorizontalStack Spacing="1" Margin="3" Background="Brown">
+							<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
+								Path="{./Image}"
+								Visible="{./IsExpandable}"
+								SvgSub="{./IsExpanded}"
+								MouseEnter="{Background=LightGray}"
+								MouseLeave="{Background=Transparent}"/>
+							<Label Text="{./Caption}"/>
+						</HorizontalStack>
+						<Container Name="Content" Visible="false"/>
+					</VerticalStack>
+				</Template>
+				<VerticalStack Height="Fit" Name="ItemsContainer"/>
+			</Expandable>		
+		</ItemTemplate>
+		<ItemTemplate DataType="Tests.TestItem" >
+				<HorizontalStack Margin="0" Background="Teal">
+					<GraphicObject Width="5" Height="5" Background="Green"/>
+					<Label Text="{Name}" Width="Stretched"/>
+				</HorizontalStack>
+		</ItemTemplate>
+
+	</TreeView>
+</Container>

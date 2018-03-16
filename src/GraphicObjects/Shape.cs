@@ -145,7 +145,7 @@ namespace Crow
 				}
 			}
 		}
-		protected override int measureRawSize(LayoutingType lt)
+		public override int measureRawSize(LayoutingType lt)
 		{
 			if ((lt == LayoutingType.Width && contentSize.Width == 0) || (lt == LayoutingType.Height && contentSize.Height == 0)) {
 				using (Surface drawing = new ImageSurface (Format.A1, 1,1)) {

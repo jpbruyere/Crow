@@ -36,6 +36,12 @@ using System.Diagnostics;
 
 namespace Tests
 {
+	public class TestContainer : TestItem {			
+		public List<TestItem> Children;
+	}
+	public class TestItem {
+		public string Name;
+	}
 	class BasicTests : CrowWindow
 	{
 		public BasicTests ()
@@ -52,10 +58,20 @@ namespace Tests
 			}
 		}
 
+
+
 		#region Test values for Binding
 		public List<Crow.Command> Commands;
 		public int intValue = 500;
 		DirectoryInfo curDir = new DirectoryInfo (Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+		public List<TestContainer> TestTree = new List<TestContainer>(
+			new TestContainer[] {
+				new TestContainer() { Name = "main", Children = new List<TestItem>(
+						new TestItem[] {
+							new TestItem() { Name="item1"},
+							new TestItem() { Name="item2"}
+						}
+				)}});
 		//DirectoryInfo curDir = new DirectoryInfo (@"/mnt/data/Images");
 		public FileSystemInfo[] CurDirectory {
 			get { return curDir.GetFileSystemInfos (); }
@@ -178,9 +194,9 @@ namespace Tests
 			this.KeyDown += KeyboardKeyDown1;
 
 			//testFiles = new string [] { @"Interfaces/Experimental/testDock.crow" };
-			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/0.crow" };
-			testFiles = new string [] { @"Interfaces/TemplatedContainer/testTreeView.crow" };
+			//testFiles = new string [] { @"Interfaces/TemplatedContainer/testTreeView.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
 //			testFiles = new string[] { @"Interfaces/TemplatedControl/testItemTemplateTag.crow" };
 
@@ -199,6 +215,7 @@ namespace Tests
 
 			Load(testFiles[idx]).DataSource = this;
 
+			showTarget = FindByName ("ShowTarget");
 //			LoadIMLFragment (@"<DockWindow Width=""150"" Height=""150"" Background=""DarkRed"" />", 0);
 //			LoadIMLFragment (@"<DockWindow Width=""200"" Height=""150"" Background=""DarkGreen"" />", 0);
 //			LoadIMLFragment (@"<DockWindow Width=""250"" Height=""150"" Background=""Brown"" />", 0);
@@ -206,6 +223,7 @@ namespace Tests
 
 
 		}
+		GraphicObject showTarget;
 		void KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
 			try {
@@ -214,8 +232,9 @@ namespace Tests
 				Quit (null, null);
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F1) {
-				TestList.Add ("new string");
-				NotifyValueChanged ("TestList", TestList);
+//				TestList.Add ("new string");
+//				NotifyValueChanged ("TestList", TestList);
+					showTarget.Visible = !showTarget.Visible;
 				return;
 			} else if (e.Key == OpenTK.Input.Key.F4) {
 				GraphicObject w = Load ("Interfaces/TemplatedContainer/testWindow.goml");

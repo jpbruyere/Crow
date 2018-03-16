@@ -1,0 +1,45 @@
+﻿<?xml version="1.0"?>
+<TreeView Data="{TestTree}">
+	<Template>
+			<VerticalStack
+				Height="Fit" Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
+	</Template>
+	<ItemTemplate DataType="Tests.TestContainer" Data="Children">
+		<Expandable Caption="{Name}" >
+			<Template>
+				<VerticalStack>
+					<Border Style="TreeItemBorder" Focusable="false" MouseDoubleClick="./onClickForExpand">
+						<HorizontalStack Spacing="1">
+							<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
+								Path="{./Image}"
+								Visible="{./IsExpandable}"
+								SvgSub="{./IsExpanded}"
+								MouseEnter="{Background=LightGray}"
+								MouseLeave="{Background=Transparent}"/>
+							<Image Style="TreeIcon"
+								Path="#Crow.Icons.crowproj.svg"/>
+							<GraphicObject Width="2" Height="9" Background="Green" Visible="{IsStartupProject}"/>
+							<Label Text="{./Caption}"/>
+						</HorizontalStack>
+					</Border>
+					<Container Name="Content" Visible="false"/>
+				</VerticalStack>
+			</Template>
+			<HorizontalStack Height="Fit">
+				<GraphicObject Width="8" Height="10"/>
+				<VerticalStack Height="Fit" Name="ItemsContainer"/>
+			</HorizontalStack>
+		</Expandable>		
+	</ItemTemplate>
+	<ItemTemplate DataType="Tests.TestItem" >
+		<Border Style="TreeItemBorder">
+			<HorizontalStack>
+				<GraphicObject Width="5" Height="5"/>
+				<Image Style="TreeIcon"
+					Path="#Crow.Icons.assembly.svg"/>
+				<Label Text="{Name}" Width="Stretched"/>
+			</HorizontalStack>
+		</Border>
+	</ItemTemplate>
+
+</TreeView>

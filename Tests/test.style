@@ -32,3 +32,18 @@ labPerfVal{
 	Font = "droid, 8";
 	Width = "50%";
 }
+TreeItemBorder {
+	CornerRadius="2";
+	Margin="0";
+	Focusable="true";
+	Height="Fit";
+	Width="Stretched";
+	Foreground="Transparent";
+	MouseEnter="{Foreground=DimGray}";
+	MouseLeave="{Foreground=Transparent}";
+}
+TreeIcon {
+	Margin="0";
+	Width="14";
+	Height="14";
+}

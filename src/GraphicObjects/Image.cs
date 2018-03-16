@@ -129,6 +129,12 @@ namespace Crow
 				if (_pic == value)
 					return;
 				_pic = value;
+				if (_pic!=null){
+					if (!_pic.Loaded)
+						_pic.Load (IFace, _pic.Path);
+					Scaled = _pic.Scaled;
+					KeepProportions = _pic.KeepProportions;
+				}
 				NotifyValueChanged ("Picture", _pic);
 				RegisterForGraphicUpdate ();
 			}
@@ -182,7 +188,7 @@ namespace Crow
 		#endregion
 
 		#region GraphicObject overrides
-		protected override int measureRawSize (LayoutingType lt)
+		public override int measureRawSize (LayoutingType lt)
 		{
 			if (_pic == null)
 				return 2 * Margin;

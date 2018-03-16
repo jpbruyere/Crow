@@ -204,16 +204,20 @@ namespace Crow
 			CairoHelpers.CairoRectangle(gr,rBack, CornerRadius);
 			gr.Fill ();
 
-			gr.Save ();
-			if (ClipToClientRect) {
-				//clip to scrolled client zone
-				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
-				gr.Clip ();
-			}
+			if (child != null) {
+				gr.Save ();
+				if (ClipToClientRect) {
+					//clip to scrolled client zone
+					CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+					gr.Clip ();
+				}
 
-			gr.Translate (-ScrollX, -ScrollY);
-			if (child != null)
-				child.Paint (ref gr);
+				gr.Translate (-ScrollX, -ScrollY);
+				if (child.requestedLayoutings != LayoutingType.None) 
+					child.RegisterForLayouting ();
+				else if (child.Visible)
+					child.Paint (ref gr);
+			}
 			gr.Restore ();
 		}
 

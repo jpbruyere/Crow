@@ -129,6 +129,7 @@ namespace Crow
 					#if DEBUG_LAYOUTING
 					Debug.WriteLine ("\t\tDiscarded");
 					#endif
+					go.LayoutingDiscardCheck (LayoutType);
 					LayoutingTries = 0;
 					DiscardCount++;
 					Layoutable.RegisteredLayoutings |= LayoutType;
