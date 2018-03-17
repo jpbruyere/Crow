@@ -1500,22 +1500,15 @@ namespace Crow
 			case LayoutingType.X:
 				if (Visible) {
 					if (Left == 0) {
-
-						if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width) ||
-						    RegisteredLayoutings.HasFlag (LayoutingType.Width))
-							return false;
-
-						switch (HorizontalAlignment) {
-						case HorizontalAlignment.Left:
+						if (HorizontalAlignment == HorizontalAlignment.Left)
 							Slot.X = 0;
-							break;
-						case HorizontalAlignment.Right:
+						else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width) ||
+							RegisteredLayoutings.HasFlag (LayoutingType.Width))
+							return false;
+						else if (HorizontalAlignment == HorizontalAlignment.Right)
 							Slot.X = Parent.ClientRectangle.Width - Slot.Width;
-							break;
-						case HorizontalAlignment.Center:
+						else if (HorizontalAlignment == HorizontalAlignment.Center)
 							Slot.X = Parent.ClientRectangle.Width / 2 - Slot.Width / 2;
-							break;
-						}
 					} else
 						Slot.X = Left;
 				} else
@@ -1533,22 +1526,15 @@ namespace Crow
 			case LayoutingType.Y:
 				if (Visible) {
 					if (Top == 0) {
-
-						if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height) ||
-						    RegisteredLayoutings.HasFlag (LayoutingType.Height))
-							return false;
-
-						switch (VerticalAlignment) {
-						case VerticalAlignment.Top://this could be processed even if parent Height is not known
+						if (VerticalAlignment == VerticalAlignment.Top)
 							Slot.Y = 0;
-							break;
-						case VerticalAlignment.Bottom:
+						else if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height) ||
+							RegisteredLayoutings.HasFlag (LayoutingType.Height))
+							return false;
+						else if (VerticalAlignment == VerticalAlignment.Bottom)
 							Slot.Y = Parent.ClientRectangle.Height - Slot.Height;
-							break;
-						case VerticalAlignment.Center:
+						else if (VerticalAlignment == VerticalAlignment.Center)
 							Slot.Y = Parent.ClientRectangle.Height / 2 - Slot.Height / 2;
-							break;
-						}
 					} else
 						Slot.Y = Top;
 				} else

@@ -267,11 +267,11 @@ namespace Crow
 			else				
 				adjustStretchedGo (LayoutingType.Height);			
 		}
-//		public override void LayoutingDiscardCheck (LayoutingType lt)
-//		{
-//			if ((lt == LayoutingType.Height && _orientation == Orientation.Horizontal) ||
-//				(lt == LayoutingType.Width && _orientation == Orientation.Vertical))
-//				base.LayoutingDiscardCheck (lt);
-//		}
+		public override void LayoutingDiscardCheck (LayoutingType lt)
+		{
+			if ((lt == LayoutingType.Height && _orientation == Orientation.Horizontal) ||
+				(lt == LayoutingType.Width && _orientation == Orientation.Vertical))
+				base.LayoutingDiscardCheck (lt);
+		}
 	}
 }
