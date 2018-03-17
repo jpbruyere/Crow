@@ -1,7 +1,12 @@
 ﻿<?xml version="1.0"?>
-<Window Width="50%" Height="50%" Background="DimGray">
-	<TreeView IsRoot="true" Name="treeView" Data="{LQIs}">
-		<ItemTemplate DataType="Crow.LayoutingQueueItem" Data="triggeredLQIs">
+<DockWindow Name="winLQIs" Caption="Layouting Queue Items Explorer" Width="40%" Height="80%">
+	<VerticalStack DataSource="{CurrentSolution}">
+		<TreeView DataSource="{SelectedItem}" Name="treeView" Data="{LQIs}">
+		</TreeView>
+	</VerticalStack>
+</DockWindow>
+
+<!--		<ItemTemplate DataType="Crow.LayoutingQueueItem" Data="triggeredLQIs">
 			<Expandable>
 				<Template>
 					<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}">
@@ -62,4 +67,4 @@
 			</Expandable>
 		</ItemTemplate>
 	</TreeView>
-</Window>
+</Window>-->

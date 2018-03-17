@@ -54,9 +54,12 @@ namespace Crow.Coding
 					return;
 				instance = value;
 				NotifyValueChanged ("Instance", instance);
+				NotifyValueChanged ("LQIs", LQIs);
 			}
 		}
-			
+		public List<LQIList> LQIs {
+			get { return instance == null ? null : instance.IFace.LQIs; }
+		}			
 		public Measure DesignWidth {
 			get { return designWidth; }
 			set { 

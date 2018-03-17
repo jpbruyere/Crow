@@ -24,7 +24,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <DefineConstants>DEBUG;DBG_EVENTS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -146,7 +146,6 @@
     <EmbeddedResource Include="ui\MembersView.template">
       <LogicalName>Crow.Coding.MembersView.template</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="ui\LQIsExplorer.crow" />
     <EmbeddedResource Include="ui\MemberView.crow" />
     <EmbeddedResource Include="ui\ProjectProperties.crow" />
     <EmbeddedResource Include="ui\TreeExpandable.template">
@@ -298,6 +297,7 @@
     <EmbeddedResource Include="ui\DockWindows\winStyleView.crow" />
     <EmbeddedResource Include="ui\CategoryExp.template" />
     <EmbeddedResource Include="ui\DockWindows\winDesign.crow" />
+    <EmbeddedResource Include="ui\DockWindows\winLQIs.crow" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">
