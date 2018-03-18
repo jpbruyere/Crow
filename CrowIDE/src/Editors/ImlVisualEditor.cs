@@ -360,12 +360,14 @@ namespace Crow.Coding
 		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseEnter (sender, e);
+			if (IFace.DragAndDropOperation != null && draggedObj == null)
+				return;
 			IFace.FocusedWidget = this;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			IFace.FocusedWidget = null;
+//			IFace.FocusedWidget = null;
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
