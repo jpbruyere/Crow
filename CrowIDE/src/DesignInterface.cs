@@ -170,9 +170,11 @@ namespace Crow.Coding
 					//Console.WriteLine (lqi.ToString ());
 					#if DEBUG_LAYOUTING
 					currentLQI = lqi;
+					currentLQI.ProcessLayouting ();
 					curLQIsTries.Add(currentLQI);
-					#endif
+					#else
 					lqi.ProcessLayouting ();
+					#endif
 				}
 				LayoutingQueue = DiscardQueue;
 				Monitor.Exit (LayoutMutex);

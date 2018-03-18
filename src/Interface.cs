@@ -606,11 +606,11 @@ namespace Crow
 					lqi = LayoutingQueue.Dequeue ();
 					#if DEBUG_LAYOUTING
 					currentLQI = lqi;
+					currentLQI.ProcessLayouting ();
 					curLQIsTries.Add(currentLQI);
-					if (lqi.graphicObject.Name == BreakingName)
-						Debugger.Break();
-					#endif
+					#else
 					lqi.ProcessLayouting ();
+					#endif
 				}
 				LayoutingQueue = DiscardQueue;
 				Monitor.Exit (LayoutMutex);

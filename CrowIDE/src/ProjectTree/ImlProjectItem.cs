@@ -58,7 +58,7 @@ namespace Crow.Coding
 			}
 		}
 		public List<LQIList> LQIs {
-			get { return instance == null ? null : instance.IFace.LQIs; }
+			get { return instance == null ? null : instance.IFace.LQIsTries; }
 		}			
 		public Measure DesignWidth {
 			get { return designWidth; }

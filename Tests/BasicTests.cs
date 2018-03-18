@@ -215,7 +215,7 @@ namespace Tests
 
 			Load(testFiles[idx]).DataSource = this;
 
-			showTarget = FindByName ("ShowTarget");
+//			showTarget = FindByName ("ShowTarget");
 //			LoadIMLFragment (@"<DockWindow Width=""150"" Height=""150"" Background=""DarkRed"" />", 0);
 //			LoadIMLFragment (@"<DockWindow Width=""200"" Height=""150"" Background=""DarkGreen"" />", 0);
 //			LoadIMLFragment (@"<DockWindow Width=""250"" Height=""150"" Background=""Brown"" />", 0);

@@ -1463,7 +1463,7 @@ namespace Crow
 			#if DEBUG_LAYOUTING
 			IFace.currentLQI.Slot = LastSlots;
 			IFace.currentLQI.NewSlot = Slot;
-			Debug.WriteLine ("\t\t{0} => {1}",LastSlots,Slot);
+			//Debug.WriteLine ("\t\t{0} => {1}",LastSlots,Slot);
 			#endif
 //			#if DESIGN_MODE
 //			if (IFace.GetType().Name == "DesignInterface"){
@@ -1637,7 +1637,7 @@ namespace Crow
 		/// </summary>
 		public virtual void LayoutingDiscardCheck (LayoutingType lt) {
 			//#if DEBUG_LAYOUTING
-			Debug.WriteLine ("LayoutingDiscardCheck for {0}",this.ToString());
+			//Debug.WriteLine ("LayoutingDiscardCheck for {0}",this.ToString());
 			// #endif
 		}
 		#endregion

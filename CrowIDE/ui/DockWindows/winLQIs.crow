@@ -1,7 +1,46 @@
 ﻿<?xml version="1.0"?>
-<DockWindow Name="winLQIs" Caption="Layouting Queue Items Explorer" Width="40%" Height="80%">
+<DockWindow Name="winLQIs" Caption="Layouting Queue Items Explorer" Width="90%" Height="80%">
 	<VerticalStack DataSource="{CurrentSolution}">
 		<TreeView DataSource="{SelectedItem}" Name="treeView" Data="{LQIs}">
+			<ItemTemplate DataType="Crow.LQIList" Data="CompletedLQIs">
+				<Expandable Caption="{Count}">
+					<Template>
+						<VerticalStack>
+							<Border Style="TreeItemBorder" Focusable="false" MouseDoubleClick="./onClickForExpand">
+								<HorizontalStack Spacing="1">
+									<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
+										Path="{./Image}"
+										Visible="{./IsExpandable}"
+										SvgSub="{./IsExpanded}"
+										MouseEnter="{Background=LightGray}"
+										MouseLeave="{Background=Transparent}"/>
+									<Image Style="TreeIcon"
+										Path="#Crow.Icons.crowproj.svg"/>
+									<GraphicObject Width="2" Height="9" Background="Green" Visible="{IsStartupProject}"/>
+									<Label Text="{./Caption}"/>
+								</HorizontalStack>
+							</Border>
+							<Container Name="Content" Visible="false"/>
+						</VerticalStack>
+					</Template>
+					<HorizontalStack Height="Fit">
+						<GraphicObject Width="8" Height="10"/>
+						<VerticalStack Height="Fit" Name="ItemsContainer"/>
+					</HorizontalStack>
+				</Expandable>
+			</ItemTemplate>
+			<ItemTemplate DataType="Crow.LayoutingQueueItem">
+				<HorizontalStack Height="Fit" Focusable="true" Tooltip="{FullName}">
+					<Label Text="{LayoutingTries}" Width="18" Background="White" Foreground="Black"/>
+					<Label Text="{DiscardCount}" Width="18" Background="White" Foreground="Black"/>
+					<Label Text="{Name}" Width="130" Background="White" Foreground="Black"/>
+					<Label Text="{LayoutType}" Width="50" Background="White" Foreground="Black"/>
+					<Label Text="{Slot}" Width="50" Background="White" Foreground="Black"/>
+					<Label Text="{NewSlot}" Width="50" Background="White" Foreground="Black"/>
+					<Label Text="{Message}" Width="Stretched" Background="White" Foreground="Black"/>
+				</HorizontalStack>
+			</ItemTemplate>
+
 		</TreeView>
 	</VerticalStack>
 </DockWindow>

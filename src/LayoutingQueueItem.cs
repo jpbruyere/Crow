@@ -49,7 +49,7 @@ namespace Crow
 	/// Element class of the LayoutingQueue
 	/// </summary>
 	public struct LayoutingQueueItem
-	{
+	{		
 		/// <summary> Instance of widget to be layouted</summary>
 		public ILayoutable Layoutable;
 		/// <summary> Bitfield containing the element of the layout to performs (x|y|width|height)</summary>
@@ -58,6 +58,7 @@ namespace Crow
 		public int LayoutingTries, DiscardCount;
 
 		#if DEBUG_LAYOUTING
+		public string Message;
 		public Stopwatch LQITime;
 		public GraphicObject graphicObject {
 			get { return Layoutable as GraphicObject; }
@@ -87,9 +88,9 @@ namespace Crow
 			DiscardCount = 0;
 			#if DEBUG_LAYOUTING
 			LQITime = new Stopwatch();
-			Slot = Rectangle.Empty;
-			NewSlot = Rectangle.Empty;
-			Debug.WriteLine ("\tRegister => " + this.ToString ());
+			Slot = NewSlot = default(Rectangle);			 
+			Message = "";
+			//Debug.WriteLine ("\tRegister => " + this.ToString ());
 			#endif
 		}
 		#endregion
@@ -107,7 +108,7 @@ namespace Crow
 				//cancel layouting for object without parent, maybe some were in queue when
 				//removed from a listbox
 				#if DEBUG_UPDATE || DEBUG_LAYOUTING
-				Debug.WriteLine ("ERROR: processLayouting, no parent for: " + this.ToString ());
+				Message = "Parent is null";
 				#endif
 				go.parentRWLock.ExitReadLock ();
 				return;
@@ -115,19 +116,19 @@ namespace Crow
 
 			#if DEBUG_LAYOUTING
 			LQITime.Start();
-			Debug.WriteLine ("=> " + this.ToString ());
+			//Debug.WriteLine ("=> " + this.ToString ());
 			#endif
 			LayoutingTries++;
 			if (!Layoutable.UpdateLayout (LayoutType)) {
 				#if DEBUG_LAYOUTING
-				Debug.WriteLine ("\t\tRequeued");
+				Message = "Requeued";
 				#endif
 				if (LayoutingTries < Interface.MaxLayoutingTries) {
 					Layoutable.RegisteredLayoutings |= LayoutType;
 					(Layoutable as GraphicObject).IFace.LayoutingQueue.Enqueue (this);
 				} else if (DiscardCount < Interface.MaxDiscardCount) {
 					#if DEBUG_LAYOUTING
-					Debug.WriteLine ("\t\tDiscarded");
+					Message ="Discarded";
 					#endif
 					go.LayoutingDiscardCheck (LayoutType);
 					LayoutingTries = 0;
@@ -135,16 +136,17 @@ namespace Crow
 					Layoutable.RegisteredLayoutings |= LayoutType;
 					(Layoutable as GraphicObject).IFace.DiscardQueue.Enqueue (this);
 				}
-				//#if DEBUG_LAYOUTING
+				#if DEBUG_LAYOUTING
 				else
-					Debug.WriteLine ("\tDELETED    => " + this.ToString ());
-				//#endif
+					Message = "Deleted";
+				#endif
 			}
+			//#if DEBUG_LAYOUTING
+			else
+				Message = "Succeed";
+			//#endif
 
-			else{
-				if (LayoutingTries > 2 || DiscardCount > 0)
-					Debug.WriteLine (this.ToString ());
-			}
+
 			#if DEBUG_LAYOUTING
 			LQITime.Stop();
 			#endif
@@ -162,8 +164,10 @@ namespace Crow
 		public override string ToString ()
 		{
 			#if DEBUG_LAYOUTING
-			return string.Format ("{2};{3};{4} {1}->{0}", LayoutType,Layoutable.ToString(),
-				LayoutingTries,DiscardCount,LQITime.ElapsedTicks);
+//			return string.Format ("{2};{3};{4} {1}->{0}", LayoutType,Layoutable.ToString(),
+//				LayoutingTries,DiscardCount,LQITime.ElapsedTicks);
+			return string.Format ("{2};{3};{4} {1}->{0};{5}", LayoutType,Layoutable.ToString(),
+				LayoutingTries,DiscardCount,LQITime.ElapsedTicks, Message);
 			#else
 			return string.Format ("{2};{3} {1}->{0}", LayoutType,Layoutable.ToString(),
 				LayoutingTries, DiscardCount);
@@ -176,6 +180,16 @@ namespace Crow
 //			return this.Where (lqi => lqi.wasTriggeredBy == null).ToList ();
 //		}
 //		#endif
+		public List<LayoutingQueueItem> GetLQIs(){
+			return this.ToList();
+		}
+		#if DEBUG_LAYOUTING
+		public List<LayoutingQueueItem> CompletedLQIs(){
+			List<LayoutingQueueItem> tmp = this.Where (lqi => lqi.Message == "Succeed").ToList ();
+			return tmp;
+		}
+		#endif
+
 	}
 }
 
