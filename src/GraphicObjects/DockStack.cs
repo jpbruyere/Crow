@@ -172,7 +172,7 @@ namespace Crow
 		protected override void onDragLeave (object sender, DragDropEventArgs e)
 		{
 			DockWindow dw = e.DragSource as DockWindow;
-			if (dw != null)
+			if (dw != null && !dw.IsDocked)
 				dw.DockingPosition = Alignment.Undefined;
 			base.onDragLeave (sender, e);
 			RegisterForGraphicUpdate ();
