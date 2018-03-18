@@ -57,18 +57,19 @@ namespace Crow
 
 			Group p = Parent as Group;
 			if (p != null) {
-				lock (p.Children) {
-					for (int i = p.Children.Count - 1; i >= 0; i--) {
-						if (p.Children [i] == this)
-							break;
-						if (p.Children [i].IsDragged)
-							continue;
-						if (p.Children [i].Slot.ContainsOrIsEqual (m)) {						
-							return false;
-						}
+				childrenRWLock.EnterReadLock ();
+				for (int i = p.Children.Count - 1; i >= 0; i--) {
+					if (p.Children [i] == this)
+						break;
+					if (p.Children [i].IsDragged)
+						continue;
+					if (p.Children [i].Slot.ContainsOrIsEqual (m)) {
+						childrenRWLock.ExitReadLock ();
+						return false;
 					}
 				}
 			}
+			childrenRWLock.ExitReadLock ();
 			return Slot.ContainsOrIsEqual(m);
 		}
 
@@ -105,10 +106,8 @@ namespace Crow
 			if (IsDropTarget) {				
 				DockWindow dw = IFace.DragAndDropOperation.DragSource as DockWindow;
 				if (dw.IsDocked) {
-					//if (!dw.CheckUndock (e.Position)) {
 						base.onMouseMove (sender, e);
 						return;
-					//}						
 				}
 
 				Alignment curDockPos = dw.DockingPosition;
@@ -172,6 +171,9 @@ namespace Crow
 		}
 		protected override void onDragLeave (object sender, DragDropEventArgs e)
 		{
+			DockWindow dw = e.DragSource as DockWindow;
+			if (dw != null)
+				dw.DockingPosition = Alignment.Undefined;
 			base.onDragLeave (sender, e);
 			RegisterForGraphicUpdate ();
 		}
