@@ -148,24 +148,12 @@ namespace Crow
 			);
 			#endif
 
-			Thread t = new Thread (interfaceThread);
-			t.IsBackground = true;
-			t.Start ();
+			CrowInterface.StartThread ();
 
 			initGL ();
 		}
 		#endregion
 
-		void interfaceThread()
-		{
-			while (CrowInterface.ClientRectangle.Size.Width == 0)
-				Thread.Sleep (5);
-
-			while (true) {
-				CrowInterface.Update ();
-				Thread.Sleep (2);
-			}
-		}
 
 		#region Mouse And Keyboard handling
 		public virtual void ProcessResize(Rectangle newSize){

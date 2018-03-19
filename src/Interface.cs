@@ -65,6 +65,40 @@ namespace Crow
 	/// </remarks>
 	public class Interface : ILayoutable
 	{
+		#if DBG_EVENTS
+		const int MAX_THREAD = 20;
+
+		public DebugEvent[] PerThreadCurDbgEvt = new DebugEvent[MAX_THREAD];
+		public DebugEvent CurDbgEvt {
+			get { return PerThreadCurDbgEvt [Thread.CurrentThread.ManagedThreadId]; }
+			set { PerThreadCurDbgEvt [Thread.CurrentThread.ManagedThreadId] = value; }
+		}
+		public void DbgLogEvent (DebugEvent de) {			
+			if (CurDbgEvt == null)
+				CurDbgEvt = new DebugEvent(DbgEvtType.IfaceStart) ;			
+			de.Parent = CurDbgEvt;
+			if (CurDbgEvt != null)				
+				CurDbgEvt.ChildEvents.Add(de);
+		}
+		public DebugEvent DbgStartSubEvt (DbgEvtType dbgType){
+			DebugEvent de = new DebugEvent(dbgType); 
+			DbgStartSubEvt(de);
+			return de;
+		}
+		public void DbgStartSubEvt (DebugEvent de){
+			if (CurDbgEvt == null)
+				CurDbgEvt = new DebugEvent(DbgEvtType.IfaceStart) ;
+			de.Parent = CurDbgEvt;
+			CurDbgEvt.ChildEvents.Add(de);
+			CurDbgEvt = de;
+			CurDbgEvt.Start ();
+		}
+		public void DbgEndSubEvt () {
+			CurDbgEvt.Finished ();
+			CurDbgEvt = CurDbgEvt.Parent;
+		}
+		#endif
+
 		#region CTOR
 		static Interface(){
 			if (Type.GetType ("Mono.Runtime") == null) {
@@ -99,6 +133,25 @@ namespace Crow
 		}
 		#endregion
 
+		public void StartThread () {
+			Thread t = new Thread (interfaceThread);
+			t.IsBackground = true;
+			t.Start ();
+		}
+		void interfaceThread()
+		{
+			#if DBG_EVENTS
+			CurDbgEvt = new DebugEvent(DbgEvtType.IfaceStart);
+			#endif
+
+			while (ClientRectangle.Size.Width == 0)
+				Thread.Sleep (5);
+
+			while (true) {
+				Update ();
+				Thread.Sleep (2);
+			}
+		}
 		public void Init () {
 			CurrentInterface = this;
 			loadCursors ();
@@ -134,7 +187,7 @@ namespace Crow
 		public const int MaxCacheSize = 2048;
 		/// <summary> Above this count, the layouting is discard from the current
 		/// update cycle and requeued for the next</summary>
-		public const int MaxLayoutingTries = 30;
+		public const int MaxLayoutingTries = 20;
 		/// <summary> Above this count, the layouting is discard for the widget and it
 		/// will not be rendered on screen </summary>
 		public const int MaxDiscardCount = 3;
@@ -535,6 +588,10 @@ namespace Crow
 		/// Result: the Interface bitmap is drawn in memory (byte[] bmp) and a dirtyRect and bitmap are available
 		/// </summary>
 		public void Update(){
+			#if DBG_EVENTS
+			DbgStartSubEvt(DbgEvtType.IFaceUpdate);
+			#endif
+
 			if (armedClickSender != null && clickTimer.ElapsedMilliseconds >= Interface.DoubleClick) {
 				armedClickSender.onMouseClick (armedClickSender, armedClickEvtArgs);				
 				armedClickSender = null;
@@ -562,30 +619,17 @@ namespace Crow
 			if (!Monitor.TryEnter (UpdateMutex))
 				return;
 
-			#if MEASURE_TIME
-			updateMeasure.StartCycle();
-			#endif
-
 			processLayouting ();
-
-			#if DEBUG_LAYOUTING
-			if (curLQIsTries.Count > 0){
-				LQIsTries.Add(curLQIsTries);
-				curLQIsTries = new LQIList();
-				LQIs.Add(curLQIs);
-				curLQIs = new LQIList();
-			}
-			#endif
 
 			clippingRegistration ();
 
 			processDrawing ();
 
-			#if MEASURE_TIME
-			updateMeasure.StopCycle();
-			#endif
-
 			Monitor.Exit (UpdateMutex);
+
+			#if DBG_EVENTS
+			DbgEndSubEvt ();
+			#endif
 		}
 		#if DEBUG_LAYOUTING
 		public string BreakingName;
@@ -594,39 +638,38 @@ namespace Crow
 		/// Layouting queue items. Failing LQI's are requeued in this cycle until MaxTry is reached which
 		/// trigger an enqueue for the next Update Cycle</summary>
 		protected virtual void processLayouting(){
-			#if MEASURE_TIME
-			layoutingMeasure.StartCycle();
+			#if DBG_EVENTS
+			DbgStartSubEvt(DbgEvtType.IFaceLayouting);
 			#endif
 
 			if (Monitor.TryEnter (LayoutMutex)) {
 				DiscardQueue = new Queue<LayoutingQueueItem> ();
-				//Debug.WriteLine ("======= Layouting queue start =======");
 				LayoutingQueueItem lqi;
 				while (LayoutingQueue.Count > 0) {
 					lqi = LayoutingQueue.Dequeue ();
-					#if DEBUG_LAYOUTING
-					currentLQI = lqi;
-					curLQIsTries.Add(currentLQI);
-					if (lqi.graphicObject.Name == BreakingName)
-						Debugger.Break();
+					#if DBG_EVENTS
+					DbgStartSubEvt (new LayoutingDebugEvent(lqi.LayoutType,lqi.Layoutable as GraphicObject));
 					#endif
 					lqi.ProcessLayouting ();
+					#if DBG_EVENTS
+					DbgEndSubEvt();
+					#endif
 				}
 				LayoutingQueue = DiscardQueue;
 				Monitor.Exit (LayoutMutex);
 				DiscardQueue = null;
 			}
 
-			#if MEASURE_TIME
-			layoutingMeasure.StopCycle();
+			#if DBG_EVENTS
+			DbgEndSubEvt();
 			#endif
 		}
 		/// <summary>Degueue Widget to clip from DrawingQueue and register the last painted slot and the new one
 		/// Clipping rectangles are added at each level of the tree from leef to root, that's the way for the painting
 		/// operation to known if it should go down in the tree for further graphic updates and repaints</summary>
 		void clippingRegistration(){
-			#if MEASURE_TIME
-			clippingMeasure.StartCycle();
+			#if DBG_EVENTS
+			DbgStartSubEvt(DbgEvtType.IFaceClipping);
 			#endif
 			GraphicObject g = null;
 			while (ClippingQueue.Count > 0) {
@@ -637,15 +680,15 @@ namespace Crow
 				g.ClippingRegistration ();
 			}
 
-			#if MEASURE_TIME
-			clippingMeasure.StopCycle();
+			#if DBG_EVENTS
+			DbgEndSubEvt();
 			#endif
 		}
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
 		void processDrawing(){
-			#if MEASURE_TIME
-			drawingMeasure.StartCycle();
+			#if DBG_EVENTS
+			DbgStartSubEvt(DbgEvtType.IFaceDrawing);
 			#endif
 			if (DragImage != null)
 				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
@@ -725,8 +768,8 @@ namespace Crow
 					//surf.WriteToPng (@"/mnt/data/test.png");
 				}
 			}
-			#if MEASURE_TIME
-			drawingMeasure.StopCycle();
+			#if DBG_EVENTS
+			DbgEndSubEvt ();
 			#endif
 		}
 		#endregion

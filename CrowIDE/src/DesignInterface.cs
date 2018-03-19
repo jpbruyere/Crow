@@ -158,8 +158,8 @@ namespace Crow.Coding
 	
 		protected override void processLayouting ()
 		{
-			#if MEASURE_TIME
-			layoutingMeasure.StartCycle();
+			#if DBG_EVENTS
+			DbgStartSubEvt(DbgEvtType.IFaceLayouting);
 			#endif
 
 			if (Monitor.TryEnter (LayoutMutex)) {
@@ -167,20 +167,21 @@ namespace Crow.Coding
 				LayoutingQueueItem lqi;
 				while (LayoutingQueue.Count > 0) {
 					lqi = LayoutingQueue.Dequeue ();
-					//Console.WriteLine (lqi.ToString ());
-					#if DEBUG_LAYOUTING
-					currentLQI = lqi;
-					curLQIsTries.Add(currentLQI);
+					#if DBG_EVENTS
+					DbgStartSubEvt (new LayoutingDebugEvent(lqi.LayoutType,lqi.Layoutable as GraphicObject));
 					#endif
 					lqi.ProcessLayouting ();
+					#if DBG_EVENTS
+					DbgEndSubEvt();
+					#endif
 				}
 				LayoutingQueue = DiscardQueue;
 				Monitor.Exit (LayoutMutex);
 				DiscardQueue = null;
 			}
 
-			#if MEASURE_TIME
-			layoutingMeasure.StopCycle();
+			#if DBG_EVENTS
+			DbgEndSubEvt();
 			#endif
 		}
 	}

@@ -32,7 +32,7 @@
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <Optimize>false</Optimize>
     <OutputPath>$(SolutionDir)build\Debug</OutputPath>
-    <DefineConstants>DESIGN_MODE;DEBUG_LAYOUTING;DEBUG_UPDATE0;DEBUG_FOCUS0;DEBUG_DISPOSE0;TRACE0;DEBUG;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
+    <DefineConstants>DESIGN_MODE;DBG_EVENTS;DEBUG_LAYOUTING0;DEBUG_UPDATE0;DEBUG_FOCUS0;DEBUG_DISPOSE0;TRACE0;DEBUG;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -222,6 +222,7 @@
     <Compile Include="src\ParsingException.cs" />
     <Compile Include="src\IMLAttributes.cs" />
     <Compile Include="src\GraphicObjects\DockStack.cs" />
+    <Compile Include="src\DebugEvents\DebugEvent.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -251,6 +252,7 @@
     <Folder Include="src\rsvg\" />
     <Folder Include="src\IML\" />
     <Folder Include="Icons\" />
+    <Folder Include="src\DebugEvents\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\Icons\updown.svg" />
