@@ -588,9 +588,9 @@ namespace Crow
 		/// Result: the Interface bitmap is drawn in memory (byte[] bmp) and a dirtyRect and bitmap are available
 		/// </summary>
 		public void Update(){
-			#if DBG_EVENTS
-			DbgStartSubEvt(DbgEvtType.IFaceUpdate);
-			#endif
+//			#if DBG_EVENTS
+//			DbgStartSubEvt(DbgEvtType.IFaceUpdate);
+//			#endif
 
 			if (armedClickSender != null && clickTimer.ElapsedMilliseconds >= Interface.DoubleClick) {
 				armedClickSender.onMouseClick (armedClickSender, armedClickEvtArgs);				
@@ -627,9 +627,9 @@ namespace Crow
 
 			Monitor.Exit (UpdateMutex);
 
-			#if DBG_EVENTS
-			DbgEndSubEvt ();
-			#endif
+//			#if DBG_EVENTS
+//			DbgEndSubEvt ();
+//			#endif
 		}
 		#if DEBUG_LAYOUTING
 		public string BreakingName;
@@ -638,13 +638,18 @@ namespace Crow
 		/// Layouting queue items. Failing LQI's are requeued in this cycle until MaxTry is reached which
 		/// trigger an enqueue for the next Update Cycle</summary>
 		protected virtual void processLayouting(){
-			#if DBG_EVENTS
-			DbgStartSubEvt(DbgEvtType.IFaceLayouting);
-			#endif
-
 			if (Monitor.TryEnter (LayoutMutex)) {
 				DiscardQueue = new Queue<LayoutingQueueItem> ();
 				LayoutingQueueItem lqi;
+
+				#if DBG_EVENTS
+				bool logLayouting = false;
+				if (LayoutingQueue.Count > 0){
+					DbgStartSubEvt(DbgEvtType.IFaceLayouting);
+					logLayouting = true;
+				}
+				#endif
+
 				while (LayoutingQueue.Count > 0) {
 					lqi = LayoutingQueue.Dequeue ();
 					#if DBG_EVENTS
@@ -655,19 +660,23 @@ namespace Crow
 					DbgEndSubEvt();
 					#endif
 				}
+
+				#if DBG_EVENTS
+				if (logLayouting)
+					DbgEndSubEvt();
+				#endif
+
 				LayoutingQueue = DiscardQueue;
 				Monitor.Exit (LayoutMutex);
 				DiscardQueue = null;
 			}
-
-			#if DBG_EVENTS
-			DbgEndSubEvt();
-			#endif
 		}
 		/// <summary>Degueue Widget to clip from DrawingQueue and register the last painted slot and the new one
 		/// Clipping rectangles are added at each level of the tree from leef to root, that's the way for the painting
 		/// operation to known if it should go down in the tree for further graphic updates and repaints</summary>
 		void clippingRegistration(){
+			if (ClippingQueue.Count == 0)
+				return;
 			#if DBG_EVENTS
 			DbgStartSubEvt(DbgEvtType.IFaceClipping);
 			#endif
@@ -686,15 +695,16 @@ namespace Crow
 		}
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
-		void processDrawing(){
-			#if DBG_EVENTS
-			DbgStartSubEvt(DbgEvtType.IFaceDrawing);
-			#endif
+		void processDrawing(){			
+
 			if (DragImage != null)
 				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
 			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
 				using (ctx = new Context (surf)){
 					if (!clipping.IsEmpty) {
+						#if DBG_EVENTS
+						DbgStartSubEvt(DbgEvtType.IFaceDrawing);
+						#endif
 
 						for (int i = 0; i < clipping.NumRectangles; i++)
 							ctx.Rectangle(clipping.GetRectangle(i));
@@ -731,6 +741,9 @@ namespace Crow
 								//Console.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
 							}
 						}
+						#if DBG_EVENTS
+						DbgEndSubEvt ();
+						#endif
 
 						#if DEBUG_CLIP_RECTANGLE
 						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
@@ -768,9 +781,6 @@ namespace Crow
 					//surf.WriteToPng (@"/mnt/data/test.png");
 				}
 			}
-			#if DBG_EVENTS
-			DbgEndSubEvt ();
-			#endif
 		}
 		#endregion
 
@@ -836,12 +846,6 @@ namespace Crow
 					g.Dispose ();
 				}
 			}
-			#if DEBUG_LAYOUTING
-			LQIsTries = new List<LQIList>();
-			curLQIsTries = new LQIList();
-			LQIs = new List<LQIList>();
-			curLQIs = new LQIList();
-			#endif
 		}
 		/// <summary> Put widget on top of other root widgets</summary>
 		public void PutOnTop(GraphicObject g, bool isOverlay = false)
@@ -871,12 +875,13 @@ namespace Crow
 		/// <summary>Search a Graphic object in the tree named 'nameToFind'</summary>
 		public GraphicObject FindByName (string nameToFind)
 		{
+			GraphicObject r = null;
 			foreach (GraphicObject w in GraphicTree) {
-				GraphicObject r = w.FindByName (nameToFind);
+				r = w.FindByName (nameToFind);
 				if (r != null)
-					return r;
+					break;
 			}
-			return null;
+			return r;
 		}
 		#endregion
 

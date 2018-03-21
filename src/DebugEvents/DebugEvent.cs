@@ -64,6 +64,9 @@ namespace Crow
 		public DebugEvent Parent;
 		public List<DebugEvent> ChildEvents = new List<DebugEvent>();
 
+		public long Ticks { get { return Time.ElapsedTicks; }}
+
+
 		public virtual void Start () {
 			Time = Stopwatch.StartNew();
 		}
@@ -118,6 +121,11 @@ namespace Crow
 			base.Finished ();
 			saveTargetState ();
 			PreviousSlot = Target.LastSlots;
+		}
+
+		public override string ToString ()
+		{
+			return string.Format ("{0} {1} {2} {3} => {4}", Target, LayoutingType, EndResult, PreviousSlot, Slot);
 		}
 	}
 	#endif

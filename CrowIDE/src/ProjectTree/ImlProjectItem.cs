@@ -81,6 +81,10 @@ namespace Crow.Coding
 			get { return new List<GraphicObject> (new GraphicObject[] {instance}); }
 		}
 
+		public List<DebugEvent> DebugEvents {
+			get { return instance?.IFace.PerThreadCurDbgEvt.ToList(); }
+		}
+
 		void GTView_SelectedItemChanged (object sender, SelectionChangeEventArgs e){
 			SelectedItem = e.NewValue;
 		}

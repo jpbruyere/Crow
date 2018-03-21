@@ -158,13 +158,16 @@ namespace Crow.Coding
 	
 		protected override void processLayouting ()
 		{
-			#if DBG_EVENTS
-			DbgStartSubEvt(DbgEvtType.IFaceLayouting);
-			#endif
-
 			if (Monitor.TryEnter (LayoutMutex)) {
 				DiscardQueue = new Queue<LayoutingQueueItem> ();
 				LayoutingQueueItem lqi;
+				#if DBG_EVENTS
+				bool logLayouting = false;
+				if (LayoutingQueue.Count > 0){
+					DbgStartSubEvt(DbgEvtType.IFaceLayouting);
+					logLayouting = true;
+				}
+				#endif
 				while (LayoutingQueue.Count > 0) {
 					lqi = LayoutingQueue.Dequeue ();
 					#if DBG_EVENTS
@@ -175,14 +178,18 @@ namespace Crow.Coding
 					DbgEndSubEvt();
 					#endif
 				}
+				#if DBG_EVENTS
+				if (logLayouting)
+					DbgEndSubEvt();
+				#endif
 				LayoutingQueue = DiscardQueue;
 				Monitor.Exit (LayoutMutex);
 				DiscardQueue = null;
 			}
-
-			#if DBG_EVENTS
-			DbgEndSubEvt();
-			#endif
+		}
+		public override string ToString ()
+		{
+			return string.Format ("DI");
 		}
 	}
 }

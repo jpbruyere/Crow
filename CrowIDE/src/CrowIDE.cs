@@ -42,7 +42,7 @@ namespace Crow.Coding
 		CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp,
 		CMDAbout, CMDOptions,
 		CMDViewGTExp, CMDViewProps, CMDViewProj, CMDViewProjProps, CMDViewErrors, CMDViewSolution, CMDViewEditor, CMDViewProperties,
-		CMDViewToolbox, CMDViewSchema, CMDViewStyling,CMDViewDesign,
+		CMDViewToolbox, CMDViewSchema, CMDViewStyling,CMDViewDesign,CMDViewDbgEvts,
 		CMDCompile;
 
 		void initCommands () {
@@ -78,6 +78,8 @@ namespace Crow.Coding
 			{ Caption = "IML Shematic View", CanExecute = true};
 			CMDViewStyling = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.DockWindows.winStyleView.crow",this)))
 			{ Caption = "Styling Explorer", CanExecute = true};
+			CMDViewDbgEvts = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.DockWindows.winDbgEvts.crow",this)))
+			{ Caption = "Debug Events Explorer", CanExecute = true};
 				
 			CMDViewGTExp = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.DockWindows.winGTExplorer.crow")))
 			{ Caption = "Graphic Tree Explorer", CanExecute = false};

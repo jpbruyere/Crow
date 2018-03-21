@@ -28,6 +28,7 @@
 				<MenuItem Command="{CMDViewErrors}"/>
 				<MenuItem Command="{CMDViewGTExp}"/>
 				<MenuItem Command="{CMDViewSchema}"/>
+				<MenuItem Command="{CMDViewDbgEvts}"/>
 			</MenuItem>
 			<MenuItem Caption="Project" Fit="true" PopWidth="120">
 				<MenuItem Command="{CMDCompile}"/>

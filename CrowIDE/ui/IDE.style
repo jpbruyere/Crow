@@ -50,3 +50,9 @@ TreeIcon {
 	Width="14";
 	Height="14";
 }
+
+DbgGridCell {
+	Background="White";
+	Foreground="Black";
+	Font="mono, 10";
+}

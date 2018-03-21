@@ -214,10 +214,6 @@ namespace Crow
 		}
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
-			#if DEBUG_LAYOUTING
-			IFace.currentLQI.Slot = LastSlots;
-			IFace.currentLQI.Slot = Slot;
-			#endif
 			switch (layoutType) {
 			case LayoutingType.Width:
 				childrenRWLock.EnterReadLock ();
