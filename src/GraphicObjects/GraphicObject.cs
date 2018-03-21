@@ -154,6 +154,7 @@ namespace Crow
 			GC.SuppressFinalize(this);  
 		}  
 		~GraphicObject(){
+			Debug.WriteLine(this.ToString() + " not disposed by user");
 			Dispose(false);
 		}
 		protected virtual void Dispose(bool disposing){
@@ -171,18 +172,8 @@ namespace Crow
 				throw new Exception("Trying to dispose an object queued for Redraw: " + this.ToString());
 				#endif
 
-				if (IFace.HoverWidget != null) {
-					if (IFace.HoverWidget.IsOrIsInside(this))
-						IFace.HoverWidget = null;
-				}
-				if (IFace.ActiveWidget != null) {
-					if (IFace.ActiveWidget.IsOrIsInside (this))
-						IFace.ActiveWidget = null;
-				}
-				if (IFace.FocusedWidget != null) {
-					if (IFace.FocusedWidget.IsOrIsInside (this))
-						IFace.FocusedWidget = null;
-				}
+				unshownPostActions ();
+
 				if (!localDataSourceIsNull)
 					DataSource = null;
 
@@ -869,8 +860,8 @@ namespace Crow
 
 				RegisterForLayouting (LayoutingType.Sizing);
 
-				//trigger a mouse to handle possible hover changes
-				//CurrentInterface.ProcessMouseMove (CurrentInterface.Mouse.X, CurrentInterface.Mouse.Y);
+				if (!isVisible)
+					unshownPostActions ();
 
 				NotifyValueChanged ("Visible", isVisible);
 			}
@@ -1442,17 +1433,6 @@ namespace Crow
 		/// <summary> trigger dependant sizing component update </summary>
 		public virtual void OnLayoutChanges(LayoutingType  layoutType)
 		{
-			#if DEBUG_LAYOUTING
-			IFace.currentLQI.Slot = LastSlots;
-			IFace.currentLQI.NewSlot = Slot;
-			Debug.WriteLine ("\t\t{0} => {1}",LastSlots,Slot);
-			#endif
-//			#if DESIGN_MODE
-//			if (IFace.GetType().Name == "DesignInterface"){
-//				Debug.WriteLine ("\t\t{2}: {0} => {1}",LastSlots,Slot,this.name);
-//			}
-//			#endif
-
 			switch (layoutType) {
 			case LayoutingType.Width:
 				RegisterForLayouting (LayoutingType.X);
@@ -1955,6 +1935,25 @@ namespace Crow
 			#else
 			return Name == "unamed" ? tmp + "." + this.GetType ().Name : tmp + "." + Name;
 			#endif
+		}
+		/// <summary>
+		/// Checks to handle when widget is removed from the visible graphic tree
+		/// </summary>
+		void unshownPostActions () {
+			if (IFace.ActiveWidget != null) {
+				if (IFace.ActiveWidget.IsOrIsInside (this))
+					IFace.ActiveWidget = null;
+			}
+			if (IFace.FocusedWidget != null) {
+				if (IFace.FocusedWidget.IsOrIsInside (this))
+					IFace.FocusedWidget = null;
+			}					
+			if (IFace.HoverWidget != null) {
+				if (IFace.HoverWidget.IsOrIsInside (this)) {
+					IFace.HoverWidget = null;
+					IFace.ProcessMouseMove (IFace.Mouse.X, IFace.Mouse.Y);
+				}
+			}
 		}
 	}
 }
