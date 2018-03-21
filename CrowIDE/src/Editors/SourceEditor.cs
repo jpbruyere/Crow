@@ -370,6 +370,7 @@ namespace Crow.Coding
 					if (l == buffer.CurrentLine)
 						return;
 					buffer.CurrentLine = l;
+					l = buffer.CurrentLine; //reaffect from buffer where bound check is made
 					if ((bool)buffer [l]?.IsFolded)
 						buffer.ToogleFolding (l);					
 				} catch (Exception ex) {
