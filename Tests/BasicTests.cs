@@ -194,8 +194,10 @@ namespace Tests
 			this.KeyDown += KeyboardKeyDown1;
 
 			//testFiles = new string [] { @"Interfaces/Experimental/testDock.crow" };
-			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/0.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/testIMLContainer.crow" };
+			testFiles = new string [] { @"Interfaces/TemplatedContainer/testTabView.crow" };
 			//testFiles = new string [] { @"Interfaces/TemplatedContainer/testTreeView.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
 //			testFiles = new string[] { @"Interfaces/TemplatedControl/testItemTemplateTag.crow" };

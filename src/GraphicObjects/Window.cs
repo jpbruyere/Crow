@@ -73,9 +73,9 @@ namespace Crow
 		#endregion
 
 		#region TemplatedContainer overrides
-		protected override void loadTemplate(GraphicObject template = null)
+		protected override void loadTemplate(Interface iFace, GraphicObject template = null)
 		{
-			base.loadTemplate (template);
+			base.loadTemplate (iFace, template);
 
 			NotifyValueChanged ("ShowNormal", false);
 			NotifyValueChanged ("ShowMinimize", true);
@@ -433,7 +433,7 @@ namespace Crow
 
 		protected void butQuitPress (object sender, MouseButtonEventArgs e)
 		{
-			IFace.MouseCursor = XCursor.Default;
+			//IFace.MouseCursor = XCursor.Default;
 			close ();
 		}
 

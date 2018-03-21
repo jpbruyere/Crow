@@ -72,8 +72,8 @@ namespace Crow.Coding
 		}
 
 		void initIcons () {
-			icoMove = new SvgPicture ();
-			icoMove.Load (IFace, "#Crow.Coding.icons.move-arrows.svg");
+			icoMove = new SvgPicture ("#Crow.Coding.icons.move-arrows.svg");
+			icoMove.Load (IFace);
 //			icoStyle = new SvgPicture ();
 //			icoStyle.Load (IFace, "#Crow.Coding.icons.palette.svg");
 		}

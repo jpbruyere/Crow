@@ -110,9 +110,9 @@ namespace Crow
 				NotifyValueChanged("ItemTemplate", _itemTemplate);
 			}
 		}
-		protected override void loadTemplate(GraphicObject template = null)
+		protected override void loadTemplate(Interface iFace, GraphicObject template = null)
 		{
-			base.loadTemplate (template);
+			base.loadTemplate (iFace, template);
 
 			items = this.child.FindByName ("ItemsContainer") as Group;
 			if (items == null)

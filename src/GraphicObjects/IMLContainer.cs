@@ -34,6 +34,7 @@ namespace Crow
 		}
 
 		string path;
+		bool loaded = true;
 
 		public string Path {
 			get { return path; }
@@ -41,8 +42,37 @@ namespace Crow
 				if (path == value)
 					return;
 				path = value;
-				this.SetChild (IFace.Load (path));
+
+				if (path == null)
+					this.SetChild (null);
+				else
+					loaded = false;
+				
 				NotifyValueChanged ("Path", path);
+			}
+		}
+		protected override void EnqueueForRepaint ()
+		{
+			if (!loaded) {
+				Interface iface = IFace;
+				if (iface != null) {
+					this.SetChild (iface.Load (path));
+					loaded = true;
+					RegisterForGraphicUpdate ();
+					return;
+				}
+			}
+			base.EnqueueForRepaint ();
+		}
+		protected override void SetChild (GraphicObject _child)
+		{
+			base.SetChild (_child);
+			if (_child != null) {
+				if (_child.localDataSourceIsNull) {
+					object ds = DataSource;
+					if (ds != null)
+						OnDataSourceChanged (this, new DataSourceChangeEventArgs (null, ds));
+				}
 			}
 		}
 	}

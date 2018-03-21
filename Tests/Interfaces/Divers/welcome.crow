@@ -4,4 +4,6 @@
 	<Slider Orientation="Vertical" Height="Stretched" Width="20" Background="DimGray"/>
 	<Label Name="ShowTarget" Background="DarkBlue"/>
 </VerticalStack>-->
-<Slider Orientation="Horizontal" Height="10" Width="100" Background="DimGray"/>
+<Popper >
+	<Label/>
+</Popper>

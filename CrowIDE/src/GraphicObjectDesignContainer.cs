@@ -53,8 +53,8 @@ namespace Crow.Coding
 			lock (go.IFace.UpdateMutex) {				
 				go.IFace.DragImageHeight = dragIconSize;
 				go.IFace.DragImageWidth = dragIconSize;
-				SvgPicture pic = new SvgPicture ();
-				pic.Load (go.IFace, IconPath);
+				SvgPicture pic = new SvgPicture (IconPath);
+				pic.Load (go.IFace);
 				ImageSurface img = new ImageSurface (Format.Argb32, dragIconSize, dragIconSize);
 				using (Context ctx = new Context (img)) {
 					Rectangle r = new Rectangle (0, 0, dragIconSize, dragIconSize);

@@ -51,23 +51,29 @@ namespace Crow
 		{}
 		#endregion
 
-		public override void Load (Interface iface, string path)
-		{
-			Path = path;
-			if (sharedResources.ContainsKey (path)) {
-				sharedPicture sp = sharedResources [path];
+		public override void Load (Interface iface)
+		{			
+			Loaded = false;
+			if (iface == null)
+				return;			
+			if (sharedResources.ContainsKey (Path)) {
+				sharedPicture sp = sharedResources [Path];
 				hSVG = (Rsvg.Handle)sp.Data;
 				Dimensions = sp.Dims;
 			} else {
-				using (Stream stream = iface.GetStreamFromPath (path)) {
-					using (MemoryStream ms = new MemoryStream ()) {
-						stream.CopyTo (ms);
+				try {
+					using (Stream stream = iface.GetStreamFromPath (Path)) {
+						using (MemoryStream ms = new MemoryStream ()) {
+							stream.CopyTo (ms);
 
-						hSVG = new Rsvg.Handle (ms.ToArray ());
-						Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
+							hSVG = new Rsvg.Handle (ms.ToArray ());
+							Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
+						}
 					}
+					sharedResources [Path] = new sharedPicture (hSVG, Dimensions);
+				} catch (Exception ex) {
+					
 				}
-				sharedResources [path] = new sharedPicture (hSVG, Dimensions);
 			}
 			Loaded = true;
 		}

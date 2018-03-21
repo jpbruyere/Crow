@@ -232,9 +232,9 @@ namespace Crow
 		}
 		public virtual void onUnpop(object sender, EventArgs e)
 		{
-			if (Content != null) {
+			if (Content != null)
 				Content.Visible = false;
-			}
+			
 			Unpoped.Raise (this, e);
 		}
 

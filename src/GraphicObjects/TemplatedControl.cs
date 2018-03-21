@@ -62,7 +62,7 @@ namespace Crow
 		public TemplatedControl (Interface iface) : base(iface){}
 		#endregion
 
-		string _template;
+		string templatePath;
 		string caption;
 
 		/// <summary>
@@ -71,16 +71,16 @@ namespace Crow
 		//TODO: this property should be renamed 'TemplatePath'
 		[XmlAttributeAttribute][DefaultValue(null)]
 		public string Template {
-			get { return _template; }
+			get { return templatePath; }
 			set {
 				if (Template == value)
 					return;
-				_template = value;
+				templatePath = value;
 
-				if (string.IsNullOrEmpty(_template))
-					loadTemplate ();
-				else
-					loadTemplate (IFace.Load (_template));
+//				if (string.IsNullOrEmpty(templatePath))
+//					loadTemplate ();
+//				else
+//					loadTemplate (IFace.Load (templatePath));
 			}
 		}
 		/// <summary>
@@ -99,10 +99,10 @@ namespace Crow
 
 		#region GraphicObject overrides
 
-		public override void Initialize ()
+		public override void Initialize (Interface iFace)
 		{
-			loadTemplate ();
-			base.Initialize ();
+			loadTemplate (iFace);
+			base.Initialize (iFace);
 		}
 		/// <summary>
 		/// override search method from GraphicObject to prevent
@@ -149,15 +149,15 @@ namespace Crow
 		/// Loads the template.
 		/// </summary>
 		/// <param name="template">Optional template instance</param>
-		protected virtual void loadTemplate(GraphicObject template = null)
+		protected virtual void loadTemplate(Interface iFace, GraphicObject template = null)
 		{
 			if (this.child != null)//template change, bindings has to be reset
 				this.ClearTemplateBinding();
 			
 			if (template == null) {
-				if (!IFace.DefaultTemplates.ContainsKey (this.GetType ().FullName))
+				if (!iFace.DefaultTemplates.ContainsKey (this.GetType ().FullName))
 					throw new Exception (string.Format ("No default template found for '{0}'", this.GetType ().FullName));
-				this.SetChild (IFace.Load (IFace.DefaultTemplates[this.GetType ().FullName]));
+				this.SetChild (iFace.Load (iFace.DefaultTemplates[this.GetType ().FullName]));
 			}else
 				this.SetChild (template);
 		}

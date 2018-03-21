@@ -73,9 +73,9 @@ namespace Crow
 			get { return _contentContainer?.Child != null; }
 		}
 		//TODO: move loadTemplate and ResolveBinding in TemplatedContainer
-		protected override void loadTemplate(GraphicObject template = null)
+		protected override void loadTemplate(Interface iFace, GraphicObject template = null)
 		{
-			base.loadTemplate (template);
+			base.loadTemplate (iFace, template);
 			_contentContainer = this.child.FindByName ("Content") as Container;
 		}
 

@@ -37,6 +37,8 @@ namespace Crow
 		///  to the parent in the graphic tree </summary>
 		ILayoutable LogicalParent { get; set; }
 
+		Interface IFace { get; }
+
 		Rectangle ClientRectangle { get; }
 		Rectangle getSlot();
 

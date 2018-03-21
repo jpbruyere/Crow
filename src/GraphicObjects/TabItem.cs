@@ -66,9 +66,9 @@ namespace Crow
 					value.LogicalParent = this;
 			}
 		}
-		protected override void loadTemplate(GraphicObject template = null)
+		protected override void loadTemplate(Interface iFace, GraphicObject template = null)
 		{
-			base.loadTemplate (template);
+			base.loadTemplate (iFace, template);
 
 			titleWidget = this.child.FindByName ("TabTitle");
 		}
@@ -191,7 +191,7 @@ namespace Crow
 			set {
 				base.Parent = value;
 				if (value != null) {
-					dragStartPoint = IFace.Mouse.Position;
+					//dragStartPoint = IFace.Mouse.Position;
 					savedParent = value as TabView;
 				}
 			}

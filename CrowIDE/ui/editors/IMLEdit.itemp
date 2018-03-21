@@ -44,9 +44,5 @@
 		</VerticalStack>
 		<Splitter/>
 		<IMLContainer Path="#Crow.Coding.ui.SourceEditor.crow"/>
-<!--		<Label DataSource="{../editor.Error}" Text="{}"
-			Visible="{../editor.HasError}"
-			Height="Fit" Width="Stretched" Background="DarkRed" Foreground="White"
-			TextAlignment="TopLeft" Multiline="true"/>-->
 	</VerticalStack>
 </TabItem>

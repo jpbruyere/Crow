@@ -89,19 +89,18 @@ namespace Crow
 			set {
 				if (value == Path)
 					return;
-				try {
-					if (string.IsNullOrEmpty(value))
-						Picture = null;
-					else {
-						//lock(IFace.LayoutMutex){
-							LoadImage (value);
-						//}
-					}
-				} catch (Exception ex) {
-					Debug.WriteLine (ex.Message);
+				if (string.IsNullOrEmpty (value))
 					_pic = null;
+				else {
+					if (value.EndsWith (".svg", true, System.Globalization.CultureInfo.InvariantCulture))
+						_pic = new SvgPicture (value);
+					else
+						_pic = new BmpPicture (value);
+					_pic.Scaled = scaled;
+					_pic.KeepProportions = keepProps;
 				}
 				NotifyValueChanged ("Path", Path);
+				RegisterForGraphicUpdate ();
 			}
 		}
 		/// <summary>
@@ -131,7 +130,7 @@ namespace Crow
 				_pic = value;
 				if (_pic!=null){
 					if (!_pic.Loaded)
-						_pic.Load (IFace, _pic.Path);
+						_pic.Load (IFace);
 					Scaled = _pic.Scaled;
 					KeepProportions = _pic.KeepProportions;
 				}
@@ -170,29 +169,31 @@ namespace Crow
 		}
 		#endregion
 
-		#region Image Loading
-		public void LoadImage (string path)
-		{
-			Picture pic;
-			if (path.EndsWith (".svg", true, System.Globalization.CultureInfo.InvariantCulture))
-				pic = new SvgPicture (path);
-			else
-				pic = new BmpPicture (path);
-
-			pic.Load (IFace, path);
-			pic.Scaled = scaled;
-			pic.KeepProportions = keepProps;
-
-			Picture = pic;
-		}
-		#endregion
 
 		#region GraphicObject overrides
+		protected override void EnqueueForRepaint ()
+		{
+			if (_pic != null) {
+				if (!_pic.Loaded) {
+					Interface iface = IFace;
+					if (iface != null) {
+						_pic.Load (iface);
+						RegisterForGraphicUpdate ();
+					}
+					return;
+				}
+			}
+			base.EnqueueForRepaint ();
+		}
 		public override int measureRawSize (LayoutingType lt)
 		{
 			if (_pic == null)
 				return 2 * Margin;
 				//_pic = "#Crow.Images.Icons.IconAlerte.svg";
+
+			if (!_pic.Loaded)
+				_pic.Load (IFace);
+			
 			//TODO:take scalling in account
 			if (lt == LayoutingType.Width)
 				return _pic.Dimensions.Width + 2 * Margin;
@@ -204,7 +205,7 @@ namespace Crow
 			base.onDraw (gr);
 
 			if (_pic == null)
-				return;
+				return;			
 
 			_pic.Paint (gr, ClientRectangle, _svgSub);
 

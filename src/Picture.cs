@@ -98,7 +98,7 @@ namespace Crow
 		/// load the image for rendering from the stream given as argument
 		/// </summary>
 		/// <param name="stream">picture stream</param>
-		public abstract void Load(Interface iface, string path);
+		public abstract void Load(Interface iface);
 		#endregion
 
 		/// <summary>

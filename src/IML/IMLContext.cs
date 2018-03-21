@@ -77,7 +77,7 @@ namespace Crow.IML
 				throw new Exception ("No default parameterless constructor found in " + rootType.Name);			
 			il.Emit (OpCodes.Newobj, ci);
 			il.Emit (OpCodes.Stloc_0);
-			CompilerServices.emitSetCurInterface (il);
+			//CompilerServices.emitSetCurInterface (il);
 		}
 
 		public NodeAddress CurrentNodeAddress {

@@ -47,9 +47,9 @@ namespace Crow
 
 		}
 
-		protected override void loadTemplate (GraphicObject template)
+		protected override void loadTemplate(Interface iFace, GraphicObject template = null)
 		{
-			base.loadTemplate (template);
+			base.loadTemplate (iFace, template);
 			NotifyValueChanged ("MsgIcon", "#Crow.Images.Icons.Informations.svg");
 		}
 		string message, okMessage, cancelMessage, noMessage;

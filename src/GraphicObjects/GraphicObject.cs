@@ -171,24 +171,24 @@ namespace Crow
 				throw new Exception("Trying to dispose an object queued for Redraw: " + this.ToString());
 				#endif
 
-				if (IFace.HoverWidget != null) {
-					if (IFace.HoverWidget.IsOrIsInside(this))
-						IFace.HoverWidget = null;
-				}
-				if (IFace.ActiveWidget != null) {
-					if (IFace.ActiveWidget.IsOrIsInside (this))
-						IFace.ActiveWidget = null;
-				}
-				if (IFace.FocusedWidget != null) {
-					if (IFace.FocusedWidget.IsOrIsInside (this))
-						IFace.FocusedWidget = null;
-				}
-				if (!localDataSourceIsNull)
-					DataSource = null;
+//				if (IFace.HoverWidget != null) {
+//					if (IFace.HoverWidget.IsOrIsInside(this))
+//						IFace.HoverWidget = null;
+//				}
+//				if (IFace.ActiveWidget != null) {
+//					if (IFace.ActiveWidget.IsOrIsInside (this))
+//						IFace.ActiveWidget = null;
+//				}
+//				if (IFace.FocusedWidget != null) {
+//					if (IFace.FocusedWidget.IsOrIsInside (this))
+//						IFace.FocusedWidget = null;
+//				}
+//				if (!localDataSourceIsNull)
+//					DataSource = null;
 
-				parentRWLock.EnterWriteLock();
-				parent = null;
-				parentRWLock.ExitWriteLock();
+				//parentRWLock.EnterWriteLock();
+				Parent = null;
+				//parentRWLock.ExitWriteLock();
 			} else
 				Debug.WriteLine ("!!! Finalized by GC: {0}", this.ToString ());
 			Clipping?.Dispose ();
@@ -208,8 +208,7 @@ namespace Crow
 		/// <summary>
 		/// interface this widget is bound to, this should not be changed once the instance is created
 		/// </summary>
-		public Interface IFace = null;
-
+		public Interface IFace { get { return parent?.IFace; }}
 		/// <summary>
 		/// contains the dirty rectangles in the coordinate system of the cache. those dirty zones
 		/// are repeated at each cached levels of the tree with correspondig coordinate system. This is done
@@ -260,16 +259,16 @@ namespace Crow
 		/// <param name="iface">Iface.</param>
 		public GraphicObject (Interface iface) : this()
 		{
-			IFace = iface;
-			Initialize ();
+			//IFace = iface;
+			Initialize (iface);
 		}
 		#endregion
 		//internal bool initialized = false;
 		/// <summary>
 		/// Initialize this Graphic object instance by setting style and default values and loading template if required
 		/// </summary>
-		public virtual void Initialize(){
-			loadDefaultValues ();
+		public virtual void Initialize(Interface iFace){
+			loadDefaultValues (iFace);
 			//initialized = true;
 		}
 		#region private fields
@@ -1030,7 +1029,7 @@ namespace Crow
 
 		#region Default and Style Values loading
 		/// <summary> Loads the default values from XML attributes default </summary>
-		public void loadDefaultValues()
+		public void loadDefaultValues(Interface iFace)
 		{
 //			#if DEBUG_LOAD
 //			Debug.WriteLine ("LoadDefValues for " + this.ToString ());
@@ -1039,17 +1038,17 @@ namespace Crow
 			Type thisType = this.GetType ();
 
 			if (!string.IsNullOrEmpty (Style)) {
-				if (IFace.DefaultValuesLoader.ContainsKey (Style)) {
-					IFace.DefaultValuesLoader [Style] (this);
+				if (iFace.DefaultValuesLoader.ContainsKey (Style)) {
+					iFace.DefaultValuesLoader [Style] (this);
 					onInitialized (this, null);
 					return;
 				}
-			} else if (IFace.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
-				IFace.DefaultValuesLoader [thisType.FullName] (this);
+			} else if (iFace.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
+				iFace.DefaultValuesLoader [thisType.FullName] (this);
 				onInitialized (this, null);
 				return;
-			} else 	if (IFace.DefaultValuesLoader.ContainsKey (thisType.Name)) {
-				IFace.DefaultValuesLoader [thisType.Name] (this);
+			} else 	if (iFace.DefaultValuesLoader.ContainsKey (thisType.Name)) {
+				iFace.DefaultValuesLoader [thisType.Name] (this);
 				onInitialized (this, null);
 				return;
 			}
@@ -1063,17 +1062,17 @@ namespace Crow
 			//   those files being placed in a Styles folder
 			string styleKey = Style;
 			if (!string.IsNullOrEmpty (Style)) {
-				if (IFace.Styling.ContainsKey (Style)) {
-					styling.Add (IFace.Styling [Style]);
+				if (iFace.Styling.ContainsKey (Style)) {
+					styling.Add (iFace.Styling [Style]);
 				}
 			}
-			if (IFace.Styling.ContainsKey (thisType.FullName)) {
-				styling.Add (IFace.Styling [thisType.FullName]);
+			if (iFace.Styling.ContainsKey (thisType.FullName)) {
+				styling.Add (iFace.Styling [thisType.FullName]);
 				if (string.IsNullOrEmpty (styleKey))
 					styleKey = thisType.FullName;
 			}
-			if (IFace.Styling.ContainsKey (thisType.Name)) {
-				styling.Add (IFace.Styling [thisType.Name]);
+			if (iFace.Styling.ContainsKey (thisType.Name)) {
+				styling.Add (iFace.Styling [thisType.Name]);
 				if (string.IsNullOrEmpty (styleKey))
 					styleKey = thisType.Name;
 			}
@@ -1193,8 +1192,8 @@ namespace Crow
 			#endregion
 
 			try {
-				IFace.DefaultValuesLoader[styleKey] = (Interface.LoaderInvoker)dm.CreateDelegate(typeof(Interface.LoaderInvoker));
-				IFace.DefaultValuesLoader[styleKey] (this);
+				iFace.DefaultValuesLoader[styleKey] = (Interface.LoaderInvoker)dm.CreateDelegate(typeof(Interface.LoaderInvoker));
+				iFace.DefaultValuesLoader[styleKey] (this);
 			} catch (Exception ex) {
 				throw new Exception ("Error applying style <" + styleKey + ">:", ex);
 			}
@@ -1385,12 +1384,15 @@ namespace Crow
 			IsDirty = true;
 			EnqueueForRepaint ();
 		}
-		protected void EnqueueForRepaint (){
+		protected virtual void EnqueueForRepaint (){
 			//if no layouting remains in queue for item, registre for redraw
 			if (requestedLayoutings != LayoutingType.None)
 				RegisterForLayouting ();
-			else if (RegisteredLayoutings == LayoutingType.None && IsDirty)
-				IFace.EnqueueForRepaint (this);			
+			else if (RegisteredLayoutings == LayoutingType.None && IsDirty) {
+				Interface iface = IFace;
+				if (iface != null)
+					IFace.EnqueueForRepaint (this);
+			}
 		}
 		#endregion
 
@@ -1405,11 +1407,11 @@ namespace Crow
 		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){
 		}
 		public virtual bool ArrangeChildren { get { return false; } }
+
 		public virtual void RegisterForLayouting(LayoutingType layoutType = LayoutingType.None){
-			if (Parent == null || !Monitor.TryEnter(IFace.LayoutMutex)) {
+			Interface iface = IFace;
+			if (iface == null || !Monitor.TryEnter(IFace.LayoutMutex)) {
 				requestedLayoutings |= layoutType;
-//				if (registeredLayoutings != LayoutingType.None)
-//					Debugger.Break ();
 				return;
 			}
 			layoutType |= requestedLayoutings;
@@ -1433,9 +1435,6 @@ namespace Crow
 			if (Parent is GraphicObject)
 				(Parent as GraphicObject).ChildrenLayoutingConstraints (ref layoutType);
 
-//				//prevent queueing same LayoutingType for this
-//				layoutType &= (~RegisteredLayoutings);
-
 			if (layoutType == LayoutingType.None) {
 				Monitor.Exit (IFace.LayoutMutex);
 				return;
@@ -1443,15 +1442,15 @@ namespace Crow
 
 			//enqueue LQI LayoutingTypes separately
 			if (layoutType.HasFlag (LayoutingType.Width))
-				IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
+				iface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
 			if (layoutType.HasFlag (LayoutingType.Height))
-				IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
+				iface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
 			if (layoutType.HasFlag (LayoutingType.X))
-				IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
+				iface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
 			if (layoutType.HasFlag (LayoutingType.Y))
-				IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
+				iface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
 			if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
-				IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
+				iface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
 			
 			Monitor.Exit (IFace.LayoutMutex);
 		}

@@ -314,6 +314,7 @@ namespace Crow.IML
 
 				if (!inlineTemplate) {//load from path or default template
 					ctx.il.Emit (OpCodes.Ldloc_0);//Load  current templatedControl ref
+					ctx.il.Emit (OpCodes.Ldarg_1);//load currentInterface
 					if (string.IsNullOrEmpty (templatePath)) {
 						ctx.il.Emit (OpCodes.Ldnull);//default template loading
 					} else {
@@ -438,6 +439,7 @@ namespace Crow.IML
 					}
 				}
 				ctx.il.Emit (OpCodes.Ldloc_0);
+				ctx.il.Emit (OpCodes.Ldarg_1);//load currentInterface
 				ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miLoadDefaultVals);
 				#endregion
 
@@ -519,19 +521,22 @@ namespace Crow.IML
 						throw new Exception (reader.Name + " type not found");
 					ConstructorInfo ci = t.GetConstructor (
 						                     BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,  
-						null, Type.EmptyTypes, null);
+						                     null, Type.EmptyTypes, null);
 					if (ci == null)
 						throw new Exception ("No default parameterless constructor found in " + t.Name);					
 					ctx.il.Emit (OpCodes.Newobj, ci);
 					ctx.il.Emit (OpCodes.Stloc_0);//child is now loc_0
-					CompilerServices.emitSetCurInterface (ctx.il);
+					//CompilerServices.emitSetCurInterface (ctx.il);
 
 					ctx.nodesStack.Push (new Node (t, nodeIdx));
 					emitLoader (reader, ctx);
 					ctx.nodesStack.Pop ();
 
+					MethodInfo miAdd = ctx.nodesStack.Peek ().GetAddMethod (nodeIdx);
+					if (miAdd == CompilerServices.miLoadTmp)
+						ctx.il.Emit (OpCodes.Ldarg_1);//push cur iface if tmp load
 					ctx.il.Emit (OpCodes.Ldloc_0);//load child on stack for parenting
-					ctx.il.Emit (OpCodes.Callvirt, ctx.nodesStack.Peek().GetAddMethod(nodeIdx));
+					ctx.il.Emit (OpCodes.Callvirt, miAdd);
 					ctx.il.Emit (OpCodes.Stloc_0); //reset local to current go
 
 					nodeIdx++;

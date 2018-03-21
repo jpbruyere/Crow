@@ -43,10 +43,7 @@ namespace Crow
 		public ProgressBar(Interface iface) : base(iface){}
 		#endregion
 
-		protected override void loadTemplate (GraphicObject template)
-		{
-			
-		}
+		protected override void loadTemplate(Interface iFace, GraphicObject template = null){}
 
 		#region GraphicObject overrides
 		protected override void onDraw (Context gr)

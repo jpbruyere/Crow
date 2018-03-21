@@ -157,8 +157,8 @@ namespace Crow
 			loadCursors ();
 			loadStyling ();
 			findAvailableTemplates ();
-			initTooltip ();
-			initContextMenus ();
+//			initTooltip ();
+//			initContextMenus ();
 		}
 
 		#region Static and constants
@@ -1259,6 +1259,9 @@ namespace Crow
 		#endregion
 
 		#region ILayoutable implementation
+		/// </summary>
+		public Interface IFace { get { return this; }}
+
 		public virtual bool PointIsIn(ref Point m)
 		{
 			return true;
