@@ -1409,6 +1409,10 @@ namespace Crow
 		public virtual bool ArrangeChildren { get { return false; } }
 
 		public virtual void RegisterForLayouting(LayoutingType layoutType = LayoutingType.None){
+			#if DBG_EVENTS
+			Interface.DbgLog(DbgEvtType.RegisterLayouting, layoutType.ToString(), this);
+			#endif
+
 			Interface iface = IFace;
 			if (iface == null || !Monitor.TryEnter(IFace.LayoutMutex)) {
 				requestedLayoutings |= layoutType;
@@ -1489,8 +1493,8 @@ namespace Crow
 		/// met and LQI has to be re-queued</returns>
 		public virtual bool UpdateLayout (LayoutingType layoutType)
 		{
-			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("UpdateLayout ({1})-> {0}", this.ToString (), layoutType));
+			#if DBG_EVENTS
+			Interface.DbgLog(DbgEvtType.UpdateLayout, layoutType.ToString(), this);
 			#endif
 			//unset bit, it would be reset if LQI is re-queued
 			registeredLayoutings &= (~layoutType);

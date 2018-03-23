@@ -66,44 +66,35 @@ namespace Crow
 	public class Interface : ILayoutable
 	{
 		#if DBG_EVENTS
-		const int MAX_THREAD = 20;
+		public static long nanosecPerTick = 0;
+		public static Stopwatch DbgTicks = Stopwatch.StartNew();
+		public static List<DebugEvent> DbgEvents = new List<DebugEvent>();
 
-		public DebugEvent[] PerThreadCurDbgEvt = new DebugEvent[MAX_THREAD];
-		public DebugEvent CurDbgEvt {
-			get { return PerThreadCurDbgEvt [Thread.CurrentThread.ManagedThreadId]; }
-			set { PerThreadCurDbgEvt [Thread.CurrentThread.ManagedThreadId] = value; }
-		}
-		public void DbgLogEvent (DebugEvent de) {			
-			if (CurDbgEvt == null)
-				CurDbgEvt = new DebugEvent(DbgEvtType.IfaceStart) ;			
-			de.Parent = CurDbgEvt;
-			if (CurDbgEvt != null)				
-				CurDbgEvt.ChildEvents.Add(de);
-		}
-		public DebugEvent DbgStartSubEvt (DbgEvtType dbgType){
-			DebugEvent de = new DebugEvent(dbgType); 
-			DbgStartSubEvt(de);
-			return de;
-		}
-		public void DbgStartSubEvt (DebugEvent de){
-			if (CurDbgEvt == null)
-				CurDbgEvt = new DebugEvent(DbgEvtType.IfaceStart) ;
-			de.Parent = CurDbgEvt;
-			CurDbgEvt.ChildEvents.Add(de);
-			CurDbgEvt = de;
-			CurDbgEvt.Start ();
-		}
-		public void DbgEndSubEvt () {
-			CurDbgEvt.Finished ();
-			CurDbgEvt = CurDbgEvt.Parent;
+		public static void DbgLog (DbgEvtType type, string message = "", GraphicObject go = null) {
+			DebugEvent de = null;
+			if (go == null) 
+				de = new DebugEvent ();
+			 else 
+				de = new WidgetDebugEvent () { Target = go };
+			
+			de.ThreadId = Thread.CurrentThread.ManagedThreadId;
+			de.Ticks = DbgTicks.ElapsedTicks;
+			de.EventType = type;
+			de.Message = message;
+
+			DbgEvents.Add (de);
 		}
 		#endif
 
 		#region CTOR
-		static Interface(){
+		static Interface(){			
 			if (Type.GetType ("Mono.Runtime") == null) {
 				throw new Exception (@"C.R.O.W. run only on Mono, download latest version at: http://www.mono-project.com/download/stable/");
 			}
+
+			#if DBG_EVENTS
+			nanosecPerTick = (1000L * 1000L * 1000L) / Stopwatch.Frequency;
+			#endif
 
 			CrowConfigRoot =
 				System.IO.Path.Combine(
@@ -141,7 +132,7 @@ namespace Crow
 		void interfaceThread()
 		{
 			#if DBG_EVENTS
-			CurDbgEvt = new DebugEvent(DbgEvtType.IfaceStart);
+			DbgLog(DbgEvtType.IfaceStart, "IFace thread start");
 			#endif
 
 			while (ClientRectangle.Size.Width == 0)
@@ -157,8 +148,8 @@ namespace Crow
 			loadCursors ();
 			loadStyling ();
 			findAvailableTemplates ();
-//			initTooltip ();
-//			initContextMenus ();
+			initTooltip ();
+			initContextMenus ();
 		}
 
 		#region Static and constants
@@ -588,9 +579,9 @@ namespace Crow
 		/// Result: the Interface bitmap is drawn in memory (byte[] bmp) and a dirtyRect and bitmap are available
 		/// </summary>
 		public void Update(){
-//			#if DBG_EVENTS
-//			DbgStartSubEvt(DbgEvtType.IFaceUpdate);
-//			#endif
+			#if DBG_EVENTS
+			DbgLog(DbgEvtType.IFaceUpdate);
+			#endif
 
 			if (armedClickSender != null && clickTimer.ElapsedMilliseconds >= Interface.DoubleClick) {
 				armedClickSender.onMouseClick (armedClickSender, armedClickEvtArgs);				
@@ -645,25 +636,18 @@ namespace Crow
 				#if DBG_EVENTS
 				bool logLayouting = false;
 				if (LayoutingQueue.Count > 0){
-					DbgStartSubEvt(DbgEvtType.IFaceLayouting);
+					DbgLog(DbgEvtType.IFaceLayouting, "ProcessLayouting");
 					logLayouting = true;
 				}
 				#endif
 
 				while (LayoutingQueue.Count > 0) {
 					lqi = LayoutingQueue.Dequeue ();
-					#if DBG_EVENTS
-					DbgStartSubEvt (new LayoutingDebugEvent(lqi.LayoutType,lqi.Layoutable as GraphicObject));
-					#endif
 					lqi.ProcessLayouting ();
-					#if DBG_EVENTS
-					DbgEndSubEvt();
-					#endif
 				}
-
 				#if DBG_EVENTS
 				if (logLayouting)
-					DbgEndSubEvt();
+					DbgLog(DbgEvtType.IFaceLayouting, "End of ProcessLayouting");
 				#endif
 
 				LayoutingQueue = DiscardQueue;
@@ -678,7 +662,7 @@ namespace Crow
 			if (ClippingQueue.Count == 0)
 				return;
 			#if DBG_EVENTS
-			DbgStartSubEvt(DbgEvtType.IFaceClipping);
+			DbgLog(DbgEvtType.IFaceClipping, "ClippingRegistration");
 			#endif
 			GraphicObject g = null;
 			while (ClippingQueue.Count > 0) {
@@ -690,7 +674,7 @@ namespace Crow
 			}
 
 			#if DBG_EVENTS
-			DbgEndSubEvt();
+			DbgLog(DbgEvtType.IFaceClipping, "End of Clipping Registration");
 			#endif
 		}
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
@@ -703,7 +687,7 @@ namespace Crow
 				using (ctx = new Context (surf)){
 					if (!clipping.IsEmpty) {
 						#if DBG_EVENTS
-						DbgStartSubEvt(DbgEvtType.IFaceDrawing);
+						DbgLog(DbgEvtType.IFaceDrawing);
 						#endif
 
 						for (int i = 0; i < clipping.NumRectangles; i++)
@@ -742,7 +726,7 @@ namespace Crow
 							}
 						}
 						#if DBG_EVENTS
-						DbgEndSubEvt ();
+						DbgLog(DbgEvtType.IFaceDrawing, "End of drawing");
 						#endif
 
 						#if DEBUG_CLIP_RECTANGLE

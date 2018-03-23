@@ -125,6 +125,7 @@
     <Compile Include="src\Editors\Parsers2\Tokenizer.cs" />
     <Compile Include="src\Editors\SourceEditor.cs" />
     <Compile Include="src\ProjectTree\StyleProjectItem.cs" />
+    <Compile Include="src\DbgEventViewer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />

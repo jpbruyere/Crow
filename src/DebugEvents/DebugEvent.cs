@@ -45,87 +45,49 @@ namespace Crow
 		RecreateCache	= 0x24,
 		IFaceLayouting	= 0x80,
 		UpdateLayout	= 0x81,
-		RegisterLayouting= 0x82,
+		RequeueLQI		= 0x82,
+		DiscardLQI		= 0x83,
+		DeleteLQI		= 0x84,
+		SucceedLQI		= 0x85,
+		RegisterLayouting= 0x86,
 	}
 
 	public class DebugEvent
 	{
-		public DebugEvent (DbgEvtType type, string message = "")
-		{
-			EventType = type;
-			ThreadId = Thread.CurrentThread.ManagedThreadId;
-		}
-
 		public int ThreadId;
 		public DbgEvtType EventType;
-		public Stopwatch Time;
+		public long Ticks;
 		public string Message;
 
-		public DebugEvent Parent;
-		public List<DebugEvent> ChildEvents = new List<DebugEvent>();
-
-		public long Ticks { get { return Time.ElapsedTicks; }}
-
-
-		public virtual void Start () {
-			Time = Stopwatch.StartNew();
-		}
-		public virtual void Finished () {
-			Time.Stop();
+		public override string ToString ()
+		{
+			return string.Format ("{0,2}:{1,10}:{2} {3}", ThreadId, Ticks, EventType, Message);
 		}
 	}
-	public class WidgetDebugEvent : DebugEvent {		
-		public GraphicObject Target;
+	public class WidgetDebugEvent : DebugEvent {
+		public string FullName;
 		public LayoutingType RegisteredLayoutings;
 		public LayoutingType RequestedLayoutings;
 		public Rectangle Slot;
 		public Measure Width;
 		public Measure Height;
 
-		public WidgetDebugEvent (DbgEvtType type, GraphicObject go, string message = "") : base(type, message)
-		{
-			Target = go;
-			saveTargetState ();
+		public GraphicObject Target {
+			set {
+				FullName = value.ToString ();
+				RegisteredLayoutings = value.registeredLayoutings;
+				RequestedLayoutings = value.requestedLayoutings;
+				Width = value.Width;
+				Height = value.Height;
+				Slot = value.Slot;				
+			}
 		}
-		protected virtual void saveTargetState () {
-			RegisteredLayoutings = Target.registeredLayoutings;
-			RequestedLayoutings = Target.requestedLayoutings;
-			Width = Target.Width;
-			Height = Target.Height;
-			Slot = Target.Slot;
+		public string Name {
+			get { return string.IsNullOrEmpty(FullName) ? "" : FullName.Substring(FullName.LastIndexOf('.')+1); }
 		}
-		public override void Finished ()
-		{			
-			base.Finished ();
-			saveTargetState ();
-		}
-	}
-	public class LayoutingDebugEvent : WidgetDebugEvent
-	{
-		public enum Result {
-			Ok,
-			Requeued,
-			Discarded,
-			Deleted,
-		}
-		public LayoutingDebugEvent (LayoutingType layoutingType, GraphicObject go) : base(DbgEvtType.IFaceLayouting, go)
-		{
-			LayoutingType = layoutingType;
-			Target = go;
-		}	
-		public LayoutingType LayoutingType;
-		public Rectangle PreviousSlot;
-		public Result EndResult;
-		public override void Finished ()
-		{
-			base.Finished ();
-			saveTargetState ();
-			PreviousSlot = Target.LastSlots;
-		}
-
 		public override string ToString ()
 		{
-			return string.Format ("{0} {1} {2} {3} => {4}", Target, LayoutingType, EndResult, PreviousSlot, Slot);
+			return base.ToString() + ";" + string.Format ("{0};{1};{2};{3}", Name, RegisteredLayoutings, RequestedLayoutings, Slot);
 		}
 	}
 	#endif

@@ -82,7 +82,7 @@ namespace Crow.Coding
 		}
 
 		public List<DebugEvent> DebugEvents {
-			get { return instance?.IFace.PerThreadCurDbgEvt.ToList(); }
+			get { return Interface.DbgEvents; }
 		}
 
 		void GTView_SelectedItemChanged (object sender, SelectionChangeEventArgs e){

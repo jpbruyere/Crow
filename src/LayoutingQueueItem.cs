@@ -79,8 +79,7 @@ namespace Crow
 				go.requestedLayoutings |= LayoutType;
 				go.parentRWLock.ExitReadLock ();
 				#if DBG_EVENTS
-				(go.IFace.CurDbgEvt as LayoutingDebugEvent).EndResult = LayoutingDebugEvent.Result.Deleted;
-				go.IFace.CurDbgEvt.Message = "Parent is null";
+				Interface.DbgLog(DbgEvtType.DeleteLQI, "Parent is null", go);
 				#endif
 				return;
 			}
@@ -91,13 +90,13 @@ namespace Crow
 					Layoutable.RegisteredLayoutings |= LayoutType;
 
 					#if DBG_EVENTS
-					(go.IFace.CurDbgEvt as LayoutingDebugEvent).EndResult = LayoutingDebugEvent.Result.Requeued;
+					Interface.DbgLog(DbgEvtType.RequeueLQI, LayoutType.ToString(), go);
 					#endif
 
 					(Layoutable as GraphicObject).IFace.LayoutingQueue.Enqueue (this);
 				} else if (DiscardCount < Interface.MaxDiscardCount) {
 					#if DBG_EVENTS
-					(go.IFace.CurDbgEvt as LayoutingDebugEvent).EndResult = LayoutingDebugEvent.Result.Discarded;
+					Interface.DbgLog(DbgEvtType.DiscardLQI, LayoutType.ToString(), go);
 					#endif
 					go.LayoutingDiscardCheck (LayoutType);
 					LayoutingTries = 0;
@@ -107,12 +106,12 @@ namespace Crow
 				}
 				#if DBG_EVENTS
 				else
-				(go.IFace.CurDbgEvt as LayoutingDebugEvent).EndResult = LayoutingDebugEvent.Result.Deleted;
+					Interface.DbgLog(DbgEvtType.DeleteLQI, LayoutType.ToString(), go);
 				#endif
 			}
 			#if DBG_EVENTS
 			else
-				(go.IFace.CurDbgEvt as LayoutingDebugEvent).EndResult = LayoutingDebugEvent.Result.Ok;
+				Interface.DbgLog(DbgEvtType.SucceedLQI, LayoutType.ToString(), go);
 			#endif
 
 			go.parentRWLock.ExitReadLock ();

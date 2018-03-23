@@ -1,63 +1,96 @@
 ﻿<?xml version="1.0"?>
 <DockWindow Name="winLQIs" Caption="Layouting Queue Items Explorer" Width="90%" Height="80%">
-	<VerticalStack DataSource="{CurrentSolution}">
-		<TreeView DataSource="{SelectedItem}" Name="treeView" Data="{DebugEvents}">
-			<ItemTemplate DataType="Crow.DebugEvent" Data="ChildEvents">
-				<Expandable >
-					<Template>
-						<VerticalStack Spacing="1">							
-							<HorizontalStack Spacing="1" MouseDoubleClick="./onClickForExpand">
-								<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
-									Path="{./Image}"
-									Visible="{./IsExpandable}"
-									SvgSub="{./IsExpanded}"
-									MouseEnter="{Background=LightGray}"
-									MouseLeave="{Background=Transparent}"/>
-								<Label Style="DbgGridCell" Text="{ThreadId}" Width="18" />
-								<Label Style="DbgGridCell" Text="{EventType}" Width="90" />
-								<Label Style="DbgGridCell" Text="{Ticks}" Width="60" TextAlignment="Right"/>
-								<Label Text="{Message}" Width="Stretched" Background="White" Foreground="Black"/>				
-							</HorizontalStack>							
-							<Container Name="Content" Visible="false"/>
-						</VerticalStack>
-					</Template>
-					<HorizontalStack Height="Fit">
-						<GraphicObject Width="8" Height="10"/>
-						<VerticalStack Height="Fit" Name="ItemsContainer"/>
-					</HorizontalStack>
-				</Expandable>
-			</ItemTemplate>
-			<ItemTemplate DataType="Crow.LayoutingDebugEvent">
-				<Expandable >
-					<Template>
-						<VerticalStack Spacing="1">							
-							<HorizontalStack Spacing="1" MouseDoubleClick="./onClickForExpand">
-								<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
-									Path="{./Image}"
-									Visible="{./IsExpandable}"
-									SvgSub="{./IsExpanded}"
-									MouseEnter="{Background=LightGray}"
-									MouseLeave="{Background=Transparent}"/>
-								<Label Style="DbgGridCell" Text="{LayoutingType}" Width="60"/>
-								<Label Style="DbgGridCell" Text="{EndResult}" Width="60"/>
-								<Label Style="DbgGridCell" Text="{Ticks}" Width="60" TextAlignment="Right"/>
-								<Label Style="DbgGridCell" Text="{Target}" Width="30%" Tooltip="{Target}"/>
-								<Label Style="DbgGridCell" Text="{PreviousSlot}" Width="100"/>
-								<Label Style="DbgGridCell" Text="{Slot}" Width="100"/>
-							</HorizontalStack>							
-							<Container Name="Content" Visible="false"/>
-						</VerticalStack>
-					</Template>
-					<HorizontalStack Height="Fit">
-						<GraphicObject Width="8" Height="10"/>
-						<VerticalStack Height="Fit" Name="ItemsContainer"/>
-					</HorizontalStack>
-				</Expandable>
-			</ItemTemplate>
-		</TreeView>
+	<VerticalStack>
+<!--		<Expandable Height="Fit" Caption="Filters">-->
+			<VerticalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="Thread filter"/>
+					<TextBox Text="{²../../../../viewer.ThreadFilter}" Width="30"/>
+				</HorizontalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="Obj filter"/>
+					<TextBox Text="{²../../../../viewer.ObjFilter}" />
+					<CheckBox Caption="Sibling" IsChecked="{²../../../../viewer.ObjSibling}"/>
+					<CheckBox Caption="Parent" IsChecked="{²../../../../viewer.ObjParent}"/>
+					<CheckBox Caption="Descendants" IsChecked="{²../../../../viewer.ObjDescendants}"/>
+				</HorizontalStack>
+			</VerticalStack>
+<!--		</Expandable>-->
+		<Expandable Height="Fit" Caption="Infos">
+			<HorizontalStack Height="Fit">
+				<Label Text="elapsed:"/>
+				<Label Text="{../../../viewer.ElapsedTicks}" Foreground="White" Width="50" TextAlignment="Right"/>
+				<Label Text="ticks"/>
+				<Label Text="{../../../viewer.ElapsedMS}" Foreground="White" Width="50" TextAlignment="Right"/>
+				<Label Text="ms"/>
+			</HorizontalStack>
+		</Expandable>
+		<HorizontalStack DataSource="{CurrentSolution}">
+			<DbgEventViewer Font="mono, 8" Focusable="true" Name="viewer" DataSource="{SelectedItem}"  DebugEvents="{DebugEvents}"/>
+			<ScrollBar
+				Name="scrollbar1"
+				LargeIncrement="{../viewer.PageHeight}" SmallIncrement="30"
+				CursorSize="{../viewer.ChildHeightRatio}"
+				Value="{²../viewer.ScrollY}"
+				Maximum="{../viewer.MaxScrollY}"
+				Width="14" Orientation="Vertical"/>
+		</HorizontalStack>
 	</VerticalStack>
 </DockWindow>
-
+	<!--		<TreeView DataSource="{SelectedItem}" Name="treeView" Data="{DebugEvents}">
+				<ItemTemplate DataType="Crow.DebugEvent" Data="ChildEvents">
+					<Expandable >
+						<Template>
+							<VerticalStack Spacing="1">							
+								<HorizontalStack Spacing="1" MouseDoubleClick="./onClickForExpand">
+									<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
+										Path="{./Image}"
+										Visible="{./IsExpandable}"
+										SvgSub="{./IsExpanded}"
+										MouseEnter="{Background=LightGray}"
+										MouseLeave="{Background=Transparent}"/>
+									<Label Style="DbgGridCell" Text="{ThreadId}" Width="18" />
+									<Label Style="DbgGridCell" Text="{EventType}" Width="90" />
+									<Label Style="DbgGridCell" Text="{Ticks}" Width="60" TextAlignment="Right"/>
+									<Label Text="{Message}" Width="Stretched" Background="White" Foreground="Black"/>				
+								</HorizontalStack>							
+								<Container Name="Content" Visible="false"/>
+							</VerticalStack>
+						</Template>
+						<HorizontalStack Height="Fit">
+							<GraphicObject Width="8" Height="10"/>
+							<VerticalStack Height="Fit" Name="ItemsContainer"/>
+						</HorizontalStack>
+					</Expandable>
+				</ItemTemplate>
+				<ItemTemplate DataType="Crow.LayoutingDebugEvent">
+					<Expandable >
+						<Template>
+							<VerticalStack Spacing="1">							
+								<HorizontalStack Spacing="1" MouseDoubleClick="./onClickForExpand">
+									<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
+										Path="{./Image}"
+										Visible="{./IsExpandable}"
+										SvgSub="{./IsExpanded}"
+										MouseEnter="{Background=LightGray}"
+										MouseLeave="{Background=Transparent}"/>
+									<Label Style="DbgGridCell" Text="{LayoutingType}" Width="60"/>
+									<Label Style="DbgGridCell" Text="{EndResult}" Width="60"/>
+									<Label Style="DbgGridCell" Text="{Ticks}" Width="60" TextAlignment="Right"/>
+									<Label Style="DbgGridCell" Text="{Target}" Width="30%" Tooltip="{Target}"/>
+									<Label Style="DbgGridCell" Text="{PreviousSlot}" Width="100"/>
+									<Label Style="DbgGridCell" Text="{Slot}" Width="100"/>
+								</HorizontalStack>							
+								<Container Name="Content" Visible="false"/>
+							</VerticalStack>
+						</Template>
+						<HorizontalStack Height="Fit">
+							<GraphicObject Width="8" Height="10"/>
+							<VerticalStack Height="Fit" Name="ItemsContainer"/>
+						</HorizontalStack>
+					</Expandable>
+				</ItemTemplate>
+			</TreeView>-->
 <!--		<ItemTemplate DataType="Crow.LayoutingQueueItem" Data="triggeredLQIs">
 			<Expandable>
 				<Template>

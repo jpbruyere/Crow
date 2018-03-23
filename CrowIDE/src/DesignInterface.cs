@@ -164,23 +164,18 @@ namespace Crow.Coding
 				#if DBG_EVENTS
 				bool logLayouting = false;
 				if (LayoutingQueue.Count > 0){
-					DbgStartSubEvt(DbgEvtType.IFaceLayouting);
+					DbgLog(DbgEvtType.IFaceLayouting, "ProcessLayouting");
 					logLayouting = true;
 				}
 				#endif
+
 				while (LayoutingQueue.Count > 0) {
 					lqi = LayoutingQueue.Dequeue ();
-					#if DBG_EVENTS
-					DbgStartSubEvt (new LayoutingDebugEvent(lqi.LayoutType,lqi.Layoutable as GraphicObject));
-					#endif
 					lqi.ProcessLayouting ();
-					#if DBG_EVENTS
-					DbgEndSubEvt();
-					#endif
 				}
 				#if DBG_EVENTS
 				if (logLayouting)
-					DbgEndSubEvt();
+					DbgLog(DbgEvtType.IFaceLayouting, "End of ProcessLayouting");
 				#endif
 				LayoutingQueue = DiscardQueue;
 				Monitor.Exit (LayoutMutex);

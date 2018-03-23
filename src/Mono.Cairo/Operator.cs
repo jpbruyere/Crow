@@ -52,5 +52,21 @@ namespace Cairo
 		Xor,
 		Add,
 		Saturate,
+
+		Multiply,
+		Screen,
+		Overlay,
+		Darken,
+		Lighten,
+		Dodge,
+		Burn,
+		Light,
+		SoftLight,
+		Difference,
+		Exclusion,
+		HslHue,
+		HslSaturation,
+		HslColor,
+		HslLuminosity
 	}
 }
