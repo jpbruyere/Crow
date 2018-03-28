@@ -439,6 +439,18 @@ namespace Crow
 
 		protected virtual void close(){
 			Closing.Raise (this, null);
+			if (IFace.HoverWidget != null) {
+				if (IFace.HoverWidget.IsOrIsInside(this))
+					IFace.HoverWidget = null;
+			}
+			if (IFace.ActiveWidget != null) {
+				if (IFace.ActiveWidget.IsOrIsInside (this))
+					IFace.ActiveWidget = null;
+			}
+			if (IFace.FocusedWidget != null) {
+				if (IFace.FocusedWidget.IsOrIsInside (this))
+					IFace.FocusedWidget = null;
+			}
 			if (Parent is Interface)
 				(Parent as Interface).DeleteWidget (this);
 			else {

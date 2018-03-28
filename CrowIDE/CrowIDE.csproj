@@ -60,6 +60,7 @@
     <Reference Include="OpenTK">
       <HintPath>$(SolutionDir)packages\OpenTK.2.0.0\lib\net20\OpenTK.dll</HintPath>
     </Reference>
+    <Reference Include="Mono.CSharp" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

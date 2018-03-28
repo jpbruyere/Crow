@@ -149,14 +149,16 @@ namespace Crow.Coding
 			FoldingEvent.Raise (this, new CodeBufferEventArgs (line));
 		}
 		public void Load(string rawSource, string lineBrkRegex = @"\r\n|\r|\n|\\\n") {
+			editMutex.EnterWriteLock ();
+
 			this.Clear();
 
-			if (string.IsNullOrEmpty (rawSource))
-				return;
+			if (!string.IsNullOrEmpty (rawSource)) {
+				AddRange (Regex.Split (rawSource, lineBrkRegex));
+				lineBreak = detectLineBreakKind (rawSource);
+			}
 
-			AddRange (Regex.Split (rawSource, lineBrkRegex));
-
-			lineBreak = detectLineBreakKind (rawSource);
+			editMutex.ExitWriteLock ();
 		}
 
 		/// <summary>

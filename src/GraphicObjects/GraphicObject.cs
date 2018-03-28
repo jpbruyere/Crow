@@ -521,7 +521,7 @@ namespace Crow
 		/// and by template controls to find special element in their template implementation such
 		/// as a container or a group to put children in.
 		/// </summary>
-		[DesignCategory ("Divers")][DefaultValue(null)]
+		[DesignCategory ("Divers")]
 		public virtual string Name {
 			get {
 				#if DEBUG

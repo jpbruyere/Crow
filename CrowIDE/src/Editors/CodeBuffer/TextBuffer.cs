@@ -29,7 +29,7 @@ using System.Text;
 namespace Crow.Text
 {
 	/// <summary>
-	/// Code buffer, lines are arranged in a List<string>, new line chars are removed during string.split on '\n...',
+	/// text buffer in single piece with lines
 	/// </summary>
 	public class TextBuffer
 	{
@@ -54,6 +54,8 @@ namespace Crow.Text
 		/// </summary>
 		int _currentLine = 0;
 		int _currentCol = 0;
+		Point selStartPos = -1;	//selection start (row,column)
+		Point selEndPos = -1;	//selection end (row,column)
 
 		/// <summary>
 		/// Gets the total line count.
@@ -103,9 +105,8 @@ namespace Crow.Text
 		public int GetBufferIndexOfLine (int i) {
 			int ptr = 0;
 			editMutex.EnterReadLock ();
-			for (int j = 0; j < i; j++) {
+			for (int j = 0; j < i; j++)
 				ptr += lineLength [j];
-			}
 			editMutex.ExitReadLock ();
 			return ptr;
 		}
@@ -115,18 +116,6 @@ namespace Crow.Text
 		/// <value>absolute index in the buffer of current position</value>
 		public int BufferIndexOfCurrentPosition {
 			get {return GetBufferIndexOfLine (_currentLine) + _currentCol;}
-		}
-		public int this[int i]
-		{
-			get {				
-				int ptr = 0;
-				editMutex.EnterReadLock ();
-				for (int j = 0; j < i; j++) {
-					ptr += lineLength [j];
-				}
-				editMutex.ExitReadLock ();
-				return ptr; 
-			}
 		}
 		/// <summary>
 		/// remove line number i
@@ -146,7 +135,7 @@ namespace Crow.Text
 		/// <param name="str">linebreak free string</param>
 		public void InsertAt(int i, string str){
 			editMutex.EnterWriteLock ();
-			buffer.Insert (this [i], str);
+			buffer.Insert (GetBufferIndexOfLine (i), str);
 			lineLength.Insert (i, str.Length);
 			editMutex.ExitWriteLock ();
 			LineAdditionEvent.Raise (this, new TextBufferEventArgs (i));
@@ -178,7 +167,7 @@ namespace Crow.Text
 		}
 		public void UpdateLine(int i, string newContent){
 			editMutex.EnterWriteLock ();
-			int ptrL = this [i];
+			int ptrL = GetBufferIndexOfLine (i);
 			buffer.Remove (ptrL, lineLength [i]);
 			buffer.Insert (ptrL, newContent);
 			lineLength [i] = newContent.Length;
@@ -187,7 +176,7 @@ namespace Crow.Text
 		}
 		public void AppenedLine(int i, string newContent){
 			editMutex.EnterWriteLock ();
-			int ptr = this [i] + lineLength [i];
+			int ptr = GetBufferIndexOfLine (i) + lineLength [i];
 			if (i < LineCount - 1)
 				ptr--;
 			buffer.Insert(ptr, newContent);
@@ -207,7 +196,7 @@ namespace Crow.Text
 			editMutex.EnterWriteLock ();
 
 			string tmp = reghexLineBrk.Replace (str, "\n");//use single char line break in buffer
-			int buffPtr = this [CurrentLine] + CurrentColumn;
+			int buffPtr = GetBufferIndexOfLine (CurrentLine) + CurrentColumn;
 			buffer.Insert (buffPtr, tmp);
 
 			int lPtr = CurrentLine, strPtr = 0;
@@ -242,7 +231,7 @@ namespace Crow.Text
 		public void InsertLineBreak()
 		{
 			editMutex.EnterWriteLock ();
-			buffer.Insert (this [CurrentLine] + CurrentColumn, '\n');
+			buffer.Insert (GetBufferIndexOfLine (CurrentLine) + CurrentColumn, '\n');
 			int lgdiff = lineLength [CurrentLine] - CurrentColumn;
 			lineLength.Insert (CurrentLine + 1, lineLength [CurrentLine] - CurrentColumn);
 			lineLength [CurrentLine] = CurrentColumn + 1;
@@ -261,7 +250,7 @@ namespace Crow.Text
 						return;
 					}
 
-					buffer.Remove (this [CurrentLine] - 1, 1);
+					buffer.Remove (GetBufferIndexOfLine (CurrentLine) - 1, 1);
 
 					int col = lineLength [CurrentLine - 1] - 1;
 					lineLength [CurrentLine - 1] += lineLength [CurrentLine] - 1;
@@ -275,11 +264,11 @@ namespace Crow.Text
 					return;
 				}
 				CurrentColumn--;
-				buffer.Remove (this [CurrentLine] + CurrentColumn, 1);
+				buffer.Remove (GetBufferIndexOfLine (CurrentLine) + CurrentColumn, 1);
 				lineLength [CurrentLine]--;
 			} else {
 				int linesToRemove = SelectionEnd.Y - SelectionStart.Y;
-				int ptr = this [SelectionStart.Y] + SelectionStart.X;
+				int ptr = GetBufferIndexOfLine (SelectionStart.Y) + SelectionStart.X;
 				int length = lineLength [SelectionStart.Y] - SelectionStart.X;
 				int l = 1;
 				while (l <= linesToRemove ) {
@@ -303,10 +292,14 @@ namespace Crow.Text
 			editMutex.ExitWriteLock ();
 		}
 		public void Load(string rawSource) {
+			editMutex.EnterWriteLock ();
+
 			this.Clear();
 
-			if (string.IsNullOrEmpty (rawSource))
+			if (string.IsNullOrEmpty (rawSource)) {
+				editMutex.ExitWriteLock ();
 				return;
+			}
 
 			lineBreak = reghexLineBrk.Match (rawSource).Value;//store original line break
 			string tmp = reghexLineBrk.Replace (rawSource, "\n");//use single char line break in buffer
@@ -321,19 +314,11 @@ namespace Crow.Text
 			lineLength.Add (0);
 
 			buffer = new StringBuilder (tmp);
+
+			editMutex.ExitWriteLock ();
 		}
 
-//		public int CurrentTabulatedColumn {
-//			get {
-////				return lines [_currentLine].Content.Substring (0, _currentCol).
-////					Replace ("\t", new String (' ', Interface.TabSize)).Length;
-//			}
-//		}
-
 		#region moving cursor an selection
-		Point selStartPos = -1;	//selection start (row,column)
-		Point selEndPos = -1;	//selection end (row,column)
-
 		public bool SelectionInProgress { get { return selStartPos >= 0; }}
 		public void SetSelStartPos () {
 			selStartPos = selEndPos = CurrentPosition;
@@ -422,12 +407,12 @@ namespace Crow.Text
 		/// Current position in buffer coordinate, tabulation = 1 char
 		/// </summary>
 		public Point CurrentPosition {
-			get { return new Point(CurrentColumn, CurrentLine); }
+			get { return new Point(_currentCol, _currentLine); }
 		}
 		/// <summary>
 		/// get char at current position in buffer
 		/// </summary>
-		protected Char CurrentChar { get { return buffer[this [CurrentLine]]; } }
+		protected Char CurrentChar { get { return buffer[GetBufferIndexOfLine (_currentLine)+_currentCol]; } }
 		public string SelectedText {
 			get {
 				if (SelectionIsEmpty)
@@ -435,7 +420,7 @@ namespace Crow.Text
 				Point selStart = SelectionStart;
 				Point selEnd = SelectionEnd;
 
-				int ptr = this [selStart.Y] + selStart.X;
+				int ptr = GetBufferIndexOfLine (selStart.Y) + selStart.X;
 				int length = lineLength[selStart.Y] - selStart.X;
 				for (int i = selStart.Y+1; i <= selEnd.Y; i++) 
 					length += lineLength [i];

@@ -54,18 +54,16 @@ namespace Crow.Text
 			buffer.BufferCleared += Buffer_BufferCleared;
 			buffer.SelectionChanged += Buffer_SelectionChanged;
 			buffer.PositionChanged += Buffer_PositionChanged;
-			//buffer.Add ("");
 		}
 		#endregion
-
-		string oldSource = "";
-		volatile bool isDirty = false;
 
 		#region private and protected fields
 		int visibleLines = 1;
 		int visibleColumns = 1;
 
 		TextBuffer buffer;
+		string oldSource = "";
+		volatile bool isDirty = false;
 
 		Color selBackground;
 		Color selForeground;
@@ -88,15 +86,11 @@ namespace Crow.Text
 			NotifyValueChanged ("VisibleLines", visibleLines);
 			updateMaxScrollY ();
 			RegisterForGraphicUpdate ();
-//			System.Diagnostics.Debug.WriteLine ("update visible lines: " + visibleLines);
-//			System.Diagnostics.Debug.WriteLine ("update MaxScrollY: " + MaxScrollY);
 		}
 		void updateVisibleColumns(){
 			visibleColumns = (int)Math.Floor ((double)(ClientRectangle.Width)/ fe.MaxXAdvance);
 			NotifyValueChanged ("VisibleColumns", visibleColumns);
 			RegisterForGraphicUpdate ();
-//			System.Diagnostics.Debug.WriteLine ("update visible columns: {0} leftMargin:{1}",visibleColumns, leftMargin);
-//			System.Diagnostics.Debug.WriteLine ("update MaxScrollX: " + MaxScrollX);
 		}
 		void updateMaxScrollX (int longestTabulatedLineLength) {			
 			MaxScrollX = Math.Max (0, longestTabulatedLineLength - visibleColumns);
@@ -109,16 +103,12 @@ namespace Crow.Text
 			if (lc > 0)
 				NotifyValueChanged ("ChildHeightRatio", Slot.Height * visibleLines / lc);
 			
-		}			
-
-
+		}
 
 		#region Editor overrides
 		protected override void updateEditorFromProjFile ()
-		{
-			buffer.editMutex.EnterWriteLock ();
+		{			
 			loadSource ();
-			buffer.editMutex.ExitWriteLock ();
 
 			isDirty = false;
 			oldSource = projFile.Source;
@@ -267,7 +257,6 @@ namespace Crow.Text
 		}
 		#endregion
 
-
 		void loadSource () {
 			buffer.Load (projFile.Source);
 			projFile.RegisteredEditors [this] = true;
@@ -276,7 +265,7 @@ namespace Crow.Text
 		}
 
 		int getTabulatedColumn (int col, int line) {
-			return buffer.GetSubString (buffer [line],
+			return buffer.GetSubString (buffer.GetBufferIndexOfLine (line),
 				buffer.GetLineLength (line)).Substring(0,col).Replace ("\t", new String (' ', Interface.TabSize)).Length;
 		}
 		int getTabulatedColumn (Point pos) {
@@ -296,7 +285,7 @@ namespace Crow.Text
 				int lineLength = buffer.GetLineLength (lineIndex);
 				if (lineIndex < buffer.LineCount - 1)//dont print line break
 					lineLength--;
-				string lstr = buffer.GetSubString (buffer [lineIndex],
+				string lstr = buffer.GetSubString (buffer.GetBufferIndexOfLine (lineIndex),
 					lineLength).Replace ("\t", new String (' ', Interface.TabSize));
 
 				int lstrLength = lstr.Length;
@@ -422,7 +411,7 @@ namespace Crow.Text
 		int getBufferColFromVisualCol (int line, int column) {
 			int i = 0;
 			int buffCol = 0;
-			int buffPtr = buffer [line];
+			int buffPtr = buffer.GetBufferIndexOfLine (line);
 			while (i < column && buffCol < buffer.GetLineLength(line)) {
 				if (buffer.GetCharAt(buffPtr + buffCol) == '\t')
 					i += Interface.TabSize;

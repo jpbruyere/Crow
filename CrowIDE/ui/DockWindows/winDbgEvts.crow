@@ -26,7 +26,7 @@
 			</HorizontalStack>
 		</Expandable>
 		<HorizontalStack DataSource="{CurrentSolution}">
-			<DbgEventViewer Font="mono, 8" Focusable="true" Name="viewer" DataSource="{SelectedItem}"  DebugEvents="{DebugEvents}"/>
+			<DbgEventViewer Font="mono, 10" Background="White" Foreground="Black" Focusable="true" Name="viewer" DataSource="{SelectedItem}"  DebugEvents="{DebugEvents}"/>
 			<ScrollBar
 				Name="scrollbar1"
 				LargeIncrement="{../viewer.PageHeight}" SmallIncrement="30"

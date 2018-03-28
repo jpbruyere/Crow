@@ -33,6 +33,7 @@ using System.Xml;
 using System.Linq;
 using Crow.Coding;
 using System.Threading;
+using Mono.CSharp;
 
 namespace Crow.Coding
 {

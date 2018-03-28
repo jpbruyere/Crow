@@ -79,6 +79,8 @@ namespace Crow.Coding
 			buffer.PositionChanged += Buffer_PositionChanged;
 			buffer.FoldingEvent += Buffer_FoldingEvent;
 			buffer.Add (new CodeLine(""));
+
+
 		}
 		#endregion
 
@@ -214,9 +216,7 @@ namespace Crow.Coding
 		{
 			Debug.WriteLine("\t\tSourceEditor updateEditorFromProjFile");
 
-			buffer.editMutex.EnterWriteLock ();
 			loadSource ();
-			buffer.editMutex.ExitWriteLock ();
 
 			isDirty = false;
 			oldSource = projFile.Source;
