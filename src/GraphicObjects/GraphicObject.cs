@@ -51,6 +51,16 @@ namespace Crow
 	{
 		internal ReaderWriterLockSlim parentRWLock = new ReaderWriterLockSlim();
 
+		public string design_id;
+		public virtual bool FindByDesignID(string designID, out GraphicObject go){
+			go = null;
+			if (this.design_id == designID){
+				go = this;
+				return true;
+			}
+			return false;
+		}
+
 		#if DESIGN_MODE
 		static MethodInfo miDesignAddDefLoc = typeof(GraphicObject).GetMethod("design_add_style_location",
 			BindingFlags.Instance | BindingFlags.NonPublic);
@@ -58,7 +68,6 @@ namespace Crow
 			BindingFlags.Instance | BindingFlags.NonPublic);
 		
 		public volatile bool design_HasChanged = false;
-		public string design_id;
 		public int design_line;
 		public int design_column;
 		public string design_imlPath;
@@ -83,14 +92,6 @@ namespace Crow
 //			design_iml_locations.Add(memberName, new FileLocation(path,line,col));
 //		}
 			
-		public virtual bool FindByDesignID(string designID, out GraphicObject go){
-			go = null;
-			if (this.design_id == designID){
-				go = this;
-				return true;
-			}
-			return false;
-		}
 
 		public string GetIML(){
 			XmlDocument doc = new XmlDocument( );
@@ -197,9 +198,6 @@ namespace Crow
 		}  
 		#endregion
 
-		internal static ulong currentUid = 0;
-		internal ulong uid = 0;
-
 		internal bool isPopup = false;
 		public GraphicObject focusParent {
 			get { return (isPopup ? LogicalParent : parent) as GraphicObject; }
@@ -242,10 +240,6 @@ namespace Crow
 		/// </summary>
 		protected GraphicObject () {
 			Clipping = new Region ();
-			#if DEBUG
-			uid = currentUid;
-			currentUid++;
-			#endif			
 		}
 		/// <summary>
 		/// This constructor **must** be used when creating widget from code.
@@ -513,7 +507,7 @@ namespace Crow
 		}
 		#if DEBUG
 		[XmlIgnore]public string TreePath {
-			get { return this.GetType().Name + uid.ToString ();	}
+			get { return Name;	}
 		}
 		#endif
 		/// <summary>
@@ -523,18 +517,14 @@ namespace Crow
 		/// </summary>
 		[DesignCategory ("Divers")]
 		public virtual string Name {
-			get {
-				#if DEBUG
-				return string.IsNullOrEmpty(name) ? this.GetType().Name + uid.ToString () : name;
-				#else
-				return name;
-				#endif
+			get {				
+				return string.IsNullOrEmpty(name) ? design_id : name;
 			}
 			set {
-				if (name == value)
+				if (Name == value)
 					return;
 				name = value;
-				NotifyValueChanged("Name", name);
+				NotifyValueChanged("Name", Name);
 			}
 		}
 		/// <summary>
