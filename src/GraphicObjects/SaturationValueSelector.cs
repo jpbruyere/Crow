@@ -38,16 +38,18 @@ namespace Crow
 		{
 		}
 
+		const double div = 255.0;
+		const double colDiv = 1.0 / div;
 		double v, s;
 
 		[XmlAttributeAttribute()]
 		public virtual double V {
-			get { return v; }
+			get { return Math.Round(v * div); }
 			set {
-				if (v == value)
+				if (S == value)
 					return;
-				v = value;
-				NotifyValueChanged ("V", v);
+				v = value * colDiv;
+				NotifyValueChanged ("V", V);
 				mousePos.Y = (int)Math.Floor((1.0-v) * (double)ClientRectangle.Height);
 
 				RegisterForRedraw ();
@@ -55,12 +57,12 @@ namespace Crow
 		}
 		[XmlAttributeAttribute()]
 		public virtual double S {
-			get { return s; }
+			get { return Math.Round(s * div); }
 			set {
-				if (s == value)
+				if (S == value)
 					return;
-				s = value;
-				NotifyValueChanged ("S", s);
+				s = value * colDiv;
+				NotifyValueChanged ("S", S);
 				mousePos.X = (int)Math.Floor(s * (double)ClientRectangle.Width);
 
 				RegisterForRedraw ();
@@ -121,8 +123,8 @@ namespace Crow
 			Rectangle cb = ClientRectangle;
 			s = (double)mousePos.X / (double)cb.Width;
 			v = 1.0 - (double)mousePos.Y / (double)cb.Height;
-			NotifyValueChanged ("S", s);
-			NotifyValueChanged ("V", v);
+			NotifyValueChanged ("S", S);
+			NotifyValueChanged ("V", V);
 
 			RegisterForRedraw ();
 		}

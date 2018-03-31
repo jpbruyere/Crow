@@ -518,7 +518,7 @@ namespace Crow
 		[DesignCategory ("Divers")]
 		public virtual string Name {
 			get {				
-				return string.IsNullOrEmpty(name) ? design_id : name;
+				return string.IsNullOrEmpty(name) ? this.GetType().Name + design_id : name;
 			}
 			set {
 				if (Name == value)

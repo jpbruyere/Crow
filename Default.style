@@ -178,6 +178,7 @@ HSVSpinner {
 	Minimum = "0";
 	Maximum = "1";
 	SmallIncrement = "0.01";
+	Decimals = "-1";
 }
 TxtInFileDialog {
 	Margine = "1";

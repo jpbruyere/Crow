@@ -43,6 +43,8 @@ namespace Crow
 
 		Orientation _orientation;
 		double hue;
+		const double div = 255.0;
+		const double colDiv = 1.0 / div;
 
 		[XmlAttributeAttribute][DefaultValue(Orientation.Horizontal)]
 		public virtual Orientation Orientation
@@ -58,11 +60,11 @@ namespace Crow
 		}
 		[XmlAttributeAttribute()]
 		public virtual double Hue {
-			get { return hue; }
+			get { return Math.Round(hue * div); }
 			set {
-				if (hue == value)
+				if (Hue == value)
 					return;
-				hue = value;
+				hue = value * colDiv;
 				notifyHueChanged ();
 				updateMousePosFromHue ();
 				RegisterForRedraw ();
@@ -147,7 +149,7 @@ namespace Crow
 				mousePos.Y = (int)Math.Floor(hue * (double)ClientRectangle.Height);
 		}
 		void notifyHueChanged(){
-			NotifyValueChanged ("Hue", hue);
+			NotifyValueChanged ("Hue", Hue);
 			NotifyValueChanged ("HueColor", new SolidColor (Color.FromHSV (hue)));
 		}
 	}

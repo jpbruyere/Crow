@@ -46,7 +46,6 @@ namespace Crow
 		Color curColor;
 		double h,s,v;
 
-		[XmlAttributeAttribute()]
 		public virtual double R {
 			get { return Math.Round(curColor.R * div); }
 			set {
@@ -58,7 +57,6 @@ namespace Crow
 				notifyCurColorHasChanged ();
 			}
 		}
-		[XmlAttributeAttribute()]
 		public virtual double G {
 			get { return Math.Round(curColor.G * div); }
 			set {
@@ -70,7 +68,6 @@ namespace Crow
 				hsvFromRGB ();
 			}
 		}
-		[XmlAttributeAttribute()]
 		public virtual double B {
 			get { return Math.Round(curColor.B * div); }
 			set {
@@ -82,7 +79,6 @@ namespace Crow
 				hsvFromRGB ();
 			}
 		}
-		[XmlAttributeAttribute()]
 		public virtual double A {
 			get { return Math.Round(curColor.A * div); }
 			set {
@@ -94,41 +90,36 @@ namespace Crow
 				hsvFromRGB ();
 			}
 		}
-		[XmlAttributeAttribute()]
 		public virtual double H {
-			get { return Math.Round (h, 3); }
+			get { return Math.Round(h * div); }
 			set {
 				if (H == value)
 					return;
-				h = value;
+				h = value * colDiv;
 				NotifyValueChanged ("H", H);
 				rgbFromHSV ();
 			}
 		}
-		[XmlAttributeAttribute()]
 		public virtual double S {
-			get { return Math.Round (s, 2); }
+			get { return Math.Round(s * div); }
 			set {
-				if (s == value)
+				if (S == value)
 					return;
-				s = value;
+				s = value * colDiv;
 				NotifyValueChanged ("S", S);
 				rgbFromHSV ();
 			}
 		}
-		[XmlAttributeAttribute()]
 		public virtual double V {
-			get { return Math.Round (v, 2); }
+			get { return Math.Round(v * div); }
 			set {
-				if (v == value)
+				if (V == value)
 					return;
-				v = value;
+				v = value * colDiv;
 				NotifyValueChanged ("V", V);
 				rgbFromHSV ();
 			}
 		}
-
-		[XmlAttributeAttribute]
 		public virtual Fill SelectedColor {
 			get { return new SolidColor(curColor); }
 			set {
@@ -145,7 +136,6 @@ namespace Crow
 				hsvFromRGB ();
 			}
 		}
-		[XmlAttributeAttribute]
 		public virtual Color SelectedRawColor {
 			get { return curColor; }
 			set {
@@ -219,7 +209,7 @@ namespace Crow
 			notifyHSVHasChanged ();
 		}
 		void rgbFromHSV(){
-			curColor = Color.FromHSV (h, v, s, curColor.A);
+			curColor = Color.FromHSV (h , v, s, curColor.A);
 			notifyCurColorHasChanged ();
 			notifyRGBAHasChanged ();
 		}

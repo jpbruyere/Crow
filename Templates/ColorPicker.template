@@ -29,15 +29,15 @@
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
 					<Label Text="H" Width="Fit"/>
-					<Spinner Style="HSVSpinner" Value="{²./H}" Width="40"  />
+					<Spinner Style="ColorSpinner" Value="{²./H}" Width="40"  />
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
 					<Label Text="S" Width="Fit"/>
-					<Spinner Style="HSVSpinner" Value="{²./S}" Width="40"  />
+					<Spinner Style="ColorSpinner" Value="{²./S}" Width="40"  />
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
 					<Label Text="V" Width="Fit"/>
-					<Spinner Style="HSVSpinner" Value="{²./V}" Width="40"  />
+					<Spinner Style="ColorSpinner" Value="{²./V}" Width="40"  />
 				</HorizontalStack>
 			</VerticalStack>
 		</HorizontalStack>

@@ -129,7 +129,8 @@ namespace Crow
 				else                    
 					_actualValue = value;
 
-				_actualValue = Math.Round (_actualValue, _decimals);
+				if (_decimals >= 0)
+					_actualValue = Math.Round (_actualValue, _decimals);
 
 				NotifyValueChanged("Value",  _actualValue);
 				RegisterForGraphicUpdate();
