@@ -1,11 +1,21 @@
 <?xml version="1.0"?>
 <VerticalStack>
 	<Border Height="Fit">
-		<Label TextAlignment="Left" Text="{../../../SelectedItemName}" Width="Stretched"/>
+		<Label TextAlignment="Left" Text="{./SelectedItemName}" Width="Stretched"/>
 	</Border>
-	<Scroller  Name="scroller1" Margin="1" VerticalScrolling="true"		
-		ValueChanged="./_scroller_ValueChanged">
-		<VerticalStack LayoutChanged="./_list_LayoutChanged" Spacing="0"
-			Height="Fit" Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
-	</Scroller>
+	<HorizontalStack>
+		<Scroller  Name="scroller1" Margin="1" 
+			Background="{./Background}"
+			ScrollY="{../scrollbar1.Value}">
+			<VerticalStack Spacing="1"
+				Height="Fit" Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
+		</Scroller>
+		<ScrollBar
+			Name="scrollbar1"
+			LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
+			CursorSize="{../scroller1.ChildHeightRatio}"
+			Value="{../scroller1.ScrollY}"
+			Maximum="{../scroller1.MaximumScroll}"
+			Width="14" Orientation="Vertical"/>
+	</HorizontalStack>
 </VerticalStack>

@@ -36,6 +36,7 @@ namespace Crow
 	/// <summary>
 	/// generic class to build scrolling control in both directions
 	/// </summary>
+	[DesignIgnore]
 	public class ScrollingObject : GraphicObject
 	{
 		#region CTOR
@@ -148,7 +149,7 @@ namespace Crow
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
 		{
 			base.onMouseWheel (sender, e);
-			if (CurrentInterface.Keyboard.IsKeyDown (Key.ShiftLeft))
+			if (IFace.Keyboard.IsKeyDown (Key.ShiftLeft))
 				ScrollX += e.Delta * MouseWheelSpeed;
 			else
 				ScrollY -= e.Delta * MouseWheelSpeed;

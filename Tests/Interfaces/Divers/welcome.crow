@@ -1,21 +1,2 @@
 ﻿<?xml version="1.0"?>
-<Border BorderStyle="Sunken" Fit="true" Background="0.7,0.7,0.7,0.5" CornerRadius="10">
-	<VerticalStack Margin="20">
-		<Image Path="#Crow.Images.Icons.crow.svg"/>
-<!--		<Label Font="Times bold, 60" Text="C.R.O.W"/>-->
-		<HorizontalStack Fit="true" DataSource="{CrowVersion}" Spacing="0">
-			<Label Foreground="Black" Font="mono, 12" Text="version: "/>		
-			<Label Foreground="Black" Font="mono, 12" Text="{Major}"/>		
-			<Label Foreground="Black" Font="mono, 12" Text="."/>
-			<Label Foreground="Black" Font="mono, 12" Text="{Minor}"/>
-			<Label Foreground="Black" Font="mono, 12" Text="."/>
-			<Label Foreground="Jet" Font="mono, 12" Text="{Build}"/>
-		</HorizontalStack>
-		<GraphicObject Height="30"/>
-		<Label Font="20" Text="Press &lt;F2&gt; and &lt;F3&gt; to cycle into the examples"/>
-		<Label Font="20" Text="Those are basic tests used to validate changes,"/>
-		<GraphicObject Height="30"/>
-		<Label Foreground="Jet" Font="20" Text="&lt;F5&gt; => File dialog example"/>
-		<Label Foreground="Jet" Font="20" Text="&lt;F6&gt; => Window example"/>
-	</VerticalStack>
-</Border>
+<GraphicObject Height="30" Width="30" Background="#500000"/>

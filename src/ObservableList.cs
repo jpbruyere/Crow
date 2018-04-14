@@ -37,6 +37,7 @@ namespace Crow
 			ListAdd.Raise (this, new ListChangedEventArg (this.Count - 1, elem));
 		}
 		public void RemoveElement (T elem) {
+			System.Diagnostics.Debug.WriteLine ("remove elem:" + elem);
 			int idx = this.IndexOf (elem);
 			this.RemoveAt (idx);
 			ListRemove.Raise (this, new ListChangedEventArg (idx, elem));

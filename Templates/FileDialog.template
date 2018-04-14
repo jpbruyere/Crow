@@ -16,7 +16,7 @@
 			</Border>
 			<GraphicObject Width="5"/>
 		</HorizontalStack>
-		<Container Name="Content" MinimumSize="50,50" Background="Onyx">
+		<Container Name="Content" MinimumSize="50,50" Background="Jet">
 			<VerticalStack Margin="1">
 				<HorizontalStack Height="Fit">
 					<Button Fit="true" Caption="Up" MouseClick="./goUpDirClick">
@@ -32,15 +32,14 @@
 							SelectedItemChanged="./onSelectedItemChanged">
 							<Template>
 								<HorizontalStack>
-									<Scroller ScrollX="{../scrollbar1.Value}"  Name="scroller1"
-										VerticalScrolling="true" HorizontalScrolling="false">
+									<Scroller Name="scroller1">
 										<VerticalStack Height="Fit" VerticalAlignment="Top"
 											Name="ItemsContainer" Margin="0" Spacing="1"/>
 									</Scroller>
-									<ScrollBar Name="scrollbar1" Value="{²../scroller1.ScrollY}"
-										LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
+									<ScrollBar Name="scrollbar1" Orientation="Vertical"
+										Value="{²../scroller1.ScrollY}"	Maximum="{../scroller1.MaxScrollY}" 
 										CursorSize="{../scroller1.ChildHeightRatio}"
-										Maximum="{../scroller1.MaximumScroll}" Orientation="Vertical"
+										LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
 										Width="14" />
 								</HorizontalStack>
 							</Template>

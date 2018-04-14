@@ -7,7 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{B6D911CD-1D09-42FC-B300-9187190F2AE1}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>CrowIDE</RootNamespace>
+    <RootNamespace>Crow.Coding</RootNamespace>
     <AssemblyName>CrowIDE</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>$(SolutionDir)build/$(Configuration)</OutputPath>
@@ -18,7 +18,7 @@
       </CustomCommands>
     </CustomCommands>
     <ReleaseVersion>0.5</ReleaseVersion>
-    <StartupObject>CrowIDE.CrowIDE</StartupObject>
+    <StartupObject>Crow.Coding.CrowIDE</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -52,12 +52,6 @@
     <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Custom Command' ">
-    <StartAction>Program</StartAction>
-    <StartProgram>%24{TargetName}</StartProgram>
-    <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
-    <ConsolePause>false</ConsolePause>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -76,8 +70,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\CrowIDE.cs" />
-    <Compile Include="src\ImlVisualEditor.cs" />
-    <Compile Include="src\MembersView.cs" />
     <Compile Include="src\Extensions.cs" />
     <Compile Include="src\Solution.cs" />
     <Compile Include="src\Project.cs" />
@@ -101,51 +93,211 @@
       <Link>src\InterfaceControler.cs</Link>
     </Compile>
     <Compile Include="src\DesignInterface.cs" />
-    <Compile Include="src\EditPane.cs" />
-    <Compile Include="src\ProjectNodes.cs" />
     <Compile Include="src\SolutionControler.cs" />
+    <Compile Include="src\INetProject.cs" />
+    <Compile Include="src\MemberView\MembersView.cs" />
+    <Compile Include="src\MemberView\PropertyContainer.cs" />
+    <Compile Include="src\MemberView\CategoryContainer.cs" />
+    <Compile Include="src\GraphicObjectDesignContainer.cs" />
+    <Compile Include="src\Editors\Editor.cs" />
+    <Compile Include="src\Editors\EditPane.cs" />
+    <Compile Include="src\Editors\ImlVisualEditor.cs" />
+    <Compile Include="src\Editors\SvgEditor.cs" />
+    <Compile Include="src\Editors\Parsers\BufferParser.cs" />
+    <Compile Include="src\Editors\Parsers\CSharpParser.cs" />
+    <Compile Include="src\Editors\Parsers\StyleParser.cs" />
+    <Compile Include="src\Editors\Parsers\XMLParser.cs" />
+    <Compile Include="src\Editors\CodeBuffer\CodeBuffer.cs" />
+    <Compile Include="src\Editors\CodeBuffer\CodeBufferEventArgs.cs" />
+    <Compile Include="src\Editors\CodeBuffer\CodeLine.cs" />
+    <Compile Include="src\Editors\CodeBuffer\Node.cs" />
+    <Compile Include="src\Editors\CodeBuffer\TextFormatting.cs" />
+    <Compile Include="src\Editors\CodeBuffer\Token.cs" />
+    <Compile Include="src\ProjectTree\ProjectNodes.cs" />
+    <Compile Include="src\ProjectTree\ProjectItem.cs" />
+    <Compile Include="src\ProjectTree\ProjectReference.cs" />
+    <Compile Include="src\ProjectTree\ProjectFile.cs" />
+    <Compile Include="src\ProjectTree\ImlProjectItem.cs" />
+    <Compile Include="src\Editors\CodeBuffer\TextBuffer.cs" />
+    <Compile Include="src\Editors\CodeBuffer\TextEditor.cs" />
+    <Compile Include="src\Editors\ImlSchematicEditor.cs" />
+    <Compile Include="src\Editors\CodeBuffer\TextBufferEventArgs.cs" />
+    <Compile Include="src\Editors\Parsers2\Tokenizer.cs" />
+    <Compile Include="src\Editors\SourceEditor.cs" />
+    <Compile Include="src\ProjectTree\StyleProjectItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />
     <Folder Include="src\" />
     <Folder Include="images\" />
+    <Folder Include="ui\ItemTemplates\" />
+    <Folder Include="src\MemberView\" />
+    <Folder Include="ui\DockWindows\" />
+    <Folder Include="ui\editors\" />
+    <Folder Include="src\Editors\" />
+    <Folder Include="src\Editors\Parsers\" />
+    <Folder Include="src\Editors\CodeBuffer\" />
+    <Folder Include="src\ProjectTree\" />
+    <Folder Include="src\Editors\Parsers2\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="images\save.svg" />
     <EmbeddedResource Include="ui\IDE.style" />
     <EmbeddedResource Include="ui\MembersView.template">
-      <LogicalName>CrowIDE.MembersView.template</LogicalName>
+      <LogicalName>Crow.Coding.MembersView.template</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="ui\LQIsExplorer.crow" />
-    <EmbeddedResource Include="ui\GTreeExplorer.crow" />
-    <EmbeddedResource Include="ui\GTreeExpITemp.crow" />
     <EmbeddedResource Include="ui\MemberView.crow" />
-    <EmbeddedResource Include="ui\CSProjExplorer.crow" />
     <EmbeddedResource Include="ui\ProjectProperties.crow" />
     <EmbeddedResource Include="ui\TreeExpandable.template">
       <LogicalName>Crow.TreeExpandable.template</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="ui\ProjectTree.template" />
-    <EmbeddedResource Include="ui\MembersItem.template" />
-    <EmbeddedResource Include="ui\EditPane.template">
-      <LogicalName>CrowIDE.EditPane.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ui\EditPaneItems.template" />
     <EmbeddedResource Include="ui\CrowIDE.crow" />
     <EmbeddedResource Include="ui\icons\blank-file.svg" />
     <EmbeddedResource Include="ui\icons\sign-out.svg" />
-    <EmbeddedResource Include="ui\icons\copy-file.svg" />
-    <EmbeddedResource Include="ui\icons\paste-on-document.svg" />
-    <EmbeddedResource Include="ui\icons\scissors.svg" />
     <EmbeddedResource Include="ui\icons\reply.svg" />
     <EmbeddedResource Include="ui\icons\share-arrow.svg" />
     <EmbeddedResource Include="ui\icons\question.svg" />
-    <EmbeddedResource Include="ui\icons\inbox.svg" />
-    <EmbeddedResource Include="ui\icons\outbox.svg" />
     <EmbeddedResource Include="ui\icons\tools.svg" />
     <EmbeddedResource Include="ui\TabItem.template">
       <LogicalName>Crow.TabItem.template</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="ui\MenuItem.template">
+      <LogicalName>Crow.MenuItem.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\Options.crow" />
+    <EmbeddedResource Include="ui\IcoBut.template" />
+    <EmbeddedResource Include="ui\MembersItem.template" />
+    <EmbeddedResource Include="ui\ItemTemplates\Enum.template" />
+    <EmbeddedResource Include="ui\ItemTemplates\Fill.template" />
+    <EmbeddedResource Include="ui\DockWindows\winEditor.crow" />
+    <EmbeddedResource Include="ui\DockWindows\winErrors.crow" />
+    <EmbeddedResource Include="ui\DockWindows\winSolution.crow" />
+    <EmbeddedResource Include="ui\DockWindows\winProperties.crow" />
+    <EmbeddedResource Include="ui\DockWindows\winToolbox.crow" />
+    <EmbeddedResource Include="ui\DockWindows\toolboxBut.template" />
+    <EmbeddedResource Include="icons\toolbox\bar-chart.svg" />
+    <EmbeddedResource Include="icons\toolbox\bar-menu.svg" />
+    <EmbeddedResource Include="icons\toolbox\bullets.svg" />
+    <EmbeddedResource Include="icons\toolbox\calendar.svg" />
+    <EmbeddedResource Include="icons\toolbox\check-square-1.svg" />
+    <EmbeddedResource Include="icons\toolbox\database.svg" />
+    <EmbeddedResource Include="icons\toolbox\ellipsis.svg" />
+    <EmbeddedResource Include="icons\toolbox\file-code.svg" />
+    <EmbeddedResource Include="icons\toolbox\grab.svg" />
+    <EmbeddedResource Include="icons\toolbox\hash.svg" />
+    <EmbeddedResource Include="icons\toolbox\line-list.svg" />
+    <EmbeddedResource Include="icons\toolbox\list.svg" />
+    <EmbeddedResource Include="icons\toolbox\package.svg" />
+    <EmbeddedResource Include="icons\toolbox\pointer.svg" />
+    <EmbeddedResource Include="icons\toolbox\puzzle-piece.svg" />
+    <EmbeddedResource Include="icons\toolbox\refresh-file.svg" />
+    <EmbeddedResource Include="icons\toolbox\sliders.svg" />
+    <EmbeddedResource Include="icons\toolbox\split-browser-1.svg" />
+    <EmbeddedResource Include="icons\toolbox\table.svg" />
+    <EmbeddedResource Include="icons\toolbox\tasks.svg" />
+    <EmbeddedResource Include="icons\toolbox\picture-file.svg" />
+    <EmbeddedResource Include="icons\toolbox\warning.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.Button.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.TextBox.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.Label.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.CheckBox.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.Spinner.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.Container.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.Group.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.HorizontalStack.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.VerticalStack.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.Splitter.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.ListBox.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.ComboBox.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.TreeView.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.TabView.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.Docker.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.Window.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.Slider.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.ProgressBar.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.Grid.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.Image.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.TemplatedContainer.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.TemplatedGroup.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.IMLContainer.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.Wrapper.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.ColorPicker.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.Border.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.GroupBox.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.ScrollBar.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.Menu.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.MenuItem.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.Shape.svg" />
+    <EmbeddedResource Include="icons\toolbox\padding.svg" />
+    <EmbeddedResource Include="icons\toolbox\modal-list.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.Scroller.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.FileDialog.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.TabItem.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.Expandable.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.DirectoryView.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.MessageBox.svg" />
+    <EmbeddedResource Include="icons\toolbox\options.svg" />
+    <EmbeddedResource Include="icons\toolbox\Crow.RadioButton.svg" />
+    <EmbeddedResource Include="icons\move-arrows.svg" />
+    <EmbeddedResource Include="icons\eraser.svg" />
+    <EmbeddedResource Include="icons\light-bulb.svg" />
+    <EmbeddedResource Include="icons\pin.svg" />
+    <EmbeddedResource Include="icons\paint-brush.svg" />
+    <EmbeddedResource Include="icons\tools.svg" />
+    <EmbeddedResource Include="icons\trash.svg" />
+    <EmbeddedResource Include="icons\zoom-in.svg" />
+    <EmbeddedResource Include="icons\zoom-out.svg" />
+    <EmbeddedResource Include="icons\search.svg" />
+    <EmbeddedResource Include="icons\curly-brackets.svg" />
+    <EmbeddedResource Include="icons\compile.svg" />
+    <EmbeddedResource Include="icons\edit.svg" />
+    <EmbeddedResource Include="icons\text-file.svg" />
+    <EmbeddedResource Include="icons\undo.svg" />
+    <EmbeddedResource Include="icons\redo.svg" />
+    <EmbeddedResource Include="icons\folder.svg" />
+    <EmbeddedResource Include="icons\file.svg" />
+    <EmbeddedResource Include="icons\palette.svg" />
+    <EmbeddedResource Include="ui\ContextMenu.template">
+      <LogicalName>Crow.ContextMenu.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\editors\EditPane.template">
+      <LogicalName>Crow.Coding.EditPane.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\editors\EditPaneItems.template">
+      <LogicalName>Crow.Coding.ui.EditPaneItems.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\editors\IMLEdit.itemp">
+      <LogicalName>Crow.Coding.ui.IMLEdit.itemp</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\editors\SourceEditor.crow">
+      <LogicalName>Crow.Coding.ui.SourceEditor.crow</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\editors\SrcEdit.itemp">
+      <LogicalName>Crow.Coding.ui.SrcEdit.itemp</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\editors\SvgEdit.itemp">
+      <LogicalName>Crow.Coding.ui.SvgEdit.itemp</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\DockWindows\winGTExplorer.crow" />
+    <EmbeddedResource Include="ui\DockWindows\GTreeExpITemp.crow" />
+    <EmbeddedResource Include="icons\copy-file.svg" />
+    <EmbeddedResource Include="icons\paste-on-document.svg" />
+    <EmbeddedResource Include="icons\scissors.svg" />
+    <EmbeddedResource Include="icons\question.svg" />
+    <EmbeddedResource Include="icons\blank-file.svg" />
+    <EmbeddedResource Include="icons\save.svg" />
+    <EmbeddedResource Include="icons\open.svg" />
+    <EmbeddedResource Include="ui\NewFile.crow" />
+    <EmbeddedResource Include="ui\DockWindows\winSchema.crow" />
+    <EmbeddedResource Include="ui\DockWindows\WinSchemaItem.template" />
+    <EmbeddedResource Include="ui\editors\TextEditor.crow">
+      <LogicalName>Crow.Coding.ui.TextEditor.crow</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\DockWindows\winStyleView.crow" />
+    <EmbeddedResource Include="ui\CategoryExp.template" />
+    <EmbeddedResource Include="ui\DockWindows\winDesign.crow" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">
@@ -166,8 +318,5 @@
     <None Include="ui\icons\zoom-in.svg" />
     <None Include="ui\icons\zoom-out.svg" />
     <None Include="ui\icons\basic_floppydisk.svg" />
-    <None Include="ui\MenuItem.template">
-      <LogicalName>Crow.MenuItem.template</LogicalName>
-    </None>
   </ItemGroup>
 </Project>

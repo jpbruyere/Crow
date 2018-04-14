@@ -26,7 +26,7 @@
 using System;
 using Crow;
 
-namespace CrowIDE
+namespace Crow.Coding
 {
 	public class VerticalLine : GraphicObject
 	{

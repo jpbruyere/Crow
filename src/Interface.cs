@@ -67,6 +67,10 @@ namespace Crow
 	{
 		#region CTOR
 		static Interface(){
+			if (Type.GetType ("Mono.Runtime") == null) {
+				throw new Exception (@"C.R.O.W. run only on Mono, download latest version at: http://www.mono-project.com/download/stable/");
+			}
+
 			CrowConfigRoot =
 				System.IO.Path.Combine(
 					Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
@@ -84,9 +88,6 @@ namespace Crow
 				}
 			}
 
-			loadCursors ();
-			findAvailableTemplates ();
-
 			FontRenderingOptions = new FontOptions ();
 			FontRenderingOptions.Antialias = Antialias.Subpixel;
 			FontRenderingOptions.HintMetrics = HintMetrics.On;
@@ -94,13 +95,18 @@ namespace Crow
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
 		}
 		public Interface(){
-			CurrentInterface = this;
 			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+		}
+		#endregion
+
+		public void Init () {
+			CurrentInterface = this;
+			loadCursors ();
 			loadStyling ();
+			findAvailableTemplates ();
 			initTooltip ();
 			initContextMenus ();
 		}
-		#endregion
 
 		#region Static and constants
 		/// <summary>
@@ -121,7 +127,7 @@ namespace Crow
 		public static int DeviceRepeatInterval = 40;
 		/// <summary>Tabulation size in Text controls</summary>
 		public static int TabSize = 4;
-		public static string LineBreak = "\r\n";
+		public static string LineBreak = "\n";
 		/// <summary> Allow rendering of interface in development environment </summary>
 		public static bool DesignerMode = false;
 		/// <summary> Disable caching for a widget if this threshold is reached </summary>
@@ -206,10 +212,19 @@ namespace Crow
 		/// <summary>each IML and fragments (such as inline Templates) are compiled as a Dynamic Method stored here
 		/// on the first instance creation of a IML item.
 		/// </summary>
-		public static Dictionary<String, Instantiator> Instantiators = new Dictionary<string, Instantiator>();
+		public Dictionary<String, Instantiator> Instantiators = new Dictionary<string, Instantiator>();
 		public List<CrowThread> CrowThreads = new List<CrowThread>();//used to monitor thread finished
 
 		public DragDropEventArgs DragAndDropOperation = null;
+		public Surface DragImage = null;
+		public int DragImageWidth, DragImageHeight, DragImageX, DragImageY;
+		public void ClearDragImage () {
+			lock (UpdateMutex) {				
+				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));				
+				DragImage.Dispose();
+				DragImage = null;
+			}			
+		}
 		#endregion
 
 		#region Private Fields
@@ -250,22 +265,22 @@ namespace Crow
 				.GetManifestResourceNames ()
 				.Where (r => r.EndsWith (".style", StringComparison.OrdinalIgnoreCase))) {
 				using (Stream stream = assembly.GetManifestResourceStream (s)) {
-					new StyleReader (this, stream, s);
+					new StyleReader (this.Styling, stream, s);
 				}
 
 			}
 		}
-		static void loadCursors(){
+		void loadCursors(){
 			//Load cursors
-			XCursor.Cross = XCursorFile.Load("#Crow.Images.Icons.Cursors.cross").Cursors[0];
-			XCursor.Default = XCursorFile.Load("#Crow.Images.Icons.Cursors.arrow").Cursors[0];
-			XCursor.NW = XCursorFile.Load("#Crow.Images.Icons.Cursors.top_left_corner").Cursors[0];
-			XCursor.NE = XCursorFile.Load("#Crow.Images.Icons.Cursors.top_right_corner").Cursors[0];
-			XCursor.SW = XCursorFile.Load("#Crow.Images.Icons.Cursors.bottom_left_corner").Cursors[0];
-			XCursor.SE = XCursorFile.Load("#Crow.Images.Icons.Cursors.bottom_right_corner").Cursors[0];
-			XCursor.H = XCursorFile.Load("#Crow.Images.Icons.Cursors.sb_h_double_arrow").Cursors[0];
-			XCursor.V = XCursorFile.Load("#Crow.Images.Icons.Cursors.sb_v_double_arrow").Cursors[0];
-			XCursor.Text = XCursorFile.Load("#Crow.Images.Icons.Cursors.ibeam").Cursors[0];
+			XCursor.Cross = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.cross").Cursors[0];
+			XCursor.Default = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.arrow").Cursors[0];
+			XCursor.NW = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.top_left_corner").Cursors[0];
+			XCursor.NE = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.top_right_corner").Cursors[0];
+			XCursor.SW = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.bottom_left_corner").Cursors[0];
+			XCursor.SE = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.bottom_right_corner").Cursors[0];
+			XCursor.H = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.sb_h_double_arrow").Cursors[0];
+			XCursor.V = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.sb_v_double_arrow").Cursors[0];
+			XCursor.Text = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.ibeam").Cursors[0];
 		}
 		#endregion
 
@@ -274,16 +289,17 @@ namespace Crow
 		/// Resource ID must be 'fullClassName.template' (not case sensitive)
 		/// Those found in application assembly have priority to the default Crow's one
 		/// </summary>
-		public static Dictionary<string, string> DefaultTemplates = new Dictionary<string, string>();
+		public Dictionary<string, string> DefaultTemplates;
 		/// <summary>Finds available default templates at startup</summary>
-		static void findAvailableTemplates(){
+		void findAvailableTemplates(){
+			DefaultTemplates = new Dictionary<string, string>();
 			searchTemplatesOnDisk ("./");
 			string defTemplatePath = System.IO.Path.Combine (CrowConfigRoot, "defaultTemplates");
 			searchTemplatesOnDisk (defTemplatePath);
 			searchTemplatesIn (Assembly.GetEntryAssembly ());
 			searchTemplatesIn (Assembly.GetExecutingAssembly ());
 		}
-		static void searchTemplatesOnDisk (string templatePath){
+		void searchTemplatesOnDisk (string templatePath){
 			if (!Directory.Exists (templatePath))
 				return;
 			foreach (string f in Directory.GetFiles(templatePath, "*.template",SearchOption.AllDirectories)) {
@@ -293,7 +309,7 @@ namespace Crow
 				DefaultTemplates [clsName] = f;
 			}
 		}
-		static void searchTemplatesIn(Assembly assembly){
+		void searchTemplatesIn(Assembly assembly){
 			if (assembly == null)
 				return;
 			foreach (string resId in assembly
@@ -312,7 +328,28 @@ namespace Crow
 		/// <returns>A file or resource stream</returns>
 		/// <param name="path">This could be a normal file path, or an embedded ressource ID
 		/// Resource ID's must be prefixed with '#' character</param>
-		public static Stream GetStreamFromPath (string path)
+		public virtual Stream GetStreamFromPath (string path)
+		{
+			Stream stream = null;
+
+			if (path.StartsWith ("#")) {
+				string resId = path.Substring (1);
+				//try/catch added to prevent nunit error
+				try {
+					stream = System.Reflection.Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
+				} catch{}
+				if (stream == null)//try to find ressource in Crow assembly
+					stream = System.Reflection.Assembly.GetExecutingAssembly ().GetManifestResourceStream (resId);
+				if (stream == null)
+					throw new Exception ("Resource not found: " + path);
+			} else {
+				if (!File.Exists (path))
+					throw new FileNotFoundException ("File not found: ", path);
+				stream = new FileStream (path, FileMode.Open, FileAccess.Read);
+			}
+			return stream;
+		}
+		public static Stream StaticGetStreamFromPath (string path)
 		{
 			Stream stream = null;
 
@@ -340,10 +377,18 @@ namespace Crow
 		/// <param name="imlFragment">a valid IML string</param>
 		public GraphicObject LoadIMLFragment (string imlFragment) {
 			lock (UpdateMutex) {
-				GraphicObject tmp = Instantiator.CreateFromImlFragment (imlFragment).CreateInstance(this);
+				GraphicObject tmp = CreateITorFromIMLFragment (imlFragment).CreateInstance();
 				AddWidget (tmp);
 				return tmp;
 			}
+		}
+		/// <summary>
+		/// Add the content of the IML fragment to the graphic tree of this interface
+		/// </summary>
+		/// <returns>return the new instance for convenience, may be ignored</returns>
+		/// <param name="imlFragment">a valid IML string</param>
+		public Instantiator CreateITorFromIMLFragment (string imlFragment) {			
+			return Instantiator.CreateFromImlFragment (this, imlFragment);
 		}
 		/// <summary>
 		/// Create an instance of a GraphicObject and add it to the GraphicTree of this Interface
@@ -363,44 +408,32 @@ namespace Crow
 		/// </summary>
 		/// <returns>new instance of graphic object created</returns>
 		/// <param name="path">path of the iml file to load</param>
-		public GraphicObject Load (string path)
+		public virtual GraphicObject Load (string path)
 		{
-			//try {
-				return GetInstantiator (path).CreateInstance (this);
-			//} catch (Exception ex) {
-			//	throw new Exception ("Error loading <" + path + ">:", ex);
-			//}
+			try {
+				return GetInstantiator (path).CreateInstance ();
+			} catch (Exception ex) {
+				throw new Exception ("Error loading <" + path + ">:", ex);
+			}
 		}
 		/// <summary>
 		/// Fetch instantiator from cache or create it.
 		/// </summary>
 		/// <returns>new Instantiator</returns>
 		/// <param name="path">path of the iml file to load</param>
-		public static Instantiator GetInstantiator(string path){
+		public Instantiator GetInstantiator(string path){
 			if (!Instantiators.ContainsKey(path))
-				Instantiators [path] = new Instantiator(path);
+				Instantiators [path] = new Instantiator(this, path);
 			return Instantiators [path];
 		}
 		/// <summary>Item templates are derived from instantiator, this function
 		/// try to fetch the requested one in the cache or create it.
 		/// They have additional properties for recursivity and
 		/// custom display per item type</summary>
-		public static ItemTemplate GetItemTemplate(string path){
+		public virtual ItemTemplate GetItemTemplate(string path){
 			if (!Instantiators.ContainsKey(path))
-				Instantiators [path] = new ItemTemplate(path);
+				Instantiators [path] = new ItemTemplate(this, path);
 			return Instantiators [path] as ItemTemplate;
-		}
-		//TODO: .Net xml serialisation is no longer used, it has been replaced with instantiators
-		public static void Save<T> (string file, T graphicObject)
-		{
-			XmlSerializerNamespaces xn = new XmlSerializerNamespaces ();
-			xn.Add ("", "");
-			XmlSerializer xs = new XmlSerializer (typeof(T));
-
-			xs = new XmlSerializer (typeof(T));
-			using (Stream s = new FileStream (file, FileMode.Create)) {
-				xs.Serialize (s, graphicObject, xn);
-			}
 		}
 		#endregion
 
@@ -443,13 +476,22 @@ namespace Crow
 			set {
 				if (_hoverWidget == value)
 					return;
-				_hoverWidget = value;
-				#if DEBUG_FOCUS
+
 				if (_hoverWidget != null)
-				Debug.WriteLine("Hover => " + _hoverWidget.ToString());
-				else
-				Debug.WriteLine("Hover => null");
-				#endif
+					_hoverWidget.IsHover = false;
+
+				_hoverWidget = value;
+
+				if (_hoverWidget != null)
+				{
+					_hoverWidget.IsHover = true;
+					#if DEBUG_FOCUS
+					Debug.WriteLine("Hover => " + _hoverWidget.ToString());
+					}else
+					Debug.WriteLine("Hover => null");
+					#else
+				}
+					#endif
 			}
 		}
 		/// <summary>Widget has the keyboard or mouse focus</summary>
@@ -508,15 +550,7 @@ namespace Crow
 					}
 				}
 			}
-			if (keyboardRepeatCount > 0) {
-				int mc = keyboardRepeatCount;
-				keyboardRepeatCount -= mc;
-				if (_focusedWidget != null) {
-					for (int i = 0; i < mc; i++) {
-						_focusedWidget.onKeyDown (this, lastKeyDownEvt);
-					}
-				}
-			}
+
 			CrowThread[] tmpThreads;
 			lock (CrowThreads) {
 				tmpThreads = new CrowThread[CrowThreads.Count];
@@ -556,7 +590,7 @@ namespace Crow
 		/// <summary>Layouting loop, this is the first step of the udpate and process registered
 		/// Layouting queue items. Failing LQI's are requeued in this cycle until MaxTry is reached which
 		/// trigger an enqueue for the next Update Cycle</summary>
-		void processLayouting(){
+		protected virtual void processLayouting(){
 			#if MEASURE_TIME
 			layoutingMeasure.StartCycle();
 			#endif
@@ -608,12 +642,15 @@ namespace Crow
 			#if MEASURE_TIME
 			drawingMeasure.StartCycle();
 			#endif
+			if (DragImage != null)
+				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
 			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
 				using (ctx = new Context (surf)){
 					if (!clipping.IsEmpty) {
 
 						for (int i = 0; i < clipping.NumRectangles; i++)
 							ctx.Rectangle(clipping.GetRectangle(i));
+						
 						ctx.ClipPreserve();
 						ctx.Operator = Operator.Clear;
 						ctx.Fill();
@@ -629,6 +666,22 @@ namespace Crow
 							ctx.Save ();
 							p.Paint (ref ctx);
 							ctx.Restore ();
+						}
+
+						if (DragAndDropOperation != null) {
+							if (DragImage != null) {
+								DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
+								DragImageX = Mouse.X - DragImageWidth / 2;
+								DragImageY = Mouse.Y - DragImageHeight / 2;
+								ctx.Save ();
+								ctx.ResetClip ();
+								ctx.SetSourceSurface (DragImage, DragImageX, DragImageY);
+								ctx.PaintWithAlpha (0.8);
+								ctx.Restore ();
+								DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
+								IsDirty = true;
+								//Console.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
+							}
 						}
 
 						#if DEBUG_CLIP_RECTANGLE
@@ -829,12 +882,15 @@ namespace Crow
 			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
 			e.Mouse = Mouse;
 
-			if (ActiveWidget != null&& DragAndDropOperation == null) {
+			if (ActiveWidget != null && DragAndDropOperation == null) {
 				//TODO, ensure object is still in the graphic tree
 				//send move evt even if mouse move outside bounds
 				ActiveWidget.onMouseMove (this, e);
 				return true;
 			}
+
+			if (DragAndDropOperation != null)//drag source cant have hover event, so move has to be handle here
+				DragAndDropOperation.DragSource.onMouseMove (this, e);			
 
 			if (HoverWidget != null) {
 				resetTooltip ();
@@ -843,7 +899,7 @@ namespace Crow
 				GraphicObject topc = null;
 				while (tmp is GraphicObject) {
 					topc = tmp;
-					tmp = tmp.LogicalParent as GraphicObject;
+					tmp = tmp.focusParent;
 				}
 				int idxhw = GraphicTree.IndexOf (topc);
 				if (idxhw != 0) {
@@ -995,9 +1051,9 @@ namespace Crow
 			lastKeyDownEvt.IsRepeat = true;
 			_focusedWidget.onKeyDown (this, e);
 
-			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
-			keyboardRepeatThread.IsBackground = true;
-			keyboardRepeatThread.Start ();
+//			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
+//			keyboardRepeatThread.IsBackground = true;
+//			keyboardRepeatThread.Start ();
 
 			return true;
 		}
@@ -1014,11 +1070,11 @@ namespace Crow
 
 			_focusedWidget.onKeyUp (this, e);
 
-			if (keyboardRepeatThread != null) {
-				keyboardRepeatOn = false;
-				keyboardRepeatThread.Abort();
-				keyboardRepeatThread.Join ();
-			}
+//			if (keyboardRepeatThread != null) {
+//				keyboardRepeatOn = false;
+//				keyboardRepeatThread.Abort();
+//				keyboardRepeatThread.Join ();
+//			}
 			return true;
 		}
 		/// <summary>
@@ -1040,7 +1096,7 @@ namespace Crow
 		GraphicObject ToolTipContainer = null;
 		volatile bool tooltipVisible = false;
 
-		void initTooltip () {
+		protected void initTooltip () {
 			ToolTipContainer = Load  ("#Crow.Tooltip.template");
 			Thread t = new Thread (toolTipThreadFunc);
 			t.IsBackground = true;
@@ -1081,22 +1137,38 @@ namespace Crow
 
 		#region Contextual menu
 		MenuItem ctxMenuContainer;
-		void initContextMenus (){
+		protected void initContextMenus (){
 			ctxMenuContainer = Load  ("#Crow.ContextMenu.template") as MenuItem;
+			ctxMenuContainer.LayoutChanged += CtxMenuContainer_LayoutChanged;
+		}
+
+		void CtxMenuContainer_LayoutChanged (object sender, LayoutingEventArgs e)
+		{
+			Rectangle r = ctxMenuContainer.ScreenCoordinates (ctxMenuContainer.Slot);
+			if (e.LayoutType == LayoutingType.Width || e.LayoutType == LayoutingType.X) {
+				if (r.Right > this.clientRectangle.Right)
+					ctxMenuContainer.Left = this.clientRectangle.Right - ctxMenuContainer.Slot.Width;
+			}else if (e.LayoutType == LayoutingType.Width || e.LayoutType == LayoutingType.Y) {
+				if (r.Bottom > this.clientRectangle.Bottom)
+					ctxMenuContainer.Top = this.clientRectangle.Bottom - ctxMenuContainer.Slot.Height;
+			}
+			
 		}
 
 		public void ShowContextMenu (GraphicObject go) {
 
-			if (ctxMenuContainer.Parent == null)
-				this.AddWidget (ctxMenuContainer);
-			else
-				ctxMenuContainer.IsOpened = true;
+			lock (UpdateMutex) {
+				if (ctxMenuContainer.Parent == null)
+					this.AddWidget (ctxMenuContainer);
+				else
+					ctxMenuContainer.IsOpened = true;
 
-			ctxMenuContainer.isPopup = true;
-			ctxMenuContainer.LogicalParent = go;
-			ctxMenuContainer.DataSource = go;
+				ctxMenuContainer.isPopup = true;
+				ctxMenuContainer.LogicalParent = go;
+				ctxMenuContainer.DataSource = go;
 
-			PutOnTop (ctxMenuContainer, true);
+				PutOnTop (ctxMenuContainer, true);
+			}
 			ctxMenuContainer.Left = Mouse.X - 5;
 			ctxMenuContainer.Top = Mouse.Y - 5;
 

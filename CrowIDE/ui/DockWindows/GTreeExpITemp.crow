@@ -1,0 +1,29 @@
+﻿<?xml version="1.0"?>
+<Expandable Caption="{Name}" IsExpanded="{²IsExpanded}">
+	<Template>
+		<VerticalStack>
+			<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"						
+					Foreground="Transparent"
+					MouseEnter="{Foreground=DimGray}"
+					MouseLeave="{Foreground=Transparent}">
+				<HorizontalStack Spacing="1">
+					<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
+						Path="{./Image}"
+						Visible="{./IsExpandable}"
+						SvgSub="{./IsExpanded}"
+						MouseEnter="{Background=LightGray}"
+						MouseLeave="{Background=Transparent}"/>
+					<Border Width="16" Height="16" Foreground="Black" Background="DimGray">
+						<Image Margin="2" Path="{GetIcon}" />
+					</Border>
+					<Label Text="{./Caption}"/>
+				</HorizontalStack>
+			</Border>
+			<Container Name="Content" Visible="false"/>
+		</VerticalStack>
+	</Template>
+	<HorizontalStack Height="Fit">
+		<GraphicObject Width="8" Height="10"/>
+		<VerticalStack Height="Fit" Name="ItemsContainer"/>
+	</HorizontalStack>
+</Expandable>

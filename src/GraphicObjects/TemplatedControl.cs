@@ -43,6 +43,20 @@ namespace Crow
 	/// </summary>
 	public abstract class TemplatedControl : PrivateContainer
 	{
+		#if DESIGN_MODE
+		public bool design_inlineTemplate = false;
+		public override void getIML (System.Xml.XmlDocument doc, System.Xml.XmlNode parentElem)
+		{
+			if (this.design_isTGItem)
+				return;
+			base.getIML (doc, parentElem);
+			if (child == null || !design_inlineTemplate)
+				return;
+			XmlElement xe = doc.CreateElement("Template");
+			child.getIML (doc, xe);
+			parentElem.LastChild.AppendChild (xe);
+		}
+		#endif
 		#region CTOR
 		protected TemplatedControl() : base(){}
 		public TemplatedControl (Interface iface) : base(iface){}
@@ -66,7 +80,7 @@ namespace Crow
 				if (string.IsNullOrEmpty(_template))
 					loadTemplate ();
 				else
-					loadTemplate (CurrentInterface.Load (_template));
+					loadTemplate (IFace.Load (_template));
 			}
 		}
 		/// <summary>
@@ -133,9 +147,9 @@ namespace Crow
 				this.ClearTemplateBinding();
 			
 			if (template == null) {
-				if (!Interface.DefaultTemplates.ContainsKey (this.GetType ().FullName))
+				if (!IFace.DefaultTemplates.ContainsKey (this.GetType ().FullName))
 					throw new Exception (string.Format ("No default template found for '{0}'", this.GetType ().FullName));
-				this.SetChild (CurrentInterface.Load (Interface.DefaultTemplates[this.GetType ().FullName]));
+				this.SetChild (IFace.Load (IFace.DefaultTemplates[this.GetType ().FullName]));
 			}else
 				this.SetChild (template);
 		}

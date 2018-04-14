@@ -38,6 +38,7 @@ namespace Crow
 	/// TemplatedControl may have 3 children (template,templateItem,content) but
 	/// behave exactely as a container for layouting and drawing
 	/// </summary>
+	[DesignIgnore]
 	public class PrivateContainer : GraphicObject
 	{
 		#region CTOR
@@ -45,6 +46,14 @@ namespace Crow
 		public PrivateContainer (Interface iface) : base(iface){}
 		#endregion
 
+		#if DESIGN_MODE
+		public override bool FindByDesignID(string designID, out GraphicObject go){
+			go = null;
+			if (base.FindByDesignID (designID, out go))
+				return true;
+			return (bool)child?.FindByDesignID (designID, out go);				
+		}
+		#endif
 		protected GraphicObject child;
 
 		protected virtual void SetChild(GraphicObject _child)
@@ -52,13 +61,12 @@ namespace Crow
 
 			if (child != null) {
 				//check if HoverWidget is removed from Tree
-				if (CurrentInterface.HoverWidget != null) {
-					if (this.Contains (CurrentInterface.HoverWidget))
-						CurrentInterface.HoverWidget = null;
+				if (IFace.HoverWidget != null) {
+					if (this.Contains (IFace.HoverWidget))
+						IFace.HoverWidget = null;
 				}
-				contentSize = new Size (0, 0);
+				contentSize = default(Size);
 				child.LayoutChanged -= OnChildLayoutChanges;
-				child.Dispose ();
 				this.RegisterForGraphicUpdate ();
 			}
 
@@ -71,6 +79,13 @@ namespace Crow
 				child.RegisteredLayoutings = LayoutingType.None;
 				child.RegisterForLayouting (LayoutingType.Sizing);
 			}
+		}
+		//dispose child if not null
+		protected virtual void deleteChild () {
+			GraphicObject g = child;
+			SetChild (null);
+			if (g != null)
+				g.Dispose ();
 		}
 
 		#region GraphicObject Overrides
@@ -100,11 +115,11 @@ namespace Crow
 				//force sizing to fit if sizing on children and child has stretched size
 				switch (layoutType) {
 				case LayoutingType.Width:
-					if (Width == Measure.Fit && child.Width.Units == Unit.Percent)
+					if (Width == Measure.Fit && child.Width.IsRelativeToParent)
 						child.Width = Measure.Fit;
 					break;
 				case LayoutingType.Height:
-					if (Height == Measure.Fit && child.Height.Units == Unit.Percent)
+					if (Height == Measure.Fit && child.Height.IsRelativeToParent)
 						child.Height = Measure.Fit;
 					break;
 				}
@@ -121,14 +136,14 @@ namespace Crow
 			LayoutingType ltChild = LayoutingType.None;
 
 			if (layoutType == LayoutingType.Width) {
-				if (child.Width.Units == Unit.Percent) {
+				if (child.Width.IsRelativeToParent) {
 					ltChild |= LayoutingType.Width;
 					if (child.Width.Value < 100 && child.Left == 0)
 						ltChild |= LayoutingType.X;
 				} else if (child.Left == 0)
 					ltChild |= LayoutingType.X;
 			} else if (layoutType == LayoutingType.Height) {
-				if (child.Height.Units == Unit.Percent) {
+				if (child.Height.IsRelativeToParent) {
 					ltChild |= LayoutingType.Height;
 					if (child.Height.Value < 100 && child.Top == 0)
 						ltChild |= LayoutingType.Y;

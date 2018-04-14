@@ -38,10 +38,13 @@ namespace Crow
 		#endregion
 
 		public enum Type {
+			None,
 			Information,
-			YesNo,
 			Alert,
-			Error
+			Error,
+			YesNo,
+			YesNoCancel,
+
 		}
 
 		protected override void loadTemplate (GraphicObject template)
@@ -49,13 +52,14 @@ namespace Crow
 			base.loadTemplate (template);
 			NotifyValueChanged ("MsgIcon", "#Crow.Images.Icons.Informations.svg");
 		}
-		string message, okMessage, cancelMessage;
-		Type msgType = Type.Information;
+		string message, okMessage, cancelMessage, noMessage;
+		Type msgType = Type.None;
 
-		public event EventHandler Ok;
+		public event EventHandler Yes;
+		public event EventHandler No;
 		public event EventHandler Cancel;
 
-		[XmlAttributeAttribute][DefaultValue("Informations")]
+		[DefaultValue("Informations")]
 		public virtual string Message
 		{
 			get { return message; }
@@ -66,7 +70,7 @@ namespace Crow
 				NotifyValueChanged ("Message", message);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue("Ok")]
+		[DefaultValue("Ok")]
 		public virtual string OkMessage
 		{
 			get { return okMessage; }
@@ -77,7 +81,7 @@ namespace Crow
 				NotifyValueChanged ("OkMessage", okMessage);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue("Cancel")]
+		[DefaultValue("Cancel")]
 		public virtual string CancelMessage
 		{
 			get { return cancelMessage; }
@@ -88,7 +92,18 @@ namespace Crow
 				NotifyValueChanged ("CancelMessage", cancelMessage);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue("Information")]
+		[DefaultValue("No")]
+		public virtual string NoMessage
+		{
+			get { return cancelMessage; }
+			set {
+				if (cancelMessage == value)
+					return;
+				cancelMessage = value;
+				NotifyValueChanged ("NoMessage", cancelMessage);
+			}
+		}
+		[DefaultValue("Information")]
 		public virtual Type MsgType
 		{
 			get { return msgType; }
@@ -99,34 +114,58 @@ namespace Crow
 				NotifyValueChanged ("MsgType", msgType);
 				switch (msgType) {
 				case Type.Information:
-					NotifyValueChanged ("MsgIcon", "#Crow.Images.Icons.Informations.svg");
+					MsgIcon = "#Crow.Images.Icons.Informations.svg";
 					Caption = "Informations";
 					OkMessage = "Ok";
-					CancelMessage = "Cancel";
+					NotifyValueChanged ("CancelButIsVisible", false);
+					NotifyValueChanged ("NoButIsVisible", false);
 					break;
 				case Type.YesNo:
-					NotifyValueChanged ("MsgIcon", "#Crow.Icons.question.svg");
+				case Type.YesNoCancel:
+					MsgIcon = "#Crow.Icons.question.svg";
 					Caption = "Choice";
 					OkMessage = "Yes";
-					CancelMessage = "No";
+					NoMessage = "No";
+					NotifyValueChanged ("CancelButIsVisible", msgType == Type.YesNoCancel);
+					NotifyValueChanged ("NoButIsVisible", true);
 					break;
 				case Type.Alert:
-					NotifyValueChanged ("MsgIcon", "#Crow.Images.Icons.IconAlerte.svg");
+					MsgIcon = "#Crow.Images.Icons.IconAlerte.svg";
 					Caption = "Alert";
 					OkMessage = "Ok";
 					CancelMessage = "Cancel";
+					NotifyValueChanged ("CancelButIsVisible", true);
+					NotifyValueChanged ("NoButIsVisible", false);
 					break;
 				case Type.Error:
-					NotifyValueChanged ("MsgIcon", "#Crow.Images.Icons.exit.svg");
+					MsgIcon = "#Crow.Images.Icons.exit.svg";
 					Caption = "Error";
 					OkMessage = "Ok";
+					NotifyValueChanged ("CancelButIsVisible", false);
+					NotifyValueChanged ("NoButIsVisible", false);
 					break;
 				}
 			}
 		}
+
+		string msgIcon = null;
+		public string MsgIcon {
+			get { return msgIcon; }
+			set {
+				if (value == MsgIcon)
+					return;
+				msgIcon = value;
+				NotifyValueChanged ("MsgIcon", MsgIcon);
+			}
+		}
 		void onOkButtonClick (object sender, EventArgs e)
 		{
-			Ok.Raise (this, null);
+			Yes.Raise (this, null);
+			close ();
+		}
+		void onNoButtonClick (object sender, EventArgs e)
+		{
+			No.Raise (this, null);
 			close ();
 		}
 		void onCancelButtonClick (object sender, EventArgs e)
@@ -137,13 +176,25 @@ namespace Crow
 		public static MessageBox Show (Interface iface, Type msgBoxType, string message, string okMsg = "", string cancelMsg = ""){
 			lock (iface.UpdateMutex) {
 				MessageBox mb = new MessageBox (iface);
-				mb.CurrentInterface.AddWidget (mb);
+				mb.IFace.AddWidget (mb);
 				mb.MsgType = msgBoxType;
 				mb.Message = message;
 				if (!string.IsNullOrEmpty(okMsg))
 					mb.OkMessage = okMsg;
 				if (!string.IsNullOrEmpty(cancelMsg))
 					mb.CancelMessage = cancelMsg;
+				return mb;
+			}
+		}
+		public static MessageBox ShowModal (Interface iface, Type msgBoxType, string message){
+			lock (iface.UpdateMutex) {
+				MessageBox mb = new MessageBox (iface) {
+					Modal = true,
+					MsgType = msgBoxType,
+					Message = message
+				};
+
+				iface.AddWidget (mb);
 				return mb;
 			}
 		}

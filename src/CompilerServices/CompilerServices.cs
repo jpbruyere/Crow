@@ -77,7 +77,7 @@ namespace Crow.IML
 		internal static MethodInfo miDSChangeEmitHelper = typeof(Instantiator).GetMethod("dataSourceChangedEmitHelper", BindingFlags.Instance | BindingFlags.NonPublic);
 		internal static MethodInfo miDSReverseBinding = typeof(Instantiator).GetMethod("dataSourceReverseBinding", BindingFlags.Static | BindingFlags.NonPublic);
 
-		internal static FieldInfo miSetCurIface = typeof(GraphicObject).GetField ("CurrentInterface", BindingFlags.Public | BindingFlags.Instance);
+		internal static FieldInfo miSetCurIface = typeof(GraphicObject).GetField ("IFace", BindingFlags.Public | BindingFlags.Instance);
 		internal static MethodInfo miFindByName = typeof (GraphicObject).GetMethod ("FindByName");
 		internal static MethodInfo miGetGObjItem = typeof(List<GraphicObject>).GetMethod("get_Item", new Type[] { typeof(Int32) });
 		internal static MethodInfo miLoadDefaultVals = typeof (GraphicObject).GetMethod ("loadDefaultValues");
@@ -87,7 +87,7 @@ namespace Crow.IML
 		internal static EventInfo eiLogicalParentChanged = typeof(GraphicObject).GetEvent("LogicalParentChanged");
 
 		internal static MethodInfo miIFaceLoad = typeof(Interface).GetMethod ("Load", BindingFlags.Instance | BindingFlags.Public);
-		internal static MethodInfo miGetITemp = typeof(Interface).GetMethod ("GetItemTemplate");
+		internal static MethodInfo miGetITemp = typeof(Interface).GetMethod ("GetItemTemplate", BindingFlags.Instance | BindingFlags.Public);
 
 		internal static MethodInfo miAddITemp = typeof(Dictionary<string, ItemTemplate>).GetMethod ("set_Item", new Type[] { typeof(string), typeof(ItemTemplate) });
 		internal static MethodInfo miGetITempFromDic = typeof(Dictionary<string, ItemTemplate>).GetMethod ("get_Item", new Type[] { typeof(string) });
@@ -97,6 +97,11 @@ namespace Crow.IML
 		
 		internal static MethodInfo miCreateExpDel = typeof(ItemTemplate).GetMethod ("CreateExpandDelegate");
 		internal static FieldInfo fiFetchMethodName = typeof(ItemTemplate).GetField("fetchMethodName", BindingFlags.Instance | BindingFlags.NonPublic);
+
+		#if DESIGN_MODE
+		internal static MethodInfo miDicStrStrAdd = typeof(Dictionary<string, string>).GetMethod ("set_Item", new Type[] { typeof(string), typeof(string) });
+		#endif
+
 		#region tree handling methods
 		internal static FieldInfo fiChild = typeof(PrivateContainer).GetField ("child", BindingFlags.Instance | BindingFlags.NonPublic);
 		internal static MethodInfo miSetChild = typeof (Container).GetMethod ("SetChild");
@@ -159,18 +164,18 @@ namespace Crow.IML
 							else
 								il.Emit (OpCodes.Ldc_I4_0);
 							break;
-							//						case TypeCode.Empty:
-							//							break;
-							//						case TypeCode.Object:
-							//							break;
-							//						case TypeCode.DBNull:
-							//							break;
-							//						case TypeCode.SByte:
-							//							break;
-							//						case TypeCode.Decimal:
-							//							break;
-							//						case TypeCode.DateTime:
-							//							break;
+//						case TypeCode.Empty:
+//							break;
+//						case TypeCode.Object:
+//							break;
+//						case TypeCode.DBNull:
+//							break;
+//						case TypeCode.SByte:
+//							break;
+//						case TypeCode.Decimal:
+//							break;
+//						case TypeCode.DateTime:
+//							break;
 						case TypeCode.Char:
 							il.Emit (OpCodes.Ldc_I4, Convert.ToChar (val));
 							break;
@@ -271,7 +276,11 @@ namespace Crow.IML
 
 		#region Reflexion helpers
 		static MemberInfo getMemberInfoWithReflexion(object instance, string member){
-			return instance.GetType ().GetMember (member)?.FirstOrDefault();
+			Type t = instance.GetType();
+			MemberInfo mi = t.GetMember (member)?.FirstOrDefault();
+			if (mi == null)
+				mi = CompilerServices.SearchExtMethod (t, member);
+			return mi;
 		}
 		static MethodInfo getMethodInfoWithReflexion(object instance, string method){
 			return instance.GetType ().GetMethod (method, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
@@ -339,12 +348,20 @@ namespace Crow.IML
 					PropertyInfo pi = mi as PropertyInfo;
 					tmp = pi.GetValue (instance);
 					dstType = pi.PropertyType;
-				}
-				if (mi.MemberType == MemberTypes.Field) {
+				}else if (mi.MemberType == MemberTypes.Field) {
 					FieldInfo fi = mi as FieldInfo;
 					tmp = fi.GetValue (instance);
 					dstType = fi.FieldType;
+				}else if (mi.MemberType == MemberTypes.Method) {
+					MethodInfo gi = mi as MethodInfo;
+					if (gi.IsStatic)
+						tmp = gi.Invoke(null, new object[] {instance});
+					else
+						tmp = gi.Invoke(instance, null);
+					dstType = gi.ReturnType;
 				}
+
+
 				if (tmp != null)
 					return tmp;
 				if (dstType == typeof(string) || dstType == CompilerServices.TObject)//TODO:object should be allowed to return null and not ""
@@ -688,7 +705,7 @@ namespace Crow.IML
 		/// <summary>
 		/// create delegate helper
 		/// </summary>
-		static Delegate createDel(Type eventType, object instance, string method){
+		static Delegate createDel(object instance, Type eventType, string method){
 			Type t = instance.GetType ();
 			MethodInfo mi = t.GetMethod (method, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			if (mi == null) {

@@ -10,7 +10,7 @@
 			</VerticalStack>
 			<VerticalStack Margin="5" Spacing="1">
 				<GraphicObject Width="34" Height="21" Background="{./SelectedColor}"/>
-				<Label Focusable="true" Selectable="true" Width="Stretched" Text="{./HexColor}" />				
+				<Label Focusable="true" Selectable="true" Text="{./SelectedColor}" />				
 				<HorizontalStack Height="Fit">
 					<Label Text="R" Width="Fit"/>
 					<Spinner Style="ColorSpinner" Value="{²./R}" Width="40"  />

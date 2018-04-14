@@ -26,8 +26,12 @@
 using System;
 using Crow;
 using System.Globalization;
+using System.Threading;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 
-namespace CrowIDE
+namespace Crow.Coding
 {
 	public class DesignInterface : Interface, IValueChange
 	{
@@ -48,17 +52,30 @@ namespace CrowIDE
 			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
 		}
 		#endregion
+
 		public DesignInterface ()
 		{
-			CurrentInterface = this;
-			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 		}
 
-		protected override void loadStyling ()
+		public ProjectFile ProjFile;
+
+		public override GraphicObject Load (string path)
 		{
-			base.loadStyling ();
+			ProjectFile pi;
+			if (ProjFile.Project.solution.GetProjectFileFromPath (path, out pi))
+				return CreateITorFromIMLFragment (pi.Source).CreateInstance();			
+			return null;
 		}
-
+		public override System.IO.Stream GetStreamFromPath (string path)
+		{
+			ProjectFile pi;
+			if (ProjFile.Project.solution.GetProjectFileFromPath (path, out pi)) {
+				return new FileStream (pi.AbsolutePath, FileMode.Open);	
+			}
+			
+			Console.WriteLine ("File not found: {0}", path);
+			return null;
+		}
 		public override bool ProcessMouseMove (int x, int y)
 		{
 			int deltaX = x - Mouse.X;
@@ -137,6 +154,34 @@ namespace CrowIDE
 			}
 			HoverWidget = null;
 			return false;		
+		}
+	
+		protected override void processLayouting ()
+		{
+			#if MEASURE_TIME
+			layoutingMeasure.StartCycle();
+			#endif
+
+			if (Monitor.TryEnter (LayoutMutex)) {
+				DiscardQueue = new Queue<LayoutingQueueItem> ();
+				LayoutingQueueItem lqi;
+				while (LayoutingQueue.Count > 0) {
+					lqi = LayoutingQueue.Dequeue ();
+					//Console.WriteLine (lqi.ToString ());
+					#if DEBUG_LAYOUTING
+					currentLQI = lqi;
+					curLQIsTries.Add(currentLQI);
+					#endif
+					lqi.ProcessLayouting ();
+				}
+				LayoutingQueue = DiscardQueue;
+				Monitor.Exit (LayoutMutex);
+				DiscardQueue = null;
+			}
+
+			#if MEASURE_TIME
+			layoutingMeasure.StopCycle();
+			#endif
 		}
 	}
 }

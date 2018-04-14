@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<VerticalStack>
+	<HorizontalStack >
+		<TextEditor Focusable="true" Name="editor" Font="monospace, 12" VerticalAlignment="Top" Margin="1"
+				CurrentLine="{²CurrentLine}" CurrentColumn="{²CurrentColumn}"
+				Foreground="DimGray" Background="White" Width="Stretched" Height="Stretched"
+				ProjectNode="{}"  KeyDown="textView_KeyDown"/>
+		<ScrollBar Name="scrollbarY" Value="{²../editor.ScrollY}"
+				   LargeIncrement="{../editor.VisibleLines}"
+				   CursorSize="{../editor.ChildHeightRatio}"
+			Maximum="{../editor.MaxScrollY}" Orientation="Vertical"
+			Width="14" />
+	</HorizontalStack>
+	<ScrollBar Style="HScrollBar" Name="scrollbarX" Value="{²../editor.ScrollX}"
+			Maximum="{../editor.MaxScrollX}" Orientation="Horizontal"
+			LargeIncrement="{../editor.VisibleColumns}"
+			CursorSize="{../editor.ChildWidthRatio}"
+			Height="14" />			
+	<HorizontalStack Height="Fit">
+		<GraphicObject Height="5" Width="Stretched"/>
+		<GraphicObject Background="Red" Width="5" Height="5" Visible="{IsDirty}"/>
+		<Label Text="Line:" Foreground="Gray"/>
+		<Label Text="{CurrentLine}"/>
+		<GraphicObject Height="5" Width="10"/>
+		<Label Text="column:" Foreground="Gray"/>
+		<Label Text="{CurrentColumn}"/>
+		<GraphicObject Height="5" Width="10"/>
+		<Label Text="ScrollX:" Foreground="Gray"/>
+		<Label Text="{../../editor.ScrollX}"/>
+	</HorizontalStack>
+</VerticalStack>

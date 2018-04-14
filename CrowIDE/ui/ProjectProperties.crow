@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Window Caption="Project Properties" Width="60%" Height="70%" AlwaysOnTop="true">
+<Window Caption="Project Properties" Width="60%" Height="70%" Modal="true">
 	<HorizontalStack>
 		<VerticalStack Height="Fit" Width="50%">
 			<HorizontalStack>
@@ -60,7 +60,7 @@
 			</HorizontalStack>
 		</VerticalStack>
 		<TreeView Width="50%" IsRoot="true" Name="treeView" Data="{RootItems}" DataTest="Type"
-			ItemTemplate="#CrowIDE.ui.ProjectTree.template">
+			ItemTemplate="#Crow.Coding.ui.ProjectTree.template">
 		</TreeView>
 	</HorizontalStack>
 </Window>

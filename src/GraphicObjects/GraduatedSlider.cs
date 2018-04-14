@@ -33,6 +33,7 @@ using System.Xml.Serialization;
 
 namespace Crow
 {
+	[DesignIgnore]
 	public class GraduatedSlider : Slider
     {     
 		#region CTOR

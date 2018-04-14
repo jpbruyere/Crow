@@ -33,6 +33,7 @@ namespace Crow
 	/// <summary>
 	/// simple squarred rgb color selector
 	/// </summary>
+	[DesignIgnore]
 	public class ColorSelector : GraphicObject
 	{
 		#region CTOR
@@ -47,7 +48,7 @@ namespace Crow
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
-			if (CurrentInterface.Mouse.LeftButton == ButtonState.Released)
+			if (IFace.Mouse.LeftButton == ButtonState.Released)
 				return;
 			updateMouseLocalPos (e.Position);
 		}

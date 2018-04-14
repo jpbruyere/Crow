@@ -68,7 +68,7 @@ namespace Crow
 		protected double unity;
 
 		#region Public properties
-		[XmlAttributeAttribute()][DefaultValue("vgradient|0:White|0,1:LightGray|0,9:LightGray|1:DimGray")]
+		[DefaultValue("vgradient|0:White|0,1:LightGray|0,9:LightGray|1:DimGray")]
 		public virtual Fill CursorColor {
 			get { return _cursorColor; }
 			set {
@@ -79,7 +79,7 @@ namespace Crow
 				NotifyValueChanged ("CursorColor", _cursorColor);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(20)]
+		[DefaultValue(20)]
 		public virtual int CursorSize {
 			get { return _cursorSize; }
 			set {
@@ -90,7 +90,7 @@ namespace Crow
 				NotifyValueChanged ("CursorSize", _cursorSize);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(Orientation.Horizontal)]
+		[DefaultValue(Orientation.Horizontal)]
 		public virtual Orientation Orientation
 		{
 			get { return _orientation; }
@@ -105,7 +105,7 @@ namespace Crow
 		}
 		#endregion
 
-		[XmlAttributeAttribute()][DefaultValue(10.0)]
+		[DefaultValue(10.0)]
 		public override double Maximum {
 			get { return base.Maximum; }
 			set {				
@@ -186,16 +186,24 @@ namespace Crow
 			}
 			cursor.Inflate (-1);
         }
-        
+		Point mouseDownInit;
+		double mouseDownInitValue;
+
 		#region mouse handling
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseDown (sender, e);
-
+			mouseDownInit = ScreenPointToLocal (e.Position);
+			mouseDownInitValue = Value;
 			Rectangle cursInScreenCoord = ScreenCoordinates (cursor + Slot.Position);
-			if (cursInScreenCoord.ContainsOrIsEqual (e.Position))
+			if (cursInScreenCoord.ContainsOrIsEqual (e.Position)){
+//				Rectangle r = ClientRectangle;
+//				if (r.Width - _cursorSize > 0) {
+//					double unit = (Maximum - Minimum) / (double)(r.Width - _cursorSize);
+//					mouseDownInit += new Point ((int)(Value / unit), (int)(Value / unit));
+//				}
 				holdCursor = true;
-			else if (_orientation == Orientation.Horizontal) {
+			}else if (_orientation == Orientation.Horizontal) {
 				if (e.Position.X < cursInScreenCoord.Left)
 					Value -= LargeIncrement;
 				else
@@ -215,11 +223,25 @@ namespace Crow
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
-			if (holdCursor) {
-				if (_orientation == Orientation.Horizontal)
-					Value += (double)e.XDelta / unity;
-				else
-					Value += (double)e.YDelta / unity;
+			if (holdCursor) {				
+				Point m = ScreenPointToLocal (e.Position) - mouseDownInit;
+				Rectangle r = ClientRectangle;
+
+				if (_orientation == Orientation.Horizontal) {
+					if (r.Width - _cursorSize == 0)
+						return;					
+					double unit = (Maximum - Minimum) / (double)(r.Width - _cursorSize);
+					double tmp = mouseDownInitValue + (double)m.X * unit;
+					tmp -= tmp % SmallIncrement;
+					Value = tmp;
+				} else {
+					if (r.Height - _cursorSize == 0)
+						return;					
+					double unit = (Maximum - Minimum) / (double)(r.Height - _cursorSize);
+					double tmp = mouseDownInitValue + (double)m.Y * unit;
+					tmp -= tmp % SmallIncrement;
+					Value = tmp;
+				}
 			}
 			
 			base.onMouseMove (sender, e);

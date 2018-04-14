@@ -30,6 +30,7 @@ using System.Xml.Serialization;
 
 namespace Crow
 {
+	[DesignIgnore]
 	public class SaturationValueSelector : ColorSelector
 	{
 		public SaturationValueSelector () : base(){}
@@ -101,7 +102,7 @@ namespace Crow
 
 			ctx.Translate (rb.X, rb.Y);
 
-			ctx.SetSourceColor (Color.Jet);
+			ctx.SetSourceColor (Color.DimGrey);
 			ctx.Arc (mousePos.X, mousePos.Y, 3.5, 0, Math.PI * 2.0);
 			ctx.LineWidth = 0.5;
 			ctx.Stroke ();

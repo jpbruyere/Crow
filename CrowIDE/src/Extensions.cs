@@ -25,6 +25,9 @@ namespace Crow
 {
 	public static partial class Extensions
 	{
+		public static string GetIcon(this GraphicObject go){
+			return "#Crow.Coding.icons.toolbox." + go.GetType().FullName + ".svg";
+		}
 		public static List<GraphicObject> GetChildren(this GraphicObject go){
 			Type goType = go.GetType();
 			if (typeof (Group).IsAssignableFrom (goType))

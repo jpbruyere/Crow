@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
 <Window Caption="Properties" Width="30%" Height="60%" AlwaysOnTop="true">
-	<MembersView Instance="{SelectedItem}" DataTest="Type"  Background="DimGray"
-		ItemTemplate="#CrowIDE.ui.MembersItem.template"/>
+	<MembersView Instance="{SelectedItem}" DataTest="Type"
+		ItemTemplate="#Crow.Coding.ui.MembersItem.template"/>
 </Window>

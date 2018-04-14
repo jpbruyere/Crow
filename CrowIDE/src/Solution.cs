@@ -21,13 +21,58 @@ using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using Crow;
 
-namespace CrowIDE{	
+namespace Crow.Coding{	
 	public class SolutionProject {
 		public string ProjectHostGuid;
 		public string ProjectName;
 		public string RelativePath;
 		public string ProjectGuid;
 	}
+	public class StyleItemContainer {
+		public object Value;
+		public string Name;
+		public StyleItemContainer(string name, object _value){
+			Name = name;
+			Value = _value;
+		}
+	}
+	public class StyleContainer : IValueChange {
+		#region IValueChange implementation
+		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+		public virtual void NotifyValueChanged(string MemberName, object _value)
+		{
+			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
+		}
+		#endregion
+
+		Style style;
+		bool isExpanded;
+
+		public string Name;
+		public List<StyleItemContainer> Items;
+		public bool IsExpanded
+		{
+			get { return isExpanded; }
+			set
+			{
+				if (value == isExpanded)
+					return;
+				isExpanded = value;
+				NotifyValueChanged ("IsExpanded", isExpanded);
+			}
+		}
+		public StyleContainer(string name, Style _style){
+			Name = name;
+			style = _style;
+
+			Items = new List<StyleItemContainer> ();
+			foreach (string k in style.Keys) {
+				Items.Add(new StyleItemContainer(k, style[k]));
+			}
+		}
+	}
+
+
 	/// <summary>
 /// .sln loaded into class.
 /// </summary>
@@ -44,6 +89,51 @@ namespace CrowIDE{
 		ProjectItem selectedItem = null;
 		object selectedItemElement = null;
 		ObservableList<ProjectItem> openedItems = new ObservableList<ProjectItem>();
+		ObservableList<GraphicObjectDesignContainer> toolboxItems;
+
+		public Dictionary<string, Style> Styling;
+		public Dictionary<string, string> DefaultTemplates;
+
+		public List<Style> Styles { get { return Styling.Values.ToList(); }}
+		public List<StyleContainer> StylingContainers;
+		//TODO: check project dependencies if no startup proj
+
+		public void ReloadStyling () {
+			Styling = new Dictionary<string, Style> ();
+			if (StartupProject != null)
+				StartupProject.GetStyling ();
+//			StylingContainers = new List<StyleContainer> ();
+//			foreach (string k in Styling.Keys) {
+//				StylingContainers.Add (new StyleContainer (k, Styling [k]));
+//			}
+			foreach (ImlProjectItem pf in openedItems.OfType<ImlProjectItem>()) {
+				pf.SignalEditorOfType<ImlVisualEditor> ();
+			}
+		}
+		public string[] AvailaibleStyles {
+			get { return Styling == null ? new string[] {} : Styling.Keys.ToArray();}
+		}
+		public void ReloadDefaultTemplates () {
+			DefaultTemplates = new Dictionary<string, string>();
+			if (StartupProject != null)
+				StartupProject.GetDefaultTemplates ();
+		}
+		public void updateToolboxItems () {
+			Type[] crowItems = AppDomain.CurrentDomain.GetAssemblies ()
+				.SelectMany (t => t.GetTypes ())
+				.Where (t => t.IsClass && !t.IsAbstract && t.IsPublic &&					
+					t.Namespace == "Crow" && t.IsSubclassOf(typeof(GraphicObject)) &&
+					t.GetCustomAttribute<DesignIgnore>(false) == null).ToArray ();
+			ToolboxItems = new ObservableList<GraphicObjectDesignContainer> ();
+			foreach (Type ci in crowItems) {
+				toolboxItems.AddElement(new GraphicObjectDesignContainer(ci));
+			}
+		}
+		public bool GetProjectFileFromPath (string path, out ProjectFile pi){
+			pi = null;
+			return StartupProject == null ? false :
+				StartupProject.TryGetProjectFileFromPath (path, out pi);
+		}
 
 		public ObservableList<ProjectItem> OpenedItems {
 			get { return openedItems; }
@@ -53,6 +143,16 @@ namespace CrowIDE{
 				openedItems = value;
 				NotifyValueChanged ("OpenedItems", openedItems);
 			}
+		}
+
+		public ObservableList<GraphicObjectDesignContainer> ToolboxItems {
+			get { return toolboxItems; }
+			set {
+				if (toolboxItems == value)
+					return;
+				toolboxItems = value;
+				NotifyValueChanged ("ToolboxItems", toolboxItems);
+			}			
 		}
 		public ProjectItem SelectedItem {
 			get { return selectedItem; }
@@ -114,22 +214,69 @@ namespace CrowIDE{
 			NotifyValueChanged ("CompilerErrors", CompilerErrors);
 		}
 
-		void onSelectedItemChanged (object sender, SelectionChangeEventArgs e){			
-			ProjectItem pi = e.NewValue as ProjectItem;
-			if (pi == null)
-				return;
-			if (openedItems.Contains (pi))
-				return;
-			openedItems.AddElement (pi);
+		void saveOpenedItemsInUserConfig (){
+			if (openedItems.Count == 0)
+				UserConfig.Set ("OpenedItems", "");
+			else
+				UserConfig.Set ("OpenedItems", openedItems.Select(o => o.AbsolutePath).Aggregate((a,b)=>a + ";" + b));
 		}
-		public void OnCloseTab (object sender, MouseButtonEventArgs e){			
-			
-			openedItems.RemoveElement ((sender as GraphicObject).DataSource as ProjectItem);
-		}
-		public void CloseItem (ProjectItem pi) {
-			openedItems.RemoveElement (pi);
+		public void ReopenItemsSavedInUserConfig () {
+			string tmp = UserConfig.Get<string> ("OpenedItems");
+			string sel = UserConfig.Get<string> ("SelectedProjItems");
+			ProjectFile selItem = null;
+			if (string.IsNullOrEmpty (tmp))
+				return;
+			foreach (string f in tmp.Split(';')) {
+				foreach (Project p in Projects) {
+					ProjectFile pi;
+					if (p.TryGetProjectFileFromAbsolutePath (f, out pi)) {
+						OpenedItems.AddElement (pi);
+						pi.Project.IsExpanded = true;
+						ProjectNode pn = pi.Parent;
+						while (pn != null) {
+							pn.IsExpanded = true;
+							pn = pn.Parent;
+						}
+						if (pi.AbsolutePath == sel)
+							selItem = pi;
+						break;
+					}
+				}
+			}
+			SelectedItem = selItem;//BUG: loading in another thread focused last loaded pf
 		}
 
+		void onSelectedItemChanged (object sender, SelectionChangeEventArgs e){			
+			ProjectItem pi = e.NewValue as ProjectItem;
+			if (pi != null) {				
+				if (!openedItems.Contains (pi)) {
+					openedItems.AddElement (pi);
+					saveOpenedItemsInUserConfig ();
+				}
+			}
+			this.SelectedItem = pi;
+			UserConfig.Set ("SelectedProjItems", SelectedItem?.AbsolutePath);
+		}
+		public void OnCloseTab (object sender, MouseButtonEventArgs e){			
+			Console.WriteLine ("OnCloseTab");
+			openedItems.RemoveElement ((sender as GraphicObject).DataSource as ProjectItem);
+			saveOpenedItemsInUserConfig ();
+		}
+		public void CloseItem (ProjectItem pi) {
+			Console.WriteLine ("CloseItem: " + pi.ToString());
+			openedItems.RemoveElement (pi);
+			saveOpenedItemsInUserConfig ();
+		}
+
+		public void CloseSolution () {
+			while (openedItems.Count > 0) {
+				openedItems.RemoveElement (openedItems [0]);
+			}
+			while (toolboxItems.Count > 0) {
+				toolboxItems.RemoveElement (toolboxItems [0]);
+			}
+			NotifyValueChanged ("Projects", null);
+		}
 	    /// <summary>
 	    /// Solution name
 	    /// </summary>
@@ -209,7 +356,8 @@ namespace CrowIDE{
 					value.NotifyValueChanged("IsStartupProject", true);
 				}
 				NotifyValueChanged ("StartupProject", StartupProject);
-
+				ReloadStyling ();
+				ReloadDefaultTemplates ();
 			}
 		}
 
@@ -217,7 +365,9 @@ namespace CrowIDE{
 	    /// <summary>
 	    /// Creates new solution.
 	    /// </summary>
-	    public Solution() { }
+	    public Solution() { 
+		}
+
 		#endregion
 
 
@@ -309,6 +459,8 @@ namespace CrowIDE{
 	        }
 	        ));
 
+			Console.WriteLine ("******** CONFIG ***************");
+
 	        new Regex("GlobalSection\\(ProjectConfigurationPlatforms\\).*?[\r\n]+(.*?)EndGlobalSection[\r\n]+", RegexOptions.Singleline).Replace(slnTxt, new MatchEvaluator(m2 =>
 	        {
 	            foreach (Match m3 in new Regex("\\s*({[A-F0-9-]+})\\.(.*?)\\.(.*?)\\s+=\\s+(.*?)[\r\n]+").Matches(m2.Groups[1].ToString()))
@@ -321,6 +473,8 @@ namespace CrowIDE{
 	                Project p = s.Projects.Where(x => x.ProjectGuid == guid).FirstOrDefault();
 	                if (p == null)
 	                    continue;
+
+						Console.WriteLine ("{0},{1},{2},{3}",guid,solutionConfig,action,projectConfig);
 
 	                int iConfigIndex = s.configurations.IndexOf(solutionConfig);
 	                if (iConfigIndex == -1)
@@ -380,7 +534,9 @@ namespace CrowIDE{
 	        ));
 
 			s.UserConfig = new Configuration (s.path + ".user");
-
+			s.ReloadStyling ();
+			s.ReloadDefaultTemplates ();
+			s.updateToolboxItems ();
 	        return s;
 	    } //LoadSolution
 		#endregion

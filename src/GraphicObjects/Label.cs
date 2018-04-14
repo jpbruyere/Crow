@@ -55,6 +55,7 @@ namespace Crow
 
 		public virtual void OnTextChanged(Object sender, TextChangeEventArgs e)
 		{
+			textMeasureIsUpToDate = false;
 			NotifyValueChanged ("Text", Text);
 			TextChanged.Raise (this, e);
 		}
@@ -86,7 +87,7 @@ namespace Crow
 		protected TextExtents te;
 		#endregion
 
-		[XmlAttributeAttribute][DefaultValue("BlueGray")]
+		[XmlAttributeAttribute][DefaultValue("SteelBlue")]
 		public virtual Color SelectionBackground {
 			get { return selBackground; }
 			set {
@@ -437,48 +438,49 @@ namespace Crow
 			CurrentColumn = 0;
 			OnTextChanged (this, new TextChangeEventArgs (Text));
 		}
+		bool textMeasureIsUpToDate = false;
+		Size cachedTextSize = default(Size);
 
 		#region GraphicObject overrides
 		protected override int measureRawSize(LayoutingType lt)
-        {
+		{
 			if (lines == null)
 				lines = getLines;
+			if (!textMeasureIsUpToDate) {
+				using (ImageSurface img = new ImageSurface (Format.Argb32, 10, 10)) {
+					using (Context gr = new Context (img)) {
+						//Cairo.FontFace cf = gr.GetContextFontFace ();
 
-			using (ImageSurface img = new ImageSurface (Format.Argb32, 10, 10)) {
-				using (Context gr = new Context (img)) {
-					//Cairo.FontFace cf = gr.GetContextFontFace ();
+						gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+						gr.SetFontSize (Font.Size);
+						gr.FontOptions = Interface.FontRenderingOptions;
+						gr.Antialias = Interface.Antialias;
 
-					gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-					gr.SetFontSize (Font.Size);
+						fe = gr.FontExtents;
+						te = new TextExtents ();
 
+						cachedTextSize.Height = (int)Math.Ceiling ((fe.Ascent+fe.Descent) * Math.Max (1, lines.Count)) + Margin * 2;
 
-					fe = gr.FontExtents;
-					te = new TextExtents();
+						try {
+							foreach (string s in lines) {
+								string l = s.Replace ("\t", new String (' ', Interface.TabSize));
 
-					if (lt == LayoutingType.Height){
-						int lc = lines.Count;
-						//ensure minimal height = text line height
-						if (lc == 0)
-							lc = 1;
+								TextExtents tmp = gr.TextExtents (l);
 
-						return (int)Math.Ceiling(fe.Height * lc) + Margin * 2;
+								if (tmp.XAdvance > te.XAdvance)
+									te = tmp;
+							}
+							cachedTextSize.Width = (int)Math.Ceiling (te.XAdvance) + Margin * 2;
+							textMeasureIsUpToDate = true;
+						} catch {							
+							return -1;
+						}					
 					}
-					try {
-						foreach (string s in lines) {
-							string l = s.Replace("\t", new String (' ', Interface.TabSize));
-
-							TextExtents tmp = gr.TextExtents (l);
-
-							if (tmp.XAdvance > te.XAdvance)
-								te = tmp;
-						}
-					} catch (Exception ex) {
-						return -1;
-					}
-					return (int)Math.Ceiling (te.XAdvance) + Margin * 2;
 				}
+
 			}
-        }
+			return lt == LayoutingType.Height ? cachedTextSize.Height : cachedTextSize.Width;
+		}
 		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
@@ -552,11 +554,12 @@ namespace Crow
 				break;
 			case Alignment.Center://ok
 				rText.X = cb.X + cb.Width / 2 - rText.Width / 2;
-				rText.Y = cb.Y + cb.Height / 2 - rText.Height / 2;
+				//rText.Y = cb.Y + cb.Height / 2 - rText.Height / 2;
+				rText.Y = cb.Y + (int)Math.Floor((double)cb.Height / 2.0 - (double)rText.Height / 2.0);
 				break;
 			}
 
-			gr.FontMatrix = new Matrix(widthRatio * (float)Font.Size, 0, 0, heightRatio * (float)Font.Size, 0, 0);
+			//gr.FontMatrix = new Matrix(widthRatio * (float)Font.Size, 0, 0, heightRatio * (float)Font.Size, 0, 0);
 			fe = gr.FontExtents;
 
 			#region draw text cursor
@@ -586,8 +589,8 @@ namespace Crow
 
 				Foreground.SetAsSource (gr);
 				gr.LineWidth = 1.0;
-				gr.MoveTo (0.5 + textCursorPos + rText.X, rText.Y + CurrentLine * fe.Height);
-				gr.LineTo (0.5 + textCursorPos + rText.X, rText.Y + (CurrentLine + 1) * fe.Height);
+				gr.MoveTo (0.5 + textCursorPos + rText.X, rText.Y + CurrentLine * (fe.Ascent+fe.Descent));
+				gr.LineTo (0.5 + textCursorPos + rText.X, rText.Y + (CurrentLine + 1) * (fe.Ascent+fe.Descent));
 				gr.Stroke();
 			}
 			#endregion
@@ -597,9 +600,9 @@ namespace Crow
 //				new SolidColor(Color.DarkGreen).SetAsSource(gr);
 //				Rectangle R = new Rectangle (
 //					             rText.X + (int)SelEndCursorPos - 3,
-//					             rText.Y + (int)(SelRelease.Y * fe.Height),
+//					             rText.Y + (int)(SelRelease.Y * (fe.Ascent+fe.Descent)),
 //					             6,
-//					             (int)fe.Height);
+//					             (int)(fe.Ascent+fe.Descent));
 //				gr.Rectangle (R);
 //				gr.Fill ();
 //			}
@@ -607,9 +610,9 @@ namespace Crow
 //				new SolidColor(Color.DarkRed).SetAsSource(gr);
 //				Rectangle R = new Rectangle (
 //					rText.X + (int)SelStartCursorPos - 3,
-//					rText.Y + (int)(SelBegin.Y * fe.Height),
+//					rText.Y + (int)(SelBegin.Y * (fe.Ascent+fe.Descent)),
 //					6,
-//					(int)fe.Height);
+//					(int)(fe.Ascent+fe.Descent));
 //				gr.Rectangle (R);
 //				gr.Fill ();
 //			}
@@ -620,9 +623,9 @@ namespace Crow
 				int lineLength = (int)gr.TextExtents (l).XAdvance;
 				Rectangle lineRect = new Rectangle (
 					rText.X,
-					rText.Y + (int)Math.Ceiling(i * fe.Height),
+					rText.Y + i * (int)(fe.Ascent+fe.Descent),
 					lineLength,
-					(int)Math.Ceiling(fe.Height));
+					(int)(fe.Ascent+fe.Descent));
 
 //				if (TextAlignment == Alignment.Center ||
 //					TextAlignment == Alignment.Top ||
@@ -636,7 +639,7 @@ namespace Crow
 					continue;
 
 				Foreground.SetAsSource (gr);
-				gr.MoveTo (lineRect.X, rText.Y + fe.Ascent + fe.Height * i);
+				gr.MoveTo (lineRect.X,(double)rText.Y + fe.Ascent + (fe.Ascent+fe.Descent) * i) ;
 				gr.ShowText (l);
 				gr.Fill ();
 
@@ -666,7 +669,7 @@ namespace Crow
 						gr.Save ();
 						gr.Clip ();
 						gr.SetSourceColor (SelectionForeground);
-						gr.MoveTo (lineRect.X, rText.Y + fe.Ascent + fe.Height * i);
+						gr.MoveTo (lineRect.X, rText.Y + fe.Ascent + (fe.Ascent+fe.Descent) * i);
 						gr.ShowText (l);
 						gr.Fill ();
 						gr.Restore ();
@@ -688,12 +691,12 @@ namespace Crow
 		{
 			base.onMouseEnter (sender, e);
 			if (Selectable)
-				CurrentInterface.MouseCursor = XCursor.Text;
+				IFace.MouseCursor = XCursor.Text;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			CurrentInterface.MouseCursor = XCursor.Default;
+			IFace.MouseCursor = XCursor.Default;
 		}
 		protected override void onFocused (object sender, EventArgs e)
 		{
@@ -774,7 +777,7 @@ namespace Crow
 
 			double cPos = 0f;
 
-			CurrentLine = (int)(mouseLocalPos.Y / fe.Height);
+			CurrentLine = (int)(mouseLocalPos.Y / (fe.Ascent+fe.Descent));
 
 			//fix cu
 			if (CurrentLine >= lines.Count)

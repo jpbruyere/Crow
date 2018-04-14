@@ -38,6 +38,18 @@ namespace Crow
 	/// </summary>
 	public class TemplatedContainer : TemplatedControl
 	{
+		#if DESIGN_MODE
+		public override void getIML (System.Xml.XmlDocument doc, System.Xml.XmlNode parentElem)
+		{
+			if (this.design_isTGItem)
+				return;
+			base.getIML (doc, parentElem);
+			if (!HasContent)
+				return;
+			Content.getIML (doc, parentElem.LastChild);
+		}
+		#endif
+
 		#region CTOR
 		protected TemplatedContainer() : base(){}
 		public TemplatedContainer (Interface iface) : base(iface){}

@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<Border Background="{./Background}" Name="Content"
+	BorderWidth="1" BorderStyle="Normal"
+	MouseDown="{BorderStyle=Sunken}"
+	MouseUp="{BorderStyle=Normal}">
+	<Image Margin="1" Path="#Crow.Coding.ui.icons.blank-file.svg" />
+</Border>
