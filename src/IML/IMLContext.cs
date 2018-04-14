@@ -42,7 +42,8 @@ namespace Crow.IML
 	/// </summary>
 	public class IMLContext
 	{
-		public XmlTextReader reader = null;
+		public XmlReader reader = null;
+		public int curLine = 0;
 		public Type RootType = null;
 
 		public DynamicMethod dm = null;
@@ -182,23 +183,48 @@ namespace Crow.IML
 		/// <param name="bd">Bd.</param>
 		/// <param name="evt">passed as arg to prevent refetching it for the 3rd time</param>
 		public void emitHandlerMethodAddition(EventBinding bd){
+
 			//fetch source instance with address for handler addition (as 1st arg of handler.add)
 			il.Emit (OpCodes.Ldloc_0);//push root
 			CompilerServices.emitGetInstance (il, bd.SourceNA);
 
+			il.Emit (OpCodes.Ldloc_0);
+			CompilerServices.emitGetInstance (il, bd.TargetNA);
+
+			string[] membs = bd.TargetMember.Split ('.');
+			for (int i = 0; i < membs.Length - 1; i++) {
+				il.Emit (OpCodes.Dup);
+				il.Emit (OpCodes.Ldstr, membs[i]);
+				il.Emit (OpCodes.Call, CompilerServices.miGetMembIinfoWithRefx);
+				il.Emit (OpCodes.Call, CompilerServices.miGetValWithRefx);
+			}
+
 			//load handlerType of sourceEvent to create handler delegate (1st arg)
 			il.Emit (OpCodes.Ldtoken, bd.SourceEvent.EventHandlerType);
 			il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
-			//load target the where the method is defined (2nd arg)
-			il.Emit (OpCodes.Ldloc_0);
-			CompilerServices.emitGetInstance (il, bd.TargetNA);
 			//load methodInfo (3rd arg)
-			il.Emit (OpCodes.Ldstr, bd.TargetMember);
-
+			il.Emit (OpCodes.Ldstr, membs[membs.Length-1]);
 			il.Emit (OpCodes.Callvirt, CompilerServices.miCreateDel);
-
 			il.Emit (OpCodes.Callvirt, bd.SourceEvent.AddMethod);//call add event
 		}
-
+//		public void emitHandlerMethodAddition(EventBinding bd){
+//			//fetch source instance with address for handler addition (as 1st arg of handler.add)
+//			il.Emit (OpCodes.Ldloc_0);//push root
+//			CompilerServices.emitGetInstance (il, bd.SourceNA);
+//
+//			//load handlerType of sourceEvent to create handler delegate (1st arg)
+//			il.Emit (OpCodes.Ldtoken, bd.SourceEvent.EventHandlerType);
+//			il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
+//			//load target the where the method is defined (2nd arg)
+//			il.Emit (OpCodes.Ldloc_0);
+//			CompilerServices.emitGetInstance (il, bd.TargetNA);
+//			//load methodInfo (3rd arg)
+//			il.Emit (OpCodes.Ldstr, bd.TargetMember);
+//
+//			il.Emit (OpCodes.Callvirt, CompilerServices.miCreateDel);
+//
+//			il.Emit (OpCodes.Callvirt, bd.SourceEvent.AddMethod);//call add event
+//		}
+//
 	}
 }

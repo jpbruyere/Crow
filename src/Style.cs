@@ -29,12 +29,31 @@ using System.Collections.Generic;
 
 namespace Crow
 {
+	public struct FileLocation {
+		public string FilePath;
+		public int Line;
+		public int Column;
+
+		public FileLocation(string filePath, int line, int column){
+			FilePath = filePath;
+			Line = line;
+			Column = column;
+		}
+		public override string ToString ()
+		{
+			return string.Format ("{0} ({1},{2})", FilePath, Line, Column);
+		}
+	}
 	public class Style : Dictionary<string, object>
 	{
-		public Dictionary<string, Style> SubStyles;//TODO:implement substyles for all tags inside a style
+		#if DESIGN_MODE
+		public Dictionary<string, FileLocation> Locations = new Dictionary<string, FileLocation>();
+		#endif
+		//public Dictionary<string, Style> SubStyles;//TODO:implement substyles for all tags inside a style
 		public Style () : base()
 		{
 		}
+
 	}
 }
 

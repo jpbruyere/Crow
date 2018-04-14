@@ -47,11 +47,12 @@ namespace Crow
 		}
 
 		string _icon;
-		bool _resizable;
-		bool _movable;
+		bool resizable;
+		bool movable;
+		bool modal;
 		protected bool hoverBorder = false;
 		bool alwaysOnTop = false;
-		Fill titleBarBackground = Color.UnitedNationsBlue;
+		Fill titleBarBackground = Color.SteelBlue;
 		Fill titleBarForeground = Color.White;
 
 		Rectangle savedBounds;
@@ -96,7 +97,7 @@ namespace Crow
 		/// <summary>
 		/// Background of the title bar if any.
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue("vgradient|0:Onyx|1:UnitedNationsBlue")]
+		[XmlAttributeAttribute][DefaultValue("vgradient|0:Onyx|1:SteelBlue")]
 		public virtual Fill TitleBarBackground {
 			get { return titleBarBackground; }
 			set {
@@ -124,25 +125,37 @@ namespace Crow
 		[XmlAttributeAttribute][DefaultValue(true)]
 		public bool Resizable {
 			get {
-				return _resizable;
+				return resizable;
 			}
 			set {
-				if (_resizable == value)
+				if (resizable == value)
 					return;
-				_resizable = value;
-				NotifyValueChanged ("Resizable", _resizable);
+				resizable = value;
+				NotifyValueChanged ("Resizable", resizable);
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue(true)]
 		public bool Movable {
 			get {
-				return _movable;
+				return movable;
 			}
 			set {
-				if (_movable == value)
+				if (movable == value)
 					return;
-				_movable = value;
-				NotifyValueChanged ("Movable", _movable);
+				movable = value;
+				NotifyValueChanged ("Movable", movable);
+			}
+		}
+		[XmlAttributeAttribute][DefaultValue(false)]
+		public bool Modal {
+			get {
+				return modal;
+			}
+			set {
+				if (modal == value)
+					return;
+				modal = value;
+				NotifyValueChanged ("Modal", modal);
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue(false)]
@@ -167,17 +180,18 @@ namespace Crow
 		[XmlAttributeAttribute][DefaultValue(false)]
 		public bool AlwaysOnTop {
 			get {
-				return alwaysOnTop;
+				return modal ? true : alwaysOnTop;
 			}
 			set {
 				if (alwaysOnTop == value)
 					return;
+				
 				alwaysOnTop = value;
 
-				if (alwaysOnTop && Parent != null)
-					CurrentInterface.PutOnTop (this);
+				if (AlwaysOnTop && Parent != null)
+					IFace.PutOnTop (this);
 
-				NotifyValueChanged ("AlwaysOnTop", alwaysOnTop);
+				NotifyValueChanged ("AlwaysOnTop", AlwaysOnTop);
 			}
 		}
 //		[XmlAttributeAttribute()][DefaultValue(WindowState.Normal)]
@@ -278,15 +292,15 @@ namespace Crow
 		{
 			base.onMouseMove (sender, e);
 
-			Interface otkgw = CurrentInterface;
+			Interface otkgw = IFace;
 
 			if (!hoverBorder) {
 				currentDirection = Direction.None;
-				CurrentInterface.MouseCursor = XCursor.Default;
+				IFace.MouseCursor = XCursor.Default;
 				return;
 			}
 
-			if (this.HasFocus && _movable) {
+			if (this.HasFocus && movable) {
 				if (e.Mouse.IsButtonDown (MouseButton.Left)) {
 					MoveAndResize (e.XDelta, e.YDelta, currentDirection);
 					return;
@@ -353,10 +367,14 @@ namespace Crow
 		{
 			base.onMouseDown (sender, e);
 		}
+		public override bool MouseIsIn (Point m)
+		{
+			return modal ? true : base.MouseIsIn (m);
+		}
 		#endregion
 
 		protected void onMaximized (object sender, EventArgs e){
-			lock (CurrentInterface.LayoutMutex) {
+			lock (IFace.LayoutMutex) {
 				if (!IsMinimized)
 					savedBounds = this.LastPaintedSlot;
 				this.Left = this.Top = 0;
@@ -372,7 +390,7 @@ namespace Crow
 			Maximized.Raise (sender, e);
 		}
 		protected void onUnmaximized (object sender, EventArgs e){
-			lock (CurrentInterface.LayoutMutex) {
+			lock (IFace.LayoutMutex) {
 				this.Left = savedBounds.Left;
 				this.Top = savedBounds.Top;
 				this.Width = savedBounds.Width;
@@ -387,7 +405,7 @@ namespace Crow
 			Unmaximized.Raise (sender, e);
 		}
 		protected void onMinimized (object sender, EventArgs e){
-			lock (CurrentInterface.LayoutMutex) {
+			lock (IFace.LayoutMutex) {
 				if (IsNormal)
 					savedBounds = this.LastPaintedSlot;
 				Width = 200;
@@ -405,7 +423,7 @@ namespace Crow
 		{
 			hoverBorder = false;
 			currentDirection = Direction.None;
-			CurrentInterface.MouseCursor = XCursor.Default;
+			IFace.MouseCursor = XCursor.Default;
 		}
 		protected virtual void onBorderMouseEnter (object sender, MouseMoveEventArgs e)
 		{
@@ -415,18 +433,33 @@ namespace Crow
 
 		protected void butQuitPress (object sender, MouseButtonEventArgs e)
 		{
-			CurrentInterface.MouseCursor = XCursor.Default;
+			IFace.MouseCursor = XCursor.Default;
 			close ();
 		}
 
-		protected void close(){
+		protected virtual void close(){
 			Closing.Raise (this, null);
 			if (Parent is Interface)
 				(Parent as Interface).DeleteWidget (this);
-			else if (Parent is Group)
-				(Parent as Group).DeleteChild (this);
-			else if (Parent is PrivateContainer)
-				(Parent as Container).Child = null;
+			else {
+				GraphicObject p = Parent as GraphicObject;
+				if (p is Group) {
+					lock (IFace.UpdateMutex) {
+						RegisterClip (p.ScreenCoordinates (p.LastPaintedSlot));
+						(p as Group).DeleteChild (this);
+					}
+					//(Parent as Group).RegisterForRedraw ();
+				} else if (Parent is PrivateContainer)
+					(Parent as Container).Child = null;
+			}
+		}
+
+		public static Window Show (Interface iface, string imlPath, bool modal = false){
+			lock (iface.UpdateMutex) {
+				Window w = iface.AddWidget (imlPath) as Window;
+				w.Modal = modal;
+				return w;
+			}
 		}
 	}
 }

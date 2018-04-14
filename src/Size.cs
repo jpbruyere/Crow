@@ -163,6 +163,14 @@ namespace Crow
         {
             return new Size(s.Width + i, s.Height + i);
         }
+		public static Size operator *(Size s, int i)
+		{
+			return new Size(s.Width * i, s.Height * i);
+		}
+		public static Size operator /(Size s, int i)
+		{
+			return new Size(s.Width / i, s.Height / i);
+		}
 		#endregion
 
 		public override int GetHashCode ()

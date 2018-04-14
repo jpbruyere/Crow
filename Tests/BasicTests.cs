@@ -140,7 +140,8 @@ namespace Tests
 
 		void OnClear (object sender, MouseButtonEventArgs e) => TestList = null;
 
-		void OnLoadList (object sender, MouseButtonEventArgs e) => TestList = Color.ColorDic.Values.ToList();
+		void OnLoadList (object sender, MouseButtonEventArgs e) => TestList =
+			Color.ColorDic.Values.OrderBy(c=>c.Hue).ToList();
 
 		void command1(){
 			Console.WriteLine("command1 triggered");
@@ -158,6 +159,14 @@ namespace Tests
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
+//
+//			foreach (Color c in Color.ColorDic.Values) {
+//				if (string.IsNullOrEmpty(c.htmlCode))
+//					Console.WriteLine ("no htmlcode for {0}", c.Name);
+//				else if (c.htmlCode.Substring(1) != c.HtmlCode)
+//					Console.WriteLine ("{2} orig: {0} comp: {1}",c.htmlCode, c.HtmlCode, c.Name);
+//			}
+
 
 			Commands = new List<Crow.Command> (new Crow.Command[] {
 				new Crow.Command(new Action(() => command1())) { Caption = "command1"},
@@ -168,7 +177,9 @@ namespace Tests
 
 			this.KeyDown += KeyboardKeyDown1;
 
-			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			testFiles = new string [] { @"Interfaces/Experimental/testDock.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
@@ -183,6 +194,13 @@ namespace Tests
 			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Experimental", "*.crow")).ToArray ();
 
 			Load(testFiles[idx]).DataSource = this;
+
+			LoadIMLFragment (@"<DockWindow Width=""150"" Height=""150"" Background=""DarkRed"" />", 0);
+			LoadIMLFragment (@"<DockWindow Width=""200"" Height=""150"" Background=""DarkGreen"" />", 0);
+			LoadIMLFragment (@"<DockWindow Width=""250"" Height=""150"" Background=""Brown"" />", 0);
+			LoadIMLFragment (@"<DockWindow Width=""300"" Height=""150"" Background=""DarkBlue"" />", 0);
+
+
 		}
 		void KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
@@ -230,7 +248,7 @@ namespace Tests
 				GraphicObject obj = Load (testFiles[idx]);
 				obj.DataSource = this;
 			} catch (Exception ex) {				
-				MessageBox.Show (CurrentInterface, MessageBox.Type.Error, ex.Message + "\n" + ex.InnerException.Message);
+				MessageBox.Show (CurrentInterface, MessageBox.Type.Error, ex.Message + "\n" + ex.InnerException.Message).Modal = true;
 			}
 		}
 //		void Tv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
@@ -271,8 +289,8 @@ namespace Tests
 				return;
 			//tv.AddChild (new TabItem (CurrentInterface) { Caption = "NewTab" });
 			lock (CurrentInterface.UpdateMutex) {
-				tv.AddChild (Crow.IML.Instantiator.CreateFromImlFragment
-					(@"<TabItem Caption='New tab' Background='Blue'><Label/></TabItem>").CreateInstance (CurrentInterface));
+				tv.AddChild (CurrentInterface.LoadIMLFragment
+					(@"<TabItem Caption='New tab' Background='Blue'><Label/></TabItem>"));
 			}
 		}
 		[STAThread]

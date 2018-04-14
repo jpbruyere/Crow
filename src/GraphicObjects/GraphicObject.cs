@@ -36,6 +36,12 @@ using System.Diagnostics;
 using Crow.IML;
 using System.Threading;
 
+
+#if DESIGN_MODE
+using System.Xml;
+using System.IO;
+#endif
+
 namespace Crow
 {
 	/// <summary>
@@ -45,6 +51,101 @@ namespace Crow
 	{
 		internal ReaderWriterLockSlim parentRWLock = new ReaderWriterLockSlim();
 
+		#if DESIGN_MODE
+		static MethodInfo miDesignAddDefLoc = typeof(GraphicObject).GetMethod("design_add_style_location",
+			BindingFlags.Instance | BindingFlags.NonPublic);
+		static MethodInfo miDesignAddValLoc = typeof(GraphicObject).GetMethod("design_add_iml_location",
+			BindingFlags.Instance | BindingFlags.NonPublic);
+		
+		public volatile bool design_HasChanged = false;
+		public string design_id;
+		public int design_line;
+		public int design_column;
+		public string design_imlPath;
+		public bool design_isTGItem = false;//true if this is a templated item's root
+		public Dictionary<string,string> design_iml_values = new Dictionary<string, string>();
+		public Dictionary<string,string> design_style_values = new Dictionary<string, string>();
+		//public Dictionary<string,FileLocation> design_iml_locations = new Dictionary<string, FileLocation>();
+		public Dictionary<string,FileLocation> design_style_locations = new Dictionary<string, FileLocation>();
+
+		internal void design_add_style_location (string memberName, string path, int line, int col) {
+			if (design_style_locations.ContainsKey(memberName)){
+				Console.WriteLine ("default value localtion already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
+				return;
+			}
+			design_style_locations.Add(memberName, new FileLocation(path,line,col));
+		}
+//		internal void design_add_iml_location (string memberName, string path, int line, int col) {
+//			if (design_iml_locations.ContainsKey(memberName)){
+//				Console.WriteLine ("IML value localtion already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
+//				return;
+//			}
+//			design_iml_locations.Add(memberName, new FileLocation(path,line,col));
+//		}
+			
+		public virtual bool FindByDesignID(string designID, out GraphicObject go){
+			go = null;
+			if (this.design_id == designID){
+				go = this;
+				return true;
+			}
+			return false;
+		}
+
+		public string GetIML(){
+			XmlDocument doc = new XmlDocument( );
+
+			using (StringWriter sw = new StringWriter ()) {
+				XmlWriterSettings settings = new XmlWriterSettings {
+					Indent = true,
+					IndentChars = "\t",
+				};
+				using (XmlWriter xtw = XmlWriter.Create (sw, settings)) {
+					//(1) the xml declaration is recommended, but not mandatory
+					XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration ("1.0", "UTF-8", null);
+					doc.InsertBefore (xmlDeclaration, null);
+					getIML (doc, (XmlNode)doc);
+					doc.WriteTo (xtw);
+				}
+				this.design_HasChanged = false;
+				return sw.ToString ();
+			}
+		}
+
+		public virtual void getIML(XmlDocument doc, XmlNode parentElem) {
+			if (this.design_isTGItem)
+				return;
+			
+			XmlElement xe = doc.CreateElement(this.GetType().Name);
+
+			foreach (KeyValuePair<string,string> kv in design_iml_values) {
+				XmlAttribute xa = doc.CreateAttribute (kv.Key);
+				xa.Value = kv.Value;
+				xe.Attributes.Append (xa);
+			}
+
+			parentElem.AppendChild (xe);
+		}
+		public Surface CreateIcon (int dragIconSize = 32) {
+			ImageSurface di = new ImageSurface (Format.Argb32, dragIconSize, dragIconSize);
+			using (Context ctx = new Context (di)) {
+				double div = Math.Max (LastPaintedSlot.Width, LastPaintedSlot.Height);
+				double s = (double)dragIconSize / div;
+				ctx.Scale (s, s);
+				if (bmp == null)
+					this.onDraw (ctx);
+				else {
+					if (LastPaintedSlot.Width>LastPaintedSlot.Height)
+						ctx.SetSourceSurface (bmp, 0, (LastPaintedSlot.Width-LastPaintedSlot.Height)/2);
+					else
+						ctx.SetSourceSurface (bmp, (LastPaintedSlot.Height-LastPaintedSlot.Width)/2, 0);
+					ctx.Paint ();
+				}
+			}
+			return di;
+		}			
+		#endif
+
 		#region IDisposable implementation
 		protected bool disposed = false;
 
@@ -53,6 +154,7 @@ namespace Crow
 			GC.SuppressFinalize(this);  
 		}  
 		~GraphicObject(){
+			Debug.WriteLine(this.ToString() + " not disposed by user");
 			Dispose(false);
 		}
 		protected virtual void Dispose(bool disposing){
@@ -70,18 +172,8 @@ namespace Crow
 				throw new Exception("Trying to dispose an object queued for Redraw: " + this.ToString());
 				#endif
 
-				if (CurrentInterface.HoverWidget != null) {
-					if (CurrentInterface.HoverWidget.IsOrIsInside(this))
-						CurrentInterface.HoverWidget = null;
-				}
-				if (CurrentInterface.ActiveWidget != null) {
-					if (CurrentInterface.ActiveWidget.IsOrIsInside (this))
-						CurrentInterface.ActiveWidget = null;
-				}
-				if (CurrentInterface.FocusedWidget != null) {
-					if (CurrentInterface.FocusedWidget.IsOrIsInside (this))
-						CurrentInterface.FocusedWidget = null;
-				}
+				unshownPostActions ();
+
 				if (!localDataSourceIsNull)
 					DataSource = null;
 
@@ -100,14 +192,14 @@ namespace Crow
 		internal ulong uid = 0;
 
 		internal bool isPopup = false;
-		internal GraphicObject focusParent {
+		public GraphicObject focusParent {
 			get { return (isPopup ? LogicalParent : parent) as GraphicObject; }
 		}
 
 		/// <summary>
 		/// interface this widget is bound to, this should not be changed once the instance is created
 		/// </summary>
-		public Interface CurrentInterface = null;
+		public Interface IFace = null;
 
 		/// <summary>
 		/// contains the dirty rectangles in the coordinate system of the cache. those dirty zones
@@ -159,17 +251,17 @@ namespace Crow
 		/// <param name="iface">Iface.</param>
 		public GraphicObject (Interface iface) : this()
 		{
-			CurrentInterface = iface;
+			IFace = iface;
 			Initialize ();
 		}
 		#endregion
-		internal bool initialized = false;
+		//internal bool initialized = false;
 		/// <summary>
 		/// Initialize this Graphic object instance by setting style and default values and loading template if required
 		/// </summary>
 		public virtual void Initialize(){
 			loadDefaultValues ();
-			initialized = true;
+			//initialized = true;
 		}
 		#region private fields
 		LayoutingType registeredLayoutings = LayoutingType.All;
@@ -186,6 +278,7 @@ namespace Crow
 		bool focusable = false;
 		bool hasFocus = false;
 		bool isActive = false;
+		bool isHover = false;
 		bool mouseRepeat;
 		protected bool isVisible = true;
 		bool isEnabled = true;
@@ -196,6 +289,7 @@ namespace Crow
 		bool cacheEnabled = false;
 		bool clipToClientRect = true;
 		protected object dataSource;
+		bool rootDataLevel;
 		string style;
 		object tag;
 		bool isDragged;
@@ -252,6 +346,7 @@ namespace Crow
 
 				parentRWLock.EnterWriteLock();
 				parent = value;
+				Slot = LastSlots = default(Rectangle);
 				parentRWLock.ExitWriteLock();
 									
 				onParentChanged (this, e);
@@ -288,11 +383,24 @@ namespace Crow
 				Parent.ContextCoordinates (r);
 		}
 		public virtual Rectangle ScreenCoordinates (Rectangle r){
-			return
-				Parent.ScreenCoordinates(r) + Parent.getSlot().Position + Parent.ClientRectangle.Position;
+			try {
+				return
+					Parent.ScreenCoordinates(r) + Parent.getSlot().Position + Parent.ClientRectangle.Position;				
+			} catch (Exception ex) {
+				Debug.WriteLine (ex);
+				return default(Rectangle);
+			}
 		}
 		public virtual Rectangle getSlot () { return Slot;}
 		#endregion
+		public Point ScreenPointToLocal(Point p){
+			Point pt = p - ScreenCoordinates(Slot).TopLeft - ClientRectangle.TopLeft;
+			if (pt.X < 0)
+				pt.X = 0;
+			if (pt.Y < 0)
+				pt.Y = 0;
+			return pt;
+		}
 
 		#region EVENT HANDLERS
 		/// <summary>Occurs when mouse wheel is rolled in this object. It bubbles to the root</summary>
@@ -321,15 +429,29 @@ namespace Crow
 		public event EventHandler Focused;
 		/// <summary>Occurs when this object loose focus</summary>
 		public event EventHandler Unfocused;
-		/// <summary>Occurs when the enabled state this object is set to true</summary>
+		/// <summary>Occurs when mouse is over</summary>
+		public event EventHandler Hover;
+		/// <summary>Occurs when this control is no longer the Hover one</summary>
+		public event EventHandler UnHover;
+		/// <summary>Occurs when this object loose focus</summary>
 		public event EventHandler Enabled;
 		/// <summary>Occurs when the enabled state this object is set to false</summary>
 		public event EventHandler Disabled;
-		public event EventHandler StartDrag;
-		public event EventHandler DragEnter;
-		public event EventHandler DragLeave;
-		public event EventHandler EndDrag;
-		public event EventHandler Drop;
+
+		#region DragAndDrop Events
+		public event EventHandler<DragDropEventArgs> StartDrag;
+		public event EventHandler<DragDropEventArgs> DragEnter;
+		public event EventHandler<DragDropEventArgs> DragLeave;
+		public event EventHandler<DragDropEventArgs> EndDrag;
+		public event EventHandler<DragDropEventArgs> Drop;
+		#endregion
+
+		/// <summary>
+		/// Occurs when default value and styling are loaded, and for templated control,
+		/// template is also loaded. Bindings should be functionnal as well.
+		/// </summary>
+		public event EventHandler Initialized;
+
 		/// <summary>Occurs when one part of the rendering slot changed</summary>
 		public event EventHandler<LayoutingEventArgs> LayoutChanged;
 		/// <summary>Occurs when DataSource changed</summary>
@@ -342,7 +464,7 @@ namespace Crow
 
 		#region public properties
 		/// <summary>Random value placeholder</summary>
-		[XmlAttributeAttribute]
+		[DesignCategory ("Divers")]
 		public object Tag {
 			get { return tag; }
 			set {
@@ -356,7 +478,7 @@ namespace Crow
 		/// If enabled, resulting bitmap of graphic object is cached
 		/// speeding up rendering of complex object. Default is enabled.
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue(true)]
+		[DesignCategory ("Behavior")][DefaultValue(true)]
 		public virtual bool CacheEnabled {
 			get { return cacheEnabled; }
 			set {
@@ -369,7 +491,7 @@ namespace Crow
 		/// <summary>
 		/// If true, rendering of GraphicObject is clipped inside client rectangle
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue(true)]
+		[DesignCategory ("Appearance")][DefaultValue(true)]
 		public virtual bool ClipToClientRect {
 			get { return clipToClientRect; }
 			set {
@@ -390,7 +512,7 @@ namespace Crow
 		/// and by template controls to find special element in their template implementation such
 		/// as a container or a group to put children in.
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue(null)]
+		[DesignCategory ("Divers")][DefaultValue(null)]
 		public virtual string Name {
 			get {
 				#if DEBUG
@@ -410,7 +532,7 @@ namespace Crow
 		/// Vertical alignment inside parent, disabled if height is stretched
 		/// or top coordinate is not null
 		/// </summary>
-		[XmlAttributeAttribute	()][DefaultValue(VerticalAlignment.Center)]
+		[DesignCategory ("Layout")][DefaultValue(VerticalAlignment.Center)]
 		public virtual VerticalAlignment VerticalAlignment {
 			get { return verticalAlignment; }
 			set {
@@ -426,7 +548,7 @@ namespace Crow
 		/// Horizontal alignment inside parent, disabled if width is stretched
 		/// or left coordinate is not null
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(HorizontalAlignment.Center)]
+		[DesignCategory ("Layout")][DefaultValue(HorizontalAlignment.Center)]
 		public virtual HorizontalAlignment HorizontalAlignment {
 			get { return horizontalAlignment; }
 			set {
@@ -440,7 +562,7 @@ namespace Crow
 		/// <summary>
 		/// x position inside parent
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(0)]
+		[DesignCategory ("Layout")][DefaultValue(0)]
 		public virtual int Left {
 			get { return left; }
 			set {
@@ -454,7 +576,7 @@ namespace Crow
 		/// <summary>
 		/// y position inside parent
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(0)]
+		[DesignCategory ("Layout")][DefaultValue(0)]
 		public virtual int Top {
 			get { return top; }
 			set {
@@ -468,7 +590,7 @@ namespace Crow
 		/// <summary>
 		/// Helper property used to set width and height to fit in one call
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[DesignCategory ("Layout")][DefaultValue(false)]
 		public virtual bool Fit {
 			get { return Width == Measure.Fit && Height == Measure.Fit ? true : false; }
 			set {
@@ -482,7 +604,7 @@ namespace Crow
 		/// Width of this control, by default inherited from parent. May have special values
 		/// such as Stretched or Fit. It may be proportionnal or absolute.
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue("Inherit")]
+		[DesignCategory ("Layout")][DefaultValue("Inherit")]
 		public virtual Measure Width {
 			get {
 				return width.Units == Unit.Inherit ?
@@ -496,23 +618,24 @@ namespace Crow
 					if (value < MinimumSize.Width || (value > MaximumSize.Width && MaximumSize.Width > 0))
 						return;
 				}
-				Measure lastWP = WidthPolicy;
+				Measure old = width;
 				width = value;
 				NotifyValueChanged ("Width", width);
-				if (WidthPolicy != lastWP) {
-					NotifyValueChanged ("WidthPolicy", WidthPolicy);
+				if (width == Measure.Stretched || old == Measure.Stretched) {
+					//NotifyValueChanged ("WidthPolicy", width.Policy);
 					//contentSize in Stacks are only update on childLayoutChange, and the single stretched
 					//child of the stack is not counted in contentSize, so when changing size policy of a child
 					//we should adapt contentSize
 					//TODO:check case when child become stretched, and another stretched item already exists.
-					if (parent is GenericStack) {//TODO:check if I should test Group instead
-						if ((parent as GenericStack).Orientation == Orientation.Horizontal) {
-							if (lastWP == Measure.Fit)
-								(parent as GenericStack).contentSize.Width -= this.LastSlots.Width;
+					GenericStack gs = Parent as GenericStack;
+					if (gs != null){ //TODO:check if I should test Group instead
+						if (gs.Orientation == Orientation.Horizontal) {
+							if (width == Measure.Stretched)
+								gs.contentSize.Width -= this.LastSlots.Width;
 							else
-								(parent as GenericStack).contentSize.Width += this.LastSlots.Width;
+								gs.contentSize.Width += this.LastSlots.Width;
 						}
-					}
+					}							
 				}
 
 				this.RegisterForLayouting (LayoutingType.Width);
@@ -522,7 +645,7 @@ namespace Crow
 		/// Height of this control, by default inherited from parent. May have special values
 		/// such as Stretched or Fit. It may be proportionnal or absolute.
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue("Inherit")]
+		[DesignCategory ("Layout")][DefaultValue("Inherit")]
 		public virtual Measure Height {
 			get {
 				return height.Units == Unit.Inherit ?
@@ -536,17 +659,18 @@ namespace Crow
 					if (value < MinimumSize.Height || (value > MaximumSize.Height && MaximumSize.Height > 0))
 						return;
 				}
-				Measure lastHP = HeightPolicy;
+				Measure old = height;
 				height = value;
 				NotifyValueChanged ("Height", height);
-				if (HeightPolicy != lastHP) {
-					NotifyValueChanged ("HeightPolicy", HeightPolicy);
-					if (parent is GenericStack) {
-						if ((parent as GenericStack).Orientation == Orientation.Vertical) {
-							if (lastHP == Measure.Fit)
-								(parent as GenericStack).contentSize.Height -= this.LastSlots.Height;
+				if (height == Measure.Stretched || old == Measure.Stretched) {
+					//NotifyValueChanged ("HeightPolicy", HeightPolicy);
+					GenericStack gs = Parent as GenericStack;
+					if (gs != null){ //TODO:check if I should test Group instead
+						if (gs.Orientation == Orientation.Vertical) {
+							if (height == Measure.Stretched)
+								gs.contentSize.Height -= this.LastSlots.Height;
 							else
-								(parent as GenericStack).contentSize.Height += this.LastSlots.Height;
+								gs.contentSize.Height += this.LastSlots.Height;
 						}
 					}
 				}
@@ -555,13 +679,13 @@ namespace Crow
 			}
 		}
 		/// <summary>
-		/// Used for binding on dimensions, this property will never hold fixed size, but instead only
+		/// Was Used for binding on dimensions, this property will never hold fixed size, but instead only
 		/// Fit or Stretched, **with inherited state implementation, it is not longer used in binding**
 		/// </summary>
 		[XmlIgnore]public virtual Measure WidthPolicy { get {
 				return Width.IsFit ? Measure.Fit : Measure.Stretched; } }
 		/// <summary>
-		/// Used for binding on dimensions, this property will never hold fixed size, but instead only
+		/// Was Used for binding on dimensions, this property will never hold fixed size, but instead only
 		/// Fit or Stretched, **with inherited state implementation, it is not longer used in binding**
 		/// </summary>
 		[XmlIgnore]public virtual Measure HeightPolicy { get {
@@ -570,7 +694,7 @@ namespace Crow
 		/// Indicate that this object may received focus or not, if not focusable all the descendants are 
 		/// affected.
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[DesignCategory ("Behaviour")][DefaultValue(false)]
 		public virtual bool Focusable {
 			get { return focusable; }
 			set {
@@ -612,9 +736,28 @@ namespace Crow
 			}
 		}
 		/// <summary>
+		/// true if this control has the pointer hover
+		/// </summary>
+		[XmlIgnore]public virtual bool IsHover {
+			get { return isHover; }
+			set {
+				if (value == isHover)
+					return;
+
+				isHover = value;
+
+				if (isHover)
+					onHover (this, null);
+				else
+					onUnHover (this, null);
+
+				NotifyValueChanged ("IsHover", isHover);
+			}
+		}
+		/// <summary>
 		/// true if holding mouse button down should trigger multiple click events
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[DesignCategory ("Behaviour")][DefaultValue(false)]
 		public virtual bool MouseRepeat {
 			get { return mouseRepeat; }
 			set {
@@ -628,7 +771,7 @@ namespace Crow
 		/// <summary>
 		/// background fill of the control, maybe solid color, gradient, image, or svg
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue("Transparent")]
+		[DesignCategory ("Appearance")][DefaultValue("Transparent")]
 		public virtual Fill Background {
 			get { return background; }
 			set {
@@ -649,7 +792,7 @@ namespace Crow
 		/// <summary>
 		/// Foreground fill of the control, usage may be different among derived controls
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue("White")]
+		[DesignCategory ("Appearance")][DefaultValue("White")]
 		public virtual Fill Foreground {
 			get { return foreground; }
 			set {
@@ -663,7 +806,7 @@ namespace Crow
 		/// <summary>
 		/// Font being used in many controls, it is defined in the base GraphicObject class.
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue("sans,10")]
+		[DesignCategory ("Appearance")][DefaultValue("sans,10")]
 		public virtual Font Font {
 			get { return font; }
 			set {
@@ -677,7 +820,7 @@ namespace Crow
 		/// <summary>
 		/// to get rounded corners
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(0.0)]
+		[DesignCategory ("Appearance")][DefaultValue(0.0)]
 		public virtual double CornerRadius {
 			get { return cornerRadius; }
 			set {
@@ -692,7 +835,7 @@ namespace Crow
 		/// This is a single integer for the 4 direction, a gap between the control and it's container,
 		/// by default it is filled with the background.
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(0)]
+		[DesignCategory ("Layout")][DefaultValue(0)]
 		public virtual int Margin {
 			get { return margin; }
 			set {
@@ -706,7 +849,7 @@ namespace Crow
 		/// <summary>
 		/// set the visible state of the control, invisible controls does reserve space in the layouting system.
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue(true)]
+		[DesignCategory ("Appearance")][DefaultValue(true)]
 		public virtual bool Visible {
 			get { return isVisible; }
 			set {
@@ -717,8 +860,8 @@ namespace Crow
 
 				RegisterForLayouting (LayoutingType.Sizing);
 
-				//trigger a mouse to handle possible hover changes
-				//CurrentInterface.ProcessMouseMove (CurrentInterface.Mouse.X, CurrentInterface.Mouse.Y);
+				if (!isVisible)
+					unshownPostActions ();
 
 				NotifyValueChanged ("Visible", isVisible);
 			}
@@ -727,7 +870,7 @@ namespace Crow
 		/// get or set the enabled state, disabling a control will affect focuability and
 		/// also it's rendering which will be grayed
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue(true)]
+		[DesignCategory ("Behaviour")][DefaultValue(true)]
 		public virtual bool IsEnabled {
 			get { return isEnabled; }
 			set {
@@ -748,7 +891,7 @@ namespace Crow
 		/// <summary>
 		/// Minimal width and  height for this control
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue("1,1")]
+		[DesignCategory ("Layout")][DefaultValue("1,1")]
 		public virtual Size MinimumSize {
 			get { return minimumSize; }
 			set {
@@ -764,7 +907,7 @@ namespace Crow
 		/// <summary>
 		/// Maximum width and  height for this control, unlimited if null.
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue("0,0")]
+		[DesignCategory ("Layout")][DefaultValue("0,0")]
 		public virtual Size MaximumSize {
 			get { return maximumSize; }
 			set {
@@ -781,7 +924,7 @@ namespace Crow
 		/// Seek first logical tree upward if logicalParent is set, or seek graphic tree for
 		/// a not null dataSource that will be active for all descendants having dataSource=null
 		/// </summary>
-		[XmlAttributeAttribute]
+		[DesignCategory ("Data")]
 		public virtual object DataSource {
 			set {
 				if (DataSource == value)
@@ -793,17 +936,34 @@ namespace Crow
 
 				if (dse.NewDataSource == dse.OldDataSource)
 					return;
-			
-				OnDataSourceChanged (this, dse);
 
-
-				NotifyValueChanged ("DataSource", DataSource);
+				if (value != null)
+					rootDataLevel = true;
+				
+				lock (IFace.LayoutMutex) {
+					OnDataSourceChanged (this, dse);
+					NotifyValueChanged ("DataSource", DataSource);
+				}
 			}
 			get {
-				return dataSource == null ?
+				return rootDataLevel ? dataSource : dataSource == null ?
 					LogicalParent == null ? null :
 					LogicalParent is GraphicObject ? (LogicalParent as GraphicObject).DataSource : null :
 					dataSource;
+			}
+		}
+		/// <summary>
+		/// If true, rendering of GraphicObject is clipped inside client rectangle
+		/// </summary>
+		[DesignCategory ("Data")][DefaultValue(false)]
+		public virtual bool RootDataLevel {
+			get { return rootDataLevel; }
+			set {
+				if (rootDataLevel == value)
+					return;
+				rootDataLevel = value;
+				NotifyValueChanged ("RootDataLevel", rootDataLevel);
+				this.RegisterForRedraw ();
 			}
 		}
 		protected virtual void onLogicalParentDataSourceChanged(object sender, DataSourceChangeEventArgs e){
@@ -822,7 +982,7 @@ namespace Crow
 		/// <summary>
 		/// Style key to use for this control
 		/// </summary>
-		[XmlAttributeAttribute]
+		[DesignCategory ("Appearance")]
 		public virtual string Style {
 			get { return style; }
 			set {
@@ -834,7 +994,7 @@ namespace Crow
 				NotifyValueChanged ("Style", style);
 			}
 		}
-		[XmlAttributeAttribute]
+		[DesignCategory ("Divers")]
 		public virtual string Tooltip {
 			get { return tooltip; }
 			set {
@@ -844,7 +1004,7 @@ namespace Crow
 				NotifyValueChanged("Tooltip", tooltip);
 			}
 		}
-		[XmlAttributeAttribute]
+		[DesignCategory ("Divers")]
 		public IList<Command> ContextCommands {
 			get { return contextCommands; }
 			set {
@@ -867,20 +1027,19 @@ namespace Crow
 			Type thisType = this.GetType ();
 
 			if (!string.IsNullOrEmpty (Style)) {
-				if (CurrentInterface.DefaultValuesLoader.ContainsKey (Style)) {
-					CurrentInterface.DefaultValuesLoader [Style] (this);
+				if (IFace.DefaultValuesLoader.ContainsKey (Style)) {
+					IFace.DefaultValuesLoader [Style] (this);
+					onInitialized (this, null);
 					return;
 				}
-			} else {
-				if (CurrentInterface.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
-					CurrentInterface.DefaultValuesLoader [thisType.FullName] (this);
-					return;
-				} else if (!CurrentInterface.Styling.ContainsKey (thisType.FullName)) {
-					if (CurrentInterface.DefaultValuesLoader.ContainsKey (thisType.Name)) {
-						CurrentInterface.DefaultValuesLoader [thisType.Name] (this);
-						return;
-					}
-				}
+			} else if (IFace.DefaultValuesLoader.ContainsKey (thisType.FullName)) {
+				IFace.DefaultValuesLoader [thisType.FullName] (this);
+				onInitialized (this, null);
+				return;
+			} else 	if (IFace.DefaultValuesLoader.ContainsKey (thisType.Name)) {
+				IFace.DefaultValuesLoader [thisType.Name] (this);
+				onInitialized (this, null);
+				return;
 			}
 
 			List<Style> styling = new List<Style>();
@@ -892,24 +1051,23 @@ namespace Crow
 			//   those files being placed in a Styles folder
 			string styleKey = Style;
 			if (!string.IsNullOrEmpty (Style)) {
-				if (CurrentInterface.Styling.ContainsKey (Style)) {
-					styling.Add (CurrentInterface.Styling [Style]);
+				if (IFace.Styling.ContainsKey (Style)) {
+					styling.Add (IFace.Styling [Style]);
 				}
 			}
-			if (CurrentInterface.Styling.ContainsKey (thisType.FullName)) {
-				styling.Add (CurrentInterface.Styling [thisType.FullName]);
+			if (IFace.Styling.ContainsKey (thisType.FullName)) {
+				styling.Add (IFace.Styling [thisType.FullName]);
 				if (string.IsNullOrEmpty (styleKey))
 					styleKey = thisType.FullName;
 			}
-			if (CurrentInterface.Styling.ContainsKey (thisType.Name)) {
-				styling.Add (CurrentInterface.Styling [thisType.Name]);
+			if (IFace.Styling.ContainsKey (thisType.Name)) {
+				styling.Add (IFace.Styling [thisType.Name]);
 				if (string.IsNullOrEmpty (styleKey))
 					styleKey = thisType.Name;
 			}
 
 			if (string.IsNullOrEmpty (styleKey))
 				styleKey = thisType.FullName;
-
 
 			//Reflexion being very slow compared to dyn method or delegates,
 			//I compile the initial values coded in the CustomAttribs of the class,
@@ -962,9 +1120,60 @@ namespace Crow
 			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
 				if (pi.GetSetMethod () == null)
 					continue;
-				object defaultValue;
-				if (!getDefaultValue (pi, styling, out defaultValue))
+				XmlIgnoreAttribute xia = (XmlIgnoreAttribute)pi.GetCustomAttribute (typeof(XmlIgnoreAttribute));
+				if (xia != null)
 					continue;
+
+				object defaultValue;
+				string name = "";
+				XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
+				if (xaa != null) {
+					if (string.IsNullOrEmpty (xaa.AttributeName))
+						name = pi.Name;
+					else
+						name = xaa.AttributeName;
+				}else
+					name = pi.Name;
+				
+				int styleIndex = -1;
+				if (styling.Count > 0){
+					for (int i = 0; i < styling.Count; i++) {
+						if (styling[i].ContainsKey (name)){
+							styleIndex = i;
+							break;
+						}
+					}
+				}
+				if (styleIndex >= 0){
+					if (pi.PropertyType.IsEnum)//maybe should be in parser..
+						defaultValue = Enum.Parse(pi.PropertyType, (string)styling[styleIndex] [name], true);
+					else
+						defaultValue = styling[styleIndex] [name];
+
+					#if DESIGN_MODE
+					if (defaultValue != null){
+						FileLocation fl = styling[styleIndex].Locations[name];
+						il.Emit (OpCodes.Ldloc_0);
+						il.Emit (OpCodes.Ldstr, name);
+						il.Emit (OpCodes.Ldstr, fl.FilePath);
+						il.Emit (OpCodes.Ldc_I4, fl.Line);
+						il.Emit (OpCodes.Ldc_I4, fl.Column);
+						il.Emit (OpCodes.Call, miDesignAddDefLoc);
+
+						il.Emit (OpCodes.Ldloc_0);
+						il.Emit (OpCodes.Ldfld, typeof(GraphicObject).GetField("design_style_values"));
+						il.Emit (OpCodes.Ldstr, name);
+						il.Emit (OpCodes.Ldstr, defaultValue.ToString());
+						il.Emit (OpCodes.Call, CompilerServices.miDicStrStrAdd);
+					}
+					#endif
+
+				}else {
+					DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof (DefaultValueAttribute));
+					if (dv == null)
+						continue;
+					defaultValue = dv.Value;
+				}
 
 				CompilerServices.EmitSetValue (il, pi, defaultValue);
 			}
@@ -972,11 +1181,15 @@ namespace Crow
 			#endregion
 
 			try {
-				CurrentInterface.DefaultValuesLoader[styleKey] = (Interface.LoaderInvoker)dm.CreateDelegate(typeof(Interface.LoaderInvoker));
-				CurrentInterface.DefaultValuesLoader[styleKey] (this);
+				IFace.DefaultValuesLoader[styleKey] = (Interface.LoaderInvoker)dm.CreateDelegate(typeof(Interface.LoaderInvoker));
+				IFace.DefaultValuesLoader[styleKey] (this);
 			} catch (Exception ex) {
 				throw new Exception ("Error applying style <" + styleKey + ">:", ex);
 			}
+			onInitialized (this, null);
+		}
+		protected virtual void onInitialized (object sender, EventArgs e){
+			Initialized.Raise(sender, e);
 		}
 		bool getDefaultEvent(EventInfo ei, List<Style> styling,
 			out string expression){
@@ -990,51 +1203,6 @@ namespace Crow
 				}
 			}
 			return false;
-		}
-		/// <summary>
-		/// Gets the default value of the widget's property from either the style, or from xml default
-		/// </summary>
-		/// <returns><c>true</c>, if default value is defined, <c>false</c> otherwise.</returns>
-		/// <param name="pi">PropertyInfo</param>
-		/// <param name="styling">Styling informations</param>
-		/// <param name="defaultValue">output of Default value, null if not found</param>
-		bool getDefaultValue(PropertyInfo pi, List<Style> styling,
-			out object defaultValue){
-			defaultValue = null;
-			string name = "";
-
-			XmlIgnoreAttribute xia = (XmlIgnoreAttribute)pi.GetCustomAttribute (typeof(XmlIgnoreAttribute));
-			if (xia != null)
-				return false;
-			XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
-			if (xaa != null) {
-				if (string.IsNullOrEmpty (xaa.AttributeName))
-					name = pi.Name;
-				else
-					name = xaa.AttributeName;
-			}
-
-			int styleIndex = -1;
-			if (styling.Count > 0){
-				for (int i = 0; i < styling.Count; i++) {
-					if (styling[i].ContainsKey (name)){
-						styleIndex = i;
-						break;
-					}
-				}
-			}
-			if (styleIndex >= 0){
-				if (pi.PropertyType.IsEnum)//maybe should be in parser..
-					defaultValue = Enum.Parse(pi.PropertyType, (string)styling[styleIndex] [name], true);
-				else
-					defaultValue = styling[styleIndex] [name];
-			}else {
-				DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof (DefaultValueAttribute));
-				if (dv == null)
-					return false;
-				defaultValue = dv.Value;
-			}
-			return true;
 		}
 		#endregion
 
@@ -1060,7 +1228,7 @@ namespace Crow
 		}
 
 		#region Drag&Drop
-		[XmlAttributeAttribute][DefaultValue(false)]
+		[DesignCategory ("DragAndDrop")][DefaultValue(false)]
 		public virtual bool AllowDrag {
 			get { return allowDrag; }
 			set {
@@ -1070,7 +1238,7 @@ namespace Crow
 				NotifyValueChanged ("AllowDrag", allowDrag);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(false)]
+		[DesignCategory ("DragAndDrop")][DefaultValue(false)]
 		public virtual bool AllowDrop {
 			get { return allowDrop; }
 			set {
@@ -1105,10 +1273,12 @@ namespace Crow
 		/// fired when drag and drop operation start
 		/// </summary>
 		protected virtual void onStartDrag (object sender, DragDropEventArgs e){
-			CurrentInterface.HoverWidget = null;
+			IFace.HoverWidget = null;
 			IsDragged = true;
 			StartDrag.Raise (this, e);
+			#if DEBUG_DRAGNDROP
 			Debug.WriteLine(this.ToString() + " : START DRAG => " + e.ToString());
+			#endif
 		}
 		/// <summary>
 		///  Occured when dragging ends without dropping
@@ -1116,22 +1286,34 @@ namespace Crow
 		protected virtual void onEndDrag (object sender, DragDropEventArgs e){			
 			IsDragged = false;
 			EndDrag.Raise (this, e);
+			#if DEBUG_DRAGNDROP
 			Debug.WriteLine(this.ToString() + " : END DRAG => " + e.ToString());
+			#endif
 		}
 		protected virtual void onDragEnter (object sender, DragDropEventArgs e){
 			e.DropTarget = this;
 			DragEnter.Raise (this, e);
+			#if DEBUG_DRAGNDROP
 			Debug.WriteLine(this.ToString() + " : DRAG Enter => " + e.ToString());
+			#endif
 		}
 		protected virtual void onDragLeave (object sender, DragDropEventArgs e){			
 			e.DropTarget = null;
 			DragLeave.Raise (this, e);
+			#if DEBUG_DRAGNDROP
 			Debug.WriteLine(this.ToString() + " : DRAG Leave => " + e.ToString());
+			#endif
 		}
 		protected virtual void onDrop (object sender, DragDropEventArgs e){			
 			IsDragged = false;
 			Drop.Raise (this, e);
+			//e.DropTarget.onDragLeave (this, e);//raise drag leave in target
+			#if DEBUG_DRAGNDROP
 			Debug.WriteLine(this.ToString() + " : DROP => " + e.ToString());
+			#endif
+		}
+		public bool IsDropTarget {
+			get { return IFace.DragAndDropOperation?.DropTarget == this; }
 		}
 
 		#endregion
@@ -1180,7 +1362,7 @@ namespace Crow
 			if (Width.IsFit || Height.IsFit)
 				RegisterForLayouting (LayoutingType.Sizing);
 			else if (RegisteredLayoutings == LayoutingType.None)
-				CurrentInterface.EnqueueForRepaint (this);
+				IFace.EnqueueForRepaint (this);
 		}
 		/// <summary> query an update of the content, a redraw </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1191,7 +1373,7 @@ namespace Crow
 			#endif
 			IsDirty = true;
 			if (RegisteredLayoutings == LayoutingType.None)
-				CurrentInterface.EnqueueForRepaint (this);
+				IFace.EnqueueForRepaint (this);
 		}
 		#endregion
 
@@ -1209,7 +1391,7 @@ namespace Crow
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
 			if (Parent == null)
 				return;
-			lock (CurrentInterface.LayoutMutex) {
+			lock (IFace.LayoutMutex) {
 				//prevent queueing same LayoutingType for this
 				layoutType &= (~RegisteredLayoutings);
 
@@ -1236,27 +1418,21 @@ namespace Crow
 
 				//enqueue LQI LayoutingTypes separately
 				if (layoutType.HasFlag (LayoutingType.Width))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
+					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
 				if (layoutType.HasFlag (LayoutingType.Height))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
+					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
 				if (layoutType.HasFlag (LayoutingType.X))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
+					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
 				if (layoutType.HasFlag (LayoutingType.Y))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
+					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
 				if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
-					CurrentInterface.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
+					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
 			}
 		}
 
 		/// <summary> trigger dependant sizing component update </summary>
 		public virtual void OnLayoutChanges(LayoutingType  layoutType)
 		{
-			#if DEBUG_LAYOUTING
-			CurrentInterface.currentLQI.Slot = LastSlots;
-			CurrentInterface.currentLQI.NewSlot = Slot;
-			Debug.WriteLine ("\t\t{0} => {1}",LastSlots,Slot);
-			#endif
-
 			switch (layoutType) {
 			case LayoutingType.Width:
 				RegisterForLayouting (LayoutingType.X);
@@ -1420,7 +1596,7 @@ namespace Crow
 
 			//if no layouting remains in queue for item, registre for redraw
 			if (this.registeredLayoutings == LayoutingType.None && IsDirty)
-				CurrentInterface.EnqueueForRepaint (this);
+				IFace.EnqueueForRepaint (this);
 
 			return true;
 		}
@@ -1557,8 +1733,8 @@ namespace Crow
 		}
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
-			if (CurrentInterface.HoverWidget != this) {
-				CurrentInterface.HoverWidget = this;
+			if (IFace.HoverWidget != this) {
+				IFace.HoverWidget = this;
 				onMouseEnter (this, e);
 			}
 
@@ -1567,12 +1743,17 @@ namespace Crow
 		public virtual void onMouseMove(object sender, MouseMoveEventArgs e)
 		{
 			if (AllowDrag & HasFocus & e.Mouse.LeftButton == ButtonState.Pressed) {
-				if (CurrentInterface.DragAndDropOperation == null) {
-					CurrentInterface.DragAndDropOperation = new DragDropEventArgs (this);
-					onStartDrag (this, CurrentInterface.DragAndDropOperation);
+				if (IFace.DragAndDropOperation == null) {
+					IFace.DragAndDropOperation = new DragDropEventArgs (this);
+					onStartDrag (this, IFace.DragAndDropOperation);
 				}
 			}
 
+			//dont bubble event if dragged, mouse move is routed directely from iface
+			//to let other control behind have mouse entering
+			if (isDragged)
+				return;
+			
 			//bubble event to the top
 			GraphicObject p = focusParent;
 			if (p != null)
@@ -1585,15 +1766,15 @@ namespace Crow
 			Debug.WriteLine("MOUSE DOWN => " + this.ToString());
 			#endif
 
-			if (CurrentInterface.ActiveWidget == null)
-				CurrentInterface.ActiveWidget = this;
+			if (IFace.ActiveWidget == null)
+				IFace.ActiveWidget = this;
 			if (this.Focusable && !Interface.FocusOnHover) {
 				BubblingMouseButtonEventArg be = e as BubblingMouseButtonEventArg;
 				if (be.Focused == null) {
 					be.Focused = this;
-					CurrentInterface.FocusedWidget = this;
+					IFace.FocusedWidget = this;
 					if (e.Button == MouseButton.Right && this.ContextCommands != null)
-						CurrentInterface.ShowContextMenu (this);					
+						IFace.ShowContextMenu (this);					
 				}
 			}
 			//bubble event to the top
@@ -1608,13 +1789,13 @@ namespace Crow
 			Debug.WriteLine("MOUSE UP => " + this.ToString());
 			#endif
 
-			if (CurrentInterface.DragAndDropOperation != null){
-				if (CurrentInterface.DragAndDropOperation.DragSource == this) {
-					if (CurrentInterface.DragAndDropOperation.DropTarget != null)
-						onDrop (this, CurrentInterface.DragAndDropOperation);
+			if (IFace.DragAndDropOperation != null){
+				if (IFace.DragAndDropOperation.DragSource == this) {
+					if (IFace.DragAndDropOperation.DropTarget != null)
+						onDrop (this, IFace.DragAndDropOperation);
 					else
-						onEndDrag (this, CurrentInterface.DragAndDropOperation);
-					CurrentInterface.DragAndDropOperation = null;
+						onEndDrag (this, IFace.DragAndDropOperation);
+					IFace.DragAndDropOperation = null;
 				}
 			}
 
@@ -1655,14 +1836,6 @@ namespace Crow
 			#if DEBUG_FOCUS
 			Debug.WriteLine("MouseEnter => " + this.ToString());
 			#endif
-
-			if (CurrentInterface.DragAndDropOperation != null) {
-				if (this.AllowDrop) {
-					if (CurrentInterface.DragAndDropOperation.DragSource != this && CurrentInterface.DragAndDropOperation.DropTarget != this)
-						onDragEnter (this, CurrentInterface.DragAndDropOperation);					
-				}
-			}
-
 			MouseEnter.Raise (this, e);
 		}
 		public virtual void onMouseLeave(object sender, MouseMoveEventArgs e)
@@ -1670,11 +1843,35 @@ namespace Crow
 			#if DEBUG_FOCUS
 			Debug.WriteLine("MouseLeave => " + this.ToString());
 			#endif
-			if (CurrentInterface.DragAndDropOperation != null) {
-				if (CurrentInterface.DragAndDropOperation.DropTarget == this)
-					onDragLeave (this, CurrentInterface.DragAndDropOperation);
-			}
 			MouseLeave.Raise (this, e);
+		}
+		public virtual void onHover(object sender, EventArgs e)
+		{
+			#if DEBUG_FOCUS
+			Debug.WriteLine("MouseHover => " + this.ToString());
+			#endif
+			if (IFace.DragAndDropOperation != null) {
+				GraphicObject g = this;
+				while (g != null) {
+					if (g.AllowDrop) {
+						if (IFace.DragAndDropOperation.DragSource != this && IFace.DragAndDropOperation.DropTarget != this) {
+							if (IFace.DragAndDropOperation.DropTarget != null)
+								IFace.DragAndDropOperation.DropTarget.onDragLeave (this, IFace.DragAndDropOperation);
+							g.onDragEnter (this, IFace.DragAndDropOperation);
+						}
+						break;
+					}
+					g = g.focusParent;
+				}
+			}
+			Hover.Raise (this, e);
+		}
+		public virtual void onUnHover(object sender, EventArgs e)
+		{
+			#if DEBUG_FOCUS
+			Debug.WriteLine("MouseUnHover => " + this.ToString());
+			#endif
+			UnHover.Raise (this, e);
 		}
 		#endregion
 
@@ -1697,6 +1894,13 @@ namespace Crow
 			Disabled.Raise (this, e);
 		}
 		protected virtual void onParentChanged(object sender, DataSourceChangeEventArgs e) {
+//			if (e.NewDataSource != null) {
+//				if (width == Measure.Inherit)
+//					RegisterForLayouting (LayoutingType.Width);
+//				if (height == Measure.Inherit)
+//					RegisterForLayouting (LayoutingType.Height);
+//			}
+			
 			ParentChanged.Raise (this, e);
 			if (logicalParent == null)
 				LogicalParentChanged.Raise (this, e);
@@ -1731,6 +1935,25 @@ namespace Crow
 			#else
 			return Name == "unamed" ? tmp + "." + this.GetType ().Name : tmp + "." + Name;
 			#endif
+		}
+		/// <summary>
+		/// Checks to handle when widget is removed from the visible graphic tree
+		/// </summary>
+		void unshownPostActions () {
+			if (IFace.ActiveWidget != null) {
+				if (IFace.ActiveWidget.IsOrIsInside (this))
+					IFace.ActiveWidget = null;
+			}
+			if (IFace.FocusedWidget != null) {
+				if (IFace.FocusedWidget.IsOrIsInside (this))
+					IFace.FocusedWidget = null;
+			}					
+			if (IFace.HoverWidget != null) {
+				if (IFace.HoverWidget.IsOrIsInside (this)) {
+					IFace.HoverWidget = null;
+					IFace.ProcessMouseMove (IFace.Mouse.X, IFace.Mouse.Y);
+				}
+			}
 		}
 	}
 }

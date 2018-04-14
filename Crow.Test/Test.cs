@@ -36,6 +36,7 @@ namespace UnitTest
 		public void Init ()
 		{
 			iface = new Interface ();
+			iface.Init ();
 			iface.ProcessResize (bounds);
 		}
 

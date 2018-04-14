@@ -1,184 +1,216 @@
 ﻿Button, CheckBox, RadioButton, ComboBox, Expandable,
 MessageBox, Popper, Slider, Spinner, TextBox {
-	Focusable = true;
-	Height = Fit;
+	Focusable = "true";
+	Height = "Fit";
 }
 Border {
-	Foreground = Gray;
+	Foreground = "Gray";
 }
-CheckBox { Caption = CheckBox; }
-RadioButton { Caption = RadioButton; }
-Expandable { Caption = Expandable; }
-Popper { Caption = Popper;}
-GroupBox { Caption = Group Box; }
+CheckBox { Caption = "CheckBox"; }
+RadioButton { Caption = "RadioButton"; }
+Expandable { Caption = "Expandable"; }
+Popper { Caption = "Popper";}
+GroupBox { Caption = "Group Box"; }
 
 ControlBorder {
-	BorderWidth	= 1;
-	Foreground  = Jet;
-	Background	= Transparent;
+	BorderWidth	= "1";
+	Foreground  = "DimGray";
+	Background	= "Transparent";
 }
 ControlCaption {
-	Foreground  = Gray;
-	MouseEnter	= {Foreground=White};
-	MouseLeave	= {Foreground=Gray};
+	Foreground  = "Gray";
+	MouseEnter	= "{Foreground=White}";
+	MouseLeave	= "{Foreground=Gray}";
 }
 Icon {
-	Margin=1;
-	Width=12;
-	Height=12;
+	Margin = "1";
+	Width = "12";
+	Height = "12";
 }
 
 Wrapper {
-	Orientation = Vertical;
+	Orientation = "Vertical";
 }
 Button {
-	Caption = Button;
-	Width = Fit;
+	Caption = "Button";
+	Width = "Fit";
 }
 Label {
-	Height = Fit;
-	Width = Fit;
-	Margin = 0;
+	Height = "Fit";
+	Width = "Fit";
+	Margin = "0";
 }
 Menu {
-	Margin = 1;
-	Background = vgradient|0:DimGray|1:Onyx;
-	Height = Fit;
-	Width = Stretched;
-	VerticalAlignment = Top;
-	SelectionBackground = Transparent;
+	Margin = "1";
+	Background = "vgradient|0:DimGray|1:Black";
+	Height = "Fit";
+	Width = "Stretched";
+	VerticalAlignment = "Top";
+	SelectionBackground = "Transparent";
 }
 MenuItem {
-	Caption = MenuItem;
-	Width = Stretched;
-	Height = Fit;
-	Background = Transparent;
-	Foreground = LightGray;
-	MouseEnter = {Background = vgradient|0:UnitedNationsBlue|1:Onyx;Foreground=White;}
-	MouseLeave = {Foreground=LightGray;Background=Transparent;}
-	SelectionBackground = Transparent;
-}
-Docker {
-	AllowDrop = true;
-}
-DockWindow {
-	AllowDrag = true;
+	Caption = "MenuItem";
+	Width = "Stretched";
+	Height = "Fit";
+	Background = "Transparent";
+	Foreground = "LightGray";
+	MouseEnter = "{Background = vgradient|0:SteelBlue|1:Jet;Foreground=White;}";
+	MouseLeave = "{Foreground=LightGray;Background=Transparent;}";
+	SelectionBackground = "Transparent";
 }
 MessageBox {
-	Background = 0.3,0.3,0.3,0.3;
-	Width = Fit;
-	Title=MessageBox;
-	Font = serif, 12;
-	MinimumSize = 200,120;
-	AlwaysOnTop = true;
+	Background = "0.1,0.1,0.2,0.7";
+	Width = "Fit";
+	Caption="MessageBox";
+	Font = "serif, 12";
+	MinimumSize = "200,120";
+	AlwaysOnTop = "true";
 }
 Slider {
-	Background = vgradient|0:Black|0.1:Gray|0.9:Gray|1:LightGray;
-	Foreground = Gray;
-	Width = Fit;
+	Background = "vgradient|0:Black|0.1:Gray|0.9:Gray|1:LightGray";
+	Foreground = "Gray";
+	Height = "10";
+	Value="5";
 }
 Splitter {
-	Focusable = true;
-	Background = DimGray;
+	Focusable = "true";
+	Margin = "1";
+	Background = "Gray";
 }
 Spinner {
-	Foreground = DimGray;
+	Foreground = "DimGray";
 }
 TabView {
-	CacheEnabled = false;
+	CacheEnabled = "false";
+	AllowDrop = "true";
 }
 TabItem {
-	Caption = TabItem;
-	Focusable = true;
-	CacheEnabled = false;
+	Caption = "TabItem";
+	Focusable = "true";
+	CacheEnabled = "true";
+	//MouseEnter = "{Background = Cobalt;Foreground=White;}";
+	//MouseLeave = "{Foreground=LightGray;Background=Jet;}";
+	AllowDrag = "true";
 }
 TextBox {
-	Background = White;
-	Foreground = Black;
-	Selectable = True;
-	Text = TextBox;
-	Margin = 1;
+	Background = "White";
+	Foreground = "Black";
+	Selectable = "True";
+	Text = "TextBox";
+	Margin = "1";
 }
 Window {
-	Caption = Window;
-	Focusable = true;
-	MinimumSize=5,5;
-	Width = 150;
-	Height = 150;
+	Caption = "Window";
+	Focusable = "true";
+	MinimumSize="5,5";
+	Width = "150";
+	Height = "150";
 }
 ToolWindow {
-	Caption = Window;
-	Template = #Crow.ToolWindow.template;
-	Focusable = true;
-	MinimumSize=50,50;
-	Width = 150;
-	Height = 150;
+	Caption = "Window";
+	Template = "#Crow.ToolWindow.template";
+	Focusable = "true";
+	MinimumSize="50,50";
+	Width = "150";
+	Height = "150";
 }
-DocksView {
-	AllowDrop = true;
+Docker {
+	AllowDrop = "false";
+	Margin="0";
+	Focusable="true";
 }
-DockingView {
-	Focusable = true;
-	AllowDrag = true;
+DockStack {
+	Margin="1";
+	AllowDrop = "true";
+	Focusable="true";
+	//DragEnter="{Background=Blue}";
+	//DragLeave="{Background=Transparent}";
+	//EndDrag="{Background=Jet}";
+}
+DockWindow {
+	Background = "Onyx";
+	Focusable = "true";
+	AllowDrag = "true";
+	AlwaysOnTop = "true";
+	Margin="0";
+	Width="200";
+	Height="200";
 }
 FileDialog {
-	Template = #Crow.FileDialog.template;
-	AlwaysOnTop = true;
-	Focusable = true;
-	MinimumSize=50,50;
-	Width = 500;
-	Height = 300;
+	Template = "#Crow.FileDialog.template";
+	AlwaysOnTop = "true";
+	Focusable = "true";
+	MinimumSize="50,50";
+	Width = "500";
+	Height = "300";
 }
 ProgressBar {
-	Foreground = vgradient|0:BlueCrayola|0.5:SkyBlue|1:BlueCrayola;
+	Foreground = "vgradient|0:DarkBlue|0.5:SkyBlue|1:DarkBlue";
 }
 ScrollBar {
-	Maximum = 0;
-	Value = 0;
+	Maximum = "0";
+	Value = "0";
+}
+HScrollBar {
+	Template = "#Crow.HScrollBar.template";
+	Maximum = "0";
+	Value = "0";
 }
 Scroller {
-	CacheEnabled = false;
+	CacheEnabled = "false";
 }
 Control {
-	Margin=0;
-	Spacing=3;
+	Margin="0";
+	Spacing="3";
 }
 SaturationValueSelector {
-	Foreground=Red;
+	Foreground="Red";
 }
 HueSelector {
-	ClipToClientRect=False;
+	ClipToClientRect="False";
 }
 ColorSpinner {
-	Minimum = 0;
-	Maximum = 255;
-	SmallIncrement = 1;
+	Minimum = "0";
+	Maximum = "255";
+	SmallIncrement = "1";
 }
 HSVSpinner {
-	Minimum = 0;
-	Maximum = 1;
-	SmallIncrement = 0.01;
+	Minimum = "0";
+	Maximum = "1";
+	SmallIncrement = "0.01";
 }
 TxtInFileDialog {
-	Margine = 1;
-	Font = droid, 12;
+	Margine = "1";
+	Font = "droid, 12";
 }
 CheckBoxAlt {
-	Template= #Crow.Templates.CheckBox2.template;
-	Background = Transparent;
-	Checked={Background=DarkSlateGray;Foreground=LightGray;};
-	Unchecked = {Background=Transparent;Foreground=DimGray;};
+	Template= "#Crow.Templates.CheckBox2.template";
+	Background = "Transparent";
+	Checked="{Background=Gray;Foreground=LightGray;}";
+	Unchecked = "{Background=Transparent;Foreground=DimGray;}";
 }
 
 ArrowBut {
-	MouseRepeat=true;
-	Height=Fit;
-	Width=Fit;
-	Focusable=true;
-	Foreground=Jet;
-	Background=hgradient|0:Gray|1:Jet;
-	MouseDown={Background=hgradient|0:White|0.4:BlueCrayola|1:Jet};
-	MouseUp={Background=hgradient|0:Gray|1:Jet};
-	MouseEnter={Foreground=Black};
-	MouseLeave={Foreground=Jet};
+	MouseRepeat="true";
+	Height="Fit";
+	Width="Fit";
+	Focusable="true";
+	Foreground="Onyx";
+	Background="hgradient|0:Gray|1:Jet";
+	MouseDown="{Background=hgradient|0:White|0.4:CornflowerBlue|1:Jet}";
+	MouseUp="{Background=hgradient|0:Gray|1:DimGray}";
+	MouseEnter="{Foreground=Black}";
+	MouseLeave="{Foreground=Onyx}";
+}
+HArrowBut {
+	MouseRepeat="true";
+	Height="Fit";
+	Width="Fit";
+	Focusable="true";
+	Foreground="Jet";
+	Background="vgradient|0:Gray|1:DimGray";
+	MouseDown="{Background=vgradient|0:White|0.4:DarkBlue|1:Jet}";
+	MouseUp="{Background=vgradient|0:Gray|1:DimGray}";
+	MouseEnter="{Foreground=Black}";
+	MouseLeave="{Foreground=DimGray}";
 }

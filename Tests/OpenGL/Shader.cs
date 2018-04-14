@@ -269,7 +269,7 @@ namespace Crow
 			Stream s;
 
 			if (!string.IsNullOrEmpty (VertSourcePath)) {
-				s = Crow.Interface.GetStreamFromPath (VertSourcePath);
+				s = Crow.Interface.StaticGetStreamFromPath (VertSourcePath);
 				if (s != null) {
 					using (StreamReader sr = new StreamReader (s)) {
 						vertSource = sr.ReadToEnd ();
@@ -278,7 +278,7 @@ namespace Crow
 			}
 
 			if (!string.IsNullOrEmpty (FragSourcePath)) {
-				s = Crow.Interface.GetStreamFromPath (FragSourcePath);
+				s = Crow.Interface.StaticGetStreamFromPath (FragSourcePath);
 				if (s != null) {
 					using (StreamReader sr = new StreamReader (s)) {
 						fragSource = sr.ReadToEnd ();
@@ -287,7 +287,7 @@ namespace Crow
 			}
 
 			if (!string.IsNullOrEmpty (GeomSourcePath)) {
-				s = Crow.Interface.GetStreamFromPath (GeomSourcePath);
+				s = Crow.Interface.StaticGetStreamFromPath (GeomSourcePath);
 				if (s != null) {
 					using (StreamReader sr = new StreamReader (s)) {
 						geomSource = sr.ReadToEnd ();

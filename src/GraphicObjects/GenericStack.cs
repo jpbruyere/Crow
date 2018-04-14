@@ -28,6 +28,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Xml.Serialization;
 using System;
+using System.Linq;
 
 namespace Crow
 {
@@ -79,13 +80,7 @@ namespace Crow
 		}
 		protected override int measureRawSize (LayoutingType lt)
 		{
-			int totSpace = 0;
-			for (int i = 0; i < Children.Count; i++) {
-				if (Children [i].Visible)
-					totSpace += Spacing;
-			}
-			if (totSpace > 0)
-				totSpace -= Spacing;
+			int totSpace = Math.Max(0, Spacing * (Children.Count (c => c.Visible) - 1));
 			if (lt == LayoutingType.Width) {
 				if (Orientation == Orientation.Horizontal)
 					return contentSize.Width + totSpace + 2 * Margin;
@@ -128,13 +123,53 @@ namespace Crow
 
 				//if no layouting remains in queue for item, registre for redraw
 				if (RegisteredLayoutings == LayoutingType.None && IsDirty)
-					CurrentInterface.EnqueueForRepaint (this);
+					IFace.EnqueueForRepaint (this);
 
 				return true;
 			}
 
 			return base.UpdateLayout(layoutType);
         }
+
+		void adjustStretchedGo (LayoutingType lt){
+			if (stretchedGO == null)
+				return;
+			if (lt == LayoutingType.Width) {
+				int newW = Math.Max (
+					           this.ClientRectangle.Width - contentSize.Width - Spacing * (Children.Count - 1),
+					           stretchedGO.MinimumSize.Width);
+				if (stretchedGO.MaximumSize.Width > 0)
+					newW = Math.Min (newW, stretchedGO.MaximumSize.Width);
+				if (newW != stretchedGO.Slot.Width) {							
+					stretchedGO.Slot.Width = newW;
+					stretchedGO.IsDirty = true;
+					#if DEBUG_LAYOUTING
+				Debug.WriteLine ("\tAdjusting Width of " + stretchedGO.ToString());
+					#endif
+					stretchedGO.LayoutChanged -= OnChildLayoutChanges;
+					stretchedGO.OnLayoutChanges (LayoutingType.Width);
+					stretchedGO.LayoutChanged += OnChildLayoutChanges;
+					stretchedGO.LastSlots.Width = stretchedGO.Slot.Width;
+				}
+			} else {
+				int newH = Math.Max (
+					this.ClientRectangle.Height - contentSize.Height - Spacing * (Children.Count - 1),
+					stretchedGO.MinimumSize.Height);
+				if (stretchedGO.MaximumSize.Height > 0)
+					newH = Math.Min (newH, stretchedGO.MaximumSize.Height);
+				if (newH != stretchedGO.Slot.Height) {
+					stretchedGO.Slot.Height = newH;
+					stretchedGO.IsDirty = true;
+					#if DEBUG_LAYOUTING
+					Debug.WriteLine ("\tAdjusting Height of " + stretchedGO.ToString());
+					#endif
+					stretchedGO.LayoutChanged -= OnChildLayoutChanges;
+					stretchedGO.OnLayoutChanges (LayoutingType.Height);
+					stretchedGO.LayoutChanged += OnChildLayoutChanges;
+					stretchedGO.LastSlots.Height = stretchedGO.Slot.Height;
+				}				
+			}
+		}
 
 		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
@@ -154,24 +189,7 @@ namespace Crow
 					} else
 						contentSize.Width += go.Slot.Width - go.LastSlots.Width;
 
-					if (stretchedGO != null) {
-						int newW = Math.Max (
-							           this.ClientRectangle.Width - contentSize.Width - Spacing * (Children.Count - 1),
-							           stretchedGO.MinimumSize.Width);
-						if (stretchedGO.MaximumSize.Width > 0)
-							newW = Math.Min (newW, stretchedGO.MaximumSize.Width);
-						if (newW != stretchedGO.Slot.Width) {							
-							stretchedGO.Slot.Width = newW;
-							stretchedGO.IsDirty = true;
-#if DEBUG_LAYOUTING
-					Debug.WriteLine ("\tAdjusting Width of " + stretchedGO.ToString());
-#endif
-							stretchedGO.LayoutChanged -= OnChildLayoutChanges;
-							stretchedGO.OnLayoutChanges (LayoutingType.Width);
-							stretchedGO.LayoutChanged += OnChildLayoutChanges;
-							stretchedGO.LastSlots.Width = stretchedGO.Slot.Width;
-						}
-					}
+					adjustStretchedGo (LayoutingType.Width);					
 					
 					if (Width == Measure.Fit)
 						this.RegisterForLayouting (LayoutingType.Width);
@@ -193,24 +211,7 @@ namespace Crow
 					} else
 						contentSize.Height += go.Slot.Height - go.LastSlots.Height;
 					
-					if (stretchedGO != null) {
-						int newH = Math.Max (
-							this.ClientRectangle.Height - contentSize.Height - Spacing * (Children.Count - 1),
-							stretchedGO.MinimumSize.Height);
-						if (stretchedGO.MaximumSize.Height > 0)
-							newH = Math.Min (newH, stretchedGO.MaximumSize.Height);
-						if (newH != stretchedGO.Slot.Height) {
-							stretchedGO.Slot.Height = newH;
-							stretchedGO.IsDirty = true;
-#if DEBUG_LAYOUTING
-					Debug.WriteLine ("\tAdjusting Height of " + stretchedGO.ToString());
-#endif
-							stretchedGO.LayoutChanged -= OnChildLayoutChanges;
-							stretchedGO.OnLayoutChanges (LayoutingType.Height);
-							stretchedGO.LayoutChanged += OnChildLayoutChanges;
-							stretchedGO.LastSlots.Height = stretchedGO.Slot.Height;
-						}
-					}
+					adjustStretchedGo (LayoutingType.Height);
 
 					if (Height == Measure.Fit)
 						this.RegisterForLayouting (LayoutingType.Height);
@@ -224,6 +225,22 @@ namespace Crow
 		}
 		#endregion
 
-    
+    	public override void RemoveChild (GraphicObject child)
+		{
+			if (child != stretchedGO) {
+				if (Orientation == Orientation.Horizontal)
+					contentSize.Width -= child.LastSlots.Width;
+				else 
+					contentSize.Height -= child.LastSlots.Height;				
+			}
+			base.RemoveChild (child);
+			if (child == stretchedGO) {
+				stretchedGO = null;
+				RegisterForLayouting (LayoutingType.Sizing);
+			}else if (Orientation == Orientation.Horizontal) 				
+				adjustStretchedGo (LayoutingType.Width);
+			else				
+				adjustStretchedGo (LayoutingType.Height);			
+		}
 	}
 }

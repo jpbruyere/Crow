@@ -1,5 +1,5 @@
 ﻿//
-// MDIContainer.cs
+// IMLAttributes.cs
 //
 // Author:
 //       Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
@@ -27,14 +27,18 @@ using System;
 
 namespace Crow
 {
-	public class MDIContainer : Group
-	{
-		#region CTOR
-		public MDIContainer () : base()
-		{
-		}
-		#endregion
+	public class DesignIgnore : Attribute
+	{		
+	}
 
+	public class DesignCategory : Attribute
+	{
+		public string Name { get; set; }
+
+		public DesignCategory (string name)
+		{
+			Name = name;
+		}
 	}
 }
 

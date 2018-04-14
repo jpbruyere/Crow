@@ -91,14 +91,14 @@ namespace Crow
 		{
 			base.onMouseEnter (sender, e);
 			if ((Parent as GenericStack).Orientation == Orientation.Horizontal)
-				CurrentInterface.MouseCursor = XCursor.H;
+				IFace.MouseCursor = XCursor.H;
 			else
-				CurrentInterface.MouseCursor = XCursor.V;
+				IFace.MouseCursor = XCursor.V;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			CurrentInterface.MouseCursor = XCursor.Default;
+			IFace.MouseCursor = XCursor.Default;
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
@@ -216,6 +216,20 @@ namespace Crow
 					Height = Measure.Stretched;
 			}
 			return base.UpdateLayout (layoutType);
+		}
+		public override bool PointIsIn (ref Point m)
+		{
+			if (!(Visible & IsEnabled)||IsDragged)
+				return false;
+			if (!Parent.PointIsIn(ref m))
+				return false;
+			m -= (Parent.getSlot().Position + Parent.ClientRectangle.Position) ;
+			Rectangle r = Slot;
+			if (Width == Measure.Stretched)
+				r.Inflate (0, 5);
+			else
+				r.Inflate (5, 0);
+			return r.ContainsOrIsEqual (m);	
 		}
 		#endregion
 	}

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="67.316353mm"
+   height="27.756908mm"
+   viewBox="0 0 67.316353 27.756908"
+   version="1.1"
+   id="svg8895"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="frame.svg">
+  <defs
+     id="defs8889" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#434343"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.35"
+     inkscape:cx="195.58263"
+     inkscape:cy="-58.812438"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1600"
+     inkscape:window-height="881"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata8892">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(106.44585,-169.24652)">
+    <polygon
+       transform="matrix(0.26458333,0,0,0.26458333,-314.15488,52.734079)"
+       style="fill:#f5fcff"
+       id="polygon6818"
+       points="860.815,440.362 785.042,440.362 785.042,469.369 789.327,469.369 789.327,515.071 815.242,540.986 971.44,540.986 971.44,545.27 1001.438,545.27 1001.438,540.986 1039.466,540.986 1039.466,470.564 1013.109,444.207 1012.21,445.105 1038.193,471.091 1038.193,539.714 815.77,539.714 790.598,514.544 790.598,445.919 1014.176,445.919 1014.176,444.648 860.815,444.648 " />
+  </g>
+</svg>

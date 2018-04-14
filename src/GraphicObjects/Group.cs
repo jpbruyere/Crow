@@ -38,7 +38,33 @@ namespace Crow
 {
 	public class Group : GraphicObject
     {
-		protected ReaderWriterLockSlim childrenRWLock = new ReaderWriterLockSlim();
+		#if DESIGN_MODE
+		public override bool FindByDesignID(string designID, out GraphicObject go){
+			go = null;
+			if (base.FindByDesignID (designID, out go))
+				return true;
+			childrenRWLock.EnterReadLock ();
+			foreach (GraphicObject w in Children) {
+				if (!w.FindByDesignID (designID, out go))
+					continue;
+				childrenRWLock.ExitReadLock ();
+				return true;
+			}
+			childrenRWLock.ExitReadLock ();
+			return false;
+		}
+		public override void getIML (System.Xml.XmlDocument doc, System.Xml.XmlNode parentElem)
+		{
+			if (this.design_isTGItem)
+				return;
+			base.getIML (doc, parentElem);
+			foreach (GraphicObject g in Children) {
+				g.getIML (doc, parentElem.LastChild);	
+			}
+		}
+		#endif
+
+		protected ReaderWriterLockSlim childrenRWLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
 		#region CTOR
 		public Group () : base() {}
@@ -80,14 +106,15 @@ namespace Crow
 		{
 			child.LayoutChanged -= OnChildLayoutChanges;
 			//check if HoverWidget is removed from Tree
-			if (CurrentInterface.HoverWidget != null) {
-				if (this.Contains (CurrentInterface.HoverWidget))
-					CurrentInterface.HoverWidget = null;
+			if (IFace.HoverWidget != null) {
+				if (this.Contains (IFace.HoverWidget))
+					IFace.HoverWidget = null;
 			}
 
 			childrenRWLock.EnterWriteLock ();
 
 			Children.Remove(child);
+			child.Parent = null;
 
 			childrenRWLock.ExitWriteLock ();
 
@@ -116,6 +143,9 @@ namespace Crow
 			g.LayoutChanged += OnChildLayoutChanges;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
+		public virtual void RemoveChild (int idx) {
+			RemoveChild (children[idx]);
+		}
 		public virtual void DeleteChild (int idx) {
 			DeleteChild (children[idx]);
 		}
@@ -136,6 +166,17 @@ namespace Crow
 
 			this.RegisterForLayouting (LayoutingType.Sizing);
 			ChildrenCleared.Raise (this, new EventArgs ());
+		}
+		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
+		{
+			base.OnDataSourceChanged (this, e);
+
+			childrenRWLock.EnterReadLock ();
+			foreach (GraphicObject g in Children) {
+				if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
+					g.OnDataSourceChanged (g, e);	
+			}
+			childrenRWLock.ExitReadLock ();
 		}
 
 		public void putWidgetOnTop(GraphicObject w)
@@ -164,18 +205,7 @@ namespace Crow
 		}
 
 		#region GraphicObject overrides
-		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
-		{
-			base.OnDataSourceChanged (this, e);
 
-			childrenRWLock.EnterReadLock ();
-
-			foreach (GraphicObject g in children)
-				if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
-					g.OnDataSourceChanged (g, e);
-			
-			childrenRWLock.ExitReadLock ();
-		}
 		public override GraphicObject FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)
@@ -237,7 +267,7 @@ namespace Crow
 			switch (layoutType) {
 			case LayoutingType.Width:
 				foreach (GraphicObject c in Children) {
-					if (c.Width.Units == Unit.Percent)
+					if (c.Width.IsRelativeToParent)
 						c.RegisterForLayouting (LayoutingType.Width);
 					else
 						c.RegisterForLayouting (LayoutingType.X);
@@ -245,7 +275,7 @@ namespace Crow
 				break;
 			case LayoutingType.Height:
 				foreach (GraphicObject c in Children) {
-					if (c.Height.Units == Unit.Percent)
+					if (c.Height.IsRelativeToParent)
 						c.RegisterForLayouting (LayoutingType.Height);
 					else
 						c.RegisterForLayouting (LayoutingType.Y);
@@ -268,9 +298,9 @@ namespace Crow
 
 			childrenRWLock.EnterReadLock ();
 
-				foreach (GraphicObject g in Children) {
-					g.Paint (ref gr);
-				}
+			foreach (GraphicObject g in Children) {
+				g.Paint (ref gr);
+			}
 
 			childrenRWLock.ExitReadLock ();
 			gr.Restore ();
@@ -397,8 +427,8 @@ namespace Crow
 		#region Mouse handling
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
-			if (CurrentInterface.HoverWidget != this) {
-				CurrentInterface.HoverWidget = this;
+			if (IFace.HoverWidget != this) {
+				IFace.HoverWidget = this;
 				onMouseEnter (this, e);
 			}
 			for (int i = Children.Count - 1; i >= 0; i--) {

@@ -40,6 +40,24 @@ namespace Crow
 {
 	public abstract class TemplatedGroup : TemplatedControl
 	{
+		#if DESIGN_MODE
+		public override void getIML (System.Xml.XmlDocument doc, System.Xml.XmlNode parentElem)
+		{
+			if (this.design_isTGItem)
+				return;
+			base.getIML (doc, parentElem);
+
+			if (string.IsNullOrEmpty(_itemTemplate)) {
+				foreach (ItemTemplate it in ItemTemplates.Values) 
+					it.getIML (doc, parentElem.LastChild);				
+			}
+
+			foreach (GraphicObject g in Items) {
+				g.getIML (doc, parentElem.LastChild);	
+			}
+		}
+		#endif
+
 		#region CTOR
 		protected TemplatedGroup() : base(){}
 		public TemplatedGroup (Interface iface) : base(iface){}
@@ -130,7 +148,7 @@ namespace Crow
 				: items.Children;
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(-1)]public int SelectedIndex{
+		[XmlAttributeAttribute][DefaultValue(-1)]public virtual int SelectedIndex{
 			get { return _selectedIndex; }
 			set {
 				if (value == _selectedIndex)
@@ -427,17 +445,21 @@ namespace Crow
 					iTemp = ItemTemplates ["default"];
 			}
 
-			//lock (CurrentInterface.LayoutMutex) {
-				g = iTemp.CreateInstance(CurrentInterface);
+			lock (IFace.LayoutMutex) {
+				g = iTemp.CreateInstance();
+				#if DESIGN_MODE
+				g.design_isTGItem = true;
+				#endif
 				page.AddChild (g);
 //				if (isPaged)
 				g.LogicalParent = this;
 				g.MouseDown += itemClick;
-			//}
+			}
 
 			if (iTemp.Expand != null && g is Expandable) {
-				(g as Expandable).Expand += iTemp.Expand;
-				(g as Expandable).GetIsExpandable = iTemp.HasSubItems;
+				Expandable e = g as Expandable;
+				e.Expand += iTemp.Expand;
+				e.GetIsExpandable = iTemp.HasSubItems;
 			}
 
 			g.DataSource = o;

@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
-<HorizontalStack Background="Onyx" Margin="10" Width="90%" Height="100%">
-	<GraphicObject Margin="10" Width="Stretched" Height="Fit" Background="Mantis"
+<HorizontalStack Background="DimGray" Margin="10" Width="90%" Height="100%">
+	<GraphicObject Margin="10" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="10,10"/>
-	<GraphicObject Margin="10" Width="Stretched" Height="Stretched" Background="Mantis"
+	<GraphicObject Margin="10" Width="Stretched" Height="Stretched" Background="SeaGreen"
 			MinimumSize="10,10"/>
-	<GraphicObject Margin="10" Width="Stretched" Height="Fit" Background="Mantis"
+	<GraphicObject Margin="10" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="10,10"/>
 </HorizontalStack>

@@ -36,6 +36,7 @@ using System.ComponentModel;
 
 namespace Crow
 {
+	[DesignIgnore]
 	public class TextRun : GraphicObject
 	{
 		#region CTOR

@@ -24,6 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using System.Xml.Serialization;
 
 namespace Crow
 {
@@ -35,10 +36,10 @@ namespace Crow
 		}
 		#endregion
 
+		int undockThreshold = 4;
 		bool isDocked = false;
-		Alignment docking = Alignment.Center;
+		Alignment docking = Alignment.Undefined;
 
-		Point lastMousePos;	//last known mouse pos in this control
 		Point undockingMousePosOrig; //mouse pos when docking was donne, use for undocking on mouse move
 		Rectangle savedSlot;	//last undocked slot recalled when view is undocked
 		bool wasResizable;
@@ -50,8 +51,11 @@ namespace Crow
 					return;
 				isDocked = value;
 				NotifyValueChanged ("IsDocked", isDocked);
+				NotifyValueChanged ("IsFloating", !isDocked);
 			}
 		}
+		[XmlIgnore] public bool IsFloating { get { return !isDocked; }}
+
 		public Alignment DockingPosition {
 			get { return docking; }
 			set {
@@ -61,12 +65,7 @@ namespace Crow
 				NotifyValueChanged ("DockingPosition", DockingPosition);
 			}
 		}
-		protected override void onDrop (object sender, DragDropEventArgs e)
-		{
-			base.onDrop (sender, e);
-			Docker dv = Parent as Docker;
-			dv.Dock (this);
-		}
+
 		public override bool PointIsIn (ref Point m)
 		{			
 			if (!base.PointIsIn(ref m))
@@ -78,6 +77,8 @@ namespace Crow
 					for (int i = p.Children.Count - 1; i >= 0; i--) {
 						if (p.Children [i] == this)
 							break;
+						if (p.Children [i].IsDragged)
+							continue;
 						if (p.Children [i].Slot.ContainsOrIsEqual (m)) {						
 							return false;
 						}
@@ -87,156 +88,91 @@ namespace Crow
 			return Slot.ContainsOrIsEqual(m);
 		}
 
-//		public override void OnLayoutChanges (LayoutingType layoutType)
-//		{
-//			base.OnLayoutChanges (layoutType);
-//
-//			if (isDocked)
-//				return;
-			
-//			Docker dv = Parent as Docker;
-//			if (dv == null)
-//				return;
-//
-//			Rectangle dvCliRect = dv.ClientRectangle;
-//
-//			if (layoutType == LayoutingType.X) {
-//				if (Slot.X < dv.DockingThreshold)
-//					dock (Alignment.Left);
-//				else if (Slot.Right > dvCliRect.Width - dv.DockingThreshold)
-//					dock (Alignment.Right);
-//			}else if (layoutType == LayoutingType.Y) {
-//				if (Slot.Y < dv.DockingThreshold)
-//					dock (Alignment.Top);
-//				else if (Slot.Bottom > dvCliRect.Height - dv.DockingThreshold)
-//					dock (Alignment.Bottom);
-//			}
-//		}
-//
-//		public override void onMouseMove (object sender, MouseMoveEventArgs e)
-//		{
-//			lastMousePos = e.Position;
-//
+		public override void onMouseMove (object sender, MouseMoveEventArgs e)
+		{
 //			if (this.HasFocus && e.Mouse.IsButtonDown (MouseButton.Left) && IsDocked) {
-//				Docker dv = Parent as Docker;
-//				if (docking == Alignment.Left) {
-//					if (lastMousePos.X - undockingMousePosOrig.X > dv.DockingThreshold)
-//						undock ();
-//				} else if (docking == Alignment.Right) {
-//					if (undockingMousePosOrig.X - lastMousePos.X > dv.DockingThreshold)
-//						undock ();
-//				} else if (docking == Alignment.Top) {
-//					if (lastMousePos.Y - undockingMousePosOrig.Y > dv.DockingThreshold)
-//						undock ();
-//				} else if (docking == Alignment.Bottom) {
-//					if (undockingMousePosOrig.Y - lastMousePos.Y > dv.DockingThreshold)
-//						undock ();
-//				}
-//				return;
+//				if (Math.Abs (e.Position.X - undockingMousePosOrig.X) > 10 ||
+//				    Math.Abs (e.Position.X - undockingMousePosOrig.X) > 10)
+//					Undock ();
 //			}
-//
-//			base.onMouseMove (sender, e);
-//		}
-//		public override void onMouseDown (object sender, MouseButtonEventArgs e)
-//		{
-//			base.onMouseDown (sender, e);
-//
-//			if (this.HasFocus && IsDocked && e.Button == MouseButton.Left)
-//				undockingMousePosOrig = lastMousePos;
-//		}
 
-//		protected override void onBorderMouseEnter (object sender, MouseMoveEventArgs e)
-//		{
-//			base.onBorderMouseEnter (sender, e);
-//
-//			if (isDocked) {
-//				switch (docking) {
-//				case Alignment.Top:
-//					if (this.currentDirection != Window.Direction.S)
-//						onBorderMouseLeave (this, null);
-//					break;
-//				case Alignment.Left:
-//					if (this.currentDirection != Window.Direction.E)
-//						onBorderMouseLeave (this, null);
-//					break;
-//				case Alignment.TopLeft:
-//					break;
-//				case Alignment.Right:
-//					if (this.currentDirection != Window.Direction.W)
-//						onBorderMouseLeave (this, null);
-//					break;
-//				case Alignment.TopRight:
-//					break;
-//				case Alignment.Bottom:
-//					if (this.currentDirection != Window.Direction.N)
-//						onBorderMouseLeave (this, null);					
-//					break;
-//				case Alignment.BottomLeft:
-//					break;
-//				case Alignment.BottomRight:
-//					break;
-//				case Alignment.Center:
-//					break;
-//				default:
-//					break;
-//				}
-//			}
-//		}
+			if (this.HasFocus && e.Mouse.IsButtonDown (MouseButton.Left) && IsDocked)
+				CheckUndock (e.Position);
 
-		void undock () {
-			this.Left = savedSlot.Left;
-			this.Top = savedSlot.Top;
-			this.Width = savedSlot.Width;
-			this.Height = savedSlot.Height;
-
-			IsDocked = false;
-			Resizable = wasResizable;
+			base.onMouseMove (sender, e);
 		}
-		void dock (Alignment align){
-			IsDocked = true;
-			docking = align;
-			undockingMousePosOrig = lastMousePos;
-			savedSlot = this.LastPaintedSlot;
-			wasResizable = Resizable;
-			Resizable = false;
+		public override void onMouseDown (object sender, MouseButtonEventArgs e)
+		{
+			base.onMouseDown (sender, e);
 
-			this.Left = this.Top = 0;
+			if (this.HasFocus && IsDocked && e.Button == MouseButton.Left)
+				undockingMousePosOrig = e.Position;
+		}
+		public bool CheckUndock (Point mousePos) {
+			if (DockingPosition == Alignment.Center)
+				return false;
+			if (Math.Abs (mousePos.X - undockingMousePosOrig.X) < undockThreshold ||
+			    Math.Abs (mousePos.X - undockingMousePosOrig.X) < undockThreshold)
+				return false;
+			Undock ();
+			return true;
+		}
 
-			switch (align) {
-			case Alignment.Top:
-				this.HorizontalAlignment = HorizontalAlignment.Left;
-				this.VerticalAlignment = VerticalAlignment.Top;
-				this.Width = Measure.Stretched;
-				break;
-			case Alignment.Left:
-				this.HorizontalAlignment = HorizontalAlignment.Left;
-				this.VerticalAlignment = VerticalAlignment.Top;
-				this.Height = Measure.Stretched;
-				break;
-			case Alignment.TopLeft:
-				break;
-			case Alignment.Right:
-				this.HorizontalAlignment = HorizontalAlignment.Right;
-				this.VerticalAlignment = VerticalAlignment.Top;
-				this.Height = Measure.Stretched;
-				break;
-			case Alignment.TopRight:
-				break;
-			case Alignment.Bottom:
-				this.HorizontalAlignment = HorizontalAlignment.Left;
-				this.VerticalAlignment = VerticalAlignment.Bottom;
-				this.Width = Measure.Stretched;
-				break;
-			case Alignment.BottomLeft:
-				break;
-			case Alignment.BottomRight:
-				break;
-			case Alignment.Center:
-				break;
-			default:
-				break;
+		protected override void onStartDrag (object sender, DragDropEventArgs e)
+		{
+			base.onStartDrag (sender, e);
+
+			undockingMousePosOrig = IFace.Mouse.Position;
+		}
+		protected override void onDrop (object sender, DragDropEventArgs e)
+		{
+			if (!isDocked && DockingPosition != Alignment.Undefined)
+				Dock (e.DropTarget as DockStack);
+			base.onDrop (sender, e);
+		}
+		public void Undock () {
+			lock (IFace.UpdateMutex) {
+				DockStack ds = Parent as DockStack;
+				ds.Undock (this);
+
+				IFace.AddWidget (this);
+
+				this.Left = savedSlot.Left;
+				this.Top = savedSlot.Top;
+				this.Width = savedSlot.Width;
+				this.Height = savedSlot.Height;
+
+				IsDocked = false;
+				DockingPosition = Alignment.Undefined;
+				Resizable = wasResizable;
 			}
-			
+		}
+
+		public void Dock (DockStack target){
+			lock (IFace.UpdateMutex) {
+				IsDocked = true;
+				//undockingMousePosOrig = lastMousePos;
+				savedSlot = this.LastPaintedSlot;
+				wasResizable = Resizable;
+				Resizable = false;
+				LastSlots = LastPaintedSlot = Slot = default(Rectangle);
+				Left = Top = 0;
+
+				IFace.RemoveWidget (this);
+
+				target.Dock (this);
+			}
+		}
+
+		protected override void close ()
+		{
+			if (isDocked)
+				Undock ();
+			base.close ();
+		}
+
+		public string ExportWinConfigs () {			
+			return string.Format ("{0};{1};{2}", this.Name, DockingPosition, savedSlot);
 		}
 	}
 }
