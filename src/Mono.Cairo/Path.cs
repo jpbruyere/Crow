@@ -1,5 +1,5 @@
 //
-// Mono.Cairo.Context.cs
+// Mono.Context.cs
 //
 // Author:
 //   Miguel de Icaza (miguel@novell.com)
@@ -30,7 +30,7 @@
 
 using System;
 using System.Runtime.InteropServices;
-using Cairo;
+using vkvg;
 
 namespace Cairo {
 

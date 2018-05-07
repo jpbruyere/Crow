@@ -28,7 +28,7 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
-using Cairo;
+using vkvg;
 
 namespace Crow
 {
@@ -62,7 +62,7 @@ namespace Crow
 		#endregion
 
 		string path;
-		double strokeWidth;
+		float strokeWidth;
 
 		public string Path {
 			get { return path; }
@@ -76,7 +76,7 @@ namespace Crow
 			}
 		}
 		[XmlAttributeAttribute][DefaultValue(1.0)]
-		public double StokeWidth {
+		public float StokeWidth {
 			get { return strokeWidth; }
 			set {
 				if (strokeWidth == value)
@@ -113,22 +113,22 @@ namespace Crow
 						continue;
 					switch (c) {
 					case 'M':						
-						gr.MoveTo (sr.ReadDouble (), sr.ReadDouble ());
+						gr.MoveTo ((float)sr.ReadDouble (), (float)sr.ReadDouble ());
 						break;
 					case 'm':
-						gr.RelMoveTo (sr.ReadDouble (), sr.ReadDouble ());
+						gr.RelMoveTo ((float)sr.ReadDouble (), (float)sr.ReadDouble ());
 						break;
 					case 'L':
-						gr.LineTo (sr.ReadDouble (), sr.ReadDouble ());
+						gr.LineTo ((float)sr.ReadDouble (), (float)sr.ReadDouble ());
 						break;
 					case 'l':
-						gr.RelLineTo (sr.ReadDouble (), sr.ReadDouble ());
+						gr.RelLineTo ((float)sr.ReadDouble (), (float)sr.ReadDouble ());
 						break;
 					case 'C':
-						gr.CurveTo (sr.ReadDouble (), sr.ReadDouble (), sr.ReadDouble (), sr.ReadDouble (), sr.ReadDouble (), sr.ReadDouble ());
+						gr.CurveTo ((float)sr.ReadDouble (), (float)sr.ReadDouble (), (float)sr.ReadDouble (), (float)sr.ReadDouble (), (float)sr.ReadDouble (), (float)sr.ReadDouble ());
 						break;
 					case 'c':
-						gr.RelCurveTo (sr.ReadDouble (), sr.ReadDouble (), sr.ReadDouble (), sr.ReadDouble (), sr.ReadDouble (), sr.ReadDouble ());
+						gr.RelCurveTo ((float)sr.ReadDouble (), (float)sr.ReadDouble (), (float)sr.ReadDouble (), (float)sr.ReadDouble (), (float)sr.ReadDouble (), (float)sr.ReadDouble ());
 						break;
 					case 'Z':
 						gr.ClosePath ();
@@ -145,20 +145,20 @@ namespace Crow
 				}
 			}
 		}
-		protected override int measureRawSize (LayoutingType lt)
-		{
-			if ((lt == LayoutingType.Width && contentSize.Width == 0) || (lt == LayoutingType.Height && contentSize.Height == 0)) {
-				using (Surface drawing = new ImageSurface (Format.A1, 1,1)) {
-					using (Context ctx = new Context (drawing)) {
-						executePath (ctx);
-						Rectangle r = ctx.StrokeExtents ();
-						contentSize = new Size (r.Right, r.Bottom);
-					}
-				}
-			}
-			return lt == LayoutingType.Width ?
-				contentSize.Width + 2 * Margin: contentSize.Height + 2 * Margin;
-		}
+//		protected override int measureRawSize (LayoutingType lt)
+//		{
+//			if ((lt == LayoutingType.Width && contentSize.Width == 0) || (lt == LayoutingType.Height && contentSize.Height == 0)) {
+//				using (Surface drawing = new ImageSurface (Format.A1, 1,1)) {
+//					using (Context ctx = new Context (drawing)) {
+//						executePath (ctx);
+//						Rectangle r = ctx.StrokeExtents ();
+//						contentSize = new Size (r.Right, r.Bottom);
+//					}
+//				}
+//			}
+//			return lt == LayoutingType.Width ?
+//				contentSize.Width + 2 * Margin: contentSize.Height + 2 * Margin;
+//		}
 	}
 }
 

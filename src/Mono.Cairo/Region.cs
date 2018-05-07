@@ -138,7 +138,7 @@ namespace Cairo
 			get { return NativeMethods.cairo_region_is_empty (Handle); }
 		}
 
-		public RegionOverlap Contains (Crow.Rectangle rectangle)
+		public Cairo.RegionOverlap Contains (Crow.Rectangle rectangle)
 		{
 			return NativeMethods.cairo_region_contains_rectangle (Handle, ref rectangle);
 		}

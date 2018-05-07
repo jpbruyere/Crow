@@ -28,7 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
-using Cairo;
+using vkvg;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using System.ComponentModel;
@@ -447,14 +447,17 @@ namespace Crow
 			if (lines == null)
 				lines = getLines;
 			if (!textMeasureIsUpToDate) {
-				using (ImageSurface img = new ImageSurface (Format.Argb32, 10, 10)) {
-					using (Context gr = new Context (img)) {
+				//using (Surface img = new Surface (CrowApplication.dev, 10, 10)) {
+				if (bmp == null)
+					bmp = new Surface (CrowApplication.dev, 10, 10);
+				using (Context gr = new Context (bmp)) {
 						//Cairo.FontFace cf = gr.GetContextFontFace ();
 
-						gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-						gr.SetFontSize (Font.Size);
-						gr.FontOptions = Interface.FontRenderingOptions;
-						gr.Antialias = Interface.Antialias;
+						gr.FontFace = Font.Name;
+//						gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+//						gr.SetFontSize (Font.Size);
+//						gr.FontOptions = Interface.FontRenderingOptions;
+//						gr.Antialias = Interface.Antialias;
 
 						fe = gr.FontExtents;
 						te = new TextExtents ();
@@ -476,7 +479,7 @@ namespace Crow
 							return -1;
 						}					
 					}
-				}
+				//}
 
 			}
 			return lt == LayoutingType.Height ? cachedTextSize.Height : cachedTextSize.Width;
@@ -485,10 +488,11 @@ namespace Crow
 		{
 			base.onDraw (gr);
 
-			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-			gr.SetFontSize (Font.Size);
-			gr.FontOptions = Interface.FontRenderingOptions;
-			gr.Antialias = Interface.Antialias;
+			gr.FontFace = Font.Name;
+//			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+//			gr.SetFontSize (Font.Size);
+//			gr.FontOptions = Interface.FontRenderingOptions;
+//			gr.Antialias = Interface.Antialias;
 
 			rText = new Rectangle(new Size(
 				measureRawSize(LayoutingType.Width), measureRawSize(LayoutingType.Height)));

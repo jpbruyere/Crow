@@ -27,7 +27,7 @@
 using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
-using Cairo;
+using vkvg;
 
 namespace Crow
 {
@@ -211,7 +211,7 @@ namespace Crow
 			ctx.SetSourceSurface (bmp, rb.X, rb.Y);
 			ctx.Paint ();
 			Clipping.Dispose();
-			Clipping = new Region ();
+			Clipping = new Cairo.Region();
 		}
 		#endregion
 

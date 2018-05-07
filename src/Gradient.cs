@@ -26,7 +26,7 @@
 
 using System;
 using System.Collections.Generic;
-using Cairo;
+using vkvg;
 
 namespace Crow
 {
@@ -99,7 +99,7 @@ namespace Crow
 			foreach (ColorStop cs in Stops)
 				grad.AddColorStop (cs.Offset, cs.Color);
 			
-			ctx.SetSource (grad);
+			//ctx.SetSource (grad);
 			grad.Dispose ();
 		}
 		#endregion

@@ -26,7 +26,7 @@
 
 using System;
 using System.IO;
-using Cairo;
+using vkvg;
 
 namespace Crow
 {
@@ -95,16 +95,16 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-			using (ImageSurface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
-				using (Context gr = new Context (tmp)) {
-					gr.Translate (bounds.Left, bounds.Top);
-					gr.Scale (widthRatio, heightRatio);
-					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
-
-					hSVG.RenderCairo (gr);
-				}
-				ctx.SetSource (tmp);
-			}	
+//			using (Surface tmp = new Surface (bounds.Width, bounds.Height)) {
+//				using (Context gr = new Context (tmp)) {
+//					gr.Translate (bounds.Left, bounds.Top);
+//					gr.Scale (widthRatio, heightRatio);
+//					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
+//
+//					hSVG.RenderCairo (gr);
+//				}
+//				ctx.SetSource (tmp);
+//			}	
 		}
 		#endregion
 

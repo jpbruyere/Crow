@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 using System;
 using Crow.IML;
+using vkvg;
 
 namespace Crow
 {
@@ -82,7 +83,7 @@ namespace Crow
 //		}
 
 		Rectangle rIn = default(Rectangle);
-		double dockThresh = 0.2;
+		double dockThresh = 0.2f;
 		GraphicObject focusedChild;
 		internal GraphicObject stretchedChild;
 
@@ -178,7 +179,7 @@ namespace Crow
 			RegisterForGraphicUpdate ();
 		}
 
-		protected override void onDraw (Cairo.Context gr)
+		protected override void onDraw (Context gr)
 		{
 			gr.Save ();
 
@@ -237,9 +238,9 @@ namespace Crow
 					break;
 				}
 				gr.LineWidth = 1;
-				gr.SetSourceRGBA (0.4, 0.4, 0.9, 0.4);
+				gr.SetSource (0.4, 0.4, 0.9, 0.4);
 				gr.FillPreserve ();
-				gr.SetSourceRGBA (0.9, 0.9, 1.0, 0.8);
+				gr.SetSource (0.9, 0.9, 1.0, 0.8);
 				gr.Stroke ();
 			}
 			gr.Restore ();	

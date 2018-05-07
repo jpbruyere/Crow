@@ -1,5 +1,5 @@
 //
-// Mono.Cairo.Context.cs
+// Mono.Context.cs
 //
 // Author:
 //   Duncan Mak (duncan@ximian.com)
@@ -37,11 +37,11 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using Cairo;
+using vkvg;
 
 namespace Cairo {
 
-	[Obsolete ("Renamed Cairo.Context per suggestion from cairo binding guidelines.")]
+	[Obsolete ("Renamed Context per suggestion from cairo binding guidelines.")]
 	public class Graphics : Context {
 		public Graphics (IntPtr state) : base (state) {}
 		public Graphics (Surface surface) : base (surface) {}

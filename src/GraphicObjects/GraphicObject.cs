@@ -31,7 +31,7 @@ using System.Xml.Serialization;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
-using Cairo;
+using vkvg;
 using System.Diagnostics;
 using Crow.IML;
 using System.Threading;
@@ -127,10 +127,10 @@ namespace Crow
 			parentElem.AppendChild (xe);
 		}
 		public Surface CreateIcon (int dragIconSize = 32) {
-			ImageSurface di = new ImageSurface (Format.Argb32, dragIconSize, dragIconSize);
+			Surface di = new Surface (CrowApplication.dev, dragIconSize, dragIconSize);
 			using (Context ctx = new Context (di)) {
-				double div = Math.Max (LastPaintedSlot.Width, LastPaintedSlot.Height);
-				double s = (double)dragIconSize / div;
+				float div = Math.Max (LastPaintedSlot.Width, LastPaintedSlot.Height);
+				float s = (float)dragIconSize / div;
 				ctx.Scale (s, s);
 				if (bmp == null)
 					this.onDraw (ctx);
@@ -206,7 +206,7 @@ namespace Crow
 		/// are repeated at each cached levels of the tree with correspondig coordinate system. This is done
 		/// in a dedicated step of the update between layouting and drawing.
 		/// </summary>
-		public Region Clipping;
+		public Cairo.Region Clipping;
 
 		#region IValueChange implementation
 		/// <summary>
@@ -233,7 +233,7 @@ namespace Crow
 		/// action.
 		/// </summary>
 		protected GraphicObject () {
-			Clipping = new Region ();
+			Clipping = new Cairo.Region();
 			#if DEBUG
 			uid = currentUid;
 			currentUid++;
@@ -1628,9 +1628,9 @@ namespace Crow
 			IsDirty = false;
 			if (bmp != null)
 				bmp.Dispose ();
-			bmp = new ImageSurface (Format.Argb32, Slot.Width, Slot.Height);
+			bmp = new Surface (CrowApplication.dev, Slot.Width, Slot.Height);
 			using (Context gr = new Context (bmp)) {
-				gr.Antialias = Interface.Antialias;
+				//gr.Antialias = Interface.Antialias;
 				onDraw (gr);
 			}
 			bmp.Flush ();
@@ -1650,7 +1650,7 @@ namespace Crow
 			ctx.SetSourceSurface (bmp, rb.X, rb.Y);
 			ctx.Paint ();
 			Clipping.Dispose ();
-			Clipping = new Region ();
+			Clipping = new Cairo.Region();
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version
 		/// of the widget </summary>
@@ -1692,7 +1692,7 @@ namespace Crow
 		}
 		void paintDisabled(Context gr, Rectangle rb){
 			gr.Operator = Operator.Xor;
-			gr.SetSourceRGBA (0.6, 0.6, 0.6, 0.3);
+			gr.SetSource (0.6, 0.6, 0.6, 0.3);
 			gr.Rectangle (rb);
 			gr.Fill ();
 			gr.Operator = Operator.Over;

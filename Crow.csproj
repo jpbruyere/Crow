@@ -88,7 +88,6 @@
     <Compile Include="src\ReflexionExtensions.cs" />
     <Compile Include="src\XCursor.cs" />
     <Compile Include="src\GraphicObjects\Grid.cs" />
-    <Compile Include="src\GraphicObjects\TextRun.cs" />
     <Compile Include="src\GraphicObjects\MessageBox.cs" />
     <Compile Include="src\SelectionChangeEventArgs.cs" />
     <Compile Include="src\ValueChangeEventArgs.cs" />
@@ -222,6 +221,20 @@
     <Compile Include="src\ParsingException.cs" />
     <Compile Include="src\IMLAttributes.cs" />
     <Compile Include="src\GraphicObjects\DockStack.cs" />
+    <Compile Include="vkvg\Context.cs" />
+    <Compile Include="vkvg\Device.cs" />
+    <Compile Include="vkvg\NativeMethods.cs" />
+    <Compile Include="vkvg\Surface.cs" />
+    <Compile Include="vkEngine\enums.cs" />
+    <Compile Include="vkEngine\VkEngine.cs" />
+    <Compile Include="src\CrowApplication.cs" />
+    <Compile Include="vkvg\Enums.cs" />
+    <Compile Include="vkh\Device.cs" />
+    <Compile Include="vkh\enums.cs" />
+    <Compile Include="vkh\NativeMethods.cs" />
+    <Compile Include="vkvg\FontExtents.cs" />
+    <Compile Include="vkvg\TextExtents.cs" />
+    <Compile Include="vkvg\PointD.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -251,6 +264,9 @@
     <Folder Include="src\rsvg\" />
     <Folder Include="src\IML\" />
     <Folder Include="Icons\" />
+    <Folder Include="vkvg\" />
+    <Folder Include="vkEngine\" />
+    <Folder Include="vkh\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\Icons\updown.svg" />
@@ -395,5 +411,6 @@
     </None>
     <None Include="Icons\compiler_warning.svg" />
     <None Include="Icons\compiler_warning_orange.svg" />
+    <None Include="src\GraphicObjects\TextRun.cs" />
   </ItemGroup>
 </Project>

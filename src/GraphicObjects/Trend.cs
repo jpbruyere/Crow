@@ -28,7 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.ComponentModel;
-using Cairo;
+using vkvg;
 
 namespace Crow
 {
@@ -156,7 +156,7 @@ namespace Crow
 			double stepX = (double)r.Width / (double)(nbValues-1);
 
 			gr.LineWidth = 1.0;
-			gr.SetDash (new double[]{ 1.0 },0.0);
+			//gr.SetDash (new double[]{ 1.0 },0.0);
 
 
 
@@ -175,7 +175,7 @@ namespace Crow
 			gr.MoveTo (ptrX, values [i] * scaleY);
 
 			Foreground.SetAsSource (gr);
-			gr.SetDash (new double[]{ }, 0.0);
+			//gr.SetDash (new double[]{ }, 0.0);
 
 			while (i >= 0) {
 					gr.LineTo (ptrX, r.Bottom - values [i] * scaleY);

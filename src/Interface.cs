@@ -33,7 +33,7 @@ using System.Reflection;
 using System.Threading;
 using System.Xml;
 using System.Xml.Serialization;
-using Cairo;
+using vkvg;
 using System.Globalization;
 using Crow.IML;
 
@@ -83,19 +83,21 @@ namespace Crow
 			foreach (string af in Directory.GetFiles (AppDomain.CurrentDomain.BaseDirectory, "*.dll")){
 				try {
 					Assembly.LoadFrom (af);	
-				} catch (Exception ex) {
+				} catch {
 					Console.WriteLine ("{0} not loaded as assembly.", af);
 				}
 			}
 
-			FontRenderingOptions = new FontOptions ();
-			FontRenderingOptions.Antialias = Antialias.Subpixel;
-			FontRenderingOptions.HintMetrics = HintMetrics.On;
-			FontRenderingOptions.HintStyle = HintStyle.Full;
-			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
+//			FontRenderingOptions = new FontOptions ();
+//			FontRenderingOptions.Antialias = Antialias.Subpixel;
+//			FontRenderingOptions.HintMetrics = HintMetrics.On;
+//			FontRenderingOptions.HintStyle = HintStyle.Full;
+//			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
 		}
-		public Interface(){
+		public Interface(Surface surface){
 			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+			this.surf = surface;
+			this.clientRectangle = new Rectangle (0, 0, surface.Width, surface.Height);
 		}
 		#endregion
 
@@ -104,8 +106,8 @@ namespace Crow
 			loadCursors ();
 			loadStyling ();
 			findAvailableTemplates ();
-			initTooltip ();
-			initContextMenus ();
+			//initTooltip ();
+			//initContextMenus ();
 		}
 
 		#region Static and constants
@@ -139,9 +141,9 @@ namespace Crow
 		/// will not be rendered on screen </summary>
 		public const int MaxDiscardCount = 5;
 		/// <summary> Global font rendering settings for Cairo </summary>
-		public static FontOptions FontRenderingOptions;
+		//public static FontOptions FontRenderingOptions;
 		/// <summary> Global font rendering settings for Cairo </summary>
-		public static Antialias Antialias = Antialias.Subpixel;
+		//public static Antialias Antialias = Antialias.Subpixel;
 
 		/// <summary>
 		/// Each control need a ref to the root interface containing it, if not set in GraphicObject.currentInterface,
@@ -181,11 +183,6 @@ namespace Crow
 		#region Public Fields
 		/// <summary>Graphic Tree of this interface</summary>
 		public List<GraphicObject> GraphicTree = new List<GraphicObject>();
-		/// <summary>Interface's resulting bitmap</summary>
-		public byte[] bmp;
-		/// <summary>resulting bitmap limited to last redrawn part</summary>
-		public byte[] dirtyBmp;
-		/// <summary>True when host has to repaint Interface</summary>
 		public bool IsDirty = false;
 		/// <summary>Coordinate of the dirty bmp on the original bmp</summary>
 		public Rectangle DirtyRect;
@@ -231,11 +228,11 @@ namespace Crow
 		/// <summary>Client rectangle in the host context</summary>
 		Rectangle clientRectangle;
 		/// <summary>Clipping rectangles on the root context</summary>
-		Region clipping = new Region();
+		Cairo.Region clipping = new Cairo.Region();
 		/// <summary>Main Cairo context</summary>
 		Context ctx;
 		/// <summary>Main Cairo surface</summary>
-		Surface surf;
+		public Surface surf;
 		#endregion
 
 		#region Default values and Style loading
@@ -643,8 +640,7 @@ namespace Crow
 			drawingMeasure.StartCycle();
 			#endif
 			if (DragImage != null)
-				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
-			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
+				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));			
 				using (ctx = new Context (surf)){
 					if (!clipping.IsEmpty) {
 
@@ -660,7 +656,7 @@ namespace Crow
 							GraphicObject p = GraphicTree[i];
 							if (!p.Visible)
 								continue;
-							if (clipping.Contains (p.Slot) == RegionOverlap.Out)
+							if (clipping.Contains (p.Slot) == Cairo.RegionOverlap.Out)
 								continue;
 
 							ctx.Save ();
@@ -676,7 +672,7 @@ namespace Crow
 								ctx.Save ();
 								ctx.ResetClip ();
 								ctx.SetSourceSurface (DragImage, DragImageX, DragImageY);
-								ctx.PaintWithAlpha (0.8);
+								//ctx.PaintWithAlpha (0.8);
 								ctx.Restore ();
 								DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
 								IsDirty = true;
@@ -687,6 +683,7 @@ namespace Crow
 						#if DEBUG_CLIP_RECTANGLE
 						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
 						#endif
+					/*
 						lock (RenderMutex) {
 //							Array.Copy (bmp, dirtyBmp, bmp.Length);
 
@@ -714,11 +711,12 @@ namespace Crow
 							} else
 								IsDirty = false;
 						}
+						*/
 						clipping.Dispose ();
-						clipping = new Region ();
+						clipping = new Cairo.Region();
 					}
 					//surf.WriteToPng (@"/mnt/data/test.png");
-				}
+
 			}
 			#if MEASURE_TIME
 			drawingMeasure.StopCycle();
@@ -840,10 +838,10 @@ namespace Crow
 		public void ProcessResize(Rectangle bounds){
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
-				int stride = 4 * ClientRectangle.Width;
-				int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
-				bmp = new byte[bmpSize];
-				dirtyBmp = new byte[bmpSize];
+//				int stride = 4 * ClientRectangle.Width;
+//				int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
+//				bmp = new byte[bmpSize];
+//				dirtyBmp = new byte[bmpSize];
 
 				foreach (GraphicObject g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);

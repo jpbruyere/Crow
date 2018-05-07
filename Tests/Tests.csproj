@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>Tests.BasicTests</StartupObject>
+    <StartupObject>Tests.HelloWorld</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ReleaseVersion>0.5</ReleaseVersion>
@@ -75,6 +75,12 @@
     <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Custom Command' ">
+    <StartAction>Program</StartAction>
+    <StartProgram>%24{TargetName}</StartProgram>
+    <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -86,24 +92,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="BasicTests.cs" />
     <Compile Include="OpenGL\Shader.cs" />
     <Compile Include="OpenGL\vaoMesh.cs" />
     <Compile Include="OpenGL\Texture.cs" />
     <Compile Include="HelloWorld.cs" />
-    <Compile Include="CrowWindow.cs" />
-    <Compile Include="Hello3D.cs" />
     <Compile Include="OpenGL\Extensions.cs" />
-    <Compile Include="InterfaceControler.cs" />
-    <Compile Include="Showcase.cs" />
-    <Compile Include="GraphicObjects\ColorCircleSelector.cs" />
-    <Compile Include="GraphicObjects\SimpleGauge.cs" />
-    <Compile Include="Tutorials\T1_HelloWorld.cs" />
-    <Compile Include="Tutorials\T3_OpenGLCube.cs" />
-    <Compile Include="Tutorials\T4_Gauge.cs" />
-    <Compile Include="Tutorials\T2_IML.cs" />
-    <Compile Include="GraphicObjects\HexaContainer.cs" />
-    <Compile Include="GraphicObjects\TechBorder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -382,6 +375,19 @@
     <None Include="Interfaces\TemplatedContainer\testTabView2.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="InterfaceControler.cs" />
+    <None Include="CrowWindow.cs" />
+    <None Include="BasicTests.cs" />
+    <None Include="Hello3D.cs" />
+    <None Include="Showcase.cs" />
+    <None Include="Tutorials\T1_HelloWorld.cs" />
+    <None Include="Tutorials\T3_OpenGLCube.cs" />
+    <None Include="Tutorials\T4_Gauge.cs" />
+    <None Include="Tutorials\T2_IML.cs" />
+    <None Include="GraphicObjects\ColorCircleSelector.cs" />
+    <None Include="GraphicObjects\SimpleGauge.cs" />
+    <None Include="GraphicObjects\HexaContainer.cs" />
+    <None Include="GraphicObjects\TechBorder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />

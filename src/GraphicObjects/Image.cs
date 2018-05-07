@@ -25,7 +25,7 @@
 // THE SOFTWARE.
 
 using System;
-using Cairo;
+using vkvg;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -43,7 +43,7 @@ namespace Crow
 		Picture _pic;
 		string _svgSub;
 		bool scaled, keepProps;
-		double opacity;
+		float opacity;
 
 		#region Public properties
 		/// <summary>
@@ -138,7 +138,7 @@ namespace Crow
 		/// </summary>
 		// TODO:could be moved in GraphicObject
 		[XmlAttributeAttribute()][DefaultValue(1.0)]
-		public virtual double Opacity {
+		public virtual float Opacity {
 			get { return opacity; }
 			set {
 				if (opacity == value)
@@ -203,7 +203,7 @@ namespace Crow
 			_pic.Paint (gr, ClientRectangle, _svgSub);
 
 			if (Opacity<1.0) {
-				gr.SetSourceRGBA (0.0, 0.0, 0.0, 1.0-Opacity);
+				gr.SetSource (0, 0, 0, 1-Opacity);
 				gr.Operator = Operator.DestOut;
 				gr.Rectangle (ClientRectangle);
 				gr.Fill ();

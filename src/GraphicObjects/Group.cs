@@ -28,7 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
-using Cairo;
+using vkvg;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
@@ -332,7 +332,7 @@ namespace Crow
 				foreach (GraphicObject c in Children) {
 					if (!c.Visible)
 						continue;
-					if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
+					if (Clipping.Contains (c.Slot + ClientRectangle.Position) == Cairo.RegionOverlap.Out)
 						continue;
 					c.Paint (ref gr);
 				}
@@ -349,7 +349,7 @@ namespace Crow
 			ctx.Paint ();
 
 			Clipping.Dispose();
-			Clipping = new Region ();
+			Clipping = new Cairo.Region();
 		}
 		#endregion
 

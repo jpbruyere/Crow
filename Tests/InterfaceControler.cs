@@ -133,7 +133,7 @@ namespace Crow
 		public InterfaceControler(Rectangle ifaceBounds){
 			iRect = ifaceBounds;
 
-			CrowInterface = new Interface ();
+			//CrowInterface = new Interface ();
 			CrowInterface.Init ();
 
 			#if MEASURE_TIME

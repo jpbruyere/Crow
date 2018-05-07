@@ -26,28 +26,26 @@
 
 using System;
 using Crow;
-using Tutorials;
+//using Tutorials;
 
 namespace Tests
 {
-	class HelloWorld : CrowWindow
+	class HelloWorld : CrowApplication
 	{
 		public HelloWorld ()
-			: base(800, 600,"Crow Test with OpenTK")
+			: base(800, 600)
 		{
-		}
-
-		protected override void OnLoad (EventArgs e)
-		{
-			base.OnLoad (e);
-			LoadIMLFragment (@"<SimpleGauge Level='40' Margin='5' Background='Jet' Foreground='Gray' Width='30' Height='50%'/>");
 		}
 
 		[STAThread]
 		static void Main ()
 		{
-			HelloWorld win = new HelloWorld ();
-			win.Run (30);
+			using (HelloWorld win = new HelloWorld ()) {
+				
+				//win.Load (@"Interfaces/Divers/0.crow").DataSource = win;
+				win.Load (@"Interfaces/GraphicObject/0.crow");
+				win.Run ();
+			}
 		}
 	}
 }

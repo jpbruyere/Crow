@@ -26,7 +26,7 @@
 
 using System;
 using System.IO;
-using Cairo;
+using vkvg;
 
 namespace Crow
 {
@@ -110,14 +110,13 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-			using (ImageSurface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
+			using (Surface tmp = new Surface (CrowApplication.dev, bounds.Width, bounds.Height)) {
 				using (Context gr = new Context (tmp)) {
 					gr.Translate (bounds.Left, bounds.Top);
 					gr.Scale (widthRatio, heightRatio);
 					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
 
-					using (ImageSurface imgSurf = new ImageSurface (image, Format.Argb32, 
-						Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) {
+					using (Surface imgSurf = new Surface (CrowApplication.dev, ref image, Dimensions.Width, Dimensions.Height)) {
 						gr.SetSourceSurface (imgSurf, 0,0);
 						gr.Paint ();
 					}
@@ -157,8 +156,7 @@ namespace Crow
 			gr.Scale (widthRatio, heightRatio);
 			gr.Translate ((rect.Width/widthRatio - Dimensions.Width)/2, (rect.Height/heightRatio - Dimensions.Height)/2);
 			
-			using (ImageSurface imgSurf = new ImageSurface (image, Format.Argb32, 
-				Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) {
+			using (Surface imgSurf = new Surface (CrowApplication.dev, ref image, Dimensions.Width, Dimensions.Height)) {
 				gr.SetSourceSurface (imgSurf, 0,0);
 				gr.Paint ();
 			}

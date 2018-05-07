@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crow.Test", "Crow.Test\Crow
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrowIDE", "CrowIDE\CrowIDE.csproj", "{B6D911CD-1D09-42FC-B300-9187190F2AE1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vkglfw.net", "..\..\vulkan\vkglfw.net\vkglfw.net.csproj", "{FE2D5F0D-F9F4-4F88-9D32-C33D8A4A42C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,27 +31,39 @@ Global
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE2D5F0D-F9F4-4F88-9D32-C33D8A4A42C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE2D5F0D-F9F4-4F88-9D32-C33D8A4A42C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE2D5F0D-F9F4-4F88-9D32-C33D8A4A42C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE2D5F0D-F9F4-4F88-9D32-C33D8A4A42C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
 		$0.StandardHeader = $1
 		$1.Text = @\n${FileName}\n \nAuthor:\n      ${AuthorName} <${AuthorEmail}>\n\nCopyright (c) 2013-2017 Jean-Philippe Bruyère\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the "Software"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE.
-		$1.IncludeInNewFiles = True
 		$0.DotNetNamingPolicy = $2
-		$2.DirectoryNamespaceAssociation = None
-		$2.ResourceNamePolicy = FileFormatDefault
 		$0.TextStylePolicy = $3
-		$3.FileWidth = 120
-		$3.TabsToSpaces = False
 		$3.EolMarker = Unix
-		$3.inheritsSet = VisualStudio
-		$3.inheritsScope = text/plain
 		$3.scope = text/x-csharp
 		$0.CSharpFormattingPolicy = $4
 		$4.AfterDelegateDeclarationParameterComma = True
-		$4.inheritsSet = Mono
-		$4.inheritsScope = text/x-csharp
 		$4.scope = text/x-csharp
+		$4.IndentSwitchSection = False
+		$4.NewLinesForBracesInProperties = False
+		$4.NewLinesForBracesInAccessors = False
+		$4.NewLinesForBracesInAnonymousMethods = False
+		$4.NewLinesForBracesInControlBlocks = False
+		$4.NewLinesForBracesInAnonymousTypes = False
+		$4.NewLinesForBracesInObjectCollectionArrayInitializers = False
+		$4.NewLinesForBracesInLambdaExpressionBody = False
+		$4.NewLineForElse = False
+		$4.NewLineForCatch = False
+		$4.NewLineForFinally = False
+		$4.NewLineForMembersInObjectInit = False
+		$4.NewLineForMembersInAnonymousTypes = False
+		$4.NewLineForClausesInQuery = False
+		$4.SpacingAfterMethodDeclarationName = True
+		$4.SpaceAfterMethodCallName = True
+		$4.SpaceBeforeOpenSquareBracket = True
 		$0.VersionControlPolicy = $5
 		$5.CommitMessageStyle = $6
 		$6.Indent = @\t
@@ -57,7 +71,6 @@ Global
 		$6.LastFilePostfix = "@:\n  "
 		$6.LineAlign = 0
 		$6.Wrap = False
-		$5.inheritsSet = Mono
 		description = @C.R.O.W. c# Rapid Open Widgets\n\nCrow is a pure c# widget toolkit with XML definition of interface, bindings, styling...\n
 		version = 0.5
 	EndGlobalSection

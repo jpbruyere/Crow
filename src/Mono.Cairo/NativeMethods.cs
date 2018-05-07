@@ -548,7 +548,7 @@ namespace Cairo
 		internal static extern bool cairo_region_contains_point (IntPtr region, int x, int y);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern RegionOverlap cairo_region_contains_rectangle (IntPtr region, ref Crow.Rectangle rectangle);
+		internal static extern Cairo.RegionOverlap cairo_region_contains_rectangle (IntPtr region, ref Crow.Rectangle rectangle);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern IntPtr cairo_region_copy (IntPtr original);

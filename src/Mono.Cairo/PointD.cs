@@ -1,5 +1,5 @@
 //
-// Mono.Cairo.Context.cs
+// Mono.Context.cs
 //
 // Author:
 //   Duncan Mak (duncan@ximian.com)

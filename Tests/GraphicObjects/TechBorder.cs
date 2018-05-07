@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 using System;
 using Crow;
+using vkvg;
 
 namespace Tests
 {
@@ -37,7 +38,7 @@ namespace Tests
 		{
 			return base.measureRawSize (lt) + 6;
 		}
-		protected override void onDraw (Cairo.Context gr)
+		protected override void onDraw (Context gr)
 		{
 			gr.Save ();
 

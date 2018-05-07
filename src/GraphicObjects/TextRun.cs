@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
-using Cairo;
+using vkvg;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using System.ComponentModel;
@@ -259,7 +259,7 @@ namespace Crow
 				}
 			}
 
-			gr.FontMatrix = new Matrix (widthRatio * Font.Size, 0, 0, heightRatio * Font.Size, 0, 0);
+			//gr.FontMatrix = new Matrix (widthRatio * Font.Size, 0, 0, heightRatio * Font.Size, 0, 0);
 
 
 			int curLineCount = 0;
