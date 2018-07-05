@@ -14,15 +14,15 @@ FpsDisp {
 }
 CheckBox2 {
 	Template= "#Tests.Interfaces.CheckBox2.imlt";
-	Background = "DimGray";
-	Checked="{Background=MediumSeaGreen;Font=droid bold, 10}";
-	Unchecked = "{Background=DarkGray;Font=droid,10}";
+	Background = "Jet";
+	Checked="{Background=MediumSeaGreen}";
+	Unchecked = "{Background=Jet}";
 }
 RadioButton2 {
 	Template="#Tests.Interfaces.CheckBox2.imlt";
-	Background = "DimGray";
-	Checked = "{Background=MediumSeaGreen;Font=droid bold, 10}";
-	Unchecked = "{Background=DimGray;Font=droid,10}";
+	Background = "Jet";
+	Checked = "{Background=MediumSeaGreen}";
+	Unchecked = "{Background=Jet}";
 }
 labPerf {
 	Font = "droid, 8";

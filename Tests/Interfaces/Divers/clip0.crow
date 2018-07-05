@@ -5,6 +5,6 @@
 		MouseLeave="{Background=LimeGreen}">
 	<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="false"
 		MouseEnter="{Background=DimGray}" Width="100"
-		MouseLeave="{Background=BlueCrayola}"
-	 	Margin="10" Text="{drawing}" Background="BlueCrayola"/>
+		MouseLeave="{Background=RoyalBlue}"
+	 	Margin="10" Text="{drawing}" Background="RoyalBlue"/>
  </Container>

@@ -6,14 +6,14 @@
 		<Image Margin="2" Width="16" Height="16"
 			Path="#Crow.Icons.file.svg"/>
 			<Label Text="{Name}" Width="Stretched"
-				MouseEnter="{Background=BlueCrayola}"
+				MouseEnter="{Background=RoyalBlue}"
 				MouseLeave="{Background=Transparent}"/>
 	</HorizontalStack>
 </ItemTemplate>
 <ItemTemplate DataType="System.IO.DirectoryInfo">
 	<Border Foreground="Transparent" Focusable="true" Height="Fit">
 		<HorizontalStack
-				MouseEnter="{Background=BlueCrayola}"
+				MouseEnter="{Background=RoyalBlue}"
 				MouseLeave="{Background=Transparent}">
 			<Image Margin="2" Width="16" Height="16"
 				Path="#Crow.Icons.folder.svg"/>

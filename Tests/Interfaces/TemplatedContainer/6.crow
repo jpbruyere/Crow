@@ -4,9 +4,9 @@
 				<Expandable Width="Stretched" Background="LimeGreen">
 					<Expandable Width="Stretched" Background="DimGray">
 						<Expandable Width="Stretched" Background="Yellow">
-							<Expandable Width="Stretched" Background="NavyBlue">
+							<Expandable Width="Stretched" Background="SeaGreen">
 								<Expandable Width="Stretched" Background="Blue">
-									<Expandable Width="Stretched" Background="BlueCrayola">
+									<Expandable Width="Stretched" Background="RoyalBlue">
 										<Expandable Width="Stretched" Background="Green">
 											<Label Background="Red" Text="{fps}"/>
 										</Expandable>

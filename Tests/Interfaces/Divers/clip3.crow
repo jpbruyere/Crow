@@ -10,12 +10,12 @@
 				MouseLeave="{Background=LimeGreen}">
 			<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
 				MouseEnter="{Background=DimGray}" Width="100"
-				MouseLeave="{Background=BlueCrayola}"
-			 	Margin="10" Text="{fps}" Background="BlueCrayola"/>
+				MouseLeave="{Background=RoyalBlue}"
+			 	Margin="10" Text="{fps}" Background="RoyalBlue"/>
 			<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
 				MouseEnter="{Background=DimGray}" Width="100"
-				MouseLeave="{Background=BlueCrayola}"
-			 	Margin="10" Text="{drawing}" Background="BlueCrayola"/>
+				MouseLeave="{Background=RoyalBlue}"
+			 	Margin="10" Text="{drawing}" Background="RoyalBlue"/>
 		 </VerticalStack>
 		<VerticalStack Fit="true" Margin="50" Background="LimeGreen" CacheEnabled="false"
 				HorizontalAlignment="Right" VerticalAlignment="Bottom"
@@ -23,12 +23,12 @@
 				MouseLeave="{Background=LimeGreen}">
 			<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
 				MouseEnter="{Background=DimGray}" Width="100"
-				MouseLeave="{Background=BlueCrayola}"
-			 	Margin="10" Text="{fpsMax}" Background="BlueCrayola"/>
+				MouseLeave="{Background=RoyalBlue}"
+			 	Margin="10" Text="{fpsMax}" Background="RoyalBlue"/>
 			<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
 				MouseEnter="{Background=DimGray}" Width="100"
-				MouseLeave="{Background=BlueCrayola}"
-			 	Margin="10" Text="{fpsMin}" Background="BlueCrayola"/>
+				MouseLeave="{Background=RoyalBlue}"
+			 	Margin="10" Text="{fpsMin}" Background="RoyalBlue"/>
 		 </VerticalStack>
 	</HorizontalStack>
  </Group>
