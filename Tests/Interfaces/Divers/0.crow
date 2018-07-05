@@ -52,7 +52,7 @@
 			</HorizontalStack>
 			<HorizontalStack Height="Fit" Margin="5">
 				<Label Text="MouseEvents" Width="50%" Margin="3"
-					Background="DimGray"
+					Background="Jet"
 					Foreground="DimGray"
 					TextAlignment="Center"
 					MouseEnter="{Foreground=White}"
@@ -60,9 +60,9 @@
 					MouseDown="{Background=DarkRed}"
 					MouseClick="{Foreground=Green}"
 					MouseDoubleClick="{Foreground=Yellow}"
-					MouseUp="{Background=DimGray}"/>
+					MouseUp="{Background=Jet}"/>
 				<Label Text="MouseEvents" Width="50%" Margin="3"
-					Background="DimGray"
+					Background="Jet"
 					Foreground="DimGray"
 					TextAlignment="Center"
 					MouseClick="{Foreground=Green}"

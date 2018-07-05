@@ -9,7 +9,7 @@
 		MouseLeave="{Background=LimeGreen}">
 	<Label Left="10" HorizontalAlignment="Right" VerticalAlignment="Center" CacheEnabled="true"
 		MouseEnter="{Background=DimGray}" Width="100"
-		MouseLeave="{Background=BlueCrayola}"
-	 	Margin="10" Text="{drawing}" Background="BlueCrayola"/>
+		MouseLeave="{Background=RoyalBlue}"
+	 	Margin="10" Text="{drawing}" Background="RoyalBlue"/>
  </Group>
  </Group>

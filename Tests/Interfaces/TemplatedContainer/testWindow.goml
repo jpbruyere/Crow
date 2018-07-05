@@ -29,37 +29,37 @@
 						<HorizontalStack Fit="true">
 							<Label Text="Layouting:" Width="50" TextAlignment="Right"/>
 							<Label Name="labLayouting" Text="{layouting}" Font="droid,12" Width="80" TextAlignment="Center"
-								Background="vgradient|0:AoEnglish|1:Black"/>
+								Background="vgradient|0:SeaGreen|1:Black"/>
 						</HorizontalStack>
 						<HorizontalStack Fit="true">
 							<Label Text="Clipping:" Width="50" TextAlignment="Right"/>
 							<Label Text="{update}" Font="droid,12" Width="80" TextAlignment="Center"
-								Background="vgradient|0:AoEnglish|1:Black"/>
+								Background="vgradient|0:SeaGreen|1:Black"/>
 						</HorizontalStack>
 						<HorizontalStack Fit="true">
 							<Label Text="Drawing:" Width="50" TextAlignment="Right"/>
 							<Label Name="labDrawing" Text="{drawing}" Font="droid,12" Width="80" TextAlignment="Center"
-								Background="vgradient|0:AoEnglish|1:Black"/>
+								Background="vgradient|0:SeaGreen|1:Black"/>
 						</HorizontalStack>
 						<HorizontalStack Fit="true">
 							<Label Name="captionFps" Text="Fps:" Width="50" TextAlignment="Right"/>
 							<Label Name="valueFps" Text="{fps}" Font="droid , 12" Width="50" TextAlignment="Center"
-								Background="vgradient|0:AoEnglish|1:Black"/>
+								Background="vgradient|0:SeaGreen|1:Black"/>
 						</HorizontalStack>
 						<HorizontalStack Fit="true">
 							<Label Text="Min:" Width="50" TextAlignment="Right"/>
 							<Label Text="{fpsMin}" Font="droid , 12" Width="50" TextAlignment="Center"
-								Background="vgradient|0:AoEnglish|1:Black"/>
+								Background="vgradient|0:SeaGreen|1:Black"/>
 						</HorizontalStack>
 						<HorizontalStack Fit="true">
 							<Label Text="Max:" Width="50" TextAlignment="Right"/>
 							<Label Text="{fpsMax}" Font="droid , 12" Width="50" TextAlignment="Center"
-								Background="vgradient|0:AoEnglish|1:Black"/>
+								Background="vgradient|0:SeaGreen|1:Black"/>
 						</HorizontalStack>
 					</VerticalStack>
 			</Container>
 		</Border>
-		<HorizontalStack Fit="true" Background="BlueCrayola" Margin="3">
+		<HorizontalStack Fit="true" Background="RoyalBlue" Margin="3">
 			<GraphicObject Margin="10" Background="LimeGreen" Width="5" Height="5"/>
 			<TextBox Font="droid, 16" Multiline="true" Text="this is a test\nmultiline" Margin="2"/>
 			<GraphicObject Margin="10" Background="LimeGreen" Width="5" Height="5"/>

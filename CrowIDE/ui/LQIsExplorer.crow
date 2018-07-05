@@ -7,7 +7,7 @@
 					<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}">
 						<VerticalStack Fit="true" Margin="3" Background="DimGray"
 								HorizontalAlignment="Left"
-								MouseEnter="{Background=hgradient|0:BlueCrayola|1:Transparent}"
+								MouseEnter="{Background=hgradient|0:RoyalBlue|1:Transparent}"
 								MouseLeave="{Background=DimGray}">
 							<Label Text="{FullName}" Font="droid, 8" Background="LightGray" Foreground="Black"/>
 							<HorizontalStack Fit="true" Spacing="10">
@@ -42,7 +42,7 @@
 				<Template>
 					<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}">
 						<HorizontalStack Spacing="1" Height="Fit" Width="{./WidthPolicy}"
-								MouseEnter="{Background=hgradient|0:BlueCrayola|1:Transparent}"
+								MouseEnter="{Background=hgradient|0:RoyalBlue|1:Transparent}"
 								MouseLeave="{Background=Transparent}">
 							<Image Margin="2" Width="12" Height="12"
 

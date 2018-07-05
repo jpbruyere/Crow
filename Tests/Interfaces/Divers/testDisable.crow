@@ -4,8 +4,8 @@
 	<Label Font="20" Text="Enable / Disable test"/>
 	<Label Text="{fps}" IsEnabled="false" Font="30"/>
 	<Label Text="{fps}" IsEnabled="true" Font="30"/>
-		<Label Text="{fps}" IsEnabled="false" Font="30" Background="SeaBlue"/>
-	<Label Text="{fps}" IsEnabled="true" Font="30" Background="SeaBlue"/>
+		<Label Text="{fps}" IsEnabled="false" Font="30" Background="SeaGreen"/>
+	<Label Text="{fps}" IsEnabled="true" Font="30" Background="SeaGreen"/>
 	<Button Caption="Button" IsEnabled="true" Background="Gray"/>
 	<Button Caption="Button" IsEnabled="false" Background="Gray"/>
 	<Button Caption="Button" IsEnabled="true" />

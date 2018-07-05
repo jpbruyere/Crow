@@ -57,7 +57,7 @@
 		<Spinner Value="100"  Width="0"/>
 	</VerticalStack>
 </HorizontalStack>
-<!--<HorizontalStack Fit="true" Background="BlueCrayola" Margin="5">
+<!--<HorizontalStack Fit="true" Background="RoyalBlue" Margin="5">
 	<GraphicObject Background="Red" Width="30" Height="20"/>
 	<Spinner Maximum="10000000000" SmallIncrement="10" Value="0"/>
 	<GraphicObject Background="Green" Width="30" Height="20"/>

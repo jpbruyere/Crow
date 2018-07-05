@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <Border Fit="true" BorderWidth="2"  >
 <Scroller CornerRadius="2" Height="200" Width="300" Background="DimGray" Margin="2">
-	<VerticalStack Margin="10" VerticalAlignment="Top" Fit="true" Background="vgradient|0:BlueCrayola|1:Black" >
+	<VerticalStack Margin="10" VerticalAlignment="Top" Fit="true" Background="vgradient|0:RoyalBlue|1:Black" >
 		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 1"/>
 		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 2"/>
 		 <Label MouseEnter="{Background=Gray}" MouseLeave="{Background=hgradient|0:DarkRed|1:Transparent}" Margin="5" Background="hgradient|0:DarkRed|1:Transparent" Font="droid,20" Text="label 3"/>
@@ -35,7 +35,7 @@
 		MouseEnter="{Background=Gray}"
 		MouseLeave="{Background=LimeGreen}">
 
-		<CheckBox Margin="20" Background="BlueCrayola"/>
+		<CheckBox Margin="20" Background="RoyalBlue"/>
 		<CheckBox/>
 		<CheckBox/>
 		<CheckBox/>
@@ -49,10 +49,10 @@
 
 	<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
 		MouseEnter="{Background=DimGray}" Width="100"
-		MouseLeave="{Background=BlueCrayola}"
-	 	Margin="10" Text="{fps}" Background="BlueCrayola"/>
+		MouseLeave="{Background=RoyalBlue}"
+	 	Margin="10" Text="{fps}" Background="RoyalBlue"/>
 	<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="true"
 		MouseEnter="{Background=DimGray}" Width="100"
-		MouseLeave="{Background=BlueCrayola}"
-	 	Margin="10" Text="{drawing}" Background="BlueCrayola"/>
+		MouseLeave="{Background=RoyalBlue}"
+	 	Margin="10" Text="{drawing}" Background="RoyalBlue"/>
  </VerticalStack>-->
