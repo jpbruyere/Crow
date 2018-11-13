@@ -19,16 +19,16 @@
 	<HorizontalStack Height="Fit">
 		<Label Text="{../../editor.HoverError}" Width="Stretched"/>
 		<GraphicObject Background="Red" Width="5" Height="5" Visible="{IsDirty}"/>
-		<Label Text="Hover Line:" Foreground="Gray"/>
+		<Label Text="Hover Line:" Foreground="Grey"/>
 		<Label Text="{../../editor.HoverLine}"/>
 		<GraphicObject Height="5" Width="10"/>
-		<Label Text="Line:" Foreground="Gray"/>
+		<Label Text="Line:" Foreground="Grey"/>
 		<Label Text="{CurrentLine}"/>
 		<GraphicObject Height="5" Width="10"/>
-		<Label Text="column:" Foreground="Gray"/>
+		<Label Text="column:" Foreground="Grey"/>
 		<Label Text="{CurrentColumn}"/>
 		<GraphicObject Height="5" Width="10"/>
-		<Label Text="ScrollX:" Foreground="Gray"/>
+		<Label Text="ScrollX:" Foreground="Grey"/>
 		<Label Text="{../../editor.ScrollX}"/>
 	</HorizontalStack>
 </VerticalStack>

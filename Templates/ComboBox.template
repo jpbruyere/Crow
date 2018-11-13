@@ -3,7 +3,7 @@
 	<Template>
 		<CheckBox Caption="{./Caption}" IsChecked="{²./IsPopped}" Foreground="{./Foreground}" Background="{./Background}">
 			<Template>
-				<Border CornerRadius="0" Foreground="LightGray">
+				<Border CornerRadius="0" Foreground="LightGrey">
 					<HorizontalStack Margin="0" Spacing="1">
 						<TextBox MinimumSize="80,10" Margin="1" Foreground="Black" Background="White"
 							Text="{./Caption}"/>
@@ -16,7 +16,7 @@
 			</Template>
 		</CheckBox>
 	</Template>
-	<Border Background="DimGray" BorderWidth="1" Margin="1"
+	<Border Background="DimGrey" BorderWidth="1" Margin="1"
 		MinimumSize="{../../MinimumPopupSize}" Fit="true">
 		<Scroller Name="scroller1" Margin="2" 
 			MaximumSize="0,200"

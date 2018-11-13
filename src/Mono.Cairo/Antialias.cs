@@ -37,7 +37,7 @@ namespace Cairo
 	{
 		Default,
 		None,
-		Gray,
+		Grey,
 		Subpixel,
 	}
 }

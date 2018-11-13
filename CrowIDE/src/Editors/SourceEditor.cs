@@ -47,7 +47,7 @@ namespace Crow.Coding
 		#region CTOR
 		public SourceEditor (): base()
 		{
-			formatting.Add ((int)XMLParser.TokenType.AttributeName, new TextFormatting (Color.DarkSlateGray, Color.Transparent));
+			formatting.Add ((int)XMLParser.TokenType.AttributeName, new TextFormatting (Color.DarkSlateGrey, Color.Transparent));
 			formatting.Add ((int)XMLParser.TokenType.ElementName, new TextFormatting (Color.DarkBlue, Color.Transparent));
 			formatting.Add ((int)XMLParser.TokenType.ElementStart, new TextFormatting (Color.Black, Color.Transparent));
 			formatting.Add ((int)XMLParser.TokenType.ElementEnd, new TextFormatting (Color.Black, Color.Transparent));
@@ -58,8 +58,8 @@ namespace Crow.Coding
 			formatting.Add ((int)XMLParser.TokenType.AttributeValue, new TextFormatting (Color.FireBrick, Color.Transparent, false, true));
 			formatting.Add ((int)XMLParser.TokenType.XMLDecl, new TextFormatting (Color.ForestGreen, Color.Transparent));
 
-			formatting.Add ((int)BufferParser.TokenType.BlockComment, new TextFormatting (Color.Gray, Color.Transparent, false, true));
-			formatting.Add ((int)BufferParser.TokenType.LineComment, new TextFormatting (Color.Gray, Color.Transparent, false, true));
+			formatting.Add ((int)BufferParser.TokenType.BlockComment, new TextFormatting (Color.Grey, Color.Transparent, false, true));
+			formatting.Add ((int)BufferParser.TokenType.LineComment, new TextFormatting (Color.Grey, Color.Transparent, false, true));
 			formatting.Add ((int)BufferParser.TokenType.OperatorOrPunctuation, new TextFormatting (Color.Black, Color.Transparent));
 			formatting.Add ((int)BufferParser.TokenType.Keyword, new TextFormatting (Color.Teal, Color.Transparent));
 			//formatting.Add ((int)BufferParser.TokenType.Keyword, new TextFormatting (Color.DarkCyan, Color.Transparent));
@@ -554,7 +554,7 @@ namespace Crow.Coding
 			double y = cb.Y + (fe.Ascent+fe.Descent) * i, x = cb.X;
 
 			//Draw line numbering
-			Color mgFg = Color.Gray;
+			Color mgFg = Color.Grey;
 			Color mgBg = Color.White;
 			if (PrintLineNumbers){
 				Rectangle mgR = new Rectangle ((int)x, (int)y, leftMargin - leftMarginGap, (int)Math.Ceiling((fe.Ascent+fe.Descent)));
@@ -563,10 +563,10 @@ namespace Crow.Coding
 					if (buffer.CurrentLine == lineIndex)
 						mgFg = Color.White;
 					else
-						mgFg = Color.LightGray;
+						mgFg = Color.LightGrey;
 				}else if (buffer.CurrentLine == lineIndex) {
 					mgFg = Color.Black;
-					mgBg = Color.DarkGray;
+					mgBg = Color.DarkGrey;
 				}
 				string strLN = (lineIndex+1).ToString ();
 				gr.SetSourceColor (mgBg);
@@ -614,7 +614,7 @@ namespace Crow.Coding
 					closingNode = false;
 				}
 				gr.SetDash (new double[]{ 1.5 },0.0);
-				gr.SetSourceColor (Color.Gray);
+				gr.SetSourceColor (Color.Grey);
 				gr.Stroke ();
 				gr.SetDash (new double[]{}, 0.0);
 
@@ -901,7 +901,7 @@ namespace Crow.Coding
 		}
 		void updateHoverLine () {
 			int hvl = (int)Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent+fe.Descent)));
-			hvl = Math.Min (PrintedLines.Count, hvl);
+			hvl = Math.Min (PrintedLines.Count-1, hvl);
 			HoverLine = buffer.IndexOf (PrintedLines[hvl]);
 		}
 		void updateCurrentPosFromMouseLocalPos(){			

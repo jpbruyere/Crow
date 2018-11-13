@@ -8,7 +8,7 @@
 				<Template>
 					<CheckBox Caption="{./Caption}" IsChecked="{²./IsPopped}" Foreground="{./Foreground}" Background="{./Background}">
 						<Template>
-							<Border CornerRadius="0" Foreground="LightGray" Background="White">
+							<Border CornerRadius="0" Foreground="LightGrey" Background="White">
 								<HorizontalStack Margin="0" Spacing="1">
 									<Label Width="Stretched" MinimumSize="80,10" Margin="1" Foreground = "{LabForeground}" Background="White"
 										Text="{../../../../../SelectedItem}"/>

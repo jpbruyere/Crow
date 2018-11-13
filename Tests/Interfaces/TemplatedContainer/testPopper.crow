@@ -9,7 +9,7 @@
 		</VerticalStack>
 	</Border>
 	<GraphicObject Height="200"/>
-	<Popper Caption="TestPopper" Width="100" Background="DimGray" PopDirection="{alignment}">
+	<Popper Caption="TestPopper" Width="100" Background="DimGrey" PopDirection="{alignment}">
 		<Border Fit="True" Background="SteelBlue">
 			<Image Fit="true" Path="#go.Images.Icons.tetra.png" Margin="10"/>
 			<VerticalStack Fit="true" Margin="10" Background="CornflowerBlue">

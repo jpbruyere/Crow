@@ -3,7 +3,7 @@
 	<HorizontalStack >
 		<TextEditor Focusable="true" Name="editor" Font="monospace, 12" VerticalAlignment="Top" Margin="1"
 				CurrentLine="{²CurrentLine}" CurrentColumn="{²CurrentColumn}"
-				Foreground="DimGray" Background="White" Width="Stretched" Height="Stretched"
+				Foreground="DimGrey" Background="White" Width="Stretched" Height="Stretched"
 				ProjectNode="{}"  KeyDown="textView_KeyDown"/>
 		<ScrollBar Name="scrollbarY" Value="{²../editor.ScrollY}"
 				   LargeIncrement="{../editor.VisibleLines}"
@@ -19,13 +19,13 @@
 	<HorizontalStack Height="Fit">
 		<GraphicObject Height="5" Width="Stretched"/>
 		<GraphicObject Background="Red" Width="5" Height="5" Visible="{IsDirty}"/>
-		<Label Text="Line:" Foreground="Gray"/>
+		<Label Text="Line:" Foreground="Grey"/>
 		<Label Text="{CurrentLine}"/>
 		<GraphicObject Height="5" Width="10"/>
-		<Label Text="column:" Foreground="Gray"/>
+		<Label Text="column:" Foreground="Grey"/>
 		<Label Text="{CurrentColumn}"/>
 		<GraphicObject Height="5" Width="10"/>
-		<Label Text="ScrollX:" Foreground="Gray"/>
+		<Label Text="ScrollX:" Foreground="Grey"/>
 		<Label Text="{../../editor.ScrollX}"/>
 	</HorizontalStack>
 </VerticalStack>

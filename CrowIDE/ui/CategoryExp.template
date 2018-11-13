@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
-<Expandable Caption="{Name}" IsExpanded="{IsExpanded}" Background="Gray" Foreground="Black">
+<Expandable Caption="{Name}" IsExpanded="{IsExpanded}" Background="Grey" Foreground="Black">
 	<Template>
 		<VerticalStack>
-			<HorizontalStack Spacing="1" Height="Fit" MouseDoubleClick="./onClickForExpand" Background="Gray">
+			<HorizontalStack Spacing="1" Height="Fit" MouseDoubleClick="./onClickForExpand" Background="Grey">
 				<Container Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
-															MouseEnter="{Background=LightGray}"
+															MouseEnter="{Background=LightGrey}"
 															MouseLeave="{Background=Transparent}">
 					<Image
 						Path="#Crow.Images.Icons.expandable.svg"

@@ -54,6 +54,10 @@ namespace Crow
 					return;
 				_orientation = value;
 				NotifyValueChanged ("Orientation", _orientation);
+				if (_orientation == Orientation.Horizontal)
+					NotifyValueChanged ("ScrollBackShape", "M 0.5,5.5 L 10.5, 0.5 L 10.5,0.5 Z");
+				else
+					NotifyValueChanged ("ScrollBackShape", "M 5.5,0.5 L 10.5,10.5 L 0.5,10.5 Z");
 				RegisterForGraphicUpdate ();
 			}
 		}

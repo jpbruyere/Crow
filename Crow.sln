@@ -5,8 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crow", "Crow.csproj", "{C29
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{74289092-9F70-4941-AFCB-DFD7BE2140B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crow.Test", "Crow.Test\Crow.Test.csproj", "{42C73BD8-51F5-4BB7-8EE9-9F0BE2D80A2C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrowIDE", "CrowIDE\CrowIDE.csproj", "{B6D911CD-1D09-42FC-B300-9187190F2AE1}"
 EndProject
 Global
@@ -15,8 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{42C73BD8-51F5-4BB7-8EE9-9F0BE2D80A2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{42C73BD8-51F5-4BB7-8EE9-9F0BE2D80A2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74289092-9F70-4941-AFCB-DFD7BE2140B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{74289092-9F70-4941-AFCB-DFD7BE2140B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74289092-9F70-4941-AFCB-DFD7BE2140B6}.Release|Any CPU.ActiveCfg = Release|Any CPU

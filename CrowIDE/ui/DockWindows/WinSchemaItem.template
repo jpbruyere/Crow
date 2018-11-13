@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <Border BorderWidth="1" Foreground="Black" CornerRadius="10"
-				Background="Gray"
+				Background="Grey"
 				MouseEnter="./onBorderMouseEnter"
 				MouseLeave="./onBorderMouseLeave">
 	<VerticalStack Spacing="0">

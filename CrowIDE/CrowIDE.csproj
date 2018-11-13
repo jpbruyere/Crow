@@ -52,14 +52,17 @@
     <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Custom Command' ">
+    <StartAction>Program</StartAction>
+    <StartProgram>%24{TargetName}</StartProgram>
+    <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Drawing" />
-    <Reference Include="OpenTK">
-      <HintPath>$(SolutionDir)packages\OpenTK.2.0.0\lib\net20\OpenTK.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -74,24 +77,6 @@
     <Compile Include="src\Solution.cs" />
     <Compile Include="src\Project.cs" />
     <Compile Include="src\VerticalLine.cs" />
-    <Compile Include="..\Tests\OpenGL\Extensions.cs">
-      <Link>src\OpenGL\Extensions.cs</Link>
-    </Compile>
-    <Compile Include="..\Tests\OpenGL\Shader.cs">
-      <Link>src\OpenGL\Shader.cs</Link>
-    </Compile>
-    <Compile Include="..\Tests\OpenGL\Texture.cs">
-      <Link>src\OpenGL\Texture.cs</Link>
-    </Compile>
-    <Compile Include="..\Tests\OpenGL\vaoMesh.cs">
-      <Link>src\OpenGL\vaoMesh.cs</Link>
-    </Compile>
-    <Compile Include="..\Tests\CrowWindow.cs">
-      <Link>src\CrowWindow.cs</Link>
-    </Compile>
-    <Compile Include="..\Tests\InterfaceControler.cs">
-      <Link>src\InterfaceControler.cs</Link>
-    </Compile>
     <Compile Include="src\DesignInterface.cs" />
     <Compile Include="src\SolutionControler.cs" />
     <Compile Include="src\INetProject.cs" />

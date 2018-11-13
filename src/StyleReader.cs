@@ -182,19 +182,5 @@ namespace Crow
 				}
 			}
 		}
-
-//		public override int Read ()
-//		{			
-//			int tmp = base.Read ();
-//			char c = (char)tmp;
-//			if (c == '\n') {
-//				line++;
-//				column = 1;
-//			} else if (c == '\t')
-//				column += Interface.TabSize;
-//			else if (c != '\r')
-//				column++;
-//			return tmp;
-//		}
 	}
 }

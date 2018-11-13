@@ -43,7 +43,7 @@
 			<DockStack Name="mainDock"/>
 <!--			<DockWindow DataSource="{CurrentSolution}" Name="winEditor" Caption="Edit View" Width="70%" Height="80%">
 				<Template>
-					<Border BorderWidth="1" Foreground="DimGray" CornerRadius="{./CornerRadius}"
+					<Border BorderWidth="1" Foreground="DimGrey" CornerRadius="{./CornerRadius}"
 									Background="{./Background}"
 									MouseEnter="./onBorderMouseEnter"
 									MouseLeave="./onBorderMouseLeave">

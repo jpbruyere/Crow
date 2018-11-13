@@ -6,7 +6,7 @@
 				Path="{./Image}"
 				Visible="{./IsExpandable}"
 				SvgSub="{./IsExpanded}"
-				MouseEnter="{Background=LightGray}"
+				MouseEnter="{Background=LightGrey}"
 				MouseLeave="{Background=Transparent}"/>
 			<Image Style="TreeIcon"
 				Path="#Crow.Coding.icons.folder.svg" SvgSub="{./IsExpanded}"/>

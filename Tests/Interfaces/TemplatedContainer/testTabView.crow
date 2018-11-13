@@ -5,8 +5,8 @@
 		<Label Text="Selected Tab:"/>
 		<Label Text="{../../tabview1.SelectedTab}"/>
 	</HorizontalStack>
-	<TabView Name="tabview1" Background="DimGray" Orientation="Horizontal">
-		<TabItem Name="TabItem1" Caption="tab item 1" Background="DimGray">
+	<TabView Name="tabview1" Background="DimGrey" Orientation="Horizontal">
+		<TabItem Name="TabItem1" Caption="tab item 1" Background="DimGrey">
 			<VerticalStack Margin="20">
 				<CheckBox/>
 				<CheckBox/>
@@ -14,7 +14,7 @@
 				<CheckBox/>
 			</VerticalStack>
 		</TabItem>
-		<TabItem Name="TabItem2" Caption="tab item 2" Background="DimGray">
+		<TabItem Name="TabItem2" Caption="tab item 2" Background="DimGrey">
 			<VerticalStack Height="Fit" Margin="10">
 				<RadioButton Fit="true"/>
 				<RadioButton/>
@@ -22,16 +22,16 @@
 				<RadioButton/>
 			</VerticalStack>
 		</TabItem>
-		<TabItem Name="TabItem3" Background="DimGray" Caption="tab item 3">
+		<TabItem Name="TabItem3" Background="DimGrey" Caption="tab item 3">
 			<Container Margin="5" CornerRadius="2" >
 				<TextBox Margin="5" Multiline="true" TextAlignment="TopLeft"/>
 			</Container>
 		</TabItem>
-		<TabItem Name="TabItem4" Background="DimGray" Caption="tab item 4" Margin="0">
+		<TabItem Name="TabItem4" Background="DimGrey" Caption="tab item 4" Margin="0">
 			<TextBox/>
 		</TabItem>
 	</TabView>
-	<Button Background="vgradient|0:DimGray|1:Black" HorizontalAlignment="Right"
+	<Button Background="vgradient|0:DimGrey|1:Black" HorizontalAlignment="Right"
 		Caption="Add new tab" Width="Fit" Height="30" MouseDown="onAddTabButClick"/>
 </VerticalStack>
 </Group>

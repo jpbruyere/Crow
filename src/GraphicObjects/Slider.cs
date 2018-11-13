@@ -68,7 +68,7 @@ namespace Crow
 		protected double unity;
 
 		#region Public properties
-		[DefaultValue("vgradient|0:White|0,1:LightGray|0,9:LightGray|1:DimGray")]
+		[DefaultValue("vgradient|0:White|0,1:LightGrey|0,9:LightGrey|1:DimGrey")]
 		public virtual Fill CursorColor {
 			get { return _cursorColor; }
 			set {
@@ -121,6 +121,7 @@ namespace Crow
 		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
+
 			if (Maximum <= 0)
 				return;
 
@@ -141,6 +142,10 @@ namespace Crow
 				pEnd.X += 0.5;
 
 			}
+				
+			Background.SetAsSource (gr,r);
+			gr.Rectangle (r);
+			gr.Fill ();
 
 			DrawGraduations (gr, pStart,pEnd);
 
@@ -184,7 +189,7 @@ namespace Crow
 				cursor.TopLeft = new Point ((int)(p1.X - r.Width / 2),
 					r.Top + (int)((Value - Minimum) * unity));				
 			}
-			cursor.Inflate (-1);
+			//cursor.Inflate (-1);
         }
 		Point mouseDownInit;
 		double mouseDownInitValue;

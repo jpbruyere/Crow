@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
 	<VerticalStack>
-		<HorizontalStack Height="Fit" Margin="2" Background="DimGray" Spacing="5">
+		<HorizontalStack Height="Fit" Margin="2" Background="DimGrey" Spacing="5">
 			<HorizontalStack Width="Fit" Spacing="1">
 				<Label Text="Design Size:"/>
 				<TextBox Text="{²../../../editor.DesignWidth}" Width="40" TextAlignment="Right"/>
@@ -23,7 +23,7 @@
 		<VerticalStack Height="60%" Width="Stretched" Margin="0" MinimumSize="10,10">
 			<HorizontalStack>
 				<Scroller Name="scroller1" Margin="2" >
-					<ImlVisualEditor  Foreground="SkyBlue" Name="editor" Background="Gray"						
+					<ImlVisualEditor  Foreground="SkyBlue" Name="editor" Background="Grey"						
 						VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10"
 						Width="512" Height="512" ContextCommands="{/Commands}"
 						AllowDrop="true" AllowDrag="true" Focusable="true"

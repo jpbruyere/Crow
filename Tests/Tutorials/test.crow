@@ -1,3 +1,0 @@
-<Window Height="400" Width="50%" Caption="My first Window">
-	<Label Text="Hello World"/>
-</Window>

@@ -1,4 +1,4 @@
-﻿<Container Margin="20" Background="DimGray">
+﻿<Container Margin="20" Background="DimGrey">
 	<ImlVisualEditor Width="80%" Height="80%" Margin="0" MinimumSize="10,10" Foreground="SkyBlue"
-			Name="crowContainer" Background="DimGray"/>
+			Name="crowContainer" Background="DimGrey"/>
 </Container>

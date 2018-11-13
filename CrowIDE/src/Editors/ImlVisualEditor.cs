@@ -419,11 +419,8 @@ namespace Crow.Coding
 			}
 
 			lock (imlVE.RenderMutex) {
-				using (Cairo.Surface surf = new Cairo.ImageSurface (imlVE.bmp, Cairo.Format.Argb32,
-					imlVE.ClientRectangle.Width, imlVE.ClientRectangle.Height, imlVE.ClientRectangle.Width * 4)) {
-					gr.SetSourceSurface (surf, cb.Left, cb.Top);
-					gr.Paint ();
-				}
+				gr.SetSourceSurface (imlVE.surf, cb.Left, cb.Top);
+				gr.Paint ();
 				imlVE.IsDirty = false;
 			}
 			if (Error == null) {
@@ -557,7 +554,7 @@ namespace Crow.Coding
 
 			//				hr.Inflate (2);
 			//gr.SetDash (new double[]{ 1.0, 4.0 }, 0.0);
-			//gr.SetSourceColor (Color.Gray);
+			//gr.SetSourceColor (Color.Grey);
 //			gr.Rectangle (hr,coteStroke);
 //			gr.Stroke ();
 			gr.Operator = Operator.Over;			

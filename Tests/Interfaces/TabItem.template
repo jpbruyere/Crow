@@ -2,13 +2,13 @@
 <GenericStack Orientation="Vertical" Spacing="0"
 		Background="{./Background}"
 		MouseEnter="{/caption.Foreground=White}"
-		MouseLeave="{/caption.Foreground=Gray}">
+		MouseLeave="{/caption.Foreground=Grey}">
 	<HorizontalStack Left="{./TabOffset}"
 		Name="TabTitle"
 		HorizontalAlignment="Left"
 		Height="{./TabHeight}"
 		Width="{./TabWidth}">
-		<Label Name="caption" Text="{./Caption}" Foreground="Gray" Width="Stretched"/>
+		<Label Name="caption" Text="{./Caption}" Foreground="Grey" Width="Stretched"/>
 		<Label Text="{./ViewIndex}" Foreground="Green"/>
 		<Label Text="{./TabOffset}" Foreground="Red"/>
 		<Border CornerRadius="5" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
@@ -18,7 +18,7 @@
 		</Border>
 	</HorizontalStack>
 	<Container Margin="20">
-		<Container Background="DimGray" Name="Content"/>
+		<Container Background="DimGrey" Name="Content"/>
 	</Container>
 </GenericStack>
 

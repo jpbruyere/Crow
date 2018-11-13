@@ -2,13 +2,13 @@
 <GenericStack Orientation="Vertical" Spacing="0"
 		Background="{./Background}"
 		MouseEnter="{/caption.Foreground=White}"
-		MouseLeave="{/caption.Foreground=Gray}">
+		MouseLeave="{/caption.Foreground=Grey}">
 	<HorizontalStack Margin="2" Left="{./TabOffset}"
 		Name="TabTitle"
 		HorizontalAlignment="Left"
 		Height="{./TabHeight}"
 		Width="{./TabWidth}">
-		<Label Name="caption" Text="{./Caption}" Foreground="Gray"/>
+		<Label Name="caption" Text="{./Caption}" Foreground="Grey"/>
 		<Border CornerRadius="5" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
 					MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
 			<Image Focusable="true" Name="Image" Margin="0" Width="Stretched" Height="Stretched" Path="#Crow.Images.Icons.exit2.svg"

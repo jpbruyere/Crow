@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Window Caption="Crow IDE Options" Width="80%" Height="70%" Background="DimGray" Modal="true">
+<Window Caption="Crow IDE Options" Width="80%" Height="70%" Background="DimGrey" Modal="true">
 	<TabView>
 		<TabItem Caption="IML Visual Editor">
 			<VerticalStack Margin="10">

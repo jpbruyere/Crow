@@ -6,10 +6,10 @@
 		<CheckBox IsChecked="{²./IsPopped}" Caption="{./Caption}" Background="{./Background}" Foreground="{./Foreground}">
 			<Template>
 				<Border Name="border1"
-						MouseEnter="{Foreground=vgradient|0:White|0.2:Gray|0.9:Gray|1:Black}"
+						MouseEnter="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black}"
 						MouseLeave="{Foreground=Transparent}"
-						MouseDown="{Foreground=vgradient|0:Black|0.05:Gray|0.85:Gray|1:White}"
-						MouseUp="{Foreground=vgradient|0:White|0.2:Gray|0.9:Gray|1:Black}"
+						MouseDown="{Foreground=vgradient|0:Black|0.05:Grey|0.85:Grey|1:White}"
+						MouseUp="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black}"
 						MinimumSize = "40,0"
 						Foreground="Transparent"
 						Background="{./Background}">
@@ -23,7 +23,7 @@
 			</Template>
 		</CheckBox>
 	</Template>
-	<Border Foreground="DimGray" Width="{../PopWidth}" Height="{../PopHeight}" Background="Jet">
+	<Border Foreground="DimGrey" Width="{../PopWidth}" Height="{../PopHeight}" Background="Jet">
 		<VerticalStack Name="ItemsContainer"/>
 	</Border>
 </Popper>

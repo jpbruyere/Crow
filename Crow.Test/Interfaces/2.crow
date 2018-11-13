@@ -1,7 +1,0 @@
-﻿<?xml version="1.0"?>
-<VerticalStack Fit="true">
-	<HorizontalStack Fit="true">
-		<Label Text="label1"/>
-		<TextRun Text="textrun1"/>
-	</HorizontalStack>
-</VerticalStack>

@@ -12,7 +12,7 @@
 							Path="{./Image}"
 							Visible="{./IsExpandable}"
 							SvgSub="{./IsExpanded}"
-							MouseEnter="{Background=LightGray}"
+							MouseEnter="{Background=LightGrey}"
 							MouseLeave="{Background=Transparent}"/>
 						<Image Style="TreeIcon"
 							Path="#Crow.Icons.crowproj.svg"/>

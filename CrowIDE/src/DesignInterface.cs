@@ -59,6 +59,27 @@ namespace Crow.Coding
 
 		public ProjectFile ProjFile;
 
+
+		protected override void initX ()
+		{
+			surf = CrowIDE.MainIFace.surf.CreateSimilar (Cairo.Content.ColorAlpha, 100, 100);
+			//base.initX ();
+		}
+		public override void ProcessResize (Rectangle bounds)
+		{
+			lock (UpdateMutex) {
+				clientRectangle = bounds;
+				surf.Dispose ();
+				surf = CrowIDE.MainIFace.surf.CreateSimilar (Cairo.Content.ColorAlpha, clientRectangle.Width, clientRectangle.Height);
+
+
+				foreach (GraphicObject g in GraphicTree)
+					g.RegisterForLayouting (LayoutingType.All);
+
+				RegisterClip (clientRectangle);
+			}
+
+		}
 		public override GraphicObject Load (string path)
 		{
 			ProjectFile pi;

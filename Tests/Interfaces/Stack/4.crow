@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack>
-	<HorizontalStack Background="DimGray" Margin="10" Width="90%" Height="20%">
+	<HorizontalStack Background="DimGrey" Margin="10" Width="90%" Height="20%">
 		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="SeaGreen"/>
 		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="SeaGreen"/>
 		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="SeaGreen"/>
@@ -12,7 +12,7 @@
 		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="SeaGreen"/>
 		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="SeaGreen"/>
 	</HorizontalStack>
-	<HorizontalStack Background="DimGray" Margin="10" Width="Fit" Height="20%">
+	<HorizontalStack Background="DimGrey" Margin="10" Width="Fit" Height="20%">
 		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="SeaGreen"/>
 		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="SeaGreen"/>
 		<Label Font="droid bold, 20" Text="{fps}" Margin="5" Fit="true" Background="SeaGreen"/>

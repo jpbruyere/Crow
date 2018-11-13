@@ -25,8 +25,6 @@
 // THE SOFTWARE.
 
 using System;
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
 using Crow;
 using System.IO;
 using System.Collections.Generic;
@@ -37,43 +35,40 @@ using Crow.IML;
 
 namespace Tests
 {
-	class Showcase : CrowWindow
+	class Showcase : Interface
 	{
+		public Container crowContainer;
+
 		[STAThread]
 		static void Main ()
 		{
-			Showcase win = new Showcase ();
-			win.Run (30);
+			using (Showcase app = new Showcase ()) {
+				app.KeyboardKeyDown += App_KeyboardKeyDown;
+
+				GraphicObject g = app.AddWidget ("#Tests.ui.showcase.crow");
+				g.DataSource = app;
+				app.crowContainer = g.FindByName ("CrowContainer") as Container;
+				//I set an empty object as datasource at this level to force update when new
+				//widgets are added to the interface
+				app.crowContainer.DataSource = new object ();
+				app.hideError ();
+
+				while (true)
+					System.Threading.Thread.Sleep (10);
+
+			}
+		}
+
+		static void App_KeyboardKeyDown (object sender, KeyboardKeyEventArgs e)
+		{
+			
 		}
 
 		public Showcase ()
-			: base(1024, 800,"Showcase")
+			: base(1024, 800)
 		{
 		}
 
-		Container crowContainer;
-
-		protected override void OnLoad (EventArgs e)
-		{
-			base.OnLoad (e);
-
-			this.CrowKeyDown += Showcase_CrowKeyDown;
-			GraphicObject g = Load ("#Tests.ui.showcase.crow");
-			g.DataSource = this;
-			crowContainer = g.FindByName ("CrowContainer") as Container;
-			//I set an empty object as datasource at this level to force update when new
-			//widgets are added to the interface
-			crowContainer.DataSource = new object ();
-			hideError ();
-		}
-
-		void Showcase_CrowKeyDown (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
-		{
-			if (e.Key == OpenTK.Input.Key.Escape) {
-				Quit (null, null);
-				return;
-			}
-		}
 
 		void Dv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
 		{
@@ -83,9 +78,9 @@ namespace Tests
 			if (fi is DirectoryInfo)
 				return;
 			hideError();
-			lock (this.CurrentInterface.UpdateMutex) {
+			lock (UpdateMutex) {
 				try {
-					GraphicObject g = this.CurrentInterface.Load (fi.FullName);
+					GraphicObject g = Load (fi.FullName);
 					crowContainer.SetChild (g);
 					g.DataSource = this;
 				} catch (InstantiatorException ex) {
@@ -115,10 +110,10 @@ namespace Tests
 			hideError();
 			GraphicObject g = null;
 			try {
-				lock (this.ifaceControl [0].CrowInterface.UpdateMutex) {
+				lock (UpdateMutex) {
 					Instantiator inst = null;
 					using (MemoryStream ms = new MemoryStream (Encoding.UTF8.GetBytes (e.Text))){
-						inst = new Instantiator (this.ifaceControl [0].CrowInterface, ms);
+						inst = new Instantiator (this, ms);
 					}
 					g = inst.CreateInstance ();
 					crowContainer.SetChild (g);
@@ -129,10 +124,7 @@ namespace Tests
 				showError (ex);
 			}
 		}
-		public override void OnRender (FrameEventArgs e)
-		{
-			base.OnRender (e);
-		}
+
 
 		#region Test values for Binding
 		public int intValue = 500;

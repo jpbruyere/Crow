@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<VerticalStack Background="DimGray" Margin="10" Width="90%" Height="100%">
+<VerticalStack Background="DimGrey" Margin="10" Width="90%" Height="100%">
 	<GraphicObject Margin="10" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="10,10"/>
 	<GraphicObject Margin="10" Width="Stretched" Height="Stretched" Background="SeaGreen"
