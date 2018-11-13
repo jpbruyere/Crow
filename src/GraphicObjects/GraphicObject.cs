@@ -1411,7 +1411,7 @@ namespace Crow
 					(Parent as GraphicObject).ChildrenLayoutingConstraints (ref layoutType);
 
 //				//prevent queueing same LayoutingType for this
-//				layoutType &= (~RegisteredLayoutings);
+				layoutType &= (~RegisteredLayoutings);
 
 				if (layoutType == LayoutingType.None)
 					return;
@@ -1626,9 +1626,8 @@ namespace Crow
 			Debug.WriteLine (string.Format("RecreateCache -> {0}", this.ToString ()));
 			#endif
 			IsDirty = false;
-			if (bmp != null)
-				bmp.Dispose ();
-			bmp = new ImageSurface (Format.Argb32, Slot.Width, Slot.Height);
+			bmp?.Dispose ();
+			bmp = IFace.surf.CreateSimilar(Content.ColorAlpha, Slot.Width, Slot.Height);
 			using (Context gr = new Context (bmp)) {
 				gr.Antialias = Interface.Antialias;
 				onDraw (gr);
@@ -1701,13 +1700,13 @@ namespace Crow
 
         #region Keyboard handling
 		public virtual void onKeyDown(object sender, KeyboardKeyEventArgs e){
-			KeyDown.Raise (sender, e);
+			KeyDown.Raise (this, e);
 		}
 		public virtual void onKeyUp(object sender, KeyboardKeyEventArgs e){
-			KeyUp.Raise (sender, e);
+			KeyUp.Raise (this, e);
 		}
 		public virtual void onKeyPress(object sender, KeyPressEventArgs e){
-			KeyPress.Raise (sender, e);
+			KeyPress.Raise (this, e);
 		}
         #endregion
 
@@ -1719,7 +1718,9 @@ namespace Crow
 		/// <returns>return true, if point is in the bounds of this control</returns>
 		/// <param name="m">by ref point to test, init value is not kept</param>
 		public virtual bool PointIsIn(ref Point m)
-		{			
+		{
+			if (parent == null)
+				return false;
 			if (!(Visible & isEnabled)||IsDragged)
 				return false;
 			if (!parent.PointIsIn(ref m))

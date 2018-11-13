@@ -36,6 +36,9 @@ using System.Xml.Serialization;
 using Cairo;
 using System.Globalization;
 using Crow.IML;
+using System.Runtime.InteropServices;
+
+
 
 namespace Crow
 {
@@ -63,8 +66,22 @@ namespace Crow
 	/// The resulting surface (a byte array in the OpenTK renderer) is made available and protected with the
 	/// RenderMutex of the interface.
 	/// </remarks>
-	public class Interface : ILayoutable
+	public class Interface : ILayoutable, IDisposable ,IValueChange
 	{
+		#region IValueChange implementation
+		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+		public virtual void NotifyValueChanged(string MemberName, object _value)
+		{
+			//Debug.WriteLine ("Value changed: {0}->{1} = {2}", this, MemberName, _value);
+			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
+		}
+		#endregion
+
+		internal IntPtr xHandle, xwinHnd, xDefaultRootWin, xDefaultVisual;
+		internal UInt32 xDefaultDepth;
+		internal Int32 xScreen;
+		XLib.XErrorHandler errorHnd;
+
 		#region CTOR
 		static Interface(){
 			if (Type.GetType ("Mono.Runtime") == null) {
@@ -94,18 +111,159 @@ namespace Crow
 			FontRenderingOptions.HintStyle = HintStyle.Full;
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Rgb;
 		}
-		public Interface(){
-			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
+		public Interface(int width=800, int height=600){
+
+			clientRectangle = new Rectangle (0, 0, width, height);
+
+			Init ();
+
+			initX ();
+		}
+		private int HandleError (IntPtr display, ref XLib.XErrorEvent error_event)
+		{
+			/*if (ErrorExceptions)
+				throw new X11Exception (error_event.display, error_event.resourceid,
+					error_event.serial, error_event.error_code,
+					error_event.request_code, error_event.minor_code);
+			else
+				Console.WriteLine ("X11 Error encountered: {0}{1}\n",
+					X11Exception.GetMessage(error_event.display, error_event.resourceid,
+						error_event.serial, error_event.error_code,
+						error_event.request_code, error_event.minor_code),
+					WhereString());*/
+			Debug.WriteLine ("XERROR {0}", error_event.error_code);
+			return 0;
+		}
+		#endregion
+
+		void interfaceThread()
+		{			
+			while (true) {
+				Update ();
+
+				if (XLib.NativeMethods.XPending (xHandle) > 0) {
+					XLib.XEvent xevent = new XLib.XEvent ();
+					XLib.NativeMethods.XNextEvent (xHandle, ref xevent);
+
+					switch (xevent.type) {
+					case XLib.XEventName.Expose:
+						ProcessResize (new Rectangle (0, 0, xevent.ExposeEvent.width, xevent.ExposeEvent.height));
+						break;
+					case XLib.XEventName.KeyPress:
+						ProcessKeyDown (xevent.KeyEvent.keycode);
+						//Debug.WriteLine ("keypress: {0}", xevent.KeyEvent.keycode);
+						break;
+					case XLib.XEventName.KeyRelease:
+						ProcessKeyUp (xevent.KeyEvent.keycode);
+						//Debug.WriteLine ("keypress: {0}", xevent.KeyEvent.keycode);
+						break;
+					case XLib.XEventName.MotionNotify:
+						//Debug.WriteLine ("motion: ({0},{1})", xevent.MotionEvent.x, xevent.MotionEvent.y);
+						ProcessMouseMove (xevent.MotionEvent.x, xevent.MotionEvent.y);
+						break;
+					case XLib.XEventName.ButtonPress:
+						//Debug.WriteLine ("button press: {0}", xevent.ButtonEvent.button);
+						if (xevent.ButtonEvent.button == 4)
+							ProcessMouseWheelChanged (WheelIncrement);
+						else if(xevent.ButtonEvent.button == 5)
+							ProcessMouseWheelChanged (-WheelIncrement);
+						else
+							ProcessMouseButtonDown (xevent.ButtonEvent.button - 1);
+						break;
+					case XLib.XEventName.ButtonRelease:
+						//Debug.WriteLine ("button release: {0}", xevent.ButtonEvent.button);
+						ProcessMouseButtonUp (xevent.ButtonEvent.button - 1);
+						break;
+
+					}
+				}
+			}
+		}
+
+		#region IDisposable Support
+		private bool disposedValue = false; // To detect redundant calls
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposedValue)
+			{
+				if (disposing)
+				{
+					// TODO: dispose managed state (managed objects).
+				}
+
+				//Marshal.FreeHGlobal (lastEvent);
+				XLib.NativeMethods.XCloseDisplay (xHandle);
+
+				disposedValue = true;
+			}
+		}
+
+		// TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+		~Interface() {
+			// Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+			Dispose(false);
+		}
+
+		// This code added to correctly implement the disposable pattern.
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 		#endregion
 
 		public void Init () {
+			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
 			CurrentInterface = this;
-			loadCursors ();
+			//loadCursors ();
 			loadStyling ();
 			findAvailableTemplates ();
-			initTooltip ();
-			initContextMenus ();
+			//initTooltip ();
+			//initContextMenus ();
+
+			#if MEASURE_TIME
+			PerfMeasures.Add (updateMeasure);
+			PerfMeasures.Add (drawingMeasure);
+			PerfMeasures.Add (layoutingMeasure);
+			PerfMeasures.Add (clippingMeasure);
+			#endif
+		}
+
+		protected virtual void initX() {
+			XLib.NativeMethods.XInitThreads ();
+			xHandle = XLib.NativeMethods.XOpenDisplay(IntPtr.Zero);
+			if (xHandle == IntPtr.Zero)
+				throw new NotSupportedException("[XLib] Failed to open display.");
+
+			xScreen = XLib.NativeMethods.XDefaultScreen(xHandle);
+
+			xDefaultRootWin = XLib.NativeMethods.XDefaultRootWindow (xHandle);
+			xDefaultVisual = XLib.NativeMethods.XDefaultVisual (xHandle, xScreen);
+			xDefaultDepth = XLib.NativeMethods.XDefaultDepth (xHandle, xScreen);
+
+			xwinHnd = XLib.NativeMethods.XCreateSimpleWindow (xHandle, xDefaultRootWin,
+				0, 0, (uint)clientRectangle.Width, (uint)clientRectangle.Height, 0, IntPtr.Zero, IntPtr.Zero);
+			if (xwinHnd == IntPtr.Zero)
+				throw new NotSupportedException("[XLib] Failed to create window.");
+
+			XLib.NativeMethods.XSelectInput (xHandle, xwinHnd, XLib.EventMask.ExposureMask | 
+				XLib.EventMask.KeyPressMask	| XLib.EventMask.KeyReleaseMask | 
+				XLib.EventMask.PointerMotionMask | XLib.EventMask.ButtonPressMask | XLib.EventMask.ButtonReleaseMask);
+
+			XLib.NativeMethods.XMapWindow (xHandle, xwinHnd);
+
+			surf = new Cairo.XlibSurface (xHandle, xwinHnd, xDefaultVisual, clientRectangle.Width, clientRectangle.Height);
+
+			errorHnd = new XLib.XErrorHandler (HandleError);
+			XLib.NativeMethods.XSetErrorHandler (errorHnd);
+
+			Thread t = new Thread (interfaceThread);
+			t.IsBackground = true;
+			t.Start ();
+
 		}
 
 		#region Static and constants
@@ -125,6 +283,7 @@ namespace Crow
 		public static int DeviceRepeatDelay = 700;
 		/// <summary> Time interval in millisecond between device event repeat</summary>
 		public static int DeviceRepeatInterval = 40;
+		public static float WheelIncrement = 1;
 		/// <summary>Tabulation size in Text controls</summary>
 		public static int TabSize = 4;
 		public static string LineBreak = "\n";
@@ -178,6 +337,9 @@ namespace Crow
 		public event EventHandler<KeyboardKeyEventArgs> KeyboardKeyUp;
 		#endregion
 
+		/// <summary>Main Cairo surface</summary>
+		public Surface surf;
+
 		#region Public Fields
 		/// <summary>Graphic Tree of this interface</summary>
 		public List<GraphicObject> GraphicTree = new List<GraphicObject>();
@@ -229,13 +391,11 @@ namespace Crow
 
 		#region Private Fields
 		/// <summary>Client rectangle in the host context</summary>
-		Rectangle clientRectangle;
+		protected Rectangle clientRectangle;
 		/// <summary>Clipping rectangles on the root context</summary>
 		Region clipping = new Region();
 		/// <summary>Main Cairo context</summary>
 		Context ctx;
-		/// <summary>Main Cairo surface</summary>
-		Surface surf;
 		#endregion
 
 		#region Default values and Style loading
@@ -335,7 +495,7 @@ namespace Crow
 			if (path.StartsWith ("#")) {
 				string resId = path.Substring (1);
 				//try/catch added to prevent nunit error
-				try {
+				try {					
 					stream = System.Reflection.Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
 				} catch{}
 				if (stream == null)//try to find ressource in Crow assembly
@@ -644,80 +804,57 @@ namespace Crow
 			#endif
 			if (DragImage != null)
 				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
-			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
-				using (ctx = new Context (surf)){
-					if (!clipping.IsEmpty) {
+			//using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
+			using (ctx = new Context (surf)){
+				if (!clipping.IsEmpty) {
+					IsDirty = true;
 
-						for (int i = 0; i < clipping.NumRectangles; i++)
-							ctx.Rectangle(clipping.GetRectangle(i));
-						
-						ctx.ClipPreserve();
-						ctx.Operator = Operator.Clear;
-						ctx.Fill();
-						ctx.Operator = Operator.Over;
+					for (int i = 0; i < clipping.NumRectangles; i++)
+						ctx.Rectangle(clipping.GetRectangle(i));
+					
+					ctx.ClipPreserve();
+					ctx.Operator = Operator.Clear;
+					ctx.Fill();
+					ctx.Operator = Operator.Over;
 
-						for (int i = GraphicTree.Count -1; i >= 0 ; i--){
-							GraphicObject p = GraphicTree[i];
-							if (!p.Visible)
-								continue;
-							if (clipping.Contains (p.Slot) == RegionOverlap.Out)
-								continue;
+					for (int i = GraphicTree.Count -1; i >= 0 ; i--){
+						GraphicObject p = GraphicTree[i];
+						if (!p.Visible)
+							continue;
+						if (clipping.Contains (p.Slot) == RegionOverlap.Out)
+							continue;
 
-							ctx.Save ();
-							p.Paint (ref ctx);
-							ctx.Restore ();
-						}
-
-						if (DragAndDropOperation != null) {
-							if (DragImage != null) {
-								DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
-								DragImageX = Mouse.X - DragImageWidth / 2;
-								DragImageY = Mouse.Y - DragImageHeight / 2;
-								ctx.Save ();
-								ctx.ResetClip ();
-								ctx.SetSourceSurface (DragImage, DragImageX, DragImageY);
-								ctx.PaintWithAlpha (0.8);
-								ctx.Restore ();
-								DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
-								IsDirty = true;
-								//Console.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
-							}
-						}
-
-						#if DEBUG_CLIP_RECTANGLE
-						clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
-						#endif
-						lock (RenderMutex) {
-//							Array.Copy (bmp, dirtyBmp, bmp.Length);
-
-							if (IsDirty)
-								DirtyRect += clipping.Extents;
-							else
-								DirtyRect = clipping.Extents;
-							IsDirty = true;
-
-							DirtyRect.Left = Math.Max (0, DirtyRect.Left);
-							DirtyRect.Top = Math.Max (0, DirtyRect.Top);
-							DirtyRect.Width = Math.Min (ClientRectangle.Width - DirtyRect.Left, DirtyRect.Width);
-							DirtyRect.Height = Math.Min (ClientRectangle.Height - DirtyRect.Top, DirtyRect.Height);
-							DirtyRect.Width = Math.Max (0, DirtyRect.Width);
-							DirtyRect.Height = Math.Max (0, DirtyRect.Height);
-
-							if (DirtyRect.Width > 0 && DirtyRect.Height >0) {
-								dirtyBmp = new byte[4 * DirtyRect.Width * DirtyRect.Height];
-								for (int y = 0; y < DirtyRect.Height; y++) {
-									Array.Copy (bmp,
-										((DirtyRect.Top + y) * ClientRectangle.Width * 4) + DirtyRect.Left * 4,
-										dirtyBmp, y * DirtyRect.Width * 4, DirtyRect.Width * 4);
-								}
-
-							} else
-								IsDirty = false;
-						}
-						clipping.Dispose ();
-						clipping = new Region ();
+						ctx.Save ();
+						p.Paint (ref ctx);
+						ctx.Restore ();
 					}
+
+					if (DragAndDropOperation != null) {
+						if (DragImage != null) {
+							DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
+							DragImageX = Mouse.X - DragImageWidth / 2;
+							DragImageY = Mouse.Y - DragImageHeight / 2;
+							ctx.Save ();
+							ctx.ResetClip ();
+							ctx.SetSourceSurface (DragImage, DragImageX, DragImageY);
+							ctx.PaintWithAlpha (0.8);
+							ctx.Restore ();
+							DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
+							IsDirty = true;
+							//Console.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
+						}
+					}
+
+					#if DEBUG_CLIP_RECTANGLE
+					clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
+					#endif
+
+					clipping.Dispose ();
+					clipping = new Region ();
+					//}
 					//surf.WriteToPng (@"/mnt/data/test.png");
+
+					//XLib.NativeMethods.XSync (xHandle, 0);
 				}
 			}
 			#if MEASURE_TIME
@@ -728,7 +865,7 @@ namespace Crow
 
 		#region GraphicTree handling
 		/// <summary>Add widget to the Graphic tree of this interface and register it for layouting</summary>
-		public void AddWidget(GraphicObject g)
+		public GraphicObject AddWidget(GraphicObject g)
 		{
 			g.Parent = this;
 			int ptr = 0;
@@ -749,6 +886,8 @@ namespace Crow
 
 			g.RegisteredLayoutings = LayoutingType.None;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
+
+			return g;
 		}
 		/// <summary>Set visible state of widget to false and delete if from the graphic tree</summary>
 		public void DeleteWidget(GraphicObject g)
@@ -837,13 +976,14 @@ namespace Crow
 		/// when window resize event occurs. 
 		/// </summary>
 		/// <param name="bounds">bounding box of the interface</param>
-		public void ProcessResize(Rectangle bounds){
+		public virtual void ProcessResize(Rectangle bounds){
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
-				int stride = 4 * ClientRectangle.Width;
-				int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
-				bmp = new byte[bmpSize];
-				dirtyBmp = new byte[bmpSize];
+
+				/*surf.Dispose ();
+				surf = new Cairo.XlibSurface (xHandle, xwinHnd, xDefaultVisual, clientRectangle.Width, clientRectangle.Height);*/
+				(surf as XlibSurface).SetSize (clientRectangle.Width, clientRectangle.Height);
+
 
 				foreach (GraphicObject g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
@@ -1051,6 +1191,7 @@ namespace Crow
 			lastKeyDownEvt.IsRepeat = true;
 			_focusedWidget.onKeyDown (this, e);
 
+			KeyboardKeyDown.Raise (this, e);
 //			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
 //			keyboardRepeatThread.IsBackground = true;
 //			keyboardRepeatThread.Start ();
@@ -1069,6 +1210,8 @@ namespace Crow
 			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
 
 			_focusedWidget.onKeyUp (this, e);
+
+			KeyboardKeyUp.Raise (this, e);
 
 //			if (keyboardRepeatThread != null) {
 //				keyboardRepeatOn = false;
@@ -1246,10 +1389,11 @@ namespace Crow
 		#endregion
 
 		#if MEASURE_TIME
-		public PerformanceMeasure clippingMeasure = new PerformanceMeasure("Clipping", 100);
-		public PerformanceMeasure layoutingMeasure = new PerformanceMeasure("Layouting", 100);
-		public PerformanceMeasure updateMeasure = new PerformanceMeasure("Update", 100);
-		public PerformanceMeasure drawingMeasure = new PerformanceMeasure("Drawing", 100);
+		public PerformanceMeasure clippingMeasure = new PerformanceMeasure("Clipping", 1);
+		public PerformanceMeasure layoutingMeasure = new PerformanceMeasure("Layouting", 1);
+		public PerformanceMeasure updateMeasure = new PerformanceMeasure("Update", 1);
+		public PerformanceMeasure drawingMeasure = new PerformanceMeasure("Drawing", 1);
+		public List<PerformanceMeasure> PerfMeasures = new List<PerformanceMeasure>();
 		#endif
 		#if DEBUG_LAYOUTING
 		public List<LQIList> LQIsTries = new List<LQIList>();

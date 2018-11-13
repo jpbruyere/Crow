@@ -202,7 +202,7 @@ namespace Crow
 				double max = Math.Max (R, Math.Max (G, B));	//Max. value of RGB
 				double diff = max - min;							//Delta RGB value
 
-				if ( diff == 0 )//This is a gray, no chroma...
+				if ( diff == 0 )//This is a grey, no chroma...
 					return 0;
 
 				double h = 0.0, s = diff / max;
@@ -302,7 +302,6 @@ namespace Crow
 		public static readonly Color DarkBlue = new Color(0,0,139,"DarkBlue","#00008B");
 		public static readonly Color DarkCyan = new Color(0,139,139,"DarkCyan","#008B8B");
 		public static readonly Color DarkGoldenRod = new Color(184,134,11,"DarkGoldenRod","#B8860B");
-		public static readonly Color DarkGray = new Color(169,169,169,"DarkGray","#A9A9A9");
 		public static readonly Color DarkGrey = new Color(169,169,169,"DarkGrey","#A9A9A9");
 		public static readonly Color DarkGreen = new Color(0,100,0,"DarkGreen","#006400");
 		public static readonly Color DarkKhaki = new Color(189,183,107,"DarkKhaki","#BDB76B");
@@ -314,13 +313,11 @@ namespace Crow
 		public static readonly Color DarkSalmon = new Color(233,150,122,"DarkSalmon","#E9967A");
 		public static readonly Color DarkSeaGreen = new Color(143,188,143,"DarkSeaGreen","#8FBC8F");
 		public static readonly Color DarkSlateBlue = new Color(72,61,139,"DarkSlateBlue","#483D8B");
-		public static readonly Color DarkSlateGray = new Color(47,79,79,"DarkSlateGray","#2F4F4F");
 		public static readonly Color DarkSlateGrey = new Color(47,79,79,"DarkSlateGrey","#2F4F4F");
 		public static readonly Color DarkTurquoise = new Color(0,206,209,"DarkTurquoise","#00CED1");
 		public static readonly Color DarkViolet = new Color(148,0,211,"DarkViolet","#9400D3");
 		public static readonly Color DeepPink = new Color(255,20,147,"DeepPink","#FF1493");
 		public static readonly Color DeepSkyBlue = new Color(0,191,255,"DeepSkyBlue","#00BFFF");
-		public static readonly Color DimGray = new Color(105,105,105,"DimGray","#696969");
 		public static readonly Color DimGrey = new Color(105,105,105,"DimGrey","#696969");
 		public static readonly Color DodgerBlue = new Color(30,144,255,"DodgerBlue","#1E90FF");
 		public static readonly Color FireBrick = new Color(178,34,34,"FireBrick","#B22222");
@@ -331,7 +328,6 @@ namespace Crow
 		public static readonly Color GhostWhite = new Color(248,248,255,"GhostWhite","#F8F8FF");
 		public static readonly Color Gold = new Color(255,215,0,"Gold","#FFD700");
 		public static readonly Color GoldenRod = new Color(218,165,32,"GoldenRod","#DAA520");
-		public static readonly Color Gray = new Color(128,128,128,"Gray","#808080");
 		public static readonly Color Grey = new Color(128,128,128,"Grey","#808080");
 		public static readonly Color Green = new Color(0,128,0,"Green","#008000");
 		public static readonly Color GreenYellow = new Color(173,255,47,"GreenYellow","#ADFF2F");
@@ -350,14 +346,12 @@ namespace Crow
 		public static readonly Color LightCoral = new Color(240,128,128,"LightCoral","#F08080");
 		public static readonly Color LightCyan = new Color(224,255,255,"LightCyan","#E0FFFF");
 		public static readonly Color LightGoldenRodYellow = new Color(250,250,210,"LightGoldenRodYellow","#FAFAD2");
-		public static readonly Color LightGray = new Color(211,211,211,"LightGray","#D3D3D3");
 		public static readonly Color LightGrey = new Color(211,211,211,"LightGrey","#D3D3D3");
 		public static readonly Color LightGreen = new Color(144,238,144,"LightGreen","#90EE90");
 		public static readonly Color LightPink = new Color(255,182,193,"LightPink","#FFB6C1");
 		public static readonly Color LightSalmon = new Color(255,160,122,"LightSalmon","#FFA07A");
 		public static readonly Color LightSeaGreen = new Color(32,178,170,"LightSeaGreen","#20B2AA");
 		public static readonly Color LightSkyBlue = new Color(135,206,250,"LightSkyBlue","#87CEFA");
-		public static readonly Color LightSlateGray = new Color(119,136,153,"LightSlateGray","#778899");
 		public static readonly Color LightSlateGrey = new Color(119,136,153,"LightSlateGrey","#778899");
 		public static readonly Color LightSteelBlue = new Color(176,196,222,"LightSteelBlue","#B0C4DE");
 		public static readonly Color LightYellow = new Color(255,255,224,"LightYellow","#FFFFE0");
@@ -412,7 +406,6 @@ namespace Crow
 		public static readonly Color Silver = new Color(192,192,192,"Silver","#C0C0C0");
 		public static readonly Color SkyBlue = new Color(135,206,235,"SkyBlue","#87CEEB");
 		public static readonly Color SlateBlue = new Color(106,90,205,"SlateBlue","#6A5ACD");
-		public static readonly Color SlateGray = new Color(112,128,144,"SlateGray","#708090");
 		public static readonly Color SlateGrey = new Color(112,128,144,"SlateGrey","#708090");
 		public static readonly Color Snow = new Color(255,250,250,"Snow","#FFFAFA");
 		public static readonly Color SpringGreen = new Color(0,255,127,"SpringGreen","#00FF7F");

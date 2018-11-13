@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Window Focusable="true" Caption="Measures" Width="30%" Height="Fit" MinimumSize="100,100">
+<Window Focusable="true" Caption="Measures" Width="30%" Height="300" MinimumSize="100,100">
 	<ListBox Data="{PerfMeasures}"
 		ItemTemplate="#Tests.Interfaces.perfMsr.crow"/>
 </Window>

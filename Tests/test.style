@@ -3,7 +3,7 @@
 	Font = "droid, 10";
 	Margin = "0";
 	TextAlignment = "Center";
-	Background = "DimGray";
+	Background = "DimGrey";
 }
 FpsDisp {
 	Font = "droid bold, 10";

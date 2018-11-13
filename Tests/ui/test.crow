@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <Window Font="droid bold, 10" Caption="Open GL" HorizontalAlignment="Left" Width="30%" Height="90%">
 	<VerticalStack>
-		<HorizontalStack Background="DimGray" Height="Fit" Width="Stretched"  Margin="2">
+		<HorizontalStack Background="DimGrey" Height="Fit" Width="Stretched"  Margin="2">
 			<Popper Caption="File" Template="#Tests.ui.Popper.template" Width="Fit">
-				<Border Fit="True" Foreground="Gray" Background="DimGray">
+				<Border Fit="True" Foreground="Grey" Background="DimGrey">
 					<VerticalStack Height="Fit" Width="Fit" Margin="2">
 						<Label Text="New File" Style="#Tests.ui.MenuItem.style" />
 						<Label Text="Open..." Style="#Tests.ui.MenuItem.style"/>

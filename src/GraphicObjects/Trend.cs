@@ -60,7 +60,7 @@ namespace Crow
 				AddValue (value);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(100)]
+		[XmlAttributeAttribute()][DefaultValue(400)]
 		public virtual int NbValues {
 			get { return nbValues; }
 			set {
@@ -97,7 +97,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(20.0)]
+		[XmlAttributeAttribute()][DefaultValue(1.0)]
 		public virtual double LowThreshold {
 			get { return lowThreshold; }
 			set {

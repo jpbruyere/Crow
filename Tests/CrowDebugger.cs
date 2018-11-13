@@ -1,8 +1,8 @@
-//
-// HelloWorld.cs
+﻿//
+// CrowDebugger.cs
 //
 // Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
+//       Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // Copyright (c) 2013-2017 Jean-Philippe Bruyère
 //
@@ -23,30 +23,15 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-
 using System;
-using Crow;
 
-namespace Tutorials
+namespace Tests
 {
-	class T1_HelloWorld : CrowWindow
+	public class CrowDebugger
 	{
-		public T1_HelloWorld ()
-			: base(800, 600,"Hello World")
+		public CrowDebugger ()
 		{
-		}
-
-		protected override void OnLoad (EventArgs e)
-		{
-			base.OnLoad (e);
-			AddWidget (new Label (CurrentInterface) { Text = "Hello World" });
-		}
-
-		[STAThread]
-		static void Main ()
-		{
-			T1_HelloWorld win = new T1_HelloWorld ();
-			win.Run (30);
 		}
 	}
 }
+

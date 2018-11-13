@@ -1,4 +1,4 @@
-﻿<Border Foreground="Transparent" MouseEnter="{Foreground=Gray}" MouseLeave="{Foreground=Transparent}">
+﻿<Border Foreground="Transparent" MouseEnter="{Foreground=Grey}" MouseLeave="{Foreground=Transparent}">
 	<Label Font="{./Font}" Text="{./Caption}"
 		Margin="1"
 		Background="{./Background}"

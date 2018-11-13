@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <Border Name="Content"
-	Background="vgradient|0:White|0.1:LightGray|0.9:LightGray|1:Black" Foreground="DarkGray" 
+	Background="vgradient|0:White|0.1:LightGrey|0.9:LightGrey|1:Black" Foreground="DarkGrey" 
 	MouseEnter="{Foreground=White}"
-	MouseLeave="{Foreground=DarkGray}"
-	MouseDown="{Background=vgradient|0:Black|0.1:LightGray|0.9:LightGray|1:White}"
-	MouseUp="{Background=vgradient|0:White|0.1:LightGray|0.9:LightGray|1:Black}"
+	MouseLeave="{Foreground=DarkGrey}"
+	MouseDown="{Background=vgradient|0:Black|0.1:LightGrey|0.9:LightGrey|1:White}"
+	MouseUp="{Background=vgradient|0:White|0.1:LightGrey|0.9:LightGrey|1:Black}"
 	>
 </Border>

@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack Height="Fit" Width="Fit">
 	<Label Width="Stretched"/>
-	<Expandable  Width="Fit" Background="Gray">
+	<Expandable  Width="Fit" Background="Grey">
 		<Expandable Background="LightBlue">
 			<Expandable Background="Green">
 				<Expandable Background="LimeGreen">
-					<Expandable Background="DimGray">
+					<Expandable Background="DimGrey">
 						<Expandable Width="Stretched" Background="Yellow">
 							<Expandable Background="SeaGreen">
 								<Expandable Width="Stretched" Background="Blue">

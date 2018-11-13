@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Border BorderWidth="1" Foreground="White" CornerRadius="{./CornerRadius}"
+<Border BorderWidth="1" Foreground="Grey" CornerRadius="{./CornerRadius}"
 				Background="{./Background}"
 				MouseEnter="./onBorderMouseEnter"
 				MouseLeave="./onBorderMouseLeave">

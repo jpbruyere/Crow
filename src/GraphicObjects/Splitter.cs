@@ -141,7 +141,7 @@ namespace Crow
 		{
 			base.onMouseMove (sender, e);
 
-			if (!IsActive)
+			if (!IsActive || go1 == null || go2 == null)
 				return;
 
 			GenericStack gs = Parent as GenericStack;
