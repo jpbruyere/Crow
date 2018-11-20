@@ -28,6 +28,8 @@ namespace XLib
 		[DllImportAttribute("X11")]
 		public static extern IntPtr XFreePixmap(IntPtr disp, IntPtr pixmap);
 		[DllImportAttribute("X11")]
+		public static extern IntPtr XFree(IntPtr data);
+		[DllImportAttribute("X11")]
 		public static extern Int32 XSelectInput(IntPtr disp, IntPtr win, EventMask eventMask);
 		[DllImportAttribute("X11")]
 		public static extern Int32 XMapWindow(IntPtr disp, IntPtr win);
@@ -41,6 +43,16 @@ namespace XLib
 		public static extern int XConnectionNumber(IntPtr disp);
 		[DllImportAttribute("X11")]
 		public static extern IntPtr XSetErrorHandler(XErrorHandler error_handler);
+
+		[DllImport ("libX11")]
+		public static extern void XDisplayKeycodes (IntPtr disp, out int min, out int max);
+		[DllImport ("libX11")]
+		public static extern IntPtr XGetKeyboardMapping (IntPtr disp, byte first_keycode, int keycode_count, 
+			out int keysyms_per_keycode_return);
+		[DllImport ("libX11")]
+		unsafe public extern static byte* XGetModifierMapping (IntPtr disp);
+		[DllImport ("libX11")]
+		public static extern uint XKeycodeToKeysym (IntPtr display, int keycode, int index);
 		#endregion
 
 

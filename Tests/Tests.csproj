@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>Tests.Showcase</StartupObject>
+    <StartupObject>tests.MainClass</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ReleaseVersion>0.5</ReleaseVersion>
@@ -102,7 +102,7 @@
     <Compile Include="GraphicObjects\HexaContainer.cs" />
     <Compile Include="GraphicObjects\TechBorder.cs" />
     <Compile Include="testCairoXLib.cs" />
-    <Compile Include="CrowDebugger.cs" />
+    <Compile Include="keysyms.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">

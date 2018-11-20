@@ -23,11 +23,11 @@ namespace tests
 				//app.AddWidget ("Interfaces/Divers/perfMeasures.crow").DataSource = app;
 
 				while (true) {
-					#if MEASURE_TIME
+					/*#if MEASURE_TIME
 					foreach (PerformanceMeasure m in app.PerfMeasures)
 						m.NotifyChanges ();	
-					#endif
-					Thread.Sleep(10);
+					#endif*/
+					//Thread.Sleep(10);
 				}
 			}
 			/*using (Display disp = new Display())
@@ -50,8 +50,12 @@ namespace tests
 
 		static void App_KeyboardKeyDown (object sender, KeyboardKeyEventArgs e)
 		{
-			GraphicObject obj = sender as GraphicObject;
-			obj.IFace.AddWidget(@"Interfaces/Divers/0.crow");
+			Console.WriteLine((byte)e.Key);
+			switch (e.Key) {
+			case Key.Keypad1:
+				DebugLog.save (sender as Interface);
+				break;
+			}
 		}
 	}
 }

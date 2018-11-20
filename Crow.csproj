@@ -32,7 +32,7 @@
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <Optimize>false</Optimize>
     <OutputPath>$(SolutionDir)build\Debug</OutputPath>
-    <DefineConstants>XLIB_BACKEND0;DESIGN_MODE;DEBUG_UPDATE0;DEBUG_FOCUS0;DEBUG_DISPOSE0;DEBUG_LAYOUTING0;TRACE0;DEBUG;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
+    <DefineConstants>DEBUG_LOG;XLIB_BACKEND0;DESIGN_MODE;DEBUG_UPDATE0;DEBUG_FOCUS0;DEBUG_DISPOSE0;TRACE0;DEBUG;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
     <EnvironmentVariables>
       <EnvironmentVariables>
         <Variable name="MONO_CAIRO_DEBUG_DISPOSE" value="1" />
@@ -231,6 +231,8 @@
     <Compile Include="src\XLib\NativeMethods.cs" />
     <Compile Include="src\XLib\Window.cs" />
     <Compile Include="src\XLib\X11Structs.cs" />
+    <Compile Include="src\XLib\XKeySym.cs" />
+    <Compile Include="src\debug\DebugLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -261,6 +263,7 @@
     <Folder Include="src\IML\" />
     <Folder Include="Icons\" />
     <Folder Include="src\XLib\" />
+    <Folder Include="src\debug\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\Icons\updown.svg" />
