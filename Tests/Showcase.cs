@@ -61,7 +61,11 @@ namespace Tests
 
 		static void App_KeyboardKeyDown (object sender, KeyboardKeyEventArgs e)
 		{
-			
+			switch (e.Key) {
+			case Key.Keypad1:
+				DebugLog.save (sender as Interface);
+				break;
+			}
 		}
 
 		public Showcase ()

@@ -50,7 +50,10 @@ namespace Crow
 	public class GraphicObject : ILayoutable, IValueChange, IDisposable
 	{
 		internal ReaderWriterLockSlim parentRWLock = new ReaderWriterLockSlim();
-
+		#if DEBUG_LOG
+		public int yIndex;//absolute index in the graphic tree for debug draw
+		public int xLevel;//x increment for debug draw
+		#endif
 		#if DESIGN_MODE
 		static MethodInfo miDesignAddDefLoc = typeof(GraphicObject).GetMethod("design_add_style_location",
 			BindingFlags.Instance | BindingFlags.NonPublic);
@@ -188,8 +191,9 @@ namespace Crow
 		}  
 		#endregion
 
-		internal static ulong currentUid = 0;
-		internal ulong uid = 0;
+		#if DEBUG_LOG
+		internal static List<GraphicObject> GraphicObjects = new List<GraphicObject>();
+		#endif
 
 		internal bool isPopup = false;
 		public GraphicObject focusParent {
@@ -234,9 +238,9 @@ namespace Crow
 		/// </summary>
 		protected GraphicObject () {
 			Clipping = new Region ();
-			#if DEBUG
-			uid = currentUid;
-			currentUid++;
+			#if DEBUG_LOG
+			GraphicObjects.Add (this);
+			DebugLog.AddEvent(DbgEvtType.GOClassCreation, this);
 			#endif			
 		}
 		/// <summary>
@@ -261,7 +265,6 @@ namespace Crow
 		/// </summary>
 		public virtual void Initialize(){
 			loadDefaultValues ();
-			//initialized = true;
 		}
 		#region private fields
 		LayoutingType registeredLayoutings = LayoutingType.All;
@@ -504,7 +507,7 @@ namespace Crow
 		}
 		#if DEBUG
 		[XmlIgnore]public string TreePath {
-			get { return this.GetType().Name + uid.ToString ();	}
+			get { return this.GetType().Name + GraphicObjects.IndexOf(this).ToString ();	}
 		}
 		#endif
 		/// <summary>
@@ -516,7 +519,7 @@ namespace Crow
 		public virtual string Name {
 			get {
 				#if DEBUG
-				return string.IsNullOrEmpty(name) ? this.GetType().Name + uid.ToString () : name;
+				return string.IsNullOrEmpty(name) ? this.GetType().Name + GraphicObjects.IndexOf(this).ToString () : name;
 				#else
 				return name;
 				#endif
@@ -975,6 +978,10 @@ namespace Crow
 
 		public virtual void OnDataSourceChanged(object sender, DataSourceChangeEventArgs e){
 			DataSourceChanged.Raise (this, e);
+			#if DEBUG_LOG
+			DebugLog.AddEvent(DbgEvtType.GONewDataSource, this);
+			#endif
+
 			#if DEBUG_BINDING
 			Debug.WriteLine("New DataSource for => {0} \n\t{1}=>{2}", this.ToString(),e.OldDataSource,e.NewDataSource);
 			#endif
@@ -1189,6 +1196,9 @@ namespace Crow
 			onInitialized (this, null);
 		}
 		protected virtual void onInitialized (object sender, EventArgs e){
+			#if DEBUG_LOG
+			DebugLog.AddEvent(DbgEvtType.GOInitialized, this);
+			#endif
 			Initialized.Raise(sender, e);
 		}
 		bool getDefaultEvent(EventInfo ei, List<Style> styling,
@@ -1323,9 +1333,9 @@ namespace Crow
 		/// Register old and new slot for clipping
 		/// </summary>
 		public virtual void ClippingRegistration(){
-			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("ClippingRegistration -> {0}", this.ToString ()));
-			#endif
+			#if DEBUG_LOG
+			DebugLog.AddEvent(DbgEvtType.GOClippingRegistration, this);
+			#endif	
 			parentRWLock.EnterReadLock ();
 			if (parent != null) {					
 				Parent.RegisterClip (LastPaintedSlot);
@@ -1338,9 +1348,9 @@ namespace Crow
 		/// </summary>
 		/// <param name="clip">Clip rectangle</param>
 		public virtual void RegisterClip(Rectangle clip){
-			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("RegisterClip -> {1}:{0}", clip, this.ToString ()));
-			#endif
+			#if DEBUG_LOG
+			DebugLog.AddEvent(DbgEvtType.GORegisterClip, this);
+			#endif	
 			Rectangle  r = clip + ClientRectangle.Position;
 			if (CacheEnabled && !IsDirty)
 				Clipping.UnionRectangle (r);
@@ -1355,9 +1365,6 @@ namespace Crow
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForGraphicUpdate ()
 		{
-			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("RegisterForGraphicUpdate (IsDirty set)-> {0}", this.ToString ()));
-			#endif
 			IsDirty = true;
 			if (Width.IsFit || Height.IsFit)
 				RegisterForLayouting (LayoutingType.Sizing);
@@ -1368,9 +1375,6 @@ namespace Crow
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForRedraw ()
 		{
-			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("RegisterForRedraw (IsDirty set)-> {0}", this.ToString ()));
-			#endif
 			IsDirty = true;
 			if (RegisteredLayoutings == LayoutingType.None)
 				IFace.EnqueueForRepaint (this);
@@ -1453,9 +1457,6 @@ namespace Crow
 		/// met and LQI has to be re-queued</returns>
 		public virtual bool UpdateLayout (LayoutingType layoutType)
 		{
-			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("UpdateLayout ({1})-> {0}", this.ToString (), layoutType));
-			#endif
 			//unset bit, it would be reset if LQI is re-queued
 			registeredLayoutings &= (~layoutType);
 
@@ -1606,8 +1607,8 @@ namespace Crow
 		/// <summary> This is the common overridable drawing routine to create new widget </summary>
 		protected virtual void onDraw(Context gr)
 		{
-			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("OnDraw -> {0}", this.ToString ()));
+			#if DEBUG_LOG
+			DebugLog.AddEvent(DbgEvtType.GODraw, this);
 			#endif
 
 			Rectangle rBack = new Rectangle (Slot.Size);
@@ -1622,8 +1623,8 @@ namespace Crow
 		/// this trigger the effective drawing routine </summary>
 		protected virtual void RecreateCache ()
 		{
-			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("RecreateCache -> {0}", this.ToString ()));
+			#if DEBUG_LOG
+			DebugLog.AddEvent(DbgEvtType.GORecreateCache, this);
 			#endif
 			IsDirty = false;
 			bmp?.Dispose ();
@@ -1635,8 +1636,8 @@ namespace Crow
 			bmp.Flush ();
 		}
 		protected virtual void UpdateCache(Context ctx){
-			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("UpdateCache -> {0}", this.ToString ()));
+			#if DEBUG_LOG
+			DebugLog.AddEvent(DbgEvtType.GOUpdateCacheAndPaintOnCTX, this);
 			#endif
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 			if (clearBackground) {
@@ -1655,8 +1656,8 @@ namespace Crow
 		/// of the widget </summary>
 		public virtual void Paint (ref Context ctx)
 		{
-			#if DEBUG_UPDATE
-			Debug.WriteLine (string.Format("Paint -> {0}", this.ToString ()));
+			#if DEBUG_LOG
+			DebugLog.AddEvent(DbgEvtType.GOPaint, this);
 			#endif
 			//TODO:this test should not be necessary
 			if (Slot.Height < 0 || Slot.Width < 0 || parent == null)
@@ -1932,7 +1933,7 @@ namespace Crow
 			if (Parent != null)
 				tmp = Parent.ToString () + tmp;
 			#if DEBUG_LAYOUTING
-			return Name == "unamed" ? tmp + "." + this.GetType ().Name + uid.ToString(): tmp + "." + Name;
+			return Name == "unamed" ? tmp + "." + this.GetType ().Name + GraphicObjects.IndexOf(this).ToString(): tmp + "." + Name;
 			#else
 			return Name == "unamed" ? tmp + "." + this.GetType ().Name : tmp + "." + Name;
 			#endif
