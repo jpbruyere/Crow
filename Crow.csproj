@@ -227,12 +227,12 @@
     <Compile Include="src\ParsingException.cs" />
     <Compile Include="src\IMLAttributes.cs" />
     <Compile Include="src\GraphicObjects\DockStack.cs" />
-    <Compile Include="src\XLib\Display.cs" />
-    <Compile Include="src\XLib\NativeMethods.cs" />
-    <Compile Include="src\XLib\Window.cs" />
-    <Compile Include="src\XLib\X11Structs.cs" />
-    <Compile Include="src\XLib\XKeySym.cs" />
     <Compile Include="src\debug\DebugLogger.cs" />
+    <Compile Include="src\IBackend.cs" />
+    <Compile Include="src\backends\X11Structs.cs" />
+    <Compile Include="src\backends\XKeySym.cs" />
+    <Compile Include="src\backends\XLibBackend.cs" />
+    <Compile Include="src\backends\XCBBackend.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -262,8 +262,8 @@
     <Folder Include="src\rsvg\" />
     <Folder Include="src\IML\" />
     <Folder Include="Icons\" />
-    <Folder Include="src\XLib\" />
     <Folder Include="src\debug\" />
+    <Folder Include="src\backends\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\Icons\updown.svg" />

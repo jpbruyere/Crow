@@ -55,7 +55,7 @@ namespace Crow
 		}
 		#endif
 		protected GraphicObject child;
-		#if DEBUG_LAYOUTING
+		#if DEBUG_LOG
 		internal GraphicObject getTemplateRoot {
 			get { return child; }
 		}

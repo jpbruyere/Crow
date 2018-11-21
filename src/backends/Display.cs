@@ -11,11 +11,11 @@ namespace XLib
 
         public Display()
         {
-            handle = NativeMethods.XOpenDisplay(IntPtr.Zero);
+            handle = XOpenDisplay(IntPtr.Zero);
             if (handle == IntPtr.Zero)
                 throw new NotSupportedException("[XLib] Failed to open display.");
 
-            screen = NativeMethods.XDefaultScreen(handle);
+            screen = XDefaultScreen(handle);
             lastEvent = Marshal.AllocHGlobal(96);
         }
 

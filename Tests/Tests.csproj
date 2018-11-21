@@ -101,7 +101,6 @@
     <Compile Include="GraphicObjects\SimpleGauge.cs" />
     <Compile Include="GraphicObjects\HexaContainer.cs" />
     <Compile Include="GraphicObjects\TechBorder.cs" />
-    <Compile Include="testCairoXLib.cs" />
     <Compile Include="keysyms.cs" />
   </ItemGroup>
   <ItemGroup>
