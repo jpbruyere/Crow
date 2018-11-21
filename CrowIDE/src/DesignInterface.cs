@@ -60,7 +60,7 @@ namespace Crow.Coding
 		public ProjectFile ProjFile;
 
 
-		protected override void initX ()
+		protected override void InitBackend ()
 		{
 			surf = CrowIDE.MainIFace.surf.CreateSimilar (Cairo.Content.ColorAlpha, 100, 100);
 			//base.initX ();

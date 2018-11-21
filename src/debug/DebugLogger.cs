@@ -99,7 +99,7 @@ namespace Crow
 
 			if (type.HasFlag (DbgEvtType.GraphicObject)) {
 			}
-
+			return null;
 		}
 	}
 	public static class DebugLog

@@ -77,10 +77,7 @@ namespace Crow
 		}
 		#endregion
 
-		internal IntPtr xDisp, xwinHnd, xDefaultRootWin, xDefaultVisual;
-		internal UInt32 xDefaultDepth;
-		internal Int32 xScreen;
-		XLib.XErrorHandler errorHnd;
+		internal IBackend backend;
 
 		#region CTOR
 		static Interface(){
@@ -118,78 +115,25 @@ namespace Crow
 
 			Init ();
 
-			initX ();
-		}
-		private int HandleError (IntPtr display, ref XLib.XErrorEvent error_event)
-		{
-			/*if (ErrorExceptions)
-				throw new X11Exception (error_event.display, error_event.resourceid,
-					error_event.serial, error_event.error_code,
-					error_event.request_code, error_event.minor_code);
-			else
-				Console.WriteLine ("X11 Error encountered: {0}{1}\n",
-					X11Exception.GetMessage(error_event.display, error_event.resourceid,
-						error_event.serial, error_event.error_code,
-						error_event.request_code, error_event.minor_code),
-					WhereString());*/
-			Debug.WriteLine ("XERROR {0}", error_event.error_code);
-			return 0;
+			InitBackend ();
 		}
 		#endregion
+
+		protected virtual void InitBackend () {
+			backend = new Crow.XCB.XCBBackend ();
+			backend.Init (this);
+
+			Thread t = new Thread (interfaceThread);
+			t.IsBackground = true;
+			t.Start ();
+		}
 
 		void interfaceThread()
 		{			
 			while (true) {
 				Update ();
 
-				if (XLib.NativeMethods.XPending (xDisp) > 0) {
-					XLib.XEvent xevent = new XLib.XEvent ();
-					XLib.NativeMethods.XNextEvent (xDisp, ref xevent);
-
-					switch (xevent.type) {
-					case XLib.XEventName.Expose:
-						ProcessResize (new Rectangle (0, 0, xevent.ExposeEvent.width, xevent.ExposeEvent.height));
-						break;
-					case XLib.XEventName.KeyPress:
-						ProcessKeyDown (xevent.KeyEvent.keycode);
-
-						/*int min_keycode, max_keycode, keysyms_per_keycode;
-						XLib.NativeMethods.XDisplayKeycodes (xDisp, out min_keycode, out max_keycode);
-
-						IntPtr ksp = XLib.NativeMethods.XGetKeyboardMapping (xDisp, (byte)min_keycode,
-							             max_keycode + 1 - min_keycode, out keysyms_per_keycode);
-						XLib.NativeMethods.XFree (ksp);*/
-
-						uint keySym;
-						keySym = XLib.NativeMethods.XKeycodeToKeysym (xDisp, xevent.KeyEvent.keycode, 0);
-						char c = (char)keySym;
-
-						Debug.WriteLine ("keycode:{0}; keysym:{1}; char:{2}", xevent.KeyEvent.keycode, keySym, c);
-						break;
-					case XLib.XEventName.KeyRelease:
-						ProcessKeyUp (xevent.KeyEvent.keycode);
-						//Debug.WriteLine ("keypress: {0}", xevent.KeyEvent.keycode);
-						break;
-					case XLib.XEventName.MotionNotify:
-						//Debug.WriteLine ("motion: ({0},{1})", xevent.MotionEvent.x, xevent.MotionEvent.y);
-						ProcessMouseMove (xevent.MotionEvent.x, xevent.MotionEvent.y);
-						break;
-					case XLib.XEventName.ButtonPress:
-						//Debug.WriteLine ("button press: {0}", xevent.ButtonEvent.button);
-						if (xevent.ButtonEvent.button == 4)
-							ProcessMouseWheelChanged (WheelIncrement);
-						else if(xevent.ButtonEvent.button == 5)
-							ProcessMouseWheelChanged (-WheelIncrement);
-						else
-							ProcessMouseButtonDown (xevent.ButtonEvent.button - 1);
-						break;
-					case XLib.XEventName.ButtonRelease:
-						//Debug.WriteLine ("button release: {0}", xevent.ButtonEvent.button);
-						ProcessMouseButtonUp (xevent.ButtonEvent.button - 1);
-						break;
-
-					}
-				}
+				backend.ProcessEvents ();
 			}
 		}
 
@@ -205,8 +149,8 @@ namespace Crow
 					// TODO: dispose managed state (managed objects).
 				}
 
-				//Marshal.FreeHGlobal (lastEvent);
-				XLib.NativeMethods.XCloseDisplay (xDisp);
+				backend.CleanUp ();
+
 
 				disposedValue = true;
 			}
@@ -242,60 +186,6 @@ namespace Crow
 			PerfMeasures.Add (layoutingMeasure);
 			PerfMeasures.Add (clippingMeasure);
 			#endif
-		}
-
-		protected virtual void initX() {
-			XLib.NativeMethods.XInitThreads ();
-			xDisp = XLib.NativeMethods.XOpenDisplay(IntPtr.Zero);
-			if (xDisp == IntPtr.Zero)
-				throw new NotSupportedException("[XLib] Failed to open display.");
-
-			xScreen = XLib.NativeMethods.XDefaultScreen(xDisp);
-
-			xDefaultRootWin = XLib.NativeMethods.XDefaultRootWindow (xDisp);
-			xDefaultVisual = XLib.NativeMethods.XDefaultVisual (xDisp, xScreen);
-			xDefaultDepth = XLib.NativeMethods.XDefaultDepth (xDisp, xScreen);
-
-			xwinHnd = XLib.NativeMethods.XCreateSimpleWindow (xDisp, xDefaultRootWin,
-				0, 0, (uint)clientRectangle.Width, (uint)clientRectangle.Height, 0, IntPtr.Zero, IntPtr.Zero);
-			if (xwinHnd == IntPtr.Zero)
-				throw new NotSupportedException("[XLib] Failed to create window.");
-
-			XLib.NativeMethods.XSelectInput (xDisp, xwinHnd, XLib.EventMask.ExposureMask | 
-				XLib.EventMask.KeyPressMask	| XLib.EventMask.KeyReleaseMask | 
-				XLib.EventMask.PointerMotionMask | XLib.EventMask.ButtonPressMask | XLib.EventMask.ButtonReleaseMask);
-
-			XLib.NativeMethods.XMapWindow (xDisp, xwinHnd);
-
-			surf = new Cairo.XlibSurface (xDisp, xwinHnd, xDefaultVisual, clientRectangle.Width, clientRectangle.Height);
-
-			errorHnd = new XLib.XErrorHandler (HandleError);
-			XLib.NativeMethods.XSetErrorHandler (errorHnd);
-
-			int min_keycode, max_keycode, keysyms_per_keycode;
-
-			XLib.NativeMethods.XDisplayKeycodes (xDisp, out min_keycode, out max_keycode);
-			IntPtr ksp = XLib.NativeMethods.XGetKeyboardMapping (xDisp, (byte) min_keycode,
-				max_keycode + 1 - min_keycode, out keysyms_per_keycode);
-			XLib.NativeMethods.XFree (ksp);
-
-			unsafe {
-				byte* modmap_unmanaged = XLib.NativeMethods.XGetModifierMapping (xDisp);
-				int nummodmap = 0;
-				int* ptr = (int*)modmap_unmanaged;
-				nummodmap = ptr [0];
-				
-				for (int i = 0; i< nummodmap; i++) {
-					Console.WriteLine(modmap_unmanaged[i+4]);
-				}
-				XLib.NativeMethods.XFree ((IntPtr)modmap_unmanaged);
-			}
-
-
-			Thread t = new Thread (interfaceThread);
-			t.IsBackground = true;
-			t.Start ();
-
 		}
 
 		#region Static and constants
@@ -886,7 +776,7 @@ namespace Crow
 					//}
 					//surf.WriteToPng (@"/mnt/data/test.png");
 
-					//XLib.NativeMethods.XSync (xHandle, 0);
+					backend?.Flush ();
 				}
 			}
 			#if MEASURE_TIME
@@ -1216,7 +1106,7 @@ namespace Crow
 		/// <returns>return true, if interface handled the event, false otherwise.</returns>
 		/// <param name="button">Button index</param>
 		public bool ProcessKeyDown(int Key){
-			Keyboard.SetKeyState((Crow.Key)Key,true);
+			//Keyboard.SetKeyState((Crow.Key)Key,true);
 			KeyboardKeyEventArgs e = lastKeyDownEvt = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
 			lastKeyDownEvt.IsRepeat = true;
 
@@ -1238,7 +1128,7 @@ namespace Crow
 		/// <returns>return true, if interface handled the event, false otherwise.</returns>
 		/// <param name="button">Button index</param>
 		public bool ProcessKeyUp(int Key){
-			Keyboard.SetKeyState((Crow.Key)Key,false);
+			//Keyboard.SetKeyState((Crow.Key)Key,false);
 			if (_focusedWidget == null)
 				return false;
 			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);

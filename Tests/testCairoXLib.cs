@@ -12,7 +12,7 @@ namespace testsCairoXLib
 		static internal IntPtr xHandle, xwinHnd;
 		static internal Int32 xScreen;
 		static IntPtr xLastEvent;
-		static XLib.XErrorHandler errorHnd;
+		static XErrorHandler errorHnd;
 
 		static Pollfd[] pollfds;
 

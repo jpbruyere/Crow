@@ -16,9 +16,9 @@ namespace tests
 
 				app.KeyboardKeyDown += App_KeyboardKeyDown;
 
-				//app.AddWidget (@"Interfaces/Divers/0.crow").DataSource = app;
+				app.AddWidget (@"Interfaces/Divers/0.crow").DataSource = app;
 				//app.AddWidget (@"Interfaces/Splitter/1.crow").DataSource = app;
-				app.AddWidget (@"Interfaces/Container/0.crow").DataSource = app;
+				//app.AddWidget (@"Interfaces/Container/0.crow").DataSource = app;
 				//app.AddWidget (@"Interfaces/Divers/colorPicker.crow").DataSource = app;
 				//app.AddWidget ("Interfaces/Divers/perfMeasures.crow").DataSource = app;
 

@@ -35,7 +35,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 /// X11 Version
-namespace XLib {
+namespace Crow.XLIB {
 	//
 	// In the structures below, fields of type long are mapped to IntPtr.
 	// This will work on all platforms where sizeof(long)==sizeof(void*), which
