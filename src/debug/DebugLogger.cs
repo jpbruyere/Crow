@@ -27,7 +27,6 @@ using System;
 using Cairo;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
 #if DEBUG_LOG
@@ -47,28 +46,41 @@ namespace Crow
 		IFaceEndClipping				= 0x0104,
 		IFaceStartDrawing				= 0x0105,
 		IFaceEndDrawing					= 0x0106,
+		IFaceUpdate						= 0x0107,
 		//10 nth bit set for graphic obj
 		GraphicObject					= 0x0200,
 		GOClassCreation					= 0x0201,
-		GOInitialized					= 0x0202,
+		GOInitialization					= 0x0202,
 		GOClippingRegistration			= 0x0203,
 		GORegisterClip					= 0x0204,
 		GORegisterForGraphicUpdate		= 0x0205,
 		GOEnqueueForRepaint				= 0x0206,
-		GORegisterLayouting				= 0x0207,
-		GOProcessLayoutingWithNoParent	= 0x0208,
-		GOProcessLayouting				= 0x0209,
+		GOLayouting						= 0x0400,
+		GORegisterLayouting				= 0x0607,
+		GOProcessLayoutingWithNoParent	= 0x0608,
+		GOProcessLayouting				= 0x0609,
 		GODraw							= 0x020a,
 		GORecreateCache					= 0x020b,
 		GOUpdateCacheAndPaintOnCTX		= 0x020c,
 		GOPaint							= 0x020d,
 		GONewDataSource					= 0x020e,
 	}
+	public class DbgData {
+		public int obj;
+		public LayoutingType layout;
+		public LayoutingQueueItem.Result result;
+
+		public DbgData (int _obj) {
+			obj = _obj;
+		}
+	}
 	public class DbgEvent {
 		public long begin, end;
 		public DbgEvtType type;
 		public object data = null;
 
+		public DbgEvent() {}
+			
 		public DbgEvent(long timeStamp, DbgEvtType evt, object _data = null) {			
 			data = _data;
 			type = evt;
@@ -79,13 +91,13 @@ namespace Crow
 		{
 			GraphicObject go = data as GraphicObject;
 			if (go != null)
-				return string.Format ("{0};{1};{2}", begin, type, GraphicObject.GraphicObjects.IndexOf(go).ToString());
+				return string.Format ("{0};{1};{2};{3}", begin, end, type, GraphicObject.GraphicObjects.IndexOf(go).ToString());
 			if (!(data is LayoutingQueueItem))
-				return string.Format ("{0};{1}", begin, type);
+				return string.Format ("{0};{1};{2}", begin, end, type);
 			LayoutingQueueItem lqi = (LayoutingQueueItem)data;
 			if (type == DbgEvtType.GOProcessLayouting)
-				return string.Format ("{0};{1};{2};{3};{4};{5}", begin, type, GraphicObject.GraphicObjects.IndexOf(lqi.graphicObject).ToString(), lqi.LayoutType.ToString(), lqi.result.ToString(), end);			
-			return string.Format ("{0};{1};{2};{3}", begin, type, GraphicObject.GraphicObjects.IndexOf(lqi.graphicObject).ToString(), lqi.LayoutType.ToString());
+				return string.Format ("{0};{1};{2};{3};{4};{5}", begin, end, type, GraphicObject.GraphicObjects.IndexOf(lqi.graphicObject).ToString(), lqi.LayoutType.ToString(), lqi.result.ToString());			
+			return string.Format ("{0};{1};{2};{3};{4}", begin, end, type, GraphicObject.GraphicObjects.IndexOf(lqi.graphicObject).ToString(), lqi.LayoutType.ToString());
 			
 		}
 
@@ -94,13 +106,42 @@ namespace Crow
 				return null;
 			string[] tmp = str.Trim().Split(';');
 
-			long timeStamp = long.Parse (tmp [0]);
-			DbgEvtType type = (DbgEvtType)Enum.Parse (typeof(DbgEvtType), tmp [1]);
 
-			if (type.HasFlag (DbgEvtType.GraphicObject)) {
+			DbgEvent evt = new DbgEvent ();
+			evt.begin = long.Parse (tmp [0]);
+			evt.end = long.Parse (tmp [1]);
+			evt.type = (DbgEvtType)Enum.Parse (typeof(DbgEvtType), tmp [2]);
+
+			if (evt.type.HasFlag (DbgEvtType.GraphicObject)) {
+				DbgData data = new DbgData (int.Parse (tmp [3]));
+				if (evt.type.HasFlag (DbgEvtType.GOLayouting)) {
+					data.layout = (LayoutingType)Enum.Parse (typeof(LayoutingType), tmp [4]);
+					if (evt.type == DbgEvtType.GOProcessLayouting)
+						data.result = (LayoutingQueueItem.Result)Enum.Parse (typeof(LayoutingQueueItem.Result), tmp [5]);										
+				}
+				evt.data = data;
 			}
-			return null;
+			return evt;
 		}
+	}
+	public class DbgGo {
+		public int index;
+		public string name;
+		public int yIndex;
+		public int xLevel;
+
+		public static DbgGo Parse (string str) {
+			DbgGo g = new DbgGo ();
+			if (str == null)
+				return null;
+			string[] tmp = str.Trim().Split(';');
+			g.index = int.Parse (tmp [0]);
+			g.name = tmp [1];
+			g.yIndex = int.Parse (tmp [2]);
+			g.xLevel = int.Parse (tmp [3]);
+			return g;
+		}
+
 	}
 	public static class DebugLog
 	{
@@ -121,24 +162,6 @@ namespace Crow
 			DbgEvent evt = new DbgEvent(chrono.ElapsedTicks, evtType, data);
 			events.Add (evt);
 			return evt;
-		}
-
-		static DebugLog ()
-		{
-			surf = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height);
-			ctx = new Context (surf);
-
-			ctx.Antialias = Antialias.Subpixel;
-			ctx.FontOptions = Interface.FontRenderingOptions;
-			ctx.Antialias = Interface.Antialias;
-
-			ctx.Rectangle (bounds);
-			ctx.SetSourceColor (Crow.Color.WhiteSmoke);
-			ctx.Fill ();
-
-			ctx.SelectFontFace ("mono", FontSlant.Normal, FontWeight.Normal);
-			ctx.SetFontSize (8.0);
-			ySpacing = ctx.FontExtents.Height;
 		}
 
 		static int y, level;
@@ -170,19 +193,18 @@ namespace Crow
 			foreach (GraphicObject go in iface.GraphicTree) 
 				parseTree (go);			
 
-			using (StreamWriter s = new StreamWriter("debug.bin")){
+			using (StreamWriter s = new StreamWriter("debug.log")){
 				s.WriteLine ("[GraphicObjects]");
 				for (int i=0; i<GraphicObject.GraphicObjects.Count; i++) {
 					GraphicObject g = GraphicObject.GraphicObjects [i];
 					s.WriteLine ("{0};{1};{2};{3}", i, g.GetType().Name, g.yIndex, g.xLevel);	
 				}
 				s.WriteLine ("[Events]");
-				foreach (DbgEvent e in events) {
-					s.WriteLine (e.ToString ());	
-				}
 
+				foreach (DbgEvent e in events)
+					s.WriteLine (e.ToString ());
 			}
-
+			/*
 			List<GraphicObject> drawn = new List<GraphicObject> ();
 
 
@@ -213,27 +235,12 @@ namespace Crow
 
 				//penX = xPenStart + xResolution * lqi.begin;
 				//ctx.Rectangle (penX, penY, Math.Max(1.0, (lqi.end - lqi.begin) * xResolution), ySpacing);
-				switch (lqi.result) {
-				case LayoutingQueueItem.Result.Success:
-					ctx.SetSourceColor (Crow.Color.Green);
-					break;
-				case LayoutingQueueItem.Result.Deleted:
-					ctx.SetSourceColor (Crow.Color.Red);
-					break;
-				case LayoutingQueueItem.Result.Discarded:
-					ctx.SetSourceColor (Crow.Color.DarkOrange);
-					break;
-				case LayoutingQueueItem.Result.Requeued:
-					ctx.SetSourceColor (Crow.Color.GreenYellow);
-					break;
-				case LayoutingQueueItem.Result.Register:
-					ctx.SetSourceColor (Crow.Color.Blue);
-					break;
-				}
+
 
 				ctx.Fill ();
 			}
 			surf.WriteToPng ("debug.png");
+			*/
 		}
 	}
 }

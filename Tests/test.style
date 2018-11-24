@@ -32,3 +32,9 @@ labPerfVal{
 	Font = "droid, 8";
 	Width = "50%";
 }
+DbgLogViewer{
+	Background = "WhiteSmoke";
+	Font = "mono, 8";
+	Foreground = "Jet";
+	Focusable = "true";
+}

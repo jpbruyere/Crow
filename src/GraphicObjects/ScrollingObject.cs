@@ -149,13 +149,13 @@ namespace Crow
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
 		{
 			base.onMouseWheel (sender, e);
-			if (IFace.Keyboard.IsKeyDown (Key.ShiftLeft))
+			if (IFace.Keyboard.Shift)
 				ScrollX += e.Delta * MouseWheelSpeed;
 			else
 				ScrollY -= e.Delta * MouseWheelSpeed;
 		}
 		/// <summary> Process scrolling with arrow keys, home and end keys. </summary>
-		public override void onKeyDown (object sender, KeyboardKeyEventArgs e)
+		public override void onKeyDown (object sender, KeyEventArgs e)
 		{
 			base.onKeyDown (sender, e);
 

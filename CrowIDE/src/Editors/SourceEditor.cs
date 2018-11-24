@@ -1002,7 +1002,7 @@ namespace Crow.Coding
 		#endregion
 
 		#region Keyboard handling
-		public override void onKeyDown (object sender, KeyboardKeyEventArgs e)
+		public override void onKeyDown (object sender, KeyEventArgs e)
 		{
 			//base.onKeyDown (sender, e);
 

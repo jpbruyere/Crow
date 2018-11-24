@@ -1,11 +1,10 @@
-#region License
-//
-// HatPosition.cs
+﻿//
+// IKeyboard.cs
 //
 // Author:
-//       Stefanos A. <stapostol@gmail.com>
+//       Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Copyright (c) 2006-2014 Stefanos Apostolopoulos
+// Copyright (c) 2013-2017 Jean-Philippe Bruyère
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,40 +23,25 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-//
-#endregion
-
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Crow
 {
-    /// <summary>
-    /// Enumerates modifier keys.
-    /// </summary>
-    [Flags]
-    public enum KeyModifiers : byte
-    {
-	None = 0,
-	/// <summary>
-	/// The alt key modifier (option on Mac).
-	/// </summary>
-	Alt = 1 << 0,
+	public interface IKeyboard
+	{
+		event EventHandler<KeyEventArgs> KeyDown;
+		event EventHandler<KeyEventArgs> KeyUp;
+		event EventHandler<KeyPressEventArgs> KeyPress;
 
-	/// <summary>
-	/// The control key modifier.
-	/// </summary>
-	Control = 1 << 1,
 
-	/// <summary>
-	/// The shift key modifier.
-	/// </summary>
-	Shift = 1 << 2,
+		void HandleEvent (uint Keycode, bool pressed);
 
-	/// <summary>
-	/// The shift key modifier.
-	/// </summary>
-	AltGr = 1 << 3
-    }
+		bool IsDown (Key key);
+		bool Shift { get; }
+		bool Ctrl { get; }
+		bool Alt { get; }
+
+		void Destroy ();
+	}
 }
+

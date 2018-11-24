@@ -883,7 +883,7 @@ namespace Crow.Coding
 		}
 
 
-		public override void onKeyDown (object sender, KeyboardKeyEventArgs e)
+		public override void onKeyDown (object sender, KeyEventArgs e)
 		{
 		
 			switch (e.Key) {

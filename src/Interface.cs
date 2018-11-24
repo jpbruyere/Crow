@@ -121,11 +121,46 @@ namespace Crow
 
 		protected virtual void InitBackend () {
 			backend = new Crow.XCB.XCBBackend ();
+			//backend = new Crow.XLib.XLibBackend ();
 			backend.Init (this);
+
+			Keyboard.KeyDown += Keyboard_KeyDown;
+			Keyboard.KeyUp += Keyboard_KeyUp;
+			Keyboard.KeyPress += Keyboard_KeyPress;
 
 			Thread t = new Thread (interfaceThread);
 			t.IsBackground = true;
 			t.Start ();
+		}
+
+		void Keyboard_KeyPress (object sender, KeyPressEventArgs e)
+		{
+			if (_focusedWidget != null)
+				_focusedWidget.onKeyPress (this, e);
+		}
+
+		void Keyboard_KeyUp (object sender, KeyEventArgs e)
+		{
+			if (_focusedWidget != null)
+				_focusedWidget.onKeyUp (this, e);
+//			if (keyboardRepeatThread != null) {
+//				keyboardRepeatOn = false;
+//				keyboardRepeatThread.Abort();
+//				keyboardRepeatThread.Join ();
+//			}
+		}
+		void Keyboard_KeyDown (object sender, KeyEventArgs e)
+		{
+			//Keyboard.SetKeyState((Crow.Key)Key,true);
+			lastKeyDownEvt = e;
+			lastKeyDownEvt.IsRepeat = true;
+
+			if (_focusedWidget != null)
+				_focusedWidget.onKeyDown (this, e);
+
+			//			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
+			//			keyboardRepeatThread.IsBackground = true;
+			//			keyboardRepeatThread.Start ();
 		}
 
 		void interfaceThread()
@@ -255,8 +290,8 @@ namespace Crow
 		public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
 		public event EventHandler<MouseButtonEventArgs> MouseClick;
 		public event EventHandler<MouseMoveEventArgs> MouseMove;
-		public event EventHandler<KeyboardKeyEventArgs> KeyboardKeyDown;
-		public event EventHandler<KeyboardKeyEventArgs> KeyboardKeyUp;
+		/*public event EventHandler<KeyEventArgs> KeyboardKeyDown;
+		public event EventHandler<KeyEventArgs> KeyboardKeyUp;*/
 		#endregion
 
 		/// <summary>Main Cairo surface</summary>
@@ -648,16 +683,11 @@ namespace Crow
 			updateMeasure.StartCycle();
 			#endif
 
-			processLayouting ();
+			/*#if DEBUG_LOG
+			DebugLog.AddEvent (DbgEvtType.IFaceUpdate);
+			#endif*/
 
-			#if DEBUG_LAYOUTING
-			if (curLQIsTries.Count > 0){
-				LQIsTries.Add(curLQIsTries);
-				curLQIsTries = new LQIList();
-				LQIs.Add(curLQIs);
-				curLQIs = new LQIList();
-			}
-			#endif
+			processLayouting ();
 
 			clippingRegistration ();
 
@@ -676,24 +706,25 @@ namespace Crow
 			#if MEASURE_TIME
 			layoutingMeasure.StartCycle();
 			#endif
-
 			if (Monitor.TryEnter (LayoutMutex)) {
+				#if DEBUG_LOG
+				if (LayoutingQueue.Count > 0)
+					DebugLog.AddEvent (DbgEvtType.IFaceStartLayouting);
+				#endif
 				DiscardQueue = new Queue<LayoutingQueueItem> ();
 				//Debug.WriteLine ("======= Layouting queue start =======");
 				LayoutingQueueItem lqi;
 				while (LayoutingQueue.Count > 0) {
 					lqi = LayoutingQueue.Dequeue ();
-					#if DEBUG_LAYOUTING
-					currentLQI = lqi;
-					curLQIsTries.Add(currentLQI);
-					#endif
 					lqi.ProcessLayouting ();
 				}
 				LayoutingQueue = DiscardQueue;
 				Monitor.Exit (LayoutMutex);
 				DiscardQueue = null;
 			}
-
+			/*#if DEBUG_LOG
+			DebugLog.AddEvent (DbgEvtType.IFaceStartLayouting);
+			#endif*/
 			#if MEASURE_TIME
 			layoutingMeasure.StopCycle();
 			#endif
@@ -705,6 +736,10 @@ namespace Crow
 			#if MEASURE_TIME
 			clippingMeasure.StartCycle();
 			#endif
+			#if DEBUG_LOG
+			if (ClippingQueue.Count > 0)
+				DebugLog.AddEvent (DbgEvtType.IFaceStartClipping);
+			#endif
 			GraphicObject g = null;
 			while (ClippingQueue.Count > 0) {
 				lock (ClippingMutex) {
@@ -713,7 +748,9 @@ namespace Crow
 				}
 				g.ClippingRegistration ();
 			}
-
+			/*#if DEBUG_LOG
+			DebugLog.AddEvent (DbgEvtType.IFaceEndClipping);
+			#endif*/
 			#if MEASURE_TIME
 			clippingMeasure.StopCycle();
 			#endif
@@ -723,6 +760,10 @@ namespace Crow
 		void processDrawing(){
 			#if MEASURE_TIME
 			drawingMeasure.StartCycle();
+			#endif
+			#if DEBUG_LOG
+			if (!clipping.IsEmpty)
+				DebugLog.AddEvent (DbgEvtType.IFaceStartDrawing);
 			#endif
 			if (DragImage != null)
 				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
@@ -775,10 +816,13 @@ namespace Crow
 					clipping = new Region ();
 					//}
 					//surf.WriteToPng (@"/mnt/data/test.png");
-
+					surf.Flush();
 					backend?.Flush ();
 				}
 			}
+			/*#if DEBUG_LOG
+			DebugLog.AddEvent (DbgEvtType.IFaceEndDrawing);
+			#endif*/
 			#if MEASURE_TIME
 			drawingMeasure.StopCycle();
 			#endif
@@ -904,7 +948,10 @@ namespace Crow
 
 				/*surf.Dispose ();
 				surf = new Cairo.XlibSurface (xHandle, xwinHnd, xDefaultVisual, clientRectangle.Width, clientRectangle.Height);*/
-				(surf as XlibSurface).SetSize (clientRectangle.Width, clientRectangle.Height);
+				if (surf is XlibSurface)
+					(surf as XlibSurface).SetSize (clientRectangle.Width, clientRectangle.Height);
+				else if (surf is XcbSurface)
+					(surf as XcbSurface).SetSize (clientRectangle.Width, clientRectangle.Height);
 
 
 				foreach (GraphicObject g in GraphicTree)
@@ -918,7 +965,7 @@ namespace Crow
 		XCursor cursor = XCursor.Default;
 
 		public MouseState Mouse;
-		public KeyboardState Keyboard;
+		public IKeyboard Keyboard;
 
 		public XCursor MouseCursor {
 			set {
@@ -1100,61 +1147,9 @@ namespace Crow
 			HoverWidget.onMouseWheel (this, e);
 			return true;
 		}
-		/// <summary>
-		/// Forward key down event from the host to the crow interface
-		/// </summary>
-		/// <returns>return true, if interface handled the event, false otherwise.</returns>
-		/// <param name="button">Button index</param>
-		public bool ProcessKeyDown(int Key){
-			//Keyboard.SetKeyState((Crow.Key)Key,true);
-			KeyboardKeyEventArgs e = lastKeyDownEvt = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
-			lastKeyDownEvt.IsRepeat = true;
 
-			KeyboardKeyDown.Raise (this, e);
-
-			if (_focusedWidget == null)
-				return false;
-			_focusedWidget.onKeyDown (this, e);
-
-//			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
-//			keyboardRepeatThread.IsBackground = true;
-//			keyboardRepeatThread.Start ();
-
-			return true;
-		}
-		/// <summary>
-		/// Forward key up event from the host to the crow interface
-		/// </summary>
-		/// <returns>return true, if interface handled the event, false otherwise.</returns>
-		/// <param name="button">Button index</param>
-		public bool ProcessKeyUp(int Key){
-			//Keyboard.SetKeyState((Crow.Key)Key,false);
-			if (_focusedWidget == null)
-				return false;
-			KeyboardKeyEventArgs e = new KeyboardKeyEventArgs((Crow.Key)Key, false, Keyboard);
-
-			_focusedWidget.onKeyUp (this, e);
-
-			KeyboardKeyUp.Raise (this, e);
-
-//			if (keyboardRepeatThread != null) {
-//				keyboardRepeatOn = false;
-//				keyboardRepeatThread.Abort();
-//				keyboardRepeatThread.Join ();
-//			}
-			return true;
-		}
-		/// <summary>
-		/// Forward a translated key press event from the host to the crow interface
-		/// </summary>
-		/// <returns>return true, if interface handled the event, false otherwise.</returns>
-		/// <param name="button">Button index</param>
-		public bool ProcessKeyPress(char Key){
-			if (_focusedWidget == null)
-				return false;
-			KeyPressEventArgs e = new KeyPressEventArgs(Key);
-			_focusedWidget.onKeyPress (this, e);
-			return true;
+		public bool IsKeyDown (Key key) {
+			return false;
 		}
 		#endregion
 
@@ -1248,7 +1243,7 @@ namespace Crow
 		volatile bool mouseRepeatOn, keyboardRepeatOn, mouseRepeatTriggeredAtLeastOnce = false;
 		volatile int mouseRepeatCount, keyboardRepeatCount;
 		Thread mouseRepeatThread, keyboardRepeatThread;
-		KeyboardKeyEventArgs lastKeyDownEvt;
+		KeyEventArgs lastKeyDownEvt;
 		void mouseRepeatThreadFunc()
 		{
 			mouseRepeatOn = true;

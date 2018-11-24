@@ -133,9 +133,13 @@ namespace Crow
 				if (LayoutingTries < Interface.MaxLayoutingTries) {
 					Layoutable.RegisteredLayoutings |= LayoutType;
 					(Layoutable as GraphicObject).IFace.LayoutingQueue.Enqueue (this);
+					#if DEBUG_LOG
 					result = Result.Requeued;
+					#endif
 				} else if (DiscardCount < Interface.MaxDiscardCount) {
+					#if DEBUG_LOG
 					result = Result.Discarded;
+					#endif
 					LayoutingTries = 0;
 					DiscardCount++;
 					Layoutable.RegisteredLayoutings |= LayoutType;

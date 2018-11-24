@@ -113,12 +113,9 @@
     <Compile Include="src\GraphicObjects\TreeView.cs" />
     <Compile Include="src\GraphicObjects\TabView.cs" />
     <Compile Include="src\GraphicObjects\TabItem.cs" />
-    <Compile Include="src\Input\KeyboardKeyEventArgs.cs" />
     <Compile Include="src\Input\Buttons.cs" />
     <Compile Include="src\Input\ButtonState.cs" />
     <Compile Include="src\Input\Key.cs" />
-    <Compile Include="src\Input\KeyboardState.cs" />
-    <Compile Include="src\Input\KeyModifiers.cs" />
     <Compile Include="src\Input\MouseButton.cs" />
     <Compile Include="src\Input\MouseEventArgs.cs" />
     <Compile Include="src\Input\MouseScroll.cs" />
@@ -228,11 +225,16 @@
     <Compile Include="src\IMLAttributes.cs" />
     <Compile Include="src\GraphicObjects\DockStack.cs" />
     <Compile Include="src\debug\DebugLogger.cs" />
-    <Compile Include="src\IBackend.cs" />
-    <Compile Include="src\backends\X11Structs.cs" />
-    <Compile Include="src\backends\XKeySym.cs" />
-    <Compile Include="src\backends\XLibBackend.cs" />
-    <Compile Include="src\backends\XCBBackend.cs" />
+    <Compile Include="src\backends\xlib\X11Structs.cs" />
+    <Compile Include="src\backends\xlib\XKeySym.cs" />
+    <Compile Include="src\backends\xcb\XCBBackend.cs" />
+    <Compile Include="src\backends\IBackend.cs" />
+    <Compile Include="src\backends\IKeyboard.cs" />
+    <Compile Include="src\backends\xcb\XCBKeyboard.cs" />
+    <Compile Include="src\Input\KeyEventArgs.cs" />
+    <Compile Include="src\backends\xlib\X11Keyboard.cs" />
+    <Compile Include="src\backends\xlib\XLibBackend.cs" />
+    <Compile Include="src\debug\DbgLogViewer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -264,6 +266,8 @@
     <Folder Include="Icons\" />
     <Folder Include="src\debug\" />
     <Folder Include="src\backends\" />
+    <Folder Include="src\backends\xlib\" />
+    <Folder Include="src\backends\xcb\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\Icons\updown.svg" />

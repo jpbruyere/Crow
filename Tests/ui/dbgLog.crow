@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<VerticalStack>
+	<HorizontalStack Height="Fit">
+		<Label Text="Scale X:"/>
+		<Label Text="{../../view.XScale}"/>
+		<Label Text="Scroll X:"/>
+		<Label Text="{../../view.ScrollX}"/>
+	</HorizontalStack>
+	<HorizontalStack>
+		<DbgLogViewer Name="view" LogFile="debug.log" MouseWheelSpeed="10"/>
+		<ScrollBar Name="scrollbar1" Orientation="Vertical"
+			Value="{²../view.ScrollY}"	Maximum="{../view.MaxScrollY}" 
+			CursorSize="{../view.ChildHeightRatio}"
+			LargeIncrement="{../view.PageHeight}" SmallIncrement="30"
+			Width="14" />
+	</HorizontalStack>
+	<ScrollBar Style="HScrollBar" Name="scrollbarX" Orientation="Horizontal"
+			Value="{²../view.ScrollX}" Maximum="{../view.MaxScrollX}" 
+			CursorSize="{../view.ChildWidthRatio}" 
+			LargeIncrement="{../view.PageWidth}" SmallIncrement="30"
+			Height="14" />
+</VerticalStack>
