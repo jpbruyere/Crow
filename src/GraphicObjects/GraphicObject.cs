@@ -423,9 +423,9 @@ namespace Crow
 		/// <summary>Occurs when mouse leave this object</summary>
 		public event EventHandler<MouseMoveEventArgs> MouseLeave;
 		/// <summary>Occurs when key is pressed when this object is active</summary>
-		public event EventHandler<KeyboardKeyEventArgs> KeyDown;
+		public event EventHandler<KeyEventArgs> KeyDown;
 		/// <summary>Occurs when key is released when this object is active</summary>
-		public event EventHandler<KeyboardKeyEventArgs> KeyUp;
+		public event EventHandler<KeyEventArgs> KeyUp;
 		/// <summary>Occurs when translated key event occurs in the host when this object is active</summary>
 		public event EventHandler<KeyPressEventArgs> KeyPress;
 		/// <summary>Occurs when this object received focus</summary>
@@ -505,7 +505,7 @@ namespace Crow
 				this.RegisterForRedraw ();
 			}
 		}
-		#if DEBUG
+		#if DEBUG_LOG
 		[XmlIgnore]public string TreePath {
 			get { return this.GetType().Name + GraphicObjects.IndexOf(this).ToString ();	}
 		}
@@ -518,7 +518,7 @@ namespace Crow
 		[DesignCategory ("Divers")][DefaultValue(null)]
 		public virtual string Name {
 			get {
-				#if DEBUG
+				#if DEBUG_LOG
 				return string.IsNullOrEmpty(name) ? this.GetType().Name + GraphicObjects.IndexOf(this).ToString () : name;
 				#else
 				return name;
@@ -1027,9 +1027,9 @@ namespace Crow
 		/// <summary> Loads the default values from XML attributes default </summary>
 		public void loadDefaultValues()
 		{
-//			#if DEBUG_LOAD
-//			Debug.WriteLine ("LoadDefValues for " + this.ToString ());
-//			#endif
+			#if DEBUG_LOG
+			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GOInitialization, this);
+			#endif
 
 			Type thisType = this.GetType ();
 
@@ -1193,12 +1193,14 @@ namespace Crow
 			} catch (Exception ex) {
 				throw new Exception ("Error applying style <" + styleKey + ">:", ex);
 			}
+
+			#if DEBUG_LOG
+			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+			#endif
+
 			onInitialized (this, null);
 		}
 		protected virtual void onInitialized (object sender, EventArgs e){
-			#if DEBUG_LOG
-			DebugLog.AddEvent(DbgEvtType.GOInitialized, this);
-			#endif
 			Initialized.Raise(sender, e);
 		}
 		bool getDefaultEvent(EventInfo ei, List<Style> styling,
@@ -1375,7 +1377,7 @@ namespace Crow
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForRedraw ()
 		{
-			IsDirty = true;
+			//IsDirty = true;
 			if (RegisteredLayoutings == LayoutingType.None)
 				IFace.EnqueueForRepaint (this);
 		}
@@ -1673,8 +1675,8 @@ namespace Crow
 						RecreateCache ();
 
 					UpdateCache (ctx);
-					if (!isEnabled)
-						paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);
+					if (!isEnabled)						
+						paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);					
 				} else {
 					Rectangle rb = Slot + Parent.ClientRectangle.Position;
 					ctx.Save ();
@@ -1700,10 +1702,10 @@ namespace Crow
 		#endregion
 
         #region Keyboard handling
-		public virtual void onKeyDown(object sender, KeyboardKeyEventArgs e){
+		public virtual void onKeyDown(object sender, KeyEventArgs e){
 			KeyDown.Raise (this, e);
 		}
-		public virtual void onKeyUp(object sender, KeyboardKeyEventArgs e){
+		public virtual void onKeyUp(object sender, KeyEventArgs e){
 			KeyUp.Raise (this, e);
 		}
 		public virtual void onKeyPress(object sender, KeyPressEventArgs e){

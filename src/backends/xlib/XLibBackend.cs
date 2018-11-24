@@ -27,7 +27,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace Crow.XLIB
+namespace Crow.XLib
 {
 	public class XLibBackend : IBackend
 	{
@@ -70,15 +70,6 @@ namespace Crow.XLIB
 		[DllImportAttribute("X11")]
 		static extern IntPtr XSetErrorHandler(XErrorHandler error_handler);
 
-		[DllImport ("libX11")]
-		static extern void XDisplayKeycodes (IntPtr disp, out int min, out int max);
-		[DllImport ("libX11")]
-		static extern IntPtr XGetKeyboardMapping (IntPtr disp, byte first_keycode, int keycode_count, 
-			out int keysyms_per_keycode_return);
-		[DllImport ("libX11")]
-		unsafe static extern byte* XGetModifierMapping (IntPtr disp);
-		[DllImport ("libX11")]
-		static extern uint XKeycodeToKeysym (IntPtr display, int keycode, int index);
 		#endregion
 
 		IntPtr xDisp, xwinHnd, xDefaultRootWin, xDefaultVisual;
@@ -115,33 +106,18 @@ namespace Crow.XLIB
 
 			XMapWindow (xDisp, xwinHnd);
 
+			iFace.Keyboard = new Crow.XLib.X11Keyboard (xDisp);
+
 			iFace.surf = new Cairo.XlibSurface (xDisp, xwinHnd, xDefaultVisual, iFace.ClientRectangle.Width, iFace.ClientRectangle.Height);
 
 			errorHnd = new XErrorHandler (HandleError);
 			XSetErrorHandler (errorHnd);
-
-			int min_keycode, max_keycode, keysyms_per_keycode;
-
-			XDisplayKeycodes (xDisp, out min_keycode, out max_keycode);
-			IntPtr ksp = XGetKeyboardMapping (xDisp, (byte) min_keycode,
-				max_keycode + 1 - min_keycode, out keysyms_per_keycode);
-			XFree (ksp);
-
-			unsafe {
-				byte* modmap_unmanaged = XGetModifierMapping (xDisp);
-				int nummodmap = 0;
-				int* ptr = (int*)modmap_unmanaged;
-				nummodmap = ptr [0];
-
-				for (int i = 0; i< nummodmap; i++) {
-					Console.WriteLine(modmap_unmanaged[i+4]);
-				}
-				XFree ((IntPtr)modmap_unmanaged);
-			}
 		}
 
 		public void CleanUp ()
 		{
+			iFace.Keyboard.Destroy ();
+
 			XCloseDisplay (xDisp);
 		}
 		public void Flush () {
@@ -158,24 +134,10 @@ namespace Crow.XLIB
 					iFace.ProcessResize (new Rectangle (0, 0, xevent.ExposeEvent.width, xevent.ExposeEvent.height));
 					break;
 				case XEventName.KeyPress:
-					iFace.ProcessKeyDown (xevent.KeyEvent.keycode);
-
-					/*int min_keycode, max_keycode, keysyms_per_keycode;
-						XLib.NativeMethods.XDisplayKeycodes (xDisp, out min_keycode, out max_keycode);
-
-						IntPtr ksp = XLib.NativeMethods.XGetKeyboardMapping (xDisp, (byte)min_keycode,
-							             max_keycode + 1 - min_keycode, out keysyms_per_keycode);
-						XLib.NativeMethods.XFree (ksp);*/
-
-					uint keySym;
-					keySym = XKeycodeToKeysym (xDisp, xevent.KeyEvent.keycode, 0);
-					char c = (char)keySym;
-
-					Debug.WriteLine ("keycode:{0}; keysym:{1}; char:{2}", xevent.KeyEvent.keycode, keySym, c);
+					iFace.Keyboard.HandleEvent ((uint)xevent.KeyEvent.keycode, true);
 					break;
 				case XEventName.KeyRelease:
-					iFace.ProcessKeyUp (xevent.KeyEvent.keycode);
-					//Debug.WriteLine ("keypress: {0}", xevent.KeyEvent.keycode);
+					iFace.Keyboard.HandleEvent ((uint)xevent.KeyEvent.keycode, false);
 					break;
 				case XEventName.MotionNotify:
 					//Debug.WriteLine ("motion: ({0},{1})", xevent.MotionEvent.x, xevent.MotionEvent.y);

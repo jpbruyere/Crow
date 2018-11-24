@@ -66,15 +66,15 @@ namespace Crow
 		#endregion
 			
         #region Keyboard handling
-		public override void onKeyDown (object sender, KeyboardKeyEventArgs e)
+		public override void onKeyDown (object sender, KeyEventArgs e)
 		{
 			base.onKeyDown (sender, e);
-
+			/*
 			Key key = e.Key;
 
 			switch (key)
 			{
-			case Key.Back:
+			case Key.BackSpace:
 				if (CurrentPosition == 0)
 					return;
 				this.DeleteChar();
@@ -89,8 +89,8 @@ namespace Crow
 					IFace.Clipboard = this.SelectedText;
 				this.DeleteChar ();
 				break;
-			case Key.Enter:
-			case Key.KeypadEnter:
+			case Key.ISO_Enter:
+			case Key.KP_Enter:
 				if (!selectionIsEmpty)
 					this.DeleteChar ();
 				if (Multiline)
@@ -211,6 +211,7 @@ namespace Crow
 			default:
 				break;
 			}
+			*/
 			RegisterForGraphicUpdate();
 		}
 		public override void onKeyPress (object sender, KeyPressEventArgs e)

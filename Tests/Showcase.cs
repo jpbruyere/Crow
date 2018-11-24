@@ -43,7 +43,7 @@ namespace Tests
 		static void Main ()
 		{
 			using (Showcase app = new Showcase ()) {
-				app.KeyboardKeyDown += App_KeyboardKeyDown;
+				app.Keyboard.KeyDown += App_KeyboardKeyDown;
 
 				GraphicObject g = app.AddWidget ("#Tests.ui.showcase.crow");
 				g.DataSource = app;
@@ -59,13 +59,15 @@ namespace Tests
 			}
 		}
 
-		static void App_KeyboardKeyDown (object sender, KeyboardKeyEventArgs e)
+		static void App_KeyboardKeyDown (object sender, KeyEventArgs e)
 		{
+			#if DEBUG_LOG
 			switch (e.Key) {
-			case Key.Keypad1:
+			case Key.F2:
 				DebugLog.save (sender as Interface);
 				break;
 			}
+			#endif
 		}
 
 		public Showcase ()

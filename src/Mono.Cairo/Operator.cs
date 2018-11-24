@@ -52,5 +52,11 @@ namespace Cairo
 		Xor,
 		Add,
 		Saturate,
+		Multiply,
+		Screen,
+		Overlay,
+		Darken,
+		Lighten,
+
 	}
 }

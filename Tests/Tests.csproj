@@ -419,6 +419,7 @@
     <EmbeddedResource Include="Interfaces\TabItem.template">
       <LogicalName>Crow.TabItem.template</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="ui\dbgLog.crow" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">
