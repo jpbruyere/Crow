@@ -91,7 +91,7 @@ namespace Crow
 				if (newS == scrollY)
 					return;
 
-				scrollY = value;
+				scrollY = newS;
 
 				NotifyValueChanged ("ScrollY", scrollY);
 				RegisterForGraphicUpdate ();

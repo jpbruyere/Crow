@@ -7,7 +7,7 @@
 		<Label Text="{../../view.ScrollX}"/>
 	</HorizontalStack>
 	<HorizontalStack>
-		<DbgLogViewer Name="view" LogFile="debug.log" MouseWheelSpeed="10"/>
+		<DbgLogViewer Margin="0" Name="view" LogFile="debug.log" MouseWheelSpeed="10"/>
 		<ScrollBar Name="scrollbar1" Orientation="Vertical"
 			Value="{²../view.ScrollY}"	Maximum="{../view.MaxScrollY}" 
 			CursorSize="{../view.ChildHeightRatio}"

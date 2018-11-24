@@ -24,7 +24,7 @@ namespace tests
 				//app.AddWidget (@"Interfaces/Divers/colorPicker.crow").DataSource = app;
 				//app.AddWidget ("Interfaces/Divers/perfMeasures.crow").DataSource = app;
 				app.AddWidget ("#Tests.ui.dbgLog.crow").DataSource = app;
-
+		
 				while (true) {
 					#if MEASURE_TIME
 					foreach (PerformanceMeasure m in app.PerfMeasures)
