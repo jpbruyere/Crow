@@ -1336,7 +1336,7 @@ namespace Crow
 		/// </summary>
 		public virtual void ClippingRegistration(){
 			#if DEBUG_LOG
-			DebugLog.AddEvent(DbgEvtType.GOClippingRegistration, this);
+			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GOClippingRegistration, this);
 			#endif	
 			parentRWLock.EnterReadLock ();
 			if (parent != null) {					
@@ -1344,6 +1344,9 @@ namespace Crow
 				Parent.RegisterClip (Slot);
 			}
 			parentRWLock.ExitReadLock ();
+			#if DEBUG_LOG
+			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+			#endif
 		}
 		/// <summary>
 		/// Add clip rectangle to this.clipping and propagate up to root
@@ -1351,7 +1354,7 @@ namespace Crow
 		/// <param name="clip">Clip rectangle</param>
 		public virtual void RegisterClip(Rectangle clip){
 			#if DEBUG_LOG
-			DebugLog.AddEvent(DbgEvtType.GORegisterClip, this);
+			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GORegisterClip, this);
 			#endif	
 			Rectangle  r = clip + ClientRectangle.Position;
 			if (CacheEnabled && !IsDirty)
@@ -1362,6 +1365,9 @@ namespace Crow
 			if (p?.IsDirty == true && p?.CacheEnabled == true)
 				return;
 			Parent.RegisterClip (r + Slot.Position);
+			#if DEBUG_LOG
+			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+			#endif
 		}
 		/// <summary> Full update, taking care of sizing policy </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1610,7 +1616,7 @@ namespace Crow
 		protected virtual void onDraw(Context gr)
 		{
 			#if DEBUG_LOG
-			DebugLog.AddEvent(DbgEvtType.GODraw, this);
+			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GODraw, this);
 			#endif
 
 			Rectangle rBack = new Rectangle (Slot.Size);
@@ -1618,6 +1624,10 @@ namespace Crow
 			Background.SetAsSource (gr, rBack);
 			CairoHelpers.CairoRectangle (gr, rBack, cornerRadius);
 			gr.Fill ();
+
+			#if DEBUG_LOG
+			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+			#endif
 		}
 
 		/// <summary>
@@ -1626,7 +1636,7 @@ namespace Crow
 		protected virtual void RecreateCache ()
 		{
 			#if DEBUG_LOG
-			DebugLog.AddEvent(DbgEvtType.GORecreateCache, this);
+			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GORecreateCache, this);
 			#endif
 			IsDirty = false;
 			bmp?.Dispose ();
@@ -1636,6 +1646,9 @@ namespace Crow
 				onDraw (gr);
 			}
 			bmp.Flush ();
+			#if DEBUG_LOG
+			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+			#endif
 		}
 		protected virtual void UpdateCache(Context ctx){
 			#if DEBUG_LOG

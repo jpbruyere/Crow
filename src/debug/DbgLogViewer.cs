@@ -81,6 +81,11 @@ namespace Crow
 		{
 			base.onDraw (gr);
 
+			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+			gr.SetFontSize (Font.Size);
+			gr.FontOptions = Interface.FontRenderingOptions;
+			gr.Antialias = Interface.Antialias;
+
 			if (!loaded) {
 				if (!File.Exists (logFile))
 					return;
@@ -108,41 +113,57 @@ namespace Crow
 					maxTicks = events [events.Count - 1].begin;
 				} else
 					minTicks = maxTicks = 0;
+				
 				MaxScrollY = Math.Max(0, objs.Count - (int)Math.Ceiling((double)ClientRectangle.Height / lineHeight));
 			}
 
 			Rectangle r = ClientRectangle;
 
-			Foreground.SetAsSource (gr);
+			gr.LineWidth = 1.0;
 
 			leftMargin = 0.0;
 
 			foreach (DbgGo g in objs) {
 				if (g.yIndex == 0)
 					continue;
-				double penX = r.X + g.xLevel * 5.0, penY = (g.yIndex - ScrollY) * lineHeight - gr.FontExtents.Descent;
-				gr.MoveTo (penX, penY);
+				double penX = r.X + g.xLevel * 5.0;
 				Cairo.TextExtents te = gr.TextExtents (g.name);
 				if (te.Width + penX > leftMargin)
 					leftMargin = te.Width + penX; 
+				double penY = (g.yIndex - ScrollY) * lineHeight + r.Top;
+				if (penY < r.Top || penY > r.Bottom + lineHeight)
+					continue;
+			
+				Foreground.SetAsSource (gr);
+				gr.MoveTo (penX, penY - gr.FontExtents.Descent);
 				gr.ShowText (g.name);
+				gr.SetSourceColor (Crow.Color.Jet);
+				gr.MoveTo (r.X, penY - 0.5);
+				gr.LineTo (r.Right, penY - 0.5);
+				gr.Stroke ();
 			}
 
 			leftMargin += 2.5;
 			r.Left += (int)leftMargin;
-			gr.LineWidth = 1.0;
 			gr.MoveTo (leftMargin, r.Top);
 			gr.LineTo (leftMargin, r.Bottom);
+			Foreground.SetAsSource (gr);
 			gr.Stroke ();
 
 			MaxScrollX = (int)(maxTicks - minTicks) - r.Width;
 
+			gr.SetFontSize (8);
+
+			gr.Save ();
+			gr.Rectangle (r);
+			gr.Clip ();
+
 			foreach (DbgEvent evt in events) {
 				double x = (int)((double)(evt.begin - minTicks - ScrollX) * xScale) ;
 				x += (double)r.Left + 0.5;
-				double w = Math.Max (Math.Max(4.0, 10.0 * xScale), (double)(evt.end - evt.begin) * xScale);
+				double w = Math.Max (Math.Max(2.0, 2.0 * xScale), (double)(evt.end - evt.begin) * xScale);
 
-				if (x < r.Left || x > r.Right)
+				if (x + w < r.Left || x > r.Right)
 					continue;
 
 				if (evt.type.HasFlag (DbgEvtType.GraphicObject)) {
@@ -168,15 +189,43 @@ namespace Crow
 								gr.SetSourceColor (Crow.Color.Blue);
 								break;
 							}
+
 						}else
 							gr.SetSourceColor (Crow.Color.Bisque);
+						
 					}else if (evt.type == DbgEvtType.GOInitialization)
 						gr.SetSourceColor (Crow.Color.Cyan);					
+					else if (evt.type == DbgEvtType.GOClippingRegistration)
+						gr.SetSourceColor (Crow.Color.BlueViolet);	
+					else if (evt.type == DbgEvtType.GORegisterClip)
+						gr.SetSourceColor (Crow.Color.Orange);
+					else if (evt.type == DbgEvtType.GODraw)
+						gr.SetSourceColor (Crow.Color.Pink);
+					else if (evt.type == DbgEvtType.GORecreateCache)
+						gr.SetSourceColor (Crow.Color.YellowGreen);
 						
 					gr.Rectangle (x, y, w, lineHeight);
 					gr.Fill ();
+
+					if (evt.type.HasFlag (DbgEvtType.GOLayouting)) {
+						gr.SetSourceColor (Crow.Color.Black);
+						switch (data.layout) {
+						case LayoutingType.Height:
+							gr.MoveTo (x + w * 0.5, y + 1);
+							gr.LineTo (x + w * 0.5, y + lineHeight - 2);
+							gr.Stroke ();
+							break;
+						case LayoutingType.Width:
+							gr.MoveTo (x + 0.5, y + lineHeight * 0.5);
+							gr.LineTo (x + w - 1.0, y + lineHeight * 0.5);
+							gr.Stroke ();
+							break;
+						default:
+							break;
+						}
+					}
 				} else {
-					gr.SetSourceColor (Crow.Color.Black);
+					gr.SetSourceColor (Crow.Color.Yellow);
 					gr.MoveTo (x, r.Top);
 					gr.LineTo (x, r.Bottom);
 					gr.Stroke ();
@@ -185,11 +234,11 @@ namespace Crow
 					gr.Rectangle (x, r.Top, te.Width, lineHeight);
 					gr.Fill ();
 					gr.MoveTo (x, r.Top + gr.FontExtents.Ascent);
-					gr.SetSourceColor (Crow.Color.White);
+					gr.SetSourceColor (Crow.Color.Jet);
 					gr.ShowText (s);
 				}
 			}
-
+			gr.Restore ();
 		}
 		public override void Paint (ref Cairo.Context ctx)
 		{
@@ -200,6 +249,11 @@ namespace Crow
 			ctx.Rectangle (cb);
 			ctx.SetSourceColor (Color.CornflowerBlue);
 			ctx.Fill();
+
+			ctx.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+			ctx.SetFontSize (Font.Size);
+			ctx.FontOptions = Interface.FontRenderingOptions;
+			ctx.Antialias = Interface.Antialias;
 
 			ctx.MoveTo (cb.X, cb.Y + lineHeight);
 			ctx.ShowText (currentTick.ToString ());
@@ -217,10 +271,11 @@ namespace Crow
 				cb.X = (int)selEndX;
 				cb.Width = (int)(selStartX - selEndX);
 			}
-			ctx.Operator = Cairo.Operator.Multiply;
+			ctx.Operator = Cairo.Operator.Add;
 			cb.Width = Math.Max (1, cb.Width);
 			ctx.Rectangle (cb);
-			ctx.SetSourceColor (Color.LightYellow);
+			//ctx.SetSourceColor (Color.LightYellow);
+			ctx.SetSourceColor (Color.Jet);
 			ctx.Fill();
 			ctx.Operator = Cairo.Operator.Over;
 
@@ -230,7 +285,7 @@ namespace Crow
 			base.OnLayoutChanges (layoutType);
 			switch (layoutType) {
 			case LayoutingType.Width:
-				RegisterForLayouting (LayoutingType.X);
+				
 				break;
 			case LayoutingType.Height:
 				if (!loaded)
