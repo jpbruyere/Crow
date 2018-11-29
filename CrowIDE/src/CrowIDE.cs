@@ -101,12 +101,14 @@ namespace Crow.Coding
 			CurrentSolution = null;
 		}
 
+		static CrowIDE app;
 		[STAThread]
 		static void Main ()
 		{
-			using (CrowIDE app = new CrowIDE ()) {
+			using (app = new CrowIDE ()) {
 				MainIFace = app;
 
+				app.Keyboard.KeyDown += App_KeyboardKeyDown;
 				app.initIde ();
 
 				while (true) {
@@ -114,6 +116,18 @@ namespace Crow.Coding
 					Thread.Sleep(10);
 				}
 			}
+		}
+
+		static void App_KeyboardKeyDown (object sender, KeyEventArgs e)
+		{
+			Console.WriteLine((byte)e.Key);
+			//#if DEBUG_LOG
+			switch (e.Key) {
+			case Key.F2:				
+				DebugLog.save (app);
+				break;
+			}
+			//#endif
 		}
 
 		public CrowIDE ()

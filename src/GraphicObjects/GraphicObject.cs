@@ -51,6 +51,9 @@ namespace Crow
 	{
 		internal ReaderWriterLockSlim parentRWLock = new ReaderWriterLockSlim();
 		#if DEBUG_LOG
+		//0 is the main graphic tree, for other obj tree not added to main tree, it range from 1->n
+		//useful to track events for obj shown later, not on start, or never added to main tree
+		public int treeIndex;
 		public int yIndex;//absolute index in the graphic tree for debug draw
 		public int xLevel;//x increment for debug draw
 		#endif
@@ -1652,7 +1655,7 @@ namespace Crow
 		}
 		protected virtual void UpdateCache(Context ctx){
 			#if DEBUG_LOG
-			DebugLog.AddEvent(DbgEvtType.GOUpdateCacheAndPaintOnCTX, this);
+			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GOUpdateCacheAndPaintOnCTX, this);
 			#endif
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 			if (clearBackground) {
@@ -1666,6 +1669,9 @@ namespace Crow
 			ctx.Paint ();
 			Clipping.Dispose ();
 			Clipping = new Region ();
+			#if DEBUG_LOG
+			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+			#endif
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version
 		/// of the widget </summary>
