@@ -28,6 +28,7 @@ using Cairo;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 #if DEBUG_LOG
 namespace Crow
@@ -50,7 +51,7 @@ namespace Crow
 		//10 nth bit set for graphic obj
 		GraphicObject					= 0x0200,
 		GOClassCreation					= 0x0201,
-		GOInitialization					= 0x0202,
+		GOInitialization				= 0x0202,
 		GOClippingRegistration			= 0x0203,
 		GORegisterClip					= 0x0204,
 		GORegisterForGraphicUpdate		= 0x0205,
@@ -65,15 +66,10 @@ namespace Crow
 		GOPaint							= 0x020d,
 		GONewDataSource					= 0x020e,
 	}
-	public class DbgData {
-		public int obj;
-		public LayoutingType layout;
-		public LayoutingQueueItem.Result result;
 
-		public DbgData (int _obj) {
-			obj = _obj;
-		}
-	}
+	/// <summary>
+	/// debug events as recorded, another class is used in the viewer
+	/// </summary>
 	public class DbgEvent {
 		public long begin, end;
 		public DbgEvtType type;
@@ -85,6 +81,7 @@ namespace Crow
 			data = _data;
 			type = evt;
 			begin = timeStamp;
+			end = timeStamp;
 		}
 
 		public override string ToString ()
@@ -100,49 +97,8 @@ namespace Crow
 			return string.Format ("{0};{1};{2};{3};{4}", begin, end, type, GraphicObject.GraphicObjects.IndexOf(lqi.graphicObject).ToString(), lqi.LayoutType.ToString());
 			
 		}
-
-		public static DbgEvent Parse (string str) {
-			if (str == null)
-				return null;
-			string[] tmp = str.Trim().Split(';');
-
-
-			DbgEvent evt = new DbgEvent ();
-			evt.begin = long.Parse (tmp [0]);
-			evt.end = long.Parse (tmp [1]);
-			evt.type = (DbgEvtType)Enum.Parse (typeof(DbgEvtType), tmp [2]);
-
-			if (evt.type.HasFlag (DbgEvtType.GraphicObject)) {
-				DbgData data = new DbgData (int.Parse (tmp [3]));
-				if (evt.type.HasFlag (DbgEvtType.GOLayouting)) {
-					data.layout = (LayoutingType)Enum.Parse (typeof(LayoutingType), tmp [4]);
-					if (evt.type == DbgEvtType.GOProcessLayouting)
-						data.result = (LayoutingQueueItem.Result)Enum.Parse (typeof(LayoutingQueueItem.Result), tmp [5]);										
-				}
-				evt.data = data;
-			}
-			return evt;
-		}
 	}
-	public class DbgGo {
-		public int index;
-		public string name;
-		public int yIndex;
-		public int xLevel;
 
-		public static DbgGo Parse (string str) {
-			DbgGo g = new DbgGo ();
-			if (str == null)
-				return null;
-			string[] tmp = str.Trim().Split(';');
-			g.index = int.Parse (tmp [0]);
-			g.name = tmp [1];
-			g.yIndex = int.Parse (tmp [2]);
-			g.xLevel = int.Parse (tmp [3]);
-			return g;
-		}
-
-	}
 	public static class DebugLog
 	{
 		static Surface surf;
@@ -169,7 +125,8 @@ namespace Crow
 		static void parseTree (GraphicObject go) {
 			if (go == null)
 				return;
-				
+
+
 			go.yIndex = y++;
 			go.xLevel = level++;
 
@@ -195,52 +152,18 @@ namespace Crow
 
 			using (StreamWriter s = new StreamWriter("debug.log")){
 				s.WriteLine ("[GraphicObjects]");
-				for (int i=0; i<GraphicObject.GraphicObjects.Count; i++) {
-					GraphicObject g = GraphicObject.GraphicObjects [i];
-					s.WriteLine ("{0};{1};{2};{3}", i, g.GetType().Name, g.yIndex, g.xLevel);	
+				lock (GraphicObject.GraphicObjects) {
+					GraphicObject.GraphicObjects = GraphicObject.GraphicObjects.OrderBy (o => o.yIndex).ToList();
+					for (int i = 0; i < GraphicObject.GraphicObjects.Count; i++) {
+						GraphicObject g = GraphicObject.GraphicObjects [i];
+						s.WriteLine ("{0};{1};{2};{3}", i, g.GetType ().Name, g.yIndex, g.xLevel);	
+					}
 				}
 				s.WriteLine ("[Events]");
 
 				foreach (DbgEvent e in events)
 					s.WriteLine (e.ToString ());
 			}
-			/*
-			List<GraphicObject> drawn = new List<GraphicObject> ();
-
-
-			ctx.MoveTo (0.5 + xPenStart, 0.0);
-			ctx.LineTo (0.5 + xPenStart, bounds.Height);
-			ctx.LineWidth = 1.0;
-			ctx.SetSourceColor (Crow.Color.Black);
-			ctx.Stroke ();
-
-
-			List<LayoutingQueueItem> lqis = new List<LayoutingQueueItem>();
-
-			foreach (LayoutingQueueItem lqi in lqis) {
-				GraphicObject go = lqi.graphicObject;
-				if (go.yIndex == 0)
-					continue;
-				double penX = 0.0, penY = go.yIndex * ySpacing;
-
-				if (!drawn.Contains (go)) {
-					penX = go.xLevel * 5.0;
-
-					ctx.MoveTo (penX, penY);
-					ctx.SetSourceColor (Crow.Color.Black);
-
-					ctx.ShowText (go.GetType ().ToString ());
-					drawn.Add (go);
-				}
-
-				//penX = xPenStart + xResolution * lqi.begin;
-				//ctx.Rectangle (penX, penY, Math.Max(1.0, (lqi.end - lqi.begin) * xResolution), ySpacing);
-
-
-				ctx.Fill ();
-			}
-			surf.WriteToPng ("debug.png");
-			*/
 		}
 	}
 }

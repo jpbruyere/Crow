@@ -412,5 +412,6 @@
     </None>
     <None Include="Icons\compiler_warning.svg" />
     <None Include="Icons\compiler_warning_orange.svg" />
+    <None Include="src\debug\DebugLogViewer.cs" />
   </ItemGroup>
 </Project>
