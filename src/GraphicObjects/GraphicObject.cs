@@ -1386,7 +1386,7 @@ namespace Crow
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForRedraw ()
 		{
-			//IsDirty = true;
+			IsDirty = true;
 			if (RegisteredLayoutings == LayoutingType.None)
 				IFace.EnqueueForRepaint (this);
 		}
@@ -1789,8 +1789,6 @@ namespace Crow
 			Debug.WriteLine("MOUSE DOWN => " + this.ToString());
 			#endif
 
-			if (IFace.ActiveWidget == null)
-				IFace.ActiveWidget = this;
 			if (this.Focusable && !Interface.FocusOnHover) {
 				BubblingMouseButtonEventArg be = e as BubblingMouseButtonEventArg;
 				if (be.Focused == null) {
@@ -1956,7 +1954,7 @@ namespace Crow
 			#if DEBUG_LAYOUTING
 			return Name == "unamed" ? tmp + "." + this.GetType ().Name + GraphicObjects.IndexOf(this).ToString(): tmp + "." + Name;
 			#else
-			return Name == "unamed" ? tmp + "." + this.GetType ().Name : tmp + "." + Name;
+			return string.IsNullOrEmpty(Name) ? tmp + "." + this.GetType ().Name : tmp + "." + Name;
 			#endif
 		}
 		/// <summary>

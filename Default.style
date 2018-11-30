@@ -128,13 +128,14 @@ DockStack {
 	//EndDrag="{Background=Jet}";
 }
 DockWindow {
-	Background = "Onyx";
+	//Background = "Onyx";
 	Focusable = "true";
 	AllowDrag = "true";
 	AlwaysOnTop = "true";
 	Margin="0";
 	Width="200";
 	Height="200";
+	//MinimumSize="50,50";
 }
 FileDialog {
 	Template = "#Crow.FileDialog.template";

@@ -154,17 +154,17 @@ namespace Crow
 				if (value == _selectedIndex)
 					return;
 
-				if (_selectedIndex >= 0 && Items.Count > _selectedIndex) {
+				/*if (_selectedIndex >= 0 && Items.Count > _selectedIndex) {
 					Items[_selectedIndex].Foreground = Color.Transparent;
 					Items[_selectedIndex].Background = Color.Transparent;
-				}
+				}*/
 
 				_selectedIndex = value;
 
-				if (_selectedIndex >= 0 && Items.Count > _selectedIndex) {
+				/*if (_selectedIndex >= 0 && Items.Count > _selectedIndex) {
 					Items[_selectedIndex].Foreground = SelectionForeground;
 					Items[_selectedIndex].Background = SelectionBackground;
-				}
+				}*/
 
 				NotifyValueChanged ("SelectedIndex", _selectedIndex);
 				NotifyValueChanged ("SelectedItem", SelectedItem);

@@ -128,6 +128,9 @@ namespace Crow
 			Keyboard.KeyUp += Keyboard_KeyUp;
 			Keyboard.KeyPress += Keyboard_KeyPress;
 
+			initTooltip ();
+			initContextMenus ();
+
 			Thread t = new Thread (interfaceThread);
 			t.IsBackground = true;
 			t.Start ();
@@ -161,7 +164,7 @@ namespace Crow
 			//			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
 			//			keyboardRepeatThread.IsBackground = true;
 			//			keyboardRepeatThread.Start ();
-		}
+ 		}
 
 		void interfaceThread()
 		{			
@@ -212,8 +215,6 @@ namespace Crow
 			//loadCursors ();
 			loadStyling ();
 			findAvailableTemplates ();
-			//initTooltip ();
-			//initContextMenus ();
 
 			#if MEASURE_TIME
 			PerfMeasures.Add (updateMeasure);
@@ -500,9 +501,9 @@ namespace Crow
 			}
 		}
 		/// <summary>
-		/// Add the content of the IML fragment to the graphic tree of this interface
+		/// Create an instantiator bound to this interface from the IML fragment
 		/// </summary>
-		/// <returns>return the new instance for convenience, may be ignored</returns>
+		/// <returns>return the new instantiator</returns>
 		/// <param name="imlFragment">a valid IML string</param>
 		public Instantiator CreateITorFromIMLFragment (string imlFragment) {			
 			return Instantiator.CreateFromImlFragment (this, imlFragment);
@@ -816,7 +817,7 @@ namespace Crow
 					clipping = new Region ();
 					//}
 					//surf.WriteToPng (@"/mnt/data/test.png");
-					surf.Flush();
+
 					backend?.Flush ();
 				}
 			}
@@ -1125,6 +1126,9 @@ namespace Crow
 
 			if (FocusedWidget == null)
 				return true;
+
+			ActiveWidget = FocusedWidget;
+
 			if (!FocusedWidget.MouseRepeat)
 				return true;
 			mouseRepeatThread = new Thread (mouseRepeatThreadFunc);
