@@ -53,7 +53,7 @@ namespace Crow.Coding
 		}
 		#endregion
 
-		public DesignInterface ()
+		public DesignInterface () : base()
 		{
 		}
 
@@ -63,7 +63,6 @@ namespace Crow.Coding
 		protected override void InitBackend ()
 		{
 			surf = CrowIDE.MainIFace.surf.CreateSimilar (Cairo.Content.ColorAlpha, 100, 100);
-			//base.initX ();
 		}
 		public override void ProcessResize (Rectangle bounds)
 		{

@@ -164,7 +164,10 @@ namespace Crow
 		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseEnter (sender, e);
-			if ((LogicalParent as Menu).AutomaticOpenning && items.Children.Count>0)
+			Menu menu = LogicalParent as Menu;
+			if (menu == null)
+				return;
+			if (menu.AutomaticOpenning && items.Children.Count>0)
 				IsOpened = true;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)

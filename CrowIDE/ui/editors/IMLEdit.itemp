@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
+<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose" Background="DimGrey">
 	<VerticalStack>
-		<HorizontalStack Height="Fit" Margin="2" Background="DimGrey" Spacing="5">
+		<HorizontalStack Height="Fit" Margin="2" Spacing="5">
 			<HorizontalStack Width="Fit" Spacing="1">
 				<Label Text="Design Size:"/>
 				<TextBox Text="{²../../../editor.DesignWidth}" Width="40" TextAlignment="Right"/>
@@ -44,9 +44,9 @@
 		</VerticalStack>
 		<Splitter/>
 		<IMLContainer Path="#Crow.Coding.ui.SourceEditor.crow"/>
-<!--		<Label DataSource="{../editor.Error}" Text="{}"
+		<Label DataSource="{../editor.Error}" Text="{}"
 			Visible="{../editor.HasError}"
 			Height="Fit" Width="Stretched" Background="DarkRed" Foreground="White"
-			TextAlignment="TopLeft" Multiline="true"/>-->
+			TextAlignment="TopLeft" Multiline="true"/>
 	</VerticalStack>
 </TabItem>

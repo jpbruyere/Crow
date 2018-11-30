@@ -420,6 +420,9 @@
       <LogicalName>Crow.TabItem.template</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="ui\dbgLog.crow" />
+    <EmbeddedResource Include="Interfaces\Experimental\DockWindow.template">
+      <LogicalName>Crow.DockWindow.template</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crow.csproj">

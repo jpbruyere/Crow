@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 using System;
 using Crow.IML;
+using System.Linq;
 
 namespace Crow
 {
@@ -36,6 +37,13 @@ namespace Crow
 		public DockStack (Interface iface) : base (iface) {}
 		#endregion
 
+		/*static int color = 10;
+
+		protected override void onInitialized (object sender, EventArgs e)
+		{
+			base.onInitialized (sender, e);
+			Background = Color.ColorDic.Values.ToList()[color++];
+		}*/
 		public override void AddChild (GraphicObject g)
 		{
 			base.AddChild (g);
@@ -68,8 +76,9 @@ namespace Crow
 						return false;
 					}
 				}
+				childrenRWLock.ExitReadLock ();
 			}
-			childrenRWLock.ExitReadLock ();
+
 			return Slot.ContainsOrIsEqual(m);
 		}
 
@@ -172,8 +181,8 @@ namespace Crow
 		protected override void onDragLeave (object sender, DragDropEventArgs e)
 		{
 			DockWindow dw = e.DragSource as DockWindow;
-			if (dw != null)
-				dw.DockingPosition = Alignment.Undefined;
+			//if (dw != null)
+			//	dw.DockingPosition = Alignment.Undefined;
 			base.onDragLeave (sender, e);
 			RegisterForGraphicUpdate ();
 		}
@@ -307,14 +316,16 @@ namespace Crow
 				break;
 			}
 		}
-		public void Undock (DockWindow dw){
+		public void Undock (DockWindow dw){			
 			int idx = Children.IndexOf(dw);
+
+			Console.WriteLine ("undocking child index: {0} ; name={1}; pos:{2} ; childcount:{3}",idx, dw.Name, dw.DockingPosition, Children.Count);
 
 			RemoveChild(dw);
 
 			if (Children.Count == 0)
 				return;
-
+			
 			if (dw.DockingPosition == Alignment.Left || dw.DockingPosition == Alignment.Top) {				
 				RemoveChild (idx);
 				if (stretchedChild == dw) {

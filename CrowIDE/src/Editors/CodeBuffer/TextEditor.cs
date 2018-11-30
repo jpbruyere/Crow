@@ -530,14 +530,14 @@ namespace Crow.Text
 
 			Key key = e.Key;
 
-			if (e.Control) {
+			if (IFace.Keyboard.Ctrl) {
 				switch (key) {
 				case Key.S:
 					projFile.Save ();
 					break;
 				case Key.W:
 					editorMutex.EnterWriteLock ();
-					if (e.Shift)
+					if (IFace.Keyboard.Shift)
 						projFile.Redo (null);
 					else
 						projFile.Undo (null);
@@ -551,7 +551,7 @@ namespace Crow.Text
 
 			switch (key)
 			{
-			case Key.Back:
+			case Key.BackSpace:
 				buffer.Delete ();
 				break;
 			case Key.Clear:
@@ -563,8 +563,8 @@ namespace Crow.Text
 //					IFace.Clipboard = buffer.SelectedText;
 				buffer.Delete ();
 				break;
-			case Key.Enter:
-			case Key.KeypadEnter:
+			case Key.ISO_Enter:
+			case Key.KP_Enter:
 				if (!buffer.SelectionIsEmpty)
 					buffer.Delete ();
 				buffer.InsertLineBreak ();
@@ -573,46 +573,46 @@ namespace Crow.Text
 				buffer.ResetSelection ();
 				break;
 			case Key.Home:
-				if (e.Shift) {
+				if (IFace.Keyboard.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
-					if (e.Control)
+					if (IFace.Keyboard.Ctrl)
 						buffer.CurrentLine = 0;
 					buffer.CurrentColumn = 0;
 					buffer.SetSelEndPos ();
 					break;
 				}
 				buffer.ResetSelection ();
-				if (e.Control)
+				if (IFace.Keyboard.Ctrl)
 					buffer.CurrentLine = 0;
 				buffer.CurrentColumn = 0;
 				break;
 			case Key.End:
-				if (e.Shift) {
+				if (IFace.Keyboard.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
-					if (e.Control)
+					if (IFace.Keyboard.Ctrl)
 						buffer.CurrentLine = int.MaxValue;
 					buffer.CurrentColumn = int.MaxValue;
 					buffer.SetSelEndPos ();
 					break;
 				}
 				buffer.ResetSelection ();
-				if (e.Control)
+				if (IFace.Keyboard.Ctrl)
 					buffer.CurrentLine = int.MaxValue;
 				buffer.CurrentColumn = int.MaxValue;
 				break;
 			case Key.Insert:
-				if (e.Shift)
+				if (IFace.Keyboard.Shift)
 					buffer.InsertAt (IFace.Clipboard);
-				else if (e.Control && !buffer.SelectionIsEmpty)
+				else if (IFace.Keyboard.Ctrl && !buffer.SelectionIsEmpty)
 					IFace.Clipboard = buffer.SelectedText;
 				break;
 			case Key.Left:
-				if (e.Shift) {
+				if (IFace.Keyboard.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
-					if (e.Control)
+					if (IFace.Keyboard.Ctrl)
 						buffer.GotoWordStart ();
 					else
 						buffer.MoveLeft ();
@@ -620,16 +620,16 @@ namespace Crow.Text
 					break;
 				}
 				buffer.ResetSelection ();
-				if (e.Control)
+				if (IFace.Keyboard.Ctrl)
 					buffer.GotoWordStart ();
 				else
 					buffer.MoveLeft();
 				break;
 			case Key.Right:
-				if (e.Shift) {
+				if (IFace.Keyboard.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
-					if (e.Control)
+					if (IFace.Keyboard.Ctrl)
 						buffer.GotoWordEnd ();
 					else
 						buffer.MoveRight ();
@@ -637,13 +637,13 @@ namespace Crow.Text
 					break;
 				}
 				buffer.ResetSelection ();
-				if (e.Control)
+				if (IFace.Keyboard.Ctrl)
 					buffer.GotoWordEnd ();
 				else
 					buffer.MoveRight ();
 				break;
 			case Key.Up:
-				if (e.Shift) {
+				if (IFace.Keyboard.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
 					CurrentLine--;
@@ -654,7 +654,7 @@ namespace Crow.Text
 				CurrentLine--;
 				break;
 			case Key.Down:
-				if (e.Shift) {
+				if (IFace.Keyboard.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
 					CurrentLine++;
@@ -666,10 +666,10 @@ namespace Crow.Text
 				break;
 			case Key.Menu:
 				break;
-			case Key.NumLock:
+			case Key.Num_Lock:
 				break;
-			case Key.PageDown:
-				if (e.Shift) {
+			case Key.Page_Down:
+				if (IFace.Keyboard.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
 					CurrentLine += visibleLines;
@@ -679,8 +679,8 @@ namespace Crow.Text
 				buffer.ResetSelection ();
 				CurrentLine += visibleLines;
 				break;
-			case Key.PageUp:
-				if (e.Shift) {
+			case Key.Page_Up:
+				if (IFace.Keyboard.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
 					CurrentLine -= visibleLines;
@@ -689,8 +689,6 @@ namespace Crow.Text
 				}
 				buffer.ResetSelection ();
 				CurrentLine -= visibleLines;
-				break;
-			case Key.RWin:
 				break;
 			case Key.Tab:
 				buffer.InsertAt ("\t");

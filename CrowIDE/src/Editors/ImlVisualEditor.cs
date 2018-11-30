@@ -279,6 +279,7 @@ namespace Crow.Coding
 				SelectedItem = go;
 			} catch (Exception ex) {
 				Error = ex;
+				Debug.WriteLine ("Error Loading ui in Design iface\n" + ex.ToString ());
 				if (Monitor.IsEntered(imlVE.UpdateMutex))
 					Monitor.Exit (imlVE.UpdateMutex);
 			}
@@ -295,9 +296,9 @@ namespace Crow.Coding
 			lock (imlVE.RenderMutex)
 				isDirty = imlVE.IsDirty;
 
-			if (isDirty) {
+			if (isDirty) {				
 				lock (IFace.UpdateMutex)
-					RegisterForRedraw ();
+					RegisterForRedraw ();				
 			}
 		}
 		#endregion

@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0"?>
-<Window Height="50%" Width="60%">
-	<DockStack Background="#60101050" Margin="10"/>
+<Window Width="Stretched" Height="Stretched">
+	<DockStack Background="#60101050" Margin="20">
+	</DockStack>
 </Window>
-<!---		<DockWindow Left="400" Top="400" Width="150" Height="150" Background="MediumSeaGreen"/>
+<!---		
 		<DockWindow Left="450" Top="450" Width="150" Height="150" Background="Maize"/>-->
 	
 

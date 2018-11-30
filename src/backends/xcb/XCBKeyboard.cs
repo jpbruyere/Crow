@@ -2548,9 +2548,10 @@ namespace Crow.XKB
 				Marshal.Copy (ptrKeySyms, keySyms, 0, nbKeySyms);
 
 				uint utf32 = xkb_state_key_get_utf32 (xkbState, keycode);
+				char c = char.ConvertFromUtf32 ((int)utf32) [0];
 
-				if (utf32 > 0)
-					KeyPress.Raise (this, new KeyPressEventArgs (char.ConvertFromUtf32 ((int)utf32) [0]));
+				if (!char.IsControl(c))
+					KeyPress.Raise (this, new KeyPressEventArgs (c));
 			} else {
 				keyDir = xkb_key_direction.KEY_UP;
 				KeyUp.Raise (this, new KeyEventArgs ((Key)ks, false));

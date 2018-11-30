@@ -148,8 +148,13 @@ namespace Crow
 			gr.LineWidth = 1;
 			Foreground.SetAsSource (gr);
 			gr.StrokePreserve ();
-			gr.Clip ();
+			gr.ClipPreserve ();
+
+			Background.SetAsSource (gr);
+			gr.Fill ();
+
 			base.onDraw (gr);
+
 			gr.Restore ();
 		}
 
@@ -157,7 +162,14 @@ namespace Crow
 		int dragThreshold = 16;
 		int dis = 128;
 		internal TabView savedParent = null;
-
+		public override Fill Background {
+			get {
+				return base.Background;
+			}
+			set {
+				base.Background = value;
+			}
+		}
 		void makeFloating (TabView tv) {			
 			lock (IFace.UpdateMutex) {				
 				ImageSurface di = new ImageSurface (Format.Argb32, dis, dis);

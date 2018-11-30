@@ -109,8 +109,8 @@ namespace Crow
 				undockingMousePosOrig = e.Position;
 		}
 		public bool CheckUndock (Point mousePos) {
-			if (DockingPosition == Alignment.Center)
-				return false;
+			//if (DockingPosition == Alignment.Center)
+			//	return false;
 			if (Math.Abs (mousePos.X - undockingMousePosOrig.X) < undockThreshold ||
 			    Math.Abs (mousePos.X - undockingMousePosOrig.X) < undockThreshold)
 				return false;
@@ -126,7 +126,7 @@ namespace Crow
 		}
 		protected override void onDrop (object sender, DragDropEventArgs e)
 		{
-			if (!isDocked && DockingPosition != Alignment.Undefined)
+			if (!isDocked && DockingPosition != Alignment.Undefined && e.DropTarget is DockStack)
 				Dock (e.DropTarget as DockStack);
 			base.onDrop (sender, e);
 		}

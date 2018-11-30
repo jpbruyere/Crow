@@ -23,7 +23,16 @@ namespace tests
 				//app.AddWidget (@"Interfaces/Container/0.crow").DataSource = app;
 				//app.AddWidget (@"Interfaces/Divers/colorPicker.crow").DataSource = app;
 				//app.AddWidget ("Interfaces/Divers/perfMeasures.crow").DataSource = app;
-				app.AddWidget ("#Tests.ui.dbgLog.crow").DataSource = app;
+				//app.AddWidget ("#Tests.ui.dbgLog.crow").DataSource = app;
+				app.AddWidget (@"Interfaces/Experimental/testDock.crow").DataSource = app;
+
+				app.LoadIMLFragment (@"<DockWindow Width='150' Height='150' Name='dock1'/>");
+				app.LoadIMLFragment (@"<DockWindow Width='150' Height='150' Name='dock2'/>");
+				app.LoadIMLFragment (@"<DockWindow Width='150' Height='150' Name='dock3'/>");
+				/*app.LoadIMLFragment (@"<DockWindow Width='150' Height='150'/>");
+				app.LoadIMLFragment (@"<DockWindow Width='150' Height='150'/>");
+				app.LoadIMLFragment (@"<DockWindow Width='150' Height='150'/>");*/
+
 		
 				while (true) {
 					#if MEASURE_TIME
@@ -55,11 +64,11 @@ namespace tests
 		{
 			Console.WriteLine((byte)e.Key);
 			//#if DEBUG_LOG
-			switch (e.Key) {
+			/*switch (e.Key) {
 			case Key.F2:				
 				DebugLog.save (app);
 				break;
-			}
+			}*/
 			//#endif
 		}
 	}

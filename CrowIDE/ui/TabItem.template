@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0"?>
-<GenericStack Orientation="Vertical" Spacing="0"
-		Background="Onyx"
+<GenericStack Orientation="Vertical" Spacing="0"		
 		MouseEnter="{caption.Foreground=White}"
 		MouseLeave="{caption.Foreground=Grey}">
 	<HorizontalStack Margin="2" Left="{./TabOffset}"

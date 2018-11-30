@@ -122,11 +122,11 @@ namespace Crow.Coding
 		{
 			Console.WriteLine((byte)e.Key);
 			//#if DEBUG_LOG
-			switch (e.Key) {
+			/*switch (e.Key) {
 			case Key.F2:				
 				DebugLog.save (app);
 				break;
-			}
+			}*/
 			//#endif
 		}
 

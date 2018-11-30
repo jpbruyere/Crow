@@ -33,7 +33,6 @@ WinSchema {
 }
 TabItem {
 	AllowDrag="false";
-	Background="Jet";
 }
 TreeItemBorder {
 	CornerRadius="2";
