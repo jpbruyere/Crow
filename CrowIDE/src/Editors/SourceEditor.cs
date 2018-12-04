@@ -900,9 +900,12 @@ namespace Crow.Coding
 			}
 		}
 		void updateHoverLine () {
-			int hvl = (int)Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent+fe.Descent)));
-			hvl = Math.Min (PrintedLines.Count-1, hvl);
-			HoverLine = buffer.IndexOf (PrintedLines[hvl]);
+			if (PrintedLines.Count > 0) {
+				int hvl = (int)Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent + fe.Descent)));
+				hvl = Math.Min (PrintedLines.Count - 1, hvl);
+				HoverLine = buffer.IndexOf (PrintedLines [hvl]);
+			} else
+				HoverLine = 0;
 		}
 		void updateCurrentPosFromMouseLocalPos(){			
 			PrintedCurrentLine = (int)Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent+fe.Descent)));

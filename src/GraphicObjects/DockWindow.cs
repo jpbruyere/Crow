@@ -31,12 +31,11 @@ namespace Crow
 	public class DockWindow : Window
 	{
 		#region CTOR
-		public DockWindow () : base ()
-		{
-		}
+		public DockWindow () {}
+		public DockWindow (Interface iface) : base (iface) {}
 		#endregion
 
-		int undockThreshold = 4;
+		int undockThreshold = 10;
 		bool isDocked = false;
 		Alignment docking = Alignment.Undefined;
 
@@ -169,10 +168,6 @@ namespace Crow
 			if (isDocked)
 				Undock ();
 			base.close ();
-		}
-
-		public string ExportWinConfigs () {			
-			return string.Format ("{0};{1};{2}", this.Name, DockingPosition, savedSlot);
 		}
 	}
 }

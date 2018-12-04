@@ -65,6 +65,11 @@ namespace Crow
 		GOUpdateCacheAndPaintOnCTX		= 0x020c,
 		GOPaint							= 0x020d,
 		GONewDataSource					= 0x020e,
+		GOLock							= 0x0800,
+		GOLockUpdate					= 0x0a01,
+		GOLockClipping					= 0x0a02,
+		GOLockRender					= 0x0a03,
+		GOLockLayouting					= 0x0a04,
 	}
 
 	/// <summary>
@@ -162,7 +167,8 @@ namespace Crow
 				s.WriteLine ("[Events]");
 
 				foreach (DbgEvent e in events)
-					s.WriteLine (e.ToString ());
+					if (e != null)
+						s.WriteLine (e.ToString ());
 			}
 		}
 	}

@@ -51,11 +51,11 @@ namespace Crow.Coding
 
 		void initCommands (){
 			cmdSave = new Crow.Command (new Action (() => Save ()))
-			{ Caption = "Save", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false };
+			{ Caption = "Save", Icon = new SvgPicture ("#Crow.Coding.icons.save.svg"), CanExecute = false };
 			cmdSaveAs = new Crow.Command (new Action (() => SaveAs ()))
-			{ Caption = "Save As ..", Icon = new SvgPicture ("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false };
+			{ Caption = "Save As ..", Icon = new SvgPicture ("#Crow.Coding.icons.save.svg"), CanExecute = false };
 			cmdOpen = new Crow.Command (new Action (() => Open ())) 
-			{ Caption = "Open", Icon = new SvgPicture ("#Crow.Coding.ui.icons.outbox.svg"), CanExecute = false };
+			{ Caption = "Open", Icon = new SvgPicture ("#Crow.Coding.icons.open.svg"), CanExecute = false };
 			cmdUndo = new Crow.Command (new Action (() => Undo (null))) 
 			{ Caption = "Undo", Icon = new SvgPicture ("#Crow.Coding.icons.undo.svg"), CanExecute = false };
 			cmdRedo = new Crow.Command (new Action (() => Redo (null))) 

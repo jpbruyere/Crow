@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<Container Background="DimGrey" Margin="10" Width="90%" Height="90%">
-	<GraphicObject Margin="10"  Background="SeaGreen"
-			MinimumSize="50,50"/>
-</Container>
+<VerticalStack Margin="10" Background="Jet" >
+	<Label Text="{CPT}" Background="Red" Font="mono, 60" Margin="0"/>
+	<LaggingGraphicObject Name="lagging" Margin="10"  Background="{TestColor}"/>
+</VerticalStack>
+		
+

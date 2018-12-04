@@ -36,6 +36,8 @@ namespace Crow.Coding
 {
 	class CrowIDE : Interface
 	{
+		static bool running = true;
+
 		public Command CMDNew, CMDOpen, CMDSave, CMDSaveAs, cmdCloseSolution, CMDQuit,
 		CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp,
 		CMDAbout, CMDOptions,
@@ -45,10 +47,10 @@ namespace Crow.Coding
 
 		void initCommands () {
 			CMDNew = new Command(new Action(() => newFile())) { Caption = "New", Icon = new SvgPicture("#Crow.Coding.ui.icons.blank-file.svg"), CanExecute = true};
-			CMDOpen = new Command(new Action(() => openFileDialog())) { Caption = "Open...", Icon = new SvgPicture("#Crow.Coding.ui.icons.outbox.svg")};
-			CMDSave = new Command(new Action(() => saveFileDialog())) { Caption = "Save", Icon = new SvgPicture("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false};
-			CMDSaveAs = new Command(new Action(() => saveFileDialog())) { Caption = "Save As...", Icon = new SvgPicture("#Crow.Coding.ui.icons.inbox.svg"), CanExecute = false};
-			//CMDQuit = new Command(new Action(() => Quit (null, null))) { Caption = "Quit", Icon = new SvgPicture("#Crow.Coding.ui.icons.sign-out.svg")};
+			CMDOpen = new Command(new Action(() => openFileDialog())) { Caption = "Open...", Icon = new SvgPicture("#Crow.Coding.icons.open.svg")};
+			CMDSave = new Command(new Action(() => saveFileDialog())) { Caption = "Save", Icon = new SvgPicture("#Crow.Coding.icons.save.svg"), CanExecute = false};
+			CMDSaveAs = new Command(new Action(() => saveFileDialog())) { Caption = "Save As...", Icon = new SvgPicture("#Crow.Coding.icons.save.svg"), CanExecute = false};
+			CMDQuit = new Command(new Action(() => running = false)) { Caption = "Quit", Icon = new SvgPicture("#Crow.Coding.ui.icons.sign-out.svg")};
 			CMDUndo = new Command(new Action(() => undo())) { Caption = "Undo", Icon = new SvgPicture("#Crow.Coding.icons.undo.svg"), CanExecute = false};
 			CMDRedo = new Command(new Action(() => redo())) { Caption = "Redo", Icon = new SvgPicture("#Crow.Coding.icons.redo.svg"), CanExecute = false};
 			//CMDCut = new Command(new Action(() => Quit (null, null))) { Caption = "Cut", Icon = new SvgPicture("#Crow.Coding.icons.scissors.svg"), CanExecute = false};
@@ -58,7 +60,7 @@ namespace Crow.Coding
 			CMDOptions = new Command(new Action(() => loadWindow("#Crow.Coding.ui.Options.crow"))) { Caption = "Editor Options", Icon = new SvgPicture("#Crow.Coding.icons.tools.svg")};
 
 			cmdCloseSolution = new Command(new Action(() => closeSolution()))
-			{ Caption = "Close Solution", Icon = new SvgPicture("#Crow.Coding.ui.icons.paste-on-document.svg"), CanExecute = false};
+			{ Caption = "Close Solution", Icon = new SvgPicture("#Crow.Coding.icons.paste-on-document.svg"), CanExecute = false};
 
 			CMDViewErrors = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.DockWindows.winErrors.crow",this)))
 			{ Caption = "Errors pane"};
@@ -101,6 +103,16 @@ namespace Crow.Coding
 			CurrentSolution = null;
 		}
 
+		public void saveWinConfigs() {
+			Configuration.Global.Set ("WinConfigs", mainDock.ExportConfig ());
+		}
+		public void reloadWinConfigs() {
+			string conf = Configuration.Global.Get<string>("WinConfigs");
+			if (string.IsNullOrEmpty (conf))
+				return;
+			mainDock.ImportConfig (conf, this);
+		}
+
 		static CrowIDE app;
 		[STAThread]
 		static void Main ()
@@ -111,10 +123,15 @@ namespace Crow.Coding
 				app.Keyboard.KeyDown += App_KeyboardKeyDown;
 				app.initIde ();
 
-				while (true) {
-					
-					Thread.Sleep(10);
+				app.reloadWinConfigs ();
+
+				while (running) {
+					app.ProcessEvents ();
+					//Thread.Sleep(1);
 				}
+
+				app.saveWinConfigs ();
+				Thread.Sleep (500);
 			}
 		}
 
@@ -160,7 +177,7 @@ namespace Crow.Coding
 			instFileDlg = Instantiator.CreateFromImlFragment
 				(MainIFace, "<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}' SearchPattern='*.sln' OkClicked='onFileOpen'/>");
 
-			DockWindow dw = loadWindow ("#Crow.Coding.ui.DockWindows.winEditor.crow", this) as DockWindow;
+			/*DockWindow dw = loadWindow ("#Crow.Coding.ui.DockWindows.winEditor.crow", this) as DockWindow;
 			dw.DockingPosition = Alignment.Center;
 			dw.Dock (mainDock);
 			dw = loadWindow ("#Crow.Coding.ui.DockWindows.winSolution.crow", this) as DockWindow;
@@ -168,8 +185,9 @@ namespace Crow.Coding
 			dw.Dock (mainDock);
 			dw = loadWindow ("#Crow.Coding.ui.DockWindows.winToolbox.crow", this) as DockWindow;
 			dw.DockingPosition = Alignment.Left;
-			dw.Dock (mainDock);
+			dw.Dock (mainDock);*/
 
+			//Console.WriteLine ();
 		}
 
 		void loadProjProps () {

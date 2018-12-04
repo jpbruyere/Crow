@@ -55,19 +55,18 @@ namespace Crow
 		/// load the image for rendering from the path given as argument
 		/// </summary>
 		/// <param name="path">image path, may be embedded</param>
-		public override void Load (Interface iface, string path)
-		{
-			Path = path;
-			if (sharedResources.ContainsKey (path)) {
-				sharedPicture sp = sharedResources [path];
+		void Load ()
+		{			
+			if (sharedResources.ContainsKey (Path)) {
+				sharedPicture sp = sharedResources [Path];
 				image = (byte[])sp.Data;
 				Dimensions = sp.Dims;
 				return;
 			}
-			using (Stream stream = iface.GetStreamFromPath (path)) {				
+			using (Stream stream = Interface.StaticGetStreamFromPath (Path)) {				
 				loadBitmap (new System.Drawing.Bitmap (stream));	
 			}
-			sharedResources [path] = new sharedPicture (image, Dimensions);
+			sharedResources [Path] = new sharedPicture (image, Dimensions);
 		}
 
 		//load image via System.Drawing.Bitmap, cairo load png only

@@ -34,8 +34,12 @@ namespace Crow
 {
 	public class DbgLogViewer : ScrollingObject
 	{
+		public static Dictionary<DbgEvtType,Color> colors;
+
+ 		public static Configuration colorsConf = new Configuration("dbgcolor.conf");
+
 		#region debug viewer private classes
-		class DbgData {
+		public class DbgData {
 			public int objInstanceNum;
 			public LayoutingType layout;
 			public LayoutingQueueItem.Result result;
@@ -44,7 +48,7 @@ namespace Crow
 				objInstanceNum = _obj;
 			}
 		}
-		class DbgEvent {
+		public class DbgEvent {
 			public long begin, end;
 			public DbgEvtType type;
 			public DbgData data = null;
@@ -99,7 +103,19 @@ namespace Crow
 		}
 		#endregion
 
+		public static void reloadColors () {
+			colors = new Dictionary<DbgEvtType, Color>();
+			foreach (string n in colorsConf.Names) {
+				DbgEvtType t = (DbgEvtType)Enum.Parse (typeof(DbgEvtType), n);
+				Color c = colorsConf.Get<Color> (n);
+				colors.Add (t, c);
+			}
+
+		}
 		#region CTOR
+		static DbgLogViewer() {
+			reloadColors ();
+		}
 		protected DbgLogViewer () : base(){}
 		public DbgLogViewer (Interface iface) : base(iface){}
 		#endregion
@@ -156,8 +172,13 @@ namespace Crow
 		void storeEvent (DbgEvent evt) {
 			if (evt.data == null)//global events
 				events.Add (evt);
-			else
-				objs.Where (o => o.instanceNum == evt.data.objInstanceNum).FirstOrDefault ().events.Add (evt);						
+			else {
+				DbgGo go = objs.Where (o => o.instanceNum == evt.data.objInstanceNum).FirstOrDefault ();
+				if (go == null)
+					Console.WriteLine ("Unknown instance: " + evt.data.objInstanceNum);
+				else
+					go.events.Add (evt);						
+			}
 		}
 
 		void loadDebugFile() {
@@ -289,50 +310,7 @@ namespace Crow
 			}
 		}
 
-		Crow.Color getObjEventColor (DbgEvent evt) {
-			if (evt.type.HasFlag (DbgEvtType.GOLayouting)) {
-				if (evt.type == DbgEvtType.GOProcessLayouting) {							
-					switch (evt.data.result) {
-					case LayoutingQueueItem.Result.Success:
-						return Crow.Color.Green;
-					case LayoutingQueueItem.Result.Deleted:
-						return Crow.Color.Red;
-					case LayoutingQueueItem.Result.Discarded:
-						return Crow.Color.DarkRed;
-					case LayoutingQueueItem.Result.Requeued:
-						return Crow.Color.Orange;
-					}
-				} else if (evt.type == DbgEvtType.GOProcessLayoutingWithNoParent)
-					return Color.IndianRed;
-				else
-					return Crow.Color.Blue;				
-			}
-			switch (evt.type) {
-			case DbgEvtType.GOClassCreation:
-				return Color.GhostWhite;
-			case DbgEvtType.GOInitialization:
-				return Color.Cyan;
-			case DbgEvtType.GOClippingRegistration:
-				return Color.Cyan;
-			case DbgEvtType.GORegisterClip:
-				return Color.Cyan;
-			case DbgEvtType.GORegisterForGraphicUpdate:
-				return Color.Cyan;
-			case DbgEvtType.GOEnqueueForRepaint:
-				return Color.Cyan;
-			case DbgEvtType.GODraw:
-				return Color.Cyan;
-			case DbgEvtType.GORecreateCache:
-				return Color.Cyan;
-			case DbgEvtType.GOUpdateCacheAndPaintOnCTX:
-				return Color.Cyan;
-			case DbgEvtType.GOPaint:
-				return Color.Cyan;
-			case DbgEvtType.GONewDataSource:
-				return Color.Cyan;
-			}
-			return Crow.Color.RebeccaPurple;				
-		}
+
 
 		protected override void onDraw (Cairo.Context gr)
 		{
@@ -341,7 +319,7 @@ namespace Crow
 			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
 			gr.SetFontSize (Font.Size);
 			gr.FontOptions = Interface.FontRenderingOptions;
-			gr.Antialias = Interface.Antialias;
+			gr.Antialias = Cairo.Antialias.None;
 
 			if (objs == null)
 				return;
@@ -353,13 +331,19 @@ namespace Crow
 			double penY = topMargin + ClientRectangle.Top;
 
 			for (int i = 0; i < visibleLines; i++) {
+				if (i + ScrollY >= objs.Count)
+					break;
 				DbgGo g = objs [i + ScrollY];
 
+
 				foreach (DbgEvent evt in g.events) {
+					
+
 					if (evt.end - minTicks <= ScrollX)
 						continue;
 					if (evt.begin - minTicks > ScrollX + visibleTicks)
 						break;
+
 					double x = xScale * (evt.begin - minTicks - ScrollX) ;
 					double w = Math.Max (Math.Max(2.0, 2.0 * xScale), (double)(evt.end - evt.begin) * xScale);
 					if (x < 0.0) {
@@ -373,11 +357,32 @@ namespace Crow
 					//if (x + w > cb.Right)
 					//	continue;
 
-					gr.SetSourceColor (getObjEventColor (evt));											
+					Color c = Color.Black;
+
+					if (evt.type == DbgEvtType.GOProcessLayouting) {							
+						switch (evt.data.result) {
+						case LayoutingQueueItem.Result.Success:
+							c = Crow.Color.Green;
+							break;
+						case LayoutingQueueItem.Result.Deleted:
+							c = Crow.Color.Red;
+							break;
+						case LayoutingQueueItem.Result.Discarded:
+							c = Crow.Color.OrangeRed;
+							break;
+						case LayoutingQueueItem.Result.Requeued:
+							c = Crow.Color.Orange;
+							break;
+						}
+					} else if (colors.ContainsKey (evt.type))
+						c = colors [evt.type];
+					else
+						System.Diagnostics.Debugger.Break ();
+
+					gr.SetSourceColor (c);
 
 					gr.Rectangle (x, penY, w, fe.Height);
 					gr.Fill ();
-
 				}
 
 				penY += fe.Height;
@@ -458,7 +463,9 @@ namespace Crow
 				gr.MoveTo (x- 0.5 * te.Width, penY - gr.FontExtents.Descent);
 				gr.SetSourceColor (Crow.Color.Jet);
 				gr.ShowText (s);
+
 			}
+
 		}
 		public override void Paint (ref Cairo.Context ctx)
 		{
@@ -569,7 +576,9 @@ namespace Crow
 			if (selStart >= 0 && IFace.Mouse.IsButtonDown(MouseButton.Left))
 				selEnd = currentTick;
 
-			RegisterForRedraw ();
+			if (RegisteredLayoutings == LayoutingType.None && !IsDirty)
+				IFace.EnqueueForRepaint (this);
+			
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{

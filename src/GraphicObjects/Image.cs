@@ -173,7 +173,7 @@ namespace Crow
 			else
 				pic = new BmpPicture (path);
 
-			pic.Load (IFace, path);
+
 			pic.Scaled = scaled;
 			pic.KeepProportions = keepProps;
 

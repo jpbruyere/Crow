@@ -72,8 +72,8 @@ namespace Crow.Coding
 		}
 
 		void initIcons () {
-			icoMove = new SvgPicture ();
-			icoMove.Load (IFace, "#Crow.Coding.icons.move-arrows.svg");
+			icoMove = new SvgPicture ("#Crow.Coding.icons.move-arrows.svg");
+
 //			icoStyle = new SvgPicture ();
 //			icoStyle.Load (IFace, "#Crow.Coding.icons.palette.svg");
 		}
@@ -355,7 +355,7 @@ namespace Crow.Coding
 
 			if (oldHW == newHW)
 				return;
-			RegisterForRedraw ();
+			//RegisterForRedraw ();
 
 		}
 		public override void onMouseEnter (object sender, MouseMoveEventArgs e)

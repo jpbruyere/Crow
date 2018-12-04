@@ -464,12 +464,8 @@ namespace Crow.Coding
 				solution.DefaultTemplates [clsName] = pi.Path;
 			}
 
-			foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference>()) {				
-				Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);
-				if (p == null)
-					throw new Exception ("referenced project not found");
-				p.GetDefaultTemplates ();
-			}
+			foreach (Project p in ReferencedProjects)				
+				p.GetDefaultTemplates ();			
 		}
 //		void searchTemplatesIn(Assembly assembly){
 //			if (assembly == null)
@@ -483,6 +479,18 @@ namespace Crow.Coding
 //				DefaultTemplates[clsName] = "#" + resId;
 //			}
 //		}
+
+		public List<Project> ReferencedProjects {
+			get {
+				List<Project> tmp = new List<Project> ();
+				foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference>()) {				
+					Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);
+					if (p != null)
+						tmp.Add (p);					
+				}
+				return tmp;
+			}
+		}
 
 		public void GetStyling () {
 			try {

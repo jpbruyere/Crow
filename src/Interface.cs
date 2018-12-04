@@ -119,6 +119,7 @@ namespace Crow
 		}
 		#endregion
 
+		protected bool running;
 		protected virtual void InitBackend () {
 			backend = new Crow.XCB.XCBBackend ();
 			//backend = new Crow.XLib.XLibBackend ();
@@ -128,8 +129,10 @@ namespace Crow
 			Keyboard.KeyUp += Keyboard_KeyUp;
 			Keyboard.KeyPress += Keyboard_KeyPress;
 
-			initTooltip ();
-			initContextMenus ();
+			//initTooltip ();
+			//initContextMenus ();
+
+			running = true;
 
 			Thread t = new Thread (interfaceThread);
 			t.IsBackground = true;
@@ -168,10 +171,10 @@ namespace Crow
 
 		void interfaceThread()
 		{			
-			while (true) {
+			while (running) {
 				Update ();
 
-				backend.ProcessEvents ();
+				Thread.Sleep (1);
 			}
 		}
 
@@ -208,6 +211,9 @@ namespace Crow
 		}
 		#endregion
 
+		public void ProcessEvents() {
+			backend.ProcessEvents ();
+		}
 		public void Init () {
 			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
@@ -575,10 +581,15 @@ namespace Crow
 
 				_activeWidget = value;
 
+				#if DEBUG_FOCUS
+				NotifyValueChanged("ActiveWidget", _activeWidget);
+				#endif
+
 				if (_activeWidget != null)
 				{
 					_activeWidget.IsActive = true;
 					#if DEBUG_FOCUS
+					NotifyValueChanged("ActiveWidget", _activeWidget);
 					Debug.WriteLine("Active => " + _activeWidget.ToString());
 				}else
 					Debug.WriteLine("Active => null");
@@ -599,6 +610,9 @@ namespace Crow
 					_hoverWidget.IsHover = false;
 
 				_hoverWidget = value;
+				#if DEBUG_FOCUS
+				NotifyValueChanged("HoverWidget", _hoverWidget);
+				#endif
 
 				if (_hoverWidget != null)
 				{
@@ -621,6 +635,9 @@ namespace Crow
 				if (_focusedWidget != null)
 					_focusedWidget.HasFocus = false;
 				_focusedWidget = value;
+				#if DEBUG_FOCUS
+				NotifyValueChanged("FocusedWidget", _focusedWidget);
+				#endif
 				if (_focusedWidget != null)
 					_focusedWidget.HasFocus = true;
 			}
@@ -810,7 +827,11 @@ namespace Crow
 					}
 
 					#if DEBUG_CLIP_RECTANGLE
-					clipping.stroke (ctx, Color.Red.AdjustAlpha(0.5));
+					ctx.LineWidth = 1;
+					ctx.SetSourceColor(Color.Magenta.AdjustAlpha (0.5));
+					for (int i = 0; i < clipping.NumRectangles; i++)
+						ctx.Rectangle(clipping.GetRectangle(i));
+					ctx.Stroke ();
 					#endif
 
 					clipping.Dispose ();

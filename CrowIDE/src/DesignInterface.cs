@@ -30,6 +30,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using Cairo;
 
 namespace Crow.Coding
 {
@@ -62,15 +63,14 @@ namespace Crow.Coding
 
 		protected override void InitBackend ()
 		{
-			surf = CrowIDE.MainIFace.surf.CreateSimilar (Cairo.Content.ColorAlpha, 100, 100);
+			surf = new ImageSurface(Format.Argb32, 100, 100);
 		}
 		public override void ProcessResize (Rectangle bounds)
 		{
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
 				surf.Dispose ();
-				surf = CrowIDE.MainIFace.surf.CreateSimilar (Cairo.Content.ColorAlpha, clientRectangle.Width, clientRectangle.Height);
-
+				surf = new ImageSurface(Format.Argb32, clientRectangle.Width, clientRectangle.Height);
 
 				foreach (GraphicObject g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
