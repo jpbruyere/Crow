@@ -51,7 +51,7 @@
 				</VerticalStack>
 			</HorizontalStack>
 			<HorizontalStack Height="Fit" Margin="5">
-				<Label Text="MouseEvents" Width="50%" Margin="3"
+				<Label Text="MouseEvents" Width="50%" Margin="3" Focusable="true"
 					Background="Jet"
 					Foreground="DimGrey"
 					TextAlignment="Center"

@@ -46,7 +46,7 @@ namespace Crow
 		Measure popWidth, popHeight;
 
 		#region Public properties
-		[XmlAttributeAttribute][DefaultValue(false)]
+		[DefaultValue(false)]
 		public bool IsOpened {
 			get { return isOpened; }
 			set {
@@ -58,12 +58,12 @@ namespace Crow
 				if (isOpened) {
 					onOpen (this, null);
 					if (LogicalParent is Menu)
-						(LogicalParent as Menu).AutomaticOpenning = true;
+						(LogicalParent as Menu).AutomaticOpening = true;
 				}else
 					onClose (this, null);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(null)]
+		[DefaultValue(null)]
 		public virtual Command Command {
 			get { return command; }
 			set {
@@ -148,7 +148,7 @@ namespace Crow
 				closeMenu ();
 			}
 			if(!IsOpened)
-				(LogicalParent as Menu).AutomaticOpenning = false;
+				(LogicalParent as Menu).AutomaticOpening = false;
 		}
 		protected virtual void onOpen (object sender, EventArgs e){
 			Open.Raise (this, null);
@@ -167,7 +167,7 @@ namespace Crow
 			Menu menu = LogicalParent as Menu;
 			if (menu == null)
 				return;
-			if (menu.AutomaticOpenning && items.Children.Count>0)
+			if (menu.AutomaticOpening && items.Children.Count>0)
 				IsOpened = true;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
@@ -181,6 +181,8 @@ namespace Crow
 			MenuItem tmp = LogicalParent as MenuItem;
 			while (tmp != null) {
 				tmp.IsOpened = false;
+				tmp.Background = Color.Transparent;
+				tmp.AutomaticOpening = false;
 				tmp = tmp.LogicalParent as MenuItem;
 			}
 		}

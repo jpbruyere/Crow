@@ -48,19 +48,20 @@ namespace Crow
 		/// </summary>
 		/// <param name="path">image path, may be embedded</param>
 		public SvgPicture (string path) : base(path)
-		{}
+		{
+			Load ();
+		}
 		#endregion
 
-		public override void Load (Interface iface, string path)
-		{
-			Path = path;
-			if (sharedResources.ContainsKey (path)) {
-				sharedPicture sp = sharedResources [path];
+		void Load ()
+		{			
+			if (sharedResources.ContainsKey (Path)) {
+				sharedPicture sp = sharedResources [Path];
 				hSVG = (Rsvg.Handle)sp.Data;
 				Dimensions = sp.Dims;
 				return;
 			}
-			using (Stream stream = iface.GetStreamFromPath (path)) {
+			using (Stream stream = Interface.StaticGetStreamFromPath (Path)) {
 				using (MemoryStream ms = new MemoryStream ()) {
 					stream.CopyTo (ms);
 
@@ -68,7 +69,7 @@ namespace Crow
 					Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
 				}
 			}
-			sharedResources [path] = new sharedPicture (hSVG, Dimensions);
+			sharedResources [Path] = new sharedPicture (hSVG, Dimensions);
 		}
 
 		public void LoadSvgFragment (string fragment) {			

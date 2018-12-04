@@ -31,7 +31,7 @@ namespace Crow
 	/// <summary>
 	/// Measurement unit
 	/// </summary>
-	public enum Unit { Pixel, Percent, Inherit }
+	public enum Unit {Undefined, Pixel, Percent, Inherit }
 	/// <summary>
 	/// Measure class allow proportional sizes as well as stretched and fit on content.
 	/// </summary>
@@ -114,7 +114,7 @@ namespace Crow
 
 		public static Measure Parse(string s){
 			if (string.IsNullOrEmpty (s))
-				return Measure.Stretched;
+				return default(Measure);
 
 			string st = s.Trim ();
 			int tmp = 0;

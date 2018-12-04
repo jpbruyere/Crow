@@ -1,8 +1,8 @@
 ﻿//
-// Menu.cs
+// SimpleGauge.cs
 //
 // Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
+//       jp <>
 //
 // Copyright (c) 2013-2017 Jean-Philippe Bruyère
 //
@@ -23,60 +23,37 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-
 using System;
-using System.Xml.Serialization;
+using Crow;
 using System.ComponentModel;
+using Cairo;
 
 namespace Crow
 {
-	public class Menu : TemplatedGroup
+	public class LaggingGraphicObject : GraphicObject
 	{
-		#region CTOR
-		protected Menu () : base(){}
-		public Menu (Interface iface) : base(iface) {}
-		#endregion
-
-		Orientation orientation;
-		bool autoOpen = false;
-
-		#region Public properties
-		[XmlAttributeAttribute][DefaultValue(Orientation.Horizontal)]
-		public Orientation Orientation {
-			get { return orientation; }
-			set {
-				if (orientation == value)
-					return;
-				orientation = value;
-				NotifyValueChanged ("Orientation", orientation);
-			}
-		}
-		[XmlIgnore]public bool AutomaticOpening
+		protected override void onDraw (Context gr)
 		{
-			get { return autoOpen; }
-			set	{
-				if (autoOpen == value)
-					return;
-				autoOpen = value;
-				NotifyValueChanged ("AutomaticOpening", autoOpen);
+			base.onDraw (gr);
+
+
+			for (int i = 0; i < 100000; i++) {
+				gr.SetSourceColor (Color.Red);
+				gr.Rectangle (0, 0, 100, 100);
+				gr.Stroke ();
+
 			}
-		}
-		#endregion
 
-		public override void AddItem (GraphicObject g)
-		{			
-			base.AddItem (g);
+			//System.Threading.Thread.Sleep (1000);
 
-			if (orientation == Orientation.Horizontal)
-				g.NotifyValueChanged ("PopDirection", Alignment.Bottom);
-			else
-				g.NotifyValueChanged ("PopDirection", Alignment.Right);
 		}
-		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
+
+		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
-			base.onMouseLeave (sender, e);
-			AutomaticOpening = false;
+
+
+			RegisterForRedraw ();
 		}
-	}
+	}		
 }
 

@@ -69,7 +69,7 @@ namespace Crow
 		public override void onKeyDown (object sender, KeyEventArgs e)
 		{
 			base.onKeyDown (sender, e);
-			/*
+
 			Key key = e.Key;
 
 			switch (key)
@@ -85,12 +85,12 @@ namespace Crow
 				if (selectionIsEmpty) {
 					if (!MoveRight ())
 						return;
-				}else if (e.Shift)
+				}else if (IFace.Keyboard.Shift)
 					IFace.Clipboard = this.SelectedText;
 				this.DeleteChar ();
 				break;
-			case Key.ISO_Enter:
 			case Key.KP_Enter:
+			case Key.Return:
 				if (!selectionIsEmpty)
 					this.DeleteChar ();
 				if (Multiline)
@@ -104,46 +104,46 @@ namespace Crow
 				SelRelease = -1;
 				break;
 			case Key.Home:
-				if (e.Shift) {
+				if (IFace.Keyboard.Shift) {
 					if (selectionIsEmpty)
 						SelBegin = new Point (CurrentColumn, CurrentLine);
-					if (e.Control)
+					if (IFace.Keyboard.Ctrl)
 						CurrentLine = 0;
 					CurrentColumn = 0;
 					SelRelease = new Point (CurrentColumn, CurrentLine);
 					break;
 				}
 				SelRelease = -1;
-				if (e.Control)
+				if (IFace.Keyboard.Ctrl)
 					CurrentLine = 0;
 				CurrentColumn = 0;
 				break;
 			case Key.End:
-				if (e.Shift) {
+				if (IFace.Keyboard.Shift) {
 					if (selectionIsEmpty)
 						SelBegin = CurrentPosition;
-					if (e.Control)
+					if (IFace.Keyboard.Ctrl)
 						CurrentLine = int.MaxValue;
 					CurrentColumn = int.MaxValue;
 					SelRelease = CurrentPosition;
 					break;
 				}
 				SelRelease = -1;
-				if (e.Control)
+				if (IFace.Keyboard.Ctrl)
 					CurrentLine = int.MaxValue;
 				CurrentColumn = int.MaxValue;
 				break;
 			case Key.Insert:
-				if (e.Shift)
+				if (IFace.Keyboard.Shift)
 					this.Insert (IFace.Clipboard);
-				else if (e.Control && !selectionIsEmpty)
+				else if (IFace.Keyboard.Ctrl && !selectionIsEmpty)
 					IFace.Clipboard = this.SelectedText;
 				break;
 			case Key.Left:
-				if (e.Shift) {
+				if (IFace.Keyboard.Shift) {
 					if (selectionIsEmpty)
 						SelBegin = new Point(CurrentColumn, CurrentLine);
-					if (e.Control)
+					if (IFace.Keyboard.Ctrl)
 						GotoWordStart ();
 					else if (!MoveLeft ())
 						return;
@@ -151,16 +151,16 @@ namespace Crow
 					break;
 				}
 				SelRelease = -1;
-				if (e.Control)
+				if (IFace.Keyboard.Ctrl)
 					GotoWordStart ();
 				else
 					MoveLeft();
 				break;
 			case Key.Right:
-				if (e.Shift) {
+				if (IFace.Keyboard.Shift) {
 					if (selectionIsEmpty)
 						SelBegin = CurrentPosition;
-					if (e.Control)
+					if (IFace.Keyboard.Ctrl)
 						GotoWordEnd ();
 					else if (!MoveRight ())
 						return;
@@ -168,13 +168,13 @@ namespace Crow
 					break;
 				}
 				SelRelease = -1;
-				if (e.Control)
+				if (IFace.Keyboard.Ctrl)
 					GotoWordEnd ();
 				else
 					MoveRight ();
 				break;
 			case Key.Up:
-				if (e.Shift) {
+				if (IFace.Keyboard.Shift) {
 					if (selectionIsEmpty)
 						SelBegin = CurrentPosition;
 					CurrentLine--;
@@ -185,7 +185,7 @@ namespace Crow
 				CurrentLine--;
 				break;
 			case Key.Down:
-				if (e.Shift) {
+				if (IFace.Keyboard.Shift) {
 					if (selectionIsEmpty)
 						SelBegin = CurrentPosition;
 					CurrentLine++;
@@ -197,13 +197,11 @@ namespace Crow
 				break;
 			case Key.Menu:
 				break;
-			case Key.NumLock:
+			case Key.Num_Lock:
 				break;
-			case Key.PageDown:				
+			case Key.Page_Down:				
 				break;
-			case Key.PageUp:
-				break;
-			case Key.RWin:
+			case Key.Page_Up:
 				break;
 			case Key.Tab:
 				this.Insert ("\t");
@@ -211,7 +209,7 @@ namespace Crow
 			default:
 				break;
 			}
-			*/
+
 			RegisterForGraphicUpdate();
 		}
 		public override void onKeyPress (object sender, KeyPressEventArgs e)

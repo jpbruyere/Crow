@@ -26,6 +26,8 @@
 using System;
 using Crow.IML;
 using System.Linq;
+using System.Text;
+using System.IO;
 
 namespace Crow
 {
@@ -368,6 +370,100 @@ namespace Crow
 			dw = Children[Children.Count - 1] as DockWindow;
 			if (dw != null)
 				dw.DockingPosition = (Orientation == Orientation.Horizontal ? Alignment.Right : Alignment.Bottom);
+		}
+
+		//read next value in config string until next ';'
+		string getConfAttrib (string conf, ref int i) {
+			int nextI = conf.Substring (i).IndexOf (';');
+			string tmp = conf.Substring (i, nextI);
+			i += nextI + 1;
+			return tmp;
+		}
+		/// <summary>
+		/// Imports the config.
+		/// </summary>
+		/// <param name="conf">Conf.</param>
+		/// <param name="dataSource">Data source for the docked windows</param>
+		public void ImportConfig (string conf, object dataSource = null) {
+			lock (IFace.UpdateMutex) {
+				ClearChildren ();
+				stretchedChild = null;
+				int i = 0;
+				Orientation = (Orientation)Enum.Parse (typeof(Orientation), getConfAttrib (conf, ref i));
+				importConfig (conf, ref i, dataSource);
+			}
+		}
+		public string ExportConfig () {
+			return Orientation.ToString() + ";" + exportConfig();
+		}
+		void importConfig (string conf, ref int i, object dataSource) {						
+			if (conf [i++] != '(')
+				return;			
+			while (i < conf.Length - 4) {
+				string sc = conf.Substring (i, 4);
+				i += 4;
+				switch (sc) {
+				case "WIN;":
+					DockWindow dw = null;
+					string wName = getConfAttrib (conf, ref i);
+					try {
+						dw = IFace.Load (wName) as DockWindow;	
+					} catch {
+						dw = new DockWindow (IFace);
+					}
+
+					dw.Name = wName;
+					dw.Width = Measure.Parse (getConfAttrib (conf, ref i));
+					dw.Height = Measure.Parse (getConfAttrib (conf, ref i));
+					dw.DockingPosition = (Alignment)Enum.Parse (typeof(Alignment), getConfAttrib (conf, ref i));
+					dw.IsDocked = true;
+					dw.DataSource = dataSource;
+					this.AddChild (dw);
+
+					break;
+				case "STK;":
+					DockStack ds = new DockStack (IFace);
+					ds.Width = Measure.Parse (getConfAttrib (conf, ref i));
+					ds.Height = Measure.Parse (getConfAttrib (conf, ref i));
+					ds.Orientation = (Orientation)Enum.Parse (typeof(Orientation), getConfAttrib (conf, ref i));
+
+					this.AddChild (ds);
+
+					ds.importConfig (conf, ref i, dataSource);
+					break;
+				case "SPL;":
+					Splitter sp = new Splitter (IFace);
+					sp.Width = Measure.Parse (getConfAttrib (conf, ref i));
+					sp.Height = Measure.Parse (getConfAttrib (conf, ref i));
+					sp.Thickness = int.Parse (getConfAttrib (conf, ref i));
+					this.AddChild (sp);
+					break;
+				}
+				char nextC = conf [i++];
+				if (nextC == ')')
+					break;
+			}
+		}
+		string exportConfig () {
+			StringBuilder tmp = new StringBuilder("(");
+
+			for (int i = 0; i < Children.Count; i++) {
+				if (Children [i] is DockWindow) {
+					DockWindow dw = Children [i] as DockWindow;
+					tmp.Append (string.Format("WIN;{0};{1};{2};{3};",dw.Name, dw.Width, dw.Height, dw.DockingPosition));
+				} else if (Children [i] is DockStack) {
+					DockStack ds = Children [i] as DockStack;
+					tmp.Append (string.Format("STK;{0};{1};{2};{3}", ds.Width, ds.Height, ds.Orientation, ds.exportConfig()));
+				} else if (Children [i] is Splitter) {
+					Splitter sp = Children [i] as Splitter;
+					tmp.Append (string.Format("SPL;{0};{1};{2};", sp.Width, sp.Height, sp.Thickness));
+				}					
+				if (i < Children.Count - 1)
+					tmp.Append ("|");				
+			}
+
+			tmp.Append (")");
+			return tmp.ToString ();
 		}
 	}
 }

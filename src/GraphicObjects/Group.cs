@@ -340,7 +340,11 @@ namespace Crow
 				childrenRWLock.ExitReadLock ();
 
 				#if DEBUG_CLIP_RECTANGLE
-				Clipping.stroke (gr, Color.Amaranth.AdjustAlpha (0.8));
+				/*gr.LineWidth = 1;
+				gr.SetSourceColor(Color.DarkMagenta.AdjustAlpha (0.8));
+				for (int i = 0; i < Clipping.NumRectangles; i++)
+					gr.Rectangle(Clipping.GetRectangle(i));
+				gr.Stroke ();*/
 				#endif
 			}
 			gr.Dispose ();

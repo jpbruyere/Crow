@@ -102,6 +102,7 @@
     <Compile Include="GraphicObjects\HexaContainer.cs" />
     <Compile Include="GraphicObjects\TechBorder.cs" />
     <Compile Include="keysyms.cs" />
+    <Compile Include="GraphicObjects\LaggingGraphicObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="image\u.svg">
@@ -379,6 +380,12 @@
     <None Include="Interfaces\TemplatedContainer\testTabView2.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Interfaces\Divers\testFocus.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Interfaces\Divers\testMenu.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />
@@ -422,6 +429,14 @@
     <EmbeddedResource Include="ui\dbgLog.crow" />
     <EmbeddedResource Include="Interfaces\Experimental\DockWindow.template">
       <LogicalName>Crow.DockWindow.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\MenuItem.template">
+      <LogicalName>Crow.MenuItem.template</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="image\blank-file.svg" />
+    <EmbeddedResource Include="ui\dbgLogColors.crow" />
+    <EmbeddedResource Include="Interfaces\colorItem2.crow">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

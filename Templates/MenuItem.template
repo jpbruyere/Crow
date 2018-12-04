@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0"?>
+<HorizontalStack>
 <Popper Font="{./Font}" Caption="{./Caption}"  Background="{./Background}" PopDirection="{./PopDirection}"
 	Foreground = "{./Foreground}" CanPop="{./HasChildren}" MouseClick="./onMI_Click"
 	IsPopped="{²./IsOpened}" PopWidth="{./PopWidth}" PopHeight="{./PopHeight}">
@@ -6,10 +7,6 @@
 		<CheckBox IsChecked="{²./IsPopped}" Caption="{./Caption}" Background="{./Background}" Foreground="{./Foreground}">
 			<Template>		
 				<Border Name="border1"
-						MouseEnter="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black}"
-						MouseLeave="{Foreground=Transparent}"
-						MouseDown="{Foreground=vgradient|0:Black|0.05:Grey|0.85:Grey|1:White}"
-						MouseUp="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black}"
 						MinimumSize = "60,0"
 						Foreground="Transparent"
 						Background="{./Background}">
@@ -21,7 +18,9 @@
 			</Template>		
 		</CheckBox>
 	</Template>
-	<Border Foreground="DimGrey" Width="{../PopWidth}" Height="{../PopHeight}" Background="Jet">
+	<Border Foreground="DimGrey" Width="{../PopWidth}" Height="{../PopHeight}" Background="vgradient|0:DimGrey|1:Black">
 		<VerticalStack Name="ItemsContainer"/>
 	</Border>
 </Popper>
+<GraphicObject Background="Green" Width="5" Height="5" Visible="{./AutomaticOpening}"/>
+</HorizontalStack>

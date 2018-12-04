@@ -242,5 +242,11 @@ namespace Crow
 			else				
 				adjustStretchedGo (LayoutingType.Height);			
 		}
+
+		public override void ClearChildren ()
+		{
+			base.ClearChildren ();
+			stretchedGO = null;
+		}
 	}
 }

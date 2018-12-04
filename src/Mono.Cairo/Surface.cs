@@ -120,7 +120,7 @@ namespace Cairo {
 			IntPtr p = NativeMethods.cairo_surface_create_similar (
 				this.Handle, content, width, height);
 
-			return new Cairo.Surface (p, true);
+			return Surface.Lookup(p, true);
 		}
 
 		~Surface ()
@@ -151,6 +151,8 @@ namespace Cairo {
 
 			NativeMethods.cairo_surface_destroy (handle);
 			handle = IntPtr.Zero;
+		}
+		public virtual void SetSize (int width, int height) {			
 		}
 
 		public Status Finish ()

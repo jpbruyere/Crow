@@ -11,6 +11,11 @@
  			<Label  Text="{./DockingPosition}" TextAlignment="Left" Width="Fit"
 					 Foreground="White" />
 		</HorizontalStack>
+		<Label  Text="{./Width}" TextAlignment="Left" Width="Fit"
+				 Foreground="White" />
+		<Label  Text="{./Height}" TextAlignment="Left" Width="Fit"
+				 Foreground="White" />
+
 		<HorizontalStack Visible="{./IsDocked}" Height="Fit" Margin="1" Background="Grey">
 			<Label  Text="{./Caption}" TextAlignment="Left" Width="Stretched"
 					 Foreground="Jet" />

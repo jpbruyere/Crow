@@ -945,11 +945,17 @@ namespace Crow
 
 				if (value != null)
 					rootDataLevel = true;
-				
+
+				#if DEBUG_LOG
+				DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GOLockLayouting, this);
+				#endif
 				lock (IFace.LayoutMutex) {
 					OnDataSourceChanged (this, dse);
 					NotifyValueChanged ("DataSource", DataSource);
 				}
+				#if DEBUG_LOG
+				dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+				#endif
 			}
 			get {
 				return rootDataLevel ? dataSource : dataSource == null ?
@@ -1358,8 +1364,13 @@ namespace Crow
 		public virtual void RegisterClip(Rectangle clip){
 			#if DEBUG_LOG
 			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GORegisterClip, this);
-			#endif	
-			Rectangle  r = clip + ClientRectangle.Position;
+			#endif
+			Rectangle cb = ClientRectangle;
+			Rectangle  r = clip + cb.Position;
+			if (r.Right > cb.Right)
+				r.Width -= r.Right - cb.Right;
+			if (r.Bottom > cb.Bottom)
+				r.Height -= r.Bottom - cb.Bottom;
 			if (CacheEnabled && !IsDirty)
 				Clipping.UnionRectangle (r);
 			if (Parent == null)
@@ -1372,7 +1383,7 @@ namespace Crow
 			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
 			#endif
 		}
-		/// <summary> Full update, taking care of sizing policy </summary>
+		/// <summary> Full update, content and layouting, taking care of sizing policy </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForGraphicUpdate ()
 		{
@@ -1382,7 +1393,7 @@ namespace Crow
 			else if (RegisteredLayoutings == LayoutingType.None)
 				IFace.EnqueueForRepaint (this);
 		}
-		/// <summary> query an update of the content, a redraw </summary>
+		/// <summary> query an update of the content without layouting changes</summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForRedraw ()
 		{
@@ -1641,14 +1652,21 @@ namespace Crow
 			#if DEBUG_LOG
 			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GORecreateCache, this);
 			#endif
-			IsDirty = false;
+
+			/*if (bmp == null)
+				bmp = IFace.surf.CreateSimilar (Content.ColorAlpha, Slot.Width, Slot.Height);
+			else if (LastPaintedSlot.Width != Slot.Width || LastPaintedSlot.Height != Slot.Height)
+				bmp.SetSize (Slot.Width, Slot.Height);*/
 			bmp?.Dispose ();
-			bmp = IFace.surf.CreateSimilar(Content.ColorAlpha, Slot.Width, Slot.Height);
+			bmp = new ImageSurface(Format.Argb32, Slot.Width, Slot.Height);
+			
 			using (Context gr = new Context (bmp)) {
 				gr.Antialias = Interface.Antialias;
 				onDraw (gr);
 			}
-			bmp.Flush ();
+
+			IsDirty = false;
+
 			#if DEBUG_LOG
 			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
 			#endif
@@ -1657,6 +1675,7 @@ namespace Crow
 			#if DEBUG_LOG
 			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GOUpdateCacheAndPaintOnCTX, this);
 			#endif
+
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 			if (clearBackground) {
 					ctx.Save ();
@@ -1665,6 +1684,7 @@ namespace Crow
 					ctx.Fill ();
 					ctx.Restore ();
 			}
+
 			ctx.SetSourceSurface (bmp, rb.X, rb.Y);
 			ctx.Paint ();
 			Clipping.Dispose ();

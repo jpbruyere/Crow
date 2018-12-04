@@ -38,3 +38,6 @@ DbgLogViewer{
 	Foreground = "LightGrey";
 	Focusable = "true";
 }
+DockWindow{
+	Background = "0.1,0.1,0.1,0.5";
+}

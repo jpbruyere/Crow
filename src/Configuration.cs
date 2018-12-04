@@ -29,6 +29,7 @@ using System.Reflection;
 using System.IO;
 using System.Collections.Generic;
 using System.Threading;
+using System.Linq;
 
 namespace Crow
 {
@@ -102,6 +103,7 @@ namespace Crow
 			}
 			startSavingThread ();
 		}
+
 		static Configuration ()
 		{
 			string configRoot =
@@ -128,6 +130,13 @@ namespace Crow
 			}
 			globalConfig = new Configuration (globalConfigPath);
 		}
+
+		public string[] Names {
+			get {
+				return items.Keys.ToArray ();
+			}
+		}
+
 		void startSavingThread(){
 			Thread t = new Thread (savingThread);
 			t.IsBackground = true;
@@ -139,7 +148,7 @@ namespace Crow
 					save ();
 					isDirty = false;
 				}
-				Thread.Sleep (1000);
+				Thread.Sleep (100);
 			}
 		}
 		/// <summary>
