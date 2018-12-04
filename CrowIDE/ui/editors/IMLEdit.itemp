@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose" Background="DimGrey">
+<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose" Background="Jet">
 	<VerticalStack>
 		<HorizontalStack Height="Fit" Margin="2" Spacing="5">
 			<HorizontalStack Width="Fit" Spacing="1">
@@ -44,6 +44,7 @@
 		</VerticalStack>
 		<Splitter/>
 		<IMLContainer Path="#Crow.Coding.ui.SourceEditor.crow"/>
+		<Splitter Visible="{../editor.HasError}"/>
 		<Label DataSource="{../editor.Error}" Text="{}"
 			Visible="{../editor.HasError}"
 			Height="Fit" Width="Stretched" Background="DarkRed" Foreground="White"

@@ -35,9 +35,9 @@ namespace Crow.XLib
 		[DllImportAttribute("X11")]
 		static extern int XInitThreads();
 		[DllImportAttribute("X11")]
-		static extern IntPtr XOpenDisplay(IntPtr displayName);
+		internal static extern IntPtr XOpenDisplay(IntPtr displayName);
 		[DllImportAttribute("X11")]
-		static extern IntPtr XCloseDisplay(IntPtr disp);
+		internal static extern IntPtr XCloseDisplay(IntPtr disp);
 		[DllImportAttribute("X11")]
 		static extern Int32 XDefaultScreen(IntPtr disp);
 		[DllImportAttribute("X11")]

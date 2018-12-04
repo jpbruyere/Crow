@@ -129,8 +129,8 @@ namespace Crow
 			Keyboard.KeyUp += Keyboard_KeyUp;
 			Keyboard.KeyPress += Keyboard_KeyPress;
 
-			//initTooltip ();
-			//initContextMenus ();
+			initTooltip ();
+			initContextMenus ();
 
 			running = true;
 
@@ -173,8 +173,7 @@ namespace Crow
 		{			
 			while (running) {
 				Update ();
-
-				Thread.Sleep (1);
+				Thread.Sleep (5);
 			}
 		}
 

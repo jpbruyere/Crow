@@ -49,3 +49,7 @@ TreeIcon {
 	Width="14";
 	Height="14";
 }
+Splitter {
+	Thickness="1";
+	Background="RoyalBlue";
+}
