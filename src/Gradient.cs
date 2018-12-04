@@ -96,8 +96,11 @@ namespace Crow
 				throw new NotImplementedException ();
 			}
 
-			foreach (ColorStop cs in Stops)
+			foreach (ColorStop cs in Stops) {
+				if (cs == null)
+					continue;
 				grad.AddColorStop (cs.Offset, cs.Color);
+			}
 			
 			ctx.SetSource (grad);
 			grad.Dispose ();

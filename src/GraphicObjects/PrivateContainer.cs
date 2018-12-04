@@ -51,7 +51,9 @@ namespace Crow
 			go = null;
 			if (base.FindByDesignID (designID, out go))
 				return true;
-			return (bool)child?.FindByDesignID (designID, out go);				
+			if (child == null)
+				return false;
+			return child.FindByDesignID (designID, out go);					
 		}
 		#endif
 		protected GraphicObject child;

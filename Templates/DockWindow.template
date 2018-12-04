@@ -5,11 +5,14 @@
 				MouseEnter="./onBorderMouseEnter"
 				MouseLeave="./onBorderMouseLeave">
 	<VerticalStack Spacing="0">
-		<HorizontalStack Visible="{./IsDocked}" Height="Fit" Margin="1" Background="Grey">
+		<HorizontalStack Visible="{./IsDocked}" Height="Fit" Margin="0" Background="Black">
 			<Label  Text="{./Caption}" TextAlignment="Left" Width="Stretched"
-					 Foreground="Black" />
-			<Image Width="10" Height="10" Focusable="true" Margin="0" Path="#Crow.Images.Icons.exit2.svg"
+					 Foreground="White" />
+			<Border CornerRadius="6" BorderWidth="1" Foreground="Transparent"  Height="10" Width="10"
+				MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
+				<Image Focusable="true" Name="Image" Margin="0" Path="#Crow.Images.Icons.exit2.svg"
 					 MouseClick="./butQuitPress"/>
+			</Border>
 		</HorizontalStack>
 		<HorizontalStack Background="vgradient|0:0.5,0.6,0.5,0.5|1:0.2,0.3,0.3,0.7"
 				Name="hs" Margin="0" Spacing="0" Height="Fit" Visible="{./IsFloating}">
@@ -23,6 +26,6 @@
 			</Border>
 			<GraphicObject Width="5"/>
 		</HorizontalStack>
-		<Container Name="Content" MinimumSize="50,50"/>
+		<Container Name="Content" MinimumSize="50,50" Background="0.1,0.1,0.1,0.4"/>
 	</VerticalStack>
 </Border>

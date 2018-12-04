@@ -4,6 +4,7 @@ Crow.userprefs
 Debug
 packages
 *.nupkg
+*.user
 /GOLib.suo
 /tmp
 /bin/*
