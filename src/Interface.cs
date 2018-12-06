@@ -129,8 +129,8 @@ namespace Crow
 			Keyboard.KeyUp += Keyboard_KeyUp;
 			Keyboard.KeyPress += Keyboard_KeyPress;
 
-			initTooltip ();
-			initContextMenus ();
+			/*initTooltip ();
+			initContextMenus ();*/
 
 			running = true;
 
@@ -605,14 +605,15 @@ namespace Crow
 				if (_hoverWidget == value)
 					return;
 
-				if (_hoverWidget != null)
-					_hoverWidget.IsHover = false;
+				//if (_hoverWidget != null)
+				//	_hoverWidget.IsHover = false;
 
 				_hoverWidget = value;
+
 				#if DEBUG_FOCUS
 				NotifyValueChanged("HoverWidget", _hoverWidget);
 				#endif
-
+				/*
 				if (_hoverWidget != null)
 				{
 					_hoverWidget.IsHover = true;
@@ -623,6 +624,7 @@ namespace Crow
 					#else
 				}
 					#endif
+					*/
 			}
 		}
 		/// <summary>Widget has the keyboard or mouse focus</summary>
@@ -860,10 +862,11 @@ namespace Crow
 			if (newW != null) {
 				while (ptr < GraphicTree.Count) {
 					Window w = GraphicTree [ptr] as Window;
-					if (w != null) {
-						if (newW.AlwaysOnTop || !w.AlwaysOnTop)
-							break;
-					}
+					if (w == null)
+						break;
+					if (newW.AlwaysOnTop || !w.AlwaysOnTop)
+						break;
+					
 					ptr++;
 				}
 			}
@@ -1001,10 +1004,10 @@ namespace Crow
 		/// <returns>true if mouse is in the interface</returns>
 		public virtual bool ProcessMouseMove(int x, int y)
 		{
-			if (armedClickSender != null) {
-				armedClickSender.onMouseClick (armedClickSender, armedClickEvtArgs);
+			/*if (armedClickSender != null) {
+				//armedClickSender.onMouseClick (armedClickSender, armedClickEvtArgs);
 				armedClickSender = null;
-			}
+			}*/
 			int deltaX = x - Mouse.X;
 			int deltaY = y - Mouse.Y;
 			Mouse.X = x;
@@ -1130,7 +1133,15 @@ namespace Crow
 			if (HoverWidget == null)
 				return false;
 
-			if (HoverWidget == armedClickSender) {
+			GraphicObject hoverFocused = HoverWidget;
+			while (!hoverFocused.Focusable) {
+				hoverFocused = hoverFocused.focusParent;
+				if (hoverFocused == null) {
+					hoverFocused = HoverWidget;
+					break;
+				}
+			}
+			if (hoverFocused == armedClickSender) {
 				if (clickTimer.ElapsedMilliseconds < Interface.DoubleClick) {
 					armedClickSender.onMouseDoubleClick (armedClickSender, e);
 					armedClickSender = null;

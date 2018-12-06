@@ -15,5 +15,5 @@
 </ItemTemplate>
 <ItemTemplate Path="#Crow.Coding.ui.ItemTemplates.Enum.template" DataType="System.Enum" />
 <ItemTemplate Path="#Crow.Coding.ui.ItemTemplates.Enum.template" DataType="Style" />
-<ItemTemplate Path="#Crow.Coding.ui.ItemTemplates.Fill.template" DataType="Crow.Fill"/>
+<!--<ItemTemplate Path="#Crow.Coding.ui.ItemTemplates.Fill.template" DataType="Crow.Fill"/>-->
 	

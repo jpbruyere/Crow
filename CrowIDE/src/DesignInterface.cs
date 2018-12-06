@@ -67,6 +67,8 @@ namespace Crow.Coding
 		}
 		public override void ProcessResize (Rectangle bounds)
 		{
+			if (bounds == clientRectangle)
+				return;
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
 				surf.Dispose ();
@@ -82,8 +84,14 @@ namespace Crow.Coding
 		public override GraphicObject Load (string path)
 		{
 			ProjectFile pi;
-			if (ProjFile.Project.solution.GetProjectFileFromPath (path, out pi))
-				return CreateITorFromIMLFragment (pi.Source).CreateInstance();			
+			try {
+				
+				if (ProjFile.Project.solution.GetProjectFileFromPath (path, out pi))
+					return CreateITorFromIMLFragment (pi.Source).CreateInstance();					
+			} catch (Exception ex) {
+				
+			}
+		
 			return null;
 		}
 		public override System.IO.Stream GetStreamFromPath (string path)

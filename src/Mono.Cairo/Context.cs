@@ -38,8 +38,9 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using Cairo;
+using Color = Crow.Color;
 
-namespace Cairo {
+namespace Cairo {	
 
 	[Obsolete ("Renamed Cairo.Context per suggestion from cairo binding guidelines.")]
 	public class Graphics : Context {
@@ -158,20 +159,6 @@ namespace Cairo {
 
 			get {
 				return NativeMethods.cairo_get_operator (handle);
-			}
-		}
-
-		[Obsolete ("Use SetSourceColor method")]
-		public Color Color {
-			set {
-				SetSourceColor (value);
-			}
-		}
-
-		[Obsolete ("Use SetSourceRGBA method")]
-		public Cairo.Color ColorRgb {
-			set {
-				Color = new Color (value.R, value.G, value.B);
 			}
 		}
 
@@ -870,13 +857,9 @@ namespace Cairo {
 
 		public void ShowText(string str)
 		{
-			NativeMethods.cairo_show_text (handle, TerminateUtf8(str));
+			NativeMethods.cairo_show_text (handle, str);
 		}
 
-		public void ShowText(byte[] utf8)
-		{
-			NativeMethods.cairo_show_text (handle, TerminateUtf8(utf8));
-		}
 
 		public void TextPath(string str)
 		{
@@ -891,16 +874,10 @@ namespace Cairo {
 		public TextExtents TextExtents(string s)
 		{
 			TextExtents extents;
-			NativeMethods.cairo_text_extents (handle, TerminateUtf8(s), out extents);
+			NativeMethods.cairo_text_extents (handle, s, out extents);
 			return extents;
 		}
 
-		public TextExtents TextExtents(byte[] utf8)
-		{
-			TextExtents extents;
-			NativeMethods.cairo_text_extents (handle, TerminateUtf8(utf8), out extents);
-			return extents;
-		}
 
 		public TextExtents GlyphExtents (Glyph[] glyphs)
 		{

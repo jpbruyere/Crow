@@ -279,9 +279,6 @@ namespace Crow.Coding
 				SelectedItem = go;
 			} catch (Exception ex) {
 				Error = ex;
-				Debug.WriteLine ("Error Loading ui in Design iface\n" + ex.ToString ());
-				if (Monitor.IsEntered(imlVE.UpdateMutex))
-					Monitor.Exit (imlVE.UpdateMutex);
 			}
 		}
 		protected override void updateCheckPostProcess ()
@@ -309,7 +306,11 @@ namespace Crow.Coding
 			base.OnLayoutChanges (layoutType);
 			switch (layoutType) {
 			case LayoutingType.Width:
+				DesignWidth = Slot.Width * 100 / zoom;
+				imlVE.ProcessResize (new Size(designWidth,designHeight));
+				break;
 			case LayoutingType.Height:
+				DesignHeight = Slot.Height * 100 / zoom;
 				imlVE.ProcessResize (new Size(designWidth,designHeight));
 				break;
 			}
@@ -324,6 +325,8 @@ namespace Crow.Coding
 			ProcessMouseMove (e.X - scr.X, e.Y - scr.Y);
 
 			GraphicObject newHW = HoverWidget;
+			if (newHW == null)
+				return;
 
 			if (draggedObj != null) {
 				if (draggedObj.Parent == null) {
@@ -389,7 +392,7 @@ namespace Crow.Coding
 		{
 			base.onDraw (gr);
 
-			Rectangle cb = new Rectangle (0, 0, designWidth, designHeight);// ClientRectangle;
+			Rectangle cb = new Rectangle (0, 0, designWidth, designHeight);
 
 			gr.Save ();
 
@@ -424,7 +427,7 @@ namespace Crow.Coding
 				gr.Paint ();
 				imlVE.IsDirty = false;
 			}
-			if (Error == null) {
+			/*if (Error == null) {
 				gr.SetSourceColor (Color.Black);
 				gr.Rectangle (cb, 1.0 / z);
 			} else {
@@ -439,7 +442,7 @@ namespace Crow.Coding
 
 				}
 			}
-			gr.Stroke ();
+			gr.Stroke ();*/
 
 			Rectangle hr;
 

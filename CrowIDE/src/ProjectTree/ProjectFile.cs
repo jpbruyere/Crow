@@ -34,7 +34,7 @@ using System.Threading;
 namespace Crow.Coding
 {	
 	public class ProjectFile : ProjectItem {		
-		protected bool isOpened = false;
+		bool isOpened = false;
 		DateTime accessTime;
 		string source;
 		string origSource;
@@ -47,7 +47,7 @@ namespace Crow.Coding
 		List<String> undoStack = new List<string>();
 		List<String> redoStack = new List<string>();
 
-		public Crow.Command cmdSave, cmdSaveAs, cmdOpen, cmdUndo, cmdRedo;
+		public Crow.Command cmdSave, cmdSaveAs, cmdOpen, cmdClose, cmdUndo, cmdRedo;
 
 		void initCommands (){
 			cmdSave = new Crow.Command (new Action (() => Save ()))
@@ -55,14 +55,20 @@ namespace Crow.Coding
 			cmdSaveAs = new Crow.Command (new Action (() => SaveAs ()))
 			{ Caption = "Save As ..", Icon = new SvgPicture ("#Crow.Coding.icons.save.svg"), CanExecute = false };
 			cmdOpen = new Crow.Command (new Action (() => Open ())) 
-			{ Caption = "Open", Icon = new SvgPicture ("#Crow.Coding.icons.open.svg"), CanExecute = false };
+			{ Caption = "Open", Icon = new SvgPicture ("#Crow.Coding.icons.open.svg"), CanExecute = true };
+			cmdClose = new Crow.Command (new Action (() => Close ())) 
+			{ Caption = "Close", Icon = new SvgPicture ("#Crow.Coding.icons.open.svg"), CanExecute = false };
 			cmdUndo = new Crow.Command (new Action (() => Undo (null))) 
 			{ Caption = "Undo", Icon = new SvgPicture ("#Crow.Coding.icons.undo.svg"), CanExecute = false };
 			cmdRedo = new Crow.Command (new Action (() => Redo (null))) 
 			{ Caption = "Redo", Icon = new SvgPicture ("#Crow.Coding.icons.redo.svg"), CanExecute = false };
 
 			Commands.Insert (0, cmdOpen);
-			Commands.Insert (1, cmdSave);			
+			Commands.Insert (1, cmdSave);
+			Commands.Insert (2, cmdSaveAs);
+			Commands.Insert (3, cmdUndo);
+			Commands.Insert (4, cmdRedo);
+			Commands.Add (cmdClose);
 		}
 		public ProjectFile () {
 			initCommands();
@@ -85,7 +91,25 @@ namespace Crow.Coding
 				return node.SelectSingleNode ("LogicalName")?.InnerText;
 			}
 		}
+		public bool IsOpened {
+			get { return isOpened; }
+			set {
+				if (isOpened == value)
+					return;
+				isOpened = value;
 
+				cmdOpen.CanExecute = !isOpened;
+				cmdClose.CanExecute = isOpened;
+				cmdSave.CanExecute = isOpened && IsDirty;
+
+				if (isOpened) 
+					Project.solution.OpenItem (this);
+				else
+					Project.solution.CloseItem (this);				
+
+				NotifyValueChanged ("IsOpened", isOpened);
+			}
+		}
 		public void UnregisterEditor (object editor){
 			lock(RegisteredEditors){
 				RegisteredEditors.Remove (editor);
@@ -124,9 +148,11 @@ namespace Crow.Coding
 		}
 		public string Source {
 			get {
-				if (!isOpened)
-					Open ();
-				else {
+				if (!IsOpened) {
+					using (StreamReader sr = new StreamReader (AbsolutePath))
+						source = sr.ReadToEnd ();
+					
+				} else {
 					if (DateTime.Compare (
 						    accessTime,
 						    System.IO.File.GetLastWriteTime (AbsolutePath)) < 0)
@@ -195,13 +221,13 @@ namespace Crow.Coding
 			}
 		}
 
-		public void Open () {
+		public void Open () {			
 			accessTime = System.IO.File.GetLastWriteTime (AbsolutePath);
 			using (StreamReader sr = new StreamReader (AbsolutePath)) {
 				source = sr.ReadToEnd ();
 			}
-			isOpened = true;
 			origSource = source;
+			IsOpened = true;
 			NotifyValueChanged ("IsDirty", false);
 		}
 		public virtual void Save () {
@@ -223,9 +249,8 @@ namespace Crow.Coding
 			NotifyValueChanged ("IsDirty", false);
 		}
 		public void Close () {
-			origSource = null;
-			isOpened = false;
-			Project.solution.CloseItem (this);
+			origSource = source = null;
+			IsOpened = false;
 		}
 		public void Undo(object sender){
 			undo();
@@ -276,7 +301,15 @@ namespace Crow.Coding
 
 		}
 
+		public void onDoubleClick (object sender, MouseButtonEventArgs e){
+			if (IsOpened)
+				return;
+			Open ();
+		}
 
+		public void onClick (object sender, MouseButtonEventArgs e){
+			IsSelected = true;
+		}
 		public void OnQueryClose (object sender, EventArgs e){
 			if (IsDirty) {
 				MessageBox mb = MessageBox.ShowModal (CrowIDE.MainIFace,

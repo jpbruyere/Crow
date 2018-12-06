@@ -56,8 +56,8 @@ MenuItem {
 	//Background = "vgradient|0:DimGrey|1:Black";
 	//Background = "Transparent";
 	Foreground = "LightGrey";
-	MouseEnter = "{Background=SteelBlue;}";
-	MouseLeave = "{Background=Transparent;}";
+	//MouseEnter = "{Background=SteelBlue;}";
+	//MouseLeave = "{Background=Transparent;}";
 	//MouseEnter = "{Background = vgradient|0:SteelBlue|1:Jet;Foreground=White;}";
 	//MouseLeave = "{Foreground=LightGrey;Background=Transparent;}";
 	SelectionBackground = "Transparent";

@@ -27,6 +27,7 @@ using System;
 using Crow;
 using System.ComponentModel;
 using Cairo;
+using System.Diagnostics;
 
 namespace Crow
 {
@@ -36,13 +37,39 @@ namespace Crow
 		{
 			base.onDraw (gr);
 
+			Stopwatch t = Stopwatch.StartNew ();
 
-			for (int i = 0; i < 100000; i++) {
-				gr.SetSourceColor (Color.Red);
+			IntPtr ctxHnd = gr.Handle;
+
+			for (int i = 0; i < 1000000; i++) {
+				
+				/*gr.SetSourceRGBA (1.0,0.0,0.0,1.0);
 				gr.Rectangle (0, 0, 100, 100);
-				gr.Stroke ();
+				gr.Stroke ();*/
+
+				/*Cairo.NativeMethods.SetSourceRGBA (ctxHnd, 1.0,0.0,0.0,1.0);
+				Cairo.NativeMethods.Rectangle (ctxHnd, 0, 0, 100, 100);
+				Cairo.NativeMethods.Stroke (ctxHnd);*/
+
+
+				//tests.MainClass.cairo_set_rgba_func (ctxHnd, 1.0,0.0,0.0,1.0);
+				//tests.MainClass.cairo_rect_func (ctxHnd, 0, 0, 100, 100);
+				//tests.MainClass.cairo_stroke_func (ctxHnd);
+
+				tests.MainClass.cairo_rgba_internal (ctxHnd, 1.0,0.0,0.0,1.0);
+				tests.MainClass.cairo_rect_internal (ctxHnd, 0, 0, 100, 100);
+				tests.MainClass.cairo_stroke_internal (ctxHnd);
+				//tests.MainClass.cairo_stroke (ctxHnd);
+				//tests.MainClass.cairo_stroke_icall (ctxHnd);
+
+
 
 			}
+
+
+			t.Stop ();
+
+			Console.WriteLine("elapsed ticks = {0}", t.ElapsedTicks);
 
 			//System.Threading.Thread.Sleep (1000);
 

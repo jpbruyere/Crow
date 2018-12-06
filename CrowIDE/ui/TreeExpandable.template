@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack>
-	<Border Style="TreeItemBorder" MouseDoubleClick="./onClickForExpand">
+	<Border Style="TreeItemBorder" MouseDoubleClick="./onClickForExpand">		
 		<HorizontalStack Spacing="5">
 			<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
 				Path="{./Image}"

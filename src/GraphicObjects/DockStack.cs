@@ -116,9 +116,9 @@ namespace Crow
 		{
 			if (IsDropTarget) {				
 				DockWindow dw = IFace.DragAndDropOperation.DragSource as DockWindow;
-				if (dw.IsDocked) {
-						base.onMouseMove (sender, e);
-						return;
+				if (dw == null || dw.IsDocked) {
+					base.onMouseMove (sender, e);
+					return;
 				}
 
 				Alignment curDockPos = dw.DockingPosition;
@@ -416,6 +416,9 @@ namespace Crow
 					dw.Width = Measure.Parse (getConfAttrib (conf, ref i));
 					dw.Height = Measure.Parse (getConfAttrib (conf, ref i));
 					dw.DockingPosition = (Alignment)Enum.Parse (typeof(Alignment), getConfAttrib (conf, ref i));
+					dw.savedSlot = Rectangle.Parse (getConfAttrib (conf, ref i));
+					dw.wasResizable = Boolean.Parse (getConfAttrib (conf, ref i));
+
 					dw.IsDocked = true;
 					dw.DataSource = dataSource;
 					this.AddChild (dw);
@@ -450,7 +453,7 @@ namespace Crow
 			for (int i = 0; i < Children.Count; i++) {
 				if (Children [i] is DockWindow) {
 					DockWindow dw = Children [i] as DockWindow;
-					tmp.Append (string.Format("WIN;{0};{1};{2};{3};",dw.Name, dw.Width, dw.Height, dw.DockingPosition));
+					tmp.Append (string.Format("WIN;{0};{1};{2};{3};{4};{5};",dw.Name, dw.Width, dw.Height, dw.DockingPosition, dw.savedSlot, dw.wasResizable));
 				} else if (Children [i] is DockStack) {
 					DockStack ds = Children [i] as DockStack;
 					tmp.Append (string.Format("STK;{0};{1};{2};{3}", ds.Width, ds.Height, ds.Orientation, ds.exportConfig()));

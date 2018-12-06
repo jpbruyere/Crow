@@ -33,6 +33,8 @@ WinSchema {
 }
 TabItem {
 	AllowDrag="false";
+	Background="Onyx";
+	SelectedBackground="vgradient|0:DimGrey|0.4:Onyx";
 }
 TreeItemBorder {
 	CornerRadius="2";

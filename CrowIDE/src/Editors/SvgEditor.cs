@@ -88,6 +88,9 @@ namespace Crow.Coding
 				throw new NotImplementedException ();
 			}
 		}
+		protected override bool IsReady {			
+			get { return projFile != null;	}
+		}
 		#endregion
 
 		#region GraphicObject overrides

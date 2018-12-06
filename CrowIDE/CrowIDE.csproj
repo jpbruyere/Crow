@@ -283,6 +283,9 @@
     <EmbeddedResource Include="ui\DockWindows\winStyleView.crow" />
     <EmbeddedResource Include="ui\CategoryExp.template" />
     <EmbeddedResource Include="ui\DockWindows\winDesign.crow" />
+    <EmbeddedResource Include="ui\editors\EditTabItem.template">
+      <LogicalName>Crow.Coding.EditTabItem.template</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="ui\test.crow">

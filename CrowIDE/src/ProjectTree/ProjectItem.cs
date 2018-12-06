@@ -71,6 +71,30 @@ namespace Crow.Coding
 		public string HintPath {
 			get { return node.SelectSingleNode ("HintPath")?.InnerText; }
 		}
+
+		public override bool IsSelected {
+			get {
+				return isSelected;
+			}
+			set {
+				if (value == isSelected)
+					return;
+
+				isSelected = value;
+
+				NotifyValueChanged ("IsSelected", isSelected);
+
+				if (isSelected) {
+					Project.solution.SelectedItem = this;
+					Project.IsExpanded = true;
+					ProjectNode pn = Parent;
+					while (pn != null) {
+						pn.IsExpanded = true;
+						pn = pn.Parent;
+					}
+				}
+			}
+		}
 	}
 }
 

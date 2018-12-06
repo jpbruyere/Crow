@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose" Background="Jet">
+<TabItem QueryClose="OnQueryClose" IsSelected="{²IsSelected}" Template="#Crow.Coding.EditTabItem.template">
+
 	<VerticalStack>
 		<HorizontalStack Height="Fit" Margin="2" Spacing="5">
 			<HorizontalStack Width="Fit" Spacing="1">
@@ -24,8 +25,8 @@
 			<HorizontalStack>
 				<Scroller Name="scroller1" Margin="2" >
 					<ImlVisualEditor  Foreground="SkyBlue" Name="editor" Background="Grey"						
-						VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10"
-						Width="512" Height="512" ContextCommands="{/Commands}"
+						VerticalAlignment="Top" HorizontalAlignment="Left" Margin="4"
+						ContextCommands="{/Commands}"
 						AllowDrop="true" AllowDrag="true" Focusable="true"
 						UpdateEnabled="{../../../../../IsSelected}"
 						ProjectNode="{}" SelectedItem="{²SelectedItem}"/>

@@ -73,7 +73,7 @@ namespace Crow
 			if (stroke>0.0) {
 				gr.LineWidth = stroke;
 				double hsw = stroke / 2.0;
-				DrawRoundedRectangle (gr, r.X + hsw, r.Y + hsw, r.Width - stroke, r.Height - stroke, radius);
+				DrawRoundedRectangle (gr, hsw + r.X, hsw + r.Y, (double)r.Width - stroke, (double)r.Height - stroke, radius);
 				gr.Stroke ();
 			}else
 				DrawRoundedRectangle(gr, r.X, r.Y, r.Width, r.Height, radius);

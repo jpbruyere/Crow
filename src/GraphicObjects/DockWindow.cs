@@ -40,8 +40,8 @@ namespace Crow
 		Alignment docking = Alignment.Undefined;
 
 		Point undockingMousePosOrig; //mouse pos when docking was donne, use for undocking on mouse move
-		Rectangle savedSlot;	//last undocked slot recalled when view is undocked
-		bool wasResizable;
+		internal Rectangle savedSlot;	//last undocked slot recalled when view is undocked
+		internal bool wasResizable;
 
 		public bool IsDocked {
 			get { return isDocked; }
@@ -64,7 +64,6 @@ namespace Crow
 				NotifyValueChanged ("DockingPosition", DockingPosition);
 			}
 		}
-
 		public override bool PointIsIn (ref Point m)
 		{			
 			if (!base.PointIsIn(ref m))
@@ -136,10 +135,10 @@ namespace Crow
 
 				IFace.AddWidget (this);
 
-				this.Left = savedSlot.Left;
-				this.Top = savedSlot.Top;
-				this.Width = savedSlot.Width;
-				this.Height = savedSlot.Height;
+				Left = savedSlot.Left;
+				Top = savedSlot.Top;
+				Width = savedSlot.Width;
+				Height = savedSlot.Height;
 
 				IsDocked = false;
 				DockingPosition = Alignment.Undefined;

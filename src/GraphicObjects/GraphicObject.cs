@@ -277,14 +277,14 @@ namespace Crow
 		Fill background = Color.Transparent;
 		Fill foreground = Color.White;
 		Font font = "droid, 10";
-		Measure width, height;
+		protected Measure width, height;
 		int left, top;
 		double cornerRadius = 0;
 		int margin = 0;
 		bool focusable = false;
 		bool hasFocus = false;
 		bool isActive = false;
-		bool isHover = false;
+		//bool isHover = false;
 		bool mouseRepeat;
 		protected bool isVisible = true;
 		bool isEnabled = true;
@@ -436,9 +436,9 @@ namespace Crow
 		/// <summary>Occurs when this object loose focus</summary>
 		public event EventHandler Unfocused;
 		/// <summary>Occurs when mouse is over</summary>
-		public event EventHandler Hover;
+		//public event EventHandler Hover;
 		/// <summary>Occurs when this control is no longer the Hover one</summary>
-		public event EventHandler UnHover;
+		//public event EventHandler UnHover;
 		/// <summary>Occurs when this object loose focus</summary>
 		public event EventHandler Enabled;
 		/// <summary>Occurs when the enabled state this object is set to false</summary>
@@ -744,7 +744,7 @@ namespace Crow
 		/// <summary>
 		/// true if this control has the pointer hover
 		/// </summary>
-		[XmlIgnore]public virtual bool IsHover {
+		/*[XmlIgnore]public virtual bool IsHover {
 			get { return isHover; }
 			set {
 				if (value == isHover)
@@ -759,7 +759,7 @@ namespace Crow
 
 				NotifyValueChanged ("IsHover", isHover);
 			}
-		}
+		}*/
 		/// <summary>
 		/// true if holding mouse button down should trigger multiple click events
 		/// </summary>
@@ -866,8 +866,12 @@ namespace Crow
 
 				RegisterForLayouting (LayoutingType.Sizing);
 
-				if (!isVisible)
-					unshownPostActions ();
+				if (!isVisible && IFace.HoverWidget != null) {					
+					if (IFace.HoverWidget.IsOrIsInside (this)) {
+						//IFace.HoverWidget = null;
+						IFace.ProcessMouseMove (IFace.Mouse.X, IFace.Mouse.Y);
+					}
+				}
 
 				NotifyValueChanged ("Visible", isVisible);
 			}
@@ -1877,20 +1881,7 @@ namespace Crow
 			#if DEBUG_FOCUS
 			Debug.WriteLine("MouseEnter => " + this.ToString());
 			#endif
-			MouseEnter.Raise (this, e);
-		}
-		public virtual void onMouseLeave(object sender, MouseMoveEventArgs e)
-		{
-			#if DEBUG_FOCUS
-			Debug.WriteLine("MouseLeave => " + this.ToString());
-			#endif
-			MouseLeave.Raise (this, e);
-		}
-		public virtual void onHover(object sender, EventArgs e)
-		{
-			#if DEBUG_FOCUS
-			Debug.WriteLine("MouseHover => " + this.ToString());
-			#endif
+
 			if (IFace.DragAndDropOperation != null) {
 				GraphicObject g = this;
 				while (g != null) {
@@ -1905,15 +1896,18 @@ namespace Crow
 					g = g.focusParent;
 				}
 			}
-			Hover.Raise (this, e);
+
+			MouseEnter.Raise (this, e);
 		}
-		public virtual void onUnHover(object sender, EventArgs e)
+		public virtual void onMouseLeave(object sender, MouseMoveEventArgs e)
 		{
 			#if DEBUG_FOCUS
-			Debug.WriteLine("MouseUnHover => " + this.ToString());
+			Debug.WriteLine("MouseLeave => " + this.ToString());
 			#endif
-			UnHover.Raise (this, e);
+
+			MouseLeave.Raise (this, e);
 		}
+
 		#endregion
 
 		protected virtual void onFocused(object sender, EventArgs e){
@@ -1981,6 +1975,12 @@ namespace Crow
 		/// Checks to handle when widget is removed from the visible graphic tree
 		/// </summary>
 		void unshownPostActions () {
+			if (IFace.HoverWidget != null) {
+				if (IFace.HoverWidget.IsOrIsInside (this)) {
+					IFace.HoverWidget = null;
+					IFace.ProcessMouseMove (IFace.Mouse.X, IFace.Mouse.Y);
+				}
+			}
 			if (IFace.ActiveWidget != null) {
 				if (IFace.ActiveWidget.IsOrIsInside (this))
 					IFace.ActiveWidget = null;
@@ -1989,12 +1989,6 @@ namespace Crow
 				if (IFace.FocusedWidget.IsOrIsInside (this))
 					IFace.FocusedWidget = null;
 			}					
-			if (IFace.HoverWidget != null) {
-				if (IFace.HoverWidget.IsOrIsInside (this)) {
-					IFace.HoverWidget = null;
-					IFace.ProcessMouseMove (IFace.Mouse.X, IFace.Mouse.Y);
-				}
-			}
 		}
 	}
 }
