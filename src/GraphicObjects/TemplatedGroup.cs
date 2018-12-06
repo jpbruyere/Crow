@@ -148,7 +148,7 @@ namespace Crow
 				: items.Children;
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(-1)]public virtual int SelectedIndex{
+		[DefaultValue(-1)]public virtual int SelectedIndex{
 			get { return _selectedIndex; }
 			set {
 				if (value == _selectedIndex)

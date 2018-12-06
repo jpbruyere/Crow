@@ -5,7 +5,7 @@
 				MouseEnter="./onBorderMouseEnter"
 				MouseLeave="./onBorderMouseLeave">
 	<VerticalStack Spacing="0">
-		<HorizontalStack Visible="{./IsDocked}" Height="Fit" Margin="0" Background="Black">
+		<HorizontalStack Visible="{./IsDocked}" Height="Fit" Margin="1" Background="vgradient|0:0.3,0.5,0.8,0.9|1:0.1,0.1,0.1,0.9">
 			<Label  Text="{./Caption}" TextAlignment="Left" Width="Stretched"
 					 Foreground="White" />
 			<Border CornerRadius="6" BorderWidth="1" Foreground="Transparent"  Height="10" Width="10"

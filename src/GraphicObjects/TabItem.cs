@@ -49,6 +49,7 @@ namespace Crow
 		int tabOffset;
 		bool isSelected;
 		Measure tabThickness;
+		Fill selectedBackground = Color.Transparent;
 		#endregion
 
 		#region TemplatedControl overrides
@@ -115,8 +116,30 @@ namespace Crow
 			set {
 				if (isSelected == value)
 					return;
+
+				if (tview != null)
+					tview.SelectedTab = tview.Children.IndexOf(this);
+				
 				isSelected = value;
 				NotifyValueChanged ("IsSelected", isSelected);
+				RegisterForRedraw ();
+			}
+		}
+
+		/// <summary>
+		/// background fill of the control, maybe solid color, gradient, image, or svg
+		/// </summary>
+		[DesignCategory ("Appearance")][DefaultValue("DimGrey")]
+		public virtual Fill SelectedBackground {
+			get { return selectedBackground; }
+			set {
+				if (selectedBackground == value)
+					return;				
+				if (value == null)
+					return;
+				selectedBackground = value;
+				NotifyValueChanged ("SelectedBackground", selectedBackground);
+				RegisterForRedraw ();
 			}
 		}
 		protected override void onDraw (Context gr)
@@ -150,7 +173,11 @@ namespace Crow
 			gr.StrokePreserve ();
 			gr.ClipPreserve ();
 
-			Background.SetAsSource (gr);
+			if (IsSelected)
+				SelectedBackground.SetAsSource (gr, ClientRectangle);
+			else
+				Background.SetAsSource (gr, ClientRectangle);
+
 			gr.Fill ();
 
 			base.onDraw (gr);
@@ -162,14 +189,8 @@ namespace Crow
 		int dragThreshold = 16;
 		int dis = 128;
 		internal TabView savedParent = null;
-		public override Fill Background {
-			get {
-				return base.Background;
-			}
-			set {
-				base.Background = value;
-			}
-		}
+
+
 		void makeFloating (TabView tv) {			
 			lock (IFace.UpdateMutex) {				
 				ImageSurface di = new ImageSurface (Format.Argb32, dis, dis);
@@ -252,7 +273,7 @@ namespace Crow
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseUp (sender, e);
-			tview.UpdateLayout (LayoutingType.ArrangeChildren);
+			tview?.UpdateLayout (LayoutingType.ArrangeChildren);
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{

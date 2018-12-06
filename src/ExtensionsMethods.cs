@@ -153,13 +153,14 @@ namespace Crow
 			ctx.LineWidth = stroke;
 			ctx.Stroke ();
 		}
+
 		public static void SetSourceColor(this Cairo.Context ctx, Color c)
 		{
 			ctx.SetSourceRGBA(c.R,c.G,c.B,c.A);
 		}
 		public static void AddColorStop(this Cairo.Gradient grad, double offset, Color c)
 		{
-			grad.AddColorStop (offset, new Cairo.Color (c.R, c.G, c.B, c.A));
+			grad.AddColorStop (offset, c);
 		}
 		#endregion
 

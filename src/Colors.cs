@@ -130,16 +130,6 @@ namespace Crow
 				double.Parse(c[3]));
 		}
 
-//		public static implicit operator OpenTK.Vector4(Color c)
-//		{
-//			return new OpenTK.Vector4 ((float)c.R, (float)c.G, (float)c.B, (float)c.A);
-//		}
-//		public static implicit operator Color(OpenTK.Vector4 v)
-//		{
-//			return new Color (v.X, v.Y, v.Z, v.W);
-//		}
-
-
 		public static bool operator ==(Color left, Color right)
 		{
 			if (left.predefinied & right.predefinied)

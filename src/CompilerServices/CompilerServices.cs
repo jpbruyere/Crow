@@ -804,7 +804,7 @@ namespace Crow.IML
 						il.Emit (OpCodes.Ldstr, operandes [1].Trim ());
 					}
 					il.Emit (OpCodes.Callvirt, lopParseMi);
-					il.Emit (OpCodes.Unbox_Any, lopPI.PropertyType);
+					//il.Emit (OpCodes.Unbox_Any, lopPI.PropertyType);
 					//emit left operand assignment
 					il.Emit (OpCodes.Callvirt, lopPI.GetSetMethod());
 				} else {//tree parsing and propert gets

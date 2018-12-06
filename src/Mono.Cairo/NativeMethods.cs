@@ -752,7 +752,7 @@ namespace Cairo
 		internal static extern void cairo_show_page (IntPtr cr);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern void cairo_show_text (IntPtr cr, byte[] utf8);
+		internal static extern void cairo_show_text (IntPtr cr, string text);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern Status cairo_status (IntPtr cr);
@@ -840,7 +840,7 @@ namespace Cairo
 		#endregion
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern void cairo_text_extents (IntPtr cr, byte[] utf8, out TextExtents extents);
+		internal static extern void cairo_text_extents (IntPtr cr, string text, out TextExtents extents);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern void cairo_text_path (IntPtr ct, byte[] utf8);

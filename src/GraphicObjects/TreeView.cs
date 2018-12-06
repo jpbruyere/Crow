@@ -67,13 +67,13 @@ namespace Crow
 			GraphicObject tmp = sender as GraphicObject;
 			if (!tmp.HasFocus)
 				return;
-			if (selectedItemContainer != null) {
+			/*if (selectedItemContainer != null) {
 				selectedItemContainer.Foreground = Color.Transparent;
 				selectedItemContainer.Background = Color.Transparent;
-			}
+			}*/
 			selectedItemContainer = tmp;
-			selectedItemContainer.Foreground = SelectionForeground;
-			selectedItemContainer.Background = SelectionBackground;
+			//selectedItemContainer.Foreground = SelectionForeground;
+			//selectedItemContainer.Background = SelectionBackground;
 			NotifyValueChanged ("SelectedItem", SelectedItem);
 			raiseSelectedItemChanged ();
 		}

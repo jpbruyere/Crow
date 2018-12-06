@@ -289,7 +289,7 @@ namespace Crow
 		}
 		void Buffer_PositionChanged (object sender, EventArgs e)
 		{
-			Console.WriteLine ("Position changes: ({0},{1})", buffer.CurrentLine, buffer.CurrentColumn);
+			//Console.WriteLine ("Position changes: ({0},{1})", buffer.CurrentLine, buffer.CurrentColumn);
 			int cc = buffer.CurrentTabulatedColumn;
 
 			if (cc > visibleColumns + ScrollX) {

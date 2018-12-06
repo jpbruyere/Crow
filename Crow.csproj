@@ -32,7 +32,7 @@
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <Optimize>false</Optimize>
     <OutputPath>$(SolutionDir)build\Debug</OutputPath>
-    <DefineConstants>DEBUG_DRAGNDROP0;DEBUG_LOG;XLIB_BACKEND0;DESIGN_MODE;DEBUG_UPDATE0;DEBUG_FOCUS0;DEBUG_DISPOSE0;TRACE0;DEBUG;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
+    <DefineConstants>DEBUG_DRAGNDROP0;DEBUG_LOG0;XLIB_BACKEND0;DESIGN_MODE;DEBUG_UPDATE0;DEBUG_FOCUS;DEBUG_DISPOSE0;TRACE0;DEBUG;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
     <EnvironmentVariables>
       <EnvironmentVariables>
         <Variable name="MONO_CAIRO_DEBUG_DISPOSE" value="1" />
@@ -156,7 +156,6 @@
     <Compile Include="src\Mono.Cairo\Antialias.cs" />
     <Compile Include="src\Mono.Cairo\Cairo.cs" />
     <Compile Include="src\Mono.Cairo\CairoDebug.cs" />
-    <Compile Include="src\Mono.Cairo\Color.cs" />
     <Compile Include="src\Mono.Cairo\Content.cs" />
     <Compile Include="src\Mono.Cairo\Context.cs" />
     <Compile Include="src\Mono.Cairo\DRMDevice.cs" />
@@ -187,7 +186,6 @@
     <Compile Include="src\Mono.Cairo\LineJoin.cs" />
     <Compile Include="src\Mono.Cairo\LinearGradient.cs" />
     <Compile Include="src\Mono.Cairo\Matrix.cs" />
-    <Compile Include="src\Mono.Cairo\NativeMethods.cs" />
     <Compile Include="src\Mono.Cairo\Operator.cs" />
     <Compile Include="src\Mono.Cairo\PSSurface.cs" />
     <Compile Include="src\Mono.Cairo\Path.cs" />
@@ -197,7 +195,6 @@
     <Compile Include="src\Mono.Cairo\Point.cs" />
     <Compile Include="src\Mono.Cairo\PointD.cs" />
     <Compile Include="src\Mono.Cairo\RadialGradient.cs" />
-    <Compile Include="src\Mono.Cairo\Rectangle.cs" />
     <Compile Include="src\Mono.Cairo\Region.cs" />
     <Compile Include="src\Mono.Cairo\ScaledFont.cs" />
     <Compile Include="src\Mono.Cairo\SolidPattern.cs" />
@@ -214,7 +211,6 @@
     <Compile Include="src\Mono.Cairo\XcbSurface.cs" />
     <Compile Include="src\Mono.Cairo\XlibSurface.cs" />
     <Compile Include="src\IML\IMLContext.cs" />
-    <Compile Include="src\Mono.Cairo\MeshPattern.cs" />
     <Compile Include="src\GraphicObjects\Shape.cs" />
     <Compile Include="src\IListChanged.cs" />
     <Compile Include="src\ObservableList.cs" />
@@ -236,6 +232,8 @@
     <Compile Include="src\backends\xlib\XLibBackend.cs" />
     <Compile Include="src\debug\DbgLogViewer.cs" />
     <Compile Include="src\debug\DbgEventTypeColors.cs" />
+    <Compile Include="src\Mono.Cairo\NativeMethods.cs" />
+    <Compile Include="src\Mono.Cairo\MeshPattern.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -414,5 +412,6 @@
     <None Include="Icons\compiler_warning.svg" />
     <None Include="Icons\compiler_warning_orange.svg" />
     <None Include="src\debug\DebugLogViewer.cs" />
+    <None Include="src\Mono.Cairo\NativeMethods-internal.cs" />
   </ItemGroup>
 </Project>
