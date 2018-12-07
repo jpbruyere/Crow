@@ -180,14 +180,6 @@ namespace Crow
 		#endregion
 
         #region operators
-        public static implicit operator Rectangle(System.Drawing.Rectangle r)
-        {
-            return new Rectangle(r.X, r.Y, r.Width, r.Height);
-        }
-        public static implicit operator System.Drawing.Rectangle(Rectangle r)
-        {
-            return new System.Drawing.Rectangle(r.X, r.Y, r.Width, r.Height);
-        }
         public static Rectangle operator +(Rectangle r1, Rectangle r2)
         {
             int x = Math.Min(r1.X, r2.X);

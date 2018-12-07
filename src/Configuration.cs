@@ -144,10 +144,8 @@ namespace Crow
 		}
 		void savingThread(){
 			while(true){
-				if (isDirty) {
-					save ();
-					isDirty = false;
-				}
+				if (isDirty)
+					Save ();				
 				Thread.Sleep (100);
 			}
 		}
@@ -173,7 +171,7 @@ namespace Crow
 				items[key].Set (value);
 			isDirty = true;
 		}
-		void save(){
+		public void Save(){
 			using (Stream s = new FileStream(configPath,FileMode.Create)){
 				using (StreamWriter sw = new StreamWriter (s)) {
 					lock (items) {
@@ -184,6 +182,7 @@ namespace Crow
 					}
 				}
 			}
+			isDirty = false;
 		}
 		void load(Stream s){
 			using (StreamReader sr = new StreamReader (s)) {

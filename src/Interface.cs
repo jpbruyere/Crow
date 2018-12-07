@@ -129,8 +129,8 @@ namespace Crow
 			Keyboard.KeyUp += Keyboard_KeyUp;
 			Keyboard.KeyPress += Keyboard_KeyPress;
 
-			/*initTooltip ();
-			initContextMenus ();*/
+			initTooltip ();
+			initContextMenus ();
 
 			running = true;
 
@@ -138,7 +138,12 @@ namespace Crow
 			t.IsBackground = true;
 			t.Start ();
 		}
-
+		public void Run () {
+			while (running) {
+				ProcessEvents ();
+				Thread.Sleep(1);
+			}
+		}
 		void Keyboard_KeyPress (object sender, KeyPressEventArgs e)
 		{
 			if (_focusedWidget != null)
