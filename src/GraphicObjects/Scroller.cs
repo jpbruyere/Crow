@@ -53,7 +53,7 @@ namespace Crow
 
 		#region public properties
 		/// <summary> Horizontal Scrolling Position </summary>
-		[XmlAttributeAttribute][DefaultValue(0)]
+		[DefaultValue(0)]
 		public virtual int ScrollX {
 			get { return scrollX; }
 			set {
@@ -76,7 +76,7 @@ namespace Crow
 			}
 		}
 		/// <summary> Vertical Scrolling Position </summary>
-		[XmlAttributeAttribute][DefaultValue(0)]
+		[DefaultValue(0)]
 		public virtual int ScrollY {
 			get { return scrollY; }
 			set {
@@ -99,7 +99,7 @@ namespace Crow
 			}
 		}
 		/// <summary> Horizontal Scrolling maximum value </summary>
-		[XmlAttributeAttribute][DefaultValue(0)]
+		[DefaultValue(0)]
 		public virtual int MaxScrollX {
 			get { return maxScrollX; }
 			set {
@@ -116,7 +116,7 @@ namespace Crow
 			}
 		}
 		/// <summary> Vertical Scrolling maximum value </summary>
-		[XmlAttributeAttribute][DefaultValue(0)]
+		[DefaultValue(0)]
 		public virtual int MaxScrollY {
 			get { return maxScrollY; }
 			set {
@@ -133,7 +133,7 @@ namespace Crow
 			}
 		}
 		/// <summary> Mouse Wheel Scrolling multiplier </summary>
-		[XmlAttributeAttribute][DefaultValue(50)]
+		[DefaultValue(50)]
 		public virtual int ScrollSpeed {
 			get { return scrollSpeed; }
 			set {

@@ -1098,12 +1098,14 @@ namespace Crow
 			DynamicMethod dm = null;
 			ILGenerator il = null;
 
-			dm = new DynamicMethod("dyn_loadDefValues",
+            /*dm = new DynamicMethod("dyn_loadDefValues",
 				MethodAttributes.Family | MethodAttributes.FamANDAssem | MethodAttributes.NewSlot,
 				CallingConventions.Standard,
-				typeof(void),new Type[] {CompilerServices.TObject},thisType,true);
+				typeof(void),new Type[] {CompilerServices.TObject}, thisType, true);*/
 
-			il = dm.GetILGenerator(256);
+            dm = new DynamicMethod("dyn_loadDefValues", null, new Type[] {CompilerServices.TObject}, thisType, true);
+
+            il = dm.GetILGenerator(256);
 			il.DeclareLocal(CompilerServices.TObject);
 			il.Emit(OpCodes.Nop);
 			//set local GraphicObject to root object passed as 1st argument
@@ -1129,9 +1131,9 @@ namespace Crow
 						il.Emit (OpCodes.Ldstr, trimed.Substring (1, trimed.Length - 2));
 						//push null as 3rd arg, currentNode, not known when instanciing
 						il.Emit (OpCodes.Ldnull);
-						il.Emit (OpCodes.Callvirt, CompilerServices.miCompileDynEventHandler);
+						il.Emit (OpCodes.Call, CompilerServices.miCompileDynEventHandler);
 						il.Emit (OpCodes.Castclass, ei.EventHandlerType);
-						il.Emit (OpCodes.Callvirt, ei.AddMethod);
+						il.Emit (OpCodes.Call, ei.AddMethod);
 					}else
 						Debug.WriteLine("error in styling, event not handled : " + trimed);
 				}

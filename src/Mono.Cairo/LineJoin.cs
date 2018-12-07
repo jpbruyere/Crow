@@ -1,4 +1,4 @@
-//
+﻿//
 // Mono.Cairo.LineJoin.cs
 //
 // Authors: Duncan Mak (duncan@ximian.com)
@@ -31,7 +31,7 @@ using System;
 
 namespace Cairo
 {
-	[Serializable]
+	
 	public enum LineJoin
 	{
 		Miter,

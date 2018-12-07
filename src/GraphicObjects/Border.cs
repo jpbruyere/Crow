@@ -62,7 +62,7 @@ namespace Crow
 		/// <summary>
 		/// use to define the colors of the 3d border
 		/// </summary>
-		[XmlAttributeAttribute]
+		
 		public virtual Fill RaisedColor {
 			get { return raisedColor; }
 			set {
@@ -76,7 +76,7 @@ namespace Crow
 		/// <summary>
 		/// use to define the colors of the 3d border
 		/// </summary>
-		[XmlAttributeAttribute]
+		
 		public virtual Fill SunkenColor {
 			get { return sunkenColor; }
 			set {
@@ -90,7 +90,7 @@ namespace Crow
 		/// <summary>
 		/// border width in pixels
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue(1)]
+		[DefaultValue(1)]
 		public virtual int BorderWidth {
 			get { return _borderWidth; }
 			set {
@@ -101,7 +101,7 @@ namespace Crow
 		/// <summary>
 		/// allow 3d border effects
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue(BorderStyle.Normal)]
+		[DefaultValue(BorderStyle.Normal)]
 		public virtual BorderStyle BorderStyle {
 			get { return _borderStyle; }
 			set {

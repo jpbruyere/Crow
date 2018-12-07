@@ -1,4 +1,4 @@
-//
+﻿//
 // Mono.Cairo.FontType.cs
 //
 // Authors:
@@ -30,7 +30,7 @@ using System;
 
 namespace Cairo {
 
-	[Serializable]
+	
 	public enum FontType
 	{
 		Toy,

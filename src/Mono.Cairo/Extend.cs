@@ -1,4 +1,4 @@
-//
+﻿//
 // Mono.Cairo.Extend.cs
 //
 // Authors:
@@ -34,7 +34,7 @@ using System;
 
 namespace Cairo
 {
-	[Serializable]
+	
 	public enum Extend
 	{
 		None,

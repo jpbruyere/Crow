@@ -97,7 +97,7 @@ namespace Crow
 		/// ItemTemplate enclosing tag, or several item templates each enclosed
 		/// in a separate tag.
 		/// </summary>
-		[XmlAttributeAttribute]
+		
 		public string ItemTemplate {
 			get { return _itemTemplate; }
 			set {
@@ -128,7 +128,7 @@ namespace Crow
 		/// Other possible values are properties of Data
 		/// </summary>
 		/// <value>The data property test.</value>
-		[XmlAttributeAttribute][DefaultValue("TypeOf")]
+		[DefaultValue("TypeOf")]
 		public string DataTest {
 			get { return dataTest; }
 			set {
@@ -188,7 +188,7 @@ namespace Crow
 		[XmlIgnore]public bool HasItems {
 			get { return Items.Count > 0; }
 		}
-		[XmlAttributeAttribute]public IList Data {
+		public IList Data {
 			get { return data; }
 			set {
 				if (value == data)
@@ -250,7 +250,7 @@ namespace Crow
 				loadItem (e.Element, items, dataTest);
 		}
 
-		[XmlAttributeAttribute][DefaultValue("SteelBlue")]
+		[DefaultValue("SteelBlue")]
 		public virtual Color SelectionBackground {
 			get { return selBackground; }
 			set {
@@ -261,7 +261,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue("White")]
+		[DefaultValue("White")]
 		public virtual Color SelectionForeground {
 			get { return selForeground; }
 			set {

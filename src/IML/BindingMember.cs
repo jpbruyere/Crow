@@ -133,7 +133,7 @@ namespace Crow.IML
 				il.Emit (OpCodes.Brfalse, nextLogicParent);
 			} else if (LevelsUp > 0) {//go upward in logical tree
 				il.Emit (OpCodes.Ldc_I4, LevelsUp);//push arg 2 of goUpLevels
-				il.Emit (OpCodes.Callvirt, CompilerServices.miGoUpLevels);
+				il.Emit (OpCodes.Call, CompilerServices.miGoUpLevels);
 				//test if null
 				il.Emit (OpCodes.Dup);
 				il.Emit (OpCodes.Brfalse, cancel);

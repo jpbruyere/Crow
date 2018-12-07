@@ -40,9 +40,6 @@ namespace Cairo {
 
 	public class Surface : IDisposable
 	{
-		[Obsolete]
-		protected static Hashtable surfaces = new Hashtable ();
-
 		IntPtr handle = IntPtr.Zero;
 
 		[Obsolete]

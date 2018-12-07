@@ -1,4 +1,4 @@
-//
+﻿//
 // Mono.Cairo.Cairo.cs
 //
 // Authors:
@@ -30,7 +30,7 @@ using System;
 
 namespace Cairo
 {
-	[Serializable]
+	
 	public enum SubpixelOrder
 	{
 		Default,

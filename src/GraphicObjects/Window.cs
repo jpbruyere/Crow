@@ -84,7 +84,7 @@ namespace Crow
 		#endregion
 
 		#region public properties
-		[XmlAttributeAttribute][DefaultValue("#Crow.Images.Icons.crow.png")]
+		[DefaultValue("#Crow.Images.Icons.crow.png")]
 		public string Icon {
 			get { return _icon; } 
 			set {
@@ -97,7 +97,7 @@ namespace Crow
 		/// <summary>
 		/// Background of the title bar if any.
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue("vgradient|0:Onyx|1:SteelBlue")]
+		[DefaultValue("vgradient|0:Onyx|1:SteelBlue")]
 		public virtual Fill TitleBarBackground {
 			get { return titleBarBackground; }
 			set {
@@ -111,7 +111,7 @@ namespace Crow
 		/// <summary>
 		/// Foreground of the title bar, usualy used for the window caption color.
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue("White")]
+		[DefaultValue("White")]
 		public virtual Fill TitleBarForeground {
 			get { return titleBarForeground; }
 			set {
@@ -122,7 +122,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(true)]
+		[DefaultValue(true)]
 		public bool Resizable {
 			get {
 				return resizable;
@@ -134,7 +134,7 @@ namespace Crow
 				NotifyValueChanged ("Resizable", resizable);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(true)]
+		[DefaultValue(true)]
 		public bool Movable {
 			get {
 				return movable;
@@ -146,7 +146,7 @@ namespace Crow
 				NotifyValueChanged ("Movable", movable);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(false)]
+		[DefaultValue(false)]
 		public bool Modal {
 			get {
 				return modal;
@@ -158,7 +158,7 @@ namespace Crow
 				NotifyValueChanged ("Modal", modal);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(false)]
+		[DefaultValue(false)]
 		public bool IsMinimized {
 			get { return _minimized; }
 			set{
@@ -177,7 +177,7 @@ namespace Crow
 		[XmlIgnore]public bool IsNormal {
 			get { return !(IsMaximized|_minimized); }
 		}
-		[XmlAttributeAttribute][DefaultValue(false)]
+		[DefaultValue(false)]
 		public bool AlwaysOnTop {
 			get {
 				return modal ? true : alwaysOnTop;
@@ -194,7 +194,7 @@ namespace Crow
 				NotifyValueChanged ("AlwaysOnTop", AlwaysOnTop);
 			}
 		}
-//		[XmlAttributeAttribute()][DefaultValue(WindowState.Normal)]
+//		[DefaultValue(WindowState.Normal)]
 //		public virtual WindowState State {
 //			get { return _state; }
 //			set {

@@ -1,4 +1,4 @@
-//
+﻿//
 // Mono.Cairo.FontWeight.cs
 //
 // Authors:
@@ -32,7 +32,7 @@ using System;
 
 namespace Cairo
 {
-	[Serializable]
+	
 	public enum FontWeight
 	{
 		Normal,

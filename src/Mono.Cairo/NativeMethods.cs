@@ -44,13 +44,13 @@ namespace Cairo
 #if MONOTOUCH
 		const string cairo = "__Internal";
 #else
-		const string cairo = "libcairo-2.dll";
+    const string cairo = "cairo";
 #endif
 
-		//[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
-		//internal static extern void cairo_append_path (IntPtr cr, Path path);
+        //[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+        //internal static extern void cairo_append_path (IntPtr cr, Path path);
 
-		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
+        [DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern void cairo_arc (IntPtr cr, double xc, double yc, double radius, double angle1, double angle2);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]

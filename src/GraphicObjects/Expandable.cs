@@ -67,7 +67,7 @@ namespace Crow
 		}
 
 		#region Public properties
-		[XmlAttributeAttribute][DefaultValue("#Crow.Images.Icons.expandable.svg")]
+		[DefaultValue("#Crow.Images.Icons.expandable.svg")]
 		public string Image {
 			get { return image; }
 			set {

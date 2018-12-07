@@ -49,7 +49,7 @@ namespace Crow
 		#endregion
 
 		#region public properties
-		[XmlAttributeAttribute][DefaultValue(2)]
+		[DefaultValue(2)]
 		public int Decimals
 		{
 			get { return _decimals; }
@@ -62,7 +62,7 @@ namespace Crow
 				RegisterForGraphicUpdate();
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(0.0)]
+		[DefaultValue(0.0)]
 		public virtual double Minimum {
 			get { return minValue; }
 			set {
@@ -74,7 +74,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(100.0)]
+		[DefaultValue(100.0)]
 		public virtual double Maximum
 		{
 			get { return maxValue; }
@@ -87,7 +87,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(1.0)]
+		[DefaultValue(1.0)]
 		public virtual double SmallIncrement
 		{
 			get { return smallStep; }
@@ -100,7 +100,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(5.0)]
+		[DefaultValue(5.0)]
 		public virtual double LargeIncrement
 		{
 			get { return bigStep; }

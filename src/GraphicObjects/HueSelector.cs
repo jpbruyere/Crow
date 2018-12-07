@@ -44,7 +44,7 @@ namespace Crow
 		Orientation _orientation;
 		double hue;
 
-		[XmlAttributeAttribute][DefaultValue(Orientation.Horizontal)]
+		[DefaultValue(Orientation.Horizontal)]
 		public virtual Orientation Orientation
 		{
 			get { return _orientation; }
@@ -56,7 +56,7 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute()]
+		
 		public virtual double Hue {
 			get { return hue; }
 			set {

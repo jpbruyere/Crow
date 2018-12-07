@@ -175,7 +175,7 @@ namespace Crow.IML
 			il.Emit(OpCodes.Ldfld, CompilerServices.fiCachedDel);
 			il.Emit(OpCodes.Ldc_I4, index);//load delegate index
 			il.Emit(OpCodes.Callvirt, CompilerServices.miGetDelegateListItem);
-			il.Emit(OpCodes.Callvirt, evt.AddMethod);//call add event
+			il.Emit(OpCodes.Call, evt.AddMethod);//call add event
 		}
 		/// <summary>
 		/// Emits the handler method addition, done at end of parsing, Loc_0 is root node instance
@@ -204,8 +204,8 @@ namespace Crow.IML
 			il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
 			//load methodInfo (3rd arg)
 			il.Emit (OpCodes.Ldstr, membs[membs.Length-1]);
-			il.Emit (OpCodes.Callvirt, CompilerServices.miCreateDel);
-			il.Emit (OpCodes.Callvirt, bd.SourceEvent.AddMethod);//call add event
+			il.Emit (OpCodes.Call, CompilerServices.miCreateDel);
+			il.Emit (OpCodes.Call, bd.SourceEvent.AddMethod);//call add event
 		}
 //		public void emitHandlerMethodAddition(EventBinding bd){
 //			//fetch source instance with address for handler addition (as 1st arg of handler.add)

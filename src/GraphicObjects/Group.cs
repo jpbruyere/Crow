@@ -84,7 +84,7 @@ namespace Crow
         public virtual List<GraphicObject> Children {
 			get { return children; }
 		}
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[DefaultValue(false)]
         public bool MultiSelect
         {
             get { return _multiSelect; }

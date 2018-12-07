@@ -1,4 +1,4 @@
-//
+﻿//
 // Mono.Cairo.Operator.cs
 //
 // Authors: Duncan Mak (duncan@ximian.com)
@@ -33,7 +33,7 @@ using System;
 
 namespace Cairo
 {
-	[Serializable]
+	
 	public enum Operator
 	{
 		Clear,

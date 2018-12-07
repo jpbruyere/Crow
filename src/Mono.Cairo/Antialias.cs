@@ -1,4 +1,4 @@
-//
+﻿//
 // Mono.Cairo.Antialias.cs
 //
 // Authors:
@@ -32,7 +32,7 @@ using System;
 
 namespace Cairo
 {
-	[Serializable]
+	
 	public enum Antialias
 	{
 		Default,

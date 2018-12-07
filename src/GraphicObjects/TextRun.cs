@@ -61,13 +61,13 @@ namespace Crow
 		#endregion
 
 
-		[XmlAttributeAttribute ()]
+		
 		[DefaultValue (Alignment.Left)]
 		public Alignment TextAlignment {
 			get { return _textAlignment; }
 			set { _textAlignment = value; }
 		}
-		[XmlAttributeAttribute ()]
+		
 		[DefaultValue (false)]
 		public virtual bool HorizontalStretch {
 			get { return horizontalStretch; }
@@ -79,7 +79,7 @@ namespace Crow
 				NotifyValueChanged ("HorizontalStretch", horizontalStretch);
 			}
 		}
-		[XmlAttributeAttribute ()]
+		
 		[DefaultValue (false)]
 		public virtual bool VerticalStretch {
 			get { return verticalStretch; }
@@ -91,7 +91,7 @@ namespace Crow
 				NotifyValueChanged ("VerticalStretch", verticalStretch);
 			}
 		}
-		[XmlAttributeAttribute ()]
+		
 		[DefaultValue ("label")]
 		public string Text {
 			get {
@@ -112,7 +112,7 @@ namespace Crow
 				lines = getLines;
 			}
 		}
-		[XmlAttributeAttribute ()]
+		
 		[DefaultValue (false)]
 		public bool Multiline {
 			get { return _multiline; }
@@ -121,7 +121,7 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute ()]
+		
 		[DefaultValue (false)]
 		public bool WordWrap {
 			get {

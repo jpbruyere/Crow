@@ -198,7 +198,7 @@ namespace Crow.IML
 
 			emitBindingDelegates (ctx);
 
-			ctx.il.Emit (OpCodes.Ldloc_0);//load root obj to return
+            ctx.il.Emit (OpCodes.Ldloc_0);//load root obj to return
 			ctx.il.Emit(OpCodes.Ret);
 
 			reader.Read ();//close tag
@@ -437,9 +437,10 @@ namespace Crow.IML
 						#endif
 					}
 				}
-				ctx.il.Emit (OpCodes.Ldloc_0);
-				ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miLoadDefaultVals);
-				#endregion
+                ctx.il.Emit (OpCodes.Ldloc_0);
+                ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miLoadDefaultVals);
+                #endregion
+
 
 				#region Attributes reading
 				if (reader.HasAttributes) {
@@ -492,7 +493,7 @@ namespace Crow.IML
 		/// <summary>
 		/// Parse child node an generate corresponding msil
 		/// </summary>
-		void readChildren (XmlTextReader reader, IMLContext ctx, int startingIdx = 0)
+		void readChildren (XmlReader reader, IMLContext ctx, int startingIdx = 0)
 		{
 			bool endTagReached = false;
 			int nodeIdx = startingIdx;
@@ -622,6 +623,7 @@ namespace Crow.IML
 
 				emitRemoveOldDataSourceHandler (il, sourceEvent.Name, bindingDef.TargetMember, false);
 
+
 				//fetch method in datasource and test if it exist
 				il.Emit (OpCodes.Ldarg_2);//load new datasource
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
@@ -630,28 +632,27 @@ namespace Crow.IML
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
 				il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);//load handler method name
 				il.Emit (OpCodes.Call, CompilerServices.miGetMethInfoWithRefx);
-				il.Emit (OpCodes.Stloc_0);//save MethodInfo
-				il.Emit (OpCodes.Ldloc_0);//push mi for test if null
+				il.Emit (OpCodes.Stloc_0);//save MethodInfo                                          
+                il.Emit (OpCodes.Ldloc_0);//push mi for test if null
+                il.Emit (OpCodes.Brfalse, cancel);//cancel if null
 
-				il.Emit (OpCodes.Brfalse, cancel);
+                il.Emit (OpCodes.Ldarg_1);//load datasource change source where the event is as 1st arg of handler.add
+                if (bindingDef.IsTemplateBinding)//fetch source instance with address
+                    CompilerServices.emitGetInstance (il, bindingDef.SourceNA);
 
-				il.Emit (OpCodes.Ldarg_1);//load datasource change source where the event is as 1st arg of handler.add
-				if (bindingDef.IsTemplateBinding)//fetch source instance with address
-					CompilerServices.emitGetInstance (il, bindingDef.SourceNA);
+                //load handlerType of sourceEvent to create delegate (1st arg)
+                il.Emit (OpCodes.Ldtoken, sourceEvent.EventHandlerType);
+                il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
+                il.Emit (OpCodes.Ldarg_2);//load new datasource where the method is defined
+                il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+                il.Emit (OpCodes.Ldloc_0);//load methodInfo (3rd arg)
 
-				//load handlerType of sourceEvent to create delegate (1st arg)
-				il.Emit (OpCodes.Ldtoken, sourceEvent.EventHandlerType);
-				il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
-				il.Emit (OpCodes.Ldarg_2);//load new datasource where the method is defined
-				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
-				il.Emit (OpCodes.Ldloc_0);//load methodInfo (3rd arg)
-
-				il.Emit (OpCodes.Callvirt, CompilerServices.miCreateBoundDel);
-				il.Emit (OpCodes.Callvirt, sourceEvent.AddMethod);//call add event
-
-				System.Reflection.Emit.Label finish = il.DefineLabel ();
-				il.Emit (OpCodes.Br, finish);
-				il.MarkLabel (cancel);
+                il.Emit (OpCodes.Call, CompilerServices.miCreateBoundDel);
+                il.Emit (OpCodes.Call, sourceEvent.AddMethod);//call add event
+                                          
+                System.Reflection.Emit.Label finish = il.DefineLabel ();
+                il.Emit (OpCodes.Br, finish);
+                il.MarkLabel (cancel);
 				#if DEBUG_BINDING
 				il.EmitWriteLine (string.Format ("Handler method '{0}' for '{1}' NOT FOUND in new dataSource", bindingDef.TargetMember, sourceEvent.Name));
 				#endif
@@ -659,6 +660,7 @@ namespace Crow.IML
 				#if DEBUG_BINDING
 				il.EmitWriteLine (string.Format ("Handler method '{0}' for '{1}' FOUND in new dataSource", bindingDef.TargetMember, sourceEvent.Name));
 				#endif
+				               
 				il.Emit (OpCodes.Ret);
 
 				//store dschange delegate in instatiator instance for access while instancing graphic object
@@ -717,7 +719,7 @@ namespace Crow.IML
 
 				il.Emit (OpCodes.Ldstr, bindingCase.Key);//load name to test
 				il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
-				il.Emit (OpCodes.Callvirt, CompilerServices.stringEquals);
+				il.Emit (OpCodes.Call, CompilerServices.stringEquals);
 				il.Emit (OpCodes.Brfalse, nextTest);//if not equal, jump to next case
 				#endregion
 
@@ -851,7 +853,7 @@ namespace Crow.IML
 
 				il.Emit (OpCodes.Ldstr, bindingCase.Key);//load name to test
 				il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
-				il.Emit (OpCodes.Callvirt, CompilerServices.stringEquals);
+				il.Emit (OpCodes.Call, CompilerServices.stringEquals);
 				il.Emit (OpCodes.Brfalse, nextTest);//if not equal, jump to next case
 				#endregion
 
@@ -928,7 +930,7 @@ namespace Crow.IML
 			ilPC.Emit(OpCodes.Ldfld, CompilerServices.fiTemplateBinding);
 
 			//add template bindings dynValueChanged delegate to new parent event
-			ilPC.Emit(OpCodes.Callvirt, CompilerServices.eiValueChange.AddMethod);//call add event
+			ilPC.Emit(OpCodes.Call, CompilerServices.eiValueChange.AddMethod);//call add event
 
 			ilPC.MarkLabel (cancel);
 			ilPC.Emit (OpCodes.Ret);
@@ -972,7 +974,7 @@ namespace Crow.IML
 				//test if it's the expected one
 				il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);
 				il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
-				il.Emit (OpCodes.Callvirt, CompilerServices.stringEquals);
+				il.Emit (OpCodes.Call, CompilerServices.stringEquals);
 				il.Emit (OpCodes.Brfalse, endMethod);
 				//set destination member with valueChanged new value
 				//load destination ref
@@ -1149,7 +1151,7 @@ namespace Crow.IML
 			//test if it's the expected one
 			il.Emit (OpCodes.Ldstr, origMember);
 			il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
-			il.Emit (OpCodes.Callvirt, CompilerServices.stringEquals);
+			il.Emit (OpCodes.Call, CompilerServices.stringEquals);
 			il.Emit (OpCodes.Brfalse, endMethod);
 			//set destination member with valueChanged new value
 			//load destination ref

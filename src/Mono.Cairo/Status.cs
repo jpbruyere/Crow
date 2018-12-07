@@ -1,4 +1,4 @@
-//
+﻿//
 // Mono.Cairo.Status.cs
 //
 // Authors:
@@ -34,7 +34,7 @@ using System;
 
 namespace Cairo
 {
-	[Serializable]
+	
 	public enum Status
 	{
 		Success = 0,

@@ -1,4 +1,4 @@
-//
+﻿//
 // Mono.Cairo.Content.cs
 //
 // Authors:
@@ -33,7 +33,7 @@ using System;
 namespace Cairo
 {
 	//[Flags]
-	[Serializable]
+	
 	public enum Content
 	{
 		Color = 0x1000,

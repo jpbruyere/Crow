@@ -60,7 +60,7 @@ namespace Crow
 				AddValue (value);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(400)]
+		[DefaultValue(400)]
 		public virtual int NbValues {
 			get { return nbValues; }
 			set {
@@ -72,7 +72,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(0.0)]
+		[DefaultValue(0.0)]
 		public virtual double Minimum {
 			get { return minValue; }
 			set {
@@ -84,7 +84,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(100.0)]
+		[DefaultValue(100.0)]
 		public virtual double Maximum
 		{
 			get { return maxValue; }
@@ -97,7 +97,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(1.0)]
+		[DefaultValue(1.0)]
 		public virtual double LowThreshold {
 			get { return lowThreshold; }
 			set {
@@ -108,7 +108,7 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(80.0)]
+		[DefaultValue(80.0)]
 		public virtual double HighThreshold {
 			get { return highThreshold; }
 			set {
@@ -119,7 +119,7 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("DarkRed")]
+		[DefaultValue("DarkRed")]
 		public virtual Fill LowThresholdFill {
 			get { return lowThresholdFill; }
 			set {
@@ -130,7 +130,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("DarkGreen")]
+		[DefaultValue("DarkGreen")]
 		public virtual Fill HighThresholdFill {
 			get { return highThresholdFill; }
 			set {

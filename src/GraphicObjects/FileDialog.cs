@@ -55,7 +55,7 @@ namespace Crow
 		public string SelectedFileFullPath {
 			get { return Path.Combine (SelectedDirectory, SelectedFile); }
 		}
-		[XmlAttributeAttribute][DefaultValue("/home")]
+		[DefaultValue("/home")]
 		public virtual string CurrentDirectory {
 			get { return curDir; }
 			set {
@@ -67,7 +67,7 @@ namespace Crow
 			}
 		}
 
-		[XmlAttributeAttribute][DefaultValue("*")]
+		[DefaultValue("*")]
 		public virtual string SearchPattern {
 			get { return searchPattern; }
 			set {
@@ -78,7 +78,7 @@ namespace Crow
 
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[DefaultValue(false)]
 		public virtual bool ShowHidden {
 			get { return showHidden; }
 			set {
@@ -88,7 +88,7 @@ namespace Crow
 				NotifyValueChanged ("ShowHidden", showHidden);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(true)]
+		[DefaultValue(true)]
 		public virtual bool ShowFiles {
 			get { return showFiles; }
 			set {
@@ -98,7 +98,7 @@ namespace Crow
 				NotifyValueChanged ("ShowFiles", showFiles);
 			}
 		}
-		[XmlAttributeAttribute]public string SelectedFile {
+		public string SelectedFile {
 			get { return _selectedFile; }
 			set {
 				if (value == _selectedFile)
@@ -107,7 +107,7 @@ namespace Crow
 				NotifyValueChanged ("SelectedFile", _selectedFile);
 			}
 		}
-		[XmlAttributeAttribute]public string SelectedDirectory {
+		public string SelectedDirectory {
 			get { return _selectedDir; }
 			set {
 				if (value == _selectedDir)

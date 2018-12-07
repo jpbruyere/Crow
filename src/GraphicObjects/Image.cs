@@ -49,7 +49,7 @@ namespace Crow
 		/// <summary>
 		/// If false, original size will be kept in any case.
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue(true)]
+		[DefaultValue(true)]
 		public virtual bool Scaled {
 			get { return scaled; }
 			set {
@@ -66,7 +66,7 @@ namespace Crow
 		/// <summary>
 		/// If image is scaled, proportions will be preserved.
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue(true)]
+		[DefaultValue(true)]
 		public virtual bool KeepProportions {
 			get { return keepProps; }
 			set {
@@ -83,7 +83,7 @@ namespace Crow
 		/// <summary>
 		/// Image file path, may be on disk or embedded. Accepts bitmaps or SVG drawings.
 		/// </summary>
-        [XmlAttributeAttribute]
+        
 		public string Path {
 			get { return _pic == null ? "" : _pic.Path; }
 			set {
@@ -108,7 +108,7 @@ namespace Crow
 		/// Used only for svg images, repaint only node named referenced in SvgSub.
 		/// If null, all the svg is rendered
 		/// </summary>
-		[XmlAttributeAttribute]
+		
 		public string SvgSub {
 			get { return _svgSub; }
 			set {
@@ -122,7 +122,7 @@ namespace Crow
 		/// Object holding the image data once loaded, may be used directely to pupulate this control without 
 		/// specifying a path.
 		/// </summary>
-		[XmlAttributeAttribute]
+		
 		public Picture Picture {
 			get { return _pic; }
 			set {
@@ -137,7 +137,7 @@ namespace Crow
 		/// Opacity parameter for the image
 		/// </summary>
 		// TODO:could be moved in GraphicObject
-		[XmlAttributeAttribute()][DefaultValue(1.0)]
+		[DefaultValue(1.0)]
 		public virtual double Opacity {
 			get { return opacity; }
 			set {

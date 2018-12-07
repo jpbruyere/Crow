@@ -64,13 +64,13 @@ namespace Crow
 				return;
 			}
 			using (Stream stream = Interface.StaticGetStreamFromPath (Path)) {				
-				loadBitmap (new System.Drawing.Bitmap (stream));	
+				//loadBitmap (new System.Drawing.Bitmap (stream));	
 			}
 			sharedResources [Path] = new sharedPicture (image, Dimensions);
 		}
 
 		//load image via System.Drawing.Bitmap, cairo load png only
-		void loadBitmap (System.Drawing.Bitmap bitmap)
+		/*void loadBitmap (System.Drawing.Bitmap bitmap)
 		{
 			if (bitmap == null)
 				return;
@@ -88,7 +88,7 @@ namespace Crow
 			System.Runtime.InteropServices.Marshal.Copy (data.Scan0, image, 0, bitmapSize);
 
 			bitmap.UnlockBits (data);           
-		}
+		}*/
 
 		#region implemented abstract members of Fill
 

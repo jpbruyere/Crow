@@ -64,7 +64,7 @@ namespace Crow
 		/// <summary>
 		/// if true, action defined in this command may be executed,
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue(true)]
+		[DefaultValue(true)]
 		public virtual bool CanExecute {
 			get { return canExecute; }
 			set {
@@ -77,7 +77,7 @@ namespace Crow
 		/// <summary>
 		/// label to display in the bound control
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue("Unamed Command")]
+		[DefaultValue("Unamed Command")]
 		public virtual string Caption {
 			get { return caption; }
 			set {
@@ -91,7 +91,7 @@ namespace Crow
 		/// <summary>
 		/// Icon to display in the bound control
 		/// </summary>
-		[XmlAttributeAttribute]
+		
 		public Picture Icon {
 			get { return icon; }
 			set {

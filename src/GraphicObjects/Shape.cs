@@ -75,7 +75,7 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(1.0)]
+		[DefaultValue(1.0)]
 		public double StokeWidth {
 			get { return strokeWidth; }
 			set {
