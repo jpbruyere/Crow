@@ -56,7 +56,7 @@ namespace Crow.Coding
 			{ Caption = "Save As ..", Icon = new SvgPicture ("#Crow.Coding.icons.save.svg"), CanExecute = false };
 			cmdOpen = new Crow.Command (new Action (() => Open ())) 
 			{ Caption = "Open", Icon = new SvgPicture ("#Crow.Coding.icons.open.svg"), CanExecute = true };
-			cmdClose = new Crow.Command (new Action (() => Close ())) 
+			cmdClose = new Crow.Command (new Action (() => OnQueryClose (this,null))) 
 			{ Caption = "Close", Icon = new SvgPicture ("#Crow.Coding.icons.open.svg"), CanExecute = false };
 			cmdUndo = new Crow.Command (new Action (() => Undo (null))) 
 			{ Caption = "Undo", Icon = new SvgPicture ("#Crow.Coding.icons.undo.svg"), CanExecute = false };
@@ -110,6 +110,7 @@ namespace Crow.Coding
 				NotifyValueChanged ("IsOpened", isOpened);
 			}
 		}
+
 		public void UnregisterEditor (object editor){
 			lock(RegisteredEditors){
 				RegisteredEditors.Remove (editor);

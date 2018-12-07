@@ -230,7 +230,7 @@ namespace Crow.Text
 				}
 			}
 		}
-		[DefaultValue("BlueGrey")]
+		[DefaultValue("Blue")]
 		public virtual Color SelectionBackground {
 			get { return selBackground; }
 			set {

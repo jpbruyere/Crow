@@ -110,14 +110,14 @@ namespace tests
 				app.CMDTest = new Command(new Action(() => app.AddWidget (app.instFileDlg.CreateInstance()).DataSource = app)) { Caption = "Test", Icon = new SvgPicture("#Tests.image.blank-file.svg"), CanExecute = true};
 				//app.AddWidget (@"Interfaces/Divers/testFocus.crow").DataSource = app;
 				//app.AddWidget (@"Interfaces/Divers/testMenu.crow").DataSource = app;
-				app.AddWidget (@"Interfaces/Divers/testVisibility.crow").DataSource = app;
+				//app.AddWidget (@"Interfaces/Divers/testVisibility.crow").DataSource = app;
 				//app.AddWidget (@"Interfaces/Divers/0.crow").DataSource = app;
 				//app.AddWidget (@"Interfaces/Splitter/1.crow").DataSource = app;
-				//app.AddWidget (@"Interfaces/Container/0.crow").DataSource = app;
+				app.AddWidget (@"Interfaces/GraphicObject/0.crow").DataSource = app;
 				//app.AddWidget (@"Interfaces/TemplatedContainer/test_Listbox.crow").DataSource = app;
 
-				app.instFileDlg = Crow.IML.Instantiator.CreateFromImlFragment
-					(app, "<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}'/>");
+				/*app.instFileDlg = Crow.IML.Instantiator.CreateFromImlFragment
+					(app, "<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}'/>");*/
 				
 
 				//app.AddWidget (@"Interfaces/Divers/colorPicker.crow").DataSource = app;

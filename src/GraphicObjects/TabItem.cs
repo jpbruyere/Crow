@@ -264,7 +264,8 @@ namespace Crow
 		{
 			if (!base.PointIsIn (ref m))
 				return false;
-
+			if (tview == null)//double check this, just added to prevent exception
+				return false;
 			if (m.Y < tview.TabHeight)
 				return TabTitle.Slot.ContainsOrIsEqual (m);
 			else

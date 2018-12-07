@@ -36,8 +36,6 @@ namespace Crow.Coding
 {
 	class CrowIDE : Interface
 	{
-		static bool running = true;
-
 		public Command CMDNew, CMDOpen, CMDSave, CMDSaveAs, cmdCloseSolution, CMDQuit,
 		CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp,
 		CMDAbout, CMDOptions,
@@ -50,7 +48,7 @@ namespace Crow.Coding
 			CMDOpen = new Command(new Action(() => openFileDialog())) { Caption = "Open...", Icon = new SvgPicture("#Crow.Coding.icons.open.svg")};
 			CMDSave = new Command(new Action(() => saveFileDialog())) { Caption = "Save", Icon = new SvgPicture("#Crow.Coding.icons.save.svg"), CanExecute = false};
 			CMDSaveAs = new Command(new Action(() => saveFileDialog())) { Caption = "Save As...", Icon = new SvgPicture("#Crow.Coding.icons.save.svg"), CanExecute = false};
-			CMDQuit = new Command(new Action(() => running = false)) { Caption = "Quit", Icon = new SvgPicture("#Crow.Coding.ui.icons.sign-out.svg")};
+			CMDQuit = new Command(new Action(() => app.running = false)) { Caption = "Quit", Icon = new SvgPicture("#Crow.Coding.ui.icons.sign-out.svg")};
 			CMDUndo = new Command(new Action(() => undo())) { Caption = "Undo", Icon = new SvgPicture("#Crow.Coding.icons.undo.svg"), CanExecute = false};
 			CMDRedo = new Command(new Action(() => redo())) { Caption = "Redo", Icon = new SvgPicture("#Crow.Coding.icons.redo.svg"), CanExecute = false};
 			//CMDCut = new Command(new Action(() => Quit (null, null))) { Caption = "Cut", Icon = new SvgPicture("#Crow.Coding.icons.scissors.svg"), CanExecute = false};
@@ -105,6 +103,7 @@ namespace Crow.Coding
 
 		public void saveWinConfigs() {
 			Configuration.Global.Set ("WinConfigs", mainDock.ExportConfig ());
+			Configuration.Global.Save ();
 		}
 		public void reloadWinConfigs() {
 			string conf = Configuration.Global.Get<string>("WinConfigs");
@@ -125,13 +124,9 @@ namespace Crow.Coding
 
 				app.reloadWinConfigs ();
 
-				while (running) {
-					app.ProcessEvents ();
-					//Thread.Sleep(1);
-				}
+				app.Run ();
 
 				app.saveWinConfigs ();
-				Thread.Sleep (500);
 			}
 		}
 

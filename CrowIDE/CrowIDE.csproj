@@ -124,6 +124,7 @@
     <Folder Include="src\Editors\CodeBuffer\" />
     <Folder Include="src\ProjectTree\" />
     <Folder Include="src\Editors\Parsers2\" />
+    <Folder Include="src\ProjectTree\msbuild\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="images\save.svg" />
