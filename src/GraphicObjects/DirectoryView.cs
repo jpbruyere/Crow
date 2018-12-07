@@ -63,7 +63,7 @@ namespace Crow
 				NotifyValueChanged ("SelectedItem", _selectedItem);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(true)]
+		[DefaultValue(true)]
 		public virtual bool ShowFiles {
 			get { return showFiles; }
 			set {
@@ -74,7 +74,7 @@ namespace Crow
 				NotifyValueChanged ("FileSystemEntries", FileSystemEntries);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[DefaultValue(false)]
 		public virtual bool ShowHidden {
 			get { return showHidden; }
 			set {
@@ -85,7 +85,7 @@ namespace Crow
 				NotifyValueChanged ("FileSystemEntries", FileSystemEntries);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue("*.*")]
+		[DefaultValue("*.*")]
 		public virtual string FileMask {
 			get { return fileMask; }
 			set {
@@ -96,7 +96,7 @@ namespace Crow
 				NotifyValueChanged ("FileSystemEntries", FileSystemEntries);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue("/")]
+		[DefaultValue("/")]
 		public virtual string CurrentDirectory {
 			get { return currentDirectory; }
 			set {

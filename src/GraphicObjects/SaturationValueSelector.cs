@@ -40,7 +40,7 @@ namespace Crow
 
 		double v, s;
 
-		[XmlAttributeAttribute()]
+		
 		public virtual double V {
 			get { return v; }
 			set {
@@ -53,7 +53,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute()]
+		
 		public virtual double S {
 			get { return s; }
 			set {

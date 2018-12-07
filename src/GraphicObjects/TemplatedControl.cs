@@ -69,7 +69,7 @@ namespace Crow
 		/// Template path
 		/// </summary>
 		//TODO: this property should be renamed 'TemplatePath'
-		[XmlAttributeAttribute][DefaultValue(null)]
+		[DefaultValue(null)]
 		public string Template {
 			get { return _template; }
 			set {
@@ -86,7 +86,7 @@ namespace Crow
 		/// <summary>
 		/// a caption being recurrent need in templated widget, it is declared here.
 		/// </summary>
-		[XmlAttributeAttribute()][DefaultValue("Templated Control")]
+		[DefaultValue("Templated Control")]
 		public virtual string Caption {
 			get { return caption; }
 			set {

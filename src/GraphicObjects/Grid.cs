@@ -56,13 +56,13 @@ namespace Crow
 		#endregion
 
 		#region Public Properties
-        [XmlAttributeAttribute()][DefaultValue(2)]
+        [DefaultValue(2)]
         public int Spacing
         {
 			get { return _spacing; }
             set { _spacing = value; }
         }
-        [XmlAttributeAttribute()][DefaultValue(2)]
+        [DefaultValue(2)]
         public virtual int ColumnCount
         {
             get { return _columnCount; }
@@ -76,7 +76,7 @@ namespace Crow
 				this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 			}
         }
-		[XmlAttributeAttribute()][DefaultValue(2)]
+		[DefaultValue(2)]
 		public virtual int RowCount
 		{
 			get { return _rowCount; }

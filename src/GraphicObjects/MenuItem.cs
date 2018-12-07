@@ -85,17 +85,17 @@ namespace Crow
 				NotifyValueChanged ("Command", command);
 			}
 		}
-		[XmlAttributeAttribute]
+		
 		public override bool IsEnabled {
 			get { return Command == null ? base.IsEnabled : Command.CanExecute; }
 			set { base.IsEnabled = value; }
 		}
-		[XmlAttributeAttribute]
+		
 		public override string Caption {
 			get { return Command == null ? base.Caption : Command.Caption; }
 			set { base.Caption = value; }
 		}
-		[XmlAttributeAttribute]
+		
 		public Picture Icon {
 			get { return Command == null ? icon : Command.Icon;; }
 			set {
@@ -106,7 +106,7 @@ namespace Crow
 					NotifyValueChanged ("Icon", icon);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("Fit")]
+		[DefaultValue("Fit")]
 		public virtual Measure PopWidth {
 			get { return popWidth; }
 			set {
@@ -116,7 +116,7 @@ namespace Crow
 				NotifyValueChanged ("PopWidth", popWidth);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("Fit")]
+		[DefaultValue("Fit")]
 		public virtual Measure PopHeight {
 			get { return popHeight; }
 			set {

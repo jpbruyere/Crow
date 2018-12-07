@@ -1,5 +1,5 @@
 ﻿//
-// CheckBox.cs
+// Expandable.cs
 //
 // Author:
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
@@ -25,50 +25,10 @@
 // THE SOFTWARE.
 
 using System;
-using System.ComponentModel;
-using System.Xml.Serialization;
 
 namespace Crow
 {
-	/// <summary>
-	/// templated checkbox control
-	/// </summary>
-	public class CheckBox : TemplatedControl
-	{
-		#region CTOR
-		protected CheckBox() : base(){}
-		public CheckBox (Interface iface) : base(iface){}
-		#endregion
-
-		bool isChecked;
-
-		public event EventHandler Checked;
-		public event EventHandler Unchecked;
-
-		[DefaultValue(false)]
-		public bool IsChecked
-		{
-			get { return isChecked; }
-			set
-			{
-				if (isChecked == value)
-					return;
-
-				isChecked = value;
-
-				NotifyValueChanged ("IsChecked", value);
-
-				if (isChecked)
-					Checked.Raise (this, null);
-				else
-					Unchecked.Raise (this, null);
-			}
-		}
-
-		public override void onMouseDown (object sender, MouseButtonEventArgs e)
-		{
-			IsChecked = !IsChecked;
-			base.onMouseDown (sender, e);
-		}
-	}
+    public class XmlIgnoreAttribute : Attribute
+    {
+    }
 }

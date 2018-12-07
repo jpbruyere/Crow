@@ -66,14 +66,6 @@ namespace Crow
         {
             return new Cairo.PointD(p.X, p.Y);
         }
-        public static implicit operator System.Drawing.Point(Point p)
-        {
-            return new System.Drawing.Point(p.X, p.Y);
-        }
-        public static implicit operator Point(System.Drawing.Point p)
-        {
-            return new Point(p.X, p.Y);
-        }
         public static implicit operator Point(int i)
         {
             return new Point(i, i);

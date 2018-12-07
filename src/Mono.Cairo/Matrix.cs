@@ -37,7 +37,7 @@ using System.Runtime.InteropServices;
 namespace Cairo {
 
 	[StructLayout(LayoutKind.Sequential)]
-	public class Matrix : ICloneable
+	public class Matrix //: ICloneable
 	{
 		public double Xx;
 		public double Yx;

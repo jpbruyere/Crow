@@ -28,7 +28,7 @@ using System.Collections.Generic;
 
 namespace Crow.IML2
 {
-	public class Reader : XmlTextReader
+	public class Reader : XmlReader
 	{		
 		static List<Type> CrowTypes = new List<Type> ();
 
@@ -93,6 +93,7 @@ namespace Crow.IML2
 			il.Emit(OpCodes.Ret);
 			loader = (InstanciatorInvoker)dm.CreateDelegate (typeof(InstanciatorInvoker));
 			return loader;
+            XmlReader r = XmlReader.Create("test.xml");
 		}
 
 		protected int curDepth {

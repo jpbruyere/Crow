@@ -150,9 +150,9 @@ namespace Crow.IML
 			}
 			Type dvType = val.GetType ();
 
-			if (dvType.IsValueType) {
+            if (dvType.IsValueType) {
 				if (pi.PropertyType.IsValueType) {
-					if (pi.PropertyType.IsEnum) {
+                    if (pi.PropertyType.IsEnum) {
 						if (pi.PropertyType != dvType)
 							throw new Exception ("Enum mismatch in default values: " + pi.PropertyType.FullName);
 						il.Emit (OpCodes.Ldc_I4, Convert.ToInt32 (val));
@@ -224,7 +224,7 @@ namespace Crow.IML
 					il.Emit (OpCodes.Ldstr, Convert.ToString (val));//TODO:implement here string format?
 					//load false
 					il.Emit (OpCodes.Ldc_I4_0);
-					il.Emit (OpCodes.Callvirt, CompilerServices.miParseEnum);
+					il.Emit (OpCodes.Call, CompilerServices.miParseEnum);
 
 					if (CompilerServices.miParseEnum.ReturnType != pi.PropertyType)
 						il.Emit (OpCodes.Unbox_Any, pi.PropertyType);
@@ -236,13 +236,13 @@ namespace Crow.IML
 						throw new Exception ("no Parse method found for: " + pi.PropertyType.FullName);
 
 					il.Emit (OpCodes.Ldstr, Convert.ToString (val));//TODO:is this convert required?
-					il.Emit (OpCodes.Callvirt, miParse);
+					il.Emit (OpCodes.Call, miParse);
 
 					if (miParse.ReturnType != pi.PropertyType)
 						il.Emit (OpCodes.Unbox_Any, pi.PropertyType);
 				}
 			}
-			il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
+            il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());
 		}
 
 		#region conversions
@@ -535,23 +535,31 @@ namespace Crow.IML
 			}else if (origType.IsValueType) {
 				if (destType != origType) {
 					MethodInfo miIO = getImplicitOp (origType, destType);
-					if (miIO != null) {
-						System.Reflection.Emit.Label emitCreateDefault = il.DefineLabel ();
-						System.Reflection.Emit.Label emitContinue = il.DefineLabel ();
-						LocalBuilder lbStruct = il.DeclareLocal (origType);
-						il.Emit (OpCodes.Dup);
-						il.Emit (OpCodes.Brfalse, emitCreateDefault);
-						il.Emit (OpCodes.Unbox_Any, origType);
-						il.Emit (OpCodes.Br, emitContinue);
-						il.MarkLabel (emitCreateDefault);
-						il.Emit (OpCodes.Pop);//pop null value
-						il.Emit (OpCodes.Ldloca, lbStruct);
-						il.Emit (OpCodes.Initobj, origType);
-						il.Emit (OpCodes.Ldloc, lbStruct);
-						il.MarkLabel (emitContinue);
-						il.Emit (OpCodes.Call, miIO);
-					}else
-						il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (destType));
+                    if (miIO != null)
+                    {
+                        System.Reflection.Emit.Label emitCreateDefault = il.DefineLabel();
+                        System.Reflection.Emit.Label emitContinue = il.DefineLabel();
+                        LocalBuilder lbStruct = il.DeclareLocal(origType);
+                        il.Emit(OpCodes.Dup);
+                        il.Emit(OpCodes.Brfalse, emitCreateDefault);
+                        il.Emit(OpCodes.Unbox_Any, origType);
+                        il.Emit(OpCodes.Br, emitContinue);
+                        il.MarkLabel(emitCreateDefault);
+                        il.Emit(OpCodes.Pop);//pop null value
+                        il.Emit(OpCodes.Ldloca, lbStruct);
+                        il.Emit(OpCodes.Initobj, origType);
+                        il.Emit(OpCodes.Ldloc, lbStruct);
+                        il.MarkLabel(emitContinue);
+                        il.Emit(OpCodes.Call, miIO);
+                    }
+                    else
+                    {
+                        MethodInfo miconv = CompilerServices.GetConvertMethod(destType);
+                        if (miconv.IsStatic)
+                            il.Emit(OpCodes.Call, miconv);
+                        else
+                            il.Emit(OpCodes.Callvirt, miconv);
+                    }
 				}else
 					il.Emit (OpCodes.Unbox_Any, destType);//TODO:double check this
 			} else {
@@ -622,8 +630,12 @@ namespace Crow.IML
 				il.Emit (OpCodes.Pop);//remove null string from stack
 				il.Emit (OpCodes.Ldstr, "");//replace with empty string
 			} else if (dstType.IsPrimitive) {
-				//il.Emit (OpCodes.Unbox_Any, dstType);
-				il.Emit (OpCodes.Callvirt, CompilerServices.GetConvertMethod (dstType));
+                //il.Emit (OpCodes.Unbox_Any, dstType);
+                MethodInfo miconv = CompilerServices.GetConvertMethod(dstType);
+                if (miconv.IsStatic)
+                    il.Emit(OpCodes.Call, miconv);
+                else
+                    il.Emit(OpCodes.Callvirt, miconv);
 			} else if (dstType.IsValueType) {
 				il.Emit (OpCodes.Unbox_Any, dstType);
 			} else{
@@ -803,10 +815,13 @@ namespace Crow.IML
 
 						il.Emit (OpCodes.Ldstr, operandes [1].Trim ());
 					}
-					il.Emit (OpCodes.Callvirt, lopParseMi);
-					//il.Emit (OpCodes.Unbox_Any, lopPI.PropertyType);
-					//emit left operand assignment
-					il.Emit (OpCodes.Callvirt, lopPI.GetSetMethod());
+                    if (lopParseMi.IsStatic)
+					    il.Emit (OpCodes.Call, lopParseMi);
+                    else
+                        il.Emit(OpCodes.Callvirt, lopParseMi);
+                    //il.Emit (OpCodes.Unbox_Any, lopPI.PropertyType);
+                    //emit left operand assignment
+                    il.Emit (OpCodes.Callvirt, lopPI.GetSetMethod());
 				} else {//tree parsing and propert gets
 					il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
 

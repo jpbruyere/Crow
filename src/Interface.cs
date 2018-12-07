@@ -81,9 +81,9 @@ namespace Crow
 
 		#region CTOR
 		static Interface(){
-			if (Type.GetType ("Mono.Runtime") == null) {
+			/*if (Type.GetType ("Mono.Runtime") == null) {
 				throw new Exception (@"C.R.O.W. run only on Mono, download latest version at: http://www.mono-project.com/download/stable/");
-			}
+			}*/
 
 			CrowConfigRoot =
 				System.IO.Path.Combine(
@@ -129,8 +129,8 @@ namespace Crow
 			Keyboard.KeyUp += Keyboard_KeyUp;
 			Keyboard.KeyPress += Keyboard_KeyPress;
 
-			initTooltip ();
-			initContextMenus ();
+			//initTooltip ();
+			//initContextMenus ();
 
 			running = true;
 

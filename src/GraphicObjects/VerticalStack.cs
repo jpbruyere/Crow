@@ -43,7 +43,7 @@ namespace Crow
         }
 		#endregion
 
-        [System.Xml.Serialization.XmlIgnore]
+        [XmlIgnore]
         public override Orientation Orientation
         {
             get { return Orientation.Vertical; }            

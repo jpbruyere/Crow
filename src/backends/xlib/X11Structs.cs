@@ -1,4 +1,4 @@
-// Permission is hereby granted, free of charge, to any person obtaining
+﻿// Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
 // "Software",, to deal in the Software without restriction, including
 // without limitation the rights to use, copy, modify, merge, publish,
@@ -29,12 +29,12 @@
 using System;
 using System.ComponentModel;
 using System.Collections;
-using System.Drawing;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Reflection;
 
-/// X11 Version
+// X11 Version
 namespace Crow.XLib {
 	//
 	// In the structures below, fields of type long are mapped to IntPtr.
@@ -1690,7 +1690,7 @@ namespace Crow.XLib {
 	}
 
 	[StructLayout (LayoutKind.Sequential)]
-	[Serializable]
+	
 	public class XPoint
 	{
 		public short X;
@@ -1698,12 +1698,11 @@ namespace Crow.XLib {
 	}
 
 	[StructLayout (LayoutKind.Sequential)]
-	[Serializable]
+	
 	public class XIMCallback
 	{
 		public IntPtr client_data;
-		public XIMProc callback;
-		[NonSerialized]
+		public XIMProc callback;		
 		GCHandle gch;
 
 		public XIMCallback (IntPtr clientData, XIMProc proc)

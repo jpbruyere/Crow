@@ -222,7 +222,7 @@ namespace Crow
 					//dynamically and fetch
 
 					il.Emit (OpCodes.Ldstr, fetchMethodName);
-					il.Emit (OpCodes.Callvirt, CompilerServices.miGetDataTypeAndFetch);
+					il.Emit (OpCodes.Call, CompilerServices.miGetDataTypeAndFetch);
 				}else
 					emitGetSubData(il, dataType);			
 			}
@@ -259,7 +259,7 @@ namespace Crow
 					//dynamically and fetch
 
 					il.Emit (OpCodes.Ldstr, fetchMethodName);
-					il.Emit (OpCodes.Callvirt, CompilerServices.miGetDataTypeAndFetch);
+					il.Emit (OpCodes.Call, CompilerServices.miGetDataTypeAndFetch);
 				}else
 					emitGetSubData(il, dataType);			
 			}

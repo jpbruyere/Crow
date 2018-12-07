@@ -45,7 +45,7 @@ namespace Crow
 		}
 		#endregion
 
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[DefaultValue(false)]
 		public virtual bool IsRoot {
 			get { return isRoot; }
 			set {

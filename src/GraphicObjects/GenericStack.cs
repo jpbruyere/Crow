@@ -48,7 +48,7 @@ namespace Crow
 		#endregion
 
 		#region Public Properties
-        [XmlAttributeAttribute()][DefaultValue(2)]
+        [DefaultValue(2)]
         public int Spacing
         {
 			get { return _spacing; }
@@ -60,7 +60,7 @@ namespace Crow
 				RegisterForLayouting (LayoutingType.Sizing|LayoutingType.ArrangeChildren);
 			}
         }
-        [XmlAttributeAttribute()][DefaultValue(Orientation.Horizontal)]
+        [DefaultValue(Orientation.Horizontal)]
         public virtual Orientation Orientation
         {
             get { return _orientation; }

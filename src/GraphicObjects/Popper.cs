@@ -46,7 +46,7 @@ namespace Crow
 		public event EventHandler Unpoped;
 
 		#region Public Properties
-		[XmlAttributeAttribute()][DefaultValue("Fit")]
+		[DefaultValue("Fit")]
 		public virtual Measure PopWidth {
 			get { return popWidth; }
 			set {
@@ -56,7 +56,7 @@ namespace Crow
 				NotifyValueChanged ("PopWidth", popWidth);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue("Fit")]
+		[DefaultValue("Fit")]
 		public virtual Measure PopHeight {
 			get { return popHeight; }
 			set {
@@ -66,7 +66,7 @@ namespace Crow
 				NotifyValueChanged ("PopHeight", popHeight);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(false)]
+		[DefaultValue(false)]
 		public bool IsPopped
 		{
 			get { return _isPopped; }
@@ -89,7 +89,7 @@ namespace Crow
 
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(true)]
+		[DefaultValue(true)]
 		public bool CanPop
 		{
 			get { return _canPop; }
@@ -102,7 +102,7 @@ namespace Crow
 				NotifyValueChanged ("CanPop", _canPop);
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(Alignment.Bottom)]
+		[DefaultValue(Alignment.Bottom)]
 		public virtual Alignment PopDirection {
 			get { return popDirection; }
 			set {

@@ -87,8 +87,7 @@ namespace Crow
 		protected TextExtents te;
 		#endregion
 
-
-		[XmlAttributeAttribute][DefaultValue("SteelBlue")]
+		[DefaultValue("SteelBlue")]
 		public virtual Color SelectionBackground {
 			get { return selBackground; }
 			set {
@@ -99,7 +98,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue("White")]
+		[DefaultValue("White")]
 		public virtual Color SelectionForeground {
 			get { return selForeground; }
 			set {
@@ -110,7 +109,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(Alignment.Left)]
+		[DefaultValue(Alignment.Left)]
 		public Alignment TextAlignment
         {
             get { return _textAlignment; }
@@ -122,7 +121,7 @@ namespace Crow
 				NotifyValueChanged ("TextAlignment", _textAlignment);
 			}
         }
-		[XmlAttributeAttribute][DefaultValue(false)]
+		[DefaultValue(false)]
 		public virtual bool HorizontalStretch {
 			get { return horizontalStretch; }
 			set {
@@ -133,7 +132,7 @@ namespace Crow
 				NotifyValueChanged ("HorizontalStretch", horizontalStretch);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(false)]
+		[DefaultValue(false)]
 		public virtual bool VerticalStretch {
 			get { return verticalStretch; }
 			set {
@@ -144,7 +143,7 @@ namespace Crow
 				NotifyValueChanged ("VerticalStretch", verticalStretch);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue("label")]
+		[DefaultValue("label")]
         public string Text
         {
             get {
@@ -167,7 +166,7 @@ namespace Crow
 				RegisterForGraphicUpdate ();
             }
         }
-		[XmlAttributeAttribute][DefaultValue(false)]
+		[DefaultValue(false)]
 		public bool Selectable
 		{
 			get { return _selectable; }
@@ -182,7 +181,7 @@ namespace Crow
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(false)]
+		[DefaultValue(false)]
 		public bool Multiline
 		{
 			get { return _multiline; }
@@ -195,7 +194,7 @@ namespace Crow
 				RegisterForGraphicUpdate();
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(0)]
+		[DefaultValue(0)]
 		public int CurrentColumn{
 			get { return _currentCol; }
 			set {
@@ -210,7 +209,7 @@ namespace Crow
 				NotifyValueChanged ("CurrentColumn", _currentCol);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(0)]
+		[DefaultValue(0)]
 		public int CurrentLine{
 			get { return _currentLine; }
 			set {
@@ -236,7 +235,7 @@ namespace Crow
 		/// <summary>
 		/// Selection begin position in char units
 		/// </summary>
-		[XmlAttributeAttribute][DefaultValue("-1")]
+		[DefaultValue("-1")]
 		public Point SelBegin {
 			get {
 				return _selBegin;
@@ -249,7 +248,7 @@ namespace Crow
 				NotifyValueChanged ("SelectedText", SelectedText);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue("-1")]
+		[DefaultValue("-1")]
 		public Point SelRelease {
 			get {
 				return _selRelease;

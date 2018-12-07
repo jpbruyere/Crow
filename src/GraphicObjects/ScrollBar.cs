@@ -45,7 +45,7 @@ namespace Crow
 		public ScrollBar(Interface iface) : base(iface)	{}
 		#endregion
 
-		[XmlAttributeAttribute()][DefaultValue(Orientation.Vertical)]
+		[DefaultValue(Orientation.Vertical)]
 		public virtual Orientation Orientation
 		{
 			get { return _orientation; }
@@ -61,7 +61,7 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-		[XmlAttributeAttribute()][DefaultValue(20)]
+		[DefaultValue(20)]
 		public virtual int CursorSize {
 			get { return _cursorSize; }
 			set {

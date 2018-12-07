@@ -60,7 +60,7 @@ namespace Crow
 		}
 		#endregion
 
-        [XmlAttributeAttribute()][DefaultValue(false)]
+        [DefaultValue(false)]
         public bool IsChecked
         {
 			get { return isChecked; }

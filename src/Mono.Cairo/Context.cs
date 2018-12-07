@@ -37,7 +37,6 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using Cairo;
 using Color = Crow.Color;
 
 namespace Cairo {	
@@ -68,7 +67,9 @@ namespace Cairo {
 			//
 			int ptr_size = Marshal.SizeOf (typeof (IntPtr));
 
-			PlatformID platform = Environment.OSVersion.Platform;
+			/*PlatformID platform = Environment.OSVersion.Platform;
+            RuntimeInformation.IsOSPlatform(OSPlatform.Linux); 
+            RuntimeInformation.OSArchitecture.HasFlag(Architecture.);
 			if (platform == PlatformID.Win32NT ||
 			    platform == PlatformID.Win32S ||
 			    platform == PlatformID.Win32Windows ||
@@ -76,10 +77,10 @@ namespace Cairo {
 			    ptr_size == 4){
 				c_compiler_long_size = 4;
 				native_glyph_size = Marshal.SizeOf (typeof (NativeGlyph_4byte_longs));
-			} else {
+			} else {*/
 				c_compiler_long_size = 8;
 				native_glyph_size = Marshal.SizeOf (typeof (Glyph));
-			}
+			//}
 		}
 
 		public Context (Surface surface) : this (NativeMethods.cairo_create (surface.Handle), true)

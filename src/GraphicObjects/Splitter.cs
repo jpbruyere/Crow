@@ -43,7 +43,7 @@ namespace Crow
 
 		int thickness;
 
-		[XmlAttributeAttribute][DefaultValue(1)]
+		[DefaultValue(1)]
 		public virtual int Thickness {
 			get { return thickness; }
 			set {

@@ -46,7 +46,7 @@ namespace Crow
 		Color curColor;
 		double h,s,v;
 
-		[XmlAttributeAttribute()]
+		
 		public virtual double R {
 			get { return Math.Round(curColor.R * div); }
 			set {
@@ -58,7 +58,7 @@ namespace Crow
 				notifyCurColorHasChanged ();
 			}
 		}
-		[XmlAttributeAttribute()]
+		
 		public virtual double G {
 			get { return Math.Round(curColor.G * div); }
 			set {
@@ -70,7 +70,7 @@ namespace Crow
 				hsvFromRGB ();
 			}
 		}
-		[XmlAttributeAttribute()]
+		
 		public virtual double B {
 			get { return Math.Round(curColor.B * div); }
 			set {
@@ -82,7 +82,7 @@ namespace Crow
 				hsvFromRGB ();
 			}
 		}
-		[XmlAttributeAttribute()]
+		
 		public virtual double A {
 			get { return Math.Round(curColor.A * div); }
 			set {
@@ -94,7 +94,7 @@ namespace Crow
 				hsvFromRGB ();
 			}
 		}
-		[XmlAttributeAttribute()]
+		
 		public virtual double H {
 			get { return Math.Round (h, 3); }
 			set {
@@ -105,7 +105,7 @@ namespace Crow
 				rgbFromHSV ();
 			}
 		}
-		[XmlAttributeAttribute()]
+		
 		public virtual double S {
 			get { return Math.Round (s, 2); }
 			set {
@@ -116,7 +116,7 @@ namespace Crow
 				rgbFromHSV ();
 			}
 		}
-		[XmlAttributeAttribute()]
+		
 		public virtual double V {
 			get { return Math.Round (v, 2); }
 			set {
@@ -128,7 +128,7 @@ namespace Crow
 			}
 		}
 
-		[XmlAttributeAttribute]
+		
 		public virtual Fill SelectedColor {
 			get { return new SolidColor(curColor); }
 			set {
@@ -145,7 +145,7 @@ namespace Crow
 				hsvFromRGB ();
 			}
 		}
-		[XmlAttributeAttribute]
+		
 		public virtual Color SelectedRawColor {
 			get { return curColor; }
 			set {

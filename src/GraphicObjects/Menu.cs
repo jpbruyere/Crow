@@ -41,7 +41,7 @@ namespace Crow
 		bool autoOpen = false;
 
 		#region Public properties
-		[XmlAttributeAttribute][DefaultValue(Orientation.Horizontal)]
+		[DefaultValue(Orientation.Horizontal)]
 		public Orientation Orientation {
 			get { return orientation; }
 			set {

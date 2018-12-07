@@ -52,7 +52,7 @@ namespace Crow
 		protected bool KeyEventsOverrides = false;
 
 		/// <summary> Horizontal Scrolling Position </summary>
-		[XmlAttributeAttribute][DefaultValue(0)]
+		[DefaultValue(0)]
 		public virtual int ScrollX {
 			get { return scrollX; }
 			set {
@@ -75,7 +75,7 @@ namespace Crow
 			}
 		}
 		/// <summary> Vertical Scrolling Position </summary>
-		[XmlAttributeAttribute][DefaultValue(0)]
+		[DefaultValue(0)]
 		public virtual int ScrollY {
 			get { return scrollY; }
 			set {
@@ -98,7 +98,7 @@ namespace Crow
 			}
 		}
 		/// <summary> Horizontal Scrolling maximum value </summary>
-		[XmlAttributeAttribute][DefaultValue(0)]
+		[DefaultValue(0)]
 		public virtual int MaxScrollX {
 			get { return maxScrollX; }
 			set {
@@ -115,7 +115,7 @@ namespace Crow
 			}
 		}
 		/// <summary> Vertical Scrolling maximum value </summary>
-		[XmlAttributeAttribute][DefaultValue(0)]
+		[DefaultValue(0)]
 		public virtual int MaxScrollY {
 			get { return maxScrollY; }
 			set {
@@ -132,7 +132,7 @@ namespace Crow
 			}
 		}
 		/// <summary> Mouse Wheel Scrolling multiplier </summary>
-		[XmlAttributeAttribute][DefaultValue(1)]
+		[DefaultValue(1)]
 		public virtual int MouseWheelSpeed {
 			get { return mouseWheelSpeed; }
 			set {

@@ -75,7 +75,7 @@ namespace Crow
 		}
 		#endregion
 
-		[XmlAttributeAttribute][DefaultValue("#Crow.Images.button.svg")]
+		[DefaultValue("#Crow.Images.button.svg")]
 		public string Image {
 			get { return image; }
 			set {
@@ -85,7 +85,7 @@ namespace Crow
 				NotifyValueChanged ("Image", image);
 			}
 		}
-		[XmlAttributeAttribute][DefaultValue(false)]
+		[DefaultValue(false)]
 		public bool IsPressed
 		{
 			get { return isPressed; }
