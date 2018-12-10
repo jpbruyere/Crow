@@ -1,4 +1,4 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <TabItem Caption="{DisplayName}" QueryClose="OnQueryClose" Template="#Crow.Coding.EditTabItem.template">
-	<IMLContainer Path="#Crow.Coding.ui.SourceEditor.crow"/>
+	<IMLContainer Path="#Crow.Coding.ui.editors.SourceEditor.crow"/>
 </TabItem>

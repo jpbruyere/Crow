@@ -79,7 +79,7 @@ namespace Crow.Coding
 
 		ProjectNode parent;
 		bool isExpanded;
-		protected bool isSelected = false;
+		protected bool isSelected;
 		ItemType type;
 		string name;
 		List<ProjectNode> childNodes = new List<ProjectNode>();
@@ -87,7 +87,7 @@ namespace Crow.Coding
 		public Project Project;
 		public List<Crow.Command> Commands;//list of command available for that node
 
-		public Crow.Picture Icon {
+		public virtual Crow.Picture Icon {
 			get {
 				switch (Type) {
 				case ItemType.Reference:
@@ -95,7 +95,7 @@ namespace Crow.Coding
 				case ItemType.ProjectReference:
 					return new SvgPicture("#Crow.Icons.projectRef.svg"); 
 				default:
-					return new SvgPicture("#Crow.Coding.icons.file.svg"); 
+					return new SvgPicture("#icons.blank-file.svg"); 
 				}
 			}
 		}

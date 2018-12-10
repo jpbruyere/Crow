@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Crow</RootNamespace>
+    <Description>C# Rapid Open Widget</Description>        
+        
+    <TargetFramework>netstandard2.0</TargetFramework>
+        
+    <OutputPath>$(SolutionDir)build/$(Configuration)</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)build/obj/$(Configuration)</IntermediateOutputPath>  
+
+    <DefineConstants>NETSTANDARD2_0;DESIGN_MODE</DefineConstants>
+    
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>        
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+   
+  
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;DESIGN_MODE</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
+
+    <Compile Include="src\**\*.cs" Exclude="src\Mono.Cairo\NativeMethods-internal.cs" />
+        
+    <EmbeddedResource Include="Templates\*.*">
+      <LogicalName>Crow.%(Filename).template</LogicalName>
+    </EmbeddedResource>
+    
+    <EmbeddedResource Include="Default.style" />
+    <EmbeddedResource Include="Icons\*.*" />
+    <!--<EmbeddedResource Include="Icons\checkbox.svg" />
+    <EmbeddedResource Include="Icons\radiobutton.svg" />-->
+        
+  </ItemGroup>  
+</Project>

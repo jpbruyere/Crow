@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--<GraphicObject Background="{./Background}"/>-->
+<Border BorderWidth="1" Foreground="Black" CornerRadius="{./CornerRadius}"
+				Background="{./Background}"
+				MouseEnter="./onBorderMouseEnter"
+				MouseLeave="./onBorderMouseLeave">
+	<VerticalStack Spacing="0">
+		<HorizontalStack Visible="{./IsDocked}" Height="Fit" Margin="1" Background="vgradient|0:0.3,0.5,0.8,0.9|1:0.1,0.1,0.1,0.9">
+			<Label  Text="{./Caption}" TextAlignment="Left" Width="Stretched"
+					 Foreground="White" />
+			<Border CornerRadius="6" BorderWidth="1" Foreground="Transparent"  Height="10" Width="10"
+				MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
+				<Image Focusable="true" Name="Image" Margin="0" Path="#Crow.Icons.exit2.svg"
+					 MouseClick="./butQuitPress"/>
+			</Border>
+		</HorizontalStack>
+		<HorizontalStack Background="vgradient|0:0.5,0.6,0.5,0.5|1:0.2,0.3,0.3,0.7"
+				Name="hs" Margin="0" Spacing="0" Height="Fit" Visible="{./IsFloating}">
+			<GraphicObject Width="5"/>
+			<Image Margin="1" Width="10" Height="10" Path="{./Icon}"/>
+			<Label Width="Stretched" Foreground="White" Margin="1" TextAlignment="Left" Text="{./Caption}" />
+			<Border CornerRadius="6" BorderWidth="1" Foreground="Transparent"  Height="10" Width="10"
+				MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
+				<Image Focusable="true" Name="Image" Margin="0" Path="#Crow.Icons.exit2.svg"
+					 MouseClick="./butQuitPress"/>
+			</Border>
+			<GraphicObject Width="5"/>
+		</HorizontalStack>
+		<Container Name="Content" MinimumSize="50,50"/>
+	</VerticalStack>
+</Border>

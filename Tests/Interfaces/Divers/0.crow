@@ -101,11 +101,11 @@
 		<Splitter/>
 		<VerticalStack Width="40%" Margin="5" Spacing="5">
 			<Expandable>
-				<Image Path="#Crow.Images.Icons.crow.svg"/>
+				<Image Path="#Crow.Icons.crow.svg"/>
 			</Expandable>
 			<Popper>
 				<Border Fit="True" Background="DimGrey" CornerRadius="0" BorderWidth="1">
-					<Image Path="#Crow.Images.Icons.crow.svg" Width="100" Height="100" Margin="10"
+					<Image Path="#Crow.Icons.crow.svg" Width="100" Height="100" Margin="10"
 						MouseEnter="{Background=LightGrey}"
 						MouseLeave="{Background=Transparent}"/>
 				</Border>
@@ -114,7 +114,7 @@
 			<Container Height="Fit" Width="200" Background="DimGrey" Margin="2" CornerRadius="5">
 				<ProgressBar Background="DimGrey" Height="10" Value="50"/>
 			</Container>
-			<Image Path="#Crow.Images.Icons.crow.svg" Width="60" Height="60" Background="LightGrey" />
+			<Image Path="#Crow.Icons.crow.svg" Width="60" Height="60" Background="LightGrey" />
 <!--			<TabView Name="tabview1"
 				Height="120" Orientation="Horizontal" Spacing="15">
 				<TabItem Name="TabItem1" Caption="Tab 1" Margin="0">
@@ -154,8 +154,8 @@
 			</Border>
 			<Splitter/>-->
 			<ListBox Name="colorList" Data="{TestList}" Margin="5"
-					 ItemTemplate="#Tests.Interfaces.colorItem.crow"
-					 Template="#Crow.Templates.ScrollingListBox.template"
+					 ItemTemplate="Interfaces/colorItem.crow"
+					 Template="#Crow.ScrollingListBox.template"
 					 />
 		</VerticalStack>
 	</HorizontalStack>

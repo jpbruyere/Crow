@@ -33,7 +33,7 @@ using System.Linq;
 using System.Text;
 using Crow.IML;
 
-namespace Tests
+namespace tests
 {
 	class Showcase : Interface
 	{
@@ -53,8 +53,7 @@ namespace Tests
 				app.crowContainer.DataSource = new object ();
 				app.hideError ();
 
-				while (true)
-					System.Threading.Thread.Sleep (10);
+                app.Run();
 
 			}
 		}
@@ -85,16 +84,21 @@ namespace Tests
 				return;
 			hideError();
 			lock (UpdateMutex) {
-				try {
-					GraphicObject g = Load (fi.FullName);
-					crowContainer.SetChild (g);
-					g.DataSource = this;
-				} catch (InstantiatorException ex) {
-					showError (ex);
-				}
-			}
+                try
+                {
+                    GraphicObject g = Load(fi.FullName);
+                    crowContainer.SetChild(g);
+                    g.DataSource = this;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                    if (ex is InstantiatorException)
+                        showError((InstantiatorException)ex);
+                }
+            }
 
-			string source = "";
+            string source = "";
 			using (Stream s = new FileStream (fi.FullName, FileMode.Open)) {
 				using (StreamReader sr = new StreamReader (s)) {
 					source = sr.ReadToEnd ();
@@ -125,11 +129,12 @@ namespace Tests
 					crowContainer.SetChild (g);
 					g.DataSource = this;
 				}
-			} catch (InstantiatorException ex) {
-				System.Diagnostics.Debug.WriteLine (ex.ToString ());
-				showError (ex);
+			} catch (Exception ex) {
+				Console.WriteLine (ex.ToString ());
+                if (ex is InstantiatorException)
+				    showError ((InstantiatorException)ex);
 			}
-		}
+        }
 
 
 		#region Test values for Binding

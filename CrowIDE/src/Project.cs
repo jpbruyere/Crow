@@ -61,18 +61,18 @@ namespace Crow.Coding
 			solution = sol;
 
 			cmdSave = new Crow.Command (new Action (() => Save ()))
-			{ Caption = "Save", Icon = new SvgPicture ("#Crow.Coding.icons.save.svg"), CanExecute = true };
+			{ Caption = "Save", Icon = new SvgPicture ("#icons.save.svg"), CanExecute = true };
 			cmdOpen = new Crow.Command (new Action (() => Load ())) 
-			{ Caption = "Open", Icon = new SvgPicture ("#Crow.Coding.icons.open.svg"), CanExecute = false };
+			{ Caption = "Open", Icon = new SvgPicture ("#icons.open.svg"), CanExecute = false };
 			cmdCompile = new Crow.Command (new Action (() => Compile ())) {
 				Caption = "Compile",
-				Icon = "#Crow.Coding.icons.compile.svg"
+				Icon = "#icons.compile.svg"
 			};
 			cmdSetAsStartProj = new Crow.Command (new Action (() => setAsStartupProject ())) {
 				Caption = "Set as Startup Project"
 			};
 			cmdNewFile = new Crow.Command (new Action (() => AddNewFile ())) {
-				Caption = "Add New File", Icon = new SvgPicture ("#Crow.Coding.icons.blank-file.svg"), CanExecute = true
+				Caption = "Add New File", Icon = new SvgPicture ("#icons.blank-file.svg"), CanExecute = true
 			};
 
 			Commands = new List<Crow.Command> (new Crow.Command[] {cmdOpen,cmdSave,cmdSetAsStartProj,cmdCompile,cmdNewFile});

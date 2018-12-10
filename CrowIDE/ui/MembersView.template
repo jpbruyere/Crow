@@ -10,11 +10,10 @@
 				Height="Fit" Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
 		</Scroller>
 		<ScrollBar
-			Name="scrollbar1"
+			Name="scrollbar1" Orientation="Vertical"
 			LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
 			CursorSize="{../scroller1.ChildHeightRatio}"
 			Value="{²../scroller1.ScrollY}"
-			Maximum="{../scroller1.MaxScrollY}"
-			Width="14" Orientation="Vertical"/>
+			Maximum="{../scroller1.MaxScrollY}"/>
 	</HorizontalStack>
 </VerticalStack>

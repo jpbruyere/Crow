@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <Border BorderStyle="Sunken" Fit="true" Background="0.7,0.7,0.7,0.5" CornerRadius="10">
 	<VerticalStack Margin="20">
-		<Image Path="#Crow.Images.Icons.crow.svg"/>
+		<Image Path="#Crow.Icons.crow.svg"/>
 <!--		<Label Font="Times bold, 60" Text="C.R.O.W"/>-->
 		<HorizontalStack Fit="true" DataSource="{CrowVersion}" Spacing="0">
 			<Label Foreground="Black" Font="mono, 12" Text="version: "/>		

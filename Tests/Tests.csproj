@@ -8,8 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>tests.MainClass</StartupObject>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <StartupObject>tests.Showcase</StartupObject>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ReleaseVersion>0.5</ReleaseVersion>
     <OutputPath>$(SolutionDir)build/$(Configuration)</OutputPath>
@@ -389,6 +388,9 @@
     <None Include="Interfaces\Divers\testVisibility.crow">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Interfaces\CheckBox2.imlt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />
@@ -423,7 +425,6 @@
     <EmbeddedResource Include="ui\MenuItem.style" />
     <EmbeddedResource Include="test.style" />
     <EmbeddedResource Include="Interfaces\treeList.crow" />
-    <EmbeddedResource Include="Interfaces\CheckBox2.imlt" />
     <EmbeddedResource Include="Interfaces\perfMsr.crow" />
     <EmbeddedResource Include="ui\showcase.crow" />
     <EmbeddedResource Include="Interfaces\TabItem.template">
@@ -443,7 +444,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Crow.csproj">
+    <ProjectReference Include="..\Crow\Crow.csproj">
       <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
       <Name>Crow</Name>
     </ProjectReference>

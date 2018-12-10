@@ -67,18 +67,18 @@ namespace Crow.Coding
 
 		void initCommands () {
 			cmdDelete = new Crow.Command (new Action (() => deleteObject (SelectedItem)))
-				{ Caption = "Delete", Icon = new SvgPicture ("#Crow.Coding.icons.save.svg"), CanExecute = true };
+				{ Caption = "Delete", Icon = new SvgPicture ("#icons.save.svg"), CanExecute = true };
 			Commands = new List<Crow.Command> (new Crow.Command[] { cmdDelete });
 		}
 
 		void initIcons () {
-			icoMove = new SvgPicture ("#Crow.Coding.icons.move-arrows.svg");
+			icoMove = new SvgPicture ("#icons.move-arrows.svg");
 
-//			icoStyle = new SvgPicture ();
-//			icoStyle.Load (IFace, "#Crow.Coding.icons.palette.svg");
-		}
+            //			icoStyle = new SvgPicture ();
+            //			icoStyle.Load (IFace, "#icons.palette.svg");
+        }
 
-		[DefaultValue(true)]
+        [DefaultValue(true)]
 		public bool DrawGrid {
 			get { return drawGrid; }
 			set {

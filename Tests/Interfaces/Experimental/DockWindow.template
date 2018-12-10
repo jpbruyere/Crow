@@ -19,7 +19,7 @@
 		<HorizontalStack Visible="{./IsDocked}" Height="Fit" Margin="1" Background="Grey">
 			<Label  Text="{./Caption}" TextAlignment="Left" Width="Stretched"
 					 Foreground="Jet" />
-			<Image Width="8" Height="8" Focusable="true" Margin="0" Path="#Crow.Images.Icons.exit2.svg"
+			<Image Width="8" Height="8" Focusable="true" Margin="0" Path="#Crow.Icons.exit2.svg"
 					 MouseClick="./butQuitPress"/>
 		</HorizontalStack>
 		<HorizontalStack Background="vgradient|0:0.5,0.6,0.5,0.5|1:0.2,0.3,0.3,0.7"
@@ -29,7 +29,7 @@
 			<Label Width="Stretched" Foreground="White" Margin="1" TextAlignment="Left" Text="{./Caption}" />
 			<Border CornerRadius="6" BorderWidth="1" Foreground="Transparent"  Height="10" Width="10"
 				MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
-				<Image Focusable="true" Name="Image" Margin="0" Path="#Crow.Images.Icons.exit2.svg"
+				<Image Focusable="true" Name="Image" Margin="0" Path="#Crow.Icons.exit2.svg"
 					 MouseClick="./butQuitPress"/>
 			</Border>
 			<GraphicObject Width="5"/>

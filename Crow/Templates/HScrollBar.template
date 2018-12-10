@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<Border BorderWidth="1" Foreground="{./Foreground}" Background="{./Background}">
+	<GenericStack Orientation="{./Orientation}" Spacing="0">
+		<Shape Style="HArrowBut" MouseDown="./onScrollBack"
+            Margin="1" Width="6" Size="10,10" Path="M 0.5,4.5 L 9.5,0.5 L 9.5,9.5 Z"/>
+		<Slider Name="Slider"			
+			Orientation="{./Orientation}"
+			Value="{²./Value}"
+			Maximum="{./Maximum}"
+			CursorSize="{./CursorSize}"
+			Height="{./HeightPolicy}" Width="{./WidthPolicy}"
+			LargeIncrement="{./LargeIncrement}"
+			SmallIncrement="{./SmallIncrement}"
+			CursorColor="vgradient|0:Silver|1:Grey"
+            Background="Transparent"
+			Foreground="{./Foreground}"/>
+		<Shape Style="HArrowBut" MouseDown="./onScrollForth"
+            Margin="1" Width="6" Size="10,10" Path="M 0.5,0.5 L 9.5,4.5 L 0.5,9.5 Z"/>
+	</GenericStack>
+</Border>

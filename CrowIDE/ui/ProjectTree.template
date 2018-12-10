@@ -26,8 +26,7 @@
 						<Image Style="TreeIcon"
 							Path="#Crow.Icons.crowproj.svg"/>
 						<GraphicObject Width="4" Height="9" Background="Green" Visible="{IsStartupProject}"/>
-						<Label Text="{./Caption}"/>
-						<Label Text="{./Caption}" Visible="{IsStartupProject}" Font="mono bold, 12"/>
+						<Label Text="{./Caption}"/>						
 					</HorizontalStack>
 				</Border>
 				<Container Name="Content" Visible="false"/>
@@ -40,7 +39,7 @@
 	</Expandable>
 </ItemTemplate>
 <ItemTemplate DataType="ReferenceGroup" Data="ChildNodes" DataTest="Type" >
-	<Expandable Caption="{DisplayName}" Template="#Crow.TreeExpandable.template" IsExpanded="{²IsExpanded}">
+	<Expandable Caption="{DisplayName}" Template="#Crow.Coding.TreeExpandable.template" IsExpanded="{²IsExpanded}">
 		<HorizontalStack Height="Fit">
 			<GraphicObject Width="8" Height="10"/>
 			<VerticalStack Height="Fit" Name="ItemsContainer"/>
@@ -48,7 +47,7 @@
 	</Expandable>
 </ItemTemplate>
 <ItemTemplate DataType="VirtualGroup" Data="ChildNodes" DataTest="Type">
-	<Expandable Caption="{DisplayName}" Template="#Crow.TreeExpandable.template" IsExpanded="{²IsExpanded}">
+	<Expandable Caption="{DisplayName}" Template="#Crow.Coding.TreeExpandable.template" IsExpanded="{²IsExpanded}">
 		<HorizontalStack Height="Fit">
 			<GraphicObject Width="8" Height="10"/>
 			<VerticalStack Height="Fit" Name="ItemsContainer"/>

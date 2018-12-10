@@ -7,14 +7,12 @@
 				<ScrollBar Name="scrollbarY" Value="{²../editor.ScrollY}"
 						   LargeIncrement="10"
 						   CursorSize="{../editor.ChildHeightRatio}"
-					Maximum="{../editor.MaxScrollY}" Orientation="Vertical"
-					Width="14" />
+					Maximum="{../editor.MaxScrollY}" Orientation="Vertical"/>
 			</HorizontalStack>
 			<ScrollBar Style="HScrollBar" Name="scrollbarX" Value="{²../editor.ScrollX}"
 					Maximum="{../editor.MaxScrollX}" Orientation="Horizontal"
 					LargeIncrement="10"
-					CursorSize="{../editor.ChildWidthRatio}"
-					Height="14" />
+					CursorSize="{../editor.ChildWidthRatio}"/>
 			<HorizontalStack Height="Fit" Margin="3">
 				<Label Text="Zoom:"/>
 				<Label Text="{../../editor.Zoom}" Fit="true"/>

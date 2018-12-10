@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Crow.Coding</RootNamespace>
+    <AssemblyName>CrowIDE</AssemblyName>
+    <StartupObject>Crow.Coding.CrowIDE</StartupObject>
+        
+    <OutputPath>$(SolutionDir)build/$(Configuration)</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)build/obj/$(Configuration)</IntermediateOutputPath>  
+              
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <DefineConstants>TRACE;NETSTANDARD2_0;DEBUG;NETCOREAPP2_0</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="icons\blank-file2.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.CodeDom" Version="4.5.0" />
+        
+    <Compile Include="src\**\*.cs" />  
+        
+    <ProjectReference Include="..\Crow\Crow.NetStd.csproj" />
+        
+    <EmbeddedResource Include="icons\*.*">
+      <LogicalName>icons.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+
+    <EmbeddedResource Include="ui\**\*.crow" />
+    <EmbeddedResource Include="ui\**\*.itemp" />
+<!--      <LogicalName>ui.%(Filename)</LogicalName>-->
+<!--      <LogicalName>%(Identity)</LogicalName>
+    </EmbeddedResource>   -->     
+    <EmbeddedResource Include="ui\**\*.template">
+      <LogicalName>Crow.Coding.%(Filename).template</LogicalName>
+    </EmbeddedResource> 
+
+    <EmbeddedResource Include="DefaultTemplateOverrides\*.*">
+      <LogicalName>Crow.%(Filename).template</LogicalName>
+    </EmbeddedResource>
+        
+    <EmbeddedResource Include="IDE.style" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
+  </ItemGroup>
+    
+  <ItemGroup>
+    <Folder Include="src\msbuild\" />
+  </ItemGroup>
+</Project>

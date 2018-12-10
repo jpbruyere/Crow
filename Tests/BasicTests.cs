@@ -90,19 +90,23 @@ namespace tests
 		}
 		public static void Main(string[] args)
 		{
-			//IntPtr cairoLib = dlopen (cairoLibPath, dlmode.RTLD_LAZY);
+            //IntPtr cairoLib = dlopen (cairoLibPath, dlmode.RTLD_LAZY);
 
 
 
-			//mono_add_internal_call ("tests.MainClass:cairo_stroke_icall(IntPtr cr)", strokeFuncPtr);
+            //mono_add_internal_call ("tests.MainClass:cairo_stroke_icall(IntPtr cr)", strokeFuncPtr);
 
-			/*cairo_stroke_func = Marshal.GetDelegateForFunctionPointer<Stroke>(dlsym (cairoLib, "cairo_stroke"));
+            /*cairo_stroke_func = Marshal.GetDelegateForFunctionPointer<Stroke>(dlsym (cairoLib, "cairo_stroke"));
 			cairo_rect_func = Marshal.GetDelegateForFunctionPointer<Cairo4Doubles>(dlsym (cairoLib, "cairo_rectangle"));
 			cairo_set_rgba_func = Marshal.GetDelegateForFunctionPointer<Cairo4Doubles>(dlsym (cairoLib, "cairo_set_source_rgba"));
 */
+            foreach (string s in System.Reflection.Assembly.GetEntryAssembly().GetManifestResourceNames())
+            {
+                Console.WriteLine(s);
+            }
+            
 
-
-			using (app = new MainClass ()) {
+            using (app = new MainClass ()) {
 				//				XWindow win = new XWindow (app);
 				//				win.Show ();
 				//app.LoadIMLFragment (@"<SimpleGauge Level='40' Margin='5' Background='Jet' Foreground='Grey' Width='30' Height='50%'/>");
@@ -111,9 +115,9 @@ namespace tests
 				//app.AddWidget (@"Interfaces/Divers/testFocus.crow").DataSource = app;
 				//app.AddWidget (@"Interfaces/Divers/testMenu.crow").DataSource = app;
 				//app.AddWidget (@"Interfaces/Divers/testVisibility.crow").DataSource = app;
-				//app.AddWidget (@"Interfaces/Divers/0.crow").DataSource = app;
+				app.AddWidget (@"Interfaces/Divers/0.crow").DataSource = app;
 				//app.AddWidget (@"Interfaces/Splitter/1.crow").DataSource = app;
-				app.AddWidget (@"Interfaces/GraphicObject/0.crow").DataSource = app;
+				//app.AddWidget (@"Interfaces/GraphicObject/0.crow").DataSource = app;
 				//app.AddWidget (@"Interfaces/TemplatedContainer/test_Listbox.crow").DataSource = app;
 
 				/*app.instFileDlg = Crow.IML.Instantiator.CreateFromImlFragment
