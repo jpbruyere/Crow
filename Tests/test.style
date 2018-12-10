@@ -13,13 +13,13 @@ FpsDisp {
 	Background = "MediumSeaGreen";
 }
 CheckBox2 {
-	Template= "#Tests.Interfaces.CheckBox2.imlt";
+	Template= "Interfaces/CheckBox2.imlt";
 	Background = "Jet";
 	Checked="{Background=MediumSeaGreen}";
 	Unchecked = "{Background=Jet}";
 }
 RadioButton2 {
-	Template="#Tests.Interfaces.CheckBox2.imlt";
+	Template="Interfaces/CheckBox2.imlt";
 	Background = "Jet";
 	Checked = "{Background=MediumSeaGreen}";
 	Unchecked = "{Background=Jet}";

@@ -1,6 +1,0 @@
-﻿<?xml version="1.0"?>
-<HorizontalStack Style="Control" Background="{./Background}">
-	<Image Style="Icon" Path="#Crow.Images.Icons.checkbox.svg"
-		SvgSub="{./IsChecked}"/>
-	<Label Font="{./Font}" Text="{./Caption}" Foreground="{./Foreground}"/>
-</HorizontalStack>

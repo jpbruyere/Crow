@@ -5,22 +5,14 @@
 				MouseEnter="./onBorderMouseEnter"
 				MouseLeave="./onBorderMouseLeave">
 	<VerticalStack Spacing="0">
-		<HorizontalStack Height="Fit">
- 			<Label  Text="{./Name}" TextAlignment="Left" Width="Fit"
-					 Foreground="White" />
- 			<Label  Text="{./DockingPosition}" TextAlignment="Left" Width="Fit"
-					 Foreground="White" />
-		</HorizontalStack>
-		<Label  Text="{./Width}" TextAlignment="Left" Width="Fit"
-				 Foreground="White" />
-		<Label  Text="{./Height}" TextAlignment="Left" Width="Fit"
-				 Foreground="White" />
-
-		<HorizontalStack Visible="{./IsDocked}" Height="Fit" Margin="1" Background="Grey">
+		<HorizontalStack Visible="{./IsDocked}" Height="Fit" Margin="1" Background="vgradient|0:0.3,0.5,0.8,0.9|1:0.1,0.1,0.1,0.9">
 			<Label  Text="{./Caption}" TextAlignment="Left" Width="Stretched"
-					 Foreground="Jet" />
-			<Image Width="8" Height="8" Focusable="true" Margin="0" Path="#Crow.Icons.exit2.svg"
+					 Foreground="White" />
+			<Border CornerRadius="6" BorderWidth="1" Foreground="Transparent"  Height="10" Width="10"
+				MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
+				<Image Focusable="true" Name="Image" Margin="0" Path="#Crow.Icons.exit2.svg"
 					 MouseClick="./butQuitPress"/>
+			</Border>
 		</HorizontalStack>
 		<HorizontalStack Background="vgradient|0:0.5,0.6,0.5,0.5|1:0.2,0.3,0.3,0.7"
 				Name="hs" Margin="0" Spacing="0" Height="Fit" Visible="{./IsFloating}">
