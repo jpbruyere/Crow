@@ -20,10 +20,10 @@
 		<GroupBox Caption="Group box" >
 			<Label Text="border test" Margin="3"/>
 		</GroupBox>
-		<Container Fit="true" Background="DimGray" Margin="3">
-			<GraphicObject Width="20" Height="20" Background="LightGray"/>
+		<Container Fit="true" Background="DimGrey" Margin="3">
+			<GraphicObject Width="20" Height="20" Background="LightGrey"/>
 		</Container>-->
-<!--		<ProgressBar Height="10" Width="150" Background="DimGray" Value="50" />
+<!--		<ProgressBar Height="10" Width="150" Background="DimGrey" Value="50" />
 		<Slider Value="5" Width="150" Height="10"/>
 		<ScrollBar Orientation="Horizontal" Maximum="100" Value="50" Height="16" Width="150"/>
 		<Spinner Value="100"/>-->
@@ -48,10 +48,10 @@
 		<GroupBox Caption="Group box"  Width="Stretched">
 			<Label Text="border test" Margin="3"/>
 		</GroupBox>
-		<Container Height="Fit"  Width="Stretched" Background="DimGray" Margin="3">
-			<GraphicObject Width="20" Height="20" Background="LightGray"/>
+		<Container Height="Fit"  Width="Stretched" Background="DimGrey" Margin="3">
+			<GraphicObject Width="20" Height="20" Background="LightGrey"/>
 		</Container>
-		<ProgressBar Height="10" Width="Stretched" Background="DimGray" Value="50" />
+		<ProgressBar Height="10" Width="Stretched" Background="DimGrey" Value="50" />
 		<Slider Value="5" Width="Stretched" Height="10"/>
 		<ScrollBar Orientation="Horizontal" Maximum="100" Value="50" Height="16" Width="Stretched"/>
 		<Spinner Value="100"  Width="Stretched"/>

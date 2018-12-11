@@ -1,0 +1,10 @@
+﻿<?xml version="1.0"?>
+<Border Foreground="Transparent" Focusable="true" HorizontalAlignment="Left" Height="Fit">
+	<HorizontalStack Margin="0"
+				MouseEnter="{Background=CornflowerBlue}"
+				MouseLeave="{Background=Transparent}">
+		<GraphicObject Height="8" Width="14" Background="{}" Margin="0" CornerRadius="2"/>
+		<Label Text="{}" Margin="0" Width="Stretched" Font="mono, 8"/>
+	</HorizontalStack>
+</Border>
+

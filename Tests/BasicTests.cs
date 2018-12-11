@@ -1,325 +1,272 @@
-//
-// BasicTests.cs
-//
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 using System;
+using System.Runtime.InteropServices;
 using Crow;
+using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
-using System.Reflection;
-using System.Text;
-using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
-
-namespace Tests
+namespace tests
 {
-	class BasicTests : CrowWindow
+	class MainClass : Interface
 	{
-		public BasicTests ()
-			: base(800, 600,"test: press <F3> to toogle test files")
-		{
+		[DllImport ("dl", CallingConvention=CallingConvention.Cdecl)]
+		static extern IntPtr dlopen (string file, dlmode mode);
+		[DllImport ("dl", CallingConvention=CallingConvention.Cdecl)]
+		static extern int dlclose (IntPtr handle);
+		//void *dlsym(void *restrict handle, const char *restrict name); [Option End]
+		[DllImport ("dl", CallingConvention=CallingConvention.Cdecl)]
+		static extern IntPtr dlsym (IntPtr libHnd, string funcName);
+		[DllImport ("mono-2.0", CallingConvention=CallingConvention.Cdecl)]
+		static extern void mono_add_internal_call (string signature, IntPtr funcPtr);
+
+		[DllImport ("__Internal", EntryPoint="cairo_stroke", CallingConvention=CallingConvention.Cdecl)]
+		public static extern void cairo_stroke_internal (IntPtr ctx);
+		[DllImport ("__Internal", EntryPoint="cairo_rectangle", CallingConvention=CallingConvention.Cdecl)]
+		public static extern void cairo_rect_internal (IntPtr ctx, double x, double y, double w, double h);
+		[DllImport ("__Internal", EntryPoint="cairo_set_source_rgba", CallingConvention=CallingConvention.Cdecl)]
+		public static extern void cairo_rgba_internal (IntPtr ctx, double r, double g, double b, double a);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		public static extern void cairo_stroke (IntPtr ctx);
+
+		[Flags]
+		enum dlmode {
+			RTLD_LOCAL = 0,
+			RTLD_LAZY = 0x00001,        /* Lazy function call binding.  */
+			RTLD_NOW = 0x00002,        /* Immediate function call binding.  */
+			RTLD_BINDING_MASK = 0x3,        /* Mask of binding time value.  */
+			RTLD_NOLOAD = 0x00004,        /* Do not load the object.  */
+			RTLD_DEEPBIND = 0x00008,        /* Use deep binding.  */
+			RTLD_GLOBAL = 0x00100,
 		}
 
-		int idx = 0;
-		string[] testFiles;
+		const string cairoLibPath = @"/opt/cairo/lib/libcairo.so";
+		//static const string cairoLibPath = @"/opt/cairo/lib/libcairo.so.2.11513.0";
 
-		public Version CrowVersion {
-			get {
-				return System.Reflection.Assembly.GetAssembly(typeof(GraphicObject)).GetName().Version;
-			}
-		}
+		public delegate void Stroke(IntPtr ctx);
+		public delegate void Cairo4Doubles (IntPtr ctx, double x, double y, double z, double w);
 
-		#region Test values for Binding
-		public List<Crow.Command> Commands;
-		public int intValue = 500;
-		DirectoryInfo curDir = new DirectoryInfo (Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
-		//DirectoryInfo curDir = new DirectoryInfo (@"/mnt/data/Images");
-		public FileSystemInfo[] CurDirectory {
-			get { return curDir.GetFileSystemInfos (); }
-		}
-		public int IntValue {
-			get {
-				return intValue;
-			}
+		public static Stroke cairo_stroke_func;
+		public static Cairo4Doubles cairo_rect_func;
+		public static Cairo4Doubles cairo_set_rgba_func;
+
+		/*[DllImport (cairoLibPath, EntryPoint="cairo_stroke")]
+		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+		public static extern void cairo_stroke_icall (IntPtr cr);*/
+
+
+		static MainClass app;
+		public Command CMDTest;
+		public Measure TestWidth = 100;
+
+		public Crow.IML.Instantiator instFileDlg;
+
+		public string CurrentDirectory {
+			get { return Crow.Configuration.Global.Get<string>("CurrentDirectory");}
 			set {
-				intValue = value;
-				NotifyValueChanged ("IntValue", intValue);
+				Crow.Configuration.Global.Set ("CurrentDirectory", value);
 			}
 		}
-		void onSpinnerValueChange(object sender, ValueChangeEventArgs e){
-			if (e.MemberName != "Value")
-				return;
-			intValue = Convert.ToInt32(e.NewValue);
-		}
-		void change_alignment(object sender, EventArgs e){
-			RadioButton rb = sender as RadioButton;
-			if (rb == null)
-				return;
-			NotifyValueChanged ("alignment", Enum.Parse(typeof(Alignment), rb.Caption));
-		}
-		public IList<String> List2 = new List<string>(new string[]
-			{
-				"string1",
-				"string2",
-				"string3",
-//				"string4",
-//				"string5",
-//				"string6",
-//				"string7",
-//				"string8",
-//				"string8",
-//				"string8",
-//				"string8",
-//				"string8",
-//				"string8",
-//				"string9"
-			}
-		);
-		public IList<String> TestList2 {
-			set{
-				List2 = value;
-				NotifyValueChanged ("TestList2", testList);
-			}
-			get { return List2; }
-		}
-		List<Color> testList = Color.ColorDic.Values//.OrderBy(c=>c.Hue)
-			//.ThenBy(c=>c.Value).ThenBy(c=>c.Saturation)
-			.ToList();
-		public List<Color> TestList {
+
+		IList<Color> testList = Color.ColorDic.Values.ToList();
+		public IList<Color> TestList {
 			set{
 				testList = value;
 				NotifyValueChanged ("TestList", testList);
 			}
 			get { return testList; }
 		}
-		string curSources = "";
-		public string CurSources {
-			get { return curSources; }
-			set {
-				if (value == curSources)
-					return;
-				curSources = value;
-				NotifyValueChanged ("CurSources", curSources);
+		/*public List<KeyValuePair<DbgEvtType, Color>> ColorsKVPList {
+			get {
+				return DbgLogViewer.colors.ToList();
 			}
-		}
-		bool boolVal = true;
-		public bool BoolVal {
-			get { return boolVal; }
-			set {
-				if (boolVal == value)
-					return;
-				boolVal = value;
-				NotifyValueChanged ("BoolVal", boolVal);
-			}
-		}
+		}*/
 
-		#endregion
-
-		void OnClear (object sender, MouseButtonEventArgs e) => TestList = null;
-
-		void OnLoadList (object sender, MouseButtonEventArgs e) => TestList =
-			Color.ColorDic.Values.OrderBy(c=>c.Hue).ToList();
-
-		void command1(){
-			Console.WriteLine("command1 triggered");
-		}
-		void command2(){
-			Console.WriteLine("command2 triggered");
-		}
-		void command3(){
-			Console.WriteLine("command3 triggered");
-		}
-		void command4(){
-			Console.WriteLine("command4 triggered");
-		}
-
-		protected override void OnLoad (EventArgs e)
+		protected override void InitBackend ()
 		{
-			base.OnLoad (e);
-//
-//			foreach (Color c in Color.ColorDic.Values) {
-//				if (string.IsNullOrEmpty(c.htmlCode))
-//					Console.WriteLine ("no htmlcode for {0}", c.Name);
-//				else if (c.htmlCode.Substring(1) != c.HtmlCode)
-//					Console.WriteLine ("{2} orig: {0} comp: {1}",c.htmlCode, c.HtmlCode, c.Name);
-//			}
-
-
-			Commands = new List<Crow.Command> (new Crow.Command[] {
-				new Crow.Command(new Action(() => command1())) { Caption = "command1"},
-				new Crow.Command(new Action(() => command2())) { Caption = "command2"},
-				new Crow.Command(new Action(() => command3())) { Caption = "command3"},
-				new Crow.Command(new Action(() => command4())) { Caption = "command4"},
-			});
-
-			this.KeyDown += KeyboardKeyDown1;
-
-			//testFiles = new string [] { @"Interfaces/Experimental/testDock.crow" };
-			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
-			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Stack", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/TemplatedControl", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/TemplatedContainer", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/TemplatedGroup", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Splitter", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Wrapper", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Divers", "*.crow")).ToArray ();
-			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/DragAndDrop", "*.crow")).ToArray ();
-			//testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Experimental", "*.crow")).ToArray ();
-
-			Load(testFiles[idx]).DataSource = this;
-
-//			LoadIMLFragment (@"<DockWindow Width=""150"" Height=""150"" Background=""DarkRed"" />", 0);
-//			LoadIMLFragment (@"<DockWindow Width=""200"" Height=""150"" Background=""DarkGreen"" />", 0);
-//			LoadIMLFragment (@"<DockWindow Width=""250"" Height=""150"" Background=""Brown"" />", 0);
-//			LoadIMLFragment (@"<DockWindow Width=""300"" Height=""150"" Background=""DarkBlue"" />", 0);
-
-
+			base.InitBackend ();
+			//Keyboard.KeyDown += App_KeyboardKeyDown;
 		}
-		void KeyboardKeyDown1 (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
+		public static void Main(string[] args)
 		{
-			try {
+            //IntPtr cairoLib = dlopen (cairoLibPath, dlmode.RTLD_LAZY);
+
+
+
+            //mono_add_internal_call ("tests.MainClass:cairo_stroke_icall(IntPtr cr)", strokeFuncPtr);
+
+            /*cairo_stroke_func = Marshal.GetDelegateForFunctionPointer<Stroke>(dlsym (cairoLib, "cairo_stroke"));
+			cairo_rect_func = Marshal.GetDelegateForFunctionPointer<Cairo4Doubles>(dlsym (cairoLib, "cairo_rectangle"));
+			cairo_set_rgba_func = Marshal.GetDelegateForFunctionPointer<Cairo4Doubles>(dlsym (cairoLib, "cairo_set_source_rgba"));
+*/
+            foreach (string s in System.Reflection.Assembly.GetEntryAssembly().GetManifestResourceNames())
+            {
+                Console.WriteLine(s);
+            }
+            
+
+            using (app = new MainClass ()) {
+				//				XWindow win = new XWindow (app);
+				//				win.Show ();
+				//app.LoadIMLFragment (@"<SimpleGauge Level='40' Margin='5' Background='Jet' Foreground='Grey' Width='30' Height='50%'/>");
+
+				app.CMDTest = new Command(new Action(() => app.AddWidget (app.instFileDlg.CreateInstance()).DataSource = app)) { Caption = "Test", Icon = new SvgPicture("#Tests.image.blank-file.svg"), CanExecute = true};
+				//app.AddWidget (@"Interfaces/Divers/testFocus.crow").DataSource = app;
+				//app.AddWidget (@"Interfaces/Divers/testMenu.crow").DataSource = app;
+				//app.AddWidget (@"Interfaces/Divers/testVisibility.crow").DataSource = app;
+				app.AddWidget (@"Interfaces/Divers/0.crow").DataSource = app;
+				//app.AddWidget (@"Interfaces/Splitter/1.crow").DataSource = app;
+				//app.AddWidget (@"Interfaces/GraphicObject/0.crow").DataSource = app;
+				//app.AddWidget (@"Interfaces/TemplatedContainer/test_Listbox.crow").DataSource = app;
+
+				/*app.instFileDlg = Crow.IML.Instantiator.CreateFromImlFragment
+					(app, "<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}'/>");*/
 				
-			if (e.Key == OpenTK.Input.Key.Escape) {
-				Quit (null, null);
-				return;
-			} else if (e.Key == OpenTK.Input.Key.F1) {
-				TestList.Add ("new string");
-				NotifyValueChanged ("TestList", TestList);
-				return;
-			} else if (e.Key == OpenTK.Input.Key.F4) {
-				GraphicObject w = Load ("Interfaces/TemplatedContainer/testWindow.goml");
-				w.DataSource = this;
-				return;
-			} else if (e.Key == OpenTK.Input.Key.F5) {
-				GraphicObject w = Load ("Interfaces/Divers/testFileDialog.crow");
-				w.DataSource = this;
-				return;
-			}else if (e.Key == OpenTK.Input.Key.F6) {
-				GraphicObject w = Load ("Interfaces/Divers/0.crow");
-				w.DataSource = this;
-				return;
-			}else if (e.Key == OpenTK.Input.Key.F7) {
-				GraphicObject w = Load ("Interfaces/Divers/perfMeasures.crow");
-				w.DataSource = this.ifaceControl[0];
-				return;
-			} else if (e.Key == OpenTK.Input.Key.F2)
-				idx--;
-			else if (e.Key == OpenTK.Input.Key.F3)
-				idx++;
-			else
-				return;
 
-				ClearInterface ();
+				//app.AddWidget (@"Interfaces/Divers/colorPicker.crow").DataSource = app;
+				//app.AddWidget ("Interfaces/Divers/perfMeasures.crow").DataSource = app;
 
-				if (idx == testFiles.Length)
-					idx = 0;
-				else if (idx < 0)
-					idx = testFiles.Length - 1;
+				/*app.AddWidget ("#Tests.ui.dbgLog.crow").DataSource = app;
 
-				this.Title = testFiles [idx] + ". Press <F3> to cycle examples.";
+				GraphicObject go = app.AddWidget ("#Tests.ui.dbgLogColors.crow");
+				go.DataSource = app;
 
-				GraphicObject obj = Load (testFiles[idx]);
-				obj.DataSource = this;
-			} catch (Exception ex) {				
-				MessageBox.Show (CurrentInterface, MessageBox.Type.Error, ex.Message + "\n" + ex.InnerException.Message).Modal = true;
+				(go.FindByName("combo") as ComboBox).SelectedItemChanged += combo_selectedItemChanged;
+				(go.FindByName("kvpList") as ListBox).SelectedItemChanged += kvpList_selectedItemChanged;*/
+
+				//app.AddWidget (@"Interfaces/Experimental/testDock.crow").DataSource = app;
+
+				/*app.LoadIMLFragment (@"<DockWindow Width='150' Height='150' Name='dock1'/>");
+				app.LoadIMLFragment (@"<DockWindow Width='150' Height='150' Name='dock2'/>");
+				app.LoadIMLFragment (@"<DockWindow Width='150' Height='150' Name='dock3'/>");
+
+				app.LoadIMLFragment (@"<DockWindow Width='150' Height='150'/>");
+				app.LoadIMLFragment (@"<DockWindow Width='150' Height='150'/>");
+				app.LoadIMLFragment (@"<DockWindow Width='150' Height='150'/>");*/
+
+				long cpt = 0;
+				Measure testWidth = 100;
+				int increment = 1;
+
+				while (true) {
+					cpt++;
+					/*
+					testWidth += increment;
+
+					if (increment > 0) {
+						if (testWidth > 500)
+							increment = -increment;
+					} else if (testWidth < 100) 
+						increment = -increment;					
+					app.NotifyValueChanged ("TestWidth", testWidth);
+*/
+
+					/*app.NotifyValueChanged ("CPT", cpt);
+
+					if (cpt % 2 == 0)
+						app.NotifyValueChanged ("TestColor", Color.Red);
+					else
+						app.NotifyValueChanged ("TestColor", Color.Blue);*/
+					
+					/*#if MEASURE_TIME
+					foreach (PerformanceMeasure m in app.PerfMeasures)
+						m.NotifyChanges ();	
+					#endif*/
+					app.ProcessEvents ();
+					//Thread.Sleep(1);
+				}
 			}
-		}
-//		void Tv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
-//		{
-//			FileInfo fi = e.NewValue as FileInfo;
-//			if (fi == null)
-//				return;
-//			if (fi.Extension == ".crow" || fi.Extension == ".goml") {
-//				Instantiator i = new Instantiator(fi.FullName);
-//				lock (ifaceControl.CrowInterface.UpdateMutex) {
-//					(ifaceControl.CrowInterface.FindByName ("crowContainer") as Container).SetChild
-//					(i.CreateInstance(ifaceControl.CrowInterface));
-//					//CurSources = i.GetImlSourcesCode();
-//				}
-//			}
-//		}
-//		void onImlSourceChanged(Object sender, TextChangeEventArgs e){
-//			Instantiator i;
-//			try {
-//				i = Instantiator.CreateFromImlFragment (e.Text);
-//			} catch (Exception ex) {
-//				Debug.WriteLine (ex);
-//				return;
-//			}
-//			lock (ifaceControl.CrowInterface.UpdateMutex) {
-//				(ifaceControl.CrowInterface.FindByName ("crowContainer") as Container).SetChild
-//				(i.CreateInstance(ifaceControl.CrowInterface));
-//			}
-//		}
-		void onButClick(object send, MouseButtonEventArgs e)
-		{
-			Console.WriteLine ("button clicked:" + send.ToString());
-		}
-		void onAddTabButClick(object sender, MouseButtonEventArgs e){
+			/*using (Display disp = new Display())
+            {
+                Window win = new Window(disp);
+                bool running = true;
 
-			TabView tv = FindByName("tabview1") as TabView;
-			if (tv == null)
+                while (running) {
+                    IntPtr evt = disp.NextEvent;
+
+                    switch ((EventType)Marshal.ReadInt32(evt))
+                    {
+                        case EventType.KeyPress:
+                            running = false;
+                            break;
+                    }
+                }
+            }*/
+
+
+			//dlclose (cairoLib);
+		}
+
+		/*void onColorUpdate (object sender, MouseButtonEventArgs e)
+		{
+			DbgLogViewer.colorsConf.Set (selectedEvtType.ToString (), newColor);
+			DbgLogViewer.colors [selectedEvtType] = newColor;
+			NotifyValueChanged ("ColorsKVPList", ColorsKVPList);
+		}
+		//static DbgEvtType selectedEvtType;
+		static Color newColor;
+
+		static void kvpList_selectedItemChanged (object sender, SelectionChangeEventArgs e)
+		{
+			if (e.NewValue == null)
 				return;
-			//tv.AddChild (new TabItem (CurrentInterface) { Caption = "NewTab" });
-			lock (CurrentInterface.UpdateMutex) {
-				tv.AddChild (CurrentInterface.LoadIMLFragment
-					(@"<TabItem Caption='New tab' Background='Blue'><Label/></TabItem>"));
-			}
+			selectedEvtType = ((KeyValuePair<DbgEvtType, Color>)e.NewValue).Key;
 		}
-		[STAThread]
-		static void Main ()
+		static void combo_selectedItemChanged (object sender, SelectionChangeEventArgs e)
 		{
-			#if DEBUG
-			TextWriterTraceListener listener = new TextWriterTraceListener ("debug.log");
-			Debug.Listeners.Add (listener);
-			#endif
+			newColor = (Color)e.NewValue;
 
-			Console.WriteLine ("starting example");
-			BasicTests win = new BasicTests ();
-			win.VSync = OpenTK.VSyncMode.Adaptive;
-			win.Run (30);
-			#if DEBUG
-			listener.Dispose ();
-			#endif
-		}
-		protected override void OnUpdateFrame (OpenTK.FrameEventArgs e)
+		}*/
+
+		void App_KeyboardKeyDown (object sender, KeyEventArgs e)
 		{
-			base.OnUpdateFrame (e);
-			string test = e.Time.ToString ();
-			IntValue++;
-			if (IntValue == 1000)
-				IntValue = 0;
-			NotifyValueChanged ("PropertyLessBinding", test);
+			Console.WriteLine((byte)e.Key);
+			//#if DEBUG_LOG
+			switch (e.Key) {
+			case Key.F2:				
+				//DebugLog.save (app);
+				break;
+			case Key.F4:				
+				//app.NotifyValueChanged ("ColorsKVPList", app.ColorsKVPList);
+				break;
+			case Key.F6:
+				app.LoadIMLFragment (@"<FileDialog Caption='Open File'/>");
+				//saveDocking ();
+				break;
+			case Key.F7:				
+				//reloadDocking ();
+				break;
+			case Key.F8:				
+				app.LoadIMLFragment (@"<DockWindow Width='150' Height='150'/>");
+				break;
+			}
+			//#endif
 		}
-		void onNew(object sender, EventArgs e){
-			Debug.WriteLine ("menu new clicked");
+
+		void saveDocking () {
+			DockStack ds = FindByName ("mainDock") as DockStack;
+			if (ds == null) {
+				Console.WriteLine ("main dock not found in graphic tree");
+				return;
+			}
+			string conf = ds.ExportConfig ();
+			Console.WriteLine ("docking conf = " + conf);
+			Configuration.Global.Set ("DockingTests", conf);
+		}
+		void reloadDocking () {
+			DockStack ds = FindByName ("mainDock") as DockStack;
+			if (ds == null) {
+				Console.WriteLine ("main dock not found in graphic tree");
+				return;
+			}
+
+			string conf = Configuration.Global.Get<string> ("DockingTests");
+			if (string.IsNullOrEmpty (conf))
+				return;
+
+
+			ds.ImportConfig (conf);
 		}
 	}
 }

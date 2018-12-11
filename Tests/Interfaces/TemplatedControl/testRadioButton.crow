@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack Width="200" Height="Fit" Margin="20" Background="DimGray">
+<VerticalStack Width="200" Height="Fit" Margin="20" Background="DimGrey">
 	<RadioButton Caption="Radio1"/>
 	<RadioButton Caption="Radio2" IsChecked="true"/>
 	<RadioButton Caption="Radio3"/>

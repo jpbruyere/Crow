@@ -4,13 +4,16 @@ Crow.userprefs
 Debug
 packages
 *.nupkg
+*.user
+.vs/
 /GOLib.suo
 /tmp
 /bin/*
 /obj/*
 /GOLib.userprefs
 /Tests/obj/*
-/OTKCrow/obj
+CrowIDE/obj
+Crow/obj
 /Tests/bin/*
 /UnitTest/obj
 /UnitTest/bin
