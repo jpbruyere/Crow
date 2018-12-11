@@ -2,24 +2,37 @@
 
   <PropertyGroup>
     <RootNamespace>Crow</RootNamespace>
-    <Description>C# Rapid Open Widget</Description>        
+    <Description>C.R.O.W. is a widget toolkit and rendering engine entirely developed in C# with templates, styles, compositing, and bindings.</Description>        
         
-    <TargetFramework>netstandard2.0</TargetFramework>
+<!--    <TargetFramework>netstandard2.0</TargetFramework>-->
+    <TargetFramework>netcoreapp2.0</TargetFramework>
         
     <OutputPath>$(SolutionDir)build/$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)build/obj/$(Configuration)</IntermediateOutputPath>  
 
-    <DefineConstants>NETSTANDARD2_0;DESIGN_MODE</DefineConstants>
+    <DefineConstants>DESIGN_MODE</DefineConstants>
     
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>        
     <EnableDefaultItems>false</EnableDefaultItems>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <PackOnBuild>true</PackOnBuild>
+    <PackageId>Crow</PackageId>
+    <PackageVersion>0.8</PackageVersion>
+    <Authors>JP Bruyère</Authors>
+    <Title>C# Rapid Open Widget Toolkit</Title>
+    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageIconUrl>https://jpbruyere.github.io/Crow/images/crow.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/jpbruyere/Crow/wiki</PackageProjectUrl>
+    <PackageTags>Crow Widget Interface GUI C# .Net Mono</PackageTags>
+    <PackageCopyright>Copyright 2013-2018</PackageCopyright>
+    <Owners>JP Bruyère</Owners>
   </PropertyGroup>
    
   
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;DESIGN_MODE</DefineConstants>
+    <DefineConstants>TRACE;DESIGN_MODE;DEBUG</DefineConstants>
   </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
@@ -32,8 +45,16 @@
     
     <EmbeddedResource Include="Default.style" />
     <EmbeddedResource Include="Icons\*.*" />
-    <!--<EmbeddedResource Include="Icons\checkbox.svg" />
-    <EmbeddedResource Include="Icons\radiobutton.svg" />-->
         
+    <PackageReference Include="NuGet.Build.Packaging" Version="0.2.2" />
   </ItemGroup>  
+  <ItemGroup>
+    <Folder Include="src\backends\win32\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="src\backends\win32\User32\Structs\RawInputDevice.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\backends\win32\User32\Structs\RawInputDevice.cs" />
+  </ItemGroup>
 </Project>

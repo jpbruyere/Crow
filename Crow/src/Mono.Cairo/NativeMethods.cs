@@ -44,7 +44,7 @@ namespace Cairo
 #if MONOTOUCH
 		const string cairo = "__Internal";
 #else
-    const string cairo = "cairo";
+    	const string cairo = "cairo";
 #endif
 
         //[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]

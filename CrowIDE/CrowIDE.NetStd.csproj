@@ -35,9 +35,7 @@
 
     <EmbeddedResource Include="ui\**\*.crow" />
     <EmbeddedResource Include="ui\**\*.itemp" />
-<!--      <LogicalName>ui.%(Filename)</LogicalName>-->
-<!--      <LogicalName>%(Identity)</LogicalName>
-    </EmbeddedResource>   -->     
+  
     <EmbeddedResource Include="ui\**\*.template">
       <LogicalName>Crow.Coding.%(Filename).template</LogicalName>
     </EmbeddedResource> 

@@ -85,7 +85,7 @@ namespace Crow
 				if (selectionIsEmpty) {
 					if (!MoveRight ())
 						return;
-				}else if (IFace.Keyboard.Shift)
+				}else if (IFace.Shift)
 					IFace.Clipboard = this.SelectedText;
 				this.DeleteChar ();
 				break;
@@ -104,46 +104,46 @@ namespace Crow
 				SelRelease = -1;
 				break;
 			case Key.Home:
-				if (IFace.Keyboard.Shift) {
+				if (IFace.Shift) {
 					if (selectionIsEmpty)
 						SelBegin = new Point (CurrentColumn, CurrentLine);
-					if (IFace.Keyboard.Ctrl)
+					if (IFace.Ctrl)
 						CurrentLine = 0;
 					CurrentColumn = 0;
 					SelRelease = new Point (CurrentColumn, CurrentLine);
 					break;
 				}
 				SelRelease = -1;
-				if (IFace.Keyboard.Ctrl)
+				if (IFace.Ctrl)
 					CurrentLine = 0;
 				CurrentColumn = 0;
 				break;
 			case Key.End:
-				if (IFace.Keyboard.Shift) {
+				if (IFace.Shift) {
 					if (selectionIsEmpty)
 						SelBegin = CurrentPosition;
-					if (IFace.Keyboard.Ctrl)
+					if (IFace.Ctrl)
 						CurrentLine = int.MaxValue;
 					CurrentColumn = int.MaxValue;
 					SelRelease = CurrentPosition;
 					break;
 				}
 				SelRelease = -1;
-				if (IFace.Keyboard.Ctrl)
+				if (IFace.Ctrl)
 					CurrentLine = int.MaxValue;
 				CurrentColumn = int.MaxValue;
 				break;
 			case Key.Insert:
-				if (IFace.Keyboard.Shift)
+				if (IFace.Shift)
 					this.Insert (IFace.Clipboard);
-				else if (IFace.Keyboard.Ctrl && !selectionIsEmpty)
+				else if (IFace.Ctrl && !selectionIsEmpty)
 					IFace.Clipboard = this.SelectedText;
 				break;
 			case Key.Left:
-				if (IFace.Keyboard.Shift) {
+				if (IFace.Shift) {
 					if (selectionIsEmpty)
 						SelBegin = new Point(CurrentColumn, CurrentLine);
-					if (IFace.Keyboard.Ctrl)
+					if (IFace.Ctrl)
 						GotoWordStart ();
 					else if (!MoveLeft ())
 						return;
@@ -151,16 +151,16 @@ namespace Crow
 					break;
 				}
 				SelRelease = -1;
-				if (IFace.Keyboard.Ctrl)
+				if (IFace.Ctrl)
 					GotoWordStart ();
 				else
 					MoveLeft();
 				break;
 			case Key.Right:
-				if (IFace.Keyboard.Shift) {
+				if (IFace.Shift) {
 					if (selectionIsEmpty)
 						SelBegin = CurrentPosition;
-					if (IFace.Keyboard.Ctrl)
+					if (IFace.Ctrl)
 						GotoWordEnd ();
 					else if (!MoveRight ())
 						return;
@@ -168,13 +168,13 @@ namespace Crow
 					break;
 				}
 				SelRelease = -1;
-				if (IFace.Keyboard.Ctrl)
+				if (IFace.Ctrl)
 					GotoWordEnd ();
 				else
 					MoveRight ();
 				break;
 			case Key.Up:
-				if (IFace.Keyboard.Shift) {
+				if (IFace.Shift) {
 					if (selectionIsEmpty)
 						SelBegin = CurrentPosition;
 					CurrentLine--;
@@ -185,7 +185,7 @@ namespace Crow
 				CurrentLine--;
 				break;
 			case Key.Down:
-				if (IFace.Keyboard.Shift) {
+				if (IFace.Shift) {
 					if (selectionIsEmpty)
 						SelBegin = CurrentPosition;
 					CurrentLine++;

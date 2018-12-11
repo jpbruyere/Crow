@@ -31,7 +31,7 @@ namespace Crow.XKB
 	using xkb_keycode_t = System.UInt32;
 	using xkb_mod_index_t = System.UInt32;
 
-	public class XCBKeyboard : IKeyboard
+	public class XCBKeyboard 
 	{
 		enum xkb_keysym : uint {
 			NoSymbol						= 0x000000,
@@ -2527,21 +2527,17 @@ namespace Crow.XKB
 
 		IntPtr xkbCtx, xkbKeymap, xkbState;
 
-		#region IKeyboard implementation
+		Interface iFace;
 
-		public event EventHandler<KeyEventArgs> KeyDown;
-		public event EventHandler<KeyEventArgs> KeyUp;
-		public event EventHandler<KeyPressEventArgs> KeyPress;
 
 		public void HandleEvent (uint keycode, bool pressed) {
 			xkb_keysym ks = xkb_state_key_get_one_sym (xkbState, keycode);
 			xkb_key_direction keyDir = xkb_key_direction.KEY_DOWN;
 
 			if (pressed) {
-				KeyDown.Raise (this, new KeyEventArgs ((Key)ks, false));
+				iFace.ProcessKeyDown ((Key)ks);
 
 				IntPtr ptrKeySyms = IntPtr.Zero;
-
 
 				int nbKeySyms = xkb_state_key_get_syms (xkbState, keycode, ref ptrKeySyms);
 				int[] keySyms = new int[nbKeySyms];
@@ -2550,11 +2546,11 @@ namespace Crow.XKB
 				uint utf32 = xkb_state_key_get_utf32 (xkbState, keycode);
 				char c = char.ConvertFromUtf32 ((int)utf32) [0];
 
-				if (!char.IsControl(c))
-					KeyPress.Raise (this, new KeyPressEventArgs (c));
+				if (!char.IsControl (c))
+					iFace.ProcessKeyPress (c);
 			} else {
 				keyDir = xkb_key_direction.KEY_UP;
-				KeyUp.Raise (this, new KeyEventArgs ((Key)ks, false));
+				iFace.ProcessKeyUp ((Key)ks);
 			}
 
 			xkb_state_update_key (xkbState, keycode, keyDir);
@@ -2582,11 +2578,12 @@ namespace Crow.XKB
 			xkb_keymap_unref (xkbKeymap);
 			xkb_context_unref (xkbCtx);
 		}
-		#endregion
 
 
-		public XCBKeyboard (IntPtr xcbConnection)
+		public XCBKeyboard (IntPtr xcbConnection, Interface _iface)
 		{
+			iFace = _iface;
+
 			ushort xkb_maj, xkb_min;
 			byte base_evt, base_err;
 

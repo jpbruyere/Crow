@@ -149,7 +149,7 @@ namespace Crow
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
 		{
 			base.onMouseWheel (sender, e);
-			if (IFace.Keyboard.Shift)
+			if (IFace.Shift)
 				ScrollX += e.Delta * MouseWheelSpeed;
 			else
 				ScrollY -= e.Delta * MouseWheelSpeed;

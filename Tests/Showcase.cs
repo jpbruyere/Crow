@@ -43,7 +43,7 @@ namespace tests
 		static void Main ()
 		{
 			using (Showcase app = new Showcase ()) {
-				app.Keyboard.KeyDown += App_KeyboardKeyDown;
+				//app.Keyboard.KeyDown += App_KeyboardKeyDown;
 
 				GraphicObject g = app.AddWidget ("#Tests.ui.showcase.crow");
 				g.DataSource = app;
@@ -52,7 +52,7 @@ namespace tests
 				//widgets are added to the interface
 				app.crowContainer.DataSource = new object ();
 				app.hideError ();
-
+                app.LoadIMLFragment(@"<Window Width='150' Height='150' Name='dock1'/>");
                 app.Run();
 
 			}

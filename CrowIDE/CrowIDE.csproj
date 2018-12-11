@@ -16,8 +16,9 @@
         <Command type="Execute" command="${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" />
       </CustomCommands>
     </CustomCommands>
-    <ReleaseVersion>0.5</ReleaseVersion>
+    <ReleaseVersion>0.8.0</ReleaseVersion>
     <StartupObject>Crow.Coding.CrowIDE</StartupObject>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

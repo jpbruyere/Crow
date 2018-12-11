@@ -605,9 +605,9 @@ namespace Crow
 		{			
 			//base.onMouseWheel (sender, e);
 
-			if (IFace.Keyboard.Shift)
+			if (IFace.Shift)
 				ScrollX -= (int)((double)(e.Delta * MouseWheelSpeed) / xScale);
-			else if (IFace.Keyboard.Ctrl) {
+			else if (IFace.Ctrl) {
 				if (e.Delta > 0) {
 					XScale *= 2.0;
 				} else {

@@ -1011,14 +1011,14 @@ namespace Crow.Coding
 
 			Key key = e.Key;
 
-			if (IFace.Keyboard.Ctrl) {
+			if (IFace.Ctrl) {
 				switch (key) {
 				case Key.S:
 					projFile.Save ();
 					break;
 				case Key.W:
 					editorMutex.EnterWriteLock ();
-					if (IFace.Keyboard.Shift)
+					if (IFace.Shift)
 						projFile.Redo (null);
 					else
 						projFile.Undo (null);
@@ -1040,7 +1040,7 @@ namespace Crow.Coding
 			case Key.Delete:
 				if (buffer.SelectionIsEmpty)
 					MoveRight ();
-				else if (IFace.Keyboard.Shift)
+				else if (IFace.Shift)
 					IFace.Clipboard = buffer.SelectedText;
 				buffer.DeleteChar ();
 				break;
@@ -1054,46 +1054,46 @@ namespace Crow.Coding
 				buffer.ResetSelection ();
 				break;
 			case Key.Home:
-				if (IFace.Keyboard.Shift) {
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
-					if (IFace.Keyboard.Ctrl)
+					if (IFace.Ctrl)
 						buffer.CurrentLine = 0;
 					buffer.CurrentColumn = 0;
 					buffer.SetSelEndPos ();
 					break;
 				}
 				buffer.ResetSelection ();
-				if (IFace.Keyboard.Ctrl)
+				if (IFace.Ctrl)
 					buffer.CurrentLine = 0;
 				buffer.CurrentColumn = 0;
 				break;
 			case Key.End:
-				if (IFace.Keyboard.Shift) {
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
-					if (IFace.Keyboard.Ctrl)
+					if (IFace.Ctrl)
 						buffer.CurrentLine = int.MaxValue;
 					buffer.CurrentColumn = int.MaxValue;
 					buffer.SetSelEndPos ();
 					break;
 				}
 				buffer.ResetSelection ();
-				if (IFace.Keyboard.Ctrl)
+				if (IFace.Ctrl)
 					buffer.CurrentLine = int.MaxValue;
 				buffer.CurrentColumn = int.MaxValue;
 				break;
 			case Key.Insert:
-				if (IFace.Keyboard.Shift)
+				if (IFace.Shift)
 					buffer.Insert (IFace.Clipboard);
-				else if (IFace.Keyboard.Ctrl && !buffer.SelectionIsEmpty)
+				else if (IFace.Ctrl && !buffer.SelectionIsEmpty)
 					IFace.Clipboard = buffer.SelectedText;
 				break;
 			case Key.Left:
-				if (IFace.Keyboard.Shift) {
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
-					if (IFace.Keyboard.Ctrl)
+					if (IFace.Ctrl)
 						buffer.GotoWordStart ();
 					else
 						MoveLeft ();
@@ -1101,16 +1101,16 @@ namespace Crow.Coding
 					break;
 				}
 				buffer.ResetSelection ();
-				if (IFace.Keyboard.Ctrl)
+				if (IFace.Ctrl)
 					buffer.GotoWordStart ();
 				else
 					MoveLeft();
 				break;
 			case Key.Right:
-				if (IFace.Keyboard.Shift) {
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
-					if (IFace.Keyboard.Ctrl)
+					if (IFace.Ctrl)
 						buffer.GotoWordEnd ();
 					else
 						MoveRight ();
@@ -1118,13 +1118,13 @@ namespace Crow.Coding
 					break;
 				}
 				buffer.ResetSelection ();
-				if (IFace.Keyboard.Ctrl)
+				if (IFace.Ctrl)
 					buffer.GotoWordEnd ();
 				else
 					MoveRight ();
 				break;
 			case Key.Up:
-				if (IFace.Keyboard.Shift) {
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
 					PrintedCurrentLine--;
@@ -1135,7 +1135,7 @@ namespace Crow.Coding
 				PrintedCurrentLine--;
 				break;
 			case Key.Down:
-				if (IFace.Keyboard.Shift) {
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
 					PrintedCurrentLine++;
@@ -1150,7 +1150,7 @@ namespace Crow.Coding
 			case Key.Num_Lock:
 				break;
 			case Key.Page_Down:
-				if (IFace.Keyboard.Shift) {
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
 					PrintedCurrentLine += visibleLines;
@@ -1161,7 +1161,7 @@ namespace Crow.Coding
 				PrintedCurrentLine += visibleLines;
 				break;
 			case Key.Page_Up:
-				if (IFace.Keyboard.Shift) {
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
 					PrintedCurrentLine -= visibleLines;
@@ -1172,7 +1172,7 @@ namespace Crow.Coding
 				PrintedCurrentLine -= visibleLines;
 				break;
 			case Key.Tab:
-				if (IFace.Keyboard.Shift) {
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty ||
 						(buffer.SelectionStart.Y == buffer.SelectionEnd.Y)) {
 						//TODO

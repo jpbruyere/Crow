@@ -119,7 +119,7 @@ namespace Crow.Coding
 			using (app = new CrowIDE ()) {
 				MainIFace = app;
 
-				app.Keyboard.KeyDown += App_KeyboardKeyDown;
+				//app.Keyboard.KeyDown += App_KeyboardKeyDown;
 				app.initIde ();
 
 				app.reloadWinConfigs ();

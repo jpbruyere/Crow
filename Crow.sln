@@ -55,6 +55,6 @@ Global
 		$6.Wrap = False
 		$5.inheritsSet = Mono
 		description = @C.R.O.W. c# Rapid Open Widgets\n\nCrow is a pure c# widget toolkit with XML definition of interface, bindings, styling...\n
-		version = 0.5
+		version = 0.8.0
 	EndGlobalSection
 EndGlobal

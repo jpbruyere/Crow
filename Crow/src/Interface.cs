@@ -121,13 +121,13 @@ namespace Crow
 
 		protected bool running;
 		protected virtual void InitBackend () {
-			backend = new Crow.XCB.XCBBackend ();
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+                backend = new Crow.XCB.XCBBackend();
+            else
+                backend = new Crow.Win32.Win32Backend();
+
 			//backend = new Crow.XLib.XLibBackend ();
 			backend.Init (this);
-
-			Keyboard.KeyDown += Keyboard_KeyDown;
-			Keyboard.KeyUp += Keyboard_KeyUp;
-			Keyboard.KeyPress += Keyboard_KeyPress;
 
 			initTooltip ();
 			initContextMenus ();
@@ -144,35 +144,46 @@ namespace Crow
 				Thread.Sleep(1);
 			}
 		}
-		void Keyboard_KeyPress (object sender, KeyPressEventArgs e)
+		public void ProcessKeyPress (char c)
 		{
 			if (_focusedWidget != null)
-				_focusedWidget.onKeyPress (this, e);
+				_focusedWidget.onKeyPress (this, new KeyPressEventArgs(c));
 		}
 
-		void Keyboard_KeyUp (object sender, KeyEventArgs e)
+		public void ProcessKeyUp (Key key)
 		{
 			if (_focusedWidget != null)
-				_focusedWidget.onKeyUp (this, e);
+				_focusedWidget.onKeyUp (this, new KeyEventArgs(key, false));
 //			if (keyboardRepeatThread != null) {
 //				keyboardRepeatOn = false;
 //				keyboardRepeatThread.Abort();
 //				keyboardRepeatThread.Join ();
 //			}
 		}
-		void Keyboard_KeyDown (object sender, KeyEventArgs e)
+		public void ProcessKeyDown (Key key)
 		{
 			//Keyboard.SetKeyState((Crow.Key)Key,true);
-			lastKeyDownEvt = e;
-			lastKeyDownEvt.IsRepeat = true;
+			lastKeyDownEvt = new KeyEventArgs (key, true);
 
 			if (_focusedWidget != null)
-				_focusedWidget.onKeyDown (this, e);
+				_focusedWidget.onKeyDown (this, new KeyEventArgs (key, false));
 
 			//			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
 			//			keyboardRepeatThread.IsBackground = true;
 			//			keyboardRepeatThread.Start ();
  		}
+
+		public bool Shift {
+			get { return backend.Shift; }
+		}
+
+		public bool Ctrl {
+			get { return backend.Ctrl; }
+		}
+
+		public bool Alt {
+			get { return backend.Alt; }
+		}
 
 		void interfaceThread()
 		{			
@@ -301,6 +312,9 @@ namespace Crow
 		public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
 		public event EventHandler<MouseButtonEventArgs> MouseClick;
 		public event EventHandler<MouseMoveEventArgs> MouseMove;
+		public event EventHandler<KeyEventArgs> KeyDown;
+		public event EventHandler<KeyEventArgs> KeyUp;
+		public event EventHandler<KeyPressEventArgs> KeyPress;
 		/*public event EventHandler<KeyEventArgs> KeyboardKeyDown;
 		public event EventHandler<KeyEventArgs> KeyboardKeyUp;*/
 		#endregion
@@ -995,7 +1009,6 @@ namespace Crow
 		XCursor cursor = XCursor.Default;
 
 		public MouseState Mouse;
-		public IKeyboard Keyboard;
 
 		public XCursor MouseCursor {
 			set {
@@ -1100,10 +1113,10 @@ namespace Crow
 		/// </summary>
 		/// <returns>return true, if interface handled the event, false otherwise.</returns>
 		/// <param name="button">Button index</param>
-		public bool ProcessMouseButtonUp(int button)
+		public bool ProcessMouseButtonUp(Crow.MouseButton button)
 		{
-			Mouse.DisableBit (button);
-			MouseButtonEventArgs e = new MouseButtonEventArgs ((Crow.MouseButton)button) { Mouse = Mouse };
+			Mouse.DisableBit ((int)button);
+			MouseButtonEventArgs e = new MouseButtonEventArgs (button) { Mouse = Mouse };
 			if (_activeWidget == null)
 				return false;
 
@@ -1130,10 +1143,10 @@ namespace Crow
 		/// </summary>
 		/// <returns>return true, if interface handled the event, false otherwise.</returns>
 		/// <param name="button">Button index</param>
-		public bool ProcessMouseButtonDown(int button)
+		public bool ProcessMouseButtonDown(Crow.MouseButton button)
 		{
-			Mouse.EnableBit (button);
-			MouseButtonEventArgs e = new MouseButtonEventArgs ((Crow.MouseButton)button) { Mouse = Mouse };
+			Mouse.EnableBit ((int)button);
+			MouseButtonEventArgs e = new MouseButtonEventArgs (button) { Mouse = Mouse };
 
 			if (HoverWidget == null)
 				return false;

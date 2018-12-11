@@ -28,7 +28,7 @@ using System.Runtime.InteropServices;
 
 namespace Crow.XLib
 {
-	public class X11Keyboard : IKeyboard
+	public class X11Keyboard
 	{
 		#region PInvoke
 		[DllImportAttribute("X11")]
