@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Container Width="200" Height="100" Background="DimGray" Margin="5">
+<Container Width="200" Height="100" Background="DimGrey" Margin="5">
 	<Container Width="Stretched" Height="800" Background="DarkBlue">
 		<Label Text="{fps}" Background="RoyalBlue" VerticalAlignment="Center"/>
 	</Container>

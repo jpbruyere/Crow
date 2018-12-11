@@ -30,6 +30,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using Cairo;
 
 namespace Crow.Coding
 {
@@ -53,17 +54,44 @@ namespace Crow.Coding
 		}
 		#endregion
 
-		public DesignInterface ()
+		public DesignInterface () : base()
 		{
 		}
 
 		public ProjectFile ProjFile;
 
+
+		protected override void InitBackend ()
+		{
+			surf = new ImageSurface(Format.Argb32, 100, 100);
+		}
+		public override void ProcessResize (Rectangle bounds)
+		{
+			if (bounds == clientRectangle)
+				return;
+			lock (UpdateMutex) {
+				clientRectangle = bounds;
+				surf.Dispose ();
+				surf = new ImageSurface(Format.Argb32, clientRectangle.Width, clientRectangle.Height);
+
+				foreach (GraphicObject g in GraphicTree)
+					g.RegisterForLayouting (LayoutingType.All);
+
+				RegisterClip (clientRectangle);
+			}
+
+		}
 		public override GraphicObject Load (string path)
 		{
 			ProjectFile pi;
-			if (ProjFile.Project.solution.GetProjectFileFromPath (path, out pi))
-				return CreateITorFromIMLFragment (pi.Source).CreateInstance();			
+			try {
+				
+				if (ProjFile.Project.solution.GetProjectFileFromPath (path, out pi))
+					return CreateITorFromIMLFragment (pi.Source).CreateInstance();					
+			} catch (Exception ex) {
+				
+			}
+		
 			return null;
 		}
 		public override System.IO.Stream GetStreamFromPath (string path)

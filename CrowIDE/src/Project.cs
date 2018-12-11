@@ -61,18 +61,18 @@ namespace Crow.Coding
 			solution = sol;
 
 			cmdSave = new Crow.Command (new Action (() => Save ()))
-			{ Caption = "Save", Icon = new SvgPicture ("#Crow.Coding.icons.save.svg"), CanExecute = true };
+			{ Caption = "Save", Icon = new SvgPicture ("#icons.save.svg"), CanExecute = true };
 			cmdOpen = new Crow.Command (new Action (() => Load ())) 
-			{ Caption = "Open", Icon = new SvgPicture ("#Crow.Coding.icons.open.svg"), CanExecute = false };
+			{ Caption = "Open", Icon = new SvgPicture ("#icons.open.svg"), CanExecute = false };
 			cmdCompile = new Crow.Command (new Action (() => Compile ())) {
 				Caption = "Compile",
-				Icon = "#Crow.Coding.icons.compile.svg"
+				Icon = "#icons.compile.svg"
 			};
 			cmdSetAsStartProj = new Crow.Command (new Action (() => setAsStartupProject ())) {
 				Caption = "Set as Startup Project"
 			};
 			cmdNewFile = new Crow.Command (new Action (() => AddNewFile ())) {
-				Caption = "Add New File", Icon = new SvgPicture ("#Crow.Coding.icons.blank-file.svg"), CanExecute = true
+				Caption = "Add New File", Icon = new SvgPicture ("#icons.blank-file.svg"), CanExecute = true
 			};
 
 			Commands = new List<Crow.Command> (new Crow.Command[] {cmdOpen,cmdSave,cmdSetAsStartProj,cmdCompile,cmdNewFile});
@@ -464,12 +464,8 @@ namespace Crow.Coding
 				solution.DefaultTemplates [clsName] = pi.Path;
 			}
 
-			foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference>()) {				
-				Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);
-				if (p == null)
-					throw new Exception ("referenced project not found");
-				p.GetDefaultTemplates ();
-			}
+			foreach (Project p in ReferencedProjects)				
+				p.GetDefaultTemplates ();			
 		}
 //		void searchTemplatesIn(Assembly assembly){
 //			if (assembly == null)
@@ -483,6 +479,18 @@ namespace Crow.Coding
 //				DefaultTemplates[clsName] = "#" + resId;
 //			}
 //		}
+
+		public List<Project> ReferencedProjects {
+			get {
+				List<Project> tmp = new List<Project> ();
+				foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference>()) {				
+					Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);
+					if (p != null)
+						tmp.Add (p);					
+				}
+				return tmp;
+			}
+		}
 
 		public void GetStyling () {
 			try {

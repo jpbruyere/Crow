@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0"?>
-<Window Width="50%" Height="50%" Background="DimGray">
+<Window Width="50%" Height="50%" Background="DimGrey">
 	<TreeView IsRoot="true" Name="treeView" Data="{LQIs}">
 		<ItemTemplate DataType="Crow.LayoutingQueueItem" Data="triggeredLQIs">
 			<Expandable>
 				<Template>
 					<VerticalStack Height="{./HeightPolicy}" Width="{./WidthPolicy}">
-						<VerticalStack Fit="true" Margin="3" Background="DimGray"
+						<VerticalStack Fit="true" Margin="3" Background="DimGrey"
 								HorizontalAlignment="Left"
 								MouseEnter="{Background=hgradient|0:RoyalBlue|1:Transparent}"
-								MouseLeave="{Background=DimGray}">
-							<Label Text="{FullName}" Font="droid, 8" Background="LightGray" Foreground="Black"/>
+								MouseLeave="{Background=DimGrey}">
+							<Label Text="{FullName}" Font="droid, 8" Background="LightGrey" Foreground="Black"/>
 							<HorizontalStack Fit="true" Spacing="10">
 								<Label Text="{LayoutingTries}" Foreground="SkyBlue"/>
 								<Label Text="{DiscardCount}" Foreground="Red"/>

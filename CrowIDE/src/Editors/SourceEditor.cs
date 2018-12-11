@@ -47,7 +47,7 @@ namespace Crow.Coding
 		#region CTOR
 		public SourceEditor (): base()
 		{
-			formatting.Add ((int)XMLParser.TokenType.AttributeName, new TextFormatting (Color.DarkSlateGray, Color.Transparent));
+			formatting.Add ((int)XMLParser.TokenType.AttributeName, new TextFormatting (Color.DarkSlateGrey, Color.Transparent));
 			formatting.Add ((int)XMLParser.TokenType.ElementName, new TextFormatting (Color.DarkBlue, Color.Transparent));
 			formatting.Add ((int)XMLParser.TokenType.ElementStart, new TextFormatting (Color.Black, Color.Transparent));
 			formatting.Add ((int)XMLParser.TokenType.ElementEnd, new TextFormatting (Color.Black, Color.Transparent));
@@ -58,8 +58,8 @@ namespace Crow.Coding
 			formatting.Add ((int)XMLParser.TokenType.AttributeValue, new TextFormatting (Color.FireBrick, Color.Transparent, false, true));
 			formatting.Add ((int)XMLParser.TokenType.XMLDecl, new TextFormatting (Color.ForestGreen, Color.Transparent));
 
-			formatting.Add ((int)BufferParser.TokenType.BlockComment, new TextFormatting (Color.Gray, Color.Transparent, false, true));
-			formatting.Add ((int)BufferParser.TokenType.LineComment, new TextFormatting (Color.Gray, Color.Transparent, false, true));
+			formatting.Add ((int)BufferParser.TokenType.BlockComment, new TextFormatting (Color.Grey, Color.Transparent, false, true));
+			formatting.Add ((int)BufferParser.TokenType.LineComment, new TextFormatting (Color.Grey, Color.Transparent, false, true));
 			formatting.Add ((int)BufferParser.TokenType.OperatorOrPunctuation, new TextFormatting (Color.Black, Color.Transparent));
 			formatting.Add ((int)BufferParser.TokenType.Keyword, new TextFormatting (Color.Teal, Color.Transparent));
 			//formatting.Add ((int)BufferParser.TokenType.Keyword, new TextFormatting (Color.DarkCyan, Color.Transparent));
@@ -324,7 +324,7 @@ namespace Crow.Coding
 		}
 		void Buffer_PositionChanged (object sender, EventArgs e)
 		{
-			Console.WriteLine ("Position changes: ({0},{1})", buffer.CurrentLine, buffer.CurrentColumn);
+			//Console.WriteLine ("Position changes: ({0},{1})", buffer.CurrentLine, buffer.CurrentColumn);
 			int cc = buffer.CurrentTabulatedColumn;
 
 			if (cc > visibleColumns + ScrollX) {
@@ -554,7 +554,7 @@ namespace Crow.Coding
 			double y = cb.Y + (fe.Ascent+fe.Descent) * i, x = cb.X;
 
 			//Draw line numbering
-			Color mgFg = Color.Gray;
+			Color mgFg = Color.Grey;
 			Color mgBg = Color.White;
 			if (PrintLineNumbers){
 				Rectangle mgR = new Rectangle ((int)x, (int)y, leftMargin - leftMarginGap, (int)Math.Ceiling((fe.Ascent+fe.Descent)));
@@ -563,10 +563,10 @@ namespace Crow.Coding
 					if (buffer.CurrentLine == lineIndex)
 						mgFg = Color.White;
 					else
-						mgFg = Color.LightGray;
+						mgFg = Color.LightGrey;
 				}else if (buffer.CurrentLine == lineIndex) {
 					mgFg = Color.Black;
-					mgBg = Color.DarkGray;
+					mgBg = Color.DarkGrey;
 				}
 				string strLN = (lineIndex+1).ToString ();
 				gr.SetSourceColor (mgBg);
@@ -614,7 +614,7 @@ namespace Crow.Coding
 					closingNode = false;
 				}
 				gr.SetDash (new double[]{ 1.5 },0.0);
-				gr.SetSourceColor (Color.Gray);
+				gr.SetSourceColor (Color.Grey);
 				gr.Stroke ();
 				gr.SetDash (new double[]{}, 0.0);
 
@@ -900,9 +900,12 @@ namespace Crow.Coding
 			}
 		}
 		void updateHoverLine () {
-			int hvl = (int)Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent+fe.Descent)));
-			hvl = Math.Min (PrintedLines.Count, hvl);
-			HoverLine = buffer.IndexOf (PrintedLines[hvl]);
+			if (PrintedLines.Count > 0) {
+				int hvl = (int)Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent + fe.Descent)));
+				hvl = Math.Min (PrintedLines.Count - 1, hvl);
+				HoverLine = buffer.IndexOf (PrintedLines [hvl]);
+			} else
+				HoverLine = 0;
 		}
 		void updateCurrentPosFromMouseLocalPos(){			
 			PrintedCurrentLine = (int)Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent+fe.Descent)));
@@ -1002,20 +1005,20 @@ namespace Crow.Coding
 		#endregion
 
 		#region Keyboard handling
-		public override void onKeyDown (object sender, KeyboardKeyEventArgs e)
+		public override void onKeyDown (object sender, KeyEventArgs e)
 		{
 			//base.onKeyDown (sender, e);
 
 			Key key = e.Key;
 
-			if (e.Control) {
+			if (IFace.Ctrl) {
 				switch (key) {
 				case Key.S:
 					projFile.Save ();
 					break;
 				case Key.W:
 					editorMutex.EnterWriteLock ();
-					if (e.Shift)
+					if (IFace.Shift)
 						projFile.Redo (null);
 					else
 						projFile.Undo (null);
@@ -1029,7 +1032,7 @@ namespace Crow.Coding
 
 			switch (key)
 			{
-			case Key.Back:
+			case Key.BackSpace:
 				buffer.DeleteChar ();
 				break;
 			case Key.Clear:
@@ -1037,12 +1040,12 @@ namespace Crow.Coding
 			case Key.Delete:
 				if (buffer.SelectionIsEmpty)
 					MoveRight ();
-				else if (e.Shift)
+				else if (IFace.Shift)
 					IFace.Clipboard = buffer.SelectedText;
 				buffer.DeleteChar ();
 				break;
-			case Key.Enter:
-			case Key.KeypadEnter:
+			case Key.Return:
+			case Key.KP_Enter:
 				if (!buffer.SelectionIsEmpty)
 					buffer.DeleteChar ();
 				buffer.InsertLineBreak ();
@@ -1051,46 +1054,46 @@ namespace Crow.Coding
 				buffer.ResetSelection ();
 				break;
 			case Key.Home:
-				if (e.Shift) {
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
-					if (e.Control)
+					if (IFace.Ctrl)
 						buffer.CurrentLine = 0;
 					buffer.CurrentColumn = 0;
 					buffer.SetSelEndPos ();
 					break;
 				}
 				buffer.ResetSelection ();
-				if (e.Control)
+				if (IFace.Ctrl)
 					buffer.CurrentLine = 0;
 				buffer.CurrentColumn = 0;
 				break;
 			case Key.End:
-				if (e.Shift) {
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
-					if (e.Control)
+					if (IFace.Ctrl)
 						buffer.CurrentLine = int.MaxValue;
 					buffer.CurrentColumn = int.MaxValue;
 					buffer.SetSelEndPos ();
 					break;
 				}
 				buffer.ResetSelection ();
-				if (e.Control)
+				if (IFace.Ctrl)
 					buffer.CurrentLine = int.MaxValue;
 				buffer.CurrentColumn = int.MaxValue;
 				break;
 			case Key.Insert:
-				if (e.Shift)
+				if (IFace.Shift)
 					buffer.Insert (IFace.Clipboard);
-				else if (e.Control && !buffer.SelectionIsEmpty)
+				else if (IFace.Ctrl && !buffer.SelectionIsEmpty)
 					IFace.Clipboard = buffer.SelectedText;
 				break;
 			case Key.Left:
-				if (e.Shift) {
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
-					if (e.Control)
+					if (IFace.Ctrl)
 						buffer.GotoWordStart ();
 					else
 						MoveLeft ();
@@ -1098,16 +1101,16 @@ namespace Crow.Coding
 					break;
 				}
 				buffer.ResetSelection ();
-				if (e.Control)
+				if (IFace.Ctrl)
 					buffer.GotoWordStart ();
 				else
 					MoveLeft();
 				break;
 			case Key.Right:
-				if (e.Shift) {
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
-					if (e.Control)
+					if (IFace.Ctrl)
 						buffer.GotoWordEnd ();
 					else
 						MoveRight ();
@@ -1115,13 +1118,13 @@ namespace Crow.Coding
 					break;
 				}
 				buffer.ResetSelection ();
-				if (e.Control)
+				if (IFace.Ctrl)
 					buffer.GotoWordEnd ();
 				else
 					MoveRight ();
 				break;
 			case Key.Up:
-				if (e.Shift) {
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
 					PrintedCurrentLine--;
@@ -1132,7 +1135,7 @@ namespace Crow.Coding
 				PrintedCurrentLine--;
 				break;
 			case Key.Down:
-				if (e.Shift) {
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
 					PrintedCurrentLine++;
@@ -1144,10 +1147,10 @@ namespace Crow.Coding
 				break;
 			case Key.Menu:
 				break;
-			case Key.NumLock:
+			case Key.Num_Lock:
 				break;
-			case Key.PageDown:
-				if (e.Shift) {
+			case Key.Page_Down:
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
 					PrintedCurrentLine += visibleLines;
@@ -1157,8 +1160,8 @@ namespace Crow.Coding
 				buffer.ResetSelection ();
 				PrintedCurrentLine += visibleLines;
 				break;
-			case Key.PageUp:
-				if (e.Shift) {
+			case Key.Page_Up:
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
 					PrintedCurrentLine -= visibleLines;
@@ -1168,10 +1171,8 @@ namespace Crow.Coding
 				buffer.ResetSelection ();
 				PrintedCurrentLine -= visibleLines;
 				break;
-			case Key.RWin:
-				break;
 			case Key.Tab:
-				if (e.Shift) {
+				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty ||
 						(buffer.SelectionStart.Y == buffer.SelectionEnd.Y)) {
 						//TODO

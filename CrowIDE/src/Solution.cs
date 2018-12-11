@@ -159,7 +159,14 @@ namespace Crow.Coding{
 			set {
 				if (selectedItem == value)
 					return;
+				if (SelectedItem != null)
+					SelectedItem.IsSelected = false;
 				selectedItem = value;
+				if (SelectedItem != null) 
+					SelectedItem.IsSelected = true;
+
+				UserConfig.Set ("SelectedProjItems", SelectedItem?.AbsolutePath);
+
 				NotifyValueChanged ("SelectedItem", selectedItem);
 			}
 		}
@@ -230,40 +237,30 @@ namespace Crow.Coding{
 				foreach (Project p in Projects) {
 					ProjectFile pi;
 					if (p.TryGetProjectFileFromAbsolutePath (f, out pi)) {
-						OpenedItems.AddElement (pi);
-						pi.Project.IsExpanded = true;
-						ProjectNode pn = pi.Parent;
-						while (pn != null) {
-							pn.IsExpanded = true;
-							pn = pn.Parent;
-						}
+						pi.Open ();
 						if (pi.AbsolutePath == sel)
 							selItem = pi;
 						break;
 					}
 				}
 			}
-			SelectedItem = selItem;//BUG: loading in another thread focused last loaded pf
+			if (selItem == null)
+				return;
+			selItem.IsSelected = true;
 		}
 
-		void onSelectedItemChanged (object sender, SelectionChangeEventArgs e){			
-			ProjectItem pi = e.NewValue as ProjectItem;
-			if (pi != null) {				
-				if (!openedItems.Contains (pi)) {
-					openedItems.AddElement (pi);
-					saveOpenedItemsInUserConfig ();
-				}
-			}
-			this.SelectedItem = pi;
+		/*void onSelectedItemChanged (object sender, SelectionChangeEventArgs e){							
+			SelectedItem = e.NewValue as ProjectItem;
 			UserConfig.Set ("SelectedProjItems", SelectedItem?.AbsolutePath);
+		}*/
+
+		public void OpenItem (ProjectItem pi) {
+			if (!openedItems.Contains (pi)) {
+				openedItems.AddElement (pi);
+				saveOpenedItemsInUserConfig ();
+			}
 		}
-		public void OnCloseTab (object sender, MouseButtonEventArgs e){			
-			Console.WriteLine ("OnCloseTab");
-			openedItems.RemoveElement ((sender as GraphicObject).DataSource as ProjectItem);
-			saveOpenedItemsInUserConfig ();
-		}
-		public void CloseItem (ProjectItem pi) {
-			Console.WriteLine ("CloseItem: " + pi.ToString());
+		public void CloseItem (ProjectItem pi) {			
 			openedItems.RemoveElement (pi);
 			saveOpenedItemsInUserConfig ();
 		}

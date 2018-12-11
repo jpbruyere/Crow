@@ -3,5 +3,5 @@
 	BorderWidth="1" BorderStyle="Normal"
 	MouseDown="{BorderStyle=Sunken}"
 	MouseUp="{BorderStyle=Normal}">
-	<Image Margin="1" Path="#Crow.Coding.ui.icons.blank-file.svg" />
+	<Image Margin="1" Path="#icons.blank-file" />
 </Border>

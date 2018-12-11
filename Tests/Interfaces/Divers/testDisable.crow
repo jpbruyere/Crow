@@ -6,8 +6,8 @@
 	<Label Text="{fps}" IsEnabled="true" Font="30"/>
 		<Label Text="{fps}" IsEnabled="false" Font="30" Background="SeaGreen"/>
 	<Label Text="{fps}" IsEnabled="true" Font="30" Background="SeaGreen"/>
-	<Button Caption="Button" IsEnabled="true" Background="Gray"/>
-	<Button Caption="Button" IsEnabled="false" Background="Gray"/>
+	<Button Caption="Button" IsEnabled="true" Background="Grey"/>
+	<Button Caption="Button" IsEnabled="false" Background="Grey"/>
 	<Button Caption="Button" IsEnabled="true" />
 	<Button Caption="Button" IsEnabled="false" />
 	<Spinner Fit="true"/>

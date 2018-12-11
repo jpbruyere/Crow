@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<GenericStack Orientation="Vertical" Spacing="0"		
+	MouseEnter="{caption.Font=hack bold, 10}"
+	MouseLeave="{caption.Font=hack, 10}">
+	<HorizontalStack Margin="2" Left="{./TabOffset}"
+		Name="TabTitle"
+		HorizontalAlignment="Left"
+		Height="{./TabHeight}"
+		Width="{./TabWidth}">
+		<GraphicObject Width="5" Height="5" Background="Blue" Visible="{IsDirty}"/>
+		<Label Name="caption" Text="{DisplayName}" Foreground="Black" Width="Stretched"/>
+		<Border CornerRadius="5" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
+					MouseEnter="{Foreground=Black}" MouseLeave="{Foreground=Transparent}">
+			<Image Focusable="true" Name="Image" Margin="0" Width="Stretched" Height="Stretched" Path="#Crow.Icons.exit2.svg"
+				 MouseClick="./butCloseTabClick"/>
+		</Border>
+	</HorizontalStack>
+	<Container Name="Content"/>
+</GenericStack>

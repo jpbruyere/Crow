@@ -25,8 +25,6 @@
 // THE SOFTWARE.
 
 using System;
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
 using Crow;
 using System.IO;
 using System.Collections.Generic;
@@ -35,45 +33,47 @@ using System.Linq;
 using System.Text;
 using Crow.IML;
 
-namespace Tests
+namespace tests
 {
-	class Showcase : CrowWindow
+	class Showcase : Interface
 	{
+		public Container crowContainer;
+
 		[STAThread]
 		static void Main ()
 		{
-			Showcase win = new Showcase ();
-			win.Run (30);
+			using (Showcase app = new Showcase ()) {
+				//app.Keyboard.KeyDown += App_KeyboardKeyDown;
+
+				GraphicObject g = app.AddWidget ("#Tests.ui.showcase.crow");
+				g.DataSource = app;
+				app.crowContainer = g.FindByName ("CrowContainer") as Container;
+				//I set an empty object as datasource at this level to force update when new
+				//widgets are added to the interface
+				app.crowContainer.DataSource = new object ();
+				app.hideError ();
+                app.LoadIMLFragment(@"<Window Width='150' Height='150' Name='dock1'/>");
+                app.Run();
+
+			}
+		}
+
+		static void App_KeyboardKeyDown (object sender, KeyEventArgs e)
+		{
+			#if DEBUG_LOG
+			switch (e.Key) {
+			case Key.F2:
+				DebugLog.save (sender as Interface);
+				break;
+			}
+			#endif
 		}
 
 		public Showcase ()
-			: base(1024, 800,"Showcase")
+			: base(1024, 800)
 		{
 		}
 
-		Container crowContainer;
-
-		protected override void OnLoad (EventArgs e)
-		{
-			base.OnLoad (e);
-
-			this.CrowKeyDown += Showcase_CrowKeyDown;
-			GraphicObject g = Load ("#Tests.ui.showcase.crow");
-			g.DataSource = this;
-			crowContainer = g.FindByName ("CrowContainer") as Container;
-			//I set an empty object as datasource at this level to force update when new
-			//widgets are added to the interface
-			crowContainer.DataSource = new object ();
-			hideError ();
-		}
-
-		void Showcase_CrowKeyDown (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
-		{
-			if (e.Key == OpenTK.Input.Key.Escape) {
-				Quit (null, null);
-				return;
-			}
-		}
 
 		void Dv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
 		{
@@ -83,17 +83,22 @@ namespace Tests
 			if (fi is DirectoryInfo)
 				return;
 			hideError();
-			lock (this.CurrentInterface.UpdateMutex) {
-				try {
-					GraphicObject g = this.CurrentInterface.Load (fi.FullName);
-					crowContainer.SetChild (g);
-					g.DataSource = this;
-				} catch (InstantiatorException ex) {
-					showError (ex);
-				}
-			}
+			lock (UpdateMutex) {
+                try
+                {
+                    GraphicObject g = Load(fi.FullName);
+                    crowContainer.SetChild(g);
+                    g.DataSource = this;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                    if (ex is InstantiatorException)
+                        showError((InstantiatorException)ex);
+                }
+            }
 
-			string source = "";
+            string source = "";
 			using (Stream s = new FileStream (fi.FullName, FileMode.Open)) {
 				using (StreamReader sr = new StreamReader (s)) {
 					source = sr.ReadToEnd ();
@@ -115,24 +120,22 @@ namespace Tests
 			hideError();
 			GraphicObject g = null;
 			try {
-				lock (this.ifaceControl [0].CrowInterface.UpdateMutex) {
+				lock (UpdateMutex) {
 					Instantiator inst = null;
 					using (MemoryStream ms = new MemoryStream (Encoding.UTF8.GetBytes (e.Text))){
-						inst = new Instantiator (this.ifaceControl [0].CrowInterface, ms);
+						inst = new Instantiator (this, ms);
 					}
 					g = inst.CreateInstance ();
 					crowContainer.SetChild (g);
 					g.DataSource = this;
 				}
-			} catch (InstantiatorException ex) {
-				System.Diagnostics.Debug.WriteLine (ex.ToString ());
-				showError (ex);
+			} catch (Exception ex) {
+				Console.WriteLine (ex.ToString ());
+                if (ex is InstantiatorException)
+				    showError ((InstantiatorException)ex);
 			}
-		}
-		public override void OnRender (FrameEventArgs e)
-		{
-			base.OnRender (e);
-		}
+        }
+
 
 		#region Test values for Binding
 		public int intValue = 500;

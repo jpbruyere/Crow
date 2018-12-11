@@ -1,8 +1,8 @@
-﻿<Expandable Width="Stretched"  Background="Gray">
+﻿<Expandable Width="Stretched"  Background="Grey">
 		<Expandable Width="Stretched" Background="LightBlue">
 			<Expandable Width="Stretched" Background="Green">
 				<Expandable Width="Stretched" Background="LimeGreen">
-					<Expandable Width="Stretched" Background="DimGray">
+					<Expandable Width="Stretched" Background="DimGrey">
 						<Expandable Width="Stretched" Background="Yellow">
 							<Expandable Width="Stretched" Background="SeaGreen">
 								<Expandable Width="Stretched" Background="Blue">

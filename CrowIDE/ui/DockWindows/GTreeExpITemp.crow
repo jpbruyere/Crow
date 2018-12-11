@@ -4,16 +4,16 @@
 		<VerticalStack>
 			<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"						
 					Foreground="Transparent"
-					MouseEnter="{Foreground=DimGray}"
+					MouseEnter="{Foreground=DimGrey}"
 					MouseLeave="{Foreground=Transparent}">
 				<HorizontalStack Spacing="1">
 					<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
 						Path="{./Image}"
 						Visible="{./IsExpandable}"
 						SvgSub="{./IsExpanded}"
-						MouseEnter="{Background=LightGray}"
+						MouseEnter="{Background=LightGrey}"
 						MouseLeave="{Background=Transparent}"/>
-					<Border Width="16" Height="16" Foreground="Black" Background="DimGray">
+					<Border Width="16" Height="16" Foreground="Black" Background="DimGrey">
 						<Image Margin="2" Path="{GetIcon}" />
 					</Border>
 					<Label Text="{./Caption}"/>

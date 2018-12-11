@@ -8,13 +8,13 @@
 				<Template>
 					<CheckBox Caption="{./Caption}" IsChecked="{²./IsPopped}" Foreground="{./Foreground}" Background="{./Background}">
 						<Template>
-							<Border CornerRadius="0" Foreground="LightGray" Background="White">
+							<Border CornerRadius="0" Foreground="LightGrey" Background="White">
 								<HorizontalStack Margin="0" Spacing="1">
 									<Label Width="Stretched" MinimumSize="80,10" Margin="1" Foreground = "{LabForeground}" Background="White"
 										Text="{../../../../../SelectedItem}"/>
 									<Button Width="12" Height="12" Focusable="false"
-										Template="#Crow.Templates.ArrowBut.template">
-										<Image Margin="1" Path="#Crow.Images.Icons.updown.svg" SvgSub="down"/>
+										Template="#Crow.ArrowBut.template">
+										<Image Margin="1" Path="#Crow.Icons.updown.svg" SvgSub="down"/>
 									</Button>
 								</HorizontalStack>
 							</Border>

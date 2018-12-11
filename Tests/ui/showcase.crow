@@ -3,7 +3,7 @@
 	<DirectoryView Name="dv" CurrentDirectory="Interfaces" Width="25%" SelectedItemChanged="Dv_SelectedItemChanged"/>
 	<Splitter Width="6"/>
 	<VerticalStack>
-		<Container Name="CrowContainer" Height="60%" Background="DimGray"/>
+		<Container Name="CrowContainer" Height="60%" Background="DimGrey"/>
 		<Splitter/>
 		<HorizontalStack>
 			<Scroller Name="scroller1" Background="White"

@@ -79,6 +79,7 @@ namespace Crow.Coding
 
 		ProjectNode parent;
 		bool isExpanded;
+		protected bool isSelected;
 		ItemType type;
 		string name;
 		List<ProjectNode> childNodes = new List<ProjectNode>();
@@ -86,6 +87,18 @@ namespace Crow.Coding
 		public Project Project;
 		public List<Crow.Command> Commands;//list of command available for that node
 
+		public virtual Crow.Picture Icon {
+			get {
+				switch (Type) {
+				case ItemType.Reference:
+					return new SvgPicture ("#Crow.Icons.assembly.svg");
+				case ItemType.ProjectReference:
+					return new SvgPicture("#Crow.Icons.projectRef.svg"); 
+				default:
+					return new SvgPicture("#icons.blank-file.svg"); 
+				}
+			}
+		}
 		public ProjectNode Parent {
 			get { return parent; }
 			set { parent = value; }
@@ -124,7 +137,19 @@ namespace Crow.Coding
 				NotifyValueChanged ("IsExpanded", isExpanded);
 			}
 		}
+		public virtual bool IsSelected
+		{
+			get { return isSelected; }
+			set
+			{
+				if (value == isSelected)
+					return;
+				
+				isSelected = value;
 
+				NotifyValueChanged ("IsSelected", isSelected);
+			}
+		}
 		public override string ToString ()
 		{
 			return DisplayName;

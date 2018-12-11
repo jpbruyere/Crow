@@ -67,18 +67,18 @@ namespace Crow.Coding
 
 		void initCommands () {
 			cmdDelete = new Crow.Command (new Action (() => deleteObject (SelectedItem)))
-				{ Caption = "Delete", Icon = new SvgPicture ("#Crow.Coding.icons.save.svg"), CanExecute = true };
+				{ Caption = "Delete", Icon = new SvgPicture ("#icons.save.svg"), CanExecute = true };
 			Commands = new List<Crow.Command> (new Crow.Command[] { cmdDelete });
 		}
 
 		void initIcons () {
-			icoMove = new SvgPicture ();
-			icoMove.Load (IFace, "#Crow.Coding.icons.move-arrows.svg");
-//			icoStyle = new SvgPicture ();
-//			icoStyle.Load (IFace, "#Crow.Coding.icons.palette.svg");
-		}
+			icoMove = new SvgPicture ("#icons.move-arrows.svg");
 
-		[DefaultValue(true)]
+            //			icoStyle = new SvgPicture ();
+            //			icoStyle.Load (IFace, "#icons.palette.svg");
+        }
+
+        [DefaultValue(true)]
 		public bool DrawGrid {
 			get { return drawGrid; }
 			set {
@@ -279,8 +279,6 @@ namespace Crow.Coding
 				SelectedItem = go;
 			} catch (Exception ex) {
 				Error = ex;
-				if (Monitor.IsEntered(imlVE.UpdateMutex))
-					Monitor.Exit (imlVE.UpdateMutex);
 			}
 		}
 		protected override void updateCheckPostProcess ()
@@ -295,9 +293,9 @@ namespace Crow.Coding
 			lock (imlVE.RenderMutex)
 				isDirty = imlVE.IsDirty;
 
-			if (isDirty) {
+			if (isDirty) {				
 				lock (IFace.UpdateMutex)
-					RegisterForRedraw ();
+					RegisterForRedraw ();				
 			}
 		}
 		#endregion
@@ -308,7 +306,11 @@ namespace Crow.Coding
 			base.OnLayoutChanges (layoutType);
 			switch (layoutType) {
 			case LayoutingType.Width:
+				DesignWidth = Slot.Width * 100 / zoom;
+				imlVE.ProcessResize (new Size(designWidth,designHeight));
+				break;
 			case LayoutingType.Height:
+				DesignHeight = Slot.Height * 100 / zoom;
 				imlVE.ProcessResize (new Size(designWidth,designHeight));
 				break;
 			}
@@ -323,6 +325,8 @@ namespace Crow.Coding
 			ProcessMouseMove (e.X - scr.X, e.Y - scr.Y);
 
 			GraphicObject newHW = HoverWidget;
+			if (newHW == null)
+				return;
 
 			if (draggedObj != null) {
 				if (draggedObj.Parent == null) {
@@ -354,7 +358,7 @@ namespace Crow.Coding
 
 			if (oldHW == newHW)
 				return;
-			RegisterForRedraw ();
+			//RegisterForRedraw ();
 
 		}
 		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
@@ -388,7 +392,7 @@ namespace Crow.Coding
 		{
 			base.onDraw (gr);
 
-			Rectangle cb = new Rectangle (0, 0, designWidth, designHeight);// ClientRectangle;
+			Rectangle cb = new Rectangle (0, 0, designWidth, designHeight);
 
 			gr.Save ();
 
@@ -419,14 +423,11 @@ namespace Crow.Coding
 			}
 
 			lock (imlVE.RenderMutex) {
-				using (Cairo.Surface surf = new Cairo.ImageSurface (imlVE.bmp, Cairo.Format.Argb32,
-					imlVE.ClientRectangle.Width, imlVE.ClientRectangle.Height, imlVE.ClientRectangle.Width * 4)) {
-					gr.SetSourceSurface (surf, cb.Left, cb.Top);
-					gr.Paint ();
-				}
+				gr.SetSourceSurface (imlVE.surf, cb.Left, cb.Top);
+				gr.Paint ();
 				imlVE.IsDirty = false;
 			}
-			if (Error == null) {
+			/*if (Error == null) {
 				gr.SetSourceColor (Color.Black);
 				gr.Rectangle (cb, 1.0 / z);
 			} else {
@@ -441,7 +442,7 @@ namespace Crow.Coding
 
 				}
 			}
-			gr.Stroke ();
+			gr.Stroke ();*/
 
 			Rectangle hr;
 
@@ -557,7 +558,7 @@ namespace Crow.Coding
 
 			//				hr.Inflate (2);
 			//gr.SetDash (new double[]{ 1.0, 4.0 }, 0.0);
-			//gr.SetSourceColor (Color.Gray);
+			//gr.SetSourceColor (Color.Grey);
 //			gr.Rectangle (hr,coteStroke);
 //			gr.Stroke ();
 			gr.Operator = Operator.Over;			
@@ -886,7 +887,7 @@ namespace Crow.Coding
 		}
 
 
-		public override void onKeyDown (object sender, KeyboardKeyEventArgs e)
+		public override void onKeyDown (object sender, KeyEventArgs e)
 		{
 		
 			switch (e.Key) {

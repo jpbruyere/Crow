@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<Border Fit="true" Foreground="DimGrey" Background="Khaki">
+	<Label Margin="3" Foreground="DimGrey" Multiline="true" Text="{Tooltip}"/>
+</Border>

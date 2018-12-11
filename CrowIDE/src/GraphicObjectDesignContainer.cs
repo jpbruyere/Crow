@@ -41,7 +41,7 @@ namespace Crow.Coding
 		public Type CrowType;
 
 		public string IconPath {
-			get { return "#Crow.Coding.icons.toolbox." + CrowType.FullName + ".svg"; }
+			get { return "#icons.toolbox." + CrowType.FullName + ".svg"; }
 		}
 		public string DisplayName {
 			get { return CrowType.Name; }
@@ -53,8 +53,8 @@ namespace Crow.Coding
 			lock (go.IFace.UpdateMutex) {				
 				go.IFace.DragImageHeight = dragIconSize;
 				go.IFace.DragImageWidth = dragIconSize;
-				SvgPicture pic = new SvgPicture ();
-				pic.Load (go.IFace, IconPath);
+				SvgPicture pic = new SvgPicture (IconPath);
+				//pic.Load (go.IFace, IconPath);
 				ImageSurface img = new ImageSurface (Format.Argb32, dragIconSize, dragIconSize);
 				using (Context ctx = new Context (img)) {
 					Rectangle r = new Rectangle (0, 0, dragIconSize, dragIconSize);

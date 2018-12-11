@@ -1,23 +1,32 @@
 ﻿<?xml version="1.0"?>
 <ItemTemplate>
-	<Label Text="{}" Background="DarkRed" Foreground="White"/>
+	<Border Style="TreeItemBorder" ContextCommands="{Commands}" Focusable="true" MouseDown="onClick" MouseDoubleClick="onDoubleClick">
+		<Group>
+			<GraphicObject Height="Stretched" Background="RoyalBlue" Visible="{IsSelected}"/>
+			<HorizontalStack>
+				<GraphicObject Width="5" Height="5"/>
+				<Image Style="TreeIcon" Picture="{Icon}"/>
+				<Label Text="{DisplayName}" Width="Stretched"/>
+			</HorizontalStack>
+		</Group>
+	</Border>
 </ItemTemplate>
 <ItemTemplate DataType="Crow.Coding.Project" Data="RootItems" DataTest="Type">
-	<Expandable Caption="{Name}" ContextCommands="{Commands}" IsExpanded="{²IsExpanded}">
+	<Expandable Caption="{Name}" ContextCommands="{Commands}" IsExpanded="{²IsExpanded}" MouseDoubleClick="/onClickForExpand">
 		<Template>
 			<VerticalStack>
-				<Border Style="TreeItemBorder" Focusable="false" MouseDoubleClick="./onClickForExpand">
+				<Border Style="TreeItemBorder" >
 					<HorizontalStack Spacing="1">
 						<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
 							Path="{./Image}"
 							Visible="{./IsExpandable}"
 							SvgSub="{./IsExpanded}"
-							MouseEnter="{Background=LightGray}"
+							MouseEnter="{Background=LightGrey}"
 							MouseLeave="{Background=Transparent}"/>
 						<Image Style="TreeIcon"
 							Path="#Crow.Icons.crowproj.svg"/>
-						<GraphicObject Width="2" Height="9" Background="Green" Visible="{IsStartupProject}"/>
-						<Label Text="{./Caption}"/>
+						<GraphicObject Width="4" Height="9" Background="Green" Visible="{IsStartupProject}"/>
+						<Label Text="{./Caption}"/>						
 					</HorizontalStack>
 				</Border>
 				<Container Name="Content" Visible="false"/>
@@ -30,7 +39,7 @@
 	</Expandable>
 </ItemTemplate>
 <ItemTemplate DataType="ReferenceGroup" Data="ChildNodes" DataTest="Type" >
-	<Expandable Caption="{DisplayName}" Template="#Crow.TreeExpandable.template" IsExpanded="{²IsExpanded}">
+	<Expandable Caption="{DisplayName}" Template="#Crow.Coding.TreeExpandable.template" IsExpanded="{²IsExpanded}">
 		<HorizontalStack Height="Fit">
 			<GraphicObject Width="8" Height="10"/>
 			<VerticalStack Height="Fit" Name="ItemsContainer"/>
@@ -38,7 +47,7 @@
 	</Expandable>
 </ItemTemplate>
 <ItemTemplate DataType="VirtualGroup" Data="ChildNodes" DataTest="Type">
-	<Expandable Caption="{DisplayName}" Template="#Crow.TreeExpandable.template" IsExpanded="{²IsExpanded}">
+	<Expandable Caption="{DisplayName}" Template="#Crow.Coding.TreeExpandable.template" IsExpanded="{²IsExpanded}">
 		<HorizontalStack Height="Fit">
 			<GraphicObject Width="8" Height="10"/>
 			<VerticalStack Height="Fit" Name="ItemsContainer"/>
@@ -50,56 +59,6 @@
 		<HorizontalStack>
 			<Image Style="ProjTreeIcon"
 				Path="#Crow.Icons.folder.svg"/>
-			<Label Text="{DisplayName}" Width="Stretched"/>
-		</HorizontalStack>
-	</Border>
-</ItemTemplate>
-<ItemTemplate DataType="Reference" DataTest="Type">
-	<Border Style="TreeItemBorder" ContextCommands="{Commands}">
-		<HorizontalStack>
-			<GraphicObject Width="5" Height="5"/>
-			<Image Style="TreeIcon"
-				Path="#Crow.Icons.assembly.svg"/>
-			<Label Text="{DisplayName}" Width="Stretched"/>
-		</HorizontalStack>
-	</Border>
-</ItemTemplate>
-<ItemTemplate DataType="ProjectReference" DataTest="Type">
-	<Border Style="TreeItemBorder" ContextCommands="{Commands}">
-		<HorizontalStack>
-			<GraphicObject Width="5" Height="5"/>
-			<Image Style="TreeIcon"
-				Path="#Crow.Icons.projectRef.svg"/>
-			<Label Text="{DisplayName}" Width="Stretched"/>
-		</HorizontalStack>
-	</Border>
-</ItemTemplate>
-<ItemTemplate DataType="Compile" DataTest="Type">	
-	<Border Style="TreeItemBorder" ContextCommands="{Commands}">
-		<HorizontalStack>			
-			<GraphicObject Width="5" Height="5"/>
-			<Image Style="TreeIcon"
-				Path="#Crow.Coding.icons.file.svg"/>
-			<Label Text="{DisplayName}" Width="Stretched"/>
-		</HorizontalStack>
-	</Border>
-</ItemTemplate>
-<ItemTemplate DataType="EmbeddedResource" DataTest="Type">
-	<Border Style="TreeItemBorder" ContextCommands="{Commands}">
-		<HorizontalStack>
-			<GraphicObject Width="5" Height="5"/>
-			<Image Style="TreeIcon"
-				Path="#Crow.Coding.icons.file.svg"/>
-			<Label Text="{DisplayName}" Width="Stretched"/>
-		</HorizontalStack>
-	</Border>
-</ItemTemplate>
-<ItemTemplate DataType="None" DataTest="Type">
-	<Border Style="TreeItemBorder">
-		<HorizontalStack>
-			<GraphicObject Width="5" Height="5"/>
-			<Image Style="TreeIcon"
-				Path="#Crow.Coding.icons.file.svg"/>
 			<Label Text="{DisplayName}" Width="Stretched"/>
 		</HorizontalStack>
 	</Border>

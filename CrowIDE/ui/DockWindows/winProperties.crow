@@ -2,6 +2,6 @@
 <DockWindow Name="winProperties" Caption="Properties"  Width="20%">
 	<MembersView DataSource="{CurrentSolution}" ProjectNode="{SelectedItem}"
 		Instance="{SelectedItemElement}" DataTest="Type"
-		ItemTemplate="#Crow.Coding.ui.MembersItem.template"/>
+		ItemTemplate="#Crow.Coding.MembersItem.template"/>
 </DockWindow>
 

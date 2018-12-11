@@ -177,7 +177,7 @@ namespace Crow.Coding
 
 
 		public Fill LabForeground {
-			get { return IsSetByIML ? Color.DarkBlue : HasStyling ? Color.Black : Color.DimGray;}
+			get { return IsSetByIML ? Color.DarkBlue : HasStyling ? Color.Black : Color.DimGrey;}
 		}
 
 		/// <summary>
