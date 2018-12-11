@@ -78,6 +78,7 @@ namespace Crow.XLib
 		XErrorHandler errorHnd;
 
 		Interface iFace;
+		X11Keyboard keyboard;
 
 		#region IBackend implementation
 
@@ -106,7 +107,7 @@ namespace Crow.XLib
 
 			XMapWindow (xDisp, xwinHnd);
 
-			iFace.Keyboard = new Crow.XLib.X11Keyboard (xDisp);
+			keyboard = new Crow.XLib.X11Keyboard (xDisp);
 
 			iFace.surf = new Cairo.XlibSurface (xDisp, xwinHnd, xDefaultVisual, iFace.ClientRectangle.Width, iFace.ClientRectangle.Height);
 
@@ -116,7 +117,7 @@ namespace Crow.XLib
 
 		public void CleanUp ()
 		{
-			iFace.Keyboard.Destroy ();
+			keyboard.Destroy ();
 
 			XCloseDisplay (xDisp);
 		}
@@ -134,10 +135,10 @@ namespace Crow.XLib
 					iFace.ProcessResize (new Rectangle (0, 0, xevent.ExposeEvent.width, xevent.ExposeEvent.height));
 					break;
 				case XEventName.KeyPress:
-					iFace.Keyboard.HandleEvent ((uint)xevent.KeyEvent.keycode, true);
+					keyboard.HandleEvent ((uint)xevent.KeyEvent.keycode, true);
 					break;
 				case XEventName.KeyRelease:
-					iFace.Keyboard.HandleEvent ((uint)xevent.KeyEvent.keycode, false);
+					keyboard.HandleEvent ((uint)xevent.KeyEvent.keycode, false);
 					break;
 				case XEventName.MotionNotify:
 					//Debug.WriteLine ("motion: ({0},{1})", xevent.MotionEvent.x, xevent.MotionEvent.y);
@@ -150,17 +151,36 @@ namespace Crow.XLib
 					else if(xevent.ButtonEvent.button == 5)
 						iFace.ProcessMouseWheelChanged (-Interface.WheelIncrement);
 					else
-						iFace.ProcessMouseButtonDown (xevent.ButtonEvent.button - 1);
+						iFace.ProcessMouseButtonDown ((MouseButton)(xevent.ButtonEvent.button - 1));
 					break;
 				case XEventName.ButtonRelease:
 					//Debug.WriteLine ("button release: {0}", xevent.ButtonEvent.button);
-					iFace.ProcessMouseButtonUp (xevent.ButtonEvent.button - 1);
+					iFace.ProcessMouseButtonUp ((MouseButton)(xevent.ButtonEvent.button - 1));
 					break;
 
 				}
 			}
 		}
+		public bool IsDown (Key key) {
+			return false;
+		}
+		public bool Shift {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
 
+		public bool Ctrl {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
+
+		public bool Alt {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
 		#endregion
 
 		int HandleError (IntPtr display, ref XErrorEvent error_event)

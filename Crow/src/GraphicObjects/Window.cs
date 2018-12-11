@@ -84,7 +84,7 @@ namespace Crow
 		#endregion
 
 		#region public properties
-		[DefaultValue("#Crow.Images.Icons.crow.png")]
+		[DefaultValue("#Crow.Icons.crow.svg")]
 		public string Icon {
 			get { return _icon; } 
 			set {

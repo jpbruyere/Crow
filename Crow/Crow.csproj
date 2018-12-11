@@ -14,16 +14,17 @@
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <NoWin32Manifest>False</NoWin32Manifest>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <Description>C# Rapid Open Widget</Description>
     <BaseAddress>4194304</BaseAddress>
     <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
     <AssemblyOriginatorKeyFile>crow.key</AssemblyOriginatorKeyFile>
-    <ReleaseVersion>0.5</ReleaseVersion>
+    <ReleaseVersion>0.8.0</ReleaseVersion>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -44,7 +45,7 @@
     <OutputPath>$(SolutionDir)build\Release</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-  	<Compile Include="src\**\*.cs" Exclude="src\Mono.Cairo\NativeMethods-internal.cs"/>
+    <Compile Include="src\**\*.cs" Exclude="src\Mono.Cairo\NativeMethods-internal.cs;src\backends\win32\User32\Structs\RawInputDevice.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -146,7 +147,9 @@
     <EmbeddedResource Include="Templates\ToolWindow.template">
       <LogicalName>Crow.ToolWindow.template</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="Templates\FileItems.template" />
+    <EmbeddedResource Include="Templates\FileItems.template">
+      <LogicalName>Crow.FileItems.template</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="Templates\DefaultItem.template">
       <LogicalName>Crow.DefaultItem.template</LogicalName>
     </EmbeddedResource>
@@ -158,19 +161,23 @@
       <LogicalName>Crow.ArrowBut.template</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="Templates\treeList.template" />
-    <EmbeddedResource Include="Templates\CheckBox2.template" />
+    <EmbeddedResource Include="Templates\CheckBox2.template">
+      <LogicalName>Crow.CheckBox2.template</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="Templates\Tooltip.template">
       <LogicalName>Crow.Tooltip.template</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="Templates\ContextMenu.template">
       <LogicalName>Crow.ContextMenu.template</LogicalName>
     </EmbeddedResource>
-
     <EmbeddedResource Include="Templates\DockWindow.template">
       <LogicalName>Crow.DockWindow.template</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="Templates\HScrollBar.template">
       <LogicalName>Crow.HScrollBar.template</LogicalName>
     </EmbeddedResource>
+    <None Include="Crow.dll.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

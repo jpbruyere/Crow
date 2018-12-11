@@ -86,7 +86,7 @@ namespace tests
 		protected override void InitBackend ()
 		{
 			base.InitBackend ();
-			Keyboard.KeyDown += App_KeyboardKeyDown;
+			//Keyboard.KeyDown += App_KeyboardKeyDown;
 		}
 		public static void Main(string[] args)
 		{

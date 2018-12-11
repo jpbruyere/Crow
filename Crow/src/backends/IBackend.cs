@@ -33,6 +33,11 @@ namespace Crow
 		void CleanUp();
 		void Flush();
 		void ProcessEvents();
+
+		bool IsDown (Key key);
+		bool Shift { get; }
+		bool Ctrl { get; }
+		bool Alt { get; }
 	}
 }
 

@@ -365,6 +365,8 @@ namespace Crow.XCB
 
 		IntPtr conn;
 
+		XKB.XCBKeyboard Keyboard;
+
 
 		#region IBackend implementation
 		public void Init (Interface _iFace)
@@ -374,7 +376,7 @@ namespace Crow.XCB
 			conn = xcb_connect (null, IntPtr.Zero);
 
 
-			iFace.Keyboard = new  XKB.XCBKeyboard (conn);
+			Keyboard = new  XKB.XCBKeyboard (conn, iFace);
 
 			xcb_iterator_t scr_it = xcb_setup_roots_iterator (xcb_get_setup (conn));
 			IntPtr screen = scr_it.data;
@@ -420,7 +422,7 @@ namespace Crow.XCB
 
 		public void CleanUp ()
 		{
-			iFace.Keyboard.Destroy ();
+			Keyboard.Destroy ();
 
 			xcb_disconnect (conn);	
 		}
@@ -449,25 +451,36 @@ namespace Crow.XCB
 				else if(evt.button == xcb_button_t.WheelDown)
 					iFace.ProcessMouseWheelChanged (-Interface.WheelIncrement);
 				else
-					iFace.ProcessMouseButtonDown (evt.detail - 1);				
+					iFace.ProcessMouseButtonDown ((MouseButton)(evt.detail - 1));				
 				break;
 			case xcb_event_type.BUTTON_RELEASE:
 				if (evt.button == xcb_button_t.WheelUp || evt.button == xcb_button_t.WheelDown)
 					break;
-				iFace.ProcessMouseButtonUp (evt.detail - 1);
+				iFace.ProcessMouseButtonUp ((MouseButton)(evt.detail - 1));
 				break;
 			case xcb_event_type.KEY_PRESS:
-				iFace.Keyboard.HandleEvent (evt.keycode, true);
+				Keyboard.HandleEvent (evt.keycode, true);
 				break;
 			case xcb_event_type.KEY_RELEASE:
-				iFace.Keyboard.HandleEvent (evt.keycode, false);
+				Keyboard.HandleEvent (evt.keycode, false);
 				break;
 			default:
 				Console.WriteLine ("unknown event");
 				break;
 			}
 		}
-
+		public bool IsDown (Key key) {
+			return false;
+		}
+		public bool Shift {
+			get { return Keyboard.Shift; }
+		}
+		public bool Ctrl {
+			get { return Keyboard.Ctrl; }
+		}
+		public bool Alt {
+			get { return Keyboard.Alt;}
+		}
 		#endregion
 
 		static IntPtr findVisual (xcb_iterator_t scr_it, xcb_visualid_t visualId){
