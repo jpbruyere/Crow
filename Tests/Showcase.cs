@@ -51,8 +51,7 @@ namespace tests
 				//I set an empty object as datasource at this level to force update when new
 				//widgets are added to the interface
 				app.crowContainer.DataSource = new object ();
-				app.hideError ();
-                app.LoadIMLFragment(@"<Window Width='150' Height='150' Name='dock1'/>");
+				app.hideError ();                
                 app.Run();
 
 			}

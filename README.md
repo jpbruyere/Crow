@@ -1,7 +1,7 @@
 <h1 align="center">
   <br>
   <a href="http://www.amitmerchant.com/electron-markdownify">
-    <img src="https://github.com/jpbruyere/Crow/blob/master/Images/Icons/crow.png" alt="C.R.O.W." width="140">
+    <img src="https://github.com/jpbruyere/Crow/blob/master/Images/crow.png" alt="C.R.O.W." width="140">
   </a>
   <br>  
     <br>
@@ -57,26 +57,6 @@ Please report bugs and issues on [GitHub](https://github.com/jpbruyere/Crow/issu
 ## Getting Start
 
 ### Requirements
-- [mono >= 5.0](http://www.mono-project.com/download/)
 - [Cairo Graphic Library](https://cairographics.org/) >= 1.20 
 - [rsvg library](https://developer.gnome.org/rsvg/) for svg rendering
-- [nuget](https://www.nuget.org/).
 
-### Building from source
-
-_[Git](https://git-scm.com) has to be installed._
-
-```bash
-git clone https://github.com/jpbruyere/Crow.git     # Download source code from github
-cd Crow                                             # Enter the source directory
-nuget restore Crow.sln                              # Restore nuget packages
-xbuild  /p:Configuration=Release Crow.sln           # Build with Mono 
-```
-
-### Using nuget
-
-* add [Crow.OpenTK NuGet package](https://www.nuget.org/packages/Crow.OpenTK/) to your project.
-* Derive **CrowWindow** class.
-* Load some widget in the **OnLoad** override with `CrowWindow.Load` .
-* Build your project with **mono**. (**xbuild**)
-- copy **Crow.dll.config** to output directory if you have trouble finding native libs.

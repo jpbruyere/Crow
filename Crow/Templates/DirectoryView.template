@@ -13,7 +13,7 @@
 		</Border>
 	</ItemTemplate>
 	<ItemTemplate DataType="System.IO.DirectoryInfo" Data="GetFileSystemInfos">
-		<Expandable Caption="{Name}" >
+		<Expandable Caption="{Name}" MouseDoubleClick="/onClickForExpand">
 			<Template>
 				<VerticalStack>
 					<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"
@@ -27,8 +27,8 @@
 								SvgSub="{./IsExpanded}"
 								MouseEnter="{Background=LightGrey}"
 								MouseLeave="{Background=Transparent}"/>
-							<Image Margin="1" Width="14" Height="14"
-								Path="#Crow.Icons.folder.svg"/>
+							<Image Margin="1" Width="16" Height="16"
+								Path="#Crow.Icons.folder.svg" SvgSub="{./IsExpanded}"/>
 							<Label Text="{./Caption}"/>
 						</HorizontalStack>
 					</Border>

@@ -280,9 +280,6 @@
     <EmbeddedResource Include="icons\sign-out.svg">
       <LogicalName>icons.sign-out.svg</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="icons\folder.svg">
-      <LogicalName>icons.folder.svg</LogicalName>
-    </EmbeddedResource>
     <EmbeddedResource Include="icons\file.svg">
       <LogicalName>icons.file.svg</LogicalName>
     </EmbeddedResource>
