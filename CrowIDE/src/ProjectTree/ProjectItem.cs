@@ -45,14 +45,11 @@ namespace Crow.Coding
 
         public override Picture Icon {
             get {
-                Console.WriteLine("extension="+Extension);
-
                 switch (Extension)
                 {
                     case ".cs":
                         return new SvgPicture("#icons.cs-file.svg");
-                    case ".crow":
-                        Console.WriteLine("loading icons.xml-file");
+                    case ".crow":                        
                         return new SvgPicture("#icons.xml-file.svg");
                     case ".xml":
                         return new SvgPicture("#icons.xml-file.svg");

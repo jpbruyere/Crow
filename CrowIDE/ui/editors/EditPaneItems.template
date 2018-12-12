@@ -8,6 +8,7 @@
 <ItemTemplate Path="#Crow.Coding.ui.editors.SrcEdit.itemp" DataType=".cs"/>
 <ItemTemplate Path="#Crow.Coding.ui.editors.SrcEdit.itemp" DataType=".style"/>
 <ItemTemplate Path="#Crow.Coding.ui.editors.IMLEdit.itemp" DataType=".crow"/>
+<ItemTemplate Path="#Crow.Coding.ui.editors.IMLEdit.itemp" DataType=".itemp"/>
 <ItemTemplate Path="#Crow.Coding.ui.editors.IMLEdit.itemp" DataType=".template"/>
 <ItemTemplate DataType=".goml">
 	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">

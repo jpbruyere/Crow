@@ -160,7 +160,7 @@ namespace Crow
 							continue;
 						styling [tc] [currentProperty] = token;
 						#if DESIGN_MODE
-						styling [tc].Locations[currentProperty] = new FileLocation(resId, line,column);
+						styling [tc].Locations[currentProperty] = new FileLocation(resId, line, column - token.Length - 1, token.Length);
 						#endif
 						//System.Diagnostics.Debug.WriteLine ("Style: {3} : {0}.{1} = {2}", tc, currentProperty, token, resId);
 					}

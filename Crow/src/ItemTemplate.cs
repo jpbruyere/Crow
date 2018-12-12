@@ -180,6 +180,8 @@ namespace Crow
 			gotoItemsContainerNotFound = il.DefineLabel ();
 
 			il.Emit (OpCodes.Ldarg_1);//load sender of expand event
+			//TODO:double check if items container could be known when expand del is created
+			//to avoid a find by name
 			il.Emit(OpCodes.Ldstr, "ItemsContainer");//load name to find
 			il.Emit (OpCodes.Callvirt, CompilerServices.miFindByName);
 			il.Emit (OpCodes.Stloc_0);//save items container as loc0
@@ -288,7 +290,7 @@ namespace Crow
 				}
 				miGetDatas = piDatas.GetGetMethod ();
 				if (miGetDatas == null)
-					throw new Exception ("Read only property for fetching data in ItemTemplate: " + fetchMethodName);
+					throw new Exception ("Write only property for fetching data in ItemTemplate: " + fetchMethodName);
 			}
 
 			il.Emit (OpCodes.Callvirt, miGetDatas);

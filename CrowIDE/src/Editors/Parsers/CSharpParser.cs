@@ -349,10 +349,12 @@ namespace Crow.Coding
 					}
 
 					switch (cl.Tokens [tokPtr].Type) {
+					case TokenType.BlockCommentStart:
 					case TokenType.OpenBlock:
 						currentNode = addChildNode (currentNode, cl, tokPtr);
 						break;
-					case TokenType.CloseBlock:						
+					case TokenType.CloseBlock:
+					case TokenType.BlockCommentEnd:
 						closeNodeAndGoUp (ref currentNode, cl);
 						break;
 					case TokenType.Preprocessor:
@@ -369,7 +371,7 @@ namespace Crow.Coding
 				}
 				ptrLine++;
 			}
-			ptrLine = 0;
+			/*ptrLine = 0;
 			while (ptrLine < buffer.LineCount) {
 				CodeLine cl = buffer [ptrLine];
 				if (cl.IsFoldable) {
@@ -377,7 +379,7 @@ namespace Crow.Coding
 						cl.IsFolded = true;
 				}
 				ptrLine++;
-			}
+			}*/
 		}
 	}
 }

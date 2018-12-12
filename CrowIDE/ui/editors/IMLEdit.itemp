@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <TabItem QueryClose="OnQueryClose" IsSelected="{²IsSelected}" Template="#Crow.Coding.EditTabItem.template">
-
 	<VerticalStack>
         <VerticalStack Height="60%">
     		<Label DataSource="{../editor.HoverWidget}" Width="Stretched" Margin="2" Text="{Name}"/>
@@ -11,7 +10,7 @@
     						VerticalAlignment="Top" HorizontalAlignment="Left" Margin="4"
     						ContextCommands="{/Commands}"
     						AllowDrop="true" AllowDrag="true" Focusable="true"
-    						UpdateEnabled="{../../../../../../IsSelected}"
+    						UpdateEnabled="{IsSelected}"
     						ProjectNode="{}" SelectedItem="{²SelectedItem}"/>
     				</Scroller>
     				<ScrollBar Name="scrollbar1" Orientation="Vertical"                    

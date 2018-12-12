@@ -315,20 +315,10 @@ namespace Crow.Coding
 			if (IsDirty) {
 				MessageBox mb = MessageBox.ShowModal (CrowIDE.MainIFace,
 					                MessageBox.Type.YesNoCancel, $"{DisplayName} has unsaved changes.\nSave it now?");
-				mb.Yes += onClickSaveAndCloseNow;
-				mb.No += onClickCloseNow;
+				mb.Yes += (object _sender, EventArgs _e) => { Save (); Close (); };
+				mb.No += (object _sender, EventArgs _e) => Close();
 			} else
 				Close ();
-		}
-
-		void onClickCloseNow (object sender, EventArgs e)
-		{
-			Close ();
-		}
-		void onClickSaveAndCloseNow (object sender, EventArgs e)
-		{
-			Save ();
-			Close ();
 		}
 	}
 }

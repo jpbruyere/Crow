@@ -462,8 +462,8 @@ namespace Crow
 						cachedTextSize.Height = (int)Math.Ceiling ((fe.Ascent+fe.Descent) * Math.Max (1, lines.Count)) + Margin * 2;
 
 						try {
-							foreach (string s in lines) {
-								string l = s.Replace ("\t", new String (' ', Interface.TabSize));
+							for (int i = 0; i < lines.Count; i++) {
+								string l = lines[i].Replace ("\t", new String (' ', Interface.TabSize));
 
 								TextExtents tmp = gr.TextExtents (l);
 

@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <VerticalStack>
 	<HorizontalStack >
-		<SourceEditor Focusable="true" Name="editor" Font="monospace, 12" VerticalAlignment="Top" Margin="10"
-				CurrentLine="{²CurrentLine}" CurrentColumn="{²CurrentColumn}"
+		<SourceEditor Focusable="true" Name="editor" Font="monospace, 12" VerticalAlignment="Top" Margin="2"
+				CurrentLine="{²CurrentLine}" CurrentColumn="{²CurrentColumn}" HasFocus="{IsSelected}"
 				Foreground="Jet" Background="White" Width="Stretched" Height="Stretched"
 				ProjectNode="{}"  KeyDown="textView_KeyDown"/>
 		<ScrollBar Name="scrollbarY" Value="{²../editor.ScrollY}"

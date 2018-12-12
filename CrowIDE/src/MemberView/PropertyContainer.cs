@@ -177,7 +177,7 @@ namespace Crow.Coding
 
 
 		public Fill LabForeground {
-			get { return IsSetByIML ? Color.DarkBlue : HasStyling ? Color.Black : Color.DimGrey;}
+			get { return IsSetByIML ? Color.DarkBlue : HasStyling ? Color.Black : Color.Grey;}
 		}
 
 		/// <summary>
@@ -202,12 +202,15 @@ namespace Crow.Coding
 			ProjectFile pf;
 			if (!mview.ProjectNode.Project.TryGetProjectFileFromPath ("#" + fl.FilePath, out pf))
 				return;
-			Solution s = mview.ProjectNode.Project.solution;
-			if (!s.OpenedItems.Contains (pf))				
-				s.OpenedItems.AddElement (pf);
-			Debug.WriteLine (fl);
+
+			if (!pf.IsOpened)
+				pf.Open ();
+
 			pf.CurrentLine = fl.Line;
 			pf.CurrentColumn = fl.Column;
+
+			pf.IsSelected = true;
+
 		}
 
 		public override string ToString ()

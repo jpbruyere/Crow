@@ -84,13 +84,9 @@ namespace Crow.Coding
 		public override GraphicObject Load (string path)
 		{
 			ProjectFile pi;
-			try {
-				
-				if (ProjFile.Project.solution.GetProjectFileFromPath (path, out pi))
-					return CreateITorFromIMLFragment (pi.Source).CreateInstance();					
-			} catch (Exception ex) {
-				
-			}
+
+			if (ProjFile.Project.solution.GetProjectFileFromPath (path, out pi))
+				return CreateITorFromIMLFragment (pi.Source).CreateInstance();					
 		
 			return null;
 		}
@@ -100,9 +96,7 @@ namespace Crow.Coding
 			if (ProjFile.Project.solution.GetProjectFileFromPath (path, out pi)) {
 				return new FileStream (pi.AbsolutePath, FileMode.Open);	
 			}
-			
-			Console.WriteLine ("File not found: {0}", path);
-			return null;
+			throw new Exception ($"In Design File not found: {path}");
 		}
 		public override bool ProcessMouseMove (int x, int y)
 		{

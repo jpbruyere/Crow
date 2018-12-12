@@ -40,7 +40,7 @@ namespace Crow.Coding
 		//Dictionary<string,PropertyContainer[]> propContainersCache = new Dictionary<string, PropertyContainer[]>();
 		Dictionary<string,List<CategoryContainer>> categoryContainersCache = new Dictionary<string,List<CategoryContainer>> ();
 
-		[XmlAttributeAttribute][DefaultValue(null)]
+		[DefaultValue(null)]
 		public virtual object Instance {
 			get { return instance; }
 			set {

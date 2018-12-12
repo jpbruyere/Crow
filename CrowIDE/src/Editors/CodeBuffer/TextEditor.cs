@@ -485,7 +485,7 @@ namespace Crow.Text
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
-			if (!this.Focusable)
+			if (!Focusable)
 				return;
 
 			base.onMouseDown (sender, e);

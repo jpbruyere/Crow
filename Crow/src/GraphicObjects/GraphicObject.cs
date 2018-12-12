@@ -74,7 +74,7 @@ namespace Crow
 		//public Dictionary<string,FileLocation> design_iml_locations = new Dictionary<string, FileLocation>();
 		public Dictionary<string,FileLocation> design_style_locations = new Dictionary<string, FileLocation>();
 
-		internal void design_add_style_location (string memberName, string path, int line, int col) {
+		internal void design_add_style_location (string memberName, string path, int line, int col) {			
 			if (design_style_locations.ContainsKey(memberName)){
 				Console.WriteLine ("default value localtion already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
 				return;
@@ -376,7 +376,7 @@ namespace Crow
 		[XmlIgnore]public virtual Rectangle ClientRectangle {
 			get {
 				Rectangle cb = Slot.Size;
-				cb.Inflate ( - Margin);
+				cb.Inflate ( - margin);
 				return cb;
 			}
 		}
@@ -621,7 +621,7 @@ namespace Crow
 				if (width == value)
 					return;
 				if (value.IsFixed) {
-					if (value < MinimumSize.Width || (value > MaximumSize.Width && MaximumSize.Width > 0))
+					if (value < minimumSize.Width || (value > maximumSize.Width && maximumSize.Width > 0))
 						return;
 				}
 				Measure old = width;
@@ -662,7 +662,7 @@ namespace Crow
 				if (height == value)
 					return;
 				if (value.IsFixed) {
-					if (value < MinimumSize.Height || (value > MaximumSize.Height && MaximumSize.Height > 0))
+					if (value < minimumSize.Height || (value > maximumSize.Height && maximumSize.Height > 0))
 						return;
 				}
 				Measure old = height;
@@ -790,7 +790,7 @@ namespace Crow
 				NotifyValueChanged ("Background", background);
 				RegisterForRedraw ();
 				if (background is SolidColor) {
-					if ((Background as SolidColor).Equals (Color.Clear))
+					if ((background as SolidColor).Equals (Color.Clear))
 						clearBackground = true;
 				}
 			}
@@ -1046,9 +1046,9 @@ namespace Crow
 
 			Type thisType = this.GetType ();
 
-			if (!string.IsNullOrEmpty (Style)) {
-				if (IFace.DefaultValuesLoader.ContainsKey (Style)) {
-					IFace.DefaultValuesLoader [Style] (this);
+			if (!string.IsNullOrEmpty (style)) {
+				if (IFace.DefaultValuesLoader.ContainsKey (style)) {
+					IFace.DefaultValuesLoader [style] (this);
 					onInitialized (this, null);
 					return;
 				}
@@ -1069,10 +1069,10 @@ namespace Crow
 			//2: class name
 			//3: style may have been registered with their ressource ID minus .style extention
 			//   those files being placed in a Styles folder
-			string styleKey = Style;
-			if (!string.IsNullOrEmpty (Style)) {
-				if (IFace.Styling.ContainsKey (Style)) {
-					styling.Add (IFace.Styling [Style]);
+			string styleKey = style;
+			if (!string.IsNullOrEmpty (style)) {
+				if (IFace.Styling.ContainsKey (style)) {
+					styling.Add (IFace.Styling [style]);
 				}
 			}
 			if (IFace.Styling.ContainsKey (thisType.FullName)) {
@@ -1147,20 +1147,11 @@ namespace Crow
 					continue;
 
 				object defaultValue;
-				string name = "";
-				XmlAttributeAttribute xaa = (XmlAttributeAttribute)pi.GetCustomAttribute (typeof(XmlAttributeAttribute));
-				if (xaa != null) {
-					if (string.IsNullOrEmpty (xaa.AttributeName))
-						name = pi.Name;
-					else
-						name = xaa.AttributeName;
-				}else
-					name = pi.Name;
-				
+
 				int styleIndex = -1;
 				if (styling.Count > 0){
 					for (int i = 0; i < styling.Count; i++) {
-						if (styling[i].ContainsKey (name)){
+						if (styling[i].ContainsKey (pi.Name)){
 							styleIndex = i;
 							break;
 						}
@@ -1168,15 +1159,15 @@ namespace Crow
 				}
 				if (styleIndex >= 0){
 					if (pi.PropertyType.IsEnum)//maybe should be in parser..
-						defaultValue = Enum.Parse(pi.PropertyType, (string)styling[styleIndex] [name], true);
+						defaultValue = Enum.Parse(pi.PropertyType, (string)styling[styleIndex] [pi.Name], true);
 					else
-						defaultValue = styling[styleIndex] [name];
+						defaultValue = styling[styleIndex] [pi.Name];
 
 					#if DESIGN_MODE
 					if (defaultValue != null){
-						FileLocation fl = styling[styleIndex].Locations[name];
+						FileLocation fl = styling[styleIndex].Locations[pi.Name];
 						il.Emit (OpCodes.Ldloc_0);
-						il.Emit (OpCodes.Ldstr, name);
+						il.Emit (OpCodes.Ldstr, pi.Name);
 						il.Emit (OpCodes.Ldstr, fl.FilePath);
 						il.Emit (OpCodes.Ldc_I4, fl.Line);
 						il.Emit (OpCodes.Ldc_I4, fl.Column);
@@ -1184,7 +1175,7 @@ namespace Crow
 
 						il.Emit (OpCodes.Ldloc_0);
 						il.Emit (OpCodes.Ldfld, typeof(GraphicObject).GetField("design_style_values"));
-						il.Emit (OpCodes.Ldstr, name);
+						il.Emit (OpCodes.Ldstr, pi.Name);
 						il.Emit (OpCodes.Ldstr, defaultValue.ToString());
 						il.Emit (OpCodes.Call, CompilerServices.miDicStrStrAdd);
 					}
@@ -1377,7 +1368,7 @@ namespace Crow
 				r.Width -= r.Right - cb.Right;
 			if (r.Bottom > cb.Bottom)
 				r.Height -= r.Bottom - cb.Bottom;
-			if (CacheEnabled && !IsDirty)
+			if (cacheEnabled && !IsDirty)
 				Clipping.UnionRectangle (r);
 			if (Parent == null)
 				return;
@@ -1414,7 +1405,7 @@ namespace Crow
 		/// <summary> return size of content + margins </summary>
 		protected virtual int measureRawSize (LayoutingType lt) {
 			return lt == LayoutingType.Width ?
-				contentSize.Width + 2 * Margin: contentSize.Height + 2 * Margin;
+				contentSize.Width + 2 * margin: contentSize.Height + 2 * margin;
 		}
 		/// <summary> By default in groups, LayoutingType.ArrangeChildren is reset </summary>
 		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){
@@ -1490,13 +1481,13 @@ namespace Crow
 
 			switch (layoutType) {
 			case LayoutingType.X:
-				if (Left == 0) {
+				if (left == 0) {
 
 					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Width) ||
 					    RegisteredLayoutings.HasFlag (LayoutingType.Width))
 						return false;
 
-					switch (HorizontalAlignment) {
+					switch (horizontalAlignment) {
 					case HorizontalAlignment.Left:
 						Slot.X = 0;
 						break;
@@ -1508,7 +1499,7 @@ namespace Crow
 						break;
 					}
 				} else
-					Slot.X = Left;
+					Slot.X = left;
 
 				if (LastSlots.X == Slot.X)
 					break;
@@ -1520,13 +1511,13 @@ namespace Crow
 				LastSlots.X = Slot.X;
 				break;
 			case LayoutingType.Y:
-				if (Top == 0) {
+				if (top == 0) {
 
 					if (Parent.RegisteredLayoutings.HasFlag (LayoutingType.Height) ||
 					    RegisteredLayoutings.HasFlag (LayoutingType.Height))
 						return false;
 
-					switch (VerticalAlignment) {
+					switch (verticalAlignment) {
 					case VerticalAlignment.Top://this could be processed even if parent Height is not known
 						Slot.Y = 0;
 						break;
@@ -1538,7 +1529,7 @@ namespace Crow
 						break;
 					}
 				} else
-					Slot.Y = Top;
+					Slot.Y = top;
 
 				if (LastSlots.Y == Slot.Y)
 					break;
@@ -1550,7 +1541,7 @@ namespace Crow
 				LastSlots.Y = Slot.Y;
 				break;
 			case LayoutingType.Width:
-				if (Visible) {
+				if (isVisible) {
 					if (Width.IsFixed)
 						Slot.Width = Width;
 					else if (Width == Measure.Fit) {
@@ -1566,11 +1557,11 @@ namespace Crow
 						return false;
 
 					//size constrain
-					if (Slot.Width < MinimumSize.Width) {
-						Slot.Width = MinimumSize.Width;
+					if (Slot.Width < minimumSize.Width) {
+						Slot.Width = minimumSize.Width;
 						//NotifyValueChanged ("WidthPolicy", Measure.Stretched);
-					} else if (Slot.Width > MaximumSize.Width && MaximumSize.Width > 0) {
-						Slot.Width = MaximumSize.Width;
+					} else if (Slot.Width > maximumSize.Width && maximumSize.Width > 0) {
+						Slot.Width = maximumSize.Width;
 						//NotifyValueChanged ("WidthPolicy", Measure.Stretched);
 					}
 				} else
@@ -1586,7 +1577,7 @@ namespace Crow
 				LastSlots.Width = Slot.Width;
 				break;
 			case LayoutingType.Height:
-				if (Visible) {
+				if (isVisible) {
 					if (Height.IsFixed)
 						Slot.Height = Height;
 					else if (Height == Measure.Fit) {
@@ -1602,11 +1593,11 @@ namespace Crow
 						return false;
 
 					//size constrain
-					if (Slot.Height < MinimumSize.Height) {
-						Slot.Height = MinimumSize.Height;
+					if (Slot.Height < minimumSize.Height) {
+						Slot.Height = minimumSize.Height;
 						//NotifyValueChanged ("HeightPolicy", Measure.Stretched);
-					} else if (Slot.Height > MaximumSize.Height && MaximumSize.Height > 0) {
-						Slot.Height = MaximumSize.Height;
+					} else if (Slot.Height > maximumSize.Height && maximumSize.Height > 0) {
+						Slot.Height = maximumSize.Height;
 						//NotifyValueChanged ("HeightPolicy", Measure.Stretched);
 					}
 				} else
@@ -1641,7 +1632,7 @@ namespace Crow
 
 			Rectangle rBack = new Rectangle (Slot.Size);
 
-			Background.SetAsSource (gr, rBack);
+			background.SetAsSource (gr, rBack);
 			CairoHelpers.CairoRectangle (gr, rBack, cornerRadius);
 			gr.Fill ();
 
@@ -1769,7 +1760,7 @@ namespace Crow
 		{
 			if (parent == null)
 				return false;
-			if (!(Visible & isEnabled)||IsDragged)
+			if (!(isVisible & isEnabled)||IsDragged)
 				return false;
 			if (!parent.PointIsIn(ref m))
 				return false;
@@ -1778,7 +1769,7 @@ namespace Crow
 		}
 		public virtual bool MouseIsIn(Point m)
 		{			
-			return (!(Visible & isEnabled)||IsDragged) ? false : PointIsIn (ref m);
+			return (!(isVisible & isEnabled)||IsDragged) ? false : PointIsIn (ref m);
 		}
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
@@ -1791,7 +1782,7 @@ namespace Crow
 		}
 		public virtual void onMouseMove(object sender, MouseMoveEventArgs e)
 		{
-			if (AllowDrag & HasFocus & e.Mouse.LeftButton == ButtonState.Pressed) {
+			if (allowDrag & hasFocus & e.Mouse.LeftButton == ButtonState.Pressed) {
 				if (IFace.DragAndDropOperation == null) {
 					IFace.DragAndDropOperation = new DragDropEventArgs (this);
 					onStartDrag (this, IFace.DragAndDropOperation);
@@ -1815,12 +1806,12 @@ namespace Crow
 			Debug.WriteLine("MOUSE DOWN => " + this.ToString());
 			#endif
 
-			if (this.Focusable && !Interface.FocusOnHover) {
+			if (focusable && !Interface.FocusOnHover) {
 				BubblingMouseButtonEventArg be = e as BubblingMouseButtonEventArg;
 				if (be.Focused == null) {
 					be.Focused = this;
 					IFace.FocusedWidget = this;
-					if (e.Button == MouseButton.Right && this.ContextCommands != null)
+					if (e.Button == MouseButton.Right && contextCommands != null)
 						IFace.ShowContextMenu (this);					
 				}
 			}
@@ -1924,6 +1915,8 @@ namespace Crow
 		#endregion
 
 		protected virtual void onFocused(object sender, EventArgs e){
+			if (IFace.FocusedWidget != this)
+				IFace.FocusedWidget = this;
 			#if DEBUG_FOCUS
 			Debug.WriteLine("Focused => " + this.ToString());
 			#endif

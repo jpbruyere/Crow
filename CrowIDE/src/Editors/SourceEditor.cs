@@ -214,9 +214,9 @@ namespace Crow.Coding
 		{
 			Debug.WriteLine("\t\tSourceEditor updateEditorFromProjFile");
 
-			buffer.editMutex.EnterWriteLock ();
+			//buffer.editMutex.EnterWriteLock ();
 			loadSource ();
-			buffer.editMutex.ExitWriteLock ();
+			//buffer.editMutex.ExitWriteLock ();
 
 			isDirty = false;
 			oldSource = projFile.Source;
@@ -564,7 +564,7 @@ namespace Crow.Coding
 						mgFg = Color.White;
 					else
 						mgFg = Color.LightGrey;
-				}else if (buffer.CurrentLine == lineIndex) {
+				}else if (buffer.CurrentLine == lineIndex && HasFocus) {
 					mgFg = Color.Black;
 					mgBg = Color.DarkGrey;
 				}
@@ -997,7 +997,14 @@ namespace Crow.Coding
 			buffer.GotoWordEnd ();
 			buffer.SetSelEndPos ();
 		}
-
+		public void MakeSelection (int lineStart, int colStart, int lineEnd, int colEnd) {
+			buffer.CurrentLine = lineStart;
+			buffer.CurrentColumn = colStart;
+			buffer.SetSelStartPos ();
+			buffer.CurrentLine = lineEnd;
+			buffer.CurrentColumn = colEnd;
+			buffer.SetSelEndPos ();
+		}
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
 		{
 			base.onMouseWheel (sender, e);

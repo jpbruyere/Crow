@@ -79,7 +79,7 @@ namespace Crow.Coding
 				RegisterForRedraw ();
 			}
 		}
-		[XmlAttributeAttribute]public GraphicObject SelectedItem {
+		public GraphicObject SelectedItem {
 			get { return selectedItem; }
 			set {
 				if (selectedItem == value)
