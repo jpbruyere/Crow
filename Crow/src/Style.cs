@@ -33,11 +33,13 @@ namespace Crow
 		public string FilePath;
 		public int Line;
 		public int Column;
+		public int Length;
 
-		public FileLocation(string filePath, int line, int column){
+		public FileLocation(string filePath, int line, int column, int length = 0){
 			FilePath = filePath;
 			Line = line;
 			Column = column;
+			Length = length;
 		}
 		public override string ToString ()
 		{

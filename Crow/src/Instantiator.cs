@@ -333,6 +333,8 @@ namespace Crow.IML
 						} else {
 							using (Stream stream = iface.GetStreamFromPath (itemTemplatePath)) {
 								//itemtemplate files may have multiple root nodes
+								if (stream == null)
+									Debugger.Break ();
 								XmlReaderSettings itrSettings = new XmlReaderSettings { ConformanceLevel = ConformanceLevel.Fragment };
 								using (XmlReader itr = XmlReader.Create (stream, itrSettings)) {									
 									while (itr.Read ()) {

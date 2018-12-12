@@ -17,9 +17,9 @@
 				<GraphicObject Width="5" Height="5"/>
 			</HorizontalStack>
 		</Border>
-		<HorizontalStack Margin="5" Width="Stretched">
+		<HorizontalStack Margin="5" >
 			<Image Name="Image" Width="50" Height="30" Path="{./MsgIcon}" />
-			<Label Margin="5" Font="{./Font}" Width="Stretched" Text="{./Message}"				
+			<Label Margin="5" Font="{./Font}" Text="{./Message}"				
 				TextAlignment="Center"
 				Multiline="true" />		
 		</HorizontalStack>

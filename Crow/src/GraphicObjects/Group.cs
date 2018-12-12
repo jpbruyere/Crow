@@ -298,9 +298,8 @@ namespace Crow
 
 			childrenRWLock.EnterReadLock ();
 
-			foreach (GraphicObject g in Children) {
-				g.Paint (ref gr);
-			}
+			for (int i = 0; i < Children.Count; i++) 
+				Children[i].Paint (ref gr);			
 
 			childrenRWLock.ExitReadLock ();
 			gr.Restore ();
