@@ -25,15 +25,13 @@
 // THE SOFTWARE.
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml;
 using System.IO;
-using Crow;
+using System.Linq;
 using System.Threading;
+using System.Xml;
 
-namespace Crow.Coding
-{	
-	public class ProjectFile : ProjectItem {		
+namespace Crow.Coding {
+    public class ProjectFile : ProjectItem {		
 		bool isOpened = false;
 		DateTime accessTime;
 		string source;
@@ -222,7 +220,7 @@ namespace Crow.Coding
 			}
 		}
 
-		public void Open () {			
+		public virtual void Open () {			
 			accessTime = System.IO.File.GetLastWriteTime (AbsolutePath);
 			using (StreamReader sr = new StreamReader (AbsolutePath)) {
 				source = sr.ReadToEnd ();

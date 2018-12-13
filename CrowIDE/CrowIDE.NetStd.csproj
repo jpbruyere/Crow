@@ -23,9 +23,11 @@
     <EmbeddedResource Remove="icons\blank-file2.svg" />
   </ItemGroup>
   <ItemGroup>
+
     <PackageReference Include="System.CodeDom" Version="4.5.0" />
+<!--<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />-->
         
-    <Compile Include="src\**\*.cs" />  
+    <Compile Include="src\**\*.cs" Exclude="src\ProjectTree\CSProjectFile.cs" />  
         
     <ProjectReference Include="..\Crow\Crow.NetStd.csproj" />
         
@@ -45,7 +47,6 @@
     </EmbeddedResource>
         
     <EmbeddedResource Include="IDE.style" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
   </ItemGroup>
     
   <ItemGroup>

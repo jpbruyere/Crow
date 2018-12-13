@@ -17,7 +17,7 @@
     <DebugType>portable</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="*.cs" />  
+    <Compile Include="*.cs" Exclude="testClass.cs" />  
         
     <ProjectReference Include="..\Crow\Crow.NetStd.csproj" />
         
@@ -36,4 +36,7 @@
     </None>
   </ItemGroup>
     
+<!--  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
+  </ItemGroup>-->
 </Project>

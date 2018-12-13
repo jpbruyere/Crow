@@ -414,8 +414,9 @@ namespace Crow.XCB
 			xcb_flush (conn);
 
 
-			IntPtr visual = findVisual (scr_it, scr.root_visual);	
+			IntPtr visual = findVisual (scr_it, scr.root_visual);
 
+			//loadCursors ();	
 
 			iFace.surf = new Cairo.XcbSurface (conn, win, visual, iFace.ClientRectangle.Width, iFace.ClientRectangle.Height);
 		}
@@ -482,6 +483,20 @@ namespace Crow.XCB
 			get { return Keyboard.Alt;}
 		}
 		#endregion
+
+		void loadCursors ()
+		{
+			//Load cursors
+			XCursor.Cross = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.cross").Cursors [0];
+			XCursor.Default = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.arrow").Cursors [0];
+			XCursor.NW = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.top_left_corner").Cursors [0];
+			XCursor.NE = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.top_right_corner").Cursors [0];
+			XCursor.SW = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.bottom_left_corner").Cursors [0];
+			XCursor.SE = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.bottom_right_corner").Cursors [0];
+			XCursor.H = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.sb_h_double_arrow").Cursors [0];
+			XCursor.V = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.sb_v_double_arrow").Cursors [0];
+			XCursor.Text = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.ibeam").Cursors [0];
+		}
 
 		static IntPtr findVisual (xcb_iterator_t scr_it, xcb_visualid_t visualId){
 			for (; scr_it.rem > 0; xcb_screen_next (ref scr_it)) {

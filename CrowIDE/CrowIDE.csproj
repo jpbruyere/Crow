@@ -11,14 +11,9 @@
     <AssemblyName>CrowIDE</AssemblyName>
     <OutputPath>$(SolutionDir)build/$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)build/obj/$(Configuration)</IntermediateOutputPath>
-    <CustomCommands>
-      <CustomCommands>
-        <Command type="Execute" command="${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" />
-      </CustomCommands>
-    </CustomCommands>
     <ReleaseVersion>0.8.0</ReleaseVersion>
     <StartupObject>Crow.Coding.CrowIDE</StartupObject>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,24 +35,7 @@
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
     <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
-    <StartAction>Program</StartAction>
-    <StartProgram>%24{TargetName}</StartProgram>
-    <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
-    <ConsolePause>false</ConsolePause>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Custom Command' ">
-    <StartAction>Program</StartAction>
-    <StartProgram>%24{TargetName}</StartProgram>
-    <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
-    <ConsolePause>false</ConsolePause>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Custom Command' ">
-    <StartAction>Program</StartAction>
-    <StartProgram>%24{TargetName}</StartProgram>
-    <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
-    <ConsolePause>false</ConsolePause>
-  </PropertyGroup>
+
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -72,44 +50,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\CrowIDE.cs" />
-    <Compile Include="src\Extensions.cs" />
-    <Compile Include="src\Solution.cs" />
-    <Compile Include="src\Project.cs" />
-    <Compile Include="src\VerticalLine.cs" />
-    <Compile Include="src\DesignInterface.cs" />
-    <Compile Include="src\SolutionControler.cs" />
-    <Compile Include="src\INetProject.cs" />
-    <Compile Include="src\MemberView\MembersView.cs" />
-    <Compile Include="src\MemberView\PropertyContainer.cs" />
-    <Compile Include="src\MemberView\CategoryContainer.cs" />
-    <Compile Include="src\GraphicObjectDesignContainer.cs" />
-    <Compile Include="src\Editors\Editor.cs" />
-    <Compile Include="src\Editors\EditPane.cs" />
-    <Compile Include="src\Editors\ImlVisualEditor.cs" />
-    <Compile Include="src\Editors\SvgEditor.cs" />
-    <Compile Include="src\Editors\Parsers\BufferParser.cs" />
-    <Compile Include="src\Editors\Parsers\CSharpParser.cs" />
-    <Compile Include="src\Editors\Parsers\StyleParser.cs" />
-    <Compile Include="src\Editors\Parsers\XMLParser.cs" />
-    <Compile Include="src\Editors\CodeBuffer\CodeBuffer.cs" />
-    <Compile Include="src\Editors\CodeBuffer\CodeBufferEventArgs.cs" />
-    <Compile Include="src\Editors\CodeBuffer\CodeLine.cs" />
-    <Compile Include="src\Editors\CodeBuffer\Node.cs" />
-    <Compile Include="src\Editors\CodeBuffer\TextFormatting.cs" />
-    <Compile Include="src\Editors\CodeBuffer\Token.cs" />
-    <Compile Include="src\ProjectTree\ProjectNodes.cs" />
-    <Compile Include="src\ProjectTree\ProjectItem.cs" />
-    <Compile Include="src\ProjectTree\ProjectReference.cs" />
-    <Compile Include="src\ProjectTree\ProjectFile.cs" />
-    <Compile Include="src\ProjectTree\ImlProjectItem.cs" />
-    <Compile Include="src\Editors\CodeBuffer\TextBuffer.cs" />
-    <Compile Include="src\Editors\CodeBuffer\TextEditor.cs" />
-    <Compile Include="src\Editors\ImlSchematicEditor.cs" />
-    <Compile Include="src\Editors\CodeBuffer\TextBufferEventArgs.cs" />
-    <Compile Include="src\Editors\Parsers2\Tokenizer.cs" />
-    <Compile Include="src\Editors\SourceEditor.cs" />
-    <Compile Include="src\ProjectTree\StyleProjectItem.cs" />
+    <Compile Include="src\**\*.cs" Exclude="src\ProjectTree\CSProjectFile.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ui\" />

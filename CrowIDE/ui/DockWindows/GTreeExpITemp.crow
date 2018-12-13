@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0"?>
-<Expandable Caption="{Name}" IsExpanded="{²IsExpanded}">
+<Expandable IsExpanded="{²IsExpanded}" MouseDoubleClick="/onClickForExpand">
 	<Template>
 		<VerticalStack>
-			<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"						
+			<Border CornerRadius="2" Margin="0" Height="Fit"						
 					Foreground="Transparent"
 					MouseEnter="{Foreground=DimGrey}"
 					MouseLeave="{Foreground=Transparent}">
@@ -16,7 +16,7 @@
 					<Border Width="16" Height="16" Foreground="Black" Background="DimGrey">
 						<Image Margin="2" Path="{GetIcon}" />
 					</Border>
-					<Label Text="{./Caption}"/>
+					<Label Text="{DesignName}"/>
 				</HorizontalStack>
 			</Border>
 			<Container Name="Content" Visible="false"/>

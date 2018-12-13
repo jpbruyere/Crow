@@ -411,13 +411,7 @@ namespace Crow
 			loadingTime.ElapsedMilliseconds, this.ToString());
 			#endif
 		}
-		string getItempKey(Type dataType, object o, string propertyName){
-			try {
-				return dataType.GetProperty (propertyName).GetGetMethod ().Invoke (o, null)?.ToString();
-			} catch  {
-				return dataType.FullName;
-			}
-		}
+
 		protected void loadItem(object o, Group page, string _dataTest){
 			if (o == null)//TODO:surely a threading sync problem
 				return;
@@ -426,14 +420,23 @@ namespace Crow
 			Type dataType = o.GetType ();
 			string itempKey = dataType.FullName;
 
-			if (_dataTest != "TypeOf")
-				itempKey = getItempKey (dataType, o, _dataTest);
+			//if item template selection is not done depending on the type of item
+			//dataTest must contains a member name of the item 
+			if (_dataTest != "TypeOf") {
+				try {
+					itempKey = CompilerServices.getValue (dataType, o, _dataTest)?.ToString ();
+				} catch {
+					itempKey = dataType.FullName;
+				}
+			}
 
 			if (ItemTemplates.ContainsKey (itempKey))
 				iTemp = ItemTemplates [itempKey];
 			else {
 				foreach (string it in ItemTemplates.Keys) {
-					Type t = CompilerServices.tryGetType (it);
+					if (it == "default")
+						continue;
+					Type t = CompilerServices.getTypeFromName (it);
 					if (t == null)
 						continue;
 					if (t.IsAssignableFrom (dataType)) {//TODO:types could be cached

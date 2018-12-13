@@ -149,7 +149,10 @@ namespace Crow
 				}
 			}
 			return di;
-		}			
+		}
+        public string DesignName {
+            get { return GetType ().Name + design_id; }
+        }
 		#endif
 
 		#region IDisposable implementation

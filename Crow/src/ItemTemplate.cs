@@ -143,18 +143,9 @@ namespace Crow
 		/// </summary>
 		/// <param name="host">Host.</param>
 		public void CreateExpandDelegate (TemplatedGroup host){
-			Type dataType = null;
-			//if (host.DataTest == "TypeOf"){
-				dataType = CompilerServices.tryGetType(strDataType);
-//				if (dataType == null) {
-//					Debug.WriteLine ("ItemTemplate error: DataType not found: {0}.", strDataType);
-//					return;
-//				}
-//			}
+			Type dataType = CompilerServices.getTypeFromName(strDataType);
 			Type tmpGrpType = typeof(TemplatedGroup);
 			Type evtType = typeof(EventHandler);
-
-			//PropertyInfo piData = tmpGrpType.GetProperty ("Data");
 
 			MethodInfo evtInvoke = evtType.GetMethod ("Invoke");
 			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
@@ -195,28 +186,11 @@ namespace Crow
 			il.Emit (OpCodes.Ldarg_1);
 			il.Emit (OpCodes.Call, CompilerServices.miIsAlreadyExpanded);
 			il.Emit (OpCodes.Brtrue, gotoEnd);
-//			il.Emit (OpCodes.Ldloc_0);
-//			il.Emit (OpCodes.Callvirt, piData.GetGetMethod ());
-//			il.Emit (OpCodes.Brfalse, ifDataIsNull);
-//			il.Emit (OpCodes.Br, gotoEnd);
 
-//			il.MarkLabel(ifDataIsNull);
-
-			//copy the ref of ItemTemplates list TODO: maybe find another way to share it among the nodes?
-//			FieldInfo fiTemplates = tmpGrpType.GetField("ItemTemplates");
-//			il.Emit (OpCodes.Ldloc_0);
-//			il.Emit (OpCodes.Ldarg_0);
-//			il.Emit (OpCodes.Ldfld, fiTemplates);
-//			il.Emit (OpCodes.Stfld, fiTemplates);
-
-			//call 'fetchMethodName' from the dataSource to build the sub nodes list
-			//il.Emit (OpCodes.Ldarg_0);//load root templatedGroop
-
+			//get the dataSource of the sender
 			il.Emit (OpCodes.Ldarg_0);//push root TemplatedGroup into the stack
 			il.Emit (OpCodes.Ldarg_1);//load sender node of expand
-			il.Emit (OpCodes.Callvirt, CompilerServices.miGetDataSource);//get the dataSource of the sender
-
-
+			il.Emit (OpCodes.Callvirt, CompilerServices.miGetDataSource);
 
 			if (fetchMethodName != "self") {//special keyword self allows the use of recurent list<<<
 				if (dataType == null) {
@@ -292,9 +266,11 @@ namespace Crow
 				if (miGetDatas == null)
 					throw new Exception ("Write only property for fetching data in ItemTemplate: " + fetchMethodName);
 			}
-
-			il.Emit (OpCodes.Callvirt, miGetDatas);
-		}
+            if (miGetDatas.IsStatic)
+			    il.Emit (OpCodes.Call, miGetDatas);
+            else
+                il.Emit (OpCodes.Callvirt, miGetDatas);
+        }
 
 	
 	

@@ -24,10 +24,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -37,7 +33,10 @@ using Cairo;
 using System.Globalization;
 using Crow.IML;
 using System.Runtime.InteropServices;
-
+using System;
+using System.IO;
+using System.Diagnostics;
+using System.Collections.Generic;
 
 
 namespace Crow
@@ -412,18 +411,7 @@ namespace Crow
 
 			}
 		}
-		void loadCursors(){
-			//Load cursors
-			XCursor.Cross = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.cross").Cursors[0];
-			XCursor.Default = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.arrow").Cursors[0];
-			XCursor.NW = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.top_left_corner").Cursors[0];
-			XCursor.NE = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.top_right_corner").Cursors[0];
-			XCursor.SW = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.bottom_left_corner").Cursors[0];
-			XCursor.SE = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.bottom_right_corner").Cursors[0];
-			XCursor.H = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.sb_h_double_arrow").Cursors[0];
-			XCursor.V = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.sb_v_double_arrow").Cursors[0];
-			XCursor.Text = XCursorFile.Load(this, "#Crow.Images.Icons.Cursors.ibeam").Cursors[0];
-		}
+
 		#endregion
 
 		#region Templates
@@ -499,10 +487,10 @@ namespace Crow
 				string resId = path.Substring (1);
 				//try/catch added to prevent nunit error
 				try {
-					stream = System.Reflection.Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
+					stream = Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
 				} catch{}
 				if (stream == null)//try to find ressource in Crow assembly
-					stream = System.Reflection.Assembly.GetExecutingAssembly ().GetManifestResourceStream (resId);
+					stream = Assembly.GetExecutingAssembly ().GetManifestResourceStream (resId);
                 if (stream == null)                
                     throw new Exception("Resource not found: " + path);
 

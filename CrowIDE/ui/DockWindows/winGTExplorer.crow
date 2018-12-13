@@ -11,7 +11,7 @@
 						<Border Width="16" Height="16" Foreground="Black" Background="DimGrey">
 							<Image Margin="2" Path="{GetIcon}" />
 						</Border>
-						<Label Text="{Name}" Width="Stretched"/>
+						<Label Text="{DesignName}" Width="Stretched"/>
 					</HorizontalStack>
 				</Border>
 			</ItemTemplate>

@@ -77,8 +77,8 @@ namespace Crow.Coding
 			CMDViewStyling = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.DockWindows.winStyleView.crow",this)))
 			{ Caption = "Styling Explorer", CanExecute = true};
 				
-			CMDViewGTExp = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.DockWindows.winGTExplorer.crow")))
-			{ Caption = "Graphic Tree Explorer", CanExecute = false};
+			CMDViewGTExp = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.DockWindows.winGTExplorer.crow",this)))
+			{ Caption = "Graphic Tree Explorer", CanExecute = true};
 			CMDCompile = new Command(new Action(() => compileSolution()))
 			{ Caption = "Compile", CanExecute = false};
 			CMDViewProjProps = new Command(new Action(loadProjProps))
@@ -157,12 +157,7 @@ namespace Crow.Coding
 
 		void initIde() {
 
-            foreach (string s in System.Reflection.Assembly.GetEntryAssembly().GetManifestResourceNames())
-            {
-                Console.WriteLine(s);
-            }
-
-            initCommands ();
+			initCommands ();
 
 			GraphicObject go = AddWidget (@"#Crow.Coding.ui.CrowIDE.crow");
 			go.DataSource = this;
