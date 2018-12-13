@@ -68,6 +68,8 @@ namespace Crow.IML
 		}
 		#endregion
 
+		internal static Dictionary<string, Type> knownGOTypes = new Dictionary<string, Type> ();
+
 		public Type RootType;
 		InstanciatorInvoker loader;
 		protected Interface iface;
@@ -1183,15 +1185,21 @@ namespace Crow.IML
 		/// <returns>the corresponding type object</returns>
 		/// <param name="typeName">graphic object type name without its namespace</param>
 		Type tryGetGOType (string typeName){
+			if (knownGOTypes.ContainsKey (typeName))
+				return knownGOTypes [typeName];
 			Type t = Type.GetType ("Crow." + typeName);
-			if (t != null)
-				return t;			
+			if (t != null) {
+				knownGOTypes.Add (typeName, t);
+				return t;
+			}			
 			foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies()) {
 				if (a.IsDynamic)
 					continue;
 				foreach (Type expT in a.GetExportedTypes ()) {
-					if (expT.Name == typeName)
-						return expT;
+					if (expT.Name != typeName)
+						continue;
+					knownGOTypes.Add (typeName, expT);
+					return expT;
 				}
 			}
 			return null;

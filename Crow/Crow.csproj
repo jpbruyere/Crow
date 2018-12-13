@@ -62,7 +62,6 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup />
   <ItemGroup>
     <Folder Include="src\GraphicObjects\" />
     <Folder Include="src\Cairo\" />
@@ -179,5 +178,16 @@
     <None Include="Crow.dll.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <EmbeddedResource Include="Images\Icons\Cursors\arrow" />
+    <EmbeddedResource Include="Images\Icons\Cursors\bottom_left_corner" />
+    <EmbeddedResource Include="Images\Icons\Cursors\bottom_right_corner" />
+    <EmbeddedResource Include="Images\Icons\Cursors\cross" />
+    <EmbeddedResource Include="Images\Icons\Cursors\hand" />
+    <EmbeddedResource Include="Images\Icons\Cursors\help" />
+    <EmbeddedResource Include="Images\Icons\Cursors\move" />
+    <EmbeddedResource Include="Images\Icons\Cursors\sb_h_double_arrow" />
+    <EmbeddedResource Include="Images\Icons\Cursors\sb_v_double_arrow" />
+    <EmbeddedResource Include="Images\Icons\Cursors\top_left_corner" />
+    <EmbeddedResource Include="Images\Icons\Cursors\top_right_corner" />
   </ItemGroup>
 </Project>

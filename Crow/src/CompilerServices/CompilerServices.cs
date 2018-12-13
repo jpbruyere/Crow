@@ -33,12 +33,23 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Xml;
 using Crow.IML;
-
+using System.Text;
 
 namespace Crow.IML
 {
 	public static class CompilerServices
 	{
+		/// <summary>
+		/// known types cache, prevent rewalking all the assemblies of the domain
+		/// the key is the type simple name
+		/// </summary>
+		internal static Dictionary<string, Type> knownTypes = new Dictionary<string, Type> ();
+		/// <summary>
+		/// known extension methods.
+		/// key is type dot memberName.
+		/// </summary>
+		internal static Dictionary<string, MethodInfo> knownExtMethods = new Dictionary<string, MethodInfo> ();
+
 		internal static Type TObject = typeof(object);
 		internal static MethodInfo stringEquals = typeof (string).GetMethod("Equals", new Type [3] { typeof (string), typeof (string), typeof (StringComparison) });
 		internal static MethodInfo miObjToString = typeof(object).GetMethod("ToString");
@@ -405,20 +416,57 @@ namespace Crow.IML
 			return query;
 		}
 		/// <summary>
-		/// search for extentions method in entry assembly then in crow assembly
+		/// search for extentions method in entry assembly then in assembly where the type is defined
 		/// </summary>
 		/// <returns>Extention MethodInfo</returns>
 		/// <param name="t">Extended type</param>
 		/// <param name="methodName">Extention method name</param>
-		internal static MethodInfo SearchExtMethod(Type t, string methodName){
-			MethodInfo mi = null;
-			mi = GetExtensionMethods (Assembly.GetEntryAssembly(), t)
-				.Where (em => em.Name == methodName).FirstOrDefault ();
-			if (mi != null)
-				return mi;
+		//internal static MethodInfo SearchExtMethod(Type t, string methodName){
+		//	MethodInfo mi = null;
+		//	mi = GetExtensionMethods (Assembly.GetEntryAssembly(), t)
+		//		.Where (em => em.Name == methodName).FirstOrDefault ();
+		//	if (mi != null)
+		//		return mi;
 
-			return GetExtensionMethods (Assembly.GetExecutingAssembly(), t)
-				.Where (em => em.Name == methodName).FirstOrDefault ();
+		//	return GetExtensionMethods (t.Module.Assembly, t)
+		//		.Where (em => em.Name == methodName).FirstOrDefault ();
+		//}
+		internal static MethodInfo SearchExtMethod (Type t, string methodName)
+		{
+			string key = t.Name + "." + methodName;
+			if (knownExtMethods.ContainsKey (key))
+				return knownExtMethods [key];
+
+			//Console.WriteLine ($"*** search extension method: {t};{methodName} => key={key}");
+
+			MethodInfo mi = null;
+			mi = GetExtensionMethods2 (Assembly.GetEntryAssembly (), t, methodName);
+			if (mi == null)
+				mi = GetExtensionMethods2 (t.Module.Assembly, t, methodName);
+
+			//add key even if mi is null to prevent searching again and again for propertyless bindings
+			knownExtMethods.Add (key, mi);
+			return mi;
+		}
+
+		static MethodInfo GetExtensionMethods2 (Assembly assembly, Type extendedType, string methodName)
+		{
+			foreach (Type t in assembly.GetTypes ().Where
+					(ty => ty.IsDefined (typeof (ExtensionAttribute), false))) {
+				foreach (MethodInfo mi in t.GetMethods 
+					(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where
+						(m=> m.Name == methodName && m.IsDefined (typeof (ExtensionAttribute), false) &&
+						 m.GetParameters ().Length == 1)) {
+					Type curType = extendedType;
+					while (curType != null) {
+						if (mi.GetParameters () [0].ParameterType == curType)
+							return mi;
+						curType = curType.BaseType;
+					}						
+				}
+			
+			}
+			return null;
 		}
 		/// <summary>
 		/// retrieve event handler in class or ancestors
@@ -893,20 +941,32 @@ namespace Crow.IML
 		/// </summary>
 		/// <returns>the corresponding type object if found</returns>
 		/// <param name="strDataType">type name</param>
-		internal static Type tryGetType (string strDataType){
+		internal static Type getTypeFromName (string strDataType){
+			if (knownTypes.ContainsKey (strDataType))
+				return knownTypes [strDataType];
 			Type dataType = Type.GetType(strDataType);
-			if (dataType != null)
+			if (dataType != null) {
+				knownTypes.Add (strDataType, dataType);
 				return dataType;
-			Assembly a = Assembly.GetEntryAssembly ();
-			foreach (Type expT in a.GetExportedTypes ()) {
-				if (expT.Name == strDataType)
-					return dataType;
 			}
+			foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies ()) {
+				if (a.IsDynamic)
+					continue;
+				foreach (Type expT in a.GetExportedTypes ()) {
+					if (expT.Name != strDataType)
+						continue;
+					knownTypes.Add (strDataType, expT);
+					return expT;
+				}
+			}
+			knownTypes.Add (strDataType, null);
 			return null;
 		}
 
+		//get value from member of object
 		internal static object getDataTypeAndFetch (object data, string fetchMethod){
 			Type dataType = data.GetType();
+			//Console.WriteLine ($"get data type and fetch {data}.{fetchMethod}");
 			MethodInfo miGetDatas = dataType.GetMethod (fetchMethod, new Type[] {});
 			if (miGetDatas == null)
 				miGetDatas = CompilerServices.SearchExtMethod (dataType, fetchMethod);
@@ -923,8 +983,36 @@ namespace Crow.IML
 				if (miGetDatas == null)
 					throw new Exception ("Read only property for fetching data in ItemTemplate: " + fetchMethod);
 			}
-			object tmp = miGetDatas.Invoke (data, null);
-			return tmp;
+			return miGetDatas.IsStatic ?
+				miGetDatas.Invoke (null, new object [] { data }) : miGetDatas.Invoke (data, null);
+		}
+		//TODO:memberinfo found here must be cached
+		internal static object getValue (Type dataType, object data, string member)
+		{
+			//Console.WriteLine ($"get value: {dataType} ; {data} ; {member}");
+
+			MethodInfo miGetDatas = dataType.GetMethod (member, new Type [] { });
+			if (miGetDatas != null)
+				return miGetDatas.Invoke (data, null);
+			MemberInfo mbi = dataType.GetMember (member).FirstOrDefault ();
+			if (mbi == null) {
+				MethodInfo miExt = CompilerServices.SearchExtMethod (dataType, member);
+				if (miExt == null)//and among fields
+					throw new Exception ($"member {member} not found in {dataType}");
+				return miExt.Invoke (null, new object [] { data });
+			}
+			if (mbi.MemberType == MemberTypes.Property) {
+				miGetDatas = (mbi as PropertyInfo)?.GetGetMethod ();
+				if (miGetDatas == null)
+					throw new Exception ($"no getter found for property {member} in {dataType}");
+				return miGetDatas.Invoke (data, null);
+			}
+
+			FieldInfo fi = mbi as FieldInfo;
+			if (fi == null)
+				throw new Exception ($"member {member} not found in {dataType}");
+
+			return fi.GetValue (data);
 		}
 	}
 }
