@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
-    <StartupObject>tests.MainClass</StartupObject>
+    <StartupObject>tests.Showcase</StartupObject>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ReleaseVersion>0.8.0</ReleaseVersion>
     <OutputPath>$(SolutionDir)build/$(Configuration)</OutputPath>
@@ -24,11 +24,11 @@
     <DefineConstants>DEBUG;TRACE;MEASURE_TIME</DefineConstants>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
     <OutputPath>$(SolutionDir)build\Debug</OutputPath>
-    <EnvironmentVariables>
+<!--    <EnvironmentVariables>
       <EnvironmentVariables>
         <Variable name="MONO_CAIRO_DEBUG_DISPOSE" value="1" />
       </EnvironmentVariables>
-    </EnvironmentVariables>
+    </EnvironmentVariables>-->
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">

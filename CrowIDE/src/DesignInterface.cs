@@ -81,7 +81,7 @@ namespace Crow.Coding
 			}
 
 		}
-		public override GraphicObject Load (string path)
+		public override GraphicObject CreateInstance (string path)
 		{
 			ProjectFile pi;
 

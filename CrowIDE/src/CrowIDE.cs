@@ -159,7 +159,7 @@ namespace Crow.Coding
 
 			initCommands ();
 
-			GraphicObject go = AddWidget (@"#Crow.Coding.ui.CrowIDE.crow");
+			GraphicObject go = Load (@"#Crow.Coding.ui.CrowIDE.crow");
 			go.DataSource = this;
 
 			mainDock = go.FindByName ("mainDock") as DockStack;
@@ -278,7 +278,7 @@ namespace Crow.Coding
 				GraphicObject g = MainIFace.FindByName (path);
 				if (g != null)
 					return g as Window;
-				g = MainIFace.AddWidget (path);
+				g = MainIFace.Load (path);
 				g.Name = path;
 				g.DataSource = dataSource;
 				return g as Window;

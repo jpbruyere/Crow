@@ -41,10 +41,6 @@ namespace Crow.IML
 
 		public PropertyInfo Property { get { return member as PropertyInfo; }}
 		public bool IsTemplateBinding { get { return Address == null ? false : Address.Count == 0; }}
-//		public string Name {
-//			get { return memberName; } 
-//			set { memberName = value; }
-//		}
 
 		public MemberAddress (NodeAddress _address, string _member, bool findMember = true)
 		{
@@ -93,6 +89,9 @@ namespace Crow.IML
 
 		bool tryFindMember ()
 		{
+#if DEBUG_BINDING_FUNC_CALLS
+            Console.WriteLine ($"tryFindMember ({Address},{member})");
+#endif
 			if (member != null)
 				throw new Exception ("member already found");
 			if (Address == null)
@@ -102,13 +101,13 @@ namespace Crow.IML
 			Type t = Address.LastOrDefault ().CrowType;
 			member = t.GetMember (memberName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance).FirstOrDefault ();
 
-			#region search for extensions methods if member not found in type
+#region search for extensions methods if member not found in type
 			if (member == null && !string.IsNullOrEmpty (memberName)) {
 				Assembly a = Assembly.GetExecutingAssembly ();
 				string mn = memberName;
-				member = CompilerServices.GetExtensionMethods (a, t).Where (em => em.Name == mn).FirstOrDefault ();
+				member = CompilerServices.GetExtensionMethods (a, t, mn);
 			}
-			#endregion
+#endregion
 
 			return member != null;
 		}

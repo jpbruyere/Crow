@@ -950,6 +950,9 @@ namespace Crow.IML
 		/// create the valuechanged handler, the datasourcechanged handler and emit event handling
 		/// </summary>
 		void emitDataSourceBindings(IMLContext ctx, BindingDefinition bindingDef){
+#if DEBUG_BINDING_FUNC_CALLS
+			Console.WriteLine ($"emitDataSourceBindings: {bindingDef}");
+#endif
 			DynamicMethod dm = null;
 			ILGenerator il = null;
 			int dmVC = 0;
@@ -958,7 +961,7 @@ namespace Crow.IML
 			//will be used as origine value
 			string delName = "dyn_DSvalueChanged" + NewId;
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
-				#region create valuechanged method
+#region create valuechanged method
 				dm = new DynamicMethod (delName,
 					typeof (void),
 					CompilerServices.argsBoundValueChange, true);
@@ -1005,10 +1008,10 @@ namespace Crow.IML
 				//when datasource of source graphic object changed
 				dmVC = dsValueChangedDynMeths.Count;
 				dsValueChangedDynMeths.Add (dm);
-				#endregion
+#endregion
 			}
 
-			#region emit dataSourceChanged event handler
+#region emit dataSourceChanged event handler
 			//now we create the datasource changed method that will init the destination member with
 			//the actual value of the origin member of the datasource and then will bind the value changed
 			//dyn methode.
@@ -1052,7 +1055,7 @@ namespace Crow.IML
 				il.Emit (OpCodes.Brfalse, newDSIsNull);//new ds is null
 			}
 
-			#region fetch initial Value
+#region fetch initial Value
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
 				il.Emit (OpCodes.Ldarg_2);//load new datasource
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
@@ -1072,7 +1075,7 @@ namespace Crow.IML
 			}
 			CompilerServices.emitConvert (il, piSource.PropertyType);
 			il.Emit (OpCodes.Callvirt, piSource.GetSetMethod ());
-			#endregion
+#endregion
 
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
 				il.MarkLabel(cancelInit);
@@ -1107,14 +1110,14 @@ namespace Crow.IML
 			//store dschange delegate in instatiator instance for access while instancing graphic object
 			int delDSIndex = cachedDelegates.Count;
 			cachedDelegates.Add(dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
-			#endregion
+#endregion
 
 			ctx.emitCachedDelegateHandlerAddition(delDSIndex, CompilerServices.eiDSChange);
 
-			#if DEBUG_BINDING
+#if DEBUG_BINDING
 			Debug.WriteLine("\tDataSource ValueChanged: " + delName);
 			Debug.WriteLine("\tDataSource Changed: " + dm.Name);
-			#endif
+#endif
 		}
 		/// <summary>
 		/// Two way binding for datasource, graphicObj=>dataSource link, datasource value has priority
@@ -1134,11 +1137,11 @@ namespace Crow.IML
 				Debug.WriteLine ("Member '{0}' not found in new DataSource '{1}' of '{2}'", destMember, dest, orig);
 				return;
 			}
-			#if DEBUG_BINDING
+#if DEBUG_BINDING
 			Debug.WriteLine ("DS Reverse binding: Member '{0}' found in new DS '{1}' of '{2}'", destMember, dest, orig);
-			#endif
+#endif
 
-			#region ValueChanged emit
+#region ValueChanged emit
 			DynamicMethod dm = new DynamicMethod ("dyn_valueChanged" + NewId,
 				typeof (void), CompilerServices.argsBoundValueChange, true);
 			ILGenerator il = dm.GetILGenerator (256);
@@ -1170,11 +1173,11 @@ namespace Crow.IML
 
 			il.MarkLabel (endMethod);
 			il.Emit (OpCodes.Ret);
-			#endregion
+#endregion
 
 			orig.ValueChanged += (EventHandler<ValueChangeEventArgs>)dm.CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>), dest);
 		}
-		#endregion
+#endregion
 
 		/// <summary>
 		/// search for graphic object type in crow assembly, if not found,

@@ -407,7 +407,7 @@ namespace Crow
 					DockWindow dw = null;
 					string wName = getConfAttrib (conf, ref i);
 					try {
-						dw = IFace.Load (wName) as DockWindow;	
+						dw = IFace.CreateInstance (wName) as DockWindow;	
 					} catch {
 						dw = new DockWindow (IFace);
 					}
