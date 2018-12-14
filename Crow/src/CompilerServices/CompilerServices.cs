@@ -50,7 +50,6 @@ namespace Crow.IML
 		/// </summary>
 		internal static Dictionary<string, MethodInfo> knownExtMethods = new Dictionary<string, MethodInfo> ();
 
-		internal static Type TObject = typeof(object);
 		internal static MethodInfo stringEquals = typeof (string).GetMethod("Equals", new Type [3] { typeof (string), typeof (string), typeof (StringComparison) });
 		internal static MethodInfo miObjToString = typeof(object).GetMethod("ToString");
 		internal static MethodInfo miGetType = typeof(object).GetMethod("GetType");
@@ -289,7 +288,7 @@ namespace Crow.IML
 		static MemberInfo getMemberInfoWithReflexion(object instance, string member){
             Type t = instance.GetType();
 #if DEBUG_BINDING_FUNC_CALLS
-            Console.WriteLine ($"getMemberInfoWithReflexion ({instance},{member}); type:{t}");
+			Console.WriteLine ($"getMemberInfoWithReflexion ({instance},{member}); type:{t}");
 #endif
             MemberInfo mi = t.GetMember (member)?.FirstOrDefault();
 			if (mi == null)
@@ -330,7 +329,7 @@ namespace Crow.IML
 
 			try {
 				if (value != null) {
-					if (destType == TObject)//TODO: check that test of destType is not causing problems
+					if (destType == typeof (object))//TODO: check that test of destType is not causing problems
 						convertedVal = value;
 					else {
 						origType = value.GetType ();
@@ -387,7 +386,7 @@ namespace Crow.IML
 
 				if (tmp != null)
 					return tmp;
-				if (dstType == typeof(string) || dstType == CompilerServices.TObject)//TODO:object should be allowed to return null and not ""
+				if (dstType == typeof(string) || dstType == typeof (object))//TODO:object should be allowed to return null and not ""
 					return "";
 				if (dstType.IsValueType)
 					return Activator.CreateInstance (dstType);				
@@ -551,7 +550,7 @@ namespace Crow.IML
 		/// Emit MSIL for conversion from orig type to dest type
 		/// </summary>
 		internal static void emitConvert(ILGenerator il, Type origType, Type destType){
-			if (destType == CompilerServices.TObject)
+			if (destType == typeof(object))
 				return;
 			if (destType == typeof(string)) {
 				System.Reflection.Emit.Label emitNullStr = il.DefineLabel ();
@@ -600,7 +599,7 @@ namespace Crow.IML
 				else {
 					//implicit conversion can't be defined from or to object base class,
 					//so we will check if object underlying type is one of the implicit converter of destType
-					if (origType == TObject) {//test all implicit converter to destType on obj
+					if (origType == typeof(object)) {//test all implicit converter to destType on obj
 						System.Reflection.Emit.Label emitTestNextImpOp;
 						System.Reflection.Emit.Label emitImpOpFound = il.DefineLabel ();
 						foreach (MethodInfo mi in destType.GetMethods(BindingFlags.Public|BindingFlags.Static)) {
@@ -691,11 +690,11 @@ namespace Crow.IML
 				il.MarkLabel (convert);
 				il.Emit (OpCodes.Ldnull);//null instance for invoke
 				il.Emit (OpCodes.Ldc_I4_1);
-				il.Emit(OpCodes.Newarr, CompilerServices.TObject);
+				il.Emit(OpCodes.Newarr, typeof (object));
 				il.Emit (OpCodes.Dup);//duplicate the array ref
 				il.Emit (OpCodes.Ldc_I4_0);//push the index 0
 				il.Emit (OpCodes.Ldloc_0);//push the orig value to convert
-				il.Emit (OpCodes.Stelem, CompilerServices.TObject);//set the array element at index 0
+				il.Emit (OpCodes.Stelem, typeof (object));//set the array element at index 0
 				il.Emit (OpCodes.Callvirt, miMIInvoke);
 			}
 
@@ -777,7 +776,7 @@ namespace Crow.IML
 			Type handlerArgsType = evtParams [1].ParameterType;
 #endregion
 
-			Type [] args = { CompilerServices.TObject, handlerArgsType };
+			Type [] args = { typeof (object), handlerArgsType };
 			DynamicMethod dm = new DynamicMethod ("dyn_eventHandler",
 				typeof(void),
 				args, true);

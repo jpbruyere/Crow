@@ -86,7 +86,7 @@ namespace Crow.IML
 			if (string.IsNullOrEmpty (expression)) {
 				return bindingDef;
 			} else {
-				if (expression.StartsWith ("²")) {
+				if (expression.StartsWith ("²", StringComparison.Ordinal)) {
 					bindingDef.TwoWay = true;
 					expression = expression.Substring (1);
 				}

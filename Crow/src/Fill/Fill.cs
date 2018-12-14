@@ -44,16 +44,16 @@ namespace Crow
 		public static object Parse (string s){
 			if (string.IsNullOrEmpty (s))
 				return null;
-			if (s.Substring (1).StartsWith ("gradient"))
+			if (s.Substring (1).StartsWith ("gradient", StringComparison.Ordinal))
 				return (Gradient)Gradient.Parse (s);
 			if (s.EndsWith (".svg", true, System.Globalization.CultureInfo.InvariantCulture))
-				return SvgPicture.Parse (s);
+				return Parse (s);
 			if (s.EndsWith (".png", true, System.Globalization.CultureInfo.InvariantCulture) ||
 			    s.EndsWith (".jpg", true, System.Globalization.CultureInfo.InvariantCulture) ||
 			    s.EndsWith (".jpeg", true, System.Globalization.CultureInfo.InvariantCulture) ||
 			    s.EndsWith (".bmp", true, System.Globalization.CultureInfo.InvariantCulture) ||
 			    s.EndsWith (".gif", true, System.Globalization.CultureInfo.InvariantCulture))
-				return BmpPicture.Parse (s);
+				return Parse (s);
 			
 			return (SolidColor)SolidColor.Parse (s);
 		}

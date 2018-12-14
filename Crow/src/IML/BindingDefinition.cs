@@ -33,12 +33,13 @@ namespace Crow.IML
 	/// </summary>
 	public class BindingDefinition
 	{
-		public NodeAddress SourceNA = null;
-		public string SourceMember = "";
-		public NodeAddress TargetNA = null;
+		public NodeAddress SourceNA = null;//the widget declaring this binding in a member
+		public string SourceMember = "";//the member where the binding string has been found
+		public NodeAddress TargetNA = null;//
 		public string TargetMember = "";
 		public string TargetName = "";
-		public bool TwoWay = false;
+		public bool TwoWay = false;//two way binding
+		public Type targetType = null;//added to store dataSourceType if set
 
 		#region CTOR
 		public BindingDefinition (NodeAddress _sourceNA, string _sourceMember){
