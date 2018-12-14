@@ -80,7 +80,7 @@ namespace Crow
 				if (string.IsNullOrEmpty(_template))
 					loadTemplate ();
 				else
-					loadTemplate (IFace.Load (_template));
+					loadTemplate (IFace.CreateInstance (_template));
 			}
 		}
 		/// <summary>
@@ -149,7 +149,7 @@ namespace Crow
 			if (template == null) {
 				if (!IFace.DefaultTemplates.ContainsKey (this.GetType ().FullName))
 					throw new Exception (string.Format ("No default template found for '{0}'", this.GetType ().FullName));
-				this.SetChild (IFace.Load (IFace.DefaultTemplates[this.GetType ().FullName]));
+				this.SetChild (IFace.CreateInstance (IFace.DefaultTemplates[this.GetType ().FullName]));
 			}else
 				this.SetChild (template);
 		}

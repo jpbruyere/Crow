@@ -45,7 +45,7 @@ namespace tests
 			using (Showcase app = new Showcase ()) {
 				//app.Keyboard.KeyDown += App_KeyboardKeyDown;
 
-				GraphicObject g = app.AddWidget ("#Tests.ui.showcase.crow");
+				GraphicObject g = app.Load ("#Tests.ui.showcase.crow");
 				g.DataSource = app;
 				app.crowContainer = g.FindByName ("CrowContainer") as Container;
 				//I set an empty object as datasource at this level to force update when new
@@ -85,7 +85,7 @@ namespace tests
 			lock (UpdateMutex) {
                 try
                 {
-                    GraphicObject g = Load(fi.FullName);
+                    GraphicObject g = CreateInstance(fi.FullName);
                     crowContainer.SetChild(g);
                     g.DataSource = this;
                 }

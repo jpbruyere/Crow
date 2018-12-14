@@ -456,7 +456,7 @@ namespace Crow
 
 		public static Window Show (Interface iface, string imlPath, bool modal = false){
 			lock (iface.UpdateMutex) {
-				Window w = iface.AddWidget (imlPath) as Window;
+				Window w = iface.Load (imlPath) as Window;
 				w.Modal = modal;
 				return w;
 			}

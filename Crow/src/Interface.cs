@@ -526,10 +526,10 @@ namespace Crow
 		/// </summary>
 		/// <returns>new instance of graphic object created</returns>
 		/// <param name="path">path of the iml file to load</param>
-		public GraphicObject AddWidget (string path)
+		public GraphicObject Load (string path)
 		{
 			lock (UpdateMutex) {
-				GraphicObject tmp = Load (path);
+				GraphicObject tmp = CreateInstance (path);
 				AddWidget (tmp);
 				return tmp;
 			}
@@ -539,7 +539,7 @@ namespace Crow
 		/// </summary>
 		/// <returns>new instance of graphic object created</returns>
 		/// <param name="path">path of the iml file to load</param>
-		public virtual GraphicObject Load (string path)
+		public virtual GraphicObject CreateInstance (string path)
 		{
 			try {
 				return GetInstantiator (path).CreateInstance ();
@@ -1199,7 +1199,7 @@ namespace Crow
 		volatile bool tooltipVisible = false;
 
 		protected void initTooltip () {
-			ToolTipContainer = Load  ("#Crow.Tooltip.template");
+			ToolTipContainer = CreateInstance  ("#Crow.Tooltip.template");
 			Thread t = new Thread (toolTipThreadFunc);
 			t.IsBackground = true;
 			t.Start ();
@@ -1240,7 +1240,7 @@ namespace Crow
 		#region Contextual menu
 		MenuItem ctxMenuContainer;
 		protected void initContextMenus (){
-			ctxMenuContainer = Load  ("#Crow.ContextMenu.template") as MenuItem;
+			ctxMenuContainer = CreateInstance  ("#Crow.ContextMenu.template") as MenuItem;
 			ctxMenuContainer.LayoutChanged += CtxMenuContainer_LayoutChanged;
 		}
 

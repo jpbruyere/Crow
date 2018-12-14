@@ -97,7 +97,7 @@ namespace Crow.IML
 		internal static MethodInfo miGetDataSource = typeof(GraphicObject).GetProperty("DataSource").GetGetMethod ();
 		internal static EventInfo eiLogicalParentChanged = typeof(GraphicObject).GetEvent("LogicalParentChanged");
 
-		internal static MethodInfo miIFaceLoad = typeof(Interface).GetMethod ("Load", BindingFlags.Instance | BindingFlags.Public);
+		internal static MethodInfo miIFaceLoad = typeof(Interface).GetMethod ("CreateInstance", BindingFlags.Instance | BindingFlags.Public);
 		internal static MethodInfo miGetITemp = typeof(Interface).GetMethod ("GetItemTemplate", BindingFlags.Instance | BindingFlags.Public);
 
 		internal static MethodInfo miAddITemp = typeof(Dictionary<string, ItemTemplate>).GetMethod ("set_Item", new Type[] { typeof(string), typeof(ItemTemplate) });
@@ -287,14 +287,20 @@ namespace Crow.IML
 
 		#region Reflexion helpers
 		static MemberInfo getMemberInfoWithReflexion(object instance, string member){
-			Type t = instance.GetType();
-			MemberInfo mi = t.GetMember (member)?.FirstOrDefault();
+            Type t = instance.GetType();
+#if DEBUG_BINDING_FUNC_CALLS
+            Console.WriteLine ($"getMemberInfoWithReflexion ({instance},{member}); type:{t}");
+#endif
+            MemberInfo mi = t.GetMember (member)?.FirstOrDefault();
 			if (mi == null)
 				mi = CompilerServices.SearchExtMethod (t, member);
 			return mi;
 		}
 		static MethodInfo getMethodInfoWithReflexion(object instance, string method){
-			return instance.GetType ().GetMethod (method, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+#if DEBUG_BINDING_FUNC_CALLS
+            Console.WriteLine ($"getMethodInfoWithReflexion ({instance},{method}); type:{instance.GetType ()}");
+#endif
+            return instance.GetType ().GetMethod (method, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 		}
 		/// <summary>
 		/// set value, convert if required
@@ -303,7 +309,10 @@ namespace Crow.IML
 		/// <param name="value">Value</param>
 		/// <param name="destMember">Destination member</param>
 		static void setValueWithReflexion(object dest, object value, string destMember){
-			Type destType = null;
+#if DEBUG_BINDING_FUNC_CALLS
+            Console.WriteLine ($"setValueWithReflexion (dest:{dest},value:{value},member:{destMember});");
+#endif
+            Type destType = null;
 			Type origType = null;
 			object convertedVal = null;
 
@@ -350,7 +359,10 @@ namespace Crow.IML
 		/// default value for valueType data.
 		/// </summary>
 		static object getValueWithReflexion(object instance, MemberInfo mi){
-			object tmp = null;
+#if DEBUG_BINDING_FUNC_CALLS
+            Console.WriteLine ($"getValueWithReflexion ({instance},{mi});");
+#endif
+            object tmp = null;
 			Type dstType = null;
 			if (mi == null)
 				return null;
@@ -386,35 +398,7 @@ namespace Crow.IML
 
 			return null;
 		}
-		/// <summary>
-		/// Gets all extension methods defined in assembly for Type
-		/// </summary>
-		/// <returns>Extension methods enumerable</returns>
-		/// <param name="assembly">Assembly</param>
-		/// <param name="extendedType">Extended type to search for</param>
-		internal static IEnumerable<MethodInfo> GetExtensionMethods (Assembly assembly,
-			Type extendedType)
-		{
-			IEnumerable<MethodInfo> query = null;
-			Type curType = extendedType;
-
-			do {
-				query = from type in assembly.GetTypes ()
-						where type.IsSealed && !type.IsGenericType && !type.IsNested
-					from method in type.GetMethods (BindingFlags.Static
-						| BindingFlags.Public | BindingFlags.NonPublic)
-						where method.IsDefined (typeof (ExtensionAttribute), false)
-						where method.GetParameters () [0].ParameterType == curType
-					select method;
-
-				if (query.Count () > 0)
-					break;
-
-				curType = curType.BaseType;
-			} while (curType != null);
-
-			return query;
-		}
+		
 		/// <summary>
 		/// search for extentions method in entry assembly then in assembly where the type is defined
 		/// </summary>
@@ -440,16 +424,16 @@ namespace Crow.IML
 			//Console.WriteLine ($"*** search extension method: {t};{methodName} => key={key}");
 
 			MethodInfo mi = null;
-			mi = GetExtensionMethods2 (Assembly.GetEntryAssembly (), t, methodName);
+			mi = GetExtensionMethods (Assembly.GetEntryAssembly (), t, methodName);
 			if (mi == null)
-				mi = GetExtensionMethods2 (t.Module.Assembly, t, methodName);
+				mi = GetExtensionMethods (t.Module.Assembly, t, methodName);
 
 			//add key even if mi is null to prevent searching again and again for propertyless bindings
 			knownExtMethods.Add (key, mi);
 			return mi;
 		}
 
-		static MethodInfo GetExtensionMethods2 (Assembly assembly, Type extendedType, string methodName)
+		public static MethodInfo GetExtensionMethods (Assembly assembly, Type extendedType, string methodName)
 		{
 			foreach (Type t in assembly.GetTypes ().Where
 					(ty => ty.IsDefined (typeof (ExtensionAttribute), false))) {
@@ -504,7 +488,7 @@ namespace Crow.IML
 			}
 			return null;
 		}
-		#endregion
+#endregion
 
 		/// <summary>
 		/// Emits tree parsing command to fetch dest instance starting from orig node
@@ -725,9 +709,9 @@ namespace Crow.IML
 			Type t = instance.GetType ();
 			FieldInfo fiEvt = getEventHandlerField (t, eventName);
 			if (fiEvt == null) {
-				#if DEBUG_BINDING
+#if DEBUG_BINDING
 				Debug.WriteLine ("RemoveHandlerByName: Event '" + eventName + "' not found in " + instance);
-				#endif
+#endif
 				return;
 			}
 			EventInfo eiEvt = t.GetEvent (eventName);
@@ -736,9 +720,9 @@ namespace Crow.IML
 				foreach (Delegate d in multiDel.GetInvocationList()) {
 					if (d.Method.Name == delegateName) {
 						eiEvt.RemoveEventHandler (instance, d);
-						#if DEBUG_BINDING
+#if DEBUG_BINDING
 						Debug.WriteLine ("\t{0} handler removed in {1} for: {2}", d.Method.Name,instance, eventName);
-						#endif
+#endif
 					}
 				}
 			}
@@ -755,9 +739,9 @@ namespace Crow.IML
 				foreach (Delegate d in multiDel.GetInvocationList()) {
 					if (d.Target == target) {
 						eiEvt.RemoveEventHandler (instance, d);
-						#if DEBUG_BINDING
+#if DEBUG_BINDING
 						Debug.WriteLine ("\t{0} handler removed in {1} for: {2}", d.Method.Name,instance, eventName);
-						#endif
+#endif
 					}
 				}
 			}
@@ -776,9 +760,9 @@ namespace Crow.IML
 		}
 
 		internal static Delegate compileDynEventHandler(EventInfo sourceEvent, string expression, NodeAddress currentNode = null){
-			#if DEBUG_BINDING
+#if DEBUG_BINDING
 			Debug.WriteLine ("\tCompile Event {0}: {1}", sourceEvent.Name, expression);
-			#endif
+#endif
 
 			Type lopType = null;
 
@@ -787,11 +771,11 @@ namespace Crow.IML
 			else
 				lopType = currentNode.NodeType;
 
-			#region Retrieve EventHandler parameter type
+#region Retrieve EventHandler parameter type
 			MethodInfo evtInvoke = sourceEvent.EventHandlerType.GetMethod ("Invoke");
 			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
 			Type handlerArgsType = evtParams [1].ParameterType;
-			#endregion
+#endregion
 
 			Type [] args = { CompilerServices.TObject, handlerArgsType };
 			DynamicMethod dm = new DynamicMethod ("dyn_eventHandler",
@@ -818,7 +802,7 @@ namespace Crow.IML
 
 				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
 
-				#region Left operande
+#region Left operande
 				PropertyInfo lopPI = null;
 
 				//in dyn handler, no datasource binding, so single name in expression are also handled as current node property
@@ -828,9 +812,9 @@ namespace Crow.IML
 					lopPI = lopType.GetProperty (lop.Tokens [1]);
 				else
 					lop.emitGetTarget (il, cancel);
-				#endregion
+#endregion
 
-				#region RIGHT OPERANDES
+#region RIGHT OPERANDES
 				if (rop.IsStringConstant){
 					il.Emit (OpCodes.Ldstr, rop.Tokens[0]);
 					lop.emitSetProperty (il);
@@ -877,7 +861,7 @@ namespace Crow.IML
 					rop.emitGetProperty (il, cancelFinalSet);
 					lop.emitSetProperty (il);
 				}
-				#endregion
+#endregion
 
 				il.Emit (OpCodes.Br, success);
 
