@@ -35,6 +35,7 @@ using System.Threading;
 using System.Linq;
 using Crow.IML;
 using System.Diagnostics;
+using System.IO;
 
 namespace Crow
 {
@@ -365,8 +366,7 @@ namespace Crow
 		void loadPage(IList _data, Group page, string _dataTest)
 		{
 			#if DEBUG_LOAD
-			Stopwatch loadingTime = new Stopwatch ();
-			loadingTime.Start ();
+			Stopwatch loadingTime = Stopwatch.StartNew ();
 			#endif
 
 
@@ -404,12 +404,12 @@ namespace Crow
 //			lock (CurrentInterface.LayoutMutex)
 //				items.AddChild (page);
 
-			#if DEBUG_LOAD
+#if DEBUG_LOAD
 			loadingTime.Stop ();
-			Debug.WriteLine("Listbox {2} Loading: {0} ticks \t, {1} ms",
-			loadingTime.ElapsedTicks,
-			loadingTime.ElapsedMilliseconds, this.ToString());
-			#endif
+			using (StreamWriter sw = new StreamWriter ("loading.log", true)) {
+				sw.WriteLine ($"NEW ;{this.ToString(),-50};{loadingTime.ElapsedTicks,8};{loadingTime.ElapsedMilliseconds,8}");
+			}
+#endif
 		}
 
 		protected void loadItem(object o, Group page, string _dataTest){

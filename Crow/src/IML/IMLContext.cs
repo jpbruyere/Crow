@@ -64,7 +64,7 @@ namespace Crow.IML
 		{
 			RootType = rootType;
 			dm = new DynamicMethod ("dyn_instantiator",
-				CompilerServices.TObject, new Type [] { typeof (Instantiator), typeof (Interface) }, true);
+				typeof (object), new Type [] { typeof (Instantiator), typeof (Interface) }, true);
 			il = dm.GetILGenerator (256);
 
 			il.DeclareLocal (typeof (GraphicObject));
@@ -112,6 +112,10 @@ namespace Crow.IML
 			if (bindDef.TwoWay)
 				StorePropertyBinding (bindDef.SourceNA, bindDef.SourceMember, bindDef.TargetNA, bindDef.TargetMember);
 		}
+		/// <summary>
+		/// Stores all the names found in current iml for binding resolution if any of them
+		/// are targeting named widget 
+		/// </summary>
 		public void StoreCurrentName(string name){
 			if (!Names.ContainsKey(name))
 				Names[name] = new List<NodeAddress>();

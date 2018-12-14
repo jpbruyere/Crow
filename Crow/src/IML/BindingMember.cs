@@ -89,8 +89,8 @@ namespace Crow.IML
 
 			int ptr = 0;
 			if (splitedExp.Length == 1) {
-				if (splitedExp [0].StartsWith ("\'")) {
-					if (!splitedExp [0].EndsWith ("\'"))
+				if (splitedExp [0].StartsWith ("\'",StringComparison.Ordinal)) {
+					if (!splitedExp [0].EndsWith ("\'", StringComparison.Ordinal))
 						throw new Exception (string.Format
 							("IML:malformed string constant in binding expression: {0}", splitedExp [0]));
 					Tokens = new string[] { splitedExp [0].Substring (1, splitedExp [0].Length - 2) };

@@ -48,16 +48,16 @@ namespace Tests
 					while (!r.EndOfStream) {
 						string s = r.ReadLine ().Trim();
 						if (skip) {
-							if (s.EndsWith ("*/"))
+							if (s.EndsWith ("*/", StringComparison.Ordinal))
 								skip = false;
 							continue;
 						}
-						if (s.StartsWith ("/*")) {
-							if (!s.EndsWith ("*/"))
+						if (s.StartsWith ("/*", StringComparison.Ordinal)) {
+							if (!s.EndsWith ("*/", StringComparison.Ordinal))
 								skip = true;
 							continue;							
 						}
-						if (!s.StartsWith ("#define"))
+						if (!s.StartsWith ("#define", StringComparison.Ordinal))
 							continue;
 						string[] tmp = s.Split (new char[] {' ', '\t'}, StringSplitOptions.RemoveEmptyEntries);
 

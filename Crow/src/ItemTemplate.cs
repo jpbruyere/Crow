@@ -151,7 +151,7 @@ namespace Crow
 			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
 			Type handlerArgsType = evtParams [1].ParameterType;
 
-			Type [] args = { CompilerServices.TObject, CompilerServices.TObject, handlerArgsType };
+			Type [] args = { typeof(object), typeof(object), handlerArgsType };
 
 			#region Expand dyn meth
 			//DM is bound to templatedGroup root (arg0)
@@ -222,7 +222,7 @@ namespace Crow
 			#region Items counting dyn method
 			//dm is unbound, arg0 is instance of Item container to expand
 			dm = new DynamicMethod ("dyn_count_" + fetchMethodName,
-				typeof (bool), new Type[] {CompilerServices.TObject}, true);
+				typeof (bool), new Type[] {typeof(object)}, true);
 			il = dm.GetILGenerator (256);
 
 			//get the dataSource of the arg0

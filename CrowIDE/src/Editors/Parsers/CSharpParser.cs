@@ -358,9 +358,9 @@ namespace Crow.Coding
 						closeNodeAndGoUp (ref currentNode, cl);
 						break;
 					case TokenType.Preprocessor:
-						if (cl.Tokens [tokPtr].Content.StartsWith ("#region")) {
+						if (cl.Tokens [tokPtr].Content.StartsWith ("#region", StringComparison.Ordinal)) {
 							currentNode = addChildNode (currentNode, cl, tokPtr, "region");
-						} else if (cl.Tokens [tokPtr].Content.StartsWith ("#endregion")) {
+						} else if (cl.Tokens [tokPtr].Content.StartsWith ("#endregion", StringComparison.Ordinal)) {
 							
 							closeNodeAndGoUp (ref currentNode, cl,"region");
 						}

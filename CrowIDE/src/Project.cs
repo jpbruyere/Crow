@@ -427,7 +427,7 @@ namespace Crow.Coding {
             return pi != null;
         }
         public bool TryGetProjectFileFromPath (string path, out ProjectFile pi) {
-            if (path.StartsWith ("#"))
+            if (path.StartsWith ("#", StringComparison.Ordinal))
                 pi = flattenNodes.OfType<ProjectFile> ().FirstOrDefault
                     (pp => pp.Type == ItemType.EmbeddedResource && pp.ResourceID == path.Substring (1));
             else

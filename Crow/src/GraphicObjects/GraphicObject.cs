@@ -297,6 +297,7 @@ namespace Crow
 		Size minimumSize = "0,0";
 		bool cacheEnabled = false;
 		bool clipToClientRect = true;
+		Type dataSourceType;
 		protected object dataSource;
 		bool rootDataLevel;
 		string style;
@@ -929,15 +930,26 @@ namespace Crow
 
 				maximumSize = value;
 
-				NotifyValueChanged ("MaximumSize", maximumSize);
+				NotifyValueChanged (nameof(MaximumSize), maximumSize);
 				RegisterForLayouting (LayoutingType.Sizing);
 			}
+		}
+		/// <summary>
+		/// Fully qualify type name of expected data source.
+		/// If set, datasource bindings will be speedup by avoiding reflexion in generated dyn methods.
+		/// If an object of a different type is set as datasource, bindings will be canceled.
+		/// It accepts all derived type.
+		/// </summary>
+		[DesignCategory ("Data")]
+		public Type DataSourceType {
+			get { return dataSourceType; }
+			set { dataSourceType = value; }
 		}
 		/// <summary>
 		/// Seek first logical tree upward if logicalParent is set, or seek graphic tree for
 		/// a not null dataSource that will be active for all descendants having dataSource=null
 		/// </summary>
-		[DesignCategory ("Data")]
+			[DesignCategory ("Data")]
 		public virtual object DataSource {
 			set {
 				if (DataSource == value)
@@ -1097,19 +1109,14 @@ namespace Crow
 			//all other instance of this type would not longer use reflexion to init properly
 			//but will fetch the  dynamic initialisation method compiled for this precise type
 			//TODO:measure speed gain.
-			#region Delfault values Loading dynamic compilation
+#region Delfault values Loading dynamic compilation
 			DynamicMethod dm = null;
 			ILGenerator il = null;
 
-            /*dm = new DynamicMethod("dyn_loadDefValues",
-				MethodAttributes.Family | MethodAttributes.FamANDAssem | MethodAttributes.NewSlot,
-				CallingConventions.Standard,
-				typeof(void),new Type[] {CompilerServices.TObject}, thisType, true);*/
-
-            dm = new DynamicMethod("dyn_loadDefValues", null, new Type[] {CompilerServices.TObject}, thisType, true);
+			dm = new DynamicMethod("dyn_loadDefValues", null, new Type[] { typeof (object) }, thisType, true);
 
             il = dm.GetILGenerator(256);
-			il.DeclareLocal(CompilerServices.TObject);
+			il.DeclareLocal(typeof (object));//store root
 			il.Emit(OpCodes.Nop);
 			//set local GraphicObject to root object passed as 1st argument
 			il.Emit (OpCodes.Ldarg_0);
@@ -1122,7 +1129,7 @@ namespace Crow
 				//TODO:dynEventHandler could be cached somewhere, maybe a style instanciator class holding the styling delegate and bound to it.
 				foreach (string exp in CompilerServices.splitOnSemiColumnOutsideAccolades(expression)) {
 					string trimed = exp.Trim();
-					if (trimed.StartsWith ("{", StringComparison.OrdinalIgnoreCase)){
+					if (trimed.StartsWith ("{", StringComparison.Ordinal)){
 						il.Emit (OpCodes.Ldloc_0);//load this as 1st arg of event Add
 
 						//push eventInfo as 1st arg of compile
@@ -1225,7 +1232,7 @@ namespace Crow
 			}
 			return false;
 		}
-		#endregion
+#endregion
 
 		public virtual GraphicObject FindByName(string nameToFind){
 			return string.Equals(nameToFind, name, StringComparison.Ordinal) ? this : null;

@@ -101,8 +101,7 @@ namespace Crow.IML
 			iface = _iface;
 			sourcePath = srcPath;
 			#if DEBUG_LOAD
-			Stopwatch loadingTime = new Stopwatch ();
-			loadingTime.Start ();
+			Stopwatch loadingTime = Stopwatch.StartNew ();
 			#endif
 			try {
 				using (XmlReader itr = XmlReader.Create (stream)) {
@@ -114,8 +113,9 @@ namespace Crow.IML
 			} finally {
 				#if DEBUG_LOAD
 				loadingTime.Stop ();
-				Debug.WriteLine ("IML Instantiator creation '{2}' : {0} ticks, {1} ms",
-				loadingTime.ElapsedTicks, loadingTime.ElapsedMilliseconds, sourcePath);
+				using (StreamWriter sw = new StreamWriter ("loading.log", true)) {
+					sw.WriteLine ($"ITOR;{sourcePath,-50};{loadingTime.ElapsedTicks,8};{loadingTime.ElapsedMilliseconds,8}");
+				}
 				#endif
 			}
 		}
@@ -155,21 +155,38 @@ namespace Crow.IML
 
 		/// <summary>
 		/// Creates a new instance of the GraphicObject compiled in the instantiator
-		/// and bind it the an interface
 		/// </summary>
 		/// <returns>The new graphic object instance</returns>
-		/// <param name="iface">The interface to bind to</param>
 		public GraphicObject CreateInstance(){
+#if DEBUG_LOAD
+			Stopwatch loadingTime = Stopwatch.StartNew ();
+			GraphicObject o = loader (iface) as GraphicObject;
+			loadingTime.Stop ();
+			using (StreamWriter sw = new StreamWriter ("loading.log", true)) {
+				sw.WriteLine ($"NEW ;{sourcePath,-50};{loadingTime.ElapsedTicks,8};{loadingTime.ElapsedMilliseconds,8}");
+			}
+			return o;
+#else
 			return loader (iface) as GraphicObject;
+#endif
 		}
 		/// <summary>
 		/// Creates a new instance of T compiled in the instantiator
 		/// and bind it the an interface
 		/// </summary>
 		/// <returns>The new T instance</returns>
-		/// <param name="iface">The interface to bind to</param>
 		public T CreateInstance<T>(){
+#if DEBUG_LOAD
+			Stopwatch loadingTime = Stopwatch.StartNew ();
+			T i = (T)loader (iface);
+			loadingTime.Stop ();
+			using (StreamWriter sw = new StreamWriter ("loading.log", true)) {
+				sw.WriteLine ($"NEW ;{sourcePath,-50};{loadingTime.ElapsedTicks,8};{loadingTime.ElapsedMilliseconds,8}");
+			}
+			return i;
+#else
 			return (T)loader (iface);
+#endif
 		}
 		List<DynamicMethod> dsValueChangedDynMeths = new List<DynamicMethod>();
 		List<Delegate> cachedDelegates = new List<Delegate>();
@@ -428,8 +445,7 @@ namespace Crow.IML
 					ctx.il.Emit (OpCodes.Ldstr, sourcePath);
 					ctx.il.Emit (OpCodes.Stfld, typeof(GraphicObject).GetField("design_imlPath"));
 				}
-				#endif
-
+#endif
 				#region Styling and default values loading
 				//first check for Style attribute then trigger default value loading
 				if (reader.HasAttributes) {
@@ -464,7 +480,7 @@ namespace Crow.IML
 						if (mi.MemberType == MemberTypes.Event) {
 							foreach (string exp in CompilerServices.splitOnSemiColumnOutsideAccolades(reader.Value)) {
 								string trimed = exp.Trim();
-								if (trimed.StartsWith ("{", StringComparison.OrdinalIgnoreCase))
+								if (trimed.StartsWith ("{", StringComparison.Ordinal))
 									compileAndStoreDynHandler (ctx, mi as EventInfo, trimed.Substring (1, trimed.Length - 2));
 								else
 									emitHandlerBinding (ctx, mi as EventInfo, trimed);
@@ -479,7 +495,7 @@ namespace Crow.IML
 						if (pi.Name == "Name")
 							ctx.StoreCurrentName (reader.Value);
 
-						if (reader.Value.StartsWith ("{", StringComparison.OrdinalIgnoreCase))
+						if (reader.Value.StartsWith ("{", StringComparison.Ordinal))
 							readPropertyBinding (ctx, reader.Name, reader.Value.Substring (1, reader.Value.Length - 2));
 						else
 							CompilerServices.EmitSetValue (ctx.il, pi, reader.Value);
@@ -548,7 +564,12 @@ namespace Crow.IML
 			}
 		}
 		#endregion
-
+		/// <summary>
+		/// Reads binding expression found as attribute value in iml
+		/// </summary>
+		/// <param name="ctx">IML Context</param>
+		/// <param name="sourceMember">IML Attribute name</param>
+		/// <param name="expression">Binding Expression with accollades trimed</param>
 		void readPropertyBinding (IMLContext ctx, string sourceMember, string expression)
 		{
 			NodeAddress sourceNA = ctx.CurrentNodeAddress;
@@ -707,7 +728,7 @@ namespace Crow.IML
 
 			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
-			il.DeclareLocal (CompilerServices.TObject);
+			il.DeclareLocal (typeof(object));
 
 			il.Emit (OpCodes.Nop);
 
@@ -814,8 +835,8 @@ namespace Crow.IML
 
 			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
-			il.DeclareLocal (CompilerServices.TObject);
-			ilPC.DeclareLocal (CompilerServices.TObject);//used for checking propery less bindings
+			il.DeclareLocal (typeof(object));
+			ilPC.DeclareLocal (typeof(object));//used for checking propery less bindings
 			ilPC.DeclareLocal (typeof(MemberInfo));//used for checking propery less bindings
 
 			System.Reflection.Emit.Label cancel = ilPC.DefineLabel ();
@@ -970,7 +991,7 @@ namespace Crow.IML
 
 				System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
-				il.DeclareLocal (CompilerServices.TObject);
+				il.DeclareLocal (typeof(object));
 
 				il.Emit (OpCodes.Nop);
 
@@ -993,7 +1014,6 @@ namespace Crow.IML
 				//by default, source value type is deducted from target member type to allow
 				//memberless binding, if targetMember exists, it will be used to determine target
 				//value type for conversion
-
 				CompilerServices.emitConvert (il, piSource.PropertyType);
 
 				if (!piSource.CanWrite)
@@ -1022,7 +1042,7 @@ namespace Crow.IML
 
 			il = dm.GetILGenerator (256);
 
-			il.DeclareLocal (CompilerServices.TObject);//used for checking propery less bindings
+			il.DeclareLocal (typeof(object));//used for checking propery less bindings
 			il.DeclareLocal (typeof(MemberInfo));//used for checking propery less bindings
 			System.Reflection.Emit.Label cancel = il.DefineLabel ();
 			System.Reflection.Emit.Label newDSIsNull = il.DefineLabel ();
@@ -1148,7 +1168,7 @@ namespace Crow.IML
 
 			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
-			il.DeclareLocal (CompilerServices.TObject);
+			il.DeclareLocal (typeof(object));
 			il.Emit (OpCodes.Nop);
 
 			//load value changed member name onto the stack

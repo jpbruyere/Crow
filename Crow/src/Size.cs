@@ -33,7 +33,6 @@ namespace Crow
 {
     public struct Size
     {
-		internal static Type TSize = typeof(Size);
         public static Size Zero
         { get { return new Size(0, 0); } }
 
@@ -186,7 +185,7 @@ namespace Crow
 		}
 		public override bool Equals (object obj)
 		{
-			return (obj == null || obj.GetType() != TSize) ?
+			return (obj == null || obj.GetType() != typeof(Size)) ?
 				false :
 				this == (Size)obj;
 		}

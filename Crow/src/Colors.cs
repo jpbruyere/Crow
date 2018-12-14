@@ -41,8 +41,6 @@ namespace Crow
 	/// </summary>
 	public struct Color
     {
-		internal static Type TColor = typeof(Color);
-
 		#region CTOR
 		public Color(double _R, double _G, double _B, double _A)
 		{
@@ -104,7 +102,7 @@ namespace Crow
 			if (string.IsNullOrEmpty(s))
 				return White;
 			Color cc = default(Color);
-			if (s.StartsWith ("#")) {
+			if (s.StartsWith ("#", StringComparison.Ordinal)) {
 				cc.R = int.Parse (s.Substring (1, 2), System.Globalization.NumberStyles.HexNumber) / 255.0;
 				cc.G = int.Parse (s.Substring (3, 2), System.Globalization.NumberStyles.HexNumber) / 255.0;
 				cc.B = int.Parse (s.Substring (5, 2), System.Globalization.NumberStyles.HexNumber) / 255.0;
@@ -151,13 +149,13 @@ namespace Crow
 		}
 		public static bool operator ==(Color c, string n)
 		{
-			return n.StartsWith("#") ?
+			return n.StartsWith("#", StringComparison.Ordinal) ?
 				string.Equals(c.HtmlCode, n, StringComparison.Ordinal) :
 				string.Equals(c.Name, n, StringComparison.Ordinal);
 		}
 		public static bool operator !=(Color c, string n)
 		{
-			return n.StartsWith("#") ?
+			return n.StartsWith("#", StringComparison.Ordinal) ?
 				!string.Equals(c.HtmlCode, n, StringComparison.Ordinal) :
 				!string.Equals(c.Name, n, StringComparison.Ordinal);
 		}
@@ -429,7 +427,7 @@ namespace Crow
 		}
 		public override bool Equals (object obj)
 		{
-			return (obj == null || obj.GetType() != TColor) ?
+			return (obj == null || obj.GetType() != typeof(Color)) ?
 				false :
 				this == (Color)obj;
 		}

@@ -462,12 +462,12 @@ namespace Crow
 		{
 			Stream stream = null;
 
-			if (path.StartsWith ("#")) {
+			if (path.StartsWith ("#", StringComparison.Ordinal)) {
 				string resId = path.Substring (1);
 				//try/catch added to prevent nunit error
 				try {					
 					stream = System.Reflection.Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
-				} catch{}
+				} catch {}
 				if (stream == null)//try to find ressource in Crow assembly
 					stream = System.Reflection.Assembly.GetExecutingAssembly ().GetManifestResourceStream (resId);
 				if (stream == null)
@@ -483,7 +483,7 @@ namespace Crow
 		{
 			Stream stream = null;
 
-			if (path.StartsWith ("#")) {
+			if (path.StartsWith ("#", StringComparison.Ordinal)) {
 				string resId = path.Substring (1);
 				//try/catch added to prevent nunit error
 				try {
