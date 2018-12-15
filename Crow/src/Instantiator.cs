@@ -206,9 +206,9 @@ namespace Crow.IML
 		void parseIML (XmlReader reader) {
 			IMLContext ctx = new IMLContext (findRootType (reader));
 
-			ctx.nodesStack.Push (new Node (ctx.RootType));
+			ctx.PushNode (ctx.RootType);
 			emitLoader (reader, ctx);
-			ctx.nodesStack.Pop ();
+			ctx.PopNode ();
 
 			foreach (int idx in templateCachedDelegateIndices)
 				ctx.emitCachedDelegateHandlerAddition(idx, CompilerServices.eiLogicalParentChanged);
@@ -429,7 +429,7 @@ namespace Crow.IML
 			using (XmlTextReader reader = new XmlTextReader (tmpXml, XmlNodeType.Element, null)) {
 				reader.Read ();
 
-				#if DESIGN_MODE
+#if DESIGN_MODE
 				IXmlLineInfo li = (IXmlLineInfo)reader;
 				ctx.il.Emit (OpCodes.Ldloc_0);
 				ctx.il.Emit (OpCodes.Ldstr, this.NextDesignID);
@@ -450,23 +450,33 @@ namespace Crow.IML
 				//first check for Style attribute then trigger default value loading
 				if (reader.HasAttributes) {
 					string style = reader.GetAttribute ("Style");
-					if (!string.IsNullOrEmpty (style)){
+					if (!string.IsNullOrEmpty (style)) {
 						CompilerServices.EmitSetValue (ctx.il, CompilerServices.piStyle, style);
-						#if DESIGN_MODE
+#if DESIGN_MODE
 						emitSetDesignAttribute (ctx, "Style", style);
-						#endif
+#endif
 					}
+					//check for dataSourceType, if set, datasource bindings will use direct setter/getter
+					//instead of reflexion
+					string dataSourceType = reader.GetAttribute ("DataSourceType");
+					if (string.IsNullOrEmpty (dataSourceType)) {
+						//if not set but dataSource is not null, reset dsType to null
+						string ds = reader.GetAttribute ("DataSource");
+						if (!string.IsNullOrEmpty (ds)) 
+							ctx.SetDataSourceTypeForCurrentNode (null);
+					} else
+						ctx.SetDataSourceTypeForCurrentNode(CompilerServices.getTypeFromName (dataSourceType));
 				}
-                ctx.il.Emit (OpCodes.Ldloc_0);
+				ctx.il.Emit (OpCodes.Ldloc_0);
                 ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miLoadDefaultVals);
-                #endregion
+#endregion
 
 
 				#region Attributes reading
 				if (reader.HasAttributes) {
 
 					while (reader.MoveToNextAttribute ()) {
-						if (reader.Name == "Style")
+						if (reader.Name == "Style" || reader.Name == "DataSourceType")
 							continue;
 
 						#if DESIGN_MODE
@@ -575,13 +585,16 @@ namespace Crow.IML
 			NodeAddress sourceNA = ctx.CurrentNodeAddress;
 			BindingDefinition bindingDef = sourceNA.GetBindingDef (sourceMember, expression);
 
-			#if DEBUG_BINDING
+#if DEBUG_BINDING
 			Debug.WriteLine("Property Binding: " + bindingDef.ToString());
-			#endif
+#endif
 
-			if (bindingDef.IsDataSourceBinding)//bind on data source
-				emitDataSourceBindings (ctx, bindingDef);
-			else
+			if (bindingDef.IsDataSourceBinding) {//bind on data source
+				if (ctx.CurrentNodeHasDataSourceType)
+					emitDataSourceBindings (ctx, bindingDef, ctx.CurrentDataSourceType);
+				else
+					emitDataSourceBindings (ctx, bindingDef);
+			} else
 				ctx.StorePropertyBinding (bindingDef);
 		}
 
@@ -591,7 +604,7 @@ namespace Crow.IML
 				(dataSource as IValueChange).ValueChanged +=
 					(EventHandler<ValueChangeEventArgs>)dsValueChangedDynMeths [dynMethIdx].CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>), dscSource);
 		}
-		/// <summary> Emits remove old data source event handler./summary>
+		/// <summary> Emits remove old data source event handler.</summary>
 		void emitRemoveOldDataSourceHandler(ILGenerator il, string eventName, string delegateName, bool DSSide = true){
 			System.Reflection.Emit.Label cancel = il.DefineLabel ();
 
@@ -968,6 +981,165 @@ namespace Crow.IML
 			ctx.emitCachedDelegateHandlerAddition(delDSIndex, CompilerServices.eiLogicalParentChanged);
 		}
 		/// <summary>
+		/// data source binding with known data type
+		/// </summary>
+		void emitDataSourceBindings (IMLContext ctx, BindingDefinition bindingDef, Type dsType)
+		{
+#if DEBUG_BINDING_FUNC_CALLS
+			Console.WriteLine ($"emitDataSourceBindings with data type knows: {bindingDef}");
+#endif
+			DynamicMethod dm = null;
+			ILGenerator il = null;
+			int dmVC = 0;
+			PropertyInfo piSource = ctx.CurrentNodeType.GetProperty (bindingDef.SourceMember);
+			//if no dataSource member name is provided, valuechange is not handle and datasource change
+			//will be used as origine value
+			string delName = "dyn_DSvalueChanged" + NewId;
+			if (!string.IsNullOrEmpty (bindingDef.TargetMember)) {
+				#region create valuechanged method
+				dm = new DynamicMethod (delName,
+					typeof (void),
+					CompilerServices.argsBoundValueChange, true);
+
+				il = dm.GetILGenerator (256);
+
+				System.Reflection.Emit.Label endMethod = il.DefineLabel ();
+
+				il.DeclareLocal (typeof (object));
+
+				il.Emit (OpCodes.Nop);
+
+				//load value changed member name onto the stack
+				il.Emit (OpCodes.Ldarg_2);
+				il.Emit (OpCodes.Ldfld, CompilerServices.fiVCMbName);
+
+				//test if it's the expected one
+				il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);
+				il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
+				il.Emit (OpCodes.Call, CompilerServices.stringEquals);
+				il.Emit (OpCodes.Brfalse, endMethod);
+				//set destination member with valueChanged new value
+				//load destination ref
+				il.Emit (OpCodes.Ldarg_0);
+				//load new value onto the stack
+				il.Emit (OpCodes.Ldarg_2);
+				il.Emit (OpCodes.Ldfld, CompilerServices.fiVCNewValue);
+
+				//by default, source value type is deducted from target member type to allow
+				//memberless binding, if targetMember exists, it will be used to determine target
+				//value type for conversion
+				CompilerServices.emitConvert (il, piSource.PropertyType);
+
+				if (!piSource.CanWrite)
+					throw new Exception ("Source member of bindind is read only:" + piSource.ToString ());
+
+				il.Emit (OpCodes.Callvirt, piSource.GetSetMethod ());
+
+				il.MarkLabel (endMethod);
+				il.Emit (OpCodes.Ret);
+
+				//vc dyn meth is stored in a cached list, it will be bound to datasource only
+				//when datasource of source graphic object changed
+				dmVC = dsValueChangedDynMeths.Count;
+				dsValueChangedDynMeths.Add (dm);
+				#endregion
+			}
+
+			#region emit dataSourceChanged event handler
+			//now we create the datasource changed method that will init the destination member with
+			//the actual value of the origin member of the datasource and then will bind the value changed
+			//dyn methode.
+			//dm is bound to the instanciator instance to have access to cached dyn meth and delegates
+			dm = new DynamicMethod ("dyn_dschanged" + NewId,
+				typeof (void),
+				CompilerServices.argsBoundDSChange, true);
+
+			il = dm.GetILGenerator (256);
+
+			il.DeclareLocal (typeof (object));//used for checking propery less bindings
+			il.DeclareLocal (typeof (MemberInfo));//used for checking propery less bindings
+			il.DeclareLocal (typeof (object));//new datasource store, save one field access
+			System.Reflection.Emit.Label cancel = il.DefineLabel ();
+			System.Reflection.Emit.Label newDSIsNull = il.DefineLabel ();
+			System.Reflection.Emit.Label cancelInit = il.DefineLabel ();
+
+			il.Emit (OpCodes.Nop);
+
+			il.Emit (OpCodes.Ldarg_2);//load datasource change arg
+			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+			il.Emit (OpCodes.Stloc_2);//new ds is now loc 2
+
+			emitRemoveOldDataSourceHandler (il, "ValueChanged", delName, true);
+
+			if (!string.IsNullOrEmpty (bindingDef.TargetMember)) {
+				if (bindingDef.TwoWay) //remove handler
+					emitRemoveOldDataSourceHandler (il, "ValueChanged", delName, false);
+				//test if new ds is null
+				il.Emit (OpCodes.Ldloc_2);
+				il.Emit (OpCodes.Brfalse, newDSIsNull);//new ds is null
+				//test if new ds is of expected type
+				il.Emit (OpCodes.Ldloc_2);
+				il.Emit (OpCodes.Isinst, dsType);
+				//il.Emit (OpCodes.Call, CompilerServices.miGetMDToken);
+				//il.Emit (OpCodes.Ldc_I4, dsType.MetadataToken);
+				il.Emit (OpCodes.Brfalse, newDSIsNull);
+			}
+
+			#region fetch initial Value
+			if (!string.IsNullOrEmpty (bindingDef.TargetMember)) {
+				Type mbType;
+				MemberInfo mi = CompilerServices.GetMemberInfo (dsType, bindingDef.TargetMember, out mbType);
+				if (mi != null) {
+					il.Emit (OpCodes.Ldarg_1);//load source of dataSourceChanged which is the dest instance
+					il.Emit (OpCodes.Ldloc_2);//load new ds
+					CompilerServices.emitGetMemberValue (il, dsType, mi);
+					if (mbType != piSource.PropertyType)
+						CompilerServices.emitConvert (il, mbType, piSource.PropertyType);
+					il.Emit (OpCodes.Callvirt, piSource.GetSetMethod ());
+				}
+			}
+			#endregion
+
+			if (!string.IsNullOrEmpty (bindingDef.TargetMember)) {
+				il.MarkLabel (cancelInit);
+				//check if new dataSource implement IValueChange
+				il.Emit (OpCodes.Ldloc_2);//load new datasource
+				il.Emit (OpCodes.Isinst, typeof (IValueChange));
+				il.Emit (OpCodes.Brfalse, cancel);
+
+				il.Emit (OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
+				il.Emit (OpCodes.Ldarg_1);//load datasource change source
+				il.Emit (OpCodes.Ldloc_2);//load new datasource
+				il.Emit (OpCodes.Ldc_I4, dmVC);//load index of dynmathod
+				il.Emit (OpCodes.Call, CompilerServices.miDSChangeEmitHelper);
+
+				il.MarkLabel (cancel);
+
+				if (bindingDef.TwoWay) {
+					il.Emit (OpCodes.Ldarg_1);//arg1: dataSourceChange source, the origine of the binding
+					il.Emit (OpCodes.Ldstr, bindingDef.SourceMember);//arg2: orig member
+					il.Emit (OpCodes.Ldloc_2);//arg3: new datasource
+					il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);//arg4: dest member
+					il.Emit (OpCodes.Call, CompilerServices.miDSReverseBinding);
+				}
+
+			}
+			il.MarkLabel (newDSIsNull);
+			il.Emit (OpCodes.Ret);
+
+			//store dschange delegate in instatiator instance for access while instancing graphic object
+			int delDSIndex = cachedDelegates.Count;
+			cachedDelegates.Add (dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
+			#endregion
+
+			ctx.emitCachedDelegateHandlerAddition (delDSIndex, CompilerServices.eiDSChange);
+
+#if DEBUG_BINDING
+			Debug.WriteLine("\tDataSource ValueChanged: " + delName);
+			Debug.WriteLine("\tDataSource Changed: " + dm.Name);
+#endif
+		}
+		/// <summary>
 		/// create the valuechanged handler, the datasourcechanged handler and emit event handling
 		/// </summary>
 		void emitDataSourceBindings(IMLContext ctx, BindingDefinition bindingDef){
@@ -1044,13 +1216,18 @@ namespace Crow.IML
 
 			il.DeclareLocal (typeof(object));//used for checking propery less bindings
 			il.DeclareLocal (typeof(MemberInfo));//used for checking propery less bindings
+			il.DeclareLocal (typeof (object));//new datasource store, save one field access
 			System.Reflection.Emit.Label cancel = il.DefineLabel ();
 			System.Reflection.Emit.Label newDSIsNull = il.DefineLabel ();
 			System.Reflection.Emit.Label cancelInit = il.DefineLabel ();
 
 			il.Emit (OpCodes.Nop);
 
-			emitRemoveOldDataSourceHandler(il, "ValueChanged", delName, true);
+			il.Emit (OpCodes.Ldarg_2);//load datasource change arg
+			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+			il.Emit (OpCodes.Stloc_2);//new ds is now loc 2
+
+			emitRemoveOldDataSourceHandler (il, "ValueChanged", delName, true);
 
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
 				if (bindingDef.TwoWay){
@@ -1070,15 +1247,13 @@ namespace Crow.IML
 //					il.Emit (OpCodes.Call, CompilerServices.miRemEvtHdlByTarget);
 //					il.MarkLabel(cancelRemove);
 				}
-				il.Emit (OpCodes.Ldarg_2);//load datasource change arg
-				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+				il.Emit (OpCodes.Ldloc_2);
 				il.Emit (OpCodes.Brfalse, newDSIsNull);//new ds is null
 			}
 
 #region fetch initial Value
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
-				il.Emit (OpCodes.Ldarg_2);//load new datasource
-				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+				il.Emit (OpCodes.Ldloc_2); 
 				il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);//load member name
 				il.Emit (OpCodes.Call, CompilerServices.miGetMembIinfoWithRefx);
 				il.Emit (OpCodes.Stloc_1);//save memberInfo
@@ -1087,8 +1262,7 @@ namespace Crow.IML
 			}
 
 			il.Emit (OpCodes.Ldarg_1);//load source of dataSourceChanged which is the dest instance
-			il.Emit (OpCodes.Ldarg_2);//load new datasource
-			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+			il.Emit (OpCodes.Ldloc_2);//load new datasource
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
 				il.Emit (OpCodes.Ldloc_1);//push mi for value fetching
 				il.Emit (OpCodes.Call, CompilerServices.miGetValWithRefx);
@@ -1100,15 +1274,13 @@ namespace Crow.IML
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
 				il.MarkLabel(cancelInit);
 				//check if new dataSource implement IValueChange
-				il.Emit (OpCodes.Ldarg_2);//load new datasource
-				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+				il.Emit (OpCodes.Ldloc_2);//load new datasource
 				il.Emit (OpCodes.Isinst, typeof(IValueChange));
 				il.Emit (OpCodes.Brfalse, cancel);
 
 				il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
 				il.Emit (OpCodes.Ldarg_1);//load datasource change source
-				il.Emit (OpCodes.Ldarg_2);//load new datasource
-				il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+				il.Emit (OpCodes.Ldloc_2);//load new datasource
 				il.Emit(OpCodes.Ldc_I4, dmVC);//load index of dynmathod
 				il.Emit (OpCodes.Call, CompilerServices.miDSChangeEmitHelper);
 
@@ -1117,8 +1289,7 @@ namespace Crow.IML
 				if (bindingDef.TwoWay){
 					il.Emit (OpCodes.Ldarg_1);//arg1: dataSourceChange source, the origine of the binding
 					il.Emit (OpCodes.Ldstr, bindingDef.SourceMember);//arg2: orig member
-					il.Emit (OpCodes.Ldarg_2);//arg3: new datasource
-					il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
+					il.Emit (OpCodes.Ldloc_2);//arg3: new datasource
 					il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);//arg4: dest member
 					il.Emit (OpCodes.Call, CompilerServices.miDSReverseBinding);
 				}

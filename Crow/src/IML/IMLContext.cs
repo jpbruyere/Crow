@@ -80,6 +80,39 @@ namespace Crow.IML
 			CompilerServices.emitSetCurInterface (il);
 		}
 
+		Type curDataSourceType = null;
+		/// <summary>
+		/// Pushs  new node and set datasourcetype to current ds type
+		/// </summary>
+		/// <param name="crowType">Crow type.</param>
+		/// <param name="_index">Index.</param>
+		public void PushNode (Type crowType, int _index = 0) {
+			nodesStack.Push (new Node (crowType, _index, curDataSourceType));
+		}
+		/// <summary>
+		/// Pops node and set curDS type to previous one in node on top of the stack
+		/// </summary>
+		/// <returns>The node.</returns>
+		public Node PopNode () {
+			Node n = nodesStack.Pop ();
+			if (nodesStack.Count > 0)
+				curDataSourceType = nodesStack.Peek().DataSourceType;
+			return n;
+		}
+		public bool CurrentNodeHasDataSourceType {
+			get { return curDataSourceType != null; }
+		}
+		public Type CurrentDataSourceType {
+			get { return curDataSourceType; }
+		}
+		public void SetDataSourceTypeForCurrentNode (Type dsType)
+		{
+			Node n = nodesStack.Pop ();
+			n.DataSourceType = dsType;
+			nodesStack.Push (n);
+			curDataSourceType = dsType;
+		}
+
 		public NodeAddress CurrentNodeAddress {
 			get {
 				Node[] n = nodesStack.ToArray ();
@@ -185,7 +218,6 @@ namespace Crow.IML
 		/// Emits the handler method addition, done at end of parsing, Loc_0 is root node instance
 		/// </summary>
 		/// <param name="bd">Bd.</param>
-		/// <param name="evt">passed as arg to prevent refetching it for the 3rd time</param>
 		public void emitHandlerMethodAddition(EventBinding bd){
 
 			//fetch source instance with address for handler addition (as 1st arg of handler.add)

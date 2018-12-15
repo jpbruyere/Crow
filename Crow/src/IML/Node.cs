@@ -37,17 +37,23 @@ namespace Crow.IML
 	public struct Node
 	{
 		#region CTOR
-		public Node (Type crowType, int _index = 0)
+		public Node (Type crowType, int _index = 0, Type dsType = null)
 		{
 			CrowType = crowType;
 			Index = _index;
+			DataSourceType = dsType;
 		}
 		#endregion
 
 		/// <summary> Current node type</summary>
-		public Type CrowType;
+		public readonly Type CrowType;
 		/// <summary> Index in parent, -1 for template</summary>
-		public int Index;
+		public readonly int Index;
+		/// <summary>
+		/// DataSourceType attribute if set
+		/// </summary>
+		public Type DataSourceType;
+
 
 		/// <summary>
 		/// retrieve the child addition method depending on the type of this node
@@ -68,7 +74,7 @@ namespace Crow.IML
 			return null;
 		}
 
-		#region Equality Compare
+#region Equality Compare
 		public override bool Equals (object obj)
 		{
 			if (obj == null) 
@@ -80,13 +86,16 @@ namespace Crow.IML
 		{
 			return CrowType.GetHashCode () ^ Index.GetHashCode ();
 		}
-		#endregion
+#endregion
 
 		public bool HasTemplate {
 			get { return typeof (TemplatedControl).IsAssignableFrom (CrowType);}
 		}
 		public bool IsTemplatedGroup {
 			get { return typeof (TemplatedGroup).IsAssignableFrom (CrowType);}
+		}
+		public bool HasDataSourceType {
+			get { return DataSourceType != null; }
 		}
 
 		public static implicit operator string (Node sn)
