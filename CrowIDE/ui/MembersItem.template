@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ItemTemplate>
-	<HorizontalStack Style="MemberViewHStack" ContextCommands="{Commands}">
+	<HorizontalStack Style="MemberViewHStack" ContextCommands="{Commands}" DataSourceType="PropertyContainer">
 		<Label Style="MemberViewLabel" Text="{Name}" Foreground = "{LabForeground}"/>
 		<TextBox Margin="1" Text="{²Value}" Height="Fit" Foreground = "{LabForeground}"/>
 	</HorizontalStack>
@@ -9,7 +9,7 @@
 	Data="Properties" DataTest="Type"/>
 <ItemTemplate DataType="System.Boolean" >
 	<HorizontalStack Style="MemberViewHStack" ContextCommands="{Commands}">
-		<Label Style="MemberViewLabel" Text="{Name}" Foreground = "{LabForeground}"/>
+		<Label Style="MemberViewLabel" Text="{Name}" Foreground = "{LabForeground}" />
 		<CheckBox Background="White" Foreground = "{LabForeground}" Height="Stretched" Caption="" IsChecked="{²Value}"/>
 	</HorizontalStack>
 </ItemTemplate>

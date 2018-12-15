@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <!--<Window Height="Stretched" Width="Stretched" >-->
-	<VerticalStack>
+	<VerticalStack DataSourceType="CrowIDE">
 		<Menu>
 			<MenuItem Caption="File" Width="Fit" PopWidth="120" DataSource="{CurrentSolution}">
 				<MenuItem Command="{CMDNew}" />

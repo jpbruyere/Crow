@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<GenericStack Orientation="Vertical" Spacing="0"		
+<GenericStack Orientation="Vertical" Spacing="0" DataSourceType="ProjectFile"		
 	MouseEnter="{caption.Font=hack bold, 10}"
 	MouseLeave="{caption.Font=hack, 10}">
 	<HorizontalStack Margin="2" Left="{./TabOffset}"

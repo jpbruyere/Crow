@@ -382,8 +382,6 @@ namespace Crow.IML
 						tmp = gi.Invoke(instance, null);
 					dstType = gi.ReturnType;
 				}
-
-
 				if (tmp != null)
 					return tmp;
 				if (dstType == typeof(string) || dstType == typeof (object))//TODO:object should be allowed to return null and not ""
@@ -397,23 +395,6 @@ namespace Crow.IML
 
 			return null;
 		}
-		
-		/// <summary>
-		/// search for extentions method in entry assembly then in assembly where the type is defined
-		/// </summary>
-		/// <returns>Extention MethodInfo</returns>
-		/// <param name="t">Extended type</param>
-		/// <param name="methodName">Extention method name</param>
-		//internal static MethodInfo SearchExtMethod(Type t, string methodName){
-		//	MethodInfo mi = null;
-		//	mi = GetExtensionMethods (Assembly.GetEntryAssembly(), t)
-		//		.Where (em => em.Name == methodName).FirstOrDefault ();
-		//	if (mi != null)
-		//		return mi;
-
-		//	return GetExtensionMethods (t.Module.Assembly, t)
-		//		.Where (em => em.Name == methodName).FirstOrDefault ();
-		//}
 		internal static MethodInfo SearchExtMethod (Type t, string methodName)
 		{
 			string key = t.Name + "." + methodName;
@@ -996,6 +977,77 @@ namespace Crow.IML
 				throw new Exception ($"member {member} not found in {dataType}");
 
 			return fi.GetValue (data);
+		}
+		internal static MemberInfo GetMemberInfo (Type dataType, string member, out Type returnType)
+		{
+			MethodInfo miGetDatas = dataType.GetMethod (member, new Type [] { });
+			if (miGetDatas != null) {
+				returnType = miGetDatas.ReturnType;
+				return miGetDatas;
+			}
+
+			MemberInfo mbi = dataType.GetMember (member).FirstOrDefault ();
+			if (mbi == null)
+				miGetDatas = CompilerServices.SearchExtMethod (dataType, member);
+			else {
+				if (mbi is FieldInfo) {
+					FieldInfo fi = mbi as FieldInfo;
+					returnType = fi.FieldType;
+					return mbi;
+				}
+				if (mbi.MemberType == MemberTypes.Property)
+					miGetDatas = (mbi as PropertyInfo).GetGetMethod ();
+				else
+					miGetDatas = mbi as MethodInfo;
+			}
+			returnType = miGetDatas?.ReturnType;
+			return miGetDatas;
+
+		}
+		internal static void emitGetMemberValue (ILGenerator il, Type dataType, MemberInfo mi)
+		{
+			switch (mi.MemberType) {
+			case MemberTypes.Method:
+				MethodInfo mim = mi as MethodInfo;
+				if (mim.IsStatic)
+					il.Emit (OpCodes.Call, mim);
+				else
+					il.Emit (OpCodes.Callvirt, mim);
+				break;
+			case MemberTypes.Field:
+				il.Emit (OpCodes.Ldfld, mi as FieldInfo);
+				break;
+			}
+		}
+		//object is already on the stack
+		internal static void emitGetMemberValue (ILGenerator il, Type dataType, string member)
+		{
+			MethodInfo miGetDatas = dataType.GetMethod (member, new Type [] { });
+			if (miGetDatas != null) {
+				il.Emit (OpCodes.Callvirt, miGetDatas);
+				return;
+			}
+			MemberInfo mbi = dataType.GetMember (member).FirstOrDefault ();
+			if (mbi == null) {
+				MethodInfo miExt = CompilerServices.SearchExtMethod (dataType, member);
+				if (miExt == null)//and among fields
+					throw new Exception ($"member {member} not found in {dataType}");
+				il.Emit (OpCodes.Call, miExt);
+				return;
+			}
+			if (mbi.MemberType == MemberTypes.Property) {
+				miGetDatas = (mbi as PropertyInfo)?.GetGetMethod ();
+				if (miGetDatas == null)
+					throw new Exception ($"no getter found for property {member} in {dataType}");
+				il.Emit (OpCodes.Callvirt, miGetDatas);
+				return;
+			}
+
+			FieldInfo fi = mbi as FieldInfo;
+			if (fi == null)
+				throw new Exception ($"member {member} not found in {dataType}");
+
+			il.Emit (OpCodes.Ldfld, fi);
 		}
 	}
 }

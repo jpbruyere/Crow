@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<HorizontalStack Style="MemberViewHStack" ContextCommands="{Commands}">
+<HorizontalStack Style="MemberViewHStack" ContextCommands="{Commands}" DataSourceType="PropertyContainer">
 	<Label Style="MemberViewLabel" Text="{Name}" Foreground = "{LabForeground}"/>
 	<ComboBox Margin="0"  Height="Stretched" Width="50%" Data="{Choices}"
 			SelectedItem="{²Value}">

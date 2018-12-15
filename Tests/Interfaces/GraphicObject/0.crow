@@ -1,2 +1,4 @@
 <?xml version="1.0"?>
-<GraphicObject Background="SeaGreen"/>
+<VerticalStack >
+    <Label Text="{StringTest}" Background="SeaGreen" DataSourceType="MainClass"/>
+</VerticalStack>

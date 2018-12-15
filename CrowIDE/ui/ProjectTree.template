@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <ItemTemplate>
-	<Border Style="TreeItemBorder" ContextCommands="{Commands}" Focusable="true" MouseDown="onClick" MouseDoubleClick="onDoubleClick">
+	<Border DataSourceType="ProjectItem" Style="TreeItemBorder" ContextCommands="{Commands}" Focusable="true" MouseDown="onClick" MouseDoubleClick="onDoubleClick">
 		<Group>
 			<GraphicObject Height="Stretched" Background="RoyalBlue" Visible="{IsSelected}"/>
 			<HorizontalStack>
@@ -12,7 +12,7 @@
 	</Border>
 </ItemTemplate>
 <ItemTemplate DataType="Crow.Coding.Project" Data="RootItems" DataTest="Type">
-	<Expandable Caption="{Name}" ContextCommands="{Commands}" IsExpanded="{²IsExpanded}" MouseDoubleClick="/onClickForExpand">
+	<Expandable DataSourceType="Project" Caption="{Name}" ContextCommands="{Commands}" IsExpanded="{²IsExpanded}" MouseDoubleClick="/onClickForExpand">
 		<Template>
 			<VerticalStack>
 				<Border Style="TreeItemBorder" >
@@ -38,7 +38,7 @@
 		</HorizontalStack>
 	</Expandable>
 </ItemTemplate>
-<ItemTemplate DataType="ReferenceGroup" Data="ChildNodes" DataTest="Type" >
+<ItemTemplate DataSourceType="ProjectNode" DataType="ReferenceGroup" Data="ChildNodes" DataTest="Type" >
 	<Expandable Caption="{DisplayName}" Template="#Crow.Coding.TreeExpandable.template" IsExpanded="{²IsExpanded}">
 		<HorizontalStack Height="Fit">
 			<GraphicObject Width="8" Height="10"/>
@@ -47,7 +47,7 @@
 	</Expandable>
 </ItemTemplate>
 <ItemTemplate DataType="VirtualGroup" Data="ChildNodes" DataTest="Type">
-	<Expandable Caption="{DisplayName}" Template="#Crow.Coding.TreeExpandable.template" IsExpanded="{²IsExpanded}">
+	<Expandable DataSourceType="ProjectNode" Caption="{DisplayName}" Template="#Crow.Coding.TreeExpandable.template" IsExpanded="{²IsExpanded}">
 		<HorizontalStack Height="Fit">
 			<GraphicObject Width="8" Height="10"/>
 			<VerticalStack Height="Fit" Name="ItemsContainer"/>
@@ -55,7 +55,7 @@
 	</Expandable>
 </ItemTemplate>
 <ItemTemplate DataType="Folder" DataTest="Type">
-	<Border Style="TreeItemBorder" ContextCommands="{Commands}">
+	<Border DataSourceType="ProjectNode" Style="TreeItemBorder" ContextCommands="{Commands}">
 		<HorizontalStack>
 			<Image Style="ProjTreeIcon"
 				Path="#Crow.Icons.folder.svg"/>

@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 
 namespace tests
 {
-	class MainClass : Interface
+	public class MainClass : Interface
 	{
 		[DllImport ("dl", CallingConvention=CallingConvention.Cdecl)]
 		static extern IntPtr dlopen (string file, dlmode mode);
@@ -54,7 +54,7 @@ namespace tests
 		/*[DllImport (cairoLibPath, EntryPoint="cairo_stroke")]
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
 		public static extern void cairo_stroke_icall (IntPtr cr);*/
-
+		public string StringTest = "this is a string for testing";
 
 		static MainClass app;
 		public Command CMDTest;
@@ -115,9 +115,9 @@ namespace tests
 				//app.AddWidget (@"Interfaces/Divers/testFocus.crow").DataSource = app;
 				//app.AddWidget (@"Interfaces/Divers/testMenu.crow").DataSource = app;
 				//app.AddWidget (@"Interfaces/Divers/testVisibility.crow").DataSource = app;
-				app.Load (@"Interfaces/Divers/0.crow").DataSource = app;
+				//app.Load (@"Interfaces/Divers/0.crow").DataSource = app;
 				//app.AddWidget (@"Interfaces/Splitter/1.crow").DataSource = app;
-				//app.AddWidget (@"Interfaces/GraphicObject/0.crow").DataSource = app;
+				app.Load (@"Interfaces/GraphicObject/0.crow").DataSource = app;
 				//app.AddWidget (@"Interfaces/TemplatedContainer/test_Listbox.crow").DataSource = app;
 
 				/*app.instFileDlg = Crow.IML.Instantiator.CreateFromImlFragment
