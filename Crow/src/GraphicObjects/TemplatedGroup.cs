@@ -84,7 +84,7 @@ namespace Crow
 		#region Templating
 		//TODO: dont instantiate ItemTemplates if not used
 		//but then i should test if null in msil gen
-		public Dictionary<string, ItemTemplate> ItemTemplates = new Dictionary<string, Crow.ItemTemplate>();
+		public Dictionary<string, ItemTemplate> ItemTemplates = new Dictionary<string, ItemTemplate>();
 
 		/// <summary>
 		/// Keep track of expanded subnodes and closed time to unload
@@ -97,8 +97,7 @@ namespace Crow
 		/// ItemTemplate file may contains either a single template without the
 		/// ItemTemplate enclosing tag, or several item templates each enclosed
 		/// in a separate tag.
-		/// </summary>
-		
+		/// </summary>		
 		public string ItemTemplate {
 			get { return _itemTemplate; }
 			set {
