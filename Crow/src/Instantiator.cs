@@ -25,7 +25,6 @@
 // THE SOFTWARE.
 
 using System;
-using System.Threading;
 using System.IO;
 using System.Text;
 using System.Diagnostics;
@@ -34,7 +33,6 @@ using System.Reflection.Emit;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
-using Crow.IML;
 
 namespace Crow.IML
 {
@@ -107,16 +105,16 @@ namespace Crow.IML
 				using (XmlReader itr = XmlReader.Create (stream)) {
 					parseIML (itr);
 				}
-				stream.Dispose ();
 			} catch (Exception ex) {
 				throw new InstantiatorException(sourcePath, ex);
 			} finally {
-				#if DEBUG_LOAD
+				stream?.Dispose ();
+#if DEBUG_LOAD
 				loadingTime.Stop ();
 				using (StreamWriter sw = new StreamWriter ("loading.log", true)) {
 					sw.WriteLine ($"ITOR;{sourcePath,-50};{loadingTime.ElapsedTicks,8};{loadingTime.ElapsedMilliseconds,8}");
 				}
-				#endif
+#endif
 			}
 		}
 		/// <summary>
@@ -267,7 +265,7 @@ namespace Crow.IML
 		/// <returns>the string triplet dataType, itemTmpID read as attribute of this tag</returns>
 		/// <param name="reader">current xml text reader</param>
 		/// <param name="itemTemplatePath">file containing the templates if its a dedicated one</param>
-		string[] parseItemTemplateTag (XmlReader reader, string itemTemplatePath = "") {
+		string[] parseItemTemplateTag (IMLContext ctx, XmlReader reader, string itemTemplatePath = "") {
 			string dataType = "default", datas = "", path = "", dataTest = "TypeOf";
 			while (reader.MoveToNextAttribute ()) {
 				if (reader.Name == "DataType")
@@ -285,16 +283,16 @@ namespace Crow.IML
 
 			if (string.IsNullOrEmpty (path)) {
 				itemTmpID += Guid.NewGuid ().ToString ();
-				iface.Instantiators [itemTmpID] =
+				iface.ItemTemplates [itemTmpID] =
 					new ItemTemplate (iface, new MemoryStream (Encoding.UTF8.GetBytes (reader.ReadInnerXml ())), dataTest, dataType, datas);
 
 			} else {
 				if (!reader.IsEmptyElement)
 					throw new Exception ("ItemTemplate with Path attribute set may not include sub nodes");
 				itemTmpID += path+dataType+datas;
-				if (!iface.Instantiators.ContainsKey (itemTmpID))
-					iface.Instantiators [itemTmpID] =
-						new ItemTemplate (iface, path, dataTest, dataType, datas);
+				if (!iface.ItemTemplates.ContainsKey (itemTmpID))
+					iface.ItemTemplates [itemTmpID] =
+						new ItemTemplate (iface, path, ctx.CurrentNodeType, dataTest, dataType, datas);
 			}
 			return new string [] { dataType, itemTmpID, datas, dataTest };
 		}
@@ -328,7 +326,7 @@ namespace Crow.IML
 						reader.Read ();
 						readChildren (reader, ctx, -1);
 					} else if (reader.Name == "ItemTemplate")
-						itemTemplateIds.Add (parseItemTemplateTag (reader));					
+						itemTemplateIds.Add (parseItemTemplateTag (ctx, reader));					
 				}
 
 				if (!inlineTemplate) {//load from path or default template
@@ -347,13 +345,11 @@ namespace Crow.IML
 					//try to load ItemTemplate(s) from ItemTemplate attribute of TemplatedGroup
 					if (!string.IsNullOrEmpty (itemTemplatePath)) {
 						//check if it is already loaded in cache as a single itemTemplate instantiator
-						if (iface.Instantiators.ContainsKey (itemTemplatePath)) {
+						if (iface.ItemTemplates.ContainsKey (itemTemplatePath)) {
 							itemTemplateIds.Add (new string [] { "default", itemTemplatePath, "" });
 						} else {
 							using (Stream stream = iface.GetStreamFromPath (itemTemplatePath)) {
 								//itemtemplate files may have multiple root nodes
-								if (stream == null)
-									Debugger.Break ();
 								XmlReaderSettings itrSettings = new XmlReaderSettings { ConformanceLevel = ConformanceLevel.Fragment };
 								using (XmlReader itr = XmlReader.Create (stream, itrSettings)) {									
 									while (itr.Read ()) {
@@ -362,12 +358,12 @@ namespace Crow.IML
 										if (itr.NodeType == XmlNodeType.Element) {
 											if (itr.Name != "ItemTemplate") {
 												//the file contains a single template to use as default
-												iface.Instantiators [itemTemplatePath] =
+												iface.ItemTemplates [itemTemplatePath] =
 													new ItemTemplate (iface, itr);
 												itemTemplateIds.Add (new string [] { "default", itemTemplatePath, "", "TypeOf" });
 												break;//we should be at the end of the file
 											}
-											itemTemplateIds.Add (parseItemTemplateTag (itr, itemTemplatePath));
+											itemTemplateIds.Add (parseItemTemplateTag (ctx, itr, itemTemplatePath));
 										}
 									}
 								}
@@ -390,6 +386,9 @@ namespace Crow.IML
 					//load itemTemplate
 					ctx.il.Emit (OpCodes.Ldarg_1);//load currentInterface
 					ctx.il.Emit (OpCodes.Ldstr, iTempId [1]);//load path
+					//second arg is Type, to find assembly where to search if not in entry
+					ctx.il.Emit (OpCodes.Ldloc_0);//load TempControl ref
+					ctx.il.Emit (OpCodes.Call, CompilerServices.miGetType);
 					ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miGetITemp);
 					ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miAddITemp);
 
@@ -1159,7 +1158,7 @@ namespace Crow.IML
 					typeof (void),
 					CompilerServices.argsBoundValueChange, true);
 
-				il = dm.GetILGenerator (256);
+				il = dm.GetILGenerator (32);
 
 				System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
@@ -1212,7 +1211,7 @@ namespace Crow.IML
 				typeof (void),
 				CompilerServices.argsBoundDSChange, true);
 
-			il = dm.GetILGenerator (256);
+			il = dm.GetILGenerator (64);
 
 			il.DeclareLocal (typeof(object));//used for checking propery less bindings
 			il.DeclareLocal (typeof(MemberInfo));//used for checking propery less bindings
@@ -1230,23 +1229,9 @@ namespace Crow.IML
 			emitRemoveOldDataSourceHandler (il, "ValueChanged", delName, true);
 
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
-				if (bindingDef.TwoWay){
-//					System.Reflection.Emit.Label cancelRemove = il.DefineLabel ();
-//					//remove handler if not null
-//					il.Emit (OpCodes.Ldarg_2);//load old parent
-//					il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
-//					il.Emit (OpCodes.Brfalse, cancelRemove);//old parent is null
-
-					//remove handler
+				if (bindingDef.TwoWay)//remove handler
 					emitRemoveOldDataSourceHandler(il, "ValueChanged", delName, false);
 
-//					il.Emit (OpCodes.Ldarg_1);//3d arg: instance bound to delegate (the source)
-//					il.Emit (OpCodes.Ldstr, "ValueChanged");//2nd arg event name
-//					il.Emit (OpCodes.Ldarg_2);//1st arg load old datasource
-//					il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
-//					il.Emit (OpCodes.Call, CompilerServices.miRemEvtHdlByTarget);
-//					il.MarkLabel(cancelRemove);
-				}
 				il.Emit (OpCodes.Ldloc_2);
 				il.Emit (OpCodes.Brfalse, newDSIsNull);//new ds is null
 			}
@@ -1339,7 +1324,6 @@ namespace Crow.IML
 
 			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
-			il.DeclareLocal (typeof(object));
 			il.Emit (OpCodes.Nop);
 
 			//load value changed member name onto the stack
@@ -1358,7 +1342,8 @@ namespace Crow.IML
 			il.Emit (OpCodes.Ldarg_2);
 			il.Emit (OpCodes.Ldfld, CompilerServices.fiVCNewValue);
 
-			CompilerServices.emitConvert (il, piOrig.PropertyType, piDest.PropertyType);
+			//if (piOrig.PropertyType != piDest.PropertyType)
+				CompilerServices.emitConvert (il, piOrig.PropertyType, piDest.PropertyType);
 
 			il.Emit (OpCodes.Callvirt, piDest.GetSetMethod ());
 

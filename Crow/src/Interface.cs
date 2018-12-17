@@ -188,7 +188,7 @@ namespace Crow
 		{			
 			while (running) {
 				Update ();
-				Thread.Sleep (20);
+				Thread.Sleep (1);
 			}
 		}
 
@@ -234,7 +234,6 @@ namespace Crow
 			CurrentInterface = this;
 			//loadCursors ();
 			loadStyling ();
-			findAvailableTemplates ();
 
 			#if MEASURE_TIME
 			PerfMeasures.Add (updateMeasure);
@@ -356,6 +355,15 @@ namespace Crow
 		/// on the first instance creation of a IML item.
 		/// </summary>
 		public Dictionary<String, Instantiator> Instantiators = new Dictionary<string, Instantiator>();
+		/// <summary>
+		/// default templates dic by metadata token
+		/// </summary>
+		public Dictionary<int, Instantiator> DefaultTemplates = new Dictionary<int, Instantiator> ();
+		/// <summary>
+		/// Item templates stored with their index
+		/// </summary>
+		public Dictionary<String, ItemTemplate> ItemTemplates = new Dictionary<string, ItemTemplate> ();
+
 		public List<CrowThread> CrowThreads = new List<CrowThread>();//used to monitor thread finished
 
 		public DragDropEventArgs DragAndDropOperation = null;
@@ -414,44 +422,6 @@ namespace Crow
 
 		#endregion
 
-		#region Templates
-		/// <summary>Store one default templates resource ID per class.
-		/// Resource ID must be 'fullClassName.template' (not case sensitive)
-		/// Those found in application assembly have priority to the default Crow's one
-		/// </summary>
-		public Dictionary<string, string> DefaultTemplates;
-		/// <summary>Finds available default templates at startup</summary>
-		void findAvailableTemplates(){
-			DefaultTemplates = new Dictionary<string, string>();
-			searchTemplatesOnDisk ("./");
-			string defTemplatePath = System.IO.Path.Combine (CrowConfigRoot, "defaultTemplates");
-			searchTemplatesOnDisk (defTemplatePath);
-			searchTemplatesIn (Assembly.GetEntryAssembly ());
-			searchTemplatesIn (Assembly.GetExecutingAssembly ());
-		}
-		void searchTemplatesOnDisk (string templatePath){
-			if (!Directory.Exists (templatePath))
-				return;
-			foreach (string f in Directory.GetFiles(templatePath, "*.template",SearchOption.AllDirectories)) {
-				string clsName = System.IO.Path.GetFileNameWithoutExtension(f);
-				if (DefaultTemplates.ContainsKey (clsName))
-					continue;
-				DefaultTemplates [clsName] = f;
-			}
-		}
-		void searchTemplatesIn(Assembly assembly){
-			if (assembly == null)
-				return;
-			foreach (string resId in assembly
-				.GetManifestResourceNames ()
-				.Where (r => r.EndsWith (".template", StringComparison.OrdinalIgnoreCase))) {
-				string clsName = resId.Substring (0, resId.Length - 9);
-				if (DefaultTemplates.ContainsKey (clsName))
-					continue;
-				DefaultTemplates[clsName] = "#" + resId;
-			}
-		}
-		#endregion
 
 		#region Load/Save
 		/// <summary>Open file or find a resource from path string</summary>
@@ -486,14 +456,12 @@ namespace Crow
 			if (path.StartsWith ("#", StringComparison.Ordinal)) {
 				string resId = path.Substring (1);
 				//try/catch added to prevent nunit error
-				try {
-					stream = Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
-				} catch{}
+				stream = Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);				
 				if (stream == null)//try to find ressource in Crow assembly
 					stream = Assembly.GetExecutingAssembly ().GetManifestResourceStream (resId);
                 if (stream == null)                
                     throw new Exception("Resource not found: " + path);
-
+				Console.WriteLine(Assembly.GetEntryAssembly ().GetName ());
 			} else {
 				if (!File.Exists (path))
 					throw new FileNotFoundException ("File not found: ", path);
@@ -561,10 +529,10 @@ namespace Crow
 		/// try to fetch the requested one in the cache or create it.
 		/// They have additional properties for recursivity and
 		/// custom display per item type</summary>
-		public virtual ItemTemplate GetItemTemplate(string path){
-			if (!Instantiators.ContainsKey(path))
-				Instantiators [path] = new ItemTemplate(this, path);
-			return Instantiators [path] as ItemTemplate;
+		public virtual ItemTemplate GetItemTemplate(string path, Type declaringType){
+			if (!ItemTemplates.ContainsKey(path))
+				ItemTemplates [path] = new ItemTemplate(this, path, declaringType);
+			return ItemTemplates [path] as ItemTemplate;
 		}
 		#endregion
 

@@ -65,7 +65,6 @@
   <ItemGroup>
     <Folder Include="src\GraphicObjects\" />
     <Folder Include="src\Cairo\" />
-    <Folder Include="src\win32\" />
     <Folder Include="Images\" />
     <Folder Include="Images\Icons\" />
     <Folder Include="src\CompilerServices\" />

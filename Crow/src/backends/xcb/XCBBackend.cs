@@ -50,6 +50,7 @@ namespace Crow.XCB
 	{
 		const byte XCB_COPY_FROM_PARENT = 0;
 
+		#region struct an enums
 
 		enum xcb_window_class_t : ushort {
 			COPY_FROM_PARENT = 0,
@@ -319,11 +320,11 @@ namespace Crow.XCB
 			public UInt16 sequence;       /**< Sequence number */
 			public UInt32 length;         /**< Length of the response */
 		}
-
+		#endregion
 
 
 		#region pinvoke XCB
-		[DllImportAttribute("xcb")]
+		[DllImportAttribute ("xcb")]
 		static extern IntPtr xcb_connect(string displayName, IntPtr screenNum);
 		[DllImportAttribute("xcb")]
 		static extern IntPtr xcb_get_setup(IntPtr connection);		 
@@ -416,7 +417,7 @@ namespace Crow.XCB
 
 			IntPtr visual = findVisual (scr_it, scr.root_visual);
 
-			//loadCursors ();	
+			loadCursors ();	
 
 			iFace.surf = new Cairo.XcbSurface (conn, win, visual, iFace.ClientRectangle.Width, iFace.ClientRectangle.Height);
 		}

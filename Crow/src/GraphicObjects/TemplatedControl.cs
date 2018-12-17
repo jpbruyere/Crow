@@ -25,14 +25,9 @@
 // THE SOFTWARE.
 
 using System;
-using System.Xml.Serialization;
 using System.ComponentModel;
 using System.IO;
 using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Collections.Generic;
-using System.Text;
 using System.Reflection;
 using Cairo;
 
@@ -45,7 +40,7 @@ namespace Crow
 	{
 		#if DESIGN_MODE
 		public bool design_inlineTemplate = false;
-		public override void getIML (System.Xml.XmlDocument doc, System.Xml.XmlNode parentElem)
+		public override void getIML (XmlDocument doc, XmlNode parentElem)
 		{
 			if (this.design_isTGItem)
 				return;
@@ -57,6 +52,7 @@ namespace Crow
 			parentElem.LastChild.AppendChild (xe);
 		}
 		#endif
+
 		#region CTOR
 		protected TemplatedControl() : base(){}
 		public TemplatedControl (Interface iface) : base(iface){}
@@ -110,11 +106,8 @@ namespace Crow
 		/// </summary>
 		/// <returns>widget identified by name, or null if not found</returns>
 		/// <param name="nameToFind">widget's name to find</param>
-		public override GraphicObject FindByName (string nameToFind)
-		{
-			//prevent name searching in template
-			return nameToFind == this.Name ? this : null;
-		}
+		public override GraphicObject FindByName (string nameToFind) => nameToFind == this.Name ? this : null;
+
 		/// <summary>
 		///onDraw is overrided to prevent default drawing of background, template top container
 		///may have a binding to root background or a fixed one.
@@ -138,7 +131,9 @@ namespace Crow
 		#endregion
 
 		/// <summary>
-		/// Loads the template.
+		/// Loads the template. Each TemplatedControl MUST provide a default template
+		/// It must be an embedded ressource with ID = fullTypeName.template
+		/// Entry assembly is search first, then the one where the type is defined
 		/// </summary>
 		/// <param name="template">Optional template instance</param>
 		protected virtual void loadTemplate(GraphicObject template = null)
@@ -147,9 +142,18 @@ namespace Crow
 				this.ClearTemplateBinding();
 			
 			if (template == null) {
-				if (!IFace.DefaultTemplates.ContainsKey (this.GetType ().FullName))
-					throw new Exception (string.Format ("No default template found for '{0}'", this.GetType ().FullName));
-				this.SetChild (IFace.CreateInstance (IFace.DefaultTemplates[this.GetType ().FullName]));
+				int mdTok = this.GetType ().MetadataToken;
+
+				if (!IFace.DefaultTemplates.ContainsKey (mdTok)) {
+					string defTmpId = this.GetType ().FullName + ".template";
+					Stream s = Assembly.GetEntryAssembly ().GetManifestResourceStream (defTmpId);
+					if (s == null)
+						s = Assembly.GetAssembly (this.GetType ()).GetManifestResourceStream (defTmpId);
+					if (s == null)
+						throw new Exception (string.Format ("No default template found for '{0}'", this.GetType ().FullName));
+					IFace.DefaultTemplates [mdTok] = new IML.Instantiator (IFace, s, defTmpId);
+				}
+				this.SetChild (IFace.DefaultTemplates[mdTok].CreateInstance());
 			}else
 				this.SetChild (template);
 		}
