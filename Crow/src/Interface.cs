@@ -355,6 +355,7 @@ namespace Crow
 		/// on the first instance creation of a IML item.
 		/// </summary>
 		public Dictionary<String, Instantiator> Instantiators = new Dictionary<string, Instantiator>();
+		public Dictionary<String, Instantiator> Templates = new Dictionary<string, Instantiator> ();
 		/// <summary>
 		/// default templates dic by metadata token
 		/// </summary>
@@ -424,6 +425,28 @@ namespace Crow
 
 
 		#region Load/Save
+		/// <summary>get template stream from path providing the declaring type for which
+		/// this template is loaded. If not found in entry assembly, the assembly where the type is defined
+		/// will be searched
+		/// </summary>
+		/// <returns>The template stream</returns>
+		public virtual Stream GetTemplateStreamFromPath (string path, Type declaringType)
+		{
+			Stream s = null;
+			if (path.StartsWith ("#", StringComparison.Ordinal)) {
+				string resId = path.Substring (1);
+				s = Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
+				if (s == null)
+					s = Assembly.GetAssembly (declaringType).GetManifestResourceStream (resId);
+				if (s == null)
+					throw new Exception ($"Template not found '{path}'");
+			} else {
+				if (!File.Exists (path))
+					throw new FileNotFoundException ("Template not found: ", path);
+				s = new FileStream (path, FileMode.Open, FileAccess.Read);
+			}
+			return s;
+		}
 		/// <summary>Open file or find a resource from path string</summary>
 		/// <returns>A file or resource stream</returns>
 		/// <param name="path">This could be a normal file path, or an embedded ressource ID
@@ -434,12 +457,11 @@ namespace Crow
 
 			if (path.StartsWith ("#", StringComparison.Ordinal)) {
 				string resId = path.Substring (1);
-				//try/catch added to prevent nunit error
-				try {					
-					stream = System.Reflection.Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
-				} catch {}
-				if (stream == null)//try to find ressource in Crow assembly
-					stream = System.Reflection.Assembly.GetExecutingAssembly ().GetManifestResourceStream (resId);
+				string assemblyName = resId.Split ('.') [0];
+				Assembly a = AppDomain.CurrentDomain.GetAssemblies ().FirstOrDefault (aa => aa.GetName ().Name == assemblyName);
+				if (a == null)
+					throw new Exception ($"Assembly '{assemblyName}' not found for ressource '{path}'.");
+				stream = a.GetManifestResourceStream (resId);
 				if (stream == null)
 					throw new Exception ("Resource not found: " + path);
 			} else {
@@ -455,13 +477,16 @@ namespace Crow
 
 			if (path.StartsWith ("#", StringComparison.Ordinal)) {
 				string resId = path.Substring (1);
-				//try/catch added to prevent nunit error
-				stream = Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);				
-				if (stream == null)//try to find ressource in Crow assembly
-					stream = Assembly.GetExecutingAssembly ().GetManifestResourceStream (resId);
-                if (stream == null)                
-                    throw new Exception("Resource not found: " + path);
-				Console.WriteLine(Assembly.GetEntryAssembly ().GetName ());
+				string assemblyName = resId.Split ('.') [0];
+				Assembly a = AppDomain.CurrentDomain.GetAssemblies ().FirstOrDefault (aa => aa.GetName ().Name == assemblyName);
+				if (a == null)
+					throw new Exception ($"Assembly '{assemblyName}' not found for ressource '{path}'.");
+				stream = a.GetManifestResourceStream (resId);
+				/*foreach (var s in a.GetManifestResourceNames()) {
+					Console.WriteLine (s);
+				}*/
+				if (stream == null)
+					throw new Exception ("Resource not found: " + path);
 			} else {
 				if (!File.Exists (path))
 					throw new FileNotFoundException ("File not found: ", path);
@@ -513,6 +538,21 @@ namespace Crow
 				return GetInstantiator (path).CreateInstance ();
 			} catch (Exception ex) {
 				throw new Exception ("Error loading <" + path + ">:", ex);
+			}
+		}
+		/// <summary>
+		/// Create an instance of a GraphicObject linked to this interface but not added to the GraphicTree
+		/// </summary>
+		/// <returns>new instance of graphic object created</returns>
+		/// <param name="path">path of the iml file to load</param>
+		public virtual GraphicObject CreateTemplateInstance (string path, Type declaringType)
+		{
+			try {
+				if (!Templates.ContainsKey (path))
+					Templates [path] = new Instantiator (this, GetTemplateStreamFromPath(path, declaringType), path);
+				return Templates [path].CreateInstance ();
+			} catch (Exception ex) {
+				throw new Exception ("Error loading Template <" + path + ">:", ex);
 			}
 		}
 		/// <summary>

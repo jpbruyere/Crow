@@ -76,7 +76,7 @@ namespace Crow
 				if (string.IsNullOrEmpty(_template))
 					loadTemplate ();
 				else
-					loadTemplate (IFace.CreateInstance (_template));
+					loadTemplate (IFace.CreateTemplateInstance (_template, this.GetType()));
 			}
 		}
 		/// <summary>

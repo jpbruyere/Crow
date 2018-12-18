@@ -336,8 +336,11 @@ namespace Crow.IML
 					} else {
 						ctx.il.Emit (OpCodes.Ldarg_1);//load currentInterface
 						ctx.il.Emit (OpCodes.Ldstr, templatePath); //Load template path string
-						ctx.il.Emit (OpCodes.Callvirt,//call Interface.Load(path)
-							CompilerServices.miIFaceLoad);
+						//get declaring type for search fallback assembly
+						ctx.il.Emit (OpCodes.Ldloc_0);
+						ctx.il.Emit (OpCodes.Call, CompilerServices.miGetType);
+						ctx.il.Emit (OpCodes.Callvirt,
+							CompilerServices.miIFaceCreateTemplateInst);
 					}
 					ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miLoadTmp);//load template
 				}
@@ -348,7 +351,7 @@ namespace Crow.IML
 						if (iface.ItemTemplates.ContainsKey (itemTemplatePath)) {
 							itemTemplateIds.Add (new string [] { "default", itemTemplatePath, "" });
 						} else {
-							using (Stream stream = iface.GetStreamFromPath (itemTemplatePath)) {
+							using (Stream stream = iface.GetTemplateStreamFromPath (itemTemplatePath, ctx.CurrentNodeType)) {
 								//itemtemplate files may have multiple root nodes
 								XmlReaderSettings itrSettings = new XmlReaderSettings { ConformanceLevel = ConformanceLevel.Fragment };
 								using (XmlReader itr = XmlReader.Create (stream, itrSettings)) {									
