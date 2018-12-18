@@ -4,15 +4,15 @@
 		<Label Text="Error" Background="Red"/>
 	</TabItem>
 </ItemTemplate>
-<ItemTemplate Path="#Crow.Coding.ui.editors.SvgEdit.itemp" DataType=".svg"/>
-<ItemTemplate Path="#Crow.Coding.ui.editors.SrcEdit.itemp" DataType=".cs"/>
-<ItemTemplate Path="#Crow.Coding.ui.editors.SrcEdit.itemp" DataType=".style"/>
-<ItemTemplate Path="#Crow.Coding.ui.editors.IMLEdit.itemp" DataType=".crow"/>
-<ItemTemplate Path="#Crow.Coding.ui.editors.IMLEdit.itemp" DataType=".itemp"/>
-<ItemTemplate Path="#Crow.Coding.ui.editors.IMLEdit.itemp" DataType=".template"/>
+<ItemTemplate Path="#CrowIDE.ui.editors.SvgEdit.itemp" DataType=".svg"/>
+<ItemTemplate Path="#CrowIDE.ui.editors.SrcEdit.itemp" DataType=".cs"/>
+<ItemTemplate Path="#CrowIDE.ui.editors.SrcEdit.itemp" DataType=".style"/>
+<ItemTemplate Path="#CrowIDE.ui.editors.IMLEdit.itemp" DataType=".crow"/>
+<ItemTemplate Path="#CrowIDE.ui.editors.IMLEdit.itemp" DataType=".itemp"/>
+<ItemTemplate Path="#CrowIDE.ui.editors.IMLEdit.itemp" DataType=".template"/>
 <ItemTemplate DataType=".goml">
 	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
-		<IMLContainer Path="#Crow.Coding.ui.editors.TextEditor.crow"/>
+		<IMLContainer Path="#CrowIDE.ui.editors.TextEditor.crow"/>
 	</TabItem>
 </ItemTemplate>
 

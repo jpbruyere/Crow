@@ -48,11 +48,11 @@ namespace Crow.Coding
                 switch (Extension)
                 {
                     case ".cs":
-                        return new SvgPicture("#icons.cs-file.svg");
+                        return new SvgPicture("#CrowIDE.icons.cs-file.svg");
                     case ".crow":                        
-                        return new SvgPicture("#icons.xml-file.svg");
+                        return new SvgPicture("#CrowIDE.icons.xml-file.svg");
                     case ".xml":
-                        return new SvgPicture("#icons.xml-file.svg");
+                        return new SvgPicture("#CrowIDE.icons.xml-file.svg");
                     default:
                         return base.Icon;
                 }

@@ -95,7 +95,7 @@ namespace Crow.Coding
 				case ItemType.ProjectReference:
 					return new SvgPicture("#Crow.Icons.projectRef.svg"); 
 				default:
-					return new SvgPicture("#icons.blank-file.svg"); 
+					return new SvgPicture("#CrowIDE.icons.blank-file.svg"); 
 				}
 			}
 		}

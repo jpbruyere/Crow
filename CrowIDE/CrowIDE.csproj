@@ -7,7 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{B6D911CD-1D09-42FC-B300-9187190F2AE1}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Crow.Coding</RootNamespace>
+    <RootNamespace>CrowIDE</RootNamespace>
     <AssemblyName>CrowIDE</AssemblyName>
     <OutputPath>$(SolutionDir)build/$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)build/obj/$(Configuration)</IntermediateOutputPath>
@@ -68,8 +68,10 @@
     <Folder Include="src\ProjectTree\msbuild\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="images\save.svg" />
     <EmbeddedResource Include="IDE.style" />
+    <EmbeddedResource Include="icons\**\*.svg"/>
+
+    <EmbeddedResource Include="images\save.svg" />
     <EmbeddedResource Include="ui\MembersView.template">
       <LogicalName>Crow.Coding.MembersView.template</LogicalName>
     </EmbeddedResource>
@@ -109,124 +111,6 @@
     <EmbeddedResource Include="ui\DockWindows\winProperties.crow" />
     <EmbeddedResource Include="ui\DockWindows\winToolbox.crow" />
     <EmbeddedResource Include="ui\DockWindows\toolboxBut.template" />
-    <EmbeddedResource Include="icons\toolbox\bar-chart.svg" />
-    <EmbeddedResource Include="icons\toolbox\bar-menu.svg" />
-    <EmbeddedResource Include="icons\toolbox\bullets.svg" />
-    <EmbeddedResource Include="icons\toolbox\calendar.svg" />
-    <EmbeddedResource Include="icons\toolbox\check-square-1.svg" />
-    <EmbeddedResource Include="icons\toolbox\database.svg" />
-    <EmbeddedResource Include="icons\toolbox\ellipsis.svg" />
-    <EmbeddedResource Include="icons\toolbox\file-code.svg" />
-    <EmbeddedResource Include="icons\toolbox\grab.svg" />
-    <EmbeddedResource Include="icons\toolbox\hash.svg" />
-    <EmbeddedResource Include="icons\toolbox\line-list.svg" />
-    <EmbeddedResource Include="icons\toolbox\list.svg" />
-    <EmbeddedResource Include="icons\toolbox\package.svg" />
-    <EmbeddedResource Include="icons\toolbox\pointer.svg" />
-    <EmbeddedResource Include="icons\toolbox\puzzle-piece.svg" />
-    <EmbeddedResource Include="icons\toolbox\refresh-file.svg" />
-    <EmbeddedResource Include="icons\toolbox\sliders.svg" />
-    <EmbeddedResource Include="icons\toolbox\split-browser-1.svg" />
-    <EmbeddedResource Include="icons\toolbox\table.svg" />
-    <EmbeddedResource Include="icons\toolbox\tasks.svg" />
-    <EmbeddedResource Include="icons\toolbox\picture-file.svg" />
-    <EmbeddedResource Include="icons\toolbox\warning.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.Button.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.TextBox.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.Label.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.CheckBox.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.Spinner.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.Container.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.Group.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.HorizontalStack.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.VerticalStack.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.Splitter.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.ListBox.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.ComboBox.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.TreeView.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.TabView.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.Docker.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.Window.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.Slider.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.ProgressBar.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.Grid.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.Image.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.TemplatedContainer.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.TemplatedGroup.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.IMLContainer.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.Wrapper.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.ColorPicker.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.Border.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.GroupBox.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.ScrollBar.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.Menu.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.MenuItem.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.Shape.svg" />
-    <EmbeddedResource Include="icons\toolbox\padding.svg" />
-    <EmbeddedResource Include="icons\toolbox\modal-list.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.Scroller.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.FileDialog.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.TabItem.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.Expandable.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.DirectoryView.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.MessageBox.svg" />
-    <EmbeddedResource Include="icons\toolbox\options.svg" />
-    <EmbeddedResource Include="icons\toolbox\Crow.RadioButton.svg" />
-    <EmbeddedResource Include="icons\move-arrows.svg">
-      <LogicalName>icons.move-arrows.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\eraser.svg">
-      <LogicalName>icons.eraser.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\light-bulb.svg">
-      <LogicalName>icons.light-bulb.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\pin.svg">
-      <LogicalName>icons.pin.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\paint-brush.svg">
-      <LogicalName>icons.paint-brush.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\tools.svg">
-      <LogicalName>icons.tools.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\trash.svg">
-      <LogicalName>icons.trash.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\zoom-in.svg">
-      <LogicalName>icons.zoom-in.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\zoom-out.svg">
-      <LogicalName>icons.zoom-out.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\search.svg">
-      <LogicalName>icons.search.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\curly-brackets.svg">
-      <LogicalName>icons.curly-brackets.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\compile.svg">
-      <LogicalName>icons.compile.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\edit.svg">
-      <LogicalName>icons.edit.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\text-file.svg" />
-    <EmbeddedResource Include="icons\undo.svg">
-      <LogicalName>icons.undo.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\redo.svg">
-      <LogicalName>icons.redo.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\sign-out.svg">
-      <LogicalName>icons.sign-out.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\file.svg">
-      <LogicalName>icons.file.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\palette.svg">
-      <LogicalName>icons.palette.svg</LogicalName>
-    </EmbeddedResource>
     <EmbeddedResource Include="ui\editors\EditPane.template">
       <LogicalName>Crow.Coding.EditPane.template</LogicalName>
     </EmbeddedResource>
@@ -239,33 +123,6 @@
     <EmbeddedResource Include="ui\editors\SvgEdit.itemp" />
     <EmbeddedResource Include="ui\DockWindows\winGTExplorer.crow" />
     <EmbeddedResource Include="ui\DockWindows\GTreeExpITemp.crow" />
-    <EmbeddedResource Include="icons\copy-file.svg">
-      <LogicalName>icons.copy-file.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\paste-on-document.svg">
-      <LogicalName>icons.paste-on-document.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\scissors.svg">
-      <LogicalName>icons.scissors.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\question.svg">
-      <LogicalName>icons.question.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\blank-file.svg">
-      <LogicalName>icons.blank-file.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\cs-file.svg">
-      <LogicalName>icons.cs-file.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\xml-file.svg">
-      <LogicalName>icons.xml-file.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\save.svg">
-      <LogicalName>icons.save.svg</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="icons\open.svg">
-      <LogicalName>icons.open.svg</LogicalName>
-    </EmbeddedResource>
     <EmbeddedResource Include="ui\NewFile.crow" />
     <EmbeddedResource Include="ui\DockWindows\winSchema.crow" />
     <EmbeddedResource Include="ui\DockWindows\WinSchemaItem.template" />

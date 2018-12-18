@@ -57,18 +57,18 @@ namespace Crow.Coding {
 
             solution = sol;
 
-            cmdSave = new Crow.Command (new Action (() => Save ())) { Caption = "Save", Icon = new SvgPicture ("#icons.save.svg"), CanExecute = true };
-            cmdOpen = new Crow.Command (new Action (() => Load ())) { Caption = "Open", Icon = new SvgPicture ("#icons.open.svg"), CanExecute = false };
+            cmdSave = new Crow.Command (new Action (() => Save ())) { Caption = "Save", Icon = new SvgPicture ("#CrowIDE.icons.save.svg"), CanExecute = true };
+            cmdOpen = new Crow.Command (new Action (() => Load ())) { Caption = "Open", Icon = new SvgPicture ("#CrowIDE.icons.open.svg"), CanExecute = false };
             cmdCompile = new Crow.Command (new Action (() => Compile ())) {
                 Caption = "Compile",
-                Icon = "#icons.compile.svg"
+                Icon = "#CrowIDE.icons.compile.svg"
             };
             cmdSetAsStartProj = new Crow.Command (new Action (() => setAsStartupProject ())) {
                 Caption = "Set as Startup Project"
             };
             cmdNewFile = new Crow.Command (new Action (() => AddNewFile ())) {
                 Caption = "Add New File",
-                Icon = new SvgPicture ("#icons.blank-file.svg"),
+                Icon = new SvgPicture ("#CrowIDE.icons.blank-file.svg"),
                 CanExecute = true
             };
 
@@ -256,7 +256,7 @@ namespace Crow.Coding {
 
 
         public void AddNewFile () {
-            Window.Show (CrowIDE.MainIFace, "#Crow.Coding.ui.NewFile.crow", true).DataSource = this;
+            Window.Show (CrowIDE.MainIFace, "#CrowIDE.ui.NewFile.crow", true).DataSource = this;
         }
 
         public void Load () {

@@ -1,4 +1,4 @@
-//
+﻿//
 //  HelloCube.cs
 //
 //  Author:
@@ -44,40 +44,40 @@ namespace Crow.Coding
 		CMDCompile;
 
 		void initCommands () {
-			CMDNew = new Command(new Action(() => newFile())) { Caption = "New", Icon = new SvgPicture("#icons.blank-file.svg"), CanExecute = true};
-			CMDOpen = new Command(new Action(() => openFileDialog())) { Caption = "Open...", Icon = new SvgPicture("#icons.open.svg") };
-			CMDSave = new Command(new Action(() => saveFileDialog())) { Caption = "Save", Icon = new SvgPicture("#icons.save.svg"), CanExecute = false};
-			CMDSaveAs = new Command(new Action(() => saveFileDialog())) { Caption = "Save As...", Icon = new SvgPicture("#icons.save.svg"), CanExecute = false};
-			CMDQuit = new Command(new Action(() => app.running = false)) { Caption = "Quit", Icon = new SvgPicture("#icons.sign-out.svg") };
-			CMDUndo = new Command(new Action(() => undo())) { Caption = "Undo", Icon = new SvgPicture("#icons.undo.svg"), CanExecute = false};
-			CMDRedo = new Command(new Action(() => redo())) { Caption = "Redo", Icon = new SvgPicture("#icons.redo.svg"), CanExecute = false};
-            //CMDCut = new Command(new Action(() => Quit (null, null))) { Caption = "Cut", Icon = new SvgPicture("#icons.scissors.svg"), CanExecute = false};
-            //CMDCopy = new Command(new Action(() => Quit (null, null))) { Caption = "Copy", Icon = new SvgPicture("#icons.copy-file.svg"), CanExecute = false};
-            //CMDPaste = new Command(new Action(() => Quit (null, null))) { Caption = "Paste", Icon = new SvgPicture("#icons.paste-on-document.svg"), CanExecute = false};
-            CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("help"))) { Caption = "Help", Icon = new SvgPicture("#icons.question.svg") };
-			CMDOptions = new Command(new Action(() => loadWindow("#Crow.Coding.ui.Options.crow"))) { Caption = "Editor Options", Icon = new SvgPicture("#icons.tools.svg") };
+			CMDNew = new Command(new Action(() => newFile())) { Caption = "New", Icon = new SvgPicture("#CrowIDE.icons.blank-file.svg"), CanExecute = true};
+			CMDOpen = new Command(new Action(() => openFileDialog())) { Caption = "Open...", Icon = new SvgPicture("#CrowIDE.icons.open.svg") };
+			CMDSave = new Command(new Action(() => saveFileDialog())) { Caption = "Save", Icon = new SvgPicture("#CrowIDE.icons.save.svg"), CanExecute = false};
+			CMDSaveAs = new Command(new Action(() => saveFileDialog())) { Caption = "Save As...", Icon = new SvgPicture("#CrowIDE.icons.save.svg"), CanExecute = false};
+			CMDQuit = new Command(new Action(() => app.running = false)) { Caption = "Quit", Icon = new SvgPicture("#CrowIDE.icons.sign-out.svg") };
+			CMDUndo = new Command(new Action(() => undo())) { Caption = "Undo", Icon = new SvgPicture("#CrowIDE.icons.undo.svg"), CanExecute = false};
+			CMDRedo = new Command(new Action(() => redo())) { Caption = "Redo", Icon = new SvgPicture("#CrowIDE.icons.redo.svg"), CanExecute = false};
+            //CMDCut = new Command(new Action(() => Quit (null, null))) { Caption = "Cut", Icon = new SvgPicture("#CrowIDE.icons.scissors.svg"), CanExecute = false};
+            //CMDCopy = new Command(new Action(() => Quit (null, null))) { Caption = "Copy", Icon = new SvgPicture("#CrowIDE.icons.copy-file.svg"), CanExecute = false};
+            //CMDPaste = new Command(new Action(() => Quit (null, null))) { Caption = "Paste", Icon = new SvgPicture("#CrowIDE.icons.paste-on-document.svg"), CanExecute = false};
+            CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("help"))) { Caption = "Help", Icon = new SvgPicture("#CrowIDE.icons.question.svg") };
+			CMDOptions = new Command(new Action(() => loadWindow("#CrowIDE.ui.Options.crow"))) { Caption = "Editor Options", Icon = new SvgPicture("#CrowIDE.icons.tools.svg") };
 
 			cmdCloseSolution = new Command(new Action(() => closeSolution()))
-			{ Caption = "Close Solution", Icon = new SvgPicture("#icons.paste-on-document.svg"), CanExecute = false};
+			{ Caption = "Close Solution", Icon = new SvgPicture("#CrowIDE.icons.paste-on-document.svg"), CanExecute = false};
 
-			CMDViewErrors = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.DockWindows.winErrors.crow",this)))
+			CMDViewErrors = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winErrors.crow",this)))
 			{ Caption = "Errors pane"};
-			CMDViewSolution = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.DockWindows.winSolution.crow",this)))
+			CMDViewSolution = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winSolution.crow",this)))
 			{ Caption = "Solution Tree", CanExecute = false};
-			CMDViewEditor = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.DockWindows.winEditor.crow",this)))
+			CMDViewEditor = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winEditor.crow",this)))
 			{ Caption = "Editor Pane"};
-			CMDViewProperties = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.DockWindows.winProperties.crow",this)))
+			CMDViewProperties = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winProperties.crow",this)))
 			{ Caption = "Properties"};
-			CMDViewDesign = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.DockWindows.winDesign.crow",this)))
+			CMDViewDesign = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winDesign.crow",this)))
 			{ Caption = "Quick Design", CanExecute = true};
-			CMDViewToolbox = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.DockWindows.winToolbox.crow",this)))
+			CMDViewToolbox = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winToolbox.crow",this)))
 			{ Caption = "Toolbox", CanExecute = false};
-			CMDViewSchema = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.DockWindows.winSchema.crow",this)))
+			CMDViewSchema = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winSchema.crow",this)))
 			{ Caption = "IML Shematic View", CanExecute = true};
-			CMDViewStyling = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.DockWindows.winStyleView.crow",this)))
+			CMDViewStyling = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winStyleView.crow",this)))
 			{ Caption = "Styling Explorer", CanExecute = true};
 				
-			CMDViewGTExp = new Command(new Action(() => loadWindow ("#Crow.Coding.ui.DockWindows.winGTExplorer.crow",this)))
+			CMDViewGTExp = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winGTExplorer.crow",this)))
 			{ Caption = "Graphic Tree Explorer", CanExecute = true};
 			CMDCompile = new Command(new Action(() => compileSolution()))
 			{ Caption = "Compile", CanExecute = false};
@@ -159,7 +159,7 @@ namespace Crow.Coding
 
 			initCommands ();
 
-			GraphicObject go = Load (@"#Crow.Coding.ui.CrowIDE.crow");
+			GraphicObject go = Load (@"#CrowIDE.ui.CrowIDE.crow");
 			go.DataSource = this;
 
 			mainDock = go.FindByName ("mainDock") as DockStack;
@@ -173,13 +173,13 @@ namespace Crow.Coding
 			instFileDlg = Instantiator.CreateFromImlFragment
 				(MainIFace, "<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}' SearchPattern='*.sln' OkClicked='onFileOpen'/>");
 
-			/*DockWindow dw = loadWindow ("#Crow.Coding.ui.DockWindows.winEditor.crow", this) as DockWindow;
+			/*DockWindow dw = loadWindow ("#CrowIDE.ui.DockWindows.winEditor.crow", this) as DockWindow;
 			dw.DockingPosition = Alignment.Center;
 			dw.Dock (mainDock);
-			dw = loadWindow ("#Crow.Coding.ui.DockWindows.winSolution.crow", this) as DockWindow;
+			dw = loadWindow ("#CrowIDE.ui.DockWindows.winSolution.crow", this) as DockWindow;
 			dw.DockingPosition = Alignment.Right;
 			dw.Dock (mainDock);
-			dw = loadWindow ("#Crow.Coding.ui.DockWindows.winToolbox.crow", this) as DockWindow;
+			dw = loadWindow ("#CrowIDE.ui.DockWindows.winToolbox.crow", this) as DockWindow;
 			dw.DockingPosition = Alignment.Left;
 			dw.Dock (mainDock);*/
 
@@ -187,7 +187,7 @@ namespace Crow.Coding
 		}
 
 		void loadProjProps () {
-			loadWindow ("#Crow.Coding.ui.ProjectProperties.crow");
+			loadWindow ("#CrowIDE.ui.ProjectProperties.crow");
 		}
 		void compileSolution () {
 			//ProjectItem pi = CurrentSolution.SelectedItem;

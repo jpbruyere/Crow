@@ -96,24 +96,6 @@ namespace Crow
 		string fetchMethodName;
 		string dataTest;
 
-		static Stream getItemTemplateStream (string path, Type declaringType)
-		{
-			Stream s = null;
-			if (path.StartsWith ("#", StringComparison.Ordinal)) {
-				string resId = path.Substring (1);
-				s = Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
-				if (s == null)
-					s = Assembly.GetAssembly (declaringType).GetManifestResourceStream (resId);
-				if (s == null)
-					throw new Exception ($"Item Template not found '{path}'");
-			} else {
-				if (!File.Exists (path))
-					throw new FileNotFoundException ("Item Template not found: ", path);
-				s = new FileStream (path, FileMode.Open, FileAccess.Read);
-			}
-			return s;
-		}
-
 		#region CTOR
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Crow.ItemTemplate"/> class by parsing the file passed as argument.
@@ -122,7 +104,7 @@ namespace Crow
 		/// <param name="_dataType">type this item will be choosen for, or member of the data item</param>
 		/// <param name="_fetchDataMethod">for hierarchical data, method to call for children fetching</param>
 		public ItemTemplate (Interface _iface, string path, Type declaringType, string _dataTest = "TypeOf", string _dataType = "default", string _fetchDataMethod = null)
-			: base(_iface, getItemTemplateStream(path, declaringType)) {
+			: base(_iface, _iface.GetTemplateStreamFromPath (path, declaringType)) {
 			strDataType = _dataType;
 			fetchMethodName = _fetchDataMethod;
 			dataTest = _dataTest;

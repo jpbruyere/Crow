@@ -44,7 +44,7 @@
             </HorizontalStack>
         </VerticalStack>    		
         <Splitter/>
-		<IMLContainer Path="#Crow.Coding.ui.editors.SourceEditor.crow"/>
+		<IMLContainer Path="#CrowIDE.ui.editors.SourceEditor.crow"/>
 		<Splitter Visible="{../editor.HasError}"/>
 		<Label DataSource="{../editor.Error}" Text="{}"
 			Visible="{../editor.HasError}"
