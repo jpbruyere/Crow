@@ -37,7 +37,7 @@ namespace Crow
 	/// generic class to build scrolling control in both directions
 	/// </summary>
 	[DesignIgnore]
-	public class ScrollingObject : GraphicObject
+	public class ScrollingObject : Widget
 	{
 		#region CTOR
 		protected ScrollingObject ():base(){}

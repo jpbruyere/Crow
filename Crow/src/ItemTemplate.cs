@@ -58,7 +58,7 @@ namespace Crow
 
 			if (string.IsNullOrEmpty (sourcePath)) {
 				//inline item template
-				using (GraphicObject go = this.CreateInstance())
+				using (Widget go = this.CreateInstance())
 					go.getIML (doc, xe);
 			} else {
 				xa = doc.CreateAttribute ("Path");
@@ -165,7 +165,7 @@ namespace Crow
 			System.Reflection.Emit.Label gotoItemsContainerNotFound;
 
 			ILGenerator il = dm.GetILGenerator (256);
-			il.DeclareLocal(typeof(GraphicObject));
+			il.DeclareLocal(typeof(Widget));
 
 			gotoEnd = il.DefineLabel ();
 			ifDataIsNull = il.DefineLabel ();

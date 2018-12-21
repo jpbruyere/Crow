@@ -39,7 +39,7 @@ namespace Crow
 	/// behave exactely as a container for layouting and drawing
 	/// </summary>
 	[DesignIgnore]
-	public class PrivateContainer : GraphicObject
+	public class PrivateContainer : Widget
 	{
 		#region CTOR
 		protected PrivateContainer () : base(){}
@@ -47,7 +47,7 @@ namespace Crow
 		#endregion
 
 		#if DESIGN_MODE
-		public override bool FindByDesignID(string designID, out GraphicObject go){
+		public override bool FindByDesignID(string designID, out Widget go){
 			go = null;
 			if (base.FindByDesignID (designID, out go))
 				return true;
@@ -56,14 +56,14 @@ namespace Crow
 			return child.FindByDesignID (designID, out go);					
 		}
 		#endif
-		protected GraphicObject child;
+		protected Widget child;
 		#if DEBUG_LOG
 		internal GraphicObject getTemplateRoot {
 			get { return child; }
 		}
 		#endif
 
-		protected virtual void SetChild(GraphicObject _child)
+		protected virtual void SetChild(Widget _child)
 		{
 
 			if (child != null) {
@@ -77,7 +77,7 @@ namespace Crow
 				this.RegisterForGraphicUpdate ();
 			}
 
-			child = _child as GraphicObject;
+			child = _child as Widget;
 
 			if (child != null) {
 				child.Parent = this;
@@ -89,7 +89,7 @@ namespace Crow
 		}
 		//dispose child if not null
 		protected virtual void deleteChild () {
-			GraphicObject g = child;
+			Widget g = child;
 			SetChild (null);
 			if (g != null)
 				g.Dispose ();
@@ -97,14 +97,14 @@ namespace Crow
 
 		#region GraphicObject Overrides
 
-		public override GraphicObject FindByName (string nameToFind)
+		public override Widget FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)
 				return this;
 
 			return child == null ? null : child.FindByName (nameToFind);
 		}
-		public override bool Contains (GraphicObject goToFind)
+		public override bool Contains (Widget goToFind)
 		{
 			return child == goToFind ? true : 
 				child == null ? false : child.Contains(goToFind);
@@ -163,7 +163,7 @@ namespace Crow
 		}
 		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{			
-			GraphicObject g = sender as GraphicObject;
+			Widget g = sender as Widget;
 
 			if (arg.LayoutType == LayoutingType.Width) {
 				if (Width != Measure.Fit)

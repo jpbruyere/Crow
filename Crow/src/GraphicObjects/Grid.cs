@@ -131,7 +131,7 @@ namespace Crow
 					int idx = curY * ColumnCount + curX;
 					if (idx >= Children.Count)
 						return;
-					GraphicObject c = Children [idx];
+					Widget c = Children [idx];
 					if (!c.Visible)
 						continue;
 					c.Slot.X = curX * (slotWidth + Spacing);

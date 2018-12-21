@@ -147,7 +147,7 @@ namespace Crow
 		}
 		#endregion
 
-		public override void AddChild (GraphicObject child)
+		public override void AddChild (Widget child)
 		{
 			TabItem ti = child as TabItem;
 			if (ti == null)
@@ -162,7 +162,7 @@ namespace Crow
 			SelectedTab = ti.ViewIndex = Children.Count - 1;
 			this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 		}
-		public override void RemoveChild (GraphicObject child)
+		public override void RemoveChild (Widget child)
 		{
 			TabItem ti = child as TabItem;
 			if (ti == null)
@@ -330,7 +330,7 @@ namespace Crow
 		}
 		void Ti_MouseDown (object sender, MouseButtonEventArgs e)
 		{
-			SelectedTab = Children.IndexOf (sender as GraphicObject);
+			SelectedTab = Children.IndexOf (sender as Widget);
 		}
 	}
 }

@@ -34,7 +34,7 @@ namespace Crow
 	/// control to add between children of a Stack to allow them to be resized
 	/// with the pointer
 	/// </summary>
-	public class Splitter : GraphicObject
+	public class Splitter : Widget
 	{
 		#region CTOR
 		protected Splitter() : base(){}
@@ -58,7 +58,7 @@ namespace Crow
 
 		Unit u1, u2;
 		int init1 = -1, init2 = -1, delta = 0, min1, min2, max1 , max2;
-		GraphicObject go1 = null, go2 = null;
+		Widget go1 = null, go2 = null;
 
 		void initSplit(Measure m1, int size1, Measure m2, int size2){
 			if (m1 != Measure.Stretched) {
@@ -70,7 +70,7 @@ namespace Crow
 				u2 = m2.Units;
 			}
 		}
-		void convertSizeInPix(GraphicObject g1){
+		void convertSizeInPix(Widget g1){
 
 		}
 

@@ -24,19 +24,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Xml;
-using System.Xml.Serialization;
 using Cairo;
-using System.Globalization;
 using Crow.IML;
-using System.Runtime.InteropServices;
-using System;
-using System.IO;
-using System.Diagnostics;
-using System.Collections.Generic;
 
 
 namespace Crow
@@ -285,7 +282,7 @@ namespace Crow
 		/// </summary>
 		protected static Interface CurrentInterface;
 		internal Stopwatch clickTimer = new Stopwatch();
-		GraphicObject armedClickSender = null;
+		Widget armedClickSender = null;
 		MouseButtonEventArgs armedClickEvtArgs = null;
 //		internal GraphicObject EligibleForDoubleClick {
 //			get { return eligibleForDoubleClick; }
@@ -294,7 +291,7 @@ namespace Crow
 //				clickTimer.Restart ();
 //			}
 //		}
-		internal void armeClick (GraphicObject sender, MouseButtonEventArgs e){
+		internal void armeClick (Widget sender, MouseButtonEventArgs e){
 			armedClickSender = sender;
 			armedClickEvtArgs = e;
 			clickTimer.Restart ();
@@ -322,7 +319,7 @@ namespace Crow
 
 		#region Public Fields
 		/// <summary>Graphic Tree of this interface</summary>
-		public List<GraphicObject> GraphicTree = new List<GraphicObject>();
+		public List<Widget> GraphicTree = new List<Widget>();
 		/// <summary>Interface's resulting bitmap</summary>
 		public byte[] bmp;
 		/// <summary>resulting bitmap limited to last redrawn part</summary>
@@ -349,7 +346,7 @@ namespace Crow
 		/// <summary>Store discarded lqi between two updates</summary>
 		public Queue<LayoutingQueueItem> DiscardQueue;
 		/// <summary>Main drawing queue, holding layouted controls</summary>
-		public Queue<GraphicObject> ClippingQueue = new Queue<GraphicObject>();
+		public Queue<Widget> ClippingQueue = new Queue<Widget>();
 		public string Clipboard;//TODO:use object instead for complex copy paste
 		/// <summary>each IML and fragments (such as inline Templates) are compiled as a Dynamic Method stored here
 		/// on the first instance creation of a IML item.
@@ -499,9 +496,9 @@ namespace Crow
 		/// </summary>
 		/// <returns>return the new instance for convenience, may be ignored</returns>
 		/// <param name="imlFragment">a valid IML string</param>
-		public GraphicObject LoadIMLFragment (string imlFragment) {
+		public Widget LoadIMLFragment (string imlFragment) {
 			lock (UpdateMutex) {
-				GraphicObject tmp = CreateITorFromIMLFragment (imlFragment).CreateInstance();
+				Widget tmp = CreateITorFromIMLFragment (imlFragment).CreateInstance();
 				AddWidget (tmp);
 				return tmp;
 			}
@@ -519,10 +516,10 @@ namespace Crow
 		/// </summary>
 		/// <returns>new instance of graphic object created</returns>
 		/// <param name="path">path of the iml file to load</param>
-		public GraphicObject Load (string path)
+		public Widget Load (string path)
 		{
 			lock (UpdateMutex) {
-				GraphicObject tmp = CreateInstance (path);
+				Widget tmp = CreateInstance (path);
 				AddWidget (tmp);
 				return tmp;
 			}
@@ -532,7 +529,7 @@ namespace Crow
 		/// </summary>
 		/// <returns>new instance of graphic object created</returns>
 		/// <param name="path">path of the iml file to load</param>
-		public virtual GraphicObject CreateInstance (string path)
+		public virtual Widget CreateInstance (string path)
 		{
 			try {
 				return GetInstantiator (path).CreateInstance ();
@@ -545,7 +542,7 @@ namespace Crow
 		/// </summary>
 		/// <returns>new instance of graphic object created</returns>
 		/// <param name="path">path of the iml file to load</param>
-		public virtual GraphicObject CreateTemplateInstance (string path, Type declaringType)
+		public virtual Widget CreateTemplateInstance (string path, Type declaringType)
 		{
 			try {
 				if (!Templates.ContainsKey (path))
@@ -577,13 +574,13 @@ namespace Crow
 		#endregion
 
 		#region focus
-		GraphicObject _activeWidget;	//button is pressed on widget
-		GraphicObject _hoverWidget;		//mouse is over
-		GraphicObject _focusedWidget;	//has keyboard (or other perif) focus
+		Widget _activeWidget;	//button is pressed on widget
+		Widget _hoverWidget;		//mouse is over
+		Widget _focusedWidget;	//has keyboard (or other perif) focus
 
 		/// <summary>Widget is focused and button is down or another perif action is occuring
 		/// , it can not lose focus while Active</summary>
-		public GraphicObject ActiveWidget
+		public Widget ActiveWidget
 		{
 			get { return _activeWidget; }
 			set
@@ -614,7 +611,7 @@ namespace Crow
 			}
 		}
 		/// <summary>Pointer is over the widget</summary>
-		public virtual GraphicObject HoverWidget
+		public virtual Widget HoverWidget
 		{
 			get { return _hoverWidget; }
 			set {
@@ -644,7 +641,7 @@ namespace Crow
 			}
 		}
 		/// <summary>Widget has the keyboard or mouse focus</summary>
-		public GraphicObject FocusedWidget {
+		public Widget FocusedWidget {
 			get { return _focusedWidget; }
 			set {
 				if (_focusedWidget == value)
@@ -666,7 +663,7 @@ namespace Crow
 		/// GraphObj's property Set methods could trigger an update from another thread
 		/// Once in that queue, that means that the layouting of obj and childs have succeed,
 		/// the next step when dequeued will be clipping registration</summary>
-		public void EnqueueForRepaint(GraphicObject g)
+		public void EnqueueForRepaint(Widget g)
 		{			
 			lock (ClippingMutex) {
 				if (g.IsQueueForClipping)
@@ -775,7 +772,7 @@ namespace Crow
 			if (ClippingQueue.Count > 0)
 				DebugLog.AddEvent (DbgEvtType.IFaceStartClipping);
 			#endif
-			GraphicObject g = null;
+			Widget g = null;
 			while (ClippingQueue.Count > 0) {
 				lock (ClippingMutex) {
 					g = ClippingQueue.Dequeue ();
@@ -816,7 +813,7 @@ namespace Crow
 					ctx.Operator = Operator.Over;
 
 					for (int i = GraphicTree.Count -1; i >= 0 ; i--){
-						GraphicObject p = GraphicTree[i];
+						Widget p = GraphicTree[i];
 						if (!p.Visible)
 							continue;
 						if (clipping.Contains (p.Slot) == RegionOverlap.Out)
@@ -870,7 +867,7 @@ namespace Crow
 
 		#region GraphicTree handling
 		/// <summary>Add widget to the Graphic tree of this interface and register it for layouting</summary>
-		public GraphicObject AddWidget(GraphicObject g)
+		public Widget AddWidget(Widget g)
 		{
 			g.Parent = this;
 			int ptr = 0;
@@ -896,7 +893,7 @@ namespace Crow
 			return g;
 		}
 		/// <summary>Set visible state of widget to false and delete if from the graphic tree</summary>
-		public void DeleteWidget(GraphicObject g)
+		public void DeleteWidget(Widget g)
 		{
 			lock (UpdateMutex) {
 				RegisterClip (g.ScreenCoordinates (g.LastPaintedSlot));
@@ -906,7 +903,7 @@ namespace Crow
 			}
 		}
 		/// <summary>Set visible state of widget to false and remove if from the graphic tree</summary>
-		public void RemoveWidget(GraphicObject g)
+		public void RemoveWidget(Widget g)
 		{
 //			if (g.Contains(HoverWidget)) {
 //				while (HoverWidget != g.focusParent) {
@@ -927,7 +924,7 @@ namespace Crow
 				while (GraphicTree.Count > 0) {
 					//TODO:parent is not reset to null because object will be added
 					//to ObjectToRedraw list, and without parent, it fails
-					GraphicObject g = GraphicTree [0];
+					Widget g = GraphicTree [0];
 					RegisterClip (g.ScreenCoordinates (g.LastPaintedSlot));
 					GraphicTree.RemoveAt (0);
 					g.Dispose ();
@@ -941,7 +938,7 @@ namespace Crow
 			#endif
 		}
 		/// <summary> Put widget on top of other root widgets</summary>
-		public void PutOnTop(GraphicObject g, bool isOverlay = false)
+		public void PutOnTop(Widget g, bool isOverlay = false)
 		{
 			int ptr = 0;
 			Window newW = g as Window;
@@ -966,10 +963,10 @@ namespace Crow
 		}
 
 		/// <summary>Search a Graphic object in the tree named 'nameToFind'</summary>
-		public GraphicObject FindByName (string nameToFind)
+		public Widget FindByName (string nameToFind)
 		{
-			foreach (GraphicObject w in GraphicTree) {
-				GraphicObject r = w.FindByName (nameToFind);
+			foreach (Widget w in GraphicTree) {
+				Widget r = w.FindByName (nameToFind);
 				if (r != null)
 					return r;
 			}
@@ -994,7 +991,7 @@ namespace Crow
 					(surf as XcbSurface).SetSize (clientRectangle.Width, clientRectangle.Height);
 
 
-				foreach (GraphicObject g in GraphicTree)
+				foreach (Widget g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
 
 				RegisterClip (clientRectangle);
@@ -1043,9 +1040,9 @@ namespace Crow
 			if (HoverWidget != null) {
 				resetTooltip ();
 				//check topmost graphicobject first
-				GraphicObject tmp = HoverWidget;
-				GraphicObject topc = null;
-				while (tmp is GraphicObject) {
+				Widget tmp = HoverWidget;
+				Widget topc = null;
+				while (tmp is Widget) {
 					topc = tmp;
 					tmp = tmp.focusParent;
 				}
@@ -1091,7 +1088,7 @@ namespace Crow
 			//top level graphic obj's parsing
 			lock (GraphicTree) {
 				for (int i = 0; i < GraphicTree.Count; i++) {
-					GraphicObject g = GraphicTree [i];
+					Widget g = GraphicTree [i];
 					if (g.MouseIsIn (e.Position)) {
 						g.checkHoverWidget (e);
 						if (g is Window)
@@ -1147,7 +1144,7 @@ namespace Crow
 			if (HoverWidget == null)
 				return false;
 
-			GraphicObject hoverFocused = HoverWidget;
+			Widget hoverFocused = HoverWidget;
 			while (!hoverFocused.Focusable) {
 				hoverFocused = hoverFocused.focusParent;
 				if (hoverFocused == null) {
@@ -1203,7 +1200,7 @@ namespace Crow
 
 		#region Tooltip handling
 		Stopwatch tooltipTimer = new Stopwatch();
-		GraphicObject ToolTipContainer = null;
+		Widget ToolTipContainer = null;
 		volatile bool tooltipVisible = false;
 
 		protected void initTooltip () {
@@ -1217,7 +1214,7 @@ namespace Crow
 			while(true) {
 				if (tooltipTimer.ElapsedMilliseconds > ToolTipDelay) {
 					if (!tooltipVisible) {
-						GraphicObject g = _hoverWidget;
+						Widget g = _hoverWidget;
 						while (g != null) {
 							if (!string.IsNullOrEmpty (g.Tooltip)) {
 								AddWidget (ToolTipContainer);
@@ -1227,7 +1224,7 @@ namespace Crow
 								tooltipVisible = true;
 								break;
 							}
-							g = g.LogicalParent as GraphicObject;
+							g = g.LogicalParent as Widget;
 						}
 					}
 				}
@@ -1265,7 +1262,7 @@ namespace Crow
 			
 		}
 
-		public void ShowContextMenu (GraphicObject go) {
+		public void ShowContextMenu (Widget go) {
 
 			lock (UpdateMutex) {
 				if (ctxMenuContainer.Parent == null)

@@ -1,5 +1,5 @@
 ﻿<ItemTemplate>
-	<GraphicObject Height="16" Background="Red"/>
+	<Widget Height="16" Background="Red"/>
 </ItemTemplate>
 <ItemTemplate DataType="System.IO.FileInfo">
 	<HorizontalStack Focusable="true"  Height="Fit">

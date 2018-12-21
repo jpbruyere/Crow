@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <Border BorderWidth="1" Foreground="White" CornerRadius="{./CornerRadius}"
 				Background="{./Background}"
 				MouseEnter="./onBorderMouseEnter"
@@ -6,7 +6,7 @@
 	<VerticalStack Spacing="0">
 		<HorizontalStack Background="{./TitleBarBackground}"
 				Name="hs" Margin="2" Spacing="0" Height="Fit">
-			<GraphicObject Width="5"/>
+			<Widget Width="5"/>
 			<Image Margin="1" Width="12" Height="12" Path="{./Icon}"/>
 			<Label Width="Stretched" Foreground="{./TitleBarForeground}" Margin="1" TextAlignment="Center" Text="{./Caption}" />
 			<Border CornerRadius="0" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
@@ -14,7 +14,7 @@
 				<Image Focusable="true" Name="Image" Margin="0" Width="Stretched" Height="Stretched" Path="#Crow.Icons.exit2.svg"
 					 MouseClick="./butQuitPress"/>
 			</Border>
-			<GraphicObject Width="5"/>
+			<Widget Width="5"/>
 		</HorizontalStack>
 		<Container Name="Content" MinimumSize="50,50" Background="Jet">
 			<VerticalStack Margin="1">

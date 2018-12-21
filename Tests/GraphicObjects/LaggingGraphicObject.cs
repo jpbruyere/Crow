@@ -31,7 +31,7 @@ using System.Diagnostics;
 
 namespace Crow
 {
-	public class LaggingGraphicObject : GraphicObject
+	public class LaggingGraphicObject : Widget
 	{
 		protected override void onDraw (Context gr)
 		{

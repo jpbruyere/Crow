@@ -51,7 +51,7 @@ namespace Crow
 
 			if (Orientation == Orientation.Vertical) {
 				int tallestChild = 0;
-				foreach (GraphicObject c in Children) {
+				foreach (Widget c in Children) {
 					if (!c.Visible)
 						continue;
 					if (dx + c.Slot.Width > ClientRectangle.Width) {
@@ -70,7 +70,7 @@ namespace Crow
 				}
 			} else {
 				int largestChild = 0;
-				foreach (GraphicObject c in Children) {
+				foreach (Widget c in Children) {
 					if (!c.Visible)
 						continue;
 					if (dy + c.Slot.Height > ClientRectangle.Height) {
@@ -93,7 +93,7 @@ namespace Crow
 		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
 			//children can't stretch in a wrapper
-			GraphicObject go = sender as GraphicObject;
+			Widget go = sender as Widget;
 			//System.Diagnostics.Debug.WriteLine ("wrapper child layout change: " + go.LastSlots.ToString() + " => " + go.Slot.ToString());
 			switch (arg.LayoutType) {
 			case LayoutingType.Width:
@@ -134,7 +134,7 @@ namespace Crow
 
 					childrenRWLock.EnterReadLock();
 
-					foreach (GraphicObject c in Children) {
+					foreach (Widget c in Children) {
 						if (!c.Visible)
 							continue;
 						if (c.Height.IsRelativeToParent &&
@@ -169,7 +169,7 @@ namespace Crow
 
 				childrenRWLock.EnterReadLock();
 
-				foreach (GraphicObject c in Children) {
+				foreach (Widget c in Children) {
 					if (!c.Visible)
 						continue;
 					if (c.Width.IsRelativeToParent &&
@@ -222,7 +222,7 @@ namespace Crow
 			#endif
 			switch (layoutType) {
 			case LayoutingType.Width:
-				foreach (GraphicObject c in Children) {
+				foreach (Widget c in Children) {
 					if (c.Width.IsRelativeToParent)
 						c.RegisterForLayouting (LayoutingType.Width);
 				}
@@ -231,7 +231,7 @@ namespace Crow
 				RegisterForLayouting (LayoutingType.X);
 				break;
 			case LayoutingType.Height:
-				foreach (GraphicObject c in Children) {
+				foreach (Widget c in Children) {
 					if (c.Height.IsRelativeToParent)
 						c.RegisterForLayouting (LayoutingType.Height);
 				}

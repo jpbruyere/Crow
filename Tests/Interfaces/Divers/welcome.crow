@@ -11,10 +11,10 @@
 			<Label Foreground="Black" Font="mono, 12" Text="."/>
 			<Label Foreground="DimGrey" Font="mono, 12" Text="{Build}"/>
 		</HorizontalStack>
-		<GraphicObject Height="30"/>
+		<Widget Height="30"/>
 		<Label Font="20" Text="Press &lt;F2&gt; and &lt;F3&gt; to cycle into the examples"/>
 		<Label Font="20" Text="Those are basic tests used to validate changes,"/>
-		<GraphicObject Height="30"/>
+		<Widget Height="30"/>
 		<Label Foreground="DimGrey" Font="20" Text="&lt;F5&gt; => File dialog example"/>
 		<Label Foreground="DimGrey" Font="20" Text="&lt;F6&gt; => Window example"/>
 	</VerticalStack>

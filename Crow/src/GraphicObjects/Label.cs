@@ -35,7 +35,7 @@ using System.ComponentModel;
 
 namespace Crow
 {
-    public class Label : GraphicObject
+    public class Label : Widget
     {
 		#region CTOR
 		protected Label () : base(){}

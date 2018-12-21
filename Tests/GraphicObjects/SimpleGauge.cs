@@ -30,7 +30,7 @@ using Cairo;
 
 namespace Tutorials
 {
-	public class SimpleGauge : GraphicObject
+	public class SimpleGauge : Widget
 	{		
 		public SimpleGauge () : base() {}
 		public SimpleGauge (Interface iface): base (iface){}

@@ -29,7 +29,7 @@ using Crow;
 
 namespace Test
 {
-	public class ColorCircleSelector : GraphicObject
+	public class ColorCircleSelector : Widget
 	{
 		void computeControlPoints (
 			double xc, double yc,

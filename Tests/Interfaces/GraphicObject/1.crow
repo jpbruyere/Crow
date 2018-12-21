@@ -1,3 +1,3 @@
-<?xml version="1.0"?>
-<GraphicObject Margin="10" Width="150" Height="150" Background="SeaGreen"
+﻿<?xml version="1.0"?>
+<Widget Margin="10" Width="150" Height="150" Background="SeaGreen"
 		MinimumSize="50,50"/>

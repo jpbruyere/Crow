@@ -93,14 +93,14 @@ namespace Crow
 		{
 			int d = 0;
 			if (Orientation == Orientation.Horizontal) {
-				foreach (GraphicObject c in Children) {
+				foreach (Widget c in Children) {
 					if (!c.Visible)
 						continue;
 					c.Slot.X = d;
 					d += c.Slot.Width + Spacing;
 				}
 			} else {
-				foreach (GraphicObject c in Children) {
+				foreach (Widget c in Children) {
 					if (!c.Visible)
 						continue;					
 					c.Slot.Y = d;
@@ -109,7 +109,7 @@ namespace Crow
 			}
 			IsDirty = true;
 		}
-		GraphicObject stretchedGO = null;
+		Widget stretchedGO = null;
 		public override bool UpdateLayout (LayoutingType layoutType)
         {
 			RegisteredLayoutings &= (~layoutType);
@@ -173,7 +173,7 @@ namespace Crow
 
 		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
-			GraphicObject go = sender as GraphicObject;
+			Widget go = sender as Widget;
 			//Debug.WriteLine ("child layout change: " + go.LastSlots.ToString() + " => " + go.Slot.ToString());
 			switch (arg.LayoutType) {
 			case LayoutingType.Width:
@@ -225,7 +225,7 @@ namespace Crow
 		}
 		#endregion
 
-    	public override void RemoveChild (GraphicObject child)
+    	public override void RemoveChild (Widget child)
 		{
 			if (child != stretchedGO) {
 				if (Orientation == Orientation.Horizontal)

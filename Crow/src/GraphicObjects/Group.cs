@@ -36,15 +36,15 @@ using System.Threading;
 
 namespace Crow
 {
-	public class Group : GraphicObject
+	public class Group : Widget
     {
 		#if DESIGN_MODE
-		public override bool FindByDesignID(string designID, out GraphicObject go){
+		public override bool FindByDesignID(string designID, out Widget go){
 			go = null;
 			if (base.FindByDesignID (designID, out go))
 				return true;
 			childrenRWLock.EnterReadLock ();
-			foreach (GraphicObject w in Children) {
+			foreach (Widget w in Children) {
 				if (!w.FindByDesignID (designID, out go))
 					continue;
 				childrenRWLock.ExitReadLock ();
@@ -58,7 +58,7 @@ namespace Crow
 			if (this.design_isTGItem)
 				return;
 			base.getIML (doc, parentElem);
-			foreach (GraphicObject g in Children) {
+			foreach (Widget g in Children) {
 				g.getIML (doc, parentElem.LastChild);	
 			}
 		}
@@ -75,13 +75,13 @@ namespace Crow
 		public event EventHandler<EventArgs> ChildrenCleared;
 		#endregion
 
-		internal GraphicObject largestChild = null;
-		internal GraphicObject tallestChild = null;
+		internal Widget largestChild = null;
+		internal Widget tallestChild = null;
 
         bool _multiSelect = false;
-		List<GraphicObject> children = new List<GraphicObject>();
+		List<Widget> children = new List<Widget>();
 
-        public virtual List<GraphicObject> Children {
+        public virtual List<Widget> Children {
 			get { return children; }
 		}
 		[DefaultValue(false)]
@@ -90,7 +90,7 @@ namespace Crow
             get { return _multiSelect; }
             set { _multiSelect = value; }
         }
-		public virtual void AddChild(GraphicObject g){
+		public virtual void AddChild(Widget g){
 			childrenRWLock.EnterWriteLock();
 
 			g.Parent = this;
@@ -102,7 +102,7 @@ namespace Crow
 			g.LayoutChanged += OnChildLayoutChanges;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
-        public virtual void RemoveChild(GraphicObject child)
+        public virtual void RemoveChild(Widget child)
 		{
 			child.LayoutChanged -= OnChildLayoutChanges;
 			//check if HoverWidget is removed from Tree
@@ -126,12 +126,12 @@ namespace Crow
 			this.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 
 		}
-        public virtual void DeleteChild(GraphicObject child)
+        public virtual void DeleteChild(Widget child)
 		{
 			RemoveChild (child);
 			child.Dispose ();
         }
-		public virtual void InsertChild (int idx, GraphicObject g) {
+		public virtual void InsertChild (int idx, Widget g) {
 			childrenRWLock.EnterWriteLock ();
 				
 			g.Parent = this;
@@ -154,7 +154,7 @@ namespace Crow
 			childrenRWLock.EnterWriteLock ();
 
 			while (Children.Count > 0) {
-				GraphicObject g = Children [Children.Count - 1];
+				Widget g = Children [Children.Count - 1];
 				g.LayoutChanged -= OnChildLayoutChanges;
 				Children.RemoveAt (Children.Count - 1);
 				g.Dispose ();
@@ -172,14 +172,14 @@ namespace Crow
 			base.OnDataSourceChanged (this, e);
 
 			childrenRWLock.EnterReadLock ();
-			foreach (GraphicObject g in Children) {
+			foreach (Widget g in Children) {
 				if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
 					g.OnDataSourceChanged (g, e);	
 			}
 			childrenRWLock.ExitReadLock ();
 		}
 
-		public void putWidgetOnTop(GraphicObject w)
+		public void putWidgetOnTop(Widget w)
 		{
 			if (Children.Contains(w))
 			{
@@ -191,7 +191,7 @@ namespace Crow
 				childrenRWLock.ExitWriteLock ();
 			}
 		}
-		public void putWidgetOnBottom(GraphicObject w)
+		public void putWidgetOnBottom(Widget w)
 		{
 			if (Children.Contains(w))
 			{
@@ -206,15 +206,15 @@ namespace Crow
 
 		#region GraphicObject overrides
 
-		public override GraphicObject FindByName (string nameToFind)
+		public override Widget FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)
 				return this;
-			GraphicObject tmp = null;
+			Widget tmp = null;
 
 			childrenRWLock.EnterReadLock ();
 
-			foreach (GraphicObject w in Children) {
+			foreach (Widget w in Children) {
 				tmp = w.FindByName (nameToFind);
 				if (tmp != null)
 					break;
@@ -224,9 +224,9 @@ namespace Crow
 
 			return tmp;
 		}
-		public override bool Contains (GraphicObject goToFind)
+		public override bool Contains (Widget goToFind)
 		{
-			foreach (GraphicObject w in Children) {
+			foreach (Widget w in Children) {
 				if (w == goToFind)
 					return true;
 				if (w.Contains (goToFind))
@@ -266,7 +266,7 @@ namespace Crow
 			//position smaller objects in group when group size is fit
 			switch (layoutType) {
 			case LayoutingType.Width:
-				foreach (GraphicObject c in Children) {
+				foreach (Widget c in Children) {
 					if (c.Width.IsRelativeToParent)
 						c.RegisterForLayouting (LayoutingType.Width);
 					else
@@ -274,7 +274,7 @@ namespace Crow
 				}
 				break;
 			case LayoutingType.Height:
-				foreach (GraphicObject c in Children) {
+				foreach (Widget c in Children) {
 					if (c.Height.IsRelativeToParent)
 						c.RegisterForLayouting (LayoutingType.Height);
 					else
@@ -328,7 +328,7 @@ namespace Crow
 
 				childrenRWLock.EnterReadLock ();
 
-				foreach (GraphicObject c in Children) {
+				foreach (Widget c in Children) {
 					if (!c.Visible)
 						continue;
 					if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
@@ -358,7 +358,7 @@ namespace Crow
 
 		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
-			GraphicObject g = sender as GraphicObject;
+			Widget g = sender as Widget;
 
 			switch (arg.LayoutType) {
 			case LayoutingType.Width:
@@ -463,7 +463,7 @@ namespace Crow
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing) {
-				foreach (GraphicObject c in children)
+				foreach (Widget c in children)
 					c.Dispose ();
 			}
 			base.Dispose (disposing);

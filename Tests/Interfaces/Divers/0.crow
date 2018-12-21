@@ -141,7 +141,7 @@
 			</TabView>-->
 			<MessageBox Movable="false"/>
 			<ColorPicker SelectedColor="{²../go.Background}" Name="colorPicker" Margin="5" Fit="True" />
-			<GraphicObject Name="go" Width="100" Height="60" Background="{../../colorList.SelectedItem}"/>
+			<Widget Name="go" Width="100" Height="60" Background="{../../colorList.SelectedItem}"/>
 			<Label Text="{../colorPicker.SelectedColor}"/>
 		</VerticalStack>
 		<Splitter/>

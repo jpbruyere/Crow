@@ -73,7 +73,7 @@ namespace Crow
 		#endregion
 
 		#region TemplatedContainer overrides
-		protected override void loadTemplate(GraphicObject template = null)
+		protected override void loadTemplate(Widget template = null)
 		{
 			base.loadTemplate (template);
 
@@ -442,7 +442,7 @@ namespace Crow
 			if (Parent is Interface)
 				(Parent as Interface).DeleteWidget (this);
 			else {
-				GraphicObject p = Parent as GraphicObject;
+				Widget p = Parent as Widget;
 				if (p is Group) {
 					lock (IFace.UpdateMutex) {
 						RegisterClip (p.ScreenCoordinates (p.LastPaintedSlot));

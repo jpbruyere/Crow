@@ -105,7 +105,7 @@ namespace Crow
 
 		public void ProcessLayouting()
 		{
-			GraphicObject go = Layoutable as GraphicObject;
+			Widget go = Layoutable as Widget;
 //			if (go == null) {
 //				Debug.WriteLine ("ERROR: processLayouting on something else than a graphic object: " + this.ToString ());
 //				return;
@@ -132,7 +132,7 @@ namespace Crow
 				#endif
 				if (LayoutingTries < Interface.MaxLayoutingTries) {
 					Layoutable.RegisteredLayoutings |= LayoutType;
-					(Layoutable as GraphicObject).IFace.LayoutingQueue.Enqueue (this);
+					(Layoutable as Widget).IFace.LayoutingQueue.Enqueue (this);
 					#if DEBUG_LOG
 					result = Result.Requeued;
 					#endif
@@ -143,7 +143,7 @@ namespace Crow
 					LayoutingTries = 0;
 					DiscardCount++;
 					Layoutable.RegisteredLayoutings |= LayoutType;
-					(Layoutable as GraphicObject).IFace.DiscardQueue.Enqueue (this);
+					(Layoutable as Widget).IFace.DiscardQueue.Enqueue (this);
 				}
 				#if DEBUG_LOG
 				else {
@@ -160,9 +160,9 @@ namespace Crow
 			go.parentRWLock.ExitReadLock ();
 		}
 
-		public static implicit operator GraphicObject(LayoutingQueueItem queueItem)
+		public static implicit operator Widget(LayoutingQueueItem queueItem)
 		{
-			return queueItem.Layoutable as GraphicObject;
+			return queueItem.Layoutable as Widget;
 		}
 		public static implicit operator LayoutingType(LayoutingQueueItem lqi)
 		{

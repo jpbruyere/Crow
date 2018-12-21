@@ -37,7 +37,7 @@ using System.ComponentModel;
 namespace Crow
 {
 	[DesignIgnore]
-	public class TextRun : GraphicObject
+	public class TextRun : Widget
 	{
 		#region CTOR
 		protected TextRun () : base(){}

@@ -155,7 +155,7 @@ namespace Crow.IML
 		/// Creates a new instance of the GraphicObject compiled in the instantiator
 		/// </summary>
 		/// <returns>The new graphic object instance</returns>
-		public GraphicObject CreateInstance(){
+		public Widget CreateInstance(){
 #if DEBUG_LOAD
 			Stopwatch loadingTime = Stopwatch.StartNew ();
 			GraphicObject o = loader (iface) as GraphicObject;
@@ -165,7 +165,7 @@ namespace Crow.IML
 			}
 			return o;
 #else
-			return loader (iface) as GraphicObject;
+			return loader (iface) as Widget;
 #endif
 		}
 		/// <summary>
@@ -412,7 +412,7 @@ namespace Crow.IML
 		void emitSetDesignAttribute (IMLContext ctx, string name, string value){
 			//store member value in iml
 			ctx.il.Emit (OpCodes.Ldloc_0);
-			ctx.il.Emit (OpCodes.Ldfld, typeof(GraphicObject).GetField("design_iml_values"));
+			ctx.il.Emit (OpCodes.Ldfld, typeof(Widget).GetField("design_iml_values"));
 			ctx.il.Emit (OpCodes.Ldstr, name);
 			if (string.IsNullOrEmpty (value))
 				ctx.il.Emit (OpCodes.Ldnull);
@@ -435,17 +435,17 @@ namespace Crow.IML
 				IXmlLineInfo li = (IXmlLineInfo)reader;
 				ctx.il.Emit (OpCodes.Ldloc_0);
 				ctx.il.Emit (OpCodes.Ldstr, this.NextDesignID);
-				ctx.il.Emit (OpCodes.Stfld, typeof(GraphicObject).GetField("design_id"));
+				ctx.il.Emit (OpCodes.Stfld, typeof(Widget).GetField("design_id"));
 				ctx.il.Emit (OpCodes.Ldloc_0);
 				ctx.il.Emit (OpCodes.Ldc_I4, ctx.curLine + li.LineNumber);
-				ctx.il.Emit (OpCodes.Stfld, typeof(GraphicObject).GetField("design_line"));
+				ctx.il.Emit (OpCodes.Stfld, typeof(Widget).GetField("design_line"));
 				ctx.il.Emit (OpCodes.Ldloc_0);
 				ctx.il.Emit (OpCodes.Ldc_I4, li.LinePosition);
-				ctx.il.Emit (OpCodes.Stfld, typeof(GraphicObject).GetField("design_column"));
+				ctx.il.Emit (OpCodes.Stfld, typeof(Widget).GetField("design_column"));
 				if (!string.IsNullOrEmpty (sourcePath)) {
 					ctx.il.Emit (OpCodes.Ldloc_0);
 					ctx.il.Emit (OpCodes.Ldstr, sourcePath);
-					ctx.il.Emit (OpCodes.Stfld, typeof(GraphicObject).GetField("design_imlPath"));
+					ctx.il.Emit (OpCodes.Stfld, typeof(Widget).GetField("design_imlPath"));
 				}
 #endif
 				#region Styling and default values loading

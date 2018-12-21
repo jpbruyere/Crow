@@ -47,7 +47,7 @@ namespace Crow
 	/// <summary>
 	/// The base class for all the graphic tree elements.
 	/// </summary>
-	public class GraphicObject : ILayoutable, IValueChange, IDisposable
+	public class Widget : ILayoutable, IValueChange, IDisposable
 	{
 		internal ReaderWriterLockSlim parentRWLock = new ReaderWriterLockSlim();
 		#if DEBUG_LOG
@@ -58,9 +58,9 @@ namespace Crow
 		public int xLevel;//x increment for debug draw
 		#endif
 		#if DESIGN_MODE
-		static MethodInfo miDesignAddDefLoc = typeof(GraphicObject).GetMethod("design_add_style_location",
+		static MethodInfo miDesignAddDefLoc = typeof(Widget).GetMethod("design_add_style_location",
 			BindingFlags.Instance | BindingFlags.NonPublic);
-		static MethodInfo miDesignAddValLoc = typeof(GraphicObject).GetMethod("design_add_iml_location",
+		static MethodInfo miDesignAddValLoc = typeof(Widget).GetMethod("design_add_iml_location",
 			BindingFlags.Instance | BindingFlags.NonPublic);
 		
 		public volatile bool design_HasChanged = false;
@@ -89,7 +89,7 @@ namespace Crow
 //			design_iml_locations.Add(memberName, new FileLocation(path,line,col));
 //		}
 			
-		public virtual bool FindByDesignID(string designID, out GraphicObject go){
+		public virtual bool FindByDesignID(string designID, out Widget go){
 			go = null;
 			if (this.design_id == designID){
 				go = this;
@@ -162,7 +162,7 @@ namespace Crow
 			Dispose(true);  
 			GC.SuppressFinalize(this);  
 		}  
-		~GraphicObject(){
+		~Widget(){
 			Debug.WriteLine(this.ToString() + " not disposed by user");
 			Dispose(false);
 		}
@@ -202,8 +202,8 @@ namespace Crow
 		#endif
 
 		internal bool isPopup = false;
-		public GraphicObject focusParent {
-			get { return (isPopup ? LogicalParent : parent) as GraphicObject; }
+		public Widget focusParent {
+			get { return (isPopup ? LogicalParent : parent) as Widget; }
 		}
 
 		/// <summary>
@@ -242,7 +242,7 @@ namespace Crow
 		/// when creating widget from code because widgets has to be bound to an interface before any other
 		/// action.
 		/// </summary>
-		protected GraphicObject () {
+		protected Widget () {
 			Clipping = new Region ();
 			#if DEBUG_LOG
 			GraphicObjects.Add (this);
@@ -259,7 +259,7 @@ namespace Crow
 		/// compiler will not create it automatically because of the presence of the other one.
 		/// </summary>
 		/// <param name="iface">Iface.</param>
-		public GraphicObject (Interface iface) : this()
+		public Widget (Interface iface) : this()
 		{
 			IFace = iface;
 			Initialize ();
@@ -368,12 +368,12 @@ namespace Crow
 				if (logicalParent == value)
 					return;
 				if (logicalParent != null)
-					(logicalParent as GraphicObject).DataSourceChanged -= onLogicalParentDataSourceChanged;
+					(logicalParent as Widget).DataSourceChanged -= onLogicalParentDataSourceChanged;
 				DataSourceChangeEventArgs dsce = new DataSourceChangeEventArgs (LogicalParent, null);
 				logicalParent = value;
 				dsce.NewDataSource = LogicalParent;
 				if (logicalParent != null)
-					(logicalParent as GraphicObject).DataSourceChanged += onLogicalParentDataSourceChanged;
+					(logicalParent as Widget).DataSourceChanged += onLogicalParentDataSourceChanged;
 				onLogicalParentChanged (this, dsce);
 			}
 		}
@@ -385,7 +385,7 @@ namespace Crow
 			}
 		}
 		public virtual Rectangle ContextCoordinates(Rectangle r){
-			GraphicObject go = Parent as GraphicObject;
+			Widget go = Parent as Widget;
 			if (go == null)
 				return r + Parent.ClientRectangle.Position;
 			return go.CacheEnabled ?
@@ -618,7 +618,7 @@ namespace Crow
 		public virtual Measure Width {
 			get {
 				return width.Units == Unit.Inherit ?
-					Parent is GraphicObject ? (Parent as GraphicObject).WidthPolicy :
+					Parent is Widget ? (Parent as Widget).WidthPolicy :
 					Measure.Stretched : width;
 			}
 			set {
@@ -659,7 +659,7 @@ namespace Crow
 		public virtual Measure Height {
 			get {
 				return height.Units == Unit.Inherit ?
-					Parent is GraphicObject ? (Parent as GraphicObject).HeightPolicy :
+					Parent is Widget ? (Parent as Widget).HeightPolicy :
 					Measure.Stretched : height;
 			}
 			set {
@@ -979,7 +979,7 @@ namespace Crow
 			get {
 				return rootDataLevel ? dataSource : dataSource == null ?
 					LogicalParent == null ? null :
-					LogicalParent is GraphicObject ? (LogicalParent as GraphicObject).DataSource : null :
+					LogicalParent is Widget ? (LogicalParent as Widget).DataSource : null :
 					dataSource;
 			}
 		}
@@ -1184,7 +1184,7 @@ namespace Crow
 						il.Emit (OpCodes.Call, miDesignAddDefLoc);
 
 						il.Emit (OpCodes.Ldloc_0);
-						il.Emit (OpCodes.Ldfld, typeof(GraphicObject).GetField("design_style_values"));
+						il.Emit (OpCodes.Ldfld, typeof(Widget).GetField("design_style_values"));
 						il.Emit (OpCodes.Ldstr, pi.Name);
 						il.Emit (OpCodes.Ldstr, defaultValue.ToString());
 						il.Emit (OpCodes.Call, CompilerServices.miDicStrStrAdd);
@@ -1234,16 +1234,16 @@ namespace Crow
 		}
 #endregion
 
-		public virtual GraphicObject FindByName(string nameToFind){
+		public virtual Widget FindByName(string nameToFind){
 			return string.Equals(nameToFind, name, StringComparison.Ordinal) ? this : null;
 		}
-		public virtual bool Contains(GraphicObject goToFind){
+		public virtual bool Contains(Widget goToFind){
 			return false;
 		}
 		/// <summary>
 		/// return true if this is contained inside go
 		/// </summary>
-		public bool IsOrIsInside(GraphicObject go){
+		public bool IsOrIsInside(Widget go){
 			if (this == go)
 				return true;
 			ILayoutable p = this.Parent;
@@ -1382,7 +1382,7 @@ namespace Crow
 				Clipping.UnionRectangle (r);
 			if (Parent == null)
 				return;
-			GraphicObject p = Parent as GraphicObject;
+			Widget p = Parent as Widget;
 			if (p?.IsDirty == true && p?.CacheEnabled == true)
 				return;
 			Parent.RegisterClip (r + Slot.Position);
@@ -1440,8 +1440,8 @@ namespace Crow
 					layoutType &= (~LayoutingType.ArrangeChildren);
 
 				//apply constraints depending on parent type
-				if (Parent is GraphicObject)
-					(Parent as GraphicObject).ChildrenLayoutingConstraints (ref layoutType);
+				if (Parent is Widget)
+					(Parent as Widget).ChildrenLayoutingConstraints (ref layoutType);
 
 //				//prevent queueing same LayoutingType for this
 				layoutType &= (~RegisteredLayoutings);
@@ -1805,7 +1805,7 @@ namespace Crow
 				return;
 			
 			//bubble event to the top
-			GraphicObject p = focusParent;
+			Widget p = focusParent;
 			if (p != null)
 				p.onMouseMove(sender,e);
 
@@ -1826,7 +1826,7 @@ namespace Crow
 				}
 			}
 			//bubble event to the top
-			GraphicObject p = focusParent;
+			Widget p = focusParent;
 			if (p != null)
 				p.onMouseDown(sender,e);
 
@@ -1848,7 +1848,7 @@ namespace Crow
 			}
 
 			//bubble event to the top
-			GraphicObject p = focusParent;
+			Widget p = focusParent;
 			if (p != null)
 				p.onMouseUp(sender,e);
 
@@ -1863,7 +1863,7 @@ namespace Crow
                 MouseClick.Raise(this, e);
                 return;
             }
-			GraphicObject p = focusParent;
+			Widget p = focusParent;
 			if (p != null)
 				p.onMouseClick(sender,e);			
 		}
@@ -1876,7 +1876,7 @@ namespace Crow
                 MouseDoubleClick.Raise(this, e);
                 return;
             }
-            GraphicObject p = focusParent;
+            Widget p = focusParent;
 			if (p != null)
 				p.onMouseDoubleClick(sender,e);			
 		}
@@ -1886,7 +1886,7 @@ namespace Crow
                 MouseWheelChanged.Raise(this, e);
                 return;
             }
-            GraphicObject p = focusParent;
+            Widget p = focusParent;
 			if (p != null)
 				p.onMouseWheel(sender,e);
 		}
@@ -1897,7 +1897,7 @@ namespace Crow
 			#endif
 
 			if (IFace.DragAndDropOperation != null) {
-				GraphicObject g = this;
+				Widget g = this;
 				while (g != null) {
 					if (g.AllowDrop) {
 						if (IFace.DragAndDropOperation.DragSource != this && IFace.DragAndDropOperation.DropTarget != this) {

@@ -87,14 +87,14 @@ namespace Crow.IML
 		internal static MethodInfo miDSChangeEmitHelper = typeof(Instantiator).GetMethod("dataSourceChangedEmitHelper", BindingFlags.Instance | BindingFlags.NonPublic);
 		internal static MethodInfo miDSReverseBinding = typeof(Instantiator).GetMethod("dataSourceReverseBinding", BindingFlags.Static | BindingFlags.NonPublic);
 
-		internal static FieldInfo miSetCurIface = typeof(GraphicObject).GetField ("IFace", BindingFlags.Public | BindingFlags.Instance);
-		internal static MethodInfo miFindByName = typeof (GraphicObject).GetMethod ("FindByName");
-		internal static MethodInfo miGetGObjItem = typeof(List<GraphicObject>).GetMethod("get_Item", new Type[] { typeof(Int32) });
-		internal static MethodInfo miLoadDefaultVals = typeof (GraphicObject).GetMethod ("loadDefaultValues");
-		internal static PropertyInfo piStyle = typeof (GraphicObject).GetProperty ("Style");
-		internal static MethodInfo miGetLogicalParent = typeof(GraphicObject).GetProperty("LogicalParent").GetGetMethod();
-		internal static MethodInfo miGetDataSource = typeof(GraphicObject).GetProperty("DataSource").GetGetMethod ();
-		internal static EventInfo eiLogicalParentChanged = typeof(GraphicObject).GetEvent("LogicalParentChanged");
+		internal static FieldInfo miSetCurIface = typeof(Widget).GetField ("IFace", BindingFlags.Public | BindingFlags.Instance);
+		internal static MethodInfo miFindByName = typeof (Widget).GetMethod ("FindByName");
+		internal static MethodInfo miGetGObjItem = typeof(List<Widget>).GetMethod("get_Item", new Type[] { typeof(Int32) });
+		internal static MethodInfo miLoadDefaultVals = typeof (Widget).GetMethod ("loadDefaultValues");
+		internal static PropertyInfo piStyle = typeof (Widget).GetProperty ("Style");
+		internal static MethodInfo miGetLogicalParent = typeof(Widget).GetProperty("LogicalParent").GetGetMethod();
+		internal static MethodInfo miGetDataSource = typeof(Widget).GetProperty("DataSource").GetGetMethod ();
+		internal static EventInfo eiLogicalParentChanged = typeof(Widget).GetEvent("LogicalParentChanged");
 
 		internal static MethodInfo miIFaceLoad = typeof(Interface).GetMethod ("CreateInstance", BindingFlags.Instance | BindingFlags.Public);
 		internal static MethodInfo miIFaceCreateTemplateInst = typeof (Interface).GetMethod ("CreateTemplateInstance", BindingFlags.Instance | BindingFlags.Public);
@@ -133,7 +133,7 @@ namespace Crow.IML
 		internal static FieldInfo fiVCMbName = typeof (ValueChangeEventArgs).GetField ("MemberName");
 		internal static MethodInfo miValueChangeAdd = eiValueChange.GetAddMethod ();
 
-		internal static EventInfo eiDSChange = typeof (GraphicObject).GetEvent ("DataSourceChanged");
+		internal static EventInfo eiDSChange = typeof (Widget).GetEvent ("DataSourceChanged");
 		internal static MethodInfo miInvokeDSChange = eiDSChange.EventHandlerType.GetMethod ("Invoke");
 		internal static Type [] argsBoundDSChange = {typeof (object), typeof (object), miInvokeDSChange.GetParameters () [1].ParameterType };
 		internal static FieldInfo fiDSCNewDS = typeof (DataSourceChangeEventArgs).GetField ("NewDataSource");
@@ -806,7 +806,7 @@ namespace Crow.IML
 					//if left operand is member of current node, it's easy to fetch type, else we should use reflexion in msil
 					if (lopPI == null){//accept GraphicObj members, but it's restricive
 						//TODO: we should get the parse method by reflexion, or something else
-						lopPI = typeof(GraphicObject).GetProperty (lop.Tokens [lop.Tokens.Length-1]);
+						lopPI = typeof(Widget).GetProperty (lop.Tokens [lop.Tokens.Length-1]);
 						if (lopPI == null)
 							throw new NotSupportedException ();
 					}

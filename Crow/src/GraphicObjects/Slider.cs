@@ -50,7 +50,7 @@ namespace Crow
 
 		#region implemented abstract members of TemplatedControl
 
-		protected override void loadTemplate (GraphicObject template = null)
+		protected override void loadTemplate (Widget template = null)
 		{
 			
 		}
