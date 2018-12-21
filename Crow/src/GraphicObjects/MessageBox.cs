@@ -47,7 +47,7 @@ namespace Crow
 
 		}
 
-		protected override void loadTemplate (GraphicObject template)
+		protected override void loadTemplate (Widget template)
 		{
 			base.loadTemplate (template);
 			NotifyValueChanged ("MsgIcon", "#Crow.Icons.iconInfo.svg");

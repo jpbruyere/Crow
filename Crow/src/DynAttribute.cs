@@ -33,7 +33,7 @@ namespace Crow
 {
 	public class DynAttribute
     {
-        public GraphicObject Source;
+        public Widget Source;
         public string MemberName;
         public String Value;
     }

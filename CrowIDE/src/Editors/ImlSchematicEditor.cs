@@ -40,7 +40,7 @@ namespace Crow.Coding
 		#endregion
 
 		ProjectFile projNode;
-		GraphicObject selectedItem;
+		Widget selectedItem;
 		ImlProjectItem imlProjFile;
 		Exception imlError = null;
 
@@ -79,7 +79,7 @@ namespace Crow.Coding
 				RegisterForRedraw ();
 			}
 		}
-		public GraphicObject SelectedItem {
+		public Widget SelectedItem {
 			get { return selectedItem; }
 			set {
 				if (selectedItem == value)

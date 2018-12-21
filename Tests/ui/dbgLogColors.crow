@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <Window Template="#Crow.ToolWindow.template" AlwaysOnTop="true" Width="400" Height="300"
 	HorizontalAlignment="Right" VerticalAlignment="Bottom">
 	<VerticalStack>
@@ -14,7 +14,7 @@
 								<Template>
 									<Border CornerRadius="0" Foreground="LightGrey">
 										<HorizontalStack Margin="0" Spacing="1">
-											<!---<GraphicObject Height="8" Width="14" Background="{./Caption}" Margin="0" CornerRadius="2"/>-->
+											<!---<Widget Height="8" Width="14" Background="{./Caption}" Margin="0" CornerRadius="2"/>-->
 											<Label MinimumSize="80,10" Text="{./Caption}" Margin="0" Width="Stretched" Font="mono, 8"/>
 											<Button Width="14" Height="14" Focusable="false"
 												Template="#Crow.Templates.ArrowBut.template">
@@ -39,7 +39,7 @@
 					</Popper>
 				</Template>
 			</ComboBox>
-			<GraphicObject Height="8" Width="14" Background="{Value}" Margin="0" CornerRadius="2"/>
+			<Widget Height="8" Width="14" Background="{Value}" Margin="0" CornerRadius="2"/>
 		</HorizontalStack>
 		<HorizontalStack>			
 			<ListBox Name="kvpList" Data="{ColorsKVPList}" Margin="0"		 
@@ -49,7 +49,7 @@
 						<HorizontalStack Margin="0"
 									MouseEnter="{Background=CornflowerBlue}"
 									MouseLeave="{Background=Transparent}">
-							<GraphicObject Height="8" Width="14" Background="{Value}" Margin="0" CornerRadius="2"/>
+							<Widget Height="8" Width="14" Background="{Value}" Margin="0" CornerRadius="2"/>
 							<Label Text="{Key}" Margin="0" Width="Stretched" Font="mono, 8"/>
 						</HorizontalStack>
 					</Border>

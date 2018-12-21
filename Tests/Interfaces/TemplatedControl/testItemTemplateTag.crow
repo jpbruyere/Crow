@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <Border BorderWidth="2" Fit="true">
 	<VerticalStack Fit="true" Margin="5">
 		<ListBox Data="{TestList}" Background="0.5,0.5,0.5,0.7"
@@ -23,7 +23,7 @@
 							Height="Fit" Width="200" Margin="1" Focusable="true"
 							MouseEnter="{Background=hgradient|0:DarkRed|1:Transparent}"
 							MouseLeave="{Background=Transparent}">
-					<GraphicObject Height="12" Width="20" Background="{}" Margin="0" CornerRadius="3"/>
+					<Widget Height="12" Width="20" Background="{}" Margin="0" CornerRadius="3"/>
 					<Label Text="{}" Margin="0" Width="Stretched"/>
 				</HorizontalStack>
 			</ItemTemplate>

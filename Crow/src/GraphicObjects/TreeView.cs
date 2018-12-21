@@ -35,7 +35,7 @@ namespace Crow
 	//if their are expandable, some functions and events are added
 	public class TreeView : TemplatedGroup
 	{
-		GraphicObject selectedItemContainer = null;
+		Widget selectedItemContainer = null;
 		bool isRoot;
 
 		#region CTOR
@@ -64,7 +64,7 @@ namespace Crow
 
 		internal override void itemClick (object sender, MouseButtonEventArgs e)
 		{
-			GraphicObject tmp = sender as GraphicObject;
+			Widget tmp = sender as Widget;
 			if (!tmp.HasFocus)
 				return;
 			/*if (selectedItemContainer != null) {
@@ -85,7 +85,7 @@ namespace Crow
 
 		public void ExpandAll(){
 			foreach (Group grp in items.Children) {
-				foreach (GraphicObject go in grp.Children) {
+				foreach (Widget go in grp.Children) {
 					Expandable exp = go as Expandable;
 					if (exp == null)
 						continue;

@@ -43,7 +43,7 @@ namespace Crow
 		public ProgressBar(Interface iface) : base(iface){}
 		#endregion
 
-		protected override void loadTemplate (GraphicObject template)
+		protected override void loadTemplate (Widget template)
 		{
 			
 		}

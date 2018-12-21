@@ -24,14 +24,14 @@
 								<Label Text=" => "/>
 								<Label Text="{NewSlot}"/>
 							</HorizontalStack>
-							<GraphicObject Background="SeaGreen" Height="3" Visible="{HasTriggeredLQIs}"/>
+							<Widget Background="SeaGreen" Height="3" Visible="{HasTriggeredLQIs}"/>
 						</VerticalStack>
 						<Container Name="Content" Visible="false" HorizontalAlignment="Left"
 								Fit="true"/>
 					</VerticalStack>
 				</Template>
 				<HorizontalStack Height="Fit" Width="Fit">
-					<GraphicObject Width="20" Height="10"/>
+					<Widget Width="20" Height="10"/>
 					<TreeView Name="List" Height="Fit" Width="Fit"
 						Template="#Crow.Templates.treeList.crow" />
 				</HorizontalStack>
@@ -55,7 +55,7 @@
 					</VerticalStack>
 				</Template>
 				<HorizontalStack Height="Fit" Width="{./WidthPolicy}">
-					<GraphicObject Width="12" Height="10"/>
+					<Widget Width="12" Height="10"/>
 					<TreeView Name="List" Height="Fit" Width="{./WidthPolicy}"
 						Template="#Crow.Templates.treeList.crow" />
 				</HorizontalStack>

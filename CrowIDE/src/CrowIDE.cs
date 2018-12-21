@@ -159,7 +159,7 @@ namespace Crow.Coding
 
 			initCommands ();
 
-			GraphicObject go = Load (@"#CrowIDE.ui.CrowIDE.crow");
+			Widget go = Load (@"#CrowIDE.ui.CrowIDE.crow");
 			go.DataSource = this;
 
 			mainDock = go.FindByName ("mainDock") as DockStack;
@@ -275,7 +275,7 @@ namespace Crow.Coding
 
 		Window loadWindow(string path, object dataSource = null){
 			try {
-				GraphicObject g = MainIFace.FindByName (path);
+				Widget g = MainIFace.FindByName (path);
 				if (g != null)
 					return g as Window;
 				g = MainIFace.Load (path);
@@ -288,7 +288,7 @@ namespace Crow.Coding
 			return null;
 		}
 		void closeWindow (string path){
-			GraphicObject g = MainIFace.FindByName (path);
+			Widget g = MainIFace.FindByName (path);
 			if (g != null)
 				MainIFace.DeleteWidget (g);
 		}

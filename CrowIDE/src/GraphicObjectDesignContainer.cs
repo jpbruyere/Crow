@@ -48,7 +48,7 @@ namespace Crow.Coding
 		}
 		void onStartDrag (object sender, EventArgs e)
 		{
-			GraphicObject go = sender as GraphicObject;
+			Widget go = sender as Widget;
 
 			lock (go.IFace.UpdateMutex) {				
 				go.IFace.DragImageHeight = dragIconSize;
@@ -70,7 +70,7 @@ namespace Crow.Coding
 		}
 		void onEndDrag (object sender, DragDropEventArgs e)
 		{
-			(sender as GraphicObject).IFace.ClearDragImage ();
+			(sender as Widget).IFace.ClearDragImage ();
 
 		}
 		void onDrop (object sender, DragDropEventArgs e)
@@ -78,7 +78,7 @@ namespace Crow.Coding
 			ImlVisualEditor imlVE = e.DropTarget as ImlVisualEditor;
 			if (imlVE != null)
 				imlVE.ClearDraggedObj (false);
-			(sender as GraphicObject).IFace.ClearDragImage ();
+			(sender as Widget).IFace.ClearDragImage ();
 		}
 	}
 }

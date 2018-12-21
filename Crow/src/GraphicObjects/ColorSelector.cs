@@ -34,7 +34,7 @@ namespace Crow
 	/// simple squarred rgb color selector
 	/// </summary>
 	[DesignIgnore]
-	public class ColorSelector : GraphicObject
+	public class ColorSelector : Widget
 	{
 		#region CTOR
 		protected ColorSelector() : base(){}

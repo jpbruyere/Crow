@@ -28,7 +28,7 @@ using Cairo;
 
 namespace Crow
 {
-	public class TestCairoPatch : GraphicObject
+	public class TestCairoPatch : Widget
 	{
 		void computeControlPoints (
 			double xc, double yc,

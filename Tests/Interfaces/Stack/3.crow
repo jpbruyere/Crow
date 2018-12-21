@@ -1,45 +1,45 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack Background="DimGrey" Margin="10" Width="90%" Height="90%">
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Stretched" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Stretched" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Stretched" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Stretched" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
-	<GraphicObject Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
+	<Widget Margin="1" Width="Stretched" Height="Fit" Background="SeaGreen"
 			MinimumSize="2,2"/>
 </VerticalStack>

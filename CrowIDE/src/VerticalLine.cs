@@ -28,7 +28,7 @@ using Crow;
 
 namespace Crow.Coding
 {
-	public class VerticalLine : GraphicObject
+	public class VerticalLine : Widget
 	{
 		public VerticalLine () : base()
 		{

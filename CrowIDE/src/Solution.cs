@@ -122,7 +122,7 @@ namespace Crow.Coding{
 			Type[] crowItems = AppDomain.CurrentDomain.GetAssemblies ()
 				.SelectMany (t => t.GetTypes ())
 				.Where (t => t.IsClass && !t.IsAbstract && t.IsPublic &&					
-					t.Namespace == "Crow" && t.IsSubclassOf(typeof(GraphicObject)) &&
+					t.Namespace == "Crow" && t.IsSubclassOf(typeof(Widget)) &&
 					t.GetCustomAttribute<DesignIgnore>(false) == null).ToArray ();
 			ToolboxItems = new ObservableList<GraphicObjectDesignContainer> ();
 			foreach (Type ci in crowItems) {

@@ -4,7 +4,7 @@
 		<Template>
 			<Group Name="ItemsContainer"/>
 		</Template>
-		<ItemTemplate DataType="Crow.GraphicObject">
+		<ItemTemplate DataType="Crow.Widget">
 			<Window Style="WinSchema" Caption="{Name}">
 				<Label Text="test"/>
 			</Window>

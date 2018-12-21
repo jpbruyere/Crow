@@ -46,7 +46,7 @@ namespace Crow
 			base.onInitialized (sender, e);
 			Background = Color.ColorDic.Values.ToList()[color++];
 		}*/
-		public override void AddChild (GraphicObject g)
+		public override void AddChild (Widget g)
 		{
 			base.AddChild (g);
 			if (localLogicalParentIsNull)
@@ -54,7 +54,7 @@ namespace Crow
 			else
 				g.LogicalParent = this.LogicalParent;
 		}
-		public override void InsertChild (int idx, GraphicObject g)
+		public override void InsertChild (int idx, Widget g)
 		{
 			base.InsertChild (idx, g);
 			g.LogicalParent = this.LogicalParent;
@@ -94,14 +94,14 @@ namespace Crow
 
 		Rectangle rIn = default(Rectangle);
 		double dockThresh = 0.2;
-		GraphicObject focusedChild;
-		internal GraphicObject stretchedChild;
+		Widget focusedChild;
+		internal Widget stretchedChild;
 
 		void getFocusedChild (Point lm) {
 			Rectangle cb = ClientRectangle;
 
 			childrenRWLock.EnterReadLock ();
-			foreach (GraphicObject c in Children) {
+			foreach (Widget c in Children) {
 				Rectangle bounds = c.Slot + cb.Position;
 				if (!bounds.ContainsOrIsEqual (lm))
 					continue;
@@ -207,7 +207,7 @@ namespace Crow
 
 			childrenRWLock.EnterReadLock ();
 
-			foreach (GraphicObject g in Children)
+			foreach (Widget g in Children)
 				g.Paint (ref gr);			
 
 			childrenRWLock.ExitReadLock ();
@@ -349,7 +349,7 @@ namespace Crow
 					return;
 				}				
 				//remove level and move remaining obj to level above
-				GraphicObject g = Children [0];
+				Widget g = Children [0];
 				RemoveChild (g);
 				idx = dsp.Children.IndexOf (this);
 				dsp.RemoveChild (this);

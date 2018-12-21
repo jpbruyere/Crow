@@ -106,7 +106,7 @@ namespace Crow
 		/// </summary>
 		/// <returns>widget identified by name, or null if not found</returns>
 		/// <param name="nameToFind">widget's name to find</param>
-		public override GraphicObject FindByName (string nameToFind) => nameToFind == this.Name ? this : null;
+		public override Widget FindByName (string nameToFind) => nameToFind == this.Name ? this : null;
 
 		/// <summary>
 		///onDraw is overrided to prevent default drawing of background, template top container
@@ -136,7 +136,7 @@ namespace Crow
 		/// Entry assembly is search first, then the one where the type is defined
 		/// </summary>
 		/// <param name="template">Optional template instance</param>
-		protected virtual void loadTemplate(GraphicObject template = null)
+		protected virtual void loadTemplate(Widget template = null)
 		{
 			if (this.child != null)//template change, bindings has to be reset
 				this.ClearTemplateBinding();

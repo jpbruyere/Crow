@@ -38,7 +38,7 @@ namespace Crow
 	/// </summary>
 	/// <remarks>
 	/// </remarks>
-	public class Image : GraphicObject
+	public class Image : Widget
 	{
 		Picture _pic;
 		string _svgSub;

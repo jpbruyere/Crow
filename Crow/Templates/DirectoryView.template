@@ -36,7 +36,7 @@
 				</VerticalStack>
 			</Template>
 			<HorizontalStack Height="Fit">
-				<GraphicObject Width="12" Height="10"/>
+				<Widget Width="12" Height="10"/>
 				<VerticalStack Height="Fit" Name="ItemsContainer"/>
 			</HorizontalStack>
 		</Expandable>

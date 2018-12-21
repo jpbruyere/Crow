@@ -7,7 +7,7 @@
 		HorizontalAlignment="Left"
 		Height="{./TabHeight}"
 		Width="{./TabWidth}">
-		<GraphicObject Width="5" Height="5" Background="Blue" Visible="{IsDirty}"/>
+		<Widget Width="5" Height="5" Background="Blue" Visible="{IsDirty}"/>
 		<Label Name="caption" Text="{DisplayName}" Foreground="Black" Width="Stretched"/>
 		<Border CornerRadius="5" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
 					MouseEnter="{Foreground=Black}" MouseLeave="{Foreground=Transparent}">

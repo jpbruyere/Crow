@@ -49,7 +49,7 @@ namespace Crow.Coding
 			base.onInitialized (sender, e);
 		}
 		DesignInterface imlVE;
-		GraphicObject selectedItem;
+		Widget selectedItem;
 		ImlProjectItem imlProjFile;
 
 		bool editorIsDirty = false;//needed when tree is empty
@@ -146,7 +146,7 @@ namespace Crow.Coding
 			}
 		}
 
-		public GraphicObject SelectedItem {
+		public Widget SelectedItem {
 			get { return selectedItem; }
 			set {
 				if (selectedItem == value)
@@ -163,7 +163,7 @@ namespace Crow.Coding
 			}
 		}
 		/// <summary>PoinprojFilever the widget</summary>
-		public virtual GraphicObject HoverWidget
+		public virtual Widget HoverWidget
 		{
 			get { return imlVE.HoverWidget; }
 			set {
@@ -188,7 +188,7 @@ namespace Crow.Coding
 			}
 		}
 
-		public List<GraphicObject> GraphicTree {
+		public List<Widget> GraphicTree {
 			get { return imlVE.GraphicTree; }
 		}
 
@@ -264,7 +264,7 @@ namespace Crow.Coding
 						}
 					}
 				}
-				GraphicObject go = null;
+				Widget go = null;
 				Error = null;
 
 				if (emptyFile){
@@ -320,11 +320,11 @@ namespace Crow.Coding
 		{
 			base.onMouseMove (sender, e);
 
-			GraphicObject oldHW = HoverWidget;
+			Widget oldHW = HoverWidget;
 			Rectangle scr = this.ScreenCoordinates (this.getSlot ());
 			ProcessMouseMove (e.X - scr.X, e.Y - scr.Y);
 
-			GraphicObject newHW = HoverWidget;
+			Widget newHW = HoverWidget;
 			if (newHW == null)
 				return;
 
@@ -453,7 +453,7 @@ namespace Crow.Coding
 				gr.FontOptions = Interface.FontRenderingOptions;
 				gr.Antialias = Interface.Antialias;
 
-				GraphicObject g = SelectedItem;
+				Widget g = SelectedItem;
 				hr = g.ScreenCoordinates (g.getSlot ());
 
 //				Rectangle rIcons = new Rectangle (iconSize);
@@ -511,7 +511,7 @@ namespace Crow.Coding
 			pic.Paint (gr, r);
 			gr.Operator = Operator.Over;
 		}
-		void drawDesignOverlay (Context gr, GraphicObject g, Rectangle cb, Rectangle hr, double coteStroke, double space = 6.5){
+		void drawDesignOverlay (Context gr, Widget g, Rectangle cb, Rectangle hr, double coteStroke, double space = 6.5){
 			double z = zoom / 100.0;
 			double coteW = 3, coteL = 5;
 			bool fill = true;
@@ -612,7 +612,7 @@ namespace Crow.Coding
 			if (SelectedItem == null)
 				return;
 			
-			GraphicObject dumy = new GraphicObject (IFace);
+			Widget dumy = new Widget (IFace);
 			dumy.EndDrag += dumyOnEndDrag;
 			dumy.Drop += dumyOnDrop;
 			dumy.IsDragged = true;
@@ -644,7 +644,7 @@ namespace Crow.Coding
 
 		#region draggedObj handling
 
-		public GraphicObject draggedObj = null;
+		public Widget draggedObj = null;
 
 		void createDraggedObj (Type crowType) {
 			lock (imlVE.UpdateMutex) {
@@ -659,7 +659,7 @@ namespace Crow.Coding
 		}
 		#endregion
 
-		void removeObject (GraphicObject go) {
+		void removeObject (Widget go) {
 			if (go == null)
 				return;
 			if (go.Parent == null)
@@ -687,7 +687,7 @@ namespace Crow.Coding
 				EditorIsDirty = true;
 			//}
 		}
-		void deleteObject (GraphicObject go) {
+		void deleteObject (Widget go) {
 			if (go == null)
 				return;
 			//lock (imlVE.UpdateMutex) {
@@ -696,7 +696,7 @@ namespace Crow.Coding
 			//}
 		}
 
-		ILayoutable getPossibleParent (ILayoutable parent, GraphicObject go) {
+		ILayoutable getPossibleParent (ILayoutable parent, Widget go) {
 			if (go == null)
 				return null;
 //			lock (imlVE.UpdateMutex) {
@@ -720,7 +720,7 @@ namespace Crow.Coding
 				return parent as Group;
 //			}
 		}
-		bool tryAddObjectTo (ILayoutable parent, GraphicObject go) {
+		bool tryAddObjectTo (ILayoutable parent, Widget go) {
 			if (go == null)
 				return false;
 //			lock (imlVE.UpdateMutex) {
@@ -767,7 +767,7 @@ namespace Crow.Coding
 
 
 
-		void WidgetCheckOver (GraphicObject go, MouseMoveEventArgs e){
+		void WidgetCheckOver (Widget go, MouseMoveEventArgs e){
 			Type tGo = go.GetType();
 			if (typeof(TemplatedGroup).IsAssignableFrom (tGo)) {
 				
@@ -796,13 +796,13 @@ namespace Crow.Coding
 			HoverWidget = go;
 			WidgetMouseEnter (go, e);
 		}
-		void WidgetMouseLeave (GraphicObject go, MouseMoveEventArgs e){
+		void WidgetMouseLeave (Widget go, MouseMoveEventArgs e){
 
 		}
-		void WidgetMouseEnter (GraphicObject go, MouseMoveEventArgs e){
+		void WidgetMouseEnter (Widget go, MouseMoveEventArgs e){
 
 		}
-		void WidgetMouseMove (GraphicObject go, MouseMoveEventArgs e){}
+		void WidgetMouseMove (Widget go, MouseMoveEventArgs e){}
 
 		public bool ProcessMouseMove(int x, int y)
 		{
@@ -823,11 +823,11 @@ namespace Crow.Coding
 			if (HoverWidget != null) {
 				//TODO, ensure object is still in the graphic tree
 				//check topmost graphicobject first
-				GraphicObject tmp = HoverWidget;
-				GraphicObject topc = null;
-				while (tmp is GraphicObject) {
+				Widget tmp = HoverWidget;
+				Widget topc = null;
+				while (tmp is Widget) {
 					topc = tmp;
-					tmp = tmp.LogicalParent as GraphicObject;
+					tmp = tmp.LogicalParent as Widget;
 				}
 				int idxhw = imlVE.GraphicTree.IndexOf (topc);
 				if (idxhw != 0) {
@@ -837,7 +837,7 @@ namespace Crow.Coding
 							if (imlVE.GraphicTree [i].MouseIsIn (e.Position)) {
 								while (imlVE.HoverWidget != null) {
 									WidgetMouseLeave (imlVE.HoverWidget, e);
-									imlVE.HoverWidget = imlVE.HoverWidget.LogicalParent as GraphicObject;
+									imlVE.HoverWidget = imlVE.HoverWidget.LogicalParent as Widget;
 								}
 
 								WidgetCheckOver (GraphicTree [i], e);
@@ -855,8 +855,8 @@ namespace Crow.Coding
 				} else {
 					WidgetMouseLeave (imlVE.HoverWidget, e);
 					//seek upward from last focused graph obj's
-					while (imlVE.HoverWidget.LogicalParent as GraphicObject != null) {
-						imlVE.HoverWidget = imlVE.HoverWidget.LogicalParent as GraphicObject;
+					while (imlVE.HoverWidget.LogicalParent as Widget != null) {
+						imlVE.HoverWidget = imlVE.HoverWidget.LogicalParent as Widget;
 						if (imlVE.HoverWidget.MouseIsIn (e.Position)) {
 							WidgetCheckOver (imlVE.HoverWidget, e);
 							return true;
@@ -869,7 +869,7 @@ namespace Crow.Coding
 			//top level graphic obj's parsing
 			lock (imlVE.GraphicTree) {
 				for (int i = 0; i < imlVE.GraphicTree.Count; i++) {
-					GraphicObject g = imlVE.GraphicTree [i];
+					Widget g = imlVE.GraphicTree [i];
 					if (g.MouseIsIn (e.Position)) {
 						WidgetCheckOver (g, e);
 						return true;
@@ -883,7 +883,7 @@ namespace Crow.Coding
 
 		void GTView_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
 		{
-			SelectedItem = e.NewValue as GraphicObject;
+			SelectedItem = e.NewValue as Widget;
 		}
 
 

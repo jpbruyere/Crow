@@ -39,7 +39,7 @@ namespace Crow
 
 		bool _isPopped, _canPop;
 		Alignment popDirection;
-		GraphicObject _content;
+		Widget _content;
 		Measure popWidth, popHeight;
 
 		public event EventHandler Popped;
@@ -114,7 +114,7 @@ namespace Crow
 		}
 		#endregion
 
-		public override GraphicObject Content {
+		public override Widget Content {
 			get { return _content; }
 			set {
 				if (_content != null) {

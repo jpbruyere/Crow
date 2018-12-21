@@ -22,5 +22,5 @@
 		<VerticalStack Name="ItemsContainer"/>
 	</Border>
 </Popper>
-<GraphicObject Background="Green" Width="5" Height="5" Visible="{./AutomaticOpening}"/>
+<Widget Background="Green" Width="5" Height="5" Visible="{./AutomaticOpening}"/>
 </HorizontalStack>

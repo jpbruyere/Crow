@@ -61,27 +61,8 @@ namespace Crow.Coding
 		public ProjectFile ProjFile;
 
 
-		protected override void InitBackend ()
-		{
-			surf = new ImageSurface(Format.Argb32, 100, 100);
-		}
-		public override void ProcessResize (Rectangle bounds)
-		{
-			if (bounds == clientRectangle)
-				return;
-			lock (UpdateMutex) {
-				clientRectangle = bounds;
-				surf.Dispose ();
-				surf = new ImageSurface(Format.Argb32, clientRectangle.Width, clientRectangle.Height);
 
-				foreach (GraphicObject g in GraphicTree)
-					g.RegisterForLayouting (LayoutingType.All);
-
-				RegisterClip (clientRectangle);
-			}
-
-		}
-		public override GraphicObject CreateInstance (string path)
+		public override Widget CreateInstance (string path)
 		{
 			ProjectFile pi;
 
@@ -90,13 +71,34 @@ namespace Crow.Coding
 		
 			return null;
 		}
-		public override System.IO.Stream GetStreamFromPath (string path)
+		public override Stream GetStreamFromPath (string path)
 		{
 			ProjectFile pi;
 			if (ProjFile.Project.solution.GetProjectFileFromPath (path, out pi)) {
 				return new FileStream (pi.AbsolutePath, FileMode.Open);	
 			}
 			throw new Exception ($"In Design File not found: {path}");
+		}
+
+		protected override void InitBackend ()
+		{
+			surf = new ImageSurface (Format.Argb32, 100, 100);
+		}
+		public override void ProcessResize (Rectangle bounds)
+		{
+			if (bounds == clientRectangle)
+				return;
+			lock (UpdateMutex) {
+				clientRectangle = bounds;
+				surf.Dispose ();
+				surf = new ImageSurface (Format.Argb32, clientRectangle.Width, clientRectangle.Height);
+
+				foreach (Widget g in GraphicTree)
+					g.RegisterForLayouting (LayoutingType.All);
+
+				RegisterClip (clientRectangle);
+			}
+
 		}
 		public override bool ProcessMouseMove (int x, int y)
 		{
@@ -118,11 +120,11 @@ namespace Crow.Coding
 			if (HoverWidget != null) {
 				
 				//check topmost graphicobject first
-				GraphicObject tmp = HoverWidget;
-				GraphicObject topc = null;
-				while (tmp is GraphicObject) {
+				Widget tmp = HoverWidget;
+				Widget topc = null;
+				while (tmp is Widget) {
 					topc = tmp;
-					tmp = tmp.LogicalParent as GraphicObject;
+					tmp = tmp.LogicalParent as Widget;
 				}
 				int idxhw = GraphicTree.IndexOf (topc);
 				if (idxhw != 0) {
@@ -132,7 +134,7 @@ namespace Crow.Coding
 							if (GraphicTree [i].MouseIsIn (e.Position)) {
 								while (HoverWidget != null) {
 									HoverWidget.onMouseLeave (HoverWidget, e);
-									HoverWidget = HoverWidget.LogicalParent as GraphicObject;
+									HoverWidget = HoverWidget.LogicalParent as Widget;
 								}
 
 								GraphicTree [i].checkHoverWidget (e);
@@ -150,8 +152,8 @@ namespace Crow.Coding
 				} else {
 					HoverWidget.onMouseLeave (HoverWidget, e);
 					//seek upward from last focused graph obj's
-					while (HoverWidget.LogicalParent as GraphicObject != null) {
-						HoverWidget = HoverWidget.LogicalParent as GraphicObject;
+					while (HoverWidget.LogicalParent as Widget != null) {
+						HoverWidget = HoverWidget.LogicalParent as Widget;
 						if (HoverWidget.MouseIsIn (e.Position)) {
 							HoverWidget.checkHoverWidget (e);
 							return true;
@@ -164,7 +166,7 @@ namespace Crow.Coding
 			//top level graphic obj's parsing
 			lock (GraphicTree) {
 				for (int i = 0; i < GraphicTree.Count; i++) {
-					GraphicObject g = GraphicTree [i];
+					Widget g = GraphicTree [i];
 					if (g.MouseIsIn (e.Position)) {
 						if (!(HoverWidget is TemplatedControl))
 							g.checkHoverWidget (e);

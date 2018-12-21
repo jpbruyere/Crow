@@ -67,7 +67,7 @@ namespace Crow.IML
 				typeof (object), new Type [] { typeof (Instantiator), typeof (Interface) }, true);
 			il = dm.GetILGenerator (256);
 
-			il.DeclareLocal (typeof (GraphicObject));
+			il.DeclareLocal (typeof (Widget));
 			il.Emit (OpCodes.Nop);
 			//set local GraphicObject to root object
 			ConstructorInfo ci = rootType.GetConstructor (

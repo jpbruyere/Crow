@@ -51,9 +51,9 @@ namespace Crow.Coding
 				instance = value;
 				NotifyValueChanged ("Instance", instance);
 
-				if (Instance is GraphicObject) {
-					NotifyValueChanged ("SelectedItemName", Instance.GetType().Name + (Instance as GraphicObject).design_id
-						+ ":" + (Instance as GraphicObject).design_imlPath );
+				if (Instance is Widget) {
+					NotifyValueChanged ("SelectedItemName", Instance.GetType().Name + (Instance as Widget).design_id
+						+ ":" + (Instance as Widget).design_imlPath );
 				}else
 					NotifyValueChanged ("SelectedItemName", "");
 

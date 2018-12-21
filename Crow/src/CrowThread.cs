@@ -36,8 +36,8 @@ namespace Crow
 		public bool cancelRequested = false;
 		Thread thread;
 		public event EventHandler Finished;
-		public GraphicObject Host;
-		public CrowThread (GraphicObject host, ThreadStart start){
+		public Widget Host;
+		public CrowThread (Widget host, ThreadStart start){
 			thread = new Thread (start);
 			thread.IsBackground = true;
 			Host = host;

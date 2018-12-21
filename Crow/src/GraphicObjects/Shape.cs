@@ -54,7 +54,7 @@ namespace Crow
 		}
 		
 	}
-	public class Shape : GraphicObject
+	public class Shape : Widget
 	{
 		#region CTOR
 		protected Shape () : base() {}

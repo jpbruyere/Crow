@@ -75,7 +75,7 @@ namespace Crow.Coding
 				try {
 					if (value == Value)
 						return;
-					GraphicObject g = Instance;
+					Widget g = Instance;
 					string valstr = null, oldval = null;
 
 					if (value != null)
@@ -147,8 +147,8 @@ namespace Crow.Coding
 		/// <summary>
 		/// Current graphicobject instance
 		/// </summary>
-		public GraphicObject Instance {
-			get { return mview.ProjectNode.SelectedItem as GraphicObject; }
+		public Widget Instance {
+			get { return mview.ProjectNode.SelectedItem as Widget; }
 		}
 		public object DefaultValue {
 			get { return ((DefaultValueAttribute)(pi.GetCustomAttribute (typeof (DefaultValueAttribute)))).Value; }
@@ -184,7 +184,7 @@ namespace Crow.Coding
 		/// reset to default value
 		/// </summary>
 		public void Reset () {
-			GraphicObject inst = mview.ProjectNode.SelectedItem as GraphicObject;
+			Widget inst = mview.ProjectNode.SelectedItem as Widget;
 			if (!inst.design_iml_values.ContainsKey (Name))
 				return;
 			inst.design_iml_values.Remove (Name);
@@ -195,7 +195,7 @@ namespace Crow.Coding
 			//should reinstantiate to get default
 		}
 		public void GotoStyle(){
-			GraphicObject g = Instance;
+			Widget g = Instance;
 			if (!g.design_style_locations.ContainsKey (Name))
 				return;
 			FileLocation fl = g.design_style_locations [Name];

@@ -53,7 +53,7 @@ namespace Crow
 					it.getIML (doc, parentElem.LastChild);				
 			}
 
-			foreach (GraphicObject g in Items) {
+			foreach (Widget g in Items) {
 				g.getIML (doc, parentElem.LastChild);	
 			}
 		}
@@ -90,7 +90,7 @@ namespace Crow
 		/// Keep track of expanded subnodes and closed time to unload
 		/// </summary>
 		//Dictionary<GraphicObject, Stopwatch> nodes = new Dictionary<GraphicObject, Stopwatch>();
-		internal List<GraphicObject> nodes = new List<GraphicObject>();
+		internal List<Widget> nodes = new List<Widget>();
 		/// <summary>
 		/// Item templates file path, on disk or embedded.
 		/// 
@@ -110,7 +110,7 @@ namespace Crow
 				NotifyValueChanged("ItemTemplate", _itemTemplate);
 			}
 		}
-		protected override void loadTemplate(GraphicObject template = null)
+		protected override void loadTemplate(Widget template = null)
 		{
 			base.loadTemplate (template);
 
@@ -142,7 +142,7 @@ namespace Crow
 		}
 		#endregion
 
-		public virtual List<GraphicObject> Items{
+		public virtual List<Widget> Items{
 			get {
 				return isPaged ? items.Children.SelectMany(x => (x as Group).Children).ToList()
 				: items.Children;
@@ -278,12 +278,12 @@ namespace Crow
 		}
 
 
-		public virtual void AddItem(GraphicObject g){
+		public virtual void AddItem(Widget g){
 			items.AddChild (g);
 			g.LogicalParent = this;
 			NotifyValueChanged ("HasChildren", true);
 		}
-		public virtual void RemoveItem(GraphicObject g)
+		public virtual void RemoveItem(Widget g)
 		{
 			g.LogicalParent = null;
 			items.DeleteChild (g);
@@ -303,21 +303,21 @@ namespace Crow
 
 
 		#region GraphicObject overrides
-		public override GraphicObject FindByName (string nameToFind)
+		public override Widget FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)
 				return this;
 
-			foreach (GraphicObject w in Items) {
-				GraphicObject r = w.FindByName (nameToFind);
+			foreach (Widget w in Items) {
+				Widget r = w.FindByName (nameToFind);
 				if (r != null)
 					return r;
 			}
 			return null;
 		}
-		public override bool Contains (GraphicObject goToFind)
+		public override bool Contains (Widget goToFind)
 		{
-			foreach (GraphicObject w in Items) {
+			foreach (Widget w in Items) {
 				if (w == goToFind)
 					return true;
 				if (w.Contains (goToFind))
@@ -414,7 +414,7 @@ namespace Crow
 		protected void loadItem(object o, Group page, string _dataTest){
 			if (o == null)//TODO:surely a threading sync problem
 				return;
-			GraphicObject g = null;
+			Widget g = null;
 			ItemTemplate iTemp = null;
 			Type dataType = o.GetType ();
 			string itempKey = dataType.FullName;
@@ -496,10 +496,10 @@ namespace Crow
 			}
 		}
 		internal virtual void itemClick(object sender, MouseButtonEventArgs e){
-			SelectedIndex = data.IndexOf((sender as GraphicObject).DataSource);
+			SelectedIndex = data.IndexOf((sender as Widget).DataSource);
 		}
 
-		bool emitHelperIsAlreadyExpanded (GraphicObject go){
+		bool emitHelperIsAlreadyExpanded (Widget go){
 			if (nodes.Contains (go))
 				return true;
 			nodes.Add (go);

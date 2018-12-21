@@ -40,14 +40,14 @@ namespace Crow.Coding
 		}
 		#endregion
 
-		GraphicObject instance;
+		Widget instance;
 		Measure designWidth, designHeight;
 
 		/// <summary>
 		/// instance created with an instantiator from the source by a DesignInterface,
 		/// for now, the one in ImlVisualEditor
 		/// </summary>
-		public GraphicObject Instance {
+		public Widget Instance {
 			get { return instance; }
 			set {
 				if (instance == value)
@@ -77,8 +77,8 @@ namespace Crow.Coding
 		}
 
 
-		public List<GraphicObject> GraphicTree { 
-			get { return new List<GraphicObject> (new GraphicObject[] {instance}); }
+		public List<Widget> GraphicTree { 
+			get { return new List<Widget> (new Widget[] {instance}); }
 		}
 
 		void GTView_SelectedItemChanged (object sender, SelectionChangeEventArgs e){

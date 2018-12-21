@@ -45,7 +45,7 @@ namespace Crow
 		internal TabView tview = null;
 
 		#region Private fields
-		GraphicObject titleWidget;
+		Widget titleWidget;
 		int tabOffset;
 		bool isSelected;
 		Measure tabThickness;
@@ -53,7 +53,7 @@ namespace Crow
 		#endregion
 
 		#region TemplatedControl overrides
-		public override GraphicObject Content {
+		public override Widget Content {
 			get {
 				return _contentContainer == null ? null : _contentContainer.Child;
 			}
@@ -67,13 +67,13 @@ namespace Crow
 					value.LogicalParent = this;
 			}
 		}
-		protected override void loadTemplate(GraphicObject template = null)
+		protected override void loadTemplate(Widget template = null)
 		{
 			base.loadTemplate (template);
 
 			titleWidget = this.child.FindByName ("TabTitle");
 		}
-		internal GraphicObject TabTitle { get { return titleWidget; }}
+		internal Widget TabTitle { get { return titleWidget; }}
 		#endregion
 
 		/// <summary>

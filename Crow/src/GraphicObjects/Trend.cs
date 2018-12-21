@@ -32,7 +32,7 @@ using Cairo;
 
 namespace Crow
 {
-	public class Trend : GraphicObject
+	public class Trend : Widget
 	{
 		#region private fields
 		double minValue, maxValue, lowThreshold, highThreshold;

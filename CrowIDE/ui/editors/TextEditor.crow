@@ -15,14 +15,14 @@
 			LargeIncrement="{../editor.VisibleColumns}"
 			CursorSize="{../editor.ChildWidthRatio}"/>			
 	<HorizontalStack Height="Fit">
-		<GraphicObject Height="5" Width="Stretched"/>
-		<GraphicObject Background="Red" Width="5" Height="5" Visible="{IsDirty}"/>
+		<Widget Height="5" Width="Stretched"/>
+		<Widget Background="Red" Width="5" Height="5" Visible="{IsDirty}"/>
 		<Label Text="Line:" Foreground="Grey"/>
 		<Label Text="{CurrentLine}"/>
-		<GraphicObject Height="5" Width="10"/>
+		<Widget Height="5" Width="10"/>
 		<Label Text="column:" Foreground="Grey"/>
 		<Label Text="{CurrentColumn}"/>
-		<GraphicObject Height="5" Width="10"/>
+		<Widget Height="5" Width="10"/>
 		<Label Text="ScrollX:" Foreground="Grey"/>
 		<Label Text="{../../editor.ScrollX}"/>
 	</HorizontalStack>

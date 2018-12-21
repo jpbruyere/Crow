@@ -147,7 +147,7 @@ namespace Crow
 		}
 		#endregion
 
-		public override void SetChild (GraphicObject _child)
+		public override void SetChild (Widget _child)
 		{
 			Group g = child as Group;
 			if (g != null)

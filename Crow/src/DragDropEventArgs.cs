@@ -33,14 +33,14 @@ namespace Crow
 		/// <summary>
 		/// Source of the drag and drop operation
 		/// </summary>
-		public GraphicObject DragSource;
+		public Widget DragSource;
 		/// <summary>
 		/// Target of the drag and drop operation
 		/// </summary>
-		public GraphicObject DropTarget;
+		public Widget DropTarget;
 
 		//public DragDropEventArgs (GraphicObject source, GraphicObject target = null) : base()
-		public DragDropEventArgs (GraphicObject source = null, GraphicObject target = null) : base()
+		public DragDropEventArgs (Widget source = null, Widget target = null) : base()
 		{
 			DragSource = source;
 			DropTarget = target;

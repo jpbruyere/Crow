@@ -21,7 +21,7 @@
 			<Label Text="border test" Margin="3"/>
 		</GroupBox>
 		<Container Fit="true" Background="DimGrey" Margin="3">
-			<GraphicObject Width="20" Height="20" Background="LightGrey"/>
+			<Widget Width="20" Height="20" Background="LightGrey"/>
 		</Container>-->
 <!--		<ProgressBar Height="10" Width="150" Background="DimGrey" Value="50" />
 		<Slider Value="5" Width="150" Height="10"/>
@@ -49,7 +49,7 @@
 			<Label Text="border test" Margin="3"/>
 		</GroupBox>
 		<Container Height="Fit"  Width="Stretched" Background="DimGrey" Margin="3">
-			<GraphicObject Width="20" Height="20" Background="LightGrey"/>
+			<Widget Width="20" Height="20" Background="LightGrey"/>
 		</Container>
 		<ProgressBar Height="10" Width="Stretched" Background="DimGrey" Value="50" />
 		<Slider Value="5" Width="Stretched" Height="10"/>
@@ -58,7 +58,7 @@
 	</VerticalStack>-->
 </HorizontalStack>
 <!--<HorizontalStack Fit="true" Background="RoyalBlue" Margin="5">
-	<GraphicObject Background="Red" Width="30" Height="20"/>
+	<Widget Background="Red" Width="30" Height="20"/>
 	<Spinner Maximum="10000000000" SmallIncrement="10" Value="0"/>
-	<GraphicObject Background="Green" Width="30" Height="20"/>
+	<Widget Background="Green" Width="30" Height="20"/>
 </HorizontalStack>-->

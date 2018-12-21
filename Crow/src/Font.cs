@@ -64,12 +64,11 @@ namespace Crow
 		public FontSlant Slant {
 			get{ 
 				switch (Style) {
-				case FontStyle.Normal:
-				default:
-					return FontSlant.Normal;
 				case FontStyle.Italic:
 					return FontSlant.Italic;
-				}			
+				default:
+					return FontSlant.Normal;
+				}
 			}
 		}
 		public FontWeight Wheight {
@@ -77,8 +76,6 @@ namespace Crow
 				switch (Style) {
 				case FontStyle.Bold:
 					return FontWeight.Bold;
-				case FontStyle.Italic:
-				case FontStyle.Normal:
 				default:
 					return FontWeight.Normal;
 				}			
@@ -114,10 +111,8 @@ namespace Crow
 
 		public override string ToString()
 		{
-			if (_style == FontStyle.Normal)
-				return string.Format("{0},{1}", _name, _size);
-			else
-				return string.Format("{0} {1},{2}", _name, _style, _size);
+
+			return (_style == FontStyle.Normal) ? $"{_name},{_size}" : $"{_name} {_style},{_size}";
 
 		}
 

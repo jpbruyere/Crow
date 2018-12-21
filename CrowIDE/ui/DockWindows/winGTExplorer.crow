@@ -7,7 +7,7 @@
 			<ItemTemplate>
 				<Border Width="Stretched" Focusable="true" Foreground="Transparent">
 					<HorizontalStack Spacing="5">
-						<GraphicObject Width="5" Height="5"/>
+						<Widget Width="5" Height="5"/>
 						<Border Width="16" Height="16" Foreground="Black" Background="DimGrey">
 							<Image Margin="2" Path="{GetIcon}" />
 						</Border>

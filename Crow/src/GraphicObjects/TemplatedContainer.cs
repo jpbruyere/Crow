@@ -60,7 +60,7 @@ namespace Crow
 		/// <summary>
 		/// Single child of this templated container.
 		/// </summary>
-		public virtual GraphicObject Content {
+		public virtual Widget Content {
 			get {
 				return _contentContainer == null ? null : _contentContainer.Child;
 			}
@@ -73,21 +73,21 @@ namespace Crow
 			get { return _contentContainer?.Child != null; }
 		}
 		//TODO: move loadTemplate and ResolveBinding in TemplatedContainer
-		protected override void loadTemplate(GraphicObject template = null)
+		protected override void loadTemplate(Widget template = null)
 		{
 			base.loadTemplate (template);
 			_contentContainer = this.child.FindByName ("Content") as Container;
 		}
 
 		#region GraphicObject overrides
-		public override GraphicObject FindByName (string nameToFind)
+		public override Widget FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)
 				return this;
 
 			return Content == null ? null : Content.FindByName (nameToFind);
 		}
-		public override bool Contains (GraphicObject goToFind)
+		public override bool Contains (Widget goToFind)
 		{
 			if (Content == goToFind)
 				return true;

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <Window Left="10" Top="10" Caption="Test window"
 		Width="250" Height="550" >
 	<VerticalStack Name="contentVSStack" Margin="10" Spacing="10" Background="0.4,0.4,0.4,0.4">
@@ -13,13 +13,13 @@
 		</GroupBox>
 		<HorizontalStack Width="Stretched" Height="Fit" Margin="10" CornerRadius="5" Background="SkyBlue">
 			<RadioButton Width="80" Height="Fit"  Caption="Radio 2" IsChecked="true" />
-			<GraphicObject Width="Stretched"/>
+			<Widget Width="Stretched"/>
 			<RadioButton Width="80" Height="Fit" Caption="Radio 3" />
 		</HorizontalStack>
 		<HorizontalStack Width="Stretched" Height="Stretched" MinimumSize="10,40" Margin="0" CornerRadius="5"
 				Background="vgradient|0:White|0.1:SteelBlue|0.9:SteelBlue|1:Transparent">
 			<CheckBox Height="Fit" Width="80"/>
-			<GraphicObject Width="Stretched"/>
+			<Widget Width="Stretched"/>
 			<CheckBox Height="Fit" Width="80" IsChecked="true"/>
 		</HorizontalStack>
 		<Border Fit="true" CornerRadius="5" BorderWidth="1" >
@@ -60,9 +60,9 @@
 			</Container>
 		</Border>
 		<HorizontalStack Fit="true" Background="RoyalBlue" Margin="3">
-			<GraphicObject Margin="10" Background="LimeGreen" Width="5" Height="5"/>
+			<Widget Margin="10" Background="LimeGreen" Width="5" Height="5"/>
 			<TextBox Font="droid, 16" Multiline="true" Text="this is a test\nmultiline" Margin="2"/>
-			<GraphicObject Margin="10" Background="LimeGreen" Width="5" Height="5"/>
+			<Widget Margin="10" Background="LimeGreen" Width="5" Height="5"/>
 		</HorizontalStack>
 	</VerticalStack>
 </Window>

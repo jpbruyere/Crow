@@ -2,9 +2,9 @@
 <ItemTemplate>
 	<Border DataSourceType="ProjectItem" Style="TreeItemBorder" ContextCommands="{Commands}" Focusable="true" MouseDown="onClick" MouseDoubleClick="onDoubleClick">
 		<Group>
-			<GraphicObject Height="Stretched" Background="RoyalBlue" Visible="{IsSelected}"/>
+			<Widget Height="Stretched" Background="RoyalBlue" Visible="{IsSelected}"/>
 			<HorizontalStack>
-				<GraphicObject Width="5" Height="5"/>
+				<Widget Width="5" Height="5"/>
 				<Image Style="TreeIcon" Picture="{Icon}"/>
 				<Label Text="{DisplayName}" Width="Stretched"/>
 			</HorizontalStack>
@@ -25,7 +25,7 @@
 							MouseLeave="{Background=Transparent}"/>
 						<Image Style="TreeIcon"
 							Path="#Crow.Icons.crowproj.svg"/>
-						<GraphicObject Width="4" Height="9" Background="Green" Visible="{IsStartupProject}"/>
+						<Widget Width="4" Height="9" Background="Green" Visible="{IsStartupProject}"/>
 						<Label Text="{./Caption}"/>						
 					</HorizontalStack>
 				</Border>
@@ -33,7 +33,7 @@
 			</VerticalStack>
 		</Template>
 		<HorizontalStack Height="Fit">
-			<GraphicObject Width="8" Height="10"/>
+			<Widget Width="8" Height="10"/>
 			<VerticalStack Height="Fit" Name="ItemsContainer"/>
 		</HorizontalStack>
 	</Expandable>
@@ -41,7 +41,7 @@
 <ItemTemplate DataSourceType="ProjectNode" DataType="ReferenceGroup" Data="ChildNodes" DataTest="Type" >
 	<Expandable Caption="{DisplayName}" Template="#Crow.Coding.TreeExpandable.template" IsExpanded="{²IsExpanded}">
 		<HorizontalStack Height="Fit">
-			<GraphicObject Width="8" Height="10"/>
+			<Widget Width="8" Height="10"/>
 			<VerticalStack Height="Fit" Name="ItemsContainer"/>
 		</HorizontalStack>
 	</Expandable>
@@ -49,7 +49,7 @@
 <ItemTemplate DataType="VirtualGroup" Data="ChildNodes" DataTest="Type">
 	<Expandable DataSourceType="ProjectNode" Caption="{DisplayName}" Template="#Crow.Coding.TreeExpandable.template" IsExpanded="{²IsExpanded}">
 		<HorizontalStack Height="Fit">
-			<GraphicObject Width="8" Height="10"/>
+			<Widget Width="8" Height="10"/>
 			<VerticalStack Height="Fit" Name="ItemsContainer"/>
 		</HorizontalStack>
 	</Expandable>
