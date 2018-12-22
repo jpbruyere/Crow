@@ -32,43 +32,60 @@ namespace Crow.XLib
 	public class XLibBackend : IBackend
 	{
 		#region pinvoke
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		static extern int XInitThreads();
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		internal static extern IntPtr XOpenDisplay(IntPtr displayName);
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		internal static extern IntPtr XCloseDisplay(IntPtr disp);
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		static extern Int32 XDefaultScreen(IntPtr disp);
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		static extern IntPtr XDefaultRootWindow(IntPtr disp);
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		static extern UInt32 XDefaultDepth (IntPtr disp, Int32 screen);
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		static extern IntPtr XDefaultVisual(IntPtr disp, Int32 screen);
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		static extern IntPtr XCreateSimpleWindow(IntPtr disp, IntPtr rootWindow, Int32 x, Int32 y, UInt32 width, UInt32 height,
 			UInt32 borderWidth, IntPtr border, IntPtr background);
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		static extern IntPtr XCreatePixmap(IntPtr disp, IntPtr rootWindow, UInt32 width, UInt32 height, UInt32 depth);
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		static extern IntPtr XFreePixmap(IntPtr disp, IntPtr pixmap);
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		static extern IntPtr XFree(IntPtr data);
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		static extern Int32 XSelectInput(IntPtr disp, IntPtr win, EventMask eventMask);
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		static extern Int32 XMapWindow(IntPtr disp, IntPtr win);
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		static extern int XPending (IntPtr disp);
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		static extern IntPtr XNextEvent(IntPtr disp, ref XEvent xevent);
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		static extern Int32 XSync(IntPtr disp, int discard);
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		static extern int XConnectionNumber(IntPtr disp);
-		[DllImportAttribute("X11")]
+		[DllImport("X11")]
 		static extern IntPtr XSetErrorHandler(XErrorHandler error_handler);
+		[DllImport ("X11")]
+		static extern int XDefineCursor (IntPtr disp, IntPtr wnd, IntPtr cursor);
+
+		[DllImport ("X11")]
+		static extern uint XWarpPointer (IntPtr disp, IntPtr src_w, IntPtr dest_w, int src_x, int src_y, uint src_width, uint src_height, int dest_x, int dest_y);
+
+		[DllImport ("libXcursor.so.1")]
+		static extern int XcursorGetDefaultSize (IntPtr dpy);
+		[DllImport ("libXcursor.so.1")]
+		static extern string XcursorGetTheme (IntPtr dpy);
+		[DllImport ("libXcursor.so.1")]
+		static extern IntPtr XcursorLibraryLoadImage (string name, string theme, int size);
+		[DllImport ("libXcursor.so.1")]
+		static extern void XcursorImageDestroy (IntPtr image);
+
+		[DllImport ("libXcursor.so.1")]
+		static extern IntPtr XcursorImageLoadCursor (IntPtr dpy, IntPtr image);
 
 		#endregion
 
@@ -79,6 +96,8 @@ namespace Crow.XLib
 
 		Interface iFace;
 		X11Keyboard keyboard;
+
+		IntPtr [] cursors = new IntPtr [(int)MouseCursors.MaxEnum];
 
 		#region IBackend implementation
 
@@ -109,10 +128,12 @@ namespace Crow.XLib
 
 			keyboard = new Crow.XLib.X11Keyboard (xDisp);
 
-			iFace.surf = new Cairo.XlibSurface (xDisp, xwinHnd, xDefaultVisual, iFace.ClientRectangle.Width, iFace.ClientRectangle.Height);
+			iFace.surf = new Crow.Cairo.XlibSurface (xDisp, xwinHnd, xDefaultVisual, iFace.ClientRectangle.Width, iFace.ClientRectangle.Height);
 
 			errorHnd = new XErrorHandler (HandleError);
 			XSetErrorHandler (errorHnd);
+
+			loadCursors ();
 		}
 
 		public void CleanUp ()
@@ -122,7 +143,7 @@ namespace Crow.XLib
 			XCloseDisplay (xDisp);
 		}
 		public void Flush () {
-			XSync (xDisp, 0);
+			XSync (xDisp, 1);
 		}
 		public void ProcessEvents ()
 		{
@@ -169,19 +190,49 @@ namespace Crow.XLib
 				throw new NotImplementedException ();
 			}
 		}
-
 		public bool Ctrl {
 			get {
 				throw new NotImplementedException ();
 			}
 		}
-
 		public bool Alt {
 			get {
 				throw new NotImplementedException ();
 			}
 		}
+		public void SetCursor (MouseCursors newCur)
+		{
+			XDefineCursor (xDisp, xwinHnd, cursors[(int)newCur]);
+			XSync (xDisp, 0);
+		}
+		public void SetCursorPosition (int x, int y)
+		{
+			XWarpPointer (xDisp, IntPtr.Zero, xwinHnd, 0, 0, 0, 0, x, y);
+		}
 		#endregion
+
+		void loadCursor (MouseCursors id, string name)
+		{
+			IntPtr img = XcursorLibraryLoadImage (name, null, XcursorGetDefaultSize (xDisp));
+			cursors[(int)id] = XcursorImageLoadCursor (xDisp, img);
+			XcursorImageDestroy (img);
+		}
+
+		void loadCursors ()
+		{
+			loadCursor (MouseCursors.Default, "default");
+			loadCursor (MouseCursors.Cross, "cross");
+			loadCursor (MouseCursors.Arrow, "arrow");
+			loadCursor (MouseCursors.Text, "text");
+			loadCursor (MouseCursors.SW, "bottom_left_corner");
+			loadCursor (MouseCursors.SE, "bottom_right_corner");
+			loadCursor (MouseCursors.NW, "top_left_corner");
+			loadCursor (MouseCursors.NE, "top_right_corner");
+			loadCursor (MouseCursors.N, "top_side");
+			loadCursor (MouseCursors.S, "bottom_side");
+			loadCursor (MouseCursors.V, "size_ver");
+			loadCursor (MouseCursors.H, "size_hor");
+		}
 
 		int HandleError (IntPtr display, ref XErrorEvent error_event)
 		{
@@ -198,6 +249,8 @@ namespace Crow.XLib
 			Debug.WriteLine ("XERROR {0}", error_event.error_code);
 			return 0;
 		}
+
+
 	}
 }
 

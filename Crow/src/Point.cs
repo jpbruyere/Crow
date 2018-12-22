@@ -58,13 +58,13 @@ namespace Crow
 		public double LengthD {
 			get { return Math.Sqrt (Math.Pow (_x, 2) + Math.Pow (_y, 2)); }
 		}
-        public static implicit operator Cairo.Point(Point p)
+        public static implicit operator Crow.Cairo.Point(Point p)
         {
-            return new Cairo.Point(p.X, p.Y);
+            return new Crow.Cairo.Point(p.X, p.Y);
         }
-        public static implicit operator Cairo.PointD(Point p)
+        public static implicit operator Crow.Cairo.PointD(Point p)
         {
-            return new Cairo.PointD(p.X, p.Y);
+            return new Crow.Cairo.PointD(p.X, p.Y);
         }
         public static implicit operator Point(int i)
         {

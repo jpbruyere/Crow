@@ -28,7 +28,7 @@ using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Collections;
-using Cairo;
+using Crow.Cairo;
 using System.Text;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -461,12 +461,12 @@ namespace Crow.Text
 		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseEnter (sender, e);
-			IFace.MouseCursor = XCursor.Text;
+			IFace.MouseCursor = MouseCursors.Text;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			IFace.MouseCursor = XCursor.Default;
+			IFace.MouseCursor = MouseCursors.Default;
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{

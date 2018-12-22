@@ -35,7 +35,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Cairo {
+namespace Crow.Cairo {
 
 	public class ImageSurface : Surface
 	{
@@ -49,7 +49,7 @@ namespace Cairo {
 		}
 
 		[Obsolete ("Use ImageSurface (byte[] data, Cairo.Format format, int width, int height, int stride)")]
-		public ImageSurface (ref byte[] data, Cairo.Format format, int width, int height, int stride)
+		public ImageSurface (ref byte[] data, Crow.Cairo.Format format, int width, int height, int stride)
 			: this (data, format, width, height, stride)
 		{
 		}

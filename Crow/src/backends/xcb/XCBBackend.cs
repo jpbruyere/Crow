@@ -419,7 +419,7 @@ namespace Crow.XCB
 
 			loadCursors ();	
 
-			iFace.surf = new Cairo.XcbSurface (conn, win, visual, iFace.ClientRectangle.Width, iFace.ClientRectangle.Height);
+			iFace.surf = new Crow.Cairo.XcbSurface (conn, win, visual, iFace.ClientRectangle.Width, iFace.ClientRectangle.Height);
 		}
 
 		public void CleanUp ()
@@ -514,6 +514,15 @@ namespace Crow.XCB
 			return IntPtr.Zero;
 		}
 
+		public void SetCursor (MouseCursors newCur)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void SetCursorPosition (int x, int y)
+		{
+			throw new NotImplementedException ();
+		}
 	}
 }
 

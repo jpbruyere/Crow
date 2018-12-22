@@ -27,12 +27,31 @@ using System;
 
 namespace Crow
 {
+	public enum MouseCursors
+	{
+		Default,
+		Cross,
+		Arrow,
+		Text,
+		SW,
+		SE,
+		NW,
+		NE,
+		N,
+		S,
+		V,
+		H,
+		MaxEnum,
+	}
 	public interface IBackend
 	{
 		void Init(Interface iFace);
 		void CleanUp();
 		void Flush();
 		void ProcessEvents();
+
+		void SetCursor (MouseCursors newCur);
+		void SetCursorPosition (int x, int y);
 
 		bool IsDown (Key key);
 		bool Shift { get; }

@@ -29,7 +29,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Xml;
 using System.Reflection;
-using Cairo;
+using Crow.Cairo;
 
 namespace Crow
 {

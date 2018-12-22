@@ -105,7 +105,7 @@ namespace Crow.Win32
             User32.Window.ShowWindow(handle, ShowWindowCommand.Show);
 
             hdc = User32.Window.GetDC(handle);
-            iFace.surf = new Cairo.Win32Surface(hdc);
+            iFace.surf = new Crow.Cairo.Win32Surface(hdc);
 
         }
 
@@ -464,6 +464,15 @@ namespace Crow.Win32
             return User32.Window.DefWindowProc(handle, message, wParam, lParam);
         }
 
-    }
+		public void SetCursor (MouseCursors newCur)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void SetCursorPosition (int x, int y)
+		{
+			throw new NotImplementedException ();
+		}
+	}
 }
 

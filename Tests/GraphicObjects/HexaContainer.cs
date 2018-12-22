@@ -25,7 +25,7 @@
 // THE SOFTWARE.
 using System;
 using Crow;
-using Cairo;
+using Crow.Cairo;
 
 namespace Tutorials2
 {	

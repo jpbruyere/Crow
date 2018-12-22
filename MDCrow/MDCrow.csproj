@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <ReleaseVersion>0.8.0</ReleaseVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="src\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Crow\Crow.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+<!--  <Reference Include="MonoDevelop.Core">
+      <HintPath>..\..\..\..\..\opt\lib\monodevelop\bin\MonoDevelop.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.Ide">
+      <HintPath>..\..\..\..\..\opt\lib\monodevelop\bin\MonoDevelop.Ide.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Addins">
+      <HintPath>..\..\..\..\..\opt\lib\monodevelop\bin\Mono.Addins.dll</HintPath>
+    </Reference>     
+-->
+<!--    <Reference Include="MonoDevelop.Core" />
+    <Reference Include="MonoDevelop.Ide" />
+    <Reference Include="Mono.Addins" />-->
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MonoDevelop.Addins" Version="0.4.7" />
+  </ItemGroup>
+</Project>

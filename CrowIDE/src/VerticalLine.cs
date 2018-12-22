@@ -34,7 +34,7 @@ namespace Crow.Coding
 		{
 		}
 
-		protected override void onDraw (Cairo.Context gr)
+		protected override void onDraw (Crow.Cairo.Context gr)
 		{
 			base.onDraw (gr);
 			Foreground.SetAsSource (gr);

@@ -32,7 +32,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using Cairo;
+using Crow.Cairo;
 using Crow.IML;
 
 
@@ -118,7 +118,7 @@ namespace Crow
 		protected bool running;
 		protected virtual void InitBackend () {
             if (Environment.OSVersion.Platform == PlatformID.Unix)
-                backend = new Crow.XCB.XCBBackend();
+                backend = new Crow.XLib.XLibBackend();
             else
                 backend = new Crow.Win32.Win32Backend();
 
@@ -130,14 +130,14 @@ namespace Crow
 
 			running = true;
 
-			Thread t = new Thread (interfaceThread);
+			/*Thread t = new Thread (interfaceThread);
 			t.IsBackground = true;
-			t.Start ();
+			t.Start ();*/
 		}
 		public void Run () {
 			while (running) {
+				Update ();
 				ProcessEvents ();
-				Thread.Sleep(1);
 			}
 		}
 		public void ProcessKeyPress (char c)
@@ -999,16 +999,12 @@ namespace Crow
 		}
 
 		#region Mouse and Keyboard Handling
-		XCursor cursor = XCursor.Default;
 
 		public MouseState Mouse;
 
-		public XCursor MouseCursor {
+		public MouseCursors MouseCursor {
 			set {
-				if (value == cursor)
-					return;
-				cursor = value;
-				MouseCursorChanged.Raise (this,new MouseCursorChangedEventArgs(cursor));
+				backend.SetCursor (value);
 			}
 		}
 		/// <summary>Processes mouse move events from the root container, this function

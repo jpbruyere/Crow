@@ -189,7 +189,7 @@ namespace Crow
 			RegisterForGraphicUpdate ();
 		}
 
-		protected override void onDraw (Cairo.Context gr)
+		protected override void onDraw (Crow.Cairo.Context gr)
 		{
 			gr.Save ();
 

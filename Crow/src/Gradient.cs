@@ -26,7 +26,7 @@
 
 using System;
 using System.Collections.Generic;
-using Cairo;
+using Crow.Cairo;
 
 namespace Crow
 {
@@ -81,16 +81,16 @@ namespace Crow
 
 		public override void SetAsSource (Context ctx, Rectangle bounds = default(Rectangle))
 		{
-			Cairo.Gradient grad = null;
+			Crow.Cairo.Gradient grad = null;
 			switch (GradientType) {
 			case Type.Vertical:
-				grad = new Cairo.LinearGradient (bounds.Left, bounds.Top, bounds.Left, bounds.Bottom);
+				grad = new Crow.Cairo.LinearGradient (bounds.Left, bounds.Top, bounds.Left, bounds.Bottom);
 				break;
 			case Type.Horizontal:
-				grad = new Cairo.LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Top);
+				grad = new Crow.Cairo.LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Top);
 				break;
 			case Type.Oblic:
-				grad = new Cairo.LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
+				grad = new Crow.Cairo.LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
 				break;
 			case Type.Radial:
 				throw new NotImplementedException ();

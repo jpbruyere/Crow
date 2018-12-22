@@ -33,7 +33,7 @@ namespace Crow
 	{
 		#region Cairo extensions
 
-		public static void Rectangle(this Cairo.Context ctx, Rectangle r, double stroke = 0.0)
+		public static void Rectangle(this Crow.Cairo.Context ctx, Rectangle r, double stroke = 0.0)
 		{
 			if (stroke > 0.0) {
 				ctx.LineWidth = stroke;
@@ -43,41 +43,41 @@ namespace Crow
 			}else
 				ctx.Rectangle (r.X, r.Y, r.Width, r.Height);
 		}
-		public static double GetLength(this Cairo.PointD p){
+		public static double GetLength(this Crow.Cairo.PointD p){
 			return Math.Sqrt (Math.Pow (p.X, 2) + Math.Pow (p.Y, 2));
 		}
-		public static Cairo.PointD GetPerp(this Cairo.PointD p){
-			return new Cairo.PointD(-p.Y, p.X);
+		public static Crow.Cairo.PointD GetPerp(this Crow.Cairo.PointD p){
+			return new Crow.Cairo.PointD(-p.Y, p.X);
 		}
-		public static Cairo.PointD GetNormalized(this Cairo.PointD p){
+		public static Crow.Cairo.PointD GetNormalized(this Crow.Cairo.PointD p){
 			double length = p.GetLength();
 			p.X /= length;
 			p.Y /= length;
 			return p;
 		}
-		public static Cairo.PointD Substract(this Cairo.PointD p1, Cairo.PointD p2){
-			return new Cairo.PointD(p1.X - p2.X, p1.Y - p2.Y);
+		public static Crow.Cairo.PointD Substract(this Crow.Cairo.PointD p1, Crow.Cairo.PointD p2){
+			return new Crow.Cairo.PointD(p1.X - p2.X, p1.Y - p2.Y);
 		}
-		public static Cairo.PointD Divide(this Cairo.PointD p1, double d){
-			return new Cairo.PointD(p1.X / d, p1.Y / d);
+		public static Crow.Cairo.PointD Divide(this Crow.Cairo.PointD p1, double d){
+			return new Crow.Cairo.PointD(p1.X / d, p1.Y / d);
 		}
-		public static Cairo.PointD Add(this Cairo.PointD p1, Cairo.PointD p2){
-			return new Cairo.PointD(p1.X + p2.X, p1.Y + p2.Y);
+		public static Crow.Cairo.PointD Add(this Crow.Cairo.PointD p1, Crow.Cairo.PointD p2){
+			return new Crow.Cairo.PointD(p1.X + p2.X, p1.Y + p2.Y);
 		}
-		public static Cairo.PointD Multiply(this Cairo.PointD p1, double v){
-			return new Cairo.PointD(p1.X * v, p1.Y * v);
+		public static Crow.Cairo.PointD Multiply(this Crow.Cairo.PointD p1, double v){
+			return new Crow.Cairo.PointD(p1.X * v, p1.Y * v);
 		}
-		public static void DrawCote(this Cairo.Context ctx, Cairo.PointD p1, Cairo.PointD p2,
+		public static void DrawCote(this Crow.Cairo.Context ctx, Crow.Cairo.PointD p1, Crow.Cairo.PointD p2,
 			double stroke = 1.0, bool fill = false, double arrowWidth = 3.0, double arrowLength = 7.0)
 		{			
-			Cairo.PointD vDir = p2.Substract(p1);
+			Crow.Cairo.PointD vDir = p2.Substract(p1);
 			vDir = vDir.GetNormalized ();
-			Cairo.PointD vPerp = vDir.GetPerp ();
+			Crow.Cairo.PointD vPerp = vDir.GetPerp ();
 
-			Cairo.PointD pA0 = p1.Add(vDir.Multiply(arrowLength));
-			Cairo.PointD pA1 = p2.Substract(vDir.Multiply(arrowLength));
+			Crow.Cairo.PointD pA0 = p1.Add(vDir.Multiply(arrowLength));
+			Crow.Cairo.PointD pA1 = p2.Substract(vDir.Multiply(arrowLength));
 
-			Cairo.PointD vA = vPerp.Multiply (arrowWidth);
+			Crow.Cairo.PointD vA = vPerp.Multiply (arrowWidth);
 
 			ctx.MoveTo (p1);
 			ctx.LineTo (pA0.Add (vA));
@@ -104,17 +104,17 @@ namespace Crow
 			ctx.LineWidth = stroke;
 			ctx.Stroke ();
 		}
-		public static void DrawCoteInverse(this Cairo.Context ctx, Cairo.PointD p1, Cairo.PointD p2,
+		public static void DrawCoteInverse(this Crow.Cairo.Context ctx, Crow.Cairo.PointD p1, Crow.Cairo.PointD p2,
 			double stroke = 1.0, bool fill = false, double arrowWidth = 3.0, double arrowLength = 7.0)
 		{			
-			Cairo.PointD vDir = p2.Substract(p1);
+			Crow.Cairo.PointD vDir = p2.Substract(p1);
 			vDir = vDir.GetNormalized ();
-			Cairo.PointD vPerp = vDir.GetPerp ();
+			Crow.Cairo.PointD vPerp = vDir.GetPerp ();
 
-			Cairo.PointD pA0 = p1.Add(vDir.Multiply(arrowLength));
-			Cairo.PointD pA1 = p2.Substract(vDir.Multiply(arrowLength));
+			Crow.Cairo.PointD pA0 = p1.Add(vDir.Multiply(arrowLength));
+			Crow.Cairo.PointD pA1 = p2.Substract(vDir.Multiply(arrowLength));
 
-			Cairo.PointD vA = vPerp.Multiply (arrowWidth);
+			Crow.Cairo.PointD vA = vPerp.Multiply (arrowWidth);
 
 			ctx.MoveTo (p1.Add (vA));
 			ctx.LineTo (pA0);
@@ -136,13 +136,13 @@ namespace Crow
 			ctx.LineWidth = stroke;
 			ctx.Stroke ();
 		}
-		public static void DrawCoteFixed(this Cairo.Context ctx, Cairo.PointD p1, Cairo.PointD p2,
+		public static void DrawCoteFixed(this Crow.Cairo.Context ctx, Crow.Cairo.PointD p1, Crow.Cairo.PointD p2,
 			double stroke = 1.0, double coteWidth = 3.0)
 		{			
-			Cairo.PointD vDir = p2.Substract(p1);
+			Crow.Cairo.PointD vDir = p2.Substract(p1);
 			vDir = vDir.GetNormalized ();
-			Cairo.PointD vPerp = vDir.GetPerp ();
-			Cairo.PointD vA = vPerp.Multiply (coteWidth);
+			Crow.Cairo.PointD vPerp = vDir.GetPerp ();
+			Crow.Cairo.PointD vA = vPerp.Multiply (coteWidth);
 
 			ctx.MoveTo (p1.Add (vA));
 			ctx.LineTo (p1.Substract (vA));
@@ -154,11 +154,11 @@ namespace Crow
 			ctx.Stroke ();
 		}
 
-		public static void SetSourceColor(this Cairo.Context ctx, Color c)
+		public static void SetSourceColor(this Crow.Cairo.Context ctx, Color c)
 		{
 			ctx.SetSourceRGBA(c.R,c.G,c.B,c.A);
 		}
-		public static void AddColorStop(this Cairo.Gradient grad, double offset, Color c)
+		public static void AddColorStop(this Crow.Cairo.Gradient grad, double offset, Color c)
 		{
 			grad.AddColorStop (offset, c);
 		}

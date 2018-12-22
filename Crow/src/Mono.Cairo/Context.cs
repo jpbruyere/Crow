@@ -39,7 +39,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Color = Crow.Color;
 
-namespace Cairo {	
+namespace Crow.Cairo {	
 
 	[Obsolete ("Renamed Cairo.Context per suggestion from cairo binding guidelines.")]
 	public class Graphics : Context {
@@ -141,7 +141,7 @@ namespace Cairo {
 			set { NativeMethods.cairo_set_antialias (handle, value); }
 		}
 
-		public Cairo.Status Status {
+		public Crow.Cairo.Status Status {
 			get {
 				return NativeMethods.cairo_status (handle);
 			}
@@ -173,7 +173,7 @@ namespace Cairo {
 			}
 		}
 
-		public Cairo.FillRule FillRule {
+		public Crow.Cairo.FillRule FillRule {
 			set {
 				NativeMethods.cairo_set_fill_rule (handle, value);
 			}
@@ -193,7 +193,7 @@ namespace Cairo {
 			}
 		}
 
-		public Cairo.LineCap LineCap {
+		public Crow.Cairo.LineCap LineCap {
 			set {
 				NativeMethods.cairo_set_line_cap (handle, value);
 			}
@@ -203,7 +203,7 @@ namespace Cairo {
 			}
 		}
 
-		public Cairo.LineJoin LineJoin {
+		public Crow.Cairo.LineJoin LineJoin {
 			set {
 				NativeMethods.cairo_set_line_join (handle, value);
 			}
@@ -247,7 +247,7 @@ namespace Cairo {
 		public Pattern GetSource ()
 		{
 			var ptr = NativeMethods.cairo_get_source (handle);
-			return Cairo.Pattern.Lookup (ptr, false);
+			return Crow.Cairo.Pattern.Lookup (ptr, false);
 		}
 
 		public double MiterLimit {
@@ -275,7 +275,7 @@ namespace Cairo {
 		}
 
 		[Obsolete ("Use GetTarget/SetTarget")]
-		public Cairo.Surface Target {
+		public Crow.Cairo.Surface Target {
 			set {
 				if (handle != IntPtr.Zero)
 					NativeMethods.cairo_destroy (handle);
@@ -819,7 +819,7 @@ namespace Cairo {
 
 		public FontFace GetContextFontFace ()
 		{
-			return Cairo.FontFace.Lookup (NativeMethods.cairo_get_font_face (handle), false);
+			return Crow.Cairo.FontFace.Lookup (NativeMethods.cairo_get_font_face (handle), false);
 		}
 
 		public void SetContextFontFace (FontFace value)

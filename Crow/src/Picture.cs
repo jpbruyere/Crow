@@ -26,7 +26,7 @@
 
 using System;
 using System.IO;
-using Cairo;
+using Crow.Cairo;
 using System.Collections.Generic;
 
 namespace Crow

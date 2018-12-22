@@ -28,7 +28,7 @@ using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Collections;
-using Cairo;
+using Crow.Cairo;
 using System.Text;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -926,14 +926,14 @@ namespace Crow.Coding
 		{
 			base.onMouseEnter (sender, e);
 			if (e.X - ScreenCoordinates(Slot).X < leftMargin + ClientRectangle.X)
-				IFace.MouseCursor = XCursor.Default;
+				IFace.MouseCursor = MouseCursors.Default;
 			else
-				IFace.MouseCursor = XCursor.Text;
+				IFace.MouseCursor = MouseCursors.Text;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			IFace.MouseCursor = XCursor.Default;
+			IFace.MouseCursor = MouseCursors.Default;
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
@@ -945,9 +945,9 @@ namespace Crow.Coding
 
 			if (!e.Mouse.IsButtonDown (MouseButton.Left)) {
 				if (mouseLocalPos.X < leftMargin)
-					IFace.MouseCursor = XCursor.Default;
+					IFace.MouseCursor = MouseCursors.Default;
 				else
-					IFace.MouseCursor = XCursor.Text;
+					IFace.MouseCursor = MouseCursors.Text;
 				return;
 			}
 

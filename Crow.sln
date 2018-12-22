@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrowIDE", "CrowIDE\CrowIDE.csproj", "{B6D911CD-1D09-42FC-B300-9187190F2AE1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MDCrow", "MDCrow\MDCrow.csproj", "{34956F17-5485-4C5C-9E2D-8EB15E5160AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34956F17-5485-4C5C-9E2D-8EB15E5160AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34956F17-5485-4C5C-9E2D-8EB15E5160AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34956F17-5485-4C5C-9E2D-8EB15E5160AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34956F17-5485-4C5C-9E2D-8EB15E5160AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

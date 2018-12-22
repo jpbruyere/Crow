@@ -36,7 +36,7 @@
 using System;
 using System.Collections;
 
-namespace Cairo {
+namespace Crow.Cairo {
 
 	public class Surface : IDisposable
 	{
@@ -91,28 +91,28 @@ namespace Cairo {
 		}
 
 		[Obsolete ("Use an ImageSurface constructor instead.")]
-		public static Cairo.Surface CreateForImage (
-			ref byte[] data, Cairo.Format format, int width, int height, int stride)
+		public static Crow.Cairo.Surface CreateForImage (
+			ref byte[] data, Crow.Cairo.Format format, int width, int height, int stride)
 		{
 			IntPtr p = NativeMethods.cairo_image_surface_create_for_data (
 				data, format, width, height, stride);
 
-			return new Cairo.Surface (p, true);
+			return new Crow.Cairo.Surface (p, true);
 		}
 
 		[Obsolete ("Use an ImageSurface constructor instead.")]
-		public static Cairo.Surface CreateForImage (
-			Cairo.Format format, int width, int height)
+		public static Crow.Cairo.Surface CreateForImage (
+			Crow.Cairo.Format format, int width, int height)
 		{
 			IntPtr p = NativeMethods.cairo_image_surface_create (
 				format, width, height);
 
-			return new Cairo.Surface (p, true);
+			return new Crow.Cairo.Surface (p, true);
 		}
 
 
-		public Cairo.Surface CreateSimilar (
-			Cairo.Content content, int width, int height)
+		public Crow.Cairo.Surface CreateSimilar (
+			Crow.Cairo.Content content, int width, int height)
 		{
 			IntPtr p = NativeMethods.cairo_surface_create_similar (
 				this.Handle, content, width, height);

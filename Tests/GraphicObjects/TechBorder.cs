@@ -37,7 +37,7 @@ namespace Tests
 		{
 			return base.measureRawSize (lt) + 6;
 		}
-		protected override void onDraw (Cairo.Context gr)
+		protected override void onDraw (Crow.Cairo.Context gr)
 		{
 			gr.Save ();
 
@@ -51,7 +51,7 @@ namespace Tests
 			gr.Restore ();
 		}
 
-		void drawTechBorder1 (Cairo.Context gr){
+		void drawTechBorder1 (Crow.Cairo.Context gr){
 			Rectangle r = ClientRectangle;
 
 			double l1 = Math.Round(0.2 * Math.Min (r.Width, r.Height)) + 0.5;

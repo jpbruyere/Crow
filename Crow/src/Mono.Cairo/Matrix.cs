@@ -34,7 +34,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Cairo {
+namespace Crow.Cairo {
 
 	[StructLayout(LayoutKind.Sequential)]
 	public class Matrix //: ICloneable
@@ -114,7 +114,7 @@ namespace Cairo {
 			NativeMethods.cairo_matrix_rotate (this, radians);
 		}
 
-		public Cairo.Status Invert ()
+		public Crow.Cairo.Status Invert ()
 		{
 			return NativeMethods.cairo_matrix_invert (this);
 		}

@@ -111,7 +111,7 @@ namespace tests
 				//				win.Show ();
 				//app.LoadIMLFragment (@"<SimpleGauge Level='40' Margin='5' Background='Jet' Foreground='Grey' Width='30' Height='50%'/>");
 
-				app.CMDTest = new Command(new Action(() => app.AddWidget (app.instFileDlg.CreateInstance()).DataSource = app)) { Caption = "Test", Icon = new SvgPicture("#Tests.image.blank-file.svg"), CanExecute = true};
+				//app.CMDTest = new Command(new Action(() => app.AddWidget (app.instFileDlg.CreateInstance()).DataSource = app)) { Caption = "Test", Icon = new SvgPicture("#Tests.image.blank-file.svg"), CanExecute = true};
 				//app.AddWidget (@"Interfaces/Divers/testFocus.crow").DataSource = app;
 				//app.AddWidget (@"Interfaces/Divers/testMenu.crow").DataSource = app;
 				//app.AddWidget (@"Interfaces/Divers/testVisibility.crow").DataSource = app;
@@ -168,11 +168,12 @@ namespace tests
 						app.NotifyValueChanged ("TestColor", Color.Red);
 					else
 						app.NotifyValueChanged ("TestColor", Color.Blue);*/
-					
+
 					/*#if MEASURE_TIME
 					foreach (PerformanceMeasure m in app.PerfMeasures)
 						m.NotifyChanges ();	
 					#endif*/
+					app.Update ();
 					app.ProcessEvents ();
 					//Thread.Sleep(1);
 				}

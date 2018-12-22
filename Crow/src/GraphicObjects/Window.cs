@@ -296,7 +296,7 @@ namespace Crow
 
 			if (!hoverBorder) {
 				currentDirection = Direction.None;
-				IFace.MouseCursor = XCursor.Default;
+				IFace.MouseCursor = MouseCursors.Default;
 				return;
 			}
 
@@ -333,31 +333,31 @@ namespace Crow
 				if (currentDirection != lastDir) {
 					switch (currentDirection) {
 					case Direction.None:
-						otkgw.MouseCursor = XCursor.Default;
+						otkgw.MouseCursor = MouseCursors.Default;
 						break;
 					case Direction.N:
-						otkgw.MouseCursor = XCursor.V;
+						otkgw.MouseCursor = MouseCursors.V;
 						break;
 					case Direction.S:
-						otkgw.MouseCursor = XCursor.V;
+						otkgw.MouseCursor = MouseCursors.V;
 						break;
 					case Direction.E:
-						otkgw.MouseCursor = XCursor.H;
+						otkgw.MouseCursor = MouseCursors.H;
 						break;
 					case Direction.W:
-						otkgw.MouseCursor = XCursor.H;
+						otkgw.MouseCursor = MouseCursors.H;
 						break;
 					case Direction.NW:
-						otkgw.MouseCursor = XCursor.NW;
+						otkgw.MouseCursor = MouseCursors.NW;
 						break;
 					case Direction.NE:
-						otkgw.MouseCursor = XCursor.NE;
+						otkgw.MouseCursor = MouseCursors.NE;
 						break;
 					case Direction.SW:
-						otkgw.MouseCursor = XCursor.SW;
+						otkgw.MouseCursor = MouseCursors.SW;
 						break;
 					case Direction.SE:
-						otkgw.MouseCursor = XCursor.SE;
+						otkgw.MouseCursor = MouseCursors.SE;
 						break;
 					}
 				}				
@@ -423,7 +423,7 @@ namespace Crow
 		{
 			hoverBorder = false;
 			currentDirection = Direction.None;
-			IFace.MouseCursor = XCursor.Default;
+			IFace.MouseCursor = MouseCursors.Default;
 		}
 		protected virtual void onBorderMouseEnter (object sender, MouseMoveEventArgs e)
 		{
@@ -433,7 +433,7 @@ namespace Crow
 
 		protected void butQuitPress (object sender, MouseButtonEventArgs e)
 		{
-			IFace.MouseCursor = XCursor.Default;
+			IFace.MouseCursor = MouseCursors.Default;
 			close ();
 		}
 

@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
-<VerticalStack >
-    <Label Text="{StringTest}" Background="SeaGreen" DataSourceType="MainClass"/>
-</VerticalStack>
+
+    <Button CornerRadius="0" Background="Red"/>
+

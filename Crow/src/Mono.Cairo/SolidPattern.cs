@@ -29,7 +29,7 @@
 
 using System;
 using Color = Crow.Color;
-namespace Cairo {
+namespace Crow.Cairo {
 
 	public class SolidPattern : Pattern
 	{

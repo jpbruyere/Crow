@@ -33,7 +33,7 @@ using System.Text;
 using System.Diagnostics;
 
 using System.Xml.Serialization;
-using Cairo;
+using Crow.Cairo;
 using System.ComponentModel;
 
 namespace Crow

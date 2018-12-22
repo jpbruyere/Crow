@@ -57,18 +57,18 @@ namespace Crow
 
             return arr[minp];
         }
-		public static void CairoRectangle(Cairo.Context gr, Rectangle r, double radius, double stroke = 0.0)
+		public static void CairoRectangle(Crow.Cairo.Context gr, Rectangle r, double radius, double stroke = 0.0)
 		{
 			if (radius > 0)
 				CairoHelpers.DrawRoundedRectangle (gr, r, radius, stroke);
 			else
 				gr.Rectangle (r, stroke);
 		}
-		public static void CairoCircle(Cairo.Context gr, Rectangle r)
+		public static void CairoCircle(Crow.Cairo.Context gr, Rectangle r)
 		{
 			gr.Arc(r.X + r.Width/2, r.Y + r.Height/2, Math.Min(r.Width,r.Height)/2, 0, 2*Math.PI);
 		}
-		public static void DrawRoundedRectangle(Cairo.Context gr, Rectangle r, double radius, double stroke = 0.0)
+		public static void DrawRoundedRectangle(Crow.Cairo.Context gr, Rectangle r, double radius, double stroke = 0.0)
         {
 			if (stroke>0.0) {
 				gr.LineWidth = stroke;
@@ -78,7 +78,7 @@ namespace Crow
 			}else
 				DrawRoundedRectangle(gr, r.X, r.Y, r.Width, r.Height, radius);
         }
-        public static void DrawRoundedRectangle(Cairo.Context gr, double x, double y, double width, double height, double radius)
+        public static void DrawRoundedRectangle(Crow.Cairo.Context gr, double x, double y, double width, double height, double radius)
         {
             gr.Save();
 
@@ -96,7 +96,7 @@ namespace Crow
             gr.ClosePath();
             gr.Restore();
         }
-        public static void StrokeRaisedRectangle(Cairo.Context gr, Rectangle r, double width = 1)
+        public static void StrokeRaisedRectangle(Crow.Cairo.Context gr, Rectangle r, double width = 1)
         {
             gr.Save();
             r.Inflate((int)-width / 2, (int)-width / 2);
@@ -115,7 +115,7 @@ namespace Crow
 
             gr.Restore();
         }
-        public static void StrokeLoweredRectangle(Cairo.Context gr, Rectangle r, double width = 1)
+        public static void StrokeLoweredRectangle(Crow.Cairo.Context gr, Rectangle r, double width = 1)
         {
             gr.Save();
             r.Inflate((int)-width / 2, (int)-width / 2);

@@ -26,7 +26,7 @@
 using System;
 using Crow;
 using System.ComponentModel;
-using Cairo;
+using Crow.Cairo;
 using System.Diagnostics;
 
 namespace Crow

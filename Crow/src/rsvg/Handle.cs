@@ -1,5 +1,5 @@
 //Copyright GPL2
-using Cairo;
+using Crow.Cairo;
 
 
 namespace Rsvg {
@@ -108,7 +108,7 @@ namespace Rsvg {
 		[DllImport("rsvg-2")]
 		static extern void rsvg_handle_render_cairo_sub(IntPtr raw, IntPtr cr, string id);
 
-		public void RenderCairoSub(Cairo.Context cr, string id) {
+		public void RenderCairoSub(Crow.Cairo.Context cr, string id) {
 			rsvg_handle_render_cairo_sub(Raw, cr == null ? IntPtr.Zero : cr.Handle, id);
 		}
 

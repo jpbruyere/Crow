@@ -34,7 +34,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Cairo
+namespace Crow.Cairo
 {
 	// sort the functions like in the following page so it is easier to find what is missing
 	// http://cairographics.org/manual/index-all.html
@@ -270,13 +270,13 @@ namespace Cairo
 
 		#region Image Surface
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern IntPtr cairo_image_surface_create (Cairo.Format format, int width, int height);
+		internal static extern IntPtr cairo_image_surface_create (Crow.Cairo.Format format, int width, int height);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern IntPtr cairo_image_surface_create_for_data (byte[] data, Cairo.Format format, int width, int height, int stride);
+		internal static extern IntPtr cairo_image_surface_create_for_data (byte[] data, Crow.Cairo.Format format, int width, int height, int stride);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern IntPtr cairo_image_surface_create_for_data (IntPtr data, Cairo.Format format, int width, int height, int stride);
+		internal static extern IntPtr cairo_image_surface_create_for_data (IntPtr data, Crow.Cairo.Format format, int width, int height, int stride);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern IntPtr cairo_image_surface_create_from_png  (string filename);
@@ -698,7 +698,7 @@ namespace Cairo
 		internal static extern int cairo_get_dash_count (IntPtr cr);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern void cairo_set_fill_rule (IntPtr cr, Cairo.FillRule fill_rule);
+		internal static extern void cairo_set_fill_rule (IntPtr cr, Crow.Cairo.FillRule fill_rule);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern void cairo_set_font_face (IntPtr cr, IntPtr fontFace);
@@ -728,7 +728,7 @@ namespace Cairo
 		internal static extern void cairo_set_miter_limit (IntPtr cr, double limit);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern void cairo_set_operator (IntPtr cr, Cairo.Operator op);
+		internal static extern void cairo_set_operator (IntPtr cr, Crow.Cairo.Operator op);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern void cairo_set_source (IntPtr cr, IntPtr pattern);
@@ -777,7 +777,7 @@ namespace Cairo
 
 		#region Surface
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern IntPtr cairo_surface_create_similar (IntPtr surface, Cairo.Content content, int width, int height);
+		internal static extern IntPtr cairo_surface_create_similar (IntPtr surface, Crow.Cairo.Content content, int width, int height);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern void cairo_surface_destroy (IntPtr surface);
