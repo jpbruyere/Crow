@@ -125,61 +125,28 @@ namespace Crow
 			//backend = new Crow.XLib.XLibBackend ();
 			backend.Init (this);
 
-			initTooltip ();
-			initContextMenus ();
+			/*initTooltip ();
+			initContextMenus ();*/
 
-			running = true;
 
 			/*Thread t = new Thread (interfaceThread);
 			t.IsBackground = true;
 			t.Start ();*/
 		}
 		public void Run () {
+			//load default main.crow if present
+			try {
+				Load ("#main.crow").DataSource = this;
+			} catch {}
+
+			running = true;
+
 			while (running) {
 				Update ();
 				ProcessEvents ();
 			}
 		}
-		public void ProcessKeyPress (char c)
-		{
-			if (_focusedWidget != null)
-				_focusedWidget.onKeyPress (this, new KeyPressEventArgs(c));
-		}
 
-		public void ProcessKeyUp (Key key)
-		{
-			if (_focusedWidget != null)
-				_focusedWidget.onKeyUp (this, new KeyEventArgs(key, false));
-//			if (keyboardRepeatThread != null) {
-//				keyboardRepeatOn = false;
-//				keyboardRepeatThread.Abort();
-//				keyboardRepeatThread.Join ();
-//			}
-		}
-		public void ProcessKeyDown (Key key)
-		{
-			//Keyboard.SetKeyState((Crow.Key)Key,true);
-			lastKeyDownEvt = new KeyEventArgs (key, true);
-
-			if (_focusedWidget != null)
-				_focusedWidget.onKeyDown (this, new KeyEventArgs (key, false));
-
-			//			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
-			//			keyboardRepeatThread.IsBackground = true;
-			//			keyboardRepeatThread.Start ();
- 		}
-
-		public bool Shift {
-			get { return backend.Shift; }
-		}
-
-		public bool Ctrl {
-			get { return backend.Ctrl; }
-		}
-
-		public bool Alt {
-			get { return backend.Alt; }
-		}
 
 		void interfaceThread()
 		{			
@@ -223,7 +190,31 @@ namespace Crow
 		#endregion
 
 		public void ProcessEvents() {
+
+			if (armedClick != null) {
+				if (lastClickTime.ElapsedMilliseconds > DoubleClick) {
+					//cancel double click and 
+					armedClick.onMouseClick (armedClick, armedClickEventArgs);
+					armedClick = null;
+				}
+			}
+
+			Widget w = _hoverWidget;  //previous hover widget 
+
 			backend.ProcessEvents ();
+
+			if (!FocusOnHover || (w == _hoverWidget))
+				return;
+
+			w = _hoverWidget;
+			while (w != null) {
+				if (w.Focusable) {
+					FocusedWidget = _hoverWidget;
+					break;
+				}
+				w = w.focusParent;
+			}		
+
 		}
 		public void Init () {
 			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
@@ -246,13 +237,13 @@ namespace Crow
 		/// </summary>
 		public static string CrowConfigRoot;
 		/// <summary>If true, mouse focus is given when mouse is over control</summary>
-		public static bool FocusOnHover = false;
+		public static bool FocusOnHover = true;
 		/// <summary> Threshold to catch borders for sizing </summary>
 		public static int BorderThreshold = 5;
 		/// <summary> delay before tooltip appear </summary>
 		public static int ToolTipDelay = 500;
 		/// <summary>Double click threshold in milisecond</summary>
-		public static int DoubleClick = 250;//max duration between two mouse_down evt for a dbl clk in milisec.
+		public static int DoubleClick = 240;//max duration between two mouse_down evt for a dbl clk in milisec.
 		/// <summary> Time to wait in millisecond before starting repeat loop</summary>
 		public static int DeviceRepeatDelay = 700;
 		/// <summary> Time interval in millisecond between device event repeat</summary>
@@ -281,37 +272,10 @@ namespace Crow
 		/// the ref of this one will be stored in GraphicObject.currentInterface
 		/// </summary>
 		protected static Interface CurrentInterface;
-		internal Stopwatch clickTimer = new Stopwatch();
-		Widget armedClickSender = null;
-		MouseButtonEventArgs armedClickEvtArgs = null;
-//		internal GraphicObject EligibleForDoubleClick {
-//			get { return eligibleForDoubleClick; }
-//			set {
-//				eligibleForDoubleClick = value;
-//				clickTimer.Restart ();
-//			}
-//		}
-		internal void armeClick (Widget sender, MouseButtonEventArgs e){
-			armedClickSender = sender;
-			armedClickEvtArgs = e;
-			clickTimer.Restart ();
-		}
-		#endregion
+		Stopwatch lastClickTime = new Stopwatch();
+		Widget armedClick;//store widget with double click on first click
+		MouseButtonEventArgs armedClickEventArgs;
 
-		#region Events
-		public event EventHandler<MouseCursorChangedEventArgs> MouseCursorChanged;
-		public event EventHandler Quit;
-
-		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
-		public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
-		public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
-		public event EventHandler<MouseButtonEventArgs> MouseClick;
-		public event EventHandler<MouseMoveEventArgs> MouseMove;
-		public event EventHandler<KeyEventArgs> KeyDown;
-		public event EventHandler<KeyEventArgs> KeyUp;
-		public event EventHandler<KeyPressEventArgs> KeyPress;
-		/*public event EventHandler<KeyEventArgs> KeyboardKeyDown;
-		public event EventHandler<KeyEventArgs> KeyboardKeyUp;*/
 		#endregion
 
 		/// <summary>Main Cairo surface</summary>
@@ -325,7 +289,7 @@ namespace Crow
 		/// <summary>resulting bitmap limited to last redrawn part</summary>
 		public byte[] dirtyBmp;
 		/// <summary>True when host has to repaint Interface</summary>
-		public bool IsDirty = false;
+		public bool IsDirty;
 		/// <summary>Coordinate of the dirty bmp on the original bmp</summary>
 		public Rectangle DirtyRect;
 		/// <summary>Locked for each layouting operation</summary>
@@ -576,7 +540,7 @@ namespace Crow
 		#region focus
 		Widget _activeWidget;	//button is pressed on widget
 		Widget _hoverWidget;		//mouse is over
-		Widget _focusedWidget;	//has keyboard (or other perif) focus
+		Widget _focusedWidget;  //has keyboard (or other perif) focus
 
 		/// <summary>Widget is focused and button is down or another perif action is occuring
 		/// , it can not lose focus while Active</summary>
@@ -618,8 +582,8 @@ namespace Crow
 				if (_hoverWidget == value)
 					return;
 
-				//if (_hoverWidget != null)
-				//	_hoverWidget.IsHover = false;
+				if (_hoverWidget != null)
+					_hoverWidget.IsHover = false;
 
 				_hoverWidget = value;
 
@@ -684,29 +648,23 @@ namespace Crow
 		/// Result: the Interface bitmap is drawn in memory (byte[] bmp) and a dirtyRect and bitmap are available
 		/// </summary>
 		public void Update(){
-			if (armedClickSender != null && clickTimer.ElapsedMilliseconds >= Interface.DoubleClick) {
-				armedClickSender.onMouseClick (armedClickSender, armedClickEvtArgs);				
-				armedClickSender = null;
-			}
 
-			if (mouseRepeatCount > 0) {
-				int mc = mouseRepeatCount;
-				mouseRepeatCount -= mc;
-				if (_focusedWidget != null) {
-					mouseRepeatTriggeredAtLeastOnce = true;
-					for (int i = 0; i < mc; i++) {
-						_focusedWidget.onMouseDown (this, new BubblingMouseButtonEventArg(Mouse.X, Mouse.Y, MouseButton.Left, true));
-					}
-				}
-			}
-
-			CrowThread[] tmpThreads;
+			/*CrowThread[] tmpThreads;
 			lock (CrowThreads) {
 				tmpThreads = new CrowThread[CrowThreads.Count];
 				Array.Copy (CrowThreads.ToArray (), tmpThreads, CrowThreads.Count);
 			}
 			for (int i = 0; i < tmpThreads.Length; i++)
-				tmpThreads [i].CheckState ();
+				tmpThreads [i].CheckState ();*/
+			if (mouseRepeatTimer.ElapsedMilliseconds > 0) {
+				if (_hoverWidget != null && _hoverWidget.MouseRepeat) {
+					int repeatCount = (int)mouseRepeatTimer.ElapsedMilliseconds / DeviceRepeatInterval - mouseRepeatCount;
+					for (int i = 0; i < repeatCount; i++)
+						_hoverWidget.onMouseDown (_hoverWidget, lastMouseDownEvent);
+					mouseRepeatCount += repeatCount;
+				}
+			} else if (lastMouseDown.ElapsedMilliseconds > DeviceRepeatDelay) 
+				mouseRepeatTimer.Start ();
 
 			if (!Monitor.TryEnter (UpdateMutex))
 				return;
@@ -1001,6 +959,9 @@ namespace Crow
 		#region Mouse and Keyboard Handling
 
 		public MouseState Mouse;
+		Stopwatch lastMouseDown = new Stopwatch (), mouseRepeatTimer = new Stopwatch ();
+		int mouseRepeatCount;
+		MouseButtonEventArgs lastMouseDownEvent;
 
 		public MouseCursors MouseCursor {
 			set {
@@ -1012,10 +973,6 @@ namespace Crow
 		/// <returns>true if mouse is in the interface</returns>
 		public virtual bool ProcessMouseMove(int x, int y)
 		{
-			/*if (armedClickSender != null) {
-				//armedClickSender.onMouseClick (armedClickSender, armedClickEvtArgs);
-				armedClickSender = null;
-			}*/
 			int deltaX = x - Mouse.X;
 			int deltaY = y - Mouse.Y;
 			Mouse.X = x;
@@ -1023,20 +980,25 @@ namespace Crow
 			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
 			e.Mouse = Mouse;
 
+			if (armedClick != null) {
+				armedClick.onMouseClick (armedClick, armedClickEventArgs);
+				armedClick = null;
+			}
+
 			if (ActiveWidget != null && DragAndDropOperation == null) {
 				//TODO, ensure object is still in the graphic tree
 				//send move evt even if mouse move outside bounds
-				ActiveWidget.onMouseMove (this, e);
+				_activeWidget.onMouseMove (this, e);
 				return true;
 			}
 
 			if (DragAndDropOperation != null)//drag source cant have hover event, so move has to be handle here
 				DragAndDropOperation.DragSource.onMouseMove (this, e);			
 
-			if (HoverWidget != null) {
+			if (_hoverWidget != null) {
 				resetTooltip ();
 				//check topmost graphicobject first
-				Widget tmp = HoverWidget;
+				Widget tmp = _hoverWidget;
 				Widget topc = null;
 				while (tmp is Widget) {
 					topc = tmp;
@@ -1048,13 +1010,13 @@ namespace Crow
 					while (i < idxhw) {
 						if (!GraphicTree [i].isPopup) {
 							if (GraphicTree [i].MouseIsIn (e.Position)) {
-								while (HoverWidget != null) {
-									HoverWidget.onMouseLeave (HoverWidget, e);
-									HoverWidget = HoverWidget.focusParent;
+								while (_hoverWidget != null) {
+									_hoverWidget.onMouseLeave (_hoverWidget, e);
+									HoverWidget = _hoverWidget.focusParent;
 								}
 
 								GraphicTree [i].checkHoverWidget (e);
-								HoverWidget.onMouseMove (this, e);
+								_hoverWidget.onMouseMove (_hoverWidget, e);
 								return true;
 							}
 						}
@@ -1062,21 +1024,21 @@ namespace Crow
 					}
 				}
 
-				if (HoverWidget.MouseIsIn (e.Position)) {
-					HoverWidget.checkHoverWidget (e);
-					HoverWidget.onMouseMove (this, e);
+				if (_hoverWidget.MouseIsIn (e.Position)) {
+					_hoverWidget.checkHoverWidget (e);
+					_hoverWidget.onMouseMove (_hoverWidget, e);
 					return true;
 				} else {
-					HoverWidget.onMouseLeave (HoverWidget, e);
+					_hoverWidget.onMouseLeave (_hoverWidget, e);
 					//seek upward from last focused graph obj's
-					while (HoverWidget.focusParent != null) {
-						HoverWidget = HoverWidget.focusParent;
-						if (HoverWidget.MouseIsIn (e.Position)) {
-							HoverWidget.checkHoverWidget (e);
-							HoverWidget.onMouseMove (this, e);
+					while (_hoverWidget.focusParent != null) {
+						HoverWidget = _hoverWidget.focusParent;
+						if (_hoverWidget.MouseIsIn (e.Position)) {
+							_hoverWidget.checkHoverWidget (e);
+							_hoverWidget.onMouseMove (_hoverWidget, e);
 							return true;
 						} else
-							HoverWidget.onMouseLeave (HoverWidget, e);
+							_hoverWidget.onMouseLeave (_hoverWidget, e);
 					}
 				}
 			}
@@ -1089,7 +1051,7 @@ namespace Crow
 						g.checkHoverWidget (e);
 						if (g is Window)
 							PutOnTop (g);
-						HoverWidget.onMouseMove (this, e);
+						_hoverWidget.onMouseMove (_hoverWidget, e);
 						return true;
 					}
 				}
@@ -1105,20 +1067,37 @@ namespace Crow
 		public bool ProcessMouseButtonUp(Crow.MouseButton button)
 		{
 			Mouse.DisableBit ((int)button);
+			lastMouseDown.Reset ();
+			mouseRepeatTimer.Reset ();
+
 			MouseButtonEventArgs e = new MouseButtonEventArgs (button) { Mouse = Mouse };
 			if (_activeWidget == null)
 				return false;
 
-			if (mouseRepeatThread != null) {
-				mouseRepeatOn = false;
-				mouseRepeatThread.Cancel();
-			}
-			if (!mouseRepeatTriggeredAtLeastOnce) {
-				if (_activeWidget.MouseIsIn (e.Position))
-					armeClick (_activeWidget, e);				
-			}
-			mouseRepeatTriggeredAtLeastOnce = false;
 			_activeWidget.onMouseUp (_activeWidget, e);
+
+			if (armedClick != null) {
+				if (lastClickTime.ElapsedMilliseconds <= DoubleClick) {
+					armedClick.onMouseDoubleClick (armedClick, armedClickEventArgs);
+					ActiveWidget = null;
+				} else
+					armedClick.onMouseClick (armedClick, armedClickEventArgs);
+				armedClick = null;
+			}
+
+			Widget target = _activeWidget;
+			while (target != null) {
+				if (target.hasDoubleClick) {
+					armedClick = _activeWidget;
+					armedClickEventArgs = e;
+					lastClickTime.Restart ();
+					break;
+				} else if (target.hasClick) {
+					_activeWidget.onMouseClick (_activeWidget, e);
+					break;
+				} else
+					target = target.focusParent;
+			}
 
 //			GraphicObject lastActive = _activeWidget;
 			ActiveWidget = null;
@@ -1132,10 +1111,13 @@ namespace Crow
 		/// </summary>
 		/// <returns>return true, if interface handled the event, false otherwise.</returns>
 		/// <param name="button">Button index</param>
-		public bool ProcessMouseButtonDown(Crow.MouseButton button)
+		public bool ProcessMouseButtonDown(MouseButton button)
 		{
 			Mouse.EnableBit ((int)button);
-			MouseButtonEventArgs e = new MouseButtonEventArgs (button) { Mouse = Mouse };
+			lastMouseDown.Start ();
+			mouseRepeatCount = 0;
+
+			lastMouseDownEvent = new MouseButtonEventArgs (button) { Mouse = Mouse };
 
 			if (HoverWidget == null)
 				return false;
@@ -1148,29 +1130,13 @@ namespace Crow
 					break;
 				}
 			}
-			if (hoverFocused == armedClickSender) {
-				if (clickTimer.ElapsedMilliseconds < Interface.DoubleClick) {
-					armedClickSender.onMouseDoubleClick (armedClickSender, e);
-					armedClickSender = null;
-					return true;
-				}
-					
-			}
-			if (armedClickSender!=null)
-				armedClickSender.onMouseClick (armedClickSender, armedClickEvtArgs);				
-			armedClickSender = null;
 
-			HoverWidget.onMouseDown(HoverWidget,new BubblingMouseButtonEventArg(e));
+			_hoverWidget.onMouseDown(_hoverWidget,lastMouseDownEvent);
 
-			if (FocusedWidget == null)
-				return true;
+			/*if (_focusedWidget == null)
+				return true;*/
 
-			ActiveWidget = FocusedWidget;
-
-			if (!FocusedWidget.MouseRepeat)
-				return true;
-			mouseRepeatThread = new CrowThread (FocusedWidget, mouseRepeatThreadFunc);			
-			mouseRepeatThread.Start ();
+			ActiveWidget = _hoverWidget;
 			return true;
 		}
 		/// <summary>
@@ -1189,6 +1155,46 @@ namespace Crow
 			return true;
 		}
 
+		public void ProcessKeyPress (char c)
+		{
+			if (_focusedWidget != null)
+				_focusedWidget.onKeyPress (this, new KeyPressEventArgs (c));
+		}
+
+		public void ProcessKeyUp (Key key)
+		{
+			if (_focusedWidget != null)
+				_focusedWidget.onKeyUp (this, new KeyEventArgs (key, false));
+			//			if (keyboardRepeatThread != null) {
+			//				keyboardRepeatOn = false;
+			//				keyboardRepeatThread.Abort();
+			//				keyboardRepeatThread.Join ();
+			//			}
+		}
+		public void ProcessKeyDown (Key key)
+		{
+			//Keyboard.SetKeyState((Crow.Key)Key,true);
+			lastKeyDownEvt = new KeyEventArgs (key, true);
+
+			if (_focusedWidget != null)
+				_focusedWidget.onKeyDown (this, new KeyEventArgs (key, false));
+
+			//			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
+			//			keyboardRepeatThread.IsBackground = true;
+			//			keyboardRepeatThread.Start ();
+		}
+
+		public bool Shift {
+			get { return backend.Shift; }
+		}
+
+		public bool Ctrl {
+			get { return backend.Ctrl; }
+		}
+
+		public bool Alt {
+			get { return backend.Alt; }
+		}
 		public bool IsKeyDown (Key key) {
 			return false;
 		}
@@ -1281,21 +1287,10 @@ namespace Crow
 		#endregion
 
 		#region Device Repeat Events
-		volatile bool mouseRepeatOn, keyboardRepeatOn, mouseRepeatTriggeredAtLeastOnce = false;
-		volatile int mouseRepeatCount, keyboardRepeatCount;
-		CrowThread mouseRepeatThread, keyboardRepeatThread;
+		volatile bool keyboardRepeatOn;
+		volatile int keyboardRepeatCount;
 		KeyEventArgs lastKeyDownEvt;
-		void mouseRepeatThreadFunc()
-		{
-			mouseRepeatOn = true;
-			mouseRepeatTriggeredAtLeastOnce = false;
-			Thread.Sleep (Interface.DeviceRepeatDelay);
-			while (mouseRepeatOn&!mouseRepeatThread.cancelRequested) {
-				mouseRepeatCount++;
-				Thread.Sleep (Interface.DeviceRepeatInterval);
-			}
-			mouseRepeatCount = 0;
-		}
+
 		void keyboardRepeatThreadFunc()
 		{
 			keyboardRepeatOn = true;

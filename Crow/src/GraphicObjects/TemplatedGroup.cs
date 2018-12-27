@@ -218,9 +218,10 @@ namespace Crow
 				if (data == null)
 					return;
 
-				loadingThread = new CrowThread (this, loading);
+				/*loadingThread = new CrowThread (this, loading);
 				loadingThread.Finished += (object sender, EventArgs e) => (sender as TemplatedGroup).Loaded.Raise (sender, e);
-				loadingThread.Start ();
+				loadingThread.Start ();*/
+				loading ();
 
 				NotifyValueChanged ("SelectedIndex", _selectedIndex);
 				NotifyValueChanged ("SelectedItem", SelectedItem);
@@ -394,8 +395,8 @@ namespace Crow
 
 			for (int i = 0; i < _data.Count; i++) {				
 				loadItem (_data[i], page, _dataTest);
-				if (loadingThread.cancelRequested)
-					break;
+//				if (loadingThread.cancelRequested)
+//					break;
 			}
 
 //			if (page == items)
@@ -455,7 +456,7 @@ namespace Crow
 				page.AddChild (g);
 //				if (isPaged)
 				g.LogicalParent = this;
-				g.MouseDown += itemClick;
+				g.MouseClick += itemClick;
 			}
 
 			if (iTemp.Expand != null && g is Expandable) {
