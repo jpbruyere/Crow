@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <CheckBox Caption="{./Caption}" IsChecked="{²./IsPopped}" Foreground="{./Foreground}" Background="{./Background}">
 	<Template>
-		<Border Style="ControlBorder" Foreground="{./Foreground}" Background="{./Background}">
+		<Border Style="ControlBorder" Foreground="{./Foreground}" Background="{./Background}" ForwardMouseEvents="true">
 			<HorizontalStack Spacing="1">
 				<Image Style="Icon" Margin="1" Width="9" Height="9"	
 					MouseEnter="{Background=White}" MouseLeave="{Background=Transparent}"

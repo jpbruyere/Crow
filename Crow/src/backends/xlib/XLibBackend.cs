@@ -86,7 +86,8 @@ namespace Crow.XLib
 
 		[DllImport ("libXcursor.so.1")]
 		static extern IntPtr XcursorImageLoadCursor (IntPtr dpy, IntPtr image);
-
+		[DllImport ("X11-xcb")]
+		static extern IntPtr XGetXCBConnection (IntPtr dpy);
 		#endregion
 
 		IntPtr xDisp, xwinHnd, xDefaultRootWin, xDefaultVisual;
@@ -95,7 +96,7 @@ namespace Crow.XLib
 		XErrorHandler errorHnd;
 
 		Interface iFace;
-		X11Keyboard keyboard;
+		XKB.XCBKeyboard Keyboard;
 
 		IntPtr [] cursors = new IntPtr [(int)MouseCursors.MaxEnum];
 
@@ -108,6 +109,9 @@ namespace Crow.XLib
 			xDisp = XOpenDisplay(IntPtr.Zero);
 			if (xDisp == IntPtr.Zero)
 				throw new NotSupportedException("[XLib] Failed to open display.");
+
+			IntPtr xcbCon = XGetXCBConnection (xDisp);
+			Keyboard = new XKB.XCBKeyboard (xcbCon, iFace);
 
 			xScreen = XDefaultScreen(xDisp);
 
@@ -126,7 +130,7 @@ namespace Crow.XLib
 
 			XMapWindow (xDisp, xwinHnd);
 
-			keyboard = new Crow.XLib.X11Keyboard (xDisp);
+			//keyboard = new Crow.XLib.X11Keyboard (xDisp);
 
 			iFace.surf = new Crow.Cairo.XlibSurface (xDisp, xwinHnd, xDefaultVisual, iFace.ClientRectangle.Width, iFace.ClientRectangle.Height);
 
@@ -138,12 +142,12 @@ namespace Crow.XLib
 
 		public void CleanUp ()
 		{
-			keyboard.Destroy ();
+			Keyboard.Destroy ();
 
 			XCloseDisplay (xDisp);
 		}
 		public void Flush () {
-			XSync (xDisp, 1);
+			XSync (xDisp, 0);
 		}
 		public void ProcessEvents ()
 		{
@@ -156,10 +160,10 @@ namespace Crow.XLib
 					iFace.ProcessResize (new Rectangle (0, 0, xevent.ExposeEvent.width, xevent.ExposeEvent.height));
 					break;
 				case XEventName.KeyPress:
-					keyboard.HandleEvent ((uint)xevent.KeyEvent.keycode, true);
+					Keyboard.HandleEvent ((uint)xevent.KeyEvent.keycode, true);
 					break;
 				case XEventName.KeyRelease:
-					keyboard.HandleEvent ((uint)xevent.KeyEvent.keycode, false);
+					Keyboard.HandleEvent ((uint)xevent.KeyEvent.keycode, false);
 					break;
 				case XEventName.MotionNotify:
 					//Debug.WriteLine ("motion: ({0},{1})", xevent.MotionEvent.x, xevent.MotionEvent.y);
@@ -182,23 +186,18 @@ namespace Crow.XLib
 				}
 			}
 		}
-		public bool IsDown (Key key) {
+		public bool IsDown (Key key)
+		{
 			return false;
 		}
 		public bool Shift {
-			get {
-				throw new NotImplementedException ();
-			}
+			get { return Keyboard.Shift; }
 		}
 		public bool Ctrl {
-			get {
-				throw new NotImplementedException ();
-			}
+			get { return Keyboard.Ctrl; }
 		}
 		public bool Alt {
-			get {
-				throw new NotImplementedException ();
-			}
+			get { return Keyboard.Alt; }
 		}
 		public void SetCursor (MouseCursors newCur)
 		{

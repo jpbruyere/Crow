@@ -82,7 +82,6 @@ namespace Crow
 				maximum = timer.ElapsedTicks;			
 		}
 		void ResetStats(){
-			Debug.WriteLine("reset measure cpt:{0}",cptMeasures);
 			cptMeasures = total = current = maximum = 0;
 			minimum = long.MaxValue;
 		}

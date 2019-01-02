@@ -516,7 +516,7 @@ namespace Crow.XCB
 
 		public void SetCursor (MouseCursors newCur)
 		{
-			throw new NotImplementedException ();
+			//throw new NotImplementedException ();
 		}
 
 		public void SetCursorPosition (int x, int y)

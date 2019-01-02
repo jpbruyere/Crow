@@ -118,20 +118,12 @@ namespace Crow
 		protected bool running;
 		protected virtual void InitBackend () {
             if (Environment.OSVersion.Platform == PlatformID.Unix)
-                backend = new Crow.XLib.XLibBackend();
-            else
-                backend = new Crow.Win32.Win32Backend();
+				backend = new XLib.XLibBackend();
+				//backend = new Crow.XCB.XCBBackend();
+			else
+				backend = new Crow.Win32.Win32Backend();
 
-			//backend = new Crow.XLib.XLibBackend ();
 			backend.Init (this);
-
-			/*initTooltip ();
-			initContextMenus ();*/
-
-
-			/*Thread t = new Thread (interfaceThread);
-			t.IsBackground = true;
-			t.Start ();*/
 		}
 		public void Run () {
 			//load default main.crow if present
@@ -141,18 +133,20 @@ namespace Crow
 
 			running = true;
 
+			int frameCount = 0;
+
 			while (running) {
 				Update ();
 				ProcessEvents ();
-			}
-		}
 
-
-		void interfaceThread()
-		{			
-			while (running) {
-				Update ();
-				Thread.Sleep (1);
+#if MEASURE_TIME
+				if (frameCount++ < 1000)
+					continue;
+				for (int i = 0; i < PerfMeasures.Count; i++) {
+					PerfMeasures [i].NotifyChanges ();
+				}
+				frameCount = 0;
+#endif
 			}
 		}
 
@@ -273,8 +267,8 @@ namespace Crow
 		/// </summary>
 		protected static Interface CurrentInterface;
 		Stopwatch lastClickTime = new Stopwatch();
-		Widget armedClick;//store widget with double click on first click
-		MouseButtonEventArgs armedClickEventArgs;
+		internal Widget armedClick;//store widget with double click on first click
+		internal MouseButtonEventArgs armedClickEventArgs;
 
 		#endregion
 
@@ -941,13 +935,10 @@ namespace Crow
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
 
-				/*surf.Dispose ();
-				surf = new Cairo.XlibSurface (xHandle, xwinHnd, xDefaultVisual, clientRectangle.Width, clientRectangle.Height);*/
 				if (surf is XlibSurface)
 					(surf as XlibSurface).SetSize (clientRectangle.Width, clientRectangle.Height);
 				else if (surf is XcbSurface)
 					(surf as XcbSurface).SetSize (clientRectangle.Width, clientRectangle.Height);
-
 
 				foreach (Widget g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
@@ -977,8 +968,9 @@ namespace Crow
 			int deltaY = y - Mouse.Y;
 			Mouse.X = x;
 			Mouse.Y = y;
-			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
-			e.Mouse = Mouse;
+			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY) {
+				Mouse = Mouse
+			};
 
 			if (armedClick != null) {
 				armedClick.onMouseClick (armedClick, armedClickEventArgs);
@@ -1098,8 +1090,10 @@ namespace Crow
 				} else
 					target = target.focusParent;
 			}
+			if (target == null)
+				_activeWidget?.onMouseClick (_activeWidget, e);
 
-//			GraphicObject lastActive = _activeWidget;
+			//			GraphicObject lastActive = _activeWidget;
 			ActiveWidget = null;
 //			if (!lastActive.MouseIsIn (Mouse.Position)) {
 //				ProcessMouseMove (Mouse.X, Mouse.Y);
@@ -1117,24 +1111,12 @@ namespace Crow
 			lastMouseDown.Start ();
 			mouseRepeatCount = 0;
 
-			lastMouseDownEvent = new MouseButtonEventArgs (button) { Mouse = Mouse };
-
-			if (HoverWidget == null)
+			if (_hoverWidget == null)
 				return false;
 
-			Widget hoverFocused = HoverWidget;
-			while (!hoverFocused.Focusable) {
-				hoverFocused = hoverFocused.focusParent;
-				if (hoverFocused == null) {
-					hoverFocused = HoverWidget;
-					break;
-				}
-			}
+			lastMouseDownEvent = new MouseButtonEventArgs (button) { Mouse = Mouse };
 
-			_hoverWidget.onMouseDown(_hoverWidget,lastMouseDownEvent);
-
-			/*if (_focusedWidget == null)
-				return true;*/
+			_hoverWidget.onMouseDown (_hoverWidget, lastMouseDownEvent);
 
 			ActiveWidget = _hoverWidget;
 			return true;
@@ -1143,7 +1125,6 @@ namespace Crow
 		/// Forward the mouse wheel event from the host to the crow interface
 		/// </summary>
 		/// <returns>return true, if interface handled the event, false otherwise.</returns>
-		/// <param name="button">Button index</param>
 		public bool ProcessMouseWheelChanged(float delta)
 		{
 			Mouse.SetScrollRelative (0, delta);
@@ -1165,23 +1146,13 @@ namespace Crow
 		{
 			if (_focusedWidget != null)
 				_focusedWidget.onKeyUp (this, new KeyEventArgs (key, false));
-			//			if (keyboardRepeatThread != null) {
-			//				keyboardRepeatOn = false;
-			//				keyboardRepeatThread.Abort();
-			//				keyboardRepeatThread.Join ();
-			//			}
 		}
 		public void ProcessKeyDown (Key key)
 		{
-			//Keyboard.SetKeyState((Crow.Key)Key,true);
 			lastKeyDownEvt = new KeyEventArgs (key, true);
 
 			if (_focusedWidget != null)
 				_focusedWidget.onKeyDown (this, new KeyEventArgs (key, false));
-
-			//			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
-			//			keyboardRepeatThread.IsBackground = true;
-			//			keyboardRepeatThread.Start ();
 		}
 
 		public bool Shift {

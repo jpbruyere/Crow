@@ -289,6 +289,7 @@ namespace Crow
 		bool isActive;
 		bool isHover;
 		bool mouseRepeat;
+		bool forwardMouseEvents;
 		protected bool isVisible = true;
 		bool isEnabled = true;
 		VerticalAlignment verticalAlignment = VerticalAlignment.Center;
@@ -776,6 +777,19 @@ namespace Crow
 					return;
 				mouseRepeat = value;
 				NotifyValueChanged ("MouseRepeat", mouseRepeat);
+			}
+		}
+		/// <summary>
+		/// forward mouse events even if an handle is bound
+		/// </summary>
+		[DesignCategory ("Behaviour")][DefaultValue (false)]
+		public bool ForwardMouseEvents {
+			get { return forwardMouseEvents; }
+			set {
+				if (forwardMouseEvents == value)
+					return;
+				forwardMouseEvents = value;
+				NotifyValueChanged ("ForwardMouseEvents", forwardMouseEvents);
 			}
 		}
 		bool clearBackground = false;
@@ -1666,8 +1680,9 @@ namespace Crow
 			else if (LastPaintedSlot.Width != Slot.Width || LastPaintedSlot.Height != Slot.Height)
 				bmp.SetSize (Slot.Width, Slot.Height);*/
 			bmp?.Dispose ();
+			//bmp = IFace.surf.CreateSimilar (Content.ColorAlpha, Slot.Width, Slot.Height);
 			bmp = new ImageSurface(Format.Argb32, Slot.Width, Slot.Height);
-			
+
 			using (Context gr = new Context (bmp)) {
 				gr.Antialias = Interface.Antialias;
 				onDraw (gr);
@@ -1825,15 +1840,15 @@ namespace Crow
 						IFace.ShowContextMenu (this);					
 				}
 			}*/
-			if (MouseDown == null)
-				focusParent?.onMouseDown (sender, e);
-			else
+			if (MouseDown != null)
 				MouseDown.Invoke (this, e);
+			if (MouseDown == null || forwardMouseEvents)
+				focusParent?.onMouseDown (sender, e);
 		}
 		public virtual void onMouseUp(object sender, MouseButtonEventArgs e){
-			#if DEBUG_FOCUS
+#if DEBUG_FOCUS
 			Debug.WriteLine("MOUSE UP => " + this.ToString());
-			#endif
+#endif
 
 			/*if (IFace.DragAndDropOperation != null){
 				if (IFace.DragAndDropOperation.DragSource == this) {
@@ -1845,36 +1860,36 @@ namespace Crow
 				}
 			}*/
 
-			if (MouseUp == null)
-				focusParent?.onMouseUp (sender, e);
-			else 
+			if (MouseUp != null)
 				MouseUp.Invoke (this, e);
+			if (MouseUp == null || forwardMouseEvents)
+				focusParent?.onMouseUp (sender, e);
+
 		}
 		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){
 #if DEBUG_FOCUS
 			Debug.WriteLine("CLICK => " + this.ToString());
 #endif
-            if (MouseClick == null)
+			if (MouseClick != null)
+				MouseClick.Invoke (this, e);
+			if (MouseClick == null || forwardMouseEvents)
 				focusParent?.onMouseClick (sender, e);
-			else
-				MouseClick.Invoke(this, e);
 		}
 		public virtual void onMouseDoubleClick(object sender, MouseButtonEventArgs e){
 #if DEBUG_FOCUS
 			Debug.WriteLine("DOUBLE CLICK => " + this.ToString());
 #endif
-			if (MouseDoubleClick == null)
-				focusParent?.onMouseDoubleClick (sender, e);
-			else
+			if (MouseDoubleClick != null)
 				MouseDoubleClick.Invoke (this, e);
+			if (MouseDoubleClick == null || forwardMouseEvents)
+				focusParent?.onMouseDoubleClick (sender, e);
 		}
 		public virtual void onMouseWheel(object sender, MouseWheelEventArgs e){
-            if (MouseWheelChanged == null)
+			if (MouseWheelChanged != null)
+				MouseWheelChanged.Invoke (this, e);
+			if (MouseWheelChanged == null || forwardMouseEvents)
 				focusParent?.onMouseWheel (sender, e);
-			else
-				MouseWheelChanged.Invoke(this, e);
 
-            
 		}
 		public virtual void onMouseEnter(object sender, MouseMoveEventArgs e)
 		{

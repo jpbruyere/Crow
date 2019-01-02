@@ -466,7 +466,7 @@ namespace Crow.Win32
 
 		public void SetCursor (MouseCursors newCur)
 		{
-			throw new NotImplementedException ();
+			//throw new NotImplementedException ();
 		}
 
 		public void SetCursorPosition (int x, int y)
