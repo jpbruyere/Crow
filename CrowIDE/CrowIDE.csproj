@@ -12,12 +12,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>$(SolutionDir)build/$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)build/obj/$(Configuration)</IntermediateOutputPath>
-    <CustomCommands>
-      <CustomCommands>
-        <Command type="Execute" command="${TargetName}" workingdir="${SolutionDir}/build/${ProjectConfigName}" />
-      </CustomCommands>
-    </CustomCommands>
-    <ReleaseVersion>0.5</ReleaseVersion>
+    <ReleaseVersion>0.7.2</ReleaseVersion>
     <StartupObject>Crow.Coding.CrowIDE</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -28,8 +23,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -37,21 +30,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>0</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
-    <StartAction>Program</StartAction>
-    <StartProgram>%24{TargetName}</StartProgram>
-    <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
-    <ConsolePause>false</ConsolePause>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Custom Command' ">
-    <StartAction>Program</StartAction>
-    <StartProgram>%24{TargetName}</StartProgram>
-    <StartWorkingDirectory>%24{SolutionDir}\build\%24{ProjectConfigName}</StartWorkingDirectory>
-    <ConsolePause>false</ConsolePause>
-  </PropertyGroup>
+  </PropertyGroup>  
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />

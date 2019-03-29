@@ -350,9 +350,11 @@ namespace Crow
 						return;
 					}
 				}
-			} if (ifaceControl [focusedIdx].ProcessMouseMove (otk_e.X, otk_e.Y))
-				return;			
-
+			}
+			if (focusedIdx >= 0) {
+				if (ifaceControl [focusedIdx].ProcessMouseMove (otk_e.X, otk_e.Y))
+					return;
+			}
 			CrowMouseMove.Raise (sender, otk_e);
         }
 		protected virtual void GL_Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs otk_e)

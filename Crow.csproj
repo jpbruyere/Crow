@@ -24,20 +24,18 @@
     <AssemblyOriginatorKeyFile>crow.key</AssemblyOriginatorKeyFile>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ReleaseVersion>0.5</ReleaseVersion>
+    <ReleaseVersion>0.7.2</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-    <Optimize>false</Optimize>
-    <OutputPath>$(SolutionDir)build\Debug</OutputPath>
+    <Optimize>false</Optimize>    
     <DefineConstants>DESIGN_MODE;DEBUG_UPDATE0;DEBUG_FOCUS0;DEBUG_DISPOSE0;DEBUG_LAYOUTING0;TRACE0;DEBUG;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
-    <DefineConstants>DESIGN_MODE</DefineConstants>
-    <OutputPath>$(SolutionDir)build\Release</OutputPath>
+    <DefineConstants>DESIGN_MODE</DefineConstants>    
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="src\Colors.cs" />
