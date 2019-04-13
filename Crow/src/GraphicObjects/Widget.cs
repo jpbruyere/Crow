@@ -191,7 +191,6 @@ namespace Crow
 				parentRWLock.ExitWriteLock();
 			} else
 				Debug.WriteLine ("!!! Finalized by GC: {0}", this.ToString ());
-			Clipping?.Dispose ();
 			bmp?.Dispose ();
 			disposed = true;
 		}  
@@ -216,7 +215,7 @@ namespace Crow
 		/// are repeated at each cached levels of the tree with correspondig coordinate system. This is done
 		/// in a dedicated step of the update between layouting and drawing.
 		/// </summary>
-		public Region Clipping;
+		public Rectangles Clipping = new Rectangles();
 
 		#region IValueChange implementation
 		/// <summary>
@@ -243,7 +242,6 @@ namespace Crow
 		/// action.
 		/// </summary>
 		protected Widget () {
-			Clipping = new Region ();
 			#if DEBUG_LOG
 			GraphicObjects.Add (this);
 			DebugLog.AddEvent(DbgEvtType.GOClassCreation, this);
@@ -831,7 +829,7 @@ namespace Crow
 		/// <summary>
 		/// Font being used in many controls, it is defined in the base GraphicObject class.
 		/// </summary>
-		[DesignCategory ("Appearance")][DefaultValue("sans, 12")]
+		[DesignCategory ("Appearance")][DefaultValue("droid, 10")]
 		public virtual Font Font {
 			get { return font; }
 			set {
@@ -1394,7 +1392,7 @@ namespace Crow
 			if (r.Bottom > cb.Bottom)
 				r.Height -= r.Bottom - cb.Bottom;
 			if (cacheEnabled && !IsDirty)
-				Clipping.UnionRectangle (r);
+				Clipping.AddRectangle (r);
 			if (Parent == null)
 				return;
 			Widget p = Parent as Widget;
@@ -1710,8 +1708,7 @@ namespace Crow
 
 			ctx.SetSourceSurface (bmp, rb.X, rb.Y);
 			ctx.Paint ();
-			Clipping.Dispose ();
-			Clipping = new Region ();
+			Clipping.Reset ();
 			#if DEBUG_LOG
 			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
 			#endif

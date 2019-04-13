@@ -203,12 +203,7 @@ namespace Crow
 			Context gr = new Context (bmp);
 
 			if (!Clipping.IsEmpty) {
-				for (int i = 0; i < Clipping.NumRectangles; i++)
-					gr.Rectangle(Clipping.GetRectangle(i));
-				gr.ClipPreserve();
-				gr.Operator = Operator.Clear;
-				gr.Fill();
-				gr.Operator = Operator.Over;
+				Clipping.clearAndClip (gr);
 
 				onDraw (gr);
 			}
@@ -217,8 +212,7 @@ namespace Crow
 
 			ctx.SetSourceSurface (bmp, rb.X, rb.Y);
 			ctx.Paint ();
-			Clipping.Dispose();
-			Clipping = new Region ();
+			Clipping.Reset ();
 		}
 		#endregion
 

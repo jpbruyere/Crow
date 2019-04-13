@@ -79,7 +79,7 @@ namespace Crow
 				NotifyValueChanged ("CursorColor", _cursorColor);
 			}
 		}
-		[DefaultValue(20)]
+		[DefaultValue(10)]
 		public virtual int CursorSize {
 			get { return _cursorSize; }
 			set {

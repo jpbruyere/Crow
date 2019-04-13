@@ -310,7 +310,7 @@ namespace Crow
 		public int DragImageWidth, DragImageHeight, DragImageX, DragImageY;
 		public void ClearDragImage () {
 			lock (UpdateMutex) {				
-				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));				
+				clipping.AddRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));				
 				DragImage.Dispose();
 				DragImage = null;
 			}			
@@ -321,7 +321,7 @@ namespace Crow
 		/// <summary>Client rectangle in the host context</summary>
 		protected Rectangle clientRectangle;
 		/// <summary>Clipping rectangles on the root context</summary>
-		Region clipping = new Region();
+		Rectangles clipping = new Rectangles();
 		/// <summary>Main Cairo context</summary>
 		Context ctx;
 		#endregion
@@ -744,25 +744,19 @@ namespace Crow
 				DebugLog.AddEvent (DbgEvtType.IFaceStartDrawing);
 			#endif
 			if (DragImage != null)
-				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
+				clipping.AddRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
 			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
 				using (ctx = new Context (surf)) {
 					if (!clipping.IsEmpty) {
 						IsDirty = true;
 
-						for (int i = 0; i < clipping.NumRectangles; i++)
-							ctx.Rectangle (clipping.GetRectangle (i));
-
-						ctx.ClipPreserve ();
-						ctx.Operator = Operator.Clear;
-						ctx.Fill ();
-						ctx.Operator = Operator.Over;
+						clipping.clearAndClip (ctx);
 
 						for (int i = GraphicTree.Count - 1; i >= 0; i--) {
 							Widget p = GraphicTree[i];
 							if (!p.Visible)
 								continue;
-							if (clipping.Contains (p.Slot) == RegionOverlap.Out)
+							if (!clipping.intersect (p.Slot))
 								continue;
 
 							ctx.Save ();
@@ -788,14 +782,11 @@ namespace Crow
 
 #if DEBUG_CLIP_RECTANGLE
 						ctx.LineWidth = 1;
-						ctx.SetSourceColor(Color.Magenta.AdjustAlpha (0.5));
-						for (int i = 0; i < clipping.NumRectangles; i++)
-							ctx.Rectangle(clipping.GetRectangle(i));
+						clipping.stroke (ctx, Color.Magenta.AdjustAlpha (0.5));
 						ctx.Stroke ();
 #endif
 
-						clipping.Dispose ();
-						clipping = new Region ();
+						clipping.Reset ();
 						//}
 						//surf.WriteToPng (@"/mnt/data/test.png");
 							
@@ -1284,7 +1275,7 @@ namespace Crow
 			return true;
 		}
 		public void RegisterClip(Rectangle r){
-			clipping.UnionRectangle (r);
+			clipping.AddRectangle (r);
 		}
 		public bool ArrangeChildren { get { return false; }}
 		public int LayoutingTries {

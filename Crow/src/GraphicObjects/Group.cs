@@ -312,12 +312,7 @@ namespace Crow
 			Context gr = new Context (bmp);
 
 			if (!Clipping.IsEmpty) {
-				for (int i = 0; i < Clipping.NumRectangles; i++)
-					gr.Rectangle(Clipping.GetRectangle(i));
-				gr.ClipPreserve();
-				gr.Operator = Operator.Clear;
-				gr.Fill();
-				gr.Operator = Operator.Over;
+				Clipping.clearAndClip (gr);
 
 				base.onDraw (gr);
 
@@ -331,7 +326,7 @@ namespace Crow
 				foreach (Widget c in Children) {
 					if (!c.Visible)
 						continue;
-					if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
+					if (!Clipping.intersect (c.Slot + ClientRectangle.Position))
 						continue;
 					c.Paint (ref gr);
 				}
@@ -339,11 +334,9 @@ namespace Crow
 				childrenRWLock.ExitReadLock ();
 
 				#if DEBUG_CLIP_RECTANGLE
-				/*gr.LineWidth = 1;
-				gr.SetSourceColor(Color.DarkMagenta.AdjustAlpha (0.8));
-				for (int i = 0; i < Clipping.NumRectangles; i++)
-					gr.Rectangle(Clipping.GetRectangle(i));
-				gr.Stroke ();*/
+				gr.LineWidth = 1;
+				Clipping.stroke(gr,Color.DarkMagenta.AdjustAlpha (0.8));
+				gr.Stroke ();
 				#endif
 			}
 			gr.Dispose ();
@@ -351,8 +344,7 @@ namespace Crow
 			ctx.SetSourceSurface (bmp, rb.X, rb.Y);
 			ctx.Paint ();
 
-			Clipping.Dispose();
-			Clipping = new Region ();
+			Clipping.Reset();
 		}
 		#endregion
 
