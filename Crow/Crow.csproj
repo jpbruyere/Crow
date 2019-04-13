@@ -21,7 +21,6 @@
     <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
     <AssemblyOriginatorKeyFile>crow.key</AssemblyOriginatorKeyFile>
-    <ReleaseVersion>0.8.0</ReleaseVersion>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
@@ -32,7 +31,7 @@
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <Optimize>false</Optimize>
     <OutputPath>$(SolutionDir)build\Debug</OutputPath>
-    <DefineConstants>TRACE0;DEBUG;DEBUG_BINDING_FUNC_CALLS0;DEBUG_DRAGNDROP0;DEBUG_LOG0;XLIB_BACKEND0;DESIGN_MODE;DEBUG_UPDATE0;DEBUG_FOCUS0;DEBUG_DISPOSE0;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
+    <DefineConstants>TRACE0;DEBUG;DEBUG_BINDING_FUNC_CALLS0;DEBUG_DRAGNDROP0;DEBUG_LOG0;XLIB_BACKEND0;DESIGN_MODE;DEBUG_UPDATE0;DEBUG_FOCUS;DEBUG_DISPOSE0;MEASURE_TIME;DEBUG_LOAD0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
     <EnvironmentVariables>
       <EnvironmentVariables>
         <Variable name="MONO_CAIRO_DEBUG_DISPOSE" value="1" />

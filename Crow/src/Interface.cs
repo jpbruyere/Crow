@@ -73,14 +73,8 @@ namespace Crow
 		}
 		#endregion
 
-		internal IBackend backend;
-
 		#region CTOR
 		static Interface(){
-			/*if (Type.GetType ("Mono.Runtime") == null) {
-				throw new Exception (@"C.R.O.W. run only on Mono, download latest version at: http://www.mono-project.com/download/stable/");
-			}*/
-
 			CrowConfigRoot =
 				System.IO.Path.Combine(
 					Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
@@ -111,20 +105,12 @@ namespace Crow
 
 			Init ();
 
-			InitBackend ();
+			ProcessResize (clientRectangle);
 		}
 		#endregion
 
 		protected bool running;
-		protected virtual void InitBackend () {
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
-				backend = new XLib.XLibBackend();
-				//backend = new Crow.XCB.XCBBackend();
-			else
-				backend = new Crow.Win32.Win32Backend();
 
-			backend.Init (this);
-		}
 		public void Run () {
 			//load default main.crow if present
 			try {
@@ -162,7 +148,6 @@ namespace Crow
 					// TODO: dispose managed state (managed objects).
 				}
 
-				backend.CleanUp ();
 
 
 				disposedValue = true;
@@ -194,13 +179,11 @@ namespace Crow
 			}
 
 			Widget w = _hoverWidget;  //previous hover widget 
+				
+			//if (!FocusOnHover || (w == _hoverWidget))
+			//	return;
 
-			backend.ProcessEvents ();
-
-			if (!FocusOnHover || (w == _hoverWidget))
-				return;
-
-			w = _hoverWidget;
+			//w = _hoverWidget;
 			while (w != null) {
 				if (w.Focusable) {
 					FocusedWidget = _hoverWidget;
@@ -581,8 +564,19 @@ namespace Crow
 
 				_hoverWidget = value;
 
+				if (FocusOnHover) {
+					Widget w = _hoverWidget;  //previous hover widget 
+					while (w != null) {
+						if (w.Focusable) {
+							FocusedWidget = w;
+							break;
+						}
+						w = w.focusParent;
+					}
+				}
+
 				#if DEBUG_FOCUS
-				NotifyValueChanged("HoverWidget", _hoverWidget);
+				NotifyValueChanged ("HoverWidget", _hoverWidget);
 				#endif
 				/*
 				if (_hoverWidget != null)
@@ -751,61 +745,61 @@ namespace Crow
 			#endif
 			if (DragImage != null)
 				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
-			//using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
-			using (ctx = new Context (surf)){
-				if (!clipping.IsEmpty) {
-					IsDirty = true;
+			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
+				using (ctx = new Context (surf)) {
+					if (!clipping.IsEmpty) {
+						IsDirty = true;
 
-					for (int i = 0; i < clipping.NumRectangles; i++)
-						ctx.Rectangle(clipping.GetRectangle(i));
-					
-					ctx.ClipPreserve();
-					ctx.Operator = Operator.Clear;
-					ctx.Fill();
-					ctx.Operator = Operator.Over;
+						for (int i = 0; i < clipping.NumRectangles; i++)
+							ctx.Rectangle (clipping.GetRectangle (i));
 
-					for (int i = GraphicTree.Count -1; i >= 0 ; i--){
-						Widget p = GraphicTree[i];
-						if (!p.Visible)
-							continue;
-						if (clipping.Contains (p.Slot) == RegionOverlap.Out)
-							continue;
+						ctx.ClipPreserve ();
+						ctx.Operator = Operator.Clear;
+						ctx.Fill ();
+						ctx.Operator = Operator.Over;
 
-						ctx.Save ();
-						p.Paint (ref ctx);
-						ctx.Restore ();
-					}
+						for (int i = GraphicTree.Count - 1; i >= 0; i--) {
+							Widget p = GraphicTree[i];
+							if (!p.Visible)
+								continue;
+							if (clipping.Contains (p.Slot) == RegionOverlap.Out)
+								continue;
 
-					if (DragAndDropOperation != null) {
-						if (DragImage != null) {
-							DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
-							DragImageX = Mouse.X - DragImageWidth / 2;
-							DragImageY = Mouse.Y - DragImageHeight / 2;
 							ctx.Save ();
-							ctx.ResetClip ();
-							ctx.SetSourceSurface (DragImage, DragImageX, DragImageY);
-							ctx.PaintWithAlpha (0.8);
+							p.Paint (ref ctx);
 							ctx.Restore ();
-							DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
-							IsDirty = true;
-							//Console.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
 						}
+
+						if (DragAndDropOperation != null) {
+							if (DragImage != null) {
+								DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
+								DragImageX = Mouse.X - DragImageWidth / 2;
+								DragImageY = Mouse.Y - DragImageHeight / 2;
+								ctx.Save ();
+								ctx.ResetClip ();
+								ctx.SetSourceSurface (DragImage, DragImageX, DragImageY);
+								ctx.PaintWithAlpha (0.8);
+								ctx.Restore ();
+								DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
+								IsDirty = true;
+								//Console.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
+							}
+						}
+
+#if DEBUG_CLIP_RECTANGLE
+						ctx.LineWidth = 1;
+						ctx.SetSourceColor(Color.Magenta.AdjustAlpha (0.5));
+						for (int i = 0; i < clipping.NumRectangles; i++)
+							ctx.Rectangle(clipping.GetRectangle(i));
+						ctx.Stroke ();
+#endif
+
+						clipping.Dispose ();
+						clipping = new Region ();
+						//}
+						//surf.WriteToPng (@"/mnt/data/test.png");
+							
 					}
-
-					#if DEBUG_CLIP_RECTANGLE
-					ctx.LineWidth = 1;
-					ctx.SetSourceColor(Color.Magenta.AdjustAlpha (0.5));
-					for (int i = 0; i < clipping.NumRectangles; i++)
-						ctx.Rectangle(clipping.GetRectangle(i));
-					ctx.Stroke ();
-					#endif
-
-					clipping.Dispose ();
-					clipping = new Region ();
-					//}
-					//surf.WriteToPng (@"/mnt/data/test.png");
-
-					backend?.Flush ();
 				}
 			}
 			/*#if DEBUG_LOG
@@ -935,10 +929,9 @@ namespace Crow
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
 
-				if (surf is XlibSurface)
-					(surf as XlibSurface).SetSize (clientRectangle.Width, clientRectangle.Height);
-				else if (surf is XcbSurface)
-					(surf as XcbSurface).SetSize (clientRectangle.Width, clientRectangle.Height);
+				int stride = 4 * ClientRectangle.Width;
+				int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
+				bmp = new byte[bmpSize];
 
 				foreach (Widget g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
@@ -956,7 +949,7 @@ namespace Crow
 
 		public MouseCursors MouseCursor {
 			set {
-				backend.SetCursor (value);
+				//backend.SetCursor (value);
 			}
 		}
 		/// <summary>Processes mouse move events from the root container, this function
@@ -1118,6 +1111,17 @@ namespace Crow
 
 			_hoverWidget.onMouseDown (_hoverWidget, lastMouseDownEvent);
 
+			if (!FocusOnHover) {
+				Widget w = _hoverWidget;  //previous hover widget 
+				while (w != null) {
+					if (w.Focusable) {
+						FocusedWidget = w;
+						break;
+					}
+					w = w.focusParent;
+				}
+			}
+
 			ActiveWidget = _hoverWidget;
 			return true;
 		}
@@ -1156,15 +1160,15 @@ namespace Crow
 		}
 
 		public bool Shift {
-			get { return backend.Shift; }
+			get { return false; }
 		}
 
 		public bool Ctrl {
-			get { return backend.Ctrl; }
+			get { return false; }
 		}
 
 		public bool Alt {
-			get { return backend.Alt; }
+			get { return false; }
 		}
 		public bool IsKeyDown (Key key) {
 			return false;

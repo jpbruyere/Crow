@@ -114,6 +114,7 @@ ToolWindow {
 	Caption = "Window";
 	Template = "#Crow.ToolWindow.template";
 	Focusable = "true";
+    Movable = "true";
 	MinimumSize="50,50";
 	Width = "150";
 	Height = "150";
