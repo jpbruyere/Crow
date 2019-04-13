@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
-using Crow.Cairo;
+using vkvg;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using System.ComponentModel;
@@ -150,12 +150,12 @@ namespace Crow
 			if (lines == null)
 				lines = getLines;
 
-			using (ImageSurface img = new ImageSurface (Format.Argb32, 10, 10)) {
+			using (Surface img = new Surface (IFace.dev, 10, 10)) {
 				using (Context gr = new Context (img)) {
 					//Cairo.FontFace cf = gr.GetContextFontFace ();
 
-					gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-					gr.SetFontSize (Font.Size);
+					gr.FontFace = Font.Name;
+					gr.FontSize = (uint)Font.Size;
 
 
 					fe = gr.FontExtents;
@@ -184,10 +184,10 @@ namespace Crow
 		{
 			base.onDraw (gr);
 
-			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-			gr.SetFontSize (Font.Size);
-			gr.FontOptions = Interface.FontRenderingOptions;
-			gr.Antialias = Interface.Antialias;
+			//gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+			//gr.SetFontSize (Font.Size);
+			//gr.FontOptions = Interface.FontRenderingOptions;
+			//gr.Antialias = Interface.Antialias;
 
 			rText = new Rectangle (new Size (
 				measureRawSize (LayoutingType.Width), measureRawSize (LayoutingType.Height)));
@@ -259,7 +259,7 @@ namespace Crow
 				}
 			}
 
-			gr.FontMatrix = new Matrix (widthRatio * Font.Size, 0, 0, heightRatio * Font.Size, 0, 0);
+			//gr.FontMatrix = new Matrix (widthRatio * Font.Size, 0, 0, heightRatio * Font.Size, 0, 0);
 
 
 			int curLineCount = 0;

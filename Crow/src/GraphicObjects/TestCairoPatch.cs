@@ -24,7 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
-using Crow.Cairo;
+using vkvg;
 
 namespace Crow
 {
@@ -54,94 +54,94 @@ namespace Crow
 		{
 			base.onDraw (gr);
 
-			double radius = 100;
+			//double radius = 100;
 
-			double pi3 = Math.PI / 3.0;
+			//double pi3 = Math.PI / 3.0;
 
-			MeshPattern mp = new MeshPattern ();
+			//MeshPattern mp = new MeshPattern ();
 
-			double x1 = radius,y1 = 0,
-			x2 = 0, y2 = 0, x3 = 0, y3 = 0, x4 = 0, y4 = 0,
-			xc = radius,yc = radius;
+			//double x1 = radius,y1 = 0,
+			//x2 = 0, y2 = 0, x3 = 0, y3 = 0, x4 = 0, y4 = 0,
+			//xc = radius,yc = radius;
 
-			double dx = Math.Sin (pi3) * radius;
-			double dy = Math.Cos (pi3) * radius;
+			//double dx = Math.Sin (pi3) * radius;
+			//double dy = Math.Cos (pi3) * radius;
 
-			mp.BeginPatch ();
-			mp.MoveTo (xc, yc);
-			mp.LineTo (x1, y1);
-			x4 = xc + dx;
-			y4 = yc - dy;
-			computeControlPoints (xc, yc, x1, y1, out x2, out y2, out x3, out y3, x4, y4);
-			mp.CurveTo (x2, y2, x3, y3, x4, y4);
+			//mp.BeginPatch ();
+			//mp.MoveTo (xc, yc);
+			//mp.LineTo (x1, y1);
+			//x4 = xc + dx;
+			//y4 = yc - dy;
+			//computeControlPoints (xc, yc, x1, y1, out x2, out y2, out x3, out y3, x4, y4);
+			//mp.CurveTo (x2, y2, x3, y3, x4, y4);
 
-			mp.SetCornerColorRGB (0, 1, 1, 1);
-			mp.SetCornerColorRGB (1, 1, 0, 0);
-			mp.SetCornerColorRGB (2, 1, 1, 0);
+			//mp.SetCornerColorRGB (0, 1, 1, 1);
+			//mp.SetCornerColorRGB (1, 1, 0, 0);
+			//mp.SetCornerColorRGB (2, 1, 1, 0);
 
-			x1 = x4;
-			y1 = y4;
-			y4 = yc + dy;
+			//x1 = x4;
+			//y1 = y4;
+			//y4 = yc + dy;
 
-			computeControlPoints (xc, yc, x1, y1, out x2, out y2, out x3, out y3, x4, y4);
-			mp.CurveTo (x2, y2, x3, y3, x4, y4);
+			//computeControlPoints (xc, yc, x1, y1, out x2, out y2, out x3, out y3, x4, y4);
+			//mp.CurveTo (x2, y2, x3, y3, x4, y4);
 
-			mp.SetCornerColorRGB (3, 0, 1, 0);
-			mp.EndPatch ();
+			//mp.SetCornerColorRGB (3, 0, 1, 0);
+			//mp.EndPatch ();
 
-			x1 = x4;
-			y1 = y4;
-			x4 = xc;
-			y4 = yc * 2.0;
+			//x1 = x4;
+			//y1 = y4;
+			//x4 = xc;
+			//y4 = yc * 2.0;
 
-			mp.BeginPatch ();
-			mp.MoveTo (xc, yc);
-			mp.LineTo (x1, y1);
-			computeControlPoints (xc, yc, x1, y1, out x2, out y2, out x3, out y3, x4, y4);
-			mp.CurveTo (x2, y2, x3, y3, x4, y4);
+			//mp.BeginPatch ();
+			//mp.MoveTo (xc, yc);
+			//mp.LineTo (x1, y1);
+			//computeControlPoints (xc, yc, x1, y1, out x2, out y2, out x3, out y3, x4, y4);
+			//mp.CurveTo (x2, y2, x3, y3, x4, y4);
 
-			mp.SetCornerColorRGB (0, 1, 1, 1);
-			mp.SetCornerColorRGB (1, 0, 1, 0);
-			mp.SetCornerColorRGB (2, 0, 1, 1);
+			//mp.SetCornerColorRGB (0, 1, 1, 1);
+			//mp.SetCornerColorRGB (1, 0, 1, 0);
+			//mp.SetCornerColorRGB (2, 0, 1, 1);
 
-			x1 = x4;
-			y1 = y4;
-			x4 = xc-dx;
-			y4 = yc+dy;
+			//x1 = x4;
+			//y1 = y4;
+			//x4 = xc-dx;
+			//y4 = yc+dy;
 
-			computeControlPoints (xc, yc, x1, y1, out x2, out y2, out x3, out y3, x4, y4);
-			mp.CurveTo (x2, y2, x3, y3, x4, y4);
+			//computeControlPoints (xc, yc, x1, y1, out x2, out y2, out x3, out y3, x4, y4);
+			//mp.CurveTo (x2, y2, x3, y3, x4, y4);
 
-			mp.SetCornerColorRGB (3, 0, 0, 1);
-			mp.EndPatch ();
+			//mp.SetCornerColorRGB (3, 0, 0, 1);
+			//mp.EndPatch ();
 
-			x1 = x4;
-			y1 = y4;
-			y4 = yc - dy;
+			//x1 = x4;
+			//y1 = y4;
+			//y4 = yc - dy;
 
-			mp.BeginPatch ();
-			mp.MoveTo (xc, yc);
-			mp.LineTo (x1, y1);
-			computeControlPoints (xc, yc, x1, y1, out x2, out y2, out x3, out y3, x4, y4);
-			mp.CurveTo (x2, y2, x3, y3, x4, y4);
+			//mp.BeginPatch ();
+			//mp.MoveTo (xc, yc);
+			//mp.LineTo (x1, y1);
+			//computeControlPoints (xc, yc, x1, y1, out x2, out y2, out x3, out y3, x4, y4);
+			//mp.CurveTo (x2, y2, x3, y3, x4, y4);
 
-			mp.SetCornerColorRGB (0, 1, 1, 1);
-			mp.SetCornerColorRGB (1, 0, 0, 1);
-			mp.SetCornerColorRGB (2, 1, 0, 1);
+			//mp.SetCornerColorRGB (0, 1, 1, 1);
+			//mp.SetCornerColorRGB (1, 0, 0, 1);
+			//mp.SetCornerColorRGB (2, 1, 0, 1);
 
-			x1 = x4;
-			y1 = y4;
-			x4 = radius;
-			y4 = 0;
+			//x1 = x4;
+			//y1 = y4;
+			//x4 = radius;
+			//y4 = 0;
 
-			computeControlPoints (xc, yc, x1, y1, out x2, out y2, out x3, out y3, x4, y4);
-			mp.CurveTo (x2, y2, x3, y3, x4, y4);
+			//computeControlPoints (xc, yc, x1, y1, out x2, out y2, out x3, out y3, x4, y4);
+			//mp.CurveTo (x2, y2, x3, y3, x4, y4);
 
-			mp.SetCornerColorRGB (3, 1, 0, 0);
-			mp.EndPatch ();
+			//mp.SetCornerColorRGB (3, 1, 0, 0);
+			//mp.EndPatch ();
 
-			gr.SetSource (mp);
-			gr.Paint ();
+			//gr.SetSource (mp);
+			//gr.Paint ();
 		}
 	}
 }

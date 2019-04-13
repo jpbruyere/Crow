@@ -28,7 +28,7 @@ using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
-using Crow.Cairo;
+using vkvg;
 using System.Linq;
 
 namespace Crow
@@ -192,29 +192,29 @@ namespace Crow
 
 
 		void makeFloating (TabView tv) {			
-			lock (IFace.UpdateMutex) {				
-				ImageSurface di = new ImageSurface (Format.Argb32, dis, dis);
-				IFace.DragImageHeight = dis;
-				IFace.DragImageWidth = dis;
-				using (Context ctx = new Context (di)) {
-					double div = Math.Max (LastPaintedSlot.Width, LastPaintedSlot.Height);
-					double s = (double)dis / div;
-					ctx.Scale (s, s);
-					if (bmp == null)
-						this.onDraw (ctx);
-					else {
-						if (LastPaintedSlot.Width>LastPaintedSlot.Height)
-							ctx.SetSourceSurface (bmp, 0, (LastPaintedSlot.Width-LastPaintedSlot.Height)/2);
-						else
-							ctx.SetSourceSurface (bmp, (LastPaintedSlot.Height-LastPaintedSlot.Width)/2, 0);
+			//lock (IFace.UpdateMutex) {				
+			//	ImageSurface di = new ImageSurface (Format.Argb32, dis, dis);
+			//	IFace.DragImageHeight = dis;
+			//	IFace.DragImageWidth = dis;
+			//	using (Context ctx = new Context (di)) {
+			//		double div = Math.Max (LastPaintedSlot.Width, LastPaintedSlot.Height);
+			//		double s = (double)dis / div;
+			//		ctx.Scale (s, s);
+			//		if (bmp == null)
+			//			this.onDraw (ctx);
+			//		else {
+			//			if (LastPaintedSlot.Width>LastPaintedSlot.Height)
+			//				ctx.SetSourceSurface (bmp, 0, (LastPaintedSlot.Width-LastPaintedSlot.Height)/2);
+			//			else
+			//				ctx.SetSourceSurface (bmp, (LastPaintedSlot.Height-LastPaintedSlot.Width)/2, 0);
 
-						ctx.Paint ();
-					}
-				}
-				IFace.DragImage = di;
-			}
-			tv.RemoveChild (this);
-			savedParent = tv;
+			//			ctx.Paint ();
+			//		}
+			//	}
+			//	IFace.DragImage = di;
+			//}
+			//tv.RemoveChild (this);
+			//savedParent = tv;
 		}
 
 		public override ILayoutable Parent {

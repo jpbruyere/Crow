@@ -25,7 +25,7 @@
 // THE SOFTWARE.
 
 using System;
-using Crow.Cairo;
+using vkvg;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -203,7 +203,7 @@ namespace Crow
 			_pic.Paint (gr, ClientRectangle, _svgSub);
 
 			if (Opacity<1.0) {
-				gr.SetSourceRGBA (0.0, 0.0, 0.0, 1.0-Opacity);
+				gr.SetSourceColor (0.0, 0.0, 0.0, 1.0-Opacity);
 				gr.Operator = Operator.DestOut;
 				gr.Rectangle (ClientRectangle);
 				gr.Fill ();

@@ -32,7 +32,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using Crow.Cairo;
+using vkvg;
 using Crow.IML;
 
 
@@ -92,14 +92,15 @@ namespace Crow
 				}
 			}
 
-			FontRenderingOptions = new FontOptions ();
-			FontRenderingOptions.Antialias = Antialias.Subpixel;
-			FontRenderingOptions.HintMetrics = HintMetrics.On;
-			FontRenderingOptions.HintStyle = HintStyle.Full;
-			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Default;
+			//FontRenderingOptions = new FontOptions ();
+			//FontRenderingOptions.Antialias = Antialias.Subpixel;
+			//FontRenderingOptions.HintMetrics = HintMetrics.On;
+			//FontRenderingOptions.HintStyle = HintStyle.Full;
+			//FontRenderingOptions.SubpixelOrder = SubpixelOrder.Default;
 		}
 
-		public Interface(int width=800, int height=600){
+		public Interface(vkvg.Device dev, int width=800, int height=600){
+			this.dev = dev;
 
 			clientRectangle = new Rectangle (0, 0, width, height);
 
@@ -108,6 +109,9 @@ namespace Crow
 			ProcessResize (clientRectangle);
 		}
 		#endregion
+
+		public vkvg.Device dev;
+		public vkvg.Surface surf;
 
 		protected bool running;
 
@@ -147,7 +151,7 @@ namespace Crow
 				{
 					// TODO: dispose managed state (managed objects).
 				}
-
+				surf?.Dispose ();
 
 
 				disposedValue = true;
@@ -240,9 +244,9 @@ namespace Crow
 		/// will not be rendered on screen </summary>
 		public const int MaxDiscardCount = 5;
 		/// <summary> Global font rendering settings for Cairo </summary>
-		public static FontOptions FontRenderingOptions;
+		//public static FontOptions FontRenderingOptions;
 		/// <summary> Global font rendering settings for Cairo </summary>
-		public static Antialias Antialias = Antialias.Subpixel;
+		//public static Antialias Antialias = Antialias.Subpixel;
 
 		/// <summary>
 		/// Each control need a ref to the root interface containing it, if not set in GraphicObject.currentInterface,
@@ -255,16 +259,13 @@ namespace Crow
 
 		#endregion
 
-		/// <summary>Main Cairo surface</summary>
-		public Surface surf;
-
 		#region Public Fields
 		/// <summary>Graphic Tree of this interface</summary>
 		public List<Widget> GraphicTree = new List<Widget>();
 		/// <summary>Interface's resulting bitmap</summary>
-		public byte[] bmp;
+		//public byte[] bmp;
 		/// <summary>resulting bitmap limited to last redrawn part</summary>
-		public byte[] dirtyBmp;
+		//public byte[] dirtyBmp;
 		/// <summary>True when host has to repaint Interface</summary>
 		public bool IsDirty;
 		/// <summary>Coordinate of the dirty bmp on the original bmp</summary>
@@ -745,54 +746,54 @@ namespace Crow
 			#endif
 			if (DragImage != null)
 				clipping.AddRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
-			using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
-				using (ctx = new Context (surf)) {
-					if (!clipping.IsEmpty) {
-						IsDirty = true;
 
-						clipping.clearAndClip (ctx);
+			using (ctx = new Context (surf)) {
+				if (!clipping.IsEmpty) {
+					IsDirty = true;
 
-						for (int i = GraphicTree.Count - 1; i >= 0; i--) {
-							Widget p = GraphicTree[i];
-							if (!p.Visible)
-								continue;
-							if (!clipping.intersect (p.Slot))
-								continue;
+					clipping.clear (ctx);
 
-							ctx.Save ();
-							p.Paint (ref ctx);
-							ctx.Restore ();
-						}
+					for (int i = GraphicTree.Count - 1; i >= 0; i--) {
+						Widget p = GraphicTree[i];
+						if (!p.Visible)
+							continue;
+						if (!clipping.intersect (p.Slot))
+							continue;
 
-						if (DragAndDropOperation != null) {
-							if (DragImage != null) {
-								DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
-								DragImageX = Mouse.X - DragImageWidth / 2;
-								DragImageY = Mouse.Y - DragImageHeight / 2;
-								ctx.Save ();
-								ctx.ResetClip ();
-								ctx.SetSourceSurface (DragImage, DragImageX, DragImageY);
-								ctx.PaintWithAlpha (0.8);
-								ctx.Restore ();
-								DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
-								IsDirty = true;
-								//Console.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
-							}
-						}
+						ctx.Save ();
+						p.Paint (ref ctx);
+						ctx.Restore ();
+					}
+
+					//if (DragAndDropOperation != null) {
+					//	if (DragImage != null) {
+					//		DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
+					//		DragImageX = Mouse.X - DragImageWidth / 2;
+					//		DragImageY = Mouse.Y - DragImageHeight / 2;
+					//		ctx.Save ();
+					//		ctx.ResetClip ();
+					//		ctx.SetSourceSurface (DragImage, DragImageX, DragImageY);
+					//		ctx.PaintWithAlpha (0.8);
+					//		ctx.Restore ();
+					//		DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
+					//		IsDirty = true;
+					//		//Console.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
+					//	}
+					//}
 
 #if DEBUG_CLIP_RECTANGLE
-						ctx.LineWidth = 1;
-						clipping.stroke (ctx, Color.Magenta.AdjustAlpha (0.5));
-						ctx.Stroke ();
+					ctx.LineWidth = 1;
+					clipping.stroke (ctx, Color.Magenta.AdjustAlpha (0.5));
+					ctx.Stroke ();
 #endif
 
-						clipping.Reset ();
-						//}
-						//surf.WriteToPng (@"/mnt/data/test.png");
-							
-					}
+					clipping.Reset ();
+					//}
+					//surf.WriteToPng (@"/mnt/data/test.png");
+						
 				}
 			}
+		
 			/*#if DEBUG_LOG
 			DebugLog.AddEvent (DbgEvtType.IFaceEndDrawing);
 			#endif*/
@@ -919,10 +920,8 @@ namespace Crow
 		public virtual void ProcessResize(Rectangle bounds){
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
-
-				int stride = 4 * ClientRectangle.Width;
-				int bmpSize = Math.Abs (stride) * ClientRectangle.Height;
-				bmp = new byte[bmpSize];
+				surf?.Dispose ();
+				surf = new Surface (dev, ClientRectangle.Width, ClientRectangle.Height);
 
 				foreach (Widget g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
@@ -938,11 +937,11 @@ namespace Crow
 		int mouseRepeatCount;
 		MouseButtonEventArgs lastMouseDownEvent;
 
-		public MouseCursors MouseCursor {
-			set {
-				//backend.SetCursor (value);
-			}
-		}
+		//public MouseCursors MouseCursor {
+		//	set {
+		//		//backend.SetCursor (value);
+		//	}
+		//}
 		/// <summary>Processes mouse move events from the root container, this function
 		/// should be called by the host on mouse move event to forward events to crow interfaces</summary>
 		/// <returns>true if mouse is in the interface</returns>

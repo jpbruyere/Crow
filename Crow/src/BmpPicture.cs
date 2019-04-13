@@ -26,7 +26,7 @@
 
 using System;
 using System.IO;
-using Crow.Cairo;
+using vkvg;
 
 namespace Crow
 {
@@ -109,20 +109,20 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-			using (ImageSurface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
-				using (Context gr = new Context (tmp)) {
-					gr.Translate (bounds.Left, bounds.Top);
-					gr.Scale (widthRatio, heightRatio);
-					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
+			//using (ImageSurface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
+			//	using (Context gr = new Context (tmp)) {
+			//		gr.Translate (bounds.Left, bounds.Top);
+			//		gr.Scale (widthRatio, heightRatio);
+			//		gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
 
-					using (ImageSurface imgSurf = new ImageSurface (image, Format.Argb32, 
-						Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) {
-						gr.SetSourceSurface (imgSurf, 0,0);
-						gr.Paint ();
-					}
-				}
-				ctx.SetSource (tmp);
-			}				
+			//		using (ImageSurface imgSurf = new ImageSurface (image, Format.Argb32, 
+			//			Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) {
+			//			gr.SetSourceSurface (imgSurf, 0,0);
+			//			gr.Paint ();
+			//		}
+			//	}
+			//	ctx.SetSource (tmp);
+			//}				
 		}
 		#endregion
 
@@ -156,11 +156,11 @@ namespace Crow
 			gr.Scale (widthRatio, heightRatio);
 			gr.Translate ((rect.Width/widthRatio - Dimensions.Width)/2, (rect.Height/heightRatio - Dimensions.Height)/2);
 			
-			using (ImageSurface imgSurf = new ImageSurface (image, Format.Argb32, 
-				Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) {
-				gr.SetSourceSurface (imgSurf, 0,0);
-				gr.Paint ();
-			}
+			//using (Surface imgSurf = new Surface (. image, Format.Argb32, 
+			//	Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) {
+			//	gr.SetSourceSurface (imgSurf, 0,0);
+			//	gr.Paint ();
+			//}
 			gr.Restore ();
 		}
 	}

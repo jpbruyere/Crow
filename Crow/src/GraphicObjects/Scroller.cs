@@ -28,7 +28,7 @@ using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
-using Crow.Cairo;
+using vkvg;
 
 namespace Crow
 {
@@ -201,13 +201,13 @@ namespace Crow
 			Rectangle rBack = new Rectangle (Slot.Size);
 
 			Background.SetAsSource (gr, rBack);
-			CairoHelpers.CairoRectangle(gr,rBack, CornerRadius);
+			DrawingHelpers.CairoRectangle(gr,rBack, CornerRadius);
 			gr.Fill ();
 
 			gr.Save ();
 			if (ClipToClientRect) {
 				//clip to scrolled client zone
-				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+				DrawingHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
 				gr.Clip ();
 			}
 

@@ -25,13 +25,9 @@
 // THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace Crow
-{
-    public struct Point
+namespace vkvg {
+	public struct Point
     {
         int _x;
         int _y;
@@ -58,25 +54,21 @@ namespace Crow
 		public double LengthD {
 			get { return Math.Sqrt (Math.Pow (_x, 2) + Math.Pow (_y, 2)); }
 		}
-        //public static implicit operator Crow.Cairo.Point(Point p)
-        //{
-        //    return new Crow.Cairo.Point(p.X, p.Y);
-        //}
-        //public static implicit operator Crow.Cairo.PointD(Point p)
-        //{
-        //    return new Crow.Cairo.PointD(p.X, p.Y);
-        //}
+        public static implicit operator PointD(Point p)
+        {
+            return new PointD(p.X, p.Y);
+        }
+        public static implicit operator System.Drawing.Point(Point p)
+        {
+            return new System.Drawing.Point(p.X, p.Y);
+        }
+        public static implicit operator Point(System.Drawing.Point p)
+        {
+            return new Point(p.X, p.Y);
+        }
         public static implicit operator Point(int i)
         {
             return new Point(i, i);
-        }
-		public static implicit operator Point(vkvg.PointD p)
-        {
-            return new Point((int)p.X, (int)p.Y);
-        }
-		public static implicit operator vkvg.PointD(Point p)
-        {
-            return new vkvg.PointD(p.X, p.Y);
         }
         public static Point operator /(Point p, int d)
         {

@@ -28,7 +28,7 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
-using Crow.Cairo;
+using vkvg;
 
 namespace Crow
 {
@@ -172,22 +172,22 @@ namespace Crow
 		}
 		protected override int measureRawSize (LayoutingType lt)
 		{
-			if ((lt == LayoutingType.Width && contentSize.Width == 0) || (lt == LayoutingType.Height && contentSize.Height == 0)) {
-                if (size != default(Size))
-                    contentSize = size;
-                else
-                {
-                    using (Surface drawing = new ImageSurface(Format.A1, 1, 1))
-                    {
-                        using (Context ctx = new Context(drawing))
-                        {
-                            executePath(ctx);
-                            Rectangle r = ctx.StrokeExtents();
-                            contentSize = new Size(r.Right, r.Bottom);
-                        }
-                    }
-                }
-			}
+			//if ((lt == LayoutingType.Width && contentSize.Width == 0) || (lt == LayoutingType.Height && contentSize.Height == 0)) {
+   //             if (size != default(Size))
+   //                 contentSize = size;
+   //             else
+   //             {
+   //                 using (Surface drawing = new Surface(IFace.dev, 1, 1))
+   //                 {
+   //                     using (Context ctx = new Context(drawing))
+   //                     {
+   //                         executePath(ctx);
+   //                         Rectangle r = ctx.StrokeExtents();
+   //                         contentSize = new Size(r.Right, r.Bottom);
+   //                     }
+   //                 }
+   //             }
+			//}
 			return lt == LayoutingType.Width ?
 				contentSize.Width + 2 * Margin: contentSize.Height + 2 * Margin;
 		}

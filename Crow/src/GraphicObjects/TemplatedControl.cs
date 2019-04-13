@@ -29,7 +29,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Xml;
 using System.Reflection;
-using Crow.Cairo;
+using vkvg;
 
 namespace Crow
 {
@@ -120,7 +120,7 @@ namespace Crow
 
 			if (ClipToClientRect) {
 				//clip to client zone
-				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+				DrawingHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
 				gr.Clip ();
 			}
 

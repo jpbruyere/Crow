@@ -28,7 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
-using Crow.Cairo;
+using vkvg;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
@@ -292,7 +292,7 @@ namespace Crow
 
 			if (ClipToClientRect) {
 				//clip to client zone
-				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+				DrawingHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
 				gr.Clip ();
 			}
 
@@ -317,7 +317,7 @@ namespace Crow
 				base.onDraw (gr);
 
 				if (ClipToClientRect) {
-					CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+					DrawingHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
 					gr.Clip ();
 				}
 

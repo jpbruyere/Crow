@@ -44,7 +44,7 @@
     <OutputPath>$(SolutionDir)build\Release</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="src\**\*.cs" Exclude="src\Mono.Cairo\NativeMethods-internal.cs;src\backends\win32\User32\Structs\RawInputDevice.cs" />
+    <Compile Include="src\**\*.cs" Exclude="src\Mono.Cairo\NativeMethods-internal.cs;src\backends\win32\User32\Structs\RawInputDevice.cs;src\vkvg\Point.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -76,6 +76,7 @@
     <Folder Include="src\backends\" />
     <Folder Include="src\backends\xlib\" />
     <Folder Include="src\backends\xcb\" />
+    <Folder Include="src\vkvg\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icons\*.*" />

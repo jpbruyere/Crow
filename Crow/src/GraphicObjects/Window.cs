@@ -296,7 +296,7 @@ namespace Crow
 
 			if (!hoverBorder) {
 				currentDirection = Direction.None;
-				IFace.MouseCursor = MouseCursors.Default;
+				//IFace.MouseCursor = MouseCursors.Default;
 				return;
 			}
 
@@ -330,37 +330,37 @@ namespace Crow
 				else
 					currentDirection = Direction.None;
 
-				if (currentDirection != lastDir) {
-					switch (currentDirection) {
-					case Direction.None:
-						otkgw.MouseCursor = MouseCursors.Default;
-						break;
-					case Direction.N:
-						otkgw.MouseCursor = MouseCursors.V;
-						break;
-					case Direction.S:
-						otkgw.MouseCursor = MouseCursors.V;
-						break;
-					case Direction.E:
-						otkgw.MouseCursor = MouseCursors.H;
-						break;
-					case Direction.W:
-						otkgw.MouseCursor = MouseCursors.H;
-						break;
-					case Direction.NW:
-						otkgw.MouseCursor = MouseCursors.NW;
-						break;
-					case Direction.NE:
-						otkgw.MouseCursor = MouseCursors.NE;
-						break;
-					case Direction.SW:
-						otkgw.MouseCursor = MouseCursors.SW;
-						break;
-					case Direction.SE:
-						otkgw.MouseCursor = MouseCursors.SE;
-						break;
-					}
-				}				
+				//if (currentDirection != lastDir) {
+				//	switch (currentDirection) {
+				//	case Direction.None:
+				//		otkgw.MouseCursor = MouseCursors.Default;
+				//		break;
+				//	case Direction.N:
+				//		otkgw.MouseCursor = MouseCursors.V;
+				//		break;
+				//	case Direction.S:
+				//		otkgw.MouseCursor = MouseCursors.V;
+				//		break;
+				//	case Direction.E:
+				//		otkgw.MouseCursor = MouseCursors.H;
+				//		break;
+				//	case Direction.W:
+				//		otkgw.MouseCursor = MouseCursors.H;
+				//		break;
+				//	case Direction.NW:
+				//		otkgw.MouseCursor = MouseCursors.NW;
+				//		break;
+				//	case Direction.NE:
+				//		otkgw.MouseCursor = MouseCursors.NE;
+				//		break;
+				//	case Direction.SW:
+				//		otkgw.MouseCursor = MouseCursors.SW;
+				//		break;
+				//	case Direction.SE:
+				//		otkgw.MouseCursor = MouseCursors.SE;
+				//		break;
+				//	}
+				//}				
 			}				
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
@@ -423,7 +423,7 @@ namespace Crow
 		{
 			hoverBorder = false;
 			currentDirection = Direction.None;
-			IFace.MouseCursor = MouseCursors.Default;
+			//IFace.MouseCursor = MouseCursors.Default;
 		}
 		protected virtual void onBorderMouseEnter (object sender, MouseMoveEventArgs e)
 		{
@@ -433,7 +433,7 @@ namespace Crow
 
 		protected void butQuitPress (object sender, MouseButtonEventArgs e)
 		{
-			IFace.MouseCursor = MouseCursors.Default;
+			//IFace.MouseCursor = MouseCursors.Default;
 			close ();
 		}
 

@@ -28,7 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.ComponentModel;
-using Crow.Cairo;
+using vkvg;
 
 namespace Crow
 {
@@ -145,44 +145,44 @@ namespace Crow
 		{
 			base.onDraw (gr);
 
-			if (values.Count == 0)
-				return;
-			Rectangle r = ClientRectangle;
+//			if (values.Count == 0)
+//				return;
+//			Rectangle r = ClientRectangle;
 
-			int i = values.Count -1;
+//			int i = values.Count -1;
 
-			double ptrX = (double)r.Right;
-			double scaleY = (double)r.Height / (Maximum - Minimum);
-			double stepX = (double)r.Width / (double)(nbValues-1);
+//			double ptrX = (double)r.Right;
+//			double scaleY = (double)r.Height / (Maximum - Minimum);
+//			double stepX = (double)r.Width / (double)(nbValues-1);
 
-			gr.LineWidth = 1.0;
-			gr.SetDash (new double[]{ 1.0 },0.0);
+//			gr.LineWidth = 1.0;
+//			gr.SetDash (new double[]{ 1.0 },0.0);
 
 
 
-			LowThresholdFill.SetAsSource (gr);
-			gr.MoveTo (r.Left, r.Bottom - LowThreshold * scaleY);
-			gr.LineTo (r.Right, r.Bottom - LowThreshold * scaleY);
-//			gr.Rectangle (r.Left, r.Bottom - LowThreshold * scaleY, r.Width, LowThreshold * scaleY);
-			gr.Stroke();
+//			LowThresholdFill.SetAsSource (gr);
+//			gr.MoveTo (r.Left, r.Bottom - LowThreshold * scaleY);
+//			gr.LineTo (r.Right, r.Bottom - LowThreshold * scaleY);
+////			gr.Rectangle (r.Left, r.Bottom - LowThreshold * scaleY, r.Width, LowThreshold * scaleY);
+//			gr.Stroke();
 
-			HighThresholdFill.SetAsSource (gr);
-			gr.MoveTo (r.Left, (Maximum - HighThreshold) * scaleY);
-			gr.LineTo (r.Right, (Maximum - HighThreshold) * scaleY);
-//			gr.Rectangle (r.Left, r.Top, r.Width, (Maximum - HighThreshold) * scaleY);
-			gr.Stroke();
+//			HighThresholdFill.SetAsSource (gr);
+//			gr.MoveTo (r.Left, (Maximum - HighThreshold) * scaleY);
+//			gr.LineTo (r.Right, (Maximum - HighThreshold) * scaleY);
+////			gr.Rectangle (r.Left, r.Top, r.Width, (Maximum - HighThreshold) * scaleY);
+			//gr.Stroke();
 
-			gr.MoveTo (ptrX, values [i] * scaleY);
+			//gr.MoveTo (ptrX, values [i] * scaleY);
 
-			Foreground.SetAsSource (gr);
-			gr.SetDash (new double[]{ }, 0.0);
+			//Foreground.SetAsSource (gr);
+			//gr.SetDash (new double[]{ }, 0.0);
 
-			while (i >= 0) {
-					gr.LineTo (ptrX, r.Bottom - values [i] * scaleY);
-				ptrX -= stepX;
-				i--;
-			}
-			gr.Stroke ();
+			//while (i >= 0) {
+			//		gr.LineTo (ptrX, r.Bottom - values [i] * scaleY);
+			//	ptrX -= stepX;
+			//	i--;
+			//}
+			//gr.Stroke ();
 		}
 	}
 }

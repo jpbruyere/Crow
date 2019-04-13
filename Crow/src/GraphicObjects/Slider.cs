@@ -25,7 +25,7 @@
 // THE SOFTWARE.
 
 using System;
-using Crow.Cairo;
+using vkvg;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -166,7 +166,7 @@ namespace Crow
 		}
 		protected virtual void DrawCursor(Context gr, Rectangle _cursor)
 		{
-			CairoHelpers.CairoRectangle (gr, _cursor, CornerRadius);
+			DrawingHelpers.CairoRectangle (gr, _cursor, CornerRadius);
             Foreground.SetAsSource(gr, _cursor);
             gr.StrokePreserve();
             CursorColor.SetAsSource(gr, _cursor);

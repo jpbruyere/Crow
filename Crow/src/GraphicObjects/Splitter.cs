@@ -90,10 +90,10 @@ namespace Crow
 		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseEnter (sender, e);
-			if ((Parent as GenericStack).Orientation == Orientation.Horizontal)
-				IFace.MouseCursor = MouseCursors.H;
-			else
-				IFace.MouseCursor = MouseCursors.V;
+			//if ((Parent as GenericStack).Orientation == Orientation.Horizontal)
+			//	IFace.MouseCursor = MouseCursors.H;
+			//else
+				//IFace.MouseCursor = MouseCursors.V;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{

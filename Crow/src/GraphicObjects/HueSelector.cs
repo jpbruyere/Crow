@@ -27,7 +27,7 @@
 using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
-using Crow.Cairo;
+using vkvg;
 
 namespace Crow
 {
@@ -91,7 +91,7 @@ namespace Crow
 			grad.Stops.Add (new Gradient.ColorStop (1,     new Color (1, 0, 0, 1)));
 
 			grad.SetAsSource (gr, r);
-			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
+			DrawingHelpers.CairoRectangle (gr, r, CornerRadius);
 			gr.Fill();
 		}
 
@@ -114,7 +114,7 @@ namespace Crow
 				r.Y = mousePos.Y - 2;
 			}
 
-			CairoHelpers.CairoRectangle (ctx, r, 1);
+			DrawingHelpers.CairoRectangle (ctx, r, 1);
 			ctx.SetSourceColor (Color.White);
 			ctx.LineWidth = 1.0;
 			ctx.Stroke();

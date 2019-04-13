@@ -26,7 +26,7 @@
 
 using System;
 using System.Collections.Generic;
-using Crow.Cairo;
+using vkvg;
 
 namespace Crow
 {
@@ -81,29 +81,29 @@ namespace Crow
 
 		public override void SetAsSource (Context ctx, Rectangle bounds = default(Rectangle))
 		{
-			Crow.Cairo.Gradient grad = null;
-			switch (GradientType) {
-			case Type.Vertical:
-				grad = new Crow.Cairo.LinearGradient (bounds.Left, bounds.Top, bounds.Left, bounds.Bottom);
-				break;
-			case Type.Horizontal:
-				grad = new Crow.Cairo.LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Top);
-				break;
-			case Type.Oblic:
-				grad = new Crow.Cairo.LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-				break;
-			case Type.Radial:
-				throw new NotImplementedException ();
-			}
+			//Gradient grad = null;
+			//switch (GradientType) {
+			//case Type.Vertical:
+			//	grad = new LinearGradient (bounds.Left, bounds.Top, bounds.Left, bounds.Bottom);
+			//	break;
+			//case Type.Horizontal:
+			//	grad = new LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Top);
+			//	break;
+			//case Type.Oblic:
+			//	grad = new LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
+			//	break;
+			//case Type.Radial:
+			//	throw new NotImplementedException ();
+			//}
 
-			foreach (ColorStop cs in Stops) {
-				if (cs == null)
-					continue;
-				grad.AddColorStop (cs.Offset, cs.Color);
-			}
+			//foreach (ColorStop cs in Stops) {
+			//	if (cs == null)
+			//		continue;
+			//	grad.AddColorStop (cs.Offset, cs.Color);
+			//}
 			
-			ctx.SetSource (grad);
-			grad.Dispose ();
+			//ctx.SetSource (grad);
+			//grad.Dispose ();
 		}
 		#endregion
 

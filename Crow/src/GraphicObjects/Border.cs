@@ -28,7 +28,7 @@ using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
-using Crow.Cairo;
+using vkvg;
 
 namespace Crow
 {
@@ -134,7 +134,7 @@ namespace Crow
 			gr.Save ();
 			if (ClipToClientRect) {
 				//clip to client zone
-				CairoHelpers.CairoRectangle (gr, ClientRectangle,Math.Max(0.0, CornerRadius-Margin));
+				DrawingHelpers.CairoRectangle (gr, ClientRectangle,Math.Max(0.0, CornerRadius-Margin));
 				gr.Clip ();
 			}
 
@@ -150,14 +150,14 @@ namespace Crow
 			//				rBack.Inflate (-BorderWidth / 2);
 
 			Background.SetAsSource (gr, rBack);
-			CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
+			DrawingHelpers.CairoRectangle(gr, rBack, CornerRadius);
 			gr.Fill ();
 
 
 			if (BorderStyle == BorderStyle.Normal) {
 				if (BorderWidth > 0) {
 					Foreground.SetAsSource (gr, rBack);
-					CairoHelpers.CairoRectangle (gr, rBack, CornerRadius, BorderWidth);
+					DrawingHelpers.CairoRectangle (gr, rBack, CornerRadius, BorderWidth);
 				}
 			} else {
 				gr.LineWidth = 1.0;
@@ -237,7 +237,7 @@ namespace Crow
 			//				rBack.Inflate (-BorderWidth / 2);
 
 			Background.SetAsSource (gr, rBack);
-			CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
+			DrawingHelpers.CairoRectangle(gr, rBack, CornerRadius);
 			gr.Fill ();
 
 			double bw = _borderWidth;
@@ -252,7 +252,7 @@ namespace Crow
 					else
 						gr.SetSourceColor (sunkenColor);
 
-					CairoHelpers.CairoRectangle (gr, rBack, crad, bw);
+					DrawingHelpers.CairoRectangle (gr, rBack, crad, bw);
 
 					if (BorderStyle == BorderStyle.Sunken)
 						gr.SetSourceColor (sunkenColor);
@@ -264,7 +264,7 @@ namespace Crow
 					rBack.Height -= (int)Math.Round(bw);
 				}
 
-				CairoHelpers.CairoRectangle (gr, rBack, crad, bw);
+				DrawingHelpers.CairoRectangle (gr, rBack, crad, bw);
 			}
 		}
 		#endregion

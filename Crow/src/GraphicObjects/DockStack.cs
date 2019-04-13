@@ -28,6 +28,7 @@ using Crow.IML;
 using System.Linq;
 using System.Text;
 using System.IO;
+using vkvg;
 
 namespace Crow
 {
@@ -189,19 +190,19 @@ namespace Crow
 			RegisterForGraphicUpdate ();
 		}
 
-		protected override void onDraw (Crow.Cairo.Context gr)
+		protected override void onDraw (Context gr)
 		{
 			gr.Save ();
 
 			Rectangle rBack = new Rectangle (Slot.Size);
 
 			Background.SetAsSource (gr, rBack);
-			CairoHelpers.CairoRectangle (gr, rBack, CornerRadius);
+			DrawingHelpers.CairoRectangle (gr, rBack, CornerRadius);
 			gr.Fill ();
 
 			if (ClipToClientRect) {
 				//clip to client zone
-				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+				DrawingHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
 				gr.Clip ();
 			}
 
@@ -248,9 +249,9 @@ namespace Crow
 					break;
 				}
 				gr.LineWidth = 1;
-				gr.SetSourceRGBA (0.4, 0.4, 0.9, 0.4);
+				gr.SetSourceColor (0.4, 0.4, 0.9, 0.4);
 				gr.FillPreserve ();
-				gr.SetSourceRGBA (0.9, 0.9, 1.0, 0.8);
+				gr.SetSourceColor (0.9, 0.9, 1.0, 0.8);
 				gr.Stroke ();
 			}
 			gr.Restore ();	

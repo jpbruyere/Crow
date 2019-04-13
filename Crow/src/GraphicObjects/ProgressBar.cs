@@ -28,7 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Crow.Cairo;
+using vkvg;
 using System.Diagnostics;
 using System.Xml.Serialization;
 using System.ComponentModel;
@@ -60,7 +60,7 @@ namespace Crow
 			rBack.Width = (int)((double)rBack.Width / Maximum * Value);
 			Foreground.SetAsSource (gr, rBack);
 
-			CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);
+			DrawingHelpers.CairoRectangle(gr,rBack,CornerRadius);
 			gr.Fill();
 		}
 		#endregion

@@ -28,7 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
-using Crow.Cairo;
+using vkvg;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using System.ComponentModel;
@@ -447,14 +447,14 @@ namespace Crow
 			if (lines == null)
 				lines = getLines;
 			if (!textMeasureIsUpToDate) {
-				using (ImageSurface img = new ImageSurface (Format.Argb32, 10, 10)) {
+				using (Surface img = new Surface (IFace.dev, 10, 10)) {
 					using (Context gr = new Context (img)) {
 						//Cairo.FontFace cf = gr.GetContextFontFace ();
 
-						gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-						gr.SetFontSize (Font.Size);
-						gr.FontOptions = Interface.FontRenderingOptions;
-						gr.Antialias = Interface.Antialias;
+						gr.FontFace = Font.Name;
+						gr.FontSize = (uint)Font.Size;
+						//gr.FontOptions = Interface.FontRenderingOptions;
+						//gr.Antialias = Interface.Antialias;
 
 						fe = gr.FontExtents;
 						te = new TextExtents ();
@@ -485,10 +485,10 @@ namespace Crow
 		{
 			base.onDraw (gr);
 
-			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-			gr.SetFontSize (Font.Size);
-			gr.FontOptions = Interface.FontRenderingOptions;
-			gr.Antialias = Interface.Antialias;
+			gr.FontFace = Font.Name;
+			gr.FontSize = (uint)Font.Size;
+			//gr.FontOptions = Interface.FontRenderingOptions;
+			//gr.Antialias = Interface.Antialias;
 
 			rText = new Rectangle(new Size(
 				measureRawSize(LayoutingType.Width), measureRawSize(LayoutingType.Height)));
@@ -691,13 +691,13 @@ namespace Crow
 		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseEnter (sender, e);
-			if (Selectable)
-				IFace.MouseCursor = MouseCursors.Text;
+			//if (Selectable)
+				//IFace.MouseCursor = MouseCursors.Text;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			IFace.MouseCursor = MouseCursors.Default;
+			//IFace.MouseCursor = MouseCursors.Default;
 		}
 		protected override void onFocused (object sender, EventArgs e)
 		{

@@ -31,7 +31,7 @@ using System.Xml.Serialization;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
-using Crow.Cairo;
+using vkvg;
 using System.Diagnostics;
 using Crow.IML;
 using System.Threading;
@@ -133,21 +133,21 @@ namespace Crow
 			parentElem.AppendChild (xe);
 		}
 		public Surface CreateIcon (int dragIconSize = 32) {
-			ImageSurface di = new ImageSurface (Format.Argb32, dragIconSize, dragIconSize);
-			using (Context ctx = new Context (di)) {
-				double div = Math.Max (LastPaintedSlot.Width, LastPaintedSlot.Height);
-				double s = (double)dragIconSize / div;
-				ctx.Scale (s, s);
-				if (bmp == null)
-					this.onDraw (ctx);
-				else {
-					if (LastPaintedSlot.Width>LastPaintedSlot.Height)
-						ctx.SetSourceSurface (bmp, 0, (LastPaintedSlot.Width-LastPaintedSlot.Height)/2);
-					else
-						ctx.SetSourceSurface (bmp, (LastPaintedSlot.Height-LastPaintedSlot.Width)/2, 0);
-					ctx.Paint ();
-				}
-			}
+			Surface di = null; //new ImageSurface (Format.Argb32, dragIconSize, dragIconSize);
+			//using (Context ctx = new Context (di)) {
+			//	double div = Math.Max (LastPaintedSlot.Width, LastPaintedSlot.Height);
+			//	double s = (double)dragIconSize / div;
+			//	ctx.Scale (s, s);
+			//	if (bmp == null)
+			//		this.onDraw (ctx);
+			//	else {
+			//		if (LastPaintedSlot.Width>LastPaintedSlot.Height)
+			//			ctx.SetSourceSurface (bmp, 0, (LastPaintedSlot.Width-LastPaintedSlot.Height)/2);
+			//		else
+			//			ctx.SetSourceSurface (bmp, (LastPaintedSlot.Height-LastPaintedSlot.Width)/2, 0);
+			//		ctx.Paint ();
+			//	}
+			//}
 			return di;
 		}
         public string DesignName {
@@ -490,7 +490,7 @@ namespace Crow
 		/// If enabled, resulting bitmap of graphic object is cached
 		/// speeding up rendering of complex object. Default is enabled.
 		/// </summary>
-		[DesignCategory ("Behavior")][DefaultValue(true)]
+		[DesignCategory ("Behavior")][DefaultValue(false)]
 		public virtual bool CacheEnabled {
 			get { return cacheEnabled; }
 			set {
@@ -1656,7 +1656,7 @@ namespace Crow
 			Rectangle rBack = new Rectangle (Slot.Size);
 
 			background.SetAsSource (gr, rBack);
-			CairoHelpers.CairoRectangle (gr, rBack, cornerRadius);
+			DrawingHelpers.CairoRectangle (gr, rBack, cornerRadius);
 			gr.Fill ();
 
 			#if DEBUG_LOG
@@ -1679,10 +1679,10 @@ namespace Crow
 				bmp.SetSize (Slot.Width, Slot.Height);*/
 			bmp?.Dispose ();
 			//bmp = IFace.surf.CreateSimilar (Content.ColorAlpha, Slot.Width, Slot.Height);
-			bmp = new ImageSurface(Format.Argb32, Slot.Width, Slot.Height);
+			bmp = new Surface(IFace.dev, Slot.Width, Slot.Height);
 
 			using (Context gr = new Context (bmp)) {
-				gr.Antialias = Interface.Antialias;
+				//gr.Antialias = Interface.Antialias;
 				onDraw (gr);
 			}
 
@@ -1753,7 +1753,7 @@ namespace Crow
 		}
 		void paintDisabled(Context gr, Rectangle rb){
 			gr.Operator = Operator.Xor;
-			gr.SetSourceRGBA (0.6, 0.6, 0.6, 0.3);
+			gr.SetSourceColor (0.6, 0.6, 0.6, 0.3);
 			gr.Rectangle (rb);
 			gr.Fill ();
 			gr.Operator = Operator.Over;
