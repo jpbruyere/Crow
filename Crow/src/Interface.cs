@@ -149,9 +149,8 @@ namespace Crow
 			{
 				if (disposing)
 				{
-					// TODO: dispose managed state (managed objects).
+					surf?.Dispose ();
 				}
-				surf?.Dispose ();
 
 
 				disposedValue = true;
