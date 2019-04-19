@@ -42,7 +42,7 @@ namespace Crow
 	public struct Color
     {
 		#region CTOR
-		public Color(double _R, double _G, double _B, double _A)
+		public Color(double _R, double _G, double _B, double _A = 1)
 		{
 			A = _A.Clamp(0,1);
 			R = _R.Clamp(0,1);

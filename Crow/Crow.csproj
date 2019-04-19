@@ -52,6 +52,9 @@
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Drawing" />
+    <Reference Include="VK">
+      <HintPath>..\..\packages\Vulkan.0.1.2.5-alpha\lib\netstandard2.0\VK.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -188,5 +191,6 @@
     <EmbeddedResource Include="Images\Icons\Cursors\sb_v_double_arrow" />
     <EmbeddedResource Include="Images\Icons\Cursors\top_left_corner" />
     <EmbeddedResource Include="Images\Icons\Cursors\top_right_corner" />
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

@@ -750,7 +750,7 @@ namespace Crow
 				if (!clipping.IsEmpty) {
 					IsDirty = true;
 
-					clipping.clear (ctx);
+					clipping.clearAndClip (ctx);
 
 					for (int i = GraphicTree.Count - 1; i >= 0; i--) {
 						Widget p = GraphicTree[i];
@@ -785,7 +785,7 @@ namespace Crow
 					clipping.stroke (ctx, Color.Magenta.AdjustAlpha (0.5));
 					ctx.Stroke ();
 #endif
-
+					//clipping.stroke (ctx, new Color (1, 0, 0));
 					clipping.Reset ();
 					//}
 					//surf.WriteToPng (@"/mnt/data/test.png");
