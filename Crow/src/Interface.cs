@@ -251,7 +251,7 @@ namespace Crow
 		/// Each control need a ref to the root interface containing it, if not set in GraphicObject.currentInterface,
 		/// the ref of this one will be stored in GraphicObject.currentInterface
 		/// </summary>
-		protected static Interface CurrentInterface;
+		public static Interface CurrentInterface;
 		Stopwatch lastClickTime = new Stopwatch();
 		internal Widget armedClick;//store widget with double click on first click
 		internal MouseButtonEventArgs armedClickEventArgs;
@@ -733,6 +733,7 @@ namespace Crow
 			clippingMeasure.StopCycle();
 			#endif
 		}
+		Color clippingStrokeColor = Color.Magenta.AdjustAlpha(0.8);
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
 		void processDrawing(){
@@ -781,8 +782,11 @@ namespace Crow
 					//}
 
 #if DEBUG_CLIP_RECTANGLE
+					clippingStrokeColor.R += 0.1f;
+					if (clippingStrokeColor.R > 1f)
+						clippingStrokeColor.R = 0;
 					ctx.LineWidth = 1;
-					clipping.stroke (ctx, Color.Magenta.AdjustAlpha (0.5));
+					clipping.stroke (ctx, clippingStrokeColor);
 					ctx.Stroke ();
 #endif
 					//clipping.stroke (ctx, new Color (1, 0, 0));

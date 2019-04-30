@@ -63,6 +63,10 @@ namespace vkvg
 			set { NativeMethods.vkvg_set_operator (handle, value); }
 			get { return NativeMethods.vkvg_get_operator (handle); }
 		}
+		public FillRule FillRule {
+			set { NativeMethods.vkvg_set_fill_rule (handle, value); }
+			get { return NativeMethods.vkvg_get_fill_rule (handle); }
+		}
 		public FontExtents FontExtents {
 			get {
 				FontExtents f_extents;
@@ -78,6 +82,9 @@ namespace vkvg
 		}
 		public void ShowText (string txt) {
 			NativeMethods.vkvg_show_text (handle, txt);
+		}
+		public void ShowText (TextRun textRun) {
+			NativeMethods.vkvg_show_text_run (handle, textRun.Handle);
 		}
 		public void Save () {
 			NativeMethods.vkvg_save (handle);
@@ -232,7 +239,7 @@ namespace vkvg
 			NativeMethods.vkvg_set_source_surface (handle, surf.Handle, x, y);
 		}
 
-		private static byte[] TerminateUtf8(string s)
+		internal static byte[] TerminateUtf8(string s)
 		{
 			// compute the byte count including the trailing \0
 			var byteCount = Encoding.UTF8.GetMaxByteCount(s.Length + 1);

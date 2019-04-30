@@ -78,6 +78,9 @@ namespace vkvg {
 		public void AddColorStop (float offset, float r, float g, float b, float a = 1f) {
 			NativeMethods.vkvg_patter_add_color_stop (handle, offset, r, g, b, a);
 		}
+		public void AddColorStop (float offset, Crow.Color c) {
+			NativeMethods.vkvg_patter_add_color_stop (Handle, offset, (float)c.R, (float)c.G, (float)c.B, (float)c.A);
+		}
 
 		#region IDisposable implementation
 		public void Dispose () {

@@ -91,6 +91,7 @@ namespace Crow {
             gr.LineTo(x + radius, y + height);
             gr.Arc(x + radius, y + height - radius, radius, Math.PI / 2, Math.PI);
             gr.ClosePath();
+
             gr.Restore();
         }
         public static void StrokeRaisedRectangle(Context gr, Rectangle r, double width = 1)

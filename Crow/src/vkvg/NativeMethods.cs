@@ -122,6 +122,10 @@ namespace vkvg
 		internal static extern void vkvg_set_line_join (IntPtr ctx, LineJoin join);
 		[DllImport (libvkvg, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern void vkvg_set_operator (IntPtr ctx, Operator op);
+		[DllImport (libvkvg, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern FillRule vkvg_get_fill_rule (IntPtr ctx);
+		[DllImport (libvkvg, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void vkvg_set_fill_rule (IntPtr ctx, FillRule fr);
 		[DllImport (libvkvg, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern Operator vkvg_get_operator (IntPtr ctx);
 		[DllImport (libvkvg, CallingConvention=CallingConvention.Cdecl)]
@@ -168,7 +172,7 @@ namespace vkvg
 		[DllImport (libvkvg, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern void vkvg_show_text_run (IntPtr ctx, IntPtr textRun);
 		[DllImport (libvkvg, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern void vkvg_text_run_get_extents (IntPtr textRun);
+		internal static extern void vkvg_text_run_get_extents (IntPtr textRun, out TextExtents extents);
 		#endregion
 
 		#region Pattern

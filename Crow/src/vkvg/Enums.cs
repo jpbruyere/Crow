@@ -136,4 +136,8 @@ namespace vkvg {
 		Round,
 		Bevel
 	}
+	public enum FillRule {
+		EvenOdd,
+		NonZero,
+	}
 }

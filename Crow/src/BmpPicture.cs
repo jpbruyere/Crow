@@ -36,7 +36,7 @@ namespace Crow
 	/// </summary>
 	public class BmpPicture : Picture
 	{
-		byte[] image = null;
+		Surface imgSurface;
 
 		#region CTOR
 		/// <summary>
@@ -49,46 +49,31 @@ namespace Crow
 		/// </summary>
 		/// <param name="path">image path, may be embedded</param>
 		public BmpPicture (string path) : base(path)
-		{}
+		{
+			Load ();
+		}
 		#endregion
 		/// <summary>
 		/// load the image for rendering from the path given as argument
 		/// </summary>
 		/// <param name="path">image path, may be embedded</param>
 		void Load ()
-		{			
-			if (sharedResources.ContainsKey (Path)) {
-				sharedPicture sp = sharedResources [Path];
-				image = (byte[])sp.Data;
-				Dimensions = sp.Dims;
-				return;
-			}
-			using (Stream stream = Interface.StaticGetStreamFromPath (Path)) {				
-				//loadBitmap (new System.Drawing.Bitmap (stream));	
-			}
-			sharedResources [Path] = new sharedPicture (image, Dimensions);
-		}
-
-		//load image via System.Drawing.Bitmap, cairo load png only
-		/*void loadBitmap (System.Drawing.Bitmap bitmap)
 		{
-			if (bitmap == null)
-				return;
+			//if (sharedResources.ContainsKey (Path)) {
+			//	sharedPicture sp = sharedResources [Path];
+			//	image = (byte[])sp.Data;
+			//	Dimensions = sp.Dims;
+			//	return;
+			//}
 
-			System.Drawing.Imaging.BitmapData data = bitmap.LockBits
-				(new System.Drawing.Rectangle (0, 0, bitmap.Width, bitmap.Height),
-					System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-			Dimensions = new Size (bitmap.Width, bitmap.Height);
-
-			int stride = data.Stride;
-			int bitmapSize = Math.Abs (data.Stride) * bitmap.Height;
-
-			image = new byte[bitmapSize];
-			System.Runtime.InteropServices.Marshal.Copy (data.Scan0, image, 0, bitmapSize);
-
-			bitmap.UnlockBits (data);           
-		}*/
+			imgSurface = new Surface (Interface.CurrentInterface.dev, Path);
+			Dimensions.Width = imgSurface.Width;
+			Dimensions.Height = imgSurface.Height;
+			//using (Stream stream = Interface.StaticGetStreamFromPath (Path)) {				
+			//	loadBitmap (new System.Drawing.Bitmap (stream));	
+			//}
+			//sharedResources [Path] = new sharedPicture (image, Dimensions);
+		}			
 
 		#region implemented abstract members of Fill
 
@@ -109,20 +94,16 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-			//using (ImageSurface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
-			//	using (Context gr = new Context (tmp)) {
-			//		gr.Translate (bounds.Left, bounds.Top);
-			//		gr.Scale (widthRatio, heightRatio);
-			//		gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
-
-			//		using (ImageSurface imgSurf = new ImageSurface (image, Format.Argb32, 
-			//			Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) {
-			//			gr.SetSourceSurface (imgSurf, 0,0);
-			//			gr.Paint ();
-			//		}
-			//	}
-			//	ctx.SetSource (tmp);
-			//}				
+			using (Surface tmp = new Surface (Interface.CurrentInterface.dev, bounds.Width, bounds.Height)) {
+				using (Context gr = new Context (tmp)) {
+					gr.Translate (bounds.Left, bounds.Top);
+					gr.Scale (widthRatio, heightRatio);
+					gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
+					gr.SetSourceSurface (imgSurface, 0,0);
+					gr.Paint ();
+				}
+				ctx.SetSource (tmp);
+			}				
 		}
 		#endregion
 
@@ -155,12 +136,8 @@ namespace Crow
 			gr.Translate (rect.Left,rect.Top);
 			gr.Scale (widthRatio, heightRatio);
 			gr.Translate ((rect.Width/widthRatio - Dimensions.Width)/2, (rect.Height/heightRatio - Dimensions.Height)/2);
-			
-			//using (Surface imgSurf = new Surface (. image, Format.Argb32, 
-			//	Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) {
-			//	gr.SetSourceSurface (imgSurf, 0,0);
-			//	gr.Paint ();
-			//}
+			gr.SetSourceSurface (imgSurface, 0,0);
+			gr.Paint ();
 			gr.Restore ();
 		}
 	}

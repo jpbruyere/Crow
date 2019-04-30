@@ -39,6 +39,7 @@ namespace Crow
 			Oblic,
 			Radial
 		}
+
 		public class ColorStop
 		{
 			public double Offset;
@@ -64,6 +65,7 @@ namespace Crow
 				return new ColorStop (-1, (Color)parts [0]);
 			}
 		}
+
 		public Gradient.Type GradientType = Type.Vertical;
 //		public double x0;
 //		public double y0;
@@ -81,29 +83,29 @@ namespace Crow
 
 		public override void SetAsSource (Context ctx, Rectangle bounds = default(Rectangle))
 		{
-			//Gradient grad = null;
-			//switch (GradientType) {
-			//case Type.Vertical:
-			//	grad = new LinearGradient (bounds.Left, bounds.Top, bounds.Left, bounds.Bottom);
-			//	break;
-			//case Type.Horizontal:
-			//	grad = new LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Top);
-			//	break;
-			//case Type.Oblic:
-			//	grad = new LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-			//	break;
-			//case Type.Radial:
-			//	throw new NotImplementedException ();
-			//}
+			Pattern grad = null;
+			switch (GradientType) {
+			case Type.Vertical:
+				grad = Pattern.CreateLinearGradient (bounds.Left, bounds.Top, bounds.Left, bounds.Bottom);
+				break;
+			case Type.Horizontal:
+				grad = Pattern.CreateLinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Top);
+				break;
+			case Type.Oblic:
+				grad = Pattern.CreateLinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
+				break;
+			case Type.Radial:
+				throw new NotImplementedException ();
+			}
 
-			//foreach (ColorStop cs in Stops) {
-			//	if (cs == null)
-			//		continue;
-			//	grad.AddColorStop (cs.Offset, cs.Color);
-			//}
+			foreach (ColorStop cs in Stops) {
+				if (cs == null)
+					continue;
+				grad.AddColorStop ((float)cs.Offset, cs.Color);
+			}
 			
-			//ctx.SetSource (grad);
-			//grad.Dispose ();
+			ctx.SetSource (grad);
+			grad.Dispose ();
 		}
 		#endregion
 
