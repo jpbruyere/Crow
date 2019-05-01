@@ -131,14 +131,15 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-			gr.Save ();
+			Matrix savedMat = gr.Matrix;
 
 			gr.Translate (rect.Left,rect.Top);
 			gr.Scale (widthRatio, heightRatio);
 			gr.Translate ((rect.Width/widthRatio - Dimensions.Width)/2, (rect.Height/heightRatio - Dimensions.Height)/2);
 			gr.SetSourceSurface (imgSurface, 0,0);
 			gr.Paint ();
-			gr.Restore ();
+
+			gr.Matrix = savedMat;
 		}
 	}
 }

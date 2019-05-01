@@ -71,15 +71,15 @@ namespace Crow
 		}
 
 		void computeStats(){			
-			current = timer.ElapsedTicks;
+			current = timer.ElapsedMilliseconds;
 			if (current < cancelLimit)
 				return;
 			cptMeasures++;
-			total += timer.ElapsedTicks;
-			if (timer.ElapsedTicks < minimum)
-				minimum = timer.ElapsedTicks;
-			if (timer.ElapsedTicks > maximum)
-				maximum = timer.ElapsedTicks;			
+			total += timer.ElapsedMilliseconds;
+			if (timer.ElapsedMilliseconds < minimum)
+				minimum = timer.ElapsedMilliseconds;
+			if (timer.ElapsedMilliseconds > maximum)
+				maximum = timer.ElapsedMilliseconds;			
 		}
 		void ResetStats(){
 			cptMeasures = total = current = maximum = 0;

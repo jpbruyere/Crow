@@ -490,7 +490,7 @@ namespace Crow
 		/// If enabled, resulting bitmap of graphic object is cached
 		/// speeding up rendering of complex object. Default is enabled.
 		/// </summary>
-		[DesignCategory ("Behavior")][DefaultValue(false)]
+		[DesignCategory ("Behavior")][DefaultValue(true)]
 		public virtual bool CacheEnabled {
 			get { return cacheEnabled; }
 			set {
@@ -1655,9 +1655,11 @@ namespace Crow
 
 			Rectangle rBack = new Rectangle (Slot.Size);
 
-			background.SetAsSource (gr, rBack);
-			DrawingHelpers.CairoRectangle (gr, rBack, cornerRadius);
-			gr.Fill ();
+			//if (background != Color.Transparent) {
+				background.SetAsSource (gr, rBack);
+				DrawingHelpers.CairoRectangle (gr, rBack, cornerRadius);
+				gr.Fill ();
+			//}
 
 			#if DEBUG_LOG
 			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
@@ -1738,7 +1740,7 @@ namespace Crow
 						paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);					
 				} else {
 					Rectangle rb = Slot + Parent.ClientRectangle.Position;
-					ctx.Save ();
+					//ctx.Save ();
 
 					ctx.Translate (rb.X, rb.Y);
 
@@ -1746,7 +1748,8 @@ namespace Crow
 					if (!isEnabled)
 						paintDisabled (ctx, Slot);
 
-					ctx.Restore ();
+					ctx.Translate (-rb.X, -rb.Y);
+					//ctx.Restore ();
 				}
 				LastPaintedSlot = Slot;
 			}

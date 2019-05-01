@@ -130,7 +130,7 @@ namespace Crow
 				ProcessEvents ();
 
 #if MEASURE_TIME
-				if (frameCount++ < 1000)
+				if (frameCount++ < 100)
 					continue;
 				for (int i = 0; i < PerfMeasures.Count; i++) {
 					PerfMeasures [i].NotifyChanges ();
@@ -747,39 +747,40 @@ namespace Crow
 			if (DragImage != null)
 				clipping.AddRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
 
-			using (ctx = new Context (surf)) {
-				if (!clipping.IsEmpty) {
-					IsDirty = true;
+			lock (RenderMutex) {
+				using (ctx = new Context (surf)) {
+					if (!clipping.IsEmpty) {
+						IsDirty = true;
 
-					clipping.clearAndClip (ctx);
+						clipping.clearAndClip (ctx);
 
-					for (int i = GraphicTree.Count - 1; i >= 0; i--) {
-						Widget p = GraphicTree[i];
-						if (!p.Visible)
-							continue;
-						if (!clipping.intersect (p.Slot))
-							continue;
+						for (int i = GraphicTree.Count - 1; i >= 0; i--) {
+							Widget p = GraphicTree[i];
+							if (!p.Visible)
+								continue;
+							if (!clipping.intersect (p.Slot))
+								continue;
 
-						ctx.Save ();
-						p.Paint (ref ctx);
-						ctx.Restore ();
-					}
+							//ctx.Save ();
+							p.Paint (ref ctx);
+							//ctx.Restore ();
+						}
 
-					//if (DragAndDropOperation != null) {
-					//	if (DragImage != null) {
-					//		DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
-					//		DragImageX = Mouse.X - DragImageWidth / 2;
-					//		DragImageY = Mouse.Y - DragImageHeight / 2;
-					//		ctx.Save ();
-					//		ctx.ResetClip ();
-					//		ctx.SetSourceSurface (DragImage, DragImageX, DragImageY);
-					//		ctx.PaintWithAlpha (0.8);
-					//		ctx.Restore ();
-					//		DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
-					//		IsDirty = true;
-					//		//Console.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
-					//	}
-					//}
+						//if (DragAndDropOperation != null) {
+						//	if (DragImage != null) {
+						//		DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
+						//		DragImageX = Mouse.X - DragImageWidth / 2;
+						//		DragImageY = Mouse.Y - DragImageHeight / 2;
+						//		ctx.Save ();
+						//		ctx.ResetClip ();
+						//		ctx.SetSourceSurface (DragImage, DragImageX, DragImageY);
+						//		ctx.PaintWithAlpha (0.8);
+						//		ctx.Restore ();
+						//		DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
+						//		IsDirty = true;
+						//		//Console.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
+						//	}
+						//}
 
 #if DEBUG_CLIP_RECTANGLE
 					clippingStrokeColor.R += 0.1f;
@@ -789,14 +790,14 @@ namespace Crow
 					clipping.stroke (ctx, clippingStrokeColor);
 					ctx.Stroke ();
 #endif
-					//clipping.stroke (ctx, new Color (1, 0, 0));
-					clipping.Reset ();
-					//}
-					//surf.WriteToPng (@"/mnt/data/test.png");
-						
+						//clipping.stroke (ctx, new Color (1, 0, 0));
+						clipping.Reset ();
+						//}
+						//surf.WriteToPng (@"/mnt/data/test.png");
+
+					}
 				}
 			}
-		
 			/*#if DEBUG_LOG
 			DebugLog.AddEvent (DbgEvtType.IFaceEndDrawing);
 			#endif*/

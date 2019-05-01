@@ -39,6 +39,7 @@ Label {
 	Height = "Fit";
 	Width = "Fit";
 	Margin = "1";
+    CacheEnabled = "false";
 }
 Menu {
 	Margin = "1";

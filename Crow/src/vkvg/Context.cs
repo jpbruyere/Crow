@@ -80,6 +80,16 @@ namespace vkvg
 			NativeMethods.vkvg_text_extents (handle, TerminateUtf8(s), out extents);
 			return extents;
 		}
+		public Matrix Matrix {
+			get {
+				Matrix m;
+				NativeMethods.vkvg_get_matrix (handle, out m);
+				return m;
+			}
+			set {
+				NativeMethods.vkvg_set_matrix (handle, ref value);
+			}
+		}
 		public void ShowText (string txt) {
 			NativeMethods.vkvg_show_text (handle, txt);
 		}
@@ -98,7 +108,6 @@ namespace vkvg
 		public void Clear () {
 			NativeMethods.vkvg_clear (handle);
 		}
-
 		public void Paint () {
 			NativeMethods.vkvg_paint (handle);
 		}
