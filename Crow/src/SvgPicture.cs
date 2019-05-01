@@ -35,7 +35,7 @@ namespace Crow
 	/// </summary>
 	public class SvgPicture : Picture
 	{
-		Rsvg.Handle hSVG;
+		IntPtr nsvgImage;
 
 		#region CTOR
 		/// <summary>
@@ -54,34 +54,30 @@ namespace Crow
 		#endregion
 
 		void Load ()
-		{			
-			if (sharedResources.ContainsKey (Path)) {
-				sharedPicture sp = sharedResources [Path];
-				hSVG = (Rsvg.Handle)sp.Data;
-				Dimensions = sp.Dims;
-				return;
+		{
+			using (StreamReader sr = new StreamReader(Interface.CurrentInterface.GetStreamFromPath (Path))) {
+				nsvgImage = Interface.CurrentInterface.dev.LoadSvgFragment (sr.ReadToEnd ());
 			}
-			using (Stream stream = Interface.StaticGetStreamFromPath (Path)) {
-				using (MemoryStream ms = new MemoryStream ()) {
-					stream.CopyTo (ms);
-
-					hSVG = new Rsvg.Handle (ms.ToArray ());
-					Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
-				}
-			}
-			sharedResources [Path] = new sharedPicture (hSVG, Dimensions);
+			int w, h;
+			NativeMethods.nsvg_get_size (nsvgImage, out w, out h);
+			Dimensions.Width = w;
+			Dimensions.Height = h;
 		}
 
-		public void LoadSvgFragment (string fragment) {			
-			hSVG = new Rsvg.Handle (System.Text.Encoding.Unicode.GetBytes(fragment));
-			Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
+		public void LoadSvgFragment (string fragment) {
+			throw new NotImplementedException ();
+			/*hSVG = new Rsvg.Handle (System.Text.Encoding.Unicode.GetBytes(fragment));
+			Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);*/
 		}
 
 		#region implemented abstract members of Fill
 
 		public override void SetAsSource (Context ctx, Rectangle bounds = default(Rectangle))
 		{
-			float widthRatio = 1f;
+			if (nsvgImage == IntPtr.Zero)
+				return;
+			throw new NotImplementedException ();
+			/*float widthRatio = 1f;
 			float heightRatio = 1f;
 
 			if (Scaled){
@@ -96,16 +92,16 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-			//using (ImageSurface tmp = new ImageSurface (Format.Argb32, bounds.Width, bounds.Height)) {
-			//	using (Context gr = new Context (tmp)) {
-			//		gr.Translate (bounds.Left, bounds.Top);
-			//		gr.Scale (widthRatio, heightRatio);
-			//		gr.Translate ((bounds.Width/widthRatio - Dimensions.Width)/2, (bounds.Height/heightRatio - Dimensions.Height)/2);
-
-			//		hSVG.RenderCairo (gr);
-			//	}
-			//	ctx.SetSource (tmp);
-			//}	
+			using (Surface tmp = new Surface (Interface.CurrentInterface.dev, bounds.Width, bounds.Height)) {
+				using (Context gr = new Context (tmp)) {
+					gr.Translate (bounds.Left, bounds.Top);
+					gr.Scale (widthRatio, heightRatio);
+					gr.Translate ((bounds.Width / widthRatio - Dimensions.Width) / 2, (bounds.Height / heightRatio - Dimensions.Height) / 2);
+					gr.SetSourceSurface (svgSurface, 0, 0);
+					gr.Paint ();
+				}
+				ctx.SetSource (tmp);
+			}*/
 		}
 		#endregion
 
@@ -118,8 +114,9 @@ namespace Crow
 		/// <param name="subPart">limit rendering to svg part named 'subPart'</param>
 		public override void Paint (Context gr, Rectangle rect, string subPart = "")
 		{
-			if (hSVG == null)
+			if (nsvgImage == IntPtr.Zero)
 				return;
+
 			float widthRatio = 1f;
 			float heightRatio = 1f;
 
@@ -133,19 +130,15 @@ namespace Crow
 				else
 					widthRatio = heightRatio;
 			}
-				
+
 			gr.Save ();
 
-			gr.Translate (rect.Left,rect.Top);
+			gr.Translate (rect.Left, rect.Top);
 			gr.Scale (widthRatio, heightRatio);
-			gr.Translate (((float)rect.Width/widthRatio - Dimensions.Width)/2f, ((float)rect.Height/heightRatio - Dimensions.Height)/2f);
+			gr.Translate ((rect.Width / widthRatio - Dimensions.Width) / 2, (rect.Height / heightRatio - Dimensions.Height) / 2);
+			gr.RenderSvg (nsvgImage);
 
-			/*if (string.IsNullOrEmpty (subPart))
-				hSVG.RenderCairo (gr);
-			else
-				hSVG.RenderCairoSub (gr, "#" + subPart);*/
-			
-			gr.Restore ();			
+			gr.Restore ();
 		}
 	}
 }

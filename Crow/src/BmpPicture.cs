@@ -131,7 +131,7 @@ namespace Crow
 					widthRatio = heightRatio;
 			}
 
-			Matrix savedMat = gr.Matrix;
+			gr.Save ();
 
 			gr.Translate (rect.Left,rect.Top);
 			gr.Scale (widthRatio, heightRatio);
@@ -139,7 +139,7 @@ namespace Crow
 			gr.SetSourceSurface (imgSurface, 0,0);
 			gr.Paint ();
 
-			gr.Matrix = savedMat;
+			gr.Restore ();
 		}
 	}
 }

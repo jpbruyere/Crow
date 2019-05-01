@@ -76,8 +76,9 @@ namespace vkvg
 		}
 		public TextExtents TextExtents(string s)
 		{
-			TextExtents extents;
-			NativeMethods.vkvg_text_extents (handle, TerminateUtf8(s), out extents);
+			TextExtents extents = default(TextExtents);
+			if (!string.IsNullOrEmpty(s))
+				NativeMethods.vkvg_text_extents (handle, TerminateUtf8(s), out extents);
 			return extents;
 		}
 		public Matrix Matrix {
@@ -247,7 +248,9 @@ namespace vkvg
 		public void SetSourceSurface (Surface surf, float x = 0f, float y = 0f) {
 			NativeMethods.vkvg_set_source_surface (handle, surf.Handle, x, y);
 		}
-
+		public void RenderSvg (IntPtr nsvgImage) {
+			NativeMethods.vkvg_render_svg (handle, nsvgImage);
+		}
 		internal static byte[] TerminateUtf8(string s)
 		{
 			// compute the byte count including the trailing \0

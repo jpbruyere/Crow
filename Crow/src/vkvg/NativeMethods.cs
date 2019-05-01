@@ -244,8 +244,12 @@ namespace vkvg
 		#region Surface
 		[DllImport (libvkvg, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern IntPtr vkvg_surface_create (IntPtr device, uint width, uint height);
-		[DllImport (libvkvg, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern IntPtr vkvg_surface_create_from_image  (IntPtr dev, string filePath);
+		[DllImport (libvkvg, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern IntPtr vkvg_surface_create_from_image (IntPtr dev, string filePath);
+		[DllImport (libvkvg, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern IntPtr vkvg_surface_create_from_svg (IntPtr dev, string filePath);
+		[DllImport (libvkvg, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern IntPtr vkvg_surface_create_from_svg_fragment (IntPtr dev, byte[] filePath);
 		[DllImport (libvkvg, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern IntPtr vkvg_surface_create_from_bitmap  (IntPtr dev, ref byte[] data, uint width, uint height);
 		[DllImport (libvkvg, CallingConvention=CallingConvention.Cdecl)]
@@ -264,6 +268,19 @@ namespace vkvg
 		internal static extern uint vkvg_surface_get_reference_count (IntPtr surf);
 		[DllImport (libvkvg, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern void vkvg_surface_write_to_png (IntPtr surf, [MarshalAs(UnmanagedType.LPStr)]string path);
+		#endregion
+
+		#region NSVG
+		[DllImport (libvkvg, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern IntPtr nsvg_load_file (IntPtr dev, string filePath);
+		[DllImport (libvkvg, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern IntPtr nsvg_load (IntPtr dev, byte[] fragment);
+		[DllImport (libvkvg, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void nsvg_destroy (IntPtr nsvgImage);
+		[DllImport (libvkvg, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void nsvg_get_size (IntPtr nsvgImage, out int width, out int height);
+		[DllImport (libvkvg, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void vkvg_render_svg (IntPtr ctx, IntPtr nsvgImage);
 		#endregion
 	}
 }

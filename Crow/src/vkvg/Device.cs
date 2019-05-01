@@ -56,6 +56,16 @@ namespace vkvg
 
 		public IntPtr Handle { get { return handle; }}
 
+		public IntPtr LoadSvg (string path) {
+			return NativeMethods.nsvg_load_file (handle, path);
+		}
+		public void DestroySvg (IntPtr nsvgImage) {
+			NativeMethods.nsvg_destroy (nsvgImage);
+		}
+		public IntPtr LoadSvgFragment (string fragment) {
+			return NativeMethods.nsvg_load (handle, Context.TerminateUtf8(fragment));
+		}
+
 		#region IDisposable implementation
 		public void Dispose ()
 		{

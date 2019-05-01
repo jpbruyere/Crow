@@ -44,7 +44,10 @@ namespace vkvg
 		}
 		public Surface (Device device, string imgPath) {
 			vkvgDev = device;
-			handle = NativeMethods.vkvg_surface_create_from_image (device.Handle, imgPath);
+			if (string.Compare(System.IO.Path.GetExtension(imgPath), ".svg", StringComparison.OrdinalIgnoreCase) == 0)
+				handle = NativeMethods.vkvg_surface_create_from_svg (device.Handle, imgPath);
+			else
+				handle = NativeMethods.vkvg_surface_create_from_image (device.Handle, imgPath);
 		}
 
 		Surface (IntPtr devHandle, int width, int heigth)
