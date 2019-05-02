@@ -248,8 +248,8 @@ namespace vkvg
 		public void SetSourceSurface (Surface surf, float x = 0f, float y = 0f) {
 			NativeMethods.vkvg_set_source_surface (handle, surf.Handle, x, y);
 		}
-		public void RenderSvg (IntPtr nsvgImage) {
-			NativeMethods.vkvg_render_svg (handle, nsvgImage);
+		public void RenderSvg (IntPtr nsvgImage, string subId = null) {
+			NativeMethods.vkvg_render_svg (handle, nsvgImage, subId);
 		}
 		internal static byte[] TerminateUtf8(string s)
 		{

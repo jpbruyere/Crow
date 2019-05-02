@@ -280,7 +280,7 @@ namespace vkvg
 		[DllImport (libvkvg, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void nsvg_get_size (IntPtr nsvgImage, out int width, out int height);
 		[DllImport (libvkvg, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void vkvg_render_svg (IntPtr ctx, IntPtr nsvgImage);
+		internal static extern void vkvg_render_svg (IntPtr ctx, IntPtr nsvgImage, string subId);
 		#endregion
 	}
 }
