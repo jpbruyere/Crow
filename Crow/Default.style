@@ -171,6 +171,7 @@ ColorSpinner {
 	Minimum = "0";
 	Maximum = "255";
 	SmallIncrement = "1";
+    Width="50";
 }
 HSVSpinner {
 	Minimum = "0";
@@ -223,4 +224,9 @@ HScrollBar {
     Value = "0";
     Height = "12";
     Width = "Stretched";
+}
+EnumSelector {
+    Orientation = "Vertical";
+    Height = "Fit";
+    Spacing = "0";
 }

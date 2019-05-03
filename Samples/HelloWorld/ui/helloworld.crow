@@ -1,0 +1,8 @@
+﻿<?xml version="1.0"?>
+<Window Caption="Hello World" Icon="#Crow.Icons.crow.svg" Width="40%" Height="40%" CornerRadius="5">
+    <VerticalStack>
+        <Label Text="Hello World" Font="mono, 20"/>
+        <Image Path="#Crow.Icons.crow.svg"/>
+    </VerticalStack>
+</Window>
+

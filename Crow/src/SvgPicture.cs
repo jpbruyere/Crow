@@ -58,6 +58,7 @@ namespace Crow
 			using (StreamReader sr = new StreamReader(Interface.CurrentInterface.GetStreamFromPath (Path))) {
 				nsvgImage = Interface.CurrentInterface.dev.LoadSvgFragment (sr.ReadToEnd ());
 			}
+
 			int w, h;
 			NativeMethods.nsvg_get_size (nsvgImage, out w, out h);
 			Dimensions.Width = w;
@@ -136,7 +137,8 @@ namespace Crow
 			gr.Translate (rect.Left, rect.Top);
 			gr.Scale (widthRatio, heightRatio);
 			gr.Translate ((rect.Width / widthRatio - Dimensions.Width) / 2, (rect.Height / heightRatio - Dimensions.Height) / 2);
-			gr.RenderSvg (nsvgImage);
+
+			gr.RenderSvg (nsvgImage, subPart);
 
 			gr.Restore ();
 		}

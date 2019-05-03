@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<Container Name="topContainer" HorizontalAlignment="Center" VerticalAlignment="Top"
+	Margin="2"
+	Width="600" Height="-1">
+	<Border Margin="2" BorderWidth="1" Background="0,6;0,6;0,6;0,6" Height="-1">
+		<Group Width="0" Name="logs">
+			<VerticalStack Name="VerticalStack" Width="0" Focusable="False">
+				<Label Name="line1" Width="0" Text="Line1" Margin="0"/>
+				<Label Name="line2" Width="0" Text="Line2" Margin="0"/>
+				<Label Name="line3" Width="0" Text="Line3" Margin="0"/>
+				<Label Name="line4" Width="0" Text="Line4" Margin="0"/>
+			</VerticalStack>
+			<Button Name="btOk" Background="Gray" Fit="True"
+				HorizontalAlignment="Right" VerticalAlignment="Bottom"
+				MouseClick="BtOk_MouseClick">
+				<Label Text="Ok" Margin="3" Foreground="White" />
+			</Button>
+		</Group>
+	</Border>
+</Container>
+

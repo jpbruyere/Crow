@@ -149,6 +149,7 @@ namespace Crow
 			{
 				if (disposing)
 				{
+					ClearInterface ();
 					surf?.Dispose ();
 				}
 
@@ -761,26 +762,10 @@ namespace Crow
 							if (!clipping.intersect (p.Slot))
 								continue;
 
-							//ctx.Save ();
+							ctx.Save ();
 							p.Paint (ref ctx);
-							//ctx.Restore ();
+							ctx.Restore ();
 						}
-
-						//if (DragAndDropOperation != null) {
-						//	if (DragImage != null) {
-						//		DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
-						//		DragImageX = Mouse.X - DragImageWidth / 2;
-						//		DragImageY = Mouse.Y - DragImageHeight / 2;
-						//		ctx.Save ();
-						//		ctx.ResetClip ();
-						//		ctx.SetSourceSurface (DragImage, DragImageX, DragImageY);
-						//		ctx.PaintWithAlpha (0.8);
-						//		ctx.Restore ();
-						//		DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
-						//		IsDirty = true;
-						//		//Console.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
-						//	}
-						//}
 
 #if DEBUG_CLIP_RECTANGLE
 					clippingStrokeColor.R += 0.1f;
@@ -1134,23 +1119,29 @@ namespace Crow
 			return true;
 		}
 
-		public void ProcessKeyPress (char c)
+		public bool ProcessKeyPress (char c)
 		{
-			if (_focusedWidget != null)
-				_focusedWidget.onKeyPress (this, new KeyPressEventArgs (c));
+			if (_focusedWidget == null)
+				return false;
+			_focusedWidget.onKeyPress (this, new KeyPressEventArgs (c));
+			return true;
 		}
 
-		public void ProcessKeyUp (Key key)
+		public bool ProcessKeyUp (Key key)
 		{
-			if (_focusedWidget != null)
-				_focusedWidget.onKeyUp (this, new KeyEventArgs (key, false));
+			if (_focusedWidget == null)
+				return false;
+			_focusedWidget.onKeyUp (this, new KeyEventArgs (key, false));
+			return true;
 		}
-		public void ProcessKeyDown (Key key)
+		public bool ProcessKeyDown (Key key)
 		{
 			lastKeyDownEvt = new KeyEventArgs (key, true);
 
-			if (_focusedWidget != null)
-				_focusedWidget.onKeyDown (this, new KeyEventArgs (key, false));
+			if (_focusedWidget == null)
+				return false;
+			_focusedWidget.onKeyDown (this, new KeyEventArgs (key, false));
+			return true;
 		}
 
 		public bool Shift {

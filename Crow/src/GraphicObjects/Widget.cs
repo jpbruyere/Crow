@@ -1723,7 +1723,7 @@ namespace Crow
 			DebugLog.AddEvent(DbgEvtType.GOPaint, this);
 			#endif
 			//TODO:this test should not be necessary
-			if (Slot.Height < 0 || Slot.Width < 0 || parent == null)
+			if (Slot.Height <= 0 || Slot.Width <= 0 || parent == null)
 				return;
 			lock (this) {
 				if (cacheEnabled) {
@@ -1740,7 +1740,7 @@ namespace Crow
 						paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);					
 				} else {
 					Rectangle rb = Slot + Parent.ClientRectangle.Position;
-					//ctx.Save ();
+					ctx.Save ();
 
 					ctx.Translate (rb.X, rb.Y);
 
@@ -1748,8 +1748,8 @@ namespace Crow
 					if (!isEnabled)
 						paintDisabled (ctx, Slot);
 
-					ctx.Translate (-rb.X, -rb.Y);
-					//ctx.Restore ();
+					//ctx.Translate (-rb.X, -rb.Y);
+					ctx.Restore ();
 				}
 				LastPaintedSlot = Slot;
 			}

@@ -534,7 +534,7 @@ namespace Crow.IML
 		internal static void emitConvert(ILGenerator il, Type origType, Type destType){
 			if (destType == typeof(object))
 				return;
-			if (destType == typeof(string)) {
+			if (destType == typeof (string)) {
 				System.Reflection.Emit.Label emitNullStr = il.DefineLabel ();
 				System.Reflection.Emit.Label endConvert = il.DefineLabel ();
 				il.Emit (OpCodes.Dup);
@@ -545,6 +545,9 @@ namespace Crow.IML
 				il.Emit (OpCodes.Pop);//remove null string from stack
 				il.Emit (OpCodes.Ldstr, "");//replace with empty string
 				il.MarkLabel (endConvert);
+			}else if ((origType.IsEnum || origType == typeof(Enum)) && destType.IsEnum) {
+				il.Emit (OpCodes.Unbox_Any, destType);
+				return;
 			}else if (origType.IsValueType) {
 				if (destType != origType) {
 					MethodInfo miIO = getImplicitOp (origType, destType);
