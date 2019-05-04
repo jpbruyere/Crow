@@ -4,7 +4,7 @@
 // Author:
 //       Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Copyright (c) 2018 jp
+// Copyright (c) 2018-2019 Jean-Philippe Bruyère
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -197,7 +197,7 @@ namespace vkvg
 		internal static extern void vkvg_pattern_destroy (IntPtr pat);
 
 		[DllImport (libvkvg, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern void vkvg_patter_add_color_stop (IntPtr pat, float offset, float r, float g, float b, float a);
+		internal static extern void vkvg_pattern_add_color_stop (IntPtr pat, float offset, float r, float g, float b, float a);
 		[DllImport (libvkvg, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern void vkvg_pattern_set_extend (IntPtr pat, Extend extend);
 		[DllImport (libvkvg, CallingConvention=CallingConvention.Cdecl)]

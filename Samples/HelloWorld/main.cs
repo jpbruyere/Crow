@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading;
-using Crow;
-using CVKL;
-using VK;
+﻿using Crow;
 
 namespace HelloWorld
 {

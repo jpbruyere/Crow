@@ -4,7 +4,7 @@
 // Author:
 //       Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Copyright (c) 2019 jp
+// Copyright (c) 2019 Jean-Philippe Bruyère
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,10 +76,10 @@ namespace vkvg {
 		}
 
 		public void AddColorStop (float offset, float r, float g, float b, float a = 1f) {
-			NativeMethods.vkvg_patter_add_color_stop (handle, offset, r, g, b, a);
+			NativeMethods.vkvg_pattern_add_color_stop (handle, offset, r, g, b, a);
 		}
 		public void AddColorStop (float offset, Crow.Color c) {
-			NativeMethods.vkvg_patter_add_color_stop (Handle, offset, (float)c.R, (float)c.G, (float)c.B, (float)c.A);
+			NativeMethods.vkvg_pattern_add_color_stop (Handle, offset, (float)c.R, (float)c.G, (float)c.B, (float)c.A);
 		}
 
 		#region IDisposable implementation

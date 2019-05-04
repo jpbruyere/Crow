@@ -4,7 +4,7 @@
 // Author:
 //       Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Copyright (c) 2018 jp
+// Copyright (c) 2018-2019 jp
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,10 +25,8 @@
 // THE SOFTWARE.
 using System;
 using System.Text;
-using Crow;
 
-namespace vkvg
-{
+namespace vkvg {
 	public class Context: IDisposable
 	{
 
@@ -179,10 +177,6 @@ namespace vkvg
 		public void ClosePath () {
 			NativeMethods.vkvg_close_path (handle);
 		}
-
-//		public void Rectangle (float x, float y, float width, float height){
-//			NativeMethods.vkvg_rectangle ();
-//		}
 		public void MoveTo (PointD p){
 			NativeMethods.vkvg_move_to (handle, (float)p.X, (float)p.Y);
 		}
