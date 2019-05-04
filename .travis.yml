@@ -1,12 +1,2 @@
-sudo: required
-dist: trusty
 language: csharp
 solution: Crow.sln
-before_install:
-      - sudo apt-get -qq update
-      - sudo apt-get install -y libcairo1.10-cil libgio3.0-cil libgdk3.0-cil libglib3.0-cil
-install:
-      - nuget restore Crow.sln
-script:
-      - xbuild /p:Configuration=Release Crow.sln
-
