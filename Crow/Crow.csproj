@@ -1,214 +1,61 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(SolutionDir)netfx.props" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Crow</RootNamespace>
+    <TargetFrameworks>net471;netstandard2.0</TargetFrameworks>
     <AssemblyName>Crow</AssemblyName>
-    <FileAlignment>512</FileAlignment>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <NoStdLib>False</NoStdLib>
-    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-    <WarningLevel>4</WarningLevel>
-    <NoWin32Manifest>False</NoWin32Manifest>
-    <SignAssembly>false</SignAssembly>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <Description>C# Rapid Open Widget</Description>
-    <BaseAddress>4194304</BaseAddress>
-    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
-    <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <AssemblyOriginatorKeyFile>crow.key</AssemblyOriginatorKeyFile>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <ReleaseVersion>0.8.0</ReleaseVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-    <Optimize>false</Optimize>
-    <OutputPath>$(SolutionDir)build\Debug</OutputPath>
-    <DefineConstants>TRACE0;DEBUG;DEBUG_BINDING_FUNC_CALLS0;DEBUG_DRAGNDROP0;DEBUG_LOG0;XLIB_BACKEND0;DESIGN_MODE;DEBUG_UPDATE0;DEBUG_FOCUS0;DEBUG_DISPOSE0;MEASURE_TIME0;DEBUG_LOAD0;DEBUG_BINDING0;DEBUG_CLIP_RECTANGLE0</DefineConstants>
-    <EnvironmentVariables>
-      <EnvironmentVariables>
-        <Variable name="MONO_CAIRO_DEBUG_DISPOSE" value="1" />
-      </EnvironmentVariables>
-    </EnvironmentVariables>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <Optimize>true</Optimize>
+    <Copyright></Copyright>
+    <AssemblyVersion>0.9.0</AssemblyVersion>    
+    <Description>C.R.O.W. is a widget toolkit and rendering engine entirely developed in C# with templates, styles, compositing, and bindings.</Description>        
+                    
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>        
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+        
+    <Authors>Jean-Philippe Bruyère</Authors>
+    <Title>C# Rapid Open Widget Toolkit</Title>        
+    <PackageId>Crow.VK</PackageId>
+    <PackageTags>Crow Vulkan Widget Interface GUI</PackageTags>
+    <PackageVersion>$(AssemblyVersion)-beta</PackageVersion>
+    <PackOnBuild>True</PackOnBuild>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/jpbruyere/Crow/wiki</PackageProjectUrl>        
+    <PackageLicense>https://opensource.org/licenses/MIT</PackageLicense>
+    <PackageIconUrl>https://jpbruyere.github.io/Crow/images/crow.png</PackageIconUrl>
+    <PackageCopyright>Copyright 2013-2019</PackageCopyright>
+    <PackageReleaseNotes>Turn on vulkan layer through vkvg</PackageReleaseNotes>    
+    <RepositoryUrl>https://github.com/jpbruyere/Crow</RepositoryUrl>
+        
+    <OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>        
     <DefineConstants>DESIGN_MODE</DefineConstants>
-    <OutputPath>$(SolutionDir)build\Release</OutputPath>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="src\**\*.cs" Exclude="src\Mono.Cairo\NativeMethods-internal.cs;src\backends\win32\User32\Structs\RawInputDevice.cs;src\vkvg\Point.cs" />
-  </ItemGroup>
-  <ItemGroup>
+   
+  
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DefineConstants>TRACE;DESIGN_MODE;DEBUG</DefineConstants>
+  </PropertyGroup>
+  
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="VK">
-      <HintPath>..\..\packages\Vulkan.0.1.2.6\lib\netstandard2.0\VK.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="glTFLoader">
-      <HintPath>..\packages\glTF2Loader.1.1.3-alpha\lib\net35\glTFLoader.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Numerics.Vectors">
-      <HintPath>..\packages\System.Numerics.Vectors.4.6.0-preview4.19212.13\lib\net46\System.Numerics.Vectors.dll</HintPath>
-    </Reference>
-    <Reference Include="mscorlib" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.6.0-preview4.19212.13\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="CVKL-dotnet">
-      <HintPath>..\packages\CVKL.0.1.2\lib\netstandard2.0\CVKL-dotnet.dll</HintPath>
-    </Reference>
+    <Reference Include="Microsoft.CSharp" />        
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+    
   <ItemGroup>
-    <Folder Include="src\GraphicObjects\" />
-    <Folder Include="src\Cairo\" />
-    <Folder Include="Images\" />
-    <Folder Include="Images\Icons\" />
-    <Folder Include="src\CompilerServices\" />
-    <Folder Include="src\Fill\" />
-    <Folder Include="src\Input\" />
-    <Folder Include="src\rsvg\" />
-    <Folder Include="src\IML\" />
-    <Folder Include="Icons\" />
-    <Folder Include="src\debug\" />
-    <Folder Include="src\backends\" />
-    <Folder Include="src\backends\xlib\" />
-    <Folder Include="src\backends\xcb\" />
-    <Folder Include="src\vkvg\" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Icons\*.*" />
+    <Compile Include="src\**\*.cs" />
+        
+    <EmbeddedResource Include="Templates\*.*">
+      <LogicalName>Crow.%(Filename).template</LogicalName>
+    </EmbeddedResource>
+    
     <EmbeddedResource Include="Default.style" />
-    <EmbeddedResource Include="Templates\Button.template">
-      <LogicalName>Crow.Button.template</LogicalName>
+    <EmbeddedResource Include="Icons\*.*">
+        <LogicalName>Crow.Icons.%(Filename)%(Extension)</LogicalName>    
     </EmbeddedResource>
-    <EmbeddedResource Include="Templates\CheckBox.template">
-      <LogicalName>Crow.CheckBox.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\ComboBox.template">
-      <LogicalName>Crow.ComboBox.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Expandable.template">
-      <LogicalName>Crow.Expandable.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\DirectoryView.template">
-      <LogicalName>Crow.DirectoryView.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\FileDialog.template">
-      <LogicalName>Crow.FileDialog.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\GroupBox.template">
-      <LogicalName>Crow.GroupBox.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\ListBox.template">
-      <LogicalName>Crow.ListBox.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\MessageBox.template">
-      <LogicalName>Crow.MessageBox.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Popper.template">
-      <LogicalName>Crow.Popper.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\RadioButton.template">
-      <LogicalName>Crow.RadioButton.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\ScrollBar.template">
-      <LogicalName>Crow.ScrollBar.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Slider.template">
-      <LogicalName>Crow.Slider.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Spinner.template">
-      <LogicalName>Crow.Spinner.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\TabItem.template">
-      <LogicalName>Crow.TabItem.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\TreeView.template">
-      <LogicalName>Crow.TreeView.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Window.template">
-      <LogicalName>Crow.Window.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Images\Icons\Cursors\ibeam" />
-    <EmbeddedResource Include="Templates\MenuItem.template">
-      <LogicalName>Crow.MenuItem.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Menu.template">
-      <LogicalName>Crow.Menu.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\ColorPicker.template">
-      <LogicalName>Crow.ColorPicker.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\ToolWindow.template">
-      <LogicalName>Crow.ToolWindow.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\FileItems.template">
-      <LogicalName>Crow.FileItems.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\DefaultItem.template">
-      <LogicalName>Crow.DefaultItem.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\ScrollingListBox.template">
-      <LogicalName>Crow.ScrollingListBox.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\imgItem.template" />
-    <EmbeddedResource Include="Templates\ArrowBut.template">
-      <LogicalName>Crow.ArrowBut.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\treeList.template" />
-    <EmbeddedResource Include="Templates\CheckBox2.template">
-      <LogicalName>Crow.CheckBox2.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Tooltip.template">
-      <LogicalName>Crow.Tooltip.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\ContextMenu.template">
-      <LogicalName>Crow.ContextMenu.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\DockWindow.template">
-      <LogicalName>Crow.DockWindow.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\HScrollBar.template">
-      <LogicalName>Crow.HScrollBar.template</LogicalName>
-    </EmbeddedResource>
-    <None Include="Crow.dll.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <EmbeddedResource Include="Images\Icons\Cursors\arrow" />
-    <EmbeddedResource Include="Images\Icons\Cursors\bottom_left_corner" />
-    <EmbeddedResource Include="Images\Icons\Cursors\bottom_right_corner" />
-    <EmbeddedResource Include="Images\Icons\Cursors\cross" />
-    <EmbeddedResource Include="Images\Icons\Cursors\hand" />
-    <EmbeddedResource Include="Images\Icons\Cursors\help" />
-    <EmbeddedResource Include="Images\Icons\Cursors\move" />
-    <EmbeddedResource Include="Images\Icons\Cursors\sb_h_double_arrow" />
-    <EmbeddedResource Include="Images\Icons\Cursors\sb_v_double_arrow" />
-    <EmbeddedResource Include="Images\Icons\Cursors\top_left_corner" />
-    <EmbeddedResource Include="Images\Icons\Cursors\top_right_corner" />
-    <None Include="packages.config" />
-  </ItemGroup>
+  </ItemGroup>  
+    
+  <ItemGroup>
+    <ProjectReference Include="..\..\vke\CVKL.csproj" />
+  </ItemGroup>    
+    
 </Project>
