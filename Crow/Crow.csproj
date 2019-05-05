@@ -27,6 +27,7 @@
         
     <OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>        
     <DefineConstants>DESIGN_MODE</DefineConstants>
+    <ReleaseVersion>0.8.0</ReleaseVersion>
   </PropertyGroup>
    
   
@@ -55,7 +56,6 @@
   </ItemGroup>  
     
   <ItemGroup>
-    <ProjectReference Include="..\..\vke\CVKL.csproj" />
-  </ItemGroup>    
-    
+    <PackageReference Include="Vulkan" Version="0.1.2.8-beta" />
+  </ItemGroup>
 </Project>
