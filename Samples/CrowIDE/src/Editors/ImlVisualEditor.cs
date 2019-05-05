@@ -29,7 +29,7 @@ using Crow.IML;
 using System.Text;
 using System.Xml;
 using System.Diagnostics;
-using Crow.Cairo;
+using vkvg;
 
 namespace Crow.Coding
 {
@@ -38,7 +38,7 @@ namespace Crow.Coding
 		#region CTOR
 		public ImlVisualEditor () : base()
 		{
-			imlVE = new DesignInterface ();
+			//imlVE = new DesignInterface (Interface.de);
 			initCommands ();
 		}
 		#endregion
@@ -388,7 +388,7 @@ namespace Crow.Coding
 
 		}
 
-		protected override void onDraw (Crow.Cairo.Context gr)
+		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
 

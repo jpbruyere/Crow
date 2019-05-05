@@ -20,22 +20,27 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using Crow;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Collections;
-using System.Xml.Serialization;
 using System.IO;
-using Crow.IML;
-using System.Xml;
-using System.Linq;
-using Crow.Coding;
-using System.Threading;
+using Crow;
 
 namespace Crow.Coding
 {
-	class CrowIDE : Interface
+	class CrowIDE : CrowVkWin
 	{
+		static void Main (string [] args)
+		{
+			using (CrowIDE app = new CrowIDE ()) {
+				app.initIde ();
+				app.reloadWinConfigs ();
+				app.Run ();
+				app.saveWinConfigs ();
+			}
+		}
+
+		protected override void onLoad ()
+		{
+
+		}
 		public Command CMDNew, CMDOpen, CMDSave, CMDSaveAs, cmdCloseSolution, CMDQuit,
 		CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp,
 		CMDAbout, CMDOptions,
@@ -48,7 +53,7 @@ namespace Crow.Coding
 			CMDOpen = new Command(new Action(() => openFileDialog())) { Caption = "Open...", Icon = new SvgPicture("#CrowIDE.icons.open.svg") };
 			CMDSave = new Command(new Action(() => saveFileDialog())) { Caption = "Save", Icon = new SvgPicture("#CrowIDE.icons.save.svg"), CanExecute = false};
 			CMDSaveAs = new Command(new Action(() => saveFileDialog())) { Caption = "Save As...", Icon = new SvgPicture("#CrowIDE.icons.save.svg"), CanExecute = false};
-			CMDQuit = new Command(new Action(() => app.running = false)) { Caption = "Quit", Icon = new SvgPicture("#CrowIDE.icons.sign-out.svg") };
+			//CMDQuit = new Command(new Action(() => running = false)) { Caption = "Quit", Icon = new SvgPicture("#CrowIDE.icons.sign-out.svg") };
 			CMDUndo = new Command(new Action(() => undo())) { Caption = "Undo", Icon = new SvgPicture("#CrowIDE.icons.undo.svg"), CanExecute = false};
 			CMDRedo = new Command(new Action(() => redo())) { Caption = "Redo", Icon = new SvgPicture("#CrowIDE.icons.redo.svg"), CanExecute = false};
             //CMDCut = new Command(new Action(() => Quit (null, null))) { Caption = "Cut", Icon = new SvgPicture("#CrowIDE.icons.scissors.svg"), CanExecute = false};
@@ -86,7 +91,7 @@ namespace Crow.Coding
 		}
 
 		void openFileDialog () {			
-			AddWidget (instFileDlg.CreateInstance()).DataSource = this;
+			crow.AddWidget (instFileDlg.CreateInstance()).DataSource = this;
 		}
 		void openOptionsDialog(){}
 		void newFile() {			
@@ -112,23 +117,6 @@ namespace Crow.Coding
 			mainDock.ImportConfig (conf, this);
 		}
 
-		static CrowIDE app;
-		[STAThread]
-		static void Main ()
-		{
-			using (app = new CrowIDE ()) {
-				MainIFace = app;
-
-				//app.Keyboard.KeyDown += App_KeyboardKeyDown;
-				app.initIde ();
-
-				app.reloadWinConfigs ();
-
-				app.Run ();
-
-				app.saveWinConfigs ();
-			}
-		}
 
 		static void App_KeyboardKeyDown (object sender, KeyEventArgs e)
 		{
@@ -142,12 +130,9 @@ namespace Crow.Coding
 			//#endif
 		}
 
-		public CrowIDE ()
-			: base(1024, 800)
-		{			
-		}
 
-		Instantiator instFileDlg;
+
+		IML.Instantiator instFileDlg;
 		Solution currentSolution;
 		Project currentProject;
 		DockStack mainDock;
@@ -159,7 +144,7 @@ namespace Crow.Coding
 
 			initCommands ();
 
-			Widget go = Load (@"#CrowIDE.ui.CrowIDE.crow");
+			Widget go = crow.Load (@"#CrowIDE.ui.CrowIDE.crow");
 			go.DataSource = this;
 
 			mainDock = go.FindByName ("mainDock") as DockStack;
@@ -170,7 +155,7 @@ namespace Crow.Coding
 				CurrentSolution.ReopenItemsSavedInUserConfig ();
 			}
 
-			instFileDlg = Instantiator.CreateFromImlFragment
+			instFileDlg = IML.Instantiator.CreateFromImlFragment
 				(MainIFace, "<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}' SearchPattern='*.sln' OkClicked='onFileOpen'/>");
 
 			/*DockWindow dw = loadWindow ("#CrowIDE.ui.DockWindows.winEditor.crow", this) as DockWindow;
@@ -269,7 +254,7 @@ namespace Crow.Coding
 //					currentProject = new Project (filePath);
 				}
 			} catch (Exception ex) {
-				LoadIMLFragment ("<MessageBox Message='"+ ex.Message + "\n" + "' MsgType='Error'/>");	
+				crow.LoadIMLFragment ("<MessageBox Message='"+ ex.Message + "\n" + "' MsgType='Error'/>");	
 			}				
 		}
 

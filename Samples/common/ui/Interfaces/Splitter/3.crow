@@ -23,17 +23,17 @@
 		<Splitter Thickness="3" />
 		<Border Fit="true" CornerRadius="10" BorderWidth="1" MaximumSize="150;150" MinimumSize="50;50">
 			<VerticalStack Margin="10">
-				<Label Text="label 1" Background="hgradient|0:BlueCrayola|1:Transparent"/>
-				<Label Text="label 2" Background="hgradient|0:BlueCrayola|1:Transparent"/>
-				<Label Text="label 3" Background="hgradient|0:BlueCrayola|1:Transparent"/>
-				<Label Text="label 4" Width="Stretched" Background="hgradient|0:BlueCrayola|1:Transparent"/>
+				<Label Text="label 1" Background="hgradient|0:Blue|1:Transparent"/>
+				<Label Text="label 2" Background="hgradient|0:Blue|1:Transparent"/>
+				<Label Text="label 3" Background="hgradient|0:Blue|1:Transparent"/>
+				<Label Text="label 4" Width="Stretched" Background="hgradient|0:Blue|1:Transparent"/>
 			</VerticalStack>
 		</Border>
 		<Splitter/>
 		<Border Fit="true" CornerRadius="10" BorderWidth="1">
 			<VerticalStack Margin="10">
 				<Button Caption="Button 1" Background="hgradient|0:Red|1:DarkRed" CornerRadius="5"/>
-				<Button Caption="Button 2"  Background="hgradient|0:AoEnglish|1:Arsenic" CornerRadius="3"/>
+				<Button Caption="Button 2"  Background="hgradient|0:Green|1:Arsenic" CornerRadius="3"/>
 				<Button Caption="Button 3"  Background="hgradient|0:DarkRed|1:Transparent" CornerRadius="0"/>
 				<Button Caption="Button 4" Background="hgradient|0:DarkRed|1:Transparent" CornerRadius="8"/>
 			</VerticalStack>

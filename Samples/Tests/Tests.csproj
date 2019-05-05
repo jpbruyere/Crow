@@ -32,7 +32,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>Interfaces\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </None>
-  </ItemGroup>     
+  </ItemGroup>  
+    
   <ItemGroup>
     <PackageReference Include="CVKL" Version="0.1.3.2-beta" />
   </ItemGroup>

@@ -4,7 +4,7 @@
 	</DockStack>
 </Window>
 <!---		
-		<DockWindow Left="450" Top="450" Width="150" Height="150" Background="Maize"/>-->
+		<DockWindow Left="450" Top="450" Width="150" Height="150" Background="Yellow"/>-->
 	
 
 <!--<Group Background="DimGrey" Margin = "0" Focusable="true" >

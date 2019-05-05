@@ -28,6 +28,7 @@
         
     <OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>        
     <DefineConstants>DESIGN_MODE</DefineConstants>
+    <ReleaseVersion>0.8.0</ReleaseVersion>
   </PropertyGroup>
    
   

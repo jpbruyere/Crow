@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(SolutionDir)netfx.props" />
+  <PropertyGroup>
+    <TargetFrameworks>net472</TargetFrameworks>
+    <TargetFramework>net472</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <StartupObject>Crow.Coding.CrowIDE</StartupObject>
+    <OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>        
+    <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>                
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <ReleaseVersion>0.8.0</ReleaseVersion>
+  </PropertyGroup>
+    
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>        
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
+  
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
+    <Reference Include="System" />
+    <PackageReference Include="CVKL" Version="0.1.3.2-beta" />
+    <ProjectReference Include="..\..\Crow\Crow.csproj" />
+  </ItemGroup>    
+        
+  <ItemGroup>
+    <Compile Include="..\common\CrowWin.cs" />
+    <Compile Include="src\**\*.cs" Exclude="src\ProjectTree\CSProjectFile.cs" />  
+    <EmbeddedResource Remove="icons\blank-file2.svg" />
+    <EmbeddedResource Include="icons\*.*">
+      <LogicalName>icons.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ui\**\*.crow" />
+    <EmbeddedResource Include="ui\**\*.itemp" />  
+    <EmbeddedResource Include="ui\**\*.template">
+      <LogicalName>Crow.Coding.%(Filename).template</LogicalName>
+    </EmbeddedResource> 
+    <EmbeddedResource Include="DefaultTemplateOverrides\*.*">
+      <LogicalName>Crow.%(Filename).template</LogicalName>
+    </EmbeddedResource>        
+    <EmbeddedResource Include="IDE.style" />        
+  </ItemGroup>
+  <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
+    <PackageReference Include="System.CodeDom" Version="4.5.0" />        
+  </ItemGroup>    
+</Project>

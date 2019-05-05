@@ -25,17 +25,8 @@
 // THE SOFTWARE.
 
 using System;
-using System.Xml.Serialization;
 using System.ComponentModel;
-using System.Collections;
-using Crow.Cairo;
-using System.Text;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Linq;
-using System.Diagnostics;
-using System.IO;
-using System.Threading;
+using vkvg;
 
 namespace Crow.Text
 {
@@ -351,10 +342,10 @@ namespace Crow.Text
 			set {
 				base.Font = value;
 
-				using (ImageSurface img = new ImageSurface (Format.Argb32, 1, 1)) {
+				using (Surface img = new Surface (IFace.dev, 1, 1)) {
 					using (Context gr = new Context (img)) {
-						gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-						gr.SetFontSize (Font.Size);
+						gr.FontFace = Font.Name;
+						gr.FontSize = (uint)Font.Size;
 
 						fe = gr.FontExtents;
 					}

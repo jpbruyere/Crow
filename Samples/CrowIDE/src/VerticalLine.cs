@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 using System;
 using Crow;
+using vkvg;
 
 namespace Crow.Coding
 {
@@ -34,7 +35,7 @@ namespace Crow.Coding
 		{
 		}
 
-		protected override void onDraw (Crow.Cairo.Context gr)
+		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
 			Foreground.SetAsSource (gr);

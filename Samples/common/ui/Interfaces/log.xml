@@ -10,7 +10,7 @@
 				<Label Name="line3" Width="0" Text="Line3" Margin="0"/>
 				<Label Name="line4" Width="0" Text="Line4" Margin="0"/>
 			</VerticalStack>
-			<Button Name="btOk" Background="Gray" Fit="True"
+			<Button Name="btOk" Background="Grey" Fit="True"
 				HorizontalAlignment="Right" VerticalAlignment="Bottom"
 				MouseClick="BtOk_MouseClick">
 				<Label Text="Ok" Margin="3" Foreground="White" />

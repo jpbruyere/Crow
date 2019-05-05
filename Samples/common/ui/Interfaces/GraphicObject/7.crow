@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack Height="Fit" Width="Fit">
 	<Label Width="0"/>
-	<Expandable  Width="Fit" Background="Gray">
+	<Expandable  Width="Fit" Background="Grey">
 		<Expandable Background="LightBlue">
 			<Expandable Background="Green">
 				<Expandable Background="LimeGreen">
-					<Expandable Background="DimGray">
+					<Expandable Background="DimGrey">
 						<Expandable Width="0" Background="Yellow">
-							<Expandable Background="NavyBlue">
+							<Expandable Background="Blue">
 								<Expandable Width="0" Background="Blue">
-									<Expandable Width="0" Background="BlueCrayola">
+									<Expandable Width="0" Background="Blue">
 										<Expandable Width="0" Background="Green">
 											<Label Background="Red"/>
 										</Expandable>
@@ -22,15 +22,15 @@
 			</Expandable>
 		</Expandable>
 	</Expandable>
-	<Expandable Width="0"  Background="Gray">
+	<Expandable Width="0"  Background="Grey">
 		<Expandable Width="0" Background="LightBlue">
 			<Expandable Width="0" Background="Green">
 				<Expandable Width="0" Background="LimeGreen">
-					<Expandable Width="0" Background="DimGray">
+					<Expandable Width="0" Background="DimGrey">
 						<Expandable Width="0" Background="Yellow">
-							<Expandable Width="0" Background="NavyBlue">
+							<Expandable Width="0" Background="Blue">
 								<Expandable Width="0" Background="Blue">
-									<Expandable Width="0" Background="BlueCrayola">
+									<Expandable Width="0" Background="Blue">
 										<Expandable Width="0" Background="Green">
 											<Label Background="Red"/>
 										</Expandable>

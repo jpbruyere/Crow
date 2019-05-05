@@ -24,13 +24,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
-using Crow;
-using System.Globalization;
 using System.Threading;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using Crow.Cairo;
+
 
 namespace Crow.Coding
 {
@@ -54,7 +51,7 @@ namespace Crow.Coding
 		}
 		#endregion
 
-		public DesignInterface () : base()
+		public DesignInterface (vkvg.Device dev) : base(dev)
 		{
 		}
 
@@ -80,26 +77,7 @@ namespace Crow.Coding
 			throw new Exception ($"In Design File not found: {path}");
 		}
 
-		protected override void InitBackend ()
-		{
-			surf = new ImageSurface (Format.Argb32, 100, 100);
-		}
-		public override void ProcessResize (Rectangle bounds)
-		{
-			if (bounds == clientRectangle)
-				return;
-			lock (UpdateMutex) {
-				clientRectangle = bounds;
-				surf.Dispose ();
-				surf = new ImageSurface (Format.Argb32, clientRectangle.Width, clientRectangle.Height);
 
-				foreach (Widget g in GraphicTree)
-					g.RegisterForLayouting (LayoutingType.All);
-
-				RegisterClip (clientRectangle);
-			}
-
-		}
 		public override bool ProcessMouseMove (int x, int y)
 		{
 			int deltaX = x - Mouse.X;
