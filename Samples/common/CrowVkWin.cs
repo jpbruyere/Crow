@@ -7,9 +7,33 @@ using VK;
 namespace Crow
 {
 	public class CrowVkWin : VkWindow, IValueChange {
-		bool isRunning;
+        #region IValueChange implementation
+        public event EventHandler<Crow.ValueChangeEventArgs> ValueChanged;
+        public virtual void NotifyValueChanged(string MemberName, object _value)
+        {
+            if (ValueChanged != null)
+                ValueChanged.Invoke(this, new Crow.ValueChangeEventArgs(MemberName, _value));
+        }
+        #endregion
 
-		protected override void render () {
+        protected Crow.Interface crow;
+        protected CVKL.Image uiImage;
+        protected vkvg.Device vkvgDev;
+        bool isRunning;
+
+        protected CrowVkWin() : base()
+        {
+            Thread crowThread = new Thread(crow_thread_func);
+            crowThread.IsBackground = true;
+            crowThread.Start();
+
+            while (crow == null)
+                Thread.Sleep(2);
+
+            initUISurface();
+        }
+
+        protected override void render () {
 			int idx = swapChain.GetNextImage ();
 
 			if (idx < 0) {
@@ -25,18 +49,6 @@ namespace Crow
 			Thread.Sleep (1);
 		}
 
-		#region crow
-		#region IValueChange implementation
-		public event EventHandler<Crow.ValueChangeEventArgs> ValueChanged;
-		public virtual void NotifyValueChanged (string MemberName, object _value)
-		{
-			if (ValueChanged != null)
-				ValueChanged.Invoke (this, new Crow.ValueChangeEventArgs (MemberName, _value));
-		}
-		#endregion
-
-		protected Crow.Interface crow;
-
 		void crow_thread_func () {
 			vkvgDev = new vkvg.Device (instance.Handle, phy.Handle, dev.VkDev.Handle, presentQueue.qFamIndex,
 	   			vkvg.SampleCount.Sample_8, presentQueue.index);
@@ -51,40 +63,19 @@ namespace Crow
 
 			crow.Dispose ();
 			vkvgDev.Dispose ();
-
 			crow = null;
 		}
-		#endregion
-
-
-		protected CVKL.Image uiImage;
-		protected vkvg.Device vkvgDev;
 
 		void initUISurface () {
 			lock (crow.UpdateMutex) {
-				try {
-					uiImage?.Dispose ();
-					uiImage = new CVKL.Image (dev, new VkImage ((ulong)crow.surf.VkImage.ToInt64 ()), VkFormat.B8g8r8a8Unorm,
-						VkImageUsageFlags.Sampled, swapChain.Width, swapChain.Height);
-					uiImage.SetName ("uiImage");
-					uiImage.CreateView (VkImageViewType.ImageView2D, VkImageAspectFlags.Color);
-					uiImage.CreateSampler (VkFilter.Nearest, VkFilter.Nearest, VkSamplerMipmapMode.Nearest, VkSamplerAddressMode.ClampToBorder);
-					uiImage.Descriptor.imageLayout = VkImageLayout.ShaderReadOnlyOptimal;
-				} catch (Exception ex) {
-					Console.WriteLine (ex);
-				}
+				uiImage?.Dispose ();
+				uiImage = new CVKL.Image (dev, new VkImage ((ulong)crow.surf.VkImage.ToInt64 ()), VkFormat.B8g8r8a8Unorm,
+					VkImageUsageFlags.Sampled, swapChain.Width, swapChain.Height);
+				uiImage.SetName ("uiImage");
+				uiImage.CreateView (VkImageViewType.ImageView2D, VkImageAspectFlags.Color);
+				uiImage.CreateSampler (VkFilter.Nearest, VkFilter.Nearest, VkSamplerMipmapMode.Nearest, VkSamplerAddressMode.ClampToBorder);
+				uiImage.Descriptor.imageLayout = VkImageLayout.ShaderReadOnlyOptimal;
 			}
-		}
-
-		protected CrowVkWin () : base() {		
-			Thread crowThread = new Thread (crow_thread_func);
-			crowThread.IsBackground = true;
-			crowThread.Start ();
-
-			while (crow == null)
-				Thread.Sleep (2);
-
-			initUISurface ();
 		}
 
 		protected virtual void recordDraw (CommandBuffer cmd, int imageIndex) { }
