@@ -5,8 +5,7 @@ matrix:
   include:
     - dotnet: 2.1.502
       mono: none
-      env: DOTNETCORE=2  # optional, can be used to take different code paths in your script
-      script
+      env: DOTNETCORE=2  # optional, can be used to take different code paths in your script      
       script:
         - dotnet restore
     - mono: latest
