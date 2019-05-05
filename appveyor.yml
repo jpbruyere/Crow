@@ -1,0 +1,15 @@
+version: '0.9.0.{build}'
+configuration:
+- Debug
+- Release
+platform: Any CPU
+init:
+- ps: $Env:LABEL = "CI" + $Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
+before_build:
+- appveyor-retry dotnet restore -v Minimal
+build_script:
+- dotnet build "src\LibNETStandard20" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+after_build:  
+- dotnet pack "src\LibNETStandard20" -c %CONFIGURATION% --no-build --version-suffix %LABEL% -o artifacts
+artifacts:
+- path: artifacts\**\*.*
