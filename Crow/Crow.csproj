@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="$(SolutionDir)netfx.props" />
   <PropertyGroup>
-    <TargetFrameworks>net471;netstandard2.0</TargetFrameworks>
+<!--    <TargetFrameworks>net471;netstandard2.0</TargetFrameworks>-->
+    <TargetFrameworks>net471</TargetFrameworks>
     <AssemblyName>Crow</AssemblyName>
     <Copyright></Copyright>
     <AssemblyVersion>0.9.0</AssemblyVersion>    
@@ -27,7 +28,6 @@
         
     <OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>        
     <DefineConstants>DESIGN_MODE</DefineConstants>
-    <ReleaseVersion>0.8.0</ReleaseVersion>
   </PropertyGroup>
    
   
@@ -37,6 +37,7 @@
   
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="System" />
+    <Reference Include="mscorlib"/>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />        
