@@ -1,3 +1,9 @@
 language: csharp
 dist: xenial
-solution: Crow.sln
+
+matrix:
+  include:
+    - dotnet: 2.1.502
+      mono: none
+      env: DOTNETCORE=2  # optional, can be used to take different code paths in your script
+    - mono: latest
