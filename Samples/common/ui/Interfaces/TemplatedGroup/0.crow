@@ -1,0 +1,28 @@
+﻿<?xml version="1.0"?>
+<Menu>
+	<MenuItem Caption="File" Width="Fit">
+		<MenuItem Caption="New" />
+		<MenuItem Caption="Open"/>
+		<MenuItem Caption="Save"/>
+		<MenuItem Caption="Quit"/>
+	</MenuItem>
+	<MenuItem Caption="Edit" Name="edit" Width="Fit">
+		<MenuItem Caption="Cut"/>
+		<MenuItem Caption="Copy"/>
+		<MenuItem Caption="Paste"/>
+		<MenuItem Caption="Special" Name="special" Width="Fit">
+			<MenuItem Caption="Cut"/>
+			<MenuItem Caption="Copy"/>
+			<MenuItem Caption="Paste"/>
+		</MenuItem>
+		<MenuItem Caption="Special2" Name="special" Width="Fit">
+			<MenuItem Caption="Cut"/>
+			<MenuItem Caption="Copy"/>
+			<MenuItem Caption="Paste"/>
+		</MenuItem>
+	</MenuItem>
+	<MenuItem Caption="Help" Width="Fit">
+		<MenuItem Caption="About"/>
+		<MenuItem Caption="Help"/>
+	</MenuItem>
+</Menu>

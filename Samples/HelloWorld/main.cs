@@ -6,8 +6,6 @@ namespace HelloWorld
 		static void Main (string[] args) {
 			using (Program vke = new Program ()) {
 				vke.crow.Load ("#HelloWorld.helloworld.crow").DataSource = vke;
-				vke.crow.LoadIMLFragment ("<FileDialog />");
-
 				vke.Run ();
 			}
 		}

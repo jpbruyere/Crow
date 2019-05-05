@@ -5,6 +5,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crow", "Crow\Crow.csproj", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorld", "Samples\HelloWorld\HelloWorld.csproj", "{F535A8AB-CD93-49AB-B1B0-FFF9AE51ED6A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShowCase", "Samples\ShowCase\ShowCase.csproj", "{56329D48-D382-4850-93DE-59C453894E8A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Samples\Tests\Tests.csproj", "{5B7CA5BD-AEE8-40EE-85B0-0CAADD19B43A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +21,18 @@ Global
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2980F9B-4798-4C05-99E2-E174810F7C7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F535A8AB-CD93-49AB-B1B0-FFF9AE51ED6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F535A8AB-CD93-49AB-B1B0-FFF9AE51ED6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F535A8AB-CD93-49AB-B1B0-FFF9AE51ED6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F535A8AB-CD93-49AB-B1B0-FFF9AE51ED6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56329D48-D382-4850-93DE-59C453894E8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56329D48-D382-4850-93DE-59C453894E8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56329D48-D382-4850-93DE-59C453894E8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56329D48-D382-4850-93DE-59C453894E8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B7CA5BD-AEE8-40EE-85B0-0CAADD19B43A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B7CA5BD-AEE8-40EE-85B0-0CAADD19B43A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B7CA5BD-AEE8-40EE-85B0-0CAADD19B43A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B7CA5BD-AEE8-40EE-85B0-0CAADD19B43A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
@@ -56,5 +74,8 @@ Global
 		version = 0.8.0
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{F535A8AB-CD93-49AB-B1B0-FFF9AE51ED6A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
+		{56329D48-D382-4850-93DE-59C453894E8A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
+		{5B7CA5BD-AEE8-40EE-85B0-0CAADD19B43A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 	EndGlobalSection
 EndGlobal

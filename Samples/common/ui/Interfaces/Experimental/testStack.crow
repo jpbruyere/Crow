@@ -1,0 +1,32 @@
+﻿<?xml version="1.0"?>
+<Window Width="600" Height="500">
+<VerticalStack Margin="20" Background="DimGrey" Spacing="10">
+	<Widget Height="100" Width="500" Background="Green"/>
+	<Splitter/>
+	<HorizontalStack>
+		<Widget Height="Stretched" Width="100" Background="Red"/>
+		<Splitter/>
+		<Widget Height="Stretched" Width="100" Background="DarkRed"/>
+	</HorizontalStack>
+	<Splitter/>
+	<Widget Height="100" Width="500" Background="Green"/>
+</VerticalStack>
+</Window>
+<!--<Group Background="DimGrey" Margin = "0" Focusable="true" >
+	<Window Top="100" Left="100" Focusable="true" Caption="View 1" Width="300" Height="300"><Widget Background="Green" Focusable="true" MouseEnter="{Background=Grey}" MouseLeave="{Background=Green}"/></Window>
+	<Window Top="200" Left="200" Focusable="true" Caption="View 2" Resizable = "true" Width="300" Height="300"><Widget Focusable="true" Background="Blue" MouseEnter="{Background=Grey}" MouseLeave="{Background=Blue}"/></Window>
+	<Window Top="300" Left="300" Focusable="true" Caption="View 3" Resizable = "true" Width="300" Height="300"><Widget Focusable="true" Background="Yellow" MouseEnter="{Background=Grey}" MouseLeave="{Background=Yellow}"/></Window>
+	<Window Top="400" Left="400" Focusable="true" Caption="View 4" Resizable = "true" Width="300" Height="300"><Widget Focusable="true" Background="Black" MouseEnter="{Background=Grey}" MouseLeave="{Background=Black}"/></Window>
+</Group>-->
+<!--<Docker >
+	<DockWindow Resizable = "true" Top="100" Left="100" Caption="View 1" Width="300" Height="300">
+		<VerticalStack Background="DarkGreen" Focusable="true">
+			<Label Text="{../../Left}" Background="Black" Width="Stretched"/>
+			<Label Text="{../../Top}" Background="Black"/>
+			<Label Text="{../../LogicalParent}" Background="Black"/>
+		</VerticalStack>
+	</DockWindow>
+	<DockWindow Top="200" Left="200" Focusable="true" Caption="View 2" Resizable = "true" Width="300" Height="300"><Widget Focusable="true" Background="Blue" MouseEnter="{Background=Grey}" MouseLeave="{Background=Blue}"/></DockWindow>
+	<DockWindow Top="300" Left="300" Focusable="true" Caption="View 3" Resizable = "true" Width="300" Height="300"><Widget Focusable="true" Background="Yellow" MouseEnter="{Background=Grey}" MouseLeave="{Background=Yellow}"/></DockWindow>
+	<DockWindow Top="400" Left="400" Focusable="true" Caption="View 4" Resizable = "true" Width="300" Height="300"><Widget Focusable="true" Background="Black" MouseEnter="{Background=Grey}" MouseLeave="{Background=Black}"/></DockWindow>
+</Docker>-->
