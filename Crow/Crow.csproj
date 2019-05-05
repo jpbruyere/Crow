@@ -16,7 +16,7 @@
     <PackageId>Crow.VK</PackageId>
     <PackageTags>Crow Vulkan Widget Interface GUI</PackageTags>
     <PackageVersion>$(AssemblyVersion)-beta</PackageVersion>
-    <PackOnBuild>True</PackOnBuild>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/jpbruyere/Crow/wiki</PackageProjectUrl>        
     <PackageLicense>https://opensource.org/licenses/MIT</PackageLicense>
