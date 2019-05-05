@@ -15,6 +15,7 @@ dotnet: 2.1.502
 mono: latest
 
 script:
+    - nuget restore Crow.sln
     - msbuild Crow.sln
     - dotnet restore
     - dotnet build Crow.sln
