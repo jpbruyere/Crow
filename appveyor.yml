@@ -8,8 +8,8 @@ init:
 before_build:
 - appveyor-retry dotnet restore -v Minimal
 build_script:
-- dotnet build "src\LibNETStandard20" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+- dotnet build Crow.sln -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
 after_build:  
-- dotnet pack "src\LibNETStandard20" -c %CONFIGURATION% --no-build --version-suffix %LABEL% -o artifacts
+- dotnet pack Crow.sln -c %CONFIGURATION% --no-build --version-suffix %LABEL% -o artifacts
 artifacts:
 - path: artifacts\**\*.*
