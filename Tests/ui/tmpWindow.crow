@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<Border BorderWidth="1" Foreground="White" CornerRadius="15"
+	MouseEnter="../onBorderMouseEnter"
+	MouseLeave="../onBorderMouseLeave"
+	Background="vgradient|0:0.6,0.6,0.6,0.9|1:0.4,0.4,0.4,0.6">
+	<VerticalStack>
+		<HorizontalStack Height="Fit">
+			<Label Margin="2" Font="{../../../../Font}" Text="{../../../../Caption}" Width="Stretched"/>
+			<Border HorizontalAlignment="Right" Margin="0" VerticalAlignment="Top"
+				CornerRadius="6" BorderWidth="1" Foreground="Transparent"
+				Height="12" Width="12"
+				MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
+				<Image Focusable="true" Name="Image" Path="#Crow.Images.Icons.exit2.svg"
+					 MouseClick="../../../../../butQuitPress"/>
+			</Border>
+		</HorizontalStack>
+		<Container Name="Content"/>
+	</VerticalStack>
+</Border>

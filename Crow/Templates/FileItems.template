@@ -1,0 +1,25 @@
+﻿<ItemTemplate>
+	<Widget Height="16" Background="Red"/>
+</ItemTemplate>
+<ItemTemplate DataType="System.IO.FileInfo">
+	<HorizontalStack Focusable="true"  Height="Fit">
+		<Image Margin="2" Width="16" Height="16"
+			Path="#Crow.Icons.file.svg"/>
+			<Label Text="{Name}" Width="Stretched"
+				MouseEnter="{Background=RoyalBlue}"
+				MouseLeave="{Background=Transparent}"/>
+	</HorizontalStack>
+</ItemTemplate>
+<ItemTemplate DataType="System.IO.DirectoryInfo">
+	<Border Foreground="Transparent" Focusable="true" Height="Fit">
+		<HorizontalStack
+				MouseEnter="{Background=RoyalBlue}"
+				MouseLeave="{Background=Transparent}">
+			<Image Margin="2" Width="16" Height="16"
+				Path="#Crow.Icons.folder.svg"/>
+			<Label Text="{Name}" Width="Stretched"/>
+			<Label Text="{LastAccessTime}" />
+		</HorizontalStack>
+	</Border>
+</ItemTemplate>
+

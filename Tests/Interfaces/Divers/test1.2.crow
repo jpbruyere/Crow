@@ -1,0 +1,20 @@
+﻿<?xml version="1.0"?>
+<Container Background="Green" Height="400" Width="400">
+<VerticalStack Margin="10" Background="DarkBlue" Height="Fit" Width="Stretched">
+	<Label Text="label11" Width="Stretched"/>
+	<Label Text="label21"/>
+	<HorizontalStack Width="Fit" Height="Fit" Margin="5"
+		Focusable="True" Background="Blue">
+		<Label Text="label12"/>
+		<Label Text="label22"/>
+		<Label Text="label32"/>
+		<Label Text="label42"/>
+		<Label Text="label52"/>
+	</HorizontalStack>
+	<Label Text="label33" Background="Green" Width="Stretched"/>
+	<Button/>
+	<Label Text="label43"/>
+	<Label Text="label53"/>
+
+</VerticalStack>
+</Container>

@@ -1,0 +1,11 @@
+<svg width="9" height="9" xmlns="http://www.w3.org/2000/svg">
+ <g id="False">
+  <rect height="8" width="8" y="0.5" x="0.5" stroke="#000" fill="#fff" stroke-width="1"/>
+  <line stroke-linecap="undefined" stroke-linejoin="undefined" y2="4.5" x2="7" y1="4.5" x1="2" stroke="#000" fill="none"/>
+  <line stroke-linecap="undefined" stroke-linejoin="undefined" y2="7" x2="4.5" y1="2" x1="4.5" stroke="#000" fill="none"/>
+ </g>
+ <g id="True">
+  <rect height="8" width="8" y="0.5" x="0.5" stroke="#000" fill="#fff" stroke-width="1"/>
+  <line stroke-linecap="undefined" stroke-linejoin="undefined" y2="4.5" x2="7" y1="4.5" x1="2" stroke="#000" fill="none"/>
+ </g>
+</svg>

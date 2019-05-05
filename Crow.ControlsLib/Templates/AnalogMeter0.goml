@@ -1,0 +1,5 @@
+﻿<?xml version="1.0"?>
+<Group Margin="0" Width="-1" Height="-1" Focusable="false">
+	<Image Name="Image"  Path="#go.Images.meter.svg" SvgSub="background"/>
+<!--	<Image Name="Image"  Path="#go.Images.meter.svg" SvgSub="gauge"/>-->
+</Group>

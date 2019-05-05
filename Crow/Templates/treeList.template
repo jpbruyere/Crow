@@ -1,0 +1,3 @@
+<?xml version="1.0"?>
+<VerticalStack
+	Height="Fit" Name="ItemsContainer"/>

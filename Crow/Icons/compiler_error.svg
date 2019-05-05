@@ -1,0 +1,13 @@
+<svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+ <g id="False">
+  <title>Layer 1</title>
+  <rect id="svg_1" height="27" width="27" y="2.5" x="2.5" stroke-width="5" stroke="#bf0000" fill="#fff"/>
+  <text font-weight="bold" xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" id="svg_2" y="24.84615" x="7.82692" stroke-width="0" stroke="#bf0000" fill="#000000">X</text>
+ </g>
+  <g id="True">
+  <title>Layer 2</title>
+  <path id="svg_1" d="m16.28846,3.46154l13.78846,26.61539l-27.57692,0l13.78846,-26.61539z" stroke-linecap="null" stroke-linejoin="null" stroke-width="3" stroke="#d1d100" fill-opacity="null" fill="#fff"/>
+  <text font-weight="bold" xml:space="preserve" text-anchor="start" font-family="Georgia, Times, 'Times New Roman', serif" font-size="24" id="svg_3" y="27.15385" x="12.44231" stroke-width="0" stroke="#bf0000" fill="#000000">!</text>
+ </g>
+</svg>

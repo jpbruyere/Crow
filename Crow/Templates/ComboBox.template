@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<Popper Caption="{./SelectedItem}" Name="popper" PopDirection="Bottom" Foreground="{./Foreground}" Background="{./Background}">
+	<Template>
+		<CheckBox Caption="{./Caption}" IsChecked="{²./IsPopped}" Foreground="{./Foreground}" Background="{./Background}">
+			<Template>
+				<Border CornerRadius="0" Foreground="LightGrey">
+					<HorizontalStack Margin="0" Spacing="1">
+						<TextBox MinimumSize="80,10" Margin="1" Foreground="Black" Background="White"
+							Text="{./Caption}"/>
+						<Button Width="14" Height="14" Focusable="false"
+							Template="#Crow.ArrowBut.template">
+							<Image Margin="0"  Path="#Crow.Icons.updown.svg" SvgSub="down"/>
+						</Button>
+					</HorizontalStack>
+				</Border>
+			</Template>
+		</CheckBox>
+	</Template>
+	<Border Background="DimGrey" BorderWidth="1" Margin="1"
+		MinimumSize="{../../MinimumPopupSize}" Fit="true">
+		<Scroller Name="scroller1" Margin="2" 
+			MaximumSize="0,200"
+			HorizontalAlignment="Left">
+			<VerticalStack
+				Height="Fit" Name="ItemsContainer" Margin="0"
+				HorizontalAlignment="Left"
+				VerticalAlignment="Top"/>
+		</Scroller>
+	</Border>
+</Popper>

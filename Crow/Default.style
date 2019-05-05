@@ -1,0 +1,232 @@
+﻿Button, CheckBox, RadioButton, ComboBox, Expandable,
+MessageBox, Popper, Slider, Spinner, TextBox {
+	Focusable = "true";
+	Height = "Fit";
+}
+Border {
+	Foreground = "Grey";
+}
+CheckBox { Caption = "CheckBox"; }
+RadioButton { Caption = "RadioButton"; }
+Expandable { Caption = "Expandable"; }
+Popper { Caption = "Popper";}
+GroupBox { Caption = "Group Box"; }
+
+ControlBorder {
+	BorderWidth	= "1";
+	Foreground  = "DimGrey";
+	Background	= "Transparent";
+}
+ControlCaption {
+	Foreground  = "Grey";
+	MouseEnter	= "{Foreground=White}";
+	MouseLeave	= "{Foreground=Grey}";
+}
+Icon {
+	Margin = "1";
+	Width = "12";
+	Height = "12";
+}
+
+Wrapper {
+	Orientation = "Vertical";
+}
+Button {
+	Caption = "Button";
+	Width = "Fit";
+}
+Label {
+	Height = "Fit";
+	Width = "Fit";
+	Margin = "1";
+    CacheEnabled = "false";
+}
+Menu {
+	Margin = "1";
+	Background = "vgradient|0:DimGrey|1:Black";
+	//Background = "Transparent";
+	Height = "Fit";
+	Width = "Stretched";
+	VerticalAlignment = "Top";
+	SelectionBackground = "Transparent";
+}
+MenuItem {
+	Caption = "MenuItem";
+	Width = "Stretched";
+	Height = "Fit";
+	//Background = "vgradient|0:DimGrey|1:Black";
+	//Background = "Transparent";
+	Foreground = "LightGrey";
+	MouseEnter = "{Background=SteelBlue;}";
+	MouseLeave = "{Background=Transparent;}";
+	//MouseEnter = "{Background = vgradient|0:SteelBlue|1:Jet;Foreground=White;}";
+	//MouseLeave = "{Foreground=LightGrey;Background=Transparent;}";
+	SelectionBackground = "Transparent";
+}
+MessageBox {
+	Background = "0.1,0.1,0.2,0.7";
+	Width = "Fit";
+	Caption="MessageBox";
+	Font = "serif, 12";
+	MinimumSize = "200,120";
+	AlwaysOnTop = "true";
+}
+Slider {
+	Background = "vgradient|0:Black|0.1:Grey|0.9:Grey|1:LightGrey";
+	Foreground = "Grey";
+	Height = "8";
+	Value="5";
+}
+Splitter {
+	Focusable = "true";
+	Margin = "1";
+	Background = "Grey";
+}
+Spinner {
+	Foreground = "DimGrey";
+}
+TabView {
+	CacheEnabled = "false";
+	AllowDrop = "true";
+}
+TabItem {
+	Caption = "TabItem";
+	Focusable = "true";
+	CacheEnabled = "true";
+	//MouseEnter = "{Background = Cobalt;Foreground=White;}";
+	//MouseLeave = "{Foreground=LightGrey;Background=Jet;}";
+	AllowDrag = "true";
+}
+TextBox {
+	Background = "White";
+	Foreground = "Black";
+	Selectable = "True";
+	Text = "TextBox";
+	Margin = "1";
+}
+Window {
+	Caption = "Window";
+	Focusable = "true";
+	MinimumSize="5,5";
+	Width = "150";
+	Height = "150";
+}
+ToolWindow {
+	Caption = "Window";
+	Template = "#Crow.ToolWindow.template";
+	Focusable = "true";
+    Movable = "true";
+	MinimumSize="50,50";
+	Width = "150";
+	Height = "150";
+}
+Docker {
+	AllowDrop = "false";
+	Margin="0";
+	Focusable="true";
+}
+DockStack {
+	Margin="1";
+	AllowDrop = "true";
+	Focusable="true";
+	//DragEnter="{Background=Blue}";
+	//DragLeave="{Background=Transparent}";
+	//EndDrag="{Background=Jet}";
+}
+DockWindow {
+	//Background = "Onyx";
+	Focusable = "true";
+	AllowDrag = "true";
+	AlwaysOnTop = "true";
+	Margin="0";
+	Width="200";
+	Height="200";
+	//MinimumSize="50,50";
+}
+FileDialog {
+	Template = "#Crow.FileDialog.template";
+	AlwaysOnTop = "true";
+	Focusable = "true";
+	MinimumSize="50,50";
+	Width = "500";
+	Height = "300";
+}
+ProgressBar {
+	Foreground = "vgradient|0:DarkBlue|0.5:SkyBlue|1:DarkBlue";
+}
+Scroller {
+	CacheEnabled = "false";
+}
+Control {
+	Margin="0";
+	Spacing="3";
+}
+SaturationValueSelector {
+	Foreground="Red";
+}
+HueSelector {
+	ClipToClientRect="False";
+}
+ColorSpinner {
+	Minimum = "0";
+	Maximum = "255";
+	SmallIncrement = "1";
+    Width="50";
+}
+HSVSpinner {
+	Minimum = "0";
+	Maximum = "1";
+	SmallIncrement = "0.01";
+}
+TxtInFileDialog {
+	Margine = "1";
+	Font = "droid, 12";
+}
+CheckBoxAlt {
+	Template= "#Crow.CheckBox2.template";
+	Background = "Transparent";
+	Checked="{Background=Grey;Foreground=LightGrey;}";
+	Unchecked = "{Background=Transparent;Foreground=DimGrey;}";
+}
+
+ArrowBut {
+	MouseRepeat="true";	
+	Focusable="true";
+	Foreground="Onyx";
+	Background="hgradient|0:Grey|1:Jet";
+	MouseDown="{Background=hgradient|0:White|0.4:CornflowerBlue|1:Jet}";
+	MouseUp="{Background=hgradient|0:Grey|1:DimGrey}";
+	MouseEnter="{Foreground=Black}";
+	MouseLeave="{Foreground=Onyx}";
+}
+HArrowBut {
+	MouseRepeat="true";
+    Focusable="true";
+	Foreground="Onyx";
+	Background="vgradient|0:Grey|1:DimGrey";
+	MouseDown="{Background=vgradient|0:White|0.4:DarkBlue|1:Jet}";
+	MouseUp="{Background=vgradient|0:Grey|1:DimGrey}";
+	MouseEnter="{Foreground=Black}";
+	MouseLeave="{Foreground=DimGrey}";
+}
+ScrollBar {
+    Maximum = "0";
+    Value = "0";
+    Background = "Silver";
+    Foreground = "DimGrey";
+    Width = "12";
+    CornerRadius = "0";
+    Margin="0";
+}
+HScrollBar {
+    Template = "#Crow.HScrollBar.template";
+    Maximum = "0";
+    Value = "0";
+    Height = "12";
+    Width = "Stretched";
+}
+EnumSelector {
+    Orientation = "Vertical";
+    Height = "Fit";
+    Spacing = "0";
+}

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0"?>
+<Window Caption="Vertical Wrapper" Width="50%" Height="50%">
+	<Wrapper Orientation="Vertical" Height="Fit" Width="Fit" Margin="5" Background="MediumSeaGreen" Spacing="1" >
+		<Widget Width="50" Height="50" Background="SeaGreen"/>
+		<Widget Width="50" Height="50" Background="SeaGreen"/>
+		<Widget Width="50" Height="50" Background="SeaGreen"/>
+		<Widget Width="50" Height="50" Background="SeaGreen"/>
+		<Widget Width="50%" Height="50" Background="SeaGreen"/>
+		<Widget Width="50" Height="50" Background="SeaGreen"/>
+		<Widget Width="50" Height="50" Background="SeaGreen"/>
+		<Widget Width="50" Height="50%" Background="SeaGreen"/>
+		<Widget Width="50" Height="50" Background="SeaGreen"/>
+	</Wrapper>
+</Window>

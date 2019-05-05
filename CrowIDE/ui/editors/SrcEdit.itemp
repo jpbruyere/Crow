@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<TabItem QueryClose="OnQueryClose" IsSelected="{²IsSelected}" Template="#Crow.Coding.EditTabItem.template">
+	<IMLContainer Path="#CrowIDE.ui.editors.SourceEditor.crow"/>
+</TabItem>

@@ -1,0 +1,12 @@
+*.log
+build
+Win_x86
+Crow.userprefs
+packages
+*.nupkg
+*.user
+.vs/
+/GOLib.suo
+/tmp
+bin
+obj

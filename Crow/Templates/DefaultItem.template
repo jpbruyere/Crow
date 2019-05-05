@@ -1,0 +1,8 @@
+﻿<?xml version="1.0"?>
+<Container Fit="true" Margin="0" Focusable="true"
+		HorizontalAlignment="Left"
+		MouseEnter="{Background=SteelBlue}"
+		MouseLeave="{Background=Transparent}">
+	<Label Text="{}"/>
+</Container>
+

@@ -1,0 +1,4 @@
+﻿<?xml version="1.0"?>
+<Widget Margin="10" Width="50%" Height="50%"
+		Background="hgradient|0:Red|0.25:Blue|0.5:Green|0.75:Yellow|1:Red"
+		MinimumSize="50,50"/>

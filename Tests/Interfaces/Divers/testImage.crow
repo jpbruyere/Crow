@@ -1,0 +1,87 @@
+﻿<?xml version="1.0"?>
+<VerticalStack Fit="true">
+	<HorizontalStack Fit="true" Background="hgradient|0:DarkRed|1:Transparent" Margin="5">
+		<Label Text="SCALED PROPORTIONNAL" Width="150"/>
+		<Image Width="10%" Height="Fit" Background="vgradient|0:SkyBlue|1:White" Path="#Tests.image.crow0.svg"/>
+		<Image Margin="10" Background="vgradient|0:SkyBlue|1:White" Path="#Tests.image.crow0.svg" />
+		<Image Background="vgradient|0:SkyBlue|1:White" Width="20" Height="20" Path="#Tests.image.crow0.svg" />
+		<Image Margin="2" Background="vgradient|0:SkyBlue|1:White" Width="20" Height="20" Path="#Tests.image.crow0.svg" />
+		<Image Background="vgradient|0:SkyBlue|1:White" Width="50" Height="100" Path="#Tests.image.crow0.svg" />
+		<Image Margin="10" Background="vgradient|0:SkyBlue|1:White" Width="50" Height="100" Path="#Tests.image.crow0.svg" />
+		<Image Background="vgradient|0:SkyBlue|1:White" Width="100" Height="50" Path="#Tests.image.crow0.svg" />
+		<Image Margin="10" Background="vgradient|0:SkyBlue|1:White" Width="100" Height="50" Path="#Tests.image.crow0.svg" />
+		<Image Background="vgradient|0:SkyBlue|1:White" Width="50" Height="Fit" Path="#Tests.image.crow0.svg" />
+		<Image Margin="10" Background="vgradient|0:SkyBlue|1:White" Width="50" Height="Fit" Path="#Tests.image.crow0.svg" />
+	</HorizontalStack>
+	<HorizontalStack Fit="true" Background="hgradient|0:DarkRed|1:Transparent" Margin="5">
+		<Label Text="SCALED NOT PROPORTIONNAL" Width="150"/>
+		<Image KeepProportions="false" Background="vgradient|0:SkyBlue|1:White" Path="#Tests.image.crow0.svg" />
+		<Image KeepProportions="false" Margin="10" Background="vgradient|0:SkyBlue|1:White" Path="#Tests.image.crow0.svg" />
+		<Image KeepProportions="false" Background="vgradient|0:SkyBlue|1:White" Width="20" Height="20" Path="#Tests.image.crow0.svg" />
+		<Image KeepProportions="false" Margin="2" Background="vgradient|0:SkyBlue|1:White" Width="20" Height="20" Path="#Tests.image.crow0.svg" />
+		<Image KeepProportions="false" Background="vgradient|0:SkyBlue|1:White" Width="50" Height="100" Path="#Tests.image.crow0.svg" />
+		<Image KeepProportions="false" Margin="10" Background="vgradient|0:SkyBlue|1:White" Width="50" Height="100" Path="#Tests.image.crow0.svg" />
+		<Image KeepProportions="false" Background="vgradient|0:SkyBlue|1:White" Width="100" Height="50" Path="#Tests.image.crow0.svg" />
+		<Image KeepProportions="false" Margin="10" Background="vgradient|0:SkyBlue|1:White" Width="100" Height="50" Path="#Tests.image.crow0.svg" />
+		<Image KeepProportions="false" Background="vgradient|0:SkyBlue|1:White" Width="50" Height="Fit" Path="#Tests.image.crow0.svg" />
+		<Image KeepProportions="false" Margin="10" Background="vgradient|0:SkyBlue|1:White" Width="50" Height="Fit" Path="#Tests.image.crow0.svg" />
+	</HorizontalStack>
+	<HorizontalStack Fit="true" Background="hgradient|0:DarkRed|1:Transparent" Margin="5">
+		<Label Text="UNSCALED" Width="150"/>
+		<Image Scaled="false" Background="Blue" Path="#Tests.image.crow0.svg" />
+		<Image Scaled="false" Margin="10" Background="Blue" Path="#Tests.image.crow0.svg" />
+		<Image Scaled="false" Background="Blue" Width="20" Height="20" Path="#Tests.image.crow0.svg" />
+		<Image Scaled="false" Margin="2" Background="Blue" Width="20" Height="20" Path="#Tests.image.crow0.svg" />
+		<Image Scaled="false" Background="Blue" Width="50" Height="100" Path="#Tests.image.crow0.svg" />
+		<Image Scaled="false" Margin="10" Background="Blue" Width="50" Height="100" Path="#Tests.image.crow0.svg" />
+		<Image Scaled="false" Background="Blue" Width="100" Height="50" Path="#Tests.image.crow0.svg" />
+		<Image Scaled="false" Margin="10" Background="Blue" Width="100" Height="50" Path="#Tests.image.crow0.svg" />
+		<Image Scaled="false" Background="Blue" Width="50" Height="Fit" Path="#Tests.image.crow0.svg" />
+		<Image Scaled="false" Margin="10" Background="Blue" Width="50" Height="Fit" Path="#Tests.image.crow0.svg" />
+	</HorizontalStack>
+	<HorizontalStack Fit="true" Background="hgradient|0:DarkRed|1:Transparent" Margin="5">
+		<Label Text="SCALED PROPORTIONNAL" Width="150"/>
+		<Image Background="Blue" Path="#Crow.Icons.tetra.png"/>
+		<Image Margin="10" Background="Blue" Path="#Crow.Icons.tetra.png"/>
+		<Image Background="Blue" Width="20" Height="20" Path="#Crow.Icons.tetra.png"/>
+		<Image Margin="2" Background="Blue" Width="20" Height="20" Path="#Crow.Icons.tetra.png"/>
+		<Image Background="Blue" Width="50" Height="100" Path="#Crow.Icons.tetra.png"/>
+		<Image Margin="10" Background="Blue" Width="50" Height="100" Path="#Crow.Images.Icons.tetra.png"/>
+		<Image Background="Blue" Width="100" Height="50" Path="#Crow.Icons.tetra.png"/>
+		<Image Margin="10" Background="Blue" Width="100" Height="50" Path="#Crow.Icons.tetra.png"/>
+		<Image Background="Blue" Width="50" Height="Fit" Path="#Crow.Icons.tetra.png"/>
+		<Image Margin="10" Background="Blue" Width="50" Height="Fit" Path="#Crow.Icons.tetra.png"/>
+	</HorizontalStack>
+	<HorizontalStack Fit="true" Background="hgradient|0:DarkRed|1:Transparent" Margin="5">
+		<Label Text="SCALED NOT PROPORTIONNAL" Width="150"/>
+		<Image KeepProportions="false" Background="Blue" Path="#Crow.Icons.tetra.png"/>
+		<Image KeepProportions="false" Margin="10" Background="Blue" Path="#Crow.Icons.tetra.png"/>
+		<Image KeepProportions="false" Background="Blue" Width="20" Height="20" Path="#Crow.Icons.tetra.png"/>
+		<Image KeepProportions="false" Margin="2" Background="Blue" Width="20" Height="20" Path="#Crow.Icons.tetra.png"/>
+		<Image KeepProportions="false" Background="Blue" Width="50" Height="100" Path="#Crow.Icons.tetra.png"/>
+		<Image KeepProportions="false" Margin="10" Background="Blue" Width="50" Height="100" Path="#Crow.Images.Icons.tetra.png"/>
+		<Image KeepProportions="false" Background="Blue" Width="100" Height="50" Path="#Crow.Images.Icons.tetra.png"/>
+		<Image KeepProportions="false" Margin="10" Background="Blue" Width="100" Height="50" Path="#Crow.Images.Icons.tetra.png"/>
+		<Image KeepProportions="false" Background="Blue" Width="50" Height="Fit" Path="#Crow.Images.Icons.tetra.png"/>
+		<Image KeepProportions="false" Margin="10" Background="Blue" Width="50" Height="Fit" Path="#Crow.Images.Icons.tetra.png"/>
+	</HorizontalStack>
+	<HorizontalStack Fit="true" Background="hgradient|0:DarkRed|1:Transparent" Margin="5">
+		<Label Text="UNSCALED" Width="150"/>
+		<Image Scaled="false" Background="Blue" Path="#Crow.Images.Icons.tetra.png"/>
+		<Image Scaled="false" Margin="10" Background="Blue" Path="#Crow.Images.Icons.tetra.png"/>
+		<Image Scaled="false" Background="Blue" Width="20" Height="20" Path="#Crow.Images.Icons.tetra.png"/>
+		<Image Scaled="false" Margin="2" Background="Blue" Width="20" Height="20" Path="#Crow.Images.Icons.tetra.png"/>
+		<Image Scaled="false" Background="Blue" Width="50" Height="100" Path="#Crow.Images.Icons.tetra.png"/>
+		<Image Scaled="false" Margin="10" Background="Blue" Width="50" Height="100" Path="#Crow.Images.Icons.tetra.png"/>
+		<Image Scaled="false" Background="Blue" Width="100" Height="50" Path="#Crow.Images.Icons.tetra.png"/>
+		<Image Scaled="false" Margin="10" Background="Blue" Width="100" Height="50" Path="#Crow.Images.Icons.tetra.png"/>
+		<Image Scaled="false" Background="Blue" Width="50" Height="Fit" Path="#Crow.Images.Icons.tetra.png"/>
+		<Image Scaled="false" Margin="10" Background="Blue" Width="50" Height="Fit" Path="#Crow.Images.Icons.tetra.png"/>
+	</HorizontalStack>
+	<HorizontalStack Width="Fit" Height="100" Background="hgradient|0:DarkRed|1:Transparent" Margin="5">
+		<Image Background="Blue" Path="#Tests.image.crow0.svg" />
+		<Image Margin="10" Background="White" Path="#Tests.image.crow0.svg" />
+		<Image Background="White" Width="20" Height="10" Path="#Tests.image.crow0.svg" />
+		<Image Margin="1" Background="White" Width="20" Height="10" Path="#Tests.image.crow0.svg" />
+	</HorizontalStack>
+</VerticalStack>

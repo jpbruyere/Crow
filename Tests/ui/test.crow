@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<Window Font="droid bold, 10" Caption="Open GL" HorizontalAlignment="Left" Width="30%" Height="90%">
+	<VerticalStack>
+		<HorizontalStack Background="DimGrey" Height="Fit" Width="Stretched"  Margin="2">
+			<Popper Caption="File" Template="#Tests.ui.Popper.template" Width="Fit">
+				<Border Fit="True" Foreground="Grey" Background="DimGrey">
+					<VerticalStack Height="Fit" Width="Fit" Margin="2">
+						<Label Text="New File" Style="#Tests.ui.MenuItem.style" />
+						<Label Text="Open..." Style="#Tests.ui.MenuItem.style"/>
+						<Label Text="Save..." Style="#Tests.ui.MenuItem.style"/>
+						<Label Text="Exit" Style="#Tests.ui.MenuItem.style"/>
+					</VerticalStack>
+				</Border>
+			</Popper>
+			<Label Text="Edit" Style="#Tests.ui.LabelButton.style"/>
+			<Label Text="Project" Style="#Tests.ui.LabelButton.style"/>
+			<Label Text="Help" Style="#Tests.ui.LabelButton.style"/>
+		</HorizontalStack>
+		<GroupBox Caption="Object Rotation" Margin="10" Width="70%" Height="Fit" >
+			<VerticalStack Spacing="10">
+				<Spinner Width="50%" Maximum="1,0" SmallIncrement="0.01" Value="{²RotationSpeed}"/>
+				<Slider Height="10" Width="50%" Maximum="1,0" SmallIncrement="0.01" Value="{²RotationSpeed}"/>
+				<CheckBox IsChecked="{²ClockWiseRotation}" Caption="Clockwise Rotation"/>
+				<GroupBox Caption="Rotation Axis" Height="Fit" >
+					<VerticalStack>
+						<RadioButton Caption="x"/>
+						<RadioButton Caption="y"/>
+						<RadioButton Caption="z"/>
+					</VerticalStack>
+				</GroupBox>
+			</VerticalStack>
+		</GroupBox>
+
+		<Image Width="100" Height="100"
+		Path="#Crow.Images.Icons.exit2.svg"	/>
+	</VerticalStack>
+</Window>

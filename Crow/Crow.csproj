@@ -1,0 +1,70 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(SolutionDir)netfx.props" />
+  <PropertyGroup>
+<!--    <TargetFrameworks>net471;netstandard2.0</TargetFrameworks>-->
+    <TargetFrameworks>net471</TargetFrameworks>
+    <AssemblyName>Crow</AssemblyName>
+    <Copyright></Copyright>
+    <AssemblyVersion>0.9.0</AssemblyVersion>    
+    <Description>C.R.O.W. is a widget toolkit and rendering engine entirely developed in C# with templates, styles, compositing, and bindings.</Description>        
+                    
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>        
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+        
+    <Authors>Jean-Philippe Bruyère</Authors>
+    <Title>C# Rapid Open Widget Toolkit</Title>        
+    <PackageId>Crow.VK</PackageId>
+    <PackageTags>Crow Vulkan Widget Interface GUI</PackageTags>
+    <PackageVersion>$(AssemblyVersion)-beta</PackageVersion>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/jpbruyere/Crow/wiki</PackageProjectUrl>        
+    <PackageLicense>https://opensource.org/licenses/MIT</PackageLicense>
+    <PackageIconUrl>https://jpbruyere.github.io/Crow/images/crow.png</PackageIconUrl>
+    <PackageCopyright>Copyright 2013-2019</PackageCopyright>
+    <PackageReleaseNotes>Turn on vulkan layer through vkvg</PackageReleaseNotes>    
+    <RepositoryUrl>https://github.com/jpbruyere/Crow</RepositoryUrl>
+        
+    <OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>        
+    <DefineConstants>DESIGN_MODE</DefineConstants>
+    <ReleaseVersion>0.8.0</ReleaseVersion>
+  </PropertyGroup>
+   
+  
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <DefineConstants>TRACE;DESIGN_MODE;DEBUG;NETFRAMEWORK;NET471</DefineConstants>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+  </PropertyGroup>
+  
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
+    <Reference Include="System" />
+    <Reference Include="mscorlib" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />        
+  </ItemGroup>
+    
+  <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
+    <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
+  </ItemGroup>        
+    
+  <ItemGroup>
+    <Compile Include="src\**\*.cs" />
+        
+    <EmbeddedResource Include="Templates\*.*">
+      <LogicalName>Crow.%(Filename).template</LogicalName>
+    </EmbeddedResource>
+    
+    <EmbeddedResource Include="Default.style" />
+    <EmbeddedResource Include="Icons\*.*">
+        <LogicalName>Crow.Icons.%(Filename)%(Extension)</LogicalName>    
+    </EmbeddedResource>
+  </ItemGroup>  
+    
+  <ItemGroup>
+    <PackageReference Include="Vulkan" Version="0.1.2.8-beta" />    
+  </ItemGroup>
+</Project>

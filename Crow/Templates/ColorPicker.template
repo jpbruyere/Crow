@@ -1,0 +1,44 @@
+﻿<?xml version="1.0"?>
+<Border Background="{./Background}"	Foreground="{./Foreground}"
+		CornerRadius="{./CornerRadius}" BorderWidth="1">
+		<HorizontalStack Spacing="0">
+			<VerticalStack Margin="5">
+				<SaturationValueSelector S="{²./S}" V="{²./V}" Focusable="true" Name="colorSelector" Margin="0"
+					Foreground="{../hueSelector.HueColor}"
+					Width="128" Height="128"/>
+				<HueSelector Hue="{²./H}" Focusable="true" Name="hueSelector" Margin="0" Width="128" Height="20"/>
+			</VerticalStack>
+			<VerticalStack Margin="5" Spacing="1" Width="100">
+				<Widget Width="34" Height="21" Background="{./SelectedColor}"/>
+				<Label Focusable="true" Selectable="true" Text="{./SelectedColor}" />				
+				<HorizontalStack Height="Fit">
+					<Label Text="R" Width="Stretched" TextAlignment="Right"/>
+					<Spinner Style="ColorSpinner" Value="{²./R}"/>
+				</HorizontalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="G" Width="Stretched" TextAlignment="Right"/>
+					<Spinner Style="ColorSpinner" Value="{²./G}"/>
+				</HorizontalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="B" Width="Stretched" TextAlignment="Right"/>
+					<Spinner Style="ColorSpinner" Value="{²./B}"/>
+				</HorizontalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="A" Width="Stretched" TextAlignment="Right"/>
+					<Spinner Style="ColorSpinner" Value="{²./A}"/>
+				</HorizontalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="H" Width="Stretched" TextAlignment="Right"/>
+					<Spinner Style="HSVSpinner" Value="{²./H}"/>
+				</HorizontalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="S" Width="Stretched" TextAlignment="Right"/>
+					<Spinner Style="HSVSpinner" Value="{²./S}"/>
+				</HorizontalStack>
+				<HorizontalStack Height="Fit">
+					<Label Text="V" Width="Stretched" TextAlignment="Right"/>
+					<Spinner Style="HSVSpinner" Value="{²./V}"/>
+				</HorizontalStack>
+			</VerticalStack>
+		</HorizontalStack>
+</Border>

@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(SolutionDir)netfx.props" />
+  <PropertyGroup>
+    <TargetFrameworks>net472</TargetFrameworks>
+    <OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>
+    <OutputType>Exe</OutputType>        
+    <RepositoryUrl>https://github.com/jpbruyere/Crow</RepositoryUrl>
+    <License>https://opensource.org/licenses/MIT</License>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>    
+    <TargetFramework>net472</TargetFramework>
+    <ReleaseVersion>0.8.0</ReleaseVersion>
+  </PropertyGroup>
+            
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+  </PropertyGroup>
+    
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
+    <Reference Include="System" />
+  </ItemGroup>    
+
+  <ItemGroup>  
+    <ProjectReference Include="..\..\Crow\Crow.csproj" />
+  </ItemGroup>    
+    
+  <ItemGroup>    
+    <Compile Include="..\common\CrowWin.cs" />
+    <Datas Include="..\data\**\*.*">      
+      <Link>data\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Datas>
+    <EmbeddedResource Include="ui\*.*">        
+      <LogicalName>ShowCase.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>                
+    <None Include="..\common\ui\Interfaces\**\*.*">  
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Interfaces\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </None>
+  </ItemGroup>     
+  <ItemGroup>
+    <PackageReference Include="CVKL" Version="0.1.3.2-beta" />
+  </ItemGroup>
+</Project>
+
+    
