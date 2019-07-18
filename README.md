@@ -32,6 +32,7 @@
   <a href="https://github.com/jpbruyere/Crow/blob/master/Images/screenshot.png">
     <img src="https://github.com/jpbruyere/Crow/blob/master/Images/screenshot.png" width="400">
   </a>
+  <br>(CrowIde is not realy functional for now, it serves me to test limits and perf of templated interfaces)
 </p>
 
 #### Features
