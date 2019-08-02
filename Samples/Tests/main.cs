@@ -147,7 +147,7 @@ namespace HelloWorld
 
 			//testFiles = new string [] { @"Interfaces/Experimental/testDock.crow" };
 			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
-			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/0.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
@@ -187,9 +187,11 @@ namespace HelloWorld
 			else if (idx < 0)
 				idx = testFiles.Length - 1;
 
+			Console.WriteLine ($"loading: {testFiles [idx]}");
 			try {
 				Widget w = crow.Load (testFiles [idx]);
 				w.DataSource = this;
+
 			} catch (Exception ex) {
 				MessageBox.Show (crow, MessageBox.Type.Error, ex.Message + "\n" + ex.InnerException.Message).Modal = true;
 			}

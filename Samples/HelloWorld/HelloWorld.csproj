@@ -29,6 +29,6 @@
     </EmbeddedResource>                
   </ItemGroup>     
   <ItemGroup>
-    <PackageReference Include="CVKL" Version="0.1.3.2-beta" />
+    <PackageReference Include="CVKL" Version="0.1.5-beta" />
   </ItemGroup>
 </Project>

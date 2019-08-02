@@ -12,7 +12,8 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
         
     <Authors>Jean-Philippe Bruyère</Authors>
-    <Title>C# Rapid Open Widget Toolkit</Title>        
+    <Title>C# Rapid Open Widget Toolkit</Title>
+	<License>MIT</License>
     <PackageId>Crow.VK</PackageId>
     <PackageTags>Crow Vulkan Widget Interface GUI</PackageTags>
     <PackageVersion>$(AssemblyVersion)-beta</PackageVersion>
@@ -33,7 +34,7 @@
   
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
-    <DefineConstants>TRACE;DESIGN_MODE;DEBUG;NETFRAMEWORK;NET471</DefineConstants>
+    <DefineConstants>TRACE;DESIGN_MODE;_DEBUG_CLIP_RECTANGLE;DEBUG;NETFRAMEWORK;NET471</DefineConstants>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
   
@@ -64,6 +65,6 @@
   </ItemGroup>  
     
   <ItemGroup>
-    <PackageReference Include="Vulkan" Version="0.1.2.8-beta" />    
+    <PackageReference Include="Vulkan" Version="0.1.4-beta" />    
   </ItemGroup>
 </Project>
