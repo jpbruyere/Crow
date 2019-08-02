@@ -296,7 +296,7 @@ namespace Crow
 
 			if (!hoverBorder) {
 				currentDirection = Direction.None;
-				//IFace.MouseCursor = MouseCursors.Default;
+				IFace.MouseCursor = MouseCursor.Arrow;
 				return;
 			}
 
@@ -330,37 +330,37 @@ namespace Crow
 				else
 					currentDirection = Direction.None;
 
-				//if (currentDirection != lastDir) {
-				//	switch (currentDirection) {
-				//	case Direction.None:
-				//		otkgw.MouseCursor = MouseCursors.Default;
-				//		break;
-				//	case Direction.N:
-				//		otkgw.MouseCursor = MouseCursors.V;
-				//		break;
-				//	case Direction.S:
-				//		otkgw.MouseCursor = MouseCursors.V;
-				//		break;
-				//	case Direction.E:
-				//		otkgw.MouseCursor = MouseCursors.H;
-				//		break;
-				//	case Direction.W:
-				//		otkgw.MouseCursor = MouseCursors.H;
-				//		break;
-				//	case Direction.NW:
-				//		otkgw.MouseCursor = MouseCursors.NW;
-				//		break;
-				//	case Direction.NE:
-				//		otkgw.MouseCursor = MouseCursors.NE;
-				//		break;
-				//	case Direction.SW:
-				//		otkgw.MouseCursor = MouseCursors.SW;
-				//		break;
-				//	case Direction.SE:
-				//		otkgw.MouseCursor = MouseCursors.SE;
-				//		break;
-				//	}
-				//}				
+				if (currentDirection != lastDir) {
+					switch (currentDirection) {
+					case Direction.None:
+						otkgw.MouseCursor = MouseCursor.Arrow;
+						break;
+					case Direction.N:
+						otkgw.MouseCursor = MouseCursor.VResize;
+						break;
+					case Direction.S:
+						otkgw.MouseCursor = MouseCursor.VResize;
+						break;
+					case Direction.E:
+						otkgw.MouseCursor = MouseCursor.HResize;
+						break;
+					case Direction.W:
+						otkgw.MouseCursor = MouseCursor.HResize;
+						break;
+					/*case Direction.NW:
+						otkgw.MouseCursor = MouseCursor.NW;
+						break;
+					case Direction.NE:
+						otkgw.MouseCursor = MouseCursor.NE;
+						break;
+					case Direction.SW:
+						otkgw.MouseCursor = MouseCursor.SW;
+						break;
+					case Direction.SE:
+						otkgw.MouseCursor = MouseCursor.SE;
+						break;*/
+					}
+				}				
 			}				
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)

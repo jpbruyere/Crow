@@ -28,12 +28,12 @@ using System;
 
 namespace Crow
 {
-	//public class MouseCursorChangedEventArgs : EventArgs
-	//{
-	//	public XCursor NewCursor;
-	//	public MouseCursorChangedEventArgs (XCursor newCursor) : base()
-	//	{
-	//		NewCursor = newCursor;
-	//	}
-	//}
+	public class MouseCursorChangedEventArgs : EventArgs
+	{
+		public MouseCursor NewCursor;
+		public MouseCursorChangedEventArgs (MouseCursor newCursor) : base()
+		{
+			NewCursor = newCursor;
+		}
+	}
 }

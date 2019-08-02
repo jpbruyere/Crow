@@ -62,4 +62,13 @@ namespace Crow
         Bottom,
         Center,
     }
+	public enum MouseCursor
+	{
+		Arrow,
+		IBeam,
+		Crosshair,
+		Hand,
+		HResize,
+		VResize
+	}
 }

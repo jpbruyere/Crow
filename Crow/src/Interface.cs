@@ -920,17 +920,25 @@ namespace Crow
 		}
 
 		#region Mouse and Keyboard Handling
-
+		/// <summary>
+		/// Connect to this event to receive mouse cursor change request from crom.
+		/// </summary>
+		public event EventHandler<MouseCursorChangedEventArgs> MouseCursorChanged;
 		public MouseState Mouse;
+
 		Stopwatch lastMouseDown = new Stopwatch (), mouseRepeatTimer = new Stopwatch ();
 		int mouseRepeatCount;
 		MouseButtonEventArgs lastMouseDownEvent;
+		MouseCursor cursor = MouseCursor.Arrow;
 
-		//public MouseCursors MouseCursor {
-		//	set {
-		//		//backend.SetCursor (value);
-		//	}
-		//}
+		public MouseCursor MouseCursor {
+			set {
+				if (value == cursor)
+					return;
+				cursor = value;
+				MouseCursorChanged.Raise (this, new MouseCursorChangedEventArgs (cursor));
+			}
+		}
 		/// <summary>Processes mouse move events from the root container, this function
 		/// should be called by the host on mouse move event to forward events to crow interfaces</summary>
 		/// <returns>true if mouse is in the interface</returns>

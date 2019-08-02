@@ -23,6 +23,7 @@ namespace Crow
 
         protected CrowVkWin() : base()
         {
+
             Thread crowThread = new Thread(crow_thread_func);
             crowThread.IsBackground = true;
             crowThread.Start();
@@ -60,6 +61,7 @@ namespace Crow
 	   			vkvg.SampleCount.Sample_8, presentQueue.index);
 
 			crow = new Crow.Interface (vkvgDev, 800, 600);
+			crow.MouseCursorChanged +=Crow_MouseCursorChanged;; 
 
 			isRunning = true;
 			while (isRunning) {
@@ -70,6 +72,33 @@ namespace Crow
 			crow.Dispose ();
 			vkvgDev.Dispose ();
 			crow = null;
+		}
+
+		void Crow_MouseCursorChanged (object sender, MouseCursorChangedEventArgs e)
+		{
+			switch (e.NewCursor) {
+			case MouseCursor.Arrow:
+				SetCursor (Glfw.CursorShape.Arrow);
+				break;
+			case MouseCursor.IBeam:
+				SetCursor (Glfw.CursorShape.IBeam);
+				break;
+			case MouseCursor.Crosshair:
+				SetCursor (Glfw.CursorShape.Crosshair);
+				break;
+			case MouseCursor.Hand:
+				SetCursor (Glfw.CursorShape.Hand);
+				break;
+			case MouseCursor.HResize:
+				SetCursor (Glfw.CursorShape.HResize);
+				break;
+			case MouseCursor.VResize:
+				SetCursor (Glfw.CursorShape.VResize);
+				break;
+			default:
+				SetCursor (Glfw.CursorShape.Crosshair);
+				break;
+			}
 		}
 
 		void initUISurface () {
@@ -99,8 +128,8 @@ namespace Crow
 					VkImageLayout.Undefined, VkImageLayout.TransferDstOptimal,
 					VkPipelineStageFlags.BottomOfPipe, VkPipelineStageFlags.Transfer);
 				uiImage.SetLayout (cmd, VkImageAspectFlags.Color,
-					VkImageLayout.ColorAttachmentOptimal, VkImageLayout.TransferSrcOptimal,
-					VkPipelineStageFlags.ColorAttachmentOutput, VkPipelineStageFlags.Transfer);
+					VkImageLayout.Undefined, VkImageLayout.TransferSrcOptimal,
+					VkPipelineStageFlags.Transfer, VkPipelineStageFlags.Transfer);
 					
 				VkImageSubresourceLayers imgSubResLayer = new VkImageSubresourceLayers {
 					aspectMask = VkImageAspectFlags.Color,
@@ -151,13 +180,13 @@ namespace Crow
 		}
 
 		#region Mouse and keyboard
-		//protected override void onScroll (double xOffset, double yOffset)
-		//{
-		//	if (KeyModifiers.HasFlag (Glfw.Modifier.Shift))
-		//		crow.ProcessMouseWheelChanged ((float)xOffset);
-		//	else
-		//		crow.ProcessMouseWheelChanged ((float)yOffset);
-		//}
+		protected override void onScroll (double xOffset, double yOffset)
+		{
+			if (KeyModifiers.HasFlag (Glfw.Modifier.Shift))
+				crow.ProcessMouseWheelChanged ((float)xOffset);
+			else
+				crow.ProcessMouseWheelChanged ((float)yOffset);
+		}
 		protected override void onMouseMove (double xPos, double yPos)
 		{
 			if (crow.ProcessMouseMove ((int)xPos, (int)yPos))
@@ -185,11 +214,11 @@ namespace Crow
 			if (crow.ProcessKeyUp ((Crow.Key)key))
 				return;
 		}
-		//protected override void onChar (Glfw.CodePoint cp)
-		//{
-		//	if (crow.ProcessKeyPress (cp.ToChar ()))
-		//		return;
-		//}
+		protected override void onChar (Glfw.CodePoint cp)
+		{
+			if (crow.ProcessKeyPress (cp.ToChar ()))
+				return;
+		}
 		#endregion
 
 		#region dispose
