@@ -4,7 +4,7 @@
 
 	<HorizontalStack Fit="true" Margin="5" Background="SkyBlue">
 		<Spinner Name="sp1" Value="5" ValueChanged="onSpinnerValueChange"/>
-		<Spinner Value="5"/>
+		<Spinner Value="5" Width="60"/>
 		<Spinner Value="5"/>
 	</HorizontalStack>
 </VerticalStack>

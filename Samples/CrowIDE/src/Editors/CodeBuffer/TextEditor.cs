@@ -375,10 +375,10 @@ namespace Crow.Text
 		{
 			base.onDraw (gr);
 
-			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-			gr.SetFontSize (Font.Size);
-			gr.FontOptions = Interface.FontRenderingOptions;
-			gr.Antialias = Interface.Antialias;
+			gr.FontFace = Font.Name;
+			gr.FontSize = (uint)Font.Size;
+			//gr.FontOptions = Interface.FontRenderingOptions;
+			//gr.Antialias = Interface.Antialias;
 
 			Rectangle cb = ClientRectangle;
 
@@ -452,12 +452,12 @@ namespace Crow.Text
 		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseEnter (sender, e);
-			IFace.MouseCursor = MouseCursors.Text;
+			IFace.MouseCursor = MouseCursor.IBeam;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			IFace.MouseCursor = MouseCursors.Default;
+			IFace.MouseCursor = MouseCursor.Arrow;
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
@@ -542,10 +542,8 @@ namespace Crow.Text
 
 			switch (key)
 			{
-			case Key.BackSpace:
+			case Key.Backspace:
 				buffer.Delete ();
-				break;
-			case Key.Clear:
 				break;
 			case Key.Delete:
 				if (buffer.SelectionIsEmpty)
@@ -554,8 +552,8 @@ namespace Crow.Text
 //					IFace.Clipboard = buffer.SelectedText;
 				buffer.Delete ();
 				break;
-			case Key.ISO_Enter:
-			case Key.KP_Enter:
+			case Key.Enter:
+			case Key.KeypadEnter:
 				if (!buffer.SelectionIsEmpty)
 					buffer.Delete ();
 				buffer.InsertLineBreak ();
@@ -657,9 +655,9 @@ namespace Crow.Text
 				break;
 			case Key.Menu:
 				break;
-			case Key.Num_Lock:
+			case Key.NumLock:
 				break;
-			case Key.Page_Down:
+			case Key.PageDown:
 				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
@@ -670,7 +668,7 @@ namespace Crow.Text
 				buffer.ResetSelection ();
 				CurrentLine += visibleLines;
 				break;
-			case Key.Page_Up:
+			case Key.PageUp:
 				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();

@@ -20,7 +20,7 @@
   
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="System" />
-    <PackageReference Include="CVKL" Version="0.1.3.2-beta" />
+    <PackageReference Include="CVKL" Version="0.1.5-beta" />
     <ProjectReference Include="..\..\Crow\Crow.csproj" />
   </ItemGroup>    
         
@@ -29,7 +29,7 @@
     <Compile Include="src\**\*.cs" Exclude="src\ProjectTree\CSProjectFile.cs" />  
     <EmbeddedResource Remove="icons\blank-file2.svg" />
     <EmbeddedResource Include="icons\*.*">
-      <LogicalName>icons.%(Filename)%(Extension)</LogicalName>
+      <LogicalName>CrowIDE.icons.%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="ui\**\*.crow" />
     <EmbeddedResource Include="ui\**\*.itemp" />  

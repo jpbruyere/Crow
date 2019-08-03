@@ -47,6 +47,7 @@ namespace Crow.Coding
 		}
 		void onStartDrag (object sender, EventArgs e)
 		{
+			/*
 			Widget go = sender as Widget;
 
 			lock (go.IFace.UpdateMutex) {				
@@ -65,7 +66,7 @@ namespace Crow.Coding
 
 				}
 				go.IFace.DragImage = img;
-			}
+			}*/
 		}
 		void onEndDrag (object sender, DragDropEventArgs e)
 		{

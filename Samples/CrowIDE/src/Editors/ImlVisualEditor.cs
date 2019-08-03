@@ -446,6 +446,7 @@ namespace Crow.Coding
 
 			Rectangle hr;
 
+			/*
 			if (SelectedItem?.Parent != null) {
 
 				gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
@@ -491,7 +492,7 @@ namespace Crow.Coding
 					//drawIcon (gr, icoStyle, rIcoStyle);
 
 				}						
-			}
+			}*/
 			if (HoverWidget != null) {
 				hr = HoverWidget.ScreenCoordinates (HoverWidget.getSlot ());
 				gr.SetSourceColor (Color.SkyBlue);
@@ -501,7 +502,7 @@ namespace Crow.Coding
 			gr.Restore ();
 		}
 
-		void drawIcon (Context gr, Picture pic, Rectangle r) {
+		void drawIcon (Context gr, Picture pic, Rectangle r) {/*
 //			gr.SetSourceColor (Color.Black);
 //			CairoHelpers.CairoRectangle (gr, r.Inflated (1), 2, 1.0);
 			gr.SetSourceColor (Color.White);
@@ -509,9 +510,10 @@ namespace Crow.Coding
 			gr.Fill ();
 			gr.Operator = Operator.Clear;
 			pic.Paint (gr, r);
-			gr.Operator = Operator.Over;
+			gr.Operator = Operator.Over;*/
 		}
 		void drawDesignOverlay (Context gr, Widget g, Rectangle cb, Rectangle hr, double coteStroke, double space = 6.5){
+			/*
 			double z = zoom / 100.0;
 			double coteW = 3, coteL = 5;
 			bool fill = true;
@@ -561,7 +563,8 @@ namespace Crow.Coding
 			//gr.SetSourceColor (Color.Grey);
 //			gr.Rectangle (hr,coteStroke);
 //			gr.Stroke ();
-			gr.Operator = Operator.Over;			
+			gr.Operator = Operator.Over;
+			*/
 		}
 
 		void drawCenteredTextLine (Context gr, Point center, string txt){

@@ -148,7 +148,7 @@ namespace Crow.Coding
 			go.DataSource = this;
 
 			mainDock = go.FindByName ("mainDock") as DockStack;
-
+			ReopenLastSolution = false;
 			if (ReopenLastSolution && !string.IsNullOrEmpty (LastOpenSolution)) {
 				CurrentSolution = Solution.LoadSolution (LastOpenSolution);
 				//lock(MainIFace.UpdateMutex)

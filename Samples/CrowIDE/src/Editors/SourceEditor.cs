@@ -606,10 +606,10 @@ namespace Crow.Coding
 					gr.LineTo (rFld.Center.X + 0.5 + foldSize / 2, y + fe.Ascent / 2 + 0.5);
 					closingNode = false;
 				}
-				gr.SetDash (new double[]{ 1.5 },0.0);
+				//gr.SetDash (new double[]{ 1.5 },0.0);
 				gr.SetSourceColor (Color.Grey);
 				gr.Stroke ();
-				gr.SetDash (new double[]{}, 0.0);
+				//gr.SetDash (new double[]{}, 0.0);
 
 				if (cl.IsFoldable) {
 					gr.Rectangle (rFld);
@@ -742,7 +742,7 @@ namespace Crow.Coding
 						fts = FontSlant.Italic;
 				}
 
-				gr.SelectFontFace (Font.Name, fts, ftw);
+				gr.FontFace = Font.Name;
 				gr.SetSourceColor (fg);
 
 				gr.MoveTo (x, y + fe.Ascent);
@@ -790,7 +790,7 @@ namespace Crow.Coding
 			get { return base.Font; }
 			set {
 				base.Font = value;
-
+				/*
 				using (ImageSurface img = new ImageSurface (Format.Argb32, 1, 1)) {
 					using (Context gr = new Context (img)) {
 						gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
@@ -798,7 +798,7 @@ namespace Crow.Coding
 
 						fe = gr.FontExtents;
 					}
-				}
+				}*/
 				MaxScrollY = 0;
 				RegisterForGraphicUpdate ();
 			}
@@ -824,10 +824,8 @@ namespace Crow.Coding
 		{
 			base.onDraw (gr);
 
-			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-			gr.SetFontSize (Font.Size);
-			gr.FontOptions = Interface.FontRenderingOptions;
-			gr.Antialias = Interface.Antialias;
+			gr.FontFace = Font.Name;
+			gr.FontSize = (uint)Font.Size;
 
 			Rectangle cb = ClientRectangle;
 
@@ -919,14 +917,14 @@ namespace Crow.Coding
 		{
 			base.onMouseEnter (sender, e);
 			if (e.X - ScreenCoordinates(Slot).X < leftMargin + ClientRectangle.X)
-				IFace.MouseCursor = MouseCursors.Default;
+				IFace.MouseCursor = MouseCursor.Arrow;
 			else
-				IFace.MouseCursor = MouseCursors.Text;
+				IFace.MouseCursor = MouseCursor.IBeam;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			IFace.MouseCursor = MouseCursors.Default;
+			IFace.MouseCursor = MouseCursor.Arrow;
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
@@ -938,9 +936,9 @@ namespace Crow.Coding
 
 			if (!e.Mouse.IsButtonDown (MouseButton.Left)) {
 				if (mouseLocalPos.X < leftMargin)
-					IFace.MouseCursor = MouseCursors.Default;
+					IFace.MouseCursor = MouseCursor.Arrow;
 				else
-					IFace.MouseCursor = MouseCursors.Text;
+					IFace.MouseCursor = MouseCursor.IBeam;
 				return;
 			}
 
@@ -1032,10 +1030,8 @@ namespace Crow.Coding
 
 			switch (key)
 			{
-			case Key.BackSpace:
+			case Key.Backspace:
 				buffer.DeleteChar ();
-				break;
-			case Key.Clear:
 				break;
 			case Key.Delete:
 				if (buffer.SelectionIsEmpty)
@@ -1044,8 +1040,8 @@ namespace Crow.Coding
 					IFace.Clipboard = buffer.SelectedText;
 				buffer.DeleteChar ();
 				break;
-			case Key.Return:
-			case Key.KP_Enter:
+			case Key.Enter:
+			case Key.KeypadEnter:
 				if (!buffer.SelectionIsEmpty)
 					buffer.DeleteChar ();
 				buffer.InsertLineBreak ();
@@ -1147,9 +1143,9 @@ namespace Crow.Coding
 				break;
 			case Key.Menu:
 				break;
-			case Key.Num_Lock:
+			case Key.NumLock:
 				break;
-			case Key.Page_Down:
+			case Key.PageDown:
 				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
@@ -1160,7 +1156,7 @@ namespace Crow.Coding
 				buffer.ResetSelection ();
 				PrintedCurrentLine += visibleLines;
 				break;
-			case Key.Page_Up:
+			case Key.PageUp:
 				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();

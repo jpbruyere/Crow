@@ -1701,11 +1701,11 @@ namespace Crow
 
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 			if (clearBackground) {
-					ctx.Save ();
-					ctx.Operator = Operator.Clear;
-					ctx.Rectangle (rb);
-					ctx.Fill ();
-					ctx.Restore ();
+				ctx.Save ();
+				ctx.Operator = Operator.Clear;
+				ctx.Rectangle (rb);
+				ctx.Fill ();
+				ctx.Restore ();
 			}
 
 			ctx.SetSourceSurface (bmp, rb.X, rb.Y);
@@ -1747,8 +1747,7 @@ namespace Crow
 					onDraw (ctx);
 					if (!isEnabled)
 						paintDisabled (ctx, Slot);
-
-					//ctx.Translate (-rb.X, -rb.Y);
+						
 					ctx.Restore ();
 				}
 				LastPaintedSlot = Slot;
