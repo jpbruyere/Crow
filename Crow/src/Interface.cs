@@ -185,7 +185,7 @@ namespace Crow
 		{			
 			while (running) {
 				Update ();
-				Thread.Sleep (30);
+				Thread.Sleep (8);
 			}
 		}
 
