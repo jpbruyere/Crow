@@ -119,10 +119,10 @@ namespace Crow
 		protected virtual void InitBackend () {
             if (Environment.OSVersion.Platform == PlatformID.Unix)
                 backend = new Crow.XCB.XCBBackend();
+				//backend = new Crow.XLib.XLibBackend ();
             else
                 backend = new Crow.Win32.Win32Backend();
-
-			//backend = new Crow.XLib.XLibBackend ();
+                
 			backend.Init (this);
 
 			initTooltip ();
@@ -185,7 +185,7 @@ namespace Crow
 		{			
 			while (running) {
 				Update ();
-				Thread.Sleep (1);
+				Thread.Sleep (30);
 			}
 		}
 

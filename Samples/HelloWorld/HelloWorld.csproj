@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(SolutionDir)netfx.props" />
+  <PropertyGroup>
+    <TargetFrameworks>net471;netstandard2.0</TargetFrameworks>
+    <OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>
+    <OutputType>Exe</OutputType>        
+    <RepositoryUrl>https://github.com/jpbruyere/Crow</RepositoryUrl>
+    <License>MIT</License>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>     
+    <ReleaseVersion>0.8.0</ReleaseVersion>
+  </PropertyGroup>
+            
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
+    <Reference Include="System" />
+  </ItemGroup>    
+
+  <ItemGroup>  
+    <ProjectReference Include="..\..\Crow\Crow.csproj" />
+  </ItemGroup>    
+    
+  <ItemGroup>    
+    <Datas Include="..\data\**\*.*">      
+      <Link>data\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Datas>
+    <EmbeddedResource Include="ui\**\*.*">
+      <LogicalName>HelloWorld.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>                
+  </ItemGroup>     
+  <ItemGroup>
+    <Compile Remove="..\common\CrowWin.cs" />
+  </ItemGroup>
+</Project>

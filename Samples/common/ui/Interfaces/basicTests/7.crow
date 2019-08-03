@@ -1,0 +1,144 @@
+﻿<?xml version="1.0"?>
+<Window Title="Showcase" Height="90%" Width="90%">
+	<HorizontalStack >
+		<VerticalStack Width="33%" Margin="5">
+			<GroupBox Caption="Performance" Height="Fit">
+				<VerticalStack Width="90%" Height="Fit" Spacing="2" >
+					<HorizontalStack Height="Fit">
+						<Label Text="Fps:" Style="FpsLabel"/>
+						<Label Text="{fps}" Style="FpsDisp"/>
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Text="Min:" Style="FpsLabel"/>
+						<Label Text="{fpsMin}" Style="FpsDisp"/>
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Text="Max:" Style="FpsLabel"/>
+						<Label Text="{fpsMax}" Style="FpsDisp"/>
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Text="Update:" Style="FpsLabel"/>
+						<Label Text="{update}" Style="FpsDisp"/>
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Text="Layouting:" Style="FpsLabel"/>
+						<Label Text="{layouting}" Style="FpsDisp"/>
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Text="Clipping:" Style="FpsLabel"/>
+						<Label Text="{clipping}" Style="FpsDisp"/>
+					</HorizontalStack>
+					<HorizontalStack Height="Fit">
+						<Label Text="Drawing:" Style="FpsLabel"/>
+						<Label Text="{drawing}" Style="FpsDisp"/>
+					</HorizontalStack>
+				</VerticalStack>
+			</GroupBox>
+			<Label Width="Stretched" Margin="3" Background="Onyx"/>
+			<TextBox Text="TextBox" Multiline="true" Margin="3"/>
+			<HorizontalStack Height="Fit" Margin="5" Background="Onyx" CornerRadius="10">
+				<VerticalStack Spacing="5" Width="50%">
+					<CheckBox Fit="true"/>
+					<CheckBox Fit="true"/>
+					<CheckBox Fit="true"/>
+					<CheckBox Fit="true"/>
+				</VerticalStack>
+				<VerticalStack Spacing="5" Width="50%">
+					<RadioButton Fit="true"/>
+					<RadioButton Fit="true"/>
+					<RadioButton Fit="true"/>
+					<RadioButton Fit="true"/>
+				</VerticalStack>
+			</HorizontalStack>
+			<HorizontalStack Height="Fit" Margin="5">
+				<Label Text="MouseEvents" Width="50%" Margin="3"
+					Background="Onyx"
+					Foreground="DimGrey"
+					TextAlignment="Center"
+					MouseEnter="{Foreground=White}"
+					MouseLeave="{Foreground=DimGrey}"
+					MouseDown="{Background=DarkRed}"
+					MouseUp="{Background=Onyx}"/>
+				<Label Text="MouseEvents" Width="50%" Margin="3"
+					Background="Onyx"
+					Foreground="DimGrey"
+					TextAlignment="Center"
+					MouseEnter="{Foreground=White}"
+					MouseLeave="{Foreground=DimGrey}"
+					MouseDown="{Background=Mantis}"
+					MouseUp="{Background=Onyx}"/>
+			</HorizontalStack>
+			<GroupBox Caption="Templated controls" Height="Fit" Margin="5">
+				<HorizontalStack Height="Fit">
+					<VerticalStack Width="50%">
+						<CheckBox Template="#Tests.Interfaces.CheckBox2.imlt" Style="CheckBox2"/>
+						<CheckBox  Template="#Tests.Interfaces.CheckBox2.imlt" Style="CheckBox2"/>
+						<CheckBox  Template="#Tests.Interfaces.CheckBox2.imlt" Style="CheckBox2"/>
+						<CheckBox  Template="#Tests.Interfaces.CheckBox2.imlt" Style="CheckBox2"/>
+					</VerticalStack>
+					<Splitter/>
+					<VerticalStack Width="50%">
+						<RadioButton  Template="#Tests.Interfaces.CheckBox2.imlt" Style="RadioButton2"/>
+						<RadioButton  Template="#Tests.Interfaces.CheckBox2.imlt" Style="RadioButton2"/>
+						<RadioButton  Template="#Tests.Interfaces.CheckBox2.imlt" Style="RadioButton2"/>
+						<RadioButton  Template="#Tests.Interfaces.CheckBox2.imlt" Style="RadioButton2"/>
+					</VerticalStack>
+				</HorizontalStack>
+			</GroupBox>
+			<Spinner Fit="true"/>
+		</VerticalStack>
+		<VerticalStack Width="33%" Margin="5" Spacing="5">
+			<Expandable Background="DimGrey">
+				<Image Path="#Crow.Icons.crow.svg"/>
+			</Expandable>
+			<Popper Background="DimGrey" PopDirection="Bottom">
+				<Border Fit="True" Background="DimGrey" CornerRadius="0" BorderWidth="1">
+					<Image Path="#Crow.Icons.crow.svg" Width="100" Height="100" Margin="10"
+						MouseEnter="{Background=LightGrey}"
+						MouseLeave="{Background=Transparent}"/>
+				</Border>
+			</Popper>
+			<Slider Height="10" Width="90%"/>
+			<Container Height="Fit" Background="Onyx" Margin="2" CornerRadius="5">
+				<ProgressBar Background="DimGrey" Height="10" Value="50"/>
+			</Container>
+			<Image Path="#Crow.Icons.crow.svg" Width="60" Height="60" Background="LightGrey" />
+			<TabView Name="tabview1"
+				Height="120" Orientation="Horizontal" Spacing="15">
+				<TabItem Name="TabItem1" Caption="Tab 1" Margin="0">
+					<VerticalStack Fit="true">
+						<CheckBox/>
+						<CheckBox/>
+						<CheckBox/>
+						<CheckBox/>
+					</VerticalStack>
+				</TabItem>
+				<TabItem Name="TabItem2" Caption="Tab 2" Background="Grey">
+					<VerticalStack Fit="true">
+						<RadioButton/>
+						<RadioButton/>
+						<RadioButton/>
+						<RadioButton/>
+					</VerticalStack>
+				</TabItem>
+				<TabItem Name="TabItem2" Caption="Tab 3" Background="Grey">
+					<Container Margin="5" CornerRadius="2">
+						<TextBox Height="Stretched" Margin="5" Multiline="true" TextAlignment="TopLeft"/>
+					</Container>
+				</TabItem>
+			</TabView>
+			<MessageBox Movable="false"/>
+		</VerticalStack>
+		<VerticalStack Width="33%" Margin="5">
+			<Border Margin="5" Background="Onyx" Height="Fit">
+				<Label Width="Stretched" Margin="1" Text="{../../dv.SelectedItem}"/>
+			</Border>
+			<Border Margin="5" Background="Onyx" Height="50%">
+				<DirectoryView Name="dv" Root="./" Margin="1"/>
+			</Border>
+			<ListBox Data="{TestList}" Background="Onyx" Margin="5"
+					 ItemTemplate="#Tests.Interfaces.colorItem.crow"
+					 Template="#Crow.Templates.ScrollingListBox.goml"/>
+		</VerticalStack>
+	</HorizontalStack>
+</Window>

@@ -409,15 +409,13 @@ namespace Crow.XCB
 					xcb_window_class_t.INPUT_OUTPUT, scr.root_visual, mask, intPtr);
 			}
 
-
 			xcb_map_window (conn, win);
 
 			xcb_flush (conn);
 
-
 			IntPtr visual = findVisual (scr_it, scr.root_visual);
 
-			loadCursors ();	
+			//loadCursors ();	
 
 			iFace.surf = new Cairo.XcbSurface (conn, win, visual, iFace.ClientRectangle.Width, iFace.ClientRectangle.Height);
 		}

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0"?>
+<VerticalStack>
+	<Border Fit="true" Margin="10">
+		<VerticalStack Width="150" Height="Fit">
+			<RadioButton Caption="Left" IsChecked="true" Checked="change_alignment"/>
+			<RadioButton Caption="Right" Checked="change_alignment"/>
+			<RadioButton Caption="Top" Checked="change_alignment"/>
+			<RadioButton Caption="Bottom" Checked="change_alignment"/>
+		</VerticalStack>
+	</Border>
+	<Widget Height="200"/>
+	<Popper Caption="TestPopper" Width="100" Background="DimGrey" PopDirection="{alignment}">
+		<Border Fit="True" Background="SteelBlue">
+			<Image Fit="true" Path="#go.Images.Icons.tetra.png" Margin="10"/>
+			<VerticalStack Fit="true" Margin="10" Background="CornflowerBlue">
+				<CheckBox Name="chk1" Background="Red"/>
+				<CheckBox Name="chk2" IsChecked="true"/>
+				<CheckBox Name="chk3"/>
+				<CheckBox Name="chk4"/>
+				<HorizontalStack Fit="true" Margin="20">
+					<Label Name="captionFps" Text="Fps:" Width="50" TextAlignment="Right"/>
+					<Label Name="valueFps" Text="{fps}" Font="droid , 12" Width="50" TextAlignment="Center" Background="SeaGreen"/>
+				</HorizontalStack>
+			</VerticalStack>
+		</Border>
+	</Popper>
+</VerticalStack>

@@ -1,0 +1,5 @@
+﻿<?xml version="1.0"?>
+<Group Name="TopContainer" Width="400" Height="400"
+	Focusable="True" Background="Grey">
+	<ScrollBar Height="16" Orientation="Horizontal" Width="Stretched" Maximum="100"/>
+</Group>
