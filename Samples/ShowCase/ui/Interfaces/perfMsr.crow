@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+	<VerticalStack Spacing="1" Height="Fit" Width="Stretched">
+		<HorizontalStack Background="DarkSlateGrey">
+			<Label Text="{Name}" Width="Stretched" Font="doid bold, 10" Margin="2"/>
+			<Button Caption="Reset" MouseClick="onResetClick" Height="Fit"/>
+		</HorizontalStack>
+		<HorizontalStack>
+			<Label Text="Current:" Style="FpsLabel"/>
+			<Label Text="{current}" Style="FpsDisp"/>
+		</HorizontalStack>
+		<HorizontalStack>
+			<Label Text="Minimum:" Style="FpsLabel"/>
+			<Label Text="{minimum}" Style="FpsDisp"/>
+		</HorizontalStack>
+		<HorizontalStack>
+			<Label Text="Mean:" Style="FpsLabel"/>
+			<Label Text="{mean}" Style="FpsDisp"/>
+		</HorizontalStack>
+		<HorizontalStack>
+			<Label Text="Maximum:" Style="FpsLabel"/>
+			<Label Text="{maximum}" Style="FpsDisp"/>
+		</HorizontalStack>
+		<Border Foreground="White" Width="Stretched" Height="60">
+			<Trend Background="Black" NewValue="{current}" Minimum="0" Maximum="100"/>
+		</Border>
+<!--		<HorizontalStack>
+			<Label Text="Total:" Style="FpsLabel"/>
+			<Label Text="{total}" Style="FpsDisp"/>
+		</HorizontalStack>
+		<HorizontalStack>
+			<Label Text="Cpt:" Style="FpsLabel"/>
+			<Label Text="{cptMeasures}" Style="FpsDisp"/>
+		</HorizontalStack>-->
+	</VerticalStack>
+

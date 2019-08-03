@@ -1,0 +1,44 @@
+﻿<?xml version="1.0"?>
+<VerticalStack Fit="true">
+	<Widget CornerRadius="5" Height="10" Width="600" Background="vgradient|0:Transparent|0.5:White|1:Transparent"/>
+	<HorizontalStack Fit="true" HorizontalAlignment="Left">
+		<Border Fit="true" CornerRadius="10" BorderWidth="1">
+			<VerticalStack Margin="10">
+				<CheckBox IsChecked="false" Caption="Check 1" Background="hgradient|0:LimeGreen|1:Transparent"/>
+				<CheckBox IsChecked="false" Caption="Check 2"  Background="hgradient|0:LimeGreen|1:Transparent"/>
+				<CheckBox IsChecked="true" Caption="Check 3"  Background="hgradient|0:LimeGreen|1:Transparent"/>
+				<CheckBox IsChecked="false" Caption="Check 4" Background="hgradient|0:LimeGreen|1:Transparent"/>
+			</VerticalStack>
+		</Border>
+		<Splitter/>
+		<Border Fit="true" CornerRadius="10" BorderWidth="1">
+			<VerticalStack Margin="10">
+				<RadioButton IsChecked="false" Caption="Choice 1" Background="hgradient|0:DarkRed|1:Transparent"/>
+				<Splitter/>
+				<RadioButton Width="Stretched" IsChecked="false" Caption="Choice 2"  Background="hgradient|0:DarkRed|1:Transparent"/>
+				<RadioButton IsChecked="true" Caption="Choice 3"  Background="hgradient|0:DarkRed|1:Transparent"/>
+				<RadioButton IsChecked="false" Caption="Choice 4" Background="hgradient|0:DarkRed|1:Transparent"/>
+			</VerticalStack>
+		</Border>
+		<Splitter Thickness="3" />
+		<Border Fit="true" CornerRadius="10" BorderWidth="1" MaximumSize="150,150" MinimumSize="50,50">
+			<VerticalStack Margin="10">
+				<Label Text="label 1" Background="hgradient|0:Blue|1:Transparent"/>
+				<Label Text="label 2" Background="hgradient|0:Blue|1:Transparent"/>
+				<Label Text="label 3" Background="hgradient|0:Blue|1:Transparent"/>
+				<Label Text="label 4" Width="Stretched" Background="hgradient|0:Blue|1:Transparent"/>
+			</VerticalStack>
+		</Border>
+		<Splitter/>
+		<Border Fit="true" CornerRadius="10" BorderWidth="1">
+			<VerticalStack Margin="10">
+				<Button Caption="Button 1" Background="hgradient|0:Red|1:DarkRed" CornerRadius="5"/>
+				<Button Caption="Button 2"  Background="hgradient|0:Green|1:Blue" CornerRadius="3"/>
+				<Button Caption="Button 3"  Background="hgradient|0:DarkRed|1:Transparent" CornerRadius="0"/>
+				<Button Caption="Button 4" Background="hgradient|0:DarkRed|1:Transparent" CornerRadius="8"/>
+			</VerticalStack>
+		</Border>
+		<Splitter/>
+	</HorizontalStack>
+	<Widget CornerRadius="5" Height="10" Width="600" Background="vgradient|0:Transparent|0.5:White|1:Transparent"/>
+</VerticalStack>

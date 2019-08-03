@@ -602,10 +602,14 @@ namespace Crow.Coding
 						level = currentNode.Level - 1;
 				}
 
-				for (int l = 0; l < level; l++) {					
+				/*for (int l = 0; l < level; l++) {					
 					gr.MoveTo (rFld.Center.X + 0.5, y);
 					gr.LineTo (rFld.Center.X + 0.5, y + fe.Ascent + fe.Descent);
 					rFld.Left += foldHSpace;
+				}*/
+				if (level > 0) {
+					gr.MoveTo (rFld.Center.X + 0.5, y);
+					gr.LineTo (rFld.Center.X + 0.5, y + fe.Ascent + fe.Descent);
 				}
 				if (closingNode) {
 					gr.MoveTo (rFld.Center.X + 0.5, y);

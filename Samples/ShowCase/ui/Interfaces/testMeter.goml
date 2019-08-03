@@ -1,0 +1,2 @@
+﻿<?xml version="1.0"?>
+<AnalogMeter Width="Fit" Height="Fit" Background="White" Foreground="Black"  Value="{fps}" Minimum="Stretched" Maximum="100"/>

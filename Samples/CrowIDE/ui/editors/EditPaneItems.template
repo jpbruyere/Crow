@@ -1,0 +1,18 @@
+﻿<?xml version="1.0"?>
+<ItemTemplate>	
+	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
+		<Label Text="Error" Background="Red"/>
+	</TabItem>
+</ItemTemplate>
+<ItemTemplate Path="#CrowIDE.ui.editors.SvgEdit.itemp" DataType=".svg"/>
+<ItemTemplate Path="#CrowIDE.ui.editors.SrcEdit.itemp" DataType=".cs"/>
+<ItemTemplate Path="#CrowIDE.ui.editors.SrcEdit.itemp" DataType=".style"/>
+<ItemTemplate Path="#CrowIDE.ui.editors.IMLEdit.itemp" DataType=".crow"/>
+<ItemTemplate Path="#CrowIDE.ui.editors.IMLEdit.itemp" DataType=".itemp"/>
+<ItemTemplate Path="#CrowIDE.ui.editors.IMLEdit.itemp" DataType=".template"/>
+<ItemTemplate DataType=".goml">
+	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
+		<IMLContainer Path="#CrowIDE.ui.editors.TextEditor.crow"/>
+	</TabItem>
+</ItemTemplate>
+

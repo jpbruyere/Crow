@@ -1,0 +1,28 @@
+﻿<?xml version="1.0"?>
+<DockWindow Name="winGTExplorer" Caption="Edit View" Width="40%" Height="80%">
+	<VerticalStack Name="vstack" DataSource="{CurrentSolution}">
+		<Button Caption="Expand All" MouseClick="../treeView.onExpandAll_MouseClick"/>		
+		<TreeView DataSource="{SelectedItem}" IsRoot="true" Name="treeView" Data="{GraphicTree}"
+			SelectedItemChanged="../../vstack.DataSource.GTView_SelectedItemChanged">
+			<ItemTemplate>
+				<Border Width="Stretched" Focusable="true" Foreground="Transparent">
+					<HorizontalStack Spacing="5">
+						<Widget Width="5" Height="5"/>
+						<Border Width="16" Height="16" Foreground="Black" Background="DimGrey">
+							<Image Margin="2" Path="{GetIcon}" />
+						</Border>
+						<Label Text="{DesignName}" Width="Stretched"/>
+					</HorizontalStack>
+				</Border>
+			</ItemTemplate>
+			<ItemTemplate DataType="Crow.Group" Data="GetChildren"
+				Path="#Crow.Coding.ui.DockWindows.GTreeExpITemp.crow"/>
+			<ItemTemplate DataType="Crow.Container" Data="GetChildren"
+				Path="#Crow.Coding.ui.DockWindows.GTreeExpITemp.crow"/>
+			<ItemTemplate DataType="Crow.TemplatedContainer" Data="GetChildren"
+				Path="#Crow.Coding.ui.DockWindows.GTreeExpITemp.crow"/>
+			<ItemTemplate DataType="Crow.TemplatedGroup" Data="GetChildren"
+				Path="#Crow.Coding.ui.DockWindows.GTreeExpITemp.crow"/>
+		</TreeView>
+	</VerticalStack>
+</DockWindow>

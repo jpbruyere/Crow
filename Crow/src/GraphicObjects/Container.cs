@@ -63,7 +63,7 @@ namespace Crow
 		/// override this to handle specific steps in child addition in derived class,
 		/// and don't forget to call the base.SetChild
 		/// </summary>
-		public virtual void SetChild(Widget _child)
+		public new virtual void SetChild(Widget _child)
 		{
 			base.SetChild (_child);
 		}

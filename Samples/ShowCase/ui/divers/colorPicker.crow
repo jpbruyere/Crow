@@ -1,0 +1,7 @@
+﻿<?xml version="1.0"?>
+<VerticalStack>
+	<ColorPicker SelectedColor="{²../go.Background}" Name="colorPicker" Background="DimGrey" Margin="5" Fit="True" />
+	<Widget Name="go" Width="100" Height="60" Background="DarkBlue"/>
+	<Widget Name="go" Width="100" Height="60" Background="{../colorPicker.SelectedColor}"/>
+	<Label Text="{../colorPicker.SelectedColor}"/>
+</VerticalStack>

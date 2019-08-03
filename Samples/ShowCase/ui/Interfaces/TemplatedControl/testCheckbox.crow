@@ -1,0 +1,11 @@
+﻿<?xml version="1.0"?>
+<VerticalStack Fit="true" Margin="100" Background="DimGrey" >
+	<CheckBox Background="Grey" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
+	<CheckBox Background="Grey" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
+	<CheckBox Background="Grey" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
+	<CheckBox Background="Grey" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
+	<CheckBox Background="Grey" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
+	<CheckBox Background="Grey" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
+	<CheckBox Background="Grey" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
+	<CheckBox Background="Grey" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
+</VerticalStack>

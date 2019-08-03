@@ -1,0 +1,9 @@
+﻿<?xml version="1.0"?>
+<HorizontalStack Background="DimGrey" Margin="10" Width="90%" Height="100%">
+	<Widget Margin="10" Width="Stretched" Height="Fit" Background="SeaGreen"
+			MinimumSize="10,10"/>
+	<Widget Margin="10" Width="Stretched" Height="Stretched" Background="SeaGreen"
+			MinimumSize="10,10"/>
+	<Widget Margin="10" Width="Stretched" Height="Fit" Background="SeaGreen"
+			MinimumSize="10,10"/>
+</HorizontalStack>

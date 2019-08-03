@@ -1,0 +1,6 @@
+﻿<?xml version="1.0"?>
+<Menu>
+	<MenuItem Caption="File" Width="Fit">
+		<MenuItem Command="{CMDTest}"/>
+	</MenuItem>
+</Menu>
