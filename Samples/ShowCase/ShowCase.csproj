@@ -8,7 +8,6 @@
     <License>MIT</License>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <EnableDefaultNoneItems>false</EnableDefaultNoneItems>    
-    <TargetFramework>net471</TargetFramework>
     <ReleaseVersion>0.8.0</ReleaseVersion>
   </PropertyGroup>
             

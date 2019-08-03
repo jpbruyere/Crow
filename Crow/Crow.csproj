@@ -34,7 +34,7 @@
   
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
-    <DefineConstants>TRACE;DESIGN_MODE;_DEBUG_CLIP_RECTANGLE;DEBUG;NETFRAMEWORK;NET471</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DESIGN_MODE;_DEBUG_CLIP_RECTANGLE;NETFRAMEWORK;NET471</DefineConstants>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
   

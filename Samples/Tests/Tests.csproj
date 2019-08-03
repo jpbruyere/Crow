@@ -5,10 +5,9 @@
     <OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>
     <OutputType>Exe</OutputType>        
     <RepositoryUrl>https://github.com/jpbruyere/Crow</RepositoryUrl>
-    <License>https://opensource.org/licenses/MIT</License>
+    <License>MIT</License>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <EnableDefaultNoneItems>false</EnableDefaultNoneItems>    
-    <TargetFramework>net471</TargetFramework>
     <ReleaseVersion>0.8.0</ReleaseVersion>
   </PropertyGroup>
             

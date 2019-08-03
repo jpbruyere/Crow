@@ -66,7 +66,7 @@ namespace Crow
 			isRunning = true;
 			while (isRunning) {
 				crow.Update ();
-				Thread.Sleep (3);
+				Thread.Sleep (1);
 			}
 
 			crow.Dispose ();
