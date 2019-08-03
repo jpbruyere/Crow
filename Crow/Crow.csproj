@@ -23,7 +23,7 @@
     <PackageLicense>https://opensource.org/licenses/MIT</PackageLicense>
     <PackageIconUrl>https://jpbruyere.github.io/Crow/images/crow.png</PackageIconUrl>
     <PackageCopyright>Copyright 2013-2019</PackageCopyright>
-    <PackageReleaseNotes>Turn on vulkan layer through vkvg</PackageReleaseNotes>    
+    <PackageReleaseNotes>xcb backend</PackageReleaseNotes>    
     <RepositoryUrl>https://github.com/jpbruyere/Crow</RepositoryUrl>
         
     <OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>        
