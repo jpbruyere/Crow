@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
-
-    <Button CornerRadius="0" Background="Red"/>
-
+<VerticalStack Height="Fit" Width="20" Margin="1" Spacing="2" Background="White" >			
+	<Widget Height="50" Background="Green"/>						
+	<Widget Height="50" Background="Red"/>						
+</VerticalStack>

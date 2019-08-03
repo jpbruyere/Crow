@@ -112,14 +112,12 @@ namespace Crow
 
             Rectangle r = ClientRectangle;
 
-
-            double sx = (double)r.Width / (double)(contentSize.Width == 0? size.Width : contentSize.Width);
+			double sx = (double)r.Width / (double)(contentSize.Width == 0? size.Width : contentSize.Width);
             double sy = (double)r.Height / (double)(contentSize.Height == 0 ? size.Height : contentSize.Height);            
 
             gr.Translate(r.Left, r.Top);
             gr.Scale (sx,sy);
-
-
+            
 			executePath (gr);
 
 			Background.SetAsSource (gr, r);
@@ -173,21 +171,22 @@ namespace Crow
 		protected override int measureRawSize (LayoutingType lt)
 		{
 			//if ((lt == LayoutingType.Width && contentSize.Width == 0) || (lt == LayoutingType.Height && contentSize.Height == 0)) {
-   //             if (size != default(Size))
-   //                 contentSize = size;
-   //             else
-   //             {
-   //                 using (Surface drawing = new Surface(IFace.dev, 1, 1))
-   //                 {
-   //                     using (Context ctx = new Context(drawing))
-   //                     {
-   //                         executePath(ctx);
-   //                         Rectangle r = ctx.StrokeExtents();
-   //                         contentSize = new Size(r.Right, r.Bottom);
-   //                     }
-   //                 }
-   //             }
+			//             if (size != default(Size))
+			//                 contentSize = size;
+			//             else
+			//             {
+			//                 using (Surface drawing = new Surface(IFace.dev, 1, 1))
+			//                 {
+			//                     using (Context ctx = new Context(drawing))
+			//                     {
+			//                         executePath(ctx);
+			//                         Rectangle r = ctx.StrokeExtents();
+			//                         contentSize = new Size(r.Right, r.Bottom);
+			//                     }
+			//                 }
+			//             }
 			//}
+			contentSize = size;
 			return lt == LayoutingType.Width ?
 				contentSize.Width + 2 * Margin: contentSize.Height + 2 * Margin;
 		}

@@ -2,7 +2,7 @@
 <TreeView IsRoot="true" Name="treeView" Data="{./FileSystemEntries}" Background="{./Background}"
 		SelectedItemChanged="./onSelectedItemChanged">
 	<ItemTemplate DataType="System.IO.FileInfo">
-		<Border CornerRadius="2" Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
+		<Border Margin="0" Focusable="true"  Height="Fit" Width="Stretched" Foreground="Transparent"
 				MouseEnter="{Foreground=DimGrey}"
 				MouseLeave="{Foreground=Transparent}">
 			<HorizontalStack>
@@ -16,7 +16,7 @@
 		<Expandable Caption="{Name}" MouseDoubleClick="/onClickForExpand">
 			<Template>
 				<VerticalStack>
-					<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"
+					<Border Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"
 							Foreground="Transparent"
 							MouseEnter="{Foreground=DimGrey}"
 							MouseLeave="{Foreground=Transparent}">

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ProjectSchemaDefinitions xmlns="http://schemas.microsoft.com/build/2009/properties">
+  <ItemType Name="GLSLShader" DisplayName="GLSL Shader" />
+  <ContentType Name="GLSLShader" ItemType="GLSLShader" DisplayName="GLSL Shader" />
+  <FileExtension Name=".comp" ContentType="GLSLShader" />
+  <FileExtension Name=".geom" ContentType="GLSLShader" />
+  <FileExtension Name=".frag" ContentType="GLSLShader" />
+  <FileExtension Name=".vert" ContentType="GLSLShader" />
+</ProjectSchemaDefinitions>

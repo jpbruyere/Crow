@@ -1,12 +1,11 @@
 <?xml version="1.0"?>
-<HorizontalStack MinimumSize="40,13" Name="hstack" Margin="0" Spacing="0">
-	<Border BorderWidth="1" Width="75%"  Background="White" 
-		Foreground="{./Foreground}" Margin="0">
-		<TextBox Foreground="{./Foreground}" Font="{./Font}" Width="Stretched"
+<Border BorderWidth="1" Background="White" Foreground="{./Foreground}" Margin="0" >
+	<HorizontalStack Height="Fit">
+		<TextBox MinimumSize = "30,0" Foreground="{./Foreground}" Font="{./Font}" Width="Stretched"
 			Text="{²./Value}" TextAlignment="Right" Margin="0"/>
-	</Border>
-	<VerticalStack MinimumSize="13,13" Width="25%" Height="Stretched" Spacing="0" Margin="0">
-		<Shape Style="ArrowBut" Size="11,11" Height="50%" MouseDown="./onUp" Path="M 5.5,0.5 L 10.5,6.5 L 0.5,6.5 Z"/>			
-		<Shape Style="ArrowBut"	Size="11,11" Height="50%" MouseDown="./onDown" Path="M 0.5,0.5 L 10.5,0.5 L 5.5,6.5 Z"/>			
-	</VerticalStack>
-</HorizontalStack>
+		<VerticalStack MinimumSize="13,0" Width="Fit" Height="Fit" Spacing="2" Margin="1">			
+				<Shape Margin="0" Style="ArrowBut" Size="11,7" Height="5" MouseDown="./onUp" Path="M 5.5,0.5 L 10.5,6.5 L 0.5,6.5 Z"/>												
+				<Shape Margin="0" Style="ArrowBut"	Size="11,7" Height="5" MouseDown="./onDown" Path="M 0.5,0.5 L 10.5,0.5 L 5.5,6.5 Z"/>									
+		</VerticalStack>	
+	</HorizontalStack>
+</Border>
