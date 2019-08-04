@@ -149,35 +149,33 @@ namespace Crow
 		{
 			if (lines == null)
 				lines = getLines;
+				
+			using (Context gr = new Context (IFace.surf)) {
+				//Cairo.FontFace cf = gr.GetContextFontFace ();
 
-			using (ImageSurface img = new ImageSurface (Format.Argb32, 10, 10)) {
-				using (Context gr = new Context (img)) {
-					//Cairo.FontFace cf = gr.GetContextFontFace ();
-
-					gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-					gr.SetFontSize (Font.Size);
+				gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+				gr.SetFontSize (Font.Size);
 
 
-					fe = gr.FontExtents;
-					te = new TextExtents ();
+				fe = gr.FontExtents;
+				te = new TextExtents ();
 
-					if (lt == LayoutingType.Height) {
-						int lc = lines.Count;
-						//ensure minimal height = text line height
-						if (lc == 0)
-							lc = 1;
+				if (lt == LayoutingType.Height) {
+					int lc = lines.Count;
+					//ensure minimal height = text line height
+					if (lc == 0)
+						lc = 1;
 
-						return (int)(fe.Height * lc) + Margin * 2;
-					}
-
-					foreach (string s in lines) {
-						string l = s.Replace("\t", new String (' ', Interface.TabSize));
-						TextExtents tmp = gr.TextExtents (l);
-						if (tmp.XAdvance > te.XAdvance)
-							te = tmp;
-					}
-					return (int)Math.Ceiling (te.XAdvance) + Margin * 2;
+					return (int)(fe.Height * lc) + Margin * 2;
 				}
+
+				foreach (string s in lines) {
+					string l = s.Replace("\t", new String (' ', Interface.TabSize));
+					TextExtents tmp = gr.TextExtents (l);
+					if (tmp.XAdvance > te.XAdvance)
+						te = tmp;
+				}
+				return (int)Math.Ceiling (te.XAdvance) + Margin * 2;
 			}
 		}
 		protected override void onDraw (Context gr)

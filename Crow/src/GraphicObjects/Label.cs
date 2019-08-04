@@ -447,37 +447,34 @@ namespace Crow
 			if (lines == null)
 				lines = getLines;
 			if (!textMeasureIsUpToDate) {
-				using (ImageSurface img = new ImageSurface (Format.Argb32, 10, 10)) {
-					using (Context gr = new Context (img)) {
-						//Cairo.FontFace cf = gr.GetContextFontFace ();
+				using (Context gr = new Context (IFace.surf)) {
+					//Cairo.FontFace cf = gr.GetContextFontFace ();
 
-						gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-						gr.SetFontSize (Font.Size);
-						gr.FontOptions = Interface.FontRenderingOptions;
-						gr.Antialias = Interface.Antialias;
+					gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+					gr.SetFontSize (Font.Size);
+					gr.FontOptions = Interface.FontRenderingOptions;
+					gr.Antialias = Interface.Antialias;
 
-						fe = gr.FontExtents;
-						te = new TextExtents ();
+					fe = gr.FontExtents;
+					te = new TextExtents ();
 
-						cachedTextSize.Height = (int)Math.Ceiling ((fe.Ascent+fe.Descent) * Math.Max (1, lines.Count)) + Margin * 2;
+					cachedTextSize.Height = (int)Math.Ceiling ((fe.Ascent+fe.Descent) * Math.Max (1, lines.Count)) + Margin * 2;
 
-						try {
-							for (int i = 0; i < lines.Count; i++) {
-								string l = lines[i].Replace ("\t", new String (' ', Interface.TabSize));
+					try {
+						for (int i = 0; i < lines.Count; i++) {
+							string l = lines[i].Replace ("\t", new String (' ', Interface.TabSize));
 
-								TextExtents tmp = gr.TextExtents (l);
+							TextExtents tmp = gr.TextExtents (l);
 
-								if (tmp.XAdvance > te.XAdvance)
-									te = tmp;
-							}
-							cachedTextSize.Width = (int)Math.Ceiling (te.XAdvance) + Margin * 2;
-							textMeasureIsUpToDate = true;
-						} catch {							
-							return -1;
-						}					
-					}
+							if (tmp.XAdvance > te.XAdvance)
+								te = tmp;
+						}
+						cachedTextSize.Width = (int)Math.Ceiling (te.XAdvance) + Margin * 2;
+						textMeasureIsUpToDate = true;
+					} catch {							
+						return -1;
+					}					
 				}
-
 			}
 			return lt == LayoutingType.Height ? cachedTextSize.Height : cachedTextSize.Width;
 		}
