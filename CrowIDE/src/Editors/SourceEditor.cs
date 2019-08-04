@@ -4,7 +4,7 @@
 // Author:
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
 //
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
+// Copyright (c) 2013-2019 Jean-Philippe Bruyère
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,17 +25,10 @@
 // THE SOFTWARE.
 
 using System;
-using System.Xml.Serialization;
 using System.ComponentModel;
-using System.Collections;
 using Cairo;
-using System.Text;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Linq;
 using System.Diagnostics;
-using System.IO;
-using System.Threading;
 
 namespace Crow.Coding
 {

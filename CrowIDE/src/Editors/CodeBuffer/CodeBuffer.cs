@@ -28,7 +28,7 @@ using System.Threading;
 namespace Crow.Coding
 {
 	/// <summary>
-	/// Code buffer, lines are arranged in a List<string>, new line chars are removed during string.split on '\n...',
+	/// Code buffer, lines are arranged in a List'string', new line chars are removed during string.split on '\n...',
 	/// </summary>
 	public class CodeBuffer
 	{

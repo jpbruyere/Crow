@@ -1,146 +1,55 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(SolutionDir)netfx.props" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B6D911CD-1D09-42FC-B300-9187190F2AE1}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>CrowIDE</RootNamespace>
-    <AssemblyName>CrowIDE</AssemblyName>
-    <OutputPath>$(SolutionDir)build/$(Configuration)</OutputPath>
-    <IntermediateOutputPath>$(SolutionDir)build/obj/$(Configuration)</IntermediateOutputPath>
+    <TargetFrameworks>net471;netstandard2.0</TargetFrameworks>
+    <OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>
+    <OutputType>Exe</OutputType>        
+    <RepositoryUrl>https://github.com/jpbruyere/Crow</RepositoryUrl>
+    <License>MIT</License>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnableDefaultItems>false</EnableDefaultItems>
     <ReleaseVersion>0.8.0</ReleaseVersion>
+		
     <StartupObject>Crow.Coding.CrowIDE</StartupObject>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
   </PropertyGroup>
+              
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
-    <Optimize>true</Optimize>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>0</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
+    <DefineConstants>TRACE;NETSTANDARD2_0;DEBUG;NETCOREAPP2_0</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Drawing" />
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <ProjectReference Include="..\Crow\Crow.csproj">
-      <Project>{C2980F9B-4798-4C05-99E2-E174810F7C7B}</Project>
-      <Name>Crow</Name>
-    </ProjectReference>
+    <EmbeddedResource Remove="icons\blank-file2.svg" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\**\*.cs" Exclude="src\ProjectTree\CSProjectFile.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ui\" />
-    <Folder Include="src\" />
-    <Folder Include="images\" />
-    <Folder Include="ui\ItemTemplates\" />
-    <Folder Include="src\MemberView\" />
-    <Folder Include="ui\DockWindows\" />
-    <Folder Include="ui\editors\" />
-    <Folder Include="src\Editors\" />
-    <Folder Include="src\Editors\Parsers\" />
-    <Folder Include="src\Editors\CodeBuffer\" />
-    <Folder Include="src\ProjectTree\" />
-    <Folder Include="src\Editors\Parsers2\" />
-    <Folder Include="src\ProjectTree\msbuild\" />
-  </ItemGroup>
-  <ItemGroup>
+
+    <PackageReference Include="System.CodeDom" Version="4.5.0" />
+<!--<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />-->
+        
+    <Compile Include="src\**\*.cs" Exclude="src\ProjectTree\CSProjectFile.cs" />  
+        
+    <EmbeddedResource Include="icons\*.*">
+<!--      <LogicalName>Crowicons.%(Filename)%(Extension)</LogicalName>-->
+    </EmbeddedResource>
+
+    <EmbeddedResource Include="ui\**\*.crow" />
+    <EmbeddedResource Include="ui\**\*.itemp" />
+  
+    <EmbeddedResource Include="ui\**\*.template">
+      <LogicalName>Crow.Coding.%(Filename).template</LogicalName>
+    </EmbeddedResource> 
+
+    <EmbeddedResource Include="DefaultTemplateOverrides\*.*">
+      <LogicalName>Crow.%(Filename).template</LogicalName>
+    </EmbeddedResource>
+        
     <EmbeddedResource Include="IDE.style" />
-    <EmbeddedResource Include="icons\**\*.svg" />
-
-    <EmbeddedResource Include="images\save.svg" />
-    <EmbeddedResource Include="ui\MembersView.template">
-      <LogicalName>Crow.Coding.MembersView.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ui\LQIsExplorer.crow" />
-    <EmbeddedResource Include="ui\MemberView.crow" />
-    <EmbeddedResource Include="ui\ProjectProperties.crow" />
-    <EmbeddedResource Include="ui\TreeExpandable.template">
-      <LogicalName>Crow.Coding.TreeExpandable.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ui\ProjectTree.template">
-      <LogicalName>Crow.Coding.ProjectTree.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ui\CrowIDE.crow" />
-    <EmbeddedResource Include="DefaultTemplateOverrides\TabItem.template">
-      <LogicalName>Crow.TabItem.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DefaultTemplateOverrides\MenuItem.template">
-      <LogicalName>Crow.MenuItem.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DefaultTemplateOverrides\ContextMenu.template">
-      <LogicalName>Crow.ContextMenu.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ui\Options.crow" />
-    <EmbeddedResource Include="ui\IcoBut.template" />
-    <EmbeddedResource Include="ui\MembersItem.template">
-      <LogicalName>Crow.Coding.MembersItem.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ui\ItemTemplates\Enum.template">
-      <LogicalName>Crow.Coding.Enum.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ui\ItemTemplates\Fill.template">
-      <LogicalName>Crow.Coding.Fill.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ui\DockWindows\winEditor.crow" />
-    <EmbeddedResource Include="ui\DockWindows\winErrors.crow" />
-    <EmbeddedResource Include="ui\DockWindows\winSolution.crow" />
-    <EmbeddedResource Include="ui\DockWindows\winProperties.crow" />
-    <EmbeddedResource Include="ui\DockWindows\winToolbox.crow" />
-    <EmbeddedResource Include="ui\DockWindows\toolboxBut.template" />
-    <EmbeddedResource Include="ui\editors\EditPane.template">
-      <LogicalName>Crow.Coding.EditPane.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ui\editors\EditPaneItems.template">
-      <LogicalName>Crow.Coding.EditPaneItems.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ui\editors\IMLEdit.itemp" />
-    <EmbeddedResource Include="ui\editors\SourceEditor.crow" />
-    <EmbeddedResource Include="ui\editors\SrcEdit.itemp" />
-    <EmbeddedResource Include="ui\editors\SvgEdit.itemp" />
-    <EmbeddedResource Include="ui\DockWindows\winGTExplorer.crow" />
-    <EmbeddedResource Include="ui\DockWindows\GTreeExpITemp.crow" />
-    <EmbeddedResource Include="ui\NewFile.crow" />
-    <EmbeddedResource Include="ui\DockWindows\winSchema.crow" />
-    <EmbeddedResource Include="ui\DockWindows\WinSchemaItem.template" />
-    <EmbeddedResource Include="ui\editors\TextEditor.crow">
-      <LogicalName>Crow.Coding.ui.TextEditor.crow</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ui\DockWindows\winStyleView.crow" />
-    <EmbeddedResource Include="ui\CategoryExp.template">
-      <LogicalName>Crow.Coding.CategoryExp.template</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ui\DockWindows\winDesign.crow" />
-    <EmbeddedResource Include="ui\editors\EditTabItem.template">
-      <LogicalName>Crow.Coding.EditTabItem.template</LogicalName>
-    </EmbeddedResource>
+  </ItemGroup>
+    
+  <ItemGroup>
+    <Folder Include="src\msbuild\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ui\test.crow">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\Crow\Crow.csproj" />
   </ItemGroup>
 </Project>
