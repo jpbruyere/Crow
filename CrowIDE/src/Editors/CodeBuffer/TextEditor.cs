@@ -461,12 +461,12 @@ namespace Crow.Text
 		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseEnter (sender, e);
-			IFace.MouseCursor = XCursor.Text;
+			IFace.MouseCursor = MouseCursor.IBeam;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			IFace.MouseCursor = XCursor.Default;
+			IFace.MouseCursor = MouseCursor.Arrow;
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{

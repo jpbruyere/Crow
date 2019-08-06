@@ -24,23 +24,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
 
 
 
 namespace Crow.XCB
-{	
+{
 	using xcb_window_t = System.UInt32;
-	using xcb_pixmap_t = System.UInt32;
-	using xcb_cursor_t = System.UInt32;
-	using xcb_font_t = System.UInt32;
 	using xcb_colormap_t = System.UInt32;
-	using xcb_atom_t = System.UInt32;
-	using xcb_drawable_t = System.UInt32;
 	using xcb_visualid_t = System.UInt32;
-	using xcb_keysym_t = System.UInt32;
 	using xcb_keycode_t = System.Byte;
 	using xcb_timestamp_t = System.UInt32;
 
@@ -137,6 +130,7 @@ namespace Crow.XCB
 			MAPPING_NOTIFY,
 			GE_GENERIC,
 		}
+
 		[Flags]
 		enum xcb_cw_t : uint {
 			BACK_PIXMAP = 1,
@@ -324,47 +318,76 @@ namespace Crow.XCB
 
 
 		#region pinvoke XCB
-		[DllImportAttribute ("xcb")]
+		[DllImport ("xcb")]
 		static extern IntPtr xcb_connect(string displayName, IntPtr screenNum);
-		[DllImportAttribute("xcb")]
+		[DllImport ("xcb")]
 		static extern IntPtr xcb_get_setup(IntPtr connection);		 
-		[DllImportAttribute("xcb")]
+		[DllImport ("xcb")]
 		static extern IntPtr xcb_flush(IntPtr connection);
-		[DllImportAttribute("xcb")]
+		[DllImport ("xcb")]
 		static extern UInt32 xcb_generate_id(IntPtr connection);
 
-		[DllImportAttribute("xcb")]
+		[DllImport("xcb")]
 		static extern xcb_iterator_t xcb_setup_roots_iterator(IntPtr setup);
-		[DllImportAttribute("xcb")]
+		[DllImport("xcb")]
 		static extern xcb_iterator_t xcb_screen_allowed_depths_iterator(IntPtr scr);
-		[DllImportAttribute("xcb")]
+		[DllImport("xcb")]
 		static extern xcb_iterator_t xcb_depth_visuals_iterator(IntPtr depth);
 
-		[DllImportAttribute("xcb")]
+		[DllImport("xcb")]
 		static extern void xcb_screen_next(ref xcb_iterator_t scr_iterator);
-		[DllImportAttribute("xcb")]
+		[DllImport("xcb")]
 		static extern void xcb_depth_next(ref xcb_iterator_t depth_iterator);
-		[DllImportAttribute("xcb")]
+		[DllImport("xcb")]
 		static extern void xcb_visualtype_next(ref xcb_iterator_t depth_visual_iterator);
 
-		[DllImportAttribute("xcb")]
+		[DllImport("xcb")]
 		static extern xcb_void_cookie_t xcb_create_window(IntPtr connection, byte depth, xcb_window_t win, UInt32 parent,
 			Int16 x, Int16 y, UInt16 width, UInt16 height, UInt16 border,
 			xcb_window_class_t _class, xcb_visualid_t visual, xcb_cw_t mask, IntPtr valueList);
-		[DllImportAttribute("xcb")]
+		[DllImport("xcb")]
 		static extern xcb_void_cookie_t xcb_map_window(IntPtr conn, xcb_window_t window);
-		[DllImportAttribute("xcb")]
+		[DllImport("xcb")]
 		static extern void xcb_disconnect(IntPtr connection);
 
-		[DllImportAttribute("xcb")]
+		[DllImport("xcb")]
 		static extern IntPtr xcb_poll_for_event(IntPtr connection);
 
+		[DllImport ("xcb")]
+		static extern xcb_void_cookie_t xcb_change_window_attributes (IntPtr conn, xcb_window_t window, xcb_cw_t value_mask, IntPtr value_list);
+
+		[DllImport ("xcb")]//in xcbproto
+		static extern xcb_void_cookie_t xcb_free_cursor (IntPtr connection, UInt32 cursor);
+
+		//TODO: there should be a generic free method in xcb or at least xcb_free_event!!
+		[DllImport ("X11")]
+		static extern IntPtr XFree (IntPtr data);
+		//[DllImport ("X11")]
+		//static extern int XInitThreads ();
+		//[DllImport ("X11")]
+		//static extern void XLockDisplay (IntPtr display);
+		//[DllImport ("X11")]
+		//static extern void XUnlockDisplay (IntPtr display);
+
+		#region xcb_cursor
+		[DllImport ("xcb-cursor")]
+		static extern int xcb_cursor_context_new (IntPtr conn, IntPtr screen, out IntPtr ctx);
+		[DllImport ("xcb-cursor", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+		static extern UInt32 xcb_cursor_load_cursor (IntPtr ctx, [MarshalAs (UnmanagedType.LPStr)]string name);
+		[DllImport ("xcb-cursor")]
+		static extern void xcb_cursor_context_free (IntPtr ctx);
+
+		#endregion
 
 		#endregion
 
 		Interface iFace;
 
 		IntPtr conn;
+		xcb_window_t win;
+
+		IntPtr cursorCtx;
+		Dictionary<MouseCursor, xcb_window_t> cursors;
 
 		XKB.XCBKeyboard Keyboard;
 
@@ -376,7 +399,6 @@ namespace Crow.XCB
 
 			conn = xcb_connect (null, IntPtr.Zero);
 
-
 			Keyboard = new  XKB.XCBKeyboard (conn, iFace);
 
 			xcb_iterator_t scr_it = xcb_setup_roots_iterator (xcb_get_setup (conn));
@@ -384,7 +406,7 @@ namespace Crow.XCB
 
 			xcb_screen_t scr = (xcb_screen_t)Marshal.PtrToStructure (screen, typeof(xcb_screen_t));
 
-			xcb_window_t win = xcb_generate_id (conn);
+			win = xcb_generate_id (conn);
 
 			xcb_cw_t mask = xcb_cw_t.BACK_PIXEL | xcb_cw_t.EVENT_MASK;
 			uint[] values = {
@@ -399,15 +421,13 @@ namespace Crow.XCB
 				)
 			};
 
-			IntPtr intPtr = IntPtr.Zero;
 
-			unsafe 
-			{
-				fixed(uint* pValues = values)
-				intPtr = new IntPtr((void *) pValues);
-				xcb_create_window (conn, XCB_COPY_FROM_PARENT, win, scr.root, 0,0,(ushort)iFace.ClientRectangle.Width, (ushort)iFace.ClientRectangle.Height,0,
-					xcb_window_class_t.INPUT_OUTPUT, scr.root_visual, mask, intPtr);
-			}
+			GCHandle hndValues = GCHandle.Alloc (values, GCHandleType.Pinned);
+
+			xcb_create_window (conn, XCB_COPY_FROM_PARENT, win, scr.root, 0,0,(ushort)iFace.ClientRectangle.Width, (ushort)iFace.ClientRectangle.Height,0,
+					xcb_window_class_t.INPUT_OUTPUT, scr.root_visual, mask, hndValues.AddrOfPinnedObject());
+
+			hndValues.Free ();
 
 			xcb_map_window (conn, win);
 
@@ -415,7 +435,10 @@ namespace Crow.XCB
 
 			IntPtr visual = findVisual (scr_it, scr.root_visual);
 
-			//loadCursors ();	
+			if (xcb_cursor_context_new (conn, screen, out cursorCtx) < 0)
+				throw new Exception ("Could not initialize xcb-cursor");
+
+			loadCursors ();
 
 			iFace.surf = new Cairo.XcbSurface (conn, win, visual, iFace.ClientRectangle.Width, iFace.ClientRectangle.Height);
 		}
@@ -423,6 +446,11 @@ namespace Crow.XCB
 		public void CleanUp ()
 		{
 			Keyboard.Destroy ();
+
+			foreach (xcb_window_t cur in cursors.Values) 
+				xcb_free_cursor (conn, cur);
+
+			xcb_cursor_context_free (cursorCtx);
 
 			xcb_disconnect (conn);	
 		}
@@ -468,6 +496,7 @@ namespace Crow.XCB
 				Console.WriteLine ("unknown event");
 				break;
 			}
+			XFree (evtPtr);
 		}
 		public bool IsDown (Key key) {
 			return false;
@@ -481,20 +510,52 @@ namespace Crow.XCB
 		public bool Alt {
 			get { return Keyboard.Alt;}
 		}
+
+		public MouseCursor Cursor {
+			set {
+				GCHandle hndValues = GCHandle.Alloc (cursors [value], GCHandleType.Pinned);
+				xcb_void_cookie_t res = xcb_change_window_attributes (conn, win, xcb_cw_t.CURSOR, hndValues.AddrOfPinnedObject ());
+				hndValues.Free ();
+				xcb_flush (conn);
+			}
+		}
 		#endregion
+
+		UInt32 tryGetCursor (params string[] names)
+		{
+			for (int i = 0; i < names.Length; i++) {
+				xcb_window_t cur = xcb_cursor_load_cursor (cursorCtx, names[i]);
+				if (cur != 0)
+					return cur;
+			}
+			return 0;
+		}
+
 
 		void loadCursors ()
 		{
+			cursors = new Dictionary<MouseCursor, xcb_window_t> ();
 			//Load cursors
-			XCursor.Cross = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.cross").Cursors [0];
-			XCursor.Default = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.arrow").Cursors [0];
-			XCursor.NW = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.top_left_corner").Cursors [0];
-			XCursor.NE = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.top_right_corner").Cursors [0];
-			XCursor.SW = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.bottom_left_corner").Cursors [0];
-			XCursor.SE = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.bottom_right_corner").Cursors [0];
-			XCursor.H = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.sb_h_double_arrow").Cursors [0];
-			XCursor.V = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.sb_v_double_arrow").Cursors [0];
-			XCursor.Text = XCursorFile.Load (iFace, "#Crow.Images.Icons.Cursors.ibeam").Cursors [0];
+			cursors.Add (MouseCursor.Arrow, tryGetCursor("arrow", "default"));
+			cursors.Add (MouseCursor.IBeam, tryGetCursor ("text", "ibeam"));
+			cursors.Add (MouseCursor.Crosshair, tryGetCursor ("cross", "crosshair"));
+			cursors.Add (MouseCursor.Hand, tryGetCursor ("hand", "hand2", "hand1", "pointing_hand"));
+			cursors.Add (MouseCursor.Move, tryGetCursor ("move"));
+			cursors.Add (MouseCursor.Circle, tryGetCursor ("circle"));
+			cursors.Add (MouseCursor.H, tryGetCursor ("ew-resize"));
+			cursors.Add (MouseCursor.V, tryGetCursor ("ns-resize"));
+			cursors.Add (MouseCursor.NW, tryGetCursor ("nw-resize"));
+			cursors.Add (MouseCursor.NE, tryGetCursor ("ne-resize"));
+			cursors.Add (MouseCursor.SW, tryGetCursor ("sw-resize"));
+			cursors.Add (MouseCursor.SE, tryGetCursor ("se-resize"));
+			cursors.Add (MouseCursor.TopLeft, tryGetCursor ("nw-resize"));
+			cursors.Add (MouseCursor.Top, tryGetCursor ("n-resize"));
+			cursors.Add (MouseCursor.TopRight, tryGetCursor ("ne-resize"));
+			cursors.Add (MouseCursor.Left, tryGetCursor ("w-resize"));
+			cursors.Add (MouseCursor.Right, tryGetCursor ("e-resize"));
+			cursors.Add (MouseCursor.BottomLeft, tryGetCursor ("sw-resize"));
+			cursors.Add (MouseCursor.Bottom, tryGetCursor ("s-resize"));
+			cursors.Add (MouseCursor.BottomRight, tryGetCursor ("se-resize"));
 		}
 
 		static IntPtr findVisual (xcb_iterator_t scr_it, xcb_visualid_t visualId){

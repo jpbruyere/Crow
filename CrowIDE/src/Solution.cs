@@ -102,10 +102,9 @@ namespace Crow.Coding{
 			Styling = new Dictionary<string, Style> ();
 			if (StartupProject != null)
 				StartupProject.GetStyling ();
-//			StylingContainers = new List<StyleContainer> ();
-//			foreach (string k in Styling.Keys) {
-//				StylingContainers.Add (new StyleContainer (k, Styling [k]));
-//			}
+			StylingContainers = new List<StyleContainer> ();
+			foreach (string k in Styling.Keys) 
+				StylingContainers.Add (new StyleContainer (k, Styling [k]));
 			foreach (ImlProjectItem pf in openedItems.OfType<ImlProjectItem>()) {
 				pf.SignalEditorOfType<ImlVisualEditor> ();
 			}

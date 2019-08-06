@@ -91,9 +91,9 @@ namespace Crow
 			return loadFromStream (iface.GetStreamFromPath (path));
 		}
 
-		static XCursor imageLoad(BinaryReader sr)
+		static XCursor imageLoad (BinaryReader sr)
 		{
-			XCursor tmp = new XCursor();
+			XCursor tmp = new XCursor ();
 			//			header: 36 Image headers are 36 bytes
 			uint header = sr.ReadUInt32();
 			//			type: 0xfffd0002 Image type is 0xfffd0002
@@ -142,9 +142,9 @@ namespace Crow
 		public XCursor ()
 		{
 		}
-//		public static implicit operator MouseCursor(XCursor xc)
+//		public static implicit operator XCursor(XCursor xc)
 //		{
-//			return new MouseCursor((int)xc.Xhot, (int)xc.Yhot, (int)xc.Width, (int)xc.Height,xc.data);
+//			return new XCursor((int)xc.Xhot, (int)xc.Yhot, (int)xc.Width, (int)xc.Height,xc.data);
 //		}
 	}
 }

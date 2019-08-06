@@ -507,9 +507,9 @@ namespace Crow.Coding {
             }
             foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference> ()) {
                 Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);
-                if (p == null)
-                    throw new Exception ("referenced project not found");
-                p.GetStyling ();
+                if (p != null)
+                    //throw new Exception ("referenced project not found");
+                	p.GetStyling ();
             }
 
             //TODO:get styling from referenced assemblies

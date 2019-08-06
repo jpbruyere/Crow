@@ -923,14 +923,14 @@ namespace Crow.Coding
 		{
 			base.onMouseEnter (sender, e);
 			if (e.X - ScreenCoordinates(Slot).X < leftMargin + ClientRectangle.X)
-				IFace.MouseCursor = XCursor.Default;
+				IFace.MouseCursor = MouseCursor.Arrow;
 			else
-				IFace.MouseCursor = XCursor.Text;
+				IFace.MouseCursor = MouseCursor.IBeam;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			IFace.MouseCursor = XCursor.Default;
+			IFace.MouseCursor = MouseCursor.Arrow;
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
@@ -942,9 +942,9 @@ namespace Crow.Coding
 
 			if (!e.Mouse.IsButtonDown (MouseButton.Left)) {
 				if (mouseLocalPos.X < leftMargin)
-					IFace.MouseCursor = XCursor.Default;
+					IFace.MouseCursor = MouseCursor.Arrow;
 				else
-					IFace.MouseCursor = XCursor.Text;
+					IFace.MouseCursor = MouseCursor.IBeam;
 				return;
 			}
 

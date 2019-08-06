@@ -34,6 +34,7 @@ namespace Crow
 		void Flush();
 		void ProcessEvents();
 
+		MouseCursor Cursor { set; }
 		bool IsDown (Key key);
 		bool Shift { get; }
 		bool Ctrl { get; }

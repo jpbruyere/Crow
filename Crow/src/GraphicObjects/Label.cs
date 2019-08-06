@@ -689,12 +689,12 @@ namespace Crow
 		{
 			base.onMouseEnter (sender, e);
 			if (Selectable)
-				IFace.MouseCursor = XCursor.Text;
+				IFace.MouseCursor = MouseCursor.IBeam;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			IFace.MouseCursor = XCursor.Default;
+			IFace.MouseCursor = MouseCursor.Arrow;
 		}
 		protected override void onFocused (object sender, EventArgs e)
 		{

@@ -185,7 +185,7 @@ namespace Crow
 		{			
 			while (running) {
 				Update ();
-				Thread.Sleep (8);
+				Thread.Sleep (5);
 			}
 		}
 
@@ -804,13 +804,7 @@ namespace Crow
 				if (!clipping.IsEmpty) {
 					IsDirty = true;
 
-					for (int i = 0; i < clipping.NumRectangles; i++)
-						ctx.Rectangle(clipping.GetRectangle(i));
-					
-					ctx.ClipPreserve();
-					ctx.Operator = Operator.Clear;
-					ctx.Fill();
-					ctx.Operator = Operator.Over;
+					ctx.PushGroup ();
 
 					for (int i = GraphicTree.Count -1; i >= 0 ; i--){
 						Widget p = GraphicTree[i];
@@ -840,13 +834,25 @@ namespace Crow
 						}
 					}
 
-					#if DEBUG_CLIP_RECTANGLE
+#if DEBUG_CLIP_RECTANGLE
 					ctx.LineWidth = 1;
 					ctx.SetSourceColor(Color.Magenta.AdjustAlpha (0.5));
 					for (int i = 0; i < clipping.NumRectangles; i++)
 						ctx.Rectangle(clipping.GetRectangle(i));
 					ctx.Stroke ();
-					#endif
+#endif
+
+					ctx.PopGroupToSource ();
+
+					for (int i = 0; i < clipping.NumRectangles; i++)
+						ctx.Rectangle (clipping.GetRectangle (i));
+
+					ctx.ClipPreserve ();
+					ctx.Operator = Operator.Clear;
+					ctx.Fill ();
+					ctx.Operator = Operator.Over;
+
+					ctx.Paint ();
 
 					clipping.Dispose ();
 					clipping = new Region ();
@@ -999,16 +1005,19 @@ namespace Crow
 		}
 
 		#region Mouse and Keyboard Handling
-		XCursor cursor = XCursor.Default;
+		MouseCursor cursor = MouseCursor.Arrow;
 
 		public MouseState Mouse;
 
-		public XCursor MouseCursor {
+		public MouseCursor MouseCursor {
 			set {
+
 				if (value == cursor)
 					return;
 				cursor = value;
-				MouseCursorChanged.Raise (this,new MouseCursorChangedEventArgs(cursor));
+				if (backend != null)
+					backend.Cursor = cursor;
+				//MouseCursorChanged.Raise (this,new MouseCursorChangedEventArgs(cursor));
 			}
 		}
 		/// <summary>Processes mouse move events from the root container, this function
@@ -1037,10 +1046,10 @@ namespace Crow
 			if (DragAndDropOperation != null)//drag source cant have hover event, so move has to be handle here
 				DragAndDropOperation.DragSource.onMouseMove (this, e);			
 
-			if (HoverWidget != null) {
+			if (_hoverWidget != null) {
 				resetTooltip ();
 				//check topmost graphicobject first
-				Widget tmp = HoverWidget;
+				Widget tmp = _hoverWidget;
 				Widget topc = null;
 				while (tmp is Widget) {
 					topc = tmp;
@@ -1052,13 +1061,13 @@ namespace Crow
 					while (i < idxhw) {
 						if (!GraphicTree [i].isPopup) {
 							if (GraphicTree [i].MouseIsIn (e.Position)) {
-								while (HoverWidget != null) {
-									HoverWidget.onMouseLeave (HoverWidget, e);
-									HoverWidget = HoverWidget.focusParent;
+								while (_hoverWidget != null) {
+									_hoverWidget.onMouseLeave (_hoverWidget, e);
+									HoverWidget = _hoverWidget.focusParent;
 								}
 
 								GraphicTree [i].checkHoverWidget (e);
-								HoverWidget.onMouseMove (this, e);
+								_hoverWidget.onMouseMove (this, e);
 								return true;
 							}
 						}
@@ -1066,23 +1075,22 @@ namespace Crow
 					}
 				}
 
-				if (HoverWidget.MouseIsIn (e.Position)) {
-					HoverWidget.checkHoverWidget (e);
-					HoverWidget.onMouseMove (this, e);
+				if (_hoverWidget.MouseIsIn (e.Position)) {
+					_hoverWidget.checkHoverWidget (e);
+					_hoverWidget.onMouseMove (this, e);
 					return true;
-				} else {
-					HoverWidget.onMouseLeave (HoverWidget, e);
-					//seek upward from last focused graph obj's
-					while (HoverWidget.focusParent != null) {
-						HoverWidget = HoverWidget.focusParent;
-						if (HoverWidget.MouseIsIn (e.Position)) {
-							HoverWidget.checkHoverWidget (e);
-							HoverWidget.onMouseMove (this, e);
-							return true;
-						} else
-							HoverWidget.onMouseLeave (HoverWidget, e);
+				} 
+				_hoverWidget.onMouseLeave (_hoverWidget, e);
+				//seek upward from last focused graph obj's
+				while (_hoverWidget.focusParent != null) {
+					HoverWidget = _hoverWidget.focusParent;
+					if (_hoverWidget.MouseIsIn (e.Position)) {
+						_hoverWidget.checkHoverWidget (e);
+						_hoverWidget.onMouseMove (this, e);
+						return true;
 					}
-				}
+					_hoverWidget.onMouseLeave (_hoverWidget, e);
+				}			
 			}
 
 			//top level graphic obj's parsing
@@ -1093,7 +1101,7 @@ namespace Crow
 						g.checkHoverWidget (e);
 						if (g is Window)
 							PutOnTop (g);
-						HoverWidget.onMouseMove (this, e);
+						_hoverWidget.onMouseMove (this, e);
 						return true;
 					}
 				}
@@ -1141,14 +1149,14 @@ namespace Crow
 			Mouse.EnableBit ((int)button);
 			MouseButtonEventArgs e = new MouseButtonEventArgs (button) { Mouse = Mouse };
 
-			if (HoverWidget == null)
+			if (_hoverWidget == null)
 				return false;
 
-			Widget hoverFocused = HoverWidget;
+			Widget hoverFocused = _hoverWidget;
 			while (!hoverFocused.Focusable) {
 				hoverFocused = hoverFocused.focusParent;
 				if (hoverFocused == null) {
-					hoverFocused = HoverWidget;
+					hoverFocused = _hoverWidget;
 					break;
 				}
 			}
@@ -1164,9 +1172,9 @@ namespace Crow
 				armedClickSender.onMouseClick (armedClickSender, armedClickEvtArgs);				
 			armedClickSender = null;
 
-			HoverWidget.onMouseDown(HoverWidget,new BubblingMouseButtonEventArg(e));
+			_hoverWidget.onMouseDown(_hoverWidget,new BubblingMouseButtonEventArg(e));
 
-			if (FocusedWidget == null)
+			if (_focusedWidget == null)
 				return true;
 
 			ActiveWidget = FocusedWidget;
@@ -1187,9 +1195,9 @@ namespace Crow
 			Mouse.SetScrollRelative (0, delta);
 			MouseWheelEventArgs e = new MouseWheelEventArgs () { Mouse = Mouse, DeltaPrecise = delta };
 
-			if (HoverWidget == null)
+			if (_hoverWidget == null)
 				return false;
-			HoverWidget.onMouseWheel (this, e);
+			_hoverWidget.onMouseWheel (this, e);
 			return true;
 		}
 
@@ -1200,8 +1208,8 @@ namespace Crow
 
 		#region Tooltip handling
 		Stopwatch tooltipTimer = new Stopwatch();
-		Widget ToolTipContainer = null;
-		volatile bool tooltipVisible = false;
+		Widget ToolTipContainer;
+		volatile bool tooltipVisible;
 
 		protected void initTooltip () {
 			ToolTipContainer = CreateInstance  ("#Crow.Tooltip.template");
@@ -1279,7 +1287,7 @@ namespace Crow
 			ctxMenuContainer.Left = Mouse.X - 5;
 			ctxMenuContainer.Top = Mouse.Y - 5;
 
-			HoverWidget = ctxMenuContainer;
+			_hoverWidget = ctxMenuContainer;
 			ctxMenuContainer.onMouseEnter (ctxMenuContainer, new MouseMoveEventArgs (Mouse.X, Mouse.Y, 0, 0));
 		}
 		#endregion

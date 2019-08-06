@@ -20,17 +20,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using Crow;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Collections;
-using System.Xml.Serialization;
 using System.IO;
 using Crow.IML;
-using System.Xml;
-using System.Linq;
-using Crow.Coding;
-using System.Threading;
 
 namespace Crow.Coding
 {
