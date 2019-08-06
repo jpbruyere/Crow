@@ -54,8 +54,7 @@ namespace Crow.Win32 {
 
 			WindowProcedureDelegate = WindowProcedure;
 
-			Rect rect = new Rect
-			{
+			Rect rect = new Rect {
 				Left = iFace.ClientRectangle.Left,
 				Top = iFace.ClientRectangle.Top,
 				Right = iFace.ClientRectangle.Right,
@@ -64,8 +63,7 @@ namespace Crow.Win32 {
 
 			User32.Window.AdjustWindowRectEx (ref rect, 0, false, 0);
 
-			ExtendedWindowClass wc = new ExtendedWindowClass
-			{
+			ExtendedWindowClass wc = new ExtendedWindowClass {
 				Size = ExtendedWindowClass.SizeInBytes,
 				Style = 0,
 				WindowProc = WindowProcedureDelegate,
@@ -111,6 +109,8 @@ namespace Crow.Win32 {
 				User32.Message.DispatchMessage (ref msg);
 			}
 		}
+
+		public MouseCursor Cursor { set { throw new NotImplementedException(); } }
 
 		public bool IsDown (Key key) {
 			return false;
