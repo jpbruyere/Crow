@@ -132,7 +132,7 @@ namespace Crow.Coding
 				return;
 			}
 			int i = 0;
-			while (i < Interface.TabSize) {
+			while (i < Interface.TAB_SIZE) {
 				if (this [l] [i] != ' ')
 					break;
 				i++;
@@ -247,7 +247,7 @@ namespace Crow.Coding
 			int buffCol = 0;
 			while (i < visualPos.X) {
 				if (this [visualPos.Y] [buffCol] == '\t')
-					i += Interface.TabSize;
+					i += Interface.TAB_SIZE;
 				else
 					i++;
 				buffCol++;
@@ -277,7 +277,7 @@ namespace Crow.Coding
 		public int CurrentTabulatedColumn {
 			get {
 				return lines [_currentLine].Content.Substring (0, _currentCol).
-					Replace ("\t", new String (' ', Interface.TabSize)).Length;
+					Replace ("\t", new String (' ', Interface.TAB_SIZE)).Length;
 			}
 		}
 		/// <summary>

@@ -141,15 +141,6 @@ namespace Crow
 				mName = "IsEnabled";
 			NotifyValueChanged (mName, e.NewValue);
 		}
-		void onMI_Click (object sender, MouseButtonEventArgs e)
-		{
-			if (command != null) {
-				command.Execute ();
-				closeMenu ();
-			}
-			if(!IsOpened)
-				(LogicalParent as Menu).AutomaticOpening = false;
-		}
 		protected virtual void onOpen (object sender, EventArgs e){
 			Open.Raise (this, null);
 		}
@@ -176,7 +167,21 @@ namespace Crow
 				IsOpened = false;
 			base.onMouseLeave (this, e);
 		}
+		public override void onMouseClick (object sender, MouseButtonEventArgs e)
+		{
+#if DEBUG_FOCUS
+			System.Diagnostics.Debug.WriteLine ("MENU CLICK => " + this.ToString ());
+#endif
+			if (command != null) {
+				command.Execute ();
+				closeMenu ();
+			}
+			if (hasClick)
+				base.onMouseClick (sender, e);
 
+			if (!IsOpened)
+				(LogicalParent as Menu).AutomaticOpening = false;
+		}
 		void closeMenu () {
 			MenuItem tmp = LogicalParent as MenuItem;
 			while (tmp != null) {

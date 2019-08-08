@@ -101,6 +101,7 @@ namespace Crow
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
+			e.Handled = true;
 			base.onMouseDown (sender, e);
 
 			if (this.HasFocus && IsDocked && e.Button == MouseButton.Left)
@@ -109,6 +110,7 @@ namespace Crow
 		public bool CheckUndock (Point mousePos) {
 			//if (DockingPosition == Alignment.Center)
 			//	return false;
+			Console.WriteLine ($"{mousePos.X},{mousePos.Y}");
 			if (Math.Abs (mousePos.X - undockingMousePosOrig.X) < undockThreshold ||
 			    Math.Abs (mousePos.X - undockingMousePosOrig.X) < undockThreshold)
 				return false;

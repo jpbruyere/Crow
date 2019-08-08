@@ -27,7 +27,6 @@ Icon {
 	Width = "12";
 	Height = "12";
 }
-
 Wrapper {
 	Orientation = "Vertical";
 }
@@ -38,7 +37,15 @@ Button {
 Label {
 	Height = "Fit";
 	Width = "Fit";
-	Margin = "0";
+	Margin = "0";	
+}
+TextBox {
+	Background = "White";
+	Foreground = "Black";
+	Selectable = "True";
+	Text = "TextBox";
+	Margin = "1";
+	MouseCursor = "IBeam";
 }
 Menu {
 	Margin = "1";
@@ -95,13 +102,6 @@ TabItem {
 	//MouseEnter = "{Background = Cobalt;Foreground=White;}";
 	//MouseLeave = "{Foreground=LightGrey;Background=Jet;}";
 	AllowDrag = "true";
-}
-TextBox {
-	Background = "White";
-	Foreground = "Black";
-	Selectable = "True";
-	Text = "TextBox";
-	Margin = "1";
 }
 Window {
 	Caption = "Window";

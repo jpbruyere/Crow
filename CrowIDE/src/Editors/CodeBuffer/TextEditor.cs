@@ -277,7 +277,7 @@ namespace Crow.Text
 
 		int getTabulatedColumn (int col, int line) {
 			return buffer.GetSubString (buffer [line],
-				buffer.GetLineLength (line)).Substring(0,col).Replace ("\t", new String (' ', Interface.TabSize)).Length;
+				buffer.GetLineLength (line)).Substring(0,col).Replace ("\t", new String (' ', Interface.TAB_SIZE)).Length;
 		}
 		int getTabulatedColumn (Point pos) {
 			return getTabulatedColumn (pos.X,pos.Y);
@@ -297,7 +297,7 @@ namespace Crow.Text
 				if (lineIndex < buffer.LineCount - 1)//dont print line break
 					lineLength--;
 				string lstr = buffer.GetSubString (buffer [lineIndex],
-					lineLength).Replace ("\t", new String (' ', Interface.TabSize));
+					lineLength).Replace ("\t", new String (' ', Interface.TAB_SIZE));
 
 				int lstrLength = lstr.Length;
 				if (lstrLength > longestTabulatedLine)
@@ -425,7 +425,7 @@ namespace Crow.Text
 			int buffPtr = buffer [line];
 			while (i < column && buffCol < buffer.GetLineLength(line)) {
 				if (buffer.GetCharAt(buffPtr + buffCol) == '\t')
-					i += Interface.TabSize;
+					i += Interface.TAB_SIZE;
 				else
 					i++;
 				buffCol++;

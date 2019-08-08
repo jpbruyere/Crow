@@ -505,7 +505,7 @@ namespace Crow.Coding
 			}
 		}
 		int getTabulatedColumn (int col, int line) {
-			return buffer [line].Content.Substring (0, col).Replace ("\t", new String (' ', Interface.TabSize)).Length;
+			return buffer [line].Content.Substring (0, col).Replace ("\t", new String (' ', Interface.TAB_SIZE)).Length;
 		}
 		int getTabulatedColumn (Point pos) {
 			return getTabulatedColumn (pos.X,pos.Y);
@@ -912,7 +912,7 @@ namespace Crow.Coding
 			int buffCol = 0;
 			while (i < curVisualCol && buffCol < buffer.CurrentCodeLine.Length) {
 				if (buffer.CurrentCodeLine[buffCol] == '\t')
-					i += Interface.TabSize;
+					i += Interface.TAB_SIZE;
 				else
 					i++;
 				buffCol++;

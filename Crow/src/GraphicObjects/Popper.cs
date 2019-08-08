@@ -119,7 +119,7 @@ namespace Crow
 			set {
 				if (_content != null) {
 					_content.LogicalParent = null;
-					_content.isPopup = false;
+					//_content.isPopup = false;
 					_content.LayoutChanged -= _content_LayoutChanged;
 				}
 
@@ -129,7 +129,7 @@ namespace Crow
 					return;
 
 				_content.LogicalParent = this;
-				_content.isPopup = true;
+				//_content.isPopup = true;
 				_content.HorizontalAlignment = HorizontalAlignment.Left;
 				_content.VerticalAlignment = VerticalAlignment.Top;
 				_content.LayoutChanged += _content_LayoutChanged;
@@ -223,8 +223,8 @@ namespace Crow
 				Content.Visible = true;
 				if (Content.Parent == null)
 					IFace.AddWidget (Content);
-				if (Content.LogicalParent != this)
-					Content.LogicalParent = this;
+				//if (Content.LogicalParent != this)
+				Content.LogicalParent = this;
 				IFace.PutOnTop (Content, true);
 				_content_LayoutChanged (this, new LayoutingEventArgs (LayoutingType.Sizing));
 			}

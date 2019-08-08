@@ -462,7 +462,7 @@ namespace Crow
 
 					try {
 						for (int i = 0; i < lines.Count; i++) {
-							string l = lines[i].Replace ("\t", new String (' ', Interface.TabSize));
+							string l = lines[i].Replace ("\t", new String (' ', Interface.TAB_SIZE));
 
 							TextExtents tmp = gr.TextExtents (l);
 
@@ -616,7 +616,7 @@ namespace Crow
 			//*******************
 
 			for (int i = 0; i < lines.Count; i++) {
-				string l = lines [i].Replace ("\t", new String (' ', Interface.TabSize));
+				string l = lines [i].Replace ("\t", new String (' ', Interface.TAB_SIZE));
 				int lineLength = (int)gr.TextExtents (l).XAdvance;
 				Rectangle lineRect = new Rectangle (
 					rText.X,
@@ -684,17 +684,6 @@ namespace Crow
 				mouseLocalPos.X = 0;
 			if (mouseLocalPos.Y < 0)
 				mouseLocalPos.Y = 0;
-		}
-		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
-		{
-			base.onMouseEnter (sender, e);
-			if (Selectable)
-				IFace.MouseCursor = MouseCursor.IBeam;
-		}
-		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
-		{
-			base.onMouseLeave (sender, e);
-			IFace.MouseCursor = MouseCursor.Arrow;
 		}
 		protected override void onFocused (object sender, EventArgs e)
 		{
@@ -798,7 +787,7 @@ namespace Crow
 			{
 				string c = lines [CurrentLine].Substring (i, 1);
 				if (c == "\t")
-					c = new string (' ', Interface.TabSize);
+					c = new string (' ', Interface.TAB_SIZE);
 
 				te = gr.TextExtents(c);
 
@@ -834,7 +823,7 @@ namespace Crow
 		{
 			try {
 				string l = lines [pos.Y].Substring (0, pos.X).
-					Replace ("\t", new String (' ', Interface.TabSize));
+					Replace ("\t", new String (' ', Interface.TAB_SIZE));
 				return gr.TextExtents (l).XAdvance;
 			} catch{
 				return -1;

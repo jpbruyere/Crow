@@ -455,7 +455,7 @@ namespace Crow
 				page.AddChild (g);
 //				if (isPaged)
 				g.LogicalParent = this;
-				g.MouseDown += itemClick;
+				g.MouseClick += itemClick;
 			}
 
 			if (iTemp.Expand != null && g is Expandable) {

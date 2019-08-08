@@ -65,10 +65,10 @@ namespace Crow
 			}
 		}
 
-		public override void onMouseDown (object sender, MouseButtonEventArgs e)
+		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{
 			IsChecked = !IsChecked;
-			base.onMouseDown (sender, e);
+			base.onMouseClick (sender, e);
 		}
 	}
 }

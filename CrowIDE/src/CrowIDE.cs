@@ -42,9 +42,9 @@ namespace Crow.Coding
 			CMDQuit = new Command(new Action(() => app.running = false)) { Caption = "Quit", Icon = new SvgPicture("#CrowIDE.icons.sign-out.svg") };
 			CMDUndo = new Command(new Action(() => undo())) { Caption = "Undo", Icon = new SvgPicture("#CrowIDE.icons.undo.svg"), CanExecute = false};
 			CMDRedo = new Command(new Action(() => redo())) { Caption = "Redo", Icon = new SvgPicture("#CrowIDE.icons.redo.svg"), CanExecute = false};
-            //CMDCut = new Command(new Action(() => Quit (null, null))) { Caption = "Cut", Icon = new SvgPicture("#CrowIDE.icons.scissors.svg"), CanExecute = false};
-            //CMDCopy = new Command(new Action(() => Quit (null, null))) { Caption = "Copy", Icon = new SvgPicture("#CrowIDE.icons.copy-file.svg"), CanExecute = false};
-            //CMDPaste = new Command(new Action(() => Quit (null, null))) { Caption = "Paste", Icon = new SvgPicture("#CrowIDE.icons.paste-on-document.svg"), CanExecute = false};
+            CMDCut = new Command(new Action(() => cut())) { Caption = "Cut", Icon = new SvgPicture("#CrowIDE.icons.scissors.svg"), CanExecute = false};
+            CMDCopy = new Command(new Action(() => copy())) { Caption = "Copy", Icon = new SvgPicture("#CrowIDE.icons.copy-file.svg"), CanExecute = false};
+            CMDPaste = new Command(new Action(() => paste())) { Caption = "Paste", Icon = new SvgPicture("#CrowIDE.icons.paste-on-document.svg"), CanExecute = false};
             CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("help"))) { Caption = "Help", Icon = new SvgPicture("#CrowIDE.icons.question.svg") };
 			CMDOptions = new Command(new Action(() => loadWindow("#CrowIDE.ui.Options.crow"))) { Caption = "Editor Options", Icon = new SvgPicture("#CrowIDE.icons.tools.svg") };
 
@@ -86,6 +86,9 @@ namespace Crow.Coding
 		void saveFileDialog() {}
 		void undo() {}
 		void redo() {}
+		void cut () { }
+		void copy () { }
+		void paste () { }
 		void closeSolution (){
 			if (currentSolution != null)
 				currentSolution.CloseSolution ();
