@@ -221,11 +221,12 @@ namespace Crow
 		/// <summary> Process scrolling vertically, or if shift is down, vertically </summary>
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
 		{
-			base.onMouseWheel (sender, e);
 			if (IFace.IsKeyDown (Key.Shift_L))
 				ScrollX += e.Delta * ScrollSpeed;
 			else
 				ScrollY -= e.Delta * ScrollSpeed;
+			e.Handled = true;
+			base.onMouseWheel (sender, e);
 		}
 		/// <summary> Process scrolling with arrow keys, home and end keys. </summary>
 		public override void onKeyDown (object sender, KeyEventArgs e)

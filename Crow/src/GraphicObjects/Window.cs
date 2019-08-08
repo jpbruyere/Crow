@@ -294,11 +294,11 @@ namespace Crow
 
 			Interface otkgw = IFace;
 
-			if (!hoverBorder) {
+			/*if (!hoverBorder) {
 				currentDirection = Direction.None;
 				IFace.MouseCursor = MouseCursor.Arrow;
 				return;
-			}
+			}*/
 
 			if (this.HasFocus && movable) {
 				if (e.Mouse.IsButtonDown (MouseButton.Left)) {

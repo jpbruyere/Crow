@@ -31,7 +31,7 @@ using System.Text;
 
 namespace Crow
 {
-    public class KeyEventArgs : EventArgs
+    public class KeyEventArgs : CrowEventArgs
     {
 		int keyCode;
 		Key key;

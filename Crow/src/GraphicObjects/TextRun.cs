@@ -170,7 +170,7 @@ namespace Crow
 				}
 
 				foreach (string s in lines) {
-					string l = s.Replace("\t", new String (' ', Interface.TabSize));
+					string l = s.Replace("\t", new String (' ', Interface.TAB_SIZE));
 					TextExtents tmp = gr.TextExtents (l);
 					if (tmp.XAdvance > te.XAdvance)
 						te = tmp;
@@ -262,7 +262,7 @@ namespace Crow
 
 			int curLineCount = 0;
 			for (int i = 0; i < lines.Count; i++) {
-				string l = lines [i].Replace ("\t", new String (' ', Interface.TabSize));
+				string l = lines [i].Replace ("\t", new String (' ', Interface.TAB_SIZE));
 				List<string> wl = new List<string> ();
 				int lineLength = (int)gr.TextExtents (l).XAdvance;
 

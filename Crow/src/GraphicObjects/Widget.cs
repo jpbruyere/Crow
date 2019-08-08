@@ -201,10 +201,10 @@ namespace Crow
 		internal static List<GraphicObject> GraphicObjects = new List<GraphicObject>();
 		#endif
 
-		internal bool isPopup = false;
-		public Widget focusParent {
-			get { return (isPopup ? LogicalParent : parent) as Widget; }
-		}
+		//internal bool isPopup = false;
+		//public Widget focusParent {
+		//	get { return (isPopup ? LogicalParent : parent) as Widget; }
+		//}
 
 		/// <summary>
 		/// interface this widget is bound to, this should not be changed once the instance is created
@@ -282,20 +282,21 @@ namespace Crow
 		Font font = "sans, 10";
 		protected Measure width, height;
 		int left, top;
-		double cornerRadius = 0;
-		int margin = 0;
-		bool focusable = false;
-		bool hasFocus = false;
-		bool isActive = false;
-		//bool isHover = false;
+		double cornerRadius;
+		int margin;
+		bool focusable ;
+		bool hasFocus;
+		bool isActive;
+		bool isHover;
 		bool mouseRepeat;
+		MouseCursor mouseCursor = MouseCursor.Arrow;
 		protected bool isVisible = true;
 		bool isEnabled = true;
 		VerticalAlignment verticalAlignment = VerticalAlignment.Center;
 		HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center;
 		Size maximumSize = "0,0";
 		Size minimumSize = "0,0";
-		bool cacheEnabled = false;
+		bool cacheEnabled;
 		bool clipToClientRect = true;
 		Type dataSourceType;
 		protected object dataSource;
@@ -362,17 +363,22 @@ namespace Crow
 				onParentChanged (this, e);
 			}
 		}
+		/// <summary>
+		/// Mouse routing need to go back to logical parent for popups
+		/// </summary>
+		public Widget FocusParent => (parent is Interface ? LogicalParent : parent) as Widget; 
+
 		[XmlIgnore]public ILayoutable LogicalParent {
 			get { return logicalParent == null ? Parent : logicalParent; }
 			set {
 				if (logicalParent == value)
 					return;
-				if (logicalParent != null)
+				if (logicalParent is Widget)
 					(logicalParent as Widget).DataSourceChanged -= onLogicalParentDataSourceChanged;
 				DataSourceChangeEventArgs dsce = new DataSourceChangeEventArgs (LogicalParent, null);
 				logicalParent = value;
 				dsce.NewDataSource = LogicalParent;
-				if (logicalParent != null)
+				if (logicalParent is Widget)
 					(logicalParent as Widget).DataSourceChanged += onLogicalParentDataSourceChanged;
 				onLogicalParentChanged (this, dsce);
 			}
@@ -440,7 +446,7 @@ namespace Crow
 		/// <summary>Occurs when this object loose focus</summary>
 		public event EventHandler Unfocused;
 		/// <summary>Occurs when mouse is over</summary>
-		//public event EventHandler Hover;
+		public event EventHandler Hover;
 		/// <summary>Occurs when this control is no longer the Hover one</summary>
 		//public event EventHandler UnHover;
 		/// <summary>Occurs when this object loose focus</summary>
@@ -471,6 +477,9 @@ namespace Crow
 		/// <summary>Occurs when the logical parent has changed</summary>
 		public event EventHandler<DataSourceChangeEventArgs> LogicalParentChanged;
 		#endregion
+
+		internal bool hasDoubleClick => MouseDoubleClick != null;
+		internal bool hasClick => MouseClick != null;
 
 		#region public properties
 		/// <summary>Random value placeholder</summary>
@@ -748,7 +757,7 @@ namespace Crow
 		/// <summary>
 		/// true if this control has the pointer hover
 		/// </summary>
-		/*[XmlIgnore]public virtual bool IsHover {
+		[XmlIgnore]public virtual bool IsHover {
 			get { return isHover; }
 			set {
 				if (value == isHover)
@@ -757,13 +766,11 @@ namespace Crow
 				isHover = value;
 
 				if (isHover)
-					onHover (this, null);
-				else
-					onUnHover (this, null);
+					Hover.Raise (this, null);
 
 				NotifyValueChanged ("IsHover", isHover);
 			}
-		}*/
+		}
 		/// <summary>
 		/// true if holding mouse button down should trigger multiple click events
 		/// </summary>
@@ -777,6 +784,38 @@ namespace Crow
 				NotifyValueChanged ("MouseRepeat", mouseRepeat);
 			}
 		}
+		/// <summary>
+		/// Determine Cursor when mouse is Hover.
+		/// </summary>
+		[DesignCategory ("Behaviour")]
+		[DefaultValue (MouseCursor.Arrow)]
+		public virtual MouseCursor MouseCursor {
+			get { return mouseCursor; }
+			set {
+				if (mouseCursor == value)
+					return;
+				mouseCursor = value;
+				NotifyValueChanged ("MouseCursor", mouseCursor);
+				this.RegisterForRedraw ();
+
+				if (isHover)
+					IFace.MouseCursor = mouseCursor;
+			}
+		}
+
+		/// <summary>
+		/// forward mouse events even if an handle is bound
+		/// </summary>
+		//[DesignCategory ("Behaviour")][DefaultValue (false)]
+		//public bool ForwardMouseEvents {
+		//	get { return forwardMouseEvents; }
+		//	set {
+		//		if (forwardMouseEvents == value)
+		//			return;
+		//		forwardMouseEvents = value;
+		//		NotifyValueChanged ("ForwardMouseEvents", forwardMouseEvents);
+		//	}
+		//}
 		bool clearBackground = false;
 		/// <summary>
 		/// background fill of the control, maybe solid color, gradient, image, or svg
@@ -1665,8 +1704,9 @@ namespace Crow
 			else if (LastPaintedSlot.Width != Slot.Width || LastPaintedSlot.Height != Slot.Height)
 				bmp.SetSize (Slot.Width, Slot.Height);*/
 			bmp?.Dispose ();
+			//bmp = IFace.surf.CreateSimilar (Content.ColorAlpha, Slot.Width, Slot.Height);
 			bmp = new ImageSurface(Format.Argb32, Slot.Width, Slot.Height);
-			
+
 			using (Context gr = new Context (bmp)) {
 				gr.Antialias = Interface.Antialias;
 				onDraw (gr);
@@ -1749,13 +1789,22 @@ namespace Crow
 
         #region Keyboard handling
 		public virtual void onKeyDown(object sender, KeyEventArgs e){
-			KeyDown.Raise (this, e);
+			if (KeyDown != null)
+				KeyDown.Invoke (this, e);
+			else if (!e.Handled)
+				FocusParent?.onKeyDown (sender, e);
 		}
 		public virtual void onKeyUp(object sender, KeyEventArgs e){
-			KeyUp.Raise (this, e);
+			if (KeyUp != null)
+				KeyUp.Invoke (this, e);
+			else if (!e.Handled)
+				FocusParent?.onKeyUp (sender, e);
 		}
 		public virtual void onKeyPress(object sender, KeyPressEventArgs e){
-			KeyPress.Raise (this, e);
+			if (KeyPress != null)
+				KeyPress.Invoke (this, e);
+			else if (!e.Handled)
+				FocusParent?.onKeyPress (sender, e);
 		}
         #endregion
 
@@ -1790,7 +1839,7 @@ namespace Crow
 
 			//this.onMouseMove (this, e);//without this, window border doesn't work, should be removed
 		}
-		public virtual void onMouseMove(object sender, MouseMoveEventArgs e)
+		public virtual void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			if (allowDrag & hasFocus & e.Mouse.LeftButton == ButtonState.Pressed) {
 				if (IFace.DragAndDropOperation == null) {
@@ -1803,39 +1852,33 @@ namespace Crow
 			//to let other control behind have mouse entering
 			if (isDragged)
 				return;
-			
-			//bubble event to the top
-			Widget p = focusParent;
-			if (p != null)
-				p.onMouseMove(sender,e);
 
-			MouseMove.Raise (this, e);
+			if (MouseMove != null)
+				MouseMove.Invoke (this, e);			
+			else if (!e.Handled)
+				FocusParent?.onMouseMove (sender, e);
+
+
 		}
 		public virtual void onMouseDown(object sender, MouseButtonEventArgs e){
-			#if DEBUG_FOCUS
+#if DEBUG_FOCUS
 			Debug.WriteLine("MOUSE DOWN => " + this.ToString());
-			#endif
+#endif
 
-			if (focusable && !Interface.FocusOnHover) {
-				BubblingMouseButtonEventArg be = e as BubblingMouseButtonEventArg;
-				if (be.Focused == null) {
-					be.Focused = this;
-					IFace.FocusedWidget = this;
-					if (e.Button == MouseButton.Right && contextCommands != null)
-						IFace.ShowContextMenu (this);					
-				}
+			if (e.Button == MouseButton.Right && contextCommands != null) {
+				IFace.ShowContextMenu (this);
+				e.Handled = true;
 			}
-			//bubble event to the top
-			Widget p = focusParent;
-			if (p != null)
-				p.onMouseDown(sender,e);
 
-			MouseDown.Raise (this, e);
+			if (MouseDown != null)
+				MouseDown?.Invoke (this, e);
+			else if (!e.Handled)
+				FocusParent?.onMouseDown (sender, e);
 		}
 		public virtual void onMouseUp(object sender, MouseButtonEventArgs e){
-			#if DEBUG_FOCUS
+#if DEBUG_FOCUS
 			Debug.WriteLine("MOUSE UP => " + this.ToString());
-			#endif
+#endif
 
 			if (IFace.DragAndDropOperation != null){
 				if (IFace.DragAndDropOperation.DragSource == this) {
@@ -1846,55 +1889,42 @@ namespace Crow
 					IFace.DragAndDropOperation = null;
 				}
 			}
-
-			//bubble event to the top
-			Widget p = focusParent;
-			if (p != null)
-				p.onMouseUp(sender,e);
-
-			MouseUp.Raise (this, e);
+			if (MouseUp != null)
+				MouseUp.Invoke (this, e);
+			else if (!e.Handled)
+				FocusParent?.onMouseUp (sender, e);
 		}
 		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){
 #if DEBUG_FOCUS
 			Debug.WriteLine("CLICK => " + this.ToString());
 #endif
-            if (MouseClick != null)
-            {
-                MouseClick.Raise(this, e);
-                return;
-            }
-			Widget p = focusParent;
-			if (p != null)
-				p.onMouseClick(sender,e);			
+			if (MouseClick != null)
+				MouseClick.Invoke (this, e);
+			else if (!e.Handled)
+				FocusParent?.onMouseClick (sender, e);
 		}
 		public virtual void onMouseDoubleClick(object sender, MouseButtonEventArgs e){
 #if DEBUG_FOCUS
 			Debug.WriteLine("DOUBLE CLICK => " + this.ToString());
 #endif
-            if (MouseDoubleClick != null)
-            {
-                MouseDoubleClick.Raise(this, e);
-                return;
-            }
-            Widget p = focusParent;
-			if (p != null)
-				p.onMouseDoubleClick(sender,e);			
+			if (MouseDoubleClick != null)			
+				MouseDoubleClick.Invoke (this, e);
+			else if (!e.Handled)
+				FocusParent?.onMouseDoubleClick (sender, e);
 		}
 		public virtual void onMouseWheel(object sender, MouseWheelEventArgs e){
-            if (MouseWheelChanged != null)
-            {
-                MouseWheelChanged.Raise(this, e);
-                return;
-            }
-            Widget p = focusParent;
-			if (p != null)
-				p.onMouseWheel(sender,e);
+			if (MouseWheelChanged != null)
+				MouseWheelChanged.Invoke (this, e);
+			else if (!e.Handled)
+				FocusParent?.onMouseWheel (sender, e);
 		}
 		public virtual void onMouseEnter(object sender, MouseMoveEventArgs e)
 		{
 			#if DEBUG_FOCUS
 			Debug.WriteLine("MouseEnter => " + this.ToString());
-			#endif
+#endif
+
+			IFace.MouseCursor = mouseCursor;
 
 			if (IFace.DragAndDropOperation != null) {
 				Widget g = this;
@@ -1907,7 +1937,7 @@ namespace Crow
 						}
 						break;
 					}
-					g = g.focusParent;
+					g = g.FocusParent;
 				}
 			}
 
@@ -1925,8 +1955,6 @@ namespace Crow
 		#endregion
 
 		protected virtual void onFocused(object sender, EventArgs e){
-			if (IFace.FocusedWidget != this)
-				IFace.FocusedWidget = this;
 			#if DEBUG_FOCUS
 			Debug.WriteLine("Focused => " + this.ToString());
 			#endif
@@ -1938,6 +1966,7 @@ namespace Crow
 			#endif
 			Unfocused.Raise (this, e);
 		}
+
 		public virtual void onEnable(object sender, EventArgs e){
 			Enabled.Raise (this, e);
 		}
@@ -1945,13 +1974,6 @@ namespace Crow
 			Disabled.Raise (this, e);
 		}
 		protected virtual void onParentChanged(object sender, DataSourceChangeEventArgs e) {
-//			if (e.NewDataSource != null) {
-//				if (width == Measure.Inherit)
-//					RegisterForLayouting (LayoutingType.Width);
-//				if (height == Measure.Inherit)
-//					RegisterForLayouting (LayoutingType.Height);
-//			}
-			
 			ParentChanged.Raise (this, e);
 			if (logicalParent == null)
 				LogicalParentChanged.Raise (this, e);

@@ -31,17 +31,11 @@ using System;
 
 namespace Crow
 {
-    /// <summary>
-    /// Defines the event data for <see cref="MouseDevice"/> events.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// Do not cache instances of this type outside their event handler.
-    /// If necessary, you can clone an instance using the
-    /// <see cref="MouseEventArgs(MouseEventArgs)"/> constructor.
-    /// </para>
-    /// </remarks>
-    public class MouseEventArgs : EventArgs
+	public class CrowEventArgs : EventArgs
+	{
+		public bool Handled;
+	}
+	public class MouseEventArgs : CrowEventArgs		
     {
 	#region Fields
 

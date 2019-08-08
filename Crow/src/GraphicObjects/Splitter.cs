@@ -95,11 +95,6 @@ namespace Crow
 			else
 				IFace.MouseCursor = MouseCursor.V;
 		}
-		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
-		{
-			base.onMouseLeave (sender, e);
-			IFace.MouseCursor = MouseCursor.Arrow;
-		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseDown (sender, e);

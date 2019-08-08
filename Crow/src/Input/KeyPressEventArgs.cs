@@ -33,7 +33,7 @@ namespace Crow
     /// Defines the event arguments for KeyPress events. Instances of this class are cached:
     /// KeyPressEventArgs should only be used inside the relevant event, unless manually cloned.
     /// </summary>
-    public class KeyPressEventArgs : EventArgs
+    public class KeyPressEventArgs : CrowEventArgs
     {
         char key_char;
         
