@@ -55,6 +55,8 @@ namespace Crow
 		public void Cancel(){
 			if (thread.IsAlive & !cancelRequested){
 				cancelRequested = true;
+				Thread.Sleep (1);
+				thread.Abort ();
 				thread.Join ();
 			}
 			lock (Host.IFace.CrowThreads)

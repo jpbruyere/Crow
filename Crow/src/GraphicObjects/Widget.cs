@@ -1007,7 +1007,7 @@ namespace Crow
 				#if DEBUG_LOG
 				DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GOLockLayouting, this);
 				#endif
-				lock (IFace.LayoutMutex) {
+				lock (IFace.UpdateMutex) {
 					OnDataSourceChanged (this, dse);
 					NotifyValueChanged ("DataSource", DataSource);
 				}

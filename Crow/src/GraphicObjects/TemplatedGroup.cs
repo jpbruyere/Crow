@@ -29,6 +29,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using Crow.IML;
 
 namespace Crow {
@@ -205,7 +206,7 @@ namespace Crow {
 
 				NotifyValueChanged ("Data", data);
 
-				//lock (CurrentInterface.LayoutMutex)
+				lock (IFace.LayoutMutex)
 					ClearItems ();
 
 				if (data == null)
@@ -337,7 +338,14 @@ namespace Crow {
 		/// Items loading thread
 		/// </summary>
 		void loading(){
-			loadPage (data, items, dataTest);
+			try {
+				loadPage (data, items, dataTest);
+			} catch (Exception ex) {
+				if (Monitor.IsEntered (IFace.LayoutMutex))
+					Monitor.Exit (IFace.LayoutMutex);
+				Console.WriteLine ("loading thread aborted");
+			}
+
 		}
 //			//if (!ItemTemplates.ContainsKey ("default"))
 //			//	ItemTemplates ["default"] = Interface.GetItemTemplate (ItemTemplate);
@@ -441,7 +449,7 @@ namespace Crow {
 					iTemp = ItemTemplates ["default"];
 			}
 
-			lock (IFace.LayoutMutex) {
+			Monitor.Enter (IFace.LayoutMutex);
 				g = iTemp.CreateInstance();
 				#if DESIGN_MODE
 				g.design_isTGItem = true;
@@ -450,7 +458,7 @@ namespace Crow {
 //				if (isPaged)
 				g.LogicalParent = this;
 				g.MouseClick += itemClick;
-			}
+			Monitor.Exit (IFace.LayoutMutex);
 
 			if (iTemp.Expand != null && g is Expandable) {
 				Expandable e = g as Expandable;
