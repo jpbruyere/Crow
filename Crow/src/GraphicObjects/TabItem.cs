@@ -28,7 +28,7 @@ using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
-using Cairo;
+using Crow.Cairo;
 using System.Linq;
 
 namespace Crow

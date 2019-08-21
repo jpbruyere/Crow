@@ -30,7 +30,7 @@
 using System;
 using System.Collections;
 
-namespace Cairo {
+namespace Crow.Cairo {
    
 	public class Pattern : IDisposable
 	{

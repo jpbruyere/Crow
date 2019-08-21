@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Container Background="Yellow" Margin="10" Width="90%" Height="90%">
-	<Widget Margin="10" Width="50%" Height="50%" Background="Yellow"
+<Container Background="Blue" Margin="1" Width="90%" Height="90%">
+	<Widget Margin="1" Width="50%" Height="50%" Background="Red"
 			MinimumSize="50,50"/>
 </Container>

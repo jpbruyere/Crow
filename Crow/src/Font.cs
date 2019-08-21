@@ -25,7 +25,7 @@
 // THE SOFTWARE.
 
 using System;
-using Cairo;
+using Crow.Cairo;
 
 namespace Crow
 {

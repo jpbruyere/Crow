@@ -30,7 +30,7 @@
 
 using System;
 
-namespace Cairo {
+namespace Crow.Cairo {
 
 	public class DRMSurface : Surface
 	{

@@ -28,7 +28,7 @@
 
 using System;
 
-namespace Cairo {
+namespace Crow.Cairo {
 	public class XcbSurface : Surface
 	{
 		internal XcbSurface (IntPtr handle, bool owns) : base (handle, owns)

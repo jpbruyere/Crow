@@ -1,4 +1,4 @@
-//
+﻿//
 // Mono.Cairo.Matrix.cs
 //
 // Author: Duncan Mak
@@ -34,7 +34,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Cairo {
+namespace Crow.Cairo {
 
 	[StructLayout(LayoutKind.Sequential)]
 	public class Matrix //: ICloneable

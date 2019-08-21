@@ -37,7 +37,7 @@ Global
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
 		$0.StandardHeader = $1
-		$1.Text = @\n${FileName}\n \nAuthor:\n      ${AuthorName} <${AuthorEmail}>\n\nCopyright (c) 2013-2017 Jean-Philippe Bruyère\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the "Software"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE.
+		$1.Text = @Copyright (c) ${Year}  ${AuthorName} <${AuthorEmail}>\n\nThis code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 		$0.DotNetNamingPolicy = $2
 		$0.TextStylePolicy = $3
 		$3.EolMarker = Unix
@@ -69,7 +69,6 @@ Global
 		$6.LastFilePostfix = "@:\n  "
 		$6.LineAlign = 0
 		$6.Wrap = False
-		$5.inheritsSet = Mono
 		description = @C.R.O.W. c# Rapid Open Widgets\n\nCrow is a pure c# widget toolkit with XML definition of interface, bindings, styling...\n
 		version = 0.8.0
 	EndGlobalSection

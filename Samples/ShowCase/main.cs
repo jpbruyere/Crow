@@ -45,16 +45,20 @@ namespace tests
 			using (Showcase app = new Showcase ()) {
 				//app.Keyboard.KeyDown += App_KeyboardKeyDown;
 
-				Widget g = app.Load ("#ShowCase.showcase.crow");
-				g.DataSource = app;
-				app.crowContainer = g.FindByName ("CrowContainer") as Container;
-				//I set an empty object as datasource at this level to force update when new
-				//widgets are added to the interface
-				app.crowContainer.DataSource = new object ();
-				app.hideError ();
 				app.Run ();
 
 			}
+		}
+
+		protected override void Startup ()
+		{
+			Widget g = Load ("#ShowCase.showcase.crow");
+			g.DataSource = this;
+			crowContainer = g.FindByName ("CrowContainer") as Container;
+			//I set an empty object as datasource at this level to force update when new
+			//widgets are added to the interface
+			crowContainer.DataSource = new object ();
+			hideError ();
 		}
 
 		static void App_KeyboardKeyDown (object sender, KeyEventArgs e)

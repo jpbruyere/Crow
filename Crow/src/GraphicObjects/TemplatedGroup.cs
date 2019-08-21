@@ -25,20 +25,13 @@
 // THE SOFTWARE.
 
 using System;
-using System.Xml.Serialization;
-using System.Xml;
-using System.Reflection;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Collections;
-using System.Threading;
 using System.Linq;
 using Crow.IML;
-using System.Diagnostics;
-using System.IO;
 
-namespace Crow
-{
+namespace Crow {
 	public abstract class TemplatedGroup : TemplatedControl
 	{
 		#if DESIGN_MODE
@@ -72,7 +65,7 @@ namespace Crow
 		public event EventHandler Loaded;
 		#endregion
 
-		IList data;
+		IEnumerable data;
 		int _selectedIndex = -1;
 		Color selBackground, selForeground;
 
@@ -172,7 +165,7 @@ namespace Crow
 			}
 		}
 		[XmlIgnore]public virtual object SelectedItem{
-			get { return data == null ? null : _selectedIndex < 0 ? data.GetDefaultValue() : data[_selectedIndex]; }
+			get { return data == null ? null : _selectedIndex < 0 ? data.GetDefaultValue() : ((IList)data)?[_selectedIndex]; }
 			set {
 				if (data == null) {
 					SelectedIndex = -1;
@@ -182,13 +175,13 @@ namespace Crow
 				if (value == SelectedItem)
 					return;
 				
-				SelectedIndex = data.IndexOf (value);
+				SelectedIndex = (int)((IList)data)?.IndexOf (value);
 			}
 		}
 		[XmlIgnore]public bool HasItems {
 			get { return Items.Count > 0; }
 		}
-		public IList Data {
+		public IEnumerable Data {
 			get { return data; }
 			set {
 				if (value == data)
@@ -362,7 +355,7 @@ namespace Crow
 			if (loadingThread != null)
 				loadingThread.Cancel ();
 		}
-		void loadPage(IList _data, Group page, string _dataTest)
+		void loadPage(IEnumerable _data, Group page, string _dataTest)
 		{
 			#if DEBUG_LOAD
 			Stopwatch loadingTime = Stopwatch.StartNew ();
@@ -374,26 +367,27 @@ namespace Crow
 //				typeof(Wrapper).IsAssignableFrom (items.GetType ())) {
 				//page = items;
 				itemPerPage = int.MaxValue;
-//			} else if (typeof(GenericStack).IsAssignableFrom (items.GetType ())) {
-//				GenericStack gs = new GenericStack (items.CurrentInterface);
-//				gs.Orientation = (items as GenericStack).Orientation;
-//				gs.Width = items.Width;
-//				gs.Height = items.Height;
-//				gs.VerticalAlignment = items.VerticalAlignment;
-//				gs.HorizontalAlignment = items.HorizontalAlignment;
-//				page = gs;
-//				page.Name = "page" + pageNum;
-//				isPaged = true;
-//			} else {
-//				page = Activator.CreateInstance (items.GetType ()) as Group;
-//				page.CurrentInterface = items.CurrentInterface;
-//				page.Initialize ();
-//				page.Name = "page" + pageNum;
-//				isPaged = true;
-//			}
+			//			} else if (typeof(GenericStack).IsAssignableFrom (items.GetType ())) {
+			//				GenericStack gs = new GenericStack (items.CurrentInterface);
+			//				gs.Orientation = (items as GenericStack).Orientation;
+			//				gs.Width = items.Width;
+			//				gs.Height = items.Height;
+			//				gs.VerticalAlignment = items.VerticalAlignment;
+			//				gs.HorizontalAlignment = items.HorizontalAlignment;
+			//				page = gs;
+			//				page.Name = "page" + pageNum;
+			//				isPaged = true;
+			//			} else {
+			//				page = Activator.CreateInstance (items.GetType ()) as Group;
+			//				page.CurrentInterface = items.CurrentInterface;
+			//				page.Initialize ();
+			//				page.Name = "page" + pageNum;
+			//				isPaged = true;
+			//			}
 
-			for (int i = 0; i < _data.Count; i++) {				
-				loadItem (_data[i], page, _dataTest);
+
+			foreach (object d in _data) {
+				loadItem (d, page, _dataTest);
 				if (loadingThread.cancelRequested)
 					break;
 			}
@@ -461,22 +455,27 @@ namespace Crow
 			if (iTemp.Expand != null && g is Expandable) {
 				Expandable e = g as Expandable;
 				e.Expand += iTemp.Expand;
-				e.GetIsExpandable = iTemp.HasSubItems;
+				if ((o as ICollection) == null)
+					e.GetIsExpandable = new BooleanTestOnInstance((instance) => true);
+				else
+					e.GetIsExpandable = iTemp.HasSubItems;
 			}
 
 			g.DataSource = o;
 		}
-//		protected void _list_LayoutChanged (object sender, LayoutingEventArgs e)
-//		{
-//			#if DEBUG_LAYOUTING
-//			Debug.WriteLine("list_LayoutChanged");
-//			#endif
-//			if (_gsList.Orientation == Orientation.Horizontal) {
-//				if (e.LayoutType == LayoutingType.Width)
-//					_gsList.Width = approxSize;
-//			} else if (e.LayoutType == LayoutingType.Height)
-//				_gsList.Height = approxSize;
-//		}
+
+
+		//		protected void _list_LayoutChanged (object sender, LayoutingEventArgs e)
+		//		{
+		//			#if DEBUG_LAYOUTING
+		//			Debug.WriteLine("list_LayoutChanged");
+		//			#endif
+		//			if (_gsList.Orientation == Orientation.Horizontal) {
+		//				if (e.LayoutType == LayoutingType.Width)
+		//					_gsList.Width = approxSize;
+		//			} else if (e.LayoutType == LayoutingType.Height)
+		//				_gsList.Height = approxSize;
+		//		}
 		int approxSize
 		{
 			get {
@@ -487,16 +486,16 @@ namespace Crow
 					return -1;
 
 				return page1.Orientation == Orientation.Horizontal ?
-					data.Count < itemPerPage ?
+					(data as ICollection)?.Count < itemPerPage ?
 					-1:
-					(int)Math.Ceiling ((double)page1.Slot.Width / (double)itemPerPage * (double)(data.Count+1)):
-					data.Count < itemPerPage ?
+					(int)Math.Ceiling ((double)page1.Slot.Width / (double)itemPerPage * (double)((data as ICollection)?.Count+1)):
+					(data as ICollection)?.Count < itemPerPage ?
 					-1:
-					(int)Math.Ceiling ((double)page1.Slot.Height / (double)itemPerPage * (double)(data.Count+1));
+					(int)Math.Ceiling ((double)page1.Slot.Height / (double)itemPerPage * (double)((data as ICollection)?.Count+1));
 			}
 		}
 		internal virtual void itemClick(object sender, MouseButtonEventArgs e){
-			SelectedIndex = data.IndexOf((sender as Widget).DataSource);
+			SelectedIndex = (int)((IList)data)?.IndexOf((sender as Widget).DataSource);
 		}
 
 		bool emitHelperIsAlreadyExpanded (Widget go){

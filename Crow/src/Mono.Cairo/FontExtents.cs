@@ -34,7 +34,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Cairo
+namespace Crow.Cairo
 {
 	[StructLayout (LayoutKind.Sequential)]
 	public struct FontExtents

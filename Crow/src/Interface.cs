@@ -32,7 +32,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using Cairo;
+using Crow.Cairo;
 using Crow.IML;
 
 
@@ -62,37 +62,39 @@ namespace Crow
 	/// The resulting surface (a byte array in the OpenTK renderer) is made available and protected with the
 	/// RenderMutex of the interface.
 	/// </remarks>
-	public class Interface : ILayoutable, IDisposable ,IValueChange
+	public class Interface : ILayoutable, IDisposable, IValueChange
 	{
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-		public virtual void NotifyValueChanged(string MemberName, object _value)
+		public virtual void NotifyValueChanged (string MemberName, object _value)
 		{
 			//Debug.WriteLine ("Value changed: {0}->{1} = {2}", this, MemberName, _value);
-			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
+			ValueChanged.Raise (this, new ValueChangeEventArgs (MemberName, _value));
 		}
 		#endregion
 
-		internal IBackend backend;
+		protected IBackend backend;
+		protected bool running;
+
 
 		#region CTOR
-		static Interface(){
+		static Interface () {
 			/*if (Type.GetType ("Mono.Runtime") == null) {
 				throw new Exception (@"C.R.O.W. run only on Mono, download latest version at: http://www.mono-project.com/download/stable/");
 			}*/
 
 			CROW_CONFIG_ROOT =
-				System.IO.Path.Combine(
-					Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+				System.IO.Path.Combine (
+					Environment.GetFolderPath (Environment.SpecialFolder.UserProfile),
 					".config");
 			CROW_CONFIG_ROOT = System.IO.Path.Combine (CROW_CONFIG_ROOT, "crow");
 			if (!Directory.Exists (CROW_CONFIG_ROOT))
 				Directory.CreateDirectory (CROW_CONFIG_ROOT);
 
 			//ensure all assemblies are loaded, because IML could contains classes not instanciated in source
-			foreach (string af in Directory.GetFiles (AppDomain.CurrentDomain.BaseDirectory, "*.dll")){
+			foreach (string af in Directory.GetFiles (AppDomain.CurrentDomain.BaseDirectory, "*.dll")) {
 				try {
-					Assembly.LoadFrom (af);	
+					Assembly.LoadFrom (af);
 				} catch (Exception ex) {
 					Console.WriteLine ("{0} not loaded as assembly.", af);
 				}
@@ -105,54 +107,70 @@ namespace Crow
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Default;
 		}
 
-		public Interface(int width=800, int height=600){
-
+		public Interface(int width=800, int height=600, IBackend _backend = null){
+			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+			CurrentInterface = this;
 			clientRectangle = new Rectangle (0, 0, width, height);
+			backend = _backend;
 
-			Init ();
-
-			InitBackend ();
+			Thread t = new Thread (InterfaceThread) {
+				IsBackground = true
+			};
+			t.Start ();
+#if MEASURE_TIME
+			PerfMeasures.Add (updateMeasure);
+			PerfMeasures.Add (drawingMeasure);
+			PerfMeasures.Add (layoutingMeasure);
+			PerfMeasures.Add (clippingMeasure);
+#endif
 		}
 		#endregion
 
-		protected bool running;
-		protected virtual void InitBackend () {
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
-                backend = new Crow.XCB.XCBBackend();
-				//backend = new Crow.XLib.XLibBackend ();
-            else
-                backend = new Crow.Win32.Win32Backend();
-                
+		public virtual void InterfaceThread ()
+		{
+			if (backend == null) {
+				if (Environment.OSVersion.Platform == PlatformID.Unix)
+					backend = new XCB.XCBBackend ();
+				else
+					backend = new Win32.Win32Backend ();
+			}
+
 			backend.Init (this);
+
+			while (!running)
+				Thread.Sleep (2);
+
+			while (running) {
+				Update ();
+				Thread.Sleep (5);
+			}
+		}
+		protected virtual void Startup ()
+		{
+			try {
+				Load ("#main.crow").DataSource = this;
+			} catch { }
+		}
+		public virtual void Run () {
+			loadStyling ();
 
 			initTooltip ();
 			initContextMenus ();
 
 			running = true;
 
-			Thread t = new Thread (interfaceThread);
-			t.IsBackground = true;
-			t.Start ();
-		}
-		public void Run () {
 			Startup ();
+
 			while (running) {
 				ProcessEvents ();
 				Thread.Sleep(1);
 			}
 		}
-		protected virtual void Startup ()
-		{
-			//load default main.crow if present
-			try {
-				Load ("#main.crow").DataSource = this;
-			} catch { }
-		}
+
 		public void ProcessKeyPress (char c)
 		{
 			_focusedWidget?.onKeyPress (_focusedWidget, new KeyPressEventArgs(c));
 		}
-
 		public void ProcessKeyUp (Key key)
 		{
 			_focusedWidget?.onKeyUp (_focusedWidget, new KeyEventArgs(key, false));
@@ -173,26 +191,16 @@ namespace Crow
 			//			keyboardRepeatThread.IsBackground = true;
 			//			keyboardRepeatThread.Start ();
  		}
-
 		public bool Shift {
 			get { return backend.Shift; }
 		}
-
 		public bool Ctrl {
 			get { return backend.Ctrl; }
 		}
-
 		public bool Alt {
 			get { return backend.Alt; }
 		}
 
-		void interfaceThread()
-		{			
-			while (running) {
-				Update ();
-				Thread.Sleep (5);
-			}
-		}
 
 		#region IDisposable Support
 		private bool disposedValue = false; // To detect redundant calls
@@ -254,23 +262,9 @@ namespace Crow
 					FocusedWidget = w;
 					break;
 				}
-				w = w.LogicalParent as Widget;
+				w = w.FocusParent;
 			}
 
-		}
-		public void Init () {
-			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-
-			CurrentInterface = this;
-			//loadCursors ();
-			loadStyling ();
-
-			#if MEASURE_TIME
-			PerfMeasures.Add (updateMeasure);
-			PerfMeasures.Add (drawingMeasure);
-			PerfMeasures.Add (layoutingMeasure);
-			PerfMeasures.Add (clippingMeasure);
-			#endif
 		}
 
 		#region Static and constants
@@ -454,10 +448,10 @@ namespace Crow
 				if (s == null)
 					s = Assembly.GetAssembly (declaringType).GetManifestResourceStream (resId);
 				if (s == null)
-					throw new Exception ($"Template not found '{path}'");
+					throw new Exception ($"Template ressource not found '{path}'");
 			} else {
 				if (!File.Exists (path))
-					throw new FileNotFoundException ("Template not found: ", path);
+					throw new FileNotFoundException ($"Template not found: {path}", path);
 				s = new FileStream (path, FileMode.Open, FileAccess.Read);
 			}
 			return s;
@@ -481,7 +475,7 @@ namespace Crow
 					throw new Exception ("Resource not found: " + path);
 			} else {
 				if (!File.Exists (path))
-					throw new FileNotFoundException ("File not found: ", path);
+					throw new FileNotFoundException ($"File not found: {path}", path);
 				stream = new FileStream (path, FileMode.Open, FileAccess.Read);
 			}
 			return stream;
@@ -504,7 +498,7 @@ namespace Crow
 					throw new Exception ("Resource not found: " + path);
 			} else {
 				if (!File.Exists (path))
-					throw new FileNotFoundException ("File not found: ", path);
+					throw new FileNotFoundException ($"File not found: {path}", path);
 				stream = new FileStream (path, FileMode.Open, FileAccess.Read);
 			}
 			return stream;
@@ -700,7 +694,7 @@ namespace Crow
 		/// 	- Drawing
 		/// Result: the Interface bitmap is drawn in memory (byte[] bmp) and a dirtyRect and bitmap are available
 		/// </summary>
-		public void Update(){
+		public void Update(Context ctx = null){
 			CrowThread[] tmpThreads;
 			lock (CrowThreads) {
 				tmpThreads = new CrowThread[CrowThreads.Count];
@@ -734,11 +728,16 @@ namespace Crow
 
 			clippingRegistration ();
 
-			processDrawing ();
+			if (ctx == null) {
+				using (ctx = new Context (surf)) {
+					processDrawing (ctx);
+				}
+			}else
+				processDrawing (ctx);
 
-			#if MEASURE_TIME
+#if MEASURE_TIME
 			updateMeasure.StopCycle();
-			#endif
+#endif
 
 			Monitor.Exit (UpdateMutex);
 		}
@@ -800,7 +799,7 @@ namespace Crow
 		}
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
-		void processDrawing(){
+		void processDrawing(Context ctx){
 			#if MEASURE_TIME
 			drawingMeasure.StartCycle();
 			#endif
@@ -811,7 +810,6 @@ namespace Crow
 			if (DragImage != null)
 				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
 			//using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
-			using (ctx = new Context (surf)){
 				if (!clipping.IsEmpty) {
 					IsDirty = true;
 
@@ -872,7 +870,7 @@ namespace Crow
 
 					backend?.Flush ();
 				}
-			}
+			
 			/*#if DEBUG_LOG
 			DebugLog.AddEvent (DbgEvtType.IFaceEndDrawing);
 			#endif*/
@@ -1002,11 +1000,7 @@ namespace Crow
 
 				/*surf.Dispose ();
 				surf = new Cairo.XlibSurface (xHandle, xwinHnd, xDefaultVisual, clientRectangle.Width, clientRectangle.Height);*/
-				if (surf is XlibSurface)
-					(surf as XlibSurface).SetSize (clientRectangle.Width, clientRectangle.Height);
-				else if (surf is XcbSurface)
-					(surf as XcbSurface).SetSize (clientRectangle.Width, clientRectangle.Height);
-
+				surf.SetSize (clientRectangle.Width, clientRectangle.Height);
 
 				foreach (Widget g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);

@@ -1,4 +1,4 @@
-//
+﻿//
 // Mono.Cairo.Context.cs
 //
 // Author:
@@ -39,7 +39,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Color = Crow.Color;
 
-namespace Cairo {	
+namespace Crow.Cairo {	
 
 	[Obsolete ("Renamed Cairo.Context per suggestion from cairo binding guidelines.")]
 	public class Graphics : Context {

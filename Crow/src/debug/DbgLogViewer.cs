@@ -27,7 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Cairo;
+using Crow.Cairo;
 
 #if DEBUG_LOG
 namespace Crow
