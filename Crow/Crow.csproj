@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="$(SolutionDir)netfx.props" />
   <PropertyGroup>
-    <TargetFrameworks>net461;net471;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <AssemblyName>Crow</AssemblyName>
     <Copyright></Copyright>
     <AssemblyVersion>0.8.3.2</AssemblyVersion>    
