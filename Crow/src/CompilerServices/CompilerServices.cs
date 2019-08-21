@@ -920,7 +920,8 @@ namespace Crow.IML
 				foreach (Type expT in a.GetExportedTypes ()) {
 					if (expT.Name != strDataType)
 						continue;
-					knownTypes.Add (strDataType, expT);
+					if (!knownTypes.ContainsKey(strDataType))
+						knownTypes.Add (strDataType, expT);
 					return expT;
 				}
 			}

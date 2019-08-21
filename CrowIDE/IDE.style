@@ -1,5 +1,6 @@
-﻿Label {    
-    Foreground="Black";
+﻿//test
+Label {    
+    Foreground="White";
 }
 icon {
 	Width="14";
@@ -60,5 +61,5 @@ Splitter {
 	Background="RoyalBlue";
 }
 DockWindow {
-    Background="0.98,0.98,0.99,0.9";
+    Background="0.18,0.18,0.18,0.9";
 }

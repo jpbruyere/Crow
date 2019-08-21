@@ -200,6 +200,7 @@ namespace Crow.Coding
 				return;
 			FileLocation fl = g.design_style_locations [Name];
 			ProjectFile pf;
+			/*
 			if (!mview.ProjectNode.Project.TryGetProjectFileFromPath ("#" + fl.FilePath, out pf))
 				return;
 
@@ -209,7 +210,7 @@ namespace Crow.Coding
 			pf.CurrentLine = fl.Line;
 			pf.CurrentColumn = fl.Column;
 
-			pf.IsSelected = true;
+			pf.IsSelected = true;*/
 
 		}
 

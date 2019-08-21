@@ -30,7 +30,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using Cairo;
+using Crow.Cairo;
 
 namespace Crow.Coding
 {
@@ -56,10 +56,21 @@ namespace Crow.Coding
 
 		public DesignInterface () : base()
 		{
+			surf = new ImageSurface (Format.Argb32, 100, 100);
+
+			loadStyling ();
+		}
+		public override void InterfaceThread ()
+		{
+
+			//running = true;
+			//while (running) {
+			//	Update ();
+			//	Thread.Sleep (5);
+			//}
 		}
 
 		public ProjectFile ProjFile;
-
 
 
 		public override Widget CreateInstance (string path)
@@ -80,10 +91,7 @@ namespace Crow.Coding
 			throw new Exception ($"In Design File not found: {path}");
 		}
 
-		protected override void InitBackend ()
-		{
-			surf = new ImageSurface (Format.Argb32, 100, 100);
-		}
+
 		public override void ProcessResize (Rectangle bounds)
 		{
 			if (bounds == clientRectangle)

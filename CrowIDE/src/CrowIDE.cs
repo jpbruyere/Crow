@@ -112,16 +112,16 @@ namespace Crow.Coding
 		{
 			using (app = new CrowIDE ()) {
 				MainIFace = app;
-
 				//app.Keyboard.KeyDown += App_KeyboardKeyDown;
-				app.initIde ();
-
-				app.reloadWinConfigs ();
-
 				app.Run ();
 
 				app.saveWinConfigs ();
 			}
+		}
+		protected override void Startup ()
+		{
+			initIde ();
+			reloadWinConfigs ();
 		}
 
 		static void App_KeyboardKeyDown (object sender, KeyEventArgs e)
@@ -142,7 +142,7 @@ namespace Crow.Coding
 		}
 
 		Instantiator instFileDlg;
-		Solution currentSolution;
+		Workspace currentSolution;
 		Project currentProject;
 		DockStack mainDock;
 
@@ -159,9 +159,9 @@ namespace Crow.Coding
 			mainDock = go.FindByName ("mainDock") as DockStack;
 
 			if (ReopenLastSolution && !string.IsNullOrEmpty (LastOpenSolution)) {
-				CurrentSolution = Solution.LoadSolution (LastOpenSolution);
+				CurrentSolution = new Workspace (LastOpenSolution);
 				//lock(MainIFace.UpdateMutex)
-				CurrentSolution.ReopenItemsSavedInUserConfig ();
+				//	CurrentSolution.ReopenItemsSavedInUserConfig ();
 			}
 
 			instFileDlg = Instantiator.CreateFromImlFragment
@@ -197,7 +197,7 @@ namespace Crow.Coding
 				Crow.Configuration.Global.Set ("CurrentDirectory", value);
 			}
 		}
-		public Solution CurrentSolution {
+		public Workspace CurrentSolution {
 			get { return currentSolution; }
 			set {
 				if (currentSolution == value)
@@ -257,7 +257,7 @@ namespace Crow.Coding
 			try {
 				string ext = Path.GetExtension (filePath);
 				if (string.Equals (ext, ".sln", StringComparison.InvariantCultureIgnoreCase)) {					
-					CurrentSolution = Solution.LoadSolution (filePath);
+					CurrentSolution = new Workspace (filePath);
 					LastOpenSolution = filePath;
 //				}else if (string.Equals (ext, ".csproj", StringComparison.InvariantCultureIgnoreCase)) {
 //					currentProject = new Project (filePath);

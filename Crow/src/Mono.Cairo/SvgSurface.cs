@@ -28,7 +28,7 @@
 
 using System;
 
-namespace Cairo {
+namespace Crow.Cairo {
 
 	public class SvgSurface : Surface
 	{

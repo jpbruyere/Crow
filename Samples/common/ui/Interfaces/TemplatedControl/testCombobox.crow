@@ -1,4 +1,4 @@
 ﻿<?xml version="1.0"?>
 <Container Background="DimGrey" Width="300">
-	<ComboBox  Data="{TestList}" ItemTemplate="#Tests.Interfaces.colorItem.crow"/>
+	<ComboBox  Data="{TestList}" ItemTemplate="Interfaces/colorItem.crow"/>
 </Container>

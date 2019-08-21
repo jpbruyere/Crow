@@ -30,20 +30,21 @@ using System.Xml;
 using System.IO;
 using Crow;
 using System.Threading;
+using Microsoft.Build.Construction;
 
 namespace Crow.Coding
 {	
 	public class ProjectReference : ProjectItem {
-		public ProjectReference (ProjectItem pi) : base (pi.Project, pi.node){
+		public ProjectReference (Project proj, Microsoft.Build.Evaluation.ProjectItem pi) : base (proj, pi){
 		}
 		public string ProjectGUID {
 			get {
-				return node.SelectSingleNode ("Project")?.InnerText;
+				return "todo"; //node.SelectSingleNode ("Project")?.InnerText;
 			}
 		}
 		public override string DisplayName {
 			get {
-				return node.SelectSingleNode ("Name").InnerText;
+				return "project Ref"; // node.SelectSingleNode ("Name").InnerText;
 			}
 		}
 	}

@@ -31,7 +31,7 @@ using System.Xml.Serialization;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
-using Cairo;
+using Crow.Cairo;
 using System.Diagnostics;
 using Crow.IML;
 using System.Threading;
@@ -1007,7 +1007,7 @@ namespace Crow
 				#if DEBUG_LOG
 				DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GOLockLayouting, this);
 				#endif
-				lock (IFace.LayoutMutex) {
+				lock (IFace.UpdateMutex) {
 					OnDataSourceChanged (this, dse);
 					NotifyValueChanged ("DataSource", DataSource);
 				}

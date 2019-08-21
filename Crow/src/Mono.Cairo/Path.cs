@@ -30,9 +30,9 @@
 
 using System;
 using System.Runtime.InteropServices;
-using Cairo;
+using Crow.Cairo;
 
-namespace Cairo {
+namespace Crow.Cairo {
 
 	public class Path : IDisposable
 	{

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="$(SolutionDir)netfx.props" />
   <PropertyGroup>
-    <TargetFrameworks>net471;netstandard2.0</TargetFrameworks>
+    <TargetFramework>net472</TargetFramework>
     <OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>
     <OutputType>Exe</OutputType>        
     <RepositoryUrl>https://github.com/jpbruyere/Crow</RepositoryUrl>
@@ -15,7 +15,7 @@
               
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
-    <DefineConstants>TRACE;NETSTANDARD2_0;DEBUG;NETCOREAPP2_0</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -43,8 +43,19 @@
       <LogicalName>Crow.%(Filename).template</LogicalName>
     </EmbeddedResource>
         
-    <EmbeddedResource Include="IDE.style" />
+    <EmbeddedResource Include="IDE.style" />    
   </ItemGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Build" Version="16.0.461" />
+		<PackageReference Include="Microsoft.CodeAnalysis" Version="3.3.0-beta3-19401-01" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.3.0-beta3-19401-01" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.0-beta3-19401-01" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="3.3.0-beta3-19401-01" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Features" Version="3.3.0-beta3-19401-01" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="3.3.0-beta3-19401-01" />
+		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.0.461" />		
+	</ItemGroup>
     
   <ItemGroup>
     <Folder Include="src\msbuild\" />

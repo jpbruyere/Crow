@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="$(SolutionDir)netfx.props" />
   <PropertyGroup>
-    <TargetFrameworks>net471;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net461;net471;netstandard2.0</TargetFrameworks>
     <AssemblyName>Crow</AssemblyName>
     <Copyright></Copyright>
-    <AssemblyVersion>0.8.1</AssemblyVersion>    
+    <AssemblyVersion>0.8.3.2</AssemblyVersion>    
     <Description>C.R.O.W. is a widget toolkit and rendering engine entirely developed in C# with templates, styles, compositing, and bindings.</Description>        
                     
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>        
@@ -24,17 +24,18 @@
     <PackageIconUrl>https://jpbruyere.github.io/Crow/images/crow.png</PackageIconUrl>
     <PackageCopyright>Copyright 2013-2019</PackageCopyright>
     <PackageReleaseNotes>xcb backend</PackageReleaseNotes>    
-    <RepositoryUrl>https://github.com/jpbruyere/Crow</RepositoryUrl>
+    <RepositoryUrl>https://github.com/jpbruyere/Crow</RepositoryUrl>		
+	
+	<LangVersion>7.2</LangVersion>
         
     <OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>        
     <DefineConstants>DESIGN_MODE</DefineConstants>
-    <ReleaseVersion>0.8.0</ReleaseVersion>
   </PropertyGroup>   
   
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
     <DefineConstants>TRACE;DESIGN_MODE;_DEBUG_CLIP_RECTANGLE;_DEBUG_FOCUS;_DEBUG_DRAGNDROP;DEBUG;NETFRAMEWORK;NET471</DefineConstants>
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>    
   </PropertyGroup>
 	
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">

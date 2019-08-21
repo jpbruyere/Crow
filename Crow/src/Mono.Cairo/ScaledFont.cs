@@ -26,7 +26,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Cairo {
+namespace Crow.Cairo {
    
 	public class ScaledFont : IDisposable
 	{

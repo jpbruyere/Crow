@@ -1,4 +1,4 @@
-//
+﻿//
 // Mono.Cairo.GLSurface.cs
 //
 // Authors:
@@ -30,7 +30,7 @@
 
 using System;
 
-namespace Cairo {
+namespace Crow.Cairo {
 
 	public class GLSurface : Surface
 	{
