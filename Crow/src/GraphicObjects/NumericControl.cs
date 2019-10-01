@@ -43,9 +43,9 @@ namespace Crow
 //		}
 		#endregion
 
-		#region private fields
-		double _actualValue, minValue, maxValue, smallStep, bigStep;
-		int _decimals;
+		#region protected fields
+		protected double _actualValue, minValue, maxValue, smallStep, bigStep;
+		protected int _decimals;
 		#endregion
 
 		#region public properties
@@ -114,7 +114,7 @@ namespace Crow
 			}
 		}
 		[DefaultValue(0.0)]
-		public double Value
+		public virtual double Value
 		{
 			get { return _actualValue; }
 			set

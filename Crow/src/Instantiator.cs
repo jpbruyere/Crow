@@ -25,17 +25,16 @@
 // THE SOFTWARE.
 
 using System;
-using System.IO;
-using System.Text;
-using System.Diagnostics;
-using System.Xml;
-using System.Reflection.Emit;
-using System.Reflection;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Text;
+using System.Xml;
 
-namespace Crow.IML
-{
+namespace Crow.IML {
 	public class InstantiatorException : Exception {
 		public string Path;
 		public InstantiatorException (string path, Exception innerException)
@@ -688,7 +687,7 @@ namespace Crow.IML
                 il.Emit (OpCodes.Ldloc_0);//load methodInfo (3rd arg)
 
                 il.Emit (OpCodes.Call, CompilerServices.miCreateBoundDel);
-                il.Emit (OpCodes.Call, sourceEvent.AddMethod);//call add event
+                il.Emit (OpCodes.Callvirt, sourceEvent.AddMethod);//call add event
                                           
                 System.Reflection.Emit.Label finish = il.DefineLabel ();
                 il.Emit (OpCodes.Br, finish);
@@ -970,7 +969,7 @@ namespace Crow.IML
 			ilPC.Emit(OpCodes.Ldfld, CompilerServices.fiTemplateBinding);
 
 			//add template bindings dynValueChanged delegate to new parent event
-			ilPC.Emit(OpCodes.Call, CompilerServices.eiValueChange.AddMethod);//call add event
+			ilPC.Emit(OpCodes.Callvirt, CompilerServices.eiValueChange.AddMethod);//call add event
 
 			ilPC.MarkLabel (cancel);
 			ilPC.Emit (OpCodes.Ret);
@@ -996,7 +995,7 @@ namespace Crow.IML
 			PropertyInfo piSource = ctx.CurrentNodeType.GetProperty (bindingDef.SourceMember);
 			//if no dataSource member name is provided, valuechange is not handle and datasource change
 			//will be used as origine value
-			string delName = "dyn_DSvalueChanged" + NewId;
+			string delName = "dyn_DSvalueChangedKnownType" + NewId;
 			if (!string.IsNullOrEmpty (bindingDef.TargetMember)) {
 				#region create valuechanged method
 				dm = new DynamicMethod (delName,
@@ -1154,7 +1153,7 @@ namespace Crow.IML
 			PropertyInfo piSource = ctx.CurrentNodeType.GetProperty(bindingDef.SourceMember);
 			//if no dataSource member name is provided, valuechange is not handle and datasource change
 			//will be used as origine value
-			string delName = "dyn_DSvalueChanged" + NewId;
+			string delName = $"dyn_DSvalueChanged_{bindingDef.SourceMember}_{bindingDef.TargetMember}_{NewId}";
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
 #region create valuechanged method
 				dm = new DynamicMethod (delName,

@@ -55,10 +55,10 @@ namespace OpenToolkit.NT.Native
             /// </returns>
             [SuppressUnmanagedCodeSecurity]
             [DllImport(Library)]
-            public static unsafe extern IntPtr DefRawInputProc
+            public static extern IntPtr DefRawInputProc
             (
-                [In] Native.RawInput* rawInputArrayOut,
-                [In] int rawInputAmount,
+                [In] IntPtr rawInputArrayOut,//Native.RawInput*
+				[In] int rawInputAmount,
                 [In] uint headerSize
             );
 
@@ -155,10 +155,10 @@ namespace OpenToolkit.NT.Native
             /// </returns>
             [SuppressUnmanagedCodeSecurity]
             [DllImport(Library, SetLastError = true)]
-            public static unsafe extern uint GetRawInputBuffer
+            public static extern uint GetRawInputBuffer
             (
-                [Out] [Optional] Native.RawInput* data,
-                [In] [Out] ref uint rawInputSize,
+                [Out] [Optional] IntPtr data,//Native.RawInput*
+				[In] [Out] ref uint rawInputSize,
                 [In] uint headerSize
             );
 
@@ -219,10 +219,10 @@ namespace OpenToolkit.NT.Native
             /// <see cref="Marshal.GetLastWin32Error"/> returns the error indication.
             /// </returns>
             [DllImport(Library, SetLastError = true)]
-            public static unsafe extern uint GetRawInputDeviceList
+            public static extern uint GetRawInputDeviceList
             (
-                [Out] [Optional] RawInputDeviceList* deviceListArrayOut,
-                [In] [Out] ref uint deviceListAmount,
+                [Out] [Optional] IntPtr deviceListArrayOut,//RawInputDeviceList*
+				[In] [Out] ref uint deviceListAmount,
                 [In] uint deviceListSize
             );
 
@@ -286,7 +286,7 @@ namespace OpenToolkit.NT.Native
             /// </returns>
             [SuppressUnmanagedCodeSecurity]
             [DllImport(Library, SetLastError = true)]
-            public static unsafe extern uint GetRawInputDeviceInfo
+            public static extern uint GetRawInputDeviceInfo
             (
                 [In] [Optional] IntPtr device,
                 [In] GetRawInputDeviceInfoEnum command,
@@ -341,20 +341,22 @@ namespace OpenToolkit.NT.Native
             /// <paramref name="header"/>.<para/>
             /// If there is an error, the return value is (uint)-1 [== <see cref="uint.MaxValue"/>].
             /// </returns>
-            public static unsafe uint GetRawInputData(IntPtr rawInput, out RawInputHeader header)
+            public static uint GetRawInputData(IntPtr rawInput, out RawInputHeader header)
             {
-                uint size = RawInputHeader.SizeInBytes;
-                fixed (RawInputHeader* headerPtr = &header)
-                {
-                    return GetRawInputData
-                    (
-                        rawInput,
-                        GetRawInputDataCommand.Header,
-                        (IntPtr)headerPtr,
-                        ref size,
-                        RawInputHeader.SizeInBytes
-                    );
-                }
+				//uint size = RawInputHeader.SizeInBytes;
+				//fixed (RawInputHeader* headerPtr = &header)
+				//{
+				//    return GetRawInputData
+				//    (
+				//        rawInput,
+				//        GetRawInputDataCommand.Header,
+				//        (IntPtr)headerPtr,
+				//        ref size,
+				//        RawInputHeader.SizeInBytes
+				//    );
+				//}
+				header = default (RawInputHeader);
+				return 0u;
             }
 
             /// <summary>
@@ -370,20 +372,21 @@ namespace OpenToolkit.NT.Native
             /// <paramref name="data"/>.<para/>
             /// If there is an error, the return value is (uint)-1 [== <see cref="uint.MaxValue"/>].
             /// </returns>
-            public static unsafe uint GetRawInputData(IntPtr rawInput, out Native.RawInput data)
+            public static uint GetRawInputData(IntPtr rawInput, out Native.RawInput data)
             {
                 uint size = Native.RawInput.SizeInBytes;
-                fixed (Native.RawInput* dataPtr = &data)
-                {
-                    return GetRawInputData
-                    (
-                        rawInput,
-                        GetRawInputDataCommand.Input,
-                        (IntPtr)dataPtr,
-                        ref size,
-                        RawInputHeader.SizeInBytes
-                    );
-                }
+				throw new NotImplementedException ();
+                //fixed (Native.RawInput* dataPtr = &data)
+                //{
+                //    return GetRawInputData
+                //    (
+                //        rawInput,
+                //        GetRawInputDataCommand.Input,
+                //        (IntPtr)dataPtr,
+                //        ref size,
+                //        RawInputHeader.SizeInBytes
+                //    );
+                //}
             }
 
             /// <summary>

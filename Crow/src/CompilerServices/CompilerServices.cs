@@ -131,7 +131,6 @@ namespace Crow.IML
 		internal static Type [] argsValueChange = { typeof (object), miInvokeValueChange.GetParameters () [1].ParameterType };
 		internal static FieldInfo fiVCNewValue = typeof (ValueChangeEventArgs).GetField ("NewValue");
 		internal static FieldInfo fiVCMbName = typeof (ValueChangeEventArgs).GetField ("MemberName");
-		internal static MethodInfo miValueChangeAdd = eiValueChange.GetAddMethod ();
 
 		internal static EventInfo eiDSChange = typeof (Widget).GetEvent ("DataSourceChanged");
 		internal static MethodInfo miInvokeDSChange = eiDSChange.EventHandlerType.GetMethod ("Invoke");
@@ -918,7 +917,7 @@ namespace Crow.IML
 				if (a.IsDynamic)
 					continue;
 				foreach (Type expT in a.GetExportedTypes ()) {
-					if (expT.Name != strDataType)
+					if (expT.Name != strDataType && expT.FullName != strDataType)
 						continue;
 					if (!knownTypes.ContainsKey(strDataType))
 						knownTypes.Add (strDataType, expT);

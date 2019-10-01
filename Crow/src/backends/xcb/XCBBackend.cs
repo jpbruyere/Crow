@@ -38,6 +38,8 @@ namespace Crow.XCB
 	using xcb_timestamp_t = System.UInt32;
 
 	using xcb_void_cookie_t = System.UInt32;
+	using xcb_intern_atom_cookie_t = System.UInt32;
+	using xcb_atom_t = System.UInt32;
 
 	public class XCBBackend : IBackend
 	{
@@ -149,8 +151,15 @@ namespace Crow.XCB
 			COLORMAP = 8192,
 			CURSOR = 16384
 		}
+		enum xcb_prop_mode : byte
+		{
+			Replace,//Discard the previous property value and store the new data.
+			Prepend,//Insert the new data before the beginning of existing data.The format must match existing property value.If the property is undefined, it is treated as defined with the correct type and format with zero-length data.
+			Append,//Insert the new data after the beginning of existing data.The format must match existing property value.If the property is undefined, it is treated as defined with the correct type and format with zero-length data.
+		}
 
-		[StructLayout(LayoutKind.Sequential)]
+
+	[StructLayout(LayoutKind.Sequential)]
 		struct xcb_generic_event_t{
 			public xcb_event_type response_type;  /**< Type of the response */
 			public byte pad0;           /**< Padding */
@@ -314,6 +323,15 @@ namespace Crow.XCB
 			public UInt16 sequence;       /**< Sequence number */
 			public UInt32 length;         /**< Length of the response */
 		}
+		[StructLayout (LayoutKind.Sequential)]
+		struct xcb_intern_atom_reply_t
+		{
+			byte response_type;
+			byte pad0;
+			UInt16 sequence;
+			UInt32 length;
+			xcb_atom_t atom;
+		}
 		#endregion
 
 
@@ -359,6 +377,13 @@ namespace Crow.XCB
 		[DllImport ("xcb")]//in xcbproto
 		static extern xcb_void_cookie_t xcb_free_cursor (IntPtr connection, UInt32 cursor);
 
+		[DllImport ("xcb")]
+		static extern xcb_intern_atom_cookie_t xcb_intern_atom (IntPtr connection, byte onlyIfExists, UInt16 nameLength, string name);
+		[DllImport ("xcb")]
+		static extern IntPtr xcb_intern_atom_reply (IntPtr connection, xcb_intern_atom_cookie_t cookie, IntPtr xcb_generic_error);
+		[DllImport ("xcb")]
+		static extern xcb_void_cookie_t xcb_change_property (IntPtr connection, xcb_prop_mode mode, xcb_window_t window, xcb_atom_t property, xcb_atom_t type, byte format, UInt32 data_len, ref IntPtr data);
+
 		//TODO: there should be a generic free method in xcb or at least xcb_free_event!!
 		[DllImport ("X11")]
 		static extern IntPtr XFree (IntPtr data);
@@ -391,6 +416,7 @@ namespace Crow.XCB
 
 		XKB.XCBKeyboard Keyboard;
 
+		xcb_atom_t wmQuitAtom;
 
 		#region IBackend implementation
 		public void Init (Interface _iFace)
@@ -409,7 +435,7 @@ namespace Crow.XCB
 			win = xcb_generate_id (conn);
 
 			xcb_cw_t mask = xcb_cw_t.BACK_PIXEL | xcb_cw_t.EVENT_MASK;
-			uint[] values = {
+			uint [] values = {
 				scr.black_pixel,
 				(uint)(
 					xcb_event_mask_t.EXPOSURE |
@@ -421,6 +447,12 @@ namespace Crow.XCB
 				)
 			};
 
+			xcb_intern_atom_cookie_t cookie = xcb_intern_atom (conn, 1, 12, "WM_PROTOCOLS");
+			IntPtr reply = xcb_intern_atom_reply (conn, cookie, IntPtr.Zero);
+
+			xcb_intern_atom_cookie_t cookie2 = xcb_intern_atom (conn, 0, 16, "WM_DELETE_WINDOW");
+			IntPtr reply2 = xcb_intern_atom_reply (conn, cookie2, IntPtr.Zero);
+
 
 			GCHandle hndValues = GCHandle.Alloc (values, GCHandleType.Pinned);
 
@@ -428,6 +460,11 @@ namespace Crow.XCB
 					xcb_window_class_t.INPUT_OUTPUT, scr.root_visual, mask, hndValues.AddrOfPinnedObject());
 
 			hndValues.Free ();
+
+			IntPtr tmp = Marshal.ReadIntPtr (reply2, 8);
+			wmQuitAtom = (xcb_atom_t)tmp;
+
+			xcb_change_property (conn, xcb_prop_mode.Replace, win, (xcb_atom_t)Marshal.ReadInt32(reply,8), 4, 32, 1, ref tmp);
 
 			xcb_map_window (conn, win);
 
@@ -465,26 +502,26 @@ namespace Crow.XCB
 				return;
 			xcb_event_t evt = (xcb_event_t)Marshal.PtrToStructure (evtPtr, typeof(xcb_event_t));
 
-			switch (evt.response_type) {
+			switch ((xcb_event_type)((uint)evt.response_type & ~0x80u)) {
 			case xcb_event_type.EXPOSE:
 				if (evt.width > 0)
 					iFace.ProcessResize (new Rectangle (0, 0, evt.width, evt.height));
 				break;
 			case xcb_event_type.MOTION_NOTIFY:
-				iFace.ProcessMouseMove (evt.event_x, evt.event_y);
+				iFace.OnMouseMove (evt.event_x, evt.event_y);
 				break;
 			case xcb_event_type.BUTTON_PRESS:
 				if (evt.button == xcb_button_t.WheelUp)
-					iFace.ProcessMouseWheelChanged (Interface.WheelIncrement);
+					iFace.OnMouseWheelChanged (Interface.WheelIncrement);
 				else if(evt.button == xcb_button_t.WheelDown)
-					iFace.ProcessMouseWheelChanged (-Interface.WheelIncrement);
+					iFace.OnMouseWheelChanged (-Interface.WheelIncrement);
 				else
-					iFace.ProcessMouseButtonDown ((MouseButton)(evt.detail - 1));				
+					iFace.OnMouseButtonDown ((MouseButton)(evt.detail - 1));				
 				break;
 			case xcb_event_type.BUTTON_RELEASE:
 				if (evt.button == xcb_button_t.WheelUp || evt.button == xcb_button_t.WheelDown)
 					break;
-				iFace.ProcessMouseButtonUp ((MouseButton)(evt.detail - 1));
+				iFace.OnMouseButtonUp ((MouseButton)(evt.detail - 1));
 				break;
 			case xcb_event_type.KEY_PRESS:
 				Keyboard.HandleEvent (evt.keycode, true);
@@ -492,8 +529,12 @@ namespace Crow.XCB
 			case xcb_event_type.KEY_RELEASE:
 				Keyboard.HandleEvent (evt.keycode, false);
 				break;
+			case xcb_event_type.CLIENT_MESSAGE:
+				if ((xcb_atom_t)Marshal.ReadInt32 (evtPtr, 12)==wmQuitAtom)
+					iFace.Quit ();
+				break;
 			default:
-				Console.WriteLine ("unknown event");
+				Console.WriteLine ($"unknown event: {evt.response_type}");
 				break;
 			}
 			XFree (evtPtr);

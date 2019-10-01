@@ -515,8 +515,8 @@ namespace Crow.Coding
 			double z = zoom / 100.0;
 			double coteW = 3, coteL = 5;
 			bool fill = true;
-			Cairo.PointD p1 = new Cairo.PointD (hr.X + 0.5, hr.Y - space);
-			Cairo.PointD p2 = new Cairo.PointD (hr.Right - 0.5, hr.Y - space);
+			PointD p1 = new PointD (hr.X + 0.5, hr.Y - space);
+			PointD p2 = new PointD (hr.Right - 0.5, hr.Y - space);
 
 			if (p1.Y < cb.Top) {
 				if (hr.Bottom > cb.Bottom - space)
@@ -536,8 +536,8 @@ namespace Crow.Coding
 				drawCenteredTextLine (gr, p1.Add(p2.Substract(p1).Divide (2)), g.Width.Value.ToString());
 			}
 
-			p1 = new Cairo.PointD (hr.X - space, hr.Top + 0.5);
-			p2 = new Cairo.PointD (hr.X - space, hr.Bottom - 0.5);
+			p1 = new PointD (hr.X - space, hr.Top + 0.5);
+			p2 = new PointD (hr.X - space, hr.Bottom - 0.5);
 
 			if (p1.X < cb.Left) {
 				if (hr.Right > cb.Right - space)

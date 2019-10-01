@@ -108,7 +108,7 @@ namespace Crow.Coding
 			}
 
 		}
-		public override bool ProcessMouseMove (int x, int y)
+		public override bool OnMouseMove (int x, int y)
 		{
 			int deltaX = x - Mouse.X;
 			int deltaY = y - Mouse.Y;

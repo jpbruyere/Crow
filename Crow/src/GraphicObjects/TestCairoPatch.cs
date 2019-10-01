@@ -54,7 +54,7 @@ namespace Crow
 		{
 			base.onDraw (gr);
 
-			double radius = 100;
+			double radius = Math.Min (ClientRectangle.Width, ClientRectangle.Height) / 2;
 
 			double pi3 = Math.PI / 3.0;
 

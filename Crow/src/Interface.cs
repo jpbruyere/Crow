@@ -1,28 +1,6 @@
-﻿//
-// Interface.cs
+﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.Collections.Generic;
@@ -34,7 +12,6 @@ using System.Reflection;
 using System.Threading;
 using Crow.Cairo;
 using Crow.IML;
-
 
 namespace Crow
 {
@@ -76,7 +53,6 @@ namespace Crow
 		protected IBackend backend;
 		protected bool running;
 
-
 		#region CTOR
 		static Interface () {
 			/*if (Type.GetType ("Mono.Runtime") == null) {
@@ -95,7 +71,7 @@ namespace Crow
 			foreach (string af in Directory.GetFiles (AppDomain.CurrentDomain.BaseDirectory, "*.dll")) {
 				try {
 					Assembly.LoadFrom (af);
-				} catch (Exception ex) {
+				} catch {
 					Console.WriteLine ("{0} not loaded as assembly.", af);
 				}
 			}
@@ -108,7 +84,7 @@ namespace Crow
 		}
 
 		public Interface(int width=800, int height=600, IBackend _backend = null){
-			CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 			CurrentInterface = this;
 			clientRectangle = new Rectangle (0, 0, width, height);
 			backend = _backend;
@@ -166,31 +142,10 @@ namespace Crow
 				Thread.Sleep(1);
 			}
 		}
-
-		public void ProcessKeyPress (char c)
+		public virtual void Quit ()
 		{
-			_focusedWidget?.onKeyPress (_focusedWidget, new KeyPressEventArgs(c));
+			running = false;
 		}
-		public void ProcessKeyUp (Key key)
-		{
-			_focusedWidget?.onKeyUp (_focusedWidget, new KeyEventArgs(key, false));
-//			if (keyboardRepeatThread != null) {
-//				keyboardRepeatOn = false;
-//				keyboardRepeatThread.Abort();
-//				keyboardRepeatThread.Join ();
-//			}
-		}
-		public void ProcessKeyDown (Key key)
-		{
-			//Keyboard.SetKeyState((Crow.Key)Key,true);
-			lastKeyDownEvt = new KeyEventArgs (key, true);
-
-			_focusedWidget?.onKeyDown (_focusedWidget, new KeyEventArgs (key, false));
-
-			//			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
-			//			keyboardRepeatThread.IsBackground = true;
-			//			keyboardRepeatThread.Start ();
- 		}
 		public bool Shift {
 			get { return backend.Shift; }
 		}
@@ -311,17 +266,17 @@ namespace Crow
 		#endregion
 
 		#region Events
-		public event EventHandler<MouseCursorChangedEventArgs> MouseCursorChanged;
-		public event EventHandler Quit;
+		//public event EventHandler<MouseCursorChangedEventArgs> MouseCursorChanged;
+		////public event EventHandler Quit;
 
-		public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
-		public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
-		public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
-		public event EventHandler<MouseButtonEventArgs> MouseClick;
-		public event EventHandler<MouseMoveEventArgs> MouseMove;
-		public event EventHandler<KeyEventArgs> KeyDown;
-		public event EventHandler<KeyEventArgs> KeyUp;
-		public event EventHandler<KeyPressEventArgs> KeyPress;
+		//public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
+		//public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
+		//public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
+		//public event EventHandler<MouseButtonEventArgs> MouseClick;
+		//public event EventHandler<MouseMoveEventArgs> MouseMove;
+		//public event EventHandler<KeyEventArgs> KeyDown;
+		//public event EventHandler<KeyEventArgs> KeyUp;
+		//public event EventHandler<KeyPressEventArgs> KeyPress;
 		/*public event EventHandler<KeyEventArgs> KeyboardKeyDown;
 		public event EventHandler<KeyEventArgs> KeyboardKeyUp;*/
 		#endregion
@@ -394,7 +349,7 @@ namespace Crow
 		/// <summary>Clipping rectangles on the root context</summary>
 		Region clipping = new Region();
 		/// <summary>Main Cairo context</summary>
-		Context ctx;
+		//Context ctx;
 		#endregion
 
 		#region Default values and Style loading
@@ -417,7 +372,7 @@ namespace Crow
 			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
 		}
 		/// <summary> Search for .style resources in assembly </summary>
-		void loadStylingFromAssembly (Assembly assembly) {
+		protected void loadStylingFromAssembly (Assembly assembly) {
 			if (assembly == null)
 				return;
 			foreach (string s in assembly
@@ -429,7 +384,6 @@ namespace Crow
 
 			}
 		}
-
 		#endregion
 
 
@@ -466,6 +420,9 @@ namespace Crow
 
 			if (path.StartsWith ("#", StringComparison.Ordinal)) {
 				string resId = path.Substring (1);
+				stream = Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
+				if (stream != null)
+					return stream;
 				string assemblyName = resId.Split ('.') [0];
 				Assembly a = AppDomain.CurrentDomain.GetAssemblies ().FirstOrDefault (aa => aa.GetName ().Name == assemblyName);
 				if (a == null)
@@ -486,6 +443,9 @@ namespace Crow
 
 			if (path.StartsWith ("#", StringComparison.Ordinal)) {
 				string resId = path.Substring (1);
+				stream = Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
+				if (stream != null)
+					return stream;
 				string assemblyName = resId.Split ('.') [0];
 				Assembly a = AppDomain.CurrentDomain.GetAssemblies ().FirstOrDefault (aa => aa.GetName ().Name == assemblyName);
 				if (a == null)
@@ -863,12 +823,10 @@ namespace Crow
 
 					ctx.Paint ();
 
+					backend?.Flush ();
+
 					clipping.Dispose ();
 					clipping = new Region ();
-					//}
-					//surf.WriteToPng (@"/mnt/data/test.png");
-
-					backend?.Flush ();
 				}
 			
 			/*#if DEBUG_LOG
@@ -1015,10 +973,11 @@ namespace Crow
 		public MouseState Mouse;
 		Stopwatch lastMouseDown = new Stopwatch (), mouseRepeatTimer = new Stopwatch ();
 		bool doubleClickTriggered;	//next mouse up will trigger a double click
-		int mouseRepeatCount;
+		//int mouseRepeatCount;
 		MouseButtonEventArgs lastMouseDownEvent;
 
 		public MouseCursor MouseCursor {
+			get => cursor;
 			set {
 
 				if (value == cursor)
@@ -1032,7 +991,7 @@ namespace Crow
 		/// <summary>Processes mouse move events from the root container, this function
 		/// should be called by the host on mouse move event to forward events to crow interfaces</summary>
 		/// <returns>true if mouse is in the interface</returns>
-		public virtual bool ProcessMouseMove(int x, int y)
+		public virtual bool OnMouseMove(int x, int y)
 		{
 			int deltaX = x - Mouse.X;
 			int deltaY = y - Mouse.Y;
@@ -1122,13 +1081,13 @@ namespace Crow
 		/// </summary>
 		/// <returns>return true, if interface handled the event, false otherwise.</returns>
 		/// <param name="button">Button index</param>
-		public bool ProcessMouseButtonDown (MouseButton button)
+		public virtual bool OnMouseButtonDown (MouseButton button)
 		{
 			Mouse.EnableBit ((int)button);
 
 			doubleClickTriggered = (lastMouseDown.ElapsedMilliseconds < DOUBLECLICK_TRESHOLD);
 			lastMouseDown.Restart ();
-			mouseRepeatCount = -1;//stays negative until repeat delay is hit
+			//mouseRepeatCount = -1;//stays negative until repeat delay is hit
 
 			lastMouseDownEvent = new MouseButtonEventArgs (button) { Mouse = Mouse };
 
@@ -1145,7 +1104,7 @@ namespace Crow
 		/// </summary>
 		/// <returns>return true, if interface handled the event, false otherwise.</returns>
 		/// <param name="button">Button index</param>
-		public bool ProcessMouseButtonUp(MouseButton button)
+		public virtual bool OnMouseButtonUp(MouseButton button)
 		{
 			Mouse.DisableBit ((int)button);
 
@@ -1173,7 +1132,7 @@ namespace Crow
 		/// </summary>
 		/// <returns>return true, if interface handled the event, false otherwise.</returns>
 		/// <param name="delta">wheel delta</param>
-		public bool ProcessMouseWheelChanged(float delta)
+		public virtual bool OnMouseWheelChanged(float delta)
 		{
 			Mouse.SetScrollRelative (0, delta);
 			MouseWheelEventArgs e = new MouseWheelEventArgs () { Mouse = Mouse, DeltaPrecise = delta };
@@ -1182,6 +1141,31 @@ namespace Crow
 				return false;
 			_hoverWidget.onMouseWheel (_hoverWidget, e);
 			return true;
+		}
+
+		public virtual void OnKeyPress (char c)
+		{
+			_focusedWidget?.onKeyPress (_focusedWidget, new KeyPressEventArgs (c));
+		}
+		public virtual void OnKeyUp (Key key)
+		{
+			_focusedWidget?.onKeyUp (_focusedWidget, new KeyEventArgs (key, false));
+			//			if (keyboardRepeatThread != null) {
+			//				keyboardRepeatOn = false;
+			//				keyboardRepeatThread.Abort();
+			//				keyboardRepeatThread.Join ();
+			//			}
+		}
+		public virtual void OnKeyDown (Key key)
+		{
+			//Keyboard.SetKeyState((Crow.Key)Key,true);
+			lastKeyDownEvt = new KeyEventArgs (key, true);
+
+			_focusedWidget?.onKeyDown (_focusedWidget, new KeyEventArgs (key, false));
+
+			//			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
+			//			keyboardRepeatThread.IsBackground = true;
+			//			keyboardRepeatThread.Start ();
 		}
 
 		public bool IsKeyDown (Key key) {

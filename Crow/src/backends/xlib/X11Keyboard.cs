@@ -39,7 +39,7 @@ namespace Crow.XLib
 		static extern IntPtr XGetKeyboardMapping (IntPtr disp, byte first_keycode, int keycode_count, 
 			out int keysyms_per_keycode_return);
 		[DllImport ("libX11")]
-		unsafe static extern byte* XGetModifierMapping (IntPtr disp);
+		static extern IntPtr XGetModifierMapping (IntPtr disp);
 		[DllImport ("libX11")]
 		static extern uint XKeycodeToKeysym (IntPtr display, int keycode, int index);
 		#endregion
@@ -48,7 +48,7 @@ namespace Crow.XLib
 
 		public event EventHandler<KeyEventArgs> KeyDown;
 		public event EventHandler<KeyEventArgs> KeyUp;
-		public event EventHandler<KeyPressEventArgs> KeyPress;
+		//public event EventHandler<KeyPressEventArgs> KeyPress;
 
 		public void HandleEvent (uint keycode, bool pressed) {
 			/*int min_keycode, max_keycode, keysyms_per_keycode;
@@ -103,17 +103,26 @@ namespace Crow.XLib
 				max_keycode + 1 - min_keycode, out keysyms_per_keycode);
 			XFree (ksp);
 
-			unsafe {
-				byte* modmap_unmanaged = XGetModifierMapping (xDisp);
-				int nummodmap = 0;
-				int* ptr = (int*)modmap_unmanaged;
-				nummodmap = ptr [0];
+			IntPtr modmap_unmanaged = XGetModifierMapping (xDisp);
+			int nummodmap = nummodmap = Marshal.ReadInt32(modmap_unmanaged);
 
-				for (int i = 0; i< nummodmap; i++) {
-					Console.WriteLine(modmap_unmanaged[i+4]);
-				}
-				XFree ((IntPtr)modmap_unmanaged);
+			for (int i = 0; i < nummodmap; i++) {
+				Console.WriteLine (Marshal.ReadByte(modmap_unmanaged, i + 4));
 			}
+			XFree (modmap_unmanaged);
+
+
+			//unsafe {
+			//	byte* modmap_unmanaged = XGetModifierMapping (xDisp);
+			//	int nummodmap = 0;
+			//	int* ptr = (int*)modmap_unmanaged;
+			//	nummodmap = ptr [0];
+
+			//	for (int i = 0; i< nummodmap; i++) {
+			//		Console.WriteLine(modmap_unmanaged[i+4]);
+			//	}
+			//	XFree ((IntPtr)modmap_unmanaged);
+			//}
 		}
 	}
 }

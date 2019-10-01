@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShowCase", "Samples\ShowCas
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrowIDE", "CrowIDE\CrowIDE.csproj", "{C40A3F21-0558-4265-9251-718C1564D10A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlLib", "Samples\ControlLib\ControlLib.csproj", "{91F1CE07-EECE-4F1D-A3EE-7239B563654A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{C40A3F21-0558-4265-9251-718C1564D10A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C40A3F21-0558-4265-9251-718C1564D10A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C40A3F21-0558-4265-9251-718C1564D10A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91F1CE07-EECE-4F1D-A3EE-7239B563654A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91F1CE07-EECE-4F1D-A3EE-7239B563654A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91F1CE07-EECE-4F1D-A3EE-7239B563654A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91F1CE07-EECE-4F1D-A3EE-7239B563654A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
@@ -75,5 +81,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{F535A8AB-CD93-49AB-B1B0-FFF9AE51ED6A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{56329D48-D382-4850-93DE-59C453894E8A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
+		{91F1CE07-EECE-4F1D-A3EE-7239B563654A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 	EndGlobalSection
 EndGlobal

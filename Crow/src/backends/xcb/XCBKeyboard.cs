@@ -2535,7 +2535,7 @@ namespace Crow.XKB
 			xkb_key_direction keyDir = xkb_key_direction.KEY_DOWN;
 
 			if (pressed) {
-				iFace.ProcessKeyDown ((Key)ks);
+				iFace.OnKeyDown ((Key)ks);
 
 				IntPtr ptrKeySyms = IntPtr.Zero;
 
@@ -2547,10 +2547,10 @@ namespace Crow.XKB
 				char c = char.ConvertFromUtf32 ((int)utf32) [0];
 
 				if (!char.IsControl (c))
-					iFace.ProcessKeyPress (c);
+					iFace.OnKeyPress (c);
 			} else {
 				keyDir = xkb_key_direction.KEY_UP;
-				iFace.ProcessKeyUp ((Key)ks);
+				iFace.OnKeyUp ((Key)ks);
 			}
 
 			xkb_state_update_key (xkbState, keycode, keyDir);

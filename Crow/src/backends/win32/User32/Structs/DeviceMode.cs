@@ -117,26 +117,17 @@ namespace OpenToolkit.NT.Native
         /// Gets the name of the printer form to use; such as "Letter" or "Legal".
         /// This must be a name that can be obtain by calling the Win32 EnumForms function.
         /// </summary>
-        public unsafe string FormName
-        {
-            get
-            {
-                fixed (char* formNamePtr = &_formName)
-                {
-                    return Marshal.PtrToStringUni((IntPtr)formNamePtr);
-                }
-            }
-        }
+        public string FormName => Marshal.PtrToStringUni (_formName);
 
-        /// <summary>
-        /// With the current struct layout (which is set in stone because of interoperability with the Windows API),
-        /// there is no way to put a `string` type at this position(string is a reference type -> there is a pointer
-        /// here, which is either 4 or 8 bytes depending on the platform). This means that a string can never be
-        /// properly aligned at position 102 (which, again, can't be changed). This is why the <see cref="FormName"/>
-        /// property exists.
-        /// </summary>
-        [FieldOffset(102)]
-        private char _formName;
+		/// <summary>
+		/// With the current struct layout (which is set in stone because of interoperability with the Windows API),
+		/// there is no way to put a `string` type at this position(string is a reference type -> there is a pointer
+		/// here, which is either 4 or 8 bytes depending on the platform). This means that a string can never be
+		/// properly aligned at position 102 (which, again, can't be changed). This is why the <see cref="FormName"/>
+		/// property exists.
+		/// </summary>
+		[FieldOffset(102)]
+        private IntPtr _formName;
 
         /// <summary>
         /// For displays, specifies the number of logical pixels per inch of a display device and should be equal

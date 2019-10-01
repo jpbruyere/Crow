@@ -105,17 +105,17 @@ namespace Crow
 		}
 		#endregion
 
-		[DefaultValue(10.0)]
-		public override double Maximum {
-			get { return base.Maximum; }
-			set {				
-				if (value == base.Maximum)
-					return;
-				base.Maximum = value;
-				LargeIncrement = base.Maximum / 10.0;
-				SmallIncrement = LargeIncrement / 5.0;
-			}
-		}
+		//[DefaultValue(10.0)]
+		//public override double Maximum {
+		//	get { return base.Maximum; }
+		//	set {				
+		//		if (value == base.Maximum)
+		//			return;
+		//		base.Maximum = value;
+		//		LargeIncrement = base.Maximum / 10.0;
+		//		SmallIncrement = LargeIncrement / 5.0;
+		//	}
+		//}
 
 		#region GraphicObject Overrides
 		protected override void onDraw (Context gr)

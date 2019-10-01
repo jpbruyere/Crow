@@ -56,7 +56,7 @@ namespace Crow.Coding {
             solution = sol;
 
 			ProjectRootElement projectRootElt = ProjectRootElement.Open (solutionProject.AbsolutePath);
-			project = new Microsoft.Build.Evaluation.Project (projectRootElt, null, "15.0");
+			project = new Microsoft.Build.Evaluation.Project (projectRootElt, null, "Current");
 
 			cmdSave = new Crow.Command (new Action (() => Save ())) { Caption = "Save", Icon = new SvgPicture ("#CrowIDE.icons.save.svg"), CanExecute = true };
             cmdOpen = new Crow.Command (new Action (() => Load ())) { Caption = "Open", Icon = new SvgPicture ("#CrowIDE.icons.open.svg"), CanExecute = false };

@@ -58,10 +58,9 @@ namespace Crow
 			XCursorFile tmp = new XCursorFile ();
 
 			using (BinaryReader sr = new BinaryReader (s)) {
-				byte[] data;
 				//magic: CARD32 ’Xcur’ (0x58, 0x63, 0x75, 0x72)
 				if (new string (sr.ReadChars (4)) != "Xcur") {
-					Debug.WriteLine ("XCursor Load error: Wrong magic");
+					Console.WriteLine ("XCursor Load error: Wrong magic");
 					return null;
 				}
 				//header: CARD32 bytes in this header

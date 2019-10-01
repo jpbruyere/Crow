@@ -75,11 +75,11 @@ namespace Crow
 					return;
 				leftSlope = value;
 				NotifyValueChanged ("leftSlope", leftSlope);
-				tabSizeHasChanged = true;
+				//tabSizeHasChanged = true;
 				//RegisterForLayouting (LayoutingType.ArrangeChildren);
 			}
 		}
-		bool tabSizeHasChanged = false;
+		//bool tabSizeHasChanged = false;
 		[DefaultValue(16)]
 		public int RightSlope
 		{
@@ -89,7 +89,7 @@ namespace Crow
 					return;
 				rightSlope = value;
 				NotifyValueChanged ("RightSlope", rightSlope);
-				tabSizeHasChanged = true;
+				//tabSizeHasChanged = true;
 				//RegisterForLayouting (LayoutingType.ArrangeChildren);
 			}
 		}

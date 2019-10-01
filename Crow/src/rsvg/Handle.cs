@@ -21,9 +21,9 @@ namespace Rsvg {
 		}
 
 		[DllImport("rsvg-2")]
-		static extern unsafe IntPtr rsvg_handle_new_from_data(byte[] data, UIntPtr n_data, out IntPtr error);
+		static extern IntPtr rsvg_handle_new_from_data(byte[] data, UIntPtr n_data, out IntPtr error);
 
-		public unsafe Handle (byte[] data)
+		public Handle (byte[] data)
 		{
 			if (GetType () != typeof (Handle)) {
 				throw new InvalidOperationException ("Can't override this constructor.");
@@ -34,9 +34,9 @@ namespace Rsvg {
 		}
 
 		[DllImport("rsvg-2")]
-		static extern unsafe IntPtr rsvg_handle_new_from_file(string file_name, out IntPtr error);
+		static extern IntPtr rsvg_handle_new_from_file(string file_name, out IntPtr error);
 
-		public unsafe Handle (string file_name)
+		public Handle (string file_name)
 		{
 			IntPtr error = IntPtr.Zero;
 			Raw = rsvg_handle_new_from_file(file_name, out error);
@@ -59,9 +59,7 @@ namespace Rsvg {
 		static extern void rsvg_handle_render_cairo(IntPtr raw, IntPtr cr);
 
 		public void RenderCairo(Context cr) {
-			unsafe{
-				rsvg_handle_render_cairo (Raw, cr == null ? IntPtr.Zero : cr.Handle);
-			}
+			rsvg_handle_render_cairo (Raw, cr == null ? IntPtr.Zero : cr.Handle);
 		}
 
 		[DllImport("rsvg-2")]
@@ -86,9 +84,9 @@ namespace Rsvg {
 		}
 
 		[DllImport("rsvg-2")]
-		static extern unsafe bool rsvg_handle_close(IntPtr raw, out IntPtr error);
+		static extern bool rsvg_handle_close(IntPtr raw, out IntPtr error);
 
-		public unsafe bool Close() {
+		public bool Close() {
 			IntPtr error = IntPtr.Zero;
 			bool raw_ret = rsvg_handle_close(Raw, out error);
 			if (error != IntPtr.Zero) throw new Exception (error.ToString());

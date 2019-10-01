@@ -42,7 +42,7 @@ namespace Crow
 		public Scroller (Interface iface) : base(iface){}
 		#endregion
 
-		public event EventHandler<ScrollingEventArgs> Scrolled;
+		//public event EventHandler<ScrollingEventArgs> Scrolled;
 
 		int scrollX, scrollY, maxScrollX, maxScrollY, scrollSpeed;
 
@@ -221,7 +221,7 @@ namespace Crow
 		/// <summary> Process scrolling vertically, or if shift is down, vertically </summary>
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
 		{
-			if (IFace.IsKeyDown (Key.Shift_L))
+			if (IFace.Shift)
 				ScrollX += e.Delta * ScrollSpeed;
 			else
 				ScrollY -= e.Delta * ScrollSpeed;

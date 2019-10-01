@@ -48,7 +48,7 @@ namespace Crow
 		Widget titleWidget;
 		int tabOffset;
 		bool isSelected;
-		Measure tabThickness;
+		//Measure tabThickness;
 		Fill selectedBackground = Color.Transparent;
 		#endregion
 

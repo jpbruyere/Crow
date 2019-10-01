@@ -6,7 +6,6 @@ namespace Crow.Coding
 	{
 		public int Line;
 		public int Column;
-		public string Source;
 		public ParserException(int line, int column, string txt, string source = null)
 			: base(txt)
 		{
