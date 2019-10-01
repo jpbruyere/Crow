@@ -410,7 +410,7 @@ namespace Crow
 		public virtual Rectangle getSlot () { return Slot;}
 		#endregion
 		public Point ScreenPointToLocal(Point p){
-			Point pt = p - ScreenCoordinates(Slot).TopLeft - ClientRectangle.TopLeft;
+			Point pt = p - ScreenCoordinates (Slot).TopLeft - ClientRectangle.TopLeft;
 			if (pt.X < 0)
 				pt.X = 0;
 			if (pt.Y < 0)
@@ -912,7 +912,7 @@ namespace Crow
 				if (!isVisible && IFace.HoverWidget != null) {					
 					if (IFace.HoverWidget.IsOrIsInside (this)) {
 						//IFace.HoverWidget = null;
-						IFace.ProcessMouseMove (IFace.Mouse.X, IFace.Mouse.Y);
+						IFace.OnMouseMove (IFace.Mouse.X, IFace.Mouse.Y);
 					}
 				}
 
@@ -988,7 +988,7 @@ namespace Crow
 		/// Seek first logical tree upward if logicalParent is set, or seek graphic tree for
 		/// a not null dataSource that will be active for all descendants having dataSource=null
 		/// </summary>
-			[DesignCategory ("Data")]
+		[DesignCategory ("Data")]
 		public virtual object DataSource {
 			set {
 				if (DataSource == value)
@@ -1023,7 +1023,7 @@ namespace Crow
 			}
 		}
 		/// <summary>
-		/// If true, rendering of GraphicObject is clipped inside client rectangle
+		/// If true, lock datasource seeking upward in logic or graphic tree to this widget
 		/// </summary>
 		[DesignCategory ("Data")][DefaultValue(false)]
 		public virtual bool RootDataLevel {
@@ -1182,7 +1182,7 @@ namespace Crow
 						il.Emit (OpCodes.Ldnull);
 						il.Emit (OpCodes.Call, CompilerServices.miCompileDynEventHandler);
 						il.Emit (OpCodes.Castclass, ei.EventHandlerType);
-						il.Emit (OpCodes.Call, ei.AddMethod);
+						il.Emit (OpCodes.Callvirt, ei.AddMethod);
 					}else
 						Debug.WriteLine("error in styling, event not handled : " + trimed);
 				}
@@ -2016,7 +2016,7 @@ namespace Crow
 			if (IFace.HoverWidget != null) {
 				if (IFace.HoverWidget.IsOrIsInside (this)) {
 					IFace.HoverWidget = null;
-					IFace.ProcessMouseMove (IFace.Mouse.X, IFace.Mouse.Y);
+					IFace.OnMouseMove (IFace.Mouse.X, IFace.Mouse.Y);
 				}
 			}
 			if (IFace.ActiveWidget != null) {

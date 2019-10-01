@@ -1,70 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(SolutionDir)netfx.props" />
-  <PropertyGroup>
-    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
-    <AssemblyName>Crow</AssemblyName>
-    <Copyright></Copyright>
-    <AssemblyVersion>0.8.3.2</AssemblyVersion>    
-    <Description>C.R.O.W. is a widget toolkit and rendering engine entirely developed in C# with templates, styles, compositing, and bindings.</Description>        
-                    
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>        
-    <EnableDefaultItems>false</EnableDefaultItems>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-        
-    <Authors>Jean-Philippe Bruyère</Authors>
-    <Title>C# Rapid Open Widget Toolkit</Title>
-	<License>MIT</License>
-    <PackageId>Crow</PackageId>
-    <PackageTags>GUI Widget toolkit Interface C# .Net Mono</PackageTags>
-    <PackageVersion>$(AssemblyVersion)-beta</PackageVersion>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageProjectUrl>https://github.com/jpbruyere/Crow/wiki</PackageProjectUrl>        
-    <PackageLicense>https://opensource.org/licenses/MIT</PackageLicense>
-    <PackageIconUrl>https://jpbruyere.github.io/Crow/images/crow.png</PackageIconUrl>
-    <PackageCopyright>Copyright 2013-2019</PackageCopyright>
-    <PackageReleaseNotes>xcb backend</PackageReleaseNotes>    
-    <RepositoryUrl>https://github.com/jpbruyere/Crow</RepositoryUrl>		
-	
-	<LangVersion>7.2</LangVersion>
-        
-    <OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>        
-    <DefineConstants>DESIGN_MODE</DefineConstants>
-  </PropertyGroup>   
-  
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugType>full</DebugType>
-    <DefineConstants>TRACE;DESIGN_MODE;_DEBUG_CLIP_RECTANGLE;_DEBUG_FOCUS;_DEBUG_DRAGNDROP;DEBUG;NETFRAMEWORK;NET471</DefineConstants>
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>    
-  </PropertyGroup>
-	
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<AssemblyName>Crow</AssemblyName>
+		<Copyright>
+		</Copyright>
+		<AssemblyVersion>0.8.4.1</AssemblyVersion>
+		<Description>C.R.O.W. is a widget toolkit and rendering engine entirely developed in C# with templates, styles, compositing, and bindings.</Description>
+		<EnableDefaultItems>false</EnableDefaultItems>
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+		<Title>C# Rapid Open Widget Toolkit</Title>
+		<License>MIT</License>
+		<PackageId>Crow</PackageId>
+		<PackageTags>GUI Widget toolkit Interface C# .Net Mono</PackageTags>
+		<PackageVersion>$(AssemblyVersion)-beta</PackageVersion>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageProjectUrl>https://github.com/jpbruyere/Crow/wiki</PackageProjectUrl>
+		<PackageLicense>https://opensource.org/licenses/MIT</PackageLicense>
+		<PackageIconUrl>https://jpbruyere.github.io/Crow/images/crow.png</PackageIconUrl>
+		<PackageCopyright>Copyright 2013-2019</PackageCopyright>
+		<PackageReleaseNotes>xcb backend</PackageReleaseNotes>
+		<DefineConstants>DESIGN_MODE</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<DebugType>full</DebugType>
+		<DefineConstants>TRACE;_DEBUG_BINDING;DESIGN_MODE;_DEBUG_CLIP_RECTANGLE;_DEBUG_FOCUS;_DEBUG_DRAGNDROP;NET471;DEBUG;NETFRAMEWORK;NET461</DefineConstants>
+		<CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+	</PropertyGroup>
+	<!--  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="System" />
     <Reference Include="mscorlib" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />        
-  </ItemGroup>	
-  
-  <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
-    <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
-    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
-  </ItemGroup>
-	
-  <ItemGroup>
-    <Compile Include="src\**\*.cs" Exclude="src\Mono.Cairo\NativeMethods-internal.cs" />
-        
-    <EmbeddedResource Include="Templates\*.*">
-      <LogicalName>Crow.%(Filename).template</LogicalName>
-    </EmbeddedResource>
-    
-    <EmbeddedResource Include="Default.style" />
-    <EmbeddedResource Include="Icons\*.*" />
-  </ItemGroup>  
-  <ItemGroup>
-    <Compile Remove="src\backends\win32\User32\Structs\RawInputDevice.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\backends\win32\User32\Structs\RawInputDevice.cs" />
-  </ItemGroup>
+  </ItemGroup>	-->
+	<ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
+		<PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.6.0" />
+		<PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.6.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Include="src\**\*.cs" Exclude="src\Mono.Cairo\NativeMethods-internal.cs" />
+		<EmbeddedResource Include="Templates\*.*">
+			<LogicalName>Crow.%(Filename).template</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Default.style" />
+		<EmbeddedResource Include="Icons\*.*" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Remove="src\backends\win32\User32\Structs\RawInputDevice.cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="src\backends\win32\User32\Structs\RawInputDevice.cs" />
+	</ItemGroup>
 </Project>

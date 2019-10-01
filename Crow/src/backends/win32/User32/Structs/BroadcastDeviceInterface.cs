@@ -34,21 +34,12 @@ namespace OpenToolkit.NT.Native
         /// <summary>
         /// Gets a string that specifies the name of the device.
         /// </summary>
-        public unsafe string Name
-        {
-            get
-            {
-                fixed (char* namePtr = &_name)
-                {
-                    return Marshal.PtrToStringUni((IntPtr)namePtr);
-                }
-            }
-        }
+        //public string Name => Marshal.PtrToStringUni (_name);
 
-        /// <summary>
-        /// The first character of the <see cref="Name"/>.
-        /// </summary>
-        private char _name;
+		/// <summary>
+		/// The first character of the <see cref="Name"/>.
+		/// </summary>
+		//IntPtr _name;
 
         /// <summary>
         /// The size of this structure in bytes.

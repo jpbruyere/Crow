@@ -88,8 +88,8 @@ Splitter {
 	Margin = "1";
 	Background = "Grey";
 }
-Spinner {
-	Foreground = "DimGrey";
+Spinner {	
+	Foreground = "Grey";
 }
 TabView {
 	CacheEnabled = "false";
@@ -176,7 +176,7 @@ HSVSpinner {
 	SmallIncrement = "0.01";
 }
 TxtInFileDialog {
-	Margine = "1";
+	Margin = "1";
 	Font = "droid, 12";
 }
 CheckBoxAlt {

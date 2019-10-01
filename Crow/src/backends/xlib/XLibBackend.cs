@@ -142,22 +142,24 @@ namespace Crow.XLib
 					break;
 				case XEventName.MotionNotify:
 					//Debug.WriteLine ("motion: ({0},{1})", xevent.MotionEvent.x, xevent.MotionEvent.y);
-					iFace.ProcessMouseMove (xevent.MotionEvent.x, xevent.MotionEvent.y);
+					iFace.OnMouseMove (xevent.MotionEvent.x, xevent.MotionEvent.y);
 					break;
 				case XEventName.ButtonPress:
 					//Debug.WriteLine ("button press: {0}", xevent.ButtonEvent.button);
 					if (xevent.ButtonEvent.button == 4)
-						iFace.ProcessMouseWheelChanged (Interface.WheelIncrement);
+						iFace.OnMouseWheelChanged (Interface.WheelIncrement);
 					else if(xevent.ButtonEvent.button == 5)
-						iFace.ProcessMouseWheelChanged (-Interface.WheelIncrement);
+						iFace.OnMouseWheelChanged (-Interface.WheelIncrement);
 					else
-						iFace.ProcessMouseButtonDown ((MouseButton)(xevent.ButtonEvent.button - 1));
+						iFace.OnMouseButtonDown ((MouseButton)(xevent.ButtonEvent.button - 1));
 					break;
 				case XEventName.ButtonRelease:
 					//Debug.WriteLine ("button release: {0}", xevent.ButtonEvent.button);
-					iFace.ProcessMouseButtonUp ((MouseButton)(xevent.ButtonEvent.button - 1));
+					iFace.OnMouseButtonUp ((MouseButton)(xevent.ButtonEvent.button - 1));
 					break;
-
+				default:
+					Console.WriteLine (xevent);
+					break;
 				}
 			}
 		}

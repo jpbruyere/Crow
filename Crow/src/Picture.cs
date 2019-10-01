@@ -129,7 +129,7 @@ namespace Crow
 		}
 		#endregion
 
-		public static object Parse(string path)
+		public static new object Parse(string path)
 		{
 			if (string.IsNullOrEmpty (path))
 				return null;

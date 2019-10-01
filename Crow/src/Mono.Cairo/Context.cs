@@ -37,7 +37,6 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using Color = Crow.Color;
 
 namespace Crow.Cairo {	
 
@@ -431,6 +430,10 @@ namespace Crow.Cairo {
 		public void Arc (double xc, double yc, double radius, double angle1, double angle2)
 		{
 			NativeMethods.cairo_arc (handle, xc, yc, radius, angle1, angle2);
+		}
+		public void Arc (Point center, double radius, double angle1, double angle2)
+		{
+			NativeMethods.cairo_arc (handle, center.X, center.Y, radius, angle1, angle2);
 		}
 
 		public void ArcNegative (double xc, double yc, double radius, double angle1, double angle2)

@@ -26,6 +26,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Crow.Cairo;
 
 namespace Crow
@@ -49,7 +50,9 @@ namespace Crow
 		/// </summary>
 		/// <param name="path">image path, may be embedded</param>
 		public BmpPicture (string path) : base(path)
-		{}
+		{
+			Load ();
+		}
 		#endregion
 		/// <summary>
 		/// load the image for rendering from the path given as argument
@@ -63,11 +66,25 @@ namespace Crow
 				Dimensions = sp.Dims;
 				return;
 			}
-			using (Stream stream = Interface.StaticGetStreamFromPath (Path)) {				
+			using (Stream stream = Interface.StaticGetStreamFromPath (Path)) {
+				using (StbImage stbi = new StbImage (stream)) {
+					image = new byte [stbi.Size];
+					//rgba to argb for cairo.
+					for (int i = 0; i < stbi.Size; i+=4) {
+						image [i] = Marshal.ReadByte (stbi.Handle, i + 2);
+						image [i + 1] = Marshal.ReadByte (stbi.Handle, i + 1);
+						image [i + 2] = Marshal.ReadByte (stbi.Handle, i);
+						image [i + 3] = Marshal.ReadByte (stbi.Handle, i + 3);
+					}
+					Dimensions = new Size (stbi.Width, stbi.Height);
+				}
+
 				//loadBitmap (new System.Drawing.Bitmap (stream));	
 			}
 			sharedResources [Path] = new sharedPicture (image, Dimensions);
 		}
+
+
 
 		//load image via System.Drawing.Bitmap, cairo load png only
 		/*void loadBitmap (System.Drawing.Bitmap bitmap)

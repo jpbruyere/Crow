@@ -1,25 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(SolutionDir)netfx.props" />
   <PropertyGroup>
-    <TargetFrameworks>net471;netstandard2.0</TargetFrameworks>
-    <OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>
+    <TargetFrameworks>net471</TargetFrameworks>
     <OutputType>Exe</OutputType>        
-    <RepositoryUrl>https://github.com/jpbruyere/Crow</RepositoryUrl>
-    <License>MIT</License>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <EnableDefaultNoneItems>false</EnableDefaultNoneItems>    
-    <ReleaseVersion>0.8.0</ReleaseVersion>
   </PropertyGroup>
             
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-  </PropertyGroup>
-    
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <Reference Include="System" />
-  </ItemGroup>    
+  </PropertyGroup> 
 
   <ItemGroup>  
     <ProjectReference Include="..\..\Crow\Crow.csproj" />    
@@ -37,7 +27,4 @@
       <Link>Interfaces\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </None>
   </ItemGroup>     
-  <ItemGroup>
-    <Compile Remove="..\common\CrowWin.cs" />
-  </ItemGroup>
 </Project>

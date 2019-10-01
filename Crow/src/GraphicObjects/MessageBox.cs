@@ -95,12 +95,12 @@ namespace Crow
 		[DefaultValue("No")]
 		public virtual string NoMessage
 		{
-			get { return cancelMessage; }
+			get { return noMessage; }
 			set {
-				if (cancelMessage == value)
+				if (noMessage == value)
 					return;
-				cancelMessage = value;
-				NotifyValueChanged ("NoMessage", cancelMessage);
+				noMessage = value;
+				NotifyValueChanged ("NoMessage", noMessage);
 			}
 		}
 		[DefaultValue("Information")]

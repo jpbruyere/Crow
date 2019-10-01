@@ -13,31 +13,31 @@
 				<Label Focusable="true" Selectable="true" Text="{./SelectedColor}" />				
 				<HorizontalStack Height="Fit">
 					<Label Text="R" Width="Fit"/>
-					<Spinner Style="ColorSpinner" Value="{²./R}" Width="40"  />
+					<Spinner Style="ColorSpinner" Value="{²./R}" Width="46"  />
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
 					<Label Text="G" Width="Fit"/>
-					<Spinner Style="ColorSpinner" Value="{²./G}" Width="40"  />
+					<Spinner Style="ColorSpinner" Value="{²./G}" Width="46"  />
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
 					<Label Text="B" Width="Fit"/>
-					<Spinner Style="ColorSpinner" Value="{²./B}" Width="40"  />
+					<Spinner Style="ColorSpinner" Value="{²./B}" Width="46"  />
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
 					<Label Text="A" Width="Fit"/>
-					<Spinner Style="ColorSpinner" Value="{²./A}" Width="40"  />
+					<Spinner Style="ColorSpinner" Value="{²./A}" Width="46"  />
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
 					<Label Text="H" Width="Fit"/>
-					<Spinner Style="HSVSpinner" Value="{²./H}" Width="40"  />
+					<Spinner Style="HSVSpinner" Value="{²./H}" Width="46"  />
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
 					<Label Text="S" Width="Fit"/>
-					<Spinner Style="HSVSpinner" Value="{²./S}" Width="40"  />
+					<Spinner Style="HSVSpinner" Value="{²./S}" Width="46"  />
 				</HorizontalStack>
 				<HorizontalStack Height="Fit">
 					<Label Text="V" Width="Fit"/>
-					<Spinner Style="HSVSpinner" Value="{²./V}" Width="40"  />
+					<Spinner Style="HSVSpinner" Value="{²./V}" Width="46"  />
 				</HorizontalStack>
 			</VerticalStack>
 		</HorizontalStack>

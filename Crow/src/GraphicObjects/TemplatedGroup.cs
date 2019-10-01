@@ -340,7 +340,7 @@ namespace Crow {
 		void loading(){
 			try {
 				loadPage (data, items, dataTest);
-			} catch (Exception ex) {
+			} catch {
 				if (Monitor.IsEntered (IFace.LayoutMutex))
 					Monitor.Exit (IFace.LayoutMutex);
 				Console.WriteLine ("loading thread aborted");
@@ -518,6 +518,11 @@ namespace Crow {
 			if (disposing && loadingThread != null)
 				loadingThread.Cancel ();
 			base.Dispose (disposing);
+		}
+
+		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
+		{
+			base.OnDataSourceChanged (sender, e);
 		}
 	}
 }

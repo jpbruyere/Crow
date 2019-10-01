@@ -44,7 +44,7 @@ namespace Crow.Win32 {
 
 		WindowProc WindowProcedureDelegate;
 		string className = "myWindowClass";
-		IntPtr instance;// = Marshal.GetHINSTANCE(typeof(Win32Backend).Module);
+		IntPtr instance = IntPtr.Zero; //Marshal.GetHINSTANCE(typeof(Win32Backend).Module);
 		IntPtr handle = IntPtr.Zero;
 		IntPtr hdc = IntPtr.Zero;
 		Interface iFace;
@@ -291,9 +291,9 @@ namespace Crow.Win32 {
 			Key k = GetKey ((int)scancode);
 
 			if (pressed)
-				iFace.ProcessKeyDown (k);
+				iFace.OnKeyDown (k);
 			else
-				iFace.ProcessKeyUp (k);
+				iFace.OnKeyUp (k);
 		}
 		void handleChar (IntPtr lParam, IntPtr wParam) {
 			char c = IntPtr.Size == 4 ?
@@ -301,7 +301,7 @@ namespace Crow.Win32 {
 				(char)wParam.ToInt64 ();
 
 			if (!char.IsControl (c))
-				iFace.ProcessKeyPress (c);
+				iFace.OnKeyPress (c);
 		}
 
 
@@ -312,32 +312,32 @@ namespace Crow.Win32 {
 
 			switch (message) {
 				case WindowMessage.MouseMove:
-					iFace.ProcessMouseMove
+					iFace.OnMouseMove
 					((int)((uint)lParam.ToInt32 () & 0x0000FFFF), (int)(((uint)lParam.ToInt32 () & 0xFFFF0000) >> 16));
 					break;
 				case WindowMessage.LButtonDown:
-					iFace.ProcessMouseButtonDown (Crow.MouseButton.Left);
+					iFace.OnMouseButtonDown (Crow.MouseButton.Left);
 					return IntPtr.Zero;
 				case WindowMessage.RButtonDown:
-					iFace.ProcessMouseButtonDown (Crow.MouseButton.Right);
+					iFace.OnMouseButtonDown (Crow.MouseButton.Right);
 					return IntPtr.Zero;
 				case WindowMessage.MButtonDown:
-					iFace.ProcessMouseButtonDown (Crow.MouseButton.Middle);
+					iFace.OnMouseButtonDown (Crow.MouseButton.Middle);
 					return IntPtr.Zero;
 				case WindowMessage.LButtonUp:
-					iFace.ProcessMouseButtonUp (Crow.MouseButton.Left);
+					iFace.OnMouseButtonUp (Crow.MouseButton.Left);
 					return IntPtr.Zero;
 				case WindowMessage.RButtonUp:
-					iFace.ProcessMouseButtonUp (Crow.MouseButton.Right);
+					iFace.OnMouseButtonUp (Crow.MouseButton.Right);
 					return IntPtr.Zero;
 				case WindowMessage.MButtonUp:
-					iFace.ProcessMouseButtonUp (Crow.MouseButton.Middle);
+					iFace.OnMouseButtonUp (Crow.MouseButton.Middle);
 					return IntPtr.Zero;
 				case WindowMessage.MouseWheel:
-					iFace.ProcessMouseWheelChanged ((((long)wParam << 32) >> 48) / 120.0f);
+					iFace.OnMouseWheelChanged ((((long)wParam << 32) >> 48) / 120.0f);
 					return IntPtr.Zero;
 				case WindowMessage.MouseHWheel:
-					iFace.ProcessMouseWheelChanged ((((long)wParam << 32) >> 48) / 120.0f);
+					iFace.OnMouseWheelChanged ((((long)wParam << 32) >> 48) / 120.0f);
 					return IntPtr.Zero;
 				case WindowMessage.KeyDown:
 				case WindowMessage.SystemKeyDown:
