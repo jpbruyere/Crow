@@ -9,7 +9,7 @@ using Crow.Cairo;
 namespace Crow
 {
 	/// <summary>
-	/// simple squarred rgb color selector
+	/// Color component slider with background gradient ranging from 0 to 1 for this component value.
 	/// </summary>
 	[DesignIgnore]
 	public class ColorSlider : Widget
@@ -19,12 +19,12 @@ namespace Crow
 		public ColorSlider (Interface iface) : base(iface){}
 		#endregion
 
-		protected Point mousePos;
+		protected Point mousePos;//store local mouse pos sync with currentValue
 		Orientation orientation;
 		CursorType cursorType = CursorType.Pentagone;
 		ColorComponent component;
 		Color currentColor = Color.Black;
-		double currentValue;
+		double currentValue = -1;//force notify for property less binding 'CurrentValue'
 
 		[DefaultValue (Orientation.Horizontal)]
 		public Orientation Orientation {
@@ -64,53 +64,56 @@ namespace Crow
 			set {
 				if (currentColor == value)
 					return;
+
 				currentColor = value;
-				switch (component) {
-				case ColorComponent.Red:
-					if (currentValue != currentColor.R) {
-						currentValue = currentColor.R;
-						updateMousePosFromComponentValue ();
-					}
-					break;
-				case ColorComponent.Green:
-					if (currentValue != currentColor.G) {
-						currentValue = currentColor.G;
-						updateMousePosFromComponentValue ();
-					}
-					break;
-				case ColorComponent.Blue:
-					if (currentValue != currentColor.B) {
-						currentValue = currentColor.B;
-						updateMousePosFromComponentValue ();
-					}
-					break;
-				case ColorComponent.Alpha:
-					if (currentValue != currentColor.A) {
-						currentValue = currentColor.A;
-						updateMousePosFromComponentValue ();
-					}
-					break;
-				case ColorComponent.Hue:
-					if (currentValue != currentColor.Hue) {
-						currentValue = currentColor.Hue;
-						updateMousePosFromComponentValue ();
-					}
-					break;
-				case ColorComponent.Saturation:
-					if (currentValue != currentColor.Saturation) {
-						currentValue = currentColor.Saturation;
-						updateMousePosFromComponentValue ();
-					}
-					break;
-				case ColorComponent.Value:
-					if (currentValue != currentColor.Value) {
-						currentValue = currentColor.Value;
-						updateMousePosFromComponentValue ();
-					}
-					break;
-				}
+
 				NotifyValueChanged ("CurrentColor", currentColor);
 				RegisterForRedraw ();
+
+				switch (component) {
+				case ColorComponent.Red:
+					if (currentValue == currentColor.R)
+						return;
+					currentValue = currentColor.R;
+					break;
+				case ColorComponent.Green:
+					if (currentValue == currentColor.G)
+						return; 
+					currentValue = currentColor.G;
+					break;
+				case ColorComponent.Blue:
+					if (currentValue == currentColor.B)
+						return;
+					currentValue = currentColor.B;
+					break;
+				case ColorComponent.Alpha:
+					if (currentValue == currentColor.A)
+						return;
+					currentValue = currentColor.A;
+					break;
+				case ColorComponent.Hue:
+					if (currentValue == currentColor.Hue)
+						return;
+					currentValue = currentColor.Hue;
+					break;
+				case ColorComponent.Saturation:
+					if (currentValue == currentColor.Saturation)
+						return;
+					currentValue = currentColor.Saturation;
+					break;
+				case ColorComponent.Value:
+					if (currentValue == currentColor.Value)
+						return; 
+					currentValue = currentColor.Value;
+					break;
+				}
+
+				NotifyValueChanged ("CurrentValue", $"{currentValue:0.000}");
+
+				if (Orientation == Orientation.Horizontal)
+					mousePos.X = (int)Math.Floor (currentValue * ClientRectangle.Width);
+				else
+					mousePos.Y = (int)Math.Floor (currentValue * ClientRectangle.Height);					
 			}
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
@@ -229,16 +232,9 @@ namespace Crow
 
 			if (Orientation == Orientation.Horizontal) {
 				if (layoutType == LayoutingType.Width)
-					updateMousePosFromComponentValue ();
+					mousePos.X = (int)Math.Floor (currentValue * ClientRectangle.Width);
 			} else if (layoutType == LayoutingType.Height)
-				updateMousePosFromComponentValue ();
-		}
-		void updateMousePosFromComponentValue () {
-			if (Orientation == Orientation.Horizontal)
-				mousePos.X = (int)Math.Floor (currentValue * ClientRectangle.Width);
-			else
 				mousePos.Y = (int)Math.Floor (currentValue * ClientRectangle.Height);
-			RegisterForRedraw ();
 		}
 
 		protected virtual void updateMouseLocalPos(Point mPos){
@@ -255,6 +251,9 @@ namespace Crow
 				currentValue = (double)mousePos.X / ClientRectangle.Width;
 			else
 				currentValue = (double)mousePos.Y / ClientRectangle.Height;
+
+			NotifyValueChanged ("CurrentValue", $"{currentValue:0.000}");
+
 			Color c = currentColor;
 			switch (component) {
 			case ColorComponent.Red:
@@ -279,8 +278,6 @@ namespace Crow
 				CurrentColor = Color.FromHSV (c.Hue, currentValue, c.Saturation, c.A);
 				break;
 			}
-			//NotifyValueChanged ("CurrentColor", currentColor);
-			//RegisterForRedraw ();
 		}
 	}
 }
