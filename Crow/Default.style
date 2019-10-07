@@ -222,3 +222,8 @@ HScrollBar {
     Height = "12";
     Width = "Stretched";
 }
+EnumSelector {
+    Orientation = "Vertical";
+    Height = "Fit";
+    Spacing = "0";
+}

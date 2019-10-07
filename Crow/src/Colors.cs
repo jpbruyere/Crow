@@ -219,21 +219,18 @@ namespace Crow
 		/// </summary>
 		public double Saturation {
 			get {
-				return Math.Max (R, Math.Max (G, B));	//Max. value of RGB
+				double min = Math.Min (R, Math.Min (G, B)); //Min. value of RGB
+				double max = Math.Max (R, Math.Max (G, B)); //Max. value of RGB
+				double diff = max - min;                            //Delta RGB value
+				return diff == 0 ? 0 : diff / max;
 			}
 		}
 		/// <summary>
 		/// compute the RGB intensity of the color
 		/// </summary>
 		/// <value>The value.</value>
-		public double Value {
-			get {
-				double min = Math.Min (R, Math.Min (G, B));	//Min. value of RGB
-				double max = Math.Max (R, Math.Max (G, B));	//Max. value of RGB
-				double diff = max - min;							//Delta RGB value
-				return diff == 0 ? 0 : diff / max;
-			}
-		}
+		public double Value => Math.Max (R, Math.Max (G, B));   //Max. value of RGB
+
 		public string HtmlCode {
 			get { 
 				string tmp = "#" +
@@ -261,6 +258,7 @@ namespace Crow
 		public void ResetName(){
 			Name = "";
 			htmlCode = "";
+			predefinied = false;
 		}
 
 		#region Predefined colors
@@ -446,35 +444,55 @@ namespace Crow
         {
             return (Color)s;
         }
-		public static Color FromHSV(double _h, double _v = 1.0, double _s = 1.0, double _alpha = 1.0){
-			Color c = Color.Black;
-			c.ResetName ();
-			c.A = _alpha;
-			if (_s == 0) {//HSV from 0 to 1
-				c.R = _v;
-				c.G = _v;
-				c.B = _v;
-			}else{
-				double var_h = _h * 6.0;
+		//public static Color FromHSV(double _h, double _v = 1.0, double _s = 1.0, double _alpha = 1.0){
+		//	Color c = Color.Black;
+		//	c.ResetName ();
+		//	c.A = _alpha;
+		//	if (_s == 0) {//HSV from 0 to 1
+		//		c.R = _v;
+		//		c.G = _v;
+		//		c.B = _v;
+		//	}else{
+		//		double var_h = _h * 6.0;
 
-				if (var_h == 6.0)
-					var_h = 0;	//H must be < 1
-				double var_i = Math.Floor( var_h );	//Or ... var_i = floor( var_h )
-				double var_1 = _v * ( 1.0 - _s );
-				double var_2 = _v * (1.0 - _s * (var_h - var_i));
-				double var_3 = _v * (1.0 - _s * (1.0 - (var_h - var_i)));
+		//		if (var_h == 6.0)
+		//			var_h = 0;	//H must be < 1
+		//		double var_i = Math.Floor( var_h );	//Or ... var_i = floor( var_h )
+		//		double var_1 = _v * ( 1.0 - _s );
+		//		double var_2 = _v * (1.0 - _s * (var_h - var_i));
+		//		double var_3 = _v * (1.0 - _s * (1.0 - (var_h - var_i)));
 
-				if (var_i == 0.0) {
-					c.R = _v;
-					c.G = var_3;
-					c.B = var_1;
-				}else if ( var_i == 1.0 ) { c.R = var_2 ; c.G = _v     ; c.B = var_1; }
-				else if ( var_i == 2 ) { c.R = var_1 ; c.G = _v     ; c.B = var_3; }
-				else if ( var_i == 3 ) { c.R = var_1 ; c.G = var_2 ; c.B = _v;     }
-				else if ( var_i == 4 ) { c.R = var_3 ; c.G = var_1 ; c.B = _v;    }
-				else                   { c.R = _v     ; c.G = var_1 ; c.B = var_2; }
-			}
-			return c;
+		//		if (var_i == 0.0) {
+		//			c.R = _v;
+		//			c.G = var_3;
+		//			c.B = var_1;
+		//		}else if ( var_i == 1.0 ) { c.R = var_2 ; c.G = _v     ; c.B = var_1; }
+		//		else if ( var_i == 2 ) { c.R = var_1 ; c.G = _v     ; c.B = var_3; }
+		//		else if ( var_i == 3 ) { c.R = var_1 ; c.G = var_2 ; c.B = _v;     }
+		//		else if ( var_i == 4 ) { c.R = var_3 ; c.G = var_1 ; c.B = _v;    }
+		//		else                   { c.R = _v     ; c.G = var_1 ; c.B = var_2; }
+		//	}
+		//	return c;
+		//}
+		public static Color FromHSV (double _h, double _v = 1.0, double _s = 1.0, double _alpha = 1.0) {
+			double H = _h * 360;
+			double C = _v * _s;
+			//X = C × (1 - | (H / 60°) mod 2 - 1 |)
+			double X = C * (1 - Math.Abs((H/60.0) % 2 - 1));
+			double m = _v - C;
+
+			if (H >= 300)
+				return new Color (C + m, m, X + m, _alpha);
+			if (H >= 240)
+				return new Color (X + m, m, C + m, _alpha);
+			if (H >= 180)
+				return new Color (m, X + m, C + m, _alpha);
+			if (H >= 120)
+				return new Color (m, C + m, X + m, _alpha);
+			if (H >= 60)
+				return new Color (X + m, C + m, m, _alpha);
+
+			return new Color (C + m, X + m, m, _alpha);
 		}
-    }
+	}
 }

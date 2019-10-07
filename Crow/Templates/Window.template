@@ -34,6 +34,6 @@
 				<Widget Width="5"/>
 			</HorizontalStack>
 <!--		</Border>-->
-		<Container Name="Content" MinimumSize="0,0" Background="0.5,0.5,0.5,0.5"/>
+		<Container Name="Content" MinimumSize="0,0"/>
 	</VerticalStack>
 </Border>

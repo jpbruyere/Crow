@@ -1,30 +1,8 @@
-﻿//
-// Shape.cs
+﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
-// Author:
-//       jp <>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
+
 using System;
-using System.Xml.Serialization;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
@@ -36,7 +14,7 @@ namespace Crow
 	{
 		public PathParser (string str) : base (str) {}
 
-		public double ReadDouble () {
+		double readDouble () {
 			StringBuilder tmp = new StringBuilder();
 
 			while (Peek () >= 0) {				
@@ -52,7 +30,44 @@ namespace Crow
 			}
 			return double.Parse (tmp.ToString ());
 		}
-		
+		public void Draw (Context gr) {
+			while (Peek () >= 0) {
+				char c = (char)Read ();
+				if (c.IsWhiteSpaceOrNewLine ())
+					continue;
+				switch (c) {
+				case 'M':
+					gr.MoveTo (readDouble (), readDouble ());
+					break;
+				case 'm':
+					gr.RelMoveTo (readDouble (), readDouble ());
+					break;
+				case 'L':
+					gr.LineTo (readDouble (), readDouble ());
+					break;
+				case 'l':
+					gr.RelLineTo (readDouble (), readDouble ());
+					break;
+				case 'C':
+					gr.CurveTo (readDouble (), readDouble (), readDouble (), readDouble (), readDouble (), readDouble ());
+					break;
+				case 'c':
+					gr.RelCurveTo (readDouble (), readDouble (), readDouble (), readDouble (), readDouble (), readDouble ());
+					break;
+				case 'Z':
+					gr.ClosePath ();
+					break;
+				case 'F':
+					gr.Fill ();
+					break;
+				case 'G':
+					gr.Stroke ();
+					break;
+				default:
+					throw new Exception ("Invalid character in path string of Shape control");
+				}
+			}			
+		}
 	}
 	public class Shape : Widget
 	{
@@ -119,9 +134,9 @@ namespace Crow
             gr.Translate(r.Left, r.Top);
             gr.Scale (sx,sy);
 
-
-			executePath (gr);
-
+			using (PathParser parser = new PathParser (path))
+				parser.Draw (gr);
+				
 			Background.SetAsSource (gr, r);
 			gr.FillPreserve ();
 			gr.LineWidth = strokeWidth;
@@ -130,46 +145,7 @@ namespace Crow
             gr.Restore();
 		}
 
-		void executePath (Context gr){
-			using (PathParser sr = new PathParser (path)) {
-				while (sr.Peek () >= 0) {
-					char c = (char)sr.Read ();
-					if (c.IsWhiteSpaceOrNewLine ())
-						continue;
-					switch (c) {
-					case 'M':						
-						gr.MoveTo (sr.ReadDouble (), sr.ReadDouble ());
-						break;
-					case 'm':
-						gr.RelMoveTo (sr.ReadDouble (), sr.ReadDouble ());
-						break;
-					case 'L':
-						gr.LineTo (sr.ReadDouble (), sr.ReadDouble ());
-						break;
-					case 'l':
-						gr.RelLineTo (sr.ReadDouble (), sr.ReadDouble ());
-						break;
-					case 'C':
-						gr.CurveTo (sr.ReadDouble (), sr.ReadDouble (), sr.ReadDouble (), sr.ReadDouble (), sr.ReadDouble (), sr.ReadDouble ());
-						break;
-					case 'c':
-						gr.RelCurveTo (sr.ReadDouble (), sr.ReadDouble (), sr.ReadDouble (), sr.ReadDouble (), sr.ReadDouble (), sr.ReadDouble ());
-						break;
-					case 'Z':
-						gr.ClosePath ();
-						break;
-					case 'F':
-						gr.Fill ();
-						break;
-					case 'G':
-						gr.Stroke ();
-						break;
-					default:
-						throw new Exception ("Invalid character in path string of Shape control");
-					}
-				}
-			}
-		}
+
 		protected override int measureRawSize (LayoutingType lt)
 		{
 			if ((lt == LayoutingType.Width && contentSize.Width == 0) || (lt == LayoutingType.Height && contentSize.Height == 0)) {
@@ -181,7 +157,8 @@ namespace Crow
                     {
                         using (Context ctx = new Context(drawing))
                         {
-                            executePath(ctx);
+							using (PathParser parser = new PathParser (path))
+								parser.Draw (ctx);								
                             Rectangle r = ctx.StrokeExtents();
                             contentSize = new Size(r.Right, r.Bottom);
                         }

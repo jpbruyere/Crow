@@ -206,7 +206,7 @@ namespace Crow {
 
 				NotifyValueChanged ("Data", data);
 
-				lock (IFace.LayoutMutex)
+				lock (IFace.UpdateMutex)
 					ClearItems ();
 
 				if (data == null)
@@ -393,6 +393,8 @@ namespace Crow {
 			//				isPaged = true;
 			//			}
 
+			if (_data == null)
+				return;
 
 			foreach (object d in _data) {
 				loadItem (d, page, _dataTest);

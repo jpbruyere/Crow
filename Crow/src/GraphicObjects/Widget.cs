@@ -163,22 +163,22 @@ namespace Crow
 			GC.SuppressFinalize(this);  
 		}  
 		~Widget(){
-			Debug.WriteLine(this.ToString() + " not disposed by user");
+			Console.WriteLine(this.ToString() + " not disposed by user");
 			Dispose(false);
 		}
 		protected virtual void Dispose(bool disposing){
 			if (disposed){
 				#if DEBUG_DISPOSE
-				Debug.WriteLine ("Trying to dispose already disposed obj: {0}", this.ToString());
+				Console.WriteLine ("Trying to dispose already disposed obj: {0}", this.ToString());
 				#endif
 				return;
 			}
 
 			if (disposing) {
 				#if DEBUG_DISPOSE
-				Debug.WriteLine ("Disposing: {0}", this.ToString());
-				if (IsQueueForRedraw)
-				throw new Exception("Trying to dispose an object queued for Redraw: " + this.ToString());
+				Console.WriteLine ("Disposing: {0}", this.ToString());
+				//if ()
+				//throw new Exception("Trying to dispose an object queued for Redraw: " + this.ToString());
 				#endif
 
 				unshownPostActions ();

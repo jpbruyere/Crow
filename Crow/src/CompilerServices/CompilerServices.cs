@@ -533,7 +533,7 @@ namespace Crow.IML
 		internal static void emitConvert(ILGenerator il, Type origType, Type destType){
 			if (destType == typeof(object))
 				return;
-			if (destType == typeof(string)) {
+			if (destType == typeof (string)) {
 				System.Reflection.Emit.Label emitNullStr = il.DefineLabel ();
 				System.Reflection.Emit.Label endConvert = il.DefineLabel ();
 				il.Emit (OpCodes.Dup);
@@ -544,46 +544,46 @@ namespace Crow.IML
 				il.Emit (OpCodes.Pop);//remove null string from stack
 				il.Emit (OpCodes.Ldstr, "");//replace with empty string
 				il.MarkLabel (endConvert);
-			}else if (origType.IsValueType) {
+			} else if ((origType.IsEnum || origType == typeof (Enum)) && destType.IsEnum) {
+				il.Emit (OpCodes.Unbox_Any, destType);
+				return;
+			} else if (origType.IsValueType) {
 				if (destType != origType) {
 					MethodInfo miIO = getImplicitOp (origType, destType);
-                    if (miIO != null)
-                    {
-                        System.Reflection.Emit.Label emitCreateDefault = il.DefineLabel();
-                        System.Reflection.Emit.Label emitContinue = il.DefineLabel();
-                        LocalBuilder lbStruct = il.DeclareLocal(origType);
-                        il.Emit(OpCodes.Dup);
-                        il.Emit(OpCodes.Brfalse, emitCreateDefault);
-                        il.Emit(OpCodes.Unbox_Any, origType);
-                        il.Emit(OpCodes.Br, emitContinue);
-                        il.MarkLabel(emitCreateDefault);
-                        il.Emit(OpCodes.Pop);//pop null value
-                        il.Emit(OpCodes.Ldloca, lbStruct);
-                        il.Emit(OpCodes.Initobj, origType);
-                        il.Emit(OpCodes.Ldloc, lbStruct);
-                        il.MarkLabel(emitContinue);
-                        il.Emit(OpCodes.Call, miIO);
-                    }
-                    else
-                    {
-                        MethodInfo miconv = CompilerServices.GetConvertMethod(destType);
-                        if (miconv.IsStatic)
-                            il.Emit(OpCodes.Call, miconv);
-                        else
-                            il.Emit(OpCodes.Callvirt, miconv);
-                    }
-				}else
+					if (miIO != null) {
+						System.Reflection.Emit.Label emitCreateDefault = il.DefineLabel ();
+						System.Reflection.Emit.Label emitContinue = il.DefineLabel ();
+						LocalBuilder lbStruct = il.DeclareLocal (origType);
+						il.Emit (OpCodes.Dup);
+						il.Emit (OpCodes.Brfalse, emitCreateDefault);
+						il.Emit (OpCodes.Unbox_Any, origType);
+						il.Emit (OpCodes.Br, emitContinue);
+						il.MarkLabel (emitCreateDefault);
+						il.Emit (OpCodes.Pop);//pop null value
+						il.Emit (OpCodes.Ldloca, lbStruct);
+						il.Emit (OpCodes.Initobj, origType);
+						il.Emit (OpCodes.Ldloc, lbStruct);
+						il.MarkLabel (emitContinue);
+						il.Emit (OpCodes.Call, miIO);
+					} else {
+						MethodInfo miconv = CompilerServices.GetConvertMethod (destType);
+						if (miconv.IsStatic)
+							il.Emit (OpCodes.Call, miconv);
+						else
+							il.Emit (OpCodes.Callvirt, miconv);
+					}
+				} else
 					il.Emit (OpCodes.Unbox_Any, destType);//TODO:double check this
 			} else {
-				if (destType.IsAssignableFrom(origType))
+				if (destType.IsAssignableFrom (origType))
 					il.Emit (OpCodes.Castclass, destType);
 				else {
 					//implicit conversion can't be defined from or to object base class,
 					//so we will check if object underlying type is one of the implicit converter of destType
-					if (origType == typeof(object)) {//test all implicit converter to destType on obj
+					if (origType == typeof (object)) {//test all implicit converter to destType on obj
 						System.Reflection.Emit.Label emitTestNextImpOp;
 						System.Reflection.Emit.Label emitImpOpFound = il.DefineLabel ();
-						foreach (MethodInfo mi in destType.GetMethods(BindingFlags.Public|BindingFlags.Static)) {
+						foreach (MethodInfo mi in destType.GetMethods (BindingFlags.Public | BindingFlags.Static)) {
 							if (mi.Name == "op_Implicit") {
 								if (mi.GetParameters () [0].ParameterType == destType)
 									continue;

@@ -431,7 +431,7 @@ namespace Crow.Cairo {
 		{
 			NativeMethods.cairo_arc (handle, xc, yc, radius, angle1, angle2);
 		}
-		public void Arc (Point center, double radius, double angle1, double angle2)
+		public void Arc (PointD center, double radius, double angle1, double angle2)
 		{
 			NativeMethods.cairo_arc (handle, center.X, center.Y, radius, angle1, angle2);
 		}
