@@ -133,7 +133,7 @@ namespace Crow
 			get { return new SolidColor(curColor); }
 			set {
 				if (value == null)
-					curColor = default(Color);
+					curColor = Color.White;
 				else if (value is SolidColor) {
 					Color c = (value as SolidColor).color;
 					if (curColor == c)

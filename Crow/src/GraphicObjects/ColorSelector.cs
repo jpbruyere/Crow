@@ -41,8 +41,6 @@ namespace Crow
 		public ColorSelector (Interface iface) : base(iface){}
 		#endregion
 
-		const double div = 255.0;
-		const double colDiv = 1.0 / div;
 		protected Point mousePos;
 
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
@@ -68,6 +66,8 @@ namespace Crow
 			mousePos.X = Math.Min(cb.Right, mousePos.X);
 			mousePos.Y = Math.Max(cb.Y, mousePos.Y);
 			mousePos.Y = Math.Min(cb.Bottom, mousePos.Y);
+
+			RegisterForRedraw ();
 		}
 	}
 }

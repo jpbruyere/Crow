@@ -86,4 +86,20 @@ namespace Crow
 		SW,
 		SE,
 	}
+	public enum CursorType
+	{
+		Rectangle,
+		Circle,
+		Pentagone
+	}
+	public enum ColorComponent
+	{
+		Red,
+		Green,
+		Blue,
+		Alpha,
+		Hue,
+		Saturation,
+		Value
+	}
 }

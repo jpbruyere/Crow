@@ -39,8 +39,7 @@ namespace Crow
 		}
 
 		double v, s;
-
-		
+				
 		public virtual double V {
 			get { return v; }
 			set {
@@ -91,28 +90,36 @@ namespace Crow
 			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
 			gr.Fill();
 
+
+			gr.Arc (mousePos.X, mousePos.Y, 3.5, 0, Math.PI * 2.0);
+			gr.SetSourceColor (Color.Black);
+			gr.LineWidth = 2.0;
+			gr.StrokePreserve ();
+			gr.SetSourceColor (Color.White);
+			gr.LineWidth = 1.0;
+			gr.Stroke ();
 		}
 
-		public override void Paint (ref Context ctx)
-		{
-			base.Paint (ref ctx);
+		//public override void Paint (ref Context ctx)
+		//{
+		//	base.Paint (ref ctx);
 
-			Rectangle rb = Slot + Parent.ClientRectangle.Position;
-			ctx.Save ();
+		//	Rectangle rb = Slot + Parent.ClientRectangle.Position;
+		//	ctx.Save ();
 
-			ctx.Translate (rb.X, rb.Y);
+		//	ctx.Translate (rb.X, rb.Y);
 
-			ctx.SetSourceColor (Color.DimGrey);
-			ctx.Arc (mousePos.X, mousePos.Y, 3.5, 0, Math.PI * 2.0);
-			ctx.LineWidth = 0.5;
-			ctx.Stroke ();
-			ctx.Translate (-0.5, -0.5);
-			ctx.Arc (mousePos.X, mousePos.Y, 3.5, 0, Math.PI * 2.0);
-			ctx.SetSourceColor (Color.White);
-			ctx.Stroke ();
+		//	ctx.SetSourceColor (Color.DimGrey);
+		//	ctx.Arc (mousePos.X, mousePos.Y, 3.5, 0, Math.PI * 2.0);
+		//	ctx.LineWidth = 0.5;
+		//	ctx.Stroke ();
+		//	ctx.Translate (-0.5, -0.5);
+		//	ctx.Arc (mousePos.X, mousePos.Y, 3.5, 0, Math.PI * 2.0);
+		//	ctx.SetSourceColor (Color.White);
+		//	ctx.Stroke ();
 
-			ctx.Restore ();
-		}
+		//	ctx.Restore ();
+		//}
 
 		protected override void updateMouseLocalPos (Point mPos)
 		{

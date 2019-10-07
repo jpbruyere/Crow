@@ -75,6 +75,7 @@ namespace Crow
 				contentSize = default(Size);
 				child.LayoutChanged -= OnChildLayoutChanges;
 				this.RegisterForGraphicUpdate ();
+				child.Dispose ();
 			}
 
 			child = _child as Widget;

@@ -132,8 +132,11 @@ namespace Crow {
 		public static Rectangle operator + (Rectangle r, Point p) => new Rectangle (r.X + p.X, r.Y + p.Y, r.Width, r.Height);
 		public static Rectangle operator - (Rectangle r, Point p) => new Rectangle (r.X - p.X, r.Y - p.Y, r.Width, r.Height);
 		public static bool operator == (Rectangle r1, Rectangle r2) => r1.TopLeft == r2.TopLeft && r1.Size == r2.Size;
-		public static bool operator != (Rectangle r1, Rectangle r2) => !(r1.TopLeft == r2.TopLeft && r1.Size == r2.Size);        
-        #endregion        
+		public static bool operator != (Rectangle r1, Rectangle r2) => !(r1.TopLeft == r2.TopLeft && r1.Size == r2.Size);
+
+		public static implicit operator Rectangle (RectangleD r) => new Rectangle ((int)Math.Round(r.X), (int)Math.Round (r.Y),
+			(int)Math.Round (r.Width), (int)Math.Round (r.Height));
+		#endregion
 
 		public override string ToString () => $"{X},{Y},{Width},{Height}";        
         public static Rectangle Parse(string s)

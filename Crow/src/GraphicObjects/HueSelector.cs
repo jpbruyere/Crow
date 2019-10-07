@@ -43,6 +43,7 @@ namespace Crow
 
 		Orientation _orientation;
 		double hue;
+		CursorType cursor = CursorType.Pentagone;
 
 		[DefaultValue(Orientation.Horizontal)]
 		public virtual Orientation Orientation
@@ -72,7 +73,7 @@ namespace Crow
 		{
 			base.onDraw (gr);
 
-			Rectangle r = ClientRectangle;
+			RectangleD r = ClientRectangle;
 			r.Height -= 4;
 			r.Y += 2;
 
@@ -80,7 +81,7 @@ namespace Crow
 			if (Orientation == Orientation.Vertical)
 				gt = Gradient.Type.Vertical;
 
-			Crow.Gradient grad = new Gradient (gt);
+			Gradient grad = new Gradient (gt);
 
 			grad.Stops.Add (new Gradient.ColorStop (0,     new Color (1, 0, 0, 1)));
 			grad.Stops.Add (new Gradient.ColorStop (0.167, new Color (1, 1, 0, 1)));
@@ -93,33 +94,51 @@ namespace Crow
 			grad.SetAsSource (gr, r);
 			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
 			gr.Fill();
-		}
 
-		public override void Paint (ref Context ctx)
-		{
-			base.Paint (ref ctx);
+			r = ClientRectangle;
 
-			Rectangle rb = Slot + Parent.ClientRectangle.Position;
-			ctx.Save ();
-
-			ctx.Translate (rb.X, rb.Y);
-
-			ctx.SetSourceColor (Color.White);
-			Rectangle r = ClientRectangle;
-			if (Orientation == Orientation.Horizontal) {
-				r.Width = 4;
-				r.X = mousePos.X - 2;
-			} else {
-				r.Height = 4;
-				r.Y = mousePos.Y - 2;
+			switch (cursor) {
+			case CursorType.Rectangle:
+				if (Orientation == Orientation.Horizontal) {
+					r.Width = 5;
+					r.X = mousePos.X - 2.5;
+				} else {
+					r.Height = 5;
+					r.Y = mousePos.Y - 2.5;
+				}
+				CairoHelpers.CairoRectangle (gr, r, 1);
+				break;
+			case CursorType.Circle:
+				if (Orientation == Orientation.Horizontal)
+					gr.Arc (mousePos.X, r.Center.Y, 3.5, 0, Math.PI * 2.0);
+				else
+					gr.Arc (r.Center.X, mousePos.Y, 3.5, 0, Math.PI * 2.0);
+				break;
+			case CursorType.Pentagone:
+				if (Orientation == Orientation.Horizontal) {
+					r.Width = 5;
+					r.X = mousePos.X - 2.5;
+					double y = r.CenterD.Y-r.Height*0.2;
+					gr.MoveTo (mousePos.X, y);
+					y += r.Height * 0.15;
+					gr.LineTo (r.Right, y);
+					gr.LineTo (r.Right, r.Bottom-0.5);
+					gr.LineTo (r.Left, r.Bottom-0.5);
+					gr.LineTo (r.Left, y);
+					gr.ClosePath ();
+				} else { 
+				}
+				break;			
 			}
 
-			CairoHelpers.CairoRectangle (ctx, r, 1);
-			ctx.SetSourceColor (Color.White);
-			ctx.LineWidth = 1.0;
-			ctx.Stroke();
-			ctx.Restore ();
+			gr.SetSourceColor (Color.Black);
+			gr.LineWidth = 2.0;
+			gr.StrokePreserve ();
+			gr.SetSourceColor (Color.White);
+			gr.LineWidth = 1.0;
+			gr.Stroke ();
 		}
+
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
 			base.OnLayoutChanges (layoutType);

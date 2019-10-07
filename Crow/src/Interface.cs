@@ -50,6 +50,7 @@ namespace Crow
 		}
 		#endregion
 
+		public IBackend Backend => backend;
 		protected IBackend backend;
 		protected bool running;
 
@@ -127,18 +128,25 @@ namespace Crow
 				Load ("#main.crow").DataSource = this;
 			} catch { }
 		}
-		public virtual void Run () {
+		/// <summary>
+		/// load styling, init default tooltips and context menus, load main.crow resource if exists.
+		/// </summary>
+		public void Init () {
 			loadStyling ();
 
-			initTooltip ();
-			initContextMenus ();
-
-			running = true;
+//			initTooltip ();
+//			initContextMenus ();
 
 			Startup ();
-
+		}
+		/// <summary>
+		/// call Init() then enter the running loop performing ProcessEvents until running==false.
+		/// </summary>
+		public virtual void Run () {
+			Init ();
+			running = true;
 			while (running) {
-				ProcessEvents ();
+				backend?.ProcessEvents ();
 				Thread.Sleep(1);
 			}
 		}
@@ -190,9 +198,8 @@ namespace Crow
 		}
 		#endregion
 
-		public void ProcessEvents ()
+		/*public void ProcessEvents ()
 		{
-
 			//if (armedClick != null) {
 			//	if (lastClickTime.ElapsedMilliseconds > DOUBLECLICK_TRESHOLD) {
 			//		//cancel double click and 
@@ -200,27 +207,7 @@ namespace Crow
 			//		armedClick = null;
 			//	}
 			//}
-
-			Widget w = _hoverWidget;  //previous hover widget 
-
-			backend.ProcessEvents ();
-
-			if (DragAndDropOperation != null)
-				return;
-
-			if (!FOCUS_ON_HOVER || (w == _hoverWidget))
-				return;
-
-			w = _hoverWidget;
-			while (w != null) {
-				if (w.Focusable) {
-					FocusedWidget = w;
-					break;
-				}
-				w = w.FocusParent;
-			}
-
-		}
+		}*/
 
 		#region Static and constants
 		/// <summary>
@@ -597,7 +584,18 @@ namespace Crow
 
 				#if DEBUG_FOCUS
 				NotifyValueChanged("HoverWidget", _hoverWidget);
-				#endif
+#endif
+
+				if (DragAndDropOperation == null && FOCUS_ON_HOVER) {
+					Widget w = _hoverWidget;
+					while (w != null) {
+						if (w.Focusable) {
+							FocusedWidget = w;
+							break;
+						}
+						w = w.FocusParent;
+					}
+				}
 
 				if (_hoverWidget != null)
 				{
@@ -624,7 +622,15 @@ namespace Crow
 				NotifyValueChanged("FocusedWidget", _focusedWidget);
 				#endif
 				if (_focusedWidget != null)
+				{
 					_focusedWidget.HasFocus = true;
+#if DEBUG_FOCUS
+					Debug.WriteLine ("Focus => " + _hoverWidget.ToString ());
+				} else
+					Debug.WriteLine ("Focus => null");
+#else
+				}
+#endif
 			}
 		}
 		#endregion
