@@ -1,44 +1,42 @@
 ﻿<?xml version="1.0"?>
-<Border Background="{./Background}"	Foreground="{./Foreground}"
-		CornerRadius="{./CornerRadius}" BorderWidth="1">
-		<HorizontalStack Spacing="0">
-			<VerticalStack Margin="5">
-				<SaturationValueSelector S="{²./S}" V="{²./V}" Focusable="true" Name="colorSelector" Margin="0"
-					Foreground="{../hueSelector.HueColor}"
-					Width="128" Height="128"/>
-				<HueSelector Hue="{²./H}" Focusable="true" Name="hueSelector" Margin="0" Width="128" Height="20"/>
-			</VerticalStack>
-			<VerticalStack Margin="5" Spacing="1">
-				<Widget Width="34" Height="21" Background="{./SelectedColor}"/>
-				<Label Focusable="true" Selectable="true" Text="{./SelectedColor}" />				
-				<HorizontalStack Height="Fit">
-					<Label Text="R" Width="Fit"/>
-					<Spinner Style="ColorSpinner" Value="{²./R}" Width="46"  />
-				</HorizontalStack>
-				<HorizontalStack Height="Fit">
-					<Label Text="G" Width="Fit"/>
-					<Spinner Style="ColorSpinner" Value="{²./G}" Width="46"  />
-				</HorizontalStack>
-				<HorizontalStack Height="Fit">
-					<Label Text="B" Width="Fit"/>
-					<Spinner Style="ColorSpinner" Value="{²./B}" Width="46"  />
-				</HorizontalStack>
-				<HorizontalStack Height="Fit">
-					<Label Text="A" Width="Fit"/>
-					<Spinner Style="ColorSpinner" Value="{²./A}" Width="46"  />
-				</HorizontalStack>
-				<HorizontalStack Height="Fit">
-					<Label Text="H" Width="Fit"/>
-					<Spinner Style="HSVSpinner" Value="{²./H}" Width="46"  />
-				</HorizontalStack>
-				<HorizontalStack Height="Fit">
-					<Label Text="S" Width="Fit"/>
-					<Spinner Style="HSVSpinner" Value="{²./S}" Width="46"  />
-				</HorizontalStack>
-				<HorizontalStack Height="Fit">
-					<Label Text="V" Width="Fit"/>
-					<Spinner Style="HSVSpinner" Value="{²./V}" Width="46"  />
-				</HorizontalStack>
-			</VerticalStack>
+<Border Background="{./Background}"	Foreground="{./Foreground}" Width="Stretched"
+		CornerRadius="{./CornerRadius}" BorderWidth="1">		
+	<VerticalStack Margin="2">
+		<Widget Width="30" Height="16" Background="{./CurrentColor}"/>
+		<HorizontalStack Height="Fit">
+			<Label Style="labColor" Text="R:"/>
+			<ColorSlider Name="cs" Component="Red" CurrentColor="{²./CurrentColor}"/>			
+			<Label Style="labColorV" Text="{../cs.CurrentValue}" />
 		</HorizontalStack>
+		<HorizontalStack Height="Fit">
+			<Label Style="labColor" Text="G:"/>
+			<ColorSlider Name="cs" Component="Green" CurrentColor="{²./CurrentColor}"/>
+			<Label Style="labColorV" Text="{../cs.CurrentValue}" />
+		</HorizontalStack>
+		<HorizontalStack Height="Fit">
+			<Label Style="labColor" Text="B:"/>
+			<ColorSlider Name="cs" Component="Blue" CurrentColor="{²./CurrentColor}"/>
+			<Label Style="labColorV" Text="{../cs.CurrentValue}" />
+		</HorizontalStack>
+		<HorizontalStack Height="Fit">
+			<Label Style="labColor" Text="A:"/>
+			<ColorSlider Name="cs" Component="Alpha" CurrentColor="{²./CurrentColor}"/>
+			<Label Style="labColorV" Text="{../cs.CurrentValue}" />
+		</HorizontalStack>
+		<HorizontalStack Height="Fit">
+			<Label Style="labColor" Text="H:"/>
+			<ColorSlider Name="cs" Component="Hue" CurrentColor="{²./CurrentColor}"/>
+			<Label Style="labColorV" Text="{../cs.CurrentValue}" />
+		</HorizontalStack>
+		<HorizontalStack Height="Fit">
+			<Label Style="labColor" Text="S:"/>
+			<ColorSlider Name="cs" Component="Saturation" CurrentColor="{²./CurrentColor}"/>
+			<Label Style="labColorV" Text="{../cs.CurrentValue}" />
+		</HorizontalStack>			
+		<HorizontalStack Height="Fit">
+			<Label Style="labColor" Text="V:"/>
+			<ColorSlider Name="cs" Component="Value" CurrentColor="{²./CurrentColor}"/>
+			<Label Style="labColorV" Text="{../cs.CurrentValue}" />
+		</HorizontalStack>
+	</VerticalStack>			
 </Border>

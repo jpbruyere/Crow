@@ -3,6 +3,7 @@
     <TargetFrameworks>net471</TargetFrameworks>
     <OutputType>Exe</OutputType>        
     <EnableDefaultNoneItems>false</EnableDefaultNoneItems>    
+    <ReleaseVersion>0.8.0</ReleaseVersion>
   </PropertyGroup>
             
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -27,4 +28,7 @@
       <Link>Interfaces\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </None>
   </ItemGroup>     
+  <ItemGroup>
+    <None Remove="..\common\ui\Interfaces\basicTests\7.crow" />
+  </ItemGroup>
 </Project>

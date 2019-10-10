@@ -8,14 +8,25 @@ using System.ComponentModel;
 namespace Crow
 {
 	/// <summary>
-	/// Convenient widget for selecting value from enum
+	/// Convenient widget for selecting value among enum values. This is a templated control
+	/// expecting a 'Group' widget named 'Content' inside the template to handle the enum values display.
 	/// </summary>
-	public class EnumSelector : GenericStack
+	public class EnumSelector : TemplatedControl
 	{
 		#region CTOR
 		protected EnumSelector () : base(){}
 		public EnumSelector (Interface iface) : base(iface){}
 		#endregion
+
+		Group enumValueContainer;
+
+		protected override void loadTemplate (Widget template = null)
+		{
+			base.loadTemplate (template);
+			enumValueContainer = this.child.FindByName ("Content") as Group;
+			if (enumValueContainer == null)
+				throw new Exception("EnumSelector template MUST contain a 'Group' named 'Content'");
+		}
 
 		#region private fields
 		Enum enumValue;
@@ -37,20 +48,22 @@ namespace Crow
 
 				if (enumValue != null) {
 					if (enumType != enumValue.GetType ()) {
-						ClearChildren ();
+						enumValueContainer.ClearChildren ();
 						enumType = enumValue.GetType ();
 						foreach (string en in enumType.GetEnumNames ()) {
 							RadioButton rb = new RadioButton (IFace);
 							rb.Caption = en;
-							if (enumValue.ToString() == en)
+							rb.Fit = true;
+							rb.LogicalParent = this;
+							if (enumValue.ToString () == en)
 								rb.IsChecked = true;
-							rb.Checked += (sender, e) => (((RadioButton)sender).Parent as EnumSelector).EnumValue = (Enum)Enum.Parse (enumType, (sender as RadioButton).Caption);
-							AddChild (rb);
-							RegisterForLayouting (LayoutingType.All);
+							rb.Checked += (sender, e) => (((RadioButton)sender).LogicalParent as EnumSelector).EnumValue = (Enum)Enum.Parse (enumType, (sender as RadioButton).Caption);
+							enumValueContainer.AddChild (rb);
 						}
+					
 					}
-				} else 
-					ClearChildren ();
+				} else
+					enumValueContainer.ClearChildren ();
 
 				NotifyValueChanged ("EnumValue", enumValue);
 				RegisterForRedraw ();

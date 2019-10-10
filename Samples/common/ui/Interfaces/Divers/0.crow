@@ -140,9 +140,9 @@
 				</TabItem>
 			</TabView>-->
 			<MessageBox Movable="false"/>
-			<ColorPicker SelectedColor="{²../go.Background}" Name="colorPicker" Margin="5" Fit="True" />
+			<ColorPicker CurrentColor="{²../go.Background}" Name="colorPicker" Margin="5" />
 			<Widget Name="go" Width="100" Height="60" Background="{../../colorList.SelectedItem}"/>
-			<Label Text="{../colorPicker.SelectedColor}"/>
+			<Label Text="{../colorPicker.CurrentColor}"/>
 		</VerticalStack>
 		<Splitter/>
 		<VerticalStack Width="30%" Margin="5">
