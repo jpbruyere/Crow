@@ -1160,7 +1160,7 @@ namespace Crow.IML {
 					typeof (void),
 					CompilerServices.argsBoundValueChange, true);
 
-				il = dm.GetILGenerator (32);
+				il = dm.GetILGenerator (64);
 
 				System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
@@ -1173,7 +1173,7 @@ namespace Crow.IML {
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiVCMbName);
 
 				//test if it's the expected one
-				il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);
+				il.Emit (OpCodes.Ldstr, bindingDef.HasUnresolvedTargetName ? $"{bindingDef.TargetName}.{bindingDef.TargetMember}" : bindingDef.TargetMember);
 				il.Emit (OpCodes.Ldc_I4_4);//StringComparison.Ordinal
 				il.Emit (OpCodes.Call, CompilerServices.stringEquals);
 				il.Emit (OpCodes.Brfalse, endMethod);
@@ -1218,6 +1218,7 @@ namespace Crow.IML {
 			il.DeclareLocal (typeof(object));//used for checking propery less bindings
 			il.DeclareLocal (typeof(MemberInfo));//used for checking propery less bindings
 			il.DeclareLocal (typeof (object));//new datasource store, save one field access
+			il.DeclareLocal (typeof (MemberInfo));//used for binding with datasource.object.member (2 levels)
 			System.Reflection.Emit.Label cancel = il.DefineLabel ();
 			System.Reflection.Emit.Label newDSIsNull = il.DefineLabel ();
 			System.Reflection.Emit.Label cancelInit = il.DefineLabel ();
@@ -1238,9 +1239,19 @@ namespace Crow.IML {
 				il.Emit (OpCodes.Brfalse, newDSIsNull);//new ds is null
 			}
 
-#region fetch initial Value
+			#region fetch initial Value
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
-				il.Emit (OpCodes.Ldloc_2); 
+				il.Emit (OpCodes.Ldloc_2);
+				if (bindingDef.HasUnresolvedTargetName) {
+					il.Emit (OpCodes.Ldstr, bindingDef.TargetName);//load parent object
+					il.Emit (OpCodes.Call, CompilerServices.miGetMembIinfoWithRefx);
+					il.Emit (OpCodes.Stloc_3);
+					il.Emit (OpCodes.Ldloc_3);
+					il.Emit (OpCodes.Brfalse, cancelInit);//may be propertyLessBinding
+					il.Emit (OpCodes.Ldloc_2);//load datasource
+					il.Emit (OpCodes.Ldloc_3);//load first memberInfo
+					il.Emit (OpCodes.Call, CompilerServices.miGetValWithRefx);//get first member level
+				} 
 				il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);//load member name
 				il.Emit (OpCodes.Call, CompilerServices.miGetMembIinfoWithRefx);
 				il.Emit (OpCodes.Stloc_1);//save memberInfo
@@ -1251,12 +1262,16 @@ namespace Crow.IML {
 			il.Emit (OpCodes.Ldarg_1);//load source of dataSourceChanged which is the dest instance
 			il.Emit (OpCodes.Ldloc_2);//load new datasource
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
+				if (bindingDef.HasUnresolvedTargetName) {
+					il.Emit (OpCodes.Ldloc_3);
+					il.Emit (OpCodes.Call, CompilerServices.miGetValWithRefx);//get first member level
+				}
 				il.Emit (OpCodes.Ldloc_1);//push mi for value fetching
 				il.Emit (OpCodes.Call, CompilerServices.miGetValWithRefx);
 			}
 			CompilerServices.emitConvert (il, piSource.PropertyType);
 			il.Emit (OpCodes.Callvirt, piSource.GetSetMethod ());
-#endregion
+			#endregion
 
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
 				il.MarkLabel(cancelInit);
@@ -1268,7 +1283,7 @@ namespace Crow.IML {
 				il.Emit(OpCodes.Ldarg_0);//load ref to this instanciator onto the stack
 				il.Emit (OpCodes.Ldarg_1);//load datasource change source
 				il.Emit (OpCodes.Ldloc_2);//load new datasource
-				il.Emit(OpCodes.Ldc_I4, dmVC);//load index of dynmathod
+				il.Emit(OpCodes.Ldc_I4, dmVC);//load index of dynMethod
 				il.Emit (OpCodes.Call, CompilerServices.miDSChangeEmitHelper);
 
 				il.MarkLabel (cancel);
@@ -1277,7 +1292,8 @@ namespace Crow.IML {
 					il.Emit (OpCodes.Ldarg_1);//arg1: dataSourceChange source, the origine of the binding
 					il.Emit (OpCodes.Ldstr, bindingDef.SourceMember);//arg2: orig member
 					il.Emit (OpCodes.Ldloc_2);//arg3: new datasource
-					il.Emit (OpCodes.Ldstr, bindingDef.TargetMember);//arg4: dest member
+					il.Emit (OpCodes.Ldstr, bindingDef.HasUnresolvedTargetName ?
+						$"{bindingDef.TargetName}.{bindingDef.TargetMember}" : bindingDef.TargetMember);//arg4: dest member
 					il.Emit (OpCodes.Call, CompilerServices.miDSReverseBinding);
 				}
 
@@ -1297,6 +1313,16 @@ namespace Crow.IML {
 			Debug.WriteLine("\tDataSource Changed: " + dm.Name);
 #endif
 		}
+
+		static void emitSetValue (ILGenerator il, MemberInfo mi)
+		{
+			if (mi.MemberType == MemberTypes.Field)
+				il.Emit (OpCodes.Stfld, mi as FieldInfo);
+			else if (mi.MemberType == MemberTypes.Property)
+				il.Emit (OpCodes.Callvirt, (mi as PropertyInfo).GetSetMethod ());
+			else
+				throw new NotImplementedException ();
+		}
 		/// <summary>
 		/// Two way binding for datasource, graphicObj=>dataSource link, datasource value has priority
 		/// and will be set as init for source property (in emitDataSourceBindings func)
@@ -1309,12 +1335,18 @@ namespace Crow.IML {
 			Type tOrig = orig.GetType ();
 			Type tDest = dest.GetType ();
 			PropertyInfo piOrig = tOrig.GetProperty (origMember);
-			PropertyInfo piDest = tDest.GetProperty (destMember);
-
-			if (piDest == null) {
-				Debug.WriteLine ("Member '{0}' not found in new DataSource '{1}' of '{2}'", destMember, dest, orig);
-				return;
+			List<MemberInfo> miDests = new List<MemberInfo> ();
+			Type curType = tDest;
+			foreach (string m in destMember.Split('.')) {
+				MemberInfo miDest = curType.GetMember (m).FirstOrDefault ();
+				if (miDest == null) {
+					Debug.WriteLine ($"Member '{destMember}' not found in new DataSource '{dest}' of '{orig}'");
+					return;
+				}
+				miDests.Add (miDest);
+				curType = CompilerServices.GetMemberInfoType (miDest);
 			}
+
 #if DEBUG_BINDING
 			Debug.WriteLine ("DS Reverse binding: Member '{0}' found in new DS '{1}' of '{2}'", destMember, dest, orig);
 #endif
@@ -1322,7 +1354,7 @@ namespace Crow.IML {
 #region ValueChanged emit
 			DynamicMethod dm = new DynamicMethod ("dyn_valueChanged" + NewId,
 				typeof (void), CompilerServices.argsBoundValueChange, true);
-			ILGenerator il = dm.GetILGenerator (256);
+			ILGenerator il = dm.GetILGenerator (64);
 
 			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
@@ -1340,20 +1372,44 @@ namespace Crow.IML {
 			//set destination member with valueChanged new value
 			//load destination ref
 			il.Emit (OpCodes.Ldarg_0);
+			for (int i = 0; i < miDests.Count - 1; i++) {
+				if (miDests [i].MemberType == MemberTypes.Field)
+					il.Emit (OpCodes.Ldflda, miDests [i] as FieldInfo);
+				else if (miDests [i].MemberType == MemberTypes.Property) {
+					PropertyInfo pi = miDests [i] as PropertyInfo;
+					if (pi.PropertyType.IsValueType) {
+						il.Emit (OpCodes.Dup);//dup parent for calling property set afterward
+						il.Emit (OpCodes.Callvirt, pi.GetGetMethod ());
+						il.Emit (OpCodes.Box, pi.PropertyType);
+						il.Emit (OpCodes.Dup);//dup boxed valueType, should unbox before setting parent
+					} else
+						il.Emit (OpCodes.Callvirt, pi.GetGetMethod ());
+				} else
+					throw new NotImplementedException ();
+			}
+
 			//load new value onto the stack
 			il.Emit (OpCodes.Ldarg_2);
 			il.Emit (OpCodes.Ldfld, CompilerServices.fiVCNewValue);
 
-			//if (piOrig.PropertyType != piDest.PropertyType)
-				CompilerServices.emitConvert (il, piOrig.PropertyType, piDest.PropertyType);
+			CompilerServices.emitConvert (il, piOrig.PropertyType, curType);
 
-			il.Emit (OpCodes.Callvirt, piDest.GetSetMethod ());
+			emitSetValue (il, miDests.Last ());
 
+			for (int i = miDests.Count -2; i >= 0; i--) {
+				if (miDests [i].MemberType != MemberTypes.Property)
+					continue;
+				PropertyInfo pi = miDests [i] as PropertyInfo;
+				if (!pi.PropertyType.IsValueType)
+					continue;
+				il.Emit (OpCodes.Ldobj, pi.PropertyType);
+				il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());//updating parent
+			}
 			il.MarkLabel (endMethod);
 			il.Emit (OpCodes.Ret);
-#endregion
-
-			orig.ValueChanged += (EventHandler<ValueChangeEventArgs>)dm.CreateDelegate (typeof(EventHandler<ValueChangeEventArgs>), dest);
+			#endregion
+			EventHandler<ValueChangeEventArgs> tmp = (EventHandler<ValueChangeEventArgs>)dm.CreateDelegate (typeof (EventHandler<ValueChangeEventArgs>), dest);
+			orig.ValueChanged += tmp;
 		}
 #endregion
 

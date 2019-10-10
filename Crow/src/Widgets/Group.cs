@@ -91,6 +91,13 @@ namespace Crow
             set { _multiSelect = value; }
         }
 		public virtual void AddChild(Widget g){
+#if DEBUG
+			if (disposed) {
+				Console.WriteLine ($"AddChild ({g}) in disposed Widget: {this}\n{System.Environment.StackTrace}");
+				return;
+			}
+#endif
+
 			childrenRWLock.EnterWriteLock();
 
 			g.Parent = this;
@@ -132,6 +139,12 @@ namespace Crow
 			child.Dispose ();
         }
 		public virtual void InsertChild (int idx, Widget g) {
+#if DEBUG
+			if (disposed) {
+				Console.WriteLine ($"InsertChild ({idx},{g}) in disposed Widget: {this}\n{System.Environment.StackTrace}");
+				return;
+			}
+#endif
 			childrenRWLock.EnterWriteLock ();
 				
 			g.Parent = this;
@@ -164,7 +177,7 @@ namespace Crow
 
 			resetChildrenMaxSize ();
 
-			this.RegisterForLayouting (LayoutingType.Sizing);
+			RegisterForLayouting (LayoutingType.Sizing);
 			ChildrenCleared.Raise (this, new EventArgs ());
 		}
 		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
@@ -463,8 +476,10 @@ namespace Crow
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing) {
+				childrenRWLock.EnterReadLock ();
 				foreach (Widget c in children)
 					c.Dispose ();
+				childrenRWLock.ExitReadLock ();
 			}
 			base.Dispose (disposing);
 		}

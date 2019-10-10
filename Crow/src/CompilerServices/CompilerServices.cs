@@ -322,10 +322,7 @@ namespace Crow.IML
 				return;
 			}
 
-			if (miDest.MemberType == MemberTypes.Property)
-				destType =(miDest as PropertyInfo).PropertyType;
-			else if (miDest.MemberType == MemberTypes.Field)
-				destType =(miDest as FieldInfo).FieldType;
+			destType = CompilerServices.GetMemberInfoType (miDest);
 
 			try {
 				if (value != null) {
@@ -1050,6 +1047,12 @@ namespace Crow.IML
 
 			il.Emit (OpCodes.Ldfld, fi);
 		}
+
+		//helper to get member info underlying type.
+		internal static Type GetMemberInfoType (MemberInfo mi) =>
+				mi.MemberType == MemberTypes.Field ? (mi as FieldInfo).FieldType :
+				mi.MemberType == MemberTypes.Property ? (mi as PropertyInfo).PropertyType :
+				mi.MemberType == MemberTypes.Method ? (mi as MethodInfo).ReturnType : null;
 	}
 }
 

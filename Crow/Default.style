@@ -227,3 +227,20 @@ EnumSelector {
     Height = "Fit";
     Spacing = "0";
 }
+labColor {
+	Margin="2";	
+	Width="Fit";
+}
+labColorV {
+	Margin="1";		
+	Width="Fit";
+}
+ColorSlider {
+	Focusable="true";
+	Height="12";
+	Margin="0";
+}
+ColorPicker {
+	Height="Fit";
+	MinimumSize="200,100";	
+}

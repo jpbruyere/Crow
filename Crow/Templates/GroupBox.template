@@ -3,7 +3,7 @@
 	<Group>
 		<VerticalStack Spacing="0">
 			<Widget Height="6"/>
-			<Border  CornerRadius="5" BorderWidth="1" Margin="10" Foreground="{./Foreground}">
+			<Border  CornerRadius="{./CornerRadius}" BorderWidth="1" Margin="10" Foreground="{./Foreground}">
 				<Container Name="Content" Margin="0" MinimumSize="70,10"/>
 			</Border>
 		</VerticalStack>

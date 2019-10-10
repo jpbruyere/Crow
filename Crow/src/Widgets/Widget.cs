@@ -1,28 +1,6 @@
-﻿//
-// GraphicObject.cs
+﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.Collections.Generic;
@@ -163,13 +141,13 @@ namespace Crow
 			GC.SuppressFinalize(this);  
 		}  
 		~Widget(){
-			Console.WriteLine(this.ToString() + " not disposed by user");
+			Debug.WriteLine(this.ToString() + " not disposed by user");
 			Dispose(false);
 		}
 		protected virtual void Dispose(bool disposing){
 			if (disposed){
 				#if DEBUG_DISPOSE
-				Console.WriteLine ("Trying to dispose already disposed obj: {0}", this.ToString());
+				Debug.WriteLine ("Trying to dispose already disposed obj: {0}", this.ToString());
 				#endif
 				return;
 			}
@@ -1408,6 +1386,10 @@ namespace Crow
 		/// </summary>
 		/// <param name="clip">Clip rectangle</param>
 		public virtual void RegisterClip(Rectangle clip){
+			if (disposed) {
+				Debug.WriteLine ($"Trying to register clip for disposed Widget: {this}\n{System.Environment.StackTrace}");
+				return;
+			}
 			#if DEBUG_LOG
 			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GORegisterClip, this);
 			#endif
@@ -1417,6 +1399,10 @@ namespace Crow
 				r.Width -= r.Right - cb.Right;
 			if (r.Bottom > cb.Bottom)
 				r.Height -= r.Bottom - cb.Bottom;
+			if (r.Width < 0 || r.Height < 0) {
+				Debug.WriteLine ($"Invalid clip: {clip}:{r} hnd:{this}");//\n{Environment.StackTrace}");
+				return;
+			}
 			if (cacheEnabled && !IsDirty)
 				Clipping.UnionRectangle (r);
 			if (Parent == null)
@@ -1433,6 +1419,12 @@ namespace Crow
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForGraphicUpdate ()
 		{
+#if DEBUG
+			if (disposed) {
+				Console.WriteLine ($"RegisterForGraphicUpdate for disposed Widget: {this}\n{System.Environment.StackTrace}");
+				return;
+			}
+#endif
 			IsDirty = true;
 			if (Width.IsFit || Height.IsFit)
 				RegisterForLayouting (LayoutingType.Sizing);
@@ -1443,6 +1435,13 @@ namespace Crow
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForRedraw ()
 		{
+#if DEBUG
+			if (disposed) {
+				Console.WriteLine ($"RegisterForRedraw for disposed Widget: {this}\n{System.Environment.StackTrace}");
+				return;
+			}
+#endif
+
 			IsDirty = true;
 			if (RegisteredLayoutings == LayoutingType.None)
 				IFace.EnqueueForRepaint (this);
@@ -1461,6 +1460,12 @@ namespace Crow
 		}
 		public virtual bool ArrangeChildren { get { return false; } }
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
+#if DEBUG
+			if (disposed) {
+				Console.WriteLine ($"RegisterForLayouting({layoutType}) for disposed Widget: {this}\n{System.Environment.StackTrace}");
+				return;
+			}
+#endif
 			if (Parent == null)
 				return;
 			lock (IFace.LayoutMutex) {
@@ -1744,12 +1749,29 @@ namespace Crow
 		/// of the widget </summary>
 		public virtual void Paint (ref Context ctx)
 		{
-			#if DEBUG_LOG
+#if DEBUG_LOG
 			DebugLog.AddEvent(DbgEvtType.GOPaint, this);
-			#endif
+#endif
 			//TODO:this test should not be necessary
-			if (Slot.Height < 0 || Slot.Width < 0 || parent == null)
-				return;
+
+			if (disposed || Slot.Height < 0 || Slot.Width < 0 || parent == null){
+#if DEBUG
+				Console.ForegroundColor = ConsoleColor.Red;
+				if (disposed)
+					Console.WriteLine ($"Paint disposed widget: {this}");
+				Console.ForegroundColor = ConsoleColor.DarkRed;
+				if (Slot.Height < 0 || Slot.Width < 0)
+					Console.WriteLine ($"Paint slot invalid ({Slot}): {this}");
+				Console.ForegroundColor = ConsoleColor.DarkMagenta;
+				if (parent == null)
+					Console.WriteLine ($"Paint with parent == null: {this}");
+				Console.ForegroundColor = ConsoleColor.Magenta;
+				if (!isVisible)
+					Console.WriteLine ($"Paint invisible widget: {this}");
+				Console.ForegroundColor = ConsoleColor.Gray;
+#endif
+				return; 
+			}
 			lock (this) {
 				if (cacheEnabled) {
 					if (Slot.Width > Interface.MaxCacheSize || Slot.Height > Interface.MaxCacheSize)

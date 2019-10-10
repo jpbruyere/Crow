@@ -977,7 +977,7 @@ namespace Crow
 		MouseCursor cursor = MouseCursor.Arrow;
 
 		public MouseState Mouse;
-		Stopwatch lastMouseDown = new Stopwatch (), mouseRepeatTimer = new Stopwatch ();
+		Stopwatch lastMouseDown = Stopwatch.StartNew (), mouseRepeatTimer = new Stopwatch ();
 		bool doubleClickTriggered;	//next mouse up will trigger a double click
 		//int mouseRepeatCount;
 		MouseButtonEventArgs lastMouseDownEvent;
