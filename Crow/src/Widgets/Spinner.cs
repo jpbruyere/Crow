@@ -17,6 +17,11 @@ namespace Crow
 		}
 		#endregion
 
+		public override void onMouseClick (object sender, MouseButtonEventArgs e)
+		{
+			e.Handled = true;
+			base.onMouseClick (sender, e);
+		}
 		void onUp (object sender, MouseButtonEventArgs e)
 		{
 			Value += this.SmallIncrement;

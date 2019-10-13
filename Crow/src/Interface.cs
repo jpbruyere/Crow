@@ -134,8 +134,8 @@ namespace Crow
 		public void Init () {
 			loadStyling ();
 
-//			initTooltip ();
-//			initContextMenus ();
+			initTooltip ();
+			//initContextMenus ();
 
 			Startup ();
 		}
@@ -210,15 +210,13 @@ namespace Crow
 		}*/
 
 		#region Static and constants
-		/// <summary>
-		/// Crow configuration root path
-		/// </summary>
+		/// <summary>Crow configuration root path</summary>
 		public static string CROW_CONFIG_ROOT;
 		/// <summary>If true, mouse focus is given when mouse is over control</summary>
 		public static bool FOCUS_ON_HOVER = true;
 		/// <summary> Threshold to catch borders for sizing </summary>
 		public static int BorderThreshold = 5;
-		/// <summary> delay before tooltip appear </summary>
+		/// <summary> delay before tooltip appears </summary>
 		public static int TOOLTIP_DELAY = 500;
 		/// <summary>Double click threshold in milisecond</summary>
 		public static int DOUBLECLICK_TRESHOLD = 240;//max duration between two mouse_down evt for a dbl clk in milisec.
@@ -340,7 +338,7 @@ namespace Crow
 		#endregion
 
 		#region Default values and Style loading
-		/// Default values of properties from GraphicObjects are retrieve from XML Attributes.
+		/// Default values of properties from Widgets are retrieve from XML Attributes.
 		/// The reflexion process used to retrieve those values being very slow, it is compiled in MSIL
 		/// and injected as a dynamic method referenced in the DefaultValuesLoader Dictionnary.
 		/// The compilation is done on the first object instancing, and is also done for custom widgets
@@ -368,7 +366,6 @@ namespace Crow
 				using (Stream stream = assembly.GetManifestResourceStream (s)) {
 					new StyleReader (this.Styling, stream, s);
 				}
-
 			}
 		}
 		#endregion
@@ -490,11 +487,11 @@ namespace Crow
 		/// <param name="path">path of the iml file to load</param>
 		public virtual Widget CreateInstance (string path)
 		{
-			try {
+			//try {
 				return GetInstantiator (path).CreateInstance ();
-			} catch (Exception ex) {
-				throw new Exception ("Error loading <" + path + ">:", ex);
-			}
+			//} catch (Exception ex) {
+			//	throw new Exception ("Error loading <" + path + ">:", ex);
+			//}
 		}
 		/// <summary>
 		/// Create an instance of a GraphicObject linked to this interface but not added to the GraphicTree

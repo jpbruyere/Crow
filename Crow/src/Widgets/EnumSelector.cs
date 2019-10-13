@@ -53,7 +53,6 @@ namespace Crow
 						foreach (string en in enumType.GetEnumNames ()) {
 							RadioButton rb = new RadioButton (IFace);
 							rb.Caption = en;
-							rb.Fit = true;
 							rb.LogicalParent = this;
 							if (enumValue.ToString () == en)
 								rb.IsChecked = true;

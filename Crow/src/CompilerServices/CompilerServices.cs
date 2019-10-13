@@ -269,6 +269,8 @@ namespace Crow.IML
 				name = "ToInt16";
 			else if (targetType == typeof (int))
 				name = "ToInt32";
+			else if (targetType == typeof (uint))
+				name = "ToUInt32";
 			else if (targetType == typeof (long))
 				name = "ToInt64";
 			else if (targetType == typeof (double))

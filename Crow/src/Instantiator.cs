@@ -1318,9 +1318,10 @@ namespace Crow.IML {
 		{
 			if (mi.MemberType == MemberTypes.Field)
 				il.Emit (OpCodes.Stfld, mi as FieldInfo);
-			else if (mi.MemberType == MemberTypes.Property)
-				il.Emit (OpCodes.Callvirt, (mi as PropertyInfo).GetSetMethod ());
-			else
+			else if (mi.MemberType == MemberTypes.Property) {
+				MethodInfo mt = (mi as PropertyInfo).GetSetMethod ();
+				il.Emit (mt.IsVirtual?OpCodes.Callvirt:OpCodes.Call, mt);
+			} else
 				throw new NotImplementedException ();
 		}
 		/// <summary>
@@ -1356,6 +1357,9 @@ namespace Crow.IML {
 				typeof (void), CompilerServices.argsBoundValueChange, true);
 			ILGenerator il = dm.GetILGenerator (64);
 
+
+			Stack<LocalBuilder> locals = new Stack<LocalBuilder> ();
+
 			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
 			il.Emit (OpCodes.Nop);
@@ -1377,13 +1381,17 @@ namespace Crow.IML {
 					il.Emit (OpCodes.Ldflda, miDests [i] as FieldInfo);
 				else if (miDests [i].MemberType == MemberTypes.Property) {
 					PropertyInfo pi = miDests [i] as PropertyInfo;
+					MethodInfo mi_g = pi.GetGetMethod ();
 					if (pi.PropertyType.IsValueType) {
 						il.Emit (OpCodes.Dup);//dup parent for calling property set afterward
-						il.Emit (OpCodes.Callvirt, pi.GetGetMethod ());
-						il.Emit (OpCodes.Box, pi.PropertyType);
-						il.Emit (OpCodes.Dup);//dup boxed valueType, should unbox before setting parent
-					} else
-						il.Emit (OpCodes.Callvirt, pi.GetGetMethod ());
+						il.Emit (mi_g.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, mi_g);
+						LocalBuilder lb = il.DeclareLocal (pi.PropertyType);
+						il.Emit (OpCodes.Stloc, lb);
+						il.Emit (OpCodes.Ldloca, lb);
+						locals.Push (lb);
+					} else {
+						il.Emit (mi_g.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, mi_g);
+					}
 				} else
 					throw new NotImplementedException ();
 			}
@@ -1402,8 +1410,9 @@ namespace Crow.IML {
 				PropertyInfo pi = miDests [i] as PropertyInfo;
 				if (!pi.PropertyType.IsValueType)
 					continue;
-				il.Emit (OpCodes.Ldobj, pi.PropertyType);
-				il.Emit (OpCodes.Callvirt, pi.GetSetMethod ());//updating parent
+				MethodInfo mi_s = pi.GetSetMethod ();
+				il.Emit (OpCodes.Ldloc, locals.Pop());
+				il.Emit (mi_s.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, mi_s);
 			}
 			il.MarkLabel (endMethod);
 			il.Emit (OpCodes.Ret);
