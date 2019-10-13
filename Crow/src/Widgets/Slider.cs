@@ -83,7 +83,7 @@ namespace Crow
 		public virtual int CursorSize {
 			get { return _cursorSize; }
 			set {
-				if (_cursorSize == value || value < 8)
+				if (_cursorSize == value || value < 4)
 					return;
 				_cursorSize = value;
 				RegisterForGraphicUpdate ();

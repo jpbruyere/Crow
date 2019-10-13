@@ -114,7 +114,7 @@ namespace Crow
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Crow.ItemTemplate"/> class by parsing the IML fragment passed as arg.
 		/// </summary>
-		/// <param name="path">IML fragment to parse</param>
+		/// <param name="ImlFragment">IML fragment to parse</param>
 		/// <param name="_dataType">type this item will be choosen for, or member of the data item</param>
 		/// <param name="_fetchDataMethod">for hierarchical data, method to call for children fetching</param>
 		public ItemTemplate (Interface _iface, Stream ImlFragment, string _dataTest, string _dataType, string _fetchDataMethod)
@@ -127,7 +127,7 @@ namespace Crow
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Crow.ItemTemplate"/> class using the opened XmlReader in args.
 		/// </summary>
-		/// <param name="path">XML reader positionned before or at the root node</param>
+		/// <param name="reader">XML reader positionned before or at the root node</param>
 		/// <param name="_dataType">type this item will be choosen for, or member of the data item</param>
 		/// <param name="_fetchDataMethod">for hierarchical data, method to call for children fetching</param>
 		public ItemTemplate (Interface _iface, XmlReader reader, string _dataTest = "TypeOf" , string _dataType = null, string _fetchDataMethod = null)
@@ -272,9 +272,6 @@ namespace Crow
             else
                 il.Emit (OpCodes.Callvirt, miGetDatas);
         }
-
-	
-	
 	}
 }
 

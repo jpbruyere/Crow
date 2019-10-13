@@ -41,6 +41,8 @@ namespace Crow {
                 Height = value.Height;
             }
         }
+		[XmlIgnore]
+		public SizeD SizeD => new SizeD (Width, Height); 
 		[XmlIgnore]public Point Position{
 			get => new Point (X, Y);
 			set {
