@@ -577,9 +577,18 @@ namespace Crow.IML
 				if (destType.IsAssignableFrom (origType))
 					il.Emit (OpCodes.Castclass, destType);
 				else {
+					if (origType == typeof (string)) {
+						//search dest type for parse method
+						MethodInfo miParse = destType.GetMethod
+												("Parse", BindingFlags.Static | BindingFlags.Public,
+													Type.DefaultBinder, new Type [] { typeof (string) }, null);
+						if (miParse == null)
+							throw new Exception ("no Parse method found for: " + destType.FullName);
+						il.Emit (OpCodes.Call, miParse);
+					}
 					//implicit conversion can't be defined from or to object base class,
 					//so we will check if object underlying type is one of the implicit converter of destType
-					if (origType == typeof (object)) {//test all implicit converter to destType on obj
+					else if (origType == typeof (object)) {//test all implicit converter to destType on obj
 						System.Reflection.Emit.Label emitTestNextImpOp;
 						System.Reflection.Emit.Label emitImpOpFound = il.DefineLabel ();
 						foreach (MethodInfo mi in destType.GetMethods (BindingFlags.Public | BindingFlags.Static)) {
