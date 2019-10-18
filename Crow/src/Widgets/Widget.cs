@@ -316,7 +316,7 @@ namespace Crow
 		/// widget inside the stack, which is never added to the contentSize, instead, its size
 		/// is deducted from (parent.ClientRectangle - contentSize)
 		/// </summary>
-		internal Size contentSize;
+		public Size contentSize;
 		#endregion
 
 		#region ILayoutable
@@ -615,27 +615,9 @@ namespace Crow
 					if (value < minimumSize.Width || (value > maximumSize.Width && maximumSize.Width > 0))
 						return;
 				}
-				Measure old = width;
 				width = value;
 				NotifyValueChanged ("Width", width);
-				if (width == Measure.Stretched || old == Measure.Stretched) {
-					//NotifyValueChanged ("WidthPolicy", width.Policy);
-					//contentSize in Stacks are only update on childLayoutChange, and the single stretched
-					//child of the stack is not counted in contentSize, so when changing size policy of a child
-					//we should adapt contentSize
-					//TODO:check case when child become stretched, and another stretched item already exists.
-					GenericStack gs = Parent as GenericStack;
-					if (gs != null){ //TODO:check if I should test Group instead
-						if (gs.Orientation == Orientation.Horizontal) {
-							if (width == Measure.Stretched)
-								gs.contentSize.Width -= this.LastSlots.Width;
-							else
-								gs.contentSize.Width += this.LastSlots.Width;
-						}
-					}							
-				}
-
-				this.RegisterForLayouting (LayoutingType.Width);
+				RegisterForLayouting (LayoutingType.Width);
 			}
 		}
 		/// <summary>
@@ -656,23 +638,9 @@ namespace Crow
 					if (value < minimumSize.Height || (value > maximumSize.Height && maximumSize.Height > 0))
 						return;
 				}
-				Measure old = height;
 				height = value;
 				NotifyValueChanged ("Height", height);
-				if (height == Measure.Stretched || old == Measure.Stretched) {
-					//NotifyValueChanged ("HeightPolicy", HeightPolicy);
-					GenericStack gs = Parent as GenericStack;
-					if (gs != null){ //TODO:check if I should test Group instead
-						if (gs.Orientation == Orientation.Vertical) {
-							if (height == Measure.Stretched)
-								gs.contentSize.Height -= this.LastSlots.Height;
-							else
-								gs.contentSize.Height += this.LastSlots.Height;
-						}
-					}
-				}
-
-				this.RegisterForLayouting (LayoutingType.Height);
+				RegisterForLayouting (LayoutingType.Height);
 			}
 		}
 		/// <summary>

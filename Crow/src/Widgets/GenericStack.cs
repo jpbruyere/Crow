@@ -157,15 +157,20 @@ namespace Crow
 			case LayoutingType.Width:
 				if (Orientation == Orientation.Horizontal) {
 					if (go.Width == Measure.Stretched) {
-						if (stretchedGO == null && Width != Measure.Fit)
+						if (stretchedGO == null && Width != Measure.Fit) {
 							stretchedGO = go;
-						else if (stretchedGO != go) {
+							contentSize.Width -= go.LastSlots.Width;
+						} else if (stretchedGO != go) {
 							go.Slot.Width = 0;
 							go.Width = Measure.Fit;
 							return;
 						}
+					} else if (stretchedGO == go) {
+						stretchedGO = null;
+						contentSize.Width += go.Slot.Width;
 					} else
 						contentSize.Width += go.Slot.Width - go.LastSlots.Width;
+
 
 					adjustStretchedGo (LayoutingType.Width);					
 					
@@ -179,13 +184,17 @@ namespace Crow
 			case LayoutingType.Height:
 				if (Orientation == Orientation.Vertical) {
 					if (go.Height == Measure.Stretched) {
-						if (stretchedGO == null && Height != Measure.Fit)
+						if (stretchedGO == null && Height != Measure.Fit) {
 							stretchedGO = go;
-						else if (stretchedGO != go){
+							contentSize.Height -= go.LastSlots.Height;
+						} else if (stretchedGO != go) {
 							go.Slot.Height = 0;
 							go.Height = Measure.Fit;
 							return;
 						}
+					} else if (stretchedGO == go) {
+						stretchedGO = null;
+						contentSize.Height += go.Slot.Height;
 					} else
 						contentSize.Height += go.Slot.Height - go.LastSlots.Height;
 					
