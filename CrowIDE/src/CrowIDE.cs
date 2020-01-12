@@ -46,7 +46,7 @@ namespace Crow.Coding
             CMDCopy = new Command(new Action(() => copy())) { Caption = "Copy", Icon = new SvgPicture("#CrowIDE.icons.copy-file.svg"), CanExecute = false};
             CMDPaste = new Command(new Action(() => paste())) { Caption = "Paste", Icon = new SvgPicture("#CrowIDE.icons.paste-on-document.svg"), CanExecute = false};
             CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("help"))) { Caption = "Help", Icon = new SvgPicture("#CrowIDE.icons.question.svg") };
-			CMDOptions = new Command(new Action(() => loadWindow("#CrowIDE.ui.Options.crow"))) { Caption = "Editor Options", Icon = new SvgPicture("#CrowIDE.icons.tools.svg") };
+			CMDOptions = new Command(new Action(() => loadWindow("#CrowIDE.ui.Options.crow", this))) { Caption = "Editor Options", Icon = new SvgPicture("#CrowIDE.icons.tools.svg") };
 
 			cmdCloseSolution = new Command(new Action(() => closeSolution()))
 			{ Caption = "Close Solution", Icon = new SvgPicture("#CrowIDE.icons.paste-on-document.svg"), CanExecute = false};
@@ -71,7 +71,7 @@ namespace Crow.Coding
 			CMDViewGTExp = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winGTExplorer.crow",this)))
 			{ Caption = "Graphic Tree Explorer", CanExecute = true};
 			CMDCompile = new Command(new Action(() => compileSolution()))
-			{ Caption = "Compile", CanExecute = false};
+			{ Caption = "Compile Solution", CanExecute = false};
 			CMDViewProjProps = new Command(new Action(loadProjProps))
 			{ Caption = "Project Properties", CanExecute = false};
 		}
@@ -81,7 +81,7 @@ namespace Crow.Coding
 		}
 		void openOptionsDialog(){}
 		void newFile() {			
-			currentSolution.OpenedItems.AddElement(new ProjectFile());
+			currentSolution.OpenedItems.Add(new ProjectFile());
 		}
 		void saveFileDialog() {}
 		void undo() {}
@@ -138,7 +138,7 @@ namespace Crow.Coding
 
 		public CrowIDE ()
 			: base(1024, 800)
-		{			
+		{
 		}
 
 		Instantiator instFileDlg;
@@ -160,8 +160,8 @@ namespace Crow.Coding
 
 			if (ReopenLastSolution && !string.IsNullOrEmpty (LastOpenSolution)) {
 				CurrentSolution = new Workspace (LastOpenSolution);
-				//lock(MainIFace.UpdateMutex)
-				//	CurrentSolution.ReopenItemsSavedInUserConfig ();
+				lock(MainIFace.UpdateMutex)
+					CurrentSolution.ReopenItemsSavedInUserConfig ();
 			}
 
 			instFileDlg = Instantiator.CreateFromImlFragment

@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>        
     <EnableDefaultItems>false</EnableDefaultItems>
     <StartupObject>Crow.Coding.CrowIDE</StartupObject>
+    <ReleaseVersion>0.8.0</ReleaseVersion>
   </PropertyGroup>
               
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

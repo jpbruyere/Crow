@@ -37,7 +37,12 @@ namespace Crow
 	}
 	public interface IObservableList {
 		event EventHandler<ListChangedEventArg> ListAdd;
-		event EventHandler<ListChangedEventArg> ListRemove;		
+		event EventHandler<ListChangedEventArg> ListRemove;
+		event EventHandler<ListChangedEventArg> ListEdit;
+
+		void Insert ();
+		void Remove ();
+		void RaiseEdit ();
 	}
 }
 

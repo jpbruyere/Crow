@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net471</TargetFrameworks>
+    <TargetFrameworks>net472</TargetFrameworks>
     <OutputType>Exe</OutputType>        
     <EnableDefaultNoneItems>false</EnableDefaultNoneItems>    
     <ReleaseVersion>0.8.0</ReleaseVersion>

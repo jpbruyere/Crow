@@ -1,28 +1,6 @@
-﻿//
-// Instantiator.cs
+﻿// Copyright (c) 2013-2019  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.Collections.Generic;
@@ -256,7 +234,6 @@ namespace Crow.IML {
 			emitGOLoad (ctx, tmpXml);
 
 			ctx.curLine = curLine;
-			//emitCheckAndBindValueChanged (ctx);
 		}
 		/// <summary>
 		/// Parses the item template tag.
@@ -1141,22 +1118,39 @@ namespace Crow.IML {
 			Debug.WriteLine("\tDataSource Changed: " + dm.Name);
 #endif
 		}
+
 		/// <summary>
 		/// create the valuechanged handler, the datasourcechanged handler and emit event handling
 		/// </summary>
-		void emitDataSourceBindings(IMLContext ctx, BindingDefinition bindingDef){
+		void emitDataSourceBindings (IMLContext ctx, BindingDefinition bindingDef)
+		{
+			Delegate del = emitDataSourceBindings (ctx.CurrentNodeType.GetProperty (bindingDef.SourceMember), bindingDef);
+
+			//store dschange delegate in instatiator instance for access while instancing graphic object
+			int delDSIndex = cachedDelegates.Count;
+			cachedDelegates.Add (del);
+
+			ctx.emitCachedDelegateHandlerAddition (delDSIndex, CompilerServices.eiDSChange);
+		}
+
+		/// <summary>
+		/// create the valuechanged handler and the datasourcechanged handler and return the 
+		/// DataSourceChange delegate
+		/// </summary>
+		public Delegate emitDataSourceBindings (PropertyInfo piSource, BindingDefinition bindingDef){		
+
 #if DEBUG_BINDING_FUNC_CALLS
 			Console.WriteLine ($"emitDataSourceBindings: {bindingDef}");
 #endif
 			DynamicMethod dm = null;
 			ILGenerator il = null;
 			int dmVC = 0;
-			PropertyInfo piSource = ctx.CurrentNodeType.GetProperty(bindingDef.SourceMember);
+
 			//if no dataSource member name is provided, valuechange is not handle and datasource change
 			//will be used as origine value
 			string delName = $"dyn_DSvalueChanged_{bindingDef.SourceMember}_{bindingDef.TargetMember}_{NewId}";
 			if (!string.IsNullOrEmpty(bindingDef.TargetMember)){
-#region create valuechanged method
+			#region create valuechanged method
 				dm = new DynamicMethod (delName,
 					typeof (void),
 					CompilerServices.argsBoundValueChange, true);
@@ -1303,17 +1297,13 @@ namespace Crow.IML {
 			il.MarkLabel (newDSIsNull);
 			il.Emit (OpCodes.Ret);
 
-			//store dschange delegate in instatiator instance for access while instancing graphic object
-			int delDSIndex = cachedDelegates.Count;
-			cachedDelegates.Add(dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
-#endregion
-
-			ctx.emitCachedDelegateHandlerAddition(delDSIndex, CompilerServices.eiDSChange);
-
 #if DEBUG_BINDING
 			Debug.WriteLine("\tDataSource ValueChanged: " + delName);
 			Debug.WriteLine("\tDataSource Changed: " + dm.Name);
 #endif
+
+			return dm.CreateDelegate (CompilerServices.ehTypeDSChange, this);
+#endregion
 		}
 
 		static void emitSetValue (ILGenerator il, MemberInfo mi)
@@ -1322,8 +1312,7 @@ namespace Crow.IML {
 				il.Emit (OpCodes.Stfld, mi as FieldInfo);
 			else if (mi.MemberType == MemberTypes.Property) {
 				MethodInfo mt = (mi as PropertyInfo).GetSetMethod ();
-				//il.Emit (mt.IsVirtual?OpCodes.Callvirt:OpCodes.Call, mt);
-				il.Emit (OpCodes.Callvirt, mt);
+				il.Emit (mt.IsVirtual?OpCodes.Callvirt:OpCodes.Call, mt);
 			} else
 				throw new NotImplementedException ();
 		}

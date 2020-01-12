@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<TargetFramework>netstandard2.0</TargetFramework>
 		<AssemblyName>Crow</AssemblyName>
 		<Copyright>
 		</Copyright>
-		<AssemblyVersion>0.8.6</AssemblyVersion>
+		<AssemblyVersion>0.8.7</AssemblyVersion>
 		<Description>C.R.O.W. is a widget toolkit and rendering engine entirely developed in C# with templates, styles, compositing, and bindings.</Description>
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
@@ -22,6 +22,7 @@
 		<PackageCopyright>Copyright 2013-2019</PackageCopyright>
 		<PackageReleaseNotes></PackageReleaseNotes>
 		<DefineConstants>DESIGN_MODE</DefineConstants>		
+		<ReleaseVersion>0.8.0</ReleaseVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<DebugType>full</DebugType>

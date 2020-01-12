@@ -117,7 +117,7 @@ namespace Crow.Coding
 					t.GetCustomAttribute<DesignIgnore>(false) == null).ToArray ();
 			ToolboxItems = new ObservableList<GraphicObjectDesignContainer> ();
 			foreach (Type ci in crowItems) {
-				toolboxItems.AddElement(new GraphicObjectDesignContainer(ci));
+				toolboxItems.Add(new GraphicObjectDesignContainer(ci));
 			}
 		}
 		public bool GetProjectFileFromPath (string path, out ProjectFile pi){
@@ -247,21 +247,21 @@ namespace Crow.Coding
 
 		public void OpenItem (ProjectItem pi) {
 			if (!openedItems.Contains (pi)) {
-				openedItems.AddElement (pi);
+				openedItems.Add (pi);
 				saveOpenedItemsInUserConfig ();
 			}
 		}
 		public void CloseItem (ProjectItem pi) {			
-			openedItems.RemoveElement (pi);
+			openedItems.Remove (pi);
 			saveOpenedItemsInUserConfig ();
 		}
 
 		public void CloseSolution () {
 			while (openedItems.Count > 0) {
-				openedItems.RemoveElement (openedItems [0]);
+				openedItems.Remove (openedItems [0]);
 			}
 			while (toolboxItems?.Count > 0) {
-				toolboxItems.RemoveElement (toolboxItems [0]);
+				toolboxItems.Remove (toolboxItems [0]);
 			}
 			NotifyValueChanged ("Projects", null);
 		}
