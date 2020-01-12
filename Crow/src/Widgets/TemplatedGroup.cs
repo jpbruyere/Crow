@@ -47,6 +47,7 @@ namespace Crow {
 		IEnumerable data;
 		int _selectedIndex = -1;
 		Color selBackground, selForeground;
+		bool selColoring;
 
 		int itemPerPage = 50;
 		CrowThread loadingThread = null;
@@ -120,23 +121,36 @@ namespace Crow {
 				: items.Children;
 			}
 		}
+		/// <summary>
+		/// Enable SelectionBackground and SelectionForeground color for selected item
+		/// </summary>
+		[DefaultValue (false)]
+		public bool SelectionColoring {
+			get => selColoring;
+			set {
+				if (selColoring == value)
+					return;
+				selColoring = value;
+				NotifyValueChanged ("SelectionColoring", selColoring);
+			}
+		}
 		[DefaultValue(-1)]public virtual int SelectedIndex{
 			get { return _selectedIndex; }
 			set {
 				if (value == _selectedIndex)
 					return;
 
-				/*if (_selectedIndex >= 0 && Items.Count > _selectedIndex) {
+				if (selColoring && _selectedIndex >= 0 && Items.Count > _selectedIndex) {
 					Items[_selectedIndex].Foreground = Color.Transparent;
 					Items[_selectedIndex].Background = Color.Transparent;
-				}*/
+				}
 
 				_selectedIndex = value;
 
-				/*if (_selectedIndex >= 0 && Items.Count > _selectedIndex) {
+				if (selColoring && _selectedIndex >= 0 && Items.Count > _selectedIndex) {
 					Items[_selectedIndex].Foreground = SelectionForeground;
 					Items[_selectedIndex].Background = SelectionBackground;
-				}*/
+				}
 
 				NotifyValueChanged ("SelectedIndex", _selectedIndex);
 				NotifyValueChanged ("SelectedItem", SelectedItem);
@@ -172,6 +186,7 @@ namespace Crow {
 					IObservableList ol = data as IObservableList;
 					ol.ListAdd -= Ol_ListAdd;
 					ol.ListRemove -= Ol_ListRemove;
+					ol.ListEdit -= Ol_ListEdit;
 				}
 
 				data = value;
@@ -180,6 +195,7 @@ namespace Crow {
 					IObservableList ol = data as IObservableList;
 					ol.ListAdd += Ol_ListAdd;
 					ol.ListRemove += Ol_ListRemove;
+					ol.ListEdit += Ol_ListEdit;
 				}
 
 				NotifyValueChanged ("Data", data);
@@ -220,6 +236,13 @@ namespace Crow {
 //				(items.Children [p] as Group).InsertChild (i, e.Element);
 			} else
 				loadItem (e.Element, items, dataTest);
+		}
+		void Ol_ListEdit (object sender, ListChangedEventArg e) {
+			if (this.isPaged) {
+				throw new NotImplementedException ();
+			} else
+				items.Children [e.Index].DataSource = e.Element;
+
 		}
 
 		[DefaultValue("SteelBlue")]
@@ -483,7 +506,8 @@ namespace Crow {
 			}
 		}
 		internal virtual void itemClick(object sender, MouseButtonEventArgs e){
-			SelectedIndex = (int)((IList)data)?.IndexOf((sender as Widget).DataSource);
+			//SelectedIndex = (int)((IList)data)?.IndexOf((sender as Widget).DataSource);
+			SelectedIndex = items.Children.IndexOf(sender as Widget);
 		}
 
 		bool emitHelperIsAlreadyExpanded (Widget go){
@@ -503,6 +527,21 @@ namespace Crow {
 		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
 		{
 			base.OnDataSourceChanged (sender, e);
+		}
+
+		public void OnInsertClick (object sender, MouseEventArgs e)
+		{
+			if (data is IObservableList)
+				(data as IObservableList).Insert ();
+		}
+		public void OnRemoveClick (object sender, MouseEventArgs e)
+		{
+			if (data is IObservableList)
+				(data as IObservableList).Remove ();
+		}
+		public void OnUpdateClick (object sender, MouseEventArgs e) {
+			if (data is IObservableList)
+				(data as IObservableList).RaiseEdit ();
 		}
 	}
 }

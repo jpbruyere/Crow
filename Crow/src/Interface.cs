@@ -135,7 +135,7 @@ namespace Crow
 			loadStyling ();
 
 			initTooltip ();
-			//initContextMenus ();
+			initContextMenus ();
 
 			Startup ();
 		}

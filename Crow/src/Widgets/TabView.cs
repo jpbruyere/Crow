@@ -46,7 +46,7 @@ namespace Crow
 		int rightSlope;
 		Measure tabHeight, tabWidth;
 		Orientation _orientation;
-		int selectedTab;
+		int selectedTab = -1;
 		#endregion
 
 		#region public properties
