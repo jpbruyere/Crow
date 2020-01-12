@@ -215,7 +215,7 @@ namespace Crow
 		/// <summary>If true, mouse focus is given when mouse is over control</summary>
 		public static bool FOCUS_ON_HOVER = true;
 		/// <summary> Threshold to catch borders for sizing </summary>
-		public static int BorderThreshold = 5;
+		public static int BorderThreshold = 10;
 		/// <summary> delay before tooltip appears </summary>
 		public static int TOOLTIP_DELAY = 500;
 		/// <summary>Double click threshold in milisecond</summary>

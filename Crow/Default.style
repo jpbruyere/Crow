@@ -110,6 +110,14 @@ Window {
 	Width = "150";
 	Height = "150";
 }
+WindowIconBorder {
+	BorderWidth="1";
+	Foreground="Transparent";
+	Height="12";
+	Width="12";
+	MouseEnter="{Foreground=White}";
+	MouseLeave="{Foreground=Transparent}";
+}
 ToolWindow {
 	Caption = "Window";
 	Template = "#Crow.ToolWindow.template";
