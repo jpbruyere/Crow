@@ -272,43 +272,46 @@ namespace Crow
 
 			Interface otkgw = IFace;
 
-			/*if (!hoverBorder) {
-				currentDirection = Direction.None;
-				IFace.MouseCursor = MouseCursor.Arrow;
-				return;
-			}*/
-
-			if (this.HasFocus && movable) {
-				if (e.Mouse.IsButtonDown (MouseButton.Left)) {
-					MoveAndResize (e.XDelta, e.YDelta, currentDirection);
-					return;
+			if (HasFocus) {
+				if (movable) {
+					if (e.Mouse.IsButtonDown (MouseButton.Left)) {
+						MoveAndResize (e.XDelta, e.YDelta, currentDirection);
+						return;
+					}
 				}
+			} else {
+				currentDirection = Direction.None;
+				return;
 			}
+
+
+			Point m = Parent is Widget ? (Parent as Widget).ScreenPointToLocal (e.Position) : e.Position;
+
 			if (Resizable) {
 				Direction lastDir = currentDirection;
 
-				if (Math.Abs (e.Position.Y - this.Slot.Y) < Interface.BorderThreshold) {
-					if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
+				if (Math.Abs (m.Y - this.Slot.Y) < Interface.BorderThreshold) {
+					if (Math.Abs (m.X - this.Slot.X) < Interface.BorderThreshold)
 						currentDirection = Direction.NW;
-					else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
+					else if (Math.Abs (m.X - this.Slot.Right) < Interface.BorderThreshold)
 						currentDirection = Direction.NE;
 					else
 						currentDirection = Direction.N;
-				} else if (Math.Abs (e.Position.Y - this.Slot.Bottom) < Interface.BorderThreshold) {
-					if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
+				} else if (Math.Abs (m.Y - this.Slot.Bottom) < Interface.BorderThreshold) {
+					if (Math.Abs (m.X - this.Slot.X) < Interface.BorderThreshold)
 						currentDirection = Direction.SW;
-					else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
+					else if (Math.Abs (m.X - this.Slot.Right) < Interface.BorderThreshold)
 						currentDirection = Direction.SE;
 					else
 						currentDirection = Direction.S;
-				} else if (Math.Abs (e.Position.X - this.Slot.X) < Interface.BorderThreshold)
+				} else if (Math.Abs (m.X - this.Slot.X) < Interface.BorderThreshold)
 					currentDirection = Direction.W;
-				else if (Math.Abs (e.Position.X - this.Slot.Right) < Interface.BorderThreshold)
+				else if (Math.Abs (m.X - this.Slot.Right) < Interface.BorderThreshold)
 					currentDirection = Direction.E;
 				else
 					currentDirection = Direction.None;
 
-				if (currentDirection != lastDir) {
+				//if (currentDirection != lastDir) {
 					switch (currentDirection) {
 					case Direction.None:
 						otkgw.MouseCursor = MouseCursor.Move;
@@ -338,8 +341,14 @@ namespace Crow
 						otkgw.MouseCursor = MouseCursor.BottomRight;
 						break;
 					}
-				}				
+				//}				
 			}				
+		}
+		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
+		{
+			base.onMouseLeave (sender, e);
+			currentDirection = Direction.None;
+			IFace.MouseCursor = MouseCursor.Arrow;
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
@@ -397,17 +406,6 @@ namespace Crow
 
 			Minimize.Raise (sender, e);
 		}
-		protected virtual void onBorderMouseLeave (object sender, MouseMoveEventArgs e)
-		{
-			hoverBorder = false;
-			currentDirection = Direction.None;
-			IFace.MouseCursor = MouseCursor.Arrow;
-		}
-		protected virtual void onBorderMouseEnter (object sender, MouseMoveEventArgs e)
-		{
-			hoverBorder = true;
-		}
-
 
 		protected void butQuitPress (object sender, MouseButtonEventArgs e)
 		{
