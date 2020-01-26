@@ -9,10 +9,10 @@
   <br>  
 <p align="center">
   <a href="https://travis-ci.org/jpbruyere/Crow">
-      <img src="https://img.shields.io/travis/jpbruyere/Crow.net.svg?&logo=travis&logoColor=white">
+      <img src="https://img.shields.io/travis/jpbruyere/Crow.svg?&logo=travis&logoColor=white">
   </a>
   <a href="https://ci.appveyor.com/project/jpbruyere/Crow">
-	<img src="https://img.shields.io/appveyor/ci/jpbruyere/Crow?label=Windows&logo=appveyor&logoColor=lightgrey">
+	<img src="https://img.shields.io/appveyor/ci/jpbruyere/Crow?logo=appveyor&logoColor=lightgrey">
   </a>
   <a href="https://www.paypal.me/GrandTetraSoftware">
     <img src="https://img.shields.io/badge/Donate-PayPal-green.svg">

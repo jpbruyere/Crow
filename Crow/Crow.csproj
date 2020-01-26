@@ -15,8 +15,6 @@
 		
 		<PackageTags>GUI Widget toolkit Interface C# .Net Mono</PackageTags>
 		<PackageVersion>$(AssemblyVersion)-beta</PackageVersion>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
 		<PackageProjectUrl>https://github.com/jpbruyere/Crow/wiki</PackageProjectUrl>
 		<PackageLicense>https://opensource.org/licenses/MIT</PackageLicense>
@@ -24,6 +22,11 @@
 		<PackageCopyright>Copyright 2013-2019</PackageCopyright>
 		<PackageReleaseNotes>			
 		</PackageReleaseNotes>
+		
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>		
+		
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>    
+		<NoWarn>$(NoWarn);1591</NoWarn>
 
 		<DefineConstants>DESIGN_MODE</DefineConstants>				
 		
