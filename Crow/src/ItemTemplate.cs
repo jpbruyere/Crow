@@ -1,28 +1,6 @@
-﻿//
-// ItemTemplate.cs
+﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.IO;
@@ -114,7 +92,7 @@ namespace Crow
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Crow.ItemTemplate"/> class by parsing the IML fragment passed as arg.
 		/// </summary>
-		/// <param name="path">IML fragment to parse</param>
+		/// <param name="ImlFragment">IML fragment to parse</param>
 		/// <param name="_dataType">type this item will be choosen for, or member of the data item</param>
 		/// <param name="_fetchDataMethod">for hierarchical data, method to call for children fetching</param>
 		public ItemTemplate (Interface _iface, Stream ImlFragment, string _dataTest, string _dataType, string _fetchDataMethod)
@@ -127,7 +105,7 @@ namespace Crow
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Crow.ItemTemplate"/> class using the opened XmlReader in args.
 		/// </summary>
-		/// <param name="path">XML reader positionned before or at the root node</param>
+		/// <param name="reader">XML reader positionned before or at the root node</param>
 		/// <param name="_dataType">type this item will be choosen for, or member of the data item</param>
 		/// <param name="_fetchDataMethod">for hierarchical data, method to call for children fetching</param>
 		public ItemTemplate (Interface _iface, XmlReader reader, string _dataTest = "TypeOf" , string _dataType = null, string _fetchDataMethod = null)
@@ -272,9 +250,6 @@ namespace Crow
             else
                 il.Emit (OpCodes.Callvirt, miGetDatas);
         }
-
-	
-	
 	}
 }
 

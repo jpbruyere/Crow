@@ -77,16 +77,16 @@ namespace Crow.Coding {
 		}
 
 		public string ResourceID {
-			get {				
-				return Type != ItemType.EmbeddedResource ? null :
+			get {
+				return "todo";/* Type != ItemType.EmbeddedResource ? null :
 					node.SelectSingleNode ("LogicalName") == null ?
 					Project.Name + "." + Path.Replace ('/', '.') :
-					LogicalName;
+					LogicalName;*/
 			}
 		}
 		public string LogicalName {
 			get {
-				return node.SelectSingleNode ("LogicalName")?.InnerText;
+				return "todo";// node.SelectSingleNode ("LogicalName")?.InnerText;
 			}
 		}
 		public bool IsOpened {
@@ -214,9 +214,10 @@ namespace Crow.Coding {
 
 		public CopyToOutputState CopyToOutputDirectory {
 			get {
-				XmlNode xn = node.SelectSingleNode ("CopyToOutputDirectory");
+				return CopyToOutputState.Never;
+				/*XmlNode xn = node.SelectSingleNode ("CopyToOutputDirectory");
 				return xn == null ? CopyToOutputState.Never :
-					(CopyToOutputState)Enum.Parse (typeof(CopyToOutputState), xn.InnerText, true);
+					(CopyToOutputState)Enum.Parse (typeof(CopyToOutputState), xn.InnerText, true);*/
 			}
 		}
 

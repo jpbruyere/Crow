@@ -41,7 +41,7 @@ namespace Crow.Coding
 		}
 		public string PrintableContent {
 			get {
-				return string.IsNullOrEmpty (Content) ? "" : Content.Replace ("\t", new String (' ', Interface.TabSize));
+				return string.IsNullOrEmpty (Content) ? "" : Content.Replace ("\t", new String (' ', Interface.TAB_SIZE));
 			}
 		}
 		public int PrintableLength {

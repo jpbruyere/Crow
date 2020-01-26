@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <Popper Font="{./Font}" Caption="{./Caption}"  Background="{./Background}" PopDirection="{./PopDirection}"
-	Foreground = "{./Foreground}" CanPop="{./HasChildren}" MouseClick="./onMI_Click"
+	Foreground = "{./Foreground}" CanPop="{./HasChildren}"
 	IsPopped="{²./IsOpened}" PopWidth="{./PopWidth}" PopHeight="{./PopHeight}" IsEnabled="{./IsEnabled}">
 	<Template>
 		<CheckBox IsChecked="{²./IsPopped}" Caption="{./Caption}" Background="{./Background}" Foreground="{./Foreground}">

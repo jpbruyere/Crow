@@ -26,7 +26,7 @@
 
 using System;
 using System.IO;
-using Cairo;
+using Crow.Cairo;
 using System.Collections.Generic;
 
 namespace Crow
@@ -129,7 +129,7 @@ namespace Crow
 		}
 		#endregion
 
-		public static object Parse(string path)
+		public static new object Parse(string path)
 		{
 			if (string.IsNullOrEmpty (path))
 				return null;

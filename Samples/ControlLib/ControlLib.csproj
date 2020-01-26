@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">  
+  <PropertyGroup>
+    <TargetFrameworks>net471;netstandard2.0</TargetFrameworks>
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>     
+    <ReleaseVersion>0.8.0</ReleaseVersion>
+  </PropertyGroup>
+            
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG;NETFRAMEWORK;NET471</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
+    <Reference Include="System" />
+  </ItemGroup>    
+
+  <ItemGroup>  
+    <ProjectReference Include="..\..\Crow\Crow.csproj" />
+  </ItemGroup>    
+    
+  <ItemGroup>
+    <EmbeddedResource Include="ui\**\*.*">
+      <LogicalName>ControlLib.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>                
+  </ItemGroup>
+</Project>

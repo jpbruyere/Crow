@@ -21,7 +21,7 @@
 			</HorizontalStack>
 		</VerticalStack>
 		<Splitter/>
-		<IMLContainer Path="#Crow.Coding.ui.editors.SourceEditor.crow"/>
+		<IMLContainer Path="#CrowIDE.ui.editors.SourceEditor.crow"/>
 		<Label DataSource="{../editor.Error}" Text="{Message}"
 			Visible="{../editor.HasError}"
 			Height="Fit" Width="Stretched" Background="DarkRed" Foreground="White"

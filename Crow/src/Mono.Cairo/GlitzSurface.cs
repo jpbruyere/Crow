@@ -28,7 +28,7 @@
 
 using System;
 
-namespace Cairo {
+namespace Crow.Cairo {
 	public class GlitzSurface : Surface
 	{
 		internal GlitzSurface (IntPtr handle, bool owns) : base (handle, owns)

@@ -32,6 +32,7 @@ using Microsoft.CSharp;
 using System.CodeDom.Compiler;
 using Crow;
 using System.Text.RegularExpressions;
+using Microsoft.Build.Construction;
 
 namespace Crow.Coding {
     public class Project : IValueChange {
@@ -43,21 +44,21 @@ namespace Crow.Coding {
         #endregion
 
         bool isLoaded = false;
-        bool isExpanded;
-        XmlDocument xmlDoc;
-        XmlNode nodeProject;
-        XmlNode nodeProps;
-        XmlNodeList nodesItems;
-        SolutionProject solutionProject;
-        Crow.Command cmdSave, cmdOpen, cmdCompile, cmdSetAsStartProj, cmdNewFile;
+        bool isExpanded;        
+        ProjectInSolution solutionProject;
+		Microsoft.Build.Evaluation.Project project;
+
+		Crow.Command cmdSave, cmdOpen, cmdCompile, cmdSetAsStartProj, cmdNewFile;
 
         #region CTOR
-        public Project (Solution sol, SolutionProject sp) {
+        public Project (Workspace sol, ProjectInSolution sp) {
             solutionProject = sp;
-
             solution = sol;
 
-            cmdSave = new Crow.Command (new Action (() => Save ())) { Caption = "Save", Icon = new SvgPicture ("#CrowIDE.icons.save.svg"), CanExecute = true };
+			ProjectRootElement projectRootElt = ProjectRootElement.Open (solutionProject.AbsolutePath);
+			project = new Microsoft.Build.Evaluation.Project (projectRootElt, null, "Current");
+
+			cmdSave = new Crow.Command (new Action (() => Save ())) { Caption = "Save", Icon = new SvgPicture ("#CrowIDE.icons.save.svg"), CanExecute = true };
             cmdOpen = new Crow.Command (new Action (() => Load ())) { Caption = "Open", Icon = new SvgPicture ("#CrowIDE.icons.open.svg"), CanExecute = false };
             cmdCompile = new Crow.Command (new Action (() => Compile ())) {
                 Caption = "Compile",
@@ -78,13 +79,12 @@ namespace Crow.Coding {
         }
         #endregion
 
-        public Solution solution;
+        public Workspace solution;
         public List<Crow.Command> Commands;
         public CompilerResults CompilationResults;
         public List<Project> dependantProjects = new List<Project> ();
         public Project ParentProject = null;
-        List<ProjectNode> rootItems;
-        List<ProjectNode> flattenNodes;
+        List<ProjectNode> rootItems;        
 
         public string Name {
             get { return solutionProject.ProjectName; }
@@ -111,147 +111,60 @@ namespace Crow.Coding {
             get { return solution.StartupProject == this; }
         }
         public string Path {
-            get { return System.IO.Path.Combine (solution.SolutionFolder, solutionProject.RelativePath.Replace ('\\', '/')); }
+            get { return System.IO.Path.Combine (project.DirectoryPath.Replace ('\\', '/')); }
         }
         public string RootDir {
             get { return System.IO.Path.GetDirectoryName (Path); }
         }
 
-
-
         public List<ProjectNode> RootItems {
             get { return rootItems; }
         }
-
-        void buildTreeNodes () {
-            ProjectNode root = new ProjectNode (this, ItemType.VirtualGroup, RootNamespace);
-            List<ProjectItem> items = new List<ProjectItem> ();
-            foreach (XmlNode i in nodesItems) {
-                foreach (XmlNode f in i.ChildNodes) {
-                    items.Add (new ProjectItem (this, f));
-                }
-            }
-
-            flattenNodes = new List<ProjectNode> ();
-
-            ProjectNode refs = new ProjectNode (this, ItemType.ReferenceGroup, "References");
-            root.AddChild (refs);
-
-            foreach (ProjectItem pn in items) {
-                switch (pn.Type) {
-                    case ItemType.Reference:
-                        refs.AddChild (pn);
-                        flattenNodes.Add (pn);
-                        break;
-                    case ItemType.ProjectReference:
-                        ProjectReference pr = new ProjectReference (pn);
-                        refs.AddChild (pr);
-                        flattenNodes.Add (pr);
-                        break;
-                    case ItemType.Compile:
-                    case ItemType.None:
-                    case ItemType.EmbeddedResource:
-                        ProjectNode curNode = root;
-                        string[] folds = pn.Path.Split ('/');
-                        for (int i = 0; i < folds.Length - 1; i++) {
-                            ProjectNode nextNode = curNode.ChildNodes.FirstOrDefault (n => n.DisplayName == folds[i] && n.Type == ItemType.VirtualGroup);
-                            if (nextNode == null) {
-                                nextNode = new ProjectNode (this, ItemType.VirtualGroup, folds[i]);
-                                curNode.AddChild (nextNode);
-                            }
-                            curNode = nextNode;
-                        }
-                        ProjectNode f = null;
-                        switch (pn.Extension) {
-                            /*case ".cs":
-                                f = new CSProjectFile (pn);
-                                break;*/
-                            case ".crow":
-                            case ".template":
-                            case ".goml":
-                            case ".itemp":
-                            case ".imtl":
-                                f = new ImlProjectItem (pn);
-                                break;
-                            case ".style":
-                                f = new StyleProjectItem (pn);
-                                break;
-                            default:
-                                f = new ProjectFile (pn);
-                                break;
-                        }
-                        curNode.AddChild (f);
-                        flattenNodes.Add (f);
-                        break;
-                }
-            }
-            root.SortChilds ();
-
-            rootItems = root.ChildNodes;
-        }
-
+        
         #region Project properties
         public string ToolsVersion {
-            get { return nodeProject?.Attributes["ToolsVersion"]?.Value; }
+            get { return project.ToolsVersion; }
         }
         public string DefaultTargets {
-            get { return nodeProject?.Attributes["DefaultTargets"]?.Value; }
+            get { return project.Xml.DefaultTargets; }
         }
         public string ProjectGuid {
             get { return solutionProject.ProjectGuid; }
         }
-        public string AssemblyName {
-            get { return nodeProps["AssemblyName"]?.InnerText; }
-        }
-        public string OutputType {
-            get { return nodeProps["OutputType"]?.InnerText; }
-        }
-        public string RootNamespace {
-            get { return nodeProps["RootNamespace"]?.InnerText; }
-        }
+        public string AssemblyName => project.AllEvaluatedProperties.Where(p=>p.Name =="AssemblyName").FirstOrDefault().EvaluatedValue;
+        public string OutputType => project.AllEvaluatedProperties.Where (p => p.Name == "OutputType").FirstOrDefault ().EvaluatedValue;
+        public string RootNamespace => project.AllEvaluatedProperties.Where (p => p.Name == "RootNamespace").FirstOrDefault ().EvaluatedValue;
         public bool AllowUnsafeBlocks {
             get {
-                return nodeProps["AllowUnsafeBlocks"] == null ? false :
-               bool.Parse (nodeProps["AllowUnsafeBlocks"]?.InnerText);
+				return false;
+                /*return nodeProps["AllowUnsafeBlocks"] == null ? false :
+               bool.Parse (nodeProps["AllowUnsafeBlocks"]?.InnerText);*/
             }
         }
         public bool NoStdLib {
             get {
-                return nodeProps["NoStdLib"] == null ? false :
-              bool.Parse (nodeProps["NoStdLib"]?.InnerText);
+				return false;
+                /*return nodeProps["NoStdLib"] == null ? false :
+              bool.Parse (nodeProps["NoStdLib"]?.InnerText);*/
             }
         }
         public bool TreatWarningsAsErrors {
             get {
-                return nodeProps["TreatWarningsAsErrors"] == null ? false :
-              bool.Parse (nodeProps["TreatWarningsAsErrors"]?.InnerText);
+				return false;
+                /*return nodeProps["TreatWarningsAsErrors"] == null ? false :
+              bool.Parse (nodeProps["TreatWarningsAsErrors"]?.InnerText);*/
             }
         }
         public bool SignAssembly {
-            get { return bool.Parse (nodeProps["SignAssembly"]?.InnerText); }
+			get { return false; }// projectRootElt.Properties.Where (p => p.Name == "SignAssembly").FirstOrDefault ().Value; }
         }
-        public string TargetFrameworkVersion {
-            get { return nodeProps["TargetFrameworkVersion"]?.InnerText; }
-        }
-        public string Description {
-            get { return nodeProps["Description"]?.InnerText; }
-        }
-        public string OutputPath {
-            get { return nodeProps["OutputPath"]?.InnerText; }
-        }
-        public string IntermediateOutputPath {
-            get { return nodeProps["IntermediateOutputPath"]?.InnerText; }
-        }
-        public string StartupObject {
-            get { return nodeProps["StartupObject"]?.InnerText; }
-        }
-        public bool DebugSymbols {
-            get { return nodeProps["DebugSymbols"] == null ? false : bool.Parse (nodeProps["DebugSymbols"]?.InnerText); }
-        }
-        public int WarningLevel {
-            get { return nodeProps["WarningLevel"] == null ? 0 : int.Parse (nodeProps["WarningLevel"]?.InnerText); }
-        }
-
+        public string TargetFrameworkVersion => project.AllEvaluatedProperties.Where (p => p.Name == "TargetFrameworkVersion").FirstOrDefault ().EvaluatedValue;
+        public string Description => project.AllEvaluatedProperties.Where (p => p.Name == "Description").FirstOrDefault ().EvaluatedValue;
+        public string OutputPath => project.AllEvaluatedProperties.Where (p => p.Name == "OutputPath").FirstOrDefault ().EvaluatedValue;
+        public string IntermediateOutputPath => project.AllEvaluatedProperties.Where (p => p.Name == "IntermediateOutputPath").FirstOrDefault ().EvaluatedValue;
+        public string StartupObject => project.AllEvaluatedProperties.Where (p => p.Name == "StartupObject").FirstOrDefault ().EvaluatedValue;
+		public bool DebugSymbols => false;// nodeProps["DebugSymbols"] == null ? false : bool.Parse (nodeProps["DebugSymbols"]?.InnerText); }        
+		public int WarningLevel => 0;
         #endregion
 
 
@@ -261,26 +174,67 @@ namespace Crow.Coding {
 
         public void Load () {
 
-            xmlDoc = new XmlDocument ();
-            using (Stream ins = new FileStream (this.Path, FileMode.Open)) {
-                xmlDoc.Load (new XmlTextReader (ins) { Namespaces = false });
-            }
+			ProjectNode root = new ProjectNode (this, ItemType.VirtualGroup, RootNamespace);
+			ProjectNode refs = new ProjectNode (this, ItemType.ReferenceGroup, "References");
+			root.AddChild (refs);
 
-            nodeProject = xmlDoc.SelectSingleNode ("Project");
-            XmlNodeList nodesProps = xmlDoc.SelectNodes ("/Project/PropertyGroup");
+			foreach (Microsoft.Build.Evaluation.ProjectItem pn in project.AllEvaluatedItems) {
+				switch (pn.ItemType) {
+				case "Reference":
+					refs.AddChild (new ProjectItem(this, pn));
+					break;
+				case "ProjectReference":
+					ProjectReference pr = new ProjectReference (this, pn);
+					refs.AddChild (pr);
+					break;
+				case "Compile":
+				case "None":
+				case "EmbeddedResource":
 
-            foreach (XmlNode n in nodesProps) {
-                if (n.Attributes["Condition"] == null)
-                    nodeProps = n;
-            }
-            nodesItems = xmlDoc.SelectNodes ("/Project/ItemGroup");
+					ProjectNode curNode = root;
+					try {
+						string file = pn.EvaluatedInclude.Replace ('\\', '/');										
+						string [] folds = file.Split ('/');
+						for (int i = 0; i < folds.Length - 1; i++) {
+							ProjectNode nextNode = curNode.ChildNodes.FirstOrDefault (n => n.DisplayName == folds [i] && n.Type == ItemType.VirtualGroup);
+							if (nextNode == null) {
+								nextNode = new ProjectNode (this, ItemType.VirtualGroup, folds [i]);
+								curNode.AddChild (nextNode);
+							}
+							curNode = nextNode;
+						}
+						ProjectItem pi = new ProjectItem (this, pn);
 
-            if (ProjectGuid != solutionProject.ProjectGuid)
-                throw new Exception ("Project GUID not matching with solution");
+						switch (System.IO.Path.GetExtension (file)) {
+						/*case ".cs":
+							f = new CSProjectFile (pn);
+							break;*/
+						case ".crow":
+						case ".template":
+						case ".goml":
+						case ".itemp":
+						case ".imtl":
+							pi = new ImlProjectItem (pi);
+							break;
+						case ".style":
+							pi = new StyleProjectItem (pi);
+							break;
+						default:
+							pi = new ProjectFile (pi);
+							break;
+						}
+						curNode.AddChild (pi);
 
-            buildTreeNodes ();
+					} catch (Exception ex) {
 
-            IsLoaded = true;
+					}
+
+					break;
+				}
+			}
+			root.SortChilds ();
+			rootItems = root.ChildNodes;
+			IsLoaded = true;
         }
 
         public void Save () {
@@ -311,164 +265,164 @@ namespace Crow.Coding {
             return tmp;
         }
         public string Compile () {
-            if (ParentProject != null)
-                ParentProject.Compile ();
+        //    if (ParentProject != null)
+        //        ParentProject.Compile ();
 
-            CSharpCodeProvider cp = new CSharpCodeProvider ();
-            CompilerParameters parameters = new CompilerParameters ();
+        //    CSharpCodeProvider cp = new CSharpCodeProvider ();
+        //    CompilerParameters parameters = new CompilerParameters ();
 
-            foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference> ()) {
-                Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);
-                if (p == null)
-                    throw new Exception ("referenced project not found");
-                parameters.ReferencedAssemblies.Add (p.Compile ());
-            }
+        //    foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference> ()) {
+        //        Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);
+        //        if (p == null)
+        //            throw new Exception ("referenced project not found");
+        //        parameters.ReferencedAssemblies.Add (p.Compile ());
+        //    }
 
-            string outputDir = getDirectoryWithTokens (this.OutputPath);
-            string objDir = getDirectoryWithTokens (this.IntermediateOutputPath);
+        //    string outputDir = getDirectoryWithTokens (this.OutputPath);
+        //    string objDir = getDirectoryWithTokens (this.IntermediateOutputPath);
 
-            Directory.CreateDirectory (outputDir);
-            Directory.CreateDirectory (objDir);
+        //    Directory.CreateDirectory (outputDir);
+        //    Directory.CreateDirectory (objDir);
 
-            parameters.OutputAssembly = System.IO.Path.Combine (outputDir, this.AssemblyName);
+        //    parameters.OutputAssembly = System.IO.Path.Combine (outputDir, this.AssemblyName);
 
-            // True - exe file generation, false - dll file generation
-            if (this.OutputType == "Library") {
-                parameters.GenerateExecutable = false;
-                parameters.CompilerOptions += " /target:library";
-                parameters.OutputAssembly += ".dll";
-            } else {
-                parameters.GenerateExecutable = true;
-                parameters.CompilerOptions += " /target:exe";
-                parameters.OutputAssembly += ".exe";
-                parameters.MainClass = this.StartupObject;
-            }
+        //    // True - exe file generation, false - dll file generation
+        //    if (this.OutputType == "Library") {
+        //        parameters.GenerateExecutable = false;
+        //        parameters.CompilerOptions += " /target:library";
+        //        parameters.OutputAssembly += ".dll";
+        //    } else {
+        //        parameters.GenerateExecutable = true;
+        //        parameters.CompilerOptions += " /target:exe";
+        //        parameters.OutputAssembly += ".exe";
+        //        parameters.MainClass = this.StartupObject;
+        //    }
 
-            parameters.GenerateInMemory = false;
-            parameters.IncludeDebugInformation = this.DebugSymbols;
-            parameters.TreatWarningsAsErrors = this.TreatWarningsAsErrors;
-            parameters.WarningLevel = this.WarningLevel;
-            parameters.CompilerOptions += " /noconfig";
-            if (this.AllowUnsafeBlocks)
-                parameters.CompilerOptions += " /unsafe";
-            parameters.CompilerOptions += " /delaysign+";
-            parameters.CompilerOptions += " /debug:full /debug+";
-            parameters.CompilerOptions += " /optimize-";
-            parameters.CompilerOptions += " /define:\"DEBUG;TRACE\"";
-            parameters.CompilerOptions += " /nostdlib";
-
-
-
-            foreach (ProjectItem pi in flattenNodes.Where (p => p.Type == ItemType.Reference)) {
-
-                if (string.IsNullOrEmpty (pi.HintPath)) {
-                    parameters.CompilerOptions += " /reference:/usr/lib/mono/4.5/" + pi.Path + ".dll";
-                    continue;
-                }
-                parameters.ReferencedAssemblies.Add (pi.Path);
-                string fullHintPath = System.IO.Path.GetFullPath (System.IO.Path.Combine (RootDir, pi.HintPath.Replace ('\\', '/')));
-                if (File.Exists (fullHintPath)) {
-                    string outPath = System.IO.Path.Combine (outputDir, System.IO.Path.GetFileName (fullHintPath));
-                    if (!File.Exists (outPath))
-                        File.Copy (fullHintPath, outPath);
-                }
-            }
-            parameters.CompilerOptions += " /reference:/usr/lib/mono/4.5/System.Core.dll";
-            parameters.CompilerOptions += " /reference:/usr/lib/mono/4.5/mscorlib.dll";
-            //parameters.ReferencedAssemblies.Add ("System.Core");
-            //parameters.ReferencedAssemblies.Add ("mscorlib.dll");
+        //    parameters.GenerateInMemory = false;
+        //    parameters.IncludeDebugInformation = this.DebugSymbols;
+        //    parameters.TreatWarningsAsErrors = this.TreatWarningsAsErrors;
+        //    parameters.WarningLevel = this.WarningLevel;
+        //    parameters.CompilerOptions += " /noconfig";
+        //    if (this.AllowUnsafeBlocks)
+        //        parameters.CompilerOptions += " /unsafe";
+        //    parameters.CompilerOptions += " /delaysign+";
+        //    parameters.CompilerOptions += " /debug:full /debug+";
+        //    parameters.CompilerOptions += " /optimize-";
+        //    parameters.CompilerOptions += " /define:\"DEBUG;TRACE\"";
+        //    parameters.CompilerOptions += " /nostdlib";
 
 
-            IEnumerable<ProjectFile> pfs = flattenNodes.OfType<ProjectFile> ();
 
-            foreach (ProjectFile pi in pfs.Where (p => p.Type == ItemType.EmbeddedResource)) {
+        //    foreach (ProjectItem pi in flattenNodes.Where (p => p.Type == ItemType.Reference)) {
 
-                string absPath = pi.AbsolutePath;
-                string logicName = pi.LogicalName;
-                if (string.IsNullOrEmpty (logicName))
-                    parameters.CompilerOptions += string.Format (" /resource:{0},{1}", absPath, this.Name + "." + pi.Path.Replace ('/', '.'));
-                else
-                    parameters.CompilerOptions += string.Format (" /resource:{0},{1}", absPath, logicName);
-            }
-            foreach (ProjectFile pi in pfs.Where (p => p.Type == ItemType.None)) {
-                if (pi.CopyToOutputDirectory == CopyToOutputState.Never)
-                    continue;
-                string source = pi.AbsolutePath;
-                string target = System.IO.Path.Combine (outputDir, pi.Path);
-                Directory.CreateDirectory (System.IO.Path.GetDirectoryName (target));
+        //        if (string.IsNullOrEmpty (pi.HintPath)) {
+        //            parameters.CompilerOptions += " /reference:/usr/lib/mono/4.5/" + pi.Path + ".dll";
+        //            continue;
+        //        }
+        //        parameters.ReferencedAssemblies.Add (pi.Path);
+        //        string fullHintPath = System.IO.Path.GetFullPath (System.IO.Path.Combine (RootDir, pi.HintPath.Replace ('\\', '/')));
+        //        if (File.Exists (fullHintPath)) {
+        //            string outPath = System.IO.Path.Combine (outputDir, System.IO.Path.GetFileName (fullHintPath));
+        //            if (!File.Exists (outPath))
+        //                File.Copy (fullHintPath, outPath);
+        //        }
+        //    }
+        //    parameters.CompilerOptions += " /reference:/usr/lib/mono/4.5/System.Core.dll";
+        //    parameters.CompilerOptions += " /reference:/usr/lib/mono/4.5/mscorlib.dll";
+        //    //parameters.ReferencedAssemblies.Add ("System.Core");
+        //    //parameters.ReferencedAssemblies.Add ("mscorlib.dll");
 
-                if (File.Exists (target)) {
-                    if (pi.CopyToOutputDirectory == CopyToOutputState.PreserveNewest) {
-                        if (DateTime.Compare (
-                                System.IO.File.GetLastWriteTime (source),
-                                System.IO.File.GetLastWriteTime (target)) < 0)
-                            continue;
-                    }
-                    File.Delete (target);
-                }
-                System.Diagnostics.Debug.WriteLine ("copy " + source + " to " + target);
-                File.Copy (source, target);
-            }
-            string[] files = pfs.Where (p => p.Type == ItemType.Compile).Select (p => p.AbsolutePath).ToArray ();
 
-            System.Diagnostics.Debug.WriteLine ("---- start compilation of :" + parameters.OutputAssembly);
-            System.Diagnostics.Debug.WriteLine (parameters.CompilerOptions);
+        //    IEnumerable<ProjectFile> pfs = flattenNodes.OfType<ProjectFile> ();
 
-            CompilationResults = cp.CompileAssemblyFromFile (parameters, files);
+        //    foreach (ProjectFile pi in pfs.Where (p => p.Type == ItemType.EmbeddedResource)) {
 
-            solution.UpdateErrorList ();
+        //        string absPath = pi.AbsolutePath;
+        //        string logicName = pi.LogicalName;
+        //        if (string.IsNullOrEmpty (logicName))
+        //            parameters.CompilerOptions += string.Format (" /resource:{0},{1}", absPath, this.Name + "." + pi.Path.Replace ('/', '.'));
+        //        else
+        //            parameters.CompilerOptions += string.Format (" /resource:{0},{1}", absPath, logicName);
+        //    }
+        //    foreach (ProjectFile pi in pfs.Where (p => p.Type == ItemType.None)) {
+        //        if (pi.CopyToOutputDirectory == CopyToOutputState.Never)
+        //            continue;
+        //        string source = pi.AbsolutePath;
+        //        string target = System.IO.Path.Combine (outputDir, pi.Path);
+        //        Directory.CreateDirectory (System.IO.Path.GetDirectoryName (target));
 
-            return parameters.OutputAssembly;
-        }
+        //        if (File.Exists (target)) {
+        //            if (pi.CopyToOutputDirectory == CopyToOutputState.PreserveNewest) {
+        //                if (DateTime.Compare (
+        //                        System.IO.File.GetLastWriteTime (source),
+        //                        System.IO.File.GetLastWriteTime (target)) < 0)
+        //                    continue;
+        //            }
+        //            File.Delete (target);
+        //        }
+        //        System.Diagnostics.Debug.WriteLine ("copy " + source + " to " + target);
+        //        File.Copy (source, target);
+        //    }
+        //    string[] files = pfs.Where (p => p.Type == ItemType.Compile).Select (p => p.AbsolutePath).ToArray ();
 
-        public bool TryGetProjectFileFromAbsolutePath (string absolutePath, out ProjectFile pi) {
-            pi = flattenNodes.OfType<ProjectFile> ().FirstOrDefault
-                (pp => pp.AbsolutePath == absolutePath);
-            return pi != null;
-        }
-        public bool TryGetProjectFileFromPath (string path, out ProjectFile pi) {
-            if (path.StartsWith ("#", StringComparison.Ordinal))
-                pi = flattenNodes.OfType<ProjectFile> ().FirstOrDefault
-                    (pp => pp.Type == ItemType.EmbeddedResource && pp.ResourceID == path.Substring (1));
-            else
-                pi = flattenNodes.OfType<ProjectFile> ().FirstOrDefault (pp => pp.Path == path);
+        //    System.Diagnostics.Debug.WriteLine ("---- start compilation of :" + parameters.OutputAssembly);
+        //    System.Diagnostics.Debug.WriteLine (parameters.CompilerOptions);
 
-            if (pi != null)
-                return true;
+        //    CompilationResults = cp.CompileAssemblyFromFile (parameters, files);
 
-            foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference> ()) {
-                Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);
-                if (p == null)
-                    throw new Exception ("referenced project not found");
-                if (p.TryGetProjectFileFromPath (path, out pi))
-                    return true;
-            }
-            //TODO: search referenced assemblies
-            return false;
+        //    solution.UpdateErrorList ();
+
+        //    return parameters.OutputAssembly;
+        //}
+
+        //public bool TryGetProjectFileFromAbsolutePath (string absolutePath, out ProjectFile pi) {
+        //    pi = flattenNodes.OfType<ProjectFile> ().FirstOrDefault
+        //        (pp => pp.AbsolutePath == absolutePath);
+        //    return pi != null;
+        //}
+        //public bool TryGetProjectFileFromPath (string path, out ProjectFile pi) {
+            //if (path.StartsWith ("#", StringComparison.Ordinal))
+            //    pi = flattenNodes.OfType<ProjectFile> ().FirstOrDefault
+            //        (pp => pp.Type == ItemType.EmbeddedResource && pp.ResourceID == path.Substring (1));
+            //else
+            //    pi = flattenNodes.OfType<ProjectFile> ().FirstOrDefault (pp => pp.Path == path);
+
+            //if (pi != null)
+            //    return true;
+
+            //foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference> ()) {
+            //    Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);
+            //    if (p == null)
+            //        throw new Exception ("referenced project not found");
+            //    if (p.TryGetProjectFileFromPath (path, out pi))
+            //        return true;
+            //}
+            ////TODO: search referenced assemblies
+            return "";
         }
 
         public void GetDefaultTemplates () {
-            IEnumerable<ProjectFile> tmpFiles =
-                flattenNodes.OfType<ProjectFile> ().Where (pp => pp.Extension == ".template");
+            //IEnumerable<ProjectFile> tmpFiles =
+            //    flattenNodes.OfType<ProjectFile> ().Where (pp => pp.Extension == ".template");
 
-            foreach (ProjectFile pi in tmpFiles.Where (
-                pp => pp.Type == ItemType.None && pp.CopyToOutputDirectory != CopyToOutputState.Never)) {
+            //foreach (ProjectFile pi in tmpFiles.Where (
+            //    pp => pp.Type == ItemType.None && pp.CopyToOutputDirectory != CopyToOutputState.Never)) {
 
-                string clsName = System.IO.Path.GetFileNameWithoutExtension (pi.Path);
-                if (solution.DefaultTemplates.ContainsKey (clsName))
-                    continue;
-                solution.DefaultTemplates[clsName] = pi.AbsolutePath;
-            }
-            foreach (ProjectFile pi in tmpFiles.Where (pp => pp.Type == ItemType.EmbeddedResource)) {
-                string resId = pi.ResourceID;
-                string clsName = resId.Substring (0, resId.Length - 9);
-                if (solution.DefaultTemplates.ContainsKey (clsName))
-                    continue;
-                solution.DefaultTemplates[clsName] = pi.Path;
-            }
+            //    string clsName = System.IO.Path.GetFileNameWithoutExtension (pi.Path);
+            //    if (solution.DefaultTemplates.ContainsKey (clsName))
+            //        continue;
+            //    solution.DefaultTemplates[clsName] = pi.AbsolutePath;
+            //}
+            //foreach (ProjectFile pi in tmpFiles.Where (pp => pp.Type == ItemType.EmbeddedResource)) {
+            //    string resId = pi.ResourceID;
+            //    string clsName = resId.Substring (0, resId.Length - 9);
+            //    if (solution.DefaultTemplates.ContainsKey (clsName))
+            //        continue;
+            //    solution.DefaultTemplates[clsName] = pi.Path;
+            //}
 
-            foreach (Project p in ReferencedProjects)
-                p.GetDefaultTemplates ();
+            //foreach (Project p in ReferencedProjects)
+                //p.GetDefaultTemplates ();
         }
         //		void searchTemplatesIn(Assembly assembly){
         //			if (assembly == null)
@@ -486,17 +440,17 @@ namespace Crow.Coding {
         public List<Project> ReferencedProjects {
             get {
                 List<Project> tmp = new List<Project> ();
-                foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference> ()) {
+                /*foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference> ()) {
                     Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);
                     if (p != null)
                         tmp.Add (p);
-                }
+                }*/
                 return tmp;
             }
         }
 
         public void GetStyling () {
-            try {
+            /*try {
                 foreach (ProjectFile pi in flattenNodes.OfType<ProjectFile> ().Where (pp => pp.Type == ItemType.EmbeddedResource && pp.Extension == ".style")) {
                     using (Stream s = new MemoryStream (System.Text.Encoding.UTF8.GetBytes (pi.Source))) {
                         new StyleReader (solution.Styling, s, pi.ResourceID);
@@ -507,10 +461,10 @@ namespace Crow.Coding {
             }
             foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference> ()) {
                 Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);
-                if (p == null)
-                    throw new Exception ("referenced project not found");
-                p.GetStyling ();
-            }
+                if (p != null)
+                    //throw new Exception ("referenced project not found");
+                	p.GetStyling ();
+            }*/
 
             //TODO:get styling from referenced assemblies
         }

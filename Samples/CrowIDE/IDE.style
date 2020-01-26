@@ -1,0 +1,64 @@
+﻿Label {    
+    Foreground="Black";
+}
+icon {
+	Width="14";
+	Height="14";
+}
+MemberViewLabel {
+	Margin="1";
+	Height="Fit";
+	Width="50%";
+	Background="White";
+}
+MemberViewHStack {
+	Focusable="true";
+	Height="Fit";
+	Spacing="1";
+	MouseEnter="{Background=SteelBlue}";
+	MouseLeave="{Background=Transparent}";
+}
+
+IcoBut {
+	Template = "#Crow.Coding.IcoBut.template";
+	MinimumSize = "10,10";
+	Width = "8";
+	Height = "14";
+	Background = "Black";
+}
+
+WinSchema {
+	Template="#Crow.Coding.ui.DockWindows.WinSchemaItem.template";
+	Focusable = "true";
+	MinimumSize="150,50";
+	Width = "Fit";
+	Height = "Fit";
+}
+TabItem {
+	AllowDrag="false";
+	Background="Grey";
+	SelectedBackground="0.9,0.9,0.91,1.0";
+    Foreground="Black";
+}
+TreeItemBorder {
+	CornerRadius="2";
+	Margin="0";
+	//Focusable="true";
+	Height="Fit";
+	Width="Stretched";
+	Foreground="Transparent";
+	MouseEnter="{Foreground=DimGrey}";
+	MouseLeave="{Foreground=Transparent}";
+}
+TreeIcon {
+	Margin="0";
+	Width="14";
+	Height="14";
+}
+Splitter {
+	Thickness="1";
+	Background="RoyalBlue";
+}
+DockWindow {
+    Background="0.98,0.98,0.99,0.9";
+}

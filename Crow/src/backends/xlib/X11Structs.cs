@@ -27,15 +27,12 @@
 // NOT COMPLETE
 
 using System;
-using System.ComponentModel;
-using System.Collections;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Reflection;
 
 // X11 Version
-namespace Crow.XLib {
+namespace Crow.XLib
+{
 	//
 	// In the structures below, fields of type long are mapped to IntPtr.
 	// This will work on all platforms where sizeof(long)==sizeof(void*), which

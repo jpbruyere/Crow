@@ -1,4 +1,4 @@
-//
+﻿//
 // Mono.Cairo.Surface.cs
 //
 // Authors:
@@ -36,7 +36,7 @@
 using System;
 using System.Collections;
 
-namespace Cairo {
+namespace Crow.Cairo {
 
 	public class Surface : IDisposable
 	{

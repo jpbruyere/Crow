@@ -20,17 +20,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using Crow;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Collections;
-using System.Xml.Serialization;
 using System.IO;
 using Crow.IML;
-using System.Xml;
-using System.Linq;
-using Crow.Coding;
-using System.Threading;
 
 namespace Crow.Coding
 {
@@ -51,11 +42,11 @@ namespace Crow.Coding
 			CMDQuit = new Command(new Action(() => app.running = false)) { Caption = "Quit", Icon = new SvgPicture("#CrowIDE.icons.sign-out.svg") };
 			CMDUndo = new Command(new Action(() => undo())) { Caption = "Undo", Icon = new SvgPicture("#CrowIDE.icons.undo.svg"), CanExecute = false};
 			CMDRedo = new Command(new Action(() => redo())) { Caption = "Redo", Icon = new SvgPicture("#CrowIDE.icons.redo.svg"), CanExecute = false};
-            //CMDCut = new Command(new Action(() => Quit (null, null))) { Caption = "Cut", Icon = new SvgPicture("#CrowIDE.icons.scissors.svg"), CanExecute = false};
-            //CMDCopy = new Command(new Action(() => Quit (null, null))) { Caption = "Copy", Icon = new SvgPicture("#CrowIDE.icons.copy-file.svg"), CanExecute = false};
-            //CMDPaste = new Command(new Action(() => Quit (null, null))) { Caption = "Paste", Icon = new SvgPicture("#CrowIDE.icons.paste-on-document.svg"), CanExecute = false};
+            CMDCut = new Command(new Action(() => cut())) { Caption = "Cut", Icon = new SvgPicture("#CrowIDE.icons.scissors.svg"), CanExecute = false};
+            CMDCopy = new Command(new Action(() => copy())) { Caption = "Copy", Icon = new SvgPicture("#CrowIDE.icons.copy-file.svg"), CanExecute = false};
+            CMDPaste = new Command(new Action(() => paste())) { Caption = "Paste", Icon = new SvgPicture("#CrowIDE.icons.paste-on-document.svg"), CanExecute = false};
             CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("help"))) { Caption = "Help", Icon = new SvgPicture("#CrowIDE.icons.question.svg") };
-			CMDOptions = new Command(new Action(() => loadWindow("#CrowIDE.ui.Options.crow"))) { Caption = "Editor Options", Icon = new SvgPicture("#CrowIDE.icons.tools.svg") };
+			CMDOptions = new Command(new Action(() => loadWindow("#CrowIDE.ui.Options.crow", this))) { Caption = "Editor Options", Icon = new SvgPicture("#CrowIDE.icons.tools.svg") };
 
 			cmdCloseSolution = new Command(new Action(() => closeSolution()))
 			{ Caption = "Close Solution", Icon = new SvgPicture("#CrowIDE.icons.paste-on-document.svg"), CanExecute = false};
@@ -80,7 +71,7 @@ namespace Crow.Coding
 			CMDViewGTExp = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winGTExplorer.crow",this)))
 			{ Caption = "Graphic Tree Explorer", CanExecute = true};
 			CMDCompile = new Command(new Action(() => compileSolution()))
-			{ Caption = "Compile", CanExecute = false};
+			{ Caption = "Compile Solution", CanExecute = false};
 			CMDViewProjProps = new Command(new Action(loadProjProps))
 			{ Caption = "Project Properties", CanExecute = false};
 		}
@@ -90,11 +81,14 @@ namespace Crow.Coding
 		}
 		void openOptionsDialog(){}
 		void newFile() {			
-			currentSolution.OpenedItems.AddElement(new ProjectFile());
+			currentSolution.OpenedItems.Add(new ProjectFile());
 		}
 		void saveFileDialog() {}
 		void undo() {}
 		void redo() {}
+		void cut () { }
+		void copy () { }
+		void paste () { }
 		void closeSolution (){
 			if (currentSolution != null)
 				currentSolution.CloseSolution ();
@@ -118,16 +112,16 @@ namespace Crow.Coding
 		{
 			using (app = new CrowIDE ()) {
 				MainIFace = app;
-
 				//app.Keyboard.KeyDown += App_KeyboardKeyDown;
-				app.initIde ();
-
-				app.reloadWinConfigs ();
-
 				app.Run ();
 
 				app.saveWinConfigs ();
 			}
+		}
+		protected override void Startup ()
+		{
+			initIde ();
+			reloadWinConfigs ();
 		}
 
 		static void App_KeyboardKeyDown (object sender, KeyEventArgs e)
@@ -144,11 +138,11 @@ namespace Crow.Coding
 
 		public CrowIDE ()
 			: base(1024, 800)
-		{			
+		{
 		}
 
 		Instantiator instFileDlg;
-		Solution currentSolution;
+		Workspace currentSolution;
 		Project currentProject;
 		DockStack mainDock;
 
@@ -165,9 +159,9 @@ namespace Crow.Coding
 			mainDock = go.FindByName ("mainDock") as DockStack;
 
 			if (ReopenLastSolution && !string.IsNullOrEmpty (LastOpenSolution)) {
-				CurrentSolution = Solution.LoadSolution (LastOpenSolution);
-				//lock(MainIFace.UpdateMutex)
-				CurrentSolution.ReopenItemsSavedInUserConfig ();
+				CurrentSolution = new Workspace (LastOpenSolution);
+				lock(MainIFace.UpdateMutex)
+					CurrentSolution.ReopenItemsSavedInUserConfig ();
 			}
 
 			instFileDlg = Instantiator.CreateFromImlFragment
@@ -203,7 +197,7 @@ namespace Crow.Coding
 				Crow.Configuration.Global.Set ("CurrentDirectory", value);
 			}
 		}
-		public Solution CurrentSolution {
+		public Workspace CurrentSolution {
 			get { return currentSolution; }
 			set {
 				if (currentSolution == value)
@@ -263,7 +257,7 @@ namespace Crow.Coding
 			try {
 				string ext = Path.GetExtension (filePath);
 				if (string.Equals (ext, ".sln", StringComparison.InvariantCultureIgnoreCase)) {					
-					CurrentSolution = Solution.LoadSolution (filePath);
+					CurrentSolution = new Workspace (filePath);
 					LastOpenSolution = filePath;
 //				}else if (string.Equals (ext, ".csproj", StringComparison.InvariantCultureIgnoreCase)) {
 //					currentProject = new Project (filePath);

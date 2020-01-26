@@ -28,7 +28,7 @@ using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Collections;
-using Cairo;
+using Crow.Cairo;
 using System.Text;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -277,7 +277,7 @@ namespace Crow.Text
 
 		int getTabulatedColumn (int col, int line) {
 			return buffer.GetSubString (buffer [line],
-				buffer.GetLineLength (line)).Substring(0,col).Replace ("\t", new String (' ', Interface.TabSize)).Length;
+				buffer.GetLineLength (line)).Substring(0,col).Replace ("\t", new String (' ', Interface.TAB_SIZE)).Length;
 		}
 		int getTabulatedColumn (Point pos) {
 			return getTabulatedColumn (pos.X,pos.Y);
@@ -297,7 +297,7 @@ namespace Crow.Text
 				if (lineIndex < buffer.LineCount - 1)//dont print line break
 					lineLength--;
 				string lstr = buffer.GetSubString (buffer [lineIndex],
-					lineLength).Replace ("\t", new String (' ', Interface.TabSize));
+					lineLength).Replace ("\t", new String (' ', Interface.TAB_SIZE));
 
 				int lstrLength = lstr.Length;
 				if (lstrLength > longestTabulatedLine)
@@ -425,7 +425,7 @@ namespace Crow.Text
 			int buffPtr = buffer [line];
 			while (i < column && buffCol < buffer.GetLineLength(line)) {
 				if (buffer.GetCharAt(buffPtr + buffCol) == '\t')
-					i += Interface.TabSize;
+					i += Interface.TAB_SIZE;
 				else
 					i++;
 				buffCol++;
@@ -461,12 +461,12 @@ namespace Crow.Text
 		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseEnter (sender, e);
-			IFace.MouseCursor = XCursor.Text;
+			IFace.MouseCursor = MouseCursor.IBeam;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			IFace.MouseCursor = XCursor.Default;
+			IFace.MouseCursor = MouseCursor.Arrow;
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{

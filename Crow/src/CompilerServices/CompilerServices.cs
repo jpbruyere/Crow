@@ -1,28 +1,6 @@
-﻿//
-// CompilerServices.cs
+﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.Reflection.Emit;
@@ -131,7 +109,6 @@ namespace Crow.IML
 		internal static Type [] argsValueChange = { typeof (object), miInvokeValueChange.GetParameters () [1].ParameterType };
 		internal static FieldInfo fiVCNewValue = typeof (ValueChangeEventArgs).GetField ("NewValue");
 		internal static FieldInfo fiVCMbName = typeof (ValueChangeEventArgs).GetField ("MemberName");
-		internal static MethodInfo miValueChangeAdd = eiValueChange.GetAddMethod ();
 
 		internal static EventInfo eiDSChange = typeof (Widget).GetEvent ("DataSourceChanged");
 		internal static MethodInfo miInvokeDSChange = eiDSChange.EventHandlerType.GetMethod ("Invoke");
@@ -270,6 +247,8 @@ namespace Crow.IML
 				name = "ToInt16";
 			else if (targetType == typeof (int))
 				name = "ToInt32";
+			else if (targetType == typeof (uint))
+				name = "ToUInt32";
 			else if (targetType == typeof (long))
 				name = "ToInt64";
 			else if (targetType == typeof (double))
@@ -323,10 +302,7 @@ namespace Crow.IML
 				return;
 			}
 
-			if (miDest.MemberType == MemberTypes.Property)
-				destType =(miDest as PropertyInfo).PropertyType;
-			else if (miDest.MemberType == MemberTypes.Field)
-				destType =(miDest as FieldInfo).FieldType;
+			destType = CompilerServices.GetMemberInfoType (miDest);
 
 			try {
 				if (value != null) {
@@ -534,7 +510,7 @@ namespace Crow.IML
 		internal static void emitConvert(ILGenerator il, Type origType, Type destType){
 			if (destType == typeof(object))
 				return;
-			if (destType == typeof(string)) {
+			if (destType == typeof (string)) {
 				System.Reflection.Emit.Label emitNullStr = il.DefineLabel ();
 				System.Reflection.Emit.Label endConvert = il.DefineLabel ();
 				il.Emit (OpCodes.Dup);
@@ -545,46 +521,55 @@ namespace Crow.IML
 				il.Emit (OpCodes.Pop);//remove null string from stack
 				il.Emit (OpCodes.Ldstr, "");//replace with empty string
 				il.MarkLabel (endConvert);
-			}else if (origType.IsValueType) {
+			} else if ((origType.IsEnum || origType == typeof (Enum)) && destType.IsEnum) {
+				il.Emit (OpCodes.Unbox_Any, destType);
+				return;
+			} else if (origType.IsValueType) {
 				if (destType != origType) {
 					MethodInfo miIO = getImplicitOp (origType, destType);
-                    if (miIO != null)
-                    {
-                        System.Reflection.Emit.Label emitCreateDefault = il.DefineLabel();
-                        System.Reflection.Emit.Label emitContinue = il.DefineLabel();
-                        LocalBuilder lbStruct = il.DeclareLocal(origType);
-                        il.Emit(OpCodes.Dup);
-                        il.Emit(OpCodes.Brfalse, emitCreateDefault);
-                        il.Emit(OpCodes.Unbox_Any, origType);
-                        il.Emit(OpCodes.Br, emitContinue);
-                        il.MarkLabel(emitCreateDefault);
-                        il.Emit(OpCodes.Pop);//pop null value
-                        il.Emit(OpCodes.Ldloca, lbStruct);
-                        il.Emit(OpCodes.Initobj, origType);
-                        il.Emit(OpCodes.Ldloc, lbStruct);
-                        il.MarkLabel(emitContinue);
-                        il.Emit(OpCodes.Call, miIO);
-                    }
-                    else
-                    {
-                        MethodInfo miconv = CompilerServices.GetConvertMethod(destType);
-                        if (miconv.IsStatic)
-                            il.Emit(OpCodes.Call, miconv);
-                        else
-                            il.Emit(OpCodes.Callvirt, miconv);
-                    }
-				}else
+					if (miIO != null) {
+						System.Reflection.Emit.Label emitCreateDefault = il.DefineLabel ();
+						System.Reflection.Emit.Label emitContinue = il.DefineLabel ();
+						LocalBuilder lbStruct = il.DeclareLocal (origType);
+						il.Emit (OpCodes.Dup);
+						il.Emit (OpCodes.Brfalse, emitCreateDefault);
+						il.Emit (OpCodes.Unbox_Any, origType);
+						il.Emit (OpCodes.Br, emitContinue);
+						il.MarkLabel (emitCreateDefault);
+						il.Emit (OpCodes.Pop);//pop null value
+						il.Emit (OpCodes.Ldloca, lbStruct);
+						il.Emit (OpCodes.Initobj, origType);
+						il.Emit (OpCodes.Ldloc, lbStruct);
+						il.MarkLabel (emitContinue);
+						il.Emit (OpCodes.Call, miIO);
+					} else {
+						MethodInfo miconv = CompilerServices.GetConvertMethod (destType);
+						if (miconv.IsStatic)
+							il.Emit (OpCodes.Call, miconv);
+						else
+							il.Emit (OpCodes.Callvirt, miconv);
+					}
+				} else
 					il.Emit (OpCodes.Unbox_Any, destType);//TODO:double check this
 			} else {
-				if (destType.IsAssignableFrom(origType))
+				if (destType.IsAssignableFrom (origType))
 					il.Emit (OpCodes.Castclass, destType);
 				else {
+					if (origType == typeof (string)) {
+						//search dest type for parse method
+						MethodInfo miParse = destType.GetMethod
+												("Parse", BindingFlags.Static | BindingFlags.Public,
+													Type.DefaultBinder, new Type [] { typeof (string) }, null);
+						if (miParse == null)
+							throw new Exception ("no Parse method found for: " + destType.FullName);
+						il.Emit (OpCodes.Call, miParse);
+					}
 					//implicit conversion can't be defined from or to object base class,
 					//so we will check if object underlying type is one of the implicit converter of destType
-					if (origType == typeof(object)) {//test all implicit converter to destType on obj
+					else if (origType == typeof (object)) {//test all implicit converter to destType on obj
 						System.Reflection.Emit.Label emitTestNextImpOp;
 						System.Reflection.Emit.Label emitImpOpFound = il.DefineLabel ();
-						foreach (MethodInfo mi in destType.GetMethods(BindingFlags.Public|BindingFlags.Static)) {
+						foreach (MethodInfo mi in destType.GetMethods (BindingFlags.Public | BindingFlags.Static)) {
 							if (mi.Name == "op_Implicit") {
 								if (mi.GetParameters () [0].ParameterType == destType)
 									continue;
@@ -918,9 +903,10 @@ namespace Crow.IML
 				if (a.IsDynamic)
 					continue;
 				foreach (Type expT in a.GetExportedTypes ()) {
-					if (expT.Name != strDataType)
+					if (expT.Name != strDataType && expT.FullName != strDataType)
 						continue;
-					knownTypes.Add (strDataType, expT);
+					if (!knownTypes.ContainsKey(strDataType))
+						knownTypes.Add (strDataType, expT);
 					return expT;
 				}
 			}
@@ -1050,6 +1036,12 @@ namespace Crow.IML
 
 			il.Emit (OpCodes.Ldfld, fi);
 		}
+
+		//helper to get member info underlying type.
+		internal static Type GetMemberInfoType (MemberInfo mi) =>
+				mi.MemberType == MemberTypes.Field ? (mi as FieldInfo).FieldType :
+				mi.MemberType == MemberTypes.Property ? (mi as PropertyInfo).PropertyType :
+				mi.MemberType == MemberTypes.Method ? (mi as MethodInfo).ReturnType : null;
 	}
 }
 

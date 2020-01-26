@@ -1,0 +1,18 @@
+﻿<?xml version="1.0"?>
+<DockWindow DataSource="{CurrentSolution}" Name="winSchema" Caption="IML Schematic View" Height="60%" Width="80%">
+	<ImlSchematicEditor DataSource="{SelectedItem}" Data="{GraphicTree}">
+		<Template>
+			<Group Name="ItemsContainer"/>
+		</Template>
+		<ItemTemplate DataType="Crow.Widget">
+			<Window Style="WinSchema" Caption="{Name}">
+				<Label Text="test"/>
+			</Window>
+		</ItemTemplate>
+		<ItemTemplate DataType="Crow.Container" >
+			<Window Style="WinSchema" Caption="{Name}">
+				<Label Text="test"/>
+			</Window>
+		</ItemTemplate>
+	</ImlSchematicEditor>
+</DockWindow>

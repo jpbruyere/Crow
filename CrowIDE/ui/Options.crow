@@ -1,16 +1,13 @@
 ﻿<?xml version="1.0"?>
 <Window Caption="Crow IDE Options" Width="80%" Height="70%" Background="DimGrey" Modal="true">
-	<TabView>
-		<TabItem Caption="IML Visual Editor">
+	<TabView SelectedTab="0">
+		<TabItem Caption="IML Visual Editor" SelectedBackground="Jet">
 			<VerticalStack Margin="10">
 				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
-				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
-				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
-				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
-				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
+				<CheckBox Caption="Reopen last solution on startup" IsChecked="{²ReopenLastSolution}"/>
 			</VerticalStack>
 		</TabItem>
-		<TabItem Caption="Text Editor">
+		<TabItem Caption="Text Editor" SelectedBackground="Jet">
 			<VerticalStack Margin="10">
 				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
 				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>

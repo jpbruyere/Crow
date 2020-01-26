@@ -30,7 +30,7 @@ namespace Crow.Coding
 		public Point End;
 
 		public string PrintableContent {
-			get { return string.IsNullOrEmpty(Content) ? "" : Content.Replace("\t", new String(' ', Interface.TabSize)); }
+			get { return string.IsNullOrEmpty(Content) ? "" : Content.Replace("\t", new String(' ', Interface.TAB_SIZE)); }
 		}
 
 //		public Token (TokenType tokType, string content = ""){

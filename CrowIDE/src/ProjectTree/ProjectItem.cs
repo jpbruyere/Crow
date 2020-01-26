@@ -30,18 +30,19 @@ using System.Xml;
 using System.IO;
 using Crow;
 using System.Threading;
+using Microsoft.Build.Construction;
 
 namespace Crow.Coding
 {	
 	public class ProjectItem : ProjectNode {
 		#region CTOR
 		public ProjectItem() {}
-		public ProjectItem (Project project, XmlNode _node) : base (project){
+		public ProjectItem (Project project, Microsoft.Build.Evaluation.ProjectItem _node) : base (project){
 			node = _node;
 		}
 		#endregion
 
-		public XmlNode node;
+		public Microsoft.Build.Evaluation.ProjectItem node;
 
         public override Picture Icon {
             get {
@@ -64,17 +65,17 @@ namespace Crow.Coding
 		}
 		public string Path {
 			get {
-				return node.Attributes["Include"]?.Value.Replace('\\','/');
+				return node.EvaluatedInclude?.Replace('\\','/');
 			}
 		}
 		public string AbsolutePath {
 			get {
-				return System.IO.Path.Combine (Project.RootDir, Path);
+				return System.IO.Path.Combine (Project.Path, Path);
 			}
 		}
 		public override ItemType Type {
 			get { 
-				return (ItemType)Enum.Parse (typeof(ItemType), node.Name, true);
+				return (ItemType)Enum.Parse (typeof(ItemType), node.ItemType, true);
 			}
 		}
 		public override string DisplayName {
@@ -85,7 +86,7 @@ namespace Crow.Coding
 			}
 		}
 		public string HintPath {
-			get { return node.SelectSingleNode ("HintPath")?.InnerText; }
+			get { return "HintPath?"; }
 		}
 
 		public override bool IsSelected {

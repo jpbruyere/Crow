@@ -1,0 +1,82 @@
+﻿<?xml version="1.0"?>
+<VerticalStack>
+	<Menu>
+		<MenuItem Caption="File" Width="Fit">
+			<MenuItem Command="{CMDTest}"/>
+			<MenuItem Caption="Open"/>
+			<MenuItem Caption="Save"/>
+			<MenuItem Caption="Quit"/>
+		</MenuItem>
+		<MenuItem Caption="Edit" Name="edit" Width="Fit">
+			<MenuItem Caption="Cut"/>
+			<MenuItem Caption="Copy"/>
+			<MenuItem Caption="Paste"/>
+			<MenuItem Caption="Special" Name="special" Width="Fit">
+				<MenuItem Caption="Cut"/>
+				<MenuItem Caption="Copy"/>
+				<MenuItem Caption="Paste"/>
+			</MenuItem>
+			<MenuItem Caption="Special2" Name="special" Width="Fit">
+				<MenuItem Caption="Cut"/>
+				<MenuItem Caption="Copy"/>
+				<MenuItem Caption="Paste"/>
+			</MenuItem>
+		</MenuItem>
+		<MenuItem Caption="Help" Width="Fit">
+			<MenuItem Caption="About"/>
+			<MenuItem Caption="Help"/>
+		</MenuItem>
+	</Menu>
+	<HorizontalStack Height="Fit">
+		<Label Text="Hover:" Width="50" Foreground="Grey"/>
+		<Label Text="{HoverWidget}"/>
+	</HorizontalStack>
+	<HorizontalStack Height="Fit">
+		<Label Text="Focus:" Width="50" Foreground="Grey"/>
+		<Label Text="{FocusedWidget}"/>
+	</HorizontalStack>
+	<HorizontalStack Height="Fit">
+		<Label Text="Active:" Width="50" Foreground="Grey"/>
+		<Label Text="{ActiveWidget}"/>
+	</HorizontalStack>
+	<Container Fit="true" Margin="50" Background="SlateGrey">
+		<Label Text="MouseEvents" Margin="3" Focusable="true" Fit="true"
+			Background="Jet"
+			Foreground="DimGrey"
+			TextAlignment="Center"
+			MouseEnter="{Foreground=White}"
+			MouseLeave="{Foreground=DimGrey}"
+			MouseDown="{Background=DarkRed}"
+			MouseClick="{Foreground=Green}"
+			MouseDoubleClick="{Foreground=Yellow}"
+			MouseUp="{Background=Jet}"/>
+	</Container>
+	<TextBox Width="300" Margin="10"/>
+	<Slider Width="300" Height="12"/>
+	<ComboBox Data="{TestList}" Width="120">
+		<ItemTemplate DataType="Crow.Color">
+			<HorizontalStack
+						HorizontalAlignment="Left"
+						Height="Fit" Width="200" Margin="1" Focusable="true"
+						MouseEnter="{Background=hgradient|0:DarkRed|1:Transparent}"
+						MouseLeave="{Background=Transparent}">
+				<Widget Height="12" Width="20" Background="{}" Margin="0" CornerRadius="3"/>
+				<Label Text="{}" Margin="0" Width="Stretched"/>
+			</HorizontalStack>
+		</ItemTemplate>
+	</ComboBox>
+	<HorizontalStack Height="Fit" Margin="1" Background="DimGrey" Width="200">
+				<VerticalStack Spacing="2" Width="50%">
+					<CheckBox Caption="test" MouseEnter="{Background=Blue}" MouseLeave="{Background=Transparent}"/>
+					<CheckBox />
+					<CheckBox />
+					<CheckBox IsChecked="true"/>
+				</VerticalStack>
+				<VerticalStack Spacing="2" Width="50%">
+					<RadioButton Fit="true"/>
+					<RadioButton Fit="true" IsChecked="true"/>
+					<RadioButton Fit="true"/>
+					<RadioButton Fit="true"/>
+				</VerticalStack>
+			</HorizontalStack>
+</VerticalStack>

@@ -1,0 +1,10 @@
+﻿<?xml version="1.0"?>
+<Container Fit="true" Margin="50" Background="LimeGreen" CacheEnabled="false"
+		HorizontalAlignment="Right" VerticalAlignment="Bottom"
+		MouseEnter="{Background=Grey}"
+		MouseLeave="{Background=LimeGreen}">
+	<Label HorizontalAlignment="Center" VerticalAlignment="Center" CacheEnabled="false"
+		MouseEnter="{Background=DimGrey}" Width="100"
+		MouseLeave="{Background=RoyalBlue}"
+	 	Margin="10" Text="{drawing}" Background="RoyalBlue"/>
+ </Container>

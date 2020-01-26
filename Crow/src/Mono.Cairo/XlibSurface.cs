@@ -34,7 +34,7 @@
 
 using System;
 
-namespace Cairo {
+namespace Crow.Cairo {
 
 	public class XlibSurface : Surface
 	{
@@ -58,7 +58,7 @@ namespace Cairo {
 			NativeMethods.cairo_xlib_surface_set_drawable (Handle, drawable, width, height);
 		}
 
-		public void SetSize (int width, int height)
+		public override void SetSize (int width, int height)
 		{
 			NativeMethods.cairo_xlib_surface_set_size (Handle, width, height);
 		}

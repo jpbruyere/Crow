@@ -1,4 +1,4 @@
-//
+﻿//
 // Mono.Cairo.Context.cs
 //
 // Author:
@@ -37,9 +37,8 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using Color = Crow.Color;
 
-namespace Cairo {	
+namespace Crow.Cairo {	
 
 	[Obsolete ("Renamed Cairo.Context per suggestion from cairo binding guidelines.")]
 	public class Graphics : Context {
@@ -431,6 +430,10 @@ namespace Cairo {
 		public void Arc (double xc, double yc, double radius, double angle1, double angle2)
 		{
 			NativeMethods.cairo_arc (handle, xc, yc, radius, angle1, angle2);
+		}
+		public void Arc (PointD center, double radius, double angle1, double angle2)
+		{
+			NativeMethods.cairo_arc (handle, center.X, center.Y, radius, angle1, angle2);
 		}
 
 		public void ArcNegative (double xc, double yc, double radius, double angle1, double angle2)

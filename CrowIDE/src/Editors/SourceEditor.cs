@@ -4,7 +4,7 @@
 // Author:
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
 //
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
+// Copyright (c) 2013-2019 Jean-Philippe Bruyère
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,17 +25,10 @@
 // THE SOFTWARE.
 
 using System;
-using System.Xml.Serialization;
 using System.ComponentModel;
-using System.Collections;
-using Cairo;
-using System.Text;
+using Crow.Cairo;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Linq;
 using System.Diagnostics;
-using System.IO;
-using System.Threading;
 
 namespace Crow.Coding
 {
@@ -512,7 +505,7 @@ namespace Crow.Coding
 			}
 		}
 		int getTabulatedColumn (int col, int line) {
-			return buffer [line].Content.Substring (0, col).Replace ("\t", new String (' ', Interface.TabSize)).Length;
+			return buffer [line].Content.Substring (0, col).Replace ("\t", new String (' ', Interface.TAB_SIZE)).Length;
 		}
 		int getTabulatedColumn (Point pos) {
 			return getTabulatedColumn (pos.X,pos.Y);
@@ -602,10 +595,14 @@ namespace Crow.Coding
 						level = currentNode.Level - 1;
 				}
 
-				for (int l = 0; l < level; l++) {					
+				/*for (int l = 0; l < level; l++) {					
 					gr.MoveTo (rFld.Center.X + 0.5, y);
 					gr.LineTo (rFld.Center.X + 0.5, y + fe.Ascent + fe.Descent);
 					rFld.Left += foldHSpace;
+				}*/
+				if (level > 0) {
+					gr.MoveTo (rFld.Center.X + 0.5, y);
+					gr.LineTo (rFld.Center.X + 0.5, y + fe.Ascent + fe.Descent);
 				}
 				if (closingNode) {
 					gr.MoveTo (rFld.Center.X + 0.5, y);
@@ -915,7 +912,7 @@ namespace Crow.Coding
 			int buffCol = 0;
 			while (i < curVisualCol && buffCol < buffer.CurrentCodeLine.Length) {
 				if (buffer.CurrentCodeLine[buffCol] == '\t')
-					i += Interface.TabSize;
+					i += Interface.TAB_SIZE;
 				else
 					i++;
 				buffCol++;
@@ -926,14 +923,14 @@ namespace Crow.Coding
 		{
 			base.onMouseEnter (sender, e);
 			if (e.X - ScreenCoordinates(Slot).X < leftMargin + ClientRectangle.X)
-				IFace.MouseCursor = XCursor.Default;
+				IFace.MouseCursor = MouseCursor.Arrow;
 			else
-				IFace.MouseCursor = XCursor.Text;
+				IFace.MouseCursor = MouseCursor.IBeam;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
-			IFace.MouseCursor = XCursor.Default;
+			IFace.MouseCursor = MouseCursor.Arrow;
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
@@ -945,9 +942,9 @@ namespace Crow.Coding
 
 			if (!e.Mouse.IsButtonDown (MouseButton.Left)) {
 				if (mouseLocalPos.X < leftMargin)
-					IFace.MouseCursor = XCursor.Default;
+					IFace.MouseCursor = MouseCursor.Arrow;
 				else
-					IFace.MouseCursor = XCursor.Text;
+					IFace.MouseCursor = MouseCursor.IBeam;
 				return;
 			}
 

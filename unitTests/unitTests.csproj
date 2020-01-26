@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net472</TargetFramework>
+		<ReleaseVersion>0.8.0</ReleaseVersion>
+	</PropertyGroup>
+	<ItemGroup>
+	  <PackageReference Include="NUnit" Version="3.12.0" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Crow\Crow.csproj" />
+	</ItemGroup>
+</Project>

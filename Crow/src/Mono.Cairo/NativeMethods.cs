@@ -1,4 +1,4 @@
-//
+﻿//
 // Cairo.cs - a simplistic binding of the Cairo API to C#.
 //
 // Authors: Duncan Mak (duncan@ximian.com)
@@ -34,7 +34,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Cairo
+namespace Crow.Cairo
 {
 	// sort the functions like in the following page so it is easier to find what is missing
 	// http://cairographics.org/manual/index-all.html
