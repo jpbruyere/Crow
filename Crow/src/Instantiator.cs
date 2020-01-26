@@ -306,19 +306,19 @@ namespace Crow.IML {
 				}
 
 				if (!inlineTemplate) {//load from path or default template
-					ctx.il.Emit (OpCodes.Ldloc_0);//Load  current templatedControl ref
-					if (string.IsNullOrEmpty (templatePath)) {
-						ctx.il.Emit (OpCodes.Ldnull);//default template loading
-					} else {
+
+					if (!string.IsNullOrEmpty (templatePath)) {
+						ctx.il.Emit (OpCodes.Ldloc_0);//Load  current templatedControl ref
+						//	ctx.il.Emit (OpCodes.Ldnull);//default template loading
+						//} else {
 						ctx.il.Emit (OpCodes.Ldarg_1);//load currentInterface
 						ctx.il.Emit (OpCodes.Ldstr, templatePath); //Load template path string
 						//get declaring type for search fallback assembly
 						ctx.il.Emit (OpCodes.Ldloc_0);
 						ctx.il.Emit (OpCodes.Call, CompilerServices.miGetType);
-						ctx.il.Emit (OpCodes.Callvirt,
-							CompilerServices.miIFaceCreateTemplateInst);
+						ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miIFaceCreateTemplateInst);
+						ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miLoadTmp);//load template
 					}
-					ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miLoadTmp);//load template
 				}
 				if (itemTemplateIds.Count == 0) {
 					//try to load ItemTemplate(s) from ItemTemplate attribute of TemplatedGroup
@@ -454,7 +454,7 @@ namespace Crow.IML {
 				if (reader.HasAttributes) {
 
 					while (reader.MoveToNextAttribute ()) {
-						if (reader.Name == "Style" || reader.Name == "DataSourceType")
+						if (reader.Name == "Style" || reader.Name == "DataSourceType" || reader.Name == "Template")
 							continue;
 
 						#if DESIGN_MODE

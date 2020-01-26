@@ -36,7 +36,7 @@ namespace Crow
 		public TemplatedControl (Interface iface) : base(iface){}
 		#endregion
 
-		string _template;
+		string _template = "NOT_SET";
 		string caption;
 
 		/// <summary>
@@ -72,12 +72,6 @@ namespace Crow
 		}
 
 		#region GraphicObject overrides
-
-		public override void Initialize ()
-		{
-			loadTemplate ();
-			base.Initialize ();
-		}
 		/// <summary>
 		/// override search method from GraphicObject to prevent
 		/// searching inside template
