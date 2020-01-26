@@ -247,7 +247,7 @@ namespace Crow
 		/// <summary>
 		/// Initialize this Graphic object instance by setting style and default values and loading template if required
 		/// </summary>
-		public virtual void Initialize(){
+		public void Initialize(){
 			loadDefaultValues ();
 		}
 		#region private fields
@@ -1134,56 +1134,24 @@ namespace Crow
 				}
 			}
 
+			//first set template if it exists
+			PropertyInfo piTmp = thisType.GetProperty ("Template");
+			if (piTmp != null) {
+				//if template has been declared in IML, cancel style or default loading
+				System.Reflection.Emit.Label cancelTemplateLoad = il.DefineLabel ();
+				il.Emit (OpCodes.Ldloc_0);//load target widget
+				il.Emit (OpCodes.Ldfld, typeof (PrivateContainer).GetField ("child", BindingFlags.Instance | BindingFlags.NonPublic));
+				il.Emit (OpCodes.Brtrue, cancelTemplateLoad);
+
+				setDefaultValue (il, piTmp, ref styling);
+
+				il.MarkLabel (cancelTemplateLoad);
+			}
+
 			foreach (PropertyInfo pi in thisType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
-				if (pi.GetSetMethod () == null)
+				if (pi.Name == "Template")
 					continue;
-				XmlIgnoreAttribute xia = (XmlIgnoreAttribute)pi.GetCustomAttribute (typeof(XmlIgnoreAttribute));
-				if (xia != null)
-					continue;
-
-				object defaultValue;
-
-				int styleIndex = -1;
-				if (styling.Count > 0){
-					for (int i = 0; i < styling.Count; i++) {
-						if (styling[i].ContainsKey (pi.Name)){
-							styleIndex = i;
-							break;
-						}
-					}
-				}
-				if (styleIndex >= 0){
-					if (pi.PropertyType.IsEnum)//maybe should be in parser..
-						defaultValue = Enum.Parse(pi.PropertyType, (string)styling[styleIndex] [pi.Name], true);
-					else
-						defaultValue = styling[styleIndex] [pi.Name];
-
-					#if DESIGN_MODE
-					if (defaultValue != null){
-						FileLocation fl = styling[styleIndex].Locations[pi.Name];
-						il.Emit (OpCodes.Ldloc_0);
-						il.Emit (OpCodes.Ldstr, pi.Name);
-						il.Emit (OpCodes.Ldstr, fl.FilePath);
-						il.Emit (OpCodes.Ldc_I4, fl.Line);
-						il.Emit (OpCodes.Ldc_I4, fl.Column);
-						il.Emit (OpCodes.Call, miDesignAddDefLoc);
-
-						il.Emit (OpCodes.Ldloc_0);
-						il.Emit (OpCodes.Ldfld, typeof(Widget).GetField("design_style_values"));
-						il.Emit (OpCodes.Ldstr, pi.Name);
-						il.Emit (OpCodes.Ldstr, defaultValue.ToString());
-						il.Emit (OpCodes.Call, CompilerServices.miDicStrStrAdd);
-					}
-					#endif
-
-				}else {
-					DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof (DefaultValueAttribute));
-					if (dv == null)
-						continue;
-					defaultValue = dv.Value;
-				}
-
-				CompilerServices.EmitSetValue (il, pi, defaultValue);
+				setDefaultValue (il, pi, ref styling);
 			}
 			il.Emit(OpCodes.Ret);
 			#endregion
@@ -1201,6 +1169,59 @@ namespace Crow
 
 			onInitialized (this, null);
 		}
+		void setDefaultValue (ILGenerator il, PropertyInfo pi, ref List<Style> styling)
+		{
+			if (pi.GetSetMethod () == null)
+				return;
+			XmlIgnoreAttribute xia = (XmlIgnoreAttribute)pi.GetCustomAttribute (typeof (XmlIgnoreAttribute));
+			if (xia != null)
+				return;
+
+			object defaultValue;
+
+			int styleIndex = -1;
+			if (styling.Count > 0) {
+				for (int i = 0; i < styling.Count; i++) {
+					if (styling [i].ContainsKey (pi.Name)) {
+						styleIndex = i;
+						break;
+					}
+				}
+			}
+			if (styleIndex >= 0) {
+				if (pi.PropertyType.IsEnum)//maybe should be in parser..
+					defaultValue = Enum.Parse (pi.PropertyType, (string)styling [styleIndex] [pi.Name], true);
+				else
+					defaultValue = styling [styleIndex] [pi.Name];
+
+#if DESIGN_MODE
+				if (defaultValue != null) {
+					FileLocation fl = styling [styleIndex].Locations [pi.Name];
+					il.Emit (OpCodes.Ldloc_0);
+					il.Emit (OpCodes.Ldstr, pi.Name);
+					il.Emit (OpCodes.Ldstr, fl.FilePath);
+					il.Emit (OpCodes.Ldc_I4, fl.Line);
+					il.Emit (OpCodes.Ldc_I4, fl.Column);
+					il.Emit (OpCodes.Call, miDesignAddDefLoc);
+
+					il.Emit (OpCodes.Ldloc_0);
+					il.Emit (OpCodes.Ldfld, typeof (Widget).GetField ("design_style_values"));
+					il.Emit (OpCodes.Ldstr, pi.Name);
+					il.Emit (OpCodes.Ldstr, defaultValue.ToString ());
+					il.Emit (OpCodes.Call, CompilerServices.miDicStrStrAdd);
+				}
+#endif
+
+			} else {
+				DefaultValueAttribute dv = (DefaultValueAttribute)pi.GetCustomAttribute (typeof (DefaultValueAttribute));
+				if (dv == null)
+					return;
+				defaultValue = dv.Value;
+			}
+
+			CompilerServices.EmitSetValue (il, pi, defaultValue);
+		}
+
 		protected virtual void onInitialized (object sender, EventArgs e){
 			Initialized.Raise(sender, e);
 		}
