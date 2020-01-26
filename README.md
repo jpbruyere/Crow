@@ -8,22 +8,22 @@
   C# Rapid Open Widgets
   <br>  
 <p align="center">
-  <a href="https://gitter.im/CSharpRapidOpenWidgets?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge">
-    <img src="https://badges.gitter.im/CSharpRapidOpenWidgets.svg">
+  <a href="https://travis-ci.org/jpbruyere/Crow">
+      <img src="https://img.shields.io/travis/jpbruyere/Crow.net.svg?&logo=travis&logoColor=white">
+  </a>
+  <a href="https://ci.appveyor.com/project/jpbruyere/Crow">
+	<img src="https://img.shields.io/appveyor/ci/jpbruyere/Crow?label=Windows&logo=appveyor&logoColor=lightgrey">
   </a>
   <a href="https://www.paypal.me/GrandTetraSoftware">
     <img src="https://img.shields.io/badge/Donate-PayPal-green.svg">
   </a>
-  <a href="https://travis-ci.org/jpbruyere/Crow">
-      <img src="https://travis-ci.org/jpbruyere/Crow.svg?branch=master">
-  </a>
-  <a href="https://ci.appveyor.com/project/jpbruyere/Crow">
-    <img src="https://ci.appveyor.com/api/projects/status/j387lo59vnov8jbc?svg=true">
-  </a>
+  <a href="https://gitter.im/CSharpRapidOpenWidgets?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge">
+    <img src="https://badges.gitter.im/CSharpRapidOpenWidgets.svg">
+  </a>    
 </p>
 </h1>
 
-**C.R.O.W.** is an  [application framework](https://en.wikipedia.org/wiki/Application_framework) for building portable graphical interfaces entirely developed in **C#**. It provides a declarative interface language with **styling** and **templates** called [IML](interface-markup-language) for **Interface Markup Language** similar to [XAML](https://en.wikipedia.org/wiki/Extensible_Application_Markup_Language) and a binding system for easy code linking.
+**C.R.O.W.** is an open source  [application framework](https://en.wikipedia.org/wiki/Application_framework) for building portable graphical interfaces in **C#**. It provides a declarative interface language with **styling** and **templates** called [IML](interface-markup-language) for **Interface Markup Language** similar to [XAML](https://en.wikipedia.org/wiki/Extensible_Application_Markup_Language) and a binding system for easy code linking.
 
 C.R.O.W. is in **beta** development state, api could change.
 
