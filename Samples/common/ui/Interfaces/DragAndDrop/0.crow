@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<HorizontalStack Background="DimGrey" Margin="10" Width="90%" Height="90%" Spacing="100" Focusable="true">
+	<Container Name="source" StartDrag="{Background=DimGrey}" EndDrag="{Background=SeaGreen}" Focusable="true" Fit="true"
+			Drop="{../target.Background=Green}"
+			MouseEnter="{/txt.Foreground=Red}" MouseLeave="{/txt.Foreground=White}" MouseClick="{Background=SeaGreen}"
+			AllowDrag="true" Width="200" Height="200" Background="SeaGreen">
+		<VerticalStack Margin="50">
+			<Label Name="txt" Text="Drag me" Foreground="Grey"/>
+			<Label Text="Dragged" Visible="{../../IsDragged}" Foreground="Grey"/>
+		</VerticalStack>
+	</Container>
+	<Container Name="target" DragEnter="{Background=SeaGreen}" DragLeave="{Background=DimGrey}" Focusable="true" Fit="true"
+			MouseEnter="{/txt.Foreground=Red}" MouseLeave="{/txt.Foreground=White}"
+			AllowDrop="true"  Background="DimGrey">
+		<VerticalStack Margin="50">
+			<Label Name="txt" Text="Drop here" Foreground="Grey"/>
+			<Label Text="Dragged" Visible="{../../IsDragged}" Foreground="Grey"/>
+		</VerticalStack>
+	</Container>
+</HorizontalStack>

@@ -31,7 +31,7 @@ using System.Text;
 using System.Xml.Serialization;
 using System.Reflection;
 using System.Diagnostics;
-using Cairo;
+using Crow.Cairo;
 
 
 
@@ -53,7 +53,7 @@ namespace Crow
 		{
 			ctx.SetSourceRGBA (color.R, color.G, color.B, color.A);
 		}
-		public static object Parse(string s)
+		public static new object Parse(string s)
 		{
 			return new SolidColor((Color)s);
 		}

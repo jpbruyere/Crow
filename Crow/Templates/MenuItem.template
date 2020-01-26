@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0"?>
-<HorizontalStack>
 <Popper Font="{./Font}" Caption="{./Caption}"  Background="{./Background}" PopDirection="{./PopDirection}"
-	Foreground = "{./Foreground}" CanPop="{./HasChildren}" MouseClick="./onMI_Click"
+	Foreground = "{./Foreground}" CanPop="{./HasChildren}"
 	IsPopped="{²./IsOpened}" PopWidth="{./PopWidth}" PopHeight="{./PopHeight}">
 	<Template>
 		<CheckBox IsChecked="{²./IsPopped}" Caption="{./Caption}" Background="{./Background}" Foreground="{./Foreground}">
@@ -22,5 +21,3 @@
 		<VerticalStack Name="ItemsContainer"/>
 	</Border>
 </Popper>
-<Widget Background="Green" Width="5" Height="5" Visible="{./AutomaticOpening}"/>
-</HorizontalStack>

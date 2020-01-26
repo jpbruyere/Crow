@@ -1,0 +1,16 @@
+﻿<?xml version="1.0"?>
+<DockWindow DataSource="{CurrentSolution}" Name="winStyle" Caption="Styling"  Width="20%">
+	<TreeView Data="{StylingContainers}">
+		<Template>
+			<VerticalStack Name="ItemsContainer" Spacing="1"/>
+		</Template>
+		<ItemTemplate DataType="Crow.Coding.StyleItemContainer">
+			<HorizontalStack Height="Fit" Spacing="1">
+				<Label Background="White" Foreground="Jet" Text="{Name}" Width="40%"/>
+				<Label Background="White" Foreground="Jet" Text="{Value}" Width="Stretched"/>
+			</HorizontalStack>
+		</ItemTemplate>
+		<ItemTemplate Path="#Crow.Coding.ui.CategoryExp.template" DataType="Crow.Coding.StyleContainer" Data="Items"/>
+	</TreeView>
+</DockWindow>
+

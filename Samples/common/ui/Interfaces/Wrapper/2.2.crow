@@ -1,0 +1,32 @@
+﻿<?xml version="1.0"?>
+<Window Caption="Horizontal Wrapper" Width="50%" Height="50%">
+		<Wrapper HorizontalAlignment="Left" Orientation="Horizontal" Height="100%" Width="Fit" Margin="0" Background="MediumSeaGreen" Spacing="1" >
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50%" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50%" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50%" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50%" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50%" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+			<Widget Width="50" Height="50%" Background="SeaGreen"/>
+			<Widget Width="50" Height="50" Background="SeaGreen"/>
+		</Wrapper>	
+</Window>

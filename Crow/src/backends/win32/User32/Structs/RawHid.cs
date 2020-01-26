@@ -30,19 +30,20 @@ namespace OpenToolkit.NT.Native
         /// Gets the raw input data as an array of bytes.
         /// </summary>
         /// <returns>An array of raw input data.</returns>
-        public unsafe byte[] GetRawData()
+        public byte[] GetRawData()
         {
             byte[] result = new byte[SizeHid * Count];
 
-            fixed (byte* dataPtr = &RawData)
-            {
-                for (int i = 0; i < result.Length; i++)
-                {
-                    result[i] = *(dataPtr + i);
-                }
-            }
 
-            return result;
+			//fixed (byte* dataPtr = &RawData)
+			//{
+			//    for (int i = 0; i < result.Length; i++)
+			//    {
+			//        result[i] = *(dataPtr + i);
+			//    }
+			//}
+			throw new NotImplementedException();
+            //return result;
         }
 
         /// <summary>
@@ -50,17 +51,18 @@ namespace OpenToolkit.NT.Native
         /// </summary>
         /// <param name="index">The index at which to access the raw input data.</param>
         /// <returns>A byte of raw input data at the given index.</returns>
-        public unsafe byte GetRawDataAt(int index)
+        public byte GetRawDataAt(int index)
         {
             if (index < 0 || index > SizeHid * Count)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
 
-            fixed (byte* dataPtr = &RawData)
-            {
-                return *(dataPtr + index);
-            }
-        }
+			//fixed (byte* dataPtr = &RawData)
+			//{
+			//    return *(dataPtr + index);
+			//}
+			throw new NotImplementedException ();
+		}
     }
 }

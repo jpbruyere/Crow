@@ -1,0 +1,8 @@
+﻿<?xml version="1.0"?>
+<Container Margin="20" Background="Red" >
+	<Container Margin="20" Background="Green" MouseDown="{../go1.Visible=True}" >
+		<Widget Name="go1" Margin="20" Background="DimGrey" Visible="false" MouseDown="{Visible=false}"
+			MouseEnter="{Background=Blue}"
+			MouseLeave="{Background=DimGrey}"/>
+	</Container>
+</Container>

@@ -1,0 +1,33 @@
+﻿<?xml version="1.0"?>
+<Group Background="DimGrey" Margin="10" Fit="true">
+	<Widget Margin="10" Width="20%" Height="20%" Background="SeaGreen"
+			VerticalAlignment="Top"
+			HorizontalAlignment="Left"
+			MinimumSize="10,10"/>
+	<Widget Margin="10" Width="20%" Height="20%" Background="SeaGreen"
+			VerticalAlignment="Top"
+			MinimumSize="10,10"/>
+	<Widget Margin="10" Width="20%" Height="20%" Background="SeaGreen"
+			VerticalAlignment="Top"
+			HorizontalAlignment="Right"
+			MinimumSize="10,10"/>
+	<Widget Margin="10" Width="20%" Height="20%" Background="SeaGreen"
+			HorizontalAlignment="Left"
+			MinimumSize="10,10"/>
+	<Widget Margin="10" Width="20%" Height="20%" Background="SeaGreen"
+			MinimumSize="10,10"/>
+	<Widget Margin="10" Width="20%" Height="20%" Background="SeaGreen"
+			HorizontalAlignment="Right"
+			MinimumSize="10,10"/>
+	<Widget Margin="10" Width="20%" Height="20%" Background="SeaGreen"
+			VerticalAlignment="Bottom"
+			HorizontalAlignment="Left"
+			MinimumSize="10,10"/>
+	<Widget Margin="10" Width="20%" Height="20%" Background="SeaGreen"
+			VerticalAlignment="Bottom"
+			MinimumSize="10,10"/>
+	<Widget Margin="10" Width="20%" Height="20%" Background="SeaGreen"
+			VerticalAlignment="Bottom"
+			HorizontalAlignment="Right"
+			MinimumSize="10,10"/>
+</Group>

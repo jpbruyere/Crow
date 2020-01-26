@@ -120,11 +120,11 @@ namespace OpenToolkit.NT.Native
             /// For extended error information, your application can call <see cref="Marshal.GetLastWin32Error"/>.
             /// </returns>
             [DllImport("user32", SetLastError = true)]
-            public static unsafe extern int GetMouseMovePointsEx
+            public static extern int GetMouseMovePointsEx
             (
                 [In] uint size,
                 [In] ref MouseMovePoint movePointIn,
-                [Out] MouseMovePoint* movePointOutBuffer,
+                [Out] IntPtr movePointOutBuffer,
                 [In] int pointAmount,
                 [In] GetMouseMovePointsResolution resolution
             );

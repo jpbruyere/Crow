@@ -27,7 +27,6 @@ Icon {
 	Width = "12";
 	Height = "12";
 }
-
 Wrapper {
 	Orientation = "Vertical";
 }
@@ -38,7 +37,15 @@ Button {
 Label {
 	Height = "Fit";
 	Width = "Fit";
-	Margin = "0";
+	Margin = "0";	
+}
+TextBox {
+	Background = "White";
+	Foreground = "Black";
+	Selectable = "True";
+	Text = "TextBox";
+	Margin = "1";
+	MouseCursor = "IBeam";
 }
 Menu {
 	Margin = "1";
@@ -56,8 +63,8 @@ MenuItem {
 	//Background = "vgradient|0:DimGrey|1:Black";
 	//Background = "Transparent";
 	Foreground = "LightGrey";
-	//MouseEnter = "{Background=SteelBlue;}";
-	//MouseLeave = "{Background=Transparent;}";
+	MouseEnter = "{Background=SteelBlue;}";
+	MouseLeave = "{Background=Transparent;}";
 	//MouseEnter = "{Background = vgradient|0:SteelBlue|1:Jet;Foreground=White;}";
 	//MouseLeave = "{Foreground=LightGrey;Background=Transparent;}";
 	SelectionBackground = "Transparent";
@@ -81,8 +88,8 @@ Splitter {
 	Margin = "1";
 	Background = "Grey";
 }
-Spinner {
-	Foreground = "DimGrey";
+Spinner {	
+	Foreground = "Grey";
 }
 TabView {
 	CacheEnabled = "false";
@@ -96,19 +103,20 @@ TabItem {
 	//MouseLeave = "{Foreground=LightGrey;Background=Jet;}";
 	AllowDrag = "true";
 }
-TextBox {
-	Background = "White";
-	Foreground = "Black";
-	Selectable = "True";
-	Text = "TextBox";
-	Margin = "1";
-}
 Window {
 	Caption = "Window";
 	Focusable = "true";
 	MinimumSize="5,5";
 	Width = "150";
 	Height = "150";
+}
+WindowIconBorder {
+	BorderWidth="1";
+	Foreground="Transparent";
+	Height="12";
+	Width="12";
+	MouseEnter="{Foreground=White}";
+	MouseLeave="{Foreground=Transparent}";
 }
 ToolWindow {
 	Caption = "Window";
@@ -176,7 +184,7 @@ HSVSpinner {
 	SmallIncrement = "0.01";
 }
 TxtInFileDialog {
-	Margine = "1";
+	Margin = "1";
 	Font = "droid, 12";
 }
 CheckBoxAlt {
@@ -221,4 +229,26 @@ HScrollBar {
     Value = "0";
     Height = "12";
     Width = "Stretched";
+}
+EnumSelector {
+    Orientation = "Vertical";
+    Height = "Fit";
+    Spacing = "0";
+}
+labColor {
+	Margin="2";	
+	Width="Fit";
+}
+labColorV {
+	Margin="1";		
+	Width="Fit";
+}
+ColorSlider {
+	Focusable="true";
+	Height="12";
+	Margin="0";
+}
+ColorPicker {
+	Height="Fit";
+	MinimumSize="200,100";	
 }

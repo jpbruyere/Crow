@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--<ListBox Data="{TestList}" Focusable="true"/>-->
+<Border Margin="50">
+	<VerticalStack >
+		<Label Text="{../ColorList.SelectedItem}" Background="DarkGreen"/>
+		<Label Text="{Hover}" Background="DarkGreen"/>
+		<Button Caption="Clear" Width="Stretched" MouseClick="OnClear"/>
+		<ListBox Name="ColorList" Data="{TestList}"  Width="200" Height="200" 
+					 ItemTemplate="Interfaces/colorItem.crow">			
+		</ListBox>
+		<Button Caption="Load list" Width="Stretched" MouseClick="OnLoadList"/>
+	</VerticalStack>
+</Border>

@@ -1,0 +1,19 @@
+﻿<Properties StartupConfiguration="{B6D911CD-1D09-42FC-B300-9187190F2AE1}|Default">
+  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
+    <Watch file="../src/GraphicObjects/Shape.cs" line="42" offsetX="508" offsetY="265" expression="c" liveUpdate="False" />
+    <Watch file="../src/GraphicObjects/Shape.cs" line="48" offsetX="524" offsetY="319" expression="tmp" liveUpdate="False" />
+    <Watch file="../src/GraphicObjects/Slider.cs" line="88" offsetX="534" offsetY="788" expression="value" liveUpdate="False" />
+    <Watch file="src/SourceEditor/SourceEditor.cs" line="632" offsetX="703" offsetY="8806" expression="cl.Tokens [t]" liveUpdate="False" />
+    <Watch file="src/SourceEditor/CSharpParser.cs" line="202" offsetX="590" offsetY="1493" expression="currentTok" liveUpdate="False" />
+    <Watch file="src/SourceEditor/Parser.cs" line="258" offsetX="328" offsetY="3348" expression="tmp" liveUpdate="False" />
+    <Watch file="src/SourceEditor/SourceEditor.cs" line="629" offsetX="835" offsetY="9513" expression="lineIndex" liveUpdate="False" />
+    <Watch file="src/SourceEditor/BufferParser.cs" line="90" offsetX="544" offsetY="972" expression="SyntacticTreeMaxDepth" liveUpdate="False" />
+  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.CrowIDE PreferredExecutionTarget="MonoDevelop.Default" />
+</Properties>

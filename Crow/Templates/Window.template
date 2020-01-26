@@ -1,39 +1,31 @@
 ﻿<?xml version="1.0"?>
 <Border BorderWidth="1" Foreground="Grey" CornerRadius="{./CornerRadius}"
 				Background="{./Background}"
-				MouseEnter="./onBorderMouseEnter"
-				MouseLeave="./onBorderMouseLeave">
+				>
 	<VerticalStack Spacing="0">
-<!--		<Border Name="TitleBar" BorderWidth="1" Foreground="White" Width="{./WidthPolicy}" Height="Fit"
-				Background="vgradient|0:0.4,0.6,0.0,0.5|1:0.0,0.8,0.8,0.9">-->
-			<HorizontalStack Background="{./TitleBarBackground}"
-					Name="hs" Margin="2" Spacing="0" Height="Fit">
-				<Widget Width="5"/>
-				<Image Margin="1" Width="12" Height="12" Path="{./Icon}"/>
-				<Label Width="Stretched" Foreground="{./TitleBarForeground}" Margin="2" TextAlignment="Center" Text="{./Caption}" />
-				<Border Visible="{./ShowMinimize}" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
-					MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
-					<Image Focusable="true" Path="#Crow.Icons.minimize.svg"
-						 MouseClick="./onMinimized"/>
-				</Border>
-				<Border Visible="{./ShowNormal}" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
-					MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
-					<Image Focusable="true" Path="#Crow.Icons.normalize.svg"
-						 MouseClick="./onUnmaximized"/>
-				</Border>
-				<Border Visible="{./ShowMaximize}" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
-					MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
-					<Image Focusable="true" Path="#Crow.Icons.maximize.svg"
-						 MouseClick="./onMaximized"/>
-				</Border>
-				<Border BorderWidth="1" Foreground="Transparent"  Height="14" Width="14"
-					MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
-					<Image Focusable="true" Path="#Crow.Icons.exit2.svg"
-						 MouseClick="./butQuitPress"/>
-				</Border>
-				<Widget Width="5"/>
-			</HorizontalStack>
-<!--		</Border>-->
-		<Container Name="Content" MinimumSize="0,0" Background="0.5,0.5,0.5,0.5"/>
+		<HorizontalStack Background="{./TitleBarBackground}"
+				Name="hs" Margin="0" Spacing="0" Height="Fit">
+			<Widget Width="5"/>
+			<Image Margin="1" Width="12" Height="12" Path="{./Icon}"/>
+			<Label Width="Stretched" Foreground="{./TitleBarForeground}" Margin="2" TextAlignment="Center" Text="{./Caption}" />
+			<Border Visible="{./ShowMinimize}" Style="WindowIconBorder">
+				<Image Focusable="true" Path="#Crow.Icons.minimize.svg"
+					 MouseClick="./onMinimized"/>
+			</Border>
+			<Border Visible="{./ShowNormal}" Style="WindowIconBorder">
+				<Image Focusable="true" Path="#Crow.Icons.normalize.svg"
+					 MouseClick="./onUnmaximized"/>
+			</Border>
+			<Border Visible="{./ShowMaximize}" Style="WindowIconBorder">
+				<Image Focusable="true" Path="#Crow.Icons.maximize.svg"
+					 MouseClick="./onMaximized"/>
+			</Border>
+			<Border BorderWidth="1" Style="WindowIconBorder">
+				<Image Focusable="true" Path="#Crow.Icons.exit2.svg"
+					 MouseClick="./butQuitPress"/>
+			</Border>
+			<Widget Width="5"/>
+		</HorizontalStack>
+		<Container Name="Content" MinimumSize="0,0" Margin="4"/>
 	</VerticalStack>
 </Border>

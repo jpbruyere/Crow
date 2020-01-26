@@ -26,7 +26,7 @@
 
 using System;
 using System.Collections.Generic;
-using Cairo;
+using Crow.Cairo;
 
 namespace Crow
 {
@@ -107,7 +107,7 @@ namespace Crow
 		}
 		#endregion
 
-		public static object Parse(string s)
+		public static new object Parse(string s)
 		{
 			if (string.IsNullOrEmpty (s))
 				return Color.White;

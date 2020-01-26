@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Border BorderWidth="1" Margin="1" MinimumSize="10,10">
+<Border BorderWidth="1" Margin="1" MinimumSize="10,10" Background="{./Background}">
 	<Scroller  Name="scroller1" Margin="1" >
 		<VerticalStack
 			Height="Fit" Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>

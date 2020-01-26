@@ -1,46 +1,88 @@
-﻿//
-// IListChanged.cs
+﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
-// Author:
-//       Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
+
 using System;
 using System.Collections.Generic;
 
 namespace Crow
-{	
-	public class ObservableList<T> : List<T> , IObservableList {
-		public event EventHandler<ListChangedEventArg> ListAdd;
-		public event EventHandler<ListChangedEventArg> ListRemove;		
-
-		public void AddElement (T elem) {
-			this.Add(elem);
-			ListAdd.Raise (this, new ListChangedEventArg (this.Count - 1, elem));
+{
+	public class ObservableList<T> : List<T>, IObservableList, IValueChange {
+		#region IValueChange implementation
+		public event EventHandler<ValueChangeEventArgs> ValueChanged;
+		public virtual void NotifyValueChanged (string MemberName, object _value)
+		{
+			ValueChanged?.Invoke (this, new ValueChangeEventArgs (MemberName, _value));
 		}
-		public void RemoveElement (T elem) {
-			System.Diagnostics.Debug.WriteLine ("remove elem:" + elem);
-			int idx = this.IndexOf (elem);
-			this.RemoveAt (idx);
+		#endregion
+
+		#region IObservableList implementation
+		public event EventHandler<ListChangedEventArg> ListAdd;
+		public event EventHandler<ListChangedEventArg> ListRemove;
+		public event EventHandler<ListChangedEventArg> ListEdit;
+		#endregion
+
+		public ObservableList() : base () {}
+		public ObservableList (IEnumerable<T> collection) : base (collection) { }
+
+		int selectedIndex = -1;
+
+		public int SelectedIndex {
+			get => selectedIndex;
+			set {
+				if (selectedIndex == value)
+					return;
+
+				if (value > Count - 1)
+					selectedIndex = Count - 1;
+				else
+					selectedIndex = value;
+
+				NotifyValueChanged ("SelectedIndex", selectedIndex);
+				NotifyValueChanged ("SelectedItem", SelectedItem);
+			}
+		}
+		public T SelectedItem {
+			get => selectedIndex < 0 ? default(T) : this [selectedIndex];
+			set {
+				this [selectedIndex] = value;
+			}
+		}
+		public new void Add (T elem) {
+			base.Add (elem);
+			ListAdd.Raise (this, new ListChangedEventArg (this.Count - 1, elem));
+			SelectedIndex = this.Count - 1;
+		}
+		public new void Remove (T elem) {
+			int idx = IndexOf (elem);
+			base.RemoveAt (idx);
 			ListRemove.Raise (this, new ListChangedEventArg (idx, elem));
+		}
+		public void Remove () {
+			if (selectedIndex < 0)
+				return;
+			RemoveAt (selectedIndex);
+			SelectedIndex--;
+		}
+		public void Insert ()
+		{
+			base.Insert (selectedIndex+1, default(T));
+			SelectedIndex++;
+			ListAdd.Raise (this, new ListChangedEventArg (selectedIndex, SelectedItem));
+		}
+		public void RaiseEdit () {
+			if (selectedIndex < 0)
+				return;
+			ListEdit.Raise (this, new ListChangedEventArg (selectedIndex, SelectedItem));
+		}
+
+		public new void RemoveAt (int index)
+		{
+			base.RemoveAt (index);
+			ListRemove.Raise (this, new ListChangedEventArg (index, null));
+		}
+		public void RaiseEditAt (int index) {
+			ListEdit.Raise (this, new ListChangedEventArg (index, this[index]));
 		}
 	}
 }

@@ -1,0 +1,5 @@
+﻿<?xml version="1.0"?>
+<VerticalStack Fit="true">
+	<TextBox Text="{Datas}" Width="100" />
+	<Button Caption="Set Text to Null" MouseClick="onSetDataToNull"/>
+</VerticalStack>

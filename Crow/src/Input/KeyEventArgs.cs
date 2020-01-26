@@ -31,9 +31,9 @@ using System.Text;
 
 namespace Crow
 {
-    public class KeyEventArgs : EventArgs
+    public class KeyEventArgs : CrowEventArgs
     {
-		int keyCode;
+		int keyCode=0;
 		Key key;
 		bool repeat;	
 
@@ -53,7 +53,7 @@ namespace Crow
 		}
 		public uint ScanCode
 		{
-		    get { return (uint)Key; }
+		    get { return (uint)keyCode; }
 		}
 		public bool IsRepeat
 		{

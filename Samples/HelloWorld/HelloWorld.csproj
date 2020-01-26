@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">  
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <OutputType>Exe</OutputType>        
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>     
+    <ReleaseVersion>0.8.0</ReleaseVersion>
+  </PropertyGroup>
+            
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG;NETFRAMEWORK;NET471</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
+    <Reference Include="System" />
+  </ItemGroup>    
+
+  <ItemGroup>  
+    <ProjectReference Include="..\..\Crow\Crow.csproj" />
+  </ItemGroup>    
+    
+  <ItemGroup>
+    <EmbeddedResource Include="ui\**\*.*">
+      <LogicalName>HelloWorld.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>                
+  </ItemGroup>
+</Project>

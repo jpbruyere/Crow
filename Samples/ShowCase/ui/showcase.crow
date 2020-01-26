@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<HorizontalStack Background="Jet" Margin="5">
+	<DirectoryView Name="dv" CurrentDirectory="Interfaces" Width="25%" SelectedItemChanged="Dv_SelectedItemChanged"/>
+	<Splitter Width="6"/>
+	<VerticalStack>
+		<Container Name="CrowContainer" Height="60%" Background="DimGrey"/>
+		<Splitter/>
+		<HorizontalStack>
+			<Scroller Name="scroller1" Background="White"
+					Margin="2" ScrollY="{../scrollbar1.Value}"
+					ValueChanged="./_scroller_ValueChanged">
+				<TextBox VerticalAlignment="Top" TextChanged="Tb_TextChanged"
+					Text="{source}" Multiline="true" TextAlignment="TopLeft"
+					Font="Courriernew 10"/>
+			</Scroller>
+			<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}"
+				LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
+				CursorSize="{../scroller1.ChildHeightRatio}"
+				Maximum="{../scroller1.MaxScrollY}" Orientation="Vertical"
+				Width="14" />
+		</HorizontalStack>
+		<Label Visible="{ShowError}" Text="{ErrorMessage}" Background="Red" Foreground="White" Width="Stretched" Margin="2"
+			Multiline="true"/>
+	</VerticalStack>
+</HorizontalStack>
