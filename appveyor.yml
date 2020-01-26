@@ -1,22 +1,28 @@
-version: 0.4.{build}
+version: 0.8.{build}
 
-branches:
-  only:
-  - master 
-
-clone_depth: 1
-
-before_build:
-- cmd: nuget restore Crow.sln
-
-build_script:
-    - set path=%path%;C:\Program Files (x86)\Mono\bin
-    - xbuild /p:Configuration=Release Crow.sln 
-
-#build: off
+image:
+  - Visual Studio 2019
+  - Ubuntu
 
 build:
+  verbosity: minimal
 
-#  project: Crow.sln
+for:
+  -
+    matrix:
+      only:
+        - image: Visual Studio 2019
+    environment:
+      APPVEYOR_SAVE_CACHE_ON_ERROR: true
+    build_script:
+      - msbuild /p:Configuration=Release /t:restore
+      - msbuild /p:Configuration=Release
 
-  verbosity: normal
+  -
+    matrix:
+      only:
+        - image: Ubuntu
+    environment:
+      FrameworkPathOverride: /usr/lib/mono/4.5/
+    build_script:
+      - dotnet build /p:Configuration=Release
