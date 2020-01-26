@@ -7,6 +7,9 @@ image:
 build:
   verbosity: minimal
 
+artifacts:
+    - path: 'build/**/*.nupkg'
+
 for:
   -
     matrix:
