@@ -361,8 +361,24 @@ namespace Crow {
 //			}
 //		}
 		void cancelLoadingThread(){
-			if (loadingThread != null)
-				loadingThread.Cancel ();
+			if (loadingThread == null)
+				return;
+
+			bool updateMx = Monitor.IsEntered (IFace.UpdateMutex);
+			bool layoutMx = Monitor.IsEntered (IFace.LayoutMutex);
+
+			if (layoutMx)
+				Monitor.Exit (IFace.LayoutMutex);
+			if (updateMx)
+				Monitor.Exit (IFace.UpdateMutex);
+
+			loadingThread.Cancel ();
+
+			if (layoutMx)
+				Monitor.Enter (IFace.LayoutMutex);
+			if (updateMx)
+				Monitor.Enter (IFace.UpdateMutex);
+
 		}
 		void loadPage(IEnumerable _data, Group page, string _dataTest)
 		{
@@ -519,8 +535,8 @@ namespace Crow {
 
 		protected override void Dispose (bool disposing)
 		{
-			if (disposing && loadingThread != null)
-				loadingThread.Cancel ();
+			if (disposing)
+				cancelLoadingThread ();
 			base.Dispose (disposing);
 		}
 
