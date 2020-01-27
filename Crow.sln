@@ -39,6 +39,8 @@ Global
 		{1E5C7065-28F9-4A1A-A2FB-DB5E03A63CB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CC6DFAB-2E4A-4786-976C-89053D5EA6A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0CC6DFAB-2E4A-4786-976C-89053D5EA6A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CC6DFAB-2E4A-4786-976C-89053D5EA6A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CC6DFAB-2E4A-4786-976C-89053D5EA6A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
