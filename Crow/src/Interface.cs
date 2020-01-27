@@ -474,11 +474,13 @@ namespace Crow
 		/// <param name="path">path of the iml file to load</param>
 		public Widget Load (string path)
 		{
-			lock (UpdateMutex) {
-				Widget tmp = CreateInstance (path);
-				AddWidget (tmp);
-				return tmp;
-			}
+			Monitor.Enter (UpdateMutex); 
+
+			Widget tmp = CreateInstance (path);
+			AddWidget (tmp);
+
+			Monitor.Exit (UpdateMutex);
+			return tmp;
 		}
 		/// <summary>
 		/// Create an instance of a GraphicObject linked to this interface but not added to the GraphicTree

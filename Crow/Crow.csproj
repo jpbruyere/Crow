@@ -18,7 +18,7 @@
 		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
 		<PackageProjectUrl>https://github.com/jpbruyere/Crow/wiki</PackageProjectUrl>
 		<PackageLicense>https://opensource.org/licenses/MIT</PackageLicense>
-		<PackageIconUrl>https://jpbruyere.github.io/Crow/images/crow.png</PackageIconUrl>
+		<PackageIcon>crow.png</PackageIcon>
 		<PackageCopyright>Copyright 2013-2019</PackageCopyright>
 		<PackageReleaseNotes>			
 		</PackageReleaseNotes>
@@ -26,7 +26,7 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>		
 		
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>    
-		<NoWarn>$(NoWarn);1591</NoWarn>
+		<NoWarn>$(NoWarn);1591;1587;1570;1572;1573;1574</NoWarn>
 
 		<DefineConstants>DESIGN_MODE</DefineConstants>				
 		
@@ -44,7 +44,8 @@
 		<PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.6.0" />
 		<PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.6.0" />
 	</ItemGroup>
-	<ItemGroup>
+    <ItemGroup>
+        <Content Include="$(SolutionDir)Images/crow.png" Pack="true" PackagePath="" />
 		<Compile Include="src\**\*.cs" Exclude="src\Mono.Cairo\NativeMethods-internal.cs;src\backends\win32\User32\Structs\RawInputDevice.cs" />
 		<EmbeddedResource Include="Templates\*.*">
 			<LogicalName>Crow.%(Filename).template</LogicalName>
