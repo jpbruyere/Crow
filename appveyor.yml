@@ -20,7 +20,6 @@ for:
     build_script:
       - msbuild /p:Configuration=Release /t:restore
       - msbuild /p:Configuration=Release
-
   -
     matrix:
       only:
