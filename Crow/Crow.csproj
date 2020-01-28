@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<!--<TargetFramework>netstandard2.0</TargetFramework>-->
-		<TargetFramework>net472</TargetFramework>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		
 		<ReleaseVersion>0.8.0</ReleaseVersion>
 		<AssemblyVersion>$(ReleaseVersion)</AssemblyVersion>		
 		
