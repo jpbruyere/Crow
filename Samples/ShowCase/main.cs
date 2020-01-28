@@ -71,8 +71,7 @@ namespace tests
 					g.DataSource = this;
 				} catch (Exception ex) {
 					Console.WriteLine (ex.ToString ());
-					if (ex is InstantiatorException)
-						showError ((InstantiatorException)ex);
+					showError (ex);
 				}
 			}
 
@@ -85,9 +84,9 @@ namespace tests
 			NotifyValueChanged ("source", source);
 		}
 
-		void showError (InstantiatorException ex)
+		void showError (Exception ex)
 		{
-			NotifyValueChanged ("ErrorMessage", ex.Path + ": " + ex.InnerException.Message);
+			NotifyValueChanged ("ErrorMessage", ex.ToString());
 			NotifyValueChanged ("ShowError", true);
 		}
 		void hideError ()
@@ -111,8 +110,7 @@ namespace tests
 				}
 			} catch (Exception ex) {
 				Console.WriteLine (ex.ToString ());
-				if (ex is InstantiatorException)
-					showError ((InstantiatorException)ex);
+				showError ((Exception)ex);
 			}
 		}
 

@@ -176,7 +176,7 @@ namespace Crow
 		#endregion
 
 		#if DEBUG_LOG
-		internal static List<GraphicObject> GraphicObjects = new List<GraphicObject>();
+		internal static List<Widget> GraphicObjects = new List<Widget>();
 		#endif
 
 		//internal bool isPopup = false;

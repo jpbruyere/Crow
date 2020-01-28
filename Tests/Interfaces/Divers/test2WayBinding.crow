@@ -1,5 +1,0 @@
-﻿<?xml version="1.0"?>
-<VerticalStack Fit="true">
-	<CheckBox IsChecked="{²BoolVal}"/>
-	<CheckBox Caption="second" IsChecked="{²BoolVal}"/>
-</VerticalStack>

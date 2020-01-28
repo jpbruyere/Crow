@@ -1,0 +1,13 @@
+﻿<?xml version="1.0"?>
+<VerticalStack Margin="20" Spacing="10" >
+	<Slider Height="10" Width="Stretched"/>
+	<Slider Background="RoyalBlue" Height="10" Width="Stretched"/>
+	<Slider Background="Transparent" Margin="2" Height="10" Width="Stretched"/>
+	<Slider Background="Transparent" CursorSize="10" Height="12" Width="Stretched" CursorType="Circle"/>
+	
+	<Slider Height="10" Width="Stretched" CursorType="None" CursorColor='Red'/>
+	
+	
+	<Slider ClipToClientRect='false' Background="Transparent" CursorSize="20" Height="12" Width="Stretched" CursorType="Circle"/>
+	<Slider ClipToClientRect='false' CacheEnabled='false' Background="Transparent" CursorSize="20" Height="12" Width="Stretched" CursorType="Circle"/>
+</VerticalStack>

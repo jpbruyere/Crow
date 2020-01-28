@@ -3,8 +3,13 @@
 		<TargetFramework>net472</TargetFramework>
 		<ReleaseVersion>0.8.0</ReleaseVersion>
 	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+	  <DebugType>full</DebugType>
+	</PropertyGroup>
 	<ItemGroup>
 	  <PackageReference Include="NUnit" Version="3.12.0" />
+	  <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
+	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Crow\Crow.csproj" />

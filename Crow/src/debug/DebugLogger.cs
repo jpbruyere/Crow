@@ -91,15 +91,15 @@ namespace Crow
 
 		public override string ToString ()
 		{
-			GraphicObject go = data as GraphicObject;
+			Widget go = data as Widget;
 			if (go != null)
-				return string.Format ("{0};{1};{2};{3}", begin, end, type, GraphicObject.GraphicObjects.IndexOf(go).ToString());
+				return string.Format ("{0};{1};{2};{3}", begin, end, type, Widget.GraphicObjects.IndexOf(go).ToString());
 			if (!(data is LayoutingQueueItem))
 				return string.Format ("{0};{1};{2}", begin, end, type);
 			LayoutingQueueItem lqi = (LayoutingQueueItem)data;
 			if (type == DbgEvtType.GOProcessLayouting)
-				return string.Format ("{0};{1};{2};{3};{4};{5}", begin, end, type, GraphicObject.GraphicObjects.IndexOf(lqi.graphicObject).ToString(), lqi.LayoutType.ToString(), lqi.result.ToString());			
-			return string.Format ("{0};{1};{2};{3};{4}", begin, end, type, GraphicObject.GraphicObjects.IndexOf(lqi.graphicObject).ToString(), lqi.LayoutType.ToString());
+				return string.Format ("{0};{1};{2};{3};{4};{5}", begin, end, type, Widget.GraphicObjects.IndexOf(lqi.graphicObject).ToString(), lqi.LayoutType.ToString(), lqi.result.ToString());			
+			return string.Format ("{0};{1};{2};{3};{4}", begin, end, type, Widget.GraphicObjects.IndexOf(lqi.graphicObject).ToString(), lqi.LayoutType.ToString());
 			
 		}
 	}
@@ -127,7 +127,7 @@ namespace Crow
 
 		static int y, level;
 
-		static void parseTree (GraphicObject go) {
+		static void parseTree (Widget go) {
 			if (go == null)
 				return;
 
@@ -137,7 +137,7 @@ namespace Crow
 
 			Group gr = go as Group;
 			if (gr != null) {
-				foreach (GraphicObject g in gr.Children) {
+				foreach (Widget g in gr.Children) {
 					parseTree (g);
 				}
 			} else {
@@ -152,15 +152,15 @@ namespace Crow
 			y = 1;
 			level = 0;
 
-			foreach (GraphicObject go in iface.GraphicTree) 
+			foreach (Widget go in iface.GraphicTree) 
 				parseTree (go);			
 
 			using (StreamWriter s = new StreamWriter("debug.log")){
 				s.WriteLine ("[GraphicObjects]");
-				lock (GraphicObject.GraphicObjects) {
-					GraphicObject.GraphicObjects = GraphicObject.GraphicObjects.OrderBy (o => o.yIndex).ToList();
-					for (int i = 0; i < GraphicObject.GraphicObjects.Count; i++) {
-						GraphicObject g = GraphicObject.GraphicObjects [i];
+				lock (Widget.GraphicObjects) {
+					Widget.GraphicObjects = Widget.GraphicObjects.OrderBy (o => o.yIndex).ToList();
+					for (int i = 0; i < Widget.GraphicObjects.Count; i++) {
+						Widget g = Widget.GraphicObjects [i];
 						s.WriteLine ("{0};{1};{2};{3}", i, g.GetType ().Name, g.yIndex, g.xLevel);	
 					}
 				}

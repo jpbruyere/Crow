@@ -36,7 +36,7 @@ namespace Crow
 		#endif
 		protected Widget child;
 		#if DEBUG_LOG
-		internal GraphicObject getTemplateRoot {
+		internal Widget getTemplateRoot {
 			get { return child; }
 		}
 		#endif
