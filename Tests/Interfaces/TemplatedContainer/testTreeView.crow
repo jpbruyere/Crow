@@ -1,4 +1,0 @@
-﻿<?xml version="1.0"?>
-<Border Margin="5" Height="90%" Width="50%">
-	<DirectoryView Name="dv" CurrentDirectory="/" Margin="1"/>
-</Border>

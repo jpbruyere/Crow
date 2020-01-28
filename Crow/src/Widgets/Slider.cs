@@ -3,6 +3,7 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using Crow.Cairo;
+using System;
 using System.ComponentModel;
 
 namespace Crow
@@ -37,6 +38,7 @@ namespace Crow
 		int _cursorSize;
 		Fill _cursorColor;
 		Orientation _orientation;
+		CursorType cursorType;
 		bool holdCursor = false;
 		#endregion
 
@@ -78,19 +80,18 @@ namespace Crow
 				NotifyValueChanged ("Orientation", _orientation);
 			}
 		}
+		[DefaultValue (CursorType.Rectangle)]
+		public CursorType CursorType {
+			get => cursorType;
+			set {
+				if (cursorType == value)
+					return;
+				cursorType = value;
+				NotifyValueChanged ("CursorType", cursorType);
+				RegisterForRedraw ();
+			}
+		}
 		#endregion
-
-		//[DefaultValue(10.0)]
-		//public override double Maximum {
-		//	get { return base.Maximum; }
-		//	set {				
-		//		if (value == base.Maximum)
-		//			return;
-		//		base.Maximum = value;
-		//		LargeIncrement = base.Maximum / 10.0;
-		//		SmallIncrement = LargeIncrement / 5.0;
-		//	}
-		//}
 
 		#region GraphicObject Overrides
 		protected override void onDraw (Context gr)
@@ -141,14 +142,26 @@ namespace Crow
 		}
 		protected virtual void DrawCursor(Context gr, Rectangle _cursor)
 		{
-			CairoHelpers.CairoRectangle (gr, _cursor, CornerRadius);
-            Foreground.SetAsSource(gr, _cursor);
-            gr.StrokePreserve();
-            CursorColor.SetAsSource(gr, _cursor);
+			if (cursorType != CursorType.None) {
+				switch (CursorType) {
+				case CursorType.Rectangle:
+					CairoHelpers.CairoRectangle (gr, _cursor, CornerRadius);
+					break;
+				case CursorType.Circle:
+					gr.Arc (_cursor.CenterD, 0.5 * _cursorSize, 0, Math.PI * 2.0);
+					break;
+				case CursorType.Pentagone:
+					break;
+				}
+				Foreground.SetAsSource (gr, _cursor);
+				gr.StrokePreserve ();
+			}
+
+			CursorColor.SetAsSource(gr, _cursor);
             gr.Fill();
 		}
 
-        void computeCursorPosition()
+		void computeCursorPosition ()
         {            
             Rectangle r = ClientRectangle;
 			PointD p1; 
@@ -229,5 +242,5 @@ namespace Crow
 			base.onMouseMove (sender, e);
 		}
 		#endregion
-    }
+	}
 }

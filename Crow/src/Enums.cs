@@ -86,12 +86,20 @@ namespace Crow
 		SW,
 		SE,
 	}
+	/// <summary>
+	/// Cursor shape use in Sliders
+	/// </summary>
 	public enum CursorType
 	{
+		/// <summary>Only Background of cursor will be drawm, you may use a bmp, svg, or shape as background for custom shape.</summary>
+		None,
 		Rectangle,
 		Circle,
 		Pentagone
 	}
+	/// <summary>
+	/// Color component used in color widgets
+	/// </summary>
 	public enum ColorComponent
 	{
 		Red,

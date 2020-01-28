@@ -1,8 +1,0 @@
-﻿MouseEnter = "{Background = Grey;Foreground = White;}";
-Fit = "true";
-MouseLeave = "{Background=Transparent;Foreground=Grey;}";
-MouseDown = "{Background=Red;Foreground=White;}";
-MouseUp = "{Background=Grey;Foreground=White;}";
-Foreground="Grey";
-Margin="5";
-CornerRadius="5";

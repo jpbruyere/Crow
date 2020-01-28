@@ -1,9 +1,0 @@
-﻿<?xml version="1.0"?>
-<VerticalStack MinimumSize="50,50" Background="DimGrey" Margin="10" Width="90%" Height="90%">
-	<Widget Margin="10" Width="Stretched" Height="Fit" Background="SeaGreen"
-			MinimumSize="10,10"/>
-	<Widget Margin="10" Width="Stretched" Height="Fit" Background="SeaGreen"
-			MinimumSize="10,10"/>
-	<Widget Margin="10" Width="Stretched" Height="Fit" Background="SeaGreen"
-			MinimumSize="10,10"/>
-</VerticalStack>

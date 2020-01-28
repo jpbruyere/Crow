@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
-		
+		<!--<TargetFramework>netstandard2.0</TargetFramework>-->
+		<TargetFramework>net472</TargetFramework>
 		<ReleaseVersion>0.8.0</ReleaseVersion>
 		<AssemblyVersion>$(ReleaseVersion)</AssemblyVersion>		
 		
@@ -20,7 +20,9 @@
 		<PackageLicense>https://opensource.org/licenses/MIT</PackageLicense>
 		<PackageIcon>crow.png</PackageIcon>
 		<PackageCopyright>Copyright 2013-2019</PackageCopyright>
-		<PackageReleaseNotes>			
+		<PackageReleaseNotes>
+			This release should solve most of ms dotnet exception, the win32 backend is
+			still untested. Next beta will have a glfw backend.
 		</PackageReleaseNotes>
 		
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>		
@@ -37,12 +39,13 @@
 	
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<DebugType>full</DebugType>
-		<DefineConstants>DEBUG;TRACE;_DEBUG_DISPOSE;_DEBUG_BINDING;DESIGN_MODE;_DEBUG_CLIP_RECTANGLE;_DEBUG_FOCUS;_DEBUG_DRAGNDROP</DefineConstants>
+		<DefineConstants>DEBUG;TRACE;_DEBUG_DISPOSE;_DEBUG_BINDING;DESIGN_MODE;_DEBUG_CLIP_RECTANGLE;_DEBUG_FOCUS;_DEBUG_DRAGNDROP;_DEBUG_LOG</DefineConstants>
 		<CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
 	</PropertyGroup>
 	<ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
 		<PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.6.0" />
 		<PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.6.0" />
+		<!--<PackageReference Include="glfw-sharp" Version="0.2.0" />-->
 	</ItemGroup>
     <ItemGroup>
         <Content Include="$(SolutionDir)Images/crow.png" Pack="true" PackagePath="" />

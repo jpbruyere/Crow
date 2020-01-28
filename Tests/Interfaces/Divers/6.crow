@@ -1,6 +1,0 @@
-﻿<?xml version="1.0"?>
-<VerticalStack Fit="true" Background="DimGrey" Margin="5">
-<!--	<RadioButton/>-->
-	<Label Text="a" Width="Stretched" Background="Red"/>
-	<Label Text="{fps}" HorizontalAlignment="Right" Background="LimeGreen"/>
-</VerticalStack>

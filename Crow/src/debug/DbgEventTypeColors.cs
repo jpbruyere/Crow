@@ -30,7 +30,7 @@ using System.Linq;
 namespace Crow
 {
 	#if DEBUG_LOG
-	public class DbgEventTypeColors : GraphicObject
+	public class DbgEventTypeColors : Widget
 	{
 		protected override void onDraw (Context gr)
 		{

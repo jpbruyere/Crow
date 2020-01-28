@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0"?>
 <HorizontalStack Width="Stretched" Height="Fit" Margin="5" Background="Mantis">
-	<GraphicObject Background="Carmine" Width="10%" Height="20"/>
-	<GraphicObject Background="Carmine" Width="Stretched" Height="20"/>
-	<GraphicObject Background="Carmine" Width="10%" Height="20"/>
-	<GraphicObject Background="Carmine" Width="10%" Height="20"/>
-	<GraphicObject Background="Carmine" Width="10%" Height="20"/>
-	<GraphicObject Background="Carmine" Width="10%" Height="20"/>
-	<GraphicObject Background="Carmine" Width="10%" Height="20"/>
+	<Widget Background="Carmine" Width="10%" Height="20"/>
+	<Widget Background="Carmine" Width="Stretched" Height="20"/>
+	<Widget Background="Carmine" Width="10%" Height="20"/>
+	<Widget Background="Carmine" Width="10%" Height="20"/>
+	<Widget Background="Carmine" Width="10%" Height="20"/>
+	<Widget Background="Carmine" Width="10%" Height="20"/>
+	<Widget Background="Carmine" Width="10%" Height="20"/>
 </HorizontalStack>

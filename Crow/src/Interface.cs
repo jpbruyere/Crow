@@ -83,17 +83,19 @@ namespace Crow
 			FontRenderingOptions.HintStyle = HintStyle.Full;
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Default;
 		}
-
-		public Interface(int width=800, int height=600, IBackend _backend = null){
+		public Interface(int width=800, int height=600, IBackend _backend = null, bool startUIThread = true)  {
 			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 			CurrentInterface = this;
 			clientRectangle = new Rectangle (0, 0, width, height);
 			backend = _backend;
 
-			Thread t = new Thread (InterfaceThread) {
-				IsBackground = true
-			};
-			t.Start ();
+			if (startUIThread) {
+				Thread t = new Thread (InterfaceThread) {
+					IsBackground = true
+				};
+				t.Start ();
+			}
+
 #if MEASURE_TIME
 			PerfMeasures.Add (updateMeasure);
 			PerfMeasures.Add (drawingMeasure);
@@ -404,7 +406,7 @@ namespace Crow
 
 			if (path.StartsWith ("#", StringComparison.Ordinal)) {
 				string resId = path.Substring (1);
-				stream = Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
+				stream = Assembly.GetEntryAssembly ()?.GetManifestResourceStream (resId);
 				if (stream != null)
 					return stream;
 				string assemblyName = resId.Split ('.') [0];
@@ -474,13 +476,11 @@ namespace Crow
 		/// <param name="path">path of the iml file to load</param>
 		public Widget Load (string path)
 		{
-			Monitor.Enter (UpdateMutex); 
-
-			Widget tmp = CreateInstance (path);
-			AddWidget (tmp);
-
-			Monitor.Exit (UpdateMutex);
-			return tmp;
+			lock (UpdateMutex) {
+				Widget tmp = CreateInstance (path);
+				AddWidget (tmp);
+				return tmp;
+			}
 		}
 		/// <summary>
 		/// Create an instance of a GraphicObject linked to this interface but not added to the GraphicTree
@@ -489,11 +489,11 @@ namespace Crow
 		/// <param name="path">path of the iml file to load</param>
 		public virtual Widget CreateInstance (string path)
 		{
-			//try {
+			try {
 				return GetInstantiator (path).CreateInstance ();
-			//} catch (Exception ex) {
-			//	throw new Exception ("Error loading <" + path + ">:", ex);
-			//}
+			} catch (Exception ex) {
+				throw new Exception ("Error loading <" + path + ">:", ex);
+			}
 		}
 		/// <summary>
 		/// Create an instance of a GraphicObject linked to this interface but not added to the GraphicTree
@@ -1148,25 +1148,36 @@ namespace Crow
 			return true;
 		}
 
-		public virtual void OnKeyPress (char c)
+		public virtual bool OnKeyPress (char c)
 		{
-			_focusedWidget?.onKeyPress (_focusedWidget, new KeyPressEventArgs (c));
+			if (_focusedWidget == null)
+				return false;
+			_focusedWidget.onKeyPress (_focusedWidget, new KeyPressEventArgs (c));
+			return true;
 		}
-		public virtual void OnKeyUp (Key key)
+		public virtual bool OnKeyUp (Key key)
 		{
-			_focusedWidget?.onKeyUp (_focusedWidget, new KeyEventArgs (key, false));
+			if (_focusedWidget == null)
+				return false;
+			_focusedWidget.onKeyUp (_focusedWidget, new KeyEventArgs (key, false));
+			return true;
+
+
 			//			if (keyboardRepeatThread != null) {
 			//				keyboardRepeatOn = false;
 			//				keyboardRepeatThread.Abort();
 			//				keyboardRepeatThread.Join ();
 			//			}
 		}
-		public virtual void OnKeyDown (Key key)
+		public virtual bool OnKeyDown (Key key)
 		{
 			//Keyboard.SetKeyState((Crow.Key)Key,true);
 			lastKeyDownEvt = new KeyEventArgs (key, true);
 
-			_focusedWidget?.onKeyDown (_focusedWidget, new KeyEventArgs (key, false));
+			if (_focusedWidget == null)
+				return false;
+			_focusedWidget.onKeyDown (_focusedWidget, new KeyEventArgs (key, false));
+			return true;
 
 			//			keyboardRepeatThread = new Thread (keyboardRepeatThreadFunc);
 			//			keyboardRepeatThread.IsBackground = true;
