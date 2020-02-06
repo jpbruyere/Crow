@@ -48,7 +48,7 @@ TreeItemBorder {
 	Height="Fit";
 	Width="Stretched";
 	Foreground="Transparent";
-	MouseEnter="{Foreground=DimGrey}";
+	MouseEnter="{Foreground=Grey}";
 	MouseLeave="{Foreground=Transparent}";
 }
 TreeIcon {
@@ -58,8 +58,9 @@ TreeIcon {
 }
 Splitter {
 	Thickness="1";
-	Background="RoyalBlue";
+	Background="Grey";
 }
 DockWindow {
-    Background="0.18,0.18,0.18,0.9";
+    //Background="0.18,0.18,0.18,0.9";
+    Background="DimGrey";
 }

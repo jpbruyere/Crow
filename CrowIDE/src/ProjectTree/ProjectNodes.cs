@@ -34,8 +34,10 @@ using System.Threading;
 namespace Crow.Coding
 {
 	public enum ItemType {
+		Unknown,
 		ReferenceGroup,
 		Reference,
+		PackageReference,
 		ProjectReference,
 		VirtualGroup,
 		Folder,
@@ -59,12 +61,12 @@ namespace Crow.Coding
 		#endregion
 
 		#region CTOR
-		public ProjectNode (Project project, ItemType _type, string _name) : this(project){			
+		public ProjectNode (ProjectView project, ItemType _type, string _name) : this(project){			
 			type = _type;
 			name = _name;
 			initCommands ();
 		}
-		public ProjectNode (Project project){
+		public ProjectNode (ProjectView project){
 			Project = project;
 			initCommands ();
 		}
@@ -84,20 +86,42 @@ namespace Crow.Coding
 		string name;
 		List<ProjectNode> childNodes = new List<ProjectNode>();
 
-		public Project Project;
+		public ProjectView Project;
 		public List<Crow.Command> Commands;//list of command available for that node
+		string iconSub = "";
 
 		public virtual Crow.Picture Icon {
 			get {
 				switch (Type) {
 				case ItemType.Reference:
-					return new SvgPicture ("#Crow.Icons.assembly.svg");
+					return new SvgPicture ("#Icons.cube.svg");
 				case ItemType.ProjectReference:
-					return new SvgPicture("#Crow.Icons.projectRef.svg"); 
+					return new SvgPicture("#Crow.Icons.projectRef.svg");
+				case ItemType.PackageReference:
+					return new SvgPicture ("#Icons.package.svg");
+				case ItemType.ReferenceGroup:
+					return new SvgPicture ("#Icons.cubes.svg");
+				case ItemType.VirtualGroup:
+					return new SvgPicture ("#Icons.folder.svg");
+				case ItemType.Folder:
+					return new SvgPicture ("#Icons.folder.svg");
 				default:
-					return new SvgPicture("#CrowIDE.icons.blank-file.svg"); 
+					return new SvgPicture("#Icons.blank-file.svg"); 
 				}
 			}
+		}
+		public string IconSub {
+			get {
+				switch (Type) {
+				//case ItemType.ReferenceGroup:
+				case ItemType.VirtualGroup:
+				case ItemType.Folder:
+					return IsExpanded.ToString();
+				default:
+					return null;
+				}
+			}
+		
 		}
 		public ProjectNode Parent {
 			get { return parent; }
@@ -135,6 +159,7 @@ namespace Crow.Coding
 					return;
 				isExpanded = value;
 				NotifyValueChanged ("IsExpanded", isExpanded);
+				NotifyValueChanged ("IconSub", IconSub);
 			}
 		}
 		public virtual bool IsSelected

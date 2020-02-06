@@ -1,0 +1,7 @@
+﻿<?xml version="1.0"?>
+<VerticalStack Background="DimGrey" Margin="10" Fit="true" MinimumSize="200,20">
+	<Label Font="droid bold,20" Text="Label1" Margin="5"  Width="Stretched" Height="Fit" Background="Jet"/>	
+	<Label Font="droid bold,20" Text="Label1" Margin="5"  Width="Stretched" Height="Fit" Background="Jet"/>	
+	<Label Font="droid bold,20" Text="Label1" Margin="5"  Width="Stretched" Height="Fit" Background="Jet"/>	
+	<Label Font="droid bold,20" Text="Label1" Margin="5"  Width="Stretched" Height="Fit" Background="Jet"/>	
+</VerticalStack>

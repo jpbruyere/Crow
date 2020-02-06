@@ -1,60 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
-    <OutputType>Exe</OutputType>        
-    <EnableDefaultItems>false</EnableDefaultItems>
-    <StartupObject>Crow.Coding.CrowIDE</StartupObject>
-    <ReleaseVersion>0.8.0</ReleaseVersion>
-  </PropertyGroup>
-              
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugType>full</DebugType>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+<!--		<TargetFramework>net472</TargetFramework>-->
+		<OutputType>Exe</OutputType>
+		<StartupObject>Crow.Coding.CrowIDE</StartupObject>
+		<ReleaseVersion>$(CrowVersion)</ReleaseVersion>
+		<AssemblyVersion>$(CrowVersion)</AssemblyVersion>
+		<EnableDefaultItems>false</EnableDefaultItems>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<DebugType>full</DebugType>
+		<DefineConstants>TRACE;DEBUG</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup>
+		<EmbeddedResource Remove="icons\blank-file2.svg" />
+	</ItemGroup>
+	<ItemGroup>
+		<!--<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />-->
+		<Compile Include="src\**\*.cs" Exclude="src\ProjectTree\CSProjectFile.cs" />
+		<EmbeddedResource Include="icons\*.*">
+			<LogicalName>Icons.%(Filename)%(Extension)</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="ui\**\*.crow" />
+		<EmbeddedResource Include="ui\**\*.itemp" />
+		<EmbeddedResource Include="ui\**\*.template" Exclude="ui\DefaultTemplateOverrides\*.template">
+			<LogicalName>Crow.Coding.%(Filename).template</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="ui\DefaultTemplateOverrides\*.template">
+			<LogicalName>Crow.%(Filename).template</LogicalName>
+		</EmbeddedResource>
 
-  <ItemGroup>
-    <EmbeddedResource Remove="icons\blank-file2.svg" />
-  </ItemGroup>
-	
-  <ItemGroup>
-    <PackageReference Include="System.CodeDom" Version="4.5.0" />
-<!--<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />-->
-        
-    <Compile Include="src\**\*.cs" Exclude="src\ProjectTree\CSProjectFile.cs" />  
-        
-    <EmbeddedResource Include="icons\*.*">
-<!--      <LogicalName>Crowicons.%(Filename)%(Extension)</LogicalName>-->
-    </EmbeddedResource>
-
-    <EmbeddedResource Include="ui\**\*.crow" />
-    <EmbeddedResource Include="ui\**\*.itemp" />
-  
-    <EmbeddedResource Include="ui\**\*.template">
-      <LogicalName>Crow.Coding.%(Filename).template</LogicalName>
-    </EmbeddedResource> 
-
-    <EmbeddedResource Include="DefaultTemplateOverrides\*.*">
-      <LogicalName>Crow.%(Filename).template</LogicalName>
-    </EmbeddedResource>
-        
-    <EmbeddedResource Include="IDE.style" />    
-  </ItemGroup>
+		<EmbeddedResource Include="IDE.style" />
+	</ItemGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Build" Version="16.0.461" />
-		<PackageReference Include="Microsoft.CodeAnalysis" Version="3.3.0-beta3-19401-01" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.3.0-beta3-19401-01" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.0-beta3-19401-01" />
-		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="3.3.0-beta3-19401-01" />
-		<PackageReference Include="Microsoft.CodeAnalysis.Features" Version="3.3.0-beta3-19401-01" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="3.3.0-beta3-19401-01" />
-		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.0.461" />		
+	  <PackageReference Include="Microsoft.Build" Version="16.*">
+			<IncludeAssets>compile</IncludeAssets>
+		</PackageReference>
+	  <PackageReference Include="Microsoft.Build.Framework" Version="16.*">
+			<IncludeAssets>compile</IncludeAssets>
+		</PackageReference>
+	  <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.*">
+			<IncludeAssets>compile</IncludeAssets>
+		</PackageReference>
+	  <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.*">
+			<IncludeAssets>compile</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
-    
-  <ItemGroup>
-    <Folder Include="src\msbuild\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Crow\Crow.csproj" />
-  </ItemGroup>
+	
+	<ItemGroup>
+		<Folder Include="src\msbuild\" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Crow\Crow.csproj" />
+	</ItemGroup>
+		
 </Project>

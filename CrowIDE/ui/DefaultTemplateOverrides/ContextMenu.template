@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<MenuItem MinimumSize="20,20" Height="Fit" Width="160" Caption="Context Menu" Data="{ContextCommands}" Orientation="Vertical"
+<MenuItem MinimumSize="20,20" Height="Fit" Width="Fit" Caption="Context Menu" Data="{ContextCommands}" Orientation="Vertical"
 	IsOpened ="true" Visible="{/IsOpened}" SelectionBackground="Transparent">
 	<Template>		
-		<Border Background="DimGrey" Foreground="Black" CornerRadius="2">
-			<GenericStack Orientation="{./Orientation}" Name="ItemsContainer" Margin="2"/>
+		<Border Background="0.2,0.2,0.2,0.8" Foreground="Black" CornerRadius="2">
+			<GenericStack Orientation="{./Orientation}" Name="ItemsContainer" Margin="5"/>
 		</Border>		
 	</Template>
 	<ItemTemplate>

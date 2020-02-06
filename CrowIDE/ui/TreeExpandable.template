@@ -9,7 +9,7 @@
 				MouseEnter="{Background=LightGrey}"
 				MouseLeave="{Background=Transparent}"/>
 			<Image Style="TreeIcon"
-				Path="#Crow.Icons.folder.svg" SvgSub="{./IsExpanded}"/>
+				Path="{Icon}" SvgSub="{IconSub}"/>
 			<Label Text="{./Caption}"/>
 		</HorizontalStack>
 	</Border>

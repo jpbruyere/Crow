@@ -1,0 +1,11 @@
+﻿<?xml version="1.0"?>
+	<HorizontalStack Width="Fit" Height="Fit" Focusable="true"
+			HorizontalAlignment="Left"
+			MouseEnter="{Background=RoyalBlue}"
+			MouseLeave="{Background=Transparent}">
+		<Image Width="16" Height="16" Path="#Tests.image.folder1.svg" SvgSub="{Attributes}"/>
+		<Label Text="{Name}" Width="Fit" Height="Fit" Margin="0"/>
+		<Label Text="{Attributes}" Width="Fit" Height="Fit" Margin="0"/>
+		<Label Text="{Extension}" Width="Fit" Height="Fit" Margin="0"/>
+	</HorizontalStack>
+

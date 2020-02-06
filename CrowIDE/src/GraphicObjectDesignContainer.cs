@@ -41,7 +41,7 @@ namespace Crow.Coding
 		public Type CrowType;
 
 		public string IconPath {
-			get { return "#CrowIDE.icons.toolbox." + CrowType.FullName + ".svg"; }
+			get { return "#Icons." + CrowType.FullName + ".svg"; }
 		}
 		public string DisplayName {
 			get { return CrowType.Name; }

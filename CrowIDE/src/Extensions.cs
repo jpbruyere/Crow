@@ -26,7 +26,7 @@ namespace Crow
 	public static partial class Extensions
 	{
 		public static string GetIcon(this Widget go){
-			return "#CrowIDE.icons.toolbox." + go.GetType().FullName + ".svg";
+			return "#Icons." + go.GetType().FullName + ".svg";
 		}
 		public static List<Widget> GetChildren(this Widget go){
 			Type goType = go.GetType();

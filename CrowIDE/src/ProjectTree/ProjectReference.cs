@@ -35,7 +35,7 @@ using Microsoft.Build.Construction;
 namespace Crow.Coding
 {	
 	public class ProjectReference : ProjectItem {
-		public ProjectReference (Project proj, Microsoft.Build.Evaluation.ProjectItem pi) : base (proj, pi){
+		public ProjectReference (ProjectView proj, Microsoft.Build.Evaluation.ProjectItem pi) : base (proj, pi){
 		}
 		public string ProjectGUID {
 			get {

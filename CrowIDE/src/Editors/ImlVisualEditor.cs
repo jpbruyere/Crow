@@ -67,12 +67,12 @@ namespace Crow.Coding
 
 		void initCommands () {
 			cmdDelete = new Crow.Command (new Action (() => deleteObject (SelectedItem)))
-				{ Caption = "Delete", Icon = new SvgPicture ("#CrowIDE.icons.save.svg"), CanExecute = true };
+				{ Caption = "Delete", Icon = new SvgPicture ("#Icons.save.svg"), CanExecute = true };
 			Commands = new List<Crow.Command> (new Crow.Command[] { cmdDelete });
 		}
 
 		void initIcons () {
-			icoMove = new SvgPicture ("#CrowIDE.icons.move-arrows.svg");
+			icoMove = new SvgPicture ("#Icons.move-arrows.svg");
 
             //			icoStyle = new SvgPicture ();
             //			icoStyle.Load (IFace, "#CrowIDE.icons.palette.svg");

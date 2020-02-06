@@ -1,58 +1,48 @@
 ﻿<?xml version="1.0"?>
-<!--<Window Height="Stretched" Width="Stretched" >-->
-	<VerticalStack DataSourceType="CrowIDE">
-		<Menu>
-			<MenuItem Caption="File" Width="Fit" PopWidth="120" DataSource="{CurrentSolution}">
-				<MenuItem Command="{CMDNew}" />
-				<MenuItem Command="{CMDOpen}" />
-				<MenuItem Command="{cmdCloseSolution}" />
-				<MenuItem DataSource="{SelectedItem}" Command="{cmdSave}" />
-				<MenuItem DataSource="{SelectedItem}" Command="{cmdSaveAs}" />
-				<MenuItem Command="{CMDQuit}" />
-			</MenuItem>
-			<MenuItem Caption="Edit" Name="edit" Width="Fit" PopWidth="100" DataSource="{CurrentSolution}">
-				<MenuItem DataSource="{SelectedItem}" Command="{cmdUndo}" />
-				<MenuItem DataSource="{SelectedItem}" Command="{cmdRedo}" />
-				<MenuItem Command="{CMDCut}" />
-				<MenuItem Command="{CMDCopy}" />
-				<MenuItem Command="{CMDPaste}" />
-				<MenuItem Command="{CMDOptions}"/>
-			</MenuItem>
-			<MenuItem Caption="View" Fit="true" PopWidth="150">
-				<MenuItem Command="{CMDViewSolution}"/>
-				<MenuItem Command="{CMDViewEditor}"/>
-				<MenuItem Command="{CMDViewProperties}"/>
-				<MenuItem Command="{CMDViewDesign}"/>
-				<MenuItem Command="{CMDViewStyling}"/>
-				<MenuItem Command="{CMDViewToolbox}"/>
-				<MenuItem Command="{CMDViewErrors}"/>
-				<MenuItem Command="{CMDViewGTExp}"/>
-				<MenuItem Command="{CMDViewSchema}"/>
-			</MenuItem>
-			<MenuItem Caption="Project" Fit="true" PopWidth="120">
-				<MenuItem Command="{CMDCompile}"/>
-				<MenuItem Command="{CMDViewProjProps}"/>
-			</MenuItem>
-			<MenuItem Caption="Help" Width="Fit" PopWidth="60">
-				<MenuItem Caption="About"/>
-				<MenuItem Command="{CMDHelp}"/>
-			</MenuItem>
-		</Menu>
-<!--		<Label DataSource="{CurrentSolution}" Text="{SelectedItemElement}" Width="Stretched"/>-->
-<!--		<Docker >-->
-			<DockStack Name="mainDock"/>
-<!--			<DockWindow DataSource="{CurrentSolution}" Name="winEditor" Caption="Edit View" Width="70%" Height="80%">
-				<Template>
-					<Border BorderWidth="1" Foreground="DimGrey" CornerRadius="{./CornerRadius}"
-									Background="{./Background}"
-									MouseEnter="./onBorderMouseEnter"
-									MouseLeave="./onBorderMouseLeave">
-						<Container Name="Content" MinimumSize="50,50"/>
-					</Border>
-				</Template>
-				<EditPane SelectedItem="{²SelectedItem}" SelectedItemElement="{²SelectedItemElement}" Data="{OpenedItems}" DataTest="Extension"
-					ItemTemplate="#Crow.Coding.ui.EditPaneItems.template"/>
-			</DockWindow>-->
-<!--		</Docker>-->
-	</VerticalStack>
-<!--</Window>-->
+<VerticalStack DataSourceType="CrowIDE">
+	<Menu>
+		<MenuItem Caption="File" Width="Fit" PopWidth="120" DataSource="{CurrentSolution}">
+			<MenuItem Command="{CMDNew}" />
+			<MenuItem Command="{CMDOpen}" />
+			<MenuItem Command="{cmdCloseSolution}" />
+			<MenuItem DataSource="{SelectedItem}" Command="{cmdSave}" />
+			<MenuItem DataSource="{SelectedItem}" Command="{cmdSaveAs}" />
+			<MenuItem Command="{CMDQuit}" />
+		</MenuItem>
+		<MenuItem Caption="Edit" Name="edit" Width="Fit" PopWidth="100" DataSource="{CurrentSolution}">
+			<MenuItem DataSource="{SelectedItem}" Command="{cmdUndo}" />
+			<MenuItem DataSource="{SelectedItem}" Command="{cmdRedo}" />
+			<MenuItem Command="{CMDCut}" />
+			<MenuItem Command="{CMDCopy}" />
+			<MenuItem Command="{CMDPaste}" />
+			<MenuItem Command="{CMDOptions}" />
+		</MenuItem>
+		<MenuItem Caption="View" Fit="true" PopWidth="150">
+			<MenuItem Command="{CMDViewSolution}" />
+			<MenuItem Command="{CMDViewEditor}" />
+			<MenuItem Command="{CMDViewProperties}" />
+			<MenuItem Command="{CMDViewDesign}" />
+			<MenuItem Command="{CMDViewStyling}" />
+			<MenuItem Command="{CMDViewToolbox}" />
+			<MenuItem Command="{CMDViewErrors}" />
+			<MenuItem Command="{CMDViewLog}" />
+			<MenuItem Command="{CMDViewGTExp}" />
+			<MenuItem Command="{CMDViewSchema}" />
+		</MenuItem>
+		<MenuItem Caption="Project" Fit="true" PopWidth="120">
+			<MenuItem Command="{CMDBuild}" />
+			<MenuItem Command="{CMDClean}" />
+			<MenuItem Command="{CMDRestore}" />
+			<MenuItem Command="{CMDViewProjProps}" />
+		</MenuItem>
+		<MenuItem Caption="Help" Width="Fit" PopWidth="60">
+			<MenuItem Caption="About" />
+			<MenuItem Command="{CMDHelp}" />
+		</MenuItem>
+	</Menu>
+	<HorizontalStack DataSource="{CurrentSolution}" Height="Fit">
+		<Label Margin="3" Text="{ActiveConfiguration}" Background="Jet" Width="100"/>
+		<Label Margin="3" Text="{ActivePlatform}" Background="Jet" Width="100"/>
+	</HorizontalStack>
+	<DockStack Name="mainDock" />
+</VerticalStack>

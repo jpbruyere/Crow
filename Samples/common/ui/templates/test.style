@@ -1,0 +1,49 @@
+﻿FpsLabel {
+	Width = "30";
+	Font = "droid, 10";
+	Margin = "0";
+	TextAlignment = "Center";
+}
+FpsDisp {
+	Font = "droid bold, 10";
+	Width = "60";
+	Margin = "0";
+	CornerRadius = "3";
+	TextAlignment = "Center";
+	Background = "MediumSeaGreen";
+}
+HStackMeasure {
+	Margin = "2";
+	Width = "Fit";
+	Height = "Fit";
+	Background = "DimGrey";
+}
+CheckBox2 {
+	Template= "Interfaces/CheckBox2.imlt";
+	Background = "Jet";
+	Checked="{Background=MediumSeaGreen}";
+	Unchecked = "{Background=Jet}";
+}
+RadioButton2 {
+	Template="Interfaces/CheckBox2.imlt";
+	Background = "Jet";
+	Checked = "{Background=MediumSeaGreen}";
+	Unchecked = "{Background=Jet}";
+}
+labPerf {
+	Font = "droid, 8";
+	Width = "50%";
+}
+labPerfVal{
+	Font = "droid, 8";
+	Width = "50%";
+}
+DbgLogViewer{
+	Background = "Onyx";
+	Font = "mono, 8";
+	Foreground = "LightGrey";
+	Focusable = "true";
+}
+DockWindow{
+	Background = "0.1,0.1,0.1,0.5";
+}

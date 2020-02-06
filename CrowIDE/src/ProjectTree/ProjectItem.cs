@@ -1,43 +1,16 @@
-﻿//
-// ProjectNodes.cs
+﻿// Copyright (c) 2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
+
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
-using System.IO;
-using Crow;
-using System.Threading;
-using Microsoft.Build.Construction;
 
 namespace Crow.Coding
-{	
+{
 	public class ProjectItem : ProjectNode {
 		#region CTOR
 		public ProjectItem() {}
-		public ProjectItem (Project project, Microsoft.Build.Evaluation.ProjectItem _node) : base (project){
+		public ProjectItem (ProjectView project, Microsoft.Build.Evaluation.ProjectItem _node) : base (project){
 			node = _node;
 		}
 		#endregion
@@ -49,11 +22,11 @@ namespace Crow.Coding
                 switch (Extension)
                 {
                     case ".cs":
-                        return new SvgPicture("#CrowIDE.icons.cs-file.svg");
+                        return new SvgPicture("#Icons.cs-file.svg");
                     case ".crow":                        
-                        return new SvgPicture("#CrowIDE.icons.xml-file.svg");
+                        return new SvgPicture("#Icons.file-code.svg");
                     case ".xml":
-                        return new SvgPicture("#CrowIDE.icons.xml-file.svg");
+                        return new SvgPicture("#Icons.file-code.svg");
                     default:
                         return base.Icon;
                 }
@@ -73,11 +46,8 @@ namespace Crow.Coding
 				return System.IO.Path.Combine (Project.Path, Path);
 			}
 		}
-		public override ItemType Type {
-			get { 
-				return (ItemType)Enum.Parse (typeof(ItemType), node.ItemType, true);
-			}
-		}
+		public override ItemType Type => Enum.TryParse (node.ItemType, true, out ItemType tmp) ? tmp : ItemType.Unknown;
+
 		public override string DisplayName {
 			get { 
 				return Type == ItemType.Reference ?

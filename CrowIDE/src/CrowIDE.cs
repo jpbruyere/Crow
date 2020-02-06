@@ -1,58 +1,73 @@
-﻿//
-//  HelloCube.cs
+﻿// Copyright (c) 2016-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-//  Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-//  Copyright (c) 2016 jp
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.IO;
+using System.Reflection;
 using Crow.IML;
 
 namespace Crow.Coding
 {
 	class CrowIDE : Interface
 	{
+		public static string sdkFolder = "/usr/share/dotnet/sdk";
+		public static string msbuildRoot = Path.Combine (sdkFolder, "3.1.101/");
+		//static string sdkFolder = "/usr/lib/mono/msbuild/Current/bin/";
+		//static string msbuildRoot = sdkFolder;
+		public static string toolsVersion = "Current";
+
+		static CrowIDE ()
+		{
+			Interface.UPDATE_INTERVAL = 20;
+
+			Environment.SetEnvironmentVariable ("MSBUILD_EXE_PATH", Path.Combine (msbuildRoot, "MSBuild.dll"));
+			Environment.SetEnvironmentVariable ("MSBUILD_NUGET_PATH", "/home/jp/.nuget/packages");
+
+			Environment.SetEnvironmentVariable ("FrameworkPathOverride", "/usr/lib/mono/4.5/");
+
+			AppDomain currentDomain = AppDomain.CurrentDomain;
+			currentDomain.AssemblyResolve += msbuildAssembliesResolve;
+
+			//foreach (string s in Assembly.GetEntryAssembly ().GetManifestResourceNames ())
+				//Console.WriteLine (s);
+		}
+
+		static Assembly msbuildAssembliesResolve (object sender, ResolveEventArgs args)
+		{
+			string assemblyPath = Path.Combine (msbuildRoot, new AssemblyName (args.Name).Name + ".dll");
+			if (!File.Exists (assemblyPath)) return null;
+			Assembly assembly = Assembly.LoadFrom (assemblyPath);
+			return assembly;
+		}
+
 		public Command CMDNew, CMDOpen, CMDSave, CMDSaveAs, cmdCloseSolution, CMDQuit,
-		CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp,
-		CMDAbout, CMDOptions,
-		CMDViewGTExp, CMDViewProps, CMDViewProj, CMDViewProjProps, CMDViewErrors, CMDViewSolution, CMDViewEditor, CMDViewProperties,
+		CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp, CMDAbout, CMDOptions,
+		CMDViewGTExp, CMDViewProps, CMDViewProj, CMDViewProjProps, CMDViewErrors, CMDViewLog, CMDViewSolution, CMDViewEditor, CMDViewProperties,
 		CMDViewToolbox, CMDViewSchema, CMDViewStyling,CMDViewDesign,
-		CMDCompile;
+		CMDBuild, CMDClean, CMDRestore;
 
 		void initCommands () {
-			CMDNew = new Command(new Action(() => newFile())) { Caption = "New", Icon = new SvgPicture("#CrowIDE.icons.blank-file.svg"), CanExecute = true};
-			CMDOpen = new Command(new Action(() => openFileDialog())) { Caption = "Open...", Icon = new SvgPicture("#CrowIDE.icons.open.svg") };
-			CMDSave = new Command(new Action(() => saveFileDialog())) { Caption = "Save", Icon = new SvgPicture("#CrowIDE.icons.save.svg"), CanExecute = false};
-			CMDSaveAs = new Command(new Action(() => saveFileDialog())) { Caption = "Save As...", Icon = new SvgPicture("#CrowIDE.icons.save.svg"), CanExecute = false};
-			CMDQuit = new Command(new Action(() => app.running = false)) { Caption = "Quit", Icon = new SvgPicture("#CrowIDE.icons.sign-out.svg") };
-			CMDUndo = new Command(new Action(() => undo())) { Caption = "Undo", Icon = new SvgPicture("#CrowIDE.icons.undo.svg"), CanExecute = false};
-			CMDRedo = new Command(new Action(() => redo())) { Caption = "Redo", Icon = new SvgPicture("#CrowIDE.icons.redo.svg"), CanExecute = false};
-            CMDCut = new Command(new Action(() => cut())) { Caption = "Cut", Icon = new SvgPicture("#CrowIDE.icons.scissors.svg"), CanExecute = false};
-            CMDCopy = new Command(new Action(() => copy())) { Caption = "Copy", Icon = new SvgPicture("#CrowIDE.icons.copy-file.svg"), CanExecute = false};
-            CMDPaste = new Command(new Action(() => paste())) { Caption = "Paste", Icon = new SvgPicture("#CrowIDE.icons.paste-on-document.svg"), CanExecute = false};
-            CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("help"))) { Caption = "Help", Icon = new SvgPicture("#CrowIDE.icons.question.svg") };
-			CMDOptions = new Command(new Action(() => loadWindow("#CrowIDE.ui.Options.crow", this))) { Caption = "Editor Options", Icon = new SvgPicture("#CrowIDE.icons.tools.svg") };
+			CMDNew = new Command(new Action(() => newFile())) { Caption = "New", Icon = new SvgPicture("#Icons.blank-file.svg"), CanExecute = true};
+			CMDOpen = new Command(new Action(() => openFileDialog())) { Caption = "Open...", Icon = new SvgPicture("#Icons.open.svg") };
+			CMDSave = new Command(new Action(() => saveFileDialog())) { Caption = "Save", Icon = new SvgPicture("#Icons.save.svg"), CanExecute = false};
+			CMDSaveAs = new Command(new Action(() => saveFileDialog())) { Caption = "Save As...", Icon = new SvgPicture("#Icons.save.svg"), CanExecute = false};
+			CMDQuit = new Command(new Action(() => app.running = false)) { Caption = "Quit", Icon = new SvgPicture("#Icons.sign-out.svg") };
+			CMDUndo = new Command(new Action(() => undo())) { Caption = "Undo", Icon = new SvgPicture("#Icons.undo.svg"), CanExecute = false};
+			CMDRedo = new Command(new Action(() => redo())) { Caption = "Redo", Icon = new SvgPicture("#Icons.redo.svg"), CanExecute = false};
+            CMDCut = new Command(new Action(() => cut())) { Caption = "Cut", Icon = new SvgPicture("#Icons.scissors.svg"), CanExecute = false};
+            CMDCopy = new Command(new Action(() => copy())) { Caption = "Copy", Icon = new SvgPicture("#Icons.copy-file.svg"), CanExecute = false};
+            CMDPaste = new Command(new Action(() => paste())) { Caption = "Paste", Icon = new SvgPicture("#Icons.paste-on-document.svg"), CanExecute = false};
+            CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("help"))) { Caption = "Help", Icon = new SvgPicture("#Icons.question.svg") };
+			CMDOptions = new Command(new Action(() => loadWindow("#CrowIDE.ui.Options.crow", this))) { Caption = "Editor Options", Icon = new SvgPicture("#Icons.tools.svg") };
 
 			cmdCloseSolution = new Command(new Action(() => closeSolution()))
-			{ Caption = "Close Solution", Icon = new SvgPicture("#CrowIDE.icons.paste-on-document.svg"), CanExecute = false};
+			{ Caption = "Close Solution", Icon = new SvgPicture("#Icons.paste-on-document.svg"), CanExecute = false};
 
 			CMDViewErrors = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winErrors.crow",this)))
 			{ Caption = "Errors pane"};
+			CMDViewLog = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winLog.crow",this)))
+			{ Caption = "Log View"};
 			CMDViewSolution = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winSolution.crow",this)))
 			{ Caption = "Solution Tree", CanExecute = false};
 			CMDViewEditor = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winEditor.crow",this)))
@@ -70,8 +85,12 @@ namespace Crow.Coding
 				
 			CMDViewGTExp = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winGTExplorer.crow",this)))
 			{ Caption = "Graphic Tree Explorer", CanExecute = true};
-			CMDCompile = new Command(new Action(() => compileSolution()))
+			CMDBuild = new Command(new Action(() => CurrentSolution?.Build ("Build")))
 			{ Caption = "Compile Solution", CanExecute = false};
+			CMDClean = new Command(new Action(() => CurrentSolution?.Build ("Clean")))
+			{ Caption = "Clean Solution", CanExecute = false};
+			CMDRestore = new Command(new Action(() => CurrentSolution?.Build ("Restore")))
+			{ Caption = "Restore packages", CanExecute = false};
 			CMDViewProjProps = new Command(new Action(loadProjProps))
 			{ Caption = "Project Properties", CanExecute = false};
 		}
@@ -142,8 +161,8 @@ namespace Crow.Coding
 		}
 
 		Instantiator instFileDlg;
-		Workspace currentSolution;
-		Project currentProject;
+		SolutionView currentSolution;
+		ProjectView currentProject;
 		DockStack mainDock;
 
 		public static Interface MainIFace;
@@ -159,7 +178,7 @@ namespace Crow.Coding
 			mainDock = go.FindByName ("mainDock") as DockStack;
 
 			if (ReopenLastSolution && !string.IsNullOrEmpty (LastOpenSolution)) {
-				CurrentSolution = new Workspace (LastOpenSolution);
+				CurrentSolution = new SolutionView (LastOpenSolution);
 				lock(MainIFace.UpdateMutex)
 					CurrentSolution.ReopenItemsSavedInUserConfig ();
 			}
@@ -183,13 +202,6 @@ namespace Crow.Coding
 		void loadProjProps () {
 			loadWindow ("#CrowIDE.ui.ProjectProperties.crow");
 		}
-		void compileSolution () {
-			//ProjectItem pi = CurrentSolution.SelectedItem;
-			Project p = CurrentSolution?.Projects[1];
-			if (p == null)
-				return;
-			p.Compile ();
-		}
 
 		public string CurrentDirectory {
 			get { return Crow.Configuration.Global.Get<string>("CurrentDirectory");}
@@ -197,7 +209,7 @@ namespace Crow.Coding
 				Crow.Configuration.Global.Set ("CurrentDirectory", value);
 			}
 		}
-		public Workspace CurrentSolution {
+		public SolutionView CurrentSolution {
 			get { return currentSolution; }
 			set {
 				if (currentSolution == value)
@@ -205,7 +217,7 @@ namespace Crow.Coding
 				
 				currentSolution = value;
 
-				CMDCompile.CanExecute = (currentSolution != null);
+				CMDBuild.CanExecute = CMDClean.CanExecute = CMDRestore.CanExecute = (currentSolution != null);
 				cmdCloseSolution.CanExecute = (currentSolution != null);
 				CMDViewSolution.CanExecute = (currentSolution != null);
 				
@@ -214,7 +226,7 @@ namespace Crow.Coding
 				}
 			}
 		}
-		public Project CurrentProject {
+		public ProjectView CurrentProject {
 			get { return currentProject; }
 			set {
 				if (currentProject == value)
@@ -257,7 +269,7 @@ namespace Crow.Coding
 			try {
 				string ext = Path.GetExtension (filePath);
 				if (string.Equals (ext, ".sln", StringComparison.InvariantCultureIgnoreCase)) {					
-					CurrentSolution = new Workspace (filePath);
+					CurrentSolution = new SolutionView (filePath);
 					LastOpenSolution = filePath;
 //				}else if (string.Equals (ext, ".csproj", StringComparison.InvariantCultureIgnoreCase)) {
 //					currentProject = new Project (filePath);

@@ -20,6 +20,7 @@ namespace Crow
 		public event EventHandler<ListChangedEventArg> ListAdd;
 		public event EventHandler<ListChangedEventArg> ListRemove;
 		public event EventHandler<ListChangedEventArg> ListEdit;
+		public event EventHandler<ListChangedEventArg> ListClear;
 		#endregion
 
 		public ObservableList() : base () {}
@@ -57,6 +58,11 @@ namespace Crow
 			int idx = IndexOf (elem);
 			base.RemoveAt (idx);
 			ListRemove.Raise (this, new ListChangedEventArg (idx, elem));
+		}
+		public new void Clear ()
+		{
+			base.Clear ();
+			ListClear.Raise (this, null);
 		}
 		public void Remove () {
 			if (selectedIndex < 0)

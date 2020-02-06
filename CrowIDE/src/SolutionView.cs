@@ -15,6 +15,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Build.Construction;
+using Microsoft.Build.Evaluation;
+using Microsoft.Build.Execution;
+using Microsoft.Build.Framework;
 
 namespace Crow.Coding
 {
@@ -62,12 +65,19 @@ namespace Crow.Coding
 		}
 	}
 
-
 	/// <summary>
-/// .sln loaded into class.
-/// </summary>
-	public class Workspace: IValueChange
+	/// .sln loaded into class.
+	/// </summary>
+	public class SolutionView: IValueChange
 	{
+		/*static SolutionView ()
+		{
+			var nativeSharedMethod = typeof (SolutionFile).Assembly.GetType ("Microsoft.Build.Shared.NativeMethodsShared");
+			var isMonoField = nativeSharedMethod.GetField ("_isMono", BindingFlags.Static | BindingFlags.NonPublic);
+			isMonoField.SetValue (null, true);
+
+			Environment.SetEnvironmentVariable ("MSBUILD_EXE_PATH", "/usr/share/dotnet/sdk/3.1.101/MSBuild.dll");
+		}*/
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
 		public virtual void NotifyValueChanged(string MemberName, object _value)
@@ -76,7 +86,15 @@ namespace Crow.Coding
 		}
 		#endregion
 
+		string path;
 		SolutionFile solutionFile;
+		public ProjectCollection projectCollection;
+		public BuildParameters buildParams;
+		public Dictionary<String, String> globalProperties = new Dictionary<String, String> ();
+
+		public List<ProjectView> Projects = new List<ProjectView> ();
+
+		public Configuration UserConfig;
 
 		ProjectItem selectedItem = null;
 		object selectedItemElement = null;
@@ -89,6 +107,19 @@ namespace Crow.Coding
 		public List<Style> Styles { get { return Styling.Values.ToList(); }}
 		public List<StyleContainer> StylingContainers;
 		//TODO: check project dependencies if no startup proj
+				
+		public ObservableList<BuildEventArgs> BuildEvents = new ObservableList<BuildEventArgs> ();
+
+		public LoggerVerbosity MainLoggerVerbosity {
+			get => buildParams == null ? LoggerVerbosity.Normal : buildParams.Loggers.First().Verbosity;
+			set {
+				if (MainLoggerVerbosity == value)
+					return;
+				if (buildParams != null)
+					buildParams.Loggers.First ().Verbosity = value;
+				NotifyValueChanged ("MainLoggerVerbosity", MainLoggerVerbosity);
+			}
+		}
 
 		public void ReloadStyling () {
 			Styling = new Dictionary<string, Style> ();
@@ -170,16 +201,7 @@ namespace Crow.Coding
 				NotifyValueChanged ("SelectedItemElement", selectedItemElement);
 			}
 		}
-		public string DisplayName {
-			get { return name; }
-		}
-		/// <summary>
-		/// Gets solution path
-		/// </summary>
-		public String SolutionFolder
-		{
-			get { return Path.GetDirectoryName (path); }
-		}
+		public string DisplayName => Path.GetFileNameWithoutExtension (path);
 
 //		public System.CodeDom.Compiler.CompilerErrorCollection CompilationErrors {
 //			get {
@@ -225,7 +247,7 @@ namespace Crow.Coding
 			if (string.IsNullOrEmpty (tmp))
 				return;
 			foreach (string f in tmp.Split(';')) {
-				foreach (Project p in Projects) {
+				foreach (ProjectView p in Projects) {
 					ProjectFile pi;
 					/*if (p.TryGetProjectFileFromAbsolutePath (f, out pi)) {
 						pi.Open ();
@@ -265,74 +287,8 @@ namespace Crow.Coding
 			}
 			NotifyValueChanged ("Projects", null);
 		}
-	    /// <summary>
-	    /// Solution name
-	    /// </summary>
-	    String name;
-		/// <summary>
-		/// File path from where solution was loaded.
-		/// </summary>
-		[XmlIgnore]
-		String path;
 
-	    /// <summary>
-	    /// Solution name for debugger.
-	    /// </summary>
-	    [ExcludeFromCodeCoverage]
-	    public override string ToString()
-	    {
-	        return "Solution: " + name;
-	    }
-			
-		#region Solution properties
-	    double slnVer;                                      // 11.00 - vs2010, 12.00 - vs2015
-
-	    /// <summary>
-	    /// Visual studio version information used for generation, for example 2010, 2012, 2015 and so on...
-	    /// </summary>
-	    public int fileFormatVersion;
-
-	    /// <summary>
-	    /// null for old visual studio's
-	    /// </summary>
-	    public String VisualStudioVersion;
-	    
-	    /// <summary>
-	    /// null for old visual studio's
-	    /// </summary>
-	    public String MinimumVisualStudioVersion;
-
-	    /// <summary>
-	    /// List of project included into solution.
-	    /// </summary>
-	    public List<Project> Projects = new List<Project>();
-
-	    /// <summary>
-	    /// List of configuration list, in form "{Configuration}|{Platform}", for example "Release|Win32".
-	    /// To extract individual platforms / configuration list, use following functions.
-	    /// </summary>
-	    public List<String> configurations = new List<string>();
-
-	    /// <summary>
-	    /// Extracts platfroms supported by solution
-	    /// </summary>
-	    public IEnumerable<String> getPlatforms()
-	    {
-	        return configurations.Select(x => x.Split('|')[1]).Distinct();
-	    }
-
-	    /// <summary>
-	    /// Extracts configuration names supported by solution
-	    /// </summary>
-	    public IEnumerable<String> getConfigurations()
-	    {
-	        return configurations.Select(x => x.Split('|')[0]).Distinct();
-	    }
-		#endregion
-
-		public Configuration UserConfig;
-
-		public Project StartupProject {
+		public ProjectView StartupProject {
 			get { return null; }// Projects?.FirstOrDefault (p => p.ProjectGuid == UserConfig.Get<string> ("StartupProject")); }
 			set {
 				if (value == StartupProject)
@@ -349,22 +305,71 @@ namespace Crow.Coding
 			}
 		}
 
+		public string ActiveConfiguration {
+			get => globalProperties.TryGetValue ("Configuration", out string conf) ? conf : "";
+			set {
+				if (globalProperties.TryGetValue ("Configuration", out string conf) &&  conf == value)
+					return;
+				globalProperties ["Configuration"] = value;
+				NotifyValueChanged ("ActiveConfiguration", value);
+			}
+		}
+		public string ActivePlatform {
+			get => globalProperties.TryGetValue ("Platform", out string conf) ? conf : "";
+			set {
+				if (globalProperties.TryGetValue ("Platform", out string conf) && conf == value)
+					return;
+				globalProperties ["Platform"] = value;
+				NotifyValueChanged ("ActivePlatform", value);
+			}
+		}
+
+		public void Build (params string[] targets)
+		{
+			BuildRequestData buildRequest = new BuildRequestData (path, globalProperties, CrowIDE.toolsVersion, targets, null);
+			BuildResult buildResult = BuildManager.DefaultBuildManager.Build (buildParams, buildRequest);
+		}
 		#region CTOR
 		/// <summary>
 		/// Creates new solution.
 		/// </summary>
-		public Workspace (string path)
+		public SolutionView (string path)
 		{
+			projectCollection = new ProjectCollection ();
+			projectCollection.DefaultToolsVersion = CrowIDE.toolsVersion;
+			buildParams = new BuildParameters (projectCollection);
+			buildParams.Loggers = new List<ILogger> () { new IdeLogger (this)};
+			buildParams.ResetCaches = true;
+			buildParams.LogInitialPropertiesAndItems = true;
+			//projectCollection.IsBuildEnabled = false;
+
+			BuildManager.DefaultBuildManager.ResetCaches ();
+
 			this.path = path;
 			solutionFile = SolutionFile.Parse (path);
 			UserConfig = new Configuration (path + ".user");
+
+			globalProperties ["SolutionDir"] = Path.GetDirectoryName (path) + "/";
+			//globalProperties ["OutputPath"] = "build/";
+			//globalProperties ["IntermediateOutputPath"] = "build/obj/";
+			globalProperties ["RestoreConfigFile"] = "/home/jp/.nuget/NuGet/NuGet.Config";
+			ActiveConfiguration = solutionFile.GetDefaultConfigurationName ();
+			ActivePlatform = solutionFile.GetDefaultPlatformName ();
+
+			//solutionFile.SolutionConfigurations;
+			//added to be able to compile with net472
+#if NET472
+			globalProperties ["RoslynTargetsPath"] = Path.Combine (CrowIDE.msbuildRoot, "Roslyn/");
+			globalProperties ["MSBuildSDKsPath"] = Path.Combine (CrowIDE.msbuildRoot, "Sdks/");
+#endif
+			//------------
 
 			foreach (ProjectInSolution pis in solutionFile.ProjectsInOrder) {
 				switch (pis.ProjectType) {
 				case SolutionProjectType.Unknown:
 					break;
 				case SolutionProjectType.KnownToBeMSBuildFormat:
-					Projects.Add (new Project (this, pis));
+					Projects.Add (new ProjectView (this, pis));
 					break;
 				case SolutionProjectType.SolutionFolder:
 					break;

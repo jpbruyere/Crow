@@ -49,17 +49,17 @@ namespace Crow.Coding {
 
 		void initCommands (){
 			cmdSave = new Crow.Command (new Action (() => Save ()))
-			{ Caption = "Save", Icon = new SvgPicture ("#CrowIDE.icons.save.svg"), CanExecute = false };
+			{ Caption = "Save", Icon = new SvgPicture ("#Icons.save.svg"), CanExecute = false };
 			cmdSaveAs = new Crow.Command (new Action (() => SaveAs ()))
-			{ Caption = "Save As ..", Icon = new SvgPicture ("#CrowIDE.icons.save.svg"), CanExecute = false };
+			{ Caption = "Save As ..", Icon = new SvgPicture ("#Icons.save.svg"), CanExecute = false };
 			cmdOpen = new Crow.Command (new Action (() => Open ())) 
-			{ Caption = "Open", Icon = new SvgPicture ("#CrowIDE.icons.open.svg"), CanExecute = true };
+			{ Caption = "Open", Icon = new SvgPicture ("#Icons.open.svg"), CanExecute = true };
 			cmdClose = new Crow.Command (new Action (() => OnQueryClose (this,null))) 
-			{ Caption = "Close", Icon = new SvgPicture ("#CrowIDE.icons.open.svg"), CanExecute = false };
+			{ Caption = "Close", Icon = new SvgPicture ("#Icons.open.svg"), CanExecute = false };
 			cmdUndo = new Crow.Command (new Action (() => Undo (null))) 
-			{ Caption = "Undo", Icon = new SvgPicture ("#CrowIDE.icons.undo.svg"), CanExecute = false };
+			{ Caption = "Undo", Icon = new SvgPicture ("#Icons.undo.svg"), CanExecute = false };
 			cmdRedo = new Crow.Command (new Action (() => Redo (null))) 
-			{ Caption = "Redo", Icon = new SvgPicture ("#CrowIDE.icons.redo.svg"), CanExecute = false };
+			{ Caption = "Redo", Icon = new SvgPicture ("#Icons.redo.svg"), CanExecute = false };
 
 			Commands.Insert (0, cmdOpen);
 			Commands.Insert (1, cmdSave);

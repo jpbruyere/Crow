@@ -29,8 +29,9 @@ namespace tests
 			// += KeyboardKeyDown1;
 
 			//testFiles = new string [] { @"Interfaces/Experimental/testDock.crow" };
-			testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
-			//testFiles = new string [] { @"Interfaces/Divers/testSlider.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
+			testFiles = new string [] { @"Interfaces/Group/5.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/perfMeasures.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();

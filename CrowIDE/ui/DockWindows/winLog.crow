@@ -1,0 +1,19 @@
+﻿<?xml version="1.0"?>
+<DockWindow DataSource="{CurrentSolution}" Name="winLog" Caption="Main Logs"  Width="60%">
+	<VerticalStack>
+		<HorizontalStack Height="Fit">
+			<!--<Label Text="MaxScrollY:"/>
+			<Label Text="{../../log.MaxScrollY}"/>
+			<Label Text="ScrollY:"/>
+			<Label Text="{../../log.ScrollY}"/>			-->
+			<CheckBox Fit="true" Caption="Scroll on output" IsChecked="{²../../log.ScrollOnOutput}"/>	
+			<EnumSelector Caption="Verbosity" EnumValue="{²MainLoggerVerbosity}" Fit="true"/>
+		</HorizontalStack>
+		<HorizontalStack >
+			<BuildEventsView MouseWheelSpeed="6" Events="{BuildEvents}" Focusable="true" Name="log" Background="Black"/>		
+			<ScrollBar Name="scrollbarY" Value="{²../log.ScrollY}"				   
+				CursorSize="{../log.ChildHeightRatio}"
+				Maximum="{../log.MaxScrollY}" Orientation="Vertical"/>
+		</HorizontalStack>
+	</VerticalStack>
+</DockWindow>

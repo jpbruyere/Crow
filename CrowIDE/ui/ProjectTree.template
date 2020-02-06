@@ -11,23 +11,26 @@
 		</Group>
 	</Border>
 </ItemTemplate>
-<ItemTemplate DataType="Crow.Coding.Project" Data="RootItems" DataTest="Type">
-	<Expandable DataSourceType="Project" Caption="{Name}" ContextCommands="{Commands}" IsExpanded="{²IsExpanded}" MouseDoubleClick="/onClickForExpand">
+<ItemTemplate DataType="Crow.Coding.ProjectView" Data="RootItems" DataTest="Type">
+	<Expandable DataSourceType="ProjectView" Caption="{Name}" ContextCommands="{Commands}" IsExpanded="{²IsExpanded}" MouseDoubleClick="/onClickForExpand">
 		<Template>
 			<VerticalStack>
 				<Border Style="TreeItemBorder" >
-					<HorizontalStack Spacing="1">
-						<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
-							Path="{./Image}"
-							Visible="{./IsExpandable}"
-							SvgSub="{./IsExpanded}"
-							MouseEnter="{Background=LightGrey}"
-							MouseLeave="{Background=Transparent}"/>
-						<Image Style="TreeIcon"
-							Path="#Crow.Icons.crowproj.svg"/>
-						<Widget Width="4" Height="9" Background="Green" Visible="{IsStartupProject}"/>
-						<Label Text="{./Caption}"/>						
-					</HorizontalStack>
+					<Group>
+						<Widget Height="Stretched" Background="RoyalBlue" Visible="{IsSelected}"/>
+						<HorizontalStack Spacing="1">
+							<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
+								Path="{./Image}"
+								Visible="{./IsExpandable}"
+								SvgSub="{./IsExpanded}"
+								MouseEnter="{Background=LightGrey}"
+								MouseLeave="{Background=Transparent}"/>
+							<Image Style="TreeIcon"
+								Path="#Crow.Icons.crowproj.svg"/>
+							<Widget Width="4" Height="9" Background="Green" Visible="{IsStartupProject}"/>
+							<Label Text="{./Caption}"/>						
+						</HorizontalStack>
+					</Group>
 				</Border>
 				<Container Name="Content" Visible="false"/>
 			</VerticalStack>
