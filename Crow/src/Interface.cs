@@ -121,7 +121,11 @@ namespace Crow
 
 			while (running) {
 				Update ();
-				Thread.Sleep (5);
+				Thread.Sleep (UPDATE_INTERVAL);
+#if MEASURE_TIME
+				foreach (PerformanceMeasure m in PerfMeasures) 
+					m.NotifyChanges ();
+#endif
 			}
 		}
 		protected virtual void Startup ()
@@ -212,6 +216,8 @@ namespace Crow
 		}*/
 
 		#region Static and constants
+		/// <summary>Time interval in milisecond between Updates of the interface</summary>
+		public static int UPDATE_INTERVAL = 5;
 		/// <summary>Crow configuration root path</summary>
 		public static string CROW_CONFIG_ROOT;
 		/// <summary>If true, mouse focus is given when mouse is over control</summary>

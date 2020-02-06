@@ -25,5 +25,9 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<Link>Interfaces\%(RecursiveDir)%(Filename)%(Extension)</Link>
 		</None>
+		<EmbeddedResource Include="..\common\ui\templates\**\*.*">
+			<LogicalName>ui.%(Filename)%(Extension)</LogicalName>
+			<Link>Templates\%(Filename)%(Extension)</Link>
+		</EmbeddedResource>
 	</ItemGroup>
 </Project>

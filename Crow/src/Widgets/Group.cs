@@ -228,19 +228,19 @@ namespace Crow
 				if (lt == LayoutingType.Width) {
 					if (largestChild == null)
 						searchLargestChild ();
-					if (largestChild == null) {
+					/*if (largestChild == null) {
 						//if still null, not possible to determine a width
 						//because all children are stretched, force first one to fit
 						Children [0].Width = Measure.Fit;
 						return -1;//cancel actual sizing to let child computation take place
-					}
+					}*/
 				} else {
 					if (tallestChild == null)
 						searchTallestChild ();
-					if (tallestChild == null) {
+					/*if (tallestChild == null) {
 						Children [0].Height = Measure.Fit;
 						return -1;
-					}
+					}*/
 				}
 			}
 			return base.measureRawSize (lt);

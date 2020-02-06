@@ -1,8 +1,8 @@
 <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
  <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
  <g>
-  <rect opacity="1.0" rx="5" id="svg_1" height="59" width="59" y="2.5" x="2.5" stroke-width="6" stroke="#111111" fill="#bbbbcc"/>
-  <rect opacity="1.0" rx="5" id="svg_1" height="22" width="59" y="2.5" x="2.5" stroke-width="6" stroke="#111111" fill="#4455aa"/>
+  <rect opacity="1.0" rx="0" id="svg_1" height="59" width="59" y="2.5" x="2.5" stroke-width="2" stroke="#111111" fill="#bbbbcc"/>
+  <rect opacity="1.0" rx="0" id="svg_1" height="22" width="59" y="2.5" x="2.5" stroke-width="2" stroke="#111111" fill="#4455aa"/>
 <!--  <line stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_2" y2="24.5" x2="61.5" y1="24.5" x1="2.5" stroke-width="6" stroke="#bbbbbb" fill="none"/>-->
  </g>
 </svg>

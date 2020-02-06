@@ -1,6 +1,12 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "global", "global", "{7285454A-930F-4536-AB84-C076B44C0C80}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		README.md = README.md
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crow", "Crow\Crow.csproj", "{C2980F9B-4798-4C05-99E2-E174810F7C7B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}"
@@ -16,6 +22,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "unitTests", "unitTests\unitTests.csproj", "{0CC6DFAB-2E4A-4786-976C-89053D5EA6A2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicTests", "Samples\BasicTests\BasicTests.csproj", "{7AEB6DD5-916E-4415-84E1-78EC6E5881CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testMSBuild", "Samples\testMSBuild\testMSBuild.csproj", "{B912DD88-F41B-428A-9784-E2CF265CE3DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +47,7 @@ Global
 		{91F1CE07-EECE-4F1D-A3EE-7239B563654A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E5C7065-28F9-4A1A-A2FB-DB5E03A63CB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1E5C7065-28F9-4A1A-A2FB-DB5E03A63CB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E5C7065-28F9-4A1A-A2FB-DB5E03A63CB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CC6DFAB-2E4A-4786-976C-89053D5EA6A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0CC6DFAB-2E4A-4786-976C-89053D5EA6A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CC6DFAB-2E4A-4786-976C-89053D5EA6A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -47,6 +56,10 @@ Global
 		{7AEB6DD5-916E-4415-84E1-78EC6E5881CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AEB6DD5-916E-4415-84E1-78EC6E5881CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7AEB6DD5-916E-4415-84E1-78EC6E5881CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B912DD88-F41B-428A-9784-E2CF265CE3DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B912DD88-F41B-428A-9784-E2CF265CE3DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B912DD88-F41B-428A-9784-E2CF265CE3DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B912DD88-F41B-428A-9784-E2CF265CE3DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
@@ -91,5 +104,6 @@ Global
 		{56329D48-D382-4850-93DE-59C453894E8A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{91F1CE07-EECE-4F1D-A3EE-7239B563654A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{7AEB6DD5-916E-4415-84E1-78EC6E5881CE} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
+		{B912DD88-F41B-428A-9784-E2CF265CE3DD} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 	EndGlobalSection
 EndGlobal

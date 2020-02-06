@@ -6,5 +6,8 @@
 		<License>MIT</License>
 		<Authors>Jean-Philippe Bruyère</Authors>	    
 		<LangVersion>7.2</LangVersion>
+		
+		<CrowVersion>0.8.6</CrowVersion>
+		<CrowPackageVersion>$(CrowVersion)-beta</CrowPackageVersion>
 	</PropertyGroup>
 </Project>

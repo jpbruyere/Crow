@@ -105,11 +105,11 @@ namespace Crow
 				if (maxScrollX == value)
 					return;
 
-				maxScrollX = value;
+				maxScrollX = Math.Max(0, value);
 
 				if (scrollX > maxScrollX)
 					ScrollX = maxScrollX;
-				
+
 				NotifyValueChanged ("MaxScrollX", maxScrollX);
 				RegisterForGraphicUpdate ();
 			}
@@ -122,7 +122,7 @@ namespace Crow
 				if (maxScrollY == value)
 					return;
 
-				maxScrollY = value;
+				maxScrollY = Math.Max (0, value);
 
 				if (scrollY > maxScrollY)
 					ScrollY = maxScrollY;
