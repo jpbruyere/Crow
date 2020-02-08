@@ -30,7 +30,7 @@ namespace tests
 
 			//testFiles = new string [] { @"Interfaces/Experimental/testDock.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
-			testFiles = new string [] { @"Interfaces/Group/5.crow" };
+			testFiles = new string [] { @"Interfaces/TemplatedGroup/3.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/perfMeasures.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
@@ -138,31 +138,78 @@ namespace tests
 				return;
 			NotifyValueChanged ("alignment", Enum.Parse (typeof (Alignment), rb.Caption));
 		}
-		public IList<String> List2 = new List<string> (new string []
+		public IEnumerable<String> List2 = new List<string> (new string []
 			{
 				"string1",
 				"string2",
 				"string3",
-//				"string4",
-//				"string5",
-//				"string6",
-//				"string7",
-//				"string8",
-//				"string8",
-//				"string8",
-//				"string8",
-//				"string8",
-//				"string8",
-//				"string9"
+				"string4",
+				"string5",
+				"string6",
+				"string7",
+				"string8",
+				"string8",
+				"string8",
+				"string8",
+				"string8",
+				"string8",
+				"string9"
 			}
 		);
-		public IList<String> TestList2 {
+		public IEnumerable<String> TestList2 {
 			set {
 				List2 = value;
 				NotifyValueChanged ("TestList2", testList);
 			}
 			get { return List2; }
 		}
+		public class TestClass
+		{
+			public string Prop1 { get; set; }
+			public string Prop2 { get; set; }
+
+			public override string ToString ()
+				=> $"{Prop1}, {Prop2}";
+
+		}
+		public IEnumerable<TestClass> List3 = new List<TestClass> (new TestClass []
+			{
+				new TestClass { Prop1 = "string1", Prop2="prop2-1" },
+				new TestClass { Prop1 = "string2", Prop2="prop2-2" },
+				new TestClass { Prop1 = "string3", Prop2="prop2-3" },
+			}
+		);
+		public IEnumerable<string> TestList3Props1 => List3.Select (sc => sc.Prop1).ToList();
+		public IEnumerable<TestClass> TestList3 {
+			set {
+				List3 = value;
+				NotifyValueChanged ("TestList3", testList);
+			}
+			get { return List3; }
+		}
+		string prop1;
+		public string TestList3SelProp1 {
+			get => prop1;
+			set {
+				if (prop1 == value)
+					return;
+				prop1 = value;
+
+				NotifyValueChanged ("TestList3SelProp1", prop1);
+			}
+		}
+
+		string selString;
+		public string TestList2SelectedString {
+			get => selString;
+			set {
+				if (selString == value)
+					return;
+				selString = value;
+				NotifyValueChanged ("TestList2SelectedString", selString);
+			}
+		}
+
 		List<Color> testList = Color.ColorDic.Values//.OrderBy(c=>c.Hue)
 													//.ThenBy(c=>c.Value).ThenBy(c=>c.Saturation)
 			.ToList ();

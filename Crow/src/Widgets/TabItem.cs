@@ -1,33 +1,9 @@
-﻿//
-// TabItem.cs
+﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using System.Xml.Serialization;
 using System.ComponentModel;
-using System.Diagnostics;
 using Crow.Cairo;
 using System.Linq;
 
@@ -146,7 +122,15 @@ namespace Crow
 		{
 			gr.Save ();
 
+			parentRWLock.EnterReadLock ();
+
 			TabView tv = Parent as TabView;
+
+			//TODO:this appens in designView
+			if (tv == null) {
+				parentRWLock.ExitReadLock ();
+				return;
+			}
 
 			Rectangle r = TabTitle.Slot;
 			r.Width = TabWidth;
@@ -164,6 +148,7 @@ namespace Crow
 				r.Right + tv.RightSlope, r.Bottom-0.5);
 			gr.LineTo (Slot.Width-0.5, r.Bottom-0.5);
 
+			parentRWLock.ExitReadLock ();
 
 			gr.LineTo (Slot.Width-0.5, Slot.Height-0.5);
 			gr.LineTo (0.5, Slot.Height-0.5);
