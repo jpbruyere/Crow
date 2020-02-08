@@ -1,12 +1,6 @@
-﻿//
-// Solution.cs
+﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-//code taken in project https://sourceforge.net/projects/syncproj/
-// no licence info was included, I took the liberty to modify it.
-// Author:
-//		tarmopikaro
-//      2018 Jean-Philippe Bruyère
-//MIT-licenced
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.Collections.Generic;
@@ -21,63 +15,8 @@ using Microsoft.Build.Framework;
 
 namespace Crow.Coding
 {
-	public class StyleItemContainer {
-		public object Value;
-		public string Name;
-		public StyleItemContainer(string name, object _value){
-			Name = name;
-			Value = _value;
-		}
-	}
-	public class StyleContainer : IValueChange {
-		#region IValueChange implementation
-		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-		public virtual void NotifyValueChanged(string MemberName, object _value)
-		{
-			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
-		}
-		#endregion
-
-		Style style;
-		bool isExpanded;
-
-		public string Name;
-		public List<StyleItemContainer> Items;
-		public bool IsExpanded
-		{
-			get { return isExpanded; }
-			set
-			{
-				if (value == isExpanded)
-					return;
-				isExpanded = value;
-				NotifyValueChanged ("IsExpanded", isExpanded);
-			}
-		}
-		public StyleContainer(string name, Style _style){
-			Name = name;
-			style = _style;
-
-			Items = new List<StyleItemContainer> ();
-			foreach (string k in style.Keys) {
-				Items.Add(new StyleItemContainer(k, style[k]));
-			}
-		}
-	}
-
-	/// <summary>
-	/// .sln loaded into class.
-	/// </summary>
 	public class SolutionView: IValueChange
 	{
-		/*static SolutionView ()
-		{
-			var nativeSharedMethod = typeof (SolutionFile).Assembly.GetType ("Microsoft.Build.Shared.NativeMethodsShared");
-			var isMonoField = nativeSharedMethod.GetField ("_isMono", BindingFlags.Static | BindingFlags.NonPublic);
-			isMonoField.SetValue (null, true);
-
-			Environment.SetEnvironmentVariable ("MSBUILD_EXE_PATH", "/usr/share/dotnet/sdk/3.1.101/MSBuild.dll");
-		}*/
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
 		public virtual void NotifyValueChanged(string MemberName, object _value)
@@ -85,21 +24,25 @@ namespace Crow.Coding
 			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
 		}
 		#endregion
+
+		public readonly CrowIDE IDE;
 
 		string path;
 		SolutionFile solutionFile;
-		public ProjectCollection projectCollection;
+
 		public BuildParameters buildParams;
-		public Dictionary<String, String> globalProperties = new Dictionary<String, String> ();
+		public Dictionary<String, String> projectProperties = new Dictionary<String, String> ();
 
 		public List<ProjectView> Projects = new List<ProjectView> ();
 
 		public Configuration UserConfig;
 
-		ProjectItem selectedItem = null;
+		ProjectItemNode selectedItem = null;
 		object selectedItemElement = null;
-		ObservableList<ProjectItem> openedItems = new ObservableList<ProjectItem>();
+		ObservableList<ProjectItemNode> openedItems = new ObservableList<ProjectItemNode>();
 		ObservableList<GraphicObjectDesignContainer> toolboxItems;
+
+		public string Directory => Path.GetDirectoryName (path);
 
 		public Dictionary<string, Style> Styling;
 		public Dictionary<string, string> DefaultTemplates;
@@ -107,21 +50,75 @@ namespace Crow.Coding
 		public List<Style> Styles { get { return Styling.Values.ToList(); }}
 		public List<StyleContainer> StylingContainers;
 		//TODO: check project dependencies if no startup proj
-				
-		public ObservableList<BuildEventArgs> BuildEvents = new ObservableList<BuildEventArgs> ();
 
-		public LoggerVerbosity MainLoggerVerbosity {
-			get => buildParams == null ? LoggerVerbosity.Normal : buildParams.Loggers.First().Verbosity;
-			set {
-				if (MainLoggerVerbosity == value)
-					return;
-				if (buildParams != null)
-					buildParams.Loggers.First ().Verbosity = value;
-				NotifyValueChanged ("MainLoggerVerbosity", MainLoggerVerbosity);
-			}
+		public IEnumerable<string> Configurations => solutionFile.SolutionConfigurations.Select (sc => sc.ConfigurationName).Distinct ().ToList ();
+		public IEnumerable<string> Platforms => solutionFile.SolutionConfigurations.Select (sc => sc.PlatformName).Distinct ().ToList ();
+
+		public void Build (params string [] targets)
+		{
+			BuildRequestData buildRequest = new BuildRequestData (path, projectProperties, CrowIDE.DEFAULT_TOOLS_VERSION, targets, null);
+			BuildResult buildResult = BuildManager.DefaultBuildManager.Build (buildParams, buildRequest);
 		}
+		#region CTOR
+		/// <summary>
+		/// Creates new solution.
+		/// </summary>
+		public SolutionView (CrowIDE ide, string path)
+		{
+			this.IDE = ide;
+			this.path = path;
+			solutionFile = SolutionFile.Parse (path);
+			UserConfig = new Configuration (path + ".user");
+
+			ActiveConfiguration = solutionFile.GetDefaultConfigurationName ();
+			ActivePlatform = solutionFile.GetDefaultPlatformName ();
+
+			ide.projectCollection.SetGlobalProperty ("SolutionDir", Path.GetDirectoryName (path) + "/");
+
+			buildParams = new BuildParameters (ide.projectCollection) {
+				Loggers = ide.projectCollection.Loggers,
+				ResetCaches = true,
+				LogInitialPropertiesAndItems = true
+			};
+			//projectCollection.IsBuildEnabled = false;
+
+			BuildManager.DefaultBuildManager.ResetCaches ();
+
+#if NET472
+			ide.projectCollection.SetGlobalProperty ("RoslynTargetsPath", Path.Combine (Startup.msbuildRoot, "Roslyn/"));
+			ide.projectCollection.SetGlobalProperty ("MSBuildSDKsPath", Path.Combine (Startup.msbuildRoot, "Sdks/"));
+#endif
+			//------------
+
+			foreach (ProjectInSolution pis in solutionFile.ProjectsInOrder) {
+				switch (pis.ProjectType) {
+				case SolutionProjectType.Unknown:
+					break;
+				case SolutionProjectType.KnownToBeMSBuildFormat:
+					Projects.Add (new ProjectView (this, pis));
+					break;
+				case SolutionProjectType.SolutionFolder:
+					break;
+				case SolutionProjectType.WebProject:
+					break;
+				case SolutionProjectType.WebDeploymentProject:
+					break;
+				case SolutionProjectType.EtpSubProject:
+					break;
+				case SolutionProjectType.SharedProject:
+					break;
+				}
+			}
+
+			ReloadStyling ();
+			ReloadDefaultTemplates ();
+
+		}
+		#endregion
 
 		public void ReloadStyling () {
+			Console.WriteLine ("reload styling");
+
 			Styling = new Dictionary<string, Style> ();
 			if (StartupProject != null)
 				StartupProject.GetStyling ();
@@ -151,13 +148,13 @@ namespace Crow.Coding
 				toolboxItems.Add(new GraphicObjectDesignContainer(ci));
 			}
 		}
-		public bool GetProjectFileFromPath (string path, out ProjectFile pi){
+		public bool GetProjectFileFromPath (string path, out ProjectFileNode pi){
 			pi = null;
 			return false;/* StartupProject == null ? false :
 				StartupProject.TryGetProjectFileFromPath (path, out pi);*/
 		}
 
-		public ObservableList<ProjectItem> OpenedItems {
+		public ObservableList<ProjectItemNode> OpenedItems {
 			get { return openedItems; }
 			set {
 				if (openedItems == value)
@@ -176,7 +173,7 @@ namespace Crow.Coding
 				NotifyValueChanged ("ToolboxItems", toolboxItems);
 			}			
 		}
-		public ProjectItem SelectedItem {
+		public ProjectItemNode SelectedItem {
 			get { return selectedItem; }
 			set {
 				if (selectedItem == value)
@@ -184,10 +181,10 @@ namespace Crow.Coding
 				if (SelectedItem != null)
 					SelectedItem.IsSelected = false;
 				selectedItem = value;
-				if (SelectedItem != null) 
+				if (SelectedItem != null) {
 					SelectedItem.IsSelected = true;
-
-				//UserConfig.Set ("SelectedProjItems", SelectedItem?.AbsolutePath);
+					UserConfig.Set ("SelectedProjItems", SelectedItem.SaveID);
+				}
 
 				NotifyValueChanged ("SelectedItem", selectedItem);
 			}
@@ -238,24 +235,22 @@ namespace Crow.Coding
 			if (openedItems.Count == 0)
 				UserConfig.Set ("OpenedItems", "");
 			else
-				UserConfig.Set ("OpenedItems", openedItems.Select(o => o.AbsolutePath).Aggregate((a,b)=>a + ";" + b));
+				UserConfig.Set ("OpenedItems", openedItems.Select(o => o.SaveID).Aggregate((a,b)=>$"{a};{b}"));
 		}
 		public void ReopenItemsSavedInUserConfig () {
 			string tmp = UserConfig.Get<string> ("OpenedItems");
-			string sel = UserConfig.Get<string> ("SelectedProjItems");
-			ProjectFile selItem = null;
 			if (string.IsNullOrEmpty (tmp))
 				return;
+			string sel = UserConfig.Get<string> ("SelectedProjItems");
+			ProjectFileNode selItem = null;
 			foreach (string f in tmp.Split(';')) {
-				foreach (ProjectView p in Projects) {
-					ProjectFile pi;
-					/*if (p.TryGetProjectFileFromAbsolutePath (f, out pi)) {
-						pi.Open ();
-						if (pi.AbsolutePath == sel)
-							selItem = pi;
-						break;
-					}*/
-				}
+				string [] s = f.Split ('|');
+				ProjectFileNode pi = Projects.FirstOrDefault (p => p.DisplayName == s [0])?.Flatten.OfType<ProjectFileNode>().FirstOrDefault(pfn=>pfn.RelativePath == s[1]);
+				if (pi == null)
+					continue;
+				pi.Open ();
+				if (pi.SaveID == sel)
+					selItem = pi;
 			}
 			if (selItem == null)
 				return;
@@ -267,13 +262,13 @@ namespace Crow.Coding
 			UserConfig.Set ("SelectedProjItems", SelectedItem?.AbsolutePath);
 		}*/
 
-		public void OpenItem (ProjectItem pi) {
+		public void OpenItem (ProjectItemNode pi) {
 			if (!openedItems.Contains (pi)) {
 				openedItems.Add (pi);
 				saveOpenedItemsInUserConfig ();
 			}
 		}
-		public void CloseItem (ProjectItem pi) {			
+		public void CloseItem (ProjectItemNode pi) {			
 			openedItems.Remove (pi);
 			saveOpenedItemsInUserConfig ();
 		}
@@ -286,17 +281,22 @@ namespace Crow.Coding
 				toolboxItems.Remove (toolboxItems [0]);
 			}
 			NotifyValueChanged ("Projects", null);
+
+			IDE.projectCollection.UnloadAllProjects ();
 		}
 
 		public ProjectView StartupProject {
-			get { return null; }// Projects?.FirstOrDefault (p => p.ProjectGuid == UserConfig.Get<string> ("StartupProject")); }
+			get => Projects.FirstOrDefault (p => p.FullPath == UserConfig.Get<string> ("StartupProject")); 
 			set {
 				if (value == StartupProject)
 					return;
+
+				StartupProject?.NotifyValueChanged ("IsStartupProject", false);
+
 				if (value == null)
 					UserConfig.Set ("StartupProject", "");
 				else {
-					UserConfig.Set ("StartupProject", value.ProjectGuid);
+					UserConfig.Set ("StartupProject", value.FullPath);
 					value.NotifyValueChanged("IsStartupProject", true);
 				}
 				NotifyValueChanged ("StartupProject", StartupProject);
@@ -306,84 +306,29 @@ namespace Crow.Coding
 		}
 
 		public string ActiveConfiguration {
-			get => globalProperties.TryGetValue ("Configuration", out string conf) ? conf : "";
+			get => projectProperties.TryGetValue ("Configuration", out string conf) ? conf : null;
 			set {
-				if (globalProperties.TryGetValue ("Configuration", out string conf) &&  conf == value)
+				if (projectProperties.TryGetValue ("Configuration", out string conf) &&  conf == value)
 					return;
-				globalProperties ["Configuration"] = value;
+				projectProperties ["Configuration"] = value;
 				NotifyValueChanged ("ActiveConfiguration", value);
 			}
 		}
 		public string ActivePlatform {
-			get => globalProperties.TryGetValue ("Platform", out string conf) ? conf : "";
+			get => projectProperties.TryGetValue ("Platform", out string conf) ? conf : null;
 			set {
-				if (globalProperties.TryGetValue ("Platform", out string conf) && conf == value)
+				if (projectProperties.TryGetValue ("Platform", out string conf) && conf == value)
 					return;
-				globalProperties ["Platform"] = value;
+				projectProperties ["Platform"] = value;
 				NotifyValueChanged ("ActivePlatform", value);
 			}
+
 		}
 
-		public void Build (params string[] targets)
+		void onSelectedItemChanged (object sender, SelectionChangeEventArgs e)
 		{
-			BuildRequestData buildRequest = new BuildRequestData (path, globalProperties, CrowIDE.toolsVersion, targets, null);
-			BuildResult buildResult = BuildManager.DefaultBuildManager.Build (buildParams, buildRequest);
+			TreeNode n = e.NewValue as TreeNode;
 		}
-		#region CTOR
-		/// <summary>
-		/// Creates new solution.
-		/// </summary>
-		public SolutionView (string path)
-		{
-			projectCollection = new ProjectCollection ();
-			projectCollection.DefaultToolsVersion = CrowIDE.toolsVersion;
-			buildParams = new BuildParameters (projectCollection);
-			buildParams.Loggers = new List<ILogger> () { new IdeLogger (this)};
-			buildParams.ResetCaches = true;
-			buildParams.LogInitialPropertiesAndItems = true;
-			//projectCollection.IsBuildEnabled = false;
 
-			BuildManager.DefaultBuildManager.ResetCaches ();
-
-			this.path = path;
-			solutionFile = SolutionFile.Parse (path);
-			UserConfig = new Configuration (path + ".user");
-
-			globalProperties ["SolutionDir"] = Path.GetDirectoryName (path) + "/";
-			//globalProperties ["OutputPath"] = "build/";
-			//globalProperties ["IntermediateOutputPath"] = "build/obj/";
-			globalProperties ["RestoreConfigFile"] = "/home/jp/.nuget/NuGet/NuGet.Config";
-			ActiveConfiguration = solutionFile.GetDefaultConfigurationName ();
-			ActivePlatform = solutionFile.GetDefaultPlatformName ();
-
-			//solutionFile.SolutionConfigurations;
-			//added to be able to compile with net472
-#if NET472
-			globalProperties ["RoslynTargetsPath"] = Path.Combine (CrowIDE.msbuildRoot, "Roslyn/");
-			globalProperties ["MSBuildSDKsPath"] = Path.Combine (CrowIDE.msbuildRoot, "Sdks/");
-#endif
-			//------------
-
-			foreach (ProjectInSolution pis in solutionFile.ProjectsInOrder) {
-				switch (pis.ProjectType) {
-				case SolutionProjectType.Unknown:
-					break;
-				case SolutionProjectType.KnownToBeMSBuildFormat:
-					Projects.Add (new ProjectView (this, pis));
-					break;
-				case SolutionProjectType.SolutionFolder:
-					break;
-				case SolutionProjectType.WebProject:
-					break;
-				case SolutionProjectType.WebDeploymentProject:
-					break;
-				case SolutionProjectType.EtpSubProject:
-					break;
-				case SolutionProjectType.SharedProject:
-					break;
-				}
-			}
-		}
-		#endregion
 	}
 }

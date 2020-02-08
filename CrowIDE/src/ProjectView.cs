@@ -11,23 +11,15 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Execution;
 using System.Reflection;
 using Microsoft.Build.Evaluation;
+using System.IO;
 
 namespace Crow.Coding
 {
-	public class ProjectView : IValueChange
+	public class ProjectView : TreeNode
 	{
-		#region IValueChange implementation
-		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-		public virtual void NotifyValueChanged (string MemberName, object _value)
-		{
-			ValueChanged.Raise (this, new ValueChangeEventArgs (MemberName, _value));
-		}
-		#endregion
-
 		bool isLoaded = false;
-		bool isExpanded;
 		ProjectInSolution solutionProject;
-		Microsoft.Build.Evaluation.Project project;
+		Project project;
 
 		Crow.Command cmdSave, cmdOpen, cmdCompile, cmdSetAsStartProj, cmdNewFile;
 
@@ -37,10 +29,23 @@ namespace Crow.Coding
 			solutionProject = sp;
 			solution = sol;
 
-			//ProjectRootElement projectRootElt = ProjectRootElement.Open (solutionProject.AbsolutePath);
-			ProjectCollection pc = new ProjectCollection ();
+			ProjectRootElement projectRootElt = ProjectRootElement.Open (solutionProject.AbsolutePath);			
 
-			project = new Project (solutionProject.AbsolutePath, sol.globalProperties, CrowIDE.toolsVersion, pc);
+			project = new Project (solutionProject.AbsolutePath, null, null, sol.IDE.projectCollection);
+
+			string [] props = { "EnableDefaultItems", "EnableDefaultCompileItems", "EnableDefaultNoneItems", "EnableDefaultEmbeddedResourceItems" };
+
+			foreach (string pr in props) {
+				ProjectProperty pp = project.AllEvaluatedProperties.Where (ep => ep.Name == pr).FirstOrDefault();
+				if (pp == null)
+					project.SetGlobalProperty (pr, "true");
+			}
+			//ide.projectCollection.SetGlobalProperty ("DefaultItemExcludes", "obj/**/*;bin/**/*");
+
+			project.ReevaluateIfNecessary ();
+
+
+
 
 			cmdSave = new Crow.Command (new Action (() => Save ())) { Caption = "Save", Icon = new SvgPicture ("#Icons.save.svg"), CanExecute = true };
 			cmdOpen = new Crow.Command (new Action (() => populateTreeNodes ())) { Caption = "Open", Icon = new SvgPicture ("#Icons.open.svg"), CanExecute = false };
@@ -63,15 +68,12 @@ namespace Crow.Coding
 		#endregion
 
 		public SolutionView solution;
-		public ObservableList<Crow.Command> Commands;
 		public CompilerResults CompilationResults;
 		public List<ProjectView> dependantProjects = new List<ProjectView> ();
 		public ProjectView ParentProject = null;
-		List<ProjectNode> rootItems;
 
-		public string Name {
-			get { return solutionProject.ProjectName; }
-		}
+		public override string DisplayName => solutionProject.ProjectName;
+
 		public bool IsLoaded {
 			get { return isLoaded; }
 			set {
@@ -93,17 +95,9 @@ namespace Crow.Coding
 		public bool IsStartupProject {
 			get { return solution.StartupProject == this; }
 		}
-		public string Path {
-			get { return System.IO.Path.Combine (project.DirectoryPath.Replace ('\\', '/')); }
-		}
-		public string RootDir {
-			get { return System.IO.Path.GetDirectoryName (Path); }
-		}
-
-		public List<ProjectNode> RootItems {
-			get { return rootItems; }
-		}
-
+		public string FullPath => project.FullPath;
+		public string RootDir => project.DirectoryPath;
+	
 		#region Project properties
 		public string ToolsVersion {
 			get { return project.ToolsVersion; }
@@ -153,20 +147,45 @@ namespace Crow.Coding
 
 		public void AddNewFile ()
 		{
-			Window.Show (CrowIDE.MainIFace, "#CrowIDE.ui.NewFile.crow", true).DataSource = this;
+			Window.Show (solution.IDE, "#CrowIDE.ui.NewFile.crow", true).DataSource = this;
 		}
 
+
+		void printProperty (ProjectProperty pp, int depth = 0)
+		{
+			Console.WriteLine ($"{new string ('\t', depth)}{ pp.EvaluatedValue} ({pp.Project.FullPath})");
+			if (pp.Predecessor != null)
+				printProperty (pp.Predecessor, ++depth);
+		}
+
+		void printEvaluatedItems(Project p)
+		{
+			foreach (ProjectItem pn in p.AllEvaluatedItems) {
+				if (pn.ItemType == "Compile")
+					Console.ForegroundColor = ConsoleColor.Yellow;
+				else
+					Console.ForegroundColor = ConsoleColor.DarkGray;
+				Console.WriteLine ($"{pn.ItemType}:{pn.EvaluatedInclude}");
+
+			}
+		}
 		void populateTreeNodes ()
 		{
-
 			ProjectNode root = new ProjectNode (this, ItemType.VirtualGroup, RootNamespace);
 			ProjectNode refs = new ProjectNode (this, ItemType.ReferenceGroup, "References");
 			root.AddChild (refs);
 
+			/*Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine ($"Evaluated Globals properties for {DisplayName}");
+			foreach (ProjectProperty item in project.AllEvaluatedProperties.OrderBy(p=>p.Name)) {
+				Console.ForegroundColor = ConsoleColor.White;
+				Console.Write ($"\t{item.Name,-40} = ");
+				Console.ForegroundColor = ConsoleColor.Gray;
+				Console.WriteLine ($"{item.EvaluatedValue}");
+			}*/
 
 
-			foreach (Microsoft.Build.Evaluation.ProjectItem pn in project.AllEvaluatedItems) {
-				//Console.WriteLine ($"{pn.ItemType}:{pn.EvaluatedInclude}");
+			foreach (ProjectItem pn in project.AllEvaluatedItems) {
 
 				switch (pn.ItemType) {
 				case "ProjectReferenceTargets":
@@ -176,31 +195,30 @@ namespace Crow.Coding
 					break;
 				case "Reference":
 				case "PackageReference":
-					refs.AddChild (new ProjectItem (this, pn));
-					break;
 				case "ProjectReference":
-					ProjectReference pr = new ProjectReference (this, pn);
-					refs.AddChild (pr);
+					refs.AddChild (new ProjectItemNode (this, pn));
 					break;
 				case "Compile":
 				case "None":
 				case "EmbeddedResource":
-
 					ProjectNode curNode = root;
 					try {
 						string file = pn.EvaluatedInclude.Replace ('\\', '/');
-						string [] folds = file.Split ('/');
+						string treePath = file;
+						if (pn.HasMetadata ("Link"))
+							treePath = project.ExpandString (pn.GetMetadataValue ("Link"));							
+						string [] folds = treePath.Split ('/');
 						for (int i = 0; i < folds.Length - 1; i++) {
-							ProjectNode nextNode = curNode.ChildNodes.FirstOrDefault (n => n.DisplayName == folds [i] && n.Type == ItemType.VirtualGroup);
+							ProjectNode nextNode = curNode.Childs.OfType<ProjectNode>().FirstOrDefault (n => n.DisplayName == folds [i] && n.Type == ItemType.VirtualGroup);
 							if (nextNode == null) {
 								nextNode = new ProjectNode (this, ItemType.VirtualGroup, folds [i]);
 								curNode.AddChild (nextNode);
 							}
 							curNode = nextNode;
 						}
-						ProjectItem pi = new ProjectItem (this, pn);
+						ProjectItemNode pi = new ProjectItemNode (this, pn);
 
-						switch (System.IO.Path.GetExtension (file)) {
+						switch (Path.GetExtension (file)) {
 						/*case ".cs":
 							f = new CSProjectFile (pn);
 							break;*/
@@ -215,20 +233,26 @@ namespace Crow.Coding
 							pi = new StyleProjectItem (pi);
 							break;
 						default:
-							pi = new ProjectFile (pi);
+							pi = new ProjectFileNode (pi);
 							break;
 						}
 						curNode.AddChild (pi);
 
 					} catch (Exception ex) {
-
+						Console.ForegroundColor = ConsoleColor.Red;
+						Console.WriteLine (ex);
+						Console.ResetColor ();
 					}
 
 					break;
 				}
 			}
 			root.SortChilds ();
-			rootItems = root.ChildNodes;
+			foreach (var item in root.Childs) {
+				Childs.Add (item);
+			}
+
+
 			IsLoaded = true;
 		}
 
@@ -269,17 +293,16 @@ namespace Crow.Coding
 
 			Environment.SetEnvironmentVariable ("MSBUILD_EXE_PATH", "/usr/share/dotnet/sdk/3.1.101/MSBuild.dll");*/
 			ProjectInstance pi = BuildManager.DefaultBuildManager.GetProjectInstanceForBuild (project);
-
 			//ProjectInstance pi = new ProjectInstance (project.FullPath, solution.globalProperties, solution.toolsVersion);
 
 			/*ILogger logger = new Microsoft.Build.Logging.ConsoleLogger {
 				Verbosity = LoggerVerbosity.Diagnostic
 			};*/
-
 			if (pi.Build (new string [] { target }, solution.buildParams.Loggers))
 				Console.WriteLine ("success");
 			else
 				Console.WriteLine ("error");
+
 
 		}
 		//    if (ParentProject != null)
@@ -392,11 +415,6 @@ namespace Crow.Coding
 		//    return parameters.OutputAssembly;
 		//}
 
-		//public bool TryGetProjectFileFromAbsolutePath (string absolutePath, out ProjectFile pi) {
-		//    pi = flattenNodes.OfType<ProjectFile> ().FirstOrDefault
-		//        (pp => pp.AbsolutePath == absolutePath);
-		//    return pi != null;
-		//}
 		//public bool TryGetProjectFileFromPath (string path, out ProjectFile pi) {
 		//if (path.StartsWith ("#", StringComparison.Ordinal))
 		//    pi = flattenNodes.OfType<ProjectFile> ().FirstOrDefault
@@ -467,26 +485,61 @@ namespace Crow.Coding
 			}
 		}
 
+		/*public void GetStyling ()
+		{
+			try {
+				foreach (ProjectItem pn in project.AllEvaluatedItems.Where (ei => ei.ItemType == "EmbeddedResource"
+				 && string.Equals (Path.GetExtension (ei.EvaluatedInclude), ".style", StringComparison.OrdinalIgnoreCase))) {
+					using (Stream s = new MemoryStream (System.Text.Encoding.UTF8.GetBytes (pn.EvaluatedInclude))) {
+						string id = pn.GetMetadata ("LogicalName")?.EvaluatedValue;
+						if (string.IsNullOrEmpty (id))
+							id = DisplayName + "." + pn.EvaluatedInclude.Replace ('/', '.');
+						Console.WriteLine ($"Load styling: {id} -> {pn.EvaluatedInclude}");
+						new StyleReader (solution.Styling, s, id);
+					}
+				}
+            } catch (Exception ex) {
+                Console.WriteLine (ex.ToString ());
+            }
+            foreach (ProjectItem pr in project.AllEvaluatedItems.Where (ei => ei.ItemType == "ProjectReference")) {
+                ProjectView p = solution.Projects.FirstOrDefault (pp => pp.FilePath == pr.EvaluatedInclude);
+                if (p != null)
+					p.GetStyling ();
+				//throw new Exception ("referenced project not found");
+
+			}
+
+			//TODO:get styling from referenced assemblies
+		}*/
+
+
 		public void GetStyling ()
 		{
-			/*try {
-                foreach (ProjectFile pi in flattenNodes.OfType<ProjectFile> ().Where (pp => pp.Type == ItemType.EmbeddedResource && pp.Extension == ".style")) {
+			try {
+                foreach (ProjectFileNode pi in Flatten.OfType<ProjectFileNode> ().Where (pp => pp.Type == ItemType.EmbeddedResource && pp.Extension == ".style")) {
                     using (Stream s = new MemoryStream (System.Text.Encoding.UTF8.GetBytes (pi.Source))) {
-                        new StyleReader (solution.Styling, s, pi.ResourceID);
+                        new StyleReader (solution.Styling, s, pi.LogicalName);
                     }
                 }
             } catch (Exception ex) {
                 Console.WriteLine (ex.ToString ());
             }
-            foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference> ()) {
-                Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);
+            foreach (ProjectItemNode pr in Flatten.OfType<ProjectItemNode> ().Where(pn=>pn.Type == ItemType.ProjectReference)) {
+                ProjectView p = solution.Projects.FirstOrDefault (pp => pp.FullPath == pr.FullPath);
                 if (p != null)
                     //throw new Exception ("referenced project not found");
                 	p.GetStyling ();
-            }*/
+            }
 
 			//TODO:get styling from referenced assemblies
 		}
+
+
+		public void onClick (object sender, MouseButtonEventArgs e)
+		{
+			IsSelected = true;
+		}
+
 	}
 }
 

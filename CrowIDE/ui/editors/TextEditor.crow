@@ -17,13 +17,13 @@
 	<HorizontalStack Height="Fit">
 		<Widget Height="5" Width="Stretched"/>
 		<Widget Background="Red" Width="5" Height="5" Visible="{IsDirty}"/>
-		<Label Text="Line:" Foreground="Grey"/>
+		<Label Text="Line:" Foreground="Jet"/>
 		<Label Text="{CurrentLine}"/>
 		<Widget Height="5" Width="10"/>
-		<Label Text="column:" Foreground="Grey"/>
+		<Label Text="column:" Foreground="Jet"/>
 		<Label Text="{CurrentColumn}"/>
 		<Widget Height="5" Width="10"/>
-		<Label Text="ScrollX:" Foreground="Grey"/>
+		<Label Text="ScrollX:" Foreground="Jet"/>
 		<Label Text="{../../editor.ScrollX}"/>
 	</HorizontalStack>
 </VerticalStack>

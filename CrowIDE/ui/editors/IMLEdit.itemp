@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <TabItem DataSourceType="ImlProjectItem" QueryClose="OnQueryClose" IsSelected="{²IsSelected}" Template="#Crow.Coding.EditTabItem.template">
 	<VerticalStack>
-        <VerticalStack Height="60%">
-    		<Label DataSource="{../editor.HoverWidget}" Width="Stretched" Margin="2" Text="{Name}"/>
+     <VerticalStack Height="60%">
+    		<Label DataSource="{../editor.HoverWidget}" Width="Stretched" Margin="2" Text="{Name}" Foreground="Black"/>
     		<VerticalStack Width="Stretched" Margin="0" MinimumSize="10,10">
     			<HorizontalStack>
     				<Scroller Name="scroller1" Margin="2" >

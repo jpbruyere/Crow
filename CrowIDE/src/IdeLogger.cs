@@ -12,11 +12,11 @@ namespace Crow.Coding
 		public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Normal;
 		public string Parameters { get; set; }
 
-		SolutionView solution;
+		CrowIDE ide;
 
-		public IdeLogger (SolutionView solution)
+		public IdeLogger (CrowIDE ide)
 		{
-			this.solution = solution;
+			this.ide = ide;
 		}
 
 		public void Initialize (IEventSource eventSource)
@@ -28,42 +28,47 @@ namespace Crow.Coding
 				eventSource.BuildFinished += EventSource_BuildFinished;
 				break;
 			case LoggerVerbosity.Minimal:
-				eventSource.MessageRaised += (sender, e) => { if (e.Importance == MessageImportance.High) solution.BuildEvents.Add (e); };
+				eventSource.MessageRaised += (sender, e) => { if (e.Importance == MessageImportance.High) ide.BuildEvents.Add (e); };
 				break;
 			case LoggerVerbosity.Normal:
-				eventSource.MessageRaised += (sender, e) => { if (e.Importance != MessageImportance.Low) solution.BuildEvents.Add (e); };
+				eventSource.MessageRaised += (sender, e) => { if (e.Importance != MessageImportance.Low) ide.BuildEvents.Add (e); };
+				eventSource.ProjectStarted += EventSource_ProjectStarted;
+				eventSource.ProjectFinished += EventSource_ProjectFinished;
 				break;
 			case LoggerVerbosity.Detailed:
+				break;
 			case LoggerVerbosity.Diagnostic:
-				eventSource.AnyEventRaised += (sender, e) => { solution.BuildEvents.Add (e); };
-				eventSource.MessageRaised += (sender, e) => { solution.BuildEvents.Add (e); };
+				eventSource.AnyEventRaised += (sender, e) => { ide.BuildEvents.Add (e); };
+				eventSource.MessageRaised += (sender, e) => { ide.BuildEvents.Add (e); };
 				break;			
 			}
 
-			eventSource.BuildFinished+= (sender, e) => { solution.BuildEvents.Add (e); };
+			eventSource.BuildFinished += EventSource_BuildFinished;
 
-			eventSource.ProjectStarted += EventSource_ProjectStarted;
-			eventSource.ProjectFinished += EventSource_ProjectFinished;
 			eventSource.ErrorRaised += EventSource_ErrorRaised;
 		}
 
 		void EventSource_BuildStarted (object sender, BuildStartedEventArgs e)
 		{
-			solution.BuildEvents.Clear ();
+			ide.BuildEvents.Clear ();
+			ide.BuildEvents.Add (e);
 		}
 		void EventSource_BuildFinished (object sender, BuildFinishedEventArgs e)
 		{
+			ide.BuildEvents.Add (e);
 		}
 
 		void EventSource_ProjectStarted (object sender, ProjectStartedEventArgs e)
 		{
+			ide.BuildEvents.Add (e);
 		}
 		void EventSource_ProjectFinished (object sender, ProjectFinishedEventArgs e)
 		{
+			ide.BuildEvents.Add (e);
 		}
 		void EventSource_ErrorRaised (object sender, BuildErrorEventArgs e)
 		{
-			solution.BuildEvents.Add (e);
+			ide.BuildEvents.Add (e);
 		}
 
 

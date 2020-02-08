@@ -28,6 +28,7 @@ namespace Crow.Coding
 			Doctype = BufferParser.TokenType.Keyword,
 			ElementStart = 50,
 			ElementEnd = 51,
+			Content = 60,
 		}
 
 		public enum States
@@ -105,7 +106,8 @@ namespace Crow.Coding
 
 
 			while (! eol) {
-				SkipWhiteSpaces ();
+				if (curState != States.Content)
+					SkipWhiteSpaces ();
 
 				if (eol)
 					break;
@@ -251,6 +253,11 @@ namespace Crow.Coding
 						if (Peek () != openAttVal)
 							throw new ParserException (currentLine, currentColumn, string.Format ("Expecting {0}", openAttVal));
 						readAndResetCurrentTok (TokenType.AttributeValueClosing, true);
+						break;
+					case States.Content:
+						currentTok.Start = CurrentPosition;
+						currentTok.Content = ReadLineUntil ("<");
+						saveAndResetCurrentTok (TokenType.Content);
 						break;
 					default:
 						throw new ParserException (currentLine, currentColumn, "unexpected char: " + Peek ());

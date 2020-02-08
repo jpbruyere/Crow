@@ -10,7 +10,7 @@
 				MouseLeave="{Background=Transparent}"/>
 			<Image Style="TreeIcon"
 				Path="{Icon}" SvgSub="{IconSub}"/>
-			<Label Text="{./Caption}"/>
+			<Label Style="TreeLabel" Text="{./Caption}"/>
 		</HorizontalStack>
 	</Border>
 	<Container Name="Content" Visible="false"/>

@@ -1,28 +1,6 @@
-﻿//
-// ScrollingTextBox.cs
+﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2019 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.ComponentModel;
@@ -50,6 +28,7 @@ namespace Crow.Coding
 			formatting.Add ((int)XMLParser.TokenType.AttributeValueClosing, new TextFormatting (Color.Crimson, Color.Transparent));
 			formatting.Add ((int)XMLParser.TokenType.AttributeValue, new TextFormatting (Color.FireBrick, Color.Transparent, false, true));
 			formatting.Add ((int)XMLParser.TokenType.XMLDecl, new TextFormatting (Color.ForestGreen, Color.Transparent));
+			formatting.Add ((int)XMLParser.TokenType.Content, new TextFormatting (Color.DimGrey, Color.Transparent, false, true));
 
 			formatting.Add ((int)BufferParser.TokenType.BlockComment, new TextFormatting (Color.Grey, Color.Transparent, false, true));
 			formatting.Add ((int)BufferParser.TokenType.LineComment, new TextFormatting (Color.Grey, Color.Transparent, false, true));
@@ -60,6 +39,8 @@ namespace Crow.Coding
 			parsing.Add (".crow", "Crow.Coding.XMLParser");
 			parsing.Add (".svg", "Crow.Coding.XMLParser");
 			parsing.Add (".template", "Crow.Coding.XMLParser");
+			parsing.Add (".csproj", "Crow.Coding.XMLParser");
+			parsing.Add (".xml", "Crow.Coding.XMLParser");
 			parsing.Add (".cs", "Crow.Coding.CSharpParser");
 			parsing.Add (".style", "Crow.Coding.StyleParser");
 
@@ -439,7 +420,7 @@ namespace Crow.Coding
 			get { return buffer == null ? false : buffer.CurrentCodeLine == null ? false :
 				buffer.CurrentCodeLine.exception != null; }
 		}
-		public override ProjectFile ProjectNode {
+		public override ProjectFileNode ProjectNode {
 			get {
 				return base.ProjectNode;
 			}

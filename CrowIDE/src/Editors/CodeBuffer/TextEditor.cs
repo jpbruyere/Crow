@@ -25,17 +25,8 @@
 // THE SOFTWARE.
 
 using System;
-using System.Xml.Serialization;
 using System.ComponentModel;
-using System.Collections;
 using Crow.Cairo;
-using System.Text;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Linq;
-using System.Diagnostics;
-using System.IO;
-using System.Threading;
 
 namespace Crow.Text
 {

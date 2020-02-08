@@ -199,7 +199,7 @@ namespace Crow.Coding
 			if (!g.design_style_locations.ContainsKey (Name))
 				return;
 			FileLocation fl = g.design_style_locations [Name];
-			ProjectFile pf;
+			ProjectFileNode pf;
 			/*
 			if (!mview.ProjectNode.Project.TryGetProjectFileFromPath ("#" + fl.FilePath, out pf))
 				return;

@@ -1,28 +1,7 @@
-﻿//
-// ProjectNodes.cs
+﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,7 +10,10 @@ using System.Threading;
 using System.Xml;
 
 namespace Crow.Coding {
-    public class ProjectFile : ProjectItem {		
+	/// <summary>
+	/// represent a file node in the tree in a project
+	/// </summary>
+    public class ProjectFileNode : ProjectItemNode {		
 		bool isOpened = false;
 		DateTime accessTime;
 		string source;
@@ -45,21 +27,32 @@ namespace Crow.Coding {
 		List<String> undoStack = new List<string>();
 		List<String> redoStack = new List<string>();
 
-		public Crow.Command cmdSave, cmdSaveAs, cmdOpen, cmdClose, cmdUndo, cmdRedo;
+		public Command cmdSave, cmdSaveAs, cmdOpen, cmdClose, cmdUndo, cmdRedo;
+
+		public ProjectFileNode ()
+		{
+			initCommands ();
+		}
+
+		public ProjectFileNode (ProjectItemNode pi)
+			: base (pi.Project, pi.Item)
+		{
+			initCommands ();
+		}
 
 		void initCommands (){
-			cmdSave = new Crow.Command (new Action (() => Save ()))
-			{ Caption = "Save", Icon = new SvgPicture ("#Icons.save.svg"), CanExecute = false };
-			cmdSaveAs = new Crow.Command (new Action (() => SaveAs ()))
-			{ Caption = "Save As ..", Icon = new SvgPicture ("#Icons.save.svg"), CanExecute = false };
-			cmdOpen = new Crow.Command (new Action (() => Open ())) 
-			{ Caption = "Open", Icon = new SvgPicture ("#Icons.open.svg"), CanExecute = true };
-			cmdClose = new Crow.Command (new Action (() => OnQueryClose (this,null))) 
-			{ Caption = "Close", Icon = new SvgPicture ("#Icons.open.svg"), CanExecute = false };
-			cmdUndo = new Crow.Command (new Action (() => Undo (null))) 
-			{ Caption = "Undo", Icon = new SvgPicture ("#Icons.undo.svg"), CanExecute = false };
-			cmdRedo = new Crow.Command (new Action (() => Redo (null))) 
-			{ Caption = "Redo", Icon = new SvgPicture ("#Icons.redo.svg"), CanExecute = false };
+			cmdSave = new Command (new Action (() => Save ()))
+			{ Caption = "Save", Icon = CrowIDE.IcoSave, CanExecute = false };
+			cmdSaveAs = new Command (new Action (() => SaveAs ()))
+			{ Caption = "Save As ..", Icon = CrowIDE.IcoSave, CanExecute = false };
+			cmdOpen = new Command (new Action (() => Open ())) 
+			{ Caption = "Open", Icon = CrowIDE.IcoOpen, CanExecute = true };
+			cmdClose = new Command (new Action (() => OnQueryClose (this,null))) 
+			{ Caption = "Close", Icon = CrowIDE.IcoQuit, CanExecute = false };
+			cmdUndo = new Command (new Action (() => Undo (null))) 
+			{ Caption = "Undo", Icon = CrowIDE.IcoUndo, CanExecute = false };
+			cmdRedo = new Command (new Action (() => Redo (null))) 
+			{ Caption = "Redo", Icon = CrowIDE.IcoRedo, CanExecute = false };
 
 			Commands.Insert (0, cmdOpen);
 			Commands.Insert (1, cmdSave);
@@ -68,27 +61,25 @@ namespace Crow.Coding {
 			Commands.Insert (4, cmdRedo);
 			Commands.Add (cmdClose);
 		}
-		public ProjectFile () {
-			initCommands();
-		}
-		public ProjectFile (ProjectItem pi)
-			: base (pi.Project, pi.node) {
-			initCommands ();
+
+		public string LogicalName =>
+			Item.HasMetadata ("LogicalName") ? Item.GetMetadata ("LogicalName").EvaluatedValue :
+				$"{Project.DisplayName}.{Item.EvaluatedInclude.Replace('/','.').Replace('\\','.')}";
+
+		public string Link => Item.GetMetadata ("Link")?.EvaluatedValue;
+		public CopyToOutputState CopyToOutputDirectory {
+			get => Item.HasMetadata ("CopyToOutputDirectory") ?
+				Enum.TryParse (Item.GetMetadata ("CopyToOutputDirectory").EvaluatedValue, true, out CopyToOutputState tmp) ?
+					tmp : CopyToOutputState.Never : CopyToOutputState.Never;
+			set {
+				if (string.Equals(Item.GetMetadata ("CopyToOutputDirectory")?.EvaluatedValue, value.ToString(), StringComparison.OrdinalIgnoreCase))
+					return;
+				//TODO: check if updated in xml and writable to disk with preserve formating
+				Item.SetMetadataValue ("CopyToOutputDirectory", value.ToString ());
+				NotifyValueChanged ("CopyToOutputDirectory", CopyToOutputDirectory);
+			}
 		}
 
-		public string ResourceID {
-			get {
-				return "todo";/* Type != ItemType.EmbeddedResource ? null :
-					node.SelectSingleNode ("LogicalName") == null ?
-					Project.Name + "." + Path.Replace ('/', '.') :
-					LogicalName;*/
-			}
-		}
-		public string LogicalName {
-			get {
-				return "todo";// node.SelectSingleNode ("LogicalName")?.InnerText;
-			}
-		}
 		public bool IsOpened {
 			get { return isOpened; }
 			set {
@@ -148,13 +139,13 @@ namespace Crow.Coding {
 		public string Source {
 			get {
 				if (!IsOpened) {
-					using (StreamReader sr = new StreamReader (AbsolutePath))
+					using (StreamReader sr = new StreamReader (FullPath))
 						source = sr.ReadToEnd ();
 					
 				} else {
 					if (DateTime.Compare (
 						    accessTime,
-						    System.IO.File.GetLastWriteTime (AbsolutePath)) < 0)
+						    System.IO.File.GetLastWriteTime (FullPath)) < 0)
 						Console.WriteLine ("File has been modified outside CrowIDE");
 				}
 				return source;
@@ -212,18 +203,9 @@ namespace Crow.Coding {
 			}
 		}
 
-		public CopyToOutputState CopyToOutputDirectory {
-			get {
-				return CopyToOutputState.Never;
-				/*XmlNode xn = node.SelectSingleNode ("CopyToOutputDirectory");
-				return xn == null ? CopyToOutputState.Never :
-					(CopyToOutputState)Enum.Parse (typeof(CopyToOutputState), xn.InnerText, true);*/
-			}
-		}
-
 		public virtual void Open () {			
-			accessTime = System.IO.File.GetLastWriteTime (AbsolutePath);
-			using (StreamReader sr = new StreamReader (AbsolutePath)) {
+			accessTime = File.GetLastWriteTime (FullPath);
+			using (StreamReader sr = new StreamReader (FullPath)) {
 				source = sr.ReadToEnd ();
 			}
 			origSource = source;
@@ -233,7 +215,7 @@ namespace Crow.Coding {
 		public virtual void Save () {
 			if (!IsDirty)
 				return;
-			using (StreamWriter sw = new StreamWriter (AbsolutePath)) {
+			using (StreamWriter sw = new StreamWriter (FullPath)) {
 				sw.Write (source);
 			}
 			origSource = source;
@@ -242,7 +224,7 @@ namespace Crow.Coding {
 		public virtual void SaveAs () {
 			if (!IsDirty)
 				return;
-			using (StreamWriter sw = new StreamWriter (AbsolutePath)) {
+			using (StreamWriter sw = new StreamWriter (FullPath)) {
 				sw.Write (source);
 			}
 			origSource = source;
@@ -312,7 +294,7 @@ namespace Crow.Coding {
 		}
 		public void OnQueryClose (object sender, EventArgs e){
 			if (IsDirty) {
-				MessageBox mb = MessageBox.ShowModal (CrowIDE.MainIFace,
+				MessageBox mb = MessageBox.ShowModal (Project.solution.IDE,
 					                MessageBox.Type.YesNoCancel, $"{DisplayName} has unsaved changes.\nSave it now?");
 				mb.Yes += (object _sender, EventArgs _e) => { Save (); Close (); };
 				mb.No += (object _sender, EventArgs _e) => Close();

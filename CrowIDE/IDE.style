@@ -1,6 +1,6 @@
 ﻿//test
 Label {    
-    Foreground="White";
+    Foreground="Jet";
 }
 icon {
 	Width="14";
@@ -35,11 +35,15 @@ WinSchema {
 	Width = "Fit";
 	Height = "Fit";
 }
+TabView {
+	TabWidth="200";
+	TabHeight="22";
+}
 TabItem {
 	AllowDrag="false";
 	Background="Grey";
 	SelectedBackground="0.9,0.9,0.91,1.0";
-    Foreground="Black";
+  Foreground="Black";
 }
 TreeItemBorder {
 	CornerRadius="2";
@@ -55,6 +59,9 @@ TreeIcon {
 	Margin="0";
 	Width="14";
 	Height="14";
+}
+TreeLabel {
+	Foreground="White";
 }
 Splitter {
 	Thickness="1";

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
-<!--		<TargetFramework>net472</TargetFramework>-->
+<!--		<TargetFramework>netcoreapp3.1</TargetFramework>-->
+		<TargetFramework>net472</TargetFramework>
 		<OutputType>Exe</OutputType>
-		<StartupObject>Crow.Coding.CrowIDE</StartupObject>
-		<ReleaseVersion>$(CrowVersion)</ReleaseVersion>
+		<StartupObject>Crow.Coding.Startup</StartupObject>
+		<ReleaseVersion>0.8.0</ReleaseVersion>
 		<AssemblyVersion>$(CrowVersion)</AssemblyVersion>
 		<EnableDefaultItems>false</EnableDefaultItems>
 	</PropertyGroup>

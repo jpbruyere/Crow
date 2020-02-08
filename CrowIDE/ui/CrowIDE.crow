@@ -43,6 +43,8 @@
 	<HorizontalStack DataSource="{CurrentSolution}" Height="Fit">
 		<Label Margin="3" Text="{ActiveConfiguration}" Background="Jet" Width="100"/>
 		<Label Margin="3" Text="{ActivePlatform}" Background="Jet" Width="100"/>
+		<ComboBox Width="Fit" Data="{Configurations}" SelectedItem="{²ActiveConfiguration}"/>
+		<ComboBox Width="Fit" Data="{Platforms}" SelectedItem="{²ActivePlatform}"/>
 	</HorizontalStack>
 	<DockStack Name="mainDock" />
 </VerticalStack>

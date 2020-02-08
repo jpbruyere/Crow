@@ -49,12 +49,12 @@ namespace Crow.Coding
 			//}
 		}
 
-		public ProjectFile ProjFile;
+		public ProjectFileNode ProjFile;
 
 
 		public override Widget CreateInstance (string path)
 		{
-			ProjectFile pi;
+			ProjectFileNode pi;
 
 			if (ProjFile.Project.solution.GetProjectFileFromPath (path, out pi))
 				return CreateITorFromIMLFragment (pi.Source).CreateInstance();					
@@ -63,9 +63,9 @@ namespace Crow.Coding
 		}
 		public override Stream GetStreamFromPath (string path)
 		{
-			ProjectFile pi;
+			ProjectFileNode pi;
 			if (ProjFile.Project.solution.GetProjectFileFromPath (path, out pi)) {
-				return new FileStream (pi.AbsolutePath, FileMode.Open);	
+				return new FileStream (pi.FullPath, FileMode.Open);	
 			}
 			throw new Exception ($"In Design File not found: {path}");
 		}

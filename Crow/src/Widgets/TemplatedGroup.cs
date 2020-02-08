@@ -158,7 +158,7 @@ namespace Crow {
 			}
 		}
 		[XmlIgnore]public virtual object SelectedItem{
-			get { return data == null ? null : _selectedIndex < 0 ? data.GetDefaultValue() : ((IList)data)?[_selectedIndex]; }
+			get { return data == null ? null : _selectedIndex < 0 ? data.GetDefaultValue() : data is IList tmp ? tmp[_selectedIndex] : null; }
 			set {
 				if (data == null) {
 					SelectedIndex = -1;

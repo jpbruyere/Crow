@@ -33,10 +33,10 @@ using System.Threading;
 
 namespace Crow.Coding
 {
-	public class StyleProjectItem : ProjectFile
+	public class StyleProjectItem : ProjectFileNode
 	{
 		#region CTOR
-		public StyleProjectItem (ProjectItem pi) : base (pi){			
+		public StyleProjectItem (ProjectItemNode pi) : base (pi){			
 		}
 		#endregion
 

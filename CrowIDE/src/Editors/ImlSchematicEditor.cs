@@ -39,7 +39,7 @@ namespace Crow.Coding
 		}
 		#endregion
 
-		ProjectFile projNode;
+		ProjectFileNode projNode;
 		Widget selectedItem;
 		ImlProjectItem imlProjFile;
 		Exception imlError = null;

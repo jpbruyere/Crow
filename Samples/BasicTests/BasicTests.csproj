@@ -29,5 +29,5 @@
 			<LogicalName>ui.%(Filename)%(Extension)</LogicalName>
 			<Link>Templates\%(Filename)%(Extension)</Link>
 		</EmbeddedResource>
-	</ItemGroup>
+	</ItemGroup>	
 </Project>
