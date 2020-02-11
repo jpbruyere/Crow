@@ -339,13 +339,13 @@ namespace Crow {
 		/// Items loading thread
 		/// </summary>
 		void loading(){
-			try {
+			//try {
 				loadPage (data, items, dataTest);
-			} catch {
+			/*} catch (Exception ex) {
 				if (Monitor.IsEntered (IFace.LayoutMutex))
 					Monitor.Exit (IFace.LayoutMutex);
-				Console.WriteLine ("loading thread aborted");
-			}
+				Console.WriteLine ("loading thread aborted: " + ex.ToString());
+			}*/
 
 		}
 //			//if (!ItemTemplates.ContainsKey ("default"))
@@ -363,9 +363,12 @@ namespace Crow {
 		void cancelLoadingThread(){
 			if (loadingThread == null)
 				return;
-
 			bool updateMx = Monitor.IsEntered (IFace.UpdateMutex);
 			bool layoutMx = Monitor.IsEntered (IFace.LayoutMutex);
+
+#if DEBUG_LOG
+			DebugLog.AddEvent (DbgEvtType.TGCancelLoadingThread, this);
+#endif
 
 			if (layoutMx)
 				Monitor.Exit (IFace.LayoutMutex);

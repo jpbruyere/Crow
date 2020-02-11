@@ -174,6 +174,19 @@ namespace Crow.IML {
 		/// </summary>
 		Delegate templateBinding;
 
+#if DESIGN_MODE
+		public List<DynamicMethod> DsValueChangedDynMeths =>dsValueChangedDynMeths;
+		public List<Delegate> CachedDelegates => cachedDelegates;
+		/// <summary>
+		/// store indices of template delegate to be handled by root parentChanged event
+		/// </summary>
+		public List<int> TemplateCachedDelegateIndices => templateCachedDelegateIndices;
+		/// <summary>
+		/// Store template bindings in the instantiator
+		/// </summary>
+		public Delegate TemplateBinding => templateBinding;
+
+#endif
 		#region IML parsing
 		/// <summary>
 		/// Parses IML and build a dynamic method that will be used to instantiate one or multiple occurences of the IML file or fragment
@@ -446,7 +459,7 @@ namespace Crow.IML {
 						ctx.SetDataSourceTypeForCurrentNode(CompilerServices.getTypeFromName (dataSourceType));
 				}
 				ctx.il.Emit (OpCodes.Ldloc_0);
-                ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miLoadDefaultVals);
+                ctx.il.Emit (OpCodes.Call, CompilerServices.miLoadDefaultVals);
 #endregion
 
 
@@ -811,12 +824,12 @@ namespace Crow.IML {
 		}
 		void emitTemplateBindings(IMLContext ctx, Dictionary<string, List<MemberAddress>> bindings){
 			//value changed dyn method
-			DynamicMethod dm = new DynamicMethod ("dyn_tmpValueChanged",
+			DynamicMethod dm = new DynamicMethod ("dyn_tmpValueChanged" + NewId,
 				typeof (void), CompilerServices.argsValueChange, true);
 			ILGenerator il = dm.GetILGenerator (256);
 
 			//create parentchanged dyn meth in parallel to have only one loop over bindings
-			DynamicMethod dmPC = new DynamicMethod ("dyn_InitAndLogicalParentChanged",
+			DynamicMethod dmPC = new DynamicMethod ("dyn_InitAndLogicalParentChanged" + NewId,
 				typeof (void),
 				CompilerServices.argsBoundDSChange, true);
 			ILGenerator ilPC = dmPC.GetILGenerator (256);
@@ -1108,6 +1121,10 @@ namespace Crow.IML {
 
 			//store dschange delegate in instatiator instance for access while instancing graphic object
 			int delDSIndex = cachedDelegates.Count;
+
+			//Int32 fiLength = (Int32)il.GetType ().GetField ("code_len", BindingFlags.Instance | BindingFlags.NonPublic).GetValue (il);
+			//byte [] bytes = (byte[])il.GetType ().GetField ("code", BindingFlags.Instance | BindingFlags.NonPublic).GetValue (il);
+
 			cachedDelegates.Add (dm.CreateDelegate (CompilerServices.ehTypeDSChange, this));
 			#endregion
 
@@ -1199,7 +1216,7 @@ namespace Crow.IML {
 #endregion
 			}
 
-#region emit dataSourceChanged event handler
+			#region emit dataSourceChanged event handler
 			//now we create the datasource changed method that will init the destination member with
 			//the actual value of the origin member of the datasource and then will bind the value changed
 			//dyn methode.
@@ -1413,7 +1430,7 @@ namespace Crow.IML {
 			EventHandler<ValueChangeEventArgs> tmp = (EventHandler<ValueChangeEventArgs>)dm.CreateDelegate (typeof (EventHandler<ValueChangeEventArgs>), dest);
 			orig.ValueChanged += tmp;
 		}
-#endregion
+		#endregion
 
 		/// <summary>
 		/// search for graphic object type in crow assembly, if not found,

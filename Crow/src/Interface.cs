@@ -495,11 +495,11 @@ namespace Crow
 		/// <param name="path">path of the iml file to load</param>
 		public virtual Widget CreateInstance (string path)
 		{
-			try {
+			//try {
 				return GetInstantiator (path).CreateInstance ();
-			} catch (Exception ex) {
-				throw new Exception ("Error loading <" + path + ">:", ex);
-			}
+			//} catch (Exception ex) {
+			//	throw new Exception ("Error loading <" + path + ">:", ex);
+			//}
 		}
 		/// <summary>
 		/// Create an instance of a GraphicObject linked to this interface but not added to the GraphicTree
@@ -508,13 +508,13 @@ namespace Crow
 		/// <param name="path">path of the iml file to load</param>
 		public virtual Widget CreateTemplateInstance (string path, Type declaringType)
 		{
-			try {
+//			try {
 				if (!Templates.ContainsKey (path))
 					Templates [path] = new Instantiator (this, GetTemplateStreamFromPath(path, declaringType), path);
 				return Templates [path].CreateInstance ();
-			} catch (Exception ex) {
-				throw new Exception ("Error loading Template <" + path + ">:", ex);
-			}
+			//} catch (Exception ex) {
+			//	throw new Exception ("Error loading Template <" + path + ">:", ex);
+			//}
 		}
 		/// <summary>
 		/// Fetch instantiator from cache or create it.
