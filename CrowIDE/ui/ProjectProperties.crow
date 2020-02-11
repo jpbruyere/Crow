@@ -60,7 +60,7 @@
 			</HorizontalStack>
 		</VerticalStack>
 		<TreeView Width="50%" IsRoot="true" Name="treeView" Data="{RootItems}" DataTest="Type"
-			ItemTemplate="#Crow.Coding.ui.ProjectTree.template">
+			ItemTemplate="#ui.ProjectTree.itemp">
 		</TreeView>
 	</HorizontalStack>
 </Window>

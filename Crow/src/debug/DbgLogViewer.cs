@@ -130,7 +130,7 @@ namespace Crow
 
 		long currentTick = 0, selStart = -1, selEnd = -1, minTicks = 0, maxTicks = 0, visibleTicks = 0;
 		int currentLine = -1;
-		int visibleLines;
+		int visibleLines = 1;
 
 		public string LogFile {
 			get { return logFile; }
@@ -140,7 +140,6 @@ namespace Crow
 				logFile = value;
 
 				loadDebugFile ();
-
 
 				NotifyValueChanged ("LogFile", logFile);
 				RegisterForGraphicUpdate ();
@@ -230,8 +229,6 @@ namespace Crow
 
 					leftMargin = 2.5 + maxNameWidth;
 
-					fe = gr.FontExtents;
-
 					topMargin = 2.0 * fe.Height;
 
 					updateVisibleLines ();
@@ -241,7 +238,7 @@ namespace Crow
 
 		}
 		void updateVisibleLines(){
-			visibleLines = (int)Math.Floor (((double)ClientRectangle.Height - topMargin) / fe.Height);
+			visibleLines = fe.Height < 1 ? 1 : (int)Math.Floor (((double)ClientRectangle.Height - topMargin) / fe.Height);
 			NotifyValueChanged ("VisibleLines", visibleLines);
 			updateMaxScrollY ();
 		}
@@ -280,10 +277,15 @@ namespace Crow
 			get { return base.Font; }
 			set {
 				base.Font = value;
+				using (Context gr = new Context (IFace.surf)) {
+					gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+					gr.SetFontSize (Font.Size);
+
+					fe = gr.FontExtents;
+				}
 				loadDebugFile ();
 			}
 		}
-
 		public override int ScrollY {
 			get {
 				return base.ScrollY;
@@ -359,7 +361,7 @@ namespace Crow
 
 					Color c = Color.Black;
 
-					if (evt.type == DbgEvtType.GOProcessLayouting) {							
+					if (evt.type == DbgEvtType.GOProcessLayouting) {
 						switch (evt.data.result) {
 						case LayoutingQueueItem.Result.Success:
 							c = Crow.Color.Green;
@@ -374,11 +376,13 @@ namespace Crow
 							c = Crow.Color.Orange;
 							break;
 						}
-					} else if (colors.ContainsKey (evt.type))
+					} else if (evt.type.HasFlag (DbgEvtType.GOLock))
+						c = Color.BlueViolet;
+					else if (colors.ContainsKey (evt.type))
 						c = colors [evt.type];
-					else
-						System.Diagnostics.Debugger.Break ();
-
+					//else
+					//	System.Diagnostics.Debugger.Break ();
+					c = c.AdjustAlpha (0.2);
 					gr.SetSourceColor (c);
 
 					gr.Rectangle (x, penY, w, fe.Height);

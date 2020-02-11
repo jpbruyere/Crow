@@ -48,8 +48,7 @@ namespace Crow
 		#endregion
 
 		#region implemented abstract members of Fill
-
-		public override void SetAsSource (Context ctx, Rectangle bounds = default(Rectangle))
+		public override void SetAsSource (Context ctx, Rectangle bounds = default)
 		{
 			ctx.SetSourceRGBA (color.R, color.G, color.B, color.A);
 		}
@@ -60,32 +59,19 @@ namespace Crow
 		#endregion
 
 		#region Operators
-        public static implicit operator Color(SolidColor c)
-        {
-			return c.color;
-        }
-		public static implicit operator SolidColor(Color c)
-		{
-			return new SolidColor (c);
-		}
-		public static bool operator ==(SolidColor left, SolidColor right)
-		{
-			return left is SolidColor ? right is SolidColor ? true : false :
-				left.color == right.color ? true : false;
-		}
-		public static bool operator !=(SolidColor left, SolidColor right)
-		{
-			return left is SolidColor ? right is SolidColor ? false : true :
-				left.color == right.color ? false : true;
+        public static implicit operator Color(SolidColor c) => c.color;        
+		public static implicit operator SolidColor(Color c) => new SolidColor (c);
 
-		}
+		public static bool operator ==(SolidColor left, SolidColor right) => left?.color == right?.color;		
+		public static bool operator !=(SolidColor left, SolidColor right) => left?.color != right?.color;
+
 		public override int GetHashCode ()
 		{
 			return color.GetHashCode();
 		}
 		public override bool Equals (object obj)
 		{
-			if (obj is Crow.Color)
+			if (obj is Color)
 				return color == (Color)obj;
 			if (obj is SolidColor)
 				return color == (obj as SolidColor).color;

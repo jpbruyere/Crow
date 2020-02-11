@@ -37,7 +37,7 @@ namespace Crow.Coding
 
 		public Configuration UserConfig;
 
-		ProjectItemNode selectedItem = null;
+		TreeNode selectedItem = null;
 		object selectedItemElement = null;
 		ObservableList<ProjectItemNode> openedItems = new ObservableList<ProjectItemNode>();
 		ObservableList<GraphicObjectDesignContainer> toolboxItems;
@@ -54,11 +54,7 @@ namespace Crow.Coding
 		public IEnumerable<string> Configurations => solutionFile.SolutionConfigurations.Select (sc => sc.ConfigurationName).Distinct ().ToList ();
 		public IEnumerable<string> Platforms => solutionFile.SolutionConfigurations.Select (sc => sc.PlatformName).Distinct ().ToList ();
 
-		public void Build (params string [] targets)
-		{
-			BuildRequestData buildRequest = new BuildRequestData (path, projectProperties, CrowIDE.DEFAULT_TOOLS_VERSION, targets, null);
-			BuildResult buildResult = BuildManager.DefaultBuildManager.Build (buildParams, buildRequest);
-		}
+
 		#region CTOR
 		/// <summary>
 		/// Creates new solution.
@@ -115,6 +111,12 @@ namespace Crow.Coding
 
 		}
 		#endregion
+
+		public void Build (params string [] targets)
+		{
+			BuildRequestData buildRequest = new BuildRequestData (path, projectProperties, CrowIDE.DEFAULT_TOOLS_VERSION, targets, null);
+			BuildResult buildResult = BuildManager.DefaultBuildManager.Build (buildParams, buildRequest);
+		}
 
 		public void ReloadStyling () {
 			Console.WriteLine ("reload styling");
@@ -173,17 +175,21 @@ namespace Crow.Coding
 				NotifyValueChanged ("ToolboxItems", toolboxItems);
 			}			
 		}
-		public ProjectItemNode SelectedItem {
+
+		public TreeNode SelectedItem {
 			get { return selectedItem; }
 			set {
 				if (selectedItem == value)
 					return;
 				if (SelectedItem != null)
 					SelectedItem.IsSelected = false;
+
 				selectedItem = value;
+
 				if (SelectedItem != null) {
 					SelectedItem.IsSelected = true;
-					UserConfig.Set ("SelectedProjItems", SelectedItem.SaveID);
+					if (selectedItem is ProjectItemNode)
+						UserConfig.Set ("SelectedProjItems", (SelectedItem as ProjectItemNode).SaveID);
 				}
 
 				NotifyValueChanged ("SelectedItem", selectedItem);
@@ -195,6 +201,7 @@ namespace Crow.Coding
 				if (selectedItemElement == value)
 					return;
 				selectedItemElement = value;
+				Console.WriteLine ($"selected item element: {selectedItemElement}");
 				NotifyValueChanged ("SelectedItemElement", selectedItemElement);
 			}
 		}
@@ -327,7 +334,8 @@ namespace Crow.Coding
 
 		void onSelectedItemChanged (object sender, SelectionChangeEventArgs e)
 		{
-			TreeNode n = e.NewValue as TreeNode;
+			Console.WriteLine ($"solution.onSelectedItemChanged: {e.NewValue}");
+			SelectedItem = e.NewValue as TreeNode;
 		}
 
 	}

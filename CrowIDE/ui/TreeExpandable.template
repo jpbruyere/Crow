@@ -1,17 +1,20 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack>
-	<Border Style="TreeItemBorder" >		
-		<HorizontalStack Spacing="5" Focusable="true" MouseDoubleClick="./onClickForExpand">
-			<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
-				Path="{./Image}"
-				Visible="{./IsExpandable}"
-				SvgSub="{./IsExpanded}"
-				MouseEnter="{Background=LightGrey}"
-				MouseLeave="{Background=Transparent}"/>
-			<Image Style="TreeIcon"
-				Path="{Icon}" SvgSub="{IconSub}"/>
-			<Label Style="TreeLabel" Text="{./Caption}"/>
-		</HorizontalStack>
+	<Border Style="TreeItemBorder" Focusable="true">
+		<Group>
+			<Widget Height="Stretched" Background="RoyalBlue" Visible="{IsSelected}"/>
+			<HorizontalStack Spacing="5" MouseDoubleClick="./onClickForExpand">
+				<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
+					Path="{./Image}"
+					Visible="{./IsExpandable}"
+					SvgSub="{./IsExpanded}"
+					MouseEnter="{Background=LightGrey}"
+					MouseLeave="{Background=Transparent}"/>
+				<Image Style="TreeIcon"
+					Path="{Icon}" SvgSub="{IconSub}"/>
+				<Label Style="TreeLabel" Text="{./Caption}"/>
+			</HorizontalStack>
+		</Group>
 	</Border>
 	<Container Name="Content" Visible="false"/>
 </VerticalStack>

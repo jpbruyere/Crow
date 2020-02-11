@@ -150,13 +150,16 @@ namespace Crow.Coding
 		}
 		public void Load(string rawSource, string lineBrkRegex = @"\r\n|\r|\n|\\\n") {
 			this.Clear();
-
 			if (string.IsNullOrEmpty (rawSource))
 				return;
 
 			AddRange (Regex.Split (rawSource, lineBrkRegex));
 
 			lineBreak = detectLineBreakKind (rawSource);
+
+			for (int i = 0; i < LineCount; i++) {
+				ToogleFolding (i);
+			}
 		}
 
 		/// <summary>

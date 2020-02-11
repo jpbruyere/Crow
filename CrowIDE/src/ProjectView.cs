@@ -83,15 +83,6 @@ namespace Crow.Coding
 				NotifyValueChanged ("IsLoaded", isLoaded);
 			}
 		}
-		public bool IsExpanded {
-			get { return isExpanded; }
-			set {
-				if (value == isExpanded)
-					return;
-				isExpanded = value;
-				NotifyValueChanged ("IsExpanded", isExpanded);
-			}
-		}
 		public bool IsStartupProject {
 			get { return solution.StartupProject == this; }
 		}
@@ -147,7 +138,7 @@ namespace Crow.Coding
 
 		public void AddNewFile ()
 		{
-			Window.Show (solution.IDE, "#CrowIDE.ui.NewFile.crow", true).DataSource = this;
+			Window.Show (solution.IDE, "#ui.NewFile.crow", true).DataSource = this;
 		}
 
 
@@ -250,6 +241,7 @@ namespace Crow.Coding
 			root.SortChilds ();
 			foreach (var item in root.Childs) {
 				Childs.Add (item);
+				item.Parent = this;
 			}
 
 
@@ -415,35 +407,34 @@ namespace Crow.Coding
 		//    return parameters.OutputAssembly;
 		//}
 
-		//public bool TryGetProjectFileFromPath (string path, out ProjectFile pi) {
-		//if (path.StartsWith ("#", StringComparison.Ordinal))
-		//    pi = flattenNodes.OfType<ProjectFile> ().FirstOrDefault
-		//        (pp => pp.Type == ItemType.EmbeddedResource && pp.ResourceID == path.Substring (1));
-		//else
-		//    pi = flattenNodes.OfType<ProjectFile> ().FirstOrDefault (pp => pp.Path == path);
+		public bool TryGetProjectFileFromPath (string path, out ProjectFileNode pi)
+		{
+			if (path.StartsWith ("#", StringComparison.Ordinal))
+				pi = Flatten.OfType<ProjectFileNode> ().FirstOrDefault 
+					(f => f.Type == ItemType.EmbeddedResource && f.LogicalName == path.Substring (1));
+			else
+				pi = Flatten.OfType<ProjectFileNode> ().FirstOrDefault (pp => pp.FullPath == path);
 
-		//if (pi != null)
-		//    return true;
+			if (pi != null)
+				return true;
 
-		//foreach (ProjectReference pr in flattenNodes.OfType<ProjectReference> ()) {
-		//    Project p = solution.Projects.FirstOrDefault (pp => pp.ProjectGuid == pr.ProjectGUID);
-		//    if (p == null)
-		//        throw new Exception ("referenced project not found");
-		//    if (p.TryGetProjectFileFromPath (path, out pi))
-		//        return true;
-		//}
-		////TODO: search referenced assemblies
-		//return "";
-		//}
+			foreach (ProjectItemNode pr in Flatten.OfType<ProjectItemNode> ().Where (pn => pn.Type == ItemType.ProjectReference)) {
+				ProjectView p = solution.Projects.FirstOrDefault (pp => pp.FullPath == pr.FullPath);
+				if (p == null)
+					continue;
+				if (p.TryGetProjectFileFromPath (path, out pi))
+					return true;
+			}
+			return false;
+		}
 
 		public void GetDefaultTemplates ()
 		{
-			//IEnumerable<ProjectFile> tmpFiles =
-			//    flattenNodes.OfType<ProjectFile> ().Where (pp => pp.Extension == ".template");
+			IEnumerable<ProjectFileNode> tmpFiles =
+			    Flatten.OfType<ProjectFileNode> ().Where (pp => pp.Type == ItemType.EmbeddedResource && pp.Extension == ".template");
+			foreach (ProjectFileNode pi in tmpFiles) { 
 
-			//foreach (ProjectFile pi in tmpFiles.Where (
-			//    pp => pp.Type == ItemType.None && pp.CopyToOutputDirectory != CopyToOutputState.Never)) {
-
+			}
 			//    string clsName = System.IO.Path.GetFileNameWithoutExtension (pi.Path);
 			//    if (solution.DefaultTemplates.ContainsKey (clsName))
 			//        continue;
@@ -485,34 +476,6 @@ namespace Crow.Coding
 			}
 		}
 
-		/*public void GetStyling ()
-		{
-			try {
-				foreach (ProjectItem pn in project.AllEvaluatedItems.Where (ei => ei.ItemType == "EmbeddedResource"
-				 && string.Equals (Path.GetExtension (ei.EvaluatedInclude), ".style", StringComparison.OrdinalIgnoreCase))) {
-					using (Stream s = new MemoryStream (System.Text.Encoding.UTF8.GetBytes (pn.EvaluatedInclude))) {
-						string id = pn.GetMetadata ("LogicalName")?.EvaluatedValue;
-						if (string.IsNullOrEmpty (id))
-							id = DisplayName + "." + pn.EvaluatedInclude.Replace ('/', '.');
-						Console.WriteLine ($"Load styling: {id} -> {pn.EvaluatedInclude}");
-						new StyleReader (solution.Styling, s, id);
-					}
-				}
-            } catch (Exception ex) {
-                Console.WriteLine (ex.ToString ());
-            }
-            foreach (ProjectItem pr in project.AllEvaluatedItems.Where (ei => ei.ItemType == "ProjectReference")) {
-                ProjectView p = solution.Projects.FirstOrDefault (pp => pp.FilePath == pr.EvaluatedInclude);
-                if (p != null)
-					p.GetStyling ();
-				//throw new Exception ("referenced project not found");
-
-			}
-
-			//TODO:get styling from referenced assemblies
-		}*/
-
-
 		public void GetStyling ()
 		{
 			try {
@@ -532,12 +495,6 @@ namespace Crow.Coding
             }
 
 			//TODO:get styling from referenced assemblies
-		}
-
-
-		public void onClick (object sender, MouseButtonEventArgs e)
-		{
-			IsSelected = true;
 		}
 
 	}

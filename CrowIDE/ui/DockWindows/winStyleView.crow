@@ -10,7 +10,7 @@
 				<Label Background="White" Foreground="Jet" Text="{Value}" Width="Stretched"/>
 			</HorizontalStack>
 		</ItemTemplate>
-		<ItemTemplate Path="#Crow.Coding.CategoryExp.template" DataType="Crow.Coding.StyleContainer" Data="Items"/>
+		<ItemTemplate Path="#ui.CategoryExp.itemp" DataType="Crow.Coding.StyleContainer" Data="Items"/>
 	</TreeView>
 </DockWindow>
 

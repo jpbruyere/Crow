@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0"?>
-
-    <VerticalStack>
-        <Label Text="Hello World" Font="mono, 20"/>
-        <Image Path="#Crow.Icons.crow.svg"/>
-        <CheckBox/>
-    </VerticalStack>
-
-
+<VerticalStack>
+	<TextBox Text="{TestColor}"/>
+	<ColorPicker CurrentColor="{²TestColor}" />
+</VerticalStack>
+<!--<ScrollBar Orientation="Vertical" Height="Stretched" Width="10" />-->

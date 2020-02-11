@@ -23,6 +23,9 @@ namespace Crow.Coding {
 
 		internal ReaderWriterLockSlim srcEditMtx = new ReaderWriterLockSlim();
 
+		/// <summary>
+		/// dictionnary of boolean per editor, true if editor must reload content from project node, false if uptodate.
+		/// </summary>
 		public Dictionary<object, bool> RegisteredEditors = new Dictionary<object, bool>();
 		List<String> undoStack = new List<string>();
 		List<String> redoStack = new List<string>();
@@ -289,9 +292,9 @@ namespace Crow.Coding {
 			Open ();
 		}
 
-		public void onClick (object sender, MouseButtonEventArgs e){
+		/*public void onClick (object sender, MouseButtonEventArgs e){
 			IsSelected = true;
-		}
+		}*/
 		public void OnQueryClose (object sender, EventArgs e){
 			if (IsDirty) {
 				MessageBox mb = MessageBox.ShowModal (Project.solution.IDE,

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <ItemTemplate>
-	<Border DataSourceType="ProjectItemNode" Style="TreeItemBorder" ContextCommands="{Commands}" Focusable="true" MouseDown="onClick" MouseDoubleClick="onDoubleClick">
+	<Border DataSourceType="ProjectItemNode" Style="TreeItemBorder" ContextCommands="{Commands}" Focusable="true" MouseDoubleClick="onDoubleClick">
 		<Group>
 			<Widget Height="Stretched" Background="RoyalBlue" Visible="{IsSelected}"/>
 			<HorizontalStack>
@@ -12,7 +12,7 @@
 	</Border>
 </ItemTemplate>
 <ItemTemplate DataType="Crow.Coding.ProjectView" Data="Childs" DataTest="Type">
-	<Expandable DataSourceType="ProjectView" Caption="{DisplayName}" ContextCommands="{Commands}" IsExpanded="{²IsExpanded}" MouseDown="onClick" MouseDoubleClick="/onClickForExpand">
+	<Expandable DataSourceType="ProjectView" Caption="{DisplayName}" ContextCommands="{Commands}" IsExpanded="{²IsExpanded}" MouseDoubleClick="/onClickForExpand">
 		<Template>
 			<VerticalStack>
 				<Border Style="TreeItemBorder" >
@@ -26,9 +26,9 @@
 								MouseEnter="{Background=LightGrey}"
 								MouseLeave="{Background=Transparent}"/>
 							<Image Style="TreeIcon"
-								Path="#Crow.Icons.crowproj.svg"/>
-							<Widget Width="4" Height="9" Background="Green" Visible="{IsStartupProject}"/>
-							<Label Style="TreeLabel" Text="{./Caption}"/>						
+								Path="#Crow.Icons.crowproj.svg"/>							
+							<Label Style="TreeLabel" Text="{./Caption}"/>
+							<Label Text="(startup)" Visible="{IsStartupProject}" Fit="true"/>
 						</HorizontalStack>
 					</Group>
 				</Border>
@@ -42,7 +42,7 @@
 	</Expandable>
 </ItemTemplate>
 <ItemTemplate DataSourceType="ProjectNode" DataType="ReferenceGroup" Data="Childs" DataTest="Type" >
-	<Expandable Caption="{DisplayName}" Template="#Crow.Coding.TreeExpandable.template" IsExpanded="{²IsExpanded}">
+	<Expandable Caption="{DisplayName}" Template="#ui.TreeExpandable.template" IsExpanded="{²IsExpanded}">
 		<HorizontalStack Height="Fit">
 			<Widget Width="8" Height="10"/>
 			<VerticalStack Height="Fit" Name="ItemsContainer"/>
@@ -50,7 +50,7 @@
 	</Expandable>
 </ItemTemplate>
 <ItemTemplate DataType="VirtualGroup" Data="Childs" DataTest="Type">
-	<Expandable DataSourceType="ProjectNode" Caption="{DisplayName}" Template="#Crow.Coding.TreeExpandable.template" IsExpanded="{²IsExpanded}">
+	<Expandable DataSourceType="ProjectNode" Caption="{DisplayName}" Template="#ui.TreeExpandable.template" IsExpanded="{²IsExpanded}">
 		<HorizontalStack Height="Fit">
 			<Widget Width="8" Height="10"/>
 			<VerticalStack Height="Fit" Name="ItemsContainer"/>

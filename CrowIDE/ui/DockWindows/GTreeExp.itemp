@@ -16,7 +16,10 @@
 					<Border Width="16" Height="16" Foreground="Black" Background="DimGrey">
 						<Image Margin="2" Path="{GetIcon}" />
 					</Border>
-					<Label Text="{DesignName}"/>
+					<Widget Width="5" Height="5" Background="Blue" Visible="{IsHover}"/>
+					<Widget Width="5" Height="5" Background="Green" Visible="{Visible}"/>
+					<Label Text="{Name}" Width="Fit"/>
+					<Label Text="{LogicalParent}" Width="Stretched" Foreground="Yellow"/>
 				</HorizontalStack>
 			</Border>
 			<Container Name="Content" Visible="false"/>

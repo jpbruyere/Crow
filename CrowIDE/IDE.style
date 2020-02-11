@@ -71,3 +71,15 @@ DockWindow {
     //Background="0.18,0.18,0.18,0.9";
     Background="DimGrey";
 }
+ColorPicker {
+	Width="200";
+	Background="DimGrey";
+	Foreground="Grey";
+	Margin="5";
+}
+labColor {
+	Foreground="White";
+}
+labColorV {
+	Foreground="White";
+}

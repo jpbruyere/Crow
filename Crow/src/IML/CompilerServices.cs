@@ -445,7 +445,7 @@ namespace Crow.IML
 			}
 			return null;
 		}
-#endregion
+		#endregion
 
 		/// <summary>
 		/// Emits tree parsing command to fetch dest instance starting from orig node
@@ -521,7 +521,7 @@ namespace Crow.IML
 				il.Emit (OpCodes.Pop);//remove null string from stack
 				il.Emit (OpCodes.Ldstr, "");//replace with empty string
 				il.MarkLabel (endConvert);
-			} else if ((origType.IsEnum || origType == typeof (Enum)) && destType.IsEnum) {
+			} else if ((origType.IsEnum || origType == typeof (Enum)) && destType.IsEnum) {//TODO:double check this (multiple IsEnum test, no check of enum underlying type
 				il.Emit (OpCodes.Unbox_Any, destType);
 				return;
 			} else if (origType.IsValueType) {
@@ -598,6 +598,7 @@ namespace Crow.IML
 				}
 			}
 		}
+		internal static bool isValueType (object obj) => obj.GetType ().IsValueType;
 		/// <summary>
 		/// check type of current object on the stack and convert to dest type,
 		/// use loc_0 so store it as object!!!
@@ -618,7 +619,7 @@ namespace Crow.IML
 
 			il.MarkLabel (convert);
 
-			if (dstType == typeof(string)) {
+			if (dstType == typeof (string)) {
 				System.Reflection.Emit.Label emitNullStr = il.DefineLabel ();
 				il.Emit (OpCodes.Dup);
 				il.Emit (OpCodes.Brfalse, emitNullStr);
@@ -628,18 +629,68 @@ namespace Crow.IML
 				il.Emit (OpCodes.Pop);//remove null string from stack
 				il.Emit (OpCodes.Ldstr, "");//replace with empty string
 			} else if (dstType.IsPrimitive) {
-                //il.Emit (OpCodes.Unbox_Any, dstType);
-                MethodInfo miconv = CompilerServices.GetConvertMethod(dstType);
-                if (miconv.IsStatic)
-                    il.Emit(OpCodes.Call, miconv);
-                else
-                    il.Emit(OpCodes.Callvirt, miconv);
-			} else if (dstType.IsValueType) {
+				//il.Emit (OpCodes.Unbox_Any, dstType);
+				MethodInfo miconv = CompilerServices.GetConvertMethod (dstType);
+				if (miconv.IsStatic)
+					il.Emit (OpCodes.Call, miconv);
+				else
+					il.Emit (OpCodes.Callvirt, miconv);
+			}else if (dstType.IsValueType) {
+				System.Reflection.Emit.Label endConvert2 = il.DefineLabel ();
+				il.Emit (OpCodes.Dup);
+				il.Emit (OpCodes.Call, typeof (CompilerServices).GetMethod ("isValueType", BindingFlags.Static | BindingFlags.NonPublic));
+				System.Reflection.Emit.Label convertToValueType = il.DefineLabel ();
+				il.Emit (OpCodes.Brfalse, convertToValueType);
+
+				il.Emit (OpCodes.Unbox_Any, dstType);
+				il.Emit (OpCodes.Br, endConvert);
+
+				il.MarkLabel (convertToValueType);
+				//il.EmitWriteLine ($"convertToValueType:{dstType}");
+
+				//check if null
+				il.Emit (OpCodes.Dup);
+				LocalBuilder lbOrig = il.DeclareLocal (typeof (object));
+				LocalBuilder lbMI = il.DeclareLocal (typeof (MethodInfo));
+				il.Emit (OpCodes.Stloc, lbOrig);
+				il.Emit (OpCodes.Ldloc, lbOrig);
+
+				//il.Emit (OpCodes.Ldloc, lbOrig);
+				//il.Emit (OpCodes.Call, typeof (Console).GetMethod ("WriteLine", new Type [] { typeof (object) }));
+				il.Emit (OpCodes.Brfalse, endConvert2);
+				//il.EmitWriteLine ($"search for implOp:{dstType}");
+				il.Emit (OpCodes.Ldloc, lbOrig);
+				il.Emit (OpCodes.Callvirt, miGetType);
+				il.Emit (OpCodes.Ldtoken, dstType);//push destination property type for testing
+				il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
+				il.Emit (OpCodes.Call, miGetImplOp);
+				il.Emit (OpCodes.Stloc, lbMI);
+				il.Emit (OpCodes.Ldloc, lbMI);
+				convert = il.DefineLabel ();
+				il.Emit (OpCodes.Brtrue, convert);
+				//il.Emit (OpCodes.Ldloc, lbOrig);
+				il.Emit (OpCodes.Isinst, dstType);
+				il.Emit (OpCodes.Br, endConvert2);
+
+				il.MarkLabel (convert);
+				//il.EmitWriteLine ($"implOp found, calling:{dstType}");
+				il.Emit (OpCodes.Pop);
+				il.Emit (OpCodes.Ldloc, lbMI);
+				il.Emit (OpCodes.Ldnull);//null instance for invoke
+				il.Emit (OpCodes.Ldc_I4_1);
+				il.Emit (OpCodes.Newarr, typeof (object));
+				il.Emit (OpCodes.Dup);//duplicate the array ref
+				il.Emit (OpCodes.Ldc_I4_0);//push the index 0
+				il.Emit (OpCodes.Ldloc, lbOrig);//push the orig value to convert
+				il.Emit (OpCodes.Stelem, typeof (object));//set the array element at index 0
+				il.Emit (OpCodes.Callvirt, miMIInvoke);
+				il.MarkLabel (endConvert2);
 				il.Emit (OpCodes.Unbox_Any, dstType);
 			} else{
-				il.Emit (OpCodes.Stloc_0); //save orig value in loc0
+				LocalBuilder lbOrig = il.DeclareLocal (typeof (object));
+				il.Emit (OpCodes.Stloc, lbOrig); //save orig value in loc0
 				//first check if not null
-				il.Emit (OpCodes.Ldloc_0);
+				il.Emit (OpCodes.Ldloc, lbOrig);
 				il.Emit (OpCodes.Dup);
 				il.Emit (OpCodes.Brfalse, endConvert);
 				il.Emit (OpCodes.Callvirt, miGetType);
@@ -650,7 +701,7 @@ namespace Crow.IML
 				convert = il.DefineLabel ();
 				il.Emit (OpCodes.Brtrue, convert);
 				il.Emit (OpCodes.Pop);
-				il.Emit (OpCodes.Ldloc_0);
+				il.Emit (OpCodes.Ldloc, lbOrig);
 				il.Emit (OpCodes.Isinst, dstType);
 				il.Emit (OpCodes.Br, endConvert);
 
@@ -660,9 +711,13 @@ namespace Crow.IML
 				il.Emit(OpCodes.Newarr, typeof (object));
 				il.Emit (OpCodes.Dup);//duplicate the array ref
 				il.Emit (OpCodes.Ldc_I4_0);//push the index 0
-				il.Emit (OpCodes.Ldloc_0);//push the orig value to convert
+				il.Emit (OpCodes.Ldloc, lbOrig);//push the orig value to convert
 				il.Emit (OpCodes.Stelem, typeof (object));//set the array element at index 0
 				il.Emit (OpCodes.Callvirt, miMIInvoke);
+
+				//if (dstType.IsValueType)
+				//	il.Emit (OpCodes.Unbox_Any, dstType);
+
 			}
 
 			il.MarkLabel (endConvert);

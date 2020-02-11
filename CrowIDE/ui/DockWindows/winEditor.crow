@@ -2,5 +2,10 @@
 <DockWindow Name="winEditor" Caption="Edit View">
 	<EditPane DataSource="{CurrentSolution}"
 		SelectedItemElement="{²SelectedItemElement}" Data="{OpenedItems}" DataTest="Extension"
-		ItemTemplate="#Crow.Coding.EditPaneItems.template"/>
+		SelectedItemChanged="onSelectedItemChanged"
+		ItemTemplate="#ui.EditPane.itemp">
+		<Template>
+			<TabView SelectedTab="{²./SelectedIndex}" Name="ItemsContainer" Orientation="Horizontal"/>
+		</Template>		
+	</EditPane>
 </DockWindow>

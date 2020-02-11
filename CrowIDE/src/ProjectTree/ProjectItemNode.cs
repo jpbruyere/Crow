@@ -23,11 +23,20 @@ namespace Crow.Coding
 			get {
 				switch (Extension) {
 				case ".cs":
-					return new SvgPicture ("#Icons.cs-file.svg");
+					return CrowIDE.IcoFileCS;
 				case ".crow":
-					return new SvgPicture ("#Icons.file-code.svg");
+					return CrowIDE.IcoFileXML;
 				case ".xml":
-					return new SvgPicture ("#Icons.file-code.svg");
+					return CrowIDE.IcoFileXML;
+				case ".style":
+					return new SvgPicture ("#Icons.palette.svg");
+				case ".jpg":
+				case ".jpeg":
+				case ".png":
+				case ".gif":
+				case ".bmp":
+					return new SvgPicture ("#Icons.picture-file.svg");
+
 				default:
 					return base.Icon;
 				}
@@ -56,19 +65,10 @@ namespace Crow.Coding
 		}
 
 		public override bool IsSelected {
-			get {
-				return isSelected;
-			}
+			get => base.IsSelected;
 			set {
-				if (value == isSelected)
-					return;
-
-				isSelected = value;
-
-				NotifyValueChanged ("IsSelected", isSelected);
-
+				base.IsSelected = value;
 				if (isSelected) {
-					Project.solution.SelectedItem = this;
 					TreeNode pn = Parent;
 					while (pn != null) {
 						pn.IsExpanded = true;
@@ -77,6 +77,28 @@ namespace Crow.Coding
 				}
 			}
 		}
+		//public override bool IsSelected {
+		//	get {
+		//		return isSelected;
+		//	}
+		//	set {
+		//		if (value == isSelected)
+		//			return;
+
+		//		isSelected = value;
+
+		//		NotifyValueChanged ("IsSelected", isSelected);
+
+		//		if (isSelected) {
+		//			Project.solution.SelectedItem = this;
+		//			TreeNode pn = Parent;
+		//			while (pn != null) {
+		//				pn.IsExpanded = true;
+		//				pn = pn.Parent;
+		//			}
+		//		}
+		//	}
+		//}
 	}
 }
 

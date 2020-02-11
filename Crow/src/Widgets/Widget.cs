@@ -951,7 +951,7 @@ namespace Crow
 					rootDataLevel = true;
 
 				#if DEBUG_LOG
-				DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GOLockLayouting, this);
+				DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GOLockUpdate, this);
 				#endif
 				lock (IFace.UpdateMutex) {
 					OnDataSourceChanged (this, dse);
@@ -1156,12 +1156,12 @@ namespace Crow
 			il.Emit(OpCodes.Ret);
 			#endregion
 
-			try {
+			//try {
 				IFace.DefaultValuesLoader[styleKey] = (Interface.LoaderInvoker)dm.CreateDelegate(typeof(Interface.LoaderInvoker));
 				IFace.DefaultValuesLoader[styleKey] (this);
-			} catch (Exception ex) {
+			/*} catch (Exception ex) {
 				throw new Exception ("Error applying style <" + styleKey + ">:", ex);
-			}
+			}*/
 
 			#if DEBUG_LOG
 			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
@@ -1457,6 +1457,9 @@ namespace Crow
 #endif
 			if (Parent == null)
 				return;
+#if DEBUG_LOG
+			DbgEvent dbgEvt = DebugLog.AddEvent (DbgEvtType.GOLockLayouting, this);
+#endif
 			lock (IFace.LayoutMutex) {
 				//prevent queueing same LayoutingType for this
 				layoutType &= (~RegisteredLayoutings);
@@ -1494,6 +1497,9 @@ namespace Crow
 				if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
 					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
 			}
+#if DEBUG_LOG
+			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+#endif
 		}
 
 		/// <summary> trigger dependant sizing component update </summary>
@@ -1594,7 +1600,7 @@ namespace Crow
 					else if (Width == Measure.Stretched)
 						Slot.Width = Parent.ClientRectangle.Width;
 					else
-						Slot.Width = (int)Math.Round ((double)(Parent.ClientRectangle.Width * Width) / 100.0);
+  						Slot.Width = (int)Math.Round ((double)(Parent.ClientRectangle.Width * Width) / 100.0);
 
 					if (Slot.Width < 0)
 						return false;

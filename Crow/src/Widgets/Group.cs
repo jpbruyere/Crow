@@ -97,6 +97,7 @@ namespace Crow
 
 			Children.Remove(child);
 			child.Parent = null;
+			child.LogicalParent = null;
 
 			childrenRWLock.ExitWriteLock ();
 

@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		
-		<ReleaseVersion>$(CrowVersion)</ReleaseVersion>
+		<ReleaseVersion>0.8.0</ReleaseVersion>
 		<AssemblyVersion>$(CrowVersion)</AssemblyVersion>
 		
 		<Title>C# Rapid Open Widget Toolkit</Title>
@@ -36,7 +36,7 @@
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<DebugType>full</DebugType>
-		<DefineConstants>DEBUG;TRACE;MEASURE_TIME;_DEBUG_DISPOSE;_DEBUG_BINDING;DESIGN_MODE;_DEBUG_CLIP_RECTANGLE;_DEBUG_FOCUS;_DEBUG_DRAGNDROP;_DEBUG_LOG</DefineConstants>
+		<DefineConstants>DEBUG;TRACE;MEASURE_TIME;_DEBUG_DISPOSE;_DEBUG_BINDING;DESIGN_MODE;_DEBUG_CLIP_RECTANGLE;_DEBUG_FOCUS;DEBUG_DRAGNDROP;_DEBUG_LOG</DefineConstants>
 		<CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
 	</PropertyGroup>
 	<ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">

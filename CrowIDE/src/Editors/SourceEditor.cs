@@ -61,10 +61,9 @@ namespace Crow.Coding
 		int requestedLine = 0, requestedCol = 0;
 		volatile bool isDirty = false;
 
-		const int leftMarginGap = 10;//gap between items in margin and text
+		const int leftMarginGap = 3;//gap between items in margin and text
 		const int foldSize = 9;//folding rectangles size
-		const int foldHSpace = 4;//folding level tabulation x
-		int foldMargin { get { return parser == null ? 0 : parser.SyntacticTreeMaxDepth * foldHSpace; }}//folding margin size
+		int foldMargin = 9;// { get { return parser == null ? 0 : parser.SyntacticTreeMaxDepth * foldHSpace; }}//folding margin size
 
 		#region private and protected fields
 		bool foldingEnabled = true;
@@ -346,7 +345,7 @@ namespace Crow.Coding
 					buffer.CurrentLine = l;
 					l = buffer.CurrentLine; //reaffect from buffer where bound check is made
 					if ((bool)buffer [l]?.IsFolded)
-						buffer.ToogleFolding (l);					
+						buffer.ToogleFolding (l);//unfold current line					
 				} catch (Exception ex) {
 					requestedLine = value - 1;
 					Console.WriteLine ("Error cur column: " + ex);
@@ -528,8 +527,8 @@ namespace Crow.Coding
 			double y = cb.Y + (fe.Ascent+fe.Descent) * i, x = cb.X;
 
 			//Draw line numbering
-			Color mgFg = Color.Grey;
-			Color mgBg = Color.White;
+			Color mgFg = Color.Jet;
+			Color mgBg = Color.Grey;
 			if (PrintLineNumbers){
 				Rectangle mgR = new Rectangle ((int)x, (int)y, leftMargin - leftMarginGap, (int)Math.Ceiling((fe.Ascent+fe.Descent)));
 				if (cl.exception != null) {
@@ -552,7 +551,6 @@ namespace Crow.Coding
 				gr.ShowText (strLN);
 				gr.Fill ();
 			}
-
 
 
 			//draw folding
@@ -775,15 +773,12 @@ namespace Crow.Coding
 			get { return base.Font; }
 			set {
 				base.Font = value;
+				using (Context gr = new Context (IFace.surf)) {
+					gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+					gr.SetFontSize (Font.Size);
 
-				using (ImageSurface img = new ImageSurface (Format.Argb32, 1, 1)) {
-					using (Context gr = new Context (img)) {
-						gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-						gr.SetFontSize (Font.Size);
-
-						fe = gr.FontExtents;
-					}
-				}
+					fe = gr.FontExtents;
+				}				
 				MaxScrollY = 0;
 				RegisterForGraphicUpdate ();
 			}
@@ -950,7 +945,8 @@ namespace Crow.Coding
 			}
 
 			if (mouseLocalPos.X < leftMargin) {
-				toogleFolding (buffer.IndexOf (PrintedLines [(int)Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent+fe.Descent)))]));
+				toogleFolding (hoverLine);
+				//toogleFolding (buffer.IndexOf (PrintedLines [(int)Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent+fe.Descent)))]));
 				return;
 			}
 
@@ -1001,7 +997,7 @@ namespace Crow.Coding
 				case Key.S:
 					projFile.Save ();
 					break;
-				case Key.W:
+				case Key.z:
 					editorMutex.EnterWriteLock ();
 					if (IFace.Shift)
 						projFile.Redo (null);

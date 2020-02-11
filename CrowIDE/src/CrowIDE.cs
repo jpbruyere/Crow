@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using Crow.IML;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
@@ -32,6 +33,10 @@ namespace Crow.Coding
 		public static Picture IcoReference = new SvgPicture ("#Icons.cube.svg");
 		public static Picture IcoPackageReference = new SvgPicture ("#Icons.package.svg");
 
+		public static Picture IcoFileCS = new SvgPicture ("#Icons.cs-file.svg");
+		public static Picture IcoFileXML = new SvgPicture ("#Icons.file-code.svg");
+
+
 		public Command CMDNew, CMDOpen, CMDSave, CMDSaveAs, cmdCloseSolution, CMDQuit,
 		CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp, CMDAbout, CMDOptions,
 		CMDViewGTExp, CMDViewProps, CMDViewProj, CMDViewProjProps, CMDViewErrors, CMDViewLog, CMDViewSolution, CMDViewEditor, CMDViewProperties,
@@ -50,31 +55,31 @@ namespace Crow.Coding
             CMDCopy = new Command(new Action(copy)) { Caption = "Copy", Icon = IcoCopy, CanExecute = false};
             CMDPaste = new Command(new Action(paste)) { Caption = "Paste", Icon = IcoPaste, CanExecute = false};
             CMDHelp = new Command(new Action(() => System.Diagnostics.Debug.WriteLine("help"))) { Caption = "Help", Icon = IcoHelp };
-			CMDOptions = new Command(new Action(() => loadWindow("#CrowIDE.ui.Options.crow", this))) { Caption = "Editor Options", Icon = new SvgPicture("#Icons.tools.svg") };
+			CMDOptions = new Command(new Action(() => loadWindow("#ui.Options.crow", this))) { Caption = "Editor Options", Icon = new SvgPicture("#Icons.tools.svg") };
 
 			cmdCloseSolution = new Command(new Action(closeSolution))
 			{ Caption = "Close Solution", Icon = new SvgPicture("#Icons.paste-on-document.svg"), CanExecute = false};
 
-			CMDViewErrors = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winErrors.crow",this)))
+			CMDViewErrors = new Command(new Action(() => loadWindow ("#ui.winErrors.crow",this)))
 			{ Caption = "Errors pane"};
-			CMDViewLog = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winLog.crow",this)))
+			CMDViewLog = new Command(new Action(() => loadWindow ("#ui.winLog.crow",this)))
 			{ Caption = "Log View"};
-			CMDViewSolution = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winSolution.crow",this)))
+			CMDViewSolution = new Command(new Action(() => loadWindow ("#ui.winSolution.crow",this)))
 			{ Caption = "Solution Tree", CanExecute = false};
-			CMDViewEditor = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winEditor.crow",this)))
+			CMDViewEditor = new Command(new Action(() => loadWindow ("#ui.winEditor.crow",this)))
 			{ Caption = "Editor Pane"};
-			CMDViewProperties = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winProperties.crow",this)))
+			CMDViewProperties = new Command(new Action(() => loadWindow ("#ui.winProperties.crow",this)))
 			{ Caption = "Properties"};
-			CMDViewDesign = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winDesign.crow",this)))
+			CMDViewDesign = new Command(new Action(() => loadWindow ("#ui.winDesign.crow",this)))
 			{ Caption = "Quick Design", CanExecute = true};
-			CMDViewToolbox = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winToolbox.crow",this)))
+			CMDViewToolbox = new Command(new Action(() => loadWindow ("#ui.winToolbox.crow",this)))
 			{ Caption = "Toolbox", CanExecute = false};
-			CMDViewSchema = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winSchema.crow",this)))
+			CMDViewSchema = new Command(new Action(() => loadWindow ("#ui.winSchema.crow",this)))
 			{ Caption = "IML Shematic View", CanExecute = true};
-			CMDViewStyling = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winStyleView.crow",this)))
+			CMDViewStyling = new Command(new Action(() => loadWindow ("#ui.winStyleView.crow",this)))
 			{ Caption = "Styling Explorer", CanExecute = true};
 				
-			CMDViewGTExp = new Command(new Action(() => loadWindow ("#CrowIDE.ui.DockWindows.winGTExplorer.crow",this)))
+			CMDViewGTExp = new Command(new Action(() => loadWindow ("#ui.winGTExplorer.crow",this)))
 			{ Caption = "Graphic Tree Explorer", CanExecute = true};
 			CMDBuild = new Command(new Action(() => CurrentSolution?.Build ("Build")))
 			{ Caption = "Compile Solution", CanExecute = false};
@@ -120,9 +125,37 @@ namespace Crow.Coding
 		protected override void Startup ()
 		{
 			initIde ();
+
 			reloadWinConfigs ();
+
+			if (ReopenLastSolution && !string.IsNullOrEmpty (LastOpenSolution)) {
+				CurrentSolution = new SolutionView (this, LastOpenSolution);
+
+				Monitor.Enter (LayoutMutex);
+
+				while (!Monitor.TryEnter (UpdateMutex)) {
+					Thread.Sleep (1);
+					Monitor.Wait (LayoutMutex, 10);
+				}
+
+				CurrentSolution.ReopenItemsSavedInUserConfig ();
+
+				Monitor.Exit (UpdateMutex);
+				Monitor.Exit (LayoutMutex);
+			}
 		}
 
+		public override bool OnKeyDown (Key key)
+		{
+			switch (key) {
+			case Key.F2:
+				loadWindow ("#ui.winDebugLog.crow", this);
+				break;
+			default:
+				return base.OnKeyDown (key);
+			}
+			return true;
+		}
 		static void App_KeyboardKeyDown (object sender, KeyEventArgs e)
 		{
 			Console.WriteLine((byte)e.Key);
@@ -164,35 +197,18 @@ namespace Crow.Coding
 
 			initCommands ();
 
-			Widget go = Load (@"#CrowIDE.ui.CrowIDE.crow");
+			Widget go = Load (@"#ui.CrowIDE.crow");
 			go.DataSource = this;
 
 			mainDock = go.FindByName ("mainDock") as DockStack;
 
-			if (ReopenLastSolution && !string.IsNullOrEmpty (LastOpenSolution)) {
-				CurrentSolution = new SolutionView (this, LastOpenSolution);
-				lock(UpdateMutex)
-					CurrentSolution.ReopenItemsSavedInUserConfig ();
-			}
-
 			instFileDlg = Instantiator.CreateFromImlFragment
 				(this, "<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}' SearchPattern='*.sln' OkClicked='onFileOpen'/>");
-
-			/*DockWindow dw = loadWindow ("#CrowIDE.ui.DockWindows.winEditor.crow", this) as DockWindow;
-			dw.DockingPosition = Alignment.Center;
-			dw.Dock (mainDock);
-			dw = loadWindow ("#CrowIDE.ui.DockWindows.winSolution.crow", this) as DockWindow;
-			dw.DockingPosition = Alignment.Right;
-			dw.Dock (mainDock);
-			dw = loadWindow ("#CrowIDE.ui.DockWindows.winToolbox.crow", this) as DockWindow;
-			dw.DockingPosition = Alignment.Left;
-			dw.Dock (mainDock);*/
-
-			//Console.WriteLine ();
+				
 		}
 
 		void loadProjProps () {
-			loadWindow ("#CrowIDE.ui.ProjectProperties.crow");
+			loadWindow ("#ui.ProjectProperties.crow");
 		}
 
 		public string CurrentDirectory {
@@ -306,5 +322,6 @@ namespace Crow.Coding
 		void actionOpenFile(){
 			System.Diagnostics.Debug.WriteLine ("OpenFile action");
 		}
+
 	}
 }

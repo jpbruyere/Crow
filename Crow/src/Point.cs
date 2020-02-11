@@ -53,7 +53,7 @@ namespace Crow
 		public static bool operator <= (Point p1, Point p2) => p1.X <= p2.X && p1.Y <= p2.Y;
 		public static bool operator <= (Point s, int i) => s.X <= i && s.Y <= i;
 
-		public override string ToString () => string.Format ("({0},{1})", X, Y);
+		public override string ToString () => string.Format ("{0},{1}", X, Y);
 		public override bool Equals (object obj) => obj is Point ? this == (Point)obj :
 			obj is Point && (Point)this == (Point)obj;
 		public static Point Parse (string s)

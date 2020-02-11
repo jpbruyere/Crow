@@ -1,0 +1,19 @@
+﻿<?xml version="1.0"?>
+<ItemTemplate>	
+	<TabItem Caption="{DisplayName}" QueryClose="OnQueryClose">
+		<Label Text="Error" Background="Red"/>
+	</TabItem>
+</ItemTemplate>
+<ItemTemplate Path="#ui.SvgEdit.itemp" DataType=".svg"/>
+
+<ItemTemplate Path="#ui.SrcEdit.itemp" DataType=".cs"/>
+<ItemTemplate Path="#ui.SrcEdit.itemp" DataType=".style"/>
+<ItemTemplate Path="#ui.SrcEdit.itemp" DataType=".csproj"/>
+<ItemTemplate Path="#ui.SrcEdit.itemp" DataType=".xml"/>
+<ItemTemplate Path="#ui.SrcEdit.itemp" DataType=".md"/>
+
+<ItemTemplate Path="#ui.IMLEdit.itemp" DataType=".crow"/>
+<ItemTemplate Path="#ui.IMLEdit.itemp" DataType=".goml"/>
+<ItemTemplate Path="#ui.IMLEdit.itemp" DataType=".itemp"/>
+<ItemTemplate Path="#ui.IMLEdit.itemp" DataType=".template"/>
+

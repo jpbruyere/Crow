@@ -1,28 +1,7 @@
-﻿//
-// PropertyContainer.cs
+﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
+
 using System;
 using System.Reflection;
 using System.Linq;
@@ -31,7 +10,8 @@ using System.Diagnostics;
 using System.ComponentModel;
 
 namespace Crow.Coding
-{	
+{
+	[DebuggerDisplay ("{Type}:{Name}")]
 	public class PropertyContainer : IValueChange
 	{
 		#region IValueChange implementation
@@ -114,7 +94,7 @@ namespace Crow.Coding
 							MethodInfo me = pi.PropertyType.GetMethod
 								("Parse", BindingFlags.Static | BindingFlags.Public,
 									System.Type.DefaultBinder, new Type [] {typeof (string)},null);
-							pi.SetValue (g, me.Invoke (null, new object[] { value }), null);
+							pi.SetValue (g, me.Invoke (null, new object[] { value.ToString() }), null);
 						}
 					}else
 						pi.SetValue(g, value);
@@ -148,7 +128,7 @@ namespace Crow.Coding
 		/// Current graphicobject instance
 		/// </summary>
 		public Widget Instance {
-			get { return mview.ProjectNode.SelectedItem as Widget; }
+			get { return mview?.Instance as Widget; }
 		}
 		public object DefaultValue {
 			get { return ((DefaultValueAttribute)(pi.GetCustomAttribute (typeof (DefaultValueAttribute)))).Value; }
@@ -166,7 +146,7 @@ namespace Crow.Coding
 		/// return true if member default value comes from style
 		/// </summary>
 		public bool HasStyling {
-			get { return Instance.design_style_locations.ContainsKey(Name); }
+			get { return (bool)Instance?.design_style_locations.ContainsKey(Name); }
 		}
 		/// <summary>
 		/// Return true if current value comes from styling
@@ -200,7 +180,7 @@ namespace Crow.Coding
 				return;
 			FileLocation fl = g.design_style_locations [Name];
 			ProjectFileNode pf;
-			/*
+
 			if (!mview.ProjectNode.Project.TryGetProjectFileFromPath ("#" + fl.FilePath, out pf))
 				return;
 
@@ -210,7 +190,7 @@ namespace Crow.Coding
 			pf.CurrentLine = fl.Line;
 			pf.CurrentColumn = fl.Column;
 
-			pf.IsSelected = true;*/
+			pf.IsSelected = true;
 
 		}
 

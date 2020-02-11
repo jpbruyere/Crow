@@ -121,6 +121,7 @@ namespace Crow.Coding
 			}
 		}
 		public void TryParseBufferLine(int lPtr) {
+			Console.WriteLine ($"TryParseBufferLine: {lPtr}");
 			buffer [lPtr].exception = null;
 			currentLine = lPtr;
 			currentColumn = 0;

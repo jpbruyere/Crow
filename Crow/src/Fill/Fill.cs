@@ -31,16 +31,15 @@ namespace Crow
 			    s.EndsWith (".gif", true, System.Globalization.CultureInfo.InvariantCulture))
 				return Picture.Parse (s);
 
-			return (SolidColor)SolidColor.Parse (s);
+			return new SolidColor((Color)Color.Parse (s));
 		}
 		public static implicit operator Color(Fill c){
 			SolidColor sc = c as SolidColor;
-			return sc == null ? default(Color) : sc.color;
+			return sc == null ? default : sc.color;
 		}
 		public static implicit operator Fill(Color c){
 			return new SolidColor (c);
 		}
-
 	}
 }
 

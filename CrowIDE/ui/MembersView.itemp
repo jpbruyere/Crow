@@ -5,7 +5,7 @@
 		<TextBox Margin="1" Text="{²Value}" Height="Fit" Foreground = "{LabForeground}"/>
 	</HorizontalStack>
 </ItemTemplate>
-<ItemTemplate Path="#Crow.Coding.CategoryExp.template" DataType="Crow.Coding.CategoryContainer"
+<ItemTemplate Path="#ui.CategoryExp.itemp" DataType="Crow.Coding.CategoryContainer"
 	Data="Properties" DataTest="Type"/>
 <ItemTemplate DataType="System.Boolean" >
 	<HorizontalStack Style="MemberViewHStack" ContextCommands="{Commands}">
@@ -13,7 +13,7 @@
 		<CheckBox Background="White" Foreground = "{LabForeground}" Height="Stretched" Caption="" IsChecked="{²Value}"/>
 	</HorizontalStack>
 </ItemTemplate>
-<ItemTemplate Path="#Crow.Coding.Enum.template" DataType="System.Enum" />
-<ItemTemplate Path="#Crow.Coding.Enum.template" DataType="Style" />
-<!--<ItemTemplate Path="#Crow.Coding.ui.ItemTemplates.Fill.template" DataType="Crow.Fill"/>-->
+<ItemTemplate Path="#ui.Enum.itemp" DataType="System.Enum" />
+<ItemTemplate Path="#ui.Enum.itemp" DataType="Style" />
+<ItemTemplate Path="#ui.Fill.itemp" DataType="Crow.Fill"/>
 	

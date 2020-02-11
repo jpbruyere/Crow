@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <HorizontalStack Style="MemberViewHStack" ContextCommands="{Commands}">
-	<Label Style="MemberViewLabel" Text="{Name}" Foreground = "{LabForeground}"/>
+	<Label Style="MemberViewLabel" Text="{Name}"/>
 	<Popper Height="Stretched" Caption="{Value}">
 		<Template>
 			<CheckBox Caption="{./Caption}" IsChecked="{²./IsPopped}">
@@ -9,11 +9,11 @@
 						<Border Foreground="{LabForeground}" Width="18" Height="12" CornerRadius="3"
 							Background="{Value}">
 						</Border>
-						<Label Width="Stretched" Text="{./Caption}" Foreground="{LabForeground}"/>
+						<Label Width="Stretched" Text="{./Caption}" />
 					</HorizontalStack>
 				</Template>
 			</CheckBox>
 		</Template>
-		<ColorPicker SelectedColor="{²Value}" Background="DimGrey" Margin="5" Fit="True" />
+		<ColorPicker CurrentColor="{²Value}" />
 	</Popper>
 </HorizontalStack>
