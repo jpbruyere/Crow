@@ -5,6 +5,8 @@
 using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Crow
 {
@@ -30,6 +32,8 @@ namespace Crow
 				NotifyValueChanged ("CurrentColor", currentColor);
 			}
 		}
+
+		public IList<Color> ColorList => Color.ColorDic.Values.OrderBy (c => c.Hue).ToList ();
 	}
 }
 

@@ -7,7 +7,7 @@
 		<Authors>Jean-Philippe Bruyère</Authors>	    
 		<LangVersion>7.2</LangVersion>
 		
-		<CrowVersion>0.8.6</CrowVersion>
+		<CrowVersion>0.8.8</CrowVersion>
 		<CrowPackageVersion>$(CrowVersion)-beta</CrowPackageVersion>
 	</PropertyGroup>
 </Project>
