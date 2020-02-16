@@ -26,6 +26,7 @@
 			<MenuItem Command="{CMDViewToolbox}" />
 			<MenuItem Command="{CMDViewErrors}" />
 			<MenuItem Command="{CMDViewLog}" />
+			<MenuItem Command="{CMDViewSyntaxTree}" />
 			<MenuItem Command="{CMDViewGTExp}" />
 			<MenuItem Command="{CMDViewSchema}" />
 		</MenuItem>

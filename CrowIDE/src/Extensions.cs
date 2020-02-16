@@ -4,6 +4,9 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Crow
 {
@@ -25,5 +28,39 @@ namespace Crow
 
 			return new List<Widget>();
 		}
+
+		public static string TabulatedText (this SyntaxToken st, int tabSize) =>
+			st.ToString ().Replace ("\t", new string (' ', tabSize));
+		public static string TabulatedText (this SyntaxTrivia st, int tabSize) =>
+			st.ToString ().Replace ("\t", new string (' ', tabSize));
+
+		public static ObservableList<object> GetChilNodesOrTokens (this SyntaxNode node) {
+			ObservableList<object> tmp = new ObservableList<object> ();
+
+			var childs = node.ChildNodesAndTokens().GetEnumerator();
+
+			while (childs.MoveNext()) {
+				var c = childs.Current;
+				if (c.IsNode) {
+					tmp.Add (c.AsNode ());
+					continue;
+				}
+				SyntaxToken tok = c.AsToken ();
+				if (tok.HasLeadingTrivia) {
+					foreach (var trivia in tok.LeadingTrivia) 
+						tmp.Add (trivia);
+				}
+				tmp.Add (tok);
+				if (tok.HasTrailingTrivia) {
+					foreach (var trivia in tok.TrailingTrivia)
+						tmp.Add (trivia);
+				}
+			}
+
+			return tmp;
+		}
+		//kind is a language extension, not found by crow.
+		public static SyntaxKind CSKind (this SyntaxToken tok) => tok.Kind ();
+		public static SyntaxKind CSKind (this SyntaxTrivia tok) => tok.Kind ();
 	}
 }

@@ -210,9 +210,9 @@ namespace Crow.Coding
 						ProjectItemNode pi = new ProjectItemNode (this, pn);
 
 						switch (Path.GetExtension (file)) {
-						/*case ".cs":
-							f = new CSProjectFile (pn);
-							break;*/
+						case ".cs":
+							pi = new CSProjectItem (pi);
+							break;
 						case ".crow":
 						case ".template":
 						case ".goml":
@@ -290,6 +290,7 @@ namespace Crow.Coding
 			/*ILogger logger = new Microsoft.Build.Logging.ConsoleLogger {
 				Verbosity = LoggerVerbosity.Diagnostic
 			};*/
+
 			if (pi.Build (new string [] { target }, solution.buildParams.Loggers))
 				Console.WriteLine ("success");
 			else

@@ -40,7 +40,7 @@ namespace Crow.Coding
 		public Command CMDNew, CMDOpen, CMDSave, CMDSaveAs, cmdCloseSolution, CMDQuit,
 		CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp, CMDAbout, CMDOptions,
 		CMDViewGTExp, CMDViewProps, CMDViewProj, CMDViewProjProps, CMDViewErrors, CMDViewLog, CMDViewSolution, CMDViewEditor, CMDViewProperties,
-		CMDViewToolbox, CMDViewSchema, CMDViewStyling,CMDViewDesign,
+		CMDViewToolbox, CMDViewSchema, CMDViewStyling,CMDViewDesign, CMDViewSyntaxTree,
 		CMDBuild, CMDClean, CMDRestore;
 
 		void initCommands () {
@@ -78,9 +78,11 @@ namespace Crow.Coding
 			{ Caption = "IML Shematic View", CanExecute = true};
 			CMDViewStyling = new Command(new Action(() => loadWindow ("#ui.winStyleView.crow",this)))
 			{ Caption = "Styling Explorer", CanExecute = true};
-				
 			CMDViewGTExp = new Command(new Action(() => loadWindow ("#ui.winGTExplorer.crow",this)))
 			{ Caption = "Graphic Tree Explorer", CanExecute = true};
+			CMDViewSyntaxTree = new Command (new Action (() => loadWindow ("#ui.winSyntaxTree.crow", currentSolution)))
+			{ Caption = "Syntax Tree", CanExecute = true };
+
 			CMDBuild = new Command(new Action(() => CurrentSolution?.Build ("Build")))
 			{ Caption = "Compile Solution", CanExecute = false};
 			CMDClean = new Command(new Action(() => CurrentSolution?.Build ("Clean")))

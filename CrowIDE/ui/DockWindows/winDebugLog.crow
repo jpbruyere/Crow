@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Window DataSource="{CurrentSolution}" Name="winDesign" Caption="Design" Width="90%" Height="90%" Background="Jet" AlwaysOnTop="true">
+<Window DataSource="{CurrentSolution}" Name="winDebugLog" Caption="Design" Width="90%" Height="90%" Background="Jet" AlwaysOnTop="true">
 	<VerticalStack DataSource="{SelectedItemElement}">
 		<TextBox Name="logFile" Text="/mnt/devel/Crow/build/Debug/net472/debug.log" Width="Stretched" Height="Fit"/>
 		<DbgLogViewer LogFile="{../logFile.Text}"/>

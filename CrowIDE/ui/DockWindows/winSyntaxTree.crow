@@ -1,0 +1,45 @@
+﻿<?xml version="1.0"?>
+<DockWindow Name="winSyntaxTree" Caption="Solution" Width="40%" Height="80%" DataSource="{SelectedItem}" Background="DimGrey">
+	<TreeView Name="treeview" IsRoot="true" DataSource="{RootNode}" Data="{GetChilNodesOrTokens}">
+		<ItemTemplate DataType="Microsoft.CodeAnalysis.SyntaxToken" >
+			<Border Style="TreeItemBorder" Focusable="true">
+				<HorizontalStack>
+					<Widget Width="5" Height="5"/>
+					<Label Style="TreeLabel" Foreground="Jet" Text="{CSKind}" />
+					<Label Style="TreeLabel" Text="{}" Width="Stretched"/>
+				</HorizontalStack>
+			</Border>
+		</ItemTemplate>
+		<ItemTemplate DataType="Microsoft.CodeAnalysis.SyntaxTrivia" >
+			<Border Style="TreeItemBorder" Focusable="true">
+				<HorizontalStack>
+					<Widget Width="5" Height="5"/>
+					<Label Style="TreeLabel" Foreground="Yellow" Text="{CSKind}" />
+					<Label Style="TreeLabel" Text="{}" Width="Stretched"/>
+				</HorizontalStack>
+			</Border>
+		</ItemTemplate>		
+		<ItemTemplate DataType="Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode"  Data="GetChilNodesOrTokens">
+			<Expandable Caption="{}">
+				<Template>
+					<VerticalStack>
+						<Border Style="TreeItemBorder" Focusable="true">
+							<Group>
+								<HorizontalStack Spacing="5" MouseDoubleClick="./onClickForExpand">
+									<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand" Path="{./Image}" Visible="{./IsExpandable}" SvgSub="{./IsExpanded}" MouseEnter="{Background=LightGrey}" MouseLeave="{Background=Transparent}" />
+									<Label Style="TreeLabel" Foreground="SkyBlue" Text="{Kind}" />									
+									<Label Style="TreeLabel" Text="{./Caption}" />
+								</HorizontalStack>
+							</Group>
+						</Border>
+						<Container Name="Content" Visible="false" />
+					</VerticalStack>
+				</Template>
+				<HorizontalStack Height="Fit">
+					<Widget Width="8" Height="10" />
+					<VerticalStack Height="Fit" Name="ItemsContainer" />
+				</HorizontalStack>
+			</Expandable>
+		</ItemTemplate>
+	</TreeView>
+</DockWindow>

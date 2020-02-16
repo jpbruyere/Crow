@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<TabItem QueryClose="OnQueryClose" IsSelected="{²IsSelected}" Template="#ui.EditTabItem.template">
+	<VerticalStack>
+		<HorizontalStack >
+			<RoslynEditor Focusable="true" Name="editor" Font="monospace, 10" VerticalAlignment="Top" Margin="0"
+					CurrentLine="{²CurrentLine}" CurrentColumn="{²CurrentColumn}" HasFocus="{IsSelected}"
+					Foreground="Jet" Background="White" Width="Stretched" Height="Stretched"
+					ProjectNode="{}"  KeyDown="textView_KeyDown"/>
+			<ScrollBar Name="scrollbarY" Value="{²../editor.ScrollY}"
+					   LargeIncrement="{../editor.VisibleLines}"
+					   CursorSize="{../editor.ChildHeightRatio}"
+				Maximum="{../editor.MaxScrollY}" Orientation="Vertical"/>
+		</HorizontalStack>
+		<ScrollBar Style="HScrollBar" Name="scrollbarX" Value="{²../editor.ScrollX}"
+				Maximum="{../editor.MaxScrollX}" Orientation="Horizontal"
+				LargeIncrement="{../editor.VisibleColumns}"
+				CursorSize="{../editor.ChildWidthRatio}"/>			
+		<HorizontalStack Height="Fit">
+			<Label Text="{../../editor.HoverError}" Width="Stretched"/>
+			<Widget Background="Red" Width="5" Height="5" Visible="{IsDirty}"/>
+			<Label Text="Hover Line:" Foreground="Black"/>
+			<Label Text="{../../editor.HoverLine}"/>
+			<Widget Height="5" Width="10"/>
+			<Label Text="Line:" Foreground="Black"/>
+			<Label Text="{CurrentLine}"/>
+			<Widget Height="5" Width="10"/>
+			<Label Text="column:" Foreground="Black"/>
+			<Label Text="{CurrentColumn}"/>
+			<Widget Height="5" Width="10"/>
+			<Label Text="ScrollX:" Foreground="Black"/>
+			<Label Text="{../../editor.ScrollX}"/>
+			<Widget Height="5" Width="10"/>
+			<Label Text="ScrollY:" Foreground="Black"/>
+			<Label Text="{../../editor.ScrollY}"/>
+		</HorizontalStack>
+	</VerticalStack>
+</TabItem>

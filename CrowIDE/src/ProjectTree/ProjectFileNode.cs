@@ -24,7 +24,7 @@ namespace Crow.Coding {
 		internal ReaderWriterLockSlim srcEditMtx = new ReaderWriterLockSlim();
 
 		/// <summary>
-		/// dictionnary of boolean per editor, true if editor must reload content from project node, false if uptodate.
+		/// dictionnary of boolean per editor, when FALSE, editor must reload content from project node.
 		/// </summary>
 		public Dictionary<object, bool> RegisteredEditors = new Dictionary<object, bool>();
 		List<String> undoStack = new List<string>();
