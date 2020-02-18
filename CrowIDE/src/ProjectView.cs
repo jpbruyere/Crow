@@ -45,8 +45,6 @@ namespace Crow.Coding
 			project.ReevaluateIfNecessary ();
 
 
-
-
 			cmdSave = new Crow.Command (new Action (() => Save ())) { Caption = "Save", Icon = new SvgPicture ("#Icons.save.svg"), CanExecute = true };
 			cmdOpen = new Crow.Command (new Action (() => populateTreeNodes ())) { Caption = "Open", Icon = new SvgPicture ("#Icons.open.svg"), CanExecute = false };
 			cmdCompile = new Crow.Command (new Action (() => Compile ("Restore"))) {

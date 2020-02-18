@@ -56,11 +56,10 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-		<Folder Include="src\msbuild\" />
-			
+		<Folder Include="src\msbuild\" />			
 	</ItemGroup>
+	
 	<ItemGroup>
 		<ProjectReference Include="..\Crow\Crow.csproj" />
 	</ItemGroup>
-		
 </Project>

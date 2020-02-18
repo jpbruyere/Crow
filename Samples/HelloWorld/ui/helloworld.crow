@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack>
-	<TextBox Text="{TestColor}"/>
-	<ColorPicker CurrentColor="{²TestColor}" />
+	<TextBox Text="{²Source}" Multiline="true" Height="50%" Width="Stretched" TextAlignment="TopLeft" />	
 </VerticalStack>
 <!--<ScrollBar Orientation="Vertical" Height="Stretched" Width="10" />-->

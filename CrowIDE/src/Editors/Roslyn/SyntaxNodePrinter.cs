@@ -13,11 +13,11 @@ namespace Crow.Coding
 	{
 		static int tabSize = 4;
 		bool cancel;
-		int firstLine, visibleLines, currentLine, printedLines, totalLines;
+		int firstLine, visibleLines, currentLine, currentCol, printedLines, totalLines;
 		Context ctx;
 		RoslynEditor editor;
 		FontExtents fe;
-		double x, y;
+		double y;
 		Rectangle bounds;
 		public readonly int [] printedLinesNumbers;
 
@@ -34,9 +34,9 @@ namespace Crow.Coding
 			bounds = editor.ClientRectangle;
 
 			fe = ctx.FontExtents;
-			x = bounds.Left;
 			y = bounds.Top;
 
+			currentCol = -1;// < 0 => margin no printed
 			currentLine = 0;
 			printedLines = (firstLine == 0) ? 0 : -1;//<0 until firstLine is reached
 			if (printedLines == 0)
@@ -142,12 +142,10 @@ namespace Crow.Coding
 				tf = editor.formatting ["TypeDeclaration"];
 
 
-			Color selbg = editor.SelectionBackground;
-			Color selfg = editor.SelectionForeground;
+			/*Color selbg = editor.SelectionBackground;
+			Color selfg = editor.SelectionForeground;*/
 			FontSlant fts = FontSlant.Normal;
 			FontWeight ftw = FontWeight.Normal;
-
-
 			if (tf.Bold)
 				ftw = FontWeight.Bold;
 			if (tf.Italic)
@@ -158,17 +156,31 @@ namespace Crow.Coding
 			ctx.SetSourceColor (tf.Foreground);
 
 			//ctx.SetSourceColor (Color.Black);
+			//int charX = (int)Math.Round ((x - bounds.X - editor.leftMargin) / fe.MaxXAdvance);
+			int diffX = currentCol - editor.ScrollX;
 
-			ctx.MoveTo (x, y + fe.Ascent);
-			ctx.ShowText (lstr);
-			x += fe.MaxXAdvance * lstr.Length;
+			string str = lstr;
 
+			if (diffX < 0) {
+				if (diffX + lstr.Length > 0)
+					str = lstr.Substring (-diffX);
+				else {
+					currentCol += lstr.Length;
+					return;
+				}
+			} else
+				diffX = 0;
+
+			//ctx.MoveTo (x - (editor.ScrollX + diffX) * fe.MaxXAdvance, y + fe.Ascent);
+			ctx.MoveTo (bounds.X + editor.leftMargin + (currentCol - editor.ScrollX - diffX) * fe.MaxXAdvance, y + fe.Ascent);
+			ctx.ShowText (str);
+			currentCol += lstr.Length;
 		}
 		void checkPrintMargin ()
 		{
-			if (!editor.PrintLineNumbers || x > bounds.Left)
+			if (!editor.PrintLineNumbers || currentCol >= 0)
 				return;
-			Rectangle mgR = new Rectangle ((int)x, (int)y, editor.leftMargin - RoslynEditor.leftMarginGap, (int)Math.Ceiling ((fe.Ascent + fe.Descent)));
+			RectangleD mgR = new RectangleD (bounds.X, y, editor.leftMargin - RoslynEditor.leftMarginGap, Math.Ceiling ((fe.Ascent + fe.Descent)));
 			/*if (cl.exception != null) {
 				mgBg = Color.Red;
 				if (CurrentLine == lineIndex)
@@ -191,7 +203,7 @@ namespace Crow.Coding
 			ctx.MoveTo (bounds.X + (int)(ctx.TextExtents (totalLines.ToString ()).Width - ctx.TextExtents (strLN).Width), y + fe.Ascent);
 			ctx.ShowText (strLN);
 			ctx.Fill ();
-			x += editor.leftMargin;
+			currentCol = 0;
 		}
 
 		bool print => printedLines >= 0 && printedLines < visibleLines;
@@ -235,8 +247,8 @@ namespace Crow.Coding
 				if (trivia.IsKind (SyntaxKind.EndOfLineTrivia))
 					storeAndIncrementPrintedLine ();
 				else if (trivia.IsKind (SyntaxKind.WhitespaceTrivia))
-					x += trivia.TabulatedText (tabSize).Length * fe.MaxXAdvance;
-				else 
+					currentCol += trivia.TabulatedText (tabSize).Length;
+				else
 					printToken (trivia.TabulatedText (tabSize), trivia.Kind (), true);
 			}
 
@@ -258,7 +270,7 @@ namespace Crow.Coding
 			printedLinesNumbers [printedLines] = currentLine;
 			printedLines++;
 			y += (fe.Ascent + fe.Descent);
-			x = bounds.Left;
+			currentCol = -1;
 			cancel = printedLines == visibleLines;
 
 		}

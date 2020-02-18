@@ -30,9 +30,26 @@ namespace Crow
 		}
 
 		public static string TabulatedText (this SyntaxToken st, int tabSize) =>
-			st.ToString ().Replace ("\t", new string (' ', tabSize));
+			st.ToString ().TabulatedText (tabSize);
 		public static string TabulatedText (this SyntaxTrivia st, int tabSize) =>
-			st.ToString ().Replace ("\t", new string (' ', tabSize));
+			st.ToString ().TabulatedText(tabSize);
+		public static string TabulatedText (this string str, int tabSize) =>
+			string.IsNullOrEmpty(str) ? "" : str.Replace ("\t", new string (' ', tabSize));
+
+		public static int GetCharPosFromVisualColumn (this TextLine tl, int visualColumn, int tabSize = 4)
+		{
+			string src = tl.ToString ();
+			int i = 0;
+			int buffCol = 0;
+			while (i < visualColumn && buffCol < src.Length) {
+				if (src [buffCol] == '\t')
+					i += tabSize;
+				else
+					i++;
+				buffCol++;
+			}
+			return buffCol;
+		}
 
 		public static ObservableList<object> GetChilNodesOrTokens (this SyntaxNode node) {
 			ObservableList<object> tmp = new ObservableList<object> ();
