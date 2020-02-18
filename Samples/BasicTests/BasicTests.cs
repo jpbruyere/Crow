@@ -30,9 +30,9 @@ namespace tests
 
 			//testFiles = new string [] { @"Interfaces/Experimental/testDock.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
-			testFiles = new string [] { @"Interfaces/TemplatedGroup/3.crow" };
+			//testFiles = new string [] { @"Interfaces/TemplatedGroup/3.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/perfMeasures.crow" };
-			//testFiles = new string [] { @"Interfaces/Divers/colorPicker.crow" };
+			testFiles = new string [] { @"Interfaces/Divers/colorPicker2.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();

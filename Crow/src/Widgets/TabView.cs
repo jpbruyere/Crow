@@ -258,8 +258,6 @@ namespace Crow
 			if (SelectedTab < tabItms.Length && SelectedTab >= 0)
 				selTabViewIdx = (Children [SelectedTab] as TabItem).ViewIndex;
 
-			childrenRWLock.ExitReadLock ();
-
 			int i = 0;
 			while (i < selTabViewIdx) {
 				tabItms [i].Paint (ref gr);
@@ -273,7 +271,9 @@ namespace Crow
 
 			if (selTabViewIdx >= 0)
 				tabItms [selTabViewIdx].Paint (ref gr);
-		
+
+			childrenRWLock.ExitReadLock ();
+
 			gr.Restore ();
 		}
 

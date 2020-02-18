@@ -177,8 +177,6 @@ namespace Crow
 		protected override void UpdateCache (Context ctx)
 		{
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
-
-
 			Context gr = new Context (bmp);
 
 			if (!Clipping.IsEmpty) {

@@ -156,7 +156,7 @@ namespace Crow
 
 			if (BorderStyle == BorderStyle.Normal) {
 				if (BorderWidth > 0) {
-					Foreground.SetAsSource (gr, rBack);
+					Foreground?.SetAsSource (gr, rBack);
 					CairoHelpers.CairoRectangle (gr, rBack, CornerRadius, BorderWidth);
 				}
 			} else {
