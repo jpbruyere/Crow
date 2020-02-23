@@ -1,19 +1,15 @@
 ﻿using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.Composition;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Threading.Tasks;
 using Crow;
-using Crow.IML;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Completion;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Emit;
+using Microsoft.CodeAnalysis.Host;
 using Microsoft.CodeAnalysis.Host.Mef;
 using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.CodeAnalysis.Text;
@@ -329,17 +325,80 @@ namespace HelloWorld
 
 			var host = MefHostServices.Create (MSBuildMefHostServices.DefaultAssemblies);
 
+			Solution sol = null;
+
+			//using (var ws = new AdhocWorkspace ()) {
+			//	ws.WorkspaceFailed += (sender, e) => Console.WriteLine ($"Workspace error: {e.Diagnostic}");
+			//	ws.WorkspaceChanged += (sender, e) => Console.WriteLine ($"Workspace changed: {e.Kind} proj={e.ProjectId} doc={e.DocumentId}");
+
+			//	var solId = SolutionId.CreateNewId ();
+			//	SolutionInfo solutionInfo = SolutionInfo.Create (solId, VersionStamp.Create (), @"/tmp/testSol/testSolu.sln");
+
+			//	sol = ws.AddSolution (solutionInfo);
+			//	if (!ws.TryApplyChanges (sol))
+			//		Console.WriteLine ("error saving sol");
+
+			//	Microsoft.CodeAnalysis.Host.IPersistentStorageService p = ws.Services.PersistentStorage;
+
+			//	using (Stream s = new FileStream (solutionInfo.FilePath, FileMode.Create)) {
+			//		IPersistentStorage store = p.GetStorage (sol);
+
+			//		if (!await p.GetStorage (sol).WriteStreamAsync ("testSol", s))
+			//			Console.WriteLine ("error saving sol");
+			//	}
+
+
+
+			//var projectInfo = ProjectInfo.Create (ProjectId.CreateNewId (),
+			//								 VersionStamp.Create (),
+			//								 "testSolu",
+			//								 "testSolu.dll",
+			//								 LanguageNames.CSharp,
+			//								 @"/tmp/testSol/testSolu.csproj");
+
+
+			//	var proj = ws.AddProject (projectInfo);
+			//	var sourceText = SourceText.From ("public class A { }");
+			//	ws.AddDocument (DocumentInfo.Create (DocumentId.CreateNewId (proj.Id), "ClassA.cs"));
+
+
+
+			//	if (!ws.CanApplyChange (ApplyChangesKind.AddDocument))
+			//		Console.WriteLine ("cant apply add Document");
+			//}
+
 			using (var workspace = MSBuildWorkspace.Create (globalProperties)) {
 				//workspace. Properties["BuildingInsideVisualStudio"] = "false";
 				workspace.WorkspaceFailed += (sender, e) => Console.WriteLine ($"Workspace error: {e.Diagnostic}");
+				workspace.WorkspaceChanged += (sender, e) => Console.WriteLine ($"Workspace changed: {e.Kind} proj={e.ProjectId} doc={e.DocumentId}");
+
+				IPersistentStorageService p = workspace.Services.PersistentStorage;
+				Console.WriteLine (p);
+
+
+
+				//workspace.Services.PersistentStorage.GetStorage(sol).WriteStreamAsync()
+
+
 				Console.WriteLine ($"Opening Solution {slnPath}");
 				var solution = await workspace.OpenSolutionAsync (slnPath, new ProgressLog ());
+
+				IPersistentStorage ip = p.GetStorage (solution);
+				Console.WriteLine (ip);
+				using (Stream s = new FileStream (@"/tmp/testSol/testSolu.sln", FileMode.Create)) {
+					if (!await ip.WriteStreamAsync ("testSolu", s))
+						Console.WriteLine ("error saving sol");
+				}
+
 				Console.WriteLine ($"Proj Count:{solution.Projects.Count ()}");
 				foreach (Project project in solution.Projects) {
 					Console.WriteLine ($"Compiling project:{project.FilePath}");
 
 					Compilation compilation = await project.GetCompilationAsync ();
 					Document doc = project.Documents.First ();
+
+					Task<SourceText> src = doc.GetTextAsync ();
+
 
 					CompletionService.GetService (doc);
 					using (var ms = new MemoryStream ()) {
@@ -362,9 +421,11 @@ namespace HelloWorld
 
 				//workspace.TryApplyChanges()
 			}
+			
 			Console.WriteLine ($"end.");
 		}
 	}
+
 	class ProgressLog : IProgress<ProjectLoadProgress>
 	{
 		public void Report (ProjectLoadProgress value)
@@ -372,6 +433,7 @@ namespace HelloWorld
 			Console.WriteLine ($"{value.ElapsedTime} {value.Operation} {value.TargetFramework}");
 		}
 	}
+
 
 }
 //void compile ()
