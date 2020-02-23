@@ -29,6 +29,7 @@ namespace Crow.Coding
 
 		string path;
 		SolutionFile solutionFile;
+		Microsoft.CodeAnalysis.Solution solution;
 
 		public BuildParameters buildParams;
 		public Dictionary<String, String> projectProperties = new Dictionary<String, String> ();
@@ -70,7 +71,7 @@ namespace Crow.Coding
 			ActivePlatform = solutionFile.GetDefaultPlatformName ();
 
 			ide.projectCollection.SetGlobalProperty ("SolutionDir", Path.GetDirectoryName (path) + "/");
-
+			//ide.projectCollection.HostServices
 			buildParams = new BuildParameters (ide.projectCollection) {
 				Loggers = ide.projectCollection.Loggers,
 				ResetCaches = true,
@@ -111,6 +112,17 @@ namespace Crow.Coding
 
 		}
 		#endregion
+
+		async void load ()
+		{
+			Microsoft.CodeAnalysis.Solution solution = await IDE.Workspace.OpenSolutionAsync (path, IDE.ProgressLogger);
+			solutionFile = SolutionFile.Parse (path);
+			UserConfig = new Configuration (path + ".user");
+
+			ActiveConfiguration = solutionFile.GetDefaultConfigurationName ();
+			ActivePlatform = solutionFile.GetDefaultPlatformName ();
+
+		}
 
 		public void Build (params string [] targets)
 		{

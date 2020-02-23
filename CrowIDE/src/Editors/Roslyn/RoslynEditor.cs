@@ -76,31 +76,32 @@ namespace Crow.Coding
 		}
 		#endregion
 
+		#region private and protected fields
+
 		int tabSize = 4;
 		string oldSource = "";
 		//save requested position on error, and try it on next move
 		int requestedLine = 0, requestedCol = 0;
 		volatile bool isDirty = false;
 
-		internal const int leftMarginGap = 3;//gap between items in margin and text
-		const int foldSize = 9;//folding rectangles size
-		int foldMargin = 9;// { get { return parser == null ? 0 : parser.SyntacticTreeMaxDepth * foldHSpace; }}//folding margin size
+		internal const int leftMarginGap = 3;	//gap between items in margin and text
+		const int foldSize = 9;					//folding rectangles size
+		int foldMargin = 9;						// { get { return parser == null ? 0 : parser.SyntacticTreeMaxDepth * foldHSpace; }}//folding margin size
 
-		#region private and protected fields
 		bool foldingEnabled = true;
 		[XmlIgnore]
 		public int leftMargin { get; private set; } = 0;	//margin used to display line numbers, folding errors,etc...
 		int visibleLines = 1;
 		int visibleColumns = 1;
-		int printedCurrentLine = 0;//Index of the currentline in the PrintedLines array
-		int [] printedLines; //printed line indices in source
+		int printedCurrentLine = 0;				//Index of the currentline in the PrintedLines array
+		int [] printedLines; 					//printed line indices in source
 
 
 		internal int hoverPos, currentPos, selStartPos;//absolute char index in buffer source
 		TextSpan selection = default;
-
 		SourceText buffer = SourceText.From ("");
 		SyntaxTree syntaxTree;
+
 		//SourceText buffer => syntaxTree == null ?  : syntaxTree.TryGetText (out SourceText src) ? src : SourceText.From ("");
 		public SyntaxTree SyntaxTree {
 			get => syntaxTree;
@@ -134,9 +135,9 @@ namespace Crow.Coding
 		bool doubleClicked = false;
 		#endregion
 
-		void measureLeftMargin () {
+		internal void measureLeftMargin () {
 			leftMargin = 0;
-			if (PrintLineNumbers)
+			if (printLineNumbers)
 				leftMargin += (int)Math.Ceiling((double)buffer?.Lines.Count.ToString().Length * fe.MaxXAdvance) + 6;
 			if (foldingEnabled)
 				leftMargin += foldMargin;
@@ -406,18 +407,8 @@ namespace Crow.Coding
 				RegisterForRedraw ();
 			}
 		}
-		public bool PrintLineNumbers
-		{
-			get { return Configuration.Global.Get<bool> ("PrintLineNumbers"); }
-			set	{
-				if (PrintLineNumbers == value)
-					return;
-				Configuration.Global.Set ("PrintLineNumbers", value);
-				NotifyValueChanged ("PrintLineNumbers", PrintLineNumbers);
-				measureLeftMargin ();
-				RegisterForGraphicUpdate ();
-			}
-		}
+		internal bool printLineNumbers => (this.IFace as CrowIDE).PrintLineNumbers;
+
 		[DefaultValue("CornflowerBlue")]
 		public virtual Color SelectionBackground {
 			get { return selBackground; }

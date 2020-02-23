@@ -1404,7 +1404,7 @@ namespace Crow
 			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
 			#endif
 		}
-		/// <summary> Full update, content and layouting, taking care of sizing policy </summary>
+		/// <summary> Full update, if width or height is 'Fit' a layouting is requested, and a redraw is done in any case. </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForGraphicUpdate ()
 		{
@@ -1448,6 +1448,7 @@ namespace Crow
 		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){
 		}
 		public virtual bool ArrangeChildren { get { return false; } }
+		/// <summary> Query a layouting for the type pass as parameter, redraw only if layout changed. </summary>
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
 #if DEBUG
 			if (disposed) {

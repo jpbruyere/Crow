@@ -9,13 +9,8 @@
 		</TabItem>
 		<TabItem Caption="Text Editor" SelectedBackground="Jet">
 			<VerticalStack Margin="10">
-				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
-				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
-				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
-				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
-				<CheckBox Caption="Print Line Numbers" IsChecked="True"/>
+				<CheckBox Caption="Print Line Numbers" IsChecked="{²PrintLineNumbers}"/>
 			</VerticalStack>
 		</TabItem>
-
 	</TabView>
 </Window>

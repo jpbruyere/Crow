@@ -12,7 +12,7 @@ namespace Crow.Coding
 	public class SyntaxNodePrinter : CSharpSyntaxWalker
 	{
 		static int tabSize = 4;
-		bool cancel;
+		bool cancel, printLineNumbers;
 		int firstLine, visibleLines, currentLine, currentCol, printedLines, totalLines;
 		Context ctx;
 		RoslynEditor editor;
@@ -29,6 +29,7 @@ namespace Crow.Coding
 			this.firstLine = firstLine;
 			this.visibleLines = visibleLines;
 
+			printLineNumbers = (editor.IFace as CrowIDE).PrintLineNumbers;
 			printedLinesNumbers = new int [visibleLines];
 
 			bounds = editor.ClientRectangle;
@@ -178,31 +179,33 @@ namespace Crow.Coding
 		}
 		void checkPrintMargin ()
 		{
-			if (!editor.PrintLineNumbers || currentCol >= 0)
+			if (currentCol >= 0)
 				return;
-			RectangleD mgR = new RectangleD (bounds.X, y, editor.leftMargin - RoslynEditor.leftMarginGap, Math.Ceiling ((fe.Ascent + fe.Descent)));
-			/*if (cl.exception != null) {
-				mgBg = Color.Red;
-				if (CurrentLine == lineIndex)
-					mgFg = Color.White;
-				else
-					mgFg = Color.LightGrey;
-			}else */
-			Color mgFg = Color.Jet;
-			Color mgBg = Color.Grey;
-			if (editor.CurrentLine == currentLine && editor.HasFocus) {
-				mgFg = Color.Black;
-				mgBg = Color.DarkGrey;
-			}
-			string strLN = (currentLine + 1).ToString ();
-			ctx.SetSourceColor (mgBg);
-			ctx.Rectangle (mgR);
-			ctx.Fill ();
-			ctx.SetSourceColor (mgFg);
+			if (printLineNumbers) {
+				RectangleD mgR = new RectangleD (bounds.X, y, editor.leftMargin - RoslynEditor.leftMarginGap, Math.Ceiling ((fe.Ascent + fe.Descent)));
+				/*if (cl.exception != null) {
+					mgBg = Color.Red;
+					if (CurrentLine == lineIndex)
+						mgFg = Color.White;
+					else
+						mgFg = Color.LightGrey;
+				}else */
+				Color mgFg = Color.Jet;
+				Color mgBg = Color.Grey;
+				if (editor.CurrentLine == currentLine && editor.HasFocus) {
+					mgFg = Color.Black;
+					mgBg = Color.DarkGrey;
+				}
+				string strLN = (currentLine + 1).ToString ();
+				ctx.SetSourceColor (mgBg);
+				ctx.Rectangle (mgR);
+				ctx.Fill ();
+				ctx.SetSourceColor (mgFg);
 
-			ctx.MoveTo (bounds.X + (int)(ctx.TextExtents (totalLines.ToString ()).Width - ctx.TextExtents (strLN).Width), y + fe.Ascent);
-			ctx.ShowText (strLN);
-			ctx.Fill ();
+				ctx.MoveTo (bounds.X + (int)(ctx.TextExtents (totalLines.ToString ()).Width - ctx.TextExtents (strLN).Width), y + fe.Ascent);
+				ctx.ShowText (strLN);
+				ctx.Fill ();
+			}
 			currentCol = 0;
 		}
 

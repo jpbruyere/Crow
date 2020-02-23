@@ -10,13 +10,17 @@ using System.Threading;
 using Crow.IML;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
+using Microsoft.CodeAnalysis.Host.Mef;
+using Microsoft.CodeAnalysis.MSBuild;
 
 namespace Crow.Coding
 {
 	public class CrowIDE : Interface
 	{
 		public static string DEFAULT_TOOLS_VERSION = "Current";
+		public static CrowIDE MainWin;
 
+		#region Commands
 		public static Picture IcoNew = new SvgPicture ("#Icons.blank-file.svg");
 		public static Picture IcoOpen = new SvgPicture ("#Icons.open.svg");
 		public static Picture IcoSave = new SvgPicture ("#Icons.save.svg");
@@ -89,8 +93,8 @@ namespace Crow.Coding
 			{ Caption = "Clean Solution", CanExecute = false};
 			CMDRestore = new Command(new Action(() => CurrentSolution?.Build ("Restore")))
 			{ Caption = "Restore packages", CanExecute = false};
-			CMDViewProjProps = new Command(new Action(loadProjProps))
-			{ Caption = "Project Properties", CanExecute = false};
+			CMDViewProjProps = new Command (new Action (() => loadWindow ("#ui.ProjectProperties.crow")))
+			{ Caption = "Project Properties", CanExecute = false };
 		}
 
 		void openFileDialog () {			
@@ -122,6 +126,21 @@ namespace Crow.Coding
 				return;
 			mainDock.ImportConfig (conf, this);
 		}
+		#endregion
+
+		Instantiator instFileDlg;
+		DockStack mainDock;
+
+		public ProjectCollection projectCollection { get; private set; }
+		public ObservableList<BuildEventArgs> BuildEvents { get; private set; } = new ObservableList<BuildEventArgs> ();
+
+		public MSBuildWorkspace Workspace { get; private set; }
+		public ProgressLog ProgressLogger { get; private set; }
+
+		SolutionView currentSolution;
+		ProjectView currentProject;
+
+		public CrowIDE () : base (1024, 800) { }
 
 
 		protected override void Startup ()
@@ -158,37 +177,12 @@ namespace Crow.Coding
 			}
 			return true;
 		}
-		static void App_KeyboardKeyDown (object sender, KeyEventArgs e)
-		{
-			Console.WriteLine((byte)e.Key);
-			//#if DEBUG_LOG
-			/*switch (e.Key) {
-			case Key.F2:				
-				DebugLog.save (app);
-				break;
-			}*/
-			//#endif
-		}
-
-		public CrowIDE ()
-			: base(1024, 800)
-		{
-		}
-
-		Instantiator instFileDlg;
-		DockStack mainDock;
-
-		public ProjectCollection projectCollection { get; private set; }
-		public ObservableList<BuildEventArgs> BuildEvents { get; private set; } = new ObservableList<BuildEventArgs> ();
-
-		SolutionView currentSolution;
-		ProjectView currentProject;
-
-		//public static Interface MainIFace;
-		public static CrowIDE MainWin;
 
 		void initIde() {
-
+			var host = MefHostServices.Create (MSBuildMefHostServices.DefaultAssemblies);
+			Workspace = MSBuildWorkspace.Create (host);
+			Workspace.WorkspaceFailed += (sender, e) => Console.WriteLine ($"Workspace error: {e.Diagnostic}");
+			ProgressLogger = new ProgressLog ();
 			projectCollection = new ProjectCollection (null, new ILogger [] { new IdeLogger (this) }, ToolsetDefinitionLocations.Default) {
 				DefaultToolsVersion = DEFAULT_TOOLS_VERSION,
 
@@ -208,10 +202,25 @@ namespace Crow.Coding
 				(this, "<FileDialog Caption='Open File' CurrentDirectory='{²CurrentDirectory}' SearchPattern='*.sln' OkClicked='onFileOpen'/>");
 				
 		}
+		public void onFileOpen (object sender, EventArgs e)
+		{
+			FileDialog fd = sender as FileDialog;
 
-		void loadProjProps () {
-			loadWindow ("#ui.ProjectProperties.crow");
+			string filePath = fd.SelectedFileFullPath;
+
+			try {
+				string ext = Path.GetExtension (filePath);
+				if (string.Equals (ext, ".sln", StringComparison.InvariantCultureIgnoreCase)) {
+					CurrentSolution = new SolutionView (this, filePath);
+					LastOpenSolution = filePath;
+					//				}else if (string.Equals (ext, ".csproj", StringComparison.InvariantCultureIgnoreCase)) {
+					//					currentProject = new Project (filePath);
+				}
+			} catch (Exception ex) {
+				LoadIMLFragment ("<MessageBox Message='" + ex.Message + "\n" + "' MsgType='Error'/>");
+			}
 		}
+
 
 		public string CurrentDirectory {
 			get => Crow.Configuration.Global.Get<string>("CurrentDirectory");
@@ -277,24 +286,21 @@ namespace Crow.Coding
 				NotifyValueChanged ("MainLoggerVerbosity", MainLoggerVerbosity);
 			}
 		}
+		public bool PrintLineNumbers {
+			get { return Configuration.Global.Get<bool> ("PrintLineNumbers"); }
+			set {
+				if (PrintLineNumbers == value)
+					return;
+				Configuration.Global.Set ("PrintLineNumbers", value);
+				NotifyValueChanged ("PrintLineNumbers", PrintLineNumbers);
 
-		public void onFileOpen (object sender, EventArgs e)
-		{
-			FileDialog fd = sender as FileDialog;
-
-			string filePath = fd.SelectedFileFullPath;
-
-			try {
-				string ext = Path.GetExtension (filePath);
-				if (string.Equals (ext, ".sln", StringComparison.InvariantCultureIgnoreCase)) {					
-					CurrentSolution = new SolutionView (this, filePath);
-					LastOpenSolution = filePath;
-//				}else if (string.Equals (ext, ".csproj", StringComparison.InvariantCultureIgnoreCase)) {
-//					currentProject = new Project (filePath);
+				foreach (ProjectFileNode pfn in currentSolution?.OpenedItems.OfType<ProjectFileNode>()) {
+					foreach (RoslynEditor re in pfn.RegisteredEditors.Keys.OfType<RoslynEditor> ()) { //TODO:create a base class for source editors
+						re.measureLeftMargin ();
+						re.RegisterForGraphicUpdate ();
+					}
 				}
-			} catch (Exception ex) {
-				LoadIMLFragment ("<MessageBox Message='"+ ex.Message + "\n" + "' MsgType='Error'/>");	
-			}				
+			}
 		}
 
 		Window loadWindow(string path, object dataSource = null){
@@ -320,10 +326,5 @@ namespace Crow.Coding
 		protected void onCommandSave(object sender, MouseButtonEventArgs e){
 			System.Diagnostics.Debug.WriteLine("save");
 		}
-
-		void actionOpenFile(){
-			System.Diagnostics.Debug.WriteLine ("OpenFile action");
-		}
-
 	}
 }
