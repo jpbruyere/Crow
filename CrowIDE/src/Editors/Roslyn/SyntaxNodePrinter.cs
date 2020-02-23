@@ -206,6 +206,59 @@ namespace Crow.Coding
 				ctx.ShowText (strLN);
 				ctx.Fill ();
 			}
+			if (editor.foldingEnabled) {
+
+				Rectangle rFld = new Rectangle (bounds.X + editor.leftMargin - RoslynEditor.leftMarginGap - editor.foldMargin,
+					(int)(y + (fe.Ascent + fe.Descent) / 2.0 - RoslynEditor.foldSize / 2.0), RoslynEditor.foldSize, RoslynEditor.foldSize);
+
+				ctx.SetSourceColor (Color.Black);
+				ctx.LineWidth = 1.0;
+
+				int level = 0;
+				bool closingNode = false;
+				/*
+				if (currentNode != null) {
+					if (cl == currentNode.EndLine) {
+						currentNode = currentNode.Parent;
+						closingNode = true;
+					}
+					if (currentNode != null)
+						level = currentNode.Level - 1;
+				}
+
+				if (level > 0) {
+					gr.MoveTo (rFld.Center.X + 0.5, y);
+					gr.LineTo (rFld.Center.X + 0.5, y + fe.Ascent + fe.Descent);
+				}
+				if (closingNode) {
+					gr.MoveTo (rFld.Center.X + 0.5, y);
+					gr.LineTo (rFld.Center.X + 0.5, y + fe.Ascent / 2 + 0.5);
+					gr.LineTo (rFld.Center.X + 0.5 + foldSize / 2, y + fe.Ascent / 2 + 0.5);
+					closingNode = false;
+				}
+				gr.SetDash (new double [] { 1.5 }, 0.0);
+				gr.SetSourceColor (Color.Grey);
+				gr.Stroke ();
+				gr.SetDash (new double [] { }, 0.0);
+				*/
+
+				/*if (cl.IsFoldable) {
+					gr.Rectangle (rFld);
+					gr.SetSourceColor (Color.White);
+					gr.Fill ();
+					gr.SetSourceColor (Color.Black);
+					gr.Rectangle (rFld, 1.0);
+					if (cl.IsFolded) {
+						gr.MoveTo (rFld.Center.X + 0.5, rFld.Y + 2);
+						gr.LineTo (rFld.Center.X + 0.5, rFld.Bottom - 2);
+					} else
+						currentNode = cl.SyntacticNode;
+
+					gr.MoveTo (rFld.Left + 2, rFld.Center.Y + 0.5);
+					gr.LineTo (rFld.Right - 2, rFld.Center.Y + 0.5);
+					gr.Stroke ();
+				}*/
+			}
 			currentCol = 0;
 		}
 

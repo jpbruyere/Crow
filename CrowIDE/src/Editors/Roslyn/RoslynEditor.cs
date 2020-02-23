@@ -85,10 +85,10 @@ namespace Crow.Coding
 		volatile bool isDirty = false;
 
 		internal const int leftMarginGap = 3;	//gap between items in margin and text
-		const int foldSize = 9;					//folding rectangles size
-		int foldMargin = 9;						// { get { return parser == null ? 0 : parser.SyntacticTreeMaxDepth * foldHSpace; }}//folding margin size
+		internal const int foldSize = 9;		//folding rectangles size
+		internal int foldMargin = 9;			// { get { return parser == null ? 0 : parser.SyntacticTreeMaxDepth * foldHSpace; }}//folding margin size
 
-		bool foldingEnabled = true;
+		internal bool foldingEnabled = true;
 		[XmlIgnore]
 		public int leftMargin { get; private set; } = 0;	//margin used to display line numbers, folding errors,etc...
 		int visibleLines = 1;
@@ -568,10 +568,7 @@ namespace Crow.Coding
 			printedLines = printer.printedLinesNumbers;
 
 			#region draw text cursor
-			/*if (buffer.SelectionInProgress){
-				selStartCol = getTabulatedColumn (buffer.SelectionStart);
-				selEndCol = getTabulatedColumn (buffer.SelectionEnd);
-			}else*/
+
 			Rectangle cb = ClientRectangle;
 
 			if (!selection.IsEmpty) {
@@ -623,6 +620,7 @@ namespace Crow.Coding
 				gr.Operator = Operator.Over;
 
 			} else if (HasFocus && printedLines != null && currentPos >= 0) {
+				//Draw cursor
 				gr.LineWidth = 1.0;
 
 				TextLine tl = buffer.Lines.GetLineFromPosition (currentPos);
