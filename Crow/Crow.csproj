@@ -5,16 +5,13 @@
 		
 		<ReleaseVersion>0.8.0</ReleaseVersion>
 		<AssemblyVersion>$(CrowVersion)</AssemblyVersion>
-		
 		<Title>C# Rapid Open Widget Toolkit</Title>
 		<Description>C.R.O.W. is a widget toolkit and rendering engine developed in C# with templates, styles, compositing, and bindings.</Description>
 		<License>MIT</License>
 		<Authors>Jean-Philippe Bruyère</Authors>
 		<RepositoryUrl>https://github.com/jpbruyere/Crow</RepositoryUrl>
-		
 		<PackageVersion>$(CrowPackageVersion)</PackageVersion>
 		<PackageTags>GUI Widget toolkit Interface C# .Net Mono</PackageTags>
-		
 		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
 		<PackageProjectUrl>https://github.com/jpbruyere/Crow/wiki</PackageProjectUrl>
 		<PackageLicense>https://opensource.org/licenses/MIT</PackageLicense>
@@ -24,12 +21,10 @@
 			This release should solve most of ms dotnet exception, the win32 backend is
 			still untested. Next beta will have a glfw backend.
 		</PackageReleaseNotes>
-		
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);1591;1587;1570;1572;1573;1574</NoWarn>
-		
+		<DefineConstants>DESIGN_MODE</DefineConstants>
 		<DefineConstants>DESIGN_MODE</DefineConstants>
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
@@ -43,6 +38,12 @@
 		<PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.6.0" />
 		<PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.6.0" />
 		<!--<PackageReference Include="glfw-sharp" Version="0.2.0" />-->
+	</ItemGroup>
+	<PropertyGroup Condition=" '$(CrowStbSharp)' == 'true'">
+		<DefineConstants>$(DefineConstants);STB_SHARP</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup Condition=" '$(CrowStbSharp)' == 'true'">
+		<PackageReference Include="StbImageSharp" Version="2.22.4" />
 	</ItemGroup>
 	<ItemGroup>
 		<Content Include="$(SolutionDir)Images/crow.png" Pack="true" PackagePath="" />

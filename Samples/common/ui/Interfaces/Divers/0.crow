@@ -89,7 +89,9 @@
 			<Expandable>
 				<Image Path="#Crow.Icons.crow.svg" />
 			</Expandable>
-			<Popper />
+			<Popper >
+				<Image Path="#Crow.Icons.crow.svg" Background="White" Height="100" Width="100" Margin="20" />
+			</Popper>
 			<Slider Height="10" Width="90%" />
 			<Container Height="Fit" Width="200" Background="DimGrey" Margin="2" CornerRadius="5">
 				<ProgressBar Background="DimGrey" Height="10" Value="50" />
