@@ -26,6 +26,10 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<Link>Interfaces\%(RecursiveDir)%(Filename)%(Extension)</Link>
 		</None>
+		<None Include="$(SolutionDir)\Images\**\*.*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Images\%(RecursiveDir)%(Filename)%(Extension)</Link>
+		</None>
 	</ItemGroup>
 	<ItemGroup>
 		<None Remove="..\common\ui\Interfaces\basicTests\7.crow" />
