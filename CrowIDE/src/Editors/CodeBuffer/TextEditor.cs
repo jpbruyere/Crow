@@ -27,6 +27,7 @@
 using System;
 using System.ComponentModel;
 using Crow.Cairo;
+using Glfw;
 
 namespace Crow.Text
 {
@@ -467,7 +468,7 @@ namespace Crow.Text
 
 			updateHoverLine ();
 
-			if (e.Mouse.LeftButton == ButtonState.Released || !buffer.SelectionInProgress)
+			if (!IFace.IsDown(MouseButton.Left) || !buffer.SelectionInProgress)
 				return;
 
 			//mouse is down
@@ -542,10 +543,8 @@ namespace Crow.Text
 
 			switch (key)
 			{
-			case Key.BackSpace:
+			case Key.Backspace:
 				buffer.Delete ();
-				break;
-			case Key.Clear:
 				break;
 			case Key.Delete:
 				if (buffer.SelectionIsEmpty)
@@ -554,8 +553,8 @@ namespace Crow.Text
 //					IFace.Clipboard = buffer.SelectedText;
 				buffer.Delete ();
 				break;
-			case Key.ISO_Enter:
-			case Key.KP_Enter:
+			case Key.Enter:
+			case Key.KeypadEnter:
 				if (!buffer.SelectionIsEmpty)
 					buffer.Delete ();
 				buffer.InsertLineBreak ();
@@ -657,9 +656,7 @@ namespace Crow.Text
 				break;
 			case Key.Menu:
 				break;
-			case Key.Num_Lock:
-				break;
-			case Key.Page_Down:
+			case Key.PageDown:
 				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
@@ -670,7 +667,7 @@ namespace Crow.Text
 				buffer.ResetSelection ();
 				CurrentLine += visibleLines;
 				break;
-			case Key.Page_Up:
+			case Key.PageUp:
 				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();

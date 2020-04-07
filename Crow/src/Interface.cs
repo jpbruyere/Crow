@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2020  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Threading;
 using Crow.Cairo;
 using Crow.IML;
+using Glfw;
 
 namespace Crow
 {
@@ -50,9 +51,88 @@ namespace Crow
 		}
 		#endregion
 
-		public IBackend Backend => backend;
-		protected IBackend backend;
-		protected bool running;
+		/** GLFW callback may return a custom pointer, this list makes the link between the GLFW window pointer and the
+			manage VkWindow instance. */
+		static Dictionary<IntPtr, Interface> windows = new Dictionary<IntPtr, Interface> ();
+		/** GLFW window native pointer and current native handle for mouse cursor */
+		IntPtr hWin, currentCursor;
+
+		protected virtual void InitSurface ()
+		{
+			Glfw3.Init ();
+
+			Glfw3.WindowHint (WindowAttribute.ClientApi, 0);
+			Glfw3.WindowHint (WindowAttribute.Resizable, 1);
+
+			hWin = Glfw3.CreateWindow (clientRectangle.Width, clientRectangle.Height, "win name", MonitorHandle.Zero, IntPtr.Zero);
+
+			if (hWin == IntPtr.Zero)
+				throw new Exception ("[GLFW3] Unable to create vulkan Window");
+
+			Glfw3.SetKeyCallback (hWin, HandleKeyDelegate);
+			Glfw3.SetMouseButtonPosCallback (hWin, HandleMouseButtonDelegate);
+			Glfw3.SetCursorPosCallback (hWin, HandleCursorPosDelegate);
+			Glfw3.SetScrollCallback (hWin, HandleScrollDelegate);
+			Glfw3.SetCharCallback (hWin, HandleCharDelegate);
+			Glfw3.SetWindowSizeCallback (hWin, HandleWindowSizeDelegate);
+
+			//Glfw3.SetWindowTitle (hWin, "FPS: " + fps.ToString ());
+			switch (Environment.OSVersion.Platform) {
+			case PlatformID.MacOSX:
+				break;
+			case PlatformID.Unix:
+				IntPtr disp = Glfw3.GetX11Display ();
+				IntPtr nativeWin = Glfw3.GetX11Window (hWin);
+				Int32 scr = Glfw3.GetX11DefaultScreen (disp);
+				IntPtr visual = Glfw3.GetX11DefaultVisual (disp, scr);
+				surf = new XlibSurface (disp, nativeWin, visual, clientRectangle.Width, clientRectangle.Height);
+				break;
+			case PlatformID.Win32NT:
+			case PlatformID.Win32S:
+			case PlatformID.Win32Windows:
+				IntPtr hWin32 = Glfw3.GetWin32Window (hWin);
+				IntPtr hdc = Glfw3.GetWin32DC (hWin32);
+				surf = new Win32Surface (hdc);
+				break;
+			case PlatformID.Xbox:
+			case PlatformID.WinCE:
+				throw new PlatformNotSupportedException ("Unable to create cairo surface.");
+			}
+
+			windows.Add (hWin, this);
+		}
+
+		#region events delegates
+
+		static CursorPosDelegate HandleCursorPosDelegate = (window, xPosition, yPosition) => {
+			windows [window].OnMouseMove ((int)xPosition, (int)yPosition);
+		};
+		static MouseButtonDelegate HandleMouseButtonDelegate = (IntPtr window, MouseButton button, InputAction action, Modifier mods) => {
+			if (action == InputAction.Press) {
+				windows [window].OnMouseButtonDown (button);
+			} else {
+				windows [window].OnMouseButtonUp (button);
+			}
+		};
+		static ScrollDelegate HandleScrollDelegate = (IntPtr window, double xOffset, double yOffset) => {
+			windows [window].OnMouseWheelChanged ((int)yOffset);
+		};
+		static KeyDelegate HandleKeyDelegate = (IntPtr window, Key key, int scanCode, InputAction action, Modifier modifiers) => {
+
+			if (action == InputAction.Press || action == InputAction.Repeat) {
+				windows [window].OnKeyDown (key);
+			} else {
+				windows [window].OnKeyUp (key);
+			}
+		};
+		static CharDelegate HandleCharDelegate = (IntPtr window, CodePoint codepoint) => {
+			windows [window].OnKeyPress (codepoint.ToChar());
+		};
+		static WindowSizeDelegate HandleWindowSizeDelegate = (IntPtr window, int Width, int Height) => {
+			windows [window].ProcessResize (new Rectangle (0, 0, Width, Height));
+		};
+
+		#endregion
 
 		#region CTOR
 		static Interface () {
@@ -83,11 +163,12 @@ namespace Crow
 			FontRenderingOptions.HintStyle = HintStyle.Full;
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Default;
 		}
-		public Interface(int width=800, int height=600, IBackend _backend = null, bool startUIThread = true)  {
+		public Interface(int width=800, int height=600, bool startUIThread = true)  {
 			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 			CurrentInterface = this;
 			clientRectangle = new Rectangle (0, 0, width, height);
-			backend = _backend;
+
+			InitSurface ();
 
 			if (startUIThread) {
 				Thread t = new Thread (InterfaceThread) {
@@ -104,22 +185,14 @@ namespace Crow
 #endif
 		}
 		#endregion
-
+		public bool Running {
+			get => !Glfw3.WindowShouldClose (hWin);
+			set => Glfw3.SetWindowShouldClose (hWin, 1);
+		}
 		public virtual void InterfaceThread ()
 		{
-			if (backend == null) {
-				if (Environment.OSVersion.Platform == PlatformID.Unix)
-					backend = new XCB.XCBBackend ();
-				else
-					backend = new Win32.Win32Backend ();
-			}
 
-			backend.Init (this);
-
-			while (!running)
-				Thread.Sleep (2);
-
-			while (running) {
+			while (!Glfw3.WindowShouldClose (hWin)) {
 				Update ();
 				Thread.Sleep (UPDATE_INTERVAL);
 #if MEASURE_TIME
@@ -139,10 +212,8 @@ namespace Crow
 		/// </summary>
 		public void Init () {
 			loadStyling ();
-
 			initTooltip ();
 			initContextMenus ();
-
 			Startup ();
 		}
 		/// <summary>
@@ -150,26 +221,18 @@ namespace Crow
 		/// </summary>
 		public virtual void Run () {
 			Init ();
-			running = true;
-			while (running) {
-				backend?.ProcessEvents ();
+
+			while (!Glfw3.WindowShouldClose (hWin)) {
+				Glfw3.PollEvents ();
 				Thread.Sleep(1);
 			}
 		}
-		public virtual void Quit ()
-		{
-			running = false;
-		}
-		public bool Shift {
-			get { return backend.Shift; }
-		}
-		public bool Ctrl {
-			get { return backend.Ctrl; }
-		}
-		public bool Alt {
-			get { return backend.Alt; }
-		}
 
+		public virtual void Quit () => Glfw3.SetWindowShouldClose (hWin, 1);
+
+		public bool Shift => Glfw3.GetKey(hWin, Glfw.Key.LeftShift) == InputAction.Press;
+		public bool Ctrl => Glfw3.GetKey (hWin, Glfw.Key.LeftControl) == InputAction.Press;
+		public bool Alt => Glfw3.GetKey (hWin, Glfw.Key.LeftAlt) == InputAction.Press;
 
 		#region IDisposable Support
 		private bool disposedValue = false; // To detect redundant calls
@@ -183,8 +246,11 @@ namespace Crow
 					// TODO: dispose managed state (managed objects).
 				}
 
-				backend.CleanUp ();
+				if (currentCursor != IntPtr.Zero)
+					Glfw3.DestroyCursor (currentCursor);
 
+				Glfw3.DestroyWindow (hWin);
+				Glfw3.Terminate ();
 
 				disposedValue = true;
 			}
@@ -801,8 +867,8 @@ namespace Crow
 					if (DragAndDropOperation != null) {
 						if (DragImage != null) {
 							DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
-							DragImageX = Mouse.X - DragImageWidth / 2;
-							DragImageY = Mouse.Y - DragImageHeight / 2;
+							DragImageX = MousePosition.X - DragImageWidth / 2;
+							DragImageY = MousePosition.Y - DragImageHeight / 2;
 							ctx.Save ();
 							ctx.ResetClip ();
 							ctx.SetSourceSurface (DragImage, DragImageX, DragImageY);
@@ -834,7 +900,9 @@ namespace Crow
 
 					ctx.Paint ();
 
-					backend?.Flush ();
+					//TODO:check if flush is possible, maybe with cairo
+					//backend?.Flush ();
+					surf.Flush ();
 
 					clipping.Dispose ();
 					clipping = new Region ();
@@ -967,8 +1035,6 @@ namespace Crow
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
 
-				/*surf.Dispose ();
-				surf = new Cairo.XlibSurface (xHandle, xwinHnd, xDefaultVisual, clientRectangle.Width, clientRectangle.Height);*/
 				surf.SetSize (clientRectangle.Width, clientRectangle.Height);
 
 				foreach (Widget g in GraphicTree)
@@ -981,11 +1047,13 @@ namespace Crow
 		#region Mouse and Keyboard Handling
 		MouseCursor cursor = MouseCursor.Arrow;
 
-		public MouseState Mouse;
 		Stopwatch lastMouseDown = Stopwatch.StartNew (), mouseRepeatTimer = new Stopwatch ();
 		bool doubleClickTriggered;	//next mouse up will trigger a double click
 		//int mouseRepeatCount;
 		MouseButtonEventArgs lastMouseDownEvent;
+
+		public Point MousePosition { get; set; } = default;
+		public bool IsDown (MouseButton button) => Glfw3.GetMouseButton (hWin, button) != InputAction.Release;
 
 		public MouseCursor MouseCursor {
 			get => cursor;
@@ -994,22 +1062,62 @@ namespace Crow
 				if (value == cursor)
 					return;
 				cursor = value;
-				if (backend != null)
-					backend.Cursor = cursor;
+				if (currentCursor != IntPtr.Zero)
+					Glfw3.DestroyCursor (currentCursor);
+				switch (MouseCursor) {
+				case MouseCursor.Arrow:
+					currentCursor = Glfw3.CreateStandardCursor (CursorShape.Arrow);
+					break;
+				case MouseCursor.IBeam:
+					currentCursor = Glfw3.CreateStandardCursor (CursorShape.IBeam);
+					break;
+				case MouseCursor.Crosshair:
+					currentCursor = Glfw3.CreateStandardCursor (CursorShape.Crosshair);
+					break;
+				case MouseCursor.Circle:
+					break;
+				case MouseCursor.Hand:
+					currentCursor = Glfw3.CreateStandardCursor (CursorShape.Hand);
+					break;
+				case MouseCursor.Wait:
+					break;
+				case MouseCursor.H:
+					currentCursor = Glfw3.CreateStandardCursor (CursorShape.HResize);
+					break;
+				case MouseCursor.V:
+					currentCursor = Glfw3.CreateStandardCursor (CursorShape.VResize);
+					break;
+				case MouseCursor.Move:
+				case MouseCursor.Top:
+				case MouseCursor.TopLeft:
+				case MouseCursor.TopRight:
+				case MouseCursor.Left:
+				case MouseCursor.Right:
+				case MouseCursor.BottomLeft:
+				case MouseCursor.Bottom:
+				case MouseCursor.BottomRight:
+				case MouseCursor.NW:
+				case MouseCursor.NE:
+				case MouseCursor.SW:
+				case MouseCursor.SE:
+				default:
+					currentCursor = Glfw3.CreateStandardCursor (CursorShape.Arrow);
+					break;
+				}
+
+				Glfw3.SetCursor (hWin, currentCursor);
 				//MouseCursorChanged.Raise (this,new MouseCursorChangedEventArgs(cursor));
 			}
 		}
 		/// <summary>Processes mouse move events from the root container, this function
 		/// should be called by the host on mouse move event to forward events to crow interfaces</summary>
 		/// <returns>true if mouse is in the interface</returns>
-		public virtual bool OnMouseMove(int x, int y)
+		public virtual bool OnMouseMove (int x, int y)
 		{
-			int deltaX = x - Mouse.X;
-			int deltaY = y - Mouse.Y;
-			Mouse.X = x;
-			Mouse.Y = y;
+			int deltaX = x - MousePosition.X;
+			int deltaY = y - MousePosition.Y;
+			MousePosition = new Point (x, y);
 			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
-			e.Mouse = Mouse;
 
 			if (ActiveWidget != null && DragAndDropOperation == null) {
 				//TODO, ensure object is still in the graphic tree
@@ -1019,7 +1127,7 @@ namespace Crow
 			}
 
 			if (DragAndDropOperation != null)//drag source cant have hover event, so move has to be handle here
-				DragAndDropOperation.DragSource.onMouseMove (this, e);			
+				DragAndDropOperation.DragSource.onMouseMove (this, e);
 
 			if (_hoverWidget != null) {
 				resetTooltip ();
@@ -1035,7 +1143,7 @@ namespace Crow
 					int i = 0;
 					while (i < idxhw) {
 						//if logical parent of top container is a widget, that's a popup
-						if (GraphicTree [i].LogicalParent is Interface) { 						
+						if (GraphicTree [i].LogicalParent is Interface) {
 							if (GraphicTree [i].MouseIsIn (e.Position)) {
 								while (_hoverWidget != null) {
 									_hoverWidget.onMouseLeave (_hoverWidget, e);
@@ -1055,7 +1163,7 @@ namespace Crow
 					_hoverWidget.checkHoverWidget (e);
 					_hoverWidget.onMouseMove (this, e);
 					return true;
-				} 
+				}
 				_hoverWidget.onMouseLeave (_hoverWidget, e);
 				//seek upward from last focused graph obj's
 				tmp = _hoverWidget.FocusParent;
@@ -1068,7 +1176,7 @@ namespace Crow
 					}
 					_hoverWidget.onMouseLeave (_hoverWidget, e);
 					tmp = _hoverWidget.FocusParent;
-				}				
+				}
 			}
 
 			//top level graphic obj's parsing
@@ -1094,13 +1202,11 @@ namespace Crow
 		/// <param name="button">Button index</param>
 		public virtual bool OnMouseButtonDown (MouseButton button)
 		{
-			Mouse.EnableBit ((int)button);
-
 			doubleClickTriggered = (lastMouseDown.ElapsedMilliseconds < DOUBLECLICK_TRESHOLD);
 			lastMouseDown.Restart ();
 			//mouseRepeatCount = -1;//stays negative until repeat delay is hit
 
-			lastMouseDownEvent = new MouseButtonEventArgs (button) { Mouse = Mouse };
+			lastMouseDownEvent = new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press);
 
 			if (_hoverWidget == null)
 				return false;
@@ -1115,13 +1221,11 @@ namespace Crow
 		/// </summary>
 		/// <returns>return true, if interface handled the event, false otherwise.</returns>
 		/// <param name="button">Button index</param>
-		public virtual bool OnMouseButtonUp(MouseButton button)
+		public virtual bool OnMouseButtonUp (MouseButton button)
 		{
-			Mouse.DisableBit ((int)button);
-
 			mouseRepeatTimer.Reset ();
 
-			MouseButtonEventArgs e = new MouseButtonEventArgs (button) { Mouse = Mouse };
+			MouseButtonEventArgs e = new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Repeat);
 			if (_activeWidget == null)
 				return false;
 
@@ -1133,9 +1237,9 @@ namespace Crow
 				_activeWidget.onMouseClick (_activeWidget, e);
 
 			ActiveWidget = null;
-//			if (!lastActive.MouseIsIn (Mouse.Position)) {
-//				ProcessMouseMove (Mouse.X, Mouse.Y);
-//			}
+			//			if (!lastActive.MouseIsIn (Mouse.Position)) {
+			//				ProcessMouseMove (Mouse.X, Mouse.Y);
+			//			}
 			return true;
 		}
 		/// <summary>
@@ -1143,10 +1247,9 @@ namespace Crow
 		/// </summary>
 		/// <returns>return true, if interface handled the event, false otherwise.</returns>
 		/// <param name="delta">wheel delta</param>
-		public virtual bool OnMouseWheelChanged(float delta)
+		public virtual bool OnMouseWheelChanged (float delta)
 		{
-			Mouse.SetScrollRelative (0, delta);
-			MouseWheelEventArgs e = new MouseWheelEventArgs () { Mouse = Mouse, DeltaPrecise = delta };
+			MouseWheelEventArgs e = new MouseWheelEventArgs ((int)delta);
 
 			if (_hoverWidget == null)
 				return false;
@@ -1190,25 +1293,27 @@ namespace Crow
 			//			keyboardRepeatThread.Start ();
 		}
 
-		public bool IsKeyDown (Key key) {
+		public bool IsKeyDown (Key key)
+		{
 			return false;
 		}
 		#endregion
 
 		#region Tooltip handling
-		Stopwatch tooltipTimer = new Stopwatch();
+		Stopwatch tooltipTimer = new Stopwatch ();
 		Widget ToolTipContainer;
 		volatile bool tooltipVisible;
 
-		protected void initTooltip () {
-			ToolTipContainer = CreateInstance  ("#Crow.Tooltip.template");
+		protected void initTooltip ()
+		{
+			ToolTipContainer = CreateInstance ("#Crow.Tooltip.template");
 			Thread t = new Thread (toolTipThreadFunc);
 			t.IsBackground = true;
 			t.Start ();
 		}
 		void toolTipThreadFunc ()
 		{
-			while(true) {
+			while (true) {
 				if (tooltipTimer.ElapsedMilliseconds > TOOLTIP_DELAY) {
 					if (!tooltipVisible) {
 						Widget g = _hoverWidget;
@@ -1216,8 +1321,8 @@ namespace Crow
 							if (!string.IsNullOrEmpty (g.Tooltip)) {
 								AddWidget (ToolTipContainer);
 								ToolTipContainer.DataSource = g;
-								ToolTipContainer.Top = Mouse.Y + 10;
-								ToolTipContainer.Left = Mouse.X + 10;
+								ToolTipContainer.Top = MousePosition.Y + 10;
+								ToolTipContainer.Left = MousePosition.X + 10;
 								tooltipVisible = true;
 								break;
 							}
@@ -1225,11 +1330,12 @@ namespace Crow
 						}
 					}
 				}
-				Thread.Sleep (200);	
+				Thread.Sleep (200);
 			}
 
 		}
-		void resetTooltip () {
+		void resetTooltip ()
+		{
 			if (tooltipVisible) {
 				//ToolTipContainer.DataSource = null;
 				RemoveWidget (ToolTipContainer);
@@ -1241,8 +1347,9 @@ namespace Crow
 
 		#region Contextual menu
 		MenuItem ctxMenuContainer;
-		protected void initContextMenus (){
-			ctxMenuContainer = CreateInstance  ("#Crow.ContextMenu.template") as MenuItem;
+		protected void initContextMenus ()
+		{
+			ctxMenuContainer = CreateInstance ("#Crow.ContextMenu.template") as MenuItem;
 			ctxMenuContainer.LayoutChanged += CtxMenuContainer_LayoutChanged;
 		}
 
@@ -1252,14 +1359,15 @@ namespace Crow
 			if (e.LayoutType == LayoutingType.Width || e.LayoutType == LayoutingType.X) {
 				if (r.Right > this.clientRectangle.Right)
 					ctxMenuContainer.Left = this.clientRectangle.Right - ctxMenuContainer.Slot.Width;
-			}else if (e.LayoutType == LayoutingType.Width || e.LayoutType == LayoutingType.Y) {
+			} else if (e.LayoutType == LayoutingType.Width || e.LayoutType == LayoutingType.Y) {
 				if (r.Bottom > this.clientRectangle.Bottom)
 					ctxMenuContainer.Top = this.clientRectangle.Bottom - ctxMenuContainer.Slot.Height;
 			}
-			
+
 		}
 
-		public void ShowContextMenu (Widget go) {
+		public void ShowContextMenu (Widget go)
+		{
 
 			lock (UpdateMutex) {
 				if (ctxMenuContainer.Parent == null)
@@ -1273,11 +1381,11 @@ namespace Crow
 
 				PutOnTop (ctxMenuContainer, true);
 			}
-			ctxMenuContainer.Left = Mouse.X - 5;
-			ctxMenuContainer.Top = Mouse.Y - 5;
+			ctxMenuContainer.Left = MousePosition.X - 5;
+			ctxMenuContainer.Top = MousePosition.Y - 5;
 
 			_hoverWidget = ctxMenuContainer;
-			ctxMenuContainer.onMouseEnter (ctxMenuContainer, new MouseMoveEventArgs (Mouse.X, Mouse.Y, 0, 0));
+			ctxMenuContainer.onMouseEnter (ctxMenuContainer, new MouseMoveEventArgs (MousePosition.X, MousePosition.Y, 0, 0));
 		}
 		#endregion
 
@@ -1286,7 +1394,7 @@ namespace Crow
 		volatile int keyboardRepeatCount;
 		KeyEventArgs lastKeyDownEvt;
 
-		void keyboardRepeatThreadFunc()
+		void keyboardRepeatThreadFunc ()
 		{
 			keyboardRepeatOn = true;
 			Thread.Sleep (Interface.DEVICE_REPEAT_DELAY);
@@ -1299,14 +1407,15 @@ namespace Crow
 		#endregion
 
 		#region ILayoutable implementation
-		public virtual bool PointIsIn(ref Point m)
+		public virtual bool PointIsIn (ref Point m)
 		{
 			return true;
 		}
-		public void RegisterClip(Rectangle r){
+		public void RegisterClip (Rectangle r)
+		{
 			clipping.UnionRectangle (r);
 		}
-		public bool ArrangeChildren { get { return false; }}
+		public bool ArrangeChildren { get { return false; } }
 		public int LayoutingTries {
 			get { throw new NotImplementedException (); }
 			set { throw new NotImplementedException (); }
@@ -1317,7 +1426,7 @@ namespace Crow
 		}
 		public void RegisterForLayouting (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public bool UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
-		public Rectangle ContextCoordinates (Rectangle r) { return r;}
+		public Rectangle ContextCoordinates (Rectangle r) { return r; }
 		public Rectangle ScreenCoordinates (Rectangle r) { return r; }
 
 		public ILayoutable Parent {
@@ -1338,14 +1447,14 @@ namespace Crow
 		public Rectangle getSlot () { return ClientRectangle; }
 		#endregion
 
-		#if MEASURE_TIME
-		public PerformanceMeasure clippingMeasure = new PerformanceMeasure("Clipping", 1);
-		public PerformanceMeasure layoutingMeasure = new PerformanceMeasure("Layouting", 1);
-		public PerformanceMeasure updateMeasure = new PerformanceMeasure("Update", 1);
-		public PerformanceMeasure drawingMeasure = new PerformanceMeasure("Drawing", 1);
-		public List<PerformanceMeasure> PerfMeasures = new List<PerformanceMeasure>();
-		#endif
-		#if DEBUG_LAYOUTING
+#if MEASURE_TIME
+		public PerformanceMeasure clippingMeasure = new PerformanceMeasure ("Clipping", 1);
+		public PerformanceMeasure layoutingMeasure = new PerformanceMeasure ("Layouting", 1);
+		public PerformanceMeasure updateMeasure = new PerformanceMeasure ("Update", 1);
+		public PerformanceMeasure drawingMeasure = new PerformanceMeasure ("Drawing", 1);
+		public List<PerformanceMeasure> PerfMeasures = new List<PerformanceMeasure> ();
+#endif
+#if DEBUG_LAYOUTING
 		public List<LQIList> LQIsTries = new List<LQIList>();
 		public LQIList curLQIsTries = new LQIList();
 		public List<LQIList> LQIs = new List<LQIList>();
@@ -1354,9 +1463,9 @@ namespace Crow
 		//			get { return curUpdateLQIs.Where(l=>l.LayoutingTries>2 || l.DiscardCount > 0).ToArray(); }
 		//		}
 		public LayoutingQueueItem currentLQI;
-		#else
+#else
 		public List<LQIList> LQIs = null;//still create the var for CrowIDE
-		#endif
+#endif
 	}
 }
 

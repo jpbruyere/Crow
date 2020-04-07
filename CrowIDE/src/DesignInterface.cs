@@ -13,32 +13,16 @@ using Crow.Cairo;
 
 namespace Crow.Coding
 {
-	public class DesignInterface : Interface, IValueChange
+	public class DesignInterface : Interface
 	{
-		#region IValueChange implementation
-		/// <summary>
-		/// Raise to notify that the value of a property has changed, the binding system
-		/// rely mainly on this event. the member name may not be present in the class, this is 
-		/// used in **propertyless** bindings, this allow to raise custom named events without needing
-		/// to create an new one in the class or a new property.
-		/// </summary>
-		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-		/// <summary>
-		/// Helper function to raise the value changed event
-		/// </summary>
-		public virtual void NotifyValueChanged(string MemberName, object _value)
-		{
-			//Debug.WriteLine ("Value changed: {0}->{1} = {2}", this, MemberName, _value);
-			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
-		}
-		#endregion
-
-		public DesignInterface () : base()
+		public DesignInterface () : base(){}
+		protected override void InitSurface ()
 		{
 			surf = new ImageSurface (Format.Argb32, 100, 100);
 
 			loadStyling ();
 		}
+
 		public override void InterfaceThread ()
 		{
 
@@ -89,12 +73,10 @@ namespace Crow.Coding
 		}
 		public override bool OnMouseMove (int x, int y)
 		{
-			int deltaX = x - Mouse.X;
-			int deltaY = y - Mouse.Y;
-			Mouse.X = x;
-			Mouse.Y = y;
+			int deltaX = x - MousePosition.X;
+			int deltaY = y - MousePosition.Y;
+			MousePosition = new Point (x, y);
 			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
-			e.Mouse = Mouse;
 
 			if (ActiveWidget != null) {
 				//TODO, ensure object is still in the graphic tree

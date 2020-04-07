@@ -209,7 +209,7 @@ namespace Crow
 			set {
 				base.Parent = value;
 				if (value != null) {
-					dragStartPoint = IFace.Mouse.Position;
+					dragStartPoint = IFace.MousePosition;
 					savedParent = value as TabView;
 				}
 			}
@@ -218,7 +218,7 @@ namespace Crow
 		{
 			base.onStartDrag (sender, e);
 
-			dragStartPoint = IFace.Mouse.Position;
+			dragStartPoint = IFace.MousePosition;
 		}
 		protected override void onEndDrag (object sender, DragDropEventArgs e)
 		{

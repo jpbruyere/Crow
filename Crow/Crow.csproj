@@ -3,8 +3,8 @@
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		
-		<ReleaseVersion>0.8.0</ReleaseVersion>
 		<AssemblyVersion>$(CrowVersion)</AssemblyVersion>
+		<ReleaseVersion>$(CrowVersion)</ReleaseVersion>
 		<Title>C# Rapid Open Widget Toolkit</Title>
 		<Description>C.R.O.W. is a widget toolkit and rendering engine developed in C# with templates, styles, compositing, and bindings.</Description>
 		<License>MIT</License>
@@ -38,6 +38,7 @@
 		<PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.6.0" />
 		<PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.6.0" />
 		<!--<PackageReference Include="glfw-sharp" Version="0.2.0" />-->
+		<PackageReference Include="glfw-sharp" Version="0.2.2" />
 	</ItemGroup>
 	<PropertyGroup Condition=" '$(CrowStbSharp)' == 'true'">
 		<DefineConstants>$(DefineConstants);STB_SHARP</DefineConstants>
@@ -47,7 +48,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Content Include="$(SolutionDir)Images/crow.png" Pack="true" PackagePath="" />
-		<Compile Include="src\**\*.cs" Exclude="src\Mono.Cairo\NativeMethods-internal.cs;src\backends\win32\User32\Structs\RawInputDevice.cs" />
+		<Compile Include="src\**\*.cs" Exclude="src\Mono.Cairo\NativeMethods-internal.cs" />
 		<EmbeddedResource Include="Templates\*.*">
 			<LogicalName>Crow.%(Filename).template</LogicalName>
 		</EmbeddedResource>

@@ -14,6 +14,7 @@ using System.Text;
 using System.Xml;
 using System.Diagnostics;
 using Crow.Cairo;
+using Glfw;
 
 namespace Crow.Coding
 {
@@ -359,7 +360,7 @@ namespace Crow.Coding
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
-			if (e.Mouse.RightButton == ButtonState.Pressed) {
+			if (IFace.IsDown(MouseButton.Right)) {
 				base.onMouseDown (sender, e);
 				return;
 			}
@@ -790,12 +791,10 @@ namespace Crow.Coding
 
 		public bool ProcessMouseMove(int x, int y)
 		{
-			int deltaX = x - imlVE.Mouse.X;
-			int deltaY = y - imlVE.Mouse.Y;
-			imlVE.Mouse.X = x;
-			imlVE.Mouse.Y = y;
+			int deltaX = x - imlVE.MousePosition.X;
+			int deltaY = y - imlVE.MousePosition.Y;
+			imlVE.MousePosition = new Point (x, y);
 			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
-			e.Mouse = imlVE.Mouse;
 
 			if (imlVE.ActiveWidget != null) {
 				//TODO, ensure object is still in the graphic tree

@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis.Text;
 using Microsoft.CodeAnalysis;
 using System.Text;
 using Microsoft.CodeAnalysis.CSharp;
+using Glfw;
 
 namespace Crow.Coding
 {
@@ -704,7 +705,7 @@ namespace Crow.Coding
 			else
 				hoverPos = buffer.Lines.GetPosition (new LinePosition (hoverLine, hoverColumn));
 
-			if (e.Mouse.IsButtonDown (MouseButton.Left)) {
+			if (IFace.IsDown (MouseButton.Left)) {
 				if (hoverPos != selStartPos)
 					selection = (selStartPos < hoverPos) ?
 						TextSpan.FromBounds (selStartPos, hoverPos) :
@@ -794,7 +795,7 @@ namespace Crow.Coding
 				case Key.S:
 					projFile.Save ();
 					break;
-				case Key.z:
+				case Key.Z:
 					editorMutex.EnterWriteLock ();
 					if (IFace.Shift)
 						projFile.Redo (null);
@@ -809,7 +810,7 @@ namespace Crow.Coding
 			}
 
 			switch (key) {
-			case Key.BackSpace:
+			case Key.Backspace:
 				if (selection.IsEmpty) {
 					if (currentPos < 1)
 						return;
@@ -836,8 +837,8 @@ namespace Crow.Coding
 				if (IFace.Shift)
 					replaceSelection (IFace.Clipboard);
 				break;
-			case Key.Return:
-			case Key.KP_Enter:
+			case Key.Enter:
+			case Key.KeypadEnter:
 				if (!selection.IsEmpty)
 					replaceSelection ("");
 				selection = TextSpan.FromBounds (currentPos, currentPos);
@@ -870,14 +871,13 @@ namespace Crow.Coding
 			case Key.Down:
 				move (IFace.Shift, 0, 1);
 				break;
-			case Key.Page_Up:
+			case Key.PageUp:
 				move (IFace.Shift, 0, -visibleLines);
 				break;
-			case Key.Page_Down:
+			case Key.PageDown:
 				move (IFace.Shift, 0, visibleLines);
 				break;
 			case Key.Tab:
-			case Key.ISO_Left_Tab:
 				if (selection.IsEmpty)
 					selection = TextSpan.FromBounds (currentPos, currentPos);
 				LinePositionSpan lps = buffer.Lines.GetLinePositionSpan (selection);

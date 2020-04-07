@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Crow.IML;
+using Glfw;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
 using Microsoft.CodeAnalysis.Host.Mef;
@@ -52,7 +53,7 @@ namespace Crow.Coding
 			CMDOpen = new Command(new Action(openFileDialog)) { Caption = "Open...", Icon = IcoOpen };
 			CMDSave = new Command(new Action(saveFileDialog)) { Caption = "Save", Icon = IcoSave, CanExecute = false};
 			CMDSaveAs = new Command(new Action(saveFileDialog)) { Caption = "Save As...", Icon = IcoSaveAs, CanExecute = false};
-			CMDQuit = new Command(new Action(() => running = false)) { Caption = "Quit", Icon = IcoQuit };
+			CMDQuit = new Command(new Action(Quit)) { Caption = "Quit", Icon = IcoQuit };
 			CMDUndo = new Command(new Action(undo)) { Caption = "Undo", Icon = IcoUndo, CanExecute = false};
 			CMDRedo = new Command(new Action(redo)) { Caption = "Redo", Icon = IcoRedo, CanExecute = false};
             CMDCut = new Command(new Action(cut)) { Caption = "Cut", Icon = IcoCut, CanExecute = false};

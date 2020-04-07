@@ -12,7 +12,7 @@
 				Maximum="{../editor.MaxScrollY}" Orientation="Vertical"/>
 		</HorizontalStack>
 		<ScrollBar Style="HScrollBar" Name="scrollbarX" Value="{²../editor.ScrollX}"
-				Maximum="{../editor.MaxScrollX}" Orientation="Horizontal"
+				Maximum="{../editor.MaxScrollX}"
 				LargeIncrement="{../editor.VisibleColumns}"
 				CursorSize="{../editor.ChildWidthRatio}"/>			
 		<HorizontalStack Height="Fit">

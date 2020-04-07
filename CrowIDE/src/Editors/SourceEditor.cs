@@ -7,6 +7,7 @@ using System.ComponentModel;
 using Crow.Cairo;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Glfw;
 
 namespace Crow.Coding
 {
@@ -916,7 +917,7 @@ namespace Crow.Coding
 
 			updateHoverLine ();
 
-			if (!e.Mouse.IsButtonDown (MouseButton.Left)) {
+			if (!IFace.IsDown (MouseButton.Left)) {
 				if (mouseLocalPos.X < leftMargin)
 					IFace.MouseCursor = MouseCursor.Arrow;
 				else
@@ -997,7 +998,7 @@ namespace Crow.Coding
 				case Key.S:
 					projFile.Save ();
 					break;
-				case Key.z:
+				case Key.Z:
 					editorMutex.EnterWriteLock ();
 					if (IFace.Shift)
 						projFile.Redo (null);
@@ -1013,10 +1014,8 @@ namespace Crow.Coding
 
 			switch (key)
 			{
-			case Key.BackSpace:
+			case Key.Backspace:
 				buffer.DeleteChar ();
-				break;
-			case Key.Clear:
 				break;
 			case Key.Delete:
 				if (buffer.SelectionIsEmpty)
@@ -1025,8 +1024,8 @@ namespace Crow.Coding
 					IFace.Clipboard = buffer.SelectedText;
 				buffer.DeleteChar ();
 				break;
-			case Key.Return:
-			case Key.KP_Enter:
+			case Key.Enter:
+			case Key.KeypadEnter:
 				if (!buffer.SelectionIsEmpty)
 					buffer.DeleteChar ();
 				buffer.InsertLineBreak ();
@@ -1128,9 +1127,7 @@ namespace Crow.Coding
 				break;
 			case Key.Menu:
 				break;
-			case Key.Num_Lock:
-				break;
-			case Key.Page_Down:
+			case Key.PageDown:
 				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
@@ -1141,7 +1138,7 @@ namespace Crow.Coding
 				buffer.ResetSelection ();
 				PrintedCurrentLine += visibleLines;
 				break;
-			case Key.Page_Up:
+			case Key.PageUp:
 				if (IFace.Shift) {
 					if (buffer.SelectionIsEmpty)
 						buffer.SetSelStartPos ();
