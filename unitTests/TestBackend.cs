@@ -10,24 +10,26 @@ namespace unitTests
 {
 	public class TestInterface : Interface
 	{
-		public TestInterface (int width = 800, int height = 600, IBackend _backend = null)
-			: base (width, height, _backend, false) {
-			backend.Init (this);
-		}
+		public TestInterface (int width = 800, int height = 600)
+			: base (width, height, false) {}
 		public bool IsRunning {
-			get => running;
-			set { running = value; } 
+			get => Running;
+			set => Running = value; 
+		}
+		protected override void InitSurface ()
+		{
+			surf = new Crow.Cairo.ImageSurface (Crow.Cairo.Format.Argb32, ClientRectangle.Width, ClientRectangle.Height);
 		}
 	}
 	[TestFixture]
-	public class TestBackend : IBackend
+	public class TestBackend
 	{
 		TestInterface iFace;
 
 		[OneTimeSetUp]
 		public void Init ()
 		{
-			iFace = new TestInterface (800, 600, this);
+			iFace = new TestInterface (800, 600);
 			iFace.Init ();
 			iFace.IsRunning = true;
 		}
@@ -57,31 +59,5 @@ namespace unitTests
 			=> Assert.DoesNotThrow (()
 				=> { iFace.LoadIMLFragment (@"<CheckBox IsChecked='true'/>"); iFace.Update (); }
 				, "iFace load IML fragment failed");
-
-		#region IBackend implementation
-		public MouseCursor Cursor { set { } }
-
-		public bool Shift => false;
-
-		public bool Ctrl => false;
-
-		public bool Alt => false;
-
-		public void CleanUp () {}
-
-		public void Flush () {}
-
-		public void Init (Interface iFace)
-		{
-			iFace.surf = new Crow.Cairo.ImageSurface (Crow.Cairo.Format.Argb32, iFace.ClientRectangle.Width, iFace.ClientRectangle.Height);
-		}
-
-		public bool IsDown (Key key) => false;
-
-		public void ProcessEvents ()
-		{
-
-		}
-		#endregion
 	}
 }

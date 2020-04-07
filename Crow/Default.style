@@ -229,6 +229,7 @@ HScrollBar {
     Value = "0";
     Height = "12";
     Width = "Stretched";
+    Orientation = "Horizontal";
 }
 EnumSelector {
     Orientation = "Vertical";

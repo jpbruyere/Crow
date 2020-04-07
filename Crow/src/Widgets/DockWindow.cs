@@ -4,6 +4,7 @@
 
 using System;
 using System.Xml.Serialization;
+using Glfw;
 
 namespace Crow
 {
@@ -73,7 +74,7 @@ namespace Crow
 //					Undock ();
 //			}
 
-			if (this.HasFocus && e.Mouse.IsButtonDown (MouseButton.Left) && IsDocked)
+			if (this.HasFocus && IFace.IsDown(MouseButton.Left) && IsDocked)
 				CheckUndock (e.Position);
 
 			base.onMouseMove (sender, e);
@@ -101,7 +102,7 @@ namespace Crow
 		{
 			base.onStartDrag (sender, e);
 
-			undockingMousePosOrig = IFace.Mouse.Position;
+			undockingMousePosOrig = IFace.MousePosition;
 		}
 		protected override void onDrop (object sender, DragDropEventArgs e)
 		{

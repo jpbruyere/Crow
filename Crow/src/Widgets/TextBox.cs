@@ -28,6 +28,7 @@ using System;
 using Crow.Cairo;
 using System.Diagnostics;
 using System.Xml.Serialization;
+using Glfw;
 
 namespace Crow
 {
@@ -74,12 +75,10 @@ namespace Crow
 
 			switch (key)
 			{
-			case Key.BackSpace:
+			case Key.Backspace:
 				if (CurrentPosition == 0)
 					return;
 				this.DeleteChar();
-				break;
-			case Key.Clear:
 				break;
 			case Key.Delete:
 				if (selectionIsEmpty) {
@@ -89,8 +88,8 @@ namespace Crow
 					IFace.Clipboard = this.SelectedText;
 				this.DeleteChar ();
 				break;
-			case Key.KP_Enter:
-			case Key.Return:
+			case Key.KeypadEnter:
+			case Key.Enter:
 				if (!selectionIsEmpty)
 					this.DeleteChar ();
 				if (Multiline)
@@ -194,14 +193,6 @@ namespace Crow
 				}
 				SelRelease = -1;
 				CurrentLine++;				
-				break;
-			case Key.Menu:
-				break;
-			case Key.Num_Lock:
-				break;
-			case Key.Page_Down:				
-				break;
-			case Key.Page_Up:
 				break;
 			case Key.Tab:
 				this.Insert ("\t");

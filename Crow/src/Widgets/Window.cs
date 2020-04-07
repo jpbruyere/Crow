@@ -6,6 +6,7 @@ using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
+using Glfw;
 
 namespace Crow
 {
@@ -274,7 +275,7 @@ namespace Crow
 
 			if (HasFocus) {
 				if (movable) {
-					if (e.Mouse.IsButtonDown (MouseButton.Left)) {
+					if (IFace.IsDown (MouseButton.Left)) {
 						MoveAndResize (e.XDelta, e.YDelta, currentDirection);
 						return;
 					}

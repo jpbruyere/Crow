@@ -13,6 +13,7 @@ using Crow.Cairo;
 using System.Diagnostics;
 using Crow.IML;
 using System.Threading;
+using Glfw;
 
 
 #if DESIGN_MODE
@@ -858,7 +859,7 @@ namespace Crow
 				if (!isVisible && IFace.HoverWidget != null) {					
 					if (IFace.HoverWidget.IsOrIsInside (this)) {
 						//IFace.HoverWidget = null;
-						IFace.OnMouseMove (IFace.Mouse.X, IFace.Mouse.Y);
+						IFace.OnMouseMove (IFace.MousePosition.X, IFace.MousePosition.Y);
 					}
 				}
 
@@ -1859,7 +1860,7 @@ namespace Crow
 		}
 		public virtual void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
-			if (allowDrag & hasFocus & e.Mouse.LeftButton == ButtonState.Pressed) {
+			if (allowDrag & hasFocus & IFace.IsDown(MouseButton.Left)) {
 				if (IFace.DragAndDropOperation == null) {
 					IFace.DragAndDropOperation = new DragDropEventArgs (this);
 					onStartDrag (this, IFace.DragAndDropOperation);
@@ -2034,7 +2035,7 @@ namespace Crow
 			if (IFace.HoverWidget != null) {
 				if (IFace.HoverWidget.IsOrIsInside (this)) {
 					IFace.HoverWidget = null;
-					IFace.OnMouseMove (IFace.Mouse.X, IFace.Mouse.Y);
+					IFace.OnMouseMove (IFace.MousePosition.X, IFace.MousePosition.Y);
 				}
 			}
 			if (IFace.ActiveWidget != null) {

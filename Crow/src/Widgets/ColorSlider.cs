@@ -5,6 +5,7 @@
 using System;
 using System.ComponentModel;
 using Crow.Cairo;
+using Glfw;
 
 namespace Crow
 {
@@ -119,7 +120,7 @@ namespace Crow
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
-			if (IFace.Mouse.LeftButton == ButtonState.Released)
+			if (!IFace.IsDown(MouseButton.Left))
 				return;
 			updateMouseLocalPos (e.Position);
 		}

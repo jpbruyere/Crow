@@ -289,7 +289,7 @@ namespace Crow
 
 			this.AddChild (ti);
 
-			Point p = ScreenPointToLocal (IFace.Mouse.Position) - Margin;
+			Point p = ScreenPointToLocal (IFace.MousePosition) - Margin;
 
 			p.X = Math.Max (leftSlope, p.X);
 			p.X = Math.Min (ClientRectangle.Width - rightSlope - TabWidth, p.X);

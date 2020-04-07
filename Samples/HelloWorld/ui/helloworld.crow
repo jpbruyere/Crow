@@ -1,5 +1,4 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack>
-	<TextBox Text="{²Source}" Multiline="true" Height="50%" Width="Stretched" TextAlignment="TopLeft" />	
-</VerticalStack>
-<!--<ScrollBar Orientation="Vertical" Height="Stretched" Width="10" />-->
+<Slider Height="20" Width="Stretched"/>
+
+
