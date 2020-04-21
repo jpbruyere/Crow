@@ -30,7 +30,7 @@ namespace Crow
 		public static implicit operator Size(string s)=> string.IsNullOrEmpty (s) ? Zero : Parse (s);
 
 		public static bool operator == (Size s1, Size s2) => (s1.Width == s2.Width && s1.Height == s2.Height);
-		public static bool operator != (Size s1, Size s2) => (s1.Width == s2.Width && s1.Height == s2.Height);
+		public static bool operator != (Size s1, Size s2) => (s1.Width != s2.Width || s1.Height != s2.Height);
 		public static bool operator > (Size s1, Size s2) => (s1.Width > s2.Width && s1.Height > s2.Height);
 		public static bool operator >= (Size s1, Size s2) => (s1.Width >= s2.Width && s1.Height >= s2.Height);
 		public static bool operator < (Size s1, Size s2) => (s1.Width < s2.Width) ? s1.Height <= s2.Height :
@@ -41,7 +41,7 @@ namespace Crow
 		public static bool operator >= (Size s, int i) => s.Width >= i && s.Height >= i;
 		public static bool operator <= (Size s1, Size s2) => (s1.Width <= s2.Width && s1.Height <= s2.Height);
 		public static bool operator == (Size s, int i) => (s.Width == i && s.Height == i);
-		public static bool operator != (Size s, int i) => (s.Width == i && s.Height == i);
+		public static bool operator != (Size s, int i) => (s.Width != i || s.Height != i);
 		public static Size operator + (Size s1, Size s2) => new Size (s1.Width + s2.Width, s1.Height + s2.Height);
 		public static Size operator + (Size s, int i) => new Size (s.Width + i, s.Height + i);
 		public static Size operator * (Size s, int i) => new Size (s.Width * i, s.Height * i);
