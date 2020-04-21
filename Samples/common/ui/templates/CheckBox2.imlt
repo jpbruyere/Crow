@@ -1,4 +1,4 @@
-﻿<Label Font="{./Font}" Text="{./Caption}" Height="{./HeightPolicy}" Width="{./WidthPolicy}"
+﻿<Label Font="{./Font}" Text="{./Caption}" CornerRadius="{./CornerRadius}"
 	Margin="3"
 	Background="{./Background}"
 	Foreground="DimGrey"

@@ -64,7 +64,7 @@ Global
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
 		$0.StandardHeader = $1
-		$1.Text = @Copyright (c) ${Year}  ${AuthorName} <${AuthorEmail}>\n\nThis code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
+		$1.Text = @Copyright (c) 2013-${Year}  ${AuthorName} <${AuthorEmail}>\n\nThis code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 		$0.DotNetNamingPolicy = $2
 		$0.TextStylePolicy = $3
 		$3.EolMarker = Unix

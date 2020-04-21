@@ -1,0 +1,16 @@
+﻿<?xml version="1.0"?>
+<VerticalStack Spacing="5" Margin="5">
+	<Image Path="#images.valign.svg" Fit="True" Background="White" Margin="5" SvgSub="{²CurrentVAlign}"/>
+	<Border Height="100" Width="Fit" Background="Jet">
+		<Label Margin="5" Text="vertical aligned text" VerticalAlignment="{CurrentVAlign}" Background="DarkBlue"/>
+	</Border>
+	<EnumSelector Name="valign" Caption="Vertical Alignment" EnumValue="{²CurrentVAlign}" />
+	<EnumSelector RadioButtonStyle="CheckBox3" Name="valign" Caption="Vertical Alignment" EnumValue="{²CurrentVAlign}" >
+		<Template>
+			<VerticalStack Name="Content" Width="100"/>
+		</Template>
+	</EnumSelector>
+	<EnumSelector RadioButtonStyle="CheckBox2" Name="valign" Caption="Vertical Alignment" EnumValue="{²CurrentVAlign}" />
+	<EnumSelector RadioButtonStyle="valignStyle" Name="valign1" Caption="Vertical Alignment" EnumValue="{²CurrentVAlign}" />
+	<EnumSelector RadioButtonStyle="valignStyle2" Name="valign2" Caption="Vertical Alignment" EnumValue="{²CurrentVAlign}" />
+</VerticalStack>
