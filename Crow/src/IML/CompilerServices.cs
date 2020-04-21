@@ -33,6 +33,7 @@ namespace Crow.IML
 		internal static MethodInfo miGetType = typeof(object).GetMethod("GetType");
 		internal static MethodInfo miParseEnum = typeof(Enum).GetMethod("Parse", BindingFlags.Static | BindingFlags.Public,
 			Type.DefaultBinder, new Type [] {typeof (Type), typeof (string), typeof (bool)}, null);
+		internal static MethodInfo miParseEnumInversedParams = typeof(CompilerServices).GetMethod ("ParseEnum", BindingFlags.Static | BindingFlags.NonPublic);
 
 		internal static MethodInfo miGetTypeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle");
 		internal static MethodInfo miGetEvent = typeof(Type).GetMethod("GetEvent", new Type[] {typeof(string)});
@@ -560,9 +561,17 @@ namespace Crow.IML
 						MethodInfo miParse = destType.GetMethod
 												("Parse", BindingFlags.Static | BindingFlags.Public,
 													Type.DefaultBinder, new Type [] { typeof (string) }, null);
-						if (miParse == null)
-							throw new Exception ("no Parse method found for: " + destType.FullName);
-						il.Emit (OpCodes.Call, miParse);
+						if (miParse == null) {
+							//TODO:find parse for enums destTypes
+							if (destType.IsEnum) {
+								il.Emit (OpCodes.Ldtoken, destType);//push destination property type for testing
+								il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
+								il.Emit (OpCodes.Call, CompilerServices.miParseEnumInversedParams);
+								il.Emit (OpCodes.Unbox_Any, destType);
+							} else
+								throw new Exception ("no Parse method found for: " + destType.FullName);
+						}else
+							il.Emit (OpCodes.Call, miParse);
 					}
 					//implicit conversion can't be defined from or to object base class,
 					//so we will check if object underlying type is one of the implicit converter of destType
@@ -598,6 +607,8 @@ namespace Crow.IML
 				}
 			}
 		}
+		internal static object ParseEnum (string str, Type enumType) => Enum.Parse (enumType, str);
+
 		internal static bool isValueType (object obj) => obj.GetType ().IsValueType;
 		/// <summary>
 		/// check type of current object on the stack and convert to dest type,
