@@ -32,8 +32,9 @@ namespace tests
 			//testFiles = new string [] { @"Interfaces/Experimental/testDock.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/welcome.crow" };
 			//testFiles = new string [] { @"Interfaces/TemplatedGroup/3.crow" };
-			//testFiles = new string [] { @"Interfaces/Divers/perfMeasures.crow" };
-			testFiles = new string [] { @"Interfaces/Divers/colorPicker2.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/testShape.crow" };
+			testFiles = new string [] { @"Interfaces/TemplatedControl/testEnumSelector.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/colorPicker2.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Group", "*.crow")).ToArray ();
@@ -124,6 +125,16 @@ namespace tests
 			set {
 				intValue = value;
 				NotifyValueChanged ("IntValue", intValue);
+			}
+		}
+		VerticalAlignment currentVAlign;
+		public VerticalAlignment CurrentVAlign {
+			get => currentVAlign;
+			set {
+				if (currentVAlign == value)
+					return;
+				currentVAlign = value;
+				NotifyValueChanged ("CurrentVAlign", currentVAlign);
 			}
 		}
 		void onSpinnerValueChange (object sender, ValueChangeEventArgs e)

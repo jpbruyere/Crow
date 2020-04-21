@@ -206,5 +206,11 @@ namespace tests
 
 	}
 
-
+	public static class Extensions
+	{
+		public static Fill GetIcon (this Alignment align)
+		{
+			return (Crow.Fill)Fill.Parse ("#images.valign.svg");
+		}
+	}
 }

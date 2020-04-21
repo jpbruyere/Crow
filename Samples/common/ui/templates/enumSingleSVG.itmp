@@ -1,4 +1,4 @@
 ﻿<Border Foreground="Grey" MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Grey}">
-	<Image Path="{./Tag}" Fit="True" Margin="1" CornerRadius="{./CornerRadius}"	
+	<Image Path="#images.valign.svg" Fit="True" Margin="1" SvgSub="{./Caption}" CornerRadius="{./CornerRadius}"	
 		Background="{./Background}"/>
 </Border>

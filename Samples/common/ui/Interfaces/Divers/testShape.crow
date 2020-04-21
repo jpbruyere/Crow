@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Container Fit="true" Background="Red" Tooltip="test tooltip" >
-	<Shape Foreground="Transparent" Background="DimGrey" Size="11,11" Path="M 5.5,0.5 L 10.5,10.5 L 0.5,10.5 Z"
-		MouseEnter="{Background=hgradient|0:DimGrey|0.5:RoyalBlue|1:Black}"
-		MouseLeave="{Background=DimGrey}"/>
-</Container>
+<VerticalStack>
+	<TextBox Text="{²../shape.Path}"/>	
+	<Shape Margin="0" Width="400" Height="400" Name="shape" Foreground="Blue" Background="DimGrey" Size="100,100" Path="M 5.5,0.5 L 10.5,10.5 L 0.5,10.5 Z G"/>			
+</VerticalStack>

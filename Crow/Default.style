@@ -206,7 +206,7 @@ ArrowBut {
 }
 HArrowBut {
 	MouseRepeat="true";
-    Focusable="true";
+	Focusable="true";
 	Foreground="Onyx";
 	Background="vgradient|0:Grey|1:DimGrey";
 	MouseDown="{Background=vgradient|0:White|0.4:DarkBlue|1:Jet}";
@@ -232,9 +232,8 @@ HScrollBar {
     Orientation = "Horizontal";
 }
 EnumSelector {
-    Orientation = "Vertical";
-    Height = "Fit";
-    Spacing = "0";
+    Width = "Fit";
+    Height = "Fit";    
 }
 labColor {
 	Margin="2";	

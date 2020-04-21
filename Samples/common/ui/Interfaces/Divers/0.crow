@@ -64,10 +64,10 @@
 					</VerticalStack>
 					<Splitter />
 					<VerticalStack Width="50%">
-						<RadioButton Style="RadioButton2" />
-						<RadioButton Style="RadioButton2" />
-						<RadioButton Style="RadioButton2" />
-						<RadioButton Style="RadioButton2" />
+						<RadioButton Style="CheckBox2" />
+						<RadioButton Style="CheckBox2" />
+						<RadioButton Style="CheckBox2" />
+						<RadioButton Style="CheckBox2" />
 					</VerticalStack>
 				</HorizontalStack>
 			</GroupBox>

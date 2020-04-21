@@ -15,6 +15,9 @@
 		<ProjectReference Include="..\..\Crow\Crow.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+	  <EmbeddedResource Remove="..\common\ui\templates\test.style" />
+	</ItemGroup>
+	<ItemGroup>
 		<Datas Include="..\data\**\*.*">
 			<Link>data\%(RecursiveDir)%(Filename)%(Extension)</Link>
 		</Datas>
@@ -29,5 +32,14 @@
 			<LogicalName>ui.%(Filename)%(Extension)</LogicalName>
 			<Link>Templates\%(Filename)%(Extension)</Link>
 		</EmbeddedResource>
-	</ItemGroup>	
+		<EmbeddedResource Include="..\common\samples.style" />
+		<EmbeddedResource Include="..\common\ui\images\**\*.*">
+			<LogicalName>images.%(Filename)%(Extension)</LogicalName>
+			<Link>Images\%(Filename)%(Extension)</Link>
+		</EmbeddedResource>
+		<EmbeddedResource Include="..\common\ui\Icons\*.*">
+			<LogicalName>Icons.%(Filename)%(Extension)</LogicalName>
+			<Link>Icons\%(Filename)%(Extension)</Link>
+		</EmbeddedResource>
+	</ItemGroup>
 </Project>
