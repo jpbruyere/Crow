@@ -57,7 +57,7 @@ namespace Crow
 		/** GLFW window native pointer and current native handle for mouse cursor */
 		IntPtr hWin, currentCursor;
 
-		protected virtual void InitSurface ()
+		void initSurface ()
 		{
 			Glfw3.Init ();
 
@@ -108,22 +108,20 @@ namespace Crow
 			windows [window].OnMouseMove ((int)xPosition, (int)yPosition);
 		};
 		static MouseButtonDelegate HandleMouseButtonDelegate = (IntPtr window, MouseButton button, InputAction action, Modifier mods) => {
-			if (action == InputAction.Press) {
-				windows [window].OnMouseButtonDown (button);
-			} else {
+			if (action == InputAction.Release)
 				windows [window].OnMouseButtonUp (button);
-			}
+			else//press and repeat
+				windows [window].OnMouseButtonDown (button);
+
 		};
 		static ScrollDelegate HandleScrollDelegate = (IntPtr window, double xOffset, double yOffset) => {
 			windows [window].OnMouseWheelChanged ((int)yOffset);
 		};
 		static KeyDelegate HandleKeyDelegate = (IntPtr window, Key key, int scanCode, InputAction action, Modifier modifiers) => {
-
-			if (action == InputAction.Press || action == InputAction.Repeat) {
-				windows [window].OnKeyDown (key);
-			} else {
+			if (action == InputAction.Release)
 				windows [window].OnKeyUp (key);
-			}
+			 else
+				windows [window].OnKeyDown (key);
 		};
 		static CharDelegate HandleCharDelegate = (IntPtr window, CodePoint codepoint) => {
 			windows [window].OnKeyPress (codepoint.ToChar());
@@ -163,12 +161,17 @@ namespace Crow
 			FontRenderingOptions.HintStyle = HintStyle.Full;
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Default;
 		}
-		public Interface(int width=800, int height=600, bool startUIThread = true)  {
+		public Interface (int width, int height, IntPtr glfwWindowHandle) : this(width, height, false, false)
+		{ 
+			hWin = glfwWindowHandle;
+		}
+		public Interface(int width=800, int height=600, bool startUIThread = true, bool createSurface = true)  {
 			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 			CurrentInterface = this;
 			clientRectangle = new Rectangle (0, 0, width, height);
 
-			InitSurface ();
+			if (createSurface)
+				initSurface ();
 
 			if (startUIThread) {
 				Thread t = new Thread (InterfaceThread) {
