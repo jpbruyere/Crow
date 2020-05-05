@@ -355,7 +355,7 @@ namespace Crow.Text
 				RegisterForGraphicUpdate ();
 			}
 		}
-		protected override int measureRawSize(LayoutingType lt)
+		public override int measureRawSize(LayoutingType lt)
 		{
 			if (lt == LayoutingType.Height)
 				return (int)Math.Ceiling((fe.Ascent+fe.Descent) * buffer.LineCount) + Margin * 2;
