@@ -417,7 +417,7 @@ namespace Crow {
 		Size cachedTextSize = default(Size);
 
 		#region GraphicObject overrides
-		protected override int measureRawSize(LayoutingType lt)
+		public override int measureRawSize(LayoutingType lt)
 		{
 			if (lines == null)
 				lines = getLines;

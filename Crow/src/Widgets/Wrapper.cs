@@ -118,7 +118,7 @@ namespace Crow
 		#endregion
 
 		#region GraphicObject Overrides
-		protected override int measureRawSize (LayoutingType lt)
+		public override int measureRawSize (LayoutingType lt)
 		{
 			int tmp = 0;
 			//Wrapper can't fit in the opposite direction of the wrapper, this func is called only if Fit

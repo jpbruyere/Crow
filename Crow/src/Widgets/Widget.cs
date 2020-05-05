@@ -1441,7 +1441,7 @@ namespace Crow
 		#region Layouting
 
 		/// <summary> return size of content + margins </summary>
-		protected virtual int measureRawSize (LayoutingType lt) {
+		public virtual int measureRawSize (LayoutingType lt) {
 			return lt == LayoutingType.Width ?
 				contentSize.Width + 2 * margin: contentSize.Height + 2 * margin;
 		}

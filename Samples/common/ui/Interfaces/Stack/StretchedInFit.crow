@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<VerticalStack Background="DimGrey" Margin="1" Width="Fit" Height="Fit">
+	<Label Text="this is a test" Margin="0" Width="Stretched" Height="Fit" Background="SeaGreen"/>
+	<Label Text="this is a test" Margin="0" Width="Stretched" Height="Fit" Background="SeaGreen"/>
+	<Label Text="this is a test" Margin="0" Width="Stretched" Height="Fit" Background="SeaGreen"/>
+	<Label Text="this is a test" Margin="0" Width="Stretched" Height="Fit" Background="SeaGreen" MinimumSize="5,5"/>
+</VerticalStack>

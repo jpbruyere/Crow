@@ -56,7 +56,7 @@ namespace Crow
 			else
 				layoutType &= (~LayoutingType.Y);			
 		}
-		protected override int measureRawSize (LayoutingType lt)
+		public override int measureRawSize (LayoutingType lt)
 		{
 			int totSpace = Math.Max(0, Spacing * (Children.Count (c => c.Visible) - 1));
 			if (lt == LayoutingType.Width) {
