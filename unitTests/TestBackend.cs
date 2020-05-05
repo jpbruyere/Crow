@@ -11,15 +11,15 @@ namespace unitTests
 	public class TestInterface : Interface
 	{
 		public TestInterface (int width = 800, int height = 600)
-			: base (width, height, false) {}
-		public bool IsRunning {
-			get => Running;
-			set => Running = value; 
-		}
-		protected override void InitSurface ()
-		{
+			: base (width, height, false, false) {
 			surf = new Crow.Cairo.ImageSurface (Crow.Cairo.Format.Argb32, ClientRectangle.Width, ClientRectangle.Height);
 		}
+		bool isRunning;
+		public bool IsRunning {
+			get => isRunning;
+			set => isRunning = value; 
+		}
+
 	}
 	[TestFixture]
 	public class TestBackend
@@ -31,13 +31,6 @@ namespace unitTests
 		{
 			iFace = new TestInterface (800, 600);
 			iFace.Init ();
-			iFace.IsRunning = true;
-		}
-
-		[OneTimeTearDown]
-		public void Cleanup ()
-		{
-			iFace.IsRunning = false;
 		}
 
 		//[SetUp] public void InitTest (){}

@@ -5,7 +5,7 @@
 <!--		<TargetFramework>net472</TargetFramework>-->
 		<OutputType>Exe</OutputType>
 		<StartupObject>Crow.Coding.Startup</StartupObject>
-		<ReleaseVersion>$(CrowVersion)</ReleaseVersion>
+		<ReleaseVersion>0.8.0</ReleaseVersion>
 		<AssemblyVersion>$(CrowVersion)</AssemblyVersion>
 		<EnableDefaultItems>false</EnableDefaultItems>
 	</PropertyGroup>
@@ -53,7 +53,7 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="3.4.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.4.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="3.4.0" />
-		<PackageReference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel"/>
+		<PackageReference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel" />
 	</ItemGroup>
 	
 	<ItemGroup>
