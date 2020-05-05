@@ -4,7 +4,7 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		
 		<AssemblyVersion>$(CrowVersion)</AssemblyVersion>
-		<ReleaseVersion>$(CrowVersion)</ReleaseVersion>
+		<ReleaseVersion>0.8.0</ReleaseVersion>
 		<Title>C# Rapid Open Widget Toolkit</Title>
 		<Description>C.R.O.W. is a widget toolkit and rendering engine developed in C# with templates, styles, compositing, and bindings.</Description>
 		<License>MIT</License>
