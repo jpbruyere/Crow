@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-<!--		<TargetFramework>netcoreapp3.1</TargetFramework>-->
-		<TargetFramework>net472</TargetFramework>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+<!--		<TargetFramework>net472</TargetFramework>-->
 		<OutputType>Exe</OutputType>
 		<StartupObject>Crow.Coding.Startup</StartupObject>
-		<ReleaseVersion>0.8.0</ReleaseVersion>
+		<ReleaseVersion>$(CrowVersion)</ReleaseVersion>
 		<AssemblyVersion>$(CrowVersion)</AssemblyVersion>
 		<EnableDefaultItems>false</EnableDefaultItems>
 	</PropertyGroup>
@@ -53,6 +53,7 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="3.4.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.4.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="3.4.0" />
+		<PackageReference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel"/>
 	</ItemGroup>
 	
 	<ItemGroup>

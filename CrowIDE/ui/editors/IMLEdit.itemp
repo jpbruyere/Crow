@@ -48,7 +48,7 @@
 		<Splitter Visible="{../editor.HasError}"/>
 		<Label DataSource="{../editor.Error}" Text="{}"
 			Visible="{../editor.HasError}"
-			Height="Fit" Width="Stretched" Background="DarkRed" Foreground="White"
+			Height="12" Width="Stretched" Background="DarkRed" Foreground="White"
 			TextAlignment="TopLeft" Multiline="true"/>
 	</VerticalStack>
 </TabItem>

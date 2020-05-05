@@ -15,9 +15,9 @@ namespace Crow.Coding
 {
 	public class DesignInterface : Interface
 	{
-		public DesignInterface () : base(){}
-		protected override void InitSurface ()
+		public DesignInterface () : base (100, 100, false, false)
 		{
+
 			surf = new ImageSurface (Format.Argb32, 100, 100);
 
 			loadStyling ();
