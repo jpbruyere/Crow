@@ -18,8 +18,8 @@ for:
     environment:
       APPVEYOR_SAVE_CACHE_ON_ERROR: true
     install:
-      - vcpkg install cairo
-      - vcpkg integrate install --recurse
+      - vcpkg install cairo --recurse
+      - vcpkg integrate install 
     build_script:
       - msbuild /p:Configuration=Release /t:restore
       - msbuild /p:Configuration=Release
