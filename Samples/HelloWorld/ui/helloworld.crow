@@ -1,4 +1,6 @@
 ﻿<?xml version="1.0"?>
-<Slider Height="20" Width="Stretched"/>
+<Window>
+	<Label Text="Hello World"/>
+</Window>
 
 
