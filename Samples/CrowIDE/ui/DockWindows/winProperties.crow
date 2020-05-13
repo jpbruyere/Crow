@@ -1,7 +1,0 @@
-﻿<?xml version="1.0"?>
-<DockWindow Name="winProperties" Caption="Properties"  Width="20%">
-	<MembersView DataSource="{CurrentSolution}" ProjectNode="{SelectedItem}"
-		Instance="{SelectedItemElement}" DataTest="Type"
-		ItemTemplate="#Crow.Coding.MembersItem.template"/>
-</DockWindow>
-
