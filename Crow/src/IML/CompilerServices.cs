@@ -269,7 +269,7 @@ namespace Crow.IML
 		static MemberInfo getMemberInfoWithReflexion(object instance, string member){
             Type t = instance.GetType();
 #if DEBUG_BINDING_FUNC_CALLS
-			Console.WriteLine ($"getMemberInfoWithReflexion ({instance},{member}); type:{t}");
+			System.Diagnostics.Debug.WriteLine ($"getMemberInfoWithReflexion ({instance},{member}); type:{t}");
 #endif
             MemberInfo mi = t.GetMember (member)?.FirstOrDefault();
 			if (mi == null)
@@ -278,7 +278,7 @@ namespace Crow.IML
 		}
 		static MethodInfo getMethodInfoWithReflexion(object instance, string method){
 #if DEBUG_BINDING_FUNC_CALLS
-            Console.WriteLine ($"getMethodInfoWithReflexion ({instance},{method}); type:{instance.GetType ()}");
+            System.Diagnostics.Debug.WriteLine ($"getMethodInfoWithReflexion ({instance},{method}); type:{instance.GetType ()}");
 #endif
             return instance.GetType ().GetMethod (method, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 		}
@@ -290,7 +290,7 @@ namespace Crow.IML
 		/// <param name="destMember">Destination member</param>
 		static void setValueWithReflexion(object dest, object value, string destMember){
 #if DEBUG_BINDING_FUNC_CALLS
-            Console.WriteLine ($"setValueWithReflexion (dest:{dest},value:{value},member:{destMember});");
+            System.Diagnostics.Debug.WriteLine ($"setValueWithReflexion (dest:{dest},value:{value},member:{destMember});");
 #endif
             Type destType = null;
 			Type origType = null;
@@ -337,7 +337,7 @@ namespace Crow.IML
 		/// </summary>
 		static object getValueWithReflexion(object instance, MemberInfo mi){
 #if DEBUG_BINDING_FUNC_CALLS
-            Console.WriteLine ($"getValueWithReflexion ({instance},{mi});");
+            System.Diagnostics.Debug.WriteLine ($"getValueWithReflexion ({instance},{mi});");
 #endif
             object tmp = null;
 			Type dstType = null;
@@ -379,7 +379,7 @@ namespace Crow.IML
 			if (knownExtMethods.ContainsKey (key))
 				return knownExtMethods [key];
 
-			//Console.WriteLine ($"*** search extension method: {t};{methodName} => key={key}");
+			//System.Diagnostics.Debug.WriteLine ($"*** search extension method: {t};{methodName} => key={key}");
 
 			MethodInfo mi = null;
 			mi = GetExtensionMethods (Assembly.GetEntryAssembly (), t, methodName);
@@ -983,7 +983,7 @@ namespace Crow.IML
 		//get value from member of object
 		internal static object getDataTypeAndFetch (object data, string fetchMethod){
 			Type dataType = data.GetType();
-			//Console.WriteLine ($"get data type and fetch {data}.{fetchMethod}");
+			//System.Diagnostics.Debug.WriteLine ($"get data type and fetch {data}.{fetchMethod}");
 			MethodInfo miGetDatas = dataType.GetMethod (fetchMethod, new Type[] {});
 			if (miGetDatas == null)
 				miGetDatas = CompilerServices.SearchExtMethod (dataType, fetchMethod);
@@ -1006,7 +1006,7 @@ namespace Crow.IML
 		//TODO:memberinfo found here must be cached
 		internal static object getValue (Type dataType, object data, string member)
 		{
-			//Console.WriteLine ($"get value: {dataType} ; {data} ; {member}");
+			//System.Diagnostics.Debug.WriteLine ($"get value: {dataType} ; {data} ; {member}");
 
 			MethodInfo miGetDatas = dataType.GetMethod (member, new Type [] { });
 			if (miGetDatas != null)

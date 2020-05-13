@@ -39,7 +39,7 @@ namespace Crow
 {
 	public class SolidColor : Fill
     {
-		public Color color = Color.Transparent;
+		public Color color = Colors.Transparent;
 		#region CTOR
 		public SolidColor(Color c)
 		{
@@ -50,11 +50,11 @@ namespace Crow
 		#region implemented abstract members of Fill
 		public override void SetAsSource (Context ctx, Rectangle bounds = default)
 		{
-			ctx.SetSourceRGBA (color.R, color.G, color.B, color.A);
+			ctx.SetSourceRGBA (color.R / 255.0, color.G / 255.0, color.B / 255.0, color.A / 255.0);
 		}
 		public static new object Parse(string s)
 		{
-			return new SolidColor((Color)s);
+			return new SolidColor((Color)Color.Parse(s));
 		}
 		#endregion
 
@@ -62,21 +62,16 @@ namespace Crow
         public static implicit operator Color(SolidColor c) => c.color;        
 		public static implicit operator SolidColor(Color c) => new SolidColor (c);
 
-		public static bool operator ==(SolidColor left, SolidColor right) => left?.color == right?.color;		
-		public static bool operator !=(SolidColor left, SolidColor right) => left?.color != right?.color;
+		//public static bool operator ==(SolidColor left, SolidColor right) => left?.color == right?.color;		
+		//public static bool operator !=(SolidColor left, SolidColor right) => left?.color != right?.color;
 
 		public override int GetHashCode ()
 		{
 			return color.GetHashCode();
 		}
 		public override bool Equals (object obj)
-		{
-			if (obj is Color)
-				return color == (Color)obj;
-			if (obj is SolidColor)
-				return color == (obj as SolidColor).color;
-			return false;			
-		}
+			=> obj is Color c ? color.Equals (c) : obj is SolidColor sc && color.Equals (sc.color);
+
 //		public static bool operator ==(SolidColor c, string n)
 //		{
 //			return c.color.Name == n ? true : false;

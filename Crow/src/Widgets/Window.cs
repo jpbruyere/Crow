@@ -31,8 +31,8 @@ namespace Crow
 		bool modal;
 		protected bool hoverBorder = false;
 		bool alwaysOnTop = false;
-		Fill titleBarBackground = Color.SteelBlue;
-		Fill titleBarForeground = Color.White;
+		Fill titleBarBackground = Colors.SteelBlue;
+		Fill titleBarForeground = Colors.White;
 
 		Rectangle savedBounds;
 		bool _minimized = false;

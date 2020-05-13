@@ -26,14 +26,14 @@ namespace Crow
 		public virtual Color CurrentColor {
 			get => currentColor;
 			set {
-				if (currentColor == value)
+				if (currentColor.Equals(value))
 					return;
 				currentColor = value;
 				NotifyValueChanged ("CurrentColor", currentColor);
 			}
 		}
 
-		public IList<Color> ColorList => Color.ColorDic.Values.OrderBy (c => c.Hue).ToList ();
+		//public IList<Color> ColorList => Enum.GetValues (typeof (Color)).ToList<Color> ();// Colors. ColorDic.Values.OrderBy (c => c.Hue).ToList ();
 	}
 }
 

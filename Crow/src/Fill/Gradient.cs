@@ -57,11 +57,11 @@ namespace Crow
 
 				if (parts.Length > 2)
 					throw new Exception ("too many parameters in color stop: " + s);
-				
-				if (parts.Length == 2)
-					return new ColorStop (double.Parse (parts [0]), (Color)parts [1]);
 
-				return new ColorStop (-1, (Color)parts [0]);
+				if (parts.Length == 2)
+					return new ColorStop (double.Parse (parts [0]), (Color)Color.Parse (parts [1]));
+
+				return new ColorStop (-1, Color.FromIml (parts [0]));
 			}
 		}
 		public Gradient.Type GradientType = Type.Vertical;
@@ -110,7 +110,7 @@ namespace Crow
 		public static new object Parse(string s)
 		{
 			if (string.IsNullOrEmpty (s))
-				return Color.White;
+				return Colors.White;
 
 			Crow.Gradient tmp;
 

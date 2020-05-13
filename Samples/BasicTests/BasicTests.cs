@@ -75,7 +75,7 @@ namespace tests
 					idx++;
 					break;
 				case Key.F1:
-					TestList.Add ("new string");
+					//TestList.Add ("new string");
 					NotifyValueChanged ("TestList", TestList);
 					break;
 				case Key.F4:
@@ -223,9 +223,9 @@ namespace tests
 			}
 		}
 
-		List<Color> testList = Color.ColorDic.Values//.OrderBy(c=>c.Hue)
+		List<Color> testList = null; //Color.ColorDic.Values//.OrderBy(c=>c.Hue)
 													//.ThenBy(c=>c.Value).ThenBy(c=>c.Saturation)
-			.ToList ();
+			//.ToList ();
 		public List<Color> TestList {
 			set {
 				testList = value;
@@ -259,7 +259,7 @@ namespace tests
 		void OnClear (object sender, MouseButtonEventArgs e) => TestList = null;
 
 		void OnLoadList (object sender, MouseButtonEventArgs e) => TestList =
-			Color.ColorDic.Values.OrderBy (c => c.Hue).ToList ();
+			null; //Color.ColorDic.Values.OrderBy (c => c.Hue).ToList ();
 
 		void command1 ()
 		{

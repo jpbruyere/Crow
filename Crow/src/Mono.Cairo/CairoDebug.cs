@@ -62,15 +62,15 @@ namespace Crow.Cairo {
 				return;
 
 			if (!disposing) {
-				Console.Error.WriteLine ("{0} is leaking, programmer is missing a call to Dispose", typeof(T).FullName);
+				System.Diagnostics.Debug.WriteLine ("{0} is leaking, programmer is missing a call to Dispose", typeof(T).FullName);
 				if (Enabled) {
 					string val;
 					if (traces.TryGetValue (obj, out val)) {
-						Console.Error.WriteLine ("Allocated from:");
-						Console.Error.WriteLine (val);
+						System.Diagnostics.Debug.WriteLine ("Allocated from:");
+						System.Diagnostics.Debug.WriteLine (val);
 					}
 				} else {
-					Console.Error.WriteLine ("Set MONO_CAIRO_DEBUG_DISPOSE to track allocation traces");
+					System.Diagnostics.Debug.WriteLine ("Set MONO_CAIRO_DEBUG_DISPOSE to track allocation traces");
 				}
 			}
 

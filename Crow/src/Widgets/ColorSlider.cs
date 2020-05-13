@@ -24,7 +24,7 @@ namespace Crow
 		Orientation orientation;
 		CursorType cursorType = CursorType.Pentagone;
 		ColorComponent component;
-		Color currentColor = Color.Black;
+		Color currentColor = Colors.Black;
 		double currentValue = -1;//force notify for property less binding 'CurrentValue'
 
 		[DefaultValue (Orientation.Horizontal)]

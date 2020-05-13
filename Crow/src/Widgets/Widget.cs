@@ -55,14 +55,14 @@ namespace Crow
 
 		internal void design_add_style_location (string memberName, string path, int line, int col) {			
 			if (design_style_locations.ContainsKey(memberName)){
-				Console.WriteLine ("default value localtion already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
+				System.Diagnostics.Debug.WriteLine ("default value localtion already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
 				return;
 			}
 			design_style_locations.Add(memberName, new FileLocation(path,line,col));
 		}
 //		internal void design_add_iml_location (string memberName, string path, int line, int col) {
 //			if (design_iml_locations.ContainsKey(memberName)){
-//				Console.WriteLine ("IML value localtion already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
+//				System.Diagnostics.Debug.WriteLine ("IML value localtion already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
 //				return;
 //			}
 //			design_iml_locations.Add(memberName, new FileLocation(path,line,col));
@@ -155,7 +155,7 @@ namespace Crow
 
 			if (disposing) {
 				#if DEBUG_DISPOSE
-				Console.WriteLine ("Disposing: {0}", this.ToString());
+				System.Diagnostics.Debug.WriteLine ("Disposing: {0}", this.ToString());
 				//if ()
 				//throw new Exception("Trying to dispose an object queued for Redraw: " + this.ToString());
 				#endif
@@ -256,8 +256,8 @@ namespace Crow
 		ILayoutable logicalParent;
 		ILayoutable parent;
 		string name;
-		Fill background = Color.Transparent;
-		Fill foreground = Color.White;
+		Fill background = Colors.Transparent;
+		Fill foreground = Colors.White;
 		Font font = "sans, 10";
 		protected Measure width, height;
 		int left, top;
@@ -779,10 +779,8 @@ namespace Crow
 				background = value;
 				NotifyValueChanged ("Background", background);
 				RegisterForRedraw ();
-				if (background is SolidColor) {
-					if ((background as SolidColor).Equals (Color.Clear))
-						clearBackground = true;
-				}
+				if (background is SolidColor sc && sc.Equals (Colors.Clear))
+					clearBackground = true;				
 			}
 		}
 		/// <summary>
@@ -1411,7 +1409,7 @@ namespace Crow
 		{
 #if DEBUG
 			if (disposed) {
-				Console.WriteLine ($"RegisterForGraphicUpdate for disposed Widget: {this}\n{System.Environment.StackTrace}");
+				System.Diagnostics.Debug.WriteLine ($"RegisterForGraphicUpdate for disposed Widget: {this}\n{System.Environment.StackTrace}");
 				return;
 			}
 #endif
@@ -1427,7 +1425,7 @@ namespace Crow
 		{
 #if DEBUG
 			if (disposed) {
-				Console.WriteLine ($"RegisterForRedraw for disposed Widget: {this}\n{System.Environment.StackTrace}");
+				System.Diagnostics.Debug.WriteLine ($"RegisterForRedraw for disposed Widget: {this}\n{System.Environment.StackTrace}");
 				return;
 			}
 #endif
@@ -1453,7 +1451,7 @@ namespace Crow
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
 #if DEBUG
 			if (disposed) {
-				Console.WriteLine ($"RegisterForLayouting({layoutType}) for disposed Widget: {this}\n{System.Environment.StackTrace}");
+				System.Diagnostics.Debug.WriteLine ($"RegisterForLayouting({layoutType}) for disposed Widget: {this}\n{System.Environment.StackTrace}");
 				return;
 			}
 #endif
@@ -1755,16 +1753,16 @@ namespace Crow
 #if DEBUG
 				Console.ForegroundColor = ConsoleColor.Red;
 				if (disposed)
-					Console.WriteLine ($"Paint disposed widget: {this}");
+					System.Diagnostics.Debug.WriteLine ($"Paint disposed widget: {this}");
 				Console.ForegroundColor = ConsoleColor.DarkRed;
 				if (Slot.Height < 0 || Slot.Width < 0)
-					Console.WriteLine ($"Paint slot invalid ({Slot}): {this}");
+					System.Diagnostics.Debug.WriteLine ($"Paint slot invalid ({Slot}): {this}");
 				Console.ForegroundColor = ConsoleColor.DarkMagenta;
 				if (parent == null)
-					Console.WriteLine ($"Paint with parent == null: {this}");
+					System.Diagnostics.Debug.WriteLine ($"Paint with parent == null: {this}");
 				Console.ForegroundColor = ConsoleColor.Magenta;
 				if (!isVisible)
-					Console.WriteLine ($"Paint invisible widget: {this}");
+					System.Diagnostics.Debug.WriteLine ($"Paint invisible widget: {this}");
 				Console.ForegroundColor = ConsoleColor.Gray;
 #endif
 				return; 

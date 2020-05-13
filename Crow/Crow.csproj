@@ -62,4 +62,12 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\glfw-sharp\glfw-sharp.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Compile Remove="src\Widgets\ColorPicker2.cs" />
+	  <Compile Remove="src\Widgets\ColorSlider.cs" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="src\Widgets\ColorPicker2.cs" />
+	  <None Include="src\Widgets\ColorSlider.cs" />
+	</ItemGroup>
 </Project>

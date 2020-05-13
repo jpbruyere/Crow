@@ -72,7 +72,7 @@ namespace Crow
 				try {
 					Assembly.LoadFrom (af);
 				} catch {
-					Console.WriteLine ("{0} not loaded as assembly.", af);
+					System.Diagnostics.Debug.WriteLine ("{0} not loaded as assembly.", af);
 				}
 			}
 
@@ -524,7 +524,7 @@ namespace Crow
 					throw new Exception ($"Assembly '{assemblyName}' not found for ressource '{path}'.");
 				stream = a.GetManifestResourceStream (resId);
 				/*foreach (var s in a.GetManifestResourceNames()) {
-					Console.WriteLine (s);
+					System.Diagnostics.Debug.WriteLine (s);
 				}*/
 				if (stream == null)
 					throw new Exception ("Resource not found: " + path);
@@ -890,7 +890,7 @@ namespace Crow
 							ctx.Restore ();
 							DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
 							IsDirty = true;
-							//Console.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
+							//System.Diagnostics.Debug.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
 						}
 					}
 
@@ -1155,7 +1155,7 @@ namespace Crow
 
 				currentCursor?.Dispose ();
 				currentCursor = createCursor (cursor);
-				Console.WriteLine ($"cursor=>{cursor}");
+				System.Diagnostics.Debug.WriteLine ($"cursor=>{cursor}");
 				currentCursor.Set (hWin);
 				//MouseCursorChanged.Raise (this,new MouseCursorChangedEventArgs(cursor));
 			}

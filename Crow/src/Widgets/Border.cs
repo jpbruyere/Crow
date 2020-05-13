@@ -54,8 +54,8 @@ namespace Crow
 		#region private fields
 		int _borderWidth;
 		BorderStyle _borderStyle;
-		Fill raisedColor = Color.Grey;
-		Fill sunkenColor = Color.DimGrey;
+		Fill raisedColor = Colors.Grey;
+		Fill sunkenColor = Colors.DimGrey;
 		#endregion
 
 		#region public properties

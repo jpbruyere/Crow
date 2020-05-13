@@ -68,7 +68,7 @@ namespace Crow
 		public virtual void AddChild(Widget g){
 #if DEBUG
 			if (disposed) {
-				Console.WriteLine ($"AddChild ({g}) in disposed Widget: {this}\n{System.Environment.StackTrace}");
+				System.Diagnostics.Debug.WriteLine ($"AddChild ({g}) in disposed Widget: {this}\n{System.Environment.StackTrace}");
 				return;
 			}
 #endif
@@ -117,7 +117,7 @@ namespace Crow
 		public virtual void InsertChild (int idx, Widget g) {
 #if DEBUG
 			if (disposed) {
-				Console.WriteLine ($"InsertChild ({idx},{g}) in disposed Widget: {this}\n{System.Environment.StackTrace}");
+				System.Diagnostics.Debug.WriteLine ($"InsertChild ({idx},{g}) in disposed Widget: {this}\n{System.Environment.StackTrace}");
 				return;
 			}
 #endif

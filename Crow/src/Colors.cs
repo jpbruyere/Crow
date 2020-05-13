@@ -8,118 +8,231 @@ using System.Linq;
 
 namespace Crow
 {
+	public enum Colors : UInt32
+	{
+		AliceBlue            = 0xF0F8FFFF,
+		AntiqueWhite         = 0xFAEBD7FF,
+		Aqua                 = 0x00FFFFFF,
+		Aquamarine           = 0x7FFFD4FF,
+		Azure                = 0xF0FFFFFF,
+		Beige                = 0xF5F5DCFF,
+		Bisque               = 0xFFE4C4FF,
+		Black                = 0x000000FF,
+		BlanchedAlmond       = 0xFFEBCDFF,
+		Blue                 = 0x0000FFFF,
+		BlueViolet           = 0x8A2BE2FF,
+		Brown                = 0xA52A2AFF,
+		BurlyWood            = 0xDEB887FF,
+		CadetBlue            = 0x5F9EA0FF,
+		Chartreuse           = 0x7FFF00FF,
+		Chocolate            = 0xD2691EFF,
+		Coral                = 0xFF7F50FF,
+		CornflowerBlue       = 0x6495EDFF,
+		Cornsilk             = 0xFFF8DCFF,
+		Crimson              = 0xDC143CFF,
+		Cyan                 = 0x00FFFFFF,
+		DarkBlue             = 0x00008BFF,
+		DarkCyan             = 0x008B8BFF,
+		DarkGoldenRod        = 0xB8860BFF,
+		DarkGrey             = 0xA9A9A9FF,
+		DarkGreen            = 0x006400FF,
+		DarkKhaki            = 0xBDB76BFF,
+		DarkMagenta          = 0x8B008BFF,
+		DarkOliveGreen       = 0x556B2FFF,
+		DarkOrange           = 0xFF8C00FF,
+		DarkOrchid           = 0x9932CCFF,
+		DarkRed              = 0x8B0000FF,
+		DarkSalmon           = 0xE9967AFF,
+		DarkSeaGreen         = 0x8FBC8FFF,
+		DarkSlateBlue        = 0x483D8BFF,
+		DarkSlateGrey        = 0x2F4F4FFF,
+		DarkTurquoise        = 0x00CED1FF,
+		DarkViolet           = 0x9400D3FF,
+		DeepPink             = 0xFF1493FF,
+		DeepSkyBlue          = 0x00BFFFFF,
+		DimGrey              = 0x696969FF,
+		DodgerBlue           = 0x1E90FFFF,
+		FireBrick            = 0xB22222FF,
+		FloralWhite          = 0xFFFAF0FF,
+		ForestGreen          = 0x228B22FF,
+		Fuchsia              = 0xFF00FFFF,
+		Gainsboro            = 0xDCDCDCFF,
+		GhostWhite           = 0xF8F8FFFF,
+		Gold                 = 0xFFD700FF,
+		GoldenRod            = 0xDAA520FF,
+		Grey                 = 0x808080FF,
+		Green                = 0x008000FF,
+		GreenYellow          = 0xADFF2FFF,
+		HoneyDew             = 0xF0FFF0FF,
+		HotPink              = 0xFF69B4FF,
+		IndianRed            = 0xCD5C5CFF,
+		Indigo               = 0x4B0082FF,
+		Ivory                = 0xFFFFF0FF,
+		Jet                  = 0x343434FF,
+		Khaki                = 0xF0E68CFF,
+		Lavender             = 0xE6E6FAFF,
+		LavenderBlush        = 0xFFF0F5FF,
+		LawnGreen            = 0x7CFC00FF,
+		LemonChiffon         = 0xFFFACDFF,
+		LightBlue            = 0xADD8E6FF,
+		LightCoral           = 0xF08080FF,
+		LightCyan            = 0xE0FFFFFF,
+		LightGoldenRodYellow = 0xFAFAD2FF,
+		LightGrey            = 0xD3D3D3FF,
+		LightGreen           = 0x90EE90FF,
+		LightPink            = 0xFFB6C1FF,
+		LightSalmon          = 0xFFA07AFF,
+		LightSeaGreen        = 0x20B2AAFF,
+		LightSkyBlue         = 0x87CEFAFF,
+		LightSlateGrey       = 0x778899FF,
+		LightSteelBlue       = 0xB0C4DEFF,
+		LightYellow          = 0xFFFFE0FF,
+		Lime                 = 0x00FF00FF,
+		LimeGreen            = 0x32CD32FF,
+		Linen                = 0xFAF0E6FF,
+		Magenta              = 0xFF00FFFF,
+		Maroon               = 0x800000FF,
+		MediumAquaMarine     = 0x66CDAAFF,
+		MediumBlue           = 0x0000CDFF,
+		MediumOrchid         = 0xBA55D3FF,
+		MediumPurple         = 0x9370DBFF,
+		MediumSeaGreen       = 0x3CB371FF,
+		MediumSlateBlue      = 0x7B68EEFF,
+		MediumSpringGreen    = 0x00FA9AFF,
+		MediumTurquoise      = 0x48D1CCFF,
+		MediumVioletRed      = 0xC71585FF,
+		MidnightBlue         = 0x191970FF,
+		MintCream            = 0xF5FFFAFF,
+		MistyRose            = 0xFFE4E1FF,
+		Moccasin             = 0xFFE4B5FF,
+		NavajoWhite          = 0xFFDEADFF,
+		Navy                 = 0x000080FF,
+		OldLace              = 0xFDF5E6FF,
+		Olive                = 0x808000FF,
+		OliveDrab            = 0x6B8E23FF,
+		Onyx                 = 0x353839FF,
+		Orange               = 0xFFA500FF,
+		OrangeRed            = 0xFF4500FF,
+		Orchid               = 0xDA70D6FF,
+		PaleGoldenRod        = 0xEEE8AAFF,
+		PaleGreen            = 0x98FB98FF,
+		PaleTurquoise        = 0xAFEEEEFF,
+		PaleVioletRed        = 0xDB7093FF,
+		PapayaWhip           = 0xFFEFD5FF,
+		PeachPuff            = 0xFFDAB9FF,
+		Peru                 = 0xCD853FFF,
+		Pink                 = 0xFFC0CBFF,
+		Plum                 = 0xDDA0DDFF,
+		PowderBlue           = 0xB0E0E6FF,
+		Purple               = 0x800080FF,
+		RebeccaPurple        = 0x663399FF,
+		Red                  = 0xFF0000FF,
+		RosyBrown            = 0xBC8F8FFF,
+		RoyalBlue            = 0x4169E1FF,
+		SaddleBrown          = 0x8B4513FF,
+		Salmon               = 0xFA8072FF,
+		SandyBrown           = 0xF4A460FF,
+		SeaGreen             = 0x2E8B57FF,
+		SeaShell             = 0xFFF5EEFF,
+		Sienna               = 0xA0522DFF,
+		Silver               = 0xC0C0C0FF,
+		SkyBlue              = 0x87CEEBFF,
+		SlateBlue            = 0x6A5ACDFF,
+		SlateGrey            = 0x708090FF,
+		Snow                 = 0xFFFAFAFF,
+		SpringGreen          = 0x00FF7FFF,
+		SteelBlue            = 0x4682B4FF,
+		Tan                  = 0xD2B48CFF,
+		Teal                 = 0x008080FF,
+		Thistle              = 0xD8BFD8FF,
+		Tomato               = 0xFF6347FF,
+		Turquoise            = 0x40E0D0FF,
+		Violet               = 0xEE82EEFF,
+		Wheat                = 0xF5DEB3FF,
+		White                = 0xFFFFFFFF,
+		WhiteSmoke           = 0xF5F5F5FF,
+		Yellow               = 0xFFFF00FF,
+		YellowGreen          = 0x9ACD32FF,
+
+		Transparent			 = 0x00,
+		Clear                = 0x01
+	}
+
 	/// <summary>
 	/// Universal Color structure
 	/// </summary>
-	public struct Color : IEquatable<Color>
+	public struct Color : IEquatable<Color>//, IEquatable<Colors>
     {
 		#region CTOR
-		public Color(double _R, double _G, double _B, double _A)
+		public Color(double r, double g, double b, double a)
 		{
-			A = _A.Clamp(0,1);
-			R = _R.Clamp(0,1);
-			G = _G.Clamp(0,1);
-			B = _B.Clamp(0,1);
-			predefinied = false;
-			htmlCode = "";
-			Name = "";
+			value =
+				(((uint)Math.Round (r * 255.0)) << 24) +
+				(((uint)Math.Round (g * 255.0)) << 16) +
+				(((uint)Math.Round (b * 255.0)) << 8) +
+				(((uint)Math.Round (a * 255.0)));
 		}
-		internal Color(double _R, double _G, double _B, double _A, string _name)
+		public Color(uint r, uint g, uint b, uint a)
 		{
-			A = _A;
-			R = _R;
-			G = _G;
-			B = _B;
-			predefinied = false;
-			Name = _name;
-			htmlCode = "";
-			ColorDic.Add(_name,this);
+			value =
+				((r & 0xFF) << 24) +
+				((g & 0xFF) << 16) +
+				((b & 0xFF) << 8) +
+				((a & 0xFF));
 		}
-		internal Color(int _R, int _G, int _B, string _name, string _code)
+		public Color (byte r, byte g, byte b, byte a)
 		{
-			A = 1.0;
-			R = _R / 255.0;
-			G = _G / 255.0;
-			B = _B / 255.0;
-			Name = _name;
-			htmlCode = _code;
-			predefinied = true;
-			ColorDic.Add(_name,this);
+			value = ((uint)r << 24) + ((uint)g << 16) + ((uint)b << 8) + a;
+		}
+		public Color (UInt32 rgba)
+		{
+			this.value = rgba;
+		}
+		public Color (Colors color)
+		{
+			this.value = (UInt32)color;
 		}
 		#endregion
+		//rgba
+		UInt32 value;
 
-		/// <summary>
-		/// color names dictionary
-		/// </summary>
-		public static Dictionary<string, Color> ColorDic = new Dictionary<string, Color>();
+		public uint R {
+			get => (value & 0xFF000000) >> 24;
+			set => this.value = (value & 0x000000FF) << 24;
+		}
+		public uint G {
+			get => (value & 0x00FF0000) >> 16;
+			set => this.value = (value & 0x000000FF) << 16;
+		}
+		public uint B {
+			get => (value & 0x0000FF00) >> 8;
+			set => this.value = (value & 0x000000FF) << 8;
+		}
+		public uint A {
+			get => (value & 0x000000FF);
+			set => this.value = (value & 0x000000FF);
+		}
 
-		public string Name;
+
+
+
+		/*public string Name;
 		public string htmlCode;
-		internal bool predefinied;
-
-		#region public fields
-        public double A;
-        public double R;
-        public double G;
-		public double B;
-		#endregion
+		internal bool predefinied;*/
 
 		#region Operators
-        public static implicit operator string(Color c)
-        {
-            return c.ToString();
-        }
-		public static implicit operator Color(string s)
-		{
-			if (string.IsNullOrEmpty(s))
-				return White;
-			Color cc = default(Color);
-			if (s.StartsWith ("#", StringComparison.Ordinal)) {
-				cc.R = int.Parse (s.Substring (1, 2), System.Globalization.NumberStyles.HexNumber) / 255.0;
-				cc.G = int.Parse (s.Substring (3, 2), System.Globalization.NumberStyles.HexNumber) / 255.0;
-				cc.B = int.Parse (s.Substring (5, 2), System.Globalization.NumberStyles.HexNumber) / 255.0;
-				if (s.Length > 7)
-					cc.A = int.Parse (s.Substring (7, 2), System.Globalization.NumberStyles.HexNumber) / 255.0;
-				else
-					cc.A = 1.0;
-				return cc;
-			}
+		/*public static implicit operator string(Color c) => c.ToString();
 
-			if (char.IsLetter(s[0])){
-				if (ColorDic.ContainsKey (s))
-					return ColorDic[s];
-				throw new Exception ("Unknown color name: " + s);
-			}
+		public static implicit operator UInt32 (Color c) => c.value;*/
 
-			string[] c = s.Split(new char[] { ',' });
-							
-			return new Color(
-				double.Parse(c[0]),
-				double.Parse(c[1]),
-				double.Parse(c[2]),
-				double.Parse(c[3]));
-		}
+		/*public static implicit operator Color(string s)
+		{
+		}*/
 
-		public static bool operator ==(Color c, string n)
-		{
-			return n.StartsWith("#", StringComparison.Ordinal) ?
-				string.Equals(c.HtmlCode, n, StringComparison.Ordinal) :
-				string.Equals(c.Name, n, StringComparison.Ordinal);
-		}
-		public static bool operator !=(Color c, string n)
-		{
-			return n.StartsWith("#", StringComparison.Ordinal) ?
-				!string.Equals(c.HtmlCode, n, StringComparison.Ordinal) :
-				!string.Equals(c.Name, n, StringComparison.Ordinal);
-		}
-		public static bool operator ==(string n, Color c)
-		{
-			return string.Equals (c.Name, n, StringComparison.Ordinal);
-		}
-		public static bool operator !=(string n, Color c)
-		{
-			return !string.Equals (c.Name, n, StringComparison.Ordinal);
-		}
+		public static implicit operator Color (Colors c) => new Color ((UInt32)c);
+		public static bool operator ==(Color a, Color b) => a.Equals (b);
+		public static bool operator != (Color a, Color b) => !a.Equals (b);
+
 		public static Color operator *(Color c, Double f)
 		{
 			return new Color(c.R,c.G,c.B,c.A * f);
@@ -185,20 +298,12 @@ namespace Crow
 		public double Value => Math.Max (R, Math.Max (G, B));   //Max. value of RGB
 
 		public string HtmlCode {
-			get { 
-				string tmp = "#" +
-					((int)Math.Round (R * 255.0)).ToString ("X2") +
-					((int)Math.Round (G * 255.0)).ToString ("X2") +
-					((int)Math.Round (B * 255.0)).ToString ("X2");
-				if (A < 1.0)
-					tmp += ((int)Math.Round(A * 255.0)).ToString ("X2");
-				return tmp;
+			get {
+				string tmp = $"#{R:X2}{G:X2}{B:X2}";
+				return A == 0xFF ? tmp : $"{tmp}{A:X2}";
 			}
 		}
-		public float[] floatArray
-		{
-			get { return new float[]{ (float)R, (float)G, (float)B, (float)A }; }
-		}
+		public float[] floatArray => new float[]{ R / 255f, G / 255f, B / 255f, A / 255f };
 		/// <summary>
 		/// return a copy of the color with the alpha component modified
 		/// </summary>
@@ -208,199 +313,40 @@ namespace Crow
 		{
 			return new Color (this.R, this.G, this.B, _A);
 		}
-		public void ResetName(){
-			Name = "";
-			htmlCode = "";
-			predefinied = false;
-		}
-
-		#region Predefined colors
-        public static readonly Color Transparent = new Color(0, 0, 0, 0, "Transparent");
-		public static readonly Color Clear = new Color(-1, -1, -1, -1, "Clear");
-		public static readonly Color AliceBlue = new Color(240,248,255,"AliceBlue","#F0F8FF");
-		public static readonly Color AntiqueWhite = new Color(250,235,215,"AntiqueWhite","#FAEBD7");
-		public static readonly Color Aqua = new Color(0,255,255,"Aqua","#00FFFF");
-		public static readonly Color Aquamarine = new Color(127,255,212,"Aquamarine","#7FFFD4");
-		public static readonly Color Azure = new Color(240,255,255,"Azure","#F0FFFF");
-		public static readonly Color Beige = new Color(245,245,220,"Beige","#F5F5DC");
-		public static readonly Color Bisque = new Color(255,228,196,"Bisque","#FFE4C4");
-		public static readonly Color Black = new Color(0,0,0,"Black","#000000");
-		public static readonly Color BlanchedAlmond = new Color(255,235,205,"BlanchedAlmond","#FFEBCD");
-		public static readonly Color Blue = new Color(0,0,255,"Blue","#0000FF");
-		public static readonly Color BlueViolet = new Color(138,43,226,"BlueViolet","#8A2BE2");
-		public static readonly Color Brown = new Color(165,42,42,"Brown","#A52A2A");
-		public static readonly Color BurlyWood = new Color(222,184,135,"BurlyWood","#DEB887");
-		public static readonly Color CadetBlue = new Color(95,158,160,"CadetBlue","#5F9EA0");
-		public static readonly Color Chartreuse = new Color(127,255,0,"Chartreuse","#7FFF00");
-		public static readonly Color Chocolate = new Color(210,105,30,"Chocolate","#D2691E");
-		public static readonly Color Coral = new Color(255,127,80,"Coral","#FF7F50");
-		public static readonly Color CornflowerBlue = new Color(100,149,237,"CornflowerBlue","#6495ED");
-		public static readonly Color Cornsilk = new Color(255,248,220,"Cornsilk","#FFF8DC");
-		public static readonly Color Crimson = new Color(220,20,60,"Crimson","#DC143C");
-		public static readonly Color Cyan = new Color(0,255,255,"Cyan","#00FFFF");
-		public static readonly Color DarkBlue = new Color(0,0,139,"DarkBlue","#00008B");
-		public static readonly Color DarkCyan = new Color(0,139,139,"DarkCyan","#008B8B");
-		public static readonly Color DarkGoldenRod = new Color(184,134,11,"DarkGoldenRod","#B8860B");
-		public static readonly Color DarkGrey = new Color(169,169,169,"DarkGrey","#A9A9A9");
-		public static readonly Color DarkGreen = new Color(0,100,0,"DarkGreen","#006400");
-		public static readonly Color DarkKhaki = new Color(189,183,107,"DarkKhaki","#BDB76B");
-		public static readonly Color DarkMagenta = new Color(139,0,139,"DarkMagenta","#8B008B");
-		public static readonly Color DarkOliveGreen = new Color(85,107,47,"DarkOliveGreen","#556B2F");
-		public static readonly Color DarkOrange = new Color(255,140,0,"DarkOrange","#FF8C00");
-		public static readonly Color DarkOrchid = new Color(153,50,204,"DarkOrchid","#9932CC");
-		public static readonly Color DarkRed = new Color(139,0,0,"DarkRed","#8B0000");
-		public static readonly Color DarkSalmon = new Color(233,150,122,"DarkSalmon","#E9967A");
-		public static readonly Color DarkSeaGreen = new Color(143,188,143,"DarkSeaGreen","#8FBC8F");
-		public static readonly Color DarkSlateBlue = new Color(72,61,139,"DarkSlateBlue","#483D8B");
-		public static readonly Color DarkSlateGrey = new Color(47,79,79,"DarkSlateGrey","#2F4F4F");
-		public static readonly Color DarkTurquoise = new Color(0,206,209,"DarkTurquoise","#00CED1");
-		public static readonly Color DarkViolet = new Color(148,0,211,"DarkViolet","#9400D3");
-		public static readonly Color DeepPink = new Color(255,20,147,"DeepPink","#FF1493");
-		public static readonly Color DeepSkyBlue = new Color(0,191,255,"DeepSkyBlue","#00BFFF");
-		public static readonly Color DimGrey = new Color(105,105,105,"DimGrey","#696969");
-		public static readonly Color DodgerBlue = new Color(30,144,255,"DodgerBlue","#1E90FF");
-		public static readonly Color FireBrick = new Color(178,34,34,"FireBrick","#B22222");
-		public static readonly Color FloralWhite = new Color(255,250,240,"FloralWhite","#FFFAF0");
-		public static readonly Color ForestGreen = new Color(34,139,34,"ForestGreen","#228B22");
-		public static readonly Color Fuchsia = new Color(255,0,255,"Fuchsia","#FF00FF");
-		public static readonly Color Gainsboro = new Color(220,220,220,"Gainsboro","#DCDCDC");
-		public static readonly Color GhostWhite = new Color(248,248,255,"GhostWhite","#F8F8FF");
-		public static readonly Color Gold = new Color(255,215,0,"Gold","#FFD700");
-		public static readonly Color GoldenRod = new Color(218,165,32,"GoldenRod","#DAA520");
-		public static readonly Color Grey = new Color(128,128,128,"Grey","#808080");
-		public static readonly Color Green = new Color(0,128,0,"Green","#008000");
-		public static readonly Color GreenYellow = new Color(173,255,47,"GreenYellow","#ADFF2F");
-		public static readonly Color HoneyDew = new Color(240,255,240,"HoneyDew","#F0FFF0");
-		public static readonly Color HotPink = new Color(255,105,180,"HotPink","#FF69B4");
-		public static readonly Color IndianRed = new Color(205,92,92,"IndianRed","#CD5C5C");
-		public static readonly Color Indigo = new Color(75,0,130,"Indigo","#4B0082");
-		public static readonly Color Ivory = new Color(255,255,240,"Ivory","#FFFFF0");
-		public static readonly Color Jet = new Color(52,52,52,"Jet","#343434");
-		public static readonly Color Khaki = new Color(240,230,140,"Khaki","#F0E68C");
-		public static readonly Color Lavender = new Color(230,230,250,"Lavender","#E6E6FA");
-		public static readonly Color LavenderBlush = new Color(255,240,245,"LavenderBlush","#FFF0F5");
-		public static readonly Color LawnGreen = new Color(124,252,0,"LawnGreen","#7CFC00");
-		public static readonly Color LemonChiffon = new Color(255,250,205,"LemonChiffon","#FFFACD");
-		public static readonly Color LightBlue = new Color(173,216,230,"LightBlue","#ADD8E6");
-		public static readonly Color LightCoral = new Color(240,128,128,"LightCoral","#F08080");
-		public static readonly Color LightCyan = new Color(224,255,255,"LightCyan","#E0FFFF");
-		public static readonly Color LightGoldenRodYellow = new Color(250,250,210,"LightGoldenRodYellow","#FAFAD2");
-		public static readonly Color LightGrey = new Color(211,211,211,"LightGrey","#D3D3D3");
-		public static readonly Color LightGreen = new Color(144,238,144,"LightGreen","#90EE90");
-		public static readonly Color LightPink = new Color(255,182,193,"LightPink","#FFB6C1");
-		public static readonly Color LightSalmon = new Color(255,160,122,"LightSalmon","#FFA07A");
-		public static readonly Color LightSeaGreen = new Color(32,178,170,"LightSeaGreen","#20B2AA");
-		public static readonly Color LightSkyBlue = new Color(135,206,250,"LightSkyBlue","#87CEFA");
-		public static readonly Color LightSlateGrey = new Color(119,136,153,"LightSlateGrey","#778899");
-		public static readonly Color LightSteelBlue = new Color(176,196,222,"LightSteelBlue","#B0C4DE");
-		public static readonly Color LightYellow = new Color(255,255,224,"LightYellow","#FFFFE0");
-		public static readonly Color Lime = new Color(0,255,0,"Lime","#00FF00");
-		public static readonly Color LimeGreen = new Color(50,205,50,"LimeGreen","#32CD32");
-		public static readonly Color Linen = new Color(250,240,230,"Linen","#FAF0E6");
-		public static readonly Color Magenta = new Color(255,0,255,"Magenta","#FF00FF");
-		public static readonly Color Maroon = new Color(128,0,0,"Maroon","#800000");
-		public static readonly Color MediumAquaMarine = new Color(102,205,170,"MediumAquaMarine","#66CDAA");
-		public static readonly Color MediumBlue = new Color(0,0,205,"MediumBlue","#0000CD");
-		public static readonly Color MediumOrchid = new Color(186,85,211,"MediumOrchid","#BA55D3");
-		public static readonly Color MediumPurple = new Color(147,112,219,"MediumPurple","#9370DB");
-		public static readonly Color MediumSeaGreen = new Color(60,179,113,"MediumSeaGreen","#3CB371");
-		public static readonly Color MediumSlateBlue = new Color(123,104,238,"MediumSlateBlue","#7B68EE");
-		public static readonly Color MediumSpringGreen = new Color(0,250,154,"MediumSpringGreen","#00FA9A");
-		public static readonly Color MediumTurquoise = new Color(72,209,204,"MediumTurquoise","#48D1CC");
-		public static readonly Color MediumVioletRed = new Color(199,21,133,"MediumVioletRed","#C71585");
-		public static readonly Color MidnightBlue = new Color(25,25,112,"MidnightBlue","#191970");
-		public static readonly Color MintCream = new Color(245,255,250,"MintCream","#F5FFFA");
-		public static readonly Color MistyRose = new Color(255,228,225,"MistyRose","#FFE4E1");
-		public static readonly Color Moccasin = new Color(255,228,181,"Moccasin","#FFE4B5");
-		public static readonly Color NavajoWhite = new Color(255,222,173,"NavajoWhite","#FFDEAD");
-		public static readonly Color Navy = new Color(0,0,128,"Navy","#000080");
-		public static readonly Color OldLace = new Color(253,245,230,"OldLace","#FDF5E6");
-		public static readonly Color Olive = new Color(128,128,0,"Olive","#808000");
-		public static readonly Color OliveDrab = new Color(107,142,35,"OliveDrab","#6B8E23");
-		public static readonly Color Onyx = new Color(53,56,57,"Onyx","#353839");
-		public static readonly Color Orange = new Color(255,165,0,"Orange","#FFA500");
-		public static readonly Color OrangeRed = new Color(255,69,0,"OrangeRed","#FF4500");
-		public static readonly Color Orchid = new Color(218,112,214,"Orchid","#DA70D6");
-		public static readonly Color PaleGoldenRod = new Color(238,232,170,"PaleGoldenRod","#EEE8AA");
-		public static readonly Color PaleGreen = new Color(152,251,152,"PaleGreen","#98FB98");
-		public static readonly Color PaleTurquoise = new Color(175,238,238,"PaleTurquoise","#AFEEEE");
-		public static readonly Color PaleVioletRed = new Color(219,112,147,"PaleVioletRed","#DB7093");
-		public static readonly Color PapayaWhip = new Color(255,239,213,"PapayaWhip","#FFEFD5");
-		public static readonly Color PeachPuff = new Color(255,218,185,"PeachPuff","#FFDAB9");
-		public static readonly Color Peru = new Color(205,133,63,"Peru","#CD853F");
-		public static readonly Color Pink = new Color(255,192,203,"Pink","#FFC0CB");
-		public static readonly Color Plum = new Color(221,160,221,"Plum","#DDA0DD");
-		public static readonly Color PowderBlue = new Color(176,224,230,"PowderBlue","#B0E0E6");
-		public static readonly Color Purple = new Color(128,0,128,"Purple","#800080");
-		public static readonly Color RebeccaPurple = new Color(102,51,153,"RebeccaPurple","#663399");
-		public static readonly Color Red = new Color(255,0,0,"Red","#FF0000");
-		public static readonly Color RosyBrown = new Color(188,143,143,"RosyBrown","#BC8F8F");
-		public static readonly Color RoyalBlue = new Color(65,105,225,"RoyalBlue","#4169E1");
-		public static readonly Color SaddleBrown = new Color(139,69,19,"SaddleBrown","#8B4513");
-		public static readonly Color Salmon = new Color(250,128,114,"Salmon","#FA8072");
-		public static readonly Color SandyBrown = new Color(244,164,96,"SandyBrown","#F4A460");
-		public static readonly Color SeaGreen = new Color(46,139,87,"SeaGreen","#2E8B57");
-		public static readonly Color SeaShell = new Color(255,245,238,"SeaShell","#FFF5EE");
-		public static readonly Color Sienna = new Color(160,82,45,"Sienna","#A0522D");
-		public static readonly Color Silver = new Color(192,192,192,"Silver","#C0C0C0");
-		public static readonly Color SkyBlue = new Color(135,206,235,"SkyBlue","#87CEEB");
-		public static readonly Color SlateBlue = new Color(106,90,205,"SlateBlue","#6A5ACD");
-		public static readonly Color SlateGrey = new Color(112,128,144,"SlateGrey","#708090");
-		public static readonly Color Snow = new Color(255,250,250,"Snow","#FFFAFA");
-		public static readonly Color SpringGreen = new Color(0,255,127,"SpringGreen","#00FF7F");
-		public static readonly Color SteelBlue = new Color(70,130,180,"SteelBlue","#4682B4");
-		public static readonly Color Tan = new Color(210,180,140,"Tan","#D2B48C");
-		public static readonly Color Teal = new Color(0,128,128,"Teal","#008080");
-		public static readonly Color Thistle = new Color(216,191,216,"Thistle","#D8BFD8");
-		public static readonly Color Tomato = new Color(255,99,71,"Tomato","#FF6347");
-		public static readonly Color Turquoise = new Color(64,224,208,"Turquoise","#40E0D0");
-		public static readonly Color Violet = new Color(238,130,238,"Violet","#EE82EE");
-		public static readonly Color Wheat = new Color(245,222,179,"Wheat","#F5DEB3");
-		public static readonly Color White = new Color(255,255,255,"White","#FFFFFF");
-		public static readonly Color WhiteSmoke = new Color(245,245,245,"WhiteSmoke","#F5F5F5");
-		public static readonly Color Yellow = new Color(255,255,0,"Yellow","#FFFF00");
-		public static readonly Color YellowGreen = new Color(154,205,50,"YellowGreen","#9ACD32");
-
-		#endregion
 
 		public override bool Equals (object obj)
 			=> obj is Color c && Equals(c);
+		/*public bool Equals (Colors other)
+			=> value == (UInt32)other;*/
+
 		public bool Equals (Color other)
-		{
-			if (predefinied & other.predefinied)
-				return htmlCode == other.htmlCode;
-			return A == other.A && R == other.R && G == other.G && B == other.B;
-		}
+			=> value == other.value;
+		
 
 		public override int GetHashCode ()
-		{
-			unchecked // Overflow is fine, just wrap
-			{
-				int hash = 17;
-				// Suitable nullity checks etc, of course :)
-				hash = hash * 23 + A.GetHashCode ();
-				hash = hash * 23 + R.GetHashCode ();
-				hash = hash * 23 + G.GetHashCode ();
-				hash = hash * 23 + B.GetHashCode ();
-				return hash;
-			}
-		}
+			=> value.GetHashCode ();
 
 		public override string ToString()
+			=> Enum.IsDefined (typeof (Colors), value) ? ((Colors)value).ToString () : HtmlCode;
+			
+		public static Color FromIml (string iml)
 		{
-			if (!string.IsNullOrEmpty(Name))
-				return Name;
-			if (!string.IsNullOrEmpty (htmlCode))
-				return htmlCode;
-			string hc = HtmlCode;
-			Color pc = ColorDic.Values.FirstOrDefault (c => c.htmlCode == hc);
-			return pc.predefinied ? pc.Name : hc;
+			string [] c = iml.Split (new char [] { ',' });
+			return new Color (
+				double.Parse (c [0]),
+				double.Parse (c [1]),
+				double.Parse (c [2]),
+				double.Parse (c [3]));
 		}
 
-        public static object Parse(string s)
-        {
-            return (Color)s;
-        }
+		public static object Parse(string s)
+			=> (string.IsNullOrEmpty (s)) ? new Color (Colors.White) :
+				(s.StartsWith ("#", StringComparison.Ordinal)) ? new Color (UInt32.Parse (s.Substring (1), System.Globalization.NumberStyles.HexNumber)) :
+				(char.IsDigit(s[0])) ? FromIml (s) :
+				(Enum.TryParse<Colors> (s, out Colors cc)) ? new Color(cc) :
+				throw new Exception ("Unknown color name: " + s);
+
+
 		public static Color FromHSV (double _h, double _v = 1.0, double _s = 1.0, double _alpha = 1.0) {
 			double H = _h * 360;
 			double C = _v * _s;
@@ -421,6 +367,5 @@ namespace Crow
 
 			return new Color (C + m, X + m, m, _alpha);
 		}
-
 	}
 }

@@ -141,8 +141,8 @@ namespace Crow {
 					return;
 
 				if (selColoring && _selectedIndex >= 0 && Items.Count > _selectedIndex) {
-					Items[_selectedIndex].Foreground = Color.Transparent;
-					Items[_selectedIndex].Background = Color.Transparent;
+					Items[_selectedIndex].Foreground = Colors.Transparent;
+					Items[_selectedIndex].Background = Colors.Transparent;
 				}
 
 				_selectedIndex = value;
@@ -344,7 +344,7 @@ namespace Crow {
 			/*} catch (Exception ex) {
 				if (Monitor.IsEntered (IFace.LayoutMutex))
 					Monitor.Exit (IFace.LayoutMutex);
-				Console.WriteLine ("loading thread aborted: " + ex.ToString());
+				System.Diagnostics.Debug.WriteLine ("loading thread aborted: " + ex.ToString());
 			}*/
 
 		}

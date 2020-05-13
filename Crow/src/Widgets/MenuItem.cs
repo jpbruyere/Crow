@@ -186,7 +186,7 @@ namespace Crow
 			MenuItem tmp = LogicalParent as MenuItem;
 			while (tmp != null) {
 				tmp.IsOpened = false;
-				tmp.Background = Color.Transparent;
+				tmp.Background = Colors.Transparent;
 				tmp.AutomaticOpening = false;
 				tmp = tmp.LogicalParent as MenuItem;
 			}

@@ -25,7 +25,7 @@ namespace Crow
 		int tabOffset;
 		bool isSelected;
 		//Measure tabThickness;
-		Fill selectedBackground = Color.Transparent;
+		Fill selectedBackground = Colors.Transparent;
 		#endregion
 
 		#region TemplatedControl overrides

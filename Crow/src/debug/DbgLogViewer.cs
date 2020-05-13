@@ -174,7 +174,7 @@ namespace Crow
 			else {
 				DbgGo go = objs.Where (o => o.instanceNum == evt.data.objInstanceNum).FirstOrDefault ();
 				if (go == null)
-					Console.WriteLine ("Unknown instance: " + evt.data.objInstanceNum);
+					System.Diagnostics.Debug.WriteLine ("Unknown instance: " + evt.data.objInstanceNum);
 				else
 					go.events.Add (evt);						
 			}

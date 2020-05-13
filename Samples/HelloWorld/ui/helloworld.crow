@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
-<Window Width="200" Height="200">
-	<TextBox Text="Hello World" Background="Blue"/>
-</Window>
+<Container Margin="10" Background="Jet">
+	<!--<Widget Width="200" Height="200" Background="Blue"/>-->
+</Container>
 
 

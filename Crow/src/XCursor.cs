@@ -121,7 +121,7 @@ namespace Crow
 				tmp.data [i * 4 + 2] = sr.ReadByte ();
 				tmp.data [i * 4 + 3] = sr.ReadByte ();
 
-				//Console.WriteLine ($"{tmp.data [i * 4 + 3],2:X} {tmp.data [i * 4 + 0],2:X} {tmp.data [i * 4 + 1],2:X} {tmp.data [i * 4 + 2],2:X}");
+				//System.Diagnostics.Debug.WriteLine ($"{tmp.data [i * 4 + 3],2:X} {tmp.data [i * 4 + 0],2:X} {tmp.data [i * 4 + 1],2:X} {tmp.data [i * 4 + 2],2:X}");
 			}
 			//tmp.data = sr.ReadBytes((int)(tmp.Width * tmp.Height * 4));
 			/*using(Stream fs = new FileStream($"/tmp/test.bin_{tmp.Width}", FileMode.Create))

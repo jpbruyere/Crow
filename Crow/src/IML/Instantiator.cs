@@ -977,7 +977,7 @@ namespace Crow.IML {
 		void emitDataSourceBindings (IMLContext ctx, BindingDefinition bindingDef, Type dsType)
 		{
 #if DEBUG_BINDING_FUNC_CALLS
-			Console.WriteLine ($"emitDataSourceBindings with data type knows: {bindingDef}");
+			System.Diagnostics.Debug.WriteLine ($"emitDataSourceBindings with data type knows: {bindingDef}");
 #endif
 			DynamicMethod dm = null;
 			ILGenerator il = null;
@@ -1157,7 +1157,7 @@ namespace Crow.IML {
 		public Delegate emitDataSourceBindings (PropertyInfo piSource, BindingDefinition bindingDef){		
 
 #if DEBUG_BINDING_FUNC_CALLS
-			Console.WriteLine ($"emitDataSourceBindings: {bindingDef}");
+			System.Diagnostics.Debug.WriteLine ($"emitDataSourceBindings: {bindingDef}");
 #endif
 			DynamicMethod dm = null;
 			ILGenerator il = null;

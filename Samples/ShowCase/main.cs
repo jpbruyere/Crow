@@ -169,7 +169,7 @@ namespace tests
 			}
 			get { return List2; }
 		}
-		IList<Color> testList = Color.ColorDic.Values.OrderBy(c=>c.Hue).ThenBy(c=>c.Value).ToList ();
+		IList<Color> testList = null;// Enum.GetValues (typeof (Colors)).Cast<Color> ().ToList (); // Color.ColorDic.Values.OrderBy(c=>c.Hue).ThenBy(c=>c.Value).ToList ();
 		public IList<Color> TestList {
 			set {
 				testList = value;
@@ -202,7 +202,7 @@ namespace tests
 
 		void OnClear (object sender, MouseButtonEventArgs e) => TestList = null;
 
-		void OnLoadList (object sender, MouseButtonEventArgs e) => TestList = Color.ColorDic.Values.ToList ();
+		void OnLoadList (object sender, MouseButtonEventArgs e) => TestList = Enum.GetValues (typeof (Colors)).Cast<Color> ().ToList ();
 
 	}
 

@@ -92,10 +92,10 @@ namespace Crow
 
 
 			gr.Arc (mousePos.X, mousePos.Y, 3.5, 0, Math.PI * 2.0);
-			gr.SetSourceColor (Color.Black);
+			gr.SetSourceColor (Colors.Black);
 			gr.LineWidth = 2.0;
 			gr.StrokePreserve ();
-			gr.SetSourceColor (Color.White);
+			gr.SetSourceColor (Colors.White);
 			gr.LineWidth = 1.0;
 			gr.Stroke ();
 		}

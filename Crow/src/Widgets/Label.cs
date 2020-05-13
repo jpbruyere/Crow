@@ -66,7 +66,7 @@ namespace Crow {
 		public virtual Color SelectionBackground {
 			get { return selBackground; }
 			set {
-				if (value == selBackground)
+				if (selBackground == value)
 					return;
 				selBackground = value;
 				NotifyValueChanged ("SelectionBackground", selBackground);
@@ -77,7 +77,7 @@ namespace Crow {
 		public virtual Color SelectionForeground {
 			get { return selForeground; }
 			set {
-				if (value == selForeground)
+				if (selForeground == value)
 					return;
 				selForeground = value;
 				NotifyValueChanged ("SelectionForeground", selForeground);

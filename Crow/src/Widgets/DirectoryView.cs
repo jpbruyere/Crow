@@ -120,7 +120,7 @@ namespace Crow
 						fi.ToArray() :
 						fi.Where(f=>!f.Attributes.HasFlag (FileAttributes.Hidden)).ToArray();
 				} catch (Exception ex) {
-					Console.WriteLine (ex.ToString ());
+					System.Diagnostics.Debug.WriteLine (ex.ToString ());
 					return null;
 				}
 			}

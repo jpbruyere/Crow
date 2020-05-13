@@ -285,7 +285,7 @@ namespace Crow
 			int vTreshold = (int)(r.Height * dockThresh);
 			int hTreshold = (int)(r.Width * dockThresh);
 
-			Console.WriteLine ("Docking {0} as {2} in {1}", dw.Name, activeStack.Name, dw.DockingPosition);
+			System.Diagnostics.Debug.WriteLine ("Docking {0} as {2} in {1}", dw.Name, activeStack.Name, dw.DockingPosition);
 			switch (dw.DockingPosition) {
 			case Alignment.Top:						
 				dw.Height = vTreshold;
@@ -321,7 +321,7 @@ namespace Crow
 		public void Undock (DockWindow dw){			
 			int idx = Children.IndexOf(dw);
 
-			Console.WriteLine ("undocking child index: {0} ; name={1}; pos:{2} ; childcount:{3}",idx, dw.Name, dw.DockingPosition, Children.Count);
+			System.Diagnostics.Debug.WriteLine ("undocking child index: {0} ; name={1}; pos:{2} ; childcount:{3}",idx, dw.Name, dw.DockingPosition, Children.Count);
 
 			RemoveChild(dw);
 
