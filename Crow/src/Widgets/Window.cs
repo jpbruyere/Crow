@@ -315,31 +315,31 @@ namespace Crow
 				//if (currentDirection != lastDir) {
 					switch (currentDirection) {
 					case Direction.None:
-						otkgw.MouseCursor = MouseCursor.Move;
+						otkgw.MouseCursor = MouseCursor.move;
 						break;
 					case Direction.N:
-						otkgw.MouseCursor = MouseCursor.Top;
+						otkgw.MouseCursor = MouseCursor.top_side;
 						break;
 					case Direction.S:
-						otkgw.MouseCursor = MouseCursor.Bottom;
+						otkgw.MouseCursor = MouseCursor.bottom_side;
 						break;
 					case Direction.E:
-						otkgw.MouseCursor = MouseCursor.Right;
+						otkgw.MouseCursor = MouseCursor.right_side;
 						break;
 					case Direction.W:
-						otkgw.MouseCursor = MouseCursor.Left;
+						otkgw.MouseCursor = MouseCursor.left_side;
 						break;
 					case Direction.NW:
-						otkgw.MouseCursor = MouseCursor.TopLeft;
+						otkgw.MouseCursor = MouseCursor.top_left_corner;
 						break;
 					case Direction.NE:
-						otkgw.MouseCursor = MouseCursor.TopRight;
+						otkgw.MouseCursor = MouseCursor.top_right_corner;
 						break;
 					case Direction.SW:
-						otkgw.MouseCursor = MouseCursor.BottomLeft;
+						otkgw.MouseCursor = MouseCursor.bottom_left_corner;
 						break;
 					case Direction.SE:
-						otkgw.MouseCursor = MouseCursor.BottomRight;
+						otkgw.MouseCursor = MouseCursor.bottom_right_corner;
 						break;
 					}
 				//}				
@@ -349,7 +349,7 @@ namespace Crow
 		{
 			base.onMouseLeave (sender, e);
 			currentDirection = Direction.None;
-			IFace.MouseCursor = MouseCursor.Arrow;
+			IFace.MouseCursor = MouseCursor.top_left_arrow;
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
@@ -410,7 +410,7 @@ namespace Crow
 
 		protected void butQuitPress (object sender, MouseButtonEventArgs e)
 		{
-			IFace.MouseCursor = MouseCursor.Arrow;
+			IFace.MouseCursor = MouseCursor.top_left_arrow;
 			close ();
 		}
 

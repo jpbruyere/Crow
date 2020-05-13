@@ -39,7 +39,7 @@
 		<PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.6.0" />
 		<PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.6.0" />
 		<!--<PackageReference Include="glfw-sharp" Version="0.2.0" />-->
-		<PackageReference Include="glfw-sharp" Version="0.2.4" />
+<!--		<PackageReference Include="glfw-sharp" Version="0.2.5" />-->
 	</ItemGroup>
 	<PropertyGroup Condition=" '$(CrowStbSharp)' == 'true'">
 		<DefineConstants>$(DefineConstants);STB_SHARP</DefineConstants>
@@ -55,5 +55,11 @@
 		</EmbeddedResource>
 		<EmbeddedResource Include="Default.style" />
 		<EmbeddedResource Include="Icons\*.*" />
+		<EmbeddedResource Include="Cursors\*.*">
+			<LogicalName>Crow.Cursors.%(Filename)</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\glfw-sharp\glfw-sharp.csproj" />
 	</ItemGroup>
 </Project>

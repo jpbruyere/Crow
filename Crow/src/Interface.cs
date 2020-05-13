@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Crow.Cairo;
 using Crow.IML;
@@ -51,11 +52,74 @@ namespace Crow
 		}
 		#endregion
 
+		#region CTOR
+		static Interface ()
+		{
+			/*if (Type.GetType ("Mono.Runtime") == null) {
+				throw new Exception (@"C.R.O.W. run only on Mono, download latest version at: http://www.mono-project.com/download/stable/");
+			}*/
+
+			CROW_CONFIG_ROOT =
+				System.IO.Path.Combine (
+					Environment.GetFolderPath (Environment.SpecialFolder.UserProfile),
+					".config");
+			CROW_CONFIG_ROOT = System.IO.Path.Combine (CROW_CONFIG_ROOT, "crow");
+			if (!Directory.Exists (CROW_CONFIG_ROOT))
+				Directory.CreateDirectory (CROW_CONFIG_ROOT);
+
+			//ensure all assemblies are loaded, because IML could contains classes not instanciated in source
+			foreach (string af in Directory.GetFiles (AppDomain.CurrentDomain.BaseDirectory, "*.dll")) {
+				try {
+					Assembly.LoadFrom (af);
+				} catch {
+					Console.WriteLine ("{0} not loaded as assembly.", af);
+				}
+			}
+
+			FontRenderingOptions = new FontOptions ();
+			FontRenderingOptions.Antialias = Antialias.Subpixel;
+			FontRenderingOptions.HintMetrics = HintMetrics.On;
+			FontRenderingOptions.HintStyle = HintStyle.Full;
+			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Default;
+
+			loadCursors ();
+		}
+		public Interface (int width, int height, IntPtr glfwWindowHandle) : this (width, height, false, false)
+		{
+			hWin = glfwWindowHandle;
+		}
+		public Interface (int width = 800, int height = 600, bool startUIThread = true, bool createSurface = true)
+		{
+			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+			CurrentInterface = this;
+			clientRectangle = new Rectangle (0, 0, width, height);
+
+			if (createSurface)
+				initSurface ();
+
+			if (startUIThread) {
+				Thread t = new Thread (InterfaceThread) {
+					IsBackground = true
+				};
+				t.Start ();
+			}
+
+#if MEASURE_TIME
+			PerfMeasures.Add (updateMeasure);
+			PerfMeasures.Add (drawingMeasure);
+			PerfMeasures.Add (layoutingMeasure);
+			PerfMeasures.Add (clippingMeasure);
+#endif
+		}
+		#endregion
+
 		/** GLFW callback may return a custom pointer, this list makes the link between the GLFW window pointer and the
 			manage VkWindow instance. */
 		static Dictionary<IntPtr, Interface> windows = new Dictionary<IntPtr, Interface> ();
 		/** GLFW window native pointer and current native handle for mouse cursor */
-		IntPtr hWin, currentCursor;
+		IntPtr hWin;
+		Cursor currentCursor;
+		bool ownWindow;
 
 		void initSurface ()
 		{
@@ -63,11 +127,12 @@ namespace Crow
 
 			Glfw3.WindowHint (WindowAttribute.ClientApi, 0);
 			Glfw3.WindowHint (WindowAttribute.Resizable, 1);
+			Glfw3.WindowHint (WindowAttribute.Decorated, 1);
 
 			hWin = Glfw3.CreateWindow (clientRectangle.Width, clientRectangle.Height, "win name", MonitorHandle.Zero, IntPtr.Zero);
-
 			if (hWin == IntPtr.Zero)
 				throw new Exception ("[GLFW3] Unable to create vulkan Window");
+			ownWindow = true;
 
 			Glfw3.SetKeyCallback (hWin, HandleKeyDelegate);
 			Glfw3.SetMouseButtonPosCallback (hWin, HandleMouseButtonDelegate);
@@ -132,65 +197,10 @@ namespace Crow
 
 		#endregion
 
-		#region CTOR
-		static Interface () {
-			/*if (Type.GetType ("Mono.Runtime") == null) {
-				throw new Exception (@"C.R.O.W. run only on Mono, download latest version at: http://www.mono-project.com/download/stable/");
-			}*/
 
-			CROW_CONFIG_ROOT =
-				System.IO.Path.Combine (
-					Environment.GetFolderPath (Environment.SpecialFolder.UserProfile),
-					".config");
-			CROW_CONFIG_ROOT = System.IO.Path.Combine (CROW_CONFIG_ROOT, "crow");
-			if (!Directory.Exists (CROW_CONFIG_ROOT))
-				Directory.CreateDirectory (CROW_CONFIG_ROOT);
-
-			//ensure all assemblies are loaded, because IML could contains classes not instanciated in source
-			foreach (string af in Directory.GetFiles (AppDomain.CurrentDomain.BaseDirectory, "*.dll")) {
-				try {
-					Assembly.LoadFrom (af);
-				} catch {
-					Console.WriteLine ("{0} not loaded as assembly.", af);
-				}
-			}
-
-			FontRenderingOptions = new FontOptions ();
-			FontRenderingOptions.Antialias = Antialias.Subpixel;
-			FontRenderingOptions.HintMetrics = HintMetrics.On;
-			FontRenderingOptions.HintStyle = HintStyle.Full;
-			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Default;
-		}
-		public Interface (int width, int height, IntPtr glfwWindowHandle) : this(width, height, false, false)
-		{ 
-			hWin = glfwWindowHandle;
-		}
-		public Interface(int width=800, int height=600, bool startUIThread = true, bool createSurface = true)  {
-			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
-			CurrentInterface = this;
-			clientRectangle = new Rectangle (0, 0, width, height);
-
-			if (createSurface)
-				initSurface ();
-
-			if (startUIThread) {
-				Thread t = new Thread (InterfaceThread) {
-					IsBackground = true
-				};
-				t.Start ();
-			}
-
-#if MEASURE_TIME
-			PerfMeasures.Add (updateMeasure);
-			PerfMeasures.Add (drawingMeasure);
-			PerfMeasures.Add (layoutingMeasure);
-			PerfMeasures.Add (clippingMeasure);
-#endif
-		}
-		#endregion
 		public bool Running {
 			get => !Glfw3.WindowShouldClose (hWin);
-			set => Glfw3.SetWindowShouldClose (hWin, 1);
+			set => Glfw3.SetWindowShouldClose (hWin, value == true ? 0 : 1);
 		}
 		public virtual void InterfaceThread ()
 		{
@@ -204,11 +214,12 @@ namespace Crow
 #endif
 			}
 		}
-		protected virtual void Startup ()
+		protected virtual void OnInitialized ()
 		{
 			try {
 				Load ("#main.crow").DataSource = this;
 			} catch { }
+			Initialized.Raise (this, null);
 		}
 		/// <summary>
 		/// load styling, init default tooltips and context menus, load main.crow resource if exists.
@@ -217,7 +228,7 @@ namespace Crow
 			loadStyling ();
 			initTooltip ();
 			initContextMenus ();
-			Startup ();
+			OnInitialized ();
 		}
 		/// <summary>
 		/// call Init() then enter the running loop performing ProcessEvents until running==false.
@@ -249,11 +260,11 @@ namespace Crow
 					// TODO: dispose managed state (managed objects).
 				}
 
-				if (currentCursor != IntPtr.Zero)
-					Glfw3.DestroyCursor (currentCursor);
-
-				Glfw3.DestroyWindow (hWin);
-				Glfw3.Terminate ();
+				currentCursor?.Dispose ();
+				if (ownWindow) {
+					Glfw3.DestroyWindow (hWin);
+					Glfw3.Terminate ();
+				}
 
 				disposedValue = true;
 			}
@@ -296,7 +307,7 @@ namespace Crow
 		/// <summary> delay before tooltip appears </summary>
 		public static int TOOLTIP_DELAY = 500;
 		/// <summary>Double click threshold in milisecond</summary>
-		public static int DOUBLECLICK_TRESHOLD = 240;//max duration between two mouse_down evt for a dbl clk in milisec.
+		public static int DOUBLECLICK_TRESHOLD = 320;//max duration between two mouse_down evt for a dbl clk in milisec.
 		/// <summary> Time to wait in millisecond before starting repeat loop</summary>
 		public static int DEVICE_REPEAT_DELAY = 700;
 		/// <summary> Time interval in millisecond between device event repeat</summary>
@@ -330,7 +341,7 @@ namespace Crow
 		#region Events
 		//public event EventHandler<MouseCursorChangedEventArgs> MouseCursorChanged;
 		////public event EventHandler Quit;
-
+		public event EventHandler Initialized;
 		//public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
 		//public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
 		//public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
@@ -1048,7 +1059,76 @@ namespace Crow
 		}
 
 		#region Mouse and Keyboard Handling
-		MouseCursor cursor = MouseCursor.Arrow;
+		MouseCursor cursor = MouseCursor.top_left_arrow;
+		static void loadCursors ()
+		{
+			const int minimumSize = 32;
+			//Load cursors
+			XCursor.Cursors [MouseCursor.arrow] = XCursorFile.Load ("#Crow.Cursors.arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.base_arrow_down] = XCursorFile.Load ("#Crow.Cursors.base_arrow_down").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.base_arrow_up] = XCursorFile.Load ("#Crow.Cursors.base_arrow_up").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.boat] = XCursorFile.Load ("#Crow.Cursors.boat").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.bottom_left_corner] = XCursorFile.Load ("#Crow.Cursors.bottom_left_corner").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.bottom_right_corner] = XCursorFile.Load ("#Crow.Cursors.bottom_right_corner").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.bottom_side] = XCursorFile.Load ("#Crow.Cursors.bottom_side").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.bottom_tee] = XCursorFile.Load ("#Crow.Cursors.bottom_tee").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.center_ptr] = XCursorFile.Load ("#Crow.Cursors.center_ptr").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.circle] = XCursorFile.Load ("#Crow.Cursors.circle").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.cross] = XCursorFile.Load ("#Crow.Cursors.cross").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.cross_reverse] = XCursorFile.Load ("#Crow.Cursors.cross_reverse").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.crosshair] = XCursorFile.Load ("#Crow.Cursors.crosshair").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.dot] = XCursorFile.Load ("#Crow.Cursors.dot").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.dot_box_mask] = XCursorFile.Load ("#Crow.Cursors.dot_box_mask").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.double_arrow] = XCursorFile.Load ("#Crow.Cursors.double_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.draft_large] = XCursorFile.Load ("#Crow.Cursors.draft_large").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.draft_small] = XCursorFile.Load ("#Crow.Cursors.draft_small").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.draped_box] = XCursorFile.Load ("#Crow.Cursors.draped_box").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.exchange] = XCursorFile.Load ("#Crow.Cursors.exchange").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.fleur] = XCursorFile.Load ("#Crow.Cursors.fleur").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.gumby] = XCursorFile.Load ("#Crow.Cursors.gumby").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.hand] = XCursorFile.Load ("#Crow.Cursors.hand").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.hand1] = XCursorFile.Load ("#Crow.Cursors.hand1").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.hand2] = XCursorFile.Load ("#Crow.Cursors.hand2").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.help] = XCursorFile.Load ("#Crow.Cursors.help").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.ibeam] = XCursorFile.Load ("#Crow.Cursors.ibeam").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.left_ptr] = XCursorFile.Load ("#Crow.Cursors.left_ptr").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.left_ptr_watch] = XCursorFile.Load ("#Crow.Cursors.left_ptr_watch").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.left_side] = XCursorFile.Load ("#Crow.Cursors.left_side").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.left_tee] = XCursorFile.Load ("#Crow.Cursors.left_tee").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.ll_angle] = XCursorFile.Load ("#Crow.Cursors.ll_angle").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.lr_angle] = XCursorFile.Load ("#Crow.Cursors.lr_angle").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.move] = XCursorFile.Load ("#Crow.Cursors.move").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.pencil] = XCursorFile.Load ("#Crow.Cursors.pencil").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.pirate] = XCursorFile.Load ("#Crow.Cursors.pirate").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.plus] = XCursorFile.Load ("#Crow.Cursors.plus").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.question_arrow] = XCursorFile.Load ("#Crow.Cursors.question_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.right_ptr] = XCursorFile.Load ("#Crow.Cursors.right_ptr").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.right_side] = XCursorFile.Load ("#Crow.Cursors.right_side").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.right_tee] = XCursorFile.Load ("#Crow.Cursors.right_tee").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.sailboat] = XCursorFile.Load ("#Crow.Cursors.sailboat").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.sb_down_arrow] = XCursorFile.Load ("#Crow.Cursors.sb_down_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.sb_h_double_arrow] = XCursorFile.Load ("#Crow.Cursors.sb_h_double_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.sb_left_arrow] = XCursorFile.Load ("#Crow.Cursors.sb_left_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.sb_right_arrow] = XCursorFile.Load ("#Crow.Cursors.sb_right_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.sb_up_arrow] = XCursorFile.Load ("#Crow.Cursors.sb_up_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.sb_v_double_arrow] = XCursorFile.Load ("#Crow.Cursors.sb_v_double_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.shuttle] = XCursorFile.Load ("#Crow.Cursors.shuttle").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.sizing] = XCursorFile.Load ("#Crow.Cursors.sizing").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.target] = XCursorFile.Load ("#Crow.Cursors.target").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.tcross] = XCursorFile.Load ("#Crow.Cursors.tcross").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.top_left_arrow] = XCursorFile.Load ("#Crow.Cursors.top_left_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.top_left_corner] = XCursorFile.Load ("#Crow.Cursors.top_left_corner").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.top_right_corner] = XCursorFile.Load ("#Crow.Cursors.top_right_corner").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.top_side] = XCursorFile.Load ("#Crow.Cursors.top_side").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.top_tee] = XCursorFile.Load ("#Crow.Cursors.top_tee").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.trek] = XCursorFile.Load ("#Crow.Cursors.trek").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.ul_angle] = XCursorFile.Load ("#Crow.Cursors.ul_angle").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.ur_angle] = XCursorFile.Load ("#Crow.Cursors.ur_angle").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.watch] = XCursorFile.Load ("#Crow.Cursors.watch").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.X_cursor] = XCursorFile.Load ("#Crow.Cursors.X_cursor").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.xterm] = XCursorFile.Load ("#Crow.Cursors.xterm").Cursors.First (c => c.Width >= minimumSize);
+		}
+
 
 		Stopwatch lastMouseDown = Stopwatch.StartNew (), mouseRepeatTimer = new Stopwatch ();
 		bool doubleClickTriggered;	//next mouse up will trigger a double click
@@ -1058,57 +1138,25 @@ namespace Crow
 		public Point MousePosition { get; set; } = default;
 		public bool IsDown (MouseButton button) => Glfw3.GetMouseButton (hWin, button) != InputAction.Release;
 
+		Cursor createCursor (MouseCursor mc)
+		{
+			XCursor c = XCursor.Cursors [mc];
+			return new CustomCursor (c.Width, c.Height, c.data, c.Xhot, c.Yhot);
+		}
+
+
 		public MouseCursor MouseCursor {
 			get => cursor;
 			set {
-
+			
 				if (value == cursor)
 					return;
 				cursor = value;
-				if (currentCursor != IntPtr.Zero)
-					Glfw3.DestroyCursor (currentCursor);
-				switch (MouseCursor) {
-				case MouseCursor.Arrow:
-					currentCursor = Glfw3.CreateStandardCursor (CursorShape.Arrow);
-					break;
-				case MouseCursor.IBeam:
-					currentCursor = Glfw3.CreateStandardCursor (CursorShape.IBeam);
-					break;
-				case MouseCursor.Crosshair:
-					currentCursor = Glfw3.CreateStandardCursor (CursorShape.Crosshair);
-					break;
-				case MouseCursor.Circle:
-					break;
-				case MouseCursor.Hand:
-					currentCursor = Glfw3.CreateStandardCursor (CursorShape.Hand);
-					break;
-				case MouseCursor.Wait:
-					break;
-				case MouseCursor.H:
-					currentCursor = Glfw3.CreateStandardCursor (CursorShape.HResize);
-					break;
-				case MouseCursor.V:
-					currentCursor = Glfw3.CreateStandardCursor (CursorShape.VResize);
-					break;
-				case MouseCursor.Move:
-				case MouseCursor.Top:
-				case MouseCursor.TopLeft:
-				case MouseCursor.TopRight:
-				case MouseCursor.Left:
-				case MouseCursor.Right:
-				case MouseCursor.BottomLeft:
-				case MouseCursor.Bottom:
-				case MouseCursor.BottomRight:
-				case MouseCursor.NW:
-				case MouseCursor.NE:
-				case MouseCursor.SW:
-				case MouseCursor.SE:
-				default:
-					currentCursor = Glfw3.CreateStandardCursor (CursorShape.Arrow);
-					break;
-				}
 
-				Glfw3.SetCursor (hWin, currentCursor);
+				currentCursor?.Dispose ();
+				currentCursor = createCursor (cursor);
+				Console.WriteLine ($"cursor=>{cursor}");
+				currentCursor.Set (hWin);
 				//MouseCursorChanged.Raise (this,new MouseCursorChangedEventArgs(cursor));
 			}
 		}

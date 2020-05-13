@@ -28,7 +28,7 @@ namespace tests
 			}
 		}
 
-		protected override void Startup ()
+		protected override void OnInitialized ()
 		{
 			Widget g = Load ("#ShowCase.showcase.crow");
 			g.DataSource = this;
@@ -86,7 +86,7 @@ namespace tests
 
 		void showError (Exception ex)
 		{
-			NotifyValueChanged ("ErrorMessage", ex.ToString());
+			NotifyValueChanged ("ErrorMessage", ex.Message);
 			NotifyValueChanged ("ShowError", true);
 		}
 		void hideError ()

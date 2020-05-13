@@ -48,12 +48,8 @@ namespace Crow
 		#region GraphicObject overrides
 		[XmlIgnore]public override bool HasFocus   //trigger update when lost focus to errase text beam
         {
-            get
-            {
-                return base.HasFocus;
-            }
-            set
-            {
+            get => base.HasFocus;
+            set {
                 base.HasFocus = value;
                 RegisterForRedraw();
             }

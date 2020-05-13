@@ -268,7 +268,7 @@ namespace Crow
 		bool isActive;
 		bool isHover;
 		bool mouseRepeat;
-		MouseCursor mouseCursor = MouseCursor.Arrow;
+		MouseCursor mouseCursor = MouseCursor.top_left_arrow;
 		protected bool isVisible = true;
 		bool isEnabled = true;
 		VerticalAlignment verticalAlignment = VerticalAlignment.Center;
@@ -735,7 +735,7 @@ namespace Crow
 		/// Determine Cursor when mouse is Hover.
 		/// </summary>
 		[DesignCategory ("Behaviour")]
-		[DefaultValue (MouseCursor.Arrow)]
+		[DefaultValue (MouseCursor.top_left_arrow)]
 		public virtual MouseCursor MouseCursor {
 			get { return mouseCursor; }
 			set {
@@ -1943,7 +1943,7 @@ namespace Crow
 			Debug.WriteLine("MouseEnter => " + this.ToString());
 #endif
 
-			IFace.MouseCursor = mouseCursor;
+			IFace.MouseCursor = MouseCursor;
 
 			if (IFace.DragAndDropOperation != null) {
 				Widget g = this;

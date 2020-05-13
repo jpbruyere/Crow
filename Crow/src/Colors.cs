@@ -11,7 +11,7 @@ namespace Crow
 	/// <summary>
 	/// Universal Color structure
 	/// </summary>
-	public struct Color
+	public struct Color : IEquatable<Color>
     {
 		#region CTOR
 		public Color(double _R, double _G, double _B, double _A)
@@ -100,25 +100,6 @@ namespace Crow
 				double.Parse(c[3]));
 		}
 
-		public static bool operator ==(Color left, Color right)
-		{
-			if (left.predefinied & right.predefinied)
-				return left.htmlCode == right.htmlCode;
-			return left.A != right.A ? false :
-				left.R != right.R ? false :
-				left.G != right.G ? false :
-				left.B != right.B ? false : true;
-		}
-		public static bool operator !=(Color left, Color right)
-		{
-			if (left.predefinied & right.predefinied)
-				return left.htmlCode != right.htmlCode;
-			return left.A == right.A ? false :
-				left.R == right.R ? false :
-				left.G == right.G ? false :
-				left.B == right.B ? false : true;
-
-		}
 		public static bool operator ==(Color c, string n)
 		{
 			return n.StartsWith("#", StringComparison.Ordinal) ?
@@ -382,25 +363,29 @@ namespace Crow
 
 		#endregion
 
+		public override bool Equals (object obj)
+			=> obj is Color c && Equals(c);
+		public bool Equals (Color other)
+		{
+			if (predefinied & other.predefinied)
+				return htmlCode == other.htmlCode;
+			return A == other.A && R == other.R && G == other.G && B == other.B;
+		}
+
 		public override int GetHashCode ()
 		{
 			unchecked // Overflow is fine, just wrap
 			{
 				int hash = 17;
 				// Suitable nullity checks etc, of course :)
-				hash = hash * 23 + A.GetHashCode();
-				hash = hash * 23 + R.GetHashCode();
-				hash = hash * 23 + G.GetHashCode();
-				hash = hash * 23 + B.GetHashCode();
+				hash = hash * 23 + A.GetHashCode ();
+				hash = hash * 23 + R.GetHashCode ();
+				hash = hash * 23 + G.GetHashCode ();
+				hash = hash * 23 + B.GetHashCode ();
 				return hash;
 			}
 		}
-		public override bool Equals (object obj)
-		{
-			return (obj == null || obj.GetType() != typeof(Color)) ?
-				false :
-				this == (Color)obj;
-		}
+
 		public override string ToString()
 		{
 			if (!string.IsNullOrEmpty(Name))
@@ -416,36 +401,6 @@ namespace Crow
         {
             return (Color)s;
         }
-		//public static Color FromHSV(double _h, double _v = 1.0, double _s = 1.0, double _alpha = 1.0){
-		//	Color c = Color.Black;
-		//	c.ResetName ();
-		//	c.A = _alpha;
-		//	if (_s == 0) {//HSV from 0 to 1
-		//		c.R = _v;
-		//		c.G = _v;
-		//		c.B = _v;
-		//	}else{
-		//		double var_h = _h * 6.0;
-
-		//		if (var_h == 6.0)
-		//			var_h = 0;	//H must be < 1
-		//		double var_i = Math.Floor( var_h );	//Or ... var_i = floor( var_h )
-		//		double var_1 = _v * ( 1.0 - _s );
-		//		double var_2 = _v * (1.0 - _s * (var_h - var_i));
-		//		double var_3 = _v * (1.0 - _s * (1.0 - (var_h - var_i)));
-
-		//		if (var_i == 0.0) {
-		//			c.R = _v;
-		//			c.G = var_3;
-		//			c.B = var_1;
-		//		}else if ( var_i == 1.0 ) { c.R = var_2 ; c.G = _v     ; c.B = var_1; }
-		//		else if ( var_i == 2 ) { c.R = var_1 ; c.G = _v     ; c.B = var_3; }
-		//		else if ( var_i == 3 ) { c.R = var_1 ; c.G = var_2 ; c.B = _v;     }
-		//		else if ( var_i == 4 ) { c.R = var_3 ; c.G = var_1 ; c.B = _v;    }
-		//		else                   { c.R = _v     ; c.G = var_1 ; c.B = var_2; }
-		//	}
-		//	return c;
-		//}
 		public static Color FromHSV (double _h, double _v = 1.0, double _s = 1.0, double _alpha = 1.0) {
 			double H = _h * 360;
 			double C = _v * _s;
@@ -466,5 +421,6 @@ namespace Crow
 
 			return new Color (C + m, X + m, m, _alpha);
 		}
+
 	}
 }

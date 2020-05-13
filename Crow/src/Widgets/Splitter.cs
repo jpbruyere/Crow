@@ -91,9 +91,9 @@ namespace Crow
 		{
 			base.onMouseEnter (sender, e);
 			if ((Parent as GenericStack).Orientation == Orientation.Horizontal)
-				IFace.MouseCursor = MouseCursor.H;
+				IFace.MouseCursor = MouseCursor.sb_h_double_arrow;
 			else
-				IFace.MouseCursor = MouseCursor.V;
+				IFace.MouseCursor = MouseCursor.sb_v_double_arrow;
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{

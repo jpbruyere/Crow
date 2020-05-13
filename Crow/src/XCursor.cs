@@ -86,52 +86,54 @@ namespace Crow
 			return tmp;
 		}
 
-		public static XCursorFile Load(Interface iface, string path)
+		public static XCursorFile Load(string path)
 		{
-			return loadFromStream (iface.GetStreamFromPath (path));
+			return loadFromStream (Interface.StaticGetStreamFromPath (path));
 		}
 
-		static XCursor imageLoad(BinaryReader sr)
+		static XCursor imageLoad (BinaryReader sr)
 		{
-			XCursor tmp = new XCursor();
+			XCursor tmp = new XCursor ();
 			//			header: 36 Image headers are 36 bytes
-			uint header = sr.ReadUInt32();
+			uint header = sr.ReadUInt32 ();
 			//			type: 0xfffd0002 Image type is 0xfffd0002
-			uint type = sr.ReadUInt32();
+			uint type = sr.ReadUInt32 ();
 			//			subtype: CARD32 Image subtype is the nominal size
-			uint subtype = sr.ReadUInt32();
+			uint subtype = sr.ReadUInt32 ();
 			//			version: 1
-			uint version = sr.ReadUInt32();
+			uint version = sr.ReadUInt32 ();
 			//			width: CARD32 Must be less than or equal to 0x7fff
-			tmp.Width = sr.ReadUInt32();
+			tmp.Width = sr.ReadUInt32 ();
 			//			height: CARD32 Must be less than or equal to 0x7fff
-			tmp.Height = sr.ReadUInt32();
+			tmp.Height = sr.ReadUInt32 ();
 			//			xhot: CARD32 Must be less than or equal to width
-			tmp.Xhot = sr.ReadUInt32();
+			tmp.Xhot = sr.ReadUInt32 ();
 			//			yhot: CARD32 Must be less than or equal to height
-			tmp.Yhot = sr.ReadUInt32();
+			tmp.Yhot = sr.ReadUInt32 ();
 			//			delay: CARD32 Delay between animation frames in milliseconds
-			tmp.Delay = sr.ReadUInt32();
+			tmp.Delay = sr.ReadUInt32 ();
 			//			pixels: LISTofCARD32 Packed ARGB format pixels
-			tmp.data = sr.ReadBytes((int)(tmp.Width * tmp.Height * 4));
+			tmp.data = new byte [tmp.Width * tmp.Height * 4];
+			for (int i = 0; i < tmp.Width * tmp.Height; i++) {
+				//unchecked { tmp.data [i * 4 + 3] = (byte)(2 * (int)sr.ReadByte ()); }
+				tmp.data [i * 4 + 0] = sr.ReadByte ();
+				tmp.data [i * 4 + 1] = sr.ReadByte ();
+				tmp.data [i * 4 + 2] = sr.ReadByte ();
+				tmp.data [i * 4 + 3] = sr.ReadByte ();
+
+				//Console.WriteLine ($"{tmp.data [i * 4 + 3],2:X} {tmp.data [i * 4 + 0],2:X} {tmp.data [i * 4 + 1],2:X} {tmp.data [i * 4 + 2],2:X}");
+			}
+			//tmp.data = sr.ReadBytes((int)(tmp.Width * tmp.Height * 4));
+			/*using(Stream fs = new FileStream($"/tmp/test.bin_{tmp.Width}", FileMode.Create))
+			using (BinaryWriter sr2 = new BinaryWriter(fs)) {
+				sr2.Write (tmp.data, 0, tmp.data.Length);
+			}*/
 			return tmp;
 		}
 	}
 	public class XCursor
 	{
-		public static XCursor Default;
-		public static XCursor Cross;
-		public static XCursor Arrow;
-		public static XCursor Text;
-		public static XCursor SW;
-		public static XCursor SE;
-		public static XCursor NW;
-		public static XCursor NE;
-		public static XCursor N;
-		public static XCursor S;
-		public static XCursor V;
-		public static XCursor H;
-
+		public static readonly Dictionary<MouseCursor, XCursor> Cursors = new Dictionary<MouseCursor, XCursor>();
 		public uint Width;
 		public uint Height;
 		public uint Xhot;

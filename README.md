@@ -8,6 +8,7 @@
   C# Rapid Open Widgets
   <br>  
 <p align="center">
+  <a href="https://www.nuget.org/packages/Crow"><img src="https://buildstats.info/nuget/Crow"></a>
   <a href="https://travis-ci.org/jpbruyere/Crow">
       <img src="https://img.shields.io/travis/jpbruyere/Crow.svg?&logo=travis&logoColor=white">
   </a>
@@ -23,24 +24,24 @@
 </p>
 </h1>
 
-**C.R.O.W.** is an open source  [application framework](https://en.wikipedia.org/wiki/Application_framework) for building portable graphical interfaces in **C#**. It provides a declarative interface language with **styling** and **templates** called [IML](interface-markup-language) for **Interface Markup Language** similar to [XAML](https://en.wikipedia.org/wiki/Extensible_Application_Markup_Language) and a binding system for easy code linking.
+### Introduction
+
+Open source  [application framework](https://en.wikipedia.org/wiki/Application_framework) for building portable graphical interfaces in **C#**, featuring a ***declarative language*** for ui with ***styling*** and ***templates*** called [IML](interface-markup-language) similar to [XAML](https://en.wikipedia.org/wiki/Extensible_Application_Markup_Language) and a ***binding system*** for easy code linking.
 
 C.R.O.W. is in **beta** development state, api could change.
 
-There's currently **3 main versions**, diverging on the way they handle OS integration. The last one replace [Cairo](https://www.cairographics.org/) with [vkvg](https://github.com/jpbruyere/vkvg).
-
-| Package         | Description      | Link                             |
-|-------------------|--------------------|------------------------------|
-| Crow.OpenTK |OS layer handle with [OpenTK](https://github.com/opentk/opentk), fast implementation of 3D gui in OTK scenes |[![nuget](https://buildstats.info/nuget/Crow.OpenTK?includePreReleases=true&vWidth=100)](https://www.nuget.org/packages/Crow.OpenTK)    |
-| Crow               | `IBackend` interface for **xcb** and **win32** |[![nuget](https://buildstats.info/nuget/Crow?includePreReleases=true&vWidth=100)](https://www.nuget.org/packages/Crow)     |
-| Crow.Vk          | OS layer with [GLFW](https://www.glfw.org/), [vkvg](https://github.com/jpbruyere/vkvg) for accelerated 2d vectors and text.| [![nuget](https://buildstats.info/nuget/Crow.VK?includePreReleases=true&vWidth=100)](https://www.nuget.org/packages/Crow.Vk)     |
-
-#### Features
+### Features
 - [Declarative interface definition](https://github.com/jpbruyere/Crow/wiki/interface-markup-language).
 - [Templates](https://github.com/jpbruyere/Crow/wiki/Templates)
 - [Styling](https://github.com/jpbruyere/Crow/wiki/Styling)
 - [Dynamic binding system](https://github.com/jpbruyere/Crow/wiki/The-binding-system)
 - SVG rendering (with [rsvg library](https://developer.gnome.org/rsvg/))
+
+### Requirements
+- [GLFW3](https://www.glfw.org/) for platform dependant integration.
+- [Cairo Graphic Library](https://cairographics.org/) >= 1.20, for 2d graphic rendering.
+- [rsvg library](https://developer.gnome.org/rsvg/) for svg rendering
+
 
 <p align="center">
   <a href="https://github.com/jpbruyere/Crow/blob/master/Images/screenshot.png">
@@ -54,7 +55,7 @@ There's currently **3 main versions**, diverging on the way they handle OS integ
   </a>
 </p>
 
-#### Documentation
+### Documentation
 
 Due to the early state of this project and the frequent changes, some part of the docs may be outdated.
 
@@ -63,8 +64,4 @@ Due to the early state of this project and the frequent changes, some part of th
 * [Tutorials](https://github.com/jpbruyere/Crow/wiki/Tutorials)
 
 Please report bugs and issues on [GitHub](https://github.com/jpbruyere/Crow/issues)
-
-### Requirements
-- [Cairo Graphic Library](https://cairographics.org/) >= 1.20 
-- [rsvg library](https://developer.gnome.org/rsvg/) for svg rendering
 

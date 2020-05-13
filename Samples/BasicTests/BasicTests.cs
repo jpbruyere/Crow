@@ -18,7 +18,7 @@ namespace tests
 			}
 		}
 
-		protected override void Startup ()
+		protected override void OnInitialized ()
 		{
 			Commands = new List<Crow.Command> (new Crow.Command [] {
 				new Crow.Command(new Action(() => command1())) { Caption = "command1"},
