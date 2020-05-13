@@ -26,6 +26,7 @@
 
 using System;
 using Crow.Cairo;
+using FastEnumUtility;
 
 namespace Crow
 {
@@ -102,7 +103,7 @@ namespace Crow
 				f.Name = n [0];
 
 				if (n.Length > 1)
-					f.Style = (FontStyle)Enum.Parse (typeof(FontStyle), n[n.Length-1], true);
+					f.Style = FastEnum.Parse<FontStyle> (n[n.Length-1], true);
 			}
 
 			return f;

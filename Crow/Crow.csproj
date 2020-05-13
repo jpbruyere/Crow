@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 		
 		<AssemblyVersion>$(CrowVersion)</AssemblyVersion>
 		<ReleaseVersion>$(CrowVersion)</ReleaseVersion>
@@ -40,6 +40,7 @@
 		<PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.6.0" />
 		<!--<PackageReference Include="glfw-sharp" Version="0.2.0" />-->
 <!--		<PackageReference Include="glfw-sharp" Version="0.2.5" />-->
+		<PackageReference Include="FastEnum" Version="1.5.3" />
 	</ItemGroup>
 	<PropertyGroup Condition=" '$(CrowStbSharp)' == 'true'">
 		<DefineConstants>$(DefineConstants);STB_SHARP</DefineConstants>

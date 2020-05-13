@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FastEnumUtility;
 
 namespace Crow
 {
@@ -327,7 +328,7 @@ namespace Crow
 			=> value.GetHashCode ();
 
 		public override string ToString()
-			=> Enum.IsDefined (typeof (Colors), value) ? ((Colors)value).ToString () : HtmlCode;
+			=> FastEnum.IsDefined<Colors> (value) ? FastEnum.GetName((Colors)value) : HtmlCode;
 			
 		public static Color FromIml (string iml)
 		{
@@ -343,7 +344,7 @@ namespace Crow
 			=> (string.IsNullOrEmpty (s)) ? new Color (Colors.White) :
 				(s.StartsWith ("#", StringComparison.Ordinal)) ? new Color (UInt32.Parse (s.Substring (1), System.Globalization.NumberStyles.HexNumber)) :
 				(char.IsDigit(s[0])) ? FromIml (s) :
-				(Enum.TryParse<Colors> (s, out Colors cc)) ? new Color(cc) :
+				(FastEnum.TryParse<Colors> (s, out Colors cc)) ? new Color(cc) :
 				throw new Exception ("Unknown color name: " + s);
 
 

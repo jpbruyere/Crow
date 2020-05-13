@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 using System.Xml;
 using Crow.IML;
 using System.Text;
+using FastEnumUtility;
 
 namespace Crow.IML
 {

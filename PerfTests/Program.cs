@@ -50,7 +50,7 @@ namespace PerfTests
 
 		void testDir (string dirPath, int level = 0)
 		{
-			Console.WriteLine ($"{new string (' ', level * 4)}-{dirPath}");
+			Console.WriteLine ($"{new string (' ', level * 4)}- {dirPath}");
 			level++;
 
 			foreach (string d in Directory.GetDirectories (dirPath)) 
@@ -59,10 +59,10 @@ namespace PerfTests
 			foreach (string f in Directory.GetFiles (dirPath)) {
 				try {
 					long mean = Test (f, out long min, out long max);
-					Console.WriteLine ($"{new string (' ', level * 4)}{ Path.GetFileName (f),-30}: {min,5} |{mean,5} |{max,5}");
+					Console.WriteLine ($"{new string (' ', level * 4)}{ Path.GetFileName (f),-30}|{min,5}|{mean,5}|{max,5}");
 				} catch (Exception ex) {
 					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine ($"{ex.Message}");
+					Console.WriteLine ($"- {ex.Message}");
 					Console.ResetColor ();
 				}
 			}

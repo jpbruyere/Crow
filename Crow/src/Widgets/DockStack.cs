@@ -28,6 +28,7 @@ using Crow.IML;
 using System.Linq;
 using System.Text;
 using System.IO;
+using FastEnumUtility;
 
 namespace Crow
 {
@@ -389,7 +390,7 @@ namespace Crow
 				ClearChildren ();
 				stretchedChild = null;
 				int i = 0;
-				Orientation = (Orientation)Enum.Parse (typeof(Orientation), getConfAttrib (conf, ref i));
+				Orientation = FastEnum.Parse<Orientation> (getConfAttrib (conf, ref i));
 				importConfig (conf, ref i, dataSource);
 			}
 		}
@@ -415,7 +416,7 @@ namespace Crow
 					dw.Name = wName;
 					dw.Width = Measure.Parse (getConfAttrib (conf, ref i));
 					dw.Height = Measure.Parse (getConfAttrib (conf, ref i));
-					dw.DockingPosition = (Alignment)Enum.Parse (typeof(Alignment), getConfAttrib (conf, ref i));
+					dw.DockingPosition = FastEnum.Parse<Alignment> (getConfAttrib (conf, ref i));
 					dw.savedSlot = Rectangle.Parse (getConfAttrib (conf, ref i));
 					dw.wasResizable = Boolean.Parse (getConfAttrib (conf, ref i));
 
@@ -428,7 +429,7 @@ namespace Crow
 					DockStack ds = new DockStack (IFace);
 					ds.Width = Measure.Parse (getConfAttrib (conf, ref i));
 					ds.Height = Measure.Parse (getConfAttrib (conf, ref i));
-					ds.Orientation = (Orientation)Enum.Parse (typeof(Orientation), getConfAttrib (conf, ref i));
+					ds.Orientation = FastEnum.Parse<Orientation> (getConfAttrib (conf, ref i));
 
 					this.AddChild (ds);
 
