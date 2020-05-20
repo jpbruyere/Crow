@@ -52,13 +52,13 @@ namespace Crow.Cairo {
 
 		public Status AddColorStop (double offset, Color c)
 		{
-			NativeMethods.cairo_pattern_add_color_stop_rgba (Handle, offset, c.R, c.G, c.B, c.A);
+			NativeMethods.cairo_pattern_add_color_stop_rgba (Handle, offset, c.R / 255.0, c.G / 255.0, c.B / 255.0, c.A / 255.0);
 			return Status;
 		}
 
 		public Status AddColorStopRgb (double offset, Color c)
 		{
-			NativeMethods.cairo_pattern_add_color_stop_rgb (Handle, offset, c.R, c.G, c.B);
+			NativeMethods.cairo_pattern_add_color_stop_rgb (Handle, offset, c.R / 255.0, c.G / 255.0 / 255.0, c.B / 255.0);
 			return Status;
 		}
 	}

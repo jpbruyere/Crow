@@ -64,7 +64,7 @@ namespace Crow
 				return new ColorStop (-1, Color.FromIml (parts [0]));
 			}
 		}
-		public Gradient.Type GradientType = Type.Vertical;
+		public Type GradientType = Type.Vertical;
 //		public double x0;
 //		public double y0;
 //		public double x1;
@@ -72,7 +72,7 @@ namespace Crow
 //		public double Radius1;
 //		public double Radius2;
 		public List<ColorStop> Stops = new List<ColorStop>();
-		public Gradient(Gradient.Type _type)
+		public Gradient(Type _type)
 		{
 			GradientType = _type;
 		}
@@ -84,13 +84,13 @@ namespace Crow
 			Cairo.Gradient grad = null;
 			switch (GradientType) {
 			case Type.Vertical:
-				grad = new Cairo.LinearGradient (bounds.Left, bounds.Top, bounds.Left, bounds.Bottom);
+				grad = new LinearGradient (bounds.Left, bounds.Top, bounds.Left, bounds.Bottom);
 				break;
 			case Type.Horizontal:
-				grad = new Cairo.LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Top);
+				grad = new LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Top);
 				break;
 			case Type.Oblic:
-				grad = new Cairo.LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
+				grad = new LinearGradient (bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
 				break;
 			case Type.Radial:
 				throw new NotImplementedException ();
@@ -112,7 +112,7 @@ namespace Crow
 			if (string.IsNullOrEmpty (s))
 				return Colors.White;
 
-			Crow.Gradient tmp;
+			Gradient tmp;
 
 			string[] stops = s.Trim ().Split ('|');
 

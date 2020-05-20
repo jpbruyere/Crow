@@ -165,14 +165,9 @@ namespace Crow
 	public struct Color : IEquatable<Color>//, IEquatable<Colors>
     {
 		#region CTOR
-		public Color(double r, double g, double b, double a)
-		{
-			value =
-				(((uint)Math.Round (r * 255.0)) << 24) +
-				(((uint)Math.Round (g * 255.0)) << 16) +
-				(((uint)Math.Round (b * 255.0)) << 8) +
-				(((uint)Math.Round (a * 255.0)));
-		}
+		public Color (int r, int g, int b, int a) :
+			this ((uint)r, (uint)g, (uint)b, (uint)a) { }
+
 		public Color(uint r, uint g, uint b, uint a)
 		{
 			value =
@@ -184,6 +179,14 @@ namespace Crow
 		public Color (byte r, byte g, byte b, byte a)
 		{
 			value = ((uint)r << 24) + ((uint)g << 16) + ((uint)b << 8) + a;
+		}
+		public Color (double r, double g, double b, double a)
+		{
+			value =
+				(((uint)Math.Round (r * 255.0)) << 24) +
+				(((uint)Math.Round (g * 255.0)) << 16) +
+				(((uint)Math.Round (b * 255.0)) << 8) +
+				(((uint)Math.Round (a * 255.0)));
 		}
 		public Color (UInt32 rgba)
 		{
@@ -251,10 +254,13 @@ namespace Crow
 		/// <summary>
 		/// compute the hue of the color
 		/// </summary>
-		public double Hue {
+		public uint Hue {
 			get {
-				double min = Math.Min (R, Math.Min (G, B));	//Min. value of RGB
-				double max = Math.Max (R, Math.Max (G, B));	//Max. value of RGB
+				double r = R / 255.0;
+				double g = G / 255.0;
+				double b = B / 255.0;
+				double min = Math.Min (r, Math.Min (g, b));	//Min. value of RGB
+				double max = Math.Max (r, Math.Max (g, b));	//Max. value of RGB
 				double diff = max - min;							//Delta RGB value
 
 				if ( diff == 0 )//This is a grey, no chroma...
@@ -262,15 +268,15 @@ namespace Crow
 
 				double h = 0.0, s = diff / max;
 
-				double diffR = (((max - R) / 6.0) + (diff / 2.0)) / diff;
-				double diffG = (((max - G) / 6.0) + (diff / 2.0)) / diff;
-				double diffB = (((max - B) / 6.0) + (diff / 2.0)) / diff;
+				double diffR = (((max - r) / 6.0) + (diff / 2.0)) / diff;
+				double diffG = (((max - g) / 6.0) + (diff / 2.0)) / diff;
+				double diffB = (((max - b) / 6.0) + (diff / 2.0)) / diff;
 
-				if (R == max)
+				if (r == max)
 					h = diffB - diffG;
-				else if (G == max)
+				else if (g == max)
 					h = (1.0 / 3.0) + diffR - diffB;
-				else if (B == max)
+				else if (b == max)
 					h = (2.0 / 3.0) + diffG - diffR;
 
 				if (h < 0)
@@ -278,25 +284,25 @@ namespace Crow
 				if (h > 1)
 					h -= 1;
 
-				return h;
+				return (uint)(h*255);
 			}
 		}
 		/// <summary>
 		/// compute the saturation of the color
 		/// </summary>
-		public double Saturation {
+		public uint Saturation {
 			get {
-				double min = Math.Min (R, Math.Min (G, B)); //Min. value of RGB
-				double max = Math.Max (R, Math.Max (G, B)); //Max. value of RGB
-				double diff = max - min;                            //Delta RGB value
-				return diff == 0 ? 0 : diff / max;
+				uint min = Math.Min (R, Math.Min (G, B)); //Min. value of RGB
+				uint max = Math.Max (R, Math.Max (G, B)); //Max. value of RGB
+				uint diff = max - min;                    //Delta RGB value
+				return diff == 0 ? 0 : (uint)(255.0 * diff / max);
 			}
 		}
 		/// <summary>
 		/// compute the RGB intensity of the color
 		/// </summary>
 		/// <value>The value.</value>
-		public double Value => Math.Max (R, Math.Max (G, B));   //Max. value of RGB
+		public uint Value => Math.Max (R, Math.Max (G, B));   //Max. value of RGB
 
 		public string HtmlCode {
 			get {
@@ -348,25 +354,34 @@ namespace Crow
 				throw new Exception ("Unknown color name: " + s);
 
 
-		public static Color FromHSV (double _h, double _v = 1.0, double _s = 1.0, double _alpha = 1.0) {
+		public static Color FromHSV (double _h, double _v = 0xff, double _s = 0xff, double _alpha = 0xff) {
+			_h /= 255.0;
+			_v /= 255.0;
+			_s /= 255.0;
+
 			double H = _h * 360;
 			double C = _v * _s;
 			//X = C × (1 - | (H / 60°) mod 2 - 1 |)
-			double X = C * (1 - Math.Abs((H/60.0) % 2 - 1));
+			double X = C * (1 - Math.Abs((H/60.0)%2 - 1));
 			double m = _v - C;
 
-			if (H >= 300)
-				return new Color (C + m, m, X + m, _alpha);
-			if (H >= 240)
-				return new Color (X + m, m, C + m, _alpha);
-			if (H >= 180)
-				return new Color (m, X + m, C + m, _alpha);
-			if (H >= 120)
-				return new Color (m, C + m, X + m, _alpha);
-			if (H >= 60)
-				return new Color (X + m, C + m, m, _alpha);
+			double [] rgb = null;
 
-			return new Color (C + m, X + m, m, _alpha);
+			if (H >= 300)
+				rgb = new double [] { C, 0, X };
+			else if (H >= 240)
+				rgb = new double [] { X, 0, C };
+			else if (H >= 180)
+				rgb = new double [] { 0, X, C };
+			else if (H >= 120)
+				rgb = new double [] { 0, C, X };
+			else if (H >= 60)
+				rgb = new double [] { X, C, 0};
+			else
+				rgb = new double [] { C, X, 0 };
+
+
+			return new Color (rgb [0] + m, rgb [1] + m, rgb [2] + m, _alpha / 255.0);
 		}
 	}
 }

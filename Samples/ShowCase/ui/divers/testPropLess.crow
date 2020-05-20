@@ -1,2 +1,0 @@
-﻿<?xml version="1.0"?>
-<Label Margin="50" MinimumSize="10,10" Background="DimGrey" Text="{PropertyLessBinding}"/>

@@ -71,6 +71,7 @@ namespace PerfTests
 
 		public static void Main (string [] args)
 		{
+			Console.WriteLine ($"git:{ThisAssembly.Git.Commit} {ThisAssembly.Git.Branch} {ThisAssembly.Git.SemVer.Major}.{ThisAssembly.Git.SemVer.Minor}.{ThisAssembly.Git.SemVer.Patch} {ThisAssembly.Git.SemVer.Label}");
 			//IndentedTextWriter w = new IndentedTextWriter()
 			using (TestInterface iface = new TestInterface ()) {
 				iface.testDir ("Interfaces");

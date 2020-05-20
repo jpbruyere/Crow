@@ -326,7 +326,7 @@ namespace Crow.Cairo {
 
 		public void SetSourceColor (Color color)
 		{
-			NativeMethods.cairo_set_source_rgba (handle, color.R, color.G, color.B, color.A);
+			NativeMethods.cairo_set_source_rgba (handle, color.R / 255.0, color.G / 255.0, color.B / 255.0, color.A / 255.0);
 		}
 
 		public void SetSourceRGB (double r, double g, double b)

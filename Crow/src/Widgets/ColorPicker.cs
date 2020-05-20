@@ -30,6 +30,7 @@ namespace Crow
 					return;
 				currentColor = value;
 				NotifyValueChanged ("CurrentColor", currentColor);
+				NotifyValueChanged ("CurrentColor2", Color.FromHSV (currentColor.Hue, currentColor.Value, currentColor.Saturation, currentColor.A));
 			}
 		}
 

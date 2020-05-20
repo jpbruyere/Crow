@@ -28,4 +28,7 @@
 			<Link>Icons\%(Filename)%(Extension)</Link>
 		</EmbeddedResource>
 	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="GitInfo" Version="2.0.26" />
+	</ItemGroup>
 </Project>

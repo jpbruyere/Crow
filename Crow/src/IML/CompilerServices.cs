@@ -394,6 +394,8 @@ namespace Crow.IML
 
 		public static MethodInfo GetExtensionMethods (Assembly assembly, Type extendedType, string methodName)
 		{
+			if (assembly == null)
+				return null;
 			foreach (Type t in assembly.GetTypes ().Where
 					(ty => ty.IsDefined (typeof (ExtensionAttribute), false))) {
 				foreach (MethodInfo mi in t.GetMethods 

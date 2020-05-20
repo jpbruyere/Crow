@@ -4,7 +4,6 @@
 		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 		
 		<AssemblyVersion>$(CrowVersion)</AssemblyVersion>
-		<ReleaseVersion>$(CrowVersion)</ReleaseVersion>
 		<PackageVersion>$(CrowPackageVersion)</PackageVersion>
 		
 		<Title>C# Rapid Open Widget Toolkit</Title>
@@ -38,8 +37,7 @@
 	<ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
 		<PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.6.0" />
 		<PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.6.0" />
-		<!--<PackageReference Include="glfw-sharp" Version="0.2.0" />-->
-<!--		<PackageReference Include="glfw-sharp" Version="0.2.5" />-->
+		<PackageReference Include="glfw-sharp" Version="0.2.6" />
 		<PackageReference Include="FastEnum" Version="1.5.3" />
 	</ItemGroup>
 	<PropertyGroup Condition=" '$(CrowStbSharp)' == 'true'">
@@ -60,15 +58,21 @@
 			<LogicalName>Crow.Cursors.%(Filename)</LogicalName>
 		</EmbeddedResource>
 	</ItemGroup>
-	<ItemGroup>
+<!--	<ItemGroup>
 	  <ProjectReference Include="..\..\..\glfw-sharp\glfw-sharp.csproj" />
-	</ItemGroup>
-	<ItemGroup>
+	</ItemGroup>-->
+	<!--<ItemGroup>
 	  <Compile Remove="src\Widgets\ColorPicker2.cs" />
 	  <Compile Remove="src\Widgets\ColorSlider.cs" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Include="src\Widgets\ColorPicker2.cs" />
 	  <None Include="src\Widgets\ColorSlider.cs" />
+	</ItemGroup>-->
+	<ItemGroup>
+	  <Compile Remove="src\Widgets\ColorPicker2.cs" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="src\Widgets\ColorPicker2.cs" />
 	</ItemGroup>
 </Project>

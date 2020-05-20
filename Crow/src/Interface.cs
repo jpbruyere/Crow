@@ -470,9 +470,15 @@ namespace Crow
 			Stream s = null;
 			if (path.StartsWith ("#", StringComparison.Ordinal)) {
 				string resId = path.Substring (1);
-				s = Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
-				if (s == null)
-					s = Assembly.GetAssembly (declaringType).GetManifestResourceStream (resId);
+				s = Assembly.GetEntryAssembly ()?.GetManifestResourceStream (resId);
+				if (s != null)
+					return s;
+				string assemblyName = resId.Split ('.')[0];
+				Assembly a = AppDomain.CurrentDomain.GetAssemblies ().FirstOrDefault (aa => aa.GetName ().Name == assemblyName);
+				s = a?.GetManifestResourceStream (resId);
+				if (s != null)
+					return s;
+				s = Assembly.GetAssembly (declaringType).GetManifestResourceStream (resId);
 				if (s == null)
 					throw new Exception ($"Template ressource not found '{path}'");
 			} else {
@@ -515,7 +521,7 @@ namespace Crow
 
 			if (path.StartsWith ("#", StringComparison.Ordinal)) {
 				string resId = path.Substring (1);
-				stream = Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
+				stream = Assembly.GetEntryAssembly ()?.GetManifestResourceStream (resId);
 				if (stream != null)
 					return stream;
 				string assemblyName = resId.Split ('.') [0];
@@ -780,9 +786,8 @@ namespace Crow
 			clippingRegistration ();
 
 			if (ctx == null) {
-				using (ctx = new Context (surf)) {
+				using (ctx = new Context (surf)) 
 					processDrawing (ctx);
-				}
 			}else
 				processDrawing (ctx);
 
@@ -860,7 +865,6 @@ namespace Crow
 			#endif
 			if (DragImage != null)
 				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
-			//using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
 				if (!clipping.IsEmpty) {
 					IsDirty = true;
 
@@ -913,9 +917,7 @@ namespace Crow
 					ctx.Operator = Operator.Over;
 
 					ctx.Paint ();
-
-					//TODO:check if flush is possible, maybe with cairo
-					//backend?.Flush ();
+					
 					surf.Flush ();
 
 					clipping.Dispose ();
@@ -1062,7 +1064,7 @@ namespace Crow
 		MouseCursor cursor = MouseCursor.top_left_arrow;
 		static void loadCursors ()
 		{
-			const int minimumSize = 32;
+			const int minimumSize = 24;
 			//Load cursors
 			XCursor.Cursors [MouseCursor.arrow] = XCursorFile.Load ("#Crow.Cursors.arrow").Cursors.First (c => c.Width >= minimumSize);
 			XCursor.Cursors [MouseCursor.base_arrow_down] = XCursorFile.Load ("#Crow.Cursors.base_arrow_down").Cursors.First (c => c.Width >= minimumSize);

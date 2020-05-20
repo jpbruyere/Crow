@@ -25,7 +25,7 @@ namespace Crow
 		CursorType cursorType = CursorType.Pentagone;
 		ColorComponent component;
 		Color currentColor = Colors.Black;
-		double currentValue = -1;//force notify for property less binding 'CurrentValue'
+		int currentValue = -1;//force notify for property less binding 'CurrentValue'
 
 		[DefaultValue (Orientation.Horizontal)]
 		public Orientation Orientation {
@@ -75,46 +75,46 @@ namespace Crow
 				case ColorComponent.Red:
 					if (currentValue == currentColor.R)
 						return;
-					currentValue = currentColor.R;
+					currentValue = (int)currentColor.R;
 					break;
 				case ColorComponent.Green:
 					if (currentValue == currentColor.G)
 						return; 
-					currentValue = currentColor.G;
+					currentValue = (int)currentColor.G;
 					break;
 				case ColorComponent.Blue:
 					if (currentValue == currentColor.B)
 						return;
-					currentValue = currentColor.B;
+					currentValue = (int)currentColor.B;
 					break;
 				case ColorComponent.Alpha:
 					if (currentValue == currentColor.A)
 						return;
-					currentValue = currentColor.A;
+					currentValue = (int)currentColor.A;
 					break;
 				case ColorComponent.Hue:
 					if (currentValue == currentColor.Hue)
 						return;
-					currentValue = currentColor.Hue;
+					currentValue = (int)currentColor.Hue;
 					break;
 				case ColorComponent.Saturation:
 					if (currentValue == currentColor.Saturation)
 						return;
-					currentValue = currentColor.Saturation;
+					currentValue = (int)currentColor.Saturation;
 					break;
 				case ColorComponent.Value:
 					if (currentValue == currentColor.Value)
 						return; 
-					currentValue = currentColor.Value;
+					currentValue = (int)currentColor.Value;
 					break;
 				}
 
-				NotifyValueChanged ("CurrentValue", $"{currentValue:0.000}");
+				NotifyValueChanged ("CurrentValue", $"{currentValue:000}");
 
 				if (Orientation == Orientation.Horizontal)
-					mousePos.X = (int)Math.Floor (currentValue * ClientRectangle.Width);
+					mousePos.X = (int)Math.Floor ((double)currentValue * ClientRectangle.Width / 255.0);
 				else
-					mousePos.Y = (int)Math.Floor (currentValue * ClientRectangle.Height);					
+					mousePos.Y = (int)Math.Floor ((double)currentValue * ClientRectangle.Height / 255.0);
 			}
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
@@ -148,36 +148,36 @@ namespace Crow
 			switch (component) {
 			case ColorComponent.Red:
 				grad.Stops.Add (new Gradient.ColorStop (0, new Color (0, c.G, c.B, c.A)));
-				grad.Stops.Add (new Gradient.ColorStop (1, new Color (1, c.G, c.B, c.A)));
+				grad.Stops.Add (new Gradient.ColorStop (1, new Color (255, c.G, c.B, c.A)));
 				break;
 			case ColorComponent.Green:
 				grad.Stops.Add (new Gradient.ColorStop (0, new Color (c.R, 0, c.B, c.A)));
-				grad.Stops.Add (new Gradient.ColorStop (1, new Color (c.R, 1, c.B, c.A)));
+				grad.Stops.Add (new Gradient.ColorStop (1, new Color (c.R, 255, c.B, c.A)));
 				break;
 			case ColorComponent.Blue:
 				grad.Stops.Add (new Gradient.ColorStop (0, new Color (c.R, c.G, 0, c.A)));
-				grad.Stops.Add (new Gradient.ColorStop (1, new Color (c.R, c.G, 1, c.A)));
+				grad.Stops.Add (new Gradient.ColorStop (1, new Color (c.R, c.G, 255, c.A)));
 				break;
 			case ColorComponent.Alpha:
 				grad.Stops.Add (new Gradient.ColorStop (0, new Color (c.R, c.G, c.B, 0)));
-				grad.Stops.Add (new Gradient.ColorStop (1, new Color (c.R, c.G, c.B, 1)));
+				grad.Stops.Add (new Gradient.ColorStop (1, new Color (c.R, c.G, c.B, 255)));
 				break;
 			case ColorComponent.Hue:
-				grad.Stops.Add (new Gradient.ColorStop (0, new Color (1, 0, 0, 1)));
-				grad.Stops.Add (new Gradient.ColorStop (0.167, new Color (1, 1, 0, 1)));
-				grad.Stops.Add (new Gradient.ColorStop (0.333, new Color (0, 1, 0, 1)));
-				grad.Stops.Add (new Gradient.ColorStop (0.5, new Color (0, 1, 1, 1)));
-				grad.Stops.Add (new Gradient.ColorStop (0.667, new Color (0, 0, 1, 1)));
-				grad.Stops.Add (new Gradient.ColorStop (0.833, new Color (1, 0, 1, 1)));
-				grad.Stops.Add (new Gradient.ColorStop (1, new Color (1, 0, 0, 1)));
+				grad.Stops.Add (new Gradient.ColorStop (0, new Color (1.0, 0, 0, 1)));
+				grad.Stops.Add (new Gradient.ColorStop (0.167, new Color (1.0, 1, 0, 1)));
+				grad.Stops.Add (new Gradient.ColorStop (0.333, new Color (0.0, 1, 0, 1)));
+				grad.Stops.Add (new Gradient.ColorStop (0.5, new Color (0.0, 1, 1, 1)));
+				grad.Stops.Add (new Gradient.ColorStop (0.667, new Color (0.0, 0, 1, 1)));
+				grad.Stops.Add (new Gradient.ColorStop (0.833, new Color (1.0, 0, 1, 1)));
+				grad.Stops.Add (new Gradient.ColorStop (1, new Color (1.0, 0, 0, 1)));
 				break;
 			case ColorComponent.Saturation:
-				grad.Stops.Add (new Gradient.ColorStop (0, Color.FromHSV (c.Hue, c.Value, 0.0, c.A)));
-				grad.Stops.Add (new Gradient.ColorStop (1, Color.FromHSV (c.Hue, c.Value, 1.0, c.A)));
+				grad.Stops.Add (new Gradient.ColorStop (0, Color.FromHSV (c.Hue, c.Value, 0, c.A)));
+				grad.Stops.Add (new Gradient.ColorStop (1, Color.FromHSV (c.Hue, c.Value, 0xff, c.A)));
 				break;
 			case ColorComponent.Value:
-				grad.Stops.Add (new Gradient.ColorStop (0, Color.FromHSV (c.Hue, 0.0, c.Saturation, c.A)));
-				grad.Stops.Add (new Gradient.ColorStop (1, Color.FromHSV (c.Hue, 1.0, c.Saturation, c.A)));
+				grad.Stops.Add (new Gradient.ColorStop (0, Color.FromHSV (c.Hue, 0, c.Saturation, c.A)));
+				grad.Stops.Add (new Gradient.ColorStop (1, Color.FromHSV (c.Hue, 0xff, c.Saturation, c.A)));
 				break;
 			}
 
@@ -221,10 +221,10 @@ namespace Crow
 				break;
 			}
 
-			gr.SetSourceColor (Color.Black);
+			gr.SetSourceColor (Colors.Black);
 			gr.LineWidth = 2.0;
 			gr.StrokePreserve ();
-			gr.SetSourceColor (Color.White);
+			gr.SetSourceColor (Colors.White);
 			gr.LineWidth = 1.0;
 			gr.Stroke ();
 		}
@@ -233,9 +233,9 @@ namespace Crow
 
 			if (Orientation == Orientation.Horizontal) {
 				if (layoutType == LayoutingType.Width)
-					mousePos.X = (int)Math.Floor (currentValue * ClientRectangle.Width);
+					mousePos.X = (int)Math.Floor (currentValue / 255.0 * ClientRectangle.Width);
 			} else if (layoutType == LayoutingType.Height)
-				mousePos.Y = (int)Math.Floor (currentValue * ClientRectangle.Height);
+				mousePos.Y = (int)Math.Floor (currentValue / 255.0 * ClientRectangle.Height);
 		}
 
 		protected virtual void updateMouseLocalPos(Point mPos){
@@ -249,34 +249,34 @@ namespace Crow
 			mousePos.Y = Math.Min(cb.Bottom, mousePos.Y);
 
 			if (Orientation == Orientation.Horizontal)
-				currentValue = (double)mousePos.X / ClientRectangle.Width;
+				currentValue = (int)((double)mousePos.X / ClientRectangle.Width * 0xff);
 			else
-				currentValue = (double)mousePos.Y / ClientRectangle.Height;
+				currentValue = (int)((double)mousePos.Y / ClientRectangle.Height * 0xff);
 
-			NotifyValueChanged ("CurrentValue", $"{currentValue:0.000}");
+			NotifyValueChanged ("CurrentValue", $"{currentValue:000}");
 
 			Color c = currentColor;
 			switch (component) {
 			case ColorComponent.Red:
-				CurrentColor = new Color(currentValue, c.G, c.B, c.A);
+				CurrentColor = new Color((uint)currentValue, c.G, c.B, c.A);
 				break;
 			case ColorComponent.Green:
-				CurrentColor = new Color (c.R, currentValue, c.B, c.A);
+				CurrentColor = new Color (c.R, (uint)currentValue, c.B, c.A);
 				break;
 			case ColorComponent.Blue:
-				CurrentColor = new Color (c.R, c.G, currentValue, c.A);
+				CurrentColor = new Color (c.R, c.G, (uint)currentValue, c.A);
 				break;
 			case ColorComponent.Alpha:
-				CurrentColor = new Color (c.R, c.G, c.B, currentValue);
+				CurrentColor = new Color (c.R, c.G, c.B, (uint)currentValue);
 				break;
 			case ColorComponent.Hue:
-				CurrentColor = Color.FromHSV (currentValue, c.Value, c.Saturation, c.A);
+				CurrentColor = Color.FromHSV ((uint)currentValue, c.Value, c.Saturation, c.A);
 				break;
 			case ColorComponent.Saturation:
-				CurrentColor = Color.FromHSV (c.Hue, c.Value, currentValue, c.A);
+				CurrentColor = Color.FromHSV (c.Hue, c.Value, (uint)currentValue, c.A);
 				break;
 			case ColorComponent.Value:
-				CurrentColor = Color.FromHSV (c.Hue, currentValue, c.Saturation, c.A);
+				CurrentColor = Color.FromHSV (c.Hue, (uint)currentValue, c.Saturation, c.A);
 				break;
 			}
 		}

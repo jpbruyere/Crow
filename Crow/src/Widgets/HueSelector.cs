@@ -167,7 +167,7 @@ namespace Crow
 		}
 		void notifyHueChanged(){
 			NotifyValueChanged ("Hue", hue);
-			NotifyValueChanged ("HueColor", new SolidColor (Color.FromHSV (hue)));
+			NotifyValueChanged ("HueColor", new SolidColor (Color.FromHSV ((uint)(hue*255.0))));
 		}
 	}
 }
