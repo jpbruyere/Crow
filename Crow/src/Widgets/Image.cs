@@ -16,11 +16,11 @@ namespace Crow
 	/// </summary>
 	/// <remarks>
 	/// </remarks>
-	public class Image : Widget
+	public class Image : Scalable
 	{
 		Picture _pic;
 		string _svgSub;
-		bool scaled, keepProps;
+
 		double opacity;
 
 		#region Public properties
@@ -28,8 +28,8 @@ namespace Crow
 		/// If false, original size will be kept in any case.
 		/// </summary>
 		[DefaultValue(true)]
-		public virtual bool Scaled {
-			get { return scaled; }
+		public override bool Scaled {
+			get => base.Scaled;
 			set {
 				if (scaled == value)
 					return;
@@ -45,7 +45,7 @@ namespace Crow
 		/// If image is scaled, proportions will be preserved.
 		/// </summary>
 		[DefaultValue(true)]
-		public virtual bool KeepProportions {
+		public override bool KeepProportions {
 			get { return keepProps; }
 			set {
 				if (keepProps == value)
@@ -60,8 +60,7 @@ namespace Crow
 		}
 		/// <summary>
 		/// Image file path, may be on disk or embedded. Accepts bitmaps or SVG drawings.
-		/// </summary>
-        
+		/// </summary>        
 		public string Path {
 			get { return _pic == null ? "" : _pic.Path; }
 			set {
@@ -85,8 +84,7 @@ namespace Crow
 		/// <summary>
 		/// Used only for svg images, repaint only node named referenced in SvgSub.
 		/// If null, all the svg is rendered
-		/// </summary>
-		
+		/// </summary>		
 		public string SvgSub {
 			get { return _svgSub; }
 			set {
@@ -99,8 +97,7 @@ namespace Crow
 		/// <summary>
 		/// Object holding the image data once loaded, may be used directely to pupulate this control without 
 		/// specifying a path.
-		/// </summary>
-		
+		/// </summary>		
 		public Picture Picture {
 			get { return _pic; }
 			set {

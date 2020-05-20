@@ -197,31 +197,27 @@ CheckBoxAlt {
 ArrowBut {
 	MouseRepeat="true";	
 	Focusable="true";
-	Foreground="Onyx";
-	Background="hgradient|0:Grey|1:Jet";
-	MouseDown="{Background=hgradient|0:White|0.4:CornflowerBlue|1:Jet}";
-	MouseUp="{Background=hgradient|0:Grey|1:DimGrey}";
-	MouseEnter="{Foreground=Black}";
-	MouseLeave="{Foreground=Onyx}";
+	
+	Foreground="Jet";
+	Background="Transparent";
+	
+	MouseUp="{Background=Transparent}";
+	MouseDown="{Background=Grey}";
+	
+	MouseEnter="{Foreground=CornflowerBlue}";
+	MouseLeave="{Foreground=Jet}";
+	
+	Margin="2";
+	KeepProportions="true";
 }
-HArrowBut {
-	MouseRepeat="true";
-	Focusable="true";
-	Foreground="Onyx";
-	Background="vgradient|0:Grey|1:DimGrey";
-	MouseDown="{Background=vgradient|0:White|0.4:DarkBlue|1:Jet}";
-	MouseUp="{Background=vgradient|0:Grey|1:DimGrey}";
-	MouseEnter="{Foreground=Black}";
-	MouseLeave="{Foreground=DimGrey}";
-}
+
 ScrollBar {
     Maximum = "0";
     Value = "0";
-    Background = "Silver";
-    Foreground = "DimGrey";
-    Width = "12";
+    Foreground="Transparent";
+    Background="DimGrey";
+    Width = "12";    
     CornerRadius = "0";
-    Margin="0";
 }
 HScrollBar {
     Template = "#Crow.HScrollBar.template";

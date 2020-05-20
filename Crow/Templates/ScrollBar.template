@@ -2,7 +2,7 @@
 <Border BorderWidth="1" Foreground="{./Foreground}" Background="{./Background}">
 	<GenericStack Orientation="{./Orientation}" Spacing="0">
 		<Shape Style="ArrowBut"	MouseDown="./onScrollBack"
-            Margin="1" Height="6" Size="10,10" Path="M 4.5,0.5 L 9.5,9.5 L 0.5,9.5 Z G"/>
+    	Height="10" Size="10,10" Path="M 4.5,0.5 L 9.5,9.5 L 0.5,9.5 Z F"/>
 		<Slider Name="Slider"			
 			Orientation="{./Orientation}"
 			Value="{²./Value}"
@@ -11,10 +11,9 @@
 			Height="{./HeightPolicy}" Width="{./WidthPolicy}"
 			LargeIncrement="{./LargeIncrement}"
 			SmallIncrement="{./SmallIncrement}"
-			CursorColor="hgradient|0:Silver|1:Grey"
-			Foreground="{./Foreground}"
-            Background="Transparent"/>
+			CursorColor="Onyx"
+			Background="Transparent" Foreground="{./Foreground}"/>
 		<Shape Style="ArrowBut" MouseDown="./onScrollForth"
-             Margin="1" Height="6" Size="10,10" Path="M 0.5,0.5 L 9.5,0.5 L 4.5,9.5 Z G"/>
+      Height="10" Size="10,10" Path="M 0.5,0.5 L 9.5,0.5 L 4.5,9.5 Z F"/>
 	</GenericStack>
 </Border>

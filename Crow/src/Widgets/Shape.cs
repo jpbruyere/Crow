@@ -134,7 +134,7 @@ namespace Crow
 	/// <summary>
 	/// Widget for drawing a shape define with a path expression as defined in the PathParser.
 	/// </summary>
-	public class Shape : Widget
+	public class Shape : Scalable
 	{
 		#region CTOR
 		protected Shape () : base () { }
@@ -144,6 +144,7 @@ namespace Crow
 		string path;
 		double strokeWidth;
 		Size size;
+
 		/// <summary>
 		/// Path expression, for syntax see 'PathParser'.
 		/// </summary>
@@ -177,7 +178,6 @@ namespace Crow
 		/// <summary>
 		/// View box 
 		/// </summary>
-		/// <value>The size.</value>
 		[DefaultValue ("0,0")]
 		public Size Size {
 			get { return size; }
@@ -190,6 +190,7 @@ namespace Crow
 				RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
+
 		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
@@ -197,19 +198,32 @@ namespace Crow
 			if (string.IsNullOrEmpty (path))
 				return;
 
+			Rectangle cr = ClientRectangle;
+			double widthRatio = 1f, heightRatio = 1f;
+
+			double w = (double)(contentSize.Width == 0 ? size.Width : contentSize.Width);
+			double h = (double)(contentSize.Height == 0 ? size.Height : contentSize.Height);
+
+			if (Scaled) {
+				widthRatio = cr.Width / w;
+				heightRatio = cr.Height / h;
+			}
+
+			if (KeepProportions) {
+				if (widthRatio < heightRatio)
+					heightRatio = widthRatio;
+				else
+					widthRatio = heightRatio;
+			}
+
 			gr.Save ();
 
-			Rectangle r = ClientRectangle;
-
-
-			double sx = (double)r.Width / (double)(contentSize.Width == 0 ? size.Width : contentSize.Width);
-			double sy = (double)r.Height / (double)(contentSize.Height == 0 ? size.Height : contentSize.Height);
-
-			gr.Translate (r.Left, r.Top);
-			gr.Scale (sx, sy);
+			gr.Translate (cr.Left, cr.Top);
+			gr.Scale (widthRatio, heightRatio);
+			gr.Translate ((cr.Width / widthRatio - w) / 2, (cr.Height / heightRatio - h) / 2);
 
 			gr.LineWidth = strokeWidth;
-			Foreground.SetAsSource (gr, r);
+			Foreground.SetAsSource (gr, cr);
 
 			using (PathParser parser = new PathParser (path))
 				parser.Draw (gr);

@@ -21,8 +21,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "unitTests", "unitTests\unit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicTests", "Samples\BasicTests\BasicTests.csproj", "{7AEB6DD5-916E-4415-84E1-78EC6E5881CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "glfw-sharp", "..\..\glfw-sharp\glfw-sharp.csproj", "{A07754EB-1CAF-4D2D-8247-A3B6A46FB943}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerfTests", "PerfTests\PerfTests.csproj", "{18EBB41F-815E-4BF5-B80F-C9E2FAB2993A}"
 EndProject
 Global
@@ -53,10 +51,6 @@ Global
 		{7AEB6DD5-916E-4415-84E1-78EC6E5881CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AEB6DD5-916E-4415-84E1-78EC6E5881CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7AEB6DD5-916E-4415-84E1-78EC6E5881CE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A07754EB-1CAF-4D2D-8247-A3B6A46FB943}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A07754EB-1CAF-4D2D-8247-A3B6A46FB943}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A07754EB-1CAF-4D2D-8247-A3B6A46FB943}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A07754EB-1CAF-4D2D-8247-A3B6A46FB943}.Release|Any CPU.Build.0 = Release|Any CPU
 		{18EBB41F-815E-4BF5-B80F-C9E2FAB2993A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{18EBB41F-815E-4BF5-B80F-C9E2FAB2993A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18EBB41F-815E-4BF5-B80F-C9E2FAB2993A}.Release|Any CPU.ActiveCfg = Release|Any CPU
