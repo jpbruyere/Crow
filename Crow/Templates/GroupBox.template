@@ -7,7 +7,6 @@
 				<Container Name="Content" Margin="0" MinimumSize="70,10"/>
 			</Border>
 		</VerticalStack>
-		<Label Text="{./Caption}" VerticalAlignment="Top" Left="8"
-			Background="Clear" Margin="1"/>
+		<Label Text="{./Caption}" VerticalAlignment="Top" Left="8" Background="Clear" Margin="1"/>
 	</Group>
 </Container>

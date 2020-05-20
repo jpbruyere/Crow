@@ -800,7 +800,7 @@ namespace Crow
 		/// <summary>
 		/// Font being used in many controls, it is defined in the base GraphicObject class.
 		/// </summary>
-		[DesignCategory ("Appearance")][DefaultValue("sans, 10")]
+		[DesignCategory ("Appearance")][DefaultValue("sans, 12")]
 		public virtual Font Font {
 			get { return font; }
 			set {
@@ -1093,7 +1093,7 @@ namespace Crow
 			//all other instance of this type would not longer use reflexion to init properly
 			//but will fetch the  dynamic initialisation method compiled for this precise type
 			//TODO:measure speed gain.
-#region Delfault values Loading dynamic compilation
+			#region Delfault values Loading dynamic compilation
 			DynamicMethod dm = null;
 			ILGenerator il = null;
 

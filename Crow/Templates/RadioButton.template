@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0"?>
 <HorizontalStack Style="Control" Background="{./Background}">
-	<Image Style="Icon" Path="#Crow.Icons.radiobutton.svg"
-		SvgSub="{./IsChecked}"/>
-	<Label Text="{./Caption}"/>
+	<Image Style="Icon" Path="#Crow.Icons.radiobutton.svg" SvgSub="{./IsChecked}"/>
+	<Label Style="ControlCaption" Font="{./Font}" Text="{./Caption}" Foreground="{./Foreground}"/>
 </HorizontalStack>

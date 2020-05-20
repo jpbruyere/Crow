@@ -1,0 +1,35 @@
+﻿<?xml version="1.0"?>
+<VerticalStack Background="DimGrey">
+	<ColorPicker Name="cp" Width="Stretched"/>
+	<HorizontalStack Fit="True" Margin="10" Background="Jet">
+		<Widget Width="100" Height="60" Background="{../../cp.CurrentColor}"/>
+		<Widget Width="100" Height="60" Background="{../../cp.CurrentColor2}"/>
+	</HorizontalStack>
+	<HorizontalStack DataSource="{../cp.CurrentColor}" Fit="True" Margin="10" Background="Jet">
+		<Label Width="100" Text="Red"/>
+		<Label Width="100" Text="{R}"/>
+	</HorizontalStack>
+	<HorizontalStack DataSource="{../cp.CurrentColor}" Fit="True" Margin="10" Background="Jet">
+		<Label Width="100" Text="Blue"/>
+		<Label Width="100" Text="{B}"/>
+	</HorizontalStack>
+	<HorizontalStack DataSource="{../cp.CurrentColor}" Fit="True" Margin="10" Background="Jet">
+		<Label Width="100" Text="Green"/>
+		<Label Width="100" Text="{G}"/>
+	</HorizontalStack>
+	<HorizontalStack DataSource="{../cp.CurrentColor}" Fit="True" Margin="10" Background="Jet">
+		<Label Width="100" Text="Hue"/>
+		<Label Width="100" Text="{Hue}"/>
+	</HorizontalStack>
+	<HorizontalStack DataSource="{../cp.CurrentColor}" Fit="True" Margin="10" Background="Jet">
+		<Label Width="100" Text="Saturation"/>
+		<Label Width="100" Text="{Saturation}"/>
+	</HorizontalStack>
+	<HorizontalStack DataSource="{../cp.CurrentColor}" Fit="True" Margin="10" Background="Jet">
+		<Label Width="100" Text="Value"/>
+		<Label Width="100" Text="{Value}"/>
+	</HorizontalStack>
+</VerticalStack>
+	
+
+

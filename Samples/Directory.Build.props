@@ -1,0 +1,44 @@
+<Project>
+	<PropertyGroup>
+		<TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+		<OutputType>Exe</OutputType>
+		
+		<RootDirectory>$(MSBuildThisFileDirectory)</RootDirectory>        
+		<OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>
+		<IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)\</IntermediateOutputPath>
+		
+		<!--<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>-->
+		
+		<License>MIT</License>
+		<Authors>Jean-Philippe Bruyère</Authors>
+
+		<EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+		<SamplesDir>$(SolutionDir)Samples\</SamplesDir>
+	</PropertyGroup>
+	<PropertyGroup>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="$(SolutionDir)Crow\Crow.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="$(SamplesDir)common\ui\Interfaces\**\*.*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Interfaces\%(RecursiveDir)%(Filename)%(Extension)</Link>
+		</None>
+		<EmbeddedResource Include="$(SamplesDir)common\ui\templates\**\*.*">
+			<LogicalName>ui.%(Filename)%(Extension)</LogicalName>
+			<Link>Templates\%(Filename)%(Extension)</Link>
+		</EmbeddedResource>
+		<EmbeddedResource Include="$(SamplesDir)common\samples.style" />
+		<EmbeddedResource Include="$(SamplesDir)common\ui\images\**\*.*">
+			<LogicalName>images.%(Filename)%(Extension)</LogicalName>
+			<Link>Images\%(Filename)%(Extension)</Link>
+		</EmbeddedResource>
+		<EmbeddedResource Include="$(SamplesDir)common\ui\Icons\*.*">
+			<LogicalName>Icons.%(Filename)%(Extension)</LogicalName>
+			<Link>Icons\%(Filename)%(Extension)</Link>
+		</EmbeddedResource>
+		<Compile Include="$(SamplesDir)common\SampleBase.cs"/>
+	</ItemGroup>
+</Project>

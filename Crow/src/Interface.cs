@@ -1156,8 +1156,7 @@ namespace Crow
 				cursor = value;
 
 				currentCursor?.Dispose ();
-				currentCursor = createCursor (cursor);
-				System.Diagnostics.Debug.WriteLine ($"cursor=>{cursor}");
+				currentCursor = createCursor (cursor);				
 				currentCursor.Set (hWin);
 				//MouseCursorChanged.Raise (this,new MouseCursorChangedEventArgs(cursor));
 			}

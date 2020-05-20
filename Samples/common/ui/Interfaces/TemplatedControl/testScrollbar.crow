@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Group Name="TopContainer" Focusable="True" Background="Onyx" Margin="50">
+<Group Name="TopContainer" Focusable="True" Background="DarkGrey" Margin="50">
 	<ScrollBar  Maximum="100" Height="90%"/>
 	<ScrollBar Style="HScrollBar" Maximum="100" VerticalAlignment="Bottom"/>
 </Group>

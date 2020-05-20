@@ -35,7 +35,7 @@ namespace Crow
 		DarkBlue             = 0x00008BFF,
 		DarkCyan             = 0x008B8BFF,
 		DarkGoldenRod        = 0xB8860BFF,
-		DarkGrey             = 0xA9A9A9FF,
+		DarkGrey             = 0x202020FF,
 		DarkGreen            = 0x006400FF,
 		DarkKhaki            = 0xBDB76BFF,
 		DarkMagenta          = 0x8B008BFF,

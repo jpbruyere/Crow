@@ -242,7 +242,7 @@ namespace Crow {
 		[XmlIgnore]protected Char CurrentChar
 		{
 			get {
-				return lines [CurrentLine] [CurrentColumn];
+				return lines [CurrentLine][CurrentColumn];
 			}
 		}
 		/// <summary>

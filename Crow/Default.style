@@ -12,15 +12,26 @@ Expandable { Caption = "Expandable"; }
 Popper { Caption = "Popper";}
 GroupBox { Caption = "Group Box"; }
 
+Control {
+	Margin="0";
+	Spacing="3";
+}
 ControlBorder {
 	BorderWidth	= "1";
 	Foreground  = "DimGrey";
 	Background	= "Transparent";
+	CornerRadius = "0";	
 }
 ControlCaption {
-	Foreground  = "Grey";
+	Foreground  = "LightGrey";
 	MouseEnter	= "{Foreground=White}";
-	MouseLeave	= "{Foreground=Grey}";
+	MouseLeave	= "{Foreground=LightGrey}";
+}
+ControlEditableText {
+	Foreground	= "LightGrey";
+	Background	= "Transparent";
+	MinimumSize	= "80,10";
+	Margin		= "1";
 }
 Icon {
 	Margin = "1";
@@ -88,9 +99,7 @@ Splitter {
 	Margin = "1";
 	Background = "Grey";
 }
-Spinner {	
-	Foreground = "Grey";
-}
+
 TabView {
 	CacheEnabled = "false";
 	AllowDrop = "true";
@@ -163,10 +172,6 @@ ProgressBar {
 Scroller {
 	CacheEnabled = "false";
 }
-Control {
-	Margin="0";
-	Spacing="3";
-}
 SaturationValueSelector {
 	Foreground="Red";
 }
@@ -198,14 +203,14 @@ ArrowBut {
 	MouseRepeat="true";	
 	Focusable="true";
 	
-	Foreground="Jet";
+	Foreground="Grey";
 	Background="Transparent";
 	
-	MouseUp="{Background=Transparent}";
-	MouseDown="{Background=Grey}";
+	//MouseUp="{Background=Transparent}";
+	//MouseDown="{Background=Grey}";
 	
 	MouseEnter="{Foreground=CornflowerBlue}";
-	MouseLeave="{Foreground=Jet}";
+	MouseLeave="{Foreground=Grey}";
 	
 	Margin="2";
 	KeepProportions="true";
@@ -215,7 +220,7 @@ ScrollBar {
     Maximum = "0";
     Value = "0";
     Foreground="Transparent";
-    Background="DimGrey";
+    Background="Onyx";
     Width = "12";    
     CornerRadius = "0";
 }

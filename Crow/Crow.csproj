@@ -4,6 +4,7 @@
 		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 		
 		<AssemblyVersion>$(CrowVersion)</AssemblyVersion>
+		<ReleaseVersion>$(CrowVersion)</ReleaseVersion>
 		<PackageVersion>$(CrowPackageVersion)</PackageVersion>
 		
 		<Title>C# Rapid Open Widget Toolkit</Title>
@@ -11,33 +12,33 @@
 		<License>MIT</License>
 		<Authors>Jean-Philippe Bruyère</Authors>
 		<RepositoryUrl>https://github.com/jpbruyere/Crow</RepositoryUrl>
-		<PackageTags>GUI Widget toolkit Interface C# .Net Mono</PackageTags>
+		<PackageTags>GUI Widget toolkit Interface C# Net</PackageTags>
 		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
 		<PackageProjectUrl>https://github.com/jpbruyere/Crow/wiki</PackageProjectUrl>
 		<PackageLicense>https://opensource.org/licenses/MIT</PackageLicense>
 		<PackageIcon>crow.png</PackageIcon>
-		<PackageCopyright>Copyright 2013-2019</PackageCopyright>
+		<PackageCopyright>Copyright 2013-2020</PackageCopyright>
 		<PackageReleaseNotes>
-			This release should solve most of ms dotnet exception, the win32 backend is
-			still untested. Next beta will have a glfw backend.
+			This release is a major step to finaly get a 1.0 version of crow.
+			A single glfw backend to handle os layers, and NetCore target for samples
+			to overcome CAS exceptions on windows.
 		</PackageReleaseNotes>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);1591;1587;1570;1572;1573;1574</NoWarn>
-		<DefineConstants>DESIGN_MODE</DefineConstants>
-		<DefineConstants>DESIGN_MODE</DefineConstants>
+		<DefineConstants>_DESIGN_MODE</DefineConstants>		
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<DebugType>full</DebugType>
-		<DefineConstants>DEBUG;TRACE;MEASURE_TIME;_DEBUG_DISPOSE;_DEBUG_BINDING;DESIGN_MODE;_DEBUG_CLIP_RECTANGLE;_DEBUG_FOCUS;DEBUG_DRAGNDROP;_DEBUG_LOG</DefineConstants>
+		<DefineConstants>DEBUG;TRACE;MEASURE_TIME;_DEBUG_DISPOSE;_DEBUG_BINDING;_DEBUG_CLIP_RECTANGLE;_DEBUG_FOCUS;DEBUG_DRAGNDROP;_DEBUG_LOG</DefineConstants>
 		<CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
 	</PropertyGroup>
 	<ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
 		<PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.6.0" />
 		<PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.6.0" />
-		<PackageReference Include="glfw-sharp" Version="0.2.6" />
+		<PackageReference Include="glfw-sharp" Version="0.2.6-beta" />
 		<PackageReference Include="FastEnum" Version="1.5.3" />
 	</ItemGroup>
 	<PropertyGroup Condition=" '$(CrowStbSharp)' == 'true'">
@@ -58,21 +59,7 @@
 			<LogicalName>Crow.Cursors.%(Filename)</LogicalName>
 		</EmbeddedResource>
 	</ItemGroup>
-<!--	<ItemGroup>
-	  <ProjectReference Include="..\..\..\glfw-sharp\glfw-sharp.csproj" />
-	</ItemGroup>-->
-	<!--<ItemGroup>
-	  <Compile Remove="src\Widgets\ColorPicker2.cs" />
-	  <Compile Remove="src\Widgets\ColorSlider.cs" />
-	</ItemGroup>
-	<ItemGroup>
-	  <None Include="src\Widgets\ColorPicker2.cs" />
-	  <None Include="src\Widgets\ColorSlider.cs" />
-	</ItemGroup>-->
 	<ItemGroup>
 	  <Compile Remove="src\Widgets\ColorPicker2.cs" />
-	</ItemGroup>
-	<ItemGroup>
-	  <None Include="src\Widgets\ColorPicker2.cs" />
 	</ItemGroup>
 </Project>

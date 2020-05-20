@@ -3,12 +3,8 @@
 	<VerticalStack>
 		<HorizontalStack Spacing="1" Height="Fit" Focusable="true" MouseDoubleClick="./onClickForExpand">
 			<Container Margin="1" Width="9" Height="9" MouseDown="./onClickForExpand"
-														MouseEnter="{Background=LightGrey}"
-														MouseLeave="{Background=Transparent}">
-				<Image
-					Path="#Crow.Icons.expandable.svg"
-					Visible="{./IsExpandable}"
-					SvgSub="{./IsExpanded}"/>
+					MouseEnter="{Background=CornflowerBlue}" MouseLeave="{Background=Transparent}">
+				<Image Path="#Crow.Icons.expandable.svg" Visible="{./IsExpandable}"	SvgSub="{./IsExpanded}"/>
 			</Container>
 			<Label Style="ControlCaption" Text="{./Caption}"/>
 		</HorizontalStack>

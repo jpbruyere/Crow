@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <Border Name="Content"
-	Background="vgradient|0:White|0.1:LightGrey|0.9:LightGrey|1:Black" Foreground="DarkGrey" 
+	Background="vgradient|0:White|0.1:LightGrey|0.9:LightGrey|1:Black" Foreground="Grey" 
 	MouseEnter="{Foreground=White}"
-	MouseLeave="{Foreground=DarkGrey}"
+	MouseLeave="{Foreground=Grey}"
 	MouseDown="{Background=vgradient|0:Black|0.1:LightGrey|0.9:LightGrey|1:White}"
 	MouseUp="{Background=vgradient|0:White|0.1:LightGrey|0.9:LightGrey|1:Black}"
 	>

@@ -3,22 +3,19 @@
 	<Template>
 		<CheckBox Caption="{./Caption}" IsChecked="{²./IsPopped}" Foreground="{./Foreground}" Background="{./Background}">
 			<Template>
-				<Border CornerRadius="0" Foreground="LightGrey">
+				<Border Style="ControlBorder" >
 					<HorizontalStack Margin="0" Spacing="1">
-						<TextBox MinimumSize="80,10" Margin="1" Foreground="Black" Background="White"
-							Text="{./Caption}"/>
-						<Button Width="14" Height="14" Focusable="false"
-							Template="#Crow.ArrowBut.template">
-							<Image Margin="0"  Path="#Crow.Icons.updown.svg" SvgSub="down"/>
-						</Button>
+						<TextBox Style="ControlEditableText" Text="{./Caption}"/>
+						<Shape Style="ArrowBut" MouseDown="./onScrollForth" Width="10" Height="Stretched"
+							Size="10,10" Path="M 0.5,0.5 L 9.5,0.5 L 4.5,9.5 Z F"/>
 					</HorizontalStack>
 				</Border>
 			</Template>
 		</CheckBox>
 	</Template>
-	<Border Background="DimGrey" BorderWidth="1" Margin="1" Height="Fit" Width="1"
+	<Border Background="Onyx" Foreground="DimGrey" BorderWidth="1" Margin="1" Height="Fit" Width="1"
 		MinimumSize="{../../MinimumPopupSize}" >
-		<Scroller Name="scroller1" Margin="2" 
+		<Scroller Name="scroller1" Margin="1" 
 			MaximumSize="0,200"
 			HorizontalAlignment="Left">
 			<VerticalStack

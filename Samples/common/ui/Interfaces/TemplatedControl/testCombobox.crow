@@ -1,4 +1,8 @@
 ﻿<?xml version="1.0"?>
-<Container Background="DimGrey" Width="300">
+<VerticalStack Background="DarkGrey" Width="80%" Spacing="20">
 	<ComboBox  Data="{TestList}" ItemTemplate="Interfaces/colorItem.crow"/>
-</Container>
+	<ComboBox  Data="{TestList}" ItemTemplate="Interfaces/colorItem.crow" Width="150"/>
+	<ComboBox  Data="{TestList}" ItemTemplate="Interfaces/colorItem.crow" Width="Fit"/>
+	<ComboBox Data="{TestList3Props1}"/>
+	<ComboBox Data="{TestList3Props1}" Width="Fit"/>	
+</VerticalStack>
