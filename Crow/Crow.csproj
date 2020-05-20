@@ -23,21 +23,20 @@
 		</PackageReleaseNotes>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<NoWarn>$(NoWarn);1591;1587;1570;1572;1573;1574</NoWarn>
-		<DefineConstants>DESIGN_MODE</DefineConstants>
-		<DefineConstants>DESIGN_MODE</DefineConstants>
+		<NoWarn>$(NoWarn);1591;1587;1570;1572;1573;1574</NoWarn>		
+		<DefineConstants>_DESIGN_MODE</DefineConstants>
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<DebugType>full</DebugType>
-		<DefineConstants>DEBUG;TRACE;MEASURE_TIME;_DEBUG_DISPOSE;_DEBUG_BINDING;DESIGN_MODE;_DEBUG_CLIP_RECTANGLE;_DEBUG_FOCUS;DEBUG_DRAGNDROP;_DEBUG_LOG</DefineConstants>
+		<DefineConstants>DEBUG;TRACE;MEASURE_TIME;_DEBUG_DISPOSE;_DEBUG_BINDING;_DESIGN_MODE;_DEBUG_CLIP_RECTANGLE;_DEBUG_FOCUS;DEBUG_DRAGNDROP;_DEBUG_LOG</DefineConstants>
 		<CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
 	</PropertyGroup>
 	<ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
 		<PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.6.0" />
 		<PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.6.0" />
-		<PackageReference Include="glfw-sharp" Version="0.2.6" />
+		<PackageReference Include="glfw-sharp" Version="0.2.6-beta" />
 		<PackageReference Include="FastEnum" Version="1.5.3" />
 	</ItemGroup>
 	<PropertyGroup Condition=" '$(CrowStbSharp)' == 'true'">

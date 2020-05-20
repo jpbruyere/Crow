@@ -27,7 +27,7 @@ namespace Crow.IML
 		public DynamicMethod dm = null;
 		public ILGenerator il = null;
 		//public SubNodeType curSubNodeType;
-		public NodeStack nodesStack = new NodeStack ();
+		public Stack<Node> nodesStack = new Stack<Node> ();
 
 		/// <summary> store addresses of named node for name resolution at end of parsing </summary>
 		public Dictionary<string, List<NodeAddress>> Names  = new Dictionary<string, List<NodeAddress>>();
@@ -37,6 +37,8 @@ namespace Crow.IML
 		/// <summary> Store binding with name in target, will be resolved at end of parsing </summary>
 		public List<BindingDefinition> UnresolvedTargets = new List<BindingDefinition>();
 
+		Type curDataSourceType = null;
+
 
 		public IMLContext (Type rootType)
 		{
@@ -44,28 +46,42 @@ namespace Crow.IML
 			dm = new DynamicMethod ("dyn_instantiator",
 				typeof (object), new Type [] { typeof (Instantiator), typeof (Interface) }, true);
 			il = dm.GetILGenerator (256);
-
-			il.DeclareLocal (typeof (Widget));
-			il.Emit (OpCodes.Nop);
+			lb = il.DeclareLocal(typeof(Widget));
+		}
+		LocalBuilder lb;
+		/// <summary>
+		/// Instantiate a new widget, save it at loc.0 and set current interface from arg2 of loader
+		/// 
+		/// </summary>
+		/// <param name="widgetType"></param>
+		public void EmitCreateWidget (Type widgetType, int index = 0) {
 			//set local GraphicObject to root object
-			ConstructorInfo ci = rootType.GetConstructor (
-					BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, 
+			ConstructorInfo ci = widgetType.GetConstructor (
+					BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
 					null, Type.EmptyTypes, null);
 			if (ci == null)
-				throw new Exception ("No default parameterless constructor found in " + rootType.Name);			
+				throw new Exception ("No default parameterless constructor found in " + widgetType.Name);
 			il.Emit (OpCodes.Newobj, ci);
-			il.Emit (OpCodes.Stloc_0);
-			CompilerServices.emitSetCurInterface (il);
+			/// Loc0 is now the current new widget and arg2 of loader is the current interface
+			//LocalBuilder lb = il.DeclareLocal (typeof(Widget));
+			nodesStack.Push (new Node (widgetType, lb, index, curDataSourceType));
+			il.Emit (OpCodes.Stloc, lb);
+			il.Emit (OpCodes.Ldloc, lb);
+			il.Emit (OpCodes.Ldarg_1);
+			il.Emit (OpCodes.Stfld, CompilerServices.miSetCurIface);
 		}
+		public void Emit (OpCode opcode) => il.Emit (opcode);
+		public void EmitLdCurrentNode ()
+			=> il.Emit (OpCodes.Ldloc, nodesStack.Peek ().Locale);
+		public void ResetCurrentNodeIndex () {
+			Node n = nodesStack.Pop ();
+			nodesStack.Push (new Node (n.CrowType, n.Locale));
+		}
+		public InstanciatorInvoker CreateDelegate (Instantiator inst) {
+			EmitLdCurrentNode ();
+			il.Emit (OpCodes.Ret);
 
-		Type curDataSourceType = null;
-		/// <summary>
-		/// Pushs  new node and set datasourcetype to current ds type
-		/// </summary>
-		/// <param name="crowType">Crow type.</param>
-		/// <param name="_index">Index.</param>
-		public void PushNode (Type crowType, int _index = 0) {
-			nodesStack.Push (new Node (crowType, _index, curDataSourceType));
+			return (InstanciatorInvoker)dm.CreateDelegate (typeof (InstanciatorInvoker), inst);
 		}
 		/// <summary>
 		/// Pops node and set curDS type to previous one in node on top of the stack

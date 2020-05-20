@@ -226,8 +226,8 @@ namespace Crow
 		/// </summary>
 		public void Init () {
 			loadStyling ();
-			initTooltip ();
-			initContextMenus ();
+			//initTooltip ();
+			//initContextMenus ();
 			OnInitialized ();
 		}
 		/// <summary>

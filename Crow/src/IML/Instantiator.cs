@@ -126,6 +126,12 @@ namespace Crow.IML {
 				return new Instantiator (_iface, s);
 			}
 		}
+#if DEBUG
+		//ctor for debugging
+		public Instantiator (Interface iface) {
+			this.iface = iface;
+		}
+#endif
 		#endregion
 
 		/// <summary>
@@ -194,7 +200,7 @@ namespace Crow.IML {
 		void parseIML (XmlReader reader) {
 			IMLContext ctx = new IMLContext (findRootType (reader));
 
-			ctx.PushNode (ctx.RootType);
+			ctx.EmitCreateWidget (ctx.RootType);
 			emitLoader (reader, ctx);
 			ctx.PopNode ();
 
@@ -508,7 +514,7 @@ namespace Crow.IML {
 
 				readChildren (reader, ctx);
 
-				ctx.nodesStack.ResetCurrentNodeIndex ();
+				ctx.ResetCurrentNodeIndex ();
 			}
 		}
 		/// <summary>
@@ -535,24 +541,17 @@ namespace Crow.IML {
 					//loc_0 will be used for child
 					ctx.il.Emit (OpCodes.Ldloc_0);
 					ctx.il.Emit (OpCodes.Ldloc_0);
+					ctx.il.Emit (OpCodes.Castclass, ctx.nodesStack.Peek ().CrowType);
 
 					Type t = tryGetGOType (reader.Name);
 					if (t == null)
 						throw new Exception (reader.Name + " type not found");
-					ConstructorInfo ci = t.GetConstructor (
-						                     BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,  
-						null, Type.EmptyTypes, null);
-					if (ci == null)
-						throw new Exception ("No default parameterless constructor found in " + t.Name);					
-					ctx.il.Emit (OpCodes.Newobj, ci);
-					ctx.il.Emit (OpCodes.Stloc_0);//child is now loc_0
-					CompilerServices.emitSetCurInterface (ctx.il);
 
-					ctx.nodesStack.Push (new Node (t, nodeIdx));
+					ctx.EmitCreateWidget (t, nodeIdx);
 					emitLoader (reader, ctx);
 					ctx.nodesStack.Pop ();
 
-					ctx.il.Emit (OpCodes.Ldloc_0);//load child on stack for parenting
+					ctx.il.Emit (OpCodes.Ldloc_0);//load child on stack for parenting					
 					ctx.il.Emit (OpCodes.Callvirt, ctx.nodesStack.Peek().GetAddMethod(nodeIdx));
 					ctx.il.Emit (OpCodes.Stloc_0); //reset local to current go
 

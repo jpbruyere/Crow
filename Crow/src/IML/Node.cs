@@ -37,10 +37,10 @@ namespace Crow.IML
 	public struct Node
 	{
 		#region CTOR
-		public Node (Type crowType, int _index = 0, Type dsType = null)
-		{
+		public Node (Type crowType, LocalBuilder locale, int index = 0, Type dsType = null) {
 			CrowType = crowType;
-			Index = _index;
+			Index = index;
+			Locale = locale;
 			DataSourceType = dsType;
 		}
 		#endregion
@@ -49,6 +49,11 @@ namespace Crow.IML
 		public readonly Type CrowType;
 		/// <summary> Index in parent, -1 for template</summary>
 		public readonly int Index;
+		/// <summary>
+		/// locale during instantiator emit
+		/// </summary>
+		public readonly LocalBuilder Locale;
+
 		/// <summary>
 		/// DataSourceType attribute if set
 		/// </summary>
