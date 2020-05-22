@@ -10,9 +10,11 @@ namespace tests
 {
 	public class BasicTests : SampleBase
 	{
-		[STAThread]
 		static void Main ()
 		{
+#if NETCOREAPP3_1
+			DllMapCore.Resolve.Enable (true);
+#endif
 			using (BasicTests app = new BasicTests ()) {
 				app.Run ();
 			}
@@ -96,7 +98,7 @@ namespace tests
 				else if (idx < 0)
 					idx = testFiles.Length - 1;
 
-				Console.WriteLine ($"Loading {testFiles [idx]}.");
+				Console.WriteLine ($"Loading {testFiles [idx]}. {AppDomain.CurrentDomain.MonitoringSurvivedMemorySize}");
 
 				Load (testFiles [idx]).DataSource = this;
 			} catch (Exception ex) {

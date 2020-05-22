@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFrameworks>net472</TargetFrameworks>
-		<OutputType>Exe</OutputType>
-		<ReleaseVersion>0.8.0</ReleaseVersion>
-	</PropertyGroup>
-	<ItemGroup>
-	  <ProjectReference Include="..\Crow\Crow.csproj" />
-	</ItemGroup>
 	
-	<ItemGroup>
+	<!--<ItemGroup>
 		<None Include="$(SolutionDir)Samples\common\ui\Interfaces\**\*.*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<Link>Interfaces\%(RecursiveDir)%(Filename)%(Extension)</Link>
@@ -27,7 +19,7 @@
 			<LogicalName>Icons.%(Filename)%(Extension)</LogicalName>
 			<Link>Icons\%(Filename)%(Extension)</Link>
 		</EmbeddedResource>
-	</ItemGroup>
+	</ItemGroup>-->
 	<ItemGroup>
 	  <PackageReference Include="GitInfo" Version="2.0.26" />
 	</ItemGroup>

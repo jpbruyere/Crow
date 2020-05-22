@@ -4,7 +4,6 @@
 		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 		
 		<AssemblyVersion>$(CrowVersion)</AssemblyVersion>
-		<ReleaseVersion>$(CrowVersion)</ReleaseVersion>
 		<PackageVersion>$(CrowPackageVersion)</PackageVersion>
 		
 		<Title>C# Rapid Open Widget Toolkit</Title>
@@ -29,6 +28,7 @@
 		<DefineConstants>_DESIGN_MODE</DefineConstants>		
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+		<AppConfig>App.config</AppConfig>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<DebugType>full</DebugType>

@@ -1,32 +1,28 @@
-// Copyright (c) 2013-2019  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using Crow;
 using System.IO;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Linq;
 using System.Text;
 using Crow.IML;
 
-namespace tests
+namespace ShowCase
 {
 	class Showcase : Interface
 	{
-		public Container crowContainer;
 
-		[STAThread]
 		static void Main ()
 		{
-			using (Showcase app = new Showcase ()) {
-				//app.Keyboard.KeyDown += App_KeyboardKeyDown;
-
+#if NETCOREAPP3_1
+			DllMapCore.Resolve.Enable (true);
+#endif
+			using (Showcase app = new Showcase ()) 
 				app.Run ();
-
-			}
 		}
+
+		public Container crowContainer;
 
 		protected override void OnInitialized ()
 		{

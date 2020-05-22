@@ -15,10 +15,10 @@
 		<EnableDefaultNoneItems>false</EnableDefaultNoneItems>
 		<SamplesDir>$(SolutionDir)Samples\</SamplesDir>
 	</PropertyGroup>
-	<PropertyGroup>
-	</PropertyGroup>
 	
+
 	<ItemGroup>
+	  <PackageReference Include="DllMapCore" Version="0.1.0" Condition="'$(TargetFramework)'=='netcoreapp3.1'" />
 		<ProjectReference Include="$(SolutionDir)Crow\Crow.csproj" />
 	</ItemGroup>
 	<ItemGroup>

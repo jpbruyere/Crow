@@ -22,7 +22,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "unitTests", "unitTests\unit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BasicTests", "Samples\BasicTests\BasicTests.csproj", "{7AEB6DD5-916E-4415-84E1-78EC6E5881CE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerfTests", "PerfTests\PerfTests.csproj", "{18EBB41F-815E-4BF5-B80F-C9E2FAB2993A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerfTests", "Samples\PerfTests\PerfTests.csproj", "{18EBB41F-815E-4BF5-B80F-C9E2FAB2993A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,6 +65,7 @@ Global
 		{56329D48-D382-4850-93DE-59C453894E8A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{91F1CE07-EECE-4F1D-A3EE-7239B563654A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{7AEB6DD5-916E-4415-84E1-78EC6E5881CE} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
+		{18EBB41F-815E-4BF5-B80F-C9E2FAB2993A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00D4E149-7131-49F4-BAAD-559AA961A78E}
@@ -105,6 +106,5 @@ Global
 		$6.LineAlign = 0
 		$6.Wrap = False
 		description = @C.R.O.W. c# Rapid Open Widgets\n\nCrow is a pure c# widget toolkit with XML definition of interface, bindings, styling...\n
-		version = 0.8.0
 	EndGlobalSection
 EndGlobal

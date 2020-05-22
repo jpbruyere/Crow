@@ -8,7 +8,7 @@ using Crow;
 
 namespace Crow
 {
-	public class SampleBase : Interface {
+	public class SampleBase : Interface {	
 		public Version CrowVersion => Assembly.GetAssembly (typeof (Widget)).GetName ().Version;
 
 		#region Test values for Binding

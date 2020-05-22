@@ -1,10 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net472</TargetFramework>
-		<ReleaseVersion>0.8.0</ReleaseVersion>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-	  <DebugType>full</DebugType>
 	</PropertyGroup>
 	<ItemGroup>
 	  <PackageReference Include="NUnit" Version="3.12.0" />

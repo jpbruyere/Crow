@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-	
 	<ItemGroup>
 		<EmbeddedResource Include="ui\*.*">
 			<LogicalName>ShowCase.%(Filename)%(Extension)</LogicalName>
@@ -8,5 +7,5 @@
 	</ItemGroup>
 	<ItemGroup>
 		<None Remove="..\common\ui\Interfaces\basicTests\7.crow" />
-	</ItemGroup>
+	</ItemGroup>	
 </Project>
