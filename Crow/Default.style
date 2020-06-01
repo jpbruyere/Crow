@@ -1,4 +1,6 @@
-﻿Button, CheckBox, RadioButton, ComboBox, Expandable,
+﻿ControlBackground = "Transparent";
+
+Button, CheckBox, RadioButton, ComboBox, Expandable,
 MessageBox, Popper, Slider, Spinner, TextBox {
 	Focusable = "true";
 	Height = "Fit";
@@ -19,7 +21,7 @@ Control {
 ControlBorder {
 	BorderWidth	= "1";
 	Foreground  = "DimGrey";
-	Background	= "Transparent";
+	Background	= "${ControlBackground}";
 	CornerRadius = "0";	
 }
 ControlCaption {

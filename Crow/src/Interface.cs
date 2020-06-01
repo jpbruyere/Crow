@@ -435,6 +435,16 @@ namespace Crow
 		public Dictionary<String, LoaderInvoker> DefaultValuesLoader = new Dictionary<string, LoaderInvoker>();
 		/// <summary>Store dictionnary of member/value per StyleKey</summary>
 		public Dictionary<string, Style> Styling;
+		/// <summary>
+		/// Replacement value for style like cmake or bash variable.
+		/// </summary>
+		/// <remarks>
+		/// each 'key=value' pair in style files not enclosed in brackets are threated as constant.
+		/// If the same constant is defined more than once, only the first is kept.
+		/// Than in any IML expresion, in style or xml, constant may be used as a replacement string with ${CONSTANTID}.
+		/// If a constant is not resolved in iml while creating the instantiator, an error is thrown.
+		/// </remarks>
+		public readonly Dictionary<string, string> StylingConstants = new Dictionary<string, string> ();
 		/// <summary> parse all styling data's during application startup and build global Styling Dictionary </summary>
 		protected virtual void loadStyling() {
 			Styling = new Dictionary<string, Style> ();
@@ -451,9 +461,8 @@ namespace Crow
 			foreach (string s in assembly
 				.GetManifestResourceNames ()
 				.Where (r => r.EndsWith (".style", StringComparison.OrdinalIgnoreCase))) {
-				using (Stream stream = assembly.GetManifestResourceStream (s)) {
-					new StyleReader (this.Styling, stream, s);
-				}
+				using (StyleReader sr = new StyleReader (assembly.GetManifestResourceStream (s))) 
+					sr.Parse (this, s);				
 			}
 		}
 		#endregion

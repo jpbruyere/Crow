@@ -15,6 +15,7 @@ namespace tests
 #if NETCOREAPP3_1
 			DllMapCore.Resolve.Enable (true);
 #endif
+
 			using (BasicTests app = new BasicTests ()) {
 				app.Run ();
 			}
@@ -98,8 +99,11 @@ namespace tests
 				else if (idx < 0)
 					idx = testFiles.Length - 1;
 
+#if NETCOREAPP3_1
 				Console.WriteLine ($"Loading {testFiles [idx]}. {AppDomain.CurrentDomain.MonitoringSurvivedMemorySize}");
-
+#else
+				Console.WriteLine ($"Loading {testFiles [idx]}. {GC.GetTotalMemory(true)}");
+#endif
 				Load (testFiles [idx]).DataSource = this;
 			} catch (Exception ex) {
 				(LoadIMLFragment ($"<Label Background='Red' Foreground='White' Height='Fit' Width='Stretched' Multiline='true' VerticalAlignment='Bottom' Margin='5' />") as Label).Text = ex.ToString();

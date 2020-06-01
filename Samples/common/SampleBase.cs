@@ -12,7 +12,7 @@ namespace Crow
 		public Version CrowVersion => Assembly.GetAssembly (typeof (Widget)).GetName ().Version;
 
 		#region Test values for Binding
-		public List<Crow.Command> Commands;
+		public List<Command> Commands;
 		public int intValue = 500;
 		VerticalAlignment currentVAlign;
 
