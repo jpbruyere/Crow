@@ -20,7 +20,8 @@ namespace Crow
 		enum States { classNames, members, value, endOfStatement }
 
 		States curState = States.classNames;
-
+		int column = 1;
+		int line = 1;
 
 		#region Character ValidityCheck
 		static Regex rxValidChar = new Regex(@"\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}|\p{Mn}|\p{Mc}|\p{Nd}|\p{Pc}|\p{Cf}");
@@ -62,8 +63,8 @@ namespace Crow
 		/// <param name="iFace">the Interface to load the style for</param>
 		public void Parse (Interface iFace, string resId)
 		{
-			int column = 1;
-			int line = 1;
+			column = 1;
+			line = 1;
 			curState = States.classNames;
 
 			string styleKey = resId.Substring (0, resId.Length - 6);

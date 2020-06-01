@@ -31,7 +31,7 @@ namespace Crow.IML {
 	/// 	- Default values (appearing as attribute in C#)  loading
 	/// 	- Styling
 	/// 
-	/// Instantiators are shared amongs interfaces. Their are stored with their path as key, and inlined template
+	/// Their are stored in the Interface with their path as key, and inlined template
 	/// and itemtemplate are stored with a generated uuid
 	/// </summary>
 	public class Instantiator
@@ -470,17 +470,44 @@ namespace Crow.IML {
 						if (reader.Name == "Style" || reader.Name == "DataSourceType" || reader.Name == "Template")
 							continue;
 
-						#if DESIGN_MODE
+#if DESIGN_MODE
 						emitSetDesignAttribute (ctx, reader.Name, reader.Value);
-						#endif
+#endif
+
+						string imlValue = reader.Value;
+						StringBuilder styledValue = new StringBuilder();
+
+						int vPtr = 0;
+						while (vPtr < imlValue.Length) {
+							if (imlValue [vPtr] == '$') {
+								if (imlValue [vPtr+1] == '{') {
+									vPtr+=2;
+									string cstId = "";
+									while (vPtr < imlValue.Length) {
+										if (imlValue [vPtr] == '}') {
+											vPtr++;
+											break;
+										}
+										cstId += imlValue [vPtr++];
+									}
+									if (string.IsNullOrEmpty (cstId) || !iface.StylingConstants.ContainsKey (cstId))
+										throw new Exception ("undefined constant id: " + cstId);
+									styledValue.Append (iface.StylingConstants [cstId]);
+									continue; 
+								}
+							}
+							styledValue.Append (imlValue [vPtr++]);
+						}
+						imlValue = styledValue.ToString ();
 
 						MemberInfo mi = ctx.CurrentNodeType.GetMember (reader.Name).FirstOrDefault ();
 						if (mi == null)
 							throw new Exception ("Member '" + reader.Name + "' not found in " + ctx.CurrentNodeType.Name);
 
 						if (mi.MemberType == MemberTypes.Event) {
-							foreach (string exp in reader.Value.Split (';')) {
+							foreach (string exp in imlValue.ToString().Split (';')) {
 								string trimed = exp.Trim();
+
 								if (trimed.StartsWith ("{", StringComparison.Ordinal))
 									compileAndStoreDynHandler (ctx, mi as EventInfo, trimed.Substring (1, trimed.Length - 2));
 								else
@@ -496,10 +523,10 @@ namespace Crow.IML {
 						if (pi.Name == "Name")
 							ctx.StoreCurrentName (reader.Value);
 
-						if (reader.Value.StartsWith ("{", StringComparison.Ordinal))
-							readPropertyBinding (ctx, reader.Name, reader.Value.Substring (1, reader.Value.Length - 2));
+						if (imlValue.StartsWith ("{", StringComparison.Ordinal))
+							readPropertyBinding (ctx, reader.Name, imlValue.Substring (1, reader.Value.Length - 2));
 						else
-							CompilerServices.EmitSetValue (ctx.il, pi, reader.Value);
+							CompilerServices.EmitSetValue (ctx.il, pi, styledValue);
 
 					}
 					reader.MoveToElement ();
