@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0"?>
-<Border Style="ControlBorder" >
+<Border Style="ControlBorder" Background="{./Background}" CornerRadius="{./CornerRadius}">
 	<VerticalStack>
-		<HorizontalStack Spacing="1" Height="Fit" Focusable="true" MouseDoubleClick="./onClickForExpand">
-			<Container Margin="1" Width="9" Height="9" MouseDown="./onClickForExpand"
-					MouseEnter="{Background=CornflowerBlue}" MouseLeave="{Background=Transparent}">
-				<Image Path="#Crow.Icons.expandable.svg" Visible="{./IsExpandable}"	SvgSub="{./IsExpanded}"/>
-			</Container>
+		<HorizontalStack Spacing="1" Focusable="true" MouseDoubleClick="./onClickForExpand">
+			<Image Style="Icon" MouseDown="./onClickForExpand"
+					MouseEnter="{Background=White}" MouseLeave="{Background=Transparent}"
+					Background="{./Background}"
+					Path="#Crow.Icons.expandable.svg" Visible="{./IsExpandable}"	SvgSub="{./IsExpanded}" />			
 			<Label Style="ControlCaption" Text="{./Caption}"/>
 		</HorizontalStack>
 		<Container Name="Content" Visible="false"/>

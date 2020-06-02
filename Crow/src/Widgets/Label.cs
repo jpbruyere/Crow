@@ -424,7 +424,7 @@ namespace Crow {
 					fe = gr.FontExtents;
 					te = new TextExtents ();
 
-					cachedTextSize.Height = (int)Math.Ceiling ((fe.Ascent+fe.Descent) * Math.Max (1, lines.Count)) + Margin * 2;
+					cachedTextSize.Height = (int)Math.Ceiling ((fe.Ascent+fe.Descent) * Math.Max (1, lines.Count));
 
 					try {
 						for (int i = 0; i < lines.Count; i++) {
@@ -435,14 +435,14 @@ namespace Crow {
 							if (tmp.XAdvance > te.XAdvance)
 								te = tmp;
 						}
-						cachedTextSize.Width = (int)Math.Ceiling (te.XAdvance) + Margin * 2;
+						cachedTextSize.Width = (int)Math.Ceiling (te.XAdvance);
 						textMeasureIsUpToDate = true;
 					} catch {							
 						return -1;
 					}					
 				}
 			}
-			return lt == LayoutingType.Height ? cachedTextSize.Height : cachedTextSize.Width;
+			return Margin * 2 + (lt == LayoutingType.Height ? cachedTextSize.Height : cachedTextSize.Width);
 		}
 		protected override void onDraw (Context gr)
 		{

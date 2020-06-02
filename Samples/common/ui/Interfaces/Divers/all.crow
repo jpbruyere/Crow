@@ -1,18 +1,31 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack Name="TopContainer" Margin="100" Background="DarkGrey" Spacing="10">
-	<VerticalStack Width="200" Height="Fit" Spacing="5">
-		<Label/>
-		<TextBox />
-		<Button />
-		<CheckBox />
-		<RadioButton/>
-		<Spinner/>			
-		<Slider />
-		<Popper />
-		<Expandable />
-	</VerticalStack>
-		
-	<Widget Width="200" Height="20" Background="Teal"/>
+<VerticalStack Name="TopContainer" Margin="10" Background="DarkGrey" Spacing="10">
+	<HorizontalStack Height="Fit" >		
+		<VerticalStack Width="200" Height="Fit" Spacing="0">
+			<Label/>
+			<TextBox />
+			<Button />
+			<CheckBox />
+			<RadioButton/>
+			<Spinner/>			
+			<Slider />
+			<Popper />
+			<Expandable />
+			<ScrollBar Style="HScrollBar"/>
+		</VerticalStack>
+		<VerticalStack Width="200" Height="Fit" Spacing="0">
+			<Slider Name="margin" Background="DarkSlateGrey" Foreground="Black"  />
+			<Label Background="DarkSlateGrey" Foreground="Black" Margin="{../margin.Value}" />
+			<TextBox Background="DarkSlateGrey" Foreground="Black" Margin="{../margin.Value}"/>
+			<Button Background="DarkSlateGrey" Foreground="Black" Margin="{../margin.Value}" />
+			<CheckBox Background="DarkSlateGrey" Foreground="Black" Margin="{../margin.Value}"/>
+			<RadioButton Background="DarkSlateGrey" Foreground="Black" Margin="{../margin.Value}"/>
+			<Spinner Background="DarkSlateGrey" Foreground="Black" Margin="{../margin.Value}" />			
+			<Popper Background="DarkSlateGrey" Foreground="Black" Margin="{../margin.Value}" />
+			<Expandable Background="DarkSlateGrey" Foreground="Black" Margin="{../margin.Value}"/>
+		</VerticalStack>
+	</HorizontalStack>
+<!--	<Widget Width="200" Height="20" Background="Teal"/>
 	<Widget Width="200" Height="20" Background="SeaGreen"/>
 	<Widget Width="200" Height="20" Background="MediumSeaGreen"/>
 	<Widget Width="200" Height="20" Background="DarkSlateGrey"/>
@@ -20,5 +33,5 @@
 	<Widget Width="200" Height="20" Background="SteelBlue"/>
 	<Widget Width="200" Height="20" Background="CornflowerBlue"/>
 	<Widget Width="200" Height="20" Background="Brown"/>	
-	<Widget Width="200" Height="20" Background="FireBrick"/>
+	<Widget Width="200" Height="20" Background="FireBrick"/>-->
 </VerticalStack>

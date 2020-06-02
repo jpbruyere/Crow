@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
 <HorizontalStack Style="Control" Background="{./Background}">
-	<Image Style="Icon" Path="#Crow.Icons.checkbox.svg" SvgSub="{./IsChecked}"/>
+	<Image Style="Icon" Width="${ToggleIconSize}" Height="${ToggleIconSize}" Path="#Crow.Icons.checkbox.svg" SvgSub="{./IsChecked}"/>
 	<Label Style="ControlCaption" Font="{./Font}" Text="{./Caption}" Foreground="{./Foreground}"/>
 </HorizontalStack>

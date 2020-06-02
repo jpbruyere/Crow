@@ -3,18 +3,21 @@ ControlBorderColor = "DimGrey";
 ControlBorderWidth = "1";
 ControlCaptionColor = "LightGrey";
 ControlCaptionHoverColor = "White";
-
-IconSize = "12";
+ControlCornerRadius = "0";
+ControlInsideMargin = "1";
+IconSize = "11";
 IconMargin = "1";
+ToggleIconSize = "16";
 
 Button, CheckBox, RadioButton, ComboBox, Expandable,
 MessageBox, Popper, Slider, Spinner, TextBox {
 	Focusable = "true";
 	Height = "Fit";
+	Background = "${ControlBackground}";
+	CornerRadius = "${ControlCornerRadius}";
+	Margin="0";
 }
-Border {
-	Foreground = "Grey";
-}
+
 CheckBox { Caption = "CheckBox"; }
 RadioButton { Caption = "RadioButton"; }
 Expandable { Caption = "Expandable"; }
@@ -22,14 +25,13 @@ Popper { Caption = "Popper";}
 GroupBox { Caption = "Group Box"; }
 
 Control {
-	Margin="0";
+	Margin="${ControlInsideMargin}";
 	Spacing="3";
 }
 ControlBorder {
 	BorderWidth	= "${ControlBorderWidth}";
 	Foreground  = "${ControlBorderColor}";
-	Background	= "${ControlBackground}";
-	CornerRadius = "0";	
+	Margin = "${ControlInsideMargin}";
 }
 ControlCaption {
 	Foreground  = "${ControlCaptionColor}";
@@ -37,7 +39,7 @@ ControlCaption {
 	MouseLeave	= "{Foreground=${ControlCaptionColor}}";
 }
 ControlEditableText {
-	Foreground	= "LightGrey";
+	Foreground	= "${ControlCaptionColor}";
 	Background	= "Transparent";
 	MinimumSize	= "40,10";
 	Margin		= "1";

@@ -178,7 +178,7 @@ namespace Crow
 		/// <summary>
 		/// View box 
 		/// </summary>
-		[DefaultValue ("0,0")]
+		[DefaultValue ("32,32")]
 		public Size Size {
 			get { return size; }
 			set {
