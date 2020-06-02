@@ -159,7 +159,7 @@ namespace Crow
 								iFace.Styling [tc] = new Style ();
 							iFace.Styling [tc] [currentProperty] = token;
 #if DESIGN_MODE
-						styling [tc].Locations[currentProperty] = new FileLocation(resId, line, column - token.Length - 1, token.Length);
+							iFace.Styling [tc].Locations[currentProperty] = new FileLocation(resId, line, column - token.Length - 1, token.Length);
 #endif
 						}
 						curState = States.members;

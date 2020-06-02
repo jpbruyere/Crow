@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Xml.Serialization;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
@@ -238,8 +237,9 @@ namespace Crow
 		/// compiler will not create it automatically because of the presence of the other one.
 		/// </summary>
 		/// <param name="iface">Iface.</param>
-		public Widget (Interface iface) : this()
+		public Widget (Interface iface, string style = null) : this()
 		{
+			this.style = style;
 			IFace = iface;
 			Initialize ();
 		}

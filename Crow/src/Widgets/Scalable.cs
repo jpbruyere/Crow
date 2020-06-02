@@ -6,11 +6,14 @@ using System.ComponentModel;
 
 namespace Crow
 {
+	/// <summary>
+	/// Base class for controling scalable content behaviour.
+	/// </summary>
 	public abstract class Scalable : Widget
 	{
 		#region CTOR
-		protected Scalable () : base () { }
-		public Scalable (Interface iface) : base (iface) { }
+		protected Scalable () { }
+		public Scalable (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		protected bool scaled, keepProps;

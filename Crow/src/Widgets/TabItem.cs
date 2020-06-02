@@ -12,8 +12,8 @@ namespace Crow
 	public class TabItem : TemplatedContainer
 	{
 		#region CTOR
-		protected TabItem() : base(){}
-		public TabItem (Interface iface) : base(iface){}
+		protected TabItem() {}
+		public TabItem (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		public event EventHandler QueryClose;

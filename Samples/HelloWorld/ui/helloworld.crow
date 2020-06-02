@@ -1,2 +1,2 @@
 ﻿<?xml version="1.0"?>
-<Label Text="Hello world"/>
+<Label Text="Hello world -|${TestCst}|-"/>

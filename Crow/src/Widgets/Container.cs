@@ -2,19 +2,12 @@
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
-using System;
-using System.Xml.Serialization;
-using System.Reflection;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading;
-
 namespace Crow
 {
 	/// <summary>
 	/// simple container accepting one child
 	/// </summary>
-    public class Container : PrivateContainer
+	public class Container : PrivateContainer
     {
 		#if DESIGN_MODE
 		public override void getIML (System.Xml.XmlDocument doc, System.Xml.XmlNode parentElem)
@@ -29,8 +22,8 @@ namespace Crow
 		#endif
 
 		#region CTOR
-		protected Container() : base(){}
-		public Container (Interface iface) : base(iface){}
+		protected Container() {}
+		public Container (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		[XmlIgnore]public Widget Child {

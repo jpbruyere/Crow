@@ -1,6 +1,6 @@
 <Project>
 	<PropertyGroup>
-		<TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+		<TargetFrameworks>net472</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		
 		<RootDirectory>$(MSBuildThisFileDirectory)</RootDirectory>        
@@ -16,7 +16,6 @@
 		<SamplesDir>$(SolutionDir)Samples\</SamplesDir>
 	</PropertyGroup>
 	
-
 	<ItemGroup>
 	  <PackageReference Include="DllMapCore" Version="0.1.0" Condition="'$(TargetFramework)'=='netcoreapp3.1'" />
 		<ProjectReference Include="$(SolutionDir)Crow\Crow.csproj" />

@@ -137,8 +137,8 @@ namespace Crow
 	public class Shape : Scalable
 	{
 		#region CTOR
-		protected Shape () : base () { }
-		public Shape (Interface iface) : base (iface) { }
+		protected Shape ()  { }
+		public Shape (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		string path;

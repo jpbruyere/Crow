@@ -16,8 +16,8 @@ namespace Crow
 	public class ColorSlider : Widget
 	{
 		#region CTOR
-		protected ColorSlider() : base(){}
-		public ColorSlider (Interface iface) : base(iface){}
+		protected ColorSlider() {}
+		public ColorSlider (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		protected Point mousePos;//store local mouse pos sync with currentValue

@@ -2,9 +2,6 @@
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
-using System;
-using System.Xml.Serialization;
-
 namespace Crow
 {
 	/// <summary>
@@ -13,8 +10,8 @@ namespace Crow
 	public class ComboBox : ListBox
     {
 		#region CTOR
-		protected ComboBox() : base(){}
-		public ComboBox (Interface iface) : base(iface){}
+		protected ComboBox() {}
+		public ComboBox (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		Size minimumPopupSize = "10,10";

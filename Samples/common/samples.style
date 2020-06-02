@@ -1,3 +1,5 @@
+TestCst = "This is a constant test.";
+
 FpsLabel {
 	Width = "30";
 	Font = "droid, 10";

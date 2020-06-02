@@ -33,10 +33,8 @@ namespace Crow
 	public abstract class NumericControl : TemplatedControl
 	{
 		#region CTOR
-		protected NumericControl () : base(){}
-		public NumericControl (Interface iface) : base(iface)
-		{
-		}
+		protected NumericControl () {}
+		public NumericControl (Interface iface, string style = null) : base (iface, style) { }
 //		public NumericControl(double minimum, double maximum, double step)
 //			: base()
 //		{

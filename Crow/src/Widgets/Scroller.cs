@@ -15,8 +15,8 @@ namespace Crow
 	public class Scroller : Container
 	{
 		#region CTOR
-		protected Scroller () : base(){}
-		public Scroller (Interface iface) : base(iface){}
+		protected Scroller () {}
+		public Scroller (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		//public event EventHandler<ScrollingEventArgs> Scrolled;

@@ -16,8 +16,8 @@ namespace Crow
 	public class ColorPicker : TemplatedControl
 	{
 		#region CTOR
-		protected ColorPicker() : base(){}
-		public ColorPicker (Interface iface) : base(iface){}
+		protected ColorPicker() {}
+		public ColorPicker (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		Color currentColor;

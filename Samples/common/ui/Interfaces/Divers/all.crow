@@ -1,13 +1,17 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack Name="TopContainer" Margin="100" Background="DarkGrey" Spacing="10">
-	<Spinner/>
-	<Spinner Width="Fit"/>
-	<Spinner Width="120"/>
-	<HorizontalStack Fit="true" Margin="5" Background="DarkSlateGrey">
-		<Spinner Name="sp1" Value="5" ValueChanged="onSpinnerValueChange"/>
-		<Spinner Value="5" Width="80"/>
-		<Spinner Value="5"/>
-	</HorizontalStack>
+	<VerticalStack Width="200" Height="Fit" Spacing="5">
+		<Label/>
+		<TextBox />
+		<Button />
+		<CheckBox />
+		<RadioButton/>
+		<Spinner/>			
+		<Slider />
+		<Popper />
+		<Expandable />
+	</VerticalStack>
+		
 	<Widget Width="200" Height="20" Background="Teal"/>
 	<Widget Width="200" Height="20" Background="SeaGreen"/>
 	<Widget Width="200" Height="20" Background="MediumSeaGreen"/>

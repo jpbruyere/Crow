@@ -32,8 +32,8 @@ namespace Crow {
 		#endif
 
 		#region CTOR
-		protected TemplatedGroup() : base(){}
-		public TemplatedGroup (Interface iface) : base(iface){}
+		protected TemplatedGroup() {}
+		protected TemplatedGroup (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		protected Group items;

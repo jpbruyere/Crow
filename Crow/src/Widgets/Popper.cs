@@ -3,16 +3,15 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using System.Xml.Serialization;
 using System.ComponentModel;
 
 namespace Crow
 {
-    public class Popper : TemplatedContainer
+	public class Popper : TemplatedContainer
     {
 		#region CTOR
-		protected Popper () : base(){}
-		public Popper (Interface iface) : base(iface){}
+		protected Popper () {}
+		public Popper (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		bool _isPopped, _canPop;

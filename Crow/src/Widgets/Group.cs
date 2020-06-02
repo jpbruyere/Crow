@@ -42,8 +42,8 @@ namespace Crow
 		protected ReaderWriterLockSlim childrenRWLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
 		#region CTOR
-		public Group () : base() {}
-		public Group(Interface iface) : base(iface){}
+		public Group () {}
+		public Group(Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		#region EVENT HANDLERS

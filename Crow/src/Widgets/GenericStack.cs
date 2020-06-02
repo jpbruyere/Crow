@@ -2,10 +2,8 @@
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Xml.Serialization;
 using System;
+using System.ComponentModel;
 using System.Linq;
 
 namespace Crow
@@ -16,12 +14,12 @@ namespace Crow
 	public class GenericStack : Group
     {
 		#region CTOR
-		protected GenericStack() : base(){}
-		public GenericStack(Interface iface) : base(iface){}
+		protected GenericStack() {}
+		public GenericStack(Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		#region Private fields
-        int _spacing;
+		int _spacing;
         Orientation _orientation;
 		#endregion
 

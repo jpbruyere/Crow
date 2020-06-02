@@ -25,14 +25,14 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);1591;1587;1570;1572;1573;1574</NoWarn>
-		<DefineConstants>_DESIGN_MODE</DefineConstants>		
+		<DefineConstants>DESIGN_MODE</DefineConstants>		
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 		<AppConfig>App.config</AppConfig>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<DebugType>full</DebugType>
-		<DefineConstants>DEBUG;TRACE;MEASURE_TIME;_DEBUG_DISPOSE;_DEBUG_BINDING;_DEBUG_CLIP_RECTANGLE;_DEBUG_FOCUS;DEBUG_DRAGNDROP;_DEBUG_LOG</DefineConstants>
+		<DefineConstants>$(DefineConstants);DEBUG;TRACE;MEASURE_TIME;_DEBUG_DISPOSE;_DEBUG_BINDING;_DEBUG_CLIP_RECTANGLE;_DEBUG_FOCUS;DEBUG_DRAGNDROP;_DEBUG_LOG</DefineConstants>
 		<CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
 	</PropertyGroup>
 	<ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
@@ -58,6 +58,7 @@
 		<EmbeddedResource Include="Cursors\*.*">
 			<LogicalName>Crow.Cursors.%(Filename)</LogicalName>
 		</EmbeddedResource>
+		<Compile Include="Properties\AssemblyInfo.cs" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Remove="src\Widgets\ColorPicker2.cs" />

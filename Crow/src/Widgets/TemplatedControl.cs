@@ -32,8 +32,8 @@ namespace Crow
 		#endif
 
 		#region CTOR
-		protected TemplatedControl() : base(){}
-		public TemplatedControl (Interface iface) : base(iface){}
+		protected TemplatedControl() {}
+		protected TemplatedControl (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		string _template = "NOT_SET";

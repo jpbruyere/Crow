@@ -15,9 +15,8 @@ namespace Crow
 	public class Slider : NumericControl
     {
 		#region CTOR
-		protected Slider() : base(){}
-		public Slider(Interface iface) : base(iface)
-		{}
+		protected Slider() {}
+		public Slider(Interface iface, string style = null) : base (iface, style) { }
 //		public Slider(double minimum, double maximum, double step)
 //			: base(minimum,maximum,step)
 //		{

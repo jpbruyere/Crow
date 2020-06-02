@@ -1,4 +1,11 @@
 ﻿ControlBackground = "Transparent";
+ControlBorderColor = "DimGrey";
+ControlBorderWidth = "1";
+ControlCaptionColor = "LightGrey";
+ControlCaptionHoverColor = "White";
+
+IconSize = "12";
+IconMargin = "1";
 
 Button, CheckBox, RadioButton, ComboBox, Expandable,
 MessageBox, Popper, Slider, Spinner, TextBox {
@@ -19,26 +26,26 @@ Control {
 	Spacing="3";
 }
 ControlBorder {
-	BorderWidth	= "1";
-	Foreground  = "DimGrey";
+	BorderWidth	= "${ControlBorderWidth}";
+	Foreground  = "${ControlBorderColor}";
 	Background	= "${ControlBackground}";
 	CornerRadius = "0";	
 }
 ControlCaption {
-	Foreground  = "LightGrey";
-	MouseEnter	= "{Foreground=White}";
-	MouseLeave	= "{Foreground=LightGrey}";
+	Foreground  = "${ControlCaptionColor}";
+	MouseEnter	= "{Foreground=${ControlCaptionHoverColor}}";
+	MouseLeave	= "{Foreground=${ControlCaptionColor}}";
 }
 ControlEditableText {
 	Foreground	= "LightGrey";
 	Background	= "Transparent";
-	MinimumSize	= "80,10";
+	MinimumSize	= "40,10";
 	Margin		= "1";
 }
 Icon {
-	Margin = "1";
-	Width = "12";
-	Height = "12";
+	Margin = "${IconMargin}";
+	Width = "${IconSize}";
+	Height = "${IconSize}";
 }
 Wrapper {
 	Orientation = "Vertical";
@@ -56,7 +63,7 @@ TextBox {
 	Background = "White";
 	Foreground = "Black";
 	Selectable = "True";
-	Text = "TextBox";
+	//Text = "TextBox";
 	Margin = "1";
 	MouseCursor = "IBeam";
 }

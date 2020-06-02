@@ -3,9 +3,7 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using System.Xml.Serialization;
 using System.ComponentModel;
-using System.Diagnostics;
 using Glfw;
 
 namespace Crow
@@ -47,8 +45,8 @@ namespace Crow
 		#endregion
 
 		#region CTOR
-		protected Window() : base(){}
-		public Window (Interface iface) : base(iface){}
+		protected Window() {}
+		public Window (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		#region TemplatedContainer overrides

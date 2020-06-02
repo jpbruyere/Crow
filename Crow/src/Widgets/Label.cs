@@ -13,17 +13,8 @@ namespace Crow {
 	public class Label : Widget
     {
 		#region CTOR
-		protected Label () : base(){}
-
-		public Label(Interface iface) : base(iface)
-		{
-
-		}
-//		public Label(string _text)
-//			: base()
-//		{
-//			Text = _text;
-//		}
+		protected Label () {}
+		public Label(Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		public event EventHandler<TextChangeEventArgs> TextChanged;
