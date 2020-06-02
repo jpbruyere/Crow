@@ -150,21 +150,17 @@ namespace Crow
 						throw new ParserException (line, column, "Unexpected end of statement", resId);
 					ReadChar ();
 					if (targetsClasses.Count == 0) {
-						//style constant
-						if (!iFace.StylingConstants.ContainsKey (currentProperty))
-							iFace.StylingConstants.Add (currentProperty, token);
+						//style constants
+						iFace.StylingConstants[currentProperty] = token;
 						curState = States.classNames;
 					} else {
 						foreach (string tc in targetsClasses) {
 							if (!iFace.Styling.ContainsKey (tc))
 								iFace.Styling [tc] = new Style ();
-							else if (iFace.Styling [tc].ContainsKey (currentProperty))
-								continue;
 							iFace.Styling [tc] [currentProperty] = token;
 #if DESIGN_MODE
 						styling [tc].Locations[currentProperty] = new FileLocation(resId, line, column - token.Length - 1, token.Length);
 #endif
-							//System.Diagnostics.Debug.WriteLine ("Style: {3} : {0}.{1} = {2}", tc, currentProperty, token, resId);
 						}
 						curState = States.members;
 					}

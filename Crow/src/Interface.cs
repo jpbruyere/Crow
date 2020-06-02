@@ -52,6 +52,8 @@ namespace Crow
 		}
 		#endregion
 
+		internal static List<Assembly> crowAssemblies = new List<Assembly> ();
+
 		#region CTOR
 		static Interface ()
 		{
@@ -70,9 +72,13 @@ namespace Crow
 			//ensure all assemblies are loaded, because IML could contains classes not instanciated in source
 			foreach (string af in Directory.GetFiles (AppDomain.CurrentDomain.BaseDirectory, "*.dll")) {
 				try {
-					Assembly.LoadFrom (af);
+					Assembly a =Assembly.LoadFrom (af);
+					if (a == Assembly.GetEntryAssembly () || a == Assembly.GetExecutingAssembly ())
+						continue;
+					if (a.GetCustomAttribute (typeof (CrowAttribute)) != null) 
+						crowAssemblies.Add (a);
 				} catch {
-					System.Diagnostics.Debug.WriteLine ("{0} not loaded as assembly.", af);
+					Debug.WriteLine ("{0} not loaded as assembly.", af);
 				}
 			}
 
@@ -453,6 +459,10 @@ namespace Crow
 			//assembly, it's ignored.
 			loadStylingFromAssembly (Assembly.GetEntryAssembly ());
 			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
+
+			foreach (Assembly a in crowAssemblies) {
+				loadStylingFromAssembly (a);
+			}
 		}
 		/// <summary> Search for .style resources in assembly </summary>
 		protected void loadStylingFromAssembly (Assembly assembly) {
