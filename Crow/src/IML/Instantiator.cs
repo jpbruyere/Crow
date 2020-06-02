@@ -526,7 +526,7 @@ namespace Crow.IML {
 						if (imlValue.StartsWith ("{", StringComparison.Ordinal))
 							readPropertyBinding (ctx, reader.Name, imlValue.Substring (1, reader.Value.Length - 2));
 						else
-							CompilerServices.EmitSetValue (ctx.il, pi, styledValue);
+							CompilerServices.EmitSetValue (ctx.il, pi, imlValue);
 
 					}
 					reader.MoveToElement ();

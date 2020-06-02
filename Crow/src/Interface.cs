@@ -309,9 +309,9 @@ namespace Crow
 		/// <summary>Double click threshold in milisecond</summary>
 		public static int DOUBLECLICK_TRESHOLD = 320;//max duration between two mouse_down evt for a dbl clk in milisec.
 		/// <summary> Time to wait in millisecond before starting repeat loop</summary>
-		public static int DEVICE_REPEAT_DELAY = 700;
+		public static int DEVICE_REPEAT_DELAY = 600;
 		/// <summary> Time interval in millisecond between device event repeat</summary>
-		public static int DEVICE_REPEAT_INTERVAL = 40;
+		public static int DEVICE_REPEAT_INTERVAL = 100;
 		public static float WheelIncrement = 1;
 		/// <summary>Tabulation size in Text controls</summary>
 		public static int TAB_SIZE = 4;
@@ -769,15 +769,15 @@ namespace Crow
 			for (int i = 0; i < tmpThreads.Length; i++)
 				tmpThreads [i].CheckState ();
 
-			//if (mouseRepeatTimer.ElapsedMilliseconds > 0) {
-			//	if ((bool)_hoverWidget?.MouseRepeat) {
-			//		int repeatCount = (int)mouseRepeatTimer.ElapsedMilliseconds / DEVICE_REPEAT_INTERVAL - mouseRepeatCount;
-			//		for (int i = 0; i < repeatCount; i++)
-			//			_hoverWidget.onMouseDown (_hoverWidget, lastMouseDownEvent);
-			//		mouseRepeatCount += repeatCount;
-			//	}
-			//} else if (lastMouseDown.ElapsedMilliseconds > DEVICE_REPEAT_DELAY)
-				//mouseRepeatTimer.Start ();
+			if (lastMouseDownEvent != null) {
+				if (mouseRepeatTimer.ElapsedMilliseconds > DEVICE_REPEAT_INTERVAL) {
+					if (_hoverWidget != null && _hoverWidget.MouseRepeat) {
+						_hoverWidget.onMouseDown (_hoverWidget, lastMouseDownEvent);
+						mouseRepeatTimer.Restart ();
+					}
+				} else if (lastMouseDown.ElapsedMilliseconds > DEVICE_REPEAT_DELAY)
+					mouseRepeatTimer.Start ();
+			}
 
 			if (!Monitor.TryEnter (UpdateMutex))
 				return;
@@ -1143,7 +1143,6 @@ namespace Crow
 
 		Stopwatch lastMouseDown = Stopwatch.StartNew (), mouseRepeatTimer = new Stopwatch ();
 		bool doubleClickTriggered;	//next mouse up will trigger a double click
-		//int mouseRepeatCount;
 		MouseButtonEventArgs lastMouseDownEvent;
 
 		public Point MousePosition { get; set; } = default;
@@ -1265,7 +1264,6 @@ namespace Crow
 		{
 			doubleClickTriggered = (lastMouseDown.ElapsedMilliseconds < DOUBLECLICK_TRESHOLD);
 			lastMouseDown.Restart ();
-			//mouseRepeatCount = -1;//stays negative until repeat delay is hit
 
 			lastMouseDownEvent = new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press);
 
@@ -1285,6 +1283,7 @@ namespace Crow
 		public virtual bool OnMouseButtonUp (MouseButton button)
 		{
 			mouseRepeatTimer.Reset ();
+			lastMouseDownEvent = null;
 
 			MouseButtonEventArgs e = new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Repeat);
 			if (_activeWidget == null)
