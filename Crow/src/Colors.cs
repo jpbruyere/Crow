@@ -234,6 +234,7 @@ namespace Crow
 		}*/
 
 		public static implicit operator Color (Colors c) => new Color ((UInt32)c);
+		public static implicit operator Colors (Color c) => (Colors)c.value;
 		public static bool operator ==(Color a, Color b) => a.Equals (b);
 		public static bool operator != (Color a, Color b) => !a.Equals (b);
 

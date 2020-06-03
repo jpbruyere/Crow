@@ -69,25 +69,8 @@ namespace Crow
 		{
 			return color.GetHashCode();
 		}
-		public override bool Equals (object obj)
-			=> obj is Color c ? color.Equals (c) : obj is SolidColor sc && color.Equals (sc.color);
-
-//		public static bool operator ==(SolidColor c, string n)
-//		{
-//			return c.color.Name == n ? true : false;
-//		}
-//		public static bool operator !=(SolidColor c, string n)
-//		{
-//			return c.color.Name == n ? false : true;
-//		}
-//		public static bool operator ==(string n, SolidColor c)
-//		{
-//			return c.color.Name == n ? true : false;
-//		}
-//		public static bool operator !=(string n, SolidColor c)
-//		{
-//			return c.color.Name == n ? false : true;
-//		}
+		public override bool Equals (object obj)		
+			=> obj is Color c ? color.Equals (c) : obj is Colors cl ? color.Equals(cl) : obj is SolidColor sc && color.Equals (sc.color);			
 		public static SolidColor operator *(SolidColor c, Double f)
 		{
 			return new SolidColor(new Color(c.color.R,c.color.G,c.color.B,c.color.A * f));
@@ -100,7 +83,7 @@ namespace Crow
 		{
 			return new SolidColor(new Color(c1.color.R - c2.color.R,c1.color.G - c2.color.G,c1.color.B - c2.color.B,c1.color.A - c2.color.A));
 		}
-		#endregion				        
+		#endregion
 
 		public override string ToString()
 		{

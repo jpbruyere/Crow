@@ -38,7 +38,7 @@
 	<ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
 		<PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.6.0" />
 		<PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.6.0" />
-		<PackageReference Include="glfw-sharp" Version="0.2.6-beta" />
+		<PackageReference Include="glfw-sharp" Version="0.2.7-beta" />
 		<PackageReference Include="FastEnum" Version="1.5.3" />
 	</ItemGroup>
 	<PropertyGroup Condition=" '$(CrowStbSharp)' == 'true'">

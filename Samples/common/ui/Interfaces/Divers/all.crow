@@ -14,7 +14,7 @@
 			<ScrollBar Style="HScrollBar"/>
 		</VerticalStack>
 		<VerticalStack Width="200" Height="Fit" Spacing="0">
-			<Slider Name="margin" Background="DarkSlateGrey" Foreground="Black"  />
+			<Slider Name="margin" Background="DarkSlateGrey" Foreground="Black" Value="0"  />
 			<Label Background="DarkSlateGrey" Foreground="Black" Margin="{../margin.Value}" />
 			<TextBox Background="DarkSlateGrey" Foreground="Black" Margin="{../margin.Value}"/>
 			<Button Background="DarkSlateGrey" Foreground="Black" Margin="{../margin.Value}" />

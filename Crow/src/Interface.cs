@@ -393,7 +393,11 @@ namespace Crow
 		public Queue<LayoutingQueueItem> DiscardQueue;
 		/// <summary>Main drawing queue, holding layouted controls</summary>
 		public Queue<Widget> ClippingQueue = new Queue<Widget>();
-		public string Clipboard;//TODO:use object instead for complex copy paste
+		//TODO:use object instead for complex copy paste
+		public string Clipboard {
+			get => Glfw3.GetClipboardString (hWin);
+			set => Glfw3.SetClipboardString (hWin, value);
+		}
 		/// <summary>each IML and fragments (such as inline Templates) are compiled as a Dynamic Method stored here
 		/// on the first instance creation of a IML item.
 		/// </summary>
