@@ -152,7 +152,6 @@ namespace Crow
 			Glfw3.SetCharCallback (hWin, HandleCharDelegate);
 			Glfw3.SetWindowSizeCallback (hWin, HandleWindowSizeDelegate);
 
-			//Glfw3.SetWindowTitle (hWin, "FPS: " + fps.ToString ());
 			switch (Environment.OSVersion.Platform) {
 			case PlatformID.MacOSX:
 				break;
@@ -208,6 +207,9 @@ namespace Crow
 
 		#endregion
 
+		public string WindowTitle {
+			set => Glfw3.SetWindowTitle (hWin, value);
+		}
 
 		public bool Running {
 			get => !Glfw3.WindowShouldClose (hWin);
@@ -482,8 +484,17 @@ namespace Crow
 				.GetManifestResourceNames ()
 				.Where (r => r.EndsWith (".style", StringComparison.OrdinalIgnoreCase))) {
 				using (StyleReader sr = new StyleReader (assembly.GetManifestResourceStream (s))) 
-					sr.Parse (this.StylingConstants, this.Styling, s);				
+					sr.Parse (StylingConstants, Styling, s);				
 			}
+		}
+		public void LoadStyle (string stylePath) {
+			using (Stream s = new FileStream (stylePath, FileMode.Open))
+				LoadStyle (s, stylePath);
+
+		}
+		public void LoadStyle (Stream stream, string resId) {
+			using (StyleReader sr = new StyleReader (stream))
+				sr.Parse (StylingConstants, Styling, resId);
 		}
 		#endregion
 

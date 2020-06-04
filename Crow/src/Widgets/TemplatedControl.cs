@@ -118,9 +118,7 @@ namespace Crow
 
 				if (!IFace.DefaultTemplates.ContainsKey (mdTok)) {
 					string defTmpId = this.GetType ().FullName + ".template";
-					Stream s = Assembly.GetEntryAssembly ()?.GetManifestResourceStream (defTmpId);
-					if (s == null)
-						s = Assembly.GetAssembly (this.GetType ()).GetManifestResourceStream (defTmpId);
+					Stream s = Interface.GetStreamFromPath ("#" + defTmpId);
 					if (s == null)
 						throw new Exception (string.Format ("No default template found for '{0}'", this.GetType ().FullName));
 					IFace.DefaultTemplates [mdTok] = new IML.Instantiator (IFace, s, defTmpId);

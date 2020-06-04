@@ -1708,8 +1708,8 @@ namespace Crow
 			else if (LastPaintedSlot.Width != Slot.Width || LastPaintedSlot.Height != Slot.Height)
 				bmp.SetSize (Slot.Width, Slot.Height);*/
 			bmp?.Dispose ();
-			//bmp = IFace.surf.CreateSimilar (Content.ColorAlpha, Slot.Width, Slot.Height);
-			bmp = new ImageSurface(Format.Argb32, Slot.Width, Slot.Height);
+			bmp = IFace.surf.CreateSimilar (Content.ColorAlpha, Slot.Width, Slot.Height);
+			//bmp = new ImageSurface(Format.Argb32, Slot.Width, Slot.Height);
 
 			using (Context gr = new Context (bmp)) {
 				gr.Antialias = Interface.Antialias;

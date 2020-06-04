@@ -298,6 +298,7 @@ namespace Crow.IML {
 				bool inlineTemplate = false;
 
 				reader.Read ();
+
 				string templatePath = reader.GetAttribute ("Template");
 				string itemTemplatePath = reader.GetAttribute ("ItemTemplate");
 

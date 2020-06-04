@@ -66,7 +66,7 @@ namespace Crow
 			line = 1;
 			curState = States.classNames;
 
-			string styleKey = resId.Substring (0, resId.Length - 6);
+			//string styleKey = resId.Substring (0, resId.Length - 6);
 			string token = "";
 			List<string> targetsClasses = new List<string> ();
 			string currentProperty = "";
