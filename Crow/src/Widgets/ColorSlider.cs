@@ -221,10 +221,10 @@ namespace Crow
 				break;
 			}
 
-			gr.SetSourceColor (Colors.Black);
+			gr.SetSource (Colors.Black);
 			gr.LineWidth = 2.0;
 			gr.StrokePreserve ();
-			gr.SetSourceColor (Colors.White);
+			gr.SetSource (Colors.White);
 			gr.LineWidth = 1.0;
 			gr.Stroke ();
 		}

@@ -382,19 +382,27 @@ namespace Crow.IML
 			//System.Diagnostics.Debug.WriteLine ($"*** search extension method: {t};{methodName} => key={key}");
 
 			MethodInfo mi = null;
-			mi = GetExtensionMethods (Assembly.GetEntryAssembly (), t, methodName);
-			if (mi == null)
-				mi = GetExtensionMethods (t.Module.Assembly, t, methodName);
+			if (!TryGetExtensionMethods (Assembly.GetEntryAssembly (), t, methodName, out mi)) {
+				if (!TryGetExtensionMethods (t.Module.Assembly, t, methodName, out mi)) {
+					foreach (Assembly a in Interface.crowAssemblies) {
+						if (TryGetExtensionMethods (a, t, methodName, out mi))
+							break;
+					}
+					if (mi == null)
+						TryGetExtensionMethods (Assembly.GetExecutingAssembly (), t, methodName, out mi);//crow Assembly
+				}
+			}
 
 			//add key even if mi is null to prevent searching again and again for propertyless bindings
 			knownExtMethods.Add (key, mi);
 			return mi;
 		}
 
-		public static MethodInfo GetExtensionMethods (Assembly assembly, Type extendedType, string methodName)
+		public static bool TryGetExtensionMethods (Assembly assembly, Type extendedType, string methodName, out MethodInfo foundMI)
 		{
+			foundMI = null;
 			if (assembly == null)
-				return null;
+				return false;
 			foreach (Type t in assembly.GetTypes ().Where
 					(ty => ty.IsDefined (typeof (ExtensionAttribute), false))) {
 				foreach (MethodInfo mi in t.GetMethods 
@@ -403,14 +411,16 @@ namespace Crow.IML
 						 m.GetParameters ().Length == 1)) {
 					Type curType = extendedType;
 					while (curType != null) {
-						if (mi.GetParameters () [0].ParameterType == curType)
-							return mi;
+						if (mi.GetParameters () [0].ParameterType == curType) {
+							foundMI = mi;
+							return true;
+						}
 						curType = curType.BaseType;
 					}						
 				}
 			
 			}
-			return null;
+			return false;
 		}
 		/// <summary>
 		/// retrieve event handler in class or ancestors

@@ -173,8 +173,44 @@ namespace Crow {
 				else
 					_currentCol = value;
 				NotifyValueChanged ("CurrentColumn", _currentCol);
+
+				Rectangle cb = ClientRectangle;
+
+				if (Width == Measure.Fit || cb.Width >= cachedTextSize.Width) {
+					xTranslation = 0;
+					return;
+				}
+				int xpos = xposition;
+				if (xTranslation + xpos > cb.Width)
+					xTranslation = cb.Width - xpos;
+				else if (xpos < -xTranslation)
+					xTranslation = -xpos;
+				RegisterForRedraw ();
 			}
 		}
+		int xTranslation = 0;
+		int xposition {
+			get {
+				using (Context gr = new Context (IFace.surf)) {
+					//Cairo.FontFace cf = gr.GetContextFontFace ();
+					gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+					gr.SetFontSize (Font.Size);
+					gr.FontOptions = Interface.FontRenderingOptions;
+					gr.Antialias = Interface.Antialias;
+					try {
+						string l = lines [_currentLine];
+						if (_currentCol < l.Length)
+							l = l.Remove (Math.Min (_currentCol, l.Length));
+						l = l.Replace ("\t", new String (' ', Interface.TAB_SIZE));
+						return (int)Math.Ceiling (gr.TextExtents (l).XAdvance);
+					} catch {
+						System.Diagnostics.Debug.WriteLine ("xpos measuring fault in label");
+						return 0;
+					}
+				}
+			}
+		}
+
 		[DefaultValue(0)]
 		public int CurrentLine{
 			get { return _currentLine; }
@@ -258,7 +294,6 @@ namespace Crow {
 		[XmlIgnore]public string SelectedText
 		{
 			get {
-
 				if (SelRelease < 0 || SelBegin < 0)
 					return "";
 				if (selectionStart.Y == selectionEnd.Y)
@@ -453,6 +488,9 @@ namespace Crow {
 			gr.FontOptions = Interface.FontRenderingOptions;
 			gr.Antialias = Interface.Antialias;
 
+			gr.Save ();
+			gr.Translate (xTranslation, 0);
+
 			rText = new Rectangle(new Size(
 				measureRawSize(LayoutingType.Width), measureRawSize(LayoutingType.Height)));
 			rText.Width -= 2 * Margin;
@@ -609,7 +647,7 @@ namespace Crow {
 
 				if (Selectable) {
 					if (SelRelease >= 0 && i >= selectionStart.Y && i <= selectionEnd.Y) {
-						gr.SetSourceColor (selBackground);
+						gr.SetSource (selBackground);
 
 						Rectangle selRect = lineRect;
 
@@ -632,7 +670,7 @@ namespace Crow {
 						gr.FillPreserve ();
 						gr.Save ();
 						gr.Clip ();
-						gr.SetSourceColor (SelectionForeground);
+						gr.SetSource (SelectionForeground);
 						gr.MoveTo (lineRect.X, rText.Y + fe.Ascent + (fe.Ascent+fe.Descent) * i);
 						gr.ShowText (l);
 						gr.Fill ();
@@ -640,12 +678,15 @@ namespace Crow {
 					}
 				}
 			}
+
+			gr.Restore ();
 		}
 		#endregion
 
 		#region Mouse handling
 		void updatemouseLocalPos(Point mpos){
 			mouseLocalPos = mpos - ScreenCoordinates(Slot).TopLeft - ClientRectangle.TopLeft;
+			mouseLocalPos.X -= xTranslation;
 			if (mouseLocalPos.X < 0)
 				mouseLocalPos.X = 0;
 			if (mouseLocalPos.Y < 0)

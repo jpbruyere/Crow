@@ -324,7 +324,7 @@ namespace Crow.Cairo {
 			get { return NativeMethods.cairo_get_reference_count (handle); }
 		}
 
-		public void SetSourceColor (Color color)
+		public void SetSource (Color color)
 		{
 			NativeMethods.cairo_set_source_rgba (handle, color.R / 255.0, color.G / 255.0, color.B / 255.0, color.A / 255.0);
 		}

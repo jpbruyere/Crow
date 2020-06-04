@@ -101,13 +101,8 @@ namespace Crow.IML
 			Type t = Address.LastOrDefault ().CrowType;
 			member = t.GetMember (memberName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance).FirstOrDefault ();
 
-#region search for extensions methods if member not found in type
-			if (member == null && !string.IsNullOrEmpty (memberName)) {
-				Assembly a = Assembly.GetExecutingAssembly ();
-				string mn = memberName;
-				member = CompilerServices.GetExtensionMethods (a, t, mn);
-			}
-#endregion
+			if (member == null && !string.IsNullOrEmpty (memberName))
+				member = CompilerServices.SearchExtMethod (t, memberName);
 
 			return member != null;
 		}

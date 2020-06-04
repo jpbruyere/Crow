@@ -94,8 +94,8 @@ namespace Crow
 					if (showFiles && !string.IsNullOrEmpty(fileMask))
 						fi.AddRange(di.GetFiles(fileMask));
 					return showHidden ?
-						fi.ToArray() :
-						fi.Where(f=>!f.Attributes.HasFlag (FileAttributes.Hidden)).ToArray();
+						fi.OrderBy(f=>f.Attributes).ThenBy(f=>f.Name).ToArray() :
+						fi.Where(f=>!f.Attributes.HasFlag (FileAttributes.Hidden)).OrderBy (f => f.Attributes).ThenBy (f => f.Name).ToArray();
 				} catch (Exception ex) {
 					System.Diagnostics.Debug.WriteLine (ex.ToString ());
 					return null;

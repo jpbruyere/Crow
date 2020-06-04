@@ -1,6 +1,12 @@
 <?xml version="1.0"?>
 <HorizontalStack Background="DarkGrey" Margin="2">
-	<DirectoryView Name="dv" CurrentDirectory="Interfaces" Width="25%" SelectedItemChanged="Dv_SelectedItemChanged"/>
+	<VerticalStack  Width="25%">
+		<HorizontalStack Height="Fit">
+			<Image Margin="2" Width="14" Height="14" Path="#Crow.Icons.level-up.svg" MouseClick="./goUpDirClick"/>			
+			<TextBox Text="{²CurrentDir}" Margin="2"/>
+		</HorizontalStack>		
+		<DirectoryView Name="dv" CurrentDirectory="{CurrentDir}" SelectedItemChanged="Dv_SelectedItemChanged"/>
+	</VerticalStack>
 	<Splitter Width="6"/>
 	<VerticalStack>
 		<Container Name="CrowContainer" Height="60%" Background="Black"/>

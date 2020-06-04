@@ -32,6 +32,13 @@ namespace ShowCase
 				NotifyValueChanged ("CurrentDir",CurrentDir);
 			}
 		}
+		public void goUpDirClick (object sender, MouseButtonEventArgs e)
+		{
+			string root = Directory.GetDirectoryRoot (CurrentDir);
+			if (CurrentDir == root)
+				return;
+			CurrentDir = Directory.GetParent (CurrentDir).FullName;
+		}
 
 		protected override void OnInitialized ()
 		{

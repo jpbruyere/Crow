@@ -137,7 +137,7 @@ namespace Crow
 					double radius = CornerRadius;
 					if ((radius > rBack.Height / 2.0) || (radius > rBack.Width / 2.0))
 						radius = Math.Min (rBack.Height / 2.0, rBack.Width / 2.0);
-					gr.SetSourceColor (sunkenColor);
+					gr.SetSource (sunkenColor);
 					gr.MoveTo (0.5 + rBack.Left, -0.5 + rBack.Bottom - radius);
 					gr.ArcNegative (0.5 + rBack.Left + radius, -0.5 + rBack.Bottom - radius, radius, Math.PI, Math.PI * 0.75);
 					gr.MoveTo (0.5 + rBack.Left, -0.5 + rBack.Bottom - radius);
@@ -156,7 +156,7 @@ namespace Crow
 						gr.Arc (0.5 + rBack.Left + radius, -0.5 + rBack.Bottom - radius, radius - 1.0, Math.PI / 2.0, Math.PI * 0.75);
 						gr.Stroke ();
 
-						gr.SetSourceColor (raisedColor);
+						gr.SetSource (raisedColor);
 						gr.MoveTo (1.5 + rBack.Left, -1.5 + rBack.Bottom - radius);
 						gr.ArcNegative (0.5 + rBack.Left + radius, -0.5 + rBack.Bottom - radius, radius - 1.0, Math.PI, Math.PI * 0.75);
 						gr.MoveTo (1.5 + rBack.Left, -1.5 + rBack.Bottom - radius);
@@ -166,7 +166,7 @@ namespace Crow
 						gr.Arc (-0.5 + rBack.Right - radius, 0.5 + rBack.Top + radius, radius - 1.0, Math.PI * 1.5, Math.PI * 1.75);
 					} else {
 						gr.Stroke ();
-						gr.SetSourceColor (raisedColor);
+						gr.SetSource (raisedColor);
 					}
 					gr.MoveTo (-0.5 + rBack.Right, 0.5 + rBack.Top + radius);
 					gr.ArcNegative (-0.5 + rBack.Right - radius, 0.5 + rBack.Top + radius, radius, 0, -Math.PI * 0.25);
@@ -177,7 +177,7 @@ namespace Crow
 					gr.Arc (0.5 + rBack.Left + radius, -0.5 + rBack.Bottom - radius, radius, Math.PI / 2.0, Math.PI * 0.75);
 					gr.Stroke ();
 				} else {
-					gr.SetSourceColor (sunkenColor);
+					gr.SetSource (sunkenColor);
 					gr.MoveTo (0.5 + rBack.Left, rBack.Bottom);
 					gr.LineTo (0.5 + rBack.Left, 0.5 + rBack.Y);
 					gr.LineTo (rBack.Right, 0.5 + rBack.Y);
@@ -186,13 +186,13 @@ namespace Crow
 						gr.LineTo (-1.5 + rBack.Right, -1.5 + rBack.Bottom);
 						gr.LineTo (2.0 + rBack.Left, -1.5 + rBack.Bottom);
 						gr.Stroke ();
-						gr.SetSourceColor (raisedColor);
+						gr.SetSource (raisedColor);
 						gr.MoveTo (1.5 + rBack.Left, -1.0 + rBack.Bottom);
 						gr.LineTo (1.5 + rBack.Left, 1.5 + rBack.Y);
 						gr.LineTo (rBack.Right, 1.5 + rBack.Y);
 					} else {
 						gr.Stroke ();
-						gr.SetSourceColor (raisedColor);
+						gr.SetSource (raisedColor);
 					}
 					gr.MoveTo (-0.5 + rBack.Right, 1.5 + rBack.Y);
 					gr.LineTo (-0.5 + rBack.Right, -0.5 + rBack.Bottom);
@@ -220,16 +220,16 @@ namespace Crow
 					Foreground.SetAsSource (gr, rBack);
 				else {
 					if (BorderStyle == BorderStyle.Sunken)
-						gr.SetSourceColor (raisedColor);
+						gr.SetSource (raisedColor);
 					else
-						gr.SetSourceColor (sunkenColor);
+						gr.SetSource (sunkenColor);
 
 					CairoHelpers.CairoRectangle (gr, rBack, crad, bw);
 
 					if (BorderStyle == BorderStyle.Sunken)
-						gr.SetSourceColor (sunkenColor);
+						gr.SetSource (sunkenColor);
 					else
-						gr.SetSourceColor (raisedColor);
+						gr.SetSource (raisedColor);
 
 					bw /= 2.0;
 					rBack.Width -= (int)Math.Round(bw);

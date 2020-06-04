@@ -12,11 +12,6 @@ namespace Crow
 		#region CTOR
 		protected TextBox() {}
 		public TextBox(Interface iface, string style = null) : base (iface, style) { }
-//		public TextBox(string _initialValue)
-//			: base(_initialValue)
-//		{
-//
-//		}
 		#endregion
 
 		#region GraphicObject overrides
@@ -32,15 +27,12 @@ namespace Crow
 		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
-			FontExtents fe = gr.FontExtents;
 		}
 		#endregion
 			
         #region Keyboard handling
 		public override void onKeyDown (object sender, KeyEventArgs e)
 		{
-			base.onKeyDown (sender, e);
-
 			Key key = e.Key;
 
 			switch (key)
@@ -170,8 +162,9 @@ namespace Crow
 			default:
 				break;
 			}
-
-			RegisterForGraphicUpdate();
+			e.Handled = true;
+			base.onKeyDown (sender, e);
+			RegisterForGraphicUpdate ();
 		}
 		public override void onKeyPress (object sender, KeyPressEventArgs e)
 		{

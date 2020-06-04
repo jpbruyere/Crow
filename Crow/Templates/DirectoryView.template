@@ -12,7 +12,7 @@
 			</HorizontalStack>
 		</Border>
 	</ItemTemplate>
-	<ItemTemplate DataType="System.IO.DirectoryInfo" Data="GetFileSystemInfos">
+	<ItemTemplate DataType="System.IO.DirectoryInfo" Data="GetFileSystemInfosOrdered">
 		<Expandable Caption="{Name}" MouseDoubleClick="/onClickForExpand">
 			<Template>
 				<VerticalStack>
