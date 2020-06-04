@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0"?>
 <Border BorderWidth="1" Foreground="Grey" CornerRadius="{./CornerRadius}"
-				Background="{./Background}"
-				>
+				Background="{./Background}">
 	<VerticalStack Spacing="0">
 		<HorizontalStack Background="{./TitleBarBackground}"
 				Name="hs" Margin="0" Spacing="0" Height="Fit">
@@ -26,6 +25,6 @@
 			</Border>
 			<Widget Width="5"/>
 		</HorizontalStack>
-		<Container Name="Content" MinimumSize="0,0" Margin="4"/>
+		<Container Name="Content" MinimumSize="0,0" />
 	</VerticalStack>
 </Border>

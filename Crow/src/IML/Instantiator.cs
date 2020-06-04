@@ -62,7 +62,7 @@ namespace Crow.IML {
 		/// <summary>
 		/// Initializes a new instance of the Instantiator class.
 		/// </summary>
-		public Instantiator (Interface _iface, string path) : this (_iface, _iface.GetStreamFromPath(path), path) {
+		public Instantiator (Interface _iface, string path) : this (_iface, Interface.GetStreamFromPath(path), path) {
 			
 		}
 		/// <summary>
@@ -281,7 +281,7 @@ namespace Crow.IML {
 				itemTmpID += path+dataType+datas;
 				if (!iface.ItemTemplates.ContainsKey (itemTmpID))
 					iface.ItemTemplates [itemTmpID] =
-						new ItemTemplate (iface, path, ctx.CurrentNodeType, dataTest, dataType, datas);
+						new ItemTemplate (iface, path, dataTest, dataType, datas);
 			}
 			return new string [] { dataType, itemTmpID, datas, dataTest };
 		}
@@ -322,14 +322,9 @@ namespace Crow.IML {
 
 					if (!string.IsNullOrEmpty (templatePath)) {
 						ctx.il.Emit (OpCodes.Ldloc_0);//Load  current templatedControl ref
-						//	ctx.il.Emit (OpCodes.Ldnull);//default template loading
-						//} else {
 						ctx.il.Emit (OpCodes.Ldarg_1);//load currentInterface
 						ctx.il.Emit (OpCodes.Ldstr, templatePath); //Load template path string
-						//get declaring type for search fallback assembly
-						ctx.il.Emit (OpCodes.Ldloc_0);
-						ctx.il.Emit (OpCodes.Call, CompilerServices.miGetType);
-						ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miIFaceCreateTemplateInst);
+						ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miIFaceCreateInstance);
 						ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miLoadTmp);//load template
 					}
 				}
@@ -340,7 +335,7 @@ namespace Crow.IML {
 						if (iface.ItemTemplates.ContainsKey (itemTemplatePath)) {
 							itemTemplateIds.Add (new string [] { "default", itemTemplatePath, "" });
 						} else {
-							using (Stream stream = iface.GetTemplateStreamFromPath (itemTemplatePath, ctx.CurrentNodeType)) {
+							using (Stream stream = Interface.GetStreamFromPath (itemTemplatePath)) {
 								//itemtemplate files may have multiple root nodes
 								XmlReaderSettings itrSettings = new XmlReaderSettings { ConformanceLevel = ConformanceLevel.Fragment };
 								using (XmlReader itr = XmlReader.Create (stream, itrSettings)) {									
@@ -378,9 +373,6 @@ namespace Crow.IML {
 					//load itemTemplate
 					ctx.il.Emit (OpCodes.Ldarg_1);//load currentInterface
 					ctx.il.Emit (OpCodes.Ldstr, iTempId [1]);//load path
-					//second arg is Type, to find assembly where to search if not in entry
-					ctx.il.Emit (OpCodes.Ldloc_0);//load TempControl ref
-					ctx.il.Emit (OpCodes.Call, CompilerServices.miGetType);
 					ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miGetITemp);
 					ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miAddITemp);
 

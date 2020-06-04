@@ -454,19 +454,20 @@ namespace Crow
 		/// Than in any IML expresion, in style or xml, constant may be used as a replacement string with ${CONSTANTID}.
 		/// If a constant is not resolved in iml while creating the instantiator, an error is thrown.
 		/// </remarks>
-		public readonly Dictionary<string, string> StylingConstants = new Dictionary<string, string> ();
+		public Dictionary<string, string> StylingConstants;
 		/// <summary> parse all styling data's during application startup and build global Styling Dictionary </summary>
 		protected virtual void loadStyling() {
+			StylingConstants = new Dictionary<string, string> ();
 			Styling = new Dictionary<string, Style> ();
 
 			//fetch styling info in this order, if member styling is alreadey referenced in previous
 			//assembly, it's ignored.
-			loadStylingFromAssembly (Assembly.GetEntryAssembly ());
-			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
 
+			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
 			foreach (Assembly a in crowAssemblies) {
 				loadStylingFromAssembly (a);
 			}
+			loadStylingFromAssembly (Assembly.GetEntryAssembly ());
 		}
 		/// <summary> Search for .style resources in assembly </summary>
 		protected void loadStylingFromAssembly (Assembly assembly) {
@@ -476,93 +477,44 @@ namespace Crow
 				.GetManifestResourceNames ()
 				.Where (r => r.EndsWith (".style", StringComparison.OrdinalIgnoreCase))) {
 				using (StyleReader sr = new StyleReader (assembly.GetManifestResourceStream (s))) 
-					sr.Parse (this, s);				
+					sr.Parse (this.StylingConstants, this.Styling, s);				
 			}
 		}
 		#endregion
 
 
 		#region Load/Save
-		/// <summary>get template stream from path providing the declaring type for which
-		/// this template is loaded. If not found in entry assembly, the assembly where the type is defined
-		/// will be searched
-		/// </summary>
-		/// <returns>The template stream</returns>
-		public virtual Stream GetTemplateStreamFromPath (string path, Type declaringType)
-		{
-			Stream s = null;
-			if (path.StartsWith ("#", StringComparison.Ordinal)) {
-				string resId = path.Substring (1);
-				s = Assembly.GetEntryAssembly ()?.GetManifestResourceStream (resId);
-				if (s != null)
-					return s;
-				string assemblyName = resId.Split ('.')[0];
-				Assembly a = AppDomain.CurrentDomain.GetAssemblies ().FirstOrDefault (aa => aa.GetName ().Name == assemblyName);
-				s = a?.GetManifestResourceStream (resId);
-				if (s != null)
-					return s;
-				s = Assembly.GetAssembly (declaringType).GetManifestResourceStream (resId);
-				if (s == null)
-					throw new Exception ($"Template ressource not found '{path}'");
-			} else {
-				if (!File.Exists (path))
-					throw new FileNotFoundException ($"Template not found: {path}", path);
-				s = new FileStream (path, FileMode.Open, FileAccess.Read);
-			}
-			return s;
+		static bool tryGetResource (Assembly a, string resId, out Stream stream) {
+			stream = null;
+			if (a == null)
+				return false;
+			stream = a.GetManifestResourceStream (resId);
+			return stream != null;
 		}
-		/// <summary>Open file or find a resource from path string</summary>
-		/// <returns>A file or resource stream</returns>
-		/// <param name="path">This could be a normal file path, or an embedded ressource ID
-		/// Resource ID's must be prefixed with '#' character</param>
-		public virtual Stream GetStreamFromPath (string path)
-		{
-			Stream stream = null;
 
-			if (path.StartsWith ("#", StringComparison.Ordinal)) {
-				string resId = path.Substring (1);
-				stream = Assembly.GetEntryAssembly ()?.GetManifestResourceStream (resId);
-				if (stream != null)
-					return stream;
-				string assemblyName = resId.Split ('.') [0];
-				Assembly a = AppDomain.CurrentDomain.GetAssemblies ().FirstOrDefault (aa => aa.GetName ().Name == assemblyName);
-				if (a == null)
-					throw new Exception ($"Assembly '{assemblyName}' not found for ressource '{path}'.");
-				stream = a.GetManifestResourceStream (resId);
-				if (stream == null)
-					throw new Exception ("Resource not found: " + path);
-			} else {
-				if (!File.Exists (path))
-					throw new FileNotFoundException ($"File not found: {path}", path);
-				stream = new FileStream (path, FileMode.Open, FileAccess.Read);
-			}
-			return stream;
-		}
-		public static Stream StaticGetStreamFromPath (string path)
+		public static Stream GetStreamFromPath (string path)
 		{
-			Stream stream = null;
-
 			if (path.StartsWith ("#", StringComparison.Ordinal)) {
+				Stream stream = null;
 				string resId = path.Substring (1);
-				stream = Assembly.GetEntryAssembly ()?.GetManifestResourceStream (resId);
-				if (stream != null)
+				if (tryGetResource (Assembly.GetEntryAssembly (), resId, out stream))
 					return stream;
-				string assemblyName = resId.Split ('.') [0];
-				Assembly a = AppDomain.CurrentDomain.GetAssemblies ().FirstOrDefault (aa => aa.GetName ().Name == assemblyName);
-				if (a == null)
-					throw new Exception ($"Assembly '{assemblyName}' not found for ressource '{path}'.");
-				stream = a.GetManifestResourceStream (resId);
-				/*foreach (var s in a.GetManifestResourceNames()) {
-					System.Diagnostics.Debug.WriteLine (s);
-				}*/
-				if (stream == null)
-					throw new Exception ("Resource not found: " + path);
-			} else {
-				if (!File.Exists (path))
-					throw new FileNotFoundException ($"File not found: {path}", path);
-				stream = new FileStream (path, FileMode.Open, FileAccess.Read);
-			}
-			return stream;
+				string[] assemblyNames = resId.Split ('.');
+				if (tryGetResource (AppDomain.CurrentDomain.GetAssemblies ()
+					.FirstOrDefault (aa => aa.GetName ().Name == assemblyNames[0]), resId, out stream))
+					return stream;
+				if (assemblyNames.Length > 3)
+					if (tryGetResource (AppDomain.CurrentDomain.GetAssemblies ()
+						.FirstOrDefault (aa => aa.GetName ().Name == $"{assemblyNames[0]}.{assemblyNames[1]}"), resId, out stream))
+						return stream;
+				foreach (Assembly ca in crowAssemblies) 
+					if (tryGetResource (ca, resId, out stream))
+						return stream;
+				throw new Exception ("Resource not found: " + path);
+			} 
+			if (!File.Exists (path))
+				throw new FileNotFoundException ($"File not found: {path}", path);
+			return new FileStream (path, FileMode.Open, FileAccess.Read);
 		}
 		/// <summary>
 		/// Add the content of the IML fragment to the graphic tree of this interface
@@ -603,28 +555,7 @@ namespace Crow
 		/// <returns>new instance of graphic object created</returns>
 		/// <param name="path">path of the iml file to load</param>
 		public virtual Widget CreateInstance (string path)
-		{
-			//try {
-				return GetInstantiator (path).CreateInstance ();
-			//} catch (Exception ex) {
-			//	throw new Exception ("Error loading <" + path + ">:", ex);
-			//}
-		}
-		/// <summary>
-		/// Create an instance of a GraphicObject linked to this interface but not added to the GraphicTree
-		/// </summary>
-		/// <returns>new instance of graphic object created</returns>
-		/// <param name="path">path of the iml file to load</param>
-		public virtual Widget CreateTemplateInstance (string path, Type declaringType)
-		{
-//			try {
-				if (!Templates.ContainsKey (path))
-					Templates [path] = new Instantiator (this, GetTemplateStreamFromPath(path, declaringType), path);
-				return Templates [path].CreateInstance ();
-			//} catch (Exception ex) {
-			//	throw new Exception ("Error loading Template <" + path + ">:", ex);
-			//}
-		}
+			=> GetInstantiator (path).CreateInstance ();
 		/// <summary>
 		/// Fetch instantiator from cache or create it.
 		/// </summary>
@@ -639,9 +570,9 @@ namespace Crow
 		/// try to fetch the requested one in the cache or create it.
 		/// They have additional properties for recursivity and
 		/// custom display per item type</summary>
-		public virtual ItemTemplate GetItemTemplate(string path, Type declaringType){
+		public virtual ItemTemplate GetItemTemplate(string path){
 			if (!ItemTemplates.ContainsKey(path))
-				ItemTemplates [path] = new ItemTemplate(this, path, declaringType);
+				ItemTemplates [path] = new ItemTemplate(this, path);
 			return ItemTemplates [path] as ItemTemplate;
 		}
 		#endregion

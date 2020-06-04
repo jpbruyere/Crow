@@ -60,8 +60,7 @@ namespace Crow
 		/// Parse the full style stream and load the result in 'Styling' and 'StylingConstant'
 		/// fields of the interface passed as argument.
 		/// </summary>
-		/// <param name="iFace">the Interface to load the style for</param>
-		public void Parse (Interface iFace, string resId)
+		public void Parse (Dictionary<string, string> StylingConstants, Dictionary<string, Style> Styling, string resId)
 		{
 			column = 1;
 			line = 1;
@@ -133,9 +132,9 @@ namespace Crow
 										break;
 									constantId += c;
 								}
-								if (string.IsNullOrEmpty (constantId) || !iFace.StylingConstants.ContainsKey (constantId))
+								if (string.IsNullOrEmpty (constantId) || !StylingConstants.ContainsKey (constantId))
 									throw new ParserException (line, column, "Empty constant id in styling", resId);
-								token += iFace.StylingConstants [constantId];
+								token += StylingConstants [constantId];
 								continue;
 							}
 						} else if (c == '\"') {
@@ -151,15 +150,15 @@ namespace Crow
 					ReadChar ();
 					if (targetsClasses.Count == 0) {
 						//style constants
-						iFace.StylingConstants[currentProperty] = token;
+						StylingConstants[currentProperty] = token;
 						curState = States.classNames;
 					} else {
 						foreach (string tc in targetsClasses) {
-							if (!iFace.Styling.ContainsKey (tc))
-								iFace.Styling [tc] = new Style ();
-							iFace.Styling [tc] [currentProperty] = token;
+							if (!Styling.ContainsKey (tc))
+								Styling [tc] = new Style ();
+							Styling [tc] [currentProperty] = token;
 #if DESIGN_MODE
-							iFace.Styling [tc].Locations[currentProperty] = new FileLocation(resId, line, column - token.Length - 1, token.Length);
+							Styling [tc].Locations[currentProperty] = new FileLocation(resId, line, column - token.Length - 1, token.Length);
 #endif
 						}
 						curState = States.members;

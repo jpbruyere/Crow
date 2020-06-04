@@ -10,9 +10,8 @@ using Crow.IML;
 
 namespace ShowCase
 {
-	class Showcase : Interface
+	class Showcase : SampleBase
 	{
-
 		static void Main ()
 		{
 #if NETCOREAPP3_1
@@ -24,8 +23,20 @@ namespace ShowCase
 
 		public Container crowContainer;
 
+		public string CurrentDir {
+			get { return Configuration.Global.Get<string> ("CurrentDir"); }
+			set {
+				if (CurrentDir == value)
+					return;
+				Configuration.Global.Set ("CurrentDir", value);
+				NotifyValueChanged ("CurrentDir",CurrentDir);
+			}
+		}
+
 		protected override void OnInitialized ()
 		{
+			if (string.IsNullOrEmpty (CurrentDir))
+				CurrentDir = Path.Combine (Directory.GetCurrentDirectory (), "Interfaces");
 			Widget g = Load ("#ShowCase.showcase.crow");
 			g.DataSource = this;
 			crowContainer = g.FindByName ("CrowContainer") as Container;
@@ -46,12 +57,6 @@ namespace ShowCase
 #endif
 		}
 
-		public Showcase ()
-			: base (1024, 800)
-		{
-		}
-
-
 		void Dv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
 		{
 			FileSystemInfo fi = e.NewValue as FileSystemInfo;
@@ -59,23 +64,11 @@ namespace ShowCase
 				return;
 			if (fi is DirectoryInfo)
 				return;
-			hideError ();
-			lock (UpdateMutex) {
-				try {
-					Widget g = CreateInstance (fi.FullName);
-					crowContainer.SetChild (g);
-					g.DataSource = this;
-				} catch (Exception ex) {
-					Console.WriteLine (ex.ToString ());
-					showError (ex);
-				}
-			}
 
 			string source = "";
 			using (Stream s = new FileStream (fi.FullName, FileMode.Open)) {
-				using (StreamReader sr = new StreamReader (s)) {
+				using (StreamReader sr = new StreamReader (s))
 					source = sr.ReadToEnd ();
-				}
 			}
 			NotifyValueChanged ("source", source);
 		}
@@ -104,9 +97,12 @@ namespace ShowCase
 					crowContainer.SetChild (g);
 					g.DataSource = this;
 				}
+			} catch (InstantiatorException itorex) {
+				Console.WriteLine (itorex.ToString ());
+				showError (itorex.InnerException);
 			} catch (Exception ex) {
-				Console.WriteLine (ex.ToString ());
-				showError ((Exception)ex);
+				Console.WriteLine (ex);
+				showError (ex);
 			}
 		}
 
