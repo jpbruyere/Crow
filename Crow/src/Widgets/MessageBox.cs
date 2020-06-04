@@ -67,7 +67,7 @@ namespace Crow
 				if (message == value)
 					return;
 				message = value;
-				NotifyValueChanged ("Message", message);
+				NotifyValueChangedAuto (message);
 			}
 		}
 		[DefaultValue("Ok")]
@@ -78,7 +78,7 @@ namespace Crow
 				if (okMessage == value)
 					return;
 				okMessage = value;
-				NotifyValueChanged ("OkMessage", okMessage);
+				NotifyValueChangedAuto (okMessage);
 			}
 		}
 		[DefaultValue("Cancel")]
@@ -89,7 +89,7 @@ namespace Crow
 				if (cancelMessage == value)
 					return;
 				cancelMessage = value;
-				NotifyValueChanged ("CancelMessage", cancelMessage);
+				NotifyValueChangedAuto (cancelMessage);
 			}
 		}
 		[DefaultValue("No")]
@@ -100,7 +100,7 @@ namespace Crow
 				if (noMessage == value)
 					return;
 				noMessage = value;
-				NotifyValueChanged ("NoMessage", noMessage);
+				NotifyValueChangedAuto (noMessage);
 			}
 		}
 		[DefaultValue("Information")]
@@ -111,7 +111,7 @@ namespace Crow
 				if (msgType == value)
 					return;
 				msgType = value;
-				NotifyValueChanged ("MsgType", msgType);
+				NotifyValueChangedAuto (msgType);
 				switch (msgType) {
 				case Type.Information:
 					MsgIcon = "#Crow.Icons.iconInfo.svg";
@@ -155,7 +155,7 @@ namespace Crow
 				if (value == MsgIcon)
 					return;
 				msgIcon = value;
-				NotifyValueChanged ("MsgIcon", MsgIcon);
+				NotifyValueChangedAuto (MsgIcon);
 			}
 		}
 		void onOkButtonClick (object sender, EventArgs e)

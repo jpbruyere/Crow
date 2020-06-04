@@ -45,7 +45,7 @@ namespace Crow
 
 				scrollX = newS;
 
-				NotifyValueChanged ("ScrollX", scrollX);
+				NotifyValueChangedAuto (scrollX);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -68,7 +68,7 @@ namespace Crow
 
 				scrollY = newS;
 
-				NotifyValueChanged ("ScrollY", scrollY);
+				NotifyValueChangedAuto (scrollY);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -85,7 +85,7 @@ namespace Crow
 				if (scrollX > maxScrollX)
 					ScrollX = maxScrollX;
 
-				NotifyValueChanged ("MaxScrollX", maxScrollX);
+				NotifyValueChangedAuto (maxScrollX);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -102,7 +102,7 @@ namespace Crow
 				if (scrollY > maxScrollY)
 					ScrollY = maxScrollY;
 
-				NotifyValueChanged ("MaxScrollY", maxScrollY);
+				NotifyValueChangedAuto (maxScrollY);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -116,7 +116,7 @@ namespace Crow
 				
 				mouseWheelSpeed = value;
 
-				NotifyValueChanged ("MouseWheelSpeed", mouseWheelSpeed);
+				NotifyValueChangedAuto (mouseWheelSpeed);
 			}
 		}
 

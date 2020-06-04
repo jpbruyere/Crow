@@ -68,7 +68,7 @@ namespace Crow
 				if (_icon == value)
 					return;
 				_icon = value;
-				NotifyValueChanged ("Icon", _icon);
+				NotifyValueChangedAuto (_icon);
 			}
 		} 
 		/// <summary>
@@ -81,7 +81,7 @@ namespace Crow
 				if (titleBarBackground == value)
 					return;
 				titleBarBackground = value;
-				NotifyValueChanged ("TitleBarBackground", titleBarBackground);
+				NotifyValueChangedAuto (titleBarBackground);
 				RegisterForRedraw ();
 			}
 		}
@@ -95,7 +95,7 @@ namespace Crow
 				if (titleBarForeground == value)
 					return;
 				titleBarForeground = value;
-				NotifyValueChanged ("TitleBarForeground", titleBarForeground);
+				NotifyValueChangedAuto (titleBarForeground);
 				RegisterForRedraw ();
 			}
 		}
@@ -108,7 +108,7 @@ namespace Crow
 				if (resizable == value)
 					return;
 				resizable = value;
-				NotifyValueChanged ("Resizable", resizable);
+				NotifyValueChangedAuto (resizable);
 			}
 		}
 		[DefaultValue(true)]
@@ -120,7 +120,7 @@ namespace Crow
 				if (movable == value)
 					return;
 				movable = value;
-				NotifyValueChanged ("Movable", movable);
+				NotifyValueChangedAuto (movable);
 			}
 		}
 		[DefaultValue(false)]
@@ -132,7 +132,7 @@ namespace Crow
 				if (modal == value)
 					return;
 				modal = value;
-				NotifyValueChanged ("Modal", modal);
+				NotifyValueChangedAuto (modal);
 			}
 		}
 		[DefaultValue(false)]
@@ -145,7 +145,7 @@ namespace Crow
 				_minimized = value;
 				_contentContainer.Visible = !_minimized;
 
-				NotifyValueChanged ("IsMinimized", _minimized);
+				NotifyValueChangedAuto (_minimized);
 			}
 		}
 		[XmlIgnore]public bool IsMaximized {
@@ -168,7 +168,7 @@ namespace Crow
 				if (AlwaysOnTop && Parent != null)
 					IFace.PutOnTop (this);
 
-				NotifyValueChanged ("AlwaysOnTop", AlwaysOnTop);
+				NotifyValueChangedAuto (AlwaysOnTop);
 			}
 		}
 //		[DefaultValue(WindowState.Normal)]

@@ -53,7 +53,7 @@ namespace Crow
 				if (_orientation == value)
 					return;
 				_orientation = value;
-				NotifyValueChanged ("Orientation", _orientation);
+				NotifyValueChangedAuto (_orientation);
 				RegisterForGraphicUpdate ();
 			}
 		}

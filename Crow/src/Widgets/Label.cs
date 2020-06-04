@@ -60,7 +60,7 @@ namespace Crow {
 				if (selBackground == value)
 					return;
 				selBackground = value;
-				NotifyValueChanged ("SelectionBackground", selBackground);
+				NotifyValueChangedAuto (selBackground);
 				RegisterForRedraw ();
 			}
 		}
@@ -71,7 +71,7 @@ namespace Crow {
 				if (selForeground == value)
 					return;
 				selForeground = value;
-				NotifyValueChanged ("SelectionForeground", selForeground);
+				NotifyValueChangedAuto (selForeground);
 				RegisterForRedraw ();
 			}
 		}
@@ -84,7 +84,7 @@ namespace Crow {
 					return;
 				_textAlignment = value;
 				RegisterForRedraw ();
-				NotifyValueChanged ("TextAlignment", _textAlignment);
+				NotifyValueChangedAuto (_textAlignment);
 			}
         }
 		[DefaultValue(false)]
@@ -95,7 +95,7 @@ namespace Crow {
 					return;
 				horizontalStretch = value;
 				RegisterForRedraw ();
-				NotifyValueChanged ("HorizontalStretch", horizontalStretch);
+				NotifyValueChangedAuto (horizontalStretch);
 			}
 		}
 		[DefaultValue(false)]
@@ -106,7 +106,7 @@ namespace Crow {
 					return;
 				verticalStretch = value;
 				RegisterForRedraw ();
-				NotifyValueChanged ("VerticalStretch", verticalStretch);
+				NotifyValueChangedAuto (verticalStretch);
 			}
 		}
 		[DefaultValue("label")]
@@ -141,7 +141,7 @@ namespace Crow {
 				if (value == _selectable)
 					return;
 				_selectable = value;
-				NotifyValueChanged ("Selectable", _selectable);
+				NotifyValueChangedAuto (_selectable);
 				SelBegin = -1;
 				SelRelease = -1;
 				RegisterForRedraw ();
@@ -156,7 +156,7 @@ namespace Crow {
 				if (value == _multiline)
 					return;
 				_multiline = value;
-				NotifyValueChanged ("Multiline", _multiline);
+				NotifyValueChangedAuto (_multiline);
 				RegisterForGraphicUpdate();
 			}
 		}
@@ -172,7 +172,7 @@ namespace Crow {
 					_currentCol = lines [_currentLine].Length;
 				else
 					_currentCol = value;
-				NotifyValueChanged ("CurrentColumn", _currentCol);
+				NotifyValueChangedAuto (_currentCol);
 
 				Rectangle cb = ClientRectangle;
 
@@ -227,7 +227,7 @@ namespace Crow {
 				int cc = _currentCol;
 				_currentCol = 0;
 				CurrentColumn = cc;
-				NotifyValueChanged ("CurrentLine", _currentLine);
+				NotifyValueChangedAuto (_currentLine);
 			}
 		}
 		[XmlIgnore]public Point CurrentPosition {
@@ -246,7 +246,7 @@ namespace Crow {
 				if (value == _selBegin)
 					return;
 				_selBegin = value;
-				NotifyValueChanged ("SelBegin", _selBegin);
+				NotifyValueChangedAuto (_selBegin);
 				NotifyValueChanged ("SelectedText", SelectedText);
 			}
 		}
@@ -259,7 +259,7 @@ namespace Crow {
 				if (value == _selRelease)
 					return;
 				_selRelease = value;
-				NotifyValueChanged ("SelRelease", _selRelease);
+				NotifyValueChangedAuto (_selRelease);
 				NotifyValueChanged ("SelectedText", SelectedText);
 			}
 		}

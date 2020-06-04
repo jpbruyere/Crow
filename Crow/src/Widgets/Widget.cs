@@ -212,6 +212,10 @@ namespace Crow
 			//Debug.WriteLine ("Value changed: {0}->{1} = {2}", this, MemberName, _value);
 			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
 		}
+		public void NotifyValueChangedAuto (object _value, [CallerMemberName] string caller = null)
+		{
+			NotifyValueChanged (caller, _value);
+		}
 		#endregion
 
 		#region CTOR
@@ -469,7 +473,7 @@ namespace Crow
 				if (tag == value)
 					return;
 				tag = value;
-				NotifyValueChanged ("Tag", tag);
+				NotifyValueChangedAuto (tag);
 			}
 		}
 		/// <summary>
@@ -483,7 +487,7 @@ namespace Crow
 				if (cacheEnabled == value)
 					return;
 				cacheEnabled = value;
-				NotifyValueChanged ("CacheEnabled", cacheEnabled);
+				NotifyValueChangedAuto (cacheEnabled);
 			}
 		}
 		/// <summary>
@@ -496,7 +500,7 @@ namespace Crow
 				if (clipToClientRect == value)
 					return;
 				clipToClientRect = value;
-				NotifyValueChanged ("ClipToClientRect", clipToClientRect);
+				NotifyValueChangedAuto (clipToClientRect);
 				this.RegisterForRedraw ();
 			}
 		}
@@ -523,7 +527,7 @@ namespace Crow
 				if (name == value)
 					return;
 				name = value;
-				NotifyValueChanged("Name", name);
+				NotifyValueChangedAuto (name);
 			}
 		}
 		/// <summary>
@@ -538,7 +542,7 @@ namespace Crow
 					return;
 
 				verticalAlignment = value;
-				NotifyValueChanged("VerticalAlignment", verticalAlignment);
+				NotifyValueChangedAuto (verticalAlignment);
 				RegisterForLayouting (LayoutingType.Y);
 			}
 		}
@@ -553,7 +557,7 @@ namespace Crow
 				if (horizontalAlignment == value)
 					return;
 				horizontalAlignment = value;
-				NotifyValueChanged("HorizontalAlignment", horizontalAlignment);
+				NotifyValueChangedAuto (horizontalAlignment);
 				RegisterForLayouting (LayoutingType.X);
 			}
 		}
@@ -567,7 +571,7 @@ namespace Crow
 				if (left == value)
 					return;
 				left = value;
-				NotifyValueChanged ("Left", left);
+				NotifyValueChangedAuto (left);
 				this.RegisterForLayouting (LayoutingType.X);
 			}
 		}
@@ -581,7 +585,7 @@ namespace Crow
 				if (top == value)
 					return;
 				top = value;
-				NotifyValueChanged ("Top", top);
+				NotifyValueChangedAuto (top);
 				this.RegisterForLayouting (LayoutingType.Y);
 			}
 		}
@@ -617,7 +621,7 @@ namespace Crow
 						return;
 				}
 				width = value;
-				NotifyValueChanged ("Width", width);
+				NotifyValueChangedAuto (width);
 				RegisterForLayouting (LayoutingType.Width);
 			}
 		}
@@ -640,7 +644,7 @@ namespace Crow
 						return;
 				}
 				height = value;
-				NotifyValueChanged ("Height", height);
+				NotifyValueChangedAuto (height);
 				RegisterForLayouting (LayoutingType.Height);
 			}
 		}
@@ -667,7 +671,7 @@ namespace Crow
 				if (focusable == value)
 					return;
 				focusable = value;
-				NotifyValueChanged ("Focusable", focusable);
+				NotifyValueChangedAuto (focusable);
 			}
 		}
 		/// <summary>
@@ -684,7 +688,7 @@ namespace Crow
 					onFocused (this, null);
 				else
 					onUnfocused (this, null);
-				NotifyValueChanged ("HasFocus", hasFocus);
+				NotifyValueChangedAuto (hasFocus);
 			}
 		}
 		/// <summary>
@@ -698,7 +702,7 @@ namespace Crow
 					return;
 
 				isActive = value;
-				NotifyValueChanged ("IsActive", isActive);
+				NotifyValueChangedAuto (isActive);
 			}
 		}
 		/// <summary>
@@ -715,7 +719,7 @@ namespace Crow
 				if (isHover)
 					Hover.Raise (this, null);
 
-				NotifyValueChanged ("IsHover", isHover);
+				NotifyValueChangedAuto (isHover);
 			}
 		}
 		/// <summary>
@@ -728,7 +732,7 @@ namespace Crow
 				if (mouseRepeat == value)
 					return;
 				mouseRepeat = value;
-				NotifyValueChanged ("MouseRepeat", mouseRepeat);
+				NotifyValueChangedAuto (mouseRepeat);
 			}
 		}
 		/// <summary>
@@ -742,7 +746,7 @@ namespace Crow
 				if (mouseCursor == value)
 					return;
 				mouseCursor = value;
-				NotifyValueChanged ("MouseCursor", mouseCursor);
+				NotifyValueChangedAuto (mouseCursor);
 				this.RegisterForRedraw ();
 
 				if (isHover)
@@ -777,7 +781,7 @@ namespace Crow
 				if (value == null)
 					return;
 				background = value;
-				NotifyValueChanged ("Background", background);
+				NotifyValueChangedAuto (background);
 				RegisterForRedraw ();
 				if (background is SolidColor sc && sc.Equals (Colors.Clear))
 					clearBackground = true;				
@@ -793,7 +797,7 @@ namespace Crow
 				if (foreground == value)
 					return;
 				foreground = value;
-				NotifyValueChanged ("Foreground", foreground);
+				NotifyValueChangedAuto (foreground);
 				RegisterForRedraw ();
 			}
 		}
@@ -807,7 +811,7 @@ namespace Crow
 				if (value == font)
 					return;
 				font = value;
-				NotifyValueChanged ("Font", font);
+				NotifyValueChangedAuto (font);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -821,7 +825,7 @@ namespace Crow
 				if (value == cornerRadius)
 					return;
 				cornerRadius = value;
-				NotifyValueChanged ("CornerRadius", cornerRadius);
+				NotifyValueChangedAuto (cornerRadius);
 				RegisterForRedraw ();
 			}
 		}
@@ -836,7 +840,7 @@ namespace Crow
 				if (value == margin)
 					return;
 				margin = value;
-				NotifyValueChanged ("Margin", margin);
+				NotifyValueChangedAuto (margin);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -861,7 +865,7 @@ namespace Crow
 					}
 				}
 
-				NotifyValueChanged ("Visible", isVisible);
+				NotifyValueChangedAuto (isVisible);
 			}
 		}
 		/// <summary>
@@ -882,7 +886,7 @@ namespace Crow
 				else
 					onDisable (this, null);
 
-				NotifyValueChanged ("IsEnabled", isEnabled);
+				NotifyValueChangedAuto (isEnabled);
 				RegisterForRedraw ();
 			}
 		}
@@ -898,7 +902,7 @@ namespace Crow
 
 				minimumSize = value;
 
-				NotifyValueChanged ("MinimumSize", minimumSize);
+				NotifyValueChangedAuto (minimumSize);
 				RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
@@ -914,7 +918,7 @@ namespace Crow
 
 				maximumSize = value;
 
-				NotifyValueChanged (nameof(MaximumSize), maximumSize);
+				NotifyValueChangedAuto (maximumSize);
 				RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
@@ -954,7 +958,7 @@ namespace Crow
 				#endif
 				lock (IFace.UpdateMutex) {
 					OnDataSourceChanged (this, dse);
-					NotifyValueChanged ("DataSource", DataSource);
+					NotifyValueChangedAuto (DataSource);
 				}
 				#if DEBUG_LOG
 				dbgEvt.end = DebugLog.chrono.ElapsedTicks;
@@ -977,7 +981,7 @@ namespace Crow
 				if (rootDataLevel == value)
 					return;
 				rootDataLevel = value;
-				NotifyValueChanged ("RootDataLevel", rootDataLevel);
+				NotifyValueChangedAuto (rootDataLevel);
 				this.RegisterForRedraw ();
 			}
 		}
@@ -1010,7 +1014,7 @@ namespace Crow
 
 				style = value;
 
-				NotifyValueChanged ("Style", style);
+				NotifyValueChangedAuto (style);
 			}
 		}
 		[DesignCategory ("Divers")]
@@ -1020,7 +1024,7 @@ namespace Crow
 				if (tooltip == value)
 					return;
 				tooltip = value;
-				NotifyValueChanged("Tooltip", tooltip);
+				NotifyValueChangedAuto (tooltip);
 			}
 		}
 		[DesignCategory ("Divers")]
@@ -1030,7 +1034,7 @@ namespace Crow
 				if (contextCommands == value)
 					return;
 				contextCommands = value;
-				NotifyValueChanged("ContextCommands", contextCommands);
+				NotifyValueChangedAuto (contextCommands);
 			}
 		}
 		#endregion

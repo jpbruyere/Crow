@@ -34,7 +34,7 @@ namespace Crow
 				if (_orientation == value)
 					return;
 				_orientation = value;
-				NotifyValueChanged ("Orientation", _orientation);
+				NotifyValueChangedAuto (_orientation);
 				if (_orientation == Orientation.Horizontal)
 					NotifyValueChanged ("TabOrientation", Orientation.Vertical);
 				else
@@ -50,7 +50,7 @@ namespace Crow
 				if (leftSlope == value)
 					return;
 				leftSlope = value;
-				NotifyValueChanged ("leftSlope", leftSlope);
+				NotifyValueChangedAuto (leftSlope);
 				//tabSizeHasChanged = true;
 				//RegisterForLayouting (LayoutingType.ArrangeChildren);
 			}
@@ -64,7 +64,7 @@ namespace Crow
 				if (rightSlope == value)
 					return;
 				rightSlope = value;
-				NotifyValueChanged ("RightSlope", rightSlope);
+				NotifyValueChangedAuto (rightSlope);
 				//tabSizeHasChanged = true;
 				//RegisterForLayouting (LayoutingType.ArrangeChildren);
 			}
@@ -76,7 +76,7 @@ namespace Crow
 				if (tabHeight == value)
 					return;
 				tabHeight = value;
-				NotifyValueChanged ("TabHeight", tabHeight);
+				NotifyValueChangedAuto (tabHeight);
 //				childrenRWLock.EnterReadLock ();
 //				foreach (GraphicObject ti in Children) {
 //					ti.NotifyValueChanged ("TabHeight", tabHeight);
@@ -92,7 +92,7 @@ namespace Crow
 				if (tabWidth == value)
 					return;
 				tabWidth = value;
-				NotifyValueChanged ("TabWidth", TabWidth);
+				NotifyValueChangedAuto (TabWidth);
 //
 //				childrenRWLock.EnterReadLock ();
 //				foreach (GraphicObject ti in Children) { 
@@ -117,7 +117,7 @@ namespace Crow
 				if (selectedTab < Children.Count && selectedTab >= 0)
 					(Children [selectedTab] as TabItem).IsSelected = true;
 
-				NotifyValueChanged ("SelectedTab", selectedTab);
+				NotifyValueChangedAuto (selectedTab);
 				RegisterForRedraw ();
 			}
 		}

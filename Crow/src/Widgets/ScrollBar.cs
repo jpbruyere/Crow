@@ -30,7 +30,7 @@ namespace Crow
 				if (_orientation == value)
 					return;
 				_orientation = value;
-				NotifyValueChanged ("Orientation", _orientation);
+				NotifyValueChangedAuto (_orientation);
 				if (_orientation == Orientation.Horizontal)
 					NotifyValueChanged ("ScrollBackShape", "M 1.5,3.5 L 6.5,0.5 L 6.5,6.5 Z G");
 				else
@@ -47,7 +47,7 @@ namespace Crow
 					return;
 				_cursorSize = value;
 				RegisterForGraphicUpdate ();
-				NotifyValueChanged ("CursorSize", _cursorSize);
+				NotifyValueChangedAuto (_cursorSize);
 			}
 		}
 		public void onScrollBack (object sender, MouseButtonEventArgs e)

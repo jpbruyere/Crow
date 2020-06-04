@@ -53,7 +53,7 @@ namespace Crow
 				if (isOpened == value)
 					return;
 				isOpened = value;
-				NotifyValueChanged ("IsOpened", isOpened);
+				NotifyValueChangedAuto (isOpened);
 
 				if (isOpened) {
 					onOpen (this, null);
@@ -82,7 +82,7 @@ namespace Crow
 					command.raiseAllValuesChanged ();
 				}
 
-				NotifyValueChanged ("Command", command);
+				NotifyValueChangedAuto (command);
 			}
 		}
 		
@@ -103,7 +103,7 @@ namespace Crow
 					return;
 				icon = value;
 				if (command == null)
-					NotifyValueChanged ("Icon", icon);
+					NotifyValueChangedAuto (icon);
 			}
 		}
 		[DefaultValue("Fit")]
@@ -113,7 +113,7 @@ namespace Crow
 				if (popWidth == value)
 					return;
 				popWidth = value;
-				NotifyValueChanged ("PopWidth", popWidth);
+				NotifyValueChangedAuto (popWidth);
 			}
 		}
 		[DefaultValue("Fit")]
@@ -123,7 +123,7 @@ namespace Crow
 				if (popHeight == value)
 					return;
 				popHeight = value;
-				NotifyValueChanged ("PopHeight", popHeight);
+				NotifyValueChangedAuto (popHeight);
 			}
 		}
 		#endregion

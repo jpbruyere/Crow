@@ -26,7 +26,7 @@ namespace Crow
 				if (isRoot == value)
 					return;
 				isRoot = value;
-				NotifyValueChanged ("IsRoot", isRoot);
+				NotifyValueChangedAuto (isRoot);
 			}
 		}
 		[XmlIgnore]public override object SelectedItem {

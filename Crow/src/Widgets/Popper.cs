@@ -30,7 +30,7 @@ namespace Crow
 				if (popWidth == value)
 					return;
 				popWidth = value;
-				NotifyValueChanged ("PopWidth", popWidth);
+				NotifyValueChangedAuto (popWidth);
 			}
 		}
 		[DefaultValue("Fit")]
@@ -40,7 +40,7 @@ namespace Crow
 				if (popHeight == value)
 					return;
 				popHeight = value;
-				NotifyValueChanged ("PopHeight", popHeight);
+				NotifyValueChangedAuto (popHeight);
 			}
 		}
 		[DefaultValue(false)]
@@ -57,7 +57,7 @@ namespace Crow
 
 				_isPopped = value;
 
-				NotifyValueChanged ("IsPopped", _isPopped);
+				NotifyValueChangedAuto (_isPopped);
 
 				if (_isPopped)
 					onPop (this, null);
@@ -76,7 +76,7 @@ namespace Crow
 					return;
 
 				_canPop = value;
-				NotifyValueChanged ("CanPop", _canPop);
+				NotifyValueChangedAuto (_canPop);
 			}
 		}
 		[DefaultValue(Alignment.Bottom)]
@@ -86,7 +86,7 @@ namespace Crow
 				if (popDirection == value)
 					return;
 				popDirection = value;
-				NotifyValueChanged ("PopDirection", popDirection);
+				NotifyValueChangedAuto (popDirection);
 			}
 		}
 		#endregion

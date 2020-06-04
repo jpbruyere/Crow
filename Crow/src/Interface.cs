@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Crow.Cairo;
@@ -45,10 +46,14 @@ namespace Crow
 	{
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-		public virtual void NotifyValueChanged (string MemberName, object _value)
+		public void NotifyValueChanged (string MemberName, object _value)
 		{
 			//Debug.WriteLine ("Value changed: {0}->{1} = {2}", this, MemberName, _value);
 			ValueChanged.Raise (this, new ValueChangeEventArgs (MemberName, _value));
+		}
+		public void NotifyValueChanged (object _value, [CallerMemberName] string caller = null)
+		{
+			NotifyValueChanged (caller, _value);
 		}
 		#endregion
 

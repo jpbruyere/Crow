@@ -31,8 +31,8 @@ namespace Crow
             set { 
 				if (_spacing == value)
 					return;
-				_spacing = value; 
-				NotifyValueChanged ("Spacing", Spacing);
+				_spacing = value;
+				NotifyValueChangedAuto (Spacing);
 				RegisterForLayouting (LayoutingType.Sizing|LayoutingType.ArrangeChildren);
 			}
         }

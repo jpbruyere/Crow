@@ -26,8 +26,8 @@ namespace Crow
 			set {
 				if (thickness == value)
 					return;
-				thickness = value; 
-				NotifyValueChanged ("Thickness", thickness);
+				thickness = value;
+				NotifyValueChangedAuto (thickness);
 				RegisterForLayouting (LayoutingType.Sizing);
 				RegisterForGraphicUpdate ();
 			}

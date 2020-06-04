@@ -67,7 +67,7 @@ namespace Crow
 				if (caption == value)
 					return;
 				caption = value;
-				NotifyValueChanged ("Caption", caption);
+				NotifyValueChangedAuto (caption);
 			}
 		}
 

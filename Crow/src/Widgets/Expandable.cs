@@ -74,7 +74,7 @@ namespace Crow
 				if (image == value)
 					return;
 				image = value;
-				NotifyValueChanged ("Image", image);
+				NotifyValueChangedAuto (image);
 			}
 		}
 		[DefaultValue(false)]
@@ -93,7 +93,7 @@ namespace Crow
 				if (!isExp)
 					_isExpanded = false;
 
-				NotifyValueChanged ("IsExpanded", _isExpanded);
+				NotifyValueChangedAuto (_isExpanded);
 
 				if (_isExpanded)
 					onExpand (this, null);

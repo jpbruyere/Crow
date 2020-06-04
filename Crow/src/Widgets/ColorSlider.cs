@@ -34,7 +34,7 @@ namespace Crow
 				if (orientation == value)
 					return;
 				orientation = value;
-				NotifyValueChanged ("Orientation", orientation);
+				NotifyValueChangedAuto (orientation);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -45,7 +45,7 @@ namespace Crow
 				if (cursorType == value)
 					return;
 				cursorType = value;
-				NotifyValueChanged ("CursorType", cursorType);
+				NotifyValueChangedAuto (cursorType);
 				RegisterForRedraw ();
 			}
 		}
@@ -56,7 +56,7 @@ namespace Crow
 				if (component == value)
 					return;
 				component = value;
-				NotifyValueChanged ("Component", component);
+				NotifyValueChangedAuto (component);
 				RegisterForRedraw ();
 			}
 		}
@@ -68,7 +68,7 @@ namespace Crow
 
 				currentColor = value;
 
-				NotifyValueChanged ("CurrentColor", currentColor);
+				NotifyValueChangedAuto (currentColor);
 				RegisterForRedraw ();
 
 				switch (component) {

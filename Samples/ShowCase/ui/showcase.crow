@@ -2,7 +2,8 @@
 <HorizontalStack Background="DarkGrey" Margin="2">
 	<VerticalStack  Width="25%">
 		<HorizontalStack Height="Fit">
-			<Image Margin="2" Width="14" Height="14" Path="#Crow.Icons.level-up.svg" MouseClick="./goUpDirClick"/>			
+			<Image Margin="2" Width="16" Height="16" Path="#Crow.Icons.level-up.svg" MouseClick="./goUpDirClick"
+						 Background="Jet" MouseEnter="{Background=Grey}" MouseLeave="{Background=Jet}" />			
 			<TextBox Text="{²CurrentDir}" Margin="2"/>
 		</HorizontalStack>		
 		<DirectoryView Name="dv" CurrentDirectory="{CurrentDir}" SelectedItemChanged="Dv_SelectedItemChanged"/>
@@ -15,8 +16,8 @@
 			<Scroller Name="scroller1" Background="White"
 					Margin="2" ScrollY="{../scrollbar1.Value}"
 					ValueChanged="./_scroller_ValueChanged">
-				<TextBox VerticalAlignment="Top" TextChanged="Tb_TextChanged"
-					Text="{source}" Multiline="true" TextAlignment="TopLeft"
+				<TextBox VerticalAlignment="Top"
+					Text="{²Source}" Multiline="true" TextAlignment="TopLeft"
 					Font="Courriernew 10"/>
 			</Scroller>
 			<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}"

@@ -70,9 +70,9 @@ namespace Crow
 				if (_columnCount == value)
 					return;
 
-				_columnCount = value; 
+				_columnCount = value;
 
-				NotifyValueChanged ("ColumnCount", ColumnCount);
+				NotifyValueChangedAuto (ColumnCount);
 				this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 			}
         }
@@ -84,9 +84,9 @@ namespace Crow
 				if (_rowCount == value)
 					return;
 
-				_rowCount = value; 
+				_rowCount = value;
 
-				NotifyValueChanged ("RowCount", RowCount);
+				NotifyValueChangedAuto (RowCount);
 				this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 			}
 		}

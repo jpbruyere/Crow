@@ -27,7 +27,7 @@ namespace Crow
 				if (scaled == value)
 					return;
 				scaled = value;
-				NotifyValueChanged ("Scaled", scaled);
+				NotifyValueChangedAuto (scaled);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -41,7 +41,7 @@ namespace Crow
 				if (keepProps == value)
 					return;
 				keepProps = value;
-				NotifyValueChanged ("KeepProportions", keepProps);
+				NotifyValueChangedAuto (keepProps);
 				RegisterForGraphicUpdate ();
 			}
 		}

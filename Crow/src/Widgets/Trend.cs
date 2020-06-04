@@ -43,7 +43,7 @@ namespace Crow
 					return;
 
 				nbValues = value;
-				NotifyValueChanged ("NbValues", minValue);
+				NotifyValueChangedAuto (minValue);
 				RegisterForRedraw ();
 			}
 		}
@@ -55,7 +55,7 @@ namespace Crow
 					return;
 
 				minValue = value;
-				NotifyValueChanged ("Minimum", minValue);
+				NotifyValueChangedAuto (minValue);
 				RegisterForRedraw ();
 			}
 		}
@@ -68,7 +68,7 @@ namespace Crow
 					return;
 
 				maxValue = value;
-				NotifyValueChanged ("Maximum", maxValue);
+				NotifyValueChangedAuto (maxValue);
 				RegisterForRedraw ();
 			}
 		}
@@ -79,7 +79,7 @@ namespace Crow
 				if (lowThreshold == value)
 					return;
 				lowThreshold = value;
-				NotifyValueChanged ("LowThreshold", lowThreshold);
+				NotifyValueChangedAuto (lowThreshold);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -90,7 +90,7 @@ namespace Crow
 				if (highThreshold == value)
 					return;
 				highThreshold = value;
-				NotifyValueChanged ("HighThreshold", highThreshold);
+				NotifyValueChangedAuto (highThreshold);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -101,7 +101,7 @@ namespace Crow
 				if (lowThresholdFill == value)
 					return;
 				lowThresholdFill = value;
-				NotifyValueChanged ("LowThresholdFill", lowThresholdFill);
+				NotifyValueChangedAuto (lowThresholdFill);
 				RegisterForRedraw ();
 			}
 		}
@@ -112,7 +112,7 @@ namespace Crow
 				if (highThresholdFill == value)
 					return;
 				highThresholdFill = value;
-				NotifyValueChanged ("HighThresholdFill", highThresholdFill);
+				NotifyValueChangedAuto (highThresholdFill);
 				RegisterForRedraw ();
 			}
 		}

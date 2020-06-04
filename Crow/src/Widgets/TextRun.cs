@@ -51,7 +51,7 @@ namespace Crow
 					return;
 				horizontalStretch = value;
 				RegisterForRedraw ();
-				NotifyValueChanged ("HorizontalStretch", horizontalStretch);
+				NotifyValueChangedAuto (horizontalStretch);
 			}
 		}
 		
@@ -63,7 +63,7 @@ namespace Crow
 					return;
 				verticalStretch = value;
 				RegisterForRedraw ();
-				NotifyValueChanged ("VerticalStretch", verticalStretch);
+				NotifyValueChangedAuto (verticalStretch);
 			}
 		}
 		

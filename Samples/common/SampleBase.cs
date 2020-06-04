@@ -104,7 +104,7 @@ namespace Crow
 					return;
 				prop1 = value;
 
-				NotifyValueChanged ("TestList3SelProp1", prop1);
+				NotifyValueChanged (prop1);
 			}
 		}
 
@@ -115,7 +115,7 @@ namespace Crow
 				if (selString == value)
 					return;
 				selString = value;
-				NotifyValueChanged ("TestList2SelectedString", selString);
+				NotifyValueChanged (selString);
 			}
 		}
 
@@ -141,7 +141,7 @@ namespace Crow
 				if (value == curSources)
 					return;
 				curSources = value;
-				NotifyValueChanged ("CurSources", curSources);
+				NotifyValueChanged (curSources);
 			}
 		}
 		bool boolVal = true;
@@ -151,13 +151,21 @@ namespace Crow
 				if (boolVal == value)
 					return;
 				boolVal = value;
-				NotifyValueChanged ("BoolVal", boolVal);
+				NotifyValueChanged (boolVal);
 			}
 		}
 
 		#endregion
 
-
+		protected override void OnInitialized ()
+		{
+			Commands = new List<Command> {
+				new Command(() => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 1 clicked")) { Caption = "Action 1" },
+				new Command(() => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 2 clicked")) { Caption = "Action 2" },
+				new Command(() => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 3 clicked")) { Caption = "Action 3" }
+			};
+			base.OnInitialized ();
+		}
 
 	}
 }

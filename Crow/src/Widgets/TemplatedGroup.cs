@@ -80,7 +80,7 @@ namespace Crow {
 				_itemTemplate = value;
 
 				//TODO:reload list with new template?
-				NotifyValueChanged("ItemTemplate", _itemTemplate);
+				NotifyValueChangedAuto (_itemTemplate);
 			}
 		}
 		protected override void loadTemplate(Widget template = null)
@@ -110,7 +110,7 @@ namespace Crow {
 
 				dataTest = value;
 
-				NotifyValueChanged("DataTest", dataTest);
+				NotifyValueChangedAuto (dataTest);
 			}
 		}
 		#endregion
@@ -131,7 +131,7 @@ namespace Crow {
 				if (selColoring == value)
 					return;
 				selColoring = value;
-				NotifyValueChanged ("SelectionColoring", selColoring);
+				NotifyValueChangedAuto (selColoring);
 			}
 		}
 		[DefaultValue(-1)]public virtual int SelectedIndex{
@@ -152,7 +152,7 @@ namespace Crow {
 					Items[_selectedIndex].Background = SelectionBackground;
 				}
 
-				NotifyValueChanged ("SelectedIndex", _selectedIndex);
+				NotifyValueChangedAuto (_selectedIndex);
 				NotifyValueChanged ("SelectedItem", SelectedItem);
 				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
 			}
@@ -198,7 +198,7 @@ namespace Crow {
 					ol.ListEdit += Ol_ListEdit;
 				}
 
-				NotifyValueChanged ("Data", data);
+				NotifyValueChangedAuto (data);
 
 				lock (IFace.UpdateMutex)
 					ClearItems ();
@@ -252,7 +252,7 @@ namespace Crow {
 				if (value == selBackground)
 					return;
 				selBackground = value;
-				NotifyValueChanged ("SelectionBackground", selBackground);
+				NotifyValueChangedAuto (selBackground);
 				RegisterForRedraw ();
 			}
 		}
@@ -263,7 +263,7 @@ namespace Crow {
 				if (value == selForeground)
 					return;
 				selForeground = value;
-				NotifyValueChanged ("SelectionForeground", selForeground);
+				NotifyValueChangedAuto (selForeground);
 				RegisterForRedraw ();
 			}
 		}

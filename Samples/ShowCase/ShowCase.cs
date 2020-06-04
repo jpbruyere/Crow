@@ -7,6 +7,7 @@ using Crow;
 using System.IO;
 using System.Text;
 using Crow.IML;
+using System.Runtime.CompilerServices;
 
 namespace ShowCase
 {
@@ -24,14 +25,28 @@ namespace ShowCase
 		public Container crowContainer;
 
 		public string CurrentDir {
-			get { return Configuration.Global.Get<string> ("CurrentDir"); }
+			get { return Configuration.Global.Get<string> (nameof (CurrentDir)); }
 			set {
 				if (CurrentDir == value)
 					return;
-				Configuration.Global.Set ("CurrentDir", value);
-				NotifyValueChanged ("CurrentDir",CurrentDir);
+				Configuration.Global.Set (nameof (CurrentDir), value);
+				NotifyValueChanged (CurrentDir);
 			}
 		}
+
+		string source = @"<Label Text='Hello World' Background='MediumSeaGreen' Margin='10'/>";
+
+		public string Source {
+			get => Source;
+			set {
+				if (source == value)
+					return;
+				source = value;
+				reloadFromSource ();
+				NotifyValueChanged (source);
+			}
+		}
+
 		public void goUpDirClick (object sender, MouseButtonEventArgs e)
 		{
 			string root = Directory.GetDirectoryRoot (CurrentDir);
@@ -42,6 +57,8 @@ namespace ShowCase
 
 		protected override void OnInitialized ()
 		{
+			base.OnInitialized ();
+
 			if (string.IsNullOrEmpty (CurrentDir))
 				CurrentDir = Path.Combine (Directory.GetCurrentDirectory (), "Interfaces");
 			Widget g = Load ("#ShowCase.showcase.crow");
@@ -71,18 +88,16 @@ namespace ShowCase
 				return;
 			if (fi is DirectoryInfo)
 				return;
-
-			string source = "";
+				
 			using (Stream s = new FileStream (fi.FullName, FileMode.Open)) {
 				using (StreamReader sr = new StreamReader (s))
-					source = sr.ReadToEnd ();
+					Source = sr.ReadToEnd ();
 			}
-			NotifyValueChanged ("source", source);
 		}
 
 		void showError (Exception ex)
 		{
-			NotifyValueChanged ("ErrorMessage", ex.Message);
+			NotifyValueChanged ("ErrorMessage", (object)ex.Message);
 			NotifyValueChanged ("ShowError", true);
 		}
 		void hideError ()
@@ -90,14 +105,14 @@ namespace ShowCase
 			NotifyValueChanged ("ShowError", false);
 		}
 
-		void Tb_TextChanged (object sender, TextChangeEventArgs e)
+		void reloadFromSource ()
 		{
 			hideError ();
 			Widget g = null;
 			try {
 				lock (UpdateMutex) {
 					Instantiator inst = null;
-					using (MemoryStream ms = new MemoryStream (Encoding.UTF8.GetBytes (e.Text))) {
+					using (MemoryStream ms = new MemoryStream (Encoding.UTF8.GetBytes (source))) {
 						inst = new Instantiator (this, ms);
 					}
 					g = inst.CreateInstance ();
@@ -105,7 +120,7 @@ namespace ShowCase
 					g.DataSource = this;
 				}
 			} catch (InstantiatorException itorex) {
-				Console.WriteLine (itorex.ToString ());
+				Console.WriteLine (itorex);
 				showError (itorex.InnerException);
 			} catch (Exception ex) {
 				Console.WriteLine (ex);

@@ -50,7 +50,7 @@ namespace Crow
 
 				isChecked = value;
 
-				NotifyValueChanged ("IsChecked", value);
+				NotifyValueChangedAuto (value);
 
 				if (isChecked)
 					Checked.Raise (this, null);

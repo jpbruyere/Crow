@@ -37,7 +37,7 @@ namespace Crow
 				if (value == _selectedItem)
 					return;
 				_selectedItem = value;
-				NotifyValueChanged ("SelectedItem", _selectedItem);
+				NotifyValueChangedAuto (_selectedItem);
 			}
 		}
 		[DefaultValue(true)]
@@ -47,7 +47,7 @@ namespace Crow
 				if (showFiles == value)
 					return;
 				showFiles = value;
-				NotifyValueChanged ("ShowFiles", showFiles);
+				NotifyValueChangedAuto (showFiles);
 				NotifyValueChanged ("FileSystemEntries", FileSystemEntries);
 			}
 		}
@@ -58,7 +58,7 @@ namespace Crow
 				if (showHidden == value)
 					return;
 				showHidden = value;
-				NotifyValueChanged ("ShowHidden", showHidden);
+				NotifyValueChangedAuto (showHidden);
 				NotifyValueChanged ("FileSystemEntries", FileSystemEntries);
 			}
 		}
@@ -69,7 +69,7 @@ namespace Crow
 				if (fileMask == value)
 					return;
 				fileMask = value;
-				NotifyValueChanged ("FileMask", fileMask);
+				NotifyValueChangedAuto (fileMask);
 				NotifyValueChanged ("FileSystemEntries", FileSystemEntries);
 			}
 		}
@@ -80,7 +80,7 @@ namespace Crow
 				if (currentDirectory == value)
 					return;
 				currentDirectory = value;
-				NotifyValueChanged ("CurrentDirectory", currentDirectory);
+				NotifyValueChangedAuto (currentDirectory);
 				NotifyValueChanged ("FileSystemEntries", FileSystemEntries);
 			}
 		}

@@ -29,7 +29,7 @@ namespace Crow
 				if (isDocked == value)
 					return;
 				isDocked = value;
-				NotifyValueChanged ("IsDocked", isDocked);
+				NotifyValueChangedAuto (isDocked);
 				NotifyValueChanged ("IsFloating", !isDocked);
 			}
 		}
@@ -41,7 +41,7 @@ namespace Crow
 				if (docking == value)
 					return;
 				docking = value;
-				NotifyValueChanged ("DockingPosition", DockingPosition);
+				NotifyValueChangedAuto (DockingPosition);
 			}
 		}
 		public override bool PointIsIn (ref Point m)

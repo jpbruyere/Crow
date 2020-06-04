@@ -23,7 +23,7 @@ namespace Crow
 				if (v == value)
 					return;
 				v = value;
-				NotifyValueChanged ("V", v);
+				NotifyValueChangedAuto (v);
 				mousePos.Y = (int)Math.Floor((1.0-v) * (double)ClientRectangle.Height);
 
 				RegisterForRedraw ();
@@ -36,7 +36,7 @@ namespace Crow
 				if (s == value)
 					return;
 				s = value;
-				NotifyValueChanged ("S", s);
+				NotifyValueChangedAuto (s);
 				mousePos.X = (int)Math.Floor(s * (double)ClientRectangle.Width);
 
 				RegisterForRedraw ();

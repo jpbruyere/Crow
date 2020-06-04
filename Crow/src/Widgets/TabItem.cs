@@ -63,7 +63,7 @@ namespace Crow
 				if (viewIndex == value)
 					return;
 				viewIndex = value;
-				NotifyValueChanged ("ViewIndex", viewIndex);
+				NotifyValueChangedAuto (viewIndex);
 			}
 		}
 			
@@ -74,7 +74,7 @@ namespace Crow
 				if (tabOffset == value)
 					return;
 				tabOffset = value;
-				NotifyValueChanged ("TabOffset", tabOffset);
+				NotifyValueChangedAuto (tabOffset);
 
 				RegisterForLayouting (LayoutingType.X);
 				RegisterForGraphicUpdate ();
@@ -97,7 +97,7 @@ namespace Crow
 					tview.SelectedTab = tview.Children.IndexOf(this);
 				
 				isSelected = value;
-				NotifyValueChanged ("IsSelected", isSelected);
+				NotifyValueChangedAuto (isSelected);
 				RegisterForRedraw ();
 			}
 		}
@@ -114,7 +114,7 @@ namespace Crow
 				if (value == null)
 					return;
 				selectedBackground = value;
-				NotifyValueChanged ("SelectedBackground", selectedBackground);
+				NotifyValueChangedAuto (selectedBackground);
 				RegisterForRedraw ();
 			}
 		}

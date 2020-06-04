@@ -19,7 +19,7 @@ namespace Crow
 			get { return minimumPopupSize; }
 			set {
 				minimumPopupSize = value;
-				NotifyValueChanged ("MinimumPopupSize", minimumPopupSize);
+				NotifyValueChangedAuto (minimumPopupSize);
 			}
 		}
 

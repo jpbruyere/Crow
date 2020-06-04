@@ -34,7 +34,7 @@ namespace Crow
 				if (scaled == value)
 					return;
 				scaled = value;
-				NotifyValueChanged ("Scaled", scaled);
+				NotifyValueChangedAuto (scaled);
 				if (_pic == null)
 					return;
 				_pic.Scaled = scaled;
@@ -51,7 +51,7 @@ namespace Crow
 				if (keepProps == value)
 					return;
 				keepProps = value;
-				NotifyValueChanged ("KeepProportions", keepProps);
+				NotifyValueChangedAuto (keepProps);
 				if (_pic == null)
 					return;
 				_pic.KeepProportions = keepProps;
@@ -78,7 +78,7 @@ namespace Crow
 					Debug.WriteLine (ex.Message);
 					_pic = null;
 				}
-				NotifyValueChanged ("Path", Path);
+				NotifyValueChangedAuto (Path);
 			}
 		}
 		/// <summary>
@@ -104,7 +104,7 @@ namespace Crow
 				if (_pic == value)
 					return;
 				_pic = value;
-				NotifyValueChanged ("Picture", _pic);
+				NotifyValueChangedAuto (_pic);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -119,7 +119,7 @@ namespace Crow
 				if (opacity == value)
 					return;
 				opacity = value;
-				NotifyValueChanged ("Faded", opacity);
+				NotifyValueChangedAuto (opacity);
 				RegisterForRedraw ();
 			}
 		}

@@ -48,7 +48,7 @@ namespace Crow
 				if (orientation == value)
 					return;
 				orientation = value;
-				NotifyValueChanged ("Orientation", orientation);
+				NotifyValueChangedAuto (orientation);
 			}
 		}
 		[XmlIgnore]public bool AutomaticOpening
@@ -58,7 +58,7 @@ namespace Crow
 				if (autoOpen == value)
 					return;
 				autoOpen = value;
-				NotifyValueChanged ("AutomaticOpening", autoOpen);
+				NotifyValueChangedAuto (autoOpen);
 			}
 		}
 		#endregion

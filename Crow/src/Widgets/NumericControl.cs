@@ -56,7 +56,7 @@ namespace Crow
 				if (value == _decimals)
 					return;
 				_decimals = value;
-				NotifyValueChanged("Decimals",  _decimals);
+				NotifyValueChangedAuto (_decimals);
 				RegisterForGraphicUpdate();
 			}
 		}
@@ -68,7 +68,7 @@ namespace Crow
 					return;
 
 				minValue = value;
-				NotifyValueChanged ("Minimum", minValue);
+				NotifyValueChangedAuto (minValue);
 				RegisterForRedraw ();
 			}
 		}
@@ -81,7 +81,7 @@ namespace Crow
 					return;
 
 				maxValue = value;
-				NotifyValueChanged ("Maximum", maxValue);
+				NotifyValueChangedAuto (maxValue);
 				RegisterForRedraw ();
 			}
 		}
@@ -94,7 +94,7 @@ namespace Crow
 					return;
 
 				smallStep = value;
-				NotifyValueChanged ("SmallIncrement", smallStep);
+				NotifyValueChangedAuto (smallStep);
 				RegisterForRedraw ();
 			}
 		}
@@ -107,7 +107,7 @@ namespace Crow
 					return;
 
 				bigStep = value;
-				NotifyValueChanged ("LargeIncrement", bigStep);
+				NotifyValueChangedAuto (bigStep);
 				RegisterForRedraw ();
 			}
 		}
@@ -129,7 +129,7 @@ namespace Crow
 
 				_actualValue = Math.Round (_actualValue, _decimals);
 
-				NotifyValueChanged("Value",  _actualValue);
+				NotifyValueChangedAuto (_actualValue);
 				RegisterForGraphicUpdate();
 			}
 		}

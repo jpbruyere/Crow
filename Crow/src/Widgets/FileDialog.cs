@@ -35,7 +35,7 @@ namespace Crow
 				if (curDir == value)
 					return;
 				curDir = value;
-				NotifyValueChanged ("CurrentDirectory", curDir);
+				NotifyValueChangedAuto (curDir);
 				SelectedDirectory = curDir;
 			}
 		}
@@ -47,7 +47,7 @@ namespace Crow
 				if (searchPattern == value)
 					return;
 				searchPattern = value;
-				NotifyValueChanged ("SearchPattern", searchPattern);
+				NotifyValueChangedAuto (searchPattern);
 
 			}
 		}
@@ -58,7 +58,7 @@ namespace Crow
 				if (showHidden == value)
 					return;
 				showHidden = value;
-				NotifyValueChanged ("ShowHidden", showHidden);
+				NotifyValueChangedAuto (showHidden);
 			}
 		}
 		[DefaultValue(true)]
@@ -68,7 +68,7 @@ namespace Crow
 				if (showFiles == value)
 					return;
 				showFiles = value;
-				NotifyValueChanged ("ShowFiles", showFiles);
+				NotifyValueChangedAuto (showFiles);
 			}
 		}
 		public string SelectedFile {
@@ -77,7 +77,7 @@ namespace Crow
 				if (value == _selectedFile)
 					return;
 				_selectedFile = value;
-				NotifyValueChanged ("SelectedFile", _selectedFile);
+				NotifyValueChangedAuto (_selectedFile);
 			}
 		}
 		public string SelectedDirectory {
@@ -86,7 +86,7 @@ namespace Crow
 				if (value == _selectedDir)
 					return;
 				_selectedDir = value;
-				NotifyValueChanged ("SelectedDirectory", _selectedDir);
+				NotifyValueChangedAuto (_selectedDir);
 			}
 		}
 

@@ -52,7 +52,7 @@ namespace Crow
 					return;
 				_cursorColor = value;
 				RegisterForRedraw ();
-				NotifyValueChanged ("CursorColor", _cursorColor);
+				NotifyValueChangedAuto (_cursorColor);
 			}
 		}
 		[DefaultValue(20)]
@@ -63,7 +63,7 @@ namespace Crow
 					return;
 				_cursorSize = value;
 				RegisterForGraphicUpdate ();
-				NotifyValueChanged ("CursorSize", _cursorSize);
+				NotifyValueChangedAuto (_cursorSize);
 			}
 		}
 		[DefaultValue(Orientation.Horizontal)]
@@ -76,7 +76,7 @@ namespace Crow
 				_orientation = value; 
 
 				RegisterForLayouting (LayoutingType.All);
-				NotifyValueChanged ("Orientation", _orientation);
+				NotifyValueChangedAuto (_orientation);
 			}
 		}
 		[DefaultValue (CursorType.Rectangle)]
@@ -86,7 +86,7 @@ namespace Crow
 				if (cursorType == value)
 					return;
 				cursorType = value;
-				NotifyValueChanged ("CursorType", cursorType);
+				NotifyValueChangedAuto (cursorType);
 				RegisterForRedraw ();
 			}
 		}

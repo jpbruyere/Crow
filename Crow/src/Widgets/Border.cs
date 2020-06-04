@@ -43,7 +43,7 @@ namespace Crow
 				if (raisedColor == value)
 					return;
 				raisedColor = value;
-				NotifyValueChanged ("RaisedColor", raisedColor);
+				NotifyValueChangedAuto (raisedColor);
 				RegisterForRedraw ();
 			}
 		}
@@ -56,7 +56,7 @@ namespace Crow
 				if (sunkenColor == value)
 					return;
 				sunkenColor = value;
-				NotifyValueChanged ("SunkenColor", sunkenColor);
+				NotifyValueChangedAuto (sunkenColor);
 				RegisterForRedraw ();
 			}
 		}

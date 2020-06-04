@@ -34,7 +34,7 @@ namespace Crow
 
 				isChecked = value;
 
-				NotifyValueChanged ("IsChecked", value);
+				NotifyValueChangedAuto (isChecked);
 
 				if (isChecked)
 					Checked.Raise (this, null);

@@ -29,18 +29,12 @@ namespace Crow
 			IsPressed = true;
 
 			base.onMouseDown (sender, e);
-
-			//TODO:remove
-			NotifyValueChanged ("State", "pressed");
 		}
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{
 			IsPressed = false;
 
 			base.onMouseUp (sender, e);
-
-			//TODO:remove
-			NotifyValueChanged ("State", "normal");
 		}
 		#endregion
 
@@ -51,7 +45,7 @@ namespace Crow
 				if (image == value)
 					return;
 				image = value;
-				NotifyValueChanged ("Image", image);
+				NotifyValueChangedAuto (image);
 			}
 		}
 		[DefaultValue(false)]
@@ -65,7 +59,7 @@ namespace Crow
 
 				isPressed = value;
 
-				NotifyValueChanged ("IsPressed", isPressed);
+				NotifyValueChangedAuto (isPressed);
 
 				if (isPressed)
 					Pressed.Raise (this, null);

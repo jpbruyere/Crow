@@ -155,7 +155,7 @@ namespace Crow
 					return;
 				path = value;
 				contentSize = default (Size);
-				NotifyValueChanged ("Path", path);
+				NotifyValueChangedAuto (path);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -171,7 +171,7 @@ namespace Crow
 					return;
 				strokeWidth = value;
 				contentSize = default (Size);
-				NotifyValueChanged ("StrokeWidth", strokeWidth);
+				NotifyValueChangedAuto (strokeWidth);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -186,7 +186,7 @@ namespace Crow
 					return;
 				size = value;
 				contentSize = default (Size);
-				NotifyValueChanged ("Size", size);
+				NotifyValueChangedAuto (size);
 				RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
