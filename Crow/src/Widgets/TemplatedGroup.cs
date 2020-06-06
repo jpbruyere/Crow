@@ -339,13 +339,13 @@ namespace Crow {
 		/// Items loading thread
 		/// </summary>
 		void loading(){
-			//try {
+			try {
 				loadPage (data, items, dataTest);
-			/*} catch (Exception ex) {
+			} catch (Exception ex) {
 				if (Monitor.IsEntered (IFace.LayoutMutex))
 					Monitor.Exit (IFace.LayoutMutex);
 				System.Diagnostics.Debug.WriteLine ("loading thread aborted: " + ex.ToString());
-			}*/
+			}
 
 		}
 //			//if (!ItemTemplates.ContainsKey ("default"))

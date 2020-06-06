@@ -5,7 +5,4 @@
 			<LogicalName>ShowCase.%(Filename)%(Extension)</LogicalName>
 		</EmbeddedResource>
 	</ItemGroup>
-	<ItemGroup>
-		<None Remove="..\common\ui\Interfaces\basicTests\7.crow" />
-	</ItemGroup>	
 </Project>

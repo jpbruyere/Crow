@@ -1,29 +1,28 @@
 ﻿<?xml version="1.0"?>
-<Border BorderWidth="2" Fit="true">
+<Border BorderWidth="2" Fit="true" Background="DarkGrey">
 	<VerticalStack Fit="true" Margin="5">
-		<ListBox Data="{TestList}" Background="0.5,0.5,0.5,0.7"
-					 HorizontalAlignment="Center" Width="200" Height="200" Margin="5">
+		<ListBox Data="{TestList}" Background="Jet" HorizontalAlignment="Center" Width="200" Height="200" Margin="5">
 			<Template>
-				<Border BorderWidth="1">
+				<Border BorderWidth="1" Background="{./Background}">
 					<HorizontalStack Margin="1">
 						<Scroller Name="scroller1" Margin="2">
 							<VerticalStack Height="Fit" MinimumSize="10,10"
 								Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
 						</Scroller>
 						<ScrollBar Name="scrollbar1" Value="{²../scroller1.ScrollY}"
-							LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30" CursorSize="{../scroller1.ChildHeightRatio}"
-							Maximum="{../scroller1.MaxScrollY}" Orientation="Vertical" 
-							Width="14" />
+							LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="10" CursorSize="{../scroller1.ChildHeightRatio}"
+							Maximum="{../scroller1.MaxScrollY}"  />
 					</HorizontalStack>
 				</Border>
 			</Template>
-			<ItemTemplate DataType="Crow.Color">
+			<ItemTemplate DataType="Crow.Colors">
 				<HorizontalStack
 							HorizontalAlignment="Left"
 							Height="Fit" Width="200" Margin="1" Focusable="true"
-							MouseEnter="{Background=hgradient|0:DarkRed|1:Transparent}"
+							MouseEnter="{Background=RoyalBlue}"
 							MouseLeave="{Background=Transparent}">
-					<Widget Height="12" Width="20" Background="{}" Margin="0" CornerRadius="3"/>
+					
+					<Border Foreground="Black" Height="16" Width="30" Background="{}" Margin="0" CornerRadius="4"/>
 					<Label Text="{}" Margin="0" Width="Stretched"/>
 				</HorizontalStack>
 			</ItemTemplate>

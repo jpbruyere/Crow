@@ -100,7 +100,6 @@ MessageBox {
 	AlwaysOnTop = "true";
 }
 Slider {
-	Background = "vgradient|0:Black|0.1:Grey|0.9:Grey|1:LightGrey";
 	Foreground = "Grey";
 	Height = "10";
 	Value="5";
@@ -228,18 +227,19 @@ ArrowBut {
 }
 
 ScrollBar {
+	Orientation = "Vertical";
     Maximum = "0";
     Value = "0";
     Foreground="Transparent";
     Background="Onyx";
-    Width = "12";    
+    Width = "14";    
     CornerRadius = "0";
 }
 HScrollBar {
     Template = "#Crow.HScrollBar.template";
     Maximum = "0";
     Value = "0";
-    Height = "12";
+    Height = "14";
     Width = "Stretched";
     Orientation = "Horizontal";
 }

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0"?>
+<Container Background="Onyx">
+	<VerticalStack Background="Jet" Fit="true" Margin="10" Spacing="10"> 
+		<Gauge Width="200" Height="10" Background="RoyalBlue" Value="50" CornerRadius="5"/>
+		<NumericControl Width="200" Height="10" Value="40">
+			<Template>
+				<Gauge Maximum="{./Maximum}" Foreground="Black" BorderWidth="1" Background="RoyalBlue" Value="{./Value}" CornerRadius="5"/>
+			</Template>
+		</NumericControl>
+		<HorizontalStack Width="200" Height="200">
+			<Scroller Name="scroller1" Background="White"
+					Margin="2" ScrollY="{../scrollbar1.Value}"
+					ValueChanged="./_scroller_ValueChanged">
+				<Widget VerticalAlignment="Top" Background="vgradient|0:1,0,0,1|1:0,1,0,1" Width="1000" Height="1000"/>
+			</Scroller>
+			<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}"
+				LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30" Height="Stretched" 
+				CursorSize="{../scroller1.ChildHeightRatio}"
+				Maximum="{../scroller1.MaxScrollY}" />
+		</HorizontalStack>
+	</VerticalStack>
+</Container>

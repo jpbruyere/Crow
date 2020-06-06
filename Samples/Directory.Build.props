@@ -34,7 +34,7 @@
 			<LogicalName>images.%(Filename)%(Extension)</LogicalName>
 			<Link>Images\%(Filename)%(Extension)</Link>
 		</EmbeddedResource>
-		<EmbeddedResource Include="$(SamplesDir)common\ui\Icons\*.*">
+		<EmbeddedResource Include="$(SamplesDir)common\ui\icons\*.*">
 			<LogicalName>Icons.%(Filename)%(Extension)</LogicalName>
 			<Link>Icons\%(Filename)%(Extension)</Link>
 		</EmbeddedResource>

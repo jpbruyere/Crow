@@ -12,61 +12,143 @@ namespace Crow
 	/// templated numeric control to select a value
 	/// by slidding a cursor
 	/// </summary>
-	public class Slider : NumericControl
+	public class Slider : TemplatedControl
     {
 		#region CTOR
 		protected Slider() {}
 		public Slider(Interface iface, string style = null) : base (iface, style) { }
-//		public Slider(double minimum, double maximum, double step)
-//			: base(minimum,maximum,step)
-//		{
-//		}
 		#endregion
 
 		#region implemented abstract members of TemplatedControl
-
 		protected override void loadTemplate (Widget template = null)
 		{
-			
+			base.loadTemplate (template);
+
+			cursor = child.FindByName ("Cursor");
+			if (cursor == null)
+				return;
+			(cursor.Parent as Widget).LayoutChanged += HandleCursorContainerLayoutChanged;
+			updateCursorWidgetProps ();
 		}
 
+		void HandleCursorContainerLayoutChanged (object sender, LayoutingEventArgs e)
+		{
+			computeCursorPosition ();
+		}
 		#endregion
 
+		#region protected fields
+		protected double actualValue, minValue, maxValue, smallStep, bigStep;
+		protected int decimals;
+		#endregion
+
+		#region public properties
+		[DefaultValue (2)]
+		public int Decimals {
+			get { return decimals; }
+			set {
+				if (value == decimals)
+					return;
+				decimals = value;
+				NotifyValueChangedAuto (decimals);
+				RegisterForGraphicUpdate ();
+			}
+		}
+		[DefaultValue (0.0)]
+		public virtual double Minimum {
+			get { return minValue; }
+			set {
+				if (minValue == value)
+					return;
+
+				minValue = value;
+				NotifyValueChangedAuto (minValue);
+				RegisterForLayouting (LayoutingType.ArrangeChildren);
+			}
+		}
+		[DefaultValue (100.0)]
+		public virtual double Maximum {
+			get { return maxValue; }
+			set {
+				if (maxValue == value)
+					return;
+
+				maxValue = value;
+				NotifyValueChangedAuto (maxValue);
+				RegisterForLayouting (LayoutingType.ArrangeChildren);
+			}
+		}
+		[DefaultValue (1.0)]
+		public virtual double SmallIncrement {
+			get { return smallStep; }
+			set {
+				if (smallStep == value)
+					return;
+
+				smallStep = value;
+				NotifyValueChangedAuto (smallStep);
+				RegisterForLayouting (LayoutingType.ArrangeChildren);
+			}
+		}
+		[DefaultValue (5.0)]
+		public virtual double LargeIncrement {
+			get { return bigStep; }
+			set {
+				if (bigStep == value)
+					return;
+
+				bigStep = value;
+				NotifyValueChangedAuto (bigStep);
+				RegisterForLayouting (LayoutingType.ArrangeChildren);
+			}
+		}
+		[DefaultValue (0.0)]
+		public virtual double Value {
+			get { return actualValue; }
+			set {
+				if (value == actualValue)
+					return;
+
+				if (value < minValue)
+					actualValue = minValue;
+				else if (value > maxValue)
+					actualValue = maxValue;
+				else
+					actualValue = value;
+
+				actualValue = Math.Round (actualValue, decimals);
+
+				NotifyValueChangedAuto (actualValue);
+				RegisterForLayouting (LayoutingType.ArrangeChildren);
+			}
+		}
+		#endregion
+
+
 		#region private fields
-        Rectangle cursor;
-		int _cursorSize;
-		Fill _cursorColor;
+		//Rectangle cursor;
+		int cursorSize;
+		//Fill _cursorColor;
 		Orientation _orientation;
-		CursorType cursorType;
+		//CursorType cursorType;
 		bool holdCursor = false;
 		#endregion
+		Widget cursor;
 
 		protected double unity;
 
+		public override bool ArrangeChildren => true;
+
+		public override bool UpdateLayout (LayoutingType layoutType)
+		{
+			if (layoutType == LayoutingType.ArrangeChildren) 
+				computeCursorPosition ();
+			
+			return base.UpdateLayout (layoutType);
+		}
+
 		#region Public properties
-		[DefaultValue("vgradient|0:White|0,1:LightGrey|0,9:LightGrey|1:DimGrey")]
-		public virtual Fill CursorColor {
-			get { return _cursorColor; }
-			set {
-				if (_cursorColor == value)
-					return;
-				_cursorColor = value;
-				RegisterForRedraw ();
-				NotifyValueChangedAuto (_cursorColor);
-			}
-		}
-		[DefaultValue(20)]
-		public virtual int CursorSize {
-			get { return _cursorSize; }
-			set {
-				if (_cursorSize == value || value < 4)
-					return;
-				_cursorSize = value;
-				RegisterForGraphicUpdate ();
-				NotifyValueChangedAuto (_cursorSize);
-			}
-		}
-		[DefaultValue(Orientation.Horizontal)]
+		[DefaultValue (Orientation.Horizontal)]
 		public virtual Orientation Orientation
 		{
 			get { return _orientation; }
@@ -77,108 +159,54 @@ namespace Crow
 
 				RegisterForLayouting (LayoutingType.All);
 				NotifyValueChangedAuto (_orientation);
+				updateCursorWidgetProps ();
 			}
 		}
-		[DefaultValue (CursorType.Rectangle)]
-		public CursorType CursorType {
-			get => cursorType;
+		[DefaultValue (20)]
+		public virtual int CursorSize {
+			get { return cursorSize; }
 			set {
-				if (cursorType == value)
+				if (cursorSize == value)
 					return;
-				cursorType = value;
-				NotifyValueChangedAuto (cursorType);
-				RegisterForRedraw ();
+				cursorSize = value;
+				RegisterForGraphicUpdate ();
+				NotifyValueChangedAuto (cursorSize);
+				updateCursorWidgetProps ();
 			}
 		}
 		#endregion
 
-		#region GraphicObject Overrides
-		protected override void onDraw (Context gr)
+		void updateCursorWidgetProps ()
 		{
-			base.onDraw (gr);
-
-			if (Maximum <= 0)
+			if (cursor == null)
 				return;
-
-			computeCursorPosition ();
-
-			Rectangle r = ClientRectangle;
-			PointD pStart;
-			PointD pEnd;
-			if (_orientation == Orientation.Horizontal) {
-				pStart = r.TopLeft + new Point (_cursorSize / 2, r.Height / 2);
-				pEnd = r.TopRight + new Point (-_cursorSize / 2, r.Height / 2);
-				pStart.Y += 0.5;
-				pEnd.Y += 0.5;
+			if (Orientation == Orientation.Horizontal) {
+				cursor.Width = CursorSize;
+				cursor.Height = Measure.Stretched;
+				cursor.HorizontalAlignment = HorizontalAlignment.Left;
 			} else {
-				pStart = r.TopLeft + new Point (r.Width / 2, _cursorSize / 2);
-				pEnd = r.BottomLeft + new Point (r.Width / 2,- _cursorSize / 2);
-				pStart.X += 0.5;
-				pEnd.X += 0.5;
-
+				cursor.Height = CursorSize;
+				cursor.Width = Measure.Stretched;
+				cursor.VerticalAlignment = VerticalAlignment.Top;
 			}
-
-            Background.SetAsSource(gr, r);
-            gr.Rectangle (r);
-            gr.Fill ();
-
-			DrawGraduations (gr, pStart,pEnd);
-
-			DrawCursor (gr, cursor);
 		}
-		#endregion
-
-		protected virtual void DrawGraduations(Context gr, PointD pStart, PointD pEnd)
-		{
-			Foreground.SetAsSource (gr);
-
-			gr.LineWidth = 1;
-			gr.MoveTo(pStart);
-			gr.LineTo(pEnd);
-
-			gr.Stroke();
-
-		}
-		protected virtual void DrawCursor(Context gr, Rectangle _cursor)
-		{
-			if (cursorType != CursorType.None) {
-				switch (CursorType) {
-				case CursorType.Rectangle:
-					CairoHelpers.CairoRectangle (gr, _cursor, CornerRadius);
-					break;
-				case CursorType.Circle:
-					gr.Arc (_cursor.CenterD, 0.5 * _cursorSize, 0, Math.PI * 2.0);
-					break;
-				case CursorType.Pentagone:
-					break;
-				}
-				Foreground.SetAsSource (gr, _cursor);
-				gr.StrokePreserve ();
-			}
-
-			CursorColor.SetAsSource(gr, _cursor);
-            gr.Fill();
-		}
-
 		void computeCursorPosition ()
-        {            
-            Rectangle r = ClientRectangle;
-			PointD p1; 
-
-			if (_orientation == Orientation.Horizontal) {
-				cursor = new Rectangle (new Size (_cursorSize, (int)(r.Height)));
-				p1 = r.TopLeft + new Point (_cursorSize / 2, r.Height / 2);
-				unity = (double)(r.Width - _cursorSize) / (Maximum - Minimum);
-				cursor.TopLeft = new Point (r.Left + (int)((Value - Minimum) * unity),
-					(int)(p1.Y - cursor.Height / 2));
-			} else {
-				cursor = new Rectangle (new Size ((int)(r.Width), _cursorSize));
-				p1 = r.TopLeft + new Point (r.Width / 2, _cursorSize / 2);
-				unity = (double)(r.Height - _cursorSize) / (Maximum - Minimum);
-				cursor.TopLeft = new Point ((int)(p1.X - r.Width / 2),
-					r.Top + (int)((Value - Minimum) * unity));				
+        {
+			if (cursor == null)
+				return;
+			if (Maximum <= Minimum) {
+				cursor.Visible = false;
+				return;
 			}
-			//cursor.Inflate (-1);
+			cursor.Visible = true;
+            Rectangle r = cursor.Parent.ClientRectangle;
+			if (_orientation == Orientation.Horizontal) {
+				unity = (r.Width - cursorSize) / (Maximum - Minimum);
+				cursor.Left = r.Left + (int)((Value - Minimum) * unity);
+			} else {
+				unity = (r.Height - cursorSize) / (Maximum - Minimum);
+				cursor.Top = r.Top + (int)((Value - Minimum) * unity);				
+			}
         }
 		Point mouseDownInit;
 		double mouseDownInitValue;
@@ -189,25 +217,24 @@ namespace Crow
 			base.onMouseDown (sender, e);
 			mouseDownInit = ScreenPointToLocal (e.Position);
 			mouseDownInitValue = Value;
-			Rectangle cursInScreenCoord = ScreenCoordinates (cursor + Slot.Position);
+			Rectangle cursInScreenCoord = cursor == null ? default : cursor.ScreenCoordinates (cursor.Slot);
 			if (cursInScreenCoord.ContainsOrIsEqual (e.Position)){
-//				Rectangle r = ClientRectangle;
-//				if (r.Width - _cursorSize > 0) {
-//					double unit = (Maximum - Minimum) / (double)(r.Width - _cursorSize);
-//					mouseDownInit += new Point ((int)(Value / unit), (int)(Value / unit));
-//				}
+				//Rectangle r = cursor.Parent.ClientRectangle;
+				//if (r.Width - cursorSize > 0) {
+				//	double unit = (Maximum - Minimum) / (double)(r.Width - cursorSize);
+				//	mouseDownInit += new Point ((int)(Value / unit), (int)(Value / unit));
+				//}
 				holdCursor = true;
 			}else if (_orientation == Orientation.Horizontal) {
 				if (e.Position.X < cursInScreenCoord.Left)
 					Value -= LargeIncrement;
 				else
 					Value += LargeIncrement;
-			} else {
-				if (e.Position.Y < cursInScreenCoord.Top)
-					Value -= LargeIncrement;
-				else
-					Value += LargeIncrement;
-			}
+			} else if (e.Position.Y < cursInScreenCoord.Top)
+				Value -= LargeIncrement;
+			else
+				Value += LargeIncrement;
+
 		}
 		public override void onMouseUp (object sender,MouseButtonEventArgs e)
 		{
@@ -219,19 +246,19 @@ namespace Crow
 		{
 			if (holdCursor) {				
 				Point m = ScreenPointToLocal (e.Position) - mouseDownInit;
-				Rectangle r = ClientRectangle;
+				Rectangle r = cursor.Parent.ClientRectangle;
 
 				if (_orientation == Orientation.Horizontal) {
-					if (r.Width - _cursorSize == 0)
+					if (r.Width - cursorSize == 0)
 						return;					
-					double unit = (Maximum - Minimum) / (double)(r.Width - _cursorSize);
+					double unit = (Maximum - Minimum) / (double)(r.Width - cursorSize);
 					double tmp = mouseDownInitValue + (double)m.X * unit;
 					tmp -= tmp % SmallIncrement;
 					Value = tmp;
 				} else {
-					if (r.Height - _cursorSize == 0)
+					if (r.Height - cursorSize == 0)
 						return;					
-					double unit = (Maximum - Minimum) / (double)(r.Height - _cursorSize);
+					double unit = (Maximum - Minimum) / (double)(r.Height - cursorSize);
 					double tmp = mouseDownInitValue + (double)m.Y * unit;
 					tmp -= tmp % SmallIncrement;
 					Value = tmp;
@@ -241,5 +268,14 @@ namespace Crow
 			base.onMouseMove (sender, e);
 		}
 		#endregion
+
+		public void OnDecrease (object sender, MouseButtonEventArgs e)
+		{
+			Value -= SmallIncrement;
+		}
+		public void OnIncrease (object sender, MouseButtonEventArgs e)
+		{
+			Value += SmallIncrement;
+		}
 	}
 }

@@ -881,12 +881,12 @@ namespace Crow
 
 				isEnabled = value;
 
-				if (isEnabled)
+				if (IsEnabled)
 					onEnable (this, null);
 				else
 					onDisable (this, null);
 
-				NotifyValueChangedAuto (isEnabled);
+				NotifyValueChangedAuto (IsEnabled);
 				RegisterForRedraw ();
 			}
 		}
@@ -1782,7 +1782,7 @@ namespace Crow
 						RecreateCache ();
 
 					UpdateCache (ctx);
-					if (!isEnabled)						
+					if (!IsEnabled)						
 						paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);					
 				} else {
 					Rectangle rb = Slot + Parent.ClientRectangle.Position;
@@ -1791,7 +1791,7 @@ namespace Crow
 					ctx.Translate (rb.X, rb.Y);
 
 					onDraw (ctx);
-					if (!isEnabled)
+					if (!IsEnabled)
 						paintDisabled (ctx, Slot);
 
 					ctx.Restore ();
@@ -1840,7 +1840,7 @@ namespace Crow
 		{
 			if (parent == null)
 				return false;
-			if (!(isVisible & isEnabled)||IsDragged)
+			if (!(isVisible & IsEnabled)||IsDragged)
 				return false;
 			if (!parent.PointIsIn(ref m))
 				return false;
@@ -1849,7 +1849,7 @@ namespace Crow
 		}
 		public virtual bool MouseIsIn(Point m)
 		{			
-			return (!(isVisible & isEnabled)||IsDragged) ? false : PointIsIn (ref m);
+			return (!(isVisible & IsEnabled)||IsDragged) ? false : PointIsIn (ref m);
 		}
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{

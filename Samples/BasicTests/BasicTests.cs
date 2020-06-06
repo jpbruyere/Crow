@@ -38,7 +38,8 @@ namespace tests
 			//testFiles = new string [] { @"Interfaces/Divers/testShape.crow" };
 			//testFiles = new string [] { @"Interfaces/TemplatedControl/testEnumSelector.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/all.crow" };
-			testFiles = new string [] { @"Interfaces/Divers/templateInStyle.crow" };
+			//testFiles = new string [] { @"Interfaces/Divers/gauge.crow" };
+			testFiles = new string [] { @"Interfaces/Divers/testSlider.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/colorPicker2.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();

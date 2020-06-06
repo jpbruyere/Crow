@@ -17,8 +17,9 @@ namespace Crow
 		public Button (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
-		string image;
+		string icon;
 		bool isPressed;
+		Command command;
 
 		public event EventHandler Pressed;
 		public event EventHandler Released;
@@ -38,17 +39,51 @@ namespace Crow
 		}
 		#endregion
 
-		[DefaultValue("#Crow.Images.button.svg")]
-		public string Image {
-			get { return image; }
+		[DefaultValue (null)]
+		public virtual Command Command {
+			get { return command; }
 			set {
-				if (image == value)
+				if (command == value)
 					return;
-				image = value;
-				NotifyValueChangedAuto (image);
+
+				if (command != null) {
+					command.raiseAllValuesChanged ();
+					command.ValueChanged -= Command_ValueChanged;
+				}
+
+				command = value;
+
+				if (command != null) {
+					command.ValueChanged += Command_ValueChanged;
+					command.raiseAllValuesChanged ();
+				}
+
+				NotifyValueChangedAuto (command);
 			}
 		}
-		[DefaultValue(false)]
+
+		[DefaultValue ("#Crow.Images.button.svg")]
+		public string Icon {
+			get { return Command == null ? icon : Command.Icon; ; }
+			set {
+				if (icon == value)
+					return;
+				icon = value;
+				if (command == null)
+					NotifyValueChangedAuto (icon);
+			}
+		}
+		public override bool IsEnabled {
+			get { return Command == null ? base.IsEnabled : Command.CanExecute; }
+			set { base.IsEnabled = value; }
+		}
+
+		public override string Caption {
+			get { return Command == null ? base.Caption : Command.Caption; }
+			set { base.Caption = value; }
+		}
+
+		[DefaultValue (false)]
 		public bool IsPressed
 		{
 			get { return isPressed; }
@@ -67,5 +102,21 @@ namespace Crow
 					Released.Raise (this, null);
 			}
 		}
+
+		public override void onMouseClick (object sender, MouseButtonEventArgs e)
+		{
+			command?.Execute ();
+			e.Handled = true;
+			base.onMouseClick (sender, e);
+		}
+
+		void Command_ValueChanged (object sender, ValueChangeEventArgs e)
+		{
+			string mName = e.MemberName;
+			if (mName == "CanExecute")
+				mName = "IsEnabled";
+			NotifyValueChanged (mName, e.NewValue);
+		}
+
 	}
 }

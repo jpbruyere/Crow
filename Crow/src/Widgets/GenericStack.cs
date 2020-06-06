@@ -6,67 +6,66 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 
-namespace Crow
-{
+namespace Crow {
 	/// <summary>
 	/// group container that stacked its children horizontally or vertically
 	/// </summary>
-	public class GenericStack : Group
-    {
+	public class GenericStack : Group {
 		#region CTOR
-		protected GenericStack() {}
-		public GenericStack(Interface iface, string style = null) : base (iface, style) { }
+		protected GenericStack () { }
+		public GenericStack (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		#region Private fields
-		int _spacing;
-        Orientation _orientation;
+		int spacing;
+		Orientation orientation;
 		#endregion
 
 		#region Public Properties
-        [DefaultValue(2)]
-        public int Spacing
-        {
-			get { return _spacing; }
-            set { 
-				if (_spacing == value)
+		[DefaultValue (2)]
+		public int Spacing {
+			get => spacing;
+			set {
+				if (spacing == value)
 					return;
-				_spacing = value;
-				NotifyValueChangedAuto (Spacing);
-				RegisterForLayouting (LayoutingType.Sizing|LayoutingType.ArrangeChildren);
+				spacing = value;
+				NotifyValueChangedAuto (spacing);
+				RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 			}
-        }
-        [DefaultValue(Orientation.Horizontal)]
-        public virtual Orientation Orientation
-        {
-            get { return _orientation; }
-            set { _orientation = value; }
-        }
+		}
+		[DefaultValue (Orientation.Horizontal)]
+		public virtual Orientation Orientation {
+			get => orientation;
+			set {
+				if (orientation == value)
+					return;
+				orientation = value;
+				NotifyValueChangedAuto (orientation);
+				RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
+			}
+		}
 		#endregion
 
 		#region GraphicObject Overrides
 		public override bool ArrangeChildren { get { return true; } }
-		public override void ChildrenLayoutingConstraints (ref LayoutingType layoutType)
-		{
+		public override void ChildrenLayoutingConstraints (ref LayoutingType layoutType) {
 			//Prevent child repositionning in the direction of stacking
 			if (Orientation == Orientation.Horizontal)
 				layoutType &= (~LayoutingType.X);
 			else
-				layoutType &= (~LayoutingType.Y);			
+				layoutType &= (~LayoutingType.Y);
 		}
-		public override int measureRawSize (LayoutingType lt)
-		{
-			int totSpace = Math.Max(0, Spacing * (Children.Count (c => c.Visible) - 1));
+		public override int measureRawSize (LayoutingType lt) {
+			int totSpace = Math.Max (0, Spacing * (Children.Count (c => c.Visible) - 1));
 			if (lt == LayoutingType.Width) {
 				if (Orientation == Orientation.Horizontal)
 					return contentSize.Width + totSpace + 2 * Margin;
-			}else if (Orientation == Orientation.Vertical)
-				return contentSize.Height + totSpace + 2 * Margin;							
-			
+			} else if (Orientation == Orientation.Vertical)
+				return contentSize.Height + totSpace + 2 * Margin;
+
 			return base.measureRawSize (lt);
 		}
-		public virtual void ComputeChildrenPositions()
-		{
+		public virtual void ComputeChildrenPositions () {
 			int d = 0;
 			if (Orientation == Orientation.Horizontal) {
 				foreach (Widget c in Children) {
@@ -78,7 +77,7 @@ namespace Crow
 			} else {
 				foreach (Widget c in Children) {
 					if (!c.Visible)
-						continue;					
+						continue;
 					c.Slot.Y = d;
 					d += c.Slot.Height + Spacing;
 				}
@@ -86,8 +85,7 @@ namespace Crow
 			IsDirty = true;
 		}
 		Widget stretchedGO = null;
-		public override bool UpdateLayout (LayoutingType layoutType)
-        {
+		public override bool UpdateLayout (LayoutingType layoutType) {
 			RegisteredLayoutings &= (~layoutType);
 
 			if (layoutType == LayoutingType.ArrangeChildren) {
@@ -104,24 +102,24 @@ namespace Crow
 				return true;
 			}
 
-			return base.UpdateLayout(layoutType);
-        }
+			return base.UpdateLayout (layoutType);
+		}
 
-		void adjustStretchedGo (LayoutingType lt){
+		void adjustStretchedGo (LayoutingType lt) {
 			if (stretchedGO == null)
 				return;
 			if (lt == LayoutingType.Width) {
 				int newW = Math.Max (
-					           this.ClientRectangle.Width - contentSize.Width - Spacing * (Children.Count - 1),
-					           stretchedGO.MinimumSize.Width);
+							   this.ClientRectangle.Width - contentSize.Width - Spacing * (Children.Count - 1),
+							   stretchedGO.MinimumSize.Width);
 				if (stretchedGO.MaximumSize.Width > 0)
 					newW = Math.Min (newW, stretchedGO.MaximumSize.Width);
-				if (newW != stretchedGO.Slot.Width) {							
+				if (newW != stretchedGO.Slot.Width) {
 					stretchedGO.Slot.Width = newW;
 					stretchedGO.IsDirty = true;
-					#if DEBUG_LAYOUTING
+#if DEBUG_LAYOUTING
 				Debug.WriteLine ("\tAdjusting Width of " + stretchedGO.ToString());
-					#endif
+#endif
 					stretchedGO.LayoutChanged -= OnChildLayoutChanges;
 					stretchedGO.OnLayoutChanges (LayoutingType.Width);
 					stretchedGO.LayoutChanged += OnChildLayoutChanges;
@@ -136,19 +134,18 @@ namespace Crow
 				if (newH != stretchedGO.Slot.Height) {
 					stretchedGO.Slot.Height = newH;
 					stretchedGO.IsDirty = true;
-					#if DEBUG_LAYOUTING
+#if DEBUG_LAYOUTING
 					Debug.WriteLine ("\tAdjusting Height of " + stretchedGO.ToString());
-					#endif
+#endif
 					stretchedGO.LayoutChanged -= OnChildLayoutChanges;
 					stretchedGO.OnLayoutChanges (LayoutingType.Height);
 					stretchedGO.LayoutChanged += OnChildLayoutChanges;
 					stretchedGO.LastSlots.Height = stretchedGO.Slot.Height;
-				}				
+				}
 			}
 		}
 
-		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
-		{
+		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg) {
 			Widget go = sender as Widget;
 			//Debug.WriteLine ("child layout change: " + go.LastSlots.ToString() + " => " + go.Slot.ToString());
 			switch (arg.LayoutType) {
@@ -170,11 +167,11 @@ namespace Crow
 						contentSize.Width += go.Slot.Width - go.LastSlots.Width;
 
 
-					adjustStretchedGo (LayoutingType.Width);					
-					
+					adjustStretchedGo (LayoutingType.Width);
+
 					if (Width == Measure.Fit)
 						this.RegisterForLayouting (LayoutingType.Width);
-					
+
 					this.RegisterForLayouting (LayoutingType.ArrangeChildren);
 					return;
 				}
@@ -195,7 +192,7 @@ namespace Crow
 						contentSize.Height += go.Slot.Height;
 					} else
 						contentSize.Height += go.Slot.Height - go.LastSlots.Height;
-					
+
 					adjustStretchedGo (LayoutingType.Height);
 
 					if (Height == Measure.Fit)
@@ -210,26 +207,24 @@ namespace Crow
 		}
 		#endregion
 
-    	public override void RemoveChild (Widget child)
-		{
+		public override void RemoveChild (Widget child) {
 			if (child != stretchedGO) {
 				if (Orientation == Orientation.Horizontal)
 					contentSize.Width -= child.LastSlots.Width;
-				else 
-					contentSize.Height -= child.LastSlots.Height;				
+				else
+					contentSize.Height -= child.LastSlots.Height;
 			}
 			base.RemoveChild (child);
 			if (child == stretchedGO) {
 				stretchedGO = null;
 				RegisterForLayouting (LayoutingType.Sizing);
-			}else if (Orientation == Orientation.Horizontal) 				
+			} else if (Orientation == Orientation.Horizontal)
 				adjustStretchedGo (LayoutingType.Width);
-			else				
-				adjustStretchedGo (LayoutingType.Height);			
+			else
+				adjustStretchedGo (LayoutingType.Height);
 		}
 
-		public override void ClearChildren ()
-		{
+		public override void ClearChildren () {
 			base.ClearChildren ();
 			stretchedGO = null;
 		}

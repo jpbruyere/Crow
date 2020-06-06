@@ -6,6 +6,7 @@ using Crow.Cairo;
 
 namespace Crow
 {
+	//TODO:to be  removed, numeric control with template having Gauge child is enough
 	public class ProgressBar : NumericControl
     {
 		#region CTOR

@@ -22,7 +22,7 @@ namespace Crow
 //        }
 		#endregion
 
-		protected override void DrawGraduations(Context gr, PointD pStart, PointD pEnd)
+		/*protected override void DrawGraduations(Context gr, PointD pStart, PointD pEnd)
 		{
 			Rectangle r = ClientRectangle;
 			Foreground.SetAsSource (gr);
@@ -49,6 +49,6 @@ namespace Crow
 				gr.LineTo(new PointD(p.X, p.Y + lineLength));
 			}
 			gr.Stroke();
-		}
+		}*/
     }
 }

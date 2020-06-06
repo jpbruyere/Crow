@@ -11,5 +11,5 @@
 		LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
 		CursorSize="{../scroller1.ChildHeightRatio}"
 		Value="{²../scroller1.ScrollY}"
-		Maximum="{../scroller1.MaxScrollY}" Orientation="Vertical"/>
+		Maximum="{../scroller1.MaxScrollY}" />
 </HorizontalStack>

@@ -34,40 +34,146 @@ namespace ShowCase
 			}
 		}
 
-		string source = @"<Label Text='Hello World' Background='MediumSeaGreen' Margin='10'/>";
-
+		string source, origSource;
+		public string CurrentFile {
+			get { return Configuration.Global.Get<string> (nameof (CurrentFile)); }
+			set {
+				if (CurrentFile == value)
+					return;
+				Configuration.Global.Set (nameof (CurrentFile), value);
+				NotifyValueChanged (CurrentFile);
+			}
+		}
 		public string Source {
-			get => Source;
+			get => source;
 			set {
 				if (source == value)
 					return;
 				source = value;
 				reloadFromSource ();
+				CMDSave.CanExecute = source != origSource;
 				NotifyValueChanged (source);
 			}
 		}
 
-		public void goUpDirClick (object sender, MouseButtonEventArgs e)
+
+		public static Picture IcoNew = new SvgPicture ("#Icons.blank-file.svg");
+		public static Picture IcoOpen = new SvgPicture ("#Icons.open.svg");
+		public static Picture IcoSave = new SvgPicture ("#Icons.save.svg");
+		public static Picture IcoSaveAs = new SvgPicture ("#Icons.save.svg");
+		public static Picture IcoQuit = new SvgPicture ("#Icons.sign-out.svg");
+		public static Picture IcoUndo = new SvgPicture ("#Icons.undo.svg");
+		public static Picture IcoRedo = new SvgPicture ("#Icons.redo.svg");
+
+		public static Picture IcoCut = new SvgPicture ("#Icons.scissors.svg");
+		public static Picture IcoCopy = new SvgPicture ("#Icons.copy-file.svg");
+		public static Picture IcoPaste = new SvgPicture ("#Icons.paste-on-document.svg");
+
+		public Command CMDNew, CMDSave, CMDSaveAs, CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste;
+
+		void initCommands ()
 		{
-			string root = Directory.GetDirectoryRoot (CurrentDir);
-			if (CurrentDir == root)
+			CMDNew = new Command (new Action (onNewFile)) { Caption = "New", Icon = "#Icons.blank-file.svg", CanExecute = true };
+			CMDSave = new Command (new Action (onSave)) { Caption = "Save", Icon = "#Icons.save.svg", CanExecute = false };
+			CMDSaveAs = new Command (new Action (onSaveAs)) { Caption = "Save As...", Icon = "#Icons.save.svg", CanExecute = true };
+			/*CMDUndo = new Command (new Action (undo)) { Caption = "Undo", Icon = IcoUndo, CanExecute = false };
+			CMDRedo = new Command (new Action (redo)) { Caption = "Redo", Icon = IcoRedo, CanExecute = false };
+			CMDCut = new Command (new Action (cut)) { Caption = "Cut", Icon = IcoCut, CanExecute = false };
+			CMDCopy = new Command (new Action (copy)) { Caption = "Copy", Icon = IcoCopy, CanExecute = false };
+			CMDPaste = new Command (new Action (paste)) { Caption = "Paste", Icon = IcoPaste, CanExecute = false };*/
+		}
+
+		public new bool IsDirty {
+			get => origSource != source;
+		}
+		void onSave ()
+		{
+			if (!File.Exists (CurrentFile)) {
+				onSaveAs ();
 				return;
-			CurrentDir = Directory.GetParent (CurrentDir).FullName;
+			}
+			save ();
+		}
+		void onSaveAs ()
+		{
+			string dir = Path.GetDirectoryName (CurrentFile);
+			if (string.IsNullOrEmpty (dir))
+				dir = Directory.GetCurrentDirectory ();
+			LoadIMLFragment (@"<FileDialog Width='60%' Height='50%' Caption='Save as ...' CurrentDirectory='" +
+				dir + "' SelectedFile='" +
+				Path.GetFileName(CurrentFile) + "' OkClicked='saveFileDialog_OkClicked'/>").DataSource = this;
+		}
+		void saveFileDialog_OkClicked (object sender, EventArgs e)
+		{
+			FileDialog fd = sender as FileDialog;
+
+			if (string.IsNullOrEmpty (fd.SelectedFileFullPath))
+				return;
+
+			if (File.Exists(fd.SelectedFileFullPath)) {
+				MessageBox mb = MessageBox.ShowModal (this, MessageBox.Type.YesNo, "File exists, overwrite?");
+				mb.Yes += (sender2, e2) => {
+					CurrentFile = fd.SelectedFileFullPath;
+					save ();
+				};
+				return;
+			}
+
+			CurrentFile = fd.SelectedFileFullPath;
+			save ();
+		}
+
+		void onNewFile () {
+			if (IsDirty) {
+				MessageBox mb = MessageBox.ShowModal (this, MessageBox.Type.YesNo, "Current file has unsaved changes, are you sure?");
+				mb.Yes += (sender, e) => newFile ();
+			} else
+				newFile ();
+		}
+		void newFile()
+		{
+			origSource = "";
+			Source = "<Widget Background='DarkGrey'/>";
+			if (!string.IsNullOrEmpty (CurrentFile))
+				CurrentFile = Path.Combine (Path.GetDirectoryName (CurrentFile), "newfile.crow");
+			else
+				CurrentFile = Path.Combine (CurrentDir, "newfile.crow");
+		}
+
+
+		void save () {
+			using (Stream s = new FileStream(CurrentFile, FileMode.Create)) {
+				s.WriteByte (0xEF);
+				s.WriteByte (0xBB);
+				s.WriteByte (0xBF);
+				byte [] buff = Encoding.UTF8.GetBytes (source);
+				s.Write (buff, 0, buff.Length);
+			}
+			origSource = source;
 		}
 
 		protected override void OnInitialized ()
 		{
+			initCommands ();
+
 			base.OnInitialized ();
 
 			if (string.IsNullOrEmpty (CurrentDir))
 				CurrentDir = Path.Combine (Directory.GetCurrentDirectory (), "Interfaces");
+
 			Widget g = Load ("#ShowCase.showcase.crow");
-			g.DataSource = this;
 			crowContainer = g.FindByName ("CrowContainer") as Container;
+			g.DataSource = this;
+
+			if (!File.Exists(CurrentFile))
+				origSource = Source = @"<Label Text='Hello World' Background='MediumSeaGreen' Margin='10'/>";
+
 			//I set an empty object as datasource at this level to force update when new
 			//widgets are added to the interface
 			crowContainer.DataSource = new object ();
 			hideError ();
+
+			reloadFromFile ();
 		}
 
 		static void App_KeyboardKeyDown (object sender, KeyEventArgs e)
@@ -81,6 +187,14 @@ namespace ShowCase
 #endif
 		}
 
+		public void goUpDirClick (object sender, MouseButtonEventArgs e)
+		{
+			string root = Directory.GetDirectoryRoot (CurrentDir);
+			if (CurrentDir == root)
+				return;
+			CurrentDir = Directory.GetParent (CurrentDir).FullName;
+		}
+
 		void Dv_SelectedItemChanged (object sender, SelectionChangeEventArgs e)
 		{
 			FileSystemInfo fi = e.NewValue as FileSystemInfo;
@@ -88,11 +202,15 @@ namespace ShowCase
 				return;
 			if (fi is DirectoryInfo)
 				return;
-				
-			using (Stream s = new FileStream (fi.FullName, FileMode.Open)) {
-				using (StreamReader sr = new StreamReader (s))
-					Source = sr.ReadToEnd ();
+
+			if (IsDirty) {
+				MessageBox mb = MessageBox.ShowModal (this, MessageBox.Type.YesNo, "Current file has unsaved changes, are you sure?");
+				mb.Yes += (mbsender, mbe) => { CurrentFile = fi.FullName; reloadFromFile (); };
+				return;
 			}
+
+			CurrentFile = fi.FullName;
+			reloadFromFile ();
 		}
 
 		void showError (Exception ex)
@@ -104,7 +222,16 @@ namespace ShowCase
 		{
 			NotifyValueChanged ("ShowError", false);
 		}
-
+		void reloadFromFile ()
+		{
+			if (File.Exists (CurrentFile)) {
+				using (Stream s = new FileStream (CurrentFile, FileMode.Open)) {
+					using (StreamReader sr = new StreamReader (s))
+						origSource = sr.ReadToEnd ();
+				}
+				Source = origSource;
+			}
+		}
 		void reloadFromSource ()
 		{
 			hideError ();

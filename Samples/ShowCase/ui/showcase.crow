@@ -1,32 +1,38 @@
 <?xml version="1.0"?>
-<HorizontalStack Background="DarkGrey" Margin="2">
+<HorizontalStack Background="DarkGrey" >
 	<VerticalStack  Width="25%">
-		<HorizontalStack Height="Fit">
+		<HorizontalStack Height="Fit" Margin="2" Background="Onyx">
 			<Image Margin="2" Width="16" Height="16" Path="#Crow.Icons.level-up.svg" MouseClick="./goUpDirClick"
 						 Background="Jet" MouseEnter="{Background=Grey}" MouseLeave="{Background=Jet}" />			
 			<TextBox Text="{²CurrentDir}" Margin="2"/>
 		</HorizontalStack>		
-		<DirectoryView Name="dv" CurrentDirectory="{CurrentDir}" SelectedItemChanged="Dv_SelectedItemChanged"/>
+		<DirectoryView Margin="1" Name="dv" CurrentDirectory="{CurrentDir}" SelectedItemChanged="Dv_SelectedItemChanged"/>
 	</VerticalStack>
-	<Splitter Width="6"/>
+	<Splitter Width="6" />
 	<VerticalStack>
 		<Container Name="CrowContainer" Height="60%" Background="Black"/>
 		<Splitter/>
-		<HorizontalStack>
-			<Scroller Name="scroller1" Background="White"
-					Margin="2" ScrollY="{../scrollbar1.Value}"
-					ValueChanged="./_scroller_ValueChanged">
-				<TextBox VerticalAlignment="Top"
-					Text="{²Source}" Multiline="true" TextAlignment="TopLeft"
-					Font="Courriernew 10"/>
-			</Scroller>
-			<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}"
-				LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
-				CursorSize="{../scroller1.ChildHeightRatio}"
-				Maximum="{../scroller1.MaxScrollY}" Orientation="Vertical"
-				Width="14" />
-		</HorizontalStack>
-		<Label Visible="{ShowError}" Text="{ErrorMessage}" Background="Red" Foreground="White" Width="Stretched" Margin="2"
-			Multiline="true"/>
+		<VerticalStack>
+			<HorizontalStack Height="Fit">
+				<Button Style="IcoButton" Command="{CMDNew}" />
+				<Button Style="IcoButton" Command="{CMDSave}" />
+				<Button Style="IcoButton" Command="{CMDSaveAs}" />
+			</HorizontalStack>
+			<HorizontalStack>
+				<Scroller Name="scroller1" Background="White"
+						Margin="2" ScrollY="{../scrollbar1.Value}"
+						ValueChanged="./_scroller_ValueChanged">
+					<TextBox VerticalAlignment="Top"
+						Text="{²Source}" Multiline="true" TextAlignment="TopLeft"
+						Font="Courriernew 10"/>
+				</Scroller>
+				<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}"
+					LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
+					CursorSize="{../scroller1.ChildHeightRatio}" Maximum="{../scroller1.MaxScrollY}" />
+			</HorizontalStack>
+			<Label Text="{CurrentFile}" Width="Stretched"/>
+			<Label Visible="{ShowError}" Text="{ErrorMessage}" Background="Red" Foreground="White" Width="Stretched" Margin="2"
+				Multiline="true"/>
+		</VerticalStack>
 	</VerticalStack>
 </HorizontalStack>
