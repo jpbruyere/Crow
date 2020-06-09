@@ -120,8 +120,10 @@ namespace Crow.IML
 		/// </summary>
 		/// <param name="il">current MSIL generator</param>
 		/// <param name="cancel">cancel branching in MSIL if something go wrong</param>
-		public void emitGetTarget(ILGenerator il, System.Reflection.Emit.Label cancel){
-
+		/// <param name="currentNode">if levelUp is 0, node is templated target is not simple name, name
+		/// is search in the current node template content, which is avoid normaly.</param>
+		public void emitGetTarget(ILGenerator il, System.Reflection.Emit.Label cancel, NodeAddress currentNode = null)
+		{
 			if (IsTemplateBinding) {
 				System.Reflection.Emit.Label nextLogicParent = il.DefineLabel ();
 				il.MarkLabel (nextLogicParent);
@@ -141,7 +143,11 @@ namespace Crow.IML
 
 			if (!string.IsNullOrEmpty (Tokens [0])) {//find by name
 				il.Emit (OpCodes.Ldstr, Tokens [0]);
-				il.Emit (OpCodes.Callvirt, CompilerServices.miFindByName);
+				if (LevelsUp == 0 && currentNode[currentNode.Count-1].HasTemplate)
+					//search in template
+					il.Emit (OpCodes.Callvirt, CompilerServices.miFindByNameInTemplate);
+				else				
+					il.Emit (OpCodes.Callvirt, CompilerServices.miFindByName);
 				il.Emit (OpCodes.Dup);
 				il.Emit (OpCodes.Brfalse, cancel);
 			}

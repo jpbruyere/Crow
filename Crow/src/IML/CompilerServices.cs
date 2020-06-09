@@ -48,7 +48,7 @@ namespace Crow.IML
 		internal static MethodInfo miGetColCount = typeof(System.Collections.ICollection).GetProperty("Count").GetGetMethod();
 		internal static MethodInfo miGetDelegateListItem = typeof(List<Delegate>).GetMethod("get_Item", new Type[] { typeof(Int32) });
 
-		internal static MethodInfo miCompileDynEventHandler = typeof(CompilerServices).GetMethod ("compileDynEventHandler", BindingFlags.Static | BindingFlags.NonPublic);
+		internal static MethodInfo miCompileDynEventHandler = typeof(Instantiator).GetMethod ("compileDynEventHandler", BindingFlags.Static | BindingFlags.NonPublic);
 		internal static MethodInfo miRemEvtHdlByName = typeof(CompilerServices).GetMethod("removeEventHandlerByName", BindingFlags.Static | BindingFlags.NonPublic);
 		internal static MethodInfo miRemEvtHdlByTarget = typeof(CompilerServices).GetMethod("removeEventHandlerByTarget", BindingFlags.Static | BindingFlags.NonPublic);
 		internal static MethodInfo miGetMethInfoWithRefx = typeof(CompilerServices).GetMethod ("getMethodInfoWithReflexion", BindingFlags.Static | BindingFlags.NonPublic);
@@ -69,6 +69,7 @@ namespace Crow.IML
 
 		internal static FieldInfo miSetCurIface = typeof(Widget).GetField ("IFace", BindingFlags.Public | BindingFlags.Instance);
 		internal static MethodInfo miFindByName = typeof (Widget).GetMethod ("FindByName");
+		internal static MethodInfo miFindByNameInTemplate = typeof (TemplatedControl).GetMethod ("FindByNameInTemplate");
 		internal static MethodInfo miGetGObjItem = typeof(List<Widget>).GetMethod("get_Item", new Type[] { typeof(Int32) });
 		internal static MethodInfo miLoadDefaultVals = typeof (Widget).GetMethod ("loadDefaultValues");
 		internal static PropertyInfo piStyle = typeof (Widget).GetProperty ("Style");
@@ -711,7 +712,7 @@ namespace Crow.IML
 				il.Emit (OpCodes.Unbox_Any, dstType);
 			} else{
 				LocalBuilder lbOrig = il.DeclareLocal (typeof (object));
-				il.Emit (OpCodes.Stloc, lbOrig); //save orig value in loc0
+				il.Emit (OpCodes.Stloc, lbOrig); //save orig value in loc
 				//first check if not null
 				il.Emit (OpCodes.Ldloc, lbOrig);
 				il.Emit (OpCodes.Dup);
@@ -803,123 +804,6 @@ namespace Crow.IML
 			return Delegate.CreateDelegate (eventType, instance, mi);
 		}
 
-		internal static Delegate compileDynEventHandler(EventInfo sourceEvent, string expression, NodeAddress currentNode = null){
-#if DEBUG_BINDING
-			Debug.WriteLine ("\tCompile Event {0}: {1}", sourceEvent.Name, expression);
-#endif
-
-			Type lopType = null;
-
-			if (currentNode == null)
-				lopType = sourceEvent.DeclaringType;
-			else
-				lopType = currentNode.NodeType;
-
-#region Retrieve EventHandler parameter type
-			MethodInfo evtInvoke = sourceEvent.EventHandlerType.GetMethod ("Invoke");
-			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
-			Type handlerArgsType = evtParams [1].ParameterType;
-#endregion
-
-			Type [] args = { typeof (object), handlerArgsType };
-			DynamicMethod dm = new DynamicMethod ("dyn_eventHandler",
-				typeof(void),
-				args, true);
-			ILGenerator il = dm.GetILGenerator (256);
-			il.Emit (OpCodes.Nop);
-
-			string [] srcLines = expression.Trim ().Split (new char [] { ';' });
-
-			foreach (string srcLine in srcLines) {
-				if (string.IsNullOrEmpty (srcLine))
-					continue;
-				string [] operandes = srcLine.Trim ().Split (new char [] { '=' });
-				if (operandes.Length != 2) //not an affectation
-					throw new NotSupportedException ();
-
-				System.Reflection.Emit.Label cancel = il.DefineLabel ();
-				System.Reflection.Emit.Label cancelFinalSet = il.DefineLabel ();
-				System.Reflection.Emit.Label success = il.DefineLabel ();
-
-				BindingMember lop = new BindingMember (operandes [0].Trim ());
-				BindingMember rop = new BindingMember (operandes [1].Trim ());
-
-				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
-
-#region Left operande
-				PropertyInfo lopPI = null;
-
-				//in dyn handler, no datasource binding, so single name in expression are also handled as current node property
-				if (lop.IsSingleName)
-					lopPI = lopType.GetProperty (lop.Tokens [0]);
-				else if (lop.IsCurrentNodeProperty)
-					lopPI = lopType.GetProperty (lop.Tokens [1]);
-				else
-					lop.emitGetTarget (il, cancel);
-#endregion
-
-#region RIGHT OPERANDES
-				if (rop.IsStringConstant){
-					il.Emit (OpCodes.Ldstr, rop.Tokens[0]);
-					lop.emitSetProperty (il);
-				}else if (rop.IsSingleName && rop.Tokens[0] == "this"){
-					il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
-					lop.emitSetProperty (il);
-				}else if (rop.LevelsUp ==0 && !string.IsNullOrEmpty(rop.Tokens[0])) {//parsable constant depending on lop type
-					//if left operand is member of current node, it's easy to fetch type, else we should use reflexion in msil
-					if (lopPI == null){//accept GraphicObj members, but it's restricive
-						//TODO: we should get the parse method by reflexion, or something else
-						lopPI = typeof(Widget).GetProperty (lop.Tokens [lop.Tokens.Length-1]);
-						if (lopPI == null)
-							throw new NotSupportedException ();
-					}
-
-					MethodInfo lopParseMi = CompilerServices.miParseEnum;
-					if (lopPI.PropertyType.IsEnum){
-						//load type of enum
-						il.Emit(OpCodes.Ldtoken, lopPI.PropertyType);
-						il.Emit(OpCodes.Call, CompilerServices.miGetTypeFromHandle);
-						//load enum value name
-						il.Emit (OpCodes.Ldstr, operandes [1].Trim ());
-						//load false
-						il.Emit (OpCodes.Ldc_I4_0);
-					}else{
-						lopParseMi = lopPI.PropertyType.GetMethod ("Parse");
-						if (lopParseMi == null)
-							throw new Exception (string.Format
-								("IML: no static 'Parse' method found in: {0}", lopPI.PropertyType.Name));
-
-						il.Emit (OpCodes.Ldstr, operandes [1].Trim ());
-					}
-                    if (lopParseMi.IsStatic)
-					    il.Emit (OpCodes.Call, lopParseMi);
-                    else
-                        il.Emit(OpCodes.Callvirt, lopParseMi);
-                    //il.Emit (OpCodes.Unbox_Any, lopPI.PropertyType);
-                    //emit left operand assignment
-                    il.Emit (OpCodes.Callvirt, lopPI.GetSetMethod());
-				} else {//tree parsing and propert gets
-					il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
-
-					rop.emitGetTarget (il, cancelFinalSet);
-					rop.emitGetProperty (il, cancelFinalSet);
-					lop.emitSetProperty (il);
-				}
-#endregion
-
-				il.Emit (OpCodes.Br, success);
-
-				il.MarkLabel (cancelFinalSet);
-				il.Emit (OpCodes.Pop);	//pop null MemberInfo on the stack causing cancelation
-				il.MarkLabel (cancel);
-				il.Emit (OpCodes.Pop);	//pop null instance on the stack causing cancelation
-				il.MarkLabel (success);
-			}
-
-			il.Emit (OpCodes.Ret);
-
-			return dm.CreateDelegate (sourceEvent.EventHandlerType);
-		}
 
 		/// <summary>
 		/// MSIL helper, go n levels up

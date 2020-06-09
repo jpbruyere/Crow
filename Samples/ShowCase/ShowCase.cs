@@ -239,9 +239,8 @@ namespace ShowCase
 			try {
 				lock (UpdateMutex) {
 					Instantiator inst = null;
-					using (MemoryStream ms = new MemoryStream (Encoding.UTF8.GetBytes (source))) {
+					using (MemoryStream ms = new MemoryStream (Encoding.UTF8.GetBytes (source))) 
 						inst = new Instantiator (this, ms);
-					}
 					g = inst.CreateInstance ();
 					crowContainer.SetChild (g);
 					g.DataSource = this;

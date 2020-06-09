@@ -164,7 +164,7 @@ namespace Crow
 		/// </summary>
 		/// <value>The width of the stoke.</value>
 		[DefaultValue (1.0)]
-		public double StokeWidth {
+		public double StrokeWidth {
 			get { return strokeWidth; }
 			set {
 				if (strokeWidth == value)

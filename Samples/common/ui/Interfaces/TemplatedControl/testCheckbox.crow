@@ -19,12 +19,14 @@
 			</HorizontalStack>
 		</Template>
 	</CheckBox>
-	<CheckBox Background="Jet" Height="30" Width="60" Checked="{Background=SeaGreen}" >
+	<CheckBox Background="Jet" Height="30" Width="60"	
+						Checked="{sh.HorizontalAlignment=Right};{Background=SeaGreen}"
+						Unchecked="{sh.HorizontalAlignment=Left};{Background=Jet}">
 		<Template>
 			<Group  Background="{./Background}" Margin="0" CornerRadius="100">
 				<Shape Name="sh" HorizontalAlignment="Left" Width="{./Height}" Foreground="Grey" Size="16,16" Path="A 8,8,7.5,0,6.3 f O 1,1,1,1 G "/>
-				<Shape Visible="{./IsChecked}" HorizontalAlignment="Right" Width="{./Height}" Foreground="Grey" Size="16,16" Path="A 8,8,7.5,0,6.3 f O 1,1,1,1 G "/>
 			</Group>
 		</Template>
 	</CheckBox>
+	
 </VerticalStack>
