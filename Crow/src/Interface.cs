@@ -314,9 +314,9 @@ namespace Crow
 		/// <summary>Crow configuration root path</summary>
 		public static string CROW_CONFIG_ROOT;
 		/// <summary>If true, mouse focus is given when mouse is over control</summary>
-		public static bool FOCUS_ON_HOVER = true;
+		public static bool FOCUS_ON_HOVER = false;
 		/// <summary> Threshold to catch borders for sizing </summary>
-		public static int BorderThreshold = 10;
+		public static int BorderThreshold = 3;
 		/// <summary> delay before tooltip appears </summary>
 		public static int TOOLTIP_DELAY = 500;
 		/// <summary>Double click threshold in milisecond</summary>
@@ -603,7 +603,7 @@ namespace Crow
 		public Widget ActiveWidget
 		{
 			get { return _activeWidget; }
-			set
+			internal set
 			{
 				if (_activeWidget == value)
 					return;
@@ -645,7 +645,7 @@ namespace Crow
 
 				#if DEBUG_FOCUS
 				NotifyValueChanged("HoverWidget", _hoverWidget);
-#endif
+				#endif
 
 				if (DragAndDropOperation == null && FOCUS_ON_HOVER) {
 					Widget w = _hoverWidget;
@@ -672,7 +672,7 @@ namespace Crow
 		}
 		/// <summary>Widget has the keyboard or mouse focus</summary>
 		public Widget FocusedWidget {
-			get { return _focusedWidget; }
+			get => _focusedWidget;
 			set {
 				if (_focusedWidget == value)
 					return;
@@ -1130,13 +1130,29 @@ namespace Crow
 				//MouseCursorChanged.Raise (this,new MouseCursorChangedEventArgs(cursor));
 			}
 		}
+
+		uint stickyMouse = 0;
+		Point stickyMousePos = default;
+		internal void SetStickyMouse (uint threshold = 5)
+		{
+			stickyMouse = threshold;
+			stickyMousePos = MousePosition;
+		}
+
 		/// <summary>Processes mouse move events from the root container, this function
 		/// should be called by the host on mouse move event to forward events to crow interfaces</summary>
 		/// <returns>true if mouse is in the interface</returns>
 		public virtual bool OnMouseMove (int x, int y)
 		{
+
+			if (stickyMouse>0) {
+				if (Math.Abs(x - stickyMousePos.X) < stickyMouse && Math.Abs(y - stickyMousePos.Y) < stickyMouse)
+					return true;
+				stickyMouse = 0;
+			}
 			int deltaX = x - MousePosition.X;
 			int deltaY = y - MousePosition.Y;
+
 			MousePosition = new Point (x, y);
 			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
 
@@ -1246,16 +1262,15 @@ namespace Crow
 			mouseRepeatTimer.Reset ();
 			lastMouseDownEvent = null;
 
-			MouseButtonEventArgs e = new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Repeat);
 			if (_activeWidget == null)
 				return false;
 
-			_activeWidget.onMouseUp (_activeWidget, e);
+			_activeWidget.onMouseUp (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Release));
 
 			if (doubleClickTriggered)
-				_activeWidget.onMouseDoubleClick (_activeWidget, e);
+				_activeWidget.onMouseDoubleClick (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press));
 			else
-				_activeWidget.onMouseClick (_activeWidget, e);
+				_activeWidget.onMouseClick (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press));
 
 			ActiveWidget = null;
 			//			if (!lastActive.MouseIsIn (Mouse.Position)) {

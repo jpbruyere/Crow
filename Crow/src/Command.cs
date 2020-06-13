@@ -6,6 +6,40 @@ using System;
 using System.ComponentModel;
 
 namespace Crow {
+	public class CommandGroup : ObservableList<Command>, IValueChange
+	{
+		string caption;
+		string icon;
+
+		/// <summary>
+		/// label to display in the bound control
+		/// </summary>
+		[DefaultValue ("Unamed Command Group")]
+		public virtual string Caption {
+			get { return caption; }
+			set {
+				if (caption == value)
+					return;
+				caption = value;
+				NotifyValueChanged ("Caption", caption);
+
+			}
+		}
+		/// <summary>
+		/// Icon to display in the bound control
+		/// </summary>		
+		public string Icon {
+			get { return icon; }
+			set {
+				if (icon == value)
+					return;
+				icon = value;
+				NotifyValueChanged ("Icon", icon);
+			}
+		}
+	}
+
+
 	/// <summary>
 	/// helper class to bind in one step icon, caption, action, and validity tests to a controls 
 	/// </summary>
@@ -67,8 +101,7 @@ namespace Crow {
 		}
 		/// <summary>
 		/// Icon to display in the bound control
-		/// </summary>
-		
+		/// </summary>		
 		public string Icon {
 			get { return icon; }
 			set {

@@ -5,9 +5,16 @@ ControlCaptionColor = "LightGrey";
 ControlCaptionHoverColor = "White";
 ControlCornerRadius = "0";
 ControlInsideMargin = "1";
+ControlHighlight = "RoyalBlue";
 IconSize = "11";
 IconMargin = "1";
 ToggleIconSize = "16";
+
+WindowBackgroundColor = "";
+WindowBorderColor = "Grey";
+WindowBorderWidth = "1";
+WindowTitleBarBackground = "vgradient|0:Onyx|1:SteelBlue";
+WindowTitleBarForeground = "White";
 
 Button, CheckBox, RadioButton, ComboBox, Expandable,
 MessageBox, Popper, Slider, Spinner, TextBox {
@@ -76,28 +83,26 @@ Menu {
 	Height = "Fit";
 	Width = "Stretched";
 	VerticalAlignment = "Top";
-	SelectionBackground = "Transparent";
+	SelectionBackground = "${ControlHighlight}";
 }
 MenuItem {
 	Caption = "MenuItem";
 	Width = "Stretched";
 	Height = "Fit";
-	//Background = "vgradient|0:DimGrey|1:Black";
-	//Background = "Transparent";
+	Background = "DimGrey";	
 	Foreground = "LightGrey";
-	MouseEnter = "{Background=SteelBlue;}";
-	MouseLeave = "{Background=Transparent;}";
-	//MouseEnter = "{Background = vgradient|0:SteelBlue|1:Jet;Foreground=White;}";
-	//MouseLeave = "{Foreground=LightGrey;Background=Transparent;}";
-	SelectionBackground = "Transparent";
+	MouseEnter = "{Background=${ControlHighlight}}";
+	MouseLeave = "{Background=Transparent}";
+	SelectionBackground = "${ControlHighlight}";
 }
 MessageBox {
-	Background = "0.1,0.1,0.2,0.7";
+	Background = "0.1,0.1,0.2,0.85";
 	Width = "Fit";
 	Caption="MessageBox";
 	Font = "serif, 12";
-	MinimumSize = "200,120";
+	//MinimumSize = "200,120";
 	AlwaysOnTop = "true";
+	Resizable = "false";
 }
 Slider {
 	Foreground = "Grey";
@@ -128,6 +133,12 @@ Window {
 	MinimumSize="5,5";
 	Width = "150";
 	Height = "150";
+}
+winBorder {
+	BorderWidth = "${WindowBorderWidth}";
+	Foreground = "${WindowBorderColor}";
+	Background = "${WindowBackgroundColor}";	
+	Margin = "0";	
 }
 WindowIconBorder {
 	BorderWidth="1";
@@ -228,12 +239,12 @@ ArrowBut {
 
 ScrollBar {
 	Orientation = "Vertical";
-    Maximum = "0";
-    Value = "0";
-    Foreground="Transparent";
-    Background="Onyx";
-    Width = "14";    
-    CornerRadius = "0";
+	Maximum = "0";
+	Value = "0";
+	Foreground="Transparent";
+	Background="Onyx";
+	Width = "14";    
+	CornerRadius = "0";
 }
 HScrollBar {
     Template = "#Crow.HScrollBar.template";

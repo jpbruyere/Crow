@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <HorizontalStack Margin="50">
 	<VerticalStack Spacing="10" Width="50%">
-		<Slider Height="20" Width="Stretched"/>
+		<Slider Background="DarkGrey" Height="20" Width="Stretched"/>
 		<Slider Background="RoyalBlue" Height="50" Width="Stretched" CursorSize="50">
 			<Template>
 				<Group Background="DarkGrey" >

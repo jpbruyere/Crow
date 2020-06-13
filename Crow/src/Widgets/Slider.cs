@@ -214,7 +214,7 @@ namespace Crow
 		#region mouse handling
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
-			base.onMouseDown (sender, e);
+			e.Handled = true;
 			mouseDownInit = ScreenPointToLocal (e.Position);
 			mouseDownInitValue = Value;
 			Rectangle cursInScreenCoord = cursor == null ? default : cursor.ScreenCoordinates (cursor.Slot);
@@ -235,12 +235,13 @@ namespace Crow
 			else
 				Value += LargeIncrement;
 
+			base.onMouseDown (sender, e);
 		}
 		public override void onMouseUp (object sender,MouseButtonEventArgs e)
 		{
-			base.onMouseUp (sender, e);
-
 			holdCursor = false;
+			e.Handled = true;
+			base.onMouseUp (sender, e);
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{

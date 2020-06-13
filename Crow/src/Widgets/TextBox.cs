@@ -18,7 +18,9 @@ namespace Crow
 		[XmlIgnore]public override bool HasFocus   //trigger update when lost focus to errase text beam
         {
             get => base.HasFocus;
-            set {
+            internal set {
+				if (base.HasFocus == value)
+					return;
                 base.HasFocus = value;
                 RegisterForRedraw();
             }
@@ -40,22 +42,22 @@ namespace Crow
 			case Key.Backspace:
 				if (CurrentPosition == 0)
 					return;
-				this.DeleteChar();
+				DeleteChar();
 				break;
 			case Key.Delete:
 				if (selectionIsEmpty) {
 					if (!MoveRight ())
 						return;
 				}else if (IFace.Shift)
-					IFace.Clipboard = this.SelectedText;
-				this.DeleteChar ();
+					IFace.Clipboard = SelectedText;
+				DeleteChar ();
 				break;
 			case Key.KeypadEnter:
 			case Key.Enter:
 				if (!selectionIsEmpty)
-					this.DeleteChar ();
+					DeleteChar ();
 				if (Multiline)
-					this.InsertLineBreak ();
+					InsertLineBreak ();
 				else
 					OnTextChanged(this,new TextChangeEventArgs(Text));
 				break;

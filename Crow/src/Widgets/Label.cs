@@ -723,12 +723,14 @@ namespace Crow {
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
-			if (this.HasFocus && _selectable){
-				updatemouseLocalPos (e.Position);
-				SelBegin = -1;
-				SelRelease = -1;
-				SelectionInProgress = true;
-				RegisterForRedraw();//TODO:should put it in properties
+			if (HasFocus) {
+				if (_selectable) {
+					updatemouseLocalPos (e.Position);
+					SelBegin = -1;
+					SelRelease = -1;
+					SelectionInProgress = true;
+					RegisterForRedraw ();//TODO:should put it in properties
+				}
 			}
 
 			//done at the end to set 'hasFocus' value after testing it
@@ -737,7 +739,7 @@ namespace Crow {
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseUp (sender, e);
-			if (!(this.HasFocus || _selectable))
+			if (!(HasFocus || _selectable))
 				return;
 			if (!SelectionInProgress)
 				return;

@@ -73,8 +73,7 @@ namespace Crow
 				IFace.MouseCursor = MouseCursor.sb_v_double_arrow;
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
-		{
-			base.onMouseDown (sender, e);
+		{		
 			go1 = go2 = null;
 			init1 = init2 = -1;
 			delta = 0;
@@ -108,46 +107,49 @@ namespace Crow
 				if (init2 >= 0)
 					go2.Height = init2;
 			}
+			e.Handled = true;
+			base.onMouseDown (sender, e);
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
+			e.Handled = true;
 			base.onMouseMove (sender, e);
 
-			if (!IsActive || go1 == null || go2 == null)
-				return;
+			if (IsActive && go1 != null && go2 != null) {
+				GenericStack gs = Parent as GenericStack;
+				int newDelta = delta, size1 = init1, size2 = init2;
+				if (gs.Orientation == Orientation.Horizontal) {
+					newDelta -= e.XDelta;
+					if (size1 < 0)
+						size1 = go1.Slot.Width + delta;
+					if (size2 < 0)
+						size2 = go2.Slot.Width - delta;
+				} else {
+					newDelta -= e.YDelta;
+					if (size1 < 0)
+						size1 = go1.Slot.Height + delta;
+					if (size2 < 0)
+						size2 = go2.Slot.Height - delta;
+				}
 
-			GenericStack gs = Parent as GenericStack;
-			int newDelta = delta, size1 = init1 , size2 = init2;
-			if (gs.Orientation == Orientation.Horizontal) {
-				newDelta -= e.XDelta;
-				if (size1 < 0)
-					size1 = go1.Slot.Width + delta;
-				if (size2 < 0)
-					size2 = go2.Slot.Width - delta;
-			} else {
-				newDelta -= e.YDelta;
-				if (size1 < 0)
-					size1 = go1.Slot.Height + delta;
-				if (size2 < 0)
-					size2 = go2.Slot.Height - delta;
-			}
+				if (size1 - newDelta < min1 || (max1 > 0 && size1 - newDelta > max1) ||
+					size2 + newDelta < min2 || (max2 > 0 && size2 + newDelta > max2))
+					return;
 
-			if (size1 - newDelta < min1 || (max1 > 0 && size1 - newDelta > max1) ||
-				size2 + newDelta < min2 || (max2 > 0 && size2 + newDelta > max2))
-				return;
+				delta = newDelta;
 
-			delta = newDelta;
+				if (gs.Orientation == Orientation.Horizontal) {
+					if (init1 >= 0)
+						go1.Width = init1 - delta;
+					if (init2 >= 0)
+						go2.Width = init2 + delta;
+				} else {
+					if (init1 >= 0)
+						go1.Height = init1 - delta;
+					if (init2 >= 0)
+						go2.Height = init2 + delta;
+				}
 
-			if (gs.Orientation == Orientation.Horizontal) {
-				if (init1 >= 0)
-					go1.Width = init1 - delta;
-				if (init2 >= 0)
-					go2.Width = init2 + delta;
-			} else {
-				if (init1 >= 0)
-					go1.Height = init1 - delta;
-				if (init2 >= 0)
-					go2.Height = init2 + delta;
 			}
 		}
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)

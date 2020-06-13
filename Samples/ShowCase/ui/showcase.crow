@@ -24,7 +24,7 @@
 						ValueChanged="./_scroller_ValueChanged">
 					<TextBox VerticalAlignment="Top"
 						Text="{²Source}" Multiline="true" TextAlignment="TopLeft"
-						Font="Courriernew 10"/>
+						Font="mono 10"/>
 				</Scroller>
 				<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}"
 					LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"

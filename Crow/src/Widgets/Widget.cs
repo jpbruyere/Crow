@@ -349,7 +349,7 @@ namespace Crow
 		/// <summary>
 		/// Mouse routing need to go back to logical parent for popups
 		/// </summary>
-		public Widget FocusParent => (parent is Interface ? LogicalParent : parent) as Widget; 
+		internal Widget FocusParent => (parent is Interface ? LogicalParent : parent) as Widget; 
 
 		[XmlIgnore]public ILayoutable LogicalParent {
 			get { return logicalParent == null ? Parent : logicalParent; }
@@ -679,7 +679,7 @@ namespace Crow
 		/// </summary>
 		[XmlIgnore]public virtual bool HasFocus {
 			get { return hasFocus; }
-			set {
+			internal set {
 				if (value == hasFocus)
 					return;
 
@@ -697,7 +697,7 @@ namespace Crow
 		/// </summary>
 		[XmlIgnore]public virtual bool IsActive {
 			get { return isActive; }
-			set {
+			internal set {
 				if (value == isActive)
 					return;
 
@@ -710,7 +710,7 @@ namespace Crow
 		/// </summary>
 		[XmlIgnore]public virtual bool IsHover {
 			get { return isHover; }
-			set {
+			internal set {
 				if (value == isHover)
 					return;
 
@@ -1392,7 +1392,7 @@ namespace Crow
 			if (r.Bottom > cb.Bottom)
 				r.Height -= r.Bottom - cb.Bottom;
 			if (r.Width < 0 || r.Height < 0) {
-				Debug.WriteLine ($"Invalid clip: {clip}:{r} hnd:{this}");//\n{Environment.StackTrace}");
+				//Debug.WriteLine ($"Invalid clip: {clip}:{r} hnd:{this}");//\n{Environment.StackTrace}");
 				return;
 			}
 			if (cacheEnabled && !IsDirty)
@@ -1413,7 +1413,7 @@ namespace Crow
 		{
 #if DEBUG
 			if (disposed) {
-				System.Diagnostics.Debug.WriteLine ($"RegisterForGraphicUpdate for disposed Widget: {this}\n{System.Environment.StackTrace}");
+//				System.Diagnostics.Debug.WriteLine ($"RegisterForGraphicUpdate for disposed Widget: {this}\n{System.Environment.StackTrace}");
 				return;
 			}
 #endif
@@ -1854,8 +1854,8 @@ namespace Crow
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
 			if (IFace.HoverWidget != this) {
-				IFace.HoverWidget = this;
 				onMouseEnter (this, e);
+				IFace.HoverWidget = this;
 			}
 
 			//this.onMouseMove (this, e);//without this, window border doesn't work, should be removed
@@ -1885,6 +1885,8 @@ namespace Crow
 #if DEBUG_FOCUS
 			Debug.WriteLine("MOUSE DOWN => " + this.ToString());
 #endif
+			if (Focusable)
+				IFace.FocusedWidget = this;
 
 			if (e.Button == MouseButton.Right && contextCommands != null) {
 				IFace.ShowContextMenu (this);
@@ -1943,7 +1945,7 @@ namespace Crow
 		{
 			#if DEBUG_FOCUS
 			Debug.WriteLine("MouseEnter => " + this.ToString());
-#endif
+			#endif
 
 			IFace.MouseCursor = MouseCursor;
 
