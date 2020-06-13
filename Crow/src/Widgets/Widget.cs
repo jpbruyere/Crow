@@ -1885,8 +1885,10 @@ namespace Crow
 #if DEBUG_FOCUS
 			Debug.WriteLine("MOUSE DOWN => " + this.ToString());
 #endif
-			if (Focusable)
+			if (Focusable) {
 				IFace.FocusedWidget = this;
+				e.Handled = true;
+			}
 
 			if (e.Button == MouseButton.Right && contextCommands != null) {
 				IFace.ShowContextMenu (this);
