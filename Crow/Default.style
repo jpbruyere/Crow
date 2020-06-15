@@ -10,11 +10,13 @@ IconSize = "11";
 IconMargin = "1";
 ToggleIconSize = "16";
 
-WindowBackgroundColor = "";
+WindowBackgroundColor = "DarkGrey";
 WindowBorderColor = "Grey";
 WindowBorderWidth = "1";
-WindowTitleBarBackground = "vgradient|0:Onyx|1:SteelBlue";
+WindowTitleBarBackground = "vgradient|0:Onyx|1:RoyalBlue";
 WindowTitleBarForeground = "White";
+
+MenuBackground = "Jet";
 
 Button, CheckBox, RadioButton, ComboBox, Expandable,
 MessageBox, Popper, Slider, Spinner, TextBox {
@@ -77,23 +79,25 @@ TextBox {
 	MouseCursor = "IBeam";
 }
 Menu {
-	Margin = "1";
-	Background = "vgradient|0:DimGrey|1:Black";
-	//Background = "Transparent";
+	Margin = "0";
+	Background = "${MenuBackground}";
 	Height = "Fit";
 	Width = "Stretched";
 	VerticalAlignment = "Top";
 	SelectionBackground = "${ControlHighlight}";
+	SelectionColoring = "false";
 }
 MenuItem {
 	Caption = "MenuItem";
 	Width = "Stretched";
 	Height = "Fit";
-	Background = "DimGrey";	
-	Foreground = "LightGrey";
+	Background = "${MenuBackground}";	
+	Foreground = "${ControlCaptionColor}";
 	MouseEnter = "{Background=${ControlHighlight}}";
-	MouseLeave = "{Background=Transparent}";
-	SelectionBackground = "${ControlHighlight}";
+	MouseLeave = "{Background=${MenuBackground}}";
+	//SelectionBackground = "${ControlHighlight}";
+	SelectionBackground = "Transparent";
+	SelectionColoring = "false";
 }
 MessageBox {
 	Background = "0.1,0.1,0.2,0.85";

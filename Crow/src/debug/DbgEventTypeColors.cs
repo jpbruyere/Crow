@@ -64,7 +64,7 @@ namespace Crow
 				gr.Rectangle (rc);
 				gr.StrokePreserve ();
 
-				gr.SetSourceColor (c);
+				gr.SetSource (c);
 				gr.Fill ();
 
 				penY += fe.Height;

@@ -8,6 +8,7 @@ using System.ComponentModel;
 using Crow.Cairo;
 using System.Threading;
 
+using static Crow.Logger;
 
 namespace Crow
 {
@@ -343,6 +344,10 @@ namespace Crow
 		{
 			Widget g = sender as Widget;
 
+#if DEBUG_LAYOUTING
+			LOG ($"{arg.LayoutType}:{g}->{g.Slot}");
+#endif
+
 			switch (arg.LayoutType) {
 			case LayoutingType.Width:
 				if (Width != Measure.Fit)
@@ -377,7 +382,7 @@ namespace Crow
 		void searchLargestChild (bool forceMeasure = false)
 		{
 			#if DEBUG_LAYOUTING
-			Debug.WriteLine("\tSearch largest child");
+			LOG (this.ToString());
 			#endif
 			largestChild = null;
 			contentSize.Width = 0;
@@ -398,9 +403,9 @@ namespace Crow
 			}
 		}
 		void searchTallestChild (bool forceMeasure = false)
-		{ 
+		{
 			#if DEBUG_LAYOUTING
-			Debug.WriteLine("\tSearch tallest child");
+			LOG (this.ToString());
 			#endif
 			tallestChild = null;
 			contentSize.Height = 0;

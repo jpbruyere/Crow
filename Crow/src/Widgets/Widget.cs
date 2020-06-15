@@ -1450,6 +1450,21 @@ namespace Crow
 		/// <summary> By default in groups, LayoutingType.ArrangeChildren is reset </summary>
 		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){
 		}
+
+		internal bool firstUnresolvedFitWidth (out  Widget ancestorInUnresolvedFit)
+		{
+			ancestorInUnresolvedFit = this.Parent as Widget;
+
+			while (ancestorInUnresolvedFit != null) {
+				if (ancestorInUnresolvedFit.width.IsFit)
+					return true;
+				if (!ancestorInUnresolvedFit.Width.IsRelativeToParent || ancestorInUnresolvedFit.Parent is Interface)
+					return false;
+				ancestorInUnresolvedFit = ancestorInUnresolvedFit.Parent as Widget;
+			}
+			return false;
+		}
+
 		public virtual bool ArrangeChildren { get { return false; } }
 		/// <summary> Query a layouting for the type pass as parameter, redraw only if layout changed. </summary>
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
@@ -2028,11 +2043,11 @@ namespace Crow
 
 			if (Parent != null)
 				tmp = Parent.ToString () + tmp;
-			#if DEBUG_LAYOUTING
+			/*#if DEBUG_LAYOUTING
 			return Name == "unamed" ? tmp + "." + this.GetType ().Name + GraphicObjects.IndexOf(this).ToString(): tmp + "." + Name;
-			#else
+			#else*/
 			return string.IsNullOrEmpty(Name) ? tmp + "." + this.GetType ().Name : tmp + "." + Name;
-			#endif
+			//#endif
 		}
 		/// <summary>
 		/// Checks to handle when widget is removed from the visible graphic tree

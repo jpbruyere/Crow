@@ -1,0 +1,15 @@
+﻿<?xml version="1.0"?>
+<Container Background="DimGrey" Margin="10" Width="Fit" Height="Fit" >
+	<VerticalStack Width="Stretched" Margin="10" Background="RoyalBlue">
+		<VerticalStack Width="Stretched" Margin="10" Background="FireBrick">
+			<VerticalStack Width="Stretched" Margin="10" Background="Teal">
+				<VerticalStack Width="Stretched" Margin="10" Background="CornflowerBlue">
+					<Label Text="{./Caption}" Width="Stretched"/>
+					<Label Text="{./Caption}" Width="Stretched"/>
+					<Label Text="{./Caption}" Width="Stretched"/>
+					<Label Text="{./Caption}" Width="Stretched"/>
+				</VerticalStack>
+			</VerticalStack>
+		</VerticalStack>
+	</VerticalStack>
+</Container>

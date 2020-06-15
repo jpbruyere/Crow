@@ -1,28 +1,7 @@
-﻿//
-// DbgLogViewer.cs
+﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -359,31 +338,31 @@ namespace Crow
 					//if (x + w > cb.Right)
 					//	continue;
 
-					Color c = Color.Black;
+					Color c = Colors.Black;
 
 					if (evt.type == DbgEvtType.GOProcessLayouting) {
 						switch (evt.data.result) {
 						case LayoutingQueueItem.Result.Success:
-							c = Crow.Color.Green;
+							c = Crow.Colors.Green;
 							break;
 						case LayoutingQueueItem.Result.Deleted:
-							c = Crow.Color.Red;
+							c = Crow.Colors.Red;
 							break;
 						case LayoutingQueueItem.Result.Discarded:
-							c = Crow.Color.OrangeRed;
+							c = Crow.Colors.OrangeRed;
 							break;
 						case LayoutingQueueItem.Result.Requeued:
-							c = Crow.Color.Orange;
+							c = Crow.Colors.Orange;
 							break;
 						}
 					} else if (evt.type.HasFlag (DbgEvtType.GOLock))
-						c = Color.BlueViolet;
+						c = Colors.BlueViolet;
 					else if (colors.ContainsKey (evt.type))
 						c = colors [evt.type];
 					//else
 					//	System.Diagnostics.Debugger.Break ();
 					c = c.AdjustAlpha (0.2);
-					gr.SetSourceColor (c);
+					gr.SetSource (c);
 
 					gr.Rectangle (x, penY, w, fe.Height);
 					gr.Fill ();
@@ -391,7 +370,7 @@ namespace Crow
 
 				penY += fe.Height;
 
-				gr.SetSourceColor (Crow.Color.Jet);
+				gr.SetSource (Crow.Colors.Jet);
 				gr.MoveTo (cb.X, penY - 0.5);
 				gr.LineTo (cb.Right, penY - 0.5);
 				gr.Stroke ();
@@ -399,14 +378,14 @@ namespace Crow
 				double penX = 5.0 * g.xLevel + cb.Left;
 
 				if (g.yIndex == 0)
-					gr.SetSourceColor (Crow.Color.LightSalmon);
+					gr.SetSource (Crow.Colors.LightSalmon);
 				else
 					Foreground.SetAsSource (gr);
 
 				gr.MoveTo (penX, penY - gr.FontExtents.Descent);
 				gr.ShowText (g.name);
 
-				gr.SetSourceColor (Crow.Color.White);
+				gr.SetSource (Crow.Colors.White);
 				gr.MoveTo (cb.X, penY - gr.FontExtents.Descent);
 				gr.ShowText ((i+ ScrollY).ToString());
 
@@ -418,7 +397,7 @@ namespace Crow
 
 			gr.MoveTo (leftMargin + cb.Left, cb.Top);
 			gr.LineTo (leftMargin + cb.Left, cb.Bottom);
-			gr.SetSourceColor (Crow.Color.Grey);
+			gr.SetSource (Crow.Colors.Grey);
 
 			penY = topMargin + ClientRectangle.Top;
 
@@ -456,7 +435,7 @@ namespace Crow
 				double x = xScale * (evt.begin - minTicks - ScrollX) ;
 				x += leftMargin + cb.Left;
 
-				gr.SetSourceColor (Crow.Color.Yellow);
+				gr.SetSource (Crow.Colors.Yellow);
 				gr.MoveTo (x, penY);
 				gr.LineTo (x, cb.Bottom);
 				gr.Stroke ();
@@ -465,7 +444,7 @@ namespace Crow
 				gr.Rectangle (x - 0.5 * te.Width , penY - te.Height, te.Width, te.Height);
 				gr.Fill ();
 				gr.MoveTo (x- 0.5 * te.Width, penY - gr.FontExtents.Descent);
-				gr.SetSourceColor (Crow.Color.Jet);
+				gr.SetSource (Crow.Colors.Jet);
 				gr.ShowText (s);
 
 			}
@@ -480,7 +459,7 @@ namespace Crow
 			Rectangle cb = ClientRectangle;
 
 			ctx.Rectangle (ctxR);
-			ctx.SetSourceColor (Color.CornflowerBlue);
+			ctx.SetSource (Colors.CornflowerBlue);
 			ctx.Fill();
 
 			ctx.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
@@ -521,7 +500,7 @@ namespace Crow
 			ctxR.Width = Math.Max (1, ctxR.Width);
 			ctx.Rectangle (ctxR);
 			//ctx.SetSourceColor (Color.LightYellow);
-			ctx.SetSourceColor (Color.Jet);
+			ctx.SetSource (Colors.Jet);
 			ctx.Fill();
 			ctx.Operator = Cairo.Operator.Over;
 
@@ -577,7 +556,7 @@ namespace Crow
 			base.onMouseMove (sender, e);
 			updateMouseLocalPos (e.Position);
 
-			if (selStart >= 0 && IFace.Mouse.IsButtonDown(MouseButton.Left))
+			if (selStart >= 0 && IFace.IsDown (Glfw.MouseButton.Left))
 				selEnd = currentTick;
 
 			if (RegisteredLayoutings == LayoutingType.None && !IsDirty)
@@ -627,7 +606,7 @@ namespace Crow
 		{
 			base.onKeyDown (sender, e);
 
-			if (e.Key == Key.F3) {
+			if (e.Key == Glfw.Key.F3) {
 				if (selEnd < 0)
 					return;
 				if (selEnd < selStart)

@@ -5,7 +5,7 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
-
+using static Crow.Logger;
 namespace Crow {
 	/// <summary>
 	/// group container that stacked its children horizontally or vertically
@@ -118,7 +118,7 @@ namespace Crow {
 					stretchedGO.Slot.Width = newW;
 					stretchedGO.IsDirty = true;
 #if DEBUG_LAYOUTING
-				Debug.WriteLine ("\tAdjusting Width of " + stretchedGO.ToString());
+					LOG ($"width: {stretchedGO.ToString()}");
 #endif
 					stretchedGO.LayoutChanged -= OnChildLayoutChanges;
 					stretchedGO.OnLayoutChanges (LayoutingType.Width);
@@ -135,7 +135,7 @@ namespace Crow {
 					stretchedGO.Slot.Height = newH;
 					stretchedGO.IsDirty = true;
 #if DEBUG_LAYOUTING
-					Debug.WriteLine ("\tAdjusting Height of " + stretchedGO.ToString());
+					LOG ($"height: {stretchedGO.ToString ()}");
 #endif
 					stretchedGO.LayoutChanged -= OnChildLayoutChanges;
 					stretchedGO.OnLayoutChanges (LayoutingType.Height);

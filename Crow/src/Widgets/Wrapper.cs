@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-
+using static Crow.Logger;
 namespace Crow
 {
 	/// <summary>
@@ -192,10 +192,9 @@ namespace Crow
 		}
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
-			#if DEBUG_LAYOUTING
-			IFace.currentLQI.Slot = LastSlots;
-			IFace.currentLQI.Slot = Slot;
-			#endif
+#if DEBUG_LAYOUTING
+			LOG ($"{layoutType}: {LastSlots}->{Slot}");
+#endif
 			switch (layoutType) {
 			case LayoutingType.Width:
 				foreach (Widget c in Children) {
