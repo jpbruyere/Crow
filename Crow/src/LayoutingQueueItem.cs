@@ -75,7 +75,7 @@ namespace Crow
 			Slot = Rectangle.Zero;
 			NewSlot = Rectangle.Zero;
 			result = Result.Register;
-			DebugLog.AddEvent (DbgEvtType.GORegisterLayouting, this);
+			DbgLogger.AddEvent (DbgEvtType.GORegisterLayouting, this);
 			#endif
 		}
 		#endregion
@@ -95,19 +95,16 @@ namespace Crow
 				//cancel layouting for object without parent, maybe some were in queue when
 				//removed from a listbox
 				#if DEBUG_LOG
-				DebugLog.AddEvent (DbgEvtType.GOProcessLayoutingWithNoParent, this);
+				DbgLogger.AddEvent (DbgEvtType.GOProcessLayoutingWithNoParent, this);
 				#endif
 				go.parentRWLock.ExitReadLock ();
 				return;
 			}
 			#if DEBUG_LOG
-			DbgEvent dbgEvt = DebugLog.AddEvent (DbgEvtType.GOProcessLayouting, this);
+			DbgLogger.DbgEvent dbgEvt = DbgLogger.StartEvent (DbgEvtType.GOProcessLayouting, this);
 			#endif
 			LayoutingTries++;
 			if (!Layoutable.UpdateLayout (LayoutType)) {
-				#if DEBUG_LOG
-				dbgEvt.end = DebugLog.chrono.ElapsedTicks;
-				#endif
 				if (LayoutingTries < Interface.MaxLayoutingTries) {
 					Layoutable.RegisteredLayoutings |= LayoutType;
 					(Layoutable as Widget).IFace.LayoutingQueue.Enqueue (this);
@@ -133,7 +130,7 @@ namespace Crow
 			else{
 				result = Result.Success;
 			}
-			dbgEvt.data = this;
+			DbgLogger.EndEvent (DbgEvtType.GOProcessLayouting).data = this;
 			#endif
 			go.parentRWLock.ExitReadLock ();
 		}

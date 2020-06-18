@@ -114,13 +114,6 @@ namespace Crow
 				};
 				t.Start ();
 			}
-
-#if MEASURE_TIME
-			PerfMeasures.Add (updateMeasure);
-			PerfMeasures.Add (drawingMeasure);
-			PerfMeasures.Add (layoutingMeasure);
-			PerfMeasures.Add (clippingMeasure);
-#endif
 		}
 		#endregion
 
@@ -221,27 +214,29 @@ namespace Crow
 			while (!Glfw3.WindowShouldClose (hWin)) {
 				Update ();
 				Thread.Sleep (UPDATE_INTERVAL);
-#if MEASURE_TIME
-				foreach (PerformanceMeasure m in PerfMeasures) 
-					m.NotifyChanges ();
-#endif
 			}
 		}
 		protected virtual void OnInitialized ()
 		{
-			try {
+			/*try {
 				Load ("#main.crow").DataSource = this;
-			} catch { }
+			} catch { }*/
 			Initialized.Raise (this, null);
 		}
 		/// <summary>
 		/// load styling, init default tooltips and context menus, load main.crow resource if exists.
 		/// </summary>
 		public void Init () {
+#if DEBUG_LOG
+			DbgLogger.StartEvent (DbgEvtType.IFaceInit);
+#endif
 			loadStyling ();
 			initTooltip ();
 			initContextMenus ();
 			OnInitialized ();
+#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.IFaceInit);
+#endif
 		}
 		/// <summary>
 		/// call Init() then enter the running loop performing ProcessEvents until running==false.
@@ -560,8 +555,14 @@ namespace Crow
 		public Widget Load (string path)
 		{
 			lock (UpdateMutex) {
+				#if DEBUG_LOG
+				DbgLogger.StartEvent (DbgEvtType.IFaceLoad);
+				#endif
 				Widget tmp = CreateInstance (path);
 				AddWidget (tmp);
+				#if DEBUG_LOG
+				DbgLogger.EndEvent (DbgEvtType.IFaceLoad);
+				#endif
 				return tmp;
 			}
 		}
@@ -613,21 +614,13 @@ namespace Crow
 
 				_activeWidget = value;
 
-				#if DEBUG_FOCUS
+#if DEBUG_LOG
 				NotifyValueChanged("ActiveWidget", _activeWidget);
-				#endif
+				DbgLogger.AddEvent (DbgEvtType.ActiveWidget, _activeWidget);
+#endif
 
 				if (_activeWidget != null)
-				{
 					_activeWidget.IsActive = true;
-					#if DEBUG_FOCUS
-					NotifyValueChanged("ActiveWidget", _activeWidget);
-					Debug.WriteLine("Active => " + _activeWidget.ToString());
-				}else
-					Debug.WriteLine("Active => null");
-					#else
-				}
-					#endif
 			}
 		}
 		/// <summary>Pointer is over the widget</summary>
@@ -643,9 +636,10 @@ namespace Crow
 
 				_hoverWidget = value;
 
-				#if DEBUG_FOCUS
+#if DEBUG_LOG
 				NotifyValueChanged("HoverWidget", _hoverWidget);
-				#endif
+				DbgLogger.AddEvent (DbgEvtType.HoverWidget, _hoverWidget);
+#endif
 
 				if (DragAndDropOperation == null && FOCUS_ON_HOVER) {
 					Widget w = _hoverWidget;
@@ -659,15 +653,7 @@ namespace Crow
 				}
 
 				if (_hoverWidget != null)
-				{
 					_hoverWidget.IsHover = true;
-#if DEBUG_FOCUS
-					Debug.WriteLine("Hover => " + _hoverWidget.ToString());
-				}else
-					Debug.WriteLine("Hover => null");
-#else
-				}
-#endif					
 			}
 		}
 		/// <summary>Widget has the keyboard or mouse focus</summary>
@@ -679,19 +665,12 @@ namespace Crow
 				if (_focusedWidget != null)
 					_focusedWidget.HasFocus = false;
 				_focusedWidget = value;
-				#if DEBUG_FOCUS
+#if DEBUG_LOG
 				NotifyValueChanged("FocusedWidget", _focusedWidget);
-				#endif
-				if (_focusedWidget != null)
-				{
-					_focusedWidget.HasFocus = true;
-#if DEBUG_FOCUS
-					Debug.WriteLine ("Focus => " + _hoverWidget.ToString ());
-				} else
-					Debug.WriteLine ("Focus => null");
-#else
-				}
+				DbgLogger.AddEvent (DbgEvtType.FocusedWidget, _focusedWidget);
 #endif
+				if (_focusedWidget != null)
+					_focusedWidget.HasFocus = true;
 			}
 		}
 		#endregion
@@ -707,7 +686,7 @@ namespace Crow
 				if (g.IsQueueForClipping)
 					return;
 				#if DEBUG_LOG
-				DebugLog.AddEvent(DbgEvtType.GOEnqueueForRepaint, g);
+				DbgLogger.AddEvent(DbgEvtType.GOEnqueueForRepaint, g);
 				#endif	
 				ClippingQueue.Enqueue (g);
 				g.IsQueueForClipping = true;
@@ -742,14 +721,10 @@ namespace Crow
 
 			if (!Monitor.TryEnter (UpdateMutex))
 				return;
-
-			#if MEASURE_TIME
-			updateMeasure.StartCycle();
-			#endif
-
-			/*#if DEBUG_LOG
-			DebugLog.AddEvent (DbgEvtType.IFaceUpdate);
-			#endif*/
+				
+#if DEBUG_LOG
+			DbgLogger.StartEvent (DbgEvtType.IFaceUpdate);
+#endif
 
 			processLayouting ();
 
@@ -761,8 +736,8 @@ namespace Crow
 			}else
 				processDrawing (ctx);
 
-#if MEASURE_TIME
-			updateMeasure.StopCycle();
+#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.IFaceUpdate, true);
 #endif
 
 			Monitor.Exit (UpdateMutex);
@@ -771,14 +746,10 @@ namespace Crow
 		/// Layouting queue items. Failing LQI's are requeued in this cycle until MaxTry is reached which
 		/// trigger an enqueue for the next Update Cycle</summary>
 		protected virtual void processLayouting(){
-			#if MEASURE_TIME
-			layoutingMeasure.StartCycle();
-			#endif
 			if (Monitor.TryEnter (LayoutMutex)) {
-				#if DEBUG_LOG
-				if (LayoutingQueue.Count > 0)
-					DebugLog.AddEvent (DbgEvtType.IFaceStartLayouting);
-				#endif
+#if DEBUG_LOG
+				DbgLogger.StartEvent (DbgEvtType.IFaceLayouting);
+#endif
 				DiscardQueue = new Queue<LayoutingQueueItem> ();
 				//Debug.WriteLine ("======= Layouting queue start =======");
 				LayoutingQueueItem lqi;
@@ -787,27 +758,20 @@ namespace Crow
 					lqi.ProcessLayouting ();
 				}
 				LayoutingQueue = DiscardQueue;
+#if DEBUG_LOG
+				DbgLogger.EndEvent (DbgEvtType.IFaceLayouting, true);
+#endif
 				Monitor.Exit (LayoutMutex);
 				DiscardQueue = null;
 			}
-			/*#if DEBUG_LOG
-			DebugLog.AddEvent (DbgEvtType.IFaceStartLayouting);
-			#endif*/
-			#if MEASURE_TIME
-			layoutingMeasure.StopCycle();
-			#endif
 		}
 		/// <summary>Degueue Widget to clip from DrawingQueue and register the last painted slot and the new one
 		/// Clipping rectangles are added at each level of the tree from leef to root, that's the way for the painting
 		/// operation to known if it should go down in the tree for further graphic updates and repaints</summary>
 		void clippingRegistration(){
-			#if MEASURE_TIME
-			clippingMeasure.StartCycle();
-			#endif
-			#if DEBUG_LOG
-			if (ClippingQueue.Count > 0)
-				DebugLog.AddEvent (DbgEvtType.IFaceStartClipping);
-			#endif
+#if DEBUG_LOG
+			DbgLogger.StartEvent (DbgEvtType.IFaceClipping);
+#endif
 			Widget g = null;
 			while (ClippingQueue.Count > 0) {
 				lock (ClippingMutex) {
@@ -816,23 +780,16 @@ namespace Crow
 				}
 				g.ClippingRegistration ();
 			}
-			/*#if DEBUG_LOG
-			DebugLog.AddEvent (DbgEvtType.IFaceEndClipping);
-			#endif*/
-			#if MEASURE_TIME
-			clippingMeasure.StopCycle();
-			#endif
+#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.IFaceClipping, true);
+#endif
 		}
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
 		void processDrawing(Context ctx){
-			#if MEASURE_TIME
-			drawingMeasure.StartCycle();
-			#endif
-			#if DEBUG_LOG
-			if (!clipping.IsEmpty)
-				DebugLog.AddEvent (DbgEvtType.IFaceStartDrawing);
-			#endif
+#if DEBUG_LOG
+			DbgLogger.StartEvent (DbgEvtType.IFaceDrawing);
+#endif
 			if (DragImage != null)
 				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
 				if (!clipping.IsEmpty) {
@@ -894,12 +851,9 @@ namespace Crow
 					clipping = new Region ();
 				}
 			
-			/*#if DEBUG_LOG
-			DebugLog.AddEvent (DbgEvtType.IFaceEndDrawing);
-			#endif*/
-			#if MEASURE_TIME
-			drawingMeasure.StopCycle();
-			#endif
+#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.IFaceDrawing, true);
+#endif
 		}
 		#endregion
 
@@ -1483,13 +1437,7 @@ namespace Crow
 		public Rectangle getSlot () { return ClientRectangle; }
 		#endregion
 
-#if MEASURE_TIME
-		public PerformanceMeasure clippingMeasure = new PerformanceMeasure ("Clipping", 1);
-		public PerformanceMeasure layoutingMeasure = new PerformanceMeasure ("Layouting", 1);
-		public PerformanceMeasure updateMeasure = new PerformanceMeasure ("Update", 1);
-		public PerformanceMeasure drawingMeasure = new PerformanceMeasure ("Drawing", 1);
-		public List<PerformanceMeasure> PerfMeasures = new List<PerformanceMeasure> ();
-#endif
+
 #if DEBUG_LAYOUTING
 		public List<LQIList> LQIsTries = new List<LQIList>();
 		public LQIList curLQIsTries = new LQIList();

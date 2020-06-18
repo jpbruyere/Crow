@@ -339,6 +339,9 @@ namespace Crow {
 		/// Items loading thread
 		/// </summary>
 		void loading(){
+#if DEBUG_LOG
+			DbgLogger.StartEvent (DbgEvtType.TGLoadingThread, this);
+#endif
 			try {
 				loadPage (data, items, dataTest);
 			} catch (Exception ex) {
@@ -346,20 +349,22 @@ namespace Crow {
 					Monitor.Exit (IFace.LayoutMutex);
 				System.Diagnostics.Debug.WriteLine ("loading thread aborted: " + ex.ToString());
 			}
-
+#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.TGLoadingThread);
+#endif
 		}
-//			//if (!ItemTemplates.ContainsKey ("default"))
-//			//	ItemTemplates ["default"] = Interface.GetItemTemplate (ItemTemplate);
-//
-//			for (int i = 1; i <= (data.Count / itemPerPage) + 1; i++) {
-//				if ((bool)loadingThread?.cancelRequested) {
-//					this.Dispose ();
-//					return;
-//				}
-//				loadPage (i);
-//				Thread.Sleep (1);
-//			}
-//		}
+		//			//if (!ItemTemplates.ContainsKey ("default"))
+		//			//	ItemTemplates ["default"] = Interface.GetItemTemplate (ItemTemplate);
+		//
+		//			for (int i = 1; i <= (data.Count / itemPerPage) + 1; i++) {
+		//				if ((bool)loadingThread?.cancelRequested) {
+		//					this.Dispose ();
+		//					return;
+		//				}
+		//				loadPage (i);
+		//				Thread.Sleep (1);
+		//			}
+		//		}
 		void cancelLoadingThread(){
 			if (loadingThread == null)
 				return;
@@ -367,7 +372,7 @@ namespace Crow {
 			bool layoutMx = Monitor.IsEntered (IFace.LayoutMutex);
 
 #if DEBUG_LOG
-			DebugLog.AddEvent (DbgEvtType.TGCancelLoadingThread, this);
+			DbgLogger.AddEvent (DbgEvtType.TGCancelLoadingThread, this);
 #endif
 
 			if (layoutMx)

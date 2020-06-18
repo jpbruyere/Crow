@@ -228,7 +228,7 @@ namespace Crow
 			Clipping = new Region ();
 			#if DEBUG_LOG
 			GraphicObjects.Add (this);
-			DebugLog.AddEvent(DbgEvtType.GOClassCreation, this);
+			DbgLogger.AddEvent(DbgEvtType.GOClassCreation, this);
 			#endif			
 		}
 		/// <summary>
@@ -480,7 +480,7 @@ namespace Crow
 		/// If enabled, resulting bitmap of graphic object is cached
 		/// speeding up rendering of complex object. Default is enabled.
 		/// </summary>
-		[DesignCategory ("Behavior")][DefaultValue(true)]
+		[DesignCategory ("Behavior")][DefaultValue(false)]
 		public virtual bool CacheEnabled {
 			get { return cacheEnabled; }
 			set {
@@ -954,14 +954,14 @@ namespace Crow
 					rootDataLevel = true;
 
 				#if DEBUG_LOG
-				DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GOLockUpdate, this);
+				DbgLogger.StartEvent(DbgEvtType.GOLockUpdate, this);
 				#endif
 				lock (IFace.UpdateMutex) {
 					OnDataSourceChanged (this, dse);
 					NotifyValueChangedAuto (DataSource);
 				}
 				#if DEBUG_LOG
-				dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+				DbgLogger.EndEvent (DbgEvtType.GOLockUpdate);
 				#endif
 			}
 			get {
@@ -995,7 +995,7 @@ namespace Crow
 		public virtual void OnDataSourceChanged(object sender, DataSourceChangeEventArgs e){
 			DataSourceChanged.Raise (this, e);
 			#if DEBUG_LOG
-			DebugLog.AddEvent(DbgEvtType.GONewDataSource, this);
+			DbgLogger.AddEvent(DbgEvtType.GONewDataSource, this);
 			#endif
 
 			#if DEBUG_BINDING
@@ -1044,7 +1044,7 @@ namespace Crow
 		public void loadDefaultValues()
 		{
 			#if DEBUG_LOG
-			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GOInitialization, this);
+			DbgLogger.StartEvent (DbgEvtType.GOInitialization, this);
 			#endif
 
 			Type thisType = this.GetType ();
@@ -1165,11 +1165,6 @@ namespace Crow
 			/*} catch (Exception ex) {
 				throw new Exception ("Error applying style <" + styleKey + ">:", ex);
 			}*/
-
-			#if DEBUG_LOG
-			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
-			#endif
-
 			onInitialized (this, null);
 		}
 		void setDefaultValue (ILGenerator il, PropertyInfo pi, ref List<Style> styling)
@@ -1227,6 +1222,9 @@ namespace Crow
 
 		protected virtual void onInitialized (object sender, EventArgs e){
 			Initialized.Raise(sender, e);
+			#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.GOInitialization);
+			#endif
 		}
 		bool getDefaultEvent(EventInfo ei, List<Style> styling,
 			out string expression){
@@ -1361,7 +1359,7 @@ namespace Crow
 		/// </summary>
 		public virtual void ClippingRegistration(){
 			#if DEBUG_LOG
-			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GOClippingRegistration, this);
+			DbgLogger.StartEvent (DbgEvtType.GOClippingRegistration, this);
 			#endif	
 			parentRWLock.EnterReadLock ();
 			if (parent != null) {					
@@ -1370,7 +1368,7 @@ namespace Crow
 			}
 			parentRWLock.ExitReadLock ();
 			#if DEBUG_LOG
-			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+			DbgLogger.EndEvent (DbgEvtType.GOClippingRegistration);
 			#endif
 		}
 		/// <summary>
@@ -1383,7 +1381,7 @@ namespace Crow
 				return;
 			}
 			#if DEBUG_LOG
-			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GORegisterClip, this);
+			DbgLogger.StartEvent(DbgEvtType.GORegisterClip, this);
 			#endif
 			Rectangle cb = ClientRectangle;
 			Rectangle  r = clip + cb.Position;
@@ -1393,18 +1391,29 @@ namespace Crow
 				r.Height -= r.Bottom - cb.Bottom;
 			if (r.Width < 0 || r.Height < 0) {
 				//Debug.WriteLine ($"Invalid clip: {clip}:{r} hnd:{this}");//\n{Environment.StackTrace}");
-				return;
+				#if DEBUG_LOG
+				DbgLogger.EndEvent (DbgEvtType.GORegisterClip);
+				#endif
+			return;
 			}
 			if (cacheEnabled && !IsDirty)
 				Clipping.UnionRectangle (r);
-			if (Parent == null)
+			if (Parent == null) {
+				#if DEBUG_LOG
+				DbgLogger.EndEvent (DbgEvtType.GORegisterClip);
+				#endif
 				return;
+			}
 			Widget p = Parent as Widget;
-			if (p?.IsDirty == true && p?.CacheEnabled == true)
+			if (p?.IsDirty == true && p?.CacheEnabled == true) {
+				#if DEBUG_LOG
+				DbgLogger.EndEvent (DbgEvtType.GORegisterClip);
+				#endif
 				return;
+			}
 			Parent.RegisterClip (r + Slot.Position);
 			#if DEBUG_LOG
-			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+			DbgLogger.EndEvent (DbgEvtType.GORegisterClip);
 			#endif
 		}
 		/// <summary> Full update, if width or height is 'Fit' a layouting is requested, and a redraw is done in any case. </summary>
@@ -1433,7 +1442,6 @@ namespace Crow
 				return;
 			}
 #endif
-
 			IsDirty = true;
 			if (RegisteredLayoutings == LayoutingType.None)
 				IFace.EnqueueForRepaint (this);
@@ -1476,15 +1484,19 @@ namespace Crow
 #endif
 			if (Parent == null)
 				return;
-#if DEBUG_LOG
-			DbgEvent dbgEvt = DebugLog.AddEvent (DbgEvtType.GOLockLayouting, this);
-#endif
+			#if DEBUG_LOG
+			DbgLogger.StartEvent (DbgEvtType.GOLockLayouting, this);
+			#endif
 			lock (IFace.LayoutMutex) {
 				//prevent queueing same LayoutingType for this
 				layoutType &= (~RegisteredLayoutings);
 
-				if (layoutType == LayoutingType.None)
+				if (layoutType == LayoutingType.None) {
+					#if DEBUG_LOG
+					DbgLogger.EndEvent (DbgEvtType.GOLockLayouting);
+					#endif
 					return;
+				}
 				//dont set position for stretched item
 				if (Width == Measure.Stretched)
 					layoutType &= (~LayoutingType.X);
@@ -1501,8 +1513,12 @@ namespace Crow
 //				//prevent queueing same LayoutingType for this
 				layoutType &= (~RegisteredLayoutings);
 
-				if (layoutType == LayoutingType.None)
+				if (layoutType == LayoutingType.None) {
+					#if DEBUG_LOG
+					DbgLogger.EndEvent (DbgEvtType.GOLockLayouting);
+					#endif
 					return;
+				}
 
 				//enqueue LQI LayoutingTypes separately
 				if (layoutType.HasFlag (LayoutingType.Width))
@@ -1516,9 +1532,9 @@ namespace Crow
 				if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
 					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
 			}
-#if DEBUG_LOG
-			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
-#endif
+			#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.GOLockLayouting);
+			#endif
 		}
 
 		/// <summary> trigger dependant sizing component update </summary>
@@ -1695,7 +1711,7 @@ namespace Crow
 		protected virtual void onDraw(Context gr)
 		{
 			#if DEBUG_LOG
-			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GODraw, this);
+			DbgLogger.StartEvent(DbgEvtType.GODraw, this);
 			#endif
 
 			Rectangle rBack = new Rectangle (Slot.Size);
@@ -1705,7 +1721,7 @@ namespace Crow
 			gr.Fill ();
 
 			#if DEBUG_LOG
-			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+			DbgLogger.EndEvent (DbgEvtType.GODraw);
 			#endif
 		}
 
@@ -1715,7 +1731,7 @@ namespace Crow
 		protected virtual void RecreateCache ()
 		{
 			#if DEBUG_LOG
-			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GORecreateCache, this);
+			DbgLogger.StartEvent (DbgEvtType.GORecreateCache, this);
 			#endif
 
 			/*if (bmp == null)
@@ -1734,12 +1750,12 @@ namespace Crow
 			IsDirty = false;
 
 			#if DEBUG_LOG
-			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+			DbgLogger.EndEvent (DbgEvtType.GORecreateCache);
 			#endif
 		}
 		protected virtual void UpdateCache(Context ctx){
 			#if DEBUG_LOG
-			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GOUpdateCacheAndPaintOnCTX, this);
+			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);
 			#endif
 
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
@@ -1756,7 +1772,7 @@ namespace Crow
 			Clipping.Dispose ();
 			Clipping = new Region ();
 			#if DEBUG_LOG
-			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+			DbgLogger.EndEvent (DbgEvtType.GOUpdateCache);
 			#endif
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version
@@ -1764,7 +1780,7 @@ namespace Crow
 		public virtual void Paint (ref Context ctx)
 		{
 #if DEBUG_LOG
-			DebugLog.AddEvent(DbgEvtType.GOPaint, this);
+			DbgLogger.AddEvent(DbgEvtType.GOPaint, this);
 #endif
 			//TODO:this test should not be necessary
 

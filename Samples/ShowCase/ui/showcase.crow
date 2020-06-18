@@ -20,8 +20,7 @@
 			</HorizontalStack>
 			<HorizontalStack>
 				<Scroller Name="scroller1" Background="White"
-						Margin="2" ScrollY="{../scrollbar1.Value}"
-						ValueChanged="./_scroller_ValueChanged">
+						Margin="2" ScrollY="{../scrollbar1.Value}">
 					<TextBox VerticalAlignment="Top"
 						Text="{²Source}" Multiline="true" TextAlignment="TopLeft"
 						Font="mono 10"/>

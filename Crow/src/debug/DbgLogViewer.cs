@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Crow.Cairo;
 
 #if DEBUG_LOG
@@ -13,24 +14,118 @@ namespace Crow
 {
 	public class DbgLogViewer : ScrollingObject
 	{
-		public static Dictionary<DbgEvtType,Color> colors;
+		public static Dictionary<DbgEvtType, Color> colors;
 
- 		public static Configuration colorsConf = new Configuration("dbgcolor.conf");
+		public static Configuration colorsConf = new Configuration ("dbgcolor.conf");//, Interface.GetStreamFromPath("#Crow.dbgcolor.conf"));
 
 		#region debug viewer private classes
-		public class DbgData {
-			public int objInstanceNum;
-			public LayoutingType layout;
+		public class DbgLayoutEvent : DbgWidgetEvent
+		{
+			public LayoutingType layouting;
 			public LayoutingQueueItem.Result result;
-
-			public DbgData (int _obj) {
-				objInstanceNum = _obj;
+			public override Color Color {
+				get {
+					if (type == DbgEvtType.GORegisterLayouting)
+						return Colors.GreenYellow;
+					if (type == DbgEvtType.GOProcessLayoutingWithNoParent)
+						return Colors.DarkRed;
+					switch (result) {
+					case LayoutingQueueItem.Result.Success:
+						return Colors.Green;
+					case LayoutingQueueItem.Result.Deleted:
+						return Colors.Red;
+					case LayoutingQueueItem.Result.Discarded:
+						return Colors.OrangeRed;
+					default:
+						return Colors.Orange;
+					}
+				}
+			}
+		}
+		public class DbgWidgetEvent : DbgEvent
+		{
+			public int widgetInstanceId;
+			public override Color Color {
+				get {
+					switch (type) {
+					case DbgEvtType.GOClassCreation:
+						return Colors.DarkSlateGrey;
+					case DbgEvtType.GOInitialization:
+						return Colors.DarkOliveGreen;
+					case DbgEvtType.GOClippingRegistration:
+						return Colors.MediumTurquoise;
+					case DbgEvtType.GORegisterClip:
+						return Colors.Turquoise;
+					case DbgEvtType.GORegisterForGraphicUpdate:
+						return Colors.LightPink;
+					case DbgEvtType.GOEnqueueForRepaint:
+						return Colors.LightSalmon;
+					case DbgEvtType.GONewDataSource:
+						return Colors.MediumVioletRed;
+					case DbgEvtType.GODraw:
+						return Colors.SteelBlue;
+					case DbgEvtType.GORecreateCache:
+						return Colors.CornflowerBlue;
+					case DbgEvtType.GOUpdateCache:
+						return Colors.SteelBlue;
+					case DbgEvtType.GOPaint:
+						return Colors.RoyalBlue;
+					case DbgEvtType.GOLockUpdate:
+						return Colors.SaddleBrown;
+					case DbgEvtType.GOLockClipping:
+						return Colors.Sienna;
+					case DbgEvtType.GOLockRender:
+						return Colors.BurlyWood;
+					case DbgEvtType.GOLockLayouting:
+						return Colors.GoldenRod;
+					case DbgEvtType.TGCancelLoadingThread:
+						return Colors.Maroon;
+					default:
+						return Colors.Crimson;
+					}
+					if (type.HasFlag (DbgEvtType.GOLock))
+						return Colors.DarkMagenta;
+					return Colors.White;
+				}
 			}
 		}
 		public class DbgEvent {
 			public long begin, end;
+			public int threadId;
 			public DbgEvtType type;
-			public DbgData data = null;
+			public DbgEvent parentEvent;
+			public List<DbgEvent> events;
+			public bool HasChildEvents => events != null && events.Count > 0;
+			public long Duration => end - begin;
+
+			public virtual Color Color {
+				get {
+					switch (type) {
+					case DbgEvtType.IFaceLayouting:
+						return Colors.Yellow;
+					case DbgEvtType.IFaceClipping:
+						return Colors.DarkTurquoise;
+					case DbgEvtType.IFaceDrawing:
+						return Colors.MidnightBlue;
+					case DbgEvtType.IFaceUpdate:
+						return Colors.Grey;
+					case DbgEvtType.IFaceLoad:
+						return Colors.Teal;
+					default:
+						return Colors.White;
+					}
+
+				}
+			}
+
+			public void AddEvent (DbgEvent evt)
+			{
+				if (events == null)
+					events = new List<DbgEvent> () { evt };
+				else
+					events.Add (evt);
+				evt.parentEvent = this;
+			}
 
 			public DbgEvent() {}
 
@@ -39,23 +134,40 @@ namespace Crow
 					return null;
 				string[] tmp = str.Trim().Split(';');
 
-				DbgEvent evt = new DbgEvent ();
-				evt.begin = long.Parse (tmp [0]);
-				evt.end = long.Parse (tmp [1]);
-				evt.type = (DbgEvtType)Enum.Parse (typeof(DbgEvtType), tmp [2]);
+				DbgEvtType evtType = (DbgEvtType)Enum.Parse (typeof (DbgEvtType), tmp [3]);
 
-				if (evt.type.HasFlag (DbgEvtType.GraphicObject)) {
-					evt.data = new DbgData (int.Parse (tmp [3]));
-					if (evt.type.HasFlag (DbgEvtType.GOLayouting)) {
-						evt.data.layout = (LayoutingType)Enum.Parse (typeof(LayoutingType), tmp [4]);
-						if (evt.type == DbgEvtType.GOProcessLayouting)
-							evt.data.result = (LayoutingQueueItem.Result)Enum.Parse (typeof(LayoutingQueueItem.Result), tmp [5]);										
-					}
+				if (evtType.HasFlag (DbgEvtType.GraphicObject)) {
+					if (evtType.HasFlag (DbgEvtType.GOLayouting))
+						return new DbgLayoutEvent () {
+							begin = long.Parse (tmp [0]),
+							end = long.Parse (tmp [1]),
+							threadId = int.Parse (tmp [2]),
+							type = evtType,
+							widgetInstanceId = int.Parse (tmp [4]),
+							layouting = (LayoutingType)Enum.Parse (typeof (LayoutingType), tmp [5]),
+							result = evtType == DbgEvtType.GOProcessLayouting ?
+								(LayoutingQueueItem.Result)Enum.Parse (typeof (LayoutingQueueItem.Result), tmp [6])
+								: LayoutingQueueItem.Result.Unknown
+						};
+					return new DbgWidgetEvent () {
+						begin = long.Parse (tmp [0]),
+						end = long.Parse (tmp [1]),
+						threadId = int.Parse (tmp [2]),
+						type = evtType,
+						widgetInstanceId = int.Parse (tmp [4]),
+					};
 				}
-				return evt;
+				return new DbgEvent () {
+					begin = long.Parse (tmp [0]),
+					end = long.Parse (tmp [1]),
+					threadId = int.Parse (tmp [2]),
+					type = evtType,
+				};
 			}
+			public override string ToString ()
+				=> $"{begin}:{end}:{type}";
 		}
-		class DbgGo {
+		public class DbgGo {
 			public int listIndex;//prevent doing an IndexOf on list for each event to know y pos on screen
 			public int instanceNum;//class instantiation order, used to bind events to objs
 			public string name;
@@ -65,7 +177,7 @@ namespace Crow
 			public int yIndex;//index in parenting, the whole main graphic tree is one continuous suite
 			public int xLevel;//depth
 
-			public List<DbgEvent> events = new List<DbgEvent>();
+			public List<DbgEvent> events = new List<DbgEvent>();//flattened event list of this widget
 
 			public static DbgGo Parse (string str) {
 				DbgGo g = new DbgGo ();
@@ -96,20 +208,27 @@ namespace Crow
 			reloadColors ();
 		}
 		protected DbgLogViewer () : base(){}
-		public DbgLogViewer (Interface iface) : base(iface){}
+		public DbgLogViewer (Interface iface, string style = null) : base(iface, style){}
 		#endregion
 
 		FontExtents fe;
 
 		double xScale = 1.0/512.0, yScale = 1.0, leftMargin, topMargin = 0.0;
 		string logFile;
+		DbgGo curWidget;
+		DbgEvent curEvent;
 
-		List<DbgEvent> events;//global events
+		List<DbgEvent> events;
 		List<DbgGo> objs;
+
+		public List<DbgEvent> Events => events;
+		public List<DbgGo> Widgets => objs;
+
 
 		long currentTick = 0, selStart = -1, selEnd = -1, minTicks = 0, maxTicks = 0, visibleTicks = 0;
 		int currentLine = -1;
 		int visibleLines = 1;
+		Point mousePos;
 
 		public string LogFile {
 			get { return logFile; }
@@ -118,7 +237,9 @@ namespace Crow
 					return;
 				logFile = value;
 
+				Console.WriteLine ("before load");
 				loadDebugFile ();
+				Console.WriteLine ("after load");
 
 				NotifyValueChanged ("LogFile", logFile);
 				RegisterForGraphicUpdate ();
@@ -136,7 +257,7 @@ namespace Crow
 			}
 		}
 		public double YScale {
-			get { return yScale; }
+			get => yScale;
 			set {
 				if (yScale == value)
 					return;
@@ -145,113 +266,6 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-
-
-		void storeEvent (DbgEvent evt) {
-			if (evt.data == null)//global events
-				events.Add (evt);
-			else {
-				DbgGo go = objs.Where (o => o.instanceNum == evt.data.objInstanceNum).FirstOrDefault ();
-				if (go == null)
-					System.Diagnostics.Debug.WriteLine ("Unknown instance: " + evt.data.objInstanceNum);
-				else
-					go.events.Add (evt);						
-			}
-		}
-
-		void loadDebugFile() {
-			if (!File.Exists (logFile))
-				return;
-
-			events = new List<DbgEvent>();
-			objs = new List<DbgGo> ();
-			minTicks = maxTicks = 0;
-			leftMargin = topMargin = 0.0;
-
-			using (ImageSurface img = new ImageSurface (Format.Argb32, 1, 1)) {
-				using (Context gr = new Context (img)) {
-					double maxNameWidth = 0.0;
-
-					gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-					gr.SetFontSize (Font.Size);
-
-					using (StreamReader s = new StreamReader (logFile)) {
-						if (s.ReadLine () != "[GraphicObjects]")					
-							return;				
-						while (!s.EndOfStream) {
-							string l = s.ReadLine ();
-							if (l == "[Events]")
-								break;
-							DbgGo o = DbgGo.Parse (l);
-							objs.Add (o);
-							double nameWidth = gr.TextExtents (o.name).Width + 5.0 * o.xLevel;
-							if (nameWidth > maxNameWidth)
-								maxNameWidth = nameWidth;
-						}
-						if (!s.EndOfStream) {
-							DbgEvent firstEvt = DbgEvent.Parse (s.ReadLine ());
-							storeEvent (firstEvt);
-							minTicks = firstEvt.begin;
-						}
-
-						if (!s.EndOfStream) {
-							while (true) {
-								DbgLogViewer.DbgEvent evt = DbgEvent.Parse (s.ReadLine ());
-								storeEvent (evt);
-								if (s.EndOfStream) {
-									maxTicks = evt.end;
-									break;
-								}
-							}
-						}
-					}
-
-					leftMargin = 2.5 + maxNameWidth;
-
-					topMargin = 2.0 * fe.Height;
-
-					updateVisibleLines ();
-					updateVisibleTicks ();
-				}
-			}
-
-		}
-		void updateVisibleLines(){
-			visibleLines = fe.Height < 1 ? 1 : (int)Math.Floor (((double)ClientRectangle.Height - topMargin) / fe.Height);
-			NotifyValueChanged ("VisibleLines", visibleLines);
-			updateMaxScrollY ();
-		}
-		void updateVisibleTicks() {
-			visibleTicks = Math.Max (0, (long)((double)(ClientRectangle.Width - leftMargin) / XScale));
-			NotifyValueChanged ("VisibleTicks", visibleTicks);
-			updateMaxScrollX ();
-		}
-		/*
-		void updateVisibleColumns(){
-			visibleColumns = (int)Math.Floor ((double)(ClientRectangle.Width - leftMargin)/ fe.MaxXAdvance);
-			NotifyValueChanged ("VisibleColumns", visibleColumns);
-			updateMaxScrollX ();
-		}
-		void updateMaxScrollX () {
-			MaxScrollX = Math.Max (0, buffer.longestLineCharCount - visibleColumns);
-			if (buffer.longestLineCharCount > 0)
-				NotifyValueChanged ("ChildWidthRatio", Slot.Width * visibleColumns / buffer.longestLineCharCount);			
-		}*/
-
-		void updateMaxScrollX () {
-			if (objs == null)
-				MaxScrollX = 0;
-			else				
-				MaxScrollX =  (int)Math.Max(0L, maxTicks - minTicks - visibleTicks);
-		}
-		void updateMaxScrollY () {
-			if (objs == null)
-				MaxScrollY = 0;
-			else				
-				MaxScrollY =  Math.Max(0, objs.Count - visibleLines);
-		}
-
-
 		public override Font Font {
 			get { return base.Font; }
 			set {
@@ -266,15 +280,13 @@ namespace Crow
 			}
 		}
 		public override int ScrollY {
-			get {
-				return base.ScrollY;
-			}
+			get => base.ScrollY;
 			set {
 				base.ScrollY = value;
 
 				if (objs == null)
 					return;
-				
+
 				Rectangle cb = ClientRectangle;
 				cb.Left += (int)leftMargin;
 				cb.Width -= (int)leftMargin;
@@ -287,11 +299,90 @@ namespace Crow
 					currentLine = (int)((double)(mousePos.Y - cb.Top) / fe.Height) + ScrollY;
 
 				NotifyValueChanged ("CurrentLine", currentLine);
+			}
+		}
 
+		public DbgGo CurrentWidget {
+			get => curWidget;
+			internal set {
+				if (curWidget == value)
+					return;
+				curWidget = value;
+				NotifyValueChanged (nameof (CurrentWidget), curWidget);
+			}
+		}
+		public DbgEvent CurrentEvent {
+			get => curEvent;
+			internal set {
+				if (curEvent == value)
+					return;
+				curEvent = value;
+				NotifyValueChanged (nameof (CurrentEvent), curEvent);
 			}
 		}
 
 
+		void drawEvents (Context ctx, List<DbgEvent> evts)
+		{
+			if (evts == null || evts.Count == 0)
+				return;
+			Rectangle cb = ClientRectangle;
+
+			foreach (DbgEvent evt in evts) {
+				if (evt.end - minTicks <= ScrollX)
+					continue;
+				if (evt.begin - minTicks > ScrollX + visibleTicks)
+					break;
+				double penY = topMargin + ClientRectangle.Top;
+				if (evt.type.HasFlag (DbgEvtType.GraphicObject)) {
+					DbgWidgetEvent eW = evt as DbgWidgetEvent;
+					int lIdx = eW.widgetInstanceId - ScrollY;
+					if (lIdx < 0 || lIdx > visibleLines)
+						continue;
+					penY += (lIdx) * fe.Height; 
+				
+					ctx.SetSource (evt.Color);
+
+					double x = xScale * (evt.begin - minTicks - ScrollX);
+					double w = Math.Max (Math.Max (2.0, 2.0 * xScale), (double)(evt.end - evt.begin) * xScale);
+					if (x < 0.0) {
+						w += x;
+						x = 0.0;
+					}
+					x += leftMargin + cb.Left;
+					double rightDiff = x + w - cb.Right;
+					if (rightDiff > 0)
+						w -= rightDiff;
+
+					ctx.Rectangle (x, penY, w, fe.Height);
+					ctx.Fill ();
+				} else {
+					double x = xScale * (evt.begin - minTicks - ScrollX);
+					x += leftMargin + cb.Left;
+
+					double trunc = Math.Truncate (x);
+					if (x - trunc > 0.5)
+						x = trunc + 0.5;
+					else
+						x = trunc - 0.5;
+
+
+					ctx.SetSource (Colors.Yellow);
+					ctx.MoveTo (x, penY);
+					ctx.LineTo (x, cb.Bottom);
+					ctx.Stroke ();
+					string s = evt.type.ToString () [5].ToString ();
+					TextExtents te = ctx.TextExtents (s);
+					ctx.Rectangle (x - 0.5 * te.Width, penY - te.Height, te.Width, te.Height);
+					ctx.Fill ();
+					ctx.MoveTo (x - 0.5 * te.Width, penY - ctx.FontExtents.Descent);
+					ctx.SetSource (Colors.Jet);
+					ctx.ShowText (s);
+
+				}
+				drawEvents (ctx, evt.events);
+			}
+		}
 
 		protected override void onDraw (Cairo.Context gr)
 		{
@@ -316,58 +407,6 @@ namespace Crow
 					break;
 				DbgGo g = objs [i + ScrollY];
 
-
-				foreach (DbgEvent evt in g.events) {
-					
-
-					if (evt.end - minTicks <= ScrollX)
-						continue;
-					if (evt.begin - minTicks > ScrollX + visibleTicks)
-						break;
-
-					double x = xScale * (evt.begin - minTicks - ScrollX) ;
-					double w = Math.Max (Math.Max(2.0, 2.0 * xScale), (double)(evt.end - evt.begin) * xScale);
-					if (x < 0.0) {
-						w += x;
-						x = 0.0;
-					}
-					x += leftMargin + cb.Left;
-					double rightDiff = x + w - cb.Right;
-					if (rightDiff > 0)
-						w -= rightDiff;
-					//if (x + w > cb.Right)
-					//	continue;
-
-					Color c = Colors.Black;
-
-					if (evt.type == DbgEvtType.GOProcessLayouting) {
-						switch (evt.data.result) {
-						case LayoutingQueueItem.Result.Success:
-							c = Crow.Colors.Green;
-							break;
-						case LayoutingQueueItem.Result.Deleted:
-							c = Crow.Colors.Red;
-							break;
-						case LayoutingQueueItem.Result.Discarded:
-							c = Crow.Colors.OrangeRed;
-							break;
-						case LayoutingQueueItem.Result.Requeued:
-							c = Crow.Colors.Orange;
-							break;
-						}
-					} else if (evt.type.HasFlag (DbgEvtType.GOLock))
-						c = Colors.BlueViolet;
-					else if (colors.ContainsKey (evt.type))
-						c = colors [evt.type];
-					//else
-					//	System.Diagnostics.Debugger.Break ();
-					c = c.AdjustAlpha (0.2);
-					gr.SetSource (c);
-
-					gr.Rectangle (x, penY, w, fe.Height);
-					gr.Fill ();
-				}
-
 				penY += fe.Height;
 
 				gr.SetSource (Crow.Colors.Jet);
@@ -383,14 +422,28 @@ namespace Crow
 					Foreground.SetAsSource (gr);
 
 				gr.MoveTo (penX, penY - gr.FontExtents.Descent);
-				gr.ShowText (g.name);
+				gr.ShowText (g.name + g.instanceNum);
 
 				gr.SetSource (Crow.Colors.White);
 				gr.MoveTo (cb.X, penY - gr.FontExtents.Descent);
-				gr.ShowText ((i+ ScrollY).ToString());
-
+				gr.ShowText ((i + ScrollY).ToString ());
 			}
 
+			drawEvents (gr, events);
+			/*
+			for (int i = 0; i < visibleLines; i++) { 
+				foreach (DbgEvent evt in events) {
+					if (evt.end - minTicks <= ScrollX)
+						continue;
+					if (evt.begin - minTicks > ScrollX + visibleTicks)
+						break;
+					
+					
+				}
+
+				
+			}
+			*/
 
 			gr.MoveTo (cb.Left, topMargin - 0.5 + cb.Top);
 			gr.LineTo (cb.Right, topMargin - 0.5 + cb.Top);
@@ -429,25 +482,14 @@ namespace Crow
 			gr.Stroke ();
 
 			//global events
-			foreach (DbgEvent evt in events) {
+/*			foreach (DbgEvent evt in events) {
 				if (evt.begin - minTicks <= ScrollX)
 					continue;
 				double x = xScale * (evt.begin - minTicks - ScrollX) ;
 				x += leftMargin + cb.Left;
 
-				gr.SetSource (Crow.Colors.Yellow);
-				gr.MoveTo (x, penY);
-				gr.LineTo (x, cb.Bottom);
-				gr.Stroke ();
-				string s = evt.type.ToString () [10].ToString ();
-				Cairo.TextExtents te = gr.TextExtents (s);
-				gr.Rectangle (x - 0.5 * te.Width , penY - te.Height, te.Width, te.Height);
-				gr.Fill ();
-				gr.MoveTo (x- 0.5 * te.Width, penY - gr.FontExtents.Descent);
-				gr.SetSource (Crow.Colors.Jet);
-				gr.ShowText (s);
 
-			}
+			}*/
 
 		}
 		public override void Paint (ref Cairo.Context ctx)
@@ -473,7 +515,8 @@ namespace Crow
 			ctx.Operator = Cairo.Operator.Add;
 
 			if (currentLine >= 0) {
-				r = new Rectangle (cb.Left, (currentLine + 2 - ScrollY) * (int)fe.Height + cb.Top, cb.Width, (int)fe.Height);
+				double y = fe.Height * (currentLine - ScrollY) + topMargin + cb.Top;
+				r = new Rectangle (cb.Left,  (int)y, cb.Width, (int)fe.Height);
 
 				ctx.Operator = Cairo.Operator.Add;
 				ctx.SetSourceRGBA (0.1, 0.1, 0.1, 0.4);
@@ -481,13 +524,12 @@ namespace Crow
 				ctx.Fill ();
 			}
 
-			if (selStart < 0) {
+			if (selStart < 0 || selEnd < 0) {
 				ctx.Operator = Cairo.Operator.Over;
 				return;
 			}
 			double selStartX = (double)(selStart - ScrollX - minTicks) * xScale + leftMargin + cb.Left;
-			double selEndX = (selEnd >= 0) ? (double)(selEnd - ScrollX - minTicks) * xScale + leftMargin + cb.Left :
-				(double)(currentTick - ScrollX - minTicks) * xScale + leftMargin + cb.Left;
+			double selEndX = (double)(selEnd - ScrollX - minTicks) * xScale + leftMargin + cb.Left;
 
 			if (selStartX < selEndX) {
 				ctxR.X = (int)selStartX;
@@ -518,33 +560,6 @@ namespace Crow
 			}
 		}
 
-		Point mousePos;
-		void updateMouseLocalPos(Point mPos){
-			Rectangle r = ScreenCoordinates (Slot);
-			Rectangle cb = ClientRectangle;
-			cb.Left += (int)leftMargin;
-			cb.Width -= (int)leftMargin;
-			cb.Y += (int)topMargin;
-			cb.Height -= (int)topMargin;
-
-			mousePos = mPos - r.Position;
-
-			mousePos.X = Math.Max(cb.X, mousePos.X);
-			mousePos.X = Math.Min(cb.Right, mousePos.X);
-
-			if (mousePos.Y < cb.Top || mousePos.Y > cb.Bottom)
-				currentLine = -1;
-			else
-				currentLine = (int)((double)(mousePos.Y - cb.Top) / fe.Height) + ScrollY;
-
-			NotifyValueChanged ("CurrentLine", currentLine);
-			
-			mousePos.Y = Math.Max(cb.Y, mousePos.Y);
-			mousePos.Y = Math.Min(cb.Bottom, mousePos.Y);
-
-			currentTick = (int)((double)(mousePos.X - cb.X) / xScale) + minTicks + ScrollX;
-
-		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
@@ -554,10 +569,16 @@ namespace Crow
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
+
+			long lastTick = currentTick;
 			updateMouseLocalPos (e.Position);
 
-			if (selStart >= 0 && IFace.IsDown (Glfw.MouseButton.Left))
+			if (IFace.IsDown (Glfw.MouseButton.Left) && selStart >= 0)
 				selEnd = currentTick;
+			else if (IFace.IsDown(Glfw.MouseButton.Right)) {
+				ScrollX += (int)(lastTick - currentTick);
+				updateMouseLocalPos (e.Position);
+			}
 
 			if (RegisteredLayoutings == LayoutingType.None && !IsDirty)
 				IFace.EnqueueForRepaint (this);
@@ -567,19 +588,20 @@ namespace Crow
 		{
 			base.onMouseDown (sender, e);
 
-			selStart = currentTick;
-			selEnd = -1;
+			if (e.Button == Glfw.MouseButton.Left) {
+				selStart = currentTick;
+				selEnd = -1;
+			}
 
 			RegisterForRedraw ();
 		}
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseUp (sender, e);
-			if (selStart == currentTick) {
-				selStart = -1;
-				selEnd = -1;
-			}else
-				selEnd = currentTick;
+
+			selStart = -1;
+			selEnd = -1;
+
 			RegisterForRedraw ();
 		}
 
@@ -616,7 +638,148 @@ namespace Crow
 				selEnd = selStart = -1;
 			}
 		}
+		async void loadDebugFile ()
+		{
+			await loadDebugFileAsync ();
+		}
 
+
+
+		async Task loadDebugFileAsync ()
+		{
+			if (!File.Exists (logFile))
+				return;
+
+			events = new List<DbgEvent> ();
+			objs = new List<DbgGo> ();
+			minTicks = maxTicks = 0;
+			leftMargin = topMargin = 0.0;
+
+			using (Context gr = new Context (IFace.surf)) {
+				double maxNameWidth = 0.0;
+
+				gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+				gr.SetFontSize (Font.Size);
+
+				using (StreamReader s = new StreamReader (logFile)) {
+					if (s.ReadLine () != "[GraphicObjects]")
+						return;
+					while (!s.EndOfStream) {
+						string l = s.ReadLine ();
+						if (l == "[Events]")
+							break;
+						DbgGo o = DbgGo.Parse (l);
+						objs.Add (o);
+						double nameWidth = gr.TextExtents (o.name).Width + 5.0 * o.xLevel;
+						if (nameWidth > maxNameWidth)
+							maxNameWidth = nameWidth;
+					}
+
+					Stack<DbgEvent> startedEvents = new Stack<DbgEvent> ();
+
+					if (!s.EndOfStream) {
+						while (!s.EndOfStream) {
+							int level = 0;
+							while (s.Peek () == (int)'\t') {
+								s.Read ();
+								level++;
+							}
+							DbgEvent evt = DbgEvent.Parse (s.ReadLine ());
+							if (evt.end > maxTicks)
+								maxTicks = evt.end;
+							if (level == 0) {
+								startedEvents.Clear ();
+								events.Add (evt);
+							} else {
+								int levelDiff = level - startedEvents.Count + 1;
+								if (levelDiff > 0) {
+									if (levelDiff > 1)
+										System.Diagnostics.Debugger.Break ();
+									startedEvents.Peek ().AddEvent (evt);
+								} else {
+									startedEvents.Pop ();
+									if (-levelDiff > startedEvents.Count)
+										System.Diagnostics.Debugger.Break ();
+									while (startedEvents.Count > level)
+										startedEvents.Pop ();
+									startedEvents.Peek ().AddEvent (evt);
+								}
+							}
+							startedEvents.Push (evt);
+							if (evt.type.HasFlag(DbgEvtType.GraphicObject))
+								objs [(evt as DbgWidgetEvent).widgetInstanceId].events.Add (evt);
+						}
+						if (events.Count > 0)
+							minTicks = events [0].begin;
+					}
+				}
+
+				leftMargin = 2.5 + maxNameWidth;
+				topMargin = 2.0 * fe.Height;
+
+				updateVisibleLines ();
+				updateVisibleTicks ();
+			}
+			NotifyValueChanged ("Widgets", Widgets);
+			NotifyValueChanged ("Events", Events);
+		}
+
+		void updateVisibleLines ()
+		{
+			visibleLines = fe.Height < 1 ? 1 : (int)Math.Floor (((double)ClientRectangle.Height - topMargin) / fe.Height);
+			NotifyValueChanged ("VisibleLines", visibleLines);
+			updateMaxScrollY ();
+		}
+		void updateVisibleTicks ()
+		{
+			visibleTicks = Math.Max (0, (long)((double)(ClientRectangle.Width - leftMargin) / XScale));
+			NotifyValueChanged ("VisibleTicks", visibleTicks);
+			updateMaxScrollX ();
+		}
+
+		void updateMaxScrollX ()
+		{
+			if (objs == null)
+				MaxScrollX = 0;
+			else
+				MaxScrollX = (int)Math.Max (0L, maxTicks - minTicks - visibleTicks);
+		}
+		void updateMaxScrollY ()
+		{
+			if (objs == null)
+				MaxScrollY = 0;
+			else
+				MaxScrollY = Math.Max (0, objs.Count - visibleLines);
+		}
+
+		void updateMouseLocalPos (Point mPos)
+		{
+			Rectangle r = ScreenCoordinates (Slot);
+			Rectangle cb = ClientRectangle;
+			cb.Left += (int)leftMargin;
+			cb.Width -= (int)leftMargin;
+			cb.Y += (int)topMargin;
+			cb.Height -= (int)topMargin;
+
+			mousePos = mPos - r.Position;
+
+			mousePos.X = Math.Max (cb.X, mousePos.X);
+			mousePos.X = Math.Min (cb.Right, mousePos.X);
+
+			if (mousePos.Y < cb.Top || mousePos.Y > cb.Bottom)
+				currentLine = -1;
+			else
+				currentLine = (int)((double)(mousePos.Y - cb.Top) / fe.Height) + ScrollY;
+
+			NotifyValueChanged ("CurrentLine", currentLine);
+
+			mousePos.Y = Math.Max (cb.Y, mousePos.Y);
+			mousePos.Y = Math.Min (cb.Bottom, mousePos.Y);
+
+			currentTick = (int)((double)(mousePos.X - cb.X) / xScale) + minTicks + ScrollX;
+			CurrentWidget = (currentLine < 0 || currentLine >= objs.Count) ? null : objs [currentLine];
+			CurrentEvent = curWidget?.events.FirstOrDefault (e => e.begin <= currentTick && e.end >= currentTick);
+		}
 		void zoom (long start, long end) {						
 			//Rectangle cb = ClientRectangle;
 			//cb.X += (int)leftMargin;
