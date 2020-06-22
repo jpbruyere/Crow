@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack Width="60%" Height="60%" Spacing="10" Background="DimGrey" Margin="20" ClipToClientRect="false" CornerRadius="10">
+<VerticalStack Width="60%" Height="60%" Spacing="10" Background="DarkGrey" Margin="20" ClipToClientRect="false" CornerRadius="10">
 	<Label Background="Jet" Text="{TestList3SelProp1}"/>	
 	<ComboBox Data="{TestList3Props1}">		
 	</ComboBox>

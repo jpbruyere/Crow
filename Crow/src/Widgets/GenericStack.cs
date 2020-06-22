@@ -117,9 +117,6 @@ namespace Crow {
 				if (newW != stretchedGO.Slot.Width) {
 					stretchedGO.Slot.Width = newW;
 					stretchedGO.IsDirty = true;
-#if DEBUG_LAYOUTING
-					LOG ($"width: {stretchedGO.ToString()}");
-#endif
 					stretchedGO.LayoutChanged -= OnChildLayoutChanges;
 					stretchedGO.OnLayoutChanges (LayoutingType.Width);
 					stretchedGO.LayoutChanged += OnChildLayoutChanges;
@@ -134,9 +131,6 @@ namespace Crow {
 				if (newH != stretchedGO.Slot.Height) {
 					stretchedGO.Slot.Height = newH;
 					stretchedGO.IsDirty = true;
-#if DEBUG_LAYOUTING
-					LOG ($"height: {stretchedGO.ToString ()}");
-#endif
 					stretchedGO.LayoutChanged -= OnChildLayoutChanges;
 					stretchedGO.OnLayoutChanges (LayoutingType.Height);
 					stretchedGO.LayoutChanged += OnChildLayoutChanges;

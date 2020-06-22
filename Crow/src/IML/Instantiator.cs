@@ -78,9 +78,9 @@ namespace Crow.IML {
 			#endif
 			iface = _iface;
 			sourcePath = srcPath;
-			#if DEBUG_LOAD
-			Stopwatch loadingTime = Stopwatch.StartNew ();
-			#endif
+#if DEBUG_LOG
+			DbgEvent de = DbgLogger.StartEvent (DbgEvtType.CreateITor, sourcePath);
+#endif
 			try {
 				using (XmlReader itr = XmlReader.Create (stream)) {
 					parseIML (itr);
@@ -89,11 +89,8 @@ namespace Crow.IML {
 				throw new InstantiatorException(sourcePath, ex);
 			} finally {
 				stream?.Dispose ();
-#if DEBUG_LOAD
-				loadingTime.Stop ();
-				using (StreamWriter sw = new StreamWriter ("loading.log", true)) {
-					sw.WriteLine ($"ITOR;{sourcePath,-50};{loadingTime.ElapsedTicks,8};{loadingTime.ElapsedMilliseconds,8}");
-				}
+#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.CreateITor, de);
 #endif
 			}
 		}
@@ -136,17 +133,7 @@ namespace Crow.IML {
 		/// </summary>
 		/// <returns>The new graphic object instance</returns>
 		public Widget CreateInstance(){
-#if DEBUG_LOAD
-			Stopwatch loadingTime = Stopwatch.StartNew ();
-			GraphicObject o = loader (iface) as GraphicObject;
-			loadingTime.Stop ();
-			using (StreamWriter sw = new StreamWriter ("loading.log", true)) {
-				sw.WriteLine ($"NEW ;{sourcePath,-50};{loadingTime.ElapsedTicks,8};{loadingTime.ElapsedMilliseconds,8}");
-			}
-			return o;
-#else
 			return loader (iface) as Widget;
-#endif
 		}
 		/// <summary>
 		/// Creates a new instance of T compiled in the instantiator
@@ -154,17 +141,7 @@ namespace Crow.IML {
 		/// </summary>
 		/// <returns>The new T instance</returns>
 		public T CreateInstance<T>(){
-#if DEBUG_LOAD
-			Stopwatch loadingTime = Stopwatch.StartNew ();
-			T i = (T)loader (iface);
-			loadingTime.Stop ();
-			using (StreamWriter sw = new StreamWriter ("loading.log", true)) {
-				sw.WriteLine ($"NEW ;{sourcePath,-50};{loadingTime.ElapsedTicks,8};{loadingTime.ElapsedMilliseconds,8}");
-			}
-			return i;
-#else
 			return (T)loader (iface);
-#endif
 		}
 		List<DynamicMethod> dsValueChangedDynMeths = new List<DynamicMethod>();
 		List<Delegate> cachedDelegates = new List<Delegate>();

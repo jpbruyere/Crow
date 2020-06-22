@@ -146,9 +146,6 @@ namespace Crow
 		}
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{
-#if DEBUG_FOCUS
-			System.Diagnostics.Debug.WriteLine ("MENU CLICK => " + this.ToString ());
-#endif
 			if (command != null) {
 				command.Execute ();
 				closeMenu ();

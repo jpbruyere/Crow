@@ -159,9 +159,6 @@ namespace Crow
 		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{			
 			Widget g = sender as Widget;
-#if DEBUG_LAYOUTING
-			LOG ($"{arg.LayoutType}:{g}->{child.Slot}");
-#endif
 			if (arg.LayoutType == LayoutingType.Width) {
 				contentSize.Width = g.Slot.Width;
 				if (Width != Measure.Fit)

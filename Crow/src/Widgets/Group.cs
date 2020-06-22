@@ -67,9 +67,9 @@ namespace Crow
             set { _multiSelect = value; }
         }
 		public virtual void AddChild(Widget g){
-#if DEBUG
+#if DEBUG_LOG
 			if (disposed) {
-				System.Diagnostics.Debug.WriteLine ($"AddChild ({g}) in disposed Widget: {this}\n{System.Environment.StackTrace}");
+				DbgLogger.AddEvent (DbgEvtType.AlreadyDisposed | DbgEvtType.GOAddChild);
 				return;
 			}
 #endif
@@ -116,9 +116,9 @@ namespace Crow
 			child.Dispose ();
         }
 		public virtual void InsertChild (int idx, Widget g) {
-#if DEBUG
+#if DEBUG_LOG
 			if (disposed) {
-				System.Diagnostics.Debug.WriteLine ($"InsertChild ({idx},{g}) in disposed Widget: {this}\n{System.Environment.StackTrace}");
+				DbgLogger.AddEvent (DbgEvtType.AlreadyDisposed | DbgEvtType.GOAddChild);
 				return;
 			}
 #endif
@@ -344,10 +344,6 @@ namespace Crow
 		{
 			Widget g = sender as Widget;
 
-#if DEBUG_LAYOUTING
-			LOG ($"{arg.LayoutType}:{g}->{g.Slot}");
-#endif
-
 			switch (arg.LayoutType) {
 			case LayoutingType.Width:
 				if (Width != Measure.Fit)
@@ -381,9 +377,9 @@ namespace Crow
 		}
 		void searchLargestChild (bool forceMeasure = false)
 		{
-			#if DEBUG_LAYOUTING
-			LOG (this.ToString());
-			#endif
+#if DEBUG_LOG
+			DbgLogger.StartEvent (DbgEvtType.GOSearchLargestChild, this);
+#endif
 			largestChild = null;
 			contentSize.Width = 0;
 			for (int i = 0; i < Children.Count; i++) {
@@ -401,12 +397,15 @@ namespace Crow
 					largestChild = Children [i];
 				}
 			}
+#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.GOSearchLargestChild);
+#endif
 		}
 		void searchTallestChild (bool forceMeasure = false)
 		{
-			#if DEBUG_LAYOUTING
-			LOG (this.ToString());
-			#endif
+#if DEBUG_LOG
+			DbgLogger.StartEvent (DbgEvtType.GOSearchTallestChild, this);
+#endif
 			tallestChild = null;
 			contentSize.Height = 0;
 			for (int i = 0; i < Children.Count; i++) {
@@ -424,6 +423,9 @@ namespace Crow
 					tallestChild = Children [i];
 				}
 			}
+#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.GOSearchTallestChild);
+#endif
 		}
 
 

@@ -35,7 +35,7 @@ namespace Crow
 		/// <summary> Unsuccessfull UpdateLayout and requeueing count </summary>
 		public int LayoutingTries, DiscardCount;
 
-		#if DEBUG_LOG
+
 		public enum Result : byte {
 			Unknown,
 			Register,
@@ -44,6 +44,7 @@ namespace Crow
 			Discarded,
 			Deleted,
 		}
+#if DEBUG_LOG
 		public Result result;
 		public Widget graphicObject {
 			get { return Layoutable as Widget; }
@@ -101,7 +102,7 @@ namespace Crow
 				return;
 			}
 			#if DEBUG_LOG
-			DbgLogger.DbgEvent dbgEvt = DbgLogger.StartEvent (DbgEvtType.GOProcessLayouting, this);
+			DbgLogger.StartEvent (DbgEvtType.GOProcessLayouting, this);
 			#endif
 			LayoutingTries++;
 			if (!Layoutable.UpdateLayout (LayoutType)) {
@@ -130,7 +131,9 @@ namespace Crow
 			else{
 				result = Result.Success;
 			}
-			DbgLogger.EndEvent (DbgEvtType.GOProcessLayouting).data = this;
+			Slot = graphicObject.LastSlots;
+			NewSlot = graphicObject.Slot;
+			(DbgLogger.EndEvent (DbgEvtType.GOProcessLayouting) as DbgLayoutEvent).SetLQI (this);
 			#endif
 			go.parentRWLock.ExitReadLock ();
 		}
@@ -144,22 +147,7 @@ namespace Crow
 			return lqi.LayoutType;
 		}
 		public override string ToString ()
-		{
-			#if DEBUG_LAYOUTING
-			return string.Format ("{2};{3} {1}->{0}", LayoutType,Layoutable.ToString(),
-				LayoutingTries,DiscardCount);
-			#else
-			return string.Format ("{2};{3} {1}->{0}", LayoutType,Layoutable.ToString(),
-				LayoutingTries, DiscardCount);
-			#endif
-		}
-	}
-	public class LQIList : List<LayoutingQueueItem>{
-//		#if DEBUG_LAYOUTING
-//		public List<LayoutingQueueItem> GetRootLQIs(){
-//			return this.Where (lqi => lqi.wasTriggeredBy == null).ToList ();
-//		}
-//		#endif
+			=> $"{LayoutType};{Layoutable.ToString ()};{LayoutingTries};{DiscardCount}";
 	}
 }
 

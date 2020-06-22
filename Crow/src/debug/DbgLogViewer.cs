@@ -9,7 +9,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Crow.Cairo;
 
-#if DEBUG_LOG
 namespace Crow
 {
 	public class DbgLogViewer : ScrollingObject
@@ -17,182 +16,6 @@ namespace Crow
 		public static Dictionary<DbgEvtType, Color> colors;
 
 		public static Configuration colorsConf = new Configuration ("dbgcolor.conf");//, Interface.GetStreamFromPath("#Crow.dbgcolor.conf"));
-
-		#region debug viewer private classes
-		public class DbgLayoutEvent : DbgWidgetEvent
-		{
-			public LayoutingType layouting;
-			public LayoutingQueueItem.Result result;
-			public override Color Color {
-				get {
-					if (type == DbgEvtType.GORegisterLayouting)
-						return Colors.GreenYellow;
-					if (type == DbgEvtType.GOProcessLayoutingWithNoParent)
-						return Colors.DarkRed;
-					switch (result) {
-					case LayoutingQueueItem.Result.Success:
-						return Colors.Green;
-					case LayoutingQueueItem.Result.Deleted:
-						return Colors.Red;
-					case LayoutingQueueItem.Result.Discarded:
-						return Colors.OrangeRed;
-					default:
-						return Colors.Orange;
-					}
-				}
-			}
-		}
-		public class DbgWidgetEvent : DbgEvent
-		{
-			public int widgetInstanceId;
-			public override Color Color {
-				get {
-					switch (type) {
-					case DbgEvtType.GOClassCreation:
-						return Colors.DarkSlateGrey;
-					case DbgEvtType.GOInitialization:
-						return Colors.DarkOliveGreen;
-					case DbgEvtType.GOClippingRegistration:
-						return Colors.MediumTurquoise;
-					case DbgEvtType.GORegisterClip:
-						return Colors.Turquoise;
-					case DbgEvtType.GORegisterForGraphicUpdate:
-						return Colors.LightPink;
-					case DbgEvtType.GOEnqueueForRepaint:
-						return Colors.LightSalmon;
-					case DbgEvtType.GONewDataSource:
-						return Colors.MediumVioletRed;
-					case DbgEvtType.GODraw:
-						return Colors.SteelBlue;
-					case DbgEvtType.GORecreateCache:
-						return Colors.CornflowerBlue;
-					case DbgEvtType.GOUpdateCache:
-						return Colors.SteelBlue;
-					case DbgEvtType.GOPaint:
-						return Colors.RoyalBlue;
-					case DbgEvtType.GOLockUpdate:
-						return Colors.SaddleBrown;
-					case DbgEvtType.GOLockClipping:
-						return Colors.Sienna;
-					case DbgEvtType.GOLockRender:
-						return Colors.BurlyWood;
-					case DbgEvtType.GOLockLayouting:
-						return Colors.GoldenRod;
-					case DbgEvtType.TGCancelLoadingThread:
-						return Colors.Maroon;
-					default:
-						return Colors.Crimson;
-					}
-					if (type.HasFlag (DbgEvtType.GOLock))
-						return Colors.DarkMagenta;
-					return Colors.White;
-				}
-			}
-		}
-		public class DbgEvent {
-			public long begin, end;
-			public int threadId;
-			public DbgEvtType type;
-			public DbgEvent parentEvent;
-			public List<DbgEvent> events;
-			public bool HasChildEvents => events != null && events.Count > 0;
-			public long Duration => end - begin;
-
-			public virtual Color Color {
-				get {
-					switch (type) {
-					case DbgEvtType.IFaceLayouting:
-						return Colors.Yellow;
-					case DbgEvtType.IFaceClipping:
-						return Colors.DarkTurquoise;
-					case DbgEvtType.IFaceDrawing:
-						return Colors.MidnightBlue;
-					case DbgEvtType.IFaceUpdate:
-						return Colors.Grey;
-					case DbgEvtType.IFaceLoad:
-						return Colors.Teal;
-					default:
-						return Colors.White;
-					}
-
-				}
-			}
-
-			public void AddEvent (DbgEvent evt)
-			{
-				if (events == null)
-					events = new List<DbgEvent> () { evt };
-				else
-					events.Add (evt);
-				evt.parentEvent = this;
-			}
-
-			public DbgEvent() {}
-
-			public static DbgEvent Parse (string str) {
-				if (str == null)
-					return null;
-				string[] tmp = str.Trim().Split(';');
-
-				DbgEvtType evtType = (DbgEvtType)Enum.Parse (typeof (DbgEvtType), tmp [3]);
-
-				if (evtType.HasFlag (DbgEvtType.GraphicObject)) {
-					if (evtType.HasFlag (DbgEvtType.GOLayouting))
-						return new DbgLayoutEvent () {
-							begin = long.Parse (tmp [0]),
-							end = long.Parse (tmp [1]),
-							threadId = int.Parse (tmp [2]),
-							type = evtType,
-							widgetInstanceId = int.Parse (tmp [4]),
-							layouting = (LayoutingType)Enum.Parse (typeof (LayoutingType), tmp [5]),
-							result = evtType == DbgEvtType.GOProcessLayouting ?
-								(LayoutingQueueItem.Result)Enum.Parse (typeof (LayoutingQueueItem.Result), tmp [6])
-								: LayoutingQueueItem.Result.Unknown
-						};
-					return new DbgWidgetEvent () {
-						begin = long.Parse (tmp [0]),
-						end = long.Parse (tmp [1]),
-						threadId = int.Parse (tmp [2]),
-						type = evtType,
-						widgetInstanceId = int.Parse (tmp [4]),
-					};
-				}
-				return new DbgEvent () {
-					begin = long.Parse (tmp [0]),
-					end = long.Parse (tmp [1]),
-					threadId = int.Parse (tmp [2]),
-					type = evtType,
-				};
-			}
-			public override string ToString ()
-				=> $"{begin}:{end}:{type}";
-		}
-		public class DbgGo {
-			public int listIndex;//prevent doing an IndexOf on list for each event to know y pos on screen
-			public int instanceNum;//class instantiation order, used to bind events to objs
-			public string name;
-			//0 is the main graphic tree, for other obj tree not added to main tree, it range from 1->n
-			//useful to track events for obj shown later, not on start
-			public int treeIndex;
-			public int yIndex;//index in parenting, the whole main graphic tree is one continuous suite
-			public int xLevel;//depth
-
-			public List<DbgEvent> events = new List<DbgEvent>();//flattened event list of this widget
-
-			public static DbgGo Parse (string str) {
-				DbgGo g = new DbgGo ();
-				if (str == null)
-					return null;
-				string[] tmp = str.Trim().Split(';');
-				g.instanceNum = int.Parse (tmp [0]);
-				g.name = tmp [1];
-				g.yIndex = int.Parse (tmp [2]);
-				g.xLevel = int.Parse (tmp [3]);
-				return g;
-			}
-
-		}
-		#endregion
 
 		public static void reloadColors () {
 			colors = new Dictionary<DbgEvtType, Color>();
@@ -215,14 +38,14 @@ namespace Crow
 
 		double xScale = 1.0/512.0, yScale = 1.0, leftMargin, topMargin = 0.0;
 		string logFile;
-		DbgGo curWidget;
+		DbgWidgetRecord curWidget;
 		DbgEvent curEvent;
 
 		List<DbgEvent> events;
-		List<DbgGo> objs;
+		List<DbgWidgetRecord> objs;
 
 		public List<DbgEvent> Events => events;
-		public List<DbgGo> Widgets => objs;
+		public List<DbgWidgetRecord> Widgets => objs;
 
 
 		long currentTick = 0, selStart = -1, selEnd = -1, minTicks = 0, maxTicks = 0, visibleTicks = 0;
@@ -302,7 +125,7 @@ namespace Crow
 			}
 		}
 
-		public DbgGo CurrentWidget {
+		public DbgWidgetRecord CurrentWidget {
 			get => curWidget;
 			internal set {
 				if (curWidget == value)
@@ -316,7 +139,15 @@ namespace Crow
 			internal set {
 				if (curEvent == value)
 					return;
+
+				if (curEvent != null)
+					curEvent.IsSelected = false;
 				curEvent = value;
+				if (curEvent != null) {
+					curEvent.IsSelected = true;
+					curEvent.IsExpanded = true;
+				}
+
 				NotifyValueChanged (nameof (CurrentEvent), curEvent);
 			}
 		}
@@ -334,9 +165,9 @@ namespace Crow
 				if (evt.begin - minTicks > ScrollX + visibleTicks)
 					break;
 				double penY = topMargin + ClientRectangle.Top;
-				if (evt.type.HasFlag (DbgEvtType.GraphicObject)) {
+				if (evt.type.HasFlag (DbgEvtType.Widget)) {
 					DbgWidgetEvent eW = evt as DbgWidgetEvent;
-					int lIdx = eW.widgetInstanceId - ScrollY;
+					int lIdx = eW.InstanceIndex - ScrollY;
 					if (lIdx < 0 || lIdx > visibleLines)
 						continue;
 					penY += (lIdx) * fe.Height; 
@@ -380,7 +211,7 @@ namespace Crow
 					ctx.ShowText (s);
 
 				}
-				drawEvents (ctx, evt.events);
+				drawEvents (ctx, evt.Events);
 			}
 		}
 
@@ -405,7 +236,8 @@ namespace Crow
 			for (int i = 0; i < visibleLines; i++) {
 				if (i + ScrollY >= objs.Count)
 					break;
-				DbgGo g = objs [i + ScrollY];
+				int gIdx = i + ScrollY;
+				DbgWidgetRecord g = objs [gIdx];
 
 				penY += fe.Height;
 
@@ -422,7 +254,7 @@ namespace Crow
 					Foreground.SetAsSource (gr);
 
 				gr.MoveTo (penX, penY - gr.FontExtents.Descent);
-				gr.ShowText (g.name + g.instanceNum);
+				gr.ShowText (g.name + gIdx);
 
 				gr.SetSource (Crow.Colors.White);
 				gr.MoveTo (cb.X, penY - gr.FontExtents.Descent);
@@ -589,6 +421,8 @@ namespace Crow
 			base.onMouseDown (sender, e);
 
 			if (e.Button == Glfw.MouseButton.Left) {
+				CurrentWidget = (currentLine < 0 || currentLine >= objs.Count) ? null : objs [currentLine];
+				CurrentEvent = curWidget?.Events.FirstOrDefault (ev => ev.begin <= currentTick && ev.end >= currentTick);
 				selStart = currentTick;
 				selEnd = -1;
 			}
@@ -651,7 +485,7 @@ namespace Crow
 				return;
 
 			events = new List<DbgEvent> ();
-			objs = new List<DbgGo> ();
+			objs = new List<DbgWidgetRecord> ();
 			minTicks = maxTicks = 0;
 			leftMargin = topMargin = 0.0;
 
@@ -668,7 +502,7 @@ namespace Crow
 						string l = s.ReadLine ();
 						if (l == "[Events]")
 							break;
-						DbgGo o = DbgGo.Parse (l);
+						DbgWidgetRecord o = DbgWidgetRecord.Parse (l);
 						objs.Add (o);
 						double nameWidth = gr.TextExtents (o.name).Width + 5.0 * o.xLevel;
 						if (nameWidth > maxNameWidth)
@@ -706,8 +540,8 @@ namespace Crow
 								}
 							}
 							startedEvents.Push (evt);
-							if (evt.type.HasFlag(DbgEvtType.GraphicObject))
-								objs [(evt as DbgWidgetEvent).widgetInstanceId].events.Add (evt);
+							if (evt.type.HasFlag(DbgEvtType.Widget))
+								objs [(evt as DbgWidgetEvent).InstanceIndex].Events.Add (evt);
 						}
 						if (events.Count > 0)
 							minTicks = events [0].begin;
@@ -777,8 +611,6 @@ namespace Crow
 			mousePos.Y = Math.Min (cb.Bottom, mousePos.Y);
 
 			currentTick = (int)((double)(mousePos.X - cb.X) / xScale) + minTicks + ScrollX;
-			CurrentWidget = (currentLine < 0 || currentLine >= objs.Count) ? null : objs [currentLine];
-			CurrentEvent = curWidget?.events.FirstOrDefault (e => e.begin <= currentTick && e.end >= currentTick);
 		}
 		void zoom (long start, long end) {						
 			//Rectangle cb = ClientRectangle;
@@ -788,5 +620,5 @@ namespace Crow
 		}
 	}
 }
-#endif
+
 

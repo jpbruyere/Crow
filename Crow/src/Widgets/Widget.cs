@@ -32,6 +32,7 @@ namespace Crow
 		//0 is the main graphic tree, for other obj tree not added to main tree, it range from 1->n
 		//useful to track events for obj shown later, not on start, or never added to main tree
 		public int treeIndex;
+		public int instanceIndex;//index in the GraphicObjects list
 		public int yIndex;//absolute index in the graphic tree for debug draw
 		public int xLevel;//x increment for debug draw
 		#endif
@@ -146,18 +147,16 @@ namespace Crow
 		}
 		protected virtual void Dispose(bool disposing){
 			if (disposed){
-				#if DEBUG_DISPOSE
-				Debug.WriteLine ("Trying to dispose already disposed obj: {0}", this.ToString());
-				#endif
+#if DEBUG_LOG
+				DbgLogger.AddEvent (DbgEvtType.AlreadyDisposed, this);
+#endif
 				return;
 			}
 
+#if DEBUG_LOG
+			DbgLogger.StartEvent (DbgEvtType.Disposing, this);
+#endif
 			if (disposing) {
-				#if DEBUG_DISPOSE
-				System.Diagnostics.Debug.WriteLine ("Disposing: {0}", this.ToString());
-				//if ()
-				//throw new Exception("Trying to dispose an object queued for Redraw: " + this.ToString());
-				#endif
 
 				unshownPostActions ();
 
@@ -167,15 +166,21 @@ namespace Crow
 				parentRWLock.EnterWriteLock();
 				parent = null;
 				parentRWLock.ExitWriteLock();
-			} else
-				Debug.WriteLine ("!!! Finalized by GC: {0}", this.ToString ());
+			}
+#if DEBUG_LOG
+			 else
+				DbgLogger.AddEvent (DbgEvtType.DisposedByGC, this);
+#endif
 			Clipping?.Dispose ();
 			bmp?.Dispose ();
 			disposed = true;
-		}  
+#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.Disposing);
+#endif
+		}
 		#endregion
 
-		#if DEBUG_LOG
+#if DEBUG_LOG
 		internal static List<Widget> GraphicObjects = new List<Widget>();
 		#endif
 
@@ -226,10 +231,11 @@ namespace Crow
 		/// </summary>
 		protected Widget () {
 			Clipping = new Region ();
-			#if DEBUG_LOG
+#if DEBUG_LOG
+			instanceIndex = GraphicObjects.Count;
 			GraphicObjects.Add (this);
 			DbgLogger.AddEvent(DbgEvtType.GOClassCreation, this);
-			#endif			
+#endif
 		}
 		/// <summary>
 		/// This constructor **must** be used when creating widget from code.
@@ -1420,9 +1426,9 @@ namespace Crow
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForGraphicUpdate ()
 		{
-#if DEBUG
+#if DEBUG_LOG
 			if (disposed) {
-//				System.Diagnostics.Debug.WriteLine ($"RegisterForGraphicUpdate for disposed Widget: {this}\n{System.Environment.StackTrace}");
+				DbgLogger.AddEvent (DbgEvtType.GORegisterForGraphicUpdate | DbgEvtType.AlreadyDisposed, this);
 				return;
 			}
 #endif
@@ -1438,7 +1444,7 @@ namespace Crow
 		{
 #if DEBUG
 			if (disposed) {
-				System.Diagnostics.Debug.WriteLine ($"RegisterForRedraw for disposed Widget: {this}\n{System.Environment.StackTrace}");
+				DbgLogger.AddEvent (DbgEvtType.GORegisterForRedraw | DbgEvtType.AlreadyDisposed, this);
 				return;
 			}
 #endif
@@ -1913,9 +1919,6 @@ namespace Crow
 
 		}
 		public virtual void onMouseDown(object sender, MouseButtonEventArgs e){
-#if DEBUG_FOCUS
-			Debug.WriteLine("MOUSE DOWN => " + this.ToString());
-#endif
 			if (Focusable) {
 				IFace.FocusedWidget = this;
 				e.Handled = true;
@@ -1932,9 +1935,6 @@ namespace Crow
 				FocusParent?.onMouseDown (sender, e);
 		}
 		public virtual void onMouseUp(object sender, MouseButtonEventArgs e){
-#if DEBUG_FOCUS
-			Debug.WriteLine("MOUSE UP => " + this.ToString());
-#endif
 
 			if (IFace.DragAndDropOperation != null){
 				if (IFace.DragAndDropOperation.DragSource == this) {
@@ -1951,18 +1951,12 @@ namespace Crow
 				FocusParent?.onMouseUp (sender, e);
 		}
 		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){
-#if DEBUG_FOCUS
-			Debug.WriteLine("CLICK => " + this.ToString());
-#endif
 			if (MouseClick != null)
 				MouseClick.Invoke (this, e);
 			else if (!e.Handled)
 				FocusParent?.onMouseClick (sender, e);
 		}
 		public virtual void onMouseDoubleClick(object sender, MouseButtonEventArgs e){
-#if DEBUG_FOCUS
-			Debug.WriteLine("DOUBLE CLICK => " + this.ToString());
-#endif
 			if (MouseDoubleClick != null)			
 				MouseDoubleClick.Invoke (this, e);
 			else if (!e.Handled)
@@ -1976,10 +1970,6 @@ namespace Crow
 		}
 		public virtual void onMouseEnter(object sender, MouseMoveEventArgs e)
 		{
-			#if DEBUG_FOCUS
-			Debug.WriteLine("MouseEnter => " + this.ToString());
-			#endif
-
 			IFace.MouseCursor = MouseCursor;
 
 			if (IFace.DragAndDropOperation != null) {
@@ -2001,10 +1991,6 @@ namespace Crow
 		}
 		public virtual void onMouseLeave(object sender, MouseMoveEventArgs e)
 		{
-			#if DEBUG_FOCUS
-			Debug.WriteLine("MouseLeave => " + this.ToString());
-			#endif
-
 			MouseLeave.Raise (this, e);
 		}
 
@@ -2030,17 +2016,23 @@ namespace Crow
 			Disabled.Raise (this, e);
 		}
 		protected virtual void onParentChanged(object sender, DataSourceChangeEventArgs e) {
+#if DEBUG_LOG
+			DbgLogger.AddEvent (DbgEvtType.GONewParent, this, e);
+#endif
 			ParentChanged.Raise (this, e);
 			if (logicalParent == null)
 				LogicalParentChanged.Raise (this, e);
 		}
 		protected virtual void onLogicalParentChanged(object sender, DataSourceChangeEventArgs e) {
+#if DEBUG_LOG
+			DbgLogger.AddEvent (DbgEvtType.GONewLogicalParent, this, e);
+#endif
 			LogicalParentChanged.Raise (this, e);
 		}
 		internal void ClearTemplateBinding(){
-			#if DEBUG_UPDATE
+#if DEBUG_UPDATE
 			Debug.WriteLine (string.Format("ClearTemplateBinding: {0}", this.ToString()));
-			#endif
+#endif
 			if (ValueChanged == null)
 				return;
 			EventInfo eiEvt = this.GetType().GetEvent ("ValueChanged");

@@ -192,9 +192,6 @@ namespace Crow
 		}
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
-#if DEBUG_LAYOUTING
-			LOG ($"{layoutType}: {LastSlots}->{Slot}");
-#endif
 			switch (layoutType) {
 			case LayoutingType.Width:
 				foreach (Widget c in Children) {

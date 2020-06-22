@@ -685,11 +685,14 @@ namespace Crow
 			lock (ClippingMutex) {
 				if (g.IsQueueForClipping)
 					return;
-				#if DEBUG_LOG
-				DbgLogger.AddEvent(DbgEvtType.GOEnqueueForRepaint, g);
-				#endif	
+#if DEBUG_LOG
+				DbgLogger.StartEvent (DbgEvtType.GOEnqueueForRepaint, g);
+#endif	
 				ClippingQueue.Enqueue (g);
 				g.IsQueueForClipping = true;
+#if DEBUG_LOG
+				DbgLogger.EndEvent (DbgEvtType.GOEnqueueForRepaint);
+#endif
 			}
 		}
 		/// <summary>Main Update loop, executed in this interface thread, protected by the UpdateMutex
@@ -723,7 +726,7 @@ namespace Crow
 				return;
 				
 #if DEBUG_LOG
-			DbgLogger.StartEvent (DbgEvtType.IFaceUpdate);
+			DbgLogger.StartEvent (DbgEvtType.Update);
 #endif
 
 			processLayouting ();
@@ -737,7 +740,7 @@ namespace Crow
 				processDrawing (ctx);
 
 #if DEBUG_LOG
-			DbgLogger.EndEvent (DbgEvtType.IFaceUpdate, true);
+			DbgLogger.EndEvent (DbgEvtType.Update, true);
 #endif
 
 			Monitor.Exit (UpdateMutex);
@@ -748,7 +751,7 @@ namespace Crow
 		protected virtual void processLayouting(){
 			if (Monitor.TryEnter (LayoutMutex)) {
 #if DEBUG_LOG
-				DbgLogger.StartEvent (DbgEvtType.IFaceLayouting);
+				DbgLogger.StartEvent (DbgEvtType.Layouting);
 #endif
 				DiscardQueue = new Queue<LayoutingQueueItem> ();
 				//Debug.WriteLine ("======= Layouting queue start =======");
@@ -759,7 +762,7 @@ namespace Crow
 				}
 				LayoutingQueue = DiscardQueue;
 #if DEBUG_LOG
-				DbgLogger.EndEvent (DbgEvtType.IFaceLayouting, true);
+				DbgLogger.EndEvent (DbgEvtType.Layouting, true);
 #endif
 				Monitor.Exit (LayoutMutex);
 				DiscardQueue = null;
@@ -770,7 +773,7 @@ namespace Crow
 		/// operation to known if it should go down in the tree for further graphic updates and repaints</summary>
 		void clippingRegistration(){
 #if DEBUG_LOG
-			DbgLogger.StartEvent (DbgEvtType.IFaceClipping);
+			DbgLogger.StartEvent (DbgEvtType.Clipping);
 #endif
 			Widget g = null;
 			while (ClippingQueue.Count > 0) {
@@ -781,14 +784,14 @@ namespace Crow
 				g.ClippingRegistration ();
 			}
 #if DEBUG_LOG
-			DbgLogger.EndEvent (DbgEvtType.IFaceClipping, true);
+			DbgLogger.EndEvent (DbgEvtType.Clipping, true);
 #endif
 		}
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
 		void processDrawing(Context ctx){
 #if DEBUG_LOG
-			DbgLogger.StartEvent (DbgEvtType.IFaceDrawing);
+			DbgLogger.StartEvent (DbgEvtType.Drawing);
 #endif
 			if (DragImage != null)
 				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
@@ -852,7 +855,7 @@ namespace Crow
 				}
 			
 #if DEBUG_LOG
-			DbgLogger.EndEvent (DbgEvtType.IFaceDrawing, true);
+			DbgLogger.EndEvent (DbgEvtType.Drawing, true);
 #endif
 		}
 		#endregion
@@ -922,12 +925,6 @@ namespace Crow
 					g.Dispose ();
 				}
 			}
-			#if DEBUG_LAYOUTING
-			LQIsTries = new List<LQIList>();
-			curLQIsTries = new LQIList();
-			LQIs = new List<LQIList>();
-			curLQIs = new LQIList();
-			#endif
 		}
 		/// <summary> Put widget on top of other root widgets</summary>
 		public void PutOnTop(Widget g, bool isOverlay = false)
@@ -1436,20 +1433,6 @@ namespace Crow
 		}
 		public Rectangle getSlot () { return ClientRectangle; }
 		#endregion
-
-
-#if DEBUG_LAYOUTING
-		public List<LQIList> LQIsTries = new List<LQIList>();
-		public LQIList curLQIsTries = new LQIList();
-		public List<LQIList> LQIs = new List<LQIList>();
-		public LQIList curLQIs = new LQIList();
-		//		public static LayoutingQueueItem[] MultipleRunsLQIs {
-		//			get { return curUpdateLQIs.Where(l=>l.LayoutingTries>2 || l.DiscardCount > 0).ToArray(); }
-		//		}
-		public LayoutingQueueItem currentLQI;
-#else
-		public List<LQIList> LQIs = null;//still create the var for CrowIDE
-#endif
 	}
 }
 

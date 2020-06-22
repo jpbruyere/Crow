@@ -10,133 +10,110 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 
-#if DEBUG_LOG
+
 namespace Crow
 {
-	/*public class LayoutingEvent : DbgEvent {
-		public List<LayoutingQueueItem> lqis = new List<LayoutingQueueItem>();
-
-	}*/
 	[Flags]
 	public enum DbgEvtType {
 		////9 nth bit set for iface event
 		IFace							= 0x10000,
-		IFaceFocus						= 0x20000,
-		GraphicObject 					= 0x00100,
-		GOLayouting 					= 0x00200,
-		Drawing 						= 0x00400,
-		GOLock 							= 0x00800,
-		IFaceLayouting 					= IFace | 0x01,
-		IFaceClipping					= IFace | 0x02,
-		IFaceDrawing					= IFace | 0x03,
-		IFaceUpdate						= IFace | 0x04,
+		Focus							= 0x20000,
+		Override						= 0x40000,
+		Widget 							= 0x00100,
+		//GOLayouting 					= 0x00200,
+		//Drawing 						= 0x00400,
+		Lock 							= 0x00800,
+		Layouting	 					= IFace | 0x01000,
+		Clipping						= IFace | 0x02000,
+		Drawing							= IFace | 0x04000,
+		Update							= IFace | 0x08000,
 		IFaceLoad						= IFace | 0x05,
 		IFaceInit						= IFace | 0x06,
+		CreateITor						= IFace | 0x07,
 
-		HoverWidget						= IFaceFocus | 0x01,
-		FocusedWidget					= IFaceFocus | 0x02,
-		ActiveWidget					= IFaceFocus | 0x03,
+		HoverWidget						= Focus | 0x01,
+		FocusedWidget					= Focus | 0x02,
+		ActiveWidget					= Focus | 0x03,
 
 		//10 nth bit set for graphic obj
-		Warning = 0x4000,
-		Error							= 0x8000,
-		GOClassCreation					= GraphicObject | 0x01,
-		GOInitialization				= GraphicObject | 0x02,
-		GOClippingRegistration			= GraphicObject | 0x03,
-		GORegisterClip					= GraphicObject | 0x04,
-		GORegisterForGraphicUpdate		= GraphicObject | 0x05,
-		GOEnqueueForRepaint				= GraphicObject | 0x06,
-		GONewDataSource					= GraphicObject | 0x07,
 		TemplatedGroup					= 0x1000,
-		GORegisterLayouting 			= GraphicObject | GOLayouting | 0x01,
-		GOProcessLayouting				= GraphicObject | GOLayouting | 0x02,
-		GOProcessLayoutingWithNoParent 	= Warning | GraphicObject | GOLayouting | 0x01,
-		GODraw							= GraphicObject | Drawing | 0x01,
-		GORecreateCache					= GraphicObject | Drawing | 0x02,
-		GOUpdateCache		= GraphicObject | Drawing | 0x03,
-		GOPaint							= GraphicObject | Drawing | 0x04,
+		Dispose		 					= 0x2000,
+		Warning 						= 0x4000,
+		Error							= 0x8000,
+		GOClassCreation					= Widget | 0x01,
+		GOInitialization				= Widget | 0x02,
+		GORegisterForGraphicUpdate		= Widget | 0x03,
+		GOEnqueueForRepaint				= Widget | 0x04,
+		GONewDataSource					= Widget | 0x05,
+		GONewParent						= Widget | 0x06,
+		GONewLogicalParent				= Widget | 0x07,
+		GOAddChild		 				= Widget | 0x08,
 
-		GOLockUpdate					= GraphicObject | GOLock | 0x01,
-		GOLockClipping					= GraphicObject | GOLock | 0x02,
-		GOLockRender					= GraphicObject | GOLock | 0x03,
-		GOLockLayouting					= GraphicObject | GOLock | 0x04,
+		GOSearchLargestChild			= Widget | 0x09,
+		GOSearchTallestChild 			= Widget | 0x10,
+		GORegisterForRedraw		 		= Widget | 0x11,
 
-		TGLoadingThread					= GraphicObject | TemplatedGroup | 0x01,
-		TGCancelLoadingThread			= GraphicObject | TemplatedGroup | 0x02,
+		AlreadyDisposed					= Dispose | Widget | Error | 0x01,
+		DisposedByGC					= Dispose | Widget | Error | 0x02,
+		Disposing 						= Dispose | Widget | 0x01,
+
+		GOClippingRegistration			= Clipping | Widget | 0x01,
+		GORegisterClip					= Clipping | Widget | 0x02,
+		GORegisterLayouting 			= Layouting | Widget | 0x01,
+		GOProcessLayouting				= Layouting | Widget | 0x02,
+		GOProcessLayoutingWithNoParent 	= Layouting | Widget | Warning | 0x01,
+		GODraw							= Drawing | Widget | 0x01,
+		GORecreateCache					= Drawing | Widget | 0x02,
+		GOUpdateCache					= Drawing | Widget | 0x03,
+		GOPaint							= Drawing | Widget | 0x04,
+
+		GOLockUpdate					= Widget | Lock | 0x01,
+		GOLockClipping					= Widget | Lock | 0x02,
+		GOLockRender					= Widget | Lock | 0x03,
+		GOLockLayouting					= Widget | Lock | 0x04,
+
+		TGLoadingThread					= Widget | TemplatedGroup | 0x01,
+		TGCancelLoadingThread			= Widget | TemplatedGroup | 0x02,
 
 		All = 0x0FFFFFFF
 	}
-
-
-
+#if DEBUG_LOG
 	public static class DbgLogger
 	{
 		public static DbgEvtType IncludeEvents = DbgEvtType.All;
-		public static DbgEvtType DiscardEvents = DbgEvtType.IFaceFocus;
+		public static DbgEvtType DiscardEvents = DbgEvtType.Focus;
 
 		static bool logevt (DbgEvtType evtType)
-		{
-			return (evtType & DiscardEvents) == 0 && (evtType & IncludeEvents) != 0;
-		}
+			=> (evtType & DiscardEvents) == 0 && (evtType & IncludeEvents) != 0;
 
-		/// <summary>
-		/// debug events as recorded, another class is used in the viewer
-		/// </summary>
-		public class DbgEvent
-		{
-			public long begin, end;
-			public DbgEvtType type;
-			public object data = null;
-			public int threadId;
-			public List<DbgEvent> Events = new List<DbgEvent> ();
-
-			public DbgEvent () { }
-
-			public DbgEvent (long timeStamp, DbgEvtType evt, object _data = null)
-			{
-				data = _data;
-				type = evt;
-				begin = timeStamp;
-				end = timeStamp;
-				threadId = Thread.CurrentThread.ManagedThreadId;
-			}
-
-			public override string ToString ()
-			{
-				string tmp = $"{begin};{end};{threadId};{type}";
-				if (type.HasFlag (DbgEvtType.GraphicObject)) {
-					if (type.HasFlag (DbgEvtType.GOLayouting)) {
-						LayoutingQueueItem lqi = (LayoutingQueueItem)data;
-						tmp += $";{Widget.GraphicObjects.IndexOf (lqi.graphicObject).ToString ()};{lqi.LayoutType}";
-						if (type == DbgEvtType.GOProcessLayouting)
-							tmp += $";{lqi.result}";
-					} else
-						tmp += $";{Widget.GraphicObjects.IndexOf (data as Widget).ToString ()}";
-				}
-				return tmp;
-			}
-		}
-
-		public static Stopwatch chrono = Stopwatch.StartNew();
-
-		static List<DbgEvent> events = new List<DbgEvent>();
-		static Dictionary<int, Stack<DbgEvent>> startedEvents = new Dictionary<int, Stack<DbgEvent>> ();
 
 		static object logMutex = new object ();
+		static Stopwatch chrono = Stopwatch.StartNew ();
+		static List<DbgEvent> events = new List<DbgEvent> ();
+		//started events per thread
+		static Dictionary<int, Stack<DbgEvent>> startedEvents = new Dictionary<int, Stack<DbgEvent>> ();
+		//helper for fetching current event list to add next event to while recording
+		static List<DbgEvent> curEventList {
+			get {
+				if (startedEvents.ContainsKey (Thread.CurrentThread.ManagedThreadId)) {
+					if (startedEvents [Thread.CurrentThread.ManagedThreadId].Count == 0)
+						return events;
+					DbgEvent e = startedEvents [Thread.CurrentThread.ManagedThreadId].Peek ();
+					if (e.Events == null) 
+						e.Events = new List<DbgEvent> ();
+					return e.Events;
+				}
+				return events;
+			}
+		}
 
-
-		static List<DbgEvent> curEventList =>
-			startedEvents.ContainsKey(Thread.CurrentThread.ManagedThreadId) ?
-			startedEvents[Thread.CurrentThread.ManagedThreadId].Count == 0 ? events : startedEvents[Thread.CurrentThread.ManagedThreadId].Peek ().Events : events;
-
-		public static DbgEvent StartEvent (DbgEvtType evtType, object data = null)
+		public static DbgEvent StartEvent (DbgEvtType evtType, params object[] data)
 		{
 			if (!logevt (evtType))
 				return null;
 			lock (logMutex) {
 				chrono.Stop ();
-				DbgEvent evt = new DbgEvent (chrono.ElapsedTicks, evtType, data);
-				curEventList.Add (evt);
+				DbgEvent evt = addEventInternal (evtType, data);
 				if (!startedEvents.ContainsKey (Thread.CurrentThread.ManagedThreadId))
 					startedEvents [Thread.CurrentThread.ManagedThreadId] = new Stack<DbgEvent> ();
 				startedEvents [Thread.CurrentThread.ManagedThreadId].Push (evt);
@@ -156,7 +133,7 @@ namespace Crow
 				DbgEvent e = startedEvents [Thread.CurrentThread.ManagedThreadId].Pop ();
 				if (e.type != evtType)
 					throw new Exception ($"Begin/end event logging mismatch: {e.type}/{evtType}");
-				if (discardIfNoChildEvents && e.Events.Count == 0)
+				if (discardIfNoChildEvents && (e.Events == null || e.Events.Count == 0))
 					curEventList.Remove (e);
 				else
 					e.end = chrono.ElapsedTicks;
@@ -164,40 +141,76 @@ namespace Crow
 				return e;
 			}
 		}
-		public static DbgEvent AddEvent (DbgEvtType evtType, object data = null) {
+		/// <summary>
+		/// End event by reference to cancel unended events on failure
+		/// </summary>
+		public static DbgEvent EndEvent (DbgEvtType evtType, DbgEvent evt)
+		{
 			if (!logevt (evtType))
 				return null;
 
 			lock (logMutex) {
 				chrono.Stop ();
-				DbgEvent evt = new DbgEvent (chrono.ElapsedTicks, evtType, data);
-				curEventList.Add (evt);
+				if (!startedEvents.ContainsKey (Thread.CurrentThread.ManagedThreadId))
+					throw new Exception ("Current thread has no event started");
+				DbgEvent e = startedEvents [Thread.CurrentThread.ManagedThreadId].Pop ();
+				while (e != evt)
+					e = startedEvents [Thread.CurrentThread.ManagedThreadId].Pop ();
+				e.end = chrono.ElapsedTicks;
+				chrono.Start ();
+				return e;
+			}
+		}
+
+		public static DbgEvent AddEvent (DbgEvtType evtType, params object [] data) { 
+			if (!logevt (evtType))
+				return null;
+
+			lock (logMutex) {
+				chrono.Stop ();
+				DbgEvent evt = addEventInternal (evtType, data);
 				chrono.Start ();
 				return evt;
 			}
 		}
 
-		static int y, level;
+		static DbgEvent addEventInternal (DbgEvtType evtType, params object [] data)
+		{
+			DbgEvent evt = null;
+			if (data == null || data.Length == 0)
+				evt = new DbgEvent (chrono.ElapsedTicks, evtType);
+			else if (data [0] is Widget w)
+				evt = new DbgWidgetEvent (chrono.ElapsedTicks, evtType, w);
+			else if (data [0] is LayoutingQueueItem lqi)
+				evt = new DbgLayoutEvent (chrono.ElapsedTicks, evtType, lqi);
+			else
+				evt = new DbgEvent (chrono.ElapsedTicks, evtType);
 
-		static void parseTree (Widget go) {
+			curEventList.Add (evt);
+			return evt;
+		}
+
+		static void parseTree (Widget go, int level = 0, int y = 1) {
 			if (go == null)
 				return;
 
-			go.yIndex = y++;
-			go.xLevel = level++;
+			go.yIndex = y;
+			go.xLevel = level;
 
 			Group gr = go as Group;
 			if (gr != null) {
-				foreach (Widget g in gr.Children) {
-					parseTree (g);
-				}
+				foreach (Widget g in gr.Children) 
+					parseTree (g, level + 1, y + 1);
+
 			} else {
 				PrivateContainer pc = go as PrivateContainer;
 				if (pc != null)
-					parseTree (pc.getTemplateRoot);				
+					parseTree (pc.getTemplateRoot, level + 1, y + 1);				
 			}
-			level--;		
 		}
+		/// <summary>
+		/// Clear all recorded events from logger.
+		/// </summary>
 		public static void Reset ()
 		{
 			lock (logMutex) {
@@ -206,21 +219,23 @@ namespace Crow
 				chrono.Restart ();
 			}
 		}
-		public static void save(Interface iface) {
+		/// <summary>
+		/// Save recorded events to disk
+		/// </summary>
+		/// <param name="iface">Iface.</param>
+		public static void save(Interface iface, string dbgLogFilePath = "debug.log") {
 			lock (logMutex) {
-				y = 1;
-				level = 0;
 
 				foreach (Widget go in iface.GraphicTree)
 					parseTree (go);
 
-				using (StreamWriter s = new StreamWriter ("debug.log")) {
+				using (StreamWriter s = new StreamWriter (dbgLogFilePath)) {
 					s.WriteLine ("[GraphicObjects]");
 					lock (Widget.GraphicObjects) {
-						Widget.GraphicObjects = Widget.GraphicObjects.OrderBy (o => o.yIndex).ToList ();
+						//Widget.GraphicObjects = Widget.GraphicObjects.OrderBy (o => o.yIndex).ToList ();
 						for (int i = 0; i < Widget.GraphicObjects.Count; i++) {
 							Widget g = Widget.GraphicObjects [i];
-							s.WriteLine ("{0};{1};{2};{3}", i, g.GetType ().Name, g.yIndex, g.xLevel);
+							s.WriteLine ($"{g.GetType ().Name};{g.yIndex};{g.xLevel}");
 						}
 					}
 					s.WriteLine ("[Events]");
@@ -229,17 +244,19 @@ namespace Crow
 			}
 		}
 
-		static void saveEventList (StreamWriter s, List<DbgEvent> events, int level = 0)
+		static void saveEventList (StreamWriter s, List<DbgEvent> evts, int level = 0)
 		{
-			foreach (DbgEvent e in events) {
+			foreach (DbgEvent e in evts) {
 				if (e == null)
 					continue;
-				s.WriteLine (new string ('\t', level) + e.ToString ());
-				saveEventList (s, e.Events, level + 1);
+				s.WriteLine (new string ('\t', level) + e);
+				if (e.Events != null)
+					saveEventList (s, e.Events, level + 1);
 			}
 		}
 
 	}
-}
 #endif
+}
+
 

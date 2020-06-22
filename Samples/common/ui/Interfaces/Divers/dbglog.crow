@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <HorizontalStack>
-	<TreeView Width="20%" Data="{../dbv.Events}"> 
-		<ItemTemplate Data="events">
-			<Expandable Caption="{type}" MouseDoubleClick="/onClickForExpand" CacheEnabled="true">
+	<TreeView Width="20%" Data="{../dbv.Events}" SelectedItemChanged="onSelectedItemChanged"> 
+		<ItemTemplate Data="Events">
+			<Expandable Caption="{type}" MouseDoubleClick="/onClickForExpand" CacheEnabled="true" IsExpanded="{²IsExpanded}">
 				<Template>
 					<VerticalStack>
 						<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"
@@ -18,9 +18,37 @@
 									MouseLeave="{Background=Transparent}"/>
 								<Label Text="{./Caption}" Width="80" Font="mono, 8" />
 								<Label Text="{Duration}" Width="40" Font="mono, 8" TextAlignment="Center" Background="DimGrey"/>
-								<Group Height="5">
-									<DbgEventWidget Event="{}" />
-								</Group>
+								<DbgEventWidget Event="{}" Tooltip="{/HoverEvent}" TicksPerPixel="200" Width="Fit" Height="5"/>
+							</HorizontalStack>
+						</Border>
+						<Container Name="Content" Visible="false"/>
+					</VerticalStack>
+				</Template>
+				<HorizontalStack Height="Fit">
+					<Widget Width="12" Height="10"/>
+					<VerticalStack Height="Fit" Name="ItemsContainer"/>
+				</HorizontalStack>
+			</Expandable>
+		</ItemTemplate>		
+		<ItemTemplate Data="Events" DataType="DbgWidgetEvent">
+			<Expandable Caption="{type}" MouseDoubleClick="/onClickForExpand" CacheEnabled="true" IsExpanded="{²IsExpanded}">
+				<Template>
+					<VerticalStack>
+						<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"
+								Foreground="Transparent"
+								MouseEnter="{Foreground=DimGrey}"
+								MouseLeave="{Foreground=Transparent}">
+							<HorizontalStack Spacing="2" Background="Onyx">
+								<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
+									Path="{./Image}"
+									Visible="{HasChildEvents}"
+									SvgSub="{./IsExpanded}"
+									MouseEnter="{Background=LightGrey}"
+									MouseLeave="{Background=Transparent}"/>
+								<Label Text="{./Caption}" Width="80" Font="mono, 8" />
+								<Label Text="{Duration}" Width="40" Font="mono, 8" TextAlignment="Center" Background="DimGrey"/>
+								<Label Text="{InstanceIndex}" Width="40" Font="mono, 8" TextAlignment="Center" Background="DimGrey"/>
+								<DbgEventWidget Event="{}" Tooltip="{/HoverEvent}" TicksPerPixel="200" Width="Fit" Height="5"/>
 							</HorizontalStack>
 						</Border>
 						<Container Name="Content" Visible="false"/>
@@ -35,8 +63,8 @@
 	</TreeView>
 	<Splitter/>
 	<VerticalStack>
-		<DbgLogViewer Visible="false" Name="dbv" LogFile="debug.log" MouseWheelSpeed="10" Font="mono, 8"/>
-		<!--<ScrollBar Style="HScrollBar" Maximum="{../dbv.MaxScrollX}" Value="{²../dbv.ScrollX}"/>
+		<DbgLogViewer Visible="true" Name="dbv" LogFile="debug.log" MouseWheelSpeed="10" Font="mono, 8"/>
+		<ScrollBar Style="HScrollBar" Maximum="{../dbv.MaxScrollX}" Value="{²../dbv.ScrollX}"/>
 		<HorizontalStack Height="Fit" DataSource="{../../dbv.CurrentWidget}">
 			<Label Text="{name}"/>
 			<Label Text="{listIndex}"/>
@@ -45,7 +73,15 @@
 			<Label Text="{yIndex}"/>
 			<Label Text="{xLevel}"/>
 		</HorizontalStack>
-		<DbgEventWidget Height="20" Width="Stretched" Event="{../../dbv.CurrentEvent}"/>
+		<ListBox Data="{RootEvents}" Height="100" DataSource="{../../dbv.CurrentWidget}">
+			<ItemTemplate>
+				<DbgEventWidget Height="10" Width="Fit" Event="{}" Tooltip="{/HoverEvent}" TicksPerPixel="100"/>
+			</ItemTemplate>
+			<Template>
+				<Wrapper Name="ItemsContainer" Spacing="2" Background="DarkGrey"/>
+			</Template>
+		</ListBox>	
+		<!--<DbgEventWidget Height="20" Width="Stretched" Event="{../../dbv.CurrentEvent}"/>-->
 		<VerticalStack DataSource="{../../dbv.CurrentEvent}">
 			<HorizontalStack>
 				<Label Text="{type}"/>
@@ -58,6 +94,6 @@
 					<DbgEventWidget Height="20" Width="Stretched" Event="{}"/>
 				</ItemTemplate>
 			</ListBox>
-		</VerticalStack>-->
+		</VerticalStack>
 	</VerticalStack>
 </HorizontalStack>
