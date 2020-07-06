@@ -2,9 +2,9 @@
 <Container Background="DimGrey" Margin="10" Width="Fit" Height="Fit" >
 	<Popper Width="Stretched" Margin="10" Background="RoyalBlue">
 		<Container Width="Fit" Height="Fit" Margin="10" Background="Blue">
-			<Container Width="Stretched" Margin="10" Background="Yellow">
-				<Container Width="Stretched" Margin="10" Background="FireBrick">
-					<CheckBox Width="Stretched"/> 
+			<Container  Margin="10" Background="Yellow">
+				<Container Margin="10" Background="FireBrick">
+					<CheckBox/> 
 				</Container>
 			</Container>
 		</Container>

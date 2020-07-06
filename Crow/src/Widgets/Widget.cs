@@ -502,7 +502,7 @@ namespace Crow
 		/// If enabled, resulting bitmap of graphic object is cached
 		/// speeding up rendering of complex object. Default is enabled.
 		/// </summary>
-		[DesignCategory ("Behavior")][DefaultValue(false)]
+		[DesignCategory ("Behavior")][DefaultValue(true)]
 		public virtual bool CacheEnabled {
 			get { return cacheEnabled; }
 			set {

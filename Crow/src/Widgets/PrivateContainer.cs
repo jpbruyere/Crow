@@ -125,10 +125,12 @@ namespace Crow
 				switch (layoutType) {
 				case LayoutingType.Width:
 					if (Width == Measure.Fit && child.Width.IsRelativeToParent)
+						//child.Width = Measure.Fit;
 						contentSize.Width = child.measureRawSize (LayoutingType.Width);
 					break;
 				case LayoutingType.Height:
 					if (Height == Measure.Fit && child.Height.IsRelativeToParent)
+						//child.Height = Measure.Fit;
 						contentSize.Height = child.measureRawSize (LayoutingType.Width);
 					break;
 				}
