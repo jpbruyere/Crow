@@ -11,6 +11,8 @@ namespace HelloWorld
 			using (Interface app = new Interface ()) {
 				app.Initialized += (sender, e) => (sender as Interface).Load ("#HelloWorld.helloworld.crow");
 				app.Run ();
+
+				DbgLogger.save (app);
 			}
 		}
 	}

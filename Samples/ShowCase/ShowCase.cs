@@ -8,6 +8,7 @@ using System.IO;
 using System.Text;
 using Crow.IML;
 using System.Runtime.CompilerServices;
+using Glfw;
 
 namespace ShowCase
 {
@@ -175,17 +176,16 @@ namespace ShowCase
 
 			reloadFromFile ();
 		}
-
-		static void App_KeyboardKeyDown (object sender, KeyEventArgs e)
+		public override bool OnKeyDown (Key key)
 		{
-#if DEBUG_LOG
-			switch (e.Key) {
+			switch (key) {
 			case Key.F2:
-				DebugLog.save (sender as Interface);
-				break;
+				//DbgLogger.save (this);
+				return true;
 			}
-#endif
+			return base.OnKeyDown (key);
 		}
+
 
 		public void goUpDirClick (object sender, MouseButtonEventArgs e)
 		{

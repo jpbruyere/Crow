@@ -1293,7 +1293,6 @@ namespace Crow
 
 		protected void initTooltip ()
 		{
-			ToolTipContainer = CreateInstance ("#Crow.Tooltip.template");
 			Thread t = new Thread (toolTipThreadFunc);
 			t.IsBackground = true;
 			t.Start ();
@@ -1306,6 +1305,12 @@ namespace Crow
 						Widget g = _hoverWidget;
 						while (g != null) {
 							if (!string.IsNullOrEmpty (g.Tooltip)) {
+								if (g.Tooltip.StartsWith("#", StringComparison.Ordinal)) {
+									//custom tooltip container
+									ToolTipContainer = CreateInstance (g.Tooltip);
+								} else
+									ToolTipContainer = CreateInstance ("#Crow.Tooltip.template");
+								ToolTipContainer.LayoutChanged += ToolTipContainer_LayoutChanged;
 								AddWidget (ToolTipContainer);
 								ToolTipContainer.DataSource = g;
 								ToolTipContainer.Top = MousePosition.Y + 10;
@@ -1324,11 +1329,41 @@ namespace Crow
 		void resetTooltip ()
 		{
 			if (tooltipVisible) {
-				//ToolTipContainer.DataSource = null;
+				ToolTipContainer.LayoutChanged -= ToolTipContainer_LayoutChanged;
+				ToolTipContainer.DataSource = null;
 				RemoveWidget (ToolTipContainer);
 				tooltipVisible = false;
+				ToolTipContainer.Dispose ();
+				ToolTipContainer = null;
 			}
 			tooltipTimer.Restart ();
+		}
+		void ToolTipContainer_LayoutChanged (object sender, LayoutingEventArgs e)
+		{
+			Widget ttc = sender as Widget;
+			//tooltip container datasource is the widget triggering the tooltip
+			Rectangle r = ScreenCoordinates ((ttc.DataSource as Widget).Slot);
+
+			if (e.LayoutType == LayoutingType.X) {
+					if (ttc.Slot.Right > clientRectangle.Right)
+						ttc.Left = clientRectangle.Right - ttc.Slot.Width;
+			}/* else if (e.LayoutType == LayoutingType.Y) {
+				if (ttc.Slot.Height < tc.ClientRectangle.Height) {
+					if (PopDirection.HasFlag (Alignment.Bottom)) {
+						if (r.Bottom + ttc.Slot.Height > tc.ClientRectangle.Bottom)
+							ttc.Top = r.Top - ttc.Slot.Height;
+						else
+							ttc.Top = r.Bottom;
+					} else if (PopDirection.HasFlag (Alignment.Top)) {
+						if (r.Top - ttc.Slot.Height < tc.ClientRectangle.Top)
+							ttc.Top = r.Bottom;
+						else
+							ttc.Top = r.Top - ttc.Slot.Height;
+					} else
+						ttc.Top = r.Top;
+				} else
+					ttc.Top = 0;
+			}*/
 		}
 		#endregion
 

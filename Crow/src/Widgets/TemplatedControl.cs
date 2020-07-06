@@ -79,6 +79,7 @@ namespace Crow
 		/// <returns>widget identified by name, or null if not found</returns>
 		/// <param name="nameToFind">widget's name to find</param>
 		public override Widget FindByName (string nameToFind) => nameToFind == this.Name ? this : null;
+		public override Widget FindByType<T> () => this is TemplatedControl ? this : null;
 		public Widget FindByNameInTemplate (string nameToFind) => child?.FindByName (nameToFind);
 		/// <summary>
 		///onDraw is overrided to prevent default drawing of background, template top container

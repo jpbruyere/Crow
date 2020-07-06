@@ -39,7 +39,8 @@ namespace tests
 			//testFiles = new string [] { @"Interfaces/TemplatedControl/testEnumSelector.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/all.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/gauge.crow" };
-			testFiles = new string [] { @"Interfaces/Divers/testSlider.crow" };
+			//testFiles = new string [] { @"Interfaces/Stack/StretchedInFit4.crow" };
+			testFiles = new string [] { @"Interfaces/TemplatedGroup/1.crow" };
 			//testFiles = new string [] { @"Interfaces/Divers/colorPicker2.crow" };
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/GraphicObject", "*.crow")).ToArray ();
 			testFiles = testFiles.Concat (Directory.GetFiles (@"Interfaces/Container", "*.crow")).ToArray ();
@@ -69,18 +70,20 @@ namespace tests
 					Quit ();
 					break;
 				case Key.F2:
+					//if (IsKeyDown (Key.LeftShift))
+						//DbgLogger.Reset ();
+					//DbgLogger.save (this);
+					return false;
+				case Key.F3:
 					idx--;
 					break;
-				case Key.F3:
+				case Key.F4:
 					idx++;
 					break;
 				case Key.F1:
 					//TestList.Add ("new string");
 					NotifyValueChanged ("TestList", TestList);
 					break;
-				case Key.F4:
-					Load ("Interfaces/TemplatedContainer/testWindow.goml").DataSource = this;
-					return false;
 				case Key.F5:
 					Load ("Interfaces/Divers/testFileDialog.crow").DataSource = this;
 					return false;

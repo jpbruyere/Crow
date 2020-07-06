@@ -81,7 +81,7 @@ namespace Crow
 
 			childrenRWLock.ExitWriteLock();
 
-			g.RegisteredLayoutings = LayoutingType.None;
+			//g.RegisteredLayoutings = LayoutingType.None;
 			g.LayoutChanged += OnChildLayoutChanges;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
@@ -206,6 +206,24 @@ namespace Crow
 
 			foreach (Widget w in Children) {
 				tmp = w.FindByName (nameToFind);
+				if (tmp != null)
+					break;
+			}
+
+			childrenRWLock.ExitReadLock ();
+
+			return tmp;
+		}
+		public override Widget FindByType<T> ()
+		{
+			if (this is T)
+				return this;
+			Widget tmp = null;
+
+			childrenRWLock.EnterReadLock ();
+
+			foreach (Widget w in Children) {
+				tmp = w.FindByType<T> ();
 				if (tmp != null)
 					break;
 			}

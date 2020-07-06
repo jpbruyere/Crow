@@ -11,7 +11,6 @@ namespace Crow
 	//if their are expandable, some functions and events are added
 	public class TreeView : TemplatedGroup
 	{
-		Widget selectedItemContainer = null;
 		bool isRoot;
 
 		#region CTOR
@@ -29,28 +28,7 @@ namespace Crow
 				NotifyValueChangedAuto (isRoot);
 			}
 		}
-		[XmlIgnore]public override object SelectedItem {
-			get {
-				return selectedItemContainer == null ?
-					"" : selectedItemContainer.DataSource;
-			}
-		}
 
-		internal override void itemClick (object sender, MouseButtonEventArgs e)
-		{
-			Widget tmp = sender as Widget;
-			//if (!tmp.HasFocus)
-			//	return;
-			/*if (selectedItemContainer != null) {
-				selectedItemContainer.Foreground = Color.Transparent;
-				selectedItemContainer.Background = Color.Transparent;
-			}*/
-			selectedItemContainer = tmp;
-			//selectedItemContainer.Foreground = SelectionForeground;
-			//selectedItemContainer.Background = SelectionBackground;
-			NotifyValueChanged ("SelectedItem", SelectedItem);
-			raiseSelectedItemChanged ();
-		}
 
 		void onExpandAll_MouseClick (object sender, MouseButtonEventArgs e)
 		{

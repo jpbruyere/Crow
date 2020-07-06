@@ -103,6 +103,7 @@ namespace Crow
 			}
 			#if DEBUG_LOG
 			DbgLogger.StartEvent (DbgEvtType.GOProcessLayouting, this);
+			Slot = graphicObject.Slot;
 			#endif
 			LayoutingTries++;
 			if (!Layoutable.UpdateLayout (LayoutType)) {
@@ -131,7 +132,6 @@ namespace Crow
 			else{
 				result = Result.Success;
 			}
-			Slot = graphicObject.LastSlots;
 			NewSlot = graphicObject.Slot;
 			(DbgLogger.EndEvent (DbgEvtType.GOProcessLayouting) as DbgLayoutEvent).SetLQI (this);
 			#endif

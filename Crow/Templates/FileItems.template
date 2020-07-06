@@ -2,24 +2,24 @@
 	<Widget Height="16" Background="Red"/>
 </ItemTemplate>
 <ItemTemplate DataType="System.IO.FileInfo">
-	<HorizontalStack Focusable="true"  Height="Fit">
-		<Image Margin="2" Width="16" Height="16"
-			Path="#Crow.Icons.file.svg"/>
-			<Label Text="{Name}" Width="Stretched"
-				MouseEnter="{Background=RoyalBlue}"
-				MouseLeave="{Background=Transparent}"/>
-	</HorizontalStack>
+	<ListItem Height="Fit"
+				Selected = "{Background=${ControlHighlight}}"
+				Unselected = "{Background=Transparent}">
+		<HorizontalStack>
+			<Image Margin="2" Width="16" Height="16" Path="#Crow.Icons.file.svg"/>
+			<Label Text="{Name}" Width="Stretched"/>
+		</HorizontalStack>
+	</ListItem>
 </ItemTemplate>
 <ItemTemplate DataType="System.IO.DirectoryInfo">
-	<Border Foreground="Transparent" Focusable="true" Height="Fit">
-		<HorizontalStack
-				MouseEnter="{Background=RoyalBlue}"
-				MouseLeave="{Background=Transparent}">
-			<Image Margin="2" Width="16" Height="16"
-				Path="#Crow.Icons.folder.svg"/>
+	<ListItem Height="Fit"
+				Selected = "{Background=${ControlHighlight}}"
+				Unselected = "{Background=Transparent}">
+		<HorizontalStack>
+			<Image Margin="2" Width="16" Height="16" Path="#Crow.Icons.folder.svg"/>
 			<Label Text="{Name}" Width="Stretched"/>
 			<Label Text="{LastAccessTime}" />
 		</HorizontalStack>
-	</Border>
+	</ListItem>
 </ItemTemplate>
 

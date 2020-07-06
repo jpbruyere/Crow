@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BasicTests", "Samples\Basic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerfTests", "Samples\PerfTests\PerfTests.csproj", "{18EBB41F-815E-4BF5-B80F-C9E2FAB2993A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugLogAnalyzer", "Samples\DebugLogAnalyzer\DebugLogAnalyzer.csproj", "{7915538F-B2B1-414C-95A3-1FC58E3286B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{18EBB41F-815E-4BF5-B80F-C9E2FAB2993A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18EBB41F-815E-4BF5-B80F-C9E2FAB2993A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18EBB41F-815E-4BF5-B80F-C9E2FAB2993A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7915538F-B2B1-414C-95A3-1FC58E3286B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7915538F-B2B1-414C-95A3-1FC58E3286B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7915538F-B2B1-414C-95A3-1FC58E3286B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7915538F-B2B1-414C-95A3-1FC58E3286B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,6 +75,7 @@ Global
 		{91F1CE07-EECE-4F1D-A3EE-7239B563654A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{7AEB6DD5-916E-4415-84E1-78EC6E5881CE} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{18EBB41F-815E-4BF5-B80F-C9E2FAB2993A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
+		{7915538F-B2B1-414C-95A3-1FC58E3286B9} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00D4E149-7131-49F4-BAAD-559AA961A78E}

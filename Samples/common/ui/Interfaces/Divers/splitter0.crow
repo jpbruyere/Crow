@@ -1,0 +1,7 @@
+﻿<HorizontalStack Margin="50">
+	<Widget Background="SeaGreen" Width="33%"/>
+	<Splitter/>
+	<Widget Background="SeaGreen" Width="33%"/>
+	<Splitter/>
+	<Widget Background="SeaGreen"/>
+</HorizontalStack>

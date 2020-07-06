@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<VerticalStack>
+	<VerticalStack Height="40%">
+		<DbgLogViewer Visible="true" Name="dbv" Events="{Events}" Widgets="{Widgets}" MouseWheelSpeed="10" Font="mono, 8"									
+									CurrentEvent="{²CurrentEvent}" CurrentWidget="{²CurrentWidget}" Background="Onyx"/>
+		<ScrollBar Style="HScrollBar" Maximum="{../dbv.MaxScrollX}" Value="{²../dbv.ScrollX}"/>
+		<HorizontalStack Height="Fit" DataSource="{CurrentWidget}">
+			<Label Text="{name}"/>
+			<Label Text="{listIndex}"/>
+			<Label Text="{treeIndex}"/>
+			<Label Text="{yIndex}"/>
+			<Label Text="{xLevel}"/>
+			<Label Text="Width:"/>
+			<Label Text="{Width}"/>
+			<Label Text="Height:"/>
+			<Label Text="{Height}"/>
+			<Label Text="ScrollX"/>
+			<Label Text="{../../dbv.ScrollX}"/>
+		</HorizontalStack>
+	</VerticalStack>
+	<Splitter/>
+	<HorizontalStack Height="40%">
+		<VerticalStack Width="Stretched">
+			<TreeView Height="Stretched" Name="dbgTV" Data="{Events}" SelectedItem="{²CurrentEvent}" Background="DarkGrey"
+						SelectedItemContainerChanged="onSelectedItemContainerChanged" Painted="onTvPainted"
+						ItemTemplate="#Dbg.DbgEventTreeItems.itemp"/> 
+			<ListBox Data="{CurWidgetRootEvents}" Height="100" SelectedItem="{²CurrentEvent}">
+				<ItemTemplate>
+					<ListItem Margin="0" Height="16" IsSelected="{²IsSelected}" Width="Fit"
+								Selected="{Background=${ControlHighlight}}"
+								Unselected="{Background=Transparent}">
+						<DbgEventWidget Height="10" Width="Fit" Event="{}" Tooltip="#Dbg.DbgEvtTooltip.crow" TicksPerPixel="20" VerticalAlignment="Center"/>
+					</ListItem>
+				</ItemTemplate>
+				<Template>
+					<Wrapper Name="ItemsContainer" Spacing="0" Background="DarkGrey"/>
+				</Template>
+			</ListBox>				
+		</VerticalStack>
+		<Splitter/>
+		<VerticalStack Height="Stretched" Width="20%" Margin="${TooltipMargin}" DataSource="{CurrentEvent}">
+				<Label Text="{type}" Background="{Color}" Foreground="Black" Width="200" TextAlignment="Center" Margin="6"/>
+				<HorizontalStack Height="Fit" Width="Stretched" Spacing="2" Visible="{IsWidgetEvent}" Background="DimGrey" Margin="2">
+					<Label Text="Instance:" Foreground="White" Width="50%" />	
+					<Label Text="{InstanceIndex}" Foreground="White" Background="Onyx" Width="Stretched" TextAlignment="Center"/>				
+				</HorizontalStack>
+				<HorizontalStack Height="Fit" Width="Stretched" Spacing="2" Background="DimGrey" Margin="2">
+					<Label Text="Duration:" Foreground="White" Width="50%" />	
+					<Label Text="{Duration}" Foreground="White" Background="Onyx" Width="Stretched" TextAlignment="Right"/>				
+				</HorizontalStack>
+				<HorizontalStack Height="Fit" Width="Stretched" Spacing="2">
+					<Label Text="Begin:" Foreground="${TooltipForeground}" Width="50%"/>	
+					<Label Text="{begin}" Foreground="${TooltipForeground}" Width="Stretched" TextAlignment="Right"/>				
+				</HorizontalStack>
+				<HorizontalStack Height="Fit" Width="Stretched" Spacing="2">
+					<Label Text="End:" Foreground="${TooltipForeground}" Width="50%"/>	
+					<Label Text="{end}" Foreground="${TooltipForeground}" Width="Stretched" TextAlignment="Right"/>				
+				</HorizontalStack>
+				<VerticalStack Height="Fit" Width="Stretched" >
+					<HorizontalStack Height="Fit" Width="Stretched" Spacing="2" Background="DimGrey" Margin="2">
+						<Label Text="Layout:" Foreground="White" Width="50%" />	
+						<Label Text="{layouting}" Foreground="White" Background="Onyx" Width="Stretched" TextAlignment="Center"/>				
+					</HorizontalStack>
+					<HorizontalStack Height="Fit" Width="Stretched" Spacing="2" Background="DimGrey" Margin="2">
+						<Label Text="Result:" Foreground="White" Width="50%" />	
+						<Label Text="{result}" Foreground="White" Background="Onyx" Width="Stretched" TextAlignment="Center"/>				
+					</HorizontalStack>
+					<HorizontalStack Height="Fit" Width="Stretched" Spacing="2" Background="DimGrey" Margin="2">
+						<Label Text="Old Slot:" Foreground="White" Width="50%" />	
+						<Label Text="{OldSlot}" Foreground="White" Background="Onyx" Width="Stretched" TextAlignment="Center"/>				
+					</HorizontalStack>
+					<HorizontalStack Height="Fit" Width="Stretched" Spacing="2" Background="DimGrey" Margin="2">
+						<Label Text="New Slot:" Foreground="White" Width="50%" />	
+						<Label Text="{NewSlot}" Foreground="White" Background="Onyx" Width="Stretched" TextAlignment="Center"/>				
+					</HorizontalStack>
+				</VerticalStack>		
+				<!--<Label Text="{}" Foreground="${TooltipForeground}"/>-->
+			</VerticalStack>		
+	</HorizontalStack>
+	<Splitter/>
+	<VerticalStack Name="vs">
+			
+		<VerticalStack DataSource="{CurrentEvent}">
+			<ListBox Data="{Events}" Height="100" SelectedItem="{²CurrentEvent}">
+				<ItemTemplate>
+					<ListItem Margin="0" IsSelected="{²IsSelected}" Height="12"
+								Selected="{Background=${ControlHighlight}}"
+								Unselected="{Background=Transparent}">
+						<HorizontalStack>
+							<Label Text="{type}" Width="80"/>
+							<DbgEventWidget Height="8" Width="Stretched" Event="{}"/>
+						</HorizontalStack>
+					</ListItem>
+				</ItemTemplate>
+			</ListBox>
+		</VerticalStack>
+	</VerticalStack>
+</VerticalStack>

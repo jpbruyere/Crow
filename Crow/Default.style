@@ -10,6 +10,10 @@ IconSize = "11";
 IconMargin = "1";
 ToggleIconSize = "16";
 
+TooltipBackground = "Khaki";
+TooltipForeground = "DimGrey";
+TooltipMargin = "3";
+
 WindowBackgroundColor = "DarkGrey";
 WindowBorderColor = "Grey";
 WindowBorderWidth = "1";
@@ -84,8 +88,8 @@ Menu {
 	Height = "Fit";
 	Width = "Stretched";
 	VerticalAlignment = "Top";
-	SelectionBackground = "${ControlHighlight}";
-	SelectionColoring = "false";
+	//SelectionBackground = "${ControlHighlight}";
+	//SelectionColoring = "false";
 }
 MenuItem {
 	Caption = "MenuItem";
@@ -96,8 +100,13 @@ MenuItem {
 	MouseEnter = "{Background=${ControlHighlight}}";
 	MouseLeave = "{Background=${MenuBackground}}";
 	//SelectionBackground = "${ControlHighlight}";
-	SelectionBackground = "Transparent";
-	SelectionColoring = "false";
+	//SelectionBackground = "Transparent";
+	//SelectionColoring = "false";
+}
+ListItem {
+	//Selected = "{Background=${ControlHighlight}}";
+	//Unselected = "{Background=Transparent}";
+	//Margin="1";
 }
 MessageBox {
 	Background = "0.1,0.1,0.2,0.85";

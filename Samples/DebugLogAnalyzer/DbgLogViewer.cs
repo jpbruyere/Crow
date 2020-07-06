@@ -36,38 +36,110 @@ namespace Crow
 
 		FontExtents fe;
 
-		double xScale = 1.0/512.0, yScale = 1.0, leftMargin, topMargin = 0.0;
-		string logFile;
-		DbgWidgetRecord curWidget;
-		DbgEvent curEvent;
+		double xScale = 1.0/1024.0, yScale = 1.0, leftMargin, topMargin = 0.0;
+		DbgWidgetRecord curWidget, hoverWidget;
+		DbgEvent curEvent, hoverEvent;
 
-		List<DbgEvent> events;
-		List<DbgWidgetRecord> objs;
+		List<DbgEvent> events = new List<DbgEvent> ();
+		List<DbgWidgetRecord> widgets = new List<DbgWidgetRecord> ();
 
-		public List<DbgEvent> Events => events;
-		public List<DbgWidgetRecord> Widgets => objs;
+		public List<DbgEvent> Events {
+			get => events;
+			set {
+				if (events == value)
+					return;
+				events = value;
+				NotifyValueChanged (nameof (Events), events);
+				if (events == null)
+					return;
 
+				maxTicks = 0;
+				minTicks = long.MaxValue;
+				foreach (DbgEvent e in events) {
+					if (e.begin < minTicks)
+						minTicks = e.begin;
+					if (e.end > maxTicks)
+						maxTicks = e.end;
+				}
+
+				visibleTicks = maxTicks - minTicks;
+				XScale = (ClientRectangle.Width - leftMargin)/visibleTicks;
+				ScrollX = 0;
+				ScrollY = 0;
+
+				RegisterForGraphicUpdate ();
+			}
+		}
+		public List<DbgWidgetRecord> Widgets {
+			get => widgets;
+			set {
+				if (widgets == value)
+					return;
+				widgets = value;
+				NotifyValueChanged (nameof (Widgets), widgets);
+				updateMargins ();
+				updateMaxScrollX ();
+				updateMaxScrollY ();
+			}
+		}
+		public DbgWidgetRecord CurrentWidget {
+			get => curWidget;
+			set {
+				if (curWidget == value)
+					return;
+				curWidget = value;
+				NotifyValueChanged (nameof (CurrentWidget), curWidget);
+			}
+		}
+		public DbgEvent CurrentEvent {
+			get => curEvent;
+			set {
+				if (curEvent == value)
+					return;
+				if (curEvent != null)
+					curEvent.IsSelected = false;
+				curEvent = value;
+				if (curEvent != null) {
+					curEvent.IsSelected = true;
+					if (curEvent is DbgWidgetEvent we) {
+						//CurrentWidget = Widgets [we.InstanceIndex];
+						currentLine = we.InstanceIndex;
+					}
+					currentTick = curEvent.begin;
+					if (curEvent.begin > minTicks + ScrollX + visibleTicks ||
+						curEvent.end < minTicks + ScrollX) {
+						ScrollX = (int)(currentTick - visibleTicks / 2);
+					}
+				}
+				NotifyValueChanged (nameof (CurrentEvent), curEvent);
+				RegisterForRedraw ();
+			}
+		}
+		public DbgWidgetRecord HoverWidget {
+			get => hoverWidget;
+			internal set {
+				if (hoverWidget == value)
+					return;
+				hoverWidget = value;
+				NotifyValueChanged (nameof (HoverWidget), hoverWidget);
+			}
+		}
+
+		public DbgEvent HoverEvent {
+			get => hoverEvent;
+			set {
+				if (hoverEvent == value)
+					return;
+				hoverEvent = value;
+				NotifyValueChanged (nameof (HoverEvent), hoverEvent);
+			}
+		}
 
 		long currentTick = 0, selStart = -1, selEnd = -1, minTicks = 0, maxTicks = 0, visibleTicks = 0;
 		int currentLine = -1;
 		int visibleLines = 1;
 		Point mousePos;
 
-		public string LogFile {
-			get { return logFile; }
-			set {
-				if (logFile == value)
-					return;
-				logFile = value;
-
-				Console.WriteLine ("before load");
-				loadDebugFile ();
-				Console.WriteLine ("after load");
-
-				NotifyValueChanged ("LogFile", logFile);
-				RegisterForGraphicUpdate ();
-			}
-		}
 		public double XScale {
 			get { return xScale; }
 			set {
@@ -99,7 +171,7 @@ namespace Crow
 
 					fe = gr.FontExtents;
 				}
-				loadDebugFile ();
+				updateMargins ();
 			}
 		}
 		public override int ScrollY {
@@ -107,7 +179,7 @@ namespace Crow
 			set {
 				base.ScrollY = value;
 
-				if (objs == null)
+				if (widgets == null)
 					return;
 
 				Rectangle cb = ClientRectangle;
@@ -124,34 +196,6 @@ namespace Crow
 				NotifyValueChanged ("CurrentLine", currentLine);
 			}
 		}
-
-		public DbgWidgetRecord CurrentWidget {
-			get => curWidget;
-			internal set {
-				if (curWidget == value)
-					return;
-				curWidget = value;
-				NotifyValueChanged (nameof (CurrentWidget), curWidget);
-			}
-		}
-		public DbgEvent CurrentEvent {
-			get => curEvent;
-			internal set {
-				if (curEvent == value)
-					return;
-
-				if (curEvent != null)
-					curEvent.IsSelected = false;
-				curEvent = value;
-				if (curEvent != null) {
-					curEvent.IsSelected = true;
-					curEvent.IsExpanded = true;
-				}
-
-				NotifyValueChanged (nameof (CurrentEvent), curEvent);
-			}
-		}
-
 
 		void drawEvents (Context ctx, List<DbgEvent> evts)
 		{
@@ -188,7 +232,7 @@ namespace Crow
 					ctx.Rectangle (x, penY, w, fe.Height);
 					ctx.Fill ();
 				} else {
-					double x = xScale * (evt.begin - minTicks - ScrollX);
+					/*double x = xScale * (evt.begin - minTicks - ScrollX);
 					x += leftMargin + cb.Left;
 
 					double trunc = Math.Truncate (x);
@@ -208,7 +252,7 @@ namespace Crow
 					ctx.Fill ();
 					ctx.MoveTo (x - 0.5 * te.Width, penY - ctx.FontExtents.Descent);
 					ctx.SetSource (Colors.Jet);
-					ctx.ShowText (s);
+					ctx.ShowText (s);*/
 
 				}
 				drawEvents (ctx, evt.Events);
@@ -224,7 +268,7 @@ namespace Crow
 			gr.FontOptions = Interface.FontRenderingOptions;
 			gr.Antialias = Cairo.Antialias.None;
 
-			if (objs == null)
+			if (widgets == null)
 				return;
 
 			gr.LineWidth = 1.0;
@@ -234,10 +278,10 @@ namespace Crow
 			double penY = topMargin + ClientRectangle.Top;
 
 			for (int i = 0; i < visibleLines; i++) {
-				if (i + ScrollY >= objs.Count)
+				if (i + ScrollY >= widgets.Count)
 					break;
 				int gIdx = i + ScrollY;
-				DbgWidgetRecord g = objs [gIdx];
+				DbgWidgetRecord g = widgets [gIdx];
 
 				penY += fe.Height;
 
@@ -255,10 +299,6 @@ namespace Crow
 
 				gr.MoveTo (penX, penY - gr.FontExtents.Descent);
 				gr.ShowText (g.name + gIdx);
-
-				gr.SetSource (Crow.Colors.White);
-				gr.MoveTo (cb.X, penY - gr.FontExtents.Descent);
-				gr.ShowText ((i + ScrollY).ToString ());
 			}
 
 			drawEvents (gr, events);
@@ -331,17 +371,25 @@ namespace Crow
 			Rectangle r = new Rectangle(mousePos.X, 0, 1, Slot.Height);
 			Rectangle ctxR = ContextCoordinates (r);
 			Rectangle cb = ClientRectangle;
+			ctx.LineWidth = 1.0;
+			double x = xScale * (currentTick - minTicks - ScrollX) + leftMargin;
+			if (x - Math.Truncate (x) > 0.5)
+				x = Math.Truncate (x) + 0.5;
+			else
+				x = Math.Truncate (x) - 0.5;
+			ctx.MoveTo (x, cb.Top + topMargin - 4.0);
+			ctx.LineTo (x, cb.Bottom);
 
-			ctx.Rectangle (ctxR);
+			//ctx.Rectangle (ctxR);
 			ctx.SetSource (Colors.CornflowerBlue);
-			ctx.Fill();
+			ctx.Stroke();
 
 			ctx.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
 			ctx.SetFontSize (Font.Size);
 			ctx.FontOptions = Interface.FontRenderingOptions;
 			ctx.Antialias = Interface.Antialias;
 
-			ctx.MoveTo (ctxR.X, ctxR.Y + fe.Height);
+			ctx.MoveTo (ctxR.X - ctx.TextExtents (currentTick.ToString ()).Width / 2, ctxR.Y + fe.Height);
 			ctx.ShowText (currentTick.ToString ());
 
 			ctx.Operator = Cairo.Operator.Add;
@@ -354,6 +402,10 @@ namespace Crow
 				ctx.SetSourceRGBA (0.1, 0.1, 0.1, 0.4);
 				ctx.Rectangle (ContextCoordinates (r));
 				ctx.Fill ();
+			}
+
+			if (CurrentWidget != null) {
+
 			}
 
 			if (selStart < 0 || selEnd < 0) {
@@ -384,6 +436,10 @@ namespace Crow
 			base.OnLayoutChanges (layoutType);
 			switch (layoutType) {
 			case LayoutingType.Width:
+				if (xScale < 0) {
+					visibleTicks = maxTicks - minTicks;
+					XScale = (ClientRectangle.Width - leftMargin) / visibleTicks;
+				}
 				updateVisibleTicks ();
 				break;
 			case LayoutingType.Height:
@@ -410,6 +466,9 @@ namespace Crow
 			else if (IFace.IsDown(Glfw.MouseButton.Right)) {
 				ScrollX += (int)(lastTick - currentTick);
 				updateMouseLocalPos (e.Position);
+			} else {
+				HoverWidget = (currentLine < 0 || currentLine >= widgets.Count) ? null : widgets [currentLine];
+				HoverEvent = hoverWidget?.Events.FirstOrDefault (ev => ev.begin <= currentTick && ev.end >= currentTick);
 			}
 
 			if (RegisteredLayoutings == LayoutingType.None && !IsDirty)
@@ -421,8 +480,8 @@ namespace Crow
 			base.onMouseDown (sender, e);
 
 			if (e.Button == Glfw.MouseButton.Left) {
-				CurrentWidget = (currentLine < 0 || currentLine >= objs.Count) ? null : objs [currentLine];
-				CurrentEvent = curWidget?.Events.FirstOrDefault (ev => ev.begin <= currentTick && ev.end >= currentTick);
+				CurrentWidget = hoverWidget;
+				CurrentEvent = hoverEvent;
 				selStart = currentTick;
 				selEnd = -1;
 			}
@@ -433,6 +492,18 @@ namespace Crow
 		{
 			base.onMouseUp (sender, e);
 
+			if (e.Button == Glfw.MouseButton.Left && selEnd > 0 && selEnd != selStart) {
+				long scrX = 0;
+				if (selStart < selEnd) {
+					visibleTicks = selEnd - selStart;
+					scrX = selStart - minTicks;
+				} else {
+					visibleTicks = selStart - selEnd;
+					scrX = selEnd - minTicks;
+				}
+				XScale = (ClientRectangle.Width - leftMargin) / visibleTicks;
+				ScrollX = (int)scrX;
+			}
 			selStart = -1;
 			selEnd = -1;
 
@@ -442,7 +513,7 @@ namespace Crow
 		/// <summary> Process scrolling vertically, or if shift is down, vertically </summary>
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e)
 		{			
-			//base.onMouseWheel (sender, e);
+			base.onMouseWheel (sender, e);
 
 			if (IFace.Shift)
 				ScrollX -= (int)((double)(e.Delta * MouseWheelSpeed) / xScale);
@@ -472,22 +543,13 @@ namespace Crow
 				selEnd = selStart = -1;
 			}
 		}
-		async void loadDebugFile ()
+
+		void updateMargins ()
 		{
-			await loadDebugFileAsync ();
-		}
-
-
-
-		async Task loadDebugFileAsync ()
-		{
-			if (!File.Exists (logFile))
-				return;
-
-			events = new List<DbgEvent> ();
-			objs = new List<DbgWidgetRecord> ();
-			minTicks = maxTicks = 0;
 			leftMargin = topMargin = 0.0;
+
+			if (widgets == null)
+				return;
 
 			using (Context gr = new Context (IFace.surf)) {
 				double maxNameWidth = 0.0;
@@ -495,67 +557,17 @@ namespace Crow
 				gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
 				gr.SetFontSize (Font.Size);
 
-				using (StreamReader s = new StreamReader (logFile)) {
-					if (s.ReadLine () != "[GraphicObjects]")
-						return;
-					while (!s.EndOfStream) {
-						string l = s.ReadLine ();
-						if (l == "[Events]")
-							break;
-						DbgWidgetRecord o = DbgWidgetRecord.Parse (l);
-						objs.Add (o);
-						double nameWidth = gr.TextExtents (o.name).Width + 5.0 * o.xLevel;
-						if (nameWidth > maxNameWidth)
-							maxNameWidth = nameWidth;
-					}
-
-					Stack<DbgEvent> startedEvents = new Stack<DbgEvent> ();
-
-					if (!s.EndOfStream) {
-						while (!s.EndOfStream) {
-							int level = 0;
-							while (s.Peek () == (int)'\t') {
-								s.Read ();
-								level++;
-							}
-							DbgEvent evt = DbgEvent.Parse (s.ReadLine ());
-							if (evt.end > maxTicks)
-								maxTicks = evt.end;
-							if (level == 0) {
-								startedEvents.Clear ();
-								events.Add (evt);
-							} else {
-								int levelDiff = level - startedEvents.Count + 1;
-								if (levelDiff > 0) {
-									if (levelDiff > 1)
-										System.Diagnostics.Debugger.Break ();
-									startedEvents.Peek ().AddEvent (evt);
-								} else {
-									startedEvents.Pop ();
-									if (-levelDiff > startedEvents.Count)
-										System.Diagnostics.Debugger.Break ();
-									while (startedEvents.Count > level)
-										startedEvents.Pop ();
-									startedEvents.Peek ().AddEvent (evt);
-								}
-							}
-							startedEvents.Push (evt);
-							if (evt.type.HasFlag(DbgEvtType.Widget))
-								objs [(evt as DbgWidgetEvent).InstanceIndex].Events.Add (evt);
-						}
-						if (events.Count > 0)
-							minTicks = events [0].begin;
-					}
+				foreach (DbgWidgetRecord o in widgets) {
+					double nameWidth = gr.TextExtents (o.name).Width + 5.0 * o.xLevel;
+					if (nameWidth > maxNameWidth)
+						maxNameWidth = nameWidth;
 				}
 
-				leftMargin = 2.5 + maxNameWidth;
+				leftMargin = 10.5 + maxNameWidth;
 				topMargin = 2.0 * fe.Height;
 
-				updateVisibleLines ();
-				updateVisibleTicks ();
+				RegisterForGraphicUpdate ();
 			}
-			NotifyValueChanged ("Widgets", Widgets);
-			NotifyValueChanged ("Events", Events);
 		}
 
 		void updateVisibleLines ()
@@ -573,17 +585,17 @@ namespace Crow
 
 		void updateMaxScrollX ()
 		{
-			if (objs == null)
+			if (widgets == null)
 				MaxScrollX = 0;
 			else
 				MaxScrollX = (int)Math.Max (0L, maxTicks - minTicks - visibleTicks);
 		}
 		void updateMaxScrollY ()
 		{
-			if (objs == null)
+			if (widgets == null)
 				MaxScrollY = 0;
 			else
-				MaxScrollY = Math.Max (0, objs.Count - visibleLines);
+				MaxScrollY = Math.Max (0, widgets.Count - visibleLines);
 		}
 
 		void updateMouseLocalPos (Point mPos)
@@ -611,6 +623,7 @@ namespace Crow
 			mousePos.Y = Math.Min (cb.Bottom, mousePos.Y);
 
 			currentTick = (int)((double)(mousePos.X - cb.X) / xScale) + minTicks + ScrollX;
+			RegisterForRedraw ();
 		}
 		void zoom (long start, long end) {						
 			//Rectangle cb = ClientRectangle;

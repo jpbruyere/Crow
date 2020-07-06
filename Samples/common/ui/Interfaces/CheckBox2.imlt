@@ -1,5 +1,5 @@
-﻿<Label Font="{./Font}" Text="{./Caption}" Height="{./HeightPolicy}" Width="{./WidthPolicy}"
-	Margin="3"
+﻿<Label Font="{./Font}" Text="{./Caption}" Width="Stretched"
+	Margin="5"
 	Background="{./Background}"
 	Foreground="DimGrey"
 	TextAlignment="Center"

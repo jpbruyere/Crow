@@ -32,7 +32,7 @@
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<DebugType>full</DebugType>
-		<DefineConstants>$(DefineConstants);DEBUG_LOG;DEBUG;TRACE;DEBUG_LAYOUTING;DEBUG_DISPOSE;_DEBUG_BINDING;_DEBUG_CLIP_RECTANGLE</DefineConstants>
+		<DefineConstants>$(DefineConstants);_DEBUG_LOG;DEBUG;TRACE;DEBUG_LAYOUTING;DEBUG_DISPOSE;_DEBUG_BINDING;_DEBUG_CLIP_RECTANGLE</DefineConstants>
 		<CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
 	</PropertyGroup>
 	<ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">

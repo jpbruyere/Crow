@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Crow;
 
@@ -81,6 +82,79 @@ namespace Crow
 				=> $"{Prop1}, {Prop2}";
 
 		}
+		public class TestClassVC : IValueChange
+		{
+			public event EventHandler<ValueChangeEventArgs> ValueChanged;
+			public void NotifyValueChanged (object _value, [CallerMemberName] string caller = null)
+				=> ValueChanged.Raise (this, new ValueChangeEventArgs (caller, _value));
+			string prop1, prop2;
+			public string Prop1 {
+				get => prop1;
+				set {
+					if (prop1 == value)
+						return;
+					prop1 = value;
+					NotifyValueChanged (prop1);
+				}
+			}
+			public string Prop2 {
+				get => prop2;
+				set {
+					if (prop2 == value)
+						return;
+					prop2 = value;
+					NotifyValueChanged (prop2);
+				}
+
+
+
+		}
+
+		public override string ToString ()
+				=> $"{Prop1}, {Prop2}";
+
+		}
+		TestClass tcInstance;// = new TestClass () { Prop1 = "instance 0 prop1 value", Prop2 = "instance 0 prop2 value" };
+		TestClassVC tcVCInstance;// = new TestClassVC () { Prop1 = "instance 0 prop1 value", Prop2 = "instance 0 prop2 value" };
+		TestClass tcInstance1 = new TestClass () { Prop1 = "instance 1 prop1 value", Prop2 = "instance 1 prop2 value" };
+		TestClassVC tcVCInstance1 = new TestClassVC () { Prop1 = "instance 1 prop1 value", Prop2 = "instance 1 prop2 value" };
+		TestClass tcInstance2 = new TestClass () { Prop1 = "instance 2 prop1 value", Prop2 = "instance 2 prop2 value" };
+		TestClassVC tcVCInstance2 = new TestClassVC () { Prop1 = "instance 2 prop1 value", Prop2 = "instance 2 prop2 value" };
+
+		public TestClass TcInstance {
+			get => tcInstance;
+			set {
+				if (tcInstance == value)
+					return;
+				tcInstance = value;
+				NotifyValueChanged (tcInstance);
+			}
+		}
+		public TestClassVC TcVCInstance {
+			get => tcVCInstance;
+			set {
+				if (tcVCInstance == value)
+					return;
+				tcVCInstance = value;
+				NotifyValueChanged (tcVCInstance);
+			}
+		}
+
+		void tcInstance_ChangeProperties_MouseClick (object sender, MouseButtonEventArgs e)
+		{
+		}
+		public void tcInstance_ChangeInstance_MouseClick (object sender, MouseButtonEventArgs e)
+		{
+			if (TcInstance == tcInstance1)
+				TcInstance = tcInstance2;
+			else
+				TcInstance = tcInstance1;
+		}
+		void tcVCInstance_ChangeInstance_MouseClick (object sender, MouseButtonEventArgs e)
+		{
+			TcVCInstance = new TestClassVC () { Prop1 = "prop1 value changed", Prop2 = "prop2 value changed" };
+		}
+
 		public IEnumerable<TestClass> List3 = new List<TestClass> (new TestClass[]
 			{
 				new TestClass { Prop1 = "string1", Prop2="prop2-1" },

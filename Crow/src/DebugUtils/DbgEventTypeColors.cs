@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Crow
 {
-	public class DbgEventTypeColors : Widget
+	/*public class DbgEventTypeColors : Widget
 	{
 		protected override void onDraw (Context gr)
 		{
@@ -49,6 +49,6 @@ namespace Crow
 
 			}
 		}
-	}
+	}*/
 }
 

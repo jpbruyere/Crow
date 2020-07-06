@@ -262,7 +262,7 @@ namespace Crow
 			loadDefaultValues ();
 		}
 		#region private fields
-		LayoutingType registeredLayoutings = LayoutingType.All;
+		LayoutingType registeredLayoutings;// = LayoutingType.All;
 		ILayoutable logicalParent;
 		ILayoutable parent;
 		string name;
@@ -379,6 +379,12 @@ namespace Crow
 				return cb;
 			}
 		}
+		/// <summary>
+		/// Compute rectangle position on surface of the context. It ma be the first cached surface in parenting chain,
+		/// or the top backend surface if no cached widget is part of the current widget tree.
+		/// </summary>
+		/// <returns>A new rectangle with same dimension as the input one with x and y relative to the context surface</returns>
+		/// <param name="r">A rectangle to compute the coordinate for.</param>
 		public virtual Rectangle ContextCoordinates(Rectangle r){
 			Widget go = Parent as Widget;
 			if (go == null)
@@ -386,6 +392,15 @@ namespace Crow
 			return go.CacheEnabled ?
 				r + Parent.ClientRectangle.Position :
 				Parent.ContextCoordinates (r);
+		}
+
+		public virtual Rectangle RelativeSlot (Widget target)
+		{
+			if (this == target)
+				return Slot;
+			if (Parent is Widget p)
+				return Slot + p.RelativeSlot (target).Position + Margin;
+			return Slot + new Point(Margin, Margin);
 		}
 		public virtual Rectangle ScreenCoordinates (Rectangle r){
 			try {
@@ -465,6 +480,7 @@ namespace Crow
 		public event EventHandler<DataSourceChangeEventArgs> ParentChanged;
 		/// <summary>Occurs when the logical parent has changed</summary>
 		public event EventHandler<DataSourceChangeEventArgs> LogicalParentChanged;
+		public event EventHandler Painted;
 		#endregion
 
 		internal bool hasDoubleClick => MouseDoubleClick != null;
@@ -973,12 +989,12 @@ namespace Crow
 			get {
 				return rootDataLevel ? dataSource : dataSource == null ?
 					LogicalParent == null ? null :
-					LogicalParent is Widget ? (LogicalParent as Widget).DataSource : null :
+					LogicalParent is Widget w ? w.DataSource : null :
 					dataSource;
 			}
 		}
 		/// <summary>
-		/// If true, lock datasource seeking upward in logic or graphic tree to this widget
+		/// If true, lock datasource seeking upward in logic or graphic tree to this widget.
 		/// </summary>
 		[DesignCategory ("Data")][DefaultValue(false)]
 		public virtual bool RootDataLevel {
@@ -1023,6 +1039,17 @@ namespace Crow
 				NotifyValueChangedAuto (style);
 			}
 		}
+		/// <summary>
+		/// Gets or sets a tooltip to show when mouse stay still over the control.
+		/// </summary>
+		/// <remarks>
+		/// By default, the tooltip container widget that will be show is defined in '#Crow.Tooltip.template' and the widget
+		/// tooltip string is interpreted as a single string helper message that may be a binding expression.
+		/// If the widget Tooltip property start with a '#', the tooltip string will be interpreted as a resource path of
+		/// a custom IML template to show, which will have its datasource set to the widget triggering the tooltip.
+		/// </remarks>
+		/// <value>A single helpt string that may comes from a binding expression, or by starting with a '#',
+		/// You may provide a custom tooltip template resource path.</value>
 		[DesignCategory ("Divers")]
 		public virtual string Tooltip {
 			get { return tooltip; }
@@ -1250,6 +1277,10 @@ namespace Crow
 		public virtual Widget FindByName(string nameToFind){
 			return string.Equals(nameToFind, name, StringComparison.Ordinal) ? this : null;
 		}
+		public virtual Widget FindByType<T> ()
+		{
+			return this is T ? this : null;
+		}
 		public virtual bool Contains(Widget goToFind){
 			return false;
 		}
@@ -1442,7 +1473,7 @@ namespace Crow
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForRedraw ()
 		{
-#if DEBUG
+#if DEBUG_LOG
 			if (disposed) {
 				DbgLogger.AddEvent (DbgEvtType.GORegisterForRedraw | DbgEvtType.AlreadyDisposed, this);
 				return;
@@ -1458,6 +1489,9 @@ namespace Crow
 
 		/// <summary> return size of content + margins </summary>
 		public virtual int measureRawSize (LayoutingType lt) {
+#if DEBUG_LOG
+			DbgLogger.AddEvent(DbgEvtType.GOMeasure, this);
+#endif
 			return lt == LayoutingType.Width ?
 				contentSize.Width + 2 * margin: contentSize.Height + 2 * margin;
 		}
@@ -1766,11 +1800,10 @@ namespace Crow
 
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 			if (clearBackground) {
-					ctx.Save ();
-					ctx.Operator = Operator.Clear;
-					ctx.Rectangle (rb);
-					ctx.Fill ();
-					ctx.Restore ();
+				ctx.Operator = Operator.Clear;
+				ctx.Rectangle (rb);
+				ctx.Fill ();
+				ctx.Operator = Operator.Over;
 			}
 
 			ctx.SetSourceSurface (bmp, rb.X, rb.Y);
@@ -1835,6 +1868,7 @@ namespace Crow
 				}
 				LastPaintedSlot = Slot;
 			}
+			Painted.Raise (this, null);
 		}
 		void paintDisabled(Context gr, Rectangle rb){
 			gr.Operator = Operator.Xor;

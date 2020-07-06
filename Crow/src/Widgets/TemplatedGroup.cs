@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
+using Crow.Cairo;
 using Crow.IML;
 
 namespace Crow {
@@ -41,13 +42,14 @@ namespace Crow {
 
 		#region events
 		public event EventHandler<SelectionChangeEventArgs> SelectedItemChanged;
+		/// <summary>
+		/// raised when root widget of item template is a 'ListItem' and this item is selected.
+		/// </summary>
+		public event EventHandler<SelectionChangeEventArgs> SelectedItemContainerChanged;
 		public event EventHandler Loaded;
 		#endregion
 
 		IEnumerable data;
-		int _selectedIndex = -1;
-		Color selBackground, selForeground;
-		bool selColoring;
 
 		int itemPerPage = 50;
 		CrowThread loadingThread = null;
@@ -121,56 +123,23 @@ namespace Crow {
 				: items.Children;
 			}
 		}
-		/// <summary>
-		/// Enable SelectionBackground and SelectionForeground color for selected item
-		/// </summary>
-		[DefaultValue (false)]
-		public bool SelectionColoring {
-			get => selColoring;
+
+		object selectedItem;
+		Widget selectedItemContainer = null;
+
+		[XmlIgnore]public virtual object SelectedItem{
+			get => selectedItem;
 			set {
-				if (selColoring == value)
+				if (SelectedItem == value)
 					return;
-				selColoring = value;
-				NotifyValueChangedAuto (selColoring);
-			}
-		}
-		[DefaultValue(-1)]public virtual int SelectedIndex{
-			get { return _selectedIndex; }
-			set {
-				if (value == _selectedIndex)
-					return;
+					
+				selectedItem = value;
 
-				if (selColoring && _selectedIndex >= 0 && Items.Count > _selectedIndex) {
-					Items[_selectedIndex].Foreground = Colors.Transparent;
-					Items[_selectedIndex].Background = Colors.Transparent;
-				}
-
-				_selectedIndex = value;
-
-				if (selColoring && _selectedIndex >= 0 && Items.Count > _selectedIndex) {
-					Items[_selectedIndex].Foreground = SelectionForeground;
-					Items[_selectedIndex].Background = SelectionBackground;
-				}
-
-				NotifyValueChangedAuto (_selectedIndex);
 				NotifyValueChanged ("SelectedItem", SelectedItem);
 				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
 			}
 		}
-		[XmlIgnore]public virtual object SelectedItem{
-			get { return data == null ? null : _selectedIndex < 0 ? data.GetDefaultValue() : data is IList tmp ? tmp[_selectedIndex] : null; }
-			set {
-				if (data == null) {
-					SelectedIndex = -1;
-					return;
-				}
-				//TODO:double check if value type will be notified to binding sys
-				if (value == SelectedItem)
-					return;
-				
-				SelectedIndex = (int)((IList)data)?.IndexOf (value);
-			}
-		}
+
 		[XmlIgnore]public bool HasItems {
 			get { return Items.Count > 0; }
 		}
@@ -210,9 +179,8 @@ namespace Crow {
 				loadingThread.Finished += (object sender, EventArgs e) => (sender as TemplatedGroup).Loaded.Raise (sender, e);
 				loadingThread.Start ();
 
-				NotifyValueChanged ("SelectedIndex", _selectedIndex);
-				NotifyValueChanged ("SelectedItem", SelectedItem);
-				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
+				//NotifyValueChanged ("SelectedIndex", _selectedIndex);
+				//NotifyValueChanged ("SelectedItem", SelectedItem);
 				NotifyValueChanged ("HasItems", HasItems);
 			}
 		}
@@ -245,28 +213,6 @@ namespace Crow {
 
 		}
 
-		[DefaultValue("SteelBlue")]
-		public virtual Color SelectionBackground {
-			get { return selBackground; }
-			set {
-				if (value == selBackground)
-					return;
-				selBackground = value;
-				NotifyValueChangedAuto (selBackground);
-				RegisterForRedraw ();
-			}
-		}
-		[DefaultValue("White")]
-		public virtual Color SelectionForeground {
-			get { return selForeground; }
-			set {
-				if (value == selForeground)
-					return;
-				selForeground = value;
-				NotifyValueChangedAuto (selForeground);
-				RegisterForRedraw ();
-			}
-		}
 
 		protected void raiseSelectedItemChanged(){
 			SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
@@ -288,9 +234,8 @@ namespace Crow {
 
 		public virtual void ClearItems()
 		{
-			_selectedIndex = -1;
-			NotifyValueChanged ("SelectedIndex", _selectedIndex);
-			NotifyValueChanged ("SelectedItem", null);
+			selectedItemContainer = null;
+			SelectedItem = null;
 
 			items.ClearChildren ();
 			NotifyValueChanged ("HasChildren", false);
@@ -305,6 +250,18 @@ namespace Crow {
 
 			foreach (Widget w in Items) {
 				Widget r = w.FindByName (nameToFind);
+				if (r != null)
+					return r;
+			}
+			return null;
+		}
+		public override Widget FindByType<T> ()
+		{
+			if (this is T)
+				return this;
+
+			foreach (Widget w in Items) {
+				Widget r = w.FindByType<T> ();
 				if (r != null)
 					return r;
 			}
@@ -487,18 +444,32 @@ namespace Crow {
 				g.MouseClick += itemClick;
 			Monitor.Exit (IFace.LayoutMutex);
 
-			if (iTemp.Expand != null && g is Expandable) {
+			if (iTemp.Expand != null) {
 				Expandable e = g as Expandable;
-				e.Expand += iTemp.Expand;
-				if ((o as ICollection) == null)
-					e.GetIsExpandable = new BooleanTestOnInstance((instance) => true);
-				else
-					e.GetIsExpandable = iTemp.HasSubItems;
+				if (e == null)
+					e = g.FindByType<Expandable> () as Expandable;
+					
+				if (e != null) { 
+					e.Expand += iTemp.Expand;
+					if ((o as ICollection) == null)
+						e.GetIsExpandable = new BooleanTestOnInstance ((instance) => true);
+					else
+						e.GetIsExpandable = iTemp.HasSubItems;
+				}
+			}
+
+			if (g is ListItem li) {
+				li.Selected += Li_Selected;
 			}
 
 			g.DataSource = o;
 		}
 
+		//void expandable_expandevent (object sender, EventHandler )
+		void Li_Selected (object sender, EventArgs e)
+		{
+			SelectedItemContainerChanged.Raise (this, new SelectionChangeEventArgs (sender));
+		}
 
 		//		protected void _list_LayoutChanged (object sender, LayoutingEventArgs e)
 		//		{
@@ -531,7 +502,15 @@ namespace Crow {
 		}
 		internal virtual void itemClick(object sender, MouseButtonEventArgs e){
 			//SelectedIndex = (int)((IList)data)?.IndexOf((sender as Widget).DataSource);
-			SelectedIndex = items.Children.IndexOf(sender as Widget);
+			if (selectedItemContainer is ListItem li)
+				li.IsSelected = false;
+			selectedItemContainer = sender as Widget;
+			if (selectedItemContainer is ListItem nli)
+				nli.IsSelected = true;
+			if (selectedItemContainer == null)
+				return;
+			SelectedItem = selectedItemContainer.DataSource;
+			//SelectedIndex = items.Children.IndexOf(sender as Widget);
 		}
 
 		bool emitHelperIsAlreadyExpanded (Widget go){

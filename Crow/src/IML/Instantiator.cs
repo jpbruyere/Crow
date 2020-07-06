@@ -1563,7 +1563,15 @@ namespace Crow.IML {
 			if (t != null) {
 				knownGOTypes.Add (typeName, t);
 				return t;
-			}			
+			}
+
+			foreach (Type expT in Assembly.GetEntryAssembly ().GetExportedTypes ()) {
+				if (expT.Name != typeName)
+					continue;
+				knownGOTypes.Add (typeName, expT);
+				return expT;
+			}
+
 			foreach (Assembly a in Interface.crowAssemblies) {
 				foreach (Type expT in a.GetExportedTypes ()) {
 					if (expT.Name != typeName)

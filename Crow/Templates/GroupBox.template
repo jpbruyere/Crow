@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0"?>
-<Container Background="{./Background}">
-	<Group>
+<Container Background="{./Background}" >
+	<Group CacheEnabled="true">
 		<VerticalStack Spacing="0">
 			<Widget Height="6"/>
 			<Border  CornerRadius="{./CornerRadius}" BorderWidth="1" Margin="10" Foreground="{./Foreground}">
 				<Container Name="Content" Margin="0" MinimumSize="70,10"/>
 			</Border>
 		</VerticalStack>
-		<Label Text="{./Caption}" VerticalAlignment="Top" Left="8" Background="Clear" Margin="1"/>
+		<Label Text="{./Caption}" VerticalAlignment="Top" Left="8" Background="Clear" Margin="1" CacheEnabled="true"/>
 	</Group>
 </Container>

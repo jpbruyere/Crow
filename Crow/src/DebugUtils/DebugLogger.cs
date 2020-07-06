@@ -62,6 +62,7 @@ namespace Crow
 		GORegisterLayouting 			= Layouting | Widget | 0x01,
 		GOProcessLayouting				= Layouting | Widget | 0x02,
 		GOProcessLayoutingWithNoParent 	= Layouting | Widget | Warning | 0x01,
+		GOMeasure						= Widget | 0x03,
 		GODraw							= Drawing | Widget | 0x01,
 		GORecreateCache					= Drawing | Widget | 0x02,
 		GOUpdateCache					= Drawing | Widget | 0x03,
@@ -235,7 +236,7 @@ namespace Crow
 						//Widget.GraphicObjects = Widget.GraphicObjects.OrderBy (o => o.yIndex).ToList ();
 						for (int i = 0; i < Widget.GraphicObjects.Count; i++) {
 							Widget g = Widget.GraphicObjects [i];
-							s.WriteLine ($"{g.GetType ().Name};{g.yIndex};{g.xLevel}");
+							s.WriteLine ($"{g.GetType ().Name};{g.yIndex};{g.xLevel};{g.Width};{g.Height}");
 						}
 					}
 					s.WriteLine ("[Events]");
