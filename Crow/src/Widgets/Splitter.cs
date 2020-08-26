@@ -161,7 +161,7 @@ namespace Crow
 			if (init1 >= 0 && u1 == Unit.Percent) {
 				if (gs.Orientation == Orientation.Horizontal)
 					go1.Width = new Measure ((int)Math.Ceiling (
-						go1.Width.Value * 100.0 / (double)gs.Slot.Width), Unit.Percent);
+						go1.Width.Value * 100.0 / (double)(gs.Slot.Width - 2 * gs.Margin)), Unit.Percent);
 				else
 					go1.Height = new Measure ((int)Math.Ceiling (
 						go1.Height.Value * 100.0 / (double)gs.Slot.Height), Unit.Percent);
@@ -169,7 +169,7 @@ namespace Crow
 			if (init2 >= 0 && u2 == Unit.Percent) {
 				if (gs.Orientation == Orientation.Horizontal)
 					go2.Width = new Measure ((int)Math.Floor (
-						go2.Width.Value * 100.0 / (double)gs.Slot.Width), Unit.Percent);
+						go2.Width.Value * 100.0 / (double)(gs.Slot.Width - 2 * gs.Margin)), Unit.Percent);
 				else
 					go2.Height = new Measure ((int)Math.Floor (
 						go2.Height.Value * 100.0 / (double)gs.Slot.Height), Unit.Percent);
