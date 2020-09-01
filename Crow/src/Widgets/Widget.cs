@@ -701,14 +701,15 @@ namespace Crow
 		/// </summary>
 		[XmlIgnore]public virtual bool HasFocus {
 			get { return hasFocus; }
-			internal set {
+			set {
 				if (value == hasFocus)
 					return;
 
 				hasFocus = value;
-				if (hasFocus)
+				if (hasFocus) {
+					IFace.FocusedWidget = this;
 					onFocused (this, null);
-				else
+				} else
 					onUnfocused (this, null);
 				NotifyValueChangedAuto (hasFocus);
 			}

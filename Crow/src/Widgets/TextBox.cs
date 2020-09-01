@@ -18,7 +18,7 @@ namespace Crow
 		[XmlIgnore]public override bool HasFocus   //trigger update when lost focus to errase text beam
         {
             get => base.HasFocus;
-            internal set {
+            set {
 				if (base.HasFocus == value)
 					return;
                 base.HasFocus = value;

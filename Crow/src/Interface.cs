@@ -125,6 +125,17 @@ namespace Crow
 		Cursor currentCursor;
 		bool ownWindow;
 
+		protected void registerGlfwCallbacks ()
+		{
+			windows.Add (hWin, this);
+			Glfw3.SetKeyCallback (hWin, HandleKeyDelegate);
+			Glfw3.SetMouseButtonPosCallback (hWin, HandleMouseButtonDelegate);
+			Glfw3.SetCursorPosCallback (hWin, HandleCursorPosDelegate);
+			Glfw3.SetScrollCallback (hWin, HandleScrollDelegate);
+			Glfw3.SetCharCallback (hWin, HandleCharDelegate);
+			Glfw3.SetWindowSizeCallback (hWin, HandleWindowSizeDelegate);
+		}
+
 		void initSurface ()
 		{
 			Glfw3.Init ();
@@ -138,12 +149,7 @@ namespace Crow
 				throw new Exception ("[GLFW3] Unable to create vulkan Window");
 			ownWindow = true;
 
-			Glfw3.SetKeyCallback (hWin, HandleKeyDelegate);
-			Glfw3.SetMouseButtonPosCallback (hWin, HandleMouseButtonDelegate);
-			Glfw3.SetCursorPosCallback (hWin, HandleCursorPosDelegate);
-			Glfw3.SetScrollCallback (hWin, HandleScrollDelegate);
-			Glfw3.SetCharCallback (hWin, HandleCharDelegate);
-			Glfw3.SetWindowSizeCallback (hWin, HandleWindowSizeDelegate);
+			registerGlfwCallbacks ();
 
 			switch (Environment.OSVersion.Platform) {
 			case PlatformID.MacOSX:
@@ -166,8 +172,6 @@ namespace Crow
 			case PlatformID.WinCE:
 				throw new PlatformNotSupportedException ("Unable to create cairo surface.");
 			}
-
-			windows.Add (hWin, this);
 		}
 
 		#region events delegates
@@ -597,7 +601,7 @@ namespace Crow
 		#region focus
 		Widget _activeWidget;	//button is pressed on widget
 		Widget _hoverWidget;		//mouse is over
-		Widget _focusedWidget;	//has keyboard (or other perif) focus
+		internal Widget _focusedWidget;	//has keyboard (or other perif) focus
 
 		/// <summary>Widget is focused and button is down or another perif action is occuring
 		/// , it can not lose focus while Active</summary>
