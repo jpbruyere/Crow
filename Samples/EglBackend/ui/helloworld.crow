@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Window Caption="Showcase" Height="90%" Width="90%" Background="Jet">
+	<HorizontalStack>
+		<VerticalStack Width="30%" Margin="5">
+			<GroupBox Caption="Performance" Height="Fit">
+				<VerticalStack DataSource="{updateMeasure}" Width="90%" Height="Fit" Spacing="2">
+					<HorizontalStack Style="HStackMeasure">
+						<Label Text="Cur:" Style="FpsLabel"/>
+						<Label Text="{current}" Style="FpsDisp"/>
+					</HorizontalStack>
+					<HorizontalStack Style="HStackMeasure">
+						<Label Text="Min:" Style="FpsLabel"/>
+						<Label Text="{minimum}" Style="FpsDisp"/>
+					</HorizontalStack>
+					<HorizontalStack Style="HStackMeasure">
+						<Label Text="Mean:" Style="FpsLabel"/>
+						<Label Text="{mean}" Style="FpsDisp"/>
+					</HorizontalStack>
+					<HorizontalStack Style="HStackMeasure">
+						<Label Text="Max:" Style="FpsLabel"/>
+						<Label Text="{maximum}" Style="FpsDisp"/>
+					</HorizontalStack>										
+				</VerticalStack>
+			</GroupBox>
+			<Label Width="Stretched" Margin="3" Background="DimGrey" />
+			<TextBox Text="TextBox" Multiline="true" Margin="3" />
+			<HorizontalStack Height="Fit" Margin="5" Background="DimGrey" CornerRadius="10">
+				<VerticalStack Spacing="5" Width="50%">
+					<CheckBox Fit="true" Caption="test" />
+					<CheckBox Fit="true" />
+					<CheckBox Fit="true" />
+					<CheckBox Fit="true" IsChecked="true" />
+				</VerticalStack>
+				<VerticalStack Spacing="5" Width="50%">
+					<RadioButton Fit="true" />
+					<RadioButton Fit="true" IsChecked="true" />
+					<RadioButton Fit="true" />
+					<RadioButton Fit="true" />
+				</VerticalStack>
+			</HorizontalStack>
+			<HorizontalStack Height="Fit" Margin="5">
+				<Label Text="MouseEvents" Width="50%" Margin="3" Focusable="true" Background="Jet" Foreground="DimGrey" TextAlignment="Center" MouseEnter="{Foreground=White}" MouseLeave="{Foreground=DimGrey}" MouseDown="{Background=DarkRed}" MouseClick="{Foreground=Green}" MouseDoubleClick="{Foreground=Yellow}" MouseUp="{Background=Jet}" />
+				<Label Text="MouseEvents" Width="50%" Margin="3" Background="Jet" Foreground="DimGrey" TextAlignment="Center" MouseClick="{Foreground=Green}" MouseDoubleClick="{Foreground=Yellow}" MouseEnter="{Foreground=White}" MouseLeave="{Foreground=DimGrey}" MouseDown="{Background=SeaGreen}" MouseUp="{Background=DimGrey}" />
+			</HorizontalStack>
+			<GroupBox Caption="Templated controls" Height="Fit" Margin="5">
+				<HorizontalStack Height="Fit">
+					<VerticalStack Width="50%">
+						<CheckBox Style="CheckBox2" IsChecked="true" />
+						<CheckBox Style="CheckBox2" />
+						<CheckBox Style="CheckBox2" />
+						<CheckBox Style="CheckBox2" />
+					</VerticalStack>
+					<Splitter />
+					<VerticalStack Width="50%">
+						<RadioButton Style="CheckBox2" />
+						<RadioButton Style="CheckBox2" />
+						<RadioButton Style="CheckBox2" />
+						<RadioButton Style="CheckBox2" />
+					</VerticalStack>
+				</HorizontalStack>
+			</GroupBox>
+			<HorizontalStack Height="Fit">
+				<Label Text="Spinner" />
+				<Spinner Fit="true" />
+			</HorizontalStack>
+			<HorizontalStack Height="Fit">
+				<Button Caption="Button">
+					<Label Font="{./Font}" Name="caption" Margin="3" Foreground="LightGrey" Text="{./Caption}" />
+				</Button>
+				<Button Caption="Button" IsEnabled="false">
+					<Label Font="{./Font}" Name="caption" Margin="3" Foreground="LightGrey" Text="{./Caption}" />
+				</Button>
+			</HorizontalStack>
+		</VerticalStack>
+		<Splitter />
+		<VerticalStack Width="40%" Margin="5" Spacing="5">
+			<Expandable>
+				<Image Path="#Crow.Icons.crow.svg" />
+			</Expandable>
+			<Popper >
+				<Image Path="#Crow.Icons.crow.svg" Background="White" Height="100" Width="100" Margin="20" />
+			</Popper>
+			<Slider Height="10" Width="90%" />
+			<Container Height="Fit" Width="200" Background="DimGrey" Margin="2" CornerRadius="5">
+				<ProgressBar Background="DimGrey" Height="10" Value="50" />
+			</Container>
+			<Image Path="#Crow.Icons.crow.svg" Width="60" Height="60" Background="LightGrey" />
+			<MessageBox Movable="false" />
+			<ColorPicker CurrentColor="{²../go.Background}" Name="colorPicker" Margin="5" />
+			<Widget Name="go" Width="100" Height="60" Background="{../../colorList.SelectedItem}" />
+			<Label Text="{../colorPicker.CurrentColor}" />
+		</VerticalStack>
+		<Splitter />
+		<VerticalStack Width="30%" Margin="5">
+			<ListBox Name="colorList" Data="{TestList}" Margin="5" ItemTemplate="Interfaces/colorItem.crow" />
+		</VerticalStack>
+	</HorizontalStack>
+</Window>
