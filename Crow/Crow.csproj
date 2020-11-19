@@ -38,17 +38,21 @@
 	<ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
 		<PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.6.0" />
 		<PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.6.0" />
-		<PackageReference Include="glfw-sharp" Version="0.2.9-beta" />
-		<PackageReference Include="FastEnum" Version="1.5.3" />
 	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="FastEnum" Version="1.5.3" />
+		<PackageReference Include="glfw-sharp" Version="0.2.10-beta" />
+	</ItemGroup>
+
 	<PropertyGroup Condition=" '$(CrowStbSharp)' == 'true'">
 		<DefineConstants>$(DefineConstants);STB_SHARP</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup Condition=" '$(CrowStbSharp)' == 'true'">
 		<PackageReference Include="StbImageSharp" Version="2.22.4" />
 	</ItemGroup>
+
 	<ItemGroup>
-		<Content Include="$(SolutionDir)Images/crow.png" Pack="true" PackagePath="" />
+		<Content Include="$(SolutionDir)Images\crow.png" Pack="true" PackagePath="" />
 		<Compile Include="src\**\*.cs" Exclude="src\Mono.Cairo\NativeMethods-internal.cs" />
 		<EmbeddedResource Include="Templates\*.*">
 			<LogicalName>Crow.%(Filename).template</LogicalName>
@@ -59,8 +63,6 @@
 			<LogicalName>Crow.Cursors.%(Filename)</LogicalName>
 		</EmbeddedResource>
 		<Compile Include="Properties\AssemblyInfo.cs" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Compile Remove="src\Widgets\ColorPicker2.cs" />
+		<Compile Remove="src\Widgets\ColorPicker2.cs" />
 	</ItemGroup>
 </Project>

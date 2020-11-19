@@ -16,9 +16,6 @@ namespace ShowCase
 	{
 		static void Main ()
 		{
-#if NETCOREAPP3_1
-			DllMapCore.Resolve.Enable (true);
-#endif
 			using (Showcase app = new Showcase ()) 
 				app.Run ();
 		}

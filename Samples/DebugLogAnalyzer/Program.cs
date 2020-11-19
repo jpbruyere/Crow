@@ -13,9 +13,6 @@ namespace DebugLogAnalyzer
 	{
 		static void Main (string [] args)
 		{
-#if NETCOREAPP3_1
-			DllMapCore.Resolve.Enable (true);
-#endif
 			using (Program app = new Program ()) 
 				app.Run ();
 		}

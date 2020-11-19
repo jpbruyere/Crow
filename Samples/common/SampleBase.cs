@@ -1,4 +1,6 @@
-﻿using System;
+﻿using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,6 +12,24 @@ using Crow;
 namespace Crow
 {
 	public class SampleBase : Interface {	
+#if NETCOREAPP		
+		static IntPtr resolveUnmanaged (Assembly assembly, String libraryName) {
+			
+			switch (libraryName)
+			{
+				case "glfw3":
+					return  NativeLibrary.Load("glfw", assembly, null);
+				case "rsvg-2.40":
+					return  NativeLibrary.Load("rsvg-2", assembly, null);
+			}			
+			Console.WriteLine ($"[UNRESOLVE] {assembly} {libraryName}");			
+			return IntPtr.Zero;
+		}
+
+		static SampleBase () {
+			System.Runtime.Loader.AssemblyLoadContext.Default.ResolvingUnmanagedDll+=resolveUnmanaged;
+		}
+#endif			
 		public Version CrowVersion => Assembly.GetAssembly (typeof (Widget)).GetName ().Version;
 
 		#region Test values for Binding

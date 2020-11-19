@@ -1,9 +1,9 @@
 <Project>
 	<PropertyGroup>
-		<TargetFrameworks>net472</TargetFrameworks>
+		<TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		
-		<RootDirectory>$(MSBuildThisFileDirectory)</RootDirectory>        
+		<SolutionDir>$(MSBuildThisFileDirectory)..\</SolutionDir>
 		<OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>
 		<IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)\</IntermediateOutputPath>
 		
@@ -14,10 +14,10 @@
 
 		<EnableDefaultNoneItems>false</EnableDefaultNoneItems>
 		<SamplesDir>$(SolutionDir)Samples\</SamplesDir>
+		<AppConfig>$(SolutionDir)Crow\App.config</AppConfig>
 	</PropertyGroup>
 	
 	<ItemGroup>
-	  <PackageReference Include="DllMapCore" Version="0.1.0" Condition="'$(TargetFramework)'=='netcoreapp3.1'" />
 		<ProjectReference Include="$(SolutionDir)Crow\Crow.csproj" />
 	</ItemGroup>
 	<ItemGroup>
