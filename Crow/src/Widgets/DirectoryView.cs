@@ -1,34 +1,11 @@
-﻿//
-// DirectoryView.cs
+﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using System.Xml.Serialization;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Crow
@@ -39,8 +16,8 @@ namespace Crow
 	public class DirectoryView : TemplatedControl
 	{
 		#region CTOR
-		protected DirectoryView() : base(){}
-		public DirectoryView (Interface iface) : base(iface){}
+		protected DirectoryView() {}
+		public DirectoryView (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		#region events
@@ -60,7 +37,7 @@ namespace Crow
 				if (value == _selectedItem)
 					return;
 				_selectedItem = value;
-				NotifyValueChanged ("SelectedItem", _selectedItem);
+				NotifyValueChangedAuto (_selectedItem);
 			}
 		}
 		[DefaultValue(true)]
@@ -70,7 +47,7 @@ namespace Crow
 				if (showFiles == value)
 					return;
 				showFiles = value;
-				NotifyValueChanged ("ShowFiles", showFiles);
+				NotifyValueChangedAuto (showFiles);
 				NotifyValueChanged ("FileSystemEntries", FileSystemEntries);
 			}
 		}
@@ -81,7 +58,7 @@ namespace Crow
 				if (showHidden == value)
 					return;
 				showHidden = value;
-				NotifyValueChanged ("ShowHidden", showHidden);
+				NotifyValueChangedAuto (showHidden);
 				NotifyValueChanged ("FileSystemEntries", FileSystemEntries);
 			}
 		}
@@ -92,7 +69,7 @@ namespace Crow
 				if (fileMask == value)
 					return;
 				fileMask = value;
-				NotifyValueChanged ("FileMask", fileMask);
+				NotifyValueChangedAuto (fileMask);
 				NotifyValueChanged ("FileSystemEntries", FileSystemEntries);
 			}
 		}
@@ -103,7 +80,7 @@ namespace Crow
 				if (currentDirectory == value)
 					return;
 				currentDirectory = value;
-				NotifyValueChanged ("CurrentDirectory", currentDirectory);
+				NotifyValueChangedAuto (currentDirectory);
 				NotifyValueChanged ("FileSystemEntries", FileSystemEntries);
 			}
 		}
@@ -117,10 +94,10 @@ namespace Crow
 					if (showFiles && !string.IsNullOrEmpty(fileMask))
 						fi.AddRange(di.GetFiles(fileMask));
 					return showHidden ?
-						fi.ToArray() :
-						fi.Where(f=>!f.Attributes.HasFlag (FileAttributes.Hidden)).ToArray();
+						fi.OrderBy(f=>f.Attributes).ThenBy(f=>f.Name).ToArray() :
+						fi.Where(f=>!f.Attributes.HasFlag (FileAttributes.Hidden)).OrderBy (f => f.Attributes).ThenBy (f => f.Name).ToArray();
 				} catch (Exception ex) {
-					Console.WriteLine (ex.ToString ());
+					System.Diagnostics.Debug.WriteLine (ex.ToString ());
 					return null;
 				}
 			}

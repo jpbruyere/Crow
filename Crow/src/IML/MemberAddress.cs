@@ -90,7 +90,7 @@ namespace Crow.IML
 		bool tryFindMember ()
 		{
 #if DEBUG_BINDING_FUNC_CALLS
-            Console.WriteLine ($"tryFindMember ({Address},{member})");
+            System.Diagnostics.Debug.WriteLine ($"tryFindMember ({Address},{member})");
 #endif
 			if (member != null)
 				throw new Exception ("member already found");
@@ -101,13 +101,8 @@ namespace Crow.IML
 			Type t = Address.LastOrDefault ().CrowType;
 			member = t.GetMember (memberName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance).FirstOrDefault ();
 
-#region search for extensions methods if member not found in type
-			if (member == null && !string.IsNullOrEmpty (memberName)) {
-				Assembly a = Assembly.GetExecutingAssembly ();
-				string mn = memberName;
-				member = CompilerServices.GetExtensionMethods (a, t, mn);
-			}
-#endregion
+			if (member == null && !string.IsNullOrEmpty (memberName))
+				member = CompilerServices.SearchExtMethod (t, memberName);
 
 			return member != null;
 		}

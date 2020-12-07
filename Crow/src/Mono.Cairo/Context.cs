@@ -324,9 +324,9 @@ namespace Crow.Cairo {
 			get { return NativeMethods.cairo_get_reference_count (handle); }
 		}
 
-		public void SetSourceColor (Color color)
+		public void SetSource (Color color)
 		{
-			NativeMethods.cairo_set_source_rgba (handle, color.R, color.G, color.B, color.A);
+			NativeMethods.cairo_set_source_rgba (handle, color.R / 255.0, color.G / 255.0, color.B / 255.0, color.A / 255.0);
 		}
 
 		public void SetSourceRGB (double r, double g, double b)
@@ -340,7 +340,7 @@ namespace Crow.Cairo {
 		}
 
 		//[Obsolete ("Use SetSource method (with double parameters)")]
-		public void SetSourceSurface (Surface source, int x, int y)
+		public void SetSource (Surface source, int x = 0, int y = 0)
 		{
 			NativeMethods.cairo_set_source_surface (handle, source.Handle, x, y);
 		}
@@ -861,7 +861,7 @@ namespace Crow.Cairo {
 
 		public void ShowText(string str)
 		{
-			NativeMethods.cairo_show_text (handle, str);
+			NativeMethods.cairo_show_text (handle, TerminateUtf8 (str));
 		}
 
 

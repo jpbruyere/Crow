@@ -11,10 +11,8 @@ namespace Crow
 	public class Spinner : NumericControl
 	{
 		#region CTOR
-		protected Spinner() : base(){}
-		public Spinner (Interface iface) : base(iface)
-		{
-		}
+		protected Spinner() {}
+		public Spinner (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)

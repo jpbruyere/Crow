@@ -1,4 +1,0 @@
-﻿<?xml version="1.0"?>
-<Container Background="DimGrey" Margin="10" Fit="true">
-	<Label Text="{fps}" Margin="10" Fit="true" Background="SeaGreen"/>
-</Container>

@@ -29,7 +29,7 @@ namespace Crow
 				if (isDocked == value)
 					return;
 				isDocked = value;
-				NotifyValueChanged ("IsDocked", isDocked);
+				NotifyValueChangedAuto (isDocked);
 				NotifyValueChanged ("IsFloating", !isDocked);
 			}
 		}
@@ -41,7 +41,7 @@ namespace Crow
 				if (docking == value)
 					return;
 				docking = value;
-				NotifyValueChanged ("DockingPosition", DockingPosition);
+				NotifyValueChangedAuto (DockingPosition);
 			}
 		}
 		public override bool PointIsIn (ref Point m)
@@ -68,15 +68,18 @@ namespace Crow
 
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
-//			if (this.HasFocus && e.Mouse.IsButtonDown (MouseButton.Left) && IsDocked) {
-//				if (Math.Abs (e.Position.X - undockingMousePosOrig.X) > 10 ||
-//				    Math.Abs (e.Position.X - undockingMousePosOrig.X) > 10)
-//					Undock ();
-//			}
+			//			if (this.HasFocus && e.Mouse.IsButtonDown (MouseButton.Left) && IsDocked) {
+			//				if (Math.Abs (e.Position.X - undockingMousePosOrig.X) > 10 ||
+			//				    Math.Abs (e.Position.X - undockingMousePosOrig.X) > 10)
+			//					Undock ();
+			//			}
+			if (IFace.IsDown (MouseButton.Left) && IFace.DragAndDropOperation?.DragSource == this) {
+				if (isDocked)
+					CheckUndock (e.Position);
+				else
+					moveAndResize (e.XDelta, e.YDelta, currentDirection);
 
-			if (this.HasFocus && IFace.IsDown(MouseButton.Left) && IsDocked)
-				CheckUndock (e.Position);
-
+			}
 			base.onMouseMove (sender, e);
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
@@ -90,7 +93,7 @@ namespace Crow
 		public bool CheckUndock (Point mousePos) {
 			//if (DockingPosition == Alignment.Center)
 			//	return false;
-			Console.WriteLine ($"{mousePos.X},{mousePos.Y}");
+			System.Diagnostics.Debug.WriteLine ($"{mousePos.X},{mousePos.Y}");
 			if (Math.Abs (mousePos.X - undockingMousePosOrig.X) < undockThreshold ||
 			    Math.Abs (mousePos.X - undockingMousePosOrig.X) < undockThreshold)
 				return false;
@@ -100,7 +103,8 @@ namespace Crow
 
 		protected override void onStartDrag (object sender, DragDropEventArgs e)
 		{
-			base.onStartDrag (sender, e);
+			if (currentDirection == Direction.None)
+				base.onStartDrag (sender, e);
 
 			undockingMousePosOrig = IFace.MousePosition;
 		}

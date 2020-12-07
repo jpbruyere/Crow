@@ -49,8 +49,10 @@ namespace Crow
 
 	public class Table : TemplatedGroup
 	{
-		public Table () : base () {}
-		public Table (Interface iFace) : base (iFace) { }
+		#region CTOR
+		public Table ()  {}
+		public Table (Interface iface, string style = null) : base (iface, style) { }
+		#endregion
 
 		public ObservableList<Column> Columns = new ObservableList<Column> ();
 	}

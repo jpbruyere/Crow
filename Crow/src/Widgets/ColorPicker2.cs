@@ -25,8 +25,8 @@ namespace Crow
 		double h,s,v;
 
 		
-		public virtual double R {
-			get { return Math.Round(curColor.R * div); }
+		public virtual int R {
+			get { return curColor.R; }
 			set {
 				if (R == value)
 					return;

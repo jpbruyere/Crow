@@ -1,64 +1,35 @@
-﻿//
-// NumericControl.cs
+﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
+
 
 using System;
-using System.Xml.Serialization;
 using System.ComponentModel;
 
-namespace Crow
-{
-	public abstract class NumericControl : TemplatedControl
+namespace Crow {
+	public class NumericControl : TemplatedControl
 	{
 		#region CTOR
-		protected NumericControl () : base(){}
-		public NumericControl (Interface iface) : base(iface)
-		{
-		}
-//		public NumericControl(double minimum, double maximum, double step)
-//			: base()
-//		{
-//		}
+		protected NumericControl () {}
+		public NumericControl (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		#region protected fields
-		protected double _actualValue, minValue, maxValue, smallStep, bigStep;
-		protected int _decimals;
+		protected double actualValue, minValue, maxValue, smallStep, bigStep;
+		protected int decimals;
 		#endregion
 
 		#region public properties
 		[DefaultValue(2)]
 		public int Decimals
 		{
-			get { return _decimals; }
+			get { return decimals; }
 			set
 			{
-				if (value == _decimals)
+				if (value == decimals)
 					return;
-				_decimals = value;
-				NotifyValueChanged("Decimals",  _decimals);
+				decimals = value;
+				NotifyValueChangedAuto (decimals);
 				RegisterForGraphicUpdate();
 			}
 		}
@@ -70,7 +41,7 @@ namespace Crow
 					return;
 
 				minValue = value;
-				NotifyValueChanged ("Minimum", minValue);
+				NotifyValueChangedAuto (minValue);
 				RegisterForRedraw ();
 			}
 		}
@@ -83,7 +54,7 @@ namespace Crow
 					return;
 
 				maxValue = value;
-				NotifyValueChanged ("Maximum", maxValue);
+				NotifyValueChangedAuto (maxValue);
 				RegisterForRedraw ();
 			}
 		}
@@ -96,7 +67,7 @@ namespace Crow
 					return;
 
 				smallStep = value;
-				NotifyValueChanged ("SmallIncrement", smallStep);
+				NotifyValueChangedAuto (smallStep);
 				RegisterForRedraw ();
 			}
 		}
@@ -109,29 +80,29 @@ namespace Crow
 					return;
 
 				bigStep = value;
-				NotifyValueChanged ("LargeIncrement", bigStep);
+				NotifyValueChangedAuto (bigStep);
 				RegisterForRedraw ();
 			}
 		}
 		[DefaultValue(0.0)]
 		public virtual double Value
 		{
-			get { return _actualValue; }
+			get { return actualValue; }
 			set
 			{
-				if (value == _actualValue)
+				if (value == actualValue)
 					return;
 
 				if (value < minValue)
-					_actualValue = minValue;
+					actualValue = minValue;
 				else if (value > maxValue)
-					_actualValue = maxValue;
+					actualValue = maxValue;
 				else                    
-					_actualValue = value;
+					actualValue = value;
 
-				_actualValue = Math.Round (_actualValue, _decimals);
+				actualValue = Math.Round (actualValue, decimals);
 
-				NotifyValueChanged("Value",  _actualValue);
+				NotifyValueChangedAuto (actualValue);
 				RegisterForGraphicUpdate();
 			}
 		}

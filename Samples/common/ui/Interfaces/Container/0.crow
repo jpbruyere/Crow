@@ -1,5 +1,11 @@
 ﻿<?xml version="1.0"?>
-<Container Background="DimGrey" Margin="10" Width="90%" Height="90%">
-	<Widget Margin="10"  Background="SeaGreen"
-			MinimumSize="50,50"/>
+<Container Background="DarkGrey" Margin="10" Width="90%" Height="90%">
+	<Container Background="Jet" Margin="10" Width="90%" Height="90%">
+		<Container Background="Onyx" Margin="10" Width="90%" Height="90%">
+			<Container Background="DimGrey" Margin="10" Width="90%" Height="90%">
+				<Widget Margin="10"  Background="MediumSeaGreen"
+						MinimumSize="50,50"/>
+			</Container>
+		</Container>
+	</Container>
 </Container>

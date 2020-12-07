@@ -1,1 +1,4 @@
 ﻿<?xml version="1.0"?>
+<Container Background="{./Background}" CornerRadius="{./CornerRadius}">
+	<Widget Name="Cursor" Background="{./Foreground}" CornerRadius="{./CornerRadius}" />
+</Container>

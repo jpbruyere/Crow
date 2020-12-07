@@ -1,33 +1,10 @@
-﻿//
-// DockStack.cs
+﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
+
 using System;
-using Crow.IML;
-using System.Linq;
 using System.Text;
-using System.IO;
+using FastEnumUtility;
 
 namespace Crow
 {
@@ -36,7 +13,7 @@ namespace Crow
 	{		
 		#region CTor
 		public DockStack ()	{}
-		public DockStack (Interface iface) : base (iface) {}
+		public DockStack (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		/*static int color = 10;
@@ -94,6 +71,7 @@ namespace Crow
 
 		Rectangle rIn = default(Rectangle);
 		double dockThresh = 0.2;
+		const int dockWidthDivisor = 8;
 		Widget focusedChild;
 		internal Widget stretchedChild;
 
@@ -136,33 +114,33 @@ namespace Crow
 					rIn = cb;
 
 					if (Orientation == Orientation.Horizontal || Children.Count == 1) {
-						if (lm.Y > cb.Top + cb.Height / 3 && lm.Y < cb.Bottom - cb.Height / 3) {
-							if (lm.X < cb.Left + cb.Width / 3)
+						if (lm.Y > cb.Top + cb.Height / dockWidthDivisor && lm.Y < cb.Bottom - cb.Height / dockWidthDivisor) {
+							if (lm.X < cb.Left + cb.Width / dockWidthDivisor)
 								dw.DockingPosition = Alignment.Left;
-							else if (lm.X > cb.Right - cb.Width / 3)
+							else if (lm.X > cb.Right - cb.Width / dockWidthDivisor)
 								dw.DockingPosition = Alignment.Right;							
 						} else {
 							getFocusedChild (lm);
 							if (focusedChild != null) {
-								if (lm.Y < rIn.Top + rIn.Height / 3)
+								if (lm.Y < rIn.Top + rIn.Height / dockWidthDivisor)
 									dw.DockingPosition = Alignment.Top;
-								else if (lm.Y > rIn.Bottom - rIn.Height / 3)
+								else if (lm.Y > rIn.Bottom - rIn.Height / dockWidthDivisor)
 									dw.DockingPosition = Alignment.Bottom;										
 							}
 						}
 					}
 					if (Orientation == Orientation.Vertical || Children.Count == 1) {
-						if (lm.X > cb.Left + cb.Width / 3 && lm.X < cb.Right - cb.Width / 3) {
-							if (lm.Y < cb.Top + cb.Height / 3)
+						if (lm.X > cb.Left + cb.Width / dockWidthDivisor && lm.X < cb.Right - cb.Width / dockWidthDivisor) {
+							if (lm.Y < cb.Top + cb.Height / dockWidthDivisor)
 								dw.DockingPosition = Alignment.Top;
-							else if (lm.Y > cb.Bottom - cb.Height / 3)
+							else if (lm.Y > cb.Bottom - cb.Height / dockWidthDivisor)
 								dw.DockingPosition = Alignment.Bottom;							
 						} else {
 							getFocusedChild (lm);
 							if (focusedChild != null) {
-								if (lm.X < rIn.Left + rIn.Width / 3)
+								if (lm.X < rIn.Left + rIn.Width / dockWidthDivisor)
 									dw.DockingPosition = Alignment.Left;
-								else if (lm.X > rIn.Right - rIn.Width / 3)
+								else if (lm.X > rIn.Right - rIn.Width / dockWidthDivisor)
 									dw.DockingPosition = Alignment.Right;										
 							}
 						}
@@ -285,7 +263,7 @@ namespace Crow
 			int vTreshold = (int)(r.Height * dockThresh);
 			int hTreshold = (int)(r.Width * dockThresh);
 
-			Console.WriteLine ("Docking {0} as {2} in {1}", dw.Name, activeStack.Name, dw.DockingPosition);
+			System.Diagnostics.Debug.WriteLine ("Docking {0} as {2} in {1}", dw.Name, activeStack.Name, dw.DockingPosition);
 			switch (dw.DockingPosition) {
 			case Alignment.Top:						
 				dw.Height = vTreshold;
@@ -321,7 +299,7 @@ namespace Crow
 		public void Undock (DockWindow dw){			
 			int idx = Children.IndexOf(dw);
 
-			Console.WriteLine ("undocking child index: {0} ; name={1}; pos:{2} ; childcount:{3}",idx, dw.Name, dw.DockingPosition, Children.Count);
+			System.Diagnostics.Debug.WriteLine ("undocking child index: {0} ; name={1}; pos:{2} ; childcount:{3}",idx, dw.Name, dw.DockingPosition, Children.Count);
 
 			RemoveChild(dw);
 
@@ -389,7 +367,7 @@ namespace Crow
 				ClearChildren ();
 				stretchedChild = null;
 				int i = 0;
-				Orientation = (Orientation)Enum.Parse (typeof(Orientation), getConfAttrib (conf, ref i));
+				Orientation = FastEnum.Parse<Orientation> (getConfAttrib (conf, ref i));
 				importConfig (conf, ref i, dataSource);
 			}
 		}
@@ -415,7 +393,7 @@ namespace Crow
 					dw.Name = wName;
 					dw.Width = Measure.Parse (getConfAttrib (conf, ref i));
 					dw.Height = Measure.Parse (getConfAttrib (conf, ref i));
-					dw.DockingPosition = (Alignment)Enum.Parse (typeof(Alignment), getConfAttrib (conf, ref i));
+					dw.DockingPosition = FastEnum.Parse<Alignment> (getConfAttrib (conf, ref i));
 					dw.savedSlot = Rectangle.Parse (getConfAttrib (conf, ref i));
 					dw.wasResizable = Boolean.Parse (getConfAttrib (conf, ref i));
 
@@ -428,7 +406,7 @@ namespace Crow
 					DockStack ds = new DockStack (IFace);
 					ds.Width = Measure.Parse (getConfAttrib (conf, ref i));
 					ds.Height = Measure.Parse (getConfAttrib (conf, ref i));
-					ds.Orientation = (Orientation)Enum.Parse (typeof(Orientation), getConfAttrib (conf, ref i));
+					ds.Orientation = FastEnum.Parse<Orientation> (getConfAttrib (conf, ref i));
 
 					this.AddChild (ds);
 

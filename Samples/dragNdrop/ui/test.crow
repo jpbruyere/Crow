@@ -1,0 +1,55 @@
+﻿<?xml version="1.0"?>
+<VerticalStack Background="Jet" Focusable="true">
+	<VerticalStack Name="Watches" Background="Black" Height="Fit" Width="Stretched">
+		<HorizontalStack Height="Fit">
+			<Label Style="smallLabel" Text="hover:" Width="50"/>
+			<Label Style="smallLabel" Text="{HoverWidget}"/>
+		</HorizontalStack>
+		<HorizontalStack Height="Fit">
+			<Label Style="smallLabel" Text="focus:" Width="50"/>
+			<Label Style="smallLabel" Text="{FocusedWidget}"/>
+		</HorizontalStack>
+		<HorizontalStack Height="Fit">
+			<Label Style="smallLabel" Text="active:" Width="50"/>
+			<Label Style="smallLabel" Text="{ActiveWidget}"/>
+		</HorizontalStack>
+	</VerticalStack>
+	<HorizontalStack Margin="20" Name="zone1" Height="100" Width="Stretched" Background="Grey" AllowDrop="true" DragEnter="W_DragEnter" DragLeave="W_DragLeave">
+		<Widget Name="w1" Background="Blue" Focusable="true" Width="50" Height="Stretched" AllowDrag="true" StartDrag="W_StartDrag" EndDrag="W_EndDrag" Drop="W_Drop"/>
+		<Widget Name="w2" Background="Red" Focusable="true" Width="50" Height="Stretched" AllowDrag="true" StartDrag="W_StartDrag" EndDrag="W_EndDrag" Drop="W_Drop"/>/>
+		<Widget Name="w3" Background="Green" Focusable="true" Width="50" Height="Stretched" AllowDrag="true" StartDrag="W_StartDrag" EndDrag="W_EndDrag" Drop="W_Drop"/>/>
+		<Widget Name="w4" Background="Yellow" Focusable="true" Width="50" Height="Stretched" AllowDrag="true" StartDrag="W_StartDrag" EndDrag="W_EndDrag" Drop="W_Drop"/>/>
+		<Widget Name="w5" Background="DimGrey" Focusable="true" Width="50" Height="Stretched" AllowDrag="true" StartDrag="W_StartDrag" EndDrag="W_EndDrag" Drop="W_Drop"/>/>
+	</HorizontalStack>
+	<Widget Height="20" Focusable="true"/>
+	<HorizontalStack Margin="20" Name="zone2" Height="150" Width="Stretched" Background="Grey" AllowDrop="true" DragEnter="W_DragEnter" DragLeave="W_DragLeave">
+	</HorizontalStack>
+	<Widget Height="20"/>
+	<HorizontalStack Margin="20" Name="zone3" Height="80" Width="Stretched" Background="Grey" AllowDrop="true" DragEnter="W_DragEnter" DragLeave="W_DragLeave">
+	</HorizontalStack>
+	<Button Caption="Refresh tree" MouseClick="refreshGraphicTree"/>
+	<TreeView IsRoot="true" Name="treeView" Data="{GraphicTree}">
+		<ItemTemplate>
+			<Border Width="Stretched" Focusable="true" Foreground="Transparent">
+				<HorizontalStack Spacing="5">
+					<Widget Width="5" Height="5"/>
+					<Border Width="16" Height="16" Foreground="Black" Background="DimGrey">
+						<Image Margin="2" Path="{GetIcon}" />
+					</Border>
+					<Widget Width="2" Height="5" Background="Blue" Visible="{IsHover}"/>
+					<Widget Width="5" Height="5" Background="Green" Visible="{Visible}"/>
+					<Label Text="{Name}" Width="Fit"/>
+					<Label Text="{LogicalParent}" Width="Stretched" Foreground="Yellow"/>
+				</HorizontalStack>
+			</Border>
+		</ItemTemplate>
+		<ItemTemplate DataType="Crow.Group" Data="GetChildren"
+			Path="#ui.GTreeExp.itemp"/>
+		<ItemTemplate DataType="Crow.Container" Data="GetChildren"
+			Path="#ui.GTreeExp.itemp"/>
+		<ItemTemplate DataType="Crow.TemplatedContainer" Data="GetChildren"
+			Path="#ui.GTreeExp.itemp"/>
+		<ItemTemplate DataType="Crow.TemplatedGroup" Data="GetChildren"
+			Path="#ui.GTreeExp.itemp"/>
+	</TreeView>
+</VerticalStack>

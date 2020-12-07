@@ -1,31 +1,8 @@
-﻿//
-// Splitter.cs
+﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using System.Xml.Serialization;
 using System.ComponentModel;
 
 namespace Crow
@@ -37,8 +14,8 @@ namespace Crow
 	public class Splitter : Widget
 	{
 		#region CTOR
-		protected Splitter() : base(){}
-		public Splitter (Interface iface) : base(iface){}
+		protected Splitter() {}
+		public Splitter (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		int thickness;
@@ -49,8 +26,8 @@ namespace Crow
 			set {
 				if (thickness == value)
 					return;
-				thickness = value; 
-				NotifyValueChanged ("Thickness", thickness);
+				thickness = value;
+				NotifyValueChangedAuto (thickness);
 				RegisterForLayouting (LayoutingType.Sizing);
 				RegisterForGraphicUpdate ();
 			}
@@ -96,8 +73,7 @@ namespace Crow
 				IFace.MouseCursor = MouseCursor.sb_v_double_arrow;
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
-		{
-			base.onMouseDown (sender, e);
+		{		
 			go1 = go2 = null;
 			init1 = init2 = -1;
 			delta = 0;
@@ -131,46 +107,49 @@ namespace Crow
 				if (init2 >= 0)
 					go2.Height = init2;
 			}
+			e.Handled = true;
+			base.onMouseDown (sender, e);
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
+			e.Handled = true;
 			base.onMouseMove (sender, e);
 
-			if (!IsActive || go1 == null || go2 == null)
-				return;
+			if (IsActive && go1 != null && go2 != null) {
+				GenericStack gs = Parent as GenericStack;
+				int newDelta = delta, size1 = init1, size2 = init2;
+				if (gs.Orientation == Orientation.Horizontal) {
+					newDelta -= e.XDelta;
+					if (size1 < 0)
+						size1 = go1.Slot.Width + delta;
+					if (size2 < 0)
+						size2 = go2.Slot.Width - delta;
+				} else {
+					newDelta -= e.YDelta;
+					if (size1 < 0)
+						size1 = go1.Slot.Height + delta;
+					if (size2 < 0)
+						size2 = go2.Slot.Height - delta;
+				}
 
-			GenericStack gs = Parent as GenericStack;
-			int newDelta = delta, size1 = init1 , size2 = init2;
-			if (gs.Orientation == Orientation.Horizontal) {
-				newDelta -= e.XDelta;
-				if (size1 < 0)
-					size1 = go1.Slot.Width + delta;
-				if (size2 < 0)
-					size2 = go2.Slot.Width - delta;
-			} else {
-				newDelta -= e.YDelta;
-				if (size1 < 0)
-					size1 = go1.Slot.Height + delta;
-				if (size2 < 0)
-					size2 = go2.Slot.Height - delta;
-			}
+				if (size1 - newDelta < min1 || (max1 > 0 && size1 - newDelta > max1) ||
+					size2 + newDelta < min2 || (max2 > 0 && size2 + newDelta > max2))
+					return;
 
-			if (size1 - newDelta < min1 || (max1 > 0 && size1 - newDelta > max1) ||
-				size2 + newDelta < min2 || (max2 > 0 && size2 + newDelta > max2))
-				return;
+				delta = newDelta;
 
-			delta = newDelta;
+				if (gs.Orientation == Orientation.Horizontal) {
+					if (init1 >= 0)
+						go1.Width = init1 - delta;
+					if (init2 >= 0)
+						go2.Width = init2 + delta;
+				} else {
+					if (init1 >= 0)
+						go1.Height = init1 - delta;
+					if (init2 >= 0)
+						go2.Height = init2 + delta;
+				}
 
-			if (gs.Orientation == Orientation.Horizontal) {
-				if (init1 >= 0)
-					go1.Width = init1 - delta;
-				if (init2 >= 0)
-					go2.Width = init2 + delta;
-			} else {
-				if (init1 >= 0)
-					go1.Height = init1 - delta;
-				if (init2 >= 0)
-					go2.Height = init2 + delta;
 			}
 		}
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)
@@ -182,7 +161,7 @@ namespace Crow
 			if (init1 >= 0 && u1 == Unit.Percent) {
 				if (gs.Orientation == Orientation.Horizontal)
 					go1.Width = new Measure ((int)Math.Ceiling (
-						go1.Width.Value * 100.0 / (double)gs.Slot.Width), Unit.Percent);
+						go1.Width.Value * 100.0 / (double)(gs.Slot.Width - 2 * gs.Margin)), Unit.Percent);
 				else
 					go1.Height = new Measure ((int)Math.Ceiling (
 						go1.Height.Value * 100.0 / (double)gs.Slot.Height), Unit.Percent);
@@ -190,7 +169,7 @@ namespace Crow
 			if (init2 >= 0 && u2 == Unit.Percent) {
 				if (gs.Orientation == Orientation.Horizontal)
 					go2.Width = new Measure ((int)Math.Floor (
-						go2.Width.Value * 100.0 / (double)gs.Slot.Width), Unit.Percent);
+						go2.Width.Value * 100.0 / (double)(gs.Slot.Width - 2 * gs.Margin)), Unit.Percent);
 				else
 					go2.Height = new Measure ((int)Math.Floor (
 						go2.Height.Value * 100.0 / (double)gs.Slot.Height), Unit.Percent);

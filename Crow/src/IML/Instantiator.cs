@@ -13,6 +13,9 @@ using System.Text;
 using System.Xml;
 
 namespace Crow.IML {
+	using Label = System.Reflection.Emit.Label;
+
+
 	public class InstantiatorException : Exception {
 		public string Path;
 		public InstantiatorException (string path, Exception innerException)
@@ -31,7 +34,7 @@ namespace Crow.IML {
 	/// 	- Default values (appearing as attribute in C#)  loading
 	/// 	- Styling
 	/// 
-	/// Instantiators are shared amongs interfaces. Their are stored with their path as key, and inlined template
+	/// Their are stored in the Interface with their path as key, and inlined template
 	/// and itemtemplate are stored with a generated uuid
 	/// </summary>
 	public class Instantiator
@@ -62,7 +65,7 @@ namespace Crow.IML {
 		/// <summary>
 		/// Initializes a new instance of the Instantiator class.
 		/// </summary>
-		public Instantiator (Interface _iface, string path) : this (_iface, _iface.GetStreamFromPath(path), path) {
+		public Instantiator (Interface _iface, string path) : this (_iface, Interface.GetStreamFromPath(path), path) {
 			
 		}
 		/// <summary>
@@ -75,9 +78,9 @@ namespace Crow.IML {
 			#endif
 			iface = _iface;
 			sourcePath = srcPath;
-			#if DEBUG_LOAD
-			Stopwatch loadingTime = Stopwatch.StartNew ();
-			#endif
+#if DEBUG_LOG
+			DbgEvent de = DbgLogger.StartEvent (DbgEvtType.CreateITor, sourcePath);
+#endif
 			try {
 				using (XmlReader itr = XmlReader.Create (stream)) {
 					parseIML (itr);
@@ -86,11 +89,8 @@ namespace Crow.IML {
 				throw new InstantiatorException(sourcePath, ex);
 			} finally {
 				stream?.Dispose ();
-#if DEBUG_LOAD
-				loadingTime.Stop ();
-				using (StreamWriter sw = new StreamWriter ("loading.log", true)) {
-					sw.WriteLine ($"ITOR;{sourcePath,-50};{loadingTime.ElapsedTicks,8};{loadingTime.ElapsedMilliseconds,8}");
-				}
+#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.CreateITor, de);
 #endif
 			}
 		}
@@ -133,17 +133,7 @@ namespace Crow.IML {
 		/// </summary>
 		/// <returns>The new graphic object instance</returns>
 		public Widget CreateInstance(){
-#if DEBUG_LOAD
-			Stopwatch loadingTime = Stopwatch.StartNew ();
-			GraphicObject o = loader (iface) as GraphicObject;
-			loadingTime.Stop ();
-			using (StreamWriter sw = new StreamWriter ("loading.log", true)) {
-				sw.WriteLine ($"NEW ;{sourcePath,-50};{loadingTime.ElapsedTicks,8};{loadingTime.ElapsedMilliseconds,8}");
-			}
-			return o;
-#else
 			return loader (iface) as Widget;
-#endif
 		}
 		/// <summary>
 		/// Creates a new instance of T compiled in the instantiator
@@ -151,17 +141,7 @@ namespace Crow.IML {
 		/// </summary>
 		/// <returns>The new T instance</returns>
 		public T CreateInstance<T>(){
-#if DEBUG_LOAD
-			Stopwatch loadingTime = Stopwatch.StartNew ();
-			T i = (T)loader (iface);
-			loadingTime.Stop ();
-			using (StreamWriter sw = new StreamWriter ("loading.log", true)) {
-				sw.WriteLine ($"NEW ;{sourcePath,-50};{loadingTime.ElapsedTicks,8};{loadingTime.ElapsedMilliseconds,8}");
-			}
-			return i;
-#else
 			return (T)loader (iface);
-#endif
 		}
 		List<DynamicMethod> dsValueChangedDynMeths = new List<DynamicMethod>();
 		List<Delegate> cachedDelegates = new List<Delegate>();
@@ -175,7 +155,7 @@ namespace Crow.IML {
 		Delegate templateBinding;
 
 #if DESIGN_MODE
-		public List<DynamicMethod> DsValueChangedDynMeths =>dsValueChangedDynMeths;
+		public List<DynamicMethod> DsValueChangedDynMeths => dsValueChangedDynMeths;
 		public List<Delegate> CachedDelegates => cachedDelegates;
 		/// <summary>
 		/// store indices of template delegate to be handled by root parentChanged event
@@ -281,7 +261,7 @@ namespace Crow.IML {
 				itemTmpID += path+dataType+datas;
 				if (!iface.ItemTemplates.ContainsKey (itemTmpID))
 					iface.ItemTemplates [itemTmpID] =
-						new ItemTemplate (iface, path, ctx.CurrentNodeType, dataTest, dataType, datas);
+						new ItemTemplate (iface, path, dataTest, dataType, datas);
 			}
 			return new string [] { dataType, itemTmpID, datas, dataTest };
 		}
@@ -298,6 +278,7 @@ namespace Crow.IML {
 				bool inlineTemplate = false;
 
 				reader.Read ();
+
 				string templatePath = reader.GetAttribute ("Template");
 				string itemTemplatePath = reader.GetAttribute ("ItemTemplate");
 
@@ -322,14 +303,9 @@ namespace Crow.IML {
 
 					if (!string.IsNullOrEmpty (templatePath)) {
 						ctx.il.Emit (OpCodes.Ldloc_0);//Load  current templatedControl ref
-						//	ctx.il.Emit (OpCodes.Ldnull);//default template loading
-						//} else {
 						ctx.il.Emit (OpCodes.Ldarg_1);//load currentInterface
 						ctx.il.Emit (OpCodes.Ldstr, templatePath); //Load template path string
-						//get declaring type for search fallback assembly
-						ctx.il.Emit (OpCodes.Ldloc_0);
-						ctx.il.Emit (OpCodes.Call, CompilerServices.miGetType);
-						ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miIFaceCreateTemplateInst);
+						ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miIFaceCreateInstance);
 						ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miLoadTmp);//load template
 					}
 				}
@@ -340,7 +316,7 @@ namespace Crow.IML {
 						if (iface.ItemTemplates.ContainsKey (itemTemplatePath)) {
 							itemTemplateIds.Add (new string [] { "default", itemTemplatePath, "" });
 						} else {
-							using (Stream stream = iface.GetTemplateStreamFromPath (itemTemplatePath, ctx.CurrentNodeType)) {
+							using (Stream stream = Interface.GetStreamFromPath (itemTemplatePath)) {
 								//itemtemplate files may have multiple root nodes
 								XmlReaderSettings itrSettings = new XmlReaderSettings { ConformanceLevel = ConformanceLevel.Fragment };
 								using (XmlReader itr = XmlReader.Create (stream, itrSettings)) {									
@@ -378,9 +354,6 @@ namespace Crow.IML {
 					//load itemTemplate
 					ctx.il.Emit (OpCodes.Ldarg_1);//load currentInterface
 					ctx.il.Emit (OpCodes.Ldstr, iTempId [1]);//load path
-					//second arg is Type, to find assembly where to search if not in entry
-					ctx.il.Emit (OpCodes.Ldloc_0);//load TempControl ref
-					ctx.il.Emit (OpCodes.Call, CompilerServices.miGetType);
 					ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miGetITemp);
 					ctx.il.Emit (OpCodes.Callvirt, CompilerServices.miAddITemp);
 
@@ -470,17 +443,43 @@ namespace Crow.IML {
 						if (reader.Name == "Style" || reader.Name == "DataSourceType" || reader.Name == "Template")
 							continue;
 
-						#if DESIGN_MODE
+#if DESIGN_MODE
 						emitSetDesignAttribute (ctx, reader.Name, reader.Value);
-						#endif
+#endif
+						string imlValue = reader.Value;
+						StringBuilder styledValue = new StringBuilder();
+						//styling constants expansion
+						int vPtr = 0;
+						while (vPtr < imlValue.Length) {
+							if (imlValue [vPtr] == '$') {
+								if (imlValue [vPtr+1] == '{') {
+									vPtr+=2;
+									string cstId = "";
+									while (vPtr < imlValue.Length) {
+										if (imlValue [vPtr] == '}') {
+											vPtr++;
+											break;
+										}
+										cstId += imlValue [vPtr++];
+									}
+									if (string.IsNullOrEmpty (cstId) || !iface.StylingConstants.ContainsKey (cstId))
+										throw new Exception ("undefined constant id: " + cstId);
+									styledValue.Append (iface.StylingConstants [cstId]);
+									continue; 
+								}
+							}
+							styledValue.Append (imlValue [vPtr++]);
+						}
+						imlValue = styledValue.ToString ();
 
 						MemberInfo mi = ctx.CurrentNodeType.GetMember (reader.Name).FirstOrDefault ();
 						if (mi == null)
 							throw new Exception ("Member '" + reader.Name + "' not found in " + ctx.CurrentNodeType.Name);
 
 						if (mi.MemberType == MemberTypes.Event) {
-							foreach (string exp in reader.Value.Split (';')) {
+							foreach (string exp in imlValue.ToString().Split (';')) {
 								string trimed = exp.Trim();
+
 								if (trimed.StartsWith ("{", StringComparison.Ordinal))
 									compileAndStoreDynHandler (ctx, mi as EventInfo, trimed.Substring (1, trimed.Length - 2));
 								else
@@ -496,10 +495,10 @@ namespace Crow.IML {
 						if (pi.Name == "Name")
 							ctx.StoreCurrentName (reader.Value);
 
-						if (reader.Value.StartsWith ("{", StringComparison.Ordinal))
-							readPropertyBinding (ctx, reader.Name, reader.Value.Substring (1, reader.Value.Length - 2));
+						if (imlValue.StartsWith ("{", StringComparison.Ordinal))
+							readPropertyBinding (ctx, reader.Name, imlValue.Substring (1, reader.Value.Length - 2));
 						else
-							CompilerServices.EmitSetValue (ctx.il, pi, reader.Value);
+							CompilerServices.EmitSetValue (ctx.il, pi, imlValue);
 
 					}
 					reader.MoveToElement ();
@@ -590,6 +589,12 @@ namespace Crow.IML {
 		}
 
 		#region Emit Helper
+		/// <summary>
+		/// Create delegate from cached dyn method, delegate is bound to the datasource change sender.
+		/// </summary>
+		/// <param name="dscSource">data source change sender</param>
+		/// <param name="dataSource">new Data source.</param>
+		/// <param name="dynMethIdx">Dyn meth index in the dsValueChangedDynMeths array</param>
 		void dataSourceChangedEmitHelper(object dscSource, object dataSource, int dynMethIdx){
 			if (dataSource is IValueChange)
 				(dataSource as IValueChange).ValueChanged +=
@@ -597,7 +602,7 @@ namespace Crow.IML {
 		}
 		/// <summary> Emits remove old data source event handler.</summary>
 		void emitRemoveOldDataSourceHandler(ILGenerator il, string eventName, string delegateName, bool DSSide = true){
-			System.Reflection.Emit.Label cancel = il.DefineLabel ();
+			Label cancel = il.DefineLabel ();
 
 			il.Emit (OpCodes.Ldarg_2);//load old parent
 			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCOldDS);
@@ -625,9 +630,128 @@ namespace Crow.IML {
 		{
 			//store event handler dynamic method in instanciator
 			int dmIdx = cachedDelegates.Count;
-			cachedDelegates.Add (CompilerServices.compileDynEventHandler (sourceEvent, expression, ctx.CurrentNodeAddress));
+			cachedDelegates.Add (compileDynEventHandler (sourceEvent, expression, ctx.CurrentNodeAddress));
 			ctx.emitCachedDelegateHandlerAddition(dmIdx, sourceEvent);
 		}
+		static Delegate compileDynEventHandler (EventInfo sourceEvent, string expression, NodeAddress currentNode = null)
+		{
+#if DEBUG_BINDING
+			Debug.WriteLine ("\tCompile Event {0}: {1}", sourceEvent.Name, expression);
+#endif
+			Type lopType = null;
+
+			if (currentNode == null)
+				lopType = sourceEvent.DeclaringType;
+			else
+				lopType = currentNode.NodeType;
+
+			#region Retrieve EventHandler parameter type
+			MethodInfo evtInvoke = sourceEvent.EventHandlerType.GetMethod ("Invoke");
+			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
+			Type handlerArgsType = evtParams [1].ParameterType;
+			#endregion
+
+			Type [] args = { typeof (object), handlerArgsType };
+			DynamicMethod dm = new DynamicMethod ("dyn_eventHandler",
+				typeof (void),
+				args, true);
+			ILGenerator il = dm.GetILGenerator (64);
+
+			string [] srcLines = expression.Trim ().Split (new char [] { ';' });
+
+			foreach (string srcLine in srcLines) {
+				if (string.IsNullOrEmpty (srcLine))
+					continue;
+				string [] operandes = srcLine.Trim ().Split (new char [] { '=' });
+				if (operandes.Length != 2) //not an affectation
+					throw new NotSupportedException ();
+
+				Label cancel = il.DefineLabel ();
+				Label cancelFinalSet = il.DefineLabel ();
+				Label success = il.DefineLabel ();
+
+				BindingMember lop = new BindingMember (operandes [0].Trim ());
+				BindingMember rop = new BindingMember (operandes [1].Trim ());
+
+				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
+
+				#region Left operande
+				PropertyInfo lopPI = null;
+
+				//in dyn handler, no datasource binding, so single name in expression are also handled as current node property
+				if (lop.IsSingleName)
+					lopPI = lopType.GetProperty (lop.Tokens [0]);
+				else if (lop.IsCurrentNodeProperty)
+					lopPI = lopType.GetProperty (lop.Tokens [1]);
+				else
+					lop.emitGetTarget (il, cancel, currentNode);
+				#endregion
+
+				#region RIGHT OPERANDES
+				if (rop.IsStringConstant) {
+					il.Emit (OpCodes.Ldstr, rop.Tokens [0]);
+					lop.emitSetProperty (il);
+				} else if (rop.IsSingleName && rop.Tokens [0] == "this") {
+					il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
+					lop.emitSetProperty (il);
+				} else if (rop.LevelsUp == 0 && !string.IsNullOrEmpty (rop.Tokens [0])) {//parsable constant depending on lop type
+																						 //if left operand is member of current node, it's easy to fetch type, else we should use reflexion in msil
+					if (lopPI == null) {//accept GraphicObj members, but it's restricive
+										//TODO: we should get the parse method by reflexion, or something else
+						lopPI = typeof (Widget).GetProperty (lop.Tokens [lop.Tokens.Length - 1]);
+						if (lopPI == null)
+							throw new NotSupportedException ();
+					}
+
+					MethodInfo lopParseMi = CompilerServices.miParseEnum;
+					if (lopPI.PropertyType.IsEnum) {
+						//load type of enum
+						il.Emit (OpCodes.Ldtoken, lopPI.PropertyType);
+						il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
+						//load enum value name
+						il.Emit (OpCodes.Ldstr, operandes [1].Trim ());
+						//load false
+						il.Emit (OpCodes.Ldc_I4_0);
+					} else {
+						lopParseMi = lopPI.PropertyType.GetMethod ("Parse");
+						if (lopParseMi == null)
+							throw new Exception (string.Format
+								("IML: no static 'Parse' method found in: {0}", lopPI.PropertyType.Name));
+
+						il.Emit (OpCodes.Ldstr, operandes [1].Trim ());
+					}
+					if (lopParseMi.IsStatic)
+						il.Emit (OpCodes.Call, lopParseMi);
+					else
+						il.Emit (OpCodes.Callvirt, lopParseMi);
+					CompilerServices.emitConvert (il, lopPI.PropertyType);
+					//if (lopPI.PropertyType.IsValueType)
+					//	il.Emit (OpCodes.Unbox_Any, lopPI.PropertyType);
+					//emit left operand assignment
+					il.Emit (OpCodes.Callvirt, lopPI.GetSetMethod ());
+				} else {//tree parsing and propert gets
+					il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
+
+					rop.emitGetTarget (il, cancelFinalSet);
+					rop.emitGetProperty (il, cancelFinalSet);
+					lop.emitSetProperty (il);
+				}
+				#endregion
+
+				il.Emit (OpCodes.Br, success);
+
+				il.MarkLabel (cancelFinalSet);
+				il.Emit (OpCodes.Pop);  //pop null MemberInfo on the stack causing cancelation
+				il.MarkLabel (cancel);
+				il.Emit (OpCodes.Pop);  //pop null instance on the stack causing cancelation
+				il.MarkLabel (success);
+			}
+
+			il.Emit (OpCodes.Ret);
+
+			return dm.CreateDelegate (sourceEvent.EventHandlerType);
+		}
+
 		/// <summary> Emits handler method bindings </summary>
 		void emitHandlerBinding (IMLContext ctx, EventInfo sourceEvent, string expression){
 			NodeAddress currentNode = ctx.CurrentNodeAddress;
@@ -643,7 +767,7 @@ namespace Crow.IML {
 					                   typeof(void),
 					                   CompilerServices.argsBoundDSChange, true);
 
-				ILGenerator il = dm.GetILGenerator (256);
+				ILGenerator il = dm.GetILGenerator (64);
 				System.Reflection.Emit.Label cancel = il.DefineLabel ();
 
 				il.DeclareLocal (typeof(MethodInfo));//used to cancel binding if method doesn't exist
@@ -651,7 +775,6 @@ namespace Crow.IML {
 				il.Emit (OpCodes.Nop);
 
 				emitRemoveOldDataSourceHandler (il, sourceEvent.Name, bindingDef.TargetMember, false);
-
 
 				//fetch method in datasource and test if it exist
 				il.Emit (OpCodes.Ldarg_2);//load new datasource
@@ -728,7 +851,7 @@ namespace Crow.IML {
 			//value changed dyn method
 			DynamicMethod dm = new DynamicMethod ("dyn_valueChanged" + NewId,
 				typeof (void), CompilerServices.argsValueChange, true);
-			ILGenerator il = dm.GetILGenerator (256);
+			ILGenerator il = dm.GetILGenerator (64);
 
 			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
@@ -826,13 +949,13 @@ namespace Crow.IML {
 			//value changed dyn method
 			DynamicMethod dm = new DynamicMethod ("dyn_tmpValueChanged" + NewId,
 				typeof (void), CompilerServices.argsValueChange, true);
-			ILGenerator il = dm.GetILGenerator (256);
+			ILGenerator il = dm.GetILGenerator (64);
 
 			//create parentchanged dyn meth in parallel to have only one loop over bindings
 			DynamicMethod dmPC = new DynamicMethod ("dyn_InitAndLogicalParentChanged" + NewId,
 				typeof (void),
 				CompilerServices.argsBoundDSChange, true);
-			ILGenerator ilPC = dmPC.GetILGenerator (256);
+			ILGenerator ilPC = dmPC.GetILGenerator (64);
 
 			il.Emit (OpCodes.Nop);
 			ilPC.Emit (OpCodes.Nop);
@@ -977,7 +1100,7 @@ namespace Crow.IML {
 		void emitDataSourceBindings (IMLContext ctx, BindingDefinition bindingDef, Type dsType)
 		{
 #if DEBUG_BINDING_FUNC_CALLS
-			Console.WriteLine ($"emitDataSourceBindings with data type knows: {bindingDef}");
+			System.Diagnostics.Debug.WriteLine ($"emitDataSourceBindings with data type knows: {bindingDef}");
 #endif
 			DynamicMethod dm = null;
 			ILGenerator il = null;
@@ -992,16 +1115,14 @@ namespace Crow.IML {
 					typeof (void),
 					CompilerServices.argsBoundValueChange, true);
 
-				il = dm.GetILGenerator (256);
+				il = dm.GetILGenerator (64);
 
-				System.Reflection.Emit.Label endMethod = il.DefineLabel ();
+				Label endMethod = il.DefineLabel ();
 
 				il.DeclareLocal (typeof (object));
 
-				il.Emit (OpCodes.Nop);
-
 				//load value changed member name onto the stack
-				il.Emit (OpCodes.Ldarg_2);
+				il.Emit (OpCodes.Ldarg_2);//TODO:check _2??? not _1??
 				il.Emit (OpCodes.Ldfld, CompilerServices.fiVCMbName);
 
 				//test if it's the expected one
@@ -1045,16 +1166,15 @@ namespace Crow.IML {
 				typeof (void),
 				CompilerServices.argsBoundDSChange, true);
 
-			il = dm.GetILGenerator (256);
+			il = dm.GetILGenerator (64);
 
 			il.DeclareLocal (typeof (object));//used for checking propery less bindings
 			il.DeclareLocal (typeof (MemberInfo));//used for checking propery less bindings
 			il.DeclareLocal (typeof (object));//new datasource store, save one field access
-			System.Reflection.Emit.Label cancel = il.DefineLabel ();
-			System.Reflection.Emit.Label newDSIsNull = il.DefineLabel ();
-			System.Reflection.Emit.Label cancelInit = il.DefineLabel ();
+			Label cancel = il.DefineLabel ();
+			Label newDSIsNull = il.DefineLabel ();
+			Label cancelInit = il.DefineLabel ();
 
-			il.Emit (OpCodes.Nop);
 
 			il.Emit (OpCodes.Ldarg_2);//load datasource change arg
 			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
@@ -1137,6 +1257,7 @@ namespace Crow.IML {
 		}
 
 		/// <summary>
+		/// data source binding with unknown data type.
 		/// create the valuechanged handler, the datasourcechanged handler and emit event handling
 		/// </summary>
 		void emitDataSourceBindings (IMLContext ctx, BindingDefinition bindingDef)
@@ -1157,7 +1278,7 @@ namespace Crow.IML {
 		public Delegate emitDataSourceBindings (PropertyInfo piSource, BindingDefinition bindingDef){		
 
 #if DEBUG_BINDING_FUNC_CALLS
-			Console.WriteLine ($"emitDataSourceBindings: {bindingDef}");
+			System.Diagnostics.Debug.WriteLine ($"emitDataSourceBindings: {bindingDef}");
 #endif
 			DynamicMethod dm = null;
 			ILGenerator il = null;
@@ -1171,14 +1292,11 @@ namespace Crow.IML {
 				dm = new DynamicMethod (delName,
 					typeof (void),
 					CompilerServices.argsBoundValueChange, true);
-
 				il = dm.GetILGenerator (64);
 
-				System.Reflection.Emit.Label endMethod = il.DefineLabel ();
+				Label endMethod = il.DefineLabel ();
 
 				il.DeclareLocal (typeof(object));
-
-				il.Emit (OpCodes.Nop);
 
 				//load value changed member name onto the stack
 				il.Emit (OpCodes.Ldarg_2);
@@ -1201,8 +1319,8 @@ namespace Crow.IML {
 				//value type for conversion
 				CompilerServices.emitConvert (il, piSource.PropertyType);
 
-				if (!piSource.CanWrite)
-					throw new Exception ("Source member of bindind is read only:" + piSource.ToString());
+				if (piSource.SetMethod == null)
+					throw new Exception ("Source member of bindind is read only:" + piSource.ToString ());
 
 				il.Emit (OpCodes.Callvirt, piSource.GetSetMethod ());
 
@@ -1372,8 +1490,6 @@ namespace Crow.IML {
 
 			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
-			il.Emit (OpCodes.Nop);
-
 			//load value changed member name onto the stack
 			il.Emit (OpCodes.Ldarg_2);
 			il.Emit (OpCodes.Ldfld, CompilerServices.fiVCMbName);
@@ -1447,10 +1563,16 @@ namespace Crow.IML {
 			if (t != null) {
 				knownGOTypes.Add (typeName, t);
 				return t;
-			}			
-			foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies()) {
-				if (a.IsDynamic)
+			}
+
+			foreach (Type expT in Assembly.GetEntryAssembly ().GetExportedTypes ()) {
+				if (expT.Name != typeName)
 					continue;
+				knownGOTypes.Add (typeName, expT);
+				return expT;
+			}
+
+			foreach (Assembly a in Interface.crowAssemblies) {
 				foreach (Type expT in a.GetExportedTypes ()) {
 					if (expT.Name != typeName)
 						continue;

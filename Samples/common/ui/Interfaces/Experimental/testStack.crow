@@ -6,7 +6,7 @@
 	<HorizontalStack>
 		<Widget Height="Stretched" Width="100" Background="Red"/>
 		<Splitter/>
-		<Widget Height="Stretched" Width="100" Background="DarkRed"/>
+		<Widget Height="Stretched" Width="Stretched" Background="DarkRed"/>
 	</HorizontalStack>
 	<Splitter/>
 	<Widget Height="100" Width="500" Background="Green"/>

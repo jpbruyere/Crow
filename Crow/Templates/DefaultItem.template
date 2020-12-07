@@ -1,8 +1,7 @@
 ﻿<?xml version="1.0"?>
-<Container Height="Fit" Margin="0" Focusable="true"
-		HorizontalAlignment="Left"
-		MouseEnter="{Background=SteelBlue}"
-		MouseLeave="{Background=Transparent}">
+<ListItem Height="Fit" Margin="0" Focusable="true" HorizontalAlignment="Left" 
+				Selected = "{Background=${ControlHighlight}}"
+				Unselected = "{Background=Transparent}">
 	<Label Text="{}" HorizontalAlignment="Left" />
-</Container>
+</ListItem>
 

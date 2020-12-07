@@ -88,6 +88,8 @@ namespace Crow
 				Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.UserProfile), ".config");
 
 			Assembly a = Assembly.GetEntryAssembly ();
+			if (a == null)
+				a = AppDomain.CurrentDomain.GetAssemblies ()[1];
 			string appName = a.GetName().Name;
 			string globalConfigPath = Path.Combine (configRoot, appName);
 

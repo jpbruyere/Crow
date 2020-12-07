@@ -3,10 +3,8 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using System.Xml.Serialization;
-using System.ComponentModel;
 using Crow.Cairo;
-
+using static Crow.Logger;
 namespace Crow
 {
 	/// <summary>
@@ -20,8 +18,8 @@ namespace Crow
 	public class PrivateContainer : Widget
 	{
 		#region CTOR
-		protected PrivateContainer () : base(){}
-		public PrivateContainer (Interface iface) : base(iface){}
+		protected PrivateContainer () {}
+		public PrivateContainer (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		#if DESIGN_MODE
@@ -83,6 +81,13 @@ namespace Crow
 
 			return child == null ? null : child.FindByName (nameToFind);
 		}
+		public override Widget FindByType<T> ()
+		{
+			if (this is T)
+				return this;
+
+			return child == null ? null : child.FindByType<T> ();
+		}
 		public override bool Contains (Widget goToFind)
 		{
 			return child == goToFind ? true : 
@@ -95,18 +100,38 @@ namespace Crow
 			if (child.localDataSourceIsNull & child.localLogicalParentIsNull)
 				child.OnDataSourceChanged (child, e);
 		}
+
+		public override int measureRawSize (LayoutingType lt)
+		{
+			if (child != null) {
+				//force measure of child if sizing on children and child has stretched size
+				switch (lt) {
+				case LayoutingType.Width:
+					if (child.Width.IsRelativeToParent)
+						contentSize.Width = child.measureRawSize (LayoutingType.Width);
+					break;
+				case LayoutingType.Height:
+					if (child.Height.IsRelativeToParent)
+						contentSize.Height = child.measureRawSize (LayoutingType.Width);
+					break;
+				}
+			}
+			return base.measureRawSize (lt);
+		}
 		public override bool UpdateLayout (LayoutingType layoutType)
 		{
 			if (child != null) {
-				//force sizing to fit if sizing on children and child has stretched size
+				//force measure of child if sizing on children and child has stretched size
 				switch (layoutType) {
 				case LayoutingType.Width:
 					if (Width == Measure.Fit && child.Width.IsRelativeToParent)
-						child.Width = Measure.Fit;
+						//child.Width = Measure.Fit;
+						contentSize.Width = child.measureRawSize (LayoutingType.Width);
 					break;
 				case LayoutingType.Height:
 					if (Height == Measure.Fit && child.Height.IsRelativeToParent)
-						child.Height = Measure.Fit;
+						//child.Height = Measure.Fit;
+						contentSize.Height = child.measureRawSize (LayoutingType.Width);
 					break;
 				}
 			}
@@ -118,7 +143,7 @@ namespace Crow
 
 			if (child == null)
 				return;
-			
+
 			LayoutingType ltChild = LayoutingType.None;
 
 			if (layoutType == LayoutingType.Width) {
@@ -134,7 +159,7 @@ namespace Crow
 					if (child.Height.Value < 100 && child.Top == 0)
 						ltChild |= LayoutingType.Y;
 				} else if (child.Top == 0)
-						ltChild |= LayoutingType.Y;
+					ltChild |= LayoutingType.Y;
 			}
 			if (ltChild == LayoutingType.None)
 				return;
@@ -143,17 +168,16 @@ namespace Crow
 		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{			
 			Widget g = sender as Widget;
-
 			if (arg.LayoutType == LayoutingType.Width) {
+				contentSize.Width = g.Slot.Width;
 				if (Width != Measure.Fit)
 					return;
-				contentSize.Width = g.Slot.Width;
-				this.RegisterForLayouting (LayoutingType.Width);
-			}else if (arg.LayoutType == LayoutingType.Height){
+				RegisterForLayouting (LayoutingType.Width);
+			} else if (arg.LayoutType == LayoutingType.Height){
+				contentSize.Height = g.Slot.Height;
 				if (Height != Measure.Fit)
 					return;
-				contentSize.Height = g.Slot.Height;
-				this.RegisterForLayouting (LayoutingType.Height);
+				RegisterForLayouting (LayoutingType.Height);
 			}
 		}
 		protected override void onDraw (Context gr)
@@ -192,7 +216,7 @@ namespace Crow
 				
 			gr.Dispose ();
 
-			ctx.SetSourceSurface (bmp, rb.X, rb.Y);
+			ctx.SetSource (bmp, rb.X, rb.Y);
 			ctx.Paint ();
 			Clipping.Dispose();
 			Clipping = new Region ();

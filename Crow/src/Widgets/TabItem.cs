@@ -12,8 +12,8 @@ namespace Crow
 	public class TabItem : TemplatedContainer
 	{
 		#region CTOR
-		protected TabItem() : base(){}
-		public TabItem (Interface iface) : base(iface){}
+		protected TabItem() {}
+		public TabItem (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		public event EventHandler QueryClose;
@@ -25,7 +25,7 @@ namespace Crow
 		int tabOffset;
 		bool isSelected;
 		//Measure tabThickness;
-		Fill selectedBackground = Color.Transparent;
+		Fill selectedBackground = Colors.Transparent;
 		#endregion
 
 		#region TemplatedControl overrides
@@ -63,7 +63,7 @@ namespace Crow
 				if (viewIndex == value)
 					return;
 				viewIndex = value;
-				NotifyValueChanged ("ViewIndex", viewIndex);
+				NotifyValueChangedAuto (viewIndex);
 			}
 		}
 			
@@ -74,7 +74,7 @@ namespace Crow
 				if (tabOffset == value)
 					return;
 				tabOffset = value;
-				NotifyValueChanged ("TabOffset", tabOffset);
+				NotifyValueChangedAuto (tabOffset);
 
 				RegisterForLayouting (LayoutingType.X);
 				RegisterForGraphicUpdate ();
@@ -97,7 +97,7 @@ namespace Crow
 					tview.SelectedTab = tview.Children.IndexOf(this);
 				
 				isSelected = value;
-				NotifyValueChanged ("IsSelected", isSelected);
+				NotifyValueChangedAuto (isSelected);
 				RegisterForRedraw ();
 			}
 		}
@@ -114,7 +114,7 @@ namespace Crow
 				if (value == null)
 					return;
 				selectedBackground = value;
-				NotifyValueChanged ("SelectedBackground", selectedBackground);
+				NotifyValueChangedAuto (selectedBackground);
 				RegisterForRedraw ();
 			}
 		}
@@ -189,9 +189,9 @@ namespace Crow
 						this.onDraw (ctx);
 					else {
 						if (LastPaintedSlot.Width>LastPaintedSlot.Height)
-							ctx.SetSourceSurface (bmp, 0, (LastPaintedSlot.Width-LastPaintedSlot.Height)/2);
+							ctx.SetSource (bmp, 0, (LastPaintedSlot.Width-LastPaintedSlot.Height)/2);
 						else
-							ctx.SetSourceSurface (bmp, (LastPaintedSlot.Height-LastPaintedSlot.Width)/2, 0);
+							ctx.SetSource (bmp, (LastPaintedSlot.Height-LastPaintedSlot.Width)/2, 0);
 
 						ctx.Paint ();
 					}

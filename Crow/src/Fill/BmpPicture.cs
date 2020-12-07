@@ -44,7 +44,7 @@ namespace Crow
 				Dimensions = sp.Dims;
 				return;
 			}
-			using (Stream stream = Interface.StaticGetStreamFromPath (Path)) {
+			using (Stream stream = Interface.GetStreamFromPath (Path)) {
 #if STB_SHARP
 				StbImageSharp.ImageResult stbi = StbImageSharp.ImageResult.FromStream (stream, StbImageSharp.ColorComponents.RedGreenBlueAlpha);
 				image = new byte [stbi.Data.Length];
@@ -125,7 +125,7 @@ namespace Crow
 
 					using (ImageSurface imgSurf = new ImageSurface (image, Format.Argb32, 
 						Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) {
-						gr.SetSourceSurface (imgSurf, 0,0);
+						gr.SetSource (imgSurf, 0,0);
 						gr.Paint ();
 					}
 				}
@@ -166,7 +166,7 @@ namespace Crow
 			
 			using (ImageSurface imgSurf = new ImageSurface (image, Format.Argb32, 
 				Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) {
-				gr.SetSourceSurface (imgSurf, 0,0);
+				gr.SetSource (imgSurf, 0,0);
 				gr.Paint ();
 			}
 			gr.Restore ();

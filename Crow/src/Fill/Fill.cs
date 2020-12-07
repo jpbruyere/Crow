@@ -33,13 +33,10 @@ namespace Crow
 
 			return new SolidColor((Color)Color.Parse (s));
 		}
-		public static implicit operator Color(Fill c){
-			SolidColor sc = c as SolidColor;
-			return sc == null ? default : sc.color;
-		}
-		public static implicit operator Fill(Color c){
-			return new SolidColor (c);
-		}
+		public static implicit operator Color(Fill c) => c is SolidColor sc ? sc.color : default;
+		public static implicit operator Fill (Color c) => new SolidColor (c);
+		public static implicit operator Fill (Colors c) => new SolidColor (c);
+
 	}
 }
 

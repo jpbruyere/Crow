@@ -3,6 +3,8 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
+using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace Crow
@@ -132,10 +134,6 @@ namespace Crow
 			ctx.Stroke ();
 		}
 
-		public static void SetSourceColor(this Cairo.Context ctx, Color c)
-		{
-			ctx.SetSourceRGBA(c.R,c.G,c.B,c.A);
-		}
 		public static void AddColorStop(this Cairo.Gradient grad, double offset, Color c)
 		{
 			grad.AddColorStop (offset, c);
@@ -192,6 +190,9 @@ namespace Crow
 			
 			return null;
 		}
+
+		public static FileSystemInfo [] GetFileSystemInfosOrdered (this DirectoryInfo di)
+			=> di.GetFileSystemInfos ().OrderBy (f => f.Attributes).ThenBy (f => f.Name).ToArray ();
 	}
 }
 

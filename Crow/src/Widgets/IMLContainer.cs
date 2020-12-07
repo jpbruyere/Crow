@@ -21,7 +21,7 @@ namespace Crow
 					return;
 				path = value;
 				this.SetChild (IFace.CreateInstance (path));
-				NotifyValueChanged ("Path", path);
+				NotifyValueChangedAuto (path);
 			}
 		}
 	}

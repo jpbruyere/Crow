@@ -16,8 +16,8 @@ namespace Crow
 	public class ColorPicker : TemplatedControl
 	{
 		#region CTOR
-		protected ColorPicker() : base(){}
-		public ColorPicker (Interface iface) : base(iface){}
+		protected ColorPicker() {}
+		public ColorPicker (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		Color currentColor;
@@ -26,14 +26,15 @@ namespace Crow
 		public virtual Color CurrentColor {
 			get => currentColor;
 			set {
-				if (currentColor == value)
+				if (currentColor.Equals(value))
 					return;
 				currentColor = value;
-				NotifyValueChanged ("CurrentColor", currentColor);
+				NotifyValueChangedAuto (currentColor);
+				NotifyValueChanged ("CurrentColor2", Color.FromHSV (currentColor.Hue, currentColor.Value, currentColor.Saturation, currentColor.A));
 			}
 		}
 
-		public IList<Color> ColorList => Color.ColorDic.Values.OrderBy (c => c.Hue).ToList ();
+		//public IList<Color> ColorList => Enum.GetValues (typeof (Color)).ToList<Color> ();// Colors. ColorDic.Values.OrderBy (c => c.Hue).ToList ();
 	}
 }
 

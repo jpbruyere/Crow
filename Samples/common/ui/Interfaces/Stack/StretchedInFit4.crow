@@ -1,0 +1,12 @@
+﻿<?xml version="1.0"?>
+<Container Background="DimGrey" Margin="10" Width="Fit" Height="Fit" >
+	<Popper Width="Stretched" Margin="10" Background="RoyalBlue">
+		<Container Width="Fit" Height="Fit" Margin="10" Background="Blue">
+			<Container  Margin="10" Background="Yellow">
+				<Container Margin="10" Background="FireBrick">
+					<CheckBox/> 
+				</Container>
+			</Container>
+		</Container>
+	</Popper>
+</Container>

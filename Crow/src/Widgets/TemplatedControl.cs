@@ -32,8 +32,8 @@ namespace Crow
 		#endif
 
 		#region CTOR
-		protected TemplatedControl() : base(){}
-		public TemplatedControl (Interface iface) : base(iface){}
+		protected TemplatedControl() {}
+		protected TemplatedControl (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		string _template = "NOT_SET";
@@ -54,7 +54,7 @@ namespace Crow
 				if (string.IsNullOrEmpty(_template))
 					loadTemplate ();
 				else
-					loadTemplate (IFace.CreateTemplateInstance (_template, this.GetType()));
+					loadTemplate (IFace.CreateInstance (_template));
 			}
 		}
 		/// <summary>
@@ -67,7 +67,7 @@ namespace Crow
 				if (caption == value)
 					return;
 				caption = value;
-				NotifyValueChanged ("Caption", caption);
+				NotifyValueChangedAuto (caption);
 			}
 		}
 
@@ -79,7 +79,8 @@ namespace Crow
 		/// <returns>widget identified by name, or null if not found</returns>
 		/// <param name="nameToFind">widget's name to find</param>
 		public override Widget FindByName (string nameToFind) => nameToFind == this.Name ? this : null;
-
+		public override Widget FindByType<T> () => this is TemplatedControl ? this : null;
+		public Widget FindByNameInTemplate (string nameToFind) => child?.FindByName (nameToFind);
 		/// <summary>
 		///onDraw is overrided to prevent default drawing of background, template top container
 		///may have a binding to root background or a fixed one.
@@ -118,9 +119,7 @@ namespace Crow
 
 				if (!IFace.DefaultTemplates.ContainsKey (mdTok)) {
 					string defTmpId = this.GetType ().FullName + ".template";
-					Stream s = Assembly.GetEntryAssembly ()?.GetManifestResourceStream (defTmpId);
-					if (s == null)
-						s = Assembly.GetAssembly (this.GetType ()).GetManifestResourceStream (defTmpId);
+					Stream s = Interface.GetStreamFromPath ("#" + defTmpId);
 					if (s == null)
 						throw new Exception (string.Format ("No default template found for '{0}'", this.GetType ().FullName));
 					IFace.DefaultTemplates [mdTok] = new IML.Instantiator (IFace, s, defTmpId);

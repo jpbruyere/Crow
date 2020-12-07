@@ -3,16 +3,15 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using System.Xml.Serialization;
 using System.ComponentModel;
 
 namespace Crow
 {
-    public class Popper : TemplatedContainer
+	public class Popper : TemplatedContainer
     {
 		#region CTOR
-		protected Popper () : base(){}
-		public Popper (Interface iface) : base(iface){}
+		protected Popper () {}
+		public Popper (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		bool _isPopped, _canPop;
@@ -31,7 +30,7 @@ namespace Crow
 				if (popWidth == value)
 					return;
 				popWidth = value;
-				NotifyValueChanged ("PopWidth", popWidth);
+				NotifyValueChangedAuto (popWidth);
 			}
 		}
 		[DefaultValue("Fit")]
@@ -41,7 +40,7 @@ namespace Crow
 				if (popHeight == value)
 					return;
 				popHeight = value;
-				NotifyValueChanged ("PopHeight", popHeight);
+				NotifyValueChangedAuto (popHeight);
 			}
 		}
 		[DefaultValue(false)]
@@ -58,7 +57,7 @@ namespace Crow
 
 				_isPopped = value;
 
-				NotifyValueChanged ("IsPopped", _isPopped);
+				NotifyValueChangedAuto (_isPopped);
 
 				if (_isPopped)
 					onPop (this, null);
@@ -77,7 +76,7 @@ namespace Crow
 					return;
 
 				_canPop = value;
-				NotifyValueChanged ("CanPop", _canPop);
+				NotifyValueChangedAuto (_canPop);
 			}
 		}
 		[DefaultValue(Alignment.Bottom)]
@@ -87,7 +86,7 @@ namespace Crow
 				if (popDirection == value)
 					return;
 				popDirection = value;
-				NotifyValueChanged ("PopDirection", popDirection);
+				NotifyValueChangedAuto (popDirection);
 			}
 		}
 		#endregion

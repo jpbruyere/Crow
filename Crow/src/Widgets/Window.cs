@@ -3,9 +3,7 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using System.Xml.Serialization;
 using System.ComponentModel;
-using System.Diagnostics;
 using Glfw;
 
 namespace Crow
@@ -31,13 +29,11 @@ namespace Crow
 		bool modal;
 		protected bool hoverBorder = false;
 		bool alwaysOnTop = false;
-		Fill titleBarBackground = Color.SteelBlue;
-		Fill titleBarForeground = Color.White;
 
 		Rectangle savedBounds;
 		bool _minimized = false;
 
-		Direction currentDirection = Direction.None;
+		protected Direction currentDirection = Direction.None;
 
 		#region Events
 		public event EventHandler Closing;
@@ -47,9 +43,12 @@ namespace Crow
 		#endregion
 
 		#region CTOR
-		protected Window() : base(){}
-		public Window (Interface iface) : base(iface){}
+		protected Window() {}
+		public Window (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
+
+		Widget moveHandle, sizingHandle;
+
 
 		#region TemplatedContainer overrides
 		protected override void loadTemplate(Widget template = null)
@@ -59,48 +58,33 @@ namespace Crow
 			NotifyValueChanged ("ShowNormal", false);
 			NotifyValueChanged ("ShowMinimize", true);
 			NotifyValueChanged ("ShowMaximize", true);
-		}
-		#endregion
 
-		#region public properties
-		[DefaultValue("#Crow.Icons.crow.svg")]
+			moveHandle = child?.FindByName ("MoveHandle");
+			sizingHandle = child?.FindByName ("SizeHandle");
+
+			if (sizingHandle == null)
+				return;			
+            //sizingHandle.Unhover += (arg1, arg2) => currentDirection = Direction.None;
+            sizingHandle.Unhover += SizingHandle_Unhover;
+		}
+
+        private void SizingHandle_Unhover (object sender, EventArgs e) {
+			currentDirection = Direction.None;
+			NotifyValueChanged ("CurDir", currentDirection);
+		}
+        #endregion
+
+        #region public properties
+        [DefaultValue("#Crow.Icons.crow.svg")]
 		public string Icon {
 			get { return _icon; } 
 			set {
 				if (_icon == value)
 					return;
 				_icon = value;
-				NotifyValueChanged ("Icon", _icon);
+				NotifyValueChangedAuto (_icon);
 			}
 		} 
-		/// <summary>
-		/// Background of the title bar if any.
-		/// </summary>
-		[DefaultValue("vgradient|0:Onyx|1:SteelBlue")]
-		public virtual Fill TitleBarBackground {
-			get { return titleBarBackground; }
-			set {
-				if (titleBarBackground == value)
-					return;
-				titleBarBackground = value;
-				NotifyValueChanged ("TitleBarBackground", titleBarBackground);
-				RegisterForRedraw ();
-			}
-		}
-		/// <summary>
-		/// Foreground of the title bar, usualy used for the window caption color.
-		/// </summary>
-		[DefaultValue("White")]
-		public virtual Fill TitleBarForeground {
-			get { return titleBarForeground; }
-			set {
-				if (titleBarForeground == value)
-					return;
-				titleBarForeground = value;
-				NotifyValueChanged ("TitleBarForeground", titleBarForeground);
-				RegisterForRedraw ();
-			}
-		}
 		[DefaultValue(true)]
 		public bool Resizable {
 			get {
@@ -110,7 +94,7 @@ namespace Crow
 				if (resizable == value)
 					return;
 				resizable = value;
-				NotifyValueChanged ("Resizable", resizable);
+				NotifyValueChangedAuto (resizable);
 			}
 		}
 		[DefaultValue(true)]
@@ -122,7 +106,7 @@ namespace Crow
 				if (movable == value)
 					return;
 				movable = value;
-				NotifyValueChanged ("Movable", movable);
+				NotifyValueChangedAuto (movable);
 			}
 		}
 		[DefaultValue(false)]
@@ -134,7 +118,7 @@ namespace Crow
 				if (modal == value)
 					return;
 				modal = value;
-				NotifyValueChanged ("Modal", modal);
+				NotifyValueChangedAuto (modal);
 			}
 		}
 		[DefaultValue(false)]
@@ -147,7 +131,7 @@ namespace Crow
 				_minimized = value;
 				_contentContainer.Visible = !_minimized;
 
-				NotifyValueChanged ("IsMinimized", _minimized);
+				NotifyValueChangedAuto (_minimized);
 			}
 		}
 		[XmlIgnore]public bool IsMaximized {
@@ -170,23 +154,9 @@ namespace Crow
 				if (AlwaysOnTop && Parent != null)
 					IFace.PutOnTop (this);
 
-				NotifyValueChanged ("AlwaysOnTop", AlwaysOnTop);
+				NotifyValueChangedAuto (AlwaysOnTop);
 			}
 		}
-//		[DefaultValue(WindowState.Normal)]
-//		public virtual WindowState State {
-//			get { return _state; }
-//			set {
-//				if (_state == value)
-//					return;
-//				_state = value;
-//				NotifyValueChanged ("State", _state);
-//				NotifyValueChanged ("IsNormal", IsNormal);
-//				NotifyValueChanged ("IsMaximized", IsMaximized);
-//				NotifyValueChanged ("IsMinimized", IsMinimized);
-//				NotifyValueChanged ("IsNotMinimized", IsNotMinimized);
-//			}
-//		} 
 		#endregion
 
 		/// <summary>
@@ -195,7 +165,7 @@ namespace Crow
 		/// <param name="XDelta">mouse delta on the X axis</param>
 		/// <param name="YDelta">mouse delta on the Y axis</param>
 		/// <param name="currentDirection">Current Direction of the operation, none for moving, other value for resizing in the given direction</param>
-		public void MoveAndResize (int XDelta, int YDelta, Direction currentDirection = (Direction)0) {
+		protected void moveAndResize (int XDelta, int YDelta, Direction currentDirection = (Direction)0) {
 			int currentLeft = this.Left;
 			int currentTop = this.Top;
 			int currentWidth, currentHeight;
@@ -266,31 +236,25 @@ namespace Crow
 			}			
 		}
 
+		bool maySize => sizingHandle == null ? false : resizable & sizingHandle.IsHover;
+		bool mayMove => moveHandle == null ? false : movable & moveHandle.IsHover;
+
 		#region GraphicObject Overrides
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
 
-			Interface otkgw = IFace;
-
-			if (HasFocus) {
-				if (movable) {
-					if (IFace.IsDown (MouseButton.Left)) {
-						MoveAndResize (e.XDelta, e.YDelta, currentDirection);
-						return;
-					}
+			if (maySize || mayMove) {
+				if (grabMouse) {
+					moveAndResize (e.XDelta, e.YDelta, currentDirection);
+					return;
 				}
-			} else {
-				currentDirection = Direction.None;
+			}else
 				return;
-			}
-
 
 			Point m = Parent is Widget ? (Parent as Widget).ScreenPointToLocal (e.Position) : e.Position;
 
-			if (Resizable) {
-				Direction lastDir = currentDirection;
-
+			if (maySize) {
 				if (Math.Abs (m.Y - this.Slot.Y) < Interface.BorderThreshold) {
 					if (Math.Abs (m.X - this.Slot.X) < Interface.BorderThreshold)
 						currentDirection = Direction.NW;
@@ -309,51 +273,64 @@ namespace Crow
 					currentDirection = Direction.W;
 				else if (Math.Abs (m.X - this.Slot.Right) < Interface.BorderThreshold)
 					currentDirection = Direction.E;
-				else
-					currentDirection = Direction.None;
+			} else if (mayMove)
+				currentDirection = Direction.None;
+			else
+				return;
 
-				//if (currentDirection != lastDir) {
-					switch (currentDirection) {
-					case Direction.None:
-						otkgw.MouseCursor = MouseCursor.move;
-						break;
-					case Direction.N:
-						otkgw.MouseCursor = MouseCursor.top_side;
-						break;
-					case Direction.S:
-						otkgw.MouseCursor = MouseCursor.bottom_side;
-						break;
-					case Direction.E:
-						otkgw.MouseCursor = MouseCursor.right_side;
-						break;
-					case Direction.W:
-						otkgw.MouseCursor = MouseCursor.left_side;
-						break;
-					case Direction.NW:
-						otkgw.MouseCursor = MouseCursor.top_left_corner;
-						break;
-					case Direction.NE:
-						otkgw.MouseCursor = MouseCursor.top_right_corner;
-						break;
-					case Direction.SW:
-						otkgw.MouseCursor = MouseCursor.bottom_left_corner;
-						break;
-					case Direction.SE:
-						otkgw.MouseCursor = MouseCursor.bottom_right_corner;
-						break;
-					}
-				//}				
-			}				
+			switch (currentDirection) {
+			case Direction.None:
+				IFace.MouseCursor = MouseCursor.move;
+				break;
+			case Direction.N:
+				IFace.MouseCursor = MouseCursor.top_side;
+				break;
+			case Direction.S:
+				IFace.MouseCursor = MouseCursor.bottom_side;
+				break;
+			case Direction.E:
+				IFace.MouseCursor = MouseCursor.right_side;
+				break;
+			case Direction.W:
+				IFace.MouseCursor = MouseCursor.left_side;
+				break;
+			case Direction.NW:
+				IFace.MouseCursor = MouseCursor.top_left_corner;
+				break;
+			case Direction.NE:
+				IFace.MouseCursor = MouseCursor.top_right_corner;
+				break;
+			case Direction.SW:
+				IFace.MouseCursor = MouseCursor.bottom_left_corner;
+				break;
+			case Direction.SE:
+				IFace.MouseCursor = MouseCursor.bottom_right_corner;
+				break;
+			}
+			NotifyValueChanged ("CurDir", currentDirection);
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
 			currentDirection = Direction.None;
 			IFace.MouseCursor = MouseCursor.top_left_arrow;
+			NotifyValueChanged ("CurDir", currentDirection);
 		}
+		bool grabMouse;
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
+			NotifyValueChanged ("GrabMouse", true);
+			grabMouse = true;
+			e.Handled = true;
 			base.onMouseDown (sender, e);
+		}
+		public override void onMouseUp (object sender, MouseButtonEventArgs e)
+		{
+			NotifyValueChanged ("GrabMouse", false);
+			NotifyValueChanged ("CurDir", currentDirection);
+			grabMouse = false;
+			e.Handled = true;
+			base.onMouseUp (sender, e);
 		}
 		public override bool MouseIsIn (Point m)
 		{
@@ -365,9 +342,9 @@ namespace Crow
 			lock (IFace.LayoutMutex) {
 				if (!IsMinimized)
 					savedBounds = this.LastPaintedSlot;
-				this.Left = this.Top = 0;
-				this.RegisterForLayouting (LayoutingType.Positioning);
-				this.Width = this.Height = Measure.Stretched;
+				Left = Top = 0;
+				RegisterForLayouting (LayoutingType.Positioning);
+				Width = Height = Measure.Stretched;
 				IsMinimized = false;
 				Resizable = false;
 				NotifyValueChanged ("ShowNormal", true);
@@ -379,10 +356,10 @@ namespace Crow
 		}
 		protected void onUnmaximized (object sender, EventArgs e){
 			lock (IFace.LayoutMutex) {
-				this.Left = savedBounds.Left;
-				this.Top = savedBounds.Top;
-				this.Width = savedBounds.Width;
-				this.Height = savedBounds.Height;
+				Left = savedBounds.Left;
+				Top = savedBounds.Top;
+				Width = savedBounds.Width;
+				Height = savedBounds.Height;
 				IsMinimized = false;
 				Resizable = true;
 				NotifyValueChanged ("ShowNormal", false);
@@ -420,14 +397,14 @@ namespace Crow
 				(Parent as Interface).DeleteWidget (this);
 			else {
 				Widget p = Parent as Widget;
-				if (p is Group) {
+				if (p is Group g) {
 					lock (IFace.UpdateMutex) {
 						RegisterClip (p.ScreenCoordinates (p.LastPaintedSlot));
-						(p as Group).DeleteChild (this);
+						g.DeleteChild (this);
 					}
 					//(Parent as Group).RegisterForRedraw ();
-				} else if (Parent is PrivateContainer)
-					(Parent as Container).Child = null;
+				} else if (Parent is Container c)
+					c.Child = null;
 			}
 		}
 
@@ -438,6 +415,7 @@ namespace Crow
 				return w;
 			}
 		}
+
 	}
 }
 

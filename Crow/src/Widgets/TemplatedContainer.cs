@@ -2,11 +2,6 @@
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
-using System;
-using System.Xml.Serialization;
-using System.Xml;
-using System.Reflection;
-
 namespace Crow
 {
 	/// <summary>
@@ -16,7 +11,7 @@ namespace Crow
 	/// </summary>
 	public class TemplatedContainer : TemplatedControl
 	{
-		#if DESIGN_MODE
+#if DESIGN_MODE
 		public override void getIML (System.Xml.XmlDocument doc, System.Xml.XmlNode parentElem)
 		{
 			if (this.design_isTGItem)
@@ -26,11 +21,11 @@ namespace Crow
 				return;
 			Content.getIML (doc, parentElem.LastChild);
 		}
-		#endif
+#endif
 
-		#region CTOR
-		protected TemplatedContainer() : base(){}
-		public TemplatedContainer (Interface iface) : base(iface){}
+#region CTOR
+		protected TemplatedContainer() {}
+		public TemplatedContainer (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		protected Container _contentContainer;
@@ -57,13 +52,20 @@ namespace Crow
 			_contentContainer = this.child.FindByName ("Content") as Container;
 		}
 
-		#region GraphicObject overrides
+#region GraphicObject overrides
 		public override Widget FindByName (string nameToFind)
 		{
 			if (Name == nameToFind)
 				return this;
 
 			return Content == null ? null : Content.FindByName (nameToFind);
+		}
+		public override Widget FindByType<T> ()
+		{
+			if (this is T)
+				return this;
+
+			return Content == null ? null : Content.FindByType<T> ();
 		}
 		public override bool Contains (Widget goToFind)
 		{
@@ -73,7 +75,7 @@ namespace Crow
 				return true;
 			return base.Contains (goToFind);
 		}
-		#endregion
+#endregion
 	}
 }
 

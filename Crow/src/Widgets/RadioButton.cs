@@ -16,8 +16,8 @@ namespace Crow
 		bool isChecked;
 
 		#region CTOR
-		protected RadioButton () : base () { }
-		public RadioButton (Interface iface) : base (iface) { }
+		protected RadioButton () { }
+		public RadioButton (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		public event EventHandler Checked;
@@ -50,7 +50,7 @@ namespace Crow
 
 				isChecked = value;
 
-				NotifyValueChanged ("IsChecked", value);
+				NotifyValueChangedAuto (value);
 
 				if (isChecked)
 					Checked.Raise (this, null);

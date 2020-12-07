@@ -1,37 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
-		<OutputType>Exe</OutputType>
-		<EnableDefaultNoneItems>false</EnableDefaultNoneItems>
-		<ReleaseVersion>0.8.0</ReleaseVersion>
-		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-		<DebugType>full</DebugType>
-		<DefineConstants>TRACE;DEBUG</DefineConstants>
-		<CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-	</PropertyGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\..\Crow\Crow.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-		<Datas Include="..\data\**\*.*">
-			<Link>data\%(RecursiveDir)%(Filename)%(Extension)</Link>
-		</Datas>
 		<EmbeddedResource Include="ui\*.*">
 			<LogicalName>ShowCase.%(Filename)%(Extension)</LogicalName>
 		</EmbeddedResource>
-		<None Include="..\common\ui\Interfaces\**\*.*">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<Link>Interfaces\%(RecursiveDir)%(Filename)%(Extension)</Link>
-		</None>
-		<None Include="$(SolutionDir)\Images\**\*.*">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<Link>Images\%(RecursiveDir)%(Filename)%(Extension)</Link>
-		</None>
-	</ItemGroup>
-	<ItemGroup>
-		<None Remove="..\common\ui\Interfaces\basicTests\7.crow" />
 	</ItemGroup>
 </Project>

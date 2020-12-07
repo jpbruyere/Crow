@@ -35,7 +35,7 @@ namespace Crow
 		/// <summary> Unsuccessfull UpdateLayout and requeueing count </summary>
 		public int LayoutingTries, DiscardCount;
 
-		#if DEBUG_LOG
+
 		public enum Result : byte {
 			Unknown,
 			Register,
@@ -44,6 +44,7 @@ namespace Crow
 			Discarded,
 			Deleted,
 		}
+#if DEBUG_LOG
 		public Result result;
 		public Widget graphicObject {
 			get { return Layoutable as Widget; }
@@ -75,7 +76,7 @@ namespace Crow
 			Slot = Rectangle.Zero;
 			NewSlot = Rectangle.Zero;
 			result = Result.Register;
-			DebugLog.AddEvent (DbgEvtType.GORegisterLayouting, this);
+			DbgLogger.AddEvent (DbgEvtType.GORegisterLayouting, this);
 			#endif
 		}
 		#endregion
@@ -95,19 +96,17 @@ namespace Crow
 				//cancel layouting for object without parent, maybe some were in queue when
 				//removed from a listbox
 				#if DEBUG_LOG
-				DebugLog.AddEvent (DbgEvtType.GOProcessLayoutingWithNoParent, this);
+				DbgLogger.AddEvent (DbgEvtType.GOProcessLayoutingWithNoParent, this);
 				#endif
 				go.parentRWLock.ExitReadLock ();
 				return;
 			}
 			#if DEBUG_LOG
-			DbgEvent dbgEvt = DebugLog.AddEvent (DbgEvtType.GOProcessLayouting, this);
+			DbgLogger.StartEvent (DbgEvtType.GOProcessLayouting, this);
+			Slot = graphicObject.Slot;
 			#endif
 			LayoutingTries++;
 			if (!Layoutable.UpdateLayout (LayoutType)) {
-				#if DEBUG_LOG
-				dbgEvt.end = DebugLog.chrono.ElapsedTicks;
-				#endif
 				if (LayoutingTries < Interface.MaxLayoutingTries) {
 					Layoutable.RegisteredLayoutings |= LayoutType;
 					(Layoutable as Widget).IFace.LayoutingQueue.Enqueue (this);
@@ -133,7 +132,8 @@ namespace Crow
 			else{
 				result = Result.Success;
 			}
-			dbgEvt.data = this;
+			NewSlot = graphicObject.Slot;
+			(DbgLogger.EndEvent (DbgEvtType.GOProcessLayouting) as DbgLayoutEvent).SetLQI (this);
 			#endif
 			go.parentRWLock.ExitReadLock ();
 		}
@@ -147,22 +147,7 @@ namespace Crow
 			return lqi.LayoutType;
 		}
 		public override string ToString ()
-		{
-			#if DEBUG_LAYOUTING
-			return string.Format ("{2};{3} {1}->{0}", LayoutType,Layoutable.ToString(),
-				LayoutingTries,DiscardCount);
-			#else
-			return string.Format ("{2};{3} {1}->{0}", LayoutType,Layoutable.ToString(),
-				LayoutingTries, DiscardCount);
-			#endif
-		}
-	}
-	public class LQIList : List<LayoutingQueueItem>{
-//		#if DEBUG_LAYOUTING
-//		public List<LayoutingQueueItem> GetRootLQIs(){
-//			return this.Where (lqi => lqi.wasTriggeredBy == null).ToList ();
-//		}
-//		#endif
+			=> $"{LayoutType};{Layoutable.ToString ()};{LayoutingTries};{DiscardCount}";
 	}
 }
 

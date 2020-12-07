@@ -1,32 +1,8 @@
-﻿//
-// Trend.cs
+﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
-using System;
 using System.Collections.Generic;
-using System.Xml.Serialization;
 using System.ComponentModel;
 using Crow.Cairo;
 
@@ -41,20 +17,19 @@ namespace Crow
 		List<double> values = new List<double>();
 		#endregion
 
+		#region CTOR
+		protected Trend () {}
+		public Trend (Interface iface, string style = null) : base (iface, style) { }
+		#endregion
 
-
-		public virtual void AddValue(double _value)
+		public virtual void AddValue (double _value)
 		{
 			values.Add (_value);
 			while (values.Count > nbValues)
 				values.RemoveAt (0);
 			RegisterForRedraw ();
 		}
-		#region CTOR
-		protected Trend () : base()
-		{
-		}
-		#endregion
+
 		[XmlIgnore]public virtual int NewValue {
 			set {
 				AddValue (value);
@@ -68,7 +43,7 @@ namespace Crow
 					return;
 
 				nbValues = value;
-				NotifyValueChanged ("NbValues", minValue);
+				NotifyValueChangedAuto (minValue);
 				RegisterForRedraw ();
 			}
 		}
@@ -80,7 +55,7 @@ namespace Crow
 					return;
 
 				minValue = value;
-				NotifyValueChanged ("Minimum", minValue);
+				NotifyValueChangedAuto (minValue);
 				RegisterForRedraw ();
 			}
 		}
@@ -93,7 +68,7 @@ namespace Crow
 					return;
 
 				maxValue = value;
-				NotifyValueChanged ("Maximum", maxValue);
+				NotifyValueChangedAuto (maxValue);
 				RegisterForRedraw ();
 			}
 		}
@@ -104,7 +79,7 @@ namespace Crow
 				if (lowThreshold == value)
 					return;
 				lowThreshold = value;
-				NotifyValueChanged ("LowThreshold", lowThreshold);
+				NotifyValueChangedAuto (lowThreshold);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -115,7 +90,7 @@ namespace Crow
 				if (highThreshold == value)
 					return;
 				highThreshold = value;
-				NotifyValueChanged ("HighThreshold", highThreshold);
+				NotifyValueChangedAuto (highThreshold);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -126,7 +101,7 @@ namespace Crow
 				if (lowThresholdFill == value)
 					return;
 				lowThresholdFill = value;
-				NotifyValueChanged ("LowThresholdFill", lowThresholdFill);
+				NotifyValueChangedAuto (lowThresholdFill);
 				RegisterForRedraw ();
 			}
 		}
@@ -137,7 +112,7 @@ namespace Crow
 				if (highThresholdFill == value)
 					return;
 				highThresholdFill = value;
-				NotifyValueChanged ("HighThresholdFill", highThresholdFill);
+				NotifyValueChangedAuto (highThresholdFill);
 				RegisterForRedraw ();
 			}
 		}

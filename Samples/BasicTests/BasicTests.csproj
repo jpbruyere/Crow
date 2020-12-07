@@ -1,45 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFrameworks>net472</TargetFrameworks>
-		<OutputType>Exe</OutputType>
-		<EnableDefaultNoneItems>false</EnableDefaultNoneItems>
-		<ReleaseVersion>0.8.0</ReleaseVersion>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-		<DebugType>full</DebugType>
-		<DefineConstants>TRACE;DEBUG</DefineConstants>
-		<CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-	</PropertyGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\..\Crow\Crow.csproj" />
-	</ItemGroup>
 	<ItemGroup>
 	  <EmbeddedResource Remove="..\common\ui\templates\test.style" />
 	</ItemGroup>
-	<ItemGroup>
-		<Datas Include="..\data\**\*.*">
-			<Link>data\%(RecursiveDir)%(Filename)%(Extension)</Link>
-		</Datas>
+	<ItemGroup>		
 		<EmbeddedResource Include="ui\*.*">
 			<LogicalName>ShowCase.%(Filename)%(Extension)</LogicalName>
-		</EmbeddedResource>
-		<None Include="..\common\ui\Interfaces\**\*.*">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<Link>Interfaces\%(RecursiveDir)%(Filename)%(Extension)</Link>
-		</None>
-		<EmbeddedResource Include="..\common\ui\templates\**\*.*">
-			<LogicalName>ui.%(Filename)%(Extension)</LogicalName>
-			<Link>Templates\%(Filename)%(Extension)</Link>
-		</EmbeddedResource>
-		<EmbeddedResource Include="..\common\samples.style" />
-		<EmbeddedResource Include="..\common\ui\images\**\*.*">
-			<LogicalName>images.%(Filename)%(Extension)</LogicalName>
-			<Link>Images\%(Filename)%(Extension)</Link>
-		</EmbeddedResource>
-		<EmbeddedResource Include="..\common\ui\Icons\*.*">
-			<LogicalName>Icons.%(Filename)%(Extension)</LogicalName>
-			<Link>Icons\%(Filename)%(Extension)</Link>
 		</EmbeddedResource>
 	</ItemGroup>
 </Project>

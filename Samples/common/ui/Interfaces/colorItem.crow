@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0"?>
-<Border Foreground="Transparent" Focusable="true" HorizontalAlignment="Left" Height="Fit" Width="200">
-	<HorizontalStack Margin="0"
-				MouseEnter="{Background=hgradient|0:DarkRed|1:Transparent}"
-				MouseLeave="{Background=Transparent}">
-		<Widget Height="12" Width="20" Background="{}" Margin="0" CornerRadius="3"/>
-		<Label Text="{}" Margin="0" Width="Stretched"/>
+<ListItem HorizontalAlignment="Left" Height="Fit"
+		Selected = "{Background=${ControlHighlight}}"
+		Unselected = "{Background=Transparent}">
+	<HorizontalStack Margin="1" Spacing="3">
+		<Widget Height="12" Width="20" Background="{}" Margin="0" CornerRadius="5"/>
+		<Label  Text="{}" Margin="0" Width="Stretched"/>
 	</HorizontalStack>
-</Border>
+</ListItem>
 

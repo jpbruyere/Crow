@@ -1,6 +1,2 @@
 ﻿<?xml version="1.0"?>
-<Window Width="200" Height="200">
-	<TextBox Text="Hello World" Background="Blue"/>
-</Window>
-
-
+<Label Text="Hello World"/>

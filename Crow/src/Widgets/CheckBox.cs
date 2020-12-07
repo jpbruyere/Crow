@@ -14,8 +14,8 @@ namespace Crow
 	public class CheckBox : TemplatedControl
 	{
 		#region CTOR
-		protected CheckBox() : base(){}
-		public CheckBox (Interface iface) : base(iface){}
+		protected CheckBox() {}
+		public CheckBox (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		bool isChecked;
@@ -34,7 +34,7 @@ namespace Crow
 
 				isChecked = value;
 
-				NotifyValueChanged ("IsChecked", value);
+				NotifyValueChangedAuto (isChecked);
 
 				if (isChecked)
 					Checked.Raise (this, null);

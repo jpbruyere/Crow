@@ -81,8 +81,8 @@ namespace Crow
 		/// <param name="path">IML file to parse</param>
 		/// <param name="_dataType">type this item will be choosen for, or member of the data item</param>
 		/// <param name="_fetchDataMethod">for hierarchical data, method to call for children fetching</param>
-		public ItemTemplate (Interface _iface, string path, Type declaringType, string _dataTest = "TypeOf", string _dataType = "default", string _fetchDataMethod = null)
-			: base(_iface, _iface.GetTemplateStreamFromPath (path, declaringType)) {
+		public ItemTemplate (Interface _iface, string path, string _dataTest = "TypeOf", string _dataType = "default", string _fetchDataMethod = null)
+			: base(_iface, Interface.GetStreamFromPath (path)) {
 			strDataType = _dataType;
 			fetchMethodName = _fetchDataMethod;
 			dataTest = _dataTest;
@@ -250,6 +250,26 @@ namespace Crow
             else
                 il.Emit (OpCodes.Callvirt, miGetDatas);
         }
+	}
+
+	public static partial class Extensions
+	{
+		public static string GetIcon (this Widget go) {
+			return "#Icons." + go.GetType ().FullName + ".svg";
+		}
+		public static List<Widget> GetChildren (this Widget go) {
+			Type goType = go.GetType ();
+			if (typeof (Group).IsAssignableFrom (goType))
+				return (go as Group).Children;
+			if (typeof (Container).IsAssignableFrom (goType))
+				return new List<Widget> (new Widget[] { (go as Container).Child });
+			if (typeof (TemplatedContainer).IsAssignableFrom (goType))
+				return new List<Widget> (new Widget[] { (go as TemplatedContainer).Content });
+			if (typeof (TemplatedGroup).IsAssignableFrom (goType))
+				return (go as TemplatedGroup).Items;
+
+			return new List<Widget> ();
+		}
 	}
 }
 

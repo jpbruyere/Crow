@@ -1,39 +1,8 @@
-﻿//
-// Button.cs
+﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-//using OpenTK.Graphics.OpenGL;
-
-using System.Diagnostics;
-
-using System.Xml.Serialization;
-using Crow.Cairo;
 using System.ComponentModel;
 
 namespace Crow
@@ -41,15 +10,16 @@ namespace Crow
 	/// <summary>
 	/// templated button control
 	/// </summary>
-    public class Button : TemplatedContainer
+	public class Button : TemplatedContainer
     {
 		#region CTOR
-		protected Button() : base() {}
-		public Button (Interface iface) : base(iface){}
+		protected Button() {}
+		public Button (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
-		string image;
+		string icon;
 		bool isPressed;
+		Command command;
 
 		public event EventHandler Pressed;
 		public event EventHandler Released;
@@ -60,32 +30,60 @@ namespace Crow
 			IsPressed = true;
 
 			base.onMouseDown (sender, e);
-
-			//TODO:remove
-			NotifyValueChanged ("State", "pressed");
 		}
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{
 			IsPressed = false;
 
 			base.onMouseUp (sender, e);
-
-			//TODO:remove
-			NotifyValueChanged ("State", "normal");
 		}
 		#endregion
 
-		[DefaultValue("#Crow.Images.button.svg")]
-		public string Image {
-			get { return image; }
+		[DefaultValue (null)]
+		public virtual Command Command {
+			get { return command; }
 			set {
-				if (image == value)
+				if (command == value)
 					return;
-				image = value;
-				NotifyValueChanged ("Image", image);
+
+				if (command != null) {
+					command.raiseAllValuesChanged ();
+					command.ValueChanged -= Command_ValueChanged;
+				}
+
+				command = value;
+
+				if (command != null) {
+					command.ValueChanged += Command_ValueChanged;
+					command.raiseAllValuesChanged ();
+				}
+
+				NotifyValueChangedAuto (command);
 			}
 		}
-		[DefaultValue(false)]
+
+		[DefaultValue ("#Crow.Images.button.svg")]
+		public string Icon {
+			get { return Command == null ? icon : Command.Icon; ; }
+			set {
+				if (icon == value)
+					return;
+				icon = value;
+				if (command == null)
+					NotifyValueChangedAuto (icon);
+			}
+		}
+		public override bool IsEnabled {
+			get { return Command == null ? base.IsEnabled : Command.CanExecute; }
+			set { base.IsEnabled = value; }
+		}
+
+		public override string Caption {
+			get { return Command == null ? base.Caption : Command.Caption; }
+			set { base.Caption = value; }
+		}
+
+		[DefaultValue (false)]
 		public bool IsPressed
 		{
 			get { return isPressed; }
@@ -96,7 +94,7 @@ namespace Crow
 
 				isPressed = value;
 
-				NotifyValueChanged ("IsPressed", isPressed);
+				NotifyValueChangedAuto (isPressed);
 
 				if (isPressed)
 					Pressed.Raise (this, null);
@@ -104,5 +102,21 @@ namespace Crow
 					Released.Raise (this, null);
 			}
 		}
+
+		public override void onMouseClick (object sender, MouseButtonEventArgs e)
+		{
+			command?.Execute ();
+			e.Handled = true;
+			base.onMouseClick (sender, e);
+		}
+
+		void Command_ValueChanged (object sender, ValueChangeEventArgs e)
+		{
+			string mName = e.MemberName;
+			if (mName == "CanExecute")
+				mName = "IsEnabled";
+			NotifyValueChanged (mName, e.NewValue);
+		}
+
 	}
 }

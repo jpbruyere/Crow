@@ -49,7 +49,7 @@ namespace Crow
 					return;
 				iconsPrefix = value;
 				forceRefresh ();
-				NotifyValueChanged ("IconsPrefix", iconsPrefix);
+				NotifyValueChangedAuto (iconsPrefix);
 			}
 		}
 		[DefaultValue (".svg")]
@@ -60,7 +60,7 @@ namespace Crow
 					return;
 				iconsExtension = value;
 				forceRefresh ();
-				NotifyValueChanged ("IconsExtension", iconsExtension);
+				NotifyValueChangedAuto (iconsExtension);
 			}
 		}
 		/// <summary>
@@ -76,7 +76,7 @@ namespace Crow
 				rbStyle = value;
 				radioButtonITor = null;
 				forceRefresh ();
-				NotifyValueChanged ("RadioButtonStyle", rbStyle);
+				NotifyValueChangedAuto (rbStyle);
 			}
 		}
 		/// <summary>
@@ -120,7 +120,7 @@ namespace Crow
 				} else
 					enumValueContainer.ClearChildren ();
 
-				NotifyValueChanged ("EnumValue", enumValue);
+				NotifyValueChangedAuto (enumValue);
 				RegisterForRedraw ();
 			}
 		}

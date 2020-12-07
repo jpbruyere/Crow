@@ -1,0 +1,4 @@
+﻿IcoButton {
+	Template = "#ShowCase.Button.template";
+	Background = "Onyx";
+}

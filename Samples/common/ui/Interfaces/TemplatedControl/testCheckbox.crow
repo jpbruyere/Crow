@@ -1,11 +1,32 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack Fit="true" Margin="100" Background="DimGrey" >
-	<CheckBox Background="Grey" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
-	<CheckBox Background="Grey" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
-	<CheckBox Background="Grey" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
-	<CheckBox Background="Grey" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
-	<CheckBox Background="Grey" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
-	<CheckBox Background="Grey" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
-	<CheckBox Background="Grey" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
-	<CheckBox Background="Grey" MouseEnter="{Background=Red}" MouseLeave="{Background=Transparent}"/>
+<VerticalStack Margin="50" Background="DarkGrey" Spacing="10" >
+	<CheckBox />
+	<CheckBox Background="Jet">
+		<Template>
+			<HorizontalStack Spacing="5" Background="{./Background}" Margin="5">
+				<Label Text="{./Caption}"/>
+				<Label Text="{./IsChecked}"/>
+			</HorizontalStack>
+		</Template>
+	</CheckBox>
+	<CheckBox Background="Onyx" Width="Stretched">
+		<Template>
+			<HorizontalStack Spacing="4" Background="{./Background}" Margin="4">
+				<Border BorderWidth="0" Width="16" Height="16" Background="Black" Margin="1">
+					<Widget Background="SeaGreen" Visible="{./IsChecked}"/>
+				</Border>
+				<Label Text="{./Caption}"/>
+			</HorizontalStack>
+		</Template>
+	</CheckBox>
+	<CheckBox Background="Jet" Height="30" Width="60"	
+						Checked="{sh.HorizontalAlignment=Right};{Background=SeaGreen}"
+						Unchecked="{sh.HorizontalAlignment=Left};{Background=Jet}">
+		<Template>
+			<Group  Background="{./Background}" Margin="0" CornerRadius="100">
+				<Shape Name="sh" HorizontalAlignment="Left" Width="{./Height}" Foreground="Grey" Size="16,16" Path="A 8,8,7.5,0,6.3 f O 1,1,1,1 G "/>
+			</Group>
+		</Template>
+	</CheckBox>
+	
 </VerticalStack>

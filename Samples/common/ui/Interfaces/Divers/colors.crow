@@ -1,0 +1,15 @@
+﻿<?xml version="1.0"?>
+<Window Width="80%" Height="90%">
+<ListBox Name="ColorList" Data="{TestList}" Margin="5">
+	<Template>
+		<Wrapper Name="ItemsContainer" Orientation="Horizontal"/>
+	</Template>
+	<ItemTemplate>
+		<Group Background="{}" Width="Fit" Height="Fit" >
+			<Label Text="{}" TextAlignment="Center" Font="mono, 9" Foreground="Black" Left="2" Top="2" Margin="10" Width="100"/>
+			<Label Text="{}" TextAlignment="Center" Font="mono, 9" Left="1" Top="1" Margin="10" Width="100"/>
+		</Group>
+	</ItemTemplate>
+
+</ListBox>
+</Window>

@@ -13,17 +13,8 @@ namespace Crow {
 	public class Label : Widget
     {
 		#region CTOR
-		protected Label () : base(){}
-
-		public Label(Interface iface) : base(iface)
-		{
-
-		}
-//		public Label(string _text)
-//			: base()
-//		{
-//			Text = _text;
-//		}
+		protected Label () {}
+		public Label(Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		public event EventHandler<TextChangeEventArgs> TextChanged;
@@ -66,10 +57,10 @@ namespace Crow {
 		public virtual Color SelectionBackground {
 			get { return selBackground; }
 			set {
-				if (value == selBackground)
+				if (selBackground == value)
 					return;
 				selBackground = value;
-				NotifyValueChanged ("SelectionBackground", selBackground);
+				NotifyValueChangedAuto (selBackground);
 				RegisterForRedraw ();
 			}
 		}
@@ -77,10 +68,10 @@ namespace Crow {
 		public virtual Color SelectionForeground {
 			get { return selForeground; }
 			set {
-				if (value == selForeground)
+				if (selForeground == value)
 					return;
 				selForeground = value;
-				NotifyValueChanged ("SelectionForeground", selForeground);
+				NotifyValueChangedAuto (selForeground);
 				RegisterForRedraw ();
 			}
 		}
@@ -93,7 +84,7 @@ namespace Crow {
 					return;
 				_textAlignment = value;
 				RegisterForRedraw ();
-				NotifyValueChanged ("TextAlignment", _textAlignment);
+				NotifyValueChangedAuto (_textAlignment);
 			}
         }
 		[DefaultValue(false)]
@@ -104,7 +95,7 @@ namespace Crow {
 					return;
 				horizontalStretch = value;
 				RegisterForRedraw ();
-				NotifyValueChanged ("HorizontalStretch", horizontalStretch);
+				NotifyValueChangedAuto (horizontalStretch);
 			}
 		}
 		[DefaultValue(false)]
@@ -115,7 +106,7 @@ namespace Crow {
 					return;
 				verticalStretch = value;
 				RegisterForRedraw ();
-				NotifyValueChanged ("VerticalStretch", verticalStretch);
+				NotifyValueChangedAuto (verticalStretch);
 			}
 		}
 		[DefaultValue("label")]
@@ -150,7 +141,7 @@ namespace Crow {
 				if (value == _selectable)
 					return;
 				_selectable = value;
-				NotifyValueChanged ("Selectable", _selectable);
+				NotifyValueChangedAuto (_selectable);
 				SelBegin = -1;
 				SelRelease = -1;
 				RegisterForRedraw ();
@@ -165,7 +156,7 @@ namespace Crow {
 				if (value == _multiline)
 					return;
 				_multiline = value;
-				NotifyValueChanged ("Multiline", _multiline);
+				NotifyValueChangedAuto (_multiline);
 				RegisterForGraphicUpdate();
 			}
 		}
@@ -181,9 +172,45 @@ namespace Crow {
 					_currentCol = lines [_currentLine].Length;
 				else
 					_currentCol = value;
-				NotifyValueChanged ("CurrentColumn", _currentCol);
+				NotifyValueChangedAuto (_currentCol);
+
+				Rectangle cb = ClientRectangle;
+
+				if (Width == Measure.Fit || cb.Width >= cachedTextSize.Width) {
+					xTranslation = 0;
+					return;
+				}
+				int xpos = xposition;
+				if (xTranslation + xpos > cb.Width)
+					xTranslation = cb.Width - xpos;
+				else if (xpos < -xTranslation)
+					xTranslation = -xpos;
+				RegisterForRedraw ();
 			}
 		}
+		int xTranslation = 0;
+		int xposition {
+			get {
+				using (Context gr = new Context (IFace.surf)) {
+					//Cairo.FontFace cf = gr.GetContextFontFace ();
+					gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+					gr.SetFontSize (Font.Size);
+					gr.FontOptions = Interface.FontRenderingOptions;
+					gr.Antialias = Interface.Antialias;
+					try {
+						string l = lines [_currentLine];
+						if (_currentCol < l.Length)
+							l = l.Remove (Math.Min (_currentCol, l.Length));
+						l = l.Replace ("\t", new String (' ', Interface.TAB_SIZE));
+						return (int)Math.Ceiling (gr.TextExtents (l).XAdvance);
+					} catch {
+						System.Diagnostics.Debug.WriteLine ("xpos measuring fault in label");
+						return 0;
+					}
+				}
+			}
+		}
+
 		[DefaultValue(0)]
 		public int CurrentLine{
 			get { return _currentLine; }
@@ -200,7 +227,7 @@ namespace Crow {
 				int cc = _currentCol;
 				_currentCol = 0;
 				CurrentColumn = cc;
-				NotifyValueChanged ("CurrentLine", _currentLine);
+				NotifyValueChangedAuto (_currentLine);
 			}
 		}
 		[XmlIgnore]public Point CurrentPosition {
@@ -219,7 +246,7 @@ namespace Crow {
 				if (value == _selBegin)
 					return;
 				_selBegin = value;
-				NotifyValueChanged ("SelBegin", _selBegin);
+				NotifyValueChangedAuto (_selBegin);
 				NotifyValueChanged ("SelectedText", SelectedText);
 			}
 		}
@@ -232,7 +259,7 @@ namespace Crow {
 				if (value == _selRelease)
 					return;
 				_selRelease = value;
-				NotifyValueChanged ("SelRelease", _selRelease);
+				NotifyValueChangedAuto (_selRelease);
 				NotifyValueChanged ("SelectedText", SelectedText);
 			}
 		}
@@ -242,7 +269,7 @@ namespace Crow {
 		[XmlIgnore]protected Char CurrentChar
 		{
 			get {
-				return lines [CurrentLine] [CurrentColumn];
+				return lines [CurrentLine][CurrentColumn];
 			}
 		}
 		/// <summary>
@@ -267,7 +294,6 @@ namespace Crow {
 		[XmlIgnore]public string SelectedText
 		{
 			get {
-
 				if (SelRelease < 0 || SelBegin < 0)
 					return "";
 				if (selectionStart.Y == selectionEnd.Y)
@@ -433,7 +459,7 @@ namespace Crow {
 					fe = gr.FontExtents;
 					te = new TextExtents ();
 
-					cachedTextSize.Height = (int)Math.Ceiling ((fe.Ascent+fe.Descent) * Math.Max (1, lines.Count)) + Margin * 2;
+					cachedTextSize.Height = (int)Math.Ceiling ((fe.Ascent+fe.Descent) * Math.Max (1, lines.Count));
 
 					try {
 						for (int i = 0; i < lines.Count; i++) {
@@ -444,14 +470,14 @@ namespace Crow {
 							if (tmp.XAdvance > te.XAdvance)
 								te = tmp;
 						}
-						cachedTextSize.Width = (int)Math.Ceiling (te.XAdvance) + Margin * 2;
+						cachedTextSize.Width = (int)Math.Ceiling (te.XAdvance);
 						textMeasureIsUpToDate = true;
 					} catch {							
 						return -1;
 					}					
 				}
 			}
-			return lt == LayoutingType.Height ? cachedTextSize.Height : cachedTextSize.Width;
+			return Margin * 2 + (lt == LayoutingType.Height ? cachedTextSize.Height : cachedTextSize.Width);
 		}
 		protected override void onDraw (Context gr)
 		{
@@ -461,6 +487,9 @@ namespace Crow {
 			gr.SetFontSize (Font.Size);
 			gr.FontOptions = Interface.FontRenderingOptions;
 			gr.Antialias = Interface.Antialias;
+
+			gr.Save ();
+			gr.Translate (xTranslation, 0);
 
 			rText = new Rectangle(new Size(
 				measureRawSize(LayoutingType.Width), measureRawSize(LayoutingType.Height)));
@@ -618,7 +647,7 @@ namespace Crow {
 
 				if (Selectable) {
 					if (SelRelease >= 0 && i >= selectionStart.Y && i <= selectionEnd.Y) {
-						gr.SetSourceColor (selBackground);
+						gr.SetSource (selBackground);
 
 						Rectangle selRect = lineRect;
 
@@ -641,7 +670,7 @@ namespace Crow {
 						gr.FillPreserve ();
 						gr.Save ();
 						gr.Clip ();
-						gr.SetSourceColor (SelectionForeground);
+						gr.SetSource (SelectionForeground);
 						gr.MoveTo (lineRect.X, rText.Y + fe.Ascent + (fe.Ascent+fe.Descent) * i);
 						gr.ShowText (l);
 						gr.Fill ();
@@ -649,12 +678,15 @@ namespace Crow {
 					}
 				}
 			}
+
+			gr.Restore ();
 		}
 		#endregion
 
 		#region Mouse handling
 		void updatemouseLocalPos(Point mpos){
 			mouseLocalPos = mpos - ScreenCoordinates(Slot).TopLeft - ClientRectangle.TopLeft;
+			mouseLocalPos.X -= xTranslation;
 			if (mouseLocalPos.X < 0)
 				mouseLocalPos.X = 0;
 			if (mouseLocalPos.Y < 0)
@@ -691,12 +723,14 @@ namespace Crow {
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
-			if (this.HasFocus && _selectable){
-				updatemouseLocalPos (e.Position);
-				SelBegin = -1;
-				SelRelease = -1;
-				SelectionInProgress = true;
-				RegisterForRedraw();//TODO:should put it in properties
+			if (HasFocus) {
+				if (_selectable) {
+					updatemouseLocalPos (e.Position);
+					SelBegin = -1;
+					SelRelease = -1;
+					SelectionInProgress = true;
+					RegisterForRedraw ();//TODO:should put it in properties
+				}
 			}
 
 			//done at the end to set 'hasFocus' value after testing it
@@ -705,7 +739,7 @@ namespace Crow {
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseUp (sender, e);
-			if (!(this.HasFocus || _selectable))
+			if (!(HasFocus || _selectable))
 				return;
 			if (!SelectionInProgress)
 				return;

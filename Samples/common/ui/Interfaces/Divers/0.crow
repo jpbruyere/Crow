@@ -3,35 +3,23 @@
 	<HorizontalStack>
 		<VerticalStack Width="30%" Margin="5">
 			<GroupBox Caption="Performance" Height="Fit">
-				<VerticalStack DataSource="{drawingMeasure}" Width="90%" Height="Fit" Spacing="2">
-					<HorizontalStack Height="Fit" Tooltip="Frame per second">
-						<Label Style="FpsLabel" Text="Fps:" />
-						<Label Style="FpsDisp" Text="{minimum}" />
+				<VerticalStack DataSource="{updateMeasure}" Width="90%" Height="Fit" Spacing="2">
+					<HorizontalStack Style="HStackMeasure">
+						<Label Text="Cur:" Style="FpsLabel"/>
+						<Label Text="{current}" Style="FpsDisp"/>
 					</HorizontalStack>
-					<HorizontalStack Height="Fit" Tooltip="Minimum Frame per second">
-						<Label Style="FpsLabel" Text="Min:" />
-						<Label Style="FpsDisp" Text="{fpsMin}" />
+					<HorizontalStack Style="HStackMeasure">
+						<Label Text="Min:" Style="FpsLabel"/>
+						<Label Text="{minimum}" Style="FpsDisp"/>
 					</HorizontalStack>
-					<HorizontalStack Height="Fit" Tooltip="Maximum Frame per second">
-						<Label Style="FpsLabel" Text="Max:" />
-						<Label Style="FpsDisp" Text="{fpsMax}" />
+					<HorizontalStack Style="HStackMeasure">
+						<Label Text="Mean:" Style="FpsLabel"/>
+						<Label Text="{mean}" Style="FpsDisp"/>
 					</HorizontalStack>
-					<HorizontalStack Height="Fit" Tooltip="Update loop duration">
-						<Label Style="FpsLabel" Text="Update:" />
-						<Label Style="FpsDisp" Text="{update}" />
-					</HorizontalStack>
-					<HorizontalStack Height="Fit" Tooltip="Layouting process duration">
-						<Label Style="FpsLabel" Text="Layouting:" />
-						<Label Style="FpsDisp" Text="{layouting}" />
-					</HorizontalStack>
-					<HorizontalStack Height="Fit" Tooltip="Clipping duration">
-						<Label Style="FpsLabel" Text="Clipping:" />
-						<Label Style="FpsDisp" Text="{clipping}" />
-					</HorizontalStack>
-					<HorizontalStack Height="Fit">
-						<Label Style="FpsLabel" Text="Drawing:" />
-						<Label Style="FpsDisp" Text="{drawing}" />
-					</HorizontalStack>
+					<HorizontalStack Style="HStackMeasure">
+						<Label Text="Max:" Style="FpsLabel"/>
+						<Label Text="{maximum}" Style="FpsDisp"/>
+					</HorizontalStack>										
 				</VerticalStack>
 			</GroupBox>
 			<Label Width="Stretched" Margin="3" Background="DimGrey" />

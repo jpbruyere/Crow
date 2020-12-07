@@ -1,3 +1,5 @@
+TestCst = "This is a constant test.";
+
 FpsLabel {
 	Width = "30";
 	Font = "droid, 10";
@@ -22,7 +24,7 @@ CheckBox2 {
 	Template= "Interfaces/CheckBox2.imlt";
 	Background = "Jet";
 	Checked="{Background=MediumSeaGreen}";
-	Unchecked = "{Background=Jet}";
+	Unchecked = "{Background=Jet}";	
 }
 CheckBox3 {
 	Template= "Interfaces/CheckBox2.imlt";
@@ -42,7 +44,7 @@ labPerfVal{
 	Width = "50%";
 }
 DbgLogViewer{
-	Background = "Onyx";
+	//Background = "Onyx";
 	Font = "mono, 8";
 	Foreground = "LightGrey";
 	Focusable = "true";
@@ -64,4 +66,7 @@ valignStyle2 {
 	Unchecked = "{Background=Black}";
 	//Initialized="GetDrawModeIcon";
 	//Initialized="{Background=Blue}";
+}
+smallLabel {
+	Font="consolas, 8";
 }

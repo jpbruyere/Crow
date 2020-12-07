@@ -14,8 +14,8 @@ namespace Crow
 	public class ColorSelector : Widget
 	{
 		#region CTOR
-		protected ColorSelector() : base(){}
-		public ColorSelector (Interface iface) : base(iface){}
+		protected ColorSelector() {}
+		public ColorSelector (Interface iface, string style = null) : base(iface, style){ }
 		#endregion
 
 		protected Point mousePos;

@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0"?>
-<Window Width="Stretched" Height="Stretched" Background="Jet">
-	<DockStack Name="mainDock" Background="DarkRed" Margin="20">
-	</DockStack>
-</Window>
+<DockStack Name="mainDock" Background="Jet" Margin="0">
+	<DockWindow Resizable = "true" Top="100" Left="100" Caption="View 1" Width="300" Height="300"/>
+</DockStack>
+
 <!---		
 		<DockWindow Left="450" Top="450" Width="150" Height="150" Background="Yellow"/>-->
 	
@@ -14,7 +14,7 @@
 	<Window Top="400" Left="400" Focusable="true" Caption="View 4" Resizable = "true" Width="300" Height="300"><Widget Focusable="true" Background="Black" MouseEnter="{Background=Grey}" MouseLeave="{Background=Black}"/></Window>
 </Group>-->
 <!--<Docker >
-	<DockWindow Resizable = "true" Top="100" Left="100" Caption="View 1" Width="300" Height="300">
+	
 		<VerticalStack Background="DarkGreen" Focusable="true">
 			<Label Text="{../../Left}" Background="Black" Width="Stretched"/>
 			<Label Text="{../../Top}" Background="Black"/>

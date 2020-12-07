@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <MenuItem MinimumSize="20,20" Height="Fit" Width="160" Caption="Context Menu" Data="{ContextCommands}" Orientation="Vertical"
-	IsOpened ="true" Visible="{/IsOpened}" SelectionBackground="Transparent"
-	Background="Red">
+	IsOpened ="true" Visible="{/IsOpened}" Background="Red">
 	<Template>
 		<HorizontalStack>
 			<Border Background="DimGrey" Foreground="DimGrey" CornerRadius="5">
@@ -11,7 +10,7 @@
 		</HorizontalStack>
 	</Template>
 	<ItemTemplate>
-		<MenuItem Command="{}" Width="150" PopWidth="120" SelectionBackground="Transparent" IsEnabled="{CanExecute}">
+		<MenuItem Command="{}" Width="150" PopWidth="120" IsEnabled="{CanExecute}">
 			<Template>
 				<Popper Font="{./Font}" Caption="{./Caption}"  Background="{./Background}" PopDirection="{./PopDirection}"
 					Foreground = "{./Foreground}" CanPop="{./HasChildren}" MouseDown="./onMI_Click"

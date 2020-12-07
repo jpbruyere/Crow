@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 using System.Xml;
 using Crow.IML;
 using System.Text;
+using FastEnumUtility;
 
 namespace Crow.IML
 {
@@ -47,7 +48,7 @@ namespace Crow.IML
 		internal static MethodInfo miGetColCount = typeof(System.Collections.ICollection).GetProperty("Count").GetGetMethod();
 		internal static MethodInfo miGetDelegateListItem = typeof(List<Delegate>).GetMethod("get_Item", new Type[] { typeof(Int32) });
 
-		internal static MethodInfo miCompileDynEventHandler = typeof(CompilerServices).GetMethod ("compileDynEventHandler", BindingFlags.Static | BindingFlags.NonPublic);
+		internal static MethodInfo miCompileDynEventHandler = typeof(Instantiator).GetMethod ("compileDynEventHandler", BindingFlags.Static | BindingFlags.NonPublic);
 		internal static MethodInfo miRemEvtHdlByName = typeof(CompilerServices).GetMethod("removeEventHandlerByName", BindingFlags.Static | BindingFlags.NonPublic);
 		internal static MethodInfo miRemEvtHdlByTarget = typeof(CompilerServices).GetMethod("removeEventHandlerByTarget", BindingFlags.Static | BindingFlags.NonPublic);
 		internal static MethodInfo miGetMethInfoWithRefx = typeof(CompilerServices).GetMethod ("getMethodInfoWithReflexion", BindingFlags.Static | BindingFlags.NonPublic);
@@ -68,6 +69,7 @@ namespace Crow.IML
 
 		internal static FieldInfo miSetCurIface = typeof(Widget).GetField ("IFace", BindingFlags.Public | BindingFlags.Instance);
 		internal static MethodInfo miFindByName = typeof (Widget).GetMethod ("FindByName");
+		internal static MethodInfo miFindByNameInTemplate = typeof (TemplatedControl).GetMethod ("FindByNameInTemplate");
 		internal static MethodInfo miGetGObjItem = typeof(List<Widget>).GetMethod("get_Item", new Type[] { typeof(Int32) });
 		internal static MethodInfo miLoadDefaultVals = typeof (Widget).GetMethod ("loadDefaultValues");
 		internal static PropertyInfo piStyle = typeof (Widget).GetProperty ("Style");
@@ -75,8 +77,7 @@ namespace Crow.IML
 		internal static MethodInfo miGetDataSource = typeof(Widget).GetProperty("DataSource").GetGetMethod ();
 		internal static EventInfo eiLogicalParentChanged = typeof(Widget).GetEvent("LogicalParentChanged");
 
-		internal static MethodInfo miIFaceLoad = typeof(Interface).GetMethod ("CreateInstance", BindingFlags.Instance | BindingFlags.Public);
-		internal static MethodInfo miIFaceCreateTemplateInst = typeof (Interface).GetMethod ("CreateTemplateInstance", BindingFlags.Instance | BindingFlags.Public);
+		internal static MethodInfo miIFaceCreateInstance = typeof(Interface).GetMethod ("CreateInstance", BindingFlags.Instance | BindingFlags.Public);
 		internal static MethodInfo miGetITemp = typeof(Interface).GetMethod ("GetItemTemplate", BindingFlags.Instance | BindingFlags.Public);
 
 		internal static MethodInfo miAddITemp = typeof(Dictionary<string, ItemTemplate>).GetMethod ("set_Item", new Type[] { typeof(string), typeof(ItemTemplate) });
@@ -269,7 +270,7 @@ namespace Crow.IML
 		static MemberInfo getMemberInfoWithReflexion(object instance, string member){
             Type t = instance.GetType();
 #if DEBUG_BINDING_FUNC_CALLS
-			Console.WriteLine ($"getMemberInfoWithReflexion ({instance},{member}); type:{t}");
+			System.Diagnostics.Debug.WriteLine ($"getMemberInfoWithReflexion ({instance},{member}); type:{t}");
 #endif
             MemberInfo mi = t.GetMember (member)?.FirstOrDefault();
 			if (mi == null)
@@ -278,7 +279,7 @@ namespace Crow.IML
 		}
 		static MethodInfo getMethodInfoWithReflexion(object instance, string method){
 #if DEBUG_BINDING_FUNC_CALLS
-            Console.WriteLine ($"getMethodInfoWithReflexion ({instance},{method}); type:{instance.GetType ()}");
+            System.Diagnostics.Debug.WriteLine ($"getMethodInfoWithReflexion ({instance},{method}); type:{instance.GetType ()}");
 #endif
             return instance.GetType ().GetMethod (method, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 		}
@@ -290,7 +291,7 @@ namespace Crow.IML
 		/// <param name="destMember">Destination member</param>
 		static void setValueWithReflexion(object dest, object value, string destMember){
 #if DEBUG_BINDING_FUNC_CALLS
-            Console.WriteLine ($"setValueWithReflexion (dest:{dest},value:{value},member:{destMember});");
+            System.Diagnostics.Debug.WriteLine ($"setValueWithReflexion (dest:{dest},value:{value},member:{destMember});");
 #endif
             Type destType = null;
 			Type origType = null;
@@ -337,7 +338,7 @@ namespace Crow.IML
 		/// </summary>
 		static object getValueWithReflexion(object instance, MemberInfo mi){
 #if DEBUG_BINDING_FUNC_CALLS
-            Console.WriteLine ($"getValueWithReflexion ({instance},{mi});");
+            System.Diagnostics.Debug.WriteLine ($"getValueWithReflexion ({instance},{mi});");
 #endif
             object tmp = null;
 			Type dstType = null;
@@ -379,20 +380,30 @@ namespace Crow.IML
 			if (knownExtMethods.ContainsKey (key))
 				return knownExtMethods [key];
 
-			//Console.WriteLine ($"*** search extension method: {t};{methodName} => key={key}");
+			//System.Diagnostics.Debug.WriteLine ($"*** search extension method: {t};{methodName} => key={key}");
 
 			MethodInfo mi = null;
-			mi = GetExtensionMethods (Assembly.GetEntryAssembly (), t, methodName);
-			if (mi == null)
-				mi = GetExtensionMethods (t.Module.Assembly, t, methodName);
+			if (!TryGetExtensionMethods (Assembly.GetEntryAssembly (), t, methodName, out mi)) {
+				if (!TryGetExtensionMethods (t.Module.Assembly, t, methodName, out mi)) {
+					foreach (Assembly a in Interface.crowAssemblies) {
+						if (TryGetExtensionMethods (a, t, methodName, out mi))
+							break;
+					}
+					if (mi == null)
+						TryGetExtensionMethods (Assembly.GetExecutingAssembly (), t, methodName, out mi);//crow Assembly
+				}
+			}
 
 			//add key even if mi is null to prevent searching again and again for propertyless bindings
 			knownExtMethods.Add (key, mi);
 			return mi;
 		}
 
-		public static MethodInfo GetExtensionMethods (Assembly assembly, Type extendedType, string methodName)
+		public static bool TryGetExtensionMethods (Assembly assembly, Type extendedType, string methodName, out MethodInfo foundMI)
 		{
+			foundMI = null;
+			if (assembly == null)
+				return false;
 			foreach (Type t in assembly.GetTypes ().Where
 					(ty => ty.IsDefined (typeof (ExtensionAttribute), false))) {
 				foreach (MethodInfo mi in t.GetMethods 
@@ -401,14 +412,16 @@ namespace Crow.IML
 						 m.GetParameters ().Length == 1)) {
 					Type curType = extendedType;
 					while (curType != null) {
-						if (mi.GetParameters () [0].ParameterType == curType)
-							return mi;
+						if (mi.GetParameters () [0].ParameterType == curType) {
+							foundMI = mi;
+							return true;
+						}
 						curType = curType.BaseType;
 					}						
 				}
 			
 			}
-			return null;
+			return false;
 		}
 		/// <summary>
 		/// retrieve event handler in class or ancestors
@@ -699,7 +712,7 @@ namespace Crow.IML
 				il.Emit (OpCodes.Unbox_Any, dstType);
 			} else{
 				LocalBuilder lbOrig = il.DeclareLocal (typeof (object));
-				il.Emit (OpCodes.Stloc, lbOrig); //save orig value in loc0
+				il.Emit (OpCodes.Stloc, lbOrig); //save orig value in loc
 				//first check if not null
 				il.Emit (OpCodes.Ldloc, lbOrig);
 				il.Emit (OpCodes.Dup);
@@ -791,123 +804,6 @@ namespace Crow.IML
 			return Delegate.CreateDelegate (eventType, instance, mi);
 		}
 
-		internal static Delegate compileDynEventHandler(EventInfo sourceEvent, string expression, NodeAddress currentNode = null){
-#if DEBUG_BINDING
-			Debug.WriteLine ("\tCompile Event {0}: {1}", sourceEvent.Name, expression);
-#endif
-
-			Type lopType = null;
-
-			if (currentNode == null)
-				lopType = sourceEvent.DeclaringType;
-			else
-				lopType = currentNode.NodeType;
-
-#region Retrieve EventHandler parameter type
-			MethodInfo evtInvoke = sourceEvent.EventHandlerType.GetMethod ("Invoke");
-			ParameterInfo [] evtParams = evtInvoke.GetParameters ();
-			Type handlerArgsType = evtParams [1].ParameterType;
-#endregion
-
-			Type [] args = { typeof (object), handlerArgsType };
-			DynamicMethod dm = new DynamicMethod ("dyn_eventHandler",
-				typeof(void),
-				args, true);
-			ILGenerator il = dm.GetILGenerator (256);
-			il.Emit (OpCodes.Nop);
-
-			string [] srcLines = expression.Trim ().Split (new char [] { ';' });
-
-			foreach (string srcLine in srcLines) {
-				if (string.IsNullOrEmpty (srcLine))
-					continue;
-				string [] operandes = srcLine.Trim ().Split (new char [] { '=' });
-				if (operandes.Length != 2) //not an affectation
-					throw new NotSupportedException ();
-
-				System.Reflection.Emit.Label cancel = il.DefineLabel ();
-				System.Reflection.Emit.Label cancelFinalSet = il.DefineLabel ();
-				System.Reflection.Emit.Label success = il.DefineLabel ();
-
-				BindingMember lop = new BindingMember (operandes [0].Trim ());
-				BindingMember rop = new BindingMember (operandes [1].Trim ());
-
-				il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
-
-#region Left operande
-				PropertyInfo lopPI = null;
-
-				//in dyn handler, no datasource binding, so single name in expression are also handled as current node property
-				if (lop.IsSingleName)
-					lopPI = lopType.GetProperty (lop.Tokens [0]);
-				else if (lop.IsCurrentNodeProperty)
-					lopPI = lopType.GetProperty (lop.Tokens [1]);
-				else
-					lop.emitGetTarget (il, cancel);
-#endregion
-
-#region RIGHT OPERANDES
-				if (rop.IsStringConstant){
-					il.Emit (OpCodes.Ldstr, rop.Tokens[0]);
-					lop.emitSetProperty (il);
-				}else if (rop.IsSingleName && rop.Tokens[0] == "this"){
-					il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
-					lop.emitSetProperty (il);
-				}else if (rop.LevelsUp ==0 && !string.IsNullOrEmpty(rop.Tokens[0])) {//parsable constant depending on lop type
-					//if left operand is member of current node, it's easy to fetch type, else we should use reflexion in msil
-					if (lopPI == null){//accept GraphicObj members, but it's restricive
-						//TODO: we should get the parse method by reflexion, or something else
-						lopPI = typeof(Widget).GetProperty (lop.Tokens [lop.Tokens.Length-1]);
-						if (lopPI == null)
-							throw new NotSupportedException ();
-					}
-
-					MethodInfo lopParseMi = CompilerServices.miParseEnum;
-					if (lopPI.PropertyType.IsEnum){
-						//load type of enum
-						il.Emit(OpCodes.Ldtoken, lopPI.PropertyType);
-						il.Emit(OpCodes.Call, CompilerServices.miGetTypeFromHandle);
-						//load enum value name
-						il.Emit (OpCodes.Ldstr, operandes [1].Trim ());
-						//load false
-						il.Emit (OpCodes.Ldc_I4_0);
-					}else{
-						lopParseMi = lopPI.PropertyType.GetMethod ("Parse");
-						if (lopParseMi == null)
-							throw new Exception (string.Format
-								("IML: no static 'Parse' method found in: {0}", lopPI.PropertyType.Name));
-
-						il.Emit (OpCodes.Ldstr, operandes [1].Trim ());
-					}
-                    if (lopParseMi.IsStatic)
-					    il.Emit (OpCodes.Call, lopParseMi);
-                    else
-                        il.Emit(OpCodes.Callvirt, lopParseMi);
-                    //il.Emit (OpCodes.Unbox_Any, lopPI.PropertyType);
-                    //emit left operand assignment
-                    il.Emit (OpCodes.Callvirt, lopPI.GetSetMethod());
-				} else {//tree parsing and propert gets
-					il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
-
-					rop.emitGetTarget (il, cancelFinalSet);
-					rop.emitGetProperty (il, cancelFinalSet);
-					lop.emitSetProperty (il);
-				}
-#endregion
-
-				il.Emit (OpCodes.Br, success);
-
-				il.MarkLabel (cancelFinalSet);
-				il.Emit (OpCodes.Pop);	//pop null MemberInfo on the stack causing cancelation
-				il.MarkLabel (cancel);
-				il.Emit (OpCodes.Pop);	//pop null instance on the stack causing cancelation
-				il.MarkLabel (success);
-			}
-
-			il.Emit (OpCodes.Ret);
-
-			return dm.CreateDelegate (sourceEvent.EventHandlerType);
-		}
 
 		/// <summary>
 		/// MSIL helper, go n levels up
@@ -983,7 +879,7 @@ namespace Crow.IML
 		//get value from member of object
 		internal static object getDataTypeAndFetch (object data, string fetchMethod){
 			Type dataType = data.GetType();
-			//Console.WriteLine ($"get data type and fetch {data}.{fetchMethod}");
+			//System.Diagnostics.Debug.WriteLine ($"get data type and fetch {data}.{fetchMethod}");
 			MethodInfo miGetDatas = dataType.GetMethod (fetchMethod, new Type[] {});
 			if (miGetDatas == null)
 				miGetDatas = CompilerServices.SearchExtMethod (dataType, fetchMethod);
@@ -1006,7 +902,7 @@ namespace Crow.IML
 		//TODO:memberinfo found here must be cached
 		internal static object getValue (Type dataType, object data, string member)
 		{
-			//Console.WriteLine ($"get value: {dataType} ; {data} ; {member}");
+			//System.Diagnostics.Debug.WriteLine ($"get value: {dataType} ; {data} ; {member}");
 
 			MethodInfo miGetDatas = dataType.GetMethod (member, new Type [] { });
 			if (miGetDatas != null)

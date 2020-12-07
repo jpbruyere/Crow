@@ -1,0 +1,9 @@
+﻿<VerticalStack Fit="true">
+	<VerticalStack DataSourceType="Crow.TestClass" DataSource="{TcInstance}" Margin="10" Background="Onyx" Fit="true">
+		<Label Text="{Prop1}"/>
+		<Label Text="{Prop2}"/>
+	</VerticalStack>
+	<HorizontalStack>
+		<Button Caption="Change Instance" MouseClick="tcInstance_ChangeInstance_MouseClick"/>
+	</HorizontalStack>
+</VerticalStack>

@@ -1,48 +1,17 @@
-﻿//
-// TextBox.cs
+﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
-using System;
 using Crow.Cairo;
-using System.Diagnostics;
-using System.Xml.Serialization;
 using Glfw;
 
 namespace Crow
 {
-    public class TextBox : Label
+	public class TextBox : Label
     {
 		#region CTOR
-		protected TextBox() : base(){}
-		public TextBox(Interface iface) : base(iface)
-		{ }
-//		public TextBox(string _initialValue)
-//			: base(_initialValue)
-//		{
-//
-//		}
+		protected TextBox() {}
+		public TextBox(Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		#region GraphicObject overrides
@@ -50,6 +19,8 @@ namespace Crow
         {
             get => base.HasFocus;
             set {
+				if (base.HasFocus == value)
+					return;
                 base.HasFocus = value;
                 RegisterForRedraw();
             }
@@ -58,15 +29,12 @@ namespace Crow
 		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
-			FontExtents fe = gr.FontExtents;
 		}
 		#endregion
 			
         #region Keyboard handling
 		public override void onKeyDown (object sender, KeyEventArgs e)
 		{
-			base.onKeyDown (sender, e);
-
 			Key key = e.Key;
 
 			switch (key)
@@ -74,22 +42,22 @@ namespace Crow
 			case Key.Backspace:
 				if (CurrentPosition == 0)
 					return;
-				this.DeleteChar();
+				DeleteChar();
 				break;
 			case Key.Delete:
 				if (selectionIsEmpty) {
 					if (!MoveRight ())
 						return;
 				}else if (IFace.Shift)
-					IFace.Clipboard = this.SelectedText;
-				this.DeleteChar ();
+					IFace.Clipboard = SelectedText;
+				DeleteChar ();
 				break;
 			case Key.KeypadEnter:
 			case Key.Enter:
 				if (!selectionIsEmpty)
-					this.DeleteChar ();
+					DeleteChar ();
 				if (Multiline)
-					this.InsertLineBreak ();
+					InsertLineBreak ();
 				else
 					OnTextChanged(this,new TextChangeEventArgs(Text));
 				break;
@@ -196,8 +164,9 @@ namespace Crow
 			default:
 				break;
 			}
-
-			RegisterForGraphicUpdate();
+			e.Handled = true;
+			base.onKeyDown (sender, e);
+			RegisterForGraphicUpdate ();
 		}
 		public override void onKeyPress (object sender, KeyPressEventArgs e)
 		{

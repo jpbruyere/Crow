@@ -8,6 +8,7 @@ using System.ComponentModel;
 using Crow.Cairo;
 using System.Threading;
 
+using static Crow.Logger;
 
 namespace Crow
 {
@@ -42,8 +43,8 @@ namespace Crow
 		protected ReaderWriterLockSlim childrenRWLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
 		#region CTOR
-		public Group () : base() {}
-		public Group(Interface iface) : base(iface){}
+		public Group () {}
+		public Group(Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		#region EVENT HANDLERS
@@ -66,9 +67,9 @@ namespace Crow
             set { _multiSelect = value; }
         }
 		public virtual void AddChild(Widget g){
-#if DEBUG
+#if DEBUG_LOG
 			if (disposed) {
-				Console.WriteLine ($"AddChild ({g}) in disposed Widget: {this}\n{System.Environment.StackTrace}");
+				DbgLogger.AddEvent (DbgEvtType.AlreadyDisposed | DbgEvtType.GOAddChild);
 				return;
 			}
 #endif
@@ -80,7 +81,7 @@ namespace Crow
 
 			childrenRWLock.ExitWriteLock();
 
-			g.RegisteredLayoutings = LayoutingType.None;
+			//g.RegisteredLayoutings = LayoutingType.None;
 			g.LayoutChanged += OnChildLayoutChanges;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
@@ -115,9 +116,9 @@ namespace Crow
 			child.Dispose ();
         }
 		public virtual void InsertChild (int idx, Widget g) {
-#if DEBUG
+#if DEBUG_LOG
 			if (disposed) {
-				Console.WriteLine ($"InsertChild ({idx},{g}) in disposed Widget: {this}\n{System.Environment.StackTrace}");
+				DbgLogger.AddEvent (DbgEvtType.AlreadyDisposed | DbgEvtType.GOAddChild);
 				return;
 			}
 #endif
@@ -205,6 +206,24 @@ namespace Crow
 
 			foreach (Widget w in Children) {
 				tmp = w.FindByName (nameToFind);
+				if (tmp != null)
+					break;
+			}
+
+			childrenRWLock.ExitReadLock ();
+
+			return tmp;
+		}
+		public override Widget FindByType<T> ()
+		{
+			if (this is T)
+				return this;
+			Widget tmp = null;
+
+			childrenRWLock.EnterReadLock ();
+
+			foreach (Widget w in Children) {
+				tmp = w.FindByType<T> ();
 				if (tmp != null)
 					break;
 			}
@@ -331,7 +350,7 @@ namespace Crow
 			}
 			gr.Dispose ();
 
-			ctx.SetSourceSurface (bmp, rb.X, rb.Y);
+			ctx.SetSource (bmp, rb.X, rb.Y);
 			ctx.Paint ();
 
 			Clipping.Dispose();
@@ -376,9 +395,9 @@ namespace Crow
 		}
 		void searchLargestChild (bool forceMeasure = false)
 		{
-			#if DEBUG_LAYOUTING
-			Debug.WriteLine("\tSearch largest child");
-			#endif
+#if DEBUG_LOG
+			DbgLogger.StartEvent (DbgEvtType.GOSearchLargestChild, this);
+#endif
 			largestChild = null;
 			contentSize.Width = 0;
 			for (int i = 0; i < Children.Count; i++) {
@@ -396,12 +415,15 @@ namespace Crow
 					largestChild = Children [i];
 				}
 			}
+#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.GOSearchLargestChild);
+#endif
 		}
 		void searchTallestChild (bool forceMeasure = false)
-		{ 
-			#if DEBUG_LAYOUTING
-			Debug.WriteLine("\tSearch tallest child");
-			#endif
+		{
+#if DEBUG_LOG
+			DbgLogger.StartEvent (DbgEvtType.GOSearchTallestChild, this);
+#endif
 			tallestChild = null;
 			contentSize.Height = 0;
 			for (int i = 0; i < Children.Count; i++) {
@@ -419,6 +441,9 @@ namespace Crow
 					tallestChild = Children [i];
 				}
 			}
+#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.GOSearchTallestChild);
+#endif
 		}
 
 

@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Xml.Serialization;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
@@ -33,6 +32,7 @@ namespace Crow
 		//0 is the main graphic tree, for other obj tree not added to main tree, it range from 1->n
 		//useful to track events for obj shown later, not on start, or never added to main tree
 		public int treeIndex;
+		public int instanceIndex;//index in the GraphicObjects list
 		public int yIndex;//absolute index in the graphic tree for debug draw
 		public int xLevel;//x increment for debug draw
 		#endif
@@ -55,14 +55,14 @@ namespace Crow
 
 		internal void design_add_style_location (string memberName, string path, int line, int col) {			
 			if (design_style_locations.ContainsKey(memberName)){
-				Console.WriteLine ("default value localtion already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
+				System.Diagnostics.Debug.WriteLine ("default value localtion already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
 				return;
 			}
 			design_style_locations.Add(memberName, new FileLocation(path,line,col));
 		}
 //		internal void design_add_iml_location (string memberName, string path, int line, int col) {
 //			if (design_iml_locations.ContainsKey(memberName)){
-//				Console.WriteLine ("IML value localtion already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
+//				System.Diagnostics.Debug.WriteLine ("IML value localtion already set for {0}{1}.{2}", this.GetType().Name, this.design_id, memberName);
 //				return;
 //			}
 //			design_iml_locations.Add(memberName, new FileLocation(path,line,col));
@@ -121,9 +121,9 @@ namespace Crow
 					this.onDraw (ctx);
 				else {
 					if (LastPaintedSlot.Width>LastPaintedSlot.Height)
-						ctx.SetSourceSurface (bmp, 0, (LastPaintedSlot.Width-LastPaintedSlot.Height)/2);
+						ctx.SetSource (bmp, 0, (LastPaintedSlot.Width-LastPaintedSlot.Height)/2);
 					else
-						ctx.SetSourceSurface (bmp, (LastPaintedSlot.Height-LastPaintedSlot.Width)/2, 0);
+						ctx.SetSource (bmp, (LastPaintedSlot.Height-LastPaintedSlot.Width)/2, 0);
 					ctx.Paint ();
 				}
 			}
@@ -147,18 +147,16 @@ namespace Crow
 		}
 		protected virtual void Dispose(bool disposing){
 			if (disposed){
-				#if DEBUG_DISPOSE
-				Debug.WriteLine ("Trying to dispose already disposed obj: {0}", this.ToString());
-				#endif
+#if DEBUG_LOG
+				DbgLogger.AddEvent (DbgEvtType.AlreadyDisposed, this);
+#endif
 				return;
 			}
 
+#if DEBUG_LOG
+			DbgLogger.StartEvent (DbgEvtType.Disposing, this);
+#endif
 			if (disposing) {
-				#if DEBUG_DISPOSE
-				Console.WriteLine ("Disposing: {0}", this.ToString());
-				//if ()
-				//throw new Exception("Trying to dispose an object queued for Redraw: " + this.ToString());
-				#endif
 
 				unshownPostActions ();
 
@@ -168,15 +166,21 @@ namespace Crow
 				parentRWLock.EnterWriteLock();
 				parent = null;
 				parentRWLock.ExitWriteLock();
-			} else
-				Debug.WriteLine ("!!! Finalized by GC: {0}", this.ToString ());
+			}
+#if DEBUG_LOG
+			 else
+				DbgLogger.AddEvent (DbgEvtType.DisposedByGC, this);
+#endif
 			Clipping?.Dispose ();
 			bmp?.Dispose ();
 			disposed = true;
-		}  
+#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.Disposing);
+#endif
+		}
 		#endregion
 
-		#if DEBUG_LOG
+#if DEBUG_LOG
 		internal static List<Widget> GraphicObjects = new List<Widget>();
 		#endif
 
@@ -213,6 +217,10 @@ namespace Crow
 			//Debug.WriteLine ("Value changed: {0}->{1} = {2}", this, MemberName, _value);
 			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
 		}
+		public void NotifyValueChangedAuto (object _value, [CallerMemberName] string caller = null)
+		{
+			NotifyValueChanged (caller, _value);
+		}
 		#endregion
 
 		#region CTOR
@@ -223,10 +231,11 @@ namespace Crow
 		/// </summary>
 		protected Widget () {
 			Clipping = new Region ();
-			#if DEBUG_LOG
+#if DEBUG_LOG
+			instanceIndex = GraphicObjects.Count;
 			GraphicObjects.Add (this);
-			DebugLog.AddEvent(DbgEvtType.GOClassCreation, this);
-			#endif			
+			DbgLogger.AddEvent(DbgEvtType.GOClassCreation, this);
+#endif
 		}
 		/// <summary>
 		/// This constructor **must** be used when creating widget from code.
@@ -238,8 +247,9 @@ namespace Crow
 		/// compiler will not create it automatically because of the presence of the other one.
 		/// </summary>
 		/// <param name="iface">Iface.</param>
-		public Widget (Interface iface) : this()
+		public Widget (Interface iface, string style = null) : this()
 		{
+			this.style = style;
 			IFace = iface;
 			Initialize ();
 		}
@@ -252,12 +262,12 @@ namespace Crow
 			loadDefaultValues ();
 		}
 		#region private fields
-		LayoutingType registeredLayoutings = LayoutingType.All;
+		LayoutingType registeredLayoutings;// = LayoutingType.All;
 		ILayoutable logicalParent;
 		ILayoutable parent;
 		string name;
-		Fill background = Color.Transparent;
-		Fill foreground = Color.White;
+		Fill background = Colors.Transparent;
+		Fill foreground = Colors.White;
 		Font font = "sans, 10";
 		protected Measure width, height;
 		int left, top;
@@ -268,6 +278,8 @@ namespace Crow
 		bool isActive;
 		bool isHover;
 		bool mouseRepeat;
+		bool stickyMouseEnabled;
+		int stickyMouse;
 		MouseCursor mouseCursor = MouseCursor.top_left_arrow;
 		protected bool isVisible = true;
 		bool isEnabled = true;
@@ -345,7 +357,7 @@ namespace Crow
 		/// <summary>
 		/// Mouse routing need to go back to logical parent for popups
 		/// </summary>
-		public Widget FocusParent => (parent is Interface ? LogicalParent : parent) as Widget; 
+		internal Widget FocusParent => (parent is Interface ? LogicalParent : parent) as Widget; 
 
 		[XmlIgnore]public ILayoutable LogicalParent {
 			get { return logicalParent == null ? Parent : logicalParent; }
@@ -369,6 +381,12 @@ namespace Crow
 				return cb;
 			}
 		}
+		/// <summary>
+		/// Compute rectangle position on surface of the context. It ma be the first cached surface in parenting chain,
+		/// or the top backend surface if no cached widget is part of the current widget tree.
+		/// </summary>
+		/// <returns>A new rectangle with same dimension as the input one with x and y relative to the context surface</returns>
+		/// <param name="r">A rectangle to compute the coordinate for.</param>
 		public virtual Rectangle ContextCoordinates(Rectangle r){
 			Widget go = Parent as Widget;
 			if (go == null)
@@ -376,6 +394,15 @@ namespace Crow
 			return go.CacheEnabled ?
 				r + Parent.ClientRectangle.Position :
 				Parent.ContextCoordinates (r);
+		}
+
+		public virtual Rectangle RelativeSlot (Widget target)
+		{
+			if (this == target)
+				return Slot;
+			if (Parent is Widget p)
+				return Slot + p.RelativeSlot (target).Position + Margin;
+			return Slot + new Point(Margin, Margin);
 		}
 		public virtual Rectangle ScreenCoordinates (Rectangle r){
 			try {
@@ -424,11 +451,11 @@ namespace Crow
 		public event EventHandler Focused;
 		/// <summary>Occurs when this object loose focus</summary>
 		public event EventHandler Unfocused;
-		/// <summary>Occurs when mouse is over</summary>
+		/// <summary>Occurs when this widget is hovered by the mouse</summary>
 		public event EventHandler Hover;
-		/// <summary>Occurs when this control is no longer the Hover one</summary>
-		//public event EventHandler UnHover;
-		/// <summary>Occurs when this object loose focus</summary>
+		/// <summary>Occurs when this widget is no longuer the hover one</summary>
+		public event EventHandler Unhover;
+		/// <summary>Occurs when this widget is enabled</summary>
 		public event EventHandler Enabled;
 		/// <summary>Occurs when the enabled state this object is set to false</summary>
 		public event EventHandler Disabled;
@@ -455,6 +482,7 @@ namespace Crow
 		public event EventHandler<DataSourceChangeEventArgs> ParentChanged;
 		/// <summary>Occurs when the logical parent has changed</summary>
 		public event EventHandler<DataSourceChangeEventArgs> LogicalParentChanged;
+		public event EventHandler Painted;
 		#endregion
 
 		internal bool hasDoubleClick => MouseDoubleClick != null;
@@ -469,7 +497,7 @@ namespace Crow
 				if (tag == value)
 					return;
 				tag = value;
-				NotifyValueChanged ("Tag", tag);
+				NotifyValueChangedAuto (tag);
 			}
 		}
 		/// <summary>
@@ -483,7 +511,7 @@ namespace Crow
 				if (cacheEnabled == value)
 					return;
 				cacheEnabled = value;
-				NotifyValueChanged ("CacheEnabled", cacheEnabled);
+				NotifyValueChangedAuto (cacheEnabled);
 			}
 		}
 		/// <summary>
@@ -496,7 +524,7 @@ namespace Crow
 				if (clipToClientRect == value)
 					return;
 				clipToClientRect = value;
-				NotifyValueChanged ("ClipToClientRect", clipToClientRect);
+				NotifyValueChangedAuto (clipToClientRect);
 				this.RegisterForRedraw ();
 			}
 		}
@@ -523,7 +551,7 @@ namespace Crow
 				if (name == value)
 					return;
 				name = value;
-				NotifyValueChanged("Name", name);
+				NotifyValueChangedAuto (name);
 			}
 		}
 		/// <summary>
@@ -538,7 +566,7 @@ namespace Crow
 					return;
 
 				verticalAlignment = value;
-				NotifyValueChanged("VerticalAlignment", verticalAlignment);
+				NotifyValueChangedAuto (verticalAlignment);
 				RegisterForLayouting (LayoutingType.Y);
 			}
 		}
@@ -553,7 +581,7 @@ namespace Crow
 				if (horizontalAlignment == value)
 					return;
 				horizontalAlignment = value;
-				NotifyValueChanged("HorizontalAlignment", horizontalAlignment);
+				NotifyValueChangedAuto (horizontalAlignment);
 				RegisterForLayouting (LayoutingType.X);
 			}
 		}
@@ -567,7 +595,7 @@ namespace Crow
 				if (left == value)
 					return;
 				left = value;
-				NotifyValueChanged ("Left", left);
+				NotifyValueChangedAuto (left);
 				this.RegisterForLayouting (LayoutingType.X);
 			}
 		}
@@ -581,7 +609,7 @@ namespace Crow
 				if (top == value)
 					return;
 				top = value;
-				NotifyValueChanged ("Top", top);
+				NotifyValueChangedAuto (top);
 				this.RegisterForLayouting (LayoutingType.Y);
 			}
 		}
@@ -617,7 +645,7 @@ namespace Crow
 						return;
 				}
 				width = value;
-				NotifyValueChanged ("Width", width);
+				NotifyValueChangedAuto (width);
 				RegisterForLayouting (LayoutingType.Width);
 			}
 		}
@@ -640,7 +668,7 @@ namespace Crow
 						return;
 				}
 				height = value;
-				NotifyValueChanged ("Height", height);
+				NotifyValueChangedAuto (height);
 				RegisterForLayouting (LayoutingType.Height);
 			}
 		}
@@ -667,7 +695,7 @@ namespace Crow
 				if (focusable == value)
 					return;
 				focusable = value;
-				NotifyValueChanged ("Focusable", focusable);
+				NotifyValueChangedAuto (focusable);
 			}
 		}
 		/// <summary>
@@ -680,11 +708,12 @@ namespace Crow
 					return;
 
 				hasFocus = value;
-				if (hasFocus)
+				if (hasFocus) {
+					IFace.FocusedWidget = this;
 					onFocused (this, null);
-				else
+				} else
 					onUnfocused (this, null);
-				NotifyValueChanged ("HasFocus", hasFocus);
+				NotifyValueChangedAuto (hasFocus);
 			}
 		}
 		/// <summary>
@@ -693,12 +722,12 @@ namespace Crow
 		/// </summary>
 		[XmlIgnore]public virtual bool IsActive {
 			get { return isActive; }
-			set {
+			internal set {
 				if (value == isActive)
 					return;
 
 				isActive = value;
-				NotifyValueChanged ("IsActive", isActive);
+				NotifyValueChangedAuto (isActive);
 			}
 		}
 		/// <summary>
@@ -706,16 +735,22 @@ namespace Crow
 		/// </summary>
 		[XmlIgnore]public virtual bool IsHover {
 			get { return isHover; }
-			set {
+			internal set {
 				if (value == isHover)
 					return;
 
+				if (isHover & !value)
+					Unhover.Raise (this, null);
+
 				isHover = value;
 
-				if (isHover)
+				if (isHover) {
+					if (stickyMouseEnabled && stickyMouse > 0) 
+						IFace.stickedWidget = this;											
 					Hover.Raise (this, null);
+				}
 
-				NotifyValueChanged ("IsHover", isHover);
+				NotifyValueChangedAuto (isHover);
 			}
 		}
 		/// <summary>
@@ -728,9 +763,35 @@ namespace Crow
 				if (mouseRepeat == value)
 					return;
 				mouseRepeat = value;
-				NotifyValueChanged ("MouseRepeat", mouseRepeat);
+				NotifyValueChangedAuto (mouseRepeat);
 			}
 		}
+		/// <summary>
+		/// When StickyMouse value is greater than zero and StickyMouseEnabled is true, mouse will be sticked over the widget
+		/// until x or y delta is greater than the StickyMouse value. This is usefulle for very thin (1 pixel) border that need to
+		/// be grabbed with the mouse.
+		/// </summary>
+		public virtual int StickyMouse {
+			get => stickyMouse;
+			set {
+				if (stickyMouse == value)
+					return;
+				stickyMouse = value;
+				NotifyValueChangedAuto (stickyMouse);
+            }
+        }
+		/// <summary>
+		/// Boolean for enabling or not the sticky mouse mechanic
+		/// </summary>
+		public virtual bool StickyMouseEnabled {
+			get => stickyMouseEnabled;
+			set {
+				if (stickyMouseEnabled == value)
+					return;
+				stickyMouseEnabled = value;
+				NotifyValueChangedAuto (stickyMouseEnabled);
+            }
+        }
 		/// <summary>
 		/// Determine Cursor when mouse is Hover.
 		/// </summary>
@@ -742,7 +803,7 @@ namespace Crow
 				if (mouseCursor == value)
 					return;
 				mouseCursor = value;
-				NotifyValueChanged ("MouseCursor", mouseCursor);
+				NotifyValueChangedAuto (mouseCursor);
 				this.RegisterForRedraw ();
 
 				if (isHover)
@@ -777,12 +838,10 @@ namespace Crow
 				if (value == null)
 					return;
 				background = value;
-				NotifyValueChanged ("Background", background);
+				NotifyValueChangedAuto (background);
 				RegisterForRedraw ();
-				if (background is SolidColor) {
-					if ((background as SolidColor).Equals (Color.Clear))
-						clearBackground = true;
-				}
+				if (background is SolidColor sc && sc.Equals (Colors.Clear))
+					clearBackground = true;				
 			}
 		}
 		/// <summary>
@@ -795,21 +854,21 @@ namespace Crow
 				if (foreground == value)
 					return;
 				foreground = value;
-				NotifyValueChanged ("Foreground", foreground);
+				NotifyValueChangedAuto (foreground);
 				RegisterForRedraw ();
 			}
 		}
 		/// <summary>
 		/// Font being used in many controls, it is defined in the base GraphicObject class.
 		/// </summary>
-		[DesignCategory ("Appearance")][DefaultValue("sans, 10")]
+		[DesignCategory ("Appearance")][DefaultValue("sans, 12")]
 		public virtual Font Font {
 			get { return font; }
 			set {
 				if (value == font)
 					return;
 				font = value;
-				NotifyValueChanged ("Font", font);
+				NotifyValueChangedAuto (font);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -823,7 +882,7 @@ namespace Crow
 				if (value == cornerRadius)
 					return;
 				cornerRadius = value;
-				NotifyValueChanged ("CornerRadius", cornerRadius);
+				NotifyValueChangedAuto (cornerRadius);
 				RegisterForRedraw ();
 			}
 		}
@@ -838,7 +897,7 @@ namespace Crow
 				if (value == margin)
 					return;
 				margin = value;
-				NotifyValueChanged ("Margin", margin);
+				NotifyValueChangedAuto (margin);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -863,7 +922,7 @@ namespace Crow
 					}
 				}
 
-				NotifyValueChanged ("Visible", isVisible);
+				NotifyValueChangedAuto (isVisible);
 			}
 		}
 		/// <summary>
@@ -879,12 +938,12 @@ namespace Crow
 
 				isEnabled = value;
 
-				if (isEnabled)
+				if (IsEnabled)
 					onEnable (this, null);
 				else
 					onDisable (this, null);
 
-				NotifyValueChanged ("IsEnabled", isEnabled);
+				NotifyValueChangedAuto (IsEnabled);
 				RegisterForRedraw ();
 			}
 		}
@@ -900,7 +959,7 @@ namespace Crow
 
 				minimumSize = value;
 
-				NotifyValueChanged ("MinimumSize", minimumSize);
+				NotifyValueChangedAuto (minimumSize);
 				RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
@@ -916,7 +975,7 @@ namespace Crow
 
 				maximumSize = value;
 
-				NotifyValueChanged (nameof(MaximumSize), maximumSize);
+				NotifyValueChangedAuto (maximumSize);
 				RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
@@ -952,25 +1011,25 @@ namespace Crow
 					rootDataLevel = true;
 
 				#if DEBUG_LOG
-				DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GOLockUpdate, this);
+				DbgLogger.StartEvent(DbgEvtType.GOLockUpdate, this);
 				#endif
 				lock (IFace.UpdateMutex) {
 					OnDataSourceChanged (this, dse);
-					NotifyValueChanged ("DataSource", DataSource);
+					NotifyValueChangedAuto (DataSource);
 				}
 				#if DEBUG_LOG
-				dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+				DbgLogger.EndEvent (DbgEvtType.GOLockUpdate);
 				#endif
 			}
 			get {
 				return rootDataLevel ? dataSource : dataSource == null ?
 					LogicalParent == null ? null :
-					LogicalParent is Widget ? (LogicalParent as Widget).DataSource : null :
+					LogicalParent is Widget w ? w.DataSource : null :
 					dataSource;
 			}
 		}
 		/// <summary>
-		/// If true, lock datasource seeking upward in logic or graphic tree to this widget
+		/// If true, lock datasource seeking upward in logic or graphic tree to this widget.
 		/// </summary>
 		[DesignCategory ("Data")][DefaultValue(false)]
 		public virtual bool RootDataLevel {
@@ -979,7 +1038,7 @@ namespace Crow
 				if (rootDataLevel == value)
 					return;
 				rootDataLevel = value;
-				NotifyValueChanged ("RootDataLevel", rootDataLevel);
+				NotifyValueChangedAuto (rootDataLevel);
 				this.RegisterForRedraw ();
 			}
 		}
@@ -993,7 +1052,7 @@ namespace Crow
 		public virtual void OnDataSourceChanged(object sender, DataSourceChangeEventArgs e){
 			DataSourceChanged.Raise (this, e);
 			#if DEBUG_LOG
-			DebugLog.AddEvent(DbgEvtType.GONewDataSource, this);
+			DbgLogger.AddEvent(DbgEvtType.GONewDataSource, this);
 			#endif
 
 			#if DEBUG_BINDING
@@ -1012,9 +1071,20 @@ namespace Crow
 
 				style = value;
 
-				NotifyValueChanged ("Style", style);
+				NotifyValueChangedAuto (style);
 			}
 		}
+		/// <summary>
+		/// Gets or sets a tooltip to show when mouse stay still over the control.
+		/// </summary>
+		/// <remarks>
+		/// By default, the tooltip container widget that will be show is defined in '#Crow.Tooltip.template' and the widget
+		/// tooltip string is interpreted as a single string helper message that may be a binding expression.
+		/// If the widget Tooltip property start with a '#', the tooltip string will be interpreted as a resource path of
+		/// a custom IML template to show, which will have its datasource set to the widget triggering the tooltip.
+		/// </remarks>
+		/// <value>A single helpt string that may comes from a binding expression, or by starting with a '#',
+		/// You may provide a custom tooltip template resource path.</value>
 		[DesignCategory ("Divers")]
 		public virtual string Tooltip {
 			get { return tooltip; }
@@ -1022,7 +1092,7 @@ namespace Crow
 				if (tooltip == value)
 					return;
 				tooltip = value;
-				NotifyValueChanged("Tooltip", tooltip);
+				NotifyValueChangedAuto (tooltip);
 			}
 		}
 		[DesignCategory ("Divers")]
@@ -1032,7 +1102,7 @@ namespace Crow
 				if (contextCommands == value)
 					return;
 				contextCommands = value;
-				NotifyValueChanged("ContextCommands", contextCommands);
+				NotifyValueChangedAuto (contextCommands);
 			}
 		}
 		#endregion
@@ -1042,7 +1112,7 @@ namespace Crow
 		public void loadDefaultValues()
 		{
 			#if DEBUG_LOG
-			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GOInitialization, this);
+			DbgLogger.StartEvent (DbgEvtType.GOInitialization, this);
 			#endif
 
 			Type thisType = this.GetType ();
@@ -1095,7 +1165,7 @@ namespace Crow
 			//all other instance of this type would not longer use reflexion to init properly
 			//but will fetch the  dynamic initialisation method compiled for this precise type
 			//TODO:measure speed gain.
-#region Delfault values Loading dynamic compilation
+			#region Delfault values Loading dynamic compilation
 			DynamicMethod dm = null;
 			ILGenerator il = null;
 
@@ -1163,11 +1233,6 @@ namespace Crow
 			/*} catch (Exception ex) {
 				throw new Exception ("Error applying style <" + styleKey + ">:", ex);
 			}*/
-
-			#if DEBUG_LOG
-			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
-			#endif
-
 			onInitialized (this, null);
 		}
 		void setDefaultValue (ILGenerator il, PropertyInfo pi, ref List<Style> styling)
@@ -1225,6 +1290,9 @@ namespace Crow
 
 		protected virtual void onInitialized (object sender, EventArgs e){
 			Initialized.Raise(sender, e);
+			#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.GOInitialization);
+			#endif
 		}
 		bool getDefaultEvent(EventInfo ei, List<Style> styling,
 			out string expression){
@@ -1243,6 +1311,10 @@ namespace Crow
 
 		public virtual Widget FindByName(string nameToFind){
 			return string.Equals(nameToFind, name, StringComparison.Ordinal) ? this : null;
+		}
+		public virtual Widget FindByType<T> ()
+		{
+			return this is T ? this : null;
 		}
 		public virtual bool Contains(Widget goToFind){
 			return false;
@@ -1309,8 +1381,9 @@ namespace Crow
 		/// </summary>
 		protected virtual void onStartDrag (object sender, DragDropEventArgs e){
 			IFace.HoverWidget = null;
+			IFace.DragAndDropOperation = new DragDropEventArgs (this);
 			IsDragged = true;
-			StartDrag.Raise (this, e);
+			StartDrag.Raise (this, IFace.DragAndDropOperation);
 			#if DEBUG_DRAGNDROP
 			Debug.WriteLine(this.ToString() + " : START DRAG => " + e.ToString());
 			#endif
@@ -1359,7 +1432,7 @@ namespace Crow
 		/// </summary>
 		public virtual void ClippingRegistration(){
 			#if DEBUG_LOG
-			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GOClippingRegistration, this);
+			DbgLogger.StartEvent (DbgEvtType.GOClippingRegistration, this);
 			#endif	
 			parentRWLock.EnterReadLock ();
 			if (parent != null) {					
@@ -1368,7 +1441,7 @@ namespace Crow
 			}
 			parentRWLock.ExitReadLock ();
 			#if DEBUG_LOG
-			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+			DbgLogger.EndEvent (DbgEvtType.GOClippingRegistration);
 			#endif
 		}
 		/// <summary>
@@ -1381,7 +1454,7 @@ namespace Crow
 				return;
 			}
 			#if DEBUG_LOG
-			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GORegisterClip, this);
+			DbgLogger.StartEvent(DbgEvtType.GORegisterClip, this);
 			#endif
 			Rectangle cb = ClientRectangle;
 			Rectangle  r = clip + cb.Position;
@@ -1390,28 +1463,39 @@ namespace Crow
 			if (r.Bottom > cb.Bottom)
 				r.Height -= r.Bottom - cb.Bottom;
 			if (r.Width < 0 || r.Height < 0) {
-				Debug.WriteLine ($"Invalid clip: {clip}:{r} hnd:{this}");//\n{Environment.StackTrace}");
-				return;
+				//Debug.WriteLine ($"Invalid clip: {clip}:{r} hnd:{this}");//\n{Environment.StackTrace}");
+				#if DEBUG_LOG
+				DbgLogger.EndEvent (DbgEvtType.GORegisterClip);
+				#endif
+			return;
 			}
 			if (cacheEnabled && !IsDirty)
 				Clipping.UnionRectangle (r);
-			if (Parent == null)
+			if (Parent == null) {
+				#if DEBUG_LOG
+				DbgLogger.EndEvent (DbgEvtType.GORegisterClip);
+				#endif
 				return;
+			}
 			Widget p = Parent as Widget;
-			if (p?.IsDirty == true && p?.CacheEnabled == true)
+			if (p?.IsDirty == true && p?.CacheEnabled == true) {
+				#if DEBUG_LOG
+				DbgLogger.EndEvent (DbgEvtType.GORegisterClip);
+				#endif
 				return;
+			}
 			Parent.RegisterClip (r + Slot.Position);
 			#if DEBUG_LOG
-			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+			DbgLogger.EndEvent (DbgEvtType.GORegisterClip);
 			#endif
 		}
 		/// <summary> Full update, if width or height is 'Fit' a layouting is requested, and a redraw is done in any case. </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForGraphicUpdate ()
 		{
-#if DEBUG
+#if DEBUG_LOG
 			if (disposed) {
-				Console.WriteLine ($"RegisterForGraphicUpdate for disposed Widget: {this}\n{System.Environment.StackTrace}");
+				DbgLogger.AddEvent (DbgEvtType.GORegisterForGraphicUpdate | DbgEvtType.AlreadyDisposed, this);
 				return;
 			}
 #endif
@@ -1425,13 +1509,12 @@ namespace Crow
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForRedraw ()
 		{
-#if DEBUG
+#if DEBUG_LOG
 			if (disposed) {
-				Console.WriteLine ($"RegisterForRedraw for disposed Widget: {this}\n{System.Environment.StackTrace}");
+				DbgLogger.AddEvent (DbgEvtType.GORegisterForRedraw | DbgEvtType.AlreadyDisposed, this);
 				return;
 			}
 #endif
-
 			IsDirty = true;
 			if (RegisteredLayoutings == LayoutingType.None)
 				IFace.EnqueueForRepaint (this);
@@ -1442,32 +1525,54 @@ namespace Crow
 
 		/// <summary> return size of content + margins </summary>
 		public virtual int measureRawSize (LayoutingType lt) {
+#if DEBUG_LOG
+			DbgLogger.AddEvent(DbgEvtType.GOMeasure, this);
+#endif
 			return lt == LayoutingType.Width ?
 				contentSize.Width + 2 * margin: contentSize.Height + 2 * margin;
 		}
 		/// <summary> By default in groups, LayoutingType.ArrangeChildren is reset </summary>
 		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){
 		}
+
+		internal bool firstUnresolvedFitWidth (out  Widget ancestorInUnresolvedFit)
+		{
+			ancestorInUnresolvedFit = this.Parent as Widget;
+
+			while (ancestorInUnresolvedFit != null) {
+				if (ancestorInUnresolvedFit.width.IsFit)
+					return true;
+				if (!ancestorInUnresolvedFit.Width.IsRelativeToParent || ancestorInUnresolvedFit.Parent is Interface)
+					return false;
+				ancestorInUnresolvedFit = ancestorInUnresolvedFit.Parent as Widget;
+			}
+			return false;
+		}
+
 		public virtual bool ArrangeChildren { get { return false; } }
 		/// <summary> Query a layouting for the type pass as parameter, redraw only if layout changed. </summary>
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
 #if DEBUG
 			if (disposed) {
-				Console.WriteLine ($"RegisterForLayouting({layoutType}) for disposed Widget: {this}\n{System.Environment.StackTrace}");
+				System.Diagnostics.Debug.WriteLine ($"RegisterForLayouting({layoutType}) for disposed Widget: {this}\n{System.Environment.StackTrace}");
 				return;
 			}
 #endif
 			if (Parent == null)
 				return;
-#if DEBUG_LOG
-			DbgEvent dbgEvt = DebugLog.AddEvent (DbgEvtType.GOLockLayouting, this);
-#endif
+			#if DEBUG_LOG
+			DbgLogger.StartEvent (DbgEvtType.GOLockLayouting, this);
+			#endif
 			lock (IFace.LayoutMutex) {
 				//prevent queueing same LayoutingType for this
 				layoutType &= (~RegisteredLayoutings);
 
-				if (layoutType == LayoutingType.None)
+				if (layoutType == LayoutingType.None) {
+					#if DEBUG_LOG
+					DbgLogger.EndEvent (DbgEvtType.GOLockLayouting);
+					#endif
 					return;
+				}
 				//dont set position for stretched item
 				if (Width == Measure.Stretched)
 					layoutType &= (~LayoutingType.X);
@@ -1484,8 +1589,12 @@ namespace Crow
 //				//prevent queueing same LayoutingType for this
 				layoutType &= (~RegisteredLayoutings);
 
-				if (layoutType == LayoutingType.None)
+				if (layoutType == LayoutingType.None) {
+					#if DEBUG_LOG
+					DbgLogger.EndEvent (DbgEvtType.GOLockLayouting);
+					#endif
 					return;
+				}
 
 				//enqueue LQI LayoutingTypes separately
 				if (layoutType.HasFlag (LayoutingType.Width))
@@ -1499,9 +1608,9 @@ namespace Crow
 				if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
 					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
 			}
-#if DEBUG_LOG
-			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
-#endif
+			#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.GOLockLayouting);
+			#endif
 		}
 
 		/// <summary> trigger dependant sizing component update </summary>
@@ -1678,7 +1787,7 @@ namespace Crow
 		protected virtual void onDraw(Context gr)
 		{
 			#if DEBUG_LOG
-			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GODraw, this);
+			DbgLogger.StartEvent(DbgEvtType.GODraw, this);
 			#endif
 
 			Rectangle rBack = new Rectangle (Slot.Size);
@@ -1688,7 +1797,7 @@ namespace Crow
 			gr.Fill ();
 
 			#if DEBUG_LOG
-			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+			DbgLogger.EndEvent (DbgEvtType.GODraw);
 			#endif
 		}
 
@@ -1698,7 +1807,7 @@ namespace Crow
 		protected virtual void RecreateCache ()
 		{
 			#if DEBUG_LOG
-			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GORecreateCache, this);
+			DbgLogger.StartEvent (DbgEvtType.GORecreateCache, this);
 			#endif
 
 			/*if (bmp == null)
@@ -1706,8 +1815,8 @@ namespace Crow
 			else if (LastPaintedSlot.Width != Slot.Width || LastPaintedSlot.Height != Slot.Height)
 				bmp.SetSize (Slot.Width, Slot.Height);*/
 			bmp?.Dispose ();
-			//bmp = IFace.surf.CreateSimilar (Content.ColorAlpha, Slot.Width, Slot.Height);
-			bmp = new ImageSurface(Format.Argb32, Slot.Width, Slot.Height);
+			bmp = IFace.surf.CreateSimilar (Content.ColorAlpha, Slot.Width, Slot.Height);
+			//bmp = new ImageSurface(Format.Argb32, Slot.Width, Slot.Height);
 
 			using (Context gr = new Context (bmp)) {
 				gr.Antialias = Interface.Antialias;
@@ -1717,29 +1826,28 @@ namespace Crow
 			IsDirty = false;
 
 			#if DEBUG_LOG
-			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+			DbgLogger.EndEvent (DbgEvtType.GORecreateCache);
 			#endif
 		}
 		protected virtual void UpdateCache(Context ctx){
 			#if DEBUG_LOG
-			DbgEvent dbgEvt = DebugLog.AddEvent(DbgEvtType.GOUpdateCacheAndPaintOnCTX, this);
+			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);
 			#endif
 
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 			if (clearBackground) {
-					ctx.Save ();
-					ctx.Operator = Operator.Clear;
-					ctx.Rectangle (rb);
-					ctx.Fill ();
-					ctx.Restore ();
+				ctx.Operator = Operator.Clear;
+				ctx.Rectangle (rb);
+				ctx.Fill ();
+				ctx.Operator = Operator.Over;
 			}
 
-			ctx.SetSourceSurface (bmp, rb.X, rb.Y);
+			ctx.SetSource (bmp, rb.X, rb.Y);
 			ctx.Paint ();
 			Clipping.Dispose ();
 			Clipping = new Region ();
 			#if DEBUG_LOG
-			dbgEvt.end = DebugLog.chrono.ElapsedTicks;
+			DbgLogger.EndEvent (DbgEvtType.GOUpdateCache);
 			#endif
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version
@@ -1747,7 +1855,7 @@ namespace Crow
 		public virtual void Paint (ref Context ctx)
 		{
 #if DEBUG_LOG
-			DebugLog.AddEvent(DbgEvtType.GOPaint, this);
+			DbgLogger.AddEvent(DbgEvtType.GOPaint, this);
 #endif
 			//TODO:this test should not be necessary
 
@@ -1755,16 +1863,16 @@ namespace Crow
 #if DEBUG
 				Console.ForegroundColor = ConsoleColor.Red;
 				if (disposed)
-					Console.WriteLine ($"Paint disposed widget: {this}");
+					System.Diagnostics.Debug.WriteLine ($"Paint disposed widget: {this}");
 				Console.ForegroundColor = ConsoleColor.DarkRed;
 				if (Slot.Height < 0 || Slot.Width < 0)
-					Console.WriteLine ($"Paint slot invalid ({Slot}): {this}");
+					System.Diagnostics.Debug.WriteLine ($"Paint slot invalid ({Slot}): {this}");
 				Console.ForegroundColor = ConsoleColor.DarkMagenta;
 				if (parent == null)
-					Console.WriteLine ($"Paint with parent == null: {this}");
+					System.Diagnostics.Debug.WriteLine ($"Paint with parent == null: {this}");
 				Console.ForegroundColor = ConsoleColor.Magenta;
 				if (!isVisible)
-					Console.WriteLine ($"Paint invisible widget: {this}");
+					System.Diagnostics.Debug.WriteLine ($"Paint invisible widget: {this}");
 				Console.ForegroundColor = ConsoleColor.Gray;
 #endif
 				return; 
@@ -1780,7 +1888,7 @@ namespace Crow
 						RecreateCache ();
 
 					UpdateCache (ctx);
-					if (!isEnabled)						
+					if (!IsEnabled)						
 						paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);					
 				} else {
 					Rectangle rb = Slot + Parent.ClientRectangle.Position;
@@ -1789,13 +1897,14 @@ namespace Crow
 					ctx.Translate (rb.X, rb.Y);
 
 					onDraw (ctx);
-					if (!isEnabled)
+					if (!IsEnabled)
 						paintDisabled (ctx, Slot);
 
 					ctx.Restore ();
 				}
 				LastPaintedSlot = Slot;
 			}
+			Painted.Raise (this, null);
 		}
 		void paintDisabled(Context gr, Rectangle rb){
 			gr.Operator = Operator.Xor;
@@ -1838,7 +1947,7 @@ namespace Crow
 		{
 			if (parent == null)
 				return false;
-			if (!(isVisible & isEnabled)||IsDragged)
+			if (!(isVisible & IsEnabled)||IsDragged)
 				return false;
 			if (!parent.PointIsIn(ref m))
 				return false;
@@ -1847,13 +1956,13 @@ namespace Crow
 		}
 		public virtual bool MouseIsIn(Point m)
 		{			
-			return (!(isVisible & isEnabled)||IsDragged) ? false : PointIsIn (ref m);
+			return (!(isVisible & IsEnabled)||IsDragged) ? false : PointIsIn (ref m);
 		}
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
 			if (IFace.HoverWidget != this) {
-				IFace.HoverWidget = this;
 				onMouseEnter (this, e);
+				IFace.HoverWidget = this;
 			}
 
 			//this.onMouseMove (this, e);//without this, window border doesn't work, should be removed
@@ -1861,10 +1970,8 @@ namespace Crow
 		public virtual void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			if (allowDrag & hasFocus & IFace.IsDown(MouseButton.Left)) {
-				if (IFace.DragAndDropOperation == null) {
-					IFace.DragAndDropOperation = new DragDropEventArgs (this);
-					onStartDrag (this, IFace.DragAndDropOperation);
-				}
+				if (IFace.DragAndDropOperation == null)		
+					onStartDrag (this, IFace.DragAndDropOperation);				
 			}
 
 			//dont bubble event if dragged, mouse move is routed directely from iface
@@ -1880,9 +1987,10 @@ namespace Crow
 
 		}
 		public virtual void onMouseDown(object sender, MouseButtonEventArgs e){
-#if DEBUG_FOCUS
-			Debug.WriteLine("MOUSE DOWN => " + this.ToString());
-#endif
+			if (Focusable) {
+				IFace.FocusedWidget = this;
+				e.Handled = true;
+			}
 
 			if (e.Button == MouseButton.Right && contextCommands != null) {
 				IFace.ShowContextMenu (this);
@@ -1895,9 +2003,6 @@ namespace Crow
 				FocusParent?.onMouseDown (sender, e);
 		}
 		public virtual void onMouseUp(object sender, MouseButtonEventArgs e){
-#if DEBUG_FOCUS
-			Debug.WriteLine("MOUSE UP => " + this.ToString());
-#endif
 
 			if (IFace.DragAndDropOperation != null){
 				if (IFace.DragAndDropOperation.DragSource == this) {
@@ -1914,18 +2019,12 @@ namespace Crow
 				FocusParent?.onMouseUp (sender, e);
 		}
 		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){
-#if DEBUG_FOCUS
-			Debug.WriteLine("CLICK => " + this.ToString());
-#endif
 			if (MouseClick != null)
 				MouseClick.Invoke (this, e);
 			else if (!e.Handled)
 				FocusParent?.onMouseClick (sender, e);
 		}
 		public virtual void onMouseDoubleClick(object sender, MouseButtonEventArgs e){
-#if DEBUG_FOCUS
-			Debug.WriteLine("DOUBLE CLICK => " + this.ToString());
-#endif
 			if (MouseDoubleClick != null)			
 				MouseDoubleClick.Invoke (this, e);
 			else if (!e.Handled)
@@ -1939,11 +2038,7 @@ namespace Crow
 		}
 		public virtual void onMouseEnter(object sender, MouseMoveEventArgs e)
 		{
-			#if DEBUG_FOCUS
-			Debug.WriteLine("MouseEnter => " + this.ToString());
-#endif
-
-			IFace.MouseCursor = MouseCursor;
+			IFace.MouseCursor = MouseCursor;			
 
 			if (IFace.DragAndDropOperation != null) {
 				Widget g = this;
@@ -1963,11 +2058,10 @@ namespace Crow
 			MouseEnter.Raise (this, e);
 		}
 		public virtual void onMouseLeave(object sender, MouseMoveEventArgs e)
-		{
-			#if DEBUG_FOCUS
-			Debug.WriteLine("MouseLeave => " + this.ToString());
-			#endif
-
+		{			
+			if (IFace.DragAndDropOperation?.DropTarget == this)
+				IFace.DragAndDropOperation.DropTarget.onDragLeave (this, IFace.DragAndDropOperation);
+			
 			MouseLeave.Raise (this, e);
 		}
 
@@ -1993,17 +2087,23 @@ namespace Crow
 			Disabled.Raise (this, e);
 		}
 		protected virtual void onParentChanged(object sender, DataSourceChangeEventArgs e) {
+#if DEBUG_LOG
+			DbgLogger.AddEvent (DbgEvtType.GONewParent, this, e);
+#endif
 			ParentChanged.Raise (this, e);
 			if (logicalParent == null)
 				LogicalParentChanged.Raise (this, e);
 		}
 		protected virtual void onLogicalParentChanged(object sender, DataSourceChangeEventArgs e) {
+#if DEBUG_LOG
+			DbgLogger.AddEvent (DbgEvtType.GONewLogicalParent, this, e);
+#endif
 			LogicalParentChanged.Raise (this, e);
 		}
 		internal void ClearTemplateBinding(){
-			#if DEBUG_UPDATE
+#if DEBUG_UPDATE
 			Debug.WriteLine (string.Format("ClearTemplateBinding: {0}", this.ToString()));
-			#endif
+#endif
 			if (ValueChanged == null)
 				return;
 			EventInfo eiEvt = this.GetType().GetEvent ("ValueChanged");
@@ -2022,11 +2122,11 @@ namespace Crow
 
 			if (Parent != null)
 				tmp = Parent.ToString () + tmp;
-			#if DEBUG_LAYOUTING
+			/*#if DEBUG_LAYOUTING
 			return Name == "unamed" ? tmp + "." + this.GetType ().Name + GraphicObjects.IndexOf(this).ToString(): tmp + "." + Name;
-			#else
+			#else*/
 			return string.IsNullOrEmpty(Name) ? tmp + "." + this.GetType ().Name : tmp + "." + Name;
-			#endif
+			//#endif
 		}
 		/// <summary>
 		/// Checks to handle when widget is removed from the visible graphic tree

@@ -17,10 +17,9 @@ namespace Crow
 	//TODO: style key shared by different class may use only first encouneter class setter, which can cause bug.
 	public class StyleReader : StreamReader
 	{
-		enum States { init, classNames, members, value, endOfStatement }
+		enum States { classNames, members, value, endOfStatement }
 
-		States curState = States.init;
-
+		States curState = States.classNames;
 		int column = 1;
 		int line = 1;
 
@@ -31,13 +30,11 @@ namespace Crow
 		static Regex rxDecimal = new Regex(@"[0-9]+");
 		static Regex rxHexadecimal = new Regex(@"[0-9a-fA-F]+");
 
-		public bool nextCharIsValidCharStartName
-		{
-			get { return rxNameStartChar.IsMatch(new string(new char[]{PeekChar()})); }
+		bool nextCharIsValidCharStartName {
+			get => rxNameStartChar.IsMatch(new string(new char[]{PeekChar()}));
 		}
-		public bool nextCharIsValidCharName
-		{
-			get { return rxNameChar.IsMatch(new string(new char[]{PeekChar()})); }
+		bool nextCharIsValidCharName {
+			get => rxNameChar.IsMatch(new string(new char[]{PeekChar()})); 
 		}
 		#endregion
 
@@ -59,10 +56,17 @@ namespace Crow
 			}
 		}
 
-		public StyleReader (Dictionary<string, Style> styling, Stream stream, string resId)
-			: base(stream)
-		{			
-			string styleKey = resId.Substring (0, resId.Length - 6);
+		/// <summary>
+		/// Parse the full style stream and load the result in 'Styling' and 'StylingConstant'
+		/// fields of the interface passed as argument.
+		/// </summary>
+		public void Parse (Dictionary<string, string> StylingConstants, Dictionary<string, Style> Styling, string resId)
+		{
+			column = 1;
+			line = 1;
+			curState = States.classNames;
+
+			//string styleKey = resId.Substring (0, resId.Length - 6);
 			string token = "";
 			List<string> targetsClasses = new List<string> ();
 			string currentProperty = "";
@@ -72,7 +76,7 @@ namespace Crow
 				if (EndOfStream)
 					break;
 
-				switch (Peek()) {
+				switch (Peek ()) {
 				case '/':
 					ReadChar ();
 					if (PeekChar () != '/')
@@ -81,7 +85,7 @@ namespace Crow
 					break;
 				case ',':
 					ReadChar ();
-					if (!(curState == States.init || curState == States.classNames) || string.IsNullOrEmpty (token))
+					if (!(curState == States.classNames) || string.IsNullOrEmpty (token))
 						throw new ParserException (line, column, "Unexpected char ','", resId);
 					targetsClasses.Add (token);
 					token = "";
@@ -89,7 +93,7 @@ namespace Crow
 					break;
 				case '{':
 					ReadChar ();
-					if (!(curState == States.init || curState == States.classNames) || string.IsNullOrEmpty (token))
+					if (curState != States.classNames || string.IsNullOrEmpty (token))
 						throw new ParserException (line, column, "Unexpected char '{'", resId);
 					targetsClasses.Add (token);
 					token = "";
@@ -104,7 +108,7 @@ namespace Crow
 					break;
 				case '=':
 					ReadChar ();
-					if (!(curState == States.init || curState == States.members))
+					if (!(curState == States.members || curState == States.classNames) || string.IsNullOrEmpty (token))
 						throw new ParserException (line, column, "Unexpected char '='", resId);
 					currentProperty = token;
 					token = "";
@@ -112,38 +116,55 @@ namespace Crow
 					break;
 				case '"':
 					if (curState != States.value)
-						throw new ParserException (line, column, "Unexpected char '\"'", resId);					
+						throw new ParserException (line, column, "Unexpected char '\"'", resId);
 					ReadChar ();
 
 					while (!EndOfStream) {
-						char c = PeekChar();
-						if (c == '\"') {
-							ReadChar ();
+						char c = ReadChar ();
+						if (c == '$') {
+							if (PeekChar () == '{') {
+								ReadChar ();
+								//constant replacement
+								string constantId = "";
+								while (!EndOfStream) {
+									c = ReadChar ();
+									if (c == '}')
+										break;
+									constantId += c;
+								}
+								if (string.IsNullOrEmpty (constantId) || !StylingConstants.ContainsKey (constantId))
+									throw new ParserException (line, column, "Empty constant id in styling", resId);
+								token += StylingConstants [constantId];
+								continue;
+							}
+						} else if (c == '\"') {
+							curState = States.endOfStatement;
 							break;
 						}
-						token += ReadChar();
-						if (c == '\\' && !EndOfStream)
-							token += ReadChar();						
+						token += c;
 					}
-					curState = States.endOfStatement;
 					break;
 				case ';':
 					if (curState != States.endOfStatement)
-						throw new ParserException (line, column, "Unexpected end of statement", resId);					
+						throw new ParserException (line, column, "Unexpected end of statement", resId);
 					ReadChar ();
-					foreach (string tc in targetsClasses) {
-						if (!styling.ContainsKey (tc))
-							styling [tc] = new Style ();
-						else if (styling [tc].ContainsKey (currentProperty))
-							continue;
-						styling [tc] [currentProperty] = token;
-						#if DESIGN_MODE
-						styling [tc].Locations[currentProperty] = new FileLocation(resId, line, column - token.Length - 1, token.Length);
-						#endif
-						//System.Diagnostics.Debug.WriteLine ("Style: {3} : {0}.{1} = {2}", tc, currentProperty, token, resId);
+					if (targetsClasses.Count == 0) {
+						//style constants
+						StylingConstants[currentProperty] = token;
+						curState = States.classNames;
+					} else {
+						foreach (string tc in targetsClasses) {
+							if (!Styling.ContainsKey (tc))
+								Styling [tc] = new Style ();
+							Styling [tc] [currentProperty] = token;
+#if DESIGN_MODE
+							Styling [tc].Locations[currentProperty] = new FileLocation(resId, line, column - token.Length - 1, token.Length);
+#endif
+						}
+						curState = States.members;
 					}
 					token = "";
-					curState = States.members;
+					currentProperty = "";
 					break;
 				default:
 					if (curState == States.value)
@@ -152,13 +173,19 @@ namespace Crow
 						throw new ParserException (line, column, "expecting end of statement", resId);
 
 					if (nextCharIsValidCharStartName) {
-						token += ReadChar();
+						token += ReadChar ();
 						while (nextCharIsValidCharName)
-							token += ReadChar();
+							token += ReadChar ();
 					}
 					break;
 				}
 			}
+
+		}
+
+		public StyleReader (Stream stream)
+			: base(stream)
+		{
 		}
 	}
 }

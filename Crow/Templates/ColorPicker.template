@@ -32,7 +32,7 @@
 			<Label Style="labColor" Text="S:"/>
 			<ColorSlider Name="cs" Component="Saturation" CurrentColor="{²./CurrentColor}"/>
 			<Label Style="labColorV" Text="{../cs.CurrentValue}" />
-		</HorizontalStack>			
+		</HorizontalStack>
 		<HorizontalStack Height="Fit">
 			<Label Style="labColor" Text="V:"/>
 			<ColorSlider Name="cs" Component="Value" CurrentColor="{²./CurrentColor}"/>

@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Crow.Cairo;
@@ -45,12 +46,18 @@ namespace Crow
 	{
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-		public virtual void NotifyValueChanged (string MemberName, object _value)
+		public void NotifyValueChanged (string MemberName, object _value)
 		{
 			//Debug.WriteLine ("Value changed: {0}->{1} = {2}", this, MemberName, _value);
 			ValueChanged.Raise (this, new ValueChangeEventArgs (MemberName, _value));
 		}
+		public void NotifyValueChanged (object _value, [CallerMemberName] string caller = null)
+		{
+			NotifyValueChanged (caller, _value);
+		}
 		#endregion
+
+		internal static List<Assembly> crowAssemblies = new List<Assembly> ();
 
 		#region CTOR
 		static Interface ()
@@ -70,9 +77,13 @@ namespace Crow
 			//ensure all assemblies are loaded, because IML could contains classes not instanciated in source
 			foreach (string af in Directory.GetFiles (AppDomain.CurrentDomain.BaseDirectory, "*.dll")) {
 				try {
-					Assembly.LoadFrom (af);
+					Assembly a =Assembly.LoadFrom (af);
+					if (a == Assembly.GetEntryAssembly () || a == Assembly.GetExecutingAssembly ())
+						continue;
+					if (a.GetCustomAttribute (typeof (CrowAttribute)) != null) 
+						crowAssemblies.Add (a);
 				} catch {
-					Console.WriteLine ("{0} not loaded as assembly.", af);
+					Debug.WriteLine ("{0} not loaded as assembly.", af);
 				}
 			}
 
@@ -103,13 +114,6 @@ namespace Crow
 				};
 				t.Start ();
 			}
-
-#if MEASURE_TIME
-			PerfMeasures.Add (updateMeasure);
-			PerfMeasures.Add (drawingMeasure);
-			PerfMeasures.Add (layoutingMeasure);
-			PerfMeasures.Add (clippingMeasure);
-#endif
 		}
 		#endregion
 
@@ -120,6 +124,17 @@ namespace Crow
 		IntPtr hWin;
 		Cursor currentCursor;
 		bool ownWindow;
+
+		protected void registerGlfwCallbacks ()
+		{
+			windows.Add (hWin, this);
+			Glfw3.SetKeyCallback (hWin, HandleKeyDelegate);
+			Glfw3.SetMouseButtonPosCallback (hWin, HandleMouseButtonDelegate);
+			Glfw3.SetCursorPosCallback (hWin, HandleCursorPosDelegate);
+			Glfw3.SetScrollCallback (hWin, HandleScrollDelegate);
+			Glfw3.SetCharCallback (hWin, HandleCharDelegate);
+			Glfw3.SetWindowSizeCallback (hWin, HandleWindowSizeDelegate);
+		}
 
 		void initSurface ()
 		{
@@ -134,14 +149,8 @@ namespace Crow
 				throw new Exception ("[GLFW3] Unable to create vulkan Window");
 			ownWindow = true;
 
-			Glfw3.SetKeyCallback (hWin, HandleKeyDelegate);
-			Glfw3.SetMouseButtonPosCallback (hWin, HandleMouseButtonDelegate);
-			Glfw3.SetCursorPosCallback (hWin, HandleCursorPosDelegate);
-			Glfw3.SetScrollCallback (hWin, HandleScrollDelegate);
-			Glfw3.SetCharCallback (hWin, HandleCharDelegate);
-			Glfw3.SetWindowSizeCallback (hWin, HandleWindowSizeDelegate);
+			registerGlfwCallbacks ();
 
-			//Glfw3.SetWindowTitle (hWin, "FPS: " + fps.ToString ());
 			switch (Environment.OSVersion.Platform) {
 			case PlatformID.MacOSX:
 				break;
@@ -163,8 +172,6 @@ namespace Crow
 			case PlatformID.WinCE:
 				throw new PlatformNotSupportedException ("Unable to create cairo surface.");
 			}
-
-			windows.Add (hWin, this);
 		}
 
 		#region events delegates
@@ -197,6 +204,9 @@ namespace Crow
 
 		#endregion
 
+		public string WindowTitle {
+			set => Glfw3.SetWindowTitle (hWin, value);
+		}
 
 		public bool Running {
 			get => !Glfw3.WindowShouldClose (hWin);
@@ -208,27 +218,29 @@ namespace Crow
 			while (!Glfw3.WindowShouldClose (hWin)) {
 				Update ();
 				Thread.Sleep (UPDATE_INTERVAL);
-#if MEASURE_TIME
-				foreach (PerformanceMeasure m in PerfMeasures) 
-					m.NotifyChanges ();
-#endif
 			}
 		}
 		protected virtual void OnInitialized ()
 		{
-			try {
+			/*try {
 				Load ("#main.crow").DataSource = this;
-			} catch { }
+			} catch { }*/
 			Initialized.Raise (this, null);
 		}
 		/// <summary>
 		/// load styling, init default tooltips and context menus, load main.crow resource if exists.
 		/// </summary>
 		public void Init () {
+#if DEBUG_LOG
+			DbgLogger.StartEvent (DbgEvtType.IFaceInit);
+#endif
 			loadStyling ();
 			initTooltip ();
 			initContextMenus ();
 			OnInitialized ();
+#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.IFaceInit);
+#endif
 		}
 		/// <summary>
 		/// call Init() then enter the running loop performing ProcessEvents until running==false.
@@ -301,17 +313,19 @@ namespace Crow
 		/// <summary>Crow configuration root path</summary>
 		public static string CROW_CONFIG_ROOT;
 		/// <summary>If true, mouse focus is given when mouse is over control</summary>
-		public static bool FOCUS_ON_HOVER = true;
+		public static bool FOCUS_ON_HOVER = false;
+		/// <summary>If true, newly focused window will be put on top</summary>
+		public static bool RAISE_WIN_ON_FOCUS = true;
 		/// <summary> Threshold to catch borders for sizing </summary>
-		public static int BorderThreshold = 10;
+		public static int BorderThreshold = 3;
 		/// <summary> delay before tooltip appears </summary>
 		public static int TOOLTIP_DELAY = 500;
 		/// <summary>Double click threshold in milisecond</summary>
 		public static int DOUBLECLICK_TRESHOLD = 320;//max duration between two mouse_down evt for a dbl clk in milisec.
 		/// <summary> Time to wait in millisecond before starting repeat loop</summary>
-		public static int DEVICE_REPEAT_DELAY = 700;
+		public static int DEVICE_REPEAT_DELAY = 600;
 		/// <summary> Time interval in millisecond between device event repeat</summary>
-		public static int DEVICE_REPEAT_INTERVAL = 40;
+		public static int DEVICE_REPEAT_INTERVAL = 100;
 		public static float WheelIncrement = 1;
 		/// <summary>Tabulation size in Text controls</summary>
 		public static int TAB_SIZE = 4;
@@ -342,6 +356,9 @@ namespace Crow
 		//public event EventHandler<MouseCursorChangedEventArgs> MouseCursorChanged;
 		////public event EventHandler Quit;
 		public event EventHandler Initialized;
+
+		public event EventHandler StartDragOperation;
+		public event EventHandler EndDragOperation;
 		//public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
 		//public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
 		//public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
@@ -387,7 +404,11 @@ namespace Crow
 		public Queue<LayoutingQueueItem> DiscardQueue;
 		/// <summary>Main drawing queue, holding layouted controls</summary>
 		public Queue<Widget> ClippingQueue = new Queue<Widget>();
-		public string Clipboard;//TODO:use object instead for complex copy paste
+		//TODO:use object instead for complex copy paste
+		public string Clipboard {
+			get => Glfw3.GetClipboardString (hWin);
+			set => Glfw3.SetClipboardString (hWin, value);
+		}
 		/// <summary>each IML and fragments (such as inline Templates) are compiled as a Dynamic Method stored here
 		/// on the first instance creation of a IML item.
 		/// </summary>
@@ -435,14 +456,29 @@ namespace Crow
 		public Dictionary<String, LoaderInvoker> DefaultValuesLoader = new Dictionary<string, LoaderInvoker>();
 		/// <summary>Store dictionnary of member/value per StyleKey</summary>
 		public Dictionary<string, Style> Styling;
+		/// <summary>
+		/// Replacement value for style like cmake or bash variable.
+		/// </summary>
+		/// <remarks>
+		/// each 'key=value' pair in style files not enclosed in brackets are threated as constant.
+		/// If the same constant is defined more than once, only the first is kept.
+		/// Than in any IML expresion, in style or xml, constant may be used as a replacement string with ${CONSTANTID}.
+		/// If a constant is not resolved in iml while creating the instantiator, an error is thrown.
+		/// </remarks>
+		public Dictionary<string, string> StylingConstants;
 		/// <summary> parse all styling data's during application startup and build global Styling Dictionary </summary>
 		protected virtual void loadStyling() {
+			StylingConstants = new Dictionary<string, string> ();
 			Styling = new Dictionary<string, Style> ();
 
 			//fetch styling info in this order, if member styling is alreadey referenced in previous
 			//assembly, it's ignored.
-			loadStylingFromAssembly (Assembly.GetEntryAssembly ());
+
 			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
+			foreach (Assembly a in crowAssemblies) {
+				loadStylingFromAssembly (a);
+			}
+			loadStylingFromAssembly (Assembly.GetEntryAssembly ());
 		}
 		/// <summary> Search for .style resources in assembly </summary>
 		protected void loadStylingFromAssembly (Assembly assembly) {
@@ -451,89 +487,57 @@ namespace Crow
 			foreach (string s in assembly
 				.GetManifestResourceNames ()
 				.Where (r => r.EndsWith (".style", StringComparison.OrdinalIgnoreCase))) {
-				using (Stream stream = assembly.GetManifestResourceStream (s)) {
-					new StyleReader (this.Styling, stream, s);
-				}
+				using (StyleReader sr = new StyleReader (assembly.GetManifestResourceStream (s))) 
+					sr.Parse (StylingConstants, Styling, s);				
 			}
+		}
+		public void LoadStyle (string stylePath) {
+			using (Stream s = new FileStream (stylePath, FileMode.Open))
+				LoadStyle (s, stylePath);
+
+		}
+		public void LoadStyle (Stream stream, string resId) {
+			using (StyleReader sr = new StyleReader (stream))
+				sr.Parse (StylingConstants, Styling, resId);
 		}
 		#endregion
 
 
 		#region Load/Save
-		/// <summary>get template stream from path providing the declaring type for which
-		/// this template is loaded. If not found in entry assembly, the assembly where the type is defined
-		/// will be searched
-		/// </summary>
-		/// <returns>The template stream</returns>
-		public virtual Stream GetTemplateStreamFromPath (string path, Type declaringType)
-		{
-			Stream s = null;
-			if (path.StartsWith ("#", StringComparison.Ordinal)) {
-				string resId = path.Substring (1);
-				s = Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
-				if (s == null)
-					s = Assembly.GetAssembly (declaringType).GetManifestResourceStream (resId);
-				if (s == null)
-					throw new Exception ($"Template ressource not found '{path}'");
-			} else {
-				if (!File.Exists (path))
-					throw new FileNotFoundException ($"Template not found: {path}", path);
-				s = new FileStream (path, FileMode.Open, FileAccess.Read);
-			}
-			return s;
+		static bool tryGetResource (Assembly a, string resId, out Stream stream) {
+			stream = null;
+			if (a == null)
+				return false;
+			stream = a.GetManifestResourceStream (resId);
+			return stream != null;
 		}
-		/// <summary>Open file or find a resource from path string</summary>
-		/// <returns>A file or resource stream</returns>
-		/// <param name="path">This could be a normal file path, or an embedded ressource ID
-		/// Resource ID's must be prefixed with '#' character</param>
-		public virtual Stream GetStreamFromPath (string path)
-		{
-			Stream stream = null;
 
-			if (path.StartsWith ("#", StringComparison.Ordinal)) {
-				string resId = path.Substring (1);
-				stream = Assembly.GetEntryAssembly ()?.GetManifestResourceStream (resId);
-				if (stream != null)
-					return stream;
-				string assemblyName = resId.Split ('.') [0];
-				Assembly a = AppDomain.CurrentDomain.GetAssemblies ().FirstOrDefault (aa => aa.GetName ().Name == assemblyName);
-				if (a == null)
-					throw new Exception ($"Assembly '{assemblyName}' not found for ressource '{path}'.");
-				stream = a.GetManifestResourceStream (resId);
-				if (stream == null)
-					throw new Exception ("Resource not found: " + path);
-			} else {
-				if (!File.Exists (path))
-					throw new FileNotFoundException ($"File not found: {path}", path);
-				stream = new FileStream (path, FileMode.Open, FileAccess.Read);
-			}
-			return stream;
-		}
-		public static Stream StaticGetStreamFromPath (string path)
-		{
-			Stream stream = null;
+		public delegate Stream GetStreamFromPathDelegate (string path);
+		public static GetStreamFromPathDelegate GetStreamFromPath = _getStreamFromPath;
 
+		static Stream _getStreamFromPath (string path)
+		{
 			if (path.StartsWith ("#", StringComparison.Ordinal)) {
+				Stream stream = null;
 				string resId = path.Substring (1);
-				stream = Assembly.GetEntryAssembly ().GetManifestResourceStream (resId);
-				if (stream != null)
+				if (tryGetResource (Assembly.GetEntryAssembly (), resId, out stream))
 					return stream;
-				string assemblyName = resId.Split ('.') [0];
-				Assembly a = AppDomain.CurrentDomain.GetAssemblies ().FirstOrDefault (aa => aa.GetName ().Name == assemblyName);
-				if (a == null)
-					throw new Exception ($"Assembly '{assemblyName}' not found for ressource '{path}'.");
-				stream = a.GetManifestResourceStream (resId);
-				/*foreach (var s in a.GetManifestResourceNames()) {
-					Console.WriteLine (s);
-				}*/
-				if (stream == null)
-					throw new Exception ("Resource not found: " + path);
-			} else {
-				if (!File.Exists (path))
-					throw new FileNotFoundException ($"File not found: {path}", path);
-				stream = new FileStream (path, FileMode.Open, FileAccess.Read);
-			}
-			return stream;
+				string[] assemblyNames = resId.Split ('.');
+				if (tryGetResource (AppDomain.CurrentDomain.GetAssemblies ()
+					.FirstOrDefault (aa => aa.GetName ().Name == assemblyNames[0]), resId, out stream))
+					return stream;
+				if (assemblyNames.Length > 3)
+					if (tryGetResource (AppDomain.CurrentDomain.GetAssemblies ()
+						.FirstOrDefault (aa => aa.GetName ().Name == $"{assemblyNames[0]}.{assemblyNames[1]}"), resId, out stream))
+						return stream;
+				foreach (Assembly ca in crowAssemblies) 
+					if (tryGetResource (ca, resId, out stream))
+						return stream;
+				throw new Exception ("Resource not found: " + path);
+			} 
+			if (!File.Exists (path))
+				throw new FileNotFoundException ($"File not found: {path}", path);
+			return new FileStream (path, FileMode.Open, FileAccess.Read);
 		}
 		/// <summary>
 		/// Add the content of the IML fragment to the graphic tree of this interface
@@ -563,8 +567,14 @@ namespace Crow
 		public Widget Load (string path)
 		{
 			lock (UpdateMutex) {
+				#if DEBUG_LOG
+				DbgLogger.StartEvent (DbgEvtType.IFaceLoad);
+				#endif
 				Widget tmp = CreateInstance (path);
 				AddWidget (tmp);
+				#if DEBUG_LOG
+				DbgLogger.EndEvent (DbgEvtType.IFaceLoad);
+				#endif
 				return tmp;
 			}
 		}
@@ -574,28 +584,7 @@ namespace Crow
 		/// <returns>new instance of graphic object created</returns>
 		/// <param name="path">path of the iml file to load</param>
 		public virtual Widget CreateInstance (string path)
-		{
-			//try {
-				return GetInstantiator (path).CreateInstance ();
-			//} catch (Exception ex) {
-			//	throw new Exception ("Error loading <" + path + ">:", ex);
-			//}
-		}
-		/// <summary>
-		/// Create an instance of a GraphicObject linked to this interface but not added to the GraphicTree
-		/// </summary>
-		/// <returns>new instance of graphic object created</returns>
-		/// <param name="path">path of the iml file to load</param>
-		public virtual Widget CreateTemplateInstance (string path, Type declaringType)
-		{
-//			try {
-				if (!Templates.ContainsKey (path))
-					Templates [path] = new Instantiator (this, GetTemplateStreamFromPath(path, declaringType), path);
-				return Templates [path].CreateInstance ();
-			//} catch (Exception ex) {
-			//	throw new Exception ("Error loading Template <" + path + ">:", ex);
-			//}
-		}
+			=> GetInstantiator (path).CreateInstance ();
 		/// <summary>
 		/// Fetch instantiator from cache or create it.
 		/// </summary>
@@ -610,9 +599,9 @@ namespace Crow
 		/// try to fetch the requested one in the cache or create it.
 		/// They have additional properties for recursivity and
 		/// custom display per item type</summary>
-		public virtual ItemTemplate GetItemTemplate(string path, Type declaringType){
+		public virtual ItemTemplate GetItemTemplate(string path){
 			if (!ItemTemplates.ContainsKey(path))
-				ItemTemplates [path] = new ItemTemplate(this, path, declaringType);
+				ItemTemplates [path] = new ItemTemplate(this, path);
 			return ItemTemplates [path] as ItemTemplate;
 		}
 		#endregion
@@ -620,14 +609,14 @@ namespace Crow
 		#region focus
 		Widget _activeWidget;	//button is pressed on widget
 		Widget _hoverWidget;		//mouse is over
-		Widget _focusedWidget;	//has keyboard (or other perif) focus
+		internal Widget _focusedWidget;	//has keyboard (or other perif) focus
 
 		/// <summary>Widget is focused and button is down or another perif action is occuring
 		/// , it can not lose focus while Active</summary>
 		public Widget ActiveWidget
 		{
 			get { return _activeWidget; }
-			set
+			internal set
 			{
 				if (_activeWidget == value)
 					return;
@@ -637,21 +626,13 @@ namespace Crow
 
 				_activeWidget = value;
 
-				#if DEBUG_FOCUS
-				NotifyValueChanged("ActiveWidget", _activeWidget);
-				#endif
+				NotifyValueChanged ("ActiveWidget", _activeWidget);
+#if DEBUG_LOG
+				DbgLogger.AddEvent (DbgEvtType.ActiveWidget, _activeWidget);
+#endif
 
 				if (_activeWidget != null)
-				{
 					_activeWidget.IsActive = true;
-					#if DEBUG_FOCUS
-					NotifyValueChanged("ActiveWidget", _activeWidget);
-					Debug.WriteLine("Active => " + _activeWidget.ToString());
-				}else
-					Debug.WriteLine("Active => null");
-					#else
-				}
-					#endif
 			}
 		}
 		/// <summary>Pointer is over the widget</summary>
@@ -667,8 +648,9 @@ namespace Crow
 
 				_hoverWidget = value;
 
-				#if DEBUG_FOCUS
-				NotifyValueChanged("HoverWidget", _hoverWidget);
+				NotifyValueChanged ("HoverWidget", _hoverWidget);
+#if DEBUG_LOG
+				DbgLogger.AddEvent (DbgEvtType.HoverWidget, _hoverWidget);
 #endif
 
 				if (DragAndDropOperation == null && FOCUS_ON_HOVER) {
@@ -683,39 +665,25 @@ namespace Crow
 				}
 
 				if (_hoverWidget != null)
-				{
 					_hoverWidget.IsHover = true;
-#if DEBUG_FOCUS
-					Debug.WriteLine("Hover => " + _hoverWidget.ToString());
-				}else
-					Debug.WriteLine("Hover => null");
-#else
-				}
-#endif					
 			}
 		}
 		/// <summary>Widget has the keyboard or mouse focus</summary>
 		public Widget FocusedWidget {
-			get { return _focusedWidget; }
+			get => _focusedWidget;
 			set {
 				if (_focusedWidget == value)
 					return;
 				if (_focusedWidget != null)
 					_focusedWidget.HasFocus = false;
 				_focusedWidget = value;
-				#if DEBUG_FOCUS
-				NotifyValueChanged("FocusedWidget", _focusedWidget);
-				#endif
-				if (_focusedWidget != null)
-				{
-					_focusedWidget.HasFocus = true;
-#if DEBUG_FOCUS
-					Debug.WriteLine ("Focus => " + _hoverWidget.ToString ());
-				} else
-					Debug.WriteLine ("Focus => null");
-#else
-				}
+
+				NotifyValueChanged ("FocusedWidget", _focusedWidget);
+#if DEBUG_LOG				
+				DbgLogger.AddEvent (DbgEvtType.FocusedWidget, _focusedWidget);
 #endif
+				if (_focusedWidget != null)
+					_focusedWidget.HasFocus = true;
 			}
 		}
 		#endregion
@@ -730,11 +698,14 @@ namespace Crow
 			lock (ClippingMutex) {
 				if (g.IsQueueForClipping)
 					return;
-				#if DEBUG_LOG
-				DebugLog.AddEvent(DbgEvtType.GOEnqueueForRepaint, g);
-				#endif	
+#if DEBUG_LOG
+				DbgLogger.StartEvent (DbgEvtType.GOEnqueueForRepaint, g);
+#endif	
 				ClippingQueue.Enqueue (g);
 				g.IsQueueForClipping = true;
+#if DEBUG_LOG
+				DbgLogger.EndEvent (DbgEvtType.GOEnqueueForRepaint);
+#endif
 			}
 		}
 		/// <summary>Main Update loop, executed in this interface thread, protected by the UpdateMutex
@@ -754,40 +725,35 @@ namespace Crow
 			for (int i = 0; i < tmpThreads.Length; i++)
 				tmpThreads [i].CheckState ();
 
-			//if (mouseRepeatTimer.ElapsedMilliseconds > 0) {
-			//	if ((bool)_hoverWidget?.MouseRepeat) {
-			//		int repeatCount = (int)mouseRepeatTimer.ElapsedMilliseconds / DEVICE_REPEAT_INTERVAL - mouseRepeatCount;
-			//		for (int i = 0; i < repeatCount; i++)
-			//			_hoverWidget.onMouseDown (_hoverWidget, lastMouseDownEvent);
-			//		mouseRepeatCount += repeatCount;
-			//	}
-			//} else if (lastMouseDown.ElapsedMilliseconds > DEVICE_REPEAT_DELAY)
-				//mouseRepeatTimer.Start ();
+			if (lastMouseDownEvent != null) {
+				if (mouseRepeatTimer.ElapsedMilliseconds > DEVICE_REPEAT_INTERVAL) {
+					if (_hoverWidget != null && _hoverWidget.MouseRepeat) {
+						_hoverWidget.onMouseDown (_hoverWidget, lastMouseDownEvent);
+						mouseRepeatTimer.Restart ();
+					}
+				} else if (lastMouseDown.ElapsedMilliseconds > DEVICE_REPEAT_DELAY)
+					mouseRepeatTimer.Start ();
+			}
 
 			if (!Monitor.TryEnter (UpdateMutex))
 				return;
-
-			#if MEASURE_TIME
-			updateMeasure.StartCycle();
-			#endif
-
-			/*#if DEBUG_LOG
-			DebugLog.AddEvent (DbgEvtType.IFaceUpdate);
-			#endif*/
+				
+#if DEBUG_LOG
+			DbgLogger.StartEvent (DbgEvtType.Update);
+#endif
 
 			processLayouting ();
 
 			clippingRegistration ();
 
 			if (ctx == null) {
-				using (ctx = new Context (surf)) {
+				using (ctx = new Context (surf)) 
 					processDrawing (ctx);
-				}
 			}else
 				processDrawing (ctx);
 
-#if MEASURE_TIME
-			updateMeasure.StopCycle();
+#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.Update, true);
 #endif
 
 			Monitor.Exit (UpdateMutex);
@@ -796,14 +762,10 @@ namespace Crow
 		/// Layouting queue items. Failing LQI's are requeued in this cycle until MaxTry is reached which
 		/// trigger an enqueue for the next Update Cycle</summary>
 		protected virtual void processLayouting(){
-			#if MEASURE_TIME
-			layoutingMeasure.StartCycle();
-			#endif
 			if (Monitor.TryEnter (LayoutMutex)) {
-				#if DEBUG_LOG
-				if (LayoutingQueue.Count > 0)
-					DebugLog.AddEvent (DbgEvtType.IFaceStartLayouting);
-				#endif
+#if DEBUG_LOG
+				DbgLogger.StartEvent (DbgEvtType.Layouting);
+#endif
 				DiscardQueue = new Queue<LayoutingQueueItem> ();
 				//Debug.WriteLine ("======= Layouting queue start =======");
 				LayoutingQueueItem lqi;
@@ -812,27 +774,20 @@ namespace Crow
 					lqi.ProcessLayouting ();
 				}
 				LayoutingQueue = DiscardQueue;
+#if DEBUG_LOG
+				DbgLogger.EndEvent (DbgEvtType.Layouting, true);
+#endif
 				Monitor.Exit (LayoutMutex);
 				DiscardQueue = null;
 			}
-			/*#if DEBUG_LOG
-			DebugLog.AddEvent (DbgEvtType.IFaceStartLayouting);
-			#endif*/
-			#if MEASURE_TIME
-			layoutingMeasure.StopCycle();
-			#endif
 		}
 		/// <summary>Degueue Widget to clip from DrawingQueue and register the last painted slot and the new one
 		/// Clipping rectangles are added at each level of the tree from leef to root, that's the way for the painting
 		/// operation to known if it should go down in the tree for further graphic updates and repaints</summary>
 		void clippingRegistration(){
-			#if MEASURE_TIME
-			clippingMeasure.StartCycle();
-			#endif
-			#if DEBUG_LOG
-			if (ClippingQueue.Count > 0)
-				DebugLog.AddEvent (DbgEvtType.IFaceStartClipping);
-			#endif
+#if DEBUG_LOG
+			DbgLogger.StartEvent (DbgEvtType.Clipping);
+#endif
 			Widget g = null;
 			while (ClippingQueue.Count > 0) {
 				lock (ClippingMutex) {
@@ -841,26 +796,18 @@ namespace Crow
 				}
 				g.ClippingRegistration ();
 			}
-			/*#if DEBUG_LOG
-			DebugLog.AddEvent (DbgEvtType.IFaceEndClipping);
-			#endif*/
-			#if MEASURE_TIME
-			clippingMeasure.StopCycle();
-			#endif
+#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.Clipping, true);
+#endif
 		}
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
 		void processDrawing(Context ctx){
-			#if MEASURE_TIME
-			drawingMeasure.StartCycle();
-			#endif
-			#if DEBUG_LOG
-			if (!clipping.IsEmpty)
-				DebugLog.AddEvent (DbgEvtType.IFaceStartDrawing);
-			#endif
+#if DEBUG_LOG
+			DbgLogger.StartEvent (DbgEvtType.Drawing);
+#endif
 			if (DragImage != null)
 				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
-			//using (surf = new ImageSurface (bmp, Format.Argb32, ClientRectangle.Width, ClientRectangle.Height, ClientRectangle.Width * 4)) {
 				if (!clipping.IsEmpty) {
 					IsDirty = true;
 
@@ -885,12 +832,12 @@ namespace Crow
 							DragImageY = MousePosition.Y - DragImageHeight / 2;
 							ctx.Save ();
 							ctx.ResetClip ();
-							ctx.SetSourceSurface (DragImage, DragImageX, DragImageY);
+							ctx.SetSource (DragImage, DragImageX, DragImageY);
 							ctx.PaintWithAlpha (0.8);
 							ctx.Restore ();
 							DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
 							IsDirty = true;
-							//Console.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
+							//System.Diagnostics.Debug.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
 						}
 					}
 
@@ -913,21 +860,16 @@ namespace Crow
 					ctx.Operator = Operator.Over;
 
 					ctx.Paint ();
-
-					//TODO:check if flush is possible, maybe with cairo
-					//backend?.Flush ();
+					
 					surf.Flush ();
 
 					clipping.Dispose ();
 					clipping = new Region ();
 				}
 			
-			/*#if DEBUG_LOG
-			DebugLog.AddEvent (DbgEvtType.IFaceEndDrawing);
-			#endif*/
-			#if MEASURE_TIME
-			drawingMeasure.StopCycle();
-			#endif
+#if DEBUG_LOG
+			DbgLogger.EndEvent (DbgEvtType.Drawing, true);
+#endif
 		}
 		#endregion
 
@@ -996,12 +938,6 @@ namespace Crow
 					g.Dispose ();
 				}
 			}
-			#if DEBUG_LAYOUTING
-			LQIsTries = new List<LQIList>();
-			curLQIsTries = new LQIList();
-			LQIs = new List<LQIList>();
-			curLQIs = new LQIList();
-			#endif
 		}
 		/// <summary> Put widget on top of other root widgets</summary>
 		public void PutOnTop(Widget g, bool isOverlay = false)
@@ -1045,11 +981,31 @@ namespace Crow
 		/// when window resize event occurs. 
 		/// </summary>
 		/// <param name="bounds">bounding box of the interface</param>
-		public virtual void ProcessResize(Rectangle bounds){
+		public virtual void ProcessResize(Rectangle bounds){			
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
 
-				surf.SetSize (clientRectangle.Width, clientRectangle.Height);
+				switch (Environment.OSVersion.Platform) {
+				case PlatformID.MacOSX:
+					break;
+				case PlatformID.Unix:
+					surf.SetSize (clientRectangle.Width, clientRectangle.Height);
+					break;
+				case PlatformID.Win32NT:
+				case PlatformID.Win32S:
+				case PlatformID.Win32Windows:
+					if (ownWindow) {
+						surf.Dispose ();
+						IntPtr hWin32 = Glfw3.GetWin32Window (hWin);
+						IntPtr hdc = Glfw3.GetWin32DC (hWin32);
+						surf = new Win32Surface (hdc);
+					}else
+						surf.SetSize (clientRectangle.Width, clientRectangle.Height);
+					break;
+				case PlatformID.Xbox:
+				case PlatformID.WinCE:
+					throw new PlatformNotSupportedException ("Unable to create cairo surface.");
+				}
 
 				foreach (Widget g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
@@ -1062,7 +1018,7 @@ namespace Crow
 		MouseCursor cursor = MouseCursor.top_left_arrow;
 		static void loadCursors ()
 		{
-			const int minimumSize = 32;
+			const int minimumSize = 24;
 			//Load cursors
 			XCursor.Cursors [MouseCursor.arrow] = XCursorFile.Load ("#Crow.Cursors.arrow").Cursors.First (c => c.Width >= minimumSize);
 			XCursor.Cursors [MouseCursor.base_arrow_down] = XCursorFile.Load ("#Crow.Cursors.base_arrow_down").Cursors.First (c => c.Width >= minimumSize);
@@ -1132,7 +1088,6 @@ namespace Crow
 
 		Stopwatch lastMouseDown = Stopwatch.StartNew (), mouseRepeatTimer = new Stopwatch ();
 		bool doubleClickTriggered;	//next mouse up will trigger a double click
-		//int mouseRepeatCount;
 		MouseButtonEventArgs lastMouseDownEvent;
 
 		public Point MousePosition { get; set; } = default;
@@ -1154,31 +1109,47 @@ namespace Crow
 				cursor = value;
 
 				currentCursor?.Dispose ();
-				currentCursor = createCursor (cursor);
-				Console.WriteLine ($"cursor=>{cursor}");
+				currentCursor = createCursor (cursor);				
 				currentCursor.Set (hWin);
 				//MouseCursorChanged.Raise (this,new MouseCursorChangedEventArgs(cursor));
 			}
 		}
+		
+		Point stickyMouseDelta = default;
+		internal Widget stickedWidget = null;
+
 		/// <summary>Processes mouse move events from the root container, this function
 		/// should be called by the host on mouse move event to forward events to crow interfaces</summary>
 		/// <returns>true if mouse is in the interface</returns>
 		public virtual bool OnMouseMove (int x, int y)
-		{
+		{			
 			int deltaX = x - MousePosition.X;
 			int deltaY = y - MousePosition.Y;
+
+			if (stickedWidget != null && _activeWidget == null) {
+				stickyMouseDelta.X += deltaX;
+				stickyMouseDelta.Y += deltaY;				
+
+				if (Math.Abs (stickyMouseDelta.X) > stickedWidget.StickyMouse || Math.Abs (stickyMouseDelta.Y) > stickedWidget.StickyMouse) {
+					stickedWidget = null;
+					stickyMouseDelta = default;
+				} else {
+					Glfw3.SetCursorPosition (hWin, MousePosition.X, MousePosition.Y);
+					return true;
+				}
+			}
+
 			MousePosition = new Point (x, y);
 			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
 
-			if (ActiveWidget != null && DragAndDropOperation == null) {
+			if (DragAndDropOperation != null)//drag source cant have hover event, so move has to be handle here
+				DragAndDropOperation.DragSource.onMouseMove (this, e);
+			else if (ActiveWidget != null) {
 				//TODO, ensure object is still in the graphic tree
 				//send move evt even if mouse move outside bounds
 				_activeWidget.onMouseMove (this, e);
 				return true;
 			}
-
-			if (DragAndDropOperation != null)//drag source cant have hover event, so move has to be handle here
-				DragAndDropOperation.DragSource.onMouseMove (this, e);
 
 			if (_hoverWidget != null) {
 				resetTooltip ();
@@ -1236,8 +1207,11 @@ namespace Crow
 					Widget g = GraphicTree [i];
 					if (g.MouseIsIn (e.Position)) {
 						g.checkHoverWidget (e);
-						if (g is Window)
-							PutOnTop (g);
+						if (g is Window && FOCUS_ON_HOVER && g.Focusable) {
+							FocusedWidget = g;
+							if (RAISE_WIN_ON_FOCUS)
+								PutOnTop (g);
+						}
 						_hoverWidget.onMouseMove (_hoverWidget, e);
 						return true;
 					}
@@ -1255,7 +1229,6 @@ namespace Crow
 		{
 			doubleClickTriggered = (lastMouseDown.ElapsedMilliseconds < DOUBLECLICK_TRESHOLD);
 			lastMouseDown.Restart ();
-			//mouseRepeatCount = -1;//stays negative until repeat delay is hit
 
 			lastMouseDownEvent = new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press);
 
@@ -1275,17 +1248,17 @@ namespace Crow
 		public virtual bool OnMouseButtonUp (MouseButton button)
 		{
 			mouseRepeatTimer.Reset ();
+			lastMouseDownEvent = null;
 
-			MouseButtonEventArgs e = new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Repeat);
 			if (_activeWidget == null)
 				return false;
 
-			_activeWidget.onMouseUp (_activeWidget, e);
+			_activeWidget.onMouseUp (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Release));
 
 			if (doubleClickTriggered)
-				_activeWidget.onMouseDoubleClick (_activeWidget, e);
+				_activeWidget.onMouseDoubleClick (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press));
 			else
-				_activeWidget.onMouseClick (_activeWidget, e);
+				_activeWidget.onMouseClick (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press));
 
 			ActiveWidget = null;
 			//			if (!lastActive.MouseIsIn (Mouse.Position)) {
@@ -1357,7 +1330,6 @@ namespace Crow
 
 		protected void initTooltip ()
 		{
-			ToolTipContainer = CreateInstance ("#Crow.Tooltip.template");
 			Thread t = new Thread (toolTipThreadFunc);
 			t.IsBackground = true;
 			t.Start ();
@@ -1370,6 +1342,12 @@ namespace Crow
 						Widget g = _hoverWidget;
 						while (g != null) {
 							if (!string.IsNullOrEmpty (g.Tooltip)) {
+								if (g.Tooltip.StartsWith("#", StringComparison.Ordinal)) {
+									//custom tooltip container
+									ToolTipContainer = CreateInstance (g.Tooltip);
+								} else
+									ToolTipContainer = CreateInstance ("#Crow.Tooltip.template");
+								ToolTipContainer.LayoutChanged += ToolTipContainer_LayoutChanged;
 								AddWidget (ToolTipContainer);
 								ToolTipContainer.DataSource = g;
 								ToolTipContainer.Top = MousePosition.Y + 10;
@@ -1388,11 +1366,41 @@ namespace Crow
 		void resetTooltip ()
 		{
 			if (tooltipVisible) {
-				//ToolTipContainer.DataSource = null;
+				ToolTipContainer.LayoutChanged -= ToolTipContainer_LayoutChanged;
+				ToolTipContainer.DataSource = null;
 				RemoveWidget (ToolTipContainer);
 				tooltipVisible = false;
+				ToolTipContainer.Dispose ();
+				ToolTipContainer = null;
 			}
 			tooltipTimer.Restart ();
+		}
+		void ToolTipContainer_LayoutChanged (object sender, LayoutingEventArgs e)
+		{
+			Widget ttc = sender as Widget;
+			//tooltip container datasource is the widget triggering the tooltip
+			Rectangle r = ScreenCoordinates ((ttc.DataSource as Widget).Slot);
+
+			if (e.LayoutType == LayoutingType.X) {
+					if (ttc.Slot.Right > clientRectangle.Right)
+						ttc.Left = clientRectangle.Right - ttc.Slot.Width;
+			}/* else if (e.LayoutType == LayoutingType.Y) {
+				if (ttc.Slot.Height < tc.ClientRectangle.Height) {
+					if (PopDirection.HasFlag (Alignment.Bottom)) {
+						if (r.Bottom + ttc.Slot.Height > tc.ClientRectangle.Bottom)
+							ttc.Top = r.Top - ttc.Slot.Height;
+						else
+							ttc.Top = r.Bottom;
+					} else if (PopDirection.HasFlag (Alignment.Top)) {
+						if (r.Top - ttc.Slot.Height < tc.ClientRectangle.Top)
+							ttc.Top = r.Bottom;
+						else
+							ttc.Top = r.Top - ttc.Slot.Height;
+					} else
+						ttc.Top = r.Top;
+				} else
+					ttc.Top = 0;
+			}*/
 		}
 		#endregion
 
@@ -1497,26 +1505,6 @@ namespace Crow
 		}
 		public Rectangle getSlot () { return ClientRectangle; }
 		#endregion
-
-#if MEASURE_TIME
-		public PerformanceMeasure clippingMeasure = new PerformanceMeasure ("Clipping", 1);
-		public PerformanceMeasure layoutingMeasure = new PerformanceMeasure ("Layouting", 1);
-		public PerformanceMeasure updateMeasure = new PerformanceMeasure ("Update", 1);
-		public PerformanceMeasure drawingMeasure = new PerformanceMeasure ("Drawing", 1);
-		public List<PerformanceMeasure> PerfMeasures = new List<PerformanceMeasure> ();
-#endif
-#if DEBUG_LAYOUTING
-		public List<LQIList> LQIsTries = new List<LQIList>();
-		public LQIList curLQIsTries = new LQIList();
-		public List<LQIList> LQIs = new List<LQIList>();
-		public LQIList curLQIs = new LQIList();
-		//		public static LayoutingQueueItem[] MultipleRunsLQIs {
-		//			get { return curUpdateLQIs.Where(l=>l.LayoutingTries>2 || l.DiscardCount > 0).ToArray(); }
-		//		}
-		public LayoutingQueueItem currentLQI;
-#else
-		public List<LQIList> LQIs = null;//still create the var for CrowIDE
-#endif
 	}
 }
 

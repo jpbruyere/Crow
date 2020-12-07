@@ -53,7 +53,7 @@ namespace Crow
 				if (_orientation == value)
 					return;
 				_orientation = value;
-				NotifyValueChanged ("Orientation", _orientation);
+				NotifyValueChangedAuto (_orientation);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -131,10 +131,10 @@ namespace Crow
 				break;			
 			}
 
-			gr.SetSourceColor (Color.Black);
+			gr.SetSource (Colors.Black);
 			gr.LineWidth = 2.0;
 			gr.StrokePreserve ();
-			gr.SetSourceColor (Color.White);
+			gr.SetSource (Colors.White);
 			gr.LineWidth = 1.0;
 			gr.Stroke ();
 		}
@@ -167,7 +167,7 @@ namespace Crow
 		}
 		void notifyHueChanged(){
 			NotifyValueChanged ("Hue", hue);
-			NotifyValueChanged ("HueColor", new SolidColor (Color.FromHSV (hue)));
+			NotifyValueChanged ("HueColor", new SolidColor (Color.FromHSV ((uint)(hue*255.0))));
 		}
 	}
 }

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0"?>
+<Menu>
+	<MenuItem Caption="File" >
+		<MenuItem Caption="New">
+			<Template>
+				<Popper Font="{./Font}" Caption="{./Caption}"  Background="{./Background}" PopDirection="{./PopDirection}"
+					Foreground = "{./Foreground}" CanPop="{./HasChildren}"
+					IsPopped="{²./IsOpened}" PopWidth="{./PopWidth}" PopHeight="{./PopHeight}">
+					<Template>
+						<CheckBox IsChecked="{²./IsPopped}" Caption="{./Caption}" Background="{./Background}" Foreground="{./Foreground}">
+							<Template>		
+								<Label Text="{./Caption}"
+									Foreground="{./Foreground}"
+									Margin="2" HorizontalAlignment="Left"
+									Font="{./Font}"	/>
+							</Template>		
+						</CheckBox>
+					</Template>
+					<Border Foreground="DimGrey" Height="{../PopHeight}" Background="FireBrick" Margin="3">
+						<VerticalStack Name="ItemsContainer"/>
+					</Border>
+				</Popper>
+			</Template>
+		</MenuItem>
+	</MenuItem>	
+</Menu>

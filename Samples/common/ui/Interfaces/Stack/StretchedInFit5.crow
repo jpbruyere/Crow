@@ -1,0 +1,16 @@
+﻿<?xml version="1.0"?>
+<VerticalStack Background="DimGrey" Margin="10" Width="Fit" Height="Fit" >
+	<CheckBox Name="cb"/>
+	<CheckBox Name="cb2"/>
+	<Container Visible="{²../cb.IsChecked}" Width="Stretched" Margin="10" Background="RoyalBlue"> 
+		<VerticalStack  Margin="5" Background="Yellow">
+		<VerticalStack Margin="5" Background="Teal">
+		<VerticalStack Margin="1">
+			<VerticalStack  Margin="10" Background="FireBrick">
+				<Label Text="{./Caption}" Width="Fit" Visible="{²../../../../../../cb2.IsChecked}"/> 
+			</VerticalStack>
+		</VerticalStack>
+		</VerticalStack>
+		</VerticalStack>
+	</Container>
+</VerticalStack>

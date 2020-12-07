@@ -1,10 +1,20 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack Name="TopContainer" Width="400" Height="Fit"
-	Margin="20" Background="DarkGrey">
-
-	<HorizontalStack Fit="true" Margin="5" Background="SkyBlue">
+<VerticalStack Name="TopContainer" Margin="100" Background="DarkGrey" Spacing="10">
+	<Spinner/>
+	<Spinner Width="Fit"/>
+	<Spinner Width="120"/>
+	<HorizontalStack Fit="true" Margin="5" Background="DarkSlateGrey">
 		<Spinner Name="sp1" Value="5" ValueChanged="onSpinnerValueChange"/>
-		<Spinner Value="5" Width="60"/>
+		<Spinner Value="5" Width="80"/>
 		<Spinner Value="5"/>
 	</HorizontalStack>
+	<Widget Width="200" Height="20" Background="Teal"/>
+	<Widget Width="200" Height="20" Background="SeaGreen"/>
+	<Widget Width="200" Height="20" Background="MediumSeaGreen"/>
+	<Widget Width="200" Height="20" Background="DarkSlateGrey"/>
+	<Widget Width="200" Height="20" Background="RoyalBlue"/>
+	<Widget Width="200" Height="20" Background="SteelBlue"/>
+	<Widget Width="200" Height="20" Background="CornflowerBlue"/>
+	<Widget Width="200" Height="20" Background="Brown"/>	
+	<Widget Width="200" Height="20" Background="FireBrick"/>
 </VerticalStack>

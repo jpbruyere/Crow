@@ -61,7 +61,7 @@ namespace Crow
 				Dimensions = sp.Dims;
 				return;
 			}
-			using (Stream stream = Interface.StaticGetStreamFromPath (Path)) {
+			using (Stream stream = Interface.GetStreamFromPath (Path)) {
 				using (MemoryStream ms = new MemoryStream ()) {
 					stream.CopyTo (ms);
 

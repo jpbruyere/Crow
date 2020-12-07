@@ -1,0 +1,9 @@
+﻿<?xml version="1.0"?>
+<Window Width="400" Height="240">
+	<Template>
+		<Group >
+			<Shape StrokeWidth="1" Foreground="0.1,0.3,0.7,0.7" KeepProportions="false" Size="100,60" Path="M 5.5,15 L 15,5 L 95.5,5.5 L 95.5,50 L 70,55.5 L 5.5,55.5 Z g O 1,1,1,1 S 0.25 G"/>
+
+		</Group>
+	</Template>
+</Window>

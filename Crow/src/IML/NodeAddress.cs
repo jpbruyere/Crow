@@ -1,28 +1,6 @@
-﻿//
-// NodeAddress.cs
+﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.Collections.Generic;
@@ -83,30 +61,30 @@ namespace Crow.IML
 		/// </summary>
 		public BindingDefinition GetBindingDef(string sourceMember, string expression){
 			BindingDefinition bindingDef = new BindingDefinition(this, sourceMember);
-			if (string.IsNullOrEmpty (expression)) {
+			if (string.IsNullOrEmpty (expression)) 
 				return bindingDef;
-			} else {
-				if (expression.StartsWith ("²", StringComparison.Ordinal)) {
-					bindingDef.TwoWay = true;
-					expression = expression.Substring (1);
-				}
 
-				string exp = expression;
-				bindingDef.TargetNA = this.ResolveExpression (ref exp);
-
-				string [] bindTrg = exp.Split ('.');
-
-				if (bindTrg.Length == 0)
-					throw new Exception ("invalid binding expression: " + expression);
-				if (bindTrg.Length == 1)
-					bindingDef.TargetMember = bindTrg [0];
-				else {
-					if (!string.IsNullOrEmpty(bindTrg[0]))//searchByName
-						bindingDef.TargetName = bindTrg[0];
-
-					bindingDef.TargetMember = exp.Substring (bindTrg[0].Length + 1);
-				}
+			if (expression.StartsWith ("²", StringComparison.Ordinal)) {
+				bindingDef.TwoWay = true;
+				expression = expression.Substring (1);
 			}
+
+			string exp = expression;
+			bindingDef.TargetNA = this.ResolveExpression (ref exp);
+
+			string [] bindTrg = exp.Split ('.');
+
+			if (bindTrg.Length == 0)
+				throw new Exception ("invalid binding expression: " + expression);
+			if (bindTrg.Length == 1)
+				bindingDef.TargetMember = bindTrg [0];
+			else {
+				if (!string.IsNullOrEmpty(bindTrg[0]))//searchByName
+					bindingDef.TargetName = bindTrg[0];
+
+				bindingDef.TargetMember = exp.Substring (bindTrg[0].Length + 1);
+			}
+			
 
 			return bindingDef;
 		}

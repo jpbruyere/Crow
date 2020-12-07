@@ -15,8 +15,8 @@ namespace Crow
 	public class Scroller : Container
 	{
 		#region CTOR
-		protected Scroller () : base(){}
-		public Scroller (Interface iface) : base(iface){}
+		protected Scroller () {}
+		public Scroller (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		//public event EventHandler<ScrollingEventArgs> Scrolled;
@@ -48,7 +48,7 @@ namespace Crow
 
 				scrollX = newS;
 
-				NotifyValueChanged ("ScrollX", scrollX);
+				NotifyValueChangedAuto (scrollX);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -71,7 +71,7 @@ namespace Crow
 
 				scrollY = newS;
 
-				NotifyValueChanged ("ScrollY", scrollY);
+				NotifyValueChangedAuto (scrollY);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -91,7 +91,7 @@ namespace Crow
 				if (scrollX > maxScrollX)
 					ScrollX = maxScrollX;
 
-				NotifyValueChanged ("MaxScrollX", maxScrollX);
+				NotifyValueChangedAuto (maxScrollX);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -112,7 +112,7 @@ namespace Crow
 				if (scrollY > maxScrollY)
 					ScrollY = maxScrollY;
 
-				NotifyValueChanged ("MaxScrollY", maxScrollY);
+				NotifyValueChangedAuto (maxScrollY);
 				RegisterForGraphicUpdate ();
 			}
 		}
@@ -126,7 +126,7 @@ namespace Crow
 
 				scrollSpeed = value;
 
-				NotifyValueChanged ("ScrollSpeed", scrollSpeed);
+				NotifyValueChangedAuto (scrollSpeed);
 			}
 		}
 		#endregion

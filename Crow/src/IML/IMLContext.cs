@@ -221,24 +221,5 @@ namespace Crow.IML
 			il.Emit (OpCodes.Call, CompilerServices.miCreateDel);
 			il.Emit (OpCodes.Callvirt, bd.SourceEvent.AddMethod);//call add event
 		}
-//		public void emitHandlerMethodAddition(EventBinding bd){
-//			//fetch source instance with address for handler addition (as 1st arg of handler.add)
-//			il.Emit (OpCodes.Ldloc_0);//push root
-//			CompilerServices.emitGetInstance (il, bd.SourceNA);
-//
-//			//load handlerType of sourceEvent to create handler delegate (1st arg)
-//			il.Emit (OpCodes.Ldtoken, bd.SourceEvent.EventHandlerType);
-//			il.Emit (OpCodes.Call, CompilerServices.miGetTypeFromHandle);
-//			//load target the where the method is defined (2nd arg)
-//			il.Emit (OpCodes.Ldloc_0);
-//			CompilerServices.emitGetInstance (il, bd.TargetNA);
-//			//load methodInfo (3rd arg)
-//			il.Emit (OpCodes.Ldstr, bd.TargetMember);
-//
-//			il.Emit (OpCodes.Callvirt, CompilerServices.miCreateDel);
-//
-//			il.Emit (OpCodes.Callvirt, bd.SourceEvent.AddMethod);//call add event
-//		}
-//
 	}
 }

@@ -1,42 +1,19 @@
-﻿//
-// SaturationValueSelector.cs
+﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using Crow.Cairo;
-using System.Xml.Serialization;
 
 namespace Crow
 {
 	[DesignIgnore]
 	public class SaturationValueSelector : ColorSelector
 	{
-		public SaturationValueSelector () : base(){}
-		public SaturationValueSelector (Interface iface) : base(iface)
-		{
-		}
+		#region CTOR
+		public SaturationValueSelector () {}
+		public SaturationValueSelector (Interface iface, string style = null) : base (iface, style) { }
+		#endregion
 
 		double v, s;
 				
@@ -46,7 +23,7 @@ namespace Crow
 				if (v == value)
 					return;
 				v = value;
-				NotifyValueChanged ("V", v);
+				NotifyValueChangedAuto (v);
 				mousePos.Y = (int)Math.Floor((1.0-v) * (double)ClientRectangle.Height);
 
 				RegisterForRedraw ();
@@ -59,7 +36,7 @@ namespace Crow
 				if (s == value)
 					return;
 				s = value;
-				NotifyValueChanged ("S", s);
+				NotifyValueChangedAuto (s);
 				mousePos.X = (int)Math.Floor(s * (double)ClientRectangle.Width);
 
 				RegisterForRedraw ();
@@ -92,10 +69,10 @@ namespace Crow
 
 
 			gr.Arc (mousePos.X, mousePos.Y, 3.5, 0, Math.PI * 2.0);
-			gr.SetSourceColor (Color.Black);
+			gr.SetSource (Colors.Black);
 			gr.LineWidth = 2.0;
 			gr.StrokePreserve ();
-			gr.SetSourceColor (Color.White);
+			gr.SetSource (Colors.White);
 			gr.LineWidth = 1.0;
 			gr.Stroke ();
 		}
