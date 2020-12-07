@@ -189,9 +189,9 @@ namespace Crow
 						this.onDraw (ctx);
 					else {
 						if (LastPaintedSlot.Width>LastPaintedSlot.Height)
-							ctx.SetSourceSurface (bmp, 0, (LastPaintedSlot.Width-LastPaintedSlot.Height)/2);
+							ctx.SetSource (bmp, 0, (LastPaintedSlot.Width-LastPaintedSlot.Height)/2);
 						else
-							ctx.SetSourceSurface (bmp, (LastPaintedSlot.Height-LastPaintedSlot.Width)/2, 0);
+							ctx.SetSource (bmp, (LastPaintedSlot.Height-LastPaintedSlot.Width)/2, 0);
 
 						ctx.Paint ();
 					}

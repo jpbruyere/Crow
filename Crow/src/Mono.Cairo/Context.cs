@@ -340,7 +340,7 @@ namespace Crow.Cairo {
 		}
 
 		//[Obsolete ("Use SetSource method (with double parameters)")]
-		public void SetSourceSurface (Surface source, int x, int y)
+		public void SetSource (Surface source, int x = 0, int y = 0)
 		{
 			NativeMethods.cairo_set_source_surface (handle, source.Handle, x, y);
 		}
@@ -861,7 +861,7 @@ namespace Crow.Cairo {
 
 		public void ShowText(string str)
 		{
-			NativeMethods.cairo_show_text (handle, str);
+			NativeMethods.cairo_show_text (handle, TerminateUtf8 (str));
 		}
 
 

@@ -155,7 +155,7 @@ namespace Crow.IML {
 		Delegate templateBinding;
 
 #if DESIGN_MODE
-		public List<DynamicMethod> DsValueChangedDynMeths =>dsValueChangedDynMeths;
+		public List<DynamicMethod> DsValueChangedDynMeths => dsValueChangedDynMeths;
 		public List<Delegate> CachedDelegates => cachedDelegates;
 		/// <summary>
 		/// store indices of template delegate to be handled by root parentChanged event

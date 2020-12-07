@@ -314,6 +314,8 @@ namespace Crow
 		public static string CROW_CONFIG_ROOT;
 		/// <summary>If true, mouse focus is given when mouse is over control</summary>
 		public static bool FOCUS_ON_HOVER = false;
+		/// <summary>If true, newly focused window will be put on top</summary>
+		public static bool RAISE_WIN_ON_FOCUS = true;
 		/// <summary> Threshold to catch borders for sizing </summary>
 		public static int BorderThreshold = 3;
 		/// <summary> delay before tooltip appears </summary>
@@ -354,6 +356,9 @@ namespace Crow
 		//public event EventHandler<MouseCursorChangedEventArgs> MouseCursorChanged;
 		////public event EventHandler Quit;
 		public event EventHandler Initialized;
+
+		public event EventHandler StartDragOperation;
+		public event EventHandler EndDragOperation;
 		//public event EventHandler<MouseWheelEventArgs> MouseWheelChanged;
 		//public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
 		//public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
@@ -507,7 +512,10 @@ namespace Crow
 			return stream != null;
 		}
 
-		public static Stream GetStreamFromPath (string path)
+		public delegate Stream GetStreamFromPathDelegate (string path);
+		public static GetStreamFromPathDelegate GetStreamFromPath = _getStreamFromPath;
+
+		static Stream _getStreamFromPath (string path)
 		{
 			if (path.StartsWith ("#", StringComparison.Ordinal)) {
 				Stream stream = null;
@@ -618,8 +626,8 @@ namespace Crow
 
 				_activeWidget = value;
 
+				NotifyValueChanged ("ActiveWidget", _activeWidget);
 #if DEBUG_LOG
-				NotifyValueChanged("ActiveWidget", _activeWidget);
 				DbgLogger.AddEvent (DbgEvtType.ActiveWidget, _activeWidget);
 #endif
 
@@ -640,8 +648,8 @@ namespace Crow
 
 				_hoverWidget = value;
 
+				NotifyValueChanged ("HoverWidget", _hoverWidget);
 #if DEBUG_LOG
-				NotifyValueChanged("HoverWidget", _hoverWidget);
 				DbgLogger.AddEvent (DbgEvtType.HoverWidget, _hoverWidget);
 #endif
 
@@ -669,8 +677,9 @@ namespace Crow
 				if (_focusedWidget != null)
 					_focusedWidget.HasFocus = false;
 				_focusedWidget = value;
-#if DEBUG_LOG
-				NotifyValueChanged("FocusedWidget", _focusedWidget);
+
+				NotifyValueChanged ("FocusedWidget", _focusedWidget);
+#if DEBUG_LOG				
 				DbgLogger.AddEvent (DbgEvtType.FocusedWidget, _focusedWidget);
 #endif
 				if (_focusedWidget != null)
@@ -823,7 +832,7 @@ namespace Crow
 							DragImageY = MousePosition.Y - DragImageHeight / 2;
 							ctx.Save ();
 							ctx.ResetClip ();
-							ctx.SetSourceSurface (DragImage, DragImageX, DragImageY);
+							ctx.SetSource (DragImage, DragImageX, DragImageY);
 							ctx.PaintWithAlpha (0.8);
 							ctx.Restore ();
 							DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
@@ -972,11 +981,31 @@ namespace Crow
 		/// when window resize event occurs. 
 		/// </summary>
 		/// <param name="bounds">bounding box of the interface</param>
-		public virtual void ProcessResize(Rectangle bounds){
+		public virtual void ProcessResize(Rectangle bounds){			
 			lock (UpdateMutex) {
 				clientRectangle = bounds;
 
-				surf.SetSize (clientRectangle.Width, clientRectangle.Height);
+				switch (Environment.OSVersion.Platform) {
+				case PlatformID.MacOSX:
+					break;
+				case PlatformID.Unix:
+					surf.SetSize (clientRectangle.Width, clientRectangle.Height);
+					break;
+				case PlatformID.Win32NT:
+				case PlatformID.Win32S:
+				case PlatformID.Win32Windows:
+					if (ownWindow) {
+						surf.Dispose ();
+						IntPtr hWin32 = Glfw3.GetWin32Window (hWin);
+						IntPtr hdc = Glfw3.GetWin32DC (hWin32);
+						surf = new Win32Surface (hdc);
+					}else
+						surf.SetSize (clientRectangle.Width, clientRectangle.Height);
+					break;
+				case PlatformID.Xbox:
+				case PlatformID.WinCE:
+					throw new PlatformNotSupportedException ("Unable to create cairo surface.");
+				}
 
 				foreach (Widget g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
@@ -1085,41 +1114,42 @@ namespace Crow
 				//MouseCursorChanged.Raise (this,new MouseCursorChangedEventArgs(cursor));
 			}
 		}
-
-		uint stickyMouse = 0;
-		Point stickyMousePos = default;
-		internal void SetStickyMouse (uint threshold = 5)
-		{
-			stickyMouse = threshold;
-			stickyMousePos = MousePosition;
-		}
+		
+		Point stickyMouseDelta = default;
+		internal Widget stickedWidget = null;
 
 		/// <summary>Processes mouse move events from the root container, this function
 		/// should be called by the host on mouse move event to forward events to crow interfaces</summary>
 		/// <returns>true if mouse is in the interface</returns>
 		public virtual bool OnMouseMove (int x, int y)
-		{
-
-			if (stickyMouse>0) {
-				if (Math.Abs(x - stickyMousePos.X) < stickyMouse && Math.Abs(y - stickyMousePos.Y) < stickyMouse)
-					return true;
-				stickyMouse = 0;
-			}
+		{			
 			int deltaX = x - MousePosition.X;
 			int deltaY = y - MousePosition.Y;
+
+			if (stickedWidget != null && _activeWidget == null) {
+				stickyMouseDelta.X += deltaX;
+				stickyMouseDelta.Y += deltaY;				
+
+				if (Math.Abs (stickyMouseDelta.X) > stickedWidget.StickyMouse || Math.Abs (stickyMouseDelta.Y) > stickedWidget.StickyMouse) {
+					stickedWidget = null;
+					stickyMouseDelta = default;
+				} else {
+					Glfw3.SetCursorPosition (hWin, MousePosition.X, MousePosition.Y);
+					return true;
+				}
+			}
 
 			MousePosition = new Point (x, y);
 			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
 
-			if (ActiveWidget != null && DragAndDropOperation == null) {
+			if (DragAndDropOperation != null)//drag source cant have hover event, so move has to be handle here
+				DragAndDropOperation.DragSource.onMouseMove (this, e);
+			else if (ActiveWidget != null) {
 				//TODO, ensure object is still in the graphic tree
 				//send move evt even if mouse move outside bounds
 				_activeWidget.onMouseMove (this, e);
 				return true;
 			}
-
-			if (DragAndDropOperation != null)//drag source cant have hover event, so move has to be handle here
-				DragAndDropOperation.DragSource.onMouseMove (this, e);
 
 			if (_hoverWidget != null) {
 				resetTooltip ();
@@ -1177,8 +1207,11 @@ namespace Crow
 					Widget g = GraphicTree [i];
 					if (g.MouseIsIn (e.Position)) {
 						g.checkHoverWidget (e);
-						if (g is Window)
-							PutOnTop (g);
+						if (g is Window && FOCUS_ON_HOVER && g.Focusable) {
+							FocusedWidget = g;
+							if (RAISE_WIN_ON_FOCUS)
+								PutOnTop (g);
+						}
 						_hoverWidget.onMouseMove (_hoverWidget, e);
 						return true;
 					}

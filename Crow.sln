@@ -8,7 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "global", "global", "{728545
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crow", "Crow\Crow.csproj", "{C2980F9B-4798-4C05-99E2-E174810F7C7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crow", "Crow\Crow.csproj", "{C2980F9B-4798-4C05-99E2-E174810F7C7B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}"
 	ProjectSection(SolutionItems) = preProject
@@ -27,7 +27,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BasicTests", "Samples\Basic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerfTests", "Samples\PerfTests\PerfTests.csproj", "{18EBB41F-815E-4BF5-B80F-C9E2FAB2993A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugLogAnalyzer", "Samples\DebugLogAnalyzer\DebugLogAnalyzer.csproj", "{7915538F-B2B1-414C-95A3-1FC58E3286B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DebugLogAnalyzer", "Samples\DebugLogAnalyzer\DebugLogAnalyzer.csproj", "{7915538F-B2B1-414C-95A3-1FC58E3286B9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dragNdrop", "Samples\dragNdrop\dragNdrop.csproj", "{6E361E34-D266-4BEB-97F4-E209E01C6246}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dockableWindows", "Samples\dockableWindows\dockableWindows.csproj", "{E19FD3DB-902A-4C99-8BF0-5ACAFFE35608}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,6 +69,14 @@ Global
 		{7915538F-B2B1-414C-95A3-1FC58E3286B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7915538F-B2B1-414C-95A3-1FC58E3286B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7915538F-B2B1-414C-95A3-1FC58E3286B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E361E34-D266-4BEB-97F4-E209E01C6246}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E361E34-D266-4BEB-97F4-E209E01C6246}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E361E34-D266-4BEB-97F4-E209E01C6246}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E361E34-D266-4BEB-97F4-E209E01C6246}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E19FD3DB-902A-4C99-8BF0-5ACAFFE35608}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E19FD3DB-902A-4C99-8BF0-5ACAFFE35608}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E19FD3DB-902A-4C99-8BF0-5ACAFFE35608}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E19FD3DB-902A-4C99-8BF0-5ACAFFE35608}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +88,8 @@ Global
 		{7AEB6DD5-916E-4415-84E1-78EC6E5881CE} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{18EBB41F-815E-4BF5-B80F-C9E2FAB2993A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{7915538F-B2B1-414C-95A3-1FC58E3286B9} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
+		{6E361E34-D266-4BEB-97F4-E209E01C6246} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
+		{E19FD3DB-902A-4C99-8BF0-5ACAFFE35608} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00D4E149-7131-49F4-BAAD-559AA961A78E}

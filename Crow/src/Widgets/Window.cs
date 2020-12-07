@@ -33,7 +33,7 @@ namespace Crow
 		Rectangle savedBounds;
 		bool _minimized = false;
 
-		Direction currentDirection = Direction.None;
+		protected Direction currentDirection = Direction.None;
 
 		#region Events
 		public event EventHandler Closing;
@@ -63,13 +63,19 @@ namespace Crow
 			sizingHandle = child?.FindByName ("SizeHandle");
 
 			if (sizingHandle == null)
-				return;
-			sizingHandle.MouseEnter += (arg1, arg2) => IFace.SetStickyMouse(5);
+				return;			
+            //sizingHandle.Unhover += (arg1, arg2) => currentDirection = Direction.None;
+            sizingHandle.Unhover += SizingHandle_Unhover;
 		}
-		#endregion
 
-		#region public properties
-		[DefaultValue("#Crow.Icons.crow.svg")]
+        private void SizingHandle_Unhover (object sender, EventArgs e) {
+			currentDirection = Direction.None;
+			NotifyValueChanged ("CurDir", currentDirection);
+		}
+        #endregion
+
+        #region public properties
+        [DefaultValue("#Crow.Icons.crow.svg")]
 		public string Icon {
 			get { return _icon; } 
 			set {
@@ -159,7 +165,7 @@ namespace Crow
 		/// <param name="XDelta">mouse delta on the X axis</param>
 		/// <param name="YDelta">mouse delta on the Y axis</param>
 		/// <param name="currentDirection">Current Direction of the operation, none for moving, other value for resizing in the given direction</param>
-		public void MoveAndResize (int XDelta, int YDelta, Direction currentDirection = (Direction)0) {
+		protected void moveAndResize (int XDelta, int YDelta, Direction currentDirection = (Direction)0) {
 			int currentLeft = this.Left;
 			int currentTop = this.Top;
 			int currentWidth, currentHeight;
@@ -238,11 +244,9 @@ namespace Crow
 		{
 			base.onMouseMove (sender, e);
 
-			Interface otkgw = IFace;
-
 			if (maySize || mayMove) {
 				if (grabMouse) {
-					MoveAndResize (e.XDelta, e.YDelta, currentDirection);
+					moveAndResize (e.XDelta, e.YDelta, currentDirection);
 					return;
 				}
 			}else
@@ -276,50 +280,54 @@ namespace Crow
 
 			switch (currentDirection) {
 			case Direction.None:
-				otkgw.MouseCursor = MouseCursor.move;
+				IFace.MouseCursor = MouseCursor.move;
 				break;
 			case Direction.N:
-				otkgw.MouseCursor = MouseCursor.top_side;
+				IFace.MouseCursor = MouseCursor.top_side;
 				break;
 			case Direction.S:
-				otkgw.MouseCursor = MouseCursor.bottom_side;
+				IFace.MouseCursor = MouseCursor.bottom_side;
 				break;
 			case Direction.E:
-				otkgw.MouseCursor = MouseCursor.right_side;
+				IFace.MouseCursor = MouseCursor.right_side;
 				break;
 			case Direction.W:
-				otkgw.MouseCursor = MouseCursor.left_side;
+				IFace.MouseCursor = MouseCursor.left_side;
 				break;
 			case Direction.NW:
-				otkgw.MouseCursor = MouseCursor.top_left_corner;
+				IFace.MouseCursor = MouseCursor.top_left_corner;
 				break;
 			case Direction.NE:
-				otkgw.MouseCursor = MouseCursor.top_right_corner;
+				IFace.MouseCursor = MouseCursor.top_right_corner;
 				break;
 			case Direction.SW:
-				otkgw.MouseCursor = MouseCursor.bottom_left_corner;
+				IFace.MouseCursor = MouseCursor.bottom_left_corner;
 				break;
 			case Direction.SE:
-				otkgw.MouseCursor = MouseCursor.bottom_right_corner;
+				IFace.MouseCursor = MouseCursor.bottom_right_corner;
 				break;
 			}
-							
+			NotifyValueChanged ("CurDir", currentDirection);
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseLeave (sender, e);
 			currentDirection = Direction.None;
 			IFace.MouseCursor = MouseCursor.top_left_arrow;
+			NotifyValueChanged ("CurDir", currentDirection);
 		}
 		bool grabMouse;
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
+			NotifyValueChanged ("GrabMouse", true);
 			grabMouse = true;
 			e.Handled = true;
 			base.onMouseDown (sender, e);
 		}
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{
+			NotifyValueChanged ("GrabMouse", false);
+			NotifyValueChanged ("CurDir", currentDirection);
 			grabMouse = false;
 			e.Handled = true;
 			base.onMouseUp (sender, e);

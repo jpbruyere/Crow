@@ -71,6 +71,7 @@ namespace Crow
 
 		Rectangle rIn = default(Rectangle);
 		double dockThresh = 0.2;
+		const int dockWidthDivisor = 8;
 		Widget focusedChild;
 		internal Widget stretchedChild;
 
@@ -113,33 +114,33 @@ namespace Crow
 					rIn = cb;
 
 					if (Orientation == Orientation.Horizontal || Children.Count == 1) {
-						if (lm.Y > cb.Top + cb.Height / 3 && lm.Y < cb.Bottom - cb.Height / 3) {
-							if (lm.X < cb.Left + cb.Width / 3)
+						if (lm.Y > cb.Top + cb.Height / dockWidthDivisor && lm.Y < cb.Bottom - cb.Height / dockWidthDivisor) {
+							if (lm.X < cb.Left + cb.Width / dockWidthDivisor)
 								dw.DockingPosition = Alignment.Left;
-							else if (lm.X > cb.Right - cb.Width / 3)
+							else if (lm.X > cb.Right - cb.Width / dockWidthDivisor)
 								dw.DockingPosition = Alignment.Right;							
 						} else {
 							getFocusedChild (lm);
 							if (focusedChild != null) {
-								if (lm.Y < rIn.Top + rIn.Height / 3)
+								if (lm.Y < rIn.Top + rIn.Height / dockWidthDivisor)
 									dw.DockingPosition = Alignment.Top;
-								else if (lm.Y > rIn.Bottom - rIn.Height / 3)
+								else if (lm.Y > rIn.Bottom - rIn.Height / dockWidthDivisor)
 									dw.DockingPosition = Alignment.Bottom;										
 							}
 						}
 					}
 					if (Orientation == Orientation.Vertical || Children.Count == 1) {
-						if (lm.X > cb.Left + cb.Width / 3 && lm.X < cb.Right - cb.Width / 3) {
-							if (lm.Y < cb.Top + cb.Height / 3)
+						if (lm.X > cb.Left + cb.Width / dockWidthDivisor && lm.X < cb.Right - cb.Width / dockWidthDivisor) {
+							if (lm.Y < cb.Top + cb.Height / dockWidthDivisor)
 								dw.DockingPosition = Alignment.Top;
-							else if (lm.Y > cb.Bottom - cb.Height / 3)
+							else if (lm.Y > cb.Bottom - cb.Height / dockWidthDivisor)
 								dw.DockingPosition = Alignment.Bottom;							
 						} else {
 							getFocusedChild (lm);
 							if (focusedChild != null) {
-								if (lm.X < rIn.Left + rIn.Width / 3)
+								if (lm.X < rIn.Left + rIn.Width / dockWidthDivisor)
 									dw.DockingPosition = Alignment.Left;
-								else if (lm.X > rIn.Right - rIn.Width / 3)
+								else if (lm.X > rIn.Right - rIn.Width / dockWidthDivisor)
 									dw.DockingPosition = Alignment.Right;										
 							}
 						}

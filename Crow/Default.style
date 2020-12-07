@@ -124,7 +124,9 @@ Slider {
 }
 Splitter {
 	Focusable = "true";
-	Margin = "1";
+	Margin = "0";
+	StickyMouseEnabled="true";
+	StickyMouse="10";
 	Background = "Grey";
 }
 
@@ -175,7 +177,8 @@ Docker {
 	Focusable="true";
 }
 DockStack {
-	Margin="1";
+	Margin="2";
+	Spacing="2";
 	AllowDrop = "true";
 	Focusable="true";
 	//DragEnter="{Background=Blue}";

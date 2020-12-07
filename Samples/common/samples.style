@@ -67,3 +67,6 @@ valignStyle2 {
 	//Initialized="GetDrawModeIcon";
 	//Initialized="{Background=Blue}";
 }
+smallLabel {
+	Font="consolas, 8";
+}

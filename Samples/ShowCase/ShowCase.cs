@@ -16,6 +16,7 @@ namespace ShowCase
 	{
 		static void Main ()
 		{
+			Environment.SetEnvironmentVariable ("FONTCONFIG_PATH", @"C:\Users\Jean-Philippe\source\vcpkg\installed\x64-windows\tools\fontconfig\fonts");
 			using (Showcase app = new Showcase ()) 
 				app.Run ();
 		}
@@ -47,6 +48,7 @@ namespace ShowCase
 			set {
 				if (source == value)
 					return;
+
 				source = value;
 				reloadFromSource ();
 				CMDSave.CanExecute = source != origSource;
@@ -82,7 +84,7 @@ namespace ShowCase
 		}
 
 		public new bool IsDirty {
-			get => origSource != source;
+			get => !string.Equals(origSource, source);
 		}
 		void onSave ()
 		{

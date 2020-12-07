@@ -1,6 +1,6 @@
 <Project>
 	<PropertyGroup>
-		<TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
+		<TargetFrameworks>netcoreapp3.1</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		
 		<SolutionDir>$(MSBuildThisFileDirectory)..\</SolutionDir>

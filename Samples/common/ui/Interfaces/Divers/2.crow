@@ -2,12 +2,13 @@
 <VerticalStack Fit="true">
 	<TextBox Font="droid, 20" Text="test text box" Width="Stretched"/>
 	<HorizontalStack Margin="5" Fit="true" MouseEnter="{Background=White}" MouseLeave="{Background=Transparent}">
+		<Label Text="left" Width="80" Height="30" Background="DarkBlue" TextAlignment="Left"/>
 		<Label Text="centered" Width="80" Height="30" Background="DarkBlue" TextAlignment="Center"/>
 		<Label Text="top left" Width="80" Height="30" Background="DarkBlue" TextAlignment="TopLeft"/>
 		<Label Text="top right" Width="80" Height="30" Background="DarkBlue" TextAlignment="TopRight"/>
-		<Label Text="right center" Width="80" Height="30" Background="DarkBlue" TextAlignment="Right"/>
+		<Label Text="right" Width="80" Height="30" Background="DarkBlue" TextAlignment="Right"/>
 		<Label Text="bottom left" Width="80" Height="30" Background="DarkBlue" TextAlignment="BottomLeft"/>
-		<Label Text="bottom center" Width="80" Height="30" Background="DarkBlue" TextAlignment="Bottom"/>
+		<Label Text="bottom" Width="80" Height="30" Background="DarkBlue" TextAlignment="Bottom"/>
 		<Label Text="bottom right" Width="80" Height="30" Background="DarkBlue" TextAlignment="BottomRight"/>
 	</HorizontalStack>
 </VerticalStack>

@@ -752,7 +752,7 @@ namespace Crow.Cairo
 		internal static extern void cairo_show_page (IntPtr cr);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern void cairo_show_text (IntPtr cr, string text);
+		internal static extern void cairo_show_text (IntPtr cr, byte[] text);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern Status cairo_status (IntPtr cr);

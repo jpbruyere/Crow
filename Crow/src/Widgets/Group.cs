@@ -350,7 +350,7 @@ namespace Crow
 			}
 			gr.Dispose ();
 
-			ctx.SetSourceSurface (bmp, rb.X, rb.Y);
+			ctx.SetSource (bmp, rb.X, rb.Y);
 			ctx.Paint ();
 
 			Clipping.Dispose();

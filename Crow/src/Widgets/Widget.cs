@@ -121,9 +121,9 @@ namespace Crow
 					this.onDraw (ctx);
 				else {
 					if (LastPaintedSlot.Width>LastPaintedSlot.Height)
-						ctx.SetSourceSurface (bmp, 0, (LastPaintedSlot.Width-LastPaintedSlot.Height)/2);
+						ctx.SetSource (bmp, 0, (LastPaintedSlot.Width-LastPaintedSlot.Height)/2);
 					else
-						ctx.SetSourceSurface (bmp, (LastPaintedSlot.Height-LastPaintedSlot.Width)/2, 0);
+						ctx.SetSource (bmp, (LastPaintedSlot.Height-LastPaintedSlot.Width)/2, 0);
 					ctx.Paint ();
 				}
 			}
@@ -278,6 +278,8 @@ namespace Crow
 		bool isActive;
 		bool isHover;
 		bool mouseRepeat;
+		bool stickyMouseEnabled;
+		int stickyMouse;
 		MouseCursor mouseCursor = MouseCursor.top_left_arrow;
 		protected bool isVisible = true;
 		bool isEnabled = true;
@@ -449,11 +451,11 @@ namespace Crow
 		public event EventHandler Focused;
 		/// <summary>Occurs when this object loose focus</summary>
 		public event EventHandler Unfocused;
-		/// <summary>Occurs when mouse is over</summary>
+		/// <summary>Occurs when this widget is hovered by the mouse</summary>
 		public event EventHandler Hover;
-		/// <summary>Occurs when this control is no longer the Hover one</summary>
-		//public event EventHandler UnHover;
-		/// <summary>Occurs when this object loose focus</summary>
+		/// <summary>Occurs when this widget is no longuer the hover one</summary>
+		public event EventHandler Unhover;
+		/// <summary>Occurs when this widget is enabled</summary>
 		public event EventHandler Enabled;
 		/// <summary>Occurs when the enabled state this object is set to false</summary>
 		public event EventHandler Disabled;
@@ -737,10 +739,16 @@ namespace Crow
 				if (value == isHover)
 					return;
 
+				if (isHover & !value)
+					Unhover.Raise (this, null);
+
 				isHover = value;
 
-				if (isHover)
+				if (isHover) {
+					if (stickyMouseEnabled && stickyMouse > 0) 
+						IFace.stickedWidget = this;											
 					Hover.Raise (this, null);
+				}
 
 				NotifyValueChangedAuto (isHover);
 			}
@@ -758,6 +766,32 @@ namespace Crow
 				NotifyValueChangedAuto (mouseRepeat);
 			}
 		}
+		/// <summary>
+		/// When StickyMouse value is greater than zero and StickyMouseEnabled is true, mouse will be sticked over the widget
+		/// until x or y delta is greater than the StickyMouse value. This is usefulle for very thin (1 pixel) border that need to
+		/// be grabbed with the mouse.
+		/// </summary>
+		public virtual int StickyMouse {
+			get => stickyMouse;
+			set {
+				if (stickyMouse == value)
+					return;
+				stickyMouse = value;
+				NotifyValueChangedAuto (stickyMouse);
+            }
+        }
+		/// <summary>
+		/// Boolean for enabling or not the sticky mouse mechanic
+		/// </summary>
+		public virtual bool StickyMouseEnabled {
+			get => stickyMouseEnabled;
+			set {
+				if (stickyMouseEnabled == value)
+					return;
+				stickyMouseEnabled = value;
+				NotifyValueChangedAuto (stickyMouseEnabled);
+            }
+        }
 		/// <summary>
 		/// Determine Cursor when mouse is Hover.
 		/// </summary>
@@ -1347,8 +1381,9 @@ namespace Crow
 		/// </summary>
 		protected virtual void onStartDrag (object sender, DragDropEventArgs e){
 			IFace.HoverWidget = null;
+			IFace.DragAndDropOperation = new DragDropEventArgs (this);
 			IsDragged = true;
-			StartDrag.Raise (this, e);
+			StartDrag.Raise (this, IFace.DragAndDropOperation);
 			#if DEBUG_DRAGNDROP
 			Debug.WriteLine(this.ToString() + " : START DRAG => " + e.ToString());
 			#endif
@@ -1807,7 +1842,7 @@ namespace Crow
 				ctx.Operator = Operator.Over;
 			}
 
-			ctx.SetSourceSurface (bmp, rb.X, rb.Y);
+			ctx.SetSource (bmp, rb.X, rb.Y);
 			ctx.Paint ();
 			Clipping.Dispose ();
 			Clipping = new Region ();
@@ -1935,10 +1970,8 @@ namespace Crow
 		public virtual void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			if (allowDrag & hasFocus & IFace.IsDown(MouseButton.Left)) {
-				if (IFace.DragAndDropOperation == null) {
-					IFace.DragAndDropOperation = new DragDropEventArgs (this);
-					onStartDrag (this, IFace.DragAndDropOperation);
-				}
+				if (IFace.DragAndDropOperation == null)		
+					onStartDrag (this, IFace.DragAndDropOperation);				
 			}
 
 			//dont bubble event if dragged, mouse move is routed directely from iface
@@ -2005,7 +2038,7 @@ namespace Crow
 		}
 		public virtual void onMouseEnter(object sender, MouseMoveEventArgs e)
 		{
-			IFace.MouseCursor = MouseCursor;
+			IFace.MouseCursor = MouseCursor;			
 
 			if (IFace.DragAndDropOperation != null) {
 				Widget g = this;
@@ -2025,7 +2058,10 @@ namespace Crow
 			MouseEnter.Raise (this, e);
 		}
 		public virtual void onMouseLeave(object sender, MouseMoveEventArgs e)
-		{
+		{			
+			if (IFace.DragAndDropOperation?.DropTarget == this)
+				IFace.DragAndDropOperation.DropTarget.onDragLeave (this, IFace.DragAndDropOperation);
+			
 			MouseLeave.Raise (this, e);
 		}
 

@@ -125,7 +125,7 @@ namespace Crow
 
 					using (ImageSurface imgSurf = new ImageSurface (image, Format.Argb32, 
 						Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) {
-						gr.SetSourceSurface (imgSurf, 0,0);
+						gr.SetSource (imgSurf, 0,0);
 						gr.Paint ();
 					}
 				}
@@ -166,7 +166,7 @@ namespace Crow
 			
 			using (ImageSurface imgSurf = new ImageSurface (image, Format.Argb32, 
 				Dimensions.Width, Dimensions.Height, 4 * Dimensions.Width)) {
-				gr.SetSourceSurface (imgSurf, 0,0);
+				gr.SetSource (imgSurf, 0,0);
 				gr.Paint ();
 			}
 			gr.Restore ();
