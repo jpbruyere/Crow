@@ -17,7 +17,7 @@ namespace Crow
 		/// </summary>
 		/// <param name="ctx">backend context</param>
 		/// <param name="bounds">paint operation bounding box, unused for SolidColor</param>
-		public abstract void SetAsSource (Context ctx, Rectangle bounds = default(Rectangle));
+		public abstract void SetAsSource (Interface iFace, Context ctx, Rectangle bounds = default(Rectangle));
 		public static object Parse (string s){
 			if (string.IsNullOrEmpty (s))
 				return null;

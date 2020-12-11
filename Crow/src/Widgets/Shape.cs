@@ -120,7 +120,7 @@ namespace Crow
 							readDouble (); readDouble (); readDouble (); readDouble ();
 							break;
 						}
-						gr.SetSourceRGBA (readDouble (), readDouble (), readDouble (), readDouble ());
+						gr.SetSource (readDouble (), readDouble (), readDouble (), readDouble ());
 						break;
 					default:
 						throw new Exception ("Invalid character in path string of Shape control");
@@ -223,7 +223,7 @@ namespace Crow
 			gr.Translate ((cr.Width / widthRatio - w) / 2, (cr.Height / heightRatio - h) / 2);
 
 			gr.LineWidth = strokeWidth;
-			Foreground.SetAsSource (gr, cr);
+			Foreground.SetAsSource (IFace, gr, cr);
 
 			using (PathParser parser = new PathParser (path))
 				parser.Draw (gr);

@@ -184,7 +184,7 @@ namespace Crow
 		{
 			Rectangle rBack = new Rectangle (Slot.Size);
 
-			Background.SetAsSource (gr, rBack);
+			Background.SetAsSource (IFace, gr, rBack);
 			CairoHelpers.CairoRectangle(gr,rBack, CornerRadius);
 			gr.Fill ();
 

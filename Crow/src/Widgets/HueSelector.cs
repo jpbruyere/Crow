@@ -91,7 +91,7 @@ namespace Crow
 			grad.Stops.Add (new Gradient.ColorStop (0.833, new Color (1, 0, 1, 1)));
 			grad.Stops.Add (new Gradient.ColorStop (1,     new Color (1, 0, 0, 1)));
 
-			grad.SetAsSource (gr, r);
+			grad.SetAsSource (IFace, gr, r);
 			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
 			gr.Fill();
 

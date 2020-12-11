@@ -135,13 +135,13 @@ namespace Crow
 
 
 
-			LowThresholdFill.SetAsSource (gr);
+			LowThresholdFill.SetAsSource (IFace, gr);
 			gr.MoveTo (r.Left, r.Bottom - LowThreshold * scaleY);
 			gr.LineTo (r.Right, r.Bottom - LowThreshold * scaleY);
 //			gr.Rectangle (r.Left, r.Bottom - LowThreshold * scaleY, r.Width, LowThreshold * scaleY);
 			gr.Stroke();
 
-			HighThresholdFill.SetAsSource (gr);
+			HighThresholdFill.SetAsSource (IFace, gr);
 			gr.MoveTo (r.Left, (Maximum - HighThreshold) * scaleY);
 			gr.LineTo (r.Right, (Maximum - HighThreshold) * scaleY);
 //			gr.Rectangle (r.Left, r.Top, r.Width, (Maximum - HighThreshold) * scaleY);
@@ -149,7 +149,7 @@ namespace Crow
 
 			gr.MoveTo (ptrX, values [i] * scaleY);
 
-			Foreground.SetAsSource (gr);
+			Foreground.SetAsSource (IFace, gr);
 			gr.SetDash (new double[]{ }, 0.0);
 
 			while (i >= 0) {

@@ -173,7 +173,7 @@ namespace Crow
 
 			Rectangle rBack = new Rectangle (Slot.Size);
 
-			Background.SetAsSource (gr, rBack);
+			Background.SetAsSource (IFace, gr, rBack);
 			CairoHelpers.CairoRectangle (gr, rBack, CornerRadius);
 			gr.Fill ();
 
@@ -226,9 +226,9 @@ namespace Crow
 					break;
 				}
 				gr.LineWidth = 1;
-				gr.SetSourceRGBA (0.4, 0.4, 0.9, 0.4);
+				gr.SetSource (0.4, 0.4, 0.9, 0.4);
 				gr.FillPreserve ();
-				gr.SetSourceRGBA (0.9, 0.9, 1.0, 0.8);
+				gr.SetSource (0.9, 0.9, 1.0, 0.8);
 				gr.Stroke ();
 			}
 			gr.Restore ();	

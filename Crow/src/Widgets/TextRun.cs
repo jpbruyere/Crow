@@ -267,7 +267,7 @@ namespace Crow
 						continue;
 					}
 
-					Foreground.SetAsSource (gr);
+					Foreground.SetAsSource (IFace, gr);
 					gr.MoveTo (rText.X, rText.Y + fe.Ascent + fe.Height * curLineCount);
 
 					gr.ShowText (ll);

@@ -1792,7 +1792,7 @@ namespace Crow
 
 			Rectangle rBack = new Rectangle (Slot.Size);
 
-			background.SetAsSource (gr, rBack);
+			background.SetAsSource (IFace, gr, rBack);
 			CairoHelpers.CairoRectangle (gr, rBack, cornerRadius);
 			gr.Fill ();
 
@@ -1908,7 +1908,7 @@ namespace Crow
 		}
 		void paintDisabled(Context gr, Rectangle rb){
 			gr.Operator = Operator.Xor;
-			gr.SetSourceRGBA (0.6, 0.6, 0.6, 0.3);
+			gr.SetSource (0.6, 0.6, 0.6, 0.3);
 			gr.Rectangle (rb);
 			gr.Fill ();
 			gr.Operator = Operator.Over;

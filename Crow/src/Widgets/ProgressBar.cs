@@ -28,7 +28,7 @@ namespace Crow
 
 			Rectangle rBack = ClientRectangle;
 			rBack.Width = (int)((double)rBack.Width / Maximum * Value);
-			Foreground.SetAsSource (gr, rBack);
+			Foreground.SetAsSource (IFace, gr, rBack);
 
 			CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);
 			gr.Fill();

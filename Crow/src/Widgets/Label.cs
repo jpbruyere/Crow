@@ -588,7 +588,7 @@ namespace Crow {
 				}else
 					computeTextCursorPosition(gr);
 
-				Foreground.SetAsSource (gr);
+				Foreground.SetAsSource (IFace, gr);
 				gr.LineWidth = 1.0;
 				gr.MoveTo (0.5 + textCursorPos + rText.X, rText.Y + CurrentLine * (fe.Ascent+fe.Descent));
 				gr.LineTo (0.5 + textCursorPos + rText.X, rText.Y + (CurrentLine + 1) * (fe.Ascent+fe.Descent));
@@ -639,7 +639,7 @@ namespace Crow {
 				if (string.IsNullOrWhiteSpace (l))
 					continue;
 
-				Foreground.SetAsSource (gr);
+				Foreground.SetAsSource (IFace, gr);
 				gr.MoveTo (lineRect.X,(double)rText.Y + fe.Ascent + (fe.Ascent+fe.Descent) * i) ;
 
                 gr.ShowText (l);

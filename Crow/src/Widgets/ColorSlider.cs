@@ -181,7 +181,7 @@ namespace Crow
 				break;
 			}
 
-			grad.SetAsSource (gr, r);
+			grad.SetAsSource (IFace, gr, r);
 			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
 			gr.Fill ();
 

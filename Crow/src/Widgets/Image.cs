@@ -175,10 +175,10 @@ namespace Crow
 			if (_pic == null)
 				return;
 
-			_pic.Paint (gr, ClientRectangle, _svgSub);
+			_pic.Paint (IFace, gr, ClientRectangle, _svgSub);
 
 			if (Opacity<1.0) {
-				gr.SetSourceRGBA (0.0, 0.0, 0.0, 1.0-Opacity);
+				gr.SetSource (0.0, 0.0, 0.0, 1.0-Opacity);
 				gr.Operator = Operator.DestOut;
 				gr.Rectangle (ClientRectangle);
 				gr.Fill ();

@@ -121,14 +121,14 @@ namespace Crow
 			//			if (BorderWidth > 0)
 			//				rBack.Inflate (-BorderWidth / 2);
 
-			Background.SetAsSource (gr, rBack);
+			Background.SetAsSource (IFace, gr, rBack);
 			CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
 			gr.Fill ();
 
 
 			if (BorderStyle == BorderStyle.Normal) {
 				if (BorderWidth > 0) {
-					Foreground?.SetAsSource (gr, rBack);
+					Foreground?.SetAsSource (IFace, gr, rBack);
 					CairoHelpers.CairoRectangle (gr, rBack, CornerRadius, BorderWidth);
 				}
 			} else {
@@ -208,7 +208,7 @@ namespace Crow
 			//			if (BorderWidth > 0)
 			//				rBack.Inflate (-BorderWidth / 2);
 
-			Background.SetAsSource (gr, rBack);
+			Background.SetAsSource (IFace, gr, rBack);
 			CairoHelpers.CairoRectangle(gr, rBack, CornerRadius);
 			gr.Fill ();
 
@@ -217,7 +217,7 @@ namespace Crow
 
 			if (bw > 0) {
 				if (BorderStyle == BorderStyle.Normal)
-					Foreground.SetAsSource (gr, rBack);
+					Foreground.SetAsSource (IFace, gr, rBack);
 				else {
 					if (BorderStyle == BorderStyle.Sunken)
 						gr.SetSource (raisedColor);

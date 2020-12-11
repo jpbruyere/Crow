@@ -82,7 +82,7 @@ namespace Crow
 		/// <param name="_dataType">type this item will be choosen for, or member of the data item</param>
 		/// <param name="_fetchDataMethod">for hierarchical data, method to call for children fetching</param>
 		public ItemTemplate (Interface _iface, string path, string _dataTest = "TypeOf", string _dataType = "default", string _fetchDataMethod = null)
-			: base(_iface, Interface.GetStreamFromPath (path)) {
+			: base(_iface, _iface.GetStreamFromPath (path)) {
 			strDataType = _dataType;
 			fetchMethodName = _fetchDataMethod;
 			dataTest = _dataTest;

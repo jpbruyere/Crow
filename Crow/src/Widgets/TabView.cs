@@ -237,7 +237,7 @@ namespace Crow
 		{
 			Rectangle rBack = new Rectangle (Slot.Size);
 
-			Background.SetAsSource (gr, rBack);
+			Background.SetAsSource (IFace, gr, rBack);
 			CairoHelpers.CairoRectangle(gr,rBack, CornerRadius);
 			gr.Fill ();
 
@@ -308,6 +308,8 @@ namespace Crow
 		{
 			SelectedTab = Children.IndexOf (sender as Widget);
 		}
+		internal bool isSelectedTab (TabItem ti) =>
+			Children.IndexOf (ti) == selectedTab;
 	}
 }
 

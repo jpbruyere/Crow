@@ -86,9 +86,9 @@ namespace Crow
 			return tmp;
 		}
 
-		public static XCursorFile Load(string path)
+		public static XCursorFile Load(Interface iFace, string path)
 		{
-			return loadFromStream (Interface.GetStreamFromPath (path));
+			return loadFromStream (iFace.GetStreamFromPath (path));
 		}
 
 		static XCursor imageLoad (BinaryReader sr)

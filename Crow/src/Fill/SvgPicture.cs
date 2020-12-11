@@ -41,27 +41,23 @@ namespace Crow
 		/// <summary>
 		/// Initializes a new instance of SvgPicture.
 		/// </summary>
-		public SvgPicture ()
-		{}
+		public SvgPicture () {}
 		/// <summary>
 		/// Initializes a new instance of SvgPicture by loading the SVG file pointed by the path argument
 		/// </summary>
 		/// <param name="path">image path, may be embedded</param>
-		public SvgPicture (string path) : base(path)
-		{
-			Load ();
-		}
+		public SvgPicture (string path) : base(path) {}
 		#endregion
 
-		void Load ()
+		void load (Interface iFace)
 		{			
-			if (sharedResources.ContainsKey (Path)) {
-				sharedPicture sp = sharedResources [Path];
+			if (iFace.sharedPictures.ContainsKey (Path)) {
+				sharedPicture sp = iFace.sharedPictures [Path];
 				hSVG = (Rsvg.Handle)sp.Data;
 				Dimensions = sp.Dims;
 				return;
 			}
-			using (Stream stream = Interface.GetStreamFromPath (Path)) {
+			using (Stream stream = iFace.GetStreamFromPath (Path)) {
 				using (MemoryStream ms = new MemoryStream ()) {
 					stream.CopyTo (ms);
 
@@ -69,7 +65,7 @@ namespace Crow
 					Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
 				}
 			}
-			sharedResources [Path] = new sharedPicture (hSVG, Dimensions);
+			iFace.sharedPictures [Path] = new sharedPicture (hSVG, Dimensions);
 		}
 
 		public void LoadSvgFragment (string fragment) {			
@@ -79,8 +75,11 @@ namespace Crow
 
 		#region implemented abstract members of Fill
 
-		public override void SetAsSource (Context ctx, Rectangle bounds = default(Rectangle))
+		public override void SetAsSource (Interface iFace, Context ctx, Rectangle bounds = default(Rectangle))
 		{
+			if (hSVG == null)
+				load (iFace);
+
 			float widthRatio = 1f;
 			float heightRatio = 1f;
 
@@ -116,10 +115,11 @@ namespace Crow
 		/// <param name="gr">drawing Backend context</param>
 		/// <param name="rect">bounds of the target surface to paint</param>
 		/// <param name="subPart">limit rendering to svg part named 'subPart'</param>
-		public override void Paint (Context gr, Rectangle rect, string subPart = "")
+		public override void Paint (Interface iFace, Context gr, Rectangle rect, string subPart = "")
 		{
 			if (hSVG == null)
-				return;
+				load (iFace);
+
 			float widthRatio = 1f;
 			float heightRatio = 1f;
 

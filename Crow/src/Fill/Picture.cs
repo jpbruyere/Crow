@@ -52,11 +52,6 @@ namespace Crow
 	public abstract class Picture : Fill
 	{
 		/// <summary>
-		/// share a single store for picture resources among usage in different controls
-		/// </summary>
-		internal static Dictionary<string, sharedPicture> sharedResources = new Dictionary<string, sharedPicture>();
-
-		/// <summary>
 		/// path of the picture
 		/// </summary>
 		public string Path;
@@ -91,14 +86,6 @@ namespace Crow
 		}
 		#endregion
 
-		#region Image Loading
-		/// <summary>
-		/// load the image for rendering from the stream given as argument
-		/// </summary>
-		/// <param name="stream">picture stream</param>
-		//public abstract void Load(Interface iface, string path);
-		#endregion
-
 		/// <summary>
 		/// abstract method to paint the image in the rectangle given in arguments according
 		/// to the Scale and keepProportion parameters.
@@ -106,27 +93,11 @@ namespace Crow
 		/// <param name="gr">drawing Backend context</param>
 		/// <param name="rect">bounds of the target surface to paint</param>
 		/// <param name="subPart">used for svg only</param>
-		public abstract void Paint(Context ctx, Rectangle rect, string subPart = "");
+		public abstract void Paint(Interface iFace, Context ctx, Rectangle rect, string subPart = "");
 
 		#region Operators
-		public static implicit operator Picture(string path)
-		{
-			if (string.IsNullOrEmpty (path))
-				return null;
-			
-			Picture _pic = null;
-
-			if (path.EndsWith (".svg", true, System.Globalization.CultureInfo.InvariantCulture)) 
-				_pic = new SvgPicture (path);
-			else 
-				_pic = new BmpPicture (path);
-
-			return _pic;
-		}
-		public static implicit operator string(Picture _pic)
-		{
-			return _pic == null ? null : _pic.Path;
-		}
+		public static implicit operator Picture(string path) => Parse (path) as Picture;
+		public static implicit operator string(Picture _pic) => _pic == null ? null : _pic.Path;
 		#endregion
 
 		public static new object Parse(string path)

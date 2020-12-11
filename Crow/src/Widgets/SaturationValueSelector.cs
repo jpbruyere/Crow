@@ -49,7 +49,7 @@ namespace Crow
 			Rectangle r = ClientRectangle;
 
 			if (Foreground != null) {//TODO:test if null should be removed
-				Foreground.SetAsSource (gr, r);
+				Foreground.SetAsSource (IFace, gr, r);
 				CairoHelpers.CairoRectangle (gr, r, CornerRadius);
 				gr.Fill ();
 			}
@@ -57,13 +57,13 @@ namespace Crow
 			Crow.Gradient grad = new Gradient (Gradient.Type.Horizontal);
 			grad.Stops.Add (new Gradient.ColorStop (0, new Color (1, 1, 1, 1)));
 			grad.Stops.Add (new Gradient.ColorStop (1, new Color (1, 1, 1, 0)));
-			grad.SetAsSource (gr, r);
+			grad.SetAsSource (IFace, gr, r);
 			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
 			gr.Fill();
 			grad = new Gradient (Gradient.Type.Vertical);
 			grad.Stops.Add (new Gradient.ColorStop (0, new Color (0, 0, 0, 0)));
 			grad.Stops.Add (new Gradient.ColorStop (1, new Color (0, 0, 0, 1)));
-			grad.SetAsSource (gr, r);
+			grad.SetAsSource (IFace, gr, r);
 			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
 			gr.Fill();
 

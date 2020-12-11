@@ -154,14 +154,14 @@ namespace Crow
 			gr.LineTo (0.5, Slot.Height-0.5);
 			gr.ClosePath ();
 			gr.LineWidth = 1;
-			Foreground.SetAsSource (gr);
+			Foreground.SetAsSource (IFace, gr);
 			gr.StrokePreserve ();
 			gr.ClipPreserve ();
 
-			if (IsSelected)
-				SelectedBackground.SetAsSource (gr, ClientRectangle);
+			if (tv.isSelectedTab (this))
+				SelectedBackground.SetAsSource (IFace, gr, ClientRectangle);
 			else
-				Background.SetAsSource (gr, ClientRectangle);
+				Background.SetAsSource (IFace, gr, ClientRectangle);
 
 			gr.Fill ();
 

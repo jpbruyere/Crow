@@ -21,30 +21,25 @@ namespace Crow
 		/// <summary>
 		/// Initializes a new instance of BmpPicture.
 		/// </summary>
-		public BmpPicture ()
-		{}
+		public BmpPicture () {}
 		/// <summary>
 		/// Initializes a new instance of BmpPicture by loading the image pointed by the path argument
 		/// </summary>
 		/// <param name="path">image path, may be embedded</param>
-		public BmpPicture (string path) : base(path)
-		{
-			Load ();
-		}
+		public BmpPicture (string path) : base(path) { }
 		#endregion
 		/// <summary>
 		/// load the image for rendering from the path given as argument
 		/// </summary>
-		/// <param name="path">image path, may be embedded</param>
-		void Load ()
+		void load (Interface iFace)
 		{			
-			if (sharedResources.ContainsKey (Path)) {
-				sharedPicture sp = sharedResources [Path];
+			if (iFace.sharedPictures.ContainsKey (Path)) {
+				sharedPicture sp = iFace.sharedPictures [Path];
 				image = (byte[])sp.Data;
 				Dimensions = sp.Dims;
 				return;
 			}
-			using (Stream stream = Interface.GetStreamFromPath (Path)) {
+			using (Stream stream = iFace.GetStreamFromPath (Path)) {
 #if STB_SHARP
 				StbImageSharp.ImageResult stbi = StbImageSharp.ImageResult.FromStream (stream, StbImageSharp.ColorComponents.RedGreenBlueAlpha);
 				image = new byte [stbi.Data.Length];
@@ -72,7 +67,7 @@ namespace Crow
 
 				//loadBitmap (new System.Drawing.Bitmap (stream));	
 			}
-			sharedResources [Path] = new sharedPicture (image, Dimensions);
+			iFace.sharedPictures [Path] = new sharedPicture (image, Dimensions);
 		}
 
 
@@ -100,8 +95,11 @@ namespace Crow
 
 #region implemented abstract members of Fill
 
-		public override void SetAsSource (Context ctx, Rectangle bounds = default(Rectangle))
+		public override void SetAsSource (Interface iFace, Context ctx, Rectangle bounds = default(Rectangle))
 		{
+			if (image == null)
+				load (iFace);
+
 			float widthRatio = 1f;
 			float heightRatio = 1f;
 
@@ -141,8 +139,11 @@ namespace Crow
 		/// <param name="gr">drawing Backend context</param>
 		/// <param name="rect">bounds of the target surface to paint</param>
 		/// <param name="subPart">used for svg only</param>
-		public override void Paint (Context gr, Rectangle rect, string subPart = "")
+		public override void Paint (Interface iFace, Context gr, Rectangle rect, string subPart = "")
 		{
+			if (image == null)
+				load (iFace);
+
 			float widthRatio = 1f;
 			float heightRatio = 1f;
 

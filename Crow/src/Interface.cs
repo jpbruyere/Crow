@@ -92,8 +92,6 @@ namespace Crow
 			FontRenderingOptions.HintMetrics = HintMetrics.On;
 			FontRenderingOptions.HintStyle = HintStyle.Full;
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Default;
-
-			loadCursors ();
 		}
 		public Interface (int width, int height, IntPtr glfwWindowHandle) : this (width, height, false, false)
 		{
@@ -101,6 +99,8 @@ namespace Crow
 		}
 		public Interface (int width = 800, int height = 600, bool startUIThread = true, bool createSurface = true)
 		{
+			loadCursors ();
+
 			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 			CurrentInterface = this;
 			clientRectangle = new Rectangle (0, 0, width, height);
@@ -504,6 +504,11 @@ namespace Crow
 
 
 		#region Load/Save
+		/// <summary>
+		/// share a single store for picture resources among usage in different controls
+		/// </summary>
+		internal Dictionary<string, sharedPicture> sharedPictures = new Dictionary<string, sharedPicture> ();
+
 		static bool tryGetResource (Assembly a, string resId, out Stream stream) {
 			stream = null;
 			if (a == null)
@@ -512,10 +517,8 @@ namespace Crow
 			return stream != null;
 		}
 
-		public delegate Stream GetStreamFromPathDelegate (string path);
-		public static GetStreamFromPathDelegate GetStreamFromPath = _getStreamFromPath;
 
-		static Stream _getStreamFromPath (string path)
+		public virtual Stream GetStreamFromPath (string path)
 		{
 			if (path.StartsWith ("#", StringComparison.Ordinal)) {
 				Stream stream = null;
@@ -1016,73 +1019,76 @@ namespace Crow
 
 		#region Mouse and Keyboard Handling
 		MouseCursor cursor = MouseCursor.top_left_arrow;
-		static void loadCursors ()
+		void loadCursors ()
 		{
 			const int minimumSize = 24;
+
+			if (XCursor.Cursors.ContainsKey (MouseCursor.arrow))
+				return;
 			//Load cursors
-			XCursor.Cursors [MouseCursor.arrow] = XCursorFile.Load ("#Crow.Cursors.arrow").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.base_arrow_down] = XCursorFile.Load ("#Crow.Cursors.base_arrow_down").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.base_arrow_up] = XCursorFile.Load ("#Crow.Cursors.base_arrow_up").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.boat] = XCursorFile.Load ("#Crow.Cursors.boat").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.bottom_left_corner] = XCursorFile.Load ("#Crow.Cursors.bottom_left_corner").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.bottom_right_corner] = XCursorFile.Load ("#Crow.Cursors.bottom_right_corner").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.bottom_side] = XCursorFile.Load ("#Crow.Cursors.bottom_side").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.bottom_tee] = XCursorFile.Load ("#Crow.Cursors.bottom_tee").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.center_ptr] = XCursorFile.Load ("#Crow.Cursors.center_ptr").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.circle] = XCursorFile.Load ("#Crow.Cursors.circle").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.cross] = XCursorFile.Load ("#Crow.Cursors.cross").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.cross_reverse] = XCursorFile.Load ("#Crow.Cursors.cross_reverse").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.crosshair] = XCursorFile.Load ("#Crow.Cursors.crosshair").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.dot] = XCursorFile.Load ("#Crow.Cursors.dot").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.dot_box_mask] = XCursorFile.Load ("#Crow.Cursors.dot_box_mask").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.double_arrow] = XCursorFile.Load ("#Crow.Cursors.double_arrow").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.draft_large] = XCursorFile.Load ("#Crow.Cursors.draft_large").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.draft_small] = XCursorFile.Load ("#Crow.Cursors.draft_small").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.draped_box] = XCursorFile.Load ("#Crow.Cursors.draped_box").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.exchange] = XCursorFile.Load ("#Crow.Cursors.exchange").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.fleur] = XCursorFile.Load ("#Crow.Cursors.fleur").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.gumby] = XCursorFile.Load ("#Crow.Cursors.gumby").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.hand] = XCursorFile.Load ("#Crow.Cursors.hand").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.hand1] = XCursorFile.Load ("#Crow.Cursors.hand1").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.hand2] = XCursorFile.Load ("#Crow.Cursors.hand2").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.help] = XCursorFile.Load ("#Crow.Cursors.help").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.ibeam] = XCursorFile.Load ("#Crow.Cursors.ibeam").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.left_ptr] = XCursorFile.Load ("#Crow.Cursors.left_ptr").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.left_ptr_watch] = XCursorFile.Load ("#Crow.Cursors.left_ptr_watch").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.left_side] = XCursorFile.Load ("#Crow.Cursors.left_side").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.left_tee] = XCursorFile.Load ("#Crow.Cursors.left_tee").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.ll_angle] = XCursorFile.Load ("#Crow.Cursors.ll_angle").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.lr_angle] = XCursorFile.Load ("#Crow.Cursors.lr_angle").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.move] = XCursorFile.Load ("#Crow.Cursors.move").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.pencil] = XCursorFile.Load ("#Crow.Cursors.pencil").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.pirate] = XCursorFile.Load ("#Crow.Cursors.pirate").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.plus] = XCursorFile.Load ("#Crow.Cursors.plus").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.question_arrow] = XCursorFile.Load ("#Crow.Cursors.question_arrow").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.right_ptr] = XCursorFile.Load ("#Crow.Cursors.right_ptr").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.right_side] = XCursorFile.Load ("#Crow.Cursors.right_side").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.right_tee] = XCursorFile.Load ("#Crow.Cursors.right_tee").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.sailboat] = XCursorFile.Load ("#Crow.Cursors.sailboat").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.sb_down_arrow] = XCursorFile.Load ("#Crow.Cursors.sb_down_arrow").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.sb_h_double_arrow] = XCursorFile.Load ("#Crow.Cursors.sb_h_double_arrow").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.sb_left_arrow] = XCursorFile.Load ("#Crow.Cursors.sb_left_arrow").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.sb_right_arrow] = XCursorFile.Load ("#Crow.Cursors.sb_right_arrow").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.sb_up_arrow] = XCursorFile.Load ("#Crow.Cursors.sb_up_arrow").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.sb_v_double_arrow] = XCursorFile.Load ("#Crow.Cursors.sb_v_double_arrow").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.shuttle] = XCursorFile.Load ("#Crow.Cursors.shuttle").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.sizing] = XCursorFile.Load ("#Crow.Cursors.sizing").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.target] = XCursorFile.Load ("#Crow.Cursors.target").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.tcross] = XCursorFile.Load ("#Crow.Cursors.tcross").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.top_left_arrow] = XCursorFile.Load ("#Crow.Cursors.top_left_arrow").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.top_left_corner] = XCursorFile.Load ("#Crow.Cursors.top_left_corner").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.top_right_corner] = XCursorFile.Load ("#Crow.Cursors.top_right_corner").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.top_side] = XCursorFile.Load ("#Crow.Cursors.top_side").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.top_tee] = XCursorFile.Load ("#Crow.Cursors.top_tee").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.trek] = XCursorFile.Load ("#Crow.Cursors.trek").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.ul_angle] = XCursorFile.Load ("#Crow.Cursors.ul_angle").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.ur_angle] = XCursorFile.Load ("#Crow.Cursors.ur_angle").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.watch] = XCursorFile.Load ("#Crow.Cursors.watch").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.X_cursor] = XCursorFile.Load ("#Crow.Cursors.X_cursor").Cursors.First (c => c.Width >= minimumSize);
-			XCursor.Cursors [MouseCursor.xterm] = XCursorFile.Load ("#Crow.Cursors.xterm").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.arrow] = XCursorFile.Load (this, "#Crow.Cursors.arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.base_arrow_down] = XCursorFile.Load (this, "#Crow.Cursors.base_arrow_down").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.base_arrow_up] = XCursorFile.Load (this, "#Crow.Cursors.base_arrow_up").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.boat] = XCursorFile.Load (this, "#Crow.Cursors.boat").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.bottom_left_corner] = XCursorFile.Load (this, "#Crow.Cursors.bottom_left_corner").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.bottom_right_corner] = XCursorFile.Load (this, "#Crow.Cursors.bottom_right_corner").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.bottom_side] = XCursorFile.Load (this, "#Crow.Cursors.bottom_side").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.bottom_tee] = XCursorFile.Load (this, "#Crow.Cursors.bottom_tee").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.center_ptr] = XCursorFile.Load (this, "#Crow.Cursors.center_ptr").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.circle] = XCursorFile.Load (this, "#Crow.Cursors.circle").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.cross] = XCursorFile.Load (this, "#Crow.Cursors.cross").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.cross_reverse] = XCursorFile.Load (this, "#Crow.Cursors.cross_reverse").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.crosshair] = XCursorFile.Load (this, "#Crow.Cursors.crosshair").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.dot] = XCursorFile.Load (this, "#Crow.Cursors.dot").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.dot_box_mask] = XCursorFile.Load (this, "#Crow.Cursors.dot_box_mask").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.double_arrow] = XCursorFile.Load (this, "#Crow.Cursors.double_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.draft_large] = XCursorFile.Load (this, "#Crow.Cursors.draft_large").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.draft_small] = XCursorFile.Load (this, "#Crow.Cursors.draft_small").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.draped_box] = XCursorFile.Load (this, "#Crow.Cursors.draped_box").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.exchange] = XCursorFile.Load (this, "#Crow.Cursors.exchange").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.fleur] = XCursorFile.Load (this, "#Crow.Cursors.fleur").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.gumby] = XCursorFile.Load (this, "#Crow.Cursors.gumby").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.hand] = XCursorFile.Load (this, "#Crow.Cursors.hand").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.hand1] = XCursorFile.Load (this, "#Crow.Cursors.hand1").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.hand2] = XCursorFile.Load (this, "#Crow.Cursors.hand2").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.help] = XCursorFile.Load (this, "#Crow.Cursors.help").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.ibeam] = XCursorFile.Load (this, "#Crow.Cursors.ibeam").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.left_ptr] = XCursorFile.Load (this, "#Crow.Cursors.left_ptr").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.left_ptr_watch] = XCursorFile.Load (this, "#Crow.Cursors.left_ptr_watch").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.left_side] = XCursorFile.Load (this, "#Crow.Cursors.left_side").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.left_tee] = XCursorFile.Load (this, "#Crow.Cursors.left_tee").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.ll_angle] = XCursorFile.Load (this, "#Crow.Cursors.ll_angle").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.lr_angle] = XCursorFile.Load (this, "#Crow.Cursors.lr_angle").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.move] = XCursorFile.Load (this, "#Crow.Cursors.move").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.pencil] = XCursorFile.Load (this, "#Crow.Cursors.pencil").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.pirate] = XCursorFile.Load (this, "#Crow.Cursors.pirate").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.plus] = XCursorFile.Load (this, "#Crow.Cursors.plus").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.question_arrow] = XCursorFile.Load (this, "#Crow.Cursors.question_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.right_ptr] = XCursorFile.Load (this, "#Crow.Cursors.right_ptr").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.right_side] = XCursorFile.Load (this, "#Crow.Cursors.right_side").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.right_tee] = XCursorFile.Load (this, "#Crow.Cursors.right_tee").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.sailboat] = XCursorFile.Load (this, "#Crow.Cursors.sailboat").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.sb_down_arrow] = XCursorFile.Load (this, "#Crow.Cursors.sb_down_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.sb_h_double_arrow] = XCursorFile.Load (this, "#Crow.Cursors.sb_h_double_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.sb_left_arrow] = XCursorFile.Load (this, "#Crow.Cursors.sb_left_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.sb_right_arrow] = XCursorFile.Load (this, "#Crow.Cursors.sb_right_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.sb_up_arrow] = XCursorFile.Load (this, "#Crow.Cursors.sb_up_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.sb_v_double_arrow] = XCursorFile.Load (this, "#Crow.Cursors.sb_v_double_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.shuttle] = XCursorFile.Load (this, "#Crow.Cursors.shuttle").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.sizing] = XCursorFile.Load (this, "#Crow.Cursors.sizing").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.target] = XCursorFile.Load (this, "#Crow.Cursors.target").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.tcross] = XCursorFile.Load (this, "#Crow.Cursors.tcross").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.top_left_arrow] = XCursorFile.Load (this, "#Crow.Cursors.top_left_arrow").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.top_left_corner] = XCursorFile.Load (this, "#Crow.Cursors.top_left_corner").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.top_right_corner] = XCursorFile.Load (this, "#Crow.Cursors.top_right_corner").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.top_side] = XCursorFile.Load (this, "#Crow.Cursors.top_side").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.top_tee] = XCursorFile.Load (this, "#Crow.Cursors.top_tee").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.trek] = XCursorFile.Load (this, "#Crow.Cursors.trek").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.ul_angle] = XCursorFile.Load (this, "#Crow.Cursors.ul_angle").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.ur_angle] = XCursorFile.Load (this, "#Crow.Cursors.ur_angle").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.watch] = XCursorFile.Load (this, "#Crow.Cursors.watch").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.X_cursor] = XCursorFile.Load (this, "#Crow.Cursors.X_cursor").Cursors.First (c => c.Width >= minimumSize);
+			XCursor.Cursors [MouseCursor.xterm] = XCursorFile.Load (this, "#Crow.Cursors.xterm").Cursors.First (c => c.Width >= minimumSize);
 		}
 
 

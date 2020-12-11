@@ -114,10 +114,10 @@ namespace Crow {
 			else
 				cb.Height = (int)(cb.Height / Maximum * Value);
 
-			Background.SetAsSource (gr, cb);
+			Background.SetAsSource (IFace, gr, cb);
 			CairoHelpers.CairoRectangle (gr, cb, CornerRadius);
 			gr.Fill ();
-			Foreground.SetAsSource (gr, cb);
+			Foreground.SetAsSource (IFace, gr, cb);
 			if (borderWidth > 0)
 				CairoHelpers.CairoRectangle (gr, cb, CornerRadius, borderWidth);
 		}

@@ -26,9 +26,9 @@ namespace Crow
 		#endregion
 
 		#region implemented abstract members of Fill
-		public override void SetAsSource (Context ctx, Rectangle bounds = default)
+		public override void SetAsSource (Interface iFace, Context ctx, Rectangle bounds = default)
 		{
-			ctx.SetSourceRGBA (color.R / 255.0, color.G / 255.0, color.B / 255.0, color.A / 255.0);
+			ctx.SetSource (color.R / 255.0, color.G / 255.0, color.B / 255.0, color.A / 255.0);
 		}
 		public static new object Parse(string s)
 		{

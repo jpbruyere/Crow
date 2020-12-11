@@ -79,7 +79,7 @@ namespace Crow
 
 		#region implemented abstract members of Fill
 
-		public override void SetAsSource (Context ctx, Rectangle bounds = default(Rectangle))
+		public override void SetAsSource (Interface iFace, Context ctx, Rectangle bounds = default(Rectangle))
 		{
 			Cairo.Gradient grad = null;
 			switch (GradientType) {
