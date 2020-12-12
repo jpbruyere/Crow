@@ -204,7 +204,10 @@ FileDialog {
 	Height = "300";
 }
 ProgressBar {
-	Foreground = "vgradient|0:DarkBlue|0.5:SkyBlue|1:DarkBlue";
+	Background = "Jet";
+	Foreground = "RoyalBlue";	
+	Orientation = "Horizontal";
+	Height = "10";
 }
 Scroller {
 	CacheEnabled = "false";

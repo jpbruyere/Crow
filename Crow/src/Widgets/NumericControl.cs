@@ -30,7 +30,7 @@ namespace Crow {
 					return;
 				decimals = value;
 				NotifyValueChangedAuto (decimals);
-				RegisterForGraphicUpdate();
+				registerUpdate ();
 			}
 		}
 		[DefaultValue(0.0)]
@@ -42,7 +42,7 @@ namespace Crow {
 
 				minValue = value;
 				NotifyValueChangedAuto (minValue);
-				RegisterForRedraw ();
+				registerUpdate ();
 			}
 		}
 		[DefaultValue(100.0)]
@@ -55,7 +55,7 @@ namespace Crow {
 
 				maxValue = value;
 				NotifyValueChangedAuto (maxValue);
-				RegisterForRedraw ();
+				registerUpdate ();
 			}
 		}
 		[DefaultValue(1.0)]
@@ -68,7 +68,7 @@ namespace Crow {
 
 				smallStep = value;
 				NotifyValueChangedAuto (smallStep);
-				RegisterForRedraw ();
+				registerUpdate ();
 			}
 		}
 		[DefaultValue(5.0)]
@@ -81,7 +81,7 @@ namespace Crow {
 
 				bigStep = value;
 				NotifyValueChangedAuto (bigStep);
-				RegisterForRedraw ();
+				registerUpdate ();
 			}
 		}
 		[DefaultValue(0.0)]
@@ -103,11 +103,13 @@ namespace Crow {
 				actualValue = Math.Round (actualValue, decimals);
 
 				NotifyValueChangedAuto (actualValue);
-				RegisterForGraphicUpdate();
+				registerUpdate ();
 			}
 		}
 		#endregion
 
+		protected virtual void registerUpdate ()
+			=> RegisterForRedraw ();
 	}
 }
 

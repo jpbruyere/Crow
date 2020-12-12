@@ -13,7 +13,7 @@
 		<Authors>Jean-Philippe Bruyère</Authors>
 
 		<EnableDefaultNoneItems>false</EnableDefaultNoneItems>
-		<SamplesDir>$(SolutionDir)Samples\</SamplesDir>
+		<SamplesDir>$(MSBuildThisFileDirectory)\</SamplesDir>
 		<AppConfig>$(SolutionDir)Crow\App.config</AppConfig>
 	</PropertyGroup>
 	
@@ -29,7 +29,6 @@
 			<LogicalName>ui.%(Filename)%(Extension)</LogicalName>
 			<Link>Templates\%(Filename)%(Extension)</Link>
 		</EmbeddedResource>
-		<EmbeddedResource Include="$(SamplesDir)common\samples.style" />
 		<EmbeddedResource Include="$(SamplesDir)common\ui\images\**\*.*">
 			<LogicalName>images.%(Filename)%(Extension)</LogicalName>
 			<Link>Images\%(Filename)%(Extension)</Link>
@@ -38,6 +37,11 @@
 			<LogicalName>Icons.%(Filename)%(Extension)</LogicalName>
 			<Link>Icons\%(Filename)%(Extension)</Link>
 		</EmbeddedResource>
-		<Compile Include="$(SamplesDir)common\SampleBase.cs"/>
+		<EmbeddedResource Include="$(SamplesDir)common\samples.style" >
+			<Link>common\%(Filename)%(Extension)</Link>
+		</EmbeddedResource>
+		<Compile Include="$(SamplesDir)common\SampleBase.cs">
+			<Link>common\%(Filename)%(Extension)</Link>
+		</Compile>
 	</ItemGroup>
 </Project>

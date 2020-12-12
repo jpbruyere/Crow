@@ -9,10 +9,9 @@ using System.ComponentModel;
 namespace Crow
 {
 	/// <summary>
-	/// templated numeric control to select a value
-	/// by slidding a cursor
+	/// templated numeric control to select a value by slidding a cursor.
 	/// </summary>
-	public class Slider : TemplatedControl
+	public class Slider : NumericControl
     {
 		#region CTOR
 		protected Slider() {}
@@ -37,103 +36,18 @@ namespace Crow
 		}
 		#endregion
 
-		#region protected fields
-		protected double actualValue, minValue, maxValue, smallStep, bigStep;
-		protected int decimals;
-		#endregion
 
-		#region public properties
-		[DefaultValue (2)]
-		public int Decimals {
-			get { return decimals; }
-			set {
-				if (value == decimals)
-					return;
-				decimals = value;
-				NotifyValueChangedAuto (decimals);
-				RegisterForGraphicUpdate ();
-			}
-		}
-		[DefaultValue (0.0)]
-		public virtual double Minimum {
-			get { return minValue; }
-			set {
-				if (minValue == value)
-					return;
 
-				minValue = value;
-				NotifyValueChangedAuto (minValue);
-				RegisterForLayouting (LayoutingType.ArrangeChildren);
-			}
-		}
-		[DefaultValue (100.0)]
-		public virtual double Maximum {
-			get { return maxValue; }
-			set {
-				if (maxValue == value)
-					return;
 
-				maxValue = value;
-				NotifyValueChangedAuto (maxValue);
-				RegisterForLayouting (LayoutingType.ArrangeChildren);
-			}
-		}
-		[DefaultValue (1.0)]
-		public virtual double SmallIncrement {
-			get { return smallStep; }
-			set {
-				if (smallStep == value)
-					return;
-
-				smallStep = value;
-				NotifyValueChangedAuto (smallStep);
-				RegisterForLayouting (LayoutingType.ArrangeChildren);
-			}
-		}
-		[DefaultValue (5.0)]
-		public virtual double LargeIncrement {
-			get { return bigStep; }
-			set {
-				if (bigStep == value)
-					return;
-
-				bigStep = value;
-				NotifyValueChangedAuto (bigStep);
-				RegisterForLayouting (LayoutingType.ArrangeChildren);
-			}
-		}
-		[DefaultValue (0.0)]
-		public virtual double Value {
-			get { return actualValue; }
-			set {
-				if (value == actualValue)
-					return;
-
-				if (value < minValue)
-					actualValue = minValue;
-				else if (value > maxValue)
-					actualValue = maxValue;
-				else
-					actualValue = value;
-
-				actualValue = Math.Round (actualValue, decimals);
-
-				NotifyValueChangedAuto (actualValue);
-				RegisterForLayouting (LayoutingType.ArrangeChildren);
-			}
-		}
-		#endregion
-
+		protected override void registerUpdate ()
+			=> RegisterForLayouting (LayoutingType.ArrangeChildren);
 
 		#region private fields
-		//Rectangle cursor;
 		int cursorSize;
-		//Fill _cursorColor;
 		Orientation _orientation;
-		//CursorType cursorType;
 		bool holdCursor = false;
-		#endregion
 		Widget cursor;
+		#endregion
 
 		protected double unity;
 

@@ -17,9 +17,7 @@ namespace Crow {
 
 		#region protected fields
 		protected double actualValue, minValue, maxValue;
-		CursorType cursorType;
 		Orientation orientation;
-		int borderWidth;
 		#endregion
 
 		#region public properties
@@ -68,17 +66,6 @@ namespace Crow {
 				RegisterForGraphicUpdate();
 			}
 		}
-		[DefaultValue (CursorType.Pentagone)]
-		public CursorType CursorType {
-			get => cursorType;
-			set {
-				if (cursorType == value)
-					return;
-				cursorType = value;
-				NotifyValueChangedAuto (cursorType);
-				RegisterForRedraw ();
-			}
-		}
 		[DefaultValue (Orientation.Horizontal)]
 		public virtual Orientation Orientation {
 			get => orientation;
@@ -90,23 +77,11 @@ namespace Crow {
 				RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 			}
 		}
-		/// <summary>
-		/// border width in pixels
-		/// </summary>
-		[DefaultValue (0)]
-		public virtual int BorderWidth {
-			get { return borderWidth; }
-			set {
-				if (borderWidth == value)
-					return;
-				borderWidth = value;
-				NotifyValueChangedAuto (borderWidth);
-				RegisterForGraphicUpdate ();
-			}
-		}
 		#endregion
 
 		protected override void onDraw (Context gr) {
+			base.onDraw (gr);
+
 			Rectangle cb = ClientRectangle;
 
 			if (orientation == Orientation.Horizontal)
@@ -114,12 +89,10 @@ namespace Crow {
 			else
 				cb.Height = (int)(cb.Height / Maximum * Value);
 
-			Background.SetAsSource (IFace, gr, cb);
+
+			Foreground.SetAsSource (IFace, gr, cb);
 			CairoHelpers.CairoRectangle (gr, cb, CornerRadius);
 			gr.Fill ();
-			Foreground.SetAsSource (IFace, gr, cb);
-			if (borderWidth > 0)
-				CairoHelpers.CairoRectangle (gr, cb, CornerRadius, borderWidth);
 		}
 	}
 }

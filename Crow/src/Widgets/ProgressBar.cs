@@ -2,11 +2,14 @@
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
+using System.ComponentModel;
 using Crow.Cairo;
 
 namespace Crow
 {
-	//TODO:to be  removed, numeric control with template having Gauge child is enough
+	/// <summary>
+	/// Templated numeric control for displaying a progress indicator
+	/// </summary>
 	public class ProgressBar : NumericControl
     {
 		#region CTOR
@@ -14,25 +17,18 @@ namespace Crow
 		public ProgressBar(Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
-		protected override void loadTemplate (Widget template)
-		{			
+		Orientation orientation;
+
+		[DefaultValue (Orientation.Horizontal)]
+		public virtual Orientation Orientation {
+			get => orientation;
+			set {
+				if (orientation == value)
+					return;
+				orientation = value;
+				NotifyValueChangedAuto (orientation);
+				RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
+			}
 		}
-
-		#region GraphicObject overrides
-		protected override void onDraw (Context gr)
-		{
-			base.onDraw (gr);
-
-			if (Maximum == 0)
-				return;
-
-			Rectangle rBack = ClientRectangle;
-			rBack.Width = (int)((double)rBack.Width / Maximum * Value);
-			Foreground.SetAsSource (IFace, gr, rBack);
-
-			CairoHelpers.CairoRectangle(gr,rBack,CornerRadius);
-			gr.Fill();
-		}
-		#endregion
-    }
+	}
 }

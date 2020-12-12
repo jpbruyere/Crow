@@ -1,0 +1,3 @@
+﻿<?xml version="1.0"?>
+<Gauge Background="{./Background}" Foreground="{./Foreground}" CornerRadius="{./CornerRadius}"
+	Orientation="{./Orientation}" Minimum="{./Minimum}" Maximum="{./Maximum}" Value="{./Value}"/>

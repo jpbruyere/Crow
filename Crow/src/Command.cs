@@ -37,6 +37,11 @@ namespace Crow {
 				NotifyValueChanged ("Icon", icon);
 			}
 		}
+
+		public CommandGroup () { }
+		public CommandGroup (params Command[] commands) {
+			AddRange (commands);
+		}
 	}
 
 

@@ -2132,12 +2132,6 @@ namespace Crow
 		/// Checks to handle when widget is removed from the visible graphic tree
 		/// </summary>
 		void unshownPostActions () {
-			if (IFace.HoverWidget != null) {
-				if (IFace.HoverWidget.IsOrIsInside (this)) {
-					IFace.HoverWidget = null;
-					IFace.OnMouseMove (IFace.MousePosition.X, IFace.MousePosition.Y);
-				}
-			}
 			if (IFace.ActiveWidget != null) {
 				if (IFace.ActiveWidget.IsOrIsInside (this))
 					IFace.ActiveWidget = null;
@@ -2145,7 +2139,13 @@ namespace Crow
 			if (IFace.FocusedWidget != null) {
 				if (IFace.FocusedWidget.IsOrIsInside (this))
 					IFace.FocusedWidget = null;
-			}					
+			}
+			if (IFace.HoverWidget != null) {
+				if (IFace.HoverWidget.IsOrIsInside (this)) {
+					IFace.HoverWidget = null;
+					IFace.OnMouseMove (IFace.MousePosition.X, IFace.MousePosition.Y);
+				}
+			}
 		}
 	}
 }
