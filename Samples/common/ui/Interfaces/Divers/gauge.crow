@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0"?>
 <Container Background="Onyx">
 	<VerticalStack Background="Jet" Fit="true" Margin="10" Spacing="10"> 
-		<Gauge Width="200" Height="10" Background="RoyalBlue" Value="50" CornerRadius="5"/>
+		<Gauge Width="200" Height="10" Background="DimGrey" Foreground="RoyalBlue" Value="50" CornerRadius="5"/>
 		<NumericControl Width="200" Height="10" Value="40">
 			<Template>
-				<Gauge Maximum="{./Maximum}" Foreground="Black" BorderWidth="1" Background="RoyalBlue" Value="{./Value}" CornerRadius="5"/>
+				<Gauge Maximum="{./Maximum}" Background="DimGrey" Foreground="RoyalBlue" Value="{./Value}" CornerRadius="5"/>
 			</Template>
 		</NumericControl>
 		<HorizontalStack Width="200" Height="200">

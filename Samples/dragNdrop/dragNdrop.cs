@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Crow;
-using Glfw;
 
 namespace tests
 {

@@ -97,7 +97,7 @@ namespace Crow
 			ctx.SetSource (dbge.Color);
 			if (dbge.IsSelected) {
 				ctx.FillPreserve ();
-				ctx.SetSourceRGB (1, 1, 1);
+				ctx.SetSource (1, 1, 1);
 				ctx.Stroke ();
 			}else
 				ctx.Fill ();

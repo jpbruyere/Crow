@@ -295,7 +295,7 @@ namespace Crow
 				if (g.yIndex == 0)
 					gr.SetSource (Crow.Colors.LightSalmon);
 				else
-					Foreground.SetAsSource (gr);
+					Foreground.SetAsSource (IFace, gr);
 
 				gr.MoveTo (penX, penY - gr.FontExtents.Descent);
 				gr.ShowText (g.name + gIdx);
@@ -399,7 +399,7 @@ namespace Crow
 				r = new Rectangle (cb.Left,  (int)y, cb.Width, (int)fe.Height);
 
 				ctx.Operator = Cairo.Operator.Add;
-				ctx.SetSourceRGBA (0.1, 0.1, 0.1, 0.4);
+				ctx.SetSource (0.1, 0.1, 0.1, 0.4);
 				ctx.Rectangle (ContextCoordinates (r));
 				ctx.Fill ();
 			}

@@ -1,0 +1,12 @@
+﻿<?xml version="1.0"?>
+<VerticalStack Margin="5">
+	<VerticalStack Margin="5" Background="Onyx" DataSource="{TcVCInstance}">
+		<Label Text="{}"/>
+		<Label Text="{Prop1}"/>
+		<Label Text="{Prop2}"/>
+	</VerticalStack>
+	<HorizontalStack Height="Fit" Margin="5" Background="DimGrey">
+		<Button Background="Jet" Caption="Set DataSource Null" MouseClick="setDataSourceNull"/>
+		<Button Background="Jet" Caption="Set DataSource This" MouseClick="setDataSourceThis"/>
+	</HorizontalStack>
+</VerticalStack>
