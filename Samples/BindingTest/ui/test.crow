@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack Margin="5">
-	<VerticalStack Margin="5" Background="Onyx" DataSource="{TcVCInstance}">
+<VerticalStack Margin="5" >
+	<VerticalStack RootDataLevel="true" Name="vsDS" Margin="5" Background="Onyx" DataSource="{TcVCInstance}" DataSourceType="SampleBase.TestClassVC">
 		<Label Text="{}"/>
 		<Label Text="{Prop1}"/>
 		<Label Text="{Prop2}"/>

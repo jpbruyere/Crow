@@ -19,6 +19,7 @@ namespace Crow
 		IFace							= 0x10000,
 		Focus							= 0x20000,
 		Override						= 0x40000,
+		Binding							= 0x80000,
 		Widget 							= 0x00100,
 		//GOLayouting 					= 0x00200,
 		//Drawing 						= 0x00400,

@@ -14,13 +14,10 @@
 		<PackageTags>GUI Widget toolkit Interface C# Net</PackageTags>
 		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
 		<PackageProjectUrl>https://github.com/jpbruyere/Crow/wiki</PackageProjectUrl>
-		<PackageLicense>https://opensource.org/licenses/MIT</PackageLicense>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageIcon>crow.png</PackageIcon>
 		<PackageCopyright>Copyright 2013-2020</PackageCopyright>
 		<PackageReleaseNotes>
-			This release is a major step to finaly get a 1.0 version of crow.
-			A single glfw backend to handle os layers, and NetCore target for samples
-			to overcome CAS exceptions on windows.
 		</PackageReleaseNotes>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -32,7 +29,7 @@
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<DebugType>full</DebugType>
-		<DefineConstants>$(DefineConstants);_DEBUG_LOG;DEBUG;TRACE;DEBUG_LAYOUTING;DEBUG_DISPOSE;_DEBUG_BINDING;_DEBUG_CLIP_RECTANGLE</DefineConstants>
+		<DefineConstants>$(DefineConstants);_DEBUG_LOG;DEBUG;TRACE;_DEBUG_DISPOSE;_DEBUG_BINDING;_DEBUG_CLIP_RECTANGLE</DefineConstants>
 		<CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
 	</PropertyGroup>
 	<ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">

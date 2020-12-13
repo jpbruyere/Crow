@@ -12,14 +12,16 @@ namespace BindingTest
 
 		static void Main ()
 		{
-			using (Program app = new Program ()) 
+			using (Program app = new Program ()) {
 				app.Run ();
+				//DbgLogger.save (app);
+			}			
 		}
 
 		protected override void OnInitialized ()
 		{
 			Load ("#ui.test.crow").DataSource = this;
-
+			TcVCInstance = new TestClassVC ();
 		}
 
 

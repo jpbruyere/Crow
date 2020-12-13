@@ -766,7 +766,7 @@ namespace Crow.IML
 					if (d.Method.Name == delegateName) {
 						eiEvt.RemoveEventHandler (instance, d);
 #if DEBUG_BINDING
-						Debug.WriteLine ("\t{0} handler removed in {1} for: {2}", d.Method.Name,instance, eventName);
+						Debug.WriteLine ("\tremoveEventHandlerByName: {0} handler removed in {1} for: {2}", d.Method.Name,instance, eventName);
 #endif
 					}
 				}
@@ -785,7 +785,7 @@ namespace Crow.IML
 					if (d.Target == target) {
 						eiEvt.RemoveEventHandler (instance, d);
 #if DEBUG_BINDING
-						Debug.WriteLine ("\t{0} handler removed in {1} for: {2}", d.Method.Name,instance, eventName);
+						Debug.WriteLine ("\tremoveEventHandlerByTarget: {0} handler removed in {1} for: {2}", d.Method.Name,instance, eventName);
 #endif
 					}
 				}

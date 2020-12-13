@@ -182,12 +182,7 @@ namespace Crow
 
 #if DEBUG_LOG
 		internal static List<Widget> GraphicObjects = new List<Widget>();
-		#endif
-
-		//internal bool isPopup = false;
-		//public Widget focusParent {
-		//	get { return (isPopup ? LogicalParent : parent) as Widget; }
-		//}
+#endif
 
 		/// <summary>
 		/// interface this widget is bound to, this should not be changed once the instance is created
@@ -541,11 +536,11 @@ namespace Crow
 		[DesignCategory ("Divers")][DefaultValue(null)]
 		public virtual string Name {
 			get {
-				#if DEBUG_LOG
+#if DEBUG_LOG
 				return string.IsNullOrEmpty(name) ? this.GetType().Name + GraphicObjects.IndexOf(this).ToString () : name;
-				#else
+#else
 				return name;
-				#endif
+#endif
 			}
 			set {
 				if (name == value)
@@ -811,19 +806,6 @@ namespace Crow
 			}
 		}
 
-		/// <summary>
-		/// forward mouse events even if an handle is bound
-		/// </summary>
-		//[DesignCategory ("Behaviour")][DefaultValue (false)]
-		//public bool ForwardMouseEvents {
-		//	get { return forwardMouseEvents; }
-		//	set {
-		//		if (forwardMouseEvents == value)
-		//			return;
-		//		forwardMouseEvents = value;
-		//		NotifyValueChanged ("ForwardMouseEvents", forwardMouseEvents);
-		//	}
-		//}
 		bool clearBackground = false;
 		/// <summary>
 		/// background fill of the control, maybe solid color, gradient, image, or svg
