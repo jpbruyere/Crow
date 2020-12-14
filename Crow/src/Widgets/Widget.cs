@@ -432,9 +432,9 @@ namespace Crow
 		public event EventHandler<MouseButtonEventArgs> MouseDoubleClick;
 		/// <summary>Occurs when mouse mouve in this object. It bubbles to the root</summary>
 		public event EventHandler<MouseMoveEventArgs> MouseMove;
-		/// <summary>Occurs when mouse enter this object</summary>
+		/// <summary>Occurs when mouse enter the bounding rectangle of this object</summary>
 		public event EventHandler<MouseMoveEventArgs> MouseEnter;
-		/// <summary>Occurs when mouse leave this object</summary>
+		/// <summary>Occurs when mouse leave the bounds of this object</summary>
 		public event EventHandler<MouseMoveEventArgs> MouseLeave;
 		/// <summary>Occurs when key is pressed when this object is active</summary>
 		public event EventHandler<KeyEventArgs> KeyDown;
@@ -1968,6 +1968,14 @@ namespace Crow
 
 
 		}
+		/// <summary>
+		/// Default mouse button press method. The `MouseDown` event is raised from withing it.
+		/// </summary>
+		/// <remarks>
+		/// See `CrowEventArgs` for details on interface event handling.
+		/// </remarks>
+		/// <param name="sender">Sender of the event</param>
+		/// <param name="e">mouse button pressed event arguments</param>
 		public virtual void onMouseDown(object sender, MouseButtonEventArgs e){
 			if (Focusable) {
 				IFace.FocusedWidget = this;
@@ -1984,6 +1992,14 @@ namespace Crow
 			else if (!e.Handled)
 				FocusParent?.onMouseDown (sender, e);
 		}
+		/// <summary>
+		/// Default mouse button release method. The `MouseUp` event is raised from withing it.
+		/// </summary>
+		/// <remarks>
+		/// See `CrowEventArgs` for details on interface event handling.
+		/// </remarks>
+		/// <param name="sender">Sender of the event</param>
+		/// <param name="e">mouse button release event arguments</param>
 		public virtual void onMouseUp(object sender, MouseButtonEventArgs e){
 
 			if (IFace.DragAndDropOperation != null){
@@ -2000,12 +2016,23 @@ namespace Crow
 			else if (!e.Handled)
 				FocusParent?.onMouseUp (sender, e);
 		}
+		/// <summary>
+		/// Default mouse click method. A click is a press and release without mouving combination.
+		/// </summary>
+		/// <param name="sender">The Sender of the event</param>
+		/// <param name="e">event arguments</param>
 		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){
 			if (MouseClick != null)
 				MouseClick.Invoke (this, e);
 			else if (!e.Handled)
 				FocusParent?.onMouseClick (sender, e);
 		}
+		/// <summary>
+		/// Default mouse double click method. A double click is two consecutive press and release without mouving combination.
+		/// within a delay defined by `Interface.DOUBLECLICK_TRESHOLD`
+		/// </summary>
+		/// <param name="sender">The Sender of the event</param>
+		/// <param name="e">event arguments</param>
 		public virtual void onMouseDoubleClick(object sender, MouseButtonEventArgs e){
 			if (MouseDoubleClick != null)			
 				MouseDoubleClick.Invoke (this, e);
