@@ -501,7 +501,12 @@ namespace Crow {
 			}
 		}
 		internal virtual void itemClick(object sender, MouseButtonEventArgs e){
+			/*if (selectedItemContainer == sender)
+				return;*/
 			//SelectedIndex = (int)((IList)data)?.IndexOf((sender as Widget).DataSource);
+			ISelectable si = SelectedItem as ISelectable;
+			if (si != null)
+				si.IsSelected = false;
 			if (selectedItemContainer is ListItem li)
 				li.IsSelected = false;
 			selectedItemContainer = sender as Widget;
@@ -510,6 +515,9 @@ namespace Crow {
 			if (selectedItemContainer == null)
 				return;
 			SelectedItem = selectedItemContainer.DataSource;
+			si = SelectedItem as ISelectable;
+			if (si != null)
+				si.IsSelected = true;
 			//SelectedIndex = items.Children.IndexOf(sender as Widget);
 		}
 
@@ -524,6 +532,7 @@ namespace Crow {
 		{
 			if (disposing)
 				cancelLoadingThread ();
+			Data = null;
 			base.Dispose (disposing);
 		}
 
@@ -546,5 +555,6 @@ namespace Crow {
 			if (data is IObservableList)
 				(data as IObservableList).RaiseEdit ();
 		}
+		
 	}
 }
