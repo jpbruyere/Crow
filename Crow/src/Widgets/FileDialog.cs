@@ -111,13 +111,19 @@ namespace Crow
 				return;
 			CurrentDirectory = Directory.GetParent(CurrentDirectory).FullName;
 		}
-		void onFileSelect(object sender, MouseButtonEventArgs e){
-			if (string.IsNullOrEmpty (SelectedFile))
-				CurrentDirectory = SelectedDirectory;
-			else {
-				OkClicked.Raise (this, null);
-				IFace.DeleteWidget (this);
+		void onFileSelectDblClick (object sender, MouseButtonEventArgs e) {
+			CurrentDirectory = SelectedDirectory;
+		}
+
+		void onFileSelect (object sender, MouseButtonEventArgs e){
+			if (ShowFiles) {
+				if (string.IsNullOrEmpty (SelectedFile)) {
+					CurrentDirectory = SelectedDirectory;
+					return;
+				} 									
 			}
+			OkClicked.Raise (this, null);
+			IFace.DeleteWidget (this);
 		}
 		void onCancel(object sender, MouseButtonEventArgs e){
 			IFace.DeleteWidget (this);

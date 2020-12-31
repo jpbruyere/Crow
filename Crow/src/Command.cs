@@ -22,7 +22,6 @@ namespace Crow {
 					return;
 				caption = value;
 				NotifyValueChanged ("Caption", caption);
-
 			}
 		}
 		/// <summary>

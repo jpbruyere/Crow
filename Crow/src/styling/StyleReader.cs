@@ -85,7 +85,7 @@ namespace Crow
 					break;
 				case ',':
 					ReadChar ();
-					if (!(curState == States.classNames) || string.IsNullOrEmpty (token))
+					if (curState != States.classNames || string.IsNullOrEmpty (token))
 						throw new ParserException (line, column, "Unexpected char ','", resId);
 					targetsClasses.Add (token);
 					token = "";

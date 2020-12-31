@@ -67,6 +67,7 @@ Wrapper {
 }
 Button {
 	Caption = "Button";
+	MinimumSize = "50,20";
 	Width = "Fit";
 }
 Label {

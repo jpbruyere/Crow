@@ -169,7 +169,7 @@ namespace Crow
 			//get the dataSource of the sender
 			il.Emit (OpCodes.Ldarg_0);//push root TemplatedGroup into the stack
 			il.Emit (OpCodes.Ldarg_1);//load sender node of expand
-			il.Emit (OpCodes.Callvirt, CompilerServices.miGetDataSource);
+			il.Emit (OpCodes.Callvirt, CompilerServices.miGetDataSource);			
 
 			if (fetchMethodName != "self") {//special keyword self allows the use of recurent list<<<
 				if (dataType == null) {
@@ -178,8 +178,9 @@ namespace Crow
 
 					il.Emit (OpCodes.Ldstr, fetchMethodName);
 					il.Emit (OpCodes.Call, CompilerServices.miGetDataTypeAndFetch);
-				}else
-					emitGetSubData(il, dataType);			
+				} else {
+					emitGetSubData (il, dataType);
+				}
 			}
 			//set 'return' from the fetch method as 'data' of the list
 			//il.Emit (OpCodes.Callvirt, piData.GetSetMethod ());
@@ -228,6 +229,8 @@ namespace Crow
 		}
 		//data is on the stack
 		void emitGetSubData(ILGenerator il, Type dataType){
+			if (dataType.IsValueType)
+				il.Emit (OpCodes.Unbox_Any, dataType);
 			MethodInfo miGetDatas = dataType.GetMethod (fetchMethodName, new Type[] {});
 			if (miGetDatas == null)
 				miGetDatas = CompilerServices.SearchExtMethod (dataType, fetchMethodName);

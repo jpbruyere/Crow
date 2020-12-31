@@ -22,7 +22,7 @@
 					<TextBox Style="TxtInFileDialog" Text="{²./CurrentDirectory}"/>
 				</HorizontalStack>
 				<DirectoryView ShowHidden="{²../cbShowHidden.IsChecked}" FileMask="{²../txtFileMask.Text}" ShowFiles="{²../cbShowFiles.IsChecked}" Name="fv" CurrentDirectory="{./CurrentDirectory}" SelectedItemChanged="./onFVSelectedItemChanged"
-						Width="100%" Margin="0" MouseDoubleClick="./onFileSelect">
+						Width="100%" Margin="0" MouseDoubleClick="./onFileSelectDblClick">
 					<Template>
 						<ListBox ItemTemplate="#Crow.FileItems.template" Name="fileView" Data="{./FileSystemEntries}"
 							SelectedItemChanged="./onSelectedItemChanged">
