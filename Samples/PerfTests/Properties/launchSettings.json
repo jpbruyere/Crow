@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PerfTests": {
+      "commandName": "Project",
+      "commandLineArgs": "1"
+    }
+  }
+}
