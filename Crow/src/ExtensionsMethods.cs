@@ -180,7 +180,7 @@ namespace Crow
 		}
 		public static bool IsWhiteSpaceOrNewLine (this char c)
 		{
-			return c == '\t' || c == '\r' || c == '\n' || char.IsWhiteSpace (c);
+			return c == '\t' || c.IsAnyLineBreakCharacter() || char.IsWhiteSpace (c);
 		}
 		public static object GetDefaultValue(this object obj)
 		{			
@@ -193,6 +193,32 @@ namespace Crow
 
 		public static FileSystemInfo [] GetFileSystemInfosOrdered (this DirectoryInfo di)
 			=> di.GetFileSystemInfos ().OrderBy (f => f.Attributes).ThenBy (f => f.Name).ToArray ();
+
+		internal static bool IsAnyLineBreakCharacter (this char c) 
+			=> c == '\n' || c == '\r' || c == '\u0085' || c == '\u2028' || c == '\u2029';
+		internal static ReadOnlySpan<char> GetLine (this string str, LineSpan ls) {
+			if (ls.Start >= str.Length)
+				return "".AsSpan ();
+			return str.AsSpan ().Slice (ls.Start, ls.Length);				
+		}
+		internal static ReadOnlySpan<char> GetLine (this string str, LineSpan ls, int offset) {
+			int start = ls.Start + offset;
+			if (start >= str.Length)
+				return "".AsSpan ();
+			return str.AsSpan ().Slice (start, ls.Length);
+				
+		}
+		internal static ReadOnlySpan<char> GetLineIncludingLineBreak (this string str, LineSpan ls) {
+			if (ls.Start >= str.Length)
+				return "".AsSpan ();
+			return str.AsSpan ().Slice (ls.Start, ls.LengthIncludingLineBreak);
+		}
+		internal static ReadOnlySpan<char> GetLineIncludingLineBreak (this string str, LineSpan ls, int offset) {
+			int start = ls.Start + offset;
+			if (start >= str.Length)
+				return "".AsSpan ();
+			return str.AsSpan ().Slice (start, ls.LengthIncludingLineBreak);
+		}
 	}
 }
 

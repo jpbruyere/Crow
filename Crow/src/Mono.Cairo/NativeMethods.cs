@@ -752,9 +752,6 @@ namespace Crow.Cairo
 		internal static extern void cairo_show_page (IntPtr cr);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern void cairo_show_text (IntPtr cr, byte[] text);
-
-		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern Status cairo_status (IntPtr cr);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
@@ -839,8 +836,17 @@ namespace Crow.Cairo
 		internal static extern IntPtr cairo_svg_surface_restrict_to_version (IntPtr surface, SvgVersion version);
 		#endregion
 
-		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
-		internal static extern void cairo_text_extents (IntPtr cr, string text, out TextExtents extents);
+		[DllImport (cairo, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void cairo_show_text (IntPtr cr, byte[] text);
+
+		[DllImport (cairo, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void cairo_text_extents (IntPtr cr, byte[] utf8, out TextExtents extents);
+
+		[DllImport (cairo, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void cairo_show_text (IntPtr cr, ref byte utf8);
+
+		[DllImport (cairo, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void cairo_text_extents (IntPtr cr, ref byte utf8, out TextExtents extents);
 
 		[DllImport (cairo, CallingConvention=CallingConvention.Cdecl)]
 		internal static extern void cairo_text_path (IntPtr ct, byte[] utf8);

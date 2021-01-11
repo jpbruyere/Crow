@@ -878,10 +878,35 @@ namespace Crow.Cairo {
 		public TextExtents TextExtents(string s)
 		{
 			TextExtents extents;
-			NativeMethods.cairo_text_extents (handle, s, out extents);
+			NativeMethods.cairo_text_extents (handle, TerminateUtf8(s), out extents);
 			return extents;
 		}
+		public void ShowText (ReadOnlySpan<char> s, int tabSize) {
+			int size = s.Length * 4 + 1;
+			Span<byte> bytes = size > 512 ? new byte[size] : stackalloc byte[size];
+			int encodedBytes = Encoding.UTF8.GetBytes(s, bytes);
+			bytes[encodedBytes] = 0;
 
+			NativeMethods.cairo_show_text (handle, ref bytes.Slice (0, encodedBytes + 1).GetPinnableReference ());
+		}
+		public TextExtents TextExtents (ReadOnlySpan<char> s, int tabSize) {
+			TextExtents extents;
+			int size = s.Length * 4 + 1;
+			Span<byte> bytes = size > 512 ? new byte[size] : stackalloc byte[size];
+			int encodedBytes = Encoding.UTF8.GetBytes (s, bytes);
+			bytes[encodedBytes] = 0;
+
+			NativeMethods.cairo_text_extents (handle, ref bytes.Slice (0, encodedBytes + 1).GetPinnableReference (), out extents);
+			return extents;
+		}
+		public void TextExtents (ReadOnlySpan<char> s, int tabSize, out TextExtents extents) {
+			int size = s.Length * 4 + 1;
+			Span<byte> bytes = size > 512 ? new byte[size] : stackalloc byte[size];
+			int encodedBytes = Encoding.UTF8.GetBytes (s, bytes);
+			bytes[encodedBytes] = 0;
+			
+			NativeMethods.cairo_text_extents (handle, ref bytes.Slice(0, encodedBytes + 1).GetPinnableReference(), out extents);
+		}
 
 		public TextExtents GlyphExtents (Glyph[] glyphs)
 		{
