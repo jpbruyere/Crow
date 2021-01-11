@@ -180,12 +180,12 @@ namespace Crow
 		}
 		public override bool IsWidgetEvent => true;
 		public DbgWidgetEvent () { }
-#if DEBUG_LOG
 		public DbgWidgetEvent (long timeStamp, DbgEvtType evt, Widget w) : base (timeStamp, evt)
 		{
+#if DEBUG_LOG
 			InstanceIndex = w.instanceIndex;
-		}
 #endif
+		}
 		public override string ToString ()
 			=> $"{base.ToString ()};{InstanceIndex}";
 	}
@@ -230,6 +230,10 @@ namespace Crow
 			OldSlot = lqi.Slot;
 			NewSlot = lqi.NewSlot;
 		}
+#else
+		public DbgLayoutEvent (long timeStamp, DbgEvtType evt, LayoutingQueueItem lqi) {}
+		public void SetLQI (LayoutingQueueItem lqi) { }
+
 #endif
 		public override string ToString ()
 			=> $"{base.ToString ()};{layouting};{result};{OldSlot};{NewSlot}";

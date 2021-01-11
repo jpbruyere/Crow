@@ -5,11 +5,11 @@
 		VerticalAlignment="Top" HorizontalAlignment="Left"
 		Focusable="True" Background="Green">
 		<Image VerticalAlignment="Bottom"			
-			Name="PhaseOverlay1" Width="100" Height="100" Path="image/u.svg" Background="Red"/>
+			Name="PhaseOverlay1" Width="100" Height="100" Path="#Crow.Icons.crow.svg" Background="Red"/>
 		<Image Top="100"		
-			Name="PhaseOverlay2" Width="100" Height="100" Path="image/u.svg" Background="Red"/>
+			Name="PhaseOverlay2" Width="100" Height="100" Path="#Crow.Icons.crow.svg" Background="Red"/>
 	</Group>
 	<Image VerticalAlignment="Center" HorizontalAlignment="Right"
-		Name="PhaseOverlay0" Width="100" Height="100" Path="image/u.svg" Background="Red"/>
+		Name="PhaseOverlay0" Width="100" Height="100" Path="#Crow.Icons.crow.svg" Background="Red"/>
 
 </Group>

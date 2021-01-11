@@ -231,16 +231,12 @@ namespace Crow
 		/// load styling, init default tooltips and context menus, load main.crow resource if exists.
 		/// </summary>
 		public void Init () {
-#if DEBUG_LOG
 			DbgLogger.StartEvent (DbgEvtType.IFaceInit);
-#endif
 			loadStyling ();
 			initTooltip ();
 			initContextMenus ();
 			OnInitialized ();
-#if DEBUG_LOG
 			DbgLogger.EndEvent (DbgEvtType.IFaceInit);
-#endif
 		}
 		/// <summary>
 		/// call Init() then enter the running loop performing ProcessEvents until running==false.
@@ -570,14 +566,12 @@ namespace Crow
 		public Widget Load (string path)
 		{
 			lock (UpdateMutex) {
-				#if DEBUG_LOG
 				DbgLogger.StartEvent (DbgEvtType.IFaceLoad);
-				#endif
+
 				Widget tmp = CreateInstance (path);
 				AddWidget (tmp);
-				#if DEBUG_LOG
+
 				DbgLogger.EndEvent (DbgEvtType.IFaceLoad);
-				#endif
 				return tmp;
 			}
 		}
@@ -630,9 +624,7 @@ namespace Crow
 				_activeWidget = value;
 
 				NotifyValueChanged ("ActiveWidget", _activeWidget);
-#if DEBUG_LOG
 				DbgLogger.AddEvent (DbgEvtType.ActiveWidget, _activeWidget);
-#endif
 
 				if (_activeWidget != null)
 					_activeWidget.IsActive = true;
@@ -652,9 +644,7 @@ namespace Crow
 				_hoverWidget = value;
 
 				NotifyValueChanged ("HoverWidget", _hoverWidget);
-#if DEBUG_LOG
 				DbgLogger.AddEvent (DbgEvtType.HoverWidget, _hoverWidget);
-#endif
 
 				if (DragAndDropOperation == null && FOCUS_ON_HOVER) {
 					Widget w = _hoverWidget;
@@ -682,9 +672,7 @@ namespace Crow
 				_focusedWidget = value;
 
 				NotifyValueChanged ("FocusedWidget", _focusedWidget);
-#if DEBUG_LOG				
 				DbgLogger.AddEvent (DbgEvtType.FocusedWidget, _focusedWidget);
-#endif
 				if (_focusedWidget != null)
 					_focusedWidget.HasFocus = true;
 			}
@@ -701,14 +689,9 @@ namespace Crow
 			lock (ClippingMutex) {
 				if (g.IsQueueForClipping)
 					return;
-#if DEBUG_LOG
-				DbgLogger.StartEvent (DbgEvtType.GOEnqueueForRepaint, g);
-#endif	
+				DbgLogger.AddEvent (DbgEvtType.GOEnqueueForRepaint, g);
 				ClippingQueue.Enqueue (g);
 				g.IsQueueForClipping = true;
-#if DEBUG_LOG
-				DbgLogger.EndEvent (DbgEvtType.GOEnqueueForRepaint);
-#endif
 			}
 		}
 		/// <summary>Main Update loop, executed in this interface thread, protected by the UpdateMutex
@@ -741,9 +724,7 @@ namespace Crow
 			if (!Monitor.TryEnter (UpdateMutex))
 				return;
 				
-#if DEBUG_LOG
 			DbgLogger.StartEvent (DbgEvtType.Update);
-#endif
 
 			processLayouting ();
 
@@ -755,9 +736,7 @@ namespace Crow
 			}else
 				processDrawing (ctx);
 
-#if DEBUG_LOG
 			DbgLogger.EndEvent (DbgEvtType.Update, true);
-#endif
 
 			Monitor.Exit (UpdateMutex);
 		}
@@ -766,9 +745,9 @@ namespace Crow
 		/// trigger an enqueue for the next Update Cycle</summary>
 		protected virtual void processLayouting(){
 			if (Monitor.TryEnter (LayoutMutex)) {
-#if DEBUG_LOG
+
 				DbgLogger.StartEvent (DbgEvtType.Layouting);
-#endif
+
 				DiscardQueue = new Queue<LayoutingQueueItem> ();
 				//Debug.WriteLine ("======= Layouting queue start =======");
 				LayoutingQueueItem lqi;
@@ -777,9 +756,9 @@ namespace Crow
 					lqi.ProcessLayouting ();
 				}
 				LayoutingQueue = DiscardQueue;
-#if DEBUG_LOG
+
 				DbgLogger.EndEvent (DbgEvtType.Layouting, true);
-#endif
+
 				Monitor.Exit (LayoutMutex);
 				DiscardQueue = null;
 			}
@@ -788,9 +767,9 @@ namespace Crow
 		/// Clipping rectangles are added at each level of the tree from leef to root, that's the way for the painting
 		/// operation to known if it should go down in the tree for further graphic updates and repaints</summary>
 		void clippingRegistration(){
-#if DEBUG_LOG
+
 			DbgLogger.StartEvent (DbgEvtType.Clipping);
-#endif
+
 			Widget g = null;
 			while (ClippingQueue.Count > 0) {
 				lock (ClippingMutex) {
@@ -799,16 +778,15 @@ namespace Crow
 				}
 				g.ClippingRegistration ();
 			}
-#if DEBUG_LOG
+
 			DbgLogger.EndEvent (DbgEvtType.Clipping, true);
-#endif
 		}
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
 		void processDrawing(Context ctx){
-#if DEBUG_LOG
+
 			DbgLogger.StartEvent (DbgEvtType.Drawing);
-#endif
+
 			if (DragImage != null)
 				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
 				if (!clipping.IsEmpty) {
@@ -870,9 +848,7 @@ namespace Crow
 					clipping = new Region ();
 				}
 			
-#if DEBUG_LOG
 			DbgLogger.EndEvent (DbgEvtType.Drawing, true);
-#endif
 		}
 		#endregion
 

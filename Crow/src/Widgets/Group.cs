@@ -67,12 +67,10 @@ namespace Crow
             set { _multiSelect = value; }
         }
 		public virtual void AddChild(Widget g){
-#if DEBUG_LOG
 			if (disposed) {
 				DbgLogger.AddEvent (DbgEvtType.AlreadyDisposed | DbgEvtType.GOAddChild);
 				return;
 			}
-#endif
 
 			childrenRWLock.EnterWriteLock();
 
@@ -116,12 +114,10 @@ namespace Crow
 			child.Dispose ();
         }
 		public virtual void InsertChild (int idx, Widget g) {
-#if DEBUG_LOG
 			if (disposed) {
 				DbgLogger.AddEvent (DbgEvtType.AlreadyDisposed | DbgEvtType.GOAddChild);
 				return;
 			}
-#endif
 			childrenRWLock.EnterWriteLock ();
 				
 			g.Parent = this;
@@ -395,9 +391,8 @@ namespace Crow
 		}
 		void searchLargestChild (bool forceMeasure = false)
 		{
-#if DEBUG_LOG
 			DbgLogger.StartEvent (DbgEvtType.GOSearchLargestChild, this);
-#endif
+
 			largestChild = null;
 			contentSize.Width = 0;
 			for (int i = 0; i < Children.Count; i++) {
@@ -415,15 +410,13 @@ namespace Crow
 					largestChild = Children [i];
 				}
 			}
-#if DEBUG_LOG
+
 			DbgLogger.EndEvent (DbgEvtType.GOSearchLargestChild);
-#endif
 		}
 		void searchTallestChild (bool forceMeasure = false)
 		{
-#if DEBUG_LOG
 			DbgLogger.StartEvent (DbgEvtType.GOSearchTallestChild, this);
-#endif
+
 			tallestChild = null;
 			contentSize.Height = 0;
 			for (int i = 0; i < Children.Count; i++) {
@@ -441,9 +434,7 @@ namespace Crow
 					tallestChild = Children [i];
 				}
 			}
-#if DEBUG_LOG
 			DbgLogger.EndEvent (DbgEvtType.GOSearchTallestChild);
-#endif
 		}
 
 

@@ -1,2 +1,2 @@
 <?xml version="1.0"?>
-<TestCairoPatch Background="White"/>
+<Widget Width="200" Height="200" Background="RoyalBlue"/>

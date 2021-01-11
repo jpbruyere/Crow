@@ -4,6 +4,6 @@
 	<Container Name="MiddleContainer" Width="50%" Height="Stretched"
 		Margin="20" Focusable="True" Background="Green">
 			<Image VerticalAlignment="Bottom"			
-				Name="PhaseOverlay" Width="100" Height="100" Path="image/u.svg" Background="Red"/>
+				Name="PhaseOverlay" Width="100" Height="100" Path="#Crow.Icons.crow.svg" Background="Red"/>
 	</Container>
 </Container>

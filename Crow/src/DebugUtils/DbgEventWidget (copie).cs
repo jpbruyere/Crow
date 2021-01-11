@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Crow.Cairo;
-#if DEBUG_LOG
+
 namespace Crow
 {
 	/*
@@ -84,4 +84,3 @@ namespace Crow
 		}
 	}*/
 }
-#endif

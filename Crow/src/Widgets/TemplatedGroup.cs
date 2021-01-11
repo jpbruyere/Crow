@@ -296,9 +296,8 @@ namespace Crow {
 		/// Items loading thread
 		/// </summary>
 		void loading(){
-#if DEBUG_LOG
 			DbgLogger.StartEvent (DbgEvtType.TGLoadingThread, this);
-#endif
+
 			try {
 				loadPage (data, items, dataTest);
 			} catch (Exception ex) {
@@ -306,9 +305,8 @@ namespace Crow {
 					Monitor.Exit (IFace.LayoutMutex);
 				System.Diagnostics.Debug.WriteLine ("loading thread aborted: " + ex.ToString());
 			}
-#if DEBUG_LOG
+
 			DbgLogger.EndEvent (DbgEvtType.TGLoadingThread);
-#endif
 		}
 		//			//if (!ItemTemplates.ContainsKey ("default"))
 		//			//	ItemTemplates ["default"] = Interface.GetItemTemplate (ItemTemplate);
@@ -328,9 +326,7 @@ namespace Crow {
 			bool updateMx = Monitor.IsEntered (IFace.UpdateMutex);
 			bool layoutMx = Monitor.IsEntered (IFace.LayoutMutex);
 
-#if DEBUG_LOG
 			DbgLogger.AddEvent (DbgEvtType.TGCancelLoadingThread, this);
-#endif
 
 			if (layoutMx)
 				Monitor.Exit (IFace.LayoutMutex);

@@ -3,13 +3,10 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Crow
 {
-	[Flags]
+    [Flags]
 	public enum LayoutingType : byte
 	{
 		None = 0x00,
@@ -62,7 +59,7 @@ namespace Crow
 			get { return graphicObject.Height; }
 		}
 		public Rectangle Slot, NewSlot;
-		#endif
+#endif
 
 		#region CTOR
 		public LayoutingQueueItem (LayoutingType _layoutType, ILayoutable _graphicObject)
@@ -72,12 +69,12 @@ namespace Crow
 			Layoutable.RegisteredLayoutings |= LayoutType;
 			LayoutingTries = 0;
 			DiscardCount = 0;
-			#if DEBUG_LOG
+#if DEBUG_LOG
 			Slot = Rectangle.Zero;
 			NewSlot = Rectangle.Zero;
 			result = Result.Register;
 			DbgLogger.AddEvent (DbgEvtType.GORegisterLayouting, this);
-			#endif
+#endif
 		}
 		#endregion
 
@@ -95,57 +92,49 @@ namespace Crow
 			if (go.Parent == null) {//TODO:improve this
 				//cancel layouting for object without parent, maybe some were in queue when
 				//removed from a listbox
-				#if DEBUG_LOG
 				DbgLogger.AddEvent (DbgEvtType.GOProcessLayoutingWithNoParent, this);
-				#endif
 				go.parentRWLock.ExitReadLock ();
 				return;
 			}
-			#if DEBUG_LOG
+#if DEBUG_LOG
 			DbgLogger.StartEvent (DbgEvtType.GOProcessLayouting, this);
 			Slot = graphicObject.Slot;
-			#endif
+#endif
 			LayoutingTries++;
 			if (!Layoutable.UpdateLayout (LayoutType)) {
 				if (LayoutingTries < Interface.MaxLayoutingTries) {
 					Layoutable.RegisteredLayoutings |= LayoutType;
 					(Layoutable as Widget).IFace.LayoutingQueue.Enqueue (this);
-					#if DEBUG_LOG
+#if DEBUG_LOG
 					result = Result.Requeued;
-					#endif
+#endif
 				} else if (DiscardCount < Interface.MaxDiscardCount) {
-					#if DEBUG_LOG
+#if DEBUG_LOG
 					result = Result.Discarded;
-					#endif
+#endif
 					LayoutingTries = 0;
 					DiscardCount++;
 					Layoutable.RegisteredLayoutings |= LayoutType;
 					(Layoutable as Widget).IFace.DiscardQueue.Enqueue (this);
 				}
-				#if DEBUG_LOG
+#if DEBUG_LOG
 				else {
 					result = Result.Deleted;
 				}
-				#endif
+#endif
 			}
-			#if DEBUG_LOG
+#if DEBUG_LOG
 			else{
 				result = Result.Success;
 			}
 			NewSlot = graphicObject.Slot;
-			(DbgLogger.EndEvent (DbgEvtType.GOProcessLayouting) as DbgLayoutEvent).SetLQI (this);
-			#endif
+			DbgLogger.EndEvent (DbgEvtType.GOProcessLayouting, this);
+#endif
 			go.parentRWLock.ExitReadLock ();
 		}
 
-		public static implicit operator Widget(LayoutingQueueItem queueItem)
-		{
-			return queueItem.Layoutable as Widget;
-		}
-		public static implicit operator LayoutingType(LayoutingQueueItem lqi)
-		{
-			return lqi.LayoutType;
-		}
+		public static implicit operator Widget(LayoutingQueueItem queueItem) => queueItem.Layoutable as Widget;
+		public static implicit operator LayoutingType(LayoutingQueueItem lqi) => lqi.LayoutType;
 		public override string ToString ()
 			=> $"{LayoutType};{Layoutable.ToString ()};{LayoutingTries};{DiscardCount}";
 	}

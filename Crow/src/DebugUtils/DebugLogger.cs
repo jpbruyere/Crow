@@ -79,7 +79,7 @@ namespace Crow
 
 		All = 0x0FFFFFFF
 	}
-#if DEBUG_LOG
+	
 	public static class DbgLogger
 	{
 		public static DbgEvtType IncludeEvents = DbgEvtType.All;
@@ -109,24 +109,26 @@ namespace Crow
 			}
 		}
 
-		public static DbgEvent StartEvent (DbgEvtType evtType, params object[] data)
+		[Conditional ("DEBUG_LOG")]
+		public static void StartEvent (DbgEvtType evtType, params object[] data)
 		{
 			if (!logevt (evtType))
-				return null;
+				return;
 			lock (logMutex) {
 				chrono.Stop ();
 				DbgEvent evt = addEventInternal (evtType, data);
 				if (!startedEvents.ContainsKey (Thread.CurrentThread.ManagedThreadId))
 					startedEvents [Thread.CurrentThread.ManagedThreadId] = new Stack<DbgEvent> ();
 				startedEvents [Thread.CurrentThread.ManagedThreadId].Push (evt);
-				chrono.Start ();
-				return evt;
+				chrono.Start ();				
 			}
 		}
-		public static DbgEvent EndEvent (DbgEvtType evtType, bool discardIfNoChildEvents = false)
+
+		[Conditional ("DEBUG_LOG")]
+		public static void EndEvent (DbgEvtType evtType, bool discardIfNoChildEvents = false)
 		{
 			if (!logevt (evtType))
-				return null;
+				return;
 
 			lock (logMutex) {
 				chrono.Stop ();
@@ -140,16 +142,36 @@ namespace Crow
 				else
 					e.end = chrono.ElapsedTicks;
 				chrono.Start ();
-				return e;
 			}
+		}
+
+		// End layouting queue event and set the corresponding lqi
+		[Conditional ("DEBUG_LOG")]
+		public static void EndEvent (DbgEvtType evtType, LayoutingQueueItem lqi) {
+			if (!logevt (evtType))
+				return;
+
+			lock (logMutex) {
+				chrono.Stop ();
+				if (!startedEvents.ContainsKey (Thread.CurrentThread.ManagedThreadId))
+					throw new Exception ("Current thread has no event started");
+				DbgLayoutEvent e = startedEvents[Thread.CurrentThread.ManagedThreadId].Pop () as DbgLayoutEvent;
+				if (e?.type != evtType)
+					throw new Exception ($"Begin/end event logging mismatch: {e.type}/{evtType}");
+				e.end = chrono.ElapsedTicks;
+				e.SetLQI (lqi);
+				chrono.Start ();
+			}
+
 		}
 		/// <summary>
 		/// End event by reference to cancel unended events on failure
 		/// </summary>
-		public static DbgEvent EndEvent (DbgEvtType evtType, DbgEvent evt)
+		/*
+		public static void EndEvent (DbgEvtType evtType, DbgEvent evt)
 		{
 			if (!logevt (evtType))
-				return null;
+				return;
 
 			lock (logMutex) {
 				chrono.Stop ();
@@ -162,17 +184,17 @@ namespace Crow
 				chrono.Start ();
 				return e;
 			}
-		}
+		}*/
 
-		public static DbgEvent AddEvent (DbgEvtType evtType, params object [] data) { 
+		[Conditional("DEBUG_LOG")]
+		public static void AddEvent (DbgEvtType evtType, params object [] data) { 
 			if (!logevt (evtType))
-				return null;
+				return;
 
 			lock (logMutex) {
 				chrono.Stop ();
 				DbgEvent evt = addEventInternal (evtType, data);
 				chrono.Start ();
-				return evt;
 			}
 		}
 
@@ -191,7 +213,7 @@ namespace Crow
 			curEventList.Add (evt);
 			return evt;
 		}
-
+#if DEBUG_LOG
 		static void parseTree (Widget go, int level = 0, int y = 1) {
 			if (go == null)
 				return;
@@ -256,9 +278,8 @@ namespace Crow
 					saveEventList (s, e.Events, level + 1);
 			}
 		}
-
-	}
 #endif
+	}
 }
 
 

@@ -1,6 +1,26 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack Spacing="5" Margin="5">
-	<Image Path="#images.valign.svg" Fit="True" Background="White" Margin="5" SvgSub="{²CurrentVAlign}"/>
+	<EnumSelector Caption="Vertical Alignemnt" EnumValue="{²CurrentVAlign}" Width="200">
+		<Template>
+			<Popper Caption="{./Caption}" CornerRadius="{./CornerRadius}" Foreground="{./Foreground}" Background="{./Background}">
+				<Template>
+					<CheckBox Caption="{./Caption}" IsChecked="{²./IsPopped}" Foreground="{./Foreground}" Background="{./Background}">
+						<Template>
+							<Border Style="ControlBorder" Background="{./Background}" CornerRadius="{./CornerRadius}">
+								<HorizontalStack Spacing="5">
+									<Label Style="ControlCaption" Text="{./Caption}" Width="Fit" />
+									<Label Style="ControlCaption" TextAlignment="Right" Text="{CurrentVAlign}" Width="Stretched"/>
+								</HorizontalStack>
+							</Border>
+						</Template>
+					</CheckBox>
+				</Template>
+				<VerticalStack Height="Fit" Name="Content" Background="Jet" Margin="5" 
+							   MinimumSize="{../MinimumPopupSize}"/>
+			</Popper>
+		</Template>
+	</EnumSelector>	
+	<!--<Image Path="#images.valign.svg" Fit="True" Background="White" Margin="5" SvgSub="{²CurrentVAlign}"/>
 	<Border Height="100" Width="Fit" Background="Jet">
 		<Label Margin="5" Text="vertical aligned text" VerticalAlignment="{CurrentVAlign}" Background="DarkBlue"/>
 	</Border>
@@ -12,5 +32,5 @@
 	</EnumSelector>
 	<EnumSelector RadioButtonStyle="CheckBox2" Name="valign" Caption="Vertical Alignment" EnumValue="{²CurrentVAlign}" />
 	<EnumSelector RadioButtonStyle="valignStyle" Name="valign1" Caption="Vertical Alignment" EnumValue="{²CurrentVAlign}" />
-	<EnumSelector RadioButtonStyle="valignStyle2" Name="valign2" Caption="Vertical Alignment" EnumValue="{²CurrentVAlign}" />
+	<EnumSelector RadioButtonStyle="valignStyle2" Name="valign2" Caption="Vertical Alignment" EnumValue="{²CurrentVAlign}" />-->
 </VerticalStack>

@@ -62,7 +62,7 @@ namespace Crow
 			}
 		}
 
-		[DefaultValue ("#Crow.Images.button.svg")]
+		[DefaultValue ("#Crow.Icons.crow.svg")]
 		public string Icon {
 			get { return Command == null ? icon : Command.Icon; ; }
 			set {

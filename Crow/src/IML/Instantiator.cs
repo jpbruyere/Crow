@@ -73,14 +73,12 @@ namespace Crow.IML {
 		/// </summary>
 		public Instantiator (Interface _iface, Stream stream, string srcPath = null)
 		{
-			#if DESIGN_MODE
+#if DESIGN_MODE
 			currentInstantiatorID = NextInstantiatorID++;
-			#endif
+#endif
 			iface = _iface;
 			sourcePath = srcPath;
-#if DEBUG_LOG
-			DbgEvent de = DbgLogger.StartEvent (DbgEvtType.CreateITor, sourcePath);
-#endif
+			DbgLogger.StartEvent (DbgEvtType.CreateITor, sourcePath);
 			try {
 				using (XmlReader itr = XmlReader.Create (stream)) {
 					parseIML (itr);
@@ -89,9 +87,7 @@ namespace Crow.IML {
 				throw new InstantiatorException(sourcePath, ex);
 			} finally {
 				stream?.Dispose ();
-#if DEBUG_LOG
-			DbgLogger.EndEvent (DbgEvtType.CreateITor, de);
-#endif
+				DbgLogger.EndEvent (DbgEvtType.CreateITor);
 			}
 		}
 		/// <summary>
