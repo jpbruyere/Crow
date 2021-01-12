@@ -1,28 +1,6 @@
-﻿//
-// PerformanceMeasure.cs
+﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using System.Diagnostics;
@@ -38,14 +16,46 @@ namespace Crow
 				ValueChanged.Invoke(this, new ValueChangeEventArgs(MemberName, _value));
 		}
 		#endregion
+		public enum Kind
+        {
+			Update,
+			Clipping,
+			Layouting,
+			Drawing
+        }
+		public static PerformanceMeasure[] Measures;		
+
+		[Conditional("MEASURE_TIME")]
+		public static void InitMeasures () {
+			Measures = new PerformanceMeasure[4];
+			Measures[(int)Kind.Update] = new PerformanceMeasure (Kind.Update, 1);
+			Measures[(int)Kind.Clipping] = new PerformanceMeasure (Kind.Clipping, 1);
+			Measures[(int)Kind.Layouting] = new PerformanceMeasure (Kind.Layouting, 1);
+			Measures[(int)Kind.Drawing] = new PerformanceMeasure (Kind.Drawing, 1);
+		}
+		[Conditional ("MEASURE_TIME")]
+		public static void Notify () {
+            for (int i = 0; i < 4; i++)
+				Measures[i].NotifyChanges ();            
+		}
+		[Conditional ("MEASURE_TIME")]
+		public static void Begin (Kind kind) {
+			Measures[(int)kind].StartCycle ();
+		}
+		[Conditional ("MEASURE_TIME")]
+		public static void End (Kind kind) {
+			Measures[(int)kind].StopCycle ();
+		}
+
 
 		public Stopwatch timer = new Stopwatch ();
-		public string Name;
+		public readonly Kind MeasureKind;
 		public long current, minimum, maximum, total, cptMeasures;
 		public long cancelLimit;
+		public string Name => MeasureKind.ToString ();
 
-		public PerformanceMeasure(string name = "unamed", long _cancelLimit = 0){
-			Name = name;
+		public PerformanceMeasure (Kind measureKind, long _cancelLimit = 0){
+			MeasureKind = measureKind;
 			cancelLimit = _cancelLimit;
 			ResetStats ();
 		}

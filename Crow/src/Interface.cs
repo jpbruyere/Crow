@@ -114,9 +114,14 @@ namespace Crow
 				};
 				t.Start ();
 			}
+
+			PerformanceMeasure.InitMeasures ();
 		}
 		#endregion
 
+#if MEASURE_TIME
+		public PerformanceMeasure[] PerfMeasures => PerformanceMeasure.Measures;
+#endif
 		/** GLFW callback may return a custom pointer, this list makes the link between the GLFW window pointer and the
 			manage VkWindow instance. */
 		static Dictionary<IntPtr, Interface> windows = new Dictionary<IntPtr, Interface> ();
@@ -723,8 +728,9 @@ namespace Crow
 
 			if (!Monitor.TryEnter (UpdateMutex))
 				return;
-				
+			
 			DbgLogger.StartEvent (DbgEvtType.Update);
+			PerformanceMeasure.Begin (PerformanceMeasure.Kind.Update);
 
 			processLayouting ();
 
@@ -736,17 +742,24 @@ namespace Crow
 			}else
 				processDrawing (ctx);
 
+			PerformanceMeasure.End (PerformanceMeasure.Kind.Update);
 			DbgLogger.EndEvent (DbgEvtType.Update, true);
 
 			Monitor.Exit (UpdateMutex);
+
+			PerformanceMeasure.Notify ();
 		}
 		/// <summary>Layouting loop, this is the first step of the udpate and process registered
 		/// Layouting queue items. Failing LQI's are requeued in this cycle until MaxTry is reached which
 		/// trigger an enqueue for the next Update Cycle</summary>
 		protected virtual void processLayouting(){
 			if (Monitor.TryEnter (LayoutMutex)) {
-
+				if (LayoutingQueue.Count == 0) {
+					Monitor.Exit (LayoutMutex);
+					return;
+                }
 				DbgLogger.StartEvent (DbgEvtType.Layouting);
+				PerformanceMeasure.Begin (PerformanceMeasure.Kind.Layouting);
 
 				DiscardQueue = new Queue<LayoutingQueueItem> ();
 				//Debug.WriteLine ("======= Layouting queue start =======");
@@ -757,6 +770,7 @@ namespace Crow
 				}
 				LayoutingQueue = DiscardQueue;
 
+				PerformanceMeasure.End (PerformanceMeasure.Kind.Layouting);
 				DbgLogger.EndEvent (DbgEvtType.Layouting, true);
 
 				Monitor.Exit (LayoutMutex);
@@ -767,8 +781,11 @@ namespace Crow
 		/// Clipping rectangles are added at each level of the tree from leef to root, that's the way for the painting
 		/// operation to known if it should go down in the tree for further graphic updates and repaints</summary>
 		void clippingRegistration(){
+			if (ClippingQueue.Count == 0)
+				return;
 
 			DbgLogger.StartEvent (DbgEvtType.Clipping);
+			PerformanceMeasure.Begin (PerformanceMeasure.Kind.Clipping);
 
 			Widget g = null;
 			while (ClippingQueue.Count > 0) {
@@ -779,6 +796,7 @@ namespace Crow
 				g.ClippingRegistration ();
 			}
 
+			PerformanceMeasure.End (PerformanceMeasure.Kind.Clipping);
 			DbgLogger.EndEvent (DbgEvtType.Clipping, true);
 		}
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
@@ -789,64 +807,68 @@ namespace Crow
 
 			if (DragImage != null)
 				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
-				if (!clipping.IsEmpty) {
-					IsDirty = true;
 
-					ctx.PushGroup ();
+			if (!clipping.IsEmpty) {
+				PerformanceMeasure.Begin (PerformanceMeasure.Kind.Drawing);
+				IsDirty = true;
 
-					for (int i = GraphicTree.Count -1; i >= 0 ; i--){
-						Widget p = GraphicTree[i];
-						if (!p.Visible)
-							continue;
-						if (clipping.Contains (p.Slot) == RegionOverlap.Out)
-							continue;
+				ctx.PushGroup ();
 
+				for (int i = GraphicTree.Count -1; i >= 0 ; i--){
+					Widget p = GraphicTree[i];
+					if (!p.Visible)
+						continue;
+					if (clipping.Contains (p.Slot) == RegionOverlap.Out)
+						continue;
+
+					ctx.Save ();
+					p.Paint (ref ctx);
+					ctx.Restore ();
+				}
+
+				if (DragAndDropOperation != null) {
+					if (DragImage != null) {
+						DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
+						DragImageX = MousePosition.X - DragImageWidth / 2;
+						DragImageY = MousePosition.Y - DragImageHeight / 2;
 						ctx.Save ();
-						p.Paint (ref ctx);
+						ctx.ResetClip ();
+						ctx.SetSource (DragImage, DragImageX, DragImageY);
+						ctx.PaintWithAlpha (0.8);
 						ctx.Restore ();
+						DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
+						IsDirty = true;
+						//System.Diagnostics.Debug.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
 					}
-
-					if (DragAndDropOperation != null) {
-						if (DragImage != null) {
-							DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
-							DragImageX = MousePosition.X - DragImageWidth / 2;
-							DragImageY = MousePosition.Y - DragImageHeight / 2;
-							ctx.Save ();
-							ctx.ResetClip ();
-							ctx.SetSource (DragImage, DragImageX, DragImageY);
-							ctx.PaintWithAlpha (0.8);
-							ctx.Restore ();
-							DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
-							IsDirty = true;
-							//System.Diagnostics.Debug.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
-						}
-					}
+				}
 
 #if DEBUG_CLIP_RECTANGLE
-					ctx.LineWidth = 1;
-					ctx.SetSourceColor(Color.Magenta.AdjustAlpha (0.5));
-					for (int i = 0; i < clipping.NumRectangles; i++)
-						ctx.Rectangle(clipping.GetRectangle(i));
-					ctx.Stroke ();
+				ctx.LineWidth = 1;
+				ctx.SetSourceColor(Color.Magenta.AdjustAlpha (0.5));
+				for (int i = 0; i < clipping.NumRectangles; i++)
+					ctx.Rectangle(clipping.GetRectangle(i));
+				ctx.Stroke ();
 #endif
 
-					ctx.PopGroupToSource ();
+				ctx.PopGroupToSource ();
 
-					for (int i = 0; i < clipping.NumRectangles; i++)
-						ctx.Rectangle (clipping.GetRectangle (i));
+				for (int i = 0; i < clipping.NumRectangles; i++)
+					ctx.Rectangle (clipping.GetRectangle (i));
 
-					ctx.ClipPreserve ();
-					ctx.Operator = Operator.Clear;
-					ctx.Fill ();
-					ctx.Operator = Operator.Over;
+				ctx.ClipPreserve ();
+				ctx.Operator = Operator.Clear;
+				ctx.Fill ();
+				ctx.Operator = Operator.Over;
 
-					ctx.Paint ();
+				ctx.Paint ();
 					
-					surf.Flush ();
+				surf.Flush ();
 
-					clipping.Dispose ();
-					clipping = new Region ();
-				}
+				clipping.Dispose ();
+				clipping = new Region ();
+
+				PerformanceMeasure.End (PerformanceMeasure.Kind.Drawing);
+			}
 			
 			DbgLogger.EndEvent (DbgEvtType.Drawing, true);
 		}
