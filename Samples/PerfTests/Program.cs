@@ -81,8 +81,8 @@ namespace PerfTests
 
 				ClearInterface ();
 				if (resetStylesAndTemplates) {
-					this.Styling.Clear ();
-					this.StylingConstants.Clear ();
+					//this.Styling.Clear ();
+					//this.StylingConstants.Clear ();
 					this.Instantiators.Clear ();
 					this.Templates.Clear ();
 					this.DefaultTemplates.Clear ();
