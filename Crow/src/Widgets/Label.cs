@@ -340,7 +340,7 @@ namespace Crow {
 				bool lineBreak = false;
 				int start = 0, end = 0;
                 for (int i = 0; i < _text.Length; i++) {
-					if (_text[i] == '\r' || _text[i] == '\n') {
+					if (_text[i].IsAnyLineBreakCharacter()) {
 						if (lineBreak)
 							continue;
 						lineBreak = true;

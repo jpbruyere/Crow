@@ -11,32 +11,98 @@ namespace PerfTests
 {
 	class TestInterface : Interface
 	{
-		readonly int count;
+		readonly int count = 1, updateCycles = 0;
 		readonly bool miliseconds = false;
-		readonly bool resetStylesAndTemplates = true;
-		readonly string outDirectory;
+		readonly bool resetItors = false;
+		readonly bool screenOutput = false;
+		readonly string inDirectory = "Interfaces";//directory to test
 
-		Stream outStream;
+
+        Stream outStream;
 		TextWriter writer;
 
 		bool logToDisk => writer != null;
 
 		void writeHeader (TextWriter txtWriter) {
-			txtWriter.WriteLine ($"Crow perf test ({clientRectangle.Width} X {clientRectangle.Height}), repeat count = {count}, reset style and templates = {resetStylesAndTemplates}");
+			txtWriter.WriteLine ($"Crow perf test ({clientRectangle.Width} X {clientRectangle.Height}), repeat count = {count}, reset style and templates = {resetItors}");
 			txtWriter.WriteLine ($"git:{ThisAssembly.Git.Commit} {ThisAssembly.Git.Branch} {ThisAssembly.Git.SemVer.Major}.{ThisAssembly.Git.SemVer.Minor}.{ThisAssembly.Git.SemVer.Patch} {ThisAssembly.Git.SemVer.Label}");
 		}
-		public TestInterface (int count, string _outDirectory = "", int width = 800, int height = 600)
+
+		void printHelp () {
+			Console.WriteLine ("Usage: PerfTests.exe [options]\n");
+			Console.WriteLine ("-o,--output:\n\tWrite results to output directory, if omited, results are printed to screen.");
+			Console.WriteLine ("-i,--input:\n\tInput directory to search recursively for '.crow' file to test.");
+			Console.WriteLine ("-w,--width:\n\toutput surface width, not displayed on screen.");
+			Console.WriteLine ("-h,--height:\n\toutput surface height, not displayed on screen.");
+			Console.WriteLine ("-c,--count:\n\trepeat each test 'c' times.");
+			Console.WriteLine ("-m,--millisec:\n\tenable measure time in milisecond, if omitted measure in ticks.");
+			Console.WriteLine ("-r,--reset:\n\tenable clear iterators after each test file.");
+			Console.WriteLine ("-u,--update:\n\tmeasure 'n' update cycle with DateTime.Now string notified.");
+			Console.WriteLine ("-s,--screen:\n\tenable output to screen.");
+		}
+
+		public TestInterface (string[] args, int width = 800, int height = 600)
 			: base (width, height, false, false)
 		{
-			this.count = count;
+			string outDir = null;
 
-			if (string.IsNullOrEmpty (_outDirectory)) {
+			int i = 0;
+			try {
+				while (i < args.Length) {
+					switch (args[i++]) {
+					case "-o":
+					case "--output":
+						outDir = args[i++];
+						break;
+					case "-i":
+					case "--input":
+						inDirectory = args[i++];
+						break;
+					case "-c":
+					case "--count":
+						count = int.Parse (args[i++]);
+						break;
+					case "-w":
+					case "--width":
+						clientRectangle.Width = int.Parse (args[i++]);
+						break;
+					case "-h":
+					case "--height":
+						clientRectangle.Height = int.Parse (args[i++]);
+						break;
+					case "-m":
+					case "--millisec":
+						miliseconds = true;
+						break;
+					case "-r":
+					case "--reset":
+						resetItors = true;
+						break;
+					case "-u":
+					case "--update":
+						updateCycles = int.Parse (args[i++]);
+						break;
+					case "-s":
+					case "--screen":
+						screenOutput = true;
+						break;
+
+					default:						
+						throw new Exception ();
+					}
+				}
+			} catch (Exception) {
+				printHelp ();
+				throw;
+			}
+
+			if (string.IsNullOrEmpty (outDir)) {
 				writeHeader (Console.Out);
 				Console.WriteLine (new string ('-', 100));
 				Console.WriteLine ($"{" Path",-50}|   Min    |   Mean   |   Max    | Alloc(kb)| Lost(Kb) |");
 			} else {
-				string dirName = Path.IsPathRooted (_outDirectory) ? _outDirectory :
-					Path.Combine (Directory.GetCurrentDirectory (), _outDirectory);
+				string dirName = Path.IsPathRooted (outDir) ? outDir :
+					Path.Combine (Directory.GetCurrentDirectory (), outDir);
 				if (!Directory.Exists (dirName))
 					Directory.CreateDirectory (dirName);
 
@@ -47,11 +113,23 @@ namespace PerfTests
 				writer.WriteLine ("Path;Min;Mean;Max;Allocated;LostMem");
 			}
 
-			surf = new Crow.Cairo.ImageSurface (Crow.Cairo.Format.Argb32, ClientRectangle.Width, ClientRectangle.Height);
+			if (screenOutput)
+				initSurface ();
+			else
+				surf = new Crow.Cairo.ImageSurface (Crow.Cairo.Format.Argb32, ClientRectangle.Width, ClientRectangle.Height);
 			Init ();
 		}
 
-        protected override void Dispose (bool disposing) {
+		public void PerformTests () {
+			string dirName = Path.IsPathRooted (inDirectory) ? inDirectory :
+				Path.Combine (Directory.GetCurrentDirectory (), inDirectory);
+			if (!Directory.Exists (dirName))
+				throw new FileNotFoundException ("Input directory not found: " + dirName);
+
+			testDir (dirName);
+		}
+
+		protected override void Dispose (bool disposing) {
             base.Dispose (disposing);
 
 			if (logToDisk) {
@@ -70,17 +148,31 @@ namespace PerfTests
 			Stopwatch sw = new Stopwatch ();
 
 			for (int i = 0; i < count; i++) {
-				sw.Restart ();
 
+				if (updateCycles == 0) {
+					sw.Restart ();//dont measure load time when measuring updates
+					Load (path);
+				}else
+					Load (path).DataSource = this;
 
-				Load (path);
+				Update ();
 				while (LayoutingQueue.Count > 0)
 					Update ();
+
+				if (updateCycles > 0) {
+					sw.Restart ();
+                    for (int j = 0; j < updateCycles; j++) {
+						NotifyValueChanged ("elapsed", sw.ElapsedTicks);				
+						Update ();
+						while (LayoutingQueue.Count > 0)
+							Update ();
+					}
+				}
 
 				sw.Stop ();
 
 				ClearInterface ();
-				if (resetStylesAndTemplates) {
+				if (resetItors) {
 					//this.Styling.Clear ();
 					//this.StylingConstants.Clear ();
 					this.Instantiators.Clear ();
@@ -108,10 +200,9 @@ namespace PerfTests
 
 			return total / count;
 		}
-
 		void testDir (string dirPath, int level = 0)
 		{
-			string label = $"{new string (' ', level * 4)}- {dirPath}";
+			string label = $"{new string (' ', level * 4)}- {Path.GetFileName (dirPath)}";
 			if (!logToDisk)
 				Console.WriteLine (label, -50);
 			level++;
@@ -143,27 +234,21 @@ namespace PerfTests
 					} else {
 						Console.WriteLine ($"{label,-50}");
 						Console.ForegroundColor = ConsoleColor.Red;
-						Console.WriteLine ($"\t\t{ex.Message}");
+						Console.WriteLine ($"\t\t{ex.ToString()}");
 						Console.ResetColor ();
 					}
 				}
 			}
 		}
 		
-
 		public static void Main (string [] args)
 		{
-			int count = 10;
-			string outDir = "";
-
-			if (args.Length > 0 && int.TryParse (args[0], out int c))
-				count = c;
-			if (args.Length > 1)
-				outDir = args[1];
-
-			using (TestInterface iface = new TestInterface (count, outDir)) {
-				iface.testDir (@"Interfaces");
-			}
+            try {
+				using (TestInterface iface = new TestInterface (args)) {
+					iface.PerformTests ();
+				}
+			} catch (Exception) {
+            }
 		}
 	}
 }
