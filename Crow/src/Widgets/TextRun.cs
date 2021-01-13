@@ -19,8 +19,6 @@ namespace Crow
 		public TextRun (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
-		//TODO:change protected to private
-
 		#region private and protected fields
 		protected string _text = "label";
 		Alignment _textAlignment = Alignment.Left;
@@ -34,8 +32,6 @@ namespace Crow
 		protected FontExtents fe;
 		protected TextExtents te;
 		#endregion
-
-
 		
 		[DefaultValue (Alignment.Left)]
 		public Alignment TextAlignment {

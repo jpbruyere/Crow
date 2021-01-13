@@ -141,7 +141,7 @@ namespace Crow
 			Glfw3.SetWindowSizeCallback (hWin, HandleWindowSizeDelegate);
 		}
 
-		void initSurface ()
+		protected void initSurface ()
 		{
 			Glfw3.Init ();
 
@@ -251,9 +251,11 @@ namespace Crow
 
 			while (!Glfw3.WindowShouldClose (hWin)) {
 				Glfw3.PollEvents ();
+				UpdateFrame ();
 				Thread.Sleep(1);
 			}
 		}
+		public virtual void UpdateFrame () { }
 
 		public virtual void Quit () => Glfw3.SetWindowShouldClose (hWin, 1);
 

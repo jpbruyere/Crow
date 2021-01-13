@@ -1,0 +1,53 @@
+﻿<?xml version="1.0"?>
+<HorizontalStack>
+	<VerticalStack Width="20%" Height="Fit">
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+	</VerticalStack>
+	<VerticalStack Width="20%" Height="Fit">
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+	</VerticalStack>
+	<VerticalStack Width="20%" Height="Fit">
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+	</VerticalStack>
+	<VerticalStack Width="20%" Height="Fit">
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+		<Label Text="{elapsed}" />
+	</VerticalStack>
+</HorizontalStack>
+
+
