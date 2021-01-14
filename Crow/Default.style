@@ -74,6 +74,11 @@ Label {
 	Width = "Fit";
 	Margin = "0";	
 }
+OldLabel {
+	Height = "Fit";
+	Width = "Fit";
+	Margin = "0";	
+}
 TextBox {
 	Background = "White";
 	Foreground = "Black";

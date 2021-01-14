@@ -8,4 +8,7 @@
 			<LogicalName>ShowCase.%(Filename)%(Extension)</LogicalName>
 		</EmbeddedResource>
 	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="C:\Users\Jean-Philippe\source\Crow\Samples\common\ui\Interfaces\Experimental\testDock2.crow" />
+	</ItemGroup>
 </Project>

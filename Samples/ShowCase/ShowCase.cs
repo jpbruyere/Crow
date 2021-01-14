@@ -175,15 +175,6 @@ namespace ShowCase
 
 			reloadFromFile ();
 		}
-		public override bool OnKeyDown (Key key)
-		{
-			switch (key) {
-			case Key.F2:
-				//DbgLogger.save (this);
-				return true;
-			}
-			return base.OnKeyDown (key);
-		}
 
 
 		public void goUpDirClick (object sender, MouseButtonEventArgs e)

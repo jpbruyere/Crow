@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Crow;
+using Glfw;
 
 namespace Crow
 {
@@ -261,5 +262,25 @@ namespace Crow
 			base.OnInitialized ();
 		}
 
+		public override bool OnKeyDown (Key key) {
+			
+			switch (key) {
+			case Key.F5:
+				Load ("Interfaces/Divers/testFileDialog.crow").DataSource = this;
+				return true;
+			case Key.F6:
+				Load ("Interfaces/Divers/0.crow").DataSource = this;
+				return true;
+			case Key.F7:
+				Load ("Interfaces/Divers/perfMeasures.crow").DataSource = this;
+				return true;
+			case Key.F2:
+				if (IsKeyDown (Key.LeftShift))
+					DbgLogger.Reset ();
+				DbgLogger.Save (this);
+				return true;
+			}
+			return base.OnKeyDown (key);
+		}
 	}
 }

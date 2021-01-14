@@ -16,6 +16,7 @@ namespace PerfTests
 		readonly bool resetItors = false;
 		readonly bool screenOutput = false;
 		readonly string inDirectory = "Interfaces";//directory to test
+		readonly string outFilePath;
 
 
         Stream outStream;
@@ -24,7 +25,8 @@ namespace PerfTests
 		bool logToDisk => writer != null;
 
 		void writeHeader (TextWriter txtWriter) {
-			txtWriter.WriteLine ($"Crow perf test ({clientRectangle.Width} X {clientRectangle.Height}), repeat count = {count}, reset style and templates = {resetItors}");
+			txtWriter.WriteLine ($"Crow perf test ({clientRectangle.Width} X {clientRectangle.Height}), output to screen = { screenOutput }");
+			txtWriter.WriteLine ($"repeat = {count}, update cycles = {updateCycles} reset Instantiators = {resetItors}");
 			txtWriter.WriteLine ($"git:{ThisAssembly.Git.Commit} {ThisAssembly.Git.Branch} {ThisAssembly.Git.SemVer.Major}.{ThisAssembly.Git.SemVer.Minor}.{ThisAssembly.Git.SemVer.Patch} {ThisAssembly.Git.SemVer.Label}");
 		}
 
@@ -39,6 +41,7 @@ namespace PerfTests
 			Console.WriteLine ("-r,--reset:\n\tenable clear iterators after each test file.");
 			Console.WriteLine ("-u,--update:\n\tmeasure 'n' update cycle with DateTime.Now string notified.");
 			Console.WriteLine ("-s,--screen:\n\tenable output to screen.");
+			Console.WriteLine ("--help:\n\tthis help message.");
 		}
 
 		public TestInterface (string[] args, int width = 800, int height = 600)
@@ -86,7 +89,7 @@ namespace PerfTests
 					case "--screen":
 						screenOutput = true;
 						break;
-
+					case "--help":
 					default:						
 						throw new Exception ();
 					}
@@ -107,7 +110,8 @@ namespace PerfTests
 					Directory.CreateDirectory (dirName);
 
 				string filename = "crow-" + DateTime.Now.ToString ("yyyy-MM-dd-HH-mm") +".perflog";
-				outStream = new FileStream (Path.Combine (dirName, filename), FileMode.Create);
+				outFilePath = Path.Combine (dirName, filename);
+				outStream = new FileStream (outFilePath, FileMode.Create);
 				writer = new StreamWriter (outStream);
 				writeHeader (writer);
 				writer.WriteLine ("Path;Min;Mean;Max;Allocated;LostMem");
@@ -127,6 +131,9 @@ namespace PerfTests
 				throw new FileNotFoundException ("Input directory not found: " + dirName);
 
 			testDir (dirName);
+			
+			if (logToDisk)
+				Console.WriteLine ($"\ntest log written to: {outFilePath}");            
 		}
 
 		protected override void Dispose (bool disposing) {
@@ -222,6 +229,7 @@ namespace PerfTests
 					double lostMem = (double)(totMemAfter - totMemBefore) / 1024.0;
 					if (logToDisk) {
 						writer.WriteLine ($"{f};{min};{mean};{max};{allocAfter - allocBefore};{totMemAfter - totMemBefore}");
+						Console.Write (".");
                     } else {
 						if (miliseconds)
 							Console.WriteLine ($"{label,-50}|{min,10}|{mean,10}|{max,10}| {allocated,8:0.0} | {lostMem,8:0.0} |");

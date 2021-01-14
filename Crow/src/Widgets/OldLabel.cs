@@ -8,45 +8,13 @@ using System.Linq;
 using Crow.Cairo;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
-using System.Text;
 
 namespace Crow {
-	internal struct LineSpan
-    {
-		public readonly int Start;
-		public readonly int End;
-		public readonly int EndIncludingLineBreak;
-		public int LengthInPixel;
-		public int Length => End - Start;
-		public int LengthIncludingLineBreak => EndIncludingLineBreak - Start;
-		public int LineBreakLength => EndIncludingLineBreak - End;
-		public LineSpan (int start, int end, int endIncludingLineBreak) {
-			Start = start;
-			End = end;
-			EndIncludingLineBreak = endIncludingLineBreak;
-			LengthInPixel = -1;
-        }
-		public LineSpan WithStartOffset (int start) => new LineSpan (Start + start, End, EndIncludingLineBreak);
-		/*public ReadOnlySpan<char> GetSubString (string str) {			
-			if (Start >= str.Length)
-				return "".AsSpan();
-			return str.Length - Start < Length ?
-				str.AsSpan().Slice (Start, Length) :
-				str.AsSpan().Slice (Start);
-		}
-		public ReadOnlySpan<char> GetSubStringIncludingLineBreak (string str) {
-			if (Start >= str.Length)
-				return "".AsSpan ();
-			return (str.Length - Start < LengthIncludingLineBreak) ?
-				str.AsSpan ().Slice (Start, LengthIncludingLineBreak) :
-				str.AsSpan ().Slice (Start);
-		}*/
-	}
-	public class Label : Widget
+	public class OldLabel : Widget
     {
 		#region CTOR
-		protected Label () {}
-		public Label(Interface iface, string style = null) : base (iface, style) { }
+		protected OldLabel () {}
+		public OldLabel(Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
 		public event EventHandler<TextChangeEventArgs> TextChanged;
@@ -60,7 +28,7 @@ namespace Crow {
         //TODO:change protected to private
 
 		#region private and protected fields
-		string _text;
+		string _text = "label";
         Alignment _textAlignment;
 		bool horizontalStretch;
 		bool verticalStretch;
@@ -144,15 +112,21 @@ namespace Crow {
 		[DefaultValue("label")]
         public string Text
         {
-			get => _text;
+            get {
+				return lines == null ?
+					_text : lines.Aggregate((i, j) => i + Interface.LineBreak + j);
+			}
             set
             {
-				if (_text.AsSpan ().SequenceEqual (value.AsSpan ()))
+				if (string.Equals (value, _text, StringComparison.Ordinal))
                     return;
 
                 _text = value;
 
-				getLines ();
+				if (string.IsNullOrEmpty(_text))
+					_text = "";
+
+				lines = getLines;
 
 				OnTextChanged (this, new TextChangeEventArgs (Text));
 				RegisterForGraphicUpdate ();
@@ -161,7 +135,7 @@ namespace Crow {
 		[DefaultValue(false)]
 		public bool Selectable
 		{
-			get => _selectable;
+			get { return _selectable; }
 			set
 			{
 				if (value == _selectable)
@@ -176,7 +150,7 @@ namespace Crow {
 		[DefaultValue(false)]
 		public bool Multiline
 		{
-			get => _multiline;
+			get { return _multiline; }
 			set
 			{
 				if (value == _multiline)
@@ -224,12 +198,11 @@ namespace Crow {
 					gr.FontOptions = Interface.FontRenderingOptions;
 					gr.Antialias = Interface.Antialias;
 					try {
-						//string l = lines [_currentLine].GetSubString (_text);
-						;
-						/*if (_currentCol < l.Length)
+						string l = lines [_currentLine];
+						if (_currentCol < l.Length)
 							l = l.Remove (Math.Min (_currentCol, l.Length));
-						l = l.Replace ("\t", new String (' ', Interface.TAB_SIZE));*/
-						return (int)Math.Ceiling (gr.TextExtents (_text.GetLine (lines[_currentLine], _currentCol), Interface.TAB_SIZE).XAdvance);
+						l = l.Replace ("\t", new String (' ', Interface.TAB_SIZE));
+						return (int)Math.Ceiling (gr.TextExtents (l).XAdvance);
 					} catch {
 						System.Diagnostics.Debug.WriteLine ("xpos measuring fault in label");
 						return 0;
@@ -244,8 +217,8 @@ namespace Crow {
 			set {
 				if (value == _currentLine)
 					return;
-				if (value >= lines.Length)
-					_currentLine = lines.Length-1;
+				if (value >= lines.Count)
+					_currentLine = lines.Count-1;
 				else if (value < 0)
 					_currentLine = 0;
 				else
@@ -293,7 +266,12 @@ namespace Crow {
 		/// <summary>
 		/// return char at CurrentLine, CurrentColumn
 		/// </summary>
-		[XmlIgnore]protected Char CurrentChar => _text[lines[CurrentLine].Start + CurrentColumn];
+		[XmlIgnore]protected Char CurrentChar
+		{
+			get {
+				return lines [CurrentLine][CurrentColumn];
+			}
+		}
 		/// <summary>
 		/// ordered selection start and end positions in char units
 		/// </summary>
@@ -319,45 +297,26 @@ namespace Crow {
 				if (SelRelease < 0 || SelBegin < 0)
 					return "";
 				if (selectionStart.Y == selectionEnd.Y)
-					return _text.Substring (lines[selectionStart.Y].Start + selectionStart.X, selectionEnd.X - selectionStart.X);
-
-				StringBuilder tmp = new StringBuilder (_text.GetLineIncludingLineBreak (lines[selectionStart.Y], selectionStart.X).ToString ());
-				for (int l = selectionStart.Y + 1; l < selectionEnd.Y; l++)
-					tmp.Append (_text.GetLineIncludingLineBreak (lines[l]).ToString ());
-				tmp.Append (_text.Substring (lines[selectionEnd.Y].Start, selectionEnd.X));
-				return tmp.ToString ();
+					return lines [selectionStart.Y].Substring (selectionStart.X, selectionEnd.X - selectionStart.X);
+				string tmp = "";
+				tmp = lines [selectionStart.Y].Substring (selectionStart.X);
+				for (int l = selectionStart.Y + 1; l < selectionEnd.Y; l++) {
+					tmp += Interface.LineBreak + lines [l];
+				}
+				tmp += Interface.LineBreak + lines [selectionEnd.Y].Substring (0, selectionEnd.X);
+				return tmp;
 			}
 		}
 		[XmlIgnore]public bool selectionIsEmpty
 		{ get { return SelRelease < 0; } }
 
-		LineSpan[] lines;
-		void getLines () {
-			if (string.IsNullOrEmpty (_text)) {
-				lines = new LineSpan[] { new LineSpan (0, 0, 0) };
-				return;
+		List<string> lines;
+		List<string> getLines {
+			get {
+				return _multiline ?
+					Regex.Split (_text, "\r\n|\r|\n|\\\\n").ToList() :
+					new List<string>(new string[] { _text });
 			}
-			if (!_multiline) {
-				lines = new LineSpan[] { new LineSpan (0, _text.Length, _text.Length) };
-				return;
-			}
-
-			List<LineSpan> _lines = new List<LineSpan> ();
-			bool lineBreak = false;
-			int start = 0, end = 0;
-            for (int i = 0; i < _text.Length; i++) {
-				if (_text[i].IsAnyLineBreakCharacter()) {
-					if (lineBreak)
-						continue;
-					lineBreak = true;
-					end = i;
-                }else if (lineBreak) {
-					_lines.Add (new LineSpan (start, end, i));
-					start = end = i;
-					lineBreak = false;
-                }
-            }
-			lines = _lines.ToArray();			
 		}
 		/// <summary>
 		/// Moves cursor one char to the left.
@@ -381,7 +340,7 @@ namespace Crow {
 		public bool MoveRight(){
 			int tmp = _currentCol + 1;
 			if (tmp > lines [_currentLine].Length){
-				if (CurrentLine == lines.Length - 1)
+				if (CurrentLine == lines.Count - 1)
 					return false;
 				CurrentLine++;
 				CurrentColumn = 0;
@@ -394,7 +353,7 @@ namespace Crow {
 			//skip white spaces
 			while (!char.IsLetterOrDigit (this.CurrentChar) && CurrentColumn > 0)
 				CurrentColumn--;
-			while (char.IsLetterOrDigit (this.CurrentChar) && CurrentColumn > 0)
+			while (char.IsLetterOrDigit (lines [CurrentLine] [CurrentColumn]) && CurrentColumn > 0)
 				CurrentColumn--;
 			if (!char.IsLetterOrDigit (this.CurrentChar))
 				CurrentColumn++;
@@ -414,18 +373,20 @@ namespace Crow {
 		{
 			if (selectionIsEmpty) {
 				if (CurrentColumn == 0) {
-					if (CurrentLine == 0 && lines.Length == 1)
+					if (CurrentLine == 0 && lines.Count == 1)
 						return;
 					CurrentLine--;
 					CurrentColumn = lines [CurrentLine].Length;
+					lines [CurrentLine] += lines [CurrentLine + 1];
+					lines.RemoveAt (CurrentLine + 1);
 
-					Text = _text.Remove (lines[CurrentLine].End, lines[CurrentLine].LineBreakLength);
+					OnTextChanged (this, new TextChangeEventArgs (Text));
 					return;
 				}
 				CurrentColumn--;
-				Text = _text.Remove (lines[CurrentLine].Start + CurrentColumn, 1);				
+				lines [CurrentLine] = lines [CurrentLine].Remove (CurrentColumn, 1);
 			} else {
-				/*int linesToRemove = selectionEnd.Y - selectionStart.Y + 1;
+				int linesToRemove = selectionEnd.Y - selectionStart.Y + 1;
 				int l = selectionStart.Y;
 
 				if (linesToRemove > 0) {
@@ -440,9 +401,9 @@ namespace Crow {
 					lines [l] = lines [l].Remove (selectionStart.X, selectionEnd.X - selectionStart.X);
 				CurrentColumn = selectionStart.X;
 				SelBegin = -1;
-				SelRelease = -1;*/
+				SelRelease = -1;
 			}
-			//OnTextChanged (this, new TextChangeEventArgs (Text));
+			OnTextChanged (this, new TextChangeEventArgs (Text));
 		}
 		/// <summary>
 		/// Insert new string at caret position, should be sure no line break is inside.
@@ -450,7 +411,7 @@ namespace Crow {
 		/// <param name="str">String.</param>
 		protected void Insert(string str)
 		{
-			/*if (!selectionIsEmpty)
+			if (!selectionIsEmpty)
 				this.DeleteChar ();
 			if (_multiline) {
 				string[] strLines = Regex.Split (str, "\r\n|\r|\n|" + @"\\n").ToArray();
@@ -462,26 +423,21 @@ namespace Crow {
 					CurrentColumn += strLines[i].Length;
 				}
 			} else {
-				ReadOnlySpan<char> a = _text.AsSpan ().Slice (0 ,lines[CurrentLine].Start + CurrentColumn);
-				ReadOnlySpan<char> b = _text.AsSpan ().Slice (lines[CurrentLine].Start + CurrentColumn);
-
-				_text = string.Concat( (a, str.AsSpan(), b);
-
 				lines [CurrentLine] = lines [CurrentLine].Insert (CurrentColumn, str);
 				CurrentColumn += str.Length;
 			}
-			OnTextChanged (this, new TextChangeEventArgs (Text));*/
+			OnTextChanged (this, new TextChangeEventArgs (Text));
 		}
 		/// <summary>
 		/// Insert a line break.
 		/// </summary>
 		protected void InsertLineBreak()
 		{
-			/*lines.Insert(CurrentLine + 1, lines[CurrentLine].Substring(CurrentColumn));
+			lines.Insert(CurrentLine + 1, lines[CurrentLine].Substring(CurrentColumn));
 			lines [CurrentLine] = lines [CurrentLine].Substring (0, CurrentColumn);
 			CurrentLine++;
 			CurrentColumn = 0;
-			OnTextChanged (this, new TextChangeEventArgs (Text));*/
+			OnTextChanged (this, new TextChangeEventArgs (Text));
 		}
 		bool textMeasureIsUpToDate = false;
 		Size cachedTextSize = default(Size);
@@ -490,8 +446,7 @@ namespace Crow {
 		public override int measureRawSize(LayoutingType lt)
 		{
 			if (lines == null)
-				getLines ();
-
+				lines = getLines;
 			if (!textMeasureIsUpToDate) {
 				using (Context gr = new Context (IFace.surf)) {
 					//Cairo.FontFace cf = gr.GetContextFontFace ();
@@ -504,14 +459,14 @@ namespace Crow {
 					fe = gr.FontExtents;
 					te = new TextExtents ();
 
-					cachedTextSize.Height = (int)Math.Ceiling ((fe.Ascent+fe.Descent) * Math.Max (1, lines.Length));
+					cachedTextSize.Height = (int)Math.Ceiling ((fe.Ascent+fe.Descent) * Math.Max (1, lines.Count));
 
 					try {
-						TextExtents tmp = default;
-						for (int i = 0; i < lines.Length; i++) {							
-							gr.TextExtents (_text.GetLine (lines[i]), Interface.TAB_SIZE, out tmp);
-							if (lines[i].LengthInPixel < 0)
-								lines[i].LengthInPixel = (int)tmp.XAdvance;
+						for (int i = 0; i < lines.Count; i++) {
+							string l = lines[i].Replace ("\t", new String (' ', Interface.TAB_SIZE));
+
+							TextExtents tmp = gr.TextExtents (l);
+
 							if (tmp.XAdvance > te.XAdvance)
 								te = tmp;
 						}
@@ -642,72 +597,53 @@ namespace Crow {
 			#endregion
 
 			//****** debug selection *************
-			//			if (SelRelease >= 0) {
-			//				new SolidColor(Color.DarkGreen).SetAsSource(gr);
-			//				Rectangle R = new Rectangle (
-			//					             rText.X + (int)SelEndCursorPos - 3,
-			//					             rText.Y + (int)(SelRelease.Y * (fe.Ascent+fe.Descent)),
-			//					             6,
-			//					             (int)(fe.Ascent+fe.Descent));
-			//				gr.Rectangle (R);
-			//				gr.Fill ();
-			//			}
-			//			if (SelBegin >= 0) {
-			//				new SolidColor(Color.DarkRed).SetAsSource(gr);
-			//				Rectangle R = new Rectangle (
-			//					rText.X + (int)SelStartCursorPos - 3,
-			//					rText.Y + (int)(SelBegin.Y * (fe.Ascent+fe.Descent)),
-			//					6,
-			//					(int)(fe.Ascent+fe.Descent));
-			//				gr.Rectangle (R);
-			//				gr.Fill ();
-			//			}
+//			if (SelRelease >= 0) {
+//				new SolidColor(Color.DarkGreen).SetAsSource(gr);
+//				Rectangle R = new Rectangle (
+//					             rText.X + (int)SelEndCursorPos - 3,
+//					             rText.Y + (int)(SelRelease.Y * (fe.Ascent+fe.Descent)),
+//					             6,
+//					             (int)(fe.Ascent+fe.Descent));
+//				gr.Rectangle (R);
+//				gr.Fill ();
+//			}
+//			if (SelBegin >= 0) {
+//				new SolidColor(Color.DarkRed).SetAsSource(gr);
+//				Rectangle R = new Rectangle (
+//					rText.X + (int)SelStartCursorPos - 3,
+//					rText.Y + (int)(SelBegin.Y * (fe.Ascent+fe.Descent)),
+//					6,
+//					(int)(fe.Ascent+fe.Descent));
+//				gr.Rectangle (R);
+//				gr.Fill ();
+//			}
 			//*******************
-			if (string.IsNullOrEmpty (_text)) {
-				gr.Restore ();
-				return;
-			}
 
-			Foreground.SetAsSource (IFace, gr);
-
-			TextExtents extents;
-			Span<byte> bytes = stackalloc byte[128];
-
-			for (int i = 0; i < lines.Length; i++) {
-				if (lines[i].Length == 0)
-					continue;
-				
-				int size = lines[i].Length * 4 + 1;
-				if (bytes.Length < size)
-					bytes = size > 512 ? new byte[size] : stackalloc byte[size];
-				
-				int encodedBytes = Encoding.UTF8.GetBytes (_text.GetLine (lines[i]), bytes);
-				bytes[encodedBytes] = 0;
-
-				if (lines[i].LengthInPixel < 0) {
-					gr.TextExtents (bytes.Slice (0, encodedBytes), out extents);
-					lines[i].LengthInPixel = (int)extents.XAdvance;
-				}
-				//string l = lines [i].Replace ("\t", new String (' ', Interface.TAB_SIZE));
-				
+			for (int i = 0; i < lines.Count; i++) {
+				string l = lines [i].Replace ("\t", new String (' ', Interface.TAB_SIZE));
+				int lineLength = (int)gr.TextExtents (l).XAdvance;
 				Rectangle lineRect = new Rectangle (
 					rText.X,
 					rText.Y + i * (int)(fe.Ascent+fe.Descent),
-					lines[i].LengthInPixel,
+					lineLength,
 					(int)(fe.Ascent+fe.Descent));
 
-				//				if (TextAlignment == Alignment.Center ||
-				//					TextAlignment == Alignment.Top ||
-				//					TextAlignment == Alignment.Bottom)
-				//					lineRect.X += (rText.Width - lineLength) / 2;
-				//				else if (TextAlignment == Alignment.Right ||
-				//					TextAlignment == Alignment.TopRight ||
-				//					TextAlignment == Alignment.BottomRight)
-				//					lineRect.X += (rText.Width - lineLength);
+//				if (TextAlignment == Alignment.Center ||
+//					TextAlignment == Alignment.Top ||
+//					TextAlignment == Alignment.Bottom)
+//					lineRect.X += (rText.Width - lineLength) / 2;
+//				else if (TextAlignment == Alignment.Right ||
+//					TextAlignment == Alignment.TopRight ||
+//					TextAlignment == Alignment.BottomRight)
+//					lineRect.X += (rText.Width - lineLength);
+				if (string.IsNullOrWhiteSpace (l))
+					continue;
 
+				Foreground.SetAsSource (IFace, gr);
 				gr.MoveTo (lineRect.X,(double)rText.Y + fe.Ascent + (fe.Ascent+fe.Descent) * i) ;
-                gr.ShowText (bytes.Slice (0, encodedBytes));
-				//gr.Fill ();
+
+                gr.ShowText (l);
+				gr.Fill ();
 
 				if (Selectable) {
 					if (SelRelease >= 0 && i >= selectionStart.Y && i <= selectionEnd.Y) {
@@ -728,7 +664,7 @@ namespace Crow {
 							selRect.Left += cpStart;
 						}
 						if (i == selectionEnd.Y)
-							selRect.Width -= (lines[i].LengthInPixel - cpEnd);
+							selRect.Width -= (lineLength - cpEnd);
 
 						gr.Rectangle (selRect);
 						gr.FillPreserve ();
@@ -736,11 +672,9 @@ namespace Crow {
 						gr.Clip ();
 						gr.SetSource (SelectionForeground);
 						gr.MoveTo (lineRect.X, rText.Y + fe.Ascent + (fe.Ascent+fe.Descent) * i);
-						gr.ShowText (bytes.Slice (0, encodedBytes));
+						gr.ShowText (l);
 						gr.Fill ();
 						gr.Restore ();
-
-						Foreground.SetAsSource (IFace, gr);
 					}
 				}
 			}
@@ -765,7 +699,7 @@ namespace Crow {
 			if (!_selectable)
 				return;
 			SelBegin = new Point(0,0);
-			SelRelease = new Point (lines.LastOrDefault ().Length, lines.Length-1);
+			SelRelease = new Point (lines.LastOrDefault ().Length, lines.Count-1);
 			RegisterForRedraw ();
 		}
 		protected override void onUnfocused (object sender, EventArgs e)
@@ -840,31 +774,27 @@ namespace Crow {
 			double cPos = 0f;
 
 			CurrentLine = (int)(mouseLocalPos.Y / (fe.Ascent+fe.Descent));
-			
-			//fix cu
-			if (CurrentLine >= lines.Length)
-				CurrentLine = lines.Length - 1;
 
-			LineSpan ls = lines[CurrentLine];
-			ReadOnlySpan<char> curLine = _text.GetLine (lines[CurrentLine]);
+			//fix cu
+			if (CurrentLine >= lines.Count)
+				CurrentLine = lines.Count - 1;
 
 			switch (TextAlignment) {
 			case Alignment.Center:
 			case Alignment.Top:
 			case Alignment.Bottom:
-				cPos += ClientRectangle.Width - gr.TextExtents (curLine, Interface.TAB_SIZE).Width / 2.0;
+				cPos+= ClientRectangle.Width - gr.TextExtents(lines [CurrentLine]).Width/2.0;
 				break;
 			case Alignment.Right:
 			case Alignment.TopRight:
 			case Alignment.BottomRight:
-				cPos += ClientRectangle.Width - gr.TextExtents (curLine, Interface.TAB_SIZE).Width;
+				cPos += ClientRectangle.Width - gr.TextExtents(lines [CurrentLine]).Width;
 				break;
 			}
 
-			
 			for (int i = 0; i < lines[CurrentLine].Length; i++)
 			{
-				/*string c = .Substring (i, 1);
+				string c = lines [CurrentLine].Substring (i, 1);
 				if (c == "\t")
 					c = new string (' ', Interface.TAB_SIZE);
 
@@ -880,7 +810,7 @@ namespace Crow {
 					return;
 				}
 
-				cPos += te.XAdvance;*/
+				cPos += te.XAdvance;
 			}
 			CurrentColumn = lines[CurrentLine].Length;
 			textCursorPos = cPos;
@@ -901,9 +831,9 @@ namespace Crow {
 		double GetXFromTextPointer(Context gr, Point pos)
 		{
 			try {
-				/*string l = lines [pos.Y].Substring (0, pos.X).
-					Replace ("\t", new String (' ', Interface.TAB_SIZE));*/
-				return gr.TextExtents (_text.GetLine(lines[pos.Y], pos.X), Interface.TAB_SIZE).XAdvance;
+				string l = lines [pos.Y].Substring (0, pos.X).
+					Replace ("\t", new String (' ', Interface.TAB_SIZE));
+				return gr.TextExtents (l).XAdvance;
 			} catch{
 				return -1;
 			}
