@@ -106,10 +106,11 @@ namespace Crow
 				SelectedDirectory = e.NewValue.ToString();
 		}
 		public void goUpDirClick (object sender, MouseButtonEventArgs e){
-			string root = Directory.GetDirectoryRoot(CurrentDirectory);
-			if (CurrentDirectory == root)
+			string root = Directory.GetDirectoryRoot(CurrentDirectory);			
+			DirectoryInfo parentDir = Directory.GetParent (CurrentDirectory);
+			if (parentDir == null)
 				return;
-			CurrentDirectory = Directory.GetParent(CurrentDirectory).FullName;
+			CurrentDirectory = parentDir.FullName;
 		}
 		void onFileSelect(object sender, MouseButtonEventArgs e){
 			if (string.IsNullOrEmpty (SelectedFile))

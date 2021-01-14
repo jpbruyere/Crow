@@ -79,7 +79,7 @@ namespace DebugLogAnalyzer
 			TreeView tv = FindByName("dbgTV") as TreeView;
 			dbgTreeViewScroller = tv.FindByNameInTemplate ("scroller1") as Scroller;
 
-			loadDebugFile ("/var/tmp/debug.log");
+			loadDebugFile ("debug.log");
 		}
 
 		void loadDebugFile (string logFile)

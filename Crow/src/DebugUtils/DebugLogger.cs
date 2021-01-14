@@ -232,22 +232,29 @@ namespace Crow
 					parseTree (pc.getTemplateRoot, level + 1, y + 1);				
 			}
 		}
+
+#endif
 		/// <summary>
 		/// Clear all recorded events from logger.
 		/// </summary>
-		public static void Reset ()
-		{
+		public static void Reset () {
+#if DEBUG_LOG
 			lock (logMutex) {
-				startedEvents.Clear ();
+			startedEvents.Clear ();
 				events.Clear ();
 				chrono.Restart ();
 			}
+			Console.WriteLine ($"Crow Debug Log reseted");
+#else
+			Console.WriteLine ($"Logging disabled, compile Crow with DEBUG and DEBUG_LOG defined to enable logging.");
+#endif
 		}
 		/// <summary>
 		/// Save recorded events to disk
 		/// </summary>
-		/// <param name="iface">Iface.</param>
-		public static void save(Interface iface, string dbgLogFilePath = "debug.log") {
+		/// <param name="iface">Iface.</param>		
+		public static void Save(Interface iface, string dbgLogFilePath = "debug.log") {
+#if DEBUG_LOG
 			lock (logMutex) {
 
 				foreach (Widget go in iface.GraphicTree)
@@ -266,6 +273,10 @@ namespace Crow
 					saveEventList (s, events);
 				}
 			}
+			Console.WriteLine ($"Crow Debug Log saved to: {dbgLogFilePath}");
+#else
+			Console.WriteLine ($"Compile Crow with DEBUG and DEBUG_LOG defined to enable logging. No log saved.");
+#endif
 		}
 
 		static void saveEventList (StreamWriter s, List<DbgEvent> evts, int level = 0)
@@ -278,7 +289,6 @@ namespace Crow
 					saveEventList (s, e.Events, level + 1);
 			}
 		}
-#endif
 	}
 }
 

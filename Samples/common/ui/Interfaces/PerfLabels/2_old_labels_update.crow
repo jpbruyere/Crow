@@ -1,0 +1,29 @@
+﻿<?xml version="1.0"?>
+<HorizontalStack>
+	<VerticalStack Width="20%" Height="Fit">
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+	</VerticalStack>
+	<VerticalStack Width="20%" Height="Fit">
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+		<OldLabel Text="{elapsed}" />
+	</VerticalStack>	
+</HorizontalStack>
+
+

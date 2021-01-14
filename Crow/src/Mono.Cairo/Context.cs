@@ -907,6 +907,11 @@ namespace Crow.Cairo {
 			
 			NativeMethods.cairo_text_extents (handle, ref bytes.Slice(0, encodedBytes + 1).GetPinnableReference(), out extents);
 		}
+		public void ShowText (Span<byte> bytes) =>
+			NativeMethods.cairo_show_text (handle, ref bytes.GetPinnableReference ());
+		public void TextExtents (Span<byte> bytes, out TextExtents extents) =>
+			NativeMethods.cairo_text_extents (handle, ref bytes.GetPinnableReference (), out extents);
+
 
 		public TextExtents GlyphExtents (Glyph[] glyphs)
 		{
