@@ -252,10 +252,9 @@ namespace Crow
 			while (!Glfw3.WindowShouldClose (hWin)) {
 				Glfw3.PollEvents ();
 				UpdateFrame ();
-				Thread.Sleep(1);
 			}
 		}
-		public virtual void UpdateFrame () { }
+		public virtual void UpdateFrame () { Thread.Sleep (1); }
 
 		public virtual void Quit () => Glfw3.SetWindowShouldClose (hWin, 1);
 
@@ -311,6 +310,8 @@ namespace Crow
 		}*/
 
 		#region Static and constants
+		//initial capacity for layouting and clipping queues.
+		const int INIT_QUEUE_CAPACITY = 512;
 		/// <summary>Time interval in milisecond between Updates of the interface</summary>
 		public static int UPDATE_INTERVAL = 5;
 		/// <summary>Crow configuration root path</summary>
@@ -402,11 +403,11 @@ namespace Crow
 		/// </summary>
 		public Dictionary<string,object> Ressources = new Dictionary<string, object>();
 		/// <summary>The Main layouting queue.</summary>
-		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem> ();
+		public Queue<LayoutingQueueItem> LayoutingQueue = new Queue<LayoutingQueueItem> (INIT_QUEUE_CAPACITY);
 		/// <summary>Store discarded lqi between two updates</summary>
 		public Queue<LayoutingQueueItem> DiscardQueue;
 		/// <summary>Main drawing queue, holding layouted controls</summary>
-		public Queue<Widget> ClippingQueue = new Queue<Widget>();
+		public Queue<Widget> ClippingQueue = new Queue<Widget>(INIT_QUEUE_CAPACITY);
 		//TODO:use object instead for complex copy paste
 		public string Clipboard {
 			get => Glfw3.GetClipboardString (hWin);
@@ -710,6 +711,7 @@ namespace Crow
 		/// Result: the Interface bitmap is drawn in memory (byte[] bmp) and a dirtyRect and bitmap are available
 		/// </summary>
 		public void Update(Context ctx = null){
+
 			CrowThread[] tmpThreads;
 			lock (CrowThreads) {
 				tmpThreads = new CrowThread[CrowThreads.Count];
@@ -763,7 +765,7 @@ namespace Crow
 				DbgLogger.StartEvent (DbgEvtType.Layouting);
 				PerformanceMeasure.Begin (PerformanceMeasure.Kind.Layouting);
 
-				DiscardQueue = new Queue<LayoutingQueueItem> ();
+				DiscardQueue = new Queue<LayoutingQueueItem> (LayoutingQueue.Count);
 				//Debug.WriteLine ("======= Layouting queue start =======");
 				LayoutingQueueItem lqi;
 				while (LayoutingQueue.Count > 0) {
@@ -1323,10 +1325,7 @@ namespace Crow
 			//			keyboardRepeatThread.Start ();
 		}
 
-		public bool IsKeyDown (Key key)
-		{
-			return false;
-		}
+		public bool IsKeyDown (Key key) => Glfw3.GetKey (hWin, key) == InputAction.Press;
 		#endregion
 
 		#region Tooltip handling
