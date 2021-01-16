@@ -23,6 +23,13 @@ namespace Crow
 		Center = 0x10,
 		Undefined = 0x40
     }
+	public enum TextAlignment
+    {
+		Left,
+		Right,
+		Center,
+		Justify
+    }
     public enum HorizontalAlignment
     {
         Left,

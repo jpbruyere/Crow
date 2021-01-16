@@ -7,7 +7,7 @@ using Glfw;
 
 namespace Crow
 {
-	public class TextBox : Label
+	public class TextBox : OldLabel
     {
 		#region CTOR
 		protected TextBox() {}

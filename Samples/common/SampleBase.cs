@@ -39,7 +39,21 @@ namespace Crow
 		VerticalAlignment currentVAlign;
 
 		DirectoryInfo curDir = new DirectoryInfo (Path.GetDirectoryName (Assembly.GetEntryAssembly ().Location));
-		public FileSystemInfo[] CurDirectory => curDir.GetFileSystemInfos (); 
+		public FileSystemInfo[] CurDirectory => curDir.GetFileSystemInfos ();
+		public string MultilineText =
+			$"Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit. Sed non risus.\n\nSuspendisse lectus tortor,";
+		//public string MultilineText = $"a\n";
+		TextAlignment textAlignment = TextAlignment.Left;
+		public TextAlignment TextAlignment {
+			get => textAlignment;
+			set {
+				if (textAlignment == value)
+					return;
+				textAlignment = value;
+				NotifyValueChanged (textAlignment);
+			}
+		}
+
 		public int IntValue {
 			get => intValue;
 			set {
@@ -248,11 +262,11 @@ namespace Crow
 				boolVal = value;
 				NotifyValueChanged (boolVal);
 			}
-		}
+		}        
 
-		#endregion
+        #endregion
 
-		protected override void OnInitialized ()
+        protected override void OnInitialized ()
 		{
 			Commands = new List<Command> {
 				new Command(() => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 1 clicked")) { Caption = "Action 1" },
