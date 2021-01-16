@@ -678,7 +678,7 @@ namespace Crow
 		/// </summary>
 		[DesignCategory ("Behaviour")][DefaultValue(false)]
 		public virtual bool Focusable {
-			get { return focusable; }
+			get => focusable;
 			set {
 				if (focusable == value)
 					return;
@@ -690,7 +690,7 @@ namespace Crow
 		/// True when this control has the focus, only one control per interface may have it.
 		/// </summary>
 		[XmlIgnore]public virtual bool HasFocus {
-			get { return hasFocus; }
+			get => hasFocus;
 			set {
 				if (value == hasFocus)
 					return;
@@ -709,7 +709,7 @@ namespace Crow
 		/// be used for other two states periferic action.
 		/// </summary>
 		[XmlIgnore]public virtual bool IsActive {
-			get { return isActive; }
+			get => isActive;
 			internal set {
 				if (value == isActive)
 					return;
@@ -722,7 +722,7 @@ namespace Crow
 		/// true if this control has the pointer hover
 		/// </summary>
 		[XmlIgnore]public virtual bool IsHover {
-			get { return isHover; }
+			get => isHover;
 			internal set {
 				if (value == isHover)
 					return;
@@ -746,7 +746,7 @@ namespace Crow
 		/// </summary>
 		[DesignCategory ("Behaviour")][DefaultValue(false)]
 		public virtual bool MouseRepeat {
-			get { return mouseRepeat; }
+			get => mouseRepeat;
 			set {
 				if (mouseRepeat == value)
 					return;
@@ -794,7 +794,7 @@ namespace Crow
 				NotifyValueChangedAuto (mouseCursor);
 				this.RegisterForRedraw ();
 
-				if (isHover)
+				if (Focusable && IsHover)
 					IFace.MouseCursor = mouseCursor;
 			}
 		}
@@ -2009,7 +2009,8 @@ namespace Crow
 		}
 		public virtual void onMouseEnter(object sender, MouseMoveEventArgs e)
 		{
-			IFace.MouseCursor = MouseCursor;			
+			if (Focusable)
+				IFace.MouseCursor = MouseCursor;			
 
 			if (IFace.DragAndDropOperation != null) {
 				Widget g = this;

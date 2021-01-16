@@ -66,9 +66,7 @@ namespace Crow.Cairo {
 			//
 			int ptr_size = Marshal.SizeOf (typeof (IntPtr));
 
-			/*PlatformID platform = Environment.OSVersion.Platform;
-            RuntimeInformation.IsOSPlatform(OSPlatform.Linux); 
-            RuntimeInformation.OSArchitecture.HasFlag(Architecture.);
+			PlatformID platform = Environment.OSVersion.Platform;
 			if (platform == PlatformID.Win32NT ||
 			    platform == PlatformID.Win32S ||
 			    platform == PlatformID.Win32Windows ||
@@ -76,10 +74,10 @@ namespace Crow.Cairo {
 			    ptr_size == 4){
 				c_compiler_long_size = 4;
 				native_glyph_size = Marshal.SizeOf (typeof (NativeGlyph_4byte_longs));
-			} else {*/
+			} else {
 				c_compiler_long_size = 8;
 				native_glyph_size = Marshal.SizeOf (typeof (Glyph));
-			//}
+			}
 		}
 
 		public Context (Surface surface) : this (NativeMethods.cairo_create (surface.Handle), true)
@@ -904,8 +902,16 @@ namespace Crow.Cairo {
 			Span<byte> bytes = size > 512 ? new byte[size] : stackalloc byte[size];
 			int encodedBytes = Encoding.UTF8.GetBytes (s, bytes);
 			bytes[encodedBytes] = 0;
-			
-			NativeMethods.cairo_text_extents (handle, ref bytes.Slice(0, encodedBytes + 1).GetPinnableReference(), out extents);
+
+			NativeMethods.cairo_text_extents (handle, ref bytes.Slice (0, encodedBytes + 1).GetPinnableReference (), out extents);
+		}
+		public void TextExtents (ReadOnlySpan<char> s, out TextExtents extents) {
+			int size = s.Length * 4 + 1;
+			Span<byte> bytes = size > 512 ? new byte[size] : stackalloc byte[size];
+			int encodedBytes = Encoding.UTF8.GetBytes (s, bytes);
+			bytes[encodedBytes] = 0;
+
+			NativeMethods.cairo_text_extents (handle, ref bytes.Slice (0, encodedBytes + 1).GetPinnableReference (), out extents);
 		}
 		public void ShowText (Span<byte> bytes) =>
 			NativeMethods.cairo_show_text (handle, ref bytes.GetPinnableReference ());
