@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.ComponentModel;
 using System.Text;
 using System.Diagnostics;
+using Glfw;
 
 namespace Crow {
 	internal struct TextSpan
@@ -122,12 +123,7 @@ namespace Crow {
 		CharLocation? hoverLoc = null;
 		CharLocation? currentLoc = null;
 		CharLocation? selectionStart = null;	//selection start (row,column)
-		
-		
 
-        //protected Rectangle rText;
-		protected float widthRatio = 1f;
-		protected float heightRatio = 1f;
 		protected FontExtents fe;
 		protected TextExtents te;
 		#endregion
@@ -159,6 +155,18 @@ namespace Crow {
 				RegisterForRedraw ();
 			}
 		}
+		void resetLocationXs () {
+			if (currentLoc.HasValue) {
+				CharLocation cl = currentLoc.Value;
+				cl.VisualCharXPosition = -1;
+				currentLoc = cl;
+			}
+			if (selectionStart.HasValue) {
+				CharLocation cl = selectionStart.Value;
+				cl.VisualCharXPosition = -1;
+				selectionStart = cl;
+			}
+		}
 		/// <summary>
 		/// If measure is not 'Fit', align text inside the bounds of this label.
 		/// </summary>
@@ -170,38 +178,12 @@ namespace Crow {
 				if (value == _textAlignment)
 					return;
 				_textAlignment = value;
+				resetLocationXs ();
+
 				RegisterForRedraw ();
 				NotifyValueChangedAuto (_textAlignment);
 			}
-        }
-		/// <summary>
-		/// If Width is not 'Fit', Stretch text through the whole slot width.
-		/// </summary>
-		[DefaultValue(false)]
-		public virtual bool HorizontalStretch {
-			get { return horizontalStretch; }
-			set {
-				if (horizontalStretch == value)
-					return;
-				horizontalStretch = value;
-				RegisterForRedraw ();
-				NotifyValueChangedAuto (horizontalStretch);
-			}
-		}
-		/// <summary>
-		/// If Height is not 'Fit', stretch text through the whole slot height.
-		/// </summary>
-		[DefaultValue(false)]
-		public virtual bool VerticalStretch {
-			get { return verticalStretch; }
-			set {
-				if (verticalStretch == value)
-					return;
-				verticalStretch = value;
-				RegisterForRedraw ();
-				NotifyValueChangedAuto (verticalStretch);
-			}
-		}
+        }		
 		/// <summary>
 		/// Text to display in this label. May include linebreaks if Multiline is 'true'.
 		/// If Multiline is false, linebreaks will be treated as unrecognized unicode char.
@@ -223,22 +205,7 @@ namespace Crow {
 				RegisterForGraphicUpdate ();
             }
         }
-		
-		/*[DefaultValue(false)]
-		public bool Selectable
-		{
-			get => _selectable;
-			set
-			{
-				if (value == _selectable)
-					return;
-				_selectable = value;
-				NotifyValueChangedAuto (_selectable);
-				SelBegin = -1;
-				SelRelease = -1;
-				RegisterForRedraw ();
-			}
-		}*/
+
 		/// <summary>
 		/// If 'true', linebreaks will be interpreted. If 'false', linebreaks are threated as unprintable
 		/// unicode characters.
@@ -400,17 +367,67 @@ namespace Crow {
 		/// Moves cursor one char to the left.
 		/// </summary>
 		/// <returns><c>true</c> if move succeed</returns>
+		*/
 		public bool MoveLeft(){
-			int tmp = _currentCol - 1;
-			if (tmp < 0) {
-				if (_currentLine == 0)
+			targetColumn = -1;
+			CharLocation loc = currentLoc.Value;
+			if (loc.Column == 0) {
+				if (loc.Line == 0)
 					return false;
-				CurrentLine--;
-				CurrentColumn = int.MaxValue;
-			} else
-				CurrentColumn = tmp;
+				currentLoc = new CharLocation (loc.Line - 1, lines[loc.Line - 1].Length);
+            }else
+				currentLoc = new CharLocation (loc.Line, loc.Column - 1);
 			return true;
 		}
+		public bool MoveRight () {
+			targetColumn = -1;
+			CharLocation loc = currentLoc.Value;
+			if (loc.Column == lines[loc.Line].Length) {
+				if (loc.Line == lines.Length - 1)
+					return false;
+				currentLoc = new CharLocation (loc.Line + 1, 0);
+			} else
+				currentLoc = new CharLocation (loc.Line, loc.Column + 1);
+			return true;
+		}
+		int targetColumn = -1;
+		public bool MoveUp () {
+			CharLocation loc = currentLoc.Value;
+			if (loc.Line == 0)
+				return false;
+			
+			if (loc.Column > lines[loc.Line - 1].Length) {
+				if (targetColumn < 0)
+					targetColumn = loc.Column;
+				currentLoc = new CharLocation (loc.Line - 1, lines[loc.Line - 1].Length);
+			}else if (targetColumn < 0)
+				currentLoc = new CharLocation (loc.Line - 1, loc.Column);
+			else if (targetColumn > lines[loc.Line - 1].Length)
+				currentLoc = new CharLocation (loc.Line - 1, lines[loc.Line - 1].Length);
+			else
+				currentLoc = new CharLocation (loc.Line - 1, targetColumn);
+
+			return true;
+		}
+		public bool MoveDown () {
+			CharLocation loc = currentLoc.Value;
+			if (loc.Line == lines.Length - 1)
+				return false;
+
+			if (loc.Column > lines[loc.Line + 1].Length) {
+				if (targetColumn < 0)
+					targetColumn = loc.Column;
+				currentLoc = new CharLocation (loc.Line + 1, lines[loc.Line + 1].Length);
+			} else if (targetColumn < 0)
+				currentLoc = new CharLocation (loc.Line + 1, loc.Column);
+			else if (targetColumn > lines[loc.Line + 1].Length)
+				currentLoc = new CharLocation (loc.Line + 1, lines[loc.Line + 1].Length);
+			else
+				currentLoc = new CharLocation (loc.Line + 1, targetColumn);
+
+			return true;
+		}
+		/*
 		/// <summary>
 		/// Moves cursor one char to the right.
 		/// </summary>
@@ -596,8 +613,8 @@ namespace Crow {
 					int longestLine = 0;
 					for (int i = 0; i < lines.Length; i++) {							
 						if (lines[i].LengthInPixel < 0) {
-							if (lines[i].Length == 0 && lines[i].HasLineBreak)
-								lines[i].LengthInPixel = 10;// (int)Math.Ceiling (fe.MaxXAdvance);
+							if (lines[i].Length == 0)
+								lines[i].LengthInPixel = 0;// (int)Math.Ceiling (fe.MaxXAdvance);
 							else {
 								gr.TextExtents (_text.GetLine (lines[i]), Interface.TAB_SIZE, out tmp);
 								lines[i].LengthInPixel = (int)Math.Ceiling (tmp.XAdvance);
@@ -639,11 +656,17 @@ namespace Crow {
 			int lineHeight = (int)(fe.Ascent + fe.Descent);
 
 			CharLocation selStart = default, selEnd = default;
+			bool selectionNotEmpty = false;
 
 			if (HasFocus) {
 				updateLocation (gr, cb.Width, ref currentLoc);
-				if (selectionStart.HasValue) { 
+				if (selectionStart.HasValue) {
 					updateLocation (gr, cb.Width, ref selectionStart);
+					if (currentLoc.Value != selectionStart.Value)
+						selectionNotEmpty = true;
+					
+				}
+				if (selectionNotEmpty) {
 					if (currentLoc.Value.Line < selectionStart.Value.Line) {
 						selStart = currentLoc.Value;
 						selEnd = selectionStart.Value;
@@ -688,17 +711,13 @@ namespace Crow {
 					bytes[encodedBytes++] = 0;
 
 					if (lines[i].LengthInPixel < 0) {
-						if (lines[i].Length == 0 && lines[i].HasLineBreak)
-							lines[i].LengthInPixel = 10;// (int)Math.Ceiling (fe.MaxXAdvance);
-						else {
-							gr.TextExtents (bytes.Slice (0, encodedBytes), out extents);
-							lines[i].LengthInPixel = (int)extents.XAdvance;
-						}
+						gr.TextExtents (bytes.Slice (0, encodedBytes), out extents);
+						lines[i].LengthInPixel = (int)extents.XAdvance;
 					}
 				}
 
 				Rectangle lineRect = new Rectangle (
-					Width.IsFit ? cb.X : (int)getX (cb.Width, ref lines[i]) + cb.X,
+					Width.IsFit && !Multiline ? cb.X : (int)getX (cb.Width, ref lines[i]) + cb.X,
 					cb.Y + i * lineHeight,
 					lines[i].LengthInPixel,
 					lineHeight);
@@ -708,7 +727,7 @@ namespace Crow {
 					gr.ShowText (bytes.Slice (0, encodedBytes));
 				}
 
-				if (HasFocus && selectionStart.HasValue) {
+				if (HasFocus && selectionNotEmpty) {
 					Rectangle selRect = lineRect;
 					if (_multiline) {
 						if (i >= selStart.Line && i <= selEnd.Line) {
@@ -717,11 +736,12 @@ namespace Crow {
 								selRect.Width = (int)(selEnd.VisualCharXPosition - selStart.VisualCharXPosition);
 							} else if (i == selStart.Line) {
 								int newX = (int)selStart.VisualCharXPosition + cb.X;
-								selRect.Width -= (newX - selRect.X);
+								selRect.Width -= (newX - selRect.X) - 10;
 								selRect.X = newX;
 							} else if (i == selEnd.Line) {
 								selRect.Width = (int)selEnd.VisualCharXPosition - selRect.X;
-							}
+							} else								
+								selRect.Width += 10;
 						} else
 							continue;
                     } else {
@@ -779,16 +799,18 @@ namespace Crow {
 				RegisterForRedraw ();				
 			}
 		}
-		Point grabMousePos = -1;
+		
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
-			if (e.Button == Glfw.MouseButton.Left) {				
-				if (HasFocus) {
-					grabMousePos = e.Position - ScreenCoordinates (Slot).TopLeft - ClientRectangle.TopLeft;
-					if (IFace.Shift)
-						currentLoc = hoverLoc;
-					else
-						currentLoc = selectionStart = hoverLoc;
+			if (e.Button == Glfw.MouseButton.Left) {
+				targetColumn = -1;
+				if (HasFocus) {					
+					if (!IFace.Shift)						 
+						selectionStart = hoverLoc;
+					else if (!selectionStart.HasValue)
+						selectionStart = currentLoc;
+					currentLoc = hoverLoc;
+
 					RegisterForRedraw ();
 					e.Handled = true;
 				}					
@@ -800,14 +822,12 @@ namespace Crow {
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseUp (sender, e);
-			if (e.Button != Glfw.MouseButton.Left)
-				return;
-			Point mouseLocalPos = e.Position - ScreenCoordinates (Slot).TopLeft - ClientRectangle.TopLeft;
-			if (mouseLocalPos == grabMousePos) {
-				selectionStart = null;				
-				e.Handled = true;				
-			}
-			RegisterForRedraw ();
+			if (e.Button != Glfw.MouseButton.Left || !HasFocus || !selectionStart.HasValue)
+				return;			
+			if (selectionStart.Value == currentLoc.Value) {
+				selectionStart = null;
+				//RegisterForRedraw ();
+			}			
 		}
 		public override void onMouseDoubleClick (object sender, MouseButtonEventArgs e)
 		{
@@ -824,11 +844,80 @@ namespace Crow {
 		}
 		#endregion
 
-		/// <summary>
-		/// Update Current Column, line and TextCursorPos
-		/// from mouseLocalPos
-		/// </summary>
-		void updateLocation(Context gr, int clientWidth, ref CharLocation? location)
+		#region Keyboard handling
+		void checkShift () {
+			if (IFace.Shift) {
+				if (!selectionStart.HasValue)
+					selectionStart = currentLoc;
+			} else
+				selectionStart = null;
+		}
+		public override void onKeyDown (object sender, KeyEventArgs e) {
+			
+			switch (e.Key) {
+			case Key.Escape:
+				selectionStart = null;
+				RegisterForRedraw ();
+				break;
+			case Key.Home:
+				checkShift ();
+				if (IFace.Ctrl)
+					currentLoc = new CharLocation (0, 0);
+				else
+					currentLoc = new CharLocation (currentLoc.Value.Line, 0);
+				RegisterForRedraw ();
+				break;
+			case Key.End:
+				checkShift ();
+				int l = IFace.Ctrl ? lines.Length - 1 : currentLoc.Value.Line;
+				currentLoc = new CharLocation (l, lines[l].Length);
+				RegisterForRedraw ();
+				break;
+/*			case Key.Insert:
+				if (IFace.Shift)
+					this.Insert (IFace.Clipboard);
+				else if (IFace.Ctrl && !selectionIsEmpty)
+					IFace.Clipboard = this.SelectedText;
+				break;*/
+			case Key.Left:
+				checkShift ();
+				/*if (IFace.Ctrl)
+					GotoWordStart ();
+				else*/
+				MoveLeft ();
+				RegisterForRedraw ();
+				break;
+			case Key.Right:
+				checkShift ();
+				/*if (IFace.Ctrl)
+					GotoWordStart ();
+				else*/
+				MoveRight ();
+				RegisterForRedraw ();
+				break;
+			case Key.Up:
+				checkShift ();
+				MoveUp ();
+				RegisterForRedraw ();
+				break;
+			case Key.Down:
+				checkShift ();
+				MoveDown ();
+				RegisterForRedraw ();
+				break; 
+			default:
+				base.onKeyDown (sender, e);
+				return;
+			}
+			e.Handled = true;			
+			
+		}
+        #endregion
+        /// <summary>
+        /// Update Current Column, line and TextCursorPos
+        /// from mouseLocalPos
+        /// </summary>
+        void updateLocation (Context gr, int clientWidth, ref CharLocation? location)
 		{
 			if (location == null)
 				return;
@@ -837,7 +926,7 @@ namespace Crow {
 				return;
 			LineSpan ls = lines[loc.Line];
 			ReadOnlySpan<char> curLine = _text.GetLine (lines[loc.Line]);
-			double cPos = Width.IsFit ? 0 : getX (clientWidth, ref ls);
+			double cPos = Width.IsFit && !Multiline ? 0 : getX (clientWidth, ref ls);
 			
 			if (loc.Column >= 0) {
 				loc.VisualCharXPosition = gr.TextExtents (curLine.Slice (0, loc.Column), Interface.TAB_SIZE).XAdvance + cPos;
