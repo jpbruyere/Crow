@@ -1838,7 +1838,7 @@ namespace Crow
 						paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);					
 				} else {
 					Rectangle rb = Slot + Parent.ClientRectangle.Position;
-					ctx.Save ();
+					//ctx.Save ();
 
 					ctx.Translate (rb.X, rb.Y);
 
@@ -1846,7 +1846,8 @@ namespace Crow
 					if (!IsEnabled)
 						paintDisabled (ctx, Slot);
 
-					ctx.Restore ();
+					ctx.Translate (-rb.X, -rb.Y);
+					//ctx.Restore ();
 				}
 				LastPaintedSlot = Slot;
 			}

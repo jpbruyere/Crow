@@ -816,6 +816,13 @@ namespace Crow
 				PerformanceMeasure.Begin (PerformanceMeasure.Kind.Drawing);
 				IsDirty = true;
 
+				for (int i = 0; i < clipping.NumRectangles; i++)
+					ctx.Rectangle (clipping.GetRectangle (i));
+				ctx.ClipPreserve ();
+				ctx.Operator = Operator.Clear;
+				ctx.Fill ();
+				ctx.Operator = Operator.Over;
+
 				ctx.PushGroup ();
 
 				for (int i = GraphicTree.Count -1; i >= 0 ; i--){
@@ -825,9 +832,9 @@ namespace Crow
 					if (clipping.Contains (p.Slot) == RegionOverlap.Out)
 						continue;
 
-					ctx.Save ();
+					//ctx.Save ();
 					p.Paint (ref ctx);
-					ctx.Restore ();
+					//ctx.Restore ();
 				}
 
 				if (DragAndDropOperation != null) {
@@ -856,13 +863,10 @@ namespace Crow
 
 				ctx.PopGroupToSource ();
 
-				for (int i = 0; i < clipping.NumRectangles; i++)
-					ctx.Rectangle (clipping.GetRectangle (i));
+/*				for (int i = 0; i < clipping.NumRectangles; i++)
+					ctx.Rectangle (clipping.GetRectangle (i));*/
 
-				ctx.ClipPreserve ();
-				ctx.Operator = Operator.Clear;
-				ctx.Fill ();
-				ctx.Operator = Operator.Over;
+
 
 				ctx.Paint ();
 					
