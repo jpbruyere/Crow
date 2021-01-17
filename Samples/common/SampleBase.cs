@@ -41,7 +41,7 @@ namespace Crow
 		DirectoryInfo curDir = new DirectoryInfo (Path.GetDirectoryName (Assembly.GetEntryAssembly ().Location));
 		public FileSystemInfo[] CurDirectory => curDir.GetFileSystemInfos ();
 		public string MultilineText =
-			$"Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit. Sed non risus.\n\nSuspendisse lectus tortor,";
+			$"Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit. Sed non risus.\n\nSuspendisse lectus tortor,\nLorem ipsum dolor sit amet,\nconsectetur adipiscing elit. Sed non risus.\n\nSuspendisse lectus tortor,";
 		//public string MultilineText = $"a\n";
 		TextAlignment textAlignment = TextAlignment.Left;
 		public TextAlignment TextAlignment {

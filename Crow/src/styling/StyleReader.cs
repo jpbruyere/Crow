@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Globalization;
 using Crow.Coding;
 
 namespace Crow
@@ -15,8 +16,7 @@ namespace Crow
 	/// Parser for style files.
 	/// </summary>
 	//TODO: style key shared by different class may use only first encouneter class setter, which can cause bug.
-	public class StyleReader : StreamReader
-	{
+	public class StyleReader : StreamReader {
 		enum States { classNames, members, value, endOfStatement }
 
 		States curState = States.classNames;
@@ -24,17 +24,24 @@ namespace Crow
 		int line = 1;
 
 		#region Character ValidityCheck
-		static Regex rxValidChar = new Regex(@"\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}|\p{Mn}|\p{Mc}|\p{Nd}|\p{Pc}|\p{Cf}");
-		static Regex rxNameStartChar = new Regex(@"_|\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}");															
-		static Regex rxNameChar = new Regex(@"\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}|\p{Mn}|\p{Mc}|\p{Nd}|\p{Pc}|\p{Cf}");
-		static Regex rxDecimal = new Regex(@"[0-9]+");
-		static Regex rxHexadecimal = new Regex(@"[0-9a-fA-F]+");
+		/*static Regex rxValidChar = new Regex (@"\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}|\p{Mn}|\p{Mc}|\p{Nd}|\p{Pc}|\p{Cf}");
+		static Regex rxNameStartChar = new Regex (@"_|\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}");
+		static Regex rxNameChar = new Regex (@"\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}|\p{Mn}|\p{Mc}|\p{Nd}|\p{Pc}|\p{Cf}");
+		static Regex rxDecimal = new Regex (@"[0-9]+");
+		static Regex rxHexadecimal = new Regex (@"[0-9a-fA-F]+");*/
 
-		bool nextCharIsValidCharStartName {
-			get => rxNameStartChar.IsMatch(new string(new char[]{PeekChar()}));
-		}
+		bool nextCharIsValidCharStartName => Char.IsLetter (PeekChar ()) || PeekChar () == '_';
 		bool nextCharIsValidCharName {
-			get => rxNameChar.IsMatch(new string(new char[]{PeekChar()})); 
+			get {
+				if (Char.IsLetterOrDigit (PeekChar ()))
+					return true;
+				UnicodeCategory uc = Char.GetUnicodeCategory (PeekChar ());
+				return
+					uc == UnicodeCategory.NonSpacingMark ||
+					uc == UnicodeCategory.SpacingCombiningMark ||
+					uc == UnicodeCategory.ConnectorPunctuation ||
+					uc == UnicodeCategory.Format;
+			}
 		}
 		#endregion
 

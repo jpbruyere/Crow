@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Text;
 using System.Diagnostics;
 using Glfw;
+using System.Collections;
 
 namespace Crow {
 	internal struct TextSpan
@@ -52,20 +53,103 @@ namespace Crow {
 				HashCode.Combine (Line, Column);
 		}
     }
-	internal struct LineSpan
+    internal class LineCollection : ICollection<LineSpan>
     {
-		public readonly int Start;
-		public readonly int End;
-		public readonly int EndIncludingLineBreak;
+		LineSpan[] lines;
+
+        public int Count => throw new NotImplementedException ();
+
+        public bool IsReadOnly => throw new NotImplementedException ();
+
+        public void Add (LineSpan item) {
+            throw new NotImplementedException ();
+        }
+
+        public void Clear () {
+            throw new NotImplementedException ();
+        }
+
+        public bool Contains (LineSpan item) {
+            throw new NotImplementedException ();
+        }
+
+        public void CopyTo (LineSpan[] array, int arrayIndex) {
+            throw new NotImplementedException ();
+        }
+
+        public IEnumerator<LineSpan> GetEnumerator () {
+            throw new NotImplementedException ();
+        }
+
+        public bool Remove (LineSpan item) {
+            throw new NotImplementedException ();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator () {
+            throw new NotImplementedException ();
+        }
+
+        /*public LineSpan this[int index] {
+			get => lines[index];
+			set => lines[index] = value;
+		}
+        public int Count => lines.Length;
+        public bool IsReadOnly => false;
+
+        public void Add (LineSpan item) {
+            
+        }
+
+        public void Clear () {
+            throw new NotImplementedException ();
+        }
+
+        public bool Contains (LineSpan item) {
+            throw new NotImplementedException ();
+        }
+
+        public void CopyTo (LineSpan[] array, int arrayIndex) {
+            throw new NotImplementedException ();
+        }
+
+        public IEnumerator<LineSpan> GetEnumerator () {
+            throw new NotImplementedException ();
+        }
+
+        public int IndexOf (LineSpan item) {
+            throw new NotImplementedException ();
+        }
+
+        public void Insert (int index, LineSpan item) {
+            throw new NotImplementedException ();
+        }
+
+        public bool Remove (LineSpan item) {
+            throw new NotImplementedException ();
+        }
+
+        public void RemoveAt (int index) {
+            throw new NotImplementedException ();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator () {
+            throw new NotImplementedException ();
+        }*/
+    }
+    internal struct LineSpan
+    {
+		public int Start;
+		public int Length;
+		public int LengthIncludingLineBreak;
 		public int LengthInPixel;
-		public int Length => End - Start;
-		public int LengthIncludingLineBreak => EndIncludingLineBreak - Start;
-		public int LineBreakLength => EndIncludingLineBreak - End;
+		public int End => Start + Length;
+		public int EndIncludingLineBreak => Start + LengthIncludingLineBreak;
+		public int LineBreakLength => LengthIncludingLineBreak - Length;
 		public bool HasLineBreak => LineBreakLength > 0;
 		public LineSpan (int start, int end, int endIncludingLineBreak) {
 			Start = start;
-			End = end;
-			EndIncludingLineBreak = endIncludingLineBreak;
+			Length = end - start;
+			LengthIncludingLineBreak = endIncludingLineBreak - start;
 			LengthInPixel = -1;
         }
 		public LineSpan WithStartOffset (int start) => new LineSpan (Start + start, End, EndIncludingLineBreak);
@@ -845,13 +929,6 @@ namespace Crow {
 		#endregion
 
 		#region Keyboard handling
-		void checkShift () {
-			if (IFace.Shift) {
-				if (!selectionStart.HasValue)
-					selectionStart = currentLoc;
-			} else
-				selectionStart = null;
-		}
 		public override void onKeyDown (object sender, KeyEventArgs e) {
 			
 			switch (e.Key) {
@@ -912,12 +989,19 @@ namespace Crow {
 			e.Handled = true;			
 			
 		}
-        #endregion
-        /// <summary>
-        /// Update Current Column, line and TextCursorPos
-        /// from mouseLocalPos
-        /// </summary>
-        void updateLocation (Context gr, int clientWidth, ref CharLocation? location)
+		void checkShift () {
+			if (IFace.Shift) {
+				if (!selectionStart.HasValue)
+					selectionStart = currentLoc;
+			} else
+				selectionStart = null;
+		}
+
+		#endregion
+		/// <summary>
+		/// location column from 
+		/// </summary>
+		void updateLocation (Context gr, int clientWidth, ref CharLocation? location)
 		{
 			if (location == null)
 				return;

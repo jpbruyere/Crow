@@ -3,10 +3,10 @@ using Crow;
 
 namespace HelloWorld
 {
-	class Program {
+	class Program : SampleBase {
 		static void Main (string[] args) {
-			using (Interface app = new Interface ()) {
-				app.Initialized += (sender, e) => (sender as Interface).Load ("#HelloWorld.helloworld.crow");
+			using (Interface app = new Program ()) {
+				app.Initialized += (sender, e) => (sender as Interface).Load ("#HelloWorld.helloworld.crow").DataSource = sender;
 				app.Run ();
 			}
 		}
