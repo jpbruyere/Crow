@@ -162,7 +162,7 @@ namespace Crow
 	/// <summary>
 	/// Universal Color structure
 	/// </summary>
-	public struct Color : IEquatable<Color>//, IEquatable<Colors>
+	public struct Color : IEquatable<Color>
     {
 		#region CTOR
 		public Color (int r, int g, int b, int a) :
@@ -187,6 +187,13 @@ namespace Crow
 				(((uint)Math.Round (g * 255.0)) << 16) +
 				(((uint)Math.Round (b * 255.0)) << 8) +
 				(((uint)Math.Round (a * 255.0)));
+		}
+		public Color (ReadOnlySpan<double> rgba) {
+			value =
+				(((uint)Math.Round (rgba[0] * 255.0)) << 24) +
+				(((uint)Math.Round (rgba[1] * 255.0)) << 16) +
+				(((uint)Math.Round (rgba[2] * 255.0)) << 8) +
+				(((uint)Math.Round (rgba[3] * 255.0)));
 		}
 		public Color (UInt32 rgba)
 		{
@@ -238,18 +245,9 @@ namespace Crow
 		public static bool operator ==(Color a, Color b) => a.Equals (b);
 		public static bool operator != (Color a, Color b) => !a.Equals (b);
 
-		public static Color operator *(Color c, Double f)
-		{
-			return new Color(c.R,c.G,c.B,c.A * f);
-		}
-		public static Color operator +(Color c1, Color c2)
-		{
-			return new Color(c1.R + c2.R,c1.G + c2.G,c1.B + c2.B,c1.A + c2.A);
-		}
-		public static Color operator -(Color c1, Color c2)
-		{
-			return new Color(c1.R - c2.R,c1.G - c2.G,c1.B - c2.B,c1.A - c2.A);
-		}
+		public static Color operator *(Color c, Double f) => new Color(c.R,c.G,c.B,c.A * f);
+		public static Color operator +(Color c1, Color c2) => new Color(c1.R + c2.R,c1.G + c2.G,c1.B + c2.B,c1.A + c2.A);
+		public static Color operator -(Color c1, Color c2) =>new Color(c1.R - c2.R,c1.G - c2.G,c1.B - c2.B,c1.A - c2.A);
 		#endregion
 
 		/// <summary>
@@ -328,9 +326,7 @@ namespace Crow
 			=> value == (UInt32)other;*/
 
 		public bool Equals (Color other)
-			=> value == other.value;
-		
-
+			=> value == other.value;		
 		public override int GetHashCode ()
 			=> value.GetHashCode ();
 
@@ -339,21 +335,27 @@ namespace Crow
 			
 		public static Color FromIml (string iml)
 		{
-			string [] c = iml.Split (new char [] { ',' });
-			return new Color (
-				double.Parse (c [0]),
-				double.Parse (c [1]),
-				double.Parse (c [2]),
-				double.Parse (c [3]));
+			Span<double> components = stackalloc double[4];
+			components[3] = 1;//init alpha to 1 so that it can be ommitted
+			ReadOnlySpan<char> c = iml.AsSpan ();			
+			int i = 0;
+			int ioc = c.IndexOf (',');
+
+			while (ioc >= 0) {
+				components[i++] = double.Parse (c.Slice (0, ioc));
+				c = c.Slice (ioc + 1);
+				ioc = c.IndexOf (',');
+			}
+			components[i++] = double.Parse (c);			
+			return new Color (components);
 		}
 
 		public static object Parse(string s)
 			=> (string.IsNullOrEmpty (s)) ? new Color (Colors.White) :
-				(s.StartsWith ("#", StringComparison.Ordinal)) ? new Color (UInt32.Parse (s.Substring (1), System.Globalization.NumberStyles.HexNumber)) :
-				(char.IsDigit(s[0])) ? FromIml (s) :
-				(FastEnum.TryParse<Colors> (s, out Colors cc)) ? new Color(cc) :
+				s[0] == '#' ? new Color (UInt32.Parse (s.AsSpan().Slice (1), System.Globalization.NumberStyles.HexNumber)) :
+				char.IsDigit(s[0]) ? FromIml (s) :
+				FastEnum.TryParse<Colors> (s, out Colors cc) ? new Color(cc) :
 				throw new Exception ("Unknown color name: " + s);
-
 
 		public static Color FromHSV (double _h, double _v = 0xff, double _s = 0xff, double _alpha = 0xff) {
 			_h /= 255.0;
@@ -363,26 +365,20 @@ namespace Crow
 			double H = _h * 360;
 			double C = _v * _s;
 			//X = C × (1 - | (H / 60°) mod 2 - 1 |)
-			double X = C * (1 - Math.Abs((H/60.0)%2 - 1));
+			double X = C * (1 - Math.Abs ((H / 60.0) % 2 - 1));
 			double m = _v - C;
 
-			double [] rgb = null;
-
 			if (H >= 300)
-				rgb = new double [] { C, 0, X };
+				return new Color (C + m, m, X + m, _alpha / 255.0);
 			else if (H >= 240)
-				rgb = new double [] { X, 0, C };
+				return new Color (X + m, m, C + m, _alpha / 255.0);
 			else if (H >= 180)
-				rgb = new double [] { 0, X, C };
+				return new Color (m, X + m, C + m, _alpha / 255.0);
 			else if (H >= 120)
-				rgb = new double [] { 0, C, X };
+				return new Color ( m, C + m, X + m, _alpha / 255.0);
 			else if (H >= 60)
-				rgb = new double [] { X, C, 0};
-			else
-				rgb = new double [] { C, X, 0 };
-
-
-			return new Color (rgb [0] + m, rgb [1] + m, rgb [2] + m, _alpha / 255.0);
+				return new Color (X + m, C + m,  m, _alpha / 255.0);
+			return new Color (C + m, X + m,  m, _alpha / 255.0);
 		}
 	}
 }
