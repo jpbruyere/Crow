@@ -24,7 +24,7 @@
 		</TabItem>
 		<TabItem Name="TabItem3" Background="DimGrey" Caption="tab item 3">
 			<Container Margin="5" CornerRadius="2" >
-				<TextBox Margin="5" Multiline="true" TextAlignment="TopLeft"/>
+				<TextBox Margin="5" Multiline="true" TextAlignment="Left"/>
 			</Container>
 		</TabItem>
 		<TabItem Name="TabItem4" Background="DimGrey" Caption="tab item 4" Margin="0">
