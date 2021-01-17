@@ -1,25 +1,11 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack Background="SteelBlue" Fit="true">
 	<HorizontalStack Fit="true">
-		<TextBox Background="DarkGrey" Height="30" Width="50" TextAlignment="TopLeft"/>
-		<TextBox Background="DarkGrey" Height="30" Width="50" TextAlignment="Top"/>
-		<TextBox Background="DarkGrey" Height="30" Width="50" TextAlignment="TopRight"/>
 		<TextBox Background="DarkGrey" Height="30" Width="50" TextAlignment="Left"/>
 		<TextBox Background="DarkGrey" Height="30" Width="50" TextAlignment="Center"/>
 		<TextBox Background="DarkGrey" Height="30" Width="50" TextAlignment="Right"/>
-		<TextBox Background="DarkGrey" Height="30" Width="50" TextAlignment="BottomLeft"/>
-		<TextBox Background="DarkGrey" Height="30" Width="50" TextAlignment="Bottom"/>
-		<TextBox Background="DarkGrey" Height="30" Width="50" TextAlignment="BottomRight"/>
 	</HorizontalStack>
-	<HorizontalStack Fit="true">
-		<TextBox Background="DarkGrey" Height="30" Width="70" TextAlignment="Top" HorizontalStretch="true" Text="TopStretch"/>
-		<TextBox Background="DarkGrey" Height="30" Width="60" TextAlignment="Center" HorizontalStretch="true" Text="HorizontalStretch" />
-		<TextBox Background="DarkGrey" Height="30" Width="60" TextAlignment="Bottom" HorizontalStretch="true" Text="BottomStretch"/>
-		<TextBox Background="DarkGrey" Height="10" Width="70" TextAlignment="Left" VerticalStretch="true" Text="LeftStretch"/>
-		<TextBox Background="DarkGrey" Height="10" Width="70" TextAlignment="Center" VerticalStretch="true" Text="VerticalStretch"/>
-		<TextBox Background="DarkGrey" Height="10" Width="70" TextAlignment="Right" VerticalStretch="true" Text="RightStretch"/>
-		<TextBox Background="DarkGrey" Height="30" Width="50" HorizontalStretch="true" VerticalStretch="true" Text="Fit"/>
-	</HorizontalStack>	
+	
 	<TextBox Name="tb" Multiline="true" Font="droid,16" Margin="5" Text="A\nBB\nCCC\nDDDD"/>
 	<TextBox Multiline="true" Font="droid,16" Name="tb5" Margin="5" Text="{../tb.SelectedText}"/>
 <!--	<TextBox Font="droid,10" Name="tb1" Margin="5" Text="this is a test of a text box"/>

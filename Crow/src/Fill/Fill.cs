@@ -19,16 +19,17 @@ namespace Crow
 		/// <param name="bounds">paint operation bounding box, unused for SolidColor</param>
 		public abstract void SetAsSource (Interface iFace, Context ctx, Rectangle bounds = default(Rectangle));
 		public static object Parse (string s){
-			if (string.IsNullOrEmpty (s))
+			ReadOnlySpan<char> tmp = s.AsSpan ();
+			if (tmp.Length == 0)
 				return null;
-			if (s.Substring (1).StartsWith ("gradient", StringComparison.Ordinal))
-				return (Gradient)Gradient.Parse (s);				
-			if (s.EndsWith (".svg", true, System.Globalization.CultureInfo.InvariantCulture) ||
-				s.EndsWith (".png", true, System.Globalization.CultureInfo.InvariantCulture) ||
-			    s.EndsWith (".jpg", true, System.Globalization.CultureInfo.InvariantCulture) ||
-			    s.EndsWith (".jpeg", true, System.Globalization.CultureInfo.InvariantCulture)||
-			    s.EndsWith (".bmp", true, System.Globalization.CultureInfo.InvariantCulture) ||
-			    s.EndsWith (".gif", true, System.Globalization.CultureInfo.InvariantCulture))
+			if (tmp.Length > 8 && tmp.Slice (1, 8).SequenceEqual ("gradient"))
+				return Gradient.Parse (s);			
+			if (tmp.EndsWith (".svg", StringComparison.OrdinalIgnoreCase) ||
+				tmp.EndsWith (".png", StringComparison.OrdinalIgnoreCase) ||
+				tmp.EndsWith (".jpg", StringComparison.OrdinalIgnoreCase) ||
+				tmp.EndsWith (".jpeg", StringComparison.OrdinalIgnoreCase) ||
+				tmp.EndsWith (".bmp", StringComparison.OrdinalIgnoreCase) ||
+				tmp.EndsWith (".gif", StringComparison.OrdinalIgnoreCase))
 				return Picture.Parse (s);
 
 			return new SolidColor((Color)Color.Parse (s));

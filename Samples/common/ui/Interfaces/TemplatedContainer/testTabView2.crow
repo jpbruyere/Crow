@@ -24,7 +24,7 @@
 			</TabItem>
 			<TabItem Name="TabItem3" Background="DimGrey" Caption="tab-1.3">
 				<Container Margin="5" CornerRadius="2" >
-					<TextBox Margin="5" Multiline="true" TextAlignment="TopLeft"/>
+					<TextBox Margin="5" Multiline="true" TextAlignment="Left"/>
 				</Container>
 			</TabItem>
 		</TabView>
@@ -55,7 +55,7 @@
 			</TabItem>
 			<TabItem Name="TabItem3" Background="DimGrey" Caption="tab-2.3">
 				<Container Margin="5" CornerRadius="2" >
-					<TextBox Margin="5" Multiline="true" TextAlignment="TopLeft"/>
+					<TextBox Margin="5" Multiline="true" TextAlignment="Left"/>
 				</Container>
 			</TabItem>
 		</TabView>

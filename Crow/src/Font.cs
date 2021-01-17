@@ -1,28 +1,6 @@
-﻿//
-// Font.cs
+﻿// Copyright (c) 2013-2021  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
-// Author:
-//       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
-//
-// Copyright (c) 2013-2017 Jean-Philippe Bruyère
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
 using Crow.Cairo;
@@ -84,42 +62,36 @@ namespace Crow
 		}
 
 		#region Operators
-		public static implicit operator string(Font c)
-		{
-			return c.ToString();
-		}
-		public static implicit operator Font(string s)
-		{
-			Font f = new Font ();
-
-			if (!string.IsNullOrEmpty (s)) {
-				string[] c = s.TrimStart().TrimEnd().Split (',');
-
-				if (c.Length == 2)
-					f.Size = int.Parse (c [1].TrimStart());
-
-				string[] n = c [0].TrimEnd().Split (' ');
-
-				f.Name = n [0];
-
-				if (n.Length > 1)
-					f.Style = FastEnum.Parse<FontStyle> (n[n.Length-1], true);
-			}
-
-			return f;
-		}
+		public static implicit operator string(Font c) => c.ToString();
+		
+		public static implicit operator Font(string s) => (Font)Parse(s);
 		#endregion
 
-		public override string ToString()
-		{
-
-			return (_style == FontStyle.Normal) ? $"{_name},{_size}" : $"{_name} {_style},{_size}";
-
-		}
+		public override string ToString () =>
+			_style == FontStyle.Normal ? $"{_name},{_size}" : $"{_name} {_style},{_size}";
 
 		public static object Parse(string s)
 		{
-			return (Font)s;
+			Font f = new Font ();
+			ReadOnlySpan<char> tmp = s.AsSpan ().Trim ();
+			if (tmp.Length > 0) {
+				int ioc = tmp.IndexOf (',');
+
+				if (ioc >= 0) {
+					f.Size = int.Parse (tmp.Slice (ioc + 1).Trim ());
+					tmp = tmp.Slice (0, ioc).TrimEnd ();
+				}
+
+				ioc = tmp.IndexOf (' ');
+
+				if (ioc < 0)
+					f.Name = tmp.ToString ();
+				else {
+					f.Name = tmp.Slice (0, ioc).ToString ();
+					f.Style = FastEnum.Parse<FontStyle> (tmp.Slice (ioc + 1).ToString (), true);
+				}
+			}
+			return f;			
 		}
 	}
 }

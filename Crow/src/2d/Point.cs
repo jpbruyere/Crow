@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe jp_bruyere@hotmail.com
+﻿// Copyright (c) 2013-2021  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -9,16 +9,20 @@ using System.Text;
 
 namespace Crow
 {
-    public struct Point
+    public struct Point : IEquatable<Point>, IEquatable<int>
     {
-		public int X;
-		public int Y;
+		public int X, Y;
 
-		public Point (int x, int y)
-		{
+		#region CTOR
+		public Point (int x, int y) {
 			X = x;
 			Y = y;
 		}
+		public Point (int pos) {
+			X = pos;
+			Y = pos;
+		}
+		#endregion
 
 		public int Length => (int)Math.Sqrt (Math.Pow (X, 2) + Math.Pow (Y, 2));
 		public double LengthD => Math.Sqrt (Math.Pow (X, 2) + Math.Pow (Y, 2));
@@ -40,10 +44,10 @@ namespace Crow
 		public static Point operator / (Point p1, Point p2) => new Point (p1.X / p2.X, p1.Y / p2.Y);
 		public static Point operator / (Point p, int d) => new Point (p.X / d, p.Y / d);
 
-		public static bool operator == (Point s1, Point s2) => s1.X == s2.X && s1.Y == s2.Y;
-		public static bool operator == (Point s, int i) => s.X == i && s.Y == i;
-		public static bool operator != (Point s1, Point s2) => !(s1.X == s2.X && s1.Y == s2.Y);
-		public static bool operator != (Point s, int i) => !(s.X == i && s.Y == i);
+		public static bool operator == (Point s1, Point s2) => s1.Equals (s2);
+		public static bool operator != (Point s1, Point s2) => !s1.Equals (s2);
+		public static bool operator == (Point s, int i) => s.Equals(i);
+		public static bool operator != (Point s, int i) => !s.Equals (i);
 		public static bool operator > (Point p1, Point p2) => p1.X > p2.X && p1.Y > p2.Y;
 		public static bool operator > (Point s, int i) => s.X > i && s.Y > i;
 		public static bool operator < (Point p1, Point p2) => p1.X < p2.X && p1.Y < p2.Y;
@@ -53,34 +57,21 @@ namespace Crow
 		public static bool operator <= (Point p1, Point p2) => p1.X <= p2.X && p1.Y <= p2.Y;
 		public static bool operator <= (Point s, int i) => s.X <= i && s.Y <= i;
 
-		public override string ToString () => string.Format ("{0},{1}", X, Y);
-		public override bool Equals (object obj) => obj is Point ? this == (Point)obj :
-			obj is Point && (Point)this == (Point)obj;
-		public static Point Parse (string s)
-		{
-			if (string.IsNullOrEmpty (s))
+		public bool Equals (Point other) => X == other.X && Y == other.Y;
+		public bool Equals (int other) => X == other && Y == other;
+
+
+		public override int GetHashCode () => HashCode.Combine (X, Y);
+		public override bool Equals (object obj) => obj is Point s ? Equals (s) : false;
+		public override string ToString () => $"{X},{Y}";
+		public static Point Parse (string s) {
+			ReadOnlySpan<char> tmp = s.AsSpan ();
+			if (tmp.Length == 0)
 				return default (Point);
-			string [] d = s.Trim ().Split (',');
-			if (d.Length == 2)
-				return new Point (int.Parse (d [0]), int.Parse (d [1]));
-			else if (d.Length == 1) {
-				int tmp = int.Parse (d [0]);
-				return new Point (tmp, tmp);
-			}
-			throw new Exception ("Crow.PointD Parsing Error: " + s);
+			int ioc = tmp.IndexOf (',');
+			return ioc < 0 ? new Point (int.Parse (tmp)) : new Point (
+				int.Parse (tmp.Slice (0, ioc)),
+				int.Parse (tmp.Slice (ioc + 1)));
 		}
-
-		public override int GetHashCode ()
-		{
-#pragma warning disable RECS0025 // Champ autre qu’en lecture seule référencé dans « GetHashCode() »
-			unchecked {
-				var hashCode = 1861411795;
-				hashCode = hashCode * -1521134295 + X.GetHashCode ();
-
-				hashCode = hashCode * -1521134295 + Y.GetHashCode ();
-				return hashCode;
-			}
-#pragma warning restore RECS0025 // Champ autre qu’en lecture seule référencé dans « GetHashCode() »	}
-		}
-	}
+    }
 }

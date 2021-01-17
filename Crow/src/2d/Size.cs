@@ -1,13 +1,13 @@
-﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe jp_bruyere@hotmail.com
+﻿// Copyright (c) 2013-2021  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
+using System;
+
 namespace Crow
 {
-    public struct Size
-    {
-		public static Size Zero => new Size (0, 0);
-
+    public struct Size : IEquatable<Size>, IEquatable<int>
+	{		
 		public int Width, Height;
 
 		#region CTOR
@@ -27,10 +27,10 @@ namespace Crow
 		public static implicit operator Rectangle(Size s)=> new Rectangle (s);
         public static implicit operator Size(int i)=> new Size(i, i);
 		public static implicit operator string(Size s)=> s.ToString ();
-		public static implicit operator Size(string s)=> string.IsNullOrEmpty (s) ? Zero : Parse (s);
+		public static implicit operator Size(string s)=> Parse (s);
 
-		public static bool operator == (Size s1, Size s2) => (s1.Width == s2.Width && s1.Height == s2.Height);
-		public static bool operator != (Size s1, Size s2) => (s1.Width != s2.Width || s1.Height != s2.Height);
+		public static bool operator == (Size s1, Size s2) => s1.Equals(s2);
+		public static bool operator != (Size s1, Size s2) => !s1.Equals (s2);
 		public static bool operator > (Size s1, Size s2) => (s1.Width > s2.Width && s1.Height > s2.Height);
 		public static bool operator >= (Size s1, Size s2) => (s1.Width >= s2.Width && s1.Height >= s2.Height);
 		public static bool operator < (Size s1, Size s2) => (s1.Width < s2.Width) ? s1.Height <= s2.Height :
@@ -40,33 +40,31 @@ namespace Crow
 		public static bool operator > (Size s, int i) => s.Width > i && s.Height > i;
 		public static bool operator >= (Size s, int i) => s.Width >= i && s.Height >= i;
 		public static bool operator <= (Size s1, Size s2) => (s1.Width <= s2.Width && s1.Height <= s2.Height);
-		public static bool operator == (Size s, int i) => (s.Width == i && s.Height == i);
-		public static bool operator != (Size s, int i) => (s.Width != i || s.Height != i);
+		/*public static bool operator == (Size s, int i) => (s.Width == i && s.Height == i);
+		public static bool operator != (Size s, int i) => (s.Width != i || s.Height != i);*/
 		public static Size operator + (Size s1, Size s2) => new Size (s1.Width + s2.Width, s1.Height + s2.Height);
 		public static Size operator + (Size s, int i) => new Size (s.Width + i, s.Height + i);
 		public static Size operator * (Size s, int i) => new Size (s.Width * i, s.Height * i);
 		public static Size operator / (Size s, int i) => new Size (s.Width / i, s.Height / i);
 		#endregion
 
-		public override int GetHashCode ()
-		{
-			unchecked // Overflow is fine, just wrap
-			{
-				int hash = 17;
-				// Suitable nullity checks etc, of course :)
-				hash = hash * 23 + Width.GetHashCode();
-				hash = hash * 23 + Height.GetHashCode();
-				return hash;
-			}
-		}
-		public override bool Equals (object obj) => (obj == null || obj.GetType () != typeof (Size)) ? false : this == (Size)obj;
+
+		public bool Equals (Size other) => Width == other.Width && Height == other.Height;
+		public bool Equals (int other) => Width == other && Height == other;
+
+		public override int GetHashCode () => HashCode.Combine (Width, Height);
+		public override bool Equals (object obj) => obj is Size s ? Equals(s) : false;
 		public override string ToString () => $"{Width},{Height}";
 		public static Size Parse(string s)
-		{
-			string[] d = s.Split(',');
-			return d.Length == 1 ? new Size(int.Parse(d[0])) : new Size(
-				int.Parse(d[0]),
-				int.Parse(d[1]));
+		{							
+			ReadOnlySpan<char> tmp = s.AsSpan ();
+			if (tmp.Length == 0)
+				return default (Size);
+			int ioc = tmp.IndexOf (',');
+			return ioc < 0 ? new Size (int.Parse (tmp)) : new Size (
+				int.Parse (tmp.Slice (0, ioc)),
+				int.Parse (tmp.Slice (ioc + 1)));
 		}
-	}
+
+    }
 }
