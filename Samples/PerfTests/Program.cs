@@ -6,11 +6,31 @@ using System.CodeDom.Compiler;
 using System.Diagnostics;
 using System.IO;
 using Crow;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace PerfTests
 {
 	class TestInterface : Interface
 	{
+#if NETCOREAPP		
+		static IntPtr resolveUnmanaged (Assembly assembly, String libraryName) {
+			
+			switch (libraryName)
+			{
+				case "glfw3":
+					return  NativeLibrary.Load("glfw", assembly, null);
+				case "rsvg-2.40":
+					return  NativeLibrary.Load("rsvg-2", assembly, null);
+			}
+			Console.WriteLine ($"[UNRESOLVE] {assembly} {libraryName}");			
+			return IntPtr.Zero;
+		}
+
+		static TestInterface () {
+			System.Runtime.Loader.AssemblyLoadContext.Default.ResolvingUnmanagedDll+=resolveUnmanaged;
+		}
+#endif		
 		readonly int count = 1, updateCycles = 0;
 		readonly bool miliseconds = false;
 		readonly bool resetItors = false;
