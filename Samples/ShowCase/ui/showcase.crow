@@ -22,7 +22,7 @@
 				<Scroller Name="scroller1" Background="White"
 						Margin="2" ScrollY="{../scrollbar1.Value}">
 					<TextBox VerticalAlignment="Top"
-						Text="{²Source}" Multiline="true" TextAlignment="TopLeft"
+						Text="{²Source}" Multiline="true"
 						Font="mono 10"/>
 				</Scroller>
 				<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}"

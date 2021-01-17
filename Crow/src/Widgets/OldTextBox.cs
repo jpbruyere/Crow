@@ -7,13 +7,30 @@ using Glfw;
 
 namespace Crow
 {
-	public class TextBox : Label
+	public class OldTextBox : OldLabel
     {
 		#region CTOR
-		protected TextBox() {}
-		public TextBox(Interface iface, string style = null) : base (iface, style) { }
+		protected OldTextBox() {}
+		public OldTextBox(Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
+		#region GraphicObject overrides
+		[XmlIgnore]public override bool HasFocus   //trigger update when lost focus to errase text beam
+        {
+            get => base.HasFocus;
+            set {
+				if (base.HasFocus == value)
+					return;
+                base.HasFocus = value;
+                RegisterForRedraw();
+            }
+        }
+
+		protected override void onDraw (Context gr)
+		{
+			base.onDraw (gr);
+		}
+		#endregion
 			
         #region Keyboard handling
 		public override void onKeyDown (object sender, KeyEventArgs e)
@@ -22,7 +39,7 @@ namespace Crow
 
 			switch (key)
 			{
-			/*case Key.Backspace:
+			case Key.Backspace:
 				if (CurrentPosition == 0)
 					return;
 				DeleteChar();
@@ -143,23 +160,24 @@ namespace Crow
 				break;
 			case Key.Tab:
 				this.Insert ("\t");
-				break;*/
+				break;
 			default:
-				base.onKeyDown (sender, e);
 				break;
 			}
 			e.Handled = true;
+			base.onKeyDown (sender, e);
+			RegisterForGraphicUpdate ();
 		}
 		public override void onKeyPress (object sender, KeyPressEventArgs e)
 		{
 			base.onKeyPress (sender, e);
 
-			/*Insert (e.KeyChar.ToString());
+			this.Insert (e.KeyChar.ToString());
 
 			SelRelease = -1;
 			SelBegin = new Point(CurrentColumn, SelBegin.Y);
 
-			RegisterForGraphicUpdate();*/
+			RegisterForGraphicUpdate();
 		}
         #endregion
 	} 

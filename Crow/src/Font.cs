@@ -93,12 +93,12 @@ namespace Crow
 			Font f = new Font ();
 
 			if (!string.IsNullOrEmpty (s)) {
-				string[] c = s.TrimStart().TrimEnd().Split (new char[] { ',' });
+				string[] c = s.TrimStart().TrimEnd().Split (',');
 
 				if (c.Length == 2)
 					f.Size = int.Parse (c [1].TrimStart());
 
-				string[] n = c [0].TrimEnd().Split (new char[] { ' ' });
+				string[] n = c [0].TrimEnd().Split (' ');
 
 				f.Name = n [0];
 

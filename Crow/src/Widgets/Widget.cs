@@ -203,11 +203,13 @@ namespace Crow
 		public virtual void NotifyValueChanged(string MemberName, object _value)
 		{
 			//Debug.WriteLine ("Value changed: {0}->{1} = {2}", this, MemberName, _value);
-			ValueChanged.Raise(this, new ValueChangeEventArgs(MemberName, _value));
+			if (ValueChanged != null)
+				ValueChanged.Invoke(this, new ValueChangeEventArgs(MemberName, _value));
 		}
 		public void NotifyValueChangedAuto (object _value, [CallerMemberName] string caller = null)
 		{
-			NotifyValueChanged (caller, _value);
+			if (ValueChanged != null)
+				NotifyValueChanged (caller, _value);
 		}
 		#endregion
 
@@ -1573,10 +1575,12 @@ namespace Crow
 				RegisterForLayouting (LayoutingType.Y);
 				break;
 			}
-			LayoutChanged.Raise (this, new LayoutingEventArgs (layoutType));
+			if (LayoutChanged != null)
+				LayoutChanged.Invoke (this, new LayoutingEventArgs (layoutType));
 		}
 		internal protected void raiseLayoutChanged(LayoutingEventArgs e){
-			LayoutChanged.Raise (this, e);
+			if (LayoutChanged != null)
+				LayoutChanged.Raise (this, e);
 		}
 		/// <summary> Update layout component only one at a time, this is where the computation of alignement
 		/// and size take place.

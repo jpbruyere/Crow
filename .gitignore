@@ -18,4 +18,5 @@ src/GraphicObjects/HorizontalWrappingWidget.cs
 TestResult.xml
 *.swp
 *.perf
-.vscode
+*.vscode
+*.diagsession
