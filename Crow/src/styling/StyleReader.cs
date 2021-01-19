@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Globalization;
 using Crow.Coding;
+using System.Text;
 
 namespace Crow
 {
@@ -74,9 +75,11 @@ namespace Crow
 			curState = States.classNames;
 
 			//string styleKey = resId.Substring (0, resId.Length - 6);
-			string token = "";
+			StringBuilder token = new StringBuilder(128);
+			StringBuilder constantId = new StringBuilder (128);
+
 			List<string> targetsClasses = new List<string> ();
-			string currentProperty = "";
+			string currentProperty = null;
 
 			while (!EndOfStream) {
 				SkipWhiteSpaceAndLineBreak ();
@@ -92,18 +95,18 @@ namespace Crow
 					break;
 				case ',':
 					ReadChar ();
-					if (!(curState == States.classNames) || string.IsNullOrEmpty (token))
+					if (!(curState == States.classNames) || token.Length == 0)
 						throw new ParserException (line, column, "Unexpected char ','", resId);
-					targetsClasses.Add (token);
-					token = "";
+					targetsClasses.Add (token.ToString());
+					token.Clear();
 					curState = States.classNames;
 					break;
 				case '{':
 					ReadChar ();
-					if (curState != States.classNames || string.IsNullOrEmpty (token))
+					if (curState != States.classNames || token.Length == 0)
 						throw new ParserException (line, column, "Unexpected char '{'", resId);
-					targetsClasses.Add (token);
-					token = "";
+					targetsClasses.Add (token.ToString());
+					token.Clear();
 					curState = States.members;
 					break;
 				case '}':
@@ -115,10 +118,10 @@ namespace Crow
 					break;
 				case '=':
 					ReadChar ();
-					if (!(curState == States.members || curState == States.classNames) || string.IsNullOrEmpty (token))
+					if (!(curState == States.members || curState == States.classNames) || token.Length == 0)
 						throw new ParserException (line, column, "Unexpected char '='", resId);
-					currentProperty = token;
-					token = "";
+					currentProperty = token.ToString ();
+					token.Clear ();
 					curState = States.value;
 					break;
 				case '"':
@@ -131,24 +134,27 @@ namespace Crow
 						if (c == '$') {
 							if (PeekChar () == '{') {
 								ReadChar ();
-								//constant replacement
-								string constantId = "";
+								//constant replacement								
 								while (!EndOfStream) {
 									c = ReadChar ();
 									if (c == '}')
 										break;
-									constantId += c;
+									constantId.Append (c);
 								}
-								if (string.IsNullOrEmpty (constantId) || !StylingConstants.ContainsKey (constantId))
+								if (constantId.Length == 0)
 									throw new ParserException (line, column, "Empty constant id in styling", resId);
-								token += StylingConstants [constantId];
+								string cst = constantId.ToString ();
+								constantId.Clear ();
+								if (!StylingConstants.ContainsKey (cst))
+									throw new ParserException (line, column, $"Constant id not found in styling ({cst})", resId);
+								token.Append (StylingConstants[cst]);
 								continue;
 							}
 						} else if (c == '\"') {
 							curState = States.endOfStatement;
 							break;
 						}
-						token += c;
+						token.Append (c);
 					}
 					break;
 				case ';':
@@ -157,21 +163,21 @@ namespace Crow
 					ReadChar ();
 					if (targetsClasses.Count == 0) {
 						//style constants
-						StylingConstants[currentProperty] = token;
+						StylingConstants[currentProperty] = token.ToString ();
 						curState = States.classNames;
 					} else {
 						foreach (string tc in targetsClasses) {
 							if (!Styling.ContainsKey (tc))
 								Styling [tc] = new Style ();
-							Styling [tc] [currentProperty] = token;
+							Styling[tc][currentProperty] = token.ToString ();
 #if DESIGN_MODE
 							Styling [tc].Locations[currentProperty] = new FileLocation(resId, line, column - token.Length - 1, token.Length);
 #endif
 						}
 						curState = States.members;
 					}
-					token = "";
-					currentProperty = "";
+					token.Clear ();
+					currentProperty = null;
 					break;
 				default:
 					if (curState == States.value)
@@ -180,9 +186,9 @@ namespace Crow
 						throw new ParserException (line, column, "expecting end of statement", resId);
 
 					if (nextCharIsValidCharStartName) {
-						token += ReadChar ();
+						token.Append (ReadChar ());
 						while (nextCharIsValidCharName)
-							token += ReadChar ();
+							token.Append (ReadChar ());
 					}
 					break;
 				}

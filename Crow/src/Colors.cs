@@ -351,7 +351,7 @@ namespace Crow
 		}
 
 		public static object Parse(string s)
-			=> (string.IsNullOrEmpty (s)) ? new Color (Colors.White) :
+			=> string.IsNullOrEmpty (s) ? new Color (Colors.White) :
 				s[0] == '#' ? new Color (UInt32.Parse (s.AsSpan().Slice (1), System.Globalization.NumberStyles.HexNumber)) :
 				char.IsDigit(s[0]) ? FromIml (s) :
 				FastEnum.TryParse<Colors> (s, out Colors cc) ? new Color(cc) :
