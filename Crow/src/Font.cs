@@ -70,7 +70,7 @@ namespace Crow
 		public override string ToString () =>
 			_style == FontStyle.Normal ? $"{_name},{_size}" : $"{_name} {_style},{_size}";
 
-		public static object Parse(string s)
+		public static Font Parse(string s)
 		{
 			Font f = new Font ();
 			ReadOnlySpan<char> tmp = s.AsSpan ().Trim ();
