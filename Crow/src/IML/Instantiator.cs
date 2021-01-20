@@ -54,14 +54,30 @@ namespace Crow.IML {
 
 		internal string sourcePath;
 
-		#if DESIGN_MODE
+#if DESIGN_MODE
 		public static int NextInstantiatorID = 0;
 		public int currentInstantiatorID = 0;
 		int currentDesignID = 0;
 		internal string NextDesignID { get { return string.Format ("{0}_{1}",currentInstantiatorID, currentDesignID++); }}
-		#endif
+#endif
 
 		#region CTOR
+		static XmlReaderSettings xmlReaderSettings;		
+		static string NT_template, NT_iTemp, NT_style, NT_name, NT_dataSource, NT_dataSourceType;
+		static Instantiator () {
+			NameTable names =  new NameTable ();
+			NT_template = names.Add ("Template");
+			NT_iTemp = names.Add ("ItemTemplate");
+			NT_style = names.Add ("Style");
+			NT_name = names.Add ("Name");
+			NT_dataSource = names.Add ("DataSource");
+			NT_dataSourceType = names.Add ("DataSourceType");
+
+
+			xmlReaderSettings = new XmlReaderSettings ();
+			xmlReaderSettings.NameTable = names;
+			
+		}
 		/// <summary>
 		/// Initializes a new instance of the Instantiator class.
 		/// </summary>
@@ -80,7 +96,7 @@ namespace Crow.IML {
 			sourcePath = srcPath;
 			DbgLogger.StartEvent (DbgEvtType.CreateITor, sourcePath);
 			try {
-				using (XmlReader itr = XmlReader.Create (stream)) {
+				using (XmlReader itr = XmlReader.Create (stream, xmlReaderSettings)) {
 					parseIML (itr);
 				}
 			} catch (Exception ex) {
@@ -217,6 +233,10 @@ namespace Crow.IML {
 
 			string tmpXml = reader.ReadOuterXml ();
 
+
+			XmlTextReader r = reader as XmlTextReader;
+			
+
 			if (ctx.nodesStack.Peek().HasTemplate)
 				emitTemplateLoad (ctx, tmpXml);
 
@@ -269,20 +289,20 @@ namespace Crow.IML {
 		/// <param name="tmpXml">xml fragment</param>
 		void emitTemplateLoad (IMLContext ctx, string tmpXml) {
 			//if its a template, first read template elements
-			using (XmlTextReader reader = new XmlTextReader (tmpXml, XmlNodeType.Element, null)) {
+			using (XmlReader reader = XmlReader.Create (new StringReader(tmpXml), xmlReaderSettings)) {
 				List<string[]> itemTemplateIds = new List<string[]> ();
 				bool inlineTemplate = false;
 
 				reader.Read ();
 
-				string templatePath = reader.GetAttribute ("Template");
-				string itemTemplatePath = reader.GetAttribute ("ItemTemplate");
+				string templatePath = reader.GetAttribute (NT_template);
+				string itemTemplatePath = reader.GetAttribute (NT_iTemp);
 
 				int depth = reader.Depth + 1;
 				while (reader.Read ()) {
 					if (!reader.IsStartElement () || reader.Depth > depth)
 						continue;
-					if (reader.Name == "Template") {
+					if (reader.Name == NT_template) {
 						inlineTemplate = true;
 						#if DESIGN_MODE
 						ctx.il.Emit (OpCodes.Ldloc_0);
@@ -291,7 +311,7 @@ namespace Crow.IML {
 						#endif
 						reader.Read ();
 						readChildren (reader, ctx, -1);
-					} else if (reader.Name == "ItemTemplate")
+					} else if (reader.Name == NT_iTemp)
 						itemTemplateIds.Add (parseItemTemplateTag (ctx, reader));					
 				}
 
@@ -320,7 +340,7 @@ namespace Crow.IML {
 										if (!itr.IsStartElement ())
 											continue;
 										if (itr.NodeType == XmlNodeType.Element) {
-											if (itr.Name != "ItemTemplate") {
+											if (itr.Name != NT_iTemp) {
 												//the file contains a single template to use as default
 												iface.ItemTemplates [itemTemplatePath] =
 													new ItemTemplate (iface, itr);
@@ -409,19 +429,19 @@ namespace Crow.IML {
 				#region Styling and default values loading
 				//first check for Style attribute then trigger default value loading
 				if (reader.HasAttributes) {
-					string style = reader.GetAttribute ("Style");
+					string style = reader.GetAttribute (NT_style);
 					if (!string.IsNullOrEmpty (style)) {
 						CompilerServices.EmitSetValue (ctx.il, CompilerServices.piStyle, style);
 #if DESIGN_MODE
-						emitSetDesignAttribute (ctx, "Style", style);
+						emitSetDesignAttribute (ctx, NT_style, style);
 #endif
 					}
 					//check for dataSourceType, if set, datasource bindings will use direct setter/getter
 					//instead of reflexion
-					string dataSourceType = reader.GetAttribute ("DataSourceType");
+					string dataSourceType = reader.GetAttribute (NT_dataSourceType);
 					if (string.IsNullOrEmpty (dataSourceType)) {
 						//if not set but dataSource is not null, reset dsType to null
-						string ds = reader.GetAttribute ("DataSource");
+						string ds = reader.GetAttribute (NT_dataSource);
 						if (!string.IsNullOrEmpty (ds)) 
 							ctx.SetDataSourceTypeForCurrentNode (null);
 					} else
@@ -436,7 +456,7 @@ namespace Crow.IML {
 				if (reader.HasAttributes) {
 
 					while (reader.MoveToNextAttribute ()) {
-						if (reader.Name == "Style" || reader.Name == "DataSourceType" || reader.Name == "Template")
+						if (reader.Name == NT_style || reader.Name == NT_dataSourceType || reader.Name == NT_template)
 							continue;
 
 #if DESIGN_MODE
@@ -488,7 +508,7 @@ namespace Crow.IML {
 						if (pi == null)
 							throw new Exception ("Member '" + reader.Name + "' is not a property in " + ctx.CurrentNodeType.Name);
 
-						if (pi.Name == "Name")
+						if (pi.Name == NT_name)
 							ctx.StoreCurrentName (reader.Value);
 
 						if (imlValue.StartsWith ("{", StringComparison.Ordinal))
@@ -520,8 +540,8 @@ namespace Crow.IML {
 					break;
 				case XmlNodeType.Element:
 					//skip Templates
-					if (reader.Name == "Template" ||
-					    reader.Name == "ItemTemplate") {
+					if (reader.Name == NT_template ||
+					    reader.Name == NT_iTemp) {
 						reader.Skip ();
 						continue;
 					}
