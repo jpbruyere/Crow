@@ -18,12 +18,12 @@ namespace Crow
 		/// <param name="ctx">backend context</param>
 		/// <param name="bounds">paint operation bounding box, unused for SolidColor</param>
 		public abstract void SetAsSource (Interface iFace, Context ctx, Rectangle bounds = default(Rectangle));
-		public static object Parse (string s){
+		public static Fill Parse (string s){
 			ReadOnlySpan<char> tmp = s.AsSpan ();
 			if (tmp.Length == 0)
 				return null;
 			if (tmp.Length > 8 && tmp.Slice (1, 8).SequenceEqual ("gradient"))
-				return Gradient.Parse (s);			
+				return (Fill)Gradient.Parse (s);			
 			if (tmp.EndsWith (".svg", StringComparison.OrdinalIgnoreCase) ||
 				tmp.EndsWith (".png", StringComparison.OrdinalIgnoreCase) ||
 				tmp.EndsWith (".jpg", StringComparison.OrdinalIgnoreCase) ||

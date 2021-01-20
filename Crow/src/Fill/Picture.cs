@@ -100,7 +100,7 @@ namespace Crow
 		public static implicit operator string(Picture _pic) => _pic == null ? null : _pic.Path;
 		#endregion
 
-		public static new object Parse(string path)
+		public static new Picture Parse(string path)
 		{
 			if (string.IsNullOrEmpty (path))
 				return null;
