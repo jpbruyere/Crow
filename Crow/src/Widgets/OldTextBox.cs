@@ -59,7 +59,7 @@ namespace Crow
 				if (Multiline)
 					InsertLineBreak ();
 				else
-					OnTextChanged(this,new TextChangeEventArgs(Text));
+					OnTextChanged(this,new TextChangeEventArgs(default));
 				break;
 			case Key.Escape:
 				Text = "";

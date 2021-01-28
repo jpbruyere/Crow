@@ -24,17 +24,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using Crow.Text;
 using System;
 
 namespace Crow
 {
 	public class TextChangeEventArgs: EventArgs
 	{
-		public String Text;
+		public TextChange Change;
 
-		public TextChangeEventArgs (string _newValue) : base()
+		public TextChangeEventArgs (TextChange _newValue) : base()
 		{
-			Text = _newValue;
+			Change = _newValue;
 		}
 	}
 }

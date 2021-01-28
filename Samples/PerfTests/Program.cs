@@ -32,7 +32,7 @@ namespace PerfTests
 			System.Runtime.Loader.AssemblyLoadContext.Default.ResolvingUnmanagedDll+=resolveUnmanaged;
 		}
 #endif		
-		readonly int count = 1, updateCycles = 0;			
+		readonly int count = 10, updateCycles = 0;			
 		readonly bool screenOutput = false;
 		readonly string inDirectory = null;//directory to test
 		readonly string outFilePath;
@@ -68,7 +68,7 @@ namespace PerfTests
 			Console.WriteLine ("-i,--input:\n\tInput directory to search recursively for '.crow' file to test. If ommitted, builtin unit tests are performs");
 			Console.WriteLine ("-w,--width:\n\toutput surface width, not displayed on screen.");
 			Console.WriteLine ("-h,--height:\n\toutput surface height, not displayed on screen.");
-			Console.WriteLine ("-c,--count:\n\trepeat each test 'c' times.");
+			Console.WriteLine ("-c,--count:\n\trepeat each test 'c' times. (default = 10, minimum = 5");
 
 			Console.WriteLine ("-b,--begin:\n\tStarting stage for measures, may be the stage name or stage index");
             foreach (Stage s in Enum.GetValues(typeof(Stage))) {
@@ -76,7 +76,7 @@ namespace PerfTests
 			}
 			Console.WriteLine ("-e,--end:\n\tEnding stage for measures, may be the stage name or stage index");
 			Console.WriteLine ("-r,--reset:\n\tenable clear iterators after each test file.");
-			Console.WriteLine ("-u,--update:\n\tmeasure 'n' update cycle with DateTime.Now string notified.");
+			Console.WriteLine ("-u,--update:\n\tmeasure 'n' update cycle with elapsed ticks string notified. (default = 0)");
 			Console.WriteLine ("-s,--screen:\n\tenable output to screen.");
 			Console.WriteLine ("--help:\n\tthis help message.");
 		}
@@ -100,7 +100,7 @@ namespace PerfTests
 						break;
 					case "-c":
 					case "--count":
-						count = int.Parse (args[i++]);
+						count = Math.Max(5, int.Parse (args[i++]));
 						break;
 					case "-w":
 					case "--width":
@@ -511,10 +511,13 @@ namespace PerfTests
 
 		public static void Main (string [] args)
 		{
-            try {
+			
+			try {
 				using (TestInterface iface = new TestInterface (args)) {
-					iface.PerformUnitTests ();
-					iface.PerformTests ();
+					if (string.IsNullOrEmpty(iface.inDirectory))
+						iface.PerformUnitTests ();
+					else
+						iface.PerformTests ();
 				}
 			} catch (Exception) {
             }

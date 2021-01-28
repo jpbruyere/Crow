@@ -231,11 +231,7 @@ namespace Crow.IML {
 			ctx.curLine += li.LineNumber - 1;
 			#endif
 
-			string tmpXml = reader.ReadOuterXml ();
-
-
-			XmlTextReader r = reader as XmlTextReader;
-			
+			string tmpXml = reader.ReadOuterXml ();			
 
 			if (ctx.nodesStack.Peek().HasTemplate)
 				emitTemplateLoad (ctx, tmpXml);

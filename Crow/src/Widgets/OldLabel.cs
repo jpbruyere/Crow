@@ -128,7 +128,7 @@ namespace Crow {
 
 				lines = getLines;
 
-				OnTextChanged (this, new TextChangeEventArgs (Text));
+				OnTextChanged (this, new TextChangeEventArgs (default));
 				RegisterForGraphicUpdate ();
             }
         }
@@ -380,7 +380,7 @@ namespace Crow {
 					lines [CurrentLine] += lines [CurrentLine + 1];
 					lines.RemoveAt (CurrentLine + 1);
 
-					OnTextChanged (this, new TextChangeEventArgs (Text));
+					OnTextChanged (this, new TextChangeEventArgs (default));
 					return;
 				}
 				CurrentColumn--;
@@ -403,7 +403,7 @@ namespace Crow {
 				SelBegin = -1;
 				SelRelease = -1;
 			}
-			OnTextChanged (this, new TextChangeEventArgs (Text));
+			OnTextChanged (this, new TextChangeEventArgs (default));
 		}
 		/// <summary>
 		/// Insert new string at caret position, should be sure no line break is inside.
@@ -426,7 +426,7 @@ namespace Crow {
 				lines [CurrentLine] = lines [CurrentLine].Insert (CurrentColumn, str);
 				CurrentColumn += str.Length;
 			}
-			OnTextChanged (this, new TextChangeEventArgs (Text));
+			OnTextChanged (this, new TextChangeEventArgs (default));
 		}
 		/// <summary>
 		/// Insert a line break.
@@ -437,7 +437,7 @@ namespace Crow {
 			lines [CurrentLine] = lines [CurrentLine].Substring (0, CurrentColumn);
 			CurrentLine++;
 			CurrentColumn = 0;
-			OnTextChanged (this, new TextChangeEventArgs (Text));
+			OnTextChanged (this, new TextChangeEventArgs (default));
 		}
 		bool textMeasureIsUpToDate = false;
 		Size cachedTextSize = default(Size);

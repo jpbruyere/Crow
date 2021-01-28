@@ -2,6 +2,7 @@
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
+using Crow.Text;
 using System;
 using System.IO;
 using System.Linq;
@@ -196,24 +197,24 @@ namespace Crow
 
 		internal static bool IsAnyLineBreakCharacter (this char c) 
 			=> c == '\n' || c == '\r' || c == '\u0085' || c == '\u2028' || c == '\u2029';
-		internal static ReadOnlySpan<char> GetLine (this string str, LineSpan ls) {
+		internal static ReadOnlySpan<char> GetLine (this string str, TextLine ls) {
 			if (ls.Start >= str.Length)
 				return "".AsSpan ();
 			return str.AsSpan ().Slice (ls.Start, ls.Length);				
 		}
-		internal static ReadOnlySpan<char> GetLine (this string str, LineSpan ls, int offset) {
+		internal static ReadOnlySpan<char> GetLine (this string str, TextLine ls, int offset) {
 			int start = ls.Start + offset;
 			if (start >= str.Length)
 				return "".AsSpan ();
 			return str.AsSpan ().Slice (start, ls.Length);
 				
 		}
-		internal static ReadOnlySpan<char> GetLineIncludingLineBreak (this string str, LineSpan ls) {
+		internal static ReadOnlySpan<char> GetLineIncludingLineBreak (this string str, TextLine ls) {
 			if (ls.Start >= str.Length)
 				return "".AsSpan ();
 			return str.AsSpan ().Slice (ls.Start, ls.LengthIncludingLineBreak);
 		}
-		internal static ReadOnlySpan<char> GetLineIncludingLineBreak (this string str, LineSpan ls, int offset) {
+		internal static ReadOnlySpan<char> GetLineIncludingLineBreak (this string str, TextLine ls, int offset) {
 			int start = ls.Start + offset;
 			if (start >= str.Length)
 				return "".AsSpan ();
