@@ -2044,15 +2044,11 @@ namespace Crow
 		#endregion
 
 		protected virtual void onFocused(object sender, EventArgs e){
-			#if DEBUG_FOCUS
-			Debug.WriteLine("Focused => " + this.ToString());
-			#endif
+			DbgLogger.AddEvent (DbgEvtType.FocusedWidget, this);
 			Focused.Raise (this, e);
 		}
 		protected virtual void onUnfocused(object sender, EventArgs e){
-			#if DEBUG_FOCUS
-			Debug.WriteLine("UnFocused => " + this.ToString());
-			#endif
+			DbgLogger.AddEvent (DbgEvtType.UnfocusedWidget, this);
 			Unfocused.Raise (this, e);
 		}
 

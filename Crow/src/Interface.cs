@@ -62,10 +62,6 @@ namespace Crow
 		#region CTOR
 		static Interface ()
 		{
-			/*if (Type.GetType ("Mono.Runtime") == null) {
-				throw new Exception (@"C.R.O.W. run only on Mono, download latest version at: http://www.mono-project.com/download/stable/");
-			}*/
-
 			CROW_CONFIG_ROOT =
 				System.IO.Path.Combine (
 					Environment.GetFolderPath (Environment.SpecialFolder.UserProfile),
@@ -678,8 +674,7 @@ namespace Crow
 					_focusedWidget.HasFocus = false;
 				_focusedWidget = value;
 
-				NotifyValueChanged ("FocusedWidget", _focusedWidget);
-				DbgLogger.AddEvent (DbgEvtType.FocusedWidget, _focusedWidget);
+				NotifyValueChanged ("FocusedWidget", _focusedWidget);				
 				if (_focusedWidget != null)
 					_focusedWidget.HasFocus = true;
 			}
