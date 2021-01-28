@@ -32,9 +32,10 @@ namespace Crow
 		IFaceInit						= IFace | 0x06,
 		CreateITor						= IFace | 0x07,
 
-		HoverWidget						= Focus | 0x01,
-		FocusedWidget					= Focus | 0x02,
-		ActiveWidget					= Focus | 0x03,
+		HoverWidget						= IFace | Focus | Widget | 0x01,
+		FocusedWidget					= IFace | Focus | Widget | 0x02,
+		ActiveWidget					= IFace | Focus | Widget | 0x03,
+		UnfocusedWidget					= IFace | Focus | Widget | 0x04,
 
 		//10 nth bit set for graphic obj
 		TemplatedGroup					= 0x1000,
@@ -51,8 +52,8 @@ namespace Crow
 		GOAddChild		 				= Widget | 0x08,
 
 		GOSearchLargestChild			= Widget | 0x09,
-		GOSearchTallestChild 			= Widget | 0x10,
-		GORegisterForRedraw		 		= Widget | 0x11,
+		GOSearchTallestChild 			= Widget | 0x0A,
+		GORegisterForRedraw		 		= Widget | 0x0B,
 
 		AlreadyDisposed					= Dispose | Widget | Error | 0x01,
 		DisposedByGC					= Dispose | Widget | Error | 0x02,

@@ -444,7 +444,7 @@ namespace Crow {
 			OnTextChanged (this, new TextChangeEventArgs (Text));
 		}
 		*/
-		bool textMeasureIsUpToDate = false;
+		protected bool textMeasureIsUpToDate = false;
 		Size cachedTextSize = default(Size);
 		protected LineCollection lines;		
 		protected void getLines () {
