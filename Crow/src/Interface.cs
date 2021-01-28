@@ -209,7 +209,7 @@ namespace Crow
 
 		#endregion
 
-		public string WindowTitle {
+		public string WindowTitle {			
 			set => Glfw3.SetWindowTitle (hWin, value);
 		}
 
@@ -219,7 +219,6 @@ namespace Crow
 		}
 		public virtual void InterfaceThread ()
 		{
-
 			while (!Glfw3.WindowShouldClose (hWin)) {
 				Update ();
 				Thread.Sleep (UPDATE_INTERVAL);
@@ -767,9 +766,9 @@ namespace Crow
 
 				DiscardQueue = new Queue<LayoutingQueueItem> (LayoutingQueue.Count);
 				//Debug.WriteLine ("======= Layouting queue start =======");
-				LayoutingQueueItem lqi;
+				 				
 				while (LayoutingQueue.Count > 0) {
-					lqi = LayoutingQueue.Dequeue ();
+					LayoutingQueueItem lqi = LayoutingQueue.Dequeue ();
 					lqi.ProcessLayouting ();
 				}
 				LayoutingQueue = DiscardQueue;

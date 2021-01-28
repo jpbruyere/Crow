@@ -2,7 +2,7 @@
   "profiles": {
     "PerfTests": {
       "commandName": "Project",
-      "commandLineArgs": "-c 20 -i Interfaces/PerfLabels"
+      "commandLineArgs": "-c 10 -b 0 -e 1 "
     }
   }
 }

@@ -1212,7 +1212,7 @@ namespace Crow
 		{
 			if (pi.GetSetMethod () == null)
 				return;
-			XmlIgnoreAttribute xia = (XmlIgnoreAttribute)pi.GetCustomAttribute (typeof (XmlIgnoreAttribute));
+			XmlIgnoreAttribute xia = pi.GetCustomAttribute <XmlIgnoreAttribute>();
 			if (xia != null)
 				return;
 

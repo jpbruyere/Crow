@@ -12,162 +12,9 @@ using System.Text;
 using System.Diagnostics;
 using Glfw;
 using System.Collections;
+using Crow.Text;
 
 namespace Crow {
-	internal struct TextSpan
-    {
-		public readonly int Start;
-		public readonly int End;
-		public TextSpan (int start, int end) {
-			Start = start;
-			End = end;
-        }
-	}
-
-    [DebuggerDisplay ("{Line}, {Column}, {VisualCharXPosition}")]
-    internal struct CharLocation : IEquatable<CharLocation>
-    {
-		public readonly int Line;
-		public int Column;
-		public double VisualCharXPosition;
-		public CharLocation (int line, int column, double visualX = -1) {
-			Line = line;
-			Column = column;
-			VisualCharXPosition = visualX;
-        }
-		public bool HasVisualX => Column >= 0 && VisualCharXPosition >= 0;
-
-		public static bool operator ==(CharLocation a, CharLocation b)
-			=> a.Equals (b);
-		public static bool operator != (CharLocation a, CharLocation b)
-			=> !a.Equals (b);
-		public bool Equals (CharLocation other) {
-			return Column < 0 ?
-				Line == other.Line && VisualCharXPosition == other.VisualCharXPosition :
-				Line == other.Line && Column == other.Column;
-		}
-        public override bool Equals (object obj) => obj is CharLocation loc ? Equals(loc) : false;
-        public override int GetHashCode () {
-            return Column < 0 ?
-				HashCode.Combine (Line, VisualCharXPosition) :
-				HashCode.Combine (Line, Column);
-		}
-    }
-    internal class LineCollection : ICollection<LineSpan>
-    {
-		LineSpan[] lines;
-
-        public int Count => throw new NotImplementedException ();
-
-        public bool IsReadOnly => throw new NotImplementedException ();
-
-        public void Add (LineSpan item) {
-            throw new NotImplementedException ();
-        }
-
-        public void Clear () {
-            throw new NotImplementedException ();
-        }
-
-        public bool Contains (LineSpan item) {
-            throw new NotImplementedException ();
-        }
-
-        public void CopyTo (LineSpan[] array, int arrayIndex) {
-            throw new NotImplementedException ();
-        }
-
-        public IEnumerator<LineSpan> GetEnumerator () {
-            throw new NotImplementedException ();
-        }
-
-        public bool Remove (LineSpan item) {
-            throw new NotImplementedException ();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator () {
-            throw new NotImplementedException ();
-        }
-
-        /*public LineSpan this[int index] {
-			get => lines[index];
-			set => lines[index] = value;
-		}
-        public int Count => lines.Length;
-        public bool IsReadOnly => false;
-
-        public void Add (LineSpan item) {
-            
-        }
-
-        public void Clear () {
-            throw new NotImplementedException ();
-        }
-
-        public bool Contains (LineSpan item) {
-            throw new NotImplementedException ();
-        }
-
-        public void CopyTo (LineSpan[] array, int arrayIndex) {
-            throw new NotImplementedException ();
-        }
-
-        public IEnumerator<LineSpan> GetEnumerator () {
-            throw new NotImplementedException ();
-        }
-
-        public int IndexOf (LineSpan item) {
-            throw new NotImplementedException ();
-        }
-
-        public void Insert (int index, LineSpan item) {
-            throw new NotImplementedException ();
-        }
-
-        public bool Remove (LineSpan item) {
-            throw new NotImplementedException ();
-        }
-
-        public void RemoveAt (int index) {
-            throw new NotImplementedException ();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator () {
-            throw new NotImplementedException ();
-        }*/
-    }
-    internal struct LineSpan
-    {
-		public int Start;
-		public int Length;
-		public int LengthIncludingLineBreak;
-		public int LengthInPixel;
-		public int End => Start + Length;
-		public int EndIncludingLineBreak => Start + LengthIncludingLineBreak;
-		public int LineBreakLength => LengthIncludingLineBreak - Length;
-		public bool HasLineBreak => LineBreakLength > 0;
-		public LineSpan (int start, int end, int endIncludingLineBreak) {
-			Start = start;
-			Length = end - start;
-			LengthIncludingLineBreak = endIncludingLineBreak - start;
-			LengthInPixel = -1;
-        }
-		public LineSpan WithStartOffset (int start) => new LineSpan (Start + start, End, EndIncludingLineBreak);
-		/*public ReadOnlySpan<char> GetSubString (string str) {			
-			if (Start >= str.Length)
-				return "".AsSpan();
-			return str.Length - Start < Length ?
-				str.AsSpan().Slice (Start, Length) :
-				str.AsSpan().Slice (Start);
-		}
-		public ReadOnlySpan<char> GetSubStringIncludingLineBreak (string str) {
-			if (Start >= str.Length)
-				return "".AsSpan ();
-			return (str.Length - Start < LengthIncludingLineBreak) ?
-				str.AsSpan ().Slice (Start, LengthIncludingLineBreak) :
-				str.AsSpan ().Slice (Start);
-		}*/
-	}
 	/// <summary>
 	/// Simple label widget possibly multiline but without tabulation handling.
 	/// </summary>
@@ -184,15 +31,13 @@ namespace Crow {
 		public event EventHandler<TextChangeEventArgs> TextChanged;
 
 		public virtual void OnTextChanged(Object sender, TextChangeEventArgs e)
-		{
-			textMeasureIsUpToDate = false;
-			NotifyValueChanged ("Text", Text);
+		{			
 			TextChanged.Raise (this, e);
 		}
         //TODO:change protected to private
 
 		#region private and protected fields
-		string _text;
+		protected string _text;
         TextAlignment _textAlignment;
 		bool horizontalStretch;
 		bool verticalStretch;
@@ -204,9 +49,9 @@ namespace Crow {
 		//Point mouseLocalPos = -1;//mouse coord in widget space, filled only when clicked
 
 		
-		CharLocation? hoverLoc = null;
-		CharLocation? currentLoc = null;
-		CharLocation? selectionStart = null;	//selection start (row,column)
+		protected CharLocation? hoverLoc = null;
+		protected CharLocation? currentLoc = null;
+		protected CharLocation? selectionStart = null;	//selection start (row,column)
 
 		protected FontExtents fe;
 		protected TextExtents te;
@@ -239,18 +84,6 @@ namespace Crow {
 				RegisterForRedraw ();
 			}
 		}
-		void resetLocationXs () {
-			if (currentLoc.HasValue) {
-				CharLocation cl = currentLoc.Value;
-				cl.VisualCharXPosition = -1;
-				currentLoc = cl;
-			}
-			if (selectionStart.HasValue) {
-				CharLocation cl = selectionStart.Value;
-				cl.VisualCharXPosition = -1;
-				selectionStart = cl;
-			}
-		}
 		/// <summary>
 		/// If measure is not 'Fit', align text inside the bounds of this label.
 		/// </summary>
@@ -281,18 +114,21 @@ namespace Crow {
 				if (_text.AsSpan ().SequenceEqual (value.AsSpan ()))
                     return;
 
+				int oldTextLength = string.IsNullOrEmpty (_text) ? 0 : _text.Length;
                 _text = value;
 
 				getLines ();
 
-				OnTextChanged (this, new TextChangeEventArgs (Text));
+				textMeasureIsUpToDate = false;
+				NotifyValueChanged ("Text", Text);
+				OnTextChanged (this, new TextChangeEventArgs (new TextChange (0, oldTextLength, _text)));
 				RegisterForGraphicUpdate ();
             }
         }
 
 		/// <summary>
 		/// If 'true', linebreaks will be interpreted. If 'false', linebreaks are threated as unprintable
-		/// unicode characters.
+		/// unicode characters. Default value is 'False'.
 		/// </summary>
 		[DefaultValue(false)]
 		public bool Multiline
@@ -467,7 +303,7 @@ namespace Crow {
 			targetColumn = -1;
 			CharLocation loc = currentLoc.Value;
 			if (loc.Column == lines[loc.Line].Length) {
-				if (loc.Line == lines.Length - 1)
+				if (loc.Line == lines.Count - 1)
 					return false;
 				currentLoc = new CharLocation (loc.Line + 1, 0);
 			} else
@@ -495,7 +331,7 @@ namespace Crow {
 		}
 		public bool MoveDown () {
 			CharLocation loc = currentLoc.Value;
-			if (loc.Line == lines.Length - 1)
+			if (loc.Line == lines.Count - 1)
 				return false;
 
 			if (loc.Column > lines[loc.Line + 1].Length) {
@@ -511,22 +347,8 @@ namespace Crow {
 
 			return true;
 		}
+
 		/*
-		/// <summary>
-		/// Moves cursor one char to the right.
-		/// </summary>
-		/// <returns><c>true</c> if move succeed</returns>
-		public bool MoveRight(){
-			int tmp = _currentCol + 1;
-			if (tmp > lines [_currentLine].Length){
-				if (CurrentLine == lines.Length - 1)
-					return false;
-				CurrentLine++;
-				CurrentColumn = 0;
-			} else
-				CurrentColumn = tmp;
-			return true;
-		}
 		public void GotoWordStart(){
 			CurrentColumn--;
 			//skip white spaces
@@ -624,54 +446,96 @@ namespace Crow {
 		*/
 		bool textMeasureIsUpToDate = false;
 		Size cachedTextSize = default(Size);
-		LineSpan[] lines;
-		void getLines () {
+		protected LineCollection lines;		
+		protected void getLines () {
 			if (string.IsNullOrEmpty (_text)) {
-				lines = new LineSpan[] { new LineSpan (0, 0, 0) };
+				lines = new LineCollection(new TextLine[] { new TextLine (0, 0, 0) });
 				return;
 			}
 			if (!_multiline) {
-				lines = new LineSpan[] { new LineSpan (0, _text.Length, _text.Length) };
+				lines = new LineCollection (new TextLine[] { new TextLine (0, _text.Length, _text.Length) });
 				return;
 			}
 
-			List<LineSpan> _lines = new List<LineSpan> ();			
+			List<TextLine> _lines = new List<TextLine> ();			
 			int start = 0, i = 0;
 			while (i < _text.Length) {
 				char c = _text[i];
 				if (c == '\r') {
 					if (++i < _text.Length) {
 						if (_text[i] == '\n')
-							_lines.Add (new LineSpan (start, i - 1, ++i));
+							_lines.Add (new TextLine (start, i - 1, ++i));
 						else
-							_lines.Add (new LineSpan (start, i - 1, i));
+							_lines.Add (new TextLine (start, i - 1, i));
 					} else
-						_lines.Add (new LineSpan (start, i - 1, i));
+						_lines.Add (new TextLine (start, i - 1, i));
 					start = i;
 				} else if (c == '\n') {
 					if (++i < _text.Length) {
 						if (_text[i] == '\r')
-							_lines.Add (new LineSpan (start, i - 1, ++i));
+							_lines.Add (new TextLine (start, i - 1, ++i));
 						else
-							_lines.Add (new LineSpan (start, i - 1, i));
+							_lines.Add (new TextLine (start, i - 1, i));
 					} else
-						_lines.Add (new LineSpan (start, i - 1, i));
+						_lines.Add (new TextLine (start, i - 1, i));
 					start = i;
 
 				} else if (c == '\u0085' || c == '\u2028' || c == '\u2029')
-					_lines.Add (new LineSpan (start, i - 1, i));
+					_lines.Add (new TextLine (start, i - 1, i));
 				else
 					i++;
 			}
 
 			if (start < i)
-				_lines.Add (new LineSpan (start, _text.Length, _text.Length));
+				_lines.Add (new TextLine (start, _text.Length, _text.Length));
 			else
-				_lines.Add (new LineSpan (_text.Length, _text.Length, _text.Length));
+				_lines.Add (new TextLine (_text.Length, _text.Length, _text.Length));
 
-			lines = _lines.ToArray ();
+			lines = new LineCollection (_lines.ToArray ());
+		}
+		void resetLocationXs () {
+			if (currentLoc.HasValue) {
+				CharLocation cl = currentLoc.Value;
+				cl.VisualCharXPosition = -1;
+				currentLoc = cl;
+			}
+			if (selectionStart.HasValue) {
+				CharLocation cl = selectionStart.Value;
+				cl.VisualCharXPosition = -1;
+				selectionStart = cl;
+			}
+		}
+		double getX (int clientWidth, TextLine ls) {
+			switch (TextAlignment) {
+			case TextAlignment.Right:
+				return clientWidth - ls.LengthInPixel;
+			case TextAlignment.Center:
+				return clientWidth / 2 - ls.LengthInPixel / 2;
+			}
+			return 0;
 		}
 
+		protected TextSpan Selection {
+			get {				
+				CharLocation selStart = currentLoc.Value, selEnd = currentLoc.Value;
+				if (selectionStart.HasValue) {
+					if (currentLoc.Value.Line < selectionStart.Value.Line) {
+						selStart = currentLoc.Value;
+						selEnd = selectionStart.Value;
+					} else if (currentLoc.Value.Line > selectionStart.Value.Line) {
+						selStart = selectionStart.Value;
+						selEnd = currentLoc.Value;
+					} else if (currentLoc.Value.Column < selectionStart.Value.Column) {
+						selStart = currentLoc.Value;
+						selEnd = selectionStart.Value;
+					} else {
+						selStart = selectionStart.Value;
+						selEnd = currentLoc.Value;
+					}
+				}
+				return new TextSpan (lines.GetAbsolutePosition (selStart), lines.GetAbsolutePosition (selEnd));
+			}
+        }
 
 		#region GraphicObject overrides
 		public override int measureRawSize(LayoutingType lt)
@@ -691,17 +555,17 @@ namespace Crow {
 					fe = gr.FontExtents;
 					te = new TextExtents ();
 
-					cachedTextSize.Height = (int)Math.Ceiling ((fe.Ascent+fe.Descent) * Math.Max (1, lines.Length));
+					cachedTextSize.Height = (int)Math.Ceiling ((fe.Ascent+fe.Descent) * Math.Max (1, lines.Count));
 
 					TextExtents tmp = default;
 					int longestLine = 0;
-					for (int i = 0; i < lines.Length; i++) {							
+					for (int i = 0; i < lines.Count; i++) {							
 						if (lines[i].LengthInPixel < 0) {
 							if (lines[i].Length == 0)
-								lines[i].LengthInPixel = 0;// (int)Math.Ceiling (fe.MaxXAdvance);
+								lines.UpdateLineLengthInPixel (i, 0);// (int)Math.Ceiling (fe.MaxXAdvance);
 							else {
 								gr.TextExtents (_text.GetLine (lines[i]), Interface.TAB_SIZE, out tmp);
-								lines[i].LengthInPixel = (int)Math.Ceiling (tmp.XAdvance);
+								lines.UpdateLineLengthInPixel (i, (int)Math.Ceiling (tmp.XAdvance));
 							}
 						}
 						if (lines[i].LengthInPixel > lines[longestLine].LengthInPixel)
@@ -714,15 +578,6 @@ namespace Crow {
 			return Margin * 2 + (lt == LayoutingType.Height ? cachedTextSize.Height : cachedTextSize.Width);
 		}
 
-		double getX (int clientWidth, ref LineSpan ls) {
-			switch (TextAlignment) {
-			case TextAlignment.Right:
-				return clientWidth - ls.LengthInPixel;				
-			case TextAlignment.Center:
-				return clientWidth / 2 - ls.LengthInPixel / 2;
-			}
-			return 0;
-		}
 		protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
@@ -783,7 +638,7 @@ namespace Crow {
 			TextExtents extents;
 			Span<byte> bytes = stackalloc byte[128];			
 
-			for (int i = 0; i < lines.Length; i++) {
+			for (int i = 0; i < lines.Count; i++) {
 				int encodedBytes = -1;
 				if (lines[i].Length > 0) {
 
@@ -796,12 +651,12 @@ namespace Crow {
 
 					if (lines[i].LengthInPixel < 0) {
 						gr.TextExtents (bytes.Slice (0, encodedBytes), out extents);
-						lines[i].LengthInPixel = (int)extents.XAdvance;
+						lines.UpdateLineLengthInPixel (i, (int)extents.XAdvance);
 					}
 				}
 
 				Rectangle lineRect = new Rectangle (
-					Width.IsFit && !Multiline ? cb.X : (int)getX (cb.Width, ref lines[i]) + cb.X,
+					Width.IsFit && !Multiline ? cb.X : (int)getX (cb.Width, lines[i]) + cb.X,
 					cb.Y + i * lineHeight,
 					lines[i].LengthInPixel,
 					lineHeight);
@@ -860,7 +715,7 @@ namespace Crow {
 			base.onFocused (sender, e);
 			if (currentLoc == null) {
 				selectionStart = new CharLocation (0, 0);				
-				currentLoc = new CharLocation (lines.Length - 1, lines[lines.Length - 1].Length);
+				currentLoc = new CharLocation (lines.Count - 1, lines[lines.Count - 1].Length);
 			}
 			RegisterForRedraw ();
 		}
@@ -875,7 +730,7 @@ namespace Crow {
 
 			Point mouseLocalPos = e.Position - ScreenCoordinates (Slot).TopLeft - ClientRectangle.TopLeft;
 			int hoverLine = _multiline ?
-				(int)Math.Min (Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent + fe.Descent))), lines.Length - 1) : 0;
+				(int)Math.Min (Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent + fe.Descent))), lines.Count - 1) : 0;
 			hoverLoc = new CharLocation (hoverLine, -1, mouseLocalPos.X);
 
 			if (HasFocus && IFace.IsDown (Glfw.MouseButton.Left)) {
@@ -946,7 +801,7 @@ namespace Crow {
 				break;
 			case Key.End:
 				checkShift ();
-				int l = IFace.Ctrl ? lines.Length - 1 : currentLoc.Value.Line;
+				int l = IFace.Ctrl ? lines.Count - 1 : currentLoc.Value.Line;
 				currentLoc = new CharLocation (l, lines[l].Length);
 				RegisterForRedraw ();
 				break;
@@ -1008,9 +863,9 @@ namespace Crow {
 			CharLocation loc = location.Value;
 			if (loc.HasVisualX)
 				return;
-			LineSpan ls = lines[loc.Line];
-			ReadOnlySpan<char> curLine = _text.GetLine (lines[loc.Line]);
-			double cPos = Width.IsFit && !Multiline ? 0 : getX (clientWidth, ref ls);
+			TextLine ls = lines[loc.Line];
+			ReadOnlySpan<char> curLine = _text.GetLine (ls);
+			double cPos = Width.IsFit && !Multiline ? 0 : getX (clientWidth, ls);
 			
 			if (loc.Column >= 0) {
 				loc.VisualCharXPosition = gr.TextExtents (curLine.Slice (0, loc.Column), Interface.TAB_SIZE).XAdvance + cPos;
