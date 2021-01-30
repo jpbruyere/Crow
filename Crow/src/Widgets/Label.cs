@@ -139,6 +139,7 @@ namespace Crow {
 				if (value == _multiline)
 					return;
 				_multiline = value;
+				lines = new LineCollection (_multiline ? 4 : 1);
 				NotifyValueChangedAuto (_multiline);
 				RegisterForGraphicUpdate();
 			}
@@ -446,52 +447,78 @@ namespace Crow {
 		*/
 		protected bool textMeasureIsUpToDate = false;
 		Size cachedTextSize = default(Size);
-		protected LineCollection lines;		
+		protected LineCollection lines;
+		protected string LineBreak = null;
+		bool mixedLineBreak = false;
+
+		protected void detectLineBreak () {
+			if (!_multiline)
+				return;			
+			mixedLineBreak = false;
+
+			if (lines.Count == 0 || lines[0].LineBreakLength == 0) {
+				LineBreak = Environment.NewLine;
+				return;
+            }
+			LineBreak = _text.GetLineBreak (lines[0]).ToString ();
+
+			for (int i = 1; i < lines.Count; i++) {
+				ReadOnlySpan<char> lb = _text.GetLineBreak (lines[i]);
+				if (!lb.SequenceEqual (LineBreak)) {
+					mixedLineBreak = true;
+					break;
+                }
+			}
+        }
+
 		protected void getLines () {
+
+			if (lines == null)
+				lines = new LineCollection (_multiline ? 4 : 1);
+			else
+				lines.Clear ();
+
 			if (string.IsNullOrEmpty (_text)) {
-				lines = new LineCollection(new TextLine[] { new TextLine (0, 0, 0) });
+				lines.Add (new TextLine (0, 0, 0));
 				return;
 			}
 			if (!_multiline) {
-				lines = new LineCollection (new TextLine[] { new TextLine (0, _text.Length, _text.Length) });
+				lines.Add (new TextLine (0, _text.Length, _text.Length));
 				return;
 			}
-
-			List<TextLine> _lines = new List<TextLine> ();			
+					
 			int start = 0, i = 0;
 			while (i < _text.Length) {
 				char c = _text[i];
 				if (c == '\r') {
 					if (++i < _text.Length) {
 						if (_text[i] == '\n')
-							_lines.Add (new TextLine (start, i - 1, ++i));
+							lines.Add (new TextLine (start, i - 1, ++i));
 						else
-							_lines.Add (new TextLine (start, i - 1, i));
+							lines.Add (new TextLine (start, i - 1, i));
 					} else
-						_lines.Add (new TextLine (start, i - 1, i));
+						lines.Add (new TextLine (start, i - 1, i));
 					start = i;
 				} else if (c == '\n') {
 					if (++i < _text.Length) {
 						if (_text[i] == '\r')
-							_lines.Add (new TextLine (start, i - 1, ++i));
+							lines.Add (new TextLine (start, i - 1, ++i));
 						else
-							_lines.Add (new TextLine (start, i - 1, i));
+							lines.Add (new TextLine (start, i - 1, i));
 					} else
-						_lines.Add (new TextLine (start, i - 1, i));
+						lines.Add (new TextLine (start, i - 1, i));
 					start = i;
 
 				} else if (c == '\u0085' || c == '\u2028' || c == '\u2029')
-					_lines.Add (new TextLine (start, i - 1, i));
+					lines.Add (new TextLine (start, i - 1, i));
 				else
 					i++;
 			}
 
 			if (start < i)
-				_lines.Add (new TextLine (start, _text.Length, _text.Length));
+				lines.Add (new TextLine (start, _text.Length, _text.Length));
 			else
-				_lines.Add (new TextLine (_text.Length, _text.Length, _text.Length));
-
-			lines = new LineCollection (_lines.ToArray ());
+				lines.Add (new TextLine (_text.Length, _text.Length, _text.Length));			
 		}
 		void resetLocationXs () {
 			if (currentLoc.HasValue) {
@@ -540,7 +567,7 @@ namespace Crow {
 		#region GraphicObject overrides
 		public override int measureRawSize(LayoutingType lt)
 		{
-			if (lines == null)
+			if ((bool)lines?.IsEmpty)
 				getLines ();
 
 			if (!textMeasureIsUpToDate) {
@@ -646,7 +673,7 @@ namespace Crow {
 					if (bytes.Length < size)
 						bytes = size > 512 ? new byte[size] : stackalloc byte[size];
 
-					encodedBytes = Encoding.UTF8.GetBytes (_text.GetLine (lines[i]), bytes);
+					encodedBytes = Crow.Text.Encoding.ToUtf8 (_text.GetLine (lines[i]), bytes);
 					bytes[encodedBytes++] = 0;
 
 					if (lines[i].LengthInPixel < 0) {
@@ -868,6 +895,7 @@ namespace Crow {
 			double cPos = Width.IsFit && !Multiline ? 0 : getX (clientWidth, ls);
 			
 			if (loc.Column >= 0) {
+				//int encodedBytes = Crow.Text.Encoding2.ToUtf8 (curLine.Slice (0, loc.Column), bytes);
 				loc.VisualCharXPosition = gr.TextExtents (curLine.Slice (0, loc.Column), Interface.TAB_SIZE).XAdvance + cPos;
 				location = loc;
 				return;
@@ -878,7 +906,7 @@ namespace Crow {
 
 			for (int i = 0; i < ls.Length; i++)
 			{
-				int encodedBytes = Encoding.UTF8.GetBytes (curLine.Slice (i, 1), bytes);
+				int encodedBytes = Crow.Text.Encoding.ToUtf8 (curLine.Slice (i, 1), bytes);
 				bytes[encodedBytes] = 0;
 
 				gr.TextExtents (bytes, out te);

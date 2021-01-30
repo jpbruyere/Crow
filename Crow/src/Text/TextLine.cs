@@ -5,6 +5,13 @@ using System.Text;
 
 namespace Crow.Text
 {
+	public enum LineBreakKind
+    {
+		Undefined,
+		Unix,
+		Windows,
+		Other
+    }
 	[DebuggerDisplay ("{Start}, {Length}, {LengthInPixel}")]
 	public struct TextLine : IComparable<TextLine>
 	{
@@ -30,20 +37,8 @@ namespace Crow.Text
 		}
 		public TextLine WithStartOffset (int start) => new TextLine (Start + start, End, EndIncludingLineBreak);
 
+		
+
 		public int CompareTo (TextLine other) => Start - other.Start;
-        /*public ReadOnlySpan<char> GetSubString (string str) {			
-    if (Start >= str.Length)
-        return "".AsSpan();
-    return str.Length - Start < Length ?
-        str.AsSpan().Slice (Start, Length) :
-        str.AsSpan().Slice (Start);
-}
-public ReadOnlySpan<char> GetSubStringIncludingLineBreak (string str) {
-    if (Start >= str.Length)
-        return "".AsSpan ();
-    return (str.Length - Start < LengthIncludingLineBreak) ?
-        str.AsSpan ().Slice (Start, LengthIncludingLineBreak) :
-        str.AsSpan ().Slice (Start);
-}*/
     }
 }

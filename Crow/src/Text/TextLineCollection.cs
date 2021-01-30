@@ -26,7 +26,7 @@ namespace Crow.Text
         }
         #endregion
 
-        public int GetAbsolutePosition (CharLocation loc) => lines[loc.Line].Start + loc.Column;
+        public int GetAbsolutePosition (CharLocation loc) => lines[loc.Line].Start + loc.Column;        
         public CharLocation GetLocation (int absolutePosition) {
             TextLine tl = new TextLine (absolutePosition);
             int result = lines.AsSpan (0, length).BinarySearch (tl);            
@@ -43,12 +43,13 @@ namespace Crow.Text
         }
         public int Count => length;
         public bool IsReadOnly => false;
+        public bool IsEmpty => length == 0;
 
         public TextLine this[int index] { get => lines[index]; set => lines[index] = value; }
 
         public void Add (TextLine item) {
             if (lines.Length < length + 1) {
-                TextLine[] tmp = new TextLine[length + 4];
+                TextLine[] tmp = new TextLine[length * 2];
                 lines.AsSpan ().CopyTo (tmp);
                 lines = tmp;
             }
