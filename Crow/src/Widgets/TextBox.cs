@@ -32,18 +32,25 @@ namespace Crow
             TextSpan selection = Selection;
             switch (key) {
             case Key.Backspace:
-                if (selection.Length == 0) {
+                if (selection.IsEmpty) {
                     if (selection.Start == 0)
                         return;
-                    update (new TextChange (selection.Start - 1, 1, ""));
+                    if (currentLoc.Value.Column == 0) {
+                        int lbLength = lines[currentLoc.Value.Line - 1].LineBreakLength;
+                        update (new TextChange (selection.Start - lbLength, lbLength, ""));
+                    }else
+                        update (new TextChange (selection.Start - 1, 1, ""));
                 } else
                     update (new TextChange (selection.Start, selection.Length, ""));
                 break;
             case Key.Delete:
-                if (selection.Length == 0) {
+                if (selection.IsEmpty) {
                     if (selection.Start == Text.Length)
                         return;
-                    update (new TextChange (selection.Start, 1, ""));
+                    if (currentLoc.Value.Column >= lines[currentLoc.Value.Line].Length) 
+                        update (new TextChange (selection.Start, lines[currentLoc.Value.Line].LineBreakLength, ""));                        
+                    else
+                        update (new TextChange (selection.Start, 1, ""));
                 } else {
                     if (IFace.Shift)
                         IFace.Clipboard = Text.AsSpan (selection.Start, selection.End).ToString ();
@@ -58,10 +65,12 @@ namespace Crow
                 break;
             case Key.KeypadEnter:
             case Key.Enter:
-                if (Multiline)
-                    update (new TextChange (selection.Start, selection.Length, "\n"));
-                else
-                    OnValidate (this, new ValidateEventArgs(_text));
+                if (Multiline) {
+                    if (string.IsNullOrEmpty (LineBreak))
+                        detectLineBreak ();
+                    update (new TextChange (selection.Start, selection.Length, LineBreak));
+                } else
+                    OnValidate (this, new ValidateEventArgs (_text));
                 break;
             case Key.Escape:
                 selectionStart = null;
@@ -102,13 +111,12 @@ namespace Crow
             _text = tmp.ToString ();
 
             getLines ();
+            selectionStart = null;
+            currentLoc = lines.GetLocation (change.Start + change.ChangedText.Length);
 
             textMeasureIsUpToDate = false;
             NotifyValueChanged ("Text", Text);
             OnTextChanged (this, new TextChangeEventArgs (change));
-
-            selectionStart = null;
-            currentLoc = lines.GetLocation (change.Start + change.ChangedText.Length);
 
             RegisterForGraphicUpdate ();
         }
