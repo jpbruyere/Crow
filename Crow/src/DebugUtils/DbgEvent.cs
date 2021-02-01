@@ -128,6 +128,8 @@ namespace Crow
 				type = evtType,
 			};
 		}
+		public virtual string Print()
+			=> $"{begin,10}:{threadId,-2}:{type,-20}:";
 		public override string ToString ()
 			=> $"{begin};{end};{threadId};{type}";
 			
@@ -171,11 +173,8 @@ namespace Crow
 				case DbgEvtType.TGCancelLoadingThread:
 					return Colors.Maroon;
 				default:
-					return Colors.Crimson;
+					return Colors.White;
 				}
-				if (type.HasFlag (DbgEvtType.Lock))
-					return Colors.DarkMagenta;
-				return Colors.White;
 			}
 		}
 		public override bool IsWidgetEvent => true;
@@ -186,7 +185,11 @@ namespace Crow
 			InstanceIndex = w.instanceIndex;
 #endif
 		}
-		public override string ToString ()
+#if DEBUG_LOG
+        public override string Print () 
+            => $"{base.Print ()} {Widget.GraphicObjects[InstanceIndex]}";        
+#endif
+        public override string ToString ()
 			=> $"{base.ToString ()};{InstanceIndex}";
 	}
 	public class DbgLayoutEvent : DbgWidgetEvent
@@ -235,6 +238,9 @@ namespace Crow
 		public void SetLQI (LayoutingQueueItem lqi) { }
 
 #endif
+		public override string Print ()
+			=> $"{layouting} {result} {OldSlot}->{NewSlot} {base.Print ()}";
+
 		public override string ToString ()
 			=> $"{base.ToString ()};{layouting};{result};{OldSlot};{NewSlot}";
 	}

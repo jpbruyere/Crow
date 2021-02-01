@@ -141,8 +141,7 @@ namespace Crow
 			Dispose(true);  
 			GC.SuppressFinalize(this);  
 		}  
-		~Widget(){
-			Debug.WriteLine(this.ToString() + " not disposed by user");
+		~Widget(){			
 			Dispose(false);
 		}
 		protected virtual void Dispose(bool disposing){
@@ -1832,7 +1831,6 @@ namespace Crow
 				if (cacheEnabled) {
 					if (IsDirty)
 						RecreateCache ();
-
 					UpdateCache (ctx);
 					if (!IsEnabled)						
 						paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);					
@@ -2013,9 +2011,7 @@ namespace Crow
 		}
 		public virtual void onMouseEnter(object sender, MouseMoveEventArgs e)
 		{
-			if (Focusable)
-				IFace.MouseCursor = MouseCursor;			
-
+			IFace.MouseCursor = MouseCursor;
 			if (IFace.DragAndDropOperation != null) {
 				Widget g = this;
 				while (g != null) {
@@ -2044,7 +2040,7 @@ namespace Crow
 		#endregion
 
 		protected virtual void onFocused(object sender, EventArgs e){
-			DbgLogger.AddEvent (DbgEvtType.FocusedWidget, this);
+			DbgLogger.AddEvent (DbgEvtType.FocusedWidget, this);			
 			Focused.Raise (this, e);
 		}
 		protected virtual void onUnfocused(object sender, EventArgs e){

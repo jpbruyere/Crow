@@ -21,13 +21,13 @@
 			<HorizontalStack>
 				<Scroller Name="scroller1" Background="White"
 						Margin="2" ScrollY="{../scrollbar1.Value}">
-					<TextBox VerticalAlignment="Top"
+					<TextBox VerticalAlignment="Top" 
 						Text="{²Source}" Multiline="true"
-						Font="mono 10"/>
+						Font="consolas, 12"/>
 				</Scroller>
-				<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}"
+				<!--<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}"
 					LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
-					CursorSize="{../scroller1.ChildHeightRatio}" Maximum="{../scroller1.MaxScrollY}" />
+					CursorSize="{../scroller1.ChildHeightRatio}" Maximum="{../scroller1.MaxScrollY}" />-->
 			</HorizontalStack>
 			<Label Text="{CurrentFile}" Width="Stretched"/>
 			<Label Visible="{ShowError}" Text="{ErrorMessage}" Background="Red" Foreground="White" Width="Stretched" Margin="2"

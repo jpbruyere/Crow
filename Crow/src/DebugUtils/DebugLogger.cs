@@ -85,6 +85,7 @@ namespace Crow
 	{
 		public static DbgEvtType IncludeEvents = DbgEvtType.All;
 		public static DbgEvtType DiscardEvents = DbgEvtType.Focus;
+		public static bool ConsoleOutput = true;
 
 		static bool logevt (DbgEvtType evtType)
 			=> (evtType & DiscardEvents) == 0 && (evtType & IncludeEvents) != 0;
@@ -202,6 +203,7 @@ namespace Crow
 		static DbgEvent addEventInternal (DbgEvtType evtType, params object [] data)
 		{
 			DbgEvent evt = null;
+#if DEBUG_LOG
 			if (data == null || data.Length == 0)
 				evt = new DbgEvent (chrono.ElapsedTicks, evtType);
 			else if (data [0] is Widget w)
@@ -211,7 +213,15 @@ namespace Crow
 			else
 				evt = new DbgEvent (chrono.ElapsedTicks, evtType);
 
-			curEventList.Add (evt);
+			if (ConsoleOutput) {
+				if (evt.type.HasFlag (DbgEvtType.Error)) {
+					Console.ForegroundColor = ConsoleColor.Red;
+				}
+				Console.WriteLine (evt.Print());
+				Console.ResetColor ();
+			} else
+				curEventList.Add (evt);
+#endif
 			return evt;
 		}
 #if DEBUG_LOG

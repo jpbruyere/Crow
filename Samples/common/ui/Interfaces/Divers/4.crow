@@ -1,1695 +1,602 @@
-﻿<?xml version="1.0"?>
-<HorizontalStack>	
-	<VerticalStack Width="15%">
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-	</VerticalStack>
-	<VerticalStack Width="15%">
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-	</VerticalStack>
-	<VerticalStack Width="15%">
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-	</VerticalStack>
-	<VerticalStack Width="15%">
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-	</VerticalStack>
-	<VerticalStack Width="15%">
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-	</VerticalStack>
-	<VerticalStack Width="15%">
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Memory:" Style="labPerf" />
-			<Label Text="{memory}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Update:" Style="labPerf" />
-			<Label Text="{update}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Layouting:" Style="labPerf" />
-			<Label Text="{layouting}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Drawing:" Style="labPerf" />
-			<Label Text="{drawing}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Fps:" Style="labPerf" />
-			<Label Text="{fps}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Min:" Style="labPerf" />
-			<Label Text="{fpsMin}" Style="labPerfVal"/>
-		</HorizontalStack>
-		<HorizontalStack Height="Fit">
-			<Label Text="Max:" Style="labPerf" />
-			<Label Text="{fpsMax}" Style="labPerfVal"/>
-		</HorizontalStack>
-	</VerticalStack>
+﻿<HorizontalStack>
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
+	<VerticalStack Fit="true">	
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>
+		<Label Margin="5" Background="RoyalBlue" MouseEnter="{Background=DarkRed}" MouseLeave="{Background=RoyalBlue}"/>		
+	</VerticalStack>	
 </HorizontalStack>
