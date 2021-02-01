@@ -1,24 +1,20 @@
-﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe jp_bruyere@hotmail.com
+﻿// Copyright (c) 2013-2021  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Crow.Cairo;
-using System.Text.RegularExpressions;
 using System.ComponentModel;
-using System.Text;
-using System.Diagnostics;
 using Glfw;
-using System.Collections;
 using Crow.Text;
 
-namespace Crow {
-	/// <summary>
-	/// Simple label widget possibly multiline but without tabulation handling.
-	/// </summary>
-	public class Label : Widget
+namespace Crow
+{
+    /// <summary>
+    /// Simple label widget possibly multiline but without tabulation handling.
+    /// </summary>
+    public class Label : Widget
     {
 		#region CTOR
 		protected Label () {}
@@ -39,19 +35,24 @@ namespace Crow {
 		#region private and protected fields
 		protected string _text;
         TextAlignment _textAlignment;
-		bool horizontalStretch;
-		bool verticalStretch;
-		bool _selectable;
 		bool _multiline;
 		Color selBackground;
 		Color selForeground;
 
+		int targetColumn = -1;//handle line changes with long->short->long line length sequence.
 		//Point mouseLocalPos = -1;//mouse coord in widget space, filled only when clicked
 
-		
+
 		protected CharLocation? hoverLoc = null;
 		protected CharLocation? currentLoc = null;
-		protected CharLocation? selectionStart = null;	//selection start (row,column)
+		protected CharLocation? selectionStart = null;  //selection start (row,column)
+
+		protected LineCollection lines;
+		protected bool textMeasureIsUpToDate = false;
+		protected object linesMutex = new object ();
+		protected string LineBreak = null;
+		protected Size cachedTextSize = default (Size);
+		protected bool mixedLineBreak = false;
 
 		protected FontExtents fe;
 		protected TextExtents te;
@@ -115,11 +116,11 @@ namespace Crow {
                     return;
 
 				int oldTextLength = string.IsNullOrEmpty (_text) ? 0 : _text.Length;
-                _text = value;
-
-				getLines ();
-
-				textMeasureIsUpToDate = false;
+				lock (linesMutex) {					
+					_text = value;
+					getLines ();
+					textMeasureIsUpToDate = false;
+				}
 				NotifyValueChanged ("Text", Text);
 				OnTextChanged (this, new TextChangeEventArgs (new TextChange (0, oldTextLength, _text)));
 				RegisterForGraphicUpdate ();
@@ -144,151 +145,12 @@ namespace Crow {
 				RegisterForGraphicUpdate();
 			}
 		}
-		/*[DefaultValue(0)]
-		public int CurrentColumn{
-			get { return _currentCol; }
-			set {
-				if (value == _currentCol)
-					return;
-				if (value < 0)
-					_currentCol = 0;
-				else if (value > lines [_currentLine].Length)
-					_currentCol = lines [_currentLine].Length;
-				else
-					_currentCol = value;
-				NotifyValueChangedAuto (_currentCol);
-
-				Rectangle cb = ClientRectangle;
-
-				if (Width == Measure.Fit || cb.Width >= cachedTextSize.Width) {
-					xTranslation = 0;
-					return;
-				}
-				int xpos = xposition;
-				if (xTranslation + xpos > cb.Width)
-					xTranslation = cb.Width - xpos;
-				else if (xpos < -xTranslation)
-					xTranslation = -xpos;
-				RegisterForRedraw ();
-			}
-		}
-		int xTranslation = 0;
-		int xposition {
-			get {
-				using (Context gr = new Context (IFace.surf)) {
-					//Cairo.FontFace cf = gr.GetContextFontFace ();
-					gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-					gr.SetFontSize (Font.Size);
-					gr.FontOptions = Interface.FontRenderingOptions;
-					gr.Antialias = Interface.Antialias;
-					try {
-						return (int)Math.Ceiling (gr.TextExtents (_text.GetLine (lines[_currentLine], _currentCol), Interface.TAB_SIZE).XAdvance);
-					} catch {
-						System.Diagnostics.Debug.WriteLine ("xpos measuring fault in label");
-						return 0;
-					}
-				}
-			}
-		}
-
-		[DefaultValue(0)]
-		public int CurrentLine{
-			get { return _currentLine; }
-			set {
-				if (value == _currentLine)
-					return;
-				if (value >= lines.Length)
-					_currentLine = lines.Length-1;
-				else if (value < 0)
-					_currentLine = 0;
-				else
-					_currentLine = value;
-				//force recheck of currentCol for bounding
-				int cc = _currentCol;
-				_currentCol = 0;
-				CurrentColumn = cc;
-				NotifyValueChangedAuto (_currentLine);
-			}
-		}
-		[XmlIgnore]public Point CurrentPosition {
-			get { return new Point(_currentCol, CurrentLine); }
-		}
-		//TODO:using HasFocus for drawing selection cause SelBegin and Release binding not to work
-		/// <summary>
-		/// Selection begin position in char units
-		/// </summary>
-		[DefaultValue("-1")]
-		public Point SelBegin {
-			get {
-				return _selBegin;
-			}
-			set {
-				if (value == _selBegin)
-					return;
-				_selBegin = value;
-				NotifyValueChangedAuto (_selBegin);
-				NotifyValueChanged ("SelectedText", SelectedText);
-			}
-		}
-		[DefaultValue("-1")]
-		public Point SelRelease {
-			get {
-				return _selRelease;
-			}
-			set {
-				if (value == _selRelease)
-					return;
-				_selRelease = value;
-				NotifyValueChangedAuto (_selRelease);
-				NotifyValueChanged ("SelectedText", SelectedText);
-			}
-		}
-		/// <summary>
-		/// return char at CurrentLine, CurrentColumn
-		/// </summary>
-		[XmlIgnore]protected Char CurrentChar => _text[lines[CurrentLine].Start + CurrentColumn];
-		/// <summary>
-		/// ordered selection start and end positions in char units
-		/// </summary>
-		[XmlIgnore]protected Point selectionStart
-		{
-			get {
-				return SelRelease < 0 || SelBegin.Y < SelRelease.Y ? SelBegin :
-					SelBegin.Y > SelRelease.Y ? SelRelease :
-					SelBegin.X < SelRelease.X ? SelBegin : SelRelease;
-			}
-		}
-		[XmlIgnore]public Point selectionEnd
-		{
-			get {
-				return SelRelease < 0 || SelBegin.Y > SelRelease.Y ? SelBegin :
-					SelBegin.Y < SelRelease.Y ? SelRelease :
-					SelBegin.X > SelRelease.X ? SelBegin : SelRelease;
-			}
-		}
-		[XmlIgnore]public string SelectedText
-		{
-			get {
-				if (SelRelease < 0 || SelBegin < 0)
-					return "";
-				if (selectionStart.Y == selectionEnd.Y)
-					return _text.Substring (lines[selectionStart.Y].Start + selectionStart.X, selectionEnd.X - selectionStart.X);
-
-				StringBuilder tmp = new StringBuilder (_text.GetLineIncludingLineBreak (lines[selectionStart.Y], selectionStart.X).ToString ());
-				for (int l = selectionStart.Y + 1; l < selectionEnd.Y; l++)
-					tmp.Append (_text.GetLineIncludingLineBreak (lines[l]).ToString ());
-				tmp.Append (_text.Substring (lines[selectionEnd.Y].Start, selectionEnd.X));
-				return tmp.ToString ();
-			}
-		}
-		[XmlIgnore]public bool selectionIsEmpty
-		{ get { return SelRelease < 0; } }
+		
 
 		/// <summary>
 		/// Moves cursor one char to the left.
 		/// </summary>
-		/// <returns><c>true</c> if move succeed</returns>
-		*/
+		/// <returns><c>true</c> if move succeed</returns>		
 		public bool MoveLeft(){
 			targetColumn = -1;
 			CharLocation loc = currentLoc.Value;
@@ -310,8 +172,7 @@ namespace Crow {
 			} else
 				currentLoc = new CharLocation (loc.Line, loc.Column + 1);
 			return true;
-		}
-		int targetColumn = -1;
+		}		
 		public bool MoveUp () {
 			CharLocation loc = currentLoc.Value;
 			if (loc.Line == 0)
@@ -348,8 +209,7 @@ namespace Crow {
 
 			return true;
 		}
-
-		/*
+/*		
 		public void GotoWordStart(){
 			CurrentColumn--;
 			//skip white spaces
@@ -371,85 +231,7 @@ namespace Crow {
 			if (char.IsLetterOrDigit (this.CurrentChar))
 				CurrentColumn++;
 		}
-		public void DeleteChar()
-		{
-			if (selectionIsEmpty) {
-				if (CurrentColumn == 0) {
-					if (CurrentLine == 0 && lines.Length == 1)
-						return;
-					CurrentLine--;
-					CurrentColumn = lines [CurrentLine].Length;
-
-					Text = _text.Remove (lines[CurrentLine].End, lines[CurrentLine].LineBreakLength);
-					return;
-				}
-				CurrentColumn--;
-				Text = _text.Remove (lines[CurrentLine].Start + CurrentColumn, 1);				
-			} else {
-				int linesToRemove = selectionEnd.Y - selectionStart.Y + 1;
-				int l = selectionStart.Y;
-
-				if (linesToRemove > 0) {
-					lines [l] = lines [l].Remove (selectionStart.X, lines [l].Length - selectionStart.X) +
-						lines [selectionEnd.Y].Substring (selectionEnd.X, lines [selectionEnd.Y].Length - selectionEnd.X);
-					l++;
-					for (int c = 0; c < linesToRemove-1; c++)
-						lines.RemoveAt (l);
-					CurrentLine = selectionStart.Y;
-					CurrentColumn = selectionStart.X;
-				} else
-					lines [l] = lines [l].Remove (selectionStart.X, selectionEnd.X - selectionStart.X);
-				CurrentColumn = selectionStart.X;
-				SelBegin = -1;
-				SelRelease = -1;
-			}
-			//OnTextChanged (this, new TextChangeEventArgs (Text));
-		}
-		/// <summary>
-		/// Insert new string at caret position, should be sure no line break is inside.
-		/// </summary>
-		/// <param name="str">String.</param>
-		protected void Insert(string str)
-		{
-			if (!selectionIsEmpty)
-				this.DeleteChar ();
-			if (_multiline) {
-				string[] strLines = Regex.Split (str, "\r\n|\r|\n|" + @"\\n").ToArray();
-				lines [CurrentLine] = lines [CurrentLine].Insert (CurrentColumn, strLines[0]);
-				CurrentColumn += strLines[0].Length;
-				for (int i = 1; i < strLines.Length; i++) {
-					InsertLineBreak ();
-					lines [CurrentLine] = lines [CurrentLine].Insert (CurrentColumn, strLines[i]);
-					CurrentColumn += strLines[i].Length;
-				}
-			} else {
-				ReadOnlySpan<char> a = _text.AsSpan ().Slice (0 ,lines[CurrentLine].Start + CurrentColumn);
-				ReadOnlySpan<char> b = _text.AsSpan ().Slice (lines[CurrentLine].Start + CurrentColumn);
-
-				_text = string.Concat( (a, str.AsSpan(), b);
-
-				lines [CurrentLine] = lines [CurrentLine].Insert (CurrentColumn, str);
-				CurrentColumn += str.Length;
-			}
-			OnTextChanged (this, new TextChangeEventArgs (Text));
-		}
-		/// <summary>
-		/// Insert a line break.
-		/// </summary>
-		protected void InsertLineBreak()
-		{
-			lines.Insert(CurrentLine + 1, lines[CurrentLine].Substring(CurrentColumn));
-			lines [CurrentLine] = lines [CurrentLine].Substring (0, CurrentColumn);
-			CurrentLine++;
-			CurrentColumn = 0;
-			OnTextChanged (this, new TextChangeEventArgs (Text));
-		}
 		*/
-		protected bool textMeasureIsUpToDate = false;
-		Size cachedTextSize = default(Size);
-		protected LineCollection lines;
-		protected string LineBreak = null;
-		bool mixedLineBreak = false;
 
 		protected void detectLineBreak () {
 			if (!_multiline)
@@ -470,9 +252,8 @@ namespace Crow {
                 }
 			}
         }
-
-		protected void getLines () {
-
+		
+		protected void getLines () {			
 			if (lines == null)
 				lines = new LineCollection (_multiline ? 4 : 1);
 			else
@@ -486,7 +267,7 @@ namespace Crow {
 				lines.Add (new TextLine (0, _text.Length, _text.Length));
 				return;
 			}
-					
+
 			int start = 0, i = 0;
 			while (i < _text.Length) {
 				char c = _text[i];
@@ -518,7 +299,7 @@ namespace Crow {
 			if (start < i)
 				lines.Add (new TextLine (start, _text.Length, _text.Length));
 			else
-				lines.Add (new TextLine (_text.Length, _text.Length, _text.Length));			
+				lines.Add (new TextLine (_text.Length, _text.Length, _text.Length));
 		}
 		void resetLocationXs () {
 			if (currentLoc.HasValue) {
@@ -563,9 +344,17 @@ namespace Crow {
 				return new TextSpan (lines.GetAbsolutePosition (selStart), lines.GetAbsolutePosition (selEnd));
 			}
         }
-
-		#region GraphicObject overrides
-		public override int measureRawSize(LayoutingType lt)
+        public override bool UpdateLayout (LayoutingType layoutType) {
+			if ((LayoutingType.Sizing | layoutType) != LayoutingType.None) {
+				if (!System.Threading.Monitor.TryEnter (linesMutex))
+					return false;
+            }
+            bool result = base.UpdateLayout (layoutType);
+			System.Threading.Monitor.Exit (linesMutex);
+			return result;
+		}
+        #region GraphicObject overrides
+        public override int measureRawSize(LayoutingType lt)
 		{
 			if ((bool)lines?.IsEmpty)
 				getLines ();
@@ -604,8 +393,7 @@ namespace Crow {
 			}
 			return Margin * 2 + (lt == LayoutingType.Height ? cachedTextSize.Height : cachedTextSize.Width);
 		}
-
-		protected override void onDraw (Context gr)
+        protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
 
@@ -614,7 +402,7 @@ namespace Crow {
 			gr.FontOptions = Interface.FontRenderingOptions;
 			gr.Antialias = Interface.Antialias;
 
-			gr.Save ();			
+			//gr.Save ();			
 
 			Rectangle cb = ClientRectangle;
 
@@ -656,14 +444,15 @@ namespace Crow {
 			}
 
 			if (string.IsNullOrEmpty (_text)) {
-				gr.Restore ();
+				//gr.Restore ();
 				return;
 			}
 
 			Foreground.SetAsSource (IFace, gr);
 
 			TextExtents extents;
-			Span<byte> bytes = stackalloc byte[128];			
+			Span<byte> bytes = stackalloc byte[128];
+			int y = cb.Y;
 
 			for (int i = 0; i < lines.Count; i++) {
 				int encodedBytes = -1;
@@ -684,7 +473,7 @@ namespace Crow {
 
 				Rectangle lineRect = new Rectangle (
 					Width.IsFit && !Multiline ? cb.X : (int)getX (cb.Width, lines[i]) + cb.X,
-					cb.Y + i * lineHeight,
+					y,
 					lines[i].LengthInPixel,
 					lineHeight);
 
@@ -706,10 +495,12 @@ namespace Crow {
 								selRect.X = newX;
 							} else if (i == selEnd.Line) {
 								selRect.Width = (int)selEnd.VisualCharXPosition - selRect.X;
-							} else								
+							} else
 								selRect.Width += 10;
-						} else
+						} else {
+							y += lineHeight;
 							continue;
+						}
                     } else {
 						selRect.X = (int)selStart.VisualCharXPosition + cb.X;
 						selRect.Width = (int)(selEnd.VisualCharXPosition - selStart.VisualCharXPosition);						
@@ -730,9 +521,10 @@ namespace Crow {
 					}
 					Foreground.SetAsSource (IFace, gr);
 				}
+				y += lineHeight;
 			}
 
-			gr.Restore ();
+			//gr.Restore ();
 		}
 		#endregion
 
@@ -751,7 +543,12 @@ namespace Crow {
 			base.onUnfocused (sender, e);
 			RegisterForRedraw ();
 		}
-		public override void onMouseMove (object sender, MouseMoveEventArgs e)
+        public override void onMouseEnter (object sender, MouseMoveEventArgs e) {
+            base.onMouseEnter (sender, e);
+			if (Focusable)
+				IFace.MouseCursor = MouseCursor.ibeam;			
+		}
+        public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseMove (sender, e);
 

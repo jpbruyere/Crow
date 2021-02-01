@@ -72,8 +72,7 @@ Button {
 Label {
 	Height = "Fit";
 	Width = "Fit";
-	Margin = "0";
-	MouseCursor = "ibeam";
+	Margin = "0";	
 }
 OldLabel {
 	Height = "Fit";

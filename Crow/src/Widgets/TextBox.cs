@@ -53,7 +53,7 @@ namespace Crow
                         update (new TextChange (selection.Start, 1, ""));
                 } else {
                     if (IFace.Shift)
-                        IFace.Clipboard = Text.AsSpan (selection.Start, selection.End).ToString ();
+                        IFace.Clipboard = Text.AsSpan (selection.Start, selection.Length).ToString ();
                     update (new TextChange (selection.Start, selection.Length, ""));
                 }
                 break;
@@ -61,7 +61,7 @@ namespace Crow
                 if (IFace.Shift)
                     update (new TextChange (selection.Start, selection.Length, IFace.Clipboard));
                 else if (IFace.Ctrl && !selection.IsEmpty)
-                    IFace.Clipboard = Text.AsSpan (selection.Start, selection.End).ToString ();
+                    IFace.Clipboard = Text.AsSpan (selection.Start, selection.Length).ToString ();
                 break;
             case Key.KeypadEnter:
             case Key.Enter:
@@ -108,13 +108,15 @@ namespace Crow
             change.ChangedText.AsSpan ().CopyTo (tmp.Slice (change.Start));
             src.Slice (change.End).CopyTo (tmp.Slice (change.Start + change.ChangedText.Length));
 
-            _text = tmp.ToString ();
+            lock (linesMutex) {
+                _text = tmp.ToString ();
+                getLines ();
+                selectionStart = null;
+            }
 
-            getLines ();
-            selectionStart = null;
             currentLoc = lines.GetLocation (change.Start + change.ChangedText.Length);
-
             textMeasureIsUpToDate = false;
+
             NotifyValueChanged ("Text", Text);
             OnTextChanged (this, new TextChangeEventArgs (change));
 
