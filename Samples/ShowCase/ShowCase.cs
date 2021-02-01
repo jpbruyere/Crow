@@ -9,6 +9,7 @@ using System.Text;
 using Crow.IML;
 using System.Runtime.CompilerServices;
 using Glfw;
+using System.Diagnostics;
 
 namespace ShowCase
 {
@@ -16,7 +17,11 @@ namespace ShowCase
 	{
 		static void Main ()
 		{
+			DbgLogger.IncludeEvents = DbgEvtType.Widget;
+			DbgLogger.DiscardEvents = DbgEvtType.Focus;
+
 			Environment.SetEnvironmentVariable ("FONTCONFIG_PATH", @"C:\Users\Jean-Philippe\source\vcpkg\installed\x64-windows\tools\fontconfig\fonts");
+
 			using (Showcase app = new Showcase ()) 
 				app.Run ();
 		}
@@ -43,6 +48,7 @@ namespace ShowCase
 				NotifyValueChanged (CurrentFile);
 			}
 		}
+		
 		public string Source {
 			get => source;
 			set {
@@ -50,7 +56,9 @@ namespace ShowCase
 					return;
 
 				source = value;
-				reloadFromSource ();
+				if (!reloadChrono.IsRunning)					
+					reloadChrono.Restart ();
+				
 				CMDSave.CanExecute = source != origSource;
 				NotifyValueChanged (source);
 			}
@@ -243,7 +251,14 @@ namespace ShowCase
 				showError (ex);
 			}
 		}
+		Stopwatch reloadChrono = Stopwatch.StartNew ();
+        public override void UpdateFrame () {
+            base.UpdateFrame ();
+			if (reloadChrono.ElapsedMilliseconds < 200)
+				return;
+			reloadFromSource ();
+			reloadChrono.Reset ();
+		}
 
-
-	}
+    }
 }

@@ -26,11 +26,12 @@
 		<DefineConstants>_DESIGN_MODE;_MEASURE_TIME</DefineConstants>		
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+		<!--<AllowUnsafeBlocks>true</AllowUnsafeBlocks>-->
 		<AppConfig>App.config</AppConfig>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<DebugType>full</DebugType>
-		<DefineConstants>$(DefineConstants);_DEBUG;_DEBUG_LOG;TRACE;_DEBUG_DISPOSE;_DEBUG_BINDING;_DEBUG_CLIP_RECTANGLE</DefineConstants>
+		<DefineConstants>$(DefineConstants);DEBUG;_DEBUG_LOG;TRACE;_DEBUG_DISPOSE;_DEBUG_BINDING;_DEBUG_CLIP_RECTANGLE</DefineConstants>
 		<CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
 	</PropertyGroup>
 	<ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
