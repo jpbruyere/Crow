@@ -297,7 +297,7 @@ namespace Crow
 			childrenRWLock.EnterReadLock ();
 
 			for (int i = 0; i < Children.Count; i++) 
-				Children[i].Paint (ref gr);			
+				Children[i].Paint (gr);			
 
 			childrenRWLock.ExitReadLock ();
 			gr.Restore ();
@@ -331,7 +331,7 @@ namespace Crow
 						continue;
 					if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
 						continue;
-					c.Paint (ref gr);
+					c.Paint (gr);
 				}
 
 				childrenRWLock.ExitReadLock ();

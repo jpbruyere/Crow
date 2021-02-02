@@ -186,7 +186,7 @@ namespace Crow
 			childrenRWLock.EnterReadLock ();
 
 			foreach (Widget g in Children)
-				g.Paint (ref gr);			
+				g.Paint (gr);			
 
 			childrenRWLock.ExitReadLock ();
 

@@ -253,9 +253,12 @@ namespace Crow
 
 		public virtual void Quit () => Glfw3.SetWindowShouldClose (hWin, 1);
 
-		public bool Shift => Glfw3.GetKey(hWin, Glfw.Key.LeftShift) == InputAction.Press;
-		public bool Ctrl => Glfw3.GetKey (hWin, Glfw.Key.LeftControl) == InputAction.Press;
-		public bool Alt => Glfw3.GetKey (hWin, Glfw.Key.LeftAlt) == InputAction.Press;
+		public bool Shift => Glfw3.GetKey(hWin, Key.LeftShift) == InputAction.Press ||
+			Glfw3.GetKey (hWin, Key.RightShift) == InputAction.Press;
+		public bool Ctrl => Glfw3.GetKey (hWin, Key.LeftControl) == InputAction.Press ||
+			Glfw3.GetKey (hWin, Key.RightControl) == InputAction.Press;
+		public bool Alt => Glfw3.GetKey (hWin, Key.LeftAlt) == InputAction.Press ||
+			Glfw3.GetKey (hWin, Key.RightAlt) == InputAction.Press;
 
 		#region IDisposable Support
 		private bool disposedValue = false; // To detect redundant calls
@@ -820,7 +823,7 @@ namespace Crow
 						continue;
 
 					ctx.Save ();
-					p.Paint (ref ctx);
+					p.Paint (ctx);
 					ctx.Restore ();
 				}
 
@@ -842,7 +845,7 @@ namespace Crow
 
 #if DEBUG_CLIP_RECTANGLE
 				ctx.LineWidth = 1;
-				ctx.SetSourceColor(Color.Magenta.AdjustAlpha (0.5));
+				ctx.SetSource(1,0,0,0.5);
 				for (int i = 0; i < clipping.NumRectangles; i++)
 					ctx.Rectangle(clipping.GetRectangle(i));
 				ctx.Stroke ();
@@ -867,11 +870,36 @@ namespace Crow
 
 				PerformanceMeasure.End (PerformanceMeasure.Kind.Drawing);
 			}
+
+			if (forceTextCursor) {
+				if (FocusedWidget is Label lab && lab.SelectionIsEmpty) {					
+					Rectangle c = lab.DrawCursor (ctx);
+					if (textCursor != null && c != textCursor.Value)
+						RegisterClip (textCursor.Value);
+					textCursor = c;
+					surf.Flush ();					
+				}
+				blinkingCursor.Restart ();
+				forceTextCursor = false;
+			} else if (textCursor != null && blinkingCursor.ElapsedMilliseconds > blinkFrequency) {
+				RegisterClip (textCursor.Value);
+				textCursor = null;
+				blinkingCursor.Restart ();
+			} else if (FocusedWidget is Label lab && lab.SelectionIsEmpty) {								
+				if (blinkingCursor.ElapsedMilliseconds > blinkFrequency) {
+					textCursor = lab.DrawCursor (ctx);
+					surf.Flush ();
+					blinkingCursor.Restart ();
+				}				
+            }
 			
 			DbgLogger.EndEvent (DbgEvtType.Drawing, true);
 		}
 		#endregion
-
+		const long blinkFrequency = 300;		
+		internal Rectangle? textCursor = null;
+		internal bool forceTextCursor = true;
+		Stopwatch blinkingCursor = Stopwatch.StartNew ();
 		#region GraphicTree handling
 		/// <summary>Add widget to the Graphic tree of this interface and register it for layouting</summary>
 		public Widget AddWidget(Widget g)

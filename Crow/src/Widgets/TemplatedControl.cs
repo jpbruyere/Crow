@@ -98,7 +98,7 @@ namespace Crow
 			}
 
 			if (child != null)
-				child.Paint (ref gr);
+				child.Paint (gr);
 			gr.Restore ();
 		}
 		#endregion

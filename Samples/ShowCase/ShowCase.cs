@@ -244,10 +244,10 @@ namespace ShowCase
 					g.DataSource = this;
 				}
 			} catch (InstantiatorException itorex) {
-				Console.WriteLine (itorex);
+				//Console.WriteLine (itorex);
 				showError (itorex.InnerException);
 			} catch (Exception ex) {
-				Console.WriteLine (ex);
+				//Console.WriteLine (ex);
 				showError (ex);
 			}
 		}
