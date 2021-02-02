@@ -59,6 +59,7 @@ namespace Crow {
 		#endregion
 
 		#region CTOR
+		public Command () {}
 		/// <summary>
 		/// Initializes a new instance of Command with the action pass as argument.
 		/// </summary>

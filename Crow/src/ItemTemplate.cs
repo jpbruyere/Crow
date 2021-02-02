@@ -228,9 +228,11 @@ namespace Crow
 		}
 		//data is on the stack
 		void emitGetSubData(ILGenerator il, Type dataType){
+			if (dataType.IsValueType)
+				il.Emit (OpCodes.Unbox_Any, dataType);
 			MethodInfo miGetDatas = dataType.GetMethod (fetchMethodName, new Type[] {});
 			if (miGetDatas == null)
-				miGetDatas = CompilerServices.SearchExtMethod (dataType, fetchMethodName);
+				miGetDatas = iface.SearchExtMethod (dataType, fetchMethodName);
 
 			if (miGetDatas == null) {//in last resort, search among properties
 				PropertyInfo piDatas = dataType.GetProperty (fetchMethodName);

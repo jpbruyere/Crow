@@ -70,25 +70,31 @@ namespace Crow
 			if (!Directory.Exists (CROW_CONFIG_ROOT))
 				Directory.CreateDirectory (CROW_CONFIG_ROOT);
 
-			//ensure all assemblies are loaded, because IML could contains classes not instanciated in source
-			foreach (string af in Directory.GetFiles (AppDomain.CurrentDomain.BaseDirectory, "*.dll")) {
-				try {
-					Assembly a =Assembly.LoadFrom (af);
-					if (a == Assembly.GetEntryAssembly () || a == Assembly.GetExecutingAssembly ())
-						continue;
-					if (a.GetCustomAttribute (typeof (CrowAttribute)) != null) 
-						crowAssemblies.Add (a);
-				} catch {
-					Debug.WriteLine ("{0} not loaded as assembly.", af);
-				}
-			}
-
 			FontRenderingOptions = new FontOptions ();
 			FontRenderingOptions.Antialias = Antialias.Subpixel;
 			FontRenderingOptions.HintMetrics = HintMetrics.On;
 			FontRenderingOptions.HintStyle = HintStyle.Full;
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Default;
+
+			preloadCrowAssemblies ();
 		}
+		static void preloadCrowAssemblies () {
+			//ensure all assemblies are loaded, because IML could contains classes not instanciated in source
+			Assembly ea = Assembly.GetEntryAssembly ();
+			System.IO.FileStream[] files = ea.GetFiles ();
+			foreach (AssemblyName an in ea.GetReferencedAssemblies()) {
+				try {
+					Assembly a = Assembly.ReflectionOnlyLoad (an.Name);
+					if (a == Assembly.GetExecutingAssembly ())
+							continue;
+					if (a.GetCustomAttribute (typeof (CrowAttribute)) != null)
+							crowAssemblies.Add (a);
+				} catch {
+
+				}											
+			}
+		}
+
 		public Interface (int width, int height, IntPtr glfwWindowHandle) : this (width, height, false, false)
 		{
 			hWin = glfwWindowHandle;
@@ -171,6 +177,30 @@ namespace Crow
 			case PlatformID.WinCE:
 				throw new PlatformNotSupportedException ("Unable to create cairo surface.");
 			}
+		}
+		internal Dictionary<string, MethodInfo> knownExtMethods = new Dictionary<string, MethodInfo> ();
+		internal MethodInfo SearchExtMethod (Type t, string methodName) {
+			string key = t.Name + "." + methodName;
+			if (knownExtMethods.ContainsKey (key))
+				return knownExtMethods [key];
+
+			//System.Diagnostics.Debug.WriteLine ($"*** search extension method: {t};{methodName} => key={key}");
+
+			MethodInfo mi = null;
+			if (!CompilerServices.TryGetExtensionMethods (Assembly.GetEntryAssembly (), t, methodName, out mi)) {
+				if (!CompilerServices.TryGetExtensionMethods (t.Module.Assembly, t, methodName, out mi)) {
+					foreach (Assembly a in crowAssemblies) {
+						if (CompilerServices.TryGetExtensionMethods (a, t, methodName, out mi))
+							break;
+					}
+					if (mi == null)
+						CompilerServices.TryGetExtensionMethods (Assembly.GetExecutingAssembly (), t, methodName, out mi);//crow Assembly
+				}
+			}
+
+			//add key even if mi is null to prevent searching again and again for propertyless bindings
+			knownExtMethods.Add (key, mi);
+			return mi;
 		}
 
 		#region events delegates
