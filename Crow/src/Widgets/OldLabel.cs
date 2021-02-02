@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.ComponentModel;
 
 namespace Crow {
+	[Obsolete]
 	public class OldLabel : Widget
     {
 		#region CTOR

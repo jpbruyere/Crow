@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2020  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2021  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -95,10 +95,8 @@ namespace Crow
 		}
 		public Interface (int width = 800, int height = 600, bool startUIThread = true, bool createSurface = true)
 		{
-			loadCursors ();
-
 			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
-			CurrentInterface = this;
+			//CurrentInterface = this;
 			clientRectangle = new Rectangle (0, 0, width, height);
 
 			if (createSurface)
@@ -331,7 +329,7 @@ namespace Crow
 		public static float WheelIncrement = 1;
 		/// <summary>Tabulation size in Text controls</summary>
 		public static int TAB_SIZE = 4;
-		public static string LineBreak = "\n";
+		[Obsolete]public static string LineBreak = "\n";
 		/// <summary> Allow rendering of interface in development environment </summary>
 		public static bool DesignerMode = false;
 		/// <summary> Disable caching for a widget if this threshold is reached </summary>
@@ -351,7 +349,7 @@ namespace Crow
 		/// Each control need a ref to the root interface containing it, if not set in GraphicObject.currentInterface,
 		/// the ref of this one will be stored in GraphicObject.currentInterface
 		/// </summary>
-		protected static Interface CurrentInterface;
+		//protected static Interface CurrentInterface;
 		#endregion
 
 		#region Events
@@ -881,12 +879,12 @@ namespace Crow
 				}
 				blinkingCursor.Restart ();
 				forceTextCursor = false;
-			} else if (textCursor != null && blinkingCursor.ElapsedMilliseconds > blinkFrequency) {
+			} else if (textCursor != null && blinkingCursor.ElapsedMilliseconds > TEXT_CURSOR_BLINK_FREQUENCY) {
 				RegisterClip (textCursor.Value);
 				textCursor = null;
 				blinkingCursor.Restart ();
 			} else if (FocusedWidget is Label lab && lab.SelectionIsEmpty) {								
-				if (blinkingCursor.ElapsedMilliseconds > blinkFrequency) {
+				if (blinkingCursor.ElapsedMilliseconds > TEXT_CURSOR_BLINK_FREQUENCY) {
 					textCursor = lab.DrawCursor (ctx);
 					surf.Flush ();
 					blinkingCursor.Restart ();
@@ -896,10 +894,14 @@ namespace Crow
 			DbgLogger.EndEvent (DbgEvtType.Drawing, true);
 		}
 		#endregion
-		const long blinkFrequency = 300;		
+
+		#region Blinking text cursor
+		public static long TEXT_CURSOR_BLINK_FREQUENCY = 300;
 		internal Rectangle? textCursor = null;
 		internal bool forceTextCursor = true;
 		Stopwatch blinkingCursor = Stopwatch.StartNew ();
+		#endregion
+
 		#region GraphicTree handling
 		/// <summary>Add widget to the Graphic tree of this interface and register it for layouting</summary>
 		public Widget AddWidget(Widget g)
@@ -1125,6 +1127,10 @@ namespace Crow
 
 		Cursor createCursor (MouseCursor mc)
 		{
+			const int minimumSize = 24;
+			if (!XCursor.Cursors.ContainsKey (mc)) {
+				XCursor.Cursors[mc] = XCursorFile.Load (this, $"#Crow.Cursors.{mc}").Cursors.First (cu => cu.Width >= minimumSize);
+			}
 			XCursor c = XCursor.Cursors [mc];
 			return new CustomCursor (c.Width, c.Height, c.data, c.Xhot, c.Yhot);
 		}
@@ -1139,7 +1145,25 @@ namespace Crow
 				cursor = value;
 
 				currentCursor?.Dispose ();
-				currentCursor = createCursor (cursor);				
+				switch (cursor) {
+                case MouseCursor.arrow:
+				case MouseCursor.top_left_arrow:
+					currentCursor = new Cursor (CursorShape.Arrow);
+					break;
+                case MouseCursor.crosshair:
+					currentCursor = new Cursor (CursorShape.Crosshair);
+					break;
+                case MouseCursor.hand:
+					currentCursor = new Cursor (CursorShape.Hand);
+					break;
+                case MouseCursor.ibeam:
+					currentCursor = new Cursor (CursorShape.IBeam);
+					break;
+                default:
+					currentCursor = XCursor.Create (this, cursor);
+					break;
+                }                                
+				
 				currentCursor.Set (hWin);
 				//MouseCursorChanged.Raise (this,new MouseCursorChangedEventArgs(cursor));
 			}
