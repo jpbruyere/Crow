@@ -870,12 +870,14 @@ namespace Crow
 			}
 
 			if (forceTextCursor) {
-				if (FocusedWidget is Label lab && lab.SelectionIsEmpty) {					
-					Rectangle c = lab.DrawCursor (ctx);
-					if (textCursor != null && c != textCursor.Value)
-						RegisterClip (textCursor.Value);
-					textCursor = c;
-					surf.Flush ();					
+				if (FocusedWidget is Label lab && lab.SelectionIsEmpty) {
+					if (lab.DrawCursor (ctx, out Rectangle c)) {
+						if (textCursor != null && c != textCursor.Value)
+							RegisterClip (textCursor.Value);
+						textCursor = c;
+						surf.Flush ();
+                    } else if (textCursor != null)
+						RegisterClip (textCursor.Value);					
 				}
 				blinkingCursor.Restart ();
 				forceTextCursor = false;
@@ -885,9 +887,11 @@ namespace Crow
 				blinkingCursor.Restart ();
 			} else if (FocusedWidget is Label lab && lab.SelectionIsEmpty) {								
 				if (blinkingCursor.ElapsedMilliseconds > TEXT_CURSOR_BLINK_FREQUENCY) {
-					textCursor = lab.DrawCursor (ctx);
-					surf.Flush ();
-					blinkingCursor.Restart ();
+					if (lab.DrawCursor (ctx, out Rectangle c)) {
+						textCursor = c;
+						surf.Flush ();
+						blinkingCursor.Restart ();
+					}
 				}				
             }
 			
@@ -1124,17 +1128,6 @@ namespace Crow
 
 		public Point MousePosition { get; set; } = default;
 		public bool IsDown (MouseButton button) => Glfw3.GetMouseButton (hWin, button) != InputAction.Release;
-
-		Cursor createCursor (MouseCursor mc)
-		{
-			const int minimumSize = 24;
-			if (!XCursor.Cursors.ContainsKey (mc)) {
-				XCursor.Cursors[mc] = XCursorFile.Load (this, $"#Crow.Cursors.{mc}").Cursors.First (cu => cu.Width >= minimumSize);
-			}
-			XCursor c = XCursor.Cursors [mc];
-			return new CustomCursor (c.Width, c.Height, c.data, c.Xhot, c.Yhot);
-		}
-
 
 		public MouseCursor MouseCursor {
 			get => cursor;
