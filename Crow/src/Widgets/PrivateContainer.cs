@@ -182,11 +182,13 @@ namespace Crow
 		}
 		protected override void onDraw (Context gr)
 		{
+			DbgLogger.StartEvent (DbgEvtType.GODraw, this);
+
 			base.onDraw (gr);
 
-			gr.Save ();
 
 			if (ClipToClientRect) {
+				gr.Save ();
 				//clip to client zone
 				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
 				gr.Clip ();
@@ -196,7 +198,11 @@ namespace Crow
 				if (child.Visible)
 					child.Paint (gr);
 			}
-			gr.Restore ();
+
+			if (ClipToClientRect)
+				gr.Restore ();
+
+			DbgLogger.EndEvent (DbgEvtType.GODraw);
 		}
 		protected override void UpdateCache (Context ctx)
 		{

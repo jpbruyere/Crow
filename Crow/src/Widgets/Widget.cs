@@ -1737,10 +1737,8 @@ namespace Crow
 		#region Rendering
 		/// <summary> This is the common overridable drawing routine to create new widget </summary>
 		protected virtual void onDraw(Context gr)
-		{
-			#if DEBUG_LOG
+		{			
 			DbgLogger.StartEvent(DbgEvtType.GODraw, this);
-			#endif
 
 			Rectangle rBack = new Rectangle (Slot.Size);
 
@@ -1748,9 +1746,7 @@ namespace Crow
 			CairoHelpers.CairoRectangle (gr, rBack, cornerRadius);
 			gr.Fill ();
 
-			#if DEBUG_LOG
 			DbgLogger.EndEvent (DbgEvtType.GODraw);
-			#endif
 		}
 
 		/// <summary>

@@ -132,6 +132,8 @@ namespace Crow
 		}
 
 		protected override void onDraw (Context gr) {
+			DbgLogger.StartEvent (DbgEvtType.GODraw, this);
+
 			base.onDraw (gr);
 
 			RectangleD r = ClientRectangle;
@@ -227,6 +229,8 @@ namespace Crow
 			gr.SetSource (Colors.White);
 			gr.LineWidth = 1.0;
 			gr.Stroke ();
+
+			DbgLogger.EndEvent (DbgEvtType.GODraw);
 		}
 		public override void OnLayoutChanges (LayoutingType layoutType) {
 			base.OnLayoutChanges (layoutType);
