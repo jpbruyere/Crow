@@ -83,6 +83,7 @@ namespace Crow
 		public Measure TabHeight {
 			get { return tview == null ? Measure.Fit : tview.TabHeight; }
 		}
+		public bool IsActiveTab => tview?.ActiveTab == this;
 		public Measure TabWidth {
 			get { return tview == null ? Measure.Fit : tview.TabWidth; }
 		}
@@ -93,10 +94,15 @@ namespace Crow
 				if (isSelected == value)
 					return;
 
-				if (tview != null)
-					tview.SelectedTab = tview.Children.IndexOf(this);
+				//Console.WriteLine ($"TabItem({this.dataSource}).IsSelected: {isSelected} -> {value}");
+				/*if (tview != null)
+					tview.SelectedTab = tview.Children.IndexOf(this);*/
 				
 				isSelected = value;
+
+				if (IsSelected)
+					tview.ActiveTab = this;				
+
 				NotifyValueChangedAuto (isSelected);
 				RegisterForRedraw ();
 			}
@@ -158,7 +164,7 @@ namespace Crow
 			gr.StrokePreserve ();
 			gr.ClipPreserve ();
 
-			if (tv.isSelectedTab (this))
+			if (IsActiveTab)
 				SelectedBackground.SetAsSource (IFace, gr, ClientRectangle);
 			else
 				Background.SetAsSource (IFace, gr, ClientRectangle);
