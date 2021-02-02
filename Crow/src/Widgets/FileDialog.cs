@@ -106,19 +106,24 @@ namespace Crow
 				SelectedDirectory = e.NewValue.ToString();
 		}
 		public void goUpDirClick (object sender, MouseButtonEventArgs e){
-			string root = Directory.GetDirectoryRoot(CurrentDirectory);			
-			DirectoryInfo parentDir = Directory.GetParent (CurrentDirectory);
-			if (parentDir == null)
+			string root = Directory.GetDirectoryRoot(CurrentDirectory);
+			if (CurrentDirectory == root)
 				return;
-			CurrentDirectory = parentDir.FullName;
+			CurrentDirectory = Directory.GetParent(CurrentDirectory).FullName;
 		}
-		void onFileSelect(object sender, MouseButtonEventArgs e){
-			if (string.IsNullOrEmpty (SelectedFile))
-				CurrentDirectory = SelectedDirectory;
-			else {
-				OkClicked.Raise (this, null);
-				IFace.DeleteWidget (this);
+		void onFileSelectDblClick (object sender, MouseButtonEventArgs e) {
+			CurrentDirectory = SelectedDirectory;
+		}
+
+		void onFileSelect (object sender, MouseButtonEventArgs e){
+			if (ShowFiles) {
+				if (string.IsNullOrEmpty (SelectedFile)) {
+					CurrentDirectory = SelectedDirectory;
+					return;
+				} 									
 			}
+			OkClicked.Raise (this, null);
+			IFace.DeleteWidget (this);
 		}
 		void onCancel(object sender, MouseButtonEventArgs e){
 			IFace.DeleteWidget (this);

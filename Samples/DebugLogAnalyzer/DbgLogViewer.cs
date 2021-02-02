@@ -364,9 +364,9 @@ namespace Crow
 			}*/
 
 		}
-		public override void Paint (ref Cairo.Context ctx)
+		public override void Paint (Cairo.Context ctx)
 		{
-			base.Paint (ref ctx);
+			base.Paint (ctx);
 
 			Rectangle r = new Rectangle(mousePos.X, 0, 1, Slot.Height);
 			Rectangle ctxR = ContextCoordinates (r);
