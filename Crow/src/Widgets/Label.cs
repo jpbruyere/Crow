@@ -729,7 +729,7 @@ namespace Crow
 		}
 
 		RectangleD? textCursor = null;
-		internal Rectangle DrawCursor (Context ctx) {
+		internal bool DrawCursor (Context ctx, out Rectangle rect) {
 			if (!currentLoc.Value.HasVisualX) {
 				ctx.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
 				ctx.SetFontSize (Font.Size);
@@ -739,11 +739,16 @@ namespace Crow
 				updateLocation (ctx, ClientRectangle.Width, ref currentLoc);
 				textCursor = null;
             }
+			
 			//if (textCursor == null) {
 				Rectangle cb = ClientRectangle;
-				int lineHeight = (int)(fe.Ascent + fe.Descent);
-				textCursor = new RectangleD (currentLoc.Value.VisualCharXPosition + cb.X + Slot.X,
-							cb.Y + Slot.Y + currentLoc.Value.Line * lineHeight, 1.0, lineHeight);
+			if (currentLoc.Value.VisualCharXPosition > cb.Width) {
+				rect = default;
+				return false;
+			}
+			int lineHeight = (int)(fe.Ascent + fe.Descent);
+			textCursor = new RectangleD (currentLoc.Value.VisualCharXPosition + cb.X + Slot.X,
+						cb.Y + Slot.Y + currentLoc.Value.Line * lineHeight, 1.0, lineHeight);
 			//}
 			Rectangle c = ScreenCoordinates (textCursor.Value);
 			ctx.ResetClip ();
@@ -752,7 +757,8 @@ namespace Crow
 			ctx.MoveTo (0.5 + c.X, c.Y);
 			ctx.LineTo (0.5 + c.X, c.Bottom);
 			ctx.Stroke ();
-			return c;
+			rect = c;
+			return true;
 		}
 
 	}
