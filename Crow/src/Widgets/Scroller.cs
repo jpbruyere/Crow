@@ -197,7 +197,7 @@ namespace Crow
 
 			gr.Translate (-ScrollX, -ScrollY);
 			if (child != null)
-				child.Paint (ref gr);
+				child.Paint (gr);
 			gr.Restore ();
 		}
 

@@ -260,17 +260,17 @@ namespace Crow
 
 			int i = 0;
 			while (i < selTabViewIdx) {
-				tabItms [i].Paint (ref gr);
+				tabItms [i].Paint (gr);
 				i++;
 			}
 			i = tabItms.Length - 1;
 			while (i > selTabViewIdx) {
-				tabItms [i].Paint (ref gr);
+				tabItms [i].Paint (gr);
 				i--;
 			}
 
 			if (selTabViewIdx >= 0)
-				tabItms [selTabViewIdx].Paint (ref gr);
+				tabItms [selTabViewIdx].Paint (gr);
 
 			childrenRWLock.ExitReadLock ();
 

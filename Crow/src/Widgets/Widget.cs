@@ -1796,7 +1796,7 @@ namespace Crow
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version
 		/// of the widget </summary>
-		public virtual void Paint (ref Context ctx)
+		public virtual void Paint (Context ctx)
 		{
 			DbgLogger.StartEvent (DbgEvtType.GOPaint, this);
 

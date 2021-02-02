@@ -194,7 +194,7 @@ namespace Crow
 
 			if (child != null) {
 				if (child.Visible)
-					child.Paint (ref gr);
+					child.Paint (gr);
 			}
 			gr.Restore ();
 		}

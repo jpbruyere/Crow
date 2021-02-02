@@ -40,7 +40,7 @@
 		<Label Text="{ActiveWidget}" Font="mono, 8"/>
 	</HorizontalStack>
 	<Container Fit="true" Margin="50" Background="SlateGrey">
-		<Label Text="MouseEvents" Margin="3" Focusable="true" Fit="true"
+		<Label Text="MouseEvents" Margin="3" Focusable="false" Fit="true"
 			Background="Jet"
 			Foreground="DimGrey"
 			TextAlignment="Center"

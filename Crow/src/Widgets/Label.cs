@@ -36,6 +36,7 @@ namespace Crow
 		protected string _text;
         TextAlignment _textAlignment;
 		bool _multiline;
+		Color cursorColor;
 		Color selBackground;
 		Color selForeground;
 
@@ -60,7 +61,22 @@ namespace Crow
 		/// <summary>
 		/// Background color for selected text inside this label.
 		/// </summary>
-		[DefaultValue("SteelBlue")]
+		[DefaultValue ("White")]
+		public virtual Color CursorColor {
+			get { return cursorColor; }
+			set {
+				if (cursorColor == value)
+					return;
+				cursorColor = value;
+				NotifyValueChangedAuto (cursorColor);
+				RegisterForRedraw ();
+			}
+		}
+
+		/// <summary>
+		/// Background color for selected text inside this label.
+		/// </summary>
+		[DefaultValue ("SteelBlue")]
 		public virtual Color SelectionBackground {
 			get { return selBackground; }
 			set {
@@ -96,7 +112,9 @@ namespace Crow
 				if (value == _textAlignment)
 					return;
 				_textAlignment = value;
-				resetLocationXs ();
+
+				currentLoc?.ResetVisualX ();
+				selectionStart?.ResetVisualX ();
 
 				RegisterForRedraw ();
 				NotifyValueChangedAuto (_textAlignment);
@@ -209,29 +227,25 @@ namespace Crow
 
 			return true;
 		}
-/*		
+		
 		public void GotoWordStart(){
-			CurrentColumn--;
+			int pos = lines.GetAbsolutePosition (currentLoc.Value);			
 			//skip white spaces
-			while (!char.IsLetterOrDigit (this.CurrentChar) && CurrentColumn > 0)
-				CurrentColumn--;
-			while (char.IsLetterOrDigit (this.CurrentChar) && CurrentColumn > 0)
-				CurrentColumn--;
-			if (!char.IsLetterOrDigit (this.CurrentChar))
-				CurrentColumn++;
+			while (pos > 0 && !char.IsLetterOrDigit (_text[pos-1]))
+				pos--;
+			while (pos > 0 && char.IsLetterOrDigit (_text[pos-1]))
+				pos--;
+			currentLoc = lines.GetLocation (pos);
 		}
 		public void GotoWordEnd(){
+			int pos = lines.GetAbsolutePosition (currentLoc.Value);
 			//skip white spaces
-			if (CurrentColumn >= lines [CurrentLine].Length - 1)
-				return;
-			while (!char.IsLetterOrDigit (this.CurrentChar) && CurrentColumn < lines [CurrentLine].Length-1)
-				CurrentColumn++;
-			while (char.IsLetterOrDigit (this.CurrentChar) && CurrentColumn < lines [CurrentLine].Length-1)
-				CurrentColumn++;
-			if (char.IsLetterOrDigit (this.CurrentChar))
-				CurrentColumn++;
-		}
-		*/
+			while (pos < _text.Length -1 && !char.IsLetterOrDigit (_text[pos]))
+				pos++;
+			while (pos < _text.Length - 1 && char.IsLetterOrDigit (_text[pos]))
+				pos++;
+			currentLoc = lines.GetLocation (pos);
+		}		
 
 		protected void detectLineBreak () {
 			if (!_multiline)
@@ -301,29 +315,10 @@ namespace Crow
 			else
 				lines.Add (new TextLine (_text.Length, _text.Length, _text.Length));
 		}
-		void resetLocationXs () {
-			if (currentLoc.HasValue) {
-				CharLocation cl = currentLoc.Value;
-				cl.VisualCharXPosition = -1;
-				currentLoc = cl;
-			}
-			if (selectionStart.HasValue) {
-				CharLocation cl = selectionStart.Value;
-				cl.VisualCharXPosition = -1;
-				selectionStart = cl;
-			}
-		}
-		double getX (int clientWidth, TextLine ls) {
-			switch (TextAlignment) {
-			case TextAlignment.Right:
-				return clientWidth - ls.LengthInPixel;
-			case TextAlignment.Center:
-				return clientWidth / 2 - ls.LengthInPixel / 2;
-			}
-			return 0;
-		}
-
-		protected TextSpan Selection {
+		/// <summary>
+		/// Current Selected text span.
+		/// </summary>
+		public TextSpan Selection {
 			get {				
 				CharLocation selStart = currentLoc.Value, selEnd = currentLoc.Value;
 				if (selectionStart.HasValue) {
@@ -344,6 +339,13 @@ namespace Crow
 				return new TextSpan (lines.GetAbsolutePosition (selStart), lines.GetAbsolutePosition (selEnd));
 			}
         }
+		public string SelectedText {
+			get {
+				TextSpan selection = Selection;
+				return selection.IsEmpty ? "" : Text.AsSpan (selection.Start, selection.Length).ToString ();
+			}
+        }
+		public bool SelectionIsEmpty => selectionStart.HasValue ? Selection.IsEmpty : true;
         public override bool UpdateLayout (LayoutingType layoutType) {
 			if ((LayoutingType.Sizing | layoutType) != LayoutingType.None) {
 				if (!System.Threading.Monitor.TryEnter (linesMutex))
@@ -393,6 +395,7 @@ namespace Crow
 			}
 			return Margin * 2 + (lt == LayoutingType.Height ? cachedTextSize.Height : cachedTextSize.Width);
 		}
+		
         protected override void onDraw (Context gr)
 		{
 			base.onDraw (gr);
@@ -417,8 +420,7 @@ namespace Crow
 				if (selectionStart.HasValue) {
 					updateLocation (gr, cb.Width, ref selectionStart);
 					if (currentLoc.Value != selectionStart.Value)
-						selectionNotEmpty = true;
-					
+						selectionNotEmpty = true;					
 				}
 				if (selectionNotEmpty) {
 					if (currentLoc.Value.Line < selectionStart.Value.Line) {
@@ -434,13 +436,8 @@ namespace Crow
 						selStart = selectionStart.Value;
 						selEnd = currentLoc.Value;
 					}
-				} else {
-					Foreground.SetAsSource (IFace, gr);
-					gr.LineWidth = 1.0;
-					gr.MoveTo (0.5 + currentLoc.Value.VisualCharXPosition + cb.X, cb.Y + currentLoc.Value.Line * lineHeight);
-					gr.LineTo (0.5 + currentLoc.Value.VisualCharXPosition + cb.X, cb.Y + (currentLoc.Value.Line + 1) * lineHeight);
-					gr.Stroke ();
-				}
+				}else
+					IFace.forceTextCursor = true;
 			}
 
 			if (string.IsNullOrEmpty (_text)) {
@@ -573,7 +570,7 @@ namespace Crow
 					else if (!selectionStart.HasValue)
 						selectionStart = currentLoc;
 					currentLoc = hoverLoc;
-
+					IFace.forceTextCursor = true;
 					RegisterForRedraw ();
 					e.Handled = true;
 				}					
@@ -629,26 +626,24 @@ namespace Crow
 				currentLoc = new CharLocation (l, lines[l].Length);
 				RegisterForRedraw ();
 				break;
-/*			case Key.Insert:
-				if (IFace.Shift)
-					this.Insert (IFace.Clipboard);
-				else if (IFace.Ctrl && !selectionIsEmpty)
-					IFace.Clipboard = this.SelectedText;
-				break;*/
+			case Key.Insert:
+				if (IFace.Ctrl && !SelectionIsEmpty)
+					IFace.Clipboard = SelectedText;
+				break;
 			case Key.Left:
 				checkShift ();
-				/*if (IFace.Ctrl)
+				if (IFace.Ctrl)
 					GotoWordStart ();
-				else*/
-				MoveLeft ();
+				else
+					MoveLeft ();
 				RegisterForRedraw ();
 				break;
 			case Key.Right:
 				checkShift ();
-				/*if (IFace.Ctrl)
-					GotoWordStart ();
-				else*/
-				MoveRight ();
+				if (IFace.Ctrl)
+					GotoWordEnd ();
+				else
+					MoveRight ();
 				RegisterForRedraw ();
 				break;
 			case Key.Up:
@@ -665,8 +660,8 @@ namespace Crow
 				base.onKeyDown (sender, e);
 				return;
 			}
+			IFace.forceTextCursor = true;
 			e.Handled = true;			
-			
 		}
 		void checkShift () {
 			if (IFace.Shift) {
@@ -723,7 +718,42 @@ namespace Crow
 			loc.VisualCharXPosition = cPos;
 			location = loc;
 		}
+		double getX (int clientWidth, TextLine ls) {
+			switch (TextAlignment) {
+			case TextAlignment.Right:
+				return clientWidth - ls.LengthInPixel;
+			case TextAlignment.Center:
+				return clientWidth / 2 - ls.LengthInPixel / 2;
+			}
+			return 0;
+		}
 
+		RectangleD? textCursor = null;
+		internal Rectangle DrawCursor (Context ctx) {
+			if (!currentLoc.Value.HasVisualX) {
+				ctx.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+				ctx.SetFontSize (Font.Size);
+				ctx.FontOptions = Interface.FontRenderingOptions;
+				ctx.Antialias = Interface.Antialias;
 
-    }
+				updateLocation (ctx, ClientRectangle.Width, ref currentLoc);
+				textCursor = null;
+            }
+			//if (textCursor == null) {
+				Rectangle cb = ClientRectangle;
+				int lineHeight = (int)(fe.Ascent + fe.Descent);
+				textCursor = new RectangleD (currentLoc.Value.VisualCharXPosition + cb.X + Slot.X,
+							cb.Y + Slot.Y + currentLoc.Value.Line * lineHeight, 1.0, lineHeight);
+			//}
+			Rectangle c = ScreenCoordinates (textCursor.Value);
+			ctx.ResetClip ();
+			ctx.SetSource (cursorColor);			
+			ctx.LineWidth = 1.0;
+			ctx.MoveTo (0.5 + c.X, c.Y);
+			ctx.LineTo (0.5 + c.X, c.Bottom);
+			ctx.Stroke ();
+			return c;
+		}
+
+	}
 }

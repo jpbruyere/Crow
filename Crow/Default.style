@@ -82,6 +82,7 @@ OldLabel {
 TextBox {
 	Background = "White";
 	Foreground = "Black";
+	CursorColor = "Black";
 	Selectable = "True";
 	//Text = "TextBox";
 	Margin = "1";
