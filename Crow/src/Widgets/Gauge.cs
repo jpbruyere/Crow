@@ -80,6 +80,8 @@ namespace Crow {
 		#endregion
 
 		protected override void onDraw (Context gr) {
+			DbgLogger.StartEvent (DbgEvtType.GODraw, this);
+
 			base.onDraw (gr);
 
 			Rectangle cb = ClientRectangle;
@@ -93,6 +95,8 @@ namespace Crow {
 			Foreground.SetAsSource (IFace, gr, cb);
 			CairoHelpers.CairoRectangle (gr, cb, CornerRadius);
 			gr.Fill ();
+
+			DbgLogger.EndEvent (DbgEvtType.GODraw);
 		}
 	}
 }

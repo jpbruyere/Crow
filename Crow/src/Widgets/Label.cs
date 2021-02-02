@@ -403,11 +403,14 @@ namespace Crow
 			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
 			gr.SetFontSize (Font.Size);
 			gr.FontOptions = Interface.FontRenderingOptions;
-			gr.Antialias = Interface.Antialias;
-
-			//gr.Save ();			
+			gr.Antialias = Interface.Antialias;			
 
 			Rectangle cb = ClientRectangle;
+			if (ClipToClientRect) {
+				gr.Save ();
+				CairoHelpers.CairoRectangle (gr, cb, CornerRadius);
+				gr.Clip ();
+			}
 
 			fe = gr.FontExtents;
 			int lineHeight = (int)(fe.Ascent + fe.Descent);
@@ -440,88 +443,82 @@ namespace Crow
 					IFace.forceTextCursor = true;
 			}
 
-			if (string.IsNullOrEmpty (_text)) {
-				//gr.Restore ();
-				return;
-			}
+			if (!string.IsNullOrEmpty (_text)) {
+				Foreground.SetAsSource (IFace, gr);
 
-			Foreground.SetAsSource (IFace, gr);
+				TextExtents extents;
+				Span<byte> bytes = stackalloc byte[128];
+				int y = cb.Y;
 
-			TextExtents extents;
-			Span<byte> bytes = stackalloc byte[128];
-			int y = cb.Y;
+				for (int i = 0; i < lines.Count; i++) {
+					int encodedBytes = -1;
+					if (lines[i].Length > 0) {
+						int size = lines[i].Length * 4 + 1;
+						if (bytes.Length < size)
+							bytes = size > 512 ? new byte[size] : stackalloc byte[size];
 
-			for (int i = 0; i < lines.Count; i++) {
-				int encodedBytes = -1;
-				if (lines[i].Length > 0) {
+						encodedBytes = Crow.Text.Encoding.ToUtf8 (_text.GetLine (lines[i]), bytes);
+						bytes[encodedBytes++] = 0;
 
-					int size = lines[i].Length * 4 + 1;
-					if (bytes.Length < size)
-						bytes = size > 512 ? new byte[size] : stackalloc byte[size];
-
-					encodedBytes = Crow.Text.Encoding.ToUtf8 (_text.GetLine (lines[i]), bytes);
-					bytes[encodedBytes++] = 0;
-
-					if (lines[i].LengthInPixel < 0) {
-						gr.TextExtents (bytes.Slice (0, encodedBytes), out extents);
-						lines.UpdateLineLengthInPixel (i, (int)extents.XAdvance);
-					}
-				}
-
-				Rectangle lineRect = new Rectangle (
-					Width.IsFit && !Multiline ? cb.X : (int)getX (cb.Width, lines[i]) + cb.X,
-					y,
-					lines[i].LengthInPixel,
-					lineHeight);
-
-				if (encodedBytes > 0) {
-					gr.MoveTo (lineRect.X, lineRect.Y + fe.Ascent);
-					gr.ShowText (bytes.Slice (0, encodedBytes));
-				}
-
-				if (HasFocus && selectionNotEmpty) {
-					Rectangle selRect = lineRect;
-					if (_multiline) {
-						if (i >= selStart.Line && i <= selEnd.Line) {
-							if (selStart.Line == selEnd.Line) {
-								selRect.X = (int)selStart.VisualCharXPosition + cb.X;
-								selRect.Width = (int)(selEnd.VisualCharXPosition - selStart.VisualCharXPosition);
-							} else if (i == selStart.Line) {
-								int newX = (int)selStart.VisualCharXPosition + cb.X;
-								selRect.Width -= (newX - selRect.X) - 10;
-								selRect.X = newX;
-							} else if (i == selEnd.Line) {
-								selRect.Width = (int)selEnd.VisualCharXPosition - selRect.X;
-							} else
-								selRect.Width += 10;
-						} else {
-							y += lineHeight;
-							continue;
+						if (lines[i].LengthInPixel < 0) {
+							gr.TextExtents (bytes.Slice (0, encodedBytes), out extents);
+							lines.UpdateLineLengthInPixel (i, (int)extents.XAdvance);
 						}
-                    } else {
-						selRect.X = (int)selStart.VisualCharXPosition + cb.X;
-						selRect.Width = (int)(selEnd.VisualCharXPosition - selStart.VisualCharXPosition);						
 					}
 
-					gr.SetSource (selBackground);
-					gr.Rectangle (selRect);
-					if (encodedBytes < 0)
-						gr.Fill ();
-					else {
-						gr.FillPreserve ();
-						gr.Save ();
-						gr.Clip ();
-						gr.SetSource (SelectionForeground);
+					Rectangle lineRect = new Rectangle (
+						Width.IsFit && !Multiline ? cb.X : (int)getX (cb.Width, lines[i]) + cb.X,
+						y, lines[i].LengthInPixel, lineHeight);
+
+					if (encodedBytes > 0) {
 						gr.MoveTo (lineRect.X, lineRect.Y + fe.Ascent);
 						gr.ShowText (bytes.Slice (0, encodedBytes));
-						gr.Restore ();
 					}
-					Foreground.SetAsSource (IFace, gr);
-				}
-				y += lineHeight;
-			}
 
-			//gr.Restore ();
+					if (HasFocus && selectionNotEmpty) {
+						Rectangle selRect = lineRect;
+						if (_multiline) {
+							if (i >= selStart.Line && i <= selEnd.Line) {
+								if (selStart.Line == selEnd.Line) {
+									selRect.X = (int)selStart.VisualCharXPosition + cb.X;
+									selRect.Width = (int)(selEnd.VisualCharXPosition - selStart.VisualCharXPosition);
+								} else if (i == selStart.Line) {
+									int newX = (int)selStart.VisualCharXPosition + cb.X;
+									selRect.Width -= (newX - selRect.X) - 10;
+									selRect.X = newX;
+								} else if (i == selEnd.Line) {
+									selRect.Width = (int)selEnd.VisualCharXPosition - selRect.X;
+								} else
+									selRect.Width += 10;
+							} else {
+								y += lineHeight;
+								continue;
+							}
+						} else {
+							selRect.X = (int)selStart.VisualCharXPosition + cb.X;
+							selRect.Width = (int)(selEnd.VisualCharXPosition - selStart.VisualCharXPosition);
+						}
+
+						gr.SetSource (selBackground);
+						gr.Rectangle (selRect);
+						if (encodedBytes < 0)
+							gr.Fill ();
+						else {
+							gr.FillPreserve ();
+							gr.Save ();
+							gr.Clip ();
+							gr.SetSource (SelectionForeground);
+							gr.MoveTo (lineRect.X, lineRect.Y + fe.Ascent);
+							gr.ShowText (bytes.Slice (0, encodedBytes));
+							gr.Restore ();
+						}
+						Foreground.SetAsSource (IFace, gr);
+					}
+					y += lineHeight;
+				}
+			}
+			if (ClipToClientRect)
+				gr.Restore ();
 		}
 		#endregion
 
