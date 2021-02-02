@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Crow
 {
@@ -13,7 +14,7 @@ namespace Crow
 	{
 		const uint XC_TYPE_IMG = 0xfffd0002;
 
-		class toc
+		struct toc
 		{
 			public uint type;
 			public uint subtype;
@@ -32,13 +33,12 @@ namespace Crow
 
 		static XCursorFile loadFromStream(Stream s)
 		{
-			List<toc> tocList = new List<toc> ();
+			List<toc> tocList = new List<toc> (5);
 			XCursorFile tmp = new XCursorFile ();
 
 			using (BinaryReader sr = new BinaryReader (s)) {
-				byte[] data;
-				//magic: CARD32 ’Xcur’ (0x58, 0x63, 0x75, 0x72)
-				if (new string (sr.ReadChars (4)) != "Xcur") {
+				//magic: CARD32 ’Xcur’ (0x58, 0x63, 0x75, 0x72)				
+				if (!sr.ReadChars (4).AsSpan ().SequenceEqual("Xcur".AsSpan())) {
 					Debug.WriteLine ("XCursor Load error: Wrong magic");
 					return null;
 				}
@@ -56,7 +56,6 @@ namespace Crow
 				foreach (toc t in tocList) {
 					if (t.type != XC_TYPE_IMG)
 						continue;
-
 					sr.BaseStream.Seek (t.pos, SeekOrigin.Begin);
 					tmp.Cursors.Add(imageLoad (sr));						
 				}
@@ -91,21 +90,7 @@ namespace Crow
 			//			delay: CARD32 Delay between animation frames in milliseconds
 			tmp.Delay = sr.ReadUInt32 ();
 			//			pixels: LISTofCARD32 Packed ARGB format pixels
-			tmp.data = new byte [tmp.Width * tmp.Height * 4];
-			for (int i = 0; i < tmp.Width * tmp.Height; i++) {
-				//unchecked { tmp.data [i * 4 + 3] = (byte)(2 * (int)sr.ReadByte ()); }
-				tmp.data [i * 4 + 0] = sr.ReadByte ();
-				tmp.data [i * 4 + 1] = sr.ReadByte ();
-				tmp.data [i * 4 + 2] = sr.ReadByte ();
-				tmp.data [i * 4 + 3] = sr.ReadByte ();
-
-				//System.Diagnostics.Debug.WriteLine ($"{tmp.data [i * 4 + 3],2:X} {tmp.data [i * 4 + 0],2:X} {tmp.data [i * 4 + 1],2:X} {tmp.data [i * 4 + 2],2:X}");
-			}
-			//tmp.data = sr.ReadBytes((int)(tmp.Width * tmp.Height * 4));
-			/*using(Stream fs = new FileStream($"/tmp/test.bin_{tmp.Width}", FileMode.Create))
-			using (BinaryWriter sr2 = new BinaryWriter(fs)) {
-				sr2.Write (tmp.data, 0, tmp.data.Length);
-			}*/
+			tmp.data = sr.ReadBytes ((int)(4 * tmp.Width * tmp.Height));
 			return tmp;
 		}
 	}
@@ -119,13 +104,18 @@ namespace Crow
 		public uint Delay;
 		public byte[] data;
 
-		public XCursor ()
-		{
+		public XCursor () {	}
+		public static Glfw.CustomCursor Create (Interface iface, MouseCursor mc) {			
+			const int minimumSize = 24;
+			if (!Cursors.ContainsKey (mc))
+				XCursor.Cursors[mc] = XCursorFile.Load (iface, $"#Crow.Cursors.{mc}").Cursors.First (cu => cu.Width >= minimumSize);				
+			XCursor c = XCursor.Cursors[mc];
+			return new Glfw.CustomCursor (c.Width, c.Height, c.data, c.Xhot, c.Yhot);			
 		}
-//		public static implicit operator MouseCursor(XCursor xc)
-//		{
-//			return new MouseCursor((int)xc.Xhot, (int)xc.Yhot, (int)xc.Width, (int)xc.Height,xc.data);
-//		}
+		//		public static implicit operator MouseCursor(XCursor xc)
+		//		{
+		//			return new MouseCursor((int)xc.Xhot, (int)xc.Yhot, (int)xc.Width, (int)xc.Height,xc.data);
+		//		}
 	}
 }
 
