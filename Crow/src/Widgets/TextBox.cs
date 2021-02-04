@@ -286,6 +286,16 @@ namespace Crow
             case Key.Tab:
                 update (new TextChange (selection.Start, selection.Length, "\t"));
                 break;
+            case Key.PageUp:
+                checkShift ();
+                LineMove (-visibleLines);
+                RegisterForRedraw ();
+                break;
+            case Key.PageDown:
+                checkShift ();
+                LineMove (visibleLines);
+                RegisterForRedraw ();
+                break;
             default:
                 base.onKeyDown (sender, e);
                 break;
