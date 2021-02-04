@@ -899,15 +899,30 @@ namespace Crow
 				PerformanceMeasure.End (PerformanceMeasure.Kind.Drawing);
 			}
 
+			drawTextCursor (ctx);
+			
+			DbgLogger.EndEvent (DbgEvtType.Drawing, true);
+		}
+		#endregion
+
+		#region Blinking text cursor
+		/// <summary>
+		/// Text cursor blinking frequency.
+		/// </summary>
+		public static long TEXT_CURSOR_BLINK_FREQUENCY = 400;
+		internal Rectangle? textCursor = null;//last printed cursor, used to clear it.
+		internal bool forceTextCursor = true;//when true, cursor is printed even if blinkingCursor.elapsed is not reached.
+		Stopwatch blinkingCursor = Stopwatch.StartNew ();
+		void drawTextCursor (Context ctx) {
 			if (forceTextCursor) {
-				if (FocusedWidget is Label lab && lab.SelectionIsEmpty) {
+				if (FocusedWidget is Label lab) {
 					if (lab.DrawCursor (ctx, out Rectangle c)) {
 						if (textCursor != null && c != textCursor.Value)
 							RegisterClip (textCursor.Value);
 						textCursor = c;
 						surf.Flush ();
-                    } else if (textCursor != null)
-						RegisterClip (textCursor.Value);					
+					} else if (textCursor != null)
+						RegisterClip (textCursor.Value);
 				}
 				blinkingCursor.Restart ();
 				forceTextCursor = false;
@@ -915,25 +930,16 @@ namespace Crow
 				RegisterClip (textCursor.Value);
 				textCursor = null;
 				blinkingCursor.Restart ();
-			} else if (FocusedWidget is Label lab && lab.SelectionIsEmpty) {								
+			} else if (FocusedWidget is Label lab && lab.SelectionIsEmpty) {
 				if (blinkingCursor.ElapsedMilliseconds > TEXT_CURSOR_BLINK_FREQUENCY) {
 					if (lab.DrawCursor (ctx, out Rectangle c)) {
 						textCursor = c;
 						surf.Flush ();
 						blinkingCursor.Restart ();
 					}
-				}				
-            }
-			
-			DbgLogger.EndEvent (DbgEvtType.Drawing, true);
+				}
+			}
 		}
-		#endregion
-
-		#region Blinking text cursor
-		public static long TEXT_CURSOR_BLINK_FREQUENCY = 300;
-		internal Rectangle? textCursor = null;
-		internal bool forceTextCursor = true;
-		Stopwatch blinkingCursor = Stopwatch.StartNew ();
 		#endregion
 
 		#region GraphicTree handling

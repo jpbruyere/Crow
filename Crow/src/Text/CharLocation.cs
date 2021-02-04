@@ -31,5 +31,7 @@ namespace Crow.Text
 				HashCode.Combine (Line, VisualCharXPosition) :
 				HashCode.Combine (Line, Column);
 		}
-	}
+
+		public override string ToString () => $"{Line}, {Column}";
+    }
 }

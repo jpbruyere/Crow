@@ -30,7 +30,7 @@ namespace Crow
 			updateCursorWidgetProps ();
 		}
 
-		void HandleCursorContainerLayoutChanged (object sender, LayoutingEventArgs e)
+		protected virtual void HandleCursorContainerLayoutChanged (object sender, LayoutingEventArgs e)
 		{
 			computeCursorPosition ();
 		}
@@ -43,10 +43,10 @@ namespace Crow
 			=> RegisterForLayouting (LayoutingType.ArrangeChildren);
 
 		#region private fields
-		int cursorSize;
+		int cursorSize, minimumCursorSize;
 		Orientation _orientation;
 		bool holdCursor = false;
-		Widget cursor;
+		protected Widget cursor;
 		#endregion
 
 		protected double unity;
@@ -77,12 +77,25 @@ namespace Crow
 			}
 		}
 		[DefaultValue (20)]
-		public virtual int CursorSize {
-			get { return cursorSize; }
+		public virtual int MinimuCursorSize {
+			get => minimumCursorSize;
 			set {
-				if (cursorSize == value)
+				if (minimumCursorSize == value)
 					return;
-				cursorSize = value;
+				minimumCursorSize = value;
+				CursorSize = cursorSize;//force recheck
+				NotifyValueChangedAuto (minimumCursorSize);
+			}
+		}
+
+		[DefaultValue (20)]
+		public virtual int CursorSize {
+			get => cursorSize;
+			set {
+				int newCursorSize = Math.Max (MinimuCursorSize, value);
+				if (cursorSize == newCursorSize)
+					return;
+				cursorSize = newCursorSize;
 				RegisterForGraphicUpdate ();
 				NotifyValueChangedAuto (cursorSize);
 				updateCursorWidgetProps ();
