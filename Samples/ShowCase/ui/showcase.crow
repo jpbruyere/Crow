@@ -19,16 +19,14 @@
 				<Button Style="IcoButton" Command="{CMDSaveAs}" />
 			</HorizontalStack>
 			<HorizontalStack>
-				<Scroller Name="scroller1" Background="White"
-						Margin="2" ScrollY="{../scrollbar1.Value}">
-					<TextBox VerticalAlignment="Top" 
-						Text="{²Source}" Multiline="true"
-						Font="consolas, 12"/>
-				</Scroller>
-				<!--<ScrollBar Name="scrollbar1" Value="{../scroller1.ScrollY}"
-					LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
-					CursorSize="{../scroller1.ChildHeightRatio}" Maximum="{../scroller1.MaxScrollY}" />-->
+				<TextBox Name="tb" Text="{²Source}" Multiline="true" Font="consolas, 12" Focusable="true" Height="Stretched" Width="Stretched" />
+				<ScrollBar Value="{²../tb.ScrollY}"
+						LargeIncrement="{../tb.PageHeight}" SmallIncrement="1"
+						CursorRatio="{../tb.ChildHeightRatio}" Maximum="{../tb.MaxScrollY}" />
 			</HorizontalStack>
+			<ScrollBar Style="HScrollBar" Value="{²../tb.ScrollX}"
+					LargeIncrement="{../tb.PageWidth}" SmallIncrement="1"
+					CursorRatio="{../tb.ChildWidthRatio}" Maximum="{../tb.MaxScrollX}" />
 			<Label Text="{CurrentFile}" Width="Stretched"/>
 			<Label Visible="{ShowError}" Text="{ErrorMessage}" Background="Red" Foreground="White" Width="Stretched" Margin="2"
 				Multiline="true"/>

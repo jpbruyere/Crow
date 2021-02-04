@@ -21,15 +21,6 @@ namespace Crow.Text
                         c++;
                         continue;
                     }
-                    /*unsafe {
-                        fixed (void* bp = &source.GetPinnableReference())
-                        fixed (byte* buffer = &buff.GetPinnableReference())
-                        {
-                            return Utf16toUtf8 ((byte*)bp, buffer, tabWidth);
-                            
-                        }
-                    }*/
-
 
                     if (source[c] < 0x80) { //1 byte
                         buff[encodedBytes++] = (byte)source[c++];

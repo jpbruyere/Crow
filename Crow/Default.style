@@ -24,7 +24,7 @@ MenuBackground = "Jet";
 
 Button, CheckBox, RadioButton, ComboBox, Expandable,
 MessageBox, Popper, Slider, Spinner, TextBox {
-	Focusable = "true";
+	//Focusable = "true";
 	Height = "Fit";
 	Background = "${ControlBackground}";
 	CornerRadius = "${ControlCornerRadius}";
@@ -249,7 +249,7 @@ CheckBoxAlt {
 
 ArrowBut {
 	MouseRepeat="true";	
-	Focusable="true";
+	//Focusable="true";
 	
 	Foreground="Grey";
 	Background="Transparent";

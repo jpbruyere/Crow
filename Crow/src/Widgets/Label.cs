@@ -355,8 +355,31 @@ namespace Crow
 			System.Threading.Monitor.Exit (linesMutex);
 			return result;
 		}
-        #region GraphicObject overrides
-        public override int measureRawSize(LayoutingType lt)
+		protected virtual void measureTextBounds (Context gr) {
+			fe = gr.FontExtents;
+			te = new TextExtents ();
+
+			cachedTextSize.Height = (int)Math.Ceiling ((fe.Ascent + fe.Descent) * Math.Max (1, lines.Count));
+
+			TextExtents tmp = default;
+			int longestLine = 0;
+			for (int i = 0; i < lines.Count; i++) {
+				if (lines[i].LengthInPixel < 0) {
+					if (lines[i].Length == 0)
+						lines.UpdateLineLengthInPixel (i, 0);// (int)Math.Ceiling (fe.MaxXAdvance);
+					else {
+						gr.TextExtents (_text.GetLine (lines[i]), Interface.TAB_SIZE, out tmp);
+						lines.UpdateLineLengthInPixel (i, (int)Math.Ceiling (tmp.XAdvance));
+					}
+				}
+				if (lines[i].LengthInPixel > lines[longestLine].LengthInPixel)
+					longestLine = i;
+			}
+			cachedTextSize.Width = lines[longestLine].LengthInPixel;
+			textMeasureIsUpToDate = true;
+		}
+		#region GraphicObject overrides
+		public override int measureRawSize(LayoutingType lt)
 		{
 			if ((bool)lines?.IsEmpty)
 				getLines ();
@@ -370,48 +393,14 @@ namespace Crow
 					gr.FontOptions = Interface.FontRenderingOptions;
 					gr.Antialias = Interface.Antialias;
 
-					fe = gr.FontExtents;
-					te = new TextExtents ();
-
-					cachedTextSize.Height = (int)Math.Ceiling ((fe.Ascent+fe.Descent) * Math.Max (1, lines.Count));
-
-					TextExtents tmp = default;
-					int longestLine = 0;
-					for (int i = 0; i < lines.Count; i++) {							
-						if (lines[i].LengthInPixel < 0) {
-							if (lines[i].Length == 0)
-								lines.UpdateLineLengthInPixel (i, 0);// (int)Math.Ceiling (fe.MaxXAdvance);
-							else {
-								gr.TextExtents (_text.GetLine (lines[i]), Interface.TAB_SIZE, out tmp);
-								lines.UpdateLineLengthInPixel (i, (int)Math.Ceiling (tmp.XAdvance));
-							}
-						}
-						if (lines[i].LengthInPixel > lines[longestLine].LengthInPixel)
-							longestLine = i;
-					}
-					cachedTextSize.Width = lines[longestLine].LengthInPixel;
-					textMeasureIsUpToDate = true;				
+					measureTextBounds (gr);
 				}
 			}
 			return Margin * 2 + (lt == LayoutingType.Height ? cachedTextSize.Height : cachedTextSize.Width);
 		}
-		
-        protected override void onDraw (Context gr)
-		{
-			base.onDraw (gr);
 
-			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-			gr.SetFontSize (Font.Size);
-			gr.FontOptions = Interface.FontRenderingOptions;
-			gr.Antialias = Interface.Antialias;			
-
+		protected virtual void drawContent (Context gr) {
 			Rectangle cb = ClientRectangle;
-			if (ClipToClientRect) {
-				gr.Save ();
-				CairoHelpers.CairoRectangle (gr, cb, CornerRadius);
-				gr.Clip ();
-			}
-
 			fe = gr.FontExtents;
 			int lineHeight = (int)(fe.Ascent + fe.Descent);
 
@@ -423,13 +412,13 @@ namespace Crow
 				if (selectionStart.HasValue) {
 					updateLocation (gr, cb.Width, ref selectionStart);
 					if (currentLoc.Value != selectionStart.Value)
-						selectionNotEmpty = true;					
+						selectionNotEmpty = true;
 				}
 				if (selectionNotEmpty) {
 					if (currentLoc.Value.Line < selectionStart.Value.Line) {
 						selStart = currentLoc.Value;
 						selEnd = selectionStart.Value;
-					}else if (currentLoc.Value.Line > selectionStart.Value.Line) {
+					} else if (currentLoc.Value.Line > selectionStart.Value.Line) {
 						selStart = selectionStart.Value;
 						selEnd = currentLoc.Value;
 					} else if (currentLoc.Value.Column < selectionStart.Value.Column) {
@@ -439,7 +428,7 @@ namespace Crow
 						selStart = selectionStart.Value;
 						selEnd = currentLoc.Value;
 					}
-				}else
+				} else
 					IFace.forceTextCursor = true;
 			}
 
@@ -451,72 +440,104 @@ namespace Crow
 				int y = cb.Y;
 
 				for (int i = 0; i < lines.Count; i++) {
-					int encodedBytes = -1;
-					if (lines[i].Length > 0) {
-						int size = lines[i].Length * 4 + 1;
-						if (bytes.Length < size)
-							bytes = size > 512 ? new byte[size] : stackalloc byte[size];
+					if (!cancelLinePrint (lineHeight, y, cb.Height)) {
+						int encodedBytes = -1;
+						if (lines[i].Length > 0) {
+							int size = lines[i].Length * 4 + 1;
+							if (bytes.Length < size)
+								bytes = size > 512 ? new byte[size] : stackalloc byte[size];
 
-						encodedBytes = Crow.Text.Encoding.ToUtf8 (_text.GetLine (lines[i]), bytes);
-						bytes[encodedBytes++] = 0;
+							encodedBytes = Crow.Text.Encoding.ToUtf8 (_text.GetLine (lines[i]), bytes);
+							bytes[encodedBytes++] = 0;
 
-						if (lines[i].LengthInPixel < 0) {
-							gr.TextExtents (bytes.Slice (0, encodedBytes), out extents);
-							lines.UpdateLineLengthInPixel (i, (int)extents.XAdvance);
-						}
-					}
-
-					Rectangle lineRect = new Rectangle (
-						Width.IsFit && !Multiline ? cb.X : (int)getX (cb.Width, lines[i]) + cb.X,
-						y, lines[i].LengthInPixel, lineHeight);
-
-					if (encodedBytes > 0) {
-						gr.MoveTo (lineRect.X, lineRect.Y + fe.Ascent);
-						gr.ShowText (bytes.Slice (0, encodedBytes));
-					}
-
-					if (HasFocus && selectionNotEmpty) {
-						Rectangle selRect = lineRect;
-						if (_multiline) {
-							if (i >= selStart.Line && i <= selEnd.Line) {
-								if (selStart.Line == selEnd.Line) {
-									selRect.X = (int)selStart.VisualCharXPosition + cb.X;
-									selRect.Width = (int)(selEnd.VisualCharXPosition - selStart.VisualCharXPosition);
-								} else if (i == selStart.Line) {
-									int newX = (int)selStart.VisualCharXPosition + cb.X;
-									selRect.Width -= (newX - selRect.X) - 10;
-									selRect.X = newX;
-								} else if (i == selEnd.Line) {
-									selRect.Width = (int)selEnd.VisualCharXPosition - selRect.X;
-								} else
-									selRect.Width += 10;
-							} else {
-								y += lineHeight;
-								continue;
+							if (lines[i].LengthInPixel < 0) {
+								gr.TextExtents (bytes.Slice (0, encodedBytes), out extents);
+								lines.UpdateLineLengthInPixel (i, (int)extents.XAdvance);
 							}
-						} else {
-							selRect.X = (int)selStart.VisualCharXPosition + cb.X;
-							selRect.Width = (int)(selEnd.VisualCharXPosition - selStart.VisualCharXPosition);
 						}
 
-						gr.SetSource (selBackground);
-						gr.Rectangle (selRect);
-						if (encodedBytes < 0)
-							gr.Fill ();
-						else {
-							gr.FillPreserve ();
-							gr.Save ();
-							gr.Clip ();
-							gr.SetSource (SelectionForeground);
+						Rectangle lineRect = new Rectangle (
+							Width.IsFit && !Multiline ? cb.X : (int)getX (cb.Width, lines[i]) + cb.X,
+							y, lines[i].LengthInPixel, lineHeight);
+
+						if (encodedBytes > 0) {
 							gr.MoveTo (lineRect.X, lineRect.Y + fe.Ascent);
 							gr.ShowText (bytes.Slice (0, encodedBytes));
-							gr.Restore ();
 						}
-						Foreground.SetAsSource (IFace, gr);
+
+						if (HasFocus && selectionNotEmpty) {
+							Rectangle selRect = lineRect;
+							if (_multiline) {
+								if (i >= selStart.Line && i <= selEnd.Line) {
+									if (selStart.Line == selEnd.Line) {
+										selRect.X = (int)selStart.VisualCharXPosition + cb.X;
+										selRect.Width = (int)(selEnd.VisualCharXPosition - selStart.VisualCharXPosition);
+									} else if (i == selStart.Line) {
+										int newX = (int)selStart.VisualCharXPosition + cb.X;
+										selRect.Width -= (newX - selRect.X) - 10;
+										selRect.X = newX;
+									} else if (i == selEnd.Line) {
+										selRect.Width = (int)selEnd.VisualCharXPosition - selRect.X;
+									} else
+										selRect.Width += 10;
+								} else {
+									y += lineHeight;
+									continue;
+								}
+							} else {
+								selRect.X = (int)selStart.VisualCharXPosition + cb.X;
+								selRect.Width = (int)(selEnd.VisualCharXPosition - selStart.VisualCharXPosition);
+							}
+
+							gr.SetSource (selBackground);
+							gr.Rectangle (selRect);
+							if (encodedBytes < 0)
+								gr.Fill ();
+							else {
+								gr.FillPreserve ();
+								gr.Save ();
+								gr.Clip ();
+								gr.SetSource (SelectionForeground);
+								gr.MoveTo (lineRect.X, lineRect.Y + fe.Ascent);
+								gr.ShowText (bytes.Slice (0, encodedBytes));
+								gr.Restore ();
+							}
+							Foreground.SetAsSource (IFace, gr);
+						}
 					}
 					y += lineHeight;
 				}
 			}
+		}
+		protected virtual void updateHoverLocation (Point mouseLocalPos) {
+			int hoverLine = _multiline ?
+				(int)Math.Min (Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent + fe.Descent))), lines.Count - 1) : 0;
+			hoverLoc = new CharLocation (hoverLine, -1, mouseLocalPos.X);
+		}
+
+		protected override void onDraw (Context gr)
+		{
+			base.onDraw (gr);
+
+			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+			gr.SetFontSize (Font.Size);
+			gr.FontOptions = Interface.FontRenderingOptions;
+			gr.Antialias = Interface.Antialias;
+			
+			if (!textMeasureIsUpToDate) {
+				lock (linesMutex)
+					measureTextBounds (gr);
+            }
+			
+			if (ClipToClientRect) {
+				gr.Save ();
+				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+				gr.Clip ();
+			}
+
+			lock (linesMutex)
+				drawContent (gr);
+			
 			if (ClipToClientRect)
 				gr.Restore ();
 		}
@@ -546,13 +567,10 @@ namespace Crow
 		{
 			base.onMouseMove (sender, e);
 
-			Point mouseLocalPos = e.Position - ScreenCoordinates (Slot).TopLeft - ClientRectangle.TopLeft;
-			int hoverLine = _multiline ?
-				(int)Math.Min (Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent + fe.Descent))), lines.Count - 1) : 0;
-			hoverLoc = new CharLocation (hoverLine, -1, mouseLocalPos.X);
+			updateHoverLocation (e.Position - ScreenCoordinates (Slot).TopLeft - ClientRectangle.TopLeft);
 
-			if (HasFocus && IFace.IsDown (Glfw.MouseButton.Left)) {
-				currentLoc = hoverLoc;
+			if (HasFocus && IFace.IsDown (MouseButton.Left)) {
+				currentLoc = hoverLoc;				
 				RegisterForRedraw ();				
 			}
 		}
@@ -579,24 +597,20 @@ namespace Crow
 		public override void onMouseUp (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseUp (sender, e);
-			if (e.Button != Glfw.MouseButton.Left || !HasFocus || !selectionStart.HasValue)
+			if (e.Button != MouseButton.Left || !HasFocus || !selectionStart.HasValue)
 				return;			
-			if (selectionStart.Value == currentLoc.Value) {
+			if (selectionStart.Value == currentLoc.Value)
 				selectionStart = null;
-				//RegisterForRedraw ();
-			}			
 		}
 		public override void onMouseDoubleClick (object sender, MouseButtonEventArgs e)
 		{
 			base.onMouseDoubleClick (sender, e);
-			/*if (!(this.HasFocus || _selectable))
+			if (e.Button != MouseButton.Left || !HasFocus)
 				return;
-			
+
 			GotoWordStart ();
-			SelBegin = CurrentPosition;
+			selectionStart = currentLoc;			
 			GotoWordEnd ();
-			SelRelease = CurrentPosition;
-			SelectionInProgress = false;*/
 			RegisterForRedraw ();
 		}
 		#endregion
@@ -668,6 +682,8 @@ namespace Crow
 				selectionStart = null;
 		}
 
+		protected virtual bool cancelLinePrint (int lineHeght, int y, int clientHeight) => false;
+
 		#endregion
 		/// <summary>
 		/// location column from 
@@ -677,6 +693,7 @@ namespace Crow
 			if (location == null)
 				return;
 			CharLocation loc = location.Value;
+			//Console.WriteLine ($"updateLocation: {loc} text:{_text.Length}");
 			if (loc.HasVisualX)
 				return;
 			TextLine ls = lines[loc.Line];
@@ -726,28 +743,33 @@ namespace Crow
 		}
 
 		RectangleD? textCursor = null;
-		internal bool DrawCursor (Context ctx, out Rectangle rect) {
-			if (!currentLoc.Value.HasVisualX) {
+		internal virtual RectangleD? computeTextCursor (Rectangle cursor) {
+			Rectangle cb = ClientRectangle ;
+			if (cursor.X > cb.Width && cursor.Y > cb.Height)				
+				return null;
+			return cursor;
+		}
+		internal virtual bool DrawCursor (Context ctx, out Rectangle rect) {
+			if (!currentLoc.Value.HasVisualX) {				
 				ctx.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
 				ctx.SetFontSize (Font.Size);
 				ctx.FontOptions = Interface.FontRenderingOptions;
 				ctx.Antialias = Interface.Antialias;
-
-				updateLocation (ctx, ClientRectangle.Width, ref currentLoc);
+				lock(linesMutex)
+					updateLocation (ctx, ClientRectangle.Width, ref currentLoc);
 				textCursor = null;
             }
 			
-			//if (textCursor == null) {
-				Rectangle cb = ClientRectangle;
-			if (currentLoc.Value.VisualCharXPosition > cb.Width) {
+
+			int lineHeight = (int)(fe.Ascent + fe.Descent);
+			textCursor = computeTextCursor (new RectangleD (currentLoc.Value.VisualCharXPosition, currentLoc.Value.Line * lineHeight, 1.0, lineHeight));
+
+			if (textCursor == null) {
 				rect = default;
 				return false;
 			}
-			int lineHeight = (int)(fe.Ascent + fe.Descent);
-			textCursor = new RectangleD (currentLoc.Value.VisualCharXPosition + cb.X + Slot.X,
-						cb.Y + Slot.Y + currentLoc.Value.Line * lineHeight, 1.0, lineHeight);
 			//}
-			Rectangle c = ScreenCoordinates (textCursor.Value);
+			Rectangle c = ScreenCoordinates (textCursor.Value + Slot.Position + ClientRectangle.Position);
 			ctx.ResetClip ();
 			ctx.SetSource (cursorColor);			
 			ctx.LineWidth = 1.0;
