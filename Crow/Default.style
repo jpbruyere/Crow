@@ -85,10 +85,10 @@ TextBox {
 	Background = "White";
 	Foreground = "Black";
 	CursorColor = "Black";
-	Selectable = "True";
+	Focusable = "True";
 	//Text = "TextBox";
 	Margin = "1";
-	MouseCursor = "IBeam";
+	//MouseCursor = "IBeam";
 }
 Menu {
 	Margin = "0";

@@ -172,7 +172,7 @@ namespace Crow
             base.drawContent (gr);
             gr.Translate (scrollX, scrollY);
         }
-        protected override bool cancelLinePrint (int lineHeght, int y, int clientHeight) =>
+        protected override bool cancelLinePrint (double lineHeght, double y, int clientHeight) =>
             y + lineHeght < scrollY || y - lineHeght > clientHeight + scrollY;
         protected override void updateHoverLocation (Point mouseLocalPos) {
             base.updateHoverLocation (mouseLocalPos + new Point (ScrollX, ScrollY));

@@ -355,7 +355,7 @@ namespace Crow
 		protected virtual void drawContent (Context gr) {
 			Rectangle cb = ClientRectangle;
 			fe = gr.FontExtents;
-			int lineHeight = (int)(fe.Ascent + fe.Descent);
+			double lineHeight = fe.Ascent + fe.Descent;
 
 			CharLocation selStart = default, selEnd = default;
 			bool selectionNotEmpty = false;
@@ -390,7 +390,7 @@ namespace Crow
 
 				TextExtents extents;
 				Span<byte> bytes = stackalloc byte[128];
-				int y = cb.Y;
+				double y = cb.Y;
 
 				for (int i = 0; i < lines.Count; i++) {
 					if (!cancelLinePrint (lineHeight, y, cb.Height)) {
@@ -409,7 +409,7 @@ namespace Crow
 							}
 						}
 
-						Rectangle lineRect = new Rectangle (
+						RectangleD lineRect = new RectangleD (
 							Width.IsFit && !Multiline ? cb.X : (int)getX (cb.Width, lines[i]) + cb.X,
 							y, lines[i].LengthInPixel, lineHeight);
 
@@ -419,27 +419,27 @@ namespace Crow
 						}
 
 						if (HasFocus && selectionNotEmpty) {
-							Rectangle selRect = lineRect;
+							RectangleD selRect = lineRect;
 							if (_multiline) {
 								if (i >= selStart.Line && i <= selEnd.Line) {
 									if (selStart.Line == selEnd.Line) {
-										selRect.X = (int)selStart.VisualCharXPosition + cb.X;
-										selRect.Width = (int)(selEnd.VisualCharXPosition - selStart.VisualCharXPosition);
+										selRect.X = selStart.VisualCharXPosition + cb.X;
+										selRect.Width = selEnd.VisualCharXPosition - selStart.VisualCharXPosition;
 									} else if (i == selStart.Line) {
-										int newX = (int)selStart.VisualCharXPosition + cb.X;
-										selRect.Width -= (newX - selRect.X) - 10;
+										double newX = selStart.VisualCharXPosition + cb.X;
+										selRect.Width -= (newX - selRect.X) - 10.0;
 										selRect.X = newX;
 									} else if (i == selEnd.Line) {
-										selRect.Width = (int)selEnd.VisualCharXPosition - selRect.X;
+										selRect.Width = selEnd.VisualCharXPosition - selRect.X;
 									} else
-										selRect.Width += 10;
+										selRect.Width += 10.0;
 								} else {
 									y += lineHeight;
 									continue;
 								}
 							} else {
-								selRect.X = (int)selStart.VisualCharXPosition + cb.X;
-								selRect.Width = (int)(selEnd.VisualCharXPosition - selStart.VisualCharXPosition);
+								selRect.X = selStart.VisualCharXPosition + cb.X;
+								selRect.Width = selEnd.VisualCharXPosition - selStart.VisualCharXPosition;
 							}
 
 							gr.SetSource (selBackground);
@@ -467,7 +467,7 @@ namespace Crow
 				(int)Math.Min (Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent + fe.Descent))), lines.Count - 1) : 0;
 			hoverLoc = new CharLocation (hoverLine, -1, mouseLocalPos.X);
 		}
-		protected virtual bool cancelLinePrint (int lineHeght, int y, int clientHeight) => false;
+		protected virtual bool cancelLinePrint (double lineHeght, double y, int clientHeight) => false;
 		RectangleD? textCursor = null;
 		internal virtual RectangleD? computeTextCursor (Rectangle cursor) {
 			Rectangle cb = ClientRectangle;
