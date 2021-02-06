@@ -355,7 +355,7 @@ namespace Crow
 
 				TextExtents extents;
 				Span<byte> bytes = stackalloc byte[128];
-				double y = cb.Y;
+				double y = 0;
 
 				for (int i = 0; i < lines.Count; i++) {
 					if (!cancelLinePrint (lineHeight, y, cb.Height)) {
@@ -376,7 +376,7 @@ namespace Crow
 
 						RectangleD lineRect = new RectangleD (
 							Width.IsFit && !Multiline ? cb.X : (int)getX (cb.Width, lines[i]) + cb.X,
-							y, lines[i].LengthInPixel, lineHeight);
+							y + cb.Top, lines[i].LengthInPixel, lineHeight);
 
 						if (encodedBytes > 0) {
 							gr.MoveTo (lineRect.X, lineRect.Y + fe.Ascent);
