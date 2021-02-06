@@ -35,10 +35,11 @@ namespace Crow.Text
 			LengthIncludingLineBreak = 0;
 			LengthInPixel = -1;
 		}
-		public TextLine WithStartOffset (int start) => new TextLine (Start + start, End, EndIncludingLineBreak);
-
-		
-
+		public void SetLength (int newLength) {
+			LengthInPixel = -1;
+			Length = newLength;
+        }
+		public TextLine WithStartOffset (int start) => new TextLine (Start + start, End, EndIncludingLineBreak);		
 		public int CompareTo (TextLine other) => Start - other.Start;
     }
 }

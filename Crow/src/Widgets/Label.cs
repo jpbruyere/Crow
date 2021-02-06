@@ -255,47 +255,12 @@ namespace Crow
 			else
 				lines.Clear ();
 
-			if (string.IsNullOrEmpty (_text)) {
+			if (string.IsNullOrEmpty (_text))
 				lines.Add (new TextLine (0, 0, 0));
-				return;
-			}
-			if (!_multiline) {
+			else if (!_multiline)
 				lines.Add (new TextLine (0, _text.Length, _text.Length));
-				return;
-			}
-
-			int start = 0, i = 0;
-			while (i < _text.Length) {
-				char c = _text[i];
-				if (c == '\r') {
-					if (++i < _text.Length) {
-						if (_text[i] == '\n')
-							lines.Add (new TextLine (start, i - 1, ++i));
-						else
-							lines.Add (new TextLine (start, i - 1, i));
-					} else
-						lines.Add (new TextLine (start, i - 1, i));
-					start = i;
-				} else if (c == '\n') {
-					if (++i < _text.Length) {
-						if (_text[i] == '\r')
-							lines.Add (new TextLine (start, i - 1, ++i));
-						else
-							lines.Add (new TextLine (start, i - 1, i));
-					} else
-						lines.Add (new TextLine (start, i - 1, i));
-					start = i;
-
-				} else if (c == '\u0085' || c == '\u2028' || c == '\u2029')
-					lines.Add (new TextLine (start, i - 1, i));
-				else
-					i++;
-			}
-
-			if (start < i)
-				lines.Add (new TextLine (start, _text.Length, _text.Length));
 			else
-				lines.Add (new TextLine (_text.Length, _text.Length, _text.Length));
+				lines.Update (_text);
 		}
 		/// <summary>
 		/// Current Selected text span.
@@ -417,6 +382,14 @@ namespace Crow
 							gr.MoveTo (lineRect.X, lineRect.Y + fe.Ascent);
 							gr.ShowText (bytes.Slice (0, encodedBytes));
 						}
+						/********** DEBUG TextLineCollection *************
+						gr.SetSource (Colors.Red);
+						gr.SetFontSize (9);
+						gr.MoveTo (700, lineRect.Y + fe.Ascent);
+						gr.ShowText ($"({lines[i].Start}, {lines[i].End}, {lines[i].EndIncludingLineBreak})");
+						gr.SetFontSize (Font.Size);
+						Foreground.SetAsSource (IFace, gr);
+						********** DEBUG TextLineCollection *************/
 
 						if (HasFocus && selectionNotEmpty) {
 							RectangleD selRect = lineRect;
@@ -430,7 +403,7 @@ namespace Crow
 										selRect.Width -= (newX - selRect.X) - 10.0;
 										selRect.X = newX;
 									} else if (i == selEnd.Line) {
-										selRect.Width = selEnd.VisualCharXPosition - selRect.X;
+										selRect.Width = selEnd.VisualCharXPosition - selRect.X + cb.X;
 									} else
 										selRect.Width += 10.0;
 								} else {
@@ -519,6 +492,12 @@ namespace Crow
 
 			if (loc.Column >= 0) {
 				//int encodedBytes = Crow.Text.Encoding2.ToUtf8 (curLine.Slice (0, loc.Column), bytes);
+				//DEBUG
+				if (loc.Column > curLine.Length) {
+					Console.WriteLine ($"loc.Column: {loc.Column} curLine.Length:{curLine.Length}");
+					loc.Column = curLine.Length;
+                }
+
 				loc.VisualCharXPosition = gr.TextExtents (curLine.Slice (0, loc.Column), Interface.TAB_SIZE).XAdvance + cPos;
 				location = loc;
 				return;

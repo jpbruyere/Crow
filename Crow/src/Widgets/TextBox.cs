@@ -326,10 +326,10 @@ namespace Crow
                 src.Slice (0, change.Start).CopyTo (tmp);
                 change.ChangedText.AsSpan ().CopyTo (tmp.Slice (change.Start));
                 src.Slice (change.End).CopyTo (tmp.Slice (change.Start + change.ChangedText.Length));
-
             
                 _text = tmp.ToString ();
-                getLines ();
+                lines.Update (change);
+                //lines.Update (_text);
                 selectionStart = null;
 
                 currentLoc = lines.GetLocation (change.Start + change.ChangedText.Length);
