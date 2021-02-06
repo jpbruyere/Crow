@@ -191,6 +191,7 @@ namespace Crow
 					tmp -= tmp % SmallIncrement;
 					Value = tmp;
 				}
+				e.Handled = true;
 			}
 			
 			base.onMouseMove (sender, e);
