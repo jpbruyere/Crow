@@ -22,7 +22,7 @@ namespace Crow
 					return  NativeLibrary.Load("glfw", assembly, null);
 				case "rsvg-2.40":
 					return  NativeLibrary.Load("rsvg-2", assembly, null);
-			}			
+			}
 			Console.WriteLine ($"[UNRESOLVE] {assembly} {libraryName}");			
 			return IntPtr.Zero;
 		}
@@ -30,7 +30,7 @@ namespace Crow
 		static SampleBase () {
 			System.Runtime.Loader.AssemblyLoadContext.Default.ResolvingUnmanagedDll+=resolveUnmanaged;
 		}
-#endif			
+#endif
 		public Version CrowVersion => Assembly.GetAssembly (typeof (Widget)).GetName ().Version;
 
 		#region Test values for Binding

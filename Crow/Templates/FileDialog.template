@@ -50,7 +50,7 @@
 					<CheckBox Style="CheckBoxAlt" Name="cbShowFiles" Caption="Show Files" IsChecked="{²./ShowFiles}"/>
 					<CheckBox Style="CheckBoxAlt" Name="cbShowHidden" Caption="Show Hidden" IsChecked="{²./ShowHidden}"/>
 				</HorizontalStack>
-				<HorizontalStack Fit="true" HorizontalAlignment="Right">
+				<HorizontalStack Fit="true" HorizontalAlignment="Right" Margin="3" Spacing="3">
 					<Button Caption="Ok" MouseClick="./onFileSelect"/>
 					<Button Caption="Cancel" MouseClick="./onCancel"/>
 				</HorizontalStack>

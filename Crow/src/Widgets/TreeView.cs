@@ -7,8 +7,10 @@ using System.ComponentModel;
 
 namespace Crow
 {
-	//treeview expect expandable child (or not)
-	//if their are expandable, some functions and events are added
+	/// <summary>
+	/// Treeview expect expandable child (or not)
+	/// if their are expandable, some functions and events are added
+	/// </summary>
 	public class TreeView : TemplatedGroup
 	{
 		bool isRoot;
@@ -18,6 +20,7 @@ namespace Crow
 		public TreeView (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
+		//TODO: check if not obsolete (IsRoot)
 		[DefaultValue(false)]
 		public virtual bool IsRoot {
 			get { return isRoot; }
