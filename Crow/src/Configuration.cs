@@ -29,9 +29,13 @@ namespace Crow
 			if (type == null)
 				type = typeof(T);
 			if (parsingNeeded) {
-				MethodInfo miParse = type.GetMethod ("Parse", new Type[] {typeof(string)});
-				if (miParse != null)
-					curVal = miParse.Invoke (null, new object[]{ curVal });
+				if (type.IsEnum) {
+					curVal = Enum.Parse (typeof(T), (string)curVal);
+				}else{
+					MethodInfo miParse = type.GetMethod ("Parse", new Type[] {typeof(string)});
+					if (miParse != null)
+						curVal = miParse.Invoke (null, new object[]{ curVal });
+				}
 				parsingNeeded = false;
 			}
 			return (T)Convert.ChangeType (curVal, type);

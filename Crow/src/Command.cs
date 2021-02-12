@@ -4,6 +4,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace Crow {
 	public class CommandGroup : ObservableList<Command>, IValueChange
@@ -123,8 +124,10 @@ namespace Crow {
 		/// trigger the execution of the command
 		/// </summary>
 		public void Execute(){
-			if (execute != null && CanExecute)
-				execute ();
+			if (execute != null && CanExecute){
+				Task task = new Task(execute);
+				task.Start();
+			}
 		}
 		internal void raiseAllValuesChanged(){
 			NotifyValueChanged ("CanExecute", CanExecute);
