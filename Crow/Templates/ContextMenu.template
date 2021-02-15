@@ -3,9 +3,8 @@
 	IsOpened ="true" Visible="{/IsOpened}" Background="Red">
 	<Template>
 		<HorizontalStack>
-			<Border Background="DimGrey" Foreground="DimGrey" CornerRadius="5">
-			<GenericStack Orientation="{./Orientation}" Name="ItemsContainer"
-				Margin="2"/>
+			<Border Background="DarkGrey" Foreground="Black" CornerRadius="0">
+			<GenericStack Orientation="{./Orientation}" Name="ItemsContainer" Margin="2"/>
 			</Border>
 		</HorizontalStack>
 	</Template>
@@ -17,7 +16,7 @@
 					IsPopped="{²./IsOpened}" PopWidth="{./PopWidth}" PopHeight="{./PopHeight}">
 					<Template>
 						<Border Name="border1"
-								CornerRadius="2"
+								CornerRadius="0"
 								MouseEnter="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black}"
 								MouseLeave="{Foreground=Transparent}"
 								MouseDown="{Foreground=vgradient|0:Black|0.05:Grey|0.85:Grey|1:White}"
@@ -27,7 +26,7 @@
 								Background="{./Background}">
 								<Label Text="{./Caption}"
 									Foreground="{./Foreground}"
-									Margin="3" HorizontalAlignment="Left"
+									Margin="1" HorizontalAlignment="Left"
 									Font="{./Font}"	/>
 						</Border>
 					</Template>

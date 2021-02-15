@@ -78,7 +78,7 @@ namespace ShowCase
 		public static Picture IcoPaste = new SvgPicture ("#Icons.paste-on-document.svg");
 
 		public Command CMDNew, CMDSave, CMDSaveAs, CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste;
-
+		public CommandGroup ContextCommands => new CommandGroup (CMDNew, CMDSave, CMDSaveAs);
 		void initCommands ()
 		{
 			CMDNew = new Command (new Action (onNewFile)) { Caption = "New", Icon = "#Icons.blank-file.svg", CanExecute = true };

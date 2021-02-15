@@ -889,14 +889,10 @@ namespace Crow
 
 				isVisible = value;
 
-				RegisterForLayouting (LayoutingType.Sizing);
-
-				if (!isVisible && IFace.HoverWidget != null) {					
-					if (IFace.HoverWidget.IsOrIsInside (this)) {
-						//IFace.HoverWidget = null;
-						IFace.OnMouseMove (IFace.MousePosition.X, IFace.MousePosition.Y);
-					}
-				}
+				if (Visible)
+					RegisterForLayouting (LayoutingType.Sizing);
+				else
+					unshownPostActions ();
 
 				NotifyValueChangedAuto (isVisible);
 			}
@@ -2102,6 +2098,13 @@ namespace Crow
 			}
 			if (IFace.HoverWidget != null) {
 				if (IFace.HoverWidget.IsOrIsInside (this)) {
+					Widget w = IFace.HoverWidget;
+					MouseMoveEventArgs e = new MouseMoveEventArgs (IFace.MousePosition.X, IFace.MousePosition.Y, 0, 0);
+					while (w != this) {
+						w.onMouseLeave (this, e);
+						w = w.FocusParent;
+					}
+					this.onMouseLeave (this, e);
 					IFace.HoverWidget = null;
 					IFace.OnMouseMove (IFace.MousePosition.X, IFace.MousePosition.Y);
 				}

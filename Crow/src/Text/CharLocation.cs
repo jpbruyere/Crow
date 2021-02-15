@@ -18,7 +18,7 @@ namespace Crow.Text
 			Column = column;
 			VisualCharXPosition = visualX;
 		}
-		public bool HasVisualX => Column >= 0 && VisualCharXPosition >= 0;
+		public bool HasVisualX => Column >= 0 && VisualCharXPosition >= 0;		
 		public void ResetVisualX () => VisualCharXPosition = -1;
 		public static bool operator == (CharLocation a, CharLocation b)
 			=> a.Equals (b);

@@ -53,7 +53,7 @@ namespace Crow
 					return;
 				currentLoc = value;
 				NotifyValueChanged ("CurrentLine", CurrentLine);
-				NotifyValueChanged ("CurrentCollumn", CurrentColumn);
+				NotifyValueChanged ("CurrentColumn", CurrentColumn);
             }
         }
 		public int CurrentLine {
@@ -79,7 +79,9 @@ namespace Crow
 		/// </summary>
 		/// <param name="position">Absolute character position in text.</param>
 		public void SetCursorPosition (int position) {
-			CurrentLoc = lines.GetLocation (position);
+			CharLocation loc = lines.GetLocation (position);
+			loc.Column = Math.Min (loc.Column, lines[loc.Line].Length);
+			CurrentLoc = loc;
 		}
 
 		protected LineCollection lines;
@@ -362,7 +364,11 @@ namespace Crow
 			bool selectionNotEmpty = false;
 
 			if (HasFocus) {
-				updateLocation (gr, cb.Width, ref currentLoc);
+				if (currentLoc?.Column < 0) {
+					updateLocation (gr, cb.Width, ref currentLoc);
+					NotifyValueChanged ("CurrentColumn", CurrentColumn);
+				} else
+					updateLocation (gr, cb.Width, ref currentLoc);
 				if (selectionStart.HasValue) {
 					updateLocation (gr, cb.Width, ref selectionStart);
 					if (CurrentLoc.Value != selectionStart.Value)
@@ -490,8 +496,13 @@ namespace Crow
 				ctx.SetFontSize (Font.Size);
 				ctx.FontOptions = Interface.FontRenderingOptions;
 				ctx.Antialias = Interface.Antialias;
-				lock (linesMutex)
-					updateLocation (ctx, ClientRectangle.Width, ref currentLoc);
+				lock (linesMutex) {					
+					if (currentLoc?.Column < 0) {
+						updateLocation (ctx, ClientRectangle.Width, ref currentLoc);
+						NotifyValueChanged ("CurrentColumn", CurrentColumn);
+					} else
+						updateLocation (ctx, ClientRectangle.Width, ref currentLoc);
+				}
 				textCursor = null;
 			}
 

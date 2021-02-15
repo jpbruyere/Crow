@@ -17,9 +17,15 @@
 				<Button Style="IcoButton" Command="{CMDNew}" />
 				<Button Style="IcoButton" Command="{CMDSave}" />
 				<Button Style="IcoButton" Command="{CMDSaveAs}" />
+				<Widget Width="Stretched"/>
+				<Label Text="Line:" Foreground="Grey"/>
+				<Label Text="{../../tb.CurrentLine}"  Margin="2"/>
+				<Label Text="Col:" Foreground="Grey"/>
+				<Label Text="{../../tb.CurrentColumn}" Margin="2"/>
 			</HorizontalStack>
 			<HorizontalStack>
-				<TextBox Name="tb" Text="{²Source}" Multiline="true" Font="consolas, 12" Focusable="true" Height="Stretched" Width="Stretched" />
+				<TextBox Name="tb" Text="{²Source}" Multiline="true" Font="consolas, 12" Focusable="true" Height="Stretched" Width="Stretched"
+						 ContextCommands="{ContextCommands}"/>
 				<ScrollBar Value="{²../tb.ScrollY}"
 						LargeIncrement="{../tb.PageHeight}" SmallIncrement="1"
 						CursorRatio="{../tb.ChildHeightRatio}" Maximum="{../tb.MaxScrollY}" />
