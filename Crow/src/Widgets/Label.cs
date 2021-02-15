@@ -46,6 +46,42 @@ namespace Crow
 		protected CharLocation? currentLoc = null;
 		protected CharLocation? selectionStart = null;  //selection start (row,column)
 
+		protected CharLocation? CurrentLoc {
+			get => currentLoc;
+			set {
+				if (currentLoc == value)
+					return;
+				currentLoc = value;
+				NotifyValueChanged ("CurrentLine", CurrentLine);
+				NotifyValueChanged ("CurrentCollumn", CurrentColumn);
+            }
+        }
+		public int CurrentLine {
+			get => currentLoc.HasValue ? currentLoc.Value.Line : 0;
+			set {
+				if (currentLoc?.Line == value)
+					return;
+				currentLoc = new CharLocation (value, currentLoc.Value.Column, currentLoc.Value.VisualCharXPosition);
+				NotifyValueChanged ("CurrentLine", CurrentLine);
+			}
+        }
+		public int CurrentColumn {
+			get => currentLoc.HasValue ? currentLoc.Value.Column < 0 ? 0 : currentLoc.Value.Column : 0;
+			set {
+				if (currentLoc?.Line == value)
+					return;
+				currentLoc = new CharLocation (currentLoc.Value.Line, value, currentLoc.Value.VisualCharXPosition);
+				NotifyValueChanged ("CurrentColumn", CurrentColumn);
+			}
+		}
+		/// <summary>
+		/// Set current cursor position in label.
+		/// </summary>
+		/// <param name="position">Absolute character position in text.</param>
+		public void SetCursorPosition (int position) {
+			CurrentLoc = lines.GetLocation (position);
+		}
+
 		protected LineCollection lines;
 		protected bool textMeasureIsUpToDate = false;
 		protected object linesMutex = new object ();
@@ -111,7 +147,7 @@ namespace Crow
 					return;
 				_textAlignment = value;
 
-				currentLoc?.ResetVisualX ();
+				CurrentLoc?.ResetVisualX ();
 				selectionStart?.ResetVisualX ();
 
 				RegisterForRedraw ();
@@ -169,28 +205,28 @@ namespace Crow
 		/// <returns><c>true</c> if move succeed</returns>		
 		public bool MoveLeft(){
 			//targetColumn = -1;
-			CharLocation loc = currentLoc.Value;
+			CharLocation loc = CurrentLoc.Value;
 			if (loc.Column == 0) {
 				if (loc.Line == 0)
 					return false;
-				currentLoc = new CharLocation (loc.Line - 1, lines[loc.Line - 1].Length);
+				CurrentLoc = new CharLocation (loc.Line - 1, lines[loc.Line - 1].Length);
             }else
-				currentLoc = new CharLocation (loc.Line, loc.Column - 1);
+				CurrentLoc = new CharLocation (loc.Line, loc.Column - 1);
 			return true;
 		}
 		public bool MoveRight () {
 			targetColumn = -1;
-			CharLocation loc = currentLoc.Value;
+			CharLocation loc = CurrentLoc.Value;
 			if (loc.Column == lines[loc.Line].Length) {
 				if (loc.Line == lines.Count - 1)
 					return false;
-				currentLoc = new CharLocation (loc.Line + 1, 0);
+				CurrentLoc = new CharLocation (loc.Line + 1, 0);
 			} else
-				currentLoc = new CharLocation (loc.Line, loc.Column + 1);
+				CurrentLoc = new CharLocation (loc.Line, loc.Column + 1);
 			return true;
 		}		
 		public bool LineMove (int lineDiff) {
-			CharLocation loc = currentLoc.Value;
+			CharLocation loc = CurrentLoc.Value;
 			int newLine = Math.Min (Math.Max (0, loc.Line + lineDiff), lines.Count - 1);
 
 			if (newLine == loc.Line)
@@ -199,34 +235,34 @@ namespace Crow
 			if (loc.Column > lines[newLine].Length) {
 				if (targetColumn < 0)
 					targetColumn = loc.Column;
-				currentLoc = new CharLocation (newLine, lines[newLine].Length);
+				CurrentLoc = new CharLocation (newLine, lines[newLine].Length);
 			} else if (targetColumn < 0)
-				currentLoc = new CharLocation (newLine, loc.Column);
+				CurrentLoc = new CharLocation (newLine, loc.Column);
 			else if (targetColumn > lines[newLine].Length)
-				currentLoc = new CharLocation (newLine, lines[newLine].Length);
+				CurrentLoc = new CharLocation (newLine, lines[newLine].Length);
 			else
-				currentLoc = new CharLocation (newLine, targetColumn);
+				CurrentLoc = new CharLocation (newLine, targetColumn);
 
 			return true;
         }
 		protected int visibleLines => (int)((double)ClientRectangle.Height / (fe.Ascent + fe.Descent));
 		public void GotoWordStart(){
-			int pos = lines.GetAbsolutePosition (currentLoc.Value);			
+			int pos = lines.GetAbsolutePosition (CurrentLoc.Value);			
 			//skip white spaces
 			while (pos > 0 && !char.IsLetterOrDigit (_text[pos-1]))
 				pos--;
 			while (pos > 0 && char.IsLetterOrDigit (_text[pos-1]))
 				pos--;
-			currentLoc = lines.GetLocation (pos);
+			CurrentLoc = lines.GetLocation (pos);
 		}
 		public void GotoWordEnd(){
-			int pos = lines.GetAbsolutePosition (currentLoc.Value);
+			int pos = lines.GetAbsolutePosition (CurrentLoc.Value);
 			//skip white spaces
 			while (pos < _text.Length -1 && !char.IsLetterOrDigit (_text[pos]))
 				pos++;
 			while (pos < _text.Length - 1 && char.IsLetterOrDigit (_text[pos]))
 				pos++;
-			currentLoc = lines.GetLocation (pos);
+			CurrentLoc = lines.GetLocation (pos);
 		}		
 
 		protected void detectLineBreak () {
@@ -267,20 +303,20 @@ namespace Crow
 		/// </summary>
 		public TextSpan Selection {
 			get {				
-				CharLocation selStart = currentLoc.Value, selEnd = currentLoc.Value;
+				CharLocation selStart = CurrentLoc.Value, selEnd = CurrentLoc.Value;
 				if (selectionStart.HasValue) {
-					if (currentLoc.Value.Line < selectionStart.Value.Line) {
-						selStart = currentLoc.Value;
+					if (CurrentLoc.Value.Line < selectionStart.Value.Line) {
+						selStart = CurrentLoc.Value;
 						selEnd = selectionStart.Value;
-					} else if (currentLoc.Value.Line > selectionStart.Value.Line) {
+					} else if (CurrentLoc.Value.Line > selectionStart.Value.Line) {
 						selStart = selectionStart.Value;
-						selEnd = currentLoc.Value;
-					} else if (currentLoc.Value.Column < selectionStart.Value.Column) {
-						selStart = currentLoc.Value;
+						selEnd = CurrentLoc.Value;
+					} else if (CurrentLoc.Value.Column < selectionStart.Value.Column) {
+						selStart = CurrentLoc.Value;
 						selEnd = selectionStart.Value;
 					} else {
 						selStart = selectionStart.Value;
-						selEnd = currentLoc.Value;
+						selEnd = CurrentLoc.Value;
 					}
 				}
 				return new TextSpan (lines.GetAbsolutePosition (selStart), lines.GetAbsolutePosition (selEnd));
@@ -329,22 +365,22 @@ namespace Crow
 				updateLocation (gr, cb.Width, ref currentLoc);
 				if (selectionStart.HasValue) {
 					updateLocation (gr, cb.Width, ref selectionStart);
-					if (currentLoc.Value != selectionStart.Value)
+					if (CurrentLoc.Value != selectionStart.Value)
 						selectionNotEmpty = true;
 				}
 				if (selectionNotEmpty) {
-					if (currentLoc.Value.Line < selectionStart.Value.Line) {
-						selStart = currentLoc.Value;
+					if (CurrentLoc.Value.Line < selectionStart.Value.Line) {
+						selStart = CurrentLoc.Value;
 						selEnd = selectionStart.Value;
-					} else if (currentLoc.Value.Line > selectionStart.Value.Line) {
+					} else if (CurrentLoc.Value.Line > selectionStart.Value.Line) {
 						selStart = selectionStart.Value;
-						selEnd = currentLoc.Value;
-					} else if (currentLoc.Value.Column < selectionStart.Value.Column) {
-						selStart = currentLoc.Value;
+						selEnd = CurrentLoc.Value;
+					} else if (CurrentLoc.Value.Column < selectionStart.Value.Column) {
+						selStart = CurrentLoc.Value;
 						selEnd = selectionStart.Value;
 					} else {
 						selStart = selectionStart.Value;
-						selEnd = currentLoc.Value;
+						selEnd = CurrentLoc.Value;
 					}
 				} else
 					IFace.forceTextCursor = true;
@@ -449,7 +485,7 @@ namespace Crow
 			return cursor;
 		}
 		internal virtual bool DrawCursor (Context ctx, out Rectangle rect) {
-			if (!currentLoc.Value.HasVisualX) {
+			if (!CurrentLoc.Value.HasVisualX) {
 				ctx.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
 				ctx.SetFontSize (Font.Size);
 				ctx.FontOptions = Interface.FontRenderingOptions;
@@ -461,7 +497,7 @@ namespace Crow
 
 
 			int lineHeight = (int)(fe.Ascent + fe.Descent);
-			textCursor = computeTextCursor (new RectangleD (currentLoc.Value.VisualCharXPosition, currentLoc.Value.Line * lineHeight, 1.0, lineHeight));
+			textCursor = computeTextCursor (new RectangleD (CurrentLoc.Value.VisualCharXPosition, CurrentLoc.Value.Line * lineHeight, 1.0, lineHeight));
 
 			if (textCursor == null) {
 				rect = default;
@@ -492,39 +528,38 @@ namespace Crow
 
 			if (loc.Column >= 0) {
 				//int encodedBytes = Crow.Text.Encoding2.ToUtf8 (curLine.Slice (0, loc.Column), bytes);
-				//DEBUG
+#if DEBUG
 				if (loc.Column > curLine.Length) {
-					Console.WriteLine ($"loc.Column: {loc.Column} curLine.Length:{curLine.Length}");
+                    System.Diagnostics.Debug.WriteLine ($"loc.Column: {loc.Column} curLine.Length:{curLine.Length}");
 					loc.Column = curLine.Length;
-                }
-
+				}
+#endif
 				loc.VisualCharXPosition = gr.TextExtents (curLine.Slice (0, loc.Column), Interface.TAB_SIZE).XAdvance + cPos;
 				location = loc;
-				return;
-			}
+			} else {
+				TextExtents te;
+				Span<byte> bytes = stackalloc byte[5];//utf8 single char buffer + '\0'
 
-			TextExtents te;
-			Span<byte> bytes = stackalloc byte[5];//utf8 single char buffer + '\0'
+				for (int i = 0; i < ls.Length; i++) {
+					int encodedBytes = Crow.Text.Encoding.ToUtf8 (curLine.Slice (i, 1), bytes);
+					bytes[encodedBytes] = 0;
 
-			for (int i = 0; i < ls.Length; i++) {
-				int encodedBytes = Crow.Text.Encoding.ToUtf8 (curLine.Slice (i, 1), bytes);
-				bytes[encodedBytes] = 0;
+					gr.TextExtents (bytes, out te);
+					double halfWidth = te.XAdvance / 2;
 
-				gr.TextExtents (bytes, out te);
-				double halfWidth = te.XAdvance / 2;
+					if (loc.VisualCharXPosition <= cPos + halfWidth) {
+						loc.Column = i;
+						loc.VisualCharXPosition = cPos;
+						location = loc;
+						return;
+					}
 
-				if (loc.VisualCharXPosition <= cPos + halfWidth) {
-					loc.Column = i;
-					loc.VisualCharXPosition = cPos;
-					location = loc;
-					return;
+					cPos += te.XAdvance;
 				}
-
-				cPos += te.XAdvance;
+				loc.Column = ls.Length;
+				loc.VisualCharXPosition = cPos;
+				location = loc;
 			}
-			loc.Column = ls.Length;
-			loc.VisualCharXPosition = cPos;
-			location = loc;
 		}
 		double getX (int clientWidth, TextLine ls) {
 			switch (TextAlignment) {
@@ -538,7 +573,7 @@ namespace Crow
 		protected void checkShift () {
 			if (IFace.Shift) {
 				if (!selectionStart.HasValue)
-					selectionStart = currentLoc;
+					selectionStart = CurrentLoc;
 			} else
 				selectionStart = null;
 		}
@@ -605,9 +640,9 @@ namespace Crow
 		protected override void onFocused (object sender, EventArgs e)
 		{
 			base.onFocused (sender, e);
-			if (currentLoc == null) {
+			if (CurrentLoc == null) {
 				selectionStart = new CharLocation (0, 0);				
-				currentLoc = new CharLocation (lines.Count - 1, lines[lines.Count - 1].Length);
+				CurrentLoc = new CharLocation (lines.Count - 1, lines[lines.Count - 1].Length);
 			}
 			RegisterForRedraw ();
 		}
@@ -628,7 +663,7 @@ namespace Crow
 			updateHoverLocation (e.Position - ScreenCoordinates (Slot).TopLeft - ClientRectangle.TopLeft);
 
 			if (HasFocus && IFace.IsDown (MouseButton.Left)) {
-				currentLoc = hoverLoc;				
+				CurrentLoc = hoverLoc;				
 				RegisterForRedraw ();				
 			}
 		}		
@@ -640,8 +675,8 @@ namespace Crow
 					if (!IFace.Shift)						 
 						selectionStart = hoverLoc;
 					else if (!selectionStart.HasValue)
-						selectionStart = currentLoc;
-					currentLoc = hoverLoc;
+						selectionStart = CurrentLoc;
+					CurrentLoc = hoverLoc;
 					IFace.forceTextCursor = true;
 					RegisterForRedraw ();
 					e.Handled = true;
@@ -656,7 +691,7 @@ namespace Crow
 			base.onMouseUp (sender, e);
 			if (e.Button != MouseButton.Left || !HasFocus || !selectionStart.HasValue)
 				return;			
-			if (selectionStart.Value == currentLoc.Value)
+			if (selectionStart.Value == CurrentLoc.Value)
 				selectionStart = null;
 		}
 		public override void onMouseDoubleClick (object sender, MouseButtonEventArgs e)
@@ -666,7 +701,7 @@ namespace Crow
 				return;
 
 			GotoWordStart ();
-			selectionStart = currentLoc;			
+			selectionStart = CurrentLoc;			
 			GotoWordEnd ();
 			RegisterForRedraw ();
 		}
@@ -684,15 +719,15 @@ namespace Crow
 				targetColumn = -1;
 				checkShift ();
 				if (IFace.Ctrl)
-					currentLoc = new CharLocation (0, 0);
+					CurrentLoc = new CharLocation (0, 0);
 				else
-					currentLoc = new CharLocation (currentLoc.Value.Line, 0);
+					CurrentLoc = new CharLocation (CurrentLoc.Value.Line, 0);
 				RegisterForRedraw ();
 				break;
 			case Key.End:
 				checkShift ();
-				int l = IFace.Ctrl ? lines.Count - 1 : currentLoc.Value.Line;
-				currentLoc = new CharLocation (l, lines[l].Length);
+				int l = IFace.Ctrl ? lines.Count - 1 : CurrentLoc.Value.Line;
+				CurrentLoc = new CharLocation (l, lines[l].Length);
 				RegisterForRedraw ();
 				break;
 			case Key.Insert:

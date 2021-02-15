@@ -7,6 +7,10 @@ namespace Crow.Text
 	public struct CharLocation : IEquatable<CharLocation>
 	{
 		public readonly int Line;
+		/// <summary>
+		/// Character position in current line. If equals '-1', the visualX must contains the on screen position.
+		/// 
+		/// </summary>
 		public int Column;
 		public double VisualCharXPosition;
 		public CharLocation (int line, int column, double visualX = -1) {

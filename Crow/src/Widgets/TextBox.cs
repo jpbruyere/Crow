@@ -146,20 +146,20 @@ namespace Crow
                 return;
             Rectangle cb = ClientRectangle;
 
-            if (currentLoc.Value.VisualCharXPosition < scrollX)
-                ScrollX = (int)currentLoc.Value.VisualCharXPosition;
-            else if (currentLoc.Value.VisualCharXPosition > cb.Width + scrollX)
-                ScrollX = (int)currentLoc.Value.VisualCharXPosition - cb.Width;
+            if (CurrentLoc.Value.VisualCharXPosition < scrollX)
+                ScrollX = (int)CurrentLoc.Value.VisualCharXPosition;
+            else if (CurrentLoc.Value.VisualCharXPosition > cb.Width + scrollX)
+                ScrollX = (int)CurrentLoc.Value.VisualCharXPosition - cb.Width;
 
             double lineHeight = fe.Ascent + fe.Descent;
             int firstLine = (int)Math.Ceiling((double)scrollY / lineHeight);
             int lastLine = (int)Math.Floor((double)(scrollY + cb.Height) / lineHeight) - 1;
             //Console.WriteLine ($"current: {currentLoc.Value.Line} first:{firstLine} last:{lastLine}");
 
-            if (currentLoc.Value.Line < firstLine)
-                ScrollY = (int)(lineHeight * currentLoc.Value.Line);
-            else if (currentLoc.Value.Line > lastLine)
-                ScrollY = (int)(lineHeight * (currentLoc.Value.Line + 1)) - cb.Height;
+            if (CurrentLoc.Value.Line < firstLine)
+                ScrollY = (int)(lineHeight * CurrentLoc.Value.Line);
+            else if (CurrentLoc.Value.Line > lastLine)
+                ScrollY = (int)(lineHeight * (CurrentLoc.Value.Line + 1)) - cb.Height;
 
         }
         #endregion
@@ -241,8 +241,8 @@ namespace Crow
                 if (selection.IsEmpty) {
                     if (selection.Start == 0)
                         return;
-                    if (currentLoc.Value.Column == 0) {
-                        int lbLength = lines[currentLoc.Value.Line - 1].LineBreakLength;
+                    if (CurrentLoc.Value.Column == 0) {
+                        int lbLength = lines[CurrentLoc.Value.Line - 1].LineBreakLength;
                         update (new TextChange (selection.Start - lbLength, lbLength, ""));
                     }else
                         update (new TextChange (selection.Start - 1, 1, ""));
@@ -253,8 +253,8 @@ namespace Crow
                 if (selection.IsEmpty) {
                     if (selection.Start == Text.Length)
                         return;
-                    if (currentLoc.Value.Column >= lines[currentLoc.Value.Line].Length) 
-                        update (new TextChange (selection.Start, lines[currentLoc.Value.Line].LineBreakLength, ""));                        
+                    if (CurrentLoc.Value.Column >= lines[CurrentLoc.Value.Line].Length) 
+                        update (new TextChange (selection.Start, lines[CurrentLoc.Value.Line].LineBreakLength, ""));                        
                     else
                         update (new TextChange (selection.Start, 1, ""));
                 } else {
@@ -280,7 +280,7 @@ namespace Crow
                 break;
             case Key.Escape:
                 selectionStart = null;
-                currentLoc = lines.GetLocation (selection.Start);
+                CurrentLoc = lines.GetLocation (selection.Start);
                 RegisterForRedraw ();
                 break;
             case Key.Tab:
@@ -332,7 +332,7 @@ namespace Crow
                 //lines.Update (_text);
                 selectionStart = null;
 
-                currentLoc = lines.GetLocation (change.Start + change.ChangedText.Length);
+                CurrentLoc = lines.GetLocation (change.Start + change.ChangedText.Length);
                 textMeasureIsUpToDate = false;
                 IFace.forceTextCursor = true;
             }

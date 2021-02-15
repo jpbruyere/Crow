@@ -1,26 +1,2 @@
 ﻿<?xml version="1.0"?>
-<HorizontalStack >
-	<VerticalStack Background="Jet" Height="Stretched" Width="50%" Margin="10" >
-		<TextBox Margin="0"  Text="Hello World this is a test string" Focusable="true" Font="serif,14"/>
-		<TextBox Margin="15" Text="Hello World this is a test string" Focusable="true" Font="serif,14"
-			   Background="Grey" Focused="{Background=White}" Unfocused="{Background=Grey}"/>
-		<TextBox Width="300" Height="50"  Text="Hello World this is a test string" Focusable="true" Font="serif,14"
-			   Background="Grey" Focused="{Background=White}" Unfocused="{Background=Grey}"/>
-		<TextBox TextAlignment="Right" Width="300" Height="50"  Text="Hello World this is a test string" Focusable="true" Font="serif,14"
-			   Background="Grey" Focused="{Background=White}" Unfocused="{Background=Grey}"/>
-		<TextBox Name="lab" TextAlignment="Center" Width="Fit" Height="50"  Text="Hello World this is a test string" Focusable="true" Font="serif,14"
-			   Background="Grey" Focused="{Background=White}" Unfocused="{Background=Grey}"/>
-	</VerticalStack>
-	<VerticalStack Background="Jet" Height="Stretched" Margin="10">
-		<TextBox Multiline="true" TextAlignment="{TextAlignment}" Width="320" Height="Fit"
-				 Text="{MultilineText}" Focusable="true" Font="consolas,12" 
-				 Background="Grey" Focused="{Background=White}" Unfocused="{Background=Grey}"/>
-		<EnumSelector RadioButtonStyle="CheckBox2" Caption="Text Alignment" EnumValue="{²TextAlignment}" >
-			<Template>
-				<GroupBox Caption="{./Caption}" CornerRadius="{./CornerRadius}" Foreground="{./Foreground}" Background="{./Background}">
-					<VerticalStack Name="Content"/>
-				</GroupBox>
-			</Template>
-		</EnumSelector>
-	</VerticalStack>
-</HorizontalStack>
+<Label Text="Hello World"/>
