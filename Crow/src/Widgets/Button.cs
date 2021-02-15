@@ -113,8 +113,10 @@ namespace Crow
 		void Command_ValueChanged (object sender, ValueChangeEventArgs e)
 		{
 			string mName = e.MemberName;
-			if (mName == "CanExecute")
+			if (mName == "CanExecute") {
 				mName = "IsEnabled";
+				RegisterForRedraw ();
+			}
 			NotifyValueChanged (mName, e.NewValue);
 		}
 

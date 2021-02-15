@@ -417,7 +417,7 @@ namespace Crow
 						}
 
 						RectangleD lineRect = new RectangleD (
-							Width.IsFit && !Multiline ? cb.X : (int)getX (cb.Width, lines[i]) + cb.X,
+							(int)getX (cb.Width, lines[i]) + cb.X,
 							y + cb.Top, lines[i].LengthInPixel, lineHeight);
 
 						if (encodedBytes > 0) {
@@ -535,7 +535,7 @@ namespace Crow
 				return;
 			TextLine ls = lines[loc.Line];
 			ReadOnlySpan<char> curLine = _text.GetLine (ls);
-			double cPos = Width.IsFit && !Multiline ? 0 : getX (clientWidth, ls);
+			double cPos = getX (clientWidth, ls);
 
 			if (loc.Column >= 0) {
 				//int encodedBytes = Crow.Text.Encoding2.ToUtf8 (curLine.Slice (0, loc.Column), bytes);

@@ -16,5 +16,8 @@ namespace Crow.Text
             Length = length;
             ChangedText = changedText;
         }
+        public TextChange Inverse (string src)
+            => new TextChange (Start, string.IsNullOrEmpty (ChangedText) ? 0 : ChangedText.Length,
+                Length == 0 ? "" : src.AsSpan (Start, Length).ToString ());
     }
 }

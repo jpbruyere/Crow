@@ -889,10 +889,9 @@ namespace Crow
 
 				isVisible = value;
 
-				if (Visible)
-					RegisterForLayouting (LayoutingType.Sizing);
-				else
+				if (!Visible)
 					unshownPostActions ();
+				RegisterForLayouting (LayoutingType.Sizing);
 
 				NotifyValueChangedAuto (isVisible);
 			}
@@ -1846,7 +1845,7 @@ namespace Crow
 		}
 		void paintDisabled(Context gr, Rectangle rb){
 			gr.Operator = Operator.Xor;
-			gr.SetSource (0.6, 0.6, 0.6, 0.3);
+			gr.SetSource (0.1, 0.1, 0.1, 0.8);
 			gr.Rectangle (rb);
 			gr.Fill ();
 			gr.Operator = Operator.Over;
