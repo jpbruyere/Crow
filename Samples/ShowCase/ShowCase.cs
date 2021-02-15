@@ -10,6 +10,9 @@ using Crow.IML;
 using System.Runtime.CompilerServices;
 using Glfw;
 using System.Diagnostics;
+using Crow.Text;
+using System.Collections.Generic;
+using Encoding = System.Text.Encoding;
 
 namespace ShowCase
 {
@@ -37,8 +40,6 @@ namespace ShowCase
 				NotifyValueChanged (CurrentDir);
 			}
 		}
-
-		string source, origSource;
 		public string CurrentFile {
 			get { return Configuration.Global.Get<string> (nameof (CurrentFile)); }
 			set {
@@ -49,50 +50,85 @@ namespace ShowCase
 			}
 		}
 		
+		public Command CMDNew, CMDOpen, CMDSave, CMDSaveAs, CMDQuit, CMDShowLeftPane,
+					CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp, CMDAbout, CMDOptions;
+
+		const string _defaultFileName = "unnamed.txt";
+		string source = "";
+		int dirtyUndoLevel;
+		TextBox editor;
+		Stopwatch reloadChrono = Stopwatch.StartNew ();
+
+		public new bool IsDirty { get { return undoStack.Count != dirtyUndoLevel; } }
 		public string Source {
 			get => source;
 			set {
 				if (source == value)
 					return;
-
 				source = value;
-				if (!reloadChrono.IsRunning)					
-					reloadChrono.Restart ();
-				
-				CMDSave.CanExecute = source != origSource;
+				if (!reloadChrono.IsRunning)
+					reloadChrono.Restart ();				
 				NotifyValueChanged (source);
 			}
 		}
+		public CommandGroup EditorCommands => new CommandGroup (CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDSave, CMDSaveAs);
 
+		Stack<TextChange> undoStack = new Stack<TextChange> ();
+		Stack<TextChange> redoStack = new Stack<TextChange> ();
 
-		public static Picture IcoNew = new SvgPicture ("#Icons.blank-file.svg");
-		public static Picture IcoOpen = new SvgPicture ("#Icons.open.svg");
-		public static Picture IcoSave = new SvgPicture ("#Icons.save.svg");
-		public static Picture IcoSaveAs = new SvgPicture ("#Icons.save.svg");
-		public static Picture IcoQuit = new SvgPicture ("#Icons.sign-out.svg");
-		public static Picture IcoUndo = new SvgPicture ("#Icons.undo.svg");
-		public static Picture IcoRedo = new SvgPicture ("#Icons.redo.svg");
-
-		public static Picture IcoCut = new SvgPicture ("#Icons.scissors.svg");
-		public static Picture IcoCopy = new SvgPicture ("#Icons.copy-file.svg");
-		public static Picture IcoPaste = new SvgPicture ("#Icons.paste-on-document.svg");
-
-		public Command CMDNew, CMDSave, CMDSaveAs, CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste;
-		public CommandGroup ContextCommands => new CommandGroup (CMDNew, CMDSave, CMDSaveAs);
+		void undo () {
+			if (undoStack.TryPop (out TextChange tch)) {
+				redoStack.Push (tch.Inverse (source));
+				CMDRedo.CanExecute = true;
+				apply (tch);
+				editor.SetCursorPosition (tch.End + tch.ChangedText.Length);
+			}
+			if (undoStack.Count == 0)
+				CMDUndo.CanExecute = false;
+		}
+		void redo () {
+			if (redoStack.TryPop (out TextChange tch)) {
+				undoStack.Push (tch.Inverse (source));
+				CMDUndo.CanExecute = true;
+				apply (tch);
+				editor.SetCursorPosition (tch.End + tch.ChangedText.Length);
+			}
+			if (redoStack.Count == 0)
+				CMDRedo.CanExecute = false;
+		}
+		bool disableTextChangedEvent = false;
+		void apply (TextChange change) {
+			Span<char> tmp = stackalloc char[source.Length + (change.ChangedText.Length - change.Length)];
+			ReadOnlySpan<char> src = source.AsSpan ();
+			src.Slice (0, change.Start).CopyTo (tmp);
+			if (!string.IsNullOrEmpty (change.ChangedText))
+				change.ChangedText.AsSpan ().CopyTo (tmp.Slice (change.Start));
+			src.Slice (change.End).CopyTo (tmp.Slice (change.Start + change.ChangedText.Length));
+			disableTextChangedEvent = true;
+			Source = tmp.ToString ();
+			disableTextChangedEvent = false;
+			NotifyValueChanged ("IsDirty", IsDirty);
+		}	
+		
 		void initCommands ()
 		{
-			CMDNew = new Command (new Action (onNewFile)) { Caption = "New", Icon = "#Icons.blank-file.svg", CanExecute = true };
+			CMDNew = new Command (new Action (onNewFile)) { Caption = "New", Icon = "#Icons.blank-file.svg", CanExecute = true };			
 			CMDSave = new Command (new Action (onSave)) { Caption = "Save", Icon = "#Icons.save.svg", CanExecute = false };
 			CMDSaveAs = new Command (new Action (onSaveAs)) { Caption = "Save As...", Icon = "#Icons.save.svg", CanExecute = true };
-			/*CMDUndo = new Command (new Action (undo)) { Caption = "Undo", Icon = IcoUndo, CanExecute = false };
-			CMDRedo = new Command (new Action (redo)) { Caption = "Redo", Icon = IcoRedo, CanExecute = false };
-			CMDCut = new Command (new Action (cut)) { Caption = "Cut", Icon = IcoCut, CanExecute = false };
-			CMDCopy = new Command (new Action (copy)) { Caption = "Copy", Icon = IcoCopy, CanExecute = false };
-			CMDPaste = new Command (new Action (paste)) { Caption = "Paste", Icon = IcoPaste, CanExecute = false };*/
-		}
+			CMDQuit = new Command (new Action (() => base.Quit ())) { Caption = "Quit", Icon = "#Icons.exit.svg", CanExecute = true };
+			CMDUndo = new Command (new Action (undo)) { Caption = "Undo", Icon = "#Icons.undo.svg", CanExecute = false };
+			CMDRedo = new Command (new Action (redo)) { Caption = "Redo", Icon = "#Icons.redo.svg", CanExecute = false };
+			CMDCut = new Command (new Action (() => Quit ())) { Caption = "Cut", Icon = "#Icons.scissors.svg", CanExecute = false };
+			CMDCopy = new Command (new Action (() => Quit ())) { Caption = "Copy", Icon = "#Icons.copy-file.svg", CanExecute = false };
+			CMDPaste = new Command (new Action (() => Quit ())) { Caption = "Paste", Icon = "#Icons.paste-on-document.svg", CanExecute = false };
 
-		public new bool IsDirty {
-			get => !string.Equals(origSource, source);
+		}
+		void onNewFile () {
+			if (IsDirty) {
+				MessageBox mb = MessageBox.ShowModal (this, MessageBox.Type.YesNo, "Current file has unsaved changes, are you sure?");
+				mb.Yes += (sender, e) => newFile ();
+			} else
+				newFile ();
 		}
 		void onSave ()
 		{
@@ -131,17 +167,12 @@ namespace ShowCase
 			save ();
 		}
 
-		void onNewFile () {
-			if (IsDirty) {
-				MessageBox mb = MessageBox.ShowModal (this, MessageBox.Type.YesNo, "Current file has unsaved changes, are you sure?");
-				mb.Yes += (sender, e) => newFile ();
-			} else
-				newFile ();
-		}
 		void newFile()
 		{
-			origSource = "";
-			Source = "<Widget Background='DarkGrey'/>";
+			disableTextChangedEvent = true;
+			Source = @"<Label Text='Hello World' Background='MediumSeaGreen' Margin='10'/>";
+			disableTextChangedEvent = false;
+			resetUndoRedo ();
 			if (!string.IsNullOrEmpty (CurrentFile))
 				CurrentFile = Path.Combine (Path.GetDirectoryName (CurrentFile), "newfile.crow");
 			else
@@ -157,33 +188,57 @@ namespace ShowCase
 				byte [] buff = Encoding.UTF8.GetBytes (source);
 				s.Write (buff, 0, buff.Length);
 			}
-			origSource = source;
+			dirtyUndoLevel = undoStack.Count;
+			NotifyValueChanged ("IsDirty", IsDirty);
 		}
 
-		protected override void OnInitialized ()
-		{
-			initCommands ();
-
-			base.OnInitialized ();
-
-			if (string.IsNullOrEmpty (CurrentDir))
-				CurrentDir = Path.Combine (Directory.GetCurrentDirectory (), "Interfaces");
-
-			Widget g = Load ("#ShowCase.showcase.crow");
-			crowContainer = g.FindByName ("CrowContainer") as Container;
-			g.DataSource = this;
-
-			if (!File.Exists(CurrentFile))
-				origSource = Source = @"<Label Text='Hello World' Background='MediumSeaGreen' Margin='10'/>";
-
-			//I set an empty object as datasource at this level to force update when new
-			//widgets are added to the interface
-			crowContainer.DataSource = new object ();
+		void reloadFromFile () {
 			hideError ();
-
-			reloadFromFile ();
+			disableTextChangedEvent = true;
+			if (File.Exists (CurrentFile)) {
+				using (Stream s = new FileStream (CurrentFile, FileMode.Open)) {
+					using (StreamReader sr = new StreamReader (s))
+						Source = sr.ReadToEnd ();
+				}
+			}
+			disableTextChangedEvent = false;
+			resetUndoRedo ();
+		}
+		void reloadFromSource () {
+			hideError ();
+			Widget g = null;
+			try {
+				lock (UpdateMutex) {
+					Instantiator inst = null;
+					using (MemoryStream ms = new MemoryStream (Encoding.UTF8.GetBytes (source)))
+						inst = new Instantiator (this, ms);
+					g = inst.CreateInstance ();
+					crowContainer.SetChild (g);
+					g.DataSource = this;
+				}
+			} catch (InstantiatorException itorex) {
+				//Console.WriteLine (itorex);
+				showError (itorex.InnerException);
+			} catch (Exception ex) {
+				//Console.WriteLine (ex);
+				showError (ex);
+			}
 		}
 
+		void resetUndoRedo () {
+			undoStack.Clear ();
+			redoStack.Clear ();
+			CMDUndo.CanExecute = false;
+			CMDRedo.CanExecute = false;
+			dirtyUndoLevel = 0;
+		}
+		void showError (Exception ex) {
+			NotifyValueChanged ("ErrorMessage", (object)ex.Message);
+			NotifyValueChanged ("ShowError", true);
+		}
+		void hideError () {
+			NotifyValueChanged ("ShowError", false);
+		}
 
 		public void goUpDirClick (object sender, MouseButtonEventArgs e)
 		{
@@ -210,49 +265,47 @@ namespace ShowCase
 			CurrentFile = fi.FullName;
 			reloadFromFile ();
 		}
+		void onTextChanged (object sender, TextChangeEventArgs e) {
+			if (disableTextChangedEvent)
+				return;
+			undoStack.Push (e.Change.Inverse (source));
+			redoStack.Clear ();
+			CMDUndo.CanExecute = true;
+			CMDRedo.CanExecute = false;
+			apply (e.Change);
+		}
+		void textView_KeyDown (object sender, Crow.KeyEventArgs e) {
+			if (Ctrl && e.Key == Glfw.Key.W) {
+				if (Shift)
+					CMDRedo.Execute ();
+				else
+					CMDUndo.Execute ();
+			}
+		}
 
-		void showError (Exception ex)
-		{
-			NotifyValueChanged ("ErrorMessage", (object)ex.Message);
-			NotifyValueChanged ("ShowError", true);
-		}
-		void hideError ()
-		{
-			NotifyValueChanged ("ShowError", false);
-		}
-		void reloadFromFile ()
-		{
-			if (File.Exists (CurrentFile)) {
-				using (Stream s = new FileStream (CurrentFile, FileMode.Open)) {
-					using (StreamReader sr = new StreamReader (s))
-						origSource = sr.ReadToEnd ();
-				}
-				Source = origSource;
-			}
-		}
-		void reloadFromSource ()
-		{
+		protected override void OnInitialized () {
+			initCommands ();
+
+			base.OnInitialized ();
+
+			if (string.IsNullOrEmpty (CurrentDir))
+				CurrentDir = Path.Combine (Directory.GetCurrentDirectory (), "Interfaces");
+
+			Load ("#ShowCase.showcase.crow").DataSource = this;
+			crowContainer = FindByName ("CrowContainer") as Container;
+			editor = FindByName ("tb") as TextBox;
+
+			if (!File.Exists (CurrentFile))
+				newFile ();
+			//I set an empty object as datasource at this level to force update when new
+			//widgets are added to the interface
+			crowContainer.DataSource = new object ();
 			hideError ();
-			Widget g = null;
-			try {
-				lock (UpdateMutex) {
-					Instantiator inst = null;
-					using (MemoryStream ms = new MemoryStream (Encoding.UTF8.GetBytes (source))) 
-						inst = new Instantiator (this, ms);
-					g = inst.CreateInstance ();
-					crowContainer.SetChild (g);
-					g.DataSource = this;
-				}
-			} catch (InstantiatorException itorex) {
-				//Console.WriteLine (itorex);
-				showError (itorex.InnerException);
-			} catch (Exception ex) {
-				//Console.WriteLine (ex);
-				showError (ex);
-			}
+
+			reloadFromFile ();
 		}
-		Stopwatch reloadChrono = Stopwatch.StartNew ();
-        public override void UpdateFrame () {
+
+		public override void UpdateFrame () {
             base.UpdateFrame ();
 			if (reloadChrono.ElapsedMilliseconds < 200)
 				return;
