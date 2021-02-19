@@ -57,7 +57,7 @@ namespace ShowCase
 		string source = "";
 		int dirtyUndoLevel;
 		TextBox editor;
-		Stopwatch reloadChrono = Stopwatch.StartNew ();
+		Stopwatch reloadChrono = new Stopwatch ();
 
 		public new bool IsDirty { get { return undoStack.Count != dirtyUndoLevel; } }
 		public string Source {
