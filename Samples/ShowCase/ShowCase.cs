@@ -21,12 +21,14 @@ namespace ShowCase
 		static void Main ()
 		{
 			DbgLogger.IncludeEvents = DbgEvtType.Widget;
-			DbgLogger.DiscardEvents = DbgEvtType.Focus;
+			DbgLogger.DiscardEvents = DbgEvtType.Focus | DbgEvtType.IFace;			
 
 			Environment.SetEnvironmentVariable ("FONTCONFIG_PATH", @"C:\Users\Jean-Philippe\source\vcpkg\installed\x64-windows\tools\fontconfig\fonts");
 
-			using (Showcase app = new Showcase ()) 
+			using (Showcase app = new Showcase ()) {
+				//app.Theme = @"C:\Users\Jean-Philippe\source\Crow\Themes\TestTheme";
 				app.Run ();
+			}
 		}
 
 		public Container crowContainer;

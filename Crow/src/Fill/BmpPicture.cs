@@ -13,44 +13,48 @@ namespace Crow
 	/// <summary>
 	/// Derived from FILL for loading and drawing bitmaps in the interface
 	/// </summary>
-	public class BmpPicture : Picture
-	{
+	public class BmpPicture : Picture {
 		byte[] image = null;
 
 		#region CTOR
 		/// <summary>
 		/// Initializes a new instance of BmpPicture.
 		/// </summary>
-		public BmpPicture () {}
+		public BmpPicture () { }
 		/// <summary>
 		/// Initializes a new instance of BmpPicture by loading the image pointed by the path argument
 		/// </summary>
 		/// <param name="path">image path, may be embedded</param>
-		public BmpPicture (string path) : base(path) { }
+		public BmpPicture (string path) : base (path) { }
 		#endregion
 		/// <summary>
 		/// load the image for rendering from the path given as argument
 		/// </summary>
-		void load (Interface iFace)
-		{			
+		void load (Interface iFace) {
 			if (iFace.sharedPictures.ContainsKey (Path)) {
-				sharedPicture sp = iFace.sharedPictures [Path];
+				sharedPicture sp = iFace.sharedPictures[Path];
 				image = (byte[])sp.Data;
 				Dimensions = sp.Dims;
 				return;
 			}
 			using (Stream stream = iFace.GetStreamFromPath (Path)) {
+				load (stream);
+				//loadBitmap (new System.Drawing.Bitmap (stream));	
+				iFace.sharedPictures[Path] = new sharedPicture (image, Dimensions);
+			}
+		}
+		void load (Stream stream) {
 #if STB_SHARP
-				StbImageSharp.ImageResult stbi = StbImageSharp.ImageResult.FromStream (stream, StbImageSharp.ColorComponents.RedGreenBlueAlpha);
-				image = new byte [stbi.Data.Length];
-				//rgba to argb for cairo.
-				for (int i = 0; i < stbi.Data.Length; i += 4) {
-					image [i] = stbi.Data[i + 2];
-					image [i + 1] = stbi.Data [i + 1];
-					image [i + 2] = stbi.Data [i];
-					image [i + 3] = stbi.Data [i + 3];
-				}
-				Dimensions = new Size (stbi.Width, stbi.Height);
+			StbImageSharp.ImageResult stbi = StbImageSharp.ImageResult.FromStream (stream, StbImageSharp.ColorComponents.RedGreenBlueAlpha);
+			image = new byte[stbi.Data.Length];
+			//rgba to argb for cairo.
+			for (int i = 0; i < stbi.Data.Length; i += 4) {
+				image[i] = stbi.Data[i + 2];
+				image[i + 1] = stbi.Data[i + 1];
+				image[i + 2] = stbi.Data[i];
+				image[i + 3] = stbi.Data[i + 3];
+			}
+			Dimensions = new Size (stbi.Width, stbi.Height);
 #else
 				using (StbImage stbi = new StbImage (stream)) {
 					image = new byte [stbi.Size];
@@ -64,12 +68,12 @@ namespace Crow
 					Dimensions = new Size (stbi.Width, stbi.Height);
 				}
 #endif
-
-				//loadBitmap (new System.Drawing.Bitmap (stream));	
-			}
-			iFace.sharedPictures [Path] = new sharedPicture (image, Dimensions);
 		}
-
+		internal static sharedPicture CreateSharedPicture (Stream stream) {
+			BmpPicture pic = new BmpPicture ();
+			pic.load (stream);
+			return new sharedPicture (pic.image, pic.Dimensions);
+		}
 
 
 		//load image via System.Drawing.Bitmap, cairo load png only
@@ -93,7 +97,7 @@ namespace Crow
 			bitmap.UnlockBits (data);           
 		}*/
 
-#region implemented abstract members of Fill
+		#region implemented abstract members of Fill
 
 		public override void SetAsSource (Interface iFace, Context ctx, Rectangle bounds = default(Rectangle))
 		{

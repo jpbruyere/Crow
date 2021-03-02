@@ -535,7 +535,7 @@ namespace Crow.IML
 				il.Emit (OpCodes.Pop);//remove null string from stack
 				il.Emit (OpCodes.Ldstr, "");//replace with empty string
 				il.MarkLabel (endConvert);
-			} else if ((origType.IsEnum || origType == typeof (Enum)) && destType.IsEnum) {//TODO:double check this (multiple IsEnum test, no check of enum underlying type
+			} else if ((origType.IsEnum || origType == typeof (Enum)) && (destType.IsEnum) || destType == typeof (Enum)) {//TODO:double check this (multiple IsEnum test, no check of enum underlying type
 				il.Emit (OpCodes.Unbox_Any, destType);
 				return;
 			} else if (origType.IsValueType) {

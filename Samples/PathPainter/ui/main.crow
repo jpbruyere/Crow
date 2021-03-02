@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<HorizontalStack Background="DarkGrey" >
+	<VerticalStack>
+		<HorizontalStack Height="Fit">
+			<EnumSelector Fit="true" Caption="Draw Mode" EnumValue="{²../../painter.CurrentDrawMode}" />
+			<ComboBox Data="{../../painter.Zooms}" SelectedItem="{²../../painter.Zoom}" Width="60"/>
+		</HorizontalStack>
+		<HorizontalStack>			
+			<Border Foreground="Black" Width="Stretched" Height="Stretched" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top">
+				<Painter Name="painter" ShapeForeground="{Foreground}" ShapeBackground="{Background}"
+						 Zoom="1"
+						 Size="{Size}" Path="{²CurrentPath}" StrokeWidth="{StrokeWidth}"/>
+			</Border>
+			<ScrollBar Value="{²../painter.ScrollY}"
+					LargeIncrement="{../painter.PageHeight}" SmallIncrement="1"
+					CursorRatio="{../painter.ChildHeightRatio}" Maximum="{../painter.MaxScrollY}" />
+		</HorizontalStack>
+		<ScrollBar Style="HScrollBar" Value="{²../painter.ScrollX}"
+				LargeIncrement="{../painter.PageWidth}" SmallIncrement="1"
+				CursorRatio="{../painter.ChildWidthRatio}" Maximum="{../painter.MaxScrollX}" />		
+	</VerticalStack>
+	<Splitter/>
+	<VerticalStack Margin="2" Spacing="2">
+		<TextBox Width="Stretched" Text="{²CurrentPath}"/>
+		<HorizontalStack Height="Fit">
+			<Spinner Caption="Stroke Width" SmallIncrement="0.1" LargeIncrement="0.5" Value="{²StrokeWidth}" Width="Fit" Template="#ui.Spinner.template"/>
+			<Spinner Caption="Size" Value="{²CurrentSize}" Width="Fit" Template="#ui.Spinner.template"/>
+			<Popper Caption="Foreground" Background="{Foreground}" Fit="True" Template="#ui.colorSelector.template">
+				<ColorPicker CurrentColor="{²Foreground}" Background="Onyx" Width="{../PopWidth}"/>
+			</Popper>
+			<Popper Caption="Background" Background="{Background}" Fit="True" Template="#ui.colorSelector.template">
+				<ColorPicker CurrentColor="{²Background}" Background="Onyx" Width="{../PopWidth}"/>
+			</Popper>
+		</HorizontalStack>
+		<Group Height="200" Background="Jet">
+			<Shape Left="23" Top="9" Margin="0" Width="16" Height="16" Foreground="{Foreground}" Background="{Background}" Size="{Size}" Path="{CurrentPath}" StrokeWidth="{StrokeWidth}"/>
+			<Shape Left="17" Top="31" Margin="0" Width="32" Height="32" Foreground="{Foreground}" Background="{Background}" Size="{Size}" Path="{CurrentPath}" StrokeWidth="{StrokeWidth}"/>
+			<Shape Left="65" Top="1" Margin="0" Width="64" Height="64" Foreground="{Foreground}" Background="{Background}" Size="{Size}" Path="{CurrentPath}" StrokeWidth="{StrokeWidth}"/>
+			<Shape Left="1" Top="66" Margin="0" Width="128" Height="128" Foreground="{Foreground}" Background="{Background}" Size="{Size}" Path="{CurrentPath}" StrokeWidth="{StrokeWidth}"/>
+		</Group>
+	
+	</VerticalStack>
+</HorizontalStack>

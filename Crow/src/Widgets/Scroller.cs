@@ -259,11 +259,11 @@ namespace Crow
 			if (lt == LayoutingType.Height) {
 				MaxScrollY = child.Slot.Height - cb.Height;
 				if (child.Slot.Height > 0)
-					NotifyValueChanged ("ChildHeightRatio", Slot.Height * Slot.Height / child.Slot.Height);			
+					NotifyValueChanged ("ChildHeightRatio", (double)Slot.Height / child.Slot.Height);			
 			} else if (lt == LayoutingType.Width) {
 				MaxScrollX = child.Slot.Width - cb.Width;
 				if (child.Slot.Width > 0)
-					NotifyValueChanged ("ChildWidthRatio", Slot.Width * Slot.Width / child.Slot.Width);
+					NotifyValueChanged ("ChildWidthRatio", (double)Slot.Width / child.Slot.Width);
 			}
 		}
 		void onChildListCleared(object sender, EventArgs e){

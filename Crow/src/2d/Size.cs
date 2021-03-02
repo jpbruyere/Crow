@@ -46,6 +46,8 @@ namespace Crow
 		public static Size operator + (Size s, int i) => new Size (s.Width + i, s.Height + i);
 		public static Size operator * (Size s, int i) => new Size (s.Width * i, s.Height * i);
 		public static Size operator / (Size s, int i) => new Size (s.Width / i, s.Height / i);
+
+		public static Size operator * (Size s, double i) => new Size ((int)(s.Width * i), (int)(s.Height * i));
 		#endregion
 
 
