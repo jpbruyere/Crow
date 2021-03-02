@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2021  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -112,7 +112,7 @@ namespace Crow
 					break;
 				case LayoutingType.Height:
 					if (child.Height.IsRelativeToParent)
-						contentSize.Height = child.measureRawSize (LayoutingType.Width);
+						contentSize.Height = child.measureRawSize (LayoutingType.Height);
 					break;
 				}
 			}
@@ -131,7 +131,7 @@ namespace Crow
 				case LayoutingType.Height:
 					if (Height == Measure.Fit && child.Height.IsRelativeToParent)
 						//child.Height = Measure.Fit;
-						contentSize.Height = child.measureRawSize (LayoutingType.Width);
+						contentSize.Height = child.measureRawSize (LayoutingType.Height);
 					break;
 				}
 			}

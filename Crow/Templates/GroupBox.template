@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<Container Background="{./Background}" >
+<Container Background="{./Background}">
 	<Group CacheEnabled="true">
 		<VerticalStack Spacing="0">
 			<Widget Height="6"/>
