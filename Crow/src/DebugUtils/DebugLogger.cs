@@ -31,6 +31,7 @@ namespace Crow
 		IFaceLoad						= IFace | 0x05,
 		IFaceInit						= IFace | 0x06,
 		CreateITor						= IFace | 0x07,
+		IFaceReleadTheme				= IFace | 0x08,
 
 		HoverWidget						= IFace | Focus | Widget | 0x01,
 		FocusedWidget					= IFace | Focus | Widget | 0x02,

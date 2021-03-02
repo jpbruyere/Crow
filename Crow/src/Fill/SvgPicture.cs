@@ -35,15 +35,20 @@ namespace Crow
 				Dimensions = sp.Dims;
 				return;
 			}
-			using (Stream stream = iFace.GetStreamFromPath (Path)) {
-				using (MemoryStream ms = new MemoryStream ()) {
-					stream.CopyTo (ms);
-
-					hSVG = new Rsvg.Handle (ms.ToArray ());
-					Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
-				}
-			}
+			using (Stream stream = iFace.GetStreamFromPath (Path))
+				load (stream);
 			iFace.sharedPictures [Path] = new sharedPicture (hSVG, Dimensions);
+		}
+		void load (Stream stream) {
+			using (BinaryReader sr = new BinaryReader (stream)) {
+				hSVG = new Rsvg.Handle (sr.ReadBytes ((int)stream.Length));
+				Dimensions = new Size (hSVG.Dimensions.Width, hSVG.Dimensions.Height);
+			}
+		}
+		internal static sharedPicture CreateSharedPicture (Stream stream) {
+			SvgPicture pic = new SvgPicture ();
+			pic.load (stream);
+			return new sharedPicture (pic.hSVG, pic.Dimensions);
 		}
 
 		public void LoadSvgFragment (string fragment) {			

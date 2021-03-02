@@ -1,0 +1,23 @@
+﻿ControlBackground = "DarkRed";
+ControlBorderColor = "White";
+ControlBorderWidth = "2";
+ControlCaptionColor = "White";
+ControlCaptionHoverColor = "RoyalBlue";
+ControlCornerRadius = "5";
+ControlInsideMargin = "5";
+ControlHighlight = "RoyalBlue";
+IconSize = "16";
+IconMargin = "2";
+ToggleIconSize = "32";
+
+TooltipBackground = "Khaki";
+TooltipForeground = "DimGrey";
+TooltipMargin = "3";
+
+WindowBackgroundColor = "DarkGrey";
+WindowBorderColor = "White";
+WindowBorderWidth = "2";
+WindowTitleBarBackground = "vgradient|0:Onyx|1:Green";
+WindowTitleBarForeground = "Black";
+
+MenuBackground = "DarkGrey";

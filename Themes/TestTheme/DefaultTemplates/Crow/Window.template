@@ -1,0 +1,4 @@
+﻿<?xml version="1.0"?>
+<Border Name="SizeHandle" Style="winBorder"  CornerRadius="{./CornerRadius}" Background="{./Background}" >
+	<Container Name="Content" MinimumSize="0,0" />
+</Border>

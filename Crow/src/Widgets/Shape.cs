@@ -185,9 +185,10 @@ namespace Crow
 				if (size == value)
 					return;
 				size = value;
-				contentSize = default (Size);
+				contentSize = default;
 				NotifyValueChangedAuto (size);
-				RegisterForLayouting (LayoutingType.Sizing);
+				//RegisterForLayouting (LayoutingType.Sizing);
+				RegisterForGraphicUpdate ();
 			}
 		}
 

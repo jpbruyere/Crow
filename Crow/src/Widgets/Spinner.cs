@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2021  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -22,11 +22,17 @@ namespace Crow
 		}
 		void onUp (object sender, MouseButtonEventArgs e)
 		{
-			Value += this.SmallIncrement;
+			if (IFace.Ctrl)
+				Value += SmallIncrement;
+			else
+				Value += LargeIncrement;
 		}
 		void onDown (object sender, MouseButtonEventArgs e)
 		{
-			Value -= this.SmallIncrement;
+			if (IFace.Ctrl)
+				Value -= SmallIncrement;
+			else
+				Value -= LargeIncrement;
 		}
 
 	}

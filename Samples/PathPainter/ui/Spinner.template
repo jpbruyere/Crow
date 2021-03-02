@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<VerticalStack>
+	<Label Text="{./Caption}"/>
+	<Border Style="ControlBorder" Background="{./Background}" CornerRadius="{./CornerRadius}">
+		<HorizontalStack Spacing="1">
+			<TextBox Style="ControlEditableText" Foreground="{./Foreground}" Font="{./Font}" Width="Stretched"
+				Text="{²./Value}" TextAlignment="Right" />
+			<VerticalStack Width="16" Height="Stretched" Spacing="0" Margin="0">
+				<Shape KeepProportions="false" Margin="1" Style="ArrowBut" Height="50%" MouseDown="./onUp" Size="10,10" Path="M 4.5,0.5 L 9.5,9.5 L 0.5,9.5 Z F"/>
+				<Shape KeepProportions="false" Margin="1" Style="ArrowBut"	Height="50%" MouseDown="./onDown" Size="10,10" Path="M 0.5,0.5 L 9.5,0.5 L 4.5,9.5 Z F"/>
+			</VerticalStack>
+		</HorizontalStack>
+	</Border>
+</VerticalStack>

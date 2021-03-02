@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -15,6 +16,7 @@ using System.Threading;
 using Crow.Cairo;
 using Crow.IML;
 using Glfw;
+using Path = System.IO.Path;
 
 namespace Crow
 {
@@ -260,7 +262,9 @@ namespace Crow
 		/// </summary>
 		public void Init () {
 			DbgLogger.StartEvent (DbgEvtType.IFaceInit);
+			initDictionaries ();
 			loadStyling ();
+			loadThemeFiles ();
 			initTooltip ();
 			initContextMenus ();
 			OnInitialized ();
@@ -300,7 +304,9 @@ namespace Crow
 					// TODO: dispose managed state (managed objects).
 				}
 
-				currentCursor?.Dispose ();
+				currentCursor?.Dispose ();				
+				disposeContextMenus ();
+
 				if (ownWindow) {
 					Glfw3.DestroyWindow (hWin);
 					Glfw3.Terminate ();
@@ -442,16 +448,15 @@ namespace Crow
 		/// <summary>each IML and fragments (such as inline Templates) are compiled as a Dynamic Method stored here
 		/// on the first instance creation of a IML item.
 		/// </summary>
-		public Dictionary<String, Instantiator> Instantiators = new Dictionary<string, Instantiator>();
-		public Dictionary<String, Instantiator> Templates = new Dictionary<string, Instantiator> ();
+		public Dictionary<String, Instantiator> Instantiators;		
 		/// <summary>
 		/// default templates dic by metadata token
 		/// </summary>
-		public Dictionary<int, Instantiator> DefaultTemplates = new Dictionary<int, Instantiator> ();
+		public Dictionary<int, Instantiator> DefaultTemplates;
 		/// <summary>
 		/// Item templates stored with their index
 		/// </summary>
-		public Dictionary<String, ItemTemplate> ItemTemplates = new Dictionary<string, ItemTemplate> ();
+		public Dictionary<String, ItemTemplate> ItemTemplates;
 
 		public List<CrowThread> CrowThreads = new List<CrowThread>();//used to monitor thread finished
 
@@ -483,7 +488,7 @@ namespace Crow
 		/// The compilation is done on the first object instancing, and is also done for custom widgets
 		public delegate void LoaderInvoker(object instance);
 		/// <summary>Store one loader per StyleKey</summary>
-		public Dictionary<String, LoaderInvoker> DefaultValuesLoader = new Dictionary<string, LoaderInvoker>();
+		public Dictionary<String, LoaderInvoker> DefaultValuesLoader;
 		/// <summary>Store dictionnary of member/value per StyleKey</summary>
 		public Dictionary<string, Style> Styling;
 		/// <summary>
@@ -498,11 +503,9 @@ namespace Crow
 		public Dictionary<string, string> StylingConstants;
 		/// <summary> parse all styling data's during application startup and build global Styling Dictionary </summary>
 		protected virtual void loadStyling() {
-			StylingConstants = new Dictionary<string, string> ();
-			Styling = new Dictionary<string, Style> ();
-
 			//fetch styling info in this order, if member styling is alreadey referenced in previous
 			//assembly, it's ignored.
+			loadThemeStyle ();
 
 			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
 			foreach (Assembly a in crowAssemblies) {
@@ -518,7 +521,7 @@ namespace Crow
 				.GetManifestResourceNames ()
 				.Where (r => r.EndsWith (".style", StringComparison.OrdinalIgnoreCase))) {
 				using (StyleReader sr = new StyleReader (assembly.GetManifestResourceStream (s))) 
-					sr.Parse (StylingConstants, Styling, s);				
+					sr.Parse (StylingConstants, Styling, s);
 			}
 		}
 		public void LoadStyle (string stylePath) {
@@ -532,6 +535,120 @@ namespace Crow
 		}
 		#endregion
 
+		#region Theming
+		string theme;
+		public string Theme {
+			get => theme;
+			set {
+				if (theme == value)
+					return;
+				theme = value;
+				NotifyValueChanged (theme);
+
+				if (StylingConstants == null)//iFace not yet initialized
+					return;
+				lock (UpdateMutex) {
+					DbgLogger.StartEvent (DbgEvtType.IFaceReleadTheme);
+					disposeContextMenus ();
+					initDictionaries ();
+					loadStyling ();
+					loadThemeFiles ();					
+					initContextMenus ();
+					DbgLogger.EndEvent (DbgEvtType.IFaceReleadTheme);
+				}
+			}
+		}
+		protected void initDictionaries () {
+			const int initCapacity = 20;
+			StylingConstants = new Dictionary<string, string> (initCapacity);
+			Styling = new Dictionary<string, Style> (initCapacity);
+			DefaultValuesLoader = new Dictionary<string, LoaderInvoker> (initCapacity);
+			Instantiators = new Dictionary<string, Instantiator> (initCapacity);
+			DefaultTemplates = new Dictionary<int, Instantiator> (initCapacity);			
+			ItemTemplates = new Dictionary<string, ItemTemplate> (initCapacity);
+		}
+		void loadThemeFiles () {
+			if (string.IsNullOrEmpty (Theme))
+				return;
+			try {
+				if (Directory.Exists (theme)) {
+					string path = Path.Combine (Theme, "Images");
+					if (Directory.Exists (path)) {
+						foreach (string pic in Directory.GetFiles (path, "*.*", SearchOption.AllDirectories)) {
+							string resId = $"#{pic.Substring (path.Length + 1).Replace (Path.DirectorySeparatorChar, '.')}";
+							using (Stream s = new FileStream (pic, FileMode.Open, FileAccess.Read)) {
+								if (resId.EndsWith (".svg", StringComparison.OrdinalIgnoreCase))
+									sharedPictures[resId] = SvgPicture.CreateSharedPicture (s);
+								else
+									sharedPictures[resId] = BmpPicture.CreateSharedPicture (s);
+							}
+						}
+					}
+					if (Directory.Exists (path)) {
+						path = Path.Combine (Theme, "DefaultTemplates");
+						foreach (string iml in Directory.GetFiles (path, "*.*", SearchOption.AllDirectories)) {
+							string resId = $"#{iml.Substring (path.Length + 1).Replace (Path.DirectorySeparatorChar, '.')}";
+							int mdTok = Instantiator.tryGetGOType (resId.Substring (6, resId.Length - 15)).MetadataToken;
+							using (Stream s = new FileStream (iml, FileMode.Open, FileAccess.Read))
+								DefaultTemplates[mdTok] = new IML.Instantiator (this, s, resId);
+						}
+					}
+					path = Path.Combine (Theme, "IML");
+					if (Directory.Exists (path)) {
+						foreach (string iml in Directory.GetFiles (path, "*.*", SearchOption.AllDirectories)) {
+							string resId = $"#{iml.Substring (path.Length + 1).Replace (Path.DirectorySeparatorChar, '.')}";
+							using (Stream s = new FileStream (iml, FileMode.Open, FileAccess.Read))
+								Instantiators[path] = new Instantiator (this, s, path);
+						}
+					}
+					path = Path.Combine (Theme, "ItemTemplates");
+					if (Directory.Exists (path)) {
+						foreach (string iml in Directory.GetFiles (path, "*.*", SearchOption.AllDirectories)) {
+							string resId = $"#{iml.Substring (path.Length + 1).Replace (Path.DirectorySeparatorChar, '.')}";
+							using (Stream s = new FileStream (iml, FileMode.Open, FileAccess.Read))
+								ItemTemplates[path] = new ItemTemplate (this, s, path);
+						}
+					}
+					return;
+				}
+				using (ZipArchive archive = ZipFile.Open (Theme, ZipArchiveMode.Read)) {
+					foreach (ZipArchiveEntry entry in archive.Entries.Where (e => e.FullName.StartsWith ("Images"))) {
+						Console.WriteLine (entry.FullName);
+                    }
+					foreach (ZipArchiveEntry entry in archive.Entries.Where (e => e.FullName.StartsWith ("IML"))) {
+						Console.WriteLine (entry.FullName);
+					}
+				}
+			} catch (Exception e) {
+				throw new Exception ($"[Theme] Error reading theme ({Theme})", e);
+			}
+		}
+		void loadThemeStyle () {
+			if (string.IsNullOrEmpty (Theme))
+				return;
+            try {
+				if (Directory.Exists (theme)) {
+					string stylePath = Directory.GetFiles (theme, "*.style").FirstOrDefault ();
+					using (Stream s = new FileStream (stylePath, FileMode.Open, FileAccess.Read)) {
+						using (StyleReader sr = new StyleReader (s))
+							sr.Parse (StylingConstants, Styling, stylePath);
+					}
+					return;
+				}
+				using (ZipArchive archive = ZipFile.Open (Theme, ZipArchiveMode.Read)) {
+					ZipArchiveEntry zipStyle = archive.Entries.FirstOrDefault (e => e.FullName.EndsWith (".style", StringComparison.OrdinalIgnoreCase));
+					if (zipStyle != null) {
+						using (Stream s = zipStyle.Open ()) {
+							using (StyleReader sr = new StyleReader (s))
+								sr.Parse (StylingConstants, Styling, zipStyle.FullName);
+						}
+					}
+				}
+			} catch (Exception e) {
+				throw new Exception ($"[Theme] Error reading theme style ({Theme})", e);
+            }
+		}
+		#endregion
 
 		#region Load/Save
 		/// <summary>
@@ -1085,7 +1202,7 @@ namespace Crow
 
 		#region Mouse and Keyboard Handling
 		MouseCursor cursor = MouseCursor.top_left_arrow;
-		void loadCursors ()
+		[Obsolete]void loadCursors ()
 		{
 			const int minimumSize = 24;
 
@@ -1156,7 +1273,6 @@ namespace Crow
 			XCursor.Cursors [MouseCursor.X_cursor] = XCursorFile.Load (this, "#Crow.Cursors.X_cursor").Cursors.First (c => c.Width >= minimumSize);
 			XCursor.Cursors [MouseCursor.xterm] = XCursorFile.Load (this, "#Crow.Cursors.xterm").Cursors.First (c => c.Width >= minimumSize);
 		}
-
 
 		Stopwatch lastMouseDown = Stopwatch.StartNew (), mouseRepeatTimer = new Stopwatch ();
 		bool doubleClickTriggered;	//next mouse up will trigger a double click
@@ -1490,6 +1606,12 @@ namespace Crow
 		{
 			ctxMenuContainer = CreateInstance ("#Crow.ContextMenu.template") as MenuItem;
 			ctxMenuContainer.LayoutChanged += CtxMenuContainer_LayoutChanged;
+		}
+		protected void disposeContextMenus () {
+			if (ctxMenuContainer == null)
+				return;
+			ctxMenuContainer.LayoutChanged -= CtxMenuContainer_LayoutChanged;
+			ctxMenuContainer.Dispose ();
 		}
 
 		void CtxMenuContainer_LayoutChanged (object sender, LayoutingEventArgs e)

@@ -1568,7 +1568,7 @@ namespace Crow.IML {
 		/// </remarks>
 		/// <returns>the corresponding type object</returns>
 		/// <param name="typeName">graphic object type name without its namespace</param>
-		Type tryGetGOType (string typeName){
+		internal static Type tryGetGOType (string typeName){
 			if (knownGOTypes.ContainsKey (typeName))
 				return knownGOTypes [typeName];
 			Type t = Type.GetType ("Crow." + typeName);
