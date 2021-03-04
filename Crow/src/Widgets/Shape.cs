@@ -36,29 +36,31 @@ namespace Crow
 	public class PathParser : StringReader
 	{
 		public PathParser (string str) : base (str) { }
-
+		char[] buffer = new char[20];
 		double readDouble ()
 		{
-			StringBuilder tmp = new StringBuilder ();
+			int length = 0;			
 
 			while (Peek () >= 0) {
-				char c = (char)Read ();
-				if (c.IsWhiteSpaceOrNewLine ()) {
-					if (tmp.Length == 0)
+				buffer[length] = (char)Read ();
+				if (buffer[length].IsWhiteSpaceOrNewLine ()) {
+					if (length == 0)
 						continue;
 					else
 						break;
-				} else if (c == ',')
+				} else if (buffer[length] == ',')
 					break;
-				tmp.Append (c);
+				length++;
 			}
-			return double.Parse (tmp.ToString ());
+			return double.Parse (buffer.AsSpan(0, length));
 		}
 		public void Draw (Context gr, bool measure = false)
 		{
+			char c;
+
 			try {
 				while (Peek () >= 0) {
-					char c = (char)Read ();
+					c = (char)Read ();
 					if (c.IsWhiteSpaceOrNewLine ())
 						continue;
 					switch (c) {
