@@ -90,7 +90,7 @@ namespace Crow.IML
 		bool tryFindMember ()
 		{
 #if DEBUG_BINDING_FUNC_CALLS
-            System.Diagnostics.Debug.WriteLine ($"tryFindMember ({Address},{member})");
+            Console.WriteLine ($"tryFindMember ({Address},{member})");
 #endif
 			if (member != null)
 				throw new Exception ("member already found");

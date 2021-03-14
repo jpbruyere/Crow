@@ -452,7 +452,7 @@ namespace Crow
 		/// <summary>
 		/// default templates dic by metadata token
 		/// </summary>
-		public Dictionary<int, Instantiator> DefaultTemplates;
+		public Dictionary<string, Instantiator> DefaultTemplates;
 		/// <summary>
 		/// Item templates stored with their index
 		/// </summary>
@@ -564,7 +564,7 @@ namespace Crow
 			Styling = new Dictionary<string, Style> (initCapacity);
 			DefaultValuesLoader = new Dictionary<string, LoaderInvoker> (initCapacity);
 			Instantiators = new Dictionary<string, Instantiator> (initCapacity);
-			DefaultTemplates = new Dictionary<int, Instantiator> (initCapacity);			
+			DefaultTemplates = new Dictionary<string, Instantiator> (initCapacity);			
 			ItemTemplates = new Dictionary<string, ItemTemplate> (initCapacity);
 		}
 		void loadThemeFiles () {
@@ -588,9 +588,9 @@ namespace Crow
 						path = Path.Combine (Theme, "DefaultTemplates");
 						foreach (string iml in Directory.GetFiles (path, "*.*", SearchOption.AllDirectories)) {
 							string resId = $"#{iml.Substring (path.Length + 1).Replace (Path.DirectorySeparatorChar, '.')}";
-							int mdTok = Instantiator.tryGetGOType (resId.Substring (6, resId.Length - 15)).MetadataToken;
+							//int mdTok = Instantiator.tryGetGOType (resId.Substring (6, resId.Length - 15)).MetadataToken;
 							using (Stream s = new FileStream (iml, FileMode.Open, FileAccess.Read))
-								DefaultTemplates[mdTok] = new IML.Instantiator (this, s, resId);
+								DefaultTemplates[resId] = new IML.Instantiator (this, s, resId);
 						}
 					}
 					path = Path.Combine (Theme, "IML");
@@ -1453,6 +1453,11 @@ namespace Crow
 				return false;
 
 			_activeWidget.onMouseUp (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Release));
+
+			if (_activeWidget == null) {
+				Debug.WriteLine ("[BUG]Mystery reset of _activeWidget");
+				return true;
+			}
 
 			if (doubleClickTriggered)
 				_activeWidget.onMouseDoubleClick (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press));

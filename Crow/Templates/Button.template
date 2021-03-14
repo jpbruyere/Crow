@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Border Background="{./Background}" Name="Content"
+<Border Background="{./Background}" Name="Content"  Width="Stretched" Height="Stretched"
 	Foreground="Transparent" CornerRadius="{../CornerRadius}" BorderWidth="1"
 	MouseEnter="{Foreground=vgradient|0:White|0.2:Grey|0.9:Grey|1:Black};{caption.Foreground=White}"
 	MouseLeave="{Foreground=Transparent};{caption.Foreground=LightGrey}"

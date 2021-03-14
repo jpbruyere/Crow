@@ -588,7 +588,7 @@ namespace Crow.IML {
 			BindingDefinition bindingDef = sourceNA.GetBindingDef (sourceMember, expression);
 
 #if DEBUG_BINDING
-			Debug.WriteLine("Property Binding: " + bindingDef.ToString());
+			Console.WriteLine("Property Binding: " + bindingDef.ToString());
 #endif
 
 			if (bindingDef.IsDataSourceBinding) {//bind on data source
@@ -629,6 +629,10 @@ namespace Crow.IML {
 			il.Emit (OpCodes.Ldstr, eventName);//2nd arg event name
 			il.Emit (OpCodes.Ldstr, delegateName);//3d arg: delegate name
 			il.Emit (OpCodes.Call, CompilerServices.miRemEvtHdlByName);
+#if DEBUG_BINDING
+			il.EmitWriteLine ($"remove old ds handler: evtname:{eventName} delname:{delegateName} dsside:{DSSide}");
+#endif
+
 			il.MarkLabel(cancel);
 		}
 		#endregion
@@ -648,7 +652,7 @@ namespace Crow.IML {
 		static Delegate compileDynEventHandler (EventInfo sourceEvent, string expression, NodeAddress currentNode = null)
 		{
 #if DEBUG_BINDING
-			Debug.WriteLine ("\tCompile Event {0}: {1}", sourceEvent.Name, expression);
+			Console.WriteLine ("\tCompile Event {0}: {1}", sourceEvent.Name, expression);
 #endif
 			Type lopType = null;
 
@@ -770,7 +774,7 @@ namespace Crow.IML {
 			BindingDefinition bindingDef = currentNode.GetBindingDef (sourceEvent.Name, expression);
 
 			#if DEBUG_BINDING
-			Debug.WriteLine("Event Binding: " + bindingDef.ToString());
+			Console.WriteLine("Event Binding: " + bindingDef.ToString());
 			#endif
 
 			if (bindingDef.IsTemplateBinding | bindingDef.IsDataSourceBinding) {
@@ -861,13 +865,18 @@ namespace Crow.IML {
 			Type origineNodeType = origine.NodeType;
 
 			//value changed dyn method
-			DynamicMethod dm = new DynamicMethod ("dyn_valueChanged" + NewId,
+			string delname = "dyn_valueChanged" + NewId;
+			DynamicMethod dm = new DynamicMethod (delname,
 				typeof (void), CompilerServices.argsValueChange, true);
 			ILGenerator il = dm.GetILGenerator (64);
 
 			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
 
 			il.DeclareLocal (typeof(object));
+
+#if DEBUG_BINDING
+			il.EmitWriteLine ($"DYN Called => {delname}");
+#endif
 
 			il.Emit (OpCodes.Nop);
 
@@ -953,7 +962,7 @@ namespace Crow.IML {
 			ctx.emitCachedDelegateHandlerAddition (dmIdx, CompilerServices.eiValueChange, origine);
 
 			#if DEBUG_BINDING
-			Debug.WriteLine("\tCrow property binding: " + dm.Name);
+			Console.WriteLine("\tCrow property binding: " + dm.Name);
 			#endif
 
 		}
@@ -1025,7 +1034,7 @@ namespace Crow.IML {
 
 				foreach (MemberAddress ma in bindingCase.Value) {
 					if (ma.Address.Count == 0){
-						Debug.WriteLine("\t\tBUG: reverse template binding in normal template binding");
+						Console.WriteLine("\t\tBUG: reverse template binding in normal template binding");
 						continue;//template binding
 					}
 					//first we try to get memberInfo of new parent, if it doesn't exist, it's a propery less binding
@@ -1112,7 +1121,7 @@ namespace Crow.IML {
 		void emitDataSourceBindings (IMLContext ctx, BindingDefinition bindingDef, Type dsType)
 		{
 #if DEBUG_BINDING_FUNC_CALLS
-			System.Diagnostics.Debug.WriteLine ($"emitDataSourceBindings with data type knows: {bindingDef}");
+			Console.WriteLine ($"emitDataSourceBindings with data type knows: {bindingDef} dstype: {dsType}");
 #endif
 			DynamicMethod dm = null;
 			ILGenerator il = null;
@@ -1132,6 +1141,10 @@ namespace Crow.IML {
 				Label endMethod = il.DefineLabel ();
 
 				il.DeclareLocal (typeof (object));
+
+#if DEBUG_BINDING
+				il.EmitWriteLine ($"DYN Called => {delName}");
+#endif
 
 				//load value changed member name onto the stack
 				il.Emit (OpCodes.Ldarg_2);//TODO:check _2??? not _1??
@@ -1174,7 +1187,8 @@ namespace Crow.IML {
 			//the actual value of the origin member of the datasource and then will bind the value changed
 			//dyn methode.
 			//dm is bound to the instanciator instance to have access to cached dyn meth and delegates
-			dm = new DynamicMethod ("dyn_dschanged" + NewId,
+			string dschangeddelname = "dyn_dschanged" + NewId;
+			dm = new DynamicMethod (dschangeddelname,
 				typeof (void),
 				CompilerServices.argsBoundDSChange, true);
 
@@ -1186,7 +1200,9 @@ namespace Crow.IML {
 			Label cancel = il.DefineLabel ();
 			Label newDSIsNull = il.DefineLabel ();
 			Label cancelInit = il.DefineLabel ();
-
+#if DEBUG_BINDING
+			il.EmitWriteLine ($"DYN Called => {dschangeddelname}");
+#endif
 
 			il.Emit (OpCodes.Ldarg_2);//load datasource change arg
 			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
@@ -1206,6 +1222,9 @@ namespace Crow.IML {
 				//il.Emit (OpCodes.Call, CompilerServices.miGetMDToken);
 				//il.Emit (OpCodes.Ldc_I4, dsType.MetadataToken);
 				il.Emit (OpCodes.Brfalse, newDSIsNull);
+#if DEBUG_BINDING
+				il.EmitWriteLine ($"\tNew ds is of expected type: {dsType}");
+#endif
 			}
 
 			#region fetch initial Value
@@ -1219,6 +1238,9 @@ namespace Crow.IML {
 					if (mbType != piSource.PropertyType)
 						CompilerServices.emitConvert (il, mbType, piSource.PropertyType);
 					il.Emit (OpCodes.Callvirt, piSource.GetSetMethod ());
+#if DEBUG_BINDING
+					il.EmitWriteLine ($"{dschangeddelname}: fetch initial value for binding: {bindingDef}");
+#endif
 				}
 			}
 			#endregion
@@ -1249,6 +1271,9 @@ namespace Crow.IML {
 
 			}
 			il.MarkLabel (newDSIsNull);
+#if DEBUG_BINDING
+			il.EmitWriteLine ($"\tNew ds is NULL, expected type = {dsType}");
+#endif
 			il.Emit (OpCodes.Ret);
 
 			//store dschange delegate in instatiator instance for access while instancing graphic object
@@ -1263,8 +1288,8 @@ namespace Crow.IML {
 			ctx.emitCachedDelegateHandlerAddition (delDSIndex, CompilerServices.eiDSChange);
 
 #if DEBUG_BINDING
-			Debug.WriteLine("\tDataSource ValueChanged: " + delName);
-			Debug.WriteLine("\tDataSource Changed: " + dm.Name);
+			Console.WriteLine("\tDataSource ValueChanged: " + delName);
+			Console.WriteLine("\tDataSource Changed: " + dm.Name);
 #endif
 		}
 
@@ -1290,7 +1315,7 @@ namespace Crow.IML {
 		public Delegate emitDataSourceBindings (PropertyInfo piSource, BindingDefinition bindingDef){		
 
 #if DEBUG_BINDING_FUNC_CALLS
-			System.Diagnostics.Debug.WriteLine ($"emitDataSourceBindings: {bindingDef}");
+			Console.WriteLine ($"emitDataSourceBindings: {bindingDef}");
 #endif
 			DynamicMethod dm = null;
 			ILGenerator il = null;
@@ -1309,6 +1334,10 @@ namespace Crow.IML {
 				Label endMethod = il.DefineLabel ();
 
 				il.DeclareLocal (typeof(object));
+
+#if DEBUG_BINDING
+				il.EmitWriteLine ($"DYN Called => {delName}");
+#endif
 
 				//load value changed member name onto the stack
 				il.Emit (OpCodes.Ldarg_2);
@@ -1351,7 +1380,8 @@ namespace Crow.IML {
 			//the actual value of the origin member of the datasource and then will bind the value changed
 			//dyn methode.
 			//dm is bound to the instanciator instance to have access to cached dyn meth and delegates
-			dm = new DynamicMethod ("dyn_dschanged" + NewId,
+			string dschanged_delName = "dyn_dschanged" + NewId;
+			dm = new DynamicMethod (dschanged_delName,
 				typeof (void),
 				CompilerServices.argsBoundDSChange, true);
 
@@ -1366,6 +1396,9 @@ namespace Crow.IML {
 			System.Reflection.Emit.Label cancelInit = il.DefineLabel ();
 
 			il.Emit (OpCodes.Nop);
+#if DEBUG_BINDING
+			il.EmitWriteLine ($"dyn method call: {dschanged_delName}");
+#endif
 
 			il.Emit (OpCodes.Ldarg_2);//load datasource change arg
 			il.Emit (OpCodes.Ldfld, CompilerServices.fiDSCNewDS);
@@ -1445,8 +1478,8 @@ namespace Crow.IML {
 			il.Emit (OpCodes.Ret);
 
 #if DEBUG_BINDING
-			Debug.WriteLine("\tDataSource ValueChanged: " + delName);
-			Debug.WriteLine("\tDataSource Changed: " + dm.Name);
+			Console.WriteLine("\tDataSource ValueChanged: " + delName);
+			Console.WriteLine("\tDataSource Changed: " + dm.Name);
 #endif
 
 			return dm.CreateDelegate (CompilerServices.ehTypeDSChange, this);
@@ -1481,7 +1514,7 @@ namespace Crow.IML {
 			foreach (string m in destMember.Split('.')) {
 				MemberInfo miDest = curType.GetMember (m).FirstOrDefault ();
 				if (miDest == null) {
-					Debug.WriteLine ($"Member '{destMember}' not found in new DataSource '{dest}' of '{orig}'");
+					Console.WriteLine ($"Member '{destMember}' not found in new DataSource '{dest}' of '{orig}'");
 					return;
 				}
 				miDests.Add (miDest);
@@ -1489,7 +1522,7 @@ namespace Crow.IML {
 			}
 
 #if DEBUG_BINDING
-			Debug.WriteLine ("DS Reverse binding: Member '{0}' found in new DS '{1}' of '{2}'", destMember, dest, orig);
+			Console.WriteLine ("DS Reverse binding: Member '{0}' found in new DS '{1}' of '{2}'", destMember, dest, orig);
 #endif
 
 #region ValueChanged emit
@@ -1501,6 +1534,9 @@ namespace Crow.IML {
 			Stack<LocalBuilder> locals = new Stack<LocalBuilder> ();
 
 			System.Reflection.Emit.Label endMethod = il.DefineLabel ();
+#if DEBUG_BINDING
+			il.EmitWriteLine ($"DYN Called => {delName}");
+#endif
 
 			//load value changed member name onto the stack
 			il.Emit (OpCodes.Ldarg_2);

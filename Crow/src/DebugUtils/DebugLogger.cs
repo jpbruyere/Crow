@@ -89,7 +89,7 @@ namespace Crow
 		public static bool ConsoleOutput = true;
 
 		static bool logevt (DbgEvtType evtType)
-			=> (evtType & DiscardEvents) == 0 && (evtType & IncludeEvents) != 0;
+			=> (evtType & DiscardEvents) == 0 && (evtType & IncludeEvents) == IncludeEvents;
 
 
 		static object logMutex = new object ();

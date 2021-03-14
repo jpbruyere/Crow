@@ -115,16 +115,15 @@ namespace Crow
 				this.ClearTemplateBinding();
 			
 			if (template == null) {
-				int mdTok = this.GetType ().MetadataToken;
-
-				if (!IFace.DefaultTemplates.ContainsKey (mdTok)) {
-					string defTmpId = this.GetType ().FullName + ".template";
+				string defTmpId = this.GetType ().FullName + ".template";
+				if (!IFace.DefaultTemplates.ContainsKey (defTmpId)) {
+					
 					Stream s = IFace.GetStreamFromPath ("#" + defTmpId);
 					if (s == null)
 						throw new Exception (string.Format ("No default template found for '{0}'", this.GetType ().FullName));
-					IFace.DefaultTemplates [mdTok] = new IML.Instantiator (IFace, s, defTmpId);
+					IFace.DefaultTemplates [defTmpId] = new IML.Instantiator (IFace, s, defTmpId);
 				}
-				this.SetChild (IFace.DefaultTemplates[mdTok].CreateInstance());
+				this.SetChild (IFace.DefaultTemplates[defTmpId].CreateInstance());
 			}else
 				this.SetChild (template);
 		}

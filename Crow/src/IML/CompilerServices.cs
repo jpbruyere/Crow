@@ -270,7 +270,7 @@ namespace Crow.IML
 		static MemberInfo getMemberInfoWithReflexion(object instance, string member){
             Type t = instance.GetType();
 #if DEBUG_BINDING_FUNC_CALLS
-			System.Diagnostics.Debug.WriteLine ($"getMemberInfoWithReflexion ({instance},{member}); type:{t}");
+			Console.WriteLine ($"getMemberInfoWithReflexion ({instance},{member}); type:{t}");
 #endif
             MemberInfo mi = t.GetMember (member)?.FirstOrDefault();
 			if (mi == null)
@@ -279,7 +279,7 @@ namespace Crow.IML
 		}
 		static MethodInfo getMethodInfoWithReflexion(object instance, string method){
 #if DEBUG_BINDING_FUNC_CALLS
-            System.Diagnostics.Debug.WriteLine ($"getMethodInfoWithReflexion ({instance},{method}); type:{instance.GetType ()}");
+            Console.WriteLine ($"getMethodInfoWithReflexion ({instance},{method}); type:{instance.GetType ()}");
 #endif
             return instance.GetType ().GetMethod (method, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 		}
@@ -291,7 +291,7 @@ namespace Crow.IML
 		/// <param name="destMember">Destination member</param>
 		static void setValueWithReflexion(object dest, object value, string destMember){
 #if DEBUG_BINDING_FUNC_CALLS
-            System.Diagnostics.Debug.WriteLine ($"setValueWithReflexion (dest:{dest},value:{value},member:{destMember});");
+            Console.WriteLine ($"setValueWithReflexion (dest:{dest},value:{value},member:{destMember});");
 #endif
             Type destType = null;
 			Type origType = null;
@@ -300,7 +300,7 @@ namespace Crow.IML
 			MemberInfo miDest = getMemberInfoWithReflexion (dest, destMember);
 
 			if (miDest == null) {
-				Debug.WriteLine ("Reverse template binding error: " + destMember + " not found in " + dest);
+				Console.WriteLine ("Reverse template binding error: " + destMember + " not found in " + dest);
 				return;
 			}
 
@@ -323,7 +323,7 @@ namespace Crow.IML
 					}
 				}
 			} catch (Exception ex) {
-				Debug.WriteLine (ex.ToString ());
+				Console.WriteLine (ex.ToString ());
 				return;
 			}
 
@@ -338,7 +338,7 @@ namespace Crow.IML
 		/// </summary>
 		static object getValueWithReflexion(object instance, MemberInfo mi){
 #if DEBUG_BINDING_FUNC_CALLS
-            System.Diagnostics.Debug.WriteLine ($"getValueWithReflexion ({instance},{mi});");
+            Console.WriteLine ($"getValueWithReflexion ({instance},{mi});");
 #endif
             object tmp = null;
 			Type dstType = null;
@@ -368,7 +368,7 @@ namespace Crow.IML
 				if (dstType.IsValueType)
 					return Activator.CreateInstance (dstType);				
 			} catch (Exception ex) {
-				Debug.WriteLine (ex.ToString ());
+				Console.WriteLine (ex.ToString ());
 				return "";
 			}
 
@@ -380,7 +380,7 @@ namespace Crow.IML
 			if (knownExtMethods.ContainsKey (key))
 				return knownExtMethods [key];
 
-			//System.Diagnostics.Debug.WriteLine ($"*** search extension method: {t};{methodName} => key={key}");
+			//System.Diagnostics.Console.WriteLine ($"*** search extension method: {t};{methodName} => key={key}");
 
 			MethodInfo mi = null;
 			if (!TryGetExtensionMethods (Assembly.GetEntryAssembly (), t, methodName, out mi)) {
@@ -755,7 +755,7 @@ namespace Crow.IML
 			FieldInfo fiEvt = getEventHandlerField (t, eventName);
 			if (fiEvt == null) {
 #if DEBUG_BINDING
-				Debug.WriteLine ("RemoveHandlerByName: Event '" + eventName + "' not found in " + instance);
+				Console.WriteLine ("RemoveHandlerByName: Event '" + eventName + "' not found in " + instance);
 #endif
 				return;
 			}
@@ -766,7 +766,7 @@ namespace Crow.IML
 					if (d.Method.Name == delegateName) {
 						eiEvt.RemoveEventHandler (instance, d);
 #if DEBUG_BINDING
-						Debug.WriteLine ("\tremoveEventHandlerByName: {0} handler removed in {1} for: {2}", d.Method.Name,instance, eventName);
+						Console.WriteLine ("\tremoveEventHandlerByName: {0} handler removed in {1} for: {2}", d.Method.Name,instance, eventName);
 #endif
 					}
 				}
@@ -785,7 +785,7 @@ namespace Crow.IML
 					if (d.Target == target) {
 						eiEvt.RemoveEventHandler (instance, d);
 #if DEBUG_BINDING
-						Debug.WriteLine ("\tremoveEventHandlerByTarget: {0} handler removed in {1} for: {2}", d.Method.Name,instance, eventName);
+						Console.WriteLine ("\tremoveEventHandlerByTarget: {0} handler removed in {1} for: {2}", d.Method.Name,instance, eventName);
 #endif
 					}
 				}
@@ -798,7 +798,7 @@ namespace Crow.IML
 			Type t = instance.GetType ();
 			MethodInfo mi = t.GetMethod (method, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			if (mi == null) {
-				Debug.WriteLine ("Handler Method '{0}' not found in '{1}'", method, t);
+				Console.WriteLine ("Handler Method '{0}' not found in '{1}'", method, t);
 				return null;
 			}
 			return Delegate.CreateDelegate (eventType, instance, mi);
@@ -879,7 +879,7 @@ namespace Crow.IML
 		//get value from member of object
 		internal static object getDataTypeAndFetch (object data, string fetchMethod){
 			Type dataType = data.GetType();
-			//System.Diagnostics.Debug.WriteLine ($"get data type and fetch {data}.{fetchMethod}");
+			//Console.WriteLine ($"get data type and fetch {data}.{fetchMethod}");
 			MethodInfo miGetDatas = dataType.GetMethod (fetchMethod, new Type[] {});
 			if (miGetDatas == null)
 				miGetDatas = CompilerServices.SearchExtMethod (dataType, fetchMethod);
@@ -902,7 +902,7 @@ namespace Crow.IML
 		//TODO:memberinfo found here must be cached
 		internal static object getValue (Type dataType, object data, string member)
 		{
-			//System.Diagnostics.Debug.WriteLine ($"get value: {dataType} ; {data} ; {member}");
+			//Console.WriteLine ($"get value: {dataType} ; {data} ; {member}");
 
 			MethodInfo miGetDatas = dataType.GetMethod (member, new Type [] { });
 			if (miGetDatas != null)

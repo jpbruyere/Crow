@@ -982,12 +982,10 @@ namespace Crow
 					rootDataLevel = true;
 
 				DbgLogger.StartEvent(DbgEvtType.GOLockUpdate, this);
-
 				lock (IFace.UpdateMutex) {
 					OnDataSourceChanged (this, dse);
 					NotifyValueChangedAuto (DataSource);
 				}
-
 				DbgLogger.EndEvent (DbgEvtType.GOLockUpdate);
 			}
 			get {
@@ -1025,7 +1023,7 @@ namespace Crow
 			#endif
 
 			#if DEBUG_BINDING
-			Debug.WriteLine("New DataSource for => {0} \n\t{1}=>{2}", this.ToString(),e.OldDataSource,e.NewDataSource);
+			Console.WriteLine("New DataSource for => {0} \n\t{1}=>{2}", this.ToString(),e.OldDataSource,e.NewDataSource);
 			#endif
 		}
 		/// <summary>

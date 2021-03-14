@@ -76,6 +76,11 @@ namespace Crow
 			SelectedIndex++;
 			ListAdd.Raise (this, new ListChangedEventArg (selectedIndex, SelectedItem));
 		}
+		public void Replace (T oldValue, T newValue) {
+			int idx = IndexOf (oldValue);
+			base[idx] = newValue;
+			ListEdit.Raise (this, new ListChangedEventArg (idx, newValue));
+		}
 		public void RaiseEdit () {
 			if (selectedIndex < 0)
 				return;
