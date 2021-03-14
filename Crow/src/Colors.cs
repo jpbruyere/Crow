@@ -352,7 +352,9 @@ namespace Crow
 
 		public static Color Parse(string s)
 			=> string.IsNullOrEmpty (s) ? new Color (Colors.White) :
-				s[0] == '#' ? new Color (UInt32.Parse (s.AsSpan().Slice (1), System.Globalization.NumberStyles.HexNumber)) :
+				s[0] == '#' ? s.Length < 8 ?
+				new Color (0xff + (UInt32.Parse (s.AsSpan ().Slice (1), System.Globalization.NumberStyles.HexNumber)<<8))
+				: new Color (UInt32.Parse (s.AsSpan().Slice (1), System.Globalization.NumberStyles.HexNumber)) :
 				char.IsDigit(s[0]) ? FromIml (s) :
 				FastEnum.TryParse<Colors> (s, out Colors cc) ? new Color(cc) :
 				throw new Exception ("Unknown color name: " + s);
