@@ -188,6 +188,7 @@ DockStack {
 	Margin="2";
 	Spacing="2";
 	AllowDrop = "true";
+	AllowedDropTypes = "Crow.DockWindow";
 	Focusable="true";
 	//DragEnter="{Background=Blue}";
 	//DragLeave="{Background=Transparent}";
@@ -197,6 +198,8 @@ DockWindow {
 	//Background = "Onyx";
 	Focusable = "true";
 	AllowDrag = "true";
+	AllowDrop="true";
+	AllowedDropTypes = "Crow.DockWindow";
 	AlwaysOnTop = "true";
 	Margin="0";
 	Width="200";

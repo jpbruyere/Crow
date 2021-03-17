@@ -461,6 +461,8 @@ namespace Crow
 		public List<CrowThread> CrowThreads = new List<CrowThread>();//used to monitor thread finished
 
 		public bool DragAndDropInProgress => DragAndDropOperation != null;
+		public Widget DropTarget => DragAndDropOperation?.DropTarget;
+
 		public DragDropEventArgs DragAndDropOperation = null;
 		internal Widget dragndropHover;
 

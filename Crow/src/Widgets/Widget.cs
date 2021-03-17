@@ -13,6 +13,7 @@ using System.Diagnostics;
 using Crow.IML;
 using System.Threading;
 using Glfw;
+using System.Linq;
 
 
 #if DESIGN_MODE
@@ -287,6 +288,7 @@ namespace Crow
 		bool isDragged;
 		bool allowDrag;
 		bool allowDrop;
+		string allowedDropTypes;
 		string tooltip;
 		IList<Command> contextCommands;
 		#endregion
@@ -1314,6 +1316,9 @@ namespace Crow
 		}
 
 		#region Drag&Drop
+		/// <summary>
+		/// If true, allow widget to be dragged and dropped.
+		/// </summary>
 		[DesignCategory ("DragAndDrop")][DefaultValue(false)]
 		public virtual bool AllowDrag {
 			get => allowDrag;
@@ -1324,6 +1329,10 @@ namespace Crow
 				NotifyValueChanged ("AllowDrag", allowDrag);
 			}
 		}
+		/// <summary>
+		/// If true, allow widgets of type listed in 'AllowedDropTypes' to be dropped in this widget
+		/// during drag and drop operations.
+		/// </summary>
 		[DesignCategory ("DragAndDrop")][DefaultValue(false)]
 		public virtual bool AllowDrop {
 			get => allowDrop;
@@ -1333,18 +1342,30 @@ namespace Crow
 				allowDrop = value;
 				NotifyValueChanged ("AllowDrop", allowDrop);
 			}
+		}		
+		/// <summary>
+		/// Semicolon separated list of accepted types as dropped widget.
+		/// </summary>
+		[DesignCategory ("DragAndDrop")][DefaultValue ("Crow.Widget")]
+		public virtual string AllowedDropTypes {
+			get => allowedDropTypes;
+			set {
+				if (allowedDropTypes == value)
+					return;
+				allowedDropTypes = value;
+				NotifyValueChanged ("AllowedDropTypes", allowedDropTypes);
+			}
 		}
-
-//		public List<Type> AllowedDroppedTypes;
-//		public void AddAllowedDroppedType (Type newType){
-//			if (AllowedDroppedTypes == null)
-//				AllowedDroppedTypes = new List<Type> ();
-//			AllowedDroppedTypes.Add (newType);
-//			NotifyValueChanged ("AllowDrop", AllowDrop);
-//		}
-//		[XmlIgnore]public virtual bool AllowDrop {
-//			get { return AllowedDroppedTypes?.Count>0; }
-//		}
+		//		public List<Type> AllowedDroppedTypes;
+		//		public void AddAllowedDroppedType (Type newType){
+		//			if (AllowedDroppedTypes == null)
+		//				AllowedDroppedTypes = new List<Type> ();
+		//			AllowedDroppedTypes.Add (newType);
+		//			NotifyValueChanged ("AllowDrop", AllowDrop);
+		//		}
+		//		[XmlIgnore]public virtual bool AllowDrop {
+		//			get { return AllowedDroppedTypes?.Count>0; }
+		//		}
 		[XmlIgnore]public virtual bool IsDragged {
 			get => isDragged;
 			set {
@@ -1355,6 +1376,9 @@ namespace Crow
 				NotifyValueChanged ("IsDragged", IsDragged);
 			}
 		}
+		public bool AcceptDrop (Widget droppedWidget) =>
+			string.IsNullOrEmpty(AllowedDropTypes) || droppedWidget == null ? false :
+			AllowedDropTypes.Split (';').Contains (droppedWidget.GetType ().FullName);
 		/// <summary>
 		/// equivalent to mouse move for a dragged widget, no bubbling.
 		/// </summary>
@@ -1920,7 +1944,7 @@ namespace Crow
 			if (IFace.DragAndDropInProgress) {
 				if (IFace.dragndropHover != this) {
 					IFace.dragndropHover = this;
-					if (AllowDrop)
+					if (AllowDrop && IFace.DragAndDropOperation.DragSource.AcceptDrop (this))
 						onDragEnter (this, IFace.DragAndDropOperation);
 				}
 			} else if (IFace.HoverWidget != this) {

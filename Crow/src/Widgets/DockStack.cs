@@ -92,7 +92,8 @@ namespace Crow
 
 		public void onDragMouseMove (object sender, MouseMoveEventArgs e)
 		{
-			if (IsDropTarget) {				
+
+			//if (IsDropTarget) {				
 				DockWindow dw = IFace.DragAndDropOperation.DragSource as DockWindow;
 				if (dw == null || dw.IsDocked) {
 					base.onMouseMove (sender, e);
@@ -149,7 +150,7 @@ namespace Crow
 
 				if (curDockPos != dw.DockingPosition)
 					RegisterForGraphicUpdate ();
-			}
+			//}
 			//base.onMouseMove (sender, e);
 		}
 
@@ -189,9 +190,8 @@ namespace Crow
 				g.Paint (gr);			
 
 			childrenRWLock.ExitReadLock ();
-
-
-			if (!IsDropTarget) {
+			
+			if (!(IsDropTarget || (IFace.DropTarget is DockWindow dtdw && dtdw.Parent == this))) {
 				gr.Restore ();
 				return;
 			}

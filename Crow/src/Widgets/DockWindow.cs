@@ -74,9 +74,15 @@ namespace Crow
 				moveAndResize (e.XDelta, e.YDelta, currentDirection);
 			
 			base.onDrag (sender, e);
-			(IFace.DragAndDropOperation.DropTarget as DockStack)?.onDragMouseMove (this, e);
+			if (IFace.DragAndDropOperation.DropTarget is DockStack ds)
+				ds.onDragMouseMove (this, e);
+			else if (IFace.DragAndDropOperation.DropTarget is DockWindow dw)
+				(dw.Parent as DockStack)?.onDragMouseMove (this, e);
 		}
-		public override void onMouseDown (object sender, MouseButtonEventArgs e)
+        protected override void onDragEnter (object sender, DragDropEventArgs e) {
+            base.onDragEnter (sender, e);
+        }
+        public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
 			e.Handled = true;
 			base.onMouseDown (sender, e);
@@ -104,8 +110,12 @@ namespace Crow
 		}
 		public override void onDrop (object sender, DragDropEventArgs e)
 		{
-			if (!isDocked && DockingPosition != Alignment.Undefined && e.DropTarget is DockStack)
-				Dock (e.DropTarget as DockStack);
+			if (!(isDocked || DockingPosition == Alignment.Undefined)) {
+				if (e.DropTarget is DockStack ds)
+					Dock (ds);
+				else if (e.DropTarget is DockWindow dw)
+					Dock (dw.Parent as DockStack);
+			}
 			base.onDrop (sender, e);
 		}
 		public void Undock () {
@@ -115,8 +125,8 @@ namespace Crow
 
 				IFace.AddWidget (this);
 
-				Left = savedSlot.Left;
-				Top = savedSlot.Top;
+				Left = IFace.MousePosition.X - 10;
+				Top = IFace.MousePosition.Y - 10;
 				Width = savedSlot.Width;
 				Height = savedSlot.Height;
 
