@@ -178,10 +178,7 @@ namespace Crow
 		}
 		public override void checkHoverWidget (MouseMoveEventArgs e)
 		{
-			if (IFace.HoverWidget != this) {
-				IFace.HoverWidget = this;
-				onMouseEnter (this, e);
-			}
+			base.checkHoverWidget (e);
 			if (Content != null){
 				if (Content.Parent != null) {
 					if (Content.MouseIsIn (e.Position)) {
@@ -190,7 +187,6 @@ namespace Crow
 					}
 				}
 			}
-			base.checkHoverWidget (e);
 		}
 		#endregion
 

@@ -14,8 +14,9 @@
 			<Label Style="smallLabel" Text="{ActiveWidget}"/>
 		</HorizontalStack>
 	</VerticalStack>
-	<DockStack Height="70%"/>
-	<Splitter/>
+	<Label Text="Press 'F6' to add new windows"/>
+	<DockStack Name="mainDock" Height="Stretched"/>
+	<!--<Splitter/>
 	<Button Caption="Refresh tree" MouseClick="refreshGraphicTree"/>
 	<TreeView IsRoot="true" Name="treeView" Data="{GraphicTree}">
 		<ItemTemplate>
@@ -40,5 +41,5 @@
 			Path="#ui.GTreeExp.itemp"/>
 		<ItemTemplate DataType="Crow.TemplatedGroup" Data="GetChildren"
 			Path="#ui.GTreeExp.itemp"/>
-	</TreeView>	
+	</TreeView>	-->
 </VerticalStack>

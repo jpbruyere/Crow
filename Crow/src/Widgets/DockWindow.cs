@@ -66,21 +66,15 @@ namespace Crow
 			return Slot.ContainsOrIsEqual(m);
 		}
 
-		public override void onMouseMove (object sender, MouseMoveEventArgs e)
-		{
-			//			if (this.HasFocus && e.Mouse.IsButtonDown (MouseButton.Left) && IsDocked) {
-			//				if (Math.Abs (e.Position.X - undockingMousePosOrig.X) > 10 ||
-			//				    Math.Abs (e.Position.X - undockingMousePosOrig.X) > 10)
-			//					Undock ();
-			//			}
-			if (IFace.IsDown (MouseButton.Left) && IFace.DragAndDropOperation?.DragSource == this) {
-				if (isDocked)
-					CheckUndock (e.Position);
-				else
-					moveAndResize (e.XDelta, e.YDelta, currentDirection);
-
-			}
-			base.onMouseMove (sender, e);
+		public override void onDrag (object sender, MouseMoveEventArgs e)
+		{			
+			if (isDocked)
+				CheckUndock (e.Position);
+			else
+				moveAndResize (e.XDelta, e.YDelta, currentDirection);
+			
+			base.onDrag (sender, e);
+			(IFace.DragAndDropOperation.DropTarget as DockStack)?.onDragMouseMove (this, e);
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
@@ -108,7 +102,7 @@ namespace Crow
 
 			undockingMousePosOrig = IFace.MousePosition;
 		}
-		protected override void onDrop (object sender, DragDropEventArgs e)
+		public override void onDrop (object sender, DragDropEventArgs e)
 		{
 			if (!isDocked && DockingPosition != Alignment.Undefined && e.DropTarget is DockStack)
 				Dock (e.DropTarget as DockStack);
@@ -134,7 +128,8 @@ namespace Crow
 
 		public void Dock (DockStack target){
 			lock (IFace.UpdateMutex) {
-				IsDocked = true;
+				//IsDocked = true;
+				undockingMousePosOrig = IFace.MousePosition;
 				//undockingMousePosOrig = lastMousePos;
 				savedSlot = this.LastPaintedSlot;
 				wasResizable = Resizable;

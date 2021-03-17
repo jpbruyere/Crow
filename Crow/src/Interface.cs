@@ -460,7 +460,10 @@ namespace Crow
 
 		public List<CrowThread> CrowThreads = new List<CrowThread>();//used to monitor thread finished
 
+		public bool DragAndDropInProgress => DragAndDropOperation != null;
 		public DragDropEventArgs DragAndDropOperation = null;
+		internal Widget dragndropHover;
+
 		public Surface DragImage = null;
 		public int DragImageWidth, DragImageHeight, DragImageX, DragImageY;
 		public void ClearDragImage () {
@@ -763,14 +766,16 @@ namespace Crow
 		/// , it can not lose focus while Active</summary>
 		public Widget ActiveWidget
 		{
-			get { return _activeWidget; }
+			get => _activeWidget;
 			internal set
 			{
 				if (_activeWidget == value)
 					return;
 
-				if (_activeWidget != null)
+				if (_activeWidget != null) {
+					debugRegisterClip (_activeWidget);
 					_activeWidget.IsActive = false;
+				}
 
 				_activeWidget = value;
 
@@ -784,20 +789,22 @@ namespace Crow
 		/// <summary>Pointer is over the widget</summary>
 		public virtual Widget HoverWidget
 		{
-			get { return _hoverWidget; }
+			get => _hoverWidget;
 			set {
 				if (_hoverWidget == value)
 					return;
 
-				if (_hoverWidget != null)
+				if (_hoverWidget != null) {
+					debugRegisterClip (_hoverWidget);
 					_hoverWidget.IsHover = false;
+				}
 
 				_hoverWidget = value;
 
 				NotifyValueChanged ("HoverWidget", _hoverWidget);
 				DbgLogger.AddEvent (DbgEvtType.HoverWidget, _hoverWidget);
 
-				if (DragAndDropOperation == null && FOCUS_ON_HOVER) {
+				if (FOCUS_ON_HOVER) {
 					Widget w = _hoverWidget;
 					while (w != null) {
 						if (w.Focusable) {
@@ -818,8 +825,10 @@ namespace Crow
 			set {
 				if (_focusedWidget == value)
 					return;
-				if (_focusedWidget != null)
+				if (_focusedWidget != null) {
+					debugRegisterClip (_focusedWidget);
 					_focusedWidget.HasFocus = false;
+				}
 				_focusedWidget = value;
 
 				NotifyValueChanged ("FocusedWidget", _focusedWidget);				
@@ -1017,10 +1026,36 @@ namespace Crow
 			}
 
 			drawTextCursor (ctx);
+
+			debugHighlightFocus (ctx);
 			
 			DbgLogger.EndEvent (DbgEvtType.Drawing, true);
 		}
 		#endregion
+
+		[Conditional ("DEBUG_HIGHLIGHT_FOCUS")]
+		internal void debugRegisterClip (Widget w) {
+			RegisterClip (w.ScreenCoordinates (w.Slot));
+		}
+		[Conditional ("DEBUG_HIGHLIGHT_FOCUS")]
+		void debugHighlightFocus (Context ctx) {
+			if (HoverWidget!= null) {
+				ctx.SetSource (Colors.Purple);
+				ctx.Rectangle (HoverWidget.ScreenCoordinates (HoverWidget.Slot), 1);
+			}
+			if (FocusedWidget != null) {
+				ctx.SetSource (Colors.Blue);
+				ctx.Rectangle (FocusedWidget.ScreenCoordinates (FocusedWidget.Slot), 1);
+			}
+			if (ActiveWidget != null) {
+				ctx.SetSource (Colors.Yellow);
+				ctx.Rectangle (ActiveWidget.ScreenCoordinates (ActiveWidget.Slot), 1);
+			}
+			/*if (DragAndDropInProgress) {
+
+            }*/
+			surf.Flush ();
+		}
 
 		#region Blinking text cursor
 		/// <summary>
@@ -1317,6 +1352,17 @@ namespace Crow
 		Point stickyMouseDelta = default;
 		internal Widget stickedWidget = null;
 
+		Widget HoverOrDropTarget {
+			get => DragAndDropInProgress ? dragndropHover : HoverWidget;
+			set {
+				if (DragAndDropInProgress) {
+					dragndropHover = value;
+				} else
+					HoverWidget = value;
+            }
+        }
+		
+
 		/// <summary>Processes mouse move events from the root container, this function
 		/// should be called by the host on mouse move event to forward events to crow interfaces</summary>
 		/// <returns>true if mouse is in the interface</returns>
@@ -1325,78 +1371,89 @@ namespace Crow
 			int deltaX = x - MousePosition.X;
 			int deltaY = y - MousePosition.Y;
 
-			if (stickedWidget != null && _activeWidget == null) {
-				stickyMouseDelta.X += deltaX;
-				stickyMouseDelta.Y += deltaY;				
+			if (!DragAndDropInProgress) {
+				if (stickedWidget != null && ActiveWidget == null) {
+					stickyMouseDelta.X += deltaX;
+					stickyMouseDelta.Y += deltaY;
 
-				if (Math.Abs (stickyMouseDelta.X) > stickedWidget.StickyMouse || Math.Abs (stickyMouseDelta.Y) > stickedWidget.StickyMouse) {
-					stickedWidget = null;
-					stickyMouseDelta = default;
-				} else {
-					Glfw3.SetCursorPosition (hWin, MousePosition.X, MousePosition.Y);
-					return true;
+					if (Math.Abs (stickyMouseDelta.X) > stickedWidget.StickyMouse || Math.Abs (stickyMouseDelta.Y) > stickedWidget.StickyMouse) {
+						stickedWidget = null;
+						stickyMouseDelta = default;
+					} else {
+						Glfw3.SetCursorPosition (hWin, MousePosition.X, MousePosition.Y);
+						return true;
+					}
 				}
 			}
 
 			MousePosition = new Point (x, y);
 			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
 
-			if (DragAndDropOperation != null)//drag source cant have hover event, so move has to be handle here
-				DragAndDropOperation.DragSource.onMouseMove (this, e);
-			else if (ActiveWidget != null) {
+			if (!(DragAndDropInProgress || ActiveWidget == null)) {
 				//TODO, ensure object is still in the graphic tree
 				//send move evt even if mouse move outside bounds
-				_activeWidget.onMouseMove (this, e);
+				ActiveWidget.onMouseMove (this, e);
 				return true;
 			}
 
-			if (_hoverWidget != null) {
+			if (HoverOrDropTarget != null) {
 				resetTooltip ();
-				//check topmost graphicobject first
-				Widget tmp = _hoverWidget;
-				Widget topc = null;
-				while (tmp is Widget) {
-					topc = tmp;
-					tmp = tmp.LogicalParent as Widget;
-				}
-				int idxhw = GraphicTree.IndexOf (topc);
-				if (idxhw != 0) {
-					int i = 0;
-					while (i < idxhw) {
-						//if logical parent of top container is a widget, that's a popup
+
+				//check topmost graphicobject first				
+				Widget topContainer = HoverOrDropTarget;
+				while (topContainer.LogicalParent is Widget w)
+					topContainer = w;					
+				
+				int indexOfTopContainer = GraphicTree.IndexOf (topContainer);
+				if (indexOfTopContainer != 0) {
+                    for (int i = 0; i < indexOfTopContainer; i++) {
+						//if logical parent of top container is a Interface, that's not a popup.
 						if (GraphicTree [i].LogicalParent is Interface) {
 							if (GraphicTree [i].MouseIsIn (e.Position)) {
-								while (_hoverWidget != null) {
-									_hoverWidget.onMouseLeave (_hoverWidget, e);
-									HoverWidget = _hoverWidget.FocusParent;
-								}
-
-								GraphicTree [i].checkHoverWidget (e);
-								_hoverWidget.onMouseMove (this, e);
+								//mouse is in another top container than the actual one,
+								//so we must leave first the current top container starting from HoverWidget
+								if (DragAndDropInProgress) {
+									DragAndDropOperation.DropTarget?.onDragLeave (this, DragAndDropOperation);
+									GraphicTree[i].checkHoverWidget (e);
+									DragAndDropOperation.DragSource.onDrag (this, e);
+								} else {
+									while (HoverWidget != null) {
+										HoverWidget.onMouseLeave (this, e);
+										HoverWidget = HoverWidget.FocusParent;
+									}
+									GraphicTree[i].checkHoverWidget (e);
+									HoverWidget.onMouseMove (this, e);
+								}									
 								return true;
 							}
 						}
-						i++;
 					}
 				}
 
-				if (_hoverWidget.MouseIsIn (e.Position)) {
-					_hoverWidget.checkHoverWidget (e);
-					_hoverWidget.onMouseMove (this, e);
+				if (HoverOrDropTarget.MouseIsIn (e.Position)) {
+					HoverOrDropTarget.checkHoverWidget (e);
+					if (DragAndDropInProgress)
+						DragAndDropOperation.DragSource.onDrag (this, e);
+					else
+						HoverWidget.onMouseMove (this, e);
 					return true;
-				}
-				_hoverWidget.onMouseLeave (_hoverWidget, e);
-				//seek upward from last focused graph obj's
-				tmp = _hoverWidget.FocusParent;
-				while (tmp != null) {
-					HoverWidget = tmp;
-					if (_hoverWidget.MouseIsIn (e.Position)) {
-						_hoverWidget.checkHoverWidget (e);
-						_hoverWidget.onMouseMove (_hoverWidget, e);
-						return true;
+				} else {
+					if (DragAndDropInProgress && dragndropHover == DragAndDropOperation.DropTarget)
+						DragAndDropOperation.DropTarget.onDragLeave (this, DragAndDropOperation);
+					//seek upward from last focused graph obj's	
+					while (HoverOrDropTarget.FocusParent != null) {
+						if (!DragAndDropInProgress)
+							HoverWidget.onMouseLeave (this, e);
+						HoverOrDropTarget = HoverOrDropTarget.FocusParent;
+						if (HoverOrDropTarget.MouseIsIn (e.Position)) {
+							HoverOrDropTarget.checkHoverWidget (e);
+							if (DragAndDropInProgress)
+								DragAndDropOperation.DragSource?.onDrag (this, e);
+							else
+								HoverWidget.onMouseMove (this, e);
+							return true;
+						}						
 					}
-					_hoverWidget.onMouseLeave (_hoverWidget, e);
-					tmp = _hoverWidget.FocusParent;
 				}
 			}
 
@@ -1404,19 +1461,23 @@ namespace Crow
 			lock (GraphicTree) {
 				for (int i = 0; i < GraphicTree.Count; i++) {
 					Widget g = GraphicTree [i];
+					if (DragAndDropInProgress && DragAndDropOperation.DragSource == g)
+						continue;
 					if (g.MouseIsIn (e.Position)) {
 						g.checkHoverWidget (e);
-						if (g is Window && FOCUS_ON_HOVER && g.Focusable) {
-							FocusedWidget = g;
-							if (RAISE_WIN_ON_FOCUS)
-								PutOnTop (g);
+						if (!DragAndDropInProgress) {
+							if (g is Window && FOCUS_ON_HOVER && g.Focusable) {
+								FocusedWidget = g;
+								if (RAISE_WIN_ON_FOCUS)
+									PutOnTop (g);
+							}
+							HoverWidget.onMouseMove (this, e);
 						}
-						_hoverWidget.onMouseMove (_hoverWidget, e);
 						return true;
 					}
 				}
 			}
-			HoverWidget = null;
+			HoverOrDropTarget = null;
 			return false;
 		}
 		/// <summary>
@@ -1431,12 +1492,12 @@ namespace Crow
 
 			lastMouseDownEvent = new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press);
 
-			if (_hoverWidget == null)
+			if (HoverWidget == null)
 				return false;
 
-			_hoverWidget.onMouseDown (_hoverWidget, lastMouseDownEvent);
+			HoverWidget.onMouseDown (this, lastMouseDownEvent);
 
-			ActiveWidget = _hoverWidget;
+			ActiveWidget = HoverWidget;
 			return true;
 		}
 		/// <summary>
@@ -1448,6 +1509,19 @@ namespace Crow
 		{
 			mouseRepeatTimer.Reset ();
 			lastMouseDownEvent = null;
+
+			if (DragAndDropInProgress) {				
+				if (DragAndDropOperation.DropTarget != null)
+					DragAndDropOperation.DragSource.onDrop (this, DragAndDropOperation);
+				else
+					DragAndDropOperation.DragSource.onEndDrag (this, DragAndDropOperation);
+				DragAndDropOperation = null;
+				if (ActiveWidget != null) {
+					ActiveWidget.onMouseUp (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Release));
+					ActiveWidget = null;
+				}
+				return true;
+            }
 
 			if (_activeWidget == null)
 				return false;
@@ -1611,6 +1685,7 @@ namespace Crow
 		{
 			ctxMenuContainer = CreateInstance ("#Crow.ContextMenu.template") as MenuItem;
 			ctxMenuContainer.LayoutChanged += CtxMenuContainer_LayoutChanged;
+			ctxMenuContainer.Focusable = true;
 		}
 		protected void disposeContextMenus () {
 			if (ctxMenuContainer == null)
@@ -1641,17 +1716,19 @@ namespace Crow
 				else
 					ctxMenuContainer.IsOpened = true;
 
-				//ctxMenuContainer.isPopup = true;
+				ctxMenuContainer.BubbleMouseEvent = false;
 				ctxMenuContainer.LogicalParent = go;
 				ctxMenuContainer.DataSource = go;
+				
 
 				PutOnTop (ctxMenuContainer, true);
 			}
 			ctxMenuContainer.Left = MousePosition.X - 5;
 			ctxMenuContainer.Top = MousePosition.Y - 5;
 
-			_hoverWidget = ctxMenuContainer;
-			ctxMenuContainer.onMouseEnter (ctxMenuContainer, new MouseMoveEventArgs (MousePosition.X, MousePosition.Y, 0, 0));
+			//OnMouseMove (MousePosition.X, MousePosition.Y);
+			HoverWidget = ctxMenuContainer;
+			ctxMenuContainer.onMouseEnter (ctxMenuContainer, new MouseMoveEventArgs (MousePosition.X, MousePosition.Y, 0, 0));						
 		}
 		#endregion
 

@@ -226,7 +226,7 @@ namespace Crow
 
 			dragStartPoint = IFace.MousePosition;
 		}
-		protected override void onEndDrag (object sender, DragDropEventArgs e)
+		public override void onEndDrag (object sender, DragDropEventArgs e)
 		{
 			base.onEndDrag (sender, e);
 
@@ -237,7 +237,7 @@ namespace Crow
 
 			IFace.ClearDragImage ();
 		}
-		protected override void onDrop (object sender, DragDropEventArgs e)
+		public override void onDrop (object sender, DragDropEventArgs e)
 		{
 			base.onDrop (sender, e);
 			if (Parent != null)

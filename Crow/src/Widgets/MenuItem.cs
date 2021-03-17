@@ -126,9 +126,8 @@ namespace Crow
 			Close.Raise (this, null);
 		}
 		public override bool MouseIsIn (Point m)
-		{
-			return IsEnabled && !IsDragged ? base.MouseIsIn (m) || child.MouseIsIn (m) : false;
-		}
+			=> IsEnabled && !IsDragged ? base.MouseIsIn (m) || child.MouseIsIn (m) : false;
+		
 		public override void onMouseEnter (object sender, MouseMoveEventArgs e)
 		{
 			base.onMouseEnter (sender, e);

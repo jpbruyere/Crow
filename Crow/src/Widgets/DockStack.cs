@@ -90,7 +90,7 @@ namespace Crow
 			childrenRWLock.ExitReadLock ();			
 		}
 
-		public override void onMouseMove (object sender, MouseMoveEventArgs e)
+		public void onDragMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			if (IsDropTarget) {				
 				DockWindow dw = IFace.DragAndDropOperation.DragSource as DockWindow;
@@ -150,7 +150,7 @@ namespace Crow
 				if (curDockPos != dw.DockingPosition)
 					RegisterForGraphicUpdate ();
 			}
-			base.onMouseMove (sender, e);
+			//base.onMouseMove (sender, e);
 		}
 
 		protected override void onDragEnter (object sender, DragDropEventArgs e)
@@ -158,7 +158,7 @@ namespace Crow
 			base.onDragEnter (sender, e);
 			RegisterForGraphicUpdate ();
 		}
-		protected override void onDragLeave (object sender, DragDropEventArgs e)
+		public override void onDragLeave (object sender, DragDropEventArgs e)
 		{
 			DockWindow dw = e.DragSource as DockWindow;
 			//if (dw != null)
@@ -295,6 +295,7 @@ namespace Crow
 				stretchedChild = dw;
 				break;
 			}
+			dw.IsDocked = true;
 		}
 		public void Undock (DockWindow dw){			
 			int idx = Children.IndexOf(dw);

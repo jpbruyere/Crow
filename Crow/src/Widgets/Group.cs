@@ -444,20 +444,17 @@ namespace Crow
 
 
 		#region Mouse handling
-		public override void checkHoverWidget (MouseMoveEventArgs e)
-		{
-			if (IFace.HoverWidget != this) {
-				IFace.HoverWidget = this;
-				onMouseEnter (this, e);
-			}
+		public override void checkHoverWidget (MouseMoveEventArgs e) {
+			base.checkHoverWidget (e);//TODO:check if not possible to put it at beginning of meth to avoid doubled check to DropTarget.
+			childrenRWLock.EnterReadLock ();
 			for (int i = Children.Count - 1; i >= 0; i--) {
-				if (Children[i].MouseIsIn(e.Position))
-				{
+				if (Children[i].MouseIsIn (e.Position)) {
 					Children[i].checkHoverWidget (e);
+					childrenRWLock.ExitReadLock ();
 					return;
 				}
 			}
-			base.checkHoverWidget (e);
+			childrenRWLock.ExitReadLock ();			
 		}
 //		public override bool PointIsIn (ref Point m)
 //		{

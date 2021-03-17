@@ -35,8 +35,8 @@ namespace tests
                 gr.Paint ();
             }
             DragImage = dragImg;
-            lock (UpdateMutex)
-                startGroup.RemoveChild (e.DragSource);
+            /*lock (UpdateMutex)
+                startGroup.RemoveChild (e.DragSource);*/
         }
         private void W_EndDrag (object sender, DragDropEventArgs e) {
             lock (UpdateMutex)

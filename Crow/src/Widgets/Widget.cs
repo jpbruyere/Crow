@@ -266,6 +266,7 @@ namespace Crow
 		bool hasFocus;
 		bool isActive;
 		bool isHover;
+		bool bubbleMouseEvent;
 		bool mouseRepeat;
 		bool stickyMouseEnabled;
 		int stickyMouse;
@@ -455,6 +456,7 @@ namespace Crow
 		public event EventHandler<DragDropEventArgs> DragLeave;
 		public event EventHandler<DragDropEventArgs> EndDrag;
 		public event EventHandler<DragDropEventArgs> Drop;
+		public event EventHandler<MouseMoveEventArgs> Drag;
 		#endregion
 
 		/// <summary>
@@ -704,7 +706,7 @@ namespace Crow
 					onUnfocused (this, null);
 				NotifyValueChangedAuto (hasFocus);
 			}
-		}
+		}		
 		/// <summary>
 		/// true if this control is active, this means that mouse has been pressed in it and not yet released. It could 
 		/// be used for other two states periferic action.
@@ -740,6 +742,20 @@ namespace Crow
 				}
 
 				NotifyValueChangedAuto (isHover);
+			}
+		}
+		/// <summary>
+		/// if false, prevent mouse events to bubble to the parent in any case.
+		/// </summary>
+		[DesignCategory ("Behaviour")]
+		[DefaultValue (true)]
+		public virtual bool BubbleMouseEvent {
+			get => bubbleMouseEvent;
+			set {
+				if (bubbleMouseEvent == value)
+					return;
+				bubbleMouseEvent = value;
+				NotifyValueChangedAuto (bubbleMouseEvent);
 			}
 		}
 		/// <summary>
@@ -1300,7 +1316,7 @@ namespace Crow
 		#region Drag&Drop
 		[DesignCategory ("DragAndDrop")][DefaultValue(false)]
 		public virtual bool AllowDrag {
-			get { return allowDrag; }
+			get => allowDrag;
 			set {
 				if (allowDrag == value)
 					return;
@@ -1310,7 +1326,7 @@ namespace Crow
 		}
 		[DesignCategory ("DragAndDrop")][DefaultValue(false)]
 		public virtual bool AllowDrop {
-			get { return allowDrop; }
+			get => allowDrop;
 			set {
 				if (allowDrop == value)
 					return;
@@ -1330,7 +1346,7 @@ namespace Crow
 //			get { return AllowedDroppedTypes?.Count>0; }
 //		}
 		[XmlIgnore]public virtual bool IsDragged {
-			get { return isDragged; }
+			get => isDragged;
 			set {
 				if (isDragged == value)
 					return;
@@ -1340,53 +1356,61 @@ namespace Crow
 			}
 		}
 		/// <summary>
+		/// equivalent to mouse move for a dragged widget, no bubbling.
+		/// </summary>
+		public virtual void onDrag (object sender, MouseMoveEventArgs e) {
+			if (Drag != null)
+				Drag.Invoke (this, e);
+#if DEBUG_DRAGNDROP
+			Debug.WriteLine (this.ToString () + " : DRAG => " + e.ToString ());
+#endif
+		}
+
+		/// <summary>
 		/// fired when drag and drop operation start
 		/// </summary>
 		protected virtual void onStartDrag (object sender, DragDropEventArgs e){
-			IFace.HoverWidget = null;
-			IFace.DragAndDropOperation = new DragDropEventArgs (this);
+			IFace.DragAndDropOperation = e;
+			IFace.dragndropHover = e.DropTarget;
 			IsDragged = true;
 			StartDrag.Raise (this, IFace.DragAndDropOperation);
 			#if DEBUG_DRAGNDROP
-			Debug.WriteLine(this.ToString() + " : START DRAG => " + e.ToString());
+			Debug.WriteLine(this.ToString() + " : START DRAG => " + e.ToString());			
 			#endif
 		}
-		/// <summary>
-		///  Occured when dragging ends without dropping
-		/// </summary>
-		protected virtual void onEndDrag (object sender, DragDropEventArgs e){			
-			IsDragged = false;
-			EndDrag.Raise (this, e);
-			#if DEBUG_DRAGNDROP
-			Debug.WriteLine(this.ToString() + " : END DRAG => " + e.ToString());
-			#endif
-		}
-		protected virtual void onDragEnter (object sender, DragDropEventArgs e){
-			e.DropTarget = this;
+		protected virtual void onDragEnter (object sender, DragDropEventArgs e){			
+			e.DropTarget = this;			
 			DragEnter.Raise (this, e);
 			#if DEBUG_DRAGNDROP
 			Debug.WriteLine(this.ToString() + " : DRAG Enter => " + e.ToString());
 			#endif
 		}
-		protected virtual void onDragLeave (object sender, DragDropEventArgs e){			
-			e.DropTarget = null;
+		public virtual void onDragLeave (object sender, DragDropEventArgs e){			
 			DragLeave.Raise (this, e);
-			#if DEBUG_DRAGNDROP
-			Debug.WriteLine(this.ToString() + " : DRAG Leave => " + e.ToString());
-			#endif
+#if DEBUG_DRAGNDROP
+			Debug.WriteLine (this.ToString () + " : DRAG Leave => " + e.ToString ());
+#endif
+			e.DropTarget = null;
 		}
-		protected virtual void onDrop (object sender, DragDropEventArgs e){			
+		/// <summary>
+		///  Occured when dragging ends without dropping
+		/// </summary>
+		public virtual void onEndDrag (object sender, DragDropEventArgs e) {
+			IsDragged = false;
+			EndDrag.Raise (this, e);
+#if DEBUG_DRAGNDROP
+			Debug.WriteLine(this.ToString() + " : END DRAG => " + e.ToString());
+#endif
+		}
+		public virtual void onDrop (object sender, DragDropEventArgs e){			
 			IsDragged = false;
 			Drop.Raise (this, e);
 			//e.DropTarget.onDragLeave (this, e);//raise drag leave in target
-			#if DEBUG_DRAGNDROP
+#if DEBUG_DRAGNDROP
 			Debug.WriteLine(this.ToString() + " : DROP => " + e.ToString());
-			#endif
+#endif
 		}
-		public bool IsDropTarget {
-			get { return IFace.DragAndDropOperation?.DropTarget == this; }
-		}
-
+		public bool IsDropTarget => IFace.DragAndDropOperation?.DropTarget == this;		
 		#endregion
 
 		#region Queuing
@@ -1882,7 +1906,7 @@ namespace Crow
 		{
 			if (parent == null)
 				return false;
-			if (!(isVisible & IsEnabled)||IsDragged)
+			if (!(isVisible & IsEnabled))
 				return false;
 			if (!parent.PointIsIn(ref m))
 				return false;
@@ -1890,36 +1914,31 @@ namespace Crow
 			return Slot.ContainsOrIsEqual (m);					
 		}
 		public virtual bool MouseIsIn(Point m)
-		{			
-			return (!(isVisible & IsEnabled)||IsDragged) ? false : PointIsIn (ref m);
-		}
+			=> (!(isVisible & IsEnabled) || IsDragged) ? false : PointIsIn (ref m);
 		public virtual void checkHoverWidget(MouseMoveEventArgs e)
 		{
-			if (IFace.HoverWidget != this) {
+			if (IFace.DragAndDropInProgress) {
+				if (IFace.dragndropHover != this) {
+					IFace.dragndropHover = this;
+					if (AllowDrop)
+						onDragEnter (this, IFace.DragAndDropOperation);
+				}
+			} else if (IFace.HoverWidget != this) {
 				onMouseEnter (this, e);
 				IFace.HoverWidget = this;
-			}
-
-			//this.onMouseMove (this, e);//without this, window border doesn't work, should be removed
+			}			
 		}
 		public virtual void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
-			if (allowDrag & hasFocus & IFace.IsDown(MouseButton.Left)) {
-				if (IFace.DragAndDropOperation == null)		
-					onStartDrag (this, IFace.DragAndDropOperation);				
-			}
-
-			//dont bubble event if dragged, mouse move is routed directely from iface
-			//to let other control behind have mouse entering
-			if (isDragged)
+			if (AllowDrag & IFace.IsDown (MouseButton.Left)) {				
+				onStartDrag (this, new DragDropEventArgs (this, FocusParent));
 				return;
+			}
 
 			if (MouseMove != null)
 				MouseMove.Invoke (this, e);			
-			else if (!e.Handled)
+			else if (!e.Handled && BubbleMouseEvent)
 				FocusParent?.onMouseMove (sender, e);
-
-
 		}
 		/// <summary>
 		/// Default mouse button press method. The `MouseDown` event is raised from withing it.
@@ -1942,7 +1961,7 @@ namespace Crow
 
 			if (MouseDown != null)
 				MouseDown?.Invoke (this, e);
-			else if (!e.Handled)
+			else if (!e.Handled && BubbleMouseEvent)
 				FocusParent?.onMouseDown (sender, e);
 		}
 		/// <summary>
@@ -1955,18 +1974,9 @@ namespace Crow
 		/// <param name="e">mouse button release event arguments</param>
 		public virtual void onMouseUp(object sender, MouseButtonEventArgs e){
 
-			if (IFace.DragAndDropOperation != null){
-				if (IFace.DragAndDropOperation.DragSource == this) {
-					if (IFace.DragAndDropOperation.DropTarget != null)
-						onDrop (this, IFace.DragAndDropOperation);
-					else
-						onEndDrag (this, IFace.DragAndDropOperation);
-					IFace.DragAndDropOperation = null;
-				}
-			}
 			if (MouseUp != null)
 				MouseUp.Invoke (this, e);
-			else if (!e.Handled)
+			else if (!e.Handled && BubbleMouseEvent)
 				FocusParent?.onMouseUp (sender, e);
 		}
 		/// <summary>
@@ -1977,7 +1987,7 @@ namespace Crow
 		public virtual void onMouseClick(object sender, MouseButtonEventArgs e){
 			if (MouseClick != null)
 				MouseClick.Invoke (this, e);
-			else if (!e.Handled)
+			else if (!e.Handled && BubbleMouseEvent)
 				FocusParent?.onMouseClick (sender, e);
 		}
 		/// <summary>
@@ -1989,19 +1999,19 @@ namespace Crow
 		public virtual void onMouseDoubleClick(object sender, MouseButtonEventArgs e){
 			if (MouseDoubleClick != null)			
 				MouseDoubleClick.Invoke (this, e);
-			else if (!e.Handled)
+			else if (!e.Handled && BubbleMouseEvent)
 				FocusParent?.onMouseDoubleClick (sender, e);
 		}
 		public virtual void onMouseWheel(object sender, MouseWheelEventArgs e){
 			if (MouseWheelChanged != null)
 				MouseWheelChanged.Invoke (this, e);
-			else if (!e.Handled)
+			else if (!e.Handled && BubbleMouseEvent)
 				FocusParent?.onMouseWheel (sender, e);
 		}
 		public virtual void onMouseEnter(object sender, MouseMoveEventArgs e)
 		{
 			IFace.MouseCursor = MouseCursor;
-			if (IFace.DragAndDropOperation != null) {
+			/*if (IFace.DragAndDropOperation != null) {
 				Widget g = this;
 				while (g != null) {
 					if (g.AllowDrop) {
@@ -2014,15 +2024,12 @@ namespace Crow
 					}
 					g = g.FocusParent;
 				}
-			}
+			}*/
 
 			MouseEnter.Raise (this, e);
 		}
 		public virtual void onMouseLeave(object sender, MouseMoveEventArgs e)
 		{			
-			if (IFace.DragAndDropOperation?.DropTarget == this)
-				IFace.DragAndDropOperation.DropTarget.onDragLeave (this, IFace.DragAndDropOperation);
-			
 			MouseLeave.Raise (this, e);
 		}
 
