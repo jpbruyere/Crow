@@ -119,23 +119,18 @@ namespace Crow
 				if (activeTab == value)
 					return;
 
-				Console.WriteLine ($"TabView.ActiveTab: {activeTab?.DataSource} -> {value?.DataSource}");
-				bool selState = true;
+				//Console.WriteLine ($"TabView.ActiveTab: {activeTab?.DataSource} -> {value?.DataSource}");
 
 				if (value != null) {
 					if (activeTab != null) {
-						selState = activeTab.IsSelected;
 						activeTab.IsSelected = false;
 						ActiveTab.NotifyValueChanged ("IsActiveTab", false);
 					}
 					activeTab = value;
-					ActiveTab.IsSelected = selState;
+					ActiveTab.IsSelected = true;
 					ActiveTab.NotifyValueChanged ("IsActiveTab", true);
 				} else
 					activeTab = value;
-
-				/*if (activeTab != null)
-					value.IsSelected = true;*/
 
 				NotifyValueChangedAuto (activeTab);
 				RegisterForRedraw ();

@@ -97,6 +97,8 @@ namespace Crow
 				//Console.WriteLine ($"TabItem({this.dataSource}).IsSelected: {isSelected} -> {value}");
 				/*if (tview != null)
 					tview.SelectedTab = tview.Children.IndexOf(this);*/
+				//Console.WriteLine ($"TabView.IsSelected({this.Caption}): {isSelected} -> {value}");
+				//Console.WriteLine (new System.Diagnostics.StackTrace());
 				
 				isSelected = value;
 
