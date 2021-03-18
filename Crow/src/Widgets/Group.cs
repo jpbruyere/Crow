@@ -309,12 +309,8 @@ namespace Crow
 		}
 		protected override void UpdateCache (Context ctx)
 		{
-			Rectangle rb = Slot + Parent.ClientRectangle.Position;
-
-
-			Context gr = new Context (bmp);
-
 			if (!Clipping.IsEmpty) {
+				Context gr = new Context (bmp);
 				for (int i = 0; i < Clipping.NumRectangles; i++)
 					gr.Rectangle(Clipping.GetRectangle(i));
 				gr.ClipPreserve();
@@ -348,14 +344,11 @@ namespace Crow
 					gr.Rectangle(Clipping.GetRectangle(i));
 				gr.Stroke ();*/
 				#endif
-			}
-			gr.Dispose ();
-
-			ctx.SetSource (bmp, rb.X, rb.Y);
-			ctx.Paint ();
-
-			Clipping.Dispose();
-			Clipping = new Region ();
+				gr.Dispose ();
+				Clipping.Reset ();				
+			}/*else
+				Console.WriteLine("GROUP REPAINT WITH EMPTY CLIPPING");*/
+			paintCache (ctx, Slot + Parent.ClientRectangle.Position);
 		}
 		#endregion
 

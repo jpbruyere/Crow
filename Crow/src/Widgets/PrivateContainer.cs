@@ -224,8 +224,7 @@ namespace Crow
 
 			ctx.SetSource (bmp, rb.X, rb.Y);
 			ctx.Paint ();
-			Clipping.Dispose();
-			Clipping = new Region ();
+			Clipping.Reset ();			
 		}
 		#endregion
 

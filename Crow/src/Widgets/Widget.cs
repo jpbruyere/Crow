@@ -1810,14 +1810,11 @@ namespace Crow
 				onDraw (gr);
 			}
 
-			IsDirty = false;
+			IsDirty = false;			
 
 			DbgLogger.EndEvent (DbgEvtType.GORecreateCache);
 		}
-		protected virtual void UpdateCache(Context ctx){
-			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);
-
-			Rectangle rb = Slot + Parent.ClientRectangle.Position;
+		protected void paintCache(Context ctx, Rectangle rb) {
 			if (clearBackground) {
 				ctx.Operator = Operator.Clear;
 				ctx.Rectangle (rb);
@@ -1827,8 +1824,11 @@ namespace Crow
 
 			ctx.SetSource (bmp, rb.X, rb.Y);
 			ctx.Paint ();
-			Clipping.Dispose ();
-			Clipping = new Region ();
+		}
+		protected virtual void UpdateCache(Context ctx){
+			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);			
+			paintCache (ctx, Slot + Parent.ClientRectangle.Position);
+			Clipping.Reset ();			
 			DbgLogger.EndEvent (DbgEvtType.GOUpdateCache);
 		}
 		/// <summary> Chained painting routine on the parent context of the actual cached version
@@ -1866,9 +1866,11 @@ namespace Crow
 				}
 
 				if (cacheEnabled) {
-					if (IsDirty)
+					if (IsDirty) {
 						RecreateCache ();
-					UpdateCache (ctx);
+						paintCache (ctx, Slot + Parent.ClientRectangle.Position);
+					}else
+						UpdateCache (ctx);
 					if (!IsEnabled)						
 						paintDisabled (ctx, Slot + Parent.ClientRectangle.Position);					
 				} else {

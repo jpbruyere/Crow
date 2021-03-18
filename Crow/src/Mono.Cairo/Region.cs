@@ -192,5 +192,11 @@ namespace Crow.Cairo
 		{
 			return NativeMethods.cairo_region_xor_rectangle (Handle, ref rectangle);
 		}
+		public void Reset () {
+			if (IsEmpty)
+				return;
+			NativeMethods.cairo_region_destroy (Handle);
+			handle = NativeMethods.cairo_region_create ();			
+		}
 	}
 }
