@@ -1,6 +1,5 @@
 <Project>
 	<PropertyGroup>
-		<SolutionDir>$(MSBuildThisFileDirectory)</SolutionDir>
 		<OutputPath>$(SolutionDir)build\$(Configuration)\</OutputPath>
 		<IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)\</IntermediateOutputPath>
 		<License>MIT</License>

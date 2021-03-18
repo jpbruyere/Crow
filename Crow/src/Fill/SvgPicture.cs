@@ -27,17 +27,20 @@ namespace Crow
 		public SvgPicture (string path) : base(path) {}
 		#endregion
 
-		void load (Interface iFace)
-		{			
+		bool load (Interface iFace)
+		{
+			if (string.IsNullOrEmpty(Path))
+				return false;
 			if (iFace.sharedPictures.ContainsKey (Path)) {
 				sharedPicture sp = iFace.sharedPictures [Path];
 				hSVG = (Rsvg.Handle)sp.Data;
 				Dimensions = sp.Dims;
-				return;
+				return true;
 			}
 			using (Stream stream = iFace.GetStreamFromPath (Path))
 				load (stream);
 			iFace.sharedPictures [Path] = new sharedPicture (hSVG, Dimensions);
+			return true;
 		}
 		void load (Stream stream) {
 			using (BinaryReader sr = new BinaryReader (stream)) {
@@ -61,7 +64,8 @@ namespace Crow
 		public override void SetAsSource (Interface iFace, Context ctx, Rectangle bounds = default(Rectangle))
 		{
 			if (hSVG == null)
-				load (iFace);
+				if (!load (iFace))
+					return;
 
 			float widthRatio = 1f;
 			float heightRatio = 1f;
@@ -101,7 +105,8 @@ namespace Crow
 		public override void Paint (Interface iFace, Context gr, Rectangle rect, string subPart = "")
 		{
 			if (hSVG == null)
-				load (iFace);
+				if (!load (iFace))
+					return;
 
 			float widthRatio = 1f;
 			float heightRatio = 1f;

@@ -23,7 +23,7 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);1591;1587;1570;1572;1573;1574</NoWarn>
-		<DefineConstants>_DESIGN_MODE;_MEASURE_TIME</DefineConstants>		
+		<DefineConstants>DESIGN_MODE;_MEASURE_TIME;_DEBUG_HIGHLIGHT_FOCUS</DefineConstants>		
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 		<!--<AllowUnsafeBlocks>true</AllowUnsafeBlocks>-->
@@ -51,7 +51,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="$(SolutionDir)Images\crow.png" Pack="true" PackagePath="" />
+		<Content Include="..\Images\crow.png" Pack="true" PackagePath="" />
 		<Compile Include="src\**\*.cs" Exclude="src\Mono.Cairo\NativeMethods-internal.cs" />
 		<EmbeddedResource Include="Templates\*.*">
 			<LogicalName>Crow.%(Filename).template</LogicalName>
