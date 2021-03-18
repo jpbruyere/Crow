@@ -119,16 +119,20 @@ namespace Crow
 		}
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{
+			if (IFace.IsDown(MouseButton.Left)) {				
+				updateMouseLocalPos (e.Position);
+				e.Handled = true;
+			}
 			base.onMouseMove (sender, e);
-			if (!IFace.IsDown(MouseButton.Left))
-				return;
-			updateMouseLocalPos (e.Position);
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
-			base.onMouseDown (sender, e);
-			if (e.Button == MouseButton.Left)
+			
+			if (e.Button == MouseButton.Left) {
 				updateMouseLocalPos (e.Position);
+				e.Handled = true;
+			}
+			base.onMouseDown (sender, e);
 		}
 
 		protected override void onDraw (Context gr) {
