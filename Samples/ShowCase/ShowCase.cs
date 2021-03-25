@@ -218,11 +218,15 @@ namespace ShowCase
 					crowContainer.SetChild (g);
 					g.DataSource = this;
 				}
-			} catch (InstantiatorException itorex) {
-				//Console.WriteLine (itorex);
+			} catch (InstantiatorException itorex) {				
+				Console.ForegroundColor = ConsoleColor.DarkRed;
+				Console.WriteLine (itorex);
+				Console.ResetColor();
 				showError (itorex.InnerException);
 			} catch (Exception ex) {
-				//Console.WriteLine (ex);
+				Console.ForegroundColor = ConsoleColor.DarkRed;
+				Console.WriteLine (ex);
+				Console.ResetColor();
 				showError (ex);
 			}
 		}

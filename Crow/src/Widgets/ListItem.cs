@@ -10,7 +10,7 @@ namespace Crow
 	/// Top container to use as ItemTemplate's root for TemplatedGroups (lists, treeviews, ...) that add selection
 	/// status and events
 	/// </summary>
-	public class ListItem : Container
+	public class ListItem : Container, ISelectable
 	{
 		#region CTOR
 		public ListItem (){}

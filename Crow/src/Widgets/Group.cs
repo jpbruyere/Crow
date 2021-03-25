@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -57,13 +57,11 @@ namespace Crow
         bool _multiSelect = false;
 		List<Widget> children = new List<Widget>();
 
-        public virtual List<Widget> Children {
-			get { return children; }
-		}
+        public virtual List<Widget> Children => children;
 		[DefaultValue(false)]
         public bool MultiSelect
         {
-            get { return _multiSelect; }
+            get => _multiSelect;
             set { _multiSelect = value; }
         }
 		public virtual void AddChild(Widget g){
@@ -310,41 +308,41 @@ namespace Crow
 		protected override void UpdateCache (Context ctx)
 		{
 			if (!Clipping.IsEmpty) {
-				Context gr = new Context (bmp);
-				for (int i = 0; i < Clipping.NumRectangles; i++)
-					gr.Rectangle(Clipping.GetRectangle(i));
-				gr.ClipPreserve();
-				gr.Operator = Operator.Clear;
-				gr.Fill();
-				gr.Operator = Operator.Over;
+				using (Context gr = new Context (bmp)) {
+					for (int i = 0; i < Clipping.NumRectangles; i++)
+						gr.Rectangle(Clipping.GetRectangle(i));
+					gr.ClipPreserve();
+					gr.Operator = Operator.Clear;
+					gr.Fill();
+					gr.Operator = Operator.Over;
 
-				base.onDraw (gr);
+					base.onDraw (gr);
 
-				if (ClipToClientRect) {
-					CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
-					gr.Clip ();
+					if (ClipToClientRect) {
+						CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
+						gr.Clip ();
+					}
+
+					childrenRWLock.EnterReadLock ();
+
+					foreach (Widget c in Children) {
+						if (!c.Visible)
+							continue;
+						if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
+							continue;
+						c.Paint (gr);
+					}
+
+					childrenRWLock.ExitReadLock ();
+
+					#if DEBUG_CLIP_RECTANGLE
+					/*gr.LineWidth = 1;
+					gr.SetSourceColor(Color.DarkMagenta.AdjustAlpha (0.8));
+					for (int i = 0; i < Clipping.NumRectangles; i++)
+						gr.Rectangle(Clipping.GetRectangle(i));
+					gr.Stroke ();*/
+					#endif
 				}
-
-				childrenRWLock.EnterReadLock ();
-
-				foreach (Widget c in Children) {
-					if (!c.Visible)
-						continue;
-					if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
-						continue;
-					c.Paint (gr);
-				}
-
-				childrenRWLock.ExitReadLock ();
-
-				#if DEBUG_CLIP_RECTANGLE
-				/*gr.LineWidth = 1;
-				gr.SetSourceColor(Color.DarkMagenta.AdjustAlpha (0.8));
-				for (int i = 0; i < Clipping.NumRectangles; i++)
-					gr.Rectangle(Clipping.GetRectangle(i));
-				gr.Stroke ();*/
-				#endif
-				gr.Dispose ();
 				Clipping.Reset ();				
 			}/*else
 				Console.WriteLine("GROUP REPAINT WITH EMPTY CLIPPING");*/

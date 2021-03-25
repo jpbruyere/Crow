@@ -58,7 +58,7 @@ namespace Crow
 				if (value != null) {			
 					GenericStack gs = value as GenericStack;
 					if (gs == null)
-						throw new Exception ("Splitter may only be chil of stack");
+						throw new Exception ("Splitter may only be child of stack");
 					
 				}
 				base.Parent = value;

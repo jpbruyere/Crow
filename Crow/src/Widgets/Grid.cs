@@ -116,7 +116,7 @@ namespace Crow
 //
 //			return tmp;
 //		}
-		public override void ChildrenLayoutingConstraints (ref LayoutingType layoutType)
+		public override void ChildrenLayoutingConstraints (ILayoutable layoutable, ref LayoutingType layoutType)
 		{
 			//Prevent child repositionning
 			layoutType &= (~LayoutingType.Positioning);

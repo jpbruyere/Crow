@@ -47,8 +47,8 @@ namespace Crow {
 		#endregion
 
 		#region GraphicObject Overrides
-		public override bool ArrangeChildren { get { return true; } }
-		public override void ChildrenLayoutingConstraints (ref LayoutingType layoutType) {
+		public override bool ArrangeChildren => true;
+		public override void ChildrenLayoutingConstraints (ILayoutable layoutable, ref LayoutingType layoutType) {
 			//Prevent child repositionning in the direction of stacking
 			if (Orientation == Orientation.Horizontal)
 				layoutType &= (~LayoutingType.X);
@@ -104,39 +104,44 @@ namespace Crow {
 
 			return base.UpdateLayout (layoutType);
 		}
+		//force computed slot for child
+		protected void setChildWidth (Widget w, int newW) {
+			if (w.MaximumSize.Width > 0)
+				newW = Math.Min (newW, w.MaximumSize.Width);
+				
+			if (newW == w.Slot.Width)
+				return;
+			
+			w.Slot.Width = newW;
+			w.IsDirty = true;
+			w.LayoutChanged -= OnChildLayoutChanges;
+			w.OnLayoutChanges (LayoutingType.Width);
+			w.LayoutChanged += OnChildLayoutChanges;
+			w.LastSlots.Width = w.Slot.Width;
+		}
+		protected void setChildHeight (Widget w, int newH) {
+			if (w.MaximumSize.Height > 0)
+				newH = Math.Min (newH, w.MaximumSize.Height);
+				
+			if (newH == w.Slot.Height)
+				return;
 
+			w.Slot.Height = newH;
+			w.IsDirty = true;
+			w.LayoutChanged -= OnChildLayoutChanges;
+			w.OnLayoutChanges (LayoutingType.Height);
+			w.LayoutChanged += OnChildLayoutChanges;
+			w.LastSlots.Height = w.Slot.Height;
+		}
 		void adjustStretchedGo (LayoutingType lt) {
 			if (stretchedGO == null)
 				return;
-			if (lt == LayoutingType.Width) {
-				int newW = Math.Max (
-							   this.ClientRectangle.Width - contentSize.Width - Spacing * (Children.Count - 1),
-							   stretchedGO.MinimumSize.Width);
-				if (stretchedGO.MaximumSize.Width > 0)
-					newW = Math.Min (newW, stretchedGO.MaximumSize.Width);
-				if (newW != stretchedGO.Slot.Width) {
-					stretchedGO.Slot.Width = newW;
-					stretchedGO.IsDirty = true;
-					stretchedGO.LayoutChanged -= OnChildLayoutChanges;
-					stretchedGO.OnLayoutChanges (LayoutingType.Width);
-					stretchedGO.LayoutChanged += OnChildLayoutChanges;
-					stretchedGO.LastSlots.Width = stretchedGO.Slot.Width;
-				}
-			} else {
-				int newH = Math.Max (
-					this.ClientRectangle.Height - contentSize.Height - Spacing * (Children.Count - 1),
-					stretchedGO.MinimumSize.Height);
-				if (stretchedGO.MaximumSize.Height > 0)
-					newH = Math.Min (newH, stretchedGO.MaximumSize.Height);
-				if (newH != stretchedGO.Slot.Height) {
-					stretchedGO.Slot.Height = newH;
-					stretchedGO.IsDirty = true;
-					stretchedGO.LayoutChanged -= OnChildLayoutChanges;
-					stretchedGO.OnLayoutChanges (LayoutingType.Height);
-					stretchedGO.LayoutChanged += OnChildLayoutChanges;
-					stretchedGO.LastSlots.Height = stretchedGO.Slot.Height;
-				}
-			}
+			if (lt == LayoutingType.Width)
+				setChildWidth (stretchedGO, Math.Max (
+					ClientRectangle.Width - contentSize.Width - Spacing * (Children.Count - 1),	stretchedGO.MinimumSize.Width));				
+			else
+				setChildHeight (stretchedGO, Math.Max (
+					ClientRectangle.Height - contentSize.Height - Spacing * (Children.Count - 1), stretchedGO.MinimumSize.Height));			
 		}
 
 		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg) {

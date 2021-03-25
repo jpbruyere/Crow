@@ -498,10 +498,10 @@ namespace Crow {
 		}
 		internal virtual void itemClick(object sender, MouseButtonEventArgs e){
 			//SelectedIndex = (int)((IList)data)?.IndexOf((sender as Widget).DataSource);
-			if (selectedItemContainer is ListItem li)
+			if (selectedItemContainer is ISelectable li)
 				li.IsSelected = false;
 			selectedItemContainer = sender as Widget;
-			if (selectedItemContainer is ListItem nli)
+			if (selectedItemContainer is ISelectable nli)
 				nli.IsSelected = true;
 			if (selectedItemContainer == null)
 				return;

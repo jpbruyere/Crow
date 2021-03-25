@@ -20,7 +20,8 @@ namespace Crow
         [XmlIgnore]
         public override Orientation Orientation
         {
-            get { return Orientation.Horizontal; }
+            get => Orientation.Horizontal;
+            set { base.Orientation = Orientation.Horizontal; }
         }
     }
 }

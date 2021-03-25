@@ -510,7 +510,7 @@ namespace Crow
 		/// <summary>
 		/// If true, rendering of GraphicObject is clipped inside client rectangle
 		/// </summary>
-		[DesignCategory ("Appearance")][DefaultValue(true)]
+		[DesignCategory ("Appearance")][DefaultValue(false)]
 		public virtual bool ClipToClientRect {
 			get { return clipToClientRect; }
 			set {
@@ -1530,9 +1530,6 @@ namespace Crow
 			return lt == LayoutingType.Width ?
 				contentSize.Width + 2 * margin: contentSize.Height + 2 * margin;
 		}
-		/// <summary> By default in groups, LayoutingType.ArrangeChildren is reset </summary>
-		public virtual void ChildrenLayoutingConstraints(ref LayoutingType layoutType){
-		}
 
 		internal bool firstUnresolvedFitWidth (out  Widget ancestorInUnresolvedFit)
 		{
@@ -1549,11 +1546,19 @@ namespace Crow
 		}
 
 		public virtual bool ArrangeChildren { get { return false; } }
+		/// <summary>
+		/// Used to prevent some layouting type in children. For example, in the GenericStack,
+		/// x layouting is dismissed in the direction of the stacking to let the parent
+		/// arrange children in the x direction.
+		/// </summary>
+		/// <param name="layoutable">The children that is calling the constraints</param>
+		/// <param name="layoutType">The currently registering layouting types</param>		
+		public virtual void ChildrenLayoutingConstraints(ILayoutable layoutable, ref LayoutingType layoutType){	}
 		/// <summary> Query a layouting for the type pass as parameter, redraw only if layout changed. </summary>
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
-#if DEBUG
+#if DEBUG_LOG
 			if (disposed) {
-				System.Diagnostics.Debug.WriteLine ($"RegisterForLayouting({layoutType}) for disposed Widget: {this}\n{System.Environment.StackTrace}");
+				DbgLogger.AddEvent (DbgEvtType.GORegisterLayouting | DbgEvtType.AlreadyDisposed, this);
 				return;
 			}
 #endif
@@ -1578,8 +1583,7 @@ namespace Crow
 					layoutType &= (~LayoutingType.ArrangeChildren);
 
 				//apply constraints depending on parent type
-				if (Parent is Widget)
-					(Parent as Widget).ChildrenLayoutingConstraints (ref layoutType);
+				Parent.ChildrenLayoutingConstraints (this, ref layoutType);
 
 //				//prevent queueing same LayoutingType for this
 				layoutType &= (~RegisteredLayoutings);
@@ -1710,13 +1714,11 @@ namespace Crow
 						return false;
 
 					//size constrain
-					if (Slot.Width < minimumSize.Width) {
-						Slot.Width = minimumSize.Width;
-						//NotifyValueChanged ("WidthPolicy", Measure.Stretched);
-					} else if (Slot.Width > maximumSize.Width && maximumSize.Width > 0) {
+					if (Slot.Width < minimumSize.Width)
+						Slot.Width = minimumSize.Width;						
+					else if (maximumSize.Width > 0 && Slot.Width > maximumSize.Width)
 						Slot.Width = maximumSize.Width;
-						//NotifyValueChanged ("WidthPolicy", Measure.Stretched);
-					}
+					
 				} else
 					Slot.Width = 0;
 
@@ -1746,13 +1748,11 @@ namespace Crow
 						return false;
 
 					//size constrain
-					if (Slot.Height < minimumSize.Height) {
+					if (Slot.Height < minimumSize.Height)
 						Slot.Height = minimumSize.Height;
-						//NotifyValueChanged ("HeightPolicy", Measure.Stretched);
-					} else if (Slot.Height > maximumSize.Height && maximumSize.Height > 0) {
+					 else if (maximumSize.Height > 0 && Slot.Height > maximumSize.Height)
 						Slot.Height = maximumSize.Height;
-						//NotifyValueChanged ("HeightPolicy", Measure.Stretched);
-					}
+					
 				} else
 					Slot.Height = 0;
 
@@ -1853,7 +1853,7 @@ namespace Crow
 				Console.ForegroundColor = ConsoleColor.Magenta;
 				if (!isVisible)
 					System.Diagnostics.Debug.WriteLine ($"Paint invisible widget: {this}");
-				Console.ForegroundColor = ConsoleColor.Gray;
+				Console.ResetColor ();
 #endif
 				DbgLogger.AddEvent (DbgEvtType.Warning);
 				DbgLogger.EndEvent (DbgEvtType.GOPaint);

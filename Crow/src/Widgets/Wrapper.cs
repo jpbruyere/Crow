@@ -16,7 +16,7 @@ namespace Crow
 		#endregion
 
 		#region Group Overrides
-		public override void ChildrenLayoutingConstraints (ref LayoutingType layoutType)
+		public override void ChildrenLayoutingConstraints (ILayoutable layoutable, ref LayoutingType layoutType)
 		{
 			layoutType &= (~LayoutingType.Positioning);
 		}
