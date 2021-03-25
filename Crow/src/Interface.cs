@@ -1065,11 +1065,11 @@ namespace Crow
 		/// </summary>
 		public static long TEXT_CURSOR_BLINK_FREQUENCY = 400;
 		internal Rectangle? textCursor = null;//last printed cursor, used to clear it.
-		internal bool forceTextCursor = true;//when true, cursor is printed even if blinkingCursor.elapsed is not reached.
+		public bool forceTextCursor = true;//when true, cursor is printed even if blinkingCursor.elapsed is not reached.
 		Stopwatch blinkingCursor = Stopwatch.StartNew ();
 		void drawTextCursor (Context ctx) {
 			if (forceTextCursor) {
-				if (FocusedWidget is Label lab) {
+				if (FocusedWidget is IEditableTextWidget lab) {
 					if (lab.DrawCursor (ctx, out Rectangle c)) {
 						if (textCursor != null && c != textCursor.Value)
 							RegisterClip (textCursor.Value);
@@ -1084,7 +1084,7 @@ namespace Crow
 				RegisterClip (textCursor.Value);
 				textCursor = null;
 				blinkingCursor.Restart ();
-			} else if (FocusedWidget is Label lab && lab.SelectionIsEmpty) {
+			} else if (FocusedWidget is IEditableTextWidget lab) {
 				if (blinkingCursor.ElapsedMilliseconds > TEXT_CURSOR_BLINK_FREQUENCY) {
 					if (lab.DrawCursor (ctx, out Rectangle c)) {
 						textCursor = c;
@@ -1752,44 +1752,40 @@ namespace Crow
 		#endregion
 
 		#region ILayoutable implementation
-		public virtual bool PointIsIn (ref Point m)
-		{
-			return true;
-		}
+		public virtual bool PointIsIn (ref Point m) => true;
 		public void RegisterClip (Rectangle r)
 		{
 			clipping.UnionRectangle (r);
 		}
-		public bool ArrangeChildren { get { return false; } }
+		public bool ArrangeChildren => false;
 		public int LayoutingTries {
 			get { throw new NotImplementedException (); }
 			set { throw new NotImplementedException (); }
 		}
 		public LayoutingType RegisteredLayoutings {
-			get { return LayoutingType.None; }
+			get => LayoutingType.None;
 			set { throw new NotImplementedException (); }
 		}
 		public void RegisterForLayouting (LayoutingType layoutType) { throw new NotImplementedException (); }
 		public bool UpdateLayout (LayoutingType layoutType) { throw new NotImplementedException (); }
-		public Rectangle ContextCoordinates (Rectangle r) { return r; }
-		public Rectangle ScreenCoordinates (Rectangle r) { return r; }
+		public Rectangle ContextCoordinates (Rectangle r) => r;
+		public Rectangle ScreenCoordinates (Rectangle r) => r;
 
 		public ILayoutable Parent {
-			get { return null; }
+			get => null;
 			set { throw new NotImplementedException (); }
 		}
 		public ILayoutable LogicalParent {
-			get { return null; }
+			get => null;
 			set { throw new NotImplementedException (); }
 		}
 
-		public Rectangle ClientRectangle {
-			get { return clientRectangle; }
-		}
+		public Rectangle ClientRectangle => clientRectangle; 
 		public Interface HostContainer {
 			get { return this; }
 		}
-		public Rectangle getSlot () { return ClientRectangle; }
+		public Rectangle getSlot () => ClientRectangle;
+		public void ChildrenLayoutingConstraints(ILayoutable layoutable, ref LayoutingType layoutType){	}
 		#endregion
 	}
 }

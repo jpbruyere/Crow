@@ -210,12 +210,6 @@ namespace Crow
             
             return cursor;            
         }
-        /*internal override bool DrawCursor (Context ctx, out Rectangle rect) {            
-            ctx.Translate (-scrollX, -scrollY);
-            bool result = base.DrawCursor (ctx, out rect);
-            ctx.Translate (scrollX, scrollY);
-            return result;
-        }*/
 
         void updateMaxScrolls (LayoutingType layout) {
             Rectangle cb = ClientRectangle;

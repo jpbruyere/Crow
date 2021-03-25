@@ -91,6 +91,12 @@ namespace Crow.IML
 
 		#if DESIGN_MODE
 		internal static MethodInfo miDicStrStrAdd = typeof(Dictionary<string, string>).GetMethod ("set_Item", new Type[] { typeof(string), typeof(string) });
+		internal static FieldInfo fiWidget_design_id = typeof(Widget).GetField("design_id");
+		internal static FieldInfo fiWidget_design_line = typeof(Widget).GetField("design_line");
+		internal static FieldInfo fiWidget_design_column = typeof(Widget).GetField("design_column");
+		internal static FieldInfo fiWidget_design_imlPath = typeof(Widget).GetField("design_imlPath");
+		internal static FieldInfo fiWidget_design_iml_values = typeof(Widget).GetField("design_iml_values");
+
 		#endif
 
 		#region tree handling methods

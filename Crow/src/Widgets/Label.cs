@@ -14,7 +14,7 @@ namespace Crow
     /// <summary>
     /// Simple label widget possibly multiline but without tabulation handling.
     /// </summary>
-    public class Label : Widget
+    public class Label : Widget, IEditableTextWidget
     {
 		#region CTOR
 		protected Label () {}
@@ -490,7 +490,11 @@ namespace Crow
 				return null;
 			return cursor;
 		}
-		internal virtual bool DrawCursor (Context ctx, out Rectangle rect) {
+		public virtual bool DrawCursor (Context ctx, out Rectangle rect) {
+			if (CurrentLoc == null || !SelectionIsEmpty) {
+				rect = default;
+				return false;
+			}
 			if (!CurrentLoc.Value.HasVisualX) {
 				ctx.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
 				ctx.SetFontSize (Font.Size);
