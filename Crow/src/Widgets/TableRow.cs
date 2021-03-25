@@ -1,9 +1,11 @@
-﻿using System.Linq;
-// Copyright (c) 2019-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2019-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 using System;
 using System.ComponentModel;
+using System.Linq;
+using Crow.Cairo;
+using Glfw;
 
 namespace Crow
 {
@@ -142,5 +144,46 @@ namespace Crow
 
 			base.OnChildLayoutChanges (sender, arg);
 		}*/
+		int splitIndex = -1;		
+		const int minColumnSize = 10;
+		public override void onMouseMove(object sender, MouseMoveEventArgs e)
+		{			
+			if (Spacing > 0 && Table != null && Table.Children.Count > 0) {
+				Point m = ScreenPointToLocal (e.Position);
+				if (IFace.IsDown (Glfw.MouseButton.Left) && splitIndex >= 0) {
+					TableRow firstRow = Table.Children[0] as TableRow;
+					Rectangle cb = ClientRectangle;
+					int splitPos = (int)(0.5 * Spacing + m.X);					
+					if (splitPos > firstRow.Children[splitIndex].Slot.Left + minColumnSize && splitPos < firstRow.Children[splitIndex+1].Slot.Right - minColumnSize) {
+						Table.Columns[splitIndex+1].Width = firstRow.Children[splitIndex+1].Slot.Right - splitPos;
+						splitPos -= Spacing;
+						Table.Columns[splitIndex].Width = splitPos - firstRow.Children[splitIndex].Slot.Left;
+						Table.RegisterForLayouting (LayoutingType.Width);
+					}
+					//Console.WriteLine ($"left:{firstRow.Children[splitIndex].Slot.Left} right:{firstRow.Children[splitIndex+1].Slot.Right} cb.X:{cb.X} splitPos:{splitPos} m:{m}");				
+				} else {
+					splitIndex = -1;					
+					for (int i = 0; i < Children.Count - 1; i++)
+					{
+						Rectangle r = Children[i].Slot;
+						if (m.X >= r.Right) {
+							r = Children[i+1].Slot;
+							if (m.X <= r.Left && Table.Columns.Count - 1 > i ) {
+								Console.WriteLine ($"Set cursor Table row on mouse move. {m}");
+								IFace.MouseCursor = MouseCursor.sb_h_double_arrow;
+								splitIndex = i;
+								e.Handled = true;
+								break;
+							}
+						}
+					}
+					if (splitIndex < 0) {
+						IFace.MouseCursor = MouseCursor.top_left_arrow;
+						Console.WriteLine ($"RESet cursor Table row on mouse move. {m}");
+					}
+				}
+			}
+			base.onMouseMove(sender, e);
+		}
 	}
 }

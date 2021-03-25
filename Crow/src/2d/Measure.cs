@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -13,7 +13,7 @@ namespace Crow
 	/// <summary>
 	/// Measure class allow proportional sizes as well as stretched and fit on content.
 	/// </summary>
-	public struct Measure
+	public struct Measure : IEquatable<Measure>
 	{
 		/// <summary>
 		/// Integer value of the measure
@@ -52,38 +52,20 @@ namespace Crow
 		/// </summary>
 		public bool IsRelativeToParent { get { return Value >= 0 && Units == Unit.Percent; }}
 		#region Operators
-		public static implicit operator int(Measure m){
-			return m.Value;
-		}
-		public static implicit operator Measure(int i){
-			return new Measure(i);
-		}
-		public static implicit operator string(Measure m){
-			return m.ToString();
-		}
-		public static implicit operator Measure(string s){
-			return Measure.Parse(s);
-		}
+		public static implicit operator int(Measure m) => m.Value;
+		public static implicit operator Measure(int i) => new Measure(i);		
+		public static implicit operator string(Measure m) => m.ToString();		
+		public static implicit operator Measure(string s) => Measure.Parse(s);
 
-		public static bool operator ==(Measure m1, Measure m2){
-			return m1.Value == m2.Value && m1.Units == m2.Units;
-		}
-		public static bool operator !=(Measure m1, Measure m2){
-			return !(m1.Value == m2.Value && m1.Units == m2.Units);
-		}
+		public static bool operator ==(Measure m1, Measure m2) => m1.Equals (m2);
+		public static bool operator !=(Measure m1, Measure m2) => !m1.Equals (m2);
 		#endregion
 
+		public bool Equals(Measure other) => Value == other.Value && Units == other.Units;
+
 		#region Object overrides
-		public override int GetHashCode ()
-		{
-			return Value.GetHashCode ();
-		}
-		public override bool Equals (object obj)
-		{
-			return (obj == null || obj.GetType() != typeof(Measure)) ?
-				false :
-				this == (Measure)obj;
-		}
+		public override int GetHashCode () => HashCode.Combine (Value, Units);
+		public override bool Equals (object obj) => obj is Measure m ? Equals (m) : false;
 		public override string ToString ()
 		{
 			return Units == Unit.Inherit ? "Inherit" :

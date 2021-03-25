@@ -675,7 +675,7 @@ namespace Crow
 		{
 			base.onMouseMove (sender, e);
 
-			updateHoverLocation (e.Position - ScreenCoordinates (Slot).TopLeft - ClientRectangle.TopLeft);
+			updateHoverLocation (ScreenPointToLocal (e.Position));
 
 			if (HasFocus && IFace.IsDown (MouseButton.Left)) {
 				CurrentLoc = hoverLoc;				
