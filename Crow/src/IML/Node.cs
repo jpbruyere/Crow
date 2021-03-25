@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -66,23 +66,11 @@ namespace Crow.IML
 		}
 #endregion
 
-		public bool HasTemplate {
-			get { return typeof (TemplatedControl).IsAssignableFrom (CrowType);}
-		}
-		public bool IsTemplatedGroup {
-			get { return typeof (TemplatedGroup).IsAssignableFrom (CrowType);}
-		}
-		public bool HasDataSourceType {
-			get { return DataSourceType != null; }
-		}
+		public bool HasTemplate => typeof (TemplatedControl).IsAssignableFrom (CrowType);		
+		public bool IsTemplatedGroup => typeof (TemplatedGroup).IsAssignableFrom (CrowType);
+		public bool HasDataSourceType => DataSourceType != null;
 
-		public static implicit operator string (Node sn)
-		{
-			return sn.ToString ();
-		}
-		public override string ToString ()
-		{
-			return string.Format ("{0}.{1}", CrowType.FullName, Index);
-		}
+		public static implicit operator string (Node sn) => sn.ToString ();
+		public override string ToString () => string.Format ("{0}.{1}", CrowType.FullName, Index);
 	}
 }

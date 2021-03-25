@@ -1,4 +1,5 @@
-﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe jp_bruyere@hotmail.com
+﻿using System.Reflection;
+// Copyright (c) 2013-2019  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -94,6 +95,21 @@ namespace Crow
 		}
 		public void RaiseEditAt (int index) {
 			ListEdit.Raise (this, new ListChangedEventArg (index, this[index]));
+		}
+
+
+		public static ObservableList<T> Parse (string str) {
+			ObservableList<T> tmp = new ObservableList<T>();
+			Type t = typeof(T);
+			MethodInfo miParse = t.GetMethod ("Parse", BindingFlags.Static | BindingFlags.Public,
+							Type.DefaultBinder, new Type [] {typeof (string)}, null);
+			if (miParse == null)
+				throw new Exception ("no Parse method found for: " + t.FullName);
+			if (!string.IsNullOrEmpty (str)) {
+				foreach (string s in str.Split(';'))
+					tmp.Add((T)miParse.Invoke (null, new object[] {s}));				
+			}
+			return tmp;
 		}
 	}
 }
