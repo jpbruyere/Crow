@@ -34,8 +34,6 @@ namespace Crow
 		}
 		#endregion
 
-		int spacing;
-
 		public Table Table => Parent as Table;		
 
 		/*public override void ChildrenLayoutingConstraints(ILayoutable layoutable, ref LayoutingType layoutType)
@@ -56,21 +54,25 @@ namespace Crow
 				return;
 			int spacing = Table.Spacing;
 			ObservableList<Column> cols = Table.Columns;
-			
-			//int d = 0;
+						
 			Widget first = Children[0];
 			TableRow firstRow = Table.Children[0] as TableRow;
+
 			if (firstRow == this) {
 				base.ComputeChildrenPositions();
 				return;
 			}			
-			childrenRWLock.EnterReadLock();
+			childrenRWLock.EnterReadLock();			
+			
 			for (int i = 0; i < Children.Count && i < firstRow.Children.Count; i++)
 			{
-				Widget w = Children[i];				
-				w.Slot.X = firstRow.Children[i].Slot.X;
-				setChildWidth (w, firstRow.Children[i].Slot.Width);				
-				//d += spacing + firstRow.Children[i].Slot.Width;
+				Widget w = Children[i];
+				/*if (i < cols.Count && cols[i].Width.IsFit && cols[i].LargestWidget != null) {
+					w.Slot.X
+				}else{*/
+					w.Slot.X = firstRow.Children[i].Slot.X;
+					setChildWidth (w, firstRow.Children[i].Slot.Width);				
+				//}
 			}
 
 			childrenRWLock.ExitReadLock();
@@ -87,8 +89,7 @@ namespace Crow
 			if (layoutType == LayoutingType.Width) {
 				if (firstRow.RegisteredLayoutings.HasFlag (LayoutingType.Width))
 					return false;
-				if (this != firstRow) {
-					//contentSize = firstRow.contentSize;
+				if (this != firstRow) {					
 					Slot.Width = firstRow.Slot.Width;
 					if (Slot.Width != LastSlots.Width) {
 						IsDirty = true;
@@ -119,10 +120,27 @@ namespace Crow
 			}
 			return base.measureRawSize (lt);
 		}*/
-		public override void OnLayoutChanges(LayoutingType layoutType)
-		{
-			base.OnLayoutChanges(layoutType);
-		}
+		/*public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg) {
+			if (arg.LayoutType == LayoutingType.Width) {
+				Widget w = sender as Widget;
+				TableRow firstRow = Table.Children[0] as TableRow;
+				int c = Children.IndexOf(w);				
+				if (c < Table.Columns.Count) {
+					Column col = Table.Columns[c];
+					if (col.Width.IsFit) {
+						if (col.LargestWidget == null || w.Slot.Width > col.ComputedWidth) {
+							col.ComputedWidth = w.Slot.Width;
+							col.LargestWidget = w;
+						} else if (w == col.LargestWidget)
+							Console.WriteLine ("must search for largest widget");
+					}else if (w == firstRow)
+						col.ComputedWidth = w.Slot.Width;
+
+				}
+				Console.WriteLine ($"ROW:{Table.Children.IndexOf(this)} COL:{c} {w.LastSlots.Width} -> {w.Slot.Width} ");
+			}
+			base.OnChildLayoutChanges (sender, arg);
+		}*/
 		/*public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg) {
 			Widget go = sender as Widget;
 			TableRow row = go.Parent as TableRow;
@@ -159,6 +177,7 @@ namespace Crow
 						splitPos -= Spacing;
 						Table.Columns[splitIndex].Width = splitPos - firstRow.Children[splitIndex].Slot.Left;
 						Table.RegisterForLayouting (LayoutingType.Width);
+						e.Handled = true;
 					}
 					//Console.WriteLine ($"left:{firstRow.Children[splitIndex].Slot.Left} right:{firstRow.Children[splitIndex+1].Slot.Right} cb.X:{cb.X} splitPos:{splitPos} m:{m}");				
 				} else {
@@ -169,7 +188,6 @@ namespace Crow
 						if (m.X >= r.Right) {
 							r = Children[i+1].Slot;
 							if (m.X <= r.Left && Table.Columns.Count - 1 > i ) {
-								Console.WriteLine ($"Set cursor Table row on mouse move. {m}");
 								IFace.MouseCursor = MouseCursor.sb_h_double_arrow;
 								splitIndex = i;
 								e.Handled = true;
@@ -177,10 +195,8 @@ namespace Crow
 							}
 						}
 					}
-					if (splitIndex < 0) {
+					if (splitIndex < 0 && IFace.MouseCursor == MouseCursor.sb_h_double_arrow)
 						IFace.MouseCursor = MouseCursor.top_left_arrow;
-						Console.WriteLine ($"RESet cursor Table row on mouse move. {m}");
-					}
 				}
 			}
 			base.onMouseMove(sender, e);

@@ -56,27 +56,31 @@ namespace ShowCase
 					CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp, CMDAbout, CMDOptions;
 
 		const string _defaultFileName = "unnamed.txt";
-		string source = "";
-		int dirtyUndoLevel;
+		string source = "", origSource;		
 		TextBox editor;
 		Stopwatch reloadChrono = new Stopwatch ();
 
-		public new bool IsDirty { get { return undoStack.Count != dirtyUndoLevel; } }
+		public new bool IsDirty => source != origSource;
 		public string Source {
 			get => source;
 			set {
 				if (source == value)
 					return;
 				source = value;
+				CMDSave.CanExecute = IsDirty;
 				if (!reloadChrono.IsRunning)
 					reloadChrono.Restart ();				
 				NotifyValueChanged (source);
+				NotifyValueChanged ("IsDirty", IsDirty);
 			}
 		}
 		public CommandGroup EditorCommands => new CommandGroup (CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDSave, CMDSaveAs);
 
 		Stack<TextChange> undoStack = new Stack<TextChange> ();
 		Stack<TextChange> redoStack = new Stack<TextChange> ();
+		TextSpan selection;
+		string SelectedText =>	
+				selection.IsEmpty ? "" : Source.AsSpan (selection.Start, selection.Length).ToString ();
 
 		void undo () {
 			if (undoStack.TryPop (out TextChange tch)) {
@@ -98,6 +102,16 @@ namespace ShowCase
 			if (redoStack.Count == 0)
 				CMDRedo.CanExecute = false;
 		}
+		void cut () {
+			copy ();
+			applyChange (new TextChange (selection.Start, selection.Length, ""));
+		}
+		void copy () {
+			Clipboard = SelectedText;
+		}
+		void paste () {			
+			applyChange (new TextChange (selection.Start, selection.Length, Clipboard));
+		}
 		bool disableTextChangedEvent = false;
 		void apply (TextChange change) {
 			Span<char> tmp = stackalloc char[source.Length + (change.ChangedText.Length - change.Length)];
@@ -108,8 +122,7 @@ namespace ShowCase
 			src.Slice (change.End).CopyTo (tmp.Slice (change.Start + change.ChangedText.Length));
 			disableTextChangedEvent = true;
 			Source = tmp.ToString ();
-			disableTextChangedEvent = false;
-			NotifyValueChanged ("IsDirty", IsDirty);
+			disableTextChangedEvent = false;			
 		}	
 		
 		void initCommands ()
@@ -120,9 +133,9 @@ namespace ShowCase
 			CMDQuit = new Command (new Action (() => base.Quit ())) { Caption = "Quit", Icon = "#Icons.exit.svg", CanExecute = true };
 			CMDUndo = new Command (new Action (undo)) { Caption = "Undo", Icon = "#Icons.undo.svg", CanExecute = false };
 			CMDRedo = new Command (new Action (redo)) { Caption = "Redo", Icon = "#Icons.redo.svg", CanExecute = false };
-			CMDCut = new Command (new Action (() => Quit ())) { Caption = "Cut", Icon = "#Icons.scissors.svg", CanExecute = false };
-			CMDCopy = new Command (new Action (() => Quit ())) { Caption = "Copy", Icon = "#Icons.copy-file.svg", CanExecute = false };
-			CMDPaste = new Command (new Action (() => Quit ())) { Caption = "Paste", Icon = "#Icons.paste-on-document.svg", CanExecute = false };
+			CMDCut = new Command (new Action (() => cut ())) { Caption = "Cut", Icon = "#Icons.scissors.svg", CanExecute = false };
+			CMDCopy = new Command (new Action (() => copy ())) { Caption = "Copy", Icon = "#Icons.copy-file.svg", CanExecute = false };
+			CMDPaste = new Command (new Action (() => paste ())) { Caption = "Paste", Icon = "#Icons.paste-on-document.svg", CanExecute = false };
 
 		}
 		void onNewFile () {
@@ -190,8 +203,9 @@ namespace ShowCase
 				byte [] buff = Encoding.UTF8.GetBytes (source);
 				s.Write (buff, 0, buff.Length);
 			}
-			dirtyUndoLevel = undoStack.Count;
+			origSource = source;
 			NotifyValueChanged ("IsDirty", IsDirty);
+			CMDSave.CanExecute = false;
 		}
 
 		void reloadFromFile () {
@@ -200,7 +214,7 @@ namespace ShowCase
 			if (File.Exists (CurrentFile)) {
 				using (Stream s = new FileStream (CurrentFile, FileMode.Open)) {
 					using (StreamReader sr = new StreamReader (s))
-						Source = sr.ReadToEnd ();
+						Source = origSource = sr.ReadToEnd ();
 				}
 			}
 			disableTextChangedEvent = false;
@@ -235,8 +249,7 @@ namespace ShowCase
 			undoStack.Clear ();
 			redoStack.Clear ();
 			CMDUndo.CanExecute = false;
-			CMDRedo.CanExecute = false;
-			dirtyUndoLevel = 0;
+			CMDRedo.CanExecute = false;			
 		}
 		void showError (Exception ex) {
 			NotifyValueChanged ("ErrorMessage", (object)ex.Message);
@@ -274,18 +287,31 @@ namespace ShowCase
 		void onTextChanged (object sender, TextChangeEventArgs e) {
 			if (disableTextChangedEvent)
 				return;
-			undoStack.Push (e.Change.Inverse (source));
+			applyChange (e.Change);
+		}
+		void applyChange (TextChange change) {
+			undoStack.Push (change.Inverse (source));
 			redoStack.Clear ();
 			CMDUndo.CanExecute = true;
 			CMDRedo.CanExecute = false;
-			apply (e.Change);
+			apply (change);
+		}
+		
+		void onSelectedTextChanged (object sender, EventArgs e) {			
+			selection = (sender as Label).Selection;
+			Console.WriteLine($"selection:{selection.Start} length:{selection.Length}");
+			CMDCut.CanExecute = CMDCopy.CanExecute = !selection.IsEmpty;
 		}
 		void textView_KeyDown (object sender, Crow.KeyEventArgs e) {
-			if (Ctrl && e.Key == Glfw.Key.W) {
-				if (Shift)
-					CMDRedo.Execute ();
-				else
-					CMDUndo.Execute ();
+			if (Ctrl) {
+				if (e.Key == Glfw.Key.W) {
+					if (Shift)
+						CMDRedo.Execute ();
+					else
+						CMDUndo.Execute ();
+				} else if (e.Key == Glfw.Key.S) {
+					onSave ();
+				}
 			}
 		}
 

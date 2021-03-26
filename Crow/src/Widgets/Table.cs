@@ -21,7 +21,7 @@ namespace Crow
 
 		string caption;
 		Measure width = Measure.Fit;
-		//public int ComputedWidth;
+		public int ComputedWidth;
 		public Widget LargestWidget;
 
 		public string Caption {
@@ -70,18 +70,6 @@ namespace Crow
 		//int lineWidth;
 		ObservableList<Column> columns = new ObservableList<Column>();
 
-		/*[DefaultValue (1)]
-		public int LineWidth {
-			get => lineWidth;
-			set {
-				if (lineWidth == value)
-					return;
-				lineWidth = value;
-				NotifyValueChangedAuto (lineWidth);
-				RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
-			}
-		}*/
-
 		public ObservableList<Column> Columns {
 			get => columns;
 			set {
@@ -106,6 +94,7 @@ namespace Crow
 				layoutType &= (~(LayoutingType.X|LayoutingType.Width));			
 		}*/
 
+		//overriden to prevent search for largest child, all the rows as the same total width.
 		public override void ComputeChildrenPositions () {
 			int d = 0;
 			childrenRWLock.EnterReadLock();
@@ -123,6 +112,7 @@ namespace Crow
 			RegisteredLayoutings &= (~layoutType);
 
 			if (layoutType == LayoutingType.Width) {
+				//propagate column.width to each row's children
 				foreach (TableRow row in Children) {
 					for (int i = 0; i < Columns.Count && i < row.Children.Count; i++) 
 						row.Children[i].Width = Columns[i].Width;

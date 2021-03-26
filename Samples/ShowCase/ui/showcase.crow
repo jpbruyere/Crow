@@ -19,6 +19,9 @@
 				<Button Style="IcoButton" Command="{CMDSaveAs}" />
 				<Button Style="IcoButton" Command="{CMDUndo}" />
 				<Button Style="IcoButton" Command="{CMDRedo}" />
+				<Button Style="IcoButton" Command="{CMDCut}" />
+				<Button Style="IcoButton" Command="{CMDCopy}" />
+				<Button Style="IcoButton" Command="{CMDPaste}" />
 				<Widget Width="Stretched"/>
 				<Label Text="Line:" Foreground="Grey"/>
 				<Label Text="{../../tb.CurrentLine}"  Margin="2"/>
@@ -26,8 +29,9 @@
 				<Label Text="{../../tb.CurrentColumn}" Margin="2"/>
 			</HorizontalStack>
 			<HorizontalStack>
-				<TextBox Name="tb" Text="{Source}" Multiline="true" Font="consolas, 12" Focusable="true" Height="Stretched" Width="Stretched"						 
-						 TextChanged="onTextChanged" KeyDown="textView_KeyDown" ContextCommands="{ContextCommands}"/>
+				<TextBox Name="tb" Text="{Source}" Multiline="true" Font="consolas, 12" Focusable="true" Height="Stretched" Width="Stretched"						
+						TextChanged="onTextChanged" KeyDown="textView_KeyDown" ContextCommands="{EditorCommands}"/>
+						<!--SelectionChanged="onSelectedTextChanged"-->
 				<ScrollBar Value="{²../tb.ScrollY}"
 						LargeIncrement="{../tb.PageHeight}" SmallIncrement="1"
 						CursorRatio="{../tb.ChildHeightRatio}" Maximum="{../tb.MaxScrollY}" />
@@ -35,7 +39,10 @@
 			<ScrollBar Style="HScrollBar" Value="{²../tb.ScrollX}"
 					LargeIncrement="{../tb.PageWidth}" SmallIncrement="1"
 					CursorRatio="{../tb.ChildWidthRatio}" Maximum="{../tb.MaxScrollX}" />
-			<Label Text="{CurrentFile}" Width="Stretched"/>
+			<HorizontalStack Height="Fit">
+				<Widget Width="10" Height="10" Background="RoyalBlue" Visible="{IsDirty}"/>
+				<Label Text="{CurrentFile}" Width="Stretched"/>
+			</HorizontalStack>			
 			<Label Visible="{ShowError}" Text="{ErrorMessage}" Background="Red" Foreground="White" Width="Stretched" Margin="2"
 				Multiline="true"/>
 		</VerticalStack>

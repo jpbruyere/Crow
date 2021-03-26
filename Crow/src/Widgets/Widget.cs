@@ -634,7 +634,7 @@ namespace Crow
 				if (width == value)
 					return;
 				if (value.IsFixed) {
-					if (value < minimumSize.Width || (value > maximumSize.Width && maximumSize.Width > 0))
+					if (value < minimumSize.Width || (maximumSize.Width > 0 && value > maximumSize.Width))
 						return;
 				}
 				width = value;
@@ -657,7 +657,7 @@ namespace Crow
 				if (height == value)
 					return;
 				if (value.IsFixed) {
-					if (value < minimumSize.Height || (value > maximumSize.Height && maximumSize.Height > 0))
+					if (value < minimumSize.Height || (maximumSize.Height > 0 && value > maximumSize.Height))
 						return;
 				}
 				height = value;
