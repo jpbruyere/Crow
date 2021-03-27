@@ -1,4 +1,4 @@
 ﻿<?xml version="1.0"?>
 <Container Background="Blue" Margin="10" Fit="true">
-	<Label Text="tes" Margin="10" Fit="true" Background="SeaGreen"/>
+	<Label Text="test" Margin="10" Fit="true" Background="SeaGreen"/>
 </Container>

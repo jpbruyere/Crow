@@ -29,6 +29,7 @@ namespace Crow.Text
 		public static bool operator ==(TextSpan left, TextSpan right)
 			=> left.Equals (right);		
 		public static bool operator !=(TextSpan left, TextSpan right)
-			=> !left.Equals (right);		
+			=> !left.Equals (right);
+		public override string ToString() => $"{Start},{End}";
 	}
 }

@@ -290,7 +290,9 @@ namespace Crow
 		/// Current Selected text span.
 		/// </summary>
 		public TextSpan Selection {
-			get {				
+			get {
+				if (CurrentLoc == null)
+					return default;
 				CharLocation selStart = CurrentLoc.Value, selEnd = CurrentLoc.Value;
 				if (selectionStart.HasValue) {
 					if (CurrentLoc.Value.Line < selectionStart.Value.Line) {

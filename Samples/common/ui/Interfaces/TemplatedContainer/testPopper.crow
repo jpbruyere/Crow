@@ -1,18 +1,11 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack>
-	<Border Fit="true" Margin="10">
-		<VerticalStack Width="150" Height="Fit">
-			<RadioButton Caption="Left" IsChecked="true" Checked="change_alignment"/>
-			<RadioButton Caption="Right" Checked="change_alignment"/>
-			<RadioButton Caption="Top" Checked="change_alignment"/>
-			<RadioButton Caption="Bottom" Checked="change_alignment"/>
-		</VerticalStack>
-	</Border>
-	<Widget Height="200"/>
-	<Popper Caption="TestPopper" Width="100" Background="DimGrey" PopDirection="{alignment}">
+<Group Margin="10">
+	<EnumSelector Caption="Pop Direction" RadioButtonStyle="CheckBox2" HorizontalAlignment="Left" VerticalAlignment="Top" EnumValue="{²../popper.PopDirection}"/>
+	<Popper Name="popper" Caption="Popping Widget" Width="Fit" Background="DimGrey" PopDirection="Right"
+		MouseEnter="{IsPopped='true'}">
 		<Border Fit="True" Background="SteelBlue">
-			<Image Fit="true" Path="#Crow.Icons.crow.svg" Margin="10"/>
 			<VerticalStack Fit="true" Margin="10" Background="CornflowerBlue">
+				<Image Width="64" Height="64" Path="#Crow.Icons.crow.svg" Margin="1" />
 				<CheckBox Name="chk1" Background="Red"/>
 				<CheckBox Name="chk2" IsChecked="true"/>
 				<CheckBox Name="chk3"/>
@@ -24,4 +17,5 @@
 			</VerticalStack>
 		</Border>
 	</Popper>
-</VerticalStack>
+	<Label Multiline="true" VerticalAlignment="Bottom" Text="Popping Direction is overriden if space not sufficient."/>
+</Group>
