@@ -454,9 +454,8 @@ namespace Crow {
 				}
 			}
 
-			if (g is ListItem li) {
+			if (g is ISelectable li)
 				li.Selected += Li_Selected;
-			}
 
 			g.DataSource = o;
 		}
@@ -464,6 +463,10 @@ namespace Crow {
 		//void expandable_expandevent (object sender, EventHandler )
 		void Li_Selected (object sender, EventArgs e)
 		{
+			if (selectedItemContainer is ISelectable li)
+				li.IsSelected = false;
+			selectedItemContainer = sender as Widget;
+
 			SelectedItemContainerChanged.Raise (this, new SelectionChangeEventArgs (sender));
 		}
 
@@ -498,11 +501,11 @@ namespace Crow {
 		}
 		internal virtual void itemClick(object sender, MouseButtonEventArgs e){
 			//SelectedIndex = (int)((IList)data)?.IndexOf((sender as Widget).DataSource);
-			if (selectedItemContainer is ISelectable li)
-				li.IsSelected = false;
-			selectedItemContainer = sender as Widget;
-			if (selectedItemContainer is ISelectable nli)
+			
+			if (sender is ISelectable nli)
 				nli.IsSelected = true;
+			else
+				selectedItemContainer = sender as Widget;
 			if (selectedItemContainer == null)
 				return;
 			SelectedItem = selectedItemContainer.DataSource;

@@ -1,6 +1,7 @@
-﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe jp_bruyere@hotmail.com
+﻿// Copyright (c) 2013-2021  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
+using System;
 
 namespace Crow
 {
@@ -38,6 +39,8 @@ namespace Crow
 				return _contentContainer == null ? null : _contentContainer.Child;
 			}
 			set {
+				if (_contentContainer == null)
+					throw new Exception ("TemplatedContainer template Must contain a Container named 'Content'");
 				_contentContainer.SetChild(value);
 				NotifyValueChanged ("HasContent", HasContent);
 			}
