@@ -1954,7 +1954,11 @@ namespace Crow
 			if (IFace.DragAndDropInProgress) {
 				if (IFace.dragndropHover != this) {
 					IFace.dragndropHover = this;
-					if (AllowDrop && IFace.DragAndDropOperation.DragSource.AcceptDrop (this))
+#if DEBUG_DRAGNDROP
+					Debug.WriteLine($"DragNDropHover = {this.ToString()} AllowDrop:{AllowDrop}, {IFace.DragAndDropOperation.DragSource.AllowedDropTypes}");			
+#endif
+
+					if (AllowDrop && AcceptDrop (IFace.DragAndDropOperation.DragSource))
 						onDragEnter (this, IFace.DragAndDropOperation);
 				}
 			} else if (IFace.HoverWidget != this) {
