@@ -39,7 +39,7 @@ namespace Crow
 		}
 
 		public void ExpandAll(){
-			foreach (Group grp in items.Children) {
+			foreach (Group grp in itemsContainer.Children) {
 				foreach (Widget go in grp.Children) {
 					Expandable exp = go as Expandable;
 					if (exp == null)

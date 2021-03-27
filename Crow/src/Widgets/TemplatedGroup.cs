@@ -37,7 +37,7 @@ namespace Crow {
 		protected TemplatedGroup (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
-		protected Group items;
+		protected Group itemsContainer;
 		string _itemTemplate, dataTest;
 
 		#region events
@@ -89,10 +89,11 @@ namespace Crow {
 		{
 			base.loadTemplate (template);
 
-			items = this.child.FindByName ("ItemsContainer") as Group;
-			if (items == null)
+			itemsContainer = this.child.FindByName ("ItemsContainer") as Group;
+			if (itemsContainer == null)
 				throw new Exception ("TemplatedGroup template Must contain a Group named 'ItemsContainer'");
-			if (items.Children.Count == 0)
+			NotifyValueChanged ("Items", Items);
+			if (itemsContainer.Children.Count == 0)
 				NotifyValueChanged ("HasChildren", false);
 			else
 				NotifyValueChanged ("HasChildren", true);
@@ -105,7 +106,7 @@ namespace Crow {
 		/// <value>The data property test.</value>
 		[DefaultValue("TypeOf")]
 		public string DataTest {
-			get { return dataTest; }
+			get => dataTest;
 			set {
 				if (value == dataTest)
 					return;
@@ -119,8 +120,8 @@ namespace Crow {
 
 		public virtual List<Widget> Items{
 			get {
-				return isPaged ? items.Children.SelectMany(x => (x as Group).Children).ToList()
-				: items.Children;
+				return isPaged ? itemsContainer?.Children.SelectMany(x => (x as Group).Children).ToList()
+				: itemsContainer?.Children;
 			}
 		}
 
@@ -175,6 +176,13 @@ namespace Crow {
 				if (data == null)
 					return;
 
+				if (data is ICollection c) {
+					if (c.Count == 0) {
+						NotifyValueChanged ("HasItems", false);		
+						return;
+					}
+				}
+
 				loadingThread = new CrowThread (this, loading);
 				loadingThread.Finished += (object sender, EventArgs e) => (sender as TemplatedGroup).Loaded.Raise (sender, e);
 				loadingThread.Start ();
@@ -187,29 +195,31 @@ namespace Crow {
 
 		void Ol_ListRemove (object sender, ListChangedEventArg e)
 		{
+			cancelLoadingThread ();
 			if (this.isPaged) {
 				int p = e.Index / itemPerPage;
 				int i = e.Index % itemPerPage;
-				(items.Children [p] as Group).DeleteChild (i);
+				(itemsContainer.Children [p] as Group).DeleteChild (i);
 			} else
-				items.DeleteChild (e.Index);
+				itemsContainer.DeleteChild (e.Index);
 		}
 
 		void Ol_ListAdd (object sender, ListChangedEventArg e)
 		{
+			cancelLoadingThread ();
 			if (this.isPaged) {
 				throw new NotImplementedException();
 //				int p = e.Index / itemPerPage;
 //				int i = e.Index % itemPerPage;
 //				(items.Children [p] as Group).InsertChild (i, e.Element);
 			} else
-				loadItem (e.Element, items, dataTest);
+				loadItem (e.Element, itemsContainer, dataTest);
 		}
-		void Ol_ListEdit (object sender, ListChangedEventArg e) {
+		void Ol_ListEdit (object sender, ListChangedEventArg e) {			
 			if (this.isPaged) {
 				throw new NotImplementedException ();
 			} else
-				items.Children [e.Index].DataSource = e.Element;
+				itemsContainer.Children [e.Index].DataSource = e.Element;
 
 		}
 
@@ -220,15 +230,16 @@ namespace Crow {
 
 
 		public virtual void AddItem(Widget g){
-			items.AddChild (g);
+			
+			itemsContainer.AddChild (g);
 			g.LogicalParent = this;
 			NotifyValueChanged ("HasChildren", true);
 		}
 		public virtual void RemoveItem(Widget g)
-		{
+		{				
 			g.LogicalParent = null;
-			items.DeleteChild (g);
-			if (items.Children.Count == 0)
+			itemsContainer.DeleteChild (g);
+			if (itemsContainer.Children.Count == 0)
 				NotifyValueChanged ("HasChildren", false);
 		}
 
@@ -237,7 +248,7 @@ namespace Crow {
 			selectedItemContainer = null;
 			SelectedItem = null;
 
-			items.ClearChildren ();
+			itemsContainer.ClearChildren ();
 			NotifyValueChanged ("HasChildren", false);
 		}
 
@@ -299,7 +310,7 @@ namespace Crow {
 			DbgLogger.StartEvent (DbgEvtType.TGLoadingThread, this);
 
 			try {
-				loadPage (data, items, dataTest);
+				loadPage (data, itemsContainer, dataTest);
 			} catch (Exception ex) {
 				if (Monitor.IsEntered (IFace.LayoutMutex))
 					Monitor.Exit (IFace.LayoutMutex);
@@ -340,6 +351,7 @@ namespace Crow {
 			if (updateMx)
 				Monitor.Enter (IFace.UpdateMutex);
 
+			loadingThread = null;
 		}
 		void loadPage(IEnumerable _data, Group page, string _dataTest)
 		{
@@ -428,8 +440,12 @@ namespace Crow {
 				if (iTemp == null)
 					iTemp = ItemTemplates ["default"];
 			}
-
-			Monitor.Enter (IFace.LayoutMutex);
+			while (!Monitor.TryEnter(IFace.LayoutMutex)) {
+				if (loadingThread.cancelRequested)
+					return;
+				Thread.Sleep(1);
+			}
+			
 				g = iTemp.CreateInstance();
 				#if DESIGN_MODE
 				g.design_isTGItem = true;
@@ -466,7 +482,7 @@ namespace Crow {
 			if (selectedItemContainer is ISelectable li)
 				li.IsSelected = false;
 			selectedItemContainer = sender as Widget;
-
+			SelectedItem = selectedItemContainer.DataSource;
 			SelectedItemContainerChanged.Raise (this, new SelectionChangeEventArgs (sender));
 		}
 
@@ -486,7 +502,7 @@ namespace Crow {
 			get {
 				if (data == null)
 					return -1;
-				GenericStack page1 = items.FindByName ("page1") as GenericStack;
+				GenericStack page1 = itemsContainer.FindByName ("page1") as GenericStack;
 				if (page1 == null)
 					return -1;
 
@@ -502,10 +518,11 @@ namespace Crow {
 		internal virtual void itemClick(object sender, MouseButtonEventArgs e){
 			//SelectedIndex = (int)((IList)data)?.IndexOf((sender as Widget).DataSource);
 			
-			if (sender is ISelectable nli)
+			if (sender is ISelectable nli) {
 				nli.IsSelected = true;
-			else
-				selectedItemContainer = sender as Widget;
+				return;
+			}
+			selectedItemContainer = sender as Widget;
 			if (selectedItemContainer == null)
 				return;
 			SelectedItem = selectedItemContainer.DataSource;

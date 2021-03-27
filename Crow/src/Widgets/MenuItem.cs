@@ -134,7 +134,7 @@ namespace Crow
 			Menu menu = LogicalParent as Menu;
 			if (menu == null)
 				return;
-			if (menu.AutomaticOpening && items.Children.Count>0)
+			if (menu.AutomaticOpening && itemsContainer.Children.Count>0)
 				IsOpened = true;
 		}
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
