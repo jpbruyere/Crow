@@ -58,29 +58,52 @@ namespace Crow
 		public override void onMouseMove (object sender, MouseMoveEventArgs e)
 		{						
 			GenericStack gs = Parent as GenericStack;
+			Rectangle gsRect = gs.ClientRectangle;
 			Point m = gs.ScreenPointToLocal (e.Position);
 			int ptrSplit = gs.Children.IndexOf (this);
 
 			if (IFace.IsDown (Glfw.MouseButton.Left) && ptrSplit > 0 && ptrSplit < gs.Children.Count - 1) {
-				Widget w0 = gs.Children[ptrSplit - 1];
-				Widget w1 = gs.Children[ptrSplit + 1];
-				if (gs.Orientation == Orientation.Horizontal) {					
-					int x = m.X - Slot.Width / 2 - gs.Spacing;
+				lock (IFace.UpdateMutex) {
+					Widget w0 = gs.Children[ptrSplit - 1];
+					Widget w1 = gs.Children[ptrSplit + 1];
+					if (gs.Orientation == Orientation.Horizontal) {					
+						int x = m.X - Slot.Width / 2 - gs.Spacing;
 
-					if (x > w0.Slot.Left + w0.MinimumSize.Width &&
-						x + Slot.Width + 2 * gs.Spacing < w1.Slot.Right - w1.MinimumSize.Width) {
-						w0.Width = x - w0.Slot.X;	
-						x += Slot.Width + 2 * gs.Spacing;
-						w1.Width = w1.Slot.Right - x;						
-					}
-				} else {
-					int y = m.Y - Slot.Height / 2 - gs.Spacing;
+						if (x > w0.Slot.Left + w0.MinimumSize.Width &&
+							x + Slot.Width + 2 * gs.Spacing < w1.Slot.Right - w1.MinimumSize.Width) {
+							if (w0.Width != Measure.Stretched) {
+								if (w0.Width.IsRelativeToParent)
+									w0.Width = new Measure((int)Math.Round (100.0 * (x - w0.Slot.X) / (double)gsRect.Width), Unit.Percent);
+								else
+									w0.Width = x - w0.Slot.X;
+							}							
+							if (w1.Width != Measure.Stretched) {
+								x += Slot.Width + 2 * gs.Spacing;
+								if (w1.Width.IsRelativeToParent)
+									w1.Width = new Measure((int)Math.Round (100.0 * (w1.Slot.Right - x) / (double)gsRect.Width), Unit.Percent);
+								else
+									w1.Width = w1.Slot.Right - x;
+							}				
+						}
+					} else {
+						int y = m.Y - Slot.Height / 2 - gs.Spacing;
 
-					if (y > w0.Slot.Top + w0.MinimumSize.Height &&
-						y + Slot.Height + 2 * gs.Spacing < w1.Slot.Bottom - w1.MinimumSize.Height) {
-						w0.Height = y - w0.Slot.Top;	
-						y += Slot.Height + 2 * gs.Spacing;
-						w1.Height = w1.Slot.Bottom - y;						
+						if (y > w0.Slot.Top + w0.MinimumSize.Height &&
+							y + Slot.Height + 2 * gs.Spacing < w1.Slot.Bottom - w1.MinimumSize.Height) {
+							if (w0.Height != Measure.Stretched) {
+								if (w0.Height.IsRelativeToParent)
+									w0.Height = new Measure((int)Math.Round (100.0 * (y - w0.Slot.Top) / (double)gsRect.Height), Unit.Percent);
+								else
+									w0.Height = y - w0.Slot.Top;
+							}
+							if (w1.Height != Measure.Stretched) {
+								y += Slot.Height + 2 * gs.Spacing;
+								if (w1.Height.IsRelativeToParent)
+									w1.Height = new Measure((int)Math.Round (100.0 * (w1.Slot.Bottom - y) / (double)gsRect.Height), Unit.Percent);
+								else
+									w1.Height = w1.Slot.Bottom - y;
+							}				
+						}
 					}
 				}
 				e.Handled = true;
