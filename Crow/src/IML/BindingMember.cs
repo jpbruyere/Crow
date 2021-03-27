@@ -56,7 +56,7 @@ namespace Crow.IML
 		/// <summary>
 		/// Target the template's root node, expression was in the form './name[.name[...]]' or '/name[.name[...]]'
 		/// </summary>
-		public bool IsTemplateBinding { get { return LevelsUp < 0; }}
+		public bool IsTemplateBinding => LevelsUp < 0;
 
 		/// <summary>
 		/// No level change and expression was '.name'
@@ -70,7 +70,7 @@ namespace Crow.IML
 		/// <summary>
 		/// no level change, and only a single name in Tokens[], that's dataSource member if property binding
 		/// </summary>
-		public bool IsSingleName { get { return LevelsUp == 0 && Tokens.Length == 1; }}
+		public bool IsSingleName => LevelsUp == 0 && Tokens.Length == 1;
 
 		#region CTOR
 		/// <summary>

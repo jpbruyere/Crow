@@ -312,7 +312,7 @@ namespace Crow
         }
         #endregion
 
-        void update (TextChange change) {
+        protected void update (TextChange change) {
             lock (linesMutex) {
                 Span<char> tmp = stackalloc char[Text.Length + (change.ChangedText.Length - change.Length)];
                 //Console.WriteLine ($"{Text.Length,-4} {change.Start,-4} {change.Length,-4} {change.ChangedText.Length,-4} tmp:{tmp.Length,-4}");

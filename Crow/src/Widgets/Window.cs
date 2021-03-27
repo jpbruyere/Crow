@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2019  Bruyère Jean-Philippe jp_bruyere@hotmail.com
+﻿// Copyright (c) 2013-2021  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -26,8 +26,7 @@ namespace Crow
 		string _icon;
 		bool resizable;
 		bool movable;
-		bool modal;
-		protected bool hoverBorder = false;
+		bool modal;		
 		bool alwaysOnTop = false;
 
 		Rectangle savedBounds;
@@ -77,7 +76,7 @@ namespace Crow
         #region public properties
         [DefaultValue("#Crow.Icons.crow.svg")]
 		public string Icon {
-			get { return _icon; } 
+			get => _icon;
 			set {
 				if (_icon == value)
 					return;
@@ -87,9 +86,7 @@ namespace Crow
 		} 
 		[DefaultValue(true)]
 		public bool Resizable {
-			get {
-				return resizable;
-			}
+			get => resizable;
 			set {
 				if (resizable == value)
 					return;
@@ -99,9 +96,7 @@ namespace Crow
 		}
 		[DefaultValue(true)]
 		public bool Movable {
-			get {
-				return movable;
-			}
+			get => movable;
 			set {
 				if (movable == value)
 					return;
@@ -111,9 +106,7 @@ namespace Crow
 		}
 		[DefaultValue(false)]
 		public bool Modal {
-			get {
-				return modal;
-			}
+			get => modal;			
 			set {
 				if (modal == value)
 					return;
@@ -123,28 +116,23 @@ namespace Crow
 		}
 		[DefaultValue(false)]
 		public bool IsMinimized {
-			get { return _minimized; }
+			get => _minimized;
 			set{
 				if (value == IsMinimized)
 					return;
 
 				_minimized = value;
-				_contentContainer.Visible = !_minimized;
+				_contentContainer.IsVisible = !_minimized;
 
 				NotifyValueChangedAuto (_minimized);
 			}
 		}
-		[XmlIgnore]public bool IsMaximized {
-			get { return Width == Measure.Stretched & Height == Measure.Stretched & !_minimized; }
-		}
-		[XmlIgnore]public bool IsNormal {
-			get { return !(IsMaximized|_minimized); }
-		}
+		[XmlIgnore]public bool IsMaximized =>
+						Width == Measure.Stretched & Height == Measure.Stretched & !_minimized;		
+		[XmlIgnore]public bool IsNormal => !(IsMaximized|_minimized);
 		[DefaultValue(false)]
 		public bool AlwaysOnTop {
-			get {
-				return modal ? true : alwaysOnTop;
-			}
+			get => modal ? true : alwaysOnTop;			
 			set {
 				if (alwaysOnTop == value)
 					return;
@@ -385,7 +373,7 @@ namespace Crow
 			Minimize.Raise (sender, e);
 		}
 
-		protected void butQuitPress (object sender, MouseButtonEventArgs e)
+		public void onQuitPress (object sender, MouseButtonEventArgs e)
 		{
 			IFace.MouseCursor = MouseCursor.top_left_arrow;
 			close ();

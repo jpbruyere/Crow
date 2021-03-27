@@ -193,7 +193,7 @@ namespace Crow
 		public virtual void onPop(object sender, EventArgs e)
 		{
 			if (Content != null) {
-				Content.Visible = true;
+				Content.IsVisible = true;
 				if (Content.Parent == null)
 					IFace.AddWidget (Content);
 				//if (Content.LogicalParent != this)
@@ -206,7 +206,7 @@ namespace Crow
 		public virtual void onUnpop(object sender, EventArgs e)
 		{
 			if (Content != null) {
-				Content.Visible = false;
+				Content.IsVisible = false;
 			}
 			Unpoped.Raise (this, e);
 		}

@@ -29,8 +29,9 @@
 				<Label Text="{../../tb.CurrentColumn}" Margin="2"/>
 			</HorizontalStack>
 			<HorizontalStack>
-				<TextBox Name="tb" Text="{Source}" Multiline="true" Font="consolas, 12" Focusable="true" Height="Stretched" Width="Stretched"						
-						TextChanged="onTextChanged" KeyDown="textView_KeyDown" ContextCommands="{EditorCommands}"/>
+				<Editor Name="tb" Text="{Source}" Multiline="true" Font="consolas, 12" Focusable="true" Height="Stretched" Width="Stretched"						
+						TextChanged="onTextChanged" KeyDown="textView_KeyDown" ContextCommands="{EditorCommands}"
+						Foreground="DarkGrey" Background="White"/>
 						<!--SelectionChanged="onSelectedTextChanged"-->
 				<ScrollBar Value="{²../tb.ScrollY}"
 						LargeIncrement="{../tb.PageHeight}" SmallIncrement="1"

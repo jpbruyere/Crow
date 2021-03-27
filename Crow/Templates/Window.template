@@ -19,7 +19,7 @@
 			</Border>
 			<Border BorderWidth="1" Style="WindowIconBorder">
 				<Image Focusable="true" Path="#Crow.Icons.exit2.svg"
-					 MouseClick="./butQuitPress"/>
+					 MouseClick="./onQuitPress"/>
 			</Border>
 			<Widget Width="5"/>
 		</HorizontalStack>
