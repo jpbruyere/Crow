@@ -1,0 +1,25 @@
+﻿<VerticalStack>
+	<ColorPicker Name="cp" Width="300" Height="20" >
+		<Template>
+			<ColorPicker CurrentColor="{²./CurrentColor}" Height="Stretched">
+				<Template>
+					<ListBox Data="{./AvailableColors}" SelectedItemChanged="./onSelectedItemChanged">
+						<Template>
+							<Scroller Name="scroller1" Margin="5" Height="Stretched">
+								<Wrapper Name="ItemsContainer" Height="Fit" VerticalAlignment="Top"/>
+							</Scroller>
+						</Template>
+						<ItemTemplate>
+							<Border Width="16" Height="16" Background="{}" Foreground="Transparent" Tooltip="{}"
+													MouseEnter="{Foreground=Black}"
+													MouseLeave="{Foreground=Transparent}"/>	
+						</ItemTemplate>
+					</ListBox>
+				</Template>
+			</ColorPicker>
+		</Template>
+	</ColorPicker>
+	<Border CornerRadius="5" Width="60" Height="40" Background="{../cp.CurrentColor}">
+		<Label Text="{../../cp.CurrentColor}"/>
+	</Border>
+</VerticalStack>

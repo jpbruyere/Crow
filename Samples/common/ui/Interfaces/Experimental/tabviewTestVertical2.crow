@@ -1,0 +1,53 @@
+﻿<HorizontalStack Spacing="0" > 
+	<ListBox Data="{../grp.Children}" Width="Fit"> 
+		<Template>
+			<VerticalStack Name="ItemsContainer" Background="{./Background}"/> 
+		</Template>
+		<ItemTemplate>
+			<ListItem Height="Fit" Background="Transparent" IsSelected="{IsVisible}"
+					Selected="{.DataSource.Visible='true'};{Background=${ControlBorderColor}}"
+					Unselected="{.DataSource.Visible='false'};{Background=Transparent}">
+				<HorizontalStack Margin="5" >  
+					<Label Text="{Caption}" Margin="5" />
+					<Border CornerRadius="6" BorderWidth="1" Foreground="Transparent"  Height="10" Width="10" VerticalAlignment="Top"
+						MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
+						<Image Focusable="true" Name="Image" Margin="0" Width="Stretched" Height="Stretched" Path="#Crow.Icons.exit2.svg"
+							 MouseClick="onQuitPress"/>
+					</Border>
+					</HorizontalStack>
+			</ListItem>
+		</ItemTemplate>
+	</ListBox>
+	<Group Name="grp" Background="${ControlBorderColor}" Margin="10">
+		<Window Template="#Crow.ToolWindow.template" Caption="item 1" IsVisible="true" Width="Stretched" Height="Stretched" Resizable="False" >
+			<Template>
+				<Container Name="Content"/>
+			</Template>
+			<TextBox Text="test" Height="Stretched" Width="Stretched" Multiline="true"/>
+		</Window>
+		<Window Caption="item 2" IsVisible="false" Width="Stretched" Height="Stretched" Resizable="False" >
+			<Template>
+				<Container Name="Content"/>
+			</Template>
+			<TextBox Text="test" Height="Stretched" Width="Stretched" Multiline="true"/>
+		</Window>
+		<Window Caption="item 3" IsVisible="false" Width="Stretched" Height="Stretched" Resizable="False" >
+			<Template>
+				<Container Name="Content"/>
+			</Template>
+			<TextBox Text="test" Height="Stretched" Width="Stretched" Multiline="true"/>
+		</Window>
+		<Window Caption="item 4" IsVisible="false" Width="Stretched" Height="Stretched" Resizable="False" >
+			<Template>
+				<Container Name="Content"/>
+			</Template>
+			<TextBox Text="test" Height="Stretched" Width="Stretched" Multiline="true"/>
+		</Window>
+		<Window Caption="item 5" IsVisible="false" Width="Stretched" Height="Stretched" Resizable="False" >
+			<Template>
+				<Container Name="Content"/>
+			</Template>
+			<TextBox Text="test" Height="Stretched" Width="Stretched" Multiline="true"/>
+		</Window>
+	</Group>	
+</HorizontalStack>

@@ -1,0 +1,5 @@
+﻿<HorizontalStack Margin="50" Width="Fit">
+	<Label Text="{/Width}" Height="Stretched" Background="SeaGreen" Width="100"/> 
+	<Splitter Background="Grey"/>
+	<Label Text="{/Width}" Height="Stretched" Background="SeaGreen" Width="200"/>
+</HorizontalStack>

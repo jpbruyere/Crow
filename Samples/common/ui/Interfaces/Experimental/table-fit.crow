@@ -1,0 +1,22 @@
+﻿<Table Columns="test,Fit;test,Fit" Width="Fit" Background="Blue"> 
+	<TableRow Height="Fit" Background="Red" Margin="5">
+		<Label Text="col1" Background="Grey"/>
+		<Label Text="col2" Background="Grey"/>
+	</TableRow>
+	<TableRow Height="Fit" Background="Red" Margin="5">
+		<Label Text="this is" Background="Grey"/>
+		<Label Text="{/Width}" Background="Grey"/>
+	</TableRow>
+	<TableRow Height="Fit" Background="Red" Margin="5">
+		<Label Text="{/Width}" Background="Grey"/>
+		<Label Text="fkdksls" Background="Grey"/>
+	</TableRow>
+	<TableRow Height="Fit" Background="Red" Margin="5">
+		<Label Text="{/Width}" Background="Grey"/>
+		<Label Text="{/Width}" Background="Grey"/>
+	</TableRow>
+	<TableRow Height="Fit" Background="Red" Margin="5">
+		<Label Text="{/Width}" Background="Grey"/>
+		<Label Text="{/Width}" Background="Grey"/>
+	</TableRow>
+</Table>

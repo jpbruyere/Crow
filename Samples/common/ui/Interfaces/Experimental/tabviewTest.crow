@@ -1,0 +1,22 @@
+﻿<ListBox >
+	<Template>
+		<VerticalStack> 
+			<ListBox Data="{./Items}" Height="Fit">
+				<Template>
+					<HorizontalStack Name="ItemsContainer" Background="{./Background}"/>
+				</Template>
+				<ItemTemplate>
+					<ListItem Width="Fit" Background="Transparent" IsSelected="{IsVisible}"
+							Selected="{.DataSource.Visible='true'};{Background=Blue}"
+							Unselected="{.DataSource.Visible='false'};{Background=Transparent}"> 
+						<Label Text="{Caption}" Margin="5" />
+					</ListItem>
+				</ItemTemplate>
+			</ListBox>			
+			<Group Name="ItemsContainer"/>
+		</VerticalStack>
+	</Template>
+	<GroupBox Caption="item 1" IsVisible="false"/>
+	<GroupBox Caption="item 2" IsVisible="true"/>
+	<GroupBox Caption="item 3" IsVisible="false"/>
+</ListBox>

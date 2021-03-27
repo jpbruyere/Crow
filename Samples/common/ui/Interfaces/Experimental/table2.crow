@@ -1,0 +1,18 @@
+﻿<Table Foreground="White" Columns="test,Fit;test,Fit" Background="White" Width="Fit" Height="Fit" Margin="1" Spacing="1" > 
+	<TableRow Height="Fit"  Spacing="1" Margin="0"
+			MouseEnter="{Background=RoyalBlue}"
+			MouseLeave="{Background=Transparent}">
+		<Label Text="col1qsf" Margin="5" Background="0.3,0.3,0.3,0.8"/>
+		<Label Text="col1qsf" Margin="5" Background="0.3,0.3,0.3,0.8"/>
+		<Label Text="col1qsf" Margin="5" Background="0.3,0.3,0.3,0.8"/>
+	</TableRow>
+	<TableRow Height="Fit" Spacing="0" Margin="0"
+			MouseEnter="{Background=RoyalBlue}"
+			MouseLeave="{Background=Transparent}">
+		<Label Text="col1qsf" Margin="5" Background="0.3,0.3,0.3,0.8"/>
+		<Label Text="col1qsf" Margin="5" Background="0.3,0.3,0.3,0.8"/>
+		<Label Text="col1qsf" Margin="5" Background="0.3,0.3,0.3,0.8"/>
+	</TableRow>
+	
+
+</Table>

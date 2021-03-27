@@ -1,0 +1,31 @@
+﻿<HorizontalStack Spacing="0" > 
+	<ListBox Data="{../grp.Children}" Width="Fit"> 
+		<Template>
+			<VerticalStack Name="ItemsContainer" Background="{./Background}"/>
+		</Template>
+		<ItemTemplate>
+			<ListItem Height="Fit" Background="Transparent" IsSelected="{IsVisible}"
+					Selected="{.DataSource.Visible='true'};{Background=Grey}"
+					Unselected="{.DataSource.Visible='false'};{Background=Transparent}"> 
+				<Label Text="{Name}" Margin="5" />
+			</ListItem>
+		</ItemTemplate>
+	</ListBox>
+	<Group Name="grp" Background="Grey" Margin="10">
+		<Container Name="item 1" IsVisible="true" >
+			<TextBox Text="test" Height="Stretched" Width="Stretched" Multiline="true"/>
+		</Container>
+		<Container Name="item 2" IsVisible="false">
+			<TextBox Text="test" Height="Stretched" Width="Stretched" Multiline="true"/>
+		</Container>
+		<Container Name="item 3" IsVisible="false">
+			<TextBox Text="test" Height="Stretched" Width="Stretched" Multiline="true"/>
+		</Container>
+		<Container Name="item 4" IsVisible="false">
+			<TextBox Text="test" Height="Stretched" Width="Stretched" Multiline="true"/>
+		</Container>
+		<Container Name="item 5" IsVisible="false">
+			<ColorPicker Height="Stretched" Width="Stretched" />
+		</Container>
+	</Group>	
+</HorizontalStack>

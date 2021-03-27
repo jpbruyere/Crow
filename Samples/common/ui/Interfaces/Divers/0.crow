@@ -73,7 +73,7 @@
 			</HorizontalStack>
 		</VerticalStack>
 		<Splitter />
-		<VerticalStack Width="40%" Margin="5" Spacing="5">
+		<VerticalStack Width="Stretched" Margin="5" Spacing="5">
 			<Expandable>
 				<Image Path="#Crow.Icons.crow.svg" />
 			</Expandable>

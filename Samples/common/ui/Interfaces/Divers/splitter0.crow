@@ -1,7 +1,7 @@
 ﻿<HorizontalStack Margin="50">
-	<Widget Background="SeaGreen" Width="33%"/>
+	<Label Text="{/Width}" Height="Stretched" Background="SeaGreen" Width="33%" Margin="5"/>
 	<Splitter/>
-	<Widget Background="SeaGreen" Width="33%"/>
+	<Label Text="{/Width}" Height="Stretched" Background="SeaGreen" Width="33%" Margin="5"/>
 	<Splitter/>
-	<Widget Background="SeaGreen"/>
+	<Label Text="{/Width}" Height="Stretched" Background="SeaGreen" Width="Stretched" Margin="5"/>
 </HorizontalStack>

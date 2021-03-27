@@ -1,0 +1,7 @@
+﻿<VerticalStack Margin="50" Height="Stretched" Background="RoyalBlue"> 
+	<Label MinimumSize="0,20" Width="Stretched" Text="{/Height}" Background="SeaGreen" Height="30%"/>
+	<Splitter Background="Grey"/>
+	<Label MinimumSize="0,20" Width="Stretched" Text="{/Height}" Background="SeaGreen" Height="Stretched"/>
+	<Splitter Background="Grey"/>
+	<Label MinimumSize="0,20" Width="Stretched" Text="{/Height}" Background="SeaGreen" Height="30%"/>
+</VerticalStack>
