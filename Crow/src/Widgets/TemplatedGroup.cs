@@ -440,10 +440,14 @@ namespace Crow {
 				if (iTemp == null)
 					iTemp = ItemTemplates ["default"];
 			}
-			while (!Monitor.TryEnter(IFace.LayoutMutex)) {
-				if (loadingThread.cancelRequested)
-					return;
-				Thread.Sleep(1);
+			if (loadingThread == null)
+				Monitor.Enter(IFace.LayoutMutex);
+			else {
+				while (!Monitor.TryEnter(IFace.LayoutMutex)) {
+					if (loadingThread.cancelRequested)
+						return;
+					Thread.Sleep(1);
+				}
 			}
 			
 				g = iTemp.CreateInstance();
