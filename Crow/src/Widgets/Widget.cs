@@ -898,16 +898,24 @@ namespace Crow
 		/// <summary>
 		/// set the visible state of the control, invisible controls does reserve space in the layouting system.
 		/// </summary>
-		[DesignCategory ("Appearance")][DefaultValue(true)]
+		[Obsolete][DesignCategory ("Appearance")][DefaultValue(true)]
 		public virtual bool Visible {
-			get { return isVisible; }
+			get => IsVisible;
+			set => IsVisible = value;
+		}
+		/// <summary>
+		/// set the visible state of the control, invisible controls does reserve space in the layouting system.
+		/// </summary>
+		[DesignCategory ("Appearance")][DefaultValue(true)]
+		public virtual bool IsVisible {
+			get => isVisible; 
 			set {
 				if (value == isVisible)
 					return;
 
 				isVisible = value;
 
-				if (!Visible)
+				if (!isVisible)
 					unshownPostActions ();
 				RegisterForLayouting (LayoutingType.Sizing);
 
