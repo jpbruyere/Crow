@@ -35,8 +35,7 @@ namespace Crow
 		#region private and protected fields
 		protected string _text;
         TextAlignment _textAlignment;
-		bool _multiline;
-		Color cursorColor;
+		bool _multiline;		
 		Color selBackground;
 		Color selForeground;
 
@@ -94,20 +93,7 @@ namespace Crow
 		protected FontExtents fe;
 		protected TextExtents te;
 		#endregion
-		/// <summary>
-		/// Background color for selected text inside this label.
-		/// </summary>
-		[DefaultValue ("White")]
-		public virtual Color CursorColor {
-			get { return cursorColor; }
-			set {
-				if (cursorColor == value)
-					return;
-				cursorColor = value;
-				NotifyValueChangedAuto (cursorColor);
-				RegisterForRedraw ();
-			}
-		}
+
 
 		/// <summary>
 		/// Background color for selected text inside this label.
@@ -194,7 +180,7 @@ namespace Crow
 				if (value == _multiline)
 					return;
 				_multiline = value;
-				lines = new LineCollection (_multiline ? 4 : 1);
+				getLines ();
 				NotifyValueChangedAuto (_multiline);
 				RegisterForGraphicUpdate();
 			}
@@ -521,7 +507,7 @@ namespace Crow
 			//}
 			Rectangle c = ScreenCoordinates (textCursor.Value + Slot.Position + ClientRectangle.Position);
 			ctx.ResetClip ();
-			ctx.SetSource (cursorColor);
+			Foreground.SetAsSource (IFace, ctx, c);			
 			ctx.LineWidth = 1.0;
 			ctx.MoveTo (0.5 + c.X, c.Y);
 			ctx.LineTo (0.5 + c.X, c.Bottom);
