@@ -55,9 +55,9 @@ namespace Crow
 		internal Widget tallestChild = null;
 
         bool _multiSelect = false;
-		List<Widget> children = new List<Widget>();
+		ObservableList<Widget> children = new ObservableList<Widget>();
 
-        public virtual List<Widget> Children => children;
+        public virtual ObservableList<Widget> Children => children;
 		[DefaultValue(false)]
         public bool MultiSelect
         {
