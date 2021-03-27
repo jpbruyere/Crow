@@ -137,19 +137,6 @@ Splitter {
 	StickyMouse="10";
 	Background = "Grey";
 }
-
-TabView {
-	CacheEnabled = "false";
-	AllowDrop = "true";
-}
-TabItem {
-	Caption = "TabItem";
-	Focusable = "true";
-	CacheEnabled = "true";
-	//MouseEnter = "{Background = Cobalt;Foreground=White;}";
-	//MouseLeave = "{Foreground=LightGrey;Background=Jet;}";
-	AllowDrag = "true";
-}
 Window {
 	Caption = "Window";
 	Focusable = "true";

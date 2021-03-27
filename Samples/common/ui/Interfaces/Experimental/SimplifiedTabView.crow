@@ -1,0 +1,11 @@
+﻿<TabView>
+	<Widget Name="Item 1" Background="SeaGreen"/>
+	<Widget Name="Item 2" IsVisible="false" Background="Red"/>
+	<Widget Name="Item 3" IsVisible="false" Background="Blue"/>
+	<Widget Name="Item 4" IsVisible="false" Background="Green"/>
+	<Widget Name="Item 5" IsVisible="false" Background="Pink"/>
+	<Widget Name="Item 6" IsVisible="false" Background="SeaGreen"/>
+	<Widget Name="Item 7" IsVisible="false" Background="DarkGrey"/>
+	<Widget Name="Item 8" IsVisible="false" Background="Onyx"/>
+	<Widget Name="Item 9" IsVisible="false" Background="Yellow"/>
+</TabView>

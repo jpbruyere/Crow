@@ -1,0 +1,17 @@
+﻿<?xml version="1.0"?>
+<VerticalStack Spacing="0" > 
+	<ListBox Data="{./Items}" Fit="true" HorizontalAlignment="Left" VerticalAlignment="Top"> 
+		<Template>
+			<HorizontalStack Name="ItemsContainer" Background="{./Background}" />
+		</Template>
+		<ItemTemplate>
+			<ListItem Fit="true" Background="Transparent" IsSelected="{IsVisible}"
+					Selected="{.DataSource.Visible='true'};{Background=Grey}"
+					Unselected="{.DataSource.Visible='false'};{Background=Transparent}"> 
+				<Label Text="{Name}" Margin="5" />
+			</ListItem>
+		</ItemTemplate>
+	</ListBox>
+	<Group Name="ItemsContainer" Background="Grey" Margin="10"/>
+</VerticalStack>
+
