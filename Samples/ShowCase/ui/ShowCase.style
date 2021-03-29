@@ -2,3 +2,6 @@
 	Template = "#ShowCase.Button.template";
 	Background = "Onyx";
 }
+CheckBox2 {
+	Width = "200";
+}

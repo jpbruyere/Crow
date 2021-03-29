@@ -483,6 +483,8 @@ namespace Crow {
 		//void expandable_expandevent (object sender, EventHandler )
 		void Li_Selected (object sender, EventArgs e)
 		{
+			if (sender == selectedItemContainer)
+				return;
 			if (selectedItemContainer is ISelectable li)
 				li.IsSelected = false;
 			selectedItemContainer = sender as Widget;

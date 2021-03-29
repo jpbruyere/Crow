@@ -56,7 +56,7 @@ namespace Crow {
 				layoutType &= (~LayoutingType.Y);
 		}
 		public override int measureRawSize (LayoutingType lt) {
-			int totSpace = Math.Max (0, Spacing * (Children.Count (c => c.Visible) - 1));
+			int totSpace = Math.Max (0, Spacing * (Children.Count (c => c.IsVisible) - 1));
 			if (lt == LayoutingType.Width) {
 				if (Orientation == Orientation.Horizontal)
 					return contentSize.Width + totSpace + 2 * Margin;
@@ -69,14 +69,14 @@ namespace Crow {
 			int d = 0;
 			if (Orientation == Orientation.Horizontal) {
 				foreach (Widget c in Children) {
-					if (!c.Visible)
+					if (!c.IsVisible)
 						continue;
 					c.Slot.X = d;
 					d += c.Slot.Width + Spacing;
 				}
 			} else {
 				foreach (Widget c in Children) {
-					if (!c.Visible)
+					if (!c.IsVisible)
 						continue;
 					c.Slot.Y = d;
 					d += c.Slot.Height + Spacing;

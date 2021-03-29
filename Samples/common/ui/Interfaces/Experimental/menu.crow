@@ -1,0 +1,3 @@
+﻿<Menu>
+	<MenuItem Data="{EditsCommands}"/>
+</Menu>

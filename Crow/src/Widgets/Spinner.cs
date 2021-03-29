@@ -14,27 +14,6 @@ namespace Crow
 		protected Spinner() {}
 		public Spinner (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
-
-		public override void onMouseClick (object sender, MouseButtonEventArgs e)
-		{
-			e.Handled = true;
-			base.onMouseClick (sender, e);
-		}
-		void onUp (object sender, MouseButtonEventArgs e)
-		{
-			if (IFace.Ctrl)
-				Value += SmallIncrement;
-			else
-				Value += LargeIncrement;
-		}
-		void onDown (object sender, MouseButtonEventArgs e)
-		{
-			if (IFace.Ctrl)
-				Value -= SmallIncrement;
-			else
-				Value -= LargeIncrement;
-		}
-
 	}
 }
 

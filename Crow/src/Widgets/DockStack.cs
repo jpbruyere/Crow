@@ -397,6 +397,7 @@ namespace Crow
 					dw.DockingPosition = FastEnum.Parse<Alignment> (getConfAttrib (conf, ref i));
 					dw.savedSlot = Rectangle.Parse (getConfAttrib (conf, ref i));
 					dw.wasResizable = Boolean.Parse (getConfAttrib (conf, ref i));
+					dw.Resizable = false;
 
 					dw.IsDocked = true;
 					dw.DataSource = dataSource;

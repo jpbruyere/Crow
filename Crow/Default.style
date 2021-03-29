@@ -1,11 +1,12 @@
 ﻿ControlBackground = "Transparent";
+ControlForeground = "Grey";
+ControlHighlight = "RoyalBlue";
 ControlBorderColor = "DimGrey";
 ControlBorderWidth = "1";
-ControlCaptionColor = "LightGrey";
 ControlCaptionHoverColor = "White";
 ControlCornerRadius = "0";
 ControlInsideMargin = "1";
-ControlHighlight = "RoyalBlue";
+
 IconSize = "11";
 IconMargin = "1";
 ToggleIconSize = "16";
@@ -47,12 +48,12 @@ ControlBorder {
 	Margin = "${ControlInsideMargin}";
 }
 ControlCaption {
-	Foreground  = "${ControlCaptionColor}";
+	Foreground  = "${ControlForeground}";
 	MouseEnter	= "{Foreground=${ControlCaptionHoverColor}}";
-	MouseLeave	= "{Foreground=${ControlCaptionColor}}";
+	MouseLeave	= "{Foreground=${ControlForeground}}";
 }
 ControlEditableText {
-	Foreground	= "${ControlCaptionColor}";
+	Foreground	= "${ControlForeground}";
 	Background	= "Transparent";
 	MinimumSize	= "40,10";
 	Margin		= "1";
@@ -104,7 +105,7 @@ MenuItem {
 	Width = "Stretched";
 	Height = "Fit";
 	Background = "${MenuBackground}";	
-	Foreground = "${ControlCaptionColor}";
+	Foreground = "${ControlForeground}";
 	MouseEnter = "{Background=${ControlHighlight}}";
 	MouseLeave = "{Background=${MenuBackground}}";
 	//SelectionBackground = "${ControlHighlight}";
@@ -238,16 +239,12 @@ CheckBoxAlt {
 }
 
 ArrowBut {
-	MouseRepeat="true";	
-	//Focusable="true";
+	MouseRepeat="true";		
 	
 	Foreground="Grey";
 	Background="Transparent";
-	
-	//MouseUp="{Background=Transparent}";
-	//MouseDown="{Background=Grey}";
-	
-	MouseEnter="{Foreground=CornflowerBlue}";
+		
+	MouseEnter="{Foreground=${ControlHighlight}}";
 	MouseLeave="{Foreground=Grey}";
 	
 	Margin="2";

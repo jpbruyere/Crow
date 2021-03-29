@@ -41,7 +41,7 @@ namespace Crow
 
 		[DefaultValue (null)]
 		public virtual Command Command {
-			get { return command; }
+			get => command;
 			set {
 				if (command == value)
 					return;
@@ -64,7 +64,7 @@ namespace Crow
 
 		[DefaultValue ("#Crow.Icons.crow.svg")]
 		public string Icon {
-			get { return Command == null ? icon : Command.Icon; ; }
+			get => Command == null ? icon : Command.Icon;
 			set {
 				if (icon == value)
 					return;
@@ -74,19 +74,19 @@ namespace Crow
 			}
 		}
 		public override bool IsEnabled {
-			get { return Command == null ? base.IsEnabled : Command.CanExecute; }
-			set { base.IsEnabled = value; }
+			get => Command == null ? base.IsEnabled : Command.CanExecute;
+			set => base.IsEnabled = value;
 		}
 
 		public override string Caption {
-			get { return Command == null ? base.Caption : Command.Caption; }
-			set { base.Caption = value; }
+			get => Command == null ? base.Caption : Command.Caption;
+			set => base.Caption = value;
 		}
 
 		[DefaultValue (false)]
 		public bool IsPressed
 		{
-			get { return isPressed; }
+			get => isPressed;
 			set
 			{
 				if (isPressed == value)

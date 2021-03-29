@@ -31,7 +31,7 @@ namespace Crow
 		}
 
 		protected virtual void HandleCursorContainerLayoutChanged (object sender, LayoutingEventArgs e)
-		{
+		{			
 			computeCursorPosition ();
 		}
 		#endregion
@@ -119,13 +119,13 @@ namespace Crow
 		}
 		void computeCursorPosition ()
         {
-			if (cursor == null)
+			if (cursor?.Parent == null)
 				return;
 			if (Maximum <= Minimum) {
-				cursor.Visible = false;
+				cursor.IsVisible = false;
 				return;
 			}
-			cursor.Visible = true;
+			cursor.IsVisible = true;
             Rectangle r = cursor.Parent.ClientRectangle;
 			if (_orientation == Orientation.Horizontal) {
 				unity = (r.Width - cursorSize) / (Maximum - Minimum);

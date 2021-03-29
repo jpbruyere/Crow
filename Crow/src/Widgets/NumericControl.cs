@@ -23,7 +23,7 @@ namespace Crow {
 		[DefaultValue(2)]
 		public int Decimals
 		{
-			get { return decimals; }
+			get => decimals;
 			set
 			{
 				if (value == decimals)
@@ -35,7 +35,7 @@ namespace Crow {
 		}
 		[DefaultValue(0.0)]
 		public virtual double Minimum {
-			get { return minValue; }
+			get => minValue;
 			set {
 				if (minValue == value)
 					return;
@@ -48,7 +48,7 @@ namespace Crow {
 		[DefaultValue(100.0)]
 		public virtual double Maximum
 		{
-			get { return maxValue; }
+			get => maxValue;
 			set {
 				if (maxValue == value)
 					return;
@@ -61,7 +61,7 @@ namespace Crow {
 		[DefaultValue(1.0)]
 		public virtual double SmallIncrement
 		{
-			get { return smallStep; }
+			get => smallStep;
 			set {
 				if (smallStep == value)
 					return;
@@ -74,7 +74,7 @@ namespace Crow {
 		[DefaultValue(5.0)]
 		public virtual double LargeIncrement
 		{
-			get { return bigStep; }
+			get => bigStep;
 			set {
 				if (bigStep == value)
 					return;
@@ -87,7 +87,7 @@ namespace Crow {
 		[DefaultValue(0.0)]
 		public virtual double Value
 		{
-			get { return actualValue; }
+			get => actualValue;
 			set
 			{
 				if (value == actualValue)
@@ -110,6 +110,21 @@ namespace Crow {
 
 		protected virtual void registerUpdate ()
 			=> RegisterForRedraw ();
+		
+		protected virtual void onUp (object sender, MouseButtonEventArgs e)
+		{
+			if (IFace.Ctrl)
+				Value += SmallIncrement;
+			else
+				Value += LargeIncrement;
+		}
+		protected virtual void onDown (object sender, MouseButtonEventArgs e)
+		{
+			if (IFace.Ctrl)
+				Value -= SmallIncrement;
+			else
+				Value -= LargeIncrement;
+		}
 	}
 }
 

@@ -19,10 +19,10 @@ namespace tests
 		protected override void OnInitialized ()
 		{
 			Commands = new List<Crow.Command> (new Crow.Command [] {
-				new Crow.Command(new Action(() => command1())) { Caption = "command1"},
-				new Crow.Command(new Action(() => command2())) { Caption = "command2"},
-				new Crow.Command(new Action(() => command3())) { Caption = "command3"},
-				new Crow.Command(new Action(() => command4())) { Caption = "command4"},
+				new Crow.Command("command1", new Action(() => Console.WriteLine ("command1 triggered"))),
+				new Crow.Command("command2", new Action(() => Console.WriteLine ("command2 triggered"))),
+				new Crow.Command("command3", new Action(() => Console.WriteLine ("command3 triggered"))),
+				new Crow.Command("command4", new Action(() => Console.WriteLine ("command4 triggered"))),
 			});
 
 			// += KeyboardKeyDown1;
@@ -103,21 +103,5 @@ namespace tests
 		void OnLoadList (object sender, MouseButtonEventArgs e) => TestList =
 			null; //Color.ColorDic.Values.OrderBy (c => c.Hue).ToList ();
 
-		void command1 ()
-		{
-			Console.WriteLine ("command1 triggered");
-		}
-		void command2 ()
-		{
-			Console.WriteLine ("command2 triggered");
-		}
-		void command3 ()
-		{
-			Console.WriteLine ("command3 triggered");
-		}
-		void command4 ()
-		{
-			Console.WriteLine ("command4 triggered");
-		}
 	}
 }

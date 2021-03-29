@@ -26,7 +26,7 @@ namespace Crow
 		[DefaultValue(false)]
 		public bool IsChecked
 		{
-			get { return isChecked; }
+			get => isChecked;
 			set
 			{
 				if (isChecked == value)

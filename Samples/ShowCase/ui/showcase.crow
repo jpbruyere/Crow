@@ -17,11 +17,22 @@
 				<Button Style="IcoButton" Command="{CMDNew}" />
 				<Button Style="IcoButton" Command="{CMDSave}" />
 				<Button Style="IcoButton" Command="{CMDSaveAs}" />
-				<Button Style="IcoButton" Command="{CMDUndo}" />
+				<!--<Button Style="IcoButton" Command="{CMDUndo}" />
 				<Button Style="IcoButton" Command="{CMDRedo}" />
 				<Button Style="IcoButton" Command="{CMDCut}" />
 				<Button Style="IcoButton" Command="{CMDCopy}" />
-				<Button Style="IcoButton" Command="{CMDPaste}" />
+				<Button Style="IcoButton" Command="{CMDPaste}" />-->
+				<EnumSelector RadioButtonStyle="CheckBox2" Caption="Recorded Events" EnumValue="{²RecordedEvents}">
+					<Template>
+						<Popper Caption="{./Caption}">
+							<Scroller Height="50%" Width="80%" Background="Jet">
+								<Wrapper Name="Content" Height="Fit" VerticalAlignment="Top" />							
+							</Scroller>
+						</Popper>
+					</Template>
+				</EnumSelector>
+				<Label Text="{RecordedEvents}"/>
+				<!--<EnumSelector EnumValue="{²DiscardedEvents}"/>-->
 				<Widget Width="Stretched"/>
 				<Label Text="Line:" Foreground="Grey"/>
 				<Label Text="{../../tb.CurrentLine}"  Margin="2"/>

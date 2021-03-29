@@ -20,8 +20,9 @@ namespace ShowCase
 	{
 		static void Main ()
 		{
-			DbgLogger.IncludeEvents = DbgEvtType.Widget;
-			DbgLogger.DiscardEvents = DbgEvtType.Focus | DbgEvtType.IFace;			
+			DbgLogger.IncludeEvents = DbgEvtType.None;
+			DbgLogger.DiscardEvents = DbgEvtType.Focus | DbgEvtType.IFace;	
+			DbgLogger.ConsoleOutput = false;		
 
 			Environment.SetEnvironmentVariable ("FONTCONFIG_PATH", @"C:\Users\Jean-Philippe\source\vcpkg\installed\x64-windows\tools\fontconfig\fonts");
 
@@ -30,6 +31,7 @@ namespace ShowCase
 				app.Run ();
 			}
 		}
+
 
 		public Container crowContainer;
 
@@ -127,15 +129,15 @@ namespace ShowCase
 		
 		void initCommands ()
 		{
-			CMDNew = new Command (new Action (onNewFile)) { Caption = "New", Icon = "#Icons.blank-file.svg", CanExecute = true };			
-			CMDSave = new Command (new Action (onSave)) { Caption = "Save", Icon = "#Icons.save.svg", CanExecute = false };
-			CMDSaveAs = new Command (new Action (onSaveAs)) { Caption = "Save As...", Icon = "#Icons.save.svg", CanExecute = true };
-			CMDQuit = new Command (new Action (() => base.Quit ())) { Caption = "Quit", Icon = "#Icons.exit.svg", CanExecute = true };
-			CMDUndo = new Command (new Action (undo)) { Caption = "Undo", Icon = "#Icons.undo.svg", CanExecute = false };
-			CMDRedo = new Command (new Action (redo)) { Caption = "Redo", Icon = "#Icons.redo.svg", CanExecute = false };
-			CMDCut = new Command (new Action (() => cut ())) { Caption = "Cut", Icon = "#Icons.scissors.svg", CanExecute = false };
-			CMDCopy = new Command (new Action (() => copy ())) { Caption = "Copy", Icon = "#Icons.copy-file.svg", CanExecute = false };
-			CMDPaste = new Command (new Action (() => paste ())) { Caption = "Paste", Icon = "#Icons.paste-on-document.svg", CanExecute = false };
+			CMDNew	= new Command ("New", new Action (onNewFile), "#Icons.blank-file.svg");			
+			CMDSave = new Command ("Save", new Action (onSave), "#Icons.save.svg", false);
+			CMDSaveAs = new Command ("Save As...", new Action (onSaveAs), "#Icons.save.svg");
+			CMDQuit = new Command ("Quit", new Action (() => base.Quit ()), "#Icons.exit.svg");
+			CMDUndo = new Command ("Undo", new Action (undo),"#Icons.undo.svg", false);
+			CMDRedo = new Command ("Redo", new Action (redo),"#Icons.redo.svg", false);
+			CMDCut	= new Command ("Cut", new Action (() => cut ()), "#Icons.scissors.svg", false);
+			CMDCopy = new Command ("Copy", new Action (() => copy ()), "#Icons.copy-file.svg", false);
+			CMDPaste= new Command ("Paste", new Action (() => paste ()), "#Icons.paste-on-document.svg", false);
 
 		}
 		void onNewFile () {
@@ -345,5 +347,48 @@ namespace ShowCase
 			reloadChrono.Reset ();
 		}
 
+		DbgEvtType recordedEvents, discardedEvents;
+		public DbgEvtType RecordedEvents {
+			get => recordedEvents;
+			set {
+				if (recordedEvents == value)
+					return;
+				recordedEvents = value;
+				NotifyValueChanged(recordedEvents);
+			}
+		}
+		public DbgEvtType DiscardedEvents {
+			get => discardedEvents;
+			set {
+				if (discardedEvents == value)
+					return;
+				discardedEvents = value;
+				NotifyValueChanged(discardedEvents);
+			}
+		}
+		
+        public override bool OnKeyDown (Key key) {
+
+            switch (key) {
+            case Key.F5:
+                Load ("#ShowCase.DebugLog.crow").DataSource = this;
+                return true;
+            case Key.F6:
+				if (DbgLogger.IncludeEvents == recordedEvents) {
+					DbgLogger.IncludeEvents = DbgEvtType.None;
+					DbgLogger.DiscardEvents = DbgEvtType.All;
+ 				} else {
+					DbgLogger.IncludeEvents = recordedEvents;
+					DbgLogger.DiscardEvents = discardedEvents;
+				}
+                return true;
+            case Key.F2:
+                if (IsKeyDown (Key.LeftShift))
+                    DbgLogger.Reset ();
+                DbgLogger.Save (this);
+                return true;
+            }
+            return base.OnKeyDown (key);
+        }
     }
 }

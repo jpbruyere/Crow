@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<Window Caption="Debug Log"  Background="0.1,0.1,0.1,0.8">
+	<ListBox Data="{DebugEvents}">
+	</ListBox>
+</Window>

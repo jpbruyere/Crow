@@ -93,14 +93,14 @@ namespace Crow
 		public virtual void onExpand(object sender, EventArgs e)
 		{
 			if (_contentContainer != null)
-				_contentContainer.Visible = true;
+				_contentContainer.IsVisible = true;
 
 			Expand.Raise (this, e);
 		}
 		public virtual void onCollapse(object sender, EventArgs e)
 		{
 			if (_contentContainer != null)
-				_contentContainer.Visible = false;
+				_contentContainer.IsVisible = false;
 
 			Collapse.Raise (this, e);
 		}

@@ -7,8 +7,9 @@
 						<HorizontalStack Name="ItemsContainer" Background="{./Background}"/>
 					</Template>
 					<ItemTemplate>
-						<ListItem Width="Fit" Background="Transparent" IsSelected="{IsVisible}"
-								Selected="{.DataSource.Visible='true'};{Background=CornflowerBlue}"
+						<ListItem Width="Fit" Background="Transparent" IsSelected="{²IsVisible}"
+								Tooltip="{GetType}"
+								Selected="{DataSource.Visible='true'};{Background=CornflowerBlue}"
 								Unselected="{.DataSource.Visible='false'};{Background=Transparent}"> 
 							<Label Text="{Caption}" Margin="5" />
 						</ListItem>
@@ -17,8 +18,10 @@
 				<Group Name="ItemsContainer"/>
 			</VerticalStack>
 		</Template>
-		<GroupBox Caption="item 1" IsVisible="false" Background="CornflowerBlue"/>
-		<GroupBox Caption="item 2" IsVisible="true" Background="CornflowerBlue"/>
+		<GroupBox Caption="item 1" IsVisible="true" Background="CornflowerBlue">
+			<Label Text="{Caption}"/>
+		</GroupBox>
+		<GroupBox Caption="item 2" IsVisible="false" Background="CornflowerBlue"/>
 		<GroupBox Caption="item 3" IsVisible="false" Background="CornflowerBlue"/>
 	</ListBox>
 	<Label DataSource="{../lb.SelectedItem}" Text="{Caption}"/> 

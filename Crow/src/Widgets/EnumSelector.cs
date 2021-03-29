@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2019  Bruyère Jean-Philippe jp_bruyere@hotmail.com
+﻿using System.Linq;
+using System.Xml.Linq;
+// Copyright (c) 2019  Bruyère Jean-Philippe jp_bruyere@hotmail.com
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -36,8 +38,8 @@ namespace Crow
 		#region private fields
 		Enum enumValue;
 		Type enumType;
-		string rbStyle, iconsPrefix, iconsExtension;
-		IML.Instantiator radioButtonITor;
+		bool enumTypeIsBitsfield;
+		string rbStyle, iconsPrefix, iconsExtension;		
 		#endregion
 
 		#region public properties
@@ -73,8 +75,7 @@ namespace Crow
 			set {
 				if (rbStyle == value)
 					return;
-				rbStyle = value;
-				radioButtonITor = null;
+				rbStyle = value;				
 				forceRefresh ();
 				NotifyValueChangedAuto (rbStyle);
 			}
@@ -84,36 +85,91 @@ namespace Crow
 		/// </summary>
 		[DefaultValue(null)]
 		public virtual Enum EnumValue {
-			get { return enumValue; }
+			get => enumValue;
 			set {
 				if (enumValue == value)
 					return;
 
-				enumValue = value;
-				if (radioButtonITor == null)
-					radioButtonITor = IFace.CreateITorFromIMLFragment ($"<RadioButton Style='{rbStyle}'/>");
+				enumValue = value;									
 
 				if (enumValue != null) {
+
 					if (enumType != enumValue.GetType ()) {
 						enumValueContainer.ClearChildren ();
-						enumType = enumValue.GetType ();
-						foreach (string en in enumType.GetEnumNames ()) {
+						enumType = enumValue.GetType ();						
+												
+						enumTypeIsBitsfield = enumType.CustomAttributes.Any (ca => ca.AttributeType == typeof(FlagsAttribute));
 
-							RadioButton rb = radioButtonITor.CreateInstance<RadioButton> ();
-							rb.Caption = en;
-							rb.LogicalParent = this;
-							rb.Tag = $"{iconsPrefix}{en}{IconsExtension}";
-							if (enumValue.ToString () == en)
-								rb.IsChecked = true;
-							rb.Checked += (sender, e) => (((RadioButton)sender).LogicalParent as EnumSelector).EnumValue = (Enum)Enum.Parse (enumType, (sender as RadioButton).Caption);
-							enumValueContainer.AddChild (rb);
+						if (enumTypeIsBitsfield) {
+							IML.Instantiator iTor = IFace.CreateITorFromIMLFragment ($"<CheckBox Style='{rbStyle}'/>");
+							UInt32 currentValue = Convert.ToUInt32 (EnumValue);
+
+							foreach (Enum en in enumType.GetEnumValues()) {
+								CheckBox rb = iTor.CreateInstance<CheckBox> ();
+								rb.Caption = en.ToString();
+								rb.LogicalParent = this;
+								rb.Tag = $"{iconsPrefix}{en}{IconsExtension}";
+
+								UInt32 eni = Convert.ToUInt32 (en);
+								rb.Tooltip = $"0x{eni:x8}";
+								if (eni == 0) {
+									rb.IsChecked = currentValue == 0;
+									rb.Checked += (sender, e) => EnumValue = (Enum)Enum.ToObject(enumType, 0);										
+								} else {								
+									rb.IsChecked = currentValue == 0 ? false : EnumValue.HasFlag (en);
+									rb.Checked += onChecked;
+									rb.Unchecked += onUnchecked;
+								}
+								/*rb.Checked += (sender, e) => (((CheckBox)sender).LogicalParent as EnumSelector).EnumValue = (Enum)(object)
+											(Convert.ToUInt32 ((((CheckBox)sender).LogicalParent as EnumSelector).EnumValue) | Convert.ToUInt32 (en));						
+								rb.Unchecked += (sender, e) => (((CheckBox)sender).LogicalParent as EnumSelector).EnumValue = (Enum)(object)
+											(Convert.ToUInt32 ((((CheckBox)sender).LogicalParent as EnumSelector).EnumValue) & ~Convert.ToUInt32 (en));						*/
+
+								enumValueContainer.AddChild (rb);
+							}
+
+						} else {
+							IML.Instantiator iTor = IFace.CreateITorFromIMLFragment ($"<RadioButton Style='{rbStyle}'/>");
+							foreach (var en in enumType.GetEnumValues ()) {
+								RadioButton rb = iTor.CreateInstance<RadioButton> ();
+								rb.Caption = en.ToString();
+								rb.LogicalParent = this;
+								rb.Tag = $"{iconsPrefix}{en}{IconsExtension}";
+								if (enumValue == en)
+									rb.IsChecked = true;								
+								rb.Checked += (sender, e) => (((RadioButton)sender).LogicalParent as EnumSelector).EnumValue = (Enum)en;
+								enumValueContainer.AddChild (rb);
+							}
 						}
+							
 
+
+					} else if (enumTypeIsBitsfield) {
+						UInt32 currentValue = Convert.ToUInt32 (EnumValue);
+						if (currentValue == 0) {
+							foreach (CheckBox rb in enumValueContainer.Children) {
+								Enum en = (Enum)Enum.Parse(enumType, rb.Caption);
+								UInt32 eni = Convert.ToUInt32 (en);
+								if (eni == 0)
+									rb.IsChecked = true;
+								else
+									rb.IsChecked = false;
+							}
+						} else {
+							foreach (CheckBox rb in enumValueContainer.Children) {
+								Enum en = (Enum)Enum.Parse(enumType, rb.Caption);
+								UInt32 eni = Convert.ToUInt32 (en);
+								if (eni == 0)
+									rb.IsChecked = false;
+								else
+									rb.IsChecked = EnumValue.HasFlag (en);
+							}
+						}
 					} else {
 						foreach (RadioButton rb in enumValueContainer.Children) {
 							if (rb.Caption == enumValue.ToString ())
 								rb.IsChecked = true;
-							else if (rb.IsChecked)
+							else
 								rb.IsChecked = false;
 						}
 					}
@@ -125,6 +181,19 @@ namespace Crow
 			}
 		}
 		#endregion
+
+		void onChecked (object sender, EventArgs e) {			
+			Enum en =(Enum)Enum.Parse (enumType, (sender as CheckBox).Caption);
+			UInt32 newVal = Convert.ToUInt32 (en);
+			if (newVal == 0)
+				EnumValue = (Enum)Enum.ToObject(enumType, 0);			 
+			else
+				EnumValue = (Enum)Enum.ToObject(enumType, newVal | Convert.ToUInt32 (EnumValue));			 
+		}
+		void onUnchecked (object sender, EventArgs e) {			
+			Enum en =(Enum)Enum.Parse (enumType, (sender as CheckBox).Caption);
+			EnumValue = (Enum)Enum.ToObject(enumType, Convert.ToUInt32 (EnumValue) & ~Convert.ToUInt32 (en));			 
+		}
 
 		//force refresh to use new template if values are already displayed
 		void forceRefresh ()

@@ -35,7 +35,10 @@ namespace Crow
         public Version CrowVersion => Assembly.GetAssembly (typeof (Widget)).GetName ().Version;
 
         #region Test values for Binding
-        public List<Command> Commands;
+        public CommandGroup Commands;
+        public CommandGroup EditCommands = new CommandGroup(
+            new Command("command 1", () => Console.WriteLine("command1 pressed")));
+
         public int intValue = 500;
         VerticalAlignment currentVAlign;
 
@@ -262,14 +265,16 @@ namespace Crow
             }
         }
 
+
+
         #endregion
 
         protected override void OnInitialized () {
-            Commands = new List<Command> {
-                new Command(() => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 1 clicked")) { Caption = "Action 1" },
-                new Command(() => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 2 clicked")) { Caption = "Action 2" },
-                new Command(() => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 3 clicked")) { Caption = "Action 3" }
-            };
+            Commands = new CommandGroup (
+                new Command("Action 1", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 1 clicked")),
+                new Command("Action 2", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 2 clicked")),
+                new Command("Action 3", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 3 clicked"))
+            );
             base.OnInitialized ();
         }
 

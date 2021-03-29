@@ -64,17 +64,17 @@ namespace Crow
 		}
 		
 		public override bool IsEnabled {
-			get { return Command == null ? base.IsEnabled : Command.CanExecute; }
-			set { base.IsEnabled = value; }
+			get => Command == null ? base.IsEnabled : Command.CanExecute;
+			set => base.IsEnabled = value;
 		}
 		
 		public override string Caption {
-			get { return Command == null ? base.Caption : Command.Caption; }
-			set { base.Caption = value; }
+			get => Command == null ? base.Caption : Command.Caption;
+			set => base.Caption = value;
 		}
 		
 		public string Icon {
-			get { return Command == null ? icon : Command.Icon;; }
+			get => Command == null ? icon : Command.Icon;
 			set {
 				if (icon == value)
 					return;
@@ -85,7 +85,7 @@ namespace Crow
 		}
 		[DefaultValue("Fit")]
 		public virtual Measure PopWidth {
-			get { return popWidth; }
+			get => popWidth;
 			set {
 				if (popWidth == value)
 					return;
@@ -95,7 +95,7 @@ namespace Crow
 		}
 		[DefaultValue("Fit")]
 		public virtual Measure PopHeight {
-			get { return popHeight; }
+			get => popHeight;
 			set {
 				if (popHeight == value)
 					return;
@@ -121,8 +121,7 @@ namespace Crow
 		protected virtual void onOpen (object sender, EventArgs e){
 			Open.Raise (this, null);
 		}
-		protected virtual void onClose (object sender, EventArgs e){
-			System.Diagnostics.Debug.WriteLine ("close: " + this.ToString());
+		protected virtual void onClose (object sender, EventArgs e){			
 			Close.Raise (this, null);
 		}
 		public override bool MouseIsIn (Point m)

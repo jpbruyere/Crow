@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack Spacing="0" > 
-	<ListBox Data="{./Items}" Fit="true" HorizontalAlignment="Left" VerticalAlignment="Top"> 
+	<ListBox Data="{./Items}" Fit="true" HorizontalAlignment="Left" VerticalAlignment="Top" SelectedItem="{²./SelectedItem}"> 
 		<Template>
 			<HorizontalStack Name="ItemsContainer" Background="{./Background}" />
 		</Template>
@@ -12,6 +12,6 @@
 			</ListItem>
 		</ItemTemplate>
 	</ListBox>
-	<Group Name="ItemsContainer" Background="Grey" Margin="10"/>
+	<Group Name="ItemsContainer" Background="Grey"/>
 </VerticalStack>
 
