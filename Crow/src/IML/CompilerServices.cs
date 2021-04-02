@@ -319,7 +319,7 @@ namespace Crow.IML
 					else {
 						origType = value.GetType ();
 						if (destType.IsAssignableFrom (origType))
-							convertedVal = Convert.ChangeType (value, destType);
+							convertedVal = value;// Convert.ChangeType (value, destType);
 						else if (origType == typeof(string) & destType.IsPrimitive)
 							convertedVal = Convert.ChangeType(value, destType);
 						else if (origType.IsPrimitive & destType.IsPrimitive)
