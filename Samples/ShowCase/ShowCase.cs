@@ -21,8 +21,8 @@ namespace ShowCase
 		static void Main ()
 		{
 			DbgLogger.IncludeEvents = DbgEvtType.None;
-			DbgLogger.DiscardEvents = DbgEvtType.Focus | DbgEvtType.IFace;	
-			DbgLogger.ConsoleOutput = false;		
+			DbgLogger.DiscardEvents = DbgEvtType.All;
+			DbgLogger.ConsoleOutput = !Configuration.Global.Get<bool> (nameof (DebugLogToFile));
 
 			Environment.SetEnvironmentVariable ("FONTCONFIG_PATH", @"C:\Users\Jean-Philippe\source\vcpkg\installed\x64-windows\tools\fontconfig\fonts");
 
@@ -36,7 +36,7 @@ namespace ShowCase
 		public Container crowContainer;
 
 		public string CurrentDir {
-			get { return Configuration.Global.Get<string> (nameof (CurrentDir)); }
+			get => Configuration.Global.Get<string> (nameof (CurrentDir));
 			set {
 				if (CurrentDir == value)
 					return;
@@ -45,7 +45,7 @@ namespace ShowCase
 			}
 		}
 		public string CurrentFile {
-			get { return Configuration.Global.Get<string> (nameof (CurrentFile)); }
+			get => Configuration.Global.Get<string> (nameof (CurrentFile));
 			set {
 				if (CurrentFile == value)
 					return;
@@ -235,14 +235,8 @@ namespace ShowCase
 					g.DataSource = this;
 				}
 			} catch (InstantiatorException itorex) {				
-				Console.ForegroundColor = ConsoleColor.DarkRed;
-				Console.WriteLine (itorex);
-				Console.ResetColor();
-				showError (itorex.InnerException);
+				showError (itorex);
 			} catch (Exception ex) {
-				Console.ForegroundColor = ConsoleColor.DarkRed;
-				Console.WriteLine (ex);
-				Console.ResetColor();
 				showError (ex);
 			}
 		}
@@ -254,7 +248,7 @@ namespace ShowCase
 			CMDRedo.CanExecute = false;			
 		}
 		void showError (Exception ex) {
-			NotifyValueChanged ("ErrorMessage", (object)ex.Message);
+			NotifyValueChanged ("ErrorMessage", ex);
 			NotifyValueChanged ("ShowError", true);
 		}
 		void hideError () {
@@ -347,26 +341,59 @@ namespace ShowCase
 			reloadChrono.Reset ();
 		}
 
-		DbgEvtType recordedEvents, discardedEvents;
 		public DbgEvtType RecordedEvents {
-			get => recordedEvents;
+			get => Configuration.Global.Get<DbgEvtType> (nameof (RecordedEvents));
 			set {
-				if (recordedEvents == value)
-					return;
-				recordedEvents = value;
-				NotifyValueChanged(recordedEvents);
+				if (RecordedEvents == value)
+					return;				
+				Configuration.Global.Set (nameof (RecordedEvents), value);				
+				if (DebugLogRecording)
+					DbgLogger.IncludeEvents = RecordedEvents;
+				NotifyValueChanged(RecordedEvents);
 			}
 		}
 		public DbgEvtType DiscardedEvents {
-			get => discardedEvents;
+			get => Configuration.Global.Get<DbgEvtType> (nameof (DiscardedEvents));
 			set {
-				if (discardedEvents == value)
+				if (DiscardedEvents == value)
 					return;
-				discardedEvents = value;
-				NotifyValueChanged(discardedEvents);
+				Configuration.Global.Set (nameof (DiscardedEvents), value);
+				if (DebugLogRecording)
+					DbgLogger.DiscardEvents = DiscardedEvents;
+				NotifyValueChanged(DiscardedEvents);
 			}
 		}
-		
+		public bool DebugLoggingEnabled => DbgLogger.IsEnabled;
+		public bool DebugLogToFile {
+			get => !DbgLogger.ConsoleOutput;
+			set {
+				if (DbgLogger.ConsoleOutput != value)
+					return;
+				DbgLogger.ConsoleOutput = !value;
+				Configuration.Global.Set (nameof(DebugLogToFile), DebugLogToFile);
+				NotifyValueChanged(DebugLogToFile);
+			}
+		}
+		public string DebugLogFilePath {
+			get => Configuration.Global.Get<string> (nameof (DebugLogFilePath));
+			set {
+				if (CurrentFile == value)
+					return;
+				Configuration.Global.Set (nameof (DebugLogFilePath), value);
+				NotifyValueChanged (DebugLogFilePath);
+			}
+		}
+		bool debugLogRecording;
+		public bool DebugLogRecording {
+			get => debugLogRecording;
+			set {
+				if (debugLogRecording == value)
+					return;
+				debugLogRecording = value;
+				NotifyValueChanged(debugLogRecording);
+			}
+		}		
+
         public override bool OnKeyDown (Key key) {
 
             switch (key) {
@@ -374,18 +401,18 @@ namespace ShowCase
                 Load ("#ShowCase.DebugLog.crow").DataSource = this;
                 return true;
             case Key.F6:
-				if (DbgLogger.IncludeEvents == recordedEvents) {
+				if (DebugLogRecording) {
 					DbgLogger.IncludeEvents = DbgEvtType.None;
 					DbgLogger.DiscardEvents = DbgEvtType.All;
+					if (DebugLogToFile && !string.IsNullOrEmpty(DebugLogFilePath))
+	                	DbgLogger.Save (this, DebugLogFilePath);
+					DebugLogRecording = false;
  				} else {
-					DbgLogger.IncludeEvents = recordedEvents;
-					DbgLogger.DiscardEvents = discardedEvents;
+					DbgLogger.Reset ();
+					DbgLogger.IncludeEvents = RecordedEvents;
+					DbgLogger.DiscardEvents = DiscardedEvents;
+					DebugLogRecording = true;
 				}
-                return true;
-            case Key.F2:
-                if (IsKeyDown (Key.LeftShift))
-                    DbgLogger.Reset ();
-                DbgLogger.Save (this);
                 return true;
             }
             return base.OnKeyDown (key);

@@ -1,0 +1,9 @@
+﻿<CheckBox Foreground="Jet" Background="Jet" Height="40" Width="60"	
+	Unchecked="{sh.Path='A 8,8,7.5,0,6.3 O 0.8,0,0,1 f O 0,0,0,0.5 G'};{Background=.Foreground}"
+	Checked="{sh.Path='R 0.5,0.5,15,15 f O 0,0,0,1 G'};{Background=DimGrey}">
+	<Template>
+		<Border Background="{./Background}" Margin="10" CornerRadius="5">
+			<Shape Name="sh"  Foreground="Grey" Size="16,16" Path="A 8,8,7.5,0,6.3 O 0.8,0,0,1 f O 0,0,0,0.5 G"/>  
+		</Border>
+	</Template>
+</CheckBox>

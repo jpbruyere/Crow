@@ -145,7 +145,7 @@ namespace Crow
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{
 			if (command != null) {
-				command.Execute ();
+				command.Execute (this);
 				closeMenu ();
 			}
 			if (hasClick)

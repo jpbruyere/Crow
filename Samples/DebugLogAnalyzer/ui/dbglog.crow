@@ -10,12 +10,14 @@
 			<Label Text="{treeIndex}"/>
 			<Label Text="{yIndex}"/>
 			<Label Text="{xLevel}"/>
-			<Label Text="Width:"/>
+			<Label Text="Width:" Foreground="Grey"/>
 			<Label Text="{Width}"/>
-			<Label Text="Height:"/>
+			<Label Text="Height:" Foreground="Grey"/>
 			<Label Text="{Height}"/>
-			<Label Text="ScrollX"/>
+			<Label Text="ScrollX:" Foreground="Grey"/>
 			<Label Text="{../../dbv.ScrollX}"/>
+			<Label Text="MaxScrollX:" Foreground="Grey"/>
+			<Label Text="{../../dbv.MaxScrollX}"/>			
 		</HorizontalStack>
 	</VerticalStack>
 	<Splitter/>

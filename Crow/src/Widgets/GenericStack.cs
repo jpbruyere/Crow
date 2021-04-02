@@ -66,6 +66,7 @@ namespace Crow {
 			return base.measureRawSize (lt);
 		}
 		public virtual void ComputeChildrenPositions () {
+			DbgLogger.StartEvent(DbgEvtType.GOComputeChildrenPositions, this);
 			int d = 0;
 			if (Orientation == Orientation.Horizontal) {
 				foreach (Widget c in Children) {
@@ -83,6 +84,7 @@ namespace Crow {
 				}
 			}
 			IsDirty = true;
+			DbgLogger.EndEvent(DbgEvtType.GOComputeChildrenPositions);
 		}
 		Widget stretchedGO = null;
 		public override bool UpdateLayout (LayoutingType layoutType) {
@@ -145,6 +147,7 @@ namespace Crow {
 		}
 
 		public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg) {
+			DbgLogger.StartEvent(DbgEvtType.GOOnChildLayoutChange, this);
 			Widget go = sender as Widget;
 			//Debug.WriteLine ("child layout change: " + go.LastSlots.ToString() + " => " + go.Slot.ToString());
 			switch (arg.LayoutType) {
@@ -157,6 +160,7 @@ namespace Crow {
 						} else if (stretchedGO != go) {
 							go.Slot.Width = 0;
 							go.Width = Measure.Fit;
+							DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);
 							return;
 						}
 					} else if (stretchedGO == go) {
@@ -172,6 +176,7 @@ namespace Crow {
 						this.RegisterForLayouting (LayoutingType.Width);
 
 					this.RegisterForLayouting (LayoutingType.ArrangeChildren);
+					DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);
 					return;
 				}
 				break;
@@ -184,6 +189,7 @@ namespace Crow {
 						} else if (stretchedGO != go) {
 							go.Slot.Height = 0;
 							go.Height = Measure.Fit;
+							DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);
 							return;
 						}
 					} else if (stretchedGO == go) {
@@ -198,11 +204,13 @@ namespace Crow {
 						this.RegisterForLayouting (LayoutingType.Height);
 
 					this.RegisterForLayouting (LayoutingType.ArrangeChildren);
+					DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);
 					return;
 				}
 				break;
 			}
 			base.OnChildLayoutChanges (sender, arg);
+			DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);
 		}
 		#endregion
 

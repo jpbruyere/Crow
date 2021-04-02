@@ -290,7 +290,7 @@ namespace Crow
 		bool allowDrop;
 		string allowedDropTypes;
 		string tooltip;
-		IList<Command> contextCommands;
+		CommandGroup contextCommands;
 		#endregion
 
 		#region public fields
@@ -325,7 +325,7 @@ namespace Crow
 		#endregion
 
 		#region ILayoutable
-		[XmlIgnore]public LayoutingType RegisteredLayoutings { get { return registeredLayoutings; } set { registeredLayoutings = value; } }
+		[XmlIgnore]public LayoutingType RegisteredLayoutings { get => registeredLayoutings; set => registeredLayoutings = value; }
 		//TODO: it would save the recurent cost of a cast in event bubbling if parent type was GraphicObject
 		//		or we could add to the interface the mouse events
 		/// <summary>
@@ -499,7 +499,7 @@ namespace Crow
 		/// </summary>
 		[DesignCategory ("Behavior")][DefaultValue(true)]
 		public virtual bool CacheEnabled {
-			get { return cacheEnabled; }
+			get => cacheEnabled;
 			set {
 				if (cacheEnabled == value)
 					return;
@@ -510,9 +510,9 @@ namespace Crow
 		/// <summary>
 		/// If true, rendering of GraphicObject is clipped inside client rectangle
 		/// </summary>
-		[DesignCategory ("Appearance")][DefaultValue(false)]
+		[DesignCategory ("Appearance")][DefaultValue(true)]
 		public virtual bool ClipToClientRect {
-			get { return clipToClientRect; }
+			get => clipToClientRect;
 			set {
 				if (clipToClientRect == value)
 					return;
@@ -521,11 +521,9 @@ namespace Crow
 				this.RegisterForRedraw ();
 			}
 		}
-		#if DEBUG_LOG
-		[XmlIgnore]public string TreePath {
-			get { return this.GetType().Name + GraphicObjects.IndexOf(this).ToString ();	}
-		}
-		#endif
+#if DEBUG_LOG
+		[XmlIgnore]public string TreePath => this.GetType().Name + GraphicObjects.IndexOf(this).ToString ();
+#endif
 		/// <summary>
 		/// Name is used in binding to reference other GraphicObjects inside the graphic tree
 		/// and by template controls to find special element in their template implementation such
@@ -914,10 +912,18 @@ namespace Crow
 					return;
 
 				isVisible = value;
-
+				
 				if (!isVisible)
 					unshownPostActions ();
 				RegisterForLayouting (LayoutingType.Sizing);
+				
+				/*if (isVisible){										
+					IsDirty = true;
+					RegisterForLayouting(LayoutingType.Sizing);
+				} else {
+					unshownPostActions ();					
+				}*/
+				
 
 				NotifyValueChangedAuto (isVisible);
 			}
@@ -1089,8 +1095,8 @@ namespace Crow
 			}
 		}
 		[DesignCategory ("Divers")]
-		public IList<Command> ContextCommands {
-			get { return contextCommands; }
+		public CommandGroup ContextCommands {
+			get => contextCommands;
 			set {
 				if (contextCommands == value)
 					return;
@@ -1467,7 +1473,7 @@ namespace Crow
 		/// <param name="clip">Clip rectangle</param>
 		public virtual void RegisterClip(Rectangle clip){
 			if (disposed) {
-				DbgLogger.AddEvent (DbgEvtType.AlreadyDisposed | DbgEvtType.GORegisterClip);
+				DbgLogger.AddEvent (DbgEvtType.AlreadyDisposed | DbgEvtType.GORegisterClip, this);
 				return;
 			}
 			DbgLogger.StartEvent(DbgEvtType.GORegisterClip, this);
@@ -1500,30 +1506,34 @@ namespace Crow
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForGraphicUpdate ()
 		{
-#if DEBUG_LOG
 			if (disposed) {
 				DbgLogger.AddEvent (DbgEvtType.GORegisterForGraphicUpdate | DbgEvtType.AlreadyDisposed, this);
 				return;
 			}
-#endif
-			IsDirty = true;
+			DbgLogger.StartEvent(DbgEvtType.GORegisterForGraphicUpdate, this);
+
+			IsDirty = true;			
 			if (Width.IsFit || Height.IsFit)
 				RegisterForLayouting (LayoutingType.Sizing);
 			else if (RegisteredLayoutings == LayoutingType.None)
 				IFace.EnqueueForRepaint (this);
+
+			DbgLogger.EndEvent(DbgEvtType.GORegisterForGraphicUpdate);
 		}
 		/// <summary> query an update of the content without layouting changes</summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RegisterForRedraw ()
 		{
-#if DEBUG_LOG
 			if (disposed) {
 				DbgLogger.AddEvent (DbgEvtType.GORegisterForRedraw | DbgEvtType.AlreadyDisposed, this);
 				return;
 			}
-#endif
 			IsDirty = true;
 			if (RegisteredLayoutings == LayoutingType.None)
+				IFace.EnqueueForRepaint (this);
+		}
+		public void RegisterForRepaint () {
+			if (RegisteredLayoutings == LayoutingType.None && !IsDirty)
 				IFace.EnqueueForRepaint (this);
 		}
 		#endregion
@@ -1532,11 +1542,13 @@ namespace Crow
 
 		/// <summary> return size of content + margins </summary>
 		public virtual int measureRawSize (LayoutingType lt) {
-#if DEBUG_LOG
-			DbgLogger.AddEvent(DbgEvtType.GOMeasure, this);
-#endif
-			return lt == LayoutingType.Width ?
+			DbgLogger.StartEvent(DbgEvtType.GOMeasure, this, lt);
+
+			int tmp = lt == LayoutingType.Width ?
 				contentSize.Width + 2 * margin: contentSize.Height + 2 * margin;
+
+			DbgLogger.EndEvent(DbgEvtType.GOMeasure);
+			return tmp;
 		}
 
 		internal bool firstUnresolvedFitWidth (out  Widget ancestorInUnresolvedFit)
@@ -1564,12 +1576,11 @@ namespace Crow
 		public virtual void ChildrenLayoutingConstraints(ILayoutable layoutable, ref LayoutingType layoutType){	}
 		/// <summary> Query a layouting for the type pass as parameter, redraw only if layout changed. </summary>
 		public virtual void RegisterForLayouting(LayoutingType layoutType){
-#if DEBUG_LOG
 			if (disposed) {
-				DbgLogger.AddEvent (DbgEvtType.GORegisterLayouting | DbgEvtType.AlreadyDisposed, this);
+				DbgLogger.AddEvent (DbgEvtType.AlreadyDisposed, this);
 				return;
 			}
-#endif
+
 			if (Parent == null)
 				return;
 			DbgLogger.StartEvent (DbgEvtType.GOLockLayouting, this);
@@ -1843,6 +1854,9 @@ namespace Crow
 		/// of the widget </summary>
 		public virtual void Paint (Context ctx)
 		{
+			if (!IsVisible)
+				return;
+
 			DbgLogger.StartEvent (DbgEvtType.GOPaint, this);
 
 			//TODO:this test should not be necessary
@@ -1888,10 +1902,12 @@ namespace Crow
 					ctx.Translate (rb.X, rb.Y);
 
 					onDraw (ctx);
-					if (!IsEnabled)
-						paintDisabled (ctx, Slot);
 
 					ctx.Restore ();
+
+					if (!IsEnabled)
+						paintDisabled (ctx, rb);
+
 				}
 				LastPaintedSlot = Slot;
 			}
@@ -1900,11 +1916,11 @@ namespace Crow
 			DbgLogger.EndEvent (DbgEvtType.GOPaint);
 		}
 		void paintDisabled(Context gr, Rectangle rb){
-			gr.Operator = Operator.Xor;
-			gr.SetSource (0.1, 0.1, 0.1, 0.8);
+			//gr.Operator = Operator.Xor;
+			gr.SetSource (0.2, 0.2, 0.2, 0.8);
 			gr.Rectangle (rb);
 			gr.Fill ();
-			gr.Operator = Operator.Over;
+			//gr.Operator = Operator.Over;
 		}
 		#endregion
 
@@ -2130,6 +2146,21 @@ namespace Crow
 		/// Checks to handle when widget is removed from the visible graphic tree
 		/// </summary>
 		void unshownPostActions () {
+			//IsDirty = true;
+
+			/*if (parent is Widget p)
+				p.RegisterForGraphicUpdate();
+			else*/
+			/*try
+			{
+				parent?.RegisterClip (ContextCoordinates(LastPaintedSlot));
+			}
+			catch (System.Exception e)
+			{
+				Debug.WriteLine($"[ERR]:unshownPostActions:{e}");
+			}*/
+				
+
 			if (IFace.ActiveWidget != null) {
 				if (IFace.ActiveWidget.IsOrIsInside (this))
 					IFace.ActiveWidget = null;
@@ -2151,6 +2182,24 @@ namespace Crow
 					IFace.OnMouseMove (IFace.MousePosition.X, IFace.MousePosition.Y);
 				}
 			}
+			
+			/*Slot = default;
+			try
+			{
+				if (LastSlots.Width > 0)
+					OnLayoutChanges (LayoutingType.Width);
+				if (LastSlots.Height > 0)
+					OnLayoutChanges (LayoutingType.Height);
+				OnLayoutChanges (LayoutingType.X);
+				OnLayoutChanges (LayoutingType.Y);				
+			}
+			catch (System.Exception ex)
+			{
+				Console.WriteLine($"[ERROR]Unshown post actions: {ex}");
+			}
+			LastSlots = default;
+			LastPaintedSlot = default;*/
+			
 		}
 	}
 }

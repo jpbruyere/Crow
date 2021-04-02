@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<VerticalStack Background="DarkGrey">
+	<HorizontalStack >
+		<TabView Width="25%" >
+			<VerticalStack Name="Explorer" Background="Onyx">
+				<HorizontalStack Height="Fit" Margin="2" >
+					<Image Margin="2" Width="16" Height="16" Path="#Crow.Icons.level-up.svg" MouseClick="goUpDirClick"
+								 Background="Jet" MouseEnter="{Background=Grey}" MouseLeave="{Background=Jet}" />			
+					<TextBox Text="{²CurrentDir}" Margin="2"/>
+				</HorizontalStack>		
+				<DirectoryView Margin="1" Name="dv" CurrentDirectory="{CurrentDir}" SelectedItemChanged="Dv_SelectedItemChanged">
+					<Template>
+						<TreeView IsRoot="true" Name="treeView" Data="{./FileSystemEntries}" Background="{./Background}"
+								SelectedItemChanged="./onSelectedItemChanged">
+							<ItemTemplate DataType="System.IO.FileInfo">
+								<ListItem CornerRadius="2" Margin="0" Height="Fit" Width="Stretched"
+										ContextCommands="{GetCommands}" 
+										Selected="{Background=${ControlHighlight}}"
+										Unselected="{Background=Transparent}">
+									<HorizontalStack>
+										<Image Margin="1" Width="14" Height="14" Path="#Crow.Icons.file.svg"/>
+										<Label Text="{Name}" Width="Stretched"/>
+									</HorizontalStack>
+								</ListItem>
+							</ItemTemplate>
+							<ItemTemplate DataType="System.IO.DirectoryInfo" Data="GetFileSystemInfosOrdered">
+								<ListItem ContextCommands="{GetCommands}"
+										Selected="{/exp.Background=${ControlHighlight}}"
+										Unselected="{/exp.Background=Transparent}">
+									<Expandable Name="exp" Caption="{Name}" MouseDoubleClick="/onClickForExpand">
+										<Template>
+											<VerticalStack>
+												<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"
+														Foreground="Transparent"
+														MouseEnter="{Foreground=DimGrey}"
+														MouseLeave="{Foreground=Transparent}">
+													<HorizontalStack Background="{./Background}" Spacing="1">
+														<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
+															Path="{./Image}"
+															Visible="{./IsExpandable}"
+															SvgSub="{./IsExpanded}"
+															MouseEnter="{Background=LightGrey}"
+															MouseLeave="{Background=Transparent}"/>
+														<Image Margin="1" Width="16" Height="16"
+															Path="#Crow.Icons.folder.svg" SvgSub="{./IsExpanded}"/>
+														<Label Text="{./Caption}"/>
+													</HorizontalStack>
+												</Border>
+												<Container Name="Content" Visible="false"/>
+											</VerticalStack>
+										</Template>
+										<HorizontalStack Height="Fit">
+											<Widget Width="12" Height="10"/>
+											<VerticalStack Height="Fit" Name="ItemsContainer"/>
+										</HorizontalStack>
+									</Expandable>
+								</ListItem>
+							</ItemTemplate>
+						</TreeView>
+					</Template>		
+				</DirectoryView>
+			</VerticalStack>
+			<VerticalStack Name="DebugLogger" Margin="5" IsVisible="false" Background="Onyx">
+				<HorizontalStack Height="Fit">
+					<Image Width="30" Height="20" Path="#Crow.Icons.IconAlerte.svg" Visible="{../../../../dbgIfaceWidget.CrowDebuggerNOK}"/>
+					<Label Fit="true" Text="Crow debug assembly path:"/>
+					<Widget Width="5" Height="5" Background="SeaGreen" IsVisible="{../../../../dbgIfaceWidget.HasFocus}"/>
+					<Widget Width="5" Height="5" Background="Yellow" IsVisible="{../../../../dbgIfaceWidget.IsHover}"/>
+					<TextBox Text="{²CrowDbgAssemblyLocation}" Margin="2"/>
+				</HorizontalStack>				
+				<CheckBox Name="cbFile" Caption="Record to file" IsChecked="{²DebugLogToFile}" Background="Onyx"/>
+				<HorizontalStack Height="Fit" Width="Stretched" IsEnabled="{../cbFile.IsChecked}" Background="Onyx" Margin="5">
+					<Label Text="Debug log output file:" Fit="true"/>
+					<TextBox Text="{²DebugLogFilePath}"  />
+				</HorizontalStack>
+				<EnumSelector RadioButtonStyle="CheckBox2" Template="#Dbg.EnumSelector.template"
+						Background="Grey"
+						Caption="Recorded Events" EnumValue="{²RecordedEvents}" BitFieldExcludeMask="255" />					
+				<EnumSelector RadioButtonStyle="CheckBox2" Template="#Dbg.EnumSelector.template"
+						Background="Onyx"
+						Caption="Discarded Events" EnumValue="{²DiscardedEvents}" BitFieldExcludeMask="255" />					
+				<HorizontalStack Height="Fit">
+					<CheckBox Caption="Recording" IsChecked="{²DebugLogRecording}" Height="40" Width="60"	
+						Checked="{sh.Path='A 8,8,7.5,0,6.3 O 0.8,0,0,1 f O 0,0,0,0.5 G'}"
+						Unchecked="{sh.Path='R 0.5,0.5,15,15 f O 0,0,0,1 G'}">
+						<Template>
+							<Border Background="Onyx" Margin="10" CornerRadius="5">
+								<Shape Name="sh"  Foreground="Grey" Size="16,16" Path="R 0.5,0.5,15,15 f O 0,0,0,1 G"/> 
+							</Border>
+						</Template>
+					</CheckBox>
+					<Menu Data="{../../../../dbgIfaceWidget.LoggerCommands}" Height="Stretched" Width="Fit">
+						<ItemTemplate>
+							<Button Command="{}" Height="Stretched" Width="Fit"/>
+						</ItemTemplate>
+					</Menu>					
+				</HorizontalStack>					
+			</VerticalStack>			
+		</TabView>
+		<Splitter Width="6" />
+		<VerticalStack>
+			<DebugInterfaceWidget Name="dbgIfaceWidget" Height="60%" Background="Black" Focusable="true"
+					CrowDbgAssemblyLocation="{²CrowDbgAssemblyLocation}"
+					Recording="{²DebugLogRecording}"
+					IMLSource="{Source}"
+					CurrentException="{²CurrentException}"
+					DiscardedEvents="{DiscardedEvents}" RecordedEvents="{RecordedEvents}" DebugLogToFile="{DebugLogToFile}"/>
+			<Splitter/>
+			<!--<TabView>-->
+				<VerticalStack Name="Editor" Spacing="0">
+					<HorizontalStack Height="Fit">
+						<Button Style="IcoButton" Command="{CMDNew}" />
+						<Button Style="IcoButton" Command="{CMDSave}" />
+						<Button Style="IcoButton" Command="{CMDSaveAs}" />
+						<Button Style="IcoButton" Command="{CMDUndo}" />
+						<Button Style="IcoButton" Command="{CMDRedo}" />
+						<!--<Button Style="IcoButton" Command="{CMDCut}" />
+						<Button Style="IcoButton" Command="{CMDCopy}" />
+						<Button Style="IcoButton" Command="{CMDPaste}" />-->
+						<Widget Width="Stretched" />
+						<Widget Background="Red" IsVisible="{DebugLogRecording}" CornerRadius="10" Width="12" Height="12"/>
+					</HorizontalStack>
+
+					<HorizontalStack>
+						<Editor Name="tb" Text="{Source}" Multiline="true" Font="consolas, 12" Focusable="true" Height="Stretched" Width="Stretched"						
+								TextChanged="onTextChanged" KeyDown="textView_KeyDown" ContextCommands="{EditorCommands}"
+								Foreground="DarkGrey" Background="White"/>
+								<!--SelectionChanged="onSelectedTextChanged"-->
+						<ScrollBar Value="{²../tb.ScrollY}"
+								LargeIncrement="{../tb.PageHeight}" SmallIncrement="1"
+								CursorRatio="{../tb.ChildHeightRatio}" Maximum="{../tb.MaxScrollY}" />
+					</HorizontalStack>
+					<ScrollBar Style="HScrollBar" Value="{²../tb.ScrollX}"
+							LargeIncrement="{../tb.PageWidth}" SmallIncrement="1"
+							CursorRatio="{../tb.ChildWidthRatio}" Maximum="{../tb.MaxScrollX}" />
+					<HorizontalStack Height="Fit" Spacing="10" Background="DarkGrey">
+						<Widget Width="10" Height="10" Background="RoyalBlue" Visible="{IsDirty}"/>
+						<Label Text="{CurrentFile}" Width="Stretched"/>
+						<Widget Width="Stretched"/>
+						<Label Text="Line:" Foreground="Grey"/>
+						<Label Text="{../../tb.CurrentLine}"  Margin="2"/>
+						<Label Text="Col:" Foreground="Grey"/>
+						<Label Text="{../../tb.CurrentColumn}" Margin="2"/>
+					</HorizontalStack>
+					<Popper IsVisible="{ShowError}" Background="Red">
+						<Template>
+							<CheckBox IsChecked="{²./IsPopped}" MouseEnter="{IsChecked='true'}" MouseLeave="{IsChecked='false'}">
+								<Template>
+									<Label Text="{CurrentExceptionMSG}" Background="Red" Foreground="White" Width="Stretched" Margin="2"
+										Multiline="true"/>
+								</Template>
+							</CheckBox>
+						</Template>
+						<Label Text="{CurrentException}" Background="DarkRed" Foreground="White" Width="Stretched" Margin="2" Multiline="true"/>
+					</Popper>			
+				</VerticalStack>
+				
+			<!--</TabView>-->
+		</VerticalStack>
+	</HorizontalStack>
+</VerticalStack>

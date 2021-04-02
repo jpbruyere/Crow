@@ -9,5 +9,7 @@
 		<CrowVersion>0.9.4</CrowVersion>
 		<CrowPackageVersion>$(CrowVersion)-beta</CrowPackageVersion>
 		<CrowStbSharp>true</CrowStbSharp>
+		<CrowDebugLogEnabled>false</CrowDebugLogEnabled>
+		<GlfwSharpVersion>0.2.11-beta</GlfwSharpVersion>
 	</PropertyGroup>
 </Project>

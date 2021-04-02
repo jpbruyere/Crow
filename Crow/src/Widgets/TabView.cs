@@ -31,6 +31,10 @@ namespace Crow
 		}
 		public Orientation OppositeOrientation 
 			=> orientation == Orientation.Vertical ? Orientation.Horizontal : Orientation.Vertical;		
+		public Measure TabWidth
+			=> orientation == Orientation.Vertical ? Measure.Stretched : Measure.Fit;		
+		public Measure TabHeight
+			=> orientation == Orientation.Horizontal ? Measure.Stretched : Measure.Fit;		
 	}
 }
 

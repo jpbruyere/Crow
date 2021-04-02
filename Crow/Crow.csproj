@@ -31,7 +31,7 @@
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<DebugType>full</DebugType>
-		<DefineConstants>$(DefineConstants);DEBUG;_DEBUG_LOG;TRACE;_DEBUG_DISPOSE;_DEBUG_BINDING;_DEBUG_CLIP_RECTANGLE</DefineConstants>
+		<DefineConstants>$(DefineConstants);DEBUG;TRACE;_DEBUG_DISPOSE;_DEBUG_BINDING;_DEBUG_CLIP_RECTANGLE</DefineConstants>
 		<CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
 	</PropertyGroup>
 	<ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
@@ -40,7 +40,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="FastEnum" Version="1.5.3" />
-		<PackageReference Include="glfw-sharp" Version="0.2.11-beta" />
+		<PackageReference Include="glfw-sharp" Version="$(GlfwSharpVersion)" />
 	</ItemGroup>
 
 	<PropertyGroup Condition=" '$(CrowStbSharp)' == 'true'">
@@ -48,6 +48,13 @@
 	</PropertyGroup>
 	<ItemGroup Condition=" '$(CrowStbSharp)' == 'true'">
 		<PackageReference Include="StbImageSharp" Version="2.22.4" />
+	</ItemGroup>
+
+	<PropertyGroup Condition=" '$(CrowDebugLogEnabled)' == 'true'" >
+		<DefineConstants>$(DefineConstants);DEBUG_LOG</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\CrowDbgShared\CrowDbgShared.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -5,4 +5,7 @@
 			<LogicalName>ShowCase.%(Filename)%(Extension)</LogicalName>
 		</EmbeddedResource>
 	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="$(MSBuildThisFileDirectory)\..\..\CrowDbgShared\CrowDbgShared.csproj" />
+	</ItemGroup>
 </Project>

@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Crow.Cairo;
+using Crow.DebugLogger;
+using DebugLogAnalyzer;
 
 namespace Crow
 {
@@ -93,13 +95,13 @@ namespace Crow
 			double w = Math.Max(dbge.Duration * pixelPerTick, 2.0);
 			double x = (dbge.begin - Event.begin) * pixelPerTick;
 
-			ctx.Rectangle (x, Margin, w, h);
+			ctx.Rectangle (x, 0, w, h);
 			ctx.SetSource (dbge.Color);
-			if (dbge.IsSelected) {
+			/*if (dbge.IsSelected) {
 				ctx.FillPreserve ();
 				ctx.SetSource (1, 1, 1);
 				ctx.Stroke ();
-			}else
+			}else*/
 				ctx.Fill ();
 
 			if (dbge.Events == null)
@@ -113,9 +115,6 @@ namespace Crow
 			if (Event != null) {
 				Point m = ScreenPointToLocal (e.Position);
 				long curTick = (long)(m.X / pixelPerTick) + Event.begin;
-				/*if (Width == Measure.Fit) 
-					NotifyValueChanged ("HoverEvent", Event);
-				else*/
 				HoverEvent = hoverEvent (Event, curTick);
 
 				e.Handled = true;

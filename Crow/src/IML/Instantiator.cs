@@ -710,6 +710,11 @@ namespace Crow.IML {
 				} else if (rop.IsSingleName && rop.Tokens [0] == "this") {
 					il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current node
 					lop.emitSetProperty (il);
+				} else if (rop.IsCurrentNodeProperty || rop.IsTemplateBinding || rop.LevelsUp > 0) {
+					il.Emit (OpCodes.Ldarg_0);  //load sender ref onto the stack, the current nod
+					rop.emitGetTarget (il, cancelFinalSet);
+					rop.emitGetProperty (il, cancelFinalSet);
+					lop.emitSetProperty (il);
 				} else if (rop.LevelsUp == 0 && !string.IsNullOrEmpty (rop.Tokens [0])) {//parsable constant depending on lop type
 																						 //if left operand is member of current node, it's easy to fetch type, else we should use reflexion in msil
 					if (lopPI == null) {//accept GraphicObj members, but it's restricive

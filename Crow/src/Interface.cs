@@ -132,6 +132,8 @@ namespace Crow
 		Cursor currentCursor;
 		bool ownWindow;
 
+		public IntPtr WindowHandle => hWin;
+
 		protected void registerGlfwCallbacks ()
 		{
 			windows.Add (hWin, this);
@@ -426,7 +428,7 @@ namespace Crow
 		/// <summary>Sync mutex between host and Crow for rendering operations (bmp, dirtyBmp,...)</summary>
 		public object RenderMutex = new object();
 		/// <summary>Global lock of the update cycle</summary>
-		public object UpdateMutex = new object();
+		public object UpdateMutex = new object();		
 		/// <summary>Global lock of the clipping queue</summary>
 		public object ClippingMutex = new object();
 		//TODO:share resource instances
@@ -553,13 +555,13 @@ namespace Crow
 				if (StylingConstants == null)//iFace not yet initialized
 					return;
 				lock (UpdateMutex) {
-					DbgLogger.StartEvent (DbgEvtType.IFaceReleadTheme);
+					DbgLogger.StartEvent (DbgEvtType.IFaceReloadTheme);
 					disposeContextMenus ();
 					initDictionaries ();
 					loadStyling ();
 					loadThemeFiles ();					
 					initContextMenus ();
-					DbgLogger.EndEvent (DbgEvtType.IFaceReleadTheme);
+					DbgLogger.EndEvent (DbgEvtType.IFaceReloadTheme);
 				}
 			}
 		}
@@ -915,7 +917,7 @@ namespace Crow
 					Monitor.Exit (LayoutMutex);
 					return;
                 }
-				DbgLogger.StartEvent (DbgEvtType.Layouting);
+				DbgLogger.StartEvent (DbgEvtType.ProcessLayouting);
 				PerformanceMeasure.Begin (PerformanceMeasure.Kind.Layouting);
 
 				DiscardQueue = new Queue<LayoutingQueueItem> (LayoutingQueue.Count);
@@ -928,7 +930,7 @@ namespace Crow
 				LayoutingQueue = DiscardQueue;
 
 				PerformanceMeasure.End (PerformanceMeasure.Kind.Layouting);
-				DbgLogger.EndEvent (DbgEvtType.Layouting, true);
+				DbgLogger.EndEvent (DbgEvtType.ProcessLayouting, true);
 
 				Monitor.Exit (LayoutMutex);
 				DiscardQueue = null;
@@ -941,7 +943,7 @@ namespace Crow
 			if (ClippingQueue.Count == 0)
 				return;
 
-			DbgLogger.StartEvent (DbgEvtType.Clipping);
+			DbgLogger.StartEvent (DbgEvtType.ClippingRegistration);
 			PerformanceMeasure.Begin (PerformanceMeasure.Kind.Clipping);
 
 			Widget g = null;
@@ -954,26 +956,25 @@ namespace Crow
 			}
 
 			PerformanceMeasure.End (PerformanceMeasure.Kind.Clipping);
-			DbgLogger.EndEvent (DbgEvtType.Clipping, true);
+			DbgLogger.EndEvent (DbgEvtType.ClippingRegistration, true);
 		}
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
-		void processDrawing(Context ctx){
+		protected virtual void processDrawing(Context ctx){
 
-			DbgLogger.StartEvent (DbgEvtType.Drawing);
+			DbgLogger.StartEvent (DbgEvtType.ProcessDrawing);
 
 			if (DragImage != null)
 				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
 
 			if (!clipping.IsEmpty) {
-				PerformanceMeasure.Begin (PerformanceMeasure.Kind.Drawing);
-				IsDirty = true;
+				PerformanceMeasure.Begin (PerformanceMeasure.Kind.Drawing);				
 
 				ctx.PushGroup ();
 
 				for (int i = GraphicTree.Count -1; i >= 0 ; i--){
 					Widget p = GraphicTree[i];
-					if (!p.Visible)
+					if (!p.IsVisible)
 						continue;
 					if (clipping.Contains (p.Slot) == RegionOverlap.Out)
 						continue;
@@ -1025,13 +1026,14 @@ namespace Crow
 				clipping = new Region ();
 
 				PerformanceMeasure.End (PerformanceMeasure.Kind.Drawing);
+				IsDirty = true;
 			}
 
 			drawTextCursor (ctx);
 
 			debugHighlightFocus (ctx);
 			
-			DbgLogger.EndEvent (DbgEvtType.Drawing, true);
+			DbgLogger.EndEvent (DbgEvtType.ProcessDrawing, true);
 		}
 		#endregion
 
@@ -1613,7 +1615,7 @@ namespace Crow
 		}
 		void toolTipThreadFunc ()
 		{
-			while (true) {
+			while (true) {			
 				if (tooltipTimer.ElapsedMilliseconds > TOOLTIP_DELAY) {
 					if (!tooltipVisible) {
 						Widget g = _hoverWidget;
@@ -1654,14 +1656,18 @@ namespace Crow
 		}
 		void ToolTipContainer_LayoutChanged (object sender, LayoutingEventArgs e)
 		{
-			Widget ttc = sender as Widget;
+			Widget ttc = sender as Widget;				
+					
 			//tooltip container datasource is the widget triggering the tooltip
 			Rectangle r = ScreenCoordinates ((ttc.DataSource as Widget).Slot);
 
 			if (e.LayoutType == LayoutingType.X) {
-					if (ttc.Slot.Right > clientRectangle.Right)
-						ttc.Left = clientRectangle.Right - ttc.Slot.Width;
-			}/* else if (e.LayoutType == LayoutingType.Y) {
+				if (ttc.Slot.Right > clientRectangle.Right)
+					ttc.Left = clientRectangle.Right - ttc.Slot.Width;						
+			}else if (e.LayoutType == LayoutingType.Y) {
+				if (ttc.Slot.Bottom > clientRectangle.Bottom)
+					ttc.Top = clientRectangle.Bottom - ttc.Slot.Height;
+			}/*
 				if (ttc.Slot.Height < tc.ClientRectangle.Height) {
 					if (PopDirection.HasFlag (Alignment.Bottom)) {
 						if (r.Bottom + ttc.Slot.Height > tc.ClientRectangle.Bottom)
@@ -1678,6 +1684,7 @@ namespace Crow
 				} else
 					ttc.Top = 0;
 			}*/
+
 		}
 		#endregion
 

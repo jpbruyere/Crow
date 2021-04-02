@@ -34,6 +34,9 @@ namespace Crow
 		void updateCursor () {
 			if (cursorRatio < 0)
 				return;
+			ILayoutable l = cursor?.Parent;
+			if (l == null)
+				return;
 			Rectangle r = cursor.Parent.ClientRectangle;
 			if (Orientation == Orientation.Horizontal)
 				CursorSize = (int)(cursorRatio * r.Width);

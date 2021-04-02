@@ -29,9 +29,16 @@ namespace Crow
 		}
 
 		static SampleBase () {
-			System.Runtime.Loader.AssemblyLoadContext.Default.ResolvingUnmanagedDll+=resolveUnmanaged;
+			System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly()).ResolvingUnmanagedDll+=resolveUnmanaged;
 		}
 #endif
+		public SampleBase (IntPtr hWin) : base (800,600,hWin){}
+		public SampleBase () : base (800,600,true,true){}
+		public SampleBase (int width, int height, bool startUIThread, bool createSurface) :
+			base (width, height, startUIThread, createSurface){
+				
+			}
+
         public Version CrowVersion => Assembly.GetAssembly (typeof (Widget)).GetName ().Version;
 
         #region Test values for Binding

@@ -28,7 +28,7 @@ namespace Crow
 			if (Orientation == Orientation.Vertical) {
 				int tallestChild = 0;
 				foreach (Widget c in Children) {
-					if (!c.Visible)
+					if (!c.IsVisible)
 						continue;
 					if (dx + c.Slot.Width > ClientRectangle.Width) {
 						dx = 0;
@@ -47,7 +47,7 @@ namespace Crow
 			} else {
 				int largestChild = 0;
 				foreach (Widget c in Children) {
-					if (!c.Visible)
+					if (!c.IsVisible)
 						continue;
 					if (dy + c.Slot.Height > ClientRectangle.Height) {
 						dy = 0;

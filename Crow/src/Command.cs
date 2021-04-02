@@ -86,11 +86,17 @@ namespace Crow {
 		#region CTOR
 		public Command () {}
 		/// <summary>
-		/// Initializes a new instance of Command with the action pass as argument.
+		/// Initializes a new instance of Command with the action passed as argument.
 		/// </summary>
 		/// <param name="_executeAction">action to excecute when command is triggered</param>
-		public Command (Action _executeAction)
-		{
+		public Command (Action _executeAction) {
+			execute = _executeAction;
+		}
+		/// <summary>
+		/// Initializes a new instance of Command with the action<object> passed as argument.
+		/// </summary>
+		/// <param name="_executeAction">action to excecute when command is triggered</param>
+		public Command (Action<object> _executeAction) {
 			execute = _executeAction;
 		}
 		public Command (string caption, Action executeAction, string icon = null, bool _canExecute = true)
@@ -99,10 +105,17 @@ namespace Crow {
 			execute = executeAction;
 			canExecute = _canExecute;
 		}
+		public Command (string caption, Action<object> executeAction, string icon = null, bool _canExecute = true)
+			:base (caption, icon)
+		{					
+			execute = executeAction;
+			canExecute = _canExecute;
+		}
 		
 		#endregion
 
-		Action execute;		
+		Delegate execute;		
+
 		bool canExecute = true;
 		
 		/// <summary>
@@ -122,12 +135,16 @@ namespace Crow {
 		/// <summary>
 		/// trigger the execution of the command
 		/// </summary>
-		public virtual void Execute(){
+		public virtual void Execute (object sender = null){
 			if (execute != null && CanExecute){
-				Task task = new Task(execute);
+				Task task =	(execute is Action a) ?
+					task = new Task(a) :				
+				(execute is Action<object> o) ?
+					task = new Task(o, sender) : throw new Exception("Invalid Delegate type in Crow.Command, expecting Action or Action<object>");
 				task.Start();
 			}
 		}
+
 		internal override void raiseAllValuesChanged()
 		{
 			base.raiseAllValuesChanged();

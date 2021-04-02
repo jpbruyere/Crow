@@ -1,76 +1,27 @@
-﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿using System.Diagnostics;
+// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Crow
+namespace Crow.DebugLogger
 {
 	public class DbgEvent : DbgEventSource
 	{
 		public long begin, end;
 		public int threadId;
 		public DbgEvtType type;
+		public DbgEvtType Category => type & DbgEvtType.All;
 		public DbgEvent parentEvent;
 		public bool HasChildEvents => Events != null && Events.Count > 0;
 		public override long Duration => end - begin;
+		public double DurationMS => Math.Round ((double)Duration / Stopwatch.Frequency * 1000.0, 4);
+		public double BeginMS => Math.Round ((double)begin / Stopwatch.Frequency * 1000.0, 4);
+		public double EndMS => Math.Round ((double)end / Stopwatch.Frequency * 1000.0, 4);
 		public virtual bool IsWidgetEvent => false;
 		public virtual bool IsLayoutEvent => false;
-
-		bool isSelected;
-		bool isExpanded;
-		Widget listContainer;
-
-		public bool IsSelected {
-			get => isSelected;
-			set {
-				if (isSelected == value)
-					return;
-				isSelected = value;
-				NotifyValueChangedAuto (isSelected);
-			}
-		}
-		public bool IsExpanded {
-			get => isExpanded;
-			set {
-				if (isExpanded == value)
-					return;
-				isExpanded = value;
-				if (isExpanded && parentEvent != null)
-					parentEvent.IsExpanded = true;
-				NotifyValueChangedAuto (isExpanded);
-			}
-		}
-		public Widget ListContainer {
-			get => listContainer;
-			set {
-				if (listContainer == value)
-					return;
-				listContainer = value;
-				NotifyValueChangedAuto (listContainer);
-			}
-		}
-
-		public virtual Color Color {
-			get {
-				switch (type) {
-				case DbgEvtType.Layouting:
-					return Colors.Yellow;
-				case DbgEvtType.Clipping:
-					return Colors.DarkTurquoise;
-				case DbgEvtType.Drawing:
-					return Colors.MidnightBlue;
-				case DbgEvtType.Update:
-					return Colors.Grey;
-				case DbgEvtType.IFaceLoad:
-					return Colors.Teal;
-				default:
-					return Colors.White;
-				}
-
-			}
-		}
 
 		public void AddEvent (DbgEvent evt)
 		{
@@ -113,13 +64,20 @@ namespace Crow
 						OldSlot = Rectangle.Parse (tmp [7]),
 						NewSlot = Rectangle.Parse (tmp [8]),
 					};
-				return new DbgWidgetEvent () {
-					begin = long.Parse (tmp [0]),
-					end = long.Parse (tmp [1]),
-					threadId = int.Parse (tmp [2]),
-					type = evtType,
-					InstanceIndex = int.Parse (tmp [4]),
-				};
+				return (tmp.Length < 5) ?
+ 							new DbgWidgetEvent () {
+								begin = long.Parse (tmp [0]),
+								end = long.Parse (tmp [1]),
+								threadId = int.Parse (tmp [2]),
+								type = evtType,
+								InstanceIndex = -1,
+							} : new DbgWidgetEvent () {
+								begin = long.Parse (tmp [0]),
+								end = long.Parse (tmp [1]),
+								threadId = int.Parse (tmp [2]),
+								type = evtType,
+								InstanceIndex = int.Parse (tmp [4]),
+							};
 			}
 			return new DbgEvent () {
 				begin = long.Parse (tmp [0]),
@@ -128,120 +86,27 @@ namespace Crow
 				type = evtType,
 			};
 		}
-		public virtual string Print()
+		public virtual string Print ()
 			=> $"{begin,10}:{threadId,-2}:{type,-20}:";
 		public override string ToString ()
 			=> $"{begin};{end};{threadId};{type}";
-			
-	}
-	public class DbgWidgetEvent : DbgEvent
-	{
-		public int InstanceIndex;
-		public override Color Color {
+		public virtual Color Color {
 			get {
 				switch (type) {
-				case DbgEvtType.GOClassCreation:
-					return Colors.DarkSlateGrey;
-				case DbgEvtType.GOInitialization:
-					return Colors.DarkOliveGreen;
-				case DbgEvtType.GOClippingRegistration:
-					return Colors.MediumTurquoise;
-				case DbgEvtType.GORegisterClip:
-					return Colors.Turquoise;
-				case DbgEvtType.GORegisterForGraphicUpdate:
-					return Colors.LightPink;
-				case DbgEvtType.GOEnqueueForRepaint:
-					return Colors.LightSalmon;
-				case DbgEvtType.GONewDataSource:
-					return Colors.MediumVioletRed;
-				case DbgEvtType.GODraw:
-					return Colors.SteelBlue;
-				case DbgEvtType.GORecreateCache:
-					return Colors.CornflowerBlue;
-				case DbgEvtType.GOUpdateCache:
-					return Colors.SteelBlue;
-				case DbgEvtType.GOPaint:
-					return Colors.RoyalBlue;
-				case DbgEvtType.GOLockUpdate:
-					return Colors.SaddleBrown;
-				case DbgEvtType.GOLockClipping:
-					return Colors.Sienna;
-				case DbgEvtType.GOLockRender:
-					return Colors.BurlyWood;
-				case DbgEvtType.GOLockLayouting:
-					return Colors.GoldenRod;
-				case DbgEvtType.TGCancelLoadingThread:
-					return Colors.Maroon;
+				case DbgEvtType.ProcessLayouting:
+					return Colors.Yellow;
+				case DbgEvtType.ClippingRegistration:
+					return Colors.DarkTurquoise;
+				case DbgEvtType.ProcessDrawing:
+					return Colors.MidnightBlue;
+				case DbgEvtType.Update:
+					return Colors.Grey;
+				case DbgEvtType.IFaceLoad:
+					return Colors.Teal;
 				default:
 					return Colors.White;
 				}
 			}
-		}
-		public override bool IsWidgetEvent => true;
-		public DbgWidgetEvent () { }
-		public DbgWidgetEvent (long timeStamp, DbgEvtType evt, Widget w) : base (timeStamp, evt)
-		{
-#if DEBUG_LOG
-			InstanceIndex = w.instanceIndex;
-#endif
-		}
-#if DEBUG_LOG
-        public override string Print () 
-            => $"{base.Print ()} {Widget.GraphicObjects[InstanceIndex]}";        
-#endif
-        public override string ToString ()
-			=> $"{base.ToString ()};{InstanceIndex}";
-	}
-	public class DbgLayoutEvent : DbgWidgetEvent
-	{
-		public LayoutingType layouting;
-		public LayoutingQueueItem.Result result;
-		public Rectangle OldSlot, NewSlot;
-		public override Color Color {
-			get {
-				if (type == DbgEvtType.GORegisterLayouting)
-					return Colors.GreenYellow;
-				if (type == DbgEvtType.GOProcessLayoutingWithNoParent)
-					return Colors.DarkRed;
-				switch (result) {
-				case LayoutingQueueItem.Result.Success:
-					return Colors.Green;
-				case LayoutingQueueItem.Result.Deleted:
-					return Colors.Red;
-				case LayoutingQueueItem.Result.Discarded:
-					return Colors.OrangeRed;
-				default:
-					return Colors.Orange;
-				}
-			}
-		}
-		public override bool IsLayoutEvent => true;
-		public DbgLayoutEvent () { }
-#if DEBUG_LOG
-		public DbgLayoutEvent (long timeStamp, DbgEvtType evt, LayoutingQueueItem lqi) :
-			base (timeStamp, evt, lqi.graphicObject)
-		{
-			layouting = lqi.LayoutType;
-			result = lqi.result;
-			OldSlot = lqi.Slot;
-			NewSlot = lqi.NewSlot;
-		}
-		public void SetLQI (LayoutingQueueItem lqi)
-		{
-			layouting = lqi.LayoutType;
-			result = lqi.result;
-			OldSlot = lqi.Slot;
-			NewSlot = lqi.NewSlot;
-		}
-#else
-		public DbgLayoutEvent (long timeStamp, DbgEvtType evt, LayoutingQueueItem lqi) {}
-		public void SetLQI (LayoutingQueueItem lqi) { }
-
-#endif
-		public override string Print ()
-			=> $"{layouting} {result} {OldSlot}->{NewSlot} {base.Print ()}";
-
-		public override string ToString ()
-			=> $"{base.ToString ()};{layouting};{result};{OldSlot};{NewSlot}";
+		}		
 	}
 }

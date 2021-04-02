@@ -37,6 +37,7 @@ namespace Crow
 
 		#region private fields
 		Enum enumValue;
+		UInt32 bitFieldExcludeMask;
 		Type enumType;
 		bool enumTypeIsBitsfield;
 		string rbStyle, iconsPrefix, iconsExtension;		
@@ -102,19 +103,24 @@ namespace Crow
 
 						if (enumTypeIsBitsfield) {
 							IML.Instantiator iTor = IFace.CreateITorFromIMLFragment ($"<CheckBox Style='{rbStyle}'/>");
-							UInt32 currentValue = Convert.ToUInt32 (EnumValue);
+							UInt32 currentValue = Convert.ToUInt32 (EnumValue);							
+							currentValue &= ~bitFieldExcludeMask;
+							enumValue = (Enum)Enum.ToObject(enumType, currentValue);
 
 							foreach (Enum en in enumType.GetEnumValues()) {
+								UInt32 eni = Convert.ToUInt32 (en);
+								if ((eni & bitFieldExcludeMask) != 0)
+									continue;
+
 								CheckBox rb = iTor.CreateInstance<CheckBox> ();
 								rb.Caption = en.ToString();
 								rb.LogicalParent = this;
-								rb.Tag = $"{iconsPrefix}{en}{IconsExtension}";
-
-								UInt32 eni = Convert.ToUInt32 (en);
+								rb.Tag = $"{iconsPrefix}{en}{IconsExtension}";								
 								rb.Tooltip = $"0x{eni:x8}";
+
 								if (eni == 0) {
 									rb.IsChecked = currentValue == 0;
-									rb.Checked += (sender, e) => EnumValue = (Enum)Enum.ToObject(enumType, 0);										
+									rb.Checked += (sender, e) => EnumValue = (Enum)Enum.ToObject(enumType, 0);
 								} else {								
 									rb.IsChecked = currentValue == 0 ? false : EnumValue.HasFlag (en);
 									rb.Checked += onChecked;
@@ -145,7 +151,10 @@ namespace Crow
 
 
 					} else if (enumTypeIsBitsfield) {
-						UInt32 currentValue = Convert.ToUInt32 (EnumValue);
+						UInt32 currentValue = Convert.ToUInt32 (EnumValue);						
+						currentValue &= ~bitFieldExcludeMask;
+						enumValue = (Enum)Enum.ToObject(enumType, currentValue);
+
 						if (currentValue == 0) {
 							foreach (CheckBox rb in enumValueContainer.Children) {
 								Enum en = (Enum)Enum.Parse(enumType, rb.Caption);
@@ -181,7 +190,20 @@ namespace Crow
 			}
 		}
 		#endregion
-
+		/// <summary>
+		/// Include mask for bitfields. Used to ignore enum values in display.
+		/// </summary>
+		/// <value>UInt32 bitfield mask</value>
+		public UInt32 BitFieldExcludeMask {
+			get => bitFieldExcludeMask;
+			set {
+				if (bitFieldExcludeMask == value)
+					return;
+				bitFieldExcludeMask = value;
+				NotifyValueChangedAuto(bitFieldExcludeMask);
+				forceRefresh();
+			}
+		}
 		void onChecked (object sender, EventArgs e) {			
 			Enum en =(Enum)Enum.Parse (enumType, (sender as CheckBox).Caption);
 			UInt32 newVal = Convert.ToUInt32 (en);

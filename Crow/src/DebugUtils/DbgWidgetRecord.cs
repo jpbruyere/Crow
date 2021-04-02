@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Crow
+namespace Crow.DebugLogger
 {
 	/// <summary>
 	/// Recorded Widget instance data.

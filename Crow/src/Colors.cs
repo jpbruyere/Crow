@@ -317,7 +317,8 @@ namespace Crow
 		/// <param name="_A">normalized alpha component</param>
 		public Color AdjustAlpha(double _A)
 		{
-			return new Color (this.R, this.G, this.B, _A);
+			float[] tmp = floatArray;
+			return new Color (tmp[0], tmp[1], tmp[2], _A);
 		}
 
 		public override bool Equals (object obj)

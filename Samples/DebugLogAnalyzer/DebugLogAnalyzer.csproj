@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+	</PropertyGroup>
 	<ItemGroup>
-		<EmbeddedResource Include="ui\**\*.*">
+		<Compile Include="src\**\*.cs"/>
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="ui\*.*">
 			<LogicalName>Dbg.%(Filename)%(Extension)</LogicalName>
-		</EmbeddedResource>
-</ItemGroup>
+		</EmbeddedResource>	
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\CrowDbgShared\CrowDbgShared.csproj" />
+	</ItemGroup>
 
 </Project>

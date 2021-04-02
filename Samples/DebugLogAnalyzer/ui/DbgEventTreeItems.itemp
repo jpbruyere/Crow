@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <ItemTemplate Data="Events">
-	<ListItem IsSelected="{²IsSelected}" Height="Fit"
+	<ListItem Height="Fit"
 						Selected="{/exp.Background=${ControlHighlight}}"
 						Unselected="{/exp.Background=Transparent}">
-		<Expandable Name="exp" Caption="{type}" MouseDoubleClick="/onClickForExpand" CacheEnabled="true" IsExpanded="{²IsExpanded}">
+		<Expandable Name="exp" Caption="{type}" MouseDoubleClick="/onClickForExpand" CacheEnabled="true" >
 			<Template>
 					<VerticalStack>
 						<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"
@@ -34,10 +34,10 @@
 	</ListItem>
 </ItemTemplate>		
 <ItemTemplate Data="Events" DataType="DbgWidgetEvent">
-	<ListItem IsSelected="{²IsSelected}" Height="Fit"
+	<ListItem  Height="Fit"
 						Selected="{/exp.Background=${ControlHighlight}}"
 						Unselected="{/exp.Background=Transparent}">
-		<Expandable Name="exp" Caption="{type}" MouseDoubleClick="/onClickForExpand" CacheEnabled="true" IsExpanded="{²IsExpanded}">
+		<Expandable Name="exp" Caption="{type}" MouseDoubleClick="/onClickForExpand" CacheEnabled="true" >
 			<Template>
 				<VerticalStack>
 					<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"
@@ -53,7 +53,7 @@
 								MouseEnter="{Background=LightGrey}"
 								MouseLeave="{Background=Transparent}"/>
 							<Label Text="{./Caption}" Width="80" Font="mono, 8" />
-							<Label Text="{Duration}" Width="40" Font="mono, 8" TextAlignment="Center" Background="DimGrey"/>
+							<Label Text="{DurationMS}" Width="40" Font="mono, 8" TextAlignment="Center" Background="DimGrey"/>
 							<Label Text="{InstanceIndex}" Width="40" Font="mono, 8" TextAlignment="Center" Background="DimGrey"/>
 							<DbgEventWidget Event="{}" Tooltip="#Dbg.DbgEvtTooltip.crow" Width="Stretched" Height="5"/>
 						</HorizontalStack>

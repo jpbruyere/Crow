@@ -26,6 +26,7 @@ MenuBackground = "Jet";
 Button, CheckBox, RadioButton, ComboBox, Expandable,
 MessageBox, Popper, Slider, Spinner, TextBox {
 	//Focusable = "true";
+	Foreground="${ControlForeground}";
 	Height = "Fit";
 	Background = "${ControlBackground}";
 	CornerRadius = "${ControlCornerRadius}";
@@ -40,7 +41,10 @@ GroupBox { Caption = "Group Box"; }
 
 Control {
 	Margin="${ControlInsideMargin}";
-	Spacing="3";
+	Spacing="3";	
+	//Foreground  = "${ControlForeground}";
+	//MouseEnter	= "{Foreground=${ControlCaptionHoverColor}}";
+	//MouseLeave	= "{Foreground=${ControlForeground}}";	
 }
 ControlBorder {
 	BorderWidth	= "${ControlBorderWidth}";
@@ -48,9 +52,9 @@ ControlBorder {
 	Margin = "${ControlInsideMargin}";
 }
 ControlCaption {
-	Foreground  = "${ControlForeground}";
-	MouseEnter	= "{Foreground=${ControlCaptionHoverColor}}";
-	MouseLeave	= "{Foreground=${ControlForeground}}";
+	//Foreground  = "${ControlForeground}";
+	//MouseEnter	= "{Foreground=${ControlCaptionHoverColor}}";
+	//MouseLeave	= "{Foreground=${ControlForeground}}";
 }
 ControlEditableText {
 	Foreground	= "${ControlForeground}";

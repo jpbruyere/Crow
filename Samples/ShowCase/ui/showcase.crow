@@ -22,22 +22,64 @@
 				<Button Style="IcoButton" Command="{CMDCut}" />
 				<Button Style="IcoButton" Command="{CMDCopy}" />
 				<Button Style="IcoButton" Command="{CMDPaste}" />-->
-				<EnumSelector RadioButtonStyle="CheckBox2" Caption="Recorded Events" EnumValue="{²RecordedEvents}">
-					<Template>
-						<Popper Caption="{./Caption}">
-							<Scroller Height="50%" Width="80%" Background="Jet">
-								<Wrapper Name="Content" Height="Fit" VerticalAlignment="Top" />							
-							</Scroller>
-						</Popper>
+				<Popper IsVisible="{DebugLoggingEnabled}" Fit="true">
+					<Template>					
+						<CheckBox IsChecked="{²./IsPopped}">
+							<Template>
+								<HorizontalStack Background="Onyx" Margin="5" Spacing="10">
+									<Widget Background="Red" IsVisible="{DebugLogRecording}" CornerRadius="10" Width="12" Height="12"/>
+									<Label Text="Debug Logging" />									
+								</HorizontalStack>
+							</Template>
+						</CheckBox>
 					</Template>
-				</EnumSelector>
-				<Label Text="{RecordedEvents}"/>
-				<!--<EnumSelector EnumValue="{²DiscardedEvents}"/>-->
-				<Widget Width="Stretched"/>
-				<Label Text="Line:" Foreground="Grey"/>
-				<Label Text="{../../tb.CurrentLine}"  Margin="2"/>
-				<Label Text="Col:" Foreground="Grey"/>
-				<Label Text="{../../tb.CurrentColumn}" Margin="2"/>
+					<VerticalStack Fit="true" Background="Grey" MinimumSize="300,200" Margin="5">
+						<CheckBox Name="cbFile" Caption="Record to file" IsChecked="{²DebugLogToFile}" Background="Onyx"/>
+						<HorizontalStack Height="Fit" Width="Stretched" IsEnabled="{../cbFile.IsChecked}" Background="Onyx" Margin="5">
+							<Label Text="Debug log output file:" Fit="true"/>
+							<TextBox Text="{²DebugLogFilePath}"  />
+						</HorizontalStack>
+						<EnumSelector RadioButtonStyle="CheckBox2" EnumValue="{²RecordedEvents}" Width="Stretched">
+							<Template>
+								<Popper >
+									<Template>
+										<CheckBox IsChecked="{²./IsPopped}">
+											<Template>
+												<HorizontalStack Background="Onyx" Margin="5" Spacing="10">
+													<Label Text="Recorded Events:" Width="Stretched"/>
+													<Label Background="SeaGreen" Text="{RecordedEvents}" Margin="3"/>
+												</HorizontalStack>
+											</Template>
+										</CheckBox>
+									</Template>
+									<Scroller Height="50%" Width="80%" Background="Jet">
+										<Wrapper Name="Content" Height="Fit" VerticalAlignment="Top" />							
+									</Scroller>
+								</Popper>
+							</Template>
+						</EnumSelector>						
+						<EnumSelector RadioButtonStyle="CheckBox2" EnumValue="{²DiscardedEvents}" Width="Stretched">
+							<Template>
+								<Popper >
+									<Template>
+										<CheckBox IsChecked="{²./IsPopped}">
+											<Template>
+												<HorizontalStack Background="Onyx" Margin="5" Spacing="10">
+													<Label Text="Discarded Events:" Width="Stretched"/>
+													<Label Background="SeaGreen" Text="{DiscardedEvents}" Margin="3"/>
+												</HorizontalStack>
+											</Template>
+										</CheckBox>
+									</Template>
+									<Scroller Height="50%" Width="80%" Background="Jet">
+										<Wrapper Name="Content" Height="Fit" VerticalAlignment="Top" />							
+									</Scroller>
+								</Popper>
+							</Template>
+						</EnumSelector>						
+						<Label Text="Press 'F6' to start/stop recording"/>
+					</VerticalStack>
+				</Popper>
 			</HorizontalStack>
 			<HorizontalStack>
 				<Editor Name="tb" Text="{Source}" Multiline="true" Font="consolas, 12" Focusable="true" Height="Stretched" Width="Stretched"						
@@ -51,12 +93,26 @@
 			<ScrollBar Style="HScrollBar" Value="{²../tb.ScrollX}"
 					LargeIncrement="{../tb.PageWidth}" SmallIncrement="1"
 					CursorRatio="{../tb.ChildWidthRatio}" Maximum="{../tb.MaxScrollX}" />
-			<HorizontalStack Height="Fit">
+			<HorizontalStack Height="Fit" Spacing="10">
 				<Widget Width="10" Height="10" Background="RoyalBlue" Visible="{IsDirty}"/>
 				<Label Text="{CurrentFile}" Width="Stretched"/>
-			</HorizontalStack>			
-			<Label Visible="{ShowError}" Text="{ErrorMessage}" Background="Red" Foreground="White" Width="Stretched" Margin="2"
-				Multiline="true"/>
+				<Widget Width="Stretched"/>
+				<Label Text="Line:" Foreground="Grey"/>
+				<Label Text="{../../tb.CurrentLine}"  Margin="2"/>
+				<Label Text="Col:" Foreground="Grey"/>
+				<Label Text="{../../tb.CurrentColumn}" Margin="2"/>
+			</HorizontalStack>
+			<Popper IsVisible="{ShowError}" Background="Red">
+				<Template>
+					<CheckBox IsChecked="{²./IsPopped}" MouseEnter="{IsChecked='true'}" MouseLeave="{IsChecked='false'}">
+						<Template>
+							<Label DataSource="{ErrorMessage}" Text="{Message}" Background="Red" Foreground="White" Width="Stretched" Margin="2"
+								Multiline="true"/>
+						</Template>
+					</CheckBox>
+				</Template>
+				<Label Text="{ErrorMessage}" Background="DarkRed" Foreground="White" Width="Stretched" Margin="2" Multiline="true"/>
+			</Popper>			
 		</VerticalStack>
 	</VerticalStack>
 </HorizontalStack>

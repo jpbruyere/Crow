@@ -326,7 +326,7 @@ namespace Crow
 					childrenRWLock.EnterReadLock ();
 
 					foreach (Widget c in Children) {
-						if (!c.Visible)
+						if (!c.IsVisible)
 							continue;
 						if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
 							continue;
@@ -352,12 +352,16 @@ namespace Crow
 
 		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
+			DbgLogger.StartEvent(DbgEvtType.GOOnChildLayoutChange, this);
+
 			Widget g = sender as Widget;
 
 			switch (arg.LayoutType) {
 			case LayoutingType.Width:
-				if (Width != Measure.Fit)
+				if (Width != Measure.Fit) {
+					DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);
 					return;
+				}
 				if (g.Slot.Width > contentSize.Width) {
 					largestChild = g;
 					contentSize.Width = g.Slot.Width;
@@ -367,8 +371,10 @@ namespace Crow
 				this.RegisterForLayouting (LayoutingType.Width);
 				break;
 			case LayoutingType.Height:
-				if (Height != Measure.Fit)
+				if (Height != Measure.Fit) {
+					DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);					
 					return;
+				}
 				if (g.Slot.Height > contentSize.Height) {
 					tallestChild = g;
 					contentSize.Height = g.Slot.Height;
@@ -378,6 +384,7 @@ namespace Crow
 				this.RegisterForLayouting (LayoutingType.Height);
 				break;
 			}
+			DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);
 		}
 		//TODO: x,y position should be taken in account for computation of width and height
 		void resetChildrenMaxSize(){
@@ -392,7 +399,7 @@ namespace Crow
 			largestChild = null;
 			contentSize.Width = 0;
 			for (int i = 0; i < Children.Count; i++) {
-				if (!Children [i].Visible)
+				if (!Children [i].IsVisible)
 					continue;
 				int cw = 0;
 				if (forceMeasure)
@@ -416,7 +423,7 @@ namespace Crow
 			tallestChild = null;
 			contentSize.Height = 0;
 			for (int i = 0; i < Children.Count; i++) {
-				if (!Children [i].Visible)
+				if (!Children [i].IsVisible)
 					continue;
 				int ch = 0;
 				if (forceMeasure)

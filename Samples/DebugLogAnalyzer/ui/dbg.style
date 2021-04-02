@@ -1,0 +1,15 @@
+﻿IcoButton {
+	Template = "#Dbg.Button.template";
+	Background = "Onyx";
+}
+CheckBox2 {
+	Width = "200";
+}
+smallLabCaption {
+	Font="mono, 8";
+	Foreground="Grey";
+}
+smallLabValue {
+	Font="mono, 10";
+	Foreground="White";
+}

@@ -443,6 +443,10 @@ namespace Crow.Cairo {
 		{
 			Rectangle (rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
 		}
+		public void Rectangle (Crow.RectangleD rectangle)
+		{
+			Rectangle (rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+		}
 
 		public void Rectangle (PointD p, double width, double height)
 		{

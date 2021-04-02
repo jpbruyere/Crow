@@ -18,12 +18,12 @@ namespace tests
 
 		protected override void OnInitialized ()
 		{
-			Commands = new List<Crow.Command> (new Crow.Command [] {
+			Commands = new CommandGroup (
 				new Crow.Command("command1", new Action(() => Console.WriteLine ("command1 triggered"))),
 				new Crow.Command("command2", new Action(() => Console.WriteLine ("command2 triggered"))),
 				new Crow.Command("command3", new Action(() => Console.WriteLine ("command3 triggered"))),
-				new Crow.Command("command4", new Action(() => Console.WriteLine ("command4 triggered"))),
-			});
+				new Crow.Command("command4", new Action(() => Console.WriteLine ("command4 triggered")))
+			);
 
 			// += KeyboardKeyDown1;
 

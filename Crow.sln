@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30104.148
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "global", "global", "{728545
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crow", "Crow\Crow.csproj", "{C2980F9B-4798-4C05-99E2-E174810F7C7B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrowDbgShared", "CrowDbgShared\CrowDbgShared.csproj", "{91F1CE07-EECE-4F1D-A3EE-7239B563654A}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}"
 	ProjectSection(SolutionItems) = preProject
 		Samples\Directory.Build.props = Samples\Directory.Build.props
@@ -18,8 +20,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloWorld", "Samples\HelloWorld\HelloWorld.csproj", "{F535A8AB-CD93-49AB-B1B0-FFF9AE51ED6A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShowCase", "Samples\ShowCase\ShowCase.csproj", "{56329D48-D382-4850-93DE-59C453894E8A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ControlLib", "Samples\ControlLib\ControlLib.csproj", "{91F1CE07-EECE-4F1D-A3EE-7239B563654A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "unitTests", "unitTests\unitTests.csproj", "{0CC6DFAB-2E4A-4786-976C-89053D5EA6A2}"
 EndProject
@@ -36,6 +36,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BindingTest", "Samples\BindingTest\BindingTest.csproj", "{242094B3-A1F1-44F8-B78D-D819B595DDBA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PathPainter", "Samples\PathPainter\PathPainter.csproj", "{4066FE1E-3508-4361-ABAA-21601F632ED8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrowDebugger", "Samples\CrowDebugger\CrowDebugger.csproj", "{F86711E7-CACE-4050-82BF-0229CCEFDBA3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,6 +91,10 @@ Global
 		{4066FE1E-3508-4361-ABAA-21601F632ED8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4066FE1E-3508-4361-ABAA-21601F632ED8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4066FE1E-3508-4361-ABAA-21601F632ED8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F86711E7-CACE-4050-82BF-0229CCEFDBA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F86711E7-CACE-4050-82BF-0229CCEFDBA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F86711E7-CACE-4050-82BF-0229CCEFDBA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F86711E7-CACE-4050-82BF-0229CCEFDBA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -96,7 +102,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{F535A8AB-CD93-49AB-B1B0-FFF9AE51ED6A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{56329D48-D382-4850-93DE-59C453894E8A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
-		{91F1CE07-EECE-4F1D-A3EE-7239B563654A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{7AEB6DD5-916E-4415-84E1-78EC6E5881CE} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{18EBB41F-815E-4BF5-B80F-C9E2FAB2993A} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{7915538F-B2B1-414C-95A3-1FC58E3286B9} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
@@ -104,6 +109,7 @@ Global
 		{E19FD3DB-902A-4C99-8BF0-5ACAFFE35608} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{242094B3-A1F1-44F8-B78D-D819B595DDBA} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 		{4066FE1E-3508-4361-ABAA-21601F632ED8} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
+		{F86711E7-CACE-4050-82BF-0229CCEFDBA3} = {B2C7855A-2878-47FD-AD32-9A83DB4AB8C6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00D4E149-7131-49F4-BAAD-559AA961A78E}

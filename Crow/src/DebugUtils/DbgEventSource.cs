@@ -5,17 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace Crow
+namespace Crow.DebugLogger
 {
 	//base class for both events and widgetRecord having an event list
-	public abstract class DbgEventSource : IValueChange
+	public abstract class DbgEventSource
 	{
-		public event EventHandler<ValueChangeEventArgs> ValueChanged;
-		public virtual void NotifyValueChanged (string MemberName, object _value)
-			=> ValueChanged.Raise (this, new ValueChangeEventArgs (MemberName, _value));
-		public void NotifyValueChangedAuto (object _value, [CallerMemberName] string caller = null)
-			=> NotifyValueChanged (caller, _value);
-
 		//flattened event list of this widget
 		public List<DbgEvent> Events;
 		public virtual long Duration {

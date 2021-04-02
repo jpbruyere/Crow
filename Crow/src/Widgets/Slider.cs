@@ -26,12 +26,12 @@ namespace Crow
 			cursor = child.FindByName ("Cursor");
 			if (cursor == null)
 				return;
-			(cursor.Parent as Widget).LayoutChanged += HandleCursorContainerLayoutChanged;
+			(cursor.Parent as Widget).LayoutChanged += HandleCursorContainerLayoutChanged;//too difficult to unregister
 			updateCursorWidgetProps ();
 		}
 
 		protected virtual void HandleCursorContainerLayoutChanged (object sender, LayoutingEventArgs e)
-		{			
+		{
 			computeCursorPosition ();
 		}
 		#endregion
@@ -205,6 +205,12 @@ namespace Crow
 		public void OnIncrease (object sender, MouseButtonEventArgs e)
 		{
 			Value += SmallIncrement;
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			base.Dispose(disposing);
+
 		}
 	}
 }
