@@ -972,6 +972,14 @@ namespace Crow
 
 				ctx.PushGroup ();
 
+				for (int i = 0; i < clipping.NumRectangles; i++)
+					ctx.Rectangle (clipping.GetRectangle (i));
+
+				ctx.ClipPreserve ();
+				ctx.Operator = Operator.Clear;
+				ctx.Fill ();
+				ctx.Operator = Operator.Over;				
+
 				for (int i = GraphicTree.Count -1; i >= 0 ; i--){
 					Widget p = GraphicTree[i];
 					if (!p.IsVisible)
@@ -1009,14 +1017,6 @@ namespace Crow
 #endif
 
 				ctx.PopGroupToSource ();
-
-				for (int i = 0; i < clipping.NumRectangles; i++)
-					ctx.Rectangle (clipping.GetRectangle (i));
-
-				ctx.ClipPreserve ();
-				ctx.Operator = Operator.Clear;
-				ctx.Fill ();
-				ctx.Operator = Operator.Over;
 
 				ctx.Paint ();
 					
@@ -1371,7 +1371,9 @@ namespace Crow
 		/// should be called by the host on mouse move event to forward events to crow interfaces</summary>
 		/// <returns>true if mouse is in the interface</returns>
 		public virtual bool OnMouseMove (int x, int y)
-		{			
+		{
+			DbgLogger.StartEvent (DbgEvtType.MouseMove);
+
 			int deltaX = x - MousePosition.X;
 			int deltaY = y - MousePosition.Y;
 
@@ -1385,6 +1387,7 @@ namespace Crow
 						stickyMouseDelta = default;
 					} else {
 						Glfw3.SetCursorPosition (hWin, MousePosition.X, MousePosition.Y);
+						DbgLogger.EndEvent (DbgEvtType.MouseMove);
 						return true;
 					}
 				}
@@ -1397,6 +1400,7 @@ namespace Crow
 				//TODO, ensure object is still in the graphic tree
 				//send move evt even if mouse move outside bounds
 				ActiveWidget.onMouseMove (this, e);
+				DbgLogger.EndEvent (DbgEvtType.MouseMove);
 				return true;
 			}
 
@@ -1427,7 +1431,8 @@ namespace Crow
 									}
 									GraphicTree[i].checkHoverWidget (e);
 									HoverWidget.onMouseMove (this, e);
-								}									
+								}
+								DbgLogger.EndEvent (DbgEvtType.MouseMove);
 								return true;
 							}
 						}
@@ -1440,6 +1445,7 @@ namespace Crow
 						DragAndDropOperation.DragSource.onDrag (this, e);
 					else
 						HoverWidget.onMouseMove (this, e);
+					DbgLogger.EndEvent (DbgEvtType.MouseMove);
 					return true;
 				} else {
 					if (DragAndDropInProgress && dragndropHover == DragAndDropOperation.DropTarget)
@@ -1455,6 +1461,7 @@ namespace Crow
 								DragAndDropOperation.DragSource?.onDrag (this, e);
 							else
 								HoverWidget.onMouseMove (this, e);
+							DbgLogger.EndEvent (DbgEvtType.MouseMove);
 							return true;
 						}						
 					}
@@ -1477,11 +1484,13 @@ namespace Crow
 							}
 							HoverWidget.onMouseMove (this, e);
 						}
+						DbgLogger.EndEvent (DbgEvtType.MouseMove);
 						return true;
 					}
 				}
 			}
 			HoverOrDropTarget = null;
+			DbgLogger.EndEvent (DbgEvtType.MouseMove);
 			return false;
 		}
 		/// <summary>
@@ -1491,17 +1500,21 @@ namespace Crow
 		/// <param name="button">Button index</param>
 		public virtual bool OnMouseButtonDown (MouseButton button)
 		{
+			DbgLogger.StartEvent (DbgEvtType.MouseDown);
 			doubleClickTriggered = (lastMouseDown.ElapsedMilliseconds < DOUBLECLICK_TRESHOLD);
 			lastMouseDown.Restart ();
 
 			lastMouseDownEvent = new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press);
 
-			if (HoverWidget == null)
+			if (HoverWidget == null) {
+				DbgLogger.EndEvent (DbgEvtType.MouseDown);
 				return false;
+			}
 
 			HoverWidget.onMouseDown (this, lastMouseDownEvent);
 
 			ActiveWidget = HoverWidget;
+			DbgLogger.EndEvent (DbgEvtType.MouseDown);
 			return true;
 		}
 		/// <summary>
@@ -1511,6 +1524,7 @@ namespace Crow
 		/// <param name="button">Button index</param>
 		public virtual bool OnMouseButtonUp (MouseButton button)
 		{
+			DbgLogger.StartEvent (DbgEvtType.MouseUp);
 			mouseRepeatTimer.Reset ();
 			lastMouseDownEvent = null;
 
@@ -1524,16 +1538,20 @@ namespace Crow
 					ActiveWidget.onMouseUp (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Release));
 					ActiveWidget = null;
 				}
+				DbgLogger.EndEvent (DbgEvtType.MouseUp);
 				return true;
             }
 
-			if (_activeWidget == null)
+			if (_activeWidget == null) {
+				DbgLogger.EndEvent (DbgEvtType.MouseUp);
 				return false;
+			}
 
 			_activeWidget.onMouseUp (_activeWidget, new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Release));
 
 			if (_activeWidget == null) {
 				Debug.WriteLine ("[BUG]Mystery reset of _activeWidget");
+				DbgLogger.EndEvent (DbgEvtType.MouseUp | DbgEvtType.Error);
 				return true;
 			}
 
@@ -1546,6 +1564,7 @@ namespace Crow
 			//			if (!lastActive.MouseIsIn (Mouse.Position)) {
 			//				ProcessMouseMove (Mouse.X, Mouse.Y);
 			//			}
+			DbgLogger.EndEvent (DbgEvtType.MouseUp);
 			return true;
 		}
 		/// <summary>
