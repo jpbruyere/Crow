@@ -24,7 +24,7 @@ namespace Crow
 			return string.Format ("{0} ({1},{2})", FilePath, Line, Column);
 		}
 	}
-	public class Style : Dictionary<string, object>
+	public class Style : Dictionary<string, string>
 	{
 		#if DESIGN_MODE
 		public Dictionary<string, FileLocation> Locations = new Dictionary<string, FileLocation>();
