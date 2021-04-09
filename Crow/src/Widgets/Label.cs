@@ -161,11 +161,25 @@ namespace Crow
 					getLines ();
 					textMeasureIsUpToDate = false;
 				}
+				constraintsLocations();
 				NotifyValueChanged ("Text", Text);
 				OnTextChanged (this, new TextChangeEventArgs (new TextChange (0, oldTextLength, _text)));
 				RegisterForGraphicUpdate ();
             }
         }
+
+		void constraintsLocations () {
+			if (selectionStart.HasValue) {
+				CharLocation loc = CurrentLoc.Value;
+				int l = Math.Min (loc.Line, lines.Count - 1);
+				selectionStart = new CharLocation (l, Math.Min (loc.Column, lines[l].Length - 1));
+			}
+			if (CurrentLoc.HasValue) {
+				CharLocation loc = CurrentLoc.Value;
+				int l = Math.Min (loc.Line, lines.Count - 1);
+				CurrentLoc = new CharLocation (l, Math.Min (loc.Column, lines[l].Length - 1));
+			}
+		}
 
 		/// <summary>
 		/// If 'true', linebreaks will be interpreted. If 'false', linebreaks are threated as unprintable
@@ -181,6 +195,7 @@ namespace Crow
 					return;
 				_multiline = value;
 				getLines ();
+				constraintsLocations();
 				NotifyValueChangedAuto (_multiline);
 				RegisterForGraphicUpdate();
 			}
@@ -445,6 +460,7 @@ namespace Crow
 								selRect.Width = selEnd.VisualCharXPosition - selStart.VisualCharXPosition;
 							}
 
+
 							gr.SetSource (selBackground);
 							gr.Rectangle (selRect);
 							if (encodedBytes < 0)
@@ -518,7 +534,7 @@ namespace Crow
 			return true;
 		}
 
-		void updateLocation (Context gr, int clientWidth, ref CharLocation? location) {
+		protected void updateLocation (Context gr, int clientWidth, ref CharLocation? location) {
 			if (location == null)
 				return;
 			CharLocation loc = location.Value;

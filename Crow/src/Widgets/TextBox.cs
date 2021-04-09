@@ -133,17 +133,20 @@ namespace Crow
 		}
 
 		/// <summary> Process scrolling vertically, or if shift is down, vertically </summary>
-		public override void onMouseWheel (object sender, MouseWheelEventArgs e) {
-			base.onMouseWheel (sender, e);
+		public override void onMouseWheel (object sender, MouseWheelEventArgs e) {			
 			if (IFace.Shift)
 				ScrollX += e.Delta * MouseWheelSpeed;
 			else
 				ScrollY -= e.Delta * MouseWheelSpeed;
+			
+			e.Handled = true;
+			base.onMouseWheel (sender, e);
 		}
-        public override void onMouseMove (object sender, MouseMoveEventArgs e) {
-            base.onMouseMove (sender, e);
-            if (!HasFocus || !IFace.IsDown (MouseButton.Left))
-                return;
+        public override void onMouseMove (object sender, MouseMoveEventArgs e) {            
+            if (!HasFocus || !IFace.IsDown (MouseButton.Left)) {
+                base.onMouseMove (sender, e);
+				return;
+			}
             Rectangle cb = ClientRectangle;
 
             if (CurrentLoc.Value.VisualCharXPosition < scrollX)
@@ -161,6 +164,8 @@ namespace Crow
             else if (CurrentLoc.Value.Line > lastLine)
                 ScrollY = (int)(lineHeight * (CurrentLoc.Value.Line + 1)) - cb.Height;
 
+			e.Handled = true;
+			base.onMouseMove (sender, e);
         }
         #endregion
         public override void OnLayoutChanges (LayoutingType layoutType) {
