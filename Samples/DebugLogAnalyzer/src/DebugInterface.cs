@@ -41,11 +41,11 @@ namespace Crow
 				}
 				catch (System.Exception ex)
 				{
-					if (Monitor.IsEntered(LayoutMutex))
+					while (Monitor.IsEntered(LayoutMutex))
 						Monitor.Exit (LayoutMutex);
-					if (Monitor.IsEntered(UpdateMutex))
+					while (Monitor.IsEntered(UpdateMutex))
 						Monitor.Exit (UpdateMutex);
-					if (Monitor.IsEntered(ClippingMutex))
+					while (Monitor.IsEntered(ClippingMutex))
 						Monitor.Exit (ClippingMutex);
 					delSetCurrentException (ex);					
 					ClearInterface();

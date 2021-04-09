@@ -190,9 +190,9 @@ namespace Crow
 					double tmp = mouseDownInitValue + (double)m.Y * unit;
 					tmp -= tmp % SmallIncrement;
 					Value = tmp;
-				}
-				e.Handled = true;
+				}				
 			}
+			e.Handled = true;
 			
 			base.onMouseMove (sender, e);
 		}

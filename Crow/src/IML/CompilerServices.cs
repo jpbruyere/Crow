@@ -136,6 +136,7 @@ namespace Crow.IML
 			il.Emit (OpCodes.Stfld, miSetCurIface);
 		}
 
+		//TODO: should be able to handle struct in default values.
 		public static void EmitSetValue(ILGenerator il, PropertyInfo pi, object val){
 			il.Emit (OpCodes.Ldloc_0);
 

@@ -127,6 +127,9 @@ namespace Crow
             public override string ToString ()
                 => $"{Prop1}, {Prop2}";
 
+			public void OnValidateCommand (Object sender, ValidateEventArgs e) {
+				Console.WriteLine ($"Validation: {e.ValidatedText}");
+			}
         }
         public class TestClassVC : IValueChange
         {
@@ -160,7 +163,7 @@ namespace Crow
                     => $"{Prop1}, {Prop2}";
 
         }
-        TestClass tcInstance;// = new TestClass () { Prop1 = "instance 0 prop1 value", Prop2 = "instance 0 prop2 value" };
+        TestClass tcInstance = new TestClass () { Prop1 = "instance 0 prop1 value", Prop2 = "instance 0 prop2 value" };
         TestClassVC tcVCInstance;// = new TestClassVC () { Prop1 = "instance 0 prop1 value", Prop2 = "instance 0 prop2 value" };
         TestClass tcInstance1 = new TestClass () { Prop1 = "instance 1 prop1 value", Prop2 = "instance 1 prop2 value" };
         TestClassVC tcVCInstance1 = new TestClassVC () { Prop1 = "instance 1 prop1 value", Prop2 = "instance 1 prop2 value" };

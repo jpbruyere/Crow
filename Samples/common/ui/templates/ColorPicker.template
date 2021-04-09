@@ -1,60 +1,34 @@
 ﻿<?xml version="1.0"?>
-<TabView >
-	<TabItem Caption="HSV">
-		<Border Background="{./Background}"	Foreground="{./Foreground}" Width="Stretched"
-				CornerRadius="{./CornerRadius}" BorderWidth="1">		
-			<VerticalStack Margin="2">
-				<Widget Width="30" Height="16" Background="{./CurrentColor}"/>
-				<HorizontalStack Height="Fit">
-					<Label Style="labColor" Text="R:"/>
-					<ColorSlider Name="cs" Component="Red" CurrentColor="{²../../../../../../CurrentColor}"/>
-					<Label Style="labColorV" Text="{../cs.CurrentValue}" />
-				</HorizontalStack>
-				<HorizontalStack Height="Fit">
-					<Label Style="labColor" Text="G:"/>
-					<ColorSlider Name="cs" Component="Green" CurrentColor="{²../../../../../../CurrentColor}"/>
-					<Label Style="labColorV" Text="{../cs.CurrentValue}" />
-				</HorizontalStack>
-				<HorizontalStack Height="Fit">
-					<Label Style="labColor" Text="B:"/>
-					<ColorSlider Name="cs" Component="Blue" CurrentColor="{²../../../../../../CurrentColor}"/>
-					<Label Style="labColorV" Text="{../cs.CurrentValue}" />
-				</HorizontalStack>
-				<HorizontalStack Height="Fit">
-					<Label Style="labColor" Text="A:"/>
-					<ColorSlider Name="cs" Component="Alpha" CurrentColor="{²../../../../../../CurrentColor}"/>
-					<Label Style="labColorV" Text="{../cs.CurrentValue}" />
-				</HorizontalStack>
-				<HorizontalStack Height="Fit">
-					<Label Style="labColor" Text="H:"/>
-					<ColorSlider Name="cs" Component="Hue" CurrentColor="{²../../../../../../CurrentColor}"/>
-					<Label Style="labColorV" Text="{../cs.CurrentValue}" />
-				</HorizontalStack>
-				<HorizontalStack Height="Fit">
-					<Label Style="labColor" Text="S:"/>
-					<ColorSlider Name="cs" Component="Saturation" CurrentColor="{²../../../../../../CurrentColor}"/>
-					<Label Style="labColorV" Text="{../cs.CurrentValue}" />
-				</HorizontalStack>			
-				<HorizontalStack Height="Fit">
-					<Label Style="labColor" Text="V:"/>
-					<ColorSlider Name="cs" Component="Value" CurrentColor="{²../../../../../../CurrentColor}"/>
-					<Label Style="labColorV" Text="{../cs.CurrentValue}" />
-				</HorizontalStack>
-			</VerticalStack>			
-		</Border>
-	</TabItem>
-	<TabItem Caption="List" Height="Stretched">
-		<ListBox Data="{../../../ColorList}" SelectedItem="{²../../../CurrentColor}">
-			<Template>
-				<Scroller Name="scroller1" Margin="5">
-					<Wrapper Name="ItemsContainer" Height="Fit" VerticalAlignment="Top"/>
-				</Scroller>
-			</Template>
-			<ItemTemplate>
-				<Border Width="16" Height="16" Background="{}" Foreground="Transparent" Tooltip="{}"
-								MouseEnter="{Foreground=Black}"
-								MouseLeave="{Foreground=Transparent}"/>	
-			</ItemTemplate>
-		</ListBox>
-	</TabItem>
-</TabView>
+<Popper Margin="0" Caption="{./CurrentColor}" Background="{./Background}" >
+				<Template>
+					<CheckBox Margin="0" Caption="{./Caption}" IsChecked="{²./IsPopped}" Background="{./Background}">
+						<Template>
+							<HorizontalStack Margin="3"  Spacing="3" Background="{./Background}">
+								<Border Width="18" Height="12" CornerRadius="3"
+									Background="{../../../../CurrentColor}">
+								</Border>
+								<Label Width="Stretched" Text="{./Caption}" />
+							</HorizontalStack>
+						</Template>/>{}
+					</CheckBox>
+				</Template>
+				<TabView  MinimumSize="{../../MinimumPopupSize}" Width="Fit" Height="Fit"  >
+					<ColorPicker Name="HSV" CurrentColor="{²../../../CurrentColor}" Background="Onyx"/>
+					<ColorPicker IsVisible="false" Name="Names" CurrentColor="{²../../../CurrentColor}" Height="Stretched" Background="Onyx">
+						<Template>
+							<ListBox Width="Stretched" Data="{./AvailableColors}" SelectedItemChanged="./onSelectedItemChanged">
+								<Template>
+									<Scroller Name="scroller1" Margin="5" ClipToClientRect="true" Background="Onyx">
+										<Wrapper Name="ItemsContainer" Height="Fit" VerticalAlignment="Top"/>
+									</Scroller>
+								</Template>
+								<ItemTemplate>
+									<Border Width="16" Height="16" Background="{}" Foreground="Transparent" Tooltip="{}"
+															MouseEnter="{Foreground=Black}"
+															MouseLeave="{Foreground=Transparent}"/>	
+								</ItemTemplate>
+							</ListBox>
+						</Template>
+					</ColorPicker>
+			</TabView>
+		</Popper>

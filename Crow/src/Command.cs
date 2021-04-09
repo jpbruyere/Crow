@@ -7,6 +7,7 @@ using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Crow {
 	public abstract class CommandBase : IValueChange {
@@ -20,7 +21,7 @@ namespace Crow {
 		
 		#region CTOR
 		protected CommandBase() {}
-		protected CommandBase (string _caption, string _icon)
+		protected CommandBase (string _caption, string _icon = null)
 		{
 			caption = _caption;			
 			icon = _icon;
@@ -60,7 +61,7 @@ namespace Crow {
 			NotifyValueChanged ("Caption", caption);
 		}
 	}
-	public class CommandGroup : CommandBase, IEnumerable
+	public class CommandGroup : CommandBase, IEnumerable, IList<CommandBase>
 	{
 		public ObservableList<CommandBase> Commands = new ObservableList<CommandBase>();
 
@@ -69,11 +70,44 @@ namespace Crow {
 			base (caption, icon) {
 			Commands.AddRange (commands);
 		}
+		public CommandGroup (string caption, params CommandBase[] commands) :
+			base (caption) {
+			Commands.AddRange (commands);
+		}
 		public CommandGroup (params CommandBase[] commands) {
 			Commands.AddRange (commands);
 		}
 
+		
+		public int Count => Commands.Count;
+
+		public bool IsReadOnly => false;
+
+		public CommandBase this[int index] { get => Commands[index]; set => Commands[index] = value; }
+
 		public IEnumerator GetEnumerator() => Commands.GetEnumerator ();
+
+		public int IndexOf(CommandBase item) => Commands.IndexOf (item);
+
+		public void Insert(int index, CommandBase item) => Commands.Insert(index, item);
+
+		public void RemoveAt(int index) => Commands.RemoveAt(index);
+
+		public void Add(CommandBase item) => Commands.Add (item);
+
+		public void Clear() => Commands.Clear();
+
+		public bool Contains(CommandBase item) => Commands.Contains (item);
+
+		public void CopyTo(CommandBase[] array, int arrayIndex) => Commands.CopyTo (array, arrayIndex);		
+
+		public bool Remove(CommandBase item) {			
+			Commands.Remove (item);
+			return true;
+		}
+
+		IEnumerator<CommandBase> IEnumerable<CommandBase>.GetEnumerator()
+			=> Commands.GetEnumerator();
 	}
 
 

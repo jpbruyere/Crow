@@ -40,7 +40,7 @@
 		<EmbeddedResource Include="$(SamplesDir)common\samples.style" >
 			<Link>common\%(Filename)%(Extension)</Link>
 		</EmbeddedResource>
-		<Compile Include="$(SamplesDir)common\SampleBase.cs">
+		<Compile Include="$(SamplesDir)common\*.cs">
 			<Link>common\%(Filename)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>

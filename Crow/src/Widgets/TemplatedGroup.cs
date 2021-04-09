@@ -65,7 +65,7 @@ namespace Crow {
 		/// Keep track of expanded subnodes and closed time to unload
 		/// </summary>
 		//Dictionary<GraphicObject, Stopwatch> nodes = new Dictionary<GraphicObject, Stopwatch>();
-		internal List<Widget> nodes = new List<Widget>();
+		internal List<Widget> nodes = new List<Widget>();//TODO:close time tracking
 		/// <summary>
 		/// Item templates file path, on disk or embedded.
 		/// 
@@ -157,6 +157,8 @@ namespace Crow {
 					ol.ListAdd -= Ol_ListAdd;
 					ol.ListRemove -= Ol_ListRemove;
 					ol.ListEdit -= Ol_ListEdit;
+					ol.ListClear -= Ol_ListClear;
+					
 				}
 
 				data = value;
@@ -166,6 +168,7 @@ namespace Crow {
 					ol.ListAdd += Ol_ListAdd;
 					ol.ListRemove += Ol_ListRemove;
 					ol.ListEdit += Ol_ListEdit;
+					ol.ListClear += Ol_ListClear;
 				}
 
 				NotifyValueChangedAuto (data);
@@ -220,6 +223,16 @@ namespace Crow {
 				throw new NotImplementedException ();
 			} else
 				itemsContainer.Children [e.Index].DataSource = e.Element;
+
+		}
+		void Ol_ListClear (object sender, ListChangedEventArg e) {
+			cancelLoadingThread ();			
+			if (this.isPaged) {
+				throw new NotImplementedException ();
+			} else {
+				lock (IFace.UpdateMutex)
+					itemsContainer.ClearChildren ();
+			}
 
 		}
 
@@ -334,24 +347,30 @@ namespace Crow {
 		void cancelLoadingThread(){
 			if (loadingThread == null)
 				return;
-			bool updateMx = Monitor.IsEntered (IFace.UpdateMutex);
-			bool layoutMx = Monitor.IsEntered (IFace.LayoutMutex);
 
-			DbgLogger.AddEvent (DbgEvtType.TGCancelLoadingThread, this);
+			DbgLogger.StartEvent (DbgEvtType.TGCancelLoadingThread, this);
 
-			if (layoutMx)
-				Monitor.Exit (IFace.LayoutMutex);
-			if (updateMx)
+			int updateMx = 0, layoutMx = 0;
+
+			while (Monitor.IsEntered (IFace.UpdateMutex)) {
 				Monitor.Exit (IFace.UpdateMutex);
+				updateMx++;
+			}
+			while (Monitor.IsEntered (IFace.LayoutMutex)) {
+				Monitor.Exit (IFace.LayoutMutex);
+				layoutMx++;
+			}			
 
 			loadingThread.Cancel ();
 
-			if (layoutMx)
+			for (int i = 0; i < layoutMx; i++)
 				Monitor.Enter (IFace.LayoutMutex);
-			if (updateMx)
+			for (int i = 0; i < updateMx; i++)
 				Monitor.Enter (IFace.UpdateMutex);
 
 			loadingThread = null;
+			
+			DbgLogger.EndEvent (DbgEvtType.TGCancelLoadingThread);
 		}
 		void loadPage(IEnumerable _data, Group page, string _dataTest)
 		{

@@ -52,7 +52,7 @@ namespace Crow
 		/// <summary> Vertical Scrolling Position </summary>
 		[DefaultValue(0)]
 		public virtual int ScrollY {
-			get { return scrollY; }
+			get => scrollY;
 			set {
 				if (scrollY == value)
 					return;
@@ -75,7 +75,7 @@ namespace Crow
 		/// <summary> Horizontal Scrolling maximum value </summary>
 		[DefaultValue(0)]
 		public virtual int MaxScrollX {
-			get { return maxScrollX; }
+			get => maxScrollX;
 			set {
 				if (maxScrollX == value)
 					return;
@@ -92,7 +92,7 @@ namespace Crow
 		/// <summary> Vertical Scrolling maximum value </summary>
 		[DefaultValue(0)]
 		public virtual int MaxScrollY {
-			get { return maxScrollY; }
+			get => maxScrollY;
 			set {
 				if (maxScrollY == value)
 					return;
@@ -109,7 +109,7 @@ namespace Crow
 		/// <summary> Mouse Wheel Scrolling multiplier </summary>
 		[DefaultValue(1)]
 		public virtual int MouseWheelSpeed {
-			get { return mouseWheelSpeed; }
+			get => mouseWheelSpeed;
 			set {
 				if (mouseWheelSpeed == value)
 					return;

@@ -166,8 +166,9 @@ namespace Crow
 		#region GraphicObject overrides
 		public override void onMouseLeave (object sender, MouseMoveEventArgs e)
 		{
-			base.onMouseLeave (this, e);
 			IsPopped = false;
+			e.Handled = true;
+			base.onMouseLeave (this, e);
 		}
 		public override bool MouseIsIn (Point m)
 		{			

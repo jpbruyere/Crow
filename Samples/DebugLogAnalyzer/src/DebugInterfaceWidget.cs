@@ -216,9 +216,16 @@ namespace Crow
 
 		public override void onMouseMove(object sender, MouseMoveEventArgs e)
 		{
-			if (initialized) {				
-				Point m = ScreenPointToLocal (e.Position);			
-				delMouseMove (m.X, m.Y);									
+			if (initialized) {
+				try
+				{
+					Point m = ScreenPointToLocal (e.Position);
+					delMouseMove (m.X, m.Y);
+				}
+				catch (System.Exception ex)
+				{
+					Console.WriteLine($"[Error][DebugIFace mouse move]{ex}");
+				}
 				e.Handled = true;
 			}
 			base.onMouseMove(sender, e);
@@ -226,7 +233,14 @@ namespace Crow
 		public override void onMouseDown(object sender, MouseButtonEventArgs e)
 		{
 			if (initialized) {				
-				delMouseDown (e.Button);
+				try
+				{
+					delMouseDown (e.Button);
+				}
+				catch (System.Exception ex)
+				{
+					Console.WriteLine($"[Error][DebugIFace mouse down]{ex}");
+				}
 				e.Handled=true;
 			}
 			base.onMouseDown (sender, e);			
@@ -234,7 +248,14 @@ namespace Crow
 		public override void onMouseUp(object sender, MouseButtonEventArgs e)
 		{
 			if (initialized) {				
-				delMouseUp (e.Button);			
+				try
+				{
+					delMouseUp (e.Button);			
+				}
+				catch (System.Exception ex)
+				{
+					Console.WriteLine($"[Error][DebugIFace mouse up]{ex}");
+				}
 				e.Handled=true;
 			}
 			base.onMouseUp (sender, e);

@@ -1,5 +1,5 @@
 ﻿<VerticalStack>
-	<ColorPicker Name="cp"  Height="20" Background="Grey" >
+	<ColorPicker Name="cp"  >
 		<Template>
 			<Popper Margin="0" Caption="{./CurrentColor}" Background="{./Background}" >
 				<Template>
@@ -14,33 +14,29 @@
 						</Template>/>{}
 					</CheckBox>
 				</Template>
-				<TabView TabWidth="60" LeftSlope="0" RightSlope="0" MinimumSize="{../../MinimumPopupSize}" Width="Fit" Height="Fit" ActivateNewTab="false">
-					<TabItem Template="/mnt/devel/crow/Samples/common/ui/templates/TabItem.template" Caption="HSV" Width="Fit" Height="Fit">
-						<ColorPicker CurrentColor="{²../../../../CurrentColor}" />
-					</TabItem>
-					<TabItem Template="/mnt/devel/crow/Samples/common/ui/templates/TabItem.template" Caption="Names" Width="Fit" Height="Stretched">						
-						<ColorPicker CurrentColor="{²../../../../CurrentColor}" Height="Stretched" >
-							<Template>
-								<ListBox Margin="0" Width="Stretched" Data="{./AvailableColors}" SelectedItemChanged="./onSelectedItemChanged">
-									<Template>
-										<Scroller Name="scroller1" Margin="5" ClipToClientRect="true" >
-											<Wrapper Name="ItemsContainer" Height="Fit" VerticalAlignment="Top"/>
-										</Scroller>
-									</Template>
-									<ItemTemplate>
-										<Border Width="16" Height="16" Background="{}" Foreground="Transparent" Tooltip="{}"
-																MouseEnter="{Foreground=Black}"
-																MouseLeave="{Foreground=Transparent}"/>	
-									</ItemTemplate>
-								</ListBox>
-							</Template>
-						</ColorPicker>
-					</TabItem>
-				</TabView>
+				<TabView  MinimumSize="{../../MinimumPopupSize}" Width="Fit" Height="Fit"  >
+					<ColorPicker Name="HSV" CurrentColor="{²../../../CurrentColor}" Background="Onyx"/>
+					<ColorPicker IsVisible="false" Name="Names" CurrentColor="{²../../../CurrentColor}" Height="Stretched" Background="Onyx">
+						<Template>
+							<ListBox Width="Stretched" Data="{./AvailableColors}" SelectedItemChanged="./onSelectedItemChanged">
+								<Template>
+									<Scroller Name="scroller1" Margin="5" ClipToClientRect="true" Background="Onyx">
+										<Wrapper Name="ItemsContainer" Height="Fit" VerticalAlignment="Top"/>
+									</Scroller>
+								</Template>
+								<ItemTemplate>
+									<Border Width="16" Height="16" Background="{}" Foreground="Transparent" Tooltip="{}"
+															MouseEnter="{Foreground=Black}"
+															MouseLeave="{Foreground=Transparent}"/>	
+								</ItemTemplate>
+							</ListBox>
+						</Template>
+					</ColorPicker>
+			</TabView>
 			</Popper>
 		</Template>
 	</ColorPicker>
-	<Border CornerRadius="5" Width="60" Height="40" Background="{../cp.CurrentColor}">
+	<Border CornerRadius="5" Width="100" Height="80" Background="{../cp.CurrentColor}">
 		<Label Text="{../../cp.CurrentColor}"/>
 	</Border>
 </VerticalStack>
