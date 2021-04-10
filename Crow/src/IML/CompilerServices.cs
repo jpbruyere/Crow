@@ -84,6 +84,7 @@ namespace Crow.IML
 		internal static MethodInfo miGetITempFromDic = typeof(Dictionary<string, ItemTemplate>).GetMethod ("get_Item", new Type[] { typeof(string) });
 		internal static FieldInfo fldItemTemplates = typeof(TemplatedGroup).GetField("ItemTemplates");
 		internal static MethodInfo miLoadPage = typeof(TemplatedGroup).GetMethod ("loadPage", BindingFlags.Instance | BindingFlags.NonPublic| BindingFlags.Public);
+		internal static MethodInfo miRegisterSubData = typeof(TemplatedGroup).GetMethod ("registerSubData", BindingFlags.Instance | BindingFlags.NonPublic);
 		internal static MethodInfo miIsAlreadyExpanded = typeof(TemplatedGroup).GetMethod("emitHelperIsAlreadyExpanded", BindingFlags.Instance | BindingFlags.NonPublic);
 		
 		internal static MethodInfo miCreateExpDel = typeof(ItemTemplate).GetMethod ("CreateExpandDelegate");

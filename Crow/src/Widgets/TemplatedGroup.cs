@@ -133,8 +133,14 @@ namespace Crow {
 			set {
 				if (SelectedItem == value)
 					return;
-					
+				
+				if (selectedItem is ISelectable oldItem)
+					oldItem.IsSelected = false;
+
 				selectedItem = value;
+
+				if (selectedItem is ISelectable newItem)
+					newItem.IsSelected = true;
 
 				NotifyValueChanged ("SelectedItem", SelectedItem);
 				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
@@ -374,11 +380,6 @@ namespace Crow {
 		}
 		void loadPage(IEnumerable _data, Group page, string _dataTest)
 		{
-			#if DEBUG_LOAD
-			Stopwatch loadingTime = Stopwatch.StartNew ();
-			#endif
-
-
 //			if (typeof(TabView).IsAssignableFrom (items.GetType ())||
 //				typeof(Menu).IsAssignableFrom (this.GetType())||
 //				typeof(Wrapper).IsAssignableFrom (items.GetType ())) {
@@ -416,12 +417,6 @@ namespace Crow {
 //			lock (CurrentInterface.LayoutMutex)
 //				items.AddChild (page);
 
-#if DEBUG_LOAD
-			loadingTime.Stop ();
-			using (StreamWriter sw = new StreamWriter ("loading.log", true)) {
-				sw.WriteLine ($"NEW ;{this.ToString(),-50};{loadingTime.ElapsedTicks,8};{loadingTime.ElapsedMilliseconds,8}");
-			}
-#endif
 		}
 
 		protected void loadItem(object o, Group page, string _dataTest){
@@ -586,6 +581,24 @@ namespace Crow {
 		public void OnUpdateClick (object sender, MouseEventArgs e) {
 			if (data is IObservableList)
 				(data as IObservableList).RaiseEdit ();
+		}
+
+
+		void registerSubData (IEnumerable datas, string dataTest, Group itemsContainer){//, object dataParent) {
+			/*if (dataParent is IValueChange vc) {
+
+			}*/
+			if (datas is IObservableList ol) {
+				ol.ListAdd += (sender, e) => loadItem (e.Element, itemsContainer, dataTest);
+				ol.ListRemove += (sender, e) => itemsContainer.DeleteChild (e.Index);
+				ol.ListEdit += (sender, e) => itemsContainer.Children [e.Index].DataSource = e.Element;
+				ol.ListClear += (sender, e) => {	lock (IFace.UpdateMutex)
+														itemsContainer.ClearChildren ();};
+				
+			}
+		}
+		void onDatasChanged (object sender, ValueChangeEventArgs e) {
+			
 		}
 	}
 }

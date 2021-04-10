@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Crow.IML;
+using System.Collections;
 
 namespace Crow
 {
@@ -136,14 +137,16 @@ namespace Crow
 			//DM is bound to templatedGroup root (arg0)
 			//arg1 is the sender of the expand event
 			DynamicMethod dm = new DynamicMethod ("dyn_expand_" + fetchMethodName,
-				typeof (void), args,typeof(TemplatedGroup), true);
+				typeof (void), args, typeof(TemplatedGroup), true);			
 
 			System.Reflection.Emit.Label gotoEnd;
 			System.Reflection.Emit.Label ifDataIsNull;
 			System.Reflection.Emit.Label gotoItemsContainerNotFound;
 
-			ILGenerator il = dm.GetILGenerator (256);
+			ILGenerator il = dm.GetILGenerator (256);			
+			
 			il.DeclareLocal(typeof(Widget));
+			il.DeclareLocal(typeof(IEnumerable));
 
 			gotoEnd = il.DefineLabel ();
 			ifDataIsNull = il.DefineLabel ();
@@ -181,11 +184,26 @@ namespace Crow
 				}else
 					emitGetSubData(il, dataType);			
 			}
+			il.Emit (OpCodes.Stloc_1);//save and reload datas IEnumerable for registering IObsList
+			il.Emit (OpCodes.Ldloc_1);
+
 			//set 'return' from the fetch method as 'data' of the list
 			//il.Emit (OpCodes.Callvirt, piData.GetSetMethod ());
 			il.Emit (OpCodes.Ldloc_0);//load second arg of loadPage, the sender node
 			il.Emit (OpCodes.Ldstr, dataTest);//load 3rd arg, dataTest kind on subitems
 			il.Emit (OpCodes.Callvirt, CompilerServices.miLoadPage);
+
+			//try register Observable list events
+			il.Emit (OpCodes.Ldarg_0);//root templated group
+			il.Emit (OpCodes.Ldloc_1);//datas enumerable
+			il.Emit (OpCodes.Ldstr, dataTest);//load dataTest kind on subitems
+			il.Emit (OpCodes.Ldloc_0);//load items container
+			//load datas parent
+			/*il.Emit (OpCodes.Ldarg_0);//push root TemplatedGroup into the stack
+			il.Emit (OpCodes.Ldarg_1);//load sender node of expand
+			il.Emit (OpCodes.Callvirt, CompilerServices.miGetDataSource);*/
+			il.Emit (OpCodes.Call, CompilerServices.miRegisterSubData);
+
 			il.Emit (OpCodes.Br, gotoEnd);
 
 			il.MarkLabel(gotoItemsContainerNotFound);
