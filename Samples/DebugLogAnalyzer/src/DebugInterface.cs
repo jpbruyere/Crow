@@ -32,6 +32,7 @@ namespace Crow
 		string source;
 		Action delRegisterForRepaint;//call RegisterForRepaint in the container widget (DebugInterfaceWidget)
 		Action<Exception> delSetCurrentException;
+		Func<object> delGetScreenCoordinate;
 
 		void interfaceThread () {
 			while (!Terminate) {
@@ -68,6 +69,7 @@ namespace Crow
 			Type t = w.GetType();
 			delRegisterForRepaint = (Action)Delegate.CreateDelegate(typeof(Action), w, t.GetMethod("RegisterForRepaint"));
 			delSetCurrentException = (Action<Exception>)Delegate.CreateDelegate(typeof(Action<Exception>), w, t.GetProperty("CurrentException").GetSetMethod());
+			delGetScreenCoordinate = (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), w, t.GetMethod("GetScreenCoordinates"));
 		}
 		public void ResetDirtyState () {
 			IsDirty = false;
@@ -109,6 +111,11 @@ namespace Crow
 					g.RegisterForLayouting (LayoutingType.All);
 				RegisterClip (clientRectangle);
 			}				
-		}				
+		}
+		public override void ForceMousePosition()
+		{
+			Point p = (Point)delGetScreenCoordinate();
+			Glfw.Glfw3.SetCursorPosition (WindowHandle, p.X + MousePosition.X, p.Y + MousePosition.Y);
+		}
 	}
 }

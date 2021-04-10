@@ -140,16 +140,19 @@ namespace Crow
 
 		public bool CrowDebuggerOK => initialized;
 		public bool CrowDebuggerNOK => !initialized;
-		void notifyCrowDebuggerState () {
+		public string CrowDebuggerErrorMessage = "";
+		void notifyCrowDebuggerState (string errorMsg = null) {
 			NotifyValueChanged("CrowDebuggerOK", CrowDebuggerOK);
 			NotifyValueChanged("CrowDebuggerNOK", CrowDebuggerNOK);
+			CrowDebuggerErrorMessage = errorMsg;
+			NotifyValueChanged("CrowDebuggerErrorMessage", CrowDebuggerErrorMessage);
 		}
 
 		void tryStartDebugInterface () {
 			if (initialized)
 				return;
 			if (!File.Exists (crowDbgAssemblyLocation))	{
-				notifyCrowDebuggerState();
+				notifyCrowDebuggerState($"Crow.dll for debugging file not found");
 				return;
 			}
 			
@@ -161,7 +164,7 @@ namespace Crow
 
 				Type debuggerType = crowAssembly.GetType("Crow.DbgLogger");
 				if (!(bool)debuggerType.GetField("IsEnabled").GetValue(null)) {
-					notifyCrowDebuggerState();
+					notifyCrowDebuggerState("Crow.dll must be compiled with CrowDebugLogEnabled='True'");
 					return;
 				}				
 
@@ -201,6 +204,7 @@ namespace Crow
 				dbgIfaceType.GetMethod("Run").Invoke (dbgIFace, null);
 
 				initialized = true;
+				notifyCrowDebuggerState();
 										
 				//Console.WriteLine($"DbgIFace: LoadCtx:{AssemblyLoadContext.GetLoadContext (dbgIFace.GetType().Assembly).Name})");
 			//}
@@ -298,5 +302,7 @@ namespace Crow
 				dla.Events = events;
 			}
 		}
+
+		public virtual object GetScreenCoordinates () => ScreenCoordinates(Slot).TopLeft;
 	}
 }

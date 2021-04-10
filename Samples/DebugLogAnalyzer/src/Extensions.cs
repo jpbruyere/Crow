@@ -7,7 +7,8 @@ namespace DebugLogAnalyzer {
 
 		public static CommandGroup GetCommands (this System.IO.DirectoryInfo di) =>
 			new CommandGroup(
-				new Command ("Set as root", ()=> {Program.CurrentProgramInstance.CurrentDir = di.FullName;}));		
+				new Command ("Set as root", ()=> {Program.CurrentProgramInstance.CurrentDir = di.FullName;})				
+			);		
 		public static CommandGroup GetCommands (this System.IO.FileInfo fi) =>
 			new CommandGroup(
 				new Command ("Delete", (sender0) => {

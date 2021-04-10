@@ -67,7 +67,9 @@
 					<Widget Width="5" Height="5" Background="SeaGreen" IsVisible="{../../../../dbgIfaceWidget.HasFocus}"/>
 					<Widget Width="5" Height="5" Background="Yellow" IsVisible="{../../../../dbgIfaceWidget.IsHover}"/>
 					<TextBox Text="{²CrowDbgAssemblyLocation}" Margin="2"/>
-				</HorizontalStack>				
+				</HorizontalStack>
+				<Label Background="Red" Foreground="White" Margin="5" Width="Stretched" Text="{../../../dbgIfaceWidget.CrowDebuggerErrorMessage}"
+					IsVisible="{../../../dbgIfaceWidget.CrowDebuggerNOK}"/>
 				<CheckBox Name="cbFile" Caption="Record to file" IsChecked="{²DebugLogToFile}" Background="Onyx"/>
 				<HorizontalStack Height="Fit" Width="Stretched" IsEnabled="{../cbFile.IsChecked}" Background="Onyx" Margin="5">
 					<Label Text="Debug log output file:" Fit="true"/>

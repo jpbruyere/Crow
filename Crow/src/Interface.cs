@@ -1365,7 +1365,9 @@ namespace Crow
 					HoverWidget = value;
             }
         }
-		
+		public virtual void ForceMousePosition () {
+			Glfw3.SetCursorPosition (hWin, MousePosition.X, MousePosition.Y);
+		}
 
 		/// <summary>Processes mouse move events from the root container, this function
 		/// should be called by the host on mouse move event to forward events to crow interfaces</summary>
@@ -1386,7 +1388,7 @@ namespace Crow
 						stickedWidget = null;
 						stickyMouseDelta = default;
 					} else {
-						Glfw3.SetCursorPosition (hWin, MousePosition.X, MousePosition.Y);
+						ForceMousePosition ();
 						DbgLogger.EndEvent (DbgEvtType.MouseMove);
 						return true;
 					}
