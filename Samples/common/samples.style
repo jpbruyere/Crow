@@ -52,6 +52,16 @@ DbgLogViewer{
 DockWindow{
 	Background = "0.1,0.1,0.1,0.5";
 }
+DockStack {
+	Margin="0";
+	Spacing="0";
+	AllowDrop = "true";
+	AllowedDropTypes = "Crow.DockWindow";
+	Focusable="true";
+	//DragEnter="{Background=Blue}";
+	//DragLeave="{Background=Transparent}";
+	//EndDrag="{Background=Jet}";
+}
 
 valignStyle {
 	Template="#ui.enumSingleSVG.itmp";

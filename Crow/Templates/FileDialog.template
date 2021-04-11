@@ -8,7 +8,7 @@
 			<Border CornerRadius="0" BorderWidth="1" Foreground="Transparent"  Height="12" Width="12"
 				MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
 				<Image Focusable="true" Name="Image" Margin="0" Width="Stretched" Height="Stretched" Path="#Crow.Icons.exit2.svg"
-					 MouseClick="./butQuitPress"/>
+					 MouseClick="./onQuitPress"/>
 			</Border>
 			<Widget Width="5"/>
 		</HorizontalStack>

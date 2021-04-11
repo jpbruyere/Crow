@@ -1,0 +1,12 @@
+DockStack {
+	Margin="0";
+	Spacing="0";
+	//Background="DimGrey";
+}
+DockWindow {
+	Template="#ui.dockWin.template";
+}
+TabView {
+	Template="#ui.TabView.template";
+	//Background="Onyx";
+}

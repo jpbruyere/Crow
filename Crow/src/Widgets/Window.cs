@@ -154,74 +154,76 @@ namespace Crow
 		/// <param name="YDelta">mouse delta on the Y axis</param>
 		/// <param name="currentDirection">Current Direction of the operation, none for moving, other value for resizing in the given direction</param>
 		protected void moveAndResize (int XDelta, int YDelta, Direction currentDirection = (Direction)0) {
-			int currentLeft = this.Left;
-			int currentTop = this.Top;
-			int currentWidth, currentHeight;
+			lock (IFace.UpdateMutex) {
+				int currentLeft = this.Left;
+				int currentTop = this.Top;
+				int currentWidth, currentHeight;
 
-			if (currentLeft == 0) {
-				currentLeft = this.Slot.Left;
-				this.Left = currentLeft;
+				if (currentLeft == 0) {
+					currentLeft = this.Slot.Left;
+					this.Left = currentLeft;
+				}
+				if (currentTop == 0) {
+					currentTop = this.Slot.Top;
+					this.Top = currentTop;
+				}
+				if (this.Width.IsFixed)
+					currentWidth = this.Width;
+				else
+					currentWidth = this.Slot.Width;
+
+				if (this.Height.IsFixed)
+					currentHeight = this.Height;
+				else
+					currentHeight = this.Slot.Height;
+
+				switch (currentDirection) {
+				case Direction.None:
+					this.Left = currentLeft + XDelta;				
+					this.Top = currentTop + YDelta;
+					break;
+				case Direction.N:
+					this.Height = currentHeight - YDelta;
+					if (this.Height == currentHeight - YDelta)
+						this.Top = currentTop + YDelta;
+					break;
+				case Direction.S:
+					this.Height = currentHeight + YDelta;
+					break;
+				case Direction.W:
+					this.Width = currentWidth - XDelta;
+					if (this.Width == currentWidth - XDelta)
+						this.Left = currentLeft + XDelta;
+					break;
+				case Direction.E:
+					this.Width = currentWidth + XDelta;
+					break;
+				case Direction.NW:
+					this.Height = currentHeight - YDelta;
+					if (this.Height == currentHeight - YDelta)
+						this.Top = currentTop + YDelta;
+					this.Width = currentWidth - XDelta;
+					if (this.Width == currentWidth - XDelta)
+						this.Left = currentLeft + XDelta;
+					break;
+				case Direction.NE:
+					this.Height = currentHeight - YDelta;
+					if (this.Height == currentHeight - YDelta)
+						this.Top = currentTop + YDelta;
+					this.Width = currentWidth + XDelta;
+					break;
+				case Direction.SW:
+					this.Width = currentWidth - XDelta;
+					if (this.Width == currentWidth - XDelta)
+						this.Left = currentLeft + XDelta;
+					this.Height = currentHeight + YDelta;
+					break;
+				case Direction.SE:
+					this.Height = currentHeight + YDelta;
+					this.Width = currentWidth + XDelta;
+					break;
+				}				
 			}
-			if (currentTop == 0) {
-				currentTop = this.Slot.Top;
-				this.Top = currentTop;
-			}
-			if (this.Width.IsFixed)
-				currentWidth = this.Width;
-			else
-				currentWidth = this.Slot.Width;
-
-			if (this.Height.IsFixed)
-				currentHeight = this.Height;
-			else
-				currentHeight = this.Slot.Height;
-
-			switch (currentDirection) {
-			case Direction.None:
-				this.Left = currentLeft + XDelta;				
-				this.Top = currentTop + YDelta;
-				break;
-			case Direction.N:
-				this.Height = currentHeight - YDelta;
-				if (this.Height == currentHeight - YDelta)
-					this.Top = currentTop + YDelta;
-				break;
-			case Direction.S:
-				this.Height = currentHeight + YDelta;
-				break;
-			case Direction.W:
-				this.Width = currentWidth - XDelta;
-				if (this.Width == currentWidth - XDelta)
-					this.Left = currentLeft + XDelta;
-				break;
-			case Direction.E:
-				this.Width = currentWidth + XDelta;
-				break;
-			case Direction.NW:
-				this.Height = currentHeight - YDelta;
-				if (this.Height == currentHeight - YDelta)
-					this.Top = currentTop + YDelta;
-				this.Width = currentWidth - XDelta;
-				if (this.Width == currentWidth - XDelta)
-					this.Left = currentLeft + XDelta;
-				break;
-			case Direction.NE:
-				this.Height = currentHeight - YDelta;
-				if (this.Height == currentHeight - YDelta)
-					this.Top = currentTop + YDelta;
-				this.Width = currentWidth + XDelta;
-				break;
-			case Direction.SW:
-				this.Width = currentWidth - XDelta;
-				if (this.Width == currentWidth - XDelta)
-					this.Left = currentLeft + XDelta;
-				this.Height = currentHeight + YDelta;
-				break;
-			case Direction.SE:
-				this.Height = currentHeight + YDelta;
-				this.Width = currentWidth + XDelta;
-				break;
-			}			
 		}
 
 		bool maySize => sizingHandle == null ? false : resizable & sizingHandle.IsHover;

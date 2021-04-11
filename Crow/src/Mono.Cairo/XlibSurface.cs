@@ -4,9 +4,11 @@
 // Authors:
 //    Duncan Mak
 //    Miguel de Icaza.
+//	  JP Bruyère
 //
 // (C) Ximian Inc, 2003.
 // (C) Novell, Inc. 2003.
+// (C) JP Bruyère 2021
 //
 // This is an OO wrapper API for the Cairo API
 //
@@ -63,33 +65,13 @@ namespace Crow.Cairo {
 			NativeMethods.cairo_xlib_surface_set_size (Handle, width, height);
 		}
 
-		public int Depth {
-			get { return NativeMethods.cairo_xlib_surface_get_depth (Handle); }
-		}
-		
-		public IntPtr Display {
-			get { return NativeMethods.cairo_xlib_surface_get_display (Handle); }
-		}
+		public int Depth => NativeMethods.cairo_xlib_surface_get_depth (Handle);
+		public IntPtr Display => NativeMethods.cairo_xlib_surface_get_display (Handle);
+		public IntPtr Drawable => NativeMethods.cairo_xlib_surface_get_drawable (Handle);
+		public override int Width => NativeMethods.cairo_xlib_surface_get_width (Handle);		
+		public override int Height => NativeMethods.cairo_xlib_surface_get_height (Handle);		
 
-		public IntPtr Drawable {
-			get { return NativeMethods.cairo_xlib_surface_get_drawable (Handle); }
-		}
-
-		public int Height {
-			get { return NativeMethods.cairo_xlib_surface_get_height (Handle); }
-		}
-
-		public IntPtr Screen {
-			get { return NativeMethods.cairo_xlib_surface_get_screen (Handle); }
-		}
-
-		public IntPtr Visual {
-			get { return NativeMethods.cairo_xlib_surface_get_visual (Handle); }
-		}
-
-		public int Width {
-			get { return NativeMethods.cairo_xlib_surface_get_width (Handle); }
-		}
-
+		public IntPtr Screen => NativeMethods.cairo_xlib_surface_get_screen (Handle);
+		public IntPtr Visual=> NativeMethods.cairo_xlib_surface_get_visual (Handle);
 	}
 }

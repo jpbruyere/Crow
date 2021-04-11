@@ -23,6 +23,8 @@ WindowTitleBarForeground = "White";
 
 MenuBackground = "Jet";
 
+InactiveTabItem = "Jet";
+
 Button, CheckBox, RadioButton, ComboBox, Expandable,
 MessageBox, Popper, Slider, Spinner, TextBox {
 	//Focusable = "true";
@@ -32,6 +34,8 @@ MessageBox, Popper, Slider, Spinner, TextBox {
 	CornerRadius = "${ControlCornerRadius}";
 	Margin="0";
 }
+
+Border { Margin = "1"; }
 
 CheckBox { Caption = "CheckBox"; }
 RadioButton { Caption = "RadioButton"; }
@@ -153,10 +157,11 @@ winBorder {
 	BorderWidth = "${WindowBorderWidth}";
 	Foreground = "${WindowBorderColor}";
 	Background = "${WindowBackgroundColor}";	
-	Margin = "0";	
+	Margin = "1";	
 }
 WindowIconBorder {
 	BorderWidth="1";
+	Margin="1";
 	Foreground="Transparent";
 	Height="12";
 	Width="12";
@@ -171,23 +176,13 @@ ToolWindow {
 	Width = "150";
 	Height = "150";
 }
-Docker {
-	AllowDrop = "false";
-	Margin="0";
-	Focusable="true";
-}
 DockStack {
-	Margin="2";
-	Spacing="2";
+	Margin="0";
+	Spacing="1";
 	AllowDrop = "true";
 	AllowedDropTypes = "Crow.DockWindow";
-	Focusable="true";
-	//DragEnter="{Background=Blue}";
-	//DragLeave="{Background=Transparent}";
-	//EndDrag="{Background=Jet}";
 }
-DockWindow {
-	//Background = "Onyx";
+DockWindow {	
 	Focusable = "true";
 	AllowDrag = "true";
 	AllowDrop="true";
@@ -196,7 +191,12 @@ DockWindow {
 	Margin="0";
 	Width="200";
 	Height="200";
+	HorizontalAlignment="Left";
+	VerticalAlignment="Top";
 	//MinimumSize="50,50";
+}
+DockingTabView {
+	Template = "#Crow.DockingTabView.template";
 }
 FileDialog {
 	Template = "#Crow.FileDialog.template";

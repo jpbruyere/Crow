@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack>
+<VerticalStack Background="DimGrey">
 	<VerticalStack Name="Watches" Background="Black" Height="Fit" Width="Stretched">
 		<HorizontalStack Height="Fit">
 			<Label Style="smallLabel" Text="hover:" Width="50"/>
@@ -14,11 +14,11 @@
 			<Label Style="smallLabel" Text="{ActiveWidget}"/>
 		</HorizontalStack>
 	</VerticalStack>
-	<Label Text="Press 'F6' to add new windows"/>
-	<DockStack Name="mainDock" Height="Stretched"/>
+	<Label Text="Press 'F6' to add new windows, 'F2'/'F3' for save/restore"/>
+	<DockStack Name="mainDock" Height="Stretched" />
 	<!--<Splitter/>
 	<Button Caption="Refresh tree" MouseClick="refreshGraphicTree"/>
-	<TreeView IsRoot="true" Name="treeView" Data="{GraphicTree}">
+	<TreeView IsRoot="true" Name="treeView" Data="{GraphicTree}" Height="200">
 		<ItemTemplate>
 			<Border Width="Stretched" Focusable="true" Foreground="Transparent">
 				<HorizontalStack Spacing="5">
@@ -28,6 +28,7 @@
 					</Border>
 					<Widget Width="2" Height="5" Background="Blue" Visible="{IsHover}"/>
 					<Widget Width="5" Height="5" Background="Green" Visible="{Visible}"/>
+					<Label Text="{Caption}" Width="Fit"/>
 					<Label Text="{Name}" Width="Fit"/>
 					<Label Text="{LogicalParent}" Width="Stretched" Foreground="Yellow"/>
 				</HorizontalStack>
@@ -41,5 +42,5 @@
 			Path="#ui.GTreeExp.itemp"/>
 		<ItemTemplate DataType="Crow.TemplatedGroup" Data="GetChildren"
 			Path="#ui.GTreeExp.itemp"/>
-	</TreeView>	-->
+	</TreeView>-->
 </VerticalStack>

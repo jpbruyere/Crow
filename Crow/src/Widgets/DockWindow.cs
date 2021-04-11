@@ -4,6 +4,7 @@
 
 using System;
 using System.Xml.Serialization;
+using Crow.Cairo;
 using Glfw;
 
 namespace Crow
@@ -44,7 +45,7 @@ namespace Crow
 				NotifyValueChangedAuto (DockingPosition);
 			}
 		}
-		public override bool PointIsIn (ref Point m)
+		/*public override bool PointIsIn (ref Point m)
 		{			
 			if (!base.PointIsIn(ref m))
 				return false;
@@ -64,7 +65,7 @@ namespace Crow
 				}
 			}
 			return Slot.ContainsOrIsEqual(m);
-		}
+		}*/
 
 		public override void onDrag (object sender, MouseMoveEventArgs e)
 		{			
@@ -74,10 +75,71 @@ namespace Crow
 				moveAndResize (e.XDelta, e.YDelta, currentDirection);
 			
 			base.onDrag (sender, e);
-			if (IFace.DragAndDropOperation.DropTarget is DockStack ds)
+
+			if (isDocked)
+				return;
+
+			Alignment dockingPosSave = DockingPosition;
+			Rectangle r = default;
+
+			Console.WriteLine ($"onDrag target={IFace.DragAndDropOperation.DropTarget}");
+
+			if (IFace.DragAndDropOperation.DropTarget is DockStack ds) {
 				ds.onDragMouseMove (this, e);
-			else if (IFace.DragAndDropOperation.DropTarget is DockWindow dw)
-				(dw.Parent as DockStack)?.onDragMouseMove (this, e);
+				r = ds.ScreenCoordinates (ds.LastPaintedSlot);
+			}else if (IFace.DragAndDropOperation.DropTarget is DockWindow dw && dw.IsDocked == true) {
+				Point m = dw.ScreenPointToLocal (e.Position);
+				Rectangle dwCb = dw.ClientRectangle;				
+				dwCb.Inflate (dwCb.Width / -3, dwCb.Height / -3);
+				if (dwCb.ContainsOrIsEqual(m)) {
+					DockingPosition = Alignment.Center;
+					r = dw.ScreenCoordinates (dw.LastPaintedSlot);
+					Console.WriteLine ("center");
+				} else if (dw.Parent is DockStack dsp) {					
+					dsp.onDragMouseMove (this, e);
+					if (dsp.focusedChild == null)
+						r = dsp.ScreenCoordinates (dsp.LastPaintedSlot);
+					else
+						r = dsp.focusedChild.ScreenCoordinates (dsp.focusedChild.LastPaintedSlot);
+				}
+			}else
+				DockingPosition = Alignment.Undefined;
+
+			if (DockingPosition != dockingPosSave) {
+				if (DockingPosition == Alignment.Undefined) {
+					IFace.ClearDragImage ();
+					return;
+				}
+				switch (DockingPosition) {
+				case Alignment.Top:
+					r.Height /= 4;
+					break;
+				case Alignment.Bottom:
+					r.Y += r.Height - r.Height / 4;
+					r.Height /= 4;
+					break;
+				case Alignment.Left:
+					r.Width /= 4;
+					break;
+				case Alignment.Right:
+					r.X += r.Width - r.Width / 4;
+					r.Width /= 4;
+					break;
+				case Alignment.Center:
+					r.Inflate (r.Width / -3, r.Height / -3);
+					break;
+				}
+	            Surface dragImg = IFace.surf.CreateSimilar (Crow.Cairo.Content.ColorAlpha,	r.Width, r.Height);
+				using (Crow.Cairo.Context gr = new Crow.Cairo.Context(dragImg)) {
+					gr.LineWidth = 1;
+					gr.Rectangle (0,0,r.Width,r.Height);
+					gr.SetSource (0.2,0.3,0.9,0.5);
+					gr.FillPreserve ();
+					gr.SetSource (0.1,0.2,1);
+					gr.Stroke ();
+				}
+				IFace.CreateDragImage (dragImg, r, false);
+			}
 		}
         protected override void onDragEnter (object sender, DragDropEventArgs e) {
             base.onDragEnter (sender, e);
@@ -113,16 +175,40 @@ namespace Crow
 			if (!(isDocked || DockingPosition == Alignment.Undefined)) {
 				if (e.DropTarget is DockStack ds)
 					Dock (ds);
-				else if (e.DropTarget is DockWindow dw)
-					Dock (dw.Parent as DockStack);
+				else if (e.DropTarget is DockWindow dw) {
+					if (DockingPosition == Alignment.Center)
+						Dock (dw);
+					else
+						Dock (dw.Parent as DockStack);
+				}
 			}
 			base.onDrop (sender, e);
+			IFace.ClearDragImage ();
 		}
 		public void Undock () {
 			lock (IFace.UpdateMutex) {
-				DockStack ds = Parent as DockStack;
-				ds.Undock (this);
-
+				if (LogicalParent is TabView tv) {
+					tv.RemoveItem (this, false);
+					if (tv.Items.Count == 1) {
+						Widget w = tv.Items[0];
+						tv.RemoveItem (w, false);
+						DockStack ds = tv.Parent as DockStack;
+						int idx = ds.Children.IndexOf (tv);
+						ds.RemoveChild (tv);
+						ds.InsertChild (idx, w);
+						w.Width = tv.Width;
+						w.Height = tv.Height;
+						if (ds.stretchedChild == tv)
+							ds.stretchedChild = w;
+						tv.Dispose();
+						w.IsVisible = true;
+						ds.checkAlignments();
+					}
+				} else if (Parent is DockStack ds) {
+					ds.Undock (this);
+				} else
+					throw new Exception ("docking error");				
+				
 				IFace.AddWidget (this);
 
 				Left = IFace.MousePosition.X - 10;
@@ -136,18 +222,47 @@ namespace Crow
 			}
 		}
 
-		public void Dock (DockStack target){
+		void dock () {
+			IFace.RemoveWidget (this);
+
+			undockingMousePosOrig = IFace.MousePosition;
+			//undockingMousePosOrig = lastMousePos;
+			savedSlot = this.LastPaintedSlot;
+			wasResizable = Resizable;
+			Resizable = false;
+			LastSlots = LastPaintedSlot = Slot = default(Rectangle);
+			Left = Top = 0;
+		}
+		public void Dock (DockWindow target) {
 			lock (IFace.UpdateMutex) {
 				//IsDocked = true;
-				undockingMousePosOrig = IFace.MousePosition;
-				//undockingMousePosOrig = lastMousePos;
-				savedSlot = this.LastPaintedSlot;
-				wasResizable = Resizable;
-				Resizable = false;
-				LastSlots = LastPaintedSlot = Slot = default(Rectangle);
-				Left = Top = 0;
+				dock ();
 
-				IFace.RemoveWidget (this);
+				if (target.LogicalParent is TabView tv) {
+					tv.AddItem (this);
+					DockingPosition = Alignment.Center;
+					this.Width = this.Height = Measure.Stretched;
+					IsDocked = true;
+				} else if (target.Parent is DockStack ds) {
+					int idx = ds.Children.IndexOf (target);
+					ds.RemoveChild (target);
+					TabView tv2 = new TabView(IFace, "DockingTabView");
+					ds.InsertChild (idx, tv2);
+					tv2.Width = target.Width;
+					tv2.Height = target.Height;
+					if (ds.stretchedChild == target)
+						ds.stretchedChild = tv2;
+					tv2.AddItem (target);
+					tv2.AddItem (this);
+					target.Width = target.Height = this.Width = this.Height = Measure.Stretched;
+					target.DockingPosition = this.DockingPosition = Alignment.Center;
+					IsDocked = true;
+				}				
+			}
+		}
+		public void Dock (DockStack target){
+			lock (IFace.UpdateMutex) {				
+				dock ();
 
 				target.Dock (this);
 			}
@@ -159,6 +274,9 @@ namespace Crow
 				Undock ();
 			base.close ();
 		}
+
+		internal string GetConfigString () =>
+			string.Format($"WIN;{Name};{Width};{Height};{DockingPosition};{savedSlot};{wasResizable};");
 	}
 }
 

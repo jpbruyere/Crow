@@ -69,13 +69,8 @@ namespace Crow.Cairo {
 		{
 		}
 
-		public int Width {
-			get { return NativeMethods.cairo_image_surface_get_width (Handle); }
-		}
-
-		public int Height {
-			get { return NativeMethods.cairo_image_surface_get_height (Handle); }
-		}
+		public override int Width => NativeMethods.cairo_image_surface_get_width (Handle);
+		public override int Height => NativeMethods.cairo_image_surface_get_height (Handle);		
 
 		public byte[] Data {
 			get {

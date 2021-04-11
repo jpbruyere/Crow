@@ -125,12 +125,6 @@ namespace Crow.Cairo {
 			Dispose (false);
 		}
 
-		//[Obsolete ("Use Context.SetSource() followed by Context.Paint()")]
-		public void Show (Context gr, double x, double y)
-		{
-			NativeMethods.cairo_set_source_surface (gr.Handle, handle, x, y);
-			NativeMethods.cairo_paint (gr.Handle);
-		}
 
 		public void Dispose ()
 		{
@@ -172,6 +166,8 @@ namespace Crow.Cairo {
 		{
 			NativeMethods.cairo_surface_mark_dirty_rectangle (Handle, rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
 		}
+		public virtual int Width => -1;
+		public virtual int Height => -1;
 
 		public IntPtr Handle {
 			get {

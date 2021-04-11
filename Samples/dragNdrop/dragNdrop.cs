@@ -25,16 +25,16 @@ namespace tests
         
 
         private void W_StartDrag (object sender, DragDropEventArgs e) {
+			Rectangle r = e.DragSource.LastPaintedSlot;
             startGroup = e.DragSource.Parent as Group;
-            DragImageHeight = e.DragSource.LastPaintedSlot.Height;
-            DragImageWidth = e.DragSource.LastPaintedSlot.Width;
 
-            Crow.Cairo.Surface dragImg = surf.CreateSimilar (Crow.Cairo.Content.ColorAlpha, DragImageWidth, DragImageHeight);
+            Crow.Cairo.Surface dragImg = surf.CreateSimilar (Crow.Cairo.Content.ColorAlpha,
+				r.Width, r.Height);
             using (Crow.Cairo.Context gr = new Crow.Cairo.Context(dragImg)) {
                 gr.SetSource (e.DragSource.bmp, 0, 0);
                 gr.Paint ();
             }
-            DragImage = dragImg;
+			CreateDragImage (dragImg)            
             /*lock (UpdateMutex)
                 startGroup.RemoveChild (e.DragSource);*/
         }

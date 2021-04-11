@@ -1,0 +1,25 @@
+﻿<?xml version="1.0"?>
+<GenericStack Orientation="{./OppositeOrientation}" Spacing="0" Background="{./Background}" > 
+	<ListBox  Data="{./Items}" Width="{./TabHeight}" Height="{./TabWidth}" HorizontalAlignment="Left" VerticalAlignment="Top"
+				SelectedItem="{²./SelectedItem}"> 
+		<Template>
+			<GenericStack Orientation="{../../../Orientation}" Name="ItemsContainer" />
+		</Template>
+		<ItemTemplate>
+			<ListItem Fit="true" Background="${InactiveTabItem}" IsSelected="{IsVisible}"
+					Selected="{.DataSource.Visible='true'};{Background=.DataSource.Background}"
+					Unselected="{.DataSource.Visible='false'};{Background=${InactiveTabItem}}">
+				<HorizontalStack Margin="2" >  
+					<Label Text="{Caption}" Margin="3" />
+					<Border CornerRadius="6" BorderWidth="1" Foreground="Transparent"  Height="10" Width="10" VerticalAlignment="Center"
+						MouseEnter="{Foreground=White}" MouseLeave="{Foreground=Transparent}">
+						<Image Focusable="true" Name="Image" Margin="0" Width="Stretched" Height="Stretched" Path="#Crow.Icons.exit2.svg"
+							 MouseClick="onQuitPress"/>
+					</Border>
+					</HorizontalStack>
+			</ListItem>			
+		</ItemTemplate>
+	</ListBox>
+	<Group Name="ItemsContainer" />
+</GenericStack>
+

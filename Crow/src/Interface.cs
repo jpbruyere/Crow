@@ -469,13 +469,26 @@ namespace Crow
 		internal Widget dragndropHover;
 
 		public Surface DragImage = null;
-		public int DragImageWidth, DragImageHeight, DragImageX, DragImageY;
+		public Rectangle DragImageBounds;
+		public bool DragImageFolowMouse;//prevent dragImg to be moved by mouse
 		public void ClearDragImage () {
-			lock (UpdateMutex) {				
-				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));				
+			lock (UpdateMutex) {
+				if (DragImage == null)
+					return;
+				clipping.UnionRectangle (DragImageBounds);				
 				DragImage.Dispose();
 				DragImage = null;
-			}			
+				DragImageBounds = default;
+			}
+		}
+		public void CreateDragImage (Surface img, Rectangle bounds, bool followMouse = true) {
+			lock (UpdateMutex) {
+				if (DragImage != null)
+					ClearDragImage ();
+				DragImage = img;
+				DragImageBounds = bounds;
+				DragImageFolowMouse = followMouse;
+			}
 		}
 		#endregion
 
@@ -965,7 +978,7 @@ namespace Crow
 			DbgLogger.StartEvent (DbgEvtType.ProcessDrawing);
 
 			if (DragImage != null)
-				clipping.UnionRectangle(new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight));
+				clipping.UnionRectangle(DragImageBounds);
 
 			if (!clipping.IsEmpty) {
 				PerformanceMeasure.Begin (PerformanceMeasure.Kind.Drawing);				
@@ -994,17 +1007,18 @@ namespace Crow
 
 				if (DragAndDropOperation != null) {
 					if (DragImage != null) {
-						DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
-						DragImageX = MousePosition.X - DragImageWidth / 2;
-						DragImageY = MousePosition.Y - DragImageHeight / 2;
+						DirtyRect += DragImageBounds;
+						if (DragImageFolowMouse) {
+							DragImageBounds.X = MousePosition.X - DragImageBounds.Width / 2;
+							DragImageBounds.Y = MousePosition.Y - DragImageBounds.Height / 2;
+						}
 						ctx.Save ();
 						ctx.ResetClip ();
-						ctx.SetSource (DragImage, DragImageX, DragImageY);
+						ctx.SetSource (DragImage, DragImageBounds.X, DragImageBounds.Y);
 						ctx.PaintWithAlpha (0.8);
 						ctx.Restore ();
-						DirtyRect += new Rectangle (DragImageX, DragImageY, DragImageWidth, DragImageHeight);
+						DirtyRect += DragImageBounds;
 						IsDirty = true;
-						//System.Diagnostics.Debug.WriteLine ("dragimage drawn: {0},{1}", DragImageX, DragImageY);
 					}
 				}
 
