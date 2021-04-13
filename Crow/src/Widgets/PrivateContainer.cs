@@ -195,7 +195,7 @@ namespace Crow
 			}
 
 			if (child != null) {
-				if (child.Visible)
+				if (child.IsVisible)
 					child.Paint (gr);
 			}
 
@@ -206,6 +206,8 @@ namespace Crow
 		}
 		protected override void UpdateCache (Context ctx)
 		{
+			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);
+
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
 			Context gr = new Context (bmp);
 
@@ -224,7 +226,9 @@ namespace Crow
 
 			ctx.SetSource (bmp, rb.X, rb.Y);
 			ctx.Paint ();
-			Clipping.Reset ();			
+			DbgLogger.AddEvent (DbgEvtType.GOResetClip, this);
+			Clipping.Reset ();
+			DbgLogger.EndEvent(DbgEvtType.GOUpdateCache);
 		}
 		#endregion
 

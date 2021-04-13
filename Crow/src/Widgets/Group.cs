@@ -307,6 +307,7 @@ namespace Crow
 		}
 		protected override void UpdateCache (Context ctx)
 		{
+			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);
 			if (!Clipping.IsEmpty) {
 				using (Context gr = new Context (bmp)) {
 					for (int i = 0; i < Clipping.NumRectangles; i++)
@@ -343,10 +344,12 @@ namespace Crow
 					gr.Stroke ();*/
 					#endif
 				}
-				Clipping.Reset ();				
+				DbgLogger.AddEvent (DbgEvtType.GOResetClip, this);
+				Clipping.Reset ();
 			}/*else
 				Console.WriteLine("GROUP REPAINT WITH EMPTY CLIPPING");*/
 			paintCache (ctx, Slot + Parent.ClientRectangle.Position);
+			DbgLogger.EndEvent(DbgEvtType.GOUpdateCache);				
 		}
 		#endregion
 
@@ -367,6 +370,10 @@ namespace Crow
 					contentSize.Width = g.Slot.Width;
 				} else if (g == largestChild)
 					searchLargestChild ();
+				else {
+					DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);
+					return;
+				}
 
 				this.RegisterForLayouting (LayoutingType.Width);
 				break;
@@ -380,6 +387,10 @@ namespace Crow
 					contentSize.Height = g.Slot.Height;
 				} else if (g == tallestChild)
 					searchTallestChild ();
+				else {
+					DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);
+					return;
+				}
 
 				this.RegisterForLayouting (LayoutingType.Height);
 				break;
@@ -437,6 +448,7 @@ namespace Crow
 					tallestChild = Children [i];
 				}
 			}
+
 			DbgLogger.EndEvent (DbgEvtType.GOSearchTallestChild);
 		}
 

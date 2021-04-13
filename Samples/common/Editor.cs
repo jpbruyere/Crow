@@ -336,205 +336,209 @@ namespace Crow
 		int tabSize = 4;
 
 		protected override void drawContent (Context gr) {
-			lock(TokenMutex) {
-				if (source == null || source.Tokens.Length == 0) {
-					base.drawContent (gr);
-					return;
-				}
-			
-				Rectangle cb = ClientRectangle;
-				fe = gr.FontExtents;
-				double lineHeight = fe.Ascent + fe.Descent;
-
-				CharLocation selStart = default, selEnd = default;
-				bool selectionNotEmpty = false;
-
-				if (HasFocus) {
-					if (currentLoc?.Column < 0) {
-						updateLocation (gr, cb.Width, ref currentLoc);
-						NotifyValueChanged ("CurrentColumn", CurrentColumn);
-					} else
-						updateLocation (gr, cb.Width, ref currentLoc);
-
-					if (overlay != null) {
-						Point p = new Point((int)currentLoc.Value.VisualCharXPosition, (int)(lineHeight * (currentLoc.Value.Line + 1)));
-						p += ScreenCoordinates (Slot).TopLeft;
-						overlay.Left = p.X;
-						overlay.Top = p.Y;
+			try {
+				lock(TokenMutex) {
+					if (source == null || source.Tokens.Length == 0) {
+						base.drawContent (gr);
+						return;
 					}
-					if (selectionStart.HasValue) {
-						updateLocation (gr, cb.Width, ref selectionStart);
-						if (CurrentLoc.Value != selectionStart.Value)
-							selectionNotEmpty = true;
-					}
-					if (selectionNotEmpty) {
-						if (CurrentLoc.Value.Line < selectionStart.Value.Line) {
-							selStart = CurrentLoc.Value;
-							selEnd = selectionStart.Value;
-						} else if (CurrentLoc.Value.Line > selectionStart.Value.Line) {
-							selStart = selectionStart.Value;
-							selEnd = CurrentLoc.Value;
-						} else if (CurrentLoc.Value.Column < selectionStart.Value.Column) {
-							selStart = CurrentLoc.Value;
-							selEnd = selectionStart.Value;
-						} else {
-							selStart = selectionStart.Value;
-							selEnd = CurrentLoc.Value;
+				
+					Rectangle cb = ClientRectangle;
+					fe = gr.FontExtents;
+					double lineHeight = fe.Ascent + fe.Descent;
+
+					CharLocation selStart = default, selEnd = default;
+					bool selectionNotEmpty = false;
+
+					if (HasFocus) {
+						if (currentLoc?.Column < 0) {
+							updateLocation (gr, cb.Width, ref currentLoc);
+							NotifyValueChanged ("CurrentColumn", CurrentColumn);
+						} else
+							updateLocation (gr, cb.Width, ref currentLoc);
+
+						if (overlay != null) {
+							Point p = new Point((int)currentLoc.Value.VisualCharXPosition, (int)(lineHeight * (currentLoc.Value.Line + 1)));
+							p += ScreenCoordinates (Slot).TopLeft;
+							overlay.Left = p.X;
+							overlay.Top = p.Y;
 						}
-					} else
-						IFace.forceTextCursor = true;
-				}
-
-				double spacePixelWidth = gr.TextExtents (" ").XAdvance;
-				int x = 0, y = 0;
-				double pixX = cb.Left;
-
-
-				Foreground.SetAsSource (IFace, gr);
-				gr.Translate (-ScrollX, -ScrollY);
-
-
-				ReadOnlySpan<char> sourceBytes = source.Source.AsSpan();
-				Span<byte> bytes = stackalloc byte[128];
-				TextExtents extents;
-				int tokPtr = 0;
-				Token tok = source.Tokens[tokPtr];
-				bool multilineToken = false;				
-
-				ReadOnlySpan<char> buff = sourceBytes;
-
-
-				for (int i = 0; i < lines.Count; i++) {
-					//if (!cancelLinePrint (lineHeight, lineHeight * y, cb.Height)) {
-
-					if (multilineToken) {
-						if (tok.End < lines[i].End) {//last incomplete line of multiline token
-							buff = sourceBytes.Slice (lines[i].Start, tok.End - lines[i].Start);								
-						} else {//print full line
-							buff = sourceBytes.Slice (lines[i].Start, lines[i].Length);
+						if (selectionStart.HasValue) {
+							updateLocation (gr, cb.Width, ref selectionStart);
+							if (CurrentLoc.Value != selectionStart.Value)
+								selectionNotEmpty = true;
 						}
+						if (selectionNotEmpty) {
+							if (CurrentLoc.Value.Line < selectionStart.Value.Line) {
+								selStart = CurrentLoc.Value;
+								selEnd = selectionStart.Value;
+							} else if (CurrentLoc.Value.Line > selectionStart.Value.Line) {
+								selStart = selectionStart.Value;
+								selEnd = CurrentLoc.Value;
+							} else if (CurrentLoc.Value.Column < selectionStart.Value.Column) {
+								selStart = CurrentLoc.Value;
+								selEnd = selectionStart.Value;
+							} else {
+								selStart = selectionStart.Value;
+								selEnd = CurrentLoc.Value;
+							}
+						} else
+							IFace.forceTextCursor = true;
 					}
 
-					while (tok.Start < lines[i].End) {
-						if (!multilineToken) {
-							if (tok.End > lines[i].End) {//first line of multiline
-								multilineToken = true;
-								buff = sourceBytes.Slice (tok.Start, lines[i].End - tok.Start);
-							} else
-								buff = sourceBytes.Slice (tok.Start, tok.Length);
+					double spacePixelWidth = gr.TextExtents (" ").XAdvance;
+					int x = 0, y = 0;
+					double pixX = cb.Left;
 
-							if (tok.Type.HasFlag (TokenType.Punctuation))
-								gr.SetSource(Colors.DarkGrey);
-							else if (tok.Type.HasFlag (TokenType.Trivia))
-								gr.SetSource(Colors.DimGrey);
-							else if (tok.Type == TokenType.ElementName) {
-								gr.SetSource(Colors.Green);
-							}else if (tok.Type == TokenType.AttributeName) {
-								gr.SetSource(Colors.Blue);
-							}else if (tok.Type == TokenType.AttributeValue) {
-								gr.SetSource(Colors.OrangeRed);
-							}else if (tok.Type == TokenType.EqualSign) {
-								gr.SetSource(Colors.Black);
-							}else if (tok.Type == TokenType.PI_Target) {
-								gr.SetSource(Colors.DarkSlateBlue);
-							}else {
-								gr.SetSource(Colors.Red);
-							}									
-						}
 
-						int size = buff.Length * 4 + 1;
-						if (bytes.Length < size)
-							bytes = size > 512 ? new byte[size] : stackalloc byte[size];
+					Foreground.SetAsSource (IFace, gr);
+					gr.Translate (-ScrollX, -ScrollY);
 
-						int encodedBytes = Crow.Text.Encoding.ToUtf8 (buff, bytes);
 
-						if (encodedBytes > 0) {
-							bytes[encodedBytes++] = 0;
-							gr.TextExtents (bytes.Slice (0, encodedBytes), out extents);
-							gr.MoveTo (pixX, lineHeight * y + fe.Ascent);
-							gr.ShowText (bytes.Slice (0, encodedBytes));
-							pixX += extents.XAdvance;
-							x += buff.Length;								
-						}
+					ReadOnlySpan<char> sourceBytes = source.Source.AsSpan();
+					Span<byte> bytes = stackalloc byte[128];
+					TextExtents extents;
+					int tokPtr = 0;
+					Token tok = source.Tokens[tokPtr];
+					bool multilineToken = false;				
+
+					ReadOnlySpan<char> buff = sourceBytes;
+
+
+					for (int i = 0; i < lines.Count; i++) {
+						//if (!cancelLinePrint (lineHeight, lineHeight * y, cb.Height)) {
 
 						if (multilineToken) {
-							if (tok.End < lines[i].End)//last incomplete line of multiline token
-								multilineToken = false;
-							else
-								break;
+							if (tok.End < lines[i].End) {//last incomplete line of multiline token
+								buff = sourceBytes.Slice (lines[i].Start, tok.End - lines[i].Start);								
+							} else {//print full line
+								buff = sourceBytes.Slice (lines[i].Start, lines[i].Length);
+							}
 						}
 
-						if (++tokPtr >= source.Tokens.Length)
-							break;
-						tok = source.Tokens[tokPtr];
-					}
+						while (tok.Start < lines[i].End) {
+							if (!multilineToken) {
+								if (tok.End > lines[i].End) {//first line of multiline
+									multilineToken = true;
+									buff = sourceBytes.Slice (tok.Start, lines[i].End - tok.Start);
+								} else
+									buff = sourceBytes.Slice (tok.Start, tok.Length);
 
-					if (HasFocus && selectionNotEmpty) {
-						RectangleD lineRect = new RectangleD (cb.X,	lineHeight * y + cb.Top, pixX, lineHeight);
-						RectangleD selRect = lineRect;
-						
-						if (i >= selStart.Line && i <= selEnd.Line) {
-							if (selStart.Line == selEnd.Line) {
-								selRect.X = selStart.VisualCharXPosition + cb.X;
-								selRect.Width = selEnd.VisualCharXPosition - selStart.VisualCharXPosition;
-							} else if (i == selStart.Line) {
-								double newX = selStart.VisualCharXPosition + cb.X;
-								selRect.Width -= (newX - selRect.X) - 10.0;
-								selRect.X = newX;
-							} else if (i == selEnd.Line)
-								selRect.Width = selEnd.VisualCharXPosition - selRect.X + cb.X;
-							else
-								selRect.Width += 10.0;
+								if (tok.Type.HasFlag (TokenType.Punctuation))
+									gr.SetSource(Colors.DarkGrey);
+								else if (tok.Type.HasFlag (TokenType.Trivia))
+									gr.SetSource(Colors.DimGrey);
+								else if (tok.Type == TokenType.ElementName) {
+									gr.SetSource(Colors.Green);
+								}else if (tok.Type == TokenType.AttributeName) {
+									gr.SetSource(Colors.Blue);
+								}else if (tok.Type == TokenType.AttributeValue) {
+									gr.SetSource(Colors.OrangeRed);
+								}else if (tok.Type == TokenType.EqualSign) {
+									gr.SetSource(Colors.Black);
+								}else if (tok.Type == TokenType.PI_Target) {
+									gr.SetSource(Colors.DarkSlateBlue);
+								}else {
+									gr.SetSource(Colors.Red);
+								}									
+							}
 
-							buff = sourceBytes.Slice(lines[i].Start, lines[i].Length);
 							int size = buff.Length * 4 + 1;
 							if (bytes.Length < size)
 								bytes = size > 512 ? new byte[size] : stackalloc byte[size];
 
 							int encodedBytes = Crow.Text.Encoding.ToUtf8 (buff, bytes);
 
-							gr.SetSource (SelectionBackground);
-							gr.Rectangle (selRect);
-							if (encodedBytes < 0)
-								gr.Fill ();
-							else {
-								gr.FillPreserve ();
-								gr.Save ();
-								gr.Clip ();
-								gr.SetSource (SelectionForeground);
-								gr.MoveTo (lineRect.X, lineRect.Y + fe.Ascent);
+							if (encodedBytes > 0) {
+								bytes[encodedBytes++] = 0;
+								gr.TextExtents (bytes.Slice (0, encodedBytes), out extents);
+								gr.MoveTo (pixX, lineHeight * y + fe.Ascent);
 								gr.ShowText (bytes.Slice (0, encodedBytes));
-								gr.Restore ();
+								pixX += extents.XAdvance;
+								x += buff.Length;								
 							}
-							Foreground.SetAsSource (IFace, gr);
+
+							if (multilineToken) {
+								if (tok.End < lines[i].End)//last incomplete line of multiline token
+									multilineToken = false;
+								else
+									break;
+							}
+
+							if (++tokPtr >= source.Tokens.Length)
+								break;
+							tok = source.Tokens[tokPtr];
 						}
-					}
 
-					if (!multilineToken) {
-						if (++tokPtr >= source.Tokens.Length)
-							break;
-						tok = source.Tokens[tokPtr];
-					}
+						if (HasFocus && selectionNotEmpty) {
+							RectangleD lineRect = new RectangleD (cb.X,	lineHeight * y + cb.Top, pixX, lineHeight);
+							RectangleD selRect = lineRect;
+							
+							if (i >= selStart.Line && i <= selEnd.Line) {
+								if (selStart.Line == selEnd.Line) {
+									selRect.X = selStart.VisualCharXPosition + cb.X;
+									selRect.Width = selEnd.VisualCharXPosition - selStart.VisualCharXPosition;
+								} else if (i == selStart.Line) {
+									double newX = selStart.VisualCharXPosition + cb.X;
+									selRect.Width -= (newX - selRect.X) - 10.0;
+									selRect.X = newX;
+								} else if (i == selEnd.Line)
+									selRect.Width = selEnd.VisualCharXPosition - selRect.X + cb.X;
+								else
+									selRect.Width += 10.0;
 
-					x = 0;
-					pixX = 0;
-		
-					y++;
+								buff = sourceBytes.Slice(lines[i].Start, lines[i].Length);
+								int size = buff.Length * 4 + 1;
+								if (bytes.Length < size)
+									bytes = size > 512 ? new byte[size] : stackalloc byte[size];
+
+								int encodedBytes = Crow.Text.Encoding.ToUtf8 (buff, bytes);
+
+								gr.SetSource (SelectionBackground);
+								gr.Rectangle (selRect);
+								if (encodedBytes < 0)
+									gr.Fill ();
+								else {
+									gr.FillPreserve ();
+									gr.Save ();
+									gr.Clip ();
+									gr.SetSource (SelectionForeground);
+									gr.MoveTo (lineRect.X, lineRect.Y + fe.Ascent);
+									gr.ShowText (bytes.Slice (0, encodedBytes));
+									gr.Restore ();
+								}
+								Foreground.SetAsSource (IFace, gr);
+							}
+						}
+
+						if (!multilineToken) {
+							if (++tokPtr >= source.Tokens.Length)
+								break;
+							tok = source.Tokens[tokPtr];
+						}
+
+						x = 0;
+						pixX = 0;
+			
+						y++;
 
 
-						/*	} else if (tok2.Type == TokenType.Tabulation) {
-								int spaceRounding = x % tabSize;
-								int spaces = spaceRounding == 0 ?
-									tabSize * tok2.Length :
-									spaceRounding + tabSize * (tok2.Length - 1);
-								x += spaces;
-								pixX += spacePixelWidth * spaces;
-								continue;
-							} else if (tok2.Type == TokenType.WhiteSpace) {
-								x += tok2.Length;
-								pixX += spacePixelWidth * tok2.Length;*/																				
-				}					
-				gr.Translate (ScrollX, ScrollY);
+							/*	} else if (tok2.Type == TokenType.Tabulation) {
+									int spaceRounding = x % tabSize;
+									int spaces = spaceRounding == 0 ?
+										tabSize * tok2.Length :
+										spaceRounding + tabSize * (tok2.Length - 1);
+									x += spaces;
+									pixX += spacePixelWidth * spaces;
+									continue;
+								} else if (tok2.Type == TokenType.WhiteSpace) {
+									x += tok2.Length;
+									pixX += spacePixelWidth * tok2.Length;*/																				
+					}					
+					gr.Translate (ScrollX, ScrollY);
+				}
+			} catch {
+				
 			}
 		}			
 	}

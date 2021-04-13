@@ -31,6 +31,8 @@ namespace Crow.DebugLogger
 					return Colors.MediumTurquoise;
 				case DbgEvtType.GORegisterClip:
 					return Colors.Turquoise;
+				case DbgEvtType.GOResetClip:
+					return Colors.DarkRed;
 				case DbgEvtType.GORegisterForGraphicUpdate:
 					return Colors.LightPink;
 				case DbgEvtType.GOEnqueueForRepaint:

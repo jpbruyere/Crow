@@ -64,13 +64,15 @@ namespace Crow
 
 		GOClippingRegistration			= Widget | Clipping | 0x01,
 		GORegisterClip					= Widget | Clipping | 0x02,
+		GOResetClip						= Widget | Clipping | 0x03,
 		GORegisterLayouting 			= Widget | Layouting | 0x01,
 		GOProcessLayouting				= Widget | Layouting | 0x02,
 		GOProcessLayoutingWithNoParent 	= Widget | Layouting | Warning | 0x01,
 		GODraw							= Widget | Drawing | 0x01,
 		GORecreateCache					= Widget | Drawing | 0x02,
 		GOUpdateCache					= Widget | Drawing | 0x03,
-		GOPaint							= Widget | Drawing | 0x04,
+		GOPaintCache					= Widget | Drawing | 0x04,		
+		GOPaint							= Widget | Drawing | 0x05,
 
 		GOLockUpdate					= Widget | Lock | 0x01,
 		GOLockClipping					= Widget | Lock | 0x02,
