@@ -72,14 +72,22 @@ namespace Crow {
 				foreach (Widget c in Children) {
 					if (!c.IsVisible)
 						continue;
-					c.Slot.X = d;
+					if (c.Slot.X != d) {
+						c.Slot.X = d;
+						c.OnLayoutChanges (LayoutingType.X);
+						c.LastSlots.X = c.Slot.X;
+					}
 					d += c.Slot.Width + Spacing;
 				}
 			} else {
 				foreach (Widget c in Children) {
 					if (!c.IsVisible)
 						continue;
-					c.Slot.Y = d;
+					if (c.Slot.Y != d) {
+						c.Slot.Y = d;
+						c.OnLayoutChanges (LayoutingType.Y);
+						c.LastSlots.Y = c.Slot.Y;
+					}
 					d += c.Slot.Height + Spacing;
 				}
 			}
@@ -135,7 +143,7 @@ namespace Crow {
 			w.LayoutChanged += OnChildLayoutChanges;
 			w.LastSlots.Height = w.Slot.Height;
 		}
-		void adjustStretchedGo (LayoutingType lt) {
+		internal void adjustStretchedGo (LayoutingType lt) {
 			if (stretchedGO == null)
 				return;
 			if (lt == LayoutingType.Width)
@@ -214,6 +222,18 @@ namespace Crow {
 		}
 		#endregion
 
+		public override void AddChild (Widget child) {
+			base.AddChild (child);
+			if (Orientation == Orientation.Horizontal) {
+				if (child.Width == Measure.Stretched)
+					child.RegisterForLayouting (LayoutingType.Width);
+				else
+					contentSize.Width += child.LastSlots.Width;
+			}else if (child.Height == Measure.Stretched)
+				child.RegisterForLayouting (LayoutingType.Height);
+			else
+				contentSize.Height += child.LastSlots.Height;			
+		}
 		public override void RemoveChild (Widget child) {
 			if (child != stretchedGO) {
 				if (Orientation == Orientation.Horizontal)
