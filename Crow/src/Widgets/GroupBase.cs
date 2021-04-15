@@ -288,7 +288,8 @@ namespace Crow
 		#region Mouse handling
 		public override void checkHoverWidget (MouseMoveEventArgs e) {
 			base.checkHoverWidget (e);//TODO:check if not possible to put it at beginning of meth to avoid doubled check to DropTarget.
-			childrenRWLock.EnterReadLock ();
+			if (!childrenRWLock.TryEnterReadLock (10))
+				return;
 			for (int i = Children.Count - 1; i >= 0; i--) {
 				if (Children[i].MouseIsIn (e.Position)) {
 					Children[i].checkHoverWidget (e);
