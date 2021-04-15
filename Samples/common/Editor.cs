@@ -72,8 +72,8 @@ namespace Crow
 			Tokenizer tokenizer = new Tokenizer();
 			Tokens = tokenizer.Tokenize (Source);
 
-			foreach (Token t in Tokens)
-				Console.WriteLine ($"{t,-40} {Source.AsSpan(t.Start, t.Length).ToString()}");
+			/*foreach (Token t in Tokens)
+				Console.WriteLine ($"{t,-40} {Source.AsSpan(t.Start, t.Length).ToString()}");*/
 		}
 		public class TokenizerException : Exception {
 			public readonly int Position;

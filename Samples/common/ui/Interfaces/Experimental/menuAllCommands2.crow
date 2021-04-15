@@ -1,0 +1,21 @@
+﻿<Menu>
+	<MenuItem Caption="test" Fit="true">
+		<MenuItem Caption="test" Fit="true"/>
+		<MenuItem Caption="test" Fit="true"/>
+	</MenuItem>
+	<MenuItem Caption="test" Fit="true"/>
+	<MenuItem Data="{AllCommands}" Fit="true">
+		<ItemTemplate DataType="Command">
+			<MenuItem Command="{}" Fit="true"/>
+		</ItemTemplate>
+		<ItemTemplate DataType="CommandGroup">
+			<Popper Caption="{Caption}" Fit="true">
+				<ListBox Data="{Commands}" Fit="true">
+					<ItemTemplate>				
+						<MenuItem Command="{}" Fit="true"/>
+					</ItemTemplate>
+				</ListBox>
+			</Popper>
+		</ItemTemplate>
+	</MenuItem>
+</Menu>

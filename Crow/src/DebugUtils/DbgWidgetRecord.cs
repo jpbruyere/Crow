@@ -21,7 +21,7 @@ namespace Crow.DebugLogger
 		public string name;
 		//0 is the main graphic tree, for other obj tree not added to main tree, it range from 1->n
 		//useful to track events for obj shown later, not on start
-		public int treeIndex;
+		public int InstanceIndex;
 		public int yIndex;//index in parenting, the whole main graphic tree is one continuous suite
 		public int xLevel;//depth
 		public String Width;
@@ -34,10 +34,11 @@ namespace Crow.DebugLogger
 				return null;
 			string [] tmp = str.Trim ().Split (';');
 			g.name = tmp [0];
-			g.yIndex = int.Parse (tmp [1]);
-			g.xLevel = int.Parse (tmp [2]);
-			g.Width = tmp [3];
-			g.Height = tmp [4];
+			g.InstanceIndex = int.Parse (tmp [1]);
+			g.yIndex = int.Parse (tmp [2]);
+			g.xLevel = int.Parse (tmp [3]);
+			g.Width = tmp [4];
+			g.Height = tmp [5];
 			return g;
 		}
 

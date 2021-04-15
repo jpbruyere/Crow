@@ -1,0 +1,45 @@
+﻿<TreeView Data="{AllCommands}" Fit="true">
+	<Template>
+		<VerticalStack Name="ItemsContainer"/>
+	</Template>
+	<ItemTemplate DataType="Crow.Command">
+		<ListItem CornerRadius="2" Margin="0" Fit="true"
+				Selected="{Background=${ControlHighlight}}"
+				Unselected="{Background=Transparent}">
+			<Button Command="{}" />
+		</ListItem>
+	</ItemTemplate>
+	<ItemTemplate DataType="Crow.CommandGroup" Data="Commands">
+		<ListItem
+				Selected="{/exp.Background=${ControlHighlight}}"
+				Unselected="{/exp.Background=Transparent}">
+			<Expandable Name="exp" Caption="{Name}" MouseDoubleClick="/onClickForExpand">
+				<Template>
+					<VerticalStack>
+						<Border CornerRadius="2" Margin="0" Height="Fit" MouseDoubleClick="./onClickForExpand"
+								Foreground="Transparent"
+								MouseEnter="{Foreground=DimGrey}"
+								MouseLeave="{Foreground=Transparent}">
+							<HorizontalStack Background="{./Background}" Spacing="1">
+								<Image Margin="1" Width="9" Height="9" Focusable="true" MouseDown="./onClickForExpand"
+									Path="{./Image}"
+									Visible="{./IsExpandable}"
+									SvgSub="{./IsExpanded}"
+									MouseEnter="{Background=LightGrey}"
+									MouseLeave="{Background=Transparent}"/>
+								<Image Margin="1" Width="16" Height="16"
+									Path="#Crow.Icons.folder.svg" SvgSub="{./IsExpanded}"/>
+								<Label Text="{./Caption}"/>
+							</HorizontalStack>
+						</Border>
+						<Container Name="Content" Visible="false"/>
+					</VerticalStack>
+				</Template>
+				<HorizontalStack Height="Fit">
+					<Widget Width="12" Height="10"/>
+					<VerticalStack Height="Fit" Name="ItemsContainer"/>
+				</HorizontalStack>
+			</Expandable>
+		</ListItem>
+	</ItemTemplate>
+</TreeView>

@@ -10,6 +10,18 @@ using DebugLogAnalyzer;
 
 namespace Crow
 {
+	public class DbgEventView : TemplatedContainer {
+		DbgEvent evt;
+		public DbgEvent Event {
+			get => evt;
+			set {
+				if (evt == value)
+					return;
+				evt = value;
+				NotifyValueChangedAuto (evt);
+			}
+		}
+	}
 	public class DbgEventWidget : Widget
 	{
 		public DbgEventWidget (){}

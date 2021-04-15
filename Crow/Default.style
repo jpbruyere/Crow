@@ -23,7 +23,7 @@ WindowTitleBarForeground = "White";
 
 MenuBackground = "Jet";
 
-InactiveTabItem = "Jet";
+InactiveTabItem = "DarkGrey";
 
 Button, CheckBox, RadioButton, ComboBox, Expandable,
 MessageBox, Popper, Slider, Spinner, TextBox {
@@ -292,4 +292,16 @@ ColorSlider {
 ColorPicker {
 	Height="Fit";
 	MinimumSize="200,100";	
+}
+TableRow {
+	Width="Stretched";
+}
+TableHeaderRow {
+	Height="Fit";
+	Width="Stretched";//TODO:Force it to stretched programmatically
+}
+TableHeaderLabel {
+	Margin = "1";
+	Background = "Jet";
+	Foreground = "LightGrey";
 }

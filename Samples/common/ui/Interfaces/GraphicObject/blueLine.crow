@@ -1,0 +1,3 @@
+﻿<?xml version="1.0"?>
+<Widget Margin="10" Width="0" Height="20"
+		Background = "vgradient|0:0.1,0.1,0.1,0.1|0.5:Blue|1:0.1,0.1,0.1,0.1"/>

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <VerticalStack Background="DarkGrey">
 	<HorizontalStack >
-		<TabView Width="25%" >
-			<VerticalStack Name="Explorer" Background="Onyx">
+		<HorizontalStack Width="25%" >
+			<VerticalStack Width="50%" Name="Explorer" Background="Onyx">
 				<HorizontalStack Height="Fit" Margin="2" >
 					<Image Margin="2" Width="16" Height="16" Path="#Crow.Icons.level-up.svg" MouseClick="goUpDirClick"
 								 Background="Jet" MouseEnter="{Background=Grey}" MouseLeave="{Background=Jet}" />			
@@ -60,7 +60,8 @@
 					</Template>		
 				</DirectoryView>
 			</VerticalStack>
-			<VerticalStack Name="DebugLogger" Margin="5" IsVisible="false" Background="Onyx">
+			<Splitter/>
+			<VerticalStack Name="DebugLogger" Margin="5" IsVisible="true" Background="Onyx">
 				<HorizontalStack Height="Fit">
 					<Image Width="30" Height="20" Path="#Crow.Icons.IconAlerte.svg" Visible="{../../../../dbgIfaceWidget.CrowDebuggerNOK}"/>
 					<Label Fit="true" Text="Crow debug assembly path:"/>
@@ -80,7 +81,8 @@
 						Caption="Recorded Events" EnumValue="{²RecordedEvents}" BitFieldExcludeMask="255" />					
 				<EnumSelector RadioButtonStyle="CheckBox2" Template="#Dbg.EnumSelector.template"
 						Background="Onyx"
-						Caption="Discarded Events" EnumValue="{²DiscardedEvents}" BitFieldExcludeMask="255" />					
+						Caption="Discarded Events" EnumValue="{²DiscardedEvents}" BitFieldExcludeMask="255" />
+				<CheckBox Caption="Begin recording on startup" IsChecked="{²DebugLogOnStartup}" Background="Onyx"/>				
 				<HorizontalStack Height="Fit">
 					<CheckBox Caption="Recording" IsChecked="{²DebugLogRecording}" Height="40" Width="60"	
 						Checked="{sh.Path='A 8,8,7.5,0,6.3 O 0.8,0,0,1 f O 0,0,0,0.5 G'}"
@@ -98,7 +100,7 @@
 					</Menu>					
 				</HorizontalStack>					
 			</VerticalStack>			
-		</TabView>
+		</HorizontalStack>
 		<Splitter Width="6" />
 		<VerticalStack>
 			<DebugInterfaceWidget Name="dbgIfaceWidget" Height="60%" Background="Black" Focusable="true"

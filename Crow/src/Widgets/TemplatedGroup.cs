@@ -126,7 +126,7 @@ namespace Crow {
 		}
 
 		object selectedItem;
-		Widget selectedItemContainer = null;
+		protected Widget selectedItemContainer = null;
 
 		[XmlIgnore]public virtual object SelectedItem{
 			get => selectedItem;
@@ -231,7 +231,7 @@ namespace Crow {
 				itemsContainer.Children [e.Index].DataSource = e.Element;
 
 		}
-		void Ol_ListClear (object sender, ListChangedEventArg e) {
+		void Ol_ListClear (object sender, ListClearEventArg e) {
 			cancelLoadingThread ();			
 			if (this.isPaged) {
 				throw new NotImplementedException ();
@@ -254,18 +254,20 @@ namespace Crow {
 			g.LogicalParent = this;
 			NotifyValueChanged ("HasChildren", true);
 		}
-		public virtual void RemoveItem(Widget g)
-		{				
-			g.LogicalParent = null;
-			itemsContainer.DeleteChild (g);
+		public virtual void RemoveItem(Widget g, bool disposeChild = true)
+		{							
+			if (disposeChild)
+				itemsContainer.DeleteChild (g);
+			else
+				itemsContainer.RemoveChild (g);
 			if (itemsContainer.Children.Count == 0)
 				NotifyValueChanged ("HasChildren", false);
 		}
 
 		public virtual void ClearItems()
 		{
-			selectedItemContainer = null;
-			SelectedItem = null;
+			/*selectedItemContainer = null;
+			SelectedItem = null;*/
 
 			itemsContainer.ClearChildren ();
 			NotifyValueChanged ("HasChildren", false);
@@ -455,9 +457,9 @@ namespace Crow {
 					iTemp = ItemTemplates ["default"];
 			}
 			if (loadingThread == null)
-				Monitor.Enter(IFace.LayoutMutex);
+				Monitor.Enter(IFace.UpdateMutex);
 			else {
-				while (!Monitor.TryEnter(IFace.LayoutMutex)) {
+				while (!Monitor.TryEnter(IFace.UpdateMutex)) {
 					if (loadingThread.cancelRequested)
 						return;
 					Thread.Sleep(1);
@@ -472,7 +474,7 @@ namespace Crow {
 //				if (isPaged)
 				g.LogicalParent = this;
 				g.MouseClick += itemClick;
-			Monitor.Exit (IFace.LayoutMutex);
+			Monitor.Exit (IFace.UpdateMutex);
 
 			if (iTemp.Expand != null) {
 				Expandable e = g as Expandable;
@@ -588,14 +590,14 @@ namespace Crow {
 			/*if (dataParent is IValueChange vc) {
 
 			}*/
-			if (datas is IObservableList ol) {
+			/*if (datas is IObservableList ol) {
 				ol.ListAdd += (sender, e) => loadItem (e.Element, itemsContainer, dataTest);
 				ol.ListRemove += (sender, e) => itemsContainer.DeleteChild (e.Index);
 				ol.ListEdit += (sender, e) => itemsContainer.Children [e.Index].DataSource = e.Element;
 				ol.ListClear += (sender, e) => {	lock (IFace.UpdateMutex)
 														itemsContainer.ClearChildren ();};
 				
-			}
+			}*/
 		}
 		void onDatasChanged (object sender, ValueChangeEventArgs e) {
 			

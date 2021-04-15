@@ -1,14 +1,45 @@
-﻿<Table Columns="test,Fit;test,200" Width="Fit" Background="Blue"> 
-	<TableRow Height="Fit" Background="Red" Margin="5">
-		<Label Text="col1" Background="Grey"/>
-		<Label Text="col2" Background="Grey"/>
+﻿<Table Columns="test,Fit;test,Fit;test,Stretched;test,Fit" Margin="10" 
+	ColumnSpacing="5" Spacing="5" 
+	Foreground="Red"
+	RowsMargin="0"
+	BorderLineWidth="0"
+	VerticalLineWidth="1"
+	HorizontalLineWidth="1"
+	Background="DarkGrey" >   	
+	<TableRow Height="Fit" >
+		<Label Text="firstlkjdqsfmlkjqsl" Background="1,0,0,0.5" HorizontalAlignment="Left" Height="Stretched"/>
+		<Label Text="second" Background="0,1,0,0.5" Height="Stretched"/>
+		<Label Text="third" Background="0,0,1,0.5" Height="Stretched"/>
+		<Label Text="forth" Background="0,1,1,0.5" Height="Stretched"/>
 	</TableRow>
-	<TableRow Height="Fit" Background="Red" Margin="5">
-		<Label Text="this is a test" Background="Grey"/>
-		<Label Text="{/Width}" Background="Grey"/>
+	<TableRow Height="Fit" >
+		<Label Text="first" Background="1,0,0,0.5" HorizontalAlignment="Left"/>
+		<Label Text="seconddsqfsqdfsdqff" Background="0,1,0,0.5"/>
+		<Label Text="thirdkljhkljhkljhkljhkljhkjhkjh" Background="0,0,1,0.5"/>
+		<Label Text="forthbbbbbbbbbb" Background="0,1,1,0.5"/>
 	</TableRow>
-	<TableRow Height="Fit" Background="Red" Margin="5">
-		<Label Text="{/Width}" Background="Grey"/>
-		<Label Text="fkdksls" Background="Grey"/>
+	<TableRow Height="Fit">
+		<Label Text="first" Background="1,0,0,0.5" HorizontalAlignment="Left"/>
+		<Label Text="second" Background="0,1,0,0.5"/>
+		<Label Text="third" Background="0,0,1,0.5"/>
+		<Label Text="forth" Background="0,1,1,0.5"/>
+	</TableRow>
+	<TableRow Height="Fit" >
+		<Label Text="first" Background="1,0,0,0.5" HorizontalAlignment="Left"/>
+		<Label Text="second" Background="0,1,0,0.5"/>
+		<Label Text="third" Background="0,0,1,0.5"/>
+		<Label Text="forth" Background="0,1,1,0.5"/>
+	</TableRow>
+	<TableRow Height="Fit" >
+		<Label Text="first" Background="1,0,0,0.5" HorizontalAlignment="Left"/>
+		<Label Text="second" Background="0,1,0,0.5"/>
+		<Label Text="third" Background="0,0,1,0.5"/>
+		<Label Text="forth" Background="0,1,1,0.5"/>
+	</TableRow>
+	<TableRow Height="Fit" >
+		<Label Text="first" Background="1,0,0,0.5" HorizontalAlignment="Left"/>
+		<Label Text="second" Background="0,1,0,0.5"/>
+		<Label Text="third" Background="0,0,1,0.5"/>
+		<Label Text="forth" Background="0,1,1,0.5"/>
 	</TableRow>
 </Table>

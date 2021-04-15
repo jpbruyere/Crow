@@ -11,6 +11,7 @@ using Crow.Text;
 using System.Collections.Generic;
 using Encoding = System.Text.Encoding;
 using Crow.DebugLogger;
+using System.Linq;
 
 namespace DebugLogAnalyzer
 {
@@ -41,7 +42,8 @@ namespace DebugLogAnalyzer
 
 			/*TreeView tv = FindByName("dbgTV") as TreeView;
 			dbgTreeViewScroller = tv.FindByNameInTemplate ("scroller1") as Scroller;*/
-
+			if (DebugLogOnStartup)
+				DebugLogRecording = true;
 
 			if (!File.Exists (CurrentFile))
 				newFile ();
@@ -50,20 +52,52 @@ namespace DebugLogAnalyzer
 
 			reloadFromFile ();
 		}
+
+		public override void UpdateFrame()
+		{
+			base.UpdateFrame();
+
+		}
+
 			
-		List<DbgEvent> events = new List<DbgEvent>();
-		List<DbgWidgetRecord> widgets = new List<DbgWidgetRecord>();
-		DbgEvent curEvent = new DbgEvent();
+		ObservableList<DbgEvent> events = new ObservableList<DbgEvent>();
+		ObservableList<DbgWidgetRecord> widgets = new ObservableList<DbgWidgetRecord>();
+		DbgEvent curEvent;
+		bool disableCurrentEventHistory;
+		Stack<DbgEvent> CurrentEventHistoryForward = new Stack<DbgEvent>();
+		Stack<DbgEvent> CurrentEventHistoryBackward = new Stack<DbgEvent>();
 		DbgWidgetRecord curWidget = new DbgWidgetRecord();
 		bool debugLogRecording;
-		Scroller dbgTreeViewScroller;		
 		int targetTvScroll = -1;
 
+		public string[] AllEventTypes => Enum.GetNames (typeof(DbgEvtType));
+		string searchEventType;
+		DbgWidgetRecord searchWidget;
+		public string SearchEventType {
+			get => searchEventType;
+			set {
+				if (searchEventType == value)
+					return;
+				searchEventType = value;
+				NotifyValueChanged (searchEventType);
+			}
+		}
+
+		public DbgWidgetRecord SearchWidget {
+			get => searchWidget;
+			set {
+				if (searchWidget == value)
+					return;
+				searchWidget = value;
+				NotifyValueChanged (searchWidget);
+			}
+		}
 
 
 
 		public Command CMDNew, CMDOpen, CMDSave, CMDSaveAs, CMDQuit, CMDShowLeftPane,
-					CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp, CMDAbout, CMDOptions;
+					CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDHelp, CMDAbout, CMDOptions,
+					CMDGotoParentEvent, CMDEventHistoryForward, CMDEventHistoryBackward;
 		public CommandGroup EventCommands, DirectoryCommands;
 		public CommandGroup EditorCommands => new CommandGroup (CMDUndo, CMDRedo, CMDCut, CMDCopy, CMDPaste, CMDSave, CMDSaveAs);
 		void initCommands ()
@@ -78,8 +112,12 @@ namespace DebugLogAnalyzer
 			CMDCopy = new Command ("Copy", new Action (() => copy ()), "#Icons.copy-file.svg", false);
 			CMDPaste= new Command ("Paste", new Action (() => paste ()), "#Icons.paste-on-document.svg", false);
 
+			CMDGotoParentEvent = new Command("parent", ()=> { CurrentEvent = CurrentEvent?.parentEvent; }, null, false);
+			CMDEventHistoryBackward = new Command("back.", currentEventHistoryGoBack, null, false);
+			CMDEventHistoryForward = new Command("forw.", currentEventHistoryGoForward, null, false);
+
 			EventCommands = new CommandGroup(
-				new Command("Goto parent event", ()=> { CurrentEvent = CurrentEvent?.parentEvent; })
+				CMDGotoParentEvent, CMDEventHistoryBackward, CMDEventHistoryForward
 			);
 			DirectoryCommands = new CommandGroup(
 				new Command("Set as root directory", ()=> { CurrentEvent = CurrentEvent?.parentEvent; })
@@ -100,7 +138,7 @@ namespace DebugLogAnalyzer
 				NotifyValueChanged(CrowDbgAssemblyLocation);
 			}
 		}
-		public List<DbgEvent> Events {
+		public ObservableList<DbgEvent> Events {
 			get => events;
 			set {
 				if (events == value)
@@ -109,7 +147,7 @@ namespace DebugLogAnalyzer
 				NotifyValueChanged (nameof (Events), events);
 			}
 		}
-		public List<DbgWidgetRecord> Widgets {
+		public ObservableList<DbgWidgetRecord> Widgets {
 			get => widgets;
 			set {
 				if (widgets == value)
@@ -118,18 +156,83 @@ namespace DebugLogAnalyzer
 				NotifyValueChanged (nameof (Widgets), widgets);
 			}
 		}
+		/*IEnumerable<DbgWidgetEvent> widgetEvents (DbgWidgetRecord wr, DbgEvent evt) {
+			if (evt is DbgWidgetEvent we && we.InstanceIndex == wr.InstanceIndex)
+				yield return we;
+			if (evt.Events != null) {
+				foreach (DbgEvent e in evt.Events)
+					foreach (DbgWidgetEvent ye in widgetEvents (wr, e))				
+						yield return ye;
+			}
+		}
+		IEnumerable<DbgWidgetEvent> currentWidgetEvents;
+
+		public IEnumerable<DbgWidgetEvent> CurrentWidgetEvents {
+			get => currentWidgetEvents;
+			set {
+				currentWidgetEvents = value;
+				NotifyValueChanged (currentWidgetEvents);
+				curWidget.Events = new List<DbgEvent> (currentWidgetEvents);
+			}
+		}
+		IEnumerable<DbgWidgetEvent> getCurrentWidgetEvents () {
+			if (CurrentWidget == null)
+				yield return null;
+			else {
+				foreach (DbgEvent evt in Events)
+					foreach (DbgWidgetEvent dwe in widgetEvents (CurrentWidget, evt))
+						yield return dwe;
+			}
+		}*/
+
+		 
 		public DbgEvent CurrentEvent {
 			get => curEvent;
 			set {
 				if (curEvent == value)
 					return;
+
+				if (!disableCurrentEventHistory) {
+					CurrentEventHistoryForward.Clear ();
+					CMDEventHistoryForward.CanExecute = false;
+					if (!(value == null || curEvent == null)) {
+						CurrentEventHistoryBackward.Push (curEvent);
+						CMDEventHistoryBackward.CanExecute = true;
+					}
+				}				
 				
 				curEvent = value;
+
 				NotifyValueChanged (nameof (CurrentEvent), curEvent);
 				NotifyValueChanged ("CurEventChildEvents", curEvent?.Events);
-				
+				if (CurrentEvent != null && CurrentEvent.parentEvent != null)
+					CMDGotoParentEvent.CanExecute = true;
+				else
+					CMDGotoParentEvent.CanExecute = false;				
 			}
 		}
+		void currentEventHistoryGoBack () {
+			disableCurrentEventHistory = true;
+			if (CurrentEvent != null) {
+				CurrentEventHistoryForward.Push (CurrentEvent);
+				CMDEventHistoryForward.CanExecute = true;
+			}
+			CurrentEvent = CurrentEventHistoryBackward.Pop ();
+			CMDEventHistoryBackward.CanExecute = CurrentEventHistoryBackward.Count > 0;
+
+			disableCurrentEventHistory = false;
+		}
+
+		void currentEventHistoryGoForward () {
+			disableCurrentEventHistory = true;
+			CurrentEventHistoryBackward.Push (CurrentEvent);
+			CMDEventHistoryBackward.CanExecute = true;
+			CurrentEvent = CurrentEventHistoryForward.Pop ();
+			CMDEventHistoryForward.CanExecute = CurrentEventHistoryForward.Count > 0;
+
+			disableCurrentEventHistory = false;
+		}
+
 		public DbgWidgetRecord CurrentWidget {
 			get => curWidget;
 			set {
@@ -138,8 +241,7 @@ namespace DebugLogAnalyzer
 				curWidget = value;
 				NotifyValueChanged (nameof (CurrentWidget), curWidget);
 				NotifyValueChanged ("CurWidgetRootEvents", curWidget?.RootEvents);
-				NotifyValueChanged ("CurWidgetEvents", curWidget?.Events);
-				
+				NotifyValueChanged ("CurrentWidgetEvents", curWidget?.Events);
 			}
 		}
 		public List<DbgWidgetEvent> CurWidgetRootEvents => curWidget == null? new List<DbgWidgetEvent>() : curWidget.RootEvents;
@@ -192,7 +294,16 @@ namespace DebugLogAnalyzer
 				debugLogRecording = value;
 				NotifyValueChanged(debugLogRecording);
 			}
-		}		
+		}
+		public bool DebugLogOnStartup {
+			get => Configuration.Global.Get<bool> (nameof(DebugLogOnStartup));
+			set {
+				if (DbgLogger.ConsoleOutput != value)
+					return;				
+				Configuration.Global.Set (nameof(DebugLogOnStartup), value);
+				NotifyValueChanged(DebugLogOnStartup);
+			}
+		}				
 
 		
 		const string _defaultFileName = "unnamed.txt";

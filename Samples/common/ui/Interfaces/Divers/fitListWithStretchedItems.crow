@@ -1,0 +1,15 @@
+﻿<?xml version="1.0"?>
+
+<ListBox Data="{TestList}" Width="Fit" >
+	<Template>
+		<Scroller Height="Stretched" Background="DarkRed" Margin="1">
+			<VerticalStack Name="ItemsContainer" Orientation="Horizontal" VerticalAlignment="Top" Height="Fit" Background="Grey" Margin="20"/>
+		</Scroller>
+	</Template>
+	<ItemTemplate>
+		<!--<Label Text="{}" TextAlignment="Center" Font="mono, 9" Foreground="Black" Margin="10" Width="Stretched" Background="{}"/>-->
+		<Label Text="{}" TextAlignment="Center" Font="mono, 9" Foreground="Black" Margin="10" Background="{}" Width="Stretched" />
+	</ItemTemplate>
+
+</ListBox>
+

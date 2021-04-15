@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<DockWindow Caption="Debug Log" Background="0.05,0.05,0.1,0.9" Width="80%" Height="80%">
+	<VerticalStack Name="LogGraph" Background="DarkGrey">
+		<EnumSelector RadioButtonStyle="CheckBox2" Template="#Dbg.EnumSelector.template"
+				Caption="Discarded Events" EnumValue="{²../dbv.Filter}" BitFieldExcludeMask="255" />					
+		<HorizontalStack>
+			<DbgLogViewer Visible="true" Name="dbv" Events="{Events}" Widgets="{Widgets}" 
+									 CurrentEvent="{²CurrentEvent}" CurrentWidget="{²CurrentWidget}" />
+			<ScrollBar Maximum="{../dbv.MaxScrollY}" Value="{²../dbv.ScrollY}" SmallIncrement="1" LargeIncrement="10"
+											CursorRatio="{../dbv.ChildHeightRatio}"/>
+		</HorizontalStack>
+		<ScrollBar Style="HScrollBar"  Maximum="{../dbv.MaxScrollX}" Value="{²../dbv.ScrollX}" SmallIncrement="1" LargeIncrement="10"
+					CursorRatio="{../dbv.ChildWidthRatio}"/>
+	</VerticalStack>
+</Window>

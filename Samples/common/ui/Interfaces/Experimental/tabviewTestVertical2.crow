@@ -1,4 +1,5 @@
-﻿<HorizontalStack Spacing="0" > 
+﻿<?xml version="1.0"?>
+<HorizontalStack Spacing="0" > 
 	<ListBox Data="{../grp.Children}" Width="Fit"> 
 		<Template>
 			<VerticalStack Name="ItemsContainer" Background="{./Background}"/> 

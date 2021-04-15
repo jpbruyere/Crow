@@ -87,19 +87,19 @@ namespace Crow
 		#endregion
 
 		#region GraphicObject override
-		[XmlIgnore]public override Rectangle ClientRectangle {
+		/*[XmlIgnore]public override Rectangle ClientRectangle {
 			get {
 				Rectangle cb = base.ClientRectangle;
 				cb.Inflate (- BorderWidth);
 				return cb;
 			}
-		}
+		}*/
 
-		public override int measureRawSize (LayoutingType lt)
+		/*public override int measureRawSize (LayoutingType lt)
 		{
 			int tmp = base.measureRawSize (lt);
 			return tmp < 0 ? tmp : tmp + 2 * BorderWidth;
-		}
+		}*/
 		protected override void onDraw (Context gr)
 		{
 			drawborder2 (gr);

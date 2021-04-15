@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ItemTemplate DataType="Command">
+	<Button Command="{}" Fit="true"/>
+</ItemTemplate>
+<ItemTemplate DataType="CommandGroup">
+	<MenuItem Data="{}" Fit="true" />
+</ItemTemplate>
+

@@ -215,7 +215,7 @@ namespace Crow
 				return;
 			}
 			RegisterForLayouting (LayoutingType.ArrangeChildren);
-			raiseLayoutChanged (new LayoutingEventArgs (layoutType));
+			raiseLayoutChanged (layoutType);
 		}
 		#endregion
 	}

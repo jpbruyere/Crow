@@ -609,6 +609,8 @@ namespace Crow
 		}
 		public override int measureRawSize(LayoutingType lt)
 		{
+			DbgLogger.StartEvent(DbgEvtType.GOMeasure, this, lt);
+
 			if ((bool)lines?.IsEmpty)
 				getLines ();
 
@@ -624,6 +626,7 @@ namespace Crow
 					measureTextBounds (gr);
 				}
 			}
+			DbgLogger.EndEvent(DbgEvtType.GOMeasure);
 			return Margin * 2 + (lt == LayoutingType.Height ? cachedTextSize.Height : cachedTextSize.Width);
 		}
 		

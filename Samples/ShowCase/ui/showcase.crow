@@ -10,6 +10,20 @@
 	</VerticalStack>
 	<Splitter Width="6" />
 	<VerticalStack>
+		<!--<VerticalStack Name="Watches" Background="Black" Height="Fit" Width="Stretched">
+			<HorizontalStack Height="Fit">
+				<Label Style="smallLabel" Text="hover:" Width="50"/>
+				<Label Style="smallLabel" Text="{HoverWidget}"/>
+			</HorizontalStack>
+			<HorizontalStack Height="Fit">
+				<Label Style="smallLabel" Text="focus:" Width="50"/>
+				<Label Style="smallLabel" Text="{FocusedWidget}"/>
+			</HorizontalStack>
+			<HorizontalStack Height="Fit">
+				<Label Style="smallLabel" Text="active:" Width="50"/>
+				<Label Style="smallLabel" Text="{ActiveWidget}"/>
+			</HorizontalStack>
+		</VerticalStack>-->
 		<Container Name="CrowContainer" Height="60%" Background="Black"/>
 		<Splitter/>
 		<VerticalStack>

@@ -1,28 +1,27 @@
-﻿<VerticalStack>
-	<ListBox Name="lb">
-		<Template>
-			<VerticalStack Spacing="0"> 
-				<ListBox Data="{./Items}" Height="Fit" SelectedItem="{²./SelectedItem}">
-					<Template>
-						<HorizontalStack Name="ItemsContainer" Background="{./Background}"/>
-					</Template>
-					<ItemTemplate>
-						<ListItem Width="Fit" Background="Transparent" IsSelected="{²IsVisible}"
-								Tooltip="{GetType}"
-								Selected="{DataSource.Visible='true'};{Background=CornflowerBlue}"
-								Unselected="{.DataSource.Visible='false'};{Background=Transparent}"> 
-							<Label Text="{Caption}" Margin="5" />
-						</ListItem>
-					</ItemTemplate>
-				</ListBox>			
-				<Group Name="ItemsContainer"/>
-			</VerticalStack>
-		</Template>
-		<GroupBox Caption="item 1" IsVisible="true" Background="CornflowerBlue">
-			<Label Text="{Caption}"/>
-		</GroupBox>
-		<GroupBox Caption="item 2" IsVisible="false" Background="CornflowerBlue"/>
-		<GroupBox Caption="item 3" IsVisible="false" Background="CornflowerBlue"/>
-	</ListBox>
-	<Label DataSource="{../lb.SelectedItem}" Text="{Caption}"/> 
-</VerticalStack>
+﻿<TabView Orientation="Vertical">
+	<Template>
+		<GenericStack Orientation="{./OppositeOrientation}" Spacing="0" Background="{./Background}" > 
+			<ListBox  Data="{./Items}" Width="Fit" Height="Fit" HorizontalAlignment="Left" VerticalAlignment="Top"
+						SelectedItem="{²./SelectedItem}"> 
+				<Template>
+					<GenericStack Orientation="{../../../Orientation}" Name="ItemsContainer" Width="Fit" />
+				</Template>
+				<ItemTemplate>
+					<ListItem Width="Stretched" Height="Fit" Background="${InactiveTabItem}" IsSelected="{IsVisible}" Margin="5"
+							Selected="{.DataSource.Visible='true'};{Background=.DataSource.Background}"
+							Unselected="{.DataSource.Visible='false'};{Background=${InactiveTabItem}}"> 
+						<Label Text="{Name}" Width="Fit" />
+					</ListItem>
+				</ItemTemplate>
+			</ListBox>
+			<Group Name="ItemsContainer" />
+		</GenericStack>
+	</Template>
+	<GroupBox Name="item 1qdsf" Caption="item 1" IsVisible="true" Background="Violet"/>			
+	<GroupBox Name="item 2qdsmlkjqsdlfkj" Caption="item 2" IsVisible="false" Background="CornflowerBlue"/>
+	<GroupBox Name="item 3" Caption="item 3" IsVisible="false" Background="Red"/>
+	<GroupBox Name="item 4qsdfmlkjqs" Caption="item 4" IsVisible="false" Background="Green"/>
+	<GroupBox Name="item 5" Caption="item 5" IsVisible="false" Background="Brown"/>
+	<GroupBox Name="item 6" Caption="item 6" IsVisible="false" Background="RoyalBlue"/>
+	<GroupBox Name="item 7qsdf" Caption="item 7" IsVisible="false" Background="Yellow"/>
+</TabView>

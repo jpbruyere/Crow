@@ -12,6 +12,7 @@ using System.Diagnostics;
 using CrowDbgShared;
 using System.Collections.Generic;
 using Crow.DebugLogger;
+using System.Linq;
 
 namespace Crow
 {	
@@ -27,7 +28,10 @@ namespace Crow
 		Type dbgIfaceType;
 		Action<int, int> delResize;
 		Func<int, int, bool> delMouseMove;
+		Func<float, bool> delMouseWheelChanged;
 		Func<MouseButton, bool> delMouseDown, delMouseUp;
+		Func<char, bool> delKeyPress;
+		Func<Key, bool> delKeyDown, delKeyUp;
 		Action delResetDirtyState;
 		Action delResetDebugger;
 		Action<object, string> delSaveDebugLog;
@@ -178,11 +182,23 @@ namespace Crow
 				delMouseMove = (Func<int, int, bool>)Delegate.CreateDelegate(typeof(Func<int, int, bool>),
 											dbgIFace, dbgIfaceType.GetMethod("OnMouseMove"));
 
+				delMouseWheelChanged = (Func<float, bool>)Delegate.CreateDelegate(typeof(Func<float, bool>),
+											dbgIFace, dbgIfaceType.GetMethod("OnMouseWheelChanged"));
+
+
 				delMouseDown = (Func<MouseButton, bool>)Delegate.CreateDelegate(typeof(Func<MouseButton, bool>),
 											dbgIFace, dbgIfaceType.GetMethod("OnMouseButtonDown"));
 
 				delMouseUp = (Func<MouseButton, bool>)Delegate.CreateDelegate(typeof(Func<MouseButton, bool>),
 											dbgIFace, dbgIfaceType.GetMethod("OnMouseButtonUp"));
+
+				delKeyDown = (Func<Key, bool>)Delegate.CreateDelegate(typeof(Func<Key, bool>),
+											dbgIFace, dbgIfaceType.GetMethod("OnKeyDown"));
+				delKeyUp = (Func<Key, bool>)Delegate.CreateDelegate(typeof(Func<Key, bool>),
+											dbgIFace, dbgIfaceType.GetMethod("OnKeyUp"));
+				delKeyPress = (Func<char, bool>)Delegate.CreateDelegate(typeof(Func<char, bool>),
+											dbgIFace, dbgIfaceType.GetMethod("OnKeyPress"));
+
 
 				delGetSurfacePointer = (IntPtrGetterDelegate)Delegate.CreateDelegate(typeof(IntPtrGetterDelegate),
 											dbgIFace, dbgIfaceType.GetProperty("SurfacePointer").GetGetMethod());
@@ -218,19 +234,60 @@ namespace Crow
 		}
 		public override bool CacheEnabled { get => true; set => base.CacheEnabled = true; }
 
+		public override void onKeyDown(object sender, KeyEventArgs e)
+		{
+			if (initialized) {
+				try
+				{					
+					e.Handled = delKeyDown (e.Key);
+				}
+				catch (System.Exception ex)
+				{
+					Console.WriteLine($"[Error][DebugIFace key down]{ex}");
+				}				
+			}
+			base.onKeyDown(sender, e);
+		}
+		public override void onKeyUp(object sender, KeyEventArgs e)
+		{
+			if (initialized) {
+				try
+				{					
+					e.Handled = delKeyUp (e.Key);
+				}
+				catch (System.Exception ex)
+				{
+					Console.WriteLine($"[Error][DebugIFace key up]{ex}");
+				}				
+			}
+			base.onKeyUp(sender, e);
+		}
+		public override void onKeyPress(object sender, KeyPressEventArgs e)
+		{
+			if (initialized) {
+				try
+				{					
+					e.Handled = delKeyPress (e.KeyChar);
+				}
+				catch (System.Exception ex)
+				{
+					Console.WriteLine($"[Error][DebugIFace key press]{ex}");
+				}				
+			}
+			base.onKeyPress(sender, e);
+		}
 		public override void onMouseMove(object sender, MouseMoveEventArgs e)
 		{
 			if (initialized) {
 				try
 				{
 					Point m = ScreenPointToLocal (e.Position);
-					delMouseMove (m.X, m.Y);
+					e.Handled = delMouseMove (m.X, m.Y);
 				}
 				catch (System.Exception ex)
 				{
 					Console.WriteLine($"[Error][DebugIFace mouse move]{ex}");
-				}
-				e.Handled = true;
+				}				
 			}
 			base.onMouseMove(sender, e);
 		}
@@ -239,13 +296,12 @@ namespace Crow
 			if (initialized) {				
 				try
 				{
-					delMouseDown (e.Button);
+					e.Handled = delMouseDown (e.Button);
 				}
 				catch (System.Exception ex)
 				{
 					Console.WriteLine($"[Error][DebugIFace mouse down]{ex}");
-				}
-				e.Handled=true;
+				}				
 			}
 			base.onMouseDown (sender, e);			
 		}
@@ -254,15 +310,28 @@ namespace Crow
 			if (initialized) {				
 				try
 				{
-					delMouseUp (e.Button);			
+					e.Handled = delMouseUp (e.Button);			
 				}
 				catch (System.Exception ex)
 				{
 					Console.WriteLine($"[Error][DebugIFace mouse up]{ex}");
-				}
-				e.Handled=true;
+				}				
 			}
 			base.onMouseUp (sender, e);
+		}
+		public override void onMouseWheel(object sender, MouseWheelEventArgs e)
+		{
+			if (initialized) {				
+				try
+				{
+					e.Handled = delMouseWheelChanged (e.Delta);			
+				}
+				catch (System.Exception ex)
+				{
+					Console.WriteLine($"[Error][DebugIFace mouse wheel change]{ex}");
+				}				
+			}
+			base.onMouseWheel(sender, e);
 		}
 
 		protected override void RecreateCache()
@@ -286,21 +355,51 @@ namespace Crow
 			
 		}
 
+		int firstWidgetIndexToGet = 0;
 		void getLog () {
+			DebugLogAnalyzer.Program dla = IFace as DebugLogAnalyzer.Program;
+
 			using (Stream stream = new MemoryStream (1024)) {
 				Type debuggerType = crowAssembly.GetType("Crow.DbgLogger");
-				debuggerType.GetMethod("Save", new Type[] {dbgIfaceType, typeof(Stream)}).Invoke(null, new object[] {dbgIFace, stream});
+				MethodInfo miSave = debuggerType.GetMethod("Save",
+					new Type[] {
+						dbgIfaceType,
+						typeof(Stream),
+						typeof(int),
+						typeof(bool)
+					});
+
+
+				widgets = new List<DbgWidgetRecord>();
+				events = new List<DbgEvent>();
+				miSave.Invoke(null, new object[] {dbgIFace, stream, firstWidgetIndexToGet, true});
 				//debuggerType.GetMethod("Save", new Type[] {dbgIfaceType, typeof(string)}).Invoke(null, new object[] {dbgIFace, "debug.log"});
 				//delSaveDebugLog(dbgIFace, "debug.log");
 				stream.Seek(0, SeekOrigin.Begin);
-				events = new List<DbgEvent>();
-				widgets = new List<DbgWidgetRecord>();
 				DbgLogger.Load (stream, events, widgets);
-				//DbgLogger.Load ("debug.log", events, widgets);
-				DebugLogAnalyzer.Program dla = IFace as DebugLogAnalyzer.Program;
-				dla.Widgets = widgets;
-				dla.Events = events;
+
+				lock (dla.UpdateMutex) {
+					for (int i = 0; i < widgets.Count; i++) {
+						widgets[i].listIndex = dla.Widgets.Count;
+						dla.Widgets.Add	(widgets[i]);
+					}
+					for (int i = 0; i < events.Count; i++) {
+						dla.Events.Add (events[i]);
+						updateWidgetEvents (dla.Widgets, events[i]);
+					}
+				}				
+				firstWidgetIndexToGet += widgets.Count;				
+				if (widgets.Count > 0 && firstWidgetIndexToGet != widgets.Last().InstanceIndex + 1)
+					Debugger.Break ();
 			}
+		}
+		void updateWidgetEvents (List<DbgWidgetRecord> widgets, DbgEvent evt) {
+			if (evt is DbgWidgetEvent we)
+				widgets.FirstOrDefault (w => w.InstanceIndex == we.InstanceIndex)?.Events.Add (we);
+			if (evt.Events == null)
+				return;
+			foreach (DbgEvent e in evt.Events) 
+				updateWidgetEvents (widgets, e);			
 		}
 
 		public virtual object GetScreenCoordinates () => ScreenCoordinates(Slot).TopLeft;

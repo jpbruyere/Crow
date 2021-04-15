@@ -1,0 +1,13 @@
+﻿<Menu Caption="test">
+	<MenuItem Caption="parent" Width="Fit">
+		<MenuItem Caption="Test" Width="Fit"/>
+		<MenuItem Data="{Commands}" Caption="menu">
+			<Template>
+				<VerticalStack Name="ItemsContainer" Width="Stretched" />
+			</Template>
+			<ItemTemplate>
+				<MenuItem Command="{}"/>
+			</ItemTemplate>
+		</MenuItem>
+	</MenuItem>
+</Menu>

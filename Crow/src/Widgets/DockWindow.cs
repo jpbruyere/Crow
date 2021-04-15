@@ -31,10 +31,14 @@ namespace Crow
 					return;
 				isDocked = value;
 				NotifyValueChangedAuto (isDocked);
-				NotifyValueChanged ("IsFloating", !isDocked);
+				NotifyValueChanged ("IsFloating", IsFloating);
+				NotifyValueChanged ("IsDockedInTabView", IsDockedInTabView);
+				NotifyValueChanged ("IsDockedInStack", IsDockedInStack);
 			}
 		}
-		[XmlIgnore] public bool IsFloating { get { return !isDocked; }}
+		[XmlIgnore] public bool IsFloating => !isDocked;
+		[XmlIgnore] public bool IsDockedInTabView => LogicalParent is TabView;
+		[XmlIgnore] public bool IsDockedInStack => Parent is DockStack;
 
 		public Alignment DockingPosition {
 			get { return docking; }

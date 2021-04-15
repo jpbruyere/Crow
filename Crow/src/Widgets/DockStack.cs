@@ -325,14 +325,14 @@ namespace Crow
 			dw.savedSlot = Rectangle.Parse (getConfAttrib (conf, ref i));
 			dw.wasResizable = Boolean.Parse (getConfAttrib (conf, ref i));
 			dw.Resizable = false;
-
-			dw.IsDocked = true;
+			
 			dw.DataSource = dataSource;
 			return dw;
 		}
 		void importConfig (string conf, ref int i, object dataSource) {						
 			if (conf [i++] != '(')
-				return;			
+				return;
+			DockWindow dw = null;			
 			while (i < conf.Length - 4) {
 				string sc = conf.Substring (i, 4);
 				i += 4;
@@ -343,12 +343,17 @@ namespace Crow
 					tv.Height = Measure.Parse (getConfAttrib (conf, ref i));
 					this.AddChild (tv);
 					i++;					
-					while (conf [i] != ')')
-						tv.AddItem (importDockWinConfig (conf, ref i, dataSource));
+					while (conf [i] != ')') {
+						dw = importDockWinConfig (conf, ref i, dataSource);
+						tv.AddItem (dw);
+						dw.IsDocked = true;
+					}
 					i++;
 					break;
-				case "WIN;":					
-					this.AddChild (importDockWinConfig (conf, ref i, dataSource));
+				case "WIN;":		
+					dw = importDockWinConfig (conf, ref i, dataSource);			
+					this.AddChild (dw);
+					dw.IsDocked = true;
 					break;
 				case "STK;":
 					DockStack ds = new DockStack (IFace);

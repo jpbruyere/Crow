@@ -27,6 +27,9 @@ namespace Crow
 				orientation = value;
 				NotifyValueChangedAuto (orientation);
 				NotifyValueChanged ("OppositeOrientation", OppositeOrientation);
+				NotifyValueChanged ("TabWidth", TabWidth);
+				NotifyValueChanged ("TabHeight", TabHeight);
+				RegisterForLayouting (LayoutingType.Sizing);
 			}
 		}
 		public Orientation OppositeOrientation 
@@ -34,7 +37,28 @@ namespace Crow
 		public Measure TabWidth
 			=> orientation == Orientation.Vertical ? Measure.Stretched : Measure.Fit;		
 		public Measure TabHeight
-			=> orientation == Orientation.Horizontal ? Measure.Stretched : Measure.Fit;		
+			=> orientation == Orientation.Horizontal ? Measure.Stretched : Measure.Fit;
+
+		public override void RemoveItem(Widget g, bool disposeChild = true)
+		{			
+			if (SelectedItem != g) {
+				base.RemoveItem(g, disposeChild);
+				return;
+			}
+				
+			int idx = Items.IndexOf (g);
+			base.RemoveItem(g, disposeChild);
+
+			if (idx >= Items.Count)
+				selectedItemContainer = Items.LastOrDefault();
+			else
+				selectedItemContainer = Items[idx];
+
+			if (selectedItemContainer == null)
+				return;
+			selectedItemContainer.IsVisible = true;
+			SelectedItem = selectedItemContainer;
+		}
 	}
 }
 

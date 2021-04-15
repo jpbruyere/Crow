@@ -151,8 +151,10 @@ namespace Crow
 			if (hasClick)
 				base.onMouseClick (sender, e);
 
-			if (!IsOpened)
-				(LogicalParent as Menu).AutomaticOpening = false;
+			if (!IsOpened) 
+				if (LogicalParent is Menu m)
+					m.AutomaticOpening = false;
+			
 		}
 		void closeMenu () {
 			MenuItem tmp = LogicalParent as MenuItem;

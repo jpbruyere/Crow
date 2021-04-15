@@ -721,6 +721,14 @@ namespace Crow
 				return tmp;
 			}
 		}
+		public T LoadIMLFragment<T> (string imlFragment) where T : Widget
+		 {
+			lock (UpdateMutex) {
+				T tmp = CreateITorFromIMLFragment (imlFragment).CreateInstance<T>();
+				AddWidget (tmp);
+				return tmp;
+			}
+		}
 		/// <summary>
 		/// Create an instantiator bound to this interface from the IML fragment
 		/// </summary>
@@ -746,6 +754,18 @@ namespace Crow
 				return tmp;
 			}
 		}
+		public T Load<T> (string path) where T : Widget
+		{
+			lock (UpdateMutex) {
+				DbgLogger.StartEvent (DbgEvtType.IFaceLoad);
+
+				T tmp = CreateInstance<T> (path);
+				AddWidget (tmp);
+
+				DbgLogger.EndEvent (DbgEvtType.IFaceLoad);
+				return tmp;
+			}
+		}
 		/// <summary>
 		/// Create an instance of a GraphicObject linked to this interface but not added to the GraphicTree
 		/// </summary>
@@ -753,6 +773,8 @@ namespace Crow
 		/// <param name="path">path of the iml file to load</param>
 		public virtual Widget CreateInstance (string path)
 			=> GetInstantiator (path).CreateInstance ();
+		public virtual T CreateInstance<T> (string path) where T : Widget
+			=> GetInstantiator (path).CreateInstance<T> ();
 		/// <summary>
 		/// Fetch instantiator from cache or create it.
 		/// </summary>
@@ -985,13 +1007,6 @@ namespace Crow
 
 				ctx.PushGroup ();
 
-				for (int i = 0; i < clipping.NumRectangles; i++)
-					ctx.Rectangle (clipping.GetRectangle (i));
-
-				ctx.ClipPreserve ();
-				ctx.Operator = Operator.Clear;
-				ctx.Fill ();
-				ctx.Operator = Operator.Over;				
 
 				for (int i = GraphicTree.Count -1; i >= 0 ; i--){
 					Widget p = GraphicTree[i];
@@ -1031,6 +1046,15 @@ namespace Crow
 #endif
 
 				ctx.PopGroupToSource ();
+				
+				for (int i = 0; i < clipping.NumRectangles; i++)
+					ctx.Rectangle (clipping.GetRectangle (i));
+
+				ctx.ClipPreserve ();
+				ctx.Operator = Operator.Clear;
+				ctx.Fill ();
+				ctx.Operator = Operator.Over;				
+
 
 				ctx.Paint ();
 					
@@ -1698,10 +1722,10 @@ namespace Crow
 
 			if (e.LayoutType == LayoutingType.X) {
 				if (ttc.Slot.Right > clientRectangle.Right)
-					ttc.Left = clientRectangle.Right - ttc.Slot.Width;						
+					ttc.Left = MousePosition.X - ttc.Slot.Width - 10;
 			}else if (e.LayoutType == LayoutingType.Y) {
 				if (ttc.Slot.Bottom > clientRectangle.Bottom)
-					ttc.Top = clientRectangle.Bottom - ttc.Slot.Height;
+					ttc.Top = MousePosition.Y - ttc.Slot.Height - 10;
 			}/*
 				if (ttc.Slot.Height < tc.ClientRectangle.Height) {
 					if (PopDirection.HasFlag (Alignment.Bottom)) {

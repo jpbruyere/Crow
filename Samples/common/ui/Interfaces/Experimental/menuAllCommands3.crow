@@ -1,0 +1,40 @@
+﻿<Menu Data="{AllCommands}">
+	<ItemTemplate DataType="Command">
+		<MenuItem Command="{}" Fit="true"/>
+	</ItemTemplate>
+	<ItemTemplate DataType="CommandGroup">
+		<MenuItem Caption="{Caption}" Fit="true">
+			<Template>
+				<ListItem>
+					<Popper Font="{./Font}" Caption="{./Caption}"  Background="{./Background}" PopDirection="{./PopDirection}"
+						Foreground = "{./Foreground}" CanPop="{./HasChildren}"
+						IsPopped="{²./IsOpened}" PopWidth="{./PopWidth}" PopHeight="{./PopHeight}">
+						<Template>
+							<CheckBox IsChecked="{²./IsPopped}" Caption="{./Caption}" Background="{./Background}" Foreground="{./Foreground}">
+								<Template>		
+									<Border Name="border1"
+											MinimumSize = "60,0"
+											Foreground="Transparent"
+											Background="{./Background}">
+											<Label Text="{./Caption}"
+												Foreground="{./Foreground}"
+												Margin="2" HorizontalAlignment="Left"
+												Font="{./Font}"	/>
+									</Border>
+								</Template>		
+							</CheckBox>
+						</Template>
+						<Border Foreground="Red" Width="{../PopWidth}" Height="{../PopHeight}" Background="${MenuBackground}">
+							<VerticalStack Name="ItemsContainer" Width="Stretched" />
+						</Border>
+					</Popper>
+				</ListItem>
+			</Template>
+			<ListBox Data="{Commands}" Fit="true">
+				<ItemTemplate>
+					<MenuItem Command="{}" Fit="true"/>
+				</ItemTemplate>
+			</ListBox>
+		</MenuItem>
+	</ItemTemplate>
+</Menu>

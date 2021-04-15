@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<HorizontalStack Spacing="5" Background="{./Background}">
+	<Label Text="{./Caption}"/>
+	<Popper Caption="{./SelectedItem}" Name="popper" PopDirection="Bottom" Foreground="{./Foreground}" Background="{./Background}">
+		<Template>
+			<CheckBox Caption="{./Caption}" IsChecked="{²./IsPopped}" Foreground="{./Foreground}" Background="{./Background}">
+				<Template>
+					<Border Style="ControlBorder" Background="{./Background}">
+						<HorizontalStack Margin="0" Spacing="1">
+							<TextBox Style="ControlEditableText" Text="{./Caption}"/>
+							<Shape Style="ArrowBut" MouseDown="./onScrollForth" Width="10" Height="Stretched"
+								Size="10,10" Path="M 0.5,0.5 L 9.5,0.5 L 4.5,9.5 Z F"/>
+						</HorizontalStack>
+					</Border>
+				</Template>
+			</CheckBox>
+		</Template>
+		<Border Background="Onyx" Foreground="DimGrey" BorderWidth="1" Margin="1" Height="Fit" Width="Fit"
+			MinimumSize="{../../MinimumPopupSize}" >
+			<Scroller Name="scroller1" Margin="1" 
+				MaximumSize="0,200"
+				HorizontalAlignment="Left">
+				<VerticalStack
+					Height="Fit" Name="ItemsContainer" Margin="0"
+					HorizontalAlignment="Left"
+					VerticalAlignment="Top"/>
+			</Scroller>
+		</Border>
+	</Popper>
+</HorizontalStack>

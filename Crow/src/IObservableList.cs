@@ -10,7 +10,7 @@ namespace Crow
 		event EventHandler<ListChangedEventArg> ListAdd;
 		event EventHandler<ListChangedEventArg> ListRemove;
 		event EventHandler<ListChangedEventArg> ListEdit;
-		event EventHandler<ListChangedEventArg> ListClear;
+		event EventHandler<ListClearEventArg> ListClear;
 
 		void Insert ();
 		void Remove ();

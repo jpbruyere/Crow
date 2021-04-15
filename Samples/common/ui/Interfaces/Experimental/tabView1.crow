@@ -1,0 +1,4 @@
+﻿<TabView>
+	<GroupBox Caption="test" Background="Black"/>
+	<GroupBox Caption="test" Background="Black"/>
+</TabView>

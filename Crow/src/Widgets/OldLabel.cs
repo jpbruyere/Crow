@@ -482,6 +482,8 @@ namespace Crow {
 		}
 		protected override void onDraw (Context gr)
 		{
+			DbgLogger.StartEvent(DbgEvtType.GODraw, this);
+
 			base.onDraw (gr);
 
 			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
@@ -681,6 +683,7 @@ namespace Crow {
 			}
 
 			gr.Restore ();
+			DbgLogger.EndEvent (DbgEvtType.GODraw);
 		}
 		#endregion
 

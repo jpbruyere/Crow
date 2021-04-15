@@ -18,8 +18,8 @@ namespace Crow.DebugLogger
 		public bool HasChildEvents => Events != null && Events.Count > 0;
 		public override long Duration => end - begin;
 		public double DurationMS => Math.Round ((double)Duration / Stopwatch.Frequency * 1000.0, 4);
-		public double BeginMS => Math.Round ((double)begin / Stopwatch.Frequency * 1000.0, 4);
-		public double EndMS => Math.Round ((double)end / Stopwatch.Frequency * 1000.0, 4);
+		public double BeginMS => Math.Round ((double)begin / Stopwatch.Frequency, 6);
+		public double EndMS => Math.Round ((double)end / Stopwatch.Frequency, 6);
 		public virtual bool IsWidgetEvent => false;
 		public virtual bool IsLayoutEvent => false;
 

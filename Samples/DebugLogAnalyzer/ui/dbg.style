@@ -13,3 +13,24 @@ smallLabValue {
 	Font="mono, 10";
 	Foreground="White";
 }
+DbgLogViewer {
+	MouseWheelSpeed="3";
+	Font="mono, 8";
+	Background="Onyx";
+}
+DbgEventView {
+	Height="Fit";
+	Width="150";
+}
+ComboBox {
+	Template="#Dbg.ComboBox.template";
+	Background="Jet";
+}
+labWidgetRecordList {
+	Font="mono, 11";
+	Background="Grey";
+	Foreground="Jet";
+	Margin="0";
+	Width="24";
+	TextAlignment="Right";
+}

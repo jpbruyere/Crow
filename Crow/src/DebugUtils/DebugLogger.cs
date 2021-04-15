@@ -104,10 +104,11 @@ namespace Crow
 			lock (logMutex) {
 				chrono.Stop ();
 				if (!startedEvents.ContainsKey (Thread.CurrentThread.ManagedThreadId))
-					throw new Exception ("Current thread has no event started");
+					throw new Exception ($"Current thread has no event started\n{new System.Diagnostics.StackTrace()}");
+
 				DbgLayoutEvent e = startedEvents[Thread.CurrentThread.ManagedThreadId].Pop () as DbgLayoutEvent;
 				if (e?.type != evtType)
-					throw new Exception ($"Begin/end event logging mismatch: {e.type}/{evtType}");
+					throw new Exception ($"Begin/end event logging mismatch: {e.type}/{evtType}\n{new System.Diagnostics.StackTrace()}");
 				e.end = chrono.ElapsedTicks;
 				e.SetLQI (lqi.LayoutType, lqi.result, lqi.Slot, lqi.NewSlot);
 				chrono.Start ();
@@ -177,23 +178,18 @@ namespace Crow
 			return evt;
 		}
 
-		static void parseTree (Widget go, int level = 0, int y = 1) {
+		static void parseTree (Widget go, int xLevel = 1, int y = 0) {
 			if (go == null)
 				return;
 
 			go.yIndex = y;
-			go.xLevel = level;
+			go.xLevel = xLevel;
 
-			Group gr = go as Group;
-			if (gr != null) {
-				foreach (Widget g in gr.Children) 
-					parseTree (g, level + 1, y + 1);
-
-			} else {
-				PrivateContainer pc = go as PrivateContainer;
-				if (pc != null)
-					parseTree (pc.getTemplateRoot, level + 1, y + 1);				
-			}
+			if (go is Group gr) {
+				for (int i = 0; i < gr.Children.Count; i++)				
+					parseTree (gr.Children[i], xLevel + 1, i);
+			} else if (go is PrivateContainer pc)
+				parseTree (pc.getTemplateRoot, xLevel + 1);		
 		}
 		static void saveEventList (StreamWriter s, List<DbgEvent> evts, int level = 0)
 		{
@@ -235,23 +231,34 @@ namespace Crow
 #endif
 		}
 		[Conditional("DEBUG_LOG")]
-		public static void Save(Interface iface, Stream stream) {			
+		public static void Save(Interface iface, Stream stream, int startingWidgetsIndex = -1, bool saveEvents = true) {			
 #if DEBUG_LOG
 			using (StreamWriter writer = new StreamWriter (stream, Encoding.UTF8, 1024, true)) {
 				lock (logMutex)
 				lock (iface.UpdateMutex) {
 					chrono.Stop();
-					foreach (Widget go in iface.GraphicTree)
-						parseTree (go);
 
-					writer.WriteLine ("[GraphicObjects]");
-					for (int i = 0; i < Widget.GraphicObjects.Count; i++) {
-						Widget g = Widget.GraphicObjects [i];
-						writer.WriteLine ($"{g.GetType ().Name};{g.yIndex};{g.xLevel};{g.Width};{g.Height}");
+					if (startingWidgetsIndex >= 0 ) {
+						foreach (Widget go in iface.GraphicTree)
+							parseTree (go);
+
+						if (saveEvents)
+							writer.WriteLine ("[GraphicObjects]");
+						for (int i = startingWidgetsIndex; i < Widget.GraphicObjects.Count; i++) {
+							Widget g = Widget.GraphicObjects [i];
+							writer.WriteLine ($"{g.GetType ().Name};{g.instanceIndex};{g.yIndex};{g.xLevel};{g.Width};{g.Height}");
+						}
 					}
-				
-					writer.WriteLine ("[Events]");
-					saveEventList (writer, events);
+
+					if (saveEvents) {
+						if (startingWidgetsIndex >= 0)				
+							writer.WriteLine ("[Events]");
+						saveEventList (writer, events);
+					}
+					if (startedEvents.Count > 0)
+						Console.WriteLine ($"[DebugLogger]Warning: Started events not null when events saved!");
+					startedEvents.Clear ();
+					events.Clear ();
 					chrono.Start();
 				}
 			}
@@ -267,20 +274,24 @@ namespace Crow
 		public static void Load (Stream stream, List<DbgEvent> events, List<DbgWidgetRecord> widgets)
 		{			
 			using (StreamReader reader = new StreamReader (stream)) {
-			
-				if (reader.ReadLine () != "[GraphicObjects]")
-					return;
-				while (!reader.EndOfStream) {
-					string l = reader.ReadLine ();
-					if (l == "[Events]")
-						break;
-					DbgWidgetRecord o = DbgWidgetRecord.Parse (l);
-					o.listIndex = widgets.Count;
-					widgets.Add (o);
+				
+				if (widgets != null) {
+					if (events != null && reader.ReadLine () != "[GraphicObjects]")
+						return;
+					while (!reader.EndOfStream) {
+						string l = reader.ReadLine ();
+						if (l == "[Events]")
+							break;
+						DbgWidgetRecord o = DbgWidgetRecord.Parse (l);
+						o.listIndex = widgets.Count;
+						widgets.Add (o);
+					}
 				}
 
-				Stack<DbgEvent> startedEvents = new Stack<DbgEvent> ();
+				if (events == null)
+					return;
 
+				Stack<DbgEvent> startedEvents = new Stack<DbgEvent> ();
 				if (!reader.EndOfStream) {
 					while (!reader.EndOfStream) {
 						int level = 0;
@@ -308,12 +319,14 @@ namespace Crow
 							}
 						}
 						startedEvents.Push (evt);
-						if (evt.type.HasFlag (DbgEvtType.Widget)) {
+						/*if (evt.type.HasFlag (DbgEvtType.Widget)) {
 							DbgWidgetEvent dwe =  evt as DbgWidgetEvent;
 							if (dwe.InstanceIndex >= 0)
 								widgets [dwe.InstanceIndex].Events.Add (evt);
-						}
+						}*/
 					}
+					startedEvents.Pop();
+
 				}
 			}
 		}

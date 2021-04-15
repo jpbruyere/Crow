@@ -13,7 +13,7 @@ namespace Crow
 	{
 		AliceBlue            = 0xF0F8FFFF,
 		AntiqueWhite         = 0xFAEBD7FF,
-		Aqua                 = 0x00FFFFFF,
+		//Aqua                 = 0x00FFFFFF,
 		Aquamarine           = 0x7FFFD4FF,
 		Azure                = 0xF0FFFFFF,
 		Beige                = 0xF5F5DCFF,

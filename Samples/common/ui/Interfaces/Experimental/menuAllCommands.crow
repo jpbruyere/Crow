@@ -1,0 +1,21 @@
+﻿<ListBox Data="{AllCommands}">
+	<Template>
+		<HorizontalStack Name="ItemsContainer" Margin="20" Background="DarkGrey" Fit="true"/>
+	</Template>
+	<ItemTemplate DataType="Crow.Command">
+		<Button Command="{}"/>
+	</ItemTemplate>
+	<ItemTemplate DataType="Crow.CommandGroup">
+		<VerticalStack Fit="true" Background="DarkRed" Margin="10">
+			<Label Text="{Caption}"/>
+			<ListBox Data="{Commands}">
+				<Template>
+					<VerticalStack Name="ItemsContainer" Margin="20" Background="DarkGrey" Fit="true"/>
+				</Template>
+				<ItemTemplate DataType="Crow.Command">
+					<Button Command="{}" />
+				</ItemTemplate>
+			</ListBox>
+		</VerticalStack>
+	</ItemTemplate>
+</ListBox>

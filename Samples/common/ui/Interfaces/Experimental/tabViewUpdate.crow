@@ -1,0 +1,12 @@
+﻿<TabView>
+	<Border Name="container1" Background="Grey">
+	<VerticalStack>
+			<TextBox Text="{²TestString}" MouseEnter="{Background=Salmon}" MouseLeave="{Background=White}"/>
+	</VerticalStack>
+	</Border>
+	<Border  Name="container2" Background="Grey">
+	<VerticalStack>
+			<TextBox Text="{²TestString}" Foreground="Blue" MouseEnter="{Background=Salmon}" MouseLeave="{Background=White}"/>
+	</VerticalStack>
+	</Border>
+</TabView>

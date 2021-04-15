@@ -1,0 +1,9 @@
+﻿<HorizontalStack Margin="50">
+	<VerticalStack Height="Stretched" Width="33%" Background="SeaGreen">
+		<DirectoryView Margin="1" Name="dv" CurrentDirectory="{CurrentDir}" SelectedItemChanged="Dv_SelectedItemChanged"/>
+	</VerticalStack>
+	<Splitter/>
+	<Label Text="{/Width}" Height="Stretched" Background="SeaGreen" Width="33%" Margin="5"/>
+	<Splitter/>
+	<Label Text="{/Width}" Height="Stretched" Background="SeaGreen" Width="Stretched" Margin="5"/>
+</HorizontalStack>

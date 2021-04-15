@@ -77,7 +77,7 @@ namespace Crow.IML
 		internal static MethodInfo miGetDataSource = typeof(Widget).GetProperty("DataSource").GetGetMethod ();
 		internal static EventInfo eiLogicalParentChanged = typeof(Widget).GetEvent("LogicalParentChanged");
 
-		internal static MethodInfo miIFaceCreateInstance = typeof(Interface).GetMethod ("CreateInstance", BindingFlags.Instance | BindingFlags.Public);
+		internal static MethodInfo miIFaceCreateInstance = typeof(Interface).GetMethods().First (m => m.Name == "CreateInstance" && m.IsGenericMethod == false);
 		internal static MethodInfo miGetITemp = typeof(Interface).GetMethod ("GetItemTemplate", BindingFlags.Instance | BindingFlags.Public);
 
 		internal static MethodInfo miAddITemp = typeof(Dictionary<string, ItemTemplate>).GetMethod ("set_Item", new Type[] { typeof(string), typeof(ItemTemplate) });

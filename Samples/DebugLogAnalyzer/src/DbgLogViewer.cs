@@ -300,7 +300,7 @@ namespace Crow
 
 				double penX = 5.0 * g.xLevel + cb.Left;
 
-				if (g.yIndex == 0)
+				if (g.xLevel == 0)
 					gr.SetSource (Crow.Colors.LightSalmon);
 				else if (currentLine == g.listIndex)
 					gr.SetSource(Colors.RoyalBlue);
@@ -434,10 +434,16 @@ namespace Crow
 
 			ctxR.Width = Math.Max (1, ctxR.Width);
 			ctx.Rectangle (ctxR);
-			//ctx.SetSourceColor (Color.LightYellow);
-			ctx.SetSource (Colors.Jet);
+			ctx.SetSource (0.0,0.2,0.8,0.15);
+			//ctx.SetSource (Colors.Jet);
 			ctx.Fill();
 			ctx.Operator = Cairo.Operator.Over;
+
+			str = $"{ticksToMS(Math.Abs (selEnd - selStart))} (ms)";
+
+			ctx.MoveTo (ctxR.Center.X - ctx.TextExtents (str).Width / 2, ctxR.Y + fe.Height);
+			ctx.SetSource (Colors.Black);
+			ctx.ShowText (str);
 
 		}
 		public override void OnLayoutChanges (LayoutingType layoutType)
@@ -469,7 +475,7 @@ namespace Crow
 			int lastLine = hoverLine;
 			updateMouseLocalPos (e.Position);
 
-			if (IFace.IsDown (Glfw.MouseButton.Left) && selStart >= 0)
+			if ((IFace.IsDown (Glfw.MouseButton.Left) || IFace.IsDown (Glfw.MouseButton.Middle)) && selStart >= 0)
 				selEnd = hoverTick;
 			else if (IFace.IsDown(Glfw.MouseButton.Right)) {
 				if (lastTick >= 0 && hoverTick >= 0)
@@ -479,28 +485,30 @@ namespace Crow
 				updateMouseLocalPos (e.Position);
 			} else {
 				HoverWidget = (hoverLine < 0 || hoverLine >= widgets.Count) ? null : widgets [hoverLine];
-				HoverEvent = hoverWidget?.Events.FirstOrDefault (ev => ev.begin <= hoverTick && ev.end >= hoverTick);
-				Task.Run (() => findHoverEvent (hoverWidget, hoverTick));
+				//HoverEvent = hoverWidget?.Events.FirstOrDefault (ev => ev.begin <= hoverTick && ev.end >= hoverTick);
+				double tickPerPixel = (double)visibleTicks / ClientRectangle.Width;
+				//Console.WriteLine ($"ticks per pixel: {tickPerPixel}");
+				Task.Run (() => findHoverEvent (hoverWidget, hoverTick, (int)tickPerPixel));
 			}
 
 			RegisterForRepaint();
 			
 			e.Handled = true;
 			base.onMouseMove (sender, e);
-		}
-		void findHoverEvent (DbgWidgetRecord widget, long tick) {
-			DbgEvent tmp = widget?.Events.FirstOrDefault (ev => ev.begin <= tick && ev.end >= tick);			
+		}		
+		void findHoverEvent (DbgWidgetRecord widget, long tick, long precision = 0) {
+			DbgEvent tmp = widget?.Events.FirstOrDefault (ev => ev.begin - precision <= tick && ev.end + precision >= tick);
 			if (tmp == null) {
-				tmp = Events.Where(e=>e.type.HasFlag(DbgEvtType.IFace)).Where (ev => ev.begin <= tick && ev.end >= tick).FirstOrDefault();				
+				tmp = Events.Where(e=>e.type.HasFlag(DbgEvtType.IFace)).Where (ev => ev.begin - precision <= tick && ev.end + precision >= tick).FirstOrDefault();				
 				while(tmp != null) {
-					DbgEvent che = tmp.Events?.Where(e=>e.type.HasFlag(DbgEvtType.IFace)).Where (ev => ev.begin <= tick && ev.end >= tick).FirstOrDefault();
+					DbgEvent che = tmp.Events?.Where(e=>e.type.HasFlag(DbgEvtType.IFace)).Where (ev => ev.begin - precision <= tick && ev.end + precision >= tick).FirstOrDefault();
 					if (che == null)
 						break;
 					tmp = che;
 				}
 			} else {
 				while(tmp != null) {
-					DbgEvent che = tmp.Events?.OfType<DbgWidgetEvent>()?.Where(ev=>ev.InstanceIndex == widget.listIndex && ev.begin <= tick && ev.end >= tick).FirstOrDefault();
+					DbgEvent che = tmp.Events?.OfType<DbgWidgetEvent>()?.Where(ev=>ev.InstanceIndex == widget.listIndex && ev.begin - precision <= tick && ev.end + precision >= tick).FirstOrDefault();
 					if (che == null)
 						break;
 					tmp = che;
@@ -510,21 +518,23 @@ namespace Crow
 		}
 		public override void onMouseClick(object sender, MouseButtonEventArgs e)
 		{
-			if (e.Button == Glfw.MouseButton.Left && selEnd < 0) {
-				currentTick = hoverTick;
-				currentLine = hoverLine;
-				CurrentWidget = hoverWidget;
-				CurrentEvent = hoverEvent;
+			if (e.Button == Glfw.MouseButton.Left) {
+				if (selEnd < 0) {
+					currentTick = hoverTick;
+					currentLine = hoverLine;
+					CurrentWidget = hoverWidget;
+					CurrentEvent = hoverEvent;
+				}
+				selStart = -1;
+				selEnd = -1;
 			}
-			selStart = -1;
-			selEnd = -1;
 
 			e.Handled = true;
 			base.onMouseClick(sender, e);
 		}
 		public override void onMouseDown (object sender, MouseButtonEventArgs e)
 		{
-			if (e.Button == Glfw.MouseButton.Left) {
+			if (e.Button == Glfw.MouseButton.Left || e.Button == Glfw.MouseButton.Middle) {
 				selStart = hoverTick;
 				selEnd = -1;
 			}
@@ -561,7 +571,9 @@ namespace Crow
 
 			if (IFace.Shift)
 				ScrollX -= (int)((double)(e.Delta * MouseWheelSpeed) / xScale);
-			else if (IFace.Ctrl) {
+			else if (IFace.Ctrl)
+				ScrollY -= e.Delta * MouseWheelSpeed;
+			else {
 				if (e.Delta > 0) {
 					XScale *= 2.0;
 				} else {
@@ -569,8 +581,7 @@ namespace Crow
 						XScale *= 0.5;
 				}
 				ScrollX = (long)(hoverTick - (long)((double)Math.Max(0, mousePos.X - (long)leftMargin) / xScale) - minTicks);
-			}else
-				ScrollY -= e.Delta * MouseWheelSpeed;
+			}
 		}
 
 		public override void onKeyDown (object sender, KeyEventArgs e)

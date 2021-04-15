@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Crow
 {
@@ -21,7 +22,7 @@ namespace Crow
 		public event EventHandler<ListChangedEventArg> ListAdd;
 		public event EventHandler<ListChangedEventArg> ListRemove;
 		public event EventHandler<ListChangedEventArg> ListEdit;
-		public event EventHandler<ListChangedEventArg> ListClear;
+		public event EventHandler<ListClearEventArg> ListClear;
 		#endregion
 
 		public ObservableList() : base () {}
@@ -57,13 +58,17 @@ namespace Crow
 		}
 		public new void Remove (T elem) {
 			int idx = IndexOf (elem);
-			base.RemoveAt (idx);
+			if (idx < 0)
+				Console.WriteLine ($"ObsList.Remove idx < 0: {new System.Diagnostics.StackTrace()}");
+			else
+				base.RemoveAt (idx);
 			ListRemove.Raise (this, new ListChangedEventArg (idx, elem));
 		}
 		public new void Clear ()
 		{
+			ListClearEventArg eventArg = new ListClearEventArg (this.Cast<object>());
 			base.Clear ();
-			ListClear.Raise (this, null);
+			ListClear.Raise (this, eventArg);
 		}
 		public void Remove () {
 			if (selectedIndex < 0)
