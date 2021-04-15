@@ -9,13 +9,11 @@ using Glfw;
 
 namespace Crow
 {
-	public class TableRow : HorizontalStack, ISelectable {
+	public class TableRow : GroupBase, ISelectable {
 		#region ISelectable implementation
 		bool isSelected;
-
 		public event EventHandler Selected;
 		public event EventHandler Unselected;
-
 		[DefaultValue (false)]
 		public virtual bool IsSelected {
 			get { return isSelected; }
@@ -33,173 +31,157 @@ namespace Crow
 			}
 		}
 		#endregion
+		#region EVENT HANDLERS
+		public event EventHandler<EventArgs> ChildrenCleared;
+		#endregion
+		public override void ChildrenLayoutingConstraints(ILayoutable layoutable, ref LayoutingType layoutType)
+			=> layoutType &= (~(LayoutingType.X|LayoutingType.Width));		
 
-		public Table Table => Parent as Table;		
-
-		/*public override void ChildrenLayoutingConstraints(ILayoutable layoutable, ref LayoutingType layoutType)
-		{
-			//trigger layouting for width only in the first row, the other will be set at the same horizontal position and width.
-			if (Table == null) {
-				base.ChildrenLayoutingConstraints (layoutable, ref layoutType);
+		public Table Table => Parent as Table;
+		internal Widget tallestChild = null;
+		public override void InsertChild (int idx, Widget g) {
+			if (disposed) {
+				DbgLogger.AddEvent (DbgEvtType.AlreadyDisposed | DbgEvtType.GOAddChild);
 				return;
 			}
-			if (this == Table.Children[0])
-				layoutType &= (~LayoutingType.X);	
-			else
-				layoutType &= (~(LayoutingType.X|LayoutingType.Width));			
-		}*/
-
-		public override void ComputeChildrenPositions () {
-			if (Children.Count == 0)
-				return;
-			int spacing = Table.Spacing;
-			ObservableList<Column> cols = Table.Columns;
-						
-			Widget first = Children[0];
-			TableRow firstRow = Table.Children[0] as TableRow;
-
-			if (firstRow == this) {
-				base.ComputeChildrenPositions();
-				return;
-			}			
-			childrenRWLock.EnterReadLock();			
+			childrenRWLock.EnterWriteLock ();
+				
+			g.Parent = this;
+			Children.Insert (idx, g);
 			
-			for (int i = 0; i < Children.Count && i < firstRow.Children.Count; i++)
-			{
-				Widget w = Children[i];
-				/*if (i < cols.Count && cols[i].Width.IsFit && cols[i].LargestWidget != null) {
-					w.Slot.X
-				}else{*/
-					w.Slot.X = firstRow.Children[i].Slot.X;
-					setChildWidth (w, firstRow.Children[i].Slot.Width);				
-				//}
+			childrenRWLock.ExitWriteLock ();
+
+			if (g.LastSlots.Height > contentSize.Height) {
+				tallestChild = g;
+				contentSize.Height = g.LastSlots.Height;
 			}
 
-			childrenRWLock.ExitReadLock();
-			IsDirty = true;
-		}
-		
-		public override bool UpdateLayout(LayoutingType layoutType)
-		{
-			RegisteredLayoutings &= (~layoutType);
-
-			if (Table == null)
-				return false;
-			TableRow firstRow = Table.Children[0] as TableRow;
-			if (layoutType == LayoutingType.Width) {
-				if (firstRow.RegisteredLayoutings.HasFlag (LayoutingType.Width))
-					return false;
-				if (this != firstRow) {					
-					Slot.Width = firstRow.Slot.Width;
-					if (Slot.Width != LastSlots.Width) {
-						IsDirty = true;
-						OnLayoutChanges (layoutType);
-						LastSlots.Width = Slot.Width;
-					}
-					if (RegisteredLayoutings == LayoutingType.None && IsDirty)
-						IFace.EnqueueForRepaint (this);
-
-					return true;
-				}
-			}
 			
-			return base.UpdateLayout(layoutType);
+			g.LayoutChanged += OnChildLayoutChanges;
+			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
-		/*public override int measureRawSize (LayoutingType lt) {
-			if (lt == LayoutingType.Width) {
-				if (Table == null)
-					return -1;
-				TableRow firstRow = Table.Children[0] as TableRow;				
-				if (this != firstRow) {
-					if (firstRow.RegisteredLayoutings.HasFlag (LayoutingType.Width))
-						return -1;
-					contentSize = firstRow.contentSize;
-					return firstRow.measureRawSize (lt);
-				}
-
+		public override void RemoveChild(Widget child)
+		{
+			child.LayoutChanged -= OnChildLayoutChanges;
+			//check if HoverWidget is removed from Tree
+			if (IFace.HoverWidget != null) {
+				if (this.Contains (IFace.HoverWidget))
+					IFace.HoverWidget = null;
 			}
+
+			childrenRWLock.EnterWriteLock ();
+
+			Children.Remove(child);
+			child.Parent = null;
+			child.LogicalParent = null;
+
+			childrenRWLock.ExitWriteLock ();
+
+			if (child == tallestChild && Height == Measure.Fit)
+				searchTallestChild ();
+
+			this.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
+
+		}
+		public override void ClearChildren()
+		{
+			childrenRWLock.EnterWriteLock ();
+
+			while (Children.Count > 0) {
+				Widget g = Children [Children.Count - 1];
+				g.LayoutChanged -= OnChildLayoutChanges;
+				Children.RemoveAt (Children.Count - 1);
+				g.Dispose ();
+			}
+
+			childrenRWLock.ExitWriteLock ();
+
+			resetChildrenMaxSize ();
+
+			RegisterForLayouting (LayoutingType.Sizing);
+			ChildrenCleared.Raise (this, new EventArgs ());
+		}
+		public override int measureRawSize (LayoutingType lt)
+		{
+			if (lt == LayoutingType.Height && Children.Count > 0 && tallestChild == null)
+				searchTallestChild ();					
 			return base.measureRawSize (lt);
-		}*/
-		/*public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg) {
-			if (arg.LayoutType == LayoutingType.Width) {
-				Widget w = sender as Widget;
-				TableRow firstRow = Table.Children[0] as TableRow;
-				int c = Children.IndexOf(w);				
-				if (c < Table.Columns.Count) {
-					Column col = Table.Columns[c];
-					if (col.Width.IsFit) {
-						if (col.LargestWidget == null || w.Slot.Width > col.ComputedWidth) {
-							col.ComputedWidth = w.Slot.Width;
-							col.LargestWidget = w;
-						} else if (w == col.LargestWidget)
-							Console.WriteLine ("must search for largest widget");
-					}else if (w == firstRow)
-						col.ComputedWidth = w.Slot.Width;
+		}		
+		public override void OnLayoutChanges (LayoutingType layoutType)
+		{
+			base.OnLayoutChanges (layoutType);
 
+			childrenRWLock.EnterReadLock ();
+			//position smaller objects in group when group size is fit
+			switch (layoutType) {
+			case LayoutingType.Height:
+				childrenRWLock.EnterReadLock ();
+				foreach (Widget c in Children) {
+					if (c.Height.IsRelativeToParent)
+						c.RegisterForLayouting (LayoutingType.Height);
+					else
+						c.RegisterForLayouting (LayoutingType.Y);
 				}
-				Console.WriteLine ($"ROW:{Table.Children.IndexOf(this)} COL:{c} {w.LastSlots.Width} -> {w.Slot.Width} ");
+				childrenRWLock.ExitReadLock ();
+				break;
 			}
-			base.OnChildLayoutChanges (sender, arg);
-		}*/
-		/*public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg) {
-			Widget go = sender as Widget;
-			TableRow row = go.Parent as TableRow;
-			TableRow firstRow = Table.Children[0] as TableRow;
+			childrenRWLock.ExitReadLock ();
+		}		
+		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
+		{
+			DbgLogger.StartEvent(DbgEvtType.GOOnChildLayoutChange, this);
 
-			if (arg.LayoutType == LayoutingType.Width) {
-				if (row == firstRow) {
-					base.OnChildLayoutChanges (sender, arg);
-					int idx = Children.IndexOf (go);					
-					foreach (TableRow r in Table.Children.Skip(1)) {
-						if (idx < r.Children.Count)
-							r.setChildWidth (r.Children[idx], go.Slot.Width);
-						r.contentSize = firstRow.contentSize;
-					}					
-				} //else
-					this.RegisterForLayouting (LayoutingType.ArrangeChildren);
-				return;
+			Widget g = sender as Widget;
+
+			switch (arg.LayoutType) {
+			case LayoutingType.Height:
+				if (Height == Measure.Fit) {
+					if (g.Slot.Height > contentSize.Height) {
+						tallestChild = g;
+						contentSize.Height = g.Slot.Height;
+					} else if (g == tallestChild)
+						searchTallestChild ();
+					else
+						break;
+					this.RegisterForLayouting (LayoutingType.Height);
+				}
+				break;
 			}
+			DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);
+		}
+		protected virtual void searchTallestChild (bool forceMeasure = false)
+		{
+			DbgLogger.StartEvent (DbgEvtType.GOSearchTallestChild, this);
 
-			base.OnChildLayoutChanges (sender, arg);
-		}*/
-		int splitIndex = -1;		
-		const int minColumnSize = 10;
-		public override void onMouseMove(object sender, MouseMoveEventArgs e)
-		{			
-			if (Spacing > 0 && Table != null && Table.Children.Count > 0) {
-				Point m = ScreenPointToLocal (e.Position);
-				if (IFace.IsDown (Glfw.MouseButton.Left) && splitIndex >= 0) {
-					TableRow firstRow = Table.Children[0] as TableRow;
-					Rectangle cb = ClientRectangle;
-					int splitPos = (int)(0.5 * Spacing + m.X);					
-					if (splitPos > firstRow.Children[splitIndex].Slot.Left + minColumnSize && splitPos < firstRow.Children[splitIndex+1].Slot.Right - minColumnSize) {
-						Table.Columns[splitIndex+1].Width = firstRow.Children[splitIndex+1].Slot.Right - splitPos;
-						splitPos -= Spacing;
-						Table.Columns[splitIndex].Width = splitPos - firstRow.Children[splitIndex].Slot.Left;
-						Table.RegisterForLayouting (LayoutingType.Width);
-						e.Handled = true;
-					}
-					//Console.WriteLine ($"left:{firstRow.Children[splitIndex].Slot.Left} right:{firstRow.Children[splitIndex+1].Slot.Right} cb.X:{cb.X} splitPos:{splitPos} m:{m}");				
-				} else {
-					splitIndex = -1;					
-					for (int i = 0; i < Children.Count - 1; i++)
-					{
-						Rectangle r = Children[i].Slot;
-						if (m.X >= r.Right) {
-							r = Children[i+1].Slot;
-							if (m.X <= r.Left && Table.Columns.Count - 1 > i ) {
-								IFace.MouseCursor = MouseCursor.sb_h_double_arrow;
-								splitIndex = i;
-								e.Handled = true;
-								break;
-							}
-						}
-					}
-					if (splitIndex < 0 && IFace.MouseCursor == MouseCursor.sb_h_double_arrow)
-						IFace.MouseCursor = MouseCursor.top_left_arrow;
+			childrenRWLock.EnterReadLock ();
+
+			tallestChild = null;
+			contentSize.Height = 0;
+			for (int i = 0; i < Children.Count; i++) {
+				if (!Children [i].IsVisible)
+					continue;
+				int ch = 0;
+				if (forceMeasure)
+					ch = Children [i].measureRawSize (LayoutingType.Height);
+				else if (Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
+					continue;
+				else
+					ch = Children [i].Slot.Height;
+				if (ch > contentSize.Height) {
+					contentSize.Height = ch;
+					tallestChild = Children [i];
 				}
 			}
-			base.onMouseMove(sender, e);
+			if (tallestChild == null && !forceMeasure)
+				searchTallestChild (true);
+
+			childrenRWLock.ExitReadLock ();
+
+			DbgLogger.EndEvent (DbgEvtType.GOSearchTallestChild);
+		}
+		void resetChildrenMaxSize(){
+			tallestChild = null;
+			contentSize = 0;
 		}
 	}
 }

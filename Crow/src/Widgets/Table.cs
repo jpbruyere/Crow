@@ -22,7 +22,7 @@ namespace Crow
 		string caption;
 		Measure width = Measure.Fit;
 		public int ComputedWidth;
-		public Widget LargestWidget;
+		public Widget LargestChild;
 
 		public string Caption {
 			get => caption;
@@ -66,111 +66,306 @@ namespace Crow
 		public Table ()  {}
 		public Table (Interface iface, string style = null) : base (iface, style) { }
 		#endregion
+		int columnSpacing, borderLineWidth, verticalLineWidth, horizontalLineWidth, rowsMargin;
+		ObservableList<Column> columns;
+		HorizontalStack HeaderRow;
+		string headerCellTemplate;
+		IML.Instantiator headerCellITor;
 
-		//int lineWidth;
-		ObservableList<Column> columns = new ObservableList<Column>();
+		[DefaultValue ("#Crow.DefaultTableHeaderCell.template")]
+		public string HeaderCellTemplate {
+			get => headerCellTemplate;
+			set {
+				if (headerCellTemplate == value)
+					return;
+				headerCellTemplate = value;
+				NotifyValueChangedAuto (headerCellTemplate);
 
+				headerCellITor = new IML.Instantiator (IFace, HeaderCellTemplate);
+				createHeaderRow();
+			}
+		}
+		public override void InsertChild (int idx, Widget g) {
+			g.Width = Measure.Stretched;
+			g.Margin = RowsMargin;
+			base.InsertChild (idx, g);			
+		}
+		[DefaultValue (2)]
+		public int ColumnSpacing {
+			get => columnSpacing;
+			set {
+				if (columnSpacing == value)
+					return;
+				columnSpacing = value;
+				NotifyValueChangedAuto (columnSpacing);
+				if (HeaderRow != null)
+					HeaderRow.Spacing = ColumnSpacing;
+				//RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
+			}
+		}
+		[DefaultValue (1)]
+		public int BorderLineWidth {
+			get => borderLineWidth;
+			set {
+				if (borderLineWidth == value)
+					return;
+				borderLineWidth = value;
+				NotifyValueChangedAuto (borderLineWidth);
+				RegisterForRedraw ();
+			}
+		}
+		[DefaultValue (1)]
+		public int HorizontalLineWidth {
+			get => horizontalLineWidth;
+			set {
+				if (horizontalLineWidth == value)
+					return;
+				horizontalLineWidth = value;
+				NotifyValueChangedAuto (horizontalLineWidth);
+				RegisterForRedraw ();
+			}
+		}
+		[DefaultValue (1)]
+		public int VerticalLineWidth {
+			get => verticalLineWidth;
+			set {
+				if (verticalLineWidth == value)
+					return;
+				verticalLineWidth = value;
+				NotifyValueChangedAuto (verticalLineWidth);
+				RegisterForRedraw ();
+			}
+		}
+		[DefaultValue (1)]
+		public int RowsMargin {
+			get => rowsMargin;
+			set {
+				if (rowsMargin == value)
+					return;
+				rowsMargin = value;
+				NotifyValueChangedAuto (rowsMargin);
+				childrenRWLock.EnterReadLock ();
+				foreach (Widget row in Children)
+					row.Margin = rowsMargin;
+				childrenRWLock.ExitReadLock ();
+			}
+		}		
+		//int lineWidth;		
 		public ObservableList<Column> Columns {
 			get => columns;
 			set {
 				if (columns == value)
 					return;
+				if (columns != null) {
+					deleteHeaderRow ();
+					columns.ListAdd -= Ol_AddColumn;
+					columns.ListAdd -= Ol_RemoveColumn;
+				}
+
 				columns = value;
+
+				if (columns != null) {
+					createHeaderRow ();					
+					columns.ListAdd += Ol_AddColumn;
+					columns.ListAdd += Ol_RemoveColumn;
+				}
 				NotifyValueChangedAuto(columns);
 			}
 		}
-		public override void AddChild (Widget child) {
-			TableRow tr = child as TableRow;
-			if (tr == null)
-				throw new Exception ("Table widget accept only TableRow as child.");
-			base.AddChild (child);
+		void deleteHeaderRow () {
+			if (HeaderRow == null)
+				return;
+			DeleteChild (HeaderRow);
+			HeaderRow = null;
 		}
-		/*public override void ChildrenLayoutingConstraints(ILayoutable layoutable, ref LayoutingType layoutType)
-		{
-			//trigger layouting for width only in the first row, the other will be set at the same horizontal position and width.
-			if (layoutable == Children[0])
-				layoutType &= (~LayoutingType.X);	
-			else
-				layoutType &= (~(LayoutingType.X|LayoutingType.Width));			
-		}*/
+		void createHeaderRow () {
+			deleteHeaderRow ();
+			if (Columns == null || headerCellITor == null)
+				return;
+			HeaderRow = new HorizontalStack(IFace, "TableHeaderRow") {Spacing = ColumnSpacing};
+			InsertChild (0, HeaderRow);			
+			foreach (Column c in Columns) {
+				Widget cell = headerCellITor.CreateInstance();
+				cell.LayoutChanged += onHeaderCell_LayoutChanges;
+				HeaderRow.AddChild (cell);
+				cell.DataSource = c;
+			}
+		}
+		
+		void Ol_AddColumn (object sender, ListChangedEventArg e) {
+			HeaderRow.InsertChild (e.Index, headerCellITor.CreateInstance());
+			HeaderRow.DataSource = e.Element;
+		}
+		void Ol_RemoveColumn (object sender, ListChangedEventArg e) {
+			Widget w = HeaderRow.Children[e.Index];
+			HeaderRow.RemoveChild (e.Index);
+			w.Dispose ();
+		}
+		void onHeaderCell_LayoutChanges (object sender, LayoutingEventArgs e) {
+			if (Columns == null)
+				return;
+			if (e.LayoutType == LayoutingType.Width) {
+				Widget g = sender as Widget;
+				int cIdx = HeaderRow.Children.IndexOf (g);
+				if (cIdx < Columns.Count &&  Columns[cIdx].Width.IsFit)
+					searchLargestChildInColumn (cIdx);				
+				childrenRWLock.EnterReadLock ();
+				for (int i = 1; i < Children.Count; i++) {
+					TableRow row = Children[i] as TableRow;
+					if (row.Children.Count <= cIdx)
+						continue;
+					setRowCellWidth (row.Children[cIdx], g.Slot.Width);
+				}
+				childrenRWLock.ExitReadLock ();
 
-		//overriden to prevent search for largest child, all the rows as the same total width.
-		public override void ComputeChildrenPositions () {
-			int d = 0;
-			childrenRWLock.EnterReadLock();
-			foreach (Widget c in Children) {
-				if (!c.Visible)
+				RegisterForRedraw ();
+			} else if (e.LayoutType == LayoutingType.X) {
+				Widget g = sender as Widget;
+				int cIdx = HeaderRow.Children.IndexOf (g);
+				childrenRWLock.EnterReadLock ();
+				for (int i = 1; i < Children.Count; i++) {
+					TableRow row = Children[i] as TableRow;
+					if (row.Children.Count <= cIdx)
+						continue;
+					row.Children[cIdx].Slot.X = g.Slot.X;
+					row.RegisterForRedraw();
+				}
+				childrenRWLock.ExitReadLock ();
+				RegisterForRedraw ();
+			}
+		}
+		protected void setRowCellWidth (Widget w, int newW) {
+			if (newW == w.Slot.Width)
+				return;
+			
+			w.Slot.Width = newW;
+			w.IsDirty = true;
+			w.OnLayoutChanges (LayoutingType.Width);
+			w.LastSlots.Width = w.Slot.Width;
+			w.RegisterForRedraw ();
+		}		
+
+		public override void ClearChildren()
+		{
+			base.ClearChildren();
+			createHeaderRow ();
+		}
+
+		void searchLargestChildInColumn (int cIdx)
+		{
+			DbgLogger.StartEvent (DbgEvtType.GOSearchLargestChild, this);
+
+			Column c = Columns[cIdx];
+
+			childrenRWLock.EnterReadLock ();
+
+			c.LargestChild = null;
+			int largestWidth = 0;	
+			for (int i = 1; i < Children.Count; i++) {
+				TableRow row = Children[i] as TableRow;
+				if (!row.IsVisible)
 					continue;
-				c.Slot.Y = d;
-				d += c.Slot.Height + Spacing;
-			}
-			childrenRWLock.ExitReadLock();			
-			IsDirty = true;
-		}
-		public override bool UpdateLayout(LayoutingType layoutType)
-		{
-			RegisteredLayoutings &= (~layoutType);
-
-			if (layoutType == LayoutingType.Width) {
-				//propagate column.width to each row's children
-				foreach (TableRow row in Children) {
-					for (int i = 0; i < Columns.Count && i < row.Children.Count; i++) 
-						row.Children[i].Width = Columns[i].Width;
-				}				
-			}
-			return base.UpdateLayout(layoutType);
-		}
-	
-		/*public override void OnChildLayoutChanges (object sender, LayoutingEventArgs arg) {			
-			TableRow row = sender as TableRow;
-			TableRow firstRow = Children[0] as TableRow;
-
-			if (arg.LayoutType == LayoutingType.Width) {
-				if (row == firstRow) {
-					base.OnChildLayoutChanges (sender, arg);										
-					foreach (TableRow r in Children.Skip(1)) {						
-						r.contentSize = firstRow.contentSize;
-						setChildWidth (r, firstRow.Slot.Width);
-					}					
+				int cw = row.Children [cIdx]. measureRawSize (LayoutingType.Width);
+				if (cw > largestWidth) {
+					largestWidth = cw;
+					c.LargestChild = row.Children [cIdx];
 				}
 			}
+			childrenRWLock.ExitReadLock ();
 
-			base.OnChildLayoutChanges (sender, arg);
-		}*/
-		/*protected override void onDraw (Context gr) {
+			if (HeaderRow.Children[cIdx].Slot.Width > largestWidth) {
+				c.LargestChild = HeaderRow.Children[cIdx];
+				return;
+			}
+			HeaderRow.Children[cIdx].Slot.Width = largestWidth;
+			//HeaderRow.adjustStretchedGo (LayoutingType.Width);
+
+			DbgLogger.EndEvent (DbgEvtType.GOSearchLargestChild);
+		}
+		int splitIndex = -1;		
+		const int minColumnSize = 10;		
+		public override void onMouseMove(object sender, MouseMoveEventArgs e)
+		{
+			
+			if (ColumnSpacing > 0 && Columns.Count > 0) {
+				Point m = ScreenPointToLocal (e.Position);
+				if (IFace.IsDown (Glfw.MouseButton.Left) && splitIndex >= 0) {					
+					int splitPos = (int)(0.5 * ColumnSpacing + m.X);					
+					if (splitPos > HeaderRow.Children[splitIndex].Slot.Left + minColumnSize && splitPos < HeaderRow.Children[splitIndex+1].Slot.Right - minColumnSize) {
+						Columns[splitIndex+1].Width = HeaderRow.Children[splitIndex+1].Slot.Right - splitPos;
+						splitPos -= ColumnSpacing;
+						Columns[splitIndex].Width =  splitPos - HeaderRow.Children[splitIndex].Slot.Left;
+						HeaderRow.RegisterForLayouting (LayoutingType.ArrangeChildren);
+						e.Handled = true;
+					}
+					//Console.WriteLine ($"left:{HeaderRow.Children[splitIndex].Slot.Left} right:{HeaderRow.Children[splitIndex+1].Slot.Right} splitPos:{splitPos} m:{m}");				
+				} else {
+					splitIndex = -1;					
+					for (int i = 0; i < Columns.Count - 1; i++)
+					{
+						Rectangle r = HeaderRow.Children[i].Slot;
+						if (m.X >= r.Right) {
+							r = HeaderRow.Children[i+1].Slot;
+							if (m.X <= r.Left && Columns.Count - 1 > i ) {
+								IFace.MouseCursor = MouseCursor.sb_h_double_arrow;
+								splitIndex = i;
+								e.Handled = true;
+								break;
+							}
+						}
+					}
+					if (splitIndex < 0 && IFace.MouseCursor == MouseCursor.sb_h_double_arrow)
+						IFace.MouseCursor = MouseCursor.top_left_arrow;
+				}
+			}
+			base.onMouseMove(sender, e);
+		}		
+
+
+		protected override void onDraw (Context gr) {
 			DbgLogger.StartEvent (DbgEvtType.GODraw, this);
 
 			base.onDraw (gr);
 
-			if (Children.Count > 0) {
+			if (Columns != null && columns.Count > 0 && HeaderRow != null) {
 
 				Rectangle cb = ClientRectangle;
-				TableRow fr = Children[0] as TableRow;
+							
+				Foreground.SetAsSource (IFace, gr, cb);
+				if (BorderLineWidth > 0) {
+					gr.LineWidth = BorderLineWidth;
+					CairoHelpers.CairoRectangle (gr, cb, CornerRadius, borderLineWidth);
+					gr.Stroke ();
+				}
+				double x = 0;
+				if (VerticalLineWidth > 0) {
+					gr.LineWidth = VerticalLineWidth;
+					x = cb.Left + HeaderRow.Margin + 0.5 * ColumnSpacing + HeaderRow.Children[0].Slot.Width;// - 0.5 * VerticalLineWidth;				
+					for (int i = 1; i < HeaderRow.Children.Count ; i++)
+					{
+						gr.MoveTo (x, cb.Y);
+						gr.LineTo (x, cb.Bottom);
+						x += columnSpacing + HeaderRow.Children[i].Slot.Width ;
+					}
+					gr.Stroke ();
+				}
 
+				if (HorizontalLineWidth > 0) {
+					gr.LineWidth = HorizontalLineWidth;
+					x = cb.Top + 0.5 * Spacing + Children[0].Slot.Height;// - 0.5 * HorizontalLineWidth;
+					for (int i = 1; i < Children.Count; i++)
+					{
+						gr.MoveTo (cb.Left, x);
+						gr.LineTo (cb.Right, x);
+						x += Spacing + Children[i].Slot.Height ;
+					}
+					gr.Stroke ();
+				}
 				
-				gr.LineWidth = lineWidth;
-				Foreground.SetAsSource (IFace, gr, cb);				
-				CairoHelpers.CairoRectangle (gr, cb, CornerRadius, lineWidth);
-				double x = 0.5 + cb.Left + fr.Margin + 0.5 * fr.Spacing + fr.Children[0].Slot.Width;				
-				for (int i = 1; i < fr.Children.Count ; i++)
-				{
-					gr.MoveTo (x, cb.Y);
-					gr.LineTo (x, cb.Bottom);
-					x += fr.Spacing + fr.Children[i].Slot.Width ;
-				}
-
-				//horizontal lines
-				x = 0.5 + cb.Top + 0.5 * Spacing + Children[0].Slot.Height;
-				for (int i = 0; i < Children.Count - 1; i++)
-				{
-					gr.MoveTo (cb.Left, x);
-					gr.LineTo (cb.Right, x);
-					x += Spacing + Children[i].Slot.Height ;
-				}
-				gr.Stroke ();
 			}
 
 			DbgLogger.EndEvent (DbgEvtType.GODraw);
-		}*/		
-	}	
+		}			
+
+	}
 }

@@ -279,8 +279,8 @@ namespace Crow
 		}
 		public static List<Widget> GetChildren (this Widget go) {
 			Type goType = go.GetType ();
-			if (typeof (Group).IsAssignableFrom (goType))
-				return (go as Group).Children;
+			if (typeof (GroupBase).IsAssignableFrom (goType))
+				return (go as GroupBase).Children;
 			if (typeof (Container).IsAssignableFrom (goType))
 				return new List<Widget> (new Widget[] { (go as Container).Child });
 			if (typeof (TemplatedContainer).IsAssignableFrom (goType))

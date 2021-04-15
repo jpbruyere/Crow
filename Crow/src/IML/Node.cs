@@ -39,7 +39,7 @@ namespace Crow.IML
 		/// <returns>The child addition method</returns>
 		/// <param name="childIdx">child index or, template root node has index == -1</param>
 		public MethodInfo GetAddMethod(int childIdx){
-			if (typeof (Group).IsAssignableFrom (CrowType))
+			if (typeof (GroupBase).IsAssignableFrom (CrowType))
 				return CompilerServices.miAddChild;
 			if (typeof (Container).IsAssignableFrom (CrowType))
 				return CompilerServices.miSetChild;

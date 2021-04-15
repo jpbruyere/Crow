@@ -12,76 +12,20 @@ using static Crow.Logger;
 
 namespace Crow
 {
-	public class Group : Widget
+	public class Group : GroupBase
     {
-		#if DESIGN_MODE
-		public override bool FindByDesignID(string designID, out Widget go){
-			go = null;
-			if (base.FindByDesignID (designID, out go))
-				return true;
-			childrenRWLock.EnterReadLock ();
-			foreach (Widget w in Children) {
-				if (!w.FindByDesignID (designID, out go))
-					continue;
-				childrenRWLock.ExitReadLock ();
-				return true;
-			}
-			childrenRWLock.ExitReadLock ();
-			return false;
-		}
-		public override void getIML (System.Xml.XmlDocument doc, System.Xml.XmlNode parentElem)
-		{
-			if (this.design_isTGItem)
-				return;
-			base.getIML (doc, parentElem);
-			foreach (Widget g in Children) {
-				g.getIML (doc, parentElem.LastChild);	
-			}
-		}
-		#endif
-
-		protected ReaderWriterLockSlim childrenRWLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
 		#region CTOR
 		public Group () {}
 		public Group(Interface iface, string style = null) : base (iface, style) { }
 		#endregion
 
+		internal Widget largestChild = null;
+		internal Widget tallestChild = null;
 		#region EVENT HANDLERS
 		public event EventHandler<EventArgs> ChildrenCleared;
 		#endregion
-
-		internal Widget largestChild = null;
-		internal Widget tallestChild = null;
-
-        bool _multiSelect = false;
-		ObservableList<Widget> children = new ObservableList<Widget>();
-
-        public virtual ObservableList<Widget> Children => children;
-		[DefaultValue(false)]
-        public bool MultiSelect
-        {
-            get => _multiSelect;
-            set { _multiSelect = value; }
-        }
-		public virtual void AddChild(Widget g){
-			if (disposed) {
-				DbgLogger.AddEvent (DbgEvtType.AlreadyDisposed | DbgEvtType.GOAddChild);
-				return;
-			}
-
-			childrenRWLock.EnterWriteLock();
-
-			g.Parent = this;
-			Children.Add (g);
-
-			childrenRWLock.ExitWriteLock();
-
-			//g.RegisteredLayoutings = LayoutingType.None;
-			g.LayoutChanged += OnChildLayoutChanges;
-			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
-		}
-        public virtual void RemoveChild(Widget child)
+        public override void RemoveChild(Widget child)
 		{
 			child.LayoutChanged -= OnChildLayoutChanges;
 			//check if HoverWidget is removed from Tree
@@ -106,12 +50,7 @@ namespace Crow
 			this.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 
 		}
-        public virtual void DeleteChild(Widget child)
-		{
-			RemoveChild (child);
-			child.Dispose ();
-        }
-		public virtual void InsertChild (int idx, Widget g) {
+		public override void InsertChild (int idx, Widget g) {
 			if (disposed) {
 				DbgLogger.AddEvent (DbgEvtType.AlreadyDisposed | DbgEvtType.GOAddChild);
 				return;
@@ -120,20 +59,23 @@ namespace Crow
 				
 			g.Parent = this;
 			Children.Insert (idx, g);
-
+			
 			childrenRWLock.ExitWriteLock ();
 
-			g.RegisteredLayoutings = LayoutingType.None;
+			if (g.LastSlots.Width > contentSize.Width) {
+				largestChild = g;
+				contentSize.Width = g.LastSlots.Width;
+			}
+			if (g.LastSlots.Height > contentSize.Height) {
+				tallestChild = g;
+				contentSize.Height = g.LastSlots.Height;
+			}
+
+			
 			g.LayoutChanged += OnChildLayoutChanges;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
-		public virtual void RemoveChild (int idx) {
-			RemoveChild (children[idx]);
-		}
-		public virtual void DeleteChild (int idx) {
-			DeleteChild (children[idx]);
-		}
-		public virtual void ClearChildren()
+		public override void ClearChildren()
 		{
 			childrenRWLock.EnterWriteLock ();
 
@@ -151,104 +93,17 @@ namespace Crow
 			RegisterForLayouting (LayoutingType.Sizing);
 			ChildrenCleared.Raise (this, new EventArgs ());
 		}
-		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
-		{
-			base.OnDataSourceChanged (this, e);
-
-			childrenRWLock.EnterReadLock ();
-			foreach (Widget g in Children) {
-				if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
-					g.OnDataSourceChanged (g, e);	
-			}
-			childrenRWLock.ExitReadLock ();
-		}
-
-		public void putWidgetOnTop(Widget w)
-		{
-			if (Children.Contains(w))
-			{
-				childrenRWLock.EnterWriteLock ();
-
-				Children.Remove (w);
-				Children.Add (w);
-
-				childrenRWLock.ExitWriteLock ();
-			}
-		}
-		public void putWidgetOnBottom(Widget w)
-		{
-			if (Children.Contains(w))
-			{
-				childrenRWLock.EnterWriteLock ();
-
-				Children.Remove (w);
-				Children.Insert (0, w);
-
-				childrenRWLock.ExitWriteLock ();
-			}
-		}
 
 		#region GraphicObject overrides
-
-		public override Widget FindByName (string nameToFind)
-		{
-			if (Name == nameToFind)
-				return this;
-			Widget tmp = null;
-
-			childrenRWLock.EnterReadLock ();
-
-			foreach (Widget w in Children) {
-				tmp = w.FindByName (nameToFind);
-				if (tmp != null)
-					break;
-			}
-
-			childrenRWLock.ExitReadLock ();
-
-			return tmp;
-		}
-		public override Widget FindByType<T> ()
-		{
-			if (this is T)
-				return this;
-			Widget tmp = null;
-
-			childrenRWLock.EnterReadLock ();
-
-			foreach (Widget w in Children) {
-				tmp = w.FindByType<T> ();
-				if (tmp != null)
-					break;
-			}
-
-			childrenRWLock.ExitReadLock ();
-
-			return tmp;
-		}
-		public override bool Contains (Widget goToFind)
-		{
-			foreach (Widget w in Children) {
-				if (w == goToFind)
-					return true;
-				if (w.Contains (goToFind))
-					return true;
-			}
-			return false;
-		}
 		public override int measureRawSize (LayoutingType lt)
 		{
 			if (Children.Count > 0) {
 				if (lt == LayoutingType.Width) {
 					if (largestChild == null)
-						searchLargestChild ();
-					if (largestChild == null)
-						searchLargestChild (true);
+						searchLargestChild ();					
 				} else {
 					if (tallestChild == null)
-						searchTallestChild ();
-					if (tallestChild == null)
-						searchTallestChild (true);
+						searchTallestChild ();					
 				}
 			}
 			return base.measureRawSize (lt);
@@ -262,97 +117,29 @@ namespace Crow
 			//position smaller objects in group when group size is fit
 			switch (layoutType) {
 			case LayoutingType.Width:
+				//childrenRWLock.EnterReadLock ();
 				foreach (Widget c in Children) {
 					if (c.Width.IsRelativeToParent)
 						c.RegisterForLayouting (LayoutingType.Width);
 					else
 						c.RegisterForLayouting (LayoutingType.X);
 				}
+				//childrenRWLock.ExitReadLock ();
 				break;
 			case LayoutingType.Height:
+				//childrenRWLock.EnterReadLock ();
 				foreach (Widget c in Children) {
 					if (c.Height.IsRelativeToParent)
 						c.RegisterForLayouting (LayoutingType.Height);
 					else
 						c.RegisterForLayouting (LayoutingType.Y);
 				}
+				//childrenRWLock.ExitReadLock ();
 				break;
 			}
 			childrenRWLock.ExitReadLock ();
 		}
-		protected override void onDraw (Context gr)
-		{
-			DbgLogger.StartEvent (DbgEvtType.GODraw, this);
-
-			base.onDraw (gr);			
-
-			if (ClipToClientRect) {
-				gr.Save ();
-				//clip to client zone
-				CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
-				gr.Clip ();
-			}
-
-			childrenRWLock.EnterReadLock ();
-
-			for (int i = 0; i < Children.Count; i++) 
-				Children[i].Paint (gr);			
-
-			childrenRWLock.ExitReadLock ();
-
-			if (ClipToClientRect)
-				gr.Restore ();
-
-			DbgLogger.EndEvent (DbgEvtType.GODraw);
-		}
-		protected override void UpdateCache (Context ctx)
-		{
-			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);
-			if (!Clipping.IsEmpty) {
-				using (Context gr = new Context (bmp)) {
-					for (int i = 0; i < Clipping.NumRectangles; i++)
-						gr.Rectangle(Clipping.GetRectangle(i));
-					gr.ClipPreserve();
-					gr.Operator = Operator.Clear;
-					gr.Fill();
-					gr.Operator = Operator.Over;
-
-					base.onDraw (gr);
-
-					if (ClipToClientRect) {
-						CairoHelpers.CairoRectangle (gr, ClientRectangle, CornerRadius);
-						gr.Clip ();
-					}
-
-					childrenRWLock.EnterReadLock ();
-
-					foreach (Widget c in Children) {
-						if (!c.IsVisible)
-							continue;
-						if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
-							continue;
-						c.Paint (gr);
-					}
-
-					childrenRWLock.ExitReadLock ();
-
-					#if DEBUG_CLIP_RECTANGLE
-					/*gr.LineWidth = 1;
-					gr.SetSourceColor(Color.DarkMagenta.AdjustAlpha (0.8));
-					for (int i = 0; i < Clipping.NumRectangles; i++)
-						gr.Rectangle(Clipping.GetRectangle(i));
-					gr.Stroke ();*/
-					#endif
-				}
-				DbgLogger.AddEvent (DbgEvtType.GOResetClip, this);
-				Clipping.Reset ();
-			}/*else
-				Console.WriteLine("GROUP REPAINT WITH EMPTY CLIPPING");*/
-			paintCache (ctx, Slot + Parent.ClientRectangle.Position);
-			DbgLogger.EndEvent(DbgEvtType.GOUpdateCache);				
-		}
 		#endregion
-
 		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
 		{
 			DbgLogger.StartEvent(DbgEvtType.GOOnChildLayoutChange, this);
@@ -361,38 +148,28 @@ namespace Crow
 
 			switch (arg.LayoutType) {
 			case LayoutingType.Width:
-				if (Width != Measure.Fit) {
-					DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);
-					return;
+				if (Width == Measure.Fit) {
+					if (g.Slot.Width > contentSize.Width) {
+						largestChild = g;
+						contentSize.Width = g.Slot.Width;
+					} else if (g == largestChild)
+						searchLargestChild ();
+					else
+						break;
+					this.RegisterForLayouting (LayoutingType.Width);
 				}
-				if (g.Slot.Width > contentSize.Width) {
-					largestChild = g;
-					contentSize.Width = g.Slot.Width;
-				} else if (g == largestChild)
-					searchLargestChild ();
-				else {
-					DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);
-					return;
-				}
-
-				this.RegisterForLayouting (LayoutingType.Width);
 				break;
 			case LayoutingType.Height:
-				if (Height != Measure.Fit) {
-					DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);					
-					return;
+				if (Height == Measure.Fit) {
+					if (g.Slot.Height > contentSize.Height) {
+						tallestChild = g;
+						contentSize.Height = g.Slot.Height;
+					} else if (g == tallestChild)
+						searchTallestChild ();
+					else
+						break;
+					this.RegisterForLayouting (LayoutingType.Height);
 				}
-				if (g.Slot.Height > contentSize.Height) {
-					tallestChild = g;
-					contentSize.Height = g.Slot.Height;
-				} else if (g == tallestChild)
-					searchTallestChild ();
-				else {
-					DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);
-					return;
-				}
-
-				this.RegisterForLayouting (LayoutingType.Height);
 				break;
 			}
 			DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);
@@ -403,9 +180,11 @@ namespace Crow
 			tallestChild = null;
 			contentSize = 0;
 		}
-		void searchLargestChild (bool forceMeasure = false)
+		protected virtual void searchLargestChild (bool forceMeasure = false)
 		{
 			DbgLogger.StartEvent (DbgEvtType.GOSearchLargestChild, this);
+
+			//childrenRWLock.EnterReadLock ();
 
 			largestChild = null;
 			contentSize.Width = 0;
@@ -414,8 +193,8 @@ namespace Crow
 					continue;
 				int cw = 0;
 				if (forceMeasure)
-					cw = children [i].measureRawSize (LayoutingType.Width);
-				else if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
+					cw = Children [i].measureRawSize (LayoutingType.Width);
+				else if (Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
 					continue;
 				else
 					cw = Children [i].Slot.Width;
@@ -424,12 +203,18 @@ namespace Crow
 					largestChild = Children [i];
 				}
 			}
+			if (largestChild == null && !forceMeasure)
+				searchLargestChild (true);
+
+			//childrenRWLock.ExitReadLock ();
 
 			DbgLogger.EndEvent (DbgEvtType.GOSearchLargestChild);
 		}
-		void searchTallestChild (bool forceMeasure = false)
+		protected virtual void searchTallestChild (bool forceMeasure = false)
 		{
 			DbgLogger.StartEvent (DbgEvtType.GOSearchTallestChild, this);
+
+			//childrenRWLock.EnterReadLock ();
 
 			tallestChild = null;
 			contentSize.Height = 0;
@@ -438,8 +223,8 @@ namespace Crow
 					continue;
 				int ch = 0;
 				if (forceMeasure)
-					ch = children [i].measureRawSize (LayoutingType.Height);
-				else if (children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
+					ch = Children [i].measureRawSize (LayoutingType.Height);
+				else if (Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
 					continue;
 				else
 					ch = Children [i].Slot.Height;
@@ -448,50 +233,12 @@ namespace Crow
 					tallestChild = Children [i];
 				}
 			}
+			if (tallestChild == null && !forceMeasure)
+				searchTallestChild (true);
+
+			//childrenRWLock.ExitReadLock ();
 
 			DbgLogger.EndEvent (DbgEvtType.GOSearchTallestChild);
-		}
-
-
-		#region Mouse handling
-		public override void checkHoverWidget (MouseMoveEventArgs e) {
-			base.checkHoverWidget (e);//TODO:check if not possible to put it at beginning of meth to avoid doubled check to DropTarget.
-			childrenRWLock.EnterReadLock ();
-			for (int i = Children.Count - 1; i >= 0; i--) {
-				if (Children[i].MouseIsIn (e.Position)) {
-					Children[i].checkHoverWidget (e);
-					childrenRWLock.ExitReadLock ();
-					return;
-				}
-			}
-			childrenRWLock.ExitReadLock ();			
-		}
-//		public override bool PointIsIn (ref Point m)
-//		{
-//			if (!base.PointIsIn (ref m))
-//				return false;
-//			if (CurrentInterface.HoverWidget == this)
-//				return true;
-//			lock (Children) {
-//				for (int i = Children.Count - 1; i >= 0; i--) {
-//					if (Children [i].Slot.ContainsOrIsEqual (m) && !(bool)CurrentInterface.HoverWidget?.IsOrIsInside(Children[i])) {						
-//						return false;
-//					}
-//				}
-//			}
-//			return true;
-//		}
-		#endregion
-
-		protected override void Dispose (bool disposing)
-		{
-			if (disposing) {
-				childrenRWLock.EnterReadLock ();
-				foreach (Widget c in children)
-					c.Dispose ();
-				childrenRWLock.ExitReadLock ();
-			}
-			base.Dispose (disposing);
 		}
 	}
 }

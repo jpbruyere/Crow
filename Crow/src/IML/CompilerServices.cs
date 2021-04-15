@@ -103,8 +103,8 @@ namespace Crow.IML
 		#region tree handling methods
 		internal static FieldInfo fiChild = typeof(PrivateContainer).GetField ("child", BindingFlags.Instance | BindingFlags.NonPublic);
 		internal static MethodInfo miSetChild = typeof (Container).GetMethod ("SetChild");
-		internal static MethodInfo miAddChild = typeof (Group).GetMethod ("AddChild");
-		internal static FieldInfo fiChildren = typeof(Group).GetField ("children", BindingFlags.Instance | BindingFlags.NonPublic);
+		internal static MethodInfo miAddChild = typeof (GroupBase).GetMethod ("AddChild");
+		internal static MethodInfo miGetChildren = typeof(GroupBase).GetProperty ("Children", BindingFlags.Instance | BindingFlags.Public).GetGetMethod();
 		internal static MethodInfo miLoadTmp = typeof (TemplatedControl).GetMethod ("loadTemplate", BindingFlags.Instance | BindingFlags.NonPublic);
 		internal static PropertyInfo piContent = typeof(TemplatedContainer).GetProperty ("Content");
 		internal static MethodInfo miAddItem = typeof (TemplatedGroup).GetMethod ("AddItem", BindingFlags.Instance | BindingFlags.Public);
@@ -504,8 +504,8 @@ namespace Crow.IML
 		/// <param name="parentType">Parent type</param>
 		/// <param name="index">Index of child, -1 for template root</param>
 		internal static void emitGetChild(ILGenerator il, Type parentType, int index){
-			if (typeof (Group).IsAssignableFrom (parentType)) {
-				il.Emit (OpCodes.Ldfld, fiChildren);
+			if (typeof (GroupBase).IsAssignableFrom (parentType)) {
+				il.Emit (OpCodes.Callvirt, miGetChildren);
 				il.Emit(OpCodes.Ldc_I4, index);
 				il.Emit (OpCodes.Callvirt, miGetGObjItem);
 				return;

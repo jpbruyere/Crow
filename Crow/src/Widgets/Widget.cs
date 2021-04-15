@@ -911,18 +911,18 @@ namespace Crow
 				if (value == isVisible)
 					return;
 
-				isVisible = value;
+				isVisible = value;				
 				
-				if (!isVisible)
+				/*if (!isVisible)
 					unshownPostActions ();
-				RegisterForLayouting (LayoutingType.Sizing);
-				
-				/*if (isVisible){										
+				RegisterForLayouting (LayoutingType.Sizing);*/
+
+				if (isVisible){										
 					IsDirty = true;
-					RegisterForLayouting(LayoutingType.Sizing);
 				} else {
 					unshownPostActions ();					
-				}*/
+				}
+				RegisterForLayouting(LayoutingType.Sizing);
 				
 
 				NotifyValueChangedAuto (isVisible);
@@ -1641,9 +1641,9 @@ namespace Crow
 			if (LayoutChanged != null)
 				LayoutChanged.Invoke (this, new LayoutingEventArgs (layoutType));
 		}
-		internal protected void raiseLayoutChanged(LayoutingEventArgs e){
+		internal protected void raiseLayoutChanged(LayoutingType layoutingType){
 			if (LayoutChanged != null)
-				LayoutChanged.Raise (this, e);
+				LayoutChanged.Raise (this, new LayoutingEventArgs(layoutingType));
 		}
 		/// <summary> Update layout component only one at a time, this is where the computation of alignement
 		/// and size take place.
@@ -1834,6 +1834,7 @@ namespace Crow
 			DbgLogger.EndEvent (DbgEvtType.GORecreateCache);
 		}
 		protected void paintCache(Context ctx, Rectangle rb) {
+			DbgLogger.StartEvent(DbgEvtType.GOPaintCache, this);	
 			if (clearBackground) {
 				ctx.Operator = Operator.Clear;
 				ctx.Rectangle (rb);
@@ -1843,10 +1844,12 @@ namespace Crow
 
 			ctx.SetSource (bmp, rb.X, rb.Y);
 			ctx.Paint ();
+			DbgLogger.EndEvent(DbgEvtType.GOPaintCache);	
 		}
 		protected virtual void UpdateCache(Context ctx){
 			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);			
 			paintCache (ctx, Slot + Parent.ClientRectangle.Position);
+			DbgLogger.AddEvent (DbgEvtType.GOResetClip, this);
 			Clipping.Reset ();			
 			DbgLogger.EndEvent (DbgEvtType.GOUpdateCache);
 		}
@@ -1854,8 +1857,8 @@ namespace Crow
 		/// of the widget </summary>
 		public virtual void Paint (Context ctx)
 		{
-			if (!IsVisible)
-				return;
+			/*if (!IsVisible)
+				return;*/
 
 			DbgLogger.StartEvent (DbgEvtType.GOPaint, this);
 
@@ -2146,19 +2149,19 @@ namespace Crow
 		/// Checks to handle when widget is removed from the visible graphic tree
 		/// </summary>
 		void unshownPostActions () {
-			//IsDirty = true;
+			IsDirty = true;			
 
 			/*if (parent is Widget p)
 				p.RegisterForGraphicUpdate();
 			else*/
-			/*try
+			try
 			{
 				parent?.RegisterClip (ContextCoordinates(LastPaintedSlot));
 			}
 			catch (System.Exception e)
 			{
 				Debug.WriteLine($"[ERR]:unshownPostActions:{e}");
-			}*/
+			}
 				
 
 			if (IFace.ActiveWidget != null) {
@@ -2199,7 +2202,7 @@ namespace Crow
 			}
 			LastSlots = default;
 			LastPaintedSlot = default;*/
-			
+			//Slot = LastSlots = default;			
 		}
 	}
 }
