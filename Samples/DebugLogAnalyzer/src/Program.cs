@@ -125,10 +125,6 @@ namespace DebugLogAnalyzer
 
 		}
 
-
-		
-
-			
 		public string CrowDbgAssemblyLocation {
 			get => Configuration.Global.Get<string>("CrowDbgAssemblyLocation");
 			set {
@@ -156,35 +152,6 @@ namespace DebugLogAnalyzer
 				NotifyValueChanged (nameof (Widgets), widgets);
 			}
 		}
-		/*IEnumerable<DbgWidgetEvent> widgetEvents (DbgWidgetRecord wr, DbgEvent evt) {
-			if (evt is DbgWidgetEvent we && we.InstanceIndex == wr.InstanceIndex)
-				yield return we;
-			if (evt.Events != null) {
-				foreach (DbgEvent e in evt.Events)
-					foreach (DbgWidgetEvent ye in widgetEvents (wr, e))				
-						yield return ye;
-			}
-		}
-		IEnumerable<DbgWidgetEvent> currentWidgetEvents;
-
-		public IEnumerable<DbgWidgetEvent> CurrentWidgetEvents {
-			get => currentWidgetEvents;
-			set {
-				currentWidgetEvents = value;
-				NotifyValueChanged (currentWidgetEvents);
-				curWidget.Events = new List<DbgEvent> (currentWidgetEvents);
-			}
-		}
-		IEnumerable<DbgWidgetEvent> getCurrentWidgetEvents () {
-			if (CurrentWidget == null)
-				yield return null;
-			else {
-				foreach (DbgEvent evt in Events)
-					foreach (DbgWidgetEvent dwe in widgetEvents (CurrentWidget, evt))
-						yield return dwe;
-			}
-		}*/
-
 		 
 		public DbgEvent CurrentEvent {
 			get => curEvent;
@@ -277,7 +244,7 @@ namespace DebugLogAnalyzer
 				NotifyValueChanged(DebugLogToFile);
 			}
 		}
-		public string DebugLogFilePath {
+		/*public string DebugLogFilePath {
 			get => Configuration.Global.Get<string> (nameof (DebugLogFilePath));
 			set {
 				if (CurrentFile == value)
@@ -285,7 +252,7 @@ namespace DebugLogAnalyzer
 				Configuration.Global.Set (nameof (DebugLogFilePath), value);
 				NotifyValueChanged (DebugLogFilePath);
 			}
-		}
+		}*/
 		public bool DebugLogRecording {
 			get => debugLogRecording;
 			set {

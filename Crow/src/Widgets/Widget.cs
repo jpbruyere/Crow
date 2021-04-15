@@ -158,9 +158,9 @@ namespace Crow
 				if (!localDataSourceIsNull)
 					DataSource = null;
 
-				parentRWLock.EnterWriteLock ();
+				//parentRWLock.EnterWriteLock ();
 				parent = null;
-				parentRWLock.ExitWriteLock ();
+				//parentRWLock.ExitWriteLock ();
 			} else {
 				DbgLogger.AddEvent (DbgEvtType.DisposedByGC, this);
 			}

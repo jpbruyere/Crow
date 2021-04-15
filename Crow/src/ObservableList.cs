@@ -56,6 +56,11 @@ namespace Crow
 			ListAdd.Raise (this, new ListChangedEventArg (this.Count - 1, elem));
 			SelectedIndex = this.Count - 1;
 		}
+		public new void Insert (int index, T elem) {
+			base.Insert (index, elem);
+			ListAdd.Raise (this, new ListChangedEventArg (index, elem));
+			SelectedIndex = index;
+		}
 		public new void Remove (T elem) {
 			int idx = IndexOf (elem);
 			if (idx < 0)

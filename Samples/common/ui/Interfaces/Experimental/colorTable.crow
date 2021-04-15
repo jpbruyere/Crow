@@ -1,0 +1,12 @@
+﻿<ListBox Data="{TestList}" >
+	<Template>
+		<Table Name="ItemsContainer" Columns="name,Stretched;color,100"/> 
+	</Template>
+	<ItemTemplate>
+		<TableRow>
+			<Label Text="{}" Margin="5" />
+			<Widget Background="{}" Width="50" Height="10"/>
+		</TableRow>
+	</ItemTemplate>
+
+</ListBox>

@@ -225,8 +225,8 @@ namespace Crow
 		/// <param name="iface">Iface.</param>
 		public static void Save(Interface iface, string dbgLogFilePath = "debug.log") {
 #if DEBUG_LOG
-				using (Stream stream = new FileStream (dbgLogFilePath, FileMode.Create, FileAccess.Write))
-					Save (iface, stream);
+			using (Stream stream = new FileStream (dbgLogFilePath, FileMode.Create, FileAccess.Write))
+				Save (iface, stream);
 			Console.WriteLine ($"Crow Debug Log saved to: {System.IO.Path.GetFullPath(dbgLogFilePath)}");
 #endif
 		}
@@ -254,11 +254,9 @@ namespace Crow
 						if (startingWidgetsIndex >= 0)				
 							writer.WriteLine ("[Events]");
 						saveEventList (writer, events);
+						startedEvents.Clear ();
+						events.Clear ();
 					}
-					if (startedEvents.Count > 0)
-						Console.WriteLine ($"[DebugLogger]Warning: Started events not null when events saved!");
-					startedEvents.Clear ();
-					events.Clear ();
 					chrono.Start();
 				}
 			}

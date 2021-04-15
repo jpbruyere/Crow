@@ -293,6 +293,10 @@ ColorPicker {
 	Height="Fit";
 	MinimumSize="200,100";	
 }
+Table {
+	Spacing="1";
+	Foreground="Grey";	
+}
 TableRow {
 	Width="Stretched";
 }

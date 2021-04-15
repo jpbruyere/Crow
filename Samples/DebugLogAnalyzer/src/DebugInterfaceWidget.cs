@@ -47,7 +47,9 @@ namespace Crow
 		public CommandGroup LoggerCommands =>
 			new CommandGroup(
 				new Command("Get logs", () => getLog ()),
-				new Command("Reset logs", () => delResetDebugger ())
+				new Command("Reset logs", () => delResetDebugger ()),
+				new Command("Save to file", () => saveLogToDebugLogFilePath ()),
+				new Command("Load from file", () => loadLogFromDebugLogFilePath ())
 			);
 		public string IMLSource {
 			get => imlSource;
@@ -128,7 +130,42 @@ namespace Crow
 				NotifyValueChangedAuto (DebugLogToFile);
 			}
 		}
+		public string DebugLogFilePath {
+			get => Configuration.Global.Get<string> ("DebugLogFilePath");
+			set {
+				if (DebugLogFilePath == value)
+					return;
+				Configuration.Global.Set ("DebugLogFilePath", value);
+				NotifyValueChangedAuto (value);
+			}
+		}
+		int firstWidgetIndexToSave, lastWidgetIndexToSave;
+		public int FirstWidgetIndexToSave {
+			get => firstWidgetIndexToSave;
+			set {
+				if (firstWidgetIndexToSave == value)
+					return;
+				if (value > lastWidgetIndexToSave)
+					firstWidgetIndexToSave = lastWidgetIndexToSave;
+				else
+					firstWidgetIndexToSave = value;
 
+				NotifyValueChangedAuto (firstWidgetIndexToSave);
+			}
+		}
+		public int LastWidgetIndexToSave {
+			get => lastWidgetIndexToSave;
+			set {
+				if (lastWidgetIndexToSave == value)
+					return;
+				if (lastWidgetIndexToSave > widgets.Count)
+					lastWidgetIndexToSave = widgets.Count;
+				else
+					lastWidgetIndexToSave = value;
+
+				NotifyValueChangedAuto (lastWidgetIndexToSave);
+			}
+		}
 
 		protected override void onInitialized(object sender, EventArgs e)
 		{
@@ -373,8 +410,6 @@ namespace Crow
 				widgets = new List<DbgWidgetRecord>();
 				events = new List<DbgEvent>();
 				miSave.Invoke(null, new object[] {dbgIFace, stream, firstWidgetIndexToGet, true});
-				//debuggerType.GetMethod("Save", new Type[] {dbgIfaceType, typeof(string)}).Invoke(null, new object[] {dbgIFace, "debug.log"});
-				//delSaveDebugLog(dbgIFace, "debug.log");
 				stream.Seek(0, SeekOrigin.Begin);
 				DbgLogger.Load (stream, events, widgets);
 
@@ -400,6 +435,12 @@ namespace Crow
 				return;
 			foreach (DbgEvent e in evt.Events) 
 				updateWidgetEvents (widgets, e);			
+		}
+		void saveLogToDebugLogFilePath () {
+
+		}
+		void loadLogFromDebugLogFilePath () {
+
 		}
 
 		public virtual object GetScreenCoordinates () => ScreenCoordinates(Slot).TopLeft;

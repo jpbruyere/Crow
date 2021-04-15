@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <VerticalStack Background="DarkGrey">
 	<HorizontalStack >
-		<HorizontalStack Width="25%" >
-			<VerticalStack Width="50%" Name="Explorer" Background="Onyx">
+		<TabView Width="25%" >
+			<VerticalStack Name="Explorer" Background="Onyx">
 				<HorizontalStack Height="Fit" Margin="2" >
 					<Image Margin="2" Width="16" Height="16" Path="#Crow.Icons.level-up.svg" MouseClick="goUpDirClick"
 								 Background="Jet" MouseEnter="{Background=Grey}" MouseLeave="{Background=Jet}" />			
@@ -60,8 +60,7 @@
 					</Template>		
 				</DirectoryView>
 			</VerticalStack>
-			<Splitter/>
-			<VerticalStack Name="DebugLogger" Margin="5" IsVisible="true" Background="Onyx">
+			<VerticalStack Name="DebugLogger" Margin="5" IsVisible="false" Background="Onyx">
 				<HorizontalStack Height="Fit">
 					<Image Width="30" Height="20" Path="#Crow.Icons.IconAlerte.svg" Visible="{../../../../dbgIfaceWidget.CrowDebuggerNOK}"/>
 					<Label Fit="true" Text="Crow debug assembly path:"/>
@@ -71,10 +70,10 @@
 				</HorizontalStack>
 				<Label Background="Red" Foreground="White" Margin="5" Width="Stretched" Text="{../../../dbgIfaceWidget.CrowDebuggerErrorMessage}"
 					IsVisible="{../../../dbgIfaceWidget.CrowDebuggerNOK}"/>
-				<CheckBox Name="cbFile" Caption="Record to file" IsChecked="{²DebugLogToFile}" Background="Onyx"/>
+				<!--<CheckBox Name="cbFile" Caption="Record to file" IsChecked="{²DebugLogToFile}" Background="Onyx"/>-->
 				<HorizontalStack Height="Fit" Width="Stretched" IsEnabled="{../cbFile.IsChecked}" Background="Onyx" Margin="5">
 					<Label Text="Debug log output file:" Fit="true"/>
-					<TextBox Text="{²DebugLogFilePath}"  />
+					<TextBox Text="{²../../../../dbgIfaceWidget.DebugLogFilePath}"  />
 				</HorizontalStack>
 				<EnumSelector RadioButtonStyle="CheckBox2" Template="#Dbg.EnumSelector.template"
 						Background="Grey"
@@ -100,7 +99,7 @@
 					</Menu>					
 				</HorizontalStack>					
 			</VerticalStack>			
-		</HorizontalStack>
+		</TabView>
 		<Splitter Width="6" />
 		<VerticalStack>
 			<DebugInterfaceWidget Name="dbgIfaceWidget" Height="60%" Background="Black" Focusable="true"

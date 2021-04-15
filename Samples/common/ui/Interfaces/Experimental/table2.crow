@@ -1,18 +1,20 @@
-﻿<Table Foreground="White" Columns="test,Fit;test,Fit" Background="White" Width="Fit" Height="Fit" Margin="1" Spacing="1" > 
-	<TableRow Height="Fit"  Spacing="1" Margin="0"
-			MouseEnter="{Background=RoyalBlue}"
-			MouseLeave="{Background=Transparent}">
-		<Label Text="col1qsf" Margin="5" Background="0.3,0.3,0.3,0.8"/>
-		<Label Text="col1qsf" Margin="5" Background="0.3,0.3,0.3,0.8"/>
-		<Label Text="col1qsf" Margin="5" Background="0.3,0.3,0.3,0.8"/>
-	</TableRow>
-	<TableRow Height="Fit" Spacing="0" Margin="0"
-			MouseEnter="{Background=RoyalBlue}"
-			MouseLeave="{Background=Transparent}">
-		<Label Text="col1qsf" Margin="5" Background="0.3,0.3,0.3,0.8"/>
-		<Label Text="col1qsf" Margin="5" Background="0.3,0.3,0.3,0.8"/>
-		<Label Text="col1qsf" Margin="5" Background="0.3,0.3,0.3,0.8"/>
-	</TableRow>
-	
-
-</Table>
+﻿<List Data="{TestList}">
+	<Table Foreground="White" Columns="test,Fit;test,Fit" Width="Fit" Height="Fit"
+		Spacing="1" ColumnSpacing="1"
+		VerticalLineWidth="1" Margin="0" RowsMargin="0"> 
+		<TableRow
+				MouseEnter="{Background=RoyalBlue}"
+				MouseLeave="{Background=Transparent}">
+			<Label Text="col1qsf" Margin="5" />
+			<Label Text="col1qsf" Margin="5" />
+			<Label Text="col1qsf" Margin="5" />
+		</TableRow>
+		<TableRow 
+				MouseEnter="{Background=RoyalBlue}"
+				MouseLeave="{Background=Transparent}">
+			<Label Text="col1qsf" Margin="5"/>
+			<Label Text="col1qsfsdqfdqsfdqsfdqsf" Margin="5"/>
+			<Label Text="col1qsfdsqfdqsf" Margin="5"/>
+		</TableRow>
+	</Table>
+</List>

@@ -118,13 +118,17 @@ namespace Crow
 		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
 		{
 			base.OnDataSourceChanged (this, e);
-
-			childrenRWLock.EnterReadLock ();
-			foreach (Widget g in Children) {
-				if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
-					g.OnDataSourceChanged (g, e);	
+			try {
+				childrenRWLock.EnterReadLock ();
+				foreach (Widget g in Children) {
+					if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
+						g.OnDataSourceChanged (g, e);	
+				}
+				childrenRWLock.ExitReadLock ();
+			} catch (Exception) {
+				childrenRWLock.ExitReadLock ();
+				throw;
 			}
-			childrenRWLock.ExitReadLock ();
 		}
 
 		public void putWidgetOnTop(Widget w)
@@ -213,12 +217,20 @@ namespace Crow
 				gr.Clip ();
 			}
 
-			childrenRWLock.EnterReadLock ();
+			try
+			{
+				childrenRWLock.EnterReadLock ();
 
-			for (int i = 0; i < Children.Count; i++) 
-				Children[i].Paint (gr);			
+				for (int i = 0; i < Children.Count; i++) 
+					Children[i].Paint (gr);			
 
-			childrenRWLock.ExitReadLock ();
+				childrenRWLock.ExitReadLock ();
+			}
+			catch (System.Exception)
+			{
+				childrenRWLock.ExitReadLock ();
+				throw;
+			}
 
 			if (ClipToClientRect)
 				gr.Restore ();

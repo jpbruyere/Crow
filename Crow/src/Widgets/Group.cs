@@ -184,7 +184,7 @@ namespace Crow
 		{
 			DbgLogger.StartEvent (DbgEvtType.GOSearchLargestChild, this);
 
-			//childrenRWLock.EnterReadLock ();
+			childrenRWLock.EnterReadLock ();
 
 			largestChild = null;
 			contentSize.Width = 0;
@@ -206,7 +206,7 @@ namespace Crow
 			if (largestChild == null && !forceMeasure)
 				searchLargestChild (true);
 
-			//childrenRWLock.ExitReadLock ();
+			childrenRWLock.ExitReadLock ();
 
 			DbgLogger.EndEvent (DbgEvtType.GOSearchLargestChild);
 		}
@@ -214,7 +214,7 @@ namespace Crow
 		{
 			DbgLogger.StartEvent (DbgEvtType.GOSearchTallestChild, this);
 
-			//childrenRWLock.EnterReadLock ();
+			childrenRWLock.EnterReadLock ();
 
 			tallestChild = null;
 			contentSize.Height = 0;
@@ -236,7 +236,7 @@ namespace Crow
 			if (tallestChild == null && !forceMeasure)
 				searchTallestChild (true);
 
-			//childrenRWLock.ExitReadLock ();
+			childrenRWLock.ExitReadLock ();
 
 			DbgLogger.EndEvent (DbgEvtType.GOSearchTallestChild);
 		}

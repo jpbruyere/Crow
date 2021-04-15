@@ -88,9 +88,18 @@ namespace Crow
 		public override void InsertChild (int idx, Widget g) {
 			g.Width = Measure.Stretched;
 			g.Margin = RowsMargin;
-			base.InsertChild (idx, g);			
+			base.InsertChild (idx, g);
+			if (HeaderRow == null || idx == 0)
+				return;
+			TableRow row = g as TableRow;
+			for (int i = 0; i < HeaderRow.Children.Count; i++) {
+				if (row.Children.Count <= i)
+					continue;
+				setRowCellWidth (row.Children[i], HeaderRow.Children[i].Slot.Width);				
+				row.Children[i].Slot.X = HeaderRow.Children[i].Slot.X;
+			}
 		}
-		[DefaultValue (2)]
+		[DefaultValue (1)]
 		public int ColumnSpacing {
 			get => columnSpacing;
 			set {
@@ -228,7 +237,6 @@ namespace Crow
 					if (row.Children.Count <= cIdx)
 						continue;
 					row.Children[cIdx].Slot.X = g.Slot.X;
-					row.RegisterForRedraw();
 				}
 				childrenRWLock.ExitReadLock ();
 				RegisterForRedraw ();
@@ -236,8 +244,7 @@ namespace Crow
 		}
 		protected void setRowCellWidth (Widget w, int newW) {
 			if (newW == w.Slot.Width)
-				return;
-			
+				return;			
 			w.Slot.Width = newW;
 			w.IsDirty = true;
 			w.OnLayoutChanges (LayoutingType.Width);
