@@ -26,7 +26,11 @@
 
 using System;
 using System.Collections.Generic;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 
 namespace Crow
 {

@@ -8,13 +8,19 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 
+#if VKVG
+using vkvg;
+#else
+using Crow.Cairo;
+#endif
+
 namespace Crow
 {
 	public static class ExtensionsMethods
 	{
 		#region Cairo extensions
 
-		public static void Rectangle(this Cairo.Context ctx, Rectangle r, double stroke = 0.0)
+		public static void Rectangle(this Context ctx, Rectangle r, double stroke = 0.0)
 		{
 			if (stroke > 0.0) {
 				ctx.LineWidth = stroke;
@@ -48,7 +54,7 @@ namespace Crow
 		public static PointD Multiply(this PointD p1, double v){
 			return new PointD(p1.X * v, p1.Y * v);
 		}
-		public static void DrawCote(this Cairo.Context ctx, PointD p1, PointD p2,
+		public static void DrawCote(this Context ctx, PointD p1, PointD p2,
 			double stroke = 1.0, bool fill = false, double arrowWidth = 3.0, double arrowLength = 7.0)
 		{			
 			PointD vDir = p2.Substract(p1);
@@ -85,7 +91,7 @@ namespace Crow
 			ctx.LineWidth = stroke;
 			ctx.Stroke ();
 		}
-		public static void DrawCoteInverse(this Cairo.Context ctx, PointD p1, PointD p2,
+		public static void DrawCoteInverse(this Context ctx, PointD p1, PointD p2,
 			double stroke = 1.0, bool fill = false, double arrowWidth = 3.0, double arrowLength = 7.0)
 		{			
 			PointD vDir = p2.Substract(p1);
@@ -117,7 +123,7 @@ namespace Crow
 			ctx.LineWidth = stroke;
 			ctx.Stroke ();
 		}
-		public static void DrawCoteFixed(this Cairo.Context ctx, PointD p1, PointD p2,
+		public static void DrawCoteFixed(this Context ctx, PointD p1, PointD p2,
 			double stroke = 1.0, double coteWidth = 3.0)
 		{			
 			PointD vDir = p2.Substract(p1);
@@ -135,7 +141,7 @@ namespace Crow
 			ctx.Stroke ();
 		}
 
-		public static void AddColorStop(this Cairo.Gradient grad, double offset, Color c)
+		public static void AddColorStop(this Gradient grad, double offset, Color c)
 		{
 			grad.AddColorStop (offset, c);
 		}

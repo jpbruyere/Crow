@@ -8,7 +8,11 @@ using System;
 using Glfw;
 using Crow.Text;
 using System.Collections.Generic;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 using System.Threading.Tasks;
 using System.Linq;
 

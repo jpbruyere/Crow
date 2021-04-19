@@ -8,7 +8,11 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 using System.Diagnostics;
 using Crow.IML;
 using System.Threading;

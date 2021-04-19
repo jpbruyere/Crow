@@ -4,7 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 using Crow.DebugLogger;
 using DebugLogAnalyzer;
 

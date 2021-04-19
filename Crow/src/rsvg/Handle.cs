@@ -1,5 +1,9 @@
 ﻿//Copyright GPL2
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 
 
 namespace Rsvg {

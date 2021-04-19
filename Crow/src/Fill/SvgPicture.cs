@@ -4,7 +4,11 @@
 
 using System;
 using System.IO;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 
 namespace Crow
 {

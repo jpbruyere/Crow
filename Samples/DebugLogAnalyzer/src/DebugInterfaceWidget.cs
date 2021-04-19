@@ -7,7 +7,11 @@ using Glfw;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.IO;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 using System.Diagnostics;
 using System.Collections.Generic;
 using Crow.DebugLogger;

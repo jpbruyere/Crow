@@ -8,7 +8,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 using Crow.IML;
 
 namespace Crow {

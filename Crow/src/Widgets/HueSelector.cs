@@ -27,7 +27,11 @@
 using System;
 using System.Xml.Serialization;
 using System.ComponentModel;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 
 namespace Crow
 {

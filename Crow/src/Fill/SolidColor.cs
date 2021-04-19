@@ -9,7 +9,11 @@ using System.Text;
 using System.Xml.Serialization;
 using System.Reflection;
 using System.Diagnostics;
+#if VKVG
+using vkvg;
+#else
 using Crow.Cairo;
+#endif
 
 
 
