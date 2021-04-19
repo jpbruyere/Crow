@@ -302,10 +302,11 @@ TableRow {
 }
 TableHeaderRow {
 	Height="Fit";
+	Background="Black";
 	Width="Stretched";//TODO:Force it to stretched programmatically
 }
 TableHeaderLabel {
 	Margin = "1";
-	Background = "Jet";
+	//Background = "Jet";
 	Foreground = "LightGrey";
 }

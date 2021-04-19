@@ -134,12 +134,14 @@ namespace Crow
 
 		/// <summary> Process scrolling vertically, or if shift is down, vertically </summary>
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e) {			
+			e.Handled = true;
 			if (IFace.Shift)
 				ScrollX += e.Delta * MouseWheelSpeed;
-			else
+			else if (Multiline)
 				ScrollY -= e.Delta * MouseWheelSpeed;
+			else
+				e.Handled = false;
 			
-			e.Handled = true;
 			base.onMouseWheel (sender, e);
 		}
         public override void onMouseMove (object sender, MouseMoveEventArgs e) {            

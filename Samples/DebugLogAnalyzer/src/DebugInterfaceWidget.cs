@@ -9,7 +9,6 @@ using System.Runtime.Loader;
 using System.IO;
 using Crow.Cairo;
 using System.Diagnostics;
-using CrowDbgShared;
 using System.Collections.Generic;
 using Crow.DebugLogger;
 using System.Linq;
@@ -34,8 +33,8 @@ namespace Crow
 		Func<Key, bool> delKeyDown, delKeyUp;
 		Action delResetDirtyState;
 		Action delResetDebugger;
-		Action<object, string> delSaveDebugLog;
-		IntPtrGetterDelegate delGetSurfacePointer;
+		Action<object, string> delSaveDebugLog;		
+		Func<IntPtr> delGetSurfacePointer;
 		Action<string> delSetSource;
 
 		FieldInfo fiDbg_IncludeEvents, fiDbg_DiscardEvents, fiDbg_ConsoleOutput;
@@ -237,7 +236,7 @@ namespace Crow
 											dbgIFace, dbgIfaceType.GetMethod("OnKeyPress"));
 
 
-				delGetSurfacePointer = (IntPtrGetterDelegate)Delegate.CreateDelegate(typeof(IntPtrGetterDelegate),
+				delGetSurfacePointer = (Func<IntPtr>)Delegate.CreateDelegate(typeof(Func<IntPtr>),
 											dbgIFace, dbgIfaceType.GetProperty("SurfacePointer").GetGetMethod());
 				delSetSource = (Action<string>)Delegate.CreateDelegate(typeof(Action<string>),
 											dbgIFace, dbgIfaceType.GetProperty("Source").GetSetMethod());	

@@ -34,7 +34,7 @@ namespace tests
                 gr.SetSource (e.DragSource.bmp, 0, 0);
                 gr.Paint ();
             }
-			CreateDragImage (dragImg)            
+			CreateDragImage (dragImg, r);
             /*lock (UpdateMutex)
                 startGroup.RemoveChild (e.DragSource);*/
         }
