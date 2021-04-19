@@ -70,7 +70,17 @@ namespace Crow
 			}
 			return Slot.ContainsOrIsEqual(m);
 		}*/
-
+		
+		bool tryGetTargetDockStack (DockWindow dw, out DockStack ds) {
+			if (dw.Parent is DockStack dwp)
+				ds = dwp;
+			else if (dw.LogicalParent is TabView)
+				ds = dw.LogicalParent.Parent as DockStack;
+			else
+				ds = null;
+			return ds != null;
+		}
+		bool dockParentParent = false;
 		public override void onDrag (object sender, MouseMoveEventArgs e)
 		{			
 			if (isDocked)
@@ -84,6 +94,8 @@ namespace Crow
 				return;
 
 			Alignment dockingPosSave = DockingPosition;
+			bool dockParentParentSave = dockParentParent;
+			dockParentParent = false;
 			Rectangle r = default;
 
 			Console.WriteLine ($"onDrag target={IFace.DragAndDropOperation.DropTarget}");
@@ -93,23 +105,45 @@ namespace Crow
 				r = ds.ScreenCoordinates (ds.LastPaintedSlot);
 			}else if (IFace.DragAndDropOperation.DropTarget is DockWindow dw && dw.IsDocked == true) {
 				Point m = dw.ScreenPointToLocal (e.Position);
-				Rectangle dwCb = dw.ClientRectangle;				
-				dwCb.Inflate (dwCb.Width / -3, dwCb.Height / -3);
+				r = dw.ClientRectangle;
+				Rectangle dwCb = r;
+				dwCb.Inflate (dwCb.Width / -5, dwCb.Height / -5);
 				if (dwCb.ContainsOrIsEqual(m)) {
 					DockingPosition = Alignment.Center;
 					r = dw.ScreenCoordinates (dw.LastPaintedSlot);
-					Console.WriteLine ("center");
-				} else if (dw.Parent is DockStack dsp) {					
-					dsp.onDragMouseMove (this, e);
-					if (dsp.focusedChild == null)
-						r = dsp.ScreenCoordinates (dsp.LastPaintedSlot);
-					else
-						r = dsp.focusedChild.ScreenCoordinates (dsp.focusedChild.LastPaintedSlot);
+				} else {
+					dwCb = r;
+					dwCb.Inflate (-4,-4);
+										
+					if (tryGetTargetDockStack (dw, out DockStack targetStack)) {
+						Console.WriteLine ($"exterior: {!dwCb.ContainsOrIsEqual (m)} targetStack.Parent: {targetStack.Parent.GetType()}");
+						if (dwCb.ContainsOrIsEqual (m)) {
+							r = dw.ScreenCoordinates (dw.LastPaintedSlot);
+						} else if (targetStack.Parent is DockStack) {
+							dockParentParent = true;
+							targetStack = targetStack.Parent as DockStack;
+							r = targetStack.ScreenCoordinates (targetStack.LastPaintedSlot);
+						} else
+							r = dw.ScreenCoordinates (dw.LastPaintedSlot);
+						
+						targetStack.onDragMouseMove (this, e);
+					} else
+						System.Diagnostics.Debugger.Break ();
+
+					/*if (dw.Parent is DockStack dsp) {
+						if (dsp.focusedChild == null)
+							r = dsp.ScreenCoordinates (dsp.LastPaintedSlot);
+						else
+							r = dsp.focusedChild.ScreenCoordinates (dsp.focusedChild.LastPaintedSlot);
+					} else if (dw.LogicalParent is TabView tv && dw.LogicalParent.Parent is DockStack dspp) {
+						dspp.onDragMouseMove (this, e);
+						r = tv.ScreenCoordinates (tv.LastPaintedSlot);
+					}*/
 				}
 			}else
 				DockingPosition = Alignment.Undefined;
 
-			if (DockingPosition != dockingPosSave) {
+			if (DockingPosition != dockingPosSave || dockParentParent != dockParentParentSave) {
 				if (DockingPosition == Alignment.Undefined) {
 					IFace.ClearDragImage ();
 					return;
@@ -182,9 +216,14 @@ namespace Crow
 				else if (e.DropTarget is DockWindow dw) {
 					if (DockingPosition == Alignment.Center)
 						Dock (dw);
-					else
-						Dock (dw.Parent as DockStack);
-				}
+					else if (tryGetTargetDockStack (dw, out DockStack targetStack)) {
+						if (dockParentParent)
+							targetStack = targetStack.Parent as DockStack;
+						Dock (targetStack);						
+					}else
+						System.Diagnostics.Debugger.Break ();
+				}else
+					System.Diagnostics.Debugger.Break ();
 			}
 			base.onDrop (sender, e);
 			IFace.ClearDragImage ();

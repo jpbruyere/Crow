@@ -146,6 +146,7 @@ namespace Crow
 							}
 						}
 					}
+					
 				}
 
 				if (curDockPos != dw.DockingPosition)
