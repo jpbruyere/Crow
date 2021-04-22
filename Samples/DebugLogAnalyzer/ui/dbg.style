@@ -22,10 +22,6 @@ DbgEventView {
 	Height="Fit";
 	Width="150";
 }
-ComboBox {
-	Template="#Dbg.ComboBox.template";
-	Background="Jet";
-}
 labWidgetRecordList {
 	Font="mono, 11";
 	Background="Grey";

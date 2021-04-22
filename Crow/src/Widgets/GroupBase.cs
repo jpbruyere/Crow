@@ -175,11 +175,11 @@ namespace Crow
 
 			return tmp;
 		}
-		public override Widget FindByType<T> ()
+		public override T FindByType<T> () 
 		{
-			if (this is T)
-				return this;
-			Widget tmp = null;
+			if (this is T t)
+				return t;
+			T tmp = default(T);
 
 			childrenRWLock.EnterReadLock ();
 

@@ -1,14 +1,10 @@
 <?xml version="1.0"?>
 <Popper >
 	<Template>
-		<CheckBox IsChecked="{²./IsPopped}">
-			<Template>
-				<HorizontalStack Background="{../../../Background}" Margin="5" Spacing="10">
-					<Label Text="{../../../../Caption}" Width="Stretched"/>
-					<Label Background="SeaGreen" Text="{../../../../EnumValue}" Margin="3"/>
-				</HorizontalStack>
-			</Template>
-		</CheckBox>
+		<HorizontalStack Background="{../../Background}" Margin="5" Spacing="10">
+			<Label Text="{../../../Caption}" Width="Stretched"/>
+			<Label Background="SeaGreen" Text="{../../../EnumValue}" Margin="3"/>
+		</HorizontalStack>
 	</Template>	
 	<Wrapper Name="Content" Height="Fit" Width="{../PopWidth}" Background="Jet" />	
 </Popper>

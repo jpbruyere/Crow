@@ -10,8 +10,8 @@ namespace Crow
 	/// <summary>
 	/// templated control whose content can be hidden and shown on demand
 	/// </summary>
-    public class Expandable : TemplatedContainer
-    {
+	public class Expandable : TemplatedContainer, IToggle
+	{
 		#region CTOR
 		protected Expandable() : base(){}
 		public Expandable (Interface iface) : base(iface){}
@@ -31,6 +31,20 @@ namespace Crow
 		/// Occurs when control is collapsed.
 		/// </summary>
 		public event EventHandler Collapse;
+		#endregion
+
+		#region IToggle implementation
+		public event EventHandler ToggleOn;
+		public event EventHandler ToggleOff;
+		public BooleanTestOnInstance IsToggleable { get; set; }
+		public bool IsToggled {
+			get => _isExpanded;
+			set {
+				if (value == _isExpanded)
+					return;
+				IsExpanded = value;
+			}
+		}
 		#endregion
 
 		public BooleanTestOnInstance GetIsExpandable;
@@ -55,11 +69,11 @@ namespace Crow
 			}
 		}
 		[DefaultValue(false)]
-        public bool IsExpanded
-        {
+		public bool IsExpanded
+		{
 			get { return _isExpanded; }
-            set
-            {
+			set
+			{
 				if (value == _isExpanded)
 					return;
 
@@ -68,16 +82,17 @@ namespace Crow
 				bool isExp = IsExpandable;
 				NotifyValueChanged ("IsExpandable", isExp);
 				if (!isExp)
-					_isExpanded = false;
+					_isExpanded = false;				
 
 				NotifyValueChangedAuto (_isExpanded);
+				NotifyValueChanged ("IsToggled",_isExpanded);
 
 				if (_isExpanded)
 					onExpand (this, null);
 				else
 					onCollapse (this, null);
-            }
-        }
+			}
+		}
 		[XmlIgnore]public bool IsExpandable {
 			get {
 				try {
@@ -88,6 +103,7 @@ namespace Crow
 				}
 			}
 		}
+
 		#endregion
 
 		public virtual void onExpand(object sender, EventArgs e)
@@ -96,6 +112,7 @@ namespace Crow
 				_contentContainer.IsVisible = true;
 
 			Expand.Raise (this, e);
+			ToggleOn.Raise (this, null);
 		}
 		public virtual void onCollapse(object sender, EventArgs e)
 		{
@@ -103,6 +120,7 @@ namespace Crow
 				_contentContainer.IsVisible = false;
 
 			Collapse.Raise (this, e);
+			ToggleOff.Raise (this, null);
 		}
 	}
 }

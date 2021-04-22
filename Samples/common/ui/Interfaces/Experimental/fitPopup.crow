@@ -1,0 +1,11 @@
+﻿<Popper Width="Fit">
+	<Template>
+		<Label Text="{./Caption}"/>
+	</Template>
+	<VerticalStack Width="Fit" Height="Fit" Background="Grey">
+		<Label Width="Stretched"/>
+		<Label Text="mljdqslfkj" Width="Stretched"/>
+		<Label Width="Stretched"/>
+		<Label Text="mljdqslfkjqsdfhjsdqfkljhsdqfkljhs" Width="Stretched"/>
+	</VerticalStack>
+</Popper>

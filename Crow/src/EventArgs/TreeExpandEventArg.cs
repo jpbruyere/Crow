@@ -9,9 +9,8 @@ namespace Crow
 		/// <summary>
 		/// Source of the expand/collapse event
 		/// </summary>
-		public Expandable SourceWidget;
-		public TreeExpandEventArg (Expandable sourceWidget)
-		{
+		public IToggle SourceWidget;
+		public TreeExpandEventArg (IToggle sourceWidget) {
 
 		}
 	}

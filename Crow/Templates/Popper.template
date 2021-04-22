@@ -1,14 +1,9 @@
 ﻿<?xml version="1.0"?>
-<CheckBox Caption="{./Caption}" IsChecked="{²./IsPopped}" Foreground="{./Foreground}" Background="{./Background}">
-	<Template>
-		<Border Style="ControlBorder" Background="{./Background}" CornerRadius="{./CornerRadius}">
-			<HorizontalStack Spacing="1">
-				<Image Style="Icon" 
-					MouseEnter="{Background=White}" MouseLeave="{Background=Transparent}"
-					Background="{./Background}"
-					Path="#Crow.Icons.expandable.svg" SvgSub="{./IsChecked}"/>
-				<Label Style="ControlCaption" Text="{./Caption}" />
-			</HorizontalStack>
-		</Border>
-	</Template>
-</CheckBox>
+<Border Style="ControlBorder" Background="{./Background}" CornerRadius="{./CornerRadius}">
+	<HorizontalStack Spacing="1">
+		<Image Style="Icon" 
+			MouseEnter="{Background=White}" MouseLeave="{Background=Transparent}"					
+			Path="#Crow.Icons.expandable.svg" SvgSub="{./IsPopped}"/>
+		<Label Style="ControlCaption" Text="{./Caption}" Foreground="{./Foreground}"/>
+	</HorizontalStack>
+</Border>

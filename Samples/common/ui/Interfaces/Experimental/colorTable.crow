@@ -1,6 +1,8 @@
-﻿<ListBox Data="{TestList}" >
+﻿<ListBox Data="{TestList}" >        
 	<Template>
-		<Table Name="ItemsContainer" Columns="name,Stretched;color,100"/> 
+		<Scroller>
+			<Table Name="ItemsContainer" Columns="name,Fit;color,100" Height="Fit" Width="Stretched" VerticalAlignment="Top"/> 
+		</Scroller>
 	</Template>
 	<ItemTemplate>
 		<TableRow>

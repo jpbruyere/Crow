@@ -252,7 +252,7 @@ namespace Crow
 			loadDefaultValues ();
 		}
 		#region private fields
-		LayoutingType registeredLayoutings;// = LayoutingType.All;
+		LayoutingType registeredLayoutings;// = LayoutingType.Sizing;
 		ILayoutable logicalParent;
 		ILayoutable parent;
 		string name;
@@ -1304,13 +1304,10 @@ namespace Crow
 		}
 #endregion
 
-		public virtual Widget FindByName(string nameToFind){
-			return string.Equals(nameToFind, name, StringComparison.Ordinal) ? this : null;
-		}
-		public virtual Widget FindByType<T> ()
-		{
-			return this is T ? this : null;
-		}
+		public virtual Widget FindByName(string nameToFind)
+			=> string.Equals(nameToFind, name, StringComparison.Ordinal) ? this : null;		
+		public virtual T FindByType<T> () //where T : Widget
+			=> this is T t? t : default(T);		
 		public virtual bool Contains(Widget goToFind){
 			return false;
 		}

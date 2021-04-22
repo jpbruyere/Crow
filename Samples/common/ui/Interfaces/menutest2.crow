@@ -1,0 +1,59 @@
+﻿<?xml version="1.0"?>
+<Menu Data="{AllCommands}">
+	<ItemTemplate DataType="CommandGroup" >
+			<MenuItem Data="{Commands}" Width="Fit" IsEnabled="{CanExecute}">
+				<Template>
+					<Popper PopDirection="Bottom" Caption="{Caption}"
+									PopWidth="{./PopWidth}" PopHeight="{./PopHeight}"
+									MouseEnter="{Background=${ControlHighlight}}"
+									MouseLeave="{Background=Transparent}">
+						<Template>
+							<Label Text="{./Caption}" Width="Stretched" Height="Stretched" Margin="3"
+								Background="{./Background}"/>
+						</Template>
+						<VerticalStack Name="ItemsContainer" Fit="true" Background="DarkGrey"/>
+					</Popper>
+				</Template>
+				<ItemTemplate DataType="Command" >
+					<Button Command="{}" Width="Stretched">
+						<Template>
+							<HorizontalStack  Margin="3" HorizontalAlignment="Left"
+													MouseEnter="{Background=${ControlHighlight}}"
+													MouseLeave="{Background=Transparent}">
+								<Image Width="10" Height="10" Margin="1" Path="{./Icon}" />
+								<Label Text="{./Caption}" />	
+							</HorizontalStack>
+						</Template>
+					</Button>
+				</ItemTemplate>					
+				<ItemTemplate DataType="CommandGroup" >
+					<MenuItem Data="{Commands}" Width="Stretched" IsEnabled="{CanExecute}">
+						<Template>
+							<Popper PopDirection="Right" Caption="{Caption}"
+									PopWidth="{./PopWidth}" PopHeight="{./PopHeight}"
+									MouseEnter="{Background=${ControlHighlight}}"
+									MouseLeave="{Background=Transparent}">
+								<Template>
+									<Label Text="{./Caption}" Width="Stretched" Height="Stretched" Margin="3"
+										Background="{./Background}"/>
+								</Template>		
+								<VerticalStack Name="ItemsContainer" Fit="true" Background="DarkGrey"/>
+							</Popper>
+						</Template>
+						<ItemTemplate DataType="Command">
+							<Button Command="{}" Width="Stretched">
+								<Template>
+									<HorizontalStack  Margin="3" HorizontalAlignment="Left"
+															MouseEnter="{Background=${ControlHighlight}}"
+															MouseLeave="{Background=Transparent}">
+										<Image Width="10" Height="10" Margin="1" Path="{./Icon}" />
+										<Label Text="{./Caption}" />	
+									</HorizontalStack>
+								</Template>
+							</Button>
+						</ItemTemplate>
+					</MenuItem>
+				</ItemTemplate>
+			</MenuItem>
+		</ItemTemplate>	
+</Menu>

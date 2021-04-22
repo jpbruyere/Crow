@@ -287,17 +287,17 @@ namespace Crow {
 			}
 			return null;
 		}
-		public override Widget FindByType<T> ()
+		public override T FindByType<T> ()
 		{
-			if (this is T)
-				return this;
+			if (this is T t)
+				return t;
 
 			foreach (Widget w in Items) {
-				Widget r = w.FindByType<T> ();
+				T r = w.FindByType<T> ();
 				if (r != null)
 					return r;
 			}
-			return null;
+			return default(T);
 		}
 		public override bool Contains (Widget goToFind)
 		{
@@ -333,8 +333,10 @@ namespace Crow {
 			try {
 				loadPage (data, itemsContainer, dataTest);
 			} catch (Exception ex) {
-				if (Monitor.IsEntered (IFace.LayoutMutex))
-					Monitor.Exit (IFace.LayoutMutex);
+				while (Monitor.IsEntered (IFace.UpdateMutex))
+					Monitor.Exit (IFace.UpdateMutex);			
+				while (Monitor.IsEntered (IFace.LayoutMutex)) 
+					Monitor.Exit (IFace.LayoutMutex);			
 				System.Diagnostics.Debug.WriteLine ("loading thread aborted: " + ex.ToString());
 			}
 
@@ -477,16 +479,17 @@ namespace Crow {
 			Monitor.Exit (IFace.UpdateMutex);
 
 			if (iTemp.Expand != null) {
-				Expandable e = g as Expandable;
-				if (e == null)
-					e = g.FindByType<Expandable> () as Expandable;
+				IToggle toggle = g as IToggle;
+				
+				if (toggle == null)
+					toggle = g.FindByType<IToggle> ();
 					
-				if (e != null) { 
-					e.Expand += iTemp.Expand;
-					if ((o as ICollection) == null)
-						e.GetIsExpandable = new BooleanTestOnInstance ((instance) => true);
+				if (toggle != null) { 
+					toggle.ToggleOn += iTemp.Expand;
+					if (o is ICollection)
+						toggle.IsToggleable = iTemp.HasSubItems;
 					else
-						e.GetIsExpandable = iTemp.HasSubItems;
+						toggle.IsToggleable = new BooleanTestOnInstance ((instance) => true);
 				}
 			}
 
@@ -563,11 +566,6 @@ namespace Crow {
 			if (disposing)
 				cancelLoadingThread ();
 			base.Dispose (disposing);
-		}
-
-		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
-		{
-			base.OnDataSourceChanged (sender, e);
 		}
 
 		public void OnInsertClick (object sender, MouseEventArgs e)

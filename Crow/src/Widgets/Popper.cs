@@ -7,7 +7,7 @@ using System.ComponentModel;
 
 namespace Crow
 {
-	public class Popper : TemplatedContainer
+	public class Popper : TemplatedContainer, IToggle
     {
 		#region CTOR
 		protected Popper () {}
@@ -110,6 +110,7 @@ namespace Crow
 				_content.HorizontalAlignment = HorizontalAlignment.Left;
 				_content.VerticalAlignment = VerticalAlignment.Top;
 				_content.LayoutChanged += _content_LayoutChanged;
+				_content.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 			}
 		}
 		void positionContent(LayoutingType lt){
@@ -193,23 +194,24 @@ namespace Crow
 
 		public virtual void onPop(object sender, EventArgs e)
 		{
-			if (Content != null) {
-				Content.IsVisible = true;
+			if (Content != null) {				
 				if (Content.Parent == null)
 					IFace.AddWidget (Content);
+				Content.IsVisible = true;
 				//if (Content.LogicalParent != this)
 				Content.LogicalParent = this;
 				IFace.PutOnTop (Content, true);
-				_content_LayoutChanged (this, new LayoutingEventArgs (LayoutingType.Sizing));
+				//_content_LayoutChanged (this, new LayoutingEventArgs (LayoutingType.Sizing));
 			}
 			Popped.Raise (this, e);
+			ToggleOn.Raise (this, null);
 		}
 		public virtual void onUnpop(object sender, EventArgs e)
 		{
-			if (Content != null) {
-				Content.IsVisible = false;
-			}
+			if (Content != null)
+				Content.IsVisible = false;			
 			Unpoped.Raise (this, e);
+			ToggleOff.Raise (this, null);
 		}
 
 		protected override void Dispose (bool disposing)
@@ -220,5 +222,23 @@ namespace Crow
 			}
 			base.Dispose (disposing);
 		}
+		public override void onMouseClick (object sender, MouseButtonEventArgs e)
+		{
+			IsPopped = !IsPopped;
+			base.onMouseClick (sender, e);
+		}
+		#region IToggle implementation
+		public event EventHandler ToggleOn;
+		public event EventHandler ToggleOff;
+		public BooleanTestOnInstance IsToggleable { get; set; }
+		public bool IsToggled {
+			get => _isPopped;
+			set {
+				if (value == _isPopped)
+					return;
+				IsPopped = value;
+			}
+		}
+		#endregion		
 	}
 }

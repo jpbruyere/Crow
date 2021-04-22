@@ -1,6 +1,6 @@
 ﻿<NumericControl Value="50" Height="Fit" Width="200" Background="DarkGrey">
 	<Template>
-		<Border Style="ControlBorder" Background="{./Background}" CornerRadius="{./CornerRadius}" Margin="0">
+		<Border Style="ControlBorder" Background="{./Background}" CornerRadius="{./CornerRadius}" Margin="1">
 			<VerticalStack Spacing="0">
 
 				<HorizontalStack Spacing="5">

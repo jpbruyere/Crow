@@ -47,26 +47,27 @@ namespace Crow
 		#region Test values for Binding
 		public CommandGroup Commands, AllCommands;
 		public CommandGroup EditCommands = new CommandGroup("Edit Commands",
-			new Command("Edit command 1", () => Console.WriteLine("edit command1 pressed")),
-			new Command("Edit command 2", () => Console.WriteLine("edit command2 pressed")),
-			new Command("Edit command 3", () => Console.WriteLine("edit command3 pressed"))
+			new Command("Edit command 1", (sender) => MessageBox.ShowModal((sender as Widget).IFace, MessageBox.Type.Information, "Edit comand 1 clicked")),
+			new Command("Edit command 2 a bit longer", (sender) => MessageBox.ShowModal((sender as Widget).IFace, MessageBox.Type.Information, "Edit comand 2 clicked"), null, false),
+			new Command("Edit command three", (sender) => MessageBox.ShowModal((sender as Widget).IFace, MessageBox.Type.Information, "Edit comand 3 clicked"))
 		);
 		public CommandGroup FileCommands = new CommandGroup("File Commands",
-			new Command("File command 1", () => Console.WriteLine("File command1 pressed")),
-			new Command("File command 2", () => Console.WriteLine("File command2 pressed")),
-			new Command("File command 3", () => Console.WriteLine("File command3 pressed"))
+			new Command("File command 1", (sender) => MessageBox.ShowModal((sender as Widget).IFace, MessageBox.Type.Information, "File comand 1 clicked")),
+			new Command("File command 2 a bit longer", (sender) => MessageBox.ShowModal((sender as Widget).IFace, MessageBox.Type.Information, "File comand 2 clicked")),
+			new Command("File command three", (sender) => MessageBox.ShowModal((sender as Widget).IFace, MessageBox.Type.Information, "File comand 3 clicked"))
 		);
 
 		void initCommands()
 		{
 			Commands = new CommandGroup("commands msg boxes",
 				new Command("Action 1", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 1 clicked")),
-				new Command("Action 2", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 2 clicked")),
-				new Command("Action 3", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 3 clicked"))
+				new Command("Action two", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 2 clicked"), null, false),
+				new Command("Action three", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu 3 clicked"))
 			);
 			AllCommands = new CommandGroup ("All Commands",
-				EditCommands,
 				FileCommands,
+				EditCommands,
+				new CommandGroup ("Combined commands", FileCommands, EditCommands),
 				new Command("Action A", () => MessageBox.ShowModal(this, MessageBox.Type.Information, "context menu A clicked"))
 			);
 		}

@@ -3,28 +3,24 @@
 	<MenuItem Caption="File" Fit="true">
 		<MenuItem Caption="New">
 			<Template>
-<Popper Font="{./Font}" Caption="{./Caption}"  Background="{./Background}" PopDirection="{./PopDirection}"
-	Foreground = "{./Foreground}" CanPop="{./HasChildren}"
-	IsPopped="{²./IsOpened}" PopWidth="{./PopWidth}" PopHeight="{./PopHeight}">
-	<Template>
-		<CheckBox IsChecked="{²./IsPopped}" Caption="{./Caption}" Background="{./Background}" Foreground="{./Foreground}">
-			<Template>		
-				<Border Name="border1"
-						MinimumSize = "60,0"
-						Foreground="Transparent"
-						Background="{./Background}">
-						<Label Text="{./Caption}"
-							Foreground="{./Foreground}"
-							Margin="2" HorizontalAlignment="Left"
-							Font="{./Font}"	/>
-				</Border>
-			</Template>		
-		</CheckBox>
-	</Template>
-	<Border Foreground="DimGrey" Width="{../PopWidth}" Height="{../PopHeight}" Background="${MenuBackground}">
-		<VerticalStack Name="ItemsContainer"/>
-	</Border>
-</Popper>
+				<Popper Font="{./Font}" Caption="{./Caption}"  Background="{./Background}" PopDirection="{./PopDirection}"
+					Foreground = "{./Foreground}" CanPop="{./HasChildren}"
+					IsPopped="{²./IsOpened}" PopWidth="{./PopWidth}" PopHeight="{./PopHeight}">
+					<Template>
+						<Border Name="border1"
+								MinimumSize = "60,0"
+								Foreground="Transparent"
+								Background="{./Background}">
+								<Label Text="{./Caption}"
+									Foreground="{./Foreground}"
+									Margin="2" HorizontalAlignment="Left"
+									Font="{./Font}"	/>
+						</Border>
+					</Template>
+					<Border Foreground="DimGrey" Width="{../PopWidth}" Height="{../PopHeight}" Background="${MenuBackground}">
+						<VerticalStack Name="ItemsContainer"/>
+					</Border>
+				</Popper>
 			</Template>
 		</MenuItem>
 	</MenuItem>	

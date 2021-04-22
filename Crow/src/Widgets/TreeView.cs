@@ -33,7 +33,7 @@ namespace Crow
 		}
 
 
-		void onExpandAll_MouseClick (object sender, MouseButtonEventArgs e)
+		/*void onExpandAll_MouseClick (object sender, MouseButtonEventArgs e)
 		{
 			ExpandAll ();
 		}
@@ -41,23 +41,22 @@ namespace Crow
 		public void ExpandAll(){
 			foreach (Group grp in itemsContainer.Children) {
 				foreach (Widget go in grp.Children) {
-					Expandable exp = go as Expandable;
-					if (exp == null)
-						continue;
-					TreeView subTV = exp.FindByName ("List") as TreeView;
-					if (subTV == null)
-						continue;
-					EventHandler handler = null;
-					handler = delegate(object sender, EventArgs e) {
-						TreeView tv = sender as TreeView;
-						tv.Loaded -= handler;
-						tv.ExpandAll ();
-					};
-					subTV.Loaded += handler;
-					exp.IsExpanded = true;
+					if (go is IToggle exp) {
+						TreeView subTV = exp.FindByName ("List") as TreeView;
+						if (subTV == null)
+							continue;
+						EventHandler handler = null;
+						handler = delegate(object sender, EventArgs e) {
+							TreeView tv = sender as TreeView;
+							tv.Loaded -= handler;
+							tv.ExpandAll ();
+						};
+						subTV.Loaded += handler;
+						exp.IsToggled = true;
+					}
 				}
 			}
-		}
+		}*/
 	}
 }
 

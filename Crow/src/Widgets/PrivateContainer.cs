@@ -81,12 +81,12 @@ namespace Crow
 
 			return child == null ? null : child.FindByName (nameToFind);
 		}
-		public override Widget FindByType<T> ()
+		public override T FindByType<T> ()
 		{
-			if (this is T)
-				return this;
+			if (this is T t)
+				return t;
 
-			return child == null ? null : child.FindByType<T> ();
+			return child == null ? default(T) : child.FindByType<T> ();
 		}
 		public override bool Contains (Widget goToFind)
 		{
