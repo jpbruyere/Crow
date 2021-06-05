@@ -162,9 +162,8 @@ namespace Crow
 						throw new ParserException (line, column, "Unexpected end of statement", resId);
 					ReadChar ();
 					if (targetsClasses.Count == 0) {
-						//style constants, only the first occurence is kept
-						if (!StylingConstants.ContainsKey (currentProperty))
-							StylingConstants[currentProperty] = token.ToString ();
+						//style constants override previous values.						
+						StylingConstants[currentProperty] = token.ToString ();
 						curState = States.classNames;
 					} else {
 						foreach (string tc in targetsClasses) {

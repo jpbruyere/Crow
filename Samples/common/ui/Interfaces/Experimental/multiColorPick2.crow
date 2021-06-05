@@ -3,18 +3,14 @@
 		<Template>
 			<Popper Margin="0" Caption="{./CurrentColor}" Background="{./Background}" >
 				<Template>
-					<CheckBox Margin="0" Caption="{./Caption}" IsChecked="{²./IsPopped}" Background="{./Background}">
-						<Template>
-							<HorizontalStack Margin="3"  Spacing="3" Background="{./Background}">
-								<Border Width="18" Height="12" CornerRadius="3"
-									Background="{../../../../CurrentColor}">
-								</Border>
-								<Label Width="Stretched" Text="{./Caption}" />
-							</HorizontalStack>
-						</Template>/>{}
-					</CheckBox>
-				</Template>
-				<TabView  MinimumSize="{../../MinimumPopupSize}" Width="Fit" Height="Fit"  >
+					<HorizontalStack Margin="3"  Spacing="3" Background="{./Background}">
+						<Border Width="18" Height="12" CornerRadius="3"
+							Background="{../../../CurrentColor}">
+						</Border>
+						<Label Width="Stretched" Text="{./Caption}" />
+					</HorizontalStack>
+				</Template>/>
+				<TabView  MinimumSize="{../MinimumPopupSize}" Width="200" Height="200"  >
 					<ColorPicker Name="HSV" CurrentColor="{²../../../CurrentColor}" Background="Onyx"/>
 					<ColorPicker IsVisible="false" Name="Names" CurrentColor="{²../../../CurrentColor}" Height="Stretched" Background="Onyx">
 						<Template>

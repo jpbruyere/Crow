@@ -922,8 +922,7 @@ namespace Crow
 				} else {
 					unshownPostActions ();					
 				}
-				RegisterForLayouting(LayoutingType.Sizing);
-				
+				RegisterForLayouting(LayoutingType.Sizing);				
 
 				NotifyValueChangedAuto (isVisible);
 			}
@@ -1629,9 +1628,17 @@ namespace Crow
 		{
 			switch (layoutType) {
 			case LayoutingType.Width:
+				/*if (Parent is Widget p) {
+					if (p.Width.IsFit)
+						p.RegisterForLayouting (LayoutingType.Width);
+				}*/
 				RegisterForLayouting (LayoutingType.X);
 				break;
 			case LayoutingType.Height:
+				/*if (Parent is Widget pp) {
+					if (pp.Height.IsFit)
+						pp.RegisterForLayouting (LayoutingType.Height);
+				}*/
 				RegisterForLayouting (LayoutingType.Y);
 				break;
 			}

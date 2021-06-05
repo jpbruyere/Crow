@@ -92,7 +92,10 @@
 							</Border>
 						</Template>
 					</CheckBox>
-					<Menu Data="{../../../../dbgIfaceWidget.LoggerCommands}" Height="Stretched" Width="Fit">
+					<Menu Data="{../../../../dbgIfaceWidget.LoggerCommands}" Height="Fit" Width="Stretched">
+						<Template>
+							<Wrapper Orientation="Vertical" Name="ItemsContainer" Margin="0" Background="{./Background}"/>
+						</Template>
 						<ItemTemplate>
 							<Button Command="{}" Height="Stretched" Width="Fit"/>
 						</ItemTemplate>

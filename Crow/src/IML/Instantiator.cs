@@ -214,7 +214,7 @@ namespace Crow.IML {
 			while (reader.NodeType != XmlNodeType.Element)
 				reader.Read ();
 			root = reader.Name;
-			Type t = tryGetGOType (root);
+			Type t = GetWidgetTypeFromName (root);
 			if (t == null)
 				throw new Exception ("IML parsing error: undefined root type (" + root + ")");
 			return t;
@@ -547,7 +547,7 @@ namespace Crow.IML {
 					ctx.il.Emit (OpCodes.Ldloc_0);
 					ctx.il.Emit (OpCodes.Ldloc_0);
 
-					Type t = tryGetGOType (reader.Name);
+					Type t = GetWidgetTypeFromName (reader.Name);
 					if (t == null)
 						throw new Exception (reader.Name + " type not found");
 					ConstructorInfo ci = t.GetConstructor (
@@ -1609,7 +1609,7 @@ namespace Crow.IML {
 		/// </remarks>
 		/// <returns>the corresponding type object</returns>
 		/// <param name="typeName">graphic object type name without its namespace</param>
-		internal static Type tryGetGOType (string typeName){
+		public static Type GetWidgetTypeFromName (string typeName){
 			if (knownGOTypes.ContainsKey (typeName))
 				return knownGOTypes [typeName];
 			Type t = Type.GetType ("Crow." + typeName);

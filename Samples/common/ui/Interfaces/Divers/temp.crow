@@ -1,0 +1,4 @@
+﻿<VerticalStack>
+	<Label Text='Hello World' Background='MediumSeaGreen' Margin='10'/>
+	<CheckBox I
+</VerticalStack>

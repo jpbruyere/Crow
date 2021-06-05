@@ -523,15 +523,12 @@ namespace Crow
 		public Dictionary<string, string> StylingConstants;
 		/// <summary> parse all styling data's during application startup and build global Styling Dictionary </summary>
 		protected virtual void loadStyling() {
-			//fetch styling info in this order, if member styling is alreadey referenced in previous
-			//assembly, it's ignored.
-			loadThemeStyle ();
-
 			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
 			foreach (Assembly a in crowAssemblies) {
 				loadStylingFromAssembly (a);
 			}
 			loadStylingFromAssembly (Assembly.GetEntryAssembly ());
+			loadThemeStyle ();			
 		}
 		/// <summary> Search for .style resources in assembly </summary>
 		protected void loadStylingFromAssembly (Assembly assembly) {

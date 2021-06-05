@@ -1,6 +1,4 @@
-﻿using System.Security.Principal;
-using System.Threading;
-// Copyright (c) 2013-2019  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2021  Bruyère Jean-Philippe <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 
@@ -11,272 +9,11 @@ using System.Collections.Generic;
 using Crow.Cairo;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace Crow
 {
-	[Flags]
-	public enum TokenType {
-		Unknown,
-		Trivia					= 0x0100,
-		WhiteSpace				= 0x4100,
-		Tabulation				= 0x4101,
-		LineBreak				= 0x4102,
-		LineComment				= 0x0103,
-		BlockCommentStart		= 0x0104,
-		BlockComment			= 0x0105,
-		BlockCommentEnd			= 0x0106,
-		Name					= 0x0200,
-		ElementName				= 0x0201,
-		AttributeName			= 0x0202,
-		PI_Target				= 0x0203,
-		Punctuation				= 0x0400,
-		PI_Start				= 0x0401,// '<?'
-		PI_End					= 0x0402,// '?>'
-		Operator 				= 0x0800,
-		EqualSign 				= 0x0801,
-		AttributeValue 			= 0x2000,
-		Keyword 				= 0x1000,
-		ElementOpen 			= 0x0403,// '<'
-		EndElementOpen			= 0x0404,// '</'
-		EmptyElementClosing		= 0x0405,// '/>'
-		ClosingSign				= 0x0406,// '>'
-		DTDObjectOpen			= 0x04A0,// '<!'
-		Content,
-	}
-	
-	public struct Token {
-		public readonly TokenType Type;
-		public int Start;
-		public readonly int Length;
-		public int End => Start + Length;
-		public TextSpan Span => new TextSpan (Start, End);
-
-		public Token (TokenType type, int pos) {
-			Type = type;
-			Start = pos;
-			Length = 1;
-		}
-		public Token (TokenType type, int start, int end) {
-			Type = type;
-			Start = start;
-			Length = end - start;
-		}		
-		public override string ToString() => $"{Type},{Start} {Length}";
-	}
-	public class XmlSource {
-		public Token[] Tokens;
-		public readonly string Source;		
-
-		public XmlSource (string _source) {
-			Source = _source;
-			Tokenizer tokenizer = new Tokenizer();
-			Tokens = tokenizer.Tokenize (Source);
-
-			/*foreach (Token t in Tokens)
-				Console.WriteLine ($"{t,-40} {Source.AsSpan(t.Start, t.Length).ToString()}");*/
-		}
-		public class TokenizerException : Exception {
-			public readonly int Position;
-			public TokenizerException(string message, int position, Exception innerException = null)
-					: base (message, innerException) {
-				Position = position;
-			}
-		}
-
-		class Tokenizer {
-			enum States
-			{
-				Init,//first statement of prolog, xmldecl should only apear in this state
-				prolog,//misc before doctypedecl
-				ProcessingInstrucitons,
-				DTD,
-				DTDObject,//doctype finished				
-				Xml,
-				StartTag,//inside start tag
-				Content,//after start tag with no closing slash
-				EndTag
-			}
-
-			States curState = States.Init;
-			List<Token> Toks = new List<Token>(100);
-
-			public Tokenizer  () {}
-
-			void skipWhiteSpaces (ref SpanCharReader reader) {
-				while(!reader.EndOfSpan) {
-					switch (reader.Peak) {
-						case '\x85':
-						case '\x2028':
-						case '\xA':
-							reader.Read();
-							addTok (ref reader, TokenType.LineBreak);
-							break;
-						case '\xD':
-							reader.Read();
-							if (reader.IsNextCharIn ('\xA', '\x85'))
-								reader.Read();
-							addTok (ref reader, TokenType.LineBreak);														
-							break;
-						case '\x20':
-						case '\x9':
-							char c = reader.Read();									
-							while (reader.TryPeak (c))
-								reader.Read();
-							addTok (ref reader, c == '\x20' ? TokenType.WhiteSpace : TokenType.Tabulation);
-							break;
-						default:
-							return;
-					}
-				}
-			}
-			bool readName (ref SpanCharReader reader) {
-				if (reader.EndOfSpan)
-					return false;
-				char c = reader.Peak;					
-				if (char.IsLetter(c) || c == '_' || c == ':') {
-					reader.Advance ();
-					while (reader.TryPeak (ref c)) {									
-						if (!(char.IsLetterOrDigit(c) || c == '.' || c == '-' || c == '\xB7'))
-							return true;
-						reader.Advance ();
-					}
-					return true;
-				}
-				return false;
-			}
-
-			int startOfTok;
-			void addTok (ref SpanCharReader reader, TokenType tokType) {
-				if (reader.CurrentPosition == startOfTok)
-					return;
-				Toks.Add (new Token(tokType, startOfTok, reader.CurrentPosition));
-				startOfTok = reader.CurrentPosition;
-			}
-			public Token[] Tokenize (string source) {
-				SpanCharReader reader = new SpanCharReader(source);
-				
-				startOfTok = 0;
-				int curObjectLevel = 0;
-				curState = States.Init;
-
-				while(!reader.EndOfSpan) {
-
-					skipWhiteSpaces (ref reader);
-
-					if (reader.EndOfSpan)
-						break;
-
-					switch (reader.Peak) {				
-					case '<':
-						reader.Advance ();
-						if (reader.TryPeak ('?')) {								
-							reader.Advance ();
-							addTok (ref reader, TokenType.PI_Start);
-							readName (ref reader);
-							addTok (ref reader, TokenType.PI_Target);
-							curState = States.ProcessingInstrucitons;
-						} else if (reader.TryPeak ('!')) {
-							reader.Advance ();
-							if (reader.TryPeak ("--")) {
-								reader.Advance (2);
-								addTok (ref reader, TokenType.BlockCommentStart);										
-								if (reader.TryReadUntil ("-->")) {
-									addTok (ref reader, TokenType.BlockComment);
-									reader.Advance (3);											
-									addTok (ref reader, TokenType.BlockCommentEnd);
-								} else if (reader.TryPeak ("-->")) {
-									reader.Advance (3);											
-									addTok (ref reader, TokenType.BlockCommentEnd);
-								}
-							} else {
-								addTok (ref reader, TokenType.DTDObjectOpen);
-								if (readName (ref reader)) {
-									addTok (ref reader, TokenType.Keyword);
-									curState = States.DTDObject;
-								}								
-							}								
-						} else if (reader.TryPeak('/')) {
-							reader.Advance ();
-							addTok (ref reader, TokenType.EndElementOpen);
-							if (readName (ref reader)) {
-								addTok (ref reader, TokenType.ElementName);
-								if (reader.TryPeak('>')) {
-									reader.Advance ();
-									addTok (ref reader, TokenType.ClosingSign);
-
-									if (--curObjectLevel > 0)
-										curState = States.Content;
-									else
-										curState = States.Xml;
-								} 
-							}
-						}else{							
-							addTok (ref reader, TokenType.ElementOpen);							
-							if (readName (ref reader)) {
-								addTok (ref reader, TokenType.ElementName);								
-								curState = States.StartTag;
-							}
-						}
-						break;
-					case '?':
-						reader.Advance ();
-						if (reader.TryPeak ('>')){
-							reader.Advance ();
-							addTok (ref reader, TokenType.PI_End);
-						}else
-							addTok (ref reader, TokenType.Unknown);						
-						curState = States.prolog;						
-						break;
-					case '\'':
-					case '"':
-						char q = reader.Read();
-						if (reader.TryReadUntil (q)) {
-							reader.Advance ();
-							addTok (ref reader, TokenType.AttributeValue);
-						} else
-							addTok (ref reader, TokenType.Unknown);
-						break;
-					case '=':
-						reader.Advance();
-						addTok (ref reader, TokenType.EqualSign);
-						break;
-					case '>':
-						reader.Advance();
-						addTok (ref reader, TokenType.ClosingSign);
-						curObjectLevel++;
-						curState = States.Content;
-						break;
-					case '/':
-						reader.Advance();
-						if (reader.TryRead ('>')) {
-							addTok (ref reader, TokenType.EmptyElementClosing);
-							if (--curObjectLevel > 0)
-								curState = States.Content;
-							else
-								curState = States.Xml;
-						}else
-							addTok (ref reader, TokenType.Unknown);
-						break;
-					default:
-						if (curState == States.StartTag || curState == States.ProcessingInstrucitons) {
-							if (readName(ref reader))
-								addTok (ref reader, TokenType.AttributeName);
-							else if (reader.TryAdvance())
-								addTok (ref reader, TokenType.Unknown);
-						} else {
-							reader.TryReadUntil ('<');
-							addTok (ref reader, TokenType.Content);
-						}
-						break;
-					}
-				}
-
-				return Toks.ToArray();
-			}
-			
-		}
-
-	}
 	public class Editor : TextBox {
 		XmlSource source;
 		object TokenMutex = new object();
@@ -292,18 +29,134 @@ namespace Crow
 			base.onInitialized(sender, e);
 
 		}
-		Widget overlay;
+		ListBox overlay;
+		List<String> suggestions;
+		public List<String> Suggestions {
+			get => suggestions;
+			set {
+				suggestions = value;
+				NotifyValueChangedAuto (suggestions);
+				if (suggestions == null || suggestions.Count == 0)
+					hideOverlay ();
+				else
+					showOverlay ();				
+			}
+		}
+		bool suggestionsActive => overlay != null && overlay.IsVisible;
+		Token currentToken;
+		SyntaxNode currentNode;
+		string[] allWidgetNames = typeof (Widget).Assembly.GetExportedTypes ().Where(t=>typeof(Widget).IsAssignableFrom (t))
+					.Select (s => s.Name).ToArray ();
+
+
+		string [] getAllCrowTypeMembers (string crowTypeName) {
+			Type crowType = IML.Instantiator.GetWidgetTypeFromName (crowTypeName);
+			return crowType.GetMembers (BindingFlags.Public | BindingFlags.Instance).
+				Where (m=>((m is PropertyInfo pi && pi.CanWrite) || (m is EventInfo)) &&
+						m.GetCustomAttribute<XmlIgnoreAttribute>() == null).Select (mb=>mb.Name).ToArray();
+		}
 		public override void OnTextChanged(object sender, TextChangeEventArgs e)
 		{
 			base.OnTextChanged(sender, e);
-			//Task.Run(()=>parse());			
-			parse();
+			//Task.Run(()=>parse());
 
-			/*if (overlay == null && HasFocus)
-				overlay = IFace.LoadIMLFragment(@"<Widget Width='50' Height='50' Background='Jet'/>");*/
+			parse();
+			tryGetSuggestions ();
+
+			//Console.WriteLine ($"{pos}: {suggestionTok.AsString (_text)} {suggestionTok}");
+		}
+		void tryGetSuggestions () {
+			if (!currentLoc.HasValue)
+				return;
+			int pos = lines.GetAbsolutePosition (CurrentLoc.Value);	
+			currentToken = source.FindTokenIncludingPosition (pos);
+			currentNode = source.FindNodeIncludingPosition (pos);
+
+			Console.WriteLine ($"Current Token: {currentToken} Current Node: {currentNode}");
+
+			if (currentToken.Type == TokenType.ElementOpen) {
+				Suggestions = new List<string> (allWidgetNames);
+			} else if (currentToken.Type == TokenType.ElementName) {
+				Suggestions = allWidgetNames.Where (s => s.StartsWith (currentToken.AsString (_text), StringComparison.OrdinalIgnoreCase)).ToList ();
+			} else if (currentNode is AttributeSyntax attribNode) {
+				if (currentNode.Parent is ElementTagSyntax eltTag) {
+					if (currentToken.Type == TokenType.AttributeName && eltTag.NameToken.HasValue) {
+						Suggestions = getAllCrowTypeMembers (eltTag.NameToken.Value.AsString (_text))
+							.Where (s => s.StartsWith (currentToken.AsString (_text), StringComparison.OrdinalIgnoreCase)).ToList ();
+					}
+				}
+			} else if (currentNode is ElementStartTagSyntax eltStartTag) {
+				Suggestions = getAllCrowTypeMembers (eltStartTag.NameToken.Value.AsString (_text)).ToList ();
+			} else {
+				/*SyntaxNode curNode = source.FindNodeIncludingPosition (pos);
+				Console.WriteLine ($"Current Node: {curNode}");
+				if (curNode is ElementStartTagSyntax eltStartTag &&
+					(currentToken.Type != TokenType.ClosingSign && currentToken.Type != TokenType.EmptyElementClosing && currentToken.Type != TokenType.Unknown)) {
+					Suggestions = getAllCrowTypeMembers (eltStartTag.NameToken.Value.AsString (_text)).ToList ();
+				} else*/
+					hideOverlay ();
+			}
+		}
+		void showOverlay () {
+			lock (IFace.UpdateMutex) {
+				if (overlay == null) {
+					overlay = IFace.LoadIMLFragment<ListBox>(@"
+						<ListBox Style='suggestionsListBox' Data='{Suggestions}' />
+					");
+					overlay.DataSource = this;
+					overlay.Loaded += (sender, arg) => (sender as ListBox).SelectedIndex = 0;				
+				} else
+					overlay.IsVisible = true;
+				overlay.RegisterForLayouting(LayoutingType.Sizing);	
+			}
+		}
+		void hideOverlay () {
+			if (overlay == null)
+				return;
+			overlay.IsVisible = false;
+		}
+		void completeToken () {			
+			string selectedSugg = overlay.SelectedItem as string;
+			if (selectedSugg == null)
+				return;
+			if (currentToken.Type == TokenType.ElementOpen || currentToken.Type == TokenType.WhiteSpace)
+				update (new TextChange (currentToken.End, 0, selectedSugg));
+			else
+				update (new TextChange (currentToken.Start, currentToken.Length, selectedSugg));
+			hideOverlay ();
+		}
+		public override void onMouseDown (object sender, MouseButtonEventArgs e) {
+			hideOverlay ();
+			base.onMouseDown (sender, e);
 		}
 		public override void onKeyDown(object sender, KeyEventArgs e)
 		{
+			if (suggestionsActive) {
+				switch (e.Key) {
+				case Key.Escape:
+					hideOverlay ();
+					return;
+				case Key.Left:
+				case Key.Right:
+					hideOverlay ();
+					break;
+				case Key.End:
+				case Key.Home:
+				case Key.Down:
+				case Key.Up:
+				case Key.PageDown:
+				case Key.PageUp:
+					overlay.onKeyDown (this, e);
+					return;
+				case Key.Tab:
+					completeToken ();
+					return;
+				}
+			} else if (e.Key == Key.Space && IFace.Ctrl) {
+				tryGetSuggestions ();
+				return;
+			}
+
 			TextSpan selection = Selection;
 			if (e.Key == Key.Tab && !selection.IsEmpty) {
 				int lineStart = lines.GetLocation (selection.Start).Line;
@@ -332,8 +185,7 @@ namespace Crow
 				return;
 			}
 			base.onKeyDown(sender, e);			
-		}
-		int tabSize = 4;
+		}		
 
 		protected override void drawContent (Context gr) {
 			try {
@@ -357,11 +209,15 @@ namespace Crow
 						} else
 							updateLocation (gr, cb.Width, ref currentLoc);
 
-						if (overlay != null) {
-							Point p = new Point((int)currentLoc.Value.VisualCharXPosition, (int)(lineHeight * (currentLoc.Value.Line + 1)));
-							p += ScreenCoordinates (Slot).TopLeft;
-							overlay.Left = p.X;
-							overlay.Top = p.Y;
+						if (overlay != null && overlay.IsVisible) {
+							Point p = new Point((int)currentLoc.Value.VisualCharXPosition - ScrollX, (int)(lineHeight * (currentLoc.Value.Line + 1) - ScrollY));
+							if (p.Y < 0 || p.X < 0)
+								hideOverlay ();
+							else {
+								p += ScreenCoordinates (Slot).TopLeft;
+								overlay.Left = p.X;
+								overlay.Top = p.Y;
+							}
 						}
 						if (selectionStart.HasValue) {
 							updateLocation (gr, cb.Width, ref selectionStart);
@@ -535,7 +391,7 @@ namespace Crow
 									x += tok2.Length;
 									pixX += spacePixelWidth * tok2.Length;*/																				
 					}					
-					gr.Translate (ScrollX, ScrollY);
+					//gr.Translate (ScrollX, ScrollY);
 				}
 			} catch {
 				

@@ -80,3 +80,11 @@ valignStyle2 {
 smallLabel {
 	Font="consolas, 8";
 }
+suggestionsListBox {
+	Template = "#ui.Suggestions.template";
+	Width = "Fit";
+	Height = "Fit";
+	MaximumSize = "300, 120";
+	Background = "Jet";
+	UseLoadingThread = "false";
+}

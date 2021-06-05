@@ -62,6 +62,7 @@ namespace Crow
 			
 			childrenRWLock.ExitWriteLock ();
 
+			//largestChild = tallestChild = null;
 			if (g.LastSlots.Width > contentSize.Width) {
 				largestChild = g;
 				contentSize.Width = g.LastSlots.Width;
@@ -70,9 +71,9 @@ namespace Crow
 				tallestChild = g;
 				contentSize.Height = g.LastSlots.Height;
 			}
-
 			
 			g.LayoutChanged += OnChildLayoutChanges;
+			g.RegisteredLayoutings = LayoutingType.None;
 			g.RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 		}
 		public override void ClearChildren()
@@ -99,10 +100,10 @@ namespace Crow
 		{
 			if (Children.Count > 0) {
 				if (lt == LayoutingType.Width) {
-					if (largestChild == null)
+					//if (largestChild == null)
 						searchLargestChild ();					
 				} else {
-					if (tallestChild == null)
+					//if (tallestChild == null)
 						searchTallestChild ();					
 				}
 			}
@@ -110,7 +111,9 @@ namespace Crow
 		}
 
 		public override void OnLayoutChanges (LayoutingType layoutType)
-		{
+		{			
+			/*if (!IsVisible)
+				return;*/
 			base.OnLayoutChanges (layoutType);
 
 			childrenRWLock.EnterReadLock ();
@@ -194,7 +197,7 @@ namespace Crow
 				int cw = 0;
 				if (forceMeasure)
 					cw = Children [i].measureRawSize (LayoutingType.Width);
-				else if (Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
+				else if (Children[i].Width.IsRelativeToParent || Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
 					continue;
 				else
 					cw = Children [i].Slot.Width;
@@ -224,7 +227,7 @@ namespace Crow
 				int ch = 0;
 				if (forceMeasure)
 					ch = Children [i].measureRawSize (LayoutingType.Height);
-				else if (Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
+				else if (Children[i].Height.IsRelativeToParent || Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
 					continue;
 				else
 					ch = Children [i].Slot.Height;

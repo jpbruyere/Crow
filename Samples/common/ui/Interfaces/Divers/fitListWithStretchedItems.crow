@@ -1,14 +1,18 @@
 ﻿<?xml version="1.0"?>
 
-<ListBox Data="{TestList}" Width="Fit" >
+<ListBox Data="{TestList}" Width="Fit" Focusable="true" >
 	<Template>
-		<Scroller Height="Stretched" Background="DarkRed" Margin="1">
+		<Scroller Name="ItemsScroller" Height="Stretched" Background="Onyx" Margin="10">
 			<VerticalStack Name="ItemsContainer" Orientation="Horizontal" VerticalAlignment="Top" Height="Fit" Background="Grey" Margin="20"/>
 		</Scroller>
 	</Template>
 	<ItemTemplate>
 		<!--<Label Text="{}" TextAlignment="Center" Font="mono, 9" Foreground="Black" Margin="10" Width="Stretched" Background="{}"/>-->
-		<Label Text="{}" TextAlignment="Center" Font="mono, 9" Foreground="Black" Margin="10" Background="{}" Width="Stretched" />
+		<ListItem Width="Stretched" Margin="1" CornerRadius="5"
+			Selected="{Background=Yellow}"
+			Unselected="{Background=Transparent}">
+			<Label Text="{}" TextAlignment="Center" Font="mono, 9" Foreground="Black" Margin="6" Background="{}" Width="Stretched" />
+		</ListItem>
 	</ItemTemplate>
 
 </ListBox>

@@ -485,6 +485,14 @@ namespace Crow
 			int hoverLine = _multiline ?
 				(int)Math.Min (Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent + fe.Descent))), lines.Count - 1) : 0;
 			hoverLoc = new CharLocation (hoverLine, -1, mouseLocalPos.X);
+			using (Context gr = new Context (IFace.surf)) {
+				gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+				gr.SetFontSize (Font.Size);
+				gr.FontOptions = Interface.FontRenderingOptions;
+				gr.Antialias = Interface.Antialias;
+
+				updateLocation (gr, ClientRectangle.Width, ref hoverLoc);
+			}
 		}
 		protected virtual bool cancelLinePrint (double lineHeght, double y, int clientHeight) => false;
 		RectangleD? textCursor = null;

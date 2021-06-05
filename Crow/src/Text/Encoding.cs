@@ -44,6 +44,7 @@ namespace Crow.Text
                 }
                 throw new NotImplementedException();
             }
+			buff[encodedBytes] = 0;
             return encodedBytes;
         }
 

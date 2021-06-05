@@ -1,6 +1,7 @@
 <Project>
 	<PropertyGroup>
 		<TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+		<!--<TargetFrameworks>net5</TargetFrameworks>-->
 		<OutputType>Exe</OutputType>
 		
 		<SolutionDir>$(MSBuildThisFileDirectory)..\</SolutionDir>
@@ -40,7 +41,7 @@
 		<EmbeddedResource Include="$(SamplesDir)common\samples.style" >
 			<Link>common\%(Filename)%(Extension)</Link>
 		</EmbeddedResource>
-		<Compile Include="$(SamplesDir)common\*.cs">
+		<Compile Include="$(SamplesDir)common\src\**\*.cs">
 			<Link>common\%(Filename)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>

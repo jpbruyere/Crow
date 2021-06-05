@@ -8,7 +8,7 @@
 			<Label Width="Stretched" Text="{./Caption}" />
 		</HorizontalStack>
 	</Template>
-	<TabView  MinimumSize="{../../MinimumPopupSize}" Width="Fit" Height="Fit"  >
+	<TabView  MinimumSize="{../MinimumPopupSize}" Width="200" Height="200"  >
 		<ColorPicker Name="HSV" CurrentColor="{²../../../CurrentColor}" Background="Onyx"/>
 		<ColorPicker IsVisible="false" Name="Names" CurrentColor="{²../../../CurrentColor}" Height="Stretched" Background="Onyx">
 			<Template>

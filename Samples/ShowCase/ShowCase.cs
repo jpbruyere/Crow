@@ -20,9 +20,9 @@ namespace ShowCase
 	{
 		static void Main ()
 		{
-			DbgLogger.IncludeEvents = DbgEvtType.None;
-			DbgLogger.DiscardEvents = DbgEvtType.All;
-			DbgLogger.ConsoleOutput = !Configuration.Global.Get<bool> (nameof (DebugLogToFile));
+			DbgLogger.IncludeEvents = DbgEvtType.Layouting;
+			//DbgLogger.DiscardEvents = DbgEvtType.All;
+			//DbgLogger.ConsoleOutput = !Configuration.Global.Get<bool> (nameof (DebugLogToFile));			
 
 			Environment.SetEnvironmentVariable ("FONTCONFIG_PATH", @"C:\Users\Jean-Philippe\source\vcpkg\installed\x64-windows\tools\fontconfig\fonts");
 

@@ -38,6 +38,8 @@ namespace Crow {
 		#endregion
 
 		protected Group itemsContainer;
+		//if scroller name 'ItemsScroller' is found in template, scroll will adapt to selected items change.
+		protected Scroller scroller;
 		string _itemTemplate, dataTest;
 
 		#region events
@@ -55,6 +57,20 @@ namespace Crow {
 		CrowThread loadingThread = null;
 
 		bool isPaged = false;
+		bool useLoadingThread;
+		/// <summary>
+		/// Use anothred thread for loading items, default value is true.
+		/// </summary>
+		[DefaultValue(true)]
+		public bool UseLoadingThread {
+			get => useLoadingThread;
+			set {
+				if (useLoadingThread == value)
+					return;
+				useLoadingThread = value;
+				NotifyValueChangedAuto (useLoadingThread);
+			}
+		}
 
 		#region Templating
 		//TODO: dont instantiate ItemTemplates if not used
@@ -92,6 +108,7 @@ namespace Crow {
 			itemsContainer = this.child.FindByName ("ItemsContainer") as Group;
 			if (itemsContainer == null)
 				throw new Exception ("TemplatedGroup template Must contain a Group named 'ItemsContainer'");
+			scroller = child.FindByName ("ItemsScroller") as Scroller;
 			NotifyValueChanged ("Items", Items);
 			if (itemsContainer.Children.Count == 0)
 				NotifyValueChanged ("HasChildren", false);
@@ -131,7 +148,7 @@ namespace Crow {
 		[XmlIgnore]public virtual object SelectedItem{
 			get => selectedItem;
 			set {
-				if (SelectedItem == value)
+				if (selectedItem == value)
 					return;
 				
 				if (selectedItem is ISelectable oldItem)
@@ -143,10 +160,24 @@ namespace Crow {
 					newItem.IsSelected = true;
 
 				NotifyValueChanged ("SelectedItem", SelectedItem);
+				NotifyValueChanged ("SelectedIndex", SelectedIndex);
 				SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
 			}
 		}
+		[XmlIgnore]public virtual int SelectedIndex{
+			get => selectedItemContainer == null ? -1 : itemsContainer.Children.IndexOf (selectedItemContainer);
+			set {
+				if (SelectedIndex == value)
+					return;
 
+				if (value < 0 || itemsContainer.Children.Count == 0)
+					Li_Selected (null, null);
+				if (value < itemsContainer.Children.Count)
+					Li_Selected (itemsContainer.Children[value], null);
+				else
+					Li_Selected (itemsContainer.Children[itemsContainer.Children.Count - 1], null);
+			}
+		}
 		[XmlIgnore]public bool HasItems {
 			get { return Items.Count > 0; }
 		}
@@ -191,10 +222,15 @@ namespace Crow {
 						return;
 					}
 				}
-
-				loadingThread = new CrowThread (this, loading);
-				loadingThread.Finished += (object sender, EventArgs e) => (sender as TemplatedGroup).Loaded.Raise (sender, e);
-				loadingThread.Start ();
+				
+				if (useLoadingThread) {
+					loadingThread = new CrowThread (this, loading);
+					loadingThread.Finished += (object sender, EventArgs e) => (sender as TemplatedGroup).Loaded.Raise (sender, e);
+					loadingThread.Start ();
+				} else {
+					loading();
+					Loaded.Raise (this, null);
+				}
 
 				//NotifyValueChanged ("SelectedIndex", _selectedIndex);
 				//NotifyValueChanged ("SelectedItem", SelectedItem);
@@ -241,13 +277,9 @@ namespace Crow {
 			}
 
 		}
-
-
 		protected void raiseSelectedItemChanged(){
 			SelectedItemChanged.Raise (this, new SelectionChangeEventArgs (SelectedItem));
 		}
-
-
 		public virtual void AddItem(Widget g){
 			
 			itemsContainer.AddChild (g);
@@ -334,7 +366,7 @@ namespace Crow {
 				loadPage (data, itemsContainer, dataTest);
 			} catch (Exception ex) {
 				while (Monitor.IsEntered (IFace.UpdateMutex))
-					Monitor.Exit (IFace.UpdateMutex);			
+					Monitor.Exit (IFace.UpdateMutex);
 				while (Monitor.IsEntered (IFace.LayoutMutex)) 
 					Monitor.Exit (IFace.LayoutMutex);			
 				System.Diagnostics.Debug.WriteLine ("loading thread aborted: " + ex.ToString());
@@ -412,7 +444,7 @@ namespace Crow {
 
 			foreach (object d in _data) {
 				loadItem (d, page, _dataTest);
-				if (loadingThread.cancelRequested)
+				if (loadingThread != null && loadingThread.cancelRequested)
 					break;
 			}
 
@@ -504,10 +536,27 @@ namespace Crow {
 		{
 			if (sender == selectedItemContainer)
 				return;
-			if (selectedItemContainer is ISelectable li)
-				li.IsSelected = false;
+			if (selectedItemContainer is ISelectable lo)
+				lo.IsSelected = false;
 			selectedItemContainer = sender as Widget;
-			SelectedItem = selectedItemContainer.DataSource;
+			if (selectedItemContainer is ISelectable ln)
+				ln.IsSelected = true;
+			SelectedItem = selectedItemContainer?.DataSource;
+
+			if (scroller != null && selectedItemContainer != null && itemsContainer is GenericStack gs) {
+				Rectangle scrollerCb = scroller.ClientRectangle;
+				Rectangle cb = gs.Slot;
+				Rectangle rItem = selectedItemContainer.Slot + new Point (gs.Margin);
+				if (gs.Orientation == Orientation.Vertical) {
+					if (rItem.Y - scroller.ScrollY < 0)
+						scroller.ScrollY = rItem.Y;
+					else if (rItem.Bottom - scroller.ScrollY > scrollerCb.Height)
+						scroller.ScrollY = rItem.Bottom - scrollerCb.Height;
+				} else if (rItem.X - scroller.ScrollX < 0)
+					scroller.ScrollX = rItem.X;
+				else if (rItem.Right - scroller.ScrollX > scrollerCb.Width)
+					scroller.ScrollX = rItem.Right - scrollerCb.Width;
+			}
 			SelectedItemContainerChanged.Raise (this, new SelectionChangeEventArgs (sender));
 		}
 
@@ -550,8 +599,7 @@ namespace Crow {
 			selectedItemContainer = sender as Widget;
 			if (selectedItemContainer == null)
 				return;
-			SelectedItem = selectedItemContainer.DataSource;
-			//SelectedIndex = items.Children.IndexOf(sender as Widget);
+			SelectedItem = selectedItemContainer.DataSource;			
 		}
 
 		bool emitHelperIsAlreadyExpanded (Widget go){
@@ -599,6 +647,23 @@ namespace Crow {
 		}
 		void onDatasChanged (object sender, ValueChangeEventArgs e) {
 			
+		}
+
+		public override void onKeyDown(object sender, KeyEventArgs e)
+		{
+			switch (e.Key) {
+			case Glfw.Key.Up:
+				if (SelectedIndex > 0)
+					SelectedIndex--;
+				break;
+			case Glfw.Key.Down:
+				if (SelectedIndex < Items.Count - 1)
+					SelectedIndex++;
+				break;
+			default:
+				base.onKeyDown(sender, e);
+				break;
+			}
 		}
 	}
 }
