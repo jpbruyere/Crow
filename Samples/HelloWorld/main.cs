@@ -1,5 +1,6 @@
 ﻿using System;
 using Crow;
+using Samples;
 
 namespace HelloWorld
 {

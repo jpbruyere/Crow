@@ -1,5 +1,6 @@
 using Crow;
 using Glfw;
+using Samples;
 
 namespace tests
 {

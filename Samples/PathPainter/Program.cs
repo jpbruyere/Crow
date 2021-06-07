@@ -1,5 +1,6 @@
 ﻿using Crow;
 using System;
+using Samples;
 
 namespace PathPainter
 {
