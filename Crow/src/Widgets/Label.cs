@@ -396,7 +396,7 @@ namespace Crow
 			}
 
 			if (!string.IsNullOrEmpty (_text)) {
-				Foreground.SetAsSource (IFace, gr);
+				Foreground?.SetAsSource (IFace, gr);
 
 				TextExtents extents;
 				Span<byte> bytes = stackalloc byte[128];

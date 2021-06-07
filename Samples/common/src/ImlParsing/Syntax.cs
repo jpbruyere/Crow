@@ -128,8 +128,12 @@ namespace Crow
 								Exceptions.Add (new SyntaxException  ("Extra equal sign in attribute syntax", iter.Current));
 							else
 								attrib.EqualToken = iter.Current;
-						else if (iter.Current.Type == TokenType.AttributeValue) {
-							attrib.ValueToken = attrib.EndToken = iter.Current;
+						else if (iter.Current.Type == TokenType.AttributeValueOpen)
+							attrib.ValueOpenToken = iter.Current;
+						else if (iter.Current.Type == TokenType.AttributeValue)
+							attrib.ValueToken = iter.Current;
+						else if (iter.Current.Type == TokenType.AttributeValueClose) {
+							attrib.ValueCloseToken = attrib.EndToken = iter.Current;
 							CurrentNode = CurrentNode.Parent;
 						} else {
 							Exceptions.Add (new SyntaxException  ("Unexpected Token", iter.Current));
@@ -232,7 +236,7 @@ namespace Crow
 		public  XmlSource Source => Root.source;
 		public bool Contains (int pos) =>
 			EndToken.HasValue ?
-				StartToken.Start <= pos && EndToken.Value.End >= pos : false;
+				StartToken.Start <= pos && EndToken.Value.End > pos : false;
 
 		public void Dump (int level = 0) {
 			Console.WriteLine ($"{new string('\t', level)}{this}");
@@ -303,8 +307,10 @@ namespace Crow
 	public class AttributeSyntax : SyntaxNode {
 		public Token? NameToken { get; internal set; }
 		public Token? EqualToken { get; internal set; }
+		public Token? ValueOpenToken { get; internal set; }		
+		public Token? ValueCloseToken { get; internal set; }		
 		public Token? ValueToken { get; internal set; }		
 		public AttributeSyntax (Token startTok) : base  (startTok) {}
-		public override bool IsComplete => base.IsComplete & NameToken.HasValue & EqualToken.HasValue & ValueToken.HasValue;
+		public override bool IsComplete => base.IsComplete & NameToken.HasValue & EqualToken.HasValue & ValueToken.HasValue & ValueOpenToken.HasValue & ValueCloseToken.HasValue;
 	}
 }

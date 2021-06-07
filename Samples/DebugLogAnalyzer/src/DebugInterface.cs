@@ -5,6 +5,7 @@
 using System;
 using Crow.Cairo;
 using System.Threading;
+using Samples;
 
 namespace Crow
 {

@@ -19,7 +19,7 @@
 			</ColorPicker>
 		</Template>
 	</ColorPicker>
-	<Border CornerRadius="5" Width="60" Height="40" Background="{../cp.CurrentColor}">
+	<Border CornerRadius="5" Margin="10" Width="Fit" Height="40" Background="{../cp.CurrentColor}">
 		<Label Text="{../../cp.CurrentColor}"/>
 	</Border>
 </VerticalStack>

@@ -8,7 +8,7 @@
 		<Widget Width="50%" Height="50" Background="SeaGreen"/>
 		<Widget Width="50" Height="50" Background="SeaGreen"/>
 		<Widget Width="50" Height="50" Background="SeaGreen"/>
-		<Widget Width="50" Height="50%" Background="SeaGreen"/>
+		<Widget Width="50%" Height="50" Background="SeaGreen"/>
 		<Widget Width="50" Height="50" Background="SeaGreen"/>
 	</Wrapper>
 </Window>

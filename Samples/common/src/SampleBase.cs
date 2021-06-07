@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace Crow
+namespace Samples
 {
 	public class SampleBase : Interface
 	{
@@ -355,6 +355,10 @@ namespace Crow
 		{
 			initCommands();
 			base.OnInitialized();
+		}
+		protected override void processDrawing(Crow.Cairo.Context ctx)
+		{
+			base.processDrawing(ctx);
 		}
 
 		public override bool OnKeyDown(Key key)

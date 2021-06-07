@@ -23,7 +23,7 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);1591;1587;1570;1572;1573;1574</NoWarn>
-		<DefineConstants>DESIGN_MODE;_MEASURE_TIME;_DEBUG_HIGHLIGHT_FOCUS</DefineConstants>		
+		<DefineConstants>DESIGN_MODE;MEASURE_TIME;_DEBUG_HIGHLIGHT_FOCUS</DefineConstants>		
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 		<!--<AllowUnsafeBlocks>true</AllowUnsafeBlocks>-->

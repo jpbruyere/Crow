@@ -100,6 +100,7 @@ namespace Crow
 		public Interface (int width, int height, IntPtr glfwWindowHandle) : this (width, height, false, false)
 		{
 			hWin = glfwWindowHandle;
+			PerformanceMeasure.InitMeasures ();
 		}
 		public Interface (int width = 800, int height = 600, bool startUIThread = true, bool createSurface = true)
 		{
@@ -110,14 +111,14 @@ namespace Crow
 			if (createSurface)
 				initSurface ();
 
+			PerformanceMeasure.InitMeasures ();
+
 			if (startUIThread) {
 				Thread t = new Thread (InterfaceThread) {
 					IsBackground = true
 				};
 				t.Start ();
-			}
-
-			PerformanceMeasure.InitMeasures ();
+			}			
 		}
 		#endregion
 

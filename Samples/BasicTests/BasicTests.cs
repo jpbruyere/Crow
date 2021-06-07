@@ -5,7 +5,7 @@ using System.Linq;
 using Crow;
 using Glfw;
 
-namespace tests
+namespace Samples
 {
 	public class BasicTests : SampleBase
 	{

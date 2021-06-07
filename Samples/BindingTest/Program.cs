@@ -4,6 +4,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using Crow;
+using Samples;
 
 namespace BindingTest
 {

@@ -25,9 +25,10 @@ namespace Crow
 			syntaxAnalyser.Process ();
 			sw.Stop();
 
-			foreach (Token t in Tokens)
+			/*foreach (Token t in Tokens)
 				Console.WriteLine ($"{t,-40} {Source.AsSpan(t.Start, t.Length).ToString()}");
-			syntaxAnalyser.Root.Dump();
+			syntaxAnalyser.Root.Dump();*/
+			
 			Console.WriteLine ($"Syntax Analysis done in {sw.ElapsedMilliseconds}(ms) {sw.ElapsedTicks}(ticks)");
 			foreach (SyntaxException ex in syntaxAnalyser.Exceptions)
 				Console.WriteLine ($"{ex}");
@@ -212,9 +213,13 @@ namespace Crow
 					case '\'':
 					case '"':
 						char q = reader.Read();
-						if (reader.TryReadUntil (q))
+						addTok (ref reader, TokenType.AttributeValueOpen);
+						if (reader.TryReadUntil (q)) {
+							addTok (ref reader, TokenType.AttributeValue);
 							reader.Advance ();
-						addTok (ref reader, TokenType.AttributeValue);						
+							addTok (ref reader, TokenType.AttributeValueClose);
+						} else
+							addTok (ref reader, TokenType.AttributeValue);
 						break;
 					case '=':
 						reader.Advance();
