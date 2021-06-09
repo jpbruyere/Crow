@@ -1,0 +1,62 @@
+﻿<?xml version="1.0"?>
+<Menu Data="{AllCommands}">
+	<ItemTemplate DataType="Crow.Command">
+		<Button Command="{}">
+			<Template>
+				<Label Text="{./Caption}" Width="Stretched" Height="Stretched" Margin="3"
+								MouseEnter="{Background=${ControlHighlight}}"
+								MouseLeave="{Background=Transparent}"/>
+			</Template>
+		</Button>
+	</ItemTemplate>
+	<ItemTemplate DataType="Crow.CommandGroup" >
+		<MenuItem Data="{Commands}" Width="Fit" IsEnabled="{CanExecute}">
+			<Template>
+				<Popper PopDirection="Bottom" Caption="{Caption}"
+								MouseEnter="{Background=${ControlHighlight}}"
+								MouseLeave="{Background=Transparent}">
+					<Template>
+						<Label Text="{./Caption}" Width="Stretched" Height="Fit" Margin="3"
+							Background="{./Background}"/>
+					</Template>
+					<VerticalStack Name="ItemsContainer" Fit="true" Background="Jet"/>
+				</Popper>
+			</Template>
+			<ItemTemplate DataType="Crow.Command">
+				<Button Command="{}" Width="Stretched">
+					<Template>
+						<Label Text="{./Caption}" Width="Stretched" Height="Stretched" Margin="3"
+
+										MouseEnter="{Background=${ControlHighlight}}"
+										MouseLeave="{Background=Transparent}"/>
+					</Template>
+				</Button>			</ItemTemplate>					
+			<ItemTemplate DataType="Crow.CommandGroup" >
+				<MenuItem Data="{Commands}" Width="Stretched"  IsEnabled="{CanExecute}">
+					<Template>
+						<Popper PopDirection="Right" Caption="{Caption}"
+								MouseEnter="{Background=${ControlHighlight}}"
+								MouseLeave="{Background=Transparent}">
+							<Template>
+								<Label Text="{./Caption}" Width="Stretched" Height="Stretched" Margin="3"
+									Background="{./Background}"/>
+							</Template>		
+							<Border Foreground="DimGrey" Width="{../PopWidth}" Height="{../PopHeight}" Background="DarkGrey">
+								<VerticalStack Name="ItemsContainer"/>
+							</Border>
+						</Popper>
+					</Template>
+					<ItemTemplate DataType="Crow.Command">
+						<Button Command="{}" Width="Stretched">
+							<Template>
+								<Label Text="{./Caption}" Width="Stretched" Height="Stretched"  Margin="3"
+												MouseEnter="{Background=${ControlHighlight}}"
+												MouseLeave="{Background=Transparent}"/>
+							</Template>
+						</Button>
+					</ItemTemplate>
+				</MenuItem>
+			</ItemTemplate>
+		</MenuItem>
+	</ItemTemplate>
+</Menu>
