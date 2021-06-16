@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ListBox Data="{PerfMeasures}">
+	<Template>
+		<GroupBox Caption="Performance" Height="Fit">
+			<VerticalStack Name="ItemsContainer" Width="90%" Height="Fit" Spacing="2"/>
+		</GroupBox>
+	</Template>
+	<ItemTemplate>
+		<HorizontalStack Style="HStackMeasure">
+			<Label Text="{Name}" Style="FpsLabel" Width="100"/>
+			<Label Text="{current}" Style="FpsDisp" Width="80" TextAlignment="Right" Margin="2"/>
+		</HorizontalStack>
+	</ItemTemplate>
+</ListBox>

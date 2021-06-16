@@ -265,29 +265,30 @@ namespace Crow
 			Column c = Columns[cIdx];
 
 			childrenRWLock.EnterReadLock ();
-
-			c.LargestChild = null;
-			int largestWidth = 0;	
-			for (int i = 1; i < Children.Count; i++) {
-				TableRow row = Children[i] as TableRow;
-				if (!row.IsVisible)
-					continue;
-				int cw = row.Children [cIdx]. measureRawSize (LayoutingType.Width);
-				if (cw > largestWidth) {
-					largestWidth = cw;
-					c.LargestChild = row.Children [cIdx];
+			try {
+				c.LargestChild = null;
+				int largestWidth = 0;	
+				for (int i = 1; i < Children.Count; i++) {
+					TableRow row = Children[i] as TableRow;
+					if (!row.IsVisible)
+						continue;
+					int cw = row.Children [cIdx]. measureRawSize (LayoutingType.Width);
+					if (cw > largestWidth) {
+						largestWidth = cw;
+						c.LargestChild = row.Children [cIdx];
+					}
 				}
+				if (HeaderRow.Children[cIdx].Slot.Width > largestWidth) {
+					c.LargestChild = HeaderRow.Children[cIdx];
+					return;
+				}
+				HeaderRow.Children[cIdx].Slot.Width = largestWidth;
+			} finally {
+				childrenRWLock.ExitReadLock ();
+				DbgLogger.EndEvent (DbgEvtType.GOSearchLargestChild);
 			}
-			childrenRWLock.ExitReadLock ();
-
-			if (HeaderRow.Children[cIdx].Slot.Width > largestWidth) {
-				c.LargestChild = HeaderRow.Children[cIdx];
-				return;
-			}
-			HeaderRow.Children[cIdx].Slot.Width = largestWidth;
 			//HeaderRow.adjustStretchedGo (LayoutingType.Width);
 
-			DbgLogger.EndEvent (DbgEvtType.GOSearchLargestChild);
 		}
 		int splitIndex = -1;		
 		const int minColumnSize = 10;		

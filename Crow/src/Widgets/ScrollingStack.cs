@@ -114,10 +114,8 @@ namespace Crow {
 				gr.Clip ();
 			}
 
-			try
-			{
-				childrenRWLock.EnterReadLock ();
-				
+			childrenRWLock.EnterReadLock ();
+			try	{				
 				for (int i = Scroll; i < Children.Count && i < Scroll + visibleItems; i++) {
 					if (!Children[i].IsVisible)
 						continue;
@@ -125,13 +123,8 @@ namespace Crow {
 						continue;*/
 					Children[i].Paint (gr);
 				}
-
+			} finally {
 				childrenRWLock.ExitReadLock ();
-			}
-			catch (System.Exception)
-			{
-				childrenRWLock.ExitReadLock ();
-				throw;
 			}
 
 			if (ClipToClientRect)
@@ -159,16 +152,17 @@ namespace Crow {
 					}
 
 					childrenRWLock.EnterReadLock ();
-
-					for (int i = Scroll; i < Children.Count && i < Scroll + visibleItems; i++) {
-						if (!Children[i].IsVisible)
-							continue;
-						/*if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
-							continue;*/
-						Children[i].Paint (gr);
+					try {
+						for (int i = Scroll; i < Children.Count && i < Scroll + visibleItems; i++) {
+							if (!Children[i].IsVisible)
+								continue;
+							/*if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
+								continue;*/
+							Children[i].Paint (gr);
+						}
+					} finally {
+						childrenRWLock.ExitReadLock ();
 					}
-
-					childrenRWLock.ExitReadLock ();
 
 					#if DEBUG_CLIP_RECTANGLE
 					/*gr.LineWidth = 1;
@@ -191,14 +185,16 @@ namespace Crow {
 			base.checkHoverWidget (e);//TODO:check if not possible to put it at beginning of meth to avoid doubled check to DropTarget.
 			if (!childrenRWLock.TryEnterReadLock (10))
 				return;
-			for (int i = Children.Count - 1; i >= 0; i--) {
-				if (Children[i].MouseIsIn (e.Position)) {
-					Children[i].checkHoverWidget (e);
-					childrenRWLock.ExitReadLock ();
-					return;
+			try {
+				for (int i = Children.Count - 1; i >= 0; i--) {
+					if (Children[i].MouseIsIn (e.Position)) {
+						Children[i].checkHoverWidget (e);
+						return;
+					}
 				}
+			} finally {
+				childrenRWLock.ExitReadLock ();
 			}
-			childrenRWLock.ExitReadLock ();			
 		}
 		/// <summary> Process scrolling vertically, or if shift is down, vertically </summary>
 		public override void onMouseWheel (object sender, MouseWheelEventArgs e) {			

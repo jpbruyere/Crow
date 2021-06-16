@@ -2,26 +2,21 @@
 <Window Caption="Showcase" Height="90%" Width="90%" Background="DarkGrey">
 	<HorizontalStack>
 		<VerticalStack Width="30%" Margin="5">
-			<GroupBox Caption="Performance" Height="Fit">
-				<VerticalStack DataSource="{updateMeasure}" Width="90%" Height="Fit" Spacing="2">
+			<ListBox Data="{PerfMeasures}" Height="Fit">
+				<Template>
+					<GroupBox Caption="Performance">
+						<VerticalStack Name="ItemsContainer" Width="90%" Spacing="2"/>
+					</GroupBox>
+				</Template>
+				<ItemTemplate>
 					<HorizontalStack Style="HStackMeasure">
-						<Label Text="Cur:" Style="FpsLabel"/>
-						<Label Text="{current}" Style="FpsDisp"/>
+						<Label Text="{Name}" Style="FpsLabel" Width="80"/>
+						<Label Text="{current}" Style="FpsDisp" Width="60" TextAlignment="Right" Margin="2"/>
+						<Label Text="{minimum}" Style="FpsDisp" Width="60" TextAlignment="Right" Margin="2"/>
+						<Label Text="{maximum}" Style="FpsDisp" Width="60" TextAlignment="Right" Margin="2"/>
 					</HorizontalStack>
-					<HorizontalStack Style="HStackMeasure">
-						<Label Text="Min:" Style="FpsLabel"/>
-						<Label Text="{minimum}" Style="FpsDisp"/>
-					</HorizontalStack>
-					<HorizontalStack Style="HStackMeasure">
-						<Label Text="Mean:" Style="FpsLabel"/>
-						<Label Text="{mean}" Style="FpsDisp"/>
-					</HorizontalStack>
-					<HorizontalStack Style="HStackMeasure">
-						<Label Text="Max:" Style="FpsLabel"/>
-						<Label Text="{maximum}" Style="FpsDisp"/>
-					</HorizontalStack>										
-				</VerticalStack>
-			</GroupBox>
+				</ItemTemplate>
+			</ListBox>
 			<Label Width="Stretched" Margin="3" Background="DimGrey" />
 			<TextBox Text="TextBox" Multiline="true" Margin="3" />
 			<HorizontalStack Height="Fit" Margin="5" Background="DimGrey" CornerRadius="10">
@@ -75,7 +70,7 @@
 		<Splitter />
 		<VerticalStack Width="Stretched" Margin="5" Spacing="5">
 			<Expandable>
-				<Image Path="#Crow.Icons.crow.svg" />
+				<Image Path="#Crow.Icons.crow.svg" Background="White" Height="100" Width="Stretched" Margin="20"/>
 			</Expandable>
 			<Popper >
 				<Image Path="#Crow.Icons.crow.svg" Background="White" Height="100" Width="100" Margin="20" />

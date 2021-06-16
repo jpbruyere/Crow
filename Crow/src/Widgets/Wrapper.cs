@@ -109,26 +109,26 @@ namespace Crow
 					int largestChild = 0;
 
 					childrenRWLock.EnterReadLock();
+					try {
+						foreach (Widget c in Children) {
+							if (!c.IsVisible)
+								continue;
+							if (c.Height.IsRelativeToParent &&
+							    c.RegisteredLayoutings.HasFlag (LayoutingType.Height)) {							
+								return -1;
+							}
+							if (dy + c.Slot.Height > ClientRectangle.Height) {
+								dy = 0;
+								tmp += largestChild + Spacing;
+								largestChild = c.Slot.Width;
+							} else if (largestChild < c.Slot.Width)
+								largestChild = c.Slot.Width;
 
-					foreach (Widget c in Children) {
-						if (!c.Visible)
-							continue;
-						if (c.Height.IsRelativeToParent &&
-						    c.RegisteredLayoutings.HasFlag (LayoutingType.Height)) {
-							childrenRWLock.ExitReadLock();
-							return -1;
+							dy += c.Slot.Height + Spacing;
 						}
-						if (dy + c.Slot.Height > ClientRectangle.Height) {
-							dy = 0;
-							tmp += largestChild + Spacing;
-							largestChild = c.Slot.Width;
-						} else if (largestChild < c.Slot.Width)
-							largestChild = c.Slot.Width;
-
-						dy += c.Slot.Height + Spacing;
+					} finally {
+						childrenRWLock.ExitReadLock ();
 					}
-
-					childrenRWLock.ExitReadLock ();
 
 					if (dy == 0)
 						tmp -= Spacing;
@@ -144,26 +144,26 @@ namespace Crow
 				int tallestChild = 0;
 
 				childrenRWLock.EnterReadLock();
+				try {
+					foreach (Widget c in Children) {
+						if (!c.IsVisible)
+							continue;
+						if (c.Width.IsRelativeToParent &&
+						    c.RegisteredLayoutings.HasFlag (LayoutingType.Width)) {
+							return -1;
+						}
+						if (dx + c.Slot.Width > ClientRectangle.Width) {
+							dx = 0;
+							tmp += tallestChild + Spacing;
+							tallestChild = c.Slot.Height;
+						} else if (tallestChild < c.Slot.Height)
+							tallestChild = c.Slot.Height;
 
-				foreach (Widget c in Children) {
-					if (!c.Visible)
-						continue;
-					if (c.Width.IsRelativeToParent &&
-					    c.RegisteredLayoutings.HasFlag (LayoutingType.Width)) {
-						childrenRWLock.ExitReadLock();
-						return -1;
+						dx += c.Slot.Width + Spacing;
 					}
-					if (dx + c.Slot.Width > ClientRectangle.Width) {
-						dx = 0;
-						tmp += tallestChild + Spacing;
-						tallestChild = c.Slot.Height;
-					} else if (tallestChild < c.Slot.Height)
-						tallestChild = c.Slot.Height;
-
-					dx += c.Slot.Width + Spacing;
+				} finally {
+					childrenRWLock.ExitReadLock();
 				}
-
-				childrenRWLock.ExitReadLock();
 
 				if (dx == 0)
 					tmp -= Spacing;
@@ -192,30 +192,35 @@ namespace Crow
 		}
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
-			switch (layoutType) {
-			case LayoutingType.Width:
-				foreach (Widget c in Children) {
-					if (c.Width.IsRelativeToParent)
-						c.RegisterForLayouting (LayoutingType.Width);
+			childrenRWLock.EnterReadLock();
+			try {
+				switch (layoutType) {
+				case LayoutingType.Width:
+					foreach (Widget c in Children) {
+						if (c.Width.IsRelativeToParent)
+							c.RegisterForLayouting (LayoutingType.Width);
+					}
+					if (Height == Measure.Fit)
+						RegisterForLayouting (LayoutingType.Height);
+					RegisterForLayouting (LayoutingType.X);
+					break;
+				case LayoutingType.Height:
+					foreach (Widget c in Children) {
+						if (c.Height.IsRelativeToParent)
+							c.RegisterForLayouting (LayoutingType.Height);
+					}
+					if (Width == Measure.Fit)
+						RegisterForLayouting (LayoutingType.Width);
+					RegisterForLayouting (LayoutingType.Y);
+					break;
+				default:
+					return;
 				}
-				if (Height == Measure.Fit)
-					RegisterForLayouting (LayoutingType.Height);
-				RegisterForLayouting (LayoutingType.X);
-				break;
-			case LayoutingType.Height:
-				foreach (Widget c in Children) {
-					if (c.Height.IsRelativeToParent)
-						c.RegisterForLayouting (LayoutingType.Height);
-				}
-				if (Width == Measure.Fit)
-					RegisterForLayouting (LayoutingType.Width);
-				RegisterForLayouting (LayoutingType.Y);
-				break;
-			default:
-				return;
+				RegisterForLayouting (LayoutingType.ArrangeChildren);
+				raiseLayoutChanged (layoutType);
+			} finally {
+				childrenRWLock.ExitReadLock();
 			}
-			RegisterForLayouting (LayoutingType.ArrangeChildren);
-			raiseLayoutChanged (layoutType);
 		}
 		#endregion
 	}

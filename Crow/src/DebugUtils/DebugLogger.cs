@@ -25,7 +25,7 @@ namespace Crow
 		static bool logevt (DbgEvtType evtType)
 			//=> IncludeEvents != DbgEvtType.None && (evtType & DiscardEvents) == 0 && (evtType & IncludeEvents) == IncludeEvents;
 			//=> IncludeEvents != DbgEvtType.None && (evtType & DiscardEvents) == 0 && (evtType & IncludeEvents) == IncludeEvents;
-			=> IncludeEvents == DbgEvtType.All || (IncludeEvents != DbgEvtType.None && (evtType & IncludeEvents) == IncludeEvents);
+			=> IncludeEvents == DbgEvtType.All || (IncludeEvents != DbgEvtType.None && (evtType & IncludeEvents) != 0);
 			
 
 

@@ -332,7 +332,7 @@ namespace Crow
 		/// Parent in the graphic tree, used for rendering and layouting
 		/// </summary>
 		[XmlIgnore]public virtual ILayoutable Parent {
-			get { return parent; }
+			get => parent;
 			set {
 				if (parent == value)
 					return;
@@ -1012,12 +1012,12 @@ namespace Crow
 				if (value != null)
 					rootDataLevel = true;
 
-				DbgLogger.StartEvent(DbgEvtType.GOLockUpdate, this);
-				lock (IFace.UpdateMutex) {
+				/*DbgLogger.StartEvent(DbgEvtType.GOLockUpdate, this);
+				lock (IFace.UpdateMutex) {*/
 					OnDataSourceChanged (this, dse);
 					NotifyValueChangedAuto (DataSource);
-				}
-				DbgLogger.EndEvent (DbgEvtType.GOLockUpdate);
+				/*}
+				DbgLogger.EndEvent (DbgEvtType.GOLockUpdate);*/
 			}
 			get {
 				return rootDataLevel ? dataSource : dataSource == null ?
@@ -1456,8 +1456,8 @@ namespace Crow
 
 			parentRWLock.EnterReadLock ();
 			if (parent != null) {					
-				Parent.RegisterClip (LastPaintedSlot);
-				Parent.RegisterClip (Slot);
+				parent.RegisterClip (LastPaintedSlot);
+				parent.RegisterClip (Slot);
 			}
 			parentRWLock.ExitReadLock ();
 
@@ -1473,30 +1473,26 @@ namespace Crow
 				return;
 			}
 			DbgLogger.StartEvent(DbgEvtType.GORegisterClip, this);
-			Rectangle cb = ClientRectangle;
-			Rectangle  r = clip + cb.Position;
-			if (r.Right > cb.Right)
-				r.Width -= r.Right - cb.Right;
-			if (r.Bottom > cb.Bottom)
-				r.Height -= r.Bottom - cb.Bottom;
-			if (r.Width < 0 || r.Height < 0) {
-				//Debug.WriteLine ($"Invalid clip: {clip}:{r} hnd:{this}");//\n{Environment.StackTrace}");				
-				DbgLogger.EndEvent (DbgEvtType.GORegisterClip);				
-				return;
-			}
-			if (cacheEnabled && !IsDirty)
-				Clipping.UnionRectangle (r);
-			if (Parent == null) {
+			try {
+				Rectangle cb = ClientRectangle;
+				Rectangle  r = clip + cb.Position;
+				if (r.Right > cb.Right)
+					r.Width -= r.Right - cb.Right;
+				if (r.Bottom > cb.Bottom)
+					r.Height -= r.Bottom - cb.Bottom;
+				if (r.Width < 0 || r.Height < 0)
+					return;
+				if (cacheEnabled && !IsDirty)
+					Clipping.UnionRectangle (r);
+				if (Parent == null)					
+					return;				
+				Widget p = Parent as Widget;
+				if (p?.IsDirty == true && p?.CacheEnabled == true)
+					return;				
+				Parent.RegisterClip (r + Slot.Position);
+			} finally {
 				DbgLogger.EndEvent (DbgEvtType.GORegisterClip);
-				return;
 			}
-			Widget p = Parent as Widget;
-			if (p?.IsDirty == true && p?.CacheEnabled == true) {
-				DbgLogger.EndEvent (DbgEvtType.GORegisterClip);
-				return;
-			}
-			Parent.RegisterClip (r + Slot.Position);
-			DbgLogger.EndEvent (DbgEvtType.GORegisterClip);
 		}
 		/// <summary> Full update, if width or height is 'Fit' a layouting is requested, and a redraw is done in any case. </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1580,47 +1576,47 @@ namespace Crow
 			if (Parent == null)
 				return;
 			DbgLogger.StartEvent (DbgEvtType.GOLockLayouting, this);
-			lock (IFace.LayoutMutex) {
-				//prevent queueing same LayoutingType for this
-				layoutType &= (~RegisteredLayoutings);
+			try {
+				lock (IFace.LayoutMutex) {
+					//prevent queueing same LayoutingType for this
+					layoutType &= (~RegisteredLayoutings);
 
-				if (layoutType == LayoutingType.None) {
-					DbgLogger.EndEvent (DbgEvtType.GOLockLayouting);
-					return;
+					if (layoutType == LayoutingType.None)
+						return;
+					
+					//dont set position for stretched item
+					if (Width == Measure.Stretched)
+						layoutType &= (~LayoutingType.X);
+					if (Height == Measure.Stretched)
+						layoutType &= (~LayoutingType.Y);
+
+					if (!ArrangeChildren)
+						layoutType &= (~LayoutingType.ArrangeChildren);
+
+					//apply constraints depending on parent type
+					Parent.ChildrenLayoutingConstraints (this, ref layoutType);
+
+	//				//prevent queueing same LayoutingType for this
+					layoutType &= (~RegisteredLayoutings);
+
+					if (layoutType == LayoutingType.None)
+						return;
+
+					//enqueue LQI LayoutingTypes separately
+					if (layoutType.HasFlag (LayoutingType.Width))
+						IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
+					if (layoutType.HasFlag (LayoutingType.Height))
+						IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
+					if (layoutType.HasFlag (LayoutingType.X))
+						IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
+					if (layoutType.HasFlag (LayoutingType.Y))
+						IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
+					if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
+						IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
 				}
-				//dont set position for stretched item
-				if (Width == Measure.Stretched)
-					layoutType &= (~LayoutingType.X);
-				if (Height == Measure.Stretched)
-					layoutType &= (~LayoutingType.Y);
-
-				if (!ArrangeChildren)
-					layoutType &= (~LayoutingType.ArrangeChildren);
-
-				//apply constraints depending on parent type
-				Parent.ChildrenLayoutingConstraints (this, ref layoutType);
-
-//				//prevent queueing same LayoutingType for this
-				layoutType &= (~RegisteredLayoutings);
-
-				if (layoutType == LayoutingType.None) {
-					DbgLogger.EndEvent (DbgEvtType.GOLockLayouting);
-					return;
-				}
-
-				//enqueue LQI LayoutingTypes separately
-				if (layoutType.HasFlag (LayoutingType.Width))
-					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Width, this));
-				if (layoutType.HasFlag (LayoutingType.Height))
-					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Height, this));
-				if (layoutType.HasFlag (LayoutingType.X))
-					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.X, this));
-				if (layoutType.HasFlag (LayoutingType.Y))
-					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.Y, this));
-				if (layoutType.HasFlag (LayoutingType.ArrangeChildren))
-					IFace.LayoutingQueue.Enqueue (new LayoutingQueueItem (LayoutingType.ArrangeChildren, this));
+			} finally {
+				DbgLogger.EndEvent (DbgEvtType.GOLockLayouting);
 			}
-			DbgLogger.EndEvent (DbgEvtType.GOLockLayouting);
 		}
 
 		/// <summary> trigger dependant sizing component update </summary>
@@ -1888,11 +1884,11 @@ namespace Crow
 				DbgLogger.EndEvent (DbgEvtType.GOPaint);
 				return; 
 			}
-			lock (this) {
+			//lock (this) {
 				if (cacheEnabled) {
 					if (Slot.Width > Interface.MaxCacheSize || Slot.Height > Interface.MaxCacheSize)
 						cacheEnabled = false;
-				}
+				}				
 
 				if (cacheEnabled) {
 					if (IsDirty) {
@@ -1915,9 +1911,10 @@ namespace Crow
 					if (!IsEnabled)
 						paintDisabled (ctx, rb);
 
-				}
+				}				
+
 				LastPaintedSlot = Slot;
-			}
+			//}
 			Painted.Raise (this, null);
 
 			DbgLogger.EndEvent (DbgEvtType.GOPaint);

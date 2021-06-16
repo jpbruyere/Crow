@@ -35,12 +35,13 @@ namespace Crow
 			}
 
 			childrenRWLock.EnterWriteLock ();
-
-			Children.Remove(child);
-			child.Parent = null;
-			child.LogicalParent = null;
-
-			childrenRWLock.ExitWriteLock ();
+			try {
+				Children.Remove(child);
+				child.Parent = null;
+				child.LogicalParent = null;
+			} finally {
+				childrenRWLock.ExitWriteLock ();
+			}
 
 			if (child == largestChild && Width == Measure.Fit)
 				searchLargestChild ();
@@ -56,14 +57,15 @@ namespace Crow
 				return;
 			}
 			childrenRWLock.EnterWriteLock ();
-				
-			g.Parent = this;
-			Children.Insert (idx, g);
-			
-			childrenRWLock.ExitWriteLock ();
+			try {	
+				g.Parent = this;
+				Children.Insert (idx, g);
+			} finally {
+				childrenRWLock.ExitWriteLock ();
+			}
 
 			//largestChild = tallestChild = null;
-			if (g.LastSlots.Width > contentSize.Width) {
+			if (g.LastSlots.Width > contentSize.Width) {//TODO:Layout mutex?
 				largestChild = g;
 				contentSize.Width = g.LastSlots.Width;
 			}
@@ -79,15 +81,16 @@ namespace Crow
 		public override void ClearChildren()
 		{
 			childrenRWLock.EnterWriteLock ();
-
-			while (Children.Count > 0) {
-				Widget g = Children [Children.Count - 1];
-				g.LayoutChanged -= OnChildLayoutChanges;
-				Children.RemoveAt (Children.Count - 1);
-				g.Dispose ();
+			try {
+				while (Children.Count > 0) {
+					Widget g = Children [Children.Count - 1];
+					g.LayoutChanged -= OnChildLayoutChanges;
+					Children.RemoveAt (Children.Count - 1);
+					g.Dispose ();
+				}
+			} finally {
+				childrenRWLock.ExitWriteLock ();
 			}
-
-			childrenRWLock.ExitWriteLock ();
 
 			resetChildrenMaxSize ();
 
@@ -117,30 +120,33 @@ namespace Crow
 			base.OnLayoutChanges (layoutType);
 
 			childrenRWLock.EnterReadLock ();
-			//position smaller objects in group when group size is fit
-			switch (layoutType) {
-			case LayoutingType.Width:
-				//childrenRWLock.EnterReadLock ();
-				foreach (Widget c in Children) {
-					if (c.Width.IsRelativeToParent)
-						c.RegisterForLayouting (LayoutingType.Width);
-					else
-						c.RegisterForLayouting (LayoutingType.X);
+			try {
+				//position smaller objects in group when group size is fit
+				switch (layoutType) {
+				case LayoutingType.Width:
+					//childrenRWLock.EnterReadLock ();
+					foreach (Widget c in Children) {
+						if (c.Width.IsRelativeToParent)
+							c.RegisterForLayouting (LayoutingType.Width);
+						else
+							c.RegisterForLayouting (LayoutingType.X);
+					}
+					//childrenRWLock.ExitReadLock ();
+					break;
+				case LayoutingType.Height:
+					//childrenRWLock.EnterReadLock ();
+					foreach (Widget c in Children) {
+						if (c.Height.IsRelativeToParent)
+							c.RegisterForLayouting (LayoutingType.Height);
+						else
+							c.RegisterForLayouting (LayoutingType.Y);
+					}
+					//childrenRWLock.ExitReadLock ();
+					break;
 				}
-				//childrenRWLock.ExitReadLock ();
-				break;
-			case LayoutingType.Height:
-				//childrenRWLock.EnterReadLock ();
-				foreach (Widget c in Children) {
-					if (c.Height.IsRelativeToParent)
-						c.RegisterForLayouting (LayoutingType.Height);
-					else
-						c.RegisterForLayouting (LayoutingType.Y);
-				}
-				//childrenRWLock.ExitReadLock ();
-				break;
+			} finally {
+				childrenRWLock.ExitReadLock ();
 			}
-			childrenRWLock.ExitReadLock ();
 		}
 		#endregion
 		public virtual void OnChildLayoutChanges (object sender, LayoutingEventArgs arg)
@@ -177,7 +183,7 @@ namespace Crow
 			}
 			DbgLogger.EndEvent(DbgEvtType.GOOnChildLayoutChange);
 		}
-		//TODO: x,y position should be taken in account for computation of width and height
+		//TODO: x,y position should be taken in account for computation of width and height + Layout mutex?
 		void resetChildrenMaxSize(){
 			largestChild = null;
 			tallestChild = null;
@@ -186,62 +192,63 @@ namespace Crow
 		protected virtual void searchLargestChild (bool forceMeasure = false)
 		{
 			DbgLogger.StartEvent (DbgEvtType.GOSearchLargestChild, this);
-
 			childrenRWLock.EnterReadLock ();
 
-			largestChild = null;
-			contentSize.Width = 0;
-			for (int i = 0; i < Children.Count; i++) {
-				if (!Children [i].IsVisible)
-					continue;
-				int cw = 0;
-				if (forceMeasure)
-					cw = Children [i].measureRawSize (LayoutingType.Width);
-				else if (Children[i].Width.IsRelativeToParent || Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
-					continue;
-				else
-					cw = Children [i].Slot.Width;
-				if (cw > contentSize.Width) {
-					contentSize.Width = cw;
-					largestChild = Children [i];
+			try {
+
+				largestChild = null;
+				contentSize.Width = 0;
+				for (int i = 0; i < Children.Count; i++) {
+					if (!Children [i].IsVisible)
+						continue;
+					int cw = 0;
+					if (forceMeasure)
+						cw = Children [i].measureRawSize (LayoutingType.Width);
+					else if (Children[i].Width.IsRelativeToParent || Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Width))
+						continue;
+					else
+						cw = Children [i].Slot.Width;
+					if (cw > contentSize.Width) {
+						contentSize.Width = cw;
+						largestChild = Children [i];
+					}
 				}
+				if (largestChild == null && !forceMeasure)
+					searchLargestChild (true);
+			} finally {
+				childrenRWLock.ExitReadLock ();				
+				DbgLogger.EndEvent (DbgEvtType.GOSearchLargestChild);
 			}
-			if (largestChild == null && !forceMeasure)
-				searchLargestChild (true);
-
-			childrenRWLock.ExitReadLock ();
-
-			DbgLogger.EndEvent (DbgEvtType.GOSearchLargestChild);
 		}
 		protected virtual void searchTallestChild (bool forceMeasure = false)
 		{
 			DbgLogger.StartEvent (DbgEvtType.GOSearchTallestChild, this);
-
 			childrenRWLock.EnterReadLock ();
 
-			tallestChild = null;
-			contentSize.Height = 0;
-			for (int i = 0; i < Children.Count; i++) {
-				if (!Children [i].IsVisible)
-					continue;
-				int ch = 0;
-				if (forceMeasure)
-					ch = Children [i].measureRawSize (LayoutingType.Height);
-				else if (Children[i].Height.IsRelativeToParent || Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
-					continue;
-				else
-					ch = Children [i].Slot.Height;
-				if (ch > contentSize.Height) {
-					contentSize.Height = ch;
-					tallestChild = Children [i];
+			try {
+				tallestChild = null;
+				contentSize.Height = 0;
+				for (int i = 0; i < Children.Count; i++) {
+					if (!Children [i].IsVisible)
+						continue;
+					int ch = 0;
+					if (forceMeasure)
+						ch = Children [i].measureRawSize (LayoutingType.Height);
+					else if (Children[i].Height.IsRelativeToParent || Children [i].RegisteredLayoutings.HasFlag (LayoutingType.Height))
+						continue;
+					else
+						ch = Children [i].Slot.Height;
+					if (ch > contentSize.Height) {
+						contentSize.Height = ch;
+						tallestChild = Children [i];
+					}
 				}
+				if (tallestChild == null && !forceMeasure)
+					searchTallestChild (true);
+			} finally {
+				childrenRWLock.ExitReadLock ();
+				DbgLogger.EndEvent (DbgEvtType.GOSearchTallestChild);
 			}
-			if (tallestChild == null && !forceMeasure)
-				searchTallestChild (true);
-
-			childrenRWLock.ExitReadLock ();
-
-			DbgLogger.EndEvent (DbgEvtType.GOSearchTallestChild);
 		}
 	}
 }

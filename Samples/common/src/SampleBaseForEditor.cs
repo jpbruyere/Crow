@@ -98,6 +98,23 @@ namespace Samples
 				NotifyValueChanged(debugLogRecording);
 			}
 		}
+		public bool DebugLogToFile {
+			get => Configuration.Global.Get<bool> (nameof(DebugLogToFile));
+			set {
+				if (DebugLogToFile != value)
+					return;				
+				Configuration.Global.Set (nameof(DebugLogToFile), value);
+				NotifyValueChanged(DebugLogToFile);
+				DbgLogger.ConsoleOutput = !value;
+			}
+		}
+		protected static void initDebugLog () {
+			DbgLogger.IncludeEvents = DbgEvtType.None;
+			DbgLogger.DiscardEvents = DbgEvtType.All;
+			//DbgLogger.DiscardEvents = DbgEvtType.All;
+			DbgLogger.ConsoleOutput = !Configuration.Global.Get<bool> (nameof (DebugLogToFile));
+		}
+
 
 		public new bool IsDirty => source != origSource;
 

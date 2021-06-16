@@ -21,9 +21,7 @@ namespace ShowCase
 	{
 		static void Main ()
 		{
-			DbgLogger.IncludeEvents = DbgEvtType.Layouting;
-			//DbgLogger.DiscardEvents = DbgEvtType.All;
-			//DbgLogger.ConsoleOutput = !Configuration.Global.Get<bool> (nameof (DebugLogToFile));			
+			initDebugLog ();
 
 			Environment.SetEnvironmentVariable ("FONTCONFIG_PATH", @"C:\Users\Jean-Philippe\source\vcpkg\installed\x64-windows\tools\fontconfig\fonts");
 
@@ -108,17 +106,6 @@ namespace ShowCase
 			reloadChrono.Reset ();
 		}
 
-
-		public bool DebugLogToFile {
-			get => !DbgLogger.ConsoleOutput;
-			set {
-				if (DbgLogger.ConsoleOutput != value)
-					return;
-				DbgLogger.ConsoleOutput = !value;
-				Configuration.Global.Set (nameof(DebugLogToFile), DebugLogToFile);
-				NotifyValueChanged(DebugLogToFile);
-			}
-		}
 		public string DebugLogFilePath {
 			get => Configuration.Global.Get<string> (nameof (DebugLogFilePath));
 			set {

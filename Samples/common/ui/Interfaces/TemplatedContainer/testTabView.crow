@@ -2,23 +2,23 @@
 <VerticalStack >
 	<HorizontalStack Height="Fit">
 		<Label Text="Selected Tab:"/>
-		<Label Name="lab" />
+		<Label Name="lab" Text="{../../tabview1.SelectedItem}" />
 	</HorizontalStack>
-	<TabView Name="tabview1" Background="DimGrey" Orientation="Horizontal"
-		SelectedItemChanged="{../lab.Background='Blue'}">
-		<VerticalStack Name="tab #1" Margin="20">
+	<TabView Name="tabview1" Orientation="Horizontal"
+		SelectedItemChanged="{../../lab.Background=Blue}">
+		<VerticalStack Name="tab #1" Margin="20" Background="Onyx">
 			<CheckBox/>
 			<CheckBox/>
 			<CheckBox/>
 			<CheckBox/>
 		</VerticalStack>
-		<VerticalStack Name="tab #2" Margin="20">
+		<VerticalStack Name="tab #2" Margin="20" Background="Onyx">
 			<RadioButton/>
 			<RadioButton/>
 			<RadioButton/>
 			<RadioButton/>
 		</VerticalStack>
-		<VerticalStack Name="tab #3" Margin="20">
+		<VerticalStack Name="tab #3" Margin="20" Background="Onyx">
 			<TextBox/>
 			<TextBox/>
 			<TextBox/>

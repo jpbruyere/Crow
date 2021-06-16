@@ -20,14 +20,15 @@ namespace Crow
 			if (base.FindByDesignID (designID, out go))
 				return true;
 			childrenRWLock.EnterReadLock ();
-			foreach (Widget w in Children) {
-				if (!w.FindByDesignID (designID, out go))
-					continue;
+			try {
+				foreach (Widget w in Children) {
+					if (w.FindByDesignID (designID, out go))
+						return true;
+				}
+				return false;
+			} finally {
 				childrenRWLock.ExitReadLock ();
-				return true;
 			}
-			childrenRWLock.ExitReadLock ();
-			return false;
 		}
 		public override void getIML (System.Xml.XmlDocument doc, System.Xml.XmlNode parentElem)
 		{
@@ -73,12 +74,13 @@ namespace Crow
 			}
 
 			childrenRWLock.EnterWriteLock ();
-
-			Children.Remove(child);
-			child.Parent = null;
-			child.LogicalParent = null;
-
-			childrenRWLock.ExitWriteLock ();
+			try {
+				Children.Remove(child);
+				child.Parent = null;
+				child.LogicalParent = null;
+			} finally {
+				childrenRWLock.ExitWriteLock ();
+			}
 		}
         public virtual void DeleteChild(Widget child)
 		{
@@ -91,11 +93,12 @@ namespace Crow
 				return;
 			}
 			childrenRWLock.EnterWriteLock ();
-				
-			g.Parent = this;
-			Children.Insert (idx, g);
-
-			childrenRWLock.ExitWriteLock ();			
+			try {	
+				g.Parent = this;
+				Children.Insert (idx, g);
+			} finally {
+				childrenRWLock.ExitWriteLock ();
+			}
 		}
 		public virtual void RemoveChild (int idx) {
 			RemoveChild (children[idx]);
@@ -107,53 +110,57 @@ namespace Crow
 		{
 			childrenRWLock.EnterWriteLock ();
 
-			while (Children.Count > 0) {
-				Widget g = Children [Children.Count - 1];
-				Children.RemoveAt (Children.Count - 1);
-				g.Dispose ();
+			try {
+				while (Children.Count > 0) {
+					Widget g = Children [Children.Count - 1];
+					Children.RemoveAt (Children.Count - 1);
+					g.Dispose ();
+				}
+			} finally {
+				childrenRWLock.ExitWriteLock ();
 			}
-
-			childrenRWLock.ExitWriteLock ();
 		}
 		public override void OnDataSourceChanged (object sender, DataSourceChangeEventArgs e)
 		{
 			base.OnDataSourceChanged (this, e);
+
+			childrenRWLock.EnterReadLock ();
 			try {
-				childrenRWLock.EnterReadLock ();
 				foreach (Widget g in Children) {
 					if (g.localDataSourceIsNull & g.localLogicalParentIsNull)
 						g.OnDataSourceChanged (g, e);	
 				}
+			} finally {
 				childrenRWLock.ExitReadLock ();
-			} catch (Exception) {
-				childrenRWLock.ExitReadLock ();
-				throw;
 			}
 		}
 
 		public void putWidgetOnTop(Widget w)
 		{
-			if (Children.Contains(w))
-			{
-				childrenRWLock.EnterWriteLock ();
-
-				Children.Remove (w);
-				Children.Add (w);
-
+			childrenRWLock.EnterWriteLock ();
+			try {
+				if (Children.Contains(w))
+				{
+					Children.Remove (w);
+					Children.Add (w);
+				}
+			} finally {
 				childrenRWLock.ExitWriteLock ();
 			}
 		}
+
 		public void putWidgetOnBottom(Widget w)
 		{
-			if (Children.Contains(w))
-			{
-				childrenRWLock.EnterWriteLock ();
-
-				Children.Remove (w);
-				Children.Insert (0, w);
-
+			childrenRWLock.EnterWriteLock ();
+			try {
+				if (Children.Contains(w))
+				{
+					Children.Remove (w);
+					Children.Insert (0, w);
+				}
+			} finally {
 				childrenRWLock.ExitWriteLock ();
-			}
+			}			
 		}
 
 		#region GraphicObject overrides
@@ -165,15 +172,18 @@ namespace Crow
 
 			childrenRWLock.EnterReadLock ();
 
-			foreach (Widget w in Children) {
-				tmp = w.FindByName (nameToFind);
-				if (tmp != null)
-					break;
+			try {
+
+				foreach (Widget w in Children) {
+					tmp = w.FindByName (nameToFind);
+					if (tmp != null)
+						break;
+				}
+				return tmp;
+
+			} finally {
+				childrenRWLock.ExitReadLock ();
 			}
-
-			childrenRWLock.ExitReadLock ();
-
-			return tmp;
 		}
 		public override T FindByType<T> () 
 		{
@@ -195,13 +205,18 @@ namespace Crow
 		}
 		public override bool Contains (Widget goToFind)
 		{
-			foreach (Widget w in Children) {
-				if (w == goToFind)
-					return true;
-				if (w.Contains (goToFind))
-					return true;
+			childrenRWLock.EnterReadLock ();
+			try {
+				foreach (Widget w in Children) {
+					if (w == goToFind)
+						return true;
+					if (w.Contains (goToFind))
+						return true;
+				}
+				return false;
+			} finally {
+				childrenRWLock.ExitReadLock ();
 			}
-			return false;
 		}
 
 		protected override void onDraw (Context gr)
@@ -217,19 +232,13 @@ namespace Crow
 				gr.Clip ();
 			}
 
+			childrenRWLock.EnterReadLock ();
 			try
 			{
-				childrenRWLock.EnterReadLock ();
-
 				for (int i = 0; i < Children.Count; i++) 
-					Children[i].Paint (gr);			
-
+					Children[i].Paint (gr);				
+			} finally {
 				childrenRWLock.ExitReadLock ();
-			}
-			catch (System.Exception)
-			{
-				childrenRWLock.ExitReadLock ();
-				throw;
 			}
 
 			if (ClipToClientRect)
@@ -257,16 +266,17 @@ namespace Crow
 					}
 
 					childrenRWLock.EnterReadLock ();
-
-					foreach (Widget c in Children) {
-						if (!c.IsVisible)
-							continue;
-						if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
-							continue;
-						c.Paint (gr);
+					try {
+						foreach (Widget c in Children) {
+							if (!c.IsVisible)
+								continue;
+							if (Clipping.Contains (c.Slot + ClientRectangle.Position) == RegionOverlap.Out)
+								continue;
+							c.Paint (gr);
+						}
+					} finally {
+						childrenRWLock.ExitReadLock ();
 					}
-
-					childrenRWLock.ExitReadLock ();
 
 					#if DEBUG_CLIP_RECTANGLE
 					/*gr.LineWidth = 1;
@@ -290,14 +300,16 @@ namespace Crow
 			base.checkHoverWidget (e);//TODO:check if not possible to put it at beginning of meth to avoid doubled check to DropTarget.
 			if (!childrenRWLock.TryEnterReadLock (10))
 				return;
-			for (int i = Children.Count - 1; i >= 0; i--) {
-				if (Children[i].MouseIsIn (e.Position)) {
-					Children[i].checkHoverWidget (e);
-					childrenRWLock.ExitReadLock ();
-					return;
+			try {
+				for (int i = Children.Count - 1; i >= 0; i--) {
+					if (Children[i].MouseIsIn (e.Position)) {
+						Children[i].checkHoverWidget (e);
+						return;
+					}
 				}
+			} finally {
+				childrenRWLock.ExitReadLock ();
 			}
-			childrenRWLock.ExitReadLock ();			
 		}
 		#endregion
 
@@ -305,9 +317,12 @@ namespace Crow
 		{
 			if (disposing) {
 				childrenRWLock.EnterReadLock ();
-				foreach (Widget c in Children)
-					c.Dispose ();
-				childrenRWLock.ExitReadLock ();
+				try {
+					foreach (Widget c in Children)
+						c.Dispose ();
+				} finally {
+					childrenRWLock.ExitReadLock ();
+				}
 			}
 			base.Dispose (disposing);
 		}

@@ -79,15 +79,18 @@ namespace Crow
 			Rectangle cb = ClientRectangle;
 
 			childrenRWLock.EnterReadLock ();
-			foreach (Widget c in Children) {
-				Rectangle bounds = c.Slot + cb.Position;
-				if (!bounds.ContainsOrIsEqual (lm))
-					continue;
-				rIn = bounds;
-				focusedChild = c;
-				break;
+			try {
+				foreach (Widget c in Children) {
+					Rectangle bounds = c.Slot + cb.Position;
+					if (!bounds.ContainsOrIsEqual (lm))
+						continue;
+					rIn = bounds;
+					focusedChild = c;
+					break;
+				}
+			} finally {
+				childrenRWLock.ExitReadLock ();
 			}
-			childrenRWLock.ExitReadLock ();			
 		}
 
 		public void onDragMouseMove (object sender, MouseMoveEventArgs e)

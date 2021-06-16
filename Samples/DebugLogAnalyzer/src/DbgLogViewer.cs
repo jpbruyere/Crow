@@ -481,7 +481,7 @@ namespace Crow
 				if (lastTick >= 0 && hoverTick >= 0)
 					ScrollX += lastTick - hoverTick;
 				if (lastLine >= 0 && hoverLine >= 0)
-				ScrollY += lastLine - hoverLine;
+					ScrollY += lastLine - hoverLine;
 				updateMouseLocalPos (e.Position);
 			} else {
 				HoverWidget = (hoverLine < 0 || hoverLine >= widgets.Count) ? null : widgets [hoverLine];

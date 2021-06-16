@@ -43,13 +43,28 @@ namespace Crow
 				}
 				catch (System.Exception ex)
 				{
-					while (Monitor.IsEntered(LayoutMutex))
+					while (Monitor.IsEntered(LayoutMutex)) {
+						Console.WriteLine ($"[DebugIFace] trying to exit LayoutMutex on error");
+						Monitor.Exit (LayoutMutex);
+					}
+					while (Monitor.IsEntered(UpdateMutex)) {
+						Console.WriteLine ($"[DebugIFace] trying to exit UpdateMutex on error");
+						Monitor.Exit (UpdateMutex);
+					}
+					while (Monitor.IsEntered(ClippingMutex)) {
+						Console.WriteLine ($"[DebugIFace] trying to exit ClippingMutex on error");
+						Monitor.Exit (ClippingMutex);
+					}
+
+
+					/*while (Monitor.IsEntered(LayoutMutex))
 						Monitor.Exit (LayoutMutex);
 					while (Monitor.IsEntered(UpdateMutex))
 						Monitor.Exit (UpdateMutex);
 					while (Monitor.IsEntered(ClippingMutex))
-						Monitor.Exit (ClippingMutex);
-					delSetCurrentException (ex);					
+						Monitor.Exit (ClippingMutex);*/
+					delSetCurrentException (ex);
+					Console.WriteLine ($"[DbgIFace] {ex}");
 					ClearInterface();
 					Thread.Sleep(1000);	
 				}

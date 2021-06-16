@@ -21,8 +21,7 @@ namespace DebugLogAnalyzer
 		
 		static void Main (string [] args)
 		{
-			DbgLogger.IncludeEvents = DbgEvtType.None;
-			DbgLogger.DiscardEvents = DbgEvtType.All;
+			initDebugLog ();
 
 			using (Program app = new Program ()) {
 				CurrentProgramInstance = app;
@@ -195,15 +194,6 @@ namespace DebugLogAnalyzer
 		}
 		public List<DbgWidgetEvent> CurWidgetRootEvents => curWidget == null? new List<DbgWidgetEvent>() : curWidget.RootEvents;
 
-		public bool DebugLogToFile {
-			get => Configuration.Global.Get<bool> (nameof(DebugLogToFile));
-			set {
-				if (DbgLogger.ConsoleOutput != value)
-					return;				
-				Configuration.Global.Set (nameof(DebugLogToFile), value);
-				NotifyValueChanged(DebugLogToFile);
-			}
-		}
 		/*public string DebugLogFilePath {
 			get => Configuration.Global.Get<string> (nameof (DebugLogFilePath));
 			set {
@@ -216,8 +206,8 @@ namespace DebugLogAnalyzer
 		public bool DebugLogOnStartup {
 			get => Configuration.Global.Get<bool> (nameof(DebugLogOnStartup));
 			set {
-				if (DbgLogger.ConsoleOutput != value)
-					return;				
+				if (DebugLogOnStartup == value)
+					return;
 				Configuration.Global.Set (nameof(DebugLogOnStartup), value);
 				NotifyValueChanged(DebugLogOnStartup);
 			}

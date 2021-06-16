@@ -154,7 +154,7 @@ namespace Crow
 		/// <param name="YDelta">mouse delta on the Y axis</param>
 		/// <param name="currentDirection">Current Direction of the operation, none for moving, other value for resizing in the given direction</param>
 		protected void moveAndResize (int XDelta, int YDelta, Direction currentDirection = (Direction)0) {
-			lock (IFace.UpdateMutex) {
+			//lock (IFace.UpdateMutex) {
 				int currentLeft = this.Left;
 				int currentTop = this.Top;
 				int currentWidth, currentHeight;
@@ -223,7 +223,7 @@ namespace Crow
 					this.Width = currentWidth + XDelta;
 					break;
 				}				
-			}
+			//}
 		}
 
 		bool maySize => sizingHandle == null ? false : resizable & sizingHandle.IsHover;
@@ -386,15 +386,15 @@ namespace Crow
 			if (Parent is Interface)
 				(Parent as Interface).DeleteWidget (this);
 			else {
-				Widget p = Parent as Widget;
-				if (p is Group g) {
-					lock (IFace.UpdateMutex) {
-						RegisterClip (p.ScreenCoordinates (p.LastPaintedSlot));
-						g.DeleteChild (this);
-					}
-					//(Parent as Group).RegisterForRedraw ();
-				} else if (Parent is Container c)
-					c.Child = null;
+				lock (IFace.UpdateMutex) {
+					Widget p = Parent as Widget;
+					if (p is Group g) {
+							RegisterClip (p.ScreenCoordinates (p.LastPaintedSlot));
+							g.DeleteChild (this);
+						//(Parent as Group).RegisterForRedraw ();
+					} else if (Parent is Container c)
+						c.Child = null;
+				}
 			}
 		}
 

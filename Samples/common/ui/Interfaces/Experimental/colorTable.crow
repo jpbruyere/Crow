@@ -1,13 +1,15 @@
 ﻿<ListBox Data="{TestList}" >        
 	<Template>
 		<Scroller>
-			<Table Name="ItemsContainer" Columns="name,Fit;color,100" Height="Fit" Width="Stretched" VerticalAlignment="Top"/> 
+			<Table Name="ItemsContainer" Columns="name,Fit;color,100" Height="Fit" Width="Fit" VerticalAlignment="Top"/>
 		</Scroller>
 	</Template>
 	<ItemTemplate>
 		<TableRow>
 			<Label Text="{}" Margin="5" />
-			<Widget Background="{}" Width="50" Height="10"/>
+			<Container Height="Stretched" Margin="5">
+				<Widget Background="{}" />
+			</Container>
 		</TableRow>
 	</ItemTemplate>
 

@@ -30,12 +30,15 @@ namespace Crow
 		long ticksPerPixel;
 		double pixelPerTick;
 
+		object dataMutex = new object();
+
 		public DbgEvent Event {
 			get => evt;
 			set {
 				if (evt == value)
 					return;
-				evt = value;
+				lock (dataMutex)
+					evt = value;
 				updatePixelPerTicks ();
 				NotifyValueChangedAuto (evt);
 				RegisterForRedraw ();
@@ -46,6 +49,8 @@ namespace Crow
 			private set {
 				if (hoverEvt == value)
 					return;
+				lock (dataMutex)
+					evt = value;
 				hoverEvt = value;
 				NotifyValueChangedAuto (hoverEvt);
 			}
@@ -83,24 +88,27 @@ namespace Crow
 
 		protected override void onDraw (Context gr)
 		{
-			if (Event == null) {
-				base.onDraw (gr);
-				return;
+			lock (dataMutex) {
+
+				if (Event == null) {
+					base.onDraw (gr);
+					return;
+				}
+
+				gr.LineWidth = 1;
+				gr.SetDash (new double [] { 1.0, 3.0 }, 0);
+
+				Rectangle cb = ClientRectangle;
+
+				if (Event.Duration == 0) {
+					gr.SetSource (Event.Color);
+					gr.Rectangle (cb);
+					gr.Fill ();
+					return;
+				}
+
+				drawEvent (gr, cb.Height, Event);
 			}
-
-			gr.LineWidth = 1;
-			gr.SetDash (new double [] { 1.0, 3.0 }, 0);
-
-			Rectangle cb = ClientRectangle;
-
-			if (Event.Duration == 0) {
-				gr.SetSource (Event.Color);
-				gr.Rectangle (cb);
-				gr.Fill ();
-				return;
-			}
-
-			drawEvent (gr, cb.Height, Event);
 		}
 		void drawEvent (Context ctx, int h, DbgEvent dbge)
 		{

@@ -31,7 +31,7 @@
 					<Label Style="smallLabValue" Tooltip="VisibleTicks" Text="{../../dbv.VisibleTicks}"/>				
 				</HorizontalStack>
 			</VerticalStack>
-			<!--<VerticalStack Name="AllEvents" Width="Stretched" IsVisible="false">
+			<VerticalStack Name="AllEvents" Width="Stretched" IsVisible="false">
 				<TreeView Height="Stretched" Name="dbgTV" Data="{Events}" SelectedItem="{²CurrentEvent}" Background="DarkGrey"							
 							ItemTemplate="#Dbg.DbgEventTreeItems.itemp"/> 
 				<ListBox Data="{CurWidgetEvents}" Height="100" SelectedItem="{²CurrentEvent}">
@@ -50,7 +50,7 @@
 			<VerticalStack Name="CurWidgetEvents" Width="Stretched" IsVisible="false">
 				<TreeView Height="Stretched" Data="{CurrentWidgetEvents}" Background="DarkGrey"							
 							ItemTemplate="#Dbg.DbgEventTreeItems.itemp"/> 
-			</VerticalStack>-->
+			</VerticalStack>
 		</TabView>
 		<Splitter/>
 		<HorizontalStack Height="30%">

@@ -365,14 +365,14 @@ namespace Crow {
 			try {
 				loadPage (data, itemsContainer, dataTest);
 			} catch (Exception ex) {
-				while (Monitor.IsEntered (IFace.UpdateMutex))
+/*				while (Monitor.IsEntered (IFace.UpdateMutex))
 					Monitor.Exit (IFace.UpdateMutex);
 				while (Monitor.IsEntered (IFace.LayoutMutex)) 
-					Monitor.Exit (IFace.LayoutMutex);			
+					Monitor.Exit (IFace.LayoutMutex);*/
 				System.Diagnostics.Debug.WriteLine ("loading thread aborted: " + ex.ToString());
+			} finally {
+				DbgLogger.EndEvent (DbgEvtType.TGLoadingThread);
 			}
-
-			DbgLogger.EndEvent (DbgEvtType.TGLoadingThread);
 		}
 		//			//if (!ItemTemplates.ContainsKey ("default"))
 		//			//	ItemTemplates ["default"] = Interface.GetItemTemplate (ItemTemplate);
@@ -392,7 +392,7 @@ namespace Crow {
 
 			DbgLogger.StartEvent (DbgEvtType.TGCancelLoadingThread, this);
 
-			int updateMx = 0, layoutMx = 0;
+			/*int updateMx = 0, layoutMx = 0;
 
 			while (Monitor.IsEntered (IFace.UpdateMutex)) {
 				Monitor.Exit (IFace.UpdateMutex);
@@ -401,14 +401,14 @@ namespace Crow {
 			while (Monitor.IsEntered (IFace.LayoutMutex)) {
 				Monitor.Exit (IFace.LayoutMutex);
 				layoutMx++;
-			}			
+			}*/			
 
 			loadingThread.Cancel ();
 
-			for (int i = 0; i < layoutMx; i++)
+			/*for (int i = 0; i < layoutMx; i++)
 				Monitor.Enter (IFace.LayoutMutex);
 			for (int i = 0; i < updateMx; i++)
-				Monitor.Enter (IFace.UpdateMutex);
+				Monitor.Enter (IFace.UpdateMutex);*/
 
 			loadingThread = null;
 			
@@ -500,6 +500,7 @@ namespace Crow {
 				}
 			}
 			
+			try {
 				g = iTemp.CreateInstance();
 				#if DESIGN_MODE
 				g.design_isTGItem = true;
@@ -508,7 +509,9 @@ namespace Crow {
 //				if (isPaged)
 				g.LogicalParent = this;
 				g.MouseClick += itemClick;
-			Monitor.Exit (IFace.UpdateMutex);
+			} finally {
+				Monitor.Exit (IFace.UpdateMutex);
+			}
 
 			if (iTemp.Expand != null) {
 				IToggle toggle = g as IToggle;

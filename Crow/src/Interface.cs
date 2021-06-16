@@ -924,20 +924,23 @@ namespace Crow
 			DbgLogger.StartEvent (DbgEvtType.Update);
 			PerformanceMeasure.Begin (PerformanceMeasure.Kind.Update);
 
-			processLayouting ();
+			try {
+				processLayouting ();
 
-			clippingRegistration ();
+				clippingRegistration ();
 
-			if (ctx == null) {
-				using (ctx = new Context (surf)) 
+				if (ctx == null) {
+					using (ctx = new Context (surf)) 
+						processDrawing (ctx);
+				}else
 					processDrawing (ctx);
-			}else
-				processDrawing (ctx);
+			} finally {
 
-			PerformanceMeasure.End (PerformanceMeasure.Kind.Update);
-			DbgLogger.EndEvent (DbgEvtType.Update, true);
+				PerformanceMeasure.End (PerformanceMeasure.Kind.Update);
+				DbgLogger.EndEvent (DbgEvtType.Update, true);
 
-			Monitor.Exit (UpdateMutex);
+				Monitor.Exit (UpdateMutex);
+			}
 
 			PerformanceMeasure.Notify ();
 		}
@@ -950,23 +953,23 @@ namespace Crow
 					Monitor.Exit (LayoutMutex);
 					return;
                 }
+
 				DbgLogger.StartEvent (DbgEvtType.ProcessLayouting);
 				PerformanceMeasure.Begin (PerformanceMeasure.Kind.Layouting);
+				try {
+					DiscardQueue = new Queue<LayoutingQueueItem> (LayoutingQueue.Count);
+					while (LayoutingQueue.Count > 0) {
+						LayoutingQueueItem lqi = LayoutingQueue.Dequeue ();
+						lqi.ProcessLayouting ();
+					}
+					LayoutingQueue = DiscardQueue;
+				} finally {
+					PerformanceMeasure.End (PerformanceMeasure.Kind.Layouting);
+					DbgLogger.EndEvent (DbgEvtType.ProcessLayouting, true);
 
-				DiscardQueue = new Queue<LayoutingQueueItem> (LayoutingQueue.Count);
-				//Debug.WriteLine ("======= Layouting queue start =======");
-				 				
-				while (LayoutingQueue.Count > 0) {
-					LayoutingQueueItem lqi = LayoutingQueue.Dequeue ();
-					lqi.ProcessLayouting ();
+					Monitor.Exit (LayoutMutex);
+					DiscardQueue = null;
 				}
-				LayoutingQueue = DiscardQueue;
-
-				PerformanceMeasure.End (PerformanceMeasure.Kind.Layouting);
-				DbgLogger.EndEvent (DbgEvtType.ProcessLayouting, true);
-
-				Monitor.Exit (LayoutMutex);
-				DiscardQueue = null;
 			}
 		}
 		/// <summary>Degueue Widget to clip from DrawingQueue and register the last painted slot and the new one
@@ -1004,7 +1007,6 @@ namespace Crow
 				PerformanceMeasure.Begin (PerformanceMeasure.Kind.Drawing);				
 
 				ctx.PushGroup ();
-
 
 				for (int i = GraphicTree.Count -1; i >= 0 ; i--){
 					Widget p = GraphicTree[i];

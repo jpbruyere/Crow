@@ -611,9 +611,12 @@ namespace Crow
 				if (!System.Threading.Monitor.TryEnter (linesMutex))
 					return false;
 			}
-			bool result = base.UpdateLayout (layoutType);
-			System.Threading.Monitor.Exit (linesMutex);
-			return result;
+			try {
+				bool result = base.UpdateLayout (layoutType);				
+				return result;
+			} finally {
+				System.Threading.Monitor.Exit (linesMutex);
+			}
 		}
 		public override int measureRawSize(LayoutingType lt)
 		{
