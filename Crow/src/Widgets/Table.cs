@@ -270,7 +270,7 @@ namespace Crow
 				int largestWidth = 0;	
 				for (int i = 1; i < Children.Count; i++) {
 					TableRow row = Children[i] as TableRow;
-					if (!row.IsVisible)
+					if (!row.IsVisible || row.Children.Count <= i)
 						continue;
 					int cw = row.Children [cIdx]. measureRawSize (LayoutingType.Width);
 					if (cw > largestWidth) {
@@ -295,7 +295,7 @@ namespace Crow
 		public override void onMouseMove(object sender, MouseMoveEventArgs e)
 		{
 			
-			if (ColumnSpacing > 0 && Columns.Count > 0) {
+			if (Columns != null && ColumnSpacing > 0 && Columns.Count > 0) {
 				Point m = ScreenPointToLocal (e.Position);
 				if (IFace.IsDown (Glfw.MouseButton.Left) && splitIndex >= 0) {					
 					int splitPos = (int)(0.5 * ColumnSpacing + m.X);					

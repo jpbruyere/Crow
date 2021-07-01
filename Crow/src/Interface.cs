@@ -78,23 +78,40 @@ namespace Crow
 			FontRenderingOptions.HintStyle = HintStyle.Full;
 			FontRenderingOptions.SubpixelOrder = SubpixelOrder.Default;
 
-			preloadCrowAssemblies ();
+			
 		}
-		static void preloadCrowAssemblies () {
+		public static string [] CrowAssemblyNames {
+			set {
+				if (value == null)
+					return;
+				preloadCrowAssemblies (value);
+			}
+		}
+		static void preloadCrowAssemblies (string [] crowAssemblyNames) {
 			//ensure all assemblies are loaded, because IML could contains classes not instanciated in source
-			Assembly ea = Assembly.GetEntryAssembly ();
+			/*Assembly ea = Assembly.GetEntryAssembly ();
 			System.IO.FileStream[] files = ea.GetFiles ();
 			foreach (AssemblyName an in ea.GetReferencedAssemblies()) {
 				try {
 					Assembly a = Assembly.ReflectionOnlyLoad (an.Name);
 					if (a == Assembly.GetExecutingAssembly ())
-							continue;
+						continue;
 					if (a.GetCustomAttribute (typeof (CrowAttribute)) != null)
-							crowAssemblies.Add (a);
+						crowAssemblies.Add (a);
 				} catch {
 
 				}											
+			}*/
+			foreach (string assemblyName in crowAssemblyNames) {
+				try {
+					crowAssemblies.Add (Assembly.Load (assemblyName));
+				} catch (Exception ex) {
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine ($"Unable to preload CrowAssembly: {assemblyName}: {ex}");
+					Console.ResetColor();
+				}											
 			}
+
 		}
 
 		public Interface (int width, int height, IntPtr glfwWindowHandle) : this (width, height, false, false)
@@ -144,6 +161,7 @@ namespace Crow
 			Glfw3.SetScrollCallback (hWin, HandleScrollDelegate);
 			Glfw3.SetCharCallback (hWin, HandleCharDelegate);
 			Glfw3.SetWindowSizeCallback (hWin, HandleWindowSizeDelegate);
+			Glfw3.SetWindowRefreshCallback (hWin, HandleWindowRefreshDelegate);
 		}
 
 		protected void initSurface ()
@@ -157,7 +175,7 @@ namespace Crow
 			hWin = Glfw3.CreateWindow (clientRectangle.Width, clientRectangle.Height, "win name", MonitorHandle.Zero, IntPtr.Zero);
 			if (hWin == IntPtr.Zero)
 				throw new Exception ("[GLFW3] Unable to create vulkan Window");
-			ownWindow = true;
+			ownWindow = true;			
 
 			registerGlfwCallbacks ();
 
@@ -183,6 +201,41 @@ namespace Crow
 				throw new PlatformNotSupportedException ("Unable to create cairo surface.");
 			}
 		}
+
+		public void SetWindowIcon (string path) {
+			using (Stream stream = GetStreamFromPath (path)) {
+#if STB_SHARP
+				StbImageSharp.ImageResult stbi = StbImageSharp.ImageResult.FromStream (stream, StbImageSharp.ColorComponents.RedGreenBlueAlpha);
+				byte[] image = new byte[stbi.Data.Length];
+				//rgba to argb for cairo.
+				for (int i = 0; i < stbi.Data.Length; i += 4) {
+					image[i] = stbi.Data[i + 2];
+					image[i + 1] = stbi.Data[i + 1];
+					image[i + 2] = stbi.Data[i];
+					image[i + 3] = stbi.Data[i + 3];
+				}
+				Glfw.Image icon = new Glfw.Image ((uint)stbi.Width, (uint)stbi.Height, image);
+				Glfw3.SetWindowIcon (hWin, 1, ref icon);
+				icon.Dispose();
+				
+#else
+				using (StbImage stbi = new StbImage (stream)) {
+					byte[] image = new byte [stbi.Size];
+					//rgba to argb for cairo.
+					for (int i = 0; i < stbi.Size; i+=4) {
+						image [i] = Marshal.ReadByte (stbi.Handle, i + 2);
+						image [i + 1] = Marshal.ReadByte (stbi.Handle, i + 1);
+						image [i + 2] = Marshal.ReadByte (stbi.Handle, i);
+						image [i + 3] = Marshal.ReadByte (stbi.Handle, i + 3);
+					}
+					Glfw.Image icon = new Glfw.Image (stbi.Width, stbi.Height, image);
+					Glfw3.setWindowIcon (hWin, 1, ref icon);
+					icon.Dispose();
+				}
+#endif
+			}
+		}
+
 		internal Dictionary<string, MethodInfo> knownExtMethods = new Dictionary<string, MethodInfo> ();
 		internal MethodInfo SearchExtMethod (Type t, string methodName) {
 			string key = t.Name + "." + methodName;
@@ -235,6 +288,9 @@ namespace Crow
 		static WindowSizeDelegate HandleWindowSizeDelegate = (IntPtr window, int Width, int Height) => {
 			windows [window].ProcessResize (new Rectangle (0, 0, Width, Height));
 		};
+		static WindowDelegate HandleWindowRefreshDelegate = (IntPtr window) => {
+			windows [window].registerRefreshClientRectangle ();
+		};
 
 		#endregion
 
@@ -265,14 +321,22 @@ namespace Crow
 		/// </summary>
 		public void Init () {
 			DbgLogger.StartEvent (DbgEvtType.IFaceInit);
-			initDictionaries ();
-			loadStyling ();
-			loadThemeFiles ();
+			init_internal ();
 			initTooltip ();
-			initContextMenus ();
 			OnInitialized ();
 			DbgLogger.EndEvent (DbgEvtType.IFaceInit);
 		}
+		/// <summary>
+		/// Maybe called anytime to reset all Instantiators, Styles and Theme. Lock the UpdateMutex to
+		/// call it after the normal startup.
+		/// </summary>
+		protected void init_internal() {
+			disposeContextMenus ();
+			initDictionaries ();
+			loadStyling ();
+			loadThemeFiles ();					
+			initContextMenus ();
+		}		
 		/// <summary>
 		/// call Init() then enter the running loop performing ProcessEvents until running==false.
 		/// </summary>
@@ -283,7 +347,10 @@ namespace Crow
 				Glfw3.PollEvents ();
 				UpdateFrame ();
 			}
+			
+			Terminate ();
 		}
+		public virtual void Terminate () {}
 		public virtual void UpdateFrame () { Thread.Sleep (1); }
 
 		public virtual void Quit () => Glfw3.SetWindowShouldClose (hWin, 1);
@@ -294,6 +361,22 @@ namespace Crow
 			Glfw3.GetKey (hWin, Key.RightControl) == InputAction.Press;
 		public bool Alt => Glfw3.GetKey (hWin, Key.LeftAlt) == InputAction.Press ||
 			Glfw3.GetKey (hWin, Key.RightAlt) == InputAction.Press;
+
+#if DEBUG_STATS
+		public long TotalWidgetCreated => Widget.TotalWidgetCreated;
+		public long TotalWidgetDisposed => Widget.TotalWidgetDisposed;
+		public long TotalWidgetActive => Widget.TotalWidgetCreated - Widget.TotalWidgetDisposed;
+		public long TotalWidgetInGraphicTree {
+			get {
+				lock(UpdateMutex) {
+					long total = 0;
+					foreach (Widget w in GraphicTree)
+						total += 1 + w.ChildCount;
+					return total;
+				}
+			}
+		}
+#endif
 
 		#region IDisposable Support
 		private bool disposedValue = false; // To detect redundant calls
@@ -307,7 +390,7 @@ namespace Crow
 					// TODO: dispose managed state (managed objects).
 				}
 
-				currentCursor?.Dispose ();				
+				currentCursor?.Dispose ();
 				disposeContextMenus ();
 
 				if (ownWindow) {
@@ -523,13 +606,14 @@ namespace Crow
 		/// </remarks>
 		public Dictionary<string, string> StylingConstants;
 		/// <summary> parse all styling data's during application startup and build global Styling Dictionary </summary>
+		/// <remarks>
+		/// </remarks>
 		protected virtual void loadStyling() {
-			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
-			foreach (Assembly a in crowAssemblies) {
-				loadStylingFromAssembly (a);
-			}
+			loadThemeStyle ();
 			loadStylingFromAssembly (Assembly.GetEntryAssembly ());
-			loadThemeStyle ();			
+			foreach (Assembly a in crowAssemblies)
+				loadStylingFromAssembly (a);			
+			loadStylingFromAssembly (Assembly.GetExecutingAssembly ());
 		}
 		/// <summary> Search for .style resources in assembly </summary>
 		protected void loadStylingFromAssembly (Assembly assembly) {
@@ -567,11 +651,7 @@ namespace Crow
 					return;
 				lock (UpdateMutex) {
 					DbgLogger.StartEvent (DbgEvtType.IFaceReloadTheme);
-					disposeContextMenus ();
-					initDictionaries ();
-					loadStyling ();
-					loadThemeFiles ();					
-					initContextMenus ();
+					init_internal ();
 					DbgLogger.EndEvent (DbgEvtType.IFaceReloadTheme);
 				}
 			}
@@ -691,8 +771,7 @@ namespace Crow
 				if (tryGetResource (Assembly.GetEntryAssembly (), resId, out stream))
 					return stream;
 				string[] assemblyNames = resId.Split ('.');
-				if (tryGetResource (AppDomain.CurrentDomain.GetAssemblies ()
-					.FirstOrDefault (aa => aa.GetName ().Name == assemblyNames[0]), resId, out stream))
+				if (AppDomain.CurrentDomain.GetAssemblies ().FirstOrDefault (aa => aa.GetName ().Name == assemblyNames[0]).TryGetResource (resId, out stream))
 					return stream;
 				if (assemblyNames.Length > 3)
 					if (tryGetResource (AppDomain.CurrentDomain.GetAssemblies ()
@@ -994,6 +1073,17 @@ namespace Crow
 			PerformanceMeasure.End (PerformanceMeasure.Kind.Clipping);
 			DbgLogger.EndEvent (DbgEvtType.ClippingRegistration, true);
 		}
+		void clear(Context ctx) {
+			for (int i = 0; i < clipping.NumRectangles; i++)
+				ctx.Rectangle (clipping.GetRectangle (i));
+
+			ctx.ClipPreserve ();
+			ctx.Operator = Operator.Clear;
+			ctx.Fill ();
+			ctx.Operator = Operator.Over;			
+		}
+		public bool SolidBackground = true;
+
 		/// <summary>Clipping Rectangles drive the drawing process. For compositing, each object under a clip rectangle should be
 		/// repainted. If it contains also clip rectangles, its cache will be update, or if not cached a full redraw will take place</summary>
 		protected virtual void processDrawing(Context ctx){
@@ -1008,6 +1098,9 @@ namespace Crow
 
 				ctx.PushGroup ();
 
+				if (SolidBackground)
+					clear (ctx);
+				
 				for (int i = GraphicTree.Count -1; i >= 0 ; i--){
 					Widget p = GraphicTree[i];
 					if (!p.IsVisible)
@@ -1015,9 +1108,9 @@ namespace Crow
 					if (clipping.Contains (p.Slot) == RegionOverlap.Out)
 						continue;
 
-					ctx.Save ();
+					//ctx.Save ();
 					p.Paint (ctx);
-					ctx.Restore ();
+					//ctx.Restore ();
 				}
 
 				if (DragAndDropOperation != null) {
@@ -1046,22 +1139,16 @@ namespace Crow
 #endif
 
 				ctx.PopGroupToSource ();
-				
-				for (int i = 0; i < clipping.NumRectangles; i++)
-					ctx.Rectangle (clipping.GetRectangle (i));
 
-				ctx.ClipPreserve ();
-				ctx.Operator = Operator.Clear;
-				ctx.Fill ();
-				ctx.Operator = Operator.Over;				
-
+				if (!SolidBackground)
+					clear (ctx);
 
 				ctx.Paint ();
-					
+
 				surf.Flush ();
 
-				clipping.Dispose ();
-				clipping = new Region ();
+				
+				clipping.Reset ();
 
 				PerformanceMeasure.End (PerformanceMeasure.Kind.Drawing);
 				IsDirty = true;
@@ -1273,9 +1360,11 @@ namespace Crow
 				foreach (Widget g in GraphicTree)
 					g.RegisterForLayouting (LayoutingType.All);
 
-				RegisterClip (clientRectangle);
+				registerRefreshClientRectangle ();
 			}
 		}
+
+		internal void registerRefreshClientRectangle () => RegisterClip (clientRectangle);
 
 		#region Mouse and Keyboard Handling
 		MouseCursor cursor = MouseCursor.top_left_arrow;
@@ -1403,6 +1492,9 @@ namespace Crow
 					HoverWidget = value;
             }
         }
+		/// <summary>
+		/// Ask OS to force the mouse position to the actual coordinate of Interface.MousePosition
+		/// </summary>
 		public virtual void ForceMousePosition () {
 			Glfw3.SetCursorPosition (hWin, MousePosition.X, MousePosition.Y);
 		}
@@ -1414,124 +1506,122 @@ namespace Crow
 		{
 			DbgLogger.StartEvent (DbgEvtType.MouseMove);
 
-			int deltaX = x - MousePosition.X;
-			int deltaY = y - MousePosition.Y;
+			try {
 
-			if (!DragAndDropInProgress) {
-				if (stickedWidget != null && ActiveWidget == null) {
-					stickyMouseDelta.X += deltaX;
-					stickyMouseDelta.Y += deltaY;
+				int deltaX = x - MousePosition.X;
+				int deltaY = y - MousePosition.Y;
 
-					if (Math.Abs (stickyMouseDelta.X) > stickedWidget.StickyMouse || Math.Abs (stickyMouseDelta.Y) > stickedWidget.StickyMouse) {
-						stickedWidget = null;
-						stickyMouseDelta = default;
-					} else {
-						ForceMousePosition ();
-						DbgLogger.EndEvent (DbgEvtType.MouseMove);
-						return true;
-					}
-				}
-			}
+				if (!DragAndDropInProgress) {
+					if (stickedWidget != null && ActiveWidget == null) {
+						stickyMouseDelta.X += deltaX;
+						stickyMouseDelta.Y += deltaY;
 
-			MousePosition = new Point (x, y);
-			MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
-
-			if (!(DragAndDropInProgress || ActiveWidget == null)) {
-				//TODO, ensure object is still in the graphic tree
-				//send move evt even if mouse move outside bounds
-				ActiveWidget.onMouseMove (this, e);
-				DbgLogger.EndEvent (DbgEvtType.MouseMove);
-				return true;
-			}
-
-			if (HoverOrDropTarget != null) {
-				resetTooltip ();
-
-				//check topmost graphicobject first				
-				Widget topContainer = HoverOrDropTarget;
-				while (topContainer.LogicalParent is Widget w)
-					topContainer = w;					
-				
-				int indexOfTopContainer = GraphicTree.IndexOf (topContainer);
-				if (indexOfTopContainer != 0) {
-                    for (int i = 0; i < indexOfTopContainer; i++) {
-						//if logical parent of top container is a Interface, that's not a popup.
-						if (GraphicTree [i].LogicalParent is Interface) {
-							if (GraphicTree [i].MouseIsIn (e.Position)) {
-								//mouse is in another top container than the actual one,
-								//so we must leave first the current top container starting from HoverWidget
-								if (DragAndDropInProgress) {
-									DragAndDropOperation.DropTarget?.onDragLeave (this, DragAndDropOperation);
-									GraphicTree[i].checkHoverWidget (e);
-									DragAndDropOperation.DragSource.onDrag (this, e);
-								} else {
-									while (HoverWidget != null) {
-										HoverWidget.onMouseLeave (this, e);
-										HoverWidget = HoverWidget.FocusParent;
-									}
-									GraphicTree[i].checkHoverWidget (e);
-									HoverWidget.onMouseMove (this, e);
-								}
-								DbgLogger.EndEvent (DbgEvtType.MouseMove);
-								return true;
-							}
-						}
-					}
-				}
-
-				if (HoverOrDropTarget.MouseIsIn (e.Position)) {
-					HoverOrDropTarget.checkHoverWidget (e);
-					if (DragAndDropInProgress)
-						DragAndDropOperation.DragSource.onDrag (this, e);
-					else
-						HoverWidget.onMouseMove (this, e);
-					DbgLogger.EndEvent (DbgEvtType.MouseMove);
-					return true;
-				} else {
-					if (DragAndDropInProgress && dragndropHover == DragAndDropOperation.DropTarget)
-						DragAndDropOperation.DropTarget.onDragLeave (this, DragAndDropOperation);
-					//seek upward from last focused graph obj's	
-					while (HoverOrDropTarget.FocusParent != null) {
-						if (!DragAndDropInProgress)
-							HoverWidget.onMouseLeave (this, e);
-						HoverOrDropTarget = HoverOrDropTarget.FocusParent;
-						if (HoverOrDropTarget.MouseIsIn (e.Position)) {
-							HoverOrDropTarget.checkHoverWidget (e);
-							if (DragAndDropInProgress)
-								DragAndDropOperation.DragSource?.onDrag (this, e);
-							else
-								HoverWidget.onMouseMove (this, e);
-							DbgLogger.EndEvent (DbgEvtType.MouseMove);
+						if (Math.Abs (stickyMouseDelta.X) > stickedWidget.StickyMouse || Math.Abs (stickyMouseDelta.Y) > stickedWidget.StickyMouse) {
+							stickedWidget = null;
+							stickyMouseDelta = default;
+						} else {
+							ForceMousePosition ();
 							return true;
-						}						
-					}
-				}
-			}
-
-			//top level graphic obj's parsing
-			lock (GraphicTree) {
-				for (int i = 0; i < GraphicTree.Count; i++) {
-					Widget g = GraphicTree [i];
-					if (DragAndDropInProgress && DragAndDropOperation.DragSource == g)
-						continue;
-					if (g.MouseIsIn (e.Position)) {
-						g.checkHoverWidget (e);
-						if (!DragAndDropInProgress) {
-							if (g is Window && FOCUS_ON_HOVER && g.Focusable) {
-								FocusedWidget = g;
-								if (RAISE_WIN_ON_FOCUS)
-									PutOnTop (g);
-							}
-							HoverWidget.onMouseMove (this, e);
 						}
-						DbgLogger.EndEvent (DbgEvtType.MouseMove);
-						return true;
 					}
 				}
+
+				MousePosition = new Point (x, y);
+				MouseMoveEventArgs e = new MouseMoveEventArgs (x, y, deltaX, deltaY);
+
+				if (!(DragAndDropInProgress || ActiveWidget == null)) {
+					//TODO, ensure object is still in the graphic tree
+					//send move evt even if mouse move outside bounds
+					ActiveWidget.onMouseMove (this, e);
+					return true;
+				}
+
+				if (HoverOrDropTarget != null) {
+					resetTooltip ();
+
+					//check topmost graphicobject first				
+					Widget topContainer = HoverOrDropTarget;
+					while (topContainer.LogicalParent is Widget w)
+						topContainer = w;					
+					
+					int indexOfTopContainer = GraphicTree.IndexOf (topContainer);
+					if (indexOfTopContainer != 0) {
+	                    for (int i = 0; i < indexOfTopContainer; i++) {//check all top containers that are at a higher level
+							//if logical parent of top container is the Interface, that's not a popup.
+							if (GraphicTree [i].LogicalParent is Interface) {
+								if (GraphicTree [i].MouseIsIn (e.Position)) {
+									//mouse is in another top container than the actual one,
+									//so we must leave first the current top container starting from HoverWidget
+									if (DragAndDropInProgress) {
+										DragAndDropOperation.DropTarget?.onDragLeave (this, DragAndDropOperation);
+										GraphicTree[i].checkHoverWidget (e);
+										DragAndDropOperation.DragSource.onDrag (this, e);
+									} else {
+										while (HoverWidget != null) {
+											HoverWidget.onMouseLeave (this, e);
+											HoverWidget = HoverWidget.FocusParent;
+										}
+										GraphicTree[i].checkHoverWidget (e);
+										HoverWidget.onMouseMove (this, e);
+									}
+									return true;
+								}
+							}
+						}
+					}
+
+					if (HoverOrDropTarget.MouseIsIn (e.Position)) {
+						HoverOrDropTarget.checkHoverWidget (e);
+						if (DragAndDropInProgress)
+							DragAndDropOperation.DragSource.onDrag (this, e);
+						else
+							HoverWidget.onMouseMove (this, e);
+						return true;
+					} else {
+						if (DragAndDropInProgress && dragndropHover == DragAndDropOperation.DropTarget)
+							DragAndDropOperation.DropTarget.onDragLeave (this, DragAndDropOperation);
+						//seek upward from last focused graph obj's	
+						while (HoverOrDropTarget.FocusParent != null) {
+							if (!DragAndDropInProgress)
+								HoverWidget.onMouseLeave (this, e);
+							HoverOrDropTarget = HoverOrDropTarget.FocusParent;
+							if (HoverOrDropTarget.MouseIsIn (e.Position)) {
+								HoverOrDropTarget.checkHoverWidget (e);
+								if (DragAndDropInProgress)
+									DragAndDropOperation.DragSource?.onDrag (this, e);
+								else
+									HoverWidget.onMouseMove (this, e);
+								return true;
+							}						
+						}
+					}
+				}
+
+				//top level graphic obj's parsing
+				lock (GraphicTree) {
+					for (int i = 0; i < GraphicTree.Count; i++) {
+						Widget g = GraphicTree [i];
+						if (DragAndDropInProgress && DragAndDropOperation.DragSource == g)
+							continue;
+						if (g.MouseIsIn (e.Position)) {
+							g.checkHoverWidget (e);
+							if (!DragAndDropInProgress) {
+								if (g is Window && FOCUS_ON_HOVER && g.Focusable) {
+									FocusedWidget = g;
+									if (RAISE_WIN_ON_FOCUS)
+										PutOnTop (g);
+								}
+								HoverWidget.onMouseMove (this, e);
+							}
+							return true;
+						}
+					}
+				}
+				HoverOrDropTarget = null;
+				return false;
+			} finally {
+				DbgLogger.EndEvent (DbgEvtType.MouseMove);
 			}
-			HoverOrDropTarget = null;
-			DbgLogger.EndEvent (DbgEvtType.MouseMove);
-			return false;
 		}
 		/// <summary>
 		/// Forward the mouse down event from the host to the hover widget in the crow interface
@@ -1541,21 +1631,24 @@ namespace Crow
 		public virtual bool OnMouseButtonDown (MouseButton button)
 		{
 			DbgLogger.StartEvent (DbgEvtType.MouseDown);
-			doubleClickTriggered = (lastMouseDown.ElapsedMilliseconds < DOUBLECLICK_TRESHOLD);
-			lastMouseDown.Restart ();
 
-			lastMouseDownEvent = new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press);
+			try {
+				doubleClickTriggered = (lastMouseDown.ElapsedMilliseconds < DOUBLECLICK_TRESHOLD);
+				lastMouseDown.Restart ();
 
-			if (HoverWidget == null) {
+				lastMouseDownEvent = new MouseButtonEventArgs (MousePosition.X, MousePosition.Y, button, InputAction.Press);
+
+				if (HoverWidget == null) 
+					return false;
+
+				HoverWidget.onMouseDown (this, lastMouseDownEvent);
+
+				ActiveWidget = HoverWidget;
+				return true;
+
+			} finally {
 				DbgLogger.EndEvent (DbgEvtType.MouseDown);
-				return false;
 			}
-
-			HoverWidget.onMouseDown (this, lastMouseDownEvent);
-
-			ActiveWidget = HoverWidget;
-			DbgLogger.EndEvent (DbgEvtType.MouseDown);
-			return true;
 		}
 		/// <summary>
 		/// Forward the mouse up event from the host to the crow interface
@@ -1645,6 +1738,33 @@ namespace Crow
 		}
 		public virtual bool OnKeyDown (Key key)
 		{
+#if DEBUG_STATS
+			if (Shift && key == Key.F1) {
+				LoadIMLFragment (@"
+<Window Caption='Debug Statistick' Width='50%' Height='50%' Background='DarkGrey'>
+	<VerticalStack>
+		<HorizontalStack Height='Fit'>
+			<Label Text='TotalWidgetCreated:' Width='50%'/>
+			<Label Text='{TotalWidgetCreated}' TextAlignment='Right'/>
+		</HorizontalStack>
+		<HorizontalStack Height='Fit'>
+			<Label Text='TotalWidgetDisposed:' Width='50%'/>
+			<Label Text='{TotalWidgetDisposed}' TextAlignment='Right'/>
+		</HorizontalStack>
+		<HorizontalStack Height='Fit'>
+			<Label Text='TotalWidgetActive:' Width='50%'/>
+			<Label Text='{TotalWidgetActive}' TextAlignment='Right'/>
+		</HorizontalStack>		
+		<HorizontalStack Height='Fit'>
+			<Label Text='TotalWidgetInGraphicTree:' Width='50%'/>
+			<Label Text='{TotalWidgetInGraphicTree}' TextAlignment='Right'/>
+		</HorizontalStack>
+	</VerticalStack>
+</Window>
+				").DataSource = this;
+			}
+#endif
+			
 			//Keyboard.SetKeyState((Crow.Key)Key,true);
 			lastKeyDownEvt = new KeyEventArgs (key, true);
 
@@ -1665,6 +1785,7 @@ namespace Crow
 		Stopwatch tooltipTimer = new Stopwatch ();
 		Widget ToolTipContainer;
 		volatile bool tooltipVisible;
+		object tooltipMutex = new object ();
 
 		protected void initTooltip ()
 		{
@@ -1674,26 +1795,28 @@ namespace Crow
 		}
 		void toolTipThreadFunc ()
 		{
-			while (true) {			
-				if (tooltipTimer.ElapsedMilliseconds > TOOLTIP_DELAY) {
-					if (!tooltipVisible) {
-						Widget g = _hoverWidget;
-						while (g != null) {
-							if (!string.IsNullOrEmpty (g.Tooltip)) {
-								if (g.Tooltip.StartsWith("#", StringComparison.Ordinal)) {
-									//custom tooltip container
-									ToolTipContainer = CreateInstance (g.Tooltip);
-								} else
-									ToolTipContainer = CreateInstance ("#Crow.Tooltip.template");
-								ToolTipContainer.LayoutChanged += ToolTipContainer_LayoutChanged;
-								AddWidget (ToolTipContainer);
-								ToolTipContainer.DataSource = g;
-								ToolTipContainer.Top = MousePosition.Y + 10;
-								ToolTipContainer.Left = MousePosition.X + 10;
-								tooltipVisible = true;
-								break;
+			while (true) {
+				lock (tooltipMutex) {
+					if (tooltipTimer.ElapsedMilliseconds > TOOLTIP_DELAY) {
+						if (!tooltipVisible) {
+							Widget g = _hoverWidget;
+							while (g != null) {
+								if (!string.IsNullOrEmpty (g.Tooltip)) {
+									if (g.Tooltip.StartsWith("#", StringComparison.Ordinal)) {
+										//custom tooltip container
+										ToolTipContainer = CreateInstance (g.Tooltip);
+									} else
+										ToolTipContainer = CreateInstance ("#Crow.Tooltip.template");
+									ToolTipContainer.LayoutChanged += ToolTipContainer_LayoutChanged;
+									AddWidget (ToolTipContainer);
+									ToolTipContainer.DataSource = g;
+									ToolTipContainer.Top = MousePosition.Y + 10;
+									ToolTipContainer.Left = MousePosition.X + 10;
+									tooltipVisible = true;
+									break;
+								}
+								g = g.LogicalParent as Widget;
 							}
-							g = g.LogicalParent as Widget;
 						}
 					}
 				}
@@ -1703,13 +1826,15 @@ namespace Crow
 		}
 		void resetTooltip ()
 		{
-			if (tooltipVisible) {
-				ToolTipContainer.LayoutChanged -= ToolTipContainer_LayoutChanged;
-				ToolTipContainer.DataSource = null;
-				RemoveWidget (ToolTipContainer);
-				tooltipVisible = false;
-				ToolTipContainer.Dispose ();
-				ToolTipContainer = null;
+			lock (tooltipMutex) {
+				if (tooltipVisible) {
+					ToolTipContainer.LayoutChanged -= ToolTipContainer_LayoutChanged;
+					ToolTipContainer.DataSource = null;
+					RemoveWidget (ToolTipContainer);
+					tooltipVisible = false;
+					ToolTipContainer.Dispose ();
+					ToolTipContainer = null;
+				}
 			}
 			tooltipTimer.Restart ();
 		}
@@ -1718,7 +1843,7 @@ namespace Crow
 			Widget ttc = sender as Widget;				
 					
 			//tooltip container datasource is the widget triggering the tooltip
-			Rectangle r = ScreenCoordinates ((ttc.DataSource as Widget).Slot);
+			Rectangle r = ttc?.DataSource is Widget w ? ScreenCoordinates (w.Slot) : ClientRectangle;
 
 			if (e.LayoutType == LayoutingType.X) {
 				if (ttc.Slot.Right > clientRectangle.Right)

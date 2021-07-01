@@ -88,3 +88,25 @@ suggestionsListBox {
 	Background = "Jet";
 	UseLoadingThread = "false";
 }
+allWidgetBackground = "DarkGrey";
+allWidgetCell {
+	Template = "Interfaces/grpBoxUnamed.tmp";
+	Width = "20%";
+	Background = "${allWidgetBackground}";
+	MouseEnter = "{Background=Jet}";
+	MouseLeave = "{Background=${allWidgetBackground}}";
+}
+allWidgetNamedCell {
+	Template = "Interfaces/grpBox.tmp";
+	Width = "20%";
+	Background = "${allWidgetBackground}";
+	MouseEnter = "{Background=Onyx}";
+	MouseLeave = "{Background=${allWidgetBackground}}";
+}
+allWidgetCell2 {
+	Template = "Interfaces/grpBox2.tmp";
+	Width = "20%";		
+}
+allWidgetHS {
+	Width = "20%";
+}

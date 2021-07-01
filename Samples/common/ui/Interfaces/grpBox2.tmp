@@ -1,0 +1,10 @@
+﻿<VerticalStack Margin="2" Background="Transparent"
+	MouseEnter = "{Background=DarkGrey};{lab.Foreground=SkyBlue}"
+	MouseLeave = "{Background=Transparent};{lab.Foreground=DarkGrey}">
+	<!--<Group  Height="Fit">
+		<Label Font="sans, 10" Foreground="DarkGrey" Text="{./Caption}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="4"/>
+		<Label Font="sans, 10" Foreground="White" Text="{./Caption}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="2"/>
+	</Group>-->
+	<Label Name="lab" Font="sans, 9" Foreground="DarkGrey" Text="{./Caption}" Margin="1"/>
+	<Container Name="Content" Margin="5" Background="{AllWidgetBackground}"/>
+</VerticalStack>

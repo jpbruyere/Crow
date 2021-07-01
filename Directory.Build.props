@@ -6,10 +6,13 @@
 		<Authors>Jean-Philippe Bruyère</Authors>	    
 		<LangVersion>7.3</LangVersion>
 		
-		<CrowVersion>0.9.4</CrowVersion>
+		<CrowVersion>0.9.7</CrowVersion>
 		<CrowPackageVersion>$(CrowVersion)-beta</CrowPackageVersion>
 		<CrowStbSharp>true</CrowStbSharp>
 		<CrowDebugLogEnabled>false</CrowDebugLogEnabled>
+		<CrowDebugStatsEnabled>true</CrowDebugStatsEnabled>
+		<CrowDesignModeEnabled>true</CrowDesignModeEnabled>
+		
 		<GlfwSharpVersion>0.2.11-beta</GlfwSharpVersion>
 	</PropertyGroup>
 </Project>

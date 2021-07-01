@@ -1,0 +1,114 @@
+﻿<VerticalStack Name="Base" Background="{AllWidgetBackground}" Margin="1" >
+	<HorizontalStack Height="15%">
+		<GroupBox Style="allWidgetCell2" Caption="Label" >
+			<Label/>
+		</GroupBox>
+		<GroupBox Style="allWidgetCell2" Caption="TextBox">
+			<TextBox/>
+		</GroupBox>
+		<GroupBox Style="allWidgetCell2" Caption="Button">
+			<Button  />
+		</GroupBox>
+		<GroupBox Style="allWidgetCell2" Caption="CheckBox" >
+			<CheckBox />
+		</GroupBox>
+		<GroupBox Style="allWidgetCell2" Caption="RadioButton">
+			<RadioButton/>
+		</GroupBox>
+	</HorizontalStack>
+	<HorizontalStack Height="15%">
+		<GroupBox Style="allWidgetCell2" Caption="Spinner" >
+			<Spinner/>
+		</GroupBox>
+		<GroupBox Style="allWidgetCell2" Caption="Slider">
+			<Slider/>
+		</GroupBox>
+		<GroupBox Style="allWidgetCell2" Caption="ProgressBar">
+			<ProgressBar Value="40" />
+		</GroupBox>
+	</HorizontalStack>
+	<HorizontalStack Height="20%" >
+		<GroupBox Style="allWidgetCell2" Caption="Border">
+			<Border >
+				<Label/>
+			</Border>
+		</GroupBox>
+		<GroupBox Style="allWidgetCell2" Caption="GroupBox">
+			<GroupBox >
+				<Label/>
+			</GroupBox>
+		</GroupBox>
+		<GroupBox Style="allWidgetCell2" Caption="Container">
+			<Container>
+				<Label/>
+			</Container>
+		</GroupBox>
+		<GroupBox Style="allWidgetCell2" Caption="VerticalStack">
+			<VerticalStack>
+				<Label/>
+				<Label/>
+				<Label/>
+		</VerticalStack>
+		</GroupBox>
+		<GroupBox Style="allWidgetCell2" Caption="HorizontalStack">
+			<HorizontalStack>
+				<Label/>
+				<Label/>
+				<Label/>
+			</HorizontalStack>
+		</GroupBox>
+	</HorizontalStack>
+	<HorizontalStack Height="20%"  >
+		<GroupBox Style="allWidgetCell2" Caption="Expandable">
+			<Expandable>
+				<Label/>
+			</Expandable>
+		</GroupBox>
+		<GroupBox Style="allWidgetCell2" Caption="Popper">
+			<Popper>
+				<Label/>
+			</Popper>
+		</GroupBox>
+		<GroupBox Style="allWidgetCell2" Caption="ListBox">
+			<ListBox Data="{TestList}" />
+		</GroupBox>
+		<GroupBox Style="allWidgetCell2" Caption="ComboBox">
+			<ComboBox Data="{TestList}"/>
+		</GroupBox>
+		<GroupBox Style="allWidgetCell2" Caption="ColorPicker">
+			<ColorPicker Template="Interfaces/colorPicker.tmp" CurrentColor="{²AllWidgetBackground}"/>
+		</GroupBox>
+	</HorizontalStack>
+	<HorizontalStack Height="25%"  >
+		<GroupBox Style="allWidgetCell2" Caption="Vertical ScrollBar">
+			<ScrollBar Maximum="10" />
+		</GroupBox>
+		<GroupBox Style="allWidgetCell2" Caption="Horizontal ScrollBar">
+			<ScrollBar Style="HScrollBar" Maximum="10" />
+		</GroupBox>
+		<GroupBox Style="allWidgetCell2" Caption="TabView">
+			<TabView >
+				<Widget Name="tab1" Background="Grey"/>
+				<Widget Name="tab2" Background="DarkSlateGrey" IsVisible="false"/>
+				<Widget Name="tab3" Background="DarkRed" IsVisible="false"/>
+			</TabView >
+		</GroupBox>
+		<GroupBox Style="allWidgetCell2" Caption="Table">
+			<Table Columns="Column1,Fit;Column2,Fit;Column3,Stretched" >   	
+				<TableRow Height="Fit" >
+					<Label/>
+					<Label/>
+					<Label/>
+				</TableRow>
+				<TableRow Height="Fit" >
+					<Label/>
+					<Label/>
+					<Label/>
+				</TableRow>
+				<TableRow Height="Fit" >
+					<Label/>
+				</TableRow>
+			</Table>
+		</GroupBox>
+	</HorizontalStack>
+</VerticalStack>

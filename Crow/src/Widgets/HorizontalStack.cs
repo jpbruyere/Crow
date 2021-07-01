@@ -20,5 +20,6 @@ namespace Crow
 			get => Orientation.Horizontal;
 			set { base.Orientation = Orientation.Horizontal; }
 		}
+		protected override string LogName => "hs";
 	}
 }

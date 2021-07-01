@@ -11,7 +11,7 @@
 					</HorizontalStack>
 				</Template>/>
 				<TabView  MinimumSize="{../MinimumPopupSize}" Width="200" Height="200"  >
-					<ColorPicker Name="HSV" CurrentColor="{²../../../CurrentColor}" Background="Onyx"/>
+					<ColorPicker Name="HSV" CurrentColor="{²../../../CurrentColor}" Background="Onyx" BubbleMouseEvent="false"/>
 					<ColorPicker IsVisible="false" Name="Names" CurrentColor="{²../../../CurrentColor}" Height="Stretched" Background="Onyx">
 						<Template>
 							<ListBox Width="Stretched" Data="{./AvailableColors}" SelectedItemChanged="./onSelectedItemChanged">
@@ -28,7 +28,7 @@
 							</ListBox>
 						</Template>
 					</ColorPicker>
-			</TabView>
+				</TabView>
 			</Popper>
 		</Template>
 	</ColorPicker>

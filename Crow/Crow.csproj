@@ -23,7 +23,7 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);1591;1587;1570;1572;1573;1574</NoWarn>
-		<DefineConstants>DESIGN_MODE;MEASURE_TIME;_DEBUG_HIGHLIGHT_FOCUS</DefineConstants>		
+		<DefineConstants>MEASURE_TIME;_DEBUG_HIGHLIGHT_FOCUS</DefineConstants>		
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 		<!--<AllowUnsafeBlocks>true</AllowUnsafeBlocks>-->
@@ -60,15 +60,21 @@
 	<PropertyGroup Condition=" '$(CrowDebugLogEnabled)' == 'true'" >
 		<DefineConstants>$(DefineConstants);DEBUG_LOG</DefineConstants>
 	</PropertyGroup>
-	<ItemGroup>
+	<PropertyGroup Condition=" '$(CrowDebugStatsEnabled)' == 'true'" >
+		<DefineConstants>$(DefineConstants);DEBUG_STATS</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(CrowDesignModeEnabled)' == 'true'" >
+		<DefineConstants>$(DefineConstants);DESIGN_MODE</DefineConstants>
+	</PropertyGroup>
+	<!--<ItemGroup>
 		<ProjectReference Include="..\CrowDbgShared\CrowDbgShared.csproj" />
-	</ItemGroup>
+	</ItemGroup>-->
 
 	<ItemGroup>
 		<Content Include="..\Images\crow.png" Pack="true" PackagePath="" />
 		<Compile Include="src\**\*.cs" Exclude="src\Mono.Cairo\NativeMethods-internal.cs" />
 		<EmbeddedResource Include="Templates\*.*">
-			<LogicalName>Crow.%(Filename).template</LogicalName>
+			<LogicalName>Crow.%(Filename)%(Extension)</LogicalName>
 		</EmbeddedResource>
 		<EmbeddedResource Include="Default.style" />
 		<EmbeddedResource Include="Icons\*.*" />

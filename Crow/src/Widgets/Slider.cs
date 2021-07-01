@@ -45,21 +45,11 @@ namespace Crow
 		#region private fields
 		int cursorSize, minimumCursorSize;
 		Orientation _orientation;
-		bool holdCursor = false;
+		bool holdCursor, inverted;
 		protected Widget cursor;
 		#endregion
 
 		protected double unity;
-
-		public override bool ArrangeChildren => true;
-
-		public override bool UpdateLayout (LayoutingType layoutType)
-		{
-			if (layoutType == LayoutingType.ArrangeChildren) 
-				computeCursorPosition ();
-			
-			return base.UpdateLayout (layoutType);
-		}
 
 		#region Public properties
 		[DefaultValue (Orientation.Horizontal)]
@@ -101,7 +91,30 @@ namespace Crow
 				updateCursorWidgetProps ();
 			}
 		}
+		/// <summary>
+		/// if true, horizontal gauge will align drawing right, and vertical on bottom.
+		/// </summary>
+		public bool Inverted {
+			get => inverted;
+			set {
+				if (inverted == value)
+					return;
+				inverted = value;
+				NotifyValueChangedAuto (inverted);
+				RegisterForLayouting (LayoutingType.ArrangeChildren);
+			}
+		}
+
 		#endregion
+
+		public override bool ArrangeChildren => true;
+		public override bool UpdateLayout (LayoutingType layoutType)
+		{
+			if (layoutType == LayoutingType.ArrangeChildren) 
+				computeCursorPosition ();
+			
+			return base.UpdateLayout (layoutType);
+		}
 
 		void updateCursorWidgetProps ()
 		{
@@ -129,10 +142,16 @@ namespace Crow
             Rectangle r = cursor.Parent.ClientRectangle;
 			if (_orientation == Orientation.Horizontal) {
 				unity = (r.Width - cursorSize) / (Maximum - Minimum);
-				cursor.Left = r.Left + (int)((Value - Minimum) * unity);
+				if (inverted)
+					cursor.Left = r.Right - cursorSize - (int)((Value - Minimum) * unity);
+				else
+					cursor.Left = r.Left + (int)((Value - Minimum) * unity);
 			} else {
 				unity = (r.Height - cursorSize) / (Maximum - Minimum);
-				cursor.Top = r.Top + (int)((Value - Minimum) * unity);				
+				if (inverted)
+					cursor.Top = r.Bottom - cursorSize - (int)((Value - Minimum) * unity);
+				else
+					cursor.Top = r.Top + (int)((Value - Minimum) * unity);
 			}
         }
 		Point mouseDownInit;
@@ -145,6 +164,7 @@ namespace Crow
 			mouseDownInit = ScreenPointToLocal (e.Position);
 			mouseDownInitValue = Value;
 			Rectangle cursInScreenCoord = cursor == null ? default : cursor.ScreenCoordinates (cursor.Slot);
+			double multiplier = inverted ? -1 : 1;
 			if (cursInScreenCoord.ContainsOrIsEqual (e.Position)){
 				//Rectangle r = cursor.Parent.ClientRectangle;
 				//if (r.Width - cursorSize > 0) {
@@ -154,13 +174,13 @@ namespace Crow
 				holdCursor = true;
 			}else if (_orientation == Orientation.Horizontal) {
 				if (e.Position.X < cursInScreenCoord.Left)
-					Value -= LargeIncrement;
+					Value -= LargeIncrement * multiplier;
 				else
-					Value += LargeIncrement;
+					Value += LargeIncrement * multiplier;
 			} else if (e.Position.Y < cursInScreenCoord.Top)
-				Value -= LargeIncrement;
+				Value -= LargeIncrement * multiplier;
 			else
-				Value += LargeIncrement;
+				Value += LargeIncrement * multiplier;
 
 			base.onMouseDown (sender, e);
 		}
@@ -180,6 +200,8 @@ namespace Crow
 					if (r.Width - cursorSize == 0)
 						return;					
 					double unit = (Maximum - Minimum) / (double)(r.Width - cursorSize);
+					if (inverted)
+						unit = -unit;
 					double tmp = mouseDownInitValue + (double)m.X * unit;
 					tmp -= tmp % SmallIncrement;
 					Value = tmp;
@@ -187,6 +209,8 @@ namespace Crow
 					if (r.Height - cursorSize == 0)
 						return;					
 					double unit = (Maximum - Minimum) / (double)(r.Height - cursorSize);
+					if (inverted)
+						unit = -unit;
 					double tmp = mouseDownInitValue + (double)m.Y * unit;
 					tmp -= tmp % SmallIncrement;
 					Value = tmp;

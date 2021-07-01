@@ -15,7 +15,7 @@ namespace Crow.Text
 			Start = start;
 			End = end;
 		}
-
+		public static TextSpan FromStartAndLength (int start, int length = 0) => new TextSpan (start, start + length);
 		public bool IsEmpty => Start == End;
 		public int Length => End - Start;
 

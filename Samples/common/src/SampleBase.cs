@@ -44,17 +44,28 @@ namespace Samples
 
 		public Version CrowVersion => Assembly.GetAssembly(typeof(Widget)).GetName().Version;
 
+		static void showMsgBox (object sender) {
+			Widget w = sender as Widget;
+			Command cmd = w.DataSource as Command;
+			MessageBox.ShowModal(w.IFace, MessageBox.Type.Information, $"{cmd.Caption} CLICKED");
+		}
+
 		#region Test values for Binding
 		public CommandGroup Commands, AllCommands;
 		public CommandGroup EditCommands = new CommandGroup("Edit Commands",
-			new Command("Edit command 1", (sender) => MessageBox.ShowModal((sender as Widget).IFace, MessageBox.Type.Information, "Edit comand 1 clicked")),
-			new Command("Edit command 2 a bit longer", (sender) => MessageBox.ShowModal((sender as Widget).IFace, MessageBox.Type.Information, "Edit comand 2 clicked"), null, false),
-			new Command("Edit command three", (sender) => MessageBox.ShowModal((sender as Widget).IFace, MessageBox.Type.Information, "Edit comand 3 clicked"))
+			new Command("Edit command 1", (sender) => showMsgBox (sender)),
+			new Command("Edit command 2 a bit longer", (sender) => showMsgBox (sender), null, false),
+			new Command("Edit command three", (sender) => showMsgBox (sender)),
+			new CommandGroup("Subedit menu",
+				new Command("Subedit command 1", (sender) => showMsgBox (sender)),
+				new Command("Subedit command 2 a bit longer", (sender) => showMsgBox (sender), null, false),
+				new Command("Subedit command three", (sender) => showMsgBox (sender))
+			)			
 		);
 		public CommandGroup FileCommands = new CommandGroup("File Commands",
-			new Command("File command 1", (sender) => MessageBox.ShowModal((sender as Widget).IFace, MessageBox.Type.Information, "File comand 1 clicked")),
-			new Command("File command 2 a bit longer", (sender) => MessageBox.ShowModal((sender as Widget).IFace, MessageBox.Type.Information, "File comand 2 clicked")),
-			new Command("File command three", (sender) => MessageBox.ShowModal((sender as Widget).IFace, MessageBox.Type.Information, "File comand 3 clicked"))
+			new Command("File command 1", (sender) => showMsgBox (sender)),
+			new Command("File command 2 a bit longer", (sender) => showMsgBox (sender)),
+			new Command("File command three", (sender) => showMsgBox (sender))
 		);
 
 		void initCommands()
@@ -323,29 +334,38 @@ namespace Samples
 
 
 		string curSources = "";
+		bool boolVal = true;
 		public string CurSources
 		{
-			get { return curSources; }
-			set
-			{
+			get => curSources;
+			set	{
 				if (value == curSources)
 					return;
 				curSources = value;
 				NotifyValueChanged(curSources);
 			}
 		}
-		bool boolVal = true;
 		public bool BoolVal
 		{
-			get { return boolVal; }
-			set
-			{
+			get => boolVal;
+			set	{
 				if (boolVal == value)
 					return;
 				boolVal = value;
 				NotifyValueChanged(boolVal);
 			}
 		}
+		public Color AllWidgetBackground {
+			get => Configuration.Global.Get<Color> (nameof(AllWidgetBackground));
+			set {
+				if (value == AllWidgetBackground)
+					return;
+				Configuration.Global.Set (nameof(AllWidgetBackground), value);
+				NotifyValueChanged (value);
+			}
+		}
+
+
 
 
 

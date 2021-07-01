@@ -120,15 +120,29 @@ namespace Crow
 			Rectangle r = this.ScreenCoordinates (this.Slot);
 			if (lt == LayoutingType.X) {
 				if (popDirection.HasFlag (Alignment.Right)) {
-					if (r.Right + Content.Slot.Width > tc.ClientRectangle.Right)
-						Content.Left = r.Left - Content.Slot.Width;
-					else
-						Content.Left = r.Right;
+					if (popDirection == Alignment.Right) {
+						if (r.Right + Content.Slot.Width > tc.ClientRectangle.Right)
+							Content.Left = r.Left - Content.Slot.Width;
+						else
+							Content.Left = r.Right;
+					} else {
+						if (r.Left + Content.Slot.Width > tc.ClientRectangle.Right)
+							Content.Left = r.Right - Content.Slot.Width;
+						else
+							Content.Left = r.Left;
+					}
 				} else if (popDirection.HasFlag (Alignment.Left)) {
-					if (r.Left - Content.Slot.Width < tc.ClientRectangle.Left)
-						Content.Left = r.Right;
-					else
-						Content.Left = r.Left - Content.Slot.Width;
+					if (popDirection == Alignment.Left) {
+						if (r.Left - Content.Slot.Width < tc.ClientRectangle.Left)
+							Content.Left = r.Right;
+						else
+							Content.Left = r.Left - Content.Slot.Width;
+					} else {
+						if (r.Right - Content.Slot.Width < tc.ClientRectangle.Left)
+							Content.Left = r.Right;
+						else
+							Content.Left = r.Right - Content.Slot.Width;						
+					}
 				} else {
 					if (Content.Slot.Width < tc.ClientRectangle.Width) {
 						if (r.Left + Content.Slot.Width > tc.ClientRectangle.Right)
@@ -225,6 +239,7 @@ namespace Crow
 		public override void onMouseClick (object sender, MouseButtonEventArgs e)
 		{
 			IsPopped = !IsPopped;
+			//e.Handled = true;
 			base.onMouseClick (sender, e);
 		}
 		#region IToggle implementation

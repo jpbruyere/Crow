@@ -1,0 +1,15 @@
+﻿<?xml version="1.0"?>
+<ItemTemplate DataType="Crow.Command" Path="#Crow.MenuButton.template"/>
+<ItemTemplate DataType="Crow.CommandGroup" Data="Commands">
+	<Popper PopDirection="Right" Caption="{Caption}" IsEnabled="{CanExecute}" Width="Stretched"
+			MouseEnter="{Background=${ControlHighlight}}"
+			MouseLeave="{Background=Transparent}">
+		<Template>
+			<HorizontalStack Background="{./Background}" Width="Stretched" Height="Stretched" Margin="3">
+				<Label Text="{./Caption}"   Width="Fit" Height="Stretched"/>
+				<Label Text="..."/>
+			</HorizontalStack>
+		</Template>		
+		<VerticalStack Margin="0" Name="ItemsContainer" Fit="true" Background="${MenuBackground}"/>
+	</Popper>
+</ItemTemplate>

@@ -1,0 +1,16 @@
+﻿<HorizontalStack Margin="20" Background="Jet">
+	<VerticalStack Width="Fit" Background="DarkSlateGrey" Margin="10" Height="Fit">
+		<HorizontalStack Height="Fit" Spacing="10">
+			<Label Text="Value:"/>
+			<Label Text="{../../slider.Value}" Background="Onyx" Margin="1" Width="40" TextAlignment="Right"/>
+		</HorizontalStack>
+		<Slider Name="slider" Height="10" Width="200" Background="DarkGrey"
+			Minimum="0" Maximum="100" Value="50" Inverted="{../cb.IsChecked}"/>
+		<CheckBox Name="cb" Caption="Inverted" />
+	</VerticalStack>
+	<Gauge Height="20" Width="200" Foreground="RoyalBlue" Background="DarkGrey" Margin="2" Value="{../slider.Value}"
+		Inverted="{../cb.IsChecked}"  />
+	<Gauge Height="200" Width="20" Foreground="RoyalBlue" Background="DarkGrey" Margin="2" Value="{../slider.Value}"
+		Inverted="{../cb.IsChecked}" Orientation="Vertical" />
+
+</HorizontalStack>

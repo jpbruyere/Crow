@@ -12,6 +12,7 @@ namespace Samples
 		static void Main ()
 		{
 			using (BasicTests app = new BasicTests ()) {
+				app.SolidBackground = false;
 				app.Run ();
 			}
 		}
@@ -91,8 +92,8 @@ namespace Samples
 #endif
 				Load (testFiles [idx]).DataSource = this;
 			} catch (Exception ex) {
-				(LoadIMLFragment ($"<Label Background='Red' Foreground='White' Height='Fit' Width='Stretched' Multiline='true' VerticalAlignment='Bottom' Margin='5' />") as OldLabel).Text = ex.ToString();
-				Console.WriteLine (ex.Message + "\n" + ex.InnerException);
+				//(LoadIMLFragment ($"<Label Background='Red' Foreground='White' Height='Fit' Width='Stretched' Multiline='true' VerticalAlignment='Bottom' Margin='5' />") as OldLabel).Text = ex.ToString();
+				Console.WriteLine (ex);
 																														 //MessageBox.Show (CurrentInterface, MessageBox.Type.Error, ex.Message + "\n" + ex.InnerException.Message).Modal = true;
 			}
 			return false;

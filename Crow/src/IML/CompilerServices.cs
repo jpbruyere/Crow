@@ -70,7 +70,7 @@ namespace Crow.IML
 		internal static FieldInfo miSetCurIface = typeof(Widget).GetField ("IFace", BindingFlags.Public | BindingFlags.Instance);
 		internal static MethodInfo miFindByName = typeof (Widget).GetMethod ("FindByName");
 		internal static MethodInfo miFindByNameInTemplate = typeof (TemplatedControl).GetMethod ("FindByNameInTemplate");
-		internal static MethodInfo miGetGObjItem = typeof(List<Widget>).GetMethod("get_Item", new Type[] { typeof(Int32) });
+		internal static MethodInfo miGetGObjItem = typeof(IList<Widget>).GetMethod("get_Item", new Type[] { typeof(Int32) });
 		internal static MethodInfo miLoadDefaultVals = typeof (Widget).GetMethod ("loadDefaultValues");
 		internal static PropertyInfo piStyle = typeof (Widget).GetProperty ("Style");
 		internal static MethodInfo miGetLogicalParent = typeof(Widget).GetProperty("LogicalParent").GetGetMethod();
@@ -289,7 +289,9 @@ namespace Crow.IML
 #if DEBUG_BINDING_FUNC_CALLS
             Console.WriteLine ($"getMethodInfoWithReflexion ({instance},{method}); type:{instance.GetType ()}");
 #endif
-            return instance.GetType ().GetMethod (method, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+			Type t = instance.GetType();
+            MethodInfo mi = t.GetMethod (method, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+			return mi ?? CompilerServices.SearchExtMethod (t, method);			
 		}
 		/// <summary>
 		/// set value, convert if required
@@ -417,7 +419,7 @@ namespace Crow.IML
 				foreach (MethodInfo mi in t.GetMethods 
 					(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where
 						(m=> m.Name == methodName && m.IsDefined (typeof (ExtensionAttribute), false) &&
-						 m.GetParameters ().Length == 1)) {
+						 m.GetParameters ().Length > 0)) {
 					Type curType = extendedType;
 					while (curType != null) {
 						if (mi.GetParameters () [0].ParameterType == curType) {
@@ -831,7 +833,7 @@ namespace Crow.IML
 		/// <summary>
 		/// Splits expression on semicolon but ignore those between accolades
 		/// </summary>
-		internal static string[] splitOnSemiColumnOutsideAccolades (string expression){
+		/*internal static string[] splitOnSemiColumnOutsideAccolades (string expression){
 			List<String> exps = new List<string>();
 			int accCount = 0;
 			int expPtr = 0;
@@ -846,7 +848,7 @@ namespace Crow.IML
 				case ';':
 					if (accCount > 0)
 						break;
-					exps.Add(expression.Substring(expPtr, c - expPtr - 1));
+					exps.Add(expression.Substring(expPtr, c - expPtr));
 					expPtr = c + 1;
 					break;
 				}
@@ -854,7 +856,7 @@ namespace Crow.IML
 			if (exps.Count == 0)
 				exps.Add(expression);
 			return exps.ToArray ();
-		}
+		}*/
 		/// <summary>
 		/// Try to get the type named strDataType, search first in crow assembly then in
 		/// entry assembly.

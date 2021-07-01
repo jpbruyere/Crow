@@ -1,0 +1,20 @@
+﻿<?xml version="1.0"?>
+<Menu Data="{AllCommands}">
+	<ItemTemplate DataType="Crow.Command" Path="Interfaces/menuCommand.itmp"/>
+	<ItemTemplate DataType="Crow.CommandGroup" >
+		<MenuItem Data="{Commands}" Width="Fit" IsEnabled="{CanExecute}"
+					ItemTemplate="Interfaces/menuItem.itmp">
+			<Template>
+				<Popper PopDirection="Bottom" Caption="{Caption}" Width="Fit"
+								MouseEnter="{Background=${ControlHighlight}}"
+								MouseLeave="{Background=Transparent}">
+					<Template>
+						<Label Text="{./Caption}" Width="Stretched" Height="Fit" Margin="3"
+							Background="{./Background}"/>
+					</Template>
+					<VerticalStack Name="ItemsContainer" Fit="true" Background="Jet"/>
+				</Popper>
+			</Template>
+		</MenuItem>
+	</ItemTemplate>
+</Menu>

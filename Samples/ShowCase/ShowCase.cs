@@ -26,13 +26,13 @@ namespace ShowCase
 			Environment.SetEnvironmentVariable ("FONTCONFIG_PATH", @"C:\Users\Jean-Philippe\source\vcpkg\installed\x64-windows\tools\fontconfig\fonts");
 
 			using (Showcase app = new Showcase ()) {
+				app.WindowTitle = "C.R.O.W Showcase";
+				app.SetWindowIcon ("#Crow.Icons.crow.png");
 				//app.Theme = @"C:\Users\Jean-Philippe\source\Crow\Themes\TestTheme";
 				CurrentProgramInstance = app;
 				app.Run ();
 			}
-		}
-
-
+		}		
 		public Container crowContainer;		
 
 		Stopwatch reloadChrono = new Stopwatch ();
@@ -106,15 +106,6 @@ namespace ShowCase
 			reloadChrono.Reset ();
 		}
 
-		public string DebugLogFilePath {
-			get => Configuration.Global.Get<string> (nameof (DebugLogFilePath));
-			set {
-				if (CurrentFile == value)
-					return;
-				Configuration.Global.Set (nameof (DebugLogFilePath), value);
-				NotifyValueChanged (DebugLogFilePath);
-			}
-		}
 
         public override bool OnKeyDown (Key key) {
 

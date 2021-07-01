@@ -1,0 +1,34 @@
+﻿<?xml version="1.0"?>
+<Menu Data="{AllCommands}" >
+	<ItemTemplate DataType="Crow.Command" Path="Interfaces/menuCommand.itmp"/>
+	<ItemTemplate DataType="Crow.CommandGroup" >
+		<MenuItem Data="{Commands}" Width="Fit" IsEnabled="{CanExecute}">
+			<Template>
+				<Popper PopDirection="Bottom" Caption="{Caption}" Width="Fit" IsPopped="{²./IsOpened}"
+								MouseEnter="{Background=${ControlHighlight}}"
+								MouseLeave="{Background=Transparent}">
+					<Template>
+						<Label Text="{./Caption}" Width="Stretched" Height="Fit" Margin="3"
+							Background="{./Background}"/>
+					</Template>
+					<VerticalStack Margin="0" Name="ItemsContainer" Fit="true" Background="Jet"/>
+				</Popper>
+			</Template>		
+			<ItemTemplate DataType="Crow.Command" Path="#Crow.MenuButton.template"/>
+			<ItemTemplate DataType="Crow.CommandGroup" Data="Commands">
+				<Popper PopDirection="Right" Caption="{Caption}" IsEnabled="{CanExecute}" Width="Stretched"
+						PopWidth="{./PopWidth}" PopHeight="{./PopHeight}"
+						MouseEnter="{Background=${ControlHighlight}}"
+						MouseLeave="{Background=Transparent}">
+					<Template>
+						<HorizontalStack Background="{./Background}" Width="Stretched" Height="Stretched" Margin="3">
+							<Label Text="{./Caption}"   Width="Fit" Height="Stretched"/>
+							<Label Text="..."/>
+						</HorizontalStack>
+					</Template>		
+					<VerticalStack Margin="0" Name="ItemsContainer" Width="{../PopWidth}" Height="{../PopHeight}" Background="${MenuBackground}"/>
+				</Popper>
+			</ItemTemplate>						
+		</MenuItem>
+	</ItemTemplate>
+</Menu>

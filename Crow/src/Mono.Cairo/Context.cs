@@ -438,6 +438,10 @@ namespace Crow.Cairo {
 		{
 			NativeMethods.cairo_arc_negative (handle, xc, yc, radius, angle1, angle2);
 		}
+		public void ArcNegative (PointD center, double radius, double angle1, double angle2)
+		{
+			NativeMethods.cairo_arc_negative (handle, center.X, center.Y, radius, angle1, angle2);
+		}
 
 		public void Rectangle (Crow.Rectangle rectangle)
 		{

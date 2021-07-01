@@ -1,0 +1,12 @@
+﻿<?xml version="1.0"?>
+<Popper PopDirection="Bottom" Caption="{Caption}" Width="Stretched" IsPopped="{²./IsOpened}"
+				MouseEnter="{Background=${ControlHighlight}}"
+				MouseLeave="{Background=Transparent}">
+	<Template>
+		<Label Text="{./Caption}" Width="Stretched" Height="Fit" Margin="3"
+			Background="{./Background}"/>
+	</Template>
+	<VerticalStack Margin="0" Name="ItemsContainer" Fit="true" Background="Jet"/>
+</Popper>
+
+

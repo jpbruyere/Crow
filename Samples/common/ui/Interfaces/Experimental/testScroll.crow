@@ -1,0 +1,12 @@
+﻿<Button Width="100" Height="200">
+	<Template>
+<VerticalStack  >
+	<Scroller Name="ItemsScroller" Background="Red" Width="Stretched">
+		<Label Text='Hello World and another part of text to test scrolling' Background='MediumSeaGreen' Margin='0' Fit="true" HorizontalAlignment="Left"/>
+	</Scroller>
+	<ScrollBar Style="HScrollBar" Value="{²../ItemsScroller.ScrollX}"
+		LargeIncrement="{../ItemsScroller.PageWidth}" SmallIncrement="1"
+		CursorRatio="{../ItemsScroller.ChildWidthRatio}" Maximum="{../ItemsScroller.MaxScrollX}"/>
+</VerticalStack>
+	</Template>
+</Button>

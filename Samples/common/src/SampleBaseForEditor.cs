@@ -101,13 +101,23 @@ namespace Samples
 		public bool DebugLogToFile {
 			get => Configuration.Global.Get<bool> (nameof(DebugLogToFile));
 			set {
-				if (DebugLogToFile != value)
+				if (DebugLogToFile == value)
 					return;				
 				Configuration.Global.Set (nameof(DebugLogToFile), value);
 				NotifyValueChanged(DebugLogToFile);
 				DbgLogger.ConsoleOutput = !value;
 			}
 		}
+		public string DebugLogFilePath {
+			get => Configuration.Global.Get<string> (nameof (DebugLogFilePath));
+			set {
+				if (CurrentFile == value)
+					return;
+				Configuration.Global.Set (nameof (DebugLogFilePath), value);
+				NotifyValueChanged (DebugLogFilePath);
+			}
+		}
+
 		protected static void initDebugLog () {
 			DbgLogger.IncludeEvents = DbgEvtType.None;
 			DbgLogger.DiscardEvents = DbgEvtType.All;
@@ -279,6 +289,8 @@ namespace Samples
 		}
 		public void goUpDirClick (object sender, MouseButtonEventArgs e)
 		{
+			if (string.IsNullOrEmpty (CurrentDir))
+				return;
 			string root = Directory.GetDirectoryRoot (CurrentDir);
 			if (CurrentDir == root)
 				return;

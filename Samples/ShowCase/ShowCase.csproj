@@ -3,9 +3,6 @@
 	<ItemGroup>
 		<EmbeddedResource Include="ui\*.*">
 			<LogicalName>ShowCase.%(Filename)%(Extension)</LogicalName>
-		</EmbeddedResource>
-	</ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="$(MSBuildThisFileDirectory)\..\..\CrowDbgShared\CrowDbgShared.csproj" />
+		</EmbeddedResource>		
 	</ItemGroup>
 </Project>

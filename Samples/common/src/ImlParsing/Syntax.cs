@@ -236,7 +236,7 @@ namespace Crow
 		public  XmlSource Source => Root.source;
 		public bool Contains (int pos) =>
 			EndToken.HasValue ?
-				StartToken.Start <= pos && EndToken.Value.End > pos : false;
+				StartToken.Start <= pos && EndToken.Value.End >= pos : false;
 
 		public void Dump (int level = 0) {
 			Console.WriteLine ($"{new string('\t', level)}{this}");

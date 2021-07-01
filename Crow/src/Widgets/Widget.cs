@@ -29,15 +29,20 @@ namespace Crow
 	public class Widget : ILayoutable, IValueChange, IDisposable
 	{
 		internal ReaderWriterLockSlim parentRWLock = new ReaderWriterLockSlim();
-		#if DEBUG_LOG
+#if DEBUG_LOG
 		//0 is the main graphic tree, for other obj tree not added to main tree, it range from 1->n
 		//useful to track events for obj shown later, not on start, or never added to main tree
 		public int treeIndex;
 		public int instanceIndex;//index in the GraphicObjects list
 		public int yIndex;//absolute index in the graphic tree for debug draw
 		public int xLevel;//x increment for debug draw
-		#endif
-		#if DESIGN_MODE
+#endif
+#if DEBUG_STATS
+		public static long TotalWidgetCreated;
+		public static long TotalWidgetDisposed;
+		public virtual long ChildCount => 0;
+#endif
+#if DESIGN_MODE
 		static MethodInfo miDesignAddDefLoc = typeof(Widget).GetMethod("design_add_style_location",
 			BindingFlags.Instance | BindingFlags.NonPublic);
 		static MethodInfo miDesignAddValLoc = typeof(Widget).GetMethod("design_add_iml_location",
@@ -133,7 +138,7 @@ namespace Crow
         public string DesignName {
             get { return GetType ().Name + design_id; }
         }
-		#endif
+#endif
 
 		#region IDisposable implementation
 		protected bool disposed = false;
@@ -168,6 +173,9 @@ namespace Crow
 			Clipping?.Dispose ();
 			bmp?.Dispose ();
 			disposed = true;
+#if DEBUG_STATS
+			TotalWidgetDisposed++;
+#endif			
 
 			DbgLogger.EndEvent (DbgEvtType.Disposing);
 		}
@@ -221,6 +229,9 @@ namespace Crow
 		/// </summary>
 		protected Widget () {
 			Clipping = new Region ();
+#if DEBUG_STATS
+			TotalWidgetCreated++;
+#endif
 #if DEBUG_LOG
 			instanceIndex = GraphicObjects.Count;
 			GraphicObjects.Add (this);
@@ -380,12 +391,10 @@ namespace Crow
 		/// <returns>A new rectangle with same dimension as the input one with x and y relative to the context surface</returns>
 		/// <param name="r">A rectangle to compute the coordinate for.</param>
 		public virtual Rectangle ContextCoordinates(Rectangle r){
-			Widget go = Parent as Widget;
-			if (go == null)
-				return r + Parent.ClientRectangle.Position;
-			return go.CacheEnabled ?
-				r + Parent.ClientRectangle.Position :
-				Parent.ContextCoordinates (r);
+			return Parent is Widget w ?
+				w.CacheEnabled ?
+					r + Parent.ClientRectangle.Position : Parent.ContextCoordinates (r)
+				: Parent != null ? r + Parent.ClientRectangle.Position : r;
 		}
 
 		public virtual Rectangle RelativeSlot (Widget target)
@@ -409,10 +418,10 @@ namespace Crow
 		#endregion
 		public Point ScreenPointToLocal(Point p){
 			Point pt = p - ScreenCoordinates (Slot).TopLeft - ClientRectangle.TopLeft;
-			if (pt.X < 0)
+			/*if (pt.X < 0)
 				pt.X = 0;
 			if (pt.Y < 0)
-				pt.Y = 0;
+				pt.Y = 0;*/
 			return pt;
 		}
 
@@ -497,7 +506,7 @@ namespace Crow
 		/// If enabled, resulting bitmap of graphic object is cached
 		/// speeding up rendering of complex object. Default is enabled.
 		/// </summary>
-		[DesignCategory ("Behavior")][DefaultValue(true)]
+		[DesignCategory ("Behavior")][DefaultValue(false)]
 		public virtual bool CacheEnabled {
 			get => cacheEnabled;
 			set {
@@ -788,6 +797,7 @@ namespace Crow
 		/// <summary>
 		/// Boolean for enabling or not the sticky mouse mechanic
 		/// </summary>
+ 		[DesignCategory ("Behaviour")][DefaultValue(false)]
 		public virtual bool StickyMouseEnabled {
 			get => stickyMouseEnabled;
 			set {
@@ -989,7 +999,7 @@ namespace Crow
 		/// </summary>
 		[DesignCategory ("Data")]
 		public Type DataSourceType {
-			get { return dataSourceType; }
+			get => dataSourceType;
 			set { dataSourceType = value; }
 		}
 		/// <summary>
@@ -1044,8 +1054,8 @@ namespace Crow
 			if (localDataSourceIsNull)
 				OnDataSourceChanged (this, e);
 		}
-		internal bool localDataSourceIsNull { get { return dataSource == null; } }
-		public bool localLogicalParentIsNull { get { return logicalParent == null; } }
+		internal bool localDataSourceIsNull => dataSource == null;
+		public bool localLogicalParentIsNull => logicalParent == null;
 
 		public virtual void OnDataSourceChanged(object sender, DataSourceChangeEventArgs e){
 			DataSourceChanged.Raise (this, e);
@@ -1062,7 +1072,7 @@ namespace Crow
 		/// </summary>
 		[DesignCategory ("Appearance")]
 		public virtual string Style {
-			get { return style; }
+			get => style;
 			set {
 				if (value == style)
 					return;
@@ -1076,7 +1086,7 @@ namespace Crow
 		/// Gets or sets a tooltip to show when mouse stay still over the control.
 		/// </summary>
 		/// <remarks>
-		/// By default, the tooltip container widget that will be show is defined in '#Crow.Tooltip.template' and the widget
+		/// By default, the tooltip container widget that will be shown is defined in '#Crow.Tooltip.template' and the widget
 		/// tooltip string is interpreted as a single string helper message that may be a binding expression.
 		/// If the widget Tooltip property start with a '#', the tooltip string will be interpreted as a resource path of
 		/// a custom IML template to show, which will have its datasource set to the widget triggering the tooltip.
@@ -1138,20 +1148,24 @@ namespace Crow
 			//   those files being placed in a Styles folder
 			string styleKey = style;
 			if (!string.IsNullOrEmpty (style)) {
-				if (IFace.Styling.ContainsKey (style)) {
-					styling.Add (IFace.Styling [style]);
+				if (IFace.Styling.ContainsKey (style))
+					styling.Add (IFace.Styling [style]);				
+			}
+			//check the whole type hierarchy for styling
+			Type styleType = thisType;
+			do {
+				if (IFace.Styling.ContainsKey (styleType.FullName)) {
+					styling.Add (IFace.Styling [styleType.FullName]);
+					/*if (string.IsNullOrEmpty (styleKey))
+						styleKey = thisType.FullName;*/
 				}
-			}
-			if (IFace.Styling.ContainsKey (thisType.FullName)) {
-				styling.Add (IFace.Styling [thisType.FullName]);
-				if (string.IsNullOrEmpty (styleKey))
-					styleKey = thisType.FullName;
-			}
-			if (IFace.Styling.ContainsKey (thisType.Name)) {
-				styling.Add (IFace.Styling [thisType.Name]);
-				if (string.IsNullOrEmpty (styleKey))
-					styleKey = thisType.Name;
-			}
+				if (IFace.Styling.ContainsKey (styleType.Name)) {
+					styling.Add (IFace.Styling [styleType.Name]);
+					/*if (string.IsNullOrEmpty (styleKey))
+						styleKey = thisType.Name;*/
+				}
+				styleType = styleType.BaseType;
+			} while (styleType != null);
 
 			if (string.IsNullOrEmpty (styleKey))
 				styleKey = thisType.FullName;
@@ -1179,7 +1193,9 @@ namespace Crow
 				if (!getDefaultEvent(ei, styling, out expression))
 					continue;
 				//TODO:dynEventHandler could be cached somewhere, maybe a style instanciator class holding the styling delegate and bound to it.
-				foreach (string exp in CompilerServices.splitOnSemiColumnOutsideAccolades(expression)) {
+				foreach (string exp in expression.Split (';')) {					
+				//foreach (string exp in CompilerServices.splitOnSemiColumnOutsideAccolades(expression)) {
+					
 					string trimed = exp.Trim();
 					if (trimed.StartsWith ("{", StringComparison.Ordinal)){
 						il.Emit (OpCodes.Ldloc_0);//load this as 1st arg of event Add
@@ -1458,7 +1474,8 @@ namespace Crow
 			if (parent != null) {					
 				parent.RegisterClip (LastPaintedSlot);
 				parent.RegisterClip (Slot);
-			}
+			}//else
+				//Console.WriteLine ($"clipping reg canceled (no parent): {this.ToString()}");
 			parentRWLock.ExitReadLock ();
 
 			DbgLogger.EndEvent (DbgEvtType.GOClippingRegistration);
@@ -1472,23 +1489,34 @@ namespace Crow
 				DbgLogger.AddEvent (DbgEvtType.AlreadyDisposed | DbgEvtType.GORegisterClip, this);
 				return;
 			}
+			//we register clip in the parent, if it's dirty, all children will be redrawn
+			if (IsDirty && CacheEnabled) {
+				//Console.WriteLine ($"regclip canceled Dirty:{IsDirty} Cached:{CacheEnabled}: {this.ToString()}");
+				return;			
+			}
 			DbgLogger.StartEvent(DbgEvtType.GORegisterClip, this);
 			try {
 				Rectangle cb = ClientRectangle;
 				Rectangle  r = clip + cb.Position;
-				if (r.Right > cb.Right)
+				/*if (r.Right > cb.Right)
 					r.Width -= r.Right - cb.Right;
 				if (r.Bottom > cb.Bottom)
-					r.Height -= r.Bottom - cb.Bottom;
-				if (r.Width < 0 || r.Height < 0)
-					return;
-				if (cacheEnabled && !IsDirty)
+					r.Height -= r.Bottom - cb.Bottom;*/
+				if (r.Width < 0 || r.Height < 0){
+					//Console.WriteLine ($"regclip canceled size w:{r.Width} h:{r.Height}: {this.ToString()}");
+					return;			
+				}
+				if (cacheEnabled)
 					Clipping.UnionRectangle (r);
-				if (Parent == null)					
-					return;				
-				Widget p = Parent as Widget;
-				if (p?.IsDirty == true && p?.CacheEnabled == true)
-					return;				
+				if (Parent == null){
+					//Console.WriteLine ($"clip chain aborded (no parent): {this.ToString()}");
+					return;			
+				}
+				/*Widget p = Parent as Widget;
+				if (p?.IsDirty == true && p?.CacheEnabled == true){
+					Console.WriteLine ($"parent.regclip canceled p.Dirty:{p?.IsDirty} Cached:{p?.CacheEnabled}: {this.ToString()}");
+					return;			
+				}*/
 				Parent.RegisterClip (r + Slot.Position);
 			} finally {
 				DbgLogger.EndEvent (DbgEvtType.GORegisterClip);
@@ -1524,6 +1552,10 @@ namespace Crow
 			if (RegisteredLayoutings == LayoutingType.None)
 				IFace.EnqueueForRepaint (this);
 		}
+		/// <summary>
+		/// query a repaint, if control is cached, cache will not be updated and simply repainted.
+		/// if not cached, repaint will trigger the onDraw method.
+		/// </summary>
 		public void RegisterForRepaint () {
 			if (RegisteredLayoutings == LayoutingType.None && !IsDirty)
 				IFace.EnqueueForRepaint (this);
@@ -1793,6 +1825,13 @@ namespace Crow
 			return true;
 		}
 		#endregion
+
+		protected void setFontForContext (Context gr) {
+			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
+			gr.SetFontSize (Font.Size);
+			gr.FontOptions = Interface.FontRenderingOptions;
+			gr.Antialias = Interface.Antialias;
+		}
 
 		#region Rendering
 		/// <summary> This is the common overridable drawing routine to create new widget </summary>
@@ -2134,16 +2173,14 @@ namespace Crow
 				}
 			}
 		}
+		protected virtual string LogName => GetType().Name;
 		public override string ToString ()
 		{
 			string tmp ="";
 
 			if (Parent != null)
-				tmp = Parent.ToString () + tmp;
-			/*#if DEBUG_LAYOUTING
-			return Name == "unamed" ? tmp + "." + this.GetType ().Name + GraphicObjects.IndexOf(this).ToString(): tmp + "." + Name;
-			#else*/
-			return string.IsNullOrEmpty(Name) ? tmp + "." + this.GetType ().Name : tmp + "." + Name;
+				tmp = Parent.ToString () + tmp;			
+			return string.IsNullOrEmpty(Name) ? tmp + "." + LogName : tmp + "." + Name;
 			//#endif
 		}
 		/// <summary>
@@ -2157,7 +2194,8 @@ namespace Crow
 			else*/
 			try
 			{
-				parent?.RegisterClip (ContextCoordinates(LastPaintedSlot));
+				if (parent != null)
+					parent.RegisterClip (ContextCoordinates(LastPaintedSlot));
 			}
 			catch (System.Exception e)
 			{

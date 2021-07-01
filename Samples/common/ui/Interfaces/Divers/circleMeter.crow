@@ -1,0 +1,18 @@
+﻿<VerticalStack Background="DarkGrey" Margin="10">
+	<Wrapper Height="Fit">
+		<Spinner Template="#ui.spinner.template" Caption="Min" Value="{²../../sld.Minimum}" Width="Fit"/>
+		<Spinner Template="#ui.spinner.template" Caption="Max" Value="{²../../sld.Maximum}" Width="Fit"/>
+		<Spinner Template="#ui.spinner.template" Caption="Value" Value="{²../../sld.Value}"
+			Minimum="{../../sld.Minimum}" Maximum="{../../sld.Maximum}" Width="Fit"/>
+		<Spinner Name="sa" Template="#ui.spinner.template" Caption="Start Angle" Value="{²../../cm.StartAngle}" Width="Fit" Maximum="360"/>
+		<Spinner Name="ea" Template="#ui.spinner.template" Caption="End Angle" Value="{²../../cm.EndAngle}" Width="Fit" Maximum="360"/>
+		<Spinner Template="#ui.spinner.template" Caption="Backline width" Value="{²../../cm.BackgroundLineWidth}" Width="Fit" Minimum="1"/>
+		<Spinner Template="#ui.spinner.template" Caption="Line width" Value="{²../../cm.LineWidth}" Width="Fit" Minimum="1"/>
+	</Wrapper>
+	<Slider Name="sld" Background="Onyx" Value="30"/>
+	<Group Background="DimGrey">
+		<CircleMeter Name="cm" Background="Onyx" Foreground="RoyalBlue" Margin="20"
+			Value="{../../sld.Value}" Minimum="{../../sld.Minimum}" Maximum="{../../sld.Maximum}"/>
+		<Label Text="{../cm.Value}" Font="consola bold, 40" />
+	</Group>
+</VerticalStack>

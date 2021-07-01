@@ -2,6 +2,6 @@
 <VerticalStack>
 	<ColorPicker CurrentColor="{²../go.Background}" Name="colorPicker" Background="DimGrey"  Width="250" />
 	<Widget Name="go" Width="100" Height="60" Background="DarkBlue"/>
-	<Widget Name="go" Width="100" Height="60" Background="{../colorPicker.CurrentColor}"/>
+	<Widget Width="100" Height="60" Background="{../colorPicker.CurrentColor}"/>
 	<Label Text="{../colorPicker.CurrentColor}"/>
 </VerticalStack>

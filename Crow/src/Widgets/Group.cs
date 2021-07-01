@@ -250,5 +250,23 @@ namespace Crow
 				DbgLogger.EndEvent (DbgEvtType.GOSearchTallestChild);
 			}
 		}
+
+#if DEBUG_STATS
+		public override long ChildCount {
+			get {
+				childrenRWLock.EnterReadLock ();
+				try {
+					long total=0;
+					foreach (Widget child in Children)
+						total += 1 + child.ChildCount;
+					return total;
+				} finally {
+					childrenRWLock.ExitReadLock ();				
+				}				
+			}
+		}
+#endif
+		protected override string LogName => "grp";
+
 	}
 }

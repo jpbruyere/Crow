@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Crow
 {
@@ -197,6 +198,14 @@ namespace Crow
 
 		internal static bool IsAnyLineBreakCharacter (this char c) 
 			=> c == '\n' || c == '\r' || c == '\u0085' || c == '\u2028' || c == '\u2029';
+
+		public static bool TryGetResource (this Assembly a, string resId, out Stream stream) {
+			stream = null;
+			if (a == null)
+				return false;
+			stream = a.GetManifestResourceStream (resId);
+			return stream != null;
+		}
 	}
 }
 

@@ -271,10 +271,7 @@ namespace Crow
 		{
 			base.onDraw (gr);
 
-			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-			gr.SetFontSize (Font.Size);
-			gr.FontOptions = Interface.FontRenderingOptions;
-			gr.Antialias = Cairo.Antialias.None;
+			setFontForContext (gr);
 
 			if (widgets == null)
 				return;
@@ -387,10 +384,7 @@ namespace Crow
 				}
 			}
 
-			ctx.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-			ctx.SetFontSize (Font.Size);
-			ctx.FontOptions = Interface.FontRenderingOptions;
-			ctx.Antialias = Interface.Antialias;
+			setFontForContext (ctx);
 
 			string str = ticksToMS(hoverTick);
 
@@ -609,8 +603,7 @@ namespace Crow
 			using (Context gr = new Context (IFace.surf)) {
 				double maxNameWidth = 0.0;
 
-				gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-				gr.SetFontSize (Font.Size);
+				setFontForContext (gr);
 
 				foreach (DbgWidgetRecord o in widgets) {
 					double nameWidth = gr.TextExtents (o.name).Width + 5.0 * o.xLevel;

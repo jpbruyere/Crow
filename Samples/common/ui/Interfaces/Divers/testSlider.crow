@@ -1,59 +1,65 @@
 ﻿<?xml version="1.0"?>
 <HorizontalStack Margin="50">
+	<CheckBox Name="inverted" Background="DarkSlateGrey" Caption="Inverted" Width="Fit" Foreground="Black"/>
+
 	<VerticalStack Spacing="10" Width="50%">
-		<Slider Background="DarkGrey" Height="20" Width="Stretched"/>
-		<Slider Background="RoyalBlue" Height="50" Width="Stretched" CursorSize="50">
+		<Slider Background="DarkGrey" Height="20" Width="Stretched" Inverted="{../../inverted.IsChecked}"/>
+		<Slider Background="RoyalBlue" Height="50" Width="Stretched" CursorSize="50"  Inverted="{../../inverted.IsChecked}">
 			<Template>
 				<Group Background="DarkGrey" >
-					<Gauge Height="50%" Background="RoyalBlue" Value="{./Value}" Maximum="{./Maximum}" Minimum="{Minimum}" Orientation="{./Orientation}"/>
+					<Gauge Height="50%" Background="Onyx" Value="{./Value}" Maximum="{./Maximum}" Minimum="{Minimum}" Orientation="{./Orientation}"
+						Inverted="{./Inverted}"/>
 					<Container Name="Cursor" Background="White" >
 						<Label Text="{./Value}" Foreground="Black"/>
 					</Container>
 				</Group>
 			</Template>	
 		</Slider>
-		<Slider Background="Transparent" Margin="2" Height="10" Width="Stretched"/>
-		<Slider Background="Transparent" CursorSize="10" Height="12" >
+		<Slider Background="Transparent" Margin="2" Height="10" Width="Stretched" Inverted="{../../inverted.IsChecked}"/>
+		<Slider Background="Transparent" CursorSize="10" Height="12" Inverted="{../../inverted.IsChecked}">
 			<Template>
 				<Group Background="DarkGrey" >
-					<Gauge Height="50%" Background="RoyalBlue" Value="{./Value}" Maximum="{./Maximum}" Minimum="{Minimum}" Orientation="{./Orientation}"/>
+					<Gauge Height="50%" Background="Onyx" Value="{./Value}" Maximum="{./Maximum}" Minimum="{Minimum}" Orientation="{./Orientation}"
+						Inverted="{./Inverted}"/>
 					<Widget Name="Cursor" Background="White" />
 				</Group>			
 			</Template>
 		</Slider>
 		
-		<Slider Height="10" Width="Stretched" />
+		<Slider Height="10" Width="Stretched" Inverted="{../../inverted.IsChecked}" />
 		
 		
-		<Slider ClipToClientRect='false' Background="DarkGrey" CursorSize="50" Height="12" CornerRadius="5" />
-		<Slider ClipToClientRect='false' CacheEnabled='false' Background="Transparent" CursorSize="20" Height="12" Width="Stretched" />
+		<Slider ClipToClientRect='false' Background="DarkGrey" CursorSize="50" Height="12" CornerRadius="5" Inverted="{../../inverted.IsChecked}" />
+		<Slider ClipToClientRect='false' CacheEnabled='false' Background="Transparent" CursorSize="20" Height="12" Width="Stretched" Inverted="{../../inverted.IsChecked}" />
 	</VerticalStack>
 	
 	<HorizontalStack Spacing="10" >
-		<Slider Orientation="Vertical" Width="20" Height="Stretched"/>
-		<Slider Orientation="Vertical" Width="50" Height="Stretched" Background="RoyalBlue"  CursorSize="50">
+		<Slider Orientation="Vertical" Width="20" Height="Stretched" Inverted="{../../inverted.IsChecked}"/>
+		<Slider Orientation="Vertical" Width="50" Height="Stretched" Background="RoyalBlue"  CursorSize="50" Inverted="{../../inverted.IsChecked}">
 			<Template>
 				<Group Background="DarkGrey" >
-					<Gauge Width="50%" Background="RoyalBlue" Value="{./Value}" Maximum="{./Maximum}" Minimum="{Minimum}" Orientation="{./Orientation}"/>
+					<Gauge Width="50%" Background="Onyx" Value="{./Value}" Maximum="{./Maximum}" Minimum="{Minimum}" Orientation="{./Orientation}"
+						Inverted="{./Inverted}"/>
 					<Container Name="Cursor" Background="White" >
 						<Label Text="{./Value}" Foreground="Black"/>
 					</Container>
 				</Group>
 			</Template>	
 		</Slider>
-		<Slider Orientation="Vertical" Width="10" Height="Stretched" Background="Transparent" Margin="2" />
-		<Slider Orientation="Vertical" Width="12" Height="Stretched" Background="Transparent" CursorSize="10" >
+		<Slider Orientation="Vertical" Width="10" Height="Stretched" Background="Transparent" Margin="2" Inverted="{../../inverted.IsChecked}"/>
+		<Slider Orientation="Vertical" Width="12" Height="Stretched" Background="Transparent" CursorSize="10" Inverted="{../../inverted.IsChecked}">
 			<Template>
 				<Group Background="DarkGrey" >
-					<Gauge Width="50%" Background="RoyalBlue" Value="{./Value}" Maximum="{./Maximum}" Minimum="{Minimum}" Orientation="{./Orientation}"/>
+					<Gauge Width="50%" Background="Onyx" Value="{./Value}" Maximum="{./Maximum}" Minimum="{Minimum}" Orientation="{./Orientation}"
+						Inverted="{./Inverted}"/>
 					<Widget Name="Cursor" Background="White" />
 				</Group>			
 			</Template>
 		</Slider>
 		
-		<Slider Width="10" />
+		<Slider Width="10" Orientation="Vertical" Inverted="{../../inverted.IsChecked}"/>
 				
-		<Slider Width="12" Height="Stretched" Orientation="Vertical" ClipToClientRect='false' Background="DarkGrey" CursorSize="50" CornerRadius="5" />
-		<Slider Width="12" Height="Stretched" Orientation="Vertical" ClipToClientRect='false' CacheEnabled='false' Background="Transparent" CursorSize="20" />
+		<Slider Width="12" Height="Stretched" Orientation="Vertical" ClipToClientRect='false' Background="DarkGrey" CursorSize="50" CornerRadius="5" Inverted="{../../inverted.IsChecked}"/>
+		<Slider Width="12" Height="Stretched" Orientation="Vertical" ClipToClientRect='false' CacheEnabled='false' Background="Transparent" CursorSize="20" Inverted="{../../inverted.IsChecked}"/>
 	</HorizontalStack>	
 </HorizontalStack>

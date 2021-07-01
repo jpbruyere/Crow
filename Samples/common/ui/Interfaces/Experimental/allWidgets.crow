@@ -1,0 +1,99 @@
+﻿<TabView Background="DimGrey">
+	<VerticalStack Name="Base" Background="Black" Margin="1" >
+		<HorizontalStack >
+			<GroupBox Style="allWidgetCell" Caption="Label" >
+				<Label/>
+			</GroupBox>
+			<GroupBox Style="allWidgetCell" Caption="TextBox">
+				<TextBox/>
+			</GroupBox>
+			<GroupBox Style="allWidgetCell" Caption="Button">
+				<Button/>
+			</GroupBox>
+			<GroupBox Style="allWidgetCell" Caption="CheckBox" >
+				<CheckBox/>
+			</GroupBox>
+			<GroupBox Style="allWidgetCell" Caption="RadioButton">
+				<RadioButton/>
+			</GroupBox>
+		</HorizontalStack>
+		<HorizontalStack Height="25%" >
+			<GroupBox Style="allWidgetCell" Caption="Expandable">
+				<Expandable/>
+			</GroupBox>
+			<GroupBox Style="allWidgetCell" Caption="Popper">
+				<Popper/>
+			</GroupBox>
+			<GroupBox Style="allWidgetCell" Caption="Popper">
+				<Menu>
+					<MenuItem Width="Fit" Caption="menu1">
+						<MenuItem Caption="test"/>
+						<MenuItem Caption="test un peu plus long"/>
+						<MenuItem Caption="test2"/>
+					</MenuItem>
+					<MenuItem Width="Fit" Caption="menu2">
+						<MenuItem Caption="test menu2"/>
+						<MenuItem Caption="test menu2 un peu plus long"/>
+						<MenuItem Caption="test2 menu2" />
+					</MenuItem>
+					<MenuItem Width="Fit" Caption="menu3"/>
+				</Menu>
+			</GroupBox>
+			<GroupBox Style="allWidgetCell" Caption="ComboBox">
+				<DirectoryView />
+			</GroupBox>
+		</HorizontalStack>
+		<HorizontalStack Height="25%"  >
+			<GroupBox Style="allWidgetNamedCell" Caption="Spinner" >
+				<Spinner/>
+			</GroupBox>
+			<GroupBox Style="allWidgetNamedCell" Caption="Slider">
+				<Slider/>
+			</GroupBox>
+			<GroupBox Style="allWidgetNamedCell" Caption="ListBox">
+				<ListBox Data="{TestList}" Height="60%" Width="80%"/>
+			</GroupBox>
+			<GroupBox Style="allWidgetNamedCell" Caption="ComboBox">
+				<ComboBox Data="{TestList}"/>
+			</GroupBox>
+		</HorizontalStack>
+		<HorizontalStack Height="25%"  >
+			<GroupBox Style="allWidgetNamedCell" Caption="Border">
+				<Border Height="50%" Width="80%"/>
+			</GroupBox>
+			<GroupBox Style="allWidgetCell" Caption="GroupBox">
+				<GroupBox Height="50%" Width="80%"/>
+			</GroupBox>
+			<GroupBox Style="allWidgetNamedCell" Caption="ProgressBar">
+				<ProgressBar Value="40" />
+			</GroupBox>
+			<GroupBox Style="allWidgetNamedCell" Caption="Vertical ScrollBar">
+				<ScrollBar Height="80%" Maximum="10" />
+			</GroupBox>
+			<GroupBox Style="allWidgetNamedCell" Caption="Horizontal ScrollBar">
+				<ScrollBar Style="HScrollBar" Width="80%" Maximum="10" />
+			</GroupBox>
+		</HorizontalStack>
+	</VerticalStack>
+	<HorizontalStack Name="Advanced" Background="DarkGrey" IsVisible="false">
+		<VerticalStack Width="50%"  >
+			<GroupBox Style="allWidgetNamedCell" Height="50%" Width="Stretched" Caption="MesageBox">
+				<MessageBox Height="80%" Width="80%"/>
+			</GroupBox>
+			<GroupBox Style="allWidgetNamedCell" Height="Stretched" Width="Stretched" Caption="FileDialog">
+				<ColorPicker Height="80%" Width="80%"/>
+			</GroupBox>
+		</VerticalStack>
+		<GroupBox Style="allWidgetNamedCell" Width="Stretched" Caption="FileDialog">
+			<FileDialog Height="80%" Width="80%"/>
+		</GroupBox>
+	</HorizontalStack>
+	<HorizontalStack Name="windows" Background="DarkGrey" IsVisible="false">
+		<GroupBox Style="allWidgetNamedCell" Caption="Window" Width="50%" >
+			<Window Width="80%" Height="80%" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+		</GroupBox>
+		<GroupBox Style="allWidgetNamedCell" Caption="DockWindow" Width="50%" >
+			<DockWindow Width="80%" Height="80%" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+		</GroupBox>
+	</HorizontalStack>
+</TabView>

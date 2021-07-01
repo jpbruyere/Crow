@@ -427,7 +427,7 @@ namespace Crow
 					Debugger.Break ();
 			}
 		}
-		void updateWidgetEvents (List<DbgWidgetRecord> widgets, DbgEvent evt) {
+		void updateWidgetEvents (IList<DbgWidgetRecord> widgets, DbgEvent evt) {
 			if (evt is DbgWidgetEvent we)
 				widgets.FirstOrDefault (w => w.InstanceIndex == we.InstanceIndex)?.Events.Add (we);
 			if (evt.Events == null)

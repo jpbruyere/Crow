@@ -277,7 +277,7 @@ namespace Crow
 		public static string GetIcon (this Widget go) {
 			return "#Icons." + go.GetType ().FullName + ".svg";
 		}
-		public static List<Widget> GetChildren (this Widget go) {
+		public static IList<Widget> GetChildren (this Widget go) {
 			Type goType = go.GetType ();
 			if (typeof (GroupBase).IsAssignableFrom (goType))
 				return (go as GroupBase).Children;

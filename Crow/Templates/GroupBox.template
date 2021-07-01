@@ -3,10 +3,11 @@
 	<Group CacheEnabled="true">
 		<VerticalStack Spacing="0">
 			<Widget Height="6"/>
-			<Border  CornerRadius="{./CornerRadius}" BorderWidth="1" Margin="10" Foreground="{./Foreground}">
+			<Border Style="ControlBorder" CornerRadius="{./CornerRadius}" Margin="10" >
 				<Container Name="Content" Margin="0" MinimumSize="70,10"/>
 			</Border>
 		</VerticalStack>
-		<Label Text="{./Caption}" VerticalAlignment="Top" Left="8" Background="Clear" Margin="1" CacheEnabled="true"/>
+		<Label Text="{./Caption}" VerticalAlignment="Top" Left="8" Background="Clear" Margin="1" CacheEnabled="true"
+			Foreground="{./Foreground}"/>
 	</Group>
 </Container>

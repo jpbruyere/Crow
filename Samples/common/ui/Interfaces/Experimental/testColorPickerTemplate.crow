@@ -1,0 +1,3 @@
+﻿<VerticalStack Height="Fit" Background="DarkBlue">
+	<ColorPicker Template="Interfaces/colorPicker.tmp" Background="Red"/>
+</VerticalStack>

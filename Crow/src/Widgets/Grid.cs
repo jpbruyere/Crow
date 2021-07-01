@@ -132,7 +132,7 @@ namespace Crow
 					if (idx >= Children.Count)
 						return;
 					Widget c = Children [idx];
-					if (!c.Visible)
+					if (!c.IsVisible)
 						continue;
 					c.Slot.X = curX * (slotWidth + Spacing);
 					c.Slot.Y = curY * (slotHeight + Spacing);

@@ -19,5 +19,6 @@ namespace Crow
 			get => Orientation.Vertical;
 			set { base.Orientation = Orientation.Vertical; }
 		}
+		protected override string LogName => "vs";
 	}
 }

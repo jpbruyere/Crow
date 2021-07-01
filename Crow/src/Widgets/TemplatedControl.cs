@@ -45,7 +45,7 @@ namespace Crow
 		//TODO: this property should be renamed 'TemplatePath'
 		[DefaultValue(null)]
 		public string Template {
-			get { return _template; }
+			get => _template;
 			set {
 				if (_template == value)
 					return;
@@ -89,6 +89,8 @@ namespace Crow
 		/// <param name="gr">Backend context</param>
 		protected override void onDraw (Context gr)
 		{
+			DbgLogger.StartEvent (DbgEvtType.GODraw, this);
+
 			gr.Save ();
 
 			if (ClipToClientRect) {
@@ -99,7 +101,10 @@ namespace Crow
 
 			if (child != null)
 				child.Paint (gr);
+
 			gr.Restore ();
+
+			DbgLogger.EndEvent (DbgEvtType.GODraw);
 		}
 		#endregion
 

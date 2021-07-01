@@ -1,0 +1,12 @@
+﻿<Popper Background='MediumSeaGreen' Margin='0' Fit="true">
+	<Template>
+		<Label/>
+	</Template>
+	<Border Name="bd" Background="Grey" Width="200" Height="100">
+		<Container Name="ct">
+			<Label Fit="true" 
+				MouseDown="{Background=Yellow}"
+				MouseUp="{Background=Transparent}"/>
+		</Container>
+	</Border>
+</Popper>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <VerticalStack>
-	<ColorPicker CurrentColor="{²../go.Background}" Name="colorPicker" Background="DimGrey" Margin="5" Width="300" Template="#ui.ColorPicker.template" />
 	<Widget Name="go" Width="100" Height="60" Background="DarkBlue"/>
-	<Widget Name="go" Width="100" Height="60" Background="{../colorPicker.CurrentColor}"/>
+	<Widget Width="100" Height="60" Background="{../colorPicker.CurrentColor}"/>
 	<Label Text="{../colorPicker.CurrentColor}"/>
+	<ColorPicker CurrentColor="{²../go.Background}" Name="colorPicker" Background="DimGrey" MinimumSize="0,0" Width="300" Template="#ui.ColorPicker.template" />
 </VerticalStack>

@@ -92,8 +92,6 @@ namespace Crow
 				Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.UserProfile), ".config");
 
 			Assembly a = Assembly.GetEntryAssembly ();
-			if (a == null)
-				a = AppDomain.CurrentDomain.GetAssemblies ()[1];
 			string appName = a.GetName().Name;
 			string globalConfigPath = Path.Combine (configRoot, appName);
 
@@ -105,8 +103,8 @@ namespace Crow
 			string defaultConfigResID = appName + ".default.config";
 			foreach (string resIds in a.GetManifestResourceNames()) {
 				if (string.Equals (defaultConfigResID, resIds, StringComparison.OrdinalIgnoreCase)) {
-				using (Stream s = a.GetManifestResourceStream (defaultConfigResID))
-					globalConfig = new Configuration (globalConfigPath, s);
+					using (Stream s = a.GetManifestResourceStream (defaultConfigResID))
+						globalConfig = new Configuration (globalConfigPath, s);
 					return;
 				}
 			}
@@ -130,6 +128,14 @@ namespace Crow
 					Save ();				
 				Thread.Sleep (100);
 			}
+		}
+		public bool TryGet<T> (string key, out T result) {
+			if (items.ContainsKey (key)){
+				result = items [key].GetValue<T> ();
+				return true;
+			}
+			result = default(T);
+			return false;
 		}
 		/// <summary>
 		/// retrive the value of the configuration key given in parameter

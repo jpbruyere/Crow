@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" ?>
+<Border Style="ControlBorder" Background="{./Background}" CornerRadius="{./CornerRadius}" Margin="1">
+	<VerticalStack Spacing="0">
+		<HorizontalStack Spacing="4">
+			<Label Text="{./Caption}" Style="ControlCaption" Margin="2"/>
+			<TextBox Style="ControlEditableText" Foreground="{./Foreground}" Font="{./Font}" Width="Stretched" Margin="2"
+				Text="{²./Value}" TextAlignment="Right" Background="Jet" />
+			<VerticalStack Width="16" Height="Stretched" Spacing="1" Margin="1">
+				<Shape KeepProportions="false" Margin="0" Style="ArrowBut" Height="50%" MouseDown="./onUp" Size="10,10" Path="M 4.5,0.5 L 9.5,9.5 L 0.5,9.5 Z F"/>
+				<Shape KeepProportions="false" Margin="0" Style="ArrowBut"	Height="50%" MouseDown="./onDown" Size="10,10" Path="M 0.5,0.5 L 9.5,0.5 L 4.5,9.5 Z F"/>
+			</VerticalStack>
+		</HorizontalStack>
+		<Slider Background="Onyx" Foreground="Grey" Height="6" Value="{²./Value}" Minimum="{./Minimum}" Maximum="{./Maximum}"
+			Width = "Stretched"
+			MouseEnter="{Foreground=${ControlHighlight}}" 
+			MouseLeave="{Foreground=Grey}" />
+	</VerticalStack>
+</Border>

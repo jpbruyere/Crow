@@ -119,7 +119,7 @@ namespace Crow
 			}
 		}
 		/// <summary> Mouse Wheel Scrolling multiplier </summary>
-		[DefaultValue (5)]
+		[DefaultValue (20)]
 		public virtual int MouseWheelSpeed {
 			get { return mouseWheelSpeed; }
 			set {
@@ -232,6 +232,23 @@ namespace Crow
 					NotifyValueChanged ("ChildHeightRatio", Math.Min (1.0, (double)cb.Height / cachedTextSize.Height));
 			}
 		}
+		public virtual void Cut () {
+			TextSpan selection = Selection;
+			if (selection.IsEmpty)
+				return;
+			IFace.Clipboard = SelectedText;
+			update (new TextChange (selection.Start, selection.Length, ""));
+		}
+		public virtual void Copy () {
+			TextSpan selection = Selection;
+			if (selection.IsEmpty)
+				return;
+			IFace.Clipboard = SelectedText;		
+		}
+		public virtual void Paste () {
+			TextSpan selection = Selection;
+			update (new TextChange (selection.Start, selection.Length, IFace.Clipboard));
+		}
 
 		#region Keyboard handling
 		public override void onKeyDown (object sender, KeyEventArgs e) {
@@ -266,9 +283,9 @@ namespace Crow
 				break;
 			case Key.Insert:
 				if (IFace.Shift)
-					update (new TextChange (selection.Start, selection.Length, IFace.Clipboard));
-				else if (IFace.Ctrl && !selection.IsEmpty)
-					IFace.Clipboard = SelectedText;
+					Paste ();
+				else if (IFace.Ctrl)
+					Copy ();
 				break;
 			case Key.KeypadEnter:
 			case Key.Enter:
@@ -321,9 +338,9 @@ namespace Crow
 
 		protected void update (TextChange change) {
 			lock (linesMutex) {
-				Span<char> tmp = stackalloc char[Text.Length + (change.ChangedText.Length - change.Length)];
-				//Console.WriteLine ($"{Text.Length,-4} {change.Start,-4} {change.Length,-4} {change.ChangedText.Length,-4} tmp:{tmp.Length,-4}");
 				ReadOnlySpan<char> src = Text.AsSpan ();
+				Span<char> tmp = stackalloc char[src.Length + (change.ChangedText.Length - change.Length)];
+				//Console.WriteLine ($"{Text.Length,-4} {change.Start,-4} {change.Length,-4} {change.ChangedText.Length,-4} tmp:{tmp.Length,-4}");
 				src.Slice (0, change.Start).CopyTo (tmp);
 				change.ChangedText.AsSpan ().CopyTo (tmp.Slice (change.Start));
 				src.Slice (change.End).CopyTo (tmp.Slice (change.Start + change.ChangedText.Length));
@@ -338,11 +355,11 @@ namespace Crow
 				IFace.forceTextCursor = true;
 			}
 
-
 			NotifyValueChanged ("Text", Text);
 			OnTextChanged (this, new TextChangeEventArgs (change));
 			
 			RegisterForGraphicUpdate ();
 		}
+		protected override string LogName => "tb";
 	}
 }

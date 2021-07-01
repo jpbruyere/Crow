@@ -39,7 +39,7 @@ namespace Crow
 		}
 
 		public Token FindTokenIncludingPosition (int pos) {
-			if (tokens == null || tokens.Length == 0)
+			if (pos == 0 || tokens == null || tokens.Length == 0)
 				return default;
 			int idx = Array.BinarySearch (tokens, 0, tokens.Length, new  Token () {Start = pos});
 

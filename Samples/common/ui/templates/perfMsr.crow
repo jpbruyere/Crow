@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 
-	<VerticalStack Spacing="1" Height="Fit" Width="Stretched">
+	<VerticalStack Spacing="1" Height="Fit" Width="Stretched" Background="DarkGrey">
 		<HorizontalStack Background="DarkSlateGrey">
 			<Label Text="{Name}" Width="Stretched" Font="doid bold, 10" Margin="2"/>
 			<Button Caption="Reset" MouseClick="onResetClick" Height="Fit"/>

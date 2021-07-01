@@ -255,5 +255,6 @@ namespace Crow {
 			base.ClearChildren ();
 			stretchedGO = null;
 		}
+		protected override string LogName => "gs";
 	}
 }

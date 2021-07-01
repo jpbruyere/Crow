@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0"?>
-<VerticalStack Fit="true">
-	<TextBox Font="droid, 20" Text="test text box" Width="Stretched"/>
-	<HorizontalStack Margin="5" Fit="true" MouseEnter="{Background=White}" MouseLeave="{Background=Transparent}">
-		<Label Focusable="true" Text="left" Width="80" Height="30" Background="DarkBlue" TextAlignment="Left"/>
-		<Label Focusable="true" Text="centered" Width="80" Height="30" Background="DarkBlue" TextAlignment="Center"/>
-		<Label Focusable="true" Text="right" Width="80" Height="30" Background="DarkBlue" TextAlignment="Right"/>
+<VerticalStack Fit="true" Spacing="0">
+	<TextBox Font="droid, 20" Text="multiline text box" Width="Stretched" Multiline="true"/>
+	<HorizontalStack Background="DarkSlateGrey" Margin="15" Spacing="15" Fit="true" MouseEnter="{Background=Jet}" MouseLeave="{Background=Grey}">
+		<TextBox Focusable="true" Text="left" Width="80" Height="30"  TextAlignment="Left"/>
+		<TextBox Focusable="true" Text="centered" Width="80" Height="30"  TextAlignment="Center"/>
+		<TextBox Focusable="true" Text="right" Width="80" Height="30"  TextAlignment="Right"/>
 	</HorizontalStack>
 </VerticalStack>

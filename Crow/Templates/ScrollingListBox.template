@@ -1,13 +1,12 @@
 <?xml version="1.0"?>
 <Border BorderWidth="1" Background="{./Background}">
 	<HorizontalStack Margin="1">
-		<Scroller Name="ItemsScroller" 
-				Margin="2">
+		<Scroller Name="ItemsScroller" Margin="2">
 			<VerticalStack Height="Fit" MinimumSize="10,10"
 				Name="ItemsContainer" Margin="0" VerticalAlignment="Top"/>
 		</Scroller>
 		<ScrollBar Name="scrollbar1" Value="{²../ItemsScroller.ScrollY}"
-			LargeIncrement="{../ItemsScroller.PageHeight}" SmallIncrement="30" CursorSize="{../ItemsScroller.ChildHeightRatio}"
+			LargeIncrement="{../ItemsScroller.PageHeight}" SmallIncrement="30" CursorRatio="{../ItemsScroller.ChildHeightRatio}"
 			Maximum="{../ItemsScroller.MaxScrollY}" Orientation="Vertical" 
 			Width="12" />
 	</HorizontalStack>

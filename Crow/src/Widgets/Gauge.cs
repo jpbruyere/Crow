@@ -1,7 +1,6 @@
-﻿// Copyright (c) 2013-2020  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
+﻿// Copyright (c) 2013-2021  Jean-Philippe Bruyère <jp_bruyere@hotmail.com>
 //
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-
 
 using System;
 using System.ComponentModel;
@@ -18,6 +17,7 @@ namespace Crow {
 		#region protected fields
 		protected double actualValue, minValue, maxValue;
 		Orientation orientation;
+		bool inverted;
 		#endregion
 
 		#region public properties
@@ -77,6 +77,19 @@ namespace Crow {
 				RegisterForLayouting (LayoutingType.Sizing | LayoutingType.ArrangeChildren);
 			}
 		}
+		/// <summary>
+		/// if true, horizontal gauge will align drawing right, and vertical on bottom.
+		/// </summary>
+		public bool Inverted {
+			get => inverted;
+			set {
+				if (inverted == value)
+					return;
+				inverted = value;
+				NotifyValueChangedAuto (inverted);
+				RegisterForRedraw ();
+			}
+		}
 		#endregion
 
 		protected override void onDraw (Context gr) {
@@ -85,15 +98,20 @@ namespace Crow {
 			base.onDraw (gr);
 
 			Rectangle cb = ClientRectangle;
+			Rectangle r = cb;
 
-			if (orientation == Orientation.Horizontal)
-				cb.Width = (int)(cb.Width / Maximum * Value);
-			else
-				cb.Height = (int)(cb.Height / Maximum * Value);
+			if (orientation == Orientation.Horizontal) {
+				r.Width = (int)(cb.Width / Maximum * Value);
+				if (inverted)
+					r.Left = cb.Right - r.Width;
+			} else {				
+				r.Height = (int)(cb.Height / Maximum * Value);
+				if (inverted)
+					r.Top = cb.Bottom - r.Height;
+			}
 
-
-			Foreground.SetAsSource (IFace, gr, cb);
-			CairoHelpers.CairoRectangle (gr, cb, CornerRadius);
+			Foreground?.SetAsSource (IFace, gr, r);
+			CairoHelpers.CairoRectangle (gr, r, CornerRadius);
 			gr.Fill ();
 
 			DbgLogger.EndEvent (DbgEvtType.GODraw);

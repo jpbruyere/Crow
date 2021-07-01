@@ -490,6 +490,7 @@ namespace Crow.IML {
 
 						if (mi.MemberType == MemberTypes.Event) {
 							foreach (string exp in imlValue.ToString().Split (';')) {
+							//foreach (string exp in CompilerServices.splitOnSemiColumnOutsideAccolades (imlValue.ToString())) {
 								string trimed = exp.Trim();
 
 								if (trimed.StartsWith ("{", StringComparison.Ordinal))
@@ -826,9 +827,10 @@ namespace Crow.IML {
                 System.Reflection.Emit.Label finish = il.DefineLabel ();
                 il.Emit (OpCodes.Br, finish);
                 il.MarkLabel (cancel);
-				#if DEBUG_BINDING
+				//#if DEBUG_BINDING	
+				//TODO: try to print datasource type in the error message			
 				il.EmitWriteLine (string.Format ("Handler method '{0}' for '{1}' NOT FOUND in new dataSource", bindingDef.TargetMember, sourceEvent.Name));
-				#endif
+				//#endif
 				il.MarkLabel (finish);
 				#if DEBUG_BINDING
 				il.EmitWriteLine (string.Format ("Handler method '{0}' for '{1}' FOUND in new dataSource", bindingDef.TargetMember, sourceEvent.Name));

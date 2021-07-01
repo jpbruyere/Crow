@@ -4,7 +4,7 @@
 			<Group>
 				<Gauge Background="DarkGrey" Foreground="RoyalBlue" Height="Stretched"
 						Orientation="{./Orientation}" Minimum="{./Minimum}" Maximum="{./Maximum}" Value="{./Value}"/>
-				<Label Foreground="White" Text="{ProgressMessage}" Width="Stretched" Margin="3" Background="Transparent" Height="Fit"/>
+				<Label Foreground="White" Text="{./Caption}" Width="Stretched" Margin="3" Background="Transparent" Height="Fit"/>
 			</Group>
 		</Template>
 	</ProgressBar>

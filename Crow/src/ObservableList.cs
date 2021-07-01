@@ -6,10 +6,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections;
 
 namespace Crow
 {
-	public class ObservableList<T> : List<T>, IObservableList, IValueChange {
+	public class ObservableList<T> : IList<T>, IObservableList, IValueChange {
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
 		public virtual void NotifyValueChanged (string MemberName, object _value)
@@ -25,8 +26,13 @@ namespace Crow
 		public event EventHandler<ListClearEventArg> ListClear;
 		#endregion
 
-		public ObservableList() : base () {}
-		public ObservableList (IEnumerable<T> collection) : base (collection) { }
+		List<T> items;
+		public ObservableList() {
+			items = new List<T>();
+		}
+		public ObservableList (IEnumerable<T> collection) {
+			items = new List<T> (collection);
+		}
 
 		int selectedIndex = -1;
 
@@ -51,28 +57,47 @@ namespace Crow
 				this [selectedIndex] = value;
 			}
 		}
-		public new void Add (T elem) {
-			base.Add (elem);
+
+		public int Count => items.Count;
+
+		public bool IsReadOnly => false;
+
+		public T this[int index] {
+			get => items[index];
+			set {
+
+				if (items[index] == null) {
+					if (value == null)
+						return;
+				}else if (items[index].Equals (value))
+					return;
+				Replace (items[index], value);
+			}
+		}
+
+		public void Add (T elem) {
+			items.Add (elem);
 			ListAdd.Raise (this, new ListChangedEventArg (this.Count - 1, elem));
 			SelectedIndex = this.Count - 1;
 		}
-		public new void Insert (int index, T elem) {
-			base.Insert (index, elem);
+		public void Insert (int index, T elem) {
+			items.Insert (index, elem);
 			ListAdd.Raise (this, new ListChangedEventArg (index, elem));
 			SelectedIndex = index;
 		}
-		public new void Remove (T elem) {
+		public bool Remove (T elem) {
 			int idx = IndexOf (elem);
 			if (idx < 0)
-				Console.WriteLine ($"ObsList.Remove idx < 0: {new System.Diagnostics.StackTrace()}");
+				return false;
 			else
-				base.RemoveAt (idx);
+				items.RemoveAt (idx);
 			ListRemove.Raise (this, new ListChangedEventArg (idx, elem));
+			return true;
 		}
-		public new void Clear ()
+		public void Clear ()
 		{
 			ListClearEventArg eventArg = new ListClearEventArg (this.Cast<object>());
-			base.Clear ();
+			items.Clear ();
 			ListClear.Raise (this, eventArg);
 		}
 		public void Remove () {
@@ -83,13 +108,13 @@ namespace Crow
 		}
 		public void Insert ()
 		{
-			base.Insert (selectedIndex+1, default(T));
+			items.Insert (selectedIndex+1, default(T));
 			SelectedIndex++;
 			ListAdd.Raise (this, new ListChangedEventArg (selectedIndex, SelectedItem));
 		}
 		public void Replace (T oldValue, T newValue) {
 			int idx = IndexOf (oldValue);
-			base[idx] = newValue;
+			items[idx] = newValue;
 			ListEdit.Raise (this, new ListChangedEventArg (idx, newValue));
 		}
 		public void RaiseEdit () {
@@ -98,9 +123,9 @@ namespace Crow
 			ListEdit.Raise (this, new ListChangedEventArg (selectedIndex, SelectedItem));
 		}
 
-		public new void RemoveAt (int index)
+		public void RemoveAt (int index)
 		{
-			base.RemoveAt (index);
+			items.RemoveAt (index);
 			ListRemove.Raise (this, new ListChangedEventArg (index, null));
 		}
 		public void RaiseEditAt (int index) {
@@ -121,6 +146,17 @@ namespace Crow
 			}
 			return tmp;
 		}
+
+		public int IndexOf(T item) => items.IndexOf (item);
+
+		public bool Contains(T item) => items.Contains (item);
+
+		public void CopyTo(T[] array, int arrayIndex) => items.CopyTo (array, arrayIndex);
+
+
+		public IEnumerator<T> GetEnumerator() => items.GetEnumerator ();
+
+		IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator ();
 	}
 }
 

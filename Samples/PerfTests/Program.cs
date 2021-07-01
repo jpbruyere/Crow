@@ -166,8 +166,8 @@ namespace PerfTests
 			else
 				surf = new Crow.Cairo.ImageSurface (Crow.Cairo.Format.Argb32, ClientRectangle.Width, ClientRectangle.Height);
 
-			loadStyling ();
-			
+			initDictionaries ();
+			loadStyling ();			
 		}
 
 		protected override void Dispose (bool disposing) {

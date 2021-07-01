@@ -34,7 +34,7 @@
 									</Scroller>
 									<ScrollBar Name="scrollbar1" Orientation="Vertical"
 										Value="{²../scroller1.ScrollY}"	Maximum="{../scroller1.MaxScrollY}" 
-										CursorSize="{../scroller1.ChildHeightRatio}"
+										CursorRatio="{../scroller1.ChildHeightRatio}"
 										LargeIncrement="{../scroller1.PageHeight}" SmallIncrement="30"
 										Width="14" />
 								</HorizontalStack>

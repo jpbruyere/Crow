@@ -33,7 +33,7 @@ namespace Crow
         //TODO:change protected to private
 
 		#region private and protected fields
-		protected string _text;
+		protected string _text = "";
         TextAlignment _textAlignment;
 		bool _multiline;		
 		Color selBackground;
@@ -45,7 +45,7 @@ namespace Crow
 		protected CharLocation? currentLoc = null;
 		protected CharLocation? selectionStart = null;  //selection start (row,column)
 
-		protected CharLocation? CurrentLoc {
+		protected virtual CharLocation? CurrentLoc {
 			get => currentLoc;
 			set {
 				if (currentLoc == value)
@@ -55,7 +55,7 @@ namespace Crow
 				NotifyValueChanged ("CurrentColumn", CurrentColumn);
             }
         }
-		public int CurrentLine {
+		public virtual int CurrentLine {
 			get => currentLoc.HasValue ? currentLoc.Value.Line : 0;
 			set {
 				if (currentLoc?.Line == value)
@@ -64,12 +64,12 @@ namespace Crow
 				NotifyValueChanged ("CurrentLine", CurrentLine);
 			}
         }
-		public int CurrentColumn {
+		public virtual int CurrentColumn {
 			get => currentLoc.HasValue ? currentLoc.Value.Column < 0 ? 0 : currentLoc.Value.Column : 0;
 			set {
-				if (currentLoc?.Line == value)
+				if (CurrentColumn == value)
 					return;
-				currentLoc = new CharLocation (currentLoc.Value.Line, value, currentLoc.Value.VisualCharXPosition);
+				currentLoc = new CharLocation (currentLoc.Value.Line, value);
 				NotifyValueChanged ("CurrentColumn", CurrentColumn);
 			}
 		}
@@ -302,9 +302,16 @@ namespace Crow
 				lines.Update (_text);
 		}
 		/// <summary>
-		/// Current Selected text span.
+		/// Current Selected text span. May be used to set current position, or current selection.
 		/// </summary>
 		public TextSpan Selection {
+			set {
+				if (value.IsEmpty)
+					selectionStart = null;
+				else
+					selectionStart = lines.GetLocation (value.Start);
+				CurrentLoc = lines.GetLocation (value.End);
+			}
 			get {
 				if (CurrentLoc == null)
 					return default;
@@ -486,11 +493,7 @@ namespace Crow
 				(int)Math.Min (Math.Max (0, Math.Floor (mouseLocalPos.Y / (fe.Ascent + fe.Descent))), lines.Count - 1) : 0;
 			hoverLoc = new CharLocation (hoverLine, -1, mouseLocalPos.X);
 			using (Context gr = new Context (IFace.surf)) {
-				gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-				gr.SetFontSize (Font.Size);
-				gr.FontOptions = Interface.FontRenderingOptions;
-				gr.Antialias = Interface.Antialias;
-
+				setFontForContext (gr);
 				updateLocation (gr, ClientRectangle.Width, ref hoverLoc);
 			}
 		}
@@ -503,15 +506,12 @@ namespace Crow
 			return cursor;
 		}
 		public virtual bool DrawCursor (Context ctx, out Rectangle rect) {
-			if (CurrentLoc == null || !SelectionIsEmpty) {
+			if (CurrentLoc == null) {
 				rect = default;
 				return false;
 			}
 			if (!CurrentLoc.Value.HasVisualX) {
-				ctx.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-				ctx.SetFontSize (Font.Size);
-				ctx.FontOptions = Interface.FontRenderingOptions;
-				ctx.Antialias = Interface.Antialias;
+				setFontForContext (ctx);
 				lock (linesMutex) {					
 					if (currentLoc?.Column < 0) {
 						updateLocation (ctx, ClientRectangle.Width, ref currentLoc);
@@ -627,13 +627,7 @@ namespace Crow
 
 			if (!textMeasureIsUpToDate) {
 				using (Context gr = new Context (IFace.surf)) {
-					//Cairo.FontFace cf = gr.GetContextFontFace ();
-
-					gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-					gr.SetFontSize (Font.Size);
-					gr.FontOptions = Interface.FontRenderingOptions;
-					gr.Antialias = Interface.Antialias;
-
+					setFontForContext (gr);
 					measureTextBounds (gr);
 				}
 			}
@@ -645,10 +639,7 @@ namespace Crow
 		{
 			base.onDraw (gr);
 
-			gr.SelectFontFace (Font.Name, Font.Slant, Font.Wheight);
-			gr.SetFontSize (Font.Size);
-			gr.FontOptions = Interface.FontRenderingOptions;
-			gr.Antialias = Interface.Antialias;
+			setFontForContext (gr);
 			
 			if (!textMeasureIsUpToDate) {
 				lock (linesMutex)

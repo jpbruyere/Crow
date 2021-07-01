@@ -9,7 +9,8 @@ namespace Crow {
 	/// <summary>
 	/// Base class for Command and CommandGroup.
 	/// </summary>
-	public abstract class CommandBase : IValueChange {
+	public abstract class CommandBase : IValueChange
+	{
 		#region IValueChange implementation
 		public event EventHandler<ValueChangeEventArgs> ValueChanged;
 		public virtual void NotifyValueChanged(string MemberName, object _value)

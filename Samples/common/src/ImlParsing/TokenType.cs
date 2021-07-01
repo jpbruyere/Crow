@@ -24,17 +24,17 @@ namespace Crow
 		Punctuation				= 0x0400,
 		PI_Start				= 0x0401,// '<?'
 		PI_End					= 0x0402,// '?>'
-		Operator 				= 0x0800,
-		EqualSign 				= 0x0801,
-		AttributeValue			= 0x2000,
-		AttributeValueOpen		= 0x2001,
-		AttributeValueClose		= 0x2002,
-		Keyword 				= 0x1000,
 		ElementOpen 			= 0x0403,// '<'
 		EndElementOpen			= 0x0404,// '</'
 		EmptyElementClosing		= 0x0405,// '/>'
 		ClosingSign				= 0x0406,// '>'
 		DTDObjectOpen			= 0x04A0,// '<!'
+		Operator 				= 0x0800,
+		EqualSign 				= 0x0801,
+		Keyword 				= 0x1000,
+		AttributeValue			= 0x2000,
+		AttributeValueOpen		= 0x2001,
+		AttributeValueClose		= 0x2002,
 		Content,
 	}
 }

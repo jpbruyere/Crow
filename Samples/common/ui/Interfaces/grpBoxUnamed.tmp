@@ -1,0 +1,1 @@
+﻿<Container Background="{./Background}" Name="Content" Margin="0" MinimumSize="70,10"/>

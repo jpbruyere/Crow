@@ -209,25 +209,20 @@ namespace Crow
 			DbgLogger.StartEvent(DbgEvtType.GOUpdateCache, this);
 
 			Rectangle rb = Slot + Parent.ClientRectangle.Position;
-			Context gr = new Context (bmp);
-
 			if (!Clipping.IsEmpty) {
-				for (int i = 0; i < Clipping.NumRectangles; i++)
-					gr.Rectangle(Clipping.GetRectangle(i));
-				gr.ClipPreserve();
-				gr.Operator = Operator.Clear;
-				gr.Fill();
-				gr.Operator = Operator.Over;
+				using (Context gr = new Context (bmp)) {
+					for (int i = 0; i < Clipping.NumRectangles; i++)
+						gr.Rectangle(Clipping.GetRectangle(i));
+					gr.ClipPreserve();
+					gr.Operator = Operator.Clear;
+					gr.Fill();
+					gr.Operator = Operator.Over;
 
-				onDraw (gr);
+					onDraw (gr);
+				}
 			}
-				
-			gr.Dispose ();
+			base.UpdateCache (ctx);
 
-			ctx.SetSource (bmp, rb.X, rb.Y);
-			ctx.Paint ();
-			DbgLogger.AddEvent (DbgEvtType.GOResetClip, this);
-			Clipping.Reset ();
 			DbgLogger.EndEvent(DbgEvtType.GOUpdateCache);
 		}
 		#endregion
@@ -249,6 +244,23 @@ namespace Crow
 				child.Dispose ();
 			base.Dispose (disposing);
 		}
+#if DEBUG_STATS
+		public override long ChildCount => child == null ? 0 : 1 + child.ChildCount;
+#endif
+
+		/*public override bool IsVisible {
+			get => base.IsVisible;
+			set {
+				if (value == isVisible)
+					return;
+
+				base.IsVisible = value;
+
+				if (isVisible &&  child != null) {
+					child.RegisterForRedraw();
+				}
+			}
+		}*/
 	}
 }
 

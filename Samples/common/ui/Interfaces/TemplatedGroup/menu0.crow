@@ -1,18 +1,10 @@
 ﻿<?xml version="1.0"?>
 <Menu Data="{AllCommands}">
-	<ItemTemplate DataType="Crow.Command">
-		<Button Command="{}">
-			<Template>
-				<Label Text="{./Caption}" Width="Stretched" Height="Stretched" Margin="3"
-								MouseEnter="{Background=${ControlHighlight}}"
-								MouseLeave="{Background=Transparent}"/>
-			</Template>
-		</Button>
-	</ItemTemplate>
+	<ItemTemplate DataType="Crow.Command" Path="Interfaces/menuCommand.itmp"/>
 	<ItemTemplate DataType="Crow.CommandGroup" >
 		<MenuItem Data="{Commands}" Width="Fit" IsEnabled="{CanExecute}">
 			<Template>
-				<Popper PopDirection="Bottom" Caption="{Caption}"
+				<Popper PopDirection="Bottom" Caption="{Caption}" Width="Fit"
 								MouseEnter="{Background=${ControlHighlight}}"
 								MouseLeave="{Background=Transparent}">
 					<Template>
@@ -22,15 +14,7 @@
 					<VerticalStack Name="ItemsContainer" Fit="true" Background="Jet"/>
 				</Popper>
 			</Template>
-			<ItemTemplate DataType="Crow.Command">
-				<Button Command="{}" Width="Stretched">
-					<Template>
-						<Label Text="{./Caption}" Width="Stretched" Height="Stretched" Margin="3"
-
-										MouseEnter="{Background=${ControlHighlight}}"
-										MouseLeave="{Background=Transparent}"/>
-					</Template>
-				</Button>			</ItemTemplate>					
+			<ItemTemplate DataType="Crow.Command" Path="Interfaces/menuCommand.itmp"/>
 			<ItemTemplate DataType="Crow.CommandGroup" >
 				<MenuItem Data="{Commands}" Width="Stretched"  IsEnabled="{CanExecute}">
 					<Template>
@@ -46,15 +30,7 @@
 							</Border>
 						</Popper>
 					</Template>
-					<ItemTemplate DataType="Crow.Command">
-						<Button Command="{}" Width="Stretched">
-							<Template>
-								<Label Text="{./Caption}" Width="Stretched" Height="Stretched"  Margin="3"
-												MouseEnter="{Background=${ControlHighlight}}"
-												MouseLeave="{Background=Transparent}"/>
-							</Template>
-						</Button>
-					</ItemTemplate>
+					<ItemTemplate DataType="Crow.Command" Path="Interfaces/menuCommand.itmp"/>
 				</MenuItem>
 			</ItemTemplate>
 		</MenuItem>

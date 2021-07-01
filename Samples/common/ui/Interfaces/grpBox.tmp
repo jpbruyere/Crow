@@ -1,0 +1,5 @@
+﻿<Group Background="{./Background}">
+	<Container Name="Content" Margin="0" MinimumSize="70,10"/>
+	<Label Font="sans, 10" Foreground="DarkGrey" Text="{./Caption}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="4"/>
+	<Label Font="sans, 10" Foreground="White" Text="{./Caption}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="2"/>
+</Group>

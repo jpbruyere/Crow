@@ -32,6 +32,7 @@ namespace Crow
 		}
 		ListBox overlay;
 		IList suggestions;
+		volatile bool disableSuggestions;
 		public IList Suggestions {
 			get => suggestions;
 			set {
@@ -67,7 +68,8 @@ namespace Crow
 			//Task.Run(()=>parse());
 
 			parse();
-			if (HasFocus)
+			
+			if (!disableSuggestions && HasFocus)
 				tryGetSuggestions ();
 
 			//Console.WriteLine ($"{pos}: {suggestionTok.AsString (_text)} {suggestionTok}");
@@ -78,7 +80,6 @@ namespace Crow
 			int pos = lines.GetAbsolutePosition (CurrentLoc.Value);	
 			currentToken = source.FindTokenIncludingPosition (pos);
 			currentNode = source.FindNodeIncludingPosition (pos);
-
 			Console.WriteLine ($"Current Token: {currentToken} Current Node: {currentNode}");
 
 			if (currentToken.Type == TokenType.ElementOpen) {
@@ -96,7 +97,10 @@ namespace Crow
 								MemberInfo mi = getCrowTypeMember (
 									eltTag.NameToken.Value.AsString (_text), attribNode.NameToken.Value.AsString (_text));
 								if (mi is PropertyInfo pi) {
-									if (pi.PropertyType.IsEnum)
+									if (pi.Name == "Style")
+										Suggestions = IFace.Styling.Keys
+											.Where (s => s.StartsWith (currentToken.AsString (_text), StringComparison.OrdinalIgnoreCase)).ToList ();
+									else if (pi.PropertyType.IsEnum)
 										Suggestions = Enum.GetNames (pi.PropertyType)
 											.Where (s => s.StartsWith (currentToken.AsString (_text), StringComparison.OrdinalIgnoreCase)).ToList ();
 									else if (pi.PropertyType == typeof(bool))
@@ -113,6 +117,8 @@ namespace Crow
 								MemberInfo mi = getCrowTypeMember (
 									eltTag.NameToken.Value.AsString (_text), attribNode.NameToken.Value.AsString (_text));
 								if (mi is PropertyInfo pi) {
+									if (pi.Name == "Style")
+										Suggestions = IFace.Styling.Keys.ToList ();
 									if (pi.PropertyType.IsEnum)
 										Suggestions = Enum.GetNames (pi.PropertyType).ToList ();
 									else if (pi.PropertyType == typeof(bool))
@@ -125,7 +131,7 @@ namespace Crow
 							}
 						}
 					}
-				}
+				}			
 			} else if (currentToken.Type != TokenType.AttributeValueClose && 
 					currentToken.Type != TokenType.EmptyElementClosing && 
 					currentToken.Type != TokenType.ClosingSign && 
@@ -133,8 +139,8 @@ namespace Crow
 				if (currentToken.Type == TokenType.AttributeName)
 					Suggestions = getAllCrowTypeMembers (eltStartTag.NameToken.Value.AsString (_text))
 						.Where (s => s.Name.StartsWith (currentToken.AsString (_text), StringComparison.OrdinalIgnoreCase)).ToList ();
-				else
-					Suggestions = getAllCrowTypeMembers (eltStartTag.NameToken.Value.AsString (_text)).ToList ();
+				//else if (currentToken.Type == TokenType.ElementName)
+				//	Suggestions = getAllCrowTypeMembers (eltStartTag.NameToken.Value.AsString (_text)).ToList ();
 			} else {
 				/*SyntaxNode curNode = source.FindNodeIncludingPosition (pos);
 				Console.WriteLine ($"Current Node: {curNode}");
@@ -221,38 +227,41 @@ namespace Crow
 		
 		public override void onKeyDown(object sender, KeyEventArgs e)
 		{
-			if (suggestionsActive) {
-				switch (e.Key) {
-				case Key.Escape:
-					hideOverlay ();
-					return;
-				case Key.Left:
-				case Key.Right:
-					hideOverlay ();
-					break;
-				case Key.End:
-				case Key.Home:
-				case Key.Down:
-				case Key.Up:
-				case Key.PageDown:
-				case Key.PageUp:
-					overlay.onKeyDown (this, e);
-					return;
-				case Key.Tab:
-				case Key.Enter:
-				case Key.KeypadEnter:
-					completeToken ();
+			TextSpan selection = Selection;
+
+			if (SelectionIsEmpty) {
+				if (suggestionsActive) {
+					switch (e.Key) {
+					case Key.Escape:
+						hideOverlay ();
+						return;
+					case Key.Left:
+					case Key.Right:
+						hideOverlay ();
+						break;
+					case Key.End:
+					case Key.Home:
+					case Key.Down:
+					case Key.Up:
+					case Key.PageDown:
+					case Key.PageUp:
+						overlay.onKeyDown (this, e);
+						return;
+					case Key.Tab:
+					case Key.Enter:
+					case Key.KeypadEnter:
+						completeToken ();
+						return;
+					}
+				} else if (e.Key == Key.Space && IFace.Ctrl) {
+					tryGetSuggestions ();
 					return;
 				}
-			} else if (e.Key == Key.Space && IFace.Ctrl) {
-				tryGetSuggestions ();
-				return;
-			}
-
-			TextSpan selection = Selection;
-			if (e.Key == Key.Tab && !selection.IsEmpty) {
+			} else if (e.Key == Key.Tab && !selection.IsEmpty) {
 				int lineStart = lines.GetLocation (selection.Start).Line;
 				int lineEnd = lines.GetLocation (selection.End).Line;
+
+				disableSuggestions = true;
 
 				if (IFace.Shift) {
 					for (int l = lineStart; l <= lineEnd; l++) {				
@@ -270,13 +279,15 @@ namespace Crow
 					for (int l = lineStart; l <= lineEnd; l++)		
 						update (new TextChange (lines[l].Start, 0, "\t"));				
 				}
+				
+				selectionStart = new CharLocation (lineStart, 0);
+				CurrentLoc = new CharLocation (lineEnd, lines[lineEnd].Length);
 
-                selectionStart = new CharLocation (lineStart, 0);
-                CurrentLoc = new CharLocation (lineEnd, lines[lineEnd].Length);
+				disableSuggestions = false;
 
 				return;
 			}
-			base.onKeyDown(sender, e);			
+			base.onKeyDown(sender, e);
 		}		
 
 		protected override void drawContent (Context gr) {

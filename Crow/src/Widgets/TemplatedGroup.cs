@@ -135,10 +135,10 @@ namespace Crow {
 		}
 		#endregion
 
-		public virtual List<Widget> Items{
+		public virtual IList<Widget> Items{
 			get {
-				return isPaged ? itemsContainer?.Children.SelectMany(x => (x as Group).Children).ToList()
-				: itemsContainer?.Children;
+				return isPaged ? (IList<Widget>)itemsContainer?.Children.SelectMany(x => (x as Group).Children).ToList()
+				: (IList<Widget>)itemsContainer?.Children;
 			}
 		}
 
@@ -263,7 +263,7 @@ namespace Crow {
 		void Ol_ListEdit (object sender, ListChangedEventArg e) {			
 			if (this.isPaged) {
 				throw new NotImplementedException ();
-			} else
+			} else if (e.Index<itemsContainer.Children.Count)
 				itemsContainer.Children [e.Index].DataSource = e.Element;
 
 		}

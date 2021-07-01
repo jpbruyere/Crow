@@ -48,8 +48,8 @@ namespace Crow
 		#endregion
 
         bool _multiSelect = false;
-		ObservableList<Widget> children = new ObservableList<Widget>();
-        public virtual ObservableList<Widget> Children => children;
+		IList<Widget> children = new ObservableList<Widget>();
+        public virtual IList<Widget> Children => children;
 
 		[DefaultValue(false)]
         public bool MultiSelect
@@ -286,11 +286,10 @@ namespace Crow
 					gr.Stroke ();*/
 					#endif
 				}
-				DbgLogger.AddEvent (DbgEvtType.GOResetClip, this);
-				Clipping.Reset ();
 			}/*else
 				Console.WriteLine("GROUP REPAINT WITH EMPTY CLIPPING");*/
-			paintCache (ctx, Slot + Parent.ClientRectangle.Position);
+			//paintCache (ctx, Slot + Parent.ClientRectangle.Position);
+			base.UpdateCache (ctx);
 			DbgLogger.EndEvent(DbgEvtType.GOUpdateCache);				
 		}
 		#endregion

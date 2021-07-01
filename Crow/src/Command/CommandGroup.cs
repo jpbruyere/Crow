@@ -8,19 +8,21 @@ using System.Collections.Generic;
 namespace Crow {
 	public class CommandGroup : CommandBase, IEnumerable, IList<CommandBase>
 	{
-		public List<CommandBase> Commands = new List<CommandBase>();
+		public IList<CommandBase> Commands;
 
-		public CommandGroup () { }
+		public CommandGroup () {
+			Commands = new ObservableList<CommandBase>();
+		}
 		public CommandGroup (string caption, string icon, params CommandBase[] commands) :
 			base (caption, icon) {
-			Commands.AddRange (commands);
+			Commands = new ObservableList<CommandBase>(commands);
 		}
 		public CommandGroup (string caption, params CommandBase[] commands) :
 			base (caption) {
-			Commands.AddRange (commands);
+			Commands = new ObservableList<CommandBase>(commands);
 		}
 		public CommandGroup (params CommandBase[] commands) {
-			Commands.AddRange (commands);
+			Commands = new ObservableList<CommandBase>(commands);
 		}
 
 		
@@ -46,10 +48,7 @@ namespace Crow {
 
 		public void CopyTo(CommandBase[] array, int arrayIndex) => Commands.CopyTo (array, arrayIndex);		
 
-		public bool Remove(CommandBase item) {			
-			Commands.Remove (item);
-			return true;
-		}
+		public bool Remove(CommandBase item) => Commands.Remove (item);
 
 		IEnumerator<CommandBase> IEnumerable<CommandBase>.GetEnumerator()
 			=> Commands.GetEnumerator();

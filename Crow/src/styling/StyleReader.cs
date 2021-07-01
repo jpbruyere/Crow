@@ -162,17 +162,20 @@ namespace Crow
 						throw new ParserException (line, column, "Unexpected end of statement", resId);
 					ReadChar ();
 					if (targetsClasses.Count == 0) {
-						//style constants override previous values.						
-						StylingConstants[currentProperty] = token.ToString ();
+						//only first style constants kept.
+						if (!StylingConstants.ContainsKey (currentProperty))
+							StylingConstants[currentProperty] = token.ToString ();
 						curState = States.classNames;
 					} else {
 						foreach (string tc in targetsClasses) {
 							if (!Styling.ContainsKey (tc))
 								Styling [tc] = new Style ();
-							Styling[tc][currentProperty] = token.ToString ();
+							if (!Styling[tc].ContainsKey (currentProperty)) {
+								Styling[tc][currentProperty] = token.ToString ();
 #if DESIGN_MODE
-							Styling [tc].Locations[currentProperty] = new FileLocation(resId, line, column - token.Length - 1, token.Length);
+								Styling [tc].Locations[currentProperty] = new FileLocation(resId, line, column - token.Length - 1, token.Length);
 #endif
+							}
 						}
 						curState = States.members;
 					}
