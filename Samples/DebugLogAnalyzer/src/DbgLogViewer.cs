@@ -47,8 +47,8 @@ namespace Crow
 		DbgWidgetRecord curWidget, hoverWidget;
 		DbgEvent curEvent, hoverEvent;
 
-		List<DbgEvent> events = new List<DbgEvent> ();
-		List<DbgWidgetRecord> widgets = new List<DbgWidgetRecord> ();
+		IList<DbgEvent> events = new List<DbgEvent> ();
+		IList<DbgWidgetRecord> widgets = new List<DbgWidgetRecord> ();
 		
 
 		public DbgEvtType Filter {
@@ -61,7 +61,7 @@ namespace Crow
 				RegisterForGraphicUpdate();
 			}
 		}
-		public List<DbgEvent> Events {
+		public IList<DbgEvent> Events {
 			get => events;
 			set {
 				if (events == value)
@@ -91,7 +91,7 @@ namespace Crow
 				RegisterForGraphicUpdate ();
 			}
 		}
-		public List<DbgWidgetRecord> Widgets {
+		public IList<DbgWidgetRecord> Widgets {
 			get => widgets;
 			set {
 				if (widgets == value)
@@ -159,6 +159,7 @@ namespace Crow
 					return;
 				hoverEvent = value;
 				NotifyValueChanged (nameof (HoverEvent), hoverEvent);
+				RegisterForRepaint ();
 			}
 		}
 
@@ -201,8 +202,20 @@ namespace Crow
 				updateMargins ();
 			}
 		}
-
-		void drawEvents (Context ctx, List<DbgEvent> evts)
+		RectangleD getWidgetEvtBounds (DbgEvent evt, ref Rectangle cb, double penY) {
+			double x = xScale * (evt.begin - minTicks - ScrollX);
+			double w = Math.Max (Math.Max (2.0, 2.0 * xScale), (double)(evt.end - evt.begin) * xScale);
+			if (x < 0.0) {
+				w += x;
+				x = 0.0;
+			}
+			x += leftMargin + cb.Left;
+			double rightDiff = x + w - cb.Right;
+			if (rightDiff > 0)
+				w -= rightDiff;
+			return new RectangleD(x, penY, w, fe.Height);
+		}
+		void drawEvents (Context ctx, IList<DbgEvent> evts)
 		{
 			if (evts == null || evts.Count == 0)
 				return;
@@ -224,26 +237,8 @@ namespace Crow
 							penY += (lIdx) * fe.Height; 
 						
 							ctx.SetSource (evt.Color);
-
-							double x = xScale * (evt.begin - minTicks - ScrollX);
-							double w = Math.Max (Math.Max (2.0, 2.0 * xScale), (double)(evt.end - evt.begin) * xScale);
-							if (x < 0.0) {
-								w += x;
-								x = 0.0;
-							}
-							x += leftMargin + cb.Left;
-							double rightDiff = x + w - cb.Right;
-							if (rightDiff > 0)
-								w -= rightDiff;
-							RectangleD r = new RectangleD(x, penY, w, fe.Height);
-							ctx.Rectangle (r);
+							ctx.Rectangle (getWidgetEvtBounds (evt, ref cb, penY));
 							ctx.Fill ();
-							/*if (evt == CurrentEvent) {
-								r.Inflate(2,2);
-								ctx.SetSource(Colors.White);
-								ctx.Rectangle(r);
-								ctx.Stroke();
-							}*/
 						}
 					} else if (evt.type.HasFlag (DbgEvtType.IFace)) {
 						double x = xScale * (evt.begin - minTicks - ScrollX);
@@ -400,6 +395,12 @@ namespace Crow
 				ctx.SetSource (0.1, 0.1, 0.1, 0.4);
 				ctx.Rectangle (ContextCoordinates (r));
 				ctx.Fill ();
+
+				if (hoverEvent is DbgWidgetEvent wevt) {
+					ctx.SetSource (1.0,1.0,1.0,0.7);
+					ctx.SetDash (new double[] {1, 2});
+					ctx.Rectangle ((Rectangle)getWidgetEvtBounds (wevt, ref cb, y).Inflated (1), 1);
+				}
 			}
 
 			if (currentLine >= ScrollY && currentLine < scrollY + visibleLines) {
@@ -439,6 +440,8 @@ namespace Crow
 			ctx.SetSource (Colors.Black);
 			ctx.ShowText (str);
 
+
+
 		}
 		public override void OnLayoutChanges (LayoutingType layoutType)
 		{
@@ -477,7 +480,7 @@ namespace Crow
 				if (lastLine >= 0 && hoverLine >= 0)
 					ScrollY += lastLine - hoverLine;
 				updateMouseLocalPos (e.Position);
-			} else {
+			} else if (widgets != null) {
 				HoverWidget = (hoverLine < 0 || hoverLine >= widgets.Count) ? null : widgets [hoverLine];
 				//HoverEvent = hoverWidget?.Events.FirstOrDefault (ev => ev.begin <= hoverTick && ev.end >= hoverTick);
 				double tickPerPixel = (double)visibleTicks / ClientRectangle.Width;

@@ -1556,6 +1556,13 @@ namespace Crow
 		/// query a repaint, if control is cached, cache will not be updated and simply repainted.
 		/// if not cached, repaint will trigger the onDraw method.
 		/// </summary>
+		/// <remark>
+		/// This could be usefull in widget with complex drawing, that need some markers on top: the main part
+		/// of the drawing could take place in the onDraw method, and the markers (single line, rectangle, ...)
+		/// could be drawn in the Paint method. Such widget must have 'CacheEnabled=true' and to simply update the
+		/// markers without a full redraw, just call 'RegisterForRepaint'.
+		/// 
+		/// </remark>
 		public void RegisterForRepaint () {
 			if (RegisteredLayoutings == LayoutingType.None && !IsDirty)
 				IFace.EnqueueForRepaint (this);

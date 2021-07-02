@@ -210,7 +210,7 @@ namespace Crow.Cairo {
 			}
 		}
 
-		public void SetDash (double [] dashes, double offset)
+		public void SetDash (double [] dashes, double offset = 0)
 		{
 			NativeMethods.cairo_set_dash (handle, dashes, dashes.Length, offset);
 		}

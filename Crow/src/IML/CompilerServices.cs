@@ -387,26 +387,28 @@ namespace Crow.IML
 		internal static MethodInfo SearchExtMethod (Type t, string methodName)
 		{
 			string key = t.Name + "." + methodName;
-			if (knownExtMethods.ContainsKey (key))
-				return knownExtMethods [key];
+			lock (knownExtMethods) {
+				if (knownExtMethods.ContainsKey (key))
+					return knownExtMethods [key];
 
-			//System.Diagnostics.Console.WriteLine ($"*** search extension method: {t};{methodName} => key={key}");
+				//System.Diagnostics.Console.WriteLine ($"*** search extension method: {t};{methodName} => key={key}");
 
-			MethodInfo mi = null;
-			if (!TryGetExtensionMethods (Assembly.GetEntryAssembly (), t, methodName, out mi)) {
-				if (!TryGetExtensionMethods (t.Module.Assembly, t, methodName, out mi)) {
-					foreach (Assembly a in Interface.crowAssemblies) {
-						if (TryGetExtensionMethods (a, t, methodName, out mi))
-							break;
+				MethodInfo mi = null;
+				if (!TryGetExtensionMethods (Assembly.GetEntryAssembly (), t, methodName, out mi)) {
+					if (!TryGetExtensionMethods (t.Module.Assembly, t, methodName, out mi)) {
+						foreach (Assembly a in Interface.crowAssemblies) {
+							if (TryGetExtensionMethods (a, t, methodName, out mi))
+								break;
+						}
+						if (mi == null)
+							TryGetExtensionMethods (Assembly.GetExecutingAssembly (), t, methodName, out mi);//crow Assembly
 					}
-					if (mi == null)
-						TryGetExtensionMethods (Assembly.GetExecutingAssembly (), t, methodName, out mi);//crow Assembly
 				}
-			}
 
-			//add key even if mi is null to prevent searching again and again for propertyless bindings
-			knownExtMethods.Add (key, mi);
-			return mi;
+				//add key even if mi is null to prevent searching again and again for propertyless bindings
+				knownExtMethods.Add (key, mi);
+				return mi;
+			}
 		}
 
 		public static bool TryGetExtensionMethods (Assembly assembly, Type extendedType, string methodName, out MethodInfo foundMI)

@@ -17,6 +17,7 @@ DbgLogViewer {
 	MouseWheelSpeed="3";
 	Font="mono, 8";
 	Background="Onyx";
+	CacheEnabled = "true";	
 }
 DbgEventView {
 	Height="Fit";
@@ -29,4 +30,8 @@ labWidgetRecordList {
 	Margin="0";
 	Width="24";
 	TextAlignment="Right";
+}
+
+DbgEventWidget {
+	CacheEnabled = "true";
 }

@@ -120,15 +120,6 @@ namespace Crow
 				NotifyValueChangedAuto (discardedEvents);
 			}
 		}
-		public bool DebugLogToFile {
-			get => initialized ? !(bool)fiDbg_ConsoleOutput.GetValue (dbgIFace) : false;
-			set {
-				if (!initialized || DebugLogToFile == value)
-					return;				
-				fiDbg_ConsoleOutput.SetValue (dbgIFace, !value);
-				NotifyValueChangedAuto (DebugLogToFile);
-			}
-		}
 		public string DebugLogFilePath {
 			get => Configuration.Global.Get<string> ("DebugLogFilePath");
 			set {

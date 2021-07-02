@@ -13,7 +13,7 @@ namespace Crow
 		static DebugInterface() {
 			DbgLogger.IncludeEvents = DbgEvtType.None;
 			DbgLogger.DiscardEvents = DbgEvtType.None;
-			DbgLogger.ConsoleOutput = true;
+			DbgLogger.ConsoleOutput = false;
 		}
 		public DebugInterface (IntPtr hWin) : base (hWin)
 		{

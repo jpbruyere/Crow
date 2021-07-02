@@ -70,11 +70,10 @@
 				</HorizontalStack>
 				<Label Background="Red" Foreground="White" Margin="5" Width="Stretched" Text="{../../../dbgIfaceWidget.CrowDebuggerErrorMessage}"
 					IsVisible="{../../../dbgIfaceWidget.CrowDebuggerNOK}"/>
-				<HorizontalStack Height="Fit" Width="Stretched" IsEnabled="{../cbFile.IsChecked}" Background="Onyx" Margin="5">
+				<HorizontalStack Height="Fit" Width="Stretched" Background="Onyx" Margin="5">
 					<Label Text="Debug log output file:" Fit="true"/>
 					<TextBox Text="{²../../../../dbgIfaceWidget.DebugLogFilePath}"  />
 				</HorizontalStack>
-				<CheckBox Name="cbFile" Caption="Record to file" IsChecked="{²../../../dbgIfaceWidget.DebugLogToFile}" Background="Onyx"/>
 				<EnumSelector RadioButtonStyle="CheckBox2" Template="#Dbg.EnumSelector.template"
 						Background="Grey"
 						Caption="Recorded Events" EnumValue="{²RecordedEvents}" BitFieldExcludeMask="255" />					
@@ -110,7 +109,7 @@
 					Recording="{²DebugLogRecording}"
 					IMLSource="{Source}"
 					CurrentException="{²CurrentException}"
-					DiscardedEvents="{DiscardedEvents}" RecordedEvents="{RecordedEvents}" DebugLogToFile="{DebugLogToFile}"/>
+					DiscardedEvents="{DiscardedEvents}" RecordedEvents="{RecordedEvents}"/>
 			<Splitter/>
 			<!--<TabView>-->
 				<VerticalStack Name="Editor" Spacing="0">
