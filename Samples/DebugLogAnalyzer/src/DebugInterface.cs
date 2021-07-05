@@ -17,6 +17,7 @@ namespace Crow
 		}
 		public DebugInterface (IntPtr hWin) : base (hWin)
 		{
+			SolidBackground = false;
 			surf = new ImageSurface (Format.Argb32, 100, 100);
 		}
 
